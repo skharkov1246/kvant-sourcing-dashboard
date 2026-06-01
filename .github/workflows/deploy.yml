@@ -34,7 +34,9 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
           set -euo pipefail
-          python main.py
+          # инсайты по правилам: ключ Claude (ANTHROPIC_API_KEY) не задан.
+          # появится ключ — убери --no-llm и задай секрет → будут инсайты от Claude.
+          python main.py --no-llm
           mkdir -p public
           latest="$(ls -t reports/dashboard_*.html | head -1)"
           cp "$latest" public/index.html
