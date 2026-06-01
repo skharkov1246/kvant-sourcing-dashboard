@@ -24,7 +24,57 @@ import metrics as metrics_mod
 import period as period_mod
 from bitrix_client import BitrixClient
 
-RFQ_SELECT = ["id", "assignedById", "stageId", "createdTime", "movedTime", "parentId2", "categoryId"]
+RFQ_SELECT = ["id", "assignedById", "stageId", "createdTime", "movedTime", "parentId2", "categoryId",
+              "title", "companyId", "ufCrm18Supplier", "ufCrm18SupplContact"]
+
+SUPPLIER_CRM_FIELDS = ("ufCrm18Supplier", "ufCrm18SupplContact")
+
+
+def _crm_ref_ids(val):
+    """Значение crm-поля (напр. ['CO_372','C_45']) → (company_ids, contact_ids)."""
+    comps, conts = set(), set()
+    for x in (val if isinstance(val, list) else [val] if val else []):
+        s = str(x).strip()
+        if s.startswith("CO_"):
+            comps.add(s[3:])
+        elif s.startswith("CT_"):
+            conts.add(s[3:])
+        elif s.startswith("C_"):
+            conts.add(s[2:])
+        elif s.isdigit():
+            comps.add(s)
+    return comps, conts
+
+
+def _attach_suppliers(client: BitrixClient, rfqs: list[dict]) -> None:
+    """Проставляет r['_supplier'] — имя поставщика (компания/контакт) по ссылкам RFQ."""
+    comp_ids, cont_ids = set(), set()
+    for r in rfqs:
+        if r.get("companyId"):
+            comp_ids.add(str(r["companyId"]))
+        for f in SUPPLIER_CRM_FIELDS:
+            c, t = _crm_ref_ids(r.get(f))
+            comp_ids |= c
+            cont_ids |= t
+    comp_names = client.companies_by_ids(comp_ids) if comp_ids else {}
+    cont_names = client.contacts_by_ids(cont_ids) if cont_ids else {}
+
+    def name_of(r):
+        c, t = _crm_ref_ids(r.get("ufCrm18Supplier"))
+        for cid in c:
+            if comp_names.get(cid):
+                return comp_names[cid]
+        for tid in t:
+            if cont_names.get(tid):
+                return cont_names[tid]
+        _, t2 = _crm_ref_ids(r.get("ufCrm18SupplContact"))
+        for tid in t2:
+            if cont_names.get(tid):
+                return cont_names[tid]
+        return comp_names.get(str(r.get("companyId") or ""), "—")
+
+    for r in rfqs:
+        r["_supplier"] = name_of(r)
 
 
 def _names_and_since(client: BitrixClient):
@@ -77,6 +127,9 @@ def run(args) -> int:
     print("• Сделки периода (все воронки) для покрытия…")
     period_deals = client.deals_in_period(p.start_iso, p.end_iso)
     print(f"  сделок периода: {len(period_deals)}")
+
+    print("• Поставщики по RFQ (компании/контакты)…")
+    _attach_suppliers(client, rfqs)
 
     print("• Расчёт метрик…")
     m = metrics_mod.build(

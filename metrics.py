@@ -76,6 +76,17 @@ def build(
             if wi is not None:
                 wk[wi] += 1
         tkp = sum(1 for r in items if deal_state(r.get("parentId2")) == "tkp")
+        details = []
+        for r in items:
+            wi = period.week_index(parse_dt(r.get("createdTime", "")))
+            details.append({
+                "subj": (r.get("title") or "—")[:90],
+                "sup": r.get("_supplier", "—"),
+                "st": classify_stage(r.get("stageId", "")),
+                "wk": wi if wi is not None else -1,
+                "dt": (r.get("createdTime") or "")[:10],
+            })
+        by_supplier = [{"sup": s, "n": n} for s, n in Counter(d["sup"] for d in details).most_common()]
         sourcers_a.append({
             "id": uid,
             "n": names.get(uid, f"user#{uid}"),
@@ -91,6 +102,8 @@ def build(
             "avgDays": _round(mean(durs)) if durs else 0,
             "tkp": tkp,
             "tkpP": _pct(tkp, c),
+            "details": details,
+            "bySupplier": by_supplier,
         })
     sourcers_a.sort(key=lambda s: s["c"], reverse=True)
 

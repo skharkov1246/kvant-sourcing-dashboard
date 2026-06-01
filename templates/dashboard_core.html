@@ -122,6 +122,30 @@
   .updbar.is-late .ub-dot{background:var(--warn);box-shadow:0 0 9px rgba(229,99,77,.7)}
   .updbar.is-late .ub-next{color:#f0917f;font-weight:600}
   @keyframes ubpulse{0%{box-shadow:0 0 0 0 rgba(78,201,138,.5)}70%{box-shadow:0 0 0 6px rgba(78,201,138,0)}100%{box-shadow:0 0 0 0 rgba(78,201,138,0)}}
+
+  /* кликабельные строки сорсеров + выезжающая панель «кому/какие» */
+  tr.clickrow,.row.clickrow{cursor:pointer}
+  tr.clickrow:hover td{background:rgba(245,165,36,.06)}
+  .row.clickrow:hover{background:rgba(245,165,36,.05);border-radius:8px}
+  .clickrow .who::after,.clickrow .nm::after{content:" ›";color:var(--a);font-weight:700}
+  .ovl{position:fixed;inset:0;background:rgba(8,11,15,.62);opacity:0;pointer-events:none;transition:opacity .2s;z-index:40}
+  .ovl.on{opacity:1;pointer-events:auto}
+  .drw{position:fixed;top:0;right:0;height:100%;width:min(560px,94vw);background:var(--panel);border-left:1px solid var(--line);box-shadow:-20px 0 50px rgba(0,0,0,.45);transform:translateX(100%);transition:transform .25s cubic-bezier(.2,.7,.2,1);z-index:41;display:flex;flex-direction:column}
+  .drw.on{transform:none}
+  .drw>header{padding:17px 22px;border-bottom:1px solid var(--line);margin:0;display:flex;align-items:flex-start;gap:12px}
+  .drw h3{font-family:'Archivo';font-size:18px;font-weight:800}
+  .drw .sub2{color:var(--mut);font-size:12px;margin-top:4px;font-family:var(--mono)}
+  .drw .x{margin-left:auto;cursor:pointer;color:var(--mut);font-size:24px;line-height:.8;background:none;border:0}
+  .drw .x:hover{color:var(--ink)}
+  .drw .body{padding:14px 22px 28px;overflow:auto}
+  .drw .h{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);margin:16px 0 8px}
+  .suprow{display:flex;justify-content:space-between;font-size:12.5px;padding:6px 0;border-bottom:1px solid rgba(42,50,61,.5)}
+  .suprow b{font-family:var(--mono);color:var(--a2)}
+  .req{padding:9px 0;border-bottom:1px solid rgba(42,50,61,.5)}
+  .req .rt{font-size:12.5px;color:var(--ink);line-height:1.45}
+  .req .rm{font-size:11px;color:var(--dim);font-family:var(--mono);margin-top:4px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .req .rm .sp{color:var(--b2)}
+  .req .pill{font-size:9.5px;padding:1px 6px;border-radius:5px;background:var(--panel2);color:var(--mut)}
 </style>
 </head>
 <body>
@@ -224,6 +248,12 @@
 
 <footer id="footer"></footer>
 
+<div class="ovl" id="ovl"></div>
+<aside class="drw" id="drw" aria-hidden="true">
+  <header><div><h3 id="drwName"></h3><div class="sub2" id="drwSub"></div></div><button class="x" id="drwX" aria-label="Закрыть">×</button></header>
+  <div class="body" id="drwBody"></div>
+</aside>
+
 <script>
 window.__DATA__ = __DATA_JSON__;
 window.__INSIGHTS__ = __INSIGHTS_JSON__;
@@ -257,11 +287,11 @@ document.getElementById('wkchart').innerHTML=weekTot.map(w=>`<div class="wkcol">
 // ---- block A load
 document.getElementById('loadTotal').textContent=A.reduce((s,r)=>s+r.c,0);
 const maxA=Math.max(1,...A.map(r=>r.c));
-document.getElementById('rowsA').innerHTML=A.map((r,i)=>`<div class="row"><div class="rk">${i+1}</div><div><div class="top"><div class="nm">${r.n}${r.since?`<small>с ${r.since}</small>`:''}</div><div class="ct">${r.c}<small>${r.perDay}/дн</small></div></div><div class="track"><div class="fill fillA" data-w="${(r.c/maxA*100).toFixed(1)}" style="width:0%"></div></div></div></div>`).join('');
+document.getElementById('rowsA').innerHTML=A.map((r,i)=>`<div class="row clickrow" data-uid="${r.id}"><div class="rk">${i+1}</div><div><div class="top"><div class="nm">${r.n}${r.since?`<small>с ${r.since}</small>`:''}</div><div class="ct">${r.c}<small>${r.perDay}/дн</small></div></div><div class="track"><div class="fill fillA" data-w="${(r.c/maxA*100).toFixed(1)}" style="width:0%"></div></div></div></div>`).join('');
 
 // ---- spark table
 const spMax=Math.max(1,...A.flatMap(r=>r.wk));
-document.getElementById('tbSpark').innerHTML=A.map(r=>`<tr><td><div class="who" style="font-size:12.5px">${r.n}</div></td><td><div class="spark">${r.wk.map(v=>`<i style="height:${Math.max(1,v/spMax*26)}px" title="${v}"></i>`).join('')}</div></td><td class="num r">${r.c}</td></tr>`).join('');
+document.getElementById('tbSpark').innerHTML=A.map(r=>`<tr class="clickrow" data-uid="${r.id}"><td><div class="who" style="font-size:12.5px">${r.n}</div></td><td><div class="spark">${r.wk.map(v=>`<i style="height:${Math.max(1,v/spMax*26)}px" title="${v}"></i>`).join('')}</div></td><td class="num r">${r.c}</td></tr>`).join('');
 
 // ---- conversion
 document.getElementById('tbConv').innerHTML=A.map(r=>{const b=r.buckets;const p=v=>(v/r.c*100);
@@ -327,6 +357,34 @@ document.getElementById('insCov').innerHTML=INS.coverage||'<span class="dimv">�
 document.getElementById('footer').innerHTML=
  `<b>Методология.</b> Сущность «Запросы поставщикам» (Bitrix24 entityTypeId 166, воронка 24), createdTime в периоде, группировка по «ответственному». Блок A — отдел 172 (Гринёв) и подчинённые; блок B — все прочие. «КП/выбран» = Selected + «КП получено»; «Отказ» = «Отказ в КП» + прочие закрытые; «Молчание» = «Ответ не получен в срок». «Ср. срок» = createdTime→movedTime по закрытым. Цепочка до сделки — через <span class="mono">parentId2</span>; «ТКП выдано+» = стадия сделки в исполнении/выиграна. Источник инсайтов: ${INS._source==='claude'?'Claude (Opus)':'правила'}.<br>`+
  `<b>Данные:</b> live-выгрузка из kvantpro.bitrix24.ru · ${M.period.label}.`;
+
+// ---- дрилл-даун по сорсеру: кому и какие запросы он отправлял
+const STG={new:'Новый',sent:'Отправлен',dialog:'Переписка/цена',selected:'КП/выбран',refused:'Отказ',no_answer:'Молчание',other:'Прочее'};
+const _byId=Object.fromEntries(A.map(s=>[String(s.id),s]));
+const _ovl=document.getElementById('ovl'),_drw=document.getElementById('drw');
+const _esc=s=>String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const _wk=i=>(i>=0&&M.weekly[i])?`${M.weekly[i].w} (${M.weekly[i].d})`:'—';
+function openDrw(uid){
+  const s=_byId[String(uid)];if(!s)return;
+  document.getElementById('drwName').textContent=s.n;
+  document.getElementById('drwSub').textContent=`${s.c} запросов · ${s.perDay}/дн · до ТКП ${s.tkpP}%`;
+  const sup=s.bySupplier||[],det=(s.details||[]).slice().sort((a,b)=>(b.wk-a.wk)||(a.dt<b.dt?1:-1));
+  let h='';
+  if(sup.length){
+    h+=`<div class="h">По поставщикам (${sup.length})</div>`;
+    h+=sup.slice(0,12).map(x=>`<div class="suprow"><span>${_esc(x.sup)}</span><b>${x.n}</b></div>`).join('');
+    if(sup.length>12)h+=`<div class="suprow"><span class="dimv">…ещё ${sup.length-12}</span><b></b></div>`;
+  }
+  h+=`<div class="h">Запросы (${det.length})</div>`;
+  h+=det.map(d=>`<div class="req"><div class="rt">${_esc(d.subj)}</div><div class="rm"><span class="sp">${_esc(d.sup)}</span><span class="pill">${STG[d.st]||d.st}</span><span>${_wk(d.wk)}</span><span>${d.dt||''}</span></div></div>`).join('')||'<div class="dimv">нет данных</div>';
+  document.getElementById('drwBody').innerHTML=h;
+  _ovl.classList.add('on');_drw.classList.add('on');_drw.setAttribute('aria-hidden','false');
+}
+function closeDrw(){_ovl.classList.remove('on');_drw.classList.remove('on');_drw.setAttribute('aria-hidden','true');}
+_ovl.addEventListener('click',closeDrw);
+document.getElementById('drwX').addEventListener('click',closeDrw);
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDrw();});
+document.querySelectorAll('[data-uid]').forEach(el=>el.addEventListener('click',()=>openDrw(el.dataset.uid)));
 
 // ---- animations
 requestAnimationFrame(()=>setTimeout(()=>{

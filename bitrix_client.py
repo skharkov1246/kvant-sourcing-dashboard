@@ -214,6 +214,27 @@ class BitrixClient:
                 out[str(d["ID"])] = d
         return out
 
+    def companies_by_ids(self, ids: Iterable, *, chunk: int = 50) -> dict[str, str]:
+        clean = sorted({int(i) for i in ids if str(i).isdigit()})
+        out: dict[str, str] = {}
+        for i in range(0, len(clean), chunk):
+            part = clean[i : i + chunk]
+            res = self.call("crm.company.list", {"filter": {"@ID": part}, "select": ["ID", "TITLE"], "start": -1}) or []
+            for c in res:
+                out[str(c["ID"])] = c.get("TITLE") or f"company#{c['ID']}"
+        return out
+
+    def contacts_by_ids(self, ids: Iterable, *, chunk: int = 50) -> dict[str, str]:
+        clean = sorted({int(i) for i in ids if str(i).isdigit()})
+        out: dict[str, str] = {}
+        for i in range(0, len(clean), chunk):
+            part = clean[i : i + chunk]
+            res = self.call("crm.contact.list", {"filter": {"@ID": part}, "select": ["ID", "NAME", "LAST_NAME"], "start": -1}) or []
+            for c in res:
+                nm = " ".join(x for x in [c.get("NAME"), c.get("LAST_NAME")] if x).strip()
+                out[str(c["ID"])] = nm or f"contact#{c['ID']}"
+        return out
+
     # ----------------------------------------------------------------- per-deal data
     def get_comments(self, deal_id: int | str) -> list[dict]:
         return self.list_paged(
