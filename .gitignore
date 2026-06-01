@@ -1,0 +1,15 @@
+.venv/
+.env
+__pycache__/
+*.pyc
+reports/
+.cache/
+
+# дашборд-снимки содержат ПДн — генерируются в CI, в репозиторий не кладём
+# (гейт public/_worker.js при этом остаётся в репозитории)
+public/*.html
+
+# крупный дамп Bitrix — в репозитории не нужен
+agent/corpus.json
+
+.DS_Store

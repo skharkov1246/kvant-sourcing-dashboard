@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>__TITLE__</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0e1116;--panel:#161b22;--panel2:#1c232d;--line:#2a323d;
+    --ink:#e8edf2;--mut:#8b97a6;--dim:#5d6878;
+    --a:#f5a524;--a2:#ffcf6b;--b:#3aa6b9;--b2:#6fd0df;
+    --ok:#4ec98a;--ok2:#9ae6bd;--warn:#e5634d;--nr:#c4503e;--ip:#46566a;--new:#33414f;
+    --mono:'IBM Plex Mono',ui-monospace,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  body{padding:34px 30px 60px;max-width:1180px;margin:0 auto;
+    background-image:radial-gradient(1100px 420px at 80% -8%,rgba(245,165,36,.07),transparent 60%),radial-gradient(900px 380px at 6% 0%,rgba(58,166,185,.06),transparent 55%);}
+  .mono{font-family:var(--mono)}
+  header{border-bottom:1px solid var(--line);padding-bottom:20px;margin-bottom:24px}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--a);font-weight:600}
+  h1{font-family:'Archivo';font-weight:800;font-size:30px;line-height:1.08;margin-top:9px;letter-spacing:-.01em}
+  .sub{margin-top:11px;color:var(--mut);font-size:13.5px;display:flex;gap:18px;flex-wrap:wrap}
+  .sub b{color:var(--ink);font-weight:600}
+
+  .kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:11px;margin-bottom:14px}
+  .kpi{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:13px 14px;position:relative;overflow:hidden}
+  .kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--dim)}
+  .kpi.amber::before{background:var(--a)}.kpi.teal::before{background:var(--b)}.kpi.ok::before{background:var(--ok)}.kpi.warn::before{background:var(--warn)}.kpi.ip::before{background:var(--ip)}
+  .kpi .lbl{font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--mut);font-weight:600}
+  .kpi .val{font-family:'Archivo';font-weight:800;font-size:26px;margin-top:6px;line-height:1}
+  .kpi .meta{font-size:10.5px;color:var(--dim);margin-top:5px}
+  .kpi .val.amber{color:var(--a2)}.kpi .val.teal{color:var(--b2)}.kpi .val.ok{color:var(--ok)}.kpi .val.warn{color:var(--warn)}
+
+  .secttl{font-family:'Archivo';font-size:13px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--mut);margin:30px 0 14px;display:flex;align-items:center;gap:12px}
+  .secttl b{color:var(--a2);font-weight:800}
+  .secttl::after{content:"";flex:1;height:1px;background:var(--line)}
+  .grid{display:grid;grid-template-columns:1.6fr 1fr;gap:22px;align-items:start}
+  @media(max-width:880px){.grid{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}}
+  section.card{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:20px 22px;margin-bottom:22px}
+  .card h2{font-family:'Archivo';font-size:16px;font-weight:700;display:flex;align-items:center;gap:10px}
+  .tag{font-family:var(--mono);font-size:10.5px;font-weight:600;padding:3px 8px;border-radius:6px;letter-spacing:.04em}
+  .tag.a{background:rgba(245,165,36,.14);color:var(--a2);border:1px solid rgba(245,165,36,.3)}
+  .tag.b{background:rgba(58,166,185,.14);color:var(--b2);border:1px solid rgba(58,166,185,.3)}
+  .card .note{color:var(--mut);font-size:12.5px;margin-top:5px;line-height:1.5}
+  .subtotal{margin-left:auto;font-family:var(--mono);font-size:13px;color:var(--mut)}.subtotal b{color:var(--ink);font-size:16px}
+
+  .rows{margin-top:16px;display:flex;flex-direction:column;gap:10px}
+  .row{display:grid;grid-template-columns:22px 1fr;gap:11px;align-items:center}
+  .rk{font-family:var(--mono);font-size:12px;color:var(--dim);text-align:right}
+  .top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px}
+  .nm{font-weight:600;font-size:13.5px}.nm small{color:var(--dim);font-weight:500;font-size:11px;margin-left:7px;font-family:var(--mono)}
+  .ct{font-family:'Archivo';font-weight:800;font-size:16px}.ct small{font-family:var(--mono);font-weight:500;font-size:11px;color:var(--mut);margin-left:6px}
+  .track{height:9px;background:var(--panel2);border-radius:6px;overflow:hidden}
+  .fill{height:100%;border-radius:6px}.fillA{background:linear-gradient(90deg,var(--a),var(--a2))}
+
+  table{width:100%;border-collapse:collapse;margin-top:12px;font-size:13px}
+  th{text-align:left;font-family:var(--mono);font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--mut);font-weight:600;padding:0 7px 9px;border-bottom:1px solid var(--line)}
+  th.r,td.r{text-align:right}
+  td{padding:8px 7px;border-bottom:1px solid rgba(42,50,61,.5)}
+  td .who{font-weight:600}td .dep{color:var(--dim);font-size:11px;font-family:var(--mono)}
+  td.num{font-family:var(--mono);font-weight:600}
+  tr:hover td{background:rgba(255,255,255,.02)}
+  .q{color:var(--ok)}.nrc{color:var(--nr)}.dimv{color:var(--dim)}
+
+  .stack{display:flex;height:13px;border-radius:5px;overflow:hidden;background:var(--panel2)}
+  .stack i{height:100%;transition:width .8s cubic-bezier(.2,.7,.2,1)}
+  .snew{background:var(--new)}.ssent{background:var(--b)}.sdlg{background:var(--b2)}.ssel{background:var(--ok)}.sref{background:var(--a)}.snr{background:var(--nr)}.soth{background:#566}
+  .legendrow{display:flex;gap:14px;flex-wrap:wrap;margin-top:14px;font-size:11px;color:var(--mut)}
+  .legendrow span{display:flex;align-items:center;gap:5px}.sw{width:10px;height:10px;border-radius:3px;display:inline-block}
+
+  .spd{font-family:var(--mono);font-weight:600;padding:2px 7px;border-radius:5px;font-size:12px}
+  .spd.f{background:rgba(78,201,138,.15);color:var(--ok2)}
+  .spd.m{background:rgba(245,165,36,.15);color:var(--a2)}
+  .spd.s{background:rgba(196,80,62,.18);color:#f0917f}
+
+  .split{display:flex;flex-direction:column;align-items:center;gap:13px}
+  .legend{width:100%;display:flex;flex-direction:column;gap:8px;margin-top:2px}
+  .leg{display:flex;align-items:center;gap:10px;font-size:12.5px}
+  .dot{width:11px;height:11px;border-radius:3px;flex:none}
+  .leg .v{margin-left:auto;font-family:'Archivo';font-weight:800;font-size:15px}
+  .leg .p{font-family:var(--mono);color:var(--mut);font-size:11.5px;width:40px;text-align:right}
+
+  .insight{background:var(--panel2);border:1px solid var(--line);border-left:3px solid var(--a);border-radius:11px;padding:15px 17px;font-size:13px;line-height:1.55;color:#cdd6e0}
+  .insight h3{font-family:'Archivo';font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--a2);margin-bottom:9px}
+  .insight b{color:#fff}.insight .flag{color:var(--warn);font-weight:600}.insight .good{color:var(--ok);font-weight:600}
+  .insight.bot{border-left-color:var(--warn)}.insight.bot h3{color:#f0917f}
+
+  .wkchart{display:flex;align-items:flex-end;gap:18px;height:180px;margin:20px 8px 6px;padding-bottom:0}
+  .wkcol{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end}
+  .wkbars{display:flex;gap:5px;align-items:flex-end;height:100%;width:100%;justify-content:center}
+  .wkbar{width:26px;border-radius:5px 5px 0 0;position:relative;display:flex;justify-content:center;transition:height .9s cubic-bezier(.2,.7,.2,1)}
+  .wkbar.a{background:linear-gradient(180deg,var(--a2),var(--a))}.wkbar.b{background:linear-gradient(180deg,var(--b2),var(--b))}
+  .wkbar span{position:absolute;top:-17px;font-family:var(--mono);font-size:11px;font-weight:600}
+  .wkbar.a span{color:var(--a2)}.wkbar.b span{color:var(--b2)}
+  .wklbl{font-size:11px;color:var(--mut);text-align:center;font-family:var(--mono)}
+  .wklbl b{display:block;color:var(--ink);font-family:'IBM Plex Sans';font-weight:600;font-size:12px}
+
+  .spark{display:flex;gap:3px;align-items:flex-end;height:26px}
+  .spark i{width:8px;background:var(--a);border-radius:2px 2px 0 0;opacity:.85}
+
+  footer{margin-top:30px;padding-top:16px;border-top:1px solid var(--line);color:var(--dim);font-size:11.5px;line-height:1.7}
+  footer b{color:var(--mut)}
+  .barlist{margin-top:14px;display:flex;flex-direction:column;gap:10px}
+  .blrow .blt{display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px}.blrow .blt b{font-family:var(--mono)}
+  .bltrack{height:8px;background:var(--panel2);border-radius:5px;overflow:hidden}.bltrack i{display:block;height:100%;background:linear-gradient(90deg,var(--b),var(--b2));border-radius:5px}
+
+  /* статус-бар обновления данных */
+  .updbar{display:flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:9px 15px;margin-bottom:18px;font-family:var(--mono);font-size:12.5px;color:var(--mut)}
+  .updbar b{font-weight:600;color:var(--ink)}
+  .updbar .ub-sep{color:var(--dim)}
+  .updbar .ub-dot{width:9px;height:9px;border-radius:50%;flex:none;background:var(--dim)}
+  .updbar.is-ok{border-color:rgba(78,201,138,.35)}
+  .updbar.is-ok .ub-dot{background:var(--ok);animation:ubpulse 2s infinite}
+  .updbar.is-ok .ub-next b{color:var(--ok2)}
+  .updbar.is-warn{border-color:rgba(245,165,36,.42)}
+  .updbar.is-warn .ub-dot{background:var(--a)}.updbar.is-warn .ub-next{color:var(--a2)}
+  .updbar.is-late{border-color:rgba(229,99,77,.55);background:rgba(229,99,77,.09)}
+  .updbar.is-late .ub-dot{background:var(--warn);box-shadow:0 0 9px rgba(229,99,77,.7)}
+  .updbar.is-late .ub-next{color:#f0917f;font-weight:600}
+  @keyframes ubpulse{0%{box-shadow:0 0 0 0 rgba(78,201,138,.5)}70%{box-shadow:0 0 0 6px rgba(78,201,138,0)}100%{box-shadow:0 0 0 0 rgba(78,201,138,0)}}
+</style>
+</head>
+<body>
+<div id="updstatus" class="updbar"><span class="ub-dot"></span><span class="ub-main">Обновление…</span></div>
+<header>
+  <div class="eyebrow">Квант · Отдел поиска поставщиков</div>
+  <h1>Анализ работы сорсеров — нагрузка · конверсия · покрытие сделок</h1>
+  <div class="sub" id="subline"></div>
+</header>
+
+<div class="kpis" id="kpis"></div>
+
+<div class="secttl"><b>1</b> · Нагрузка и недельная динамика</div>
+<div class="grid">
+  <div>
+    <section class="card">
+      <h2>Динамика по неделям <span class="subtotal">A vs B</span></h2>
+      <div class="note">Карточки RFQ по дате создания, по неделям (Пн–Вс; первая неделя — с начала периода). Отдел Гринёва (A) против «вне отдела» (B).</div>
+      <div class="wkchart" id="wkchart"></div>
+      <div class="legendrow"><span><i class="sw" style="background:var(--a)"></i>Отдел Гринёва (A)</span><span><i class="sw" style="background:var(--b)"></i>Вне отдела (B)</span></div>
+    </section>
+    <section class="card">
+      <h2><span class="tag a">БЛОК A</span> Нагрузка по сорсерам <span class="subtotal">итого <b id="loadTotal"></b></span></h2>
+      <div class="rows" id="rowsA"></div>
+    </section>
+  </div>
+  <div>
+    <section class="card">
+      <h2>Темп каждого по неделям</h2>
+      <div class="note">Спарклайны по неделям — кто разгоняется, а кто проседает.</div>
+      <table><thead><tr><th>Сорсер</th><th>недели</th><th class="r">Σ</th></tr></thead><tbody id="tbSpark"></tbody></table>
+    </section>
+    <section class="card">
+      <div class="insight"><h3>Нагрузка</h3><div id="insLoad"></div></div>
+    </section>
+  </div>
+</div>
+
+<div class="secttl"><b>2</b> · Конверсия по стадиям</div>
+<section class="card">
+  <h2><span class="tag a">БЛОК A</span> Структура запросов по стадиям + результат</h2>
+  <div class="note">Цветная полоса — все запросы сорсера по стадиям. Закрытые раскладываются на <span class="q">КП/выбран</span> + <span style="color:var(--a2)">отказ</span> + <span class="nrc">молчание</span>. «Ср. срок» — дней от создания до смены стадии у закрытых.</div>
+  <div class="legendrow">
+    <span><i class="sw snew"></i>Новый</span><span><i class="sw ssent"></i>Отправлен</span><span><i class="sw sdlg"></i>Переписка/цена</span>
+    <span><i class="sw ssel"></i>КП/выбран</span><span><i class="sw sref"></i>Отказ</span><span><i class="sw snr"></i>Молчание</span><span><i class="sw soth"></i>Прочее</span>
+  </div>
+  <table>
+    <thead><tr><th>Сорсер</th><th style="width:200px">Стадии (доля от всех)</th><th class="r">Закрыто</th><th class="r">✓ КП</th><th class="r">↩ Отказ</th><th class="r">✕ Молчание</th><th class="r">Ср. срок</th></tr></thead>
+    <tbody id="tbConv"></tbody>
+    <tfoot id="tfConv"></tfoot>
+  </table>
+  <div class="insight" style="margin-top:16px"><h3>Конверсия и скорость</h3><div id="insConv"></div></div>
+</section>
+
+<div class="secttl"><b>3</b> · Цепочка «запрос → сделка»</div>
+<div class="grid">
+  <div>
+    <section class="card">
+      <h2><span class="tag a">БЛОК A</span> Доводимость до ТКП</h2>
+      <div class="note">Доля RFQ сорсера, чья связанная сделка (<span class="mono">parentId2</span>) достигла «ТКП выдано» или дальше.</div>
+      <div class="barlist" id="tkpList"></div>
+    </section>
+  </div>
+  <div>
+    <section class="card">
+      <h2>Исход связанных сделок</h2>
+      <div class="split"><svg width="180" height="180" viewBox="0 0 42 42" id="donutChain"></svg><div class="legend" id="legChain"></div></div>
+    </section>
+    <section class="card">
+      <h2>Какие воронки кормит сорсинг</h2>
+      <div class="barlist" id="catList"></div>
+    </section>
+  </div>
+</div>
+
+<div class="secttl"><b>4</b> · Покрытие сделок сорсингом</div>
+<div class="kpis" id="kpisCov" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px"></div>
+<div class="grid">
+  <div>
+    <section class="card">
+      <h2>Сколько поставщиков запрашивают на сделку</h2>
+      <div class="note">Сделки периода, у которых есть запросы. Слева — единичный запрос (один поставщик), справа — широкий обзвон.</div>
+      <div class="wkchart" id="histchart" style="height:150px"></div>
+      <div class="legendrow"><span><i class="sw" style="background:var(--b)"></i>число сделок</span></div>
+    </section>
+  </div>
+  <div>
+    <section class="card">
+      <h2>Покрытие</h2>
+      <div class="split"><svg width="170" height="170" viewBox="0 0 42 42" id="donutCov"></svg><div class="legend" id="legCov"></div></div>
+    </section>
+    <section class="card"><div class="insight"><h3>Покрытие и глубина</h3><div id="insCov"></div></div></section>
+  </div>
+</div>
+<section class="card">
+  <h2>Покрытие по воронкам</h2>
+  <div class="note">Сделки периода. «Ср. постав.» — среднее число запрошенных поставщиков на сделку, где сорсинг есть.</div>
+  <table><thead><tr><th>Воронка</th><th class="r">Сделок</th><th class="r">С запросом</th><th class="r">Покрытие</th><th class="r">Запросов</th><th class="r">Ср. постав.</th></tr></thead><tbody id="tbCov"></tbody></table>
+</section>
+
+<footer id="footer"></footer>
+
+<script>
+window.__DATA__ = __DATA_JSON__;
+window.__INSIGHTS__ = __INSIGHTS_JSON__;
+const M = window.__DATA__, INS = window.__INSIGHTS__;
+const cs = getComputedStyle(document.documentElement);
+const k = M.kpi, A = M.sourcersA, cov = M.coverage;
+const NS = "http://www.w3.org/2000/svg";
+
+// ---- subline + KPIs
+document.getElementById('subline').innerHTML =
+  `<span>Период: <b>${M.period.label}</b></span>`+
+  `<span>Источник: <b>Bitrix24 · СП «Запросы поставщикам» (166)</b></span>`+
+  `<span>База: <b>${k.total}</b> RFQ · ${cov.deals} сделок периода</span>`;
+
+const pctOf=(v,w)=>w?Math.round(v/w*100):0;
+const kpis=[
+ ['','Запросов за период',k.total,k.respCount+' ответственных',''],
+ ['amber','Отдел Гринёва',k.deptA,pctOf(k.deptA,k.total)+'% · блок A','amber'],
+ ['teal','Вне отдела',k.outside,pctOf(k.outside,k.total)+'% · блок B','teal'],
+ ['ip','Ещё в работе',k.inWorkPct+'%',k.openCount+' открыто',''],
+ ['ok','КП / выбран*',k.kpPctOfClosedA+'%','из '+k.closedCountA+' закрытых (A)','ok'],
+ ['amber','Дошло до ТКП',k.tkpPct+'%','сделка ТКП выдано+','amber'],
+];
+document.getElementById('kpis').innerHTML=kpis.map(x=>`<div class="kpi ${x[0]}"><div class="lbl">${x[1]}</div><div class="val ${x[4]}">${x[2]}</div><div class="meta">${x[3]}</div></div>`).join('');
+
+// ---- weekly chart
+const weekTot=M.weekly;
+const wkMax=Math.max(1,...weekTot.flatMap(w=>[w.A,w.B]));
+document.getElementById('wkchart').innerHTML=weekTot.map(w=>`<div class="wkcol"><div class="wkbars"><div class="wkbar a" data-h="${w.A/wkMax*100}"><span>${w.A}</span></div><div class="wkbar b" data-h="${w.B/wkMax*100}"><span>${w.B}</span></div></div><div class="wklbl"><b>${w.w}</b>${w.d}</div></div>`).join('');
+
+// ---- block A load
+document.getElementById('loadTotal').textContent=A.reduce((s,r)=>s+r.c,0);
+const maxA=Math.max(1,...A.map(r=>r.c));
+document.getElementById('rowsA').innerHTML=A.map((r,i)=>`<div class="row"><div class="rk">${i+1}</div><div><div class="top"><div class="nm">${r.n}${r.since?`<small>с ${r.since}</small>`:''}</div><div class="ct">${r.c}<small>${r.perDay}/дн</small></div></div><div class="track"><div class="fill fillA" data-w="${(r.c/maxA*100).toFixed(1)}" style="width:0%"></div></div></div></div>`).join('');
+
+// ---- spark table
+const spMax=Math.max(1,...A.flatMap(r=>r.wk));
+document.getElementById('tbSpark').innerHTML=A.map(r=>`<tr><td><div class="who" style="font-size:12.5px">${r.n}</div></td><td><div class="spark">${r.wk.map(v=>`<i style="height:${Math.max(1,v/spMax*26)}px" title="${v}"></i>`).join('')}</div></td><td class="num r">${r.c}</td></tr>`).join('');
+
+// ---- conversion
+document.getElementById('tbConv').innerHTML=A.map(r=>{const b=r.buckets;const p=v=>(v/r.c*100);
+ const stack=`<div class="stack"><i class="snew" style="width:${p(b.new)}%"></i><i class="ssent" style="width:${p(b.sent)}%"></i><i class="sdlg" style="width:${p(b.dialog)}%"></i><i class="ssel" style="width:${p(b.selected)}%"></i><i class="sref" style="width:${p(b.refused)}%"></i><i class="snr" style="width:${p(b.no_answer)}%"></i><i class="soth" style="width:${p(b.other)}%"></i></div>`;
+ const sp=r.avgDays<2?'f':(r.avgDays<6?'m':'s');
+ const pc=v=>r.closed?` <small class="dimv">${Math.round(v/r.closed*100)}%</small>`:'';
+ const cell=(v,clz)=> v>0?`<span class="${clz}">${v}</span>${pc(v)}`:`<span class="dimv">0</span>`;
+ const out=b.sent+b.dialog+b.selected+b.refused+b.no_answer+b.other;
+ return `<tr><td><div class="who">${r.n}</div><div class="dep">${r.c} запр. · вышло из «Новый» ${out}</div></td><td>${stack}</td><td class="num r">${r.closed}<small class="dimv"> / ${r.c}</small></td><td class="num r">${cell(r.kp,'q')}</td><td class="num r">${cell(r.refusedCol,'')}</td><td class="num r">${cell(r.noAnswer,'nrc')}</td><td class="r"><span class="spd ${sp}">${r.avgDays}</span></td></tr>`;}).join('');
+const tot=A.reduce((t,r)=>({c:t.c+r.c,closed:t.closed+r.closed,kp:t.kp+r.kp,ref:t.ref+r.refusedCol,nr:t.nr+r.noAnswer}),{c:0,closed:0,kp:0,ref:0,nr:0});
+document.getElementById('tfConv').innerHTML=`<tr style="border-top:2px solid var(--line)"><td><b>Отдел, итого</b></td><td></td><td class="r num">${tot.closed} / ${tot.c}</td><td class="r num q">${tot.kp}</td><td class="r num">${tot.ref}</td><td class="r num nrc">${tot.nr}</td><td class="r"></td></tr>`;
+
+// ---- tkp list
+const tkpMax=Math.max(1,...A.map(r=>r.tkpP));
+document.getElementById('tkpList').innerHTML=[...A].sort((a,b)=>b.tkpP-a.tkpP).map(r=>`<div class="blrow"><div class="blt"><span>${r.n} <span class="dimv mono">${r.tkp} из ${r.c}</span></span><b style="color:var(--a2)">${r.tkpP}%</b></div><div class="bltrack"><i style="width:0%;background:linear-gradient(90deg,var(--a),var(--a2))" data-w="${r.tkpP/tkpMax*100}"></i></div></div>`).join('');
+
+// ---- donut helper
+function donut(el,parts,top,bot){let off=0;parts.forEach(p=>{const c=document.createElementNS(NS,'circle');c.setAttribute('cx',21);c.setAttribute('cy',21);c.setAttribute('r',15.915);c.setAttribute('fill','transparent');c.setAttribute('stroke',cs.getPropertyValue(p.col).trim());c.setAttribute('stroke-width',5);c.setAttribute('stroke-dasharray',`${p.pct} ${100-p.pct}`);c.setAttribute('stroke-dashoffset',-off);c.setAttribute('transform','rotate(-90 21 21)');el.appendChild(c);off+=p.pct;});
+ const t1=document.createElementNS(NS,'text');t1.setAttribute('x',21);t1.setAttribute('y',20.4);t1.setAttribute('text-anchor','middle');t1.setAttribute('fill','#e8edf2');t1.setAttribute('font-size','6');t1.setAttribute('font-family','Archivo');t1.setAttribute('font-weight','800');t1.textContent=top;el.appendChild(t1);
+ const t2=document.createElementNS(NS,'text');t2.setAttribute('x',21);t2.setAttribute('y',25);t2.setAttribute('text-anchor','middle');t2.setAttribute('fill','#8b97a6');t2.setAttribute('font-size','2.7');t2.setAttribute('font-family','IBM Plex Mono');t2.textContent=bot;el.appendChild(t2);}
+
+// ---- chain donut + legend
+const ch=M.chain, chTot=Math.max(1,k.total);
+donut(document.getElementById('donutChain'),[
+ {pct:ch.early/chTot*100,col:'--ip'},{pct:ch.tkp/chTot*100,col:'--a'},{pct:ch.lost/chTot*100,col:'--nr'}
+],String(k.total),'RFQ');
+document.getElementById('legChain').innerHTML=
+ `<div class="leg"><span class="dot" style="background:var(--ip)"></span> На ранних стадиях <span class="v">${ch.early}</span><span class="p">${pctOf(ch.early,k.total)}%</span></div>`+
+ `<div class="leg"><span class="dot" style="background:var(--a)"></span> ТКП выдано+ <span class="v" style="color:var(--a2)">${ch.tkp}</span><span class="p">${pctOf(ch.tkp,k.total)}%</span></div>`+
+ `<div class="leg"><span class="dot" style="background:var(--nr)"></span> Сделка проиграна <span class="v" style="color:var(--nr)">${ch.lost}</span><span class="p">${pctOf(ch.lost,k.total)}%</span></div>`;
+
+// ---- categories fed by sourcing
+const cats=M.catList, catMax=Math.max(1,...cats.map(c=>c.v));
+document.getElementById('catList').innerHTML=cats.map(c=>`<div class="blrow"><div class="blt"><span>${c.cat}</span><b>${c.v} · ${c.p}%</b></div><div class="bltrack"><i style="width:0%" data-w="${c.v/catMax*100}"></i></div></div>`).join('');
+
+// ---- coverage KPIs
+document.getElementById('kpisCov').innerHTML=[
+ ['','Сделок периода',cov.deals,'все воронки',''],
+ ['ok','С запросом',cov.withReq,'покрытие '+cov.covPct+'%','ok'],
+ ['warn','Без запроса',cov.withoutReq,(100-cov.covPct)+'% сделок','warn'],
+ ['amber','Ср. поставщиков/сделку',cov.avgSuppliers,'где сорсинг есть','amber'],
+].map(x=>`<div class="kpi ${x[0]}"><div class="lbl">${x[1]}</div><div class="val ${x[4]}">${x[2]}</div><div class="meta">${x[3]}</div></div>`).join('');
+
+// ---- coverage histogram
+const hist=cov.hist, hMax=Math.max(1,...hist.map(x=>x.v));
+document.getElementById('histchart').innerHTML=hist.map(x=>`<div class="wkcol"><div class="wkbars"><div class="wkbar" style="background:linear-gradient(180deg,var(--b2),var(--b))" data-h="${x.v/hMax*100}"><span style="color:var(--b2)">${x.v}</span></div></div><div class="wklbl">${x.l}</div></div>`).join('');
+
+// ---- coverage donut + legend
+donut(document.getElementById('donutCov'),[{pct:cov.covPct,col:'--ok'},{pct:100-cov.covPct,col:'--warn'}],String(cov.deals),'сделок');
+document.getElementById('legCov').innerHTML=
+ `<div class="leg"><span class="dot" style="background:var(--ok)"></span> С запросом <span class="v" style="color:var(--ok)">${cov.withReq}</span><span class="p">${cov.covPct}%</span></div>`+
+ `<div class="leg"><span class="dot" style="background:var(--warn)"></span> Без запроса <span class="v" style="color:var(--warn)">${cov.withoutReq}</span><span class="p">${100-cov.covPct}%</span></div>`;
+
+// ---- coverage by category
+document.getElementById('tbCov').innerHTML=cov.byCat.map(c=>{const cl=c.covPct>=70?'q':(c.covPct>=50?'dimv':'nrc');return `<tr><td><div class="who">${c.cat}</div></td><td class="num r">${c.deals}</td><td class="num r">${c.withReq}</td><td class="num r ${cl}">${c.covPct}%</td><td class="num r dimv">${c.reqs}</td><td class="num r" style="color:var(--a2)">${c.avgSup}</td></tr>`;}).join('');
+
+// ---- insights
+document.getElementById('insLoad').innerHTML=INS.load||'<span class="dimv">—</span>';
+document.getElementById('insConv').innerHTML=INS.conversion||'<span class="dimv">—</span>';
+document.getElementById('insCov').innerHTML=INS.coverage||'<span class="dimv">—</span>';
+
+// ---- footer
+document.getElementById('footer').innerHTML=
+ `<b>Методология.</b> Сущность «Запросы поставщикам» (Bitrix24 entityTypeId 166, воронка 24), createdTime в периоде, группировка по «ответственному». Блок A — отдел 172 (Гринёв) и подчинённые; блок B — все прочие. «КП/выбран» = Selected + «КП получено»; «Отказ» = «Отказ в КП» + прочие закрытые; «Молчание» = «Ответ не получен в срок». «Ср. срок» = createdTime→movedTime по закрытым. Цепочка до сделки — через <span class="mono">parentId2</span>; «ТКП выдано+» = стадия сделки в исполнении/выиграна. Источник инсайтов: ${INS._source==='claude'?'Claude (Opus)':'правила'}.<br>`+
+ `<b>Данные:</b> live-выгрузка из kvantpro.bitrix24.ru · ${M.period.label}.`;
+
+// ---- animations
+requestAnimationFrame(()=>setTimeout(()=>{
+  document.querySelectorAll('.wkbar[data-h]').forEach(e=>e.style.height=e.dataset.h+'%');
+  document.querySelectorAll('.fill[data-w]').forEach((e,i)=>{e.style.transition='width .9s cubic-bezier(.2,.7,.2,1) '+(i*.05)+'s';e.style.width=e.dataset.w+'%';});
+  document.querySelectorAll('.bltrack i[data-w]').forEach((e,i)=>{e.style.transition='width .8s ease '+(i*.04)+'s';e.style.width=e.dataset.w+'%';});
+},80));
+
+// ---- статус обновления данных: «обновлено» + обратный отсчёт до следующего запуска
+(function(){
+  const el=document.getElementById('updstatus'); if(!el) return;
+  const gen=new Date("__GENERATED_AT__"), next=new Date("__NEXT_UPDATE__");
+  const graceMs=2*3600*1000;                 // допустимое опоздание автодеплоя (GitHub-крон бывает с задержкой)
+  const pad=n=>String(n).padStart(2,'0');
+  const fmt=new Intl.DateTimeFormat('ru-RU',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit',timeZone:'Europe/Moscow'});
+  const okNext=!isNaN(next.getTime());
+  const lastTxt=isNaN(gen.getTime())?'—':fmt.format(gen);
+  function render(){
+    const now=new Date();
+    let cls='is-ok', right='';
+    if(okNext && next-now>0){
+      const d=next-now,h=Math.floor(d/3600000),m=Math.floor(d%3600000/60000),s=Math.floor(d%60000/1000);
+      cls='is-ok'; right=`следующее обновление через <b>${pad(h)}:${pad(m)}:${pad(s)}</b>`;
+    } else if(okNext && now-next<=graceMs){
+      cls='is-warn'; right='обновление ожидается…';
+    } else if(okNext){
+      cls='is-late';
+      const lh=Math.floor((now-next)/3600000);
+      right=`⚠ обновление не произошло${lh>=1?` ${lh} ч назад`:''} — данные устарели, проверьте автодеплой`;
+    }
+    el.className='updbar '+cls;
+    el.innerHTML=`<span class="ub-dot"></span>`+
+      `<span class="ub-main">Обновлено: <b>${lastTxt} МСК</b></span>`+
+      (right?`<span class="ub-sep">·</span><span class="ub-next">${right}</span>`:'');
+  }
+  render(); setInterval(render,1000);
+  // однократно подтянуть свежий деплой вскоре после наступления срока обновления
+  if(okNext){
+    const key='upd-reload:'+next.getTime();
+    const delay=(next-new Date())+5*60*1000;
+    if(delay>0 && delay<26*3600*1000){
+      setTimeout(()=>{ if(!sessionStorage.getItem(key)){ sessionStorage.setItem(key,'1'); location.reload(); } }, delay);
+    }
+  }
+})();
+</script>
+</body>
+</html>

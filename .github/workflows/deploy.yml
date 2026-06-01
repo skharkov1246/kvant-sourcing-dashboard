@@ -1,0 +1,63 @@
+name: Daily dashboard refresh
+
+# Раз в сутки тянет свежие данные из Bitrix, пересобирает дашборд с инсайтами
+# и заливает его на Cloudflare Pages (за Basic Auth из public/_worker.js).
+on:
+  schedule:
+    - cron: "0 5 * * *"     # 05:00 UTC = 08:00 МСК каждый день (GitHub считает по UTC)
+  workflow_dispatch: {}      # + кнопка «Run workflow» во вкладке Actions для ручного запуска
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dashboard-deploy    # не запускать два деплоя одновременно
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Установка зависимостей
+        run: pip install -r requirements.txt
+
+      - name: Генерация дашборда (окно 01.05.2026 → сегодня)
+        env:
+          BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          set -euo pipefail
+          python main.py
+          mkdir -p public
+          latest="$(ls -t reports/dashboard_*.html | head -1)"
+          cp "$latest" public/index.html
+          echo "index.html ← $latest ($(wc -c < public/index.html) байт)"
+
+      - name: Деплой на Cloudflare Pages
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          BASIC_AUTH_PASS: ${{ secrets.BASIC_AUTH_PASS }}
+        run: |
+          set -euo pipefail
+          # создать проект, если его ещё нет (иначе тихо пропустить)
+          npx --yes wrangler@latest pages project create kvant-sourcing-f122 \
+            --production-branch=main 2>/dev/null || true
+          # пароль гейта берём из GitHub-секрета и кладём в секрет Pages
+          # (в репозитории пароля нет). Если пуст — деплой не падает, но гейт вернёт 503.
+          if [ -n "${BASIC_AUTH_PASS:-}" ]; then
+            printf '%s' "$BASIC_AUTH_PASS" \
+              | npx --yes wrangler@latest pages secret put BASIC_AUTH_PASS --project-name=kvant-sourcing-f122 \
+              || echo "⚠ не удалось задать секрет в CI — задайте BASIC_AUTH_PASS в Cloudflare Pages → Settings"
+          else
+            echo "⚠ GitHub-секрет BASIC_AUTH_PASS пуст — гейт будет закрыт (503), пока не зададите пароль"
+          fi
+          npx --yes wrangler@latest pages deploy public \
+            --project-name=kvant-sourcing-f122 --branch=main
