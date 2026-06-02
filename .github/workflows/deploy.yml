@@ -61,5 +61,8 @@ jobs:
           else
             echo "⚠ GitHub-секрет BASIC_AUTH_PASS пуст — гейт будет закрыт (503), пока не зададите пароль"
           fi
+          # --commit-message ASCII: иначе wrangler цепляет кириллическое сообщение
+          # git-коммита и Cloudflare отвергает деплой (code 8000111).
           npx --yes wrangler@latest pages deploy public \
-            --project-name=kvant-sourcing-f122 --branch=main
+            --project-name=kvant-sourcing-f122 --branch=main \
+            --commit-dirty=true --commit-message="auto deploy"
