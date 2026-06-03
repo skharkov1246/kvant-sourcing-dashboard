@@ -4,7 +4,10 @@ name: Daily dashboard refresh
 # и заливает его на Cloudflare Pages (за Basic Auth из public/_worker.js).
 on:
   schedule:
-    - cron: "0 5 * * *"     # 05:00 UTC = 08:00 МСК каждый день (GitHub считает по UTC)
+    # GitHub запускает cron по UTC и НЕнадёжно: на «ровный час» задержки/пропуски максимальны.
+    # Поэтому минута смещена, и добавлен запасной заход — если основной GitHub пропустит.
+    - cron: "17 5 * * *"     # 05:17 UTC ≈ 08:17 МСК — основной
+    - cron: "17 7 * * *"     # 07:17 UTC — запасной (пересборка идемпотентна)
   workflow_dispatch: {}      # + кнопка «Run workflow» во вкладке Actions для ручного запуска
 
 permissions:
@@ -18,9 +21,9 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
           cache: pip
