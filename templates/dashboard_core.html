@@ -544,7 +544,7 @@ if (C) {
   $('cmpOwners').innerHTML=(C.byOwner||[]).slice(0,30).map(o=>`<div class="ownrow" data-uid="${o.uid}"><div class="onm who" style="min-width:240px;flex-shrink:0">${_esc(o.name)}</div><div class="obar"><i style="width:${(o.deals/omx*100).toFixed(0)}%"></i></div><div class="ocnt">${o.deals} <span class="dimv">/ ${o.open} в раб.</span></div></div>`).join('')+((C.byOwner||[]).length>30?`<div class="dimv" style="padding:7px 9px">…ещё ${C.byOwner.length-30} сотрудников (см. отраслевые вкладки)</div>`:'');
   const f=C.flow;
   $('cmpFlow').innerHTML=`<div class="flowbox drill" data-flow="created"><div class="n">${f.created}</div><div class="l">создано</div></div><div class="flowbox drill" data-flow="open"><div class="n" style="color:var(--b2)">${f.open}</div><div class="l">в работе</div></div><div class="flowbox drill" data-flow="won"><div class="n" style="color:var(--ok)">${f.won}</div><div class="l">выиграно</div></div><div class="flowbox drill" data-flow="lost"><div class="n" style="color:var(--nr)">${f.lost}</div><div class="l">закрыто-минус</div></div>`;
-  var ordEl=$('cmpOrdersNote'); if(ordEl) ordEl.innerHTML=`<b style="color:var(--ok2)">Заказы (СП-172): ${f.orders}</b> в исполнении — реальные победы и контрактная выручка (детали на вкладках КАМы/Инжиниринг/Продукт).`;
+  var ordEl=$('cmpOrdersNote'); if(ordEl) ordEl.innerHTML=`<b>${f.contracts}</b> контрактов с заказами поставщикам (${f.orders} закупок): продажи <b style="color:var(--ok)">${f.sales}</b> · закупка <b style="color:var(--a)">${f.buy}</b> · маржа <b style="color:var(--ok2)">${f.margin}</b>. Детали — вкладки «Контракты» и КАМы/Инжиниринг/Продукт.`;
   const gmx=Math.max(1,...C.growth.flatMap(x=>[x.comp,x.cont,x.leads]));
   const fmtN=v=>String(v).replace(/\B(?=(\d{3})+(?!\d))/g,' ');
   const gbar=(v,c)=>`<div class="wkbar" style="width:14px;min-height:${v?3:0}px;height:${(v/gmx*100).toFixed(1)}%;background:${c}" title="${v}"></div>`;
@@ -592,7 +592,7 @@ const METH={
   'c.cat':{t:'Структура по воронкам',what:'Распределение сделок по воронкам.',src:'crm.deal.list (CATEGORY_ID) + crm.dealcategory.list (имена).',formula:'Count и доля % по CATEGORY_ID, YTD.',note:'Клик по строке — сделки воронки.'},
   'c.matrix':{t:'Воронка × месяц',what:'Кросс-таблица притока: топ-5 воронок по месяцам.',src:'crm.deal.list (CATEGORY_ID × месяц DATE_CREATE).',formula:'Count сделок в каждой ячейке (месяц × воронка).',note:'Клик по ячейке — сделки пересечения.'},
   'c.owners':{t:'Сделки по исполнителям',what:'Кто завёл сделки 2026.',src:'crm.deal.list (ASSIGNED_BY_ID) + user.get (имена).',formula:'Число сделок и число открытых на ответственного.',note:'Клик — все сделки сотрудника.'},
-  'c.flow':{t:'Поток сделок и рост базы',what:'Воронка исходов + прирост клиентской базы.',src:'crm.deal.list; СП-172 (заказы); crm.company/contact/lead.list.',formula:'создано = все YTD; в работе = STAGE_SEMANTIC_ID ∉ {S,F}; выиграно = число Заказов (СП-172); закрыто-минус = STAGE_SEMANTIC_ID = F. Рост базы = новые компании/контакты/лиды по месяцам.',note:'«Создано» и «в работе» кликабельны.'},
+  'c.flow':{t:'Поток сделок и рост базы',what:'Воронка исходов (когорта «создано в 2026») + прирост клиентской базы.',src:'crm.deal.list; Заказы поставщикам СП-172; crm.company/contact/lead.list.',formula:'создано = все YTD; в работе = STAGE_SEMANTIC_ID ∉ {S,F}; выиграно = статус S; закрыто-минус = статус F. Инвариант: создано = в работе + выиграно + проигрыш. Строка ниже: продажи (Σ сумм сделок-контрактов) · закупка (Σ заказов поставщикам) · маржа.',note:'Все 4 бокса воронки кликабельны.'},
   'c.params':{t:'20 параметров температуры',what:'Сводные индикаторы здоровья воронки (YTD, пол 01.01.2026).',list:[
     '<b>Сделок создано</b> — count crm.deal.list по DATE_CREATE, все воронки.',
     '<b>Среднемесячно</b> — Σ по полным месяцам ÷ число полных месяцев.',
@@ -602,10 +602,10 @@ const METH={
     '<b>В работе (open)</b> — STAGE_SEMANTIC_ID ∉ {S, F}.',
     '<b>Активный пайплайн</b> — Σ OPPORTUNITY открытых, € по курсам Bitrix.',
     '<b>Ср. размер открытой</b> — пайплайн ÷ число открытых.',
-    '<b>Заказы (выигр.)</b> — число записей СП-172 (заказы в исполнении).',
-    '<b>Σ заказов</b> — Σ OPPORTUNITY заказов СП-172, €.',
-    '<b>Закрыто заказов</b> — заказы со стадией …:SUCCESS.',
-    '<b>Ср. чек заказа</b> — Σ заказов ÷ число заказов.',
+    '<b>Контрактов</b> — сделок с ≥1 заказом поставщику (СП-172).',
+    '<b>Выручка (продажи)</b> — Σ сумм сделок-контрактов (€). Продажа = сумма сделки.',
+    '<b>Закупка</b> — Σ OPPORTUNITY заказов поставщикам СП-172 (€). СП-172 = заказы поставщикам, его сумма — закупка, а не выручка.',
+    '<b>Маржа</b> — выручка − закупка (валовая).',
     '<b>Закрыто-минус</b> — STAGE_SEMANTIC_ID = F (по CLOSEDATE).',
     '<b>Просрочены (open)</b> — открытые с CLOSEDATE < сегодня.',
     '<b>Новых компаний</b> — crm.company.list по DATE_CREATE, YTD.',
@@ -614,9 +614,9 @@ const METH={
     '<b>RFQ сорсинг</b> — число записей СП-166, YTD.',
     '<b>Покрытие сорсингом</b> — сделки с ≥1 RFQ ÷ всего сделок.',
     '<b>Исполнителей</b> — уникальных ASSIGNED_BY_ID по сделкам.']},
-  'd.kpi':{t:'KPI направления',what:'Сводка по набору групп вкладки.',src:'crm.deal.list + Заказы СП-172, по ответственным групп.',formula:'Сделок = созданные YTD; Активный пайплайн = Σ OPPORTUNITY открытых (€); Заказы = число записей СП-172; Контрактная выручка = Σ заказов (€); Закрыто = заказы …:SUCCESS.',note:'Клик по карточке — список записей за цифрой.'},
-  'd.groups':{t:'Сделки → заказы → выручка',what:'Главная таблица направления по группам отделов.',src:'crm.deal.list (ASSIGNED_BY_ID ∈ UF_DEPARTMENT группы) + СП-172.',formula:'Заказ привязан к группе через сделку-родителя (parentId2), иначе по assignedById. Колонки: сделок, в работе, пайплайн (Σopen€), заказов, выручка (Σ€), закрыто (:SUCCESS), зак/сд (заказы÷сделки).',note:'Клик по строке группы — её сделки и заказы.'},
-  'd.rev':{t:'Выручка по группам',what:'Ранжирование групп по контрактной выручке.',formula:'Σ заказов группы (€); длина бара — относительно максимума в наборе.',note:'Клик — записи группы.'},
+  'd.kpi':{t:'KPI направления',what:'Сводка по набору групп вкладки.',src:'crm.deal.list (продажи) + Заказы поставщикам СП-172 (закупки), по ответственным групп.',formula:'Сделок = созданные YTD; Пайплайн = Σ открытых продаж (€); Контрактов = сделок с заказами; Выручка = Σ сумм сделок-контрактов (€); Закупка = Σ заказов поставщикам (€); Маржа = выручка − закупка.',note:'СП-172 = заказы поставщикам, его сумма — закупка, а не выручка.'},
+  'd.groups':{t:'Продажи → закупка → маржа',what:'Главная таблица направления по группам отделов.',src:'crm.deal.list (ASSIGNED_BY_ID ∈ UF_DEPARTMENT группы) + Заказы поставщикам СП-172.',formula:'СП-172 = заказы ПОСТАВЩИКАМ (opportunity = закупка). Продажа = сумма родительской сделки. Контракт = сделка с ≥1 заказом. Колонки: сделок (YTD), пайплайн (Σ открытых продаж €), контрактов, продажи (Σ сумм сделок-контрактов €), закупка (Σ заказов €), маржа = продажи − закупка.',note:'Привязка к группе — через владельца сделки-родителя. Клик по строке — сделки и заказы группы.'},
+  'd.rev':{t:'Выручка по группам',what:'Ранжирование групп по продажам (выручке).',formula:'Σ сумм сделок-контрактов группы (€); длина бара — относительно максимума в наборе.',note:'Клик — сделки и заказы группы.'},
   'd.people':{t:'До человека',what:'Те же метрики по каждому сотруднику группы.',src:'группировка по ASSIGNED_BY_ID внутри групп.',formula:'Сделки / пайплайн / заказы / выручка / зак-сд по сотруднику.',note:'Клик по сотруднику — его сделки и заказы.'}
 };
 function _methBody(o){
@@ -666,13 +666,13 @@ function openDir(D,opt,spec){
   deals=deals.slice().sort((a,b)=>b.raw-a.raw);
   orders=orders.slice().sort((a,b)=>b.raw-a.raw);
   document.getElementById('drwName').textContent=title;
-  document.getElementById('drwSub').textContent=`${sub} · ${D.label} · сделок ${deals.length} · заказов ${orders.length}`;
+  document.getElementById('drwSub').textContent=`${sub} · ${D.label} · сделок ${deals.length} · закупок ${orders.length}`;
   const showOwn=kind!=='own';
   const own=x=>showOwn?`<span>${_esc(x.own)}</span>`:'';
   const orow=o=>`<div class="req"><div class="rt">${_esc(o.t)}</div><div class="rm"><span class="pill">${o.closed?'исполнен':'в работе'}</span>${own(o)}<span class="amt">${o.amt}</span></div></div>`;
   const drow=d=>`<div class="req"><div class="rt">${_esc(d.t)}</div><div class="rm"><span class="pill">${d.open?'в работе':'закрыта'}</span>${own(d)}<span class="amt">${d.amt}</span></div></div>`;
   let h='';
-  if(orders.length){const s=orders.reduce((a,o)=>a+o.raw,0);h+=`<div class="h">Заказы (${orders.length}) · Σ ${_fmtE(s)}</div>`+orders.slice(0,300).map(orow).join('');if(orders.length>300)h+=`<div class="dimv" style="padding:6px 0">…ещё ${orders.length-300}</div>`;}
+  if(orders.length){const s=orders.reduce((a,o)=>a+o.raw,0);h+=`<div class="h">Заказы поставщикам (${orders.length}) · закупка Σ ${_fmtE(s)}</div>`+orders.slice(0,300).map(orow).join('');if(orders.length>300)h+=`<div class="dimv" style="padding:6px 0">…ещё ${orders.length-300}</div>`;}
   if(deals.length){const pl=deals.filter(d=>d.open).reduce((a,d)=>a+d.raw,0);h+=`<div class="h">Сделки (${deals.length}) · пайплайн ${_fmtE(pl)}</div>`+deals.slice(0,300).map(drow).join('');if(deals.length>300)h+=`<div class="dimv" style="padding:6px 0">…ещё ${deals.length-300}</div>`;}
   document.getElementById('drwBody').innerHTML=h||'<div class="dimv">нет записей</div>';
   _ovl.classList.add('on');_drw.classList.add('on');_drw.setAttribute('aria-hidden','false');
@@ -681,16 +681,17 @@ function renderDir(D, elId, opt){
   const el=document.getElementById(elId); if(!el) return;
   if(!D){ el.innerHTML='<div class="note" style="padding:20px 0">нет данных</div>'; return; }
   const t=D.totals;
-  const row=r=>`<tr class="drill" data-drill="grp:${_esc(r.group)}"><td><div class="who">${_esc(r.group)}</div></td><td class="num r">${r.deals}</td><td class="num r">${r.open}</td><td class="num r">${r.pipeline}</td><td class="num r" style="color:var(--ok2)">${r.orders}</td><td class="num r" style="color:var(--ok)">${r.revenue}</td><td class="num r dimv">${r.closed}</td><td class="num r">${r.conv}</td></tr>`;
+  const mcol=x=>{const c=x.marginRaw<0?'var(--nr)':'var(--ok)';const p=x.marginPct==null?'':` <small class="dimv">${x.marginPct}%</small>`;return `<span style="color:${c}">${x.margin}</span>${p}`;};
+  const row=r=>`<tr class="drill" data-drill="grp:${_esc(r.group)}"><td><div class="who">${_esc(r.group)}</div></td><td class="num r">${r.deals}</td><td class="num r">${r.pipeline}</td><td class="num r" style="color:var(--ok2)">${r.contracts}</td><td class="num r">${r.sales}</td><td class="num r" style="color:var(--a)">${r.buy}</td><td class="num r">${mcol(r)}</td></tr>`;
   const rmx=Math.max(1,...D.byRevenue.map(x=>x.v));
   let h=`<header><div class="eyebrow">${opt.eyebrow}</div><h1>${opt.title}</h1><div class="sub"><span>Период: <b>${D.label}</b></span><span>Источник: <b>Bitrix24 · сделки + Заказы (СП-172)</b></span><span class="dimv">↳ клик по карточке, группе или человеку — детализация</span></div></header>`;
   h+=`<div class="kpis" style="grid-template-columns:repeat(3,1fr)">${D.kpis.map(p=>`<div class="kpi ${p.clz}${p.drill?' drill':''}"${p.drill?` data-drill="kpi:${p.drill}"`:''}><div class="lbl">${p.lbl}</div><div class="val ${p.clz}">${p.val}</div><div class="meta">${p.meta}</div>${qmark('d.kpi')}</div>`).join('')}</div>`;
-  h+=`<div class="secttl"><b>1</b> · ${opt.sec1}${qmark('d.groups')}</div><section class="card"><h2>Сделки → заказы → выручка</h2><div class="note">По ответственным группы. «Пайплайн» — Σ открытых сделок (€); «Заказы» (СП-172) = выигранные; «Выручка» — Σ заказов (€); «Зак/сд» = заказов на одну сделку 2026 (повторные заказы по сделкам старше 2026 дают >1×). Суммы — к базовой € по курсам Bitrix.</div><table><thead><tr><th>${opt.unit}</th><th class="r">сделок</th><th class="r">в работе</th><th class="r">пайплайн</th><th class="r">заказов</th><th class="r">выручка</th><th class="r">закрыто</th><th class="r">зак/сд</th></tr></thead><tbody>${D.rows.map(row).join('')}</tbody><tfoot><tr style="border-top:2px solid var(--line)"><td><b>Итого</b></td><td class="r num">${t.deals}</td><td class="r num">${t.open}</td><td class="r num">${t.pipeline}</td><td class="r num" style="color:var(--ok2)">${t.orders}</td><td class="r num" style="color:var(--ok)">${t.revenue}</td><td class="r num dimv">${t.closed}</td><td class="r num">${t.conv}</td></tr></tfoot></table></section>`;
+  h+=`<div class="secttl"><b>1</b> · ${opt.sec1}${qmark('d.groups')}</div><section class="card"><h2>Продажи → закупка → маржа</h2><div class="note">«Пайплайн» — Σ открытых сделок (продажа, €). «Контрактов» — сделок с заказами поставщикам. «Продажи» — Σ сумм этих сделок (выручка, €). «Закупка» — Σ заказов поставщикам СП-172 (€). «Маржа» = продажи − закупка. Суммы — к базовой € по курсам Bitrix.</div><table><thead><tr><th>${opt.unit}</th><th class="r">сделок</th><th class="r">пайплайн</th><th class="r">контрактов</th><th class="r">продажи</th><th class="r">закупка</th><th class="r">маржа</th></tr></thead><tbody>${D.rows.map(row).join('')}</tbody><tfoot><tr style="border-top:2px solid var(--line)"><td><b>Итого</b></td><td class="r num">${t.deals}</td><td class="r num">${t.pipeline}</td><td class="r num" style="color:var(--ok2)">${t.contracts}</td><td class="r num">${t.sales}</td><td class="r num" style="color:var(--a)">${t.buy}</td><td class="r num" style="color:var(--ok)">${t.margin} <small class="dimv">${t.marginPct}%</small></td></tr></tfoot></table></section>`;
   h+=`<div class="secttl"><b>2</b> · Выручка по ${opt.sec2}${qmark('d.rev')}</div><section class="card"><div class="barlist">${D.byRevenue.map(x=>`<div class="blrow drill" data-drill="grp:${_esc(x.group)}"><div class="blt"><span>${_esc(x.group)}</span><b>${x.label}</b></div><div class="bltrack"><i style="width:${(x.v/rmx*100).toFixed(0)}%;background:linear-gradient(90deg,var(--ok),var(--ok2))"></i></div></div>`).join('')}</div></section>`;
   if(D.people&&D.people.length){
-    h+=`<div class="secttl"><b>3</b> · До человека${qmark('d.people')}</div><section class="card"><table><thead><tr><th>Сотрудник</th><th>направление</th><th class="r">сделок</th><th class="r">пайплайн</th><th class="r">заказов</th><th class="r">выручка</th><th class="r">зак/сд</th></tr></thead><tbody>`+D.people.map(p=>`<tr class="drill" data-drill="own:${_esc(p.uid)}"><td><div class="who">${_esc(p.name)}</div></td><td class="dep">${_esc(p.grp)}</td><td class="num r">${p.deals}</td><td class="num r">${p.pipeline}</td><td class="num r" style="color:var(--ok2)">${p.orders}</td><td class="num r" style="color:var(--ok)">${p.revenue}</td><td class="num r">${p.conv}</td></tr>`).join('')+`</tbody></table></section>`;
+    h+=`<div class="secttl"><b>3</b> · До человека${qmark('d.people')}</div><section class="card"><table><thead><tr><th>Сотрудник</th><th>направление</th><th class="r">сделок</th><th class="r">контрактов</th><th class="r">продажи</th><th class="r">закупка</th><th class="r">маржа</th></tr></thead><tbody>`+D.people.map(p=>`<tr class="drill" data-drill="own:${_esc(p.uid)}"><td><div class="who">${_esc(p.name)}</div></td><td class="dep">${_esc(p.grp)}</td><td class="num r">${p.deals}</td><td class="num r" style="color:var(--ok2)">${p.contracts}</td><td class="num r">${p.sales}</td><td class="num r" style="color:var(--a)">${p.buy}</td><td class="num r">${mcol(p)}</td></tr>`).join('')+`</tbody></table></section>`;
   }
-  h+=`<footer>${opt.title} · Bitrix24 (сделки + Заказы СП-172) · ${D.label}. Заказ = выигранная сделка в исполнении; выручка — Σ заказов к базовой € по курсам Bitrix; привязка заказа к группе — через сделку-родителя.</footer>`;
+  h+=`<footer>${opt.title} · Bitrix24 (сделки + Заказы поставщикам СП-172) · ${D.label}. Продажи — Σ сумм сделок-контрактов; закупка — Σ заказов поставщикам (СП-172); маржа = продажи − закупка. Суммы к базовой € по курсам Bitrix; привязка заказа к группе — через владельца сделки-родителя.</footer>`;
   el.innerHTML=h;
   el.querySelectorAll('[data-drill]').forEach(n=>n.addEventListener('click',ev=>{ if(ev.target.closest('.qq'))return; openDir(D,opt,n.dataset.drill); }));
 }

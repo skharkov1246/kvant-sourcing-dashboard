@@ -214,20 +214,27 @@ def run(args) -> int:
             select=["id", "title", "stageId", "opportunity", "currencyId", "createdTime", "parentId2", "assignedById"])
         # заказы СП-172: исключаем проигранные (…:FAIL) — это не контрактная выручка
         orders_ytd = [o for o in orders_ytd if not str(o.get("stageId", "")).endswith(":FAIL")]
-        # полная карта владельцев сделок: 2026 + родители заказов, созданные ДО 2026
-        # (иначе ~70% заказов атрибутируются по assignedById карточки заказа, а не по владельцу сделки)
+        # курсы → база € (для продаж сделок)
+        _cur = client.call("crm.currency.list", {}) or []
+        _rate = {x.get("CURRENCY"): (float(x.get("AMOUNT") or 1) / float(x.get("AMOUNT_CNT") or 1)) for x in _cur}
+        _eur = lambda o, cu: float(o or 0) * _rate.get(cu, 1.0)
+        # полные карты по сделкам: владелец + сумма продажи (€). 2026 + родители заказов старше 2026.
+        # (иначе ~70% заказов атрибутируются по assignedById карточки заказа, а не по владельцу сделки;
+        #  а продажа = сумма сделки, а НЕ opportunity заказа СП-172, который = закупка у поставщика)
         deal_owner = {str(d["ID"]): str(d.get("ASSIGNED_BY_ID")) for d in deals_ytd}
+        deal_sale = {str(d["ID"]): _eur(d.get("OPPORTUNITY"), d.get("CURRENCY_ID")) for d in deals_ytd}
         parent_ids = {str(o.get("parentId2")) for o in orders_ytd if o.get("parentId2")}
         missing = [pid for pid in parent_ids if pid and pid not in deal_owner]
         if missing:
-            extra = client.deals_by_ids(missing, select=["ID", "ASSIGNED_BY_ID"])
+            extra = client.deals_by_ids(missing, select=["ID", "ASSIGNED_BY_ID", "OPPORTUNITY", "CURRENCY_ID"])
             for did, d in extra.items():
                 deal_owner[str(did)] = str(d.get("ASSIGNED_BY_ID"))
-            print(f"  владельцы родительских сделок заказов: догружено {len(extra)} (из {len(missing)})")
-        company_data = company_mod.compute(client, as_of=p.end, created=deals_ytd, orders=orders_ytd)
-        kam_data = kam_mod.compute_set(client, kam_mod.CLIENT_GROUPS, as_of=p.end, created=deals_ytd, orders=orders_ytd, with_people=True, deal_owner=deal_owner)
-        eng_data = kam_mod.compute_set(client, kam_mod.ENG_GROUPS, as_of=p.end, created=deals_ytd, orders=orders_ytd, with_people=True, deal_owner=deal_owner)
-        prod_data = kam_mod.compute_set(client, kam_mod.PRODUCT_GROUPS, as_of=p.end, created=deals_ytd, orders=orders_ytd, with_people=True, deal_owner=deal_owner)
+                deal_sale[str(did)] = _eur(d.get("OPPORTUNITY"), d.get("CURRENCY_ID"))
+            print(f"  родительские сделки заказов: догружено {len(extra)} (из {len(missing)})")
+        company_data = company_mod.compute(client, as_of=p.end, created=deals_ytd, orders=orders_ytd, deal_sale=deal_sale)
+        kam_data = kam_mod.compute_set(client, kam_mod.CLIENT_GROUPS, as_of=p.end, created=deals_ytd, orders=orders_ytd, with_people=True, deal_owner=deal_owner, deal_sale=deal_sale)
+        eng_data = kam_mod.compute_set(client, kam_mod.ENG_GROUPS, as_of=p.end, created=deals_ytd, orders=orders_ytd, with_people=True, deal_owner=deal_owner, deal_sale=deal_sale)
+        prod_data = kam_mod.compute_set(client, kam_mod.PRODUCT_GROUPS, as_of=p.end, created=deals_ytd, orders=orders_ytd, with_people=True, deal_owner=deal_owner, deal_sale=deal_sale)
     except Exception as e:  # вкладка «Сорсинг» не должна падать из-за доп. вкладок
         print(f"  ⚠ доп-вкладки пропущены: {type(e).__name__}: {e}")
 

@@ -24,7 +24,8 @@ def _money(v: float) -> str:
 
 
 def compute(client: BitrixClient, *, as_of: dt.date | None = None,
-            created: list[dict] | None = None, orders: list[dict] | None = None) -> dict:
+            created: list[dict] | None = None, orders: list[dict] | None = None,
+            deal_sale: dict | None = None) -> dict:
     today = as_of or dt.date.today()
     months = [f"2026-{m:02d}" for m in range(1, today.month + 1)]
     cur_part = today.strftime("%Y-%m")
@@ -72,8 +73,15 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         orders = client.list_items(172, filter={">=createdTime": YEAR_START},
                                    select=["id", "title", "stageId", "opportunity", "currencyId", "createdTime"])
     orders = [o for o in orders if not str(o.get("stageId", "")).endswith(":FAIL")]
-    orders_sum = sum(eur(o.get("opportunity"), o.get("currencyId")) for o in orders)
+    # opportunity заказа СП-172 = ЗАКУПКА (в валюте поставщика), НЕ выручка.
+    buy_sum = sum(eur(o.get("opportunity"), o.get("currencyId")) for o in orders)
     orders_closed = sum(1 for o in orders if str(o.get("stageId", "")).endswith(":SUCCESS"))
+    # выручка (продажи) = Σ сумм сделок-контрактов (уникальных родителей заказов); маржа = продажи − закупка
+    if deal_sale is None:
+        deal_sale = {str(d["ID"]): eur(d.get("OPPORTUNITY"), d.get("CURRENCY_ID")) for d in created}
+    contract_deals = {str(o.get("parentId2")) for o in orders if o.get("parentId2")}
+    sales_sum = sum(deal_sale.get(did, 0.0) for did in contract_deals)
+    margin_sum = sales_sum - buy_sum
 
     # overdue среди открытых (по созданным в 2026); CLOSEDATE с временем → сравниваем с концом дня
     overdue = client.count_deals({"<CLOSEDATE": today.isoformat() + "T23:59:59", "!=STAGE_SEMANTIC_ID": ["S", "F"], ">=DATE_CREATE": YEAR_START})
@@ -110,10 +118,10 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         ("В работе (open)", str(openc), "открытых сделок", ""),
         ("Активный пайплайн", _money(open_sum), "Σ открытых, €", "ok"),
         ("Ср. размер открытой", _money(open_sum / openc if openc else 0), "потенциал/сделку", ""),
-        ("Заказы (выигр.)", str(len(orders)), "сделки в исполнении (СП-172)", "ok"),
-        ("Σ заказов", _money(orders_sum), "контрактная выручка, €", "ok"),
-        ("Закрыто заказов", str(orders_closed), "поставлено и оплачено", "ok"),
-        ("Ср. чек заказа", _money(orders_sum / len(orders) if orders else 0), "€/заказ", ""),
+        ("Контрактов", str(len(contract_deals)), "сделок с заказами поставщикам", "ok"),
+        ("Выручка (продажи)", _money(sales_sum), "Σ сумм сделок-контрактов, €", "ok"),
+        ("Закупка", _money(buy_sum), "Σ заказов поставщикам (СП-172), €", "amber"),
+        ("Маржа", _money(margin_sum), f"{round(margin_sum/sales_sum*100) if sales_sum else 0}% валовая", "ok" if margin_sum >= 0 else "warn"),
         ("Закрыто-минус", str(lost), "проигрыш (из созданных 2026)", "warn"),
         ("Просрочены (open)", str(overdue), "CLOSEDATE прошёл", "warn" if overdue else ""),
         ("Новых компаний", str(sum(comp.values())), "рост базы YTD", ""),
@@ -142,7 +150,9 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         "matrix": {"months": [MLBL[int(m[5:7])] for m in months], "mks": list(months),
                    "rows": [{"cat": name(k), "cid": str(k), "cells": [by_mon_cat[m].get(k, 0) for m in months]} for k in top5]},
         "params": [{"lbl": l, "val": v, "meta": me, "clz": c} for l, v, me, c in params],
-        "flow": {"created": total, "open": openc, "won": won_c, "lost": lost_c, "orders": len(orders)},
+        "flow": {"created": total, "open": openc, "won": won_c, "lost": lost_c,
+                 "contracts": len(contract_deals), "orders": len(orders),
+                 "sales": _money(sales_sum), "buy": _money(buy_sum), "margin": _money(margin_sum)},
         "growth": [{"m": MLBL[int(m[5:7])], "comp": comp.get(m, 0), "cont": cont.get(m, 0), "leads": leads.get(m, 0)} for m in months],
         "deals": deal_details,
         "byOwner": by_owner,
