@@ -91,11 +91,11 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         out = {}
         for m in range(1, today.month + 1):
             lo = f"2026-{m:02d}-01T00:00:00"; hi = f"2026-{m+1:02d}-01T00:00:00" if m < 12 else "2027-01-01T00:00:00"
-            out[f"2026-{m:02d}"] = client.call(method, {"filter": {f">={field}": lo, f"<{field}": hi}, "select": ["ID"], "start": 0})
+            out[f"2026-{m:02d}"] = client.count(method, {f">={field}": lo, f"<{field}": hi})
         return out
-    comp = {k: (v or {}).get("total") or 0 if isinstance(v, dict) else 0 for k, v in monthly("crm.company.list", "DATE_CREATE").items()}
-    cont = {k: (v or {}).get("total") or 0 if isinstance(v, dict) else 0 for k, v in monthly("crm.contact.list", "DATE_CREATE").items()}
-    leads = {k: (v or {}).get("total") or 0 if isinstance(v, dict) else 0 for k, v in monthly("crm.lead.list", "DATE_CREATE").items()}
+    comp = monthly("crm.company.list", "DATE_CREATE")
+    cont = monthly("crm.contact.list", "DATE_CREATE")
+    leads = monthly("crm.lead.list", "DATE_CREATE")
 
     total = len(created)
     complete = [m for m in months if m != cur_part]

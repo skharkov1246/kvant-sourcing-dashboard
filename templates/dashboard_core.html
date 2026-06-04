@@ -98,6 +98,9 @@
   .wkbar.a span{color:var(--a2)}.wkbar.b span{color:var(--b2)}
   .wklbl{font-size:11px;color:var(--mut);text-align:center;font-family:var(--mono)}
   .wklbl b{display:block;color:var(--ink);font-family:'IBM Plex Sans';font-weight:600;font-size:12px}
+  .gnums{display:flex;flex-direction:column;gap:1px;margin-top:4px;font-family:var(--mono);font-size:10px;line-height:1.3}
+  .gnums i{font-style:normal}
+  .legendrow b{font-family:var(--mono);color:var(--ink);margin-left:3px}
 
   .spark{display:flex;gap:3px;align-items:flex-end;height:26px}
   .spark i{width:8px;background:var(--a);border-radius:2px 2px 0 0;opacity:.85}
@@ -528,7 +531,12 @@ if (C) {
   const f=C.flow;
   $('cmpFlow').innerHTML=`<div class="flowbox drill" data-flow="created"><div class="n">${f.created}</div><div class="l">создано</div></div><div class="flowbox drill" data-flow="open"><div class="n" style="color:var(--b2)">${f.open}</div><div class="l">в работе</div></div><div class="flowbox"><div class="n" style="color:var(--ok)">${f.won}</div><div class="l">выиграно (заказы)</div></div><div class="flowbox"><div class="n" style="color:var(--nr)">${f.lost}</div><div class="l">закрыто-минус</div></div>`;
   const gmx=Math.max(1,...C.growth.flatMap(x=>[x.comp,x.cont,x.leads]));
-  $('cmpGrowth').innerHTML=C.growth.map(x=>`<div class="wkcol"><div class="wkbars"><div class="wkbar" style="width:13px;height:${(x.comp/gmx*100).toFixed(0)}%;background:var(--ok)" title="компании ${x.comp}"></div><div class="wkbar" style="width:13px;height:${(x.cont/gmx*100).toFixed(0)}%;background:var(--b)" title="контакты ${x.cont}"></div><div class="wkbar" style="width:13px;height:${(x.leads/gmx*100).toFixed(0)}%;background:var(--a)" title="лиды ${x.leads}"></div></div><div class="wklbl"><b>${x.m}</b></div></div>`).join('');
+  const fmtN=v=>String(v).replace(/\B(?=(\d{3})+(?!\d))/g,' ');
+  const gbar=(v,c)=>`<div class="wkbar" style="width:14px;min-height:${v?3:0}px;height:${(v/gmx*100).toFixed(1)}%;background:${c}" title="${v}"></div>`;
+  $('cmpGrowth').innerHTML=C.growth.map(x=>`<div class="wkcol"><div class="wkbars">${gbar(x.comp,'var(--ok)')}${gbar(x.cont,'var(--b)')}${gbar(x.leads,'var(--a)')}</div><div class="wklbl"><b>${x.m}</b><span class="gnums"><i style="color:var(--ok)">${fmtN(x.comp)}</i><i style="color:var(--b)">${fmtN(x.cont)}</i><i style="color:var(--a)">${fmtN(x.leads)}</i></span></div></div>`).join('');
+  const gt=C.growth.reduce((a,x)=>({comp:a.comp+x.comp,cont:a.cont+x.cont,leads:a.leads+x.leads}),{comp:0,cont:0,leads:0});
+  const gleg=$('cmpGrowth').closest('section').querySelector('.legendrow');
+  if(gleg)gleg.innerHTML=`<span><i class="sw" style="background:var(--ok)"></i>компании <b>${fmtN(gt.comp)}</b></span><span><i class="sw" style="background:var(--b)"></i>контакты <b>${fmtN(gt.cont)}</b></span><span><i class="sw" style="background:var(--a)"></i>лиды <b>${fmtN(gt.leads)}</b></span>`;
   $('cmpFooter').innerHTML='Пульс компании · Bitrix24 (сделки/компании/контакты/лиды/СП-166) · '+C.label+'. Суммы — к базовой € по курсам Bitrix; победы/Σ — по дате закрытия. «Просрочены» = открытые с прошедшим CLOSEDATE (вероятно, дата не ведётся).';
   // ---- drill «Пульса»: клик по графику/ячейке/сотруднику → список сделок
   const monLbl=mk=>{const b=C.byMon.find(x=>x.mk===mk);return b?b.m:mk;};

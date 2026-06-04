@@ -125,12 +125,25 @@ class BitrixClient:
         return out
 
     def count_deals(self, filter: dict | None = None) -> int:
-        data = self._session.post(
-            self.base + "crm.deal.list.json",
-            json={"filter": filter or {}, "select": ["ID"], "start": 0},
-            timeout=self.timeout,
-        ).json()
-        return int(data.get("total") or 0)
+        return self.count("crm.deal.list", filter)
+
+    def count(self, method: str, filter: dict | None = None) -> int:
+        """Общее число записей list-метода: читает поле total из ответа.
+        (call() возвращает только result-массив без total, поэтому считаем отдельным сырым запросом.)"""
+        self._throttle()
+        for attempt in range(4):
+            try:
+                data = self._session.post(
+                    self.base + method + ".json",
+                    json={"filter": filter or {}, "select": ["ID"], "start": 0},
+                    timeout=self.timeout,
+                ).json()
+            except requests.RequestException:
+                time.sleep(0.5 * (attempt + 1)); continue
+            if isinstance(data, dict) and data.get("error") in ("QUERY_LIMIT_EXCEEDED", "OPERATION_TIME_LIMIT"):
+                time.sleep(0.7 * (attempt + 1)); continue
+            return int((data or {}).get("total") or 0)
+        return 0
 
     # ----------------------------------------------------------------- smart-process items
     def list_items(
