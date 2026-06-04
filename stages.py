@@ -83,6 +83,8 @@ def deal_reached_tkp(stage_id: str, semantic_id: str | None, stage_name: str | N
     suf = stage_id.split(":")[-1] if stage_id else ""
     if suf in _TKP_SUFFIX:
         return True
+    if suf == "NEW":  # начальная стадия — не считаем по имени (бывают мисконфиг-имена стадий)
+        return False
     name = (stage_name or "").upper()
     if any(n in name for n in _TKP_NEG):
         return False

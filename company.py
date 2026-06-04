@@ -40,7 +40,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
     unames = client.users()
     catname = lambda k: cats.get(str(k), f"cat#{k}")
     by_mon = Counter(); by_cat = Counter(); by_mon_cat = defaultdict(Counter)
-    openc = 0; open_sum = 0.0; owners = set(); created_ids = set()
+    openc = 0; open_sum = 0.0; won_c = 0; lost_c = 0; owners = set(); created_ids = set()
     deal_details: list[dict] = []
     for d in created:
         created_ids.add(str(d["ID"]))
@@ -55,32 +55,28 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         amt = eur(d.get("OPPORTUNITY"), d.get("CURRENCY_ID"))
         if is_open:
             openc += 1; open_sum += amt
+        elif sem == "S":
+            won_c += 1
+        else:  # sem == "F"
+            lost_c += 1
         deal_details.append({"id": str(d["ID"]), "t": (d.get("TITLE") or f'Сделка #{d["ID"]}')[:90],
                              "raw": round(amt), "amt": _money(amt), "mon": mm, "cid": cid, "c": catname(cid),
                              "o": unames.get(owner, f"user#{owner}") if owner else "—", "uid": owner,
                              "sem": sem or "P", "op": is_open})
+    # воронка считается по ЕДИНОЙ когорте «создано в 2026»: created = open + won_c + lost_c (инвариант)
+    lost = lost_c
 
-    won = client.list_deals_fast(filter={"STAGE_SEMANTIC_ID": "S", ">=CLOSEDATE": YEAR_START},
-        select=["ID", "OPPORTUNITY", "CURRENCY_ID", "DATE_CREATE", "CLOSEDATE"])
-    won_sum = sum(eur(d.get("OPPORTUNITY"), d.get("CURRENCY_ID")) for d in won)
-    cyc = []
-    for d in won:
-        try:
-            a = dt.date.fromisoformat(str(d["DATE_CREATE"])[:10]); b = dt.date.fromisoformat(str(d["CLOSEDATE"])[:10])
-            cyc.append((b - a).days)
-        except Exception:
-            pass
-    lost = client.count_deals({"STAGE_SEMANTIC_ID": "F", ">=CLOSEDATE": YEAR_START})
-
-    # «Заказы» (СП-172) = выигранные сделки в исполнении → реальная контрактная выручка
+    # «Заказы» (СП-172) = выигранные сделки в исполнении → реальная контрактная выручка.
+    # Исключаем проигранные (стадия …:FAIL) — это не контрактная выручка.
     if orders is None:
         orders = client.list_items(172, filter={">=createdTime": YEAR_START},
-                                   select=["id", "stageId", "opportunity", "currencyId", "createdTime"])
+                                   select=["id", "title", "stageId", "opportunity", "currencyId", "createdTime"])
+    orders = [o for o in orders if not str(o.get("stageId", "")).endswith(":FAIL")]
     orders_sum = sum(eur(o.get("opportunity"), o.get("currencyId")) for o in orders)
     orders_closed = sum(1 for o in orders if str(o.get("stageId", "")).endswith(":SUCCESS"))
 
-    # overdue среди открытых (по созданным в 2026)
-    overdue = client.count_deals({"<CLOSEDATE": today.isoformat(), "!=STAGE_SEMANTIC_ID": ["S", "F"], ">=DATE_CREATE": YEAR_START})
+    # overdue среди открытых (по созданным в 2026); CLOSEDATE с временем → сравниваем с концом дня
+    overdue = client.count_deals({"<CLOSEDATE": today.isoformat() + "T23:59:59", "!=STAGE_SEMANTIC_ID": ["S", "F"], ">=DATE_CREATE": YEAR_START})
 
     rfqs = client.list_items(config.SPA_ENTITY_TYPE_ID, filter={"categoryId": config.SPA_CATEGORY_ID, ">=createdTime": YEAR_START},
                              select=["id", "parentId2"])
@@ -118,7 +114,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         ("Σ заказов", _money(orders_sum), "контрактная выручка, €", "ok"),
         ("Закрыто заказов", str(orders_closed), "поставлено и оплачено", "ok"),
         ("Ср. чек заказа", _money(orders_sum / len(orders) if orders else 0), "€/заказ", ""),
-        ("Закрыто-минус", str(lost), "отсев/проигрыш", "warn"),
+        ("Закрыто-минус", str(lost), "проигрыш (из созданных 2026)", "warn"),
         ("Просрочены (open)", str(overdue), "CLOSEDATE прошёл", "warn" if overdue else ""),
         ("Новых компаний", str(sum(comp.values())), "рост базы YTD", ""),
         ("Новых контактов", str(sum(cont.values())), "рост базы YTD", ""),
@@ -146,7 +142,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         "matrix": {"months": [MLBL[int(m[5:7])] for m in months], "mks": list(months),
                    "rows": [{"cat": name(k), "cid": str(k), "cells": [by_mon_cat[m].get(k, 0) for m in months]} for k in top5]},
         "params": [{"lbl": l, "val": v, "meta": me, "clz": c} for l, v, me, c in params],
-        "flow": {"created": total, "open": openc, "won": len(orders), "lost": lost},
+        "flow": {"created": total, "open": openc, "won": won_c, "lost": lost_c, "orders": len(orders)},
         "growth": [{"m": MLBL[int(m[5:7])], "comp": comp.get(m, 0), "cont": cont.get(m, 0), "leads": leads.get(m, 0)} for m in months],
         "deals": deal_details,
         "byOwner": by_owner,

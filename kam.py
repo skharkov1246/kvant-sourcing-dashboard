@@ -45,7 +45,7 @@ def _ratio(orders: int, deals: int) -> str:
 
 def compute_set(client: BitrixClient, groups: dict[str, str], *, as_of: dt.date | None = None,
                 created: list[dict] | None = None, orders: list[dict] | None = None,
-                with_people: bool = False) -> dict:
+                with_people: bool = False, deal_owner: dict | None = None) -> dict:
     today = as_of or dt.date.today()
     curlist = client.call("crm.currency.list", {}) or []
     rate = {x.get("CURRENCY"): (float(x.get("AMOUNT") or 1) / float(x.get("AMOUNT_CNT") or 1)) for x in curlist}
@@ -61,11 +61,15 @@ def compute_set(client: BitrixClient, groups: dict[str, str], *, as_of: dt.date 
 
     if created is None:
         created = client.list_deals_fast(filter={">=DATE_CREATE": YEAR_START},
-            select=["ID", "STAGE_SEMANTIC_ID", "OPPORTUNITY", "CURRENCY_ID", "ASSIGNED_BY_ID"])
+            select=["ID", "TITLE", "STAGE_SEMANTIC_ID", "OPPORTUNITY", "CURRENCY_ID", "ASSIGNED_BY_ID"])
     if orders is None:
         orders = client.list_items(172, filter={">=createdTime": YEAR_START},
-            select=["id", "stageId", "opportunity", "currencyId", "parentId2", "assignedById"])
-    deal_owner = {str(d["ID"]): str(d.get("ASSIGNED_BY_ID")) for d in created}
+            select=["id", "title", "stageId", "opportunity", "currencyId", "parentId2", "assignedById"])
+        orders = [o for o in orders if not str(o.get("stageId", "")).endswith(":FAIL")]
+    # карта владельца сделки (id→uid): из main передаётся полная (вкл. родителей старше 2026),
+    # иначе строим из created (тогда заказы на сделки до 2026 уйдут в fallback на assignedById)
+    if deal_owner is None:
+        deal_owner = {str(d["ID"]): str(d.get("ASSIGNED_BY_ID")) for d in created}
 
     def blank():
         return {"deals": 0, "open": 0, "pipeline": 0.0, "orders": 0, "revenue": 0.0, "closed": 0}
