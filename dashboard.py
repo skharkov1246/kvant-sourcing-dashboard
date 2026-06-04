@@ -29,7 +29,8 @@ def _json_for_script(obj) -> str:
 
 
 def render(metrics: dict, insights: dict, *, title: str = DEFAULT_TITLE, company: dict | None = None,
-           kam: dict | None = None, eng: dict | None = None, prod: dict | None = None) -> str:
+           kam: dict | None = None, eng: dict | None = None, prod: dict | None = None,
+           contracts: dict | None = None) -> str:
     html = TEMPLATE.read_text(encoding="utf-8")
     html = html.replace("__TITLE__", title)
     html = html.replace("__DATA_JSON__", _json_for_script(metrics))
@@ -38,6 +39,7 @@ def render(metrics: dict, insights: dict, *, title: str = DEFAULT_TITLE, company
     html = html.replace("__KAM_JSON__", _json_for_script(kam) if kam else "null")
     html = html.replace("__ENG_JSON__", _json_for_script(eng) if eng else "null")
     html = html.replace("__PRODUCT_JSON__", _json_for_script(prod) if prod else "null")
+    html = html.replace("__CONTRACTS_JSON__", _json_for_script(contracts) if contracts else "null")
     gen, nxt = _update_stamps()
     html = html.replace("__GENERATED_AT__", gen)
     html = html.replace("__NEXT_UPDATE__", nxt)
@@ -46,8 +48,9 @@ def render(metrics: dict, insights: dict, *, title: str = DEFAULT_TITLE, company
 
 def write(metrics: dict, insights: dict, out_path: str | Path, *, title: str = DEFAULT_TITLE,
           company: dict | None = None, kam: dict | None = None,
-          eng: dict | None = None, prod: dict | None = None) -> Path:
+          eng: dict | None = None, prod: dict | None = None, contracts: dict | None = None) -> Path:
     out = Path(out_path)
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(render(metrics, insights, title=title, company=company, kam=kam, eng=eng, prod=prod), encoding="utf-8")
+    out.write_text(render(metrics, insights, title=title, company=company, kam=kam, eng=eng, prod=prod,
+                          contracts=contracts), encoding="utf-8")
     return out

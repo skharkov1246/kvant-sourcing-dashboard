@@ -156,6 +156,18 @@
   .ownrow .obar i{display:block;height:100%;background:linear-gradient(90deg,var(--a),var(--a2))}
   .ownrow .ocnt{font-family:var(--mono);font-size:12px;color:var(--a2);min-width:74px;text-align:right}
   .ownrow .who::after{content:" ›";color:var(--a);font-weight:700}
+  /* вкладка «Контракты» */
+  .ctools{margin:0 0 12px}
+  .search{width:100%;max-width:520px;padding:9px 13px;border-radius:9px;border:1px solid var(--line);background:var(--panel2);color:var(--ink);font-size:13px;font-family:inherit}
+  .search:focus{outline:none;border-color:var(--a)}
+  th.sortable{cursor:pointer;user-select:none;transition:color .12s}
+  th.sortable:hover{color:var(--a2)}
+  th.sortable.on{color:var(--a)}
+  .ctab td{vertical-align:top}
+  .dt{font-family:var(--mono);font-size:12px;white-space:nowrap}
+  .dt small{display:block;font-size:9.5px;letter-spacing:.04em;text-transform:uppercase;margin-top:1px}
+  .dt.fact{color:var(--ok)}.dt.fact small{color:var(--ok2)}
+  .dt.plan{color:var(--mut)}.dt.plan small{color:var(--dim)}
   /* бейдж «как считается» + методика в дровере */
   .qq{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;border:1px solid var(--line);color:var(--mut);font-size:10px;font-family:var(--mono);cursor:pointer;margin-left:8px;vertical-align:middle;transition:.12s;user-select:none;flex-shrink:0}
   .qq:hover{border-color:var(--a);color:var(--a);background:rgba(245,165,36,.08)}
@@ -211,7 +223,7 @@
 </head>
 <body>
 <div id="updstatus" class="updbar"><span class="ub-dot"></span><span class="ub-main">Обновление…</span></div>
-<div class="tabs"><button class="tab act" data-tab="sourcing">Сорсинг</button><button class="tab" data-tab="company">Пульс компании</button><button class="tab" data-tab="kam">КАМы</button><button class="tab" data-tab="eng">Инжиниринг</button><button class="tab" data-tab="prod">Продукт-оунеры</button></div>
+<div class="tabs"><button class="tab act" data-tab="sourcing">Сорсинг</button><button class="tab" data-tab="company">Пульс компании</button><button class="tab" data-tab="kam">КАМы</button><button class="tab" data-tab="eng">Инжиниринг</button><button class="tab" data-tab="prod">Продукт-оунеры</button><button class="tab" data-tab="contracts">Контракты</button></div>
 <div id="tab-sourcing">
 <header>
   <div class="eyebrow">Квант · Отдел поиска поставщиков</div>
@@ -350,6 +362,7 @@
 <div id="tab-kam" hidden></div>
 <div id="tab-eng" hidden></div>
 <div id="tab-prod" hidden></div>
+<div id="tab-contracts" hidden></div>
 
 <div class="ovl" id="ovl"></div>
 <aside class="drw" id="drw" aria-hidden="true">
@@ -364,6 +377,7 @@ window.__COMPANY__ = __COMPANY_JSON__;
 window.__KAM__ = __KAM_JSON__;
 window.__ENG__ = __ENG_JSON__;
 window.__PRODUCT__ = __PRODUCT_JSON__;
+window.__CONTRACTS__ = __CONTRACTS_JSON__;
 const M = window.__DATA__, INS = window.__INSIGHTS__;
 const cs = getComputedStyle(document.documentElement);
 const k = M.kpi, A = M.sourcersA, cov = M.coverage;
@@ -683,10 +697,40 @@ function renderDir(D, elId, opt){
 renderDir(window.__KAM__,'tab-kam',{eyebrow:'Квант · коммерческий департамент',title:'КАМы — клиентские направления',sec1:'Клиентские направления',sec2:'направлениям',unit:'Направление'});
 renderDir(window.__ENG__,'tab-eng',{eyebrow:'Квант · инжиниринг',title:'Инжиниринг — проекты, заказы, выручка',sec1:'Инженерные группы',sec2:'группам',unit:'Группа'});
 renderDir(window.__PRODUCT__,'tab-prod',{eyebrow:'Квант · продуктовые линии',title:'Продукт-оунеры — линейки оборудования',sec1:'Продуктовые линии',sec2:'линиям',unit:'Линия'});
+// ---- вкладка «Контракты»: один список заказов СП-172 с поиском и сортировкой
+(function(){
+  const X=window.__CONTRACTS__, el=document.getElementById('tab-contracts'); if(!el) return;
+  if(!X){ el.innerHTML='<div class="note" style="padding:20px 0">нет данных по контрактам</div>'; return; }
+  let sortKey='saleEur', sortDir=-1, q='';
+  const NUM={saleEur:1,buyEur:1,marginEur:1};
+  const COLS=[['customer','Заказчик','l'],['deal','№ сделки / контракт','l'],['saleEur','Сумма сделки','r'],['buyEur','Закупка','r'],['marginEur','Маржа','r']];
+  const orph=X.orphan&&X.orphan.n?` · ещё ${X.orphan.n} заказов без сделки (закупка ${X.orphan.buy})`:'';
+  el.innerHTML=`<header><div class="eyebrow">Квант · реализация</div><h1>Контракты в реализации</h1><div class="sub"><span>Источник: <b>Bitrix24 · сделки + Заказы поставщикам (СП-172)</b></span><span>Состояние: <b>${X.label}</b></span><span class="dimv">Победные сделки с заказами поставщикам${orph}</span></div></header>`
+    +`<div class="kpis" style="grid-template-columns:repeat(6,1fr)">${X.kpis.map(p=>`<div class="kpi ${p.clz}"><div class="lbl">${p.lbl}</div><div class="val ${p.clz}">${p.val}</div><div class="meta">${p.meta}</div></div>`).join('')}</div>`
+    +`<div class="secttl"><b>·</b> Список контрактов <span id="ctCount" class="dimv" style="font-weight:400"></span></div>`
+    +`<div class="ctools"><input id="ctSearch" class="search" placeholder="Поиск: заказчик · № сделки · контракт · поставщик…"></div>`
+    +`<section class="card"><div class="note">«Сумма сделки» — продажа клиенту (сделка). «Закупка» — Σ заказов поставщикам по сделке (СП-172). «Маржа» = продажа − закупка. Все суммы — к базовой € по курсам Bitrix. Клик по заголовку — сортировка.</div><table class="ctab"><thead id="ctHead"></thead><tbody id="ctBody"></tbody></table></section>`;
+  const head=()=>{document.getElementById('ctHead').innerHTML='<tr>'+COLS.map(c=>`<th class="${c[2]==='r'?'r ':''}sortable${sortKey===c[0]?' on':''}" data-sk="${c[0]}">${c[1]}${sortKey===c[0]?(sortDir<0?' ▾':' ▴'):''}</th>`).join('')+'</tr>';};
+  const mcell=x=>{const cl=x.marginEur<0?'color:var(--nr)':'color:var(--ok)';const pct=x.marginPct==null?'<span class="dimv">—</span>':(x.marginPct+'%');return `<div class="mono" style="${cl}">${x.marginLbl}</div><div class="dep">${pct}</div>`;};
+  function rows(){
+    let r=X.rows;
+    if(q){const s=q.toLowerCase(); r=r.filter(x=>((x.customer||'')+' '+(x.title||'')+' '+x.deal+' '+(x.suppliers||'')).toLowerCase().includes(s));}
+    r=r.slice().sort((a,b)=> NUM[sortKey] ? ((a[sortKey]||0)-(b[sortKey]||0))*sortDir : String(a[sortKey]||'').localeCompare(String(b[sortKey]||''),'ru')*sortDir);
+    document.getElementById('ctCount').textContent=`(${r.length} из ${X.rows.length})`;
+    document.getElementById('ctBody').innerHTML=r.map(x=>`<tr><td><div class="who">${_esc(x.customer)}</div><div class="dep">${_esc(x.title)}</div></td>`
+      +`<td><div class="mono">${x.deal?('#'+x.deal):'—'}</div><div class="dep">${x.done?'<span class="pill p-selected">завершён</span>':'<span class="pill">в реализации</span>'} ${x.norders}×закуп${x.suppliers?(' · '+_esc(x.suppliers)):''}</div></td>`
+      +`<td class="r"><div class="mono" style="color:var(--ink)">${x.saleLbl}</div><div class="dep">${x.saleCur&&x.saleCur!=='EUR'?_esc(x.saleOrig):''}</div></td>`
+      +`<td class="r"><div class="mono" style="color:var(--a)">${x.buyLbl}</div></td>`
+      +`<td class="r">${mcell(x)}</td></tr>`).join('')||'<tr><td colspan="5" class="dimv" style="padding:14px">ничего не найдено</td></tr>';
+  }
+  head(); rows();
+  document.getElementById('ctSearch').addEventListener('input',e=>{q=e.target.value; rows();});
+  document.getElementById('ctHead').addEventListener('click',e=>{const th=e.target.closest('th.sortable'); if(!th)return; const kk=th.dataset.sk; if(sortKey===kk)sortDir=-sortDir; else {sortKey=kk; sortDir=(NUM[kk]?-1:1);} head(); rows();});
+})();
 document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{
   document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('act',x===b));
   const t=b.dataset.tab;
-  ['sourcing','company','kam','eng','prod'].forEach(n=>{const el=document.getElementById('tab-'+n); if(el) el.hidden=(n!==t);});
+  ['sourcing','company','kam','eng','prod','contracts'].forEach(n=>{const el=document.getElementById('tab-'+n); if(el) el.hidden=(n!==t);});
   window.scrollTo(0,0);
 }));
 injectMeth();

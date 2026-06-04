@@ -23,6 +23,7 @@ import config
 import dashboard
 import insights as insights_mod
 import kam as kam_mod
+import contracts as contracts_mod
 import metrics as metrics_mod
 import period as period_mod
 from bitrix_client import BitrixClient
@@ -230,9 +231,17 @@ def run(args) -> int:
     except Exception as e:  # вкладка «Сорсинг» не должна падать из-за доп. вкладок
         print(f"  ⚠ доп-вкладки пропущены: {type(e).__name__}: {e}")
 
+    contracts_data = None
+    try:
+        print("• Контракты в реализации (СП-172, все непроигранные)…")
+        contracts_data = contracts_mod.compute(client, as_of=p.end)
+        print(f"  ✓ контрактов: {len(contracts_data['rows'])}")
+    except Exception as e:
+        print(f"  ⚠ вкладка «Контракты» пропущена: {type(e).__name__}: {e}")
+
     html_path = out_dir / f"dashboard_{slug}.html"
     dashboard.write(m, ins, html_path, title=f"Сорсинг · {p.label}",
-                    company=company_data, kam=kam_data, eng=eng_data, prod=prod_data)
+                    company=company_data, kam=kam_data, eng=eng_data, prod=prod_data, contracts=contracts_data)
     print(f"  ✓ дашборд: {html_path}")
 
     if args.open:
