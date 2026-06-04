@@ -185,6 +185,19 @@
   .req .rm{font-size:11px;color:var(--dim);font-family:var(--mono);margin-top:4px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
   .req .rm .sp{color:var(--b2)}
   .req .pill{font-size:9.5px;padding:1px 6px;border-radius:5px;background:var(--panel2);color:var(--mut)}
+  .req .pill.p-selected{color:var(--ok);background:rgba(46,191,127,.14)}
+  .req .pill.p-refused{color:var(--a);background:rgba(245,165,36,.12)}
+  .req .pill.p-no_answer{color:var(--nr);background:rgba(229,72,77,.12)}
+  .req .pill.p-dialog{color:var(--b2)}.req .pill.p-sent{color:var(--b)}.req .pill.p-new{color:var(--new)}
+  /* легенда-фильтр статусов в дровере сорсера */
+  tr.clickrow .stack{cursor:pointer}
+  .statleg{display:flex;flex-wrap:wrap;gap:6px;margin:2px 0 8px}
+  .stchip{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border:1px solid var(--line);border-radius:999px;font-size:11px;color:var(--mut);cursor:pointer;transition:.12s;user-select:none}
+  .stchip:hover{border-color:var(--a);color:var(--ink)}
+  .stchip.on{background:rgba(245,165,36,.12);border-color:var(--a);color:var(--ink)}
+  .stchip b{font-family:var(--mono);color:var(--ink);margin-left:1px}
+  .stchip .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+  .dot.snew{background:var(--new)}.dot.ssent{background:var(--b)}.dot.sdlg{background:var(--b2)}.dot.ssel{background:var(--ok)}.dot.sref{background:var(--a)}.dot.snr{background:var(--nr)}.dot.soth{background:#566}
   .tabs{display:flex;gap:8px;margin-bottom:18px}
   .tab{font-family:var(--mono);font-size:12px;padding:7px 14px;border-radius:8px;border:1px solid var(--line);color:var(--mut);background:var(--panel);cursor:pointer}
   .tab.act{color:#0e1116;background:var(--a2);border-color:var(--a2);font-weight:700}
@@ -391,7 +404,7 @@ document.getElementById('tbConv').innerHTML=A.map(r=>{const b=r.buckets;const p=
  const pc=v=>r.closed?` <small class="dimv">${Math.round(v/r.closed*100)}%</small>`:'';
  const cell=(v,clz)=> v>0?`<span class="${clz}">${v}</span>${pc(v)}`:`<span class="dimv">0</span>`;
  const out=b.sent+b.dialog+b.selected+b.refused+b.no_answer+b.other;
- return `<tr><td><div class="who">${r.n}</div><div class="dep">${r.c} запр. · вышло из «Новый» ${out}</div></td><td>${stack}</td><td class="num r">${r.closed}<small class="dimv"> / ${r.c}</small></td><td class="num r">${cell(r.kp,'q')}</td><td class="num r">${cell(r.refusedCol,'')}</td><td class="num r">${cell(r.noAnswer,'nrc')}</td><td class="r"><span class="spd ${sp}">${r.avgDays}</span></td></tr>`;}).join('');
+ return `<tr class="clickrow" data-uid="${r.id}"><td><div class="who">${r.n}</div><div class="dep">${r.c} запр. · вышло из «Новый» ${out}</div></td><td>${stack}</td><td class="num r">${r.closed}<small class="dimv"> / ${r.c}</small></td><td class="num r">${cell(r.kp,'q')}</td><td class="num r">${cell(r.refusedCol,'')}</td><td class="num r">${cell(r.noAnswer,'nrc')}</td><td class="r"><span class="spd ${sp}">${r.avgDays}</span></td></tr>`;}).join('');
 const tot=A.reduce((t,r)=>({c:t.c+r.c,closed:t.closed+r.closed,kp:t.kp+r.kp,ref:t.ref+r.refusedCol,nr:t.nr+r.noAnswer}),{c:0,closed:0,kp:0,ref:0,nr:0});
 document.getElementById('tfConv').innerHTML=`<tr style="border-top:2px solid var(--line)"><td><b>Отдел, итого</b></td><td></td><td class="r num">${tot.closed} / ${tot.c}</td><td class="r num q">${tot.kp}</td><td class="r num">${tot.ref}</td><td class="r num nrc">${tot.nr}</td><td class="r"></td></tr>`;
 
@@ -458,6 +471,8 @@ document.getElementById('footer').innerHTML=
 
 // ---- дрилл-даун по сорсеру: кому и какие запросы он отправлял
 const STG={new:'Новый',sent:'Отправлен',dialog:'Переписка/цена',selected:'КП/выбран',refused:'Отказ',no_answer:'Молчание',other:'Прочее'};
+const SBUCK=[['new','snew'],['sent','ssent'],['dialog','sdlg'],['selected','ssel'],['refused','sref'],['no_answer','snr'],['other','soth']];
+const SORD={new:0,sent:1,dialog:2,selected:3,refused:4,no_answer:5,other:6};
 const _byId=Object.fromEntries(A.map(s=>[String(s.id),s]));
 const _ovl=document.getElementById('ovl'),_drw=document.getElementById('drw');
 const _esc=s=>String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
@@ -466,16 +481,27 @@ function openDrw(uid){
   const s=_byId[String(uid)];if(!s)return;
   document.getElementById('drwName').textContent=s.n;
   document.getElementById('drwSub').textContent=`${s.c} запросов · ${s.perDay}/дн · до ТКП ${s.tkpP}%`;
-  const sup=s.bySupplier||[],det=(s.details||[]).slice().sort((a,b)=>(b.wk-a.wk)||(a.dt<b.dt?1:-1));
-  let h='';
-  if(sup.length){
-    h+=`<div class="h">По поставщикам (${sup.length})</div>`;
-    h+=sup.slice(0,12).map(x=>`<div class="suprow"><span>${_esc(x.sup)}</span><b>${x.n}</b></div>`).join('');
-    if(sup.length>12)h+=`<div class="suprow"><span class="dimv">…ещё ${sup.length-12}</span><b></b></div>`;
+  const b=s.buckets||{};
+  const tot=SBUCK.reduce((a,[k])=>a+(b[k]||0),0)||1;
+  const sup=s.bySupplier||[];
+  const allDet=(s.details||[]).slice().sort((a,b2)=>(SORD[a.st]-SORD[b2.st])||(b2.wk-a.wk)||(a.dt<b2.dt?1:-1));
+  const body=document.getElementById('drwBody');
+  function render(filter){
+    let h=`<div class="h">Распределение по статусам · клик — фильтр</div>`;
+    h+=`<div class="stack" style="height:16px;margin:2px 0 9px">`+SBUCK.map(([k,cl])=>b[k]?`<i class="${cl}" style="width:${(b[k]/tot*100).toFixed(1)}%" title="${STG[k]}: ${b[k]}"></i>`:'').join('')+`</div>`;
+    h+=`<div class="statleg"><span class="stchip${filter?'':' on'}" data-st="">Все <b>${allDet.length}</b></span>`+SBUCK.filter(([k])=>b[k]).map(([k,cl])=>`<span class="stchip${filter===k?' on':''}" data-st="${k}"><i class="dot ${cl}"></i>${STG[k]} <b>${b[k]}</b></span>`).join('')+`</div>`;
+    if(sup.length){
+      h+=`<div class="h">По поставщикам (${sup.length})</div>`;
+      h+=sup.slice(0,12).map(x=>`<div class="suprow"><span>${_esc(x.sup)}</span><b>${x.n}</b></div>`).join('');
+      if(sup.length>12)h+=`<div class="suprow"><span class="dimv">…ещё ${sup.length-12}</span><b></b></div>`;
+    }
+    const det=filter?allDet.filter(d=>d.st===filter):allDet;
+    h+=`<div class="h">Запросы (${det.length}${filter?' · '+STG[filter]:''})</div>`;
+    h+=det.map(d=>`<div class="req"><div class="rt">${_esc(d.subj)}</div><div class="rm"><span class="sp">${_esc(d.sup)}</span><span class="pill p-${d.st}">${STG[d.st]||d.st}</span><span>${_wk(d.wk)}</span><span>${d.dt||''}</span></div></div>`).join('')||'<div class="dimv">нет запросов в этом статусе</div>';
+    body.innerHTML=h;
+    body.querySelectorAll('.stchip').forEach(c=>c.addEventListener('click',()=>render(c.dataset.st||null)));
   }
-  h+=`<div class="h">Запросы (${det.length})</div>`;
-  h+=det.map(d=>`<div class="req"><div class="rt">${_esc(d.subj)}</div><div class="rm"><span class="sp">${_esc(d.sup)}</span><span class="pill">${STG[d.st]||d.st}</span><span>${_wk(d.wk)}</span><span>${d.dt||''}</span></div></div>`).join('')||'<div class="dimv">нет данных</div>';
-  document.getElementById('drwBody').innerHTML=h;
+  render(null);
   _ovl.classList.add('on');_drw.classList.add('on');_drw.setAttribute('aria-hidden','false');
 }
 function closeDrw(){_ovl.classList.remove('on');_drw.classList.remove('on');_drw.setAttribute('aria-hidden','true');}
