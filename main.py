@@ -211,10 +211,22 @@ def run(args) -> int:
             select=["ID", "TITLE", "CATEGORY_ID", "STAGE_SEMANTIC_ID", "OPPORTUNITY", "CURRENCY_ID", "DATE_CREATE", "ASSIGNED_BY_ID"])
         orders_ytd = client.list_items(172, filter={">=createdTime": ys},
             select=["id", "title", "stageId", "opportunity", "currencyId", "createdTime", "parentId2", "assignedById"])
+        # заказы СП-172: исключаем проигранные (…:FAIL) — это не контрактная выручка
+        orders_ytd = [o for o in orders_ytd if not str(o.get("stageId", "")).endswith(":FAIL")]
+        # полная карта владельцев сделок: 2026 + родители заказов, созданные ДО 2026
+        # (иначе ~70% заказов атрибутируются по assignedById карточки заказа, а не по владельцу сделки)
+        deal_owner = {str(d["ID"]): str(d.get("ASSIGNED_BY_ID")) for d in deals_ytd}
+        parent_ids = {str(o.get("parentId2")) for o in orders_ytd if o.get("parentId2")}
+        missing = [pid for pid in parent_ids if pid and pid not in deal_owner]
+        if missing:
+            extra = client.deals_by_ids(missing, select=["ID", "ASSIGNED_BY_ID"])
+            for did, d in extra.items():
+                deal_owner[str(did)] = str(d.get("ASSIGNED_BY_ID"))
+            print(f"  владельцы родительских сделок заказов: догружено {len(extra)} (из {len(missing)})")
         company_data = company_mod.compute(client, as_of=p.end, created=deals_ytd, orders=orders_ytd)
-        kam_data = kam_mod.compute_set(client, kam_mod.CLIENT_GROUPS, as_of=p.end, created=deals_ytd, orders=orders_ytd, with_people=True)
-        eng_data = kam_mod.compute_set(client, kam_mod.ENG_GROUPS, as_of=p.end, created=deals_ytd, orders=orders_ytd, with_people=True)
-        prod_data = kam_mod.compute_set(client, kam_mod.PRODUCT_GROUPS, as_of=p.end, created=deals_ytd, orders=orders_ytd, with_people=True)
+        kam_data = kam_mod.compute_set(client, kam_mod.CLIENT_GROUPS, as_of=p.end, created=deals_ytd, orders=orders_ytd, with_people=True, deal_owner=deal_owner)
+        eng_data = kam_mod.compute_set(client, kam_mod.ENG_GROUPS, as_of=p.end, created=deals_ytd, orders=orders_ytd, with_people=True, deal_owner=deal_owner)
+        prod_data = kam_mod.compute_set(client, kam_mod.PRODUCT_GROUPS, as_of=p.end, created=deals_ytd, orders=orders_ytd, with_people=True, deal_owner=deal_owner)
     except Exception as e:  # вкладка «Сорсинг» не должна падать из-за доп. вкладок
         print(f"  ⚠ доп-вкладки пропущены: {type(e).__name__}: {e}")
 

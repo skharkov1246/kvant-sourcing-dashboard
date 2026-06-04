@@ -340,7 +340,7 @@
   <div class="kpis" id="cmpKpis" style="grid-template-columns:repeat(5,1fr)"></div>
   <div class="secttl"><b>3</b> · Исход и рост базы</div>
   <div class="grid">
-    <section class="card"><h2>Поток сделок 2026</h2><div class="note">Большинство созданных — тендерные лиды; «закрыто-минус» = в основном отсев на квалификации. Победы — по дате закрытия.</div><div class="flow" id="cmpFlow"></div></section>
+    <section class="card"><h2>Поток сделок 2026</h2><div class="note">Воронка по когорте «создано в 2026»: создано = в работе + выиграно + проигрыш. Статус «выиграна» в самих сделках проставляется редко — реальные победы и выручка фиксируются Заказами (СП-172), см. строку ниже и вкладки направлений. Клик по боксу — список сделок.</div><div class="flow" id="cmpFlow"></div><div class="note" id="cmpOrdersNote" style="margin-top:10px"></div></section>
     <section class="card"><h2>Рост базы по месяцам</h2><div class="wkchart" id="cmpGrowth" style="height:150px"></div>
     <div class="legendrow"><span><i class="sw" style="background:var(--ok)"></i>компании</span><span><i class="sw" style="background:var(--b)"></i>контакты</span><span><i class="sw" style="background:var(--a)"></i>лиды</span></div></section>
   </div>
@@ -368,6 +368,7 @@ const M = window.__DATA__, INS = window.__INSIGHTS__;
 const cs = getComputedStyle(document.documentElement);
 const k = M.kpi, A = M.sourcersA, cov = M.coverage;
 const NS = "http://www.w3.org/2000/svg";
+const _esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
 // ---- subline + KPIs
 document.getElementById('subline').innerHTML =
@@ -394,11 +395,11 @@ document.getElementById('wkchart').innerHTML=weekTot.map(w=>`<div class="wkcol">
 // ---- block A load
 document.getElementById('loadTotal').textContent=A.reduce((s,r)=>s+r.c,0);
 const maxA=Math.max(1,...A.map(r=>r.c));
-document.getElementById('rowsA').innerHTML=A.map((r,i)=>`<div class="row clickrow" data-uid="${r.id}"><div class="rk">${i+1}</div><div><div class="top"><div class="nm">${r.n}${r.since?`<small>с ${r.since}</small>`:''}</div><div class="ct">${r.c}<small>${r.perDay}/дн</small></div></div><div class="track"><div class="fill fillA" data-w="${(r.c/maxA*100).toFixed(1)}" style="width:0%"></div></div></div></div>`).join('');
+document.getElementById('rowsA').innerHTML=A.map((r,i)=>`<div class="row clickrow" data-uid="${r.id}"><div class="rk">${i+1}</div><div><div class="top"><div class="nm">${_esc(r.n)}${r.since?`<small>с ${r.since}</small>`:''}</div><div class="ct">${r.c}<small>${r.perDay}/дн</small></div></div><div class="track"><div class="fill fillA" data-w="${(r.c/maxA*100).toFixed(1)}" style="width:0%"></div></div></div></div>`).join('');
 
 // ---- spark table
 const spMax=Math.max(1,...A.flatMap(r=>r.wk));
-document.getElementById('tbSpark').innerHTML=A.map(r=>`<tr class="clickrow" data-uid="${r.id}"><td><div class="who" style="font-size:12.5px">${r.n}</div></td><td><div class="spark">${r.wk.map(v=>`<i style="height:${Math.max(1,v/spMax*26)}px" title="${v}"></i>`).join('')}</div></td><td class="num r">${r.c}</td></tr>`).join('');
+document.getElementById('tbSpark').innerHTML=A.map(r=>`<tr class="clickrow" data-uid="${r.id}"><td><div class="who" style="font-size:12.5px">${_esc(r.n)}</div></td><td><div class="spark">${r.wk.map(v=>`<i style="height:${Math.max(1,v/spMax*26)}px" title="${v}"></i>`).join('')}</div></td><td class="num r">${r.c}</td></tr>`).join('');
 
 // ---- conversion
 document.getElementById('tbConv').innerHTML=A.map(r=>{const b=r.buckets;const p=v=>(v/r.c*100);
@@ -407,20 +408,20 @@ document.getElementById('tbConv').innerHTML=A.map(r=>{const b=r.buckets;const p=
  const pc=v=>r.closed?` <small class="dimv">${Math.round(v/r.closed*100)}%</small>`:'';
  const cell=(v,clz)=> v>0?`<span class="${clz}">${v}</span>${pc(v)}`:`<span class="dimv">0</span>`;
  const out=b.sent+b.dialog+b.selected+b.refused+b.no_answer+b.other;
- return `<tr class="clickrow" data-uid="${r.id}"><td><div class="who">${r.n}</div><div class="dep">${r.c} запр. · вышло из «Новый» ${out}</div></td><td>${stack}</td><td class="num r">${r.closed}<small class="dimv"> / ${r.c}</small></td><td class="num r">${cell(r.kp,'q')}</td><td class="num r">${cell(r.refusedCol,'')}</td><td class="num r">${cell(r.noAnswer,'nrc')}</td><td class="r"><span class="spd ${sp}">${r.avgDays}</span></td></tr>`;}).join('');
+ return `<tr class="clickrow" data-uid="${r.id}"><td><div class="who">${_esc(r.n)}</div><div class="dep">${r.c} запр. · вышло из «Новый» ${out}</div></td><td>${stack}</td><td class="num r">${r.closed}<small class="dimv"> / ${r.c}</small></td><td class="num r">${cell(r.kp,'q')}</td><td class="num r">${cell(r.refusedCol,'')}</td><td class="num r">${cell(r.noAnswer,'nrc')}</td><td class="r"><span class="spd ${sp}">${r.avgDays}</span></td></tr>`;}).join('');
 const tot=A.reduce((t,r)=>({c:t.c+r.c,closed:t.closed+r.closed,kp:t.kp+r.kp,ref:t.ref+r.refusedCol,nr:t.nr+r.noAnswer}),{c:0,closed:0,kp:0,ref:0,nr:0});
 document.getElementById('tfConv').innerHTML=`<tr style="border-top:2px solid var(--line)"><td><b>Отдел, итого</b></td><td></td><td class="r num">${tot.closed} / ${tot.c}</td><td class="r num q">${tot.kp}</td><td class="r num">${tot.ref}</td><td class="r num nrc">${tot.nr}</td><td class="r"></td></tr>`;
 
 // ---- отправлено vs создано (+ фейк)
 if (M.send && M.send.rows){
-  document.getElementById('tbSend').innerHTML=M.send.rows.map(r=>`<tr><td><div class="who">${r.n}</div></td><td class="num r">${r.total}</td><td class="num r q">${r.sent}</td><td class="num r ${r.nosend?'nrc':'dimv'}">${r.nosend}</td><td class="num r ${r.sentPct>=80?'q':(r.sentPct>=50?'':'nrc')}">${r.sentPct}%</td><td class="num r ${r.fake>=5?'nrc':'dimv'}">${r.fake}</td><td class="num r dimv">${r.fuPct}%</td></tr>`).join('');
+  document.getElementById('tbSend').innerHTML=M.send.rows.map(r=>`<tr><td><div class="who">${_esc(r.n)}</div></td><td class="num r">${r.total}</td><td class="num r q">${r.sent}</td><td class="num r ${r.nosend?'nrc':'dimv'}">${r.nosend}</td><td class="num r ${r.sentPct>=80?'q':(r.sentPct>=50?'':'nrc')}">${r.sentPct}%</td><td class="num r ${r.fake>=5?'nrc':'dimv'}">${r.fake}</td><td class="num r dimv">${r.fuPct}%</td></tr>`).join('');
   const ts=M.send.totals;
   document.getElementById('tfSend').innerHTML=`<tr style="border-top:2px solid var(--line)"><td><b>Отдел, итого</b></td><td class="r num">${ts.total}</td><td class="r num q">${ts.sent}</td><td class="r num nrc">${ts.nosend}</td><td class="r num">${ts.sentPct}%</td><td class="r num nrc">${ts.fake}</td><td class="r"></td></tr>`;
 }
 
 // ---- tkp list
 const tkpMax=Math.max(1,...A.map(r=>r.tkpP));
-document.getElementById('tkpList').innerHTML=[...A].sort((a,b)=>b.tkpP-a.tkpP).map(r=>`<div class="blrow"><div class="blt"><span>${r.n} <span class="dimv mono">${r.tkp} из ${r.c}</span></span><b style="color:var(--a2)">${r.tkpP}%</b></div><div class="bltrack"><i style="width:0%;background:linear-gradient(90deg,var(--a),var(--a2))" data-w="${r.tkpP/tkpMax*100}"></i></div></div>`).join('');
+document.getElementById('tkpList').innerHTML=[...A].sort((a,b)=>b.tkpP-a.tkpP).map(r=>`<div class="blrow"><div class="blt"><span>${_esc(r.n)} <span class="dimv mono">${r.tkp} из ${r.c}</span></span><b style="color:var(--a2)">${r.tkpP}%</b></div><div class="bltrack"><i style="width:0%;background:linear-gradient(90deg,var(--a),var(--a2))" data-w="${r.tkpP/tkpMax*100}"></i></div></div>`).join('');
 
 // ---- donut helper
 function donut(el,parts,top,bot){let off=0;parts.forEach(p=>{const c=document.createElementNS(NS,'circle');c.setAttribute('cx',21);c.setAttribute('cy',21);c.setAttribute('r',15.915);c.setAttribute('fill','transparent');c.setAttribute('stroke',cs.getPropertyValue(p.col).trim());c.setAttribute('stroke-width',5);c.setAttribute('stroke-dasharray',`${p.pct} ${100-p.pct}`);c.setAttribute('stroke-dashoffset',-off);c.setAttribute('transform','rotate(-90 21 21)');el.appendChild(c);off+=p.pct;});
@@ -439,7 +440,7 @@ document.getElementById('legChain').innerHTML=
 
 // ---- categories fed by sourcing
 const cats=M.catList, catMax=Math.max(1,...cats.map(c=>c.v));
-document.getElementById('catList').innerHTML=cats.map(c=>`<div class="blrow"><div class="blt"><span>${c.cat}</span><b>${c.v} · ${c.p}%</b></div><div class="bltrack"><i style="width:0%" data-w="${c.v/catMax*100}"></i></div></div>`).join('');
+document.getElementById('catList').innerHTML=cats.map(c=>`<div class="blrow"><div class="blt"><span>${_esc(c.cat)}</span><b>${c.v} · ${c.p}%</b></div><div class="bltrack"><i style="width:0%" data-w="${c.v/catMax*100}"></i></div></div>`).join('');
 
 // ---- coverage KPIs
 document.getElementById('kpisCov').innerHTML=[
@@ -460,7 +461,7 @@ document.getElementById('legCov').innerHTML=
  `<div class="leg"><span class="dot" style="background:var(--warn)"></span> Без запроса <span class="v" style="color:var(--warn)">${cov.withoutReq}</span><span class="p">${100-cov.covPct}%</span></div>`;
 
 // ---- coverage by category
-document.getElementById('tbCov').innerHTML=cov.byCat.map(c=>{const cl=c.covPct>=70?'q':(c.covPct>=50?'dimv':'nrc');return `<tr><td><div class="who">${c.cat}</div></td><td class="num r">${c.deals}</td><td class="num r">${c.withReq}</td><td class="num r ${cl}">${c.covPct}%</td><td class="num r dimv">${c.reqs}</td><td class="num r" style="color:var(--a2)">${c.avgSup}</td></tr>`;}).join('');
+document.getElementById('tbCov').innerHTML=cov.byCat.map(c=>{const cl=c.covPct>=70?'q':(c.covPct>=50?'dimv':'nrc');return `<tr><td><div class="who">${_esc(c.cat)}</div></td><td class="num r">${c.deals}</td><td class="num r">${c.withReq}</td><td class="num r ${cl}">${c.covPct}%</td><td class="num r dimv">${c.reqs}</td><td class="num r" style="color:var(--a2)">${c.avgSup}</td></tr>`;}).join('');
 
 // ---- insights
 document.getElementById('insLoad').innerHTML=INS.load||'<span class="dimv">—</span>';
@@ -478,7 +479,6 @@ const SBUCK=[['new','snew'],['sent','ssent'],['dialog','sdlg'],['selected','ssel
 const SORD={new:0,sent:1,dialog:2,selected:3,refused:4,no_answer:5,other:6};
 const _byId=Object.fromEntries(A.map(s=>[String(s.id),s]));
 const _ovl=document.getElementById('ovl'),_drw=document.getElementById('drw');
-const _esc=s=>String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 const _wk=i=>(i>=0&&M.weekly[i])?`${M.weekly[i].w} (${M.weekly[i].d})`:'—';
 function openDrw(uid){
   const s=_byId[String(uid)];if(!s)return;
@@ -522,14 +522,15 @@ if (C) {
   const mmx=Math.max(1,...C.byMon.map(x=>x.v));
   $('cmpMon').innerHTML=C.byMon.map(x=>`<div class="wkcol drill" data-mk="${x.mk}"><div class="wkbars"><div class="wkbar a" style="height:${(x.v/mmx*100).toFixed(0)}%"><span>${x.v}</span></div></div><div class="wklbl"><b>${x.m}</b></div></div>`).join('');
   const cmx=Math.max(1,...C.byCat.map(x=>x.v));
-  $('cmpCat').innerHTML=C.byCat.map(x=>`<div class="blrow drill" data-cid="${x.cid}"><div class="blt"><span>${x.cat}</span><b>${x.v} · ${x.p}%</b></div><div class="bltrack"><i style="width:${(x.v/cmx*100).toFixed(0)}%"></i></div></div>`).join('');
+  $('cmpCat').innerHTML=C.byCat.map(x=>`<div class="blrow drill" data-cid="${x.cid}"><div class="blt"><span>${_esc(x.cat)}</span><b>${x.v} · ${x.p}%</b></div><div class="bltrack"><i style="width:${(x.v/cmx*100).toFixed(0)}%"></i></div></div>`).join('');
   $('cmpMxHead').innerHTML='<tr><th>Воронка</th>'+C.matrix.months.map(m=>`<th class="r">${m}</th>`).join('')+'</tr>';
-  $('cmpMxBody').innerHTML=C.matrix.rows.map(r=>`<tr><td><div class="who">${r.cat}</div></td>`+r.cells.map((v,ci)=>v?`<td class="num r cell drill" data-mk="${C.matrix.mks[ci]}" data-cid="${r.cid}">${v}</td>`:`<td class="num r dimv">·</td>`).join('')+`</tr>`).join('');
+  $('cmpMxBody').innerHTML=C.matrix.rows.map(r=>`<tr><td><div class="who">${_esc(r.cat)}</div></td>`+r.cells.map((v,ci)=>v?`<td class="num r cell drill" data-mk="${C.matrix.mks[ci]}" data-cid="${r.cid}">${v}</td>`:`<td class="num r dimv">·</td>`).join('')+`</tr>`).join('');
   $('cmpKpis').innerHTML=C.params.map(p=>`<div class="kpi ${p.clz}"><div class="lbl">${p.lbl}</div><div class="val ${p.clz}">${p.val}</div><div class="meta">${p.meta}</div></div>`).join('');
   const omx=Math.max(1,...(C.byOwner||[]).map(o=>o.deals));
   $('cmpOwners').innerHTML=(C.byOwner||[]).slice(0,30).map(o=>`<div class="ownrow" data-uid="${o.uid}"><div class="onm who" style="min-width:240px;flex-shrink:0">${_esc(o.name)}</div><div class="obar"><i style="width:${(o.deals/omx*100).toFixed(0)}%"></i></div><div class="ocnt">${o.deals} <span class="dimv">/ ${o.open} в раб.</span></div></div>`).join('')+((C.byOwner||[]).length>30?`<div class="dimv" style="padding:7px 9px">…ещё ${C.byOwner.length-30} сотрудников (см. отраслевые вкладки)</div>`:'');
   const f=C.flow;
-  $('cmpFlow').innerHTML=`<div class="flowbox drill" data-flow="created"><div class="n">${f.created}</div><div class="l">создано</div></div><div class="flowbox drill" data-flow="open"><div class="n" style="color:var(--b2)">${f.open}</div><div class="l">в работе</div></div><div class="flowbox"><div class="n" style="color:var(--ok)">${f.won}</div><div class="l">выиграно (заказы)</div></div><div class="flowbox"><div class="n" style="color:var(--nr)">${f.lost}</div><div class="l">закрыто-минус</div></div>`;
+  $('cmpFlow').innerHTML=`<div class="flowbox drill" data-flow="created"><div class="n">${f.created}</div><div class="l">создано</div></div><div class="flowbox drill" data-flow="open"><div class="n" style="color:var(--b2)">${f.open}</div><div class="l">в работе</div></div><div class="flowbox drill" data-flow="won"><div class="n" style="color:var(--ok)">${f.won}</div><div class="l">выиграно</div></div><div class="flowbox drill" data-flow="lost"><div class="n" style="color:var(--nr)">${f.lost}</div><div class="l">закрыто-минус</div></div>`;
+  var ordEl=$('cmpOrdersNote'); if(ordEl) ordEl.innerHTML=`<b style="color:var(--ok2)">Заказы (СП-172): ${f.orders}</b> в исполнении — реальные победы и контрактная выручка (детали на вкладках КАМы/Инжиниринг/Продукт).`;
   const gmx=Math.max(1,...C.growth.flatMap(x=>[x.comp,x.cont,x.leads]));
   const fmtN=v=>String(v).replace(/\B(?=(\d{3})+(?!\d))/g,' ');
   const gbar=(v,c)=>`<div class="wkbar" style="width:14px;min-height:${v?3:0}px;height:${(v/gmx*100).toFixed(1)}%;background:${c}" title="${v}"></div>`;
@@ -545,7 +546,9 @@ if (C) {
   $('cmpCat').querySelectorAll('[data-cid]').forEach(n=>n.addEventListener('click',()=>openDeals(D.filter(d=>d.cid===n.dataset.cid),`Воронка: ${catLbl(n.dataset.cid)}`,'Сделки воронки 2026')));
   $('cmpMxBody').querySelectorAll('td.cell').forEach(n=>n.addEventListener('click',()=>openDeals(D.filter(d=>d.mon===n.dataset.mk&&d.cid===n.dataset.cid),`${catLbl(n.dataset.cid)} · ${monLbl(n.dataset.mk)}`,'Сделки месяца × воронки')));
   $('cmpOwners').querySelectorAll('[data-uid]').forEach(n=>n.addEventListener('click',()=>{const o=(C.byOwner||[]).find(z=>z.uid===n.dataset.uid);openDeals(D.filter(d=>d.uid===n.dataset.uid),o?o.name:('сотрудник #'+n.dataset.uid),'Все сделки сотрудника 2026');}));
-  $('cmpFlow').querySelectorAll('[data-flow]').forEach(n=>n.addEventListener('click',()=>{const k=n.dataset.flow;openDeals(k==='open'?D.filter(d=>d.op):D,k==='open'?'Сделки в работе':'Все созданные сделки','Поток 2026');}));
+  $('cmpFlow').querySelectorAll('[data-flow]').forEach(n=>n.addEventListener('click',()=>{const k=n.dataset.flow;
+    const sel={created:[D,'Все созданные сделки 2026'],open:[D.filter(d=>d.op),'Сделки в работе'],won:[D.filter(d=>d.sem==='S'),'Выигранные сделки (статус)'],lost:[D.filter(d=>d.sem==='F'),'Проигранные сделки']}[k]||[D,'Сделки'];
+    openDeals(sel[0],sel[1],'Поток 2026');}));
 }
 // ---- вкладки направлений (КАМы / Инжиниринг / Продукт-оунеры) — общий рендер
 // ---- drill-down отраслевых вкладок: клик по метрике → список сделок/заказов в дровере
@@ -664,14 +667,14 @@ function renderDir(D, elId, opt){
   const el=document.getElementById(elId); if(!el) return;
   if(!D){ el.innerHTML='<div class="note" style="padding:20px 0">нет данных</div>'; return; }
   const t=D.totals;
-  const row=r=>`<tr class="drill" data-drill="grp:${_esc(r.group)}"><td><div class="who">${r.group}</div></td><td class="num r">${r.deals}</td><td class="num r">${r.open}</td><td class="num r">${r.pipeline}</td><td class="num r" style="color:var(--ok2)">${r.orders}</td><td class="num r" style="color:var(--ok)">${r.revenue}</td><td class="num r dimv">${r.closed}</td><td class="num r">${r.conv}</td></tr>`;
+  const row=r=>`<tr class="drill" data-drill="grp:${_esc(r.group)}"><td><div class="who">${_esc(r.group)}</div></td><td class="num r">${r.deals}</td><td class="num r">${r.open}</td><td class="num r">${r.pipeline}</td><td class="num r" style="color:var(--ok2)">${r.orders}</td><td class="num r" style="color:var(--ok)">${r.revenue}</td><td class="num r dimv">${r.closed}</td><td class="num r">${r.conv}</td></tr>`;
   const rmx=Math.max(1,...D.byRevenue.map(x=>x.v));
   let h=`<header><div class="eyebrow">${opt.eyebrow}</div><h1>${opt.title}</h1><div class="sub"><span>Период: <b>${D.label}</b></span><span>Источник: <b>Bitrix24 · сделки + Заказы (СП-172)</b></span><span class="dimv">↳ клик по карточке, группе или человеку — детализация</span></div></header>`;
   h+=`<div class="kpis" style="grid-template-columns:repeat(3,1fr)">${D.kpis.map(p=>`<div class="kpi ${p.clz}${p.drill?' drill':''}"${p.drill?` data-drill="kpi:${p.drill}"`:''}><div class="lbl">${p.lbl}</div><div class="val ${p.clz}">${p.val}</div><div class="meta">${p.meta}</div>${qmark('d.kpi')}</div>`).join('')}</div>`;
   h+=`<div class="secttl"><b>1</b> · ${opt.sec1}${qmark('d.groups')}</div><section class="card"><h2>Сделки → заказы → выручка</h2><div class="note">По ответственным группы. «Пайплайн» — Σ открытых сделок (€); «Заказы» (СП-172) = выигранные; «Выручка» — Σ заказов (€); «Зак/сд» = заказов на одну сделку 2026 (повторные заказы по сделкам старше 2026 дают >1×). Суммы — к базовой € по курсам Bitrix.</div><table><thead><tr><th>${opt.unit}</th><th class="r">сделок</th><th class="r">в работе</th><th class="r">пайплайн</th><th class="r">заказов</th><th class="r">выручка</th><th class="r">закрыто</th><th class="r">зак/сд</th></tr></thead><tbody>${D.rows.map(row).join('')}</tbody><tfoot><tr style="border-top:2px solid var(--line)"><td><b>Итого</b></td><td class="r num">${t.deals}</td><td class="r num">${t.open}</td><td class="r num">${t.pipeline}</td><td class="r num" style="color:var(--ok2)">${t.orders}</td><td class="r num" style="color:var(--ok)">${t.revenue}</td><td class="r num dimv">${t.closed}</td><td class="r num">${t.conv}</td></tr></tfoot></table></section>`;
-  h+=`<div class="secttl"><b>2</b> · Выручка по ${opt.sec2}${qmark('d.rev')}</div><section class="card"><div class="barlist">${D.byRevenue.map(x=>`<div class="blrow drill" data-drill="grp:${_esc(x.group)}"><div class="blt"><span>${x.group}</span><b>${x.label}</b></div><div class="bltrack"><i style="width:${(x.v/rmx*100).toFixed(0)}%;background:linear-gradient(90deg,var(--ok),var(--ok2))"></i></div></div>`).join('')}</div></section>`;
+  h+=`<div class="secttl"><b>2</b> · Выручка по ${opt.sec2}${qmark('d.rev')}</div><section class="card"><div class="barlist">${D.byRevenue.map(x=>`<div class="blrow drill" data-drill="grp:${_esc(x.group)}"><div class="blt"><span>${_esc(x.group)}</span><b>${x.label}</b></div><div class="bltrack"><i style="width:${(x.v/rmx*100).toFixed(0)}%;background:linear-gradient(90deg,var(--ok),var(--ok2))"></i></div></div>`).join('')}</div></section>`;
   if(D.people&&D.people.length){
-    h+=`<div class="secttl"><b>3</b> · До человека${qmark('d.people')}</div><section class="card"><table><thead><tr><th>Сотрудник</th><th>направление</th><th class="r">сделок</th><th class="r">пайплайн</th><th class="r">заказов</th><th class="r">выручка</th><th class="r">зак/сд</th></tr></thead><tbody>`+D.people.map(p=>`<tr class="drill" data-drill="own:${_esc(p.uid)}"><td><div class="who">${p.name}</div></td><td class="dep">${p.grp}</td><td class="num r">${p.deals}</td><td class="num r">${p.pipeline}</td><td class="num r" style="color:var(--ok2)">${p.orders}</td><td class="num r" style="color:var(--ok)">${p.revenue}</td><td class="num r">${p.conv}</td></tr>`).join('')+`</tbody></table></section>`;
+    h+=`<div class="secttl"><b>3</b> · До человека${qmark('d.people')}</div><section class="card"><table><thead><tr><th>Сотрудник</th><th>направление</th><th class="r">сделок</th><th class="r">пайплайн</th><th class="r">заказов</th><th class="r">выручка</th><th class="r">зак/сд</th></tr></thead><tbody>`+D.people.map(p=>`<tr class="drill" data-drill="own:${_esc(p.uid)}"><td><div class="who">${_esc(p.name)}</div></td><td class="dep">${_esc(p.grp)}</td><td class="num r">${p.deals}</td><td class="num r">${p.pipeline}</td><td class="num r" style="color:var(--ok2)">${p.orders}</td><td class="num r" style="color:var(--ok)">${p.revenue}</td><td class="num r">${p.conv}</td></tr>`).join('')+`</tbody></table></section>`;
   }
   h+=`<footer>${opt.title} · Bitrix24 (сделки + Заказы СП-172) · ${D.label}. Заказ = выигранная сделка в исполнении; выручка — Σ заказов к базовой € по курсам Bitrix; привязка заказа к группе — через сделку-родителя.</footer>`;
   el.innerHTML=h;
