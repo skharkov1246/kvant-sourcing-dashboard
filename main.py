@@ -15,6 +15,7 @@ import datetime as dt
 import json
 import sys
 import webbrowser
+from collections import Counter, defaultdict
 from pathlib import Path
 
 import config
@@ -90,6 +91,51 @@ def _names_and_since(client: BitrixClient):
     return names, since
 
 
+SPA_NEW_STAGE = "DT166_24:NEW"
+
+
+def _send_stats(client: BitrixClient, rfqs: list[dict], sourcer_rows: list[dict],
+                dept_a_ids: set[str], start_iso: str, end_iso: str) -> dict:
+    """Реально отправлено vs создано: по факту исходящего CRM-письма на карточке RFQ.
+    Возвращает {"rows": [...по сорсерам блока A...], "totals": {...}}."""
+    counts: Counter = Counter()  # card_id -> кол-во исходящих писем
+    last = 0
+    while True:
+        ch = client.call("crm.activity.list", {
+            "filter": {"OWNER_TYPE_ID": config.SPA_ENTITY_TYPE_ID, "PROVIDER_ID": "CRM_EMAIL",
+                       "DIRECTION": 2, ">=CREATED": start_iso, "<=CREATED": end_iso, ">ID": last},
+            "select": ["ID", "OWNER_ID"], "order": {"ID": "ASC"}, "start": -1}) or []
+        if not ch:
+            break
+        for a in ch:
+            counts[str(a.get("OWNER_ID"))] += 1
+        last = int(ch[-1]["ID"])
+        if len(ch) < 50:
+            break
+
+    by_user: dict[str, list[dict]] = defaultdict(list)
+    for r in rfqs:
+        u = str(r.get("assignedById"))
+        if u in dept_a_ids:
+            by_user[u].append(r)
+
+    rows = []
+    for s in sourcer_rows:  # уже блок A, отсортирован по объёму
+        items = by_user.get(s["id"], [])
+        total = len(items)
+        sent = sum(1 for r in items if counts.get(str(r["id"])))
+        fake = sum(1 for r in items if r.get("stageId") != SPA_NEW_STAGE and not counts.get(str(r["id"])))
+        followup = sum(1 for r in items if counts.get(str(r["id"]), 0) >= 2)
+        rows.append({
+            "id": s["id"], "n": s["n"], "total": total, "sent": sent, "nosend": total - sent,
+            "sentPct": round(sent / total * 100) if total else 0,
+            "fake": fake, "fuPct": round(followup / sent * 100) if sent else 0,
+        })
+    tot = {kk: sum(r[kk] for r in rows) for kk in ("total", "sent", "nosend", "fake")}
+    tot["sentPct"] = round(tot["sent"] / tot["total"] * 100) if tot["total"] else 0
+    return {"rows": rows, "totals": tot}
+
+
 def run(args) -> int:
     settings = config.Settings.load()
     as_of = dt.date.fromisoformat(args.as_of) if args.as_of else None
@@ -136,6 +182,9 @@ def run(args) -> int:
         p, rfqs, deal_index, period_deals, dept_a_ids,
         names, since, deal_stage_names, category_names,
     )
+
+    print("• Отправлено vs создано (письма)…")
+    m["send"] = _send_stats(client, rfqs, m["sourcersA"], dept_a_ids, p.start_iso, p.end_iso)
 
     out_dir = Path(args.out)
     slug = (args.period or f"{p.start}_{p.end}").replace(":", "_")
