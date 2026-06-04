@@ -234,7 +234,7 @@
 </head>
 <body>
 <div id="updstatus" class="updbar"><span class="ub-dot"></span><span class="ub-main">Обновление…</span></div>
-<div class="tabs"><button class="tab act" data-tab="sourcing">Сорсинг</button><button class="tab" data-tab="company">Пульс компании</button><button class="tab" data-tab="kam">КАМы</button><button class="tab" data-tab="eng">Инжиниринг</button><button class="tab" data-tab="prod">Продукт-оунеры</button><button class="tab" data-tab="contracts">Реализация</button></div>
+<div class="tabs"><button class="tab act" data-tab="sourcing">Сорсинг</button><button class="tab" data-tab="company">Пульс компании</button><button class="tab" data-tab="kam">КАМы</button><button class="tab" data-tab="eng">Инжиниринг</button><button class="tab" data-tab="prod">Продукт-оунеры</button><button class="tab" data-tab="contracts">Реализация</button><button class="tab" data-tab="suppliers">Поставщики</button></div>
 <div id="tab-sourcing">
 <header>
   <div class="eyebrow">Квант · Отдел поиска поставщиков</div>
@@ -380,6 +380,7 @@
 <div id="tab-eng" hidden></div>
 <div id="tab-prod" hidden></div>
 <div id="tab-contracts" hidden></div>
+<div id="tab-suppliers" hidden></div>
 
 <div class="ovl" id="ovl"></div>
 <aside class="drw" id="drw" aria-hidden="true">
@@ -764,10 +765,34 @@ renderDir(window.__PRODUCT__,'tab-prod',{eyebrow:'Квант · продукто
   document.getElementById('ctSearch').addEventListener('input',e=>{q=e.target.value; rows();});
   document.getElementById('ctHead').addEventListener('click',e=>{const th=e.target.closest('th.sortable'); if(!th)return; const kk=th.dataset.sk; if(sortKey===kk)sortDir=-sortDir; else {sortKey=kk; sortDir=(NUM[kk]?-1:1);} head(); rows();});
 })();
+// ---- вкладка «Поставщики»: список по обороту (Σ закупок СП-172)
+(function(){
+  const X=(window.__CONTRACTS__&&window.__CONTRACTS__.suppliers), el=document.getElementById('tab-suppliers'); if(!el) return;
+  if(!X||!X.rows){ el.innerHTML='<div class="note" style="padding:20px 0">нет данных по поставщикам</div>'; return; }
+  let sortKey='buy', sortDir=-1, q='';
+  const NUM={buy:1,share:1,norders:1,ncontracts:1,nclients:1};
+  const COLS=[['name','Поставщик','l'],['buy','Оборот (закупка)','r'],['share','Доля','r'],['norders','Заказов','r'],['nclients','Клиентов','r'],['last','Посл. заказ','l']];
+  el.innerHTML=`<header><div class="eyebrow">Квант · снабжение</div><h1>Поставщики по обороту</h1><div class="sub"><span>Источник: <b>Bitrix24 · Заказы поставщикам (СП-172)</b></span><span>Состояние: <b>${X.label}</b> · обновление каждые 2ч</span><span class="dimv">Оборот = Σ наших закупок у поставщика</span></div></header>`
+    +`<div class="kpis" style="grid-template-columns:repeat(6,1fr)">${X.kpis.map(p=>`<div class="kpi ${p.clz}"><div class="lbl">${p.lbl}</div><div class="val ${p.clz}">${p.val}</div><div class="meta">${p.meta}</div></div>`).join('')}</div>`
+    +`<div class="secttl"><b>·</b> Наши поставщики <span id="spCount" class="dimv" style="font-weight:400"></span></div>`
+    +`<div class="ctools"><input id="spSearch" class="search" placeholder="Поиск: поставщик · клиент…"></div>`
+    +`<section class="card"><div class="note">«Оборот» — Σ наших закупок у поставщика (€, заказы СП-172, без проигранных). «Доля» — от всего объёма закупок. Клик по заголовку — сортировка. Наведи на строку — клиенты.</div><table class="ctab"><thead id="spHead"></thead><tbody id="spBody"></tbody></table></section>`;
+  const head=()=>{document.getElementById('spHead').innerHTML='<tr><th class="r" style="width:42px">№</th>'+COLS.map(c=>`<th class="${c[2]==='r'?'r ':''}sortable${sortKey===c[0]?' on':''}" data-sk="${c[0]}">${c[1]}${sortKey===c[0]?(sortDir<0?' ▾':' ▴'):''}</th>`).join('')+'</tr>';};
+  function rows(){
+    let r=X.rows;
+    if(q){const s=q.toLowerCase(); r=r.filter(x=>((x.name||'')+' '+(x.clients||'')).toLowerCase().includes(s));}
+    r=r.slice().sort((a,b)=> NUM[sortKey] ? ((a[sortKey]||0)-(b[sortKey]||0))*sortDir : String(a[sortKey]||'').localeCompare(String(b[sortKey]||''),'ru')*sortDir);
+    document.getElementById('spCount').textContent=`(${r.length} из ${X.rows.length})`;
+    document.getElementById('spBody').innerHTML=r.map((x,i)=>`<tr><td class="r dimv mono">${i+1}</td><td><div class="who">${_esc(x.name)}</div>${x.clients?`<div class="dep">для: ${_esc(x.clients)}</div>`:''}</td><td class="r"><div class="mono" style="color:var(--a)">${x.buyLbl}</div><div class="dep">${x.curs?_esc(x.curs):''}</div></td><td class="r mono">${x.share}%</td><td class="r mono">${x.norders}</td><td class="r mono">${x.nclients}</td><td class="dep">${x.last||'—'}</td></tr>`).join('')||'<tr><td colspan="7" class="dimv" style="padding:14px">ничего не найдено</td></tr>';
+  }
+  head(); rows();
+  document.getElementById('spSearch').addEventListener('input',e=>{q=e.target.value; rows();});
+  document.getElementById('spHead').addEventListener('click',e=>{const th=e.target.closest('th.sortable'); if(!th)return; const kk=th.dataset.sk; if(sortKey===kk)sortDir=-sortDir; else {sortKey=kk; sortDir=(NUM[kk]?-1:1);} head(); rows();});
+})();
 document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{
   document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('act',x===b));
   const t=b.dataset.tab;
-  ['sourcing','company','kam','eng','prod','contracts'].forEach(n=>{const el=document.getElementById('tab-'+n); if(el) el.hidden=(n!==t);});
+  ['sourcing','company','kam','eng','prod','contracts','suppliers'].forEach(n=>{const el=document.getElementById('tab-'+n); if(el) el.hidden=(n!==t);});
   window.scrollTo(0,0);
 }));
 injectMeth();

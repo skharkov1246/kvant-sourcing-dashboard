@@ -42,7 +42,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
 
     # 1. все непроигранные заказы поставщикам (закупки)
     orders = client.list_items(172, filter={}, select=["id", "title", "companyId", "parentId2",
-                                                        "opportunity", "currencyId", "stageId"])
+                                                        "opportunity", "currencyId", "stageId", "createdTime"])
     orders = [o for o in orders if not str(o.get("stageId", "")).endswith(":FAIL")]
     supl = client.companies_by_ids({str(o["companyId"]) for o in orders if o.get("companyId")})
 
@@ -94,9 +94,54 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
         ("Ср. маржа", f"{round(margin_sum/sale_sum*100) if sale_sum else 0}%", "по сумме, валовая", ""),
         ("Без цены сделки", str(len(rows) - len(priced)), "сделка без суммы продажи", "warn" if len(rows) - len(priced) else ""),
     ]
+    # --- агрегация по ПОСТАВЩИКАМ (оборот = Σ закупок СП-172) ---
+    sup_agg: dict[str, dict] = defaultdict(lambda: {"buy": 0.0, "norders": 0, "deals": set(),
+                                                    "clients": set(), "last": "", "curs": set()})
+    for o in orders:
+        sid = str(o.get("companyId") or "")
+        if not sid:
+            continue
+        a = sup_agg[sid]
+        a["buy"] += eur(o.get("opportunity"), o.get("currencyId"))
+        a["norders"] += 1
+        did = str(o.get("parentId2") or "")
+        if did:
+            a["deals"].add(did)
+            cl = clients.get(str(deals.get(did, {}).get("COMPANY_ID")))
+            if cl:
+                a["clients"].add(cl)
+        ct = str(o.get("createdTime") or "")[:10]
+        if ct > a["last"]:
+            a["last"] = ct
+        if o.get("currencyId"):
+            a["curs"].add(o.get("currencyId"))
+    sup_total = sum(a["buy"] for a in sup_agg.values()) or 1.0
+    sup_rows = sorted(({
+        "id": sid, "name": supl.get(sid) or f"company #{sid}",
+        "buy": round(a["buy"]), "buyLbl": _money(a["buy"]),
+        "share": round(a["buy"] / sup_total * 100, 1),
+        "norders": a["norders"], "ncontracts": len(a["deals"]), "nclients": len(a["clients"]),
+        "clients": ", ".join(sorted(a["clients"]))[:80],
+        "avg": _money(a["buy"] / a["norders"] if a["norders"] else 0),
+        "last": a["last"], "curs": ", ".join(sorted(a["curs"])),
+    } for sid, a in sup_agg.items()), key=lambda r: -r["buy"])
+    top10 = sum(r["buy"] for r in sup_rows[:10])
+    sup_kpis = [
+        ("Поставщиков", str(len(sup_rows)), "с заказами (СП-172)", ""),
+        ("Σ оборот", _money(sup_total), "сумма закупок, €", "amber"),
+        ("Топ-10 доля", f"{round(top10 / sup_total * 100)}%", "концентрация закупок", "warn" if top10 / sup_total > 0.6 else ""),
+        ("Ср. на поставщика", _money(sup_total / len(sup_rows) if sup_rows else 0), "€/поставщик", ""),
+        ("Заказов всего", str(sum(r["norders"] for r in sup_rows)), "закупок", ""),
+        ("Разовых", str(sum(1 for r in sup_rows if r["norders"] == 1)), "поставщиков с 1 заказом", "amber"),
+    ]
     return {
         "label": f"на {today.strftime('%d.%m.%Y')}",
         "rows": rows,
         "kpis": [{"lbl": l, "val": v, "meta": m, "clz": c} for l, v, m, c in kpis],
         "orphan": {"n": len(orphan), "buy": _money(orphan_buy)},
+        "suppliers": {
+            "label": f"на {today.strftime('%d.%m.%Y')}",
+            "rows": sup_rows,
+            "kpis": [{"lbl": l, "val": v, "meta": m, "clz": c} for l, v, m, c in sup_kpis],
+        },
     }
