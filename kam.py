@@ -45,7 +45,8 @@ def _ratio(orders: int, deals: int) -> str:
 
 def compute_set(client: BitrixClient, groups: dict[str, str], *, as_of: dt.date | None = None,
                 created: list[dict] | None = None, orders: list[dict] | None = None,
-                with_people: bool = False, deal_owner: dict | None = None) -> dict:
+                with_people: bool = False, deal_owner: dict | None = None,
+                deal_sale: dict | None = None) -> dict:
     today = as_of or dt.date.today()
     curlist = client.call("crm.currency.list", {}) or []
     rate = {x.get("CURRENCY"): (float(x.get("AMOUNT") or 1) / float(x.get("AMOUNT_CNT") or 1)) for x in curlist}
@@ -70,11 +71,15 @@ def compute_set(client: BitrixClient, groups: dict[str, str], *, as_of: dt.date 
     # иначе строим из created (тогда заказы на сделки до 2026 уйдут в fallback на assignedById)
     if deal_owner is None:
         deal_owner = {str(d["ID"]): str(d.get("ASSIGNED_BY_ID")) for d in created}
+    if deal_sale is None:
+        deal_sale = {str(d["ID"]): eur(d.get("OPPORTUNITY"), d.get("CURRENCY_ID")) for d in created}
 
     def blank():
-        return {"deals": 0, "open": 0, "pipeline": 0.0, "orders": 0, "revenue": 0.0, "closed": 0}
+        return {"deals": 0, "open": 0, "pipeline": 0.0, "orders": 0, "buy": 0.0, "closed": 0}
     g = defaultdict(blank)
     ppl = defaultdict(blank)
+    contracts_g: dict[str, set] = defaultdict(set)   # группа → {id сделки-контракта (есть заказ поставщику)}
+    contracts_p: dict[str, set] = defaultdict(set)
     deal_details: list[dict] = []
     order_details: list[dict] = []
 
@@ -84,7 +89,7 @@ def compute_set(client: BitrixClient, groups: dict[str, str], *, as_of: dt.date 
         if not grp:
             continue
         is_open = (d.get("STAGE_SEMANTIC_ID") or "").upper() not in ("S", "F")
-        amt = eur(d.get("OPPORTUNITY"), d.get("CURRENCY_ID"))
+        amt = eur(d.get("OPPORTUNITY"), d.get("CURRENCY_ID"))   # сумма сделки = ПРОДАЖА
         for bucket in (g[grp], ppl[owner]):
             bucket["deals"] += 1
             if is_open:
@@ -95,50 +100,61 @@ def compute_set(client: BitrixClient, groups: dict[str, str], *, as_of: dt.date 
                              "owner": owner, "own": owner_name.get(owner, owner), "open": is_open})
 
     for o in orders:
-        owner = deal_owner.get(str(o.get("parentId2"))) or str(o.get("assignedById"))
+        did = str(o.get("parentId2") or "")
+        owner = deal_owner.get(did) or str(o.get("assignedById"))
         grp = owner_group.get(owner)
         if not grp:
             continue
         won_closed = str(o.get("stageId", "")).endswith(":SUCCESS")
-        amt = eur(o.get("opportunity"), o.get("currencyId"))
+        buy = eur(o.get("opportunity"), o.get("currencyId"))    # opportunity заказа СП-172 = ЗАКУПКА
         for bucket in (g[grp], ppl[owner]):
             bucket["orders"] += 1
-            bucket["revenue"] += amt
+            bucket["buy"] += buy
             if won_closed:
                 bucket["closed"] += 1
+        if did:
+            contracts_g[grp].add(did); contracts_p[owner].add(did)
         order_details.append({"id": str(o.get("id")), "t": (o.get("title") or f'Заказ #{o.get("id")}')[:90],
-                              "amt": _money(amt), "raw": round(amt), "grp": grp,
+                              "amt": _money(buy), "raw": round(buy), "grp": grp,
                               "owner": owner, "own": owner_name.get(owner, owner), "closed": won_closed})
 
-    def fmt_rows(src: dict, label_key: str, label_get):
+    def sales_of(cset): return sum(deal_sale.get(did, 0.0) for did in cset)
+
+    def fmt_rows(src, cmap, label_key, label_get):
         out = []
         for key, v in src.items():
+            sales = sales_of(cmap.get(key, set())); margin = sales - v["buy"]
             out.append({
                 label_key: label_get(key), "uid": str(key), "grp": owner_group.get(key, "") if label_key == "name" else "",
                 "deals": v["deals"], "open": v["open"], "pipeline": _money(v["pipeline"]),
-                "orders": v["orders"], "revenue": _money(v["revenue"]), "revenueRaw": round(v["revenue"]),
-                "closed": v["closed"], "conv": _ratio(v["orders"], v["deals"]),
+                "contracts": len(cmap.get(key, set())), "orders": v["orders"],
+                "sales": _money(sales), "salesRaw": round(sales),
+                "buy": _money(v["buy"]), "buyRaw": round(v["buy"]),
+                "margin": _money(margin), "marginRaw": round(margin),
+                "marginPct": (round(margin / sales * 100) if sales else None),
+                "closed": v["closed"],
             })
-        out.sort(key=lambda r: r["revenueRaw"], reverse=True)
+        out.sort(key=lambda r: r["salesRaw"], reverse=True)
         return out
 
-    rows = fmt_rows(g, "group", lambda k: k)
-    people = fmt_rows({u: v for u, v in ppl.items() if v["deals"] or v["orders"]}, "name", lambda u: owner_name.get(u, u)) if with_people else []
+    rows = fmt_rows(g, contracts_g, "group", lambda k: k)
+    people = fmt_rows({u: v for u, v in ppl.items() if v["deals"] or v["orders"]}, contracts_p, "name", lambda u: owner_name.get(u, u)) if with_people else []
 
     pipe_sum = sum(g[r["group"]]["pipeline"] for r in rows)
-    rev_sum = sum(g[r["group"]]["revenue"] for r in rows)
-    tot_deals = sum(r["deals"] for r in rows); tot_orders = sum(r["orders"] for r in rows)
-    tot = {"deals": tot_deals, "open": sum(r["open"] for r in rows),
-           "pipeline": _money(pipe_sum), "orders": tot_orders,
-           "revenue": _money(rev_sum), "closed": sum(r["closed"] for r in rows),
-           "conv": _ratio(tot_orders, tot_deals)}
+    sales_sum = sum(r["salesRaw"] for r in rows); buy_sum = sum(r["buyRaw"] for r in rows)
+    margin_sum = sales_sum - buy_sum; tot_contracts = sum(r["contracts"] for r in rows)
+    tot = {"deals": sum(r["deals"] for r in rows), "open": sum(r["open"] for r in rows),
+           "pipeline": _money(pipe_sum), "contracts": tot_contracts, "orders": sum(r["orders"] for r in rows),
+           "sales": _money(sales_sum), "buy": _money(buy_sum), "margin": _money(margin_sum),
+           "marginPct": (round(margin_sum / sales_sum * 100) if sales_sum else 0),
+           "closed": sum(r["closed"] for r in rows)}
     kpis = [
-        ("Групп", str(len(rows)), "в наборе", "", ""),
-        ("Сделок", str(tot["deals"]), "у группы (YTD)", "", "deals"),
-        ("Активный пайплайн", tot["pipeline"], "Σ открытых, €", "ok", "open"),
-        ("Заказы (выигр.)", str(tot["orders"]), "СП-172", "ok", "orders"),
-        ("Контрактная выручка", tot["revenue"], "Σ заказов, €", "ok", "revenue"),
-        ("Закрыто заказов", str(tot["closed"]), "поставлено/оплачено", "", "closed"),
+        ("Сделок", str(tot["deals"]), "создано (YTD)", "", "deals"),
+        ("Активный пайплайн", tot["pipeline"], "Σ открытых продаж, €", "ok", "open"),
+        ("Контрактов", str(tot_contracts), "сделок с заказами поставщикам", "ok", ""),
+        ("Выручка (продажи)", tot["sales"], "Σ сумм сделок-контрактов, €", "ok", ""),
+        ("Закупка", tot["buy"], "Σ заказов поставщикам, €", "amber", "orders"),
+        ("Маржа", tot["margin"], f"{tot['marginPct']}% валовая", "ok" if margin_sum >= 0 else "warn", ""),
     ]
     return {
         "label": f"01.01 – {today.strftime('%d.%m.%Y')}",
@@ -146,7 +162,7 @@ def compute_set(client: BitrixClient, groups: dict[str, str], *, as_of: dt.date 
         "people": people,
         "totals": tot,
         "kpis": [{"lbl": l, "val": vv, "meta": me, "clz": c, "drill": dr} for l, vv, me, c, dr in kpis],
-        "byRevenue": [{"group": r["group"], "v": r["revenueRaw"], "label": r["revenue"]} for r in rows],
+        "byRevenue": [{"group": r["group"], "v": r["salesRaw"], "label": r["sales"]} for r in rows],
         "deals": deal_details,
         "orders": order_details,
     }
