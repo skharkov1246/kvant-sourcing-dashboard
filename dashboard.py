@@ -28,19 +28,21 @@ def _json_for_script(obj) -> str:
     return json.dumps(obj, ensure_ascii=False).replace("</", "<\\/")
 
 
-def render(metrics: dict, insights: dict, *, title: str = DEFAULT_TITLE) -> str:
+def render(metrics: dict, insights: dict, *, title: str = DEFAULT_TITLE, company: dict | None = None) -> str:
     html = TEMPLATE.read_text(encoding="utf-8")
     html = html.replace("__TITLE__", title)
     html = html.replace("__DATA_JSON__", _json_for_script(metrics))
     html = html.replace("__INSIGHTS_JSON__", _json_for_script(insights))
+    html = html.replace("__COMPANY_JSON__", _json_for_script(company) if company else "null")
     gen, nxt = _update_stamps()
     html = html.replace("__GENERATED_AT__", gen)
     html = html.replace("__NEXT_UPDATE__", nxt)
     return html
 
 
-def write(metrics: dict, insights: dict, out_path: str | Path, *, title: str = DEFAULT_TITLE) -> Path:
+def write(metrics: dict, insights: dict, out_path: str | Path, *, title: str = DEFAULT_TITLE,
+          company: dict | None = None) -> Path:
     out = Path(out_path)
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(render(metrics, insights, title=title), encoding="utf-8")
+    out.write_text(render(metrics, insights, title=title, company=company), encoding="utf-8")
     return out

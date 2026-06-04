@@ -18,6 +18,7 @@ import webbrowser
 from collections import Counter, defaultdict
 from pathlib import Path
 
+import company as company_mod
 import config
 import dashboard
 import insights as insights_mod
@@ -201,8 +202,15 @@ def run(args) -> int:
     ins = insights_mod.generate(m, settings, use_llm=use_llm)
     print(f"  источник: {ins.get('_source')}")
 
+    try:
+        print("• Пульс компании (YTD)…")
+        company_data = company_mod.compute(client, as_of=p.end)
+    except Exception as e:  # вкладка «Сорсинг» не должна падать из-за «Пульса»
+        print(f"  ⚠ пульс компании пропущен: {type(e).__name__}: {e}")
+        company_data = None
+
     html_path = out_dir / f"dashboard_{slug}.html"
-    dashboard.write(m, ins, html_path, title=f"Сорсинг · {p.label}")
+    dashboard.write(m, ins, html_path, title=f"Сорсинг · {p.label}", company=company_data)
     print(f"  ✓ дашборд: {html_path}")
 
     if args.open:

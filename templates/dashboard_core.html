@@ -146,10 +146,18 @@
   .req .rm{font-size:11px;color:var(--dim);font-family:var(--mono);margin-top:4px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
   .req .rm .sp{color:var(--b2)}
   .req .pill{font-size:9.5px;padding:1px 6px;border-radius:5px;background:var(--panel2);color:var(--mut)}
+  .tabs{display:flex;gap:8px;margin-bottom:18px}
+  .tab{font-family:var(--mono);font-size:12px;padding:7px 14px;border-radius:8px;border:1px solid var(--line);color:var(--mut);background:var(--panel);cursor:pointer}
+  .tab.act{color:#0e1116;background:var(--a2);border-color:var(--a2);font-weight:700}
+  .flow{display:flex;gap:10px;margin-top:12px}
+  .flowbox{flex:1;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px;text-align:center}
+  .flowbox .n{font-family:'Archivo';font-weight:800;font-size:22px}.flowbox .l{font-size:11px;color:var(--mut);margin-top:3px}
 </style>
 </head>
 <body>
 <div id="updstatus" class="updbar"><span class="ub-dot"></span><span class="ub-main">Обновление…</span></div>
+<div class="tabs"><button class="tab act" data-tab="sourcing">Сорсинг</button><button class="tab" data-tab="company">Пульс компании</button></div>
+<div id="tab-sourcing">
 <header>
   <div class="eyebrow">Квант · Отдел поиска поставщиков</div>
   <h1>Анализ работы сорсеров — нагрузка · конверсия · покрытие сделок</h1>
@@ -258,6 +266,30 @@
 </section>
 
 <footer id="footer"></footer>
+</div><!-- /tab-sourcing -->
+
+<div id="tab-company" hidden>
+  <header>
+    <div class="eyebrow">Квант · обзор компании</div>
+    <h1>Пульс компании — приток сделок и температура</h1>
+    <div class="sub" id="cmpSub"></div>
+  </header>
+  <div class="secttl"><b>1</b> · Динамика создания сделок</div>
+  <div class="grid">
+    <section class="card"><h2>Создано сделок по месяцам</h2><div class="note">Все клиентские воронки; текущий месяц — частичный.</div><div class="wkchart" id="cmpMon"></div></section>
+    <section class="card"><h2>Структура по воронкам (YTD)</h2><div class="barlist" id="cmpCat"></div></section>
+  </div>
+  <section class="card"><h2>Воронка × месяц (топ-5)</h2><table><thead id="cmpMxHead"></thead><tbody id="cmpMxBody"></tbody></table></section>
+  <div class="secttl"><b>2</b> · 20 параметров температуры</div>
+  <div class="kpis" id="cmpKpis" style="grid-template-columns:repeat(5,1fr)"></div>
+  <div class="secttl"><b>3</b> · Исход и рост базы</div>
+  <div class="grid">
+    <section class="card"><h2>Поток сделок 2026</h2><div class="note">Большинство созданных — тендерные лиды; «закрыто-минус» = в основном отсев на квалификации. Победы — по дате закрытия.</div><div class="flow" id="cmpFlow"></div></section>
+    <section class="card"><h2>Рост базы по месяцам</h2><div class="wkchart" id="cmpGrowth" style="height:150px"></div>
+    <div class="legendrow"><span><i class="sw" style="background:var(--ok)"></i>компании</span><span><i class="sw" style="background:var(--b)"></i>контакты</span><span><i class="sw" style="background:var(--a)"></i>лиды</span></div></section>
+  </div>
+  <footer id="cmpFooter"></footer>
+</div>
 
 <div class="ovl" id="ovl"></div>
 <aside class="drw" id="drw" aria-hidden="true">
@@ -268,6 +300,7 @@
 <script>
 window.__DATA__ = __DATA_JSON__;
 window.__INSIGHTS__ = __INSIGHTS_JSON__;
+window.__COMPANY__ = __COMPANY_JSON__;
 const M = window.__DATA__, INS = window.__INSIGHTS__;
 const cs = getComputedStyle(document.documentElement);
 const k = M.kpi, A = M.sourcersA, cov = M.coverage;
@@ -403,6 +436,32 @@ _ovl.addEventListener('click',closeDrw);
 document.getElementById('drwX').addEventListener('click',closeDrw);
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDrw();});
 document.querySelectorAll('[data-uid]').forEach(el=>el.addEventListener('click',()=>openDrw(el.dataset.uid)));
+
+// ---- вкладка «Пульс компании»
+const C = window.__COMPANY__;
+if (C) {
+  const $=id=>document.getElementById(id);
+  $('cmpSub').innerHTML=`<span>Период: <b>${C.label}</b></span><span>Источник: <b>Bitrix24 · все воронки</b></span><span>База: <b>€</b></span>`;
+  const mmx=Math.max(1,...C.byMon.map(x=>x.v));
+  $('cmpMon').innerHTML=C.byMon.map(x=>`<div class="wkcol"><div class="wkbars"><div class="wkbar a" style="height:${(x.v/mmx*100).toFixed(0)}%"><span>${x.v}</span></div></div><div class="wklbl"><b>${x.m}</b></div></div>`).join('');
+  const cmx=Math.max(1,...C.byCat.map(x=>x.v));
+  $('cmpCat').innerHTML=C.byCat.map(x=>`<div class="blrow"><div class="blt"><span>${x.cat}</span><b>${x.v} · ${x.p}%</b></div><div class="bltrack"><i style="width:${(x.v/cmx*100).toFixed(0)}%"></i></div></div>`).join('');
+  $('cmpMxHead').innerHTML='<tr><th>Воронка</th>'+C.matrix.months.map(m=>`<th class="r">${m}</th>`).join('')+'</tr>';
+  $('cmpMxBody').innerHTML=C.matrix.rows.map(r=>`<tr><td><div class="who">${r.cat}</div></td>`+r.cells.map(v=>`<td class="num r">${v||'·'}</td>`).join('')+`</tr>`).join('');
+  $('cmpKpis').innerHTML=C.params.map(p=>`<div class="kpi ${p.clz}"><div class="lbl">${p.lbl}</div><div class="val ${p.clz}">${p.val}</div><div class="meta">${p.meta}</div></div>`).join('');
+  const f=C.flow;
+  $('cmpFlow').innerHTML=`<div class="flowbox"><div class="n">${f.created}</div><div class="l">создано</div></div><div class="flowbox"><div class="n" style="color:var(--b2)">${f.open}</div><div class="l">в работе</div></div><div class="flowbox"><div class="n" style="color:var(--ok)">${f.won}</div><div class="l">выиграно</div></div><div class="flowbox"><div class="n" style="color:var(--nr)">${f.lost}</div><div class="l">закрыто-минус</div></div>`;
+  const gmx=Math.max(1,...C.growth.flatMap(x=>[x.comp,x.cont,x.leads]));
+  $('cmpGrowth').innerHTML=C.growth.map(x=>`<div class="wkcol"><div class="wkbars"><div class="wkbar" style="width:13px;height:${(x.comp/gmx*100).toFixed(0)}%;background:var(--ok)" title="компании ${x.comp}"></div><div class="wkbar" style="width:13px;height:${(x.cont/gmx*100).toFixed(0)}%;background:var(--b)" title="контакты ${x.cont}"></div><div class="wkbar" style="width:13px;height:${(x.leads/gmx*100).toFixed(0)}%;background:var(--a)" title="лиды ${x.leads}"></div></div><div class="wklbl"><b>${x.m}</b></div></div>`).join('');
+  $('cmpFooter').innerHTML='Пульс компании · Bitrix24 (сделки/компании/контакты/лиды/СП-166) · '+C.label+'. Суммы — к базовой € по курсам Bitrix; победы/Σ — по дате закрытия. «Просрочены» = открытые с прошедшим CLOSEDATE (вероятно, дата не ведётся).';
+}
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('act',x===b));
+  const t=b.dataset.tab;
+  document.getElementById('tab-sourcing').hidden=(t!=='sourcing');
+  document.getElementById('tab-company').hidden=(t!=='company');
+  window.scrollTo(0,0);
+}));
 
 // ---- animations
 requestAnimationFrame(()=>setTimeout(()=>{
