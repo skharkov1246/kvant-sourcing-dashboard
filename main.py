@@ -208,9 +208,9 @@ def run(args) -> int:
         print("• Пульс + КАМы + инжиниринг + продукт (YTD): общий пул сделок/заказов…")
         ys = "2026-01-01T00:00:00"
         deals_ytd = client.list_deals_fast(filter={">=DATE_CREATE": ys},
-            select=["ID", "CATEGORY_ID", "STAGE_SEMANTIC_ID", "OPPORTUNITY", "CURRENCY_ID", "DATE_CREATE", "ASSIGNED_BY_ID"])
+            select=["ID", "TITLE", "CATEGORY_ID", "STAGE_SEMANTIC_ID", "OPPORTUNITY", "CURRENCY_ID", "DATE_CREATE", "ASSIGNED_BY_ID"])
         orders_ytd = client.list_items(172, filter={">=createdTime": ys},
-            select=["id", "stageId", "opportunity", "currencyId", "createdTime", "parentId2", "assignedById"])
+            select=["id", "title", "stageId", "opportunity", "currencyId", "createdTime", "parentId2", "assignedById"])
         company_data = company_mod.compute(client, as_of=p.end, created=deals_ytd, orders=orders_ytd)
         kam_data = kam_mod.compute_set(client, kam_mod.CLIENT_GROUPS, as_of=p.end, created=deals_ytd, orders=orders_ytd, with_people=True)
         eng_data = kam_mod.compute_set(client, kam_mod.ENG_GROUPS, as_of=p.end, created=deals_ytd, orders=orders_ytd, with_people=True)
