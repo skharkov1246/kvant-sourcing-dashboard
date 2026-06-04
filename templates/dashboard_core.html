@@ -246,6 +246,17 @@
   <table><thead><tr><th>Воронка</th><th class="r">Сделок</th><th class="r">С запросом</th><th class="r">Покрытие</th><th class="r">Запросов</th><th class="r">Ср. постав.</th></tr></thead><tbody id="tbCov"></tbody></table>
 </section>
 
+<div class="secttl"><b>5</b> · Реально отправлено vs создано (+ фейк-отправки)</div>
+<section class="card">
+  <h2><span class="tag a">БЛОК A</span> Письмо действительно ушло поставщику?</h2>
+  <div class="note">«С письмом» = на карточке есть исходящее CRM-письмо (факт отправки). «Без письма» — карточка создана, но письма через систему не было. «Фейк» = карточка двинута из «Новый», но письма нет. «Дожим%» = доля карточек с ≥2 письмами.</div>
+  <table>
+    <thead><tr><th>Сорсер</th><th class="r">создано</th><th class="r">с письмом</th><th class="r">без письма</th><th class="r">% отправл.</th><th class="r">фейк</th><th class="r">дожим%</th></tr></thead>
+    <tbody id="tbSend"></tbody>
+    <tfoot id="tfSend"></tfoot>
+  </table>
+</section>
+
 <footer id="footer"></footer>
 
 <div class="ovl" id="ovl"></div>
@@ -303,6 +314,13 @@ document.getElementById('tbConv').innerHTML=A.map(r=>{const b=r.buckets;const p=
  return `<tr><td><div class="who">${r.n}</div><div class="dep">${r.c} запр. · вышло из «Новый» ${out}</div></td><td>${stack}</td><td class="num r">${r.closed}<small class="dimv"> / ${r.c}</small></td><td class="num r">${cell(r.kp,'q')}</td><td class="num r">${cell(r.refusedCol,'')}</td><td class="num r">${cell(r.noAnswer,'nrc')}</td><td class="r"><span class="spd ${sp}">${r.avgDays}</span></td></tr>`;}).join('');
 const tot=A.reduce((t,r)=>({c:t.c+r.c,closed:t.closed+r.closed,kp:t.kp+r.kp,ref:t.ref+r.refusedCol,nr:t.nr+r.noAnswer}),{c:0,closed:0,kp:0,ref:0,nr:0});
 document.getElementById('tfConv').innerHTML=`<tr style="border-top:2px solid var(--line)"><td><b>Отдел, итого</b></td><td></td><td class="r num">${tot.closed} / ${tot.c}</td><td class="r num q">${tot.kp}</td><td class="r num">${tot.ref}</td><td class="r num nrc">${tot.nr}</td><td class="r"></td></tr>`;
+
+// ---- отправлено vs создано (+ фейк)
+if (M.send && M.send.rows){
+  document.getElementById('tbSend').innerHTML=M.send.rows.map(r=>`<tr><td><div class="who">${r.n}</div></td><td class="num r">${r.total}</td><td class="num r q">${r.sent}</td><td class="num r ${r.nosend?'nrc':'dimv'}">${r.nosend}</td><td class="num r ${r.sentPct>=80?'q':(r.sentPct>=50?'':'nrc')}">${r.sentPct}%</td><td class="num r ${r.fake>=5?'nrc':'dimv'}">${r.fake}</td><td class="num r dimv">${r.fuPct}%</td></tr>`).join('');
+  const ts=M.send.totals;
+  document.getElementById('tfSend').innerHTML=`<tr style="border-top:2px solid var(--line)"><td><b>Отдел, итого</b></td><td class="r num">${ts.total}</td><td class="r num q">${ts.sent}</td><td class="r num nrc">${ts.nosend}</td><td class="r num">${ts.sentPct}%</td><td class="r num nrc">${ts.fake}</td><td class="r"></td></tr>`;
+}
 
 // ---- tkp list
 const tkpMax=Math.max(1,...A.map(r=>r.tkpP));
