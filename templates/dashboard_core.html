@@ -168,6 +168,17 @@
   .dt small{display:block;font-size:9.5px;letter-spacing:.04em;text-transform:uppercase;margin-top:1px}
   .dt.fact{color:var(--ok)}.dt.fact small{color:var(--ok2)}
   .dt.plan{color:var(--mut)}.dt.plan small{color:var(--dim)}
+  /* пай-чарт поставщиков (сорсинг) */
+  .piewrap{display:flex;gap:20px;align-items:center;flex-wrap:wrap}
+  .piesvg{flex-shrink:0}
+  .pieC{fill:var(--ink);font-family:'Archivo';font-size:26px;font-weight:800}
+  .pieL{fill:var(--mut);font-family:var(--mono);font-size:8px;text-transform:uppercase;letter-spacing:.1em}
+  .pielegend{flex:1;min-width:220px;display:flex;flex-direction:column;gap:3px}
+  .lgrow{display:flex;align-items:center;gap:8px;font-size:12px;padding:2px 0}
+  .lgrow .dot{width:9px;height:9px;border-radius:2px;flex-shrink:0}
+  .lgrow .lnm{flex:1;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .lgrow b{font-family:var(--mono);color:var(--ink)}
+  .lgrow small{font-family:var(--mono);color:var(--mut);min-width:34px;text-align:right}
   /* бейдж «как считается» + методика в дровере */
   .qq{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;border:1px solid var(--line);color:var(--mut);font-size:10px;font-family:var(--mono);cursor:pointer;margin-left:8px;vertical-align:middle;transition:.12s;user-select:none;flex-shrink:0}
   .qq:hover{border-color:var(--a);color:var(--a);background:rgba(245,165,36,.08)}
@@ -223,7 +234,7 @@
 </head>
 <body>
 <div id="updstatus" class="updbar"><span class="ub-dot"></span><span class="ub-main">Обновление…</span></div>
-<div class="tabs"><button class="tab act" data-tab="sourcing">Сорсинг</button><button class="tab" data-tab="company">Пульс компании</button><button class="tab" data-tab="kam">КАМы</button><button class="tab" data-tab="eng">Инжиниринг</button><button class="tab" data-tab="prod">Продукт-оунеры</button><button class="tab" data-tab="contracts">Контракты</button></div>
+<div class="tabs"><button class="tab act" data-tab="sourcing">Сорсинг</button><button class="tab" data-tab="company">Пульс компании</button><button class="tab" data-tab="kam">КАМы</button><button class="tab" data-tab="eng">Инжиниринг</button><button class="tab" data-tab="prod">Продукт-оунеры</button><button class="tab" data-tab="contracts">Реализация</button></div>
 <div id="tab-sourcing">
 <header>
   <div class="eyebrow">Квант · Отдел поиска поставщиков</div>
@@ -332,6 +343,12 @@
   </table>
 </section>
 
+<div class="secttl"><b>6</b> · Разнообразие поставщиков</div>
+<div class="grid">
+  <section class="card"><h2>Основные запрошенные поставщики</h2><div class="note">Доля запросов (СП-166, блок A) по поставщикам — насколько диверсифицирована база. Наведи на сектор — имя и число запросов.</div><div class="pie" id="supPie"></div></section>
+  <section class="card"><h2>Поставщиков на сорсера</h2><div class="note">Сколько РАЗНЫХ поставщиков запрашивает каждый — ширина воронки поиска. Клик — кому и что слал.</div><div id="supPerSorcer" class="ownlist"></div></section>
+</div>
+
 <footer id="footer"></footer>
 </div><!-- /tab-sourcing -->
 
@@ -429,8 +446,25 @@ document.getElementById('tfConv').innerHTML=`<tr style="border-top:2px solid var
 // ---- отправлено vs создано (+ фейк)
 if (M.send && M.send.rows){
   document.getElementById('tbSend').innerHTML=M.send.rows.map(r=>`<tr><td><div class="who">${_esc(r.n)}</div></td><td class="num r">${r.total}</td><td class="num r q">${r.sent}</td><td class="num r ${r.nosend?'nrc':'dimv'}">${r.nosend}</td><td class="num r ${r.sentPct>=80?'q':(r.sentPct>=50?'':'nrc')}">${r.sentPct}%</td><td class="num r ${r.fake>=5?'nrc':'dimv'}">${r.fake}</td><td class="num r dimv">${r.fuPct}%</td></tr>`).join('');
-  const ts=M.send.totals;
-  document.getElementById('tfSend').innerHTML=`<tr style="border-top:2px solid var(--line)"><td><b>Отдел, итого</b></td><td class="r num">${ts.total}</td><td class="r num q">${ts.sent}</td><td class="r num nrc">${ts.nosend}</td><td class="r num">${ts.sentPct}%</td><td class="r num nrc">${ts.fake}</td><td class="r"></td></tr>`;
+}
+// ---- разнообразие поставщиков (пай-чарт + поставщиков на сорсера)
+{
+  const SM=M.supplierMix, pie=document.getElementById('supPie');
+  const PAL=['#f5a524','#2ebf7f','#3b82f6','#a855f7','#ec4899','#14b8a6','#eab308','#ef4444','#8b5cf6','#06b6d4','#f97316','#84cc16'];
+  if(pie&&SM&&SM.top&&SM.top.length){
+    const R=52,SW=22,Ccirc=2*Math.PI*R,tot=SM.total||1; let off=0,circ='';
+    SM.top.forEach((s,i)=>{const len=s.n/tot*Ccirc; circ+=`<circle r="${R}" cx="80" cy="80" fill="none" stroke="${PAL[i%PAL.length]}" stroke-width="${SW}" stroke-dasharray="${len.toFixed(2)} ${(Ccirc-len).toFixed(2)}" stroke-dashoffset="${(-off).toFixed(2)}" transform="rotate(-90 80 80)"><title>${_esc(s.sup)}: ${s.n} (${s.p}%)</title></circle>`; off+=len;});
+    if(SM.other>0){const len=SM.other/tot*Ccirc; circ+=`<circle r="${R}" cx="80" cy="80" fill="none" stroke="#3a4250" stroke-width="${SW}" stroke-dasharray="${len.toFixed(2)} ${(Ccirc-len).toFixed(2)}" stroke-dashoffset="${(-off).toFixed(2)}" transform="rotate(-90 80 80)"><title>прочие: ${SM.other}</title></circle>`;}
+    const svg=`<svg viewBox="0 0 160 160" width="150" height="150">${circ}<text x="80" y="76" text-anchor="middle" class="pieC">${SM.distinct}</text><text x="80" y="94" text-anchor="middle" class="pieL">поставщиков</text></svg>`;
+    const leg=SM.top.map((s,i)=>`<div class="lgrow"><i class="dot" style="background:${PAL[i%PAL.length]}"></i><span class="lnm" title="${_esc(s.sup)}">${_esc(s.sup)}</span><b>${s.n}</b><small>${s.p}%</small></div>`).join('')+(SM.other>0?`<div class="lgrow"><i class="dot" style="background:#3a4250"></i><span class="lnm dimv">прочие (${Math.max(0,SM.distinct-SM.top.length)})</span><b>${SM.other}</b><small></small></div>`:'');
+    pie.innerHTML=`<div class="piewrap"><div class="piesvg">${svg}</div><div class="pielegend">${leg}</div></div>`+(SM.unknown?`<div class="note" style="margin-top:8px">Без указания поставщика: ${SM.unknown} запросов.</div>`:'');
+  } else if(pie){ pie.innerHTML='<div class="note">нет данных по поставщикам</div>'; }
+  const ps=document.getElementById('supPerSorcer');
+  if(ps){const mx=Math.max(1,...A.map(s=>s.nsup||0));
+    ps.innerHTML=A.slice().sort((a,b)=>(b.nsup||0)-(a.nsup||0)).map(s=>`<div class="ownrow clickrow" data-uid="${s.id}"><div class="onm who" style="min-width:160px;flex-shrink:0">${_esc(s.n)}</div><div class="obar"><i style="width:${((s.nsup||0)/mx*100).toFixed(0)}%"></i></div><div class="ocnt">${s.nsup||0} <span class="dimv">пост. / ${s.c} зап.</span></div></div>`).join('');
+  }
+  if(M.send&&M.send.totals){const ts=M.send.totals;
+  document.getElementById('tfSend').innerHTML=`<tr style="border-top:2px solid var(--line)"><td><b>Отдел, итого</b></td><td class="r num">${ts.total}</td><td class="r num q">${ts.sent}</td><td class="r num nrc">${ts.nosend}</td><td class="r num">${ts.sentPct}%</td><td class="r num nrc">${ts.fake}</td><td class="r"></td></tr>`;}
 }
 
 // ---- tkp list
@@ -588,6 +622,7 @@ const METH={
   's.tkp':{t:'Цепочка «запрос → сделка»',what:'Доля запросов, чья клиентская сделка дошла до коммерческого предложения и далее.',src:'parentId2 RFQ → crm.deal.list (стадия сделки).',formula:'RFQ засчитан, если у сделки-родителя STAGE_SEMANTIC_ID = S (выиграна) либо стадия из набора «ТКП выдано+».',note:'Эвристика по именам стадий; набор сверяется с воронками — возможна небольшая погрешность.'},
   's.cov':{t:'Покрытие сделок сорсингом',what:'Сколько клиентских сделок реально обеспечены запросами поставщикам.',src:'crm.deal.list (созданные в окне) ↔ обратный parentId2 из СП-166.',formula:'Покрытие = доля сделок с ≥1 связанным RFQ. Ср. поставщиков = RFQ ÷ покрытые сделки. Гистограмма: 1 / 2–3 / 4–5 / 6+ запросов на сделку.'},
   's.send':{t:'Реально отправлено vs создано',what:'Сверка: карточку запроса завели — но отправили ли письмо поставщику.',src:'Активности OWNER_TYPE_ID=166, PROVIDER_ID=CRM_EMAIL (исходящие письма).',formula:'Отправлено = RFQ с ≥1 исходящим письмом. «Фейк-отправки» = RFQ в стадии «отправлено» без письма.',note:'Привязка письма к RFQ местами неполная на стороне Bitrix — считаем нижней оценкой.'},
+  's.suppliers':{t:'Разнообразие поставщиков',what:'Насколько широка база поставщиков, к которым обращается сорсинг.',src:'СП-166 (запросы), поле поставщика ufCrm18Supplier → имя компании; блок A.',formula:'Пай-чарт — доля запросов по поставщикам (топ-12 + прочие). «Поставщиков на сорсера» — число РАЗНЫХ поставщиков, к которым обращался сотрудник.',note:'Концентрация на немногих поставщиках = риск; широкая база = больше альтернатив по цене/срокам.'},
   'c.mon':{t:'Создано сделок по месяцам',what:'Приток новых сделок помесячно.',src:'crm.deal.list, поле DATE_CREATE, все клиентские воронки.',filt:'DATE_CREATE ≥ 01.01.2026.',formula:'Count сделок по месяцу создания; текущий месяц частичный.',note:'Клик по столбцу — список сделок месяца.'},
   'c.cat':{t:'Структура по воронкам',what:'Распределение сделок по воронкам.',src:'crm.deal.list (CATEGORY_ID) + crm.dealcategory.list (имена).',formula:'Count и доля % по CATEGORY_ID, YTD.',note:'Клик по строке — сделки воронки.'},
   'c.matrix':{t:'Воронка × месяц',what:'Кросс-таблица притока: топ-5 воронок по месяцам.',src:'crm.deal.list (CATEGORY_ID × месяц DATE_CREATE).',formula:'Count сделок в каждой ячейке (месяц × воронка).',note:'Клик по ячейке — сделки пересечения.'},
@@ -644,6 +679,7 @@ function injectMeth(){
     else if(/Нагрузка/.test(t))k='s.load'; else if(/Конверс/.test(t))k='s.conv';
     else if(/Цепочк/.test(t))k='s.tkp'; else if(/Покрыт/.test(t))k='s.cov';
     else if(/отправлено vs|Реально отправлено/.test(t))k='s.send';
+    else if(/Разнообразие постав/.test(t))k='s.suppliers';
     if(k)add(s,k);
   });
   const sh=document.querySelector('#tab-sourcing header h1'); if(sh) add(sh,'s.kpi');
@@ -706,23 +742,23 @@ renderDir(window.__PRODUCT__,'tab-prod',{eyebrow:'Квант · продукто
   const NUM={saleEur:1,buyEur:1,marginEur:1};
   const COLS=[['customer','Заказчик','l'],['deal','№ сделки / контракт','l'],['saleEur','Сумма сделки','r'],['buyEur','Закупка','r'],['marginEur','Маржа','r']];
   const orph=X.orphan&&X.orphan.n?` · ещё ${X.orphan.n} заказов без сделки (закупка ${X.orphan.buy})`:'';
-  el.innerHTML=`<header><div class="eyebrow">Квант · реализация</div><h1>Контракты в реализации</h1><div class="sub"><span>Источник: <b>Bitrix24 · сделки + Заказы поставщикам (СП-172)</b></span><span>Состояние: <b>${X.label}</b></span><span class="dimv">Победные сделки с заказами поставщикам${orph}</span></div></header>`
+  el.innerHTML=`<header><div class="eyebrow">Квант · реализация</div><h1>Сделки в реализации</h1><div class="sub"><span>Источник: <b>Bitrix24 · сделки + Заказы поставщикам (СП-172)</b></span><span>Состояние: <b>${X.label}</b> · обновление каждые 2ч</span><span class="dimv">Победные сделки с заказами поставщикам${orph}</span></div></header>`
     +`<div class="kpis" style="grid-template-columns:repeat(6,1fr)">${X.kpis.map(p=>`<div class="kpi ${p.clz}"><div class="lbl">${p.lbl}</div><div class="val ${p.clz}">${p.val}</div><div class="meta">${p.meta}</div></div>`).join('')}</div>`
     +`<div class="secttl"><b>·</b> Список контрактов <span id="ctCount" class="dimv" style="font-weight:400"></span></div>`
     +`<div class="ctools"><input id="ctSearch" class="search" placeholder="Поиск: заказчик · № сделки · контракт · поставщик…"></div>`
     +`<section class="card"><div class="note">«Сумма сделки» — продажа клиенту (сделка). «Закупка» — Σ заказов поставщикам по сделке (СП-172). «Маржа» = продажа − закупка. Все суммы — к базовой € по курсам Bitrix. Клик по заголовку — сортировка.</div><table class="ctab"><thead id="ctHead"></thead><tbody id="ctBody"></tbody></table></section>`;
-  const head=()=>{document.getElementById('ctHead').innerHTML='<tr>'+COLS.map(c=>`<th class="${c[2]==='r'?'r ':''}sortable${sortKey===c[0]?' on':''}" data-sk="${c[0]}">${c[1]}${sortKey===c[0]?(sortDir<0?' ▾':' ▴'):''}</th>`).join('')+'</tr>';};
+  const head=()=>{document.getElementById('ctHead').innerHTML='<tr><th class="r" style="width:42px">№</th>'+COLS.map(c=>`<th class="${c[2]==='r'?'r ':''}sortable${sortKey===c[0]?' on':''}" data-sk="${c[0]}">${c[1]}${sortKey===c[0]?(sortDir<0?' ▾':' ▴'):''}</th>`).join('')+'</tr>';};
   const mcell=x=>{const cl=x.marginEur<0?'color:var(--nr)':'color:var(--ok)';const pct=x.marginPct==null?'<span class="dimv">—</span>':(x.marginPct+'%');return `<div class="mono" style="${cl}">${x.marginLbl}</div><div class="dep">${pct}</div>`;};
   function rows(){
     let r=X.rows;
     if(q){const s=q.toLowerCase(); r=r.filter(x=>((x.customer||'')+' '+(x.title||'')+' '+x.deal+' '+(x.suppliers||'')).toLowerCase().includes(s));}
     r=r.slice().sort((a,b)=> NUM[sortKey] ? ((a[sortKey]||0)-(b[sortKey]||0))*sortDir : String(a[sortKey]||'').localeCompare(String(b[sortKey]||''),'ru')*sortDir);
     document.getElementById('ctCount').textContent=`(${r.length} из ${X.rows.length})`;
-    document.getElementById('ctBody').innerHTML=r.map(x=>`<tr><td><div class="who">${_esc(x.customer)}</div><div class="dep">${_esc(x.title)}</div></td>`
+    document.getElementById('ctBody').innerHTML=r.map((x,i)=>`<tr><td class="r dimv mono">${i+1}</td><td><div class="who">${_esc(x.customer)}</div><div class="dep">${_esc(x.title)}</div></td>`
       +`<td><div class="mono">${x.deal?('#'+x.deal):'—'}</div><div class="dep">${x.done?'<span class="pill p-selected">завершён</span>':'<span class="pill">в реализации</span>'} ${x.norders}×закуп${x.suppliers?(' · '+_esc(x.suppliers)):''}</div></td>`
       +`<td class="r"><div class="mono" style="color:var(--ink)">${x.saleLbl}</div><div class="dep">${x.saleCur&&x.saleCur!=='EUR'?_esc(x.saleOrig):''}</div></td>`
       +`<td class="r"><div class="mono" style="color:var(--a)">${x.buyLbl}</div></td>`
-      +`<td class="r">${mcell(x)}</td></tr>`).join('')||'<tr><td colspan="5" class="dimv" style="padding:14px">ничего не найдено</td></tr>';
+      +`<td class="r">${mcell(x)}</td></tr>`).join('')||'<tr><td colspan="6" class="dimv" style="padding:14px">ничего не найдено</td></tr>';
   }
   head(); rows();
   document.getElementById('ctSearch').addEventListener('input',e=>{q=e.target.value; rows();});

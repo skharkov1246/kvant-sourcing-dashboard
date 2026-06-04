@@ -87,7 +87,9 @@ def build(
                 "dt": (r.get("createdTime") or "")[:10],
             })
         by_supplier = [{"sup": s, "n": n} for s, n in Counter(d["sup"] for d in details).most_common()]
+        nsup = sum(1 for x in by_supplier if x["sup"] not in ("—", "", None))
         sourcers_a.append({
+            "nsup": nsup,
             "id": uid,
             "n": names.get(uid, f"user#{uid}"),
             "since": since.get(uid, ""),
@@ -106,6 +108,22 @@ def build(
             "bySupplier": by_supplier,
         })
     sourcers_a.sort(key=lambda s: s["c"], reverse=True)
+
+    # ---- разнообразие поставщиков (блок A): топ запрошенных + общий охват
+    sup_a = Counter()
+    for r in rfqs:
+        if str(r.get("assignedById")) in dept_a_ids:
+            sup_a[r.get("_supplier") or "—"] += 1
+    named = Counter({s: n for s, n in sup_a.items() if s not in ("—", "", None)})
+    _topn = named.most_common(12)
+    _named_total = sum(named.values())
+    supplier_mix = {
+        "top": [{"sup": s, "n": n, "p": _pct(n, _named_total)} for s, n in _topn],
+        "other": _named_total - sum(n for _, n in _topn),
+        "distinct": len(named),
+        "total": _named_total,
+        "unknown": sup_a.get("—", 0),
+    }
 
     # ---- недельная динамика A vs B
     weekly = []
@@ -196,6 +214,7 @@ def build(
         },
         "weekly": weekly,
         "sourcersA": sourcers_a,
+        "supplierMix": supplier_mix,
         "chain": {
             "early": chain.get("early", 0),
             "tkp": tkp_all,
