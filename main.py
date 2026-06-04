@@ -22,6 +22,7 @@ import company as company_mod
 import config
 import dashboard
 import insights as insights_mod
+import kam as kam_mod
 import metrics as metrics_mod
 import period as period_mod
 from bitrix_client import BitrixClient
@@ -202,15 +203,21 @@ def run(args) -> int:
     ins = insights_mod.generate(m, settings, use_llm=use_llm)
     print(f"  источник: {ins.get('_source')}")
 
+    company_data = kam_data = None
     try:
-        print("• Пульс компании (YTD)…")
-        company_data = company_mod.compute(client, as_of=p.end)
-    except Exception as e:  # вкладка «Сорсинг» не должна падать из-за «Пульса»
-        print(f"  ⚠ пульс компании пропущен: {type(e).__name__}: {e}")
-        company_data = None
+        print("• Пульс компании + КАМы (YTD): общий пул сделок/заказов…")
+        ys = "2026-01-01T00:00:00"
+        deals_ytd = client.list_deals_fast(filter={">=DATE_CREATE": ys},
+            select=["ID", "CATEGORY_ID", "STAGE_SEMANTIC_ID", "OPPORTUNITY", "CURRENCY_ID", "DATE_CREATE", "ASSIGNED_BY_ID"])
+        orders_ytd = client.list_items(172, filter={">=createdTime": ys},
+            select=["id", "stageId", "opportunity", "currencyId", "createdTime", "parentId2", "assignedById"])
+        company_data = company_mod.compute(client, as_of=p.end, created=deals_ytd, orders=orders_ytd)
+        kam_data = kam_mod.compute(client, as_of=p.end, created=deals_ytd, orders=orders_ytd)
+    except Exception as e:  # вкладка «Сорсинг» не должна падать из-за доп. вкладок
+        print(f"  ⚠ пульс/КАМы пропущены: {type(e).__name__}: {e}")
 
     html_path = out_dir / f"dashboard_{slug}.html"
-    dashboard.write(m, ins, html_path, title=f"Сорсинг · {p.label}", company=company_data)
+    dashboard.write(m, ins, html_path, title=f"Сорсинг · {p.label}", company=company_data, kam=kam_data)
     print(f"  ✓ дашборд: {html_path}")
 
     if args.open:

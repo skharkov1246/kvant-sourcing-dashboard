@@ -23,7 +23,8 @@ def _money(v: float) -> str:
     return f"€{v}"
 
 
-def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
+def compute(client: BitrixClient, *, as_of: dt.date | None = None,
+            created: list[dict] | None = None, orders: list[dict] | None = None) -> dict:
     today = as_of or dt.date.today()
     months = [f"2026-{m:02d}" for m in range(1, today.month + 1)]
     cur_part = today.strftime("%Y-%m")
@@ -33,8 +34,9 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
     rate = {x.get("CURRENCY"): (float(x.get("AMOUNT") or 1) / float(x.get("AMOUNT_CNT") or 1)) for x in curlist}
     def eur(o, cu): return float(o or 0) * rate.get(cu, 1.0)
 
-    created = client.list_deals_fast(filter={">=DATE_CREATE": YEAR_START},
-        select=["ID", "CATEGORY_ID", "STAGE_SEMANTIC_ID", "OPPORTUNITY", "CURRENCY_ID", "DATE_CREATE", "ASSIGNED_BY_ID"])
+    if created is None:
+        created = client.list_deals_fast(filter={">=DATE_CREATE": YEAR_START},
+            select=["ID", "CATEGORY_ID", "STAGE_SEMANTIC_ID", "OPPORTUNITY", "CURRENCY_ID", "DATE_CREATE", "ASSIGNED_BY_ID"])
     by_mon = Counter(); by_cat = Counter(); by_mon_cat = defaultdict(Counter)
     openc = 0; open_sum = 0.0; owners = set(); created_ids = set()
     for d in created:
@@ -58,6 +60,13 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
         except Exception:
             pass
     lost = client.count_deals({"STAGE_SEMANTIC_ID": "F", ">=CLOSEDATE": YEAR_START})
+
+    # «Заказы» (СП-172) = выигранные сделки в исполнении → реальная контрактная выручка
+    if orders is None:
+        orders = client.list_items(172, filter={">=createdTime": YEAR_START},
+                                   select=["id", "stageId", "opportunity", "currencyId", "createdTime"])
+    orders_sum = sum(eur(o.get("opportunity"), o.get("currencyId")) for o in orders)
+    orders_closed = sum(1 for o in orders if str(o.get("stageId", "")).endswith(":SUCCESS"))
 
     # overdue среди открытых (по созданным в 2026)
     overdue = client.count_deals({"<CLOSEDATE": today.isoformat(), "!=STAGE_SEMANTIC_ID": ["S", "F"], ">=DATE_CREATE": YEAR_START})
@@ -94,10 +103,10 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
         ("В работе (open)", str(openc), "открытых сделок", ""),
         ("Активный пайплайн", _money(open_sum), "Σ открытых, €", "ok"),
         ("Ср. размер открытой", _money(open_sum / openc if openc else 0), "потенциал/сделку", ""),
-        ("Выиграно (YTD)", str(len(won)), "по дате закрытия", "ok"),
-        ("Σ выручки (won)", _money(won_sum), "закрыто в плюс, €", "ok"),
-        ("Ср. чек победы", _money(won_sum / len(won) if won else 0), "won, €", ""),
-        ("Ср. цикл победы", f"{round(sum(cyc)/len(cyc)) if cyc else 0} дн", "создание→закрытие", ""),
+        ("Заказы (выигр.)", str(len(orders)), "сделки в исполнении (СП-172)", "ok"),
+        ("Σ заказов", _money(orders_sum), "контрактная выручка, €", "ok"),
+        ("Закрыто заказов", str(orders_closed), "поставлено и оплачено", "ok"),
+        ("Ср. чек заказа", _money(orders_sum / len(orders) if orders else 0), "€/заказ", ""),
         ("Закрыто-минус", str(lost), "отсев/проигрыш", "warn"),
         ("Просрочены (open)", str(overdue), "CLOSEDATE прошёл", "warn" if overdue else ""),
         ("Новых компаний", str(sum(comp.values())), "рост базы YTD", ""),
@@ -116,6 +125,6 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
         "matrix": {"months": [MLBL[int(m[5:7])] for m in months],
                    "rows": [{"cat": name(k), "cells": [by_mon_cat[m].get(k, 0) for m in months]} for k in top5]},
         "params": [{"lbl": l, "val": v, "meta": me, "clz": c} for l, v, me, c in params],
-        "flow": {"created": total, "open": openc, "won": len(won), "lost": lost},
+        "flow": {"created": total, "open": openc, "won": len(orders), "lost": lost},
         "growth": [{"m": MLBL[int(m[5:7])], "comp": comp.get(m, 0), "cont": cont.get(m, 0), "leads": leads.get(m, 0)} for m in months],
     }
