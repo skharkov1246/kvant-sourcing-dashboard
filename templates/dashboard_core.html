@@ -128,6 +128,16 @@
   tr.clickrow:hover td{background:rgba(245,165,36,.06)}
   .row.clickrow:hover{background:rgba(245,165,36,.05);border-radius:8px}
   .clickrow .who::after,.clickrow .nm::after{content:" ›";color:var(--a);font-weight:700}
+  /* кликабельные элементы отраслевых вкладок (KPI / строки групп и людей / бары) */
+  .drill{cursor:pointer}
+  tr.drill:hover td{background:rgba(245,165,36,.06)}
+  tr.drill .who::after{content:" ›";color:var(--a);font-weight:700}
+  .kpi.drill{transition:border-color .12s,transform .12s}
+  .kpi.drill:hover{border-color:var(--a);transform:translateY(-1px)}
+  .kpi.drill .lbl::after{content:" ›";color:var(--a)}
+  .blrow.drill{cursor:pointer;border-radius:8px;transition:background .12s}
+  .blrow.drill:hover{background:rgba(245,165,36,.05)}
+  .req .rm .amt{margin-left:auto;color:var(--ok)}
   .ovl{position:fixed;inset:0;background:rgba(8,11,15,.62);opacity:0;pointer-events:none;transition:opacity .2s;z-index:40}
   .ovl.on{opacity:1;pointer-events:auto}
   .drw{position:fixed;top:0;right:0;height:100%;width:min(560px,94vw);background:var(--panel);border-left:1px solid var(--line);box-shadow:-20px 0 50px rgba(0,0,0,.45);transform:translateX(100%);transition:transform .25s cubic-bezier(.2,.7,.2,1);z-index:41;display:flex;flex-direction:column}
@@ -463,21 +473,51 @@ if (C) {
   $('cmpFooter').innerHTML='Пульс компании · Bitrix24 (сделки/компании/контакты/лиды/СП-166) · '+C.label+'. Суммы — к базовой € по курсам Bitrix; победы/Σ — по дате закрытия. «Просрочены» = открытые с прошедшим CLOSEDATE (вероятно, дата не ведётся).';
 }
 // ---- вкладки направлений (КАМы / Инжиниринг / Продукт-оунеры) — общий рендер
+// ---- drill-down отраслевых вкладок: клик по метрике → список сделок/заказов в дровере
+const _fmtE=v=>{v=Math.round(v);const a=Math.abs(v);return a>=1e6?'€'+(v/1e6).toFixed(1)+'M':a>=1e3?'€'+Math.round(v/1e3)+'K':'€'+v;};
+function openDir(D,opt,spec){
+  const i=spec.indexOf(':'),kind=spec.slice(0,i),key=spec.slice(i+1);
+  let deals=[],orders=[],title='',sub='';
+  if(kind==='grp'){deals=D.deals.filter(x=>x.grp===key);orders=D.orders.filter(x=>x.grp===key);title=key;sub=opt.unit;}
+  else if(kind==='own'){deals=D.deals.filter(x=>x.owner===key);orders=D.orders.filter(x=>x.owner===key);const p=(D.people||[]).find(z=>z.uid===key);title=p?p.name:key;sub=p?p.grp:'';}
+  else if(kind==='kpi'){
+    if(key==='deals'){deals=D.deals;title='Все сделки';}
+    else if(key==='open'){deals=D.deals.filter(x=>x.open);title='Активные сделки (пайплайн)';}
+    else if(key==='orders'){orders=D.orders;title='Все заказы';}
+    else if(key==='revenue'){orders=D.orders;title='Заказы по сумме';}
+    else if(key==='closed'){orders=D.orders.filter(x=>x.closed);title='Закрытые (исполненные) заказы';}
+    sub=opt.title;
+  }
+  deals=deals.slice().sort((a,b)=>b.raw-a.raw);
+  orders=orders.slice().sort((a,b)=>b.raw-a.raw);
+  document.getElementById('drwName').textContent=title;
+  document.getElementById('drwSub').textContent=`${sub} · ${D.label} · сделок ${deals.length} · заказов ${orders.length}`;
+  const showOwn=kind!=='own';
+  const own=x=>showOwn?`<span>${_esc(x.own)}</span>`:'';
+  const orow=o=>`<div class="req"><div class="rt">${_esc(o.t)}</div><div class="rm"><span class="pill">${o.closed?'исполнен':'в работе'}</span>${own(o)}<span class="amt">${o.amt}</span></div></div>`;
+  const drow=d=>`<div class="req"><div class="rt">${_esc(d.t)}</div><div class="rm"><span class="pill">${d.open?'в работе':'закрыта'}</span>${own(d)}<span class="amt">${d.amt}</span></div></div>`;
+  let h='';
+  if(orders.length){const s=orders.reduce((a,o)=>a+o.raw,0);h+=`<div class="h">Заказы (${orders.length}) · Σ ${_fmtE(s)}</div>`+orders.slice(0,300).map(orow).join('');if(orders.length>300)h+=`<div class="dimv" style="padding:6px 0">…ещё ${orders.length-300}</div>`;}
+  if(deals.length){const pl=deals.filter(d=>d.open).reduce((a,d)=>a+d.raw,0);h+=`<div class="h">Сделки (${deals.length}) · пайплайн ${_fmtE(pl)}</div>`+deals.slice(0,300).map(drow).join('');if(deals.length>300)h+=`<div class="dimv" style="padding:6px 0">…ещё ${deals.length-300}</div>`;}
+  document.getElementById('drwBody').innerHTML=h||'<div class="dimv">нет записей</div>';
+  _ovl.classList.add('on');_drw.classList.add('on');_drw.setAttribute('aria-hidden','false');
+}
 function renderDir(D, elId, opt){
   const el=document.getElementById(elId); if(!el) return;
   if(!D){ el.innerHTML='<div class="note" style="padding:20px 0">нет данных</div>'; return; }
   const t=D.totals;
-  const row=r=>`<tr><td><div class="who">${r.group}</div></td><td class="num r">${r.deals}</td><td class="num r">${r.open}</td><td class="num r">${r.pipeline}</td><td class="num r" style="color:var(--ok2)">${r.orders}</td><td class="num r" style="color:var(--ok)">${r.revenue}</td><td class="num r dimv">${r.closed}</td><td class="num r">${r.conv}</td></tr>`;
+  const row=r=>`<tr class="drill" data-drill="grp:${_esc(r.group)}"><td><div class="who">${r.group}</div></td><td class="num r">${r.deals}</td><td class="num r">${r.open}</td><td class="num r">${r.pipeline}</td><td class="num r" style="color:var(--ok2)">${r.orders}</td><td class="num r" style="color:var(--ok)">${r.revenue}</td><td class="num r dimv">${r.closed}</td><td class="num r">${r.conv}</td></tr>`;
   const rmx=Math.max(1,...D.byRevenue.map(x=>x.v));
-  let h=`<header><div class="eyebrow">${opt.eyebrow}</div><h1>${opt.title}</h1><div class="sub"><span>Период: <b>${D.label}</b></span><span>Источник: <b>Bitrix24 · сделки + Заказы (СП-172)</b></span></div></header>`;
-  h+=`<div class="kpis" style="grid-template-columns:repeat(3,1fr)">${D.kpis.map(p=>`<div class="kpi ${p.clz}"><div class="lbl">${p.lbl}</div><div class="val ${p.clz}">${p.val}</div><div class="meta">${p.meta}</div></div>`).join('')}</div>`;
+  let h=`<header><div class="eyebrow">${opt.eyebrow}</div><h1>${opt.title}</h1><div class="sub"><span>Период: <b>${D.label}</b></span><span>Источник: <b>Bitrix24 · сделки + Заказы (СП-172)</b></span><span class="dimv">↳ клик по карточке, группе или человеку — детализация</span></div></header>`;
+  h+=`<div class="kpis" style="grid-template-columns:repeat(3,1fr)">${D.kpis.map(p=>`<div class="kpi ${p.clz}${p.drill?' drill':''}"${p.drill?` data-drill="kpi:${p.drill}"`:''}><div class="lbl">${p.lbl}</div><div class="val ${p.clz}">${p.val}</div><div class="meta">${p.meta}</div></div>`).join('')}</div>`;
   h+=`<div class="secttl"><b>1</b> · ${opt.sec1}</div><section class="card"><h2>Сделки → заказы → выручка</h2><div class="note">По ответственным группы. «Пайплайн» — Σ открытых сделок (€); «Заказы» (СП-172) = выигранные; «Выручка» — Σ заказов (€); «Зак/сд» = заказов на одну сделку 2026 (повторные заказы по сделкам старше 2026 дают >1×). Суммы — к базовой € по курсам Bitrix.</div><table><thead><tr><th>${opt.unit}</th><th class="r">сделок</th><th class="r">в работе</th><th class="r">пайплайн</th><th class="r">заказов</th><th class="r">выручка</th><th class="r">закрыто</th><th class="r">зак/сд</th></tr></thead><tbody>${D.rows.map(row).join('')}</tbody><tfoot><tr style="border-top:2px solid var(--line)"><td><b>Итого</b></td><td class="r num">${t.deals}</td><td class="r num">${t.open}</td><td class="r num">${t.pipeline}</td><td class="r num" style="color:var(--ok2)">${t.orders}</td><td class="r num" style="color:var(--ok)">${t.revenue}</td><td class="r num dimv">${t.closed}</td><td class="r num">${t.conv}</td></tr></tfoot></table></section>`;
-  h+=`<div class="secttl"><b>2</b> · Выручка по ${opt.sec2}</div><section class="card"><div class="barlist">${D.byRevenue.map(x=>`<div class="blrow"><div class="blt"><span>${x.group}</span><b>${x.label}</b></div><div class="bltrack"><i style="width:${(x.v/rmx*100).toFixed(0)}%;background:linear-gradient(90deg,var(--ok),var(--ok2))"></i></div></div>`).join('')}</div></section>`;
+  h+=`<div class="secttl"><b>2</b> · Выручка по ${opt.sec2}</div><section class="card"><div class="barlist">${D.byRevenue.map(x=>`<div class="blrow drill" data-drill="grp:${_esc(x.group)}"><div class="blt"><span>${x.group}</span><b>${x.label}</b></div><div class="bltrack"><i style="width:${(x.v/rmx*100).toFixed(0)}%;background:linear-gradient(90deg,var(--ok),var(--ok2))"></i></div></div>`).join('')}</div></section>`;
   if(D.people&&D.people.length){
-    h+=`<div class="secttl"><b>3</b> · До человека</div><section class="card"><table><thead><tr><th>Сотрудник</th><th>направление</th><th class="r">сделок</th><th class="r">пайплайн</th><th class="r">заказов</th><th class="r">выручка</th><th class="r">зак/сд</th></tr></thead><tbody>`+D.people.map(p=>`<tr><td><div class="who">${p.name}</div></td><td class="dep">${p.grp}</td><td class="num r">${p.deals}</td><td class="num r">${p.pipeline}</td><td class="num r" style="color:var(--ok2)">${p.orders}</td><td class="num r" style="color:var(--ok)">${p.revenue}</td><td class="num r">${p.conv}</td></tr>`).join('')+`</tbody></table></section>`;
+    h+=`<div class="secttl"><b>3</b> · До человека</div><section class="card"><table><thead><tr><th>Сотрудник</th><th>направление</th><th class="r">сделок</th><th class="r">пайплайн</th><th class="r">заказов</th><th class="r">выручка</th><th class="r">зак/сд</th></tr></thead><tbody>`+D.people.map(p=>`<tr class="drill" data-drill="own:${_esc(p.uid)}"><td><div class="who">${p.name}</div></td><td class="dep">${p.grp}</td><td class="num r">${p.deals}</td><td class="num r">${p.pipeline}</td><td class="num r" style="color:var(--ok2)">${p.orders}</td><td class="num r" style="color:var(--ok)">${p.revenue}</td><td class="num r">${p.conv}</td></tr>`).join('')+`</tbody></table></section>`;
   }
   h+=`<footer>${opt.title} · Bitrix24 (сделки + Заказы СП-172) · ${D.label}. Заказ = выигранная сделка в исполнении; выручка — Σ заказов к базовой € по курсам Bitrix; привязка заказа к группе — через сделку-родителя.</footer>`;
   el.innerHTML=h;
+  el.querySelectorAll('[data-drill]').forEach(n=>n.addEventListener('click',()=>openDir(D,opt,n.dataset.drill)));
 }
 renderDir(window.__KAM__,'tab-kam',{eyebrow:'Квант · коммерческий департамент',title:'КАМы — клиентские направления',sec1:'Клиентские направления',sec2:'направлениям',unit:'Направление'});
 renderDir(window.__ENG__,'tab-eng',{eyebrow:'Квант · инжиниринг',title:'Инжиниринг — проекты, заказы, выручка',sec1:'Инженерные группы',sec2:'группам',unit:'Группа'});

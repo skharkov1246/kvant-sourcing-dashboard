@@ -71,17 +71,24 @@ def compute_set(client: BitrixClient, groups: dict[str, str], *, as_of: dt.date 
         return {"deals": 0, "open": 0, "pipeline": 0.0, "orders": 0, "revenue": 0.0, "closed": 0}
     g = defaultdict(blank)
     ppl = defaultdict(blank)
+    deal_details: list[dict] = []
+    order_details: list[dict] = []
 
     for d in created:
         owner = str(d.get("ASSIGNED_BY_ID"))
         grp = owner_group.get(owner)
         if not grp:
             continue
+        is_open = (d.get("STAGE_SEMANTIC_ID") or "").upper() not in ("S", "F")
+        amt = eur(d.get("OPPORTUNITY"), d.get("CURRENCY_ID"))
         for bucket in (g[grp], ppl[owner]):
             bucket["deals"] += 1
-            if (d.get("STAGE_SEMANTIC_ID") or "").upper() not in ("S", "F"):
+            if is_open:
                 bucket["open"] += 1
-                bucket["pipeline"] += eur(d.get("OPPORTUNITY"), d.get("CURRENCY_ID"))
+                bucket["pipeline"] += amt
+        deal_details.append({"id": str(d["ID"]), "t": (d.get("TITLE") or f'Сделка #{d["ID"]}')[:90],
+                             "amt": _money(amt), "raw": round(amt), "grp": grp,
+                             "owner": owner, "own": owner_name.get(owner, owner), "open": is_open})
 
     for o in orders:
         owner = deal_owner.get(str(o.get("parentId2"))) or str(o.get("assignedById"))
@@ -95,12 +102,15 @@ def compute_set(client: BitrixClient, groups: dict[str, str], *, as_of: dt.date 
             bucket["revenue"] += amt
             if won_closed:
                 bucket["closed"] += 1
+        order_details.append({"id": str(o.get("id")), "t": (o.get("title") or f'Заказ #{o.get("id")}')[:90],
+                              "amt": _money(amt), "raw": round(amt), "grp": grp,
+                              "owner": owner, "own": owner_name.get(owner, owner), "closed": won_closed})
 
     def fmt_rows(src: dict, label_key: str, label_get):
         out = []
         for key, v in src.items():
             out.append({
-                label_key: label_get(key), "grp": owner_group.get(key, "") if label_key == "name" else "",
+                label_key: label_get(key), "uid": str(key), "grp": owner_group.get(key, "") if label_key == "name" else "",
                 "deals": v["deals"], "open": v["open"], "pipeline": _money(v["pipeline"]),
                 "orders": v["orders"], "revenue": _money(v["revenue"]), "revenueRaw": round(v["revenue"]),
                 "closed": v["closed"], "conv": _ratio(v["orders"], v["deals"]),
@@ -119,18 +129,20 @@ def compute_set(client: BitrixClient, groups: dict[str, str], *, as_of: dt.date 
            "revenue": _money(rev_sum), "closed": sum(r["closed"] for r in rows),
            "conv": _ratio(tot_orders, tot_deals)}
     kpis = [
-        ("Групп", str(len(rows)), "в наборе", ""),
-        ("Сделок", str(tot["deals"]), "у группы (YTD)", ""),
-        ("Активный пайплайн", tot["pipeline"], "Σ открытых, €", "ok"),
-        ("Заказы (выигр.)", str(tot["orders"]), "СП-172", "ok"),
-        ("Контрактная выручка", tot["revenue"], "Σ заказов, €", "ok"),
-        ("Закрыто заказов", str(tot["closed"]), "поставлено/оплачено", ""),
+        ("Групп", str(len(rows)), "в наборе", "", ""),
+        ("Сделок", str(tot["deals"]), "у группы (YTD)", "", "deals"),
+        ("Активный пайплайн", tot["pipeline"], "Σ открытых, €", "ok", "open"),
+        ("Заказы (выигр.)", str(tot["orders"]), "СП-172", "ok", "orders"),
+        ("Контрактная выручка", tot["revenue"], "Σ заказов, €", "ok", "revenue"),
+        ("Закрыто заказов", str(tot["closed"]), "поставлено/оплачено", "", "closed"),
     ]
     return {
         "label": f"01.01 – {today.strftime('%d.%m.%Y')}",
         "rows": rows,
         "people": people,
         "totals": tot,
-        "kpis": [{"lbl": l, "val": vv, "meta": me, "clz": c} for l, vv, me, c in kpis],
+        "kpis": [{"lbl": l, "val": vv, "meta": me, "clz": c, "drill": dr} for l, vv, me, c, dr in kpis],
         "byRevenue": [{"group": r["group"], "v": r["revenueRaw"], "label": r["revenue"]} for r in rows],
+        "deals": deal_details,
+        "orders": order_details,
     }
