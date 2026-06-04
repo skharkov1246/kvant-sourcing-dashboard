@@ -11,16 +11,17 @@ TEMPLATE = BASE_DIR / "templates" / "dashboard_core.html"
 DEFAULT_TITLE = "Анализ работы сорсеров · КВАНТ"
 
 _MSK = dt.timezone(dt.timedelta(hours=3))
-_UPDATE_HOUR_MSK = 8  # ежедневный автодеплой; совпадает с cron в .github/workflows/deploy.yml (05:00 UTC)
 
 
 def _update_stamps() -> tuple[str, str]:
-    """(время генерации, время следующего ожидаемого обновления) — МСК, ISO-8601."""
-    now = dt.datetime.now(_MSK)
-    nxt = now.replace(hour=_UPDATE_HOUR_MSK, minute=0, second=0, microsecond=0)
-    if nxt <= now:
-        nxt += dt.timedelta(days=1)
-    return now.isoformat(timespec="seconds"), nxt.isoformat(timespec="seconds")
+    """(время генерации, время следующего ожидаемого обновления) — МСК, ISO-8601.
+    Cron в .github/workflows/deploy.yml: `7 */2 * * *` — каждые 2 часа в :07 UTC
+    (чётные часы UTC). Считаем ближайший такой слот строго после now."""
+    now_utc = dt.datetime.now(dt.timezone.utc)
+    nxt = now_utc.replace(minute=7, second=0, microsecond=0)
+    while nxt <= now_utc or nxt.hour % 2 != 0:
+        nxt += dt.timedelta(hours=1)
+    return now_utc.astimezone(_MSK).isoformat(timespec="seconds"), nxt.astimezone(_MSK).isoformat(timespec="seconds")
 
 
 def _json_for_script(obj) -> str:
