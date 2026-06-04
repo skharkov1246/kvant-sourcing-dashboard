@@ -9,11 +9,24 @@
 from __future__ import annotations
 
 import datetime as dt
+import re
 from collections import defaultdict
 
 from bitrix_client import BitrixClient
 
 _SYM = {"EUR": "€", "USD": "$", "CNY": "¥", "RUB": "₽", "INR": "₹", "GBP": "£", "AED": "AED ", "JPY": "¥"}
+
+
+def _regno(*titles) -> int:
+    """Порядковый номер сделки в реализации — число В НАЧАЛЕ названия, за которым идёт точка:
+    «871. …» у сделки, «871/1. …» у заказа. Требуем точку, чтобы не путать с клиентскими
+    PO-кодами вида «2100007489 …» / «2077921/4 …» (там после цифр пробел/слэш, не точка).
+    0 — если номера нет."""
+    for t in titles:
+        m = re.match(r"\s*(\d{1,4})(?:/\d+)?\.", str(t or ""))
+        if m:
+            return int(m.group(1))
+    return 0
 
 
 def _money(v: float) -> str:
@@ -65,10 +78,15 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
         buy = sum(eur(o.get("opportunity"), o.get("currencyId")) for o in ords)
         margin = sale - buy
         suppliers = sorted({supl.get(str(o.get("companyId"))) for o in ords if o.get("companyId")} - {None})
+        entered = min((str(o.get("createdTime") or "")[:10] for o in ords if o.get("createdTime")), default="")
+        dtitle = d.get("TITLE") or (ords[0].get("title") if ords else "")
+        seq = _regno(d.get("TITLE"), ords[0].get("title") if ords else "")
         rows.append({
             "deal": did,
+            "seq": seq,
+            "entered": entered,
             "customer": clients.get(str(d.get("COMPANY_ID"))) or "—",
-            "title": (d.get("TITLE") or (ords[0].get("title") if ords else "") or f"Сделка #{did}")[:90],
+            "title": (dtitle or f"Сделка #{did}")[:90],
             "saleEur": round(sale), "saleLbl": _money(sale), "saleOrig": _orig(d.get("OPPORTUNITY"), d.get("CURRENCY_ID")),
             "saleCur": d.get("CURRENCY_ID") or "",
             "buyEur": round(buy), "buyLbl": _money(buy),
@@ -79,20 +97,22 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
             "done": all(str(o.get("stageId", "")).endswith(":SUCCESS") for o in ords),
             "hasSale": bool(d.get("OPPORTUNITY")),
         })
-    rows.sort(key=lambda r: -r["saleEur"])
+    # по умолчанию — по номеру реализации убыванием (новые сверху, для отслеживания появления новых)
+    rows.sort(key=lambda r: -r["seq"])
 
+    maxseq = max((r["seq"] for r in rows), default=0)
     sale_sum = sum(r["saleEur"] for r in rows)
     buy_sum = sum(r["buyEur"] for r in rows)
     margin_sum = sale_sum - buy_sum
     priced = [r for r in rows if r["hasSale"]]
     orphan_buy = sum(eur(o.get("opportunity"), o.get("currencyId")) for o in orphan)
     kpis = [
+        ("Последний №", str(maxseq), "макс. номер в реализации", "ok"),
         ("Контрактов", str(len(rows)), "сделок с заказами поставщикам", ""),
         ("Σ продажи", _money(sale_sum), "сумма сделок (выручка), €", "ok"),
         ("Σ закупки", _money(buy_sum), "заказы поставщикам, €", "amber"),
         ("Σ маржа", _money(margin_sum), "продажа − закупка, €", "ok" if margin_sum >= 0 else "warn"),
         ("Ср. маржа", f"{round(margin_sum/sale_sum*100) if sale_sum else 0}%", "по сумме, валовая", ""),
-        ("Без цены сделки", str(len(rows) - len(priced)), "сделка без суммы продажи", "warn" if len(rows) - len(priced) else ""),
     ]
     # --- агрегация по ПОСТАВЩИКАМ (оборот = Σ закупок СП-172) ---
     sup_agg: dict[str, dict] = defaultdict(lambda: {"buy": 0.0, "norders": 0, "deals": set(),
