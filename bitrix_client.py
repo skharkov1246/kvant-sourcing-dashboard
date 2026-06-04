@@ -255,6 +255,23 @@ class BitrixClient:
     def get_product_rows(self, deal_id: int | str) -> list[dict]:
         return self.call("crm.deal.productrows.get", {"id": int(deal_id)}) or []
 
+    # ----------------------------------------------------------------- deal chat (IM)
+    def deal_chat_id(self, deal_id: int | str) -> str | None:
+        """ID IM-чата сделки (entity_type=CRM, entity_id=DEAL|<id>)."""
+        ch = self.call("im.chat.get", {"ENTITY_TYPE": "CRM", "ENTITY_ID": f"DEAL|{deal_id}"})
+        if isinstance(ch, dict):
+            return str(ch.get("ID") or ch.get("id") or "") or None
+        return None
+
+    def chat_messages(self, chat_id: str | int, *, limit: int = 50) -> list[dict]:
+        r = self.call("im.dialog.messages.get", {"DIALOG_ID": f"chat{chat_id}", "LIMIT": limit})
+        return (r or {}).get("messages", []) if isinstance(r, dict) else []
+
+    def deal_chat_messages(self, deal_id: int | str, *, limit: int = 50) -> list[dict]:
+        """Сообщения чата сделки (как есть; author_id<=0 — системные/боты)."""
+        cid = self.deal_chat_id(deal_id)
+        return self.chat_messages(cid, limit=limit) if cid else []
+
     # ----------------------------------------------------------------- reference maps (cached)
     def users(self) -> dict[str, str]:
         if self._users is None:
