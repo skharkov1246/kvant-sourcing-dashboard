@@ -156,7 +156,7 @@
 </head>
 <body>
 <div id="updstatus" class="updbar"><span class="ub-dot"></span><span class="ub-main">Обновление…</span></div>
-<div class="tabs"><button class="tab act" data-tab="sourcing">Сорсинг</button><button class="tab" data-tab="company">Пульс компании</button><button class="tab" data-tab="kam">КАМы</button></div>
+<div class="tabs"><button class="tab act" data-tab="sourcing">Сорсинг</button><button class="tab" data-tab="company">Пульс компании</button><button class="tab" data-tab="kam">КАМы</button><button class="tab" data-tab="eng">Инжиниринг</button><button class="tab" data-tab="prod">Продукт-оунеры</button></div>
 <div id="tab-sourcing">
 <header>
   <div class="eyebrow">Квант · Отдел поиска поставщиков</div>
@@ -291,25 +291,9 @@
   <footer id="cmpFooter"></footer>
 </div>
 
-<div id="tab-kam" hidden>
-  <header>
-    <div class="eyebrow">Квант · коммерческий департамент</div>
-    <h1>КАМы — пайплайн, заказы и выручка по направлениям</h1>
-    <div class="sub" id="kamSub"></div>
-  </header>
-  <div class="kpis" id="kamKpis" style="grid-template-columns:repeat(3,1fr)"></div>
-  <div class="secttl"><b>1</b> · Направления (группы КАМ)</div>
-  <section class="card"><h2>Сделки → заказы → выручка</h2>
-    <div class="note">Группировка по ответственным направления. «Пайплайн» — Σ открытых сделок (€). «Заказы» — связанные сделки в исполнении (СП-172) = выигранные; «Выручка» — Σ заказов (€). «Конв.» = заказы ÷ сделки. Суммы — к базовой € по курсам Bitrix.</div>
-    <table>
-      <thead><tr><th>Направление</th><th class="r">сделок</th><th class="r">в работе</th><th class="r">пайплайн</th><th class="r">заказов</th><th class="r">выручка</th><th class="r">закрыто</th><th class="r">конв.</th></tr></thead>
-      <tbody id="kamBody"></tbody><tfoot id="kamFoot"></tfoot>
-    </table>
-  </section>
-  <div class="secttl"><b>2</b> · Контрактная выручка по направлениям</div>
-  <section class="card"><div class="barlist" id="kamRev"></div></section>
-  <footer id="kamFooter"></footer>
-</div>
+<div id="tab-kam" hidden></div>
+<div id="tab-eng" hidden></div>
+<div id="tab-prod" hidden></div>
 
 <div class="ovl" id="ovl"></div>
 <aside class="drw" id="drw" aria-hidden="true">
@@ -322,6 +306,8 @@ window.__DATA__ = __DATA_JSON__;
 window.__INSIGHTS__ = __INSIGHTS_JSON__;
 window.__COMPANY__ = __COMPANY_JSON__;
 window.__KAM__ = __KAM_JSON__;
+window.__ENG__ = __ENG_JSON__;
+window.__PRODUCT__ = __PRODUCT_JSON__;
 const M = window.__DATA__, INS = window.__INSIGHTS__;
 const cs = getComputedStyle(document.documentElement);
 const k = M.kpi, A = M.sourcersA, cov = M.coverage;
@@ -476,23 +462,30 @@ if (C) {
   $('cmpGrowth').innerHTML=C.growth.map(x=>`<div class="wkcol"><div class="wkbars"><div class="wkbar" style="width:13px;height:${(x.comp/gmx*100).toFixed(0)}%;background:var(--ok)" title="компании ${x.comp}"></div><div class="wkbar" style="width:13px;height:${(x.cont/gmx*100).toFixed(0)}%;background:var(--b)" title="контакты ${x.cont}"></div><div class="wkbar" style="width:13px;height:${(x.leads/gmx*100).toFixed(0)}%;background:var(--a)" title="лиды ${x.leads}"></div></div><div class="wklbl"><b>${x.m}</b></div></div>`).join('');
   $('cmpFooter').innerHTML='Пульс компании · Bitrix24 (сделки/компании/контакты/лиды/СП-166) · '+C.label+'. Суммы — к базовой € по курсам Bitrix; победы/Σ — по дате закрытия. «Просрочены» = открытые с прошедшим CLOSEDATE (вероятно, дата не ведётся).';
 }
-// ---- вкладка «КАМы»
-const K = window.__KAM__;
-if (K) {
-  const $k=id=>document.getElementById(id);
-  $k('kamSub').innerHTML=`<span>Период: <b>${K.label}</b></span><span>Источник: <b>Bitrix24 · сделки + Заказы (СП-172)</b></span>`;
-  $k('kamKpis').innerHTML=K.kpis.map(p=>`<div class="kpi ${p.clz}"><div class="lbl">${p.lbl}</div><div class="val ${p.clz}">${p.val}</div><div class="meta">${p.meta}</div></div>`).join('');
-  $k('kamBody').innerHTML=K.rows.map(r=>`<tr><td><div class="who">${r.group}</div></td><td class="num r">${r.deals}</td><td class="num r">${r.open}</td><td class="num r">${r.pipeline}</td><td class="num r" style="color:var(--ok2)">${r.orders}</td><td class="num r" style="color:var(--ok)">${r.revenue}</td><td class="num r dimv">${r.closed}</td><td class="num r">${r.winPct}%</td></tr>`).join('');
-  const kt=K.totals;
-  $k('kamFoot').innerHTML=`<tr style="border-top:2px solid var(--line)"><td><b>Итого</b></td><td class="r num">${kt.deals}</td><td class="r num">${kt.open}</td><td class="r num">${kt.pipeline}</td><td class="r num" style="color:var(--ok2)">${kt.orders}</td><td class="r num" style="color:var(--ok)">${kt.revenue}</td><td class="r num dimv">${kt.closed}</td><td class="r"></td></tr>`;
-  const krmx=Math.max(1,...K.byRevenue.map(x=>x.v));
-  $k('kamRev').innerHTML=K.byRevenue.map(x=>`<div class="blrow"><div class="blt"><span>${x.group}</span><b>${x.label}</b></div><div class="bltrack"><i style="width:${(x.v/krmx*100).toFixed(0)}%;background:linear-gradient(90deg,var(--ok),var(--ok2))"></i></div></div>`).join('');
-  $k('kamFooter').innerHTML='КАМы · Bitrix24 (сделки + Заказы СП-172) · '+K.label+'. Заказ = выигранная сделка в исполнении; выручка — Σ заказов к базовой € по курсам Bitrix. Заказ привязан к направлению через сделку-родителя (parentId2).';
+// ---- вкладки направлений (КАМы / Инжиниринг / Продукт-оунеры) — общий рендер
+function renderDir(D, elId, opt){
+  const el=document.getElementById(elId); if(!el) return;
+  if(!D){ el.innerHTML='<div class="note" style="padding:20px 0">нет данных</div>'; return; }
+  const t=D.totals;
+  const row=r=>`<tr><td><div class="who">${r.group}</div></td><td class="num r">${r.deals}</td><td class="num r">${r.open}</td><td class="num r">${r.pipeline}</td><td class="num r" style="color:var(--ok2)">${r.orders}</td><td class="num r" style="color:var(--ok)">${r.revenue}</td><td class="num r dimv">${r.closed}</td><td class="num r">${r.conv}</td></tr>`;
+  const rmx=Math.max(1,...D.byRevenue.map(x=>x.v));
+  let h=`<header><div class="eyebrow">${opt.eyebrow}</div><h1>${opt.title}</h1><div class="sub"><span>Период: <b>${D.label}</b></span><span>Источник: <b>Bitrix24 · сделки + Заказы (СП-172)</b></span></div></header>`;
+  h+=`<div class="kpis" style="grid-template-columns:repeat(3,1fr)">${D.kpis.map(p=>`<div class="kpi ${p.clz}"><div class="lbl">${p.lbl}</div><div class="val ${p.clz}">${p.val}</div><div class="meta">${p.meta}</div></div>`).join('')}</div>`;
+  h+=`<div class="secttl"><b>1</b> · ${opt.sec1}</div><section class="card"><h2>Сделки → заказы → выручка</h2><div class="note">По ответственным группы. «Пайплайн» — Σ открытых сделок (€); «Заказы» (СП-172) = выигранные; «Выручка» — Σ заказов (€); «Зак/сд» = заказов на одну сделку 2026 (повторные заказы по сделкам старше 2026 дают >1×). Суммы — к базовой € по курсам Bitrix.</div><table><thead><tr><th>${opt.unit}</th><th class="r">сделок</th><th class="r">в работе</th><th class="r">пайплайн</th><th class="r">заказов</th><th class="r">выручка</th><th class="r">закрыто</th><th class="r">зак/сд</th></tr></thead><tbody>${D.rows.map(row).join('')}</tbody><tfoot><tr style="border-top:2px solid var(--line)"><td><b>Итого</b></td><td class="r num">${t.deals}</td><td class="r num">${t.open}</td><td class="r num">${t.pipeline}</td><td class="r num" style="color:var(--ok2)">${t.orders}</td><td class="r num" style="color:var(--ok)">${t.revenue}</td><td class="r num dimv">${t.closed}</td><td class="r num">${t.conv}</td></tr></tfoot></table></section>`;
+  h+=`<div class="secttl"><b>2</b> · Выручка по ${opt.sec2}</div><section class="card"><div class="barlist">${D.byRevenue.map(x=>`<div class="blrow"><div class="blt"><span>${x.group}</span><b>${x.label}</b></div><div class="bltrack"><i style="width:${(x.v/rmx*100).toFixed(0)}%;background:linear-gradient(90deg,var(--ok),var(--ok2))"></i></div></div>`).join('')}</div></section>`;
+  if(D.people&&D.people.length){
+    h+=`<div class="secttl"><b>3</b> · До человека</div><section class="card"><table><thead><tr><th>Сотрудник</th><th>направление</th><th class="r">сделок</th><th class="r">пайплайн</th><th class="r">заказов</th><th class="r">выручка</th><th class="r">зак/сд</th></tr></thead><tbody>`+D.people.map(p=>`<tr><td><div class="who">${p.name}</div></td><td class="dep">${p.grp}</td><td class="num r">${p.deals}</td><td class="num r">${p.pipeline}</td><td class="num r" style="color:var(--ok2)">${p.orders}</td><td class="num r" style="color:var(--ok)">${p.revenue}</td><td class="num r">${p.conv}</td></tr>`).join('')+`</tbody></table></section>`;
+  }
+  h+=`<footer>${opt.title} · Bitrix24 (сделки + Заказы СП-172) · ${D.label}. Заказ = выигранная сделка в исполнении; выручка — Σ заказов к базовой € по курсам Bitrix; привязка заказа к группе — через сделку-родителя.</footer>`;
+  el.innerHTML=h;
 }
+renderDir(window.__KAM__,'tab-kam',{eyebrow:'Квант · коммерческий департамент',title:'КАМы — клиентские направления',sec1:'Клиентские направления',sec2:'направлениям',unit:'Направление'});
+renderDir(window.__ENG__,'tab-eng',{eyebrow:'Квант · инжиниринг',title:'Инжиниринг — проекты, заказы, выручка',sec1:'Инженерные группы',sec2:'группам',unit:'Группа'});
+renderDir(window.__PRODUCT__,'tab-prod',{eyebrow:'Квант · продуктовые линии',title:'Продукт-оунеры — линейки оборудования',sec1:'Продуктовые линии',sec2:'линиям',unit:'Линия'});
 document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{
   document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('act',x===b));
   const t=b.dataset.tab;
-  ['sourcing','company','kam'].forEach(n=>{const el=document.getElementById('tab-'+n); if(el) el.hidden=(n!==t);});
+  ['sourcing','company','kam','eng','prod'].forEach(n=>{const el=document.getElementById('tab-'+n); if(el) el.hidden=(n!==t);});
   window.scrollTo(0,0);
 }));
 

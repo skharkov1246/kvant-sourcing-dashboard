@@ -203,21 +203,24 @@ def run(args) -> int:
     ins = insights_mod.generate(m, settings, use_llm=use_llm)
     print(f"  источник: {ins.get('_source')}")
 
-    company_data = kam_data = None
+    company_data = kam_data = eng_data = prod_data = None
     try:
-        print("• Пульс компании + КАМы (YTD): общий пул сделок/заказов…")
+        print("• Пульс + КАМы + инжиниринг + продукт (YTD): общий пул сделок/заказов…")
         ys = "2026-01-01T00:00:00"
         deals_ytd = client.list_deals_fast(filter={">=DATE_CREATE": ys},
             select=["ID", "CATEGORY_ID", "STAGE_SEMANTIC_ID", "OPPORTUNITY", "CURRENCY_ID", "DATE_CREATE", "ASSIGNED_BY_ID"])
         orders_ytd = client.list_items(172, filter={">=createdTime": ys},
             select=["id", "stageId", "opportunity", "currencyId", "createdTime", "parentId2", "assignedById"])
         company_data = company_mod.compute(client, as_of=p.end, created=deals_ytd, orders=orders_ytd)
-        kam_data = kam_mod.compute(client, as_of=p.end, created=deals_ytd, orders=orders_ytd)
+        kam_data = kam_mod.compute_set(client, kam_mod.CLIENT_GROUPS, as_of=p.end, created=deals_ytd, orders=orders_ytd, with_people=True)
+        eng_data = kam_mod.compute_set(client, kam_mod.ENG_GROUPS, as_of=p.end, created=deals_ytd, orders=orders_ytd, with_people=True)
+        prod_data = kam_mod.compute_set(client, kam_mod.PRODUCT_GROUPS, as_of=p.end, created=deals_ytd, orders=orders_ytd, with_people=True)
     except Exception as e:  # вкладка «Сорсинг» не должна падать из-за доп. вкладок
-        print(f"  ⚠ пульс/КАМы пропущены: {type(e).__name__}: {e}")
+        print(f"  ⚠ доп-вкладки пропущены: {type(e).__name__}: {e}")
 
     html_path = out_dir / f"dashboard_{slug}.html"
-    dashboard.write(m, ins, html_path, title=f"Сорсинг · {p.label}", company=company_data, kam=kam_data)
+    dashboard.write(m, ins, html_path, title=f"Сорсинг · {p.label}",
+                    company=company_data, kam=kam_data, eng=eng_data, prod=prod_data)
     print(f"  ✓ дашборд: {html_path}")
 
     if args.open:
