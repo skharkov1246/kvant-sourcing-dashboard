@@ -36,18 +36,29 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
 
     if created is None:
         created = client.list_deals_fast(filter={">=DATE_CREATE": YEAR_START},
-            select=["ID", "CATEGORY_ID", "STAGE_SEMANTIC_ID", "OPPORTUNITY", "CURRENCY_ID", "DATE_CREATE", "ASSIGNED_BY_ID"])
+            select=["ID", "TITLE", "CATEGORY_ID", "STAGE_SEMANTIC_ID", "OPPORTUNITY", "CURRENCY_ID", "DATE_CREATE", "ASSIGNED_BY_ID"])
+    unames = client.users()
+    catname = lambda k: cats.get(str(k), f"cat#{k}")
     by_mon = Counter(); by_cat = Counter(); by_mon_cat = defaultdict(Counter)
     openc = 0; open_sum = 0.0; owners = set(); created_ids = set()
+    deal_details: list[dict] = []
     for d in created:
         created_ids.add(str(d["ID"]))
         mm = str(d.get("DATE_CREATE", ""))[:7]
-        by_mon[mm] += 1; by_cat[str(d.get("CATEGORY_ID"))] += 1; by_mon_cat[mm][str(d.get("CATEGORY_ID"))] += 1
-        if d.get("ASSIGNED_BY_ID"):
-            owners.add(str(d["ASSIGNED_BY_ID"]))
+        cid = str(d.get("CATEGORY_ID"))
+        by_mon[mm] += 1; by_cat[cid] += 1; by_mon_cat[mm][cid] += 1
+        owner = str(d.get("ASSIGNED_BY_ID") or "")
+        if owner:
+            owners.add(owner)
         sem = (d.get("STAGE_SEMANTIC_ID") or "").upper()
-        if sem not in ("S", "F"):
-            openc += 1; open_sum += eur(d.get("OPPORTUNITY"), d.get("CURRENCY_ID"))
+        is_open = sem not in ("S", "F")
+        amt = eur(d.get("OPPORTUNITY"), d.get("CURRENCY_ID"))
+        if is_open:
+            openc += 1; open_sum += amt
+        deal_details.append({"id": str(d["ID"]), "t": (d.get("TITLE") or f'Сделка #{d["ID"]}')[:90],
+                             "raw": round(amt), "amt": _money(amt), "mon": mm, "cid": cid, "c": catname(cid),
+                             "o": unames.get(owner, f"user#{owner}") if owner else "—", "uid": owner,
+                             "sem": sem or "P", "op": is_open})
 
     won = client.list_deals_fast(filter={"STAGE_SEMANTIC_ID": "S", ">=CLOSEDATE": YEAR_START},
         select=["ID", "OPPORTUNITY", "CURRENCY_ID", "DATE_CREATE", "CLOSEDATE"])
@@ -118,13 +129,25 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
     ]
     top_cats = by_cat.most_common(6)
     top5 = [k for k, _ in by_cat.most_common(5)]
+    own_count = Counter(d["uid"] for d in deal_details if d["uid"])
+    own_open = defaultdict(float)
+    for d in deal_details:
+        if d["op"] and d["uid"]:
+            own_open[d["uid"]] += d["raw"]
+    by_owner = sorted(
+        [{"uid": u, "name": unames.get(u, f"user#{u}"), "deals": c,
+          "open": sum(1 for x in deal_details if x["uid"] == u and x["op"]),
+          "openLbl": _money(own_open[u])} for u, c in own_count.items()],
+        key=lambda x: -x["deals"])
     return {
         "label": f"01.01 – {today.strftime('%d.%m.%Y')}",
-        "byMon": [{"m": MLBL[int(m[5:7])], "v": by_mon[m]} for m in months],
-        "byCat": [{"cat": name(k), "v": v, "p": round(v / total * 100) if total else 0} for k, v in top_cats],
-        "matrix": {"months": [MLBL[int(m[5:7])] for m in months],
-                   "rows": [{"cat": name(k), "cells": [by_mon_cat[m].get(k, 0) for m in months]} for k in top5]},
+        "byMon": [{"m": MLBL[int(m[5:7])], "mk": m, "v": by_mon[m]} for m in months],
+        "byCat": [{"cat": name(k), "cid": str(k), "v": v, "p": round(v / total * 100) if total else 0} for k, v in top_cats],
+        "matrix": {"months": [MLBL[int(m[5:7])] for m in months], "mks": list(months),
+                   "rows": [{"cat": name(k), "cid": str(k), "cells": [by_mon_cat[m].get(k, 0) for m in months]} for k in top5]},
         "params": [{"lbl": l, "val": v, "meta": me, "clz": c} for l, v, me, c in params],
         "flow": {"created": total, "open": openc, "won": len(orders), "lost": lost},
         "growth": [{"m": MLBL[int(m[5:7])], "comp": comp.get(m, 0), "cont": cont.get(m, 0), "leads": leads.get(m, 0)} for m in months],
+        "deals": deal_details,
+        "byOwner": by_owner,
     }
