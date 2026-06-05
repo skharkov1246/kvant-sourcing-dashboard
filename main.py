@@ -174,7 +174,9 @@ def run(args) -> int:
     deal_index = client.deals_by_ids(parent_ids)
 
     print("• Сделки периода (все воронки) для покрытия…")
-    period_deals = client.deals_in_period(p.start_iso, p.end_iso)
+    period_deals = client.deals_in_period(p.start_iso, p.end_iso, select=[
+        "ID", "TITLE", "CATEGORY_ID", "STAGE_ID", "STAGE_SEMANTIC_ID", "DATE_CREATE",
+        "ASSIGNED_BY_ID", "COMPANY_ID", "OPPORTUNITY", "CURRENCY_ID"])
     print(f"  сделок периода: {len(period_deals)}")
 
     print("• Поставщики по RFQ (компании/контакты)…")
@@ -188,6 +190,35 @@ def run(args) -> int:
 
     print("• Отправлено vs создано (письма)…")
     m["send"] = _send_stats(client, rfqs, m["sourcersA"], dept_a_ids, p.start_iso, p.end_iso)
+
+    # список непокрытых сделок (созданы в окне, нет ни одного запроса поставщику)
+    try:
+        _rfqpar = {str(r.get("parentId2")) for r in rfqs if r.get("parentId2")}
+        _unc = [d for d in period_deals if str(d["ID"]) not in _rfqpar]
+        _cur = client.call("crm.currency.list", {}) or []
+        _rate = {x.get("CURRENCY"): (float(x.get("AMOUNT") or 1) / float(x.get("AMOUNT_CNT") or 1)) for x in _cur}
+        _eur = lambda o, cu: float(o or 0) * _rate.get(cu, 1.0)
+        _mfmt = lambda v: (f"€{v/1e6:.1f}M" if abs(v) >= 1e6 else f"€{round(v/1e3)}K" if abs(v) >= 1e3 else f"€{round(v)}")
+        _users = client.users()
+        _cnames = client.companies_by_ids({str(d.get("COMPANY_ID")) for d in _unc if d.get("COMPANY_ID") and str(d.get("COMPANY_ID")) != "0"})
+        _unc_rows = []
+        for d in _unc:
+            amt = _eur(d.get("OPPORTUNITY"), d.get("CURRENCY_ID"))
+            sem = (d.get("STAGE_SEMANTIC_ID") or "").upper()
+            _unc_rows.append({
+                "id": str(d["ID"]), "t": (d.get("TITLE") or f'Сделка #{d["ID"]}')[:90],
+                "client": _cnames.get(str(d.get("COMPANY_ID")), "—") or "—",
+                "owner": _users.get(str(d.get("ASSIGNED_BY_ID")), "—"),
+                "raw": round(amt), "amt": _mfmt(amt),
+                "cat": category_names.get(str(d.get("CATEGORY_ID")), ""),
+                "date": str(d.get("DATE_CREATE", ""))[:10],
+                "sem": "проиграна" if sem == "F" else ("выиграна" if sem == "S" else "в работе"),
+            })
+        _unc_rows.sort(key=lambda r: -r["raw"])
+        m["coverage"]["uncovered"] = _unc_rows
+        print(f"  непокрытых сделок (без запросов поставщикам): {len(_unc_rows)}")
+    except Exception as e:
+        print(f"  ⚠ список непокрытых пропущен: {type(e).__name__}: {e}")
 
     out_dir = Path(args.out)
     slug = (args.period or f"{p.start}_{p.end}").replace(":", "_")
