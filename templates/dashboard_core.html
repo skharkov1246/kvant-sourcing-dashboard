@@ -643,6 +643,7 @@ function renderPulse(C){
 // ---- вкладки направлений (КАМы / Инжиниринг / Продукт-оунеры) — общий рендер
 // ---- drill-down отраслевых вкладок: клик по метрике → список сделок/заказов в дровере
 const _fmtE=v=>{v=Math.round(v);const a=Math.abs(v);return a>=1e6?'€'+(v/1e6).toFixed(1)+'M':a>=1e3?'€'+Math.round(v/1e3)+'K':'€'+v;};
+const _days=n=>{const a=Math.abs(n)%100,b=a%10;if(a>10&&a<20)return n+' дней';if(b===1)return n+' день';if(b>=2&&b<=4)return n+' дня';return n+' дней';};
 // ---- универсальный сортируемый список(и) сделок в дровере: кликабельные тумблеры сортировки ----
 // sections: [{key, h, hx?, items, cols:[{k,lbl,get,txt?,def?}], rowFn, cap?, empty?}]
 function _drwSortable(head, sections){
@@ -873,7 +874,7 @@ function renderCohorts(C){
         +`<div class="pcard"><div class="pv">${TD.p75!=null?TD.p75+' дн':'—'}</div><div class="pl">75% побеждают за (P75)</div></div>`
         +`<div class="pcard"><div class="pv">${TD.p90!=null?TD.p90+' дн':'—'}</div><div class="pl">90% побеждают за (P90)</div></div>`
       +`</div>`
-      +TD.thresholds.map(t=>`<div class="ttrrow"><div class="ttrlbl">за ${t.d} дн</div><div class="ttrtrack"><i style="width:${t.pct}%"></i></div><div class="ttrpct"><b>${t.pct}%</b> <span class="dimv">${t.cnt} сд.</span></div></div>`).join('')
+      +TD.thresholds.map(t=>`<div class="ttrrow"><div class="ttrlbl">за ${_days(t.d)}</div><div class="ttrtrack"><i style="width:${t.pct}%"></i></div><div class="ttrpct"><b>${t.pct}%</b> <span class="dimv">${t.cnt} сд.</span></div></div>`).join('')
       +`<div class="note" style="margin-top:10px">Среднее ${TD.mean!=null?TD.mean+' дн':'—'} · самая долгая ${TD.max!=null?TD.max+' дн':'—'}. Считается только по переведённым в реализацию (победным). Срок «создание→первый запрос поставщикам» — во вкладке «Сорсинг».</div>`
       +`</section>`;
   }
@@ -959,8 +960,8 @@ document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{
     +`<div class="pcard"><div class="pv">${TD.p75!=null?TD.p75+' дн':'—'}</div><div class="pl">75% за (P75)</div></div>`
     +`<div class="pcard"><div class="pv">${TD.p90!=null?TD.p90+' дн':'—'}</div><div class="pl">90% за (P90)</div></div>`
     +`</div>`
-    +TD.thresholds.map(t=>`<div class="ttrrow"><div class="ttrlbl">за ${t.d} дн</div><div class="ttrtrack"><i style="width:${t.pct}%"></i></div><div class="ttrpct"><b>${t.pct}%</b> <span class="dimv">${t.cnt} сд.</span></div></div>`).join('')
-    +`<div class="note" style="margin-top:10px">Из <b>${TD.n}</b> сделок с запросом поставщикам · среднее ${TD.mean!=null?TD.mean+' дн':'—'} · самая долгая ${TD.max!=null?TD.max+' дн':'—'}.</div>`;
+    +TD.thresholds.map(t=>`<div class="ttrrow"><div class="ttrlbl">за ${_days(t.d)}</div><div class="ttrtrack"><i style="width:${t.pct}%"></i></div><div class="ttrpct"><b>${t.pct}%</b> <span class="dimv">${t.cnt} сд.</span></div></div>`).join('')
+    +`<div class="note" style="margin-top:10px">Из <b>${TD.n}</b> сделок с запросом · медиана <b>${TD.p50!=null?_days(TD.p50):'—'}</b> · среднее ${TD.mean!=null?_days(TD.mean):'—'} · самая долгая ${TD.max!=null?_days(TD.max):'—'}. Запрос обычно уходит в первые сутки; всё после 10 дней — длинный хвост (${TD.tail10}% сделок).</div>`;
 })();
 injectMeth();
 
