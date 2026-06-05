@@ -20,6 +20,7 @@ import config
 from bitrix_client import BitrixClient
 
 YEAR_START = "2026-01-01T00:00:00"
+COHORT_START = "2025-01-01T00:00:00"  # когорты смотрят шире Пульса: 2025 + 2026
 MLBL = {1: "янв", 2: "фев", 3: "мар", 4: "апр", 5: "май", 6: "июн",
         7: "июл", 8: "авг", 9: "сен", 10: "окт", 11: "ноя", 12: "дек"}
 
@@ -179,15 +180,54 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         key=lambda x: -x["active"])
 
     # --- когортный анализ: сделки по кварталу/месяцу создания → успехи (реализация) ---
+    # Окно шире Пульса: с 2025-01-01 (Пульс выше — строго YTD-2026). 2026 уже загружен,
+    # дочитываем только 2025 и объединяем. Заказы поставщикам: 2025-е + уже загруженные 2026-е
+    # (заказ всегда позже своей сделки, поэтому пол 2025 покрывает все заказы когорт ≥2025).
+    pre_created = client.list_deals_fast(
+        filter={">=DATE_CREATE": COHORT_START, "<DATE_CREATE": YEAR_START},
+        select=["ID", "TITLE", "CATEGORY_ID", "STAGE_SEMANTIC_ID", "OPPORTUNITY", "CURRENCY_ID", "DATE_CREATE", "ASSIGNED_BY_ID"])
+    pre_orders = client.list_items(172, filter={">=createdTime": COHORT_START, "<createdTime": YEAR_START},
+        select=["id", "stageId", "opportunity", "currencyId", "createdTime", "parentId2"])
+    pre_orders = [o for o in pre_orders if not str(o.get("stageId", "")).endswith(":FAIL")]
+    coh_all_orders = orders + pre_orders
+    coh_parents = {str(o.get("parentId2")) for o in coh_all_orders if o.get("parentId2")}
+    coh_buy: dict[str, float] = defaultdict(float); coh_first: dict[str, str] = {}
+    for o in coh_all_orders:
+        did_o = str(o.get("parentId2") or "")
+        if not did_o:
+            continue
+        coh_buy[did_o] += eur(o.get("opportunity"), o.get("currencyId"))
+        ct = str(o.get("createdTime") or "")[:10]
+        if ct and (did_o not in coh_first or ct < coh_first[did_o]):
+            coh_first[did_o] = ct
+    coh_date = dict(deal_date)
+    coh_date.update({str(d["ID"]): str(d.get("DATE_CREATE", ""))[:10] for d in pre_created})
+
+    def _coh_detail(d):
+        did = str(d["ID"]); cid = str(d.get("CATEGORY_ID")); owner = str(d.get("ASSIGNED_BY_ID") or "")
+        sem = (d.get("STAGE_SEMANTIC_ID") or "").upper()
+        amt = eur(d.get("OPPORTUNITY"), d.get("CURRENCY_ID")); seq = _regno(d.get("TITLE"))
+        cls = "lost" if sem == "F" else ("real" if (did in coh_parents or seq > 0) else "early")
+        return {"id": did, "t": (d.get("TITLE") or f"Сделка #{did}")[:90], "raw": round(amt),
+                "amt": _money(amt), "mon": str(d.get("DATE_CREATE", ""))[:7], "cid": cid, "c": catname(cid),
+                "uid": owner, "o": unames.get(owner, f"user#{owner}") if owner else "—",
+                "cls": cls, "seq": seq, "sem": sem or "P", "ovd": False}
+    # 2026-детали уже посчитаны выше (deal_details) — переиспользуем; для 2026-сделок членство в
+    # coh_parents идентично order_parents (их заказы все ≥2026), поэтому cls совпадает.
+    coh_details = deal_details + [_coh_detail(d) for d in pre_created]
+
     def _cblank(): return {"created": 0, "real": 0, "lost": 0, "early": 0, "sales": 0.0, "buy": 0.0, "ttr": []}
     coh_q = defaultdict(_cblank); coh_m = defaultdict(_cblank)
-    for d in deal_details:
-        did = d["id"]; mm = d["mon"]; q = f"{mm[:4]}-Q{(int(mm[5:7]) - 1) // 3 + 1}"; cls = d["cls"]
+    for d in coh_details:
+        did = d["id"]; mm = d["mon"]
+        if len(mm) < 7:
+            continue
+        q = f"{mm[:4]}-Q{(int(mm[5:7]) - 1) // 3 + 1}"; cls = d["cls"]
         for c in (coh_q[q], coh_m[mm]):
             c["created"] += 1; c[cls] += 1
             if cls == "real":
-                c["sales"] += d["raw"]; c["buy"] += buy_by_deal.get(did, 0.0)
-                fo, dd0 = first_order.get(did), deal_date.get(did)
+                c["sales"] += d["raw"]; c["buy"] += coh_buy.get(did, 0.0)
+                fo, dd0 = coh_first.get(did), coh_date.get(did)
                 if fo and dd0:
                     try:
                         days = (dt.date.fromisoformat(fo) - dt.date.fromisoformat(dd0)).days
@@ -211,8 +251,10 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             })
         return out
     cohorts = {
+        "label": f"01.01.2025 – {today.strftime('%d.%m.%Y')}",
         "quarters": _coh_rows(coh_q, lambda k: k.replace("-Q", " · Q")),
         "months": _coh_rows(coh_m, lambda k: f"{MLBL[int(k[5:7])]} {k[:4]}"),
+        "deals": coh_details,
     }
 
     return {
