@@ -51,19 +51,23 @@ def _pctile(sorted_vals: list, p: float):
     return round(sorted_vals[f] + (sorted_vals[c] - sorted_vals[f]) * (k - f))
 
 
-_TTR_THRESH = [10, 20, 30, 45, 60, 90, 120, 180, 270, 365]
+_TTR_THRESH = [10, 20, 30, 45, 60, 90, 120, 180, 270, 365]   # для долгих процессов (победа)
+_RFQ_THRESH = [1, 2, 3, 5, 7, 10, 14, 21, 30]                # для быстрых (первый запрос: важны сутки/двое/трое)
 
 
-def _ttr_dist(values: list) -> dict:
+def _ttr_dist(values: list, thresholds: list | None = None) -> dict:
     """Накопленное распределение (CDF) сроков в днях + перцентили. values — список дней (>=0)."""
     sv = sorted(values)
     n = len(sv)
+    th = thresholds or _TTR_THRESH
     return {
         "n": n,
         "thresholds": [{"d": t, "pct": round(sum(1 for x in sv if x <= t) / n * 100) if n else 0,
-                        "cnt": sum(1 for x in sv if x <= t)} for t in _TTR_THRESH],
+                        "cnt": sum(1 for x in sv if x <= t)} for t in th],
         "p25": _pctile(sv, 25), "p50": _pctile(sv, 50), "p75": _pctile(sv, 75), "p90": _pctile(sv, 90),
         "mean": round(sum(sv) / n) if n else None, "max": sv[-1] if sv else None,
+        # доля «хвоста» за порогом 10 дней — для подписи
+        "tail10": round(sum(1 for x in sv if x > 10) / n * 100) if n else 0,
     }
 
 
@@ -298,7 +302,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
 
     # распределения сроков: КОГОРТЫ — создание→перевод в реализацию (победа); СОРСИНГ — создание→первый запрос поставщикам
     ttr_dist = _ttr_dist([t for c in coh_q.values() for t in c["ttr"]])  # каждая сделка ровно в одном квартале
-    ttr_rfq_dist = _ttr_dist(rfq_ttr_all)
+    ttr_rfq_dist = _ttr_dist(rfq_ttr_all, _RFQ_THRESH)  # мелкие пороги: сутки/двое/трое важнее
 
     def _coh_rows(agg, lblfn):
         out = []
