@@ -217,15 +217,12 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
     pre_orders = [o for o in pre_orders if not str(o.get("stageId", "")).endswith(":FAIL")]
     coh_all_orders = orders + pre_orders
     coh_parents = {str(o.get("parentId2")) for o in coh_all_orders if o.get("parentId2")}
-    coh_buy: dict[str, float] = defaultdict(float); coh_first: dict[str, str] = {}
+    coh_buy: dict[str, float] = defaultdict(float)
     for o in coh_all_orders:
         did_o = str(o.get("parentId2") or "")
         if not did_o:
             continue
         coh_buy[did_o] += eur(o.get("opportunity"), o.get("currencyId"))
-        ct = str(o.get("createdTime") or "")[:10]
-        if ct and (did_o not in coh_first or ct < coh_first[did_o]):
-            coh_first[did_o] = ct
     coh_date = dict(deal_date)
     coh_date.update({str(d["ID"]): str(d.get("DATE_CREATE", ""))[:10] for d in pre_created})
     # момент ПОБЕДЫ = первый вход сделки в воронку реализации (категория 0) из истории стадий
@@ -233,6 +230,18 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         realize_date = client.stage_first_entry(2, 0, COHORT_START)
     except Exception:
         realize_date = {}
+    # первый ЗАПРОС поставщикам (СП-166) по сделке — для метрики скорости сорсинга
+    rfq_all = client.list_items(config.SPA_ENTITY_TYPE_ID,
+        filter={"categoryId": config.SPA_CATEGORY_ID, ">=createdTime": COHORT_START},
+        select=["id", "parentId2", "createdTime"])
+    first_rfq: dict[str, str] = {}
+    for r in rfq_all:
+        did_r = str(r.get("parentId2") or "")
+        if not did_r:
+            continue
+        ct = str(r.get("createdTime") or "")[:10]
+        if ct and (did_r not in first_rfq or ct < first_rfq[did_r]):
+            first_rfq[did_r] = ct
 
     def _coh_detail(d):
         did = str(d["ID"]); cid = str(d.get("CATEGORY_ID")); owner = str(d.get("ASSIGNED_BY_ID") or "")
@@ -251,29 +260,29 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
     def _cblank(): return {"created": 0, "real": 0, "lost": 0, "early": 0, "sales": 0.0, "buy": 0.0,
                            "ttr": [], "csum": 0.0, "esum": 0.0, "lsum": 0.0}
     coh_q = defaultdict(_cblank); coh_m = defaultdict(_cblank)
-    order_ttr_all = []  # создание сделки → первый заказ поставщику (метрика сорсинга)
+    rfq_ttr_all = []  # создание сделки → первый ЗАПРОС поставщикам (СП-166) — метрика сорсинга (по всем сделкам с запросом)
     for d in coh_details:
         did = d["id"]; mm = d["mon"]
         if len(mm) < 7:
             continue
         q = f"{mm[:4]}-Q{(int(mm[5:7]) - 1) // 3 + 1}"; cls = d["cls"]
+        dd0 = coh_date.get(did)
+        fr = first_rfq.get(did)  # первый запрос поставщикам
+        if fr and dd0:
+            try:
+                rq = (dt.date.fromisoformat(fr) - dt.date.fromisoformat(dd0)).days
+                if rq >= 0:
+                    rfq_ttr_all.append(rq)
+            except Exception:
+                pass
         win_days = None  # создание → перевод в реализацию (победа)
         if cls == "real":
-            dd0 = coh_date.get(did)
             rd = realize_date.get(did)
             if rd and dd0:
                 try:
                     wd = (dt.date.fromisoformat(rd) - dt.date.fromisoformat(dd0)).days
                     if wd >= 0:
                         win_days = wd
-                except Exception:
-                    pass
-            fo = coh_first.get(did)  # первый заказ поставщику
-            if fo and dd0:
-                try:
-                    od = (dt.date.fromisoformat(fo) - dt.date.fromisoformat(dd0)).days
-                    if od >= 0:
-                        order_ttr_all.append(od)
                 except Exception:
                     pass
         for c in (coh_q[q], coh_m[mm]):
@@ -287,9 +296,9 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             else:
                 c["lsum"] += d["raw"]
 
-    # распределения сроков: КОГОРТЫ — создание→перевод в реализацию (победа); СОРСИНГ — создание→первый заказ
+    # распределения сроков: КОГОРТЫ — создание→перевод в реализацию (победа); СОРСИНГ — создание→первый запрос поставщикам
     ttr_dist = _ttr_dist([t for c in coh_q.values() for t in c["ttr"]])  # каждая сделка ровно в одном квартале
-    ttr_order_dist = _ttr_dist(order_ttr_all)
+    ttr_rfq_dist = _ttr_dist(rfq_ttr_all)
 
     def _coh_rows(agg, lblfn):
         out = []
@@ -336,5 +345,5 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         "growth": [{"m": MLBL[int(m[5:7])], "comp": comp.get(m, 0), "cont": cont.get(m, 0), "leads": leads.get(m, 0)} for m in months],
         "deals": deal_details,
         "cohorts": cohorts,
-        "ttrOrder": ttr_order_dist,
+        "ttrRFQ": ttr_rfq_dist,
     }
