@@ -51,6 +51,22 @@ def _pctile(sorted_vals: list, p: float):
     return round(sorted_vals[f] + (sorted_vals[c] - sorted_vals[f]) * (k - f))
 
 
+_TTR_THRESH = [10, 20, 30, 45, 60, 90, 120, 180, 270, 365]
+
+
+def _ttr_dist(values: list) -> dict:
+    """Накопленное распределение (CDF) сроков в днях + перцентили. values — список дней (>=0)."""
+    sv = sorted(values)
+    n = len(sv)
+    return {
+        "n": n,
+        "thresholds": [{"d": t, "pct": round(sum(1 for x in sv if x <= t) / n * 100) if n else 0,
+                        "cnt": sum(1 for x in sv if x <= t)} for t in _TTR_THRESH],
+        "p25": _pctile(sv, 25), "p50": _pctile(sv, 50), "p75": _pctile(sv, 75), "p90": _pctile(sv, 90),
+        "mean": round(sum(sv) / n) if n else None, "max": sv[-1] if sv else None,
+    }
+
+
 def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             created: list[dict] | None = None, orders: list[dict] | None = None,
             deal_sale: dict | None = None) -> dict:
@@ -212,6 +228,11 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             coh_first[did_o] = ct
     coh_date = dict(deal_date)
     coh_date.update({str(d["ID"]): str(d.get("DATE_CREATE", ""))[:10] for d in pre_created})
+    # момент ПОБЕДЫ = первый вход сделки в воронку реализации (категория 0) из истории стадий
+    try:
+        realize_date = client.stage_first_entry(2, 0, COHORT_START)
+    except Exception:
+        realize_date = {}
 
     def _coh_detail(d):
         did = str(d["ID"]); cid = str(d.get("CATEGORY_ID")); owner = str(d.get("ASSIGNED_BY_ID") or "")
@@ -230,42 +251,45 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
     def _cblank(): return {"created": 0, "real": 0, "lost": 0, "early": 0, "sales": 0.0, "buy": 0.0,
                            "ttr": [], "csum": 0.0, "esum": 0.0, "lsum": 0.0}
     coh_q = defaultdict(_cblank); coh_m = defaultdict(_cblank)
+    order_ttr_all = []  # создание сделки → первый заказ поставщику (метрика сорсинга)
     for d in coh_details:
         did = d["id"]; mm = d["mon"]
         if len(mm) < 7:
             continue
         q = f"{mm[:4]}-Q{(int(mm[5:7]) - 1) // 3 + 1}"; cls = d["cls"]
+        win_days = None  # создание → перевод в реализацию (победа)
+        if cls == "real":
+            dd0 = coh_date.get(did)
+            rd = realize_date.get(did)
+            if rd and dd0:
+                try:
+                    wd = (dt.date.fromisoformat(rd) - dt.date.fromisoformat(dd0)).days
+                    if wd >= 0:
+                        win_days = wd
+                except Exception:
+                    pass
+            fo = coh_first.get(did)  # первый заказ поставщику
+            if fo and dd0:
+                try:
+                    od = (dt.date.fromisoformat(fo) - dt.date.fromisoformat(dd0)).days
+                    if od >= 0:
+                        order_ttr_all.append(od)
+                except Exception:
+                    pass
         for c in (coh_q[q], coh_m[mm]):
             c["created"] += 1; c[cls] += 1; c["csum"] += d["raw"]  # csum — сумма ВСЕХ созданных
             if cls == "real":
                 c["sales"] += d["raw"]; c["buy"] += coh_buy.get(did, 0.0)
-                fo, dd0 = coh_first.get(did), coh_date.get(did)
-                if fo and dd0:
-                    try:
-                        days = (dt.date.fromisoformat(fo) - dt.date.fromisoformat(dd0)).days
-                        if days >= 0:
-                            c["ttr"].append(days)
-                    except Exception:
-                        pass
+                if win_days is not None:
+                    c["ttr"].append(win_days)
             elif cls == "early":
                 c["esum"] += d["raw"]
             else:
                 c["lsum"] += d["raw"]
 
-    # --- распределение срока выхода в реализацию (TTR): за сколько дней доходят сделки ---
-    # каждая реализованная сделка попадает ровно в один квартал → собираем все TTR из coh_q
-    ttr_all = sorted(t for c in coh_q.values() for t in c["ttr"])
-    _n = len(ttr_all)
-    _THRESH = [10, 20, 30, 45, 60, 90, 120, 180, 270, 365]
-    ttr_dist = {
-        "n": _n,
-        "thresholds": [{"d": t, "pct": round(sum(1 for x in ttr_all if x <= t) / _n * 100) if _n else 0,
-                        "cnt": sum(1 for x in ttr_all if x <= t)} for t in _THRESH],
-        "p25": _pctile(ttr_all, 25), "p50": _pctile(ttr_all, 50),
-        "p75": _pctile(ttr_all, 75), "p90": _pctile(ttr_all, 90),
-        "mean": round(sum(ttr_all) / _n) if _n else None,
-        "max": ttr_all[-1] if ttr_all else None,
-    }
+    # распределения сроков: КОГОРТЫ — создание→перевод в реализацию (победа); СОРСИНГ — создание→первый заказ
+    ttr_dist = _ttr_dist([t for c in coh_q.values() for t in c["ttr"]])  # каждая сделка ровно в одном квартале
+    ttr_order_dist = _ttr_dist(order_ttr_all)
 
     def _coh_rows(agg, lblfn):
         out = []
@@ -312,4 +336,5 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         "growth": [{"m": MLBL[int(m[5:7])], "comp": comp.get(m, 0), "cont": cont.get(m, 0), "leads": leads.get(m, 0)} for m in months],
         "deals": deal_details,
         "cohorts": cohorts,
+        "ttrOrder": ttr_order_dist,
     }
