@@ -101,6 +101,9 @@
   .gnums{display:flex;flex-direction:column;gap:1px;margin-top:4px;font-family:var(--mono);font-size:10px;line-height:1.3}
   .gnums i{font-style:normal}
   .legendrow b{font-family:var(--mono);color:var(--ink);margin-left:3px}
+  .distbar{display:flex;height:24px;border-radius:7px;overflow:hidden;background:var(--panel2)}
+  .distbar i{height:100%;cursor:pointer;transition:filter .12s;min-width:2px}
+  .distbar i:hover{filter:brightness(1.25)}
 
   .spark{display:flex;gap:3px;align-items:flex-end;height:26px}
   .spark i{width:8px;background:var(--a);border-radius:2px 2px 0 0;opacity:.85}
@@ -352,29 +355,7 @@
 <footer id="footer"></footer>
 </div><!-- /tab-sourcing -->
 
-<div id="tab-company" hidden>
-  <header>
-    <div class="eyebrow">Квант · обзор компании</div>
-    <h1>Пульс компании — приток сделок и температура</h1>
-    <div class="sub" id="cmpSub"></div>
-  </header>
-  <div class="secttl"><b>1</b> · Динамика создания сделок</div>
-  <div class="grid">
-    <section class="card"><h2>Создано сделок по месяцам</h2><div class="note">Все клиентские воронки; текущий месяц — частичный.</div><div class="wkchart" id="cmpMon"></div></section>
-    <section class="card"><h2>Структура по воронкам (YTD)</h2><div class="barlist" id="cmpCat"></div></section>
-  </div>
-  <section class="card"><h2>Воронка × месяц (топ-5)</h2><div class="note">Число созданных сделок по месяцу и воронке. Клик по ячейке — список этих сделок.</div><table><thead id="cmpMxHead"></thead><tbody id="cmpMxBody"></tbody></table></section>
-  <section class="card"><h2>Сделки по исполнителям</h2><div class="note">Кто завёл сделки 2026 (по ответственному). Клик по сотруднику — все его сделки.</div><div class="ownlist" id="cmpOwners"></div></section>
-  <div class="secttl"><b>2</b> · 20 параметров температуры</div>
-  <div class="kpis" id="cmpKpis" style="grid-template-columns:repeat(5,1fr)"></div>
-  <div class="secttl"><b>3</b> · Исход и рост базы</div>
-  <div class="grid">
-    <section class="card"><h2>Поток сделок 2026</h2><div class="note">Воронка по когорте «создано в 2026»: создано = в работе + выиграно + проигрыш. Статус «выиграна» в самих сделках проставляется редко — реальные победы и выручка фиксируются Заказами (СП-172), см. строку ниже и вкладки направлений. Клик по боксу — список сделок.</div><div class="flow" id="cmpFlow"></div><div class="note" id="cmpOrdersNote" style="margin-top:10px"></div></section>
-    <section class="card"><h2>Рост базы по месяцам</h2><div class="wkchart" id="cmpGrowth" style="height:150px"></div>
-    <div class="legendrow"><span><i class="sw" style="background:var(--ok)"></i>компании</span><span><i class="sw" style="background:var(--b)"></i>контакты</span><span><i class="sw" style="background:var(--a)"></i>лиды</span></div></section>
-  </div>
-  <footer id="cmpFooter"></footer>
-</div>
+<div id="tab-company" hidden></div>
 
 <div id="tab-kam" hidden></div>
 <div id="tab-eng" hidden></div>
@@ -563,54 +544,85 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDrw();});
 document.querySelectorAll('[data-uid]').forEach(el=>el.addEventListener('click',()=>openDrw(el.dataset.uid)));
 
 // ---- вкладка «Пульс компании»
-const C = window.__COMPANY__;
-if (C) {
-  const $=id=>document.getElementById(id);
-  const D=C.deals||[];
-  $('cmpSub').innerHTML=`<span>Период: <b>${C.label}</b></span><span>Источник: <b>Bitrix24 · все воронки</b></span><span>База: <b>€</b></span><span class="dimv">↳ клик по графику, ячейке или сотруднику — список сделок</span>`;
-  const mmx=Math.max(1,...C.byMon.map(x=>x.v));
-  $('cmpMon').innerHTML=C.byMon.map(x=>`<div class="wkcol drill" data-mk="${x.mk}"><div class="wkbars"><div class="wkbar a" style="height:${(x.v/mmx*100).toFixed(0)}%"><span>${x.v}</span></div></div><div class="wklbl"><b>${x.m}</b></div></div>`).join('');
-  const cmx=Math.max(1,...C.byCat.map(x=>x.v));
-  $('cmpCat').innerHTML=C.byCat.map(x=>`<div class="blrow drill" data-cid="${x.cid}"><div class="blt"><span>${_esc(x.cat)}</span><b>${x.v} · ${x.p}%</b></div><div class="bltrack"><i style="width:${(x.v/cmx*100).toFixed(0)}%"></i></div></div>`).join('');
-  $('cmpMxHead').innerHTML='<tr><th>Воронка</th>'+C.matrix.months.map(m=>`<th class="r">${m}</th>`).join('')+'</tr>';
-  $('cmpMxBody').innerHTML=C.matrix.rows.map(r=>`<tr><td><div class="who">${_esc(r.cat)}</div></td>`+r.cells.map((v,ci)=>v?`<td class="num r cell drill" data-mk="${C.matrix.mks[ci]}" data-cid="${r.cid}">${v}</td>`:`<td class="num r dimv">·</td>`).join('')+`</tr>`).join('');
-  $('cmpKpis').innerHTML=C.params.map(p=>`<div class="kpi ${p.clz}"><div class="lbl">${p.lbl}</div><div class="val ${p.clz}">${p.val}</div><div class="meta">${p.meta}</div></div>`).join('');
-  const omx=Math.max(1,...(C.byOwner||[]).map(o=>o.deals));
-  $('cmpOwners').innerHTML=(C.byOwner||[]).slice(0,30).map(o=>`<div class="ownrow" data-uid="${o.uid}"><div class="onm who" style="min-width:240px;flex-shrink:0">${_esc(o.name)}</div><div class="obar"><i style="width:${(o.deals/omx*100).toFixed(0)}%"></i></div><div class="ocnt">${o.deals} <span class="dimv">/ ${o.open} в раб.</span></div></div>`).join('')+((C.byOwner||[]).length>30?`<div class="dimv" style="padding:7px 9px">…ещё ${C.byOwner.length-30} сотрудников (см. отраслевые вкладки)</div>`:'');
-  const f=C.flow;
-  $('cmpFlow').innerHTML=`<div class="flowbox drill" data-flow="created"><div class="n">${f.created}</div><div class="l">создано</div></div><div class="flowbox drill" data-flow="open"><div class="n" style="color:var(--b2)">${f.open}</div><div class="l">в работе</div></div><div class="flowbox drill" data-flow="won"><div class="n" style="color:var(--ok)">${f.won}</div><div class="l">выиграно</div></div><div class="flowbox drill" data-flow="lost"><div class="n" style="color:var(--nr)">${f.lost}</div><div class="l">закрыто-минус</div></div>`;
-  var ordEl=$('cmpOrdersNote'); if(ordEl) ordEl.innerHTML=`<b>${f.contracts}</b> контрактов с заказами поставщикам (${f.orders} закупок): продажи <b style="color:var(--ok)">${f.sales}</b> · закупка <b style="color:var(--a)">${f.buy}</b> · маржа <b style="color:var(--ok2)">${f.margin}</b>. Детали — вкладки «Контракты» и КАМы/Инжиниринг/Продукт.`;
-  const gmx=Math.max(1,...C.growth.flatMap(x=>[x.comp,x.cont,x.leads]));
-  const fmtN=v=>String(v).replace(/\B(?=(\d{3})+(?!\d))/g,' ');
+// ---- Пульс компании: управленческий обзор (полностью рендерится из window.__COMPANY__)
+function renderPulse(C){
+  const el=document.getElementById('tab-company'); if(!el) return;
+  if(!C){ el.innerHTML='<div class="note" style="padding:20px 0">нет данных</div>'; return; }
+  const D=C.deals||[], f=C.funnel;
+  const kpi=p=>`<div class="kpi ${p.clz}${p.drill?' drill':''}"${p.drill?` data-drill="${p.drill}"`:''}><div class="lbl">${p.lbl}</div><div class="val ${p.clz}">${p.val}</div><div class="meta">${p.meta}</div>${p.drill?qmark('c.kpi'):''}</div>`;
+  let h=`<header><div class="eyebrow">Квант · пульс компании</div><h1>Пульс компании</h1><div class="sub"><span>Период: <b>${C.label}</b></span><span>Источник: <b>Bitrix24 · сделки + Заказы (СП-172)</b></span><span class="dimv">↳ клик по любому показателю — список сделок</span></div></header>`;
+  h+=`<div class="kpis" style="grid-template-columns:repeat(4,1fr)">${C.kpis.map(kpi).join('')}</div>`;
+  // 1 · распределение созданных
+  const fb=(lbl,n,pct,dr,color)=>`<div class="flowbox drill" data-drill="${dr}"><div class="n" style="color:${color}">${n}</div><div class="l">${lbl}</div><div class="dimv" style="font-size:11px">${pct}%</div></div>`;
+  h+=`<div class="secttl"><b>1</b> · Что стало с созданными сделками${qmark('c.funnel')}</div><section class="card"><div class="note">Каждая созданная в 2026 сделка — в одном из трёх состояний (создано = ранний + в реализации + проиграно). «В реализации» = есть заказ поставщику (СП-172) или номер реализации в названии — статус «выиграна» в портале почти не ставится, поэтому считать по нему нельзя. Клик — список.</div>`
+    +`<div class="distbar">${f.early?`<i class="drill" data-drill="early" style="width:${f.earlyPct}%;background:var(--b2)" title="ранний ${f.early}"></i>`:''}${f.real?`<i class="drill" data-drill="real" style="width:${f.realPct}%;background:var(--ok)" title="в реализации ${f.real}"></i>`:''}${f.lost?`<i class="drill" data-drill="lost" style="width:${f.lostPct}%;background:var(--nr)" title="проиграно ${f.lost}"></i>`:''}</div>`
+    +`<div class="flow" style="margin-top:14px">${fb('Создано',f.created,100,'all','var(--ink)')}${fb('Ранний пайплайн',f.early,f.earlyPct,'early','var(--b2)')}${fb('В реализации',f.real,f.realPct,'real','var(--ok)')}${fb('Проиграно',f.lost,f.lostPct,'lost','var(--nr)')}</div>`
+    +`<div class="note" style="margin-top:10px">В реализации: продажи <b style="color:var(--ok)">${f.sales}</b> · закупка <b style="color:var(--a)">${f.buy}</b> · маржа <b style="color:var(--ok2)">${f.margin}</b>. Подробнее — вкладки «Реализация» и КАМы/Инжиниринг/Продукт.</div></section>`;
+  // 2 · динамика входа + структура
+  const mmx=Math.max(1,...C.byMon.map(x=>x.v)), cmx=Math.max(1,...C.byCat.map(x=>x.v));
+  h+=`<div class="secttl"><b>2</b> · Динамика входа и структура${qmark('c.mon')}</div><div class="grid">`
+    +`<section class="card"><h2>Создано по месяцам</h2><div class="note">Столбец — создано; зелёным — сколько из них дошло до реализации. Клик — сделки месяца.</div><div class="wkchart">`
+    +C.byMon.map(x=>`<div class="wkcol drill" data-drill="month:${x.mk}"><div class="wkbars"><div class="wkbar a" style="height:${(x.v/mmx*100).toFixed(0)}%"><span>${x.v}</span></div></div><div class="wklbl"><b>${x.m}</b>${x.real?`<span class="gnums"><i style="color:var(--ok)">${x.real} реал</i></span>`:''}</div></div>`).join('')
+    +`</div></section>`
+    +`<section class="card"><h2>По воронкам: вход и конверсия</h2><div class="note">Создано в воронке и сколько дошло до реализации (конв.). Клик — сделки воронки.</div><div class="barlist">`
+    +C.byCat.map(x=>`<div class="blrow drill" data-drill="cat:${x.cid}"><div class="blt"><span>${_esc(x.cat)}</span><b>${x.v} <span class="dimv">· реал ${x.real} (${x.conv}%)</span></b></div><div class="bltrack"><i style="width:${(x.v/cmx*100).toFixed(0)}%"></i></div></div>`).join('')
+    +`</div></section></div>`;
+  h+=`<section class="card"><h2>Воронка × месяц${qmark('c.matrix')}</h2><div class="note">Создано по месяцу и воронке. Клик по ячейке — сделки пересечения.</div><table><thead><tr><th>Воронка</th>`+C.matrix.months.map(m=>`<th class="r">${m}</th>`).join('')+`</tr></thead><tbody>`
+    +C.matrix.rows.map(r=>`<tr><td><div class="who">${_esc(r.cat)}</div></td>`+r.cells.map((v,ci)=>v?`<td class="num r cell drill" data-mk="${C.matrix.mks[ci]}" data-cid="${r.cid}">${v}</td>`:`<td class="num r dimv">·</td>`).join('')+`</tr>`).join('')
+    +`</tbody></table></section>`;
+  // 3 · люди — нагрузка и результат
+  h+=`<div class="secttl"><b>3</b> · Нагрузка и результат по людям${qmark('c.owners')}</div><section class="card"><div class="note">«Активная нагрузка» = открытые ранние сделки (что реально в работе) + их Σ потенциала; закрытые НЕ считаются нагрузкой. «В реализации» — доведено до заказа; «конв.» = реализация ÷ создано. Клик по строке — сделки сотрудника.</div>`
+    +`<table><thead><tr><th>Сотрудник</th><th class="r">актив. нагрузка</th><th class="r">пайплайн</th><th class="r">в реализации</th><th class="r">проиграно</th><th class="r">конв.</th></tr></thead><tbody>`
+    +C.byOwner.map(o=>`<tr class="drill" data-drill="owner:${o.uid}"><td><div class="who">${_esc(o.name)}</div></td><td class="num r">${o.active}</td><td class="num r dimv">${o.activeLbl}</td><td class="num r" style="color:var(--ok)">${o.real}</td><td class="num r" style="color:var(--nr)">${o.lost}</td><td class="num r">${o.conv}%</td></tr>`).join('')
+    +`</tbody></table></section>`;
+  // 4 · температура
+  h+=`<div class="secttl"><b>4</b> · Температура${qmark('c.params')}</div><div class="kpis" style="grid-template-columns:repeat(5,1fr)">${C.params.map(kpi).join('')}</div>`;
+  // 5 · рост базы
+  const gmx=Math.max(1,...C.growth.flatMap(x=>[x.comp,x.cont,x.leads])), fmtN=v=>String(v).replace(/\B(?=(\d{3})+(?!\d))/g,' ');
   const gbar=(v,c)=>`<div class="wkbar" style="width:14px;min-height:${v?3:0}px;height:${(v/gmx*100).toFixed(1)}%;background:${c}" title="${v}"></div>`;
-  $('cmpGrowth').innerHTML=C.growth.map(x=>`<div class="wkcol"><div class="wkbars">${gbar(x.comp,'var(--ok)')}${gbar(x.cont,'var(--b)')}${gbar(x.leads,'var(--a)')}</div><div class="wklbl"><b>${x.m}</b><span class="gnums"><i style="color:var(--ok)">${fmtN(x.comp)}</i><i style="color:var(--b)">${fmtN(x.cont)}</i><i style="color:var(--a)">${fmtN(x.leads)}</i></span></div></div>`).join('');
   const gt=C.growth.reduce((a,x)=>({comp:a.comp+x.comp,cont:a.cont+x.cont,leads:a.leads+x.leads}),{comp:0,cont:0,leads:0});
-  const gleg=$('cmpGrowth').closest('section').querySelector('.legendrow');
-  if(gleg)gleg.innerHTML=`<span><i class="sw" style="background:var(--ok)"></i>компании <b>${fmtN(gt.comp)}</b></span><span><i class="sw" style="background:var(--b)"></i>контакты <b>${fmtN(gt.cont)}</b></span><span><i class="sw" style="background:var(--a)"></i>лиды <b>${fmtN(gt.leads)}</b></span>`;
-  $('cmpFooter').innerHTML='Пульс компании · Bitrix24 (сделки/компании/контакты/лиды/СП-166) · '+C.label+'. Суммы — к базовой € по курсам Bitrix; победы/Σ — по дате закрытия. «Просрочены» = открытые с прошедшим CLOSEDATE (вероятно, дата не ведётся).';
-  // ---- drill «Пульса»: клик по графику/ячейке/сотруднику → список сделок
+  h+=`<div class="secttl"><b>5</b> · Рост клиентской базы${qmark('c.growth')}</div><section class="card"><div class="wkchart" style="height:150px">`
+    +C.growth.map(x=>`<div class="wkcol"><div class="wkbars">${gbar(x.comp,'var(--ok)')}${gbar(x.cont,'var(--b)')}${gbar(x.leads,'var(--a)')}</div><div class="wklbl"><b>${x.m}</b><span class="gnums"><i style="color:var(--ok)">${fmtN(x.comp)}</i><i style="color:var(--b)">${fmtN(x.cont)}</i><i style="color:var(--a)">${fmtN(x.leads)}</i></span></div></div>`).join('')
+    +`</div><div class="legendrow"><span><i class="sw" style="background:var(--ok)"></i>компании <b>${fmtN(gt.comp)}</b></span><span><i class="sw" style="background:var(--b)"></i>контакты <b>${fmtN(gt.cont)}</b></span><span><i class="sw" style="background:var(--a)"></i>лиды <b>${fmtN(gt.leads)}</b></span></div></section>`;
+  h+=`<footer>Пульс компании · Bitrix24 · ${C.label}. «В реализации» = сделка с заказом поставщику (СП-172) или номером реализации; статус «выиграна» в портале почти не используется. Суммы — к базовой € по курсам Bitrix.</footer>`;
+  el.innerHTML=h;
   const monLbl=mk=>{const b=C.byMon.find(x=>x.mk===mk);return b?b.m:mk;};
-  const catLbl=cid=>{const b=C.byCat.find(x=>x.cid===cid)||(C.matrix.rows.find(x=>x.cid===cid));return b?b.cat:('воронка '+cid);};
-  $('cmpMon').querySelectorAll('[data-mk]').forEach(n=>n.addEventListener('click',()=>openDeals(D.filter(d=>d.mon===n.dataset.mk),`Сделки за ${monLbl(n.dataset.mk)} 2026`,'Создано в месяце')));
-  $('cmpCat').querySelectorAll('[data-cid]').forEach(n=>n.addEventListener('click',()=>openDeals(D.filter(d=>d.cid===n.dataset.cid),`Воронка: ${catLbl(n.dataset.cid)}`,'Сделки воронки 2026')));
-  $('cmpMxBody').querySelectorAll('td.cell').forEach(n=>n.addEventListener('click',()=>openDeals(D.filter(d=>d.mon===n.dataset.mk&&d.cid===n.dataset.cid),`${catLbl(n.dataset.cid)} · ${monLbl(n.dataset.mk)}`,'Сделки месяца × воронки')));
-  $('cmpOwners').querySelectorAll('[data-uid]').forEach(n=>n.addEventListener('click',()=>{const o=(C.byOwner||[]).find(z=>z.uid===n.dataset.uid);openDeals(D.filter(d=>d.uid===n.dataset.uid),o?o.name:('сотрудник #'+n.dataset.uid),'Все сделки сотрудника 2026');}));
-  $('cmpFlow').querySelectorAll('[data-flow]').forEach(n=>n.addEventListener('click',()=>{const k=n.dataset.flow;
-    const sel={created:[D,'Все созданные сделки 2026'],open:[D.filter(d=>d.op),'Сделки в работе'],won:[D.filter(d=>d.sem==='S'),'Выигранные сделки (статус)'],lost:[D.filter(d=>d.sem==='F'),'Проигранные сделки']}[k]||[D,'Сделки'];
-    openDeals(sel[0],sel[1],'Поток 2026');}));
+  const catLbl=cid=>{const b=C.byCat.find(x=>x.cid===cid);return b?b.cat:('воронка '+cid);};
+  const ownLbl=uid=>{const o=C.byOwner.find(z=>z.uid===uid);return o?o.name:('сотрудник #'+uid);};
+  function resolve(spec){
+    if(spec==='all') return [D,'Все созданные сделки'];
+    if(spec==='early') return [D.filter(d=>d.cls==='early'),'Ранний пайплайн (активные)'];
+    if(spec==='real') return [D.filter(d=>d.cls==='real'),'В реализации'];
+    if(spec==='lost') return [D.filter(d=>d.cls==='lost'),'Проигранные'];
+    if(spec==='overdue') return [D.filter(d=>d.ovd),'Просроченные (открытые, срок прошёл)'];
+    if(spec.indexOf('month:')===0){const mk=spec.slice(6);return [D.filter(d=>d.mon===mk),'Создано — '+monLbl(mk)];}
+    if(spec.indexOf('cat:')===0){const cid=spec.slice(4);return [D.filter(d=>d.cid===cid),'Воронка: '+catLbl(cid)];}
+    if(spec.indexOf('owner:')===0){const uid=spec.slice(6);return [D.filter(d=>d.uid===uid),ownLbl(uid)];}
+    return [D,'Сделки'];
+  }
+  el.addEventListener('click',ev=>{
+    if(ev.target.closest('.qq')) return;
+    const cell=ev.target.closest('td.cell[data-mk]');
+    if(cell){ openDeals(D.filter(d=>d.mon===cell.dataset.mk&&d.cid===cell.dataset.cid),`${catLbl(cell.dataset.cid)} · ${monLbl(cell.dataset.mk)}`,'Сделки месяца × воронки'); return; }
+    const n=ev.target.closest('[data-drill]');
+    if(n){ const r=resolve(n.dataset.drill); openDeals(r[0],r[1],'Пульс 2026'); }
+  });
 }
 // ---- вкладки направлений (КАМы / Инжиниринг / Продукт-оунеры) — общий рендер
 // ---- drill-down отраслевых вкладок: клик по метрике → список сделок/заказов в дровере
 const _fmtE=v=>{v=Math.round(v);const a=Math.abs(v);return a>=1e6?'€'+(v/1e6).toFixed(1)+'M':a>=1e3?'€'+Math.round(v/1e3)+'K':'€'+v;};
-// ---- drill «Пульса»: список сделок в дровере
-const SEM={S:'выиграна',F:'проиграна',P:'в работе'};
+// ---- drill «Пульса»: список сделок в дровере (с классом сделки)
+const CLS={early:['ранний','var(--b2)'],real:['в реализации','var(--ok)'],lost:['проигран','var(--nr)']};
 function openDeals(list,title,sub){
   list=(list||[]).slice().sort((a,b)=>b.raw-a.raw);
-  const sum=list.reduce((a,d)=>a+d.raw,0), open=list.filter(d=>d.op).length;
+  const sum=list.reduce((a,d)=>a+d.raw,0);
+  const cnt={early:0,real:0,lost:0}; list.forEach(d=>{if(cnt[d.cls]!=null)cnt[d.cls]++;});
   document.getElementById('drwName').textContent=title;
-  document.getElementById('drwSub').textContent=`${sub} · ${(window.__COMPANY__&&window.__COMPANY__.label)||''} · сделок ${list.length} · открытых ${open}`;
-  let h=`<div class="h">Сделки (${list.length}) · Σ ${_fmtE(sum)}</div>`;
-  h+=list.slice(0,400).map(d=>`<div class="req"><div class="rt">${_esc(d.t)}</div><div class="rm"><span class="pill">${_esc(d.c)}</span><span class="pill">${SEM[d.sem]||'в работе'}</span><span>${_esc(d.o)}</span><span class="amt">${d.amt}</span></div></div>`).join('')||'<div class="dimv">нет сделок</div>';
+  document.getElementById('drwSub').textContent=`${sub} · ${(window.__COMPANY__&&window.__COMPANY__.label)||''} · сделок ${list.length} · Σ ${_fmtE(sum)}`;
+  const chip=k=>cnt[k]?`<span class="stchip"><i class="dot" style="background:${CLS[k][1]}"></i>${CLS[k][0]} <b>${cnt[k]}</b></span>`:'';
+  let h=(cnt.early||cnt.real||cnt.lost)?`<div class="statleg" style="margin-bottom:8px">${chip('early')}${chip('real')}${chip('lost')}</div>`:'';
+  h+=`<div class="h">Сделки (${list.length})</div>`;
+  h+=list.slice(0,400).map(d=>`<div class="req"><div class="rt">${d.seq?`<b style="color:var(--a2)">#${d.seq}</b> `:''}${_esc(d.t)}</div><div class="rm"><span class="pill" style="color:${CLS[d.cls]?CLS[d.cls][1]:'var(--mut)'}">${CLS[d.cls]?CLS[d.cls][0]:(d.sem||'')}</span><span class="pill">${_esc(d.c)}</span><span>${_esc(d.o)}</span>${d.ovd?'<span class="pill" style="color:var(--nr)">просрочена</span>':''}<span class="amt">${d.amt}</span></div></div>`).join('')||'<div class="dimv">нет сделок</div>';
   if(list.length>400)h+=`<div class="dimv" style="padding:6px 0">…ещё ${list.length-400}</div>`;
   document.getElementById('drwBody').innerHTML=h;
   _ovl.classList.add('on');_drw.classList.add('on');_drw.setAttribute('aria-hidden','false');
@@ -624,7 +636,9 @@ const METH={
   's.cov':{t:'Покрытие сделок сорсингом',what:'Сколько клиентских сделок реально обеспечены запросами поставщикам.',src:'crm.deal.list (созданные в окне) ↔ обратный parentId2 из СП-166.',formula:'Покрытие = доля сделок с ≥1 связанным RFQ. Ср. поставщиков = RFQ ÷ покрытые сделки. Гистограмма: 1 / 2–3 / 4–5 / 6+ запросов на сделку.'},
   's.send':{t:'Реально отправлено vs создано',what:'Сверка: карточку запроса завели — но отправили ли письмо поставщику.',src:'Активности OWNER_TYPE_ID=166, PROVIDER_ID=CRM_EMAIL (исходящие письма).',formula:'Отправлено = RFQ с ≥1 исходящим письмом. «Фейк-отправки» = RFQ в стадии «отправлено» без письма.',note:'Привязка письма к RFQ местами неполная на стороне Bitrix — считаем нижней оценкой.'},
   's.suppliers':{t:'Разнообразие поставщиков',what:'Насколько широка база поставщиков, к которым обращается сорсинг.',src:'СП-166 (запросы), поле поставщика ufCrm18Supplier → имя компании; блок A.',formula:'Пай-чарт — доля запросов по поставщикам (топ-12 + прочие). «Поставщиков на сорсера» — число РАЗНЫХ поставщиков, к которым обращался сотрудник.',note:'Концентрация на немногих поставщиках = риск; широкая база = больше альтернатив по цене/срокам.'},
-  'c.mon':{t:'Создано сделок по месяцам',what:'Приток новых сделок помесячно.',src:'crm.deal.list, поле DATE_CREATE, все клиентские воронки.',filt:'DATE_CREATE ≥ 01.01.2026.',formula:'Count сделок по месяцу создания; текущий месяц частичный.',note:'Клик по столбцу — список сделок месяца.'},
+  'c.kpi':{t:'Сводные показатели Пульса',what:'Верхняя панель: вход, активный пайплайн, реализация, выручка/маржа, проигрыш, просрочка.',src:'crm.deal.list (созданные YTD) + Заказы поставщикам СП-172.',formula:'«В работе» = ранние (открытые, ещё не в реализации). «В реализации» = есть заказ СП-172 или номер реализации в названии. «Выручка» = Σ сумм сделок-контрактов; «Маржа» = выручка − закупка. «Проиграно» = статус F. «Просрочено» = открытые с прошедшим CLOSEDATE.',note:'Каждая карточка кликабельна — список сделок за цифрой.'},
+  'c.funnel':{t:'Что стало с созданными сделками',what:'Распределение всех созданных-2026 сделок по терминальным состояниям.',src:'crm.deal.list + СП-172.',formula:'Создано = Ранний пайплайн (открыта, не в реализации) + В реализации (есть заказ/номер) + Проиграно (статус F). Инвариант точный. Статус «выиграна» в портале почти не ставится (≈1 сделка), поэтому НЕ используется как признак победы.',note:'Клик по боксу/сегменту — список сделок состояния.'},
+  'c.mon':{t:'Создано сделок по месяцам',what:'Приток новых сделок помесячно + сколько дошло до реализации.',src:'crm.deal.list, поле DATE_CREATE, все клиентские воронки.',filt:'DATE_CREATE ≥ 01.01.2026.',formula:'Count сделок по месяцу создания (текущий месяц частичный); зелёным — из них в реализации. По воронкам — вход и конверсия в реализацию (реал ÷ создано).',note:'Клик по столбцу/воронке/ячейке — список сделок.'},
   'c.cat':{t:'Структура по воронкам',what:'Распределение сделок по воронкам.',src:'crm.deal.list (CATEGORY_ID) + crm.dealcategory.list (имена).',formula:'Count и доля % по CATEGORY_ID, YTD.',note:'Клик по строке — сделки воронки.'},
   'c.matrix':{t:'Воронка × месяц',what:'Кросс-таблица притока: топ-5 воронок по месяцам.',src:'crm.deal.list (CATEGORY_ID × месяц DATE_CREATE).',formula:'Count сделок в каждой ячейке (месяц × воронка).',note:'Клик по ячейке — сделки пересечения.'},
   'c.owners':{t:'Сделки по исполнителям',what:'Кто завёл сделки 2026.',src:'crm.deal.list (ASSIGNED_BY_ID) + user.get (имена).',formula:'Число сделок и число открытых на ответственного.',note:'Клик — все сделки сотрудника.'},
@@ -673,11 +687,9 @@ const qmark=k=>`<span class="qq" data-meth="${k}">?</span>`;
 function _qqNode(key){const s=document.createElement('span');s.className='qq';s.textContent='?';s.title='как считается';s.dataset.meth=key;s._b=1;s.addEventListener('click',e=>{e.stopPropagation();openMeth(key);});return s;}
 function injectMeth(){
   const add=(el,key)=>{ if(el&&!el.querySelector(':scope > .qq')) el.appendChild(_qqNode(key)); };
-  const bySel={cmpMon:'c.mon',cmpCat:'c.cat',cmpMxBody:'c.matrix',cmpOwners:'c.owners',cmpFlow:'c.flow',cmpGrowth:'c.flow'};
-  for(const id in bySel){const el=document.getElementById(id); if(el){const sec=el.closest('section'); add(sec&&sec.querySelector('h2'),bySel[id]);}}
-  document.querySelectorAll('#tab-sourcing .secttl, #tab-company .secttl').forEach(s=>{const t=s.textContent;let k=null;
-    if(/20 парам/.test(t))k='c.params';
-    else if(/Нагрузка/.test(t))k='s.load'; else if(/Конверс/.test(t))k='s.conv';
+  // Пульс/отраслевые/контракты рендерят бейджи «?» инлайн (qmark). Здесь — только секции «Сорсинга».
+  document.querySelectorAll('#tab-sourcing .secttl').forEach(s=>{const t=s.textContent;let k=null;
+    if(/Нагрузка/.test(t))k='s.load'; else if(/Конверс/.test(t))k='s.conv';
     else if(/Цепочк/.test(t))k='s.tkp'; else if(/Покрыт/.test(t))k='s.cov';
     else if(/отправлено vs|Реально отправлено/.test(t))k='s.send';
     else if(/Разнообразие постав/.test(t))k='s.suppliers';
@@ -735,6 +747,7 @@ function renderDir(D, elId, opt){
 renderDir(window.__KAM__,'tab-kam',{eyebrow:'Квант · коммерческий департамент',title:'КАМы — клиентские направления',sec1:'Клиентские направления',sec2:'направлениям',unit:'Направление'});
 renderDir(window.__ENG__,'tab-eng',{eyebrow:'Квант · инжиниринг',title:'Инжиниринг — проекты, заказы, выручка',sec1:'Инженерные группы',sec2:'группам',unit:'Группа'});
 renderDir(window.__PRODUCT__,'tab-prod',{eyebrow:'Квант · продуктовые линии',title:'Продукт-оунеры — линейки оборудования',sec1:'Продуктовые линии',sec2:'линиям',unit:'Линия'});
+renderPulse(window.__COMPANY__);
 // ---- вкладка «Контракты»: один список заказов СП-172 с поиском и сортировкой
 (function(){
   const X=window.__CONTRACTS__, el=document.getElementById('tab-contracts'); if(!el) return;
