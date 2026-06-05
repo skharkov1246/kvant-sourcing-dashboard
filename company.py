@@ -216,7 +216,8 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
     # coh_parents идентично order_parents (их заказы все ≥2026), поэтому cls совпадает.
     coh_details = deal_details + [_coh_detail(d) for d in pre_created]
 
-    def _cblank(): return {"created": 0, "real": 0, "lost": 0, "early": 0, "sales": 0.0, "buy": 0.0, "ttr": []}
+    def _cblank(): return {"created": 0, "real": 0, "lost": 0, "early": 0, "sales": 0.0, "buy": 0.0,
+                           "ttr": [], "csum": 0.0, "esum": 0.0, "lsum": 0.0}
     coh_q = defaultdict(_cblank); coh_m = defaultdict(_cblank)
     for d in coh_details:
         did = d["id"]; mm = d["mon"]
@@ -224,7 +225,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             continue
         q = f"{mm[:4]}-Q{(int(mm[5:7]) - 1) // 3 + 1}"; cls = d["cls"]
         for c in (coh_q[q], coh_m[mm]):
-            c["created"] += 1; c[cls] += 1
+            c["created"] += 1; c[cls] += 1; c["csum"] += d["raw"]  # csum — сумма ВСЕХ созданных
             if cls == "real":
                 c["sales"] += d["raw"]; c["buy"] += coh_buy.get(did, 0.0)
                 fo, dd0 = coh_first.get(did), coh_date.get(did)
@@ -235,11 +236,16 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
                             c["ttr"].append(days)
                     except Exception:
                         pass
+            elif cls == "early":
+                c["esum"] += d["raw"]
+            else:
+                c["lsum"] += d["raw"]
 
     def _coh_rows(agg, lblfn):
         out = []
         for k in sorted(agg):
             c = agg[k]; sales = c["sales"]; margin = sales - c["buy"]; cr = c["created"]
+            csum = c["csum"]
             out.append({
                 "key": k, "label": lblfn(k), "created": cr, "real": c["real"], "lost": c["lost"], "early": c["early"],
                 "conv": round(c["real"] / cr * 100) if cr else 0,
@@ -248,6 +254,12 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
                 "sales": _money(sales), "salesRaw": round(sales), "buy": _money(c["buy"]),
                 "margin": _money(margin), "marginRaw": round(margin),
                 "ttr": (round(sum(c["ttr"]) / len(c["ttr"])) if c["ttr"] else None),
+                # измерение ПО СУММЕ (€): доля суммы созданных сделок по исходам — корреляция со штучной
+                "createdSum": _money(csum), "createdSumRaw": round(csum),
+                "convVal": round(sales / csum * 100) if csum else 0,        # реализация ÷ сумма создано
+                "realValPct": round(sales / csum * 100) if csum else 0,
+                "earlyValPct": round(c["esum"] / csum * 100) if csum else 0,
+                "lostValPct": round(c["lsum"] / csum * 100) if csum else 0,
             })
         return out
     cohorts = {
