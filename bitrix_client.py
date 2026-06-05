@@ -145,6 +145,44 @@ class BitrixClient:
             return int((data or {}).get("total") or 0)
         return 0
 
+    def stage_first_entry(self, entity_type_id: int, category_id: int, since: str) -> dict[str, str]:
+        """Момент ПЕРВОГО входа сущности в указанную воронку (category_id) — из истории стадий.
+        crm.stagehistory.list возвращает result={items:[...]} + next; пагинируем сами.
+        Для сделок (entityTypeId=2) воронка 0 — это воронка реализации (победа).
+        Возвращает {OWNER_ID(str): дата YYYY-MM-DD первого входа}, начиная с even `since`."""
+        params = {
+            "entityTypeId": entity_type_id,
+            "filter": {"CATEGORY_ID": category_id, ">=CREATED_TIME": since},
+            "select": ["OWNER_ID", "CREATED_TIME", "STAGE_ID"],
+            "order": {"CREATED_TIME": "ASC"},
+        }
+        first: dict[str, str] = {}
+        start = 0
+        while True:
+            params["start"] = start
+            self._throttle()
+            try:
+                data = self._session.post(self.base + "crm.stagehistory.list.json",
+                                          json=params, timeout=self.timeout).json()
+            except requests.RequestException:
+                break
+            if isinstance(data, dict) and data.get("error"):
+                if data.get("error") in ("QUERY_LIMIT_EXCEEDED", "OPERATION_TIME_LIMIT"):
+                    time.sleep(0.7); continue
+                raise BitrixError(f"crm.stagehistory.list: {data['error']} {data.get('error_description','')}")
+            res = (data or {}).get("result") or {}
+            items = res.get("items") if isinstance(res, dict) else res
+            items = items or []
+            for x in items:                       # ASC по CREATED_TIME → первый встреченный = самый ранний
+                did = str(x.get("OWNER_ID"))
+                if did and did not in first:
+                    first[did] = str(x.get("CREATED_TIME"))[:10]
+            nxt = data.get("next")
+            if not nxt or not items:
+                break
+            start = nxt
+        return first
+
     # ----------------------------------------------------------------- smart-process items
     def list_items(
         self,
