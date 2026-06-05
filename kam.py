@@ -151,6 +151,7 @@ def compute_set(client: BitrixClient, groups: dict[str, str] | None, *, as_of: d
         deal_details.append({"id": did, "t": (d.get("TITLE") or f'Сделка #{did}')[:90],
                              "amt": _money(amt), "raw": round(amt), "grp": grp,
                              "owner": owner, "own": owner_name.get(owner, owner),
+                             "date": str(d.get("DATE_CREATE", ""))[:10],
                              "open": cls == "early", "cls": cls, "seq": seq})
 
     # заказы — только по сделкам-контрактам когорты 2026 (для drill «Закупка» и согласованных сумм)
@@ -163,6 +164,7 @@ def compute_set(client: BitrixClient, groups: dict[str, str] | None, *, as_of: d
         order_details.append({"id": str(o.get("id")), "t": (o.get("title") or f'Заказ #{o.get("id")}')[:90],
                               "amt": _money(buy), "raw": round(buy), "grp": grp,
                               "owner": deal_own.get(did, ""), "own": owner_name.get(deal_own.get(did, ""), ""),
+                              "date": str(o.get("createdTime", ""))[:10],
                               "closed": str(o.get("stageId", "")).endswith(":SUCCESS")})
 
     def fmt_rows(src, label_key, label_get):
