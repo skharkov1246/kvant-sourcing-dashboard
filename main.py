@@ -211,7 +211,7 @@ def run(args) -> int:
         print("• Общий пул сделок/заказов (YTD)…")
         ys = "2026-01-01T00:00:00"
         deals_ytd = client.list_deals_fast(filter={">=DATE_CREATE": ys},
-            select=["ID", "TITLE", "CATEGORY_ID", "STAGE_ID", "STAGE_SEMANTIC_ID", "OPPORTUNITY", "CURRENCY_ID", "DATE_CREATE", "CLOSEDATE", "ASSIGNED_BY_ID"])
+            select=["ID", "TITLE", "CATEGORY_ID", "STAGE_ID", "STAGE_SEMANTIC_ID", "OPPORTUNITY", "CURRENCY_ID", "DATE_CREATE", "CLOSEDATE", "ASSIGNED_BY_ID", "COMPANY_ID"])
         orders_ytd = client.list_items(172, filter={">=createdTime": ys},
             select=["id", "title", "stageId", "opportunity", "currencyId", "createdTime", "parentId2", "assignedById"])
         # заказы СП-172: исключаем проигранные (…:FAIL) — это не контрактная выручка
@@ -233,7 +233,13 @@ def run(args) -> int:
                 deal_owner[str(did)] = str(d.get("ASSIGNED_BY_ID"))
                 deal_sale[str(did)] = _eur(d.get("OPPORTUNITY"), d.get("CURRENCY_ID"))
             print(f"  родительские сделки заказов: догружено {len(extra)} (из {len(missing)})")
+        # КАМ — по КЛИЕНТУ (холдингу), не по отделу: компания сделки → направление
+        _comp_ids = {str(d.get("COMPANY_ID")) for d in deals_ytd if d.get("COMPANY_ID") and str(d.get("COMPANY_ID")) != "0"}
+        _cnames = client.companies_by_ids(_comp_ids)
+        deal_group = {str(d["ID"]): kam_mod.client_dir(_cnames.get(str(d.get("COMPANY_ID")), "")) for d in deals_ytd}
+        print(f"  клиентских направлений КАМ: {len(set(deal_group.values()))}")
     except Exception as e:
+        deal_group = None
         print(f"  ⚠ общий пул не получен — Пульс/КАМ/Инж/Продукт пропущены: {type(e).__name__}: {e}")
 
     # --- каждая вкладка изолирована: сбой одной не гасит остальные ---
@@ -243,8 +249,13 @@ def run(args) -> int:
             print("  ✓ Пульс компании")
         except Exception as e:
             print(f"  ⚠ Пульс компании пропущен: {type(e).__name__}: {e}")
-        for label, groups, key in (("КАМы", kam_mod.CLIENT_GROUPS, "kam"),
-                                    ("Инжиниринг", kam_mod.ENG_GROUPS, "eng"),
+        try:
+            kam_data = kam_mod.compute_set(client, None, as_of=p.end, created=deals_ytd, orders=orders_ytd,
+                                           with_people=True, deal_sale=deal_sale, deal_group=deal_group)
+            print("  ✓ КАМы (по клиенту)")
+        except Exception as e:
+            print(f"  ⚠ КАМы пропущены: {type(e).__name__}: {e}")
+        for label, groups, key in (("Инжиниринг", kam_mod.ENG_GROUPS, "eng"),
                                     ("Продукт", kam_mod.PRODUCT_GROUPS, "prod")):
             try:
                 data = kam_mod.compute_set(client, groups, as_of=p.end, created=deals_ytd, orders=orders_ytd,
