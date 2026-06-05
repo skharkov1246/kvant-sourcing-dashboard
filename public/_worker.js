@@ -29,8 +29,14 @@ export default {
         },
       });
     }
-    // авторизованы → отдаём статический файл из public/
-    return env.ASSETS.fetch(request);
+    // авторизованы → отдаём статический файл, но ЗАПРЕЩАЕМ кэширование:
+    // иначе браузер/edge отдают старый index.html и после деплоя «сайт не обновляется».
+    const resp = await env.ASSETS.fetch(request);
+    const headers = new Headers(resp.headers);
+    headers.set("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
+    headers.set("Pragma", "no-cache");
+    headers.set("Expires", "0");
+    return new Response(resp.body, { status: resp.status, statusText: resp.statusText, headers });
   },
 };
 
