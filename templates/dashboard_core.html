@@ -706,8 +706,9 @@ function openDir(D,opt,spec){
   else if(kind==='own'){deals=D.deals.filter(x=>x.owner===key);orders=D.orders.filter(x=>x.owner===key);const p=(D.people||[]).find(z=>z.uid===key);title=p?p.name:key;sub=p?p.grp:'';}
   else if(kind==='kpi'){
     if(key==='deals'){deals=D.deals;title='Все сделки';}
-    else if(key==='open'){deals=D.deals.filter(x=>x.open);title='Активные сделки (пайплайн)';}
-    else if(key==='orders'){orders=D.orders;title='Все заказы';}
+    else if(key==='open'){deals=D.deals.filter(x=>x.open);title='Активные сделки (ранний пайплайн)';}
+    else if(key==='real'){deals=D.deals.filter(x=>x.cls==='real');orders=D.orders;title='Контракты в реализации + заказы';}
+    else if(key==='orders'){orders=D.orders;title='Заказы поставщикам';}
     else if(key==='revenue'){orders=D.orders;title='Заказы по сумме';}
     else if(key==='closed'){orders=D.orders.filter(x=>x.closed);title='Закрытые (исполненные) заказы';}
     sub=opt.title;
@@ -719,7 +720,8 @@ function openDir(D,opt,spec){
   const showOwn=kind!=='own';
   const own=x=>showOwn?`<span>${_esc(x.own)}</span>`:'';
   const orow=o=>`<div class="req"><div class="rt">${_esc(o.t)}</div><div class="rm"><span class="pill">${o.closed?'исполнен':'в работе'}</span>${own(o)}<span class="amt">${o.amt}</span></div></div>`;
-  const drow=d=>`<div class="req"><div class="rt">${_esc(d.t)}</div><div class="rm"><span class="pill">${d.open?'в работе':'закрыта'}</span>${own(d)}<span class="amt">${d.amt}</span></div></div>`;
+  const DCL={early:['ранний','var(--b2)'],real:['в реализации','var(--ok)'],lost:['проигран','var(--nr)']};
+  const drow=d=>`<div class="req"><div class="rt">${d.seq?`<b style="color:var(--a2)">#${d.seq}</b> `:''}${_esc(d.t)}</div><div class="rm"><span class="pill" style="color:${DCL[d.cls]?DCL[d.cls][1]:'var(--mut)'}">${DCL[d.cls]?DCL[d.cls][0]:(d.open?'в работе':'закрыта')}</span>${own(d)}<span class="amt">${d.amt}</span></div></div>`;
   let h='';
   if(orders.length){const s=orders.reduce((a,o)=>a+o.raw,0);h+=`<div class="h">Заказы поставщикам (${orders.length}) · закупка Σ ${_fmtE(s)}</div>`+orders.slice(0,300).map(orow).join('');if(orders.length>300)h+=`<div class="dimv" style="padding:6px 0">…ещё ${orders.length-300}</div>`;}
   if(deals.length){const pl=deals.filter(d=>d.open).reduce((a,d)=>a+d.raw,0);h+=`<div class="h">Сделки (${deals.length}) · пайплайн ${_fmtE(pl)}</div>`+deals.slice(0,300).map(drow).join('');if(deals.length>300)h+=`<div class="dimv" style="padding:6px 0">…ещё ${deals.length-300}</div>`;}

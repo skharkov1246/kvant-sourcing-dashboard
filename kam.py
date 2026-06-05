@@ -8,6 +8,7 @@
 from __future__ import annotations
 
 import datetime as dt
+import re
 from collections import defaultdict
 
 import config
@@ -15,8 +16,11 @@ from bitrix_client import BitrixClient
 
 YEAR_START = "2026-01-01T00:00:00"
 
-# клиентские направления (КАМы)
-CLIENT_GROUPS = {"112": "Лукойл", "110": "Норникель", "116": "Шельф/Роснефть", "114": "Нефтегаз", "126": "Сибур"}
+# клиентские направления (КАМы). Один отдел может вести и направление, и клиента —
+# отдел 132 «Группа по динамическому оборудованию + Сибур» относится и к продукту (Компрессоры),
+# и к клиенту Сибур, поэтому он есть и в CLIENT_GROUPS (Сибур), и в PRODUCT_GROUPS (Компрессоры).
+CLIENT_GROUPS = {"112": "Лукойл", "110": "Норникель", "116": "Шельф/Роснефть", "114": "Нефтегаз",
+                 "126": "Сибур", "132": "Сибур"}
 # продуктовые линии (продукт-оунеры)
 PRODUCT_GROUPS = {"132": "Компрессоры", "160": "Газотурбины", "162": "Фильтрация",
                   "130": "Водяные насосы", "166": "Технологич. насосы", "124": "Грануляция"}
@@ -27,20 +31,19 @@ ENG_GROUPS = {"68": "Инжиниринг (общая)", "122": "Констру�
 
 def _money(v: float) -> str:
     v = round(v)
-    if abs(v) >= 1_000_000:
-        return f"€{v/1_000_000:.1f}M"
-    if abs(v) >= 1_000:
-        return f"€{v/1_000:.0f}K"
-    return f"€{v}"
+    sign = "-" if v < 0 else ""
+    a = abs(v)
+    if a >= 1_000_000:
+        return f"{sign}€{a/1_000_000:.1f}M"
+    if a >= 1_000:
+        return f"{sign}€{a/1_000:.0f}K"
+    return f"{sign}€{a}"
 
 
-def _ratio(orders: int, deals: int) -> str:
-    """Заказов на одну созданную в 2026 сделку (заказ может ссылаться на сделку-родителя старше 2026,
-    поэтому значение может быть >1×; это нормальный показатель повторных заказов, а не процент-конверсия)."""
-    if not deals:
-        return "—"
-    r = orders / deals
-    return f"{r:.1f}×" if r < 10 else f"{round(r)}×"
+def _regno(title) -> int:
+    """Номер реализации в начале названия сделки («871. …»); требуем точку (не путать с PO-кодами)."""
+    m = re.match(r"\s*(\d{1,4})(?:/\d+)?\.", str(title or ""))
+    return int(m.group(1)) if m else 0
 
 
 def compute_set(client: BitrixClient, groups: dict[str, str], *, as_of: dt.date | None = None,
@@ -74,12 +77,23 @@ def compute_set(client: BitrixClient, groups: dict[str, str], *, as_of: dt.date 
     if deal_sale is None:
         deal_sale = {str(d["ID"]): eur(d.get("OPPORTUNITY"), d.get("CURRENCY_ID")) for d in created}
 
+    # КОГОРТА 2026: классифицируем созданные сделки (early/real/lost), контракты = real ⊆ созданных.
+    # Сигналы реализации из заказов 2026: какие сделки имеют заказ + Σ закупки на сделку + признак SUCCESS.
+    order_parents = set(); buy_by_deal: dict[str, float] = defaultdict(float); succ_by_deal: dict[str, bool] = {}
+    for o in orders:
+        did = str(o.get("parentId2") or "")
+        if not did:
+            continue
+        order_parents.add(did)
+        buy_by_deal[did] += eur(o.get("opportunity"), o.get("currencyId"))
+        if str(o.get("stageId", "")).endswith(":SUCCESS"):
+            succ_by_deal[did] = True
+
     def blank():
-        return {"deals": 0, "open": 0, "pipeline": 0.0, "orders": 0, "buy": 0.0, "closed": 0}
+        return {"deals": 0, "early": 0, "pipeline": 0.0, "real": 0, "sales": 0.0, "buy": 0.0, "closed": 0}
     g = defaultdict(blank)
     ppl = defaultdict(blank)
-    contracts_g: dict[str, set] = defaultdict(set)   # группа → {id сделки-контракта (есть заказ поставщику)}
-    contracts_p: dict[str, set] = defaultdict(set)
+    deal_grp: dict[str, str] = {}; deal_own: dict[str, str] = {}
     deal_details: list[dict] = []
     order_details: list[dict] = []
 
@@ -88,73 +102,76 @@ def compute_set(client: BitrixClient, groups: dict[str, str], *, as_of: dt.date 
         grp = owner_group.get(owner)
         if not grp:
             continue
-        is_open = (d.get("STAGE_SEMANTIC_ID") or "").upper() not in ("S", "F")
+        did = str(d["ID"]); sem = (d.get("STAGE_SEMANTIC_ID") or "").upper()
         amt = eur(d.get("OPPORTUNITY"), d.get("CURRENCY_ID"))   # сумма сделки = ПРОДАЖА
-        for bucket in (g[grp], ppl[owner]):
-            bucket["deals"] += 1
-            if is_open:
-                bucket["open"] += 1
-                bucket["pipeline"] += amt
-        deal_details.append({"id": str(d["ID"]), "t": (d.get("TITLE") or f'Сделка #{d["ID"]}')[:90],
+        seq = _regno(d.get("TITLE"))
+        is_real = (did in order_parents) or seq > 0   # в реализации = есть заказ или номер реализации
+        cls = "lost" if sem == "F" else ("real" if is_real else "early")
+        for b in (g[grp], ppl[owner]):
+            b["deals"] += 1
+            if cls == "early":
+                b["early"] += 1; b["pipeline"] += amt
+            elif cls == "real":
+                b["real"] += 1; b["sales"] += amt; b["buy"] += buy_by_deal.get(did, 0.0)
+                if succ_by_deal.get(did):
+                    b["closed"] += 1
+        if cls == "real":
+            deal_grp[did] = grp; deal_own[did] = owner
+        deal_details.append({"id": did, "t": (d.get("TITLE") or f'Сделка #{did}')[:90],
                              "amt": _money(amt), "raw": round(amt), "grp": grp,
-                             "owner": owner, "own": owner_name.get(owner, owner), "open": is_open})
+                             "owner": owner, "own": owner_name.get(owner, owner),
+                             "open": cls == "early", "cls": cls, "seq": seq})
 
+    # заказы — только по сделкам-контрактам когорты 2026 (для drill «Закупка» и согласованных сумм)
     for o in orders:
         did = str(o.get("parentId2") or "")
-        owner = deal_owner.get(did) or str(o.get("assignedById"))
-        grp = owner_group.get(owner)
+        grp = deal_grp.get(did)
         if not grp:
             continue
-        won_closed = str(o.get("stageId", "")).endswith(":SUCCESS")
-        buy = eur(o.get("opportunity"), o.get("currencyId"))    # opportunity заказа СП-172 = ЗАКУПКА
-        for bucket in (g[grp], ppl[owner]):
-            bucket["orders"] += 1
-            bucket["buy"] += buy
-            if won_closed:
-                bucket["closed"] += 1
-        if did:
-            contracts_g[grp].add(did); contracts_p[owner].add(did)
+        buy = eur(o.get("opportunity"), o.get("currencyId"))
         order_details.append({"id": str(o.get("id")), "t": (o.get("title") or f'Заказ #{o.get("id")}')[:90],
                               "amt": _money(buy), "raw": round(buy), "grp": grp,
-                              "owner": owner, "own": owner_name.get(owner, owner), "closed": won_closed})
+                              "owner": deal_own.get(did, ""), "own": owner_name.get(deal_own.get(did, ""), ""),
+                              "closed": str(o.get("stageId", "")).endswith(":SUCCESS")})
 
-    def sales_of(cset): return sum(deal_sale.get(did, 0.0) for did in cset)
-
-    def fmt_rows(src, cmap, label_key, label_get):
+    def fmt_rows(src, label_key, label_get):
         out = []
         for key, v in src.items():
-            sales = sales_of(cmap.get(key, set())); margin = sales - v["buy"]
+            sales = v["sales"]; margin = sales - v["buy"]
             out.append({
                 label_key: label_get(key), "uid": str(key), "grp": owner_group.get(key, "") if label_key == "name" else "",
-                "deals": v["deals"], "open": v["open"], "pipeline": _money(v["pipeline"]),
-                "contracts": len(cmap.get(key, set())), "orders": v["orders"],
+                "deals": v["deals"], "open": v["early"], "pipeline": _money(v["pipeline"]),
+                "contracts": v["real"], "orders": v["real"],
                 "sales": _money(sales), "salesRaw": round(sales),
                 "buy": _money(v["buy"]), "buyRaw": round(v["buy"]),
                 "margin": _money(margin), "marginRaw": round(margin),
                 "marginPct": (round(margin / sales * 100) if sales else None),
+                "conv": (round(v["real"] / v["deals"] * 100) if v["deals"] else 0),
                 "closed": v["closed"],
             })
         out.sort(key=lambda r: r["salesRaw"], reverse=True)
         return out
 
-    rows = fmt_rows(g, contracts_g, "group", lambda k: k)
-    people = fmt_rows({u: v for u, v in ppl.items() if v["deals"] or v["orders"]}, contracts_p, "name", lambda u: owner_name.get(u, u)) if with_people else []
+    rows = fmt_rows(g, "group", lambda k: k)
+    people = fmt_rows({u: v for u, v in ppl.items() if v["deals"]}, "name", lambda u: owner_name.get(u, u)) if with_people else []
 
     pipe_sum = sum(g[r["group"]]["pipeline"] for r in rows)
     sales_sum = sum(r["salesRaw"] for r in rows); buy_sum = sum(r["buyRaw"] for r in rows)
     margin_sum = sales_sum - buy_sum; tot_contracts = sum(r["contracts"] for r in rows)
-    tot = {"deals": sum(r["deals"] for r in rows), "open": sum(r["open"] for r in rows),
-           "pipeline": _money(pipe_sum), "contracts": tot_contracts, "orders": sum(r["orders"] for r in rows),
+    tot_deals = sum(r["deals"] for r in rows)
+    tot = {"deals": tot_deals, "open": sum(r["open"] for r in rows),
+           "pipeline": _money(pipe_sum), "contracts": tot_contracts,
            "sales": _money(sales_sum), "buy": _money(buy_sum), "margin": _money(margin_sum),
            "marginPct": (round(margin_sum / sales_sum * 100) if sales_sum else 0),
+           "conv": (round(tot_contracts / tot_deals * 100) if tot_deals else 0),
            "closed": sum(r["closed"] for r in rows)}
     kpis = [
         ("Сделок", str(tot["deals"]), "создано (YTD)", "", "deals"),
         ("Активный пайплайн", tot["pipeline"], "Σ открытых продаж, €", "ok", "open"),
-        ("Контрактов", str(tot_contracts), "сделок с заказами поставщикам", "ok", ""),
-        ("Выручка (продажи)", tot["sales"], "Σ сумм сделок-контрактов, €", "ok", ""),
+        ("Контрактов", str(tot_contracts), f"в реализации · конв. {tot['conv']}%", "ok", "real"),
+        ("Выручка (продажи)", tot["sales"], "Σ сумм сделок-контрактов, €", "ok", "real"),
         ("Закупка", tot["buy"], "Σ заказов поставщикам, €", "amber", "orders"),
-        ("Маржа", tot["margin"], f"{tot['marginPct']}% валовая", "ok" if margin_sum >= 0 else "warn", ""),
+        ("Маржа", tot["margin"], f"{tot['marginPct']}% валовая", "ok" if margin_sum >= 0 else "warn", "real"),
     ]
     return {
         "label": f"01.01 – {today.strftime('%d.%m.%Y')}",
