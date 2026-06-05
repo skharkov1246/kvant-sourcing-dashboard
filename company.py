@@ -64,6 +64,16 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
     orders = [o for o in orders if not str(o.get("stageId", "")).endswith(":FAIL")]
     unames = client.users()
     order_parents = {str(o.get("parentId2")) for o in orders if o.get("parentId2")}
+    buy_by_deal: dict[str, float] = defaultdict(float); first_order: dict[str, str] = {}
+    for o in orders:
+        did_o = str(o.get("parentId2") or "")
+        if not did_o:
+            continue
+        buy_by_deal[did_o] += eur(o.get("opportunity"), o.get("currencyId"))
+        ct = str(o.get("createdTime") or "")[:10]
+        if ct and (did_o not in first_order or ct < first_order[did_o]):
+            first_order[did_o] = ct
+    deal_date = {str(d["ID"]): str(d.get("DATE_CREATE", ""))[:10] for d in created}
     if deal_sale is None:
         deal_sale = {str(d["ID"]): eur(d.get("OPPORTUNITY"), d.get("CURRENCY_ID")) for d in created}
 
@@ -168,6 +178,43 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
          for u, v in own.items() if u and v["created"]],
         key=lambda x: -x["active"])
 
+    # --- когортный анализ: сделки по кварталу/месяцу создания → успехи (реализация) ---
+    def _cblank(): return {"created": 0, "real": 0, "lost": 0, "early": 0, "sales": 0.0, "buy": 0.0, "ttr": []}
+    coh_q = defaultdict(_cblank); coh_m = defaultdict(_cblank)
+    for d in deal_details:
+        did = d["id"]; mm = d["mon"]; q = f"{mm[:4]}-Q{(int(mm[5:7]) - 1) // 3 + 1}"; cls = d["cls"]
+        for c in (coh_q[q], coh_m[mm]):
+            c["created"] += 1; c[cls] += 1
+            if cls == "real":
+                c["sales"] += d["raw"]; c["buy"] += buy_by_deal.get(did, 0.0)
+                fo, dd0 = first_order.get(did), deal_date.get(did)
+                if fo and dd0:
+                    try:
+                        days = (dt.date.fromisoformat(fo) - dt.date.fromisoformat(dd0)).days
+                        if days >= 0:
+                            c["ttr"].append(days)
+                    except Exception:
+                        pass
+
+    def _coh_rows(agg, lblfn):
+        out = []
+        for k in sorted(agg):
+            c = agg[k]; sales = c["sales"]; margin = sales - c["buy"]; cr = c["created"]
+            out.append({
+                "key": k, "label": lblfn(k), "created": cr, "real": c["real"], "lost": c["lost"], "early": c["early"],
+                "conv": round(c["real"] / cr * 100) if cr else 0,
+                "lostPct": round(c["lost"] / cr * 100) if cr else 0,
+                "earlyPct": round(c["early"] / cr * 100) if cr else 0,
+                "sales": _money(sales), "salesRaw": round(sales), "buy": _money(c["buy"]),
+                "margin": _money(margin), "marginRaw": round(margin),
+                "ttr": (round(sum(c["ttr"]) / len(c["ttr"])) if c["ttr"] else None),
+            })
+        return out
+    cohorts = {
+        "quarters": _coh_rows(coh_q, lambda k: k.replace("-Q", " · Q")),
+        "months": _coh_rows(coh_m, lambda k: f"{MLBL[int(k[5:7])]} {k[:4]}"),
+    }
+
     return {
         "label": f"01.01 – {today.strftime('%d.%m.%Y')}",
         "kpis": [{"lbl": l, "val": v, "meta": me, "clz": c, "drill": dr} for l, v, me, c, dr in kpis],
@@ -183,4 +230,5 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         "byOwner": by_owner,
         "growth": [{"m": MLBL[int(m[5:7])], "comp": comp.get(m, 0), "cont": cont.get(m, 0), "leads": leads.get(m, 0)} for m in months],
         "deals": deal_details,
+        "cohorts": cohorts,
     }
