@@ -236,6 +236,24 @@
   .stchip b{font-family:var(--mono);color:var(--ink);margin-left:1px}
   .stchip .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
   .dot.snew{background:var(--new)}.dot.ssent{background:var(--b)}.dot.sdlg{background:var(--b2)}.dot.ssel{background:var(--ok)}.dot.sref{background:var(--a)}.dot.snr{background:var(--nr)}.dot.soth{background:#566}
+  /* тумблеры сортировки в дроверах */
+  .sortbar{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:2px 0 10px}
+  .sortbar .sortlab{font:600 9px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--mut);margin-right:2px}
+  .sortt{font-family:var(--mono);font-size:11px;padding:3px 9px;border:1px solid var(--line);border-radius:999px;background:transparent;color:var(--mut);cursor:pointer;transition:.12s;user-select:none}
+  .sortt:hover{border-color:var(--a);color:var(--ink)}
+  .sortt.on{background:rgba(245,165,36,.12);border-color:var(--a);color:var(--ink);font-weight:600}
+  .req .rm .dt{color:var(--mut)}
+  /* распределение срока выхода в реализацию (квантиль TTR) */
+  .ttrrow{display:flex;align-items:center;gap:12px;padding:5px 0}
+  .ttrlbl{min-width:74px;font-family:var(--mono);font-size:12px;color:var(--ink)}
+  .ttrtrack{flex:1;height:16px;border-radius:6px;background:var(--panel2);overflow:hidden}
+  .ttrtrack i{display:block;height:100%;background:linear-gradient(90deg,var(--ok),var(--ok2));border-radius:6px;transition:width .8s cubic-bezier(.2,.7,.2,1)}
+  .ttrpct{min-width:108px;text-align:right;font-family:var(--mono);font-size:12px}
+  .ttrpct b{color:var(--ok)}.ttrpct .dimv{font-size:11px}
+  .pcards{display:flex;flex-wrap:wrap;gap:10px;margin:4px 0 14px}
+  .pcard{flex:1;min-width:120px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+  .pcard .pv{font-family:var(--mono);font-weight:700;font-size:19px;color:var(--a2)}
+  .pcard .pl{font-size:11px;color:var(--mut);margin-top:2px}
   .tabs{display:flex;gap:8px;margin-bottom:18px}
   .tab{font-family:var(--mono);font-size:12px;padding:7px 14px;border-radius:8px;border:1px solid var(--line);color:var(--mut);background:var(--panel);cursor:pointer}
   .tab.act{color:#0e1116;background:var(--a2);border-color:var(--a2);font-weight:700}
@@ -622,20 +640,59 @@ function renderPulse(C){
 // ---- вкладки направлений (КАМы / Инжиниринг / Продукт-оунеры) — общий рендер
 // ---- drill-down отраслевых вкладок: клик по метрике → список сделок/заказов в дровере
 const _fmtE=v=>{v=Math.round(v);const a=Math.abs(v);return a>=1e6?'€'+(v/1e6).toFixed(1)+'M':a>=1e3?'€'+Math.round(v/1e3)+'K':'€'+v;};
+// ---- универсальный сортируемый список(и) сделок в дровере: кликабельные тумблеры сортировки ----
+// sections: [{key, h, hx?, items, cols:[{k,lbl,get,txt?,def?}], rowFn, cap?, empty?}]
+function _drwSortable(head, sections){
+  const body=document.getElementById('drwBody');
+  sections.forEach(s=>{ const def=s.cols.find(c=>c.def)||s.cols[0]; s._sk=def.k; s._dir=def.txt?1:-1; });
+  function seg(s){
+    const col=s.cols.find(c=>c.k===s._sk)||s.cols[0];
+    const arr=s.items.slice().sort((a,b)=>{
+      const va=col.get(a),vb=col.get(b);
+      return col.txt?String(va||'').localeCompare(String(vb||''),'ru')*s._dir:((va||0)-(vb||0))*s._dir;
+    });
+    const cap=s.cap||400;
+    const bar=`<div class="sortbar" data-sec="${s.key}"><span class="sortlab">сорт.</span>`
+      +s.cols.map(c=>`<button class="sortt${c.k===s._sk?' on':''}" data-k="${c.k}">${c.lbl}${c.k===s._sk?(s._dir<0?' ↓':' ↑'):''}</button>`).join('')+`</div>`;
+    return `<div class="h">${s.h} (${arr.length})${s.hx||''}</div>`+bar
+      +(arr.length?arr.slice(0,cap).map(s.rowFn).join(''):`<div class="dimv">${s.empty||'нет записей'}</div>`)
+      +(arr.length>cap?`<div class="dimv" style="padding:6px 0">…ещё ${arr.length-cap}</div>`:'');
+  }
+  function draw(){
+    const vis=sections.filter(s=>s.items.length);
+    body.innerHTML=(head||'')+(vis.length?vis.map(seg).join(''):'<div class="dimv">нет записей</div>');
+    vis.forEach(s=>{
+      const barEl=body.querySelector('.sortbar[data-sec="'+s.key+'"]'); if(!barEl)return;
+      barEl.querySelectorAll('.sortt').forEach(btn=>btn.addEventListener('click',()=>{
+        const k=btn.dataset.k;
+        if(k===s._sk)s._dir=-s._dir; else {s._sk=k; const c=s.cols.find(x=>x.k===k); s._dir=(c&&c.txt)?1:-1;}
+        draw();
+      }));
+    });
+  }
+  draw();
+}
 // ---- drill «Пульса»: список сделок в дровере (с классом сделки)
 const CLS={early:['ранний','var(--b2)'],real:['в реализации','var(--ok)'],lost:['проигран','var(--nr)']};
+const _STORD={lost:0,early:1,real:2};
+const DEALCOLS=[
+  {k:'amt',lbl:'сумма',get:d=>d.raw||0,def:true},
+  {k:'date',lbl:'дата',get:d=>d.date||d.mon||'',txt:true},
+  {k:'seq',lbl:'№',get:d=>d.seq||0},
+  {k:'cat',lbl:'воронка',get:d=>d.c||'',txt:true},
+  {k:'own',lbl:'менеджер',get:d=>d.o||'',txt:true},
+  {k:'cls',lbl:'статус',get:d=>_STORD[d.cls]!=null?_STORD[d.cls]:9},
+];
 function openDeals(list,title,sub){
-  list=(list||[]).slice().sort((a,b)=>b.raw-a.raw);
-  const sum=list.reduce((a,d)=>a+d.raw,0);
+  list=(list||[]).slice();
+  const sum=list.reduce((a,d)=>a+(d.raw||0),0);
   const cnt={early:0,real:0,lost:0}; list.forEach(d=>{if(cnt[d.cls]!=null)cnt[d.cls]++;});
   document.getElementById('drwName').textContent=title;
   document.getElementById('drwSub').textContent=`${sub} · ${(window.__COMPANY__&&window.__COMPANY__.label)||''} · сделок ${list.length} · Σ ${_fmtE(sum)}`;
   const chip=k=>cnt[k]?`<span class="stchip"><i class="dot" style="background:${CLS[k][1]}"></i>${CLS[k][0]} <b>${cnt[k]}</b></span>`:'';
-  let h=(cnt.early||cnt.real||cnt.lost)?`<div class="statleg" style="margin-bottom:8px">${chip('early')}${chip('real')}${chip('lost')}</div>`:'';
-  h+=`<div class="h">Сделки (${list.length})</div>`;
-  h+=list.slice(0,400).map(d=>`<div class="req"><div class="rt">${d.seq?`<b style="color:var(--a2)">#${d.seq}</b> `:''}${_esc(d.t)}</div><div class="rm"><span class="pill" style="color:${CLS[d.cls]?CLS[d.cls][1]:'var(--mut)'}">${CLS[d.cls]?CLS[d.cls][0]:(d.sem||'')}</span><span class="pill">${_esc(d.c)}</span><span>${_esc(d.o)}</span>${d.ovd?'<span class="pill" style="color:var(--nr)">просрочена</span>':''}<span class="amt">${d.amt}</span></div></div>`).join('')||'<div class="dimv">нет сделок</div>';
-  if(list.length>400)h+=`<div class="dimv" style="padding:6px 0">…ещё ${list.length-400}</div>`;
-  document.getElementById('drwBody').innerHTML=h;
+  const head=(cnt.early||cnt.real||cnt.lost)?`<div class="statleg" style="margin-bottom:8px">${chip('early')}${chip('real')}${chip('lost')}</div>`:'';
+  const rowFn=d=>`<div class="req"><div class="rt">${d.seq?`<b style="color:var(--a2)">#${d.seq}</b> `:''}${_esc(d.t)}</div><div class="rm"><span class="pill" style="color:${CLS[d.cls]?CLS[d.cls][1]:'var(--mut)'}">${CLS[d.cls]?CLS[d.cls][0]:(d.sem||'')}</span><span class="pill">${_esc(d.c)}</span><span>${_esc(d.o)}</span>${d.date?`<span class="dt">${d.date}</span>`:''}${d.ovd?'<span class="pill" style="color:var(--nr)">просрочена</span>':''}<span class="amt">${d.amt}</span></div></div>`;
+  _drwSortable(head,[{key:'d',h:'Сделки',items:list,cols:DEALCOLS,rowFn,empty:'нет сделок'}]);
   _ovl.classList.add('on');_drw.classList.add('on');_drw.setAttribute('aria-hidden','false');
 }
 // ---- список сделок без запросов поставщикам (покрытие сорсинга)
@@ -644,11 +701,15 @@ function openUncovered(rows){
   const sum=rows.reduce((a,d)=>a+(d.raw||0),0);
   document.getElementById('drwName').textContent='Сделки без запросов поставщикам';
   document.getElementById('drwSub').textContent=`в окне · ${rows.length} сделок · Σ потенциал ${_fmtE(sum)} · сорсинг не подключён`;
-  let h='<div class="note" style="margin-bottom:8px">Созданы в периоде, но ни одного запроса поставщику (СП-166). Часть может не требовать закупки (услуги, тендеро-лиды на квалификации) — проверьте и подключите сорсинг, где нужно. Сортировка по потенциалу.</div>';
-  h+=`<div class="h">Сделки (${rows.length})</div>`;
-  h+=rows.slice(0,400).map(d=>`<div class="req"><div class="rt">${_esc(d.t)}</div><div class="rm"><span class="pill">${_esc(d.cat)}</span><span class="pill">${d.sem}</span><span>${_esc(d.client)}</span><span class="dimv">${_esc(d.owner)}</span><span>${d.date}</span><span class="amt">${d.amt}</span></div></div>`).join('')||'<div class="dimv">все сделки покрыты запросами</div>';
-  if(rows.length>400)h+=`<div class="dimv" style="padding:6px 0">…ещё ${rows.length-400}</div>`;
-  document.getElementById('drwBody').innerHTML=h;
+  const head='<div class="note" style="margin-bottom:8px">Созданы в периоде, но ни одного запроса поставщику (СП-166). Часть может не требовать закупки (услуги, тендеро-лиды на квалификации) — проверьте и подключите сорсинг, где нужно.</div>';
+  const rowFn=d=>`<div class="req"><div class="rt">${_esc(d.t)}</div><div class="rm"><span class="pill">${_esc(d.cat)}</span><span class="pill">${d.sem}</span><span>${_esc(d.client)}</span><span class="dimv">${_esc(d.owner)}</span><span class="dt">${d.date}</span><span class="amt">${d.amt}</span></div></div>`;
+  _drwSortable(head,[{key:'u',h:'Сделки',items:rows,empty:'все сделки покрыты запросами',rowFn,cols:[
+    {k:'amt',lbl:'сумма',get:d=>d.raw||0,def:true},
+    {k:'date',lbl:'дата',get:d=>d.date||'',txt:true},
+    {k:'client',lbl:'клиент',get:d=>d.client||'',txt:true},
+    {k:'cat',lbl:'воронка',get:d=>d.cat||'',txt:true},
+    {k:'own',lbl:'менеджер',get:d=>d.owner||'',txt:true},
+  ]}]);
   _ovl.classList.add('on');_drw.classList.add('on');_drw.setAttribute('aria-hidden','false');
 }
 // ---- методика «как считается»: реестр + бейджи «?» + дровер
@@ -661,6 +722,7 @@ const METH={
   's.send':{t:'Реально отправлено vs создано',what:'Сверка: карточку запроса завели — но отправили ли письмо поставщику.',src:'Активности OWNER_TYPE_ID=166, PROVIDER_ID=CRM_EMAIL (исходящие письма).',formula:'Отправлено = RFQ с ≥1 исходящим письмом. «Фейк-отправки» = RFQ в стадии «отправлено» без письма.',note:'Привязка письма к RFQ местами неполная на стороне Bitrix — считаем нижней оценкой.'},
   's.suppliers':{t:'Разнообразие поставщиков',what:'Насколько широка база поставщиков, к которым обращается сорсинг.',src:'СП-166 (запросы), поле поставщика ufCrm18Supplier → имя компании; блок A.',formula:'Пай-чарт — доля запросов по поставщикам (топ-12 + прочие). «Поставщиков на сорсера» — число РАЗНЫХ поставщиков, к которым обращался сотрудник.',note:'Концентрация на немногих поставщиках = риск; широкая база = больше альтернатив по цене/срокам.'},
   'c.cohorts':{t:'Когортный анализ сделок',what:'Эффективность сделок по кварталу/месяцу их СОЗДАНИЯ: сколько дошло до реализации. Окно — с 01.01.2025 (шире Пульса, чтобы видеть зрелые когорты прошлого года).',src:'crm.deal.list (дата создания, с 2025) + классификация (есть заказ СП-172/номер реализации).',formula:'Когорта = квартал/месяц создания. «В реализации» (успех) = сделка с заказом/номером. «Конв. шт» = реализация ÷ создано (по количеству). «Конв. €» = Σ продаж реализованных ÷ Σ сумм ВСЕХ созданных сделок когорты (по сумме). Две полосы (шт/€) показывают распределение когорты на ранний/реализация/проигрыш отдельно по количеству и по деньгам. «Срок» = ср. дней от создания сделки до первого заказа поставщику.',note:'Сравнение конв.шт и конв.€ показывает корреляцию размера и успеха: конв.€ > конв.шт ⇒ крупные сделки доходят до реализации чаще мелких. Когорты 2025 зрелые; свежие кварталы 2026 ещё «дозревают». Клик — список сделок когорты.'},
+  'c.ttr':{t:'Скорость выхода в реализацию (квантиль)',what:'За какой срок сделки доходят до реализации — накопленное распределение по дням.',src:'crm.deal.list (дата создания) → СП-172 (дата первого заказа поставщику). Только сделки, дошедшие до реализации, с 2025.',formula:'Срок сделки = дней от её создания до первого заказа поставщику. «За N дней — X%» = доля реализованных сделок, уложившихся в N дней (накопленный процент). P25/P50/P75/P90 — перцентили: срок, за который доходит соответствующая доля (P50 = медиана).',note:'Считается ТОЛЬКО по дошедшим до реализации — это скорость успешной конверсии, а не доля успеха. Длинный хвост (P90 ≫ медианы) = часть сделок зреет очень долго.'},
   'c.kpi':{t:'Сводные показатели Пульса',what:'Верхняя панель: вход, активный пайплайн, реализация, выручка/маржа, проигрыш, просрочка.',src:'crm.deal.list (созданные YTD) + Заказы поставщикам СП-172.',formula:'«В работе» = ранние (открытые, ещё не в реализации). «В реализации» = есть заказ СП-172 или номер реализации в названии. «Выручка» = Σ сумм сделок-контрактов; «Маржа» = выручка − закупка. «Проиграно» = статус F. «Просрочено» = открытые с прошедшим CLOSEDATE.',note:'Каждая карточка кликабельна — список сделок за цифрой.'},
   'c.funnel':{t:'Что стало с созданными сделками',what:'Распределение всех созданных-2026 сделок по терминальным состояниям.',src:'crm.deal.list + СП-172.',formula:'Создано = Ранний пайплайн (открыта, не в реализации) + В реализации (есть заказ/номер) + Проиграно (статус F). Инвариант точный. Статус «выиграна» в портале почти не ставится (≈1 сделка), поэтому НЕ используется как признак победы.',note:'Клик по боксу/сегменту — список сделок состояния.'},
   'c.mon':{t:'Создано сделок по месяцам',what:'Приток новых сделок помесячно + сколько дошло до реализации.',src:'crm.deal.list, поле DATE_CREATE, все клиентские воронки.',filt:'DATE_CREATE ≥ 01.01.2026.',formula:'Count сделок по месяцу создания (текущий месяц частичный); зелёным — из них в реализации. По воронкам — вход и конверсия в реализацию (реал ÷ создано).',note:'Клик по столбцу/воронке/ячейке — список сделок.'},
@@ -738,19 +800,22 @@ function openDir(D,opt,spec){
     else if(key==='closed'){orders=D.orders.filter(x=>x.closed);title='Закрытые (исполненные) заказы';}
     sub=opt.title;
   }
-  deals=deals.slice().sort((a,b)=>b.raw-a.raw);
-  orders=orders.slice().sort((a,b)=>b.raw-a.raw);
   document.getElementById('drwName').textContent=title;
   document.getElementById('drwSub').textContent=`${sub} · ${D.label} · сделок ${deals.length} · закупок ${orders.length}`;
   const showOwn=kind!=='own';
   const own=x=>showOwn?`<span>${_esc(x.own)}</span>`:'';
-  const orow=o=>`<div class="req"><div class="rt">${_esc(o.t)}</div><div class="rm"><span class="pill">${o.closed?'исполнен':'в работе'}</span>${own(o)}<span class="amt">${o.amt}</span></div></div>`;
+  const orow=o=>`<div class="req"><div class="rt">${_esc(o.t)}</div><div class="rm"><span class="pill">${o.closed?'исполнен':'в работе'}</span>${own(o)}${o.date?`<span class="dt">${o.date}</span>`:''}<span class="amt">${o.amt}</span></div></div>`;
   const DCL={early:['ранний','var(--b2)'],real:['в реализации','var(--ok)'],lost:['проигран','var(--nr)']};
-  const drow=d=>`<div class="req"><div class="rt">${d.seq?`<b style="color:var(--a2)">#${d.seq}</b> `:''}${_esc(d.t)}</div><div class="rm"><span class="pill" style="color:${DCL[d.cls]?DCL[d.cls][1]:'var(--mut)'}">${DCL[d.cls]?DCL[d.cls][0]:(d.open?'в работе':'закрыта')}</span>${own(d)}<span class="amt">${d.amt}</span></div></div>`;
-  let h='';
-  if(orders.length){const s=orders.reduce((a,o)=>a+o.raw,0);h+=`<div class="h">Заказы поставщикам (${orders.length}) · закупка Σ ${_fmtE(s)}</div>`+orders.slice(0,300).map(orow).join('');if(orders.length>300)h+=`<div class="dimv" style="padding:6px 0">…ещё ${orders.length-300}</div>`;}
-  if(deals.length){const pl=deals.filter(d=>d.open).reduce((a,d)=>a+d.raw,0);h+=`<div class="h">Сделки (${deals.length}) · пайплайн ${_fmtE(pl)}</div>`+deals.slice(0,300).map(drow).join('');if(deals.length>300)h+=`<div class="dimv" style="padding:6px 0">…ещё ${deals.length-300}</div>`;}
-  document.getElementById('drwBody').innerHTML=h||'<div class="dimv">нет записей</div>';
+  const _dord={lost:0,early:1,real:2};
+  const drow=d=>`<div class="req"><div class="rt">${d.seq?`<b style="color:var(--a2)">#${d.seq}</b> `:''}${_esc(d.t)}</div><div class="rm"><span class="pill" style="color:${DCL[d.cls]?DCL[d.cls][1]:'var(--mut)'}">${DCL[d.cls]?DCL[d.cls][0]:(d.open?'в работе':'закрыта')}</span>${own(d)}${d.date?`<span class="dt">${d.date}</span>`:''}<span class="amt">${d.amt}</span></div></div>`;
+  const ownCol=k=>showOwn?[{k:'own',lbl:'менеджер',get:x=>x.own||'',txt:true}]:[];
+  const ocols=[{k:'amt',lbl:'сумма',get:o=>o.raw||0,def:true},{k:'date',lbl:'дата',get:o=>o.date||'',txt:true},{k:'st',lbl:'статус',get:o=>o.closed?1:0}].concat(ownCol());
+  const dcols=[{k:'amt',lbl:'сумма',get:d=>d.raw||0,def:true},{k:'date',lbl:'дата',get:d=>d.date||'',txt:true},{k:'seq',lbl:'№',get:d=>d.seq||0},{k:'cls',lbl:'статус',get:d=>_dord[d.cls]!=null?_dord[d.cls]:9}].concat(ownCol());
+  const oSum=orders.reduce((a,o)=>a+(o.raw||0),0), pl=deals.filter(d=>d.open).reduce((a,d)=>a+(d.raw||0),0);
+  _drwSortable('',[
+    {key:'o',h:'Заказы поставщикам',hx:` · закупка Σ ${_fmtE(oSum)}`,items:orders,cols:ocols,rowFn:orow,cap:300,empty:'нет заказов'},
+    {key:'d',h:'Сделки',hx:` · пайплайн ${_fmtE(pl)}`,items:deals,cols:dcols,rowFn:drow,cap:300,empty:'нет сделок'},
+  ]);
   _ovl.classList.add('on');_drw.classList.add('on');_drw.setAttribute('aria-hidden','false');
 }
 function renderDir(D, elId, opt){
@@ -793,6 +858,20 @@ function renderCohorts(C){
   h+=`<div class="secttl"><b>2</b> · По месяцам</div><section class="card"><table><thead><tr><th>Месяц</th><th class="r">создано</th><th class="r">конв. шт</th><th class="r">Σ создано</th><th class="r">продажи</th><th class="r">конв. €</th><th class="r">проигр.</th><th class="r">срок, дн</th></tr></thead><tbody>`
     + M.map(c=>`<tr class="drill" data-m="${c.key}"><td><div class="who">${c.label}</div></td><td class="num r">${c.created}</td><td class="num r">${c.conv}%</td><td class="num r dimv">${c.createdSum}</td><td class="num r" style="color:var(--ok)">${c.sales}</td><td class="num r" style="color:var(--a2)"><b>${c.convVal}%</b></td><td class="num r" style="color:var(--nr)">${c.lost}</td><td class="num r">${c.ttr!=null?c.ttr:'—'}</td></tr>`).join('')
     + `</tbody></table></section>`;
+  const TD=C.cohorts.ttrDist;
+  if(TD&&TD.n){
+    h+=`<div class="secttl"><b>3</b> · Скорость выхода в реализацию${qmark('c.ttr')}</div><section class="card">`
+      +`<div class="note">Из <b>${TD.n}</b> сделок, дошедших до реализации — за какой срок (дней от создания сделки до первого заказа поставщику) накапливается какая доля. «За 40 дней — X%» = столько % реализованных сделок уложились в 40 дней.</div>`
+      +`<div class="pcards">`
+        +`<div class="pcard"><div class="pv">${TD.p25!=null?TD.p25+' дн':'—'}</div><div class="pl">25% доходят за (P25)</div></div>`
+        +`<div class="pcard"><div class="pv">${TD.p50!=null?TD.p50+' дн':'—'}</div><div class="pl">медиана — половина (P50)</div></div>`
+        +`<div class="pcard"><div class="pv">${TD.p75!=null?TD.p75+' дн':'—'}</div><div class="pl">75% доходят за (P75)</div></div>`
+        +`<div class="pcard"><div class="pv">${TD.p90!=null?TD.p90+' дн':'—'}</div><div class="pl">90% доходят за (P90)</div></div>`
+      +`</div>`
+      +TD.thresholds.map(t=>`<div class="ttrrow"><div class="ttrlbl">за ${t.d} дн</div><div class="ttrtrack"><i style="width:${t.pct}%"></i></div><div class="ttrpct"><b>${t.pct}%</b> <span class="dimv">${t.cnt} сд.</span></div></div>`).join('')
+      +`<div class="note" style="margin-top:10px">Среднее ${TD.mean!=null?TD.mean+' дн':'—'} · самая долгая ${TD.max!=null?TD.max+' дн':'—'}. Срок считается только для дошедших до реализации (не для всех созданных).</div>`
+      +`</section>`;
+  }
   h+=`<footer>Когортный анализ · Bitrix24 · ${cohLbl}. Когорта = квартал/месяц создания сделки. «В реализации» = сделка с заказом поставщику (СП-172) или номером реализации. «Срок» — ср. дней от создания до первого заказа поставщику.</footer>`;
   el.innerHTML=h;
   el.addEventListener('click',ev=>{

@@ -42,6 +42,15 @@ def _regno(title) -> int:
     return int(m.group(1)) if m else 0
 
 
+def _pctile(sorted_vals: list, p: float):
+    """p-й перцентиль (линейная интерполяция) из ОТСОРТИРОВАННОГО списка. None если пусто."""
+    if not sorted_vals:
+        return None
+    k = (len(sorted_vals) - 1) * p / 100.0
+    f = int(k); c = min(f + 1, len(sorted_vals) - 1)
+    return round(sorted_vals[f] + (sorted_vals[c] - sorted_vals[f]) * (k - f))
+
+
 def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             created: list[dict] | None = None, orders: list[dict] | None = None,
             deal_sale: dict | None = None) -> dict:
@@ -114,7 +123,8 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             ob["pipe"] += amt
         deal_details.append({
             "id": did, "t": (d.get("TITLE") or f"Сделка #{did}")[:90],
-            "raw": round(amt), "amt": _money(amt), "mon": mm, "cid": cid, "c": catname(cid),
+            "raw": round(amt), "amt": _money(amt), "mon": mm, "date": str(d.get("DATE_CREATE", ""))[:10],
+            "cid": cid, "c": catname(cid),
             "uid": owner, "o": unames.get(owner, f"user#{owner}") if owner else "—",
             "cls": cls, "seq": seq, "sem": sem or "P", "ovd": ovd,
         })
@@ -209,7 +219,8 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         amt = eur(d.get("OPPORTUNITY"), d.get("CURRENCY_ID")); seq = _regno(d.get("TITLE"))
         cls = "lost" if sem == "F" else ("real" if (did in coh_parents or seq > 0) else "early")
         return {"id": did, "t": (d.get("TITLE") or f"Сделка #{did}")[:90], "raw": round(amt),
-                "amt": _money(amt), "mon": str(d.get("DATE_CREATE", ""))[:7], "cid": cid, "c": catname(cid),
+                "amt": _money(amt), "mon": str(d.get("DATE_CREATE", ""))[:7], "date": str(d.get("DATE_CREATE", ""))[:10],
+                "cid": cid, "c": catname(cid),
                 "uid": owner, "o": unames.get(owner, f"user#{owner}") if owner else "—",
                 "cls": cls, "seq": seq, "sem": sem or "P", "ovd": False}
     # 2026-детали уже посчитаны выше (deal_details) — переиспользуем; для 2026-сделок членство в
@@ -241,6 +252,21 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             else:
                 c["lsum"] += d["raw"]
 
+    # --- распределение срока выхода в реализацию (TTR): за сколько дней доходят сделки ---
+    # каждая реализованная сделка попадает ровно в один квартал → собираем все TTR из coh_q
+    ttr_all = sorted(t for c in coh_q.values() for t in c["ttr"])
+    _n = len(ttr_all)
+    _THRESH = [10, 20, 30, 45, 60, 90, 120, 180, 270, 365]
+    ttr_dist = {
+        "n": _n,
+        "thresholds": [{"d": t, "pct": round(sum(1 for x in ttr_all if x <= t) / _n * 100) if _n else 0,
+                        "cnt": sum(1 for x in ttr_all if x <= t)} for t in _THRESH],
+        "p25": _pctile(ttr_all, 25), "p50": _pctile(ttr_all, 50),
+        "p75": _pctile(ttr_all, 75), "p90": _pctile(ttr_all, 90),
+        "mean": round(sum(ttr_all) / _n) if _n else None,
+        "max": ttr_all[-1] if ttr_all else None,
+    }
+
     def _coh_rows(agg, lblfn):
         out = []
         for k in sorted(agg):
@@ -267,6 +293,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         "quarters": _coh_rows(coh_q, lambda k: k.replace("-Q", " · Q")),
         "months": _coh_rows(coh_m, lambda k: f"{MLBL[int(k[5:7])]} {k[:4]}"),
         "deals": coh_details,
+        "ttrDist": ttr_dist,
     }
 
     return {
