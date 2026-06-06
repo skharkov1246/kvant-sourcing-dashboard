@@ -50,6 +50,8 @@ export default {
 
     const ctype = resp.headers.get("content-type") || "";
     if (ctype.includes("text/html")) {
+      // лог визита для ежедневного отчёта (уникальные IP). Поллинг свежести (X-Poll) не считаем.
+      if (env.VISITS && request.headers.get("X-Poll") !== "1") ctx.waitUntil(logVisit(request, env));
       try {
         // читаем БАЙТЫ один раз; их же и отдаём (без двойного чтения/перекодировки).
         // Content-Encoding/Length чистим — тело уже декодировано рантаймом, edge сожмёт заново.
@@ -90,6 +92,18 @@ async function triggerRebuild(env) {
       body: JSON.stringify({ event_type: "rebuild" }),
     });
   } catch (e) { /* самообновление — best-effort, ошибки не мешают отдаче страницы */ }
+}
+
+// лог визита в KV: ключ v:{МСК-дата}:{IP} = число заходов за день (TTL 45 дней).
+// Уникальные IP за день = число таких ключей; сумма значений = всего заходов.
+async function logVisit(request, env) {
+  try {
+    const ip = request.headers.get("CF-Connecting-IP") || "0.0.0.0";
+    const day = new Date(Date.now() + 3 * 3600 * 1000).toISOString().slice(0, 10); // МСК (UTC+3)
+    const key = `v:${day}:${ip}`;
+    const n = parseInt((await env.VISITS.get(key)) || "0", 10) + 1;
+    await env.VISITS.put(key, String(n), { expirationTtl: 60 * 60 * 24 * 45 });
+  } catch (e) { /* аналитика — best-effort */ }
 }
 
 // сравнение за постоянное время, чтобы не подсказывать пароль по таймингу

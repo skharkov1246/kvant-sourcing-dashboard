@@ -1,0 +1,21 @@
+# Планировщик дашборда КВАНТ — отдельный Cloudflare Cron Worker (деплоится ОТДЕЛЬНО от Pages).
+# Деплой:  cd scheduler && wrangler deploy   (секреты — через `wrangler secret put`, см. АВТООБНОВЛЕНИЕ.md)
+name = "kvant-dashboard-scheduler"
+main = "worker.js"
+compatibility_date = "2024-11-01"
+
+# 1) пересборка каждые 2 часа (в :07 UTC);  2) отчёт раз в день в 00:05 МСК (= 21:05 UTC)
+[triggers]
+crons = ["7 */2 * * *", "5 21 * * *"]
+
+# ТОТ ЖЕ KV namespace, что привязан к Pages-проекту (туда Pages-воркер пишет визиты).
+# Создать: `wrangler kv namespace create VISITS` → полученный id вписать сюда.
+[[kv_namespaces]]
+binding = "VISITS"
+id = "ЗАМЕНИТЬ_НА_ID_KV"
+
+[vars]
+REPORT_TO = "skharkov@gmail.com"
+# REPORT_FROM — адрес на домене, ВЕРИФИЦИРОВАННОМ в Resend (напр. "Дашборд КВАНТ <dashboard@ваш-домен>").
+# Для быстрого старта (письма на свой же ящик) можно временно оставить onboarding@resend.dev.
+REPORT_FROM = "onboarding@resend.dev"

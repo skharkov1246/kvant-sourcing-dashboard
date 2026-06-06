@@ -988,7 +988,7 @@ requestAnimationFrame(()=>setTimeout(()=>{
     if(polling)return; polling=true; let tries=0;
     const iv=setInterval(async()=>{ tries++;
       try{
-        const r=await fetch(location.href,{cache:'no-store'}); const t=await r.text();
+        const r=await fetch(location.href,{cache:'no-store',headers:{'X-Poll':'1'}}); const t=await r.text();
         const mm=t.match(/gen=new Date\("([^"]+)"\)/);
         if(mm){ const g2=Date.parse(mm[1]); if(!isNaN(g2)&&g2>gen.getTime()){ clearInterval(iv); location.reload(); return; } }
       }catch(e){}
