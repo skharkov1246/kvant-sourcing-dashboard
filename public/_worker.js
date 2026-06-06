@@ -1,12 +1,22 @@
-// Гейт доступа к дашборду: HTTP Basic Auth перед отдачей статики.
+// Гейт доступа к дашборду: HTTP Basic Auth перед отдачей статики + САМООБНОВЛЕНИЕ.
 // Cloudflare Pages в advanced-режиме (наличие _worker.js) гоняет ВСЕ запросы
 // через этот fetch; сами файлы отдаём через env.ASSETS уже после проверки.
 //
 // Пароль в КОДЕ НЕ хранится — берётся из переменной окружения проекта
-// BASIC_AUTH_PASS (секрет Cloudflare Pages; задаётся в CI или в дашборде).
-// Логин — BASIC_AUTH_USER (по умолчанию "kvant").
+// BASIC_AUTH_PASS (секрет Cloudflare Pages). Логин — BASIC_AUTH_USER (по умолчанию "kvant").
+//
+// САМООБНОВЛЕНИЕ: если при заходе данные старше 2 ч, воркер сам триггерит пересборку
+// (GitHub repository_dispatch {"event_type":"rebuild"}), а страница опрашивает сервер
+// и перезагрузится, когда придёт свежий деплой. Так датчик почти всегда зелёный.
+// Нужен один секрет проекта: GH_DISPATCH_TOKEN — fine-grained PAT этого репозитория
+// с правом Contents: Read and write (или classic с scope `repo`). Без него воркер просто
+// отдаёт статику как раньше (самообновление выключено, ломаться нечему).
+const GH_REPO = "skharkov1246/kvant-sourcing-dashboard";
+const FRESH_MS = 2 * 3600 * 1000;          // порог свежести — 2 часа
+const DEBOUNCE_MS = 15 * 60;               // не триггерить пересборку чаще раза в 15 мин (сек, для Cache-Control)
+
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const user = env.BASIC_AUTH_USER || "kvant";
     const pass = env.BASIC_AUTH_PASS;
 
@@ -29,6 +39,7 @@ export default {
         },
       });
     }
+
     // авторизованы → отдаём статический файл, но ЗАПРЕЩАЕМ кэширование:
     // иначе браузер/edge отдают старый index.html и после деплоя «сайт не обновляется».
     const resp = await env.ASSETS.fetch(request);
@@ -36,9 +47,41 @@ export default {
     headers.set("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
     headers.set("Pragma", "no-cache");
     headers.set("Expires", "0");
+
+    const ctype = resp.headers.get("content-type") || "";
+    if (ctype.includes("text/html")) {
+      // читаем страницу, достаём метку генерации и при устаревании — триггерим пересборку
+      const body = await resp.text();
+      const m = body.match(/gen=new Date\("([^"]+)"\)/);
+      const genMs = m ? Date.parse(m[1]) : NaN;
+      const stale = isNaN(genMs) || (Date.now() - genMs) > FRESH_MS;
+      if (stale && env.GH_DISPATCH_TOKEN) ctx.waitUntil(triggerRebuild(env));
+      return new Response(body, { status: resp.status, statusText: resp.statusText, headers });
+    }
     return new Response(resp.body, { status: resp.status, statusText: resp.statusText, headers });
   },
 };
+
+// Триггер пересборки через GitHub repository_dispatch, с дебаунсом через Cache API
+// (не чаще раза в 15 мин на edge — чтобы пачка заходов в окно сборки не наплодила прогонов).
+async function triggerRebuild(env) {
+  try {
+    const cache = caches.default;
+    const marker = new Request("https://kvant-internal/rebuild-marker");
+    if (await cache.match(marker)) return;                         // дебаунс активен
+    await cache.put(marker, new Response("1", { headers: { "Cache-Control": "max-age=" + DEBOUNCE_MS } }));
+    await fetch(`https://api.github.com/repos/${GH_REPO}/dispatches`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${env.GH_DISPATCH_TOKEN}`,
+        "Accept": "application/vnd.github+json",
+        "User-Agent": "kvant-dashboard-worker",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ event_type: "rebuild" }),
+    });
+  } catch (e) { /* самообновление — best-effort, ошибки не мешают отдаче страницы */ }
+}
 
 // сравнение за постоянное время, чтобы не подсказывать пароль по таймингу
 function timingSafeEqual(a, b) {

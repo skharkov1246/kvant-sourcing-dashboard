@@ -972,42 +972,41 @@ requestAnimationFrame(()=>setTimeout(()=>{
   document.querySelectorAll('.bltrack i[data-w]').forEach((e,i)=>{e.style.transition='width .8s ease '+(i*.04)+'s';e.style.width=e.dataset.w+'%';});
 },80));
 
-// ---- статус обновления данных: «обновлено» + обратный отсчёт до следующего запуска
+// ---- статус обновления данных: датчик ПО ВОЗРАСТУ данных (зелёный = свежее 2 ч).
+// При устаревании сайт сам опрашивает сервер и перезагружается, когда придёт свежий деплой
+// (воркер при заходе на устаревший сайт триггерит пересборку — см. _worker.js / АВТООБНОВЛЕНИЕ.md).
 (function(){
   const el=document.getElementById('updstatus'); if(!el) return;
-  const gen=new Date("__GENERATED_AT__"), next=new Date("__NEXT_UPDATE__");
-  const graceMs=2*3600*1000;                 // допустимое опоздание автодеплоя (GitHub-крон бывает с задержкой)
-  const pad=n=>String(n).padStart(2,'0');
+  const gen=new Date("__GENERATED_AT__");
+  const okGen=!isNaN(gen.getTime());
   const fmt=new Intl.DateTimeFormat('ru-RU',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit',timeZone:'Europe/Moscow'});
-  const okNext=!isNaN(next.getTime());
-  const lastTxt=isNaN(gen.getTime())?'—':fmt.format(gen);
+  const lastTxt=okGen?fmt.format(gen):'—';
+  const FRESH=2*3600*1000, GRACE=3*3600*1000;     // ≤2ч — зелёный; 2–3ч — обновляется; >3ч — устарело
+  const agoTxt=ms=>{const m=Math.floor(ms/60000);if(m<1)return 'только что';if(m<60)return m+' мин назад';const h=Math.floor(m/60),mm=m%60;return h+' ч'+(mm?' '+mm+' мин':'')+' назад';};
+  let polling=false;
+  function pollFresh(){                            // ждём свежий деплой: опрашиваем страницу, при новой метке — reload
+    if(polling)return; polling=true; let tries=0;
+    const iv=setInterval(async()=>{ tries++;
+      try{
+        const r=await fetch(location.href,{cache:'no-store'}); const t=await r.text();
+        const mm=t.match(/gen=new Date\("([^"]+)"\)/);
+        if(mm){ const g2=Date.parse(mm[1]); if(!isNaN(g2)&&g2>gen.getTime()){ clearInterval(iv); location.reload(); return; } }
+      }catch(e){}
+      if(tries>=12){ clearInterval(iv); polling=false; }   // ~12 мин — сдаёмся (следующий заход триггернёт снова)
+    },60000);
+  }
   function render(){
-    const now=new Date();
-    let cls='is-ok', right='';
-    if(okNext && next-now>0){
-      const d=next-now,h=Math.floor(d/3600000),m=Math.floor(d%3600000/60000),s=Math.floor(d%60000/1000);
-      cls='is-ok'; right=`следующее обновление через <b>${pad(h)}:${pad(m)}:${pad(s)}</b>`;
-    } else if(okNext && now-next<=graceMs){
-      cls='is-warn'; right='обновление ожидается…';
-    } else if(okNext){
-      cls='is-late';
-      const lh=Math.floor((now-next)/3600000);
-      right=`⚠ обновление не произошло${lh>=1?` ${lh} ч назад`:''} — данные устарели, проверьте автодеплой`;
-    }
+    const age=okGen?(Date.now()-gen.getTime()):Infinity;
+    let cls,right;
+    if(age<=FRESH){ cls='is-ok'; right='данные актуальны'; }
+    else if(age<=GRACE){ cls='is-warn'; right='обновляю свежие данные…'; pollFresh(); }
+    else { cls='is-late'; right='данные устарели — обновляю…'; pollFresh(); }
     el.className='updbar '+cls;
     el.innerHTML=`<span class="ub-dot"></span>`+
-      `<span class="ub-main">Обновлено: <b>${lastTxt} МСК</b></span>`+
-      (right?`<span class="ub-sep">·</span><span class="ub-next">${right}</span>`:'');
+      `<span class="ub-main">Обновлено: <b>${lastTxt} МСК</b> <span class="dimv">(${okGen?agoTxt(age):'—'})</span></span>`+
+      `<span class="ub-sep">·</span><span class="ub-next">${right}</span>`;
   }
-  render(); setInterval(render,1000);
-  // однократно подтянуть свежий деплой вскоре после наступления срока обновления
-  if(okNext){
-    const key='upd-reload:'+next.getTime();
-    const delay=(next-new Date())+5*60*1000;
-    if(delay>0 && delay<26*3600*1000){
-      setTimeout(()=>{ if(!sessionStorage.getItem(key)){ sessionStorage.setItem(key,'1'); location.reload(); } }, delay);
-    }
-  }
+  render(); setInterval(render,30000);
 })();
 </script>
 </body>
