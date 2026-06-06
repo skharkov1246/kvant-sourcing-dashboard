@@ -50,13 +50,22 @@ export default {
 
     const ctype = resp.headers.get("content-type") || "";
     if (ctype.includes("text/html")) {
-      // читаем страницу, достаём метку генерации и при устаревании — триггерим пересборку
-      const body = await resp.text();
-      const m = body.match(/gen=new Date\("([^"]+)"\)/);
-      const genMs = m ? Date.parse(m[1]) : NaN;
-      const stale = isNaN(genMs) || (Date.now() - genMs) > FRESH_MS;
-      if (stale && env.GH_DISPATCH_TOKEN) ctx.waitUntil(triggerRebuild(env));
-      return new Response(body, { status: resp.status, statusText: resp.statusText, headers });
+      try {
+        // читаем БАЙТЫ один раз; их же и отдаём (без двойного чтения/перекодировки).
+        // Content-Encoding/Length чистим — тело уже декодировано рантаймом, edge сожмёт заново.
+        const buf = await resp.arrayBuffer();
+        const text = new TextDecoder().decode(buf);
+        const m = text.match(/gen=new Date\("([^"]+)"\)/);
+        const genMs = m ? Date.parse(m[1]) : NaN;
+        const stale = isNaN(genMs) || (Date.now() - genMs) > FRESH_MS;
+        if (stale && env.GH_DISPATCH_TOKEN) ctx.waitUntil(triggerRebuild(env));
+        headers.delete("Content-Encoding");
+        headers.delete("Content-Length");
+        return new Response(buf, { status: resp.status, statusText: resp.statusText, headers });
+      } catch (e) {
+        // что-то пошло не так с чтением — отдаём страницу как есть, ничего не ломаем
+        return new Response(resp.body, { status: resp.status, statusText: resp.statusText, headers });
+      }
     }
     return new Response(resp.body, { status: resp.status, statusText: resp.statusText, headers });
   },
