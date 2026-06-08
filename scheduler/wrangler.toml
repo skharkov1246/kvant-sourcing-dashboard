@@ -4,18 +4,26 @@ name = "kvant-dashboard-scheduler"
 main = "worker.js"
 compatibility_date = "2024-11-01"
 
-# 1) пересборка каждые 2 часа (в :07 UTC);  2) отчёт раз в день в 00:05 МСК (= 21:05 UTC)
+# 1) пересборка каждые 2 ч (:07);  2) проверка алертов (:37);  3) дневной отчёт в 00:05 МСК (21:05 UTC)
 [triggers]
-crons = ["7 */2 * * *", "5 21 * * *"]
+crons = ["7 */2 * * *", "37 */2 * * *", "5 21 * * *"]
 
-# ТОТ ЖЕ KV namespace, что привязан к Pages-проекту (туда Pages-воркер пишет визиты).
+# ТОТ ЖЕ KV namespace, что привязан к Pages-проекту (визиты + состояние алертов).
 # Создать: `wrangler kv namespace create VISITS` → полученный id вписать сюда.
 [[kv_namespaces]]
 binding = "VISITS"
 id = "ЗАМЕНИТЬ_НА_ID_KV"
 
 [vars]
+SITE_URL = "https://kvant-sourcing-f122.pages.dev/"
+BASIC_AUTH_USER = "kvant"
 REPORT_TO = "skharkov@gmail.com"
 # REPORT_FROM — адрес на домене, ВЕРИФИЦИРОВАННОМ в Resend (напр. "Дашборд КВАНТ <dashboard@ваш-домен>").
-# Для быстрого старта (письма на свой же ящик) можно временно оставить onboarding@resend.dev.
+# Для быстрого старта (письма на свой же ящик) можно временно onboarding@resend.dev.
 REPORT_FROM = "onboarding@resend.dev"
+ALERT_MIN_EUR = "100000"
+
+# Секреты (НЕ в этом файле — через `wrangler secret put`):
+#   GH_DISPATCH_TOKEN  — GitHub PAT (Contents: read/write) для пересборки
+#   RESEND_API_KEY     — ключ Resend для писем
+#   BASIC_AUTH_PASS    — пароль дашборда (планировщик читает данные сайта для алертов)
