@@ -12,7 +12,7 @@ crons = ["7 */2 * * *", "37 */2 * * *", "5 21 * * *"]
 # Создать: `wrangler kv namespace create VISITS` → полученный id вписать сюда.
 [[kv_namespaces]]
 binding = "VISITS"
-id = "ЗАМЕНИТЬ_НА_ID_KV"
+id = "3a142ea0ca0649e1865a939bb71b03ee"
 
 [vars]
 SITE_URL = "https://kvant-sourcing-f122.pages.dev/"
