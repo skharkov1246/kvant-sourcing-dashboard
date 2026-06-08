@@ -362,6 +362,12 @@
   <table><thead><tr><th>Воронка</th><th class="r">Сделок</th><th class="r">С запросом</th><th class="r">Покрытие</th><th class="r">Запросов</th><th class="r">Ср. постав.</th></tr></thead><tbody id="tbCov"></tbody></table>
 </section>
 
+<section class="card" id="covWeekly" hidden>
+  <h2>Динамика непокрытых по неделям</h2>
+  <div class="note">Сделки по неделе СОЗДАНИЯ — сколько без единого запроса поставщику. Свежая неделя обычно ещё «в работе» (запрос уходит ~за сутки); устойчиво высокий процент в прошедших неделях = реальные пропуски сорсинга. Клик по неделе — список её непокрытых сделок.</div>
+  <div id="covWeeklyBody" style="margin-top:6px"></div>
+</section>
+
 <div class="secttl"><b>5</b> · Реально отправлено vs создано (+ фейк-отправки)</div>
 <section class="card">
   <h2><span class="tag a">БЛОК A</span> Письмо действительно ушло поставщику?</h2>
@@ -524,6 +530,16 @@ document.getElementById('legCov').innerHTML=
 
 // ---- coverage by category
 document.getElementById('tbCov').innerHTML=cov.byCat.map(c=>{const cl=c.covPct>=70?'q':(c.covPct>=50?'dimv':'nrc');return `<tr><td><div class="who">${_esc(c.cat)}</div></td><td class="num r">${c.deals}</td><td class="num r">${c.withReq}</td><td class="num r ${cl}">${c.covPct}%</td><td class="num r dimv">${c.reqs}</td><td class="num r" style="color:var(--a2)">${c.avgSup}</td></tr>`;}).join('');
+
+// ---- coverage: динамика непокрытых по неделям (когорты по неделе создания)
+(function(){
+  const wk=cov.weekly||[], sec=document.getElementById('covWeekly'), body=document.getElementById('covWeeklyBody');
+  if(!sec||!body||!wk.length) return;
+  sec.hidden=false;
+  body.innerHTML=wk.map(w=>`<div class="ttrrow drill" data-wk="${w.key}"><div class="ttrlbl" style="min-width:104px">${w.label}</div><div class="ttrtrack"><i style="width:${w.uncovPct}%;background:var(--warn)"></i></div><div class="ttrpct"><b style="color:var(--warn)">${w.uncov}</b><span class="dimv">/${w.created} · ${w.uncovPct}%</span></div></div>`).join('');
+  body.addEventListener('click',ev=>{ const n=ev.target.closest('[data-wk]'); if(!n)return; const k=n.dataset.wk;
+    const w=wk.find(x=>x.key===k); openUncovered((cov.uncovered||[]).filter(r=>r.wk===k), w?('неделя '+w.label):''); });
+})();
 
 // ---- insights
 document.getElementById('insLoad').innerHTML=INS.load||'<span class="dimv">—</span>';
@@ -700,11 +716,11 @@ function openDeals(list,title,sub){
   _ovl.classList.add('on');_drw.classList.add('on');_drw.setAttribute('aria-hidden','false');
 }
 // ---- список сделок без запросов поставщикам (покрытие сорсинга)
-function openUncovered(rows){
+function openUncovered(rows,subLbl){
   rows=(rows||[]).slice();
   const sum=rows.reduce((a,d)=>a+(d.raw||0),0);
   document.getElementById('drwName').textContent='Сделки без запросов поставщикам';
-  document.getElementById('drwSub').textContent=`в окне · ${rows.length} сделок · Σ потенциал ${_fmtE(sum)} · сорсинг не подключён`;
+  document.getElementById('drwSub').textContent=`${subLbl?subLbl+' · ':'в окне · '}${rows.length} сделок · Σ потенциал ${_fmtE(sum)} · сорсинг не подключён`;
   const head='<div class="note" style="margin-bottom:8px">Созданы в периоде, но ни одного запроса поставщику (СП-166). Часть может не требовать закупки (услуги, тендеро-лиды на квалификации) — проверьте и подключите сорсинг, где нужно.</div>';
   const rowFn=d=>`<div class="req"><div class="rt">${_esc(d.t)}</div><div class="rm"><span class="pill">${_esc(d.cat)}</span><span class="pill">${d.sem}</span><span>${_esc(d.client)}</span><span class="dimv">${_esc(d.owner)}</span><span class="dt">${d.date}</span><span class="amt">${d.amt}</span></div></div>`;
   _drwSortable(head,[{key:'u',h:'Сделки',items:rows,empty:'все сделки покрыты запросами',rowFn,cols:[

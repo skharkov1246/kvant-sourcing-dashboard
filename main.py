@@ -216,7 +216,34 @@ def run(args) -> int:
             })
         _unc_rows.sort(key=lambda r: -r["raw"])
         m["coverage"]["uncovered"] = _unc_rows
-        print(f"  непокрытых сделок (без запросов поставщикам): {len(_unc_rows)}")
+        # недельная динамика непокрытых: по неделе СОЗДАНИЯ сделки (Пн–Вс), свежие сверху
+        _MONS = {1: "янв", 2: "фев", 3: "мар", 4: "апр", 5: "май", 6: "июн",
+                 7: "июл", 8: "авг", 9: "сен", 10: "окт", 11: "ноя", 12: "дек"}
+        def _mon_of(s):
+            try:
+                d = dt.date.fromisoformat(str(s)[:10]); return d - dt.timedelta(days=d.weekday())
+            except Exception:
+                return None
+        _wk_created = Counter()
+        for d in period_deals:
+            mo = _mon_of(d.get("DATE_CREATE"))
+            if mo:
+                _wk_created[mo] += 1
+        _wk_uncov = Counter()
+        for r in _unc_rows:
+            mo = _mon_of(r["date"])
+            if mo:
+                _wk_uncov[mo] += 1
+                r["wk"] = mo.isoformat()
+        _weekly = []
+        for mo in sorted(_wk_created, reverse=True):
+            created = _wk_created[mo]; uncov = _wk_uncov.get(mo, 0); end = mo + dt.timedelta(days=6)
+            label = (f"{mo.day}–{end.day} {_MONS[end.month]}" if mo.month == end.month
+                     else f"{mo.day} {_MONS[mo.month]} – {end.day} {_MONS[end.month]}")
+            _weekly.append({"key": mo.isoformat(), "label": label, "created": created,
+                            "uncov": uncov, "uncovPct": round(uncov / created * 100) if created else 0})
+        m["coverage"]["weekly"] = _weekly
+        print(f"  непокрытых сделок (без запросов поставщикам): {len(_unc_rows)} | недель: {len(_weekly)}")
     except Exception as e:
         print(f"  ⚠ список непокрытых пропущен: {type(e).__name__}: {e}")
 
