@@ -26,6 +26,7 @@ import kam as kam_mod
 import contracts as contracts_mod
 import metrics as metrics_mod
 import period as period_mod
+import reps as reps_mod
 from bitrix_client import BitrixClient
 
 RFQ_SELECT = ["id", "assignedById", "stageId", "createdTime", "movedTime", "parentId2", "categoryId",
@@ -262,7 +263,7 @@ def run(args) -> int:
     ins = insights_mod.generate(m, settings, use_llm=use_llm)
     print(f"  источник: {ins.get('_source')}")
 
-    company_data = kam_data = eng_data = prod_data = None
+    company_data = kam_data = eng_data = prod_data = reps_data = None
     deals_ytd = orders_ytd = deal_owner = deal_sale = None
     # --- общий пул сделок/заказов YTD (нужен Пульсу + отраслевым вкладкам) ---
     try:
@@ -300,10 +301,20 @@ def run(args) -> int:
         deal_group = None
         print(f"  ⚠ общий пул не получен — Пульс/КАМ/Инж/Продукт пропущены: {type(e).__name__}: {e}")
 
+    # момент перевода сделок в реализацию (вход в воронку кат.0) — выгружаем ОДИН раз, шарим
+    realize_date = None
+    try:
+        print("• История стадий: момент перевода в реализацию (для Пульса/Когорт/Коммерсантов)…")
+        realize_date = client.stage_first_entry(2, 0, "2025-01-01T00:00:00")
+        print(f"  вошли в реализацию (с 2025): {len(realize_date)} сделок")
+    except Exception as e:
+        print(f"  ⚠ история стадий пропущена: {type(e).__name__}: {e}")
+
     # --- каждая вкладка изолирована: сбой одной не гасит остальные ---
     if deals_ytd is not None:
         try:
-            company_data = company_mod.compute(client, as_of=p.end, created=deals_ytd, orders=orders_ytd, deal_sale=deal_sale)
+            company_data = company_mod.compute(client, as_of=p.end, created=deals_ytd, orders=orders_ytd,
+                                               deal_sale=deal_sale, realize_date=realize_date)
             print("  ✓ Пульс компании")
         except Exception as e:
             print(f"  ⚠ Пульс компании пропущен: {type(e).__name__}: {e}")
@@ -333,9 +344,17 @@ def run(args) -> int:
     except Exception as e:
         print(f"  ⚠ вкладка «Контракты» пропущена: {type(e).__name__}: {e}")
 
+    try:
+        print("• Коммерсанты (персональные дашборды + контрольные точки)…")
+        reps_data = reps_mod.compute(client, realize_date=realize_date, as_of=p.end)
+        print(f"  ✓ коммерсантов: {len(reps_data['reps'])}")
+    except Exception as e:
+        print(f"  ⚠ вкладка «Коммерсанты» пропущена: {type(e).__name__}: {e}")
+
     html_path = out_dir / f"dashboard_{slug}.html"
     dashboard.write(m, ins, html_path, title=f"Сорсинг · {p.label}",
-                    company=company_data, kam=kam_data, eng=eng_data, prod=prod_data, contracts=contracts_data)
+                    company=company_data, kam=kam_data, eng=eng_data, prod=prod_data,
+                    contracts=contracts_data, reps=reps_data)
     print(f"  ✓ дашборд: {html_path}")
 
     if args.open:
