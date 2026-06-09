@@ -73,7 +73,7 @@ def _ttr_dist(values: list, thresholds: list | None = None) -> dict:
 
 def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             created: list[dict] | None = None, orders: list[dict] | None = None,
-            deal_sale: dict | None = None) -> dict:
+            deal_sale: dict | None = None, realize_date: dict | None = None) -> dict:
     today = as_of or dt.date.today()
     months = [f"2026-{m:02d}" for m in range(1, today.month + 1)]
     cur_part = today.strftime("%Y-%m")
@@ -230,10 +230,12 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
     coh_date = dict(deal_date)
     coh_date.update({str(d["ID"]): str(d.get("DATE_CREATE", ""))[:10] for d in pre_created})
     # момент ПОБЕДЫ = первый вход сделки в воронку реализации (категория 0) из истории стадий
-    try:
-        realize_date = client.stage_first_entry(2, 0, COHORT_START)
-    except Exception:
-        realize_date = {}
+    # (если передан из main — переиспользуем, чтобы не выгружать историю дважды)
+    if realize_date is None:
+        try:
+            realize_date = client.stage_first_entry(2, 0, COHORT_START)
+        except Exception:
+            realize_date = {}
     # первый ЗАПРОС поставщикам (СП-166) по сделке — для метрики скорости сорсинга
     rfq_all = client.list_items(config.SPA_ENTITY_TYPE_ID,
         filter={"categoryId": config.SPA_CATEGORY_ID, ">=createdTime": COHORT_START},

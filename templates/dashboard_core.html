@@ -254,6 +254,17 @@
   .pcard{flex:1;min-width:120px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
   .pcard .pv{font-family:var(--mono);font-weight:700;font-size:19px;color:var(--a2)}
   .pcard .pl{font-size:11px;color:var(--mut);margin-top:2px}
+  /* вкладка «Коммерсанты»: суб-навигация + помесячные мини-бары */
+  .subnav{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 16px}
+  .snb{font-family:var(--mono);font-size:13px;padding:6px 14px;border:1px solid var(--line);border-radius:999px;background:transparent;color:var(--mut);cursor:pointer;transition:.12s}
+  .snb:hover{border-color:var(--a);color:var(--ink)}
+  .snb.on{background:var(--a);border-color:var(--a);color:#1a1206;font-weight:600}
+  .rmrow{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;padding:4px 0}
+  .rmon{display:inline-flex;flex-direction:column;align-items:center;gap:5px;width:52px}
+  .rmbars{display:flex;align-items:flex-end;gap:3px;height:104px}
+  .rmbars i{width:14px;border-radius:3px 3px 0 0;display:block;min-height:2px}
+  .rmc{background:linear-gradient(180deg,var(--b2),var(--b))}.rmr{background:var(--ok)}
+  .rmlbl{font:11px/1 var(--mono);color:var(--mut)}.rmv{font:11px/1 var(--mono);color:var(--ink)}
   .tabs{display:flex;gap:8px;margin-bottom:18px}
   .tab{font-family:var(--mono);font-size:12px;padding:7px 14px;border-radius:8px;border:1px solid var(--line);color:var(--mut);background:var(--panel);cursor:pointer}
   .tab.act{color:#0e1116;background:var(--a2);border-color:var(--a2);font-weight:700}
@@ -264,7 +275,7 @@
 </head>
 <body>
 <div id="updstatus" class="updbar"><span class="ub-dot"></span><span class="ub-main">Обновление…</span></div>
-<div class="tabs"><button class="tab act" data-tab="sourcing">Сорсинг</button><button class="tab" data-tab="company">Пульс компании</button><button class="tab" data-tab="kam">КАМы</button><button class="tab" data-tab="eng">Инжиниринг</button><button class="tab" data-tab="prod">Продукт-оунеры</button><button class="tab" data-tab="contracts">Реализация</button><button class="tab" data-tab="suppliers">Поставщики</button><button class="tab" data-tab="cohorts">Когорты</button></div>
+<div class="tabs"><button class="tab act" data-tab="sourcing">Сорсинг</button><button class="tab" data-tab="company">Пульс компании</button><button class="tab" data-tab="kam">КАМы</button><button class="tab" data-tab="eng">Инжиниринг</button><button class="tab" data-tab="prod">Продукт-оунеры</button><button class="tab" data-tab="reps">Коммерсанты</button><button class="tab" data-tab="contracts">Реализация</button><button class="tab" data-tab="suppliers">Поставщики</button><button class="tab" data-tab="cohorts">Когорты</button></div>
 <div id="tab-sourcing">
 <header>
   <div class="eyebrow">Квант · Отдел поиска поставщиков</div>
@@ -399,6 +410,7 @@
 <div id="tab-contracts" hidden></div>
 <div id="tab-suppliers" hidden></div>
 <div id="tab-cohorts" hidden></div>
+<div id="tab-reps" hidden></div>
 
 <div class="ovl" id="ovl"></div>
 <aside class="drw" id="drw" aria-hidden="true">
@@ -414,6 +426,7 @@ window.__KAM__ = __KAM_JSON__;
 window.__ENG__ = __ENG_JSON__;
 window.__PRODUCT__ = __PRODUCT_JSON__;
 window.__CONTRACTS__ = __CONTRACTS_JSON__;
+window.__REPS__ = __REPS_JSON__;
 const M = window.__DATA__, INS = window.__INSIGHTS__;
 const cs = getComputedStyle(document.documentElement);
 const k = M.kpi, A = M.sourcersA, cov = M.coverage;
@@ -742,6 +755,8 @@ const METH={
   's.send':{t:'Реально отправлено vs создано',what:'Сверка: карточку запроса завели — но отправили ли письмо поставщику.',src:'Активности OWNER_TYPE_ID=166, PROVIDER_ID=CRM_EMAIL (исходящие письма).',formula:'Отправлено = RFQ с ≥1 исходящим письмом. «Фейк-отправки» = RFQ в стадии «отправлено» без письма.',note:'Привязка письма к RFQ местами неполная на стороне Bitrix — считаем нижней оценкой.'},
   's.suppliers':{t:'Разнообразие поставщиков',what:'Насколько широка база поставщиков, к которым обращается сорсинг.',src:'СП-166 (запросы), поле поставщика ufCrm18Supplier → имя компании; блок A.',formula:'Пай-чарт — доля запросов по поставщикам (топ-12 + прочие). «Поставщиков на сорсера» — число РАЗНЫХ поставщиков, к которым обращался сотрудник.',note:'Концентрация на немногих поставщиках = риск; широкая база = больше альтернатив по цене/срокам.'},
   's.ttr':{t:'Скорость до первого запроса поставщикам',what:'Как быстро после создания сделки сорсинг создаёт первый запрос поставщикам — накопленное распределение по дням.',src:'crm.deal.list (дата создания) → СП-166 «Запросы поставщикам» (createdTime первого запроса, parentId2). По всем сделкам с запросом, с 2025.',formula:'Срок = дней от создания сделки до первого запроса поставщикам. «За N дней — X%» = доля сделок-с-запросом, у которых первый запрос создан в пределах N дней. P25/P50/P75/P90 — перцентили (P50 = медиана).',note:'Это отзывчивость СОРСИНГА — как быстро подключаются к сделке. Не путать со скоростью победы (вкладка «Когорты») и заказом поставщику (СП-172).'},
+  'r.kpi':{t:'Карточка эффективности коммерсанта',what:'Измеримые показатели менеджера по его портфелю сделок (с 2025).',src:'crm.deal.list (ASSIGNED_BY_ID = менеджер) + Заказы поставщикам СП-172 + история стадий.',formula:'Активных = открытые (не выиграны, не проиграны). Пайплайн = Σ их сумм. В реализации = сделки с заказом/№/в воронке кат.0. Конв = в реализации ÷ создано. Продажи = Σ сумм реализованных; Маржа = продажи − закупка. Win-rate = реализация ÷ (реализация + проиграно). Ср. чек = продажи ÷ число реализованных. Срок до победы = медиана дней создание→перевод в реализацию. Застряло = открытые без смены стадии &gt;30 дн; Просрочено = открытые с прошедшим плановым сроком.',note:'Окно — портфель с 01.01.2025 (а не только этот год), чтобы видеть и переходящие сделки. У кого мало сделок — цифры шумные.'},
+  'r.cp':{t:'Контрольные точки (воронка менеджера)',what:'Путь сделки по этапам: где портфель сейчас и где «протекает».',src:'Текущая стадия сделки (STAGE_ID/CATEGORY_ID) → уровень контрольной точки; история стадий для «в реализации».',formula:'Создано → ТКП выдано → В реализации → Договор подписан → Отгружено → Завершено. «Достигло этапа» = живых сделок на этом уровне и выше (стадии монотонны). «Создано» — весь приток; разрыв до «ТКП выдано» = проигранные + ещё ранние. Проиграно показано отдельно.',note:'Этапы определяются по стадиям воронок Bitrix (ТКП — по стадиям «ТКП выдано/Quotation Issued/EXECUTING»; договор/отгрузка — по стадиям воронки реализации кат.0). Клик по этапу — список сделок.'},
   'c.cohorts':{t:'Когортный анализ сделок',what:'Эффективность сделок по кварталу/месяцу их СОЗДАНИЯ: сколько дошло до реализации. Окно — с 01.01.2025 (шире Пульса, чтобы видеть зрелые когорты прошлого года).',src:'crm.deal.list (дата создания, с 2025) + классификация (есть заказ СП-172/номер реализации).',formula:'Когорта = квартал/месяц создания. «В реализации» (успех) = сделка с заказом/номером. «Конв. шт» = реализация ÷ создано (по количеству). «Конв. €» = Σ продаж реализованных ÷ Σ сумм ВСЕХ созданных сделок когорты (по сумме). Две полосы (шт/€) показывают распределение когорты на ранний/реализация/проигрыш отдельно по количеству и по деньгам. «Срок» = ср. дней от создания сделки до перевода в воронку реализации (победы); раскладку по дням см. в секции 3.',note:'Сравнение конв.шт и конв.€ показывает корреляцию размера и успеха: конв.€ > конв.шт ⇒ крупные сделки доходят до реализации чаще мелких. Когорты 2025 зрелые; свежие кварталы 2026 ещё «дозревают». Клик — список сделок когорты.'},
   'c.ttr':{t:'Скорость перевода в реализацию (квантиль)',what:'Как быстро сделка от своего создания переводится в воронку реализации (побеждается) — накопленное распределение по дням.',src:'crm.deal.list (дата создания) → история стадий crm.stagehistory.list: первый вход сделки в воронку реализации (категория 0 — «ТКП согласован / конкурс выигран»). По переведённым в реализацию, с 2025.',formula:'Срок = дней от создания сделки до её первого перевода в воронку реализации. «За N дней — X%» = доля побеждённых сделок, переведённых в реализацию в пределах N дней (накопленный процент). P25/P50/P75/P90 — перцентили: срок, за который побеждает соответствующая доля (P50 = медиана).',note:'Считается ТОЛЬКО по переведённым в реализацию — это скорость победы, а не доля успеха. Длинный хвост (P90 ≫ медианы) = часть сделок зреет очень долго. Срок до первого ЗАПРОСА поставщикам (отзывчивость сорсинга) — отдельно во вкладке «Сорсинг».'},
   'c.kpi':{t:'Сводные показатели Пульса',what:'Верхняя панель: вход, активный пайплайн, реализация, выручка/маржа, проигрыш, просрочка.',src:'crm.deal.list (созданные YTD) + Заказы поставщикам СП-172.',formula:'«В работе» = ранние (открытые, ещё не в реализации). «В реализации» = есть заказ СП-172 или номер реализации в названии. «Выручка» = Σ сумм сделок-контрактов; «Маржа» = выручка − закупка. «Проиграно» = статус F. «Просрочено» = открытые с прошедшим CLOSEDATE.',note:'Каждая карточка кликабельна — список сделок за цифрой.'},
@@ -904,6 +919,61 @@ function renderCohorts(C){
   });
 }
 renderCohorts(window.__COMPANY__);
+// ---- вкладка «Коммерсанты»: персональные дашборды + контрольные точки
+function renderReps(R){
+  const el=document.getElementById('tab-reps'); if(!el) return;
+  if(!R||!R.reps||!R.reps.length){ el.innerHTML='<div class="note" style="padding:20px 0">нет данных по коммерсантам</div>'; return; }
+  const reps=R.reps; let sel='all';
+  const byUid=u=>reps.find(r=>r.uid===u);
+  const navHtml=()=>`<div class="subnav"><button class="snb${sel==='all'?' on':''}" data-r="all">Сводка</button>`
+    +reps.map(r=>`<button class="snb${sel===r.uid?' on':''}" data-r="${r.uid}">${_esc(r.label)}</button>`).join('')+`</div>`;
+  function overview(){
+    const head=`<tr><th>Сотрудник</th><th class="r">создано</th><th class="r">активных</th><th class="r">пайплайн</th><th class="r">в реализ.</th><th class="r">конв</th><th class="r">продажи</th><th class="r">маржа</th><th class="r">win-rate</th><th class="r">срок,дн</th><th class="r">застряло</th></tr>`;
+    const rows=reps.map(r=>{const k=r.kpis;return `<tr class="drill" data-r="${r.uid}"><td><div class="who">${_esc(r.label)}</div><div class="dep">${_esc(r.name)}</div></td><td class="num r">${k.created}</td><td class="num r">${k.open}</td><td class="num r dimv">${k.openSum}</td><td class="num r" style="color:var(--ok)">${k.real}</td><td class="num r">${k.conv}%</td><td class="num r">${k.sales}</td><td class="num r" style="color:var(--ok2)">${k.margin}</td><td class="num r"><b>${k.winRate}%</b></td><td class="num r">${k.ttwMed!=null?k.ttwMed:'—'}</td><td class="num r" style="color:var(--amber)">${k.stuck}</td></tr>`;}).join('');
+    return `<div class="secttl"><b>·</b> Сводка по коммерсантам${qmark('r.kpi')}</div><section class="card"><div class="note">Портфель с 2025. Клик по строке — личный дашборд. «Конв» = в реализации ÷ создано; «win-rate» = выиграно ÷ (выиграно+проиграно); «срок» — медиана дней создание→реализация; «застряло» — открытые без движения &gt;30 дн.</div><table><thead>${head}</thead><tbody>${rows}</tbody></table></section>`;
+  }
+  function detail(r){
+    const k=r.kpis;
+    const card=(lbl,val,meta,clz)=>`<div class="kpi ${clz||''}"><div class="lbl">${lbl}</div><div class="val ${clz||''}">${val}</div><div class="meta">${meta}</div></div>`;
+    let h=`<div class="secttl"><b>·</b> ${_esc(r.label)} — карточка эффективности${qmark('r.kpi')}</div>`;
+    h+=`<div class="kpis" style="grid-template-columns:repeat(4,1fr)">`
+      +card('Активных сделок',k.open,'пайплайн '+k.openSum,'')
+      +card('В реализации',k.real,'конв '+k.conv+'% от созданных','ok')
+      +card('Продажи',k.sales,'маржа '+k.margin+' ('+k.marginPct+'%)','ok')
+      +card('Win-rate',k.winRate+'%','ср. чек '+k.avgCheck,'')+`</div>`;
+    h+=`<div class="kpis" style="grid-template-columns:repeat(4,1fr);margin-top:10px">`
+      +card('Создано (с 2025)',k.created,'весь портфель','')
+      +card('Проиграно',k.lost,'закрыто без сделки','warn')
+      +card('Срок до победы',(k.ttwMed!=null?k.ttwMed+' дн':'—'),'медиана · P90 '+(k.ttwP90!=null?k.ttwP90+' дн':'—'),'')
+      +card('Застряло / просрочено',k.stuck+' / '+k.overdue,'без движ. &gt;30дн / срок прошёл','warn')+`</div>`;
+    const f=r.funnel, base=f[0].n||1;
+    h+=`<div class="secttl"><b>·</b> Контрольные точки${qmark('r.cp')}</div><section class="card"><div class="note">Путь сделки по этапам. «Создано» — весь приток; дальше — сколько живых сделок достигло этапа. Разрыв Создано→ТКП включает проигранные (${k.lost}) и ещё ранние. Клик по этапу — список сделок.</div>`;
+    h+=f.map(c=>`<div class="ttrrow drill" data-lvl="${c.k}"><div class="ttrlbl" style="min-width:132px">${c.name}</div><div class="ttrtrack"><i style="width:${c.pct}%;background:${c.k>=2?'var(--ok)':'var(--b)'}"></i></div><div class="ttrpct"><b>${c.n}</b> <span class="dimv">${c.pct}%</span></div></div>`).join('');
+    h+=`<div class="ttrrow drill" data-lvl="lost"><div class="ttrlbl" style="min-width:132px;color:var(--nr)">Проиграно</div><div class="ttrtrack"><i style="width:${Math.round(k.lost/base*100)}%;background:var(--nr)"></i></div><div class="ttrpct"><b style="color:var(--nr)">${k.lost}</b> <span class="dimv">${Math.round(k.lost/base*100)}%</span></div></div></section>`;
+    if(r.bymon&&r.bymon.length){
+      const mx=Math.max(1,...r.bymon.map(m=>m.c));
+      h+=`<div class="secttl"><b>·</b> Помесячно: создано / выиграно</div><section class="card"><div class="rmrow">`
+        +r.bymon.map(m=>`<div class="rmon"><div class="rmbars"><i class="rmc" style="height:${Math.round(m.c/mx*100)}%" title="создано ${m.c}"></i><i class="rmr" style="height:${Math.round(m.r/mx*100)}%" title="выиграно ${m.r}"></i></div><div class="rmlbl">${(m.m||'').split(' ')[0]}</div><div class="rmv">${m.c}<span class="dimv">/${m.r}</span></div></div>`).join('')
+        +`</div><div class="legendrow"><span><i class="sw" style="background:var(--b)"></i>создано</span><span><i class="sw" style="background:var(--ok)"></i>выиграно</span></div></section>`;
+    }
+    return h;
+  }
+  function draw(){
+    let h=`<header><div class="eyebrow">Квант · коммерсанты</div><h1>Эффективность менеджеров</h1><div class="sub"><span>Портфель: <b>${R.window}</b></span><span class="dimv">Клик по сотруднику — личный дашборд с контрольными точками.</span></div></header>`;
+    h+=navHtml()+(sel==='all'?overview():detail(byUid(sel)));
+    el.innerHTML=h;
+    el.querySelectorAll('[data-r]').forEach(b=>b.addEventListener('click',()=>{sel=b.dataset.r;draw();window.scrollTo(0,0);}));
+    if(sel!=='all'){ const r=byUid(sel);
+      el.querySelectorAll('[data-lvl]').forEach(n=>n.addEventListener('click',()=>{ const lv=n.dataset.lvl;
+        let list, title;
+        if(lv==='lost'){ list=r.deals.filter(d=>d.cls==='lost'); title=r.label+' · Проиграно'; }
+        else { const L=+lv; const fn=r.funnel.find(x=>x.k===L); title=r.label+' · '+(fn?fn.name:''); list=(L===0)?r.deals:r.deals.filter(d=>d.lvl!=null&&d.lvl>=L); }
+        openDeals(list,title,'Контрольная точка'); }));
+    }
+  }
+  draw();
+}
+renderReps(window.__REPS__);
 // ---- вкладка «Контракты»: один список заказов СП-172 с поиском и сортировкой
 (function(){
   const X=window.__CONTRACTS__, el=document.getElementById('tab-contracts'); if(!el) return;
@@ -961,7 +1031,7 @@ renderCohorts(window.__COMPANY__);
 document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{
   document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('act',x===b));
   const t=b.dataset.tab;
-  ['sourcing','company','kam','eng','prod','contracts','suppliers','cohorts'].forEach(n=>{const el=document.getElementById('tab-'+n); if(el) el.hidden=(n!==t);});
+  ['sourcing','company','kam','eng','prod','reps','contracts','suppliers','cohorts'].forEach(n=>{const el=document.getElementById('tab-'+n); if(el) el.hidden=(n!==t);});
   window.scrollTo(0,0);
 }));
 // ---- Сорсинг: скорость до первого запроса поставщикам (создание сделки → первый СП-166) ----
