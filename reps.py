@@ -27,6 +27,17 @@ REPS = [
     ("Зорин", r"\bzorin\b"),
     ("Володин", r"volodin"),
     ("Черкасов", r"cherkas"),
+    ("Филиппенко", r"filippenko|filipenko"),
+    # руководящий коммерческий блок
+    ("Морговский", r"morgovsky"),                 # Dmitry, CCO (не Olga Morgovskaya)
+    ("Чавкин", r"chavkin"),                       # Alexey, Deputy CO
+    ("Сокольников", r"vyacheslav sokolnikov"),    # Vyacheslav (не Kirill, Engineer)
+    # референсные коммерсанты (топ по числу сделок-2026, клиентский фронт)
+    ("Миловидов", r"milovidov"),                  # KAM, Shelf
+    ("Старкова", r"starkova"),                    # KAM, Mining
+    ("Швед", r"shved"),                           # Project Implementation Manager
+    ("Корнилова", r"kornilova"),                  # Project Manager
+    ("Шипулев", r"shipulev"),                     # Project Manager
 ]
 
 # контрольные точки (монотонная шкала уровней 0..5)
