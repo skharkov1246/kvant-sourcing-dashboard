@@ -73,12 +73,23 @@ async function fetchData(env, name) {
   try { return JSON.parse(m[1].replace(/<\\\//g, "</")); } catch (e) { return null; }
 }
 
+// крупные застрявшие сделки у отслеживаемых коммерсантов (открытые, без движения >30 дн)
+function repStuckBig(reps, minEur) {
+  const out = [];
+  for (const r of (reps && reps.reps) || [])
+    for (const d of r.deals || [])
+      if (d.stuck && d.cls === "early" && (d.raw || 0) >= minEur)
+        out.push({ rep: r.label, id: String(d.id), t: d.t, amt: d.amt, raw: d.raw || 0 });
+  return out;
+}
+
 // ---------- 2. алерты ----------
 async function checkAlerts(env) {
   if (!env.VISITS || !env.BASIC_AUTH_PASS) return;
   const contracts = await fetchData(env, "__CONTRACTS__");
   const company = await fetchData(env, "__COMPANY__");
-  if (!contracts && !company) return;
+  const reps = await fetchData(env, "__REPS__");
+  if (!contracts && !company && !reps) return;
 
   const minEur = parseInt(env.ALERT_MIN_EUR || "100000", 10);
   const rows = (contracts && contracts.rows) || [];
@@ -90,15 +101,18 @@ async function checkAlerts(env) {
   const maxSeq = Math.max(0, ...rows.map((r) => r.seq || 0));
   const overdue = deals.filter((d) => d.ovd && d.cls === "early" && (d.raw || 0) >= minEur);
 
+  const repStuck = repStuckBig(reps, minEur);
   if (!seeded) {
     await env.VISITS.put("alert:maxseq", String(maxSeq));
     for (const d of overdue) await env.VISITS.put("alert:ovd:" + d.id, "1", { expirationTtl: 60 * 60 * 24 * 60 });
+    for (const d of repStuck) await env.VISITS.put("alert:rs:" + d.id, "1", { expirationTtl: 60 * 60 * 24 * 60 });
     await env.VISITS.put("alert:init", "1");
     await sendEmail(env, "КВАНТ · дашборд — алерты включены",
       `<div style="font-family:-apple-system,Segoe UI,Roboto,sans-serif"><p>Алерты подключены. Дальше буду писать только когда появится новое:</p>
        <ul><li>новые сделки, переведённые в реализацию (по № реализации);</li>
-       <li>крупные (≥ ${minEur.toLocaleString("ru-RU")} €) сделки, застрявшие открытыми с прошедшим сроком.</li></ul>
-       <p style="color:#888;font-size:12px">Текущее состояние принято за точку отсчёта (№ реализации до ${maxSeq}, застрявших сейчас ${overdue.length}) — повторных писем по ним не будет.</p></div>`);
+       <li>крупные (≥ ${minEur.toLocaleString("ru-RU")} €) сделки, застрявшие открытыми с прошедшим сроком;</li>
+       <li>крупные застрявшие сделки у коммерсантов (Полупанов, Щуренков, Ситдиков, Зорин).</li></ul>
+       <p style="color:#888;font-size:12px">Текущее состояние принято за точку отсчёта (№ реализации до ${maxSeq}, застрявших сейчас ${overdue.length}, у коммерсантов ${repStuck.length}) — повторных писем по ним не будет.</p></div>`);
     return;
   }
 
@@ -132,9 +146,28 @@ async function checkAlerts(env) {
              <td style="padding:3px 0;text-align:right;color:#b3261e">${esc(d.amt || "")}</td></tr>`).join("")}</table>`);
   }
 
+  // 2c. крупные застрявшие у коммерсантов (открытые, без движения >30 дн), о которых ещё не писали
+  const newRs = [];
+  for (const d of repStuck) {
+    if (!(await env.VISITS.get("alert:rs:" + d.id))) {
+      newRs.push(d);
+      await env.VISITS.put("alert:rs:" + d.id, "1", { expirationTtl: 60 * 60 * 24 * 60 });
+    }
+  }
+  if (newRs.length) {
+    newRs.sort((a, b) => b.raw - a.raw);
+    blocks.push(`<h3 style="margin:14px 0 6px">🟠 Застряли у коммерсантов (${newRs.length})</h3>
+      <div style="color:#888;font-size:12px;margin-bottom:4px">открытые сделки менеджеров без движения по стадиям &gt;30 дн, сумма ≥ ${minEur.toLocaleString("ru-RU")} €</div>
+      <table style="border-collapse:collapse;font-size:13px">${newRs.map((d) =>
+        `<tr><td style="padding:3px 12px 3px 0;font-weight:600">${esc(d.rep)}</td>
+             <td style="padding:3px 12px 3px 0">${esc(d.t || "")}</td>
+             <td style="padding:3px 0;text-align:right;color:#b3261e">${esc(d.amt || "")}</td></tr>`).join("")}</table>`);
+  }
+
   if (!blocks.length) return; // ничего нового — молчим
-  const n1 = fresh.length, n2 = newOvd.length;
-  const subj = [n1 ? `${n1} в реализацию` : "", n2 ? `${n2} застрявших` : ""].filter(Boolean).join(" · ");
+  const n1 = fresh.length, n2 = newOvd.length, n3 = newRs.length;
+  const subj = [n1 ? `${n1} в реализацию` : "", n2 ? `${n2} застрявших` : "",
+                n3 ? `${n3} у коммерсантов` : ""].filter(Boolean).join(" · ");
   await sendEmail(env, `КВАНТ · дашборд: ${subj}`,
     `<div style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;color:#1a1a1a">${blocks.join("")}
      <p style="margin:16px 0 0;color:#999;font-size:12px">Алерт сформирован планировщиком по свежим данным дашборда. Подробности — на дашборде.</p></div>`);
