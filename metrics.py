@@ -160,8 +160,23 @@ def build(
     tkp_all = chain.get("tkp", 0)
 
     # ---- покрытие сделок периода сорсингом
+    # Запрос ОЖИДАЕТСЯ только у живых оценённых сделок: есть сумма (оценили) и сделка не закрыта-минус
+    # (не отказ/отмена/проигрыш, статус ≠ F), и это не сделка-RFQ самого сорсинга (тайтл с «RFQ»).
+    # €0 (ещё не оценили) / бюджетные оценки / отказы — это «запрос не требуется (пока)», а не пропуск.
+    def _req_expected(d):
+        t = str(d.get("TITLE") or "")
+        if float(d.get("OPPORTUNITY") or 0) <= 0:
+            return False
+        if (d.get("STAGE_SEMANTIC_ID") or "").upper() == "F":
+            return False
+        if t.strip().upper().startswith("RFQ"):
+            return False
+        if "test" in t.lower() or "тест" in t.lower():
+            return False
+        return True
     rfq_by_deal: Counter = Counter(str(r.get("parentId2")) for r in rfqs if r.get("parentId2"))
-    period_ids = [str(d["ID"]) for d in period_deals]
+    expected = [d for d in period_deals if _req_expected(d)]
+    period_ids = [str(d["ID"]) for d in expected]
     covered = [did for did in period_ids if rfq_by_deal.get(did, 0) > 0]
     n_deals = len(period_ids)
     with_req = len(covered)
@@ -172,9 +187,8 @@ def build(
     hist_c = Counter(hbucket(rfq_by_deal[d]) for d in covered)
     hist = [{"l": l, "v": hist_c.get(l, 0)} for l in ("1 пост.", "2–3", "4–5", "6+")]
 
-    cat_of = {str(d["ID"]): str(d.get("CATEGORY_ID")) for d in period_deals}
     by_cat = defaultdict(lambda: {"deals": 0, "withReq": 0, "reqs": 0})
-    for d in period_deals:
+    for d in expected:
         cid = str(d.get("CATEGORY_ID"))
         by_cat[cid]["deals"] += 1
         did = str(d["ID"])
