@@ -21,16 +21,19 @@ const GH_REPO = "skharkov1246/kvant-sourcing-dashboard";
 const REPORT_CRON = "5 21 * * *";   // 00:05 МСК — дневной отчёт о посетителях
 const ALERT_CRON = "37 */2 * * *";  // :37 чётных часов — проверка алертов (на ~30 мин позже пересборки)
 
+const SCAN_CRON = "0 21 * * *";     // 00:00 МСК — суточный скан чатов сделок (тяжёлый, раз в сутки)
+
 export default {
   async scheduled(event, env, ctx) {
     if (event.cron === REPORT_CRON) ctx.waitUntil(sendDailyReport(env));
     else if (event.cron === ALERT_CRON) ctx.waitUntil(checkAlerts(env));
-    else ctx.waitUntil(triggerRebuild(env));
+    else if (event.cron === SCAN_CRON) ctx.waitUntil(triggerDispatch(env, "scan"));
+    else ctx.waitUntil(triggerDispatch(env, "rebuild"));
   },
 };
 
-// ---------- 1. пересборка дашборда ----------
-async function triggerRebuild(env) {
+// ---------- 1. триггер GitHub-воркфлоу (пересборка дашборда / суточный скан) ----------
+async function triggerDispatch(env, eventType) {
   if (!env.GH_DISPATCH_TOKEN) return;
   await fetch(`https://api.github.com/repos/${GH_REPO}/dispatches`, {
     method: "POST",
@@ -40,7 +43,7 @@ async function triggerRebuild(env) {
       "User-Agent": "kvant-dashboard-scheduler",
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ event_type: "rebuild" }),
+    body: JSON.stringify({ event_type: eventType }),
   });
 }
 
@@ -83,6 +86,18 @@ function repStuckBig(reps, minEur) {
   return out;
 }
 
+// БРОШЕНО в чатах сделок: ждут ответа менеджера дольше суток (зашквар) — алертим только это
+const NEGLECT_H = 24;
+function repPending(reps) {
+  const out = [];
+  for (const r of (reps && reps.reps) || [])
+    for (const w of (r.react && r.react.waiting) || [])
+      if ((w.ageH || 0) >= NEGLECT_H)
+        out.push({ rep: r.label, key: String(w.chat), deal: w.deal, t: w.t,
+                   ageH: w.ageH, ageDays: w.ageDays, kind: w.kind });
+  return out;
+}
+
 // ---------- 2. алерты ----------
 async function checkAlerts(env) {
   if (!env.VISITS || !env.BASIC_AUTH_PASS) return;
@@ -102,17 +117,20 @@ async function checkAlerts(env) {
   const overdue = deals.filter((d) => d.ovd && d.cls === "early" && (d.raw || 0) >= minEur);
 
   const repStuck = repStuckBig(reps, minEur);
+  const pending = repPending(reps);
   if (!seeded) {
     await env.VISITS.put("alert:maxseq", String(maxSeq));
     for (const d of overdue) await env.VISITS.put("alert:ovd:" + d.id, "1", { expirationTtl: 60 * 60 * 24 * 60 });
     for (const d of repStuck) await env.VISITS.put("alert:rs:" + d.id, "1", { expirationTtl: 60 * 60 * 24 * 60 });
+    for (const p of pending) await env.VISITS.put("alert:pend:" + p.key, "1", { expirationTtl: 60 * 60 * 24 * 45 });
     await env.VISITS.put("alert:init", "1");
     await sendEmail(env, "КВАНТ · дашборд — алерты включены",
       `<div style="font-family:-apple-system,Segoe UI,Roboto,sans-serif"><p>Алерты подключены. Дальше буду писать только когда появится новое:</p>
        <ul><li>новые сделки, переведённые в реализацию (по № реализации);</li>
        <li>крупные (≥ ${minEur.toLocaleString("ru-RU")} €) сделки, застрявшие открытыми с прошедшим сроком;</li>
-       <li>крупные застрявшие сделки у коммерсантов (Полупанов, Щуренков, Ситдиков, Зорин).</li></ul>
-       <p style="color:#888;font-size:12px">Текущее состояние принято за точку отсчёта (№ реализации до ${maxSeq}, застрявших сейчас ${overdue.length}, у коммерсантов ${repStuck.length}) — повторных писем по ним не будет.</p></div>`);
+       <li>крупные застрявшие сделки у коммерсантов;</li>
+       <li>@упоминания в чатах сделок, висящие без ответа дольше целевого срока.</li></ul>
+       <p style="color:#888;font-size:12px">Текущее состояние принято за точку отсчёта (№ до ${maxSeq}, застрявших ${overdue.length}, у коммерсантов ${repStuck.length}, без ответа в чатах ${pending.length}) — повторных писем по ним не будет.</p></div>`);
     return;
   }
 
@@ -164,10 +182,29 @@ async function checkAlerts(env) {
              <td style="padding:3px 0;text-align:right;color:#b3261e">${esc(d.amt || "")}</td></tr>`).join("")}</table>`);
   }
 
+  // 2d. новые «висящие» @упоминания в чатах сделок (без ответа дольше SLA)
+  const newPend = [];
+  for (const p of pending) {
+    if (!(await env.VISITS.get("alert:pend:" + p.key))) {
+      newPend.push(p);
+      await env.VISITS.put("alert:pend:" + p.key, "1", { expirationTtl: 60 * 60 * 24 * 45 });
+    }
+  }
+  if (newPend.length) {
+    newPend.sort((a, b) => (b.ageH || 0) - (a.ageH || 0));
+    blocks.push(`<h3 style="margin:14px 0 6px">🔴 Брошены в чатах сделок (${newPend.length})</h3>
+      <div style="color:#888;font-size:12px;margin-bottom:4px">ждут ответа менеджера дольше суток (запрос без ответа или его сделка с чужим последним сообщением)</div>
+      <table style="border-collapse:collapse;font-size:13px">${newPend.map((p) =>
+        `<tr><td style="padding:3px 12px 3px 0;font-weight:600">${esc(p.rep)}</td>
+             <td style="padding:3px 12px 3px 0">${esc(p.t || ("Сделка #" + p.deal))}</td>
+             <td style="padding:3px 12px 3px 0;color:#888">${esc(p.kind || "")}</td>
+             <td style="padding:3px 0;text-align:right;color:#b3261e">${esc(p.ageDays)} дн</td></tr>`).join("")}</table>`);
+  }
+
   if (!blocks.length) return; // ничего нового — молчим
-  const n1 = fresh.length, n2 = newOvd.length, n3 = newRs.length;
+  const n1 = fresh.length, n2 = newOvd.length, n3 = newRs.length, n4 = newPend.length;
   const subj = [n1 ? `${n1} в реализацию` : "", n2 ? `${n2} застрявших` : "",
-                n3 ? `${n3} у коммерсантов` : ""].filter(Boolean).join(" · ");
+                n3 ? `${n3} у коммерсантов` : "", n4 ? `${n4} без ответа` : ""].filter(Boolean).join(" · ");
   await sendEmail(env, `КВАНТ · дашборд: ${subj}`,
     `<div style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;color:#1a1a1a">${blocks.join("")}
      <p style="margin:16px 0 0;color:#999;font-size:12px">Алерт сформирован планировщиком по свежим данным дашборда. Подробности — на дашборде.</p></div>`);
