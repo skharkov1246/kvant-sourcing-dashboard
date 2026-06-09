@@ -192,10 +192,17 @@ def run(args) -> int:
     print("• Отправлено vs создано (письма)…")
     m["send"] = _send_stats(client, rfqs, m["sourcersA"], dept_a_ids, p.start_iso, p.end_iso)
 
-    # список непокрытых сделок (созданы в окне, нет ни одного запроса поставщику)
+    # список непокрытых сделок: только там, где запрос ОЖИДАЕТСЯ — живые оценённые сделки
+    # (есть сумма, статус ≠ F, не сделка-RFQ сорсинга). €0/БО/отказы/отмены — «запрос не требуется».
+    # (предикат должен совпадать с metrics._req_expected)
+    _exp = lambda d: (float(d.get("OPPORTUNITY") or 0) > 0
+                      and (d.get("STAGE_SEMANTIC_ID") or "").upper() != "F"
+                      and not str(d.get("TITLE") or "").strip().upper().startswith("RFQ")
+                      and "test" not in str(d.get("TITLE") or "").lower()
+                      and "тест" not in str(d.get("TITLE") or "").lower())
     try:
         _rfqpar = {str(r.get("parentId2")) for r in rfqs if r.get("parentId2")}
-        _unc = [d for d in period_deals if str(d["ID"]) not in _rfqpar]
+        _unc = [d for d in period_deals if str(d["ID"]) not in _rfqpar and _exp(d)]
         _cur = client.call("crm.currency.list", {}) or []
         _rate = {x.get("CURRENCY"): (float(x.get("AMOUNT") or 1) / float(x.get("AMOUNT_CNT") or 1)) for x in _cur}
         _eur = lambda o, cu: float(o or 0) * _rate.get(cu, 1.0)
@@ -227,6 +234,8 @@ def run(args) -> int:
                 return None
         _wk_created = Counter()
         for d in period_deals:
+            if not _exp(d):            # знаменатель недели — только сделки, где запрос ожидается
+                continue
             mo = _mon_of(d.get("DATE_CREATE"))
             if mo:
                 _wk_created[mo] += 1
