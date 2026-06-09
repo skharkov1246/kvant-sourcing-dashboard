@@ -13,3 +13,7 @@ public/*.html
 agent/corpus.json
 
 .DS_Store
+
+# локальный кэш wrangler
+scheduler/.wrangler/
+.wrangler/

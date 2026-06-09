@@ -1,0 +1,47 @@
+name: Daily chat snapshot
+
+# Суточный скан чатов сделок (тяжёлый: сотни запросов) — РАЗ В СУТКИ, не при каждой пересборке.
+# Пишет data/chat_snapshot.json (реакция коммерсантов; среднее за неделю собирает дашборд).
+# Надёжный триггер — repository_dispatch {"event_type":"scan"} от Cloudflare-планировщика в 00:00 МСК;
+# cron — резерв. AI-оценку (вовлечённость/проф.) НЕ трогает (её ставит Opus отдельно).
+on:
+  repository_dispatch:
+    types: [scan]
+  schedule:
+    - cron: "0 21 * * *"      # 00:00 МСК (резерв; GitHub-крон может опаздывать)
+  workflow_dispatch: {}
+
+permissions:
+  contents: write             # коммитим обновлённый снимок
+
+concurrency:
+  group: chat-scan
+  cancel-in-progress: false
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Установка зависимостей
+        run: pip install -r requirements.txt
+      - name: Скан чатов сделок → снимок
+        env:
+          BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
+        run: python chat_scan.py
+      - name: Коммит снимка
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/chat_snapshot.json
+          if git diff --cached --quiet; then
+            echo "снимок без изменений"
+          else
+            git commit -m "chore: суточный снимок чатов сделок ($(date -u +%F))"
+            git push
+          fi
