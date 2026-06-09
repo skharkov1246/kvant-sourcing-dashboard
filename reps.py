@@ -25,6 +25,8 @@ REPS = [
     ("Щуренков", r"shchurenkov|schurenkov|shurenkov"),
     ("Ситдиков", r"sitdikov"),
     ("Зорин", r"\bzorin\b"),
+    ("Володин", r"volodin"),
+    ("Черкасов", r"cherkas"),
 ]
 
 # контрольные точки (монотонная шкала уровней 0..5)
