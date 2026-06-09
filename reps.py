@@ -1,7 +1,7 @@
 """Вкладка «Коммерсанты» — персональные дашборды менеджеров с контрольными точками.
 
 Считает по 4 коммерческим сотрудникам (можно расширить) измеримые KPI:
-  ОБЪЁМ:    активных сделок + Σ пайплайн (€); создано (портфель с 2025).
+  ОБЪЁМ:    активных сделок + Σ пайплайн (€); создано (сделки ЭТОГО года, с 01.01.2026).
   РЕЗУЛЬТАТ: в реализации (шт) + конверсия %; продажи (€); маржа (€); средний чек.
   КАЧЕСТВО: проиграно (шт); win-rate = выиграно ÷ (выиграно+проиграно).
   СКОРОСТЬ: ср. срок создание→реализация (дней, из истории стадий).
@@ -17,7 +17,7 @@ from collections import Counter, defaultdict
 
 from bitrix_client import BitrixClient
 
-COHORT_START = "2025-01-01T00:00:00"
+YEAR_START = "2026-01-01T00:00:00"   # работаем только в этом году
 
 # кого показываем (имя для вкладки → паттерн поиска в имени пользователя Bitrix)
 REPS = [
@@ -197,7 +197,7 @@ def scan_chat_reaction(client, *, as_of=None, collect_samples=False):
         if uid:
             rep_ids[label] = str(uid)
     ids = list(rep_ids.values())
-    deals = client.list_deals_fast(filter={">=DATE_CREATE": COHORT_START, "ASSIGNED_BY_ID": ids},
+    deals = client.list_deals_fast(filter={">=DATE_CREATE": YEAR_START, "ASSIGNED_BY_ID": ids},
                                    select=["ID", "TITLE", "ASSIGNED_BY_ID", "CATEGORY_ID"])
     downer = {}; dstage = {}
     idset = set(ids)
@@ -292,7 +292,7 @@ def compute(client: BitrixClient, *, realize_date: dict | None = None, as_of: dt
 
     # сделки этих менеджеров с 2025 (портфель целиком)
     deals = client.list_deals_fast(
-        filter={">=DATE_CREATE": COHORT_START, "ASSIGNED_BY_ID": ids},
+        filter={">=DATE_CREATE": YEAR_START, "ASSIGNED_BY_ID": ids},
         select=["ID", "TITLE", "ASSIGNED_BY_ID", "STAGE_ID", "STAGE_SEMANTIC_ID", "CATEGORY_ID",
                 "OPPORTUNITY", "CURRENCY_ID", "DATE_CREATE", "CLOSEDATE", "MOVED_TIME", "COMPANY_ID"])
 
@@ -305,7 +305,7 @@ def compute(client: BitrixClient, *, realize_date: dict | None = None, as_of: dt
             stage_name[str(s.get("STATUS_ID"))] = s.get("NAME") or ""
 
     # заказы поставщикам (закупка/контрактность) с 2025
-    orders = client.list_items(172, filter={">=createdTime": COHORT_START},
+    orders = client.list_items(172, filter={">=createdTime": YEAR_START},
                                select=["id", "stageId", "opportunity", "currencyId", "parentId2"])
     orders = [o for o in orders if not str(o.get("stageId", "")).endswith(":FAIL")]
     order_parents = {str(o.get("parentId2")) for o in orders if o.get("parentId2")}
@@ -446,7 +446,7 @@ def compute(client: BitrixClient, *, realize_date: dict | None = None, as_of: dt
     return {
         "reps": reps_out,
         "labels": [r["label"] for r in reps_out],
-        "window": f"01.01.2025 – {today.strftime('%d.%m.%Y')}",
+        "window": f"01.01.2026 – {today.strftime('%d.%m.%Y')}",
         "slaMin": REACT_SLA_MIN,
         "reactDays": REACT_DAYS,
     }
