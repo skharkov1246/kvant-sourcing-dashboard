@@ -1,0 +1,56 @@
+name: ZIP customs — glbs.io recon/pull
+
+# Заход на glbs.io (Глобус-ВЭД) из GitHub Actions (где есть сеть) для таможенной
+# статистики. Шаг 1 — recon: логин по секретам GLBS_USER/GLBS_PASS и выгрузка
+# структуры страниц как артефактов (по ним пишется точный парсер). Пароль — только
+# в секретах репозитория, в коде/логах его нет.
+#
+# Нужны секреты: Settings → Secrets and variables → Actions →
+#   GLBS_USER = aep@kvantpro.com
+#   GLBS_PASS = <пароль glbs.io>
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "recon (собрать структуру сайта) | pull (выгрузка — после калибровки)"
+        default: "recon"
+        type: choice
+        options: ["recon", "pull"]
+
+permissions:
+  contents: read
+
+jobs:
+  glbs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Установка Playwright + Chromium
+        run: |
+          npm i -D playwright@1.56.1
+          npx playwright install --with-deps chromium
+
+      - name: Recon glbs.io
+        if: ${{ inputs.mode == 'recon' }}
+        env:
+          GLBS_USER: ${{ secrets.GLBS_USER }}
+          GLBS_PASS: ${{ secrets.GLBS_PASS }}
+        run: |
+          if [ -z "${GLBS_USER:-}" ] || [ -z "${GLBS_PASS:-}" ]; then
+            echo "::error::Задайте секреты GLBS_USER и GLBS_PASS в настройках репозитория."
+            exit 1
+          fi
+          node zip/customs/glbs_recon.mjs || true
+
+      - name: Выгрузка артефактов разведки
+        if: ${{ inputs.mode == 'recon' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: glbs-recon
+          path: zip/customs/recon
+          if-no-files-found: warn
