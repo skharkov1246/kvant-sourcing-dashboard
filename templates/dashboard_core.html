@@ -3,11 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0e1116">
 <title>__TITLE__</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
 <style>
+  /* Самохостинг шрифтов (public/fonts, woff2, сабсеты cyr+lat) — ноль внешних запросов.
+     Archivo/Plex Sans — вариативные файлы (один на семейство и сабсет). */
+  @font-face{font-family:'Archivo';font-style:normal;font-weight:700 800;font-display:swap;src:url(fonts/archivo-var-lat.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+  @font-face{font-family:'IBM Plex Mono';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/ibm-plex-mono-500-cyr.woff2) format('woff2');unicode-range:U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116}
+  @font-face{font-family:'IBM Plex Mono';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/ibm-plex-mono-500-lat.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+  @font-face{font-family:'IBM Plex Mono';font-style:normal;font-weight:600;font-display:swap;src:url(fonts/ibm-plex-mono-600-cyr.woff2) format('woff2');unicode-range:U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116}
+  @font-face{font-family:'IBM Plex Mono';font-style:normal;font-weight:600;font-display:swap;src:url(fonts/ibm-plex-mono-600-lat.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+  @font-face{font-family:'IBM Plex Sans';font-style:normal;font-weight:400 600;font-display:swap;src:url(fonts/ibm-plex-sans-var-cyr.woff2) format('woff2');unicode-range:U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116}
+  @font-face{font-family:'IBM Plex Sans';font-style:normal;font-weight:400 600;font-display:swap;src:url(fonts/ibm-plex-sans-var-lat.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+
   :root{
     --bg:#0e1116;--panel:#161b22;--panel2:#1c232d;--line:#2a323d;
     --ink:#e8edf2;--mut:#8b97a6;--dim:#5d6878;
@@ -17,12 +26,12 @@
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
-  body{padding:34px 30px 60px;max-width:1180px;margin:0 auto;
+  body{padding:clamp(18px,3.5vw,34px) clamp(14px,2.8vw,30px) 60px;max-width:1180px;margin:0 auto;
     background-image:radial-gradient(1100px 420px at 80% -8%,rgba(245,165,36,.07),transparent 60%),radial-gradient(900px 380px at 6% 0%,rgba(58,166,185,.06),transparent 55%);}
   .mono{font-family:var(--mono)}
   header{border-bottom:1px solid var(--line);padding-bottom:20px;margin-bottom:24px}
   .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--a);font-weight:600}
-  h1{font-family:'Archivo';font-weight:800;font-size:30px;line-height:1.08;margin-top:9px;letter-spacing:-.01em}
+  h1{font-family:'Archivo';font-weight:800;font-size:clamp(21px,4.2vw,30px);line-height:1.12;margin-top:9px;letter-spacing:-.01em;text-wrap:balance}
   .sub{margin-top:11px;color:var(--mut);font-size:13.5px;display:flex;gap:18px;flex-wrap:wrap}
   .sub b{color:var(--ink);font-weight:600}
 
@@ -39,8 +48,8 @@
   .secttl b{color:var(--a2);font-weight:800}
   .secttl::after{content:"";flex:1;height:1px;background:var(--line)}
   .grid{display:grid;grid-template-columns:1.6fr 1fr;gap:22px;align-items:start}
-  @media(max-width:880px){.grid{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}}
-  section.card{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:20px 22px;margin-bottom:22px}
+  .grid,.grid>div{min-width:0} /* колонки могут ужиматься — скролл остаётся внутри карточек */
+  section.card{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:20px 22px;margin-bottom:22px;box-shadow:0 12px 30px -24px rgba(0,0,0,.7)}
   .card h2{font-family:'Archivo';font-size:16px;font-weight:700;display:flex;align-items:center;gap:10px}
   .tag{font-family:var(--mono);font-size:10.5px;font-weight:600;padding:3px 8px;border-radius:6px;letter-spacing:.04em}
   .tag.a{background:rgba(245,165,36,.14);color:var(--a2);border:1px solid rgba(245,165,36,.3)}
@@ -139,24 +148,19 @@
   @keyframes ubpulse{0%{box-shadow:0 0 0 0 rgba(78,201,138,.5)}70%{box-shadow:0 0 0 6px rgba(78,201,138,0)}100%{box-shadow:0 0 0 0 rgba(78,201,138,0)}}
 
   /* кликабельные строки сорсеров + выезжающая панель «кому/какие» */
-  tr.clickrow,.row.clickrow{cursor:pointer}
-  tr.clickrow:hover td{background:rgba(245,165,36,.06)}
+  tr.clickrow,.row.clickrow,.drill{cursor:pointer}
+  tr.clickrow:hover td,tr.drill:hover td{background:rgba(245,165,36,.06)}
   .row.clickrow:hover{background:rgba(245,165,36,.05);border-radius:8px}
-  .clickrow .who::after,.clickrow .nm::after{content:" ›";color:var(--a);font-weight:700}
-  /* кликабельные элементы отраслевых вкладок (KPI / строки групп и людей / бары) */
-  .drill{cursor:pointer}
-  tr.drill:hover td{background:rgba(245,165,36,.06)}
-  tr.drill .who::after{content:" ›";color:var(--a);font-weight:700}
+  /* кликабельные элементы (строки сорсеров, отраслевые вкладки, владельцы) */
+  .clickrow .who::after,.clickrow .nm::after,tr.drill .who::after,.ownrow .who::after{content:" ›";color:var(--a);font-weight:700}
   .kpi.drill{transition:border-color .12s,transform .12s}
   .kpi.drill:hover{border-color:var(--a);transform:translateY(-1px)}
   .kpi.drill .lbl::after{content:" ›";color:var(--a)}
-  .blrow.drill{cursor:pointer;border-radius:8px;transition:background .12s}
+  .blrow.drill{border-radius:8px;transition:background .12s}
   .blrow.drill:hover{background:rgba(245,165,36,.05)}
   .req .rm .amt{margin-left:auto;color:var(--ok)}
   /* интерактивные графики «Пульса» */
-  .wkbar.drill,.wkcol.drill{cursor:pointer}
   .wkcol.drill:hover .wkbar{filter:brightness(1.25)}
-  td.cell.drill{cursor:pointer}
   td.cell.drill:hover{background:rgba(245,165,36,.12)!important;color:var(--ink)}
   .flowbox.drill{cursor:pointer;transition:transform .12s}
   .flowbox.drill:hover{transform:translateY(-2px)}
@@ -167,7 +171,6 @@
   .ownrow .obar{flex:1;height:6px;border-radius:3px;background:var(--panel2);overflow:hidden}
   .ownrow .obar i{display:block;height:100%;background:linear-gradient(90deg,var(--a),var(--a2))}
   .ownrow .ocnt{font-family:var(--mono);font-size:12px;color:var(--a2);min-width:74px;text-align:right}
-  .ownrow .who::after{content:" ›";color:var(--a);font-weight:700}
   /* вкладка «Контракты» */
   .ctools{margin:0 0 12px}
   .search{width:100%;max-width:520px;padding:9px 13px;border-radius:9px;border:1px solid var(--line);background:var(--panel2);color:var(--ink);font-size:13px;font-family:inherit}
@@ -265,12 +268,48 @@
   .rmbars i{width:14px;border-radius:3px 3px 0 0;display:block;min-height:2px}
   .rmc{background:linear-gradient(180deg,var(--b2),var(--b))}.rmr{background:var(--ok)}
   .rmlbl{font:11px/1 var(--mono);color:var(--mut)}.rmv{font:11px/1 var(--mono);color:var(--ink)}
-  .tabs{display:flex;gap:8px;margin-bottom:18px}
-  .tab{font-family:var(--mono);font-size:12px;padding:7px 14px;border-radius:8px;border:1px solid var(--line);color:var(--mut);background:var(--panel);cursor:pointer}
+  .tabs{display:flex;gap:8px;margin:0 -2px 18px;padding:8px 2px;position:sticky;top:0;z-index:30;background:var(--bg);overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .tabs::-webkit-scrollbar{display:none}
+  .tab{font-family:var(--mono);font-size:12px;padding:7px 14px;border-radius:8px;border:1px solid var(--line);color:var(--mut);background:var(--panel);cursor:pointer;white-space:nowrap;flex:none;transition:color .12s,border-color .12s}
+  .tab:hover{color:var(--ink);border-color:var(--a)}
   .tab.act{color:#0e1116;background:var(--a2);border-color:var(--a2);font-weight:700}
   .flow{display:flex;gap:10px;margin-top:12px}
   .flowbox{flex:1;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px;text-align:center}
   .flowbox .n{font-family:'Archivo';font-weight:800;font-size:22px}.flowbox .l{font-size:11px;color:var(--mut);margin-top:3px}
+
+  /* ---- доступность: видимый фокус с клавиатуры ---- */
+  .tab:focus-visible,.snb:focus-visible,.sortt:focus-visible,.stchip:focus-visible,.qq:focus-visible,.drw .x:focus-visible{outline:2px solid var(--a);outline-offset:2px}
+  .search:focus-visible{outline:2px solid var(--a);outline-offset:1px}
+
+  /* ---- адаптив: планшет → мобилка (в конце файла — перекрывает базовые правила) ---- */
+  @media(max-width:1024px){
+    .kpis{grid-template-columns:repeat(3,1fr)}
+  }
+  @media(max-width:880px){
+    .grid{grid-template-columns:1fr}
+    .kpis{grid-template-columns:repeat(2,1fr)!important} /* !important перекрывает inline-стиль #kpisCov */
+  }
+  @media(max-width:720px){
+    section.card{overflow-x:auto;padding:16px 16px}
+    section.card table{min-width:560px}
+    .flow{flex-wrap:wrap}.flowbox{flex:1 1 44%}
+    .updbar{flex-wrap:wrap;row-gap:3px}
+    .cohlbl{min-width:110px}
+    .drw{width:100vw;border-left:0}
+    .wkchart{gap:10px}.wkbar{width:18px}
+    .piewrap{justify-content:center}
+  }
+  @media(max-width:440px){
+    .kpi .val{font-size:22px}
+    .sub{gap:6px 14px;font-size:12.5px}
+    .wkchart{gap:6px}.wkbar{width:14px}.wkbar span{font-size:10px}
+    .flowbox{flex:1 1 100%}
+  }
+
+  /* ---- perf/удобство: отключаем анимации по системной настройке ---- */
+  @media(prefers-reduced-motion:reduce){
+    *,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}
+  }
 </style>
 </head>
 <body>
@@ -602,7 +641,11 @@ function closeDrw(){_ovl.classList.remove('on');_drw.classList.remove('on');_drw
 _ovl.addEventListener('click',closeDrw);
 document.getElementById('drwX').addEventListener('click',closeDrw);
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDrw();});
-document.querySelectorAll('[data-uid]').forEach(el=>el.addEventListener('click',()=>openDrw(el.dataset.uid)));
+// делегирование: один обработчик на документ вместо слушателя на каждой строке
+document.addEventListener('click',e=>{
+  if(e.target.closest('.qq'))return;
+  const n=e.target.closest('[data-uid]'); if(n) openDrw(n.dataset.uid);
+});
 
 // ---- вкладка «Пульс компании»
 // ---- Пульс компании: управленческий обзор (полностью рендерится из window.__COMPANY__)
@@ -810,7 +853,13 @@ function openMeth(key){
   _ovl.classList.add('on');_drw.classList.add('on');_drw.setAttribute('aria-hidden','false');
 }
 const qmark=k=>`<span class="qq" data-meth="${k}">?</span>`;
-function _qqNode(key){const s=document.createElement('span');s.className='qq';s.textContent='?';s.title='как считается';s.dataset.meth=key;s._b=1;s.addEventListener('click',e=>{e.stopPropagation();openMeth(key);});return s;}
+// делегирование бейджей «?»: capture-фаза гасит клик ДО прямых обработчиков строк/KPI,
+// поэтому работает и для бейджей в динамически отрисованных вкладках без перепривязки
+document.addEventListener('click',e=>{
+  const q=e.target.closest('.qq[data-meth]');
+  if(q){ e.stopPropagation(); openMeth(q.dataset.meth); }
+},true);
+function _qqNode(key){const s=document.createElement('span');s.className='qq';s.textContent='?';s.title='как считается';s.dataset.meth=key;return s;}
 function injectMeth(){
   const add=(el,key)=>{ if(el&&!el.querySelector(':scope > .qq')) el.appendChild(_qqNode(key)); };
   // Пульс/отраслевые/контракты рендерят бейджи «?» инлайн (qmark). Здесь — только секции «Сорсинга».
@@ -823,8 +872,6 @@ function injectMeth(){
     if(k)add(s,k);
   });
   const sh=document.querySelector('#tab-sourcing header h1'); if(sh) add(sh,'s.kpi');
-  // делегирование для бейджей, добавленных как HTML (отраслевые вкладки)
-  document.querySelectorAll('.qq[data-meth]').forEach(b=>{ if(!b._b){b._b=1; b.addEventListener('click',e=>{e.stopPropagation();openMeth(b.dataset.meth);});} });
 }
 function openDir(D,opt,spec){
   const i=spec.indexOf(':'),kind=spec.slice(0,i),key=spec.slice(i+1);
@@ -876,10 +923,6 @@ function renderDir(D, elId, opt){
   el.innerHTML=h;
   el.querySelectorAll('[data-drill]').forEach(n=>n.addEventListener('click',ev=>{ if(ev.target.closest('.qq'))return; openDir(D,opt,n.dataset.drill); }));
 }
-renderDir(window.__KAM__,'tab-kam',{eyebrow:'Квант · коммерческий департамент',title:'КАМы — клиентские направления',sec1:'Клиентские направления',sec2:'направлениям',unit:'Направление'});
-renderDir(window.__ENG__,'tab-eng',{eyebrow:'Квант · инжиниринг',title:'Инжиниринг — проекты, заказы, выручка',sec1:'Инженерные группы',sec2:'группам',unit:'Группа'});
-renderDir(window.__PRODUCT__,'tab-prod',{eyebrow:'Квант · продуктовые линии',title:'Продукт-оунеры — линейки оборудования',sec1:'Продуктовые линии',sec2:'линиям',unit:'Линия'});
-renderPulse(window.__COMPANY__);
 // ---- Когортный анализ: сделки по кварталу/месяцу создания → успехи (реализация)
 function renderCohorts(C){
   const el=document.getElementById('tab-cohorts'); if(!el) return;
@@ -921,7 +964,6 @@ function renderCohorts(C){
     else if(mn){ const mk=mn.dataset.m; openDeals(D.filter(d=>d.mon===mk),'Когорта по месяцу','Создано в месяце'); }
   });
 }
-renderCohorts(window.__COMPANY__);
 // ---- вкладка «Коммерсанты»: персональные дашборды + контрольные точки
 function renderReps(R){
   const el=document.getElementById('tab-reps'); if(!el) return;
@@ -1011,9 +1053,8 @@ function renderReps(R){
   }
   draw();
 }
-renderReps(window.__REPS__);
 // ---- вкладка «Контракты»: один список заказов СП-172 с поиском и сортировкой
-(function(){
+function renderContracts(){
   const X=window.__CONTRACTS__, el=document.getElementById('tab-contracts'); if(!el) return;
   if(!X){ el.innerHTML='<div class="note" style="padding:20px 0">нет данных по контрактам</div>'; return; }
   let sortKey='seq', sortDir=-1, q='';
@@ -1041,9 +1082,9 @@ renderReps(window.__REPS__);
   head(); rows();
   document.getElementById('ctSearch').addEventListener('input',e=>{q=e.target.value; rows();});
   document.getElementById('ctHead').addEventListener('click',e=>{const th=e.target.closest('th.sortable'); if(!th)return; const kk=th.dataset.sk; if(sortKey===kk)sortDir=-sortDir; else {sortKey=kk; sortDir=(NUM[kk]?-1:1);} head(); rows();});
-})();
+}
 // ---- вкладка «Поставщики»: список по обороту (Σ закупок СП-172)
-(function(){
+function renderSuppliers(){
   const X=(window.__CONTRACTS__&&window.__CONTRACTS__.suppliers), el=document.getElementById('tab-suppliers'); if(!el) return;
   if(!X||!X.rows){ el.innerHTML='<div class="note" style="padding:20px 0">нет данных по поставщикам</div>'; return; }
   let sortKey='buy', sortDir=-1, q='';
@@ -1065,10 +1106,25 @@ renderReps(window.__REPS__);
   head(); rows();
   document.getElementById('spSearch').addEventListener('input',e=>{q=e.target.value; rows();});
   document.getElementById('spHead').addEventListener('click',e=>{const th=e.target.closest('th.sortable'); if(!th)return; const kk=th.dataset.sk; if(sortKey===kk)sortDir=-sortDir; else {sortKey=kk; sortDir=(NUM[kk]?-1:1);} head(); rows();});
-})();
+}
+// ---- ленивый рендер вкладок: тяжёлые вкладки строятся при первом открытии,
+// первый рендер страницы делает только «Сорсинг» (виден по умолчанию)
+const LAZY={
+  company:()=>renderPulse(window.__COMPANY__),
+  kam:()=>renderDir(window.__KAM__,'tab-kam',{eyebrow:'Квант · коммерческий департамент',title:'КАМы — клиентские направления',sec1:'Клиентские направления',sec2:'направлениям',unit:'Направление'}),
+  eng:()=>renderDir(window.__ENG__,'tab-eng',{eyebrow:'Квант · инжиниринг',title:'Инжиниринг — проекты, заказы, выручка',sec1:'Инженерные группы',sec2:'группам',unit:'Группа'}),
+  prod:()=>renderDir(window.__PRODUCT__,'tab-prod',{eyebrow:'Квант · продуктовые линии',title:'Продукт-оунеры — линейки оборудования',sec1:'Продуктовые линии',sec2:'линиям',unit:'Линия'}),
+  cohorts:()=>renderCohorts(window.__COMPANY__),
+  reps:()=>renderReps(window.__REPS__),
+  contracts:renderContracts,
+  suppliers:renderSuppliers,
+};
+const _lazyDone={};
+function ensureTab(t){ if(LAZY[t]&&!_lazyDone[t]){ _lazyDone[t]=1; LAZY[t](); } }
 document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{
   document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('act',x===b));
   const t=b.dataset.tab;
+  ensureTab(t);
   ['sourcing','company','kam','eng','prod','reps','contracts','suppliers','cohorts'].forEach(n=>{const el=document.getElementById('tab-'+n); if(el) el.hidden=(n!==t);});
   window.scrollTo(0,0);
 }));
@@ -1108,14 +1164,22 @@ requestAnimationFrame(()=>setTimeout(()=>{
   const FRESH=2*3600*1000, GRACE=3*3600*1000;     // ≤2ч — зелёный; 2–3ч — обновляется; >3ч — устарело
   const agoTxt=ms=>{const m=Math.floor(ms/60000);if(m<1)return 'только что';if(m<60)return m+' мин назад';const h=Math.floor(m/60),mm=m%60;return h+' ч'+(mm?' '+mm+' мин':'')+' назад';};
   let polling=false;
-  function pollFresh(){                            // ждём свежий деплой: опрашиваем страницу, при новой метке — reload
+  async function freshStamp(){                     // метка свежести: /gen (пара байт) → фолбэк на скачивание страницы
+    try{
+      const r=await fetch('/gen',{cache:'no-store'});
+      if(r.ok){ const j=await r.json(); if(j&&j.gen) return Date.parse(j.gen); }
+    }catch(e){}
+    try{
+      const r=await fetch(location.href,{cache:'no-store',headers:{'X-Poll':'1'}}); const t=await r.text();
+      const mm=t.match(/gen=new Date\("([^"]+)"\)/); if(mm) return Date.parse(mm[1]);
+    }catch(e){}
+    return NaN;
+  }
+  function pollFresh(){                            // ждём свежий деплой: при новой метке — reload
     if(polling)return; polling=true; let tries=0;
     const iv=setInterval(async()=>{ tries++;
-      try{
-        const r=await fetch(location.href,{cache:'no-store',headers:{'X-Poll':'1'}}); const t=await r.text();
-        const mm=t.match(/gen=new Date\("([^"]+)"\)/);
-        if(mm){ const g2=Date.parse(mm[1]); if(!isNaN(g2)&&g2>gen.getTime()){ clearInterval(iv); location.reload(); return; } }
-      }catch(e){}
+      const g2=await freshStamp();
+      if(!isNaN(g2)&&g2>gen.getTime()){ clearInterval(iv); location.reload(); return; }
       if(tries>=12){ clearInterval(iv); polling=false; }   // ~12 мин — сдаёмся (следующий заход триггернёт снова)
     },60000);
   }
