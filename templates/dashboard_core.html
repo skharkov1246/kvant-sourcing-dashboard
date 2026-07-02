@@ -314,7 +314,7 @@
 </head>
 <body>
 <div id="updstatus" class="updbar"><span class="ub-dot"></span><span class="ub-main">Обновление…</span></div>
-<div class="tabs"><button class="tab act" data-tab="sourcing">Сорсинг</button><button class="tab" data-tab="company">Пульс компании</button><button class="tab" data-tab="kam">КАМы</button><button class="tab" data-tab="eng">Инжиниринг</button><button class="tab" data-tab="prod">Продукт-оунеры</button><button class="tab" data-tab="reps">Коммерсанты</button><button class="tab" data-tab="contracts">Реализация</button><button class="tab" data-tab="suppliers">Поставщики</button><button class="tab" data-tab="cohorts">Когорты</button></div>
+<div class="tabs"><button class="tab act" data-tab="sourcing">Сорсинг</button><button class="tab" data-tab="company">Пульс компании</button><button class="tab" data-tab="kam">КАМы</button><button class="tab" data-tab="eng">Инжиниринг</button><button class="tab" data-tab="prod">Продукт-оунеры</button><button class="tab" data-tab="reps">Коммерсанты</button><button class="tab" data-tab="contracts">Реализация</button><button class="tab" data-tab="suppliers">Поставщики</button><button class="tab" data-tab="cohorts">Когорты</button><button class="tab" data-tab="advisor">Советы знатока</button></div>
 <div id="tab-sourcing">
 <header>
   <div class="eyebrow">Квант · Отдел поиска поставщиков</div>
@@ -450,6 +450,7 @@
 <div id="tab-suppliers" hidden></div>
 <div id="tab-cohorts" hidden></div>
 <div id="tab-reps" hidden></div>
+<div id="tab-advisor" hidden></div>
 
 <div class="ovl" id="ovl"></div>
 <aside class="drw" id="drw" aria-hidden="true">
@@ -466,6 +467,7 @@ window.__ENG__ = __ENG_JSON__;
 window.__PRODUCT__ = __PRODUCT_JSON__;
 window.__CONTRACTS__ = __CONTRACTS_JSON__;
 window.__REPS__ = __REPS_JSON__;
+window.__ADVISOR__ = __ADVISOR_JSON__;
 const M = window.__DATA__, INS = window.__INSIGHTS__;
 const cs = getComputedStyle(document.documentElement);
 const k = M.kpi, A = M.sourcersA, cov = M.coverage;
@@ -836,7 +838,11 @@ const METH={
   'd.kpi':{t:'KPI направления',what:'Сводка по набору групп вкладки.',src:'crm.deal.list (продажи) + Заказы поставщикам СП-172 (закупки), по ответственным групп.',formula:'Сделок = созданные YTD; Пайплайн = Σ открытых продаж (€); Контрактов = сделок с заказами; Выручка = Σ сумм сделок-контрактов (€); Закупка = Σ заказов поставщикам (€); Маржа = выручка − закупка.',note:'СП-172 = заказы поставщикам, его сумма — закупка, а не выручка.'},
   'd.groups':{t:'Продажи → закупка → маржа',what:'Главная таблица направления по группам отделов.',src:'crm.deal.list (ASSIGNED_BY_ID ∈ UF_DEPARTMENT группы) + Заказы поставщикам СП-172.',formula:'СП-172 = заказы ПОСТАВЩИКАМ (opportunity = закупка). Продажа = сумма родительской сделки. Контракт = сделка с ≥1 заказом. Колонки: сделок (YTD), пайплайн (Σ открытых продаж €), контрактов, продажи (Σ сумм сделок-контрактов €), закупка (Σ заказов €), маржа = продажи − закупка.',note:'Привязка к группе — через владельца сделки-родителя. Клик по строке — сделки и заказы группы.'},
   'd.rev':{t:'Выручка по группам',what:'Ранжирование групп по продажам (выручке).',formula:'Σ сумм сделок-контрактов группы (€); длина бара — относительно максимума в наборе.',note:'Клик — сделки и заказы группы.'},
-  'd.people':{t:'До человека',what:'Те же метрики по каждому сотруднику группы.',src:'группировка по ASSIGNED_BY_ID внутри групп.',formula:'Сделки / пайплайн / заказы / выручка / зак-сд по сотруднику.',note:'Клик по сотруднику — его сделки и заказы.'}
+  'd.people':{t:'До человека',what:'Те же метрики по каждому сотруднику группы.',src:'группировка по ASSIGNED_BY_ID внутри групп.',formula:'Сделки / пайплайн / заказы / выручка / зак-сд по сотруднику.',note:'Клик по сотруднику — его сделки и заказы.'},
+  'a.forecast':{t:'Взвешенный прогноз',what:'Сколько денег ожидать с открытого пайплайна и на какие месяцы.',src:'crm.deal.list (открытые сделки YTD: не проиграны, не в реализации) + CLOSEDATE.',formula:'Каждая открытая сделка × вероятность: базовая = эмпирическая конверсия зрелой когорты-2025 (реализовано ÷ создано); для сделок, дошедших до «ТКП выдано+», вероятность ×3 (потолок 60%). Прогноз раскладывается по месяцу ПЛАНОВОГО закрытия (CLOSEDATE). «Покрытие» = взвешенный пайплайн ÷ средний месячный факт реализации-2026; здоровая норма ≥ 3×.',note:'Вероятность ТКП+ — эвристика (нет истории прохождения стадий по каждой сделке). Сделки без CLOSEDATE в помесячный прогноз не попадают — см. блок «Гигиена».'},
+  'a.velocity':{t:'Sales velocity менеджеров',what:'Скорость генерации выручки: у кого воронка реально «крутится».',src:'crm.deal.list (ASSIGNED_BY_ID, YTD) + история стадий (момент перевода в реализацию).',formula:'Velocity = открытые сделки × ср. чек (продажи ÷ реализованные) × win-rate (реал ÷ (реал+проигр)) ÷ медианный цикл (создание → реализация, дней) × 30 → €/мес. Показаны сотрудники с ≥5 сделками за год.',note:'У кого мало реализованных сделок — цифры шумные; velocity 0 = ещё нет ни одной реализации (нет ср. чека и цикла).'},
+  'a.lost':{t:'Причины проигрышей',what:'Почему уходят сделки — раскладка проигранных по стадиям отказа.',src:'crm.deal.list (STAGE_SEMANTIC_ID = F) + имена стадий воронок.',formula:'Группировка проигранных YTD по финальной стадии (имя стадии ≈ причина: «экономически неинтересно», «отказ клиента» и т.п.), счёт и Σ сумм.',note:'Если ≥80% проигрышей падают в одну стадию — причины в CRM фактически не заполняются, и этот разрез слепой. Лечится обязательным полем причины при закрытии в минус.'},
+  'a.clients':{t:'Клиентские риски',what:'Концентрация выручки, повторные vs новые клиенты, замолчавшие.',src:'crm.deal.list 2025–2026 (COMPANY_ID) + реализация (заказ СП-172/номер).',formula:'Топ-клиенты = Σ продаж реализованных сделок-2026 по компании. «Повторная выручка» = доля от клиентов, у которых были сделки в 2025. «Замолчал» = клиент с реализованной выручкой-2025 (≥ €10K) и НУЛЁМ созданных сделок в 2026.',note:'Сделки без привязанной компании в клиентский разрез не попадают — это тоже сигнал гигиены CRM.'}
 };
 function _methBody(o){
   const r=(k,v)=>v?`<div class="mrow"><span class="k">${k}</span><span class="v">${v}</span></div>`:'';
@@ -1107,9 +1113,49 @@ function renderSuppliers(){
   document.getElementById('spSearch').addEventListener('input',e=>{q=e.target.value; rows();});
   document.getElementById('spHead').addEventListener('click',e=>{const th=e.target.closest('th.sortable'); if(!th)return; const kk=th.dataset.sk; if(sortKey===kk)sortDir=-sortDir; else {sortKey=kk; sortDir=(NUM[kk]?-1:1);} head(); rows();});
 }
+// ---- вкладка «Советы знатока»: директорская аналитика + экзекьютив-справка
+function renderAdvisor(A){
+  const el=document.getElementById('tab-advisor'); if(!el) return;
+  if(!A){ el.innerHTML='<div class="note" style="padding:20px 0">нет данных — вкладка появится после следующей пересборки</div>'; return; }
+  const kpi=p=>`<div class="kpi ${p.clz||''}"><div class="lbl">${p.lbl}</div><div class="val ${p.clz||''}">${p.val}</div><div class="meta">${p.meta||''}</div></div>`;
+  const BCLS={ok:'',warn:'',bad:'bot'};
+  let h=`<header><div class="eyebrow">Квант · взгляд коммерческого директора</div><h1>Советы знатока — прогноз · потери · риски</h1><div class="sub"><span>Состояние: <b>${A.label}</b></span><span>Источник: <b>Bitrix24 · сделки 2025–2026 + Заказы (СП-172)</b></span><span class="dimv">Отвечает на три вопроса: сколько денег будет · где теряем · где риски концентрации</span></div></header>`;
+  // экзекьютив-справка
+  h+=`<div class="secttl"><b>·</b> Экзекьютив-справка</div>`;
+  h+=A.brief.map(b=>`<section class="card" style="padding:0;border:0;background:none;box-shadow:none;margin-bottom:10px"><div class="insight ${BCLS[b.cls]||''}" style="border-left-color:${b.cls==='bad'?'var(--warn)':(b.cls==='warn'?'var(--a)':'var(--ok)')}">${b.html}</div></section>`).join('');
+  h+=`<div class="kpis" style="grid-template-columns:repeat(6,1fr);margin-top:16px">${A.kpis.map(kpi).join('')}</div>`;
+  // 1 · прогноз
+  const F=A.forecast;
+  h+=`<div class="secttl"><b>1</b> · Сколько денег будет${qmark('a.forecast')}</div><div class="grid"><section class="card"><h2>Взвешенный прогноз по месяцам закрытия</h2><div class="note">Открытые сделки (${F.openN}) по месяцу планового закрытия. Серым — сырая сумма, янтарным — взвешенная (вероятность: до ТКП ${F.pBase}%, ТКП+ ${F.pTkp}%).</div><div class="barlist">`;
+  const fmax=Math.max(1,...(F.byMonth||[]).map(x=>x.raw));
+  h+=(F.byMonth||[]).map(x=>`<div class="blrow"><div class="blt"><span>${x.label} <span class="dimv mono">${x.n} сд.</span></span><b><span class="dimv">${x.rawLbl}</span> → <span style="color:var(--a2)">${x.wgtLbl}</span></b></div><div class="bltrack" style="position:relative"><i style="width:${(x.raw/fmax*100).toFixed(0)}%;background:var(--panel2);outline:1px solid var(--line)"></i><i style="position:absolute;left:0;top:0;width:${(x.wgt/fmax*100).toFixed(0)}%;background:linear-gradient(90deg,var(--a),var(--a2))"></i></div></div>`).join('')||'<div class="dimv">нет открытых сделок с плановой датой</div>';
+  h+=`</div>${F.noDate&&F.noDate.n?`<div class="note" style="margin-top:10px">Без плановой даты: <b>${F.noDate.n}</b> сделок, ${F.noDate.rawLbl} (взвешенно ${F.noDate.wgtLbl}) — вне помесячного прогноза.</div>`:''}</section>`;
+  h+=`<section class="card"><h2>Покрытие факта</h2><div class="note">Взвешенный пайплайн ÷ средний месячный факт реализации. Норма ≥ 3× — тогда план следующего квартала обеспечен воронкой.</div><div class="pcards"><div class="pcard"><div class="pv">${F.wgtLbl}</div><div class="pl">взвешенный прогноз</div></div><div class="pcard"><div class="pv">${F.rawLbl}</div><div class="pl">сырой пайплайн</div></div><div class="pcard"><div class="pv" style="color:${(F.coverage||0)>=3?'var(--ok)':'var(--warn)'}">${F.coverage!=null?F.coverage+'×':'—'}</div><div class="pl">покрытие (мес. факт ${F.avgRealLbl||'—'})</div></div></div></section></div>`;
+  // 2 · где теряем
+  const L=A.lost, lmax=Math.max(1,...(L.reasons||[]).map(r=>r.n));
+  h+=`<div class="secttl"><b>2</b> · Где теряем${qmark('a.lost')}</div><div class="grid"><section class="card"><h2>Причины проигрышей <span class="subtotal">${L.n} сд. · <b>${L.sumLbl}</b></span></h2><div class="note">Проигранные YTD по финальной стадии.${L.oneStagePct>=80?' <span class="flag">⚠ Почти всё в одной стадии — причины в CRM не заполняются.</span>':''}</div><div class="barlist">`;
+  h+=(L.reasons||[]).map(r=>`<div class="blrow"><div class="blt"><span>${_esc(r.name)}</span><b>${r.n} · ${r.pct}% <span class="dimv">${r.sumLbl}</span></b></div><div class="bltrack"><i style="width:${(r.n/lmax*100).toFixed(0)}%;background:linear-gradient(90deg,var(--nr),#e5634d)"></i></div></div>`).join('')||'<div class="dimv">нет проигранных сделок</div>';
+  h+=`</div></section><section class="card"><h2>Sales velocity по менеджерам${qmark('a.velocity')}</h2><div class="note">Открытые × ср. чек × win-rate ÷ цикл → €/мес. Сортировка по velocity; ≥5 сделок за год.</div><table><thead><tr><th>Менеджер</th><th class="r">открыто</th><th class="r">win-rate</th><th class="r">цикл, дн</th><th class="r">ср. чек</th><th class="r">velocity</th></tr></thead><tbody>`;
+  h+=(A.velocity||[]).map(v=>`<tr><td><div class="who">${_esc(v.n)}</div><div class="dep">${v.created} сд. · продажи ${v.sales}</div></td><td class="num r">${v.open}<small class="dimv"> · ${v.pipe}</small></td><td class="num r">${v.wr}%</td><td class="num r">${v.cyc!=null?v.cyc:'—'}</td><td class="num r">${v.check}</td><td class="num r" style="color:var(--a2)"><b>${v.velLbl}</b></td></tr>`).join('');
+  h+=`</tbody></table></section></div>`;
+  // 3 · клиентские риски
+  const C=A.clients, cmax=Math.max(1,...(C.top||[]).map(x=>x.rev));
+  h+=`<div class="secttl"><b>3</b> · Риски концентрации${qmark('a.clients')}</div><div class="grid"><section class="card"><h2>Топ-клиенты по выручке <span class="subtotal">топ-5 = <b>${C.top5Share}%</b></span></h2><div class="note">Σ продаж реализованных сделок-2026 по компании. «повт.» — клиент покупал и в 2025.</div><div class="barlist">`;
+  h+=(C.top||[]).map(x=>`<div class="blrow"><div class="blt"><span>${_esc(x.name)}${x.repeat?' <span class="pill p-selected" style="font-size:9px">повт.</span>':''}</span><b>${x.revLbl} · ${x.share}%</b></div><div class="bltrack"><i style="width:${(x.rev/cmax*100).toFixed(0)}%"></i></div></div>`).join('')||'<div class="dimv">нет реализованной выручки с привязкой к компании</div>';
+  h+=`</div><div class="note" style="margin-top:10px">Повторная выручка <b style="color:var(--ok)">${C.repeatLbl}</b> (${C.repeatShare}%) · новые клиенты <b>${C.newLbl}</b>.</div></section>`;
+  h+=`<section class="card"><h2>Замолчавшие клиенты</h2><div class="note">Покупали в 2025 (выручка ≥ €10K), в 2026 — ни одной сделки. Кандидаты на реактивацию КАМами.</div>`;
+  h+=(C.silent||[]).map(s=>`<div class="suprow"><span>${_esc(s.name)}</span><b style="color:var(--warn)">${s.revLbl} <span class="dimv">в 2025</span></b></div>`).join('')||'<div class="dimv" style="padding:8px 0">все клиенты 2025 активны — отлично</div>';
+  h+=`</section></div>`;
+  // 4 · гигиена
+  h+=`<div class="secttl"><b>4</b> · Гигиена данных</div><section class="card"><div class="note">Что мешает верить цифрам выше. Чем чище CRM — тем честнее прогноз.</div>`;
+  h+=(A.hygiene||[]).map(x=>`<div class="suprow"><span style="color:${x.cls==='bad'?'var(--warn)':'var(--ink)'}">${x.lbl}</span><b style="color:${x.n?(x.cls==='bad'?'var(--warn)':'var(--a2)'):'var(--ok)'}">${x.n}<span class="dimv"> · ${x.sumLbl}</span></b></div>`).join('');
+  h+=`</section><footer>Советы знатока · Bitrix24 · ${A.label}. Взвешенный прогноз — оценка (вероятности: конверсия когорты-2025 и эвристика ТКП+ ×3, потолок 60%). Реализация = заказ СП-172 или номер в названии сделки. Суммы к базовой € по курсам Bitrix.</footer>`;
+  el.innerHTML=h;
+}
 // ---- ленивый рендер вкладок: тяжёлые вкладки строятся при первом открытии,
 // первый рендер страницы делает только «Сорсинг» (виден по умолчанию)
 const LAZY={
+  advisor:()=>renderAdvisor(window.__ADVISOR__),
   company:()=>renderPulse(window.__COMPANY__),
   kam:()=>renderDir(window.__KAM__,'tab-kam',{eyebrow:'Квант · коммерческий департамент',title:'КАМы — клиентские направления',sec1:'Клиентские направления',sec2:'направлениям',unit:'Направление'}),
   eng:()=>renderDir(window.__ENG__,'tab-eng',{eyebrow:'Квант · инжиниринг',title:'Инжиниринг — проекты, заказы, выручка',sec1:'Инженерные группы',sec2:'группам',unit:'Группа'}),
@@ -1125,7 +1171,7 @@ document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{
   document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('act',x===b));
   const t=b.dataset.tab;
   ensureTab(t);
-  ['sourcing','company','kam','eng','prod','reps','contracts','suppliers','cohorts'].forEach(n=>{const el=document.getElementById('tab-'+n); if(el) el.hidden=(n!==t);});
+  ['sourcing','company','kam','eng','prod','reps','contracts','suppliers','cohorts','advisor'].forEach(n=>{const el=document.getElementById('tab-'+n); if(el) el.hidden=(n!==t);});
   window.scrollTo(0,0);
 }));
 // ---- Сорсинг: скорость до первого запроса поставщикам (создание сделки → первый СП-166) ----

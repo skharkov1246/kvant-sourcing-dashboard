@@ -18,6 +18,7 @@ import webbrowser
 from collections import Counter, defaultdict
 from pathlib import Path
 
+import advisor as advisor_mod
 import company as company_mod
 import config
 import dashboard
@@ -360,10 +361,22 @@ def run(args) -> int:
     except Exception as e:
         print(f"  ⚠ вкладка «Коммерсанты» пропущена: {type(e).__name__}: {e}")
 
+    advisor_data = None
+    if deals_ytd is not None:
+        try:
+            print("• Советы знатока (прогноз · потери · риски концентрации)…")
+            advisor_data = advisor_mod.compute(
+                client, as_of=p.end, deals=deals_ytd, orders=orders_ytd,
+                deal_sale=deal_sale, realize_date=realize_date,
+                deal_stage_names=deal_stage_names, category_names=category_names)
+            print(f"  ✓ советы знатока: справка из {len(advisor_data['brief'])} пунктов")
+        except Exception as e:
+            print(f"  ⚠ вкладка «Советы знатока» пропущена: {type(e).__name__}: {e}")
+
     html_path = out_dir / f"dashboard_{slug}.html"
     dashboard.write(m, ins, html_path, title=f"Сорсинг · {p.label}",
                     company=company_data, kam=kam_data, eng=eng_data, prod=prod_data,
-                    contracts=contracts_data, reps=reps_data)
+                    contracts=contracts_data, reps=reps_data, advisor=advisor_data)
     print(f"  ✓ дашборд: {html_path}")
 
     if args.open:
