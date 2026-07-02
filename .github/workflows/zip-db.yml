@@ -1,0 +1,41 @@
+name: ZIP base — apply DB migrations
+
+# Применяет zip/supabase/migrations.sql к Supabase (Postgres) базы ЗИП.
+# Запуск вручную (workflow_dispatch). Нужен секрет SUPABASE_DB_URL —
+# connection string из Supabase → Project Settings → Database → Connection string
+# (URI, роль postgres). Идемпотентно — можно гонять повторно.
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: zip-db
+  cancel-in-progress: false
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Установка psql (если нет)
+        run: |
+          set -euo pipefail
+          if ! command -v psql >/dev/null; then
+            sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client
+          fi
+          psql --version
+
+      - name: Применить миграции
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set -euo pipefail
+          if [ -z "${SUPABASE_DB_URL:-}" ]; then
+            echo "::error::Секрет SUPABASE_DB_URL не задан. Settings → Secrets → Actions → New secret."
+            exit 1
+          fi
+          psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -f zip/supabase/migrations.sql
+          echo "✓ миграции применены"
