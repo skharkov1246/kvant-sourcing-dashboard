@@ -40,6 +40,31 @@ export default {
       });
     }
 
+    const url = new URL(request.url);
+
+    // /gen — лёгкая проверка свежести для поллинга со страницы: вместо скачивания
+    // всего index.html клиент получает пару десятков байт JSON с меткой генерации.
+    // Заодно триггерит пересборку, если данные устарели (как заход на страницу).
+    if (url.pathname === "/gen") {
+      const idx = await env.ASSETS.fetch(new Request(url.origin + "/", { headers: request.headers }));
+      const text = await idx.text();
+      const m = text.match(/gen=new Date\("([^"]+)"\)/);
+      const genMs = m ? Date.parse(m[1]) : NaN;
+      const stale = isNaN(genMs) || (Date.now() - genMs) > FRESH_MS;
+      if (stale && env.GH_DISPATCH_TOKEN) ctx.waitUntil(triggerRebuild(env));
+      return new Response(JSON.stringify({ gen: m ? m[1] : null }), {
+        headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },
+      });
+    }
+
+    // шрифты — иммутабельная статика: кэшируем надолго (имена файлов стабильны)
+    if (url.pathname.startsWith("/fonts/")) {
+      const font = await env.ASSETS.fetch(request);
+      const fh = new Headers(font.headers);
+      fh.set("Cache-Control", "public, max-age=31536000, immutable");
+      return new Response(font.body, { status: font.status, statusText: font.statusText, headers: fh });
+    }
+
     // авторизованы → отдаём статический файл, но ЗАПРЕЩАЕМ кэширование:
     // иначе браузер/edge отдают старый index.html и после деплоя «сайт не обновляется».
     const resp = await env.ASSETS.fetch(request);
