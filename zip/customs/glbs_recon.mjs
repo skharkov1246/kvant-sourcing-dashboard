@@ -1,7 +1,9 @@
-// glbs.io — точный HTML вокруг «Мой ключ» + все ссылки/кнопки на /api/ (найти механизм ключа).
+// glbs.io — ключ рендерится JS-ом в карточку <h3> под «Мой ключ» (через socket.io).
+// Ждём наполнения карточки и читаем ключ (в лог — только маска), подтверждаем /api/info/.
 import { chromium } from 'playwright';
 const USER = process.env.GLBS_USER, PASS = process.env.GLBS_PASS;
 const P = (t, o) => console.log(`\n===${t}===\n` + (typeof o === 'string' ? o : JSON.stringify(o, null, 1)) + `\n===/${t}===`);
+const mask = k => k ? `len=${k.length} ${k.slice(0, 3)}…${k.slice(-2)}` : 'нет';
 
 async function login(page) {
   for (let a = 1; a <= 3; a++) {
@@ -18,49 +20,43 @@ async function login(page) {
   return false;
 }
 
+// читает текст карточки-ключа под заголовком «Мой ключ»
+const READ = () => {
+  const h1 = [...document.querySelectorAll('h1,h2,h3,h4')].find(e => /^\s*(Мой ключ|My key)\s*$/i.test(e.textContent || ''));
+  let card = h1 && h1.nextElementSibling;
+  // если следующий не карточка — поищем ближайший h3.text-nowrap
+  if (!card || !/[A-Za-z0-9]/.test(card.innerText || '')) card = document.querySelector('h3.text-nowrap');
+  const txt = (card ? card.innerText : '').replace(/\s+/g, '').trim();
+  return txt;
+};
+
 const browser = await chromium.launch();
 const page = await (await browser.newContext()).newPage();
 try {
   if (!await login(page)) { P('LOGIN_OK', false); throw new Error('login'); }
   P('LOGIN_OK', true);
   await page.goto('https://glbs.io/api/', { waitUntil: 'networkidle', timeout: 45000 });
-  await page.waitForTimeout(2500);
 
-  const info = await page.evaluate(() => {
-    // элемент, чей СОБСТВЕННЫЙ текст = «Мой ключ»
-    const all = [...document.querySelectorAll('*')];
-    const label = all.find(e => {
-      const own = [...e.childNodes].filter(n => n.nodeType === 3).map(n => n.textContent).join('').trim();
-      return /^Мой ключ$|^My key$/i.test(own);
+  // ждём до ~30с, пока карточка наполнится токеном
+  let key = '';
+  for (let i = 0; i < 30; i++) {
+    const v = await page.evaluate(READ);
+    if (/^[A-Za-z0-9_\-]{16,64}$/.test(v)) { key = v; break; }
+    await page.waitForTimeout(1000);
+  }
+  P('KEY_FOUND', mask(key));
+  if (!key) {
+    const dbg = await page.evaluate(() => {
+      const h3 = document.querySelector('h3.text-nowrap');
+      return { h3html: h3 ? h3.outerHTML.replace(/\s+/g, ' ').slice(0, 300) : 'нет h3.text-nowrap', h3text: h3 ? (h3.innerText || '').trim() : '' };
     });
-    let around = '';
-    if (label) {
-      const parts = [label.outerHTML];
-      let s = label.nextElementSibling, n = 0;
-      while (s && n < 4) { parts.push(s.outerHTML); s = s.nextElementSibling; n++; }
-      // если сиблингов мало — берём outerHTML родителя
-      around = (parts.join('\n').length < 200 && label.parentElement ? label.parentElement.outerHTML : parts.join('\n'));
-    }
-    around = (around || '(«Мой ключ» как отдельный текст не найден)').replace(/\s+/g, ' ').slice(0, 2500);
-
-    // все ссылки и кнопки, где в href/тексте/атрибутах есть key/api/generate/показать
-    const acts = [];
-    for (const e of document.querySelectorAll('a,button,[onclick],[data-url],[data-href],[data-target],[data-toggle]')) {
-      const attrs = [...e.attributes].map(a => `${a.name}=${a.value}`).join(' ');
-      if (/key|api|generat|показ|получ|создать|token/i.test((e.textContent || '') + ' ' + attrs))
-        acts.push({ tag: e.tagName, text: (e.textContent || '').trim().slice(0, 25), attrs: attrs.slice(0, 160) });
-    }
-    // список inline-скриптов с упоминанием key/api-key + короткие фрагменты
-    const scripts = [];
-    for (const s of document.querySelectorAll('script:not([src])')) {
-      const c = s.textContent || '';
-      const m = c.match(/.{0,40}(api[_-]?key|apiKey|['"]key['"]).{0,60}/i);
-      if (m) scripts.push(m[0].replace(/\s+/g, ' ').slice(0, 120));
-    }
-    return { around, acts: acts.slice(0, 20), scripts: scripts.slice(0, 8) };
-  });
-  P('AROUND_MYKEY', info.around);
-  P('ACTIONS', info.acts);
-  P('INLINE_SCRIPTS', info.scripts);
+    P('KEY_DEBUG', dbg);
+  } else {
+    const info = await page.evaluate(async (k) => {
+      try { const r = await fetch(`/api/info/?api-key=${k}`); const j = await r.json(); if (j?.meta){delete j.meta.key;delete j.meta.ip;} return { s: r.status, j }; }
+      catch (e) { return { err: e.message }; }
+    }, key);
+    P('API_INFO', info);
+  }
 } catch (e) { P('ERROR', e.message); }
 finally { await browser.close(); }
