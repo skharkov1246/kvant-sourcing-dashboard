@@ -1,36 +1,59 @@
 name: ZIP customs — glbs.io recon/pull
 
 # Заход на glbs.io (Глобус-ВЭД) из GitHub Actions (где есть сеть) для таможенной
-# статистики. Шаг 1 — recon: логин по секретам GLBS_USER/GLBS_PASS и выгрузка
-# структуры страниц как артефактов (по ним пишется точный парсер). Пароль — только
-# в секретах репозитория, в коде/логах его нет.
+# статистики.
+#   recon — Playwright-разведка структуры сайта (нужны GLBS_USER/GLBS_PASS);
+#   pull  — клиент официального API supplies-search (нужен GLBS_API_KEY),
+#           результат коммитится в zip/customs/out/.
 #
-# Нужны секреты: Settings → Secrets and variables → Actions →
-#   GLBS_USER = aep@kvantpro.com
-#   GLBS_PASS = <пароль glbs.io>
+# Секреты (Settings → Secrets and variables → Actions):
+#   GLBS_USER    = aep@kvantpro.com        (для recon)
+#   GLBS_PASS    = <пароль glbs.io>         (для recon)
+#   GLBS_API_KEY = <ключ из glbs.io/api/ «Мой ключ»>   (для pull)
 on:
   workflow_dispatch:
     inputs:
       mode:
-        description: "recon (собрать структуру сайта) | pull (выгрузка — после калибровки)"
-        default: "recon"
+        description: "recon (структура сайта) | pull (выгрузка API)"
+        default: "pull"
         type: choice
         options: ["recon", "pull"]
+      method:
+        description: "pull: search (без цен, бесплатно) | save (с ценами, тратит лимит)"
+        default: "search"
+        type: choice
+        options: ["search", "save"]
+      hs:
+        description: "pull: HS-префиксы через запятую (пусто = топ из базы)"
+        default: ""
+        type: string
+      max_hs:
+        description: "pull: сколько HS-групп за прогон"
+        default: "3"
+        type: string
 
 permissions:
-  contents: read
+  contents: write
+
+concurrency:
+  group: zip-customs
+  cancel-in-progress: false
 
 jobs:
   glbs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.ref_name }}
 
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
 
+      # --- RECON ---
       - name: Установка Playwright + Chromium
+        if: ${{ inputs.mode == 'recon' }}
         run: |
           npm i -D playwright@1.56.1
           npx playwright install --with-deps chromium
@@ -42,7 +65,7 @@ jobs:
           GLBS_PASS: ${{ secrets.GLBS_PASS }}
         run: |
           if [ -z "${GLBS_USER:-}" ] || [ -z "${GLBS_PASS:-}" ]; then
-            echo "::error::Задайте секреты GLBS_USER и GLBS_PASS в настройках репозитория."
+            echo "::error::Задайте секреты GLBS_USER и GLBS_PASS."
             exit 1
           fi
           node zip/customs/glbs_recon.mjs || true
@@ -54,3 +77,32 @@ jobs:
           name: glbs-recon
           path: zip/customs/recon
           if-no-files-found: warn
+
+      # --- PULL (API) ---
+      - name: Выгрузка API supplies-search
+        if: ${{ inputs.mode == 'pull' }}
+        env:
+          GLBS_API_KEY: ${{ secrets.GLBS_API_KEY }}
+          GLBS_METHOD: ${{ inputs.method }}
+          GLBS_HS: ${{ inputs.hs }}
+          GLBS_MAX_HS: ${{ inputs.max_hs }}
+        run: |
+          if [ -z "${GLBS_API_KEY:-}" ]; then
+            echo "::error::Задайте секрет GLBS_API_KEY (glbs.io → API → «Мой ключ»)."
+            exit 1
+          fi
+          node zip/customs/glbs_pull.mjs
+
+      - name: Коммит результатов выгрузки
+        if: ${{ inputs.mode == 'pull' }}
+        run: |
+          set -e
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add zip/customs/out
+          if git diff --cached --quiet; then
+            echo "нет изменений в zip/customs/out"
+          else
+            git commit -m "chore: выгрузка таможни glbs.io (${{ inputs.method }})"
+            git push origin HEAD:${{ github.ref_name }}
+          fi
