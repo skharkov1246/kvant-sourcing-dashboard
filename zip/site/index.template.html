@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>База ЗИП — снабжение / прайс / ODM</title>
+<style>
+:root{--bg:#f4f6f9;--pan:#ffffff;--ln:#dde3ea;--tx:#1b2330;--mut:#5d6b7a;--acc:#1f6feb;--ok:#1a7f37;--w:#9a6700;--bad:#cf222e}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:13px/1.45 -apple-system,Segoe UI,Roboto,Arial}
+.mut{color:var(--mut);font-size:12px}
+input,select,button,textarea{background:#fff;color:var(--tx);border:1px solid var(--ln);border-radius:6px;padding:6px 8px;font-size:12px}
+button{cursor:pointer}button:hover{border-color:var(--acc)}
+#banner{background:#eaf1fb;border-bottom:1px solid var(--ln);color:#3a4756;padding:7px 12px;font-size:12px}
+#banner b{color:var(--ok)}
+header{position:sticky;top:0;z-index:5;background:var(--pan);border-bottom:1px solid var(--ln);padding:9px 12px;box-shadow:0 1px 4px rgba(20,40,70,.05)}
+.bar{display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin-top:7px}
+.bar input[type=text]{min-width:240px}
+table{border-collapse:collapse;width:100%}th,td{border-bottom:1px solid var(--ln);padding:6px 8px;text-align:left;vertical-align:top}
+th{position:sticky;top:104px;background:#eef2f7;color:#3a4756;cursor:pointer;white-space:nowrap;z-index:4}
+tr:hover td{background:#f3f6fb}.cn{font-family:ui-monospace,Menlo,monospace;color:#24314a;white-space:nowrap}
+.cat{color:var(--acc);font-size:11px;white-space:nowrap}.eur{color:#9a6700}
+.odmcell{color:var(--acc);cursor:pointer;min-width:240px;max-width:360px}.odmcell b{color:var(--ok)}.detail td{background:#f6f8fb}
+.ot{width:100%;border:1px solid var(--ln);border-radius:6px;margin:4px 0;background:#fff}.ot th{position:static;background:#f0f3f8}
+.bdg{font-size:10px;padding:1px 6px;border-radius:10px;border:1px solid}
+.b-h{color:#1a7f37;border-color:#a7e0b5;background:#e6f6ec}.b-m{color:#9a6700;border-color:#f0dca0;background:#fdf6e3}.b-l{color:#cf222e;border-color:#f3b9bd;background:#fcebec}
+a{color:var(--acc)}.pill{padding:3px 8px;border-radius:20px;font-size:11px;background:#eef2f7;border:1px solid var(--ln);color:var(--mut)}
+.tabs{display:flex;gap:6px;align-items:center;flex-wrap:wrap}.tabs button{background:none;border:none;color:var(--mut);padding:6px 10px;border-bottom:2px solid transparent}
+.tabs button.on{color:var(--tx);border-color:var(--acc)}.hide{display:none}
+.exp{border:1px solid var(--ok)!important;color:var(--ok)!important;border-radius:6px!important;padding:5px 9px!important;margin-left:6px;font-size:12px}
+[contenteditable]{min-width:48px;cursor:text;border-radius:4px;padding:1px 4px}[contenteditable]:focus{outline:1px solid var(--acc);background:#fff}
+.rfq{background:#eaf1fb;border-color:var(--acc);padding:3px 8px;font-size:11px}
+.k{display:flex;gap:12px;flex-wrap:wrap;margin-top:6px}.k b{color:var(--tx)}
+.hs{max-width:74px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;cursor:help}
+.bx{background:#fbfdff;border:1px solid #cfe0f5;border-radius:8px;padding:8px 10px;margin:4px 0 8px}
+.bx .dl{margin-top:3px}.st{font-size:10px;padding:1px 6px;border-radius:8px;border:1px solid;margin-left:5px}
+.odmwrap{display:flex;flex-direction:column;gap:8px;margin:4px 0}
+.odmc{border:1px solid var(--ln);border-radius:8px;padding:8px 10px;background:#fff}
+.odmc-h{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.odmc-h b{font-size:13px;color:#16324f}
+.odmc-m{margin:4px 0 7px}
+.odmc-f{display:flex;gap:14px;align-items:center;flex-wrap:wrap;font-size:12px}
+.odmc-f label{color:var(--mut);display:flex;gap:5px;align-items:center}.odmc-f select{padding:3px 6px}
+.odmc-f .ed{border:1px solid var(--ln);border-radius:4px;padding:2px 6px;min-width:120px;display:inline-block}
+.pbx{background:#fff;border:1px solid var(--ln);border-radius:8px;padding:8px 10px;margin:4px 0 8px}
+.pbx-h{display:flex;gap:8px;align-items:center;margin-bottom:5px}
+.addp{padding:2px 8px;font-size:11px;border:1px solid var(--acc);color:var(--acc);background:#fff;border-radius:6px}
+.delp{padding:1px 6px;font-size:11px;border:1px solid var(--ln);color:var(--bad);background:#fff;border-radius:6px}
+table.pt{border-collapse:collapse;width:100%;font-size:11px}
+table.pt th{text-align:left;color:var(--mut);font-weight:600;border-bottom:1px solid var(--ln);padding:3px 6px;white-space:nowrap}
+table.pt td{border-bottom:1px solid #eef2f6;padding:2px 6px;vertical-align:top}
+table.pt select{padding:2px 4px;font-size:11px}
+table.pt [contenteditable]{border:1px solid var(--ln);border-radius:4px;padding:1px 5px;min-width:40px;display:inline-block}
+table.pt .eur{color:#0b5; font-variant-numeric:tabular-nums}
+#toast{position:fixed;bottom:16px;right:16px;background:#1b2330;color:#fff;padding:8px 14px;border-radius:8px;font-size:12px;opacity:0;transition:.2s;z-index:20;pointer-events:none}
+#toast.show{opacity:.95}
+</style></head><body>
+<div id="banner"><b>Рабочая база ЗИП</b> · __N_POS__ позиций · __N_WITH_ODM__ с ODM · __N_ODM__ ODM-записей (high __N_HI__/med __N_ME__/low __N_LO__) · обновлено __UPDATED__. Правки статусов/цен/качества и RFQ сохраняются для всей команды. Логина нет — ссылку шли коллегам.</div>
+<header>
+  <div style="display:flex;justify-content:space-between;align-items:center">
+    <div><b>База ЗИП · подземная горная техника</b> <span class="pill" id="cnt">…</span> <span class="pill" id="mode">…</span></div>
+    <div class="tabs"><button class="on" data-t="grid">Позиции</button><button data-t="sup">Поставщики</button><button data-t="stats">Сводка</button><button data-t="log">Журнал</button><button id="expPos" class="exp">⬇ Excel: позиции</button><button id="expOdm" class="exp">⬇ Excel: ODM</button><button id="expPrices" class="exp">⬇ Excel: цены</button><button id="expSup" class="exp">⬇ Excel: поставщики</button></div>
+  </div>
+  <div class="bar" id="ctrls">
+    <input id="q" type="text" placeholder="поиск: каталог, наименование, модель, OEM…">
+    <select id="fcat"></select>
+    <select id="foem"></select>
+    <select id="fbtx"><option value="">Bitrix: все</option><option>продавали</option><option>квотировали</option><option>ожидает</option></select>
+    <label class="pill"><input type="checkbox" id="fodm"> с ODM</label>
+    <label class="pill"><input type="checkbox" id="fnoodm"> без ODM</label>
+  </div>
+</header>
+<div id="grid"></div>
+<div id="suppliers" class="hide" style="padding:12px"></div>
+<div id="stats" class="hide" style="padding:12px"></div>
+<div id="log" class="hide" style="padding:12px"></div>
+<div id="toast"></div>
+<script src="./vendor/supabase.js"></script>
+<script>
+const SUPA_URL="https://vpjliavuuxjcvtxbthlp.supabase.co", SUPA_KEY="sb_publishable_z74BF5VzezeQfTc9fni-ZA_HMyTKRTJ";
+const SEED=[/*__SEED__*/];
+const sb=(window.supabase)?supabase.createClient(SUPA_URL,SUPA_KEY):null;
+const $=id=>document.getElementById(id);
+let POS=[], ODM={}, PRICES={}, DRAW={}, sortK="pp", sortA=true, LIVE=false;
+const ST=["кандидат","запрошен","ответил","отказал","в тесте","одобрен","чёрный список"];
+const QL=["","отлично","хорошо","плохо","брак"];
+const BX=["","продавали","квотировали","ожидает"];
+const SRC=["таможня","глобус-вэд","маркетплейс","кп","bitrix","прочее"];
+const CUR=["EUR","USD","RUB","CNY"];
+const CONF=["high","med","low"];
+const DST=["замер","чертёж","образец","испытан","одобрен"];
+function toast(m){const t=$("toast");t.textContent=m;t.classList.add("show");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("show"),1800);}
+function esc(s){return (s??"").toString().replace(/</g,"&lt;");}
+async function fetchAll(table){let all=[],from=0,sz=1000;while(true){const {data,error}=await sb.from(table).select("*").range(from,from+sz-1);if(error||!data||!data.length)break;all=all.concat(data);if(data.length<sz)break;from+=sz;}return all;}
+function fromSeed(){POS=SEED.map(s=>Object.assign({},s.pos,{id:s.pos.pp}));ODM={};PRICES={};DRAW={};SEED.forEach(s=>{ODM[s.pos.pp]=(s.odm||[]).map(o=>Object.assign({},o));PRICES[s.pos.pp]=(s.prices||[]).map(o=>Object.assign({},o));});}
+async function load(){
+  let ok=false;
+  if(sb){try{
+    const p=await fetchAll("positions");
+    if(p.length){
+      const o=await fetchAll("odm_suppliers");POS=p;ODM={};o.forEach(r=>{(ODM[r.position_id]=ODM[r.position_id]||[]).push(r);});
+      PRICES={};try{(await fetchAll("price_records")).forEach(r=>{(PRICES[r.position_id]=PRICES[r.position_id]||[]).push(r);});}catch(e){}
+      DRAW={};try{(await fetchAll("drawings")).forEach(r=>{(DRAW[r.position_id]=DRAW[r.position_id]||[]).push(r);});}catch(e){}
+      LIVE=true;ok=true;}
+  }catch(e){}}
+  if(!ok)fromSeed();
+  POS.sort((a,b)=>(a.pp||0)-(b.pp||0));
+  POS.forEach(d=>d._s=((d.catalog_no||"")+" "+(d.name||"")+" "+(d.note||"")+" "+(d.model||"")+" "+(d.oem||"")+" "+(d.pp||"")).toLowerCase());
+  const cats=[...new Set(POS.map(d=>d.category))].filter(Boolean).sort();
+  $("fcat").innerHTML='<option value="">Все категории ('+POS.length+')</option>'+cats.map(c=>`<option>${esc(c)}</option>`).join("");
+  const oems=[...new Set(POS.map(d=>d.oem))].filter(Boolean).sort();
+  $("foem").innerHTML='<option value="">Все OEM</option>'+oems.map(c=>`<option>${esc(c)}</option>`).join("");
+  $("mode").textContent=LIVE?"● онлайн — правки сохраняются":"● офлайн-копия (нет связи с БД)";
+  $("mode").style.color=LIVE?"#1a7f37":"#9a6700";
+  render();
+}
+async function upd(table,id,field,val){
+  if(!LIVE){toast("Офлайн-копия — правки не сохранятся");return;}
+  const o={};o[field]=val===""?null:val;
+  const {error}=await sb.from(table).update(o).eq("id",id);
+  toast(error?("ошибка: "+error.message):"сохранено ✓");
+}
+function bdg(c){c=(c||"").toLowerCase();return c=="high"?'<span class="bdg b-h">high</span>':c=="med"?'<span class="bdg b-m">med</span>':c=="low"?'<span class="bdg b-l">low</span>':"";}
+function edc(table,id,field,val){return `<span contenteditable data-tb="${table}" data-id="${id}" data-f="${field}">${esc(val)}</span>`;}
+function render(){
+  const q=$("q").value.toLowerCase().trim(),fc=$("fcat").value,fe=$("foem").value,fb=$("fbtx").value,fo=$("fodm").checked,fn=$("fnoodm").checked;
+  let a=POS.filter(d=>{const n=(ODM[d.id]||[]).length;
+    if(fc&&d.category!==fc)return 0;if(fe&&d.oem!==fe)return 0;if(fb&&(d.bitrix_status||"")!==fb)return 0;
+    if(fo&&!n)return 0;if(fn&&n)return 0;if(q&&!d._s.includes(q))return 0;return 1;});
+  a.sort((x,y)=>{let u=x[sortK],v=y[sortK];const nu=parseFloat(u),nv=parseFloat(v);if(!isNaN(nu)&&!isNaN(nv)){u=nu;v=nv;}return (u>v?1:u<v?-1:0)*(sortA?1:-1);});
+  let h=`<table><thead><tr>
+   <th data-k="pp">П/П</th><th data-k="category">Категория</th><th data-k="catalog_no">Каталог №</th>
+   <th data-k="name">Наименование</th><th data-k="oem">OEM</th><th data-k="model">Модель</th>
+   <th data-k="price_eur_competitor">Цена «врагов» €</th><th data-k="price_min">Ориентир €</th><th>Наша цена</th><th data-k="hs_code">HS</th>
+   <th>ODM</th><th data-k="bitrix_status">Bitrix</th></tr></thead><tbody>`;
+  a.forEach(d=>{const odm=ODM[d.id]||[];
+    h+=`<tr><td class="cn">${d.pp??""}</td><td class="cat">${esc(d.category)}</td><td class="cn">${esc(d.catalog_no)}</td>
+     <td>${esc(d.name)}<div class="mut" style="font-size:11px">${esc(d.note)}</div></td><td>${esc(d.oem)}</td>
+     <td class="mut">${esc(d.model)}</td><td class="eur">${d.price_eur_competitor??""}</td>
+     <td class="eur" title="${esc(d.price_src)}">${priceCell(d)}</td>
+     <td class="eur">${edc("positions",d.id,"plan_price",d.plan_price)}</td><td class="hs mut" title="${esc(d.hs_code)}">${shortHs(d.hs_code)}</td>
+     <td class="odmcell" data-tg="${d.id}">${odm.length?`<b>${odm.length}:</b> `+odm.slice(0,2).map(o=>esc(o.name)).join("; ")+(odm.length>2?` +${odm.length-2}`:"")+" ▸":'<span class="mut">— нет</span>'}</td>
+     <td><select data-tb="positions" data-id="${d.id}" data-f="bitrix_status">${BX.map(s=>`<option ${(d.bitrix_status||"")==s?"selected":""}>${s||"—"}</option>`).join("")}</select>${(Array.isArray(d.bitrix_price_history)&&d.bitrix_price_history.length)?`<div class="mut" style="font-size:10px;margin-top:2px">${d.bitrix_price_history.length} упом. ▸</div>`:""}</td></tr>
+     <tr class="detail hide" id="det-${d.id}"><td colspan="12">${infoBox(d)}${bitrixBox(d)}${priceBox(d)}${drawBox(d)}${odmCards(d,odm)}</td></tr>`;});
+  $("grid").innerHTML=h+"</tbody></table>";
+  $("cnt").textContent=a.length+" / "+POS.length;
+}
+function shortHs(h){if(!h)return"";const m=String(h).match(/\d{4}(\.\d{2,4})?/);return m?m[0]:String(h).slice(0,8);}
+function priceCell(d){if(d.price_min==null||d.price_min==="")return '<span class="mut">—</span>';const a=d.price_min,b=d.price_max;return (b&&b!=a?`${a}–${b}`:`${a}`)+" €";}
+function csvDl(name,rows,cols){
+  const q=v=>{v=(v==null?"":String(v)).replace(/"/g,'""');return /[";\n]/.test(v)?'"'+v+'"':v;};
+  const lines=[cols.join(";")].concat(rows.map(r=>cols.map(c=>q(r[c])).join(";")));
+  const blob=new Blob(["﻿"+lines.join("\n")],{type:"text/csv;charset=utf-8"});
+  const a=document.createElement("a");a.href=window.URL.createObjectURL(blob);a.download=name;a.click();
+}
+function infoBox(d){
+  let p=[];
+  if(d.applications)p.push(`<div style="margin:2px 0"><b>🛠 Где применяется:</b> ${esc(d.applications)}</div>`);
+  if(d.aliases)p.push(`<div style="margin:2px 0"><b>🔢 Альт-номера / кросс-референс:</b> <span class="cn">${esc(d.aliases)}</span></div>`);
+  return p.length?`<div style="background:#eef5ff;border:1px solid var(--ln);border-radius:6px;padding:8px 10px;margin-bottom:8px;font-size:12px">${p.join("")}</div>`:"";
+}
+function bitrixBox(d){
+  const h=d.bitrix_price_history; if(!Array.isArray(h)||!h.length)return"";
+  const cls=s=>/контракт/.test(s)?"b-h":/проигр/.test(s)?"b-l":"b-m";
+  return `<div class="bx"><b>📋 Битрикс — упоминания в сделках (${h.length}):</b>`+
+    h.map(x=>`<div class="dl mut">• ${esc(x.deal)}${x.client?` — <b>${esc(x.client)}</b>`:""}${x.status?`<span class="st ${cls(x.status)}">${esc(x.status)}</span>`:""}${x.date?` <span style="font-size:10px">${esc(x.date)}</span>`:""}</div>`).join("")+`</div>`;
+}
+function sel(tb,id,f,val,opts){return `<select data-tb="${tb}" data-id="${id}" data-f="${f}">`+opts.map(o=>`<option ${(val||"")==o?"selected":""}>${esc(o)}</option>`).join("")+`</select>`;}
+// перерисовать грид и снова раскрыть карточку позиции pid (после правки цен/чертежей)
+function rerender(pid){render();if(pid!=null){const dd=$("det-"+pid);if(dd){dd.classList.remove("hide");const tg=document.querySelector(`[data-tg="${pid}"]`);if(tg&&/▸/.test(tg.textContent))tg.textContent=tg.textContent.replace("▸","▾");}}}
+function priceBox(d){
+  const rows=PRICES[d.id]||[];
+  let h=`<div class="pbx"><div class="pbx-h"><b>💶 Цены конкурентов / таможня</b> <span class="mut">(${rows.length})</span> <button class="addp" data-addp="${d.id}">➕ строка</button></div>`;
+  if(!rows.length)h+=`<div class="mut" style="padding:3px 0">нет данных — добавьте вручную или соберётся автоматически.</div>`;
+  else{
+    h+=`<table class="pt"><thead><tr><th>Год</th><th>Источник</th><th>Импортёр</th><th>Экспортёр</th><th>Страна</th><th>Кол-во</th><th>Цена/ед</th><th>Вал.</th><th>Дов.</th><th>Ссылка</th><th></th></tr></thead><tbody>`;
+    rows.slice().sort((a,b)=>(b.year||0)-(a.year||0)).forEach(r=>{h+=`<tr>
+      <td class="cn">${edc("price_records",r.id,"year",r.year)}</td>
+      <td>${sel("price_records",r.id,"source",r.source,SRC)}</td>
+      <td>${edc("price_records",r.id,"importer",r.importer)}</td>
+      <td>${edc("price_records",r.id,"exporter",r.exporter)}</td>
+      <td>${edc("price_records",r.id,"country",r.country)}</td>
+      <td class="cn">${edc("price_records",r.id,"qty",r.qty)}</td>
+      <td class="eur">${edc("price_records",r.id,"unit_price",r.unit_price)}</td>
+      <td>${sel("price_records",r.id,"currency",r.currency,CUR)}</td>
+      <td>${sel("price_records",r.id,"confidence",r.confidence,CONF)}</td>
+      <td>${r.url?`<a href="${esc(r.url)}" target="_blank" rel="noopener">↗</a> `:""}<span class="ed" contenteditable data-tb="price_records" data-id="${r.id}" data-f="url">${esc(r.url)}</span></td>
+      <td><button class="delp" data-delp="${r.id}" data-pos="${d.id}" title="удалить строку">✕</button></td></tr>`;});
+    h+=`</tbody></table>`;
+  }
+  return h+`</div>`;
+}
+function drawBox(d){
+  const rows=DRAW[d.id]||[];
+  let h=`<div class="pbx"><div class="pbx-h"><b>📐 Чертежи / файлы</b> <span class="mut">(${rows.length})</span> `+
+    (LIVE?`<label class="addp" style="cursor:pointer">⬆ загрузить<input type="file" data-upl="${d.id}" style="display:none"></label>`:`<span class="mut">загрузка доступна онлайн</span>`)+`</div>`;
+  if(!rows.length)h+=`<div class="mut" style="padding:3px 0">файлов нет.</div>`;
+  else{
+    h+=`<table class="pt"><thead><tr><th>Файл</th><th>Рев.</th><th>Статус</th><th>Размер</th><th>Загружен</th><th></th></tr></thead><tbody>`;
+    rows.forEach(r=>{h+=`<tr>
+      <td>${r.storage_path?`<a href="#" data-dl="${esc(r.storage_path)}">${esc(r.title||r.storage_path)}</a>`:esc(r.title)}</td>
+      <td class="cn">${edc("drawings",r.id,"rev",r.rev)}</td>
+      <td>${sel("drawings",r.id,"status",r.status,DST)}</td>
+      <td class="mut cn">${r.size_bytes?Math.round(r.size_bytes/1024)+" КБ":""}</td>
+      <td class="mut cn" style="font-size:10px">${r.uploaded_at?new Date(r.uploaded_at).toLocaleDateString():""}</td>
+      <td><button class="delp" data-deld="${r.id}" data-pos="${d.id}" data-path="${esc(r.storage_path||"")}" title="удалить файл">✕</button></td></tr>`;});
+    h+=`</tbody></table>`;
+  }
+  return h+`</div>`;
+}
+function odmCards(d,odm){
+  if(!odm.length)return '<div class="mut" style="padding:6px 2px">ODM пока не найдены для этой позиции (в работе у поиска / можно добить вручную).</div>';
+  return '<div class="odmwrap">'+odm.map(o=>`<div class="odmc">
+    <div class="odmc-h">${bdg(o.confidence)} <b>${esc(o.name)}</b>${o.region?` <span class="mut">· ${esc(o.region)}</span>`:""}${o.catalog_url?` <a href="${esc(o.catalog_url)}" target="_blank" rel="noopener">↗ каталог</a>`:""}${o.catalog_price_raw?` <span class="eur">${esc(o.catalog_price_raw)}</span>`:""}</div>
+    ${o.makes?`<div class="odmc-m mut">${esc(o.makes)}</div>`:""}
+    <div class="odmc-f">
+      <label>статус <select data-tb="odm_suppliers" data-id="${o.id}" data-f="status">${ST.map(s=>`<option ${o.status==s?"selected":""}>${s}</option>`).join("")}</select></label>
+      <label>качество <select data-tb="odm_suppliers" data-id="${o.id}" data-f="quality">${QL.map(s=>`<option ${(o.quality||"")==s?"selected":""}>${s||"—"}</option>`).join("")}</select></label>
+      <label>коммент <span class="ed" contenteditable data-tb="odm_suppliers" data-id="${o.id}" data-f="comment">${esc(o.comment)}</span></label>
+      <button class="rfq" data-rfq="${o.id}" data-pos="${d.id}">📨 RFQ</button>
+    </div></div>`).join("")+'</div>';
+}
+$("grid").addEventListener("click",async e=>{
+  const tg=e.target.closest("[data-tg]");if(tg){const dd=$("det-"+tg.dataset.tg);dd.classList.toggle("hide");tg.textContent=tg.textContent.replace(/[▸▾]/,dd.classList.contains("hide")?"▸":"▾");return;}
+  const rb=e.target.closest("[data-rfq]");
+  if(rb){if(!LIVE){toast("Офлайн-копия — RFQ недоступен");return;}
+    const {error}=await sb.from("rfq_requests").insert({odm_supplier_id:+rb.dataset.rfq,position_id:+rb.dataset.pos,status:"queued"});
+    rb.textContent=error?"ошибка":"в очереди ✓";rb.disabled=!error;toast(error?error.message:"RFQ поставлен в очередь");return;}
+  // + строка цены
+  const ap=e.target.closest("[data-addp]");
+  if(ap){if(!LIVE){toast("Офлайн-копия — правки не сохранятся");return;}
+    const pid=+ap.dataset.addp;
+    const {data,error}=await sb.from("price_records").insert({position_id:pid,source:"кп",currency:"EUR",confidence:"med",created_by:"ручной"}).select();
+    if(error){toast(error.message);return;}
+    (PRICES[pid]=PRICES[pid]||[]).push(data[0]);toast("строка добавлена ✓");rerender(pid);return;}
+  // удалить строку цены
+  const dp=e.target.closest("[data-delp]");
+  if(dp){if(!LIVE){toast("Офлайн-копия");return;}
+    const rid=+dp.dataset.delp,pid=+dp.dataset.pos;
+    const {error}=await sb.from("price_records").delete().eq("id",rid);
+    if(error){toast(error.message);return;}
+    PRICES[pid]=(PRICES[pid]||[]).filter(x=>x.id!=rid);toast("удалено");rerender(pid);return;}
+  // удалить чертёж (файл в Storage + запись)
+  const dd=e.target.closest("[data-deld]");
+  if(dd){if(!LIVE){toast("Офлайн-копия");return;}
+    const rid=+dd.dataset.deld,pid=+dd.dataset.pos,path=dd.dataset.path;
+    if(path)await sb.storage.from("drawings").remove([path]);
+    const {error}=await sb.from("drawings").delete().eq("id",rid);
+    if(error){toast(error.message);return;}
+    DRAW[pid]=(DRAW[pid]||[]).filter(x=>x.id!=rid);toast("файл удалён");rerender(pid);return;}
+  // скачать чертёж (подписанная ссылка — бакет приватный)
+  const dl=e.target.closest("[data-dl]");
+  if(dl){e.preventDefault();if(!LIVE){toast("Скачивание доступно онлайн");return;}
+    const {data,error}=await sb.storage.from("drawings").createSignedUrl(dl.dataset.dl,120);
+    if(error||!data){toast(error?error.message:"нет ссылки");return;}
+    window.open(data.signedUrl,"_blank");return;}
+});
+// загрузка чертежа
+$("grid").addEventListener("change",async e=>{
+  const inp=e.target;if(inp.type!="file"||!inp.dataset.upl)return;
+  if(!LIVE){toast("Загрузка доступна онлайн");return;}
+  const pid=+inp.dataset.upl,file=inp.files&&inp.files[0];if(!file)return;
+  const safe=file.name.replace(/[^\w.\-]+/g,"_");const path=`${pid}/${Date.now()}_${safe}`;
+  toast("загрузка…");
+  const up=await sb.storage.from("drawings").upload(path,file,{upsert:false});
+  if(up.error){toast(up.error.message);return;}
+  const {data,error}=await sb.from("drawings").insert({position_id:pid,title:file.name,storage_path:path,mime:file.type,size_bytes:file.size,status:"чертёж",uploaded_by:"сайт"}).select();
+  if(error){toast(error.message);return;}
+  (DRAW[pid]=DRAW[pid]||[]).push(data[0]);toast("файл загружен ✓");rerender(pid);
+});
+$("grid").addEventListener("blur",e=>{const c=e.target;if(c.dataset&&c.dataset.f&&c.isContentEditable)upd(c.dataset.tb,+c.dataset.id,c.dataset.f,c.textContent.trim());},true);
+$("grid").addEventListener("change",e=>{const c=e.target;if(c.tagName=="SELECT"&&c.dataset.f)upd(c.dataset.tb,+c.dataset.id,c.dataset.f,c.value==="—"?"":c.value);});
+["q","fcat","foem","fbtx","fodm","fnoodm"].forEach(id=>$(id).addEventListener("input",render));
+document.addEventListener("click",e=>{const th=e.target.closest("th[data-k]");if(th){const k=th.dataset.k;sortA=sortK==k?!sortA:true;sortK=k;render();}});
+function statsHtml(){
+  const byCat={};let withOdm=0,noOdm=0,hi=0,me=0,lo=0,total=0,withPrice=0,priceRecs=0,drawCnt=0;
+  POS.forEach(d=>{const n=(ODM[d.id]||[]).length,pn=(PRICES[d.id]||[]).length,dn=(DRAW[d.id]||[]).length;
+    byCat[d.category]=byCat[d.category]||{t:0,c:0,p:0};byCat[d.category].t++;
+    if(n){byCat[d.category].c++;withOdm++;}else noOdm++;
+    if(pn){byCat[d.category].p++;withPrice++;priceRecs+=pn;}drawCnt+=dn;});
+  Object.values(ODM).forEach(arr=>arr.forEach(o=>{total++;if(o.confidence=="high")hi++;else if(o.confidence=="med")me++;else if(o.confidence=="low")lo++;}));
+  let h=`<div class="k"><span class="pill">позиций <b>${POS.length}</b></span><span class="pill">с ODM <b style="color:#1a7f37">${withOdm}</b></span><span class="pill">без ODM <b style="color:#9a6700">${noOdm}</b></span><span class="pill">ODM-записей <b>${total}</b> (high ${hi}/med ${me}/low ${lo})</span><span class="pill">с ценами <b style="color:#1a7f37">${withPrice}</b> (${priceRecs} записей)</span><span class="pill">чертежей <b>${drawCnt}</b></span></div>`;
+  h+=`<table class="ot" style="max-width:900px;margin-top:10px"><thead><tr><th>Категория</th><th>Позиций</th><th>С ODM</th><th>Покрытие ODM</th><th>С ценами</th><th>Покрытие цен</th></tr></thead><tbody>`;
+  Object.entries(byCat).sort().forEach(([c,v])=>{h+=`<tr><td>${esc(c)}</td><td class="cn">${v.t}</td><td class="cn">${v.c}</td><td class="cn">${Math.round(v.c/v.t*100)}%</td><td class="cn">${v.p}</td><td class="cn">${Math.round(v.p/v.t*100)}%</td></tr>`;});
+  return h+"</tbody></table>";
+}
+async function logHtml(){
+  if(!LIVE)return '<span class="mut">Журнал доступен в онлайн-режиме.</span>';
+  const {data}=await sb.from("change_log").select("*").order("at",{ascending:false}).limit(200);
+  return "<table class='ot'><thead><tr><th>Когда</th><th>Кто</th><th>Таблица</th><th>Строка</th><th>Действие</th><th>Изменения</th></tr></thead><tbody>"+
+   (data||[]).map(r=>`<tr><td class='cn'>${new Date(r.at).toLocaleString()}</td><td>${esc(r.actor_email||r.actor||"")}</td><td>${esc(r.table_name)}</td><td class='cn'>${esc(r.row_id)}</td><td>${esc(r.action)}</td><td class='mut' style='max-width:420px'>${esc(JSON.stringify(r.changes||{}).slice(0,300))}</td></tr>`).join("")+"</tbody></table>";
+}
+document.querySelectorAll(".tabs [data-t]").forEach(b=>b.onclick=async()=>{
+  document.querySelectorAll(".tabs [data-t]").forEach(x=>x.classList.remove("on"));b.classList.add("on");
+  const t=b.dataset.t;$("grid").classList.toggle("hide",t!="grid");$("ctrls").style.visibility=t=="grid"?"visible":"hidden";
+  $("suppliers").classList.toggle("hide",t!="sup");$("stats").classList.toggle("hide",t!="stats");$("log").classList.toggle("hide",t!="log");
+  if(t=="sup")$("suppliers").innerHTML=supHtml();
+  if(t=="stats")$("stats").innerHTML=statsHtml();
+  if(t=="log")$("log").innerHTML=await logHtml();
+});
+$("expPos").onclick=()=>{
+  const cols=["pp","category","catalog_no","catalog_norm","name","oem","model","target_equipment","material_type","applications","aliases","price_eur_competitor","price_min","price_max","price_cur","price_src","plan_price","hs_code","bitrix_status","odm_count","note"];
+  const rows=POS.map(d=>{const o={};cols.forEach(c=>o[c]=d[c]);o.odm_count=(ODM[d.id]||[]).length;return o;});
+  csvDl("zip_positions.csv",rows,cols);
+};
+$("expOdm").onclick=()=>{
+  const cols=["pp","catalog_no","name","oem","odm_name","region","country","makes","catalog_url","catalog_price_raw","terms","confidence","status","quality","comment"];
+  const rows=[];POS.forEach(d=>(ODM[d.id]||[]).forEach(o=>rows.push({pp:d.pp,catalog_no:d.catalog_no,name:d.name,oem:d.oem,odm_name:o.name,region:o.region,country:o.country,makes:o.makes,catalog_url:o.catalog_url,catalog_price_raw:o.catalog_price_raw,terms:o.terms,confidence:o.confidence,status:o.status,quality:o.quality,comment:o.comment})));
+  csvDl("zip_odm_suppliers.csv",rows,cols);
+};
+$("expPrices").onclick=()=>{
+  const cols=["pp","catalog_no","name","oem","year","source","importer","exporter","country","qty","qty_unit","unit_price","total_price","currency","incoterms","customs_decl","hs_code","confidence","url","note"];
+  const rows=[];POS.forEach(d=>(PRICES[d.id]||[]).forEach(r=>rows.push(Object.assign({pp:d.pp,catalog_no:d.catalog_no,name:d.name,oem:d.oem},
+    Object.fromEntries(cols.slice(4).map(c=>[c,r[c]]))))));
+  if(!rows.length){toast("Цен пока нет");return;}
+  csvDl("zip_price_records.csv",rows,cols);
+};
+function supKey(n){return (n||"").toLowerCase().replace(/\(.*?\)/g,"").replace(/[.,]/g,"").replace(/\b(co|ltd|inc|llc|limited|the)\b/g,"").replace(/\s+/g," ").trim();}
+function supList(){
+  const m={};
+  POS.forEach(d=>(ODM[d.id]||[]).forEach(o=>{const k=supKey(o.name);if(!k)return;
+    const e=m[k]||(m[k]={disp:o.name,pps:[],cats:{},url:""});
+    if(!e.pps.includes(d.pp))e.pps.push(d.pp);
+    e.cats[d.category]=(e.cats[d.category]||0)+1;
+    if(!e.url&&o.catalog_url)e.url=o.catalog_url;
+    if((o.name||"").length>(e.disp||"").length)e.disp=o.name;
+  }));
+  return Object.values(m).sort((a,b)=>b.pps.length-a.pps.length);
+}
+function supHtml(){
+  const L=supList();
+  let h=`<div class="mut" style="margin-bottom:8px">${L.length} поставщиков · группировка по заводу: кому слать <b>один RFQ на пакет позиций</b>. Клик по строке — список П/П, которые этот завод может закрыть.</div>`;
+  h+=`<input id="qsup" placeholder="поиск поставщика…" style="margin-bottom:8px;padding:6px 8px;width:300px;border:1px solid var(--ln);border-radius:6px">`;
+  h+=`<table class="ot" id="suptab"><thead><tr><th>Поставщик (завод)</th><th>Позиций</th><th>Топ-категории</th></tr></thead><tbody>`;
+  L.forEach((s,i)=>{const tc=Object.entries(s.cats).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([c,n])=>`${esc(c)} (${n})`).join(", ");
+    const nm=s.url?`<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.disp)}</a>`:esc(s.disp);
+    h+=`<tr class="suprow" data-si="${i}" style="cursor:pointer"><td>${nm} <span class="mut">▸</span></td><td class="cn"><b>${s.pps.length}</b></td><td class="mut">${tc}</td></tr>
+        <tr class="supdet hide" id="sd-${i}"><td colspan="3" class="cn mut" style="white-space:normal;font-size:11px">П/П (${s.pps.length}): ${s.pps.slice().sort((a,b)=>a-b).join(", ")}</td></tr>`;});
+  return h+"</tbody></table>";
+}
+$("suppliers").addEventListener("click",e=>{const r=e.target.closest(".suprow");if(r&&!e.target.closest("a")){const d=$("sd-"+r.dataset.si);if(d)d.classList.toggle("hide");}});
+$("suppliers").addEventListener("input",e=>{if(e.target.id!="qsup")return;const v=e.target.value.toLowerCase();document.querySelectorAll("#suptab .suprow").forEach(r=>{const sh=r.children[0].textContent.toLowerCase().includes(v);r.classList.toggle("hide",!sh);const d=$("sd-"+r.dataset.si);if(d&&!sh)d.classList.add("hide");});});
+$("expSup").onclick=()=>{
+  const L=supList();const cols=["supplier","positions_count","top_categories","pp_list","catalog_url"];
+  const rows=L.map(s=>({supplier:s.disp,positions_count:s.pps.length,top_categories:Object.entries(s.cats).sort((a,b)=>b[1]-a[1]).map(([c,n])=>c+":"+n).join(" | "),pp_list:s.pps.slice().sort((a,b)=>a-b).join(", "),catalog_url:s.url}));
+  csvDl("zip_suppliers_grouped.csv",rows,cols);
+};
+load();
+</script></body></html>

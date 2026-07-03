@@ -1,0 +1,25 @@
+// ОПЦИОНАЛЬНЫЙ пароль-гейт для базы ЗИП (по умолчанию сайт открыт — решение владельца).
+// Чтобы включить: скопируйте этот файл в zip/public/_worker.js (build.py его не трогает),
+// в Cloudflare Pages → проект kvant-zip → Settings → Variables добавьте секрет
+// BASIC_AUTH_PASS. Логин по умолчанию — "kvant" (переопределяется BASIC_AUTH_USER).
+// После этого Pages перейдёт в advanced-режим и весь трафик пойдёт через этот воркер.
+//
+// ВНИМАНИЕ: доступ к Supabase всё равно идёт по anon-ключу, вшитому в index.html.
+// Гейт закрывает сам сайт от посторонних, но кто извлёк ключ — сможет писать в БД
+// в обход сайта. Для полной защиты — сузьте RLS-политики в Supabase (см. migrations.sql).
+export default {
+  async fetch(request, env) {
+    const user = env.BASIC_AUTH_USER || "kvant";
+    const pass = env.BASIC_AUTH_PASS;
+    if (!pass) return env.ASSETS.fetch(request); // секрет не задан → гейт выключен
+    const got = request.headers.get("Authorization") || "";
+    const want = "Basic " + btoa(`${user}:${pass}`);
+    if (got !== want) {
+      return new Response("Требуется авторизация", {
+        status: 401,
+        headers: { "WWW-Authenticate": 'Basic realm="База ЗИП · КВАНТ", charset="UTF-8"' },
+      });
+    }
+    return env.ASSETS.fetch(request);
+  },
+};

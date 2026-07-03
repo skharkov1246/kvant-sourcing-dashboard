@@ -17,3 +17,6 @@ agent/corpus.json
 # локальный кэш wrangler
 scheduler/.wrangler/
 .wrangler/
+
+# база ЗИП: public/ — артефакт сборки (собирается build.py/CI), в репозиторий не кладём
+zip/public/
