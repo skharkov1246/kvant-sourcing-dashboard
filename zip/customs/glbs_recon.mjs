@@ -1,65 +1,62 @@
-// Разведка glbs.io (Глобус-ВЭД) — запускается в GitHub Actions, где есть сеть.
-// Логинится по секретам GLBS_USER / GLBS_PASS и сохраняет структуру страниц как
-// артефакты (screenshot + HTML + список форм/полей/ссылок), чтобы по ним написать
-// точный парсер таможенной статистики. Пароль в код НЕ пишется — только из env.
-//
-// Локально из этой сессии не работает (сеть закрыта). Гоняется workflow zip-customs.yml.
+// glbs.io — ключ рендерится JS-ом в карточку <h3> под «Мой ключ» (через socket.io).
+// Ждём наполнения карточки и читаем ключ (в лог — только маска), подтверждаем /api/info/.
 import { chromium } from 'playwright';
-import { writeFileSync, mkdirSync } from 'fs';
+const USER = process.env.GLBS_USER, PASS = process.env.GLBS_PASS;
+const P = (t, o) => console.log(`\n===${t}===\n` + (typeof o === 'string' ? o : JSON.stringify(o, null, 1)) + `\n===/${t}===`);
+const mask = k => k ? `len=${k.length} ${k.slice(0, 3)}…${k.slice(-2)}` : 'нет';
 
-const USER = process.env.GLBS_USER;
-const PASS = process.env.GLBS_PASS;
-const OUT = 'zip/customs/recon';
-mkdirSync(OUT, { recursive: true });
-
-const log = [];
-const note = (m) => { log.push(m); console.log(m); };
-
-async function dump(page, tag) {
-  try { await page.screenshot({ path: `${OUT}/${tag}.png`, fullPage: true }); } catch (e) { note(`shot ${tag}: ${e.message}`); }
-  try { writeFileSync(`${OUT}/${tag}.html`, await page.content()); } catch (e) {}
-  const forms = await page.evaluate(() => [...document.forms].map(f => ({
-    action: f.action, method: f.method,
-    fields: [...f.elements].map(el => ({ tag: el.tagName, type: el.type, name: el.name, id: el.id, ph: el.placeholder })),
-  })));
-  const links = await page.evaluate(() => [...document.querySelectorAll('a[href]')].slice(0, 80)
-    .map(a => ({ text: a.textContent.trim().slice(0, 40), href: a.href })));
-  writeFileSync(`${OUT}/${tag}.json`, JSON.stringify({ url: page.url(), title: await page.title(), forms, links }, null, 1));
-  note(`[${tag}] ${page.url()} — форм: ${forms.length}, ссылок: ${links.length}`);
+async function login(page) {
+  for (let a = 1; a <= 3; a++) {
+    await page.goto('https://glbs.io/', { waitUntil: 'domcontentloaded', timeout: 60000 });
+    await page.waitForTimeout(1500);
+    if (!(await page.$('input[type=password]'))) return true;
+    await page.fill('input[type=email],input[name*=login i],input[type=text]', USER).catch(() => {});
+    await page.fill('input[type=password]', PASS).catch(() => {});
+    await page.click('button[type=submit],input[type=submit]').catch(() => {});
+    try { await page.waitForFunction(() => !document.querySelector('input[type=password]'), { timeout: 20000 }); } catch {}
+    await page.waitForTimeout(2000);
+    if (!(await page.$('input[type=password]'))) return true;
+  }
+  return false;
 }
+
+// читает текст карточки-ключа под заголовком «Мой ключ»
+const READ = () => {
+  const h1 = [...document.querySelectorAll('h1,h2,h3,h4')].find(e => /^\s*(Мой ключ|My key)\s*$/i.test(e.textContent || ''));
+  let card = h1 && h1.nextElementSibling;
+  // если следующий не карточка — поищем ближайший h3.text-nowrap
+  if (!card || !/[A-Za-z0-9]/.test(card.innerText || '')) card = document.querySelector('h3.text-nowrap');
+  const txt = (card ? card.innerText : '').replace(/\s+/g, '').trim();
+  return txt;
+};
 
 const browser = await chromium.launch();
-const ctx = await browser.newContext();
-const page = await ctx.newPage();
-const apiCalls = [];
-page.on('request', r => { const u = r.url(); if (/\/api\/|\.json|graphql|rest/i.test(u)) apiCalls.push(`${r.method()} ${u}`); });
-
+const page = await (await browser.newContext()).newPage();
 try {
-  await page.goto('https://glbs.io/', { waitUntil: 'networkidle', timeout: 60000 });
-  await dump(page, '01-landing');
+  if (!await login(page)) { P('LOGIN_OK', false); throw new Error('login'); }
+  P('LOGIN_OK', true);
+  await page.goto('https://glbs.io/api/', { waitUntil: 'networkidle', timeout: 45000 });
 
-  // эвристический логин: ищем поле пароля и парный текст/email
-  const passSel = 'input[type=password]';
-  if (await page.$(passSel)) {
-    const userSel = 'input[type=email], input[type=text], input[name*=login i], input[name*=user i], input[name*=email i]';
-    if (USER && await page.$(userSel)) await page.fill(userSel, USER);
-    if (PASS) await page.fill(passSel, PASS);
-    note('поля логина заполнены, отправляю форму');
-    await Promise.all([
-      page.waitForLoadState('networkidle', { timeout: 60000 }).catch(() => {}),
-      page.keyboard.press('Enter'),
-    ]);
-    await page.waitForTimeout(3000);
-    await dump(page, '02-after-login');
-  } else {
-    note('поле пароля на лендинге не найдено — ищи кнопку «Войти» в 01-landing.json (links)');
+  // ждём до ~30с, пока карточка наполнится токеном
+  let key = '';
+  for (let i = 0; i < 30; i++) {
+    const v = await page.evaluate(READ);
+    if (/^[A-Za-z0-9_\-]{16,64}$/.test(v)) { key = v; break; }
+    await page.waitForTimeout(1000);
   }
-
-  writeFileSync(`${OUT}/_apicalls.txt`, apiCalls.join('\n'));
-  note(`перехвачено API-запросов: ${apiCalls.length} (см. _apicalls.txt)`);
-} catch (e) {
-  note('ОШИБКА: ' + e.message);
-} finally {
-  writeFileSync(`${OUT}/_log.txt`, log.join('\n'));
-  await browser.close();
-}
+  P('KEY_FOUND', mask(key));
+  if (!key) {
+    const dbg = await page.evaluate(() => {
+      const h3 = document.querySelector('h3.text-nowrap');
+      return { h3html: h3 ? h3.outerHTML.replace(/\s+/g, ' ').slice(0, 300) : 'нет h3.text-nowrap', h3text: h3 ? (h3.innerText || '').trim() : '' };
+    });
+    P('KEY_DEBUG', dbg);
+  } else {
+    const info = await page.evaluate(async (k) => {
+      try { const r = await fetch(`/api/info/?api-key=${k}`); const j = await r.json(); if (j?.meta){delete j.meta.key;delete j.meta.ip;} return { s: r.status, j }; }
+      catch (e) { return { err: e.message }; }
+    }, key);
+    P('API_INFO', info);
+  }
+} catch (e) { P('ERROR', e.message); }
+finally { await browser.close(); }
