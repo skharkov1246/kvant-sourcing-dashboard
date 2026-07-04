@@ -98,25 +98,77 @@ def _names_and_since(client: BitrixClient):
 
 SPA_NEW_STAGE = "DT166_24:NEW"
 
+_TAG_RE = __import__("re").compile(r"(?is)<(script|style)[^>]*>.*?</\1>|<[^>]+>")
+_WS_RE = __import__("re").compile(r"\s+")
+_ENT = {"&nbsp;": " ", "&amp;": "&", "&lt;": "<", "&gt;": ">", "&quot;": '"', "&#39;": "'", "&mdash;": "—"}
+
+
+def _email_preview(desc: str, limit: int = 220) -> str:
+    """HTML/текст письма → компактное превью без тегов."""
+    s = _TAG_RE.sub(" ", desc or "")
+    for a, b in _ENT.items():
+        s = s.replace(a, b)
+    s = _WS_RE.sub(" ", s).strip()
+    return s[:limit].rstrip() + ("…" if len(s) > limit else "")
+
+
+def _email_to(settings) -> str:
+    """Получатель письма из SETTINGS.EMAIL_META.to (если есть)."""
+    try:
+        meta = settings.get("EMAIL_META") if isinstance(settings, dict) else None
+        if isinstance(meta, dict):
+            to = meta.get("to") or meta.get("__to") or ""
+            return str(to).strip()
+    except Exception:
+        pass
+    return ""
+
+
+def _has_attachment(a: dict) -> bool:
+    for key in ("FILES", "STORAGE_ELEMENT_IDS"):
+        v = a.get(key)
+        if isinstance(v, (list, dict)) and len(v) > 0:
+            return True
+        if isinstance(v, str) and v not in ("", "0", "[]", "a:0:{}"):
+            return True
+    return False
+
 
 def _send_stats(client: BitrixClient, rfqs: list[dict], sourcer_rows: list[dict],
                 dept_a_ids: set[str], start_iso: str, end_iso: str) -> dict:
     """Реально отправлено vs создано: по факту исходящего CRM-письма на карточке RFQ.
-    Возвращает {"rows": [...по сорсерам блока A...], "totals": {...}}."""
+    Дополнительно собирает по каждой карточке письма (тема · получатель · превью · вложение)
+    для хронологического списка в дровере сорсера.
+    Возвращает {"rows": [...], "totals": {...}, "byCard": {card_id: [emails...]}}."""
     counts: Counter = Counter()  # card_id -> кол-во исходящих писем
+    by_card: dict[str, list[dict]] = defaultdict(list)
     last = 0
     while True:
         ch = client.call("crm.activity.list", {
             "filter": {"OWNER_TYPE_ID": config.SPA_ENTITY_TYPE_ID, "PROVIDER_ID": "CRM_EMAIL",
                        "DIRECTION": 2, ">=CREATED": start_iso, "<=CREATED": end_iso, ">ID": last},
-            "select": ["ID", "OWNER_ID"], "order": {"ID": "ASC"}, "start": -1}) or []
+            "select": ["ID", "OWNER_ID", "SUBJECT", "DESCRIPTION", "SETTINGS",
+                       "FILES", "STORAGE_ELEMENT_IDS", "CREATED"],
+            "order": {"ID": "ASC"}, "start": -1}) or []
         if not ch:
             break
         for a in ch:
-            counts[str(a.get("OWNER_ID"))] += 1
+            cid = str(a.get("OWNER_ID"))
+            counts[cid] += 1
+            by_card[cid].append({
+                "subj": (a.get("SUBJECT") or "").strip(),
+                "to": _email_to(a.get("SETTINGS")),
+                "body": _email_preview(a.get("DESCRIPTION")),
+                "file": _has_attachment(a),
+                "dt": (a.get("CREATED") or "")[:16].replace("T", " "),
+                "dtx": a.get("CREATED") or "",
+            })
         last = int(ch[-1]["ID"])
         if len(ch) < 50:
             break
+    # письма каждой карточки — по времени, новые сверху
+    for cid in by_card:
+        by_card[cid].sort(key=lambda e: e["dtx"], reverse=True)
 
     by_user: dict[str, list[dict]] = defaultdict(list)
     for r in rfqs:
@@ -138,7 +190,7 @@ def _send_stats(client: BitrixClient, rfqs: list[dict], sourcer_rows: list[dict]
         })
     tot = {kk: sum(r[kk] for r in rows) for kk in ("total", "sent", "nosend", "fake")}
     tot["sentPct"] = round(tot["sent"] / tot["total"] * 100) if tot["total"] else 0
-    return {"rows": rows, "totals": tot}
+    return {"rows": rows, "totals": tot, "byCard": {c: v for c, v in by_card.items()}}
 
 
 def run(args) -> int:
@@ -192,6 +244,23 @@ def run(args) -> int:
 
     print("• Отправлено vs создано (письма)…")
     m["send"] = _send_stats(client, rfqs, m["sourcersA"], dept_a_ids, p.start_iso, p.end_iso)
+
+    # обогащаем детали каждого сорсера письмами (тема · получатель · превью · вложение)
+    _by_card = m["send"].pop("byCard", {})
+    _mail_cards = 0
+    for s in m["sourcersA"]:
+        for d in s.get("details", []):
+            mails = _by_card.get(str(d.get("id"))) or []
+            d["mailN"] = len(mails)
+            if mails:
+                top = mails[0]                       # последнее письмо карточки
+                d["mailSubj"] = top["subj"]
+                d["to"] = top["to"]
+                d["body"] = top["body"]
+                d["file"] = top["file"]
+                d["mailDt"] = top["dt"]
+                _mail_cards += 1
+    print(f"  писем привязано к карточкам: {_mail_cards}")
 
     # список непокрытых сделок: только там, где запрос ОЖИДАЕТСЯ — живые оценённые сделки
     # (есть сумма, статус ≠ F, не сделка-RFQ сорсинга). €0/БО/отказы/отмены — «запрос не требуется».

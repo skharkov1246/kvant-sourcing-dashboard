@@ -80,11 +80,13 @@ def build(
         for r in items:
             wi = period.week_index(parse_dt(r.get("createdTime", "")))
             details.append({
+                "id": str(r.get("id")),
                 "subj": (r.get("title") or "—")[:90],
                 "sup": r.get("_supplier", "—"),
                 "st": classify_stage(r.get("stageId", "")),
                 "wk": wi if wi is not None else -1,
                 "dt": (r.get("createdTime") or "")[:10],
+                "dtx": (r.get("createdTime") or ""),   # полная метка для хронологической сортировки
             })
         by_supplier = [{"sup": s, "n": n} for s, n in Counter(d["sup"] for d in details).most_common()]
         nsup = sum(1 for x in by_supplier if x["sup"] not in ("—", "", None))
