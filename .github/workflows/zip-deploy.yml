@@ -42,7 +42,16 @@ jobs:
           # создать проект, если его ещё нет (иначе тихо пропустить)
           npx --yes wrangler@latest pages project create kvant-zip \
             --production-branch=main 2>/dev/null || true
-          # ASCII commit-message: иначе wrangler цепляет кириллицу git-коммита → CF отвергает (8000111)
-          npx --yes wrangler@latest pages deploy zip/public \
-            --project-name=kvant-zip --branch=main \
-            --commit-dirty=true --commit-message="zip auto deploy"
+          # ASCII commit-message: иначе wrangler цепляет кириллицу git-коммита → CF отвергает (8000111).
+          # Автоповтор: Cloudflare изредка отдаёт транзиентную «Failed to publish your Function.
+          # Unknown internal error» — повторяем до 3 раз.
+          ok=0
+          for i in 1 2 3; do
+            if npx --yes wrangler@latest pages deploy zip/public \
+                 --project-name=kvant-zip --branch=main \
+                 --commit-dirty=true --commit-message="zip auto deploy"; then
+              ok=1; break
+            fi
+            echo "⚠ деплой упал (попытка $i/3) — повтор через 20с…"; sleep 20
+          done
+          [ "$ok" = 1 ] || { echo "::error::деплой не удался после 3 попыток"; exit 1; }
