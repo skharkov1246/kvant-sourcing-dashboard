@@ -195,7 +195,33 @@ function render(){
   $("grid").innerHTML=h+"</tbody></table>";
   $("cnt").textContent=a.length+" / "+POS.length;
 }
-function buildDetail(d){const odm=ODM[d.id]||[];return masterBox(d)+infoBox(d)+bitrixBox(d)+priceBox(d)+sampleBox(d)+drawBox(d)+odmCards(d,odm);}
+function buildDetail(d){const odm=ODM[d.id]||[];return masterBox(d)+materialBox(d)+infoBox(d)+bitrixBox(d)+priceBox(d)+sampleBox(d)+drawBox(d)+odmCards(d,odm);}
+// классификатор позиции в узел перфоратора → рекомендация материала из стратегии
+function nodeByTag(re){return MATNODES.find(m=>re.test(m.part_class||""));}
+function matchNode(d){
+  const s=((d.name||"")+" "+(d.note||"")+" "+(d.model||"")).toLowerCase(),cat=(d.category||"");
+  if(/хвостовик|shank/.test(s))return nodeByTag(/хвостовик|shank/i);
+  if(/бо[её]к|поршень|piston|striker|ударник/.test(s))return nodeByTag(/бо[её]к|piston/i);
+  if(/аккумулятор|мембран|диафрагм|diaphragm/.test(s))return nodeByTag(/мембран|диафрагм|diaphragm|accumulator/i);
+  if(/втулк|букс|bushing/.test(s))return nodeByTag(/втулк|букс|bushing/i);
+  if(/клапан|valve|распредел/.test(s))return nodeByTag(/клапан|valve/i)||nodeByTag(/корпус|цилиндр|головк/i);
+  if(/корпус|головк|цилиндр|front head|cylinder/.test(s))return nodeByTag(/корпус|цилиндр|головк/i);
+  if(/коронк|штанг|drill bit|\brod\b|буров/.test(s))return nodeByTag(/буровой инструмент|коронк|drill bit/i);
+  if(/уплотн|манжет|\bseal\b|кольц|u-ring|сальник/.test(s)||/^01 Перф|^03 РТИ/.test(cat))return nodeByTag(/уплотнен|манжет|seal/i)||nodeByTag(/мембран|diaphragm/i);
+  if(/^02 Перф/.test(cat))return nodeByTag(/корпус|цилиндр|головк/i);
+  return null;
+}
+function materialBox(d){
+  const m=matchNode(d);if(!m)return"";
+  return `<div class="mbx" style="background:#f2fbf5;border-color:#bfe6d4"><div class="mbx-t">🔩 Материал/обработка «крепче OEM» · узел: ${esc((m.part_class||"").split("(")[0].slice(0,44))}</div>
+    <table class="pt"><tbody>
+    ${m.oem_material?`<tr><td class="mut" style="width:120px">OEM</td><td>${esc((m.oem_material||"").slice(0,200))}${m.oem_treatment?` · <span class="mut">${esc((m.oem_treatment||"").slice(0,130))}</span>`:""}</td></tr>`:""}
+    <tr><td class="mut"><b style="color:#1a7f37">Наша марка</b></td><td><b>${esc(m.alt_material)}</b></td></tr>
+    ${m.alt_treatment?`<tr><td class="mut"><b style="color:#1a7f37">Обработка</b></td><td>${esc(m.alt_treatment)}</td></tr>`:""}
+    ${m.expected_gain?`<tr><td class="mut">Прирост</td><td><span class="loc" style="background:#1a7f37">${esc(m.expected_gain.slice(0,80))}</span></td></tr>`:""}
+    </tbody></table>
+    <div class="mut" style="font-size:11px;margin-top:4px">Полная логика и поставщики материалов — вкладка «Материалы».</div></div>`;
+}
 // раскрыть/собрать карточку позиции (ленивая сборка контента при первом открытии)
 function toggleDetail(id){const dd=$("det-"+id);if(!dd)return;if(dd.dataset.built!="1"){dd.querySelector("td").innerHTML=buildDetail(POS.find(x=>x.id==id));dd.dataset.built="1";}dd.classList.toggle("hide");const tg=document.querySelector(`[data-tg="${id}"]`);if(tg)tg.textContent=tg.textContent.replace(/[▸▾]/,dd.classList.contains("hide")?"▸":"▾");}
 function refreshDetail(pid){const dd=$("det-"+pid);if(dd){dd.querySelector("td").innerHTML=buildDetail(POS.find(x=>x.id==pid));dd.dataset.built="1";dd.classList.remove("hide");const tg=document.querySelector(`[data-tg="${pid}"]`);if(tg&&/▸/.test(tg.textContent))tg.textContent=tg.textContent.replace("▸","▾");}}
@@ -591,18 +617,25 @@ function supList(){
   }));
   return Object.values(m).map(e=>{e.score=e.scores.length?(e.scores.reduce((a,b)=>a+b,0)/e.scores.length).toFixed(1):"—";return e;}).sort((a,b)=>b.pps.length-a.pps.length);
 }
+let SUPCACHE=[];
 function supHtml(){
-  const L=supList();
-  let h=`<div class="mut" style="margin-bottom:8px">${L.length} поставщиков (заводов). Группировка: кому слать <b>один RFQ на пакет позиций</b>. Балл — средняя скоркарта по позициям. Клик по строке — список П/П.</div>`;
+  const L=supList();SUPCACHE=L;
+  let h=`<div class="mut" style="margin-bottom:8px">${L.length} поставщиков (заводов). Группировка: кому слать <b>один RFQ на пакет позиций</b>. Балл — средняя скоркарта по позициям. Клик по строке — список П/П; 📨 — выгрузить RFQ-пакет (CSV).</div>`;
   h+=`<input id="qsup" placeholder="поиск поставщика…" style="margin-bottom:8px;padding:6px 8px;width:300px;border:1px solid var(--ln);border-radius:6px">`;
   h+=`<table class="ot" id="suptab"><thead><tr><th>Поставщик (завод)</th><th>Позиций</th><th>Балл</th><th>Лучший статус</th><th>Топ-категории</th></tr></thead><tbody>`;
   L.forEach((s,i)=>{const tc=Object.entries(s.cats).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([c,n])=>`${esc(c)} (${n})`).join(", ");
     const nm=s.url?`<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.disp)}</a>`:esc(s.disp);
-    h+=`<tr class="suprow" data-si="${i}" style="cursor:pointer"><td>${nm} <span class="mut">▸</span></td><td class="cn"><b>${s.pps.length}</b></td><td class="cn">${s.score}</td><td>${s.best?`<span class="bdg ${s.best=="одобрен"?"b-h":"b-m"}">${s.best}</span>`:""}</td><td class="mut">${tc}</td></tr>
+    h+=`<tr class="suprow" data-si="${i}" style="cursor:pointer"><td>${nm} <button class="rfq" data-rfqpack="${i}" title="выгрузить RFQ-пакет">📨</button> <span class="mut">▸</span></td><td class="cn"><b>${s.pps.length}</b></td><td class="cn">${s.score}</td><td>${s.best?`<span class="bdg ${s.best=="одобрен"?"b-h":"b-m"}">${s.best}</span>`:""}</td><td class="mut">${tc}</td></tr>
         <tr class="supdet hide" id="sd-${i}"><td colspan="5" class="cn mut" style="white-space:normal;font-size:11px">П/П (${s.pps.length}): ${s.pps.slice().sort((a,b)=>a-b).join(", ")}</td></tr>`;});
   return h+"</tbody></table>";
 }
-$("suppliers").addEventListener("click",e=>{const r=e.target.closest(".suprow");if(r&&!e.target.closest("a")){const d=$("sd-"+r.dataset.si);if(d)d.classList.toggle("hide");}});
+$("suppliers").addEventListener("click",e=>{
+  const rb=e.target.closest("[data-rfqpack]");
+  if(rb){const s=SUPCACHE[+rb.dataset.rfqpack];if(!s)return;
+    const pset=new Set(s.pps);const rows=POS.filter(d=>pset.has(d.pp)).map(d=>({pp:d.pp,catalog_no:d.catalog_no,name:d.name,oem:d.oem,qty_year:d.annual_qty,target_price:d.plan_price,rec_material:(matchNode(d)||{}).alt_material||""}));
+    csvDl("RFQ_"+(s.disp||"supplier").replace(/[^\w\-]+/g,"_").slice(0,40)+".csv",rows,["pp","catalog_no","name","oem","qty_year","target_price","rec_material"]);
+    toast("RFQ-пакет: "+rows.length+" позиций");return;}
+  const r=e.target.closest(".suprow");if(r&&!e.target.closest("a")){const d=$("sd-"+r.dataset.si);if(d)d.classList.toggle("hide");}});
 $("suppliers").addEventListener("input",e=>{if(e.target.id!="qsup")return;const v=e.target.value.toLowerCase();document.querySelectorAll("#suptab .suprow").forEach(r=>{const sh=r.children[0].textContent.toLowerCase().includes(v);r.classList.toggle("hide",!sh);const d=$("sd-"+r.dataset.si);if(d&&!sh)d.classList.add("hide");});});
 $("expSup").onclick=()=>{
   const L=supList();const cols=["supplier","positions_count","avg_score","best_status","top_categories","pp_list","catalog_url"];
