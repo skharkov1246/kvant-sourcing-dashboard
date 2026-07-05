@@ -463,11 +463,11 @@ function demHtml(){
   const byY={};years.forEach(y=>byY[y]={lines:0,units:0,plan:0,fact:0,eur:0,cny:0});
   DEMAND.forEach(d=>{const b=byY[d.year];b.lines++;b.units+=d.qty||0;b.plan+=d.plan_cost_rub||0;b.fact+=d.fact_rub||0;if(d.currency=="EUR")b.eur+=d.import_value||0;else if(d.currency=="CNY")b.cny+=d.import_value||0;});
   const last=years[years.length-1],L=byY[last];
-  let h=`<div class="mut" style="margin-bottom:8px">Спрос <b>ПАО «ГМК «Норильский никель», ЗФ: СПГТ</b> (лимиты снабжения перфораторов) + прайс конкурента <b>АО «Машиностроительный холдинг»</b>. Импортная (валютная) часть — таргет локализации.</div>`;
+  let h=`<div class="mut" style="margin-bottom:8px">Закупка <b>НОВЫХ перфораторов</b> (оборудование, статья 2.04.01 — CAPEX) подразделением <b>ГМК «Норникель», ЗФ, площадка 112W «СПГТ»</b>. Это <u>не</u> бюджет ЗИП — запчасти на обслуживание идут отдельным ремонтным потоком (нет в этих данных). Ценность: парк и OEM под наш ЗИП + бенчмарк конкурента <b>АО «Машиностроительный холдинг»</b> (локализует и машины, и запчасти).</div>`;
   h+=`<div class="cards">
-    <div class="card"><div class="n">${money(L.plan)} ₽</div><div class="l">бюджет ${last}</div></div>
-    <div class="card"><div class="n" style="color:#cf222e">€${(L.eur/1e6).toFixed(1)} млн</div><div class="l">импорт ${last} — локализуемо</div></div>
-    <div class="card"><div class="n">${Math.round(L.units)}</div><div class="l">единиц ${last}</div></div>
+    <div class="card"><div class="n">${money(L.plan)} ₽</div><div class="l">CAPEX-машины ${last} (ЗФ 112W)</div></div>
+    <div class="card"><div class="n" style="color:#cf222e">€${(L.eur/1e6).toFixed(1)} млн</div><div class="l">импорт ${last} — валютная зависимость</div></div>
+    <div class="card"><div class="n">${Math.round(L.units)}</div><div class="l">машин ${last}</div></div>
     <div class="card"><div class="n">${L.lines}</div><div class="l">позиций ${last}</div></div>
   </div>`;
   h+=`<b>Потребление и бюджет по годам</b><div style="overflow-x:auto"><table class="ot" style="max-width:840px"><thead><tr><th>Год</th><th>Позиций</th><th>Единиц</th><th>Бюджет (план) ₽</th><th>Факт ₽</th><th>Импорт €</th><th>Импорт ¥</th></tr></thead><tbody>`;
