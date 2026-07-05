@@ -61,9 +61,21 @@ def build():
         if c in conf:
             conf[c] += 1
 
+    # справочные датасеты спроса/бюджета (не привязаны к позициям; из Excel-лимитов)
+    try:
+        demand = load("demand.json")
+    except FileNotFoundError:
+        demand = []
+    try:
+        competitor = load("competitor_prices.json")
+    except FileNotFoundError:
+        competitor = []
+
     tpl = (SITE / "index.template.html").read_text(encoding="utf-8")
     seed_json = json.dumps(seed, ensure_ascii=False, separators=(",", ":"))
     html = tpl.replace("[/*__SEED__*/]", seed_json)
+    html = html.replace("[/*__DEMAND__*/]", json.dumps(demand, ensure_ascii=False, separators=(",", ":")))
+    html = html.replace("[/*__COMPET__*/]", json.dumps(competitor, ensure_ascii=False, separators=(",", ":")))
     repl = {
         "__N_POS__": str(n_pos),
         "__N_WITH_ODM__": str(n_with_odm),

@@ -72,7 +72,7 @@ table.pt .eur{color:#0b5;font-variant-numeric:tabular-nums}
 <header>
   <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
     <div><b>База ЗИП · локализация производства</b> <span class="pill" id="cnt">…</span> <span class="pill" id="mode">…</span></div>
-    <div class="tabs"><button class="on" data-t="grid">Позиции</button><button data-t="sup">Поставщики</button><button data-t="wh">Склад</button><button data-t="stats">Обзор</button><button data-t="log">Журнал</button><button id="expPos" class="exp">⬇ позиции</button><button id="expOdm" class="exp">⬇ ODM</button><button id="expPrices" class="exp">⬇ цены</button><button id="expSamples" class="exp">⬇ образцы</button><button id="expSup" class="exp">⬇ поставщики</button></div>
+    <div class="tabs"><button class="on" data-t="grid">Позиции</button><button data-t="sup">Поставщики</button><button data-t="wh">Склад</button><button data-t="dem">Спрос</button><button data-t="stats">Обзор</button><button data-t="log">Журнал</button><button id="expPos" class="exp">⬇ позиции</button><button id="expOdm" class="exp">⬇ ODM</button><button id="expPrices" class="exp">⬇ цены</button><button id="expSamples" class="exp">⬇ образцы</button><button id="expSup" class="exp">⬇ поставщики</button></div>
   </div>
   <div class="bar" id="ctrls">
     <input id="q" type="text" placeholder="поиск: каталог, наименование, модель, OEM…">
@@ -89,6 +89,7 @@ table.pt .eur{color:#0b5;font-variant-numeric:tabular-nums}
 <div id="grid"></div>
 <div id="suppliers" class="hide" style="padding:12px"></div>
 <div id="wh" class="hide" style="padding:12px"></div>
+<div id="dem" class="hide" style="padding:12px"></div>
 <div id="stats" class="hide" style="padding:12px"></div>
 <div id="log" class="hide" style="padding:12px"></div>
 <div id="toast"></div>
@@ -96,6 +97,8 @@ table.pt .eur{color:#0b5;font-variant-numeric:tabular-nums}
 <script>
 const SUPA_URL="https://vpjliavuuxjcvtxbthlp.supabase.co", SUPA_KEY="sb_publishable_z74BF5VzezeQfTc9fni-ZA_HMyTKRTJ";
 const SEED=[/*__SEED__*/];
+const DEMAND=[/*__DEMAND__*/];
+const COMPET=[/*__COMPET__*/];
 const sb=(window.supabase)?supabase.createClient(SUPA_URL,SUPA_KEY):null;
 const $=id=>document.getElementById(id);
 let POS=[], ODM={}, PRICES={}, DRAW={}, SAMPLES={}, sortK="pp", sortA=true, LIVE=false;
@@ -452,6 +455,47 @@ $("wh").addEventListener("click",async e=>{
     const {data,error}=await sb.storage.from("samples").createSignedUrl(dls.dataset.dls,120);if(!error&&data)window.open(data.signedUrl,"_blank");}
 });
 function openPos(pid){document.querySelector('.tabs [data-t="grid"]').click();refreshDetail(pid);const dd=$("det-"+pid);if(dd)dd.scrollIntoView({block:"center"});}
+// ─── Спрос и бюджет заказчика ───
+function money(n){return n==null?"—":(Math.abs(n)>=1e6?(n/1e6).toFixed(1)+" млн":Math.round(n).toLocaleString("ru"));}
+function demHtml(){
+  if(!DEMAND.length)return '<div class="mut">Данные спроса не загружены.</div>';
+  const years=[...new Set(DEMAND.map(d=>d.year))].sort();
+  const byY={};years.forEach(y=>byY[y]={lines:0,units:0,plan:0,fact:0,eur:0,cny:0});
+  DEMAND.forEach(d=>{const b=byY[d.year];b.lines++;b.units+=d.qty||0;b.plan+=d.plan_cost_rub||0;b.fact+=d.fact_rub||0;if(d.currency=="EUR")b.eur+=d.import_value||0;else if(d.currency=="CNY")b.cny+=d.import_value||0;});
+  const last=years[years.length-1],L=byY[last];
+  let h=`<div class="mut" style="margin-bottom:8px">Спрос <b>ПАО «ГМК «Норильский никель», ЗФ: СПГТ</b> (лимиты снабжения перфораторов) + прайс конкурента <b>АО «Машиностроительный холдинг»</b>. Импортная (валютная) часть — таргет локализации.</div>`;
+  h+=`<div class="cards">
+    <div class="card"><div class="n">${money(L.plan)} ₽</div><div class="l">бюджет ${last}</div></div>
+    <div class="card"><div class="n" style="color:#cf222e">€${(L.eur/1e6).toFixed(1)} млн</div><div class="l">импорт ${last} — локализуемо</div></div>
+    <div class="card"><div class="n">${Math.round(L.units)}</div><div class="l">единиц ${last}</div></div>
+    <div class="card"><div class="n">${L.lines}</div><div class="l">позиций ${last}</div></div>
+  </div>`;
+  h+=`<b>Потребление и бюджет по годам</b><div style="overflow-x:auto"><table class="ot" style="max-width:840px"><thead><tr><th>Год</th><th>Позиций</th><th>Единиц</th><th>Бюджет (план) ₽</th><th>Факт ₽</th><th>Импорт €</th><th>Импорт ¥</th></tr></thead><tbody>`;
+  years.forEach(y=>{const b=byY[y];h+=`<tr><td><b>${y}</b></td><td class="cn">${b.lines}</td><td class="cn">${Math.round(b.units)}</td><td class="eur">${money(b.plan)}</td><td class="eur">${money(b.fact)}</td><td class="eur">${b.eur?(b.eur/1e6).toFixed(2)+" млн":"—"}</td><td class="eur">${b.cny?(b.cny/1e6).toFixed(2)+" млн":"—"}</td></tr>`;});
+  h+=`</tbody></table></div>`;
+  const oem={};DEMAND.filter(d=>d.year==last).forEach(d=>{const k=d.oem||"прочее/локальное";oem[k]=oem[k]||{u:0,plan:0,eur:0};oem[k].u+=d.qty||0;oem[k].plan+=d.plan_cost_rub||0;if(d.currency=="EUR")oem[k].eur+=d.import_value||0;});
+  h+=`<b>OEM-разбивка ${last} — кого локализовать</b><table class="ot" style="max-width:620px"><thead><tr><th>OEM</th><th>Ед.</th><th>Бюджет ₽</th><th>Импорт €</th></tr></thead><tbody>`;
+  Object.entries(oem).sort((a,b)=>b[1].plan-a[1].plan).forEach(([k,v])=>h+=`<tr><td>${esc(k)}</td><td class="cn">${Math.round(v.u)}</td><td class="eur">${money(v.plan)}</td><td class="eur">${v.eur?(v.eur/1e6).toFixed(2)+" млн":"—"}</td></tr>`);
+  h+=`</tbody></table>`;
+  const models=[...new Set(COMPET.map(c=>c.model).filter(m=>m&&m.length>1))];
+  h+=`<b>Прайс конкурента — АО «Машиностроительный холдинг» (${COMPET.length} позиций)</b>
+   <div class="mut" style="margin:3px 0">Уже локализует модели: <b>${models.slice(0,14).map(esc).join(", ")}</b>. Это бенчмарк по цене/срокам, который надо обойти.</div>
+   <input id="qcomp" placeholder="поиск по прайсу конкурента (артикул / модель / наименование)…" style="margin:6px 0;padding:6px 8px;width:340px;border:1px solid var(--ln);border-radius:6px">
+   <div id="comptab" style="overflow-x:auto"></div>`;
+  return h;
+}
+function compTable(q){
+  q=(q||"").toLowerCase().trim();
+  let rows=COMPET;if(q)rows=COMPET.filter(c=>((c.catalog_no||"")+" "+(c.name||"")+" "+(c.model||"")).toLowerCase().includes(q));
+  const shown=rows.slice(0,200);
+  let h=`<table class="ot"><thead><tr><th>Каталог №</th><th>Модель</th><th>Наименование</th><th>Ед.</th><th>Цена ₽</th></tr></thead><tbody>`;
+  shown.forEach(c=>h+=`<tr><td class="cn">${esc(c.catalog_no)}</td><td class="mut">${esc(c.model)}</td><td>${esc(c.name)}</td><td class="mut cn">${esc(c.unit)}</td><td class="eur">${c.price_rub!=null?Math.round(c.price_rub).toLocaleString("ru"):""}</td></tr>`);
+  h+=`</tbody></table>`;
+  if(rows.length>200)h+=`<div class="mut" style="margin-top:4px">показаны первые 200 из ${rows.length} — уточните поиск.</div>`;
+  if(!rows.length)h+=`<div class="mut">ничего не найдено.</div>`;
+  return h;
+}
+$("dem").addEventListener("input",e=>{if(e.target.id=="qcomp")$("comptab").innerHTML=compTable(e.target.value);});
 async function logHtml(){
   if(!LIVE)return '<span class="mut">Журнал доступен в онлайн-режиме.</span>';
   const {data}=await sb.from("change_log").select("*").order("at",{ascending:false}).limit(200);
@@ -461,9 +505,10 @@ async function logHtml(){
 document.querySelectorAll(".tabs [data-t]").forEach(b=>b.onclick=async()=>{
   document.querySelectorAll(".tabs [data-t]").forEach(x=>x.classList.remove("on"));b.classList.add("on");
   const t=b.dataset.t;$("grid").classList.toggle("hide",t!="grid");$("ctrls").style.visibility=t=="grid"?"visible":"hidden";
-  $("suppliers").classList.toggle("hide",t!="sup");$("wh").classList.toggle("hide",t!="wh");$("stats").classList.toggle("hide",t!="stats");$("log").classList.toggle("hide",t!="log");
+  $("suppliers").classList.toggle("hide",t!="sup");$("wh").classList.toggle("hide",t!="wh");$("dem").classList.toggle("hide",t!="dem");$("stats").classList.toggle("hide",t!="stats");$("log").classList.toggle("hide",t!="log");
   if(t=="sup")$("suppliers").innerHTML=supHtml();
   if(t=="wh")$("wh").innerHTML=whHtml();
+  if(t=="dem"){$("dem").innerHTML=demHtml();if($("comptab"))$("comptab").innerHTML=compTable("");}
   if(t=="stats")$("stats").innerHTML=statsHtml();
   if(t=="log")$("log").innerHTML=await logHtml();
 });
