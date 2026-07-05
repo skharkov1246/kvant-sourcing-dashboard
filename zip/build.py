@@ -70,12 +70,25 @@ def build():
         competitor = load("competitor_prices.json")
     except FileNotFoundError:
         competitor = []
+    try:
+        mat_nodes = load("material_strategy.json")
+    except FileNotFoundError:
+        mat_nodes = []
+    try:
+        mat_sup = load("material_suppliers.json")
+    except FileNotFoundError:
+        mat_sup = []
+    mat_text_path = ROOT / "СТРАТЕГИЯ-МАТЕРИАЛЫ.md"
+    mat_text = mat_text_path.read_text(encoding="utf-8") if mat_text_path.exists() else ""
 
     tpl = (SITE / "index.template.html").read_text(encoding="utf-8")
     seed_json = json.dumps(seed, ensure_ascii=False, separators=(",", ":"))
     html = tpl.replace("[/*__SEED__*/]", seed_json)
     html = html.replace("[/*__DEMAND__*/]", json.dumps(demand, ensure_ascii=False, separators=(",", ":")))
     html = html.replace("[/*__COMPET__*/]", json.dumps(competitor, ensure_ascii=False, separators=(",", ":")))
+    html = html.replace("[/*__MATNODES__*/]", json.dumps(mat_nodes, ensure_ascii=False, separators=(",", ":")))
+    html = html.replace("[/*__MATSUP__*/]", json.dumps(mat_sup, ensure_ascii=False, separators=(",", ":")))
+    html = html.replace("[/*__MATTEXT__*/]", "[" + json.dumps(mat_text, ensure_ascii=False) + "]")
     repl = {
         "__N_POS__": str(n_pos),
         "__N_WITH_ODM__": str(n_with_odm),
