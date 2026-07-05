@@ -27,14 +27,19 @@ def build():
     positions = load("positions.json")
     odm = load("odm_suppliers.json")
     prices = load("price_records.json")
+    try:
+        samples = load("samples.json")
+    except FileNotFoundError:
+        samples = []
 
-    # group odm/prices by position id (pp — стабильный ключ строки в UI)
-    by_pos_odm, by_pos_price = {}, {}
-    pp_of = {p["id"]: p.get("pp") for p in positions}
+    # group odm/prices/samples by position id (pp — стабильный ключ строки в UI)
+    by_pos_odm, by_pos_price, by_pos_samp = {}, {}, {}
     for o in odm:
         by_pos_odm.setdefault(o.get("position_id"), []).append(o)
     for r in prices:
         by_pos_price.setdefault(r.get("position_id"), []).append(r)
+    for s in samples:
+        by_pos_samp.setdefault(s.get("position_id"), []).append(s)
 
     seed = []
     for p in positions:
@@ -43,6 +48,7 @@ def build():
             "pos": p,
             "odm": by_pos_odm.get(pid, []),
             "prices": by_pos_price.get(pid, []),
+            "samples": by_pos_samp.get(pid, []),
         })
 
     # статистика для баннера
