@@ -1,0 +1,41 @@
+{
+ "hs": "8431",
+ "method": "search",
+ "country": "ru",
+ "period": [
+  "2023-01-01",
+  "2026-03-31"
+ ],
+ "total_records": 0,
+ "strong": 0,
+ "weak": 0,
+ "fields": [
+  "meta",
+  "search"
+ ],
+ "meta": {
+  "auth_key": "muqnMvVxxi",
+  "ip": "172.184.174.115",
+  "status": {
+   "limits": {
+    "left": 100000,
+    "monthly": 100000
+   },
+   "mode": "full"
+  },
+  "dates_available": {
+   "start": "2012-01-01",
+   "finish": "2026-03-31"
+  },
+  "server": {
+   "time": "2026-07-07 15:30:37",
+   "status": "200",
+   "protocol": "HTTP/1.1",
+   "request_timer": {
+    "human": "00:00:03",
+    "microtime": 3.9125521183013916
+   }
+  }
+ },
+ "matched": []
+}
