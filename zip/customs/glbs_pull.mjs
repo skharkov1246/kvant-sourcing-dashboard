@@ -27,7 +27,7 @@ const COUNTRY = process.env.GLBS_COUNTRY || 'ru';
 const P1 = process.env.GLBS_PERIOD_START || '2023-01-01';
 const P2 = process.env.GLBS_PERIOD_FINISH || '2026-03-31';
 const MAX_HS = parseInt(process.env.GLBS_MAX_HS || '3', 10);
-const MAX_MATCH = parseInt(process.env.GLBS_MAX_MATCH || '4000', 10);
+const MAX_MATCH = parseInt(process.env.GLBS_MAX_MATCH || '20000', 10);
 const OUT = 'zip/customs/out';
 mkdirSync(OUT, { recursive: true });
 
@@ -122,13 +122,27 @@ for (const hs of hsList) {
     const sampleKeys = recs[0] ? Object.keys(recs[0]) : Object.keys(json);
     const skel = skeleton(json);
     if (!recs.length) console.log(`[hs ${hs}] SKELETON=${JSON.stringify(skel)}`);
+    // компактная проекция декларации ГТД (G-коды → человекочитаемые поля)
+    const cut = (s, n) => String(s || '').slice(0, n);
+    const compact = (rec, tag, pn) => ({
+      tag, pn: pn || undefined,
+      date: rec.G072 || rec.GD1 || rec.G230 || '',
+      importer: cut(rec.G082, 120), inn: rec.G081 || '',
+      exporter: cut(rec.G31_11 || rec.G022, 120), brand: cut(rec.G31_12, 40),
+      origin: rec.G34 || '', dispatch: rec.G15A || '',
+      cur: rec.G221 || '', incoterms: rec.G202 || '', place: cut(rec.G2021, 40),
+      hs10: rec.G33 || '', desc: cut(rec.G31_1, 220),
+      net_kg: rec.G38 || '', gross_kg: rec.G35 || '', usd_kg: rec.USDKG || '',
+      val: rec.G42 || '', custval: rec.G45 || '', statval: rec.G46 || '',
+    });
     // фильтр: сильный (наш PN) + слабый (OEM/перфоратор-слова)
     const strong = [], weak = [];
     for (const rec of recs) {
       const h = hay(rec);
-      let hit = false;
-      for (const t of tokenSet) { if (t.length >= 6 && h.includes(t)) { strong.push(rec); hit = true; break; } }
-      if (!hit && OEM_RE.test(hayRaw(rec))) weak.push(rec);
+      let pn = null;
+      for (const t of tokenSet) { if (t.length >= 6 && h.includes(t)) { pn = t; break; } }
+      if (pn) strong.push(compact(rec, 'strong', pn));
+      else if (OEM_RE.test(hayRaw(rec))) weak.push(compact(rec, 'weak'));
     }
     const matched = strong.concat(weak).slice(0, MAX_MATCH);
     writeFileSync(`${OUT}/customs_${hs}.json`, JSON.stringify({
