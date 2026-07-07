@@ -6,7 +6,10 @@
   "2026-03-31"
  ],
  "hs": [
-  "8431"
+  "8431",
+  "8467",
+  "8207",
+  "8412"
  ],
  "results": [
   {
@@ -48,6 +51,60 @@
     "G07"
    ],
    "url": "https://glbs.io/api/supplies-search/?api-key=***&method=search&country=ru&period_start=2023-01-01&period_finish=2026-03-31&format=json&search%5Bdirection%5D=%D0%98%D0%9C&search%5Bhs_code%5D%5B0%5D=8431*"
+  },
+  {
+   "hs": "8467",
+   "status": 400,
+   "bytes": 104,
+   "error": "{\"error\":\"Вы создали запрос с количеством поставок (143415), превышающим установленный лимит (100000).\"}",
+   "url": "https://glbs.io/api/supplies-search/?api-key=***&method=search&country=ru&period_start=2023-01-01&period_finish=2026-03-31&format=json&search%5Bdirection%5D=%D0%98%D0%9C&search%5Bhs_code%5D%5B0%5D=8467*"
+  },
+  {
+   "hs": "8207",
+   "status": 400,
+   "bytes": 104,
+   "error": "{\"error\":\"Вы создали запрос с количеством поставок (168090), превышающим установленный лимит (100000).\"}",
+   "url": "https://glbs.io/api/supplies-search/?api-key=***&method=search&country=ru&period_start=2023-01-01&period_finish=2026-03-31&format=json&search%5Bdirection%5D=%D0%98%D0%9C&search%5Bhs_code%5D%5B0%5D=8207*"
+  },
+  {
+   "hs": "8412",
+   "status": 200,
+   "total_records": 95069,
+   "strong": 15205,
+   "weak": 2687,
+   "fields": [
+    "G31_11",
+    "G31_12",
+    "G221",
+    "G0121",
+    "G15A",
+    "G17A",
+    "G0831",
+    "G0231",
+    "G34",
+    "G11",
+    "G071",
+    "G42",
+    "G45",
+    "G46",
+    "USDKG",
+    "G072",
+    "GD1",
+    "G230",
+    "G083",
+    "G082",
+    "G081",
+    "G081_region",
+    "G022",
+    "G021",
+    "G021_region",
+    "G023",
+    "G33",
+    "G2021",
+    "G202",
+    "G07"
+   ],
+   "url": "https://glbs.io/api/supplies-search/?api-key=***&method=search&country=ru&period_start=2023-01-01&period_finish=2026-03-31&format=json&search%5Bdirection%5D=%D0%98%D0%9C&search%5Bhs_code%5D%5B0%5D=8412*"
   }
  ]
 }
