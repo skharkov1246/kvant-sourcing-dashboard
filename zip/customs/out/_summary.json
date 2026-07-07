@@ -2,28 +2,20 @@
  "method": "search",
  "country": "ru",
  "period": [
-  "2023-01-01",
-  "2023-12-31"
+  "2024-01-01",
+  "2024-12-31"
  ],
  "hs": [
-  "401693",
   "848120",
-  "848180"
+  "8466"
  ],
  "results": [
   {
-   "hs": "401693",
-   "status": 400,
-   "bytes": 103,
-   "error": "{\"error\":\"Вы создали запрос с количеством поставок (136356), превышающим установленный лимит (99092).\"}",
-   "url": "https://glbs.io/api/supplies-search/?api-key=***&method=search&country=ru&period_start=2023-01-01&period_finish=2023-12-31&format=json&search%5Bdirection%5D=%D0%98%D0%9C&search%5Bhs_code%5D%5B0%5D=401693*"
-  },
-  {
    "hs": "848120",
    "status": 200,
-   "total_records": 25877,
-   "strong": 9,
-   "weak": 648,
+   "total_records": 9657,
+   "strong": 2,
+   "weak": 300,
    "fields": [
     "G31_11",
     "G31_12",
@@ -56,14 +48,47 @@
     "G202",
     "G07"
    ],
-   "url": "https://glbs.io/api/supplies-search/?api-key=***&method=search&country=ru&period_start=2023-01-01&period_finish=2023-12-31&format=json&search%5Bdirection%5D=%D0%98%D0%9C&search%5Bhs_code%5D%5B0%5D=848120*"
+   "url": "https://glbs.io/api/supplies-search/?api-key=***&method=search&country=ru&period_start=2024-01-01&period_finish=2024-12-31&format=json&search%5Bdirection%5D=%D0%98%D0%9C&search%5Bhs_code%5D%5B0%5D=848120*"
   },
   {
-   "hs": "848180",
-   "status": 400,
-   "bytes": 103,
-   "error": "{\"error\":\"Вы создали запрос с количеством поставок (128068), превышающим установленный лимит (99092).\"}",
-   "url": "https://glbs.io/api/supplies-search/?api-key=***&method=search&country=ru&period_start=2023-01-01&period_finish=2023-12-31&format=json&search%5Bdirection%5D=%D0%98%D0%9C&search%5Bhs_code%5D%5B0%5D=848180*"
+   "hs": "8466",
+   "status": 200,
+   "total_records": 17704,
+   "strong": 1,
+   "weak": 936,
+   "fields": [
+    "G31_11",
+    "G31_12",
+    "G221",
+    "G0121",
+    "G15A",
+    "G17A",
+    "G0831",
+    "G0231",
+    "G34",
+    "G11",
+    "G071",
+    "G42",
+    "G45",
+    "G46",
+    "USDKG",
+    "G072",
+    "GD1",
+    "G230",
+    "G083",
+    "G082",
+    "G081",
+    "G081_region",
+    "G022",
+    "G021",
+    "G021_region",
+    "G023",
+    "G33",
+    "G2021",
+    "G202",
+    "G07"
+   ],
+   "url": "https://glbs.io/api/supplies-search/?api-key=***&method=search&country=ru&period_start=2024-01-01&period_finish=2024-12-31&format=json&search%5Bdirection%5D=%D0%98%D0%9C&search%5Bhs_code%5D%5B0%5D=8466*"
   }
  ]
 }
