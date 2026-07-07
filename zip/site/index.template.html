@@ -102,6 +102,7 @@ const DEMAND=[/*__DEMAND__*/];
 const COMPET=[/*__COMPET__*/];
 const MATNODES=[/*__MATNODES__*/];
 const MATSUP=[/*__MATSUP__*/];
+const MATPROC=[/*__MATPROC__*/];
 const MATTEXT=[/*__MATTEXT__*/][0]||"";
 const sb=(window.supabase)?supabase.createClient(SUPA_URL,SUPA_KEY):null;
 const $=id=>document.getElementById(id);
@@ -544,18 +545,31 @@ function compTable(q){
 $("dem").addEventListener("input",e=>{if(e.target.id=="qcomp")$("comptab").innerHTML=compTable(e.target.value);});
 // ─── Материалы и металлурги («крепче оригинала») ───
 let matFilter="";
+// техкарта термообработки + протокол приёмочных испытаний по узлу (research-workflow)
+function procCard(i){
+  const p=MATPROC.find(x=>x&&x.node_index===i);if(!p)return"";
+  const ht=(p.heat_treat||[]).map(s=>`<tr><td><b>${esc(s.step)}</b></td><td>${esc(s.regime)}</td><td class="mut">${esc(s.target)}</td></tr>`).join("");
+  const tp=(p.test_protocol||[]).map(t=>`<tr><td><b>${esc(t.test)}</b></td><td class="cn">${esc(t.standard)}</td><td>${esc(t.acceptance)}</td></tr>`).join("");
+  const df=(p.defects||[]).map(d=>`<li>${esc(d)}</li>`).join("");
+  return `<details style="margin-top:6px"><summary style="cursor:pointer;font-weight:600;color:#1a7f37">⚙ Техкарта термообработки + протокол испытаний</summary>
+    <div style="margin:6px 0 2px">${p.summary?`<div class="mut" style="margin-bottom:6px">${esc(p.summary)}</div>`:""}
+    ${ht?`<div style="font-weight:600;font-size:12px;margin:4px 0">Маршрут термо/ХТО</div><div style="overflow-x:auto"><table class="pt"><thead><tr><th>Операция</th><th>Режим</th><th>Цель</th></tr></thead><tbody>${ht}</tbody></table></div>`:""}
+    ${tp?`<div style="font-weight:600;font-size:12px;margin:8px 0 4px">Протокол приёмочных испытаний</div><div style="overflow-x:auto"><table class="pt"><thead><tr><th>Испытание</th><th>Стандарт</th><th>Критерий приёмки</th></tr></thead><tbody>${tp}</tbody></table></div>`:""}
+    ${df?`<div style="font-weight:600;font-size:12px;margin:8px 0 2px">Типовые дефекты / контроль</div><ul class="mut" style="margin:2px 0 0 16px;font-size:11px">${df}</ul>`:""}
+    </div></details>`;
+}
 function matHtml(){
   let h=`<div class="mut" style="margin-bottom:8px">Материаловедческая стратегия <b>«крепче оригинала»</b>: по каждому изнашиваемому узлу — марка/обработка OEM (Epiroc/Sandvik/Tamrock) и наша превосходящая альтернатива; ниже — шорт-лист поставщиков материалов по категориям и полная стратегия.</div>`;
   if(MATNODES.length){
     h+=`<b>Металлургия узлов — что бьёт OEM</b>`;
-    MATNODES.forEach(m=>{h+=`<div class="pbx"><div class="pbx-h"><b>${esc((m.part_class||"").split("(")[0].slice(0,64))}</b>${m.expected_gain?` <span class="loc" style="background:#1a7f37">${esc(m.expected_gain.slice(0,46))}</span>`:""}</div>
+    MATNODES.forEach((m,i)=>{h+=`<div class="pbx"><div class="pbx-h"><b>${esc((m.part_class||"").split("(")[0].slice(0,64))}</b>${m.expected_gain?` <span class="loc" style="background:#1a7f37">${esc(m.expected_gain.slice(0,46))}</span>`:""}</div>
       <table class="pt"><tbody>
       ${m.oem_material?`<tr><td class="mut" style="width:130px">OEM материал</td><td>${esc(m.oem_material)}</td></tr>`:""}
       ${m.oem_treatment?`<tr><td class="mut">OEM обработка</td><td>${esc(m.oem_treatment)}</td></tr>`:""}
       <tr><td class="mut"><b style="color:#1a7f37">Наша марка</b></td><td><b>${esc(m.alt_material)}</b></td></tr>
       ${m.alt_treatment?`<tr><td class="mut"><b style="color:#1a7f37">Наша обработка</b></td><td>${esc(m.alt_treatment)}</td></tr>`:""}
       <tr><td class="mut">Почему прочнее</td><td>${esc(m.rationale)}</td></tr>
-      </tbody></table></div>`;});
+      </tbody></table>${procCard(i)}</div>`;});
   }
   const cats=[...new Set(MATSUP.map(s=>s.category))];
   h+=`<b>Поставщики материалов (${MATSUP.length})</b>
