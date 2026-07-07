@@ -7,8 +7,6 @@
  ],
  "hs": [
   "8431",
-  "8467",
-  "8207",
   "8412"
  ],
  "results": [
@@ -16,8 +14,8 @@
    "hs": "8431",
    "status": 200,
    "total_records": 67474,
-   "strong": 7246,
-   "weak": 5222,
+   "strong": 7,
+   "weak": 5970,
    "fields": [
     "G31_11",
     "G31_12",
@@ -53,25 +51,11 @@
    "url": "https://glbs.io/api/supplies-search/?api-key=***&method=search&country=ru&period_start=2023-01-01&period_finish=2026-03-31&format=json&search%5Bdirection%5D=%D0%98%D0%9C&search%5Bhs_code%5D%5B0%5D=8431*"
   },
   {
-   "hs": "8467",
-   "status": 400,
-   "bytes": 104,
-   "error": "{\"error\":\"Вы создали запрос с количеством поставок (143415), превышающим установленный лимит (100000).\"}",
-   "url": "https://glbs.io/api/supplies-search/?api-key=***&method=search&country=ru&period_start=2023-01-01&period_finish=2026-03-31&format=json&search%5Bdirection%5D=%D0%98%D0%9C&search%5Bhs_code%5D%5B0%5D=8467*"
-  },
-  {
-   "hs": "8207",
-   "status": 400,
-   "bytes": 104,
-   "error": "{\"error\":\"Вы создали запрос с количеством поставок (168090), превышающим установленный лимит (100000).\"}",
-   "url": "https://glbs.io/api/supplies-search/?api-key=***&method=search&country=ru&period_start=2023-01-01&period_finish=2026-03-31&format=json&search%5Bdirection%5D=%D0%98%D0%9C&search%5Bhs_code%5D%5B0%5D=8207*"
-  },
-  {
    "hs": "8412",
    "status": 200,
    "total_records": 95069,
-   "strong": 15205,
-   "weak": 2687,
+   "strong": 33,
+   "weak": 3559,
    "fields": [
     "G31_11",
     "G31_12",
