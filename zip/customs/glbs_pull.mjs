@@ -44,14 +44,17 @@ if (!hsList.length) {
 }
 hsList = hsList.slice(0, MAX_HS);
 
-// наши каталожные номера/алиасы (токены >=4 символов) для сильного матчинга
+// наши каталожные номера как строгие токены: обязательно с цифрой (иначе
+// англ.слова из алиасов типа ENGINE/MINING/PRODUCTS дают ложные совпадения),
+// чисто-цифровые — от 7 знаков, буквенно-цифровые — от 6.
 const tokenSet = new Set();
 const norm = s => String(s || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+const goodTok = n => /\d/.test(n) && n.length >= 6 && (/[A-Z]/.test(n) ? n.length >= 6 : n.length >= 7);
 for (const p of pos) {
   for (const raw of [p.catalog_no, p.aliases]) {
-    for (const t of String(raw || '').split(/[\s,;/]+/)) {
+    for (const t of String(raw || '').split(/[\s,;/()]+/)) {
       const n = norm(t);
-      if (n.length >= 5) tokenSet.add(n);
+      if (goodTok(n)) tokenSet.add(n);
     }
   }
 }
@@ -102,8 +105,10 @@ function cleanMeta(m) {
   for (const k of ['auth_key', 'key', 'api_key', 'apikey', 'ip', 'user_ip']) delete c[k];
   return c;
 }
-const hay = rec => norm(JSON.stringify(rec));      // для матчинга по PN
-const hayRaw = rec => JSON.stringify(rec);          // для матчинга по словам (OEM)
+// матчим ТОЛЬКО по описанию товара (не по названиям фирм/адресам!)
+const descOf = rec => `${rec.G31_1 || ''} ${rec.G31_20 || ''} ${rec.G31_12 || ''} ${rec.G07 || ''}`;
+const hay = rec => norm(descOf(rec));                                  // PN в описании
+const hayRaw = rec => `${descOf(rec)} ${rec.G31_11 || ''} ${rec.G022 || ''} ${rec.G082 || ''}`; // OEM-слова: описание+бренд+контрагенты
 
 const summary = [];
 for (const hs of hsList) {
