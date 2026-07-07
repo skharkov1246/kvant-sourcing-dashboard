@@ -131,6 +131,7 @@ for (const hs of hsList) {
     const cut = (s, n) => String(s || '').slice(0, n);
     const compact = (rec, tag, pn) => ({
       tag, pn: pn || undefined,
+      decl: rec.G281 || '', qty: rec.G0121 || rec.G41 || rec.G31_5 || '',
       date: rec.G072 || rec.GD1 || rec.G230 || '',
       importer: cut(rec.G082, 120), inn: rec.G081 || '',
       exporter: cut(rec.G31_11 || rec.G022, 120), brand: cut(rec.G31_12, 40),
@@ -154,6 +155,7 @@ for (const hs of hsList) {
       hs, method: METHOD, country: COUNTRY, period: [P1, P2],
       total_records: recs.length, strong: strong.length, weak: weak.length,
       fields: sampleKeys, meta: cleanMeta(json.meta), skeleton: recs.length ? undefined : skel,
+      sample_full: (strong.length ? recs.filter(r => OEM_RE.test(hayRaw(r))) : recs).slice(0, 2),
       matched,
     }, null, 1));
     console.log(`[hs ${hs}] status=200 total=${recs.length} strong=${strong.length} weak=${weak.length} fields=${JSON.stringify(sampleKeys.slice(0, 30))}`);
