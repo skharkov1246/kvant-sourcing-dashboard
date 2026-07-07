@@ -449,8 +449,10 @@ function statsHtml(){
   h+=`<b>Воронка локализации</b><div class="funnel">`+LOC.map(l=>`<div class="fr"><span class="nm">${esc(l)}</span><div class="fb" style="width:${Math.round(loc[l]/mx1*320)}px;background:${LOCC[l]}"></div><span>${loc[l]}</span></div>`).join("")+`</div>`;
   const smx=Math.max(1,...Object.values(samp));
   if(sampCnt)h+=`<b>Образцы по статусам</b><div class="funnel">`+SAMP.map(s=>`<div class="fr"><span class="nm">${esc(s)}</span><div class="fb" style="width:${Math.round(samp[s]/smx*320)}px;background:${SAMPC[s]}"></div><span>${samp[s]}</span></div>`).join("")+`</div>`;
-  if(sav.length){h+=`<b>Топ разброса цен (потенциал экономии OEM↔афтермаркет)</b><table class="ot" style="max-width:760px"><thead><tr><th>П/П</th><th>Наименование</th><th>мин</th><th>макс</th><th>разброс</th></tr></thead><tbody>`+
-    sav.slice(0,12).map(s=>`<tr><td class="cn">${s.d.pp}</td><td>${esc(s.d.name)}</td><td class="eur">${s.mn}</td><td class="eur">${s.mx}</td><td class="eur"><b>${(s.mx-s.mn).toFixed(1)}</b></td></tr>`).join("")+`</tbody></table>`;}
+  if(sav.length){const totDelta=sav.reduce((a,s)=>a+s.delta,0);
+    h+=`<b>Бизнес-кейс: маржа локализации</b> <span class="mut">(мин = себестоимость-ориентир афтермаркет, макс = OEM/рынок; маржа = что захватываем, локализуя. Позиций с вилкой: ${sav.length}, суммарная вилка ≈ ${totDelta.toFixed(0)} на ед.)</span>
+    <div style="overflow-x:auto"><table class="ot" style="max-width:840px"><thead><tr><th>П/П</th><th>Наименование</th><th>Себест.-ориентир</th><th>OEM/рынок</th><th>Маржа/ед</th><th>%</th></tr></thead><tbody>`+
+    sav.slice(0,15).map(s=>`<tr><td class="cn">${s.d.pp}</td><td>${esc((s.d.name||"").slice(0,40))}</td><td class="eur">${s.mn}</td><td class="eur">${s.mx}</td><td class="eur"><b>${s.delta.toFixed(1)}</b></td><td class="cn">${Math.round(s.delta/s.mn*100)}%</td></tr>`).join("")+`</tbody></table></div>`;}
   // Топ кандидатов на локализацию: готовность = завод-ODM + ценовой бенчмарк + рекомендация материала + продвинутый статус
   const cand=POS.map(d=>{const odm=(ODM[d.id]||[]).length,pr=(PRICES[d.id]||[]).length,mat=!!matchNode(d),adv=["образцы","тест","одобрено","серия"].includes(d.loc_status||"");
     const score=(odm?2:0)+(pr?2:0)+(mat?1:0)+(adv?1:0);return {d:d,odm:odm,pr:pr,mat:mat,score:score};}).filter(x=>x.odm&&x.pr).sort((a,b)=>b.score-a.score||b.pr-a.pr);
@@ -513,6 +515,14 @@ function demHtml(){
   h+=`<b>OEM-разбивка ${last} — кого локализовать</b><table class="ot" style="max-width:620px"><thead><tr><th>OEM</th><th>Ед.</th><th>Бюджет ₽</th><th>Импорт €</th></tr></thead><tbody>`;
   Object.entries(oem).sort((a,b)=>b[1].plan-a[1].plan).forEach(([k,v])=>h+=`<tr><td>${esc(k)}</td><td class="cn">${Math.round(v.u)}</td><td class="eur">${money(v.plan)}</td><td class="eur">${v.eur?(v.eur/1e6).toFixed(2)+" млн":"—"}</td></tr>`);
   h+=`</tbody></table>`;
+  // Конкурентная карта: какие ЦЕЛЫЕ машины конкурент уже локализует (цена) vs OEM-спрос → белые пятна
+  const machines=COMPET.filter(c=>(c.price_rub||0)>2e6&&/перфоратор|drill|бурильн/i.test(c.name||"")).sort((a,b)=>b.price_rub-a.price_rub);
+  const demOems=[...new Set(DEMAND.map(d=>d.oem).filter(Boolean))];
+  const mxCovers="Paus/HL·HLX·RD (собственные модели МХ)";
+  h+=`<b>Конкурентная карта — что «Машиностроительный холдинг» уже локализует</b>
+   <div style="overflow-x:auto"><table class="ot" style="max-width:700px"><thead><tr><th>Модель конкурента</th><th>Наименование</th><th>Цена ₽</th></tr></thead><tbody>`+
+   machines.slice(0,10).map(c=>`<tr><td class="mut">${esc(c.model)}</td><td>${esc((c.name||"").slice(0,44))}</td><td class="eur">${money(c.price_rub)}</td></tr>`).join("")+`</tbody></table></div>
+   <div class="mut" style="margin:4px 0 10px">Конкурент закрывает семейство <b>${esc(mxCovers)}</b> (перфораторы Sandvik/Tamrock HL·HLX·RD + база Paus). OEM в спросе Норникеля: <b>${demOems.map(esc).join(", ")}</b>. «Белое пятно» под нас — <b>${esc(demOems.filter(o=>!/paus|sandvik|tamrock/i.test(o)).join(", ")||"—")}</b>: этих OEM конкурент не локализует.</div>`;
   const models=[...new Set(COMPET.map(c=>c.model).filter(m=>m&&m.length>1))];
   h+=`<b>Прайс конкурента — АО «Машиностроительный холдинг» (${COMPET.length} позиций)</b>
    <div class="mut" style="margin:3px 0">Уже локализует модели: <b>${models.slice(0,14).map(esc).join(", ")}</b>. Это бенчмарк по цене/срокам, который надо обойти.</div>
