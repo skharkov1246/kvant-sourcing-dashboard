@@ -509,6 +509,11 @@ function custHtml(){
     <div class="card"><div class="n">${(CUSTOMS.oem_direct||[]).length}</div><div class="l">прямой импорт от OEM (Sandvik/Epiroc…)</div></div>
     <div class="card"><div class="n">${CUSTOMS.strong_linked||0}</div><div class="l">привязано к позициям (наш PN в ГТД)</div></div>
   </div>`;
+  // отслеживаемые конкуренты-локализаторы
+  const w=CUSTOMS.watched||[];
+  if(w.length){h+=`<b>Конкуренты-локализаторы под наблюдением</b><div class="mut" style="font-size:11px;margin:2px 0">Импортный след известных локализаторов ЗИП (по всей базе совпадений).</div>
+    <div style="overflow-x:auto"><table class="ot"><thead><tr><th>Компания</th><th>Деклараций</th><th>USD/кг медиана</th><th>Страны</th><th>Годы</th></tr></thead><tbody>`+
+    w.map(x=>`<tr style="background:#fef9c3"><td><b>${esc(x.name)}</b></td><td class="cn">${x.declarations}</td><td class="cn">${x.usd_kg_med??"—"}</td><td class="mut">${(x.top_origins||[]).map(o=>esc(o[0])+":"+o[1]).join(", ")}</td><td class="mut">${Object.entries(x.by_year||{}).map(([y,c])=>y+":"+c).join(", ")}</td></tr>`).join("")+`</tbody></table></div>`;}
   // по годам
   const yrs=P.by_year||{};
   h+=`<b>Импорт по годам</b><div style="overflow-x:auto"><table class="ot" style="max-width:520px"><thead><tr>`+

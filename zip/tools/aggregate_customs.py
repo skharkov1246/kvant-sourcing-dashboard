@@ -24,6 +24,26 @@ DATA = ROOT / "data"
 OUT = ROOT / "customs" / "out"
 
 norm = lambda s: re.sub(r"[^A-Z0-9]", "", str(s or "").upper())
+
+
+def norm_org(s):
+    """Привести юр.форму к короткой и снять кавычки — иначе один завод
+    двоится как «Общество с ограниченной ответственностью X» и «ООО X»."""
+    s = re.sub(r"\s+", " ", str(s or "").strip())
+    repl = [
+        (r"ПУБЛИЧНОЕ АКЦИОНЕРНОЕ ОБЩЕСТВО", "ПАО"),
+        (r"ЗАКРЫТОЕ АКЦИОНЕРНОЕ ОБЩЕСТВО", "ЗАО"),
+        (r"ОТКРЫТОЕ АКЦИОНЕРНОЕ ОБЩЕСТВО", "ОАО"),
+        (r"АКЦИОНЕРНОЕ ОБЩЕСТВО", "АО"),
+        (r"ОБЩЕСТВО С ОГРАНИЧЕННОЙ ОТВЕТСТВЕННОСТЬЮ", "ООО"),
+        (r"ИНДИВИДУАЛЬНЫЙ ПРЕДПРИНИМАТЕЛЬ", "ИП"),
+    ]
+    up = s.upper()
+    for pat, short in repl:
+        up = re.sub(pat, short, up)
+    up = up.replace("«", '"').replace("»", '"').replace("'", '"')
+    up = re.sub(r'\s*"\s*', '"', up).strip().strip('"')
+    return up
 # перфоратор-специфика (узкий фильтр — отсечь генерик «буровая лебёдка» и пр.)
 PERF_RE = re.compile(
     r"перфоратор|гидроперфоратор|гидроударник|drifter|rock ?drill|"
@@ -118,10 +138,12 @@ def main():
     # --- 2) customs_market.json (рыночная сводка) ---
     perf = [x for x in (strong_all + weak_all) if PERF_RE.search(x.get("desc", ""))]
 
-    def agg_by(items, keyf, topn=15):
+    def agg_by(items, keyf, topn=15, orgnorm=False):
         d = {}
         for x in items:
             k = (keyf(x) or "").strip()
+            if orgnorm:
+                k = norm_org(k)
             if not k:
                 continue
             e = d.setdefault(k, {"cnt": 0, "kg": []})
@@ -144,6 +166,35 @@ def main():
         return dict(sorted(d.items()))
 
     all_kg = [fnum(x.get("usd_kg")) for x in perf]
+
+    # отслеживаемые конкуренты-локализаторы (показываем всегда, вне топа) —
+    # по всем совпадениям, не только перфоратор-подмножеству
+    WATCH = {"Машиностроительный холдинг": r"машиностроительн\w* холдинг|\bМХ\b",
+             "Пумори / Уралмаш-инструмент": r"пумори"}
+    watched = []
+    allm = strong_all + weak_all
+    for label, pat in WATCH.items():
+        rx = re.compile(pat, re.I)
+        hits = [x for x in allm if rx.search(x.get("importer", "") or "")]
+        if not hits:
+            continue
+        kgv = [fnum(x.get("usd_kg")) for x in hits]
+        yrs = {}
+        for x in hits:
+            y = (x.get("date") or "")[:4]
+            if re.fullmatch(r"20\d\d", y):
+                yrs[y] = yrs.get(y, 0) + 1
+        origins = {}
+        for x in hits:
+            o = x.get("origin", "")
+            if o:
+                origins[o] = origins.get(o, 0) + 1
+        watched.append({
+            "name": label, "declarations": len(hits),
+            "usd_kg_med": pct(kgv, 0.5), "n_price": len([k for k in kgv if k]),
+            "by_year": dict(sorted(yrs.items())),
+            "top_origins": sorted(origins.items(), key=lambda a: -a[1])[:5],
+        })
     oem_direct = [{
         "year": int((x.get("date") or "0")[:4] or 0) or None,
         "importer": x.get("importer", "")[:60], "exporter": x.get("exporter", "")[:60],
@@ -161,12 +212,13 @@ def main():
             "declarations": len(perf),
             "by_year": by_year(perf),
             "origins": agg_by(perf, lambda x: x.get("origin"), 12),
-            "top_importers": agg_by(perf, lambda x: x.get("importer"), 20),
+            "top_importers": agg_by(perf, lambda x: x.get("importer"), 20, orgnorm=True),
             "top_exporters": agg_by(perf, lambda x: x.get("exporter"), 20),
             "usd_kg": {"p25": pct(all_kg, 0.25), "median": pct(all_kg, 0.5),
                        "p75": pct(all_kg, 0.75), "n_price": len([k for k in all_kg if k])},
         },
         "oem_direct": oem_direct,
+        "watched": watched,
         "strong_linked": added,
     }
     (DATA / "customs_market.json").write_text(
