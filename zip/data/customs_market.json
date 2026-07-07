@@ -7,89 +7,95 @@
   "8207",
   "8412",
   "8431",
+  "8466",
+  "8466",
+  "8466",
   "8467",
   "8467",
-  "8467"
+  "8467",
+  "848120",
+  "848120",
+  "848120"
  ],
  "note": "USD/кг — открытый бенчмарк режима search; маскированные значения пропущены; реальную инвойс-стоимость даёт method=save.",
  "perforator": {
-  "declarations": 22252,
+  "declarations": 23219,
   "by_year": {
-   "2023": 11241,
-   "2024": 6960,
-   "2025": 2862,
-   "2026": 1189
+   "2023": 11795,
+   "2024": 7286,
+   "2025": 2938,
+   "2026": 1200
   },
   "origins": [
    {
     "name": "CN",
-    "cnt": 15376,
-    "usd_kg_med": 6.38,
-    "n_price": 12021
+    "cnt": 16082,
+    "usd_kg_med": 6.75,
+    "n_price": 12500
    },
    {
     "name": "KZ",
-    "cnt": 3448,
+    "cnt": 3496,
     "usd_kg_med": null,
     "n_price": 0
    },
    {
     "name": "DE",
-    "cnt": 697,
-    "usd_kg_med": 35.8,
-    "n_price": 83
+    "cnt": 737,
+    "usd_kg_med": 36.0,
+    "n_price": 89
    },
    {
     "name": "TR",
-    "cnt": 431,
-    "usd_kg_med": 70.55,
-    "n_price": 154
+    "cnt": 471,
+    "usd_kg_med": 68.94,
+    "n_price": 171
    },
    {
     "name": "KR",
-    "cnt": 353,
-    "usd_kg_med": 7.43,
-    "n_price": 65
+    "cnt": 371,
+    "usd_kg_med": 8.12,
+    "n_price": 68
    },
    {
     "name": "TW",
-    "cnt": 288,
-    "usd_kg_med": 30.97,
-    "n_price": 35
+    "cnt": 311,
+    "usd_kg_med": 39.12,
+    "n_price": 50
    },
    {
     "name": "JP",
-    "cnt": 257,
+    "cnt": 267,
     "usd_kg_med": 27.33,
     "n_price": 28
    },
    {
     "name": "IT",
-    "cnt": 207,
-    "usd_kg_med": 35.98,
-    "n_price": 6
+    "cnt": 222,
+    "usd_kg_med": 57.89,
+    "n_price": 10
    },
    {
     "name": "CZ",
-    "cnt": 184,
-    "usd_kg_med": 50.38,
-    "n_price": 67
+    "cnt": 192,
+    "usd_kg_med": 50.96,
+    "n_price": 70
    },
    {
     "name": "IL",
-    "cnt": 163,
+    "cnt": 178,
     "usd_kg_med": 66.99,
     "n_price": 3
    },
    {
     "name": "IN",
-    "cnt": 92,
-    "usd_kg_med": 25.6,
-    "n_price": 27
+    "cnt": 105,
+    "usd_kg_med": 25.23,
+    "n_price": 29
    },
    {
     "name": "FR",
-    "cnt": 73,
+    "cnt": 75,
     "usd_kg_med": 59.72,
     "n_price": 1
    }
@@ -109,7 +115,7 @@
    },
    {
     "name": "ООО\"К2 ТУЛ",
-    "cnt": 438,
+    "cnt": 470,
     "usd_kg_med": null,
     "n_price": 0
    },
@@ -144,16 +150,22 @@
     "n_price": 275
    },
    {
+    "name": "ООО\"ТАВР",
+    "cnt": 281,
+    "usd_kg_med": 11.1,
+    "n_price": 260
+   },
+   {
+    "name": "ООО\"ИНСЕРВИС",
+    "cnt": 268,
+    "usd_kg_med": 68.36,
+    "n_price": 97
+   },
+   {
     "name": "ООО\"КАМА-МСМ",
     "cnt": 267,
     "usd_kg_med": 76.34,
     "n_price": 15
-   },
-   {
-    "name": "ООО\"ИНСЕРВИС",
-    "cnt": 258,
-    "usd_kg_med": 69.0,
-    "n_price": 91
    },
    {
     "name": "ООО\"КИТСПЕЦТЕХ",
@@ -162,16 +174,10 @@
     "n_price": 256
    },
    {
-    "name": "ООО\"ТАВР",
-    "cnt": 238,
-    "usd_kg_med": 11.0,
-    "n_price": 221
-   },
-   {
     "name": "ООО\"ОТТ",
-    "cnt": 230,
-    "usd_kg_med": 6.62,
-    "n_price": 219
+    "cnt": 231,
+    "usd_kg_med": 6.63,
+    "n_price": 220
    },
    {
     "name": "ООО\"ТИВИДЖИ",
@@ -181,9 +187,9 @@
    },
    {
     "name": "ООО\"ЭР БИ ЭЙЧ ТУЛЗ",
-    "cnt": 202,
-    "usd_kg_med": 30.54,
-    "n_price": 35
+    "cnt": 214,
+    "usd_kg_med": 30.51,
+    "n_price": 43
    },
    {
     "name": "ООО\"КОМПАНИЯ\"ПРОМАРСЕНАЛ",
@@ -210,10 +216,10 @@
     "n_price": 182
    },
    {
-    "name": "АО\"ИНДЭК",
-    "cnt": 174,
-    "usd_kg_med": 41.74,
-    "n_price": 3
+    "name": "ООО\"ИНТЕРПОЛАР",
+    "cnt": 176,
+    "usd_kg_med": 67.78,
+    "n_price": 8
    }
   ],
   "top_exporters": [
@@ -231,7 +237,7 @@
    },
    {
     "name": "ТОО \"К2 ВОСТОК\"",
-    "cnt": 438,
+    "cnt": 470,
     "usd_kg_med": null,
     "n_price": 0
    },
@@ -260,6 +266,12 @@
     "n_price": 185
    },
    {
+    "name": "KRAFTOOL I/E GMBH",
+    "cnt": 182,
+    "usd_kg_med": 10.38,
+    "n_price": 167
+   },
+   {
     "name": "ТОО \"Технотрейд Восток\"",
     "cnt": 171,
     "usd_kg_med": null,
@@ -272,16 +284,10 @@
     "n_price": 162
    },
    {
-    "name": "KRAFTOOL I/E GMBH",
-    "cnt": 154,
-    "usd_kg_med": 10.34,
-    "n_price": 141
-   },
-   {
     "name": "GANZHOU ACHTECK TOOL TECHNOLOGY CO. LTD",
-    "cnt": 143,
-    "usd_kg_med": 71.88,
-    "n_price": 47
+    "cnt": 144,
+    "usd_kg_med": 72.72,
+    "n_price": 48
    },
    {
     "name": "Ламэд ТОО",
@@ -294,6 +300,12 @@
     "cnt": 120,
     "usd_kg_med": 8.36,
     "n_price": 120
+   },
+   {
+    "name": "CERATIZIT",
+    "cnt": 114,
+    "usd_kg_med": 97.0,
+    "n_price": 1
    },
    {
     "name": "WALTER AG",
@@ -314,35 +326,29 @@
     "n_price": 108
    },
    {
+    "name": "ZHENJIANG MINGYANG IMPORT AND EXPORT CO. LTD",
+    "cnt": 102,
+    "usd_kg_med": 36.97,
+    "n_price": 44
+   },
+   {
     "name": "CHANGSHA TITAN CONSTRUCTION MACHINERY TRADING CO. LTD.",
     "cnt": 101,
     "usd_kg_med": 4.88,
     "n_price": 101
    },
    {
-    "name": "CERATIZIT",
-    "cnt": 98,
-    "usd_kg_med": null,
-    "n_price": 0
-   },
-   {
-    "name": "NINGBO GANGJIE CO.LTD.",
-    "cnt": 97,
-    "usd_kg_med": 6.87,
-    "n_price": 97
-   },
-   {
-    "name": "SHANGHAI JOYE IMPORT & EXPORT CO.LTD",
-    "cnt": 88,
-    "usd_kg_med": 10.94,
-    "n_price": 86
+    "name": "KRAFTOOL I/E GMBH.",
+    "cnt": 100,
+    "usd_kg_med": 12.23,
+    "n_price": 93
    }
   ],
   "usd_kg": {
-   "p25": 3.76,
-   "median": 6.89,
-   "p75": 17.1,
-   "n_price": 12623
+   "p25": 3.89,
+   "median": 7.2,
+   "p75": 18.12,
+   "n_price": 13154
   }
  },
  "oem_direct": [
@@ -1328,5 +1334,5 @@
    ]
   }
  ],
- "strong_linked": 49
+ "strong_linked": 72
 }
