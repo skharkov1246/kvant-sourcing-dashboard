@@ -6,31 +6,24 @@
   "2023-12-31"
  ],
  "hs": [
-  "4016",
-  "8481",
-  "8466"
+  "401693",
+  "848120",
+  "848180"
  ],
  "results": [
   {
-   "hs": "4016",
+   "hs": "401693",
    "status": 400,
    "bytes": 103,
-   "error": "{\"error\":\"Вы создали запрос с количеством поставок (284193), превышающим установленный лимит (99092).\"}",
-   "url": "https://glbs.io/api/supplies-search/?api-key=***&method=search&country=ru&period_start=2023-01-01&period_finish=2023-12-31&format=json&search%5Bdirection%5D=%D0%98%D0%9C&search%5Bhs_code%5D%5B0%5D=4016*"
+   "error": "{\"error\":\"Вы создали запрос с количеством поставок (136356), превышающим установленный лимит (99092).\"}",
+   "url": "https://glbs.io/api/supplies-search/?api-key=***&method=search&country=ru&period_start=2023-01-01&period_finish=2023-12-31&format=json&search%5Bdirection%5D=%D0%98%D0%9C&search%5Bhs_code%5D%5B0%5D=401693*"
   },
   {
-   "hs": "8481",
-   "status": 400,
-   "bytes": 103,
-   "error": "{\"error\":\"Вы создали запрос с количеством поставок (225692), превышающим установленный лимит (99092).\"}",
-   "url": "https://glbs.io/api/supplies-search/?api-key=***&method=search&country=ru&period_start=2023-01-01&period_finish=2023-12-31&format=json&search%5Bdirection%5D=%D0%98%D0%9C&search%5Bhs_code%5D%5B0%5D=8481*"
-  },
-  {
-   "hs": "8466",
+   "hs": "848120",
    "status": 200,
-   "total_records": 32465,
-   "strong": 1,
-   "weak": 1709,
+   "total_records": 25877,
+   "strong": 9,
+   "weak": 648,
    "fields": [
     "G31_11",
     "G31_12",
@@ -63,7 +56,14 @@
     "G202",
     "G07"
    ],
-   "url": "https://glbs.io/api/supplies-search/?api-key=***&method=search&country=ru&period_start=2023-01-01&period_finish=2023-12-31&format=json&search%5Bdirection%5D=%D0%98%D0%9C&search%5Bhs_code%5D%5B0%5D=8466*"
+   "url": "https://glbs.io/api/supplies-search/?api-key=***&method=search&country=ru&period_start=2023-01-01&period_finish=2023-12-31&format=json&search%5Bdirection%5D=%D0%98%D0%9C&search%5Bhs_code%5D%5B0%5D=848120*"
+  },
+  {
+   "hs": "848180",
+   "status": 400,
+   "bytes": 103,
+   "error": "{\"error\":\"Вы создали запрос с количеством поставок (128068), превышающим установленный лимит (99092).\"}",
+   "url": "https://glbs.io/api/supplies-search/?api-key=***&method=search&country=ru&period_start=2023-01-01&period_finish=2023-12-31&format=json&search%5Bdirection%5D=%D0%98%D0%9C&search%5Bhs_code%5D%5B0%5D=848180*"
   }
  ]
 }
