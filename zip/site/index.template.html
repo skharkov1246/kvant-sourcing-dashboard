@@ -72,7 +72,7 @@ table.pt .eur{color:#0b5;font-variant-numeric:tabular-nums}
 <header>
   <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
     <div><b>База ЗИП · локализация производства</b> <span class="pill" id="cnt">…</span> <span class="pill" id="mode">…</span></div>
-    <div class="tabs"><button class="on" data-t="grid">Позиции</button><button data-t="sup">Поставщики</button><button data-t="wh">Склад</button><button data-t="dem">Спрос</button><button data-t="mat">Материалы</button><button data-t="stats">Обзор</button><button data-t="log">Журнал</button><button id="expPos" class="exp">⬇ позиции</button><button id="expOdm" class="exp">⬇ ODM</button><button id="expPrices" class="exp">⬇ цены</button><button id="expSamples" class="exp">⬇ образцы</button><button id="expSup" class="exp">⬇ поставщики</button></div>
+    <div class="tabs"><button class="on" data-t="grid">Позиции</button><button data-t="sup">Поставщики</button><button data-t="wh">Склад</button><button data-t="dem">Спрос</button><button data-t="cust">Таможня</button><button data-t="mat">Материалы</button><button data-t="stats">Обзор</button><button data-t="log">Журнал</button><button id="expPos" class="exp">⬇ позиции</button><button id="expOdm" class="exp">⬇ ODM</button><button id="expPrices" class="exp">⬇ цены</button><button id="expSamples" class="exp">⬇ образцы</button><button id="expSup" class="exp">⬇ поставщики</button></div>
   </div>
   <div class="bar" id="ctrls">
     <input id="q" type="text" placeholder="поиск: каталог, наименование, модель, OEM…">
@@ -90,6 +90,7 @@ table.pt .eur{color:#0b5;font-variant-numeric:tabular-nums}
 <div id="suppliers" class="hide" style="padding:12px"></div>
 <div id="wh" class="hide" style="padding:12px"></div>
 <div id="dem" class="hide" style="padding:12px"></div>
+<div id="cust" class="hide" style="padding:12px"></div>
 <div id="mat" class="hide" style="padding:12px"></div>
 <div id="stats" class="hide" style="padding:12px"></div>
 <div id="log" class="hide" style="padding:12px"></div>
@@ -103,6 +104,7 @@ const COMPET=[/*__COMPET__*/];
 const MATNODES=[/*__MATNODES__*/];
 const MATSUP=[/*__MATSUP__*/];
 const MATPROC=[/*__MATPROC__*/];
+const CUSTOMS=[/*__CUSTOMS__*/][0]||null;
 const MATTEXT=[/*__MATTEXT__*/][0]||"";
 const sb=(window.supabase)?supabase.createClient(SUPA_URL,SUPA_KEY):null;
 const $=id=>document.getElementById(id);
@@ -496,6 +498,40 @@ $("wh").addEventListener("click",async e=>{
 function openPos(pid){document.querySelector('.tabs [data-t="grid"]').click();refreshDetail(pid);const dd=$("det-"+pid);if(dd)dd.scrollIntoView({block:"center"});}
 // ─── Спрос и бюджет заказчика ───
 function money(n){return n==null?"—":(Math.abs(n)>=1e6?(n/1e6).toFixed(1)+" млн":Math.round(n).toLocaleString("ru"));}
+function custHtml(){
+  if(!CUSTOMS||!CUSTOMS.perforator)return '<div class="mut">Таможенная статистика не загружена. Запустите workflow «ZIP customs» (glbs.io).</div>';
+  const P=CUSTOMS.perforator, kg=P.usd_kg||{};
+  const isComp=n=>/машиностроительн|холдинг/i.test(n||"");
+  let h=`<div class="mut" style="margin-bottom:8px">${esc(CUSTOMS.source||"")} · HS ${esc((CUSTOMS.hs||[]).join(", "))} · обновлено ${esc(CUSTOMS.updated||"")}</div>`;
+  h+=`<div class="cards" style="margin-bottom:10px">
+    <div class="card"><div class="n">${(P.declarations||0).toLocaleString("ru")}</div><div class="l">деклараций (перфоратор/буровой импорт)</div></div>
+    <div class="card"><div class="n">${kg.median!=null?kg.median:"—"}</div><div class="l">USD/кг медиана (p25 ${kg.p25??"—"} · p75 ${kg.p75??"—"})</div></div>
+    <div class="card"><div class="n">${(CUSTOMS.oem_direct||[]).length}</div><div class="l">прямой импорт от OEM (Sandvik/Epiroc…)</div></div>
+    <div class="card"><div class="n">${CUSTOMS.strong_linked||0}</div><div class="l">привязано к позициям (наш PN в ГТД)</div></div>
+  </div>`;
+  // по годам
+  const yrs=P.by_year||{};
+  h+=`<b>Импорт по годам</b><div style="overflow-x:auto"><table class="ot" style="max-width:520px"><thead><tr>`+
+    Object.keys(yrs).map(y=>`<th>${esc(y)}</th>`).join("")+`</tr></thead><tbody><tr>`+
+    Object.values(yrs).map(v=>`<td class="cn">${v.toLocaleString("ru")}</td>`).join("")+`</tr></tbody></table></div>`;
+  // страны
+  h+=`<b style="display:block;margin-top:10px">Страны отправления</b><div style="overflow-x:auto"><table class="ot" style="max-width:520px"><thead><tr><th>Страна</th><th>Деклараций</th><th>USD/кг медиана</th></tr></thead><tbody>`+
+    (P.origins||[]).map(r=>`<tr><td>${esc(r.name)}</td><td class="cn">${r.cnt}</td><td class="cn">${r.usd_kg_med??"—"}</td></tr>`).join("")+`</tbody></table></div>`;
+  // импортёры (конкурент подсвечен)
+  h+=`<b style="display:block;margin-top:10px">Топ импортёров-конкурентов</b><div class="mut" style="font-size:11px;margin:2px 0">Кто завозит перфораторный ЗИП в РФ. <span style="background:#fde68a;padding:0 4px;border-radius:3px">жёлтым</span> — отслеживаемый локализатор.</div>
+    <div style="overflow-x:auto"><table class="ot"><thead><tr><th>Импортёр</th><th>Деклараций</th><th>USD/кг медиана</th></tr></thead><tbody>`+
+    (P.top_importers||[]).map(r=>`<tr${isComp(r.name)?' style="background:#fef9c3"':''}><td>${esc(r.name)}</td><td class="cn">${r.cnt}</td><td class="cn">${r.usd_kg_med??"—"}</td></tr>`).join("")+`</tbody></table></div>`;
+  // экспортёры
+  h+=`<b style="display:block;margin-top:10px">Топ экспортёров (заводы-поставщики)</b><div style="overflow-x:auto"><table class="ot"><thead><tr><th>Экспортёр</th><th>Деклараций</th></tr></thead><tbody>`+
+    (P.top_exporters||[]).map(r=>`<tr><td>${esc(r.name)}</td><td class="cn">${r.cnt}</td></tr>`).join("")+`</tbody></table></div>`;
+  // прямой импорт от OEM
+  const od=CUSTOMS.oem_direct||[];
+  if(od.length){h+=`<details style="margin-top:12px"><summary style="cursor:pointer;font-weight:600">🎯 Прямой импорт от OEM — ${od.length} деклараций (Sandvik/Epiroc/Atlas Copco)</summary>
+    <div style="overflow-x:auto;margin-top:6px"><table class="ot"><thead><tr><th>Год</th><th>OEM-экспортёр</th><th>Импортёр в РФ</th><th>Ориг.</th><th>USD/кг</th><th>Описание</th></tr></thead><tbody>`+
+    od.map(o=>`<tr><td class="cn">${o.year||""}</td><td>${esc(o.exporter)}</td><td>${esc(o.importer)}</td><td class="cn">${esc(o.origin)}</td><td class="cn">${o.usd_kg??"—"}</td><td class="mut" style="max-width:300px">${esc(o.desc)}</td></tr>`).join("")+`</tbody></table></div></details>`;}
+  h+=`<div class="mut" style="font-size:11px;margin-top:10px">${esc(CUSTOMS.note||"")}</div>`;
+  return h;
+}
 function demHtml(){
   if(!DEMAND.length)return '<div class="mut">Данные спроса не загружены.</div>';
   const years=[...new Set(DEMAND.map(d=>d.year))].sort();
@@ -605,10 +641,11 @@ async function logHtml(){
 document.querySelectorAll(".tabs [data-t]").forEach(b=>b.onclick=async()=>{
   document.querySelectorAll(".tabs [data-t]").forEach(x=>x.classList.remove("on"));b.classList.add("on");
   const t=b.dataset.t;$("grid").classList.toggle("hide",t!="grid");$("ctrls").style.visibility=t=="grid"?"visible":"hidden";
-  $("suppliers").classList.toggle("hide",t!="sup");$("wh").classList.toggle("hide",t!="wh");$("dem").classList.toggle("hide",t!="dem");$("mat").classList.toggle("hide",t!="mat");$("stats").classList.toggle("hide",t!="stats");$("log").classList.toggle("hide",t!="log");
+  $("suppliers").classList.toggle("hide",t!="sup");$("wh").classList.toggle("hide",t!="wh");$("dem").classList.toggle("hide",t!="dem");$("cust").classList.toggle("hide",t!="cust");$("mat").classList.toggle("hide",t!="mat");$("stats").classList.toggle("hide",t!="stats");$("log").classList.toggle("hide",t!="log");
   if(t=="sup")$("suppliers").innerHTML=supHtml();
   if(t=="wh")$("wh").innerHTML=whHtml();
   if(t=="dem"){$("dem").innerHTML=demHtml();if($("comptab"))$("comptab").innerHTML=compTable("");}
+  if(t=="cust")$("cust").innerHTML=custHtml();
   if(t=="mat"){$("mat").innerHTML=matHtml();if($("mattab"))$("mattab").innerHTML=matSupTable("");}
   if(t=="stats")$("stats").innerHTML=statsHtml();
   if(t=="log")$("log").innerHTML=await logHtml();
