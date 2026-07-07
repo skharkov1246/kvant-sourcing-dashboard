@@ -127,6 +127,16 @@ for (const hs of hsList) {
     const sampleKeys = recs[0] ? Object.keys(recs[0]) : Object.keys(json);
     const skel = skeleton(json);
     if (!recs.length) console.log(`[hs ${hs}] SKELETON=${JSON.stringify(skel)}`);
+    // Легенда полей ГТД (Россия):
+    //   G082/G081 импортёр+ИНН · G31_11/G022 экспортёр/контрагент · G34 страна
+    //   происхождения · G15A отправления · G072 дата · G31_1 описание · G221
+    //   валюта инвойса · G202 инкотермс · G38/G35 нетто/брутто кг · USDKG USD/кг
+    //   G42 инвойс-стоимость (валюта G221) · G45 таможенная стоимость (RUB) ·
+    //   G46 статистическая стоимость (USD) · G281 № декларации.
+    // search: USDKG и вес открыты, G42/G45/G46 маскируются «*».
+    // save:   G42/G45/G46 открыты (реальные суммы), но USDKG/вес = 0; поля
+    //   количества штук в наборе нет → цену за единицу не вывести, только за
+    //   строку декларации. Лимит не расходуется (ключ mode=full).
     // компактная проекция декларации ГТД (G-коды → человекочитаемые поля)
     const cut = (s, n) => String(s || '').slice(0, n);
     const compact = (rec, tag, pn) => ({
@@ -155,7 +165,6 @@ for (const hs of hsList) {
       hs, method: METHOD, country: COUNTRY, period: [P1, P2],
       total_records: recs.length, strong: strong.length, weak: weak.length,
       fields: sampleKeys, meta: cleanMeta(json.meta), skeleton: recs.length ? undefined : skel,
-      sample_full: (strong.length ? recs.filter(r => OEM_RE.test(hayRaw(r))) : recs).slice(0, 2),
       matched,
     }, null, 1));
     console.log(`[hs ${hs}] status=200 total=${recs.length} strong=${strong.length} weak=${weak.length} fields=${JSON.stringify(sampleKeys.slice(0, 30))}`);

@@ -101,9 +101,11 @@ def main():
             (strong_all if x.get("tag") == "strong" else weak_all).append(x)
 
     # --- 1) price_records из strong (привязка к позиции) ---
+    CUSTOMS_SRC = "таможня ГТД (glbs.io)"
     prices = json.loads((DATA / "price_records.json").read_text(encoding="utf-8"))
-    existing_keys = {(r.get("position_id"), r.get("year"), (r.get("importer") or ""),
-                      (r.get("source") or "")) for r in prices}
+    # идемпотентно: убираем прежние таможенные записи и пересобираем начисто
+    prices = [r for r in prices if (r.get("source") or "") != CUSTOMS_SRC]
+    existing_keys = set()
     max_id = max([r.get("id", 0) for r in prices] + [0])
     added = 0
     for x in strong_all:
@@ -116,14 +118,14 @@ def main():
         if usd_kg:
             note = f"USD/кг≈{usd_kg}; нетто {x.get('net_kg','?')}кг · " + note
         for pid in pids:
-            key = (pid, year, x.get("importer", "")[:60], "таможня ГТД (glbs.io)")
+            key = (pid, year, x.get("importer", "")[:60])
             if key in existing_keys:
                 continue
             existing_keys.add(key)
             max_id += 1
             prices.append({
                 "id": max_id, "position_id": pid, "year": year,
-                "source": "таможня ГТД (glbs.io)",
+                "source": CUSTOMS_SRC,
                 "importer": x.get("importer", "")[:120],
                 "exporter": x.get("exporter", "")[:120],
                 "country": x.get("origin", ""),
