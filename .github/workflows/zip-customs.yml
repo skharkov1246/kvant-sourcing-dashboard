@@ -31,6 +31,18 @@ on:
         description: "pull: сколько HS-групп за прогон"
         default: "3"
         type: string
+      api_key:
+        description: "pull: ключ glbs.io (если не задан секрет GLBS_API_KEY). Маскируется в логах."
+        default: ""
+        type: string
+      period_start:
+        description: "pull: начало периода YYYY-MM-DD (по умолч. 2023-01-01)"
+        default: ""
+        type: string
+      period_finish:
+        description: "pull: конец периода YYYY-MM-DD (по умолч. 2026-03-31)"
+        default: ""
+        type: string
 
 permissions:
   contents: write
@@ -82,13 +94,16 @@ jobs:
       - name: Выгрузка API supplies-search
         if: ${{ inputs.mode == 'pull' }}
         env:
-          GLBS_API_KEY: ${{ secrets.GLBS_API_KEY }}
+          GLBS_API_KEY: ${{ secrets.GLBS_API_KEY || inputs.api_key }}
           GLBS_METHOD: ${{ inputs.method }}
           GLBS_HS: ${{ inputs.hs }}
           GLBS_MAX_HS: ${{ inputs.max_hs }}
+          GLBS_PERIOD_START: ${{ inputs.period_start }}
+          GLBS_PERIOD_FINISH: ${{ inputs.period_finish }}
         run: |
+          echo "::add-mask::${GLBS_API_KEY:-}"
           if [ -z "${GLBS_API_KEY:-}" ]; then
-            echo "::error::Задайте секрет GLBS_API_KEY (glbs.io → API → «Мой ключ»)."
+            echo "::error::Задайте секрет GLBS_API_KEY или передайте вход api_key (glbs.io → API → «Мой ключ»)."
             exit 1
           fi
           node zip/customs/glbs_pull.mjs

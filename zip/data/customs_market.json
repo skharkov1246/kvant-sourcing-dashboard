@@ -1,0 +1,1338 @@
+{
+ "updated": "2026-07-07",
+ "source": "Таможенная статистика РФ (импорт ИМ), glbs.io / Глобус-ВЭД",
+ "hs": [
+  "8207",
+  "8207",
+  "8207",
+  "8412",
+  "8431",
+  "8466",
+  "8466",
+  "8466",
+  "8467",
+  "8467",
+  "8467",
+  "848120",
+  "848120",
+  "848120"
+ ],
+ "note": "USD/кг — открытый бенчмарк режима search; маскированные значения пропущены; реальную инвойс-стоимость даёт method=save.",
+ "perforator": {
+  "declarations": 23219,
+  "by_year": {
+   "2023": 11795,
+   "2024": 7286,
+   "2025": 2938,
+   "2026": 1200
+  },
+  "origins": [
+   {
+    "name": "CN",
+    "cnt": 16082,
+    "usd_kg_med": 6.75,
+    "n_price": 12500
+   },
+   {
+    "name": "KZ",
+    "cnt": 3496,
+    "usd_kg_med": null,
+    "n_price": 0
+   },
+   {
+    "name": "DE",
+    "cnt": 737,
+    "usd_kg_med": 36.0,
+    "n_price": 89
+   },
+   {
+    "name": "TR",
+    "cnt": 471,
+    "usd_kg_med": 68.94,
+    "n_price": 171
+   },
+   {
+    "name": "KR",
+    "cnt": 371,
+    "usd_kg_med": 8.12,
+    "n_price": 68
+   },
+   {
+    "name": "TW",
+    "cnt": 311,
+    "usd_kg_med": 39.12,
+    "n_price": 50
+   },
+   {
+    "name": "JP",
+    "cnt": 267,
+    "usd_kg_med": 27.33,
+    "n_price": 28
+   },
+   {
+    "name": "IT",
+    "cnt": 222,
+    "usd_kg_med": 57.89,
+    "n_price": 10
+   },
+   {
+    "name": "CZ",
+    "cnt": 192,
+    "usd_kg_med": 50.96,
+    "n_price": 70
+   },
+   {
+    "name": "IL",
+    "cnt": 178,
+    "usd_kg_med": 66.99,
+    "n_price": 3
+   },
+   {
+    "name": "IN",
+    "cnt": 105,
+    "usd_kg_med": 25.23,
+    "n_price": 29
+   },
+   {
+    "name": "FR",
+    "cnt": 75,
+    "usd_kg_med": 59.72,
+    "n_price": 1
+   }
+  ],
+  "top_importers": [
+   {
+    "name": "ООО\"МИР ИНСТРУМЕНТА\"(ООО\"МИР ИНСТРУМЕНТА\")",
+    "cnt": 1030,
+    "usd_kg_med": null,
+    "n_price": 0
+   },
+   {
+    "name": "ООО\"СЕВЕРНЫЙ АЛЬЯНС",
+    "cnt": 587,
+    "usd_kg_med": null,
+    "n_price": 0
+   },
+   {
+    "name": "ООО\"К2 ТУЛ",
+    "cnt": 470,
+    "usd_kg_med": null,
+    "n_price": 0
+   },
+   {
+    "name": "ООО\"ЮТЭК-ТЕХНО",
+    "cnt": 321,
+    "usd_kg_med": 8.41,
+    "n_price": 321
+   },
+   {
+    "name": "ООО\"КЛС-ТРЕЙД",
+    "cnt": 321,
+    "usd_kg_med": 5.88,
+    "n_price": 319
+   },
+   {
+    "name": "ООО\"ТУРБО-ТУЛС",
+    "cnt": 309,
+    "usd_kg_med": 5.0,
+    "n_price": 309
+   },
+   {
+    "name": "ООО\"НПФ ПРОМРЕССУРС",
+    "cnt": 297,
+    "usd_kg_med": 57.08,
+    "n_price": 8
+   },
+   {
+    "name": "ООО\"СФЕРА",
+    "cnt": 285,
+    "usd_kg_med": 1.63,
+    "n_price": 275
+   },
+   {
+    "name": "ООО\"ТАВР",
+    "cnt": 281,
+    "usd_kg_med": 11.1,
+    "n_price": 260
+   },
+   {
+    "name": "ООО\"ИНСЕРВИС",
+    "cnt": 268,
+    "usd_kg_med": 68.36,
+    "n_price": 97
+   },
+   {
+    "name": "ООО\"КАМА-МСМ",
+    "cnt": 267,
+    "usd_kg_med": 76.34,
+    "n_price": 15
+   },
+   {
+    "name": "ООО\"КИТСПЕЦТЕХ",
+    "cnt": 256,
+    "usd_kg_med": 2.43,
+    "n_price": 256
+   },
+   {
+    "name": "ООО\"ОТТ",
+    "cnt": 231,
+    "usd_kg_med": 6.63,
+    "n_price": 220
+   },
+   {
+    "name": "ООО\"ТИВИДЖИ",
+    "cnt": 226,
+    "usd_kg_med": 9.9,
+    "n_price": 195
+   },
+   {
+    "name": "ООО\"ЭР БИ ЭЙЧ ТУЛЗ",
+    "cnt": 214,
+    "usd_kg_med": 30.51,
+    "n_price": 43
+   },
+   {
+    "name": "ООО\"КОМПАНИЯ\"ПРОМАРСЕНАЛ",
+    "cnt": 199,
+    "usd_kg_med": 78.65,
+    "n_price": 25
+   },
+   {
+    "name": "ООО\"МЭЙН СИСТЕМС",
+    "cnt": 189,
+    "usd_kg_med": null,
+    "n_price": 0
+   },
+   {
+    "name": "ООО\"АЗИМУТ",
+    "cnt": 186,
+    "usd_kg_med": 6.37,
+    "n_price": 185
+   },
+   {
+    "name": "ООО\"ПОМБУР",
+    "cnt": 185,
+    "usd_kg_med": 10.23,
+    "n_price": 182
+   },
+   {
+    "name": "ООО\"ИНТЕРПОЛАР",
+    "cnt": 176,
+    "usd_kg_med": 67.78,
+    "n_price": 8
+   }
+  ],
+  "top_exporters": [
+   {
+    "name": "ТОО \"Мир Инструмента - Алматы\"",
+    "cnt": 1030,
+    "usd_kg_med": null,
+    "n_price": 0
+   },
+   {
+    "name": "Товарищество с ограниченной ответственностью \"ТССП Казахстан\"",
+    "cnt": 701,
+    "usd_kg_med": null,
+    "n_price": 0
+   },
+   {
+    "name": "ТОО \"К2 ВОСТОК\"",
+    "cnt": 470,
+    "usd_kg_med": null,
+    "n_price": 0
+   },
+   {
+    "name": "ZHEJIANG BENYU TOOLS CO.LTD",
+    "cnt": 208,
+    "usd_kg_med": 5.78,
+    "n_price": 208
+   },
+   {
+    "name": "XINJIANG LONGBO INDUSTRIAL CO.LTD",
+    "cnt": 202,
+    "usd_kg_med": 5.08,
+    "n_price": 202
+   },
+   {
+    "name": "Technodom Operator AO",
+    "cnt": 189,
+    "usd_kg_med": null,
+    "n_price": 0
+   },
+   {
+    "name": "OKB ZUBR VOSTOK CO. LTD",
+    "cnt": 185,
+    "usd_kg_med": 8.41,
+    "n_price": 185
+   },
+   {
+    "name": "KRAFTOOL I/E GMBH",
+    "cnt": 182,
+    "usd_kg_med": 10.38,
+    "n_price": 167
+   },
+   {
+    "name": "ТОО \"Технотрейд Восток\"",
+    "cnt": 171,
+    "usd_kg_med": null,
+    "n_price": 0
+   },
+   {
+    "name": "SHANGHAI GUANG LIAN COMPANY.",
+    "cnt": 162,
+    "usd_kg_med": 6.01,
+    "n_price": 162
+   },
+   {
+    "name": "GANZHOU ACHTECK TOOL TECHNOLOGY CO. LTD",
+    "cnt": 144,
+    "usd_kg_med": 72.72,
+    "n_price": 48
+   },
+   {
+    "name": "Ламэд ТОО",
+    "cnt": 126,
+    "usd_kg_med": null,
+    "n_price": 0
+   },
+   {
+    "name": "OKB ZUBR VOSTOK CO. LTD.",
+    "cnt": 120,
+    "usd_kg_med": 8.36,
+    "n_price": 120
+   },
+   {
+    "name": "CERATIZIT",
+    "cnt": 114,
+    "usd_kg_med": 97.0,
+    "n_price": 1
+   },
+   {
+    "name": "WALTER AG",
+    "cnt": 113,
+    "usd_kg_med": null,
+    "n_price": 0
+   },
+   {
+    "name": "SHANGHAI GUANG LIAN COMPANY",
+    "cnt": 112,
+    "usd_kg_med": 8.0,
+    "n_price": 111
+   },
+   {
+    "name": "XINJIANG LONGBO INDUSTRIAL CO.LTD.",
+    "cnt": 108,
+    "usd_kg_med": 5.0,
+    "n_price": 108
+   },
+   {
+    "name": "ZHENJIANG MINGYANG IMPORT AND EXPORT CO. LTD",
+    "cnt": 102,
+    "usd_kg_med": 36.97,
+    "n_price": 44
+   },
+   {
+    "name": "CHANGSHA TITAN CONSTRUCTION MACHINERY TRADING CO. LTD.",
+    "cnt": 101,
+    "usd_kg_med": 4.88,
+    "n_price": 101
+   },
+   {
+    "name": "KRAFTOOL I/E GMBH.",
+    "cnt": 100,
+    "usd_kg_med": 12.23,
+    "n_price": 93
+   }
+  ],
+  "usd_kg": {
+   "p25": 3.89,
+   "median": 7.2,
+   "p75": 18.12,
+   "n_price": 13154
+  }
+ },
+ "oem_direct": [
+  {
+   "year": 2023,
+   "importer": "ООО \"КОМПЛЕКТ ЛИГА\"",
+   "exporter": "EPIROC AB",
+   "origin": "IN",
+   "usd_kg": null,
+   "desc": "ГИДРАВЛИЧЕСКИЙ ПЕРФОРАТОР COP 1838HD+T38. СЛУЖИТ ДЛЯ ПРЕОБРАЗОВАНИЯ ЭНЕРГИИ ПОТОКА И ДАВЛЕНИЯ ГИДРАВ"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО НПО \"ПРОГРЕССИВНЫЕ МАТЕРИАЛЫ\"",
+   "exporter": "SANDVIK AB",
+   "origin": "SE",
+   "usd_kg": null,
+   "desc": "СМЕННЫЕ ФРЕЗЫ ДЛЯ ОБРАБОТКИ МЕТАЛЛА ФРЕЗЕРОВАНИЕМ, С РАБОЧЕЙ ЧАСТЬЮ ИЗ ТВЕРДОСПЛАВНЫХ И БЫСТРОРЕЖУЩИ"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО НПО \"ПРОГРЕССИВНЫЕ МАТЕРИАЛЫ\"",
+   "exporter": "SANDVIK AB",
+   "origin": "SE",
+   "usd_kg": null,
+   "desc": "СМЕННЫЕ ФРЕЗЫ ДЛЯ ОБРАБОТКИ МЕТАЛЛА ФРЕЗЕРОВАНИЕМ, С РАБОЧЕЙ ЧАСТЬЮ ИЗ ТВЕРДОСПЛАВНЫХ И БЫСТРОРЕЖУЩИ"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"НПФ ПРОМРЕССУРС\"",
+   "exporter": "SANDVIKASIA LTD.",
+   "origin": "IN",
+   "usd_kg": null,
+   "desc": "ИНСТРУМЕНТЫ ДЛЯ ФРЕЗЕРОВАНИЯ МЕТАЛЛА, С ХВОСТОВИКАМИ"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"НПФ ПРОМРЕССУРС\"",
+   "exporter": "AB SANDVIK COROMANT",
+   "origin": "IT",
+   "usd_kg": null,
+   "desc": "ИНСТРУМЕНТЫ ДЛЯ ФРЕЗЕРОВАНИЯ МЕТАЛЛА, С ХВОСТОВИКАМИ"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"НПФ ПРОМРЕССУРС\"",
+   "exporter": "AB SANDVIK COROMANT",
+   "origin": "DE",
+   "usd_kg": null,
+   "desc": "ИНСТРУМЕНТЫ ДЛЯ ФРЕЗЕРОВАНИЯ МЕТАЛЛА,С ХВОСТОВИКАМИ"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"ЭФСИЭС\"",
+   "exporter": "SANDVIK COROMANT",
+   "origin": "SE",
+   "usd_kg": null,
+   "desc": "ИНСТРУМЕНТЫ ДЛЯ ФРЕЗЕРОВАНИЯ МЕТАЛЛА, С РАБОЧЕЙ ЧАСТЬЮ ИЗ МЕТАЛЛОКЕРАМИКИ; ДЛЯ ФРЕЗЕРОВАНИЯ. СТАЛЬНО"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"ЭФСИЭС\"",
+   "exporter": "SANDVIK COROMANT",
+   "origin": "SE",
+   "usd_kg": null,
+   "desc": "СМЕННЫЕ РАБОЧИЕ ИНСТРУМЕНТЫ ДЛЯ ФРЕЗЕРНЫХ СТАНКОВ ДЛЯ ОБРАБОТКИ МЕТАЛЛА, БЕЗ СОДЕРЖАНИЯ ДРАГОЦЕННЫХ "
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"НПФ ПРОМРЕССУРС\"",
+   "exporter": "AB SANDVIK COROMANT",
+   "origin": "DE",
+   "usd_kg": null,
+   "desc": "ИНСТРУМЕНТЫ ДЛЯ ФРЕЗЕРОВАНИЯ МЕТАЛЛА, С ХВОСТОВИКАМИ"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"ПАРМА ТУЛЗ\"",
+   "exporter": "SANDVIK TOOLING PRODUCTION (LANGFANG) СО. LTD.",
+   "origin": "CN",
+   "usd_kg": null,
+   "desc": "ИНСТРУМЕНТЫ ДЛЯ ФРЕЗЕРОВАНИЯ МЕТАЛЛА, С РАБОЧЕЙ ЧАСТЬЮ ИЗ МЕТАЛЛА - ФРЕЗЫ ТВЕРДОСПЛАВНЫЕ КОНЦЕВЫЕ С "
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"ЦЕНТР\"",
+   "exporter": "SANDVIK COROMANT",
+   "origin": "US",
+   "usd_kg": null,
+   "desc": "ИНСТРУМЕНТЫ ДЛЯ ФРЕЗЕРОВАНИЯ МЕТАЛЛА, С РАБОЧЕЙ ЧАСТЬЮ ИЗ ПРОЧИХ МАТЕРИАЛОВ, С ХВОСТОВИКАМИ :"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"НПФ ПРОМРЕССУРС\"",
+   "exporter": "AB SANDVIK COROMANT",
+   "origin": "DE",
+   "usd_kg": null,
+   "desc": "ИНСТРУМЕНТЫ ДЛЯ ФРЕЗЕРОВАНИЯ МЕТАЛЛА, С ХВОСТОВИКАМИ"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"ВЭЛБОР ИНТЕГРИТИ СЕРВИС\"",
+   "exporter": "SANDVIK",
+   "origin": "SE",
+   "usd_kg": null,
+   "desc": "АНТИВИБРАЦИОННАЯ ОПРАВКА ИЗ СТАЛИ С ТВЕРДОСПЛАВНЫМ ХВОСТОВИКОМ ДЛЯ ТОКАРНОГО СТАНКА, ПРИМЕНЯЕТСЯ СО "
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"ПАРМА ТУЛЗ\"",
+   "exporter": "SANDVIK TOOLING PRODUCTION (LANGFANG) CO. LTD",
+   "origin": "CN",
+   "usd_kg": null,
+   "desc": "ИНСТРУМЕНТЫ ДЛЯ ФРЕЗЕРОВАНИЯ МЕТАЛЛА, С РАБОЧЕЙ ЧАСТЬЮ ИЗ СТАЛИ, С ХВОСТОВИКАМИ"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"ПАРМА ТУЛЗ\"",
+   "exporter": "SANDVIK TOOLING PRODUCTION (LANGFANG) CO. LTD",
+   "origin": "CN",
+   "usd_kg": null,
+   "desc": "ИНСТРУМЕНТЫ ДЛЯ ФРЕЗЕРОВАНИЯ МЕТАЛЛА, С РАБОЧЕЙ ЧАСТЬЮ ИЗ СТАЛИ, С ХВОСТОВИКАМИ"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"ВЕКТОР\"",
+   "exporter": "AB SANDVIK COROMANT ШВЕЦИЯ",
+   "origin": "SE",
+   "usd_kg": null,
+   "desc": "ИНСТРУМЕНТЫ СМЕННЫЕ С РАБОЧЕЙ ЧАСТЬЮ ИЗ ВЫСОКОЛЕГИРОВАННОЙ СТАЛИ, ПЕРЕХОДНИК ОТ ЦИЛИНДРИЧЕСКОГО ХВОС"
+  },
+  {
+   "year": 2023,
+   "importer": "АО \"ПРИМОРСКИЙ ГОК\"",
+   "exporter": "FURUKAWA ROCK DRILL CO. LTD",
+   "origin": "JP",
+   "usd_kg": 64.74,
+   "desc": "ЗАПАСНЫЕ ЧАСТИ ДЛЯ ПОДЗЕМНОЙ ГОРНОЙ БУРОВОЙ МАШИНЫ, НОВЫЕ- БУРОВЫЕ КОРОНКИ"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"ТУЛСЕРВИС\"",
+   "exporter": "AB SANDVIK COROMANT",
+   "origin": "SE",
+   "usd_kg": null,
+   "desc": "СМЕННЫЙ ИНСТРУМЕНТ ДЛЯ СТАНКА: ЦЕЛЬНОЕ СВЕРЛО ИЗ МЕТАЛЛОКЕРАМИКИ, С ЦИЛИНДРИЧЕСКИМ ХВОСТОВИКОМ, С РА"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"ВЭЛБОР ИНТЕГРИТИ СЕРВИС\"",
+   "exporter": "SANDVIK",
+   "origin": "NO",
+   "usd_kg": null,
+   "desc": "АНТИВИБРАЦИОННАЯ ОПРАВКА ИЗ СТАЛИ С ТВЕРДОСПЛАВНЫМ ХВОСТОВИКОМ ДЛЯ ТОКАРНОГО СТАНКА, ПРИМЕНЯЕТСЯ СО "
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"ЭФСИЭС\"",
+   "exporter": "SANDVIK COROMANT",
+   "origin": "SE",
+   "usd_kg": null,
+   "desc": "СМЕННЫЕ РАБОЧИЕ ИНСТРУМЕНТЫ ДЛЯ ФРЕЗЕРНЫХ СТАНКОВ ДЛЯ ОБРАБОТКИ МЕТАЛЛА, БЕЗ СОДЕРЖАНИЯ ДРАГОЦЕННЫХ "
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"РБА\"",
+   "exporter": "SANDVIK",
+   "origin": "IT",
+   "usd_kg": 45.03,
+   "desc": "ИНСТРУМЕНТЫ СМЕННЫЕ МЕТАЛЛИЧЕСКИЕ ДЛЯ ФРЕЗЕРОВАНИЯ: ТВЕРДОСПЛАВНЫЕ КОНЦЕВЫЕ ФРЕЗЫ С ХВОСТОВИКАМИ ДЛЯ"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"ПАРМА ПРОМПОСТАВКА\"",
+   "exporter": "SANDVIK TOOLING PRODUCTION (LANFANG) CO. LTD",
+   "origin": "CN",
+   "usd_kg": null,
+   "desc": "ИНСТРУМЕНТЫ ДЛЯ ФРЕЗЕРОВАНИЯ МЕТАЛЛА, С РАБОЧЕЙ ЧАСТЬЮ ИЗ СТАЛИ, С ХВОСТОВИКАМИ"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"ПАРМА ПРОМПОСТАВКА\"",
+   "exporter": "SANDVIK TOOLING PRODUCTION (LANFANG) CO., LTD",
+   "origin": "CN",
+   "usd_kg": null,
+   "desc": "ИНСТРУМЕНТЫ ДЛЯ ФРЕЗЕРОВАНИЯ МЕТАЛЛА, С РАБОЧЕЙ ЧАСТЬЮ ИЗ СТАЛИ, С ХВОСТОВИКАМИ"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"ПАРМА ПРОМПОСТАВКА\"",
+   "exporter": "SANDVIK TOOLING PRODUCTION (LANFANG) CO., LTD",
+   "origin": "CN",
+   "usd_kg": null,
+   "desc": "ИНСТРУМЕНТЫ ДЛЯ ФРЕЗЕРОВАНИЯ МЕТАЛЛА, С РАБОЧЕЙ ЧАСТЬЮ ИЗ СТАЛИ, С ХВОСТОВИКАМИ"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"НПФ ПРОМРЕССУРС\"",
+   "exporter": "AB SANDVIK COROMANT",
+   "origin": "DE",
+   "usd_kg": null,
+   "desc": "ИНСТРУМЕНТЫ ДЛЯ ФРЕЗЕРОВАНИЯ МЕТАЛЛА, С ХВОСТОВИКАМИ"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"АФФЕРЕНТ\"",
+   "exporter": "SANDVIK COROMANT",
+   "origin": "SE",
+   "usd_kg": null,
+   "desc": "ИНСТРУМЕНТ МЕТАЛЛОРЕЖУЩИЙ ИЗ ТВЕРДОГО СПЛАВА(МЕТАЛЛОКЕРАМИКА) ДЛЯ ФРЕЗЕРНОЙ ОБРАБОТКИ МЕТАЛЛА, БЕЗ Х"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"НПФ ПРОМРЕССУРС\"",
+   "exporter": "AB SANDVIK COROMANT",
+   "origin": "DE",
+   "usd_kg": null,
+   "desc": "ИНСТРУМЕНТЫ ДЛЯ ФРЕЗЕРОВАНИЯ МЕТАЛЛА, С ХВОСТОВИКАМИ"
+  },
+  {
+   "year": 2023,
+   "importer": "АО \"ПРИМОРСКИЙ ГОК\"",
+   "exporter": "FURUKAWA ROCK DRILL CO. LTD",
+   "origin": "JP",
+   "usd_kg": 69.84,
+   "desc": "ЗАПАСНЫЕ ЧАСТИ ДЛЯ ПОДЗЕМНОЙ ГОРНОЙ БУРОВОЙ МАШИНЫ, НОВЫЕ - БУРОВЫЕ КОРОНКИ"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"ПАРМА ПРОМПОСТАВКА\"",
+   "exporter": "SANDVIK TOOLING PRODUCTION (LANGFANG) CO. LTD.",
+   "origin": "CN",
+   "usd_kg": null,
+   "desc": "ИНСТРУМЕНТЫ ДЛЯ ФРЕЗЕРОВАНИЯ МЕТАЛЛА, С РАБОЧЕЙ ЧАСТЬЮ ИЗ СТАЛИ С ХВОСТОВИКАМИ"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"НПФ ПРОМРЕССУРС\"",
+   "exporter": "AB SANDVIK COROMANT",
+   "origin": "DE",
+   "usd_kg": null,
+   "desc": "ИНСТРУМЕНТЫ ДЛЯ ФРЕЗЕРОВАНИЯ МЕТАЛЛА, С ХВОСТОВИКАМИ"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"НПФ ПРОМРЕССУРС\"",
+   "exporter": "AB SANDVIK COROMANT",
+   "origin": "DE",
+   "usd_kg": null,
+   "desc": "ИНСТРУМЕНТЫ ДЛЯ ФРЕЗЕРОВАНИЯ МЕТАЛЛА, С ХВОСТОВИКАМИ"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"ЦЕНТР\"",
+   "exporter": "SANDVIK COROMANT",
+   "origin": "US",
+   "usd_kg": null,
+   "desc": "ИНСТРУМЕНТЫ ДЛЯ ФРЕЗЕРОВАНИЯ МЕТАЛЛА, С РАБОЧЕЙ ЧАСТЬЮ ИЗ ПРОЧИХ МАТЕРИАЛОВ, С ХВОСТОВИКАМИ :"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"ЦЕНТР\"",
+   "exporter": "SANDVIK COROMANT",
+   "origin": "SE",
+   "usd_kg": null,
+   "desc": "ИНСТРУМЕНТЫ ДЛЯ ФРЕЗЕРОВАНИЯ МЕТАЛЛА, С РАБОЧЕЙ ЧАСТЬЮ ИЗ ПРОЧИХ МАТЕРИАЛОВ, С ХВОСТОВИКАМИ :"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"ЦЕНТР\"",
+   "exporter": "SANDVIK COROMANT",
+   "origin": "DE",
+   "usd_kg": null,
+   "desc": "ИНСТРУМЕНТЫ ДЛЯ ФРЕЗЕРОВАНИЯ МЕТАЛЛА, С РАБОЧЕЙ ЧАСТЬЮ ИЗ ПРОЧИХ МАТЕРИАЛОВ, С ХВОСТОВИКАМИ :"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"ПАРМА ПРОМПОСТАВКА\"",
+   "exporter": "SANDVIK TOOLING PRODUCTION (LANGFANG) CO. LTD.",
+   "origin": "CN",
+   "usd_kg": null,
+   "desc": "ИНСТРУМЕНТЫ ДЛЯ ФРЕЗЕРОВАНИЯ МЕТАЛЛА, С РАБОЧЕЙ ЧАСТЬЮ ИЗ СТАЛИ С ХВОСТОВИКАМИ"
+  },
+  {
+   "year": 2023,
+   "importer": "АО \"ПРИМОРСКИЙ ГОК\"",
+   "exporter": "FURUKAWA ROCK DRILL CO. LTD",
+   "origin": "JP",
+   "usd_kg": 49.81,
+   "desc": "ЗАПАСНЫЕ ЧАСТИ ДЛЯ ПОДЗЕМНОЙ ГОРНОЙ БУРОВОЙ МАШИНЫ, НОВЫЕ - БУРОВЫЕ КОРОНКИ"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"ИНТЕХСЕРВИС\"",
+   "exporter": "SANDVIK AB",
+   "origin": "CN",
+   "usd_kg": null,
+   "desc": "ФРЕЗА КОНЦЕВАЯ ТВЕРДОСПЛАВНАЯ ИЗ МЕТАЛЛОКЕРАМИКИ, ЦЕЛЬНАЯ, С РАБОЧЕЙ ЧАСТЬЮ ИЗ МЕТАЛЛОКЕРАМИКИ, С ХВ"
+  },
+  {
+   "year": 2023,
+   "importer": "АО \"ПРИМОРСКИЙ ГОК\"",
+   "exporter": "FURUKAWA ROCK DRILL CO. LTD",
+   "origin": "JP",
+   "usd_kg": 53.76,
+   "desc": "Запасные части для подземной горной буровой машины, новые - буровые коронки"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"КОМПАНИЯ Ц\"",
+   "exporter": "SANDVIK COROMANT",
+   "origin": "SE",
+   "usd_kg": null,
+   "desc": "Инструменты для фрезерования металла, с рабочей частью из прочих материалов, с хвостовиками"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"КОМПАНИЯ Ц\"",
+   "exporter": "SANDVIK COROMANT",
+   "origin": "DE",
+   "usd_kg": null,
+   "desc": "Инструменты для фрезерования металла, с рабочей частью из прочих материалов, с хвостовиками"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"КОМПАНИЯ Ц\"",
+   "exporter": "SANDVIK COROMANT",
+   "origin": "SE",
+   "usd_kg": null,
+   "desc": "Инструменты для фрезерования металла, с рабочей частью из прочих материалов, с хвостовиками"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"ЦЕНТРТЕХМАШ\"",
+   "exporter": "SANDVIK COROMANT",
+   "origin": "DE",
+   "usd_kg": null,
+   "desc": "Инструменты для фрезерования металла, с рабочей частью из твердосплавных материалов, с хвостовиками"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"СПЕКТРАЛТЕХНОЛОДЖИ\"",
+   "exporter": "SANDVIK COROMANT",
+   "origin": "SE",
+   "usd_kg": null,
+   "desc": "Сменные рабочие инструменты для промышленного металлообрабатывающего оборудования: инструменты для ф"
+  },
+  {
+   "year": 2024,
+   "importer": "ООО \"ТЕХНОТРЕЙД\"",
+   "exporter": "SANDVIK COROMANT.",
+   "origin": "SE",
+   "usd_kg": null,
+   "desc": "ИНСТРУМEНТЫ ДЛЯ ФРЕЗЕРОВАНИЯ МЕТАЛЛА, С РАБОЧЕЙ ЧАСТЬЮ ИЗ ДРУГИХ МАТЕРИАЛОВ, С ХВОСТОВИКАМИ, НЕ МЕД."
+  },
+  {
+   "year": 2024,
+   "importer": "ООО \"ПАРМА ПРОМПОСТАВКА\"",
+   "exporter": "SANDVIK TOOLING PRODUCTION (LANGFANG) CO. LTD.",
+   "origin": "CN",
+   "usd_kg": null,
+   "desc": "ИНСТРУМЕНТЫ ДЛЯ ФРЕЗЕРОВАНИЯ МЕТАЛЛА, С РАБОЧЕЙ ЧАСТЬЮ ИЗ СТАЛИ С ХВОСТОВИКАМИ.. ."
+  },
+  {
+   "year": 2024,
+   "importer": "ООО \"ИНТЕХСЕРВИС\"",
+   "exporter": "SANDVIK AB",
+   "origin": "CN",
+   "usd_kg": null,
+   "desc": "ФРЕЗА КОНЦЕВАЯ ТВЕРДОСПЛАВНАЯ, ЦЕЛЬНАЯ, С РАБОЧЕЙ ЧАСТЬЮ ИЗ МЕТАЛЛОКЕРАМИКИ, С ХВОСТОВИКОМ ИЗ МЕТАЛЛ"
+  },
+  {
+   "year": 2024,
+   "importer": "ООО \"АМЕНТО НЕВА\"",
+   "exporter": "SANDVIK HOLDINGS LTD",
+   "origin": "GB",
+   "usd_kg": null,
+   "desc": "ИНСТРУМЕНТ ДЛЯ ФРЕЗЕРОВАНИЯ ДЛЯ ОБРАБОТКИ МЕТАЛЛА С РАБОЧЕЙ ЧАСТЬЮ ИЗ ТВЕРДЫХ СПЛАВОВ БЕЗ ХВОСТОВИКА"
+  },
+  {
+   "year": 2024,
+   "importer": "ООО \"АМЕНТО НЕВА\"",
+   "exporter": "SANDVIK ITALIA S.P.A.",
+   "origin": "IT",
+   "usd_kg": null,
+   "desc": "ИНСТРУМЕНТ ДЛЯ ФРЕЗЕРОВАНИЯ ДЛЯ ОБРАБОТКИ МЕТАЛЛА С РАБОЧЕЙ ЧАСТЬЮ ИЗ ТВЕРДЫХ СПЛАВОВ БЕЗ ХВОСТОВИКА"
+  },
+  {
+   "year": 2024,
+   "importer": "ООО \"АМЕНТО НЕВА\"",
+   "exporter": "SANDVIK HOLDING GMBH",
+   "origin": "DE",
+   "usd_kg": null,
+   "desc": "ИНСТРУМЕНТ ДЛЯ ФРЕЗЕРОВАНИЯ ДЛЯ ОБРАБОТКИ МЕТАЛЛА С РАБОЧЕЙ ЧАСТЬЮ ИЗ ТВЕРДЫХ СПЛАВОВ БЕЗ ХВОСТОВИКА"
+  },
+  {
+   "year": 2024,
+   "importer": "ООО \"ИИТ\"",
+   "exporter": "SANDVIK COROMANT",
+   "origin": "SE",
+   "usd_kg": null,
+   "desc": "ИНСТРУМЕНТЫ ДЛЯ ФРЕЗЕРОВАНИЯ МЕТАЛЛА: С РАБОЧЕЙ ЧАСТЬЮ ИЗ МАТЕРИАЛОВ ТВЕРДЫХ СПЛАВОВ, С ХВОСТОВИКАМИ"
+  },
+  {
+   "year": 2024,
+   "importer": "ООО \"КАРАТ\"",
+   "exporter": "SANDVIK AB",
+   "origin": "SE",
+   "usd_kg": null,
+   "desc": "ИHСТРУМЕНТЫ ДЛЯ ФРЕЗЕРОВАНИЯ МЕТАЛЛА, С РАБОЧЕЙ ЧАСТЬЮ ИЗ ПРОЧИХ МАТЕРИАЛОВ, С ХВОСТОВИКАМИ.. ."
+  },
+  {
+   "year": 2024,
+   "importer": "ООО \"ИНТЕХСЕРВИС\"",
+   "exporter": "SANDVIK AB",
+   "origin": "CN",
+   "usd_kg": null,
+   "desc": "ФРЕЗА КОНЦЕВАЯ ТВЕРДОСПЛАВНАЯ, ЦЕЛЬНАЯ, С PАБОЧЕЙ ЧАСТЬЮ ИЗ МЕТАЛЛОКЕРАМИКИ, С ХВОСТОВИКОМ ИЗ МЕТАЛЛ"
+  },
+  {
+   "year": 2024,
+   "importer": "ООО \"УРАЛТОРГ\"",
+   "exporter": "SANDVIK COROMANT.",
+   "origin": "CN",
+   "usd_kg": null,
+   "desc": "ИНСТРУМЕНТЫ ДЛЯ ФРЕЗЕРОВАНИЯ МЕТАЛЛА, С РАБОЧЕЙ ЧАCТЬЮ ИЗ СТАЛИ, С ХВОСТОВИКАМИ.. ."
+  },
+  {
+   "year": 2024,
+   "importer": "ООО \"АМЕНТО НЕВА\"",
+   "exporter": "SANDVIK TREASURY AB.",
+   "origin": "SE",
+   "usd_kg": null,
+   "desc": "ИНСТРУMЕНТ ДЛЯ ФРЕЗЕРОВАНИЯ ДЛЯ ОБРАБОТКИ МЕТАЛЛА С РАБОЧЕЙ ЧАСТЬЮ ИЗ ТВЕРДЫХ СПЛАВОВ БЕЗ ХВОСТОВИКА"
+  },
+  {
+   "year": 2024,
+   "importer": "ООО \"АМЕНТО НЕВА\"",
+   "exporter": "SANDVIK HOLDING GMBH.",
+   "origin": "DE",
+   "usd_kg": null,
+   "desc": "ИНСТРУМЕНТ ДЛЯ ФРЕЗЕРОВАНИЯ ДЛЯ ОБРАБОТКИ МЕТАЛЛА С РАБОЧЕЙ ЧАСТЬЮ ИЗ ТВЕРДЫХ СПЛАВОВ БЕЗ ХВОСТОВИКА"
+  },
+  {
+   "year": 2024,
+   "importer": "ООО \"АМЕНТО НЕВА\"",
+   "exporter": "SANDVIK CHINA HOLDING CO. LTD.",
+   "origin": "CN",
+   "usd_kg": null,
+   "desc": "ИНСТРУМЕНТ ДЛЯ ФРЕЗЕРОВАНИЯ ДЛЯ ОБPАБОТКИ МЕТАЛЛА С РАБОЧЕЙ ЧАСТЬЮ ИЗ ТВЕРДЫХ СПЛАВОВ БЕЗ ХВОСТОВИКА"
+  },
+  {
+   "year": 2024,
+   "importer": "ООО \"НПФ ПРОМРЕССУРС\"",
+   "exporter": "AB SANDVIK COROMANT.",
+   "origin": "DE",
+   "usd_kg": null,
+   "desc": "ИНCТРУМЕНТЫ ДЛЯ ФРЕЗЕРОВАНИЯ МЕТАЛЛА, С ХВОСТОВИКАМИ.. ."
+  },
+  {
+   "year": 2024,
+   "importer": "ООО \"КОМПАНИЯ Ц\"",
+   "exporter": "SANDVIK COROMANT.",
+   "origin": "CN",
+   "usd_kg": null,
+   "desc": "ИНСТРУМЕНТЫ ДЛЯ ФРЕЗЕРОВАНИЯ МЕТАЛЛА, С РАБОЧЕЙ ЧАСТЬЮ ИЗ ПРОЧИХ МАТЕРИАЛОВ, С ХВОСТОВИКАМИ."
+  },
+  {
+   "year": 2024,
+   "importer": "ООО \"УРАЛТОРГ\"",
+   "exporter": "SANDVIK MINING AND CONSTRUCTION (CHINA) CO. LTD..",
+   "origin": "CN",
+   "usd_kg": null,
+   "desc": "ИНСТРУMЕНТЫ ДЛЯ ФРЕЗЕРОВАНИЯ МЕТАЛЛА, С РАБОЧЕЙ ЧАСТЬЮ ИЗ СТАЛИ, С ХВОСТОВИКАМИ.. ."
+  },
+  {
+   "year": 2024,
+   "importer": "ООО \"УРАЛТОРГ\"",
+   "exporter": "SANDVIK TOOLING PRODUCTION (LANGFANG) CO. LTD..",
+   "origin": "CN",
+   "usd_kg": null,
+   "desc": "ИНСТРУМЕНТЫ ДЛЯ ФРЕЗЕРOВАНИЯ МЕТАЛЛА, С РАБОЧЕЙ ЧАСТЬЮ ИЗ СТАЛИ, С ХВОСТОВИКАМИ.. ."
+  },
+  {
+   "year": 2024,
+   "importer": "ООО \"ТСТ\"",
+   "exporter": "SANDVIK COROMANT.",
+   "origin": "CN",
+   "usd_kg": null,
+   "desc": "ИНСТРУМЕНТЫ ДЛЯ ФРЕЗЕРОВАНИЯ МЕТАЛЛА, С РАБОЧЕЙ ЧАСТЬЮ ИЗ ПРОЧИХ МАТЕРИАЛОВ, С ХВОСТОВИКАМИ.. ."
+  },
+  {
+   "year": 2024,
+   "importer": "ООО \"ТСТ\"",
+   "exporter": "SANDVIK COROMANT.",
+   "origin": "IT",
+   "usd_kg": null,
+   "desc": "ИНСТРУМЕНТЫ ДЛЯ ФРЕЗЕРОBАНИЯ МЕТАЛЛА, С РАБОЧЕЙ ЧАСТЬЮ ИЗ ПРОЧИХ МАТЕРИАЛОВ, С ХВОСТОВИКАМИ.. ."
+  },
+  {
+   "year": 2024,
+   "importer": "ООО \"ТСТ\"",
+   "exporter": "SANDVIK COROMANT.",
+   "origin": "DE",
+   "usd_kg": null,
+   "desc": "ИНСТРУМЕНТЫ ДЛЯ ФРЕЗЕРОВАНИЯ МЕТАЛЛА, С РАБОЧЕЙ ЧАСТЬЮ ИЗ ПРОЧИХ МАТЕРИАЛОВ, С ХВОСТОВИКАМИ.. ."
+  },
+  {
+   "year": 2024,
+   "importer": "ООО \"УИП\"",
+   "exporter": "SANDVIK COROMANT.",
+   "origin": "CN",
+   "usd_kg": null,
+   "desc": "ИНСТРУМЕНТЫ ДЛЯ ФРЕЗЕPОВАНИЯ МЕТАЛЛА, С РАБОЧЕЙ ЧАСТЬЮ ИЗ ТВЕРДОГО СПЛАВА, С ХВОСТОВИКАМИ.. ."
+  },
+  {
+   "year": 2024,
+   "importer": "ООО \"ИМПОРТ ТУЛС\"",
+   "exporter": "SANDVIK COROMANT.",
+   "origin": "CN",
+   "usd_kg": null,
+   "desc": "ПРИСПОСОБЛЕНИЯ (РАСТОЧНАЯ ОПРАВКА/ПАТРОН/ПЕРЕХОДНИК/ВТУЛКА/ХВОСТОВИК/РЕЗЦЕДЕРЖАТЕЛЬ/КОРПУС) ДЛЯ КРЕП"
+  },
+  {
+   "year": 2024,
+   "importer": "ООО \"ИНТЕХСЕРВИС\"",
+   "exporter": "SANDVIK AB",
+   "origin": "CN",
+   "usd_kg": null,
+   "desc": "ФРЕЗА КОНЦЕВАЯ ТВЕРДОСПЛАВНАЯ, ЦЕЛЬНАЯ, С РАБОЧЕЙ ЧАСТЬЮ ИЗ МEТАЛЛОКЕРАМИКИ, С ХВОСТОВИКОМ ИЗ МЕТАЛЛ"
+  },
+  {
+   "year": 2024,
+   "importer": "ООО \"ИНТЕХСЕРВИС\"",
+   "exporter": "SANDVIK AB",
+   "origin": "CN",
+   "usd_kg": null,
+   "desc": "ФРЕЗА КОНЦЕВАЯ ТВЕРДОСПЛАВНАЯ, ЦЕЛЬНАЯ, С РАБОЧЕЙ ЧАСТЬЮ ИЗ МЕТАЛЛОКЕРАМИКИ, С ХВОСТОВИКОМ ИЗ МЕТАЛЛ"
+  },
+  {
+   "year": 2024,
+   "importer": "ООО \"УИП\"",
+   "exporter": "SANDVIK COROMANT.",
+   "origin": "CN",
+   "usd_kg": null,
+   "desc": "ИНСТРУМЕНТЫ ДЛЯ ФРЕЗЕРОВАНИЯ МЕТАЛЛA, С РАБОЧЕЙ ЧАСТЬЮ ИЗ ТВЕРДОГО СПЛАВА, С ХВОСТОВИКАМИ.. ."
+  },
+  {
+   "year": 2024,
+   "importer": "ООО \"СПЕКТРАЛТЕХНОЛОДЖИ\"",
+   "exporter": "SANDVIK COROMANT.",
+   "origin": "CN",
+   "usd_kg": null,
+   "desc": "СМЕННЫЕ РАБОЧИЕ ИНСТРУМЕНТЫ ДЛЯ ПРОМЫШЛЕННОГО МЕТАЛЛООБРАБАТЫВАЮЩЕГО ОБОРУДОВАНИЯ: ИНСТРУМЕНТЫ ДЛЯ Ф"
+  },
+  {
+   "year": 2024,
+   "importer": "ООО \"ИНТЕХСЕРВИС\"",
+   "exporter": "SANDVIK AB",
+   "origin": "CN",
+   "usd_kg": null,
+   "desc": "ФРЕЗА КОНЦЕВАЯ ТВЕРДОСПЛАВНАЯ, ЦЕЛЬНАЯ, С РАБОЧЕЙ ЧАСТЬЮ ИЗ МЕТАЛЛОКЕРАМИКИ, С ХВОСТОВИКОМ ИЗ МЕТАЛЛ"
+  },
+  {
+   "year": 2024,
+   "importer": "ООО \"ПРАДОС\"",
+   "exporter": "SANDVIK AB",
+   "origin": "MY",
+   "usd_kg": null,
+   "desc": "ИНСТРУМЕНТЫ ДЛЯ ФРЕЗЕРОВАНИЯ МЕТАЛЛА, С РАБОЧЕЙ ЧАСТЬЮ ИЗ СТАЛИ, С ХВОСТОВИКАМИ, ГРАЖД: НАЗНАЧ.. , Н"
+  },
+  {
+   "year": 2024,
+   "importer": "ООО \"СПЕКТРАЛТЕХНОЛОДЖИ\"",
+   "exporter": "SANDVIK CHINA HOLDING CO. LTD..",
+   "origin": "CN",
+   "usd_kg": null,
+   "desc": "СМЕННЫЕ РАБОЧИЕ ИНСТРУМЕНТЫ ДЛЯ ПРОМЫШЛЕННОГО МЕТАЛЛООБРАБАТЫВАЮЩЕГО ОБОРУДОВАНИЯ: ИНСТРУМЕНТЫ ДЛЯ Ф"
+  },
+  {
+   "year": 2024,
+   "importer": "ООО \"УИП\"",
+   "exporter": "SANDVIK COROMANT.",
+   "origin": "CN",
+   "usd_kg": null,
+   "desc": "ИНСТРУМЕНТЫ ДЛЯ ФРЕЗЕРОВАНИЯ МЕТАЛЛА, С РАБОЧЕЙ ЧАСТЬЮ ИЗ ТВЕРДОГО СПЛАВА, С ХВОСТОВИКАМИ.. ."
+  },
+  {
+   "year": 2024,
+   "importer": "ООО \"ПФ СОКОЛ\"",
+   "exporter": "SANDVIK",
+   "origin": "CN",
+   "usd_kg": null,
+   "desc": "АНТИВИБРАЦИОННЫЙ ПЕРЕХОДНИК 5703C6062840 — С ЦИЛИНДРИЧЕСКОГО ХВОСТОВИКА НА COROTURN SL С БЫСТРОСМЕНН"
+  },
+  {
+   "year": 2024,
+   "importer": "ООО \"ИНТЕХСЕРВИС\"",
+   "exporter": "SANDVIK AB",
+   "origin": "CN",
+   "usd_kg": null,
+   "desc": "ФРЕЗА КОНЦЕВАЯ ТВЕРДОСПЛАВНАЯ, ЦЕЛЬНАЯ, C РАБОЧЕЙ ЧАСТЬЮ ИЗ МЕТАЛЛОКЕРАМИКИ, С ХВОСТОВИКОМ ИЗ МЕТАЛЛ"
+  },
+  {
+   "year": 2024,
+   "importer": "ООО \"ИНТЕХСЕРВИС\"",
+   "exporter": "SANDVIK AB",
+   "origin": "CN",
+   "usd_kg": null,
+   "desc": "ФРЕЗА КОНЦЕВАЯ ТВЕРДОСПЛАВНАЯ, ЦЕЛЬНАЯ, C РАБОЧЕЙ ЧАСТЬЮ ИЗ МЕТАЛЛОКЕРАМИКИ, С ХВОСТОВИКОМ ИЗ МЕТАЛЛ"
+  },
+  {
+   "year": 2024,
+   "importer": "ООО \"НПФ ПРОМРЕССУРС\"",
+   "exporter": "AB SANDVIK COROMANT.",
+   "origin": "DE",
+   "usd_kg": null,
+   "desc": "ИНСТРУМЕНТЫ ДЛЯ ФРЕЗЕРОВАНИЯ МЕТАЛЛА, С ХВОСТОВИКАМИ.. ."
+  },
+  {
+   "year": 2024,
+   "importer": "ООО \"ИНТЕХСЕРВИС\"",
+   "exporter": "SANDVIK AB",
+   "origin": "CN",
+   "usd_kg": null,
+   "desc": "ФРЕЗА КОНЦЕВАЯ ТВЕРДОСПЛАВНАЯ, ЦЕЛЬНАЯ, С РАБОЧЕЙ ЧАСТЬЮ ИЗ МЕТАЛЛОКЕРАМИКИ, С ХВОСТОВИКОМ ИЗ МЕТАЛЛ"
+  },
+  {
+   "year": 2025,
+   "importer": "ООО \"ИНТЕХСЕРВИС\"",
+   "exporter": "SANDVIK AB",
+   "origin": "CN",
+   "usd_kg": null,
+   "desc": "ФРЕЗА КОНЦЕВАЯ ТВЕРДОСПЛАВНАЯ, ЦЕЛЬНАЯ, С РАБОЧЕЙ ЧАСТЬЮ ИЗ МЕТАЛЛОКЕРАМИКИ, С ХВОСТОВИКОМ ИЗ МЕТАЛЛ"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"ЗАВОД \"ВОСТОК СТАЛЬ\"",
+   "exporter": "SANDVIK MINING AND CONSTRUCTION OY",
+   "origin": "FI",
+   "usd_kg": null,
+   "desc": "ГИДРАВЛИЧЕСКИЙ ПЕРФОРАТОР"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"ЗАВОД \"ВОСТОК СТАЛЬ\"",
+   "exporter": "SANDVIK MINING AND CONSTRUCTION OY",
+   "origin": "FI",
+   "usd_kg": null,
+   "desc": "ГИДРАВЛИЧЕСКИЙ ПЕРФОРАТОР"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"ЗАВОД \"ВОСТОК СТАЛЬ\"",
+   "exporter": "SANDVIK MINING AND CONSTRUCTION OY",
+   "origin": "EU",
+   "usd_kg": null,
+   "desc": "ЧАСТИ ГИДРОПЕРФОРАТОРОВ SANDVIK"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"ЗАВОД \"ВОСТОК СТАЛЬ\"",
+   "exporter": "SANDVIK MINING AND CONSTRUCTION OY",
+   "origin": "EU",
+   "usd_kg": null,
+   "desc": "ЧАСТИ ГИДРОПЕРФОРАТОРОВ SANDVIK"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"ЗАВОД \"ВОСТОК СТАЛЬ\"",
+   "exporter": "SANDVIK MINING AND CONSTRUCTION OY",
+   "origin": "FI",
+   "usd_kg": null,
+   "desc": "ГИДРАВЛИЧЕСКИЙ ПЕРФОРАТОР"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"ЗАВОД \"ВОСТОК СТАЛЬ\"",
+   "exporter": "SANDVIK MINING AND CONSTRUCTION OY",
+   "origin": "FI",
+   "usd_kg": null,
+   "desc": "ГИДРАВЛИЧЕСКИЙ ПЕРФОРАТОР"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"МОДЕРН МАШИНЕРИ ФАР ИСТ\"",
+   "exporter": "SANDVIK",
+   "origin": "CN",
+   "usd_kg": null,
+   "desc": "ГИДРОМОТОР ПЕРФОРАТОРА В СБОРЕ №55006521"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"МОДЕРН МАШИНЕРИ ФАР ИСТ\"",
+   "exporter": "SANDVIK",
+   "origin": "CN",
+   "usd_kg": null,
+   "desc": "ПОРШЕНЬ ГИДРОПЕРФОРАТОРА №55199140"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"МОДЕРН МАШИНЕРИ ФАР ИСТ\"",
+   "exporter": "SANDVIK",
+   "origin": "CN",
+   "usd_kg": null,
+   "desc": "ПОРШЕНЬ ГИДРОПЕРФОРАТОРА , №55199140"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"МОДЕРН МАШИНЕРИ ФАР ИСТ\"",
+   "exporter": "SANDVIK",
+   "origin": "CN",
+   "usd_kg": null,
+   "desc": "РЕМ. КОМПЛЕКТ ГИДРОПЕРФОРАТОРА, СОСТОИТ ИЗ ЗАПАСНЫХ ЧАСТЕЙ ГИДРОПЕРФОРАТОРА, ПРОКЛАДОК И УПЛОТНЕНИЙ,"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"МОДЕРН МАШИНЕРИ ФАР ИСТ\"",
+   "exporter": "SANDVIK",
+   "origin": "CN",
+   "usd_kg": null,
+   "desc": "ПОРШЕНЬ ГИДРОПЕРФОРАТОРА , №55199140"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"МОДЕРН МАШИНЕРИ ФАР ИСТ\"",
+   "exporter": "SANDVIK",
+   "origin": "CN",
+   "usd_kg": null,
+   "desc": "ПОРШЕНЬ ГИДРОПЕРФОРАТОРА , №55199140"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"МОДЕРН МАШИНЕРИ ФАР ИСТ\"",
+   "exporter": "SANDVIK",
+   "origin": "CN",
+   "usd_kg": null,
+   "desc": "КРЫШКА ГИДРОПЕРФОРАТОРА ПЕРЕДНЯЯ В СБОРЕ №15274538 - 9ШТ., ДЛЯ ПОДЗЕМНОЙ (ШАХТНОЙ) ТЕХНИКИ"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"МОДЕРН МАШИНЕРИ ФАР ИСТ\"",
+   "exporter": "SANDVIK",
+   "origin": "CN",
+   "usd_kg": null,
+   "desc": "РЕМ. КОМЛЕКТ ГИДРОПЕРФОРАТОРА, СОСТОИТ ИЗ МУФТЫ, ВАЛА, ВТУЛКИ, ВАЛА В СБОРЕ ИЗ Ч/М №BG00580622"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"МОДЕРН МАШИНЕРИ ФАР ИСТ\"",
+   "exporter": "SANDVIK",
+   "origin": "CN",
+   "usd_kg": null,
+   "desc": "РЕМ. КОМПЛЕКТ ГИДРОПЕРФОРАТОРА, СОСТОИТ ИЗ ВТУЛКИ, ПРЕРЕДНЕГО ЦИЛИНДРА, ПОРШНЯ, РАСПРЕДЕЛИТЕЛЯ ИЗ Ч/"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"МОДЕРН МАШИНЕРИ ФАР ИСТ\"",
+   "exporter": "SANDVIK",
+   "origin": "CN",
+   "usd_kg": null,
+   "desc": "РЕМ. КОМПЛЕКТ ГИДРОПЕРФОРАТОРА, СОСТОИТ ИЗ ПЕРЕДНЕЙ ВТУЛКИ, РАСПРЕДЕЛИТЕЛЯ, ПОРШНЯ, ВТУЛКИ ИЗ Ч/М №B"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"МОДЕРН МАШИНЕРИ ФАР ИСТ\"",
+   "exporter": "SANDVIK",
+   "origin": "CN",
+   "usd_kg": null,
+   "desc": "РЕМ. КОМПЛЕКТ ГИДРОПЕРФОРАТОРА, СОСТИТ ИЗ КРЫШЕК, ДИАФРАГМ, ПЛАСТИН, ВТУЛОК, ВИНТА, ШПИЛЬКИ, НАБОРА "
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"МОДЕРН МАШИНЕРИ ФАР ИСТ\"",
+   "exporter": "SANDVIK",
+   "origin": "CN",
+   "usd_kg": null,
+   "desc": "РЕМ. КОМПЛЕКТ ГИДРОПЕРФОРАТОРА СОСТОИТ ИЗ ЗАПАСНЫХ ЧАСТЕЙ ГИДРОПЕРФОРАТОРА, ПРОКЛАДОК И УПЛОТНЕНИЙ, "
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"МОДЕРН МАШИНЕРИ ФАР ИСТ\"",
+   "exporter": "SANDVIK",
+   "origin": "CN",
+   "usd_kg": null,
+   "desc": "ЭКСТРАКТОР ГИДРОПЕРФОРАТОРА HLX5 №55062525"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"РОКДРИЛ\"",
+   "exporter": "MONTABERT SAS",
+   "origin": "FR",
+   "usd_kg": null,
+   "desc": "ИНСТРУМЕНТ ДЛЯ БУРЕНИЯ (ГИДРОПЕРФОРАТОР), :"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"МОДЕРН МАШИНЕРИ ФАР ИСТ\"",
+   "exporter": "SANDVIK",
+   "origin": "CN",
+   "usd_kg": null,
+   "desc": "ПЕРЕДНЯЯ КРЫШКА ГИДРОПЕРФОРАТОРА В СБОРЕ №15274538 ДЛЯ ПОДЗЕМНОЙ (ШАХТНОЙ) ТЕХНИКИ :"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"РОКДРИЛ\"",
+   "exporter": "MONTABERT SAS",
+   "origin": "FR",
+   "usd_kg": null,
+   "desc": "ИНСТРУМЕНТ ДЛЯ БУРЕНИЯ (ГИДРОПЕРФОРАТОР), :"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"ГОРМАШ ГЛОБАЛ\"",
+   "exporter": "EPIROC",
+   "origin": "TR",
+   "usd_kg": null,
+   "desc": "ЧАСТИ ДЛЯ РЕМОНТА И ТЕХНИЧЕСКОГО ОБСЛУЖИВАНИЯ ГИДРАВЛИЧЕСКОГО ПЕРФОРАТОРА, ДЛЯ ГРАЖДАНСКОГО ИСПОЛЬЗО"
+  },
+  {
+   "year": 2023,
+   "importer": "АО \"ЮГК\"",
+   "exporter": "MONTABERT",
+   "origin": "FR",
+   "usd_kg": null,
+   "desc": "КОЛОНКОВЫЙ ПЕРФОРАТОР МОДЕЛИ MONTABERT HC-50 -2ШТ. ПРЕДСТАВЛЯЕТ СОБОЙ МЕХАНИЧЕСКИЙ СИЛОВОЙ УЗЕЛ САМО"
+  },
+  {
+   "year": 2023,
+   "importer": "АО \"ЮГК\"",
+   "exporter": "MONTABERT",
+   "origin": "FR",
+   "usd_kg": null,
+   "desc": "ЧАСТИ САМОХОДНОЙ, БУРИЛЬНОЙ МАШИНЫ МОДЕЛИ НТ-72: КОЛОНКОВЫЙ ПЕРФОРАТОР МОДЕЛИ MONTABERT МОДЕЛИ HC-50"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"ХОРОШАЯ ТЕХНИКА\"",
+   "exporter": "MONTABERT S.A.S",
+   "origin": "FR",
+   "usd_kg": null,
+   "desc": "ЧАСТИ ДЛЯ РЕМОНТА И ОБСЛУЖИВАНИЯ ГИДРАВЛИЧЕСКИХ ПЕРФОРАТОРОВ БУРОВЫХ УСТАНОВОК. СМ. ДОПОЛНЕНИЕ"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"АЛЬЯНС-СЕРВИС\"",
+   "exporter": "MONTABERT S.A.S",
+   "origin": "FR",
+   "usd_kg": null,
+   "desc": "Товар прибыл в сборном контейнере, контейнер расформирован, груз размещен.. Запасные части для техни"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"АЭРО ЭКСПРЕСС ЛОГИСТИКС\"",
+   "exporter": "ATLAS COPCO GROUP",
+   "origin": "SE",
+   "usd_kg": null,
+   "desc": "Запасные части для буровой установки, новые - буровой перфоратор (комплект)"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"АЛЬЯНС-СЕРВИС\"",
+   "exporter": "MONTABERT S.A.S",
+   "origin": "FR",
+   "usd_kg": null,
+   "desc": "Товар прибыл в сборном контейнере, контейнер расформирован, груз размещен.. Запасные части гидравлич"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"ТИВИДЖИ\"",
+   "exporter": "EPIROC AB",
+   "origin": "SE",
+   "usd_kg": null,
+   "desc": "Силовые установки гидравлические: гидроперфоратор для установки анкеров при буровых работах"
+  },
+  {
+   "year": 2023,
+   "importer": "ООО \"ХОРОШАЯ ТЕХНИКА\"",
+   "exporter": "MONTABERT S.A.S",
+   "origin": "FR",
+   "usd_kg": null,
+   "desc": "Части для ремонта и обслуживания гидравлических перфораторов буровых установок.. См.. Дополнение"
+  },
+  {
+   "year": 2024,
+   "importer": "ООО \"АЛЬЯНС-СЕРВИС\"",
+   "exporter": "MONTABERT",
+   "origin": "FR",
+   "usd_kg": null,
+   "desc": "БУРОВОЕ ОБОРУДОВАНИЕ ПЕРФОРАТОР ГИДРАВЛИЧЕСКИЙ СО СТАНДАРТНЫМ НАБОРОМ ЗИП В КОМПЛЕКТЕ (ИЗМЕРИТЕЛЬНАЯ"
+  },
+  {
+   "year": 2024,
+   "importer": "ООО \"АЭРО ЭКСПРЕСС ЛОГИСТИКС\"",
+   "exporter": "ATLAS COPCO GROUP.",
+   "origin": "SE",
+   "usd_kg": null,
+   "desc": "ЗАПЧАСТИ ДЛЯ СТРОИТЕЛЬНО — ДОРОЖНОЙ ТЕХНИКИ (НЕ ПРЕДНАЗНАЧЕННОЙ ДЛЯ ДВИЖЕНИЯ ПО ДОРОГАМ ОБЩЕГО ПОЛЬЗ"
+  },
+  {
+   "year": 2024,
+   "importer": "ООО \"АЛЬЯНС-СЕРВИС\"",
+   "exporter": "MONTABERT",
+   "origin": "FR",
+   "usd_kg": null,
+   "desc": "БУРОВОЕ ОБОРУДОВАНИЕ: ПЕРФОРАТОР ГИДРАВЛИЧЕСКИЙ СО СТАНДАРТНЫМ НАБОРОМ ЗИП В КОМПЛЕКТЕ (ИЗМЕРИТЕЛЬНА"
+  },
+  {
+   "year": 2024,
+   "importer": "АО \"ОХОТСКАЯ ГГК\"",
+   "exporter": "MONTABERT SAS",
+   "origin": "FR",
+   "usd_kg": null,
+   "desc": "ДВИГАТЕЛИ ГИДРАВЛИЧЕСКИЕ СИЛОВЫЕ: ГИДРВЛИЧЕСКИЙ ПЕРФОРАТОР МОНТАБЕРТ HC95LM — 1 ШТ, ЯВЛЯЕТСЯ УЗЛОМ П"
+  },
+  {
+   "year": 2024,
+   "importer": "ООО \"ПРОТЕКМАЙН\"",
+   "exporter": "MONTABERT S.A",
+   "origin": "FR",
+   "usd_kg": null,
+   "desc": "ПЕРФОРАТОР HC25.. ."
+  },
+  {
+   "year": 2024,
+   "importer": "АО \"ЗАВОД \"ВОСТОК СТАЛЬ\"",
+   "exporter": "EPIROC AB",
+   "origin": "SE",
+   "usd_kg": null,
+   "desc": "ЗАПАСНЫЕ ЧАСТИ ГИДРАВЛИЧЕСКИХ ПЕРФОРАТОРОВ."
+  },
+  {
+   "year": 2024,
+   "importer": "ООО \"АЛЬЯНС-СЕРВИС\"",
+   "exporter": "SANDVIK MINING AND CONSTRUCTION FINLAND OY.",
+   "origin": "FI",
+   "usd_kg": null,
+   "desc": "БУРОВОЕ ОБОРУДОВАНИЕ: ПЕРФОРАТОР ГИДРАВЛИЧЕСКИЙ СО СТАНДАРТНЫМ НАБОРОM ЗИП В КОМПЛЕКТЕ (ИЗМЕРИТЕЛЬНА"
+  },
+  {
+   "year": 2024,
+   "importer": "ООО \"ТЕХНОКОННЕКТ\"",
+   "exporter": "MONTABERT  .A. ..",
+   "origin": "FR",
+   "usd_kg": null,
+   "desc": "ГИДРОПЕРФОРАТОР ДЛЯ БУРЕНИЯ."
+  },
+  {
+   "year": 2024,
+   "importer": "ООО \"МСТ\"",
+   "exporter": "EPIROC",
+   "origin": "TR",
+   "usd_kg": null,
+   "desc": "ГИДРАВЛИЧЕСКИЙ ПЕРФОРАТОР, ПРЕДСТАВЛЯЮЩИЙ СОБОЙ МЕХАНИЧЕСКИЙ СИЛОВОЙ УЗЕЛ (ГИДРОЦИЛИНДР) САМОХОДНОЙ "
+  },
+  {
+   "year": 2024,
+   "importer": "ООО \"ПРОМБУРМАШ\"",
+   "exporter": "MONTABERT S.A.S.",
+   "origin": "FR",
+   "usd_kg": null,
+   "desc": "КОМПЛЕКТУЮЩИЕ ИЗДЕЛИЯ И ЗАПАСНЫЕ ЧАСТИ ДЛЯ ОБОРУДОВАНИЯ БУРОВОГО ГЕОЛОГО-РЗВЕДОЧНОГО ПОСТАВЛЯЕМЫЕ ДЛ"
+  }
+ ],
+ "watched": [
+  {
+   "name": "Машиностроительный холдинг",
+   "declarations": 169,
+   "usd_kg_med": 11.99,
+   "n_price": 161,
+   "by_year": {
+    "2023": 169
+   },
+   "top_origins": [
+    [
+     "CN",
+     140
+    ],
+    [
+     "TR",
+     27
+    ]
+   ]
+  }
+ ],
+ "strong_linked": 72
+}

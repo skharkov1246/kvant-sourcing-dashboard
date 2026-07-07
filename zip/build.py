@@ -78,6 +78,14 @@ def build():
         mat_sup = load("material_suppliers.json")
     except FileNotFoundError:
         mat_sup = []
+    try:
+        mat_proc = load("material_process.json")
+    except FileNotFoundError:
+        mat_proc = []
+    try:
+        customs = load("customs_market.json")
+    except FileNotFoundError:
+        customs = None
     mat_text_path = ROOT / "СТРАТЕГИЯ-МАТЕРИАЛЫ.md"
     mat_text = mat_text_path.read_text(encoding="utf-8") if mat_text_path.exists() else ""
 
@@ -88,6 +96,8 @@ def build():
     html = html.replace("[/*__COMPET__*/]", json.dumps(competitor, ensure_ascii=False, separators=(",", ":")))
     html = html.replace("[/*__MATNODES__*/]", json.dumps(mat_nodes, ensure_ascii=False, separators=(",", ":")))
     html = html.replace("[/*__MATSUP__*/]", json.dumps(mat_sup, ensure_ascii=False, separators=(",", ":")))
+    html = html.replace("[/*__MATPROC__*/]", json.dumps(mat_proc, ensure_ascii=False, separators=(",", ":")))
+    html = html.replace("[/*__CUSTOMS__*/]", "[" + json.dumps(customs, ensure_ascii=False, separators=(",", ":")) + "]")
     html = html.replace("[/*__MATTEXT__*/]", "[" + json.dumps(mat_text, ensure_ascii=False) + "]")
     repl = {
         "__N_POS__": str(n_pos),

@@ -72,7 +72,7 @@ table.pt .eur{color:#0b5;font-variant-numeric:tabular-nums}
 <header>
   <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
     <div><b>База ЗИП · локализация производства</b> <span class="pill" id="cnt">…</span> <span class="pill" id="mode">…</span></div>
-    <div class="tabs"><button class="on" data-t="grid">Позиции</button><button data-t="sup">Поставщики</button><button data-t="wh">Склад</button><button data-t="dem">Спрос</button><button data-t="mat">Материалы</button><button data-t="stats">Обзор</button><button data-t="log">Журнал</button><button id="expPos" class="exp">⬇ позиции</button><button id="expOdm" class="exp">⬇ ODM</button><button id="expPrices" class="exp">⬇ цены</button><button id="expSamples" class="exp">⬇ образцы</button><button id="expSup" class="exp">⬇ поставщики</button></div>
+    <div class="tabs"><button class="on" data-t="grid">Позиции</button><button data-t="sup">Поставщики</button><button data-t="wh">Склад</button><button data-t="dem">Спрос</button><button data-t="cust">Таможня</button><button data-t="mat">Материалы</button><button data-t="stats">Обзор</button><button data-t="log">Журнал</button><button id="expPos" class="exp">⬇ позиции</button><button id="expOdm" class="exp">⬇ ODM</button><button id="expPrices" class="exp">⬇ цены</button><button id="expSamples" class="exp">⬇ образцы</button><button id="expSup" class="exp">⬇ поставщики</button></div>
   </div>
   <div class="bar" id="ctrls">
     <input id="q" type="text" placeholder="поиск: каталог, наименование, модель, OEM…">
@@ -90,6 +90,7 @@ table.pt .eur{color:#0b5;font-variant-numeric:tabular-nums}
 <div id="suppliers" class="hide" style="padding:12px"></div>
 <div id="wh" class="hide" style="padding:12px"></div>
 <div id="dem" class="hide" style="padding:12px"></div>
+<div id="cust" class="hide" style="padding:12px"></div>
 <div id="mat" class="hide" style="padding:12px"></div>
 <div id="stats" class="hide" style="padding:12px"></div>
 <div id="log" class="hide" style="padding:12px"></div>
@@ -102,6 +103,8 @@ const DEMAND=[/*__DEMAND__*/];
 const COMPET=[/*__COMPET__*/];
 const MATNODES=[/*__MATNODES__*/];
 const MATSUP=[/*__MATSUP__*/];
+const MATPROC=[/*__MATPROC__*/];
+const CUSTOMS=[/*__CUSTOMS__*/][0]||null;
 const MATTEXT=[/*__MATTEXT__*/][0]||"";
 const sb=(window.supabase)?supabase.createClient(SUPA_URL,SUPA_KEY):null;
 const $=id=>document.getElementById(id);
@@ -449,8 +452,10 @@ function statsHtml(){
   h+=`<b>Воронка локализации</b><div class="funnel">`+LOC.map(l=>`<div class="fr"><span class="nm">${esc(l)}</span><div class="fb" style="width:${Math.round(loc[l]/mx1*320)}px;background:${LOCC[l]}"></div><span>${loc[l]}</span></div>`).join("")+`</div>`;
   const smx=Math.max(1,...Object.values(samp));
   if(sampCnt)h+=`<b>Образцы по статусам</b><div class="funnel">`+SAMP.map(s=>`<div class="fr"><span class="nm">${esc(s)}</span><div class="fb" style="width:${Math.round(samp[s]/smx*320)}px;background:${SAMPC[s]}"></div><span>${samp[s]}</span></div>`).join("")+`</div>`;
-  if(sav.length){h+=`<b>Топ разброса цен (потенциал экономии OEM↔афтермаркет)</b><table class="ot" style="max-width:760px"><thead><tr><th>П/П</th><th>Наименование</th><th>мин</th><th>макс</th><th>разброс</th></tr></thead><tbody>`+
-    sav.slice(0,12).map(s=>`<tr><td class="cn">${s.d.pp}</td><td>${esc(s.d.name)}</td><td class="eur">${s.mn}</td><td class="eur">${s.mx}</td><td class="eur"><b>${(s.mx-s.mn).toFixed(1)}</b></td></tr>`).join("")+`</tbody></table>`;}
+  if(sav.length){const totDelta=sav.reduce((a,s)=>a+s.delta,0);
+    h+=`<b>Бизнес-кейс: маржа локализации</b> <span class="mut">(мин = себестоимость-ориентир афтермаркет, макс = OEM/рынок; маржа = что захватываем, локализуя. Позиций с вилкой: ${sav.length}, суммарная вилка ≈ ${totDelta.toFixed(0)} на ед.)</span>
+    <div style="overflow-x:auto"><table class="ot" style="max-width:840px"><thead><tr><th>П/П</th><th>Наименование</th><th>Себест.-ориентир</th><th>OEM/рынок</th><th>Маржа/ед</th><th>%</th></tr></thead><tbody>`+
+    sav.slice(0,15).map(s=>`<tr><td class="cn">${s.d.pp}</td><td>${esc((s.d.name||"").slice(0,40))}</td><td class="eur">${s.mn}</td><td class="eur">${s.mx}</td><td class="eur"><b>${s.delta.toFixed(1)}</b></td><td class="cn">${Math.round(s.delta/s.mn*100)}%</td></tr>`).join("")+`</tbody></table></div>`;}
   // Топ кандидатов на локализацию: готовность = завод-ODM + ценовой бенчмарк + рекомендация материала + продвинутый статус
   const cand=POS.map(d=>{const odm=(ODM[d.id]||[]).length,pr=(PRICES[d.id]||[]).length,mat=!!matchNode(d),adv=["образцы","тест","одобрено","серия"].includes(d.loc_status||"");
     const score=(odm?2:0)+(pr?2:0)+(mat?1:0)+(adv?1:0);return {d:d,odm:odm,pr:pr,mat:mat,score:score};}).filter(x=>x.odm&&x.pr).sort((a,b)=>b.score-a.score||b.pr-a.pr);
@@ -493,6 +498,45 @@ $("wh").addEventListener("click",async e=>{
 function openPos(pid){document.querySelector('.tabs [data-t="grid"]').click();refreshDetail(pid);const dd=$("det-"+pid);if(dd)dd.scrollIntoView({block:"center"});}
 // ─── Спрос и бюджет заказчика ───
 function money(n){return n==null?"—":(Math.abs(n)>=1e6?(n/1e6).toFixed(1)+" млн":Math.round(n).toLocaleString("ru"));}
+function custHtml(){
+  if(!CUSTOMS||!CUSTOMS.perforator)return '<div class="mut">Таможенная статистика не загружена. Запустите workflow «ZIP customs» (glbs.io).</div>';
+  const P=CUSTOMS.perforator, kg=P.usd_kg||{};
+  const isComp=n=>/машиностроительн|холдинг/i.test(n||"");
+  let h=`<div class="mut" style="margin-bottom:8px">${esc(CUSTOMS.source||"")} · HS ${esc((CUSTOMS.hs||[]).join(", "))} · обновлено ${esc(CUSTOMS.updated||"")}</div>`;
+  h+=`<div class="cards" style="margin-bottom:10px">
+    <div class="card"><div class="n">${(P.declarations||0).toLocaleString("ru")}</div><div class="l">деклараций (перфоратор/буровой импорт)</div></div>
+    <div class="card"><div class="n">${kg.median!=null?kg.median:"—"}</div><div class="l">USD/кг медиана (p25 ${kg.p25??"—"} · p75 ${kg.p75??"—"})</div></div>
+    <div class="card"><div class="n">${(CUSTOMS.oem_direct||[]).length}</div><div class="l">прямой импорт от OEM (Sandvik/Epiroc…)</div></div>
+    <div class="card"><div class="n">${CUSTOMS.strong_linked||0}</div><div class="l">привязано к позициям (наш PN в ГТД)</div></div>
+  </div>`;
+  // отслеживаемые конкуренты-локализаторы
+  const w=CUSTOMS.watched||[];
+  if(w.length){h+=`<b>Конкуренты-локализаторы под наблюдением</b><div class="mut" style="font-size:11px;margin:2px 0">Импортный след известных локализаторов ЗИП (по всей базе совпадений).</div>
+    <div style="overflow-x:auto"><table class="ot"><thead><tr><th>Компания</th><th>Деклараций</th><th>USD/кг медиана</th><th>Страны</th><th>Годы</th></tr></thead><tbody>`+
+    w.map(x=>`<tr style="background:#fef9c3"><td><b>${esc(x.name)}</b></td><td class="cn">${x.declarations}</td><td class="cn">${x.usd_kg_med??"—"}</td><td class="mut">${(x.top_origins||[]).map(o=>esc(o[0])+":"+o[1]).join(", ")}</td><td class="mut">${Object.entries(x.by_year||{}).map(([y,c])=>y+":"+c).join(", ")}</td></tr>`).join("")+`</tbody></table></div>`;}
+  // по годам
+  const yrs=P.by_year||{};
+  h+=`<b>Импорт по годам</b><div style="overflow-x:auto"><table class="ot" style="max-width:520px"><thead><tr>`+
+    Object.keys(yrs).map(y=>`<th>${esc(y)}</th>`).join("")+`</tr></thead><tbody><tr>`+
+    Object.values(yrs).map(v=>`<td class="cn">${v.toLocaleString("ru")}</td>`).join("")+`</tr></tbody></table></div>`;
+  // страны
+  h+=`<b style="display:block;margin-top:10px">Страны отправления</b><div style="overflow-x:auto"><table class="ot" style="max-width:520px"><thead><tr><th>Страна</th><th>Деклараций</th><th>USD/кг медиана</th></tr></thead><tbody>`+
+    (P.origins||[]).map(r=>`<tr><td>${esc(r.name)}</td><td class="cn">${r.cnt}</td><td class="cn">${r.usd_kg_med??"—"}</td></tr>`).join("")+`</tbody></table></div>`;
+  // импортёры (конкурент подсвечен)
+  h+=`<b style="display:block;margin-top:10px">Топ импортёров-конкурентов</b><div class="mut" style="font-size:11px;margin:2px 0">Кто завозит перфораторный ЗИП в РФ. <span style="background:#fde68a;padding:0 4px;border-radius:3px">жёлтым</span> — отслеживаемый локализатор.</div>
+    <div style="overflow-x:auto"><table class="ot"><thead><tr><th>Импортёр</th><th>Деклараций</th><th>USD/кг медиана</th></tr></thead><tbody>`+
+    (P.top_importers||[]).map(r=>`<tr${isComp(r.name)?' style="background:#fef9c3"':''}><td>${esc(r.name)}</td><td class="cn">${r.cnt}</td><td class="cn">${r.usd_kg_med??"—"}</td></tr>`).join("")+`</tbody></table></div>`;
+  // экспортёры
+  h+=`<b style="display:block;margin-top:10px">Топ экспортёров (заводы-поставщики)</b><div style="overflow-x:auto"><table class="ot"><thead><tr><th>Экспортёр</th><th>Деклараций</th></tr></thead><tbody>`+
+    (P.top_exporters||[]).map(r=>`<tr><td>${esc(r.name)}</td><td class="cn">${r.cnt}</td></tr>`).join("")+`</tbody></table></div>`;
+  // прямой импорт от OEM
+  const od=CUSTOMS.oem_direct||[];
+  if(od.length){h+=`<details style="margin-top:12px"><summary style="cursor:pointer;font-weight:600">🎯 Прямой импорт от OEM — ${od.length} деклараций (Sandvik/Epiroc/Atlas Copco)</summary>
+    <div style="overflow-x:auto;margin-top:6px"><table class="ot"><thead><tr><th>Год</th><th>OEM-экспортёр</th><th>Импортёр в РФ</th><th>Ориг.</th><th>USD/кг</th><th>Описание</th></tr></thead><tbody>`+
+    od.map(o=>`<tr><td class="cn">${o.year||""}</td><td>${esc(o.exporter)}</td><td>${esc(o.importer)}</td><td class="cn">${esc(o.origin)}</td><td class="cn">${o.usd_kg??"—"}</td><td class="mut" style="max-width:300px">${esc(o.desc)}</td></tr>`).join("")+`</tbody></table></div></details>`;}
+  h+=`<div class="mut" style="font-size:11px;margin-top:10px">${esc(CUSTOMS.note||"")}</div>`;
+  return h;
+}
 function demHtml(){
   if(!DEMAND.length)return '<div class="mut">Данные спроса не загружены.</div>';
   const years=[...new Set(DEMAND.map(d=>d.year))].sort();
@@ -513,6 +557,14 @@ function demHtml(){
   h+=`<b>OEM-разбивка ${last} — кого локализовать</b><table class="ot" style="max-width:620px"><thead><tr><th>OEM</th><th>Ед.</th><th>Бюджет ₽</th><th>Импорт €</th></tr></thead><tbody>`;
   Object.entries(oem).sort((a,b)=>b[1].plan-a[1].plan).forEach(([k,v])=>h+=`<tr><td>${esc(k)}</td><td class="cn">${Math.round(v.u)}</td><td class="eur">${money(v.plan)}</td><td class="eur">${v.eur?(v.eur/1e6).toFixed(2)+" млн":"—"}</td></tr>`);
   h+=`</tbody></table>`;
+  // Конкурентная карта: какие ЦЕЛЫЕ машины конкурент уже локализует (цена) vs OEM-спрос → белые пятна
+  const machines=COMPET.filter(c=>(c.price_rub||0)>2e6&&/перфоратор|drill|бурильн/i.test(c.name||"")).sort((a,b)=>b.price_rub-a.price_rub);
+  const demOems=[...new Set(DEMAND.map(d=>d.oem).filter(Boolean))];
+  const mxCovers="Paus/HL·HLX·RD (собственные модели МХ)";
+  h+=`<b>Конкурентная карта — что «Машиностроительный холдинг» уже локализует</b>
+   <div style="overflow-x:auto"><table class="ot" style="max-width:700px"><thead><tr><th>Модель конкурента</th><th>Наименование</th><th>Цена ₽</th></tr></thead><tbody>`+
+   machines.slice(0,10).map(c=>`<tr><td class="mut">${esc(c.model)}</td><td>${esc((c.name||"").slice(0,44))}</td><td class="eur">${money(c.price_rub)}</td></tr>`).join("")+`</tbody></table></div>
+   <div class="mut" style="margin:4px 0 10px">Конкурент закрывает семейство <b>${esc(mxCovers)}</b> (перфораторы Sandvik/Tamrock HL·HLX·RD + база Paus). OEM в спросе Норникеля: <b>${demOems.map(esc).join(", ")}</b>. «Белое пятно» под нас — <b>${esc(demOems.filter(o=>!/paus|sandvik|tamrock/i.test(o)).join(", ")||"—")}</b>: этих OEM конкурент не локализует.</div>`;
   const models=[...new Set(COMPET.map(c=>c.model).filter(m=>m&&m.length>1))];
   h+=`<b>Прайс конкурента — АО «Машиностроительный холдинг» (${COMPET.length} позиций)</b>
    <div class="mut" style="margin:3px 0">Уже локализует модели: <b>${models.slice(0,14).map(esc).join(", ")}</b>. Это бенчмарк по цене/срокам, который надо обойти.</div>
@@ -534,18 +586,31 @@ function compTable(q){
 $("dem").addEventListener("input",e=>{if(e.target.id=="qcomp")$("comptab").innerHTML=compTable(e.target.value);});
 // ─── Материалы и металлурги («крепче оригинала») ───
 let matFilter="";
+// техкарта термообработки + протокол приёмочных испытаний по узлу (research-workflow)
+function procCard(i){
+  const p=MATPROC.find(x=>x&&x.node_index===i);if(!p)return"";
+  const ht=(p.heat_treat||[]).map(s=>`<tr><td><b>${esc(s.step)}</b></td><td>${esc(s.regime)}</td><td class="mut">${esc(s.target)}</td></tr>`).join("");
+  const tp=(p.test_protocol||[]).map(t=>`<tr><td><b>${esc(t.test)}</b></td><td class="cn">${esc(t.standard)}</td><td>${esc(t.acceptance)}</td></tr>`).join("");
+  const df=(p.defects||[]).map(d=>`<li>${esc(d)}</li>`).join("");
+  return `<details style="margin-top:6px"><summary style="cursor:pointer;font-weight:600;color:#1a7f37">⚙ Техкарта термообработки + протокол испытаний</summary>
+    <div style="margin:6px 0 2px">${p.summary?`<div class="mut" style="margin-bottom:6px">${esc(p.summary)}</div>`:""}
+    ${ht?`<div style="font-weight:600;font-size:12px;margin:4px 0">Маршрут термо/ХТО</div><div style="overflow-x:auto"><table class="pt"><thead><tr><th>Операция</th><th>Режим</th><th>Цель</th></tr></thead><tbody>${ht}</tbody></table></div>`:""}
+    ${tp?`<div style="font-weight:600;font-size:12px;margin:8px 0 4px">Протокол приёмочных испытаний</div><div style="overflow-x:auto"><table class="pt"><thead><tr><th>Испытание</th><th>Стандарт</th><th>Критерий приёмки</th></tr></thead><tbody>${tp}</tbody></table></div>`:""}
+    ${df?`<div style="font-weight:600;font-size:12px;margin:8px 0 2px">Типовые дефекты / контроль</div><ul class="mut" style="margin:2px 0 0 16px;font-size:11px">${df}</ul>`:""}
+    </div></details>`;
+}
 function matHtml(){
   let h=`<div class="mut" style="margin-bottom:8px">Материаловедческая стратегия <b>«крепче оригинала»</b>: по каждому изнашиваемому узлу — марка/обработка OEM (Epiroc/Sandvik/Tamrock) и наша превосходящая альтернатива; ниже — шорт-лист поставщиков материалов по категориям и полная стратегия.</div>`;
   if(MATNODES.length){
     h+=`<b>Металлургия узлов — что бьёт OEM</b>`;
-    MATNODES.forEach(m=>{h+=`<div class="pbx"><div class="pbx-h"><b>${esc((m.part_class||"").split("(")[0].slice(0,64))}</b>${m.expected_gain?` <span class="loc" style="background:#1a7f37">${esc(m.expected_gain.slice(0,46))}</span>`:""}</div>
+    MATNODES.forEach((m,i)=>{h+=`<div class="pbx"><div class="pbx-h"><b>${esc((m.part_class||"").split("(")[0].slice(0,64))}</b>${m.expected_gain?` <span class="loc" style="background:#1a7f37">${esc(m.expected_gain.slice(0,46))}</span>`:""}</div>
       <table class="pt"><tbody>
       ${m.oem_material?`<tr><td class="mut" style="width:130px">OEM материал</td><td>${esc(m.oem_material)}</td></tr>`:""}
       ${m.oem_treatment?`<tr><td class="mut">OEM обработка</td><td>${esc(m.oem_treatment)}</td></tr>`:""}
       <tr><td class="mut"><b style="color:#1a7f37">Наша марка</b></td><td><b>${esc(m.alt_material)}</b></td></tr>
       ${m.alt_treatment?`<tr><td class="mut"><b style="color:#1a7f37">Наша обработка</b></td><td>${esc(m.alt_treatment)}</td></tr>`:""}
       <tr><td class="mut">Почему прочнее</td><td>${esc(m.rationale)}</td></tr>
-      </tbody></table></div>`;});
+      </tbody></table>${procCard(i)}</div>`;});
   }
   const cats=[...new Set(MATSUP.map(s=>s.category))];
   h+=`<b>Поставщики материалов (${MATSUP.length})</b>
@@ -581,10 +646,11 @@ async function logHtml(){
 document.querySelectorAll(".tabs [data-t]").forEach(b=>b.onclick=async()=>{
   document.querySelectorAll(".tabs [data-t]").forEach(x=>x.classList.remove("on"));b.classList.add("on");
   const t=b.dataset.t;$("grid").classList.toggle("hide",t!="grid");$("ctrls").style.visibility=t=="grid"?"visible":"hidden";
-  $("suppliers").classList.toggle("hide",t!="sup");$("wh").classList.toggle("hide",t!="wh");$("dem").classList.toggle("hide",t!="dem");$("mat").classList.toggle("hide",t!="mat");$("stats").classList.toggle("hide",t!="stats");$("log").classList.toggle("hide",t!="log");
+  $("suppliers").classList.toggle("hide",t!="sup");$("wh").classList.toggle("hide",t!="wh");$("dem").classList.toggle("hide",t!="dem");$("cust").classList.toggle("hide",t!="cust");$("mat").classList.toggle("hide",t!="mat");$("stats").classList.toggle("hide",t!="stats");$("log").classList.toggle("hide",t!="log");
   if(t=="sup")$("suppliers").innerHTML=supHtml();
   if(t=="wh")$("wh").innerHTML=whHtml();
   if(t=="dem"){$("dem").innerHTML=demHtml();if($("comptab"))$("comptab").innerHTML=compTable("");}
+  if(t=="cust")$("cust").innerHTML=custHtml();
   if(t=="mat"){$("mat").innerHTML=matHtml();if($("mattab"))$("mattab").innerHTML=matSupTable("");}
   if(t=="stats")$("stats").innerHTML=statsHtml();
   if(t=="log")$("log").innerHTML=await logHtml();
