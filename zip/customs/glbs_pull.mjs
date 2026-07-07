@@ -150,7 +150,7 @@ for (const hs of hsList) {
       else if (OEM_RE.test(hayRaw(rec))) weak.push(compact(rec, 'weak'));
     }
     const matched = strong.concat(weak).slice(0, MAX_MATCH);
-    writeFileSync(`${OUT}/customs_${hs}.json`, JSON.stringify({
+    writeFileSync(`${OUT}/customs_${hs}_${P1}_${P2}.json`, JSON.stringify({
       hs, method: METHOD, country: COUNTRY, period: [P1, P2],
       total_records: recs.length, strong: strong.length, weak: weak.length,
       fields: sampleKeys, meta: cleanMeta(json.meta), skeleton: recs.length ? undefined : skel,

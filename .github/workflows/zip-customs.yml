@@ -35,6 +35,14 @@ on:
         description: "pull: ключ glbs.io (если не задан секрет GLBS_API_KEY). Маскируется в логах."
         default: ""
         type: string
+      period_start:
+        description: "pull: начало периода YYYY-MM-DD (по умолч. 2023-01-01)"
+        default: ""
+        type: string
+      period_finish:
+        description: "pull: конец периода YYYY-MM-DD (по умолч. 2026-03-31)"
+        default: ""
+        type: string
 
 permissions:
   contents: write
@@ -90,6 +98,8 @@ jobs:
           GLBS_METHOD: ${{ inputs.method }}
           GLBS_HS: ${{ inputs.hs }}
           GLBS_MAX_HS: ${{ inputs.max_hs }}
+          GLBS_PERIOD_START: ${{ inputs.period_start }}
+          GLBS_PERIOD_FINISH: ${{ inputs.period_finish }}
         run: |
           echo "::add-mask::${GLBS_API_KEY:-}"
           if [ -z "${GLBS_API_KEY:-}" ]; then
