@@ -1,35 +1,40 @@
 // Клиент официального API glbs.io (Глобус-ВЭД): выгрузка таможенных деклараций
-// по нашим HS-кодам через метод /api/supplies-search/. Результаты пишутся в
-// zip/customs/out/*.json (их коммитит workflow — я читаю из репозитория).
+// по нашим HS-кодам через /api/supplies-search/. Сырой ответ огромный (десятки МБ),
+// поэтому в git коммитим ТОЛЬКО компактный отфильтрованный экстракт: декларации,
+// где в описании/участниках встречается наш каталожный номер, OEM или слова
+// «перфоратор/буровой/drifter…». Сырьё в git не попадает (лимит GitHub 100 МБ).
 //
-// Ключ — только из секрета GLBS_API_KEY (в код/лог не попадает).
+// Ключ — из env GLBS_API_KEY (в код/лог не пишется; маскируется в workflow).
 // Метод:
-//   search — бесплатно, НО цены/веса скрыты (для разведки объёма);
-//   save   — показывает цены/веса, СПИСЫВАЕТ месячный лимит (для реальных цен).
+//   search — бесплатно, цены/веса скрыты (участники, объёмы, даты, описания);
+//   save   — показывает цены/веса, СПИСЫВАЕТ лимит (реальные цены).
 //
 // env:
-//   GLBS_API_KEY   (обяз.)  — ключ API
+//   GLBS_API_KEY   (обяз.)
 //   GLBS_METHOD    search|save (по умолч. search)
 //   GLBS_COUNTRY   ru|kz|uz|am|... (по умолч. ru)
-//   GLBS_HS        список 4-значных префиксов через запятую (по умолч. — из positions.json)
-//   GLBS_PERIOD_START / GLBS_PERIOD_FINISH  YYYY-MM-DD (по умолч. 2023-01-01 .. 2026-03-31)
-//   GLBS_MAX_HS    ограничить число HS-групп за прогон (беречь лимит; по умолч. 3)
+//   GLBS_HS        4-знач. префиксы через запятую (по умолч. — из positions.json)
+//   GLBS_PERIOD_START / GLBS_PERIOD_FINISH  YYYY-MM-DD (по умолч. 2023-01-01..2026-03-31)
+//   GLBS_MAX_HS    сколько HS-групп за прогон (по умолч. 3)
+//   GLBS_FIELDS    список полей ответа через запятую (по умолч. — все)
+//   GLBS_MAX_MATCH сколько совпавших деклараций хранить на HS (по умолч. 4000)
 import { writeFileSync, mkdirSync, readFileSync } from 'fs';
 
 const KEY = process.env.GLBS_API_KEY;
-if (!KEY) { console.error('::error::нет секрета GLBS_API_KEY'); process.exit(1); }
+if (!KEY) { console.error('::error::нет ключа GLBS_API_KEY'); process.exit(1); }
 const METHOD = process.env.GLBS_METHOD || 'search';
 const COUNTRY = process.env.GLBS_COUNTRY || 'ru';
 const P1 = process.env.GLBS_PERIOD_START || '2023-01-01';
 const P2 = process.env.GLBS_PERIOD_FINISH || '2026-03-31';
 const MAX_HS = parseInt(process.env.GLBS_MAX_HS || '3', 10);
+const MAX_MATCH = parseInt(process.env.GLBS_MAX_MATCH || '4000', 10);
 const OUT = 'zip/customs/out';
 mkdirSync(OUT, { recursive: true });
 
 // HS-префиксы: из env или топ по нашей базе
 let hsList = (process.env.GLBS_HS || '').split(',').map(s => s.trim()).filter(Boolean);
+const pos = JSON.parse(readFileSync('zip/data/positions.json', 'utf8'));
 if (!hsList.length) {
-  const pos = JSON.parse(readFileSync('zip/data/positions.json', 'utf8'));
   const cnt = {};
   for (const p of pos) {
     const m = String(p.hs_code || '').match(/(\d{4})/);
@@ -39,9 +44,21 @@ if (!hsList.length) {
 }
 hsList = hsList.slice(0, MAX_HS);
 
-// поля ответа: пусто => все поля (нужно, чтобы поймать точные имена ценовых полей)
-const FIELDS = (process.env.GLBS_FIELDS || '').split(',').map(s => s.trim()).filter(Boolean);
+// наши каталожные номера/алиасы (токены >=4 символов) для сильного матчинга
+const tokenSet = new Set();
+const norm = s => String(s || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+for (const p of pos) {
+  for (const raw of [p.catalog_no, p.aliases]) {
+    for (const t of String(raw || '').split(/[\s,;/]+/)) {
+      const n = norm(t);
+      if (n.length >= 5) tokenSet.add(n);
+    }
+  }
+}
+const OEM_RE = /перфоратор|перфоратора|буров|бурильн|drifter|rock ?drill|epiroc|atlas ?copco|sandvik|tamrock|montabert|furukawa|коронк|хвостовик|shank|гидромолот|гидроударн|COP\s?\d|HLX|HL\d{3}|RD\d{3}/i;
 
+// поля ответа
+const FIELDS = (process.env.GLBS_FIELDS || '').split(',').map(s => s.trim()).filter(Boolean);
 function buildUrl(hs) {
   const p = new URLSearchParams();
   p.set('api-key', KEY);
@@ -57,6 +74,19 @@ function buildUrl(hs) {
 }
 const redact = u => u.replace(/api-key=[^&]+/, 'api-key=***');
 
+// достаём массив деклараций из ответа неизвестной точной схемы
+function recordsOf(json) {
+  if (!json || typeof json !== 'object') return [];
+  for (const k of ['search', 'data', 'supplies', 'result', 'items', 'fea', 'rows']) {
+    if (Array.isArray(json[k])) return json[k];
+    if (json[k] && Array.isArray(json[k].data)) return json[k].data;
+    if (json[k] && Array.isArray(json[k].items)) return json[k].items;
+  }
+  return Array.isArray(json) ? json : [];
+}
+const hay = rec => norm(JSON.stringify(rec));      // для матчинга по PN
+const hayRaw = rec => JSON.stringify(rec);          // для матчинга по словам (OEM)
+
 const summary = [];
 for (const hs of hsList) {
   const url = buildUrl(hs);
@@ -64,20 +94,34 @@ for (const hs of hsList) {
     const r = await fetch(url, { headers: { 'User-Agent': 'kvant-zip-bot' } });
     const text = await r.text();
     let json = null; try { json = JSON.parse(text); } catch {}
-    writeFileSync(`${OUT}/hs_${hs}.json`, json ? JSON.stringify(json, null, 1) : text);
-    // аккуратно вытащим счётчик/структуру, не зная точной схемы
-    let count = null, keys = [];
-    if (json) {
-      const data = json.data || json.supplies || json.result || json.items || json.fea || json;
-      if (Array.isArray(data)) { count = data.length; if (data[0]) keys = Object.keys(data[0]); }
-      else if (data && typeof data === 'object') { keys = Object.keys(data); }
-      if (json.meta) { delete json.meta.key; delete json.meta.ip; }
+    if (r.status !== 200 || !json) {
+      // покажем тело ошибки (без ключа) — понять причину 400
+      console.log(`[hs ${hs}] status=${r.status} bytes=${text.length} ERROR_BODY=${text.slice(0, 300)}`);
+      summary.push({ hs, status: r.status, bytes: text.length, error: text.slice(0, 300), url: redact(url) });
+      continue;
     }
-    summary.push({ hs, status: r.status, bytes: text.length, count, topKeys: keys.slice(0, 25), url: redact(url) });
-    console.log(`[hs ${hs}] status=${r.status} bytes=${text.length} count=${count ?? '?'}`);
+    const recs = recordsOf(json);
+    const sampleKeys = recs[0] ? Object.keys(recs[0]) : Object.keys(json);
+    // фильтр: сильный (наш PN) + слабый (OEM/перфоратор-слова)
+    const strong = [], weak = [];
+    for (const rec of recs) {
+      const h = hay(rec);
+      let hit = false;
+      for (const t of tokenSet) { if (t.length >= 6 && h.includes(t)) { strong.push(rec); hit = true; break; } }
+      if (!hit && OEM_RE.test(hayRaw(rec))) weak.push(rec);
+    }
+    const matched = strong.concat(weak).slice(0, MAX_MATCH);
+    writeFileSync(`${OUT}/customs_${hs}.json`, JSON.stringify({
+      hs, method: METHOD, country: COUNTRY, period: [P1, P2],
+      total_records: recs.length, strong: strong.length, weak: weak.length,
+      fields: sampleKeys, meta: json.meta || null,
+      matched,
+    }, null, 1));
+    console.log(`[hs ${hs}] status=200 total=${recs.length} strong=${strong.length} weak=${weak.length} fields=${JSON.stringify(sampleKeys.slice(0, 30))}`);
+    summary.push({ hs, status: 200, total_records: recs.length, strong: strong.length, weak: weak.length, fields: sampleKeys.slice(0, 30), url: redact(url) });
   } catch (e) {
-    summary.push({ hs, err: e.message, url: redact(url) });
     console.log(`[hs ${hs}] ОШИБКА: ${e.message}`);
+    summary.push({ hs, err: e.message, url: redact(url) });
   }
 }
 writeFileSync(`${OUT}/_summary.json`, JSON.stringify({ method: METHOD, country: COUNTRY, period: [P1, P2], hs: hsList, results: summary }, null, 1));
