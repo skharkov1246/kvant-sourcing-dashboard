@@ -74,15 +74,33 @@ function buildUrl(hs) {
 }
 const redact = u => u.replace(/api-key=[^&]+/, 'api-key=***');
 
-// достаём массив деклараций из ответа неизвестной точной схемы
+// самый большой массив объектов в ответе (схема заранее не известна)
 function recordsOf(json) {
-  if (!json || typeof json !== 'object') return [];
-  for (const k of ['search', 'data', 'supplies', 'result', 'items', 'fea', 'rows']) {
-    if (Array.isArray(json[k])) return json[k];
-    if (json[k] && Array.isArray(json[k].data)) return json[k].data;
-    if (json[k] && Array.isArray(json[k].items)) return json[k].items;
-  }
-  return Array.isArray(json) ? json : [];
+  let best = [];
+  const visit = (o, d) => {
+    if (d > 5 || !o || typeof o !== 'object') return;
+    if (Array.isArray(o)) {
+      if (o.length > best.length && o[0] && typeof o[0] === 'object') best = o;
+      return;
+    }
+    for (const k in o) visit(o[k], d + 1);
+  };
+  visit(json, 0);
+  return best;
+}
+// скелет ответа для отладки: имена ключей + длины массивов, без объёма
+function skeleton(o, d = 0) {
+  if (d > 3 || o == null) return typeof o;
+  if (Array.isArray(o)) return `[${o.length}]` + (o[0] && typeof o[0] === 'object' ? ' of ' + skeleton(o[0], d + 1) : '');
+  if (typeof o === 'object') { const r = {}; for (const k of Object.keys(o).slice(0, 40)) r[k] = skeleton(o[k], d + 1); return r; }
+  return typeof o;
+}
+// вычистить ключ/ip из меты, чтобы не попал в git
+function cleanMeta(m) {
+  if (!m || typeof m !== 'object') return m || null;
+  const c = JSON.parse(JSON.stringify(m));
+  for (const k of ['auth_key', 'key', 'api_key', 'apikey', 'ip', 'user_ip']) delete c[k];
+  return c;
 }
 const hay = rec => norm(JSON.stringify(rec));      // для матчинга по PN
 const hayRaw = rec => JSON.stringify(rec);          // для матчинга по словам (OEM)
@@ -102,6 +120,8 @@ for (const hs of hsList) {
     }
     const recs = recordsOf(json);
     const sampleKeys = recs[0] ? Object.keys(recs[0]) : Object.keys(json);
+    const skel = skeleton(json);
+    if (!recs.length) console.log(`[hs ${hs}] SKELETON=${JSON.stringify(skel)}`);
     // фильтр: сильный (наш PN) + слабый (OEM/перфоратор-слова)
     const strong = [], weak = [];
     for (const rec of recs) {
@@ -114,7 +134,7 @@ for (const hs of hsList) {
     writeFileSync(`${OUT}/customs_${hs}.json`, JSON.stringify({
       hs, method: METHOD, country: COUNTRY, period: [P1, P2],
       total_records: recs.length, strong: strong.length, weak: weak.length,
-      fields: sampleKeys, meta: json.meta || null,
+      fields: sampleKeys, meta: cleanMeta(json.meta), skeleton: recs.length ? undefined : skel,
       matched,
     }, null, 1));
     console.log(`[hs ${hs}] status=200 total=${recs.length} strong=${strong.length} weak=${weak.length} fields=${JSON.stringify(sampleKeys.slice(0, 30))}`);
