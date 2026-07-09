@@ -42,6 +42,7 @@ def norm_org(s):
     for pat, short in repl:
         up = re.sub(pat, short, up)
     up = up.replace("«", '"').replace("»", '"').replace("'", '"')
+    up = up.split("(")[0]  # снять дублирующий хвост «ООО "X" (ООО "X"…)»
     up = re.sub(r'\s*"\s*', '"', up).strip().strip('"')
     return up
 # перфоратор-специфика (узкий фильтр — отсечь генерик «буровая лебёдка» и пр.)
@@ -103,6 +104,13 @@ def main():
     # --- 1) price_records из strong (привязка к позиции) ---
     CUSTOMS_SRC = "таможня ГТД (glbs.io)"
     prices = json.loads((DATA / "price_records.json").read_text(encoding="utf-8"))
+    # чистка опечаток в источниках цен (латиница-гомоглифы/«маркетплайс» → «маркетплейс»)
+    homo = str.maketrans("aeopcyxktmhb", "аеорсухктмнв")
+    for r in prices:
+        s = (r.get("source") or "").strip()
+        canon = re.sub(r"[^а-я]", "", s.lower().translate(homo))
+        if canon in ("маркетплейс", "маркетплайс"):
+            r["source"] = "маркетплейс"
     # идемпотентно: убираем прежние таможенные записи и пересобираем начисто
     prices = [r for r in prices if (r.get("source") or "") != CUSTOMS_SRC]
     existing_keys = set()
@@ -169,6 +177,17 @@ def main():
 
     all_kg = [fnum(x.get("usd_kg")) for x in perf]
 
+    # бенчмарк USD/кг по 4-значному HS (для контекста в карточке любой позиции)
+    hs_kg = {}
+    for x in perf:
+        h = str(x.get("hs10") or "")[:4]
+        if re.fullmatch(r"\d{4}", h):
+            hs_kg.setdefault(h, []).append(fnum(x.get("usd_kg")))
+    by_hs4 = {h: {"declarations": len(v),
+                  "usd_kg_p25": pct(v, 0.25), "usd_kg_med": pct(v, 0.5),
+                  "usd_kg_p75": pct(v, 0.75), "n_price": len([k for k in v if k])}
+              for h, v in hs_kg.items() if len(v) >= 5}
+
     # отслеживаемые конкуренты-локализаторы (показываем всегда, вне топа) —
     # по всем совпадениям, не только перфоратор-подмножеству
     WATCH = {"Машиностроительный холдинг": r"машиностроительн\w* холдинг|\bМХ\b",
@@ -221,6 +240,7 @@ def main():
         },
         "oem_direct": oem_direct,
         "watched": watched,
+        "by_hs4": by_hs4,
         "strong_linked": added,
     }
     (DATA / "customs_market.json").write_text(

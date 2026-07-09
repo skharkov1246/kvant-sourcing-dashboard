@@ -260,9 +260,16 @@ function bitrixBox(d){
   return `<div class="bx"><b>📋 Битрикс — упоминания в сделках (${h.length}):</b>`+
     h.map(x=>`<div class="dl mut">• ${esc(x.deal)}${x.client?` — <b>${esc(x.client)}</b>`:""}${x.status?`<span class="st ${cls(x.status)}">${esc(x.status)}</span>`:""}${x.date?` <span style="font-size:10px">${esc(x.date)}</span>`:""}</div>`).join("")+`</div>`;
 }
+function hsBench(d){
+  const b=CUSTOMS&&CUSTOMS.by_hs4;if(!b)return"";
+  const hs4=String(d.hs_code||"").match(/\d{4}/);if(!hs4)return"";
+  const s=b[hs4[0]];if(!s||s.usd_kg_med==null)return"";
+  return `<div class="mut" style="font-size:11px;margin:2px 0 4px">🛃 Таможенный бенчмарк по HS ${hs4[0]}: <b>${s.usd_kg_med} USD/кг</b> (p25 ${s.usd_kg_p25??"—"} – p75 ${s.usd_kg_p75??"—"}), ${s.declarations} деклараций импорта в РФ. <a href="#" data-gocust="1">вкладка «Таможня»</a></div>`;
+}
 function priceBox(d){
   const rows=PRICES[d.id]||[];
   let h=`<div class="pbx"><div class="pbx-h"><b>💶 Цены конкурентов / таможня</b> <span class="mut">(${rows.length})</span> <button class="addp" data-addp="${d.id}">➕ строка</button></div>`;
+  h+=hsBench(d);
   if(!rows.length)h+=`<div class="mut" style="padding:3px 0">нет данных — добавьте вручную или соберётся автоматически.</div>`;
   else{
     h+=`<div style="overflow-x:auto"><table class="pt"><thead><tr><th>Год</th><th>Источник</th><th>Импортёр</th><th>Экспортёр</th><th>Страна</th><th>Кол-во</th><th>Цена/ед</th><th>Вал.</th><th>Дов.</th><th>Ссылка</th><th></th></tr></thead><tbody>`;
@@ -496,6 +503,7 @@ $("wh").addEventListener("click",async e=>{
     const {data,error}=await sb.storage.from("samples").createSignedUrl(dls.dataset.dls,120);if(!error&&data)window.open(data.signedUrl,"_blank");}
 });
 function openPos(pid){document.querySelector('.tabs [data-t="grid"]').click();refreshDetail(pid);const dd=$("det-"+pid);if(dd)dd.scrollIntoView({block:"center"});}
+document.addEventListener("click",e=>{const g=e.target.closest("[data-gocust]");if(g){e.preventDefault();document.querySelector('.tabs [data-t="cust"]').click();}});
 // ─── Спрос и бюджет заказчика ───
 function money(n){return n==null?"—":(Math.abs(n)>=1e6?(n/1e6).toFixed(1)+" млн":Math.round(n).toLocaleString("ru"));}
 function custHtml(){

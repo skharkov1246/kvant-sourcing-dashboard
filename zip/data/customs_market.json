@@ -1,5 +1,5 @@
 {
- "updated": "2026-07-07",
+ "updated": "2026-07-09",
  "source": "Таможенная статистика РФ (импорт ИМ), glbs.io / Глобус-ВЭД",
  "hs": [
   "8207",
@@ -102,14 +102,14 @@
   ],
   "top_importers": [
    {
-    "name": "ООО\"МИР ИНСТРУМЕНТА\"(ООО\"МИР ИНСТРУМЕНТА\")",
-    "cnt": 1030,
-    "usd_kg_med": null,
-    "n_price": 0
+    "name": "ООО\"МИР ИНСТРУМЕНТА",
+    "cnt": 1063,
+    "usd_kg_med": 15.21,
+    "n_price": 33
    },
    {
     "name": "ООО\"СЕВЕРНЫЙ АЛЬЯНС",
-    "cnt": 587,
+    "cnt": 701,
     "usd_kg_med": null,
     "n_price": 0
    },
@@ -142,6 +142,12 @@
     "cnt": 297,
     "usd_kg_med": 57.08,
     "n_price": 8
+   },
+   {
+    "name": "ООО\"ТМК ОПТТОРГ",
+    "cnt": 294,
+    "usd_kg_med": 30.45,
+    "n_price": 156
    },
    {
     "name": "ООО\"СФЕРА",
@@ -214,12 +220,6 @@
     "cnt": 185,
     "usd_kg_med": 10.23,
     "n_price": 182
-   },
-   {
-    "name": "ООО\"ИНТЕРПОЛАР",
-    "cnt": 176,
-    "usd_kg_med": 67.78,
-    "n_price": 8
    }
   ],
   "top_exporters": [
@@ -1334,5 +1334,49 @@
    ]
   }
  ],
+ "by_hs4": {
+  "8207": {
+   "declarations": 13409,
+   "usd_kg_p25": 7.28,
+   "usd_kg_med": 15.05,
+   "usd_kg_p75": 34.36,
+   "n_price": 4987
+  },
+  "8412": {
+   "declarations": 681,
+   "usd_kg_p25": 8.0,
+   "usd_kg_med": 12.64,
+   "usd_kg_p75": 34.14,
+   "n_price": 387
+  },
+  "8431": {
+   "declarations": 2809,
+   "usd_kg_p25": 1.69,
+   "usd_kg_med": 2.28,
+   "usd_kg_p75": 3.12,
+   "n_price": 2679
+  },
+  "8467": {
+   "declarations": 5353,
+   "usd_kg_p25": 4.74,
+   "usd_kg_med": 5.97,
+   "usd_kg_p75": 10.0,
+   "n_price": 4570
+  },
+  "8466": {
+   "declarations": 946,
+   "usd_kg_p25": 10.52,
+   "usd_kg_med": 19.65,
+   "usd_kg_p75": 41.68,
+   "n_price": 522
+  },
+  "8481": {
+   "declarations": 21,
+   "usd_kg_p25": 9.78,
+   "usd_kg_med": 21.87,
+   "usd_kg_p75": 56.17,
+   "n_price": 9
+  }
+ },
  "strong_linked": 72
 }
