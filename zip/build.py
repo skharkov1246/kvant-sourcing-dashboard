@@ -102,6 +102,10 @@ def build():
         bom = load("bom.json")
     except FileNotFoundError:
         bom = None
+    try:
+        customs_decl = load("customs_declarations.json")
+    except FileNotFoundError:
+        customs_decl = None
     mat_text_path = ROOT / "СТРАТЕГИЯ-МАТЕРИАЛЫ.md"
     mat_text = mat_text_path.read_text(encoding="utf-8") if mat_text_path.exists() else ""
 
@@ -116,6 +120,7 @@ def build():
     html = html.replace("[/*__CUSTOMS__*/]", "[" + json.dumps(customs, ensure_ascii=False, separators=(",", ":")) + "]")
     html = html.replace("[/*__SUPCRM__*/]", "[" + json.dumps(supplier_crm, ensure_ascii=False, separators=(",", ":")) + "]")
     html = html.replace("[/*__BOM__*/]", "[" + json.dumps(bom, ensure_ascii=False, separators=(",", ":")) + "]")
+    html = html.replace("[/*__CDECL__*/]", "[" + json.dumps(customs_decl, ensure_ascii=False, separators=(",", ":")) + "]")
     html = html.replace("[/*__MATTEXT__*/]", "[" + json.dumps(mat_text, ensure_ascii=False) + "]")
     repl = {
         "__N_POS__": str(n_pos),

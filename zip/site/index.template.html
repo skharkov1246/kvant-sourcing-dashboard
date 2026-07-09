@@ -108,6 +108,7 @@ const MATPROC=[/*__MATPROC__*/];
 const CUSTOMS=[/*__CUSTOMS__*/][0]||null;
 const SUPCRM=[/*__SUPCRM__*/][0]||null;
 const BOM=[/*__BOM__*/][0]||null;
+const CDECL=[/*__CDECL__*/][0]||{cols:[],rows:[]};
 const MATTEXT=[/*__MATTEXT__*/][0]||"";
 const sb=(window.supabase)?supabase.createClient(SUPA_URL,SUPA_KEY):null;
 const $=id=>document.getElementById(id);
@@ -520,6 +521,42 @@ $("wh").addEventListener("click",async e=>{
 });
 function openPos(pid){document.querySelector('.tabs [data-t="grid"]').click();refreshDetail(pid);const dd=$("det-"+pid);if(dd)dd.scrollIntoView({block:"center"});}
 document.addEventListener("click",e=>{const g=e.target.closest("[data-gocust]");if(g){e.preventDefault();document.querySelector('.tabs [data-t="cust"]').click();}});
+// Универсальная сортировка/фильтрация столбцов для всех табличных вкладок.
+function enhanceTable(tbl){
+  if(tbl.dataset.enh||!tbl.tHead||!tbl.tBodies[0])return;
+  if(tbl.querySelector("tr.supdet,tr.detail"))return;            // таблицы с раскрывающимися строками не трогаем
+  const tb=tbl.tBodies[0];
+  const dataRows=()=>[...tb.rows].filter(r=>!r.querySelector("td[colspan]"));
+  if(dataRows().length<5)return;                                 // мелкие/сводные пропускаем
+  tbl.dataset.enh="1";
+  const hr=tbl.tHead.rows[tbl.tHead.rows.length-1],ths=[...hr.cells];
+  const cval=(r,i)=>r.cells[i]?(r.cells[i].innerText||"").trim():"";
+  const pnum=t=>{let s=String(t).replace(/[\s ]/g,"").replace(/[^0-9.,\-]/g,"").replace(",",".");const n=parseFloat(s);return(s!==""&&s!=="-"&&!isNaN(n))?n:null;};
+  let si=-1,dir=1;
+  ths.forEach((th,i)=>{th.style.cursor="pointer";th.title="сортировать";
+    th.addEventListener("click",ev=>{if(ev.target.tagName=="INPUT")return;
+      dir=si===i?-dir:1;si=i;
+      ths.forEach(x=>{const s=x.querySelector(".sar");if(s)s.remove();});
+      const sp=document.createElement("span");sp.className="sar";sp.textContent=dir>0?" ▲":" ▼";th.appendChild(sp);
+      const rows=dataRows();
+      rows.sort((a,b)=>{const x=cval(a,i),y=cval(b,i),nx=pnum(x),ny=pnum(y);
+        if(nx!==null&&ny!==null)return(nx-ny)*dir;
+        if(nx!==null)return -1;if(ny!==null)return 1;
+        return x.localeCompare(y,"ru")*dir;});
+      rows.forEach(r=>tb.appendChild(r));
+      [...tb.rows].filter(r=>r.querySelector("td[colspan]")).forEach(r=>tb.appendChild(r));});});
+  // строка фильтров под заголовками
+  const fr=document.createElement("tr");fr.className="fltr";
+  ths.forEach(()=>{const td=document.createElement("th");td.style.padding="2px 3px";
+    const inp=document.createElement("input");inp.placeholder="⌕";inp.className="colf";
+    inp.style.cssText="width:100%;box-sizing:border-box;padding:2px 4px;font-weight:400;font-size:11px;border:1px solid var(--ln);border-radius:4px";
+    td.appendChild(inp);fr.appendChild(td);});
+  tbl.tHead.appendChild(fr);
+  fr.addEventListener("input",()=>{const fs=[...fr.querySelectorAll("input")].map(x=>x.value.toLowerCase().trim());
+    dataRows().forEach(r=>{r.style.display=fs.every((f,i)=>!f||cval(r,i).toLowerCase().includes(f))?"":"none";});});
+}
+function enhanceAll(root){(root.matches&&root.matches("table.ot")?[root]:[...(root.querySelectorAll?root.querySelectorAll("table.ot"):[])]).forEach(enhanceTable);}
+new MutationObserver(ms=>{for(const m of ms)for(const n of m.addedNodes)if(n.nodeType===1)enhanceAll(n);}).observe(document.body,{childList:true,subtree:true});
 // ─── Спрос и бюджет заказчика ───
 function money(n){return n==null?"—":(Math.abs(n)>=1e6?(n/1e6).toFixed(1)+" млн":Math.round(n).toLocaleString("ru"));}
 let bomMi=0,bomQ="",bomFilt="";
@@ -563,6 +600,27 @@ $("bom").addEventListener("click",e=>{const c=e.target.closest("[data-bf]"),mi=e
   if(mi){bomMi=+mi.dataset.bmi;bomFilt="";bomQ="";$("bom").innerHTML=bomHtml();return;}
   if(c){bomFilt=c.dataset.bf;document.querySelectorAll("#bomchips .chip").forEach(x=>x.classList.toggle("on",x.dataset.bf==bomFilt));$("bomtab").innerHTML=bomTable();}});
 $("bom").addEventListener("input",e=>{if(e.target.id=="qbom"){bomQ=e.target.value;$("bomtab").innerHTML=bomTable();}});
+function declTable(q){
+  q=(q||"").toLowerCase().trim();
+  const rows=CDECL.rows||[],CAP=400;
+  const hit=q?rows.filter(r=>r.join(" ").toLowerCase().includes(q)):rows;
+  const shown=hit.slice(0,CAP);
+  let h=`<div class="mut" style="font-size:11px;margin:4px 0">Найдено <b>${hit.length.toLocaleString("ru")}</b>${hit.length>CAP?` (показаны первые ${CAP})`:""}${q?` по «${esc(q)}»`:""}. ${hit.length?`<button class="addp" data-decldl="${esc(q)}">⬇ CSV найденного</button>`:""}</div>`;
+  if(!hit.length)return h+`<div class="mut">ничего не найдено — попробуйте часть названия/страну/HS.</div>`;
+  h+=`<table class="ot"><thead><tr><th>Импортёр</th><th>Экспортёр</th><th>Стр.</th><th>Год</th><th>USD/кг</th><th>HS</th><th>Описание</th></tr></thead><tbody>`;
+  shown.forEach(r=>{h+=`<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td class="cn">${esc(r[2])}</td><td class="cn">${esc(r[3])}</td><td class="cn">${r[4]!==""?esc(r[4]):"—"}</td><td class="cn mut">${esc(r[5])}</td><td class="mut" style="max-width:340px">${esc(r[6])}</td></tr>`;});
+  return h+`</tbody></table>`;
+}
+$("cust").addEventListener("input",e=>{if(e.target.id=="qdecl")$("decltab").innerHTML=declTable(e.target.value);});
+$("cust").addEventListener("click",e=>{
+  const dl=e.target.closest("[data-decldl]");
+  if(dl){const q=dl.dataset.decldl.toLowerCase();const rows=(CDECL.rows||[]).filter(r=>!q||r.join(" ").toLowerCase().includes(q));
+    csvDl("customs_"+(q||"all").replace(/[^\wа-я0-9]+/gi,"_").slice(0,30)+".csv",rows.map(r=>({importer:r[0],exporter:r[1],origin:r[2],year:r[3],usd_kg:r[4],hs:r[5],desc:r[6]})),["importer","exporter","origin","year","usd_kg","hs","desc"]);return;}
+  const td=e.target.closest("table.drill tbody td");
+  if(td){let name=(td.innerText||"").trim();
+    if(/^[\d\s.,]+$/.test(name)||name.length<3)name=(td.parentNode.cells[0].innerText||"").trim();
+    if(name){const q=$("qdecl");if(q){q.value=name;$("decltab").innerHTML=declTable(name);q.scrollIntoView({block:"center"});}}}
+});
 function custHtml(){
   if(!CUSTOMS||!CUSTOMS.perforator)return '<div class="mut">Таможенная статистика не загружена. Запустите workflow «ZIP customs» (glbs.io).</div>';
   const P=CUSTOMS.perforator, kg=P.usd_kg||{};
@@ -574,10 +632,15 @@ function custHtml(){
     <div class="card"><div class="n">${(CUSTOMS.oem_direct||[]).length}</div><div class="l">прямой импорт от OEM (Sandvik/Epiroc…)</div></div>
     <div class="card"><div class="n">${CUSTOMS.strong_linked||0}</div><div class="l">привязано к позициям (наш PN в ГТД)</div></div>
   </div>`;
+  // 🔎 эксплорер деклараций (drill-down)
+  h+=`<div class="pbx" style="background:#f0f7ff;border-color:#bcd6f5"><div class="pbx-h"><b>🔎 Проваливаемся в декларации</b> <span class="mut">(${(CDECL.rows||[]).length.toLocaleString("ru")} строк — импортёр, экспортёр, страна, год, USD/кг, HS, описание)</span></div>
+    <div class="mut" style="font-size:11px;margin:2px 0">Вбейте импортёра (напр. «гормаш», «машиностроительный»), экспортёра, страну или слово из описания — увидите конкретные отгрузки. Клик по строке в таблицах ниже тоже проваливает сюда. Столбцы сортируются и фильтруются.</div>
+    <input id="qdecl" placeholder="поиск по декларациям: импортёр / экспортёр / страна / HS / описание…" style="margin:6px 0;padding:7px 9px;width:min(560px,100%);border:1px solid var(--ln);border-radius:6px">
+    <div id="decltab" style="overflow-x:auto"></div></div>`;
   // отслеживаемые конкуренты-локализаторы
   const w=CUSTOMS.watched||[];
   if(w.length){h+=`<b>Конкуренты-локализаторы под наблюдением</b><div class="mut" style="font-size:11px;margin:2px 0">Импортный след известных локализаторов ЗИП (по всей базе совпадений).</div>
-    <div style="overflow-x:auto"><table class="ot"><thead><tr><th>Компания</th><th>Деклараций</th><th>USD/кг медиана</th><th>Страны</th><th>Годы</th></tr></thead><tbody>`+
+    <div style="overflow-x:auto"><table class="ot drill"><thead><tr><th>Компания</th><th>Деклараций</th><th>USD/кг медиана</th><th>Страны</th><th>Годы</th></tr></thead><tbody>`+
     w.map(x=>`<tr style="background:#fef9c3"><td><b>${esc(x.name)}</b></td><td class="cn">${x.declarations}</td><td class="cn">${x.usd_kg_med??"—"}</td><td class="mut">${(x.top_origins||[]).map(o=>esc(o[0])+":"+o[1]).join(", ")}</td><td class="mut">${Object.entries(x.by_year||{}).map(([y,c])=>y+":"+c).join(", ")}</td></tr>`).join("")+`</tbody></table></div>`;}
   // по годам
   const yrs=P.by_year||{};
@@ -585,19 +648,19 @@ function custHtml(){
     Object.keys(yrs).map(y=>`<th>${esc(y)}</th>`).join("")+`</tr></thead><tbody><tr>`+
     Object.values(yrs).map(v=>`<td class="cn">${v.toLocaleString("ru")}</td>`).join("")+`</tr></tbody></table></div>`;
   // страны
-  h+=`<b style="display:block;margin-top:10px">Страны отправления</b><div style="overflow-x:auto"><table class="ot" style="max-width:520px"><thead><tr><th>Страна</th><th>Деклараций</th><th>USD/кг медиана</th></tr></thead><tbody>`+
+  h+=`<b style="display:block;margin-top:10px">Страны отправления</b><div style="overflow-x:auto"><table class="ot drill" style="max-width:520px"><thead><tr><th>Страна</th><th>Деклараций</th><th>USD/кг медиана</th></tr></thead><tbody>`+
     (P.origins||[]).map(r=>`<tr><td>${esc(r.name)}</td><td class="cn">${r.cnt}</td><td class="cn">${r.usd_kg_med??"—"}</td></tr>`).join("")+`</tbody></table></div>`;
   // импортёры (конкурент подсвечен)
   h+=`<b style="display:block;margin-top:10px">Топ импортёров-конкурентов</b><div class="mut" style="font-size:11px;margin:2px 0">Кто завозит перфораторный ЗИП в РФ. <span style="background:#fde68a;padding:0 4px;border-radius:3px">жёлтым</span> — отслеживаемый локализатор.</div>
-    <div style="overflow-x:auto"><table class="ot"><thead><tr><th>Импортёр</th><th>Деклараций</th><th>USD/кг медиана</th></tr></thead><tbody>`+
+    <div style="overflow-x:auto"><table class="ot drill"><thead><tr><th>Импортёр</th><th>Деклараций</th><th>USD/кг медиана</th></tr></thead><tbody>`+
     (P.top_importers||[]).map(r=>`<tr${isComp(r.name)?' style="background:#fef9c3"':''}><td>${esc(r.name)}</td><td class="cn">${r.cnt}</td><td class="cn">${r.usd_kg_med??"—"}</td></tr>`).join("")+`</tbody></table></div>`;
   // экспортёры
-  h+=`<b style="display:block;margin-top:10px">Топ экспортёров (заводы-поставщики)</b><div style="overflow-x:auto"><table class="ot"><thead><tr><th>Экспортёр</th><th>Деклараций</th></tr></thead><tbody>`+
+  h+=`<b style="display:block;margin-top:10px">Топ экспортёров (заводы-поставщики)</b><div style="overflow-x:auto"><table class="ot drill"><thead><tr><th>Экспортёр</th><th>Деклараций</th></tr></thead><tbody>`+
     (P.top_exporters||[]).map(r=>`<tr><td>${esc(r.name)}</td><td class="cn">${r.cnt}</td></tr>`).join("")+`</tbody></table></div>`;
   // прямой импорт от OEM
   const od=CUSTOMS.oem_direct||[];
   if(od.length){h+=`<details style="margin-top:12px"><summary style="cursor:pointer;font-weight:600">🎯 Прямой импорт от OEM — ${od.length} деклараций (Sandvik/Epiroc/Atlas Copco)</summary>
-    <div style="overflow-x:auto;margin-top:6px"><table class="ot"><thead><tr><th>Год</th><th>OEM-экспортёр</th><th>Импортёр в РФ</th><th>Ориг.</th><th>USD/кг</th><th>Описание</th></tr></thead><tbody>`+
+    <div style="overflow-x:auto;margin-top:6px"><table class="ot drill"><thead><tr><th>Год</th><th>OEM-экспортёр</th><th>Импортёр в РФ</th><th>Ориг.</th><th>USD/кг</th><th>Описание</th></tr></thead><tbody>`+
     od.map(o=>`<tr><td class="cn">${o.year||""}</td><td>${esc(o.exporter)}</td><td>${esc(o.importer)}</td><td class="cn">${esc(o.origin)}</td><td class="cn">${o.usd_kg??"—"}</td><td class="mut" style="max-width:300px">${esc(o.desc)}</td></tr>`).join("")+`</tbody></table></div></details>`;}
   h+=`<div class="mut" style="font-size:11px;margin-top:10px">${esc(CUSTOMS.note||"")}</div>`;
   return h;
@@ -715,7 +778,7 @@ document.querySelectorAll(".tabs [data-t]").forEach(b=>b.onclick=async()=>{
   if(t=="sup")$("suppliers").innerHTML=supHtml();
   if(t=="wh")$("wh").innerHTML=whHtml();
   if(t=="dem"){$("dem").innerHTML=demHtml();if($("comptab"))$("comptab").innerHTML=compTable("");}
-  if(t=="cust")$("cust").innerHTML=custHtml();
+  if(t=="cust"){$("cust").innerHTML=custHtml();if($("decltab"))$("decltab").innerHTML=declTable("");}
   if(t=="bom")$("bom").innerHTML=bomHtml();
   if(t=="mat"){$("mat").innerHTML=matHtml();if($("mattab"))$("mattab").innerHTML=matSupTable("");}
   if(t=="stats")$("stats").innerHTML=statsHtml();

@@ -246,6 +246,27 @@ def main():
     (DATA / "customs_market.json").write_text(
         json.dumps(market, ensure_ascii=False, indent=1), encoding="utf-8")
 
+    # --- 3) полный эксплорер деклараций (drill-down, «терминал») ---
+    # массив массивов ради компактности: [importer, exporter, origin, year, usd_kg, hs10, desc]
+    cols = ["importer", "exporter", "origin", "year", "usd_kg", "hs", "desc"]
+    decl = []
+    for x in perf:
+        yr = (x.get("date") or "")[:4]
+        decl.append([
+            norm_org(x.get("importer", ""))[:60],
+            (x.get("exporter", "") or "")[:52],
+            x.get("origin", ""),
+            yr if re.fullmatch(r"20\d\d", yr) else "",
+            fnum(x.get("usd_kg")) or "",
+            str(x.get("hs10") or "")[:10],
+            (x.get("desc", "") or "")[:90],
+        ])
+    decl.sort(key=lambda r: (r[3] or "", r[0]))
+    (DATA / "customs_declarations.json").write_text(
+        json.dumps({"updated": date.today().isoformat(), "cols": cols, "rows": decl},
+                   ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+    print(f"деклараций в эксплорер: {len(decl)}")
+
     print(f"strong→price_records: +{added} (всего {len(prices)})")
     print(f"perforator-декларации: {len(perf)} | OEM-прямой импорт: {len(oem_direct)}")
     print(f"USD/кг перфоратор: {market['perforator']['usd_kg']}")
