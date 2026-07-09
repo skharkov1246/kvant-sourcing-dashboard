@@ -247,10 +247,12 @@ def main():
         json.dumps(market, ensure_ascii=False, indent=1), encoding="utf-8")
 
     # --- 3) полный эксплорер деклараций (drill-down, «терминал») ---
-    # массив массивов ради компактности: [importer, exporter, origin, year, usd_kg, hs10, desc]
-    cols = ["importer", "exporter", "origin", "year", "usd_kg", "hs", "desc"]
+    # перфораторный срез + ВСЕ strong (наш PN в описании) — даже вне перфоратор-фильтра
+    explorer = perf + [x for x in strong_all if not PERF_RE.search(x.get("desc", ""))]
+    # массив массивов ради компактности: [importer, exporter, origin, year, usd_kg, hs10, desc, pn]
+    cols = ["importer", "exporter", "origin", "year", "usd_kg", "hs", "desc", "pn"]
     decl = []
-    for x in perf:
+    for x in explorer:
         yr = (x.get("date") or "")[:4]
         decl.append([
             norm_org(x.get("importer", ""))[:60],
@@ -260,6 +262,7 @@ def main():
             fnum(x.get("usd_kg")) or "",
             str(x.get("hs10") or "")[:10],
             (x.get("desc", "") or "")[:90],
+            (x.get("pn") or "") if x.get("tag") == "strong" else "",
         ])
     decl.sort(key=lambda r: (r[3] or "", r[0]))
     (DATA / "customs_declarations.json").write_text(

@@ -67,6 +67,15 @@ table.pt .eur{color:#0b5;font-variant-numeric:tabular-nums}
 .card .n{font-size:22px;font-weight:700}.card .l{font-size:11px;color:var(--mut)}
 #toast{position:fixed;bottom:16px;right:16px;background:#1b2330;color:#fff;padding:8px 14px;border-radius:8px;font-size:12px;opacity:0;transition:.2s;z-index:20;pointer-events:none}
 #toast.show{opacity:.95}
+.ghdr td{background:#eef2f7;font-weight:600;cursor:pointer;border-top:2px solid var(--ln)}
+.ghdr.folded td{background:#e4e9f0}
+.gh-hide{display:none!important}
+#stats table.ot tbody tr[data-op],#stats table.ot tbody tr[data-cat],#stats .funnel .fr[data-locf]{cursor:pointer}
+#stats table.ot tbody tr[data-op]:hover,#stats table.ot tbody tr[data-cat]:hover{background:#f0f7ff}
+#bomtab tbody tr{cursor:pointer}
+#bomtab tbody tr.bomsel{background:#fff7e0}
+#bomdetail:empty{display:none}
+#bomdetail{background:#fffbea;border:1px solid #f0dfa8;border-radius:8px;padding:10px 12px;margin:8px 0;font-size:12px}
 </style></head><body>
 <div id="banner"><b>Рабочая база ЗИП</b> · __N_POS__ позиций · __N_WITH_ODM__ с ODM · __N_ODM__ ODM-записей (high __N_HI__/med __N_ME__/low __N_LO__) · обновлено __UPDATED__. Правки сохраняются для всей команды. Логина нет — ссылку шли коллегам.</div>
 <header>
@@ -81,6 +90,7 @@ table.pt .eur{color:#0b5;font-variant-numeric:tabular-nums}
     <select id="floc"></select>
     <select id="fcrit"><option value="">Критичность: все</option><option>A</option><option>B</option><option>C</option></select>
     <select id="fbtx"><option value="">Bitrix: все</option><option>продавали</option><option>квотировали</option><option>ожидает</option></select>
+    <select id="fgrp"><option value="">Группировка: нет</option><option value="category">по категории</option><option value="oem">по OEM</option><option value="loc">по локализации</option><option value="node">по узлу перфоратора</option><option value="crit">по критичности</option></select>
     <label class="pill"><input type="checkbox" id="fodm"> с ODM</label>
     <label class="pill"><input type="checkbox" id="fnoodm"> без ODM</label>
     <label class="pill"><input type="checkbox" id="fact"> ждёт действия</label>
@@ -128,7 +138,7 @@ const ACTIONABLE=["поиск","RFQ","образцы","тест"];
 const LOCC={"не начато":"#8a97a6","поиск":"#1f6feb","RFQ":"#8957e5","образцы":"#bf8700","тест":"#d98e00","одобрено":"#1a7f37","серия":"#0a8a5f","отложено":"#cf222e"};
 const SAMPC={"заказан":"#8957e5","в пути":"#1f6feb","на складе":"#0a8a5f","на тесте":"#d98e00","одобрен":"#1a7f37","брак":"#cf222e","возврат":"#8a97a6"};
 function toast(m){const t=$("toast");t.textContent=m;t.classList.add("show");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("show"),1800);}
-function esc(s){return (s??"").toString().replace(/</g,"&lt;");}
+function esc(s){return (s??"").toString().replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");}
 function locBadge(s){s=s||"не начато";const c=LOCC[s]||"#8a97a6";return `<span class="loc" style="background:${c}">${esc(s)}</span>`;}
 async function fetchAll(table){let all=[],from=0,sz=1000;while(true){const {data,error}=await sb.from(table).select("*").range(from,from+sz-1);if(error||!data||!data.length)break;all=all.concat(data);if(data.length<sz)break;from+=sz;}return all;}
 function fromSeed(){POS=SEED.map(s=>Object.assign({},s.pos,{id:s.pos.pp}));ODM={};PRICES={};DRAW={};SAMPLES={};SEED.forEach(s=>{ODM[s.pos.pp]=(s.odm||[]).map(o=>Object.assign({},o));PRICES[s.pos.pp]=(s.prices||[]).map(o=>Object.assign({},o));SAMPLES[s.pos.pp]=(s.samples||[]).map(o=>Object.assign({},o));});}
@@ -144,6 +154,7 @@ async function load(){
       LIVE=true;ok=true;}
   }catch(e){}}
   if(!ok)fromSeed();
+  PNMAP=null;                                                    // POS обновился — пересобрать карту PN→позиция
   POS.sort((a,b)=>(a.pp||0)-(b.pp||0));
   POS.forEach(d=>d._s=((d.catalog_no||"")+" "+(d.name||"")+" "+(d.note||"")+" "+(d.model||"")+" "+(d.oem||"")+" "+(d.pp||"")+" "+(d.owner||"")).toLowerCase());
   const cats=[...new Set(POS.map(d=>d.category))].filter(Boolean).sort();
@@ -184,13 +195,23 @@ function render(){
     if(fa&&!isActionable(d))return 0;
     if(fo&&!n)return 0;if(fn&&n)return 0;if(q&&!d._s.includes(q))return 0;return 1;});
   a.sort((x,y)=>{let u=x[sortK],v=y[sortK];const nu=parseFloat(u),nv=parseFloat(v);if(!isNaN(nu)&&!isNaN(nv)){u=nu;v=nv;}return (u>v?1:u<v?-1:0)*(sortA?1:-1);});
+  // группировка: стабильная пере-сортировка по группе (внутри — текущая сортировка)
+  const gf=$("fgrp").value;
+  const gkey=d=>gf=="category"?(d.category||"— без категории"):gf=="oem"?(d.oem||"— без OEM"):gf=="loc"?(d.loc_status||"не начато"):gf=="crit"?(d.criticality||"— без критичности"):gf=="node"?(((matchNode(d)||{}).part_class||"— прочее").split("(")[0].trim()):"";
+  if(gf){const idx=new Map(a.map((d,i)=>[d.id,i]));a.sort((x,y)=>gkey(x).localeCompare(gkey(y),"ru")||idx.get(x.id)-idx.get(y.id));}
   let h=`<table><thead><tr>
    <th data-k="pp">П/П</th><th data-k="category">Категория</th><th data-k="catalog_no">Каталог №</th>
    <th data-k="name">Наименование</th><th data-k="oem">OEM</th><th data-k="loc_status">Локализация</th>
    <th data-k="price_eur_competitor">Цена «врагов» €</th><th data-k="price_min">Ориентир €</th><th>Наша цена</th><th data-k="hs_code">HS</th>
    <th>ODM</th><th>Обр.</th><th data-k="bitrix_status">Bitrix</th></tr></thead><tbody>`;
+  let cg=null,gi=-1;
   a.forEach(d=>{const odm=ODM[d.id]||[],ns=(SAMPLES[d.id]||[]).length;
-    h+=`<tr><td class="cn">${d.pp??""}</td><td class="cat">${esc(d.category)}</td><td class="cn">${esc(d.catalog_no)}</td>
+    if(gf){const g=gkey(d);
+      if(g!==cg){cg=g;gi++;
+        const grp=a.filter(x=>gkey(x)===g),go=grp.filter(x=>(ODM[x.id]||[]).length).length,gp=grp.filter(x=>(PRICES[x.id]||[]).length).length;
+        h+=`<tr class="ghdr" data-gh="${gi}"><td colspan="13">▾ <b>${esc(g)}</b> — ${grp.length} поз. <span class="mut">· с ODM ${go} · с ценами ${gp}</span></td></tr>`;}}
+    const gof=gf?` data-gof="${gi}"`:"";
+    h+=`<tr${gof}><td class="cn">${d.pp??""}</td><td class="cat">${esc(d.category)}</td><td class="cn">${esc(d.catalog_no)}</td>
      <td>${esc(d.name)}<div class="mut" style="font-size:11px">${esc(d.model||d.note)}</div></td><td>${esc(d.oem)}</td>
      <td>${locBadge(d.loc_status)}${d.criticality?` <span class="bdg">${esc(d.criticality)}</span>`:""}</td><td class="eur">${d.price_eur_competitor??""}</td>
      <td class="eur" title="${esc(d.price_src)}">${priceCell(d)}</td>
@@ -198,7 +219,7 @@ function render(){
      <td class="odmcell" data-tg="${d.id}">${odm.length?`<b>${odm.length}:</b> `+odm.slice(0,2).map(o=>esc(o.name)).join("; ")+(odm.length>2?` +${odm.length-2}`:"")+" ▸":'<span class="mut">— нет</span> ▸'}</td>
      <td class="cn">${ns?`<b style="color:#0a8a5f">${ns}</b>`:'<span class="mut">0</span>'}</td>
      <td><select data-tb="positions" data-id="${d.id}" data-f="bitrix_status">${BX.map(s=>`<option ${(d.bitrix_status||"")==s?"selected":""}>${s||"—"}</option>`).join("")}</select></td></tr>
-     <tr class="detail hide" id="det-${d.id}" data-built="0"><td colspan="13"></td></tr>`;});
+     <tr class="detail hide"${gof} id="det-${d.id}" data-built="0"><td colspan="13"></td></tr>`;});
   $("grid").innerHTML=h+"</tbody></table>";
   $("cnt").textContent=a.length+" / "+POS.length;
 }
@@ -374,6 +395,10 @@ function odmCards(d,odm){
 }
 // ─── обработчики грида (клики) ───
 $("grid").addEventListener("click",async e=>{
+  const gh=e.target.closest(".ghdr");
+  if(gh){const i=gh.dataset.gh,fold=!gh.classList.contains("folded");gh.classList.toggle("folded",fold);
+    gh.querySelector("td").innerHTML=gh.querySelector("td").innerHTML.replace(/^[▾▸]/,fold?"▸":"▾");
+    document.querySelectorAll(`#grid [data-gof="${i}"]`).forEach(r=>r.classList.toggle("gh-hide",fold));return;}
   const tg=e.target.closest("[data-tg]");if(tg){toggleDetail(tg.dataset.tg);return;}
   const rb=e.target.closest("[data-rfq]");
   if(rb){if(!LIVE){toast("Офлайн-копия — RFQ недоступен");return;}
@@ -446,7 +471,7 @@ $("grid").addEventListener("change",async e=>{
 // ─── сохранение правок из ЛЮБОГО раздела (grid/склад/поставщики) ───
 document.addEventListener("blur",e=>{const c=e.target;if(c.dataset&&c.dataset.f&&c.isContentEditable)upd(c.dataset.tb,+c.dataset.id,c.dataset.f,c.textContent.trim());},true);
 document.addEventListener("change",e=>{const c=e.target;if(c.tagName=="SELECT"&&c.dataset.f)upd(c.dataset.tb,+c.dataset.id,c.dataset.f,c.value);});
-["q","fcat","foem","floc","fcrit","fbtx","fodm","fnoodm","fact"].forEach(id=>$(id).addEventListener("input",render));
+["q","fcat","foem","floc","fcrit","fbtx","fgrp","fodm","fnoodm","fact"].forEach(id=>$(id).addEventListener("input",render));
 document.addEventListener("click",e=>{const th=e.target.closest("#grid th[data-k]");if(th){const k=th.dataset.k;sortA=sortK==k?!sortA:true;sortK=k;render();}});
 // ─── Обзор (дашборд) ───
 function statsHtml(){
@@ -473,20 +498,20 @@ function statsHtml(){
     <div class="card"><div class="n" style="color:#0a8a5f">${POS.filter(matchNode).length}</div><div class="l">с рекомендацией материала</div></div>
   </div>`;
   const mx1=Math.max(1,...Object.values(loc));
-  h+=`<b>Воронка локализации</b><div class="funnel">`+LOC.map(l=>`<div class="fr"><span class="nm">${esc(l)}</span><div class="fb" style="width:${Math.round(loc[l]/mx1*320)}px;background:${LOCC[l]}"></div><span>${loc[l]}</span></div>`).join("")+`</div>`;
+  h+=`<b>Воронка локализации</b> <span class="mut" style="font-size:11px">(клик по этапу — показать его позиции)</span><div class="funnel">`+LOC.map(l=>`<div class="fr" data-locf="${esc(l)}" title="показать позиции этапа"><span class="nm">${esc(l)}</span><div class="fb" style="width:${Math.round(loc[l]/mx1*320)}px;background:${LOCC[l]}"></div><span>${loc[l]}</span></div>`).join("")+`</div>`;
   const smx=Math.max(1,...Object.values(samp));
   if(sampCnt)h+=`<b>Образцы по статусам</b><div class="funnel">`+SAMP.map(s=>`<div class="fr"><span class="nm">${esc(s)}</span><div class="fb" style="width:${Math.round(samp[s]/smx*320)}px;background:${SAMPC[s]}"></div><span>${samp[s]}</span></div>`).join("")+`</div>`;
   if(sav.length){const totDelta=sav.reduce((a,s)=>a+s.delta,0);
     h+=`<b>Бизнес-кейс: маржа локализации</b> <span class="mut">(мин = себестоимость-ориентир афтермаркет, макс = OEM/рынок; маржа = что захватываем, локализуя. Позиций с вилкой: ${sav.length}, суммарная вилка ≈ ${totDelta.toFixed(0)} на ед.)</span>
     <div style="overflow-x:auto"><table class="ot" style="max-width:840px"><thead><tr><th>П/П</th><th>Наименование</th><th>Себест.-ориентир</th><th>OEM/рынок</th><th>Маржа/ед</th><th>%</th></tr></thead><tbody>`+
-    sav.slice(0,15).map(s=>`<tr><td class="cn">${s.d.pp}</td><td>${esc((s.d.name||"").slice(0,40))}</td><td class="eur">${s.mn}</td><td class="eur">${s.mx}</td><td class="eur"><b>${s.delta.toFixed(1)}</b></td><td class="cn">${Math.round(s.delta/s.mn*100)}%</td></tr>`).join("")+`</tbody></table></div>`;}
+    sav.slice(0,15).map(s=>`<tr data-op="${s.d.id}" title="открыть позицию"><td class="cn">${s.d.pp}</td><td>${esc((s.d.name||"").slice(0,40))}</td><td class="eur">${s.mn}</td><td class="eur">${s.mx}</td><td class="eur"><b>${s.delta.toFixed(1)}</b></td><td class="cn">${Math.round(s.delta/s.mn*100)}%</td></tr>`).join("")+`</tbody></table></div>`;}
   // Топ кандидатов на локализацию: готовность = завод-ODM + ценовой бенчмарк + рекомендация материала + продвинутый статус
   const cand=POS.map(d=>{const odm=(ODM[d.id]||[]).length,pr=(PRICES[d.id]||[]).length,mat=!!matchNode(d),adv=["образцы","тест","одобрено","серия"].includes(d.loc_status||"");
     const score=(odm?2:0)+(pr?2:0)+(mat?1:0)+(adv?1:0);return {d:d,odm:odm,pr:pr,mat:mat,score:score};}).filter(x=>x.odm&&x.pr).sort((a,b)=>b.score-a.score||b.pr-a.pr);
   if(cand.length){h+=`<b>Топ кандидатов на локализацию</b> <span class="mut">(есть поставщик и ценовой бенчмарк; ${cand.length} шт)</span><div style="overflow-x:auto"><table class="ot" style="max-width:900px"><thead><tr><th>П/П</th><th>Наименование</th><th>OEM</th><th>Готовн.</th><th>ODM</th><th>Цен</th><th>Матер.</th><th>Статус</th></tr></thead><tbody>`+
-    cand.slice(0,20).map(x=>`<tr><td class="cn">${x.d.pp}</td><td>${esc((x.d.name||"").slice(0,44))}</td><td class="mut">${esc(x.d.oem)}</td><td class="cn"><b>${x.score}</b>/6</td><td class="cn">${x.odm}</td><td class="cn">${x.pr}</td><td>${x.mat?"✓":""}</td><td>${locBadge(x.d.loc_status)}</td></tr>`).join("")+`</tbody></table></div>`;}
+    cand.slice(0,20).map(x=>`<tr data-op="${x.d.id}" title="открыть позицию"><td class="cn">${x.d.pp}</td><td>${esc((x.d.name||"").slice(0,44))}</td><td class="mut">${esc(x.d.oem)}</td><td class="cn"><b>${x.score}</b>/6</td><td class="cn">${x.odm}</td><td class="cn">${x.pr}</td><td>${x.mat?"✓":""}</td><td>${locBadge(x.d.loc_status)}</td></tr>`).join("")+`</tbody></table></div>`;}
   h+=`<b>Покрытие по категориям</b><table class="ot" style="max-width:900px"><thead><tr><th>Категория</th><th>Позиций</th><th>С ODM</th><th>Покрытие ODM</th><th>С ценами</th><th>Покрытие цен</th></tr></thead><tbody>`;
-  Object.entries(byCat).sort().forEach(([c,v])=>{h+=`<tr><td>${esc(c)}</td><td class="cn">${v.t}</td><td class="cn">${v.c}</td><td class="cn">${Math.round(v.c/v.t*100)}%</td><td class="cn">${v.p}</td><td class="cn">${Math.round(v.p/v.t*100)}%</td></tr>`;});
+  Object.entries(byCat).sort().forEach(([c,v])=>{h+=`<tr data-cat="${esc(c)}" title="показать позиции категории"><td>${esc(c)}</td><td class="cn">${v.t}</td><td class="cn">${v.c}</td><td class="cn">${Math.round(v.c/v.t*100)}%</td><td class="cn">${v.p}</td><td class="cn">${Math.round(v.p/v.t*100)}%</td></tr>`;});
   return h+"</tbody></table>";
 }
 // ─── Склад (образцы) ───
@@ -519,7 +544,18 @@ $("wh").addEventListener("click",async e=>{
   const dls=e.target.closest("[data-dls]");if(dls){e.preventDefault();if(!LIVE){toast("Доступно онлайн");return;}
     const {data,error}=await sb.storage.from("samples").createSignedUrl(dls.dataset.dls,120);if(!error&&data)window.open(data.signedUrl,"_blank");}
 });
-function openPos(pid){document.querySelector('.tabs [data-t="grid"]').click();refreshDetail(pid);const dd=$("det-"+pid);if(dd)dd.scrollIntoView({block:"center"});}
+function resetFilters(){$("q").value="";["fcat","foem","floc","fcrit","fbtx","fgrp"].forEach(id=>$(id).value="");["fodm","fnoodm","fact"].forEach(id=>$(id).checked=false);}
+function openPos(pid){document.querySelector('.tabs [data-t="grid"]').click();
+  if(!$("det-"+pid)){resetFilters();render();}                     // строка скрыта фильтрами — сбросить
+  let dd=$("det-"+pid);
+  if(dd&&dd.classList.contains("gh-hide")){resetFilters();render();dd=null;} // строка в свёрнутой группе
+  refreshDetail(pid);dd=$("det-"+pid);if(dd)dd.scrollIntoView({block:"center"});}
+function gridWith(setup){document.querySelector('.tabs [data-t="grid"]').click();resetFilters();setup();render();window.scrollTo({top:0});}
+$("stats").addEventListener("click",e=>{
+  const op=e.target.closest("[data-op]");if(op){openPos(+op.dataset.op);return;}
+  const ct=e.target.closest("[data-cat]");if(ct){gridWith(()=>$("fcat").value=ct.dataset.cat);return;}
+  const lf=e.target.closest("[data-locf]");if(lf){gridWith(()=>$("floc").value=lf.dataset.locf);return;}
+});
 document.addEventListener("click",e=>{const g=e.target.closest("[data-gocust]");if(g){e.preventDefault();document.querySelector('.tabs [data-t="cust"]').click();}});
 // Универсальная сортировка/фильтрация столбцов для всех табличных вкладок.
 function enhanceTable(tbl){
@@ -559,7 +595,31 @@ function enhanceAll(root){(root.matches&&root.matches("table.ot")?[root]:[...(ro
 new MutationObserver(ms=>{for(const m of ms)for(const n of m.addedNodes)if(n.nodeType===1)enhanceAll(n);}).observe(document.body,{childList:true,subtree:true});
 // ─── Спрос и бюджет заказчика ───
 function money(n){return n==null?"—":(Math.abs(n)>=1e6?(n/1e6).toFixed(1)+" млн":Math.round(n).toLocaleString("ru"));}
-let bomMi=0,bomQ="",bomFilt="";
+let bomMi=0,bomQ="",bomFilt="",BOMSHOWN=[],PNMAP=null;
+// нормализованный каталожный № → позиция (для связи BOM ↔ база позиций)
+function pnPos(pn){
+  if(!PNMAP&&POS.length){PNMAP={};const nn=s=>String(s||"").toUpperCase().replace(/[^A-Z0-9]/g,"");
+    POS.forEach(d=>{const c=nn(d.catalog_no);if(c&&!(c in PNMAP))PNMAP[c]=d.id;
+      String(d.aliases||"").split(/[\s,;/]+/).forEach(t=>{const n=nn(t);if(n.length>=6&&!(n in PNMAP))PNMAP[n]=d.id;});});}
+  if(!PNMAP)return null;                                         // POS ещё грузится (LIVE) — не кэшируем пустоту
+  const n=String(pn||"").toUpperCase().replace(/[^A-Z0-9]/g,"");
+  return n&&PNMAP[n]!=null?PNMAP[n]:null;
+}
+function renderBomDetail(p){
+  const m=BOM.machines[bomMi];
+  const kits=(m.kits||[]).filter(k=>(p.kv_pn&&k.kv_pn==p.kv_pn)||(p.epiroc_pn&&p.epiroc_pn!=="-"&&k.oem_pn==p.epiroc_pn));
+  const pid=pnPos(p.epiroc_pn)??pnPos(p.kv_pn);
+  const q=(p.epiroc_pn&&p.epiroc_pn!=="-")?p.epiroc_pn:(p.desc||"").split(/\s+/).slice(0,2).join(" ");
+  let h=`<div style="display:flex;gap:14px;flex-wrap:wrap;align-items:baseline"><b style="font-size:14px">${esc(p.desc||"деталь")}</b>
+    <span class="cn">Epiroc: <b>${esc(p.epiroc_pn||"—")}</b></span><span class="cn">КВАНТ: <b>${esc(p.kv_pn||"—")}</b></span>
+    <span>кол-во на машину: <b>${esc(p.qty||"?")}</b></span>${p.owner?`<span>ответственный: <b>${esc(p.owner)}</b></span>`:""}</div>
+    <div style="margin:6px 0">Замер ${bomStage(p.st_izmer)} → РКД ${bomStage(p.st_rkd)} → ОПИ ${bomStage(p.st_opi)}</div>`;
+  if((p.suppliers||[]).length)h+=`<div>Поставщики: <b>${p.suppliers.map(esc).join(", ")}</b></div>`;
+  if((p.price_comp||[]).length||p.price_our)h+=`<div>Цены: конкуренты ${p.price_comp.map(esc).join(" / ")||"—"}${p.price_our?` · наша <b>${esc(p.price_our)}</b>`:""} ₽ без НДС</div>`;
+  if(kits.length)h+=`<div style="margin-top:4px">Входит в сервис-наборы: ${kits.map(k=>`<b>${esc(k.kit_no||k.pp)}</b> ${esc(k.name.slice(0,38))}`).join("; ")}</div>`;
+  h+=`<div style="margin-top:8px">${pid!=null?`<button class="addp" data-op="${pid}">📦 открыть позицию в базе</button> `:`<span class="mut" style="font-size:11px">в базе ${POS.length} позиций этого PN нет · </span>`}<button class="addp" data-gocm="${esc(q.replace(/\s+/g,""))}">🛃 отгрузки в таможне</button></div>`;
+  $("bomdetail").innerHTML=h;$("bomdetail").scrollIntoView({block:"nearest"});
+}
 function bomStage(v){if(!v)return'<span class="mut">—</span>';const t=v.toLowerCase();const c=/готов|успешн/.test(t)?"b-h":/сломан|брак/.test(t)?"b-l":"b-m";return `<span class="bdg ${c}">${esc(v)}</span>`;}
 function bomTable(){
   const m=BOM.machines[bomMi];let ps=m.parts;
@@ -567,8 +627,9 @@ function bomTable(){
   else if(bomFilt=="rkd")ps=ps.filter(p=>/готов/i.test(p.st_rkd||""));
   else if(bomFilt=="wip")ps=ps.filter(p=>/работе|проверке/i.test((p.st_izmer||"")+(p.st_rkd||"")));
   if(bomQ){const q=bomQ.toLowerCase();ps=ps.filter(p=>((p.epiroc_pn||"")+(p.kv_pn||"")+(p.desc||"")+(p.owner||"")).toLowerCase().includes(q));}
+  BOMSHOWN=ps;
   let h=`<table class="ot"><thead><tr><th>№ схемы</th><th>Epiroc PN</th><th>Артикул КВАНТ</th><th>Кол-во</th><th>Описание</th><th>Ответств.</th><th>Замер</th><th>РКД</th><th>ОПИ</th><th>Поставщики</th></tr></thead><tbody>`;
-  ps.forEach(p=>{h+=`<tr><td class="cn mut">${esc(p.scheme)}</td><td class="cn">${esc(p.epiroc_pn)}</td><td class="cn"><b>${esc(p.kv_pn)}</b></td><td class="cn">${esc(p.qty)}</td><td>${esc(p.desc)}</td><td class="mut">${esc(p.owner)}</td><td>${bomStage(p.st_izmer)}</td><td>${bomStage(p.st_rkd)}</td><td>${bomStage(p.st_opi)}</td><td class="mut" style="font-size:11px;max-width:150px">${(p.suppliers||[]).map(esc).join(", ")}</td></tr>`;});
+  ps.forEach((p,i)=>{h+=`<tr data-bi="${i}" title="открыть карточку детали"><td class="cn mut">${esc(p.scheme)}</td><td class="cn">${esc(p.epiroc_pn)}</td><td class="cn"><b>${esc(p.kv_pn)}</b></td><td class="cn">${esc(p.qty)}</td><td>${esc(p.desc)}</td><td class="mut">${esc(p.owner)}</td><td>${bomStage(p.st_izmer)}</td><td>${bomStage(p.st_rkd)}</td><td>${bomStage(p.st_opi)}</td><td class="mut" style="font-size:11px;max-width:150px">${(p.suppliers||[]).map(esc).join(", ")}</td></tr>`;});
   h+=`</tbody></table>`;if(!ps.length)h+=`<div class="mut">ничего не найдено.</div>`;
   return h;
 }
@@ -590,6 +651,8 @@ function bomHtml(){
   h+=`<div class="mut" style="font-size:12px;margin-bottom:6px">Воронка: <b>Замер</b> — готово ${izGot}, в работе ${izWip}; <b>РКД</b> — готово ${rkGot}, в работе/проверка ${rkWip}; <b>ОПИ</b> — ещё не начато. Ответственные: ${st.owners.map(o=>esc(o[0])+" ("+o[1]+")").join(", ")||"—"}.</div>`;
   h+=`<div class="chips" id="bomchips"><span class="chip${bomFilt==""?" on":""}" data-bf="">все (${st.parts})</span><span class="chip${bomFilt=="status"?" on":""}" data-bf="status">со статусом (${st.with_status})</span><span class="chip${bomFilt=="wip"?" on":""}" data-bf="wip">в работе</span><span class="chip${bomFilt=="rkd"?" on":""}" data-bf="rkd">РКД готово (${rkGot})</span></div>
     <input id="qbom" placeholder="поиск: Epiroc PN / KV / описание / ответственный…" value="${esc(bomQ)}" style="margin:6px 0;padding:6px 8px;width:360px;border:1px solid var(--ln);border-radius:6px">
+    <div class="mut" style="font-size:11px;margin:0 0 4px">Клик по строке — карточка детали: статусы, наборы, связь с базой позиций и таможней.</div>
+    <div id="bomdetail"></div>
     <div id="bomtab" style="overflow-x:auto">${bomTable()}</div>`;
   if(m.kits.length)h+=`<details style="margin-top:12px"><summary style="cursor:pointer;font-weight:600">🧰 Сервисные наборы (${m.kits.length})</summary>
     <div style="overflow-x:auto;margin-top:6px"><table class="ot"><thead><tr><th>№ набора</th><th>№ п/п</th><th>№ схемы</th><th>Наименование</th><th>Оригинал Epiroc</th><th>Артикул КВАНТ</th><th>Кол-во</th></tr></thead><tbody>`+
@@ -598,28 +661,73 @@ function bomHtml(){
 }
 $("bom").addEventListener("click",e=>{const c=e.target.closest("[data-bf]"),mi=e.target.closest("[data-bmi]");
   if(mi){bomMi=+mi.dataset.bmi;bomFilt="";bomQ="";$("bom").innerHTML=bomHtml();return;}
-  if(c){bomFilt=c.dataset.bf;document.querySelectorAll("#bomchips .chip").forEach(x=>x.classList.toggle("on",x.dataset.bf==bomFilt));$("bomtab").innerHTML=bomTable();}});
+  if(c){bomFilt=c.dataset.bf;document.querySelectorAll("#bomchips .chip").forEach(x=>x.classList.toggle("on",x.dataset.bf==bomFilt));$("bomtab").innerHTML=bomTable();return;}
+  const op=e.target.closest("[data-op]");if(op){openPos(+op.dataset.op);return;}
+  const gc=e.target.closest("[data-gocm]");if(gc){document.querySelector('.tabs [data-t="cust"]').click();setTimeout(()=>{const q=$("qdecl");if(q){declF={pn:"",year:"",orig:"",hs:""};if($("declfilters"))$("declfilters").innerHTML=declFilters();q.value=gc.dataset.gocm;$("decltab").innerHTML=declTable(q.value);q.scrollIntoView({block:"center"});}},60);return;}
+  const pr=e.target.closest("[data-bi]");if(pr){document.querySelectorAll("#bomtab tr.bomsel").forEach(x=>x.classList.remove("bomsel"));pr.classList.add("bomsel");renderBomDetail(BOMSHOWN[+pr.dataset.bi]);}});
 $("bom").addEventListener("input",e=>{if(e.target.id=="qbom"){bomQ=e.target.value;$("bomtab").innerHTML=bomTable();}});
+let declF={pn:"",year:"",orig:"",hs:""},DECLOPT=null;
+function declOpts(){
+  if(DECLOPT)return DECLOPT;
+  const add=(m,k)=>m.set(k,(m.get(k)||0)+1);
+  const pns=new Map(),yrs=new Map(),ors=new Map(),hss=new Map();let strongN=0;
+  (CDECL.rows||[]).forEach(r=>{if(r[7]){add(pns,r[7]);strongN++;}if(r[3])add(yrs,r[3]);if(r[2])add(ors,r[2]);if(r[5])add(hss,String(r[5]).slice(0,4));});
+  DECLOPT={pns:[...pns].sort((a,b)=>b[1]-a[1]),yrs:[...yrs].sort(),ors:[...ors].sort((a,b)=>b[1]-a[1]),hss:[...hss].sort((a,b)=>b[1]-a[1]),strongN};
+  return DECLOPT;
+}
+function declFilters(){
+  const o=declOpts();
+  const sel=(id,label,opts,cur)=>`<select id="${id}" style="padding:5px 6px;border:1px solid var(--ln);border-radius:6px;font-size:12px"><option value="">${label}</option>`+opts.map(([v,t])=>`<option value="${esc(v)}"${cur==v?" selected":""}>${esc(t)}</option>`).join("")+`</select>`;
+  return `<div style="display:flex;gap:6px;flex-wrap:wrap;margin:6px 0;align-items:center">
+    ${sel("fdpn","Наш PN: все",[["any",`🎯 любой наш PN (${o.strongN})`]].concat(o.pns.slice(0,60).map(([p,c])=>[p,`${p} (${c})`])),declF.pn)}
+    ${sel("fdyear","Год: все",o.yrs.map(([y,c])=>[y,`${y} (${c})`]),declF.year)}
+    ${sel("fdorig","Страна: все",o.ors.slice(0,25).map(([s,c])=>[s,`${s} (${c})`]),declF.orig)}
+    ${sel("fdhs","HS-группа: все",o.hss.map(([s,c])=>[s,`${s}xx (${c})`]),declF.hs)}
+    <button class="addp" id="fdreset">✕ сброс</button></div>`;
+}
 function declTable(q){
   q=(q||"").toLowerCase().trim();
   const rows=CDECL.rows||[],CAP=400;
-  const hit=q?rows.filter(r=>r.join(" ").toLowerCase().includes(q)):rows;
+  const hit=rows.filter(r=>{
+    if(declF.pn==="any"&&!r[7])return false;
+    if(declF.pn&&declF.pn!=="any"&&r[7]!==declF.pn)return false;
+    if(declF.year&&String(r[3])!==declF.year)return false;
+    if(declF.orig&&r[2]!==declF.orig)return false;
+    if(declF.hs&&String(r[5]).slice(0,4)!==declF.hs)return false;
+    if(q){const hay=r.join(" ").toLowerCase();
+      if(!hay.includes(q)&&!hay.replace(/\s+/g,"").includes(q.replace(/\s+/g,"")))return false;} // «7490 0290 74» найдёт «7490029074»
+    return true;});
   const shown=hit.slice(0,CAP);
-  let h=`<div class="mut" style="font-size:11px;margin:4px 0">Найдено <b>${hit.length.toLocaleString("ru")}</b>${hit.length>CAP?` (показаны первые ${CAP})`:""}${q?` по «${esc(q)}»`:""}. ${hit.length?`<button class="addp" data-decldl="${esc(q)}">⬇ CSV найденного</button>`:""}</div>`;
-  if(!hit.length)return h+`<div class="mut">ничего не найдено — попробуйте часть названия/страну/HS.</div>`;
-  h+=`<table class="ot"><thead><tr><th>Импортёр</th><th>Экспортёр</th><th>Стр.</th><th>Год</th><th>USD/кг</th><th>HS</th><th>Описание</th></tr></thead><tbody>`;
-  shown.forEach(r=>{h+=`<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td class="cn">${esc(r[2])}</td><td class="cn">${esc(r[3])}</td><td class="cn">${r[4]!==""?esc(r[4]):"—"}</td><td class="cn mut">${esc(r[5])}</td><td class="mut" style="max-width:340px">${esc(r[6])}</td></tr>`;});
+  const fdesc=[declF.pn==="any"?"наш PN":declF.pn,declF.year,declF.orig,declF.hs&&declF.hs+"xx",q&&`«${q}»`].filter(Boolean).join(" · ");
+  let h=`<div class="mut" style="font-size:11px;margin:4px 0">Найдено <b>${hit.length.toLocaleString("ru")}</b>${hit.length>CAP?` (показаны первые ${CAP})`:""}${fdesc?` — фильтр: ${esc(fdesc)}`:""}. ${hit.length?`<button class="addp" data-decldl="${esc(q)}">⬇ CSV найденного</button>`:""}</div>`;
+  if(!hit.length)return h+`<div class="mut">ничего не найдено — ослабьте фильтры.</div>`;
+  h+=`<table class="ot"><thead><tr><th>Импортёр</th><th>Экспортёр</th><th>Стр.</th><th>Год</th><th>USD/кг</th><th>HS</th><th>Наш PN</th><th>Описание</th></tr></thead><tbody>`;
+  shown.forEach(r=>{const pid=r[7]?pnPos(r[7]):null;
+    h+=`<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td class="cn">${esc(r[2])}</td><td class="cn">${esc(r[3])}</td><td class="cn">${r[4]!==""?esc(r[4]):"—"}</td><td class="cn mut">${esc(r[5])}</td><td class="cn">${r[7]?`<b style="color:#1a7f37">${esc(r[7])}</b>${pid!=null?` <a href="#" data-op="${pid}" title="открыть позицию">↗</a>`:""}`:""}</td><td class="mut" style="max-width:320px">${esc(r[6])}</td></tr>`;});
   return h+`</tbody></table>`;
 }
 $("cust").addEventListener("input",e=>{if(e.target.id=="qdecl")$("decltab").innerHTML=declTable(e.target.value);});
+$("cust").addEventListener("change",e=>{
+  const map={fdpn:"pn",fdyear:"year",fdorig:"orig",fdhs:"hs"};
+  if(map[e.target.id]){declF[map[e.target.id]]=e.target.value;$("decltab").innerHTML=declTable($("qdecl").value);}
+});
 $("cust").addEventListener("click",e=>{
+  if(e.target.id=="fdreset"){declF={pn:"",year:"",orig:"",hs:""};$("qdecl").value="";$("declfilters").innerHTML=declFilters();$("decltab").innerHTML=declTable("");return;}
+  const op=e.target.closest("[data-op]");if(op){e.preventDefault();openPos(+op.dataset.op);return;}
   const dl=e.target.closest("[data-decldl]");
-  if(dl){const q=dl.dataset.decldl.toLowerCase();const rows=(CDECL.rows||[]).filter(r=>!q||r.join(" ").toLowerCase().includes(q));
-    csvDl("customs_"+(q||"all").replace(/[^\wа-я0-9]+/gi,"_").slice(0,30)+".csv",rows.map(r=>({importer:r[0],exporter:r[1],origin:r[2],year:r[3],usd_kg:r[4],hs:r[5],desc:r[6]})),["importer","exporter","origin","year","usd_kg","hs","desc"]);return;}
+  if(dl){const q=dl.dataset.decldl.toLowerCase();
+    const rows=(CDECL.rows||[]).filter(r=>{
+      if(declF.pn==="any"&&!r[7])return false;
+      if(declF.pn&&declF.pn!=="any"&&r[7]!==declF.pn)return false;
+      if(declF.year&&String(r[3])!==declF.year)return false;
+      if(declF.orig&&r[2]!==declF.orig)return false;
+      if(declF.hs&&String(r[5]).slice(0,4)!==declF.hs)return false;
+      return !q||r.join(" ").toLowerCase().includes(q);});
+    csvDl("customs_"+(q||declF.pn||"filtered").replace(/[^\wа-я0-9]+/gi,"_").slice(0,30)+".csv",rows.map(r=>({importer:r[0],exporter:r[1],origin:r[2],year:r[3],usd_kg:r[4],hs:r[5],our_pn:r[7],desc:r[6]})),["importer","exporter","origin","year","usd_kg","hs","our_pn","desc"]);return;}
   const td=e.target.closest("table.drill tbody td");
   if(td){let name=(td.innerText||"").trim();
     if(/^[\d\s.,]+$/.test(name)||name.length<3)name=(td.parentNode.cells[0].innerText||"").trim();
-    if(name){const q=$("qdecl");if(q){q.value=name;$("decltab").innerHTML=declTable(name);q.scrollIntoView({block:"center"});}}}
+    if(name){const q=$("qdecl");if(q){declF={pn:"",year:"",orig:"",hs:""};if($("declfilters"))$("declfilters").innerHTML=declFilters();q.value=name;$("decltab").innerHTML=declTable(name);q.scrollIntoView({block:"center"});}}}
 });
 function custHtml(){
   if(!CUSTOMS||!CUSTOMS.perforator)return '<div class="mut">Таможенная статистика не загружена. Запустите workflow «ZIP customs» (glbs.io).</div>';
@@ -634,8 +742,9 @@ function custHtml(){
   </div>`;
   // 🔎 эксплорер деклараций (drill-down)
   h+=`<div class="pbx" style="background:#f0f7ff;border-color:#bcd6f5"><div class="pbx-h"><b>🔎 Проваливаемся в декларации</b> <span class="mut">(${(CDECL.rows||[]).length.toLocaleString("ru")} строк — импортёр, экспортёр, страна, год, USD/кг, HS, описание)</span></div>
-    <div class="mut" style="font-size:11px;margin:2px 0">Вбейте импортёра (напр. «гормаш», «машиностроительный»), экспортёра, страну или слово из описания — увидите конкретные отгрузки. Клик по строке в таблицах ниже тоже проваливает сюда. Столбцы сортируются и фильтруются.</div>
-    <input id="qdecl" placeholder="поиск по декларациям: импортёр / экспортёр / страна / HS / описание…" style="margin:6px 0;padding:7px 9px;width:min(560px,100%);border:1px solid var(--ln);border-radius:6px">
+    <div class="mut" style="font-size:11px;margin:2px 0">Группированные фильтры: <b>«Наш PN»</b> — кто возил именно наши артикулы (можно выбрать конкретный номер), год, страна, HS-группа. Плюс свободный поиск («гормаш», «машиностроительный»…). Клик по строке в сводках ниже тоже проваливает сюда.</div>
+    <div id="declfilters">${declFilters()}</div>
+    <input id="qdecl" placeholder="поиск по декларациям: импортёр / экспортёр / страна / HS / описание…" style="margin:0 0 6px;padding:7px 9px;width:min(560px,100%);border:1px solid var(--ln);border-radius:6px">
     <div id="decltab" style="overflow-x:auto"></div></div>`;
   // отслеживаемые конкуренты-локализаторы
   const w=CUSTOMS.watched||[];
