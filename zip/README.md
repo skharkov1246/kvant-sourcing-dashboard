@@ -52,6 +52,18 @@ python zip/build.py            # → zip/public/index.html (+ vendor/)
 Использует те же секреты, что дашборд: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`.
 Ручной запуск — Actions → ZIP base deploy → Run workflow.
 
+## Рабочая таблица снабжения (Google Sheets → база)
+
+Котировки поставщиков и карта производителей из рабочей Google-таблицы
+импортируются в базу скриптом `zip/tools/import_sheet.py`:
+- источник — снимок `zip/tools/sources/kvant_sourcing_sheet.xlsx` (обновить:
+  `curl -sSL "https://docs.google.com/spreadsheets/d/<ID>/export?format=xlsx" -o zip/tools/sources/kvant_sourcing_sheet.xlsx`);
+- «File A» → реальные котировки (WMS/Mindrill/YLF в USD, KAT/Sanshan/Fuxuan в
+  CNY) в `price_records` (source=«КП поставщика (таблица снабжения)»), привязка
+  по OEM PN к позиции; «Производители по позициям» → `data/sheet_meta.json`
+  (группа, применение COP, кандидаты-производители, пробники) — блок
+  «🏭 Снабжение» в карточке позиции. Идемпотентно; после — `python zip/build.py`.
+
 ## Таможня glbs.io (обновление статистики)
 
 Actions → **ZIP customs — glbs.io recon/pull** → Run workflow:

@@ -32,6 +32,11 @@ def build():
     except FileNotFoundError:
         samples = []
 
+    try:
+        sheet_meta = load("sheet_meta.json")
+    except FileNotFoundError:
+        sheet_meta = {}
+
     # group odm/prices/samples by position id (pp — стабильный ключ строки в UI)
     by_pos_odm, by_pos_price, by_pos_samp = {}, {}, {}
     for o in odm:
@@ -44,6 +49,9 @@ def build():
     seed = []
     for p in positions:
         pid = p["id"]
+        sm = sheet_meta.get(str(pid)) or sheet_meta.get(pid)
+        if sm:
+            p = dict(p, sheet_meta=sm)  # прикрепляем к позиции (идентичность в офлайне — pp)
         seed.append({
             "pos": p,
             "odm": by_pos_odm.get(pid, []),

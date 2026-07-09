@@ -198,7 +198,20 @@ function render(){
   $("grid").innerHTML=h+"</tbody></table>";
   $("cnt").textContent=a.length+" / "+POS.length;
 }
-function buildDetail(d){const odm=ODM[d.id]||[];return masterBox(d)+materialBox(d)+infoBox(d)+bitrixBox(d)+priceBox(d)+sampleBox(d)+drawBox(d)+odmCards(d,odm);}
+function buildDetail(d){const odm=ODM[d.id]||[];return masterBox(d)+sheetBox(d)+materialBox(d)+infoBox(d)+bitrixBox(d)+priceBox(d)+sampleBox(d)+drawBox(d)+odmCards(d,odm);}
+function sheetBox(d){
+  const m=d.sheet_meta;if(!m)return"";
+  const rows=[];
+  if(m.group)rows.push(`<tr><td class="mut" style="width:150px">Группа</td><td>${esc(m.group)}</td></tr>`);
+  if(m.application_cop)rows.push(`<tr><td class="mut">Применение (COP)</td><td>${esc(m.application_cop)}</td></tr>`);
+  if(m.manufacturers&&m.manufacturers.length)rows.push(`<tr><td class="mut"><b style="color:#7a3ea8">Кандидаты-производители</b></td><td><b>${m.manufacturers.map(esc).join(", ")}</b></td></tr>`);
+  if(m.original)rows.push(`<tr><td class="mut">Оригинал (OEM)</td><td>${esc(m.original)}</td></tr>`);
+  if(m.samples)rows.push(`<tr><td class="mut">Пробники</td><td>${esc(m.samples)}</td></tr>`);
+  if(m.note)rows.push(`<tr><td class="mut">Примечание</td><td>${esc(m.note)}</td></tr>`);
+  if(!rows.length)return"";
+  return `<div class="mbx" style="background:#faf5ff;border-color:#e0cffc"><div class="mbx-t">🏭 Снабжение (рабочая таблица) — прозвон/производители</div>
+    <table class="pt"><tbody>${rows.join("")}</tbody></table></div>`;
+}
 // классификатор позиции в узел перфоратора → рекомендация материала из стратегии
 function nodeByTag(re){return MATNODES.find(m=>re.test(m.part_class||""));}
 function matchNode(d){
