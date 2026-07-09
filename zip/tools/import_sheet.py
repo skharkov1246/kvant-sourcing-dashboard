@@ -135,6 +135,61 @@ def main():
     (DATA / "sheet_meta.json").write_text(
         json.dumps(meta, ensure_ascii=False, indent=1), encoding="utf-8")
 
+    # --- 3) CRM поставщиков + прозвон (Радмир) → supplier_crm.json ---
+    def find_header(rows, key="Поставщик"):
+        for i, r in enumerate(rows[:5]):
+            if any(key.lower() in str(c or "").lower() for c in r):
+                return i
+        return 0
+
+    def colmap(hdr):
+        return {str(h or "").strip().lower(): i for i, h in enumerate(hdr)}
+
+    def cell(row, cm, *names):
+        for n in names:
+            for k, i in cm.items():
+                if n.lower() in k and i < len(row) and row[i] is not None:
+                    v = str(row[i]).strip()
+                    if v:
+                        return v
+        return ""
+
+    crm = []
+    Cr = rows_of(wb["Контакт поставщиков и производи"])
+    h0 = find_header(Cr)
+    cm = colmap(Cr[h0])
+    for row in Cr[h0 + 1:]:
+        name = cell(row, cm, "поставщик")
+        if not name:
+            continue
+        comments = [c for c in (cell(row, cm, "комментарии 1"), cell(row, cm, "комментарии 2"),
+                                cell(row, cm, "комментарии 3")) if c]
+        crm.append({
+            "name": name, "kind": cell(row, cm, "завод"), "geo": cell(row, cm, "гео"),
+            "contacts": cell(row, cm, "контакты"), "direction": cell(row, cm, "направление"),
+            "last_comm": cell(row, cm, "дата последней"), "stage": cell(row, cm, "стадия"),
+            "comments": comments, "waiting": cell(row, cm, "что ждем", "что ждём"),
+        })
+
+    calls = []
+    Pr = rows_of(wb["Прозвон (Радмир)"])
+    ph2 = find_header(Pr)
+    cm2 = colmap(Pr[ph2])
+    for row in Pr[ph2 + 1:]:
+        name = cell(row, cm2, "поставщик")
+        if not name:
+            continue
+        calls.append({
+            "priority": cell(row, cm2, "приоритет"), "name": name,
+            "phone": cell(row, cm2, "телефон", "как связаться"),
+            "ask": cell(row, cm2, "что спросить"), "why": cell(row, cm2, "зачем"),
+            "stage": cell(row, cm2, "стадия"), "result": cell(row, cm2, "итог звонка"),
+            "new_contact": cell(row, cm2, "новый контакт"), "date": cell(row, cm2, "дата звонка"),
+        })
+    (DATA / "supplier_crm.json").write_text(
+        json.dumps({"updated": date.today().isoformat(), "suppliers": crm, "calls": calls},
+                   ensure_ascii=False, indent=1), encoding="utf-8")
+
     npos_q = len({r["position_id"] for r in prices if r.get("source") == QUOTE_SRC})
     nman = sum(1 for v in meta.values() if v["manufacturers"])
     print(f"котировки: +{added} записей по {npos_q} позициям (File A)")
