@@ -72,7 +72,7 @@ table.pt .eur{color:#0b5;font-variant-numeric:tabular-nums}
 <header>
   <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
     <div><b>База ЗИП · локализация производства</b> <span class="pill" id="cnt">…</span> <span class="pill" id="mode">…</span></div>
-    <div class="tabs"><button class="on" data-t="grid">Позиции</button><button data-t="sup">Поставщики</button><button data-t="wh">Склад</button><button data-t="dem">Спрос</button><button data-t="cust">Таможня</button><button data-t="mat">Материалы</button><button data-t="stats">Обзор</button><button data-t="log">Журнал</button><button id="expPos" class="exp">⬇ позиции</button><button id="expOdm" class="exp">⬇ ODM</button><button id="expPrices" class="exp">⬇ цены</button><button id="expSamples" class="exp">⬇ образцы</button><button id="expSup" class="exp">⬇ поставщики</button></div>
+    <div class="tabs"><button class="on" data-t="grid">Позиции</button><button data-t="sup">Поставщики</button><button data-t="wh">Склад</button><button data-t="dem">Спрос</button><button data-t="cust">Таможня</button><button data-t="bom">Разработка</button><button data-t="mat">Материалы</button><button data-t="stats">Обзор</button><button data-t="log">Журнал</button><button id="expPos" class="exp">⬇ позиции</button><button id="expOdm" class="exp">⬇ ODM</button><button id="expPrices" class="exp">⬇ цены</button><button id="expSamples" class="exp">⬇ образцы</button><button id="expSup" class="exp">⬇ поставщики</button></div>
   </div>
   <div class="bar" id="ctrls">
     <input id="q" type="text" placeholder="поиск: каталог, наименование, модель, OEM…">
@@ -91,6 +91,7 @@ table.pt .eur{color:#0b5;font-variant-numeric:tabular-nums}
 <div id="wh" class="hide" style="padding:12px"></div>
 <div id="dem" class="hide" style="padding:12px"></div>
 <div id="cust" class="hide" style="padding:12px"></div>
+<div id="bom" class="hide" style="padding:12px"></div>
 <div id="mat" class="hide" style="padding:12px"></div>
 <div id="stats" class="hide" style="padding:12px"></div>
 <div id="log" class="hide" style="padding:12px"></div>
@@ -106,6 +107,7 @@ const MATSUP=[/*__MATSUP__*/];
 const MATPROC=[/*__MATPROC__*/];
 const CUSTOMS=[/*__CUSTOMS__*/][0]||null;
 const SUPCRM=[/*__SUPCRM__*/][0]||null;
+const BOM=[/*__BOM__*/][0]||null;
 const MATTEXT=[/*__MATTEXT__*/][0]||"";
 const sb=(window.supabase)?supabase.createClient(SUPA_URL,SUPA_KEY):null;
 const $=id=>document.getElementById(id);
@@ -520,6 +522,47 @@ function openPos(pid){document.querySelector('.tabs [data-t="grid"]').click();re
 document.addEventListener("click",e=>{const g=e.target.closest("[data-gocust]");if(g){e.preventDefault();document.querySelector('.tabs [data-t="cust"]').click();}});
 // ─── Спрос и бюджет заказчика ───
 function money(n){return n==null?"—":(Math.abs(n)>=1e6?(n/1e6).toFixed(1)+" млн":Math.round(n).toLocaleString("ru"));}
+let bomMi=0,bomQ="",bomFilt="";
+function bomStage(v){if(!v)return'<span class="mut">—</span>';const t=v.toLowerCase();const c=/готов|успешн/.test(t)?"b-h":/сломан|брак/.test(t)?"b-l":"b-m";return `<span class="bdg ${c}">${esc(v)}</span>`;}
+function bomTable(){
+  const m=BOM.machines[bomMi];let ps=m.parts;
+  if(bomFilt=="status")ps=ps.filter(p=>p.st_izmer||p.st_rkd||p.st_opi);
+  else if(bomFilt=="rkd")ps=ps.filter(p=>/готов/i.test(p.st_rkd||""));
+  else if(bomFilt=="wip")ps=ps.filter(p=>/работе|проверке/i.test((p.st_izmer||"")+(p.st_rkd||"")));
+  if(bomQ){const q=bomQ.toLowerCase();ps=ps.filter(p=>((p.epiroc_pn||"")+(p.kv_pn||"")+(p.desc||"")+(p.owner||"")).toLowerCase().includes(q));}
+  let h=`<table class="ot"><thead><tr><th>№ схемы</th><th>Epiroc PN</th><th>Артикул КВАНТ</th><th>Кол-во</th><th>Описание</th><th>Ответств.</th><th>Замер</th><th>РКД</th><th>ОПИ</th><th>Поставщики</th></tr></thead><tbody>`;
+  ps.forEach(p=>{h+=`<tr><td class="cn mut">${esc(p.scheme)}</td><td class="cn">${esc(p.epiroc_pn)}</td><td class="cn"><b>${esc(p.kv_pn)}</b></td><td class="cn">${esc(p.qty)}</td><td>${esc(p.desc)}</td><td class="mut">${esc(p.owner)}</td><td>${bomStage(p.st_izmer)}</td><td>${bomStage(p.st_rkd)}</td><td>${bomStage(p.st_opi)}</td><td class="mut" style="font-size:11px;max-width:150px">${(p.suppliers||[]).map(esc).join(", ")}</td></tr>`;});
+  h+=`</tbody></table>`;if(!ps.length)h+=`<div class="mut">ничего не найдено.</div>`;
+  return h;
+}
+function bomHtml(){
+  if(!BOM||!BOM.machines||!BOM.machines.length)return '<div class="mut">BOM не загружен. Импорт: python zip/tools/import_bom.py.</div>';
+  const m=BOM.machines[bomMi],st=m.stats;
+  const izGot=(st.izmer||{})["готово"]||0,izWip=(st.izmer||{})["в работе"]||0;
+  const rkGot=(st.rkd||{})["готово"]||0,rkWip=((st.rkd||{})["в работе"]||0)+((st.rkd||{})["на проверке"]||0);
+  let h=`<div class="mut" style="margin-bottom:6px">Инженерная разузловка (BOM) и воронка локализации по деталям машины. Источник — рабочая таблица инженеров (Замер → РКД → ОПИ → серия). Обновлено ${esc(BOM.updated||"")}.</div>`;
+  if(BOM.machines.length>1)h+=`<div class="chips">`+BOM.machines.map((x,i)=>`<span class="chip${i==bomMi?" on":""}" data-bmi="${i}">${esc(x.name)}</span>`).join("")+`</div>`;
+  h+=`<h3 style="margin:8px 0 4px">${esc(m.name)}</h3>
+    <div class="cards" style="margin-bottom:10px">
+    <div class="card"><div class="n">${st.parts}</div><div class="l">деталей в разузловке</div></div>
+    <div class="card"><div class="n">${st.with_kv_pn}</div><div class="l">с артикулом КВАНТ</div></div>
+    <div class="card"><div class="n">${st.with_status}</div><div class="l">в работе (есть статус)</div></div>
+    <div class="card"><div class="n" style="color:#1a7f37">${rkGot}</div><div class="l">РКД готово</div></div>
+    <div class="card"><div class="n">${m.kits.length}</div><div class="l">сервис-наборов</div></div>
+    </div>`;
+  h+=`<div class="mut" style="font-size:12px;margin-bottom:6px">Воронка: <b>Замер</b> — готово ${izGot}, в работе ${izWip}; <b>РКД</b> — готово ${rkGot}, в работе/проверка ${rkWip}; <b>ОПИ</b> — ещё не начато. Ответственные: ${st.owners.map(o=>esc(o[0])+" ("+o[1]+")").join(", ")||"—"}.</div>`;
+  h+=`<div class="chips" id="bomchips"><span class="chip${bomFilt==""?" on":""}" data-bf="">все (${st.parts})</span><span class="chip${bomFilt=="status"?" on":""}" data-bf="status">со статусом (${st.with_status})</span><span class="chip${bomFilt=="wip"?" on":""}" data-bf="wip">в работе</span><span class="chip${bomFilt=="rkd"?" on":""}" data-bf="rkd">РКД готово (${rkGot})</span></div>
+    <input id="qbom" placeholder="поиск: Epiroc PN / KV / описание / ответственный…" value="${esc(bomQ)}" style="margin:6px 0;padding:6px 8px;width:360px;border:1px solid var(--ln);border-radius:6px">
+    <div id="bomtab" style="overflow-x:auto">${bomTable()}</div>`;
+  if(m.kits.length)h+=`<details style="margin-top:12px"><summary style="cursor:pointer;font-weight:600">🧰 Сервисные наборы (${m.kits.length})</summary>
+    <div style="overflow-x:auto;margin-top:6px"><table class="ot"><thead><tr><th>№ набора</th><th>№ п/п</th><th>№ схемы</th><th>Наименование</th><th>Оригинал Epiroc</th><th>Артикул КВАНТ</th><th>Кол-во</th></tr></thead><tbody>`+
+    m.kits.map(k=>`<tr><td class="cn">${esc(k.kit_no)}</td><td class="cn mut">${esc(k.pp)}</td><td class="cn mut">${esc(k.scheme)}</td><td>${esc(k.name)}</td><td class="cn">${esc(k.oem_pn)}</td><td class="cn"><b>${esc(k.kv_pn)}</b></td><td class="cn">${esc(k.qty)}</td></tr>`).join("")+`</tbody></table></div></details>`;
+  return h;
+}
+$("bom").addEventListener("click",e=>{const c=e.target.closest("[data-bf]"),mi=e.target.closest("[data-bmi]");
+  if(mi){bomMi=+mi.dataset.bmi;bomFilt="";bomQ="";$("bom").innerHTML=bomHtml();return;}
+  if(c){bomFilt=c.dataset.bf;document.querySelectorAll("#bomchips .chip").forEach(x=>x.classList.toggle("on",x.dataset.bf==bomFilt));$("bomtab").innerHTML=bomTable();}});
+$("bom").addEventListener("input",e=>{if(e.target.id=="qbom"){bomQ=e.target.value;$("bomtab").innerHTML=bomTable();}});
 function custHtml(){
   if(!CUSTOMS||!CUSTOMS.perforator)return '<div class="mut">Таможенная статистика не загружена. Запустите workflow «ZIP customs» (glbs.io).</div>';
   const P=CUSTOMS.perforator, kg=P.usd_kg||{};
@@ -668,11 +711,12 @@ async function logHtml(){
 document.querySelectorAll(".tabs [data-t]").forEach(b=>b.onclick=async()=>{
   document.querySelectorAll(".tabs [data-t]").forEach(x=>x.classList.remove("on"));b.classList.add("on");
   const t=b.dataset.t;$("grid").classList.toggle("hide",t!="grid");$("ctrls").style.visibility=t=="grid"?"visible":"hidden";
-  $("suppliers").classList.toggle("hide",t!="sup");$("wh").classList.toggle("hide",t!="wh");$("dem").classList.toggle("hide",t!="dem");$("cust").classList.toggle("hide",t!="cust");$("mat").classList.toggle("hide",t!="mat");$("stats").classList.toggle("hide",t!="stats");$("log").classList.toggle("hide",t!="log");
+  $("suppliers").classList.toggle("hide",t!="sup");$("wh").classList.toggle("hide",t!="wh");$("dem").classList.toggle("hide",t!="dem");$("cust").classList.toggle("hide",t!="cust");$("bom").classList.toggle("hide",t!="bom");$("mat").classList.toggle("hide",t!="mat");$("stats").classList.toggle("hide",t!="stats");$("log").classList.toggle("hide",t!="log");
   if(t=="sup")$("suppliers").innerHTML=supHtml();
   if(t=="wh")$("wh").innerHTML=whHtml();
   if(t=="dem"){$("dem").innerHTML=demHtml();if($("comptab"))$("comptab").innerHTML=compTable("");}
   if(t=="cust")$("cust").innerHTML=custHtml();
+  if(t=="bom")$("bom").innerHTML=bomHtml();
   if(t=="mat"){$("mat").innerHTML=matHtml();if($("mattab"))$("mattab").innerHTML=matSupTable("");}
   if(t=="stats")$("stats").innerHTML=statsHtml();
   if(t=="log")$("log").innerHTML=await logHtml();
