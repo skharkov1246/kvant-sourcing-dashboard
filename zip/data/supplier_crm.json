@@ -1,0 +1,534 @@
+{
+ "updated": "2026-07-09",
+ "suppliers": [
+  {
+   "name": "LianHuaShan Rock Tools",
+   "kind": "Завод",
+   "geo": "Китай, Ляонин, Хулудао",
+   "contacts": "86 429 4428424\n+86 13019978858\ninfo@lhsrocktools.com\ninfo@lhsdrill.com\nWeChat xintianweng398529\n郑荣生 +86 13842951993",
+   "direction": "Хвостовики, shank adapters, guide bushings",
+   "last_comm": "08.07 ← wechat",
+   "stage": "Отказ (по хвостовикам/втулкам)",
+   "comments": [
+    "Завод хвостовиков: shank adapters R22-T60 + guide bushings. Своя ковка/ТО.",
+    "08.07 WeChat (Ron Zheng / 郑荣生): не могут поставлять shank guide и bushing (наш file B — их профиль). Предложили запчасти для CAT — не наш профиль (нужны COP перфораторы). Егор общается в WeChat.",
+    "Отказ по shank guide/bushings (file B) · предлагали CAT-запчасти (мимо) · общаемся в WeChat"
+   ],
+   "waiting": "Отказ по хвостовикам/втулкам; остаёмся в WeChat-контакте на будущее (COP). Радмиру звонить не нужно."
+  },
+  {
+   "name": "Sanshan / Zuanshan",
+   "kind": "Завод",
+   "geo": "Китай, Шаньдун, Янгу / Ляочэн",
+   "contacts": "86 635 8330862\nWA +86 17563560862\nepiroc@sanshanrocktools.com\nsanshanrocktools.com\ninfo@sanshanrocktools.com",
+   "direction": "Внутренности COP: piston, liner, driver",
+   "last_comm": "09.07 → email",
+   "stage": "К/П",
+   "comments": [
+    "Завод металл-внутренностей COP (Шаньдун): piston, driver, chuck, bushing, guide + часть seals. Многое со склада.",
+    "Отправлен файл A (83). Посчитал 29/83, EXW China, CNY, в основном 'own stock'. ВАЖНО: дешёвые цены — за КИТАЙСКИЙ материал; импортный материал в разы дороже (ноты Sanshan: драйвер 1028 298→2300, задняя направляющая 2238 58→500, втулка RR14 108→1000). Гарантия 3 мес, задиры не покрываются. По импортному материалу ≈ уровень YLF/Fuxuan. 09.07 подтвердил: котировка = китайский материал; запросили цену по импортному/выше-grade материалу и условия образца.",
+    "КП 29/83 (китайский материал подтверждён; импорт ×8-9) · запрошена цена импорт-материала · образец не подтверждён · на связи · прозвон"
+   ],
+   "waiting": "Мы ждём: цену по импортному/выше-grade материалу (драйверы/поршни/направляющие/втулки/вращатели) + условия образца + material/HT/HRC."
+  },
+  {
+   "name": "Shandong KAT Drilling",
+   "kind": "Завод",
+   "geo": "Китай, Шаньдун, Ляочэн",
+   "contacts": "+86 635 8585985\nWA +86 13969583325\nkatdrilling.en.made-in-china.com",
+   "direction": "Shank adapters COP 1036-2238",
+   "last_comm": "29.06 → wechat",
+   "stage": "К/П",
+   "comments": [
+    "Завод бурового инструмента: shank adapters, коронки. Внутренности COP не делает; втулки/направляющие — по нашим чертежам.",
+    "Отправлены файлы A и B. По B посчитал 7/20. Дороже Sanshan на втулках.",
+    "КП 7/20. Остальное — по нашим чертежам (за нами). На связи (WeChat)."
+   ],
+   "waiting": "Поставщик ждёт: чертежи на остальные втулки (за Романом)."
+  },
+  {
+   "name": "Biaotuo / BPSEAL",
+   "kind": "Завод",
+   "geo": "Китай, Хэбэй, Синтай",
+   "contacts": "oilseal@bpseal.com\nbpseal.en.made-in-china.com",
+   "direction": "РТИ: PU/PTFE seals, O-rings",
+   "last_comm": "09.07 → email",
+   "stage": "Написали — ждём (прозвон)",
+   "comments": [
+    "Завод РТИ: PU/PTFE seals, O-rings. Намечен якорем по уплотнениям.",
+    "Отправлен файл C (28 поз.). Молчит, WeChat не принял.",
+    "КП нет · follow-up 09.07: считают по OEM-кроссу или нужны размеры? · молчит"
+   ],
+   "waiting": "Мы ждём: ответ — quote по кроссу или нужны ID/OD/H/материал."
+  },
+  {
+   "name": "Xingtai Huimen Seals",
+   "kind": "Завод",
+   "geo": "Китай, Хэбэй, Синтай",
+   "contacts": "86 319 7656928\nWA +86 15832965899\nfyyf1988@163.com\nhm-seals.com\n279312673@qq.com",
+   "direction": "РТИ: oil seals, O-rings, valve seals",
+   "last_comm": "09.07 → email",
+   "stage": "Написали — ждём (прозвон)",
+   "comments": [
+    "Завод общих уплотнений: oil seals, O-rings (не спец. по COP).",
+    "Отправлен файл C на почту менеджера. Уточняем: льют ли сами PU/PTFE, fit под COP.",
+    "КП нет · follow-up 09.07: quote по кроссу или нужны размеры? · молчит"
+   ],
+   "waiting": "Мы ждём: что делают из списка + цены, или размеры."
+  },
+  {
+   "name": "Nanjing Hovoo",
+   "kind": "Трейдер",
+   "geo": "Китай, Цзянсу, Нанкин",
+   "contacts": "+86 18012806665 (WA)\nsales@hovooseal.com\nhovooseal.com",
+   "direction": "COP seal kits 2238/3060/4050",
+   "last_comm": "23.06 ← wechat",
+   "stage": "К/П",
+   "comments": [
+    "Завод РТИ, seal kits под COP 2238/3060/4050.",
+    "Отправлен список ремкомплектов (10) — посчитал 2. Дослать остаток + файл C.",
+    "Трейдер, не приоритет. КП 2/10 (бенчмарк)."
+   ],
+   "waiting": "—"
+  },
+  {
+   "name": "Qingdao Hendac Prime",
+   "kind": "Завод",
+   "geo": "Китай, Шаньдун, Циндао",
+   "contacts": "86 13356873676 (Mr. Tonng Huang)\nMade-in-China store\nlucy@allianceseals.com",
+   "direction": "РТИ (авто): oil/PU seals",
+   "last_comm": "07.07 ← email",
+   "stage": "Ответил — взял в работу",
+   "comments": [
+    "Завод уплотнений (авто-сегмент); заявляет, что делает под COP.",
+    "Отправлен файл C. 07.07 прислали частичное совпадение: нашли 3115 2333 00 / 3115 5190 00 + 13-строчный PU-лист с размерами. По OEM-кроссу весь список не квотируют — нужны ID/OD/H/материал/цвет или образцы. Копируют с образца, организуют FedEx pickup 28-шт кита.",
+    "частичное совпадение по seals (не КП) · нужны размеры/образцы (за нами) · на связи"
+   ],
+   "waiting": "Поставщик ждёт: ID/OD/H/материал/цвет по позициям или образцы (Роман/Егор)."
+  },
+  {
+   "name": "Jiangxi Woserld / Siton",
+   "kind": "Завод",
+   "geo": "Китай (Woserld Цзянси / Siton)",
+   "contacts": "WA +86 13387997914\nsales@woserld.com\nwoserld.com",
+   "direction": "Внутренности COP: piston/guide/bushing/driver",
+   "last_comm": "04.07 ← email",
+   "stage": "Ответил — взял в работу",
+   "comments": [
+    "Woserld-группа, металл COP 1838/2238. Замечание Романа: качество у группы так себе.",
+    "04.07: их бренд — underground equipment, rock drill/tools у другого бренда группы. Просят профиль компании для routing.",
+    "КП нет · просят профиль компании · на связи"
+   ],
+   "waiting": "Поставщик ждёт: профиль компании."
+  },
+  {
+   "name": "WMS / Atmaca",
+   "kind": "Завод",
+   "geo": "Турция, Анкара",
+   "contacts": "+90 537 725 36 26 (WA)\nexport@drill-parts.com\ndrill-parts.com",
+   "direction": "Комплектные COP + металл-ЗИП",
+   "last_comm": "04.07 ← email",
+   "stage": "К/П",
+   "comments": [
+    "Турция, 28 лет: металл-ЗИП + комплектные COP, reverse-eng оригинала, своё CNC/шлифовка. Клапан/мотор не своё — перепродаёт.",
+    "04.07: комплектных COP2238/MD20/3060 сейчас нет, сообщат если появятся. Роль — бенчмарк по металл-ЗИП/качеству.",
+    "КП 70/83 (металл) · комплектных сейчас нет · на связи · бенчмарк"
+   ],
+   "waiting": "Мы ждём: сообщение если появятся комплектные (не срочно)."
+  },
+  {
+   "name": "Mindrill Systems",
+   "kind": "Завод",
+   "geo": "Индия",
+   "contacts": "+91 98305 94274 (WA)\nsalessupport@mindrill.com\nmindrill.com",
+   "direction": "Дрифтеры-аналоги 1838/2238/MD20",
+   "last_comm": "01.07 ← email",
+   "stage": "К/П",
+   "comments": [
+    "Индия, 52 года: комплектный COP1838-аналог + ЗИП, in-house. Прислал ISO 9001, отчёт испытаний, референсы.",
+    "Отправлены файлы A и B. По A посчитал 9 (крупное железо ок, seals дорого). Дал цену на комплектный MHD1838HD+, 4-6 нед, 1 шт на складе.",
+    "КП 9/83 + комплектный. Техника и референсы есть. На связи."
+   ],
+   "waiting": "Мы ждём: ответ на уточнения (in-house / кроссы / остаток железа)."
+  },
+  {
+   "name": "Shijiazhuang Hanjiu",
+   "kind": "Завод",
+   "geo": "Китай, Хэбэй, Шицзячжуан",
+   "contacts": "86 311 68123061\norbithydraulic-motor.com\nAlyssa@sjzhjsm.com",
+   "direction": "GAP-мотор (orbital, Char-Lynn equiv)",
+   "last_comm": "04.07 ← email",
+   "stage": "К/П",
+   "comments": [
+    "Завод гидромоторов orbital (Char-Lynn equiv). Говорит, делает наш мотор для Epiroc. Своё производство, гарантия 12 мес.",
+    "04.07: подтвердили, делали этот мотор сотни раз, готовы sample в Китай форвардеру. Backup к Jinjia (у Jinjia дешевле/быстрее).",
+    "КП по мотору · backup к Jinjia · готов на sample · на связи"
+   ],
+   "waiting": "Мы ждём: решение — Jinjia или Hanjiu (не срочно, Jinjia приоритет)."
+  },
+  {
+   "name": "Ningbo Zhongyi Hydraulic Motor",
+   "kind": "Завод",
+   "geo": "Китай, Чжэцзян, Нинбо",
+   "contacts": "400-860-6886\nsales@zihyd.com\nzihyd.com",
+   "direction": "GAP-мотор (orbital + radial-piston)",
+   "last_comm": "26.06 ← email",
+   "stage": "Ответил — взял в работу",
+   "comments": [
+    "Завод гидромоторов (Нинбо, orbital + radial-piston).",
+    "Запрос по мотору. По номеру не подберёт — просит фото/шильдик. Мотор закрыт Jinjia — низкий приоритет.",
+    "КП нет — ждёт фото от нас. Не приоритет."
+   ],
+   "waiting": "Поставщик ждёт: фото/шильдик мотора (не срочно)."
+  },
+  {
+   "name": "Jining Jinjia Hydraulic",
+   "kind": "Завод",
+   "geo": "Китай, Шаньдун, Цзинин",
+   "contacts": "+86 18554169549\nalice@jinjiahyd.com\nSales@jinjiahyd.com\njinjiahyd.com",
+   "direction": "GAP-мотор (orbital)",
+   "last_comm": "01.07 ← email",
+   "stage": "К/П",
+   "comments": [
+    "Завод гидромоторов (Цзинин, 14+ лет). Лучший по мотору 5249 85: цена+срок, фото совпало (кросс Delkom 120 102 403). Своё производство, гарантия 1 год.",
+    "Запрос по мотору. Цена, срок 10 дн, фото совпало (кросс Delkom 120 102 403). Своё производство, гарантия 1 год. Готов отправить 1 шт нашему форвардеру.",
+    "КП по мотору — лучший. Готов на образец. На связи."
+   ],
+   "waiting": "Поставщик ждёт: адрес форвардера, чтобы отправить образец."
+  },
+  {
+   "name": "Jining Liyuan Hydraulic",
+   "kind": "Завод",
+   "geo": "Китай, Шаньдун, Цзинин",
+   "contacts": "+86 13605375932\nlyexport@jnlyyy.com\njnlyyy.com",
+   "direction": "GAP-мотор (orbital+axial)",
+   "last_comm": "25.06 → email",
+   "stage": "Написали — ждём",
+   "comments": [
+    "Завод гидромоторов (orbital+axial), моторы для буровых.",
+    "Запрос по мотору отправлен. Молчит. Мотор закрыт — не дожимаем.",
+    "КП нет, молчит. Не приоритет."
+   ],
+   "waiting": "—"
+  },
+  {
+   "name": "Ningbo Helm Tower Noda",
+   "kind": "Завод",
+   "geo": "Китай, Чжэцзян, Нинбо",
+   "contacts": "WA +86 13567431300\nsales@hydraulics-china.com\nhydraulics-china.com",
+   "direction": "GAP-мотор (radial-piston)",
+   "last_comm": "25.06 → email",
+   "stage": "Написали — ждём",
+   "comments": [
+    "Завод гидромоторов (radial-piston).",
+    "Запрос по мотору отправлен. Молчит.",
+    "КП нет, молчит. Не приоритет."
+   ],
+   "waiting": "—"
+  },
+  {
+   "name": "Ningbo Chaori Hydraulic",
+   "kind": "Завод",
+   "geo": "Китай, Чжэцзян, Нинбо (Фэнхуа)",
+   "contacts": "+86 574 88850227\nExport@nbchaori.cn\nchaorihydraulic.com",
+   "direction": "GAP-клапан (charging valve)",
+   "last_comm": "01.07 ← email",
+   "stage": "К/П",
+   "comments": [
+    "Завод зарядных клапанов + азотных станций (ASME/ISO). Профильный по клапану 3768.",
+    "Запрос по клапану. Дал цены на стандарт (QXF-5 ~12 USD, CQJ-40 ~62 USD) + резьбы. Кастом — от 150 шт.",
+    "КП на их стандарт. Упёрлись в сверку резьбы (за нами). На связи."
+   ],
+   "waiting": "Поставщик ждёт: нашу резьбу/размер клапана (за Романом)."
+  },
+  {
+   "name": "Ningbo Milehertz",
+   "kind": "Завод",
+   "geo": "Китай, Чжэцзян, Нинбо",
+   "contacts": "+86 13858356336\nsales@milehertz.com\nmilehertz.com",
+   "direction": "GAP-клапан (charging kit/valve)",
+   "last_comm": "25.06 → email",
+   "stage": "Написали — ждём",
+   "comments": [
+    "Зарядные узлы/клапаны GCQJ/FPU.",
+    "Запрос по клапану отправлен. Молчит. Клапан ведём через Chaori.",
+    "КП нет, молчит. Не приоритет."
+   ],
+   "waiting": "—"
+  },
+  {
+   "name": "Difon Machinery",
+   "kind": "Завод",
+   "geo": "Китай",
+   "contacts": "+86 15153262776\ninfo@difon.cn\ndifonmachining.com",
+   "direction": "GAP-клапан (custom machining)",
+   "last_comm": "30.06 ← email",
+   "stage": "Ответил — взял в работу",
+   "comments": [
+    "Механообработка на заказ (CNC), гидроклапанные компоненты.",
+    "Запрос по клапану. Делает по чертежу, без чертежа цену не даст.",
+    "КП нет — только по чертежу (за нами). На связи."
+   ],
+   "waiting": "Поставщик ждёт: чертёж клапана (за Романом)."
+  },
+  {
+   "name": "Dongfang Yoyik",
+   "kind": "Трейдер",
+   "geo": "Китай, Сычуань, Дэян",
+   "contacts": "86-838-2206509\nyoyik1688.en.made-in-china.com\nWeChat +86 13547042288 (Miss Li)",
+   "direction": "GAP-клапан (YAV charging valve)",
+   "last_comm": "07.07 → wechat",
+   "stage": "Написали — ждём",
+   "comments": [
+    "Полу-завод/полу-трейдер, зарядный клапан YAV. Резерв по клапану.",
+    "WeChat принят. Написали 07.07 по зарядному клапану 3115 3768 00. Резерв по клапану.",
+    "КП нет · написали в WeChat 07.07 · ждём ответа"
+   ],
+   "waiting": "Мы ждём: ответ от неё в WeChat."
+  },
+  {
+   "name": "Litian / Litech",
+   "kind": "Завод",
+   "geo": "Китай, Ляонин, Хулудао",
+   "contacts": "+86 18080948772\nlitian@litechtools.com\nlitechtools.com\nmia@litechtools.com",
+   "direction": "Хвостовики COP1028-4050",
+   "last_comm": "06.07 ← email",
+   "stage": "Ответил — взял в работу",
+   "comments": [
+    "Завод бурового инструмента (Хулудао): shank adapters, муфты, штанги, коронки — своя ковка/ТО. Втулки — только по чертежам.",
+    "06.07: reference prices на стандартные shank adapters T38*8D38-435 = 89.50 USD EXW, T38*8D38-525 = 119.50 USD EXW. Только стандарт, модель под наши COP не подтверждена. Trial order возможен.",
+    "Первый ценовой ориентир по хвостовикам · привязка к нашим PN не подтверждена · на связи"
+   ],
+   "waiting": "Мы ждём: какой COP-модели соответствует + сталь/ТО/HRC/MOQ/срок/вес."
+  },
+  {
+   "name": "Pulanka Rock Tools",
+   "kind": "Завод",
+   "geo": "Китай, Чжэцзян, Тайчжоу",
+   "contacts": "+86 576 82737372\nelma@cnpulk.com\npulankagroup.com\n+86 18267645159 (WeChat отправлен)",
+   "direction": "Хвостовики + drifter ЗИП",
+   "last_comm": "08.07 → email",
+   "stage": "Ответил — взял в работу",
+   "comments": [
+    "Делает дрифтеры целиком + хвостовики и детали.",
+    "08.07 ответил: не видел список, просил переслать. Профиль: top-hammer ЗИП, коронки, штанги, shank adapters, муфты, OEM-кастом, 20+ лет. Переслали focused shank/bushing/metal RFQ.",
+    "КП нет · 08.07 ожил, переслали focused RFQ · ждём quote/scope"
+   ],
+   "waiting": "Мы ждём: quote по позициям, что уверенно делают + own/sourced."
+  },
+  {
+   "name": "Xiamen Bestlink",
+   "kind": "Завод",
+   "geo": "Китай, Фуцзянь, Сямэнь",
+   "contacts": "xmbestlink.en.made-in-china.com\nWeChat/тел +86 13600966313 (Richard Chen)",
+   "direction": "Хвостовики shank COP1838/4050",
+   "last_comm": "07.07 → wechat",
+   "stage": "Написали — ждём",
+   "comments": [
+    "Хвостовики shank COP1838/4050.",
+    "07.07 Richard добавлен в WeChat, отправлены file A + file B. Ждём ответ. Для чистой пересылки — нейтральный focused RFQ, не файл Bestlink_RFQ.",
+    "КП нет · отправлены file A+B (07.07) · ждём ответа"
+   ],
+   "waiting": "Мы ждём: ответ Richard в WeChat."
+  },
+  {
+   "name": "GMD Equipment",
+   "kind": "Завод",
+   "geo": "Китай, Фуцзянь, Сямэнь",
+   "contacts": "info@gmd-eqpt.com",
+   "direction": "Хвостовики shank COP1838",
+   "last_comm": "09.07 → email",
+   "stage": "Написали — ждём (прозвон)",
+   "comments": [
+    "Хвостовики shank COP1838.",
+    "Отправлен focused shank/bushing RFQ 09.07. Контакта менеджера нет.",
+    "КП нет · 09.07 follow-up с focused RFQ · ждём scope/quote · не дозвонился (06.07)"
+   ],
+   "waiting": "Мы ждём: ответ; контакт менеджера (Радмир)."
+  },
+  {
+   "name": "Prodrill (Xiamen)",
+   "kind": "Завод",
+   "geo": "Китай, Фуцзянь, Сямэнь",
+   "contacts": "+86 18959243380\nsales@prodrill.com.cn\nrock-drill-bits.com",
+   "direction": "Хвостовики shank COP1838 + буры",
+   "last_comm": "09.07 → email",
+   "stage": "Написали — ждём (прозвон)",
+   "comments": [
+    "Хвостовики shank COP1838 + буровой инструмент.",
+    "Отправлен focused shank/bushing RFQ 09.07.",
+    "КП нет · 09.07 follow-up с focused RFQ · ждём scope/quote · не дозвонился (06.07)"
+   ],
+   "waiting": "Мы ждём: ответ (через звонок)."
+  },
+  {
+   "name": "Guangdong DEF Seals",
+   "kind": "Завод",
+   "geo": "Китай, Гуандун, Дунгуань",
+   "contacts": "+86 769 83260341\ndefseals@defseals.com\ndefseals.com",
+   "direction": "РТИ / hydraulic seals",
+   "last_comm": "06.07 ← email",
+   "stage": "Ответил — взял в работу",
+   "comments": [
+    "Завод уплотнений (Дунгуань, 22 года), своё литьё PU/PTFE.",
+    "06.07: повторно спросили размеры ID×OD×H и материалы — без них не квотируют по OEM cross. Живой, мяч у нас.",
+    "КП нет · без размеров не считает (за нами) · на связи"
+   ],
+   "waiting": "Поставщик ждёт: размерную таблицу seals (ID×OD×H + материал) — Роман/Егор."
+  },
+  {
+   "name": "Jinhua Fuxuan Machinery",
+   "kind": "Завод",
+   "geo": "Китай, Чжэцзян, Цзиньхуа",
+   "contacts": "fuxuan-machine.com\ntiffany@fuxuan-machine.com\nWeChat/тел +86 15268086116 (Tiffany)",
+   "direction": "Металл / bushing rock drill",
+   "last_comm": "07.07 ← email",
+   "stage": "К/П",
+   "comments": [
+    "Металлообработка, bushing для rock drill.",
+    "07.07 прислала цены по 22/83 (CNY): металл-внутренности + уплотнения COP 1028/2238HD+/3060/4050/RR14. Дорого — дороже Sanshan и YLF почти везде. Пометка 'good material' на драйвере и задней направляющей 2238HD+.",
+    "КП 22/83 · дорого · ценна как 3-я котировка/сравнение · на связи"
+   ],
+   "waiting": "Мы ждём: MOQ, срок, материал/ТО/HRC, остаток позиций, скидки 10/50."
+  },
+  {
+   "name": "Xiamen Yonglianfeng",
+   "kind": "Завод",
+   "geo": "Китай, Фуцзянь, Сямэнь",
+   "contacts": "WA +86 18874204200\nylfpart.goldsupplier.com\nbin@ylfpart.com",
+   "direction": "Металл COP1838/1840",
+   "last_comm": "08.07 → email",
+   "stage": "К/П",
+   "comments": [
+    "Металл-завод COP 1838/1840 (Сямэнь).",
+    "Металл-завод COP 1838/1840 (Сямэнь). Отправлен файл A, посчитал 28/83 (железо). Дешевле Sanshan по крупному, дороже по мелочи. 08.07 ответили: форвардер в Китае есть, готовы к образцу.",
+    "КП 28/83 · готовы на образец · ждём адрес форвардера, чтобы его отправить"
+   ],
+   "waiting": "Поставщик ждёт: адрес форвардера в Китае, чтобы отправить образец — драйвер 3115 1470 00 + ударный поршень 3115 3244 00."
+  },
+  {
+   "name": "Xi'an Meiwa",
+   "kind": "Трейдер",
+   "geo": "Китай, Шэньси, Сиань",
+   "contacts": "meiwachina.en.alibaba.com",
+   "direction": "COP seal kits",
+   "last_comm": "24.06 ← alibaba",
+   "stage": "К/П",
+   "comments": [
+    "Трейдер. Только сверка цен.",
+    "Посчитал 6/10 kits.",
+    "Трейдер, не приоритет. КП 6/10 — бенчмарк."
+   ],
+   "waiting": "—"
+  },
+  {
+   "name": "Answk",
+   "kind": "Трейдер",
+   "geo": "Китай, Гуандун, Гуанчжоу",
+   "contacts": "WA +86 153288796767\nsales@answk.com\nanswk.com",
+   "direction": "COP overhaul kits",
+   "last_comm": "",
+   "stage": "Написали — ждём",
+   "comments": [
+    "Трейдер. Только сверка цен.",
+    "Написали в WhatsApp. Ответа нет.",
+    "Трейдер, не приоритет. КП нет."
+   ],
+   "waiting": "—"
+  },
+  {
+   "name": "Fujis-seal",
+   "kind": "Трейдер",
+   "geo": "Китай",
+   "contacts": "WA +86 15889753642\ncmx@fujis-seal.com\nfujis-seal.com",
+   "direction": "COP seal kits",
+   "last_comm": "",
+   "stage": "Написали — ждём",
+   "comments": [
+    "Трейдер. Только сверка цен.",
+    "Написали. Ответа нет.",
+    "Трейдер, не приоритет. КП нет."
+   ],
+   "waiting": "—"
+  }
+ ],
+ "calls": [
+  {
+   "priority": "П1",
+   "name": "Biaotuo / BPSEAL",
+   "phone": "тел. на bpseal.en.made-in-china.com\n(почта oilseal@bpseal.com)",
+   "ask": "Полное молчание с 23.06. Получили список уплотнений (28)? Считают по OEM-кроссу или нужны размеры (ID/OD/H/материал)? Льют сами PU/PTFE? ВЗЯТЬ WeChat/менеджера.",
+   "why": "Намечен главным заводом по уплотнениям (РТИ-якорь), а от него ноль ответа — нужен живой канал.",
+   "stage": "Написали — ждём (прозвон)",
+   "result": "Не дозвонился",
+   "new_contact": "",
+   "date": "06.07 · не дозвонился"
+  },
+  {
+   "priority": "П2",
+   "name": "Xingtai Huimen Seals",
+   "phone": "+86 319 7656928\nWA +86 15832965899\nfyyf1988@163.com",
+   "ask": "Молчит после отправки списка. Получили? Считают по OEM-кроссу или нужны размеры? Кто менеджер, WeChat?",
+   "why": "Завод уплотнений, второй кандидат по РТИ, полное молчание.",
+   "stage": "Написали — ждём (прозвон)",
+   "result": "",
+   "new_contact": "",
+   "date": ""
+  },
+  {
+   "priority": "П2",
+   "name": "GMD Equipment",
+   "phone": "тел. найти (Сямэнь)\ninfo@gmd-eqpt.com",
+   "ask": "Молчит, менеджера нет. Делают shank adapters / втулки / детали top-hammer сами? ВЗЯТЬ email/WeChat менеджера.",
+   "why": "Кандидат по хвостовикам, нет ни одного живого контакта — главная задача взять менеджера.",
+   "stage": "Написали — ждём (прозвон)",
+   "result": "Не дозвонился",
+   "new_contact": "info@gmd-eqpt.com (email, не через звонок)",
+   "date": "06.07 · не дозвонился"
+  },
+  {
+   "priority": "П2",
+   "name": "Prodrill (Xiamen)",
+   "phone": "+86 18959243380",
+   "ask": "Молчит с 25.06. Куют хвостовики сами (ковка/термичка)? Делают под COP1838? Кто менеджер, образец?",
+   "why": "Кандидат по хвостовикам, полное молчание.",
+   "stage": "Написали — ждём (прозвон)",
+   "result": "Не дозвонился",
+   "new_contact": "",
+   "date": "06.07 · не дозвонился"
+  },
+  {
+   "priority": "П2/П3",
+   "name": "Xiamen Bestlink",
+   "phone": "WeChat/тел +86 13600966313 (Richard Chen)",
+   "ask": "Richard добавлен в WeChat, скинули списки, но тишина. Позвони/напиши: получил ли файлы, кто считает shank/COP. Для чистой пересылки — нейтральный focused RFQ.",
+   "why": "Хвостовики COP1838/4050; канал только WeChat/тел Радмира, ответа нет.",
+   "stage": "Написали — ждём",
+   "result": "Дозвонился — прямой контакт получен",
+   "new_contact": "+86 13600966313 Richard Chen (WeChat/тел)",
+   "date": "06.07 · дозвонился"
+  },
+  {
+   "priority": "П3",
+   "name": "Pulanka Rock Tools",
+   "phone": "+86 576 82737372\n+86 18267645159 (WeChat)",
+   "ask": "08.07 ОТВЕТИЛ, попросил переслать список — переслали. Звонить ТОЛЬКО если после этого замолчит: что уверенно делают, своя ли ковка, когда цены.",
+   "why": "Делает перфораторы целиком; уже на связи — дожимать только если пропадёт.",
+   "stage": "Ответил — взял в работу",
+   "result": "Частично — новый номер не ответил, WeChat отправлен, ждём принятия",
+   "new_contact": "+86 18267645159 (WeChat отправлен)",
+   "date": "06.07 · частично"
+  },
+  {
+   "priority": "П3",
+   "name": "Dongfang Yoyik",
+   "phone": "+86 838 2206509\nWeChat +86 13547042288 (Miss Li)",
+   "ask": "Резерв по зарядному клапану. Звонить ТОЛЬКО если тема клапана оживёт / не отвечает в WeChat.",
+   "why": "Резерв по клапану, не основной металл.",
+   "stage": "Написали — ждём",
+   "result": "Дозвонился — контакт менеджера получен",
+   "new_contact": "+86 13547042288 Miss Li (WeChat)",
+   "date": "06.07 · дозвонился"
+  }
+ ]
+}

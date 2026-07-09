@@ -105,6 +105,7 @@ const MATNODES=[/*__MATNODES__*/];
 const MATSUP=[/*__MATSUP__*/];
 const MATPROC=[/*__MATPROC__*/];
 const CUSTOMS=[/*__CUSTOMS__*/][0]||null;
+const SUPCRM=[/*__SUPCRM__*/][0]||null;
 const MATTEXT=[/*__MATTEXT__*/][0]||"";
 const sb=(window.supabase)?supabase.createClient(SUPA_URL,SUPA_KEY):null;
 const $=id=>document.getElementById(id);
@@ -711,9 +712,21 @@ function supList(){
   return Object.values(m).map(e=>{e.score=e.scores.length?(e.scores.reduce((a,b)=>a+b,0)/e.scores.length).toFixed(1):"—";return e;}).sort((a,b)=>b.pps.length-a.pps.length);
 }
 let SUPCACHE=[];
+function crmStage(s){const t=(s||"").toLowerCase();const c=/одобр|контракт|образц|серия/.test(t)?"b-h":/отказ|молчани|нет /.test(t)?"b-l":"b-m";return `<span class="bdg ${c}">${esc(s||"—")}</span>`;}
+function crmHtml(){
+  if(!SUPCRM)return"";
+  const S=SUPCRM.suppliers||[],C=SUPCRM.calls||[];
+  let h=`<details open style="margin-bottom:12px"><summary style="cursor:pointer;font-weight:600">🔧 Рабочий прозвон поставщиков — наша таблица (${S.length} заводов${C.length?`, ${C.length} на прозвоне`:""})</summary>`;
+  if(C.length){h+=`<div style="margin:8px 0 4px;font-weight:600;font-size:12px">📞 Очередь прозвона</div><div style="overflow-x:auto"><table class="ot"><thead><tr><th>Приор.</th><th>Поставщик</th><th>Телефон/связь</th><th>Что спросить</th><th>Стадия</th><th>Итог</th></tr></thead><tbody>`+
+    C.map(k=>`<tr><td class="cn"><b>${esc(k.priority)}</b></td><td><b>${esc(k.name)}</b></td><td class="mut" style="max-width:180px">${esc(k.phone)}</td><td class="mut" style="max-width:260px">${esc(k.ask)}</td><td>${crmStage(k.stage)}</td><td class="mut" style="max-width:160px">${esc(k.result)}${k.date?` <span style="font-size:10px">${esc(k.date)}</span>`:""}</td></tr>`).join("")+`</tbody></table></div>`;}
+  h+=`<div style="margin:10px 0 4px;font-weight:600;font-size:12px">🏭 Контакты и стадии (${S.length})</div><div style="overflow-x:auto"><table class="ot"><thead><tr><th>Поставщик</th><th>Гео</th><th>Направление</th><th>Контакты</th><th>Стадия</th><th>Последняя комм.</th><th>Что ждём</th></tr></thead><tbody>`+
+    S.map(s=>`<tr><td><b>${esc(s.name)}</b>${s.kind?` <span class="mut" style="font-size:10px">${esc(s.kind)}</span>`:""}${s.comments&&s.comments.length?`<div class="mut" style="font-size:11px;max-width:280px">${esc(s.comments.join(" · ").slice(0,160))}</div>`:""}</td><td class="mut">${esc(s.geo)}</td><td class="mut" style="max-width:200px">${esc(s.direction)}</td><td class="mut" style="max-width:170px;white-space:pre-line">${esc(s.contacts)}</td><td>${crmStage(s.stage)}</td><td class="mut">${esc(s.last_comm)}</td><td class="mut" style="max-width:200px">${esc(s.waiting)}</td></tr>`).join("")+`</tbody></table></div>`;
+  h+=`<div class="mut" style="font-size:11px;margin-top:6px">Источник — рабочая Google-таблица снабжения (обновляется импортом). Ниже — авто-группировка ODM-заводов из общей базы.</div></details>`;
+  return h;
+}
 function supHtml(){
   const L=supList();SUPCACHE=L;
-  let h=`<div class="mut" style="margin-bottom:8px">${L.length} поставщиков (заводов). Группировка: кому слать <b>один RFQ на пакет позиций</b>. Балл — средняя скоркарта по позициям. Клик по строке — список П/П; 📨 — выгрузить RFQ-пакет (CSV).</div>`;
+  let h=crmHtml()+`<div class="mut" style="margin-bottom:8px">${L.length} поставщиков (заводов). Группировка: кому слать <b>один RFQ на пакет позиций</b>. Балл — средняя скоркарта по позициям. Клик по строке — список П/П; 📨 — выгрузить RFQ-пакет (CSV).</div>`;
   h+=`<input id="qsup" placeholder="поиск поставщика…" style="margin-bottom:8px;padding:6px 8px;width:300px;border:1px solid var(--ln);border-radius:6px">`;
   h+=`<table class="ot" id="suptab"><thead><tr><th>Поставщик (завод)</th><th>Позиций</th><th>Балл</th><th>Лучший статус</th><th>Топ-категории</th></tr></thead><tbody>`;
   L.forEach((s,i)=>{const tc=Object.entries(s.cats).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([c,n])=>`${esc(c)} (${n})`).join(", ");
