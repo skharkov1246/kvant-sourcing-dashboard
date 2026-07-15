@@ -342,7 +342,7 @@
   <div>
     <section class="card">
       <h2>Динамика по неделям <span class="subtotal">A vs B</span></h2>
-      <div class="note">Карточки RFQ по дате создания, по неделям (Пн–Вс; первая неделя — с начала периода). Отдел Гринёва (A) против «вне отдела» (B).</div>
+      <div class="note">Карточки RFQ по дате создания, по неделям (Пн–Вс) — <b>последние 4 недели</b>. Отдел Гринёва (A) против «вне отдела» (B).</div>
       <div class="wkchart" id="wkchart"></div>
       <div class="legendrow"><span><i class="sw" style="background:var(--a)"></i>Отдел Гринёва (A)</span><span><i class="sw" style="background:var(--b)"></i>Вне отдела (B)</span></div>
     </section>
@@ -505,7 +505,7 @@ const kpis=[
 document.getElementById('kpis').innerHTML=kpis.map(x=>`<div class="kpi ${x[0]}"><div class="lbl">${x[1]}</div><div class="val ${x[4]}">${x[2]}</div><div class="meta">${x[3]}</div></div>`).join('');
 
 // ---- weekly chart
-const weekTot=M.weekly;
+const weekTot=M.weekly.slice(-4);   // блок 1: показываем последние 4 недели, чтобы не уплотнять график
 const wkMax=Math.max(1,...weekTot.flatMap(w=>[w.A,w.B]));
 document.getElementById('wkchart').innerHTML=weekTot.map(w=>`<div class="wkcol"><div class="wkbars"><div class="wkbar a" data-h="${w.A/wkMax*100}"><span>${w.A}</span></div><div class="wkbar b" data-h="${w.B/wkMax*100}"><span>${w.B}</span></div></div><div class="wklbl"><b>${w.w}</b>${w.d}</div></div>`).join('');
 

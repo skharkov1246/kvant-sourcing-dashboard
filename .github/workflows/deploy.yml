@@ -9,7 +9,7 @@ on:
   repository_dispatch:
     types: [rebuild]           # внешний планировщик POST-ит /dispatches {"event_type":"rebuild"} каждые 2ч
   schedule:
-    - cron: "7 */2 * * *"      # backup каждые 2 часа в :07 UTC (GitHub может пропускать)
+    - cron: "7 */6 * * *"      # backup каждые 6 часов в :07 UTC (реже — экономия минут Actions; GitHub может пропускать)
   push:
     branches: [main]           # коммит в main → немедленная пересборка/деплой
   workflow_dispatch: {}        # ручной запуск (вкладка Actions / gh workflow run)
