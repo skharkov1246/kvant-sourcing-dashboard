@@ -25631,109 +25631,6 @@
    }
   },
   "2026-07-26": {
-   "904": {
-    "mentions": 41,
-    "self": 37,
-    "coll": 4,
-    "none": 0,
-    "medMin": 29,
-    "withinSla": 57,
-    "w30": 51,
-    "w120": 57,
-    "w1440": 78,
-    "answeredSelf": 37,
-    "handledPct": 100,
-    "presale": {
-     "mentions": 21,
-     "self": 21,
-     "coll": 0,
-     "none": 0,
-     "medMin": 70,
-     "withinSla": 52,
-     "w30": 43,
-     "w120": 52,
-     "w1440": 86,
-     "answeredSelf": 21,
-     "handledPct": 100
-    },
-    "real": {
-     "mentions": 0,
-     "self": 0,
-     "coll": 0,
-     "none": 0,
-     "medMin": null,
-     "withinSla": 0,
-     "w30": 0,
-     "w120": 0,
-     "w1440": 0,
-     "answeredSelf": 0,
-     "handledPct": 0
-    },
-    "waiting": [
-     {
-      "chat": 89800,
-      "deal": "21428",
-      "t": "Сделка: 578746 Кассета в сборе с мембр.модулями ZW500D для цеха 09 НПЗ",
-      "ageH": 705.5,
-      "ageDays": 29.4,
-      "kind": "его сделка ждёт"
-     },
-     {
-      "chat": 101312,
-      "deal": "22272",
-      "t": "Сделка: Стэк ЭДР Башнефть",
-      "ageH": 54.7,
-      "ageDays": 2.3,
-      "kind": "его сделка ждёт"
-     },
-     {
-      "chat": 101606,
-      "deal": "22284",
-      "t": "Сделка: 2136585/2 БО. УОО и ЛОС для СИ",
-      "ageH": 52.3,
-      "ageDays": 2.2,
-      "kind": "его сделка ждёт"
-     },
-     {
-      "chat": 84846,
-      "deal": "21210",
-      "t": "Сделка: 2133997/1 Мембранный модуль напорной ультрафильтра",
-      "ageH": 37.6,
-      "ageDays": 1.6,
-      "kind": "его сделка ждёт"
-     },
-     {
-      "chat": 65878,
-      "deal": "19836",
-      "t": "Сделка: ТН-260323-42 Поставка фильтрующих элементов (лот 3) (ОнОбТТУ) ",
-      "ageH": 32.7,
-      "ageDays": 1.4,
-      "kind": "его сделка ждёт"
-     },
-     {
-      "chat": 101798,
-      "deal": "22296",
-      "t": "Сделка: ТН-260721-121 Поставка мембран для котельных ЦДСВН (согл-13407",
-      "ageH": 29.0,
-      "ageDays": 1.2,
-      "kind": "его сделка ждёт"
-     },
-     {
-      "chat": 52904,
-      "deal": "19116",
-      "t": "Сделка: КП000005379 ЗИП к системе водоподготовки ESPA2 MAX, Hydranauti",
-      "ageH": 26.8,
-      "ageDays": 1.1,
-      "kind": "его сделка ждёт"
-     }
-    ],
-    "waitN": 7,
-    "waitGt1d": 7,
-    "waitGt3d": 1,
-    "waitMaxDays": 29.4,
-    "activeChats": 18,
-    "lastPostDays": 1.2
-   },
    "822": {
     "mentions": 26,
     "self": 11,
@@ -25777,7 +25674,7 @@
       "chat": 79056,
       "deal": "20616",
       "t": "Сделка: Л-Норси (бн)/02/МТБЭ.циркул_насос",
-      "ageH": 464.7,
+      "ageH": 465.5,
       "ageDays": 19.4,
       "kind": "его сделка ждёт"
      },
@@ -25785,7 +25682,7 @@
       "chat": 102358,
       "deal": "22350",
       "t": "Сделка: Закупка Блок боксов и скважинных насосов для КТК-Р",
-      "ageH": 26.8,
+      "ageH": 27.5,
       "ageDays": 1.1,
       "kind": "тег без ответа"
      }
@@ -25797,113 +25694,18 @@
     "activeChats": 7,
     "lastPostDays": 1.4
    },
-   "98": {
-    "mentions": 77,
-    "self": 40,
-    "coll": 31,
-    "none": 6,
-    "medMin": 4773,
-    "withinSla": 32,
-    "w30": 30,
-    "w120": 32,
-    "w1440": 45,
-    "answeredSelf": 40,
-    "handledPct": 92,
-    "presale": {
-     "mentions": 18,
-     "self": 10,
-     "coll": 7,
-     "none": 1,
-     "medMin": 103,
-     "withinSla": 60,
-     "w30": 50,
-     "w120": 60,
-     "w1440": 60,
-     "answeredSelf": 10,
-     "handledPct": 94
-    },
-    "real": {
-     "mentions": 0,
-     "self": 0,
-     "coll": 0,
-     "none": 0,
-     "medMin": null,
-     "withinSla": 0,
-     "w30": 0,
-     "w120": 0,
-     "w1440": 0,
-     "answeredSelf": 0,
-     "handledPct": 0
-    },
-    "waiting": [
-     {
-      "chat": 93814,
-      "deal": "21718",
-      "t": "Сделка: Л-ПНОС (бн)/02/ЗИП 2027. Бюджетирование.TARBY",
-      "ageH": 78.9,
-      "ageDays": 3.3,
-      "kind": "тег без ответа"
-     },
-     {
-      "chat": 93768,
-      "deal": "21702",
-      "t": "Сделка: Л-ПНОС (бн)/02/ЗИП 2027. Бюджетирование.Seepex",
-      "ageH": 34.7,
-      "ageDays": 1.4,
-      "kind": "тег без ответа"
-     },
-     {
-      "chat": 98784,
-      "deal": "22114",
-      "t": "Сделка: Л-Когалым (БН)/02/Поставка подшипника RENK",
-      "ageH": 32.2,
-      "ageDays": 1.3,
-      "kind": "тег без ответа"
-     },
-     {
-      "chat": 101710,
-      "deal": "22288",
-      "t": "Сделка: Л-ЭС (бн)/02/ Дополнительная потребность в ТРУ",
-      "ageH": 10.9,
-      "ageDays": 0.5,
-      "kind": "тег без ответа"
-     },
-     {
-      "chat": 101720,
-      "deal": "22292",
-      "t": "Сделка: Л-ЭС (бн)/02/УРУ_Насосы_2026",
-      "ageH": 10.9,
-      "ageDays": 0.5,
-      "kind": "тег без ответа"
-     },
-     {
-      "chat": 98668,
-      "deal": "22094",
-      "t": "Сделка: Л-ПНОС (бн)/02/лабораторные материалы в 2026",
-      "ageH": 6.2,
-      "ageDays": 0.3,
-      "kind": "тег без ответа"
-     }
-    ],
-    "waitN": 6,
-    "waitGt1d": 3,
-    "waitGt3d": 1,
-    "waitMaxDays": 3.3,
-    "activeChats": 21,
-    "lastPostDays": 8.9
-   },
    "144": {
-    "mentions": 23,
-    "self": 20,
+    "mentions": 26,
+    "self": 21,
     "coll": 3,
-    "none": 0,
+    "none": 2,
     "medMin": 155,
-    "withinSla": 45,
-    "w30": 25,
-    "w120": 45,
-    "w1440": 70,
-    "answeredSelf": 20,
-    "handledPct": 100,
+    "withinSla": 43,
+    "w30": 24,
+    "w120": 43,
+    "w1440": 71,
+    "answeredSelf": 21,
+    "handledPct": 92,
     "presale": {
      "mentions": 5,
      "self": 4,
@@ -25935,170 +25737,20 @@
     "waitGt1d": 0,
     "waitGt3d": 0,
     "waitMaxDays": 0,
-    "activeChats": 16,
+    "activeChats": 18,
     "lastPostDays": 1.2
    },
-   "56": {
-    "mentions": 453,
-    "self": 375,
-    "coll": 20,
-    "none": 58,
-    "medMin": 28,
-    "withinSla": 70,
-    "w30": 51,
-    "w120": 70,
-    "w1440": 89,
-    "answeredSelf": 375,
-    "handledPct": 87,
-    "presale": {
-     "mentions": 78,
-     "self": 42,
-     "coll": 2,
-     "none": 34,
-     "medMin": 54,
-     "withinSla": 60,
-     "w30": 43,
-     "w120": 60,
-     "w1440": 79,
-     "answeredSelf": 42,
-     "handledPct": 56
-    },
-    "real": {
-     "mentions": 0,
-     "self": 0,
-     "coll": 0,
-     "none": 0,
-     "medMin": null,
-     "withinSla": 0,
-     "w30": 0,
-     "w120": 0,
-     "w1440": 0,
-     "answeredSelf": 0,
-     "handledPct": 0
-    },
-    "waiting": [
-     {
-      "chat": 72988,
-      "deal": "20210",
-      "t": "Сделка: НН-787 Запрос расценки от 24.04.2026 на двигатели для ЗФ",
-      "ageH": 705.5,
-      "ageDays": 29.4,
-      "kind": "тег без ответа"
-     },
-     {
-      "chat": 101268,
-      "deal": "22268",
-      "t": "Сделка: НН-865  Закупка для ЗФ (06)",
-      "ageH": 31.8,
-      "ageDays": 1.3,
-      "kind": "тег без ответа"
-     }
-    ],
-    "waitN": 2,
-    "waitGt1d": 2,
-    "waitGt3d": 1,
-    "waitMaxDays": 29.4,
-    "activeChats": 289,
-    "lastPostDays": 1.4
-   },
-   "1644": {
-    "mentions": 53,
-    "self": 41,
-    "coll": 9,
-    "none": 3,
-    "medMin": 1704,
-    "withinSla": 22,
-    "w30": 12,
-    "w120": 22,
-    "w1440": 41,
-    "answeredSelf": 41,
-    "handledPct": 94,
-    "presale": {
-     "mentions": 33,
-     "self": 23,
-     "coll": 7,
-     "none": 3,
-     "medMin": 1331,
-     "withinSla": 26,
-     "w30": 13,
-     "w120": 26,
-     "w1440": 52,
-     "answeredSelf": 23,
-     "handledPct": 91
-    },
-    "real": {
-     "mentions": 1,
-     "self": 1,
-     "coll": 0,
-     "none": 0,
-     "medMin": 4,
-     "withinSla": 100,
-     "w30": 100,
-     "w120": 100,
-     "w1440": 100,
-     "answeredSelf": 1,
-     "handledPct": 100
-    },
-    "waiting": [
-     {
-      "chat": 98502,
-      "deal": "22080",
-      "t": "Сделка: 983980 ОЗСН(К) Комплект теплоизоляции верхней и боковой сборки",
-      "ageH": 118.0,
-      "ageDays": 4.9,
-      "kind": "тег без ответа"
-     },
-     {
-      "chat": 100786,
-      "deal": "22232",
-      "t": "Сделка: 5557334 Поставка капитальных запасных частей для газовой турби",
-      "ageH": 54.3,
-      "ageDays": 2.3,
-      "kind": "тег без ответа"
-     },
-     {
-      "chat": 82208,
-      "deal": "20910",
-      "t": "Сделка: ЗП6052346 Запасные части General Electric для нужд филиалов ПА",
-      "ageH": 50.6,
-      "ageDays": 2.1,
-      "kind": "его сделка ждёт"
-     },
-     {
-      "chat": 100826,
-      "deal": "22240",
-      "t": "Сделка: ЗП6071593 Поставка Комплекта горелок 372308-3500 Solar Turbine",
-      "ageH": 50.2,
-      "ageDays": 2.1,
-      "kind": "его сделка ждёт"
-     },
-     {
-      "chat": 98162,
-      "deal": "22052",
-      "t": "Сделка: НЗЛ Воспламенитель TESI",
-      "ageH": 34.6,
-      "ageDays": 1.4,
-      "kind": "его сделка ждёт"
-     }
-    ],
-    "waitN": 5,
-    "waitGt1d": 5,
-    "waitGt3d": 1,
-    "waitMaxDays": 4.9,
-    "activeChats": 17,
-    "lastPostDays": 2.0
-   },
    "72": {
-    "mentions": 110,
-    "self": 86,
-    "coll": 17,
+    "mentions": 108,
+    "self": 87,
+    "coll": 14,
     "none": 7,
     "medMin": 29,
     "withinSla": 69,
     "w30": 51,
     "w120": 69,
     "w1440": 93,
-    "answeredSelf": 86,
+    "answeredSelf": 87,
     "handledPct": 94,
     "presale": {
      "mentions": 46,
@@ -26131,7 +25783,7 @@
       "chat": 95530,
       "deal": "21822",
       "t": "Сделка: Запрос ТКП на поставку Термопар TC Direct (или аналоги) (запр6",
-      "ageH": 263.4,
+      "ageH": 264.1,
       "ageDays": 11.0,
       "kind": "тег без ответа"
      },
@@ -26139,15 +25791,15 @@
       "chat": 96266,
       "deal": "21922",
       "t": "Сделка: РН60701176 Поставка запасных частей для полного капитального р",
-      "ageH": 197.8,
-      "ageDays": 8.2,
+      "ageH": 198.5,
+      "ageDays": 8.3,
       "kind": "тег без ответа"
      },
      {
       "chat": 80802,
       "deal": "20778",
       "t": "Сделка: КП000006507 Оборудование SEKO и ЗИП",
-      "ageH": 77.1,
+      "ageH": 77.9,
       "ageDays": 3.2,
       "kind": "тег без ответа"
      },
@@ -26155,7 +25807,7 @@
       "chat": 96984,
       "deal": "21976",
       "t": "Сделка: RFQ_EA200001291_IRM запчасти Baker Hughes",
-      "ageH": 52.6,
+      "ageH": 53.3,
       "ageDays": 2.2,
       "kind": "его сделка ждёт"
      },
@@ -26163,7 +25815,7 @@
       "chat": 44920,
       "deal": "18646",
       "t": "Сделка: Нафтан Drager Газоанализаторы (8 лотов)",
-      "ageH": 51.9,
+      "ageH": 52.6,
       "ageDays": 2.2,
       "kind": "тег без ответа"
      },
@@ -26171,7 +25823,7 @@
       "chat": 98874,
       "deal": "22124",
       "t": "Сделка: RFQ_ЕА200001400_крепежные детали Baker Hughes",
-      "ageH": 35.0,
+      "ageH": 35.7,
       "ageDays": 1.5,
       "kind": "его сделка ждёт"
      },
@@ -26179,15 +25831,15 @@
       "chat": 80856,
       "deal": "20786",
       "t": "Сделка: 1199154 Отбор поставщиков запчастей к установка приготовления ",
-      "ageH": 32.2,
-      "ageDays": 1.3,
+      "ageH": 32.9,
+      "ageDays": 1.4,
       "kind": "его сделка ждёт"
      },
      {
       "chat": 99672,
       "deal": "22166",
       "t": "Сделка: RFQ_ЕА200001353_ISM ЗИПы Baker Hughes",
-      "ageH": 21.0,
+      "ageH": 21.8,
       "ageDays": 0.9,
       "kind": "тег без ответа"
      },
@@ -26195,7 +25847,7 @@
       "chat": 99670,
       "deal": "22164",
       "t": "Сделка: RFQ_ЕА2000011289_IRV ЗИПы Baker Hughes",
-      "ageH": 21.0,
+      "ageH": 21.8,
       "ageDays": 0.9,
       "kind": "тег без ответа"
      }
@@ -26207,30 +25859,109 @@
     "activeChats": 37,
     "lastPostDays": 1.2
    },
-   "204": {
-    "mentions": 21,
-    "self": 19,
-    "coll": 1,
-    "none": 1,
-    "medMin": 22,
-    "withinSla": 68,
-    "w30": 53,
-    "w120": 68,
-    "w1440": 74,
-    "answeredSelf": 19,
+   "1644": {
+    "mentions": 41,
+    "self": 32,
+    "coll": 7,
+    "none": 2,
+    "medMin": 1476,
+    "withinSla": 28,
+    "w30": 16,
+    "w120": 28,
+    "w1440": 50,
+    "answeredSelf": 32,
     "handledPct": 95,
+    "presale": {
+     "mentions": 26,
+     "self": 19,
+     "coll": 5,
+     "none": 2,
+     "medMin": 1205,
+     "withinSla": 32,
+     "w30": 16,
+     "w120": 32,
+     "w1440": 63,
+     "answeredSelf": 19,
+     "handledPct": 92
+    },
+    "real": {
+     "mentions": 1,
+     "self": 1,
+     "coll": 0,
+     "none": 0,
+     "medMin": 4,
+     "withinSla": 100,
+     "w30": 100,
+     "w120": 100,
+     "w1440": 100,
+     "answeredSelf": 1,
+     "handledPct": 100
+    },
+    "waiting": [
+     {
+      "chat": 100786,
+      "deal": "22232",
+      "t": "Сделка: 5557334 Поставка капитальных запасных частей для газовой турби",
+      "ageH": 55.0,
+      "ageDays": 2.3,
+      "kind": "тег без ответа"
+     },
+     {
+      "chat": 82208,
+      "deal": "20910",
+      "t": "Сделка: ЗП6052346 Запасные части General Electric для нужд филиалов ПА",
+      "ageH": 51.3,
+      "ageDays": 2.1,
+      "kind": "его сделка ждёт"
+     },
+     {
+      "chat": 100826,
+      "deal": "22240",
+      "t": "Сделка: ЗП6071593 Поставка Комплекта горелок 372308-3500 Solar Turbine",
+      "ageH": 50.9,
+      "ageDays": 2.1,
+      "kind": "его сделка ждёт"
+     },
+     {
+      "chat": 98162,
+      "deal": "22052",
+      "t": "Сделка: НЗЛ Воспламенитель TESI",
+      "ageH": 35.4,
+      "ageDays": 1.5,
+      "kind": "его сделка ждёт"
+     }
+    ],
+    "waitN": 4,
+    "waitGt1d": 4,
+    "waitGt3d": 0,
+    "waitMaxDays": 2.3,
+    "activeChats": 15,
+    "lastPostDays": 2.0
+   },
+   "650": {
+    "mentions": 16,
+    "self": 13,
+    "coll": 3,
+    "none": 0,
+    "medMin": 77,
+    "withinSla": 62,
+    "w30": 46,
+    "w120": 62,
+    "w1440": 69,
+    "answeredSelf": 13,
+    "handledPct": 100,
     "presale": {
      "mentions": 13,
      "self": 12,
-     "coll": 0,
-     "none": 1,
-     "medMin": 22,
-     "withinSla": 75,
-     "w30": 58,
-     "w120": 75,
-     "w1440": 75,
+     "coll": 1,
+     "none": 0,
+     "medMin": 84,
+     "withinSla": 58,
+     "w30": 42,
+     "w120": 58,
+     "w1440": 67,
      "answeredSelf": 12,
-     "handledPct": 92
+     "handledPct": 100
     },
     "real": {
      "mentions": 0,
@@ -26247,73 +25978,27 @@
     },
     "waiting": [
      {
-      "chat": 100344,
-      "deal": "22214",
-      "t": "Сделка: Л-ПАО ЛУКОЙЛ (б/н)/03/Запрос на поставку арамидного троса",
-      "ageH": 55.5,
-      "ageDays": 2.3,
+      "chat": 79060,
+      "deal": "20618",
+      "t": "Сделка: Л-ПНОС (бн)/03/LA Turbines.Ремонт турбодетандера.",
+      "ageH": 52.8,
+      "ageDays": 2.2,
       "kind": "его сделка ждёт"
      },
      {
-      "chat": 97960,
-      "deal": "22042",
-      "t": "Сделка: COM09072600099 910-ОД-2026-РИ(ЭТП) Поставка запасных частей Go",
-      "ageH": 35.1,
-      "ageDays": 1.5,
-      "kind": "тег без ответа"
+      "chat": 98784,
+      "deal": "22114",
+      "t": "Сделка: Л-Когалым (БН)/02/Поставка подшипника RENK",
+      "ageH": 33.0,
+      "ageDays": 1.4,
+      "kind": "его сделка ждёт"
      }
     ],
     "waitN": 2,
     "waitGt1d": 2,
     "waitGt3d": 0,
-    "waitMaxDays": 2.3,
-    "activeChats": 5,
-    "lastPostDays": 1.5
-   },
-   "1286": {
-    "mentions": 15,
-    "self": 11,
-    "coll": 4,
-    "none": 0,
-    "medMin": 20,
-    "withinSla": 73,
-    "w30": 55,
-    "w120": 73,
-    "w1440": 91,
-    "answeredSelf": 11,
-    "handledPct": 100,
-    "presale": {
-     "mentions": 2,
-     "self": 2,
-     "coll": 0,
-     "none": 0,
-     "medMin": 10102,
-     "withinSla": 50,
-     "w30": 50,
-     "w120": 50,
-     "w1440": 50,
-     "answeredSelf": 2,
-     "handledPct": 100
-    },
-    "real": {
-     "mentions": 0,
-     "self": 0,
-     "coll": 0,
-     "none": 0,
-     "medMin": null,
-     "withinSla": 0,
-     "w30": 0,
-     "w120": 0,
-     "w1440": 0,
-     "answeredSelf": 0,
-     "handledPct": 0
-    },
-    "waiting": [],
-    "waitN": 0,
-    "waitGt1d": 0,
-    "waitGt3d": 0,
-    "waitMaxDays": 0,
-    "activeChats": 13,
+    "waitMaxDays": 2.2,
+    "activeChats": 6,
     "lastPostDays": 1.1
    },
    "802": {
@@ -26359,7 +26044,7 @@
       "chat": 45746,
       "deal": "18714",
       "t": "Сделка: 2123241/1 Насос IMO Pump + торцевое уплотнение",
-      "ageH": 52.8,
+      "ageH": 53.5,
       "ageDays": 2.2,
       "kind": "его сделка ждёт"
      },
@@ -26367,7 +26052,7 @@
       "chat": 75098,
       "deal": "20362",
       "t": "Сделка: РН60500055 Насос центробежный (по заявке 3469)",
-      "ageH": 31.0,
+      "ageH": 31.8,
       "ageDays": 1.3,
       "kind": "его сделка ждёт"
      },
@@ -26375,7 +26060,7 @@
       "chat": 102358,
       "deal": "22350",
       "t": "Сделка: Закупка Блок боксов и скважинных насосов для КТК-Р",
-      "ageH": 26.8,
+      "ageH": 27.5,
       "ageDays": 1.1,
       "kind": "тег без ответа"
      }
@@ -26385,202 +26070,20 @@
     "waitGt3d": 0,
     "waitMaxDays": 2.2,
     "activeChats": 10,
-    "lastPostDays": 1.1
-   },
-   "650": {
-    "mentions": 16,
-    "self": 13,
-    "coll": 3,
-    "none": 0,
-    "medMin": 77,
-    "withinSla": 62,
-    "w30": 46,
-    "w120": 62,
-    "w1440": 69,
-    "answeredSelf": 13,
-    "handledPct": 100,
-    "presale": {
-     "mentions": 13,
-     "self": 12,
-     "coll": 1,
-     "none": 0,
-     "medMin": 84,
-     "withinSla": 58,
-     "w30": 42,
-     "w120": 58,
-     "w1440": 67,
-     "answeredSelf": 12,
-     "handledPct": 100
-    },
-    "real": {
-     "mentions": 0,
-     "self": 0,
-     "coll": 0,
-     "none": 0,
-     "medMin": null,
-     "withinSla": 0,
-     "w30": 0,
-     "w120": 0,
-     "w1440": 0,
-     "answeredSelf": 0,
-     "handledPct": 0
-    },
-    "waiting": [
-     {
-      "chat": 79060,
-      "deal": "20618",
-      "t": "Сделка: Л-ПНОС (бн)/03/LA Turbines.Ремонт турбодетандера.",
-      "ageH": 52.1,
-      "ageDays": 2.2,
-      "kind": "его сделка ждёт"
-     },
-     {
-      "chat": 98784,
-      "deal": "22114",
-      "t": "Сделка: Л-Когалым (БН)/02/Поставка подшипника RENK",
-      "ageH": 32.2,
-      "ageDays": 1.3,
-      "kind": "его сделка ждёт"
-     }
-    ],
-    "waitN": 2,
-    "waitGt1d": 2,
-    "waitGt3d": 0,
-    "waitMaxDays": 2.2,
-    "activeChats": 6,
-    "lastPostDays": 1.1
-   },
-   "420": {
-    "mentions": 89,
-    "self": 78,
-    "coll": 4,
-    "none": 7,
-    "medMin": 641,
-    "withinSla": 41,
-    "w30": 29,
-    "w120": 41,
-    "w1440": 58,
-    "answeredSelf": 78,
-    "handledPct": 92,
-    "presale": {
-     "mentions": 8,
-     "self": 7,
-     "coll": 1,
-     "none": 0,
-     "medMin": 134,
-     "withinSla": 43,
-     "w30": 43,
-     "w120": 43,
-     "w1440": 57,
-     "answeredSelf": 7,
-     "handledPct": 100
-    },
-    "real": {
-     "mentions": 0,
-     "self": 0,
-     "coll": 0,
-     "none": 0,
-     "medMin": null,
-     "withinSla": 0,
-     "w30": 0,
-     "w120": 0,
-     "w1440": 0,
-     "answeredSelf": 0,
-     "handledPct": 0
-    },
-    "waiting": [
-     {
-      "chat": 73320,
-      "deal": "20232",
-      "t": "Сделка: Л-Став (E2006N)/01/Теплообменник охлаждения пирогаза пропилено",
-      "ageH": 535.2,
-      "ageDays": 22.3,
-      "kind": "тег без ответа"
-     },
-     {
-      "chat": 95996,
-      "deal": "21874",
-      "t": "Сделка: РН60700725 Опрос рынка: Комплект ЗПЧ насосов общепромышленных",
-      "ageH": 438.6,
-      "ageDays": 18.3,
-      "kind": "его сделка ждёт"
-     },
-     {
-      "chat": 97618,
-      "deal": "22016",
-      "t": "Сделка: Л-ЭС (NA)/02/Cummins",
-      "ageH": 363.8,
-      "ageDays": 15.2,
-      "kind": "его сделка ждёт"
-     },
-     {
-      "chat": 68972,
-      "deal": "19990",
-      "t": "Сделка: Л-Став (бн)/02/конусы ЗИА пиролизных частей",
-      "ageH": 221.2,
-      "ageDays": 9.2,
-      "kind": "тег без ответа"
-     },
-     {
-      "chat": 99114,
-      "deal": "22144",
-      "t": "Сделка: Л-ЭС (NA)/02/Cummins запрос 2",
-      "ageH": 56.1,
-      "ageDays": 2.3,
-      "kind": "его сделка ждёт"
-     },
-     {
-      "chat": 101564,
-      "deal": "22282",
-      "t": "Сделка: Л-ЭС (NA)/01/ASCO",
-      "ageH": 30.4,
-      "ageDays": 1.3,
-      "kind": "его сделка ждёт"
-     },
-     {
-      "chat": 28344,
-      "deal": "16702",
-      "t": "Сделка: Л-Став (4-2025-ОКО)/01/KOBE SEISA Gear",
-      "ageH": 30.2,
-      "ageDays": 1.3,
-      "kind": "тег без ответа"
-     },
-     {
-      "chat": 14862,
-      "deal": "11664",
-      "t": "Сделка: Л-Став (1-2025-07-ОКО)/02/VARIAX вал",
-      "ageH": 26.7,
-      "ageDays": 1.1,
-      "kind": "тег без ответа"
-     },
-     {
-      "chat": 96776,
-      "deal": "21966",
-      "t": "Сделка: Л-Став (K5608C)/01/AERZENER",
-      "ageH": 3.9,
-      "ageDays": 0.2,
-      "kind": "тег без ответа"
-     }
-    ],
-    "waitN": 9,
-    "waitGt1d": 8,
-    "waitGt3d": 4,
-    "waitMaxDays": 22.3,
-    "activeChats": 22,
     "lastPostDays": 1.2
    },
    "17": {
-    "mentions": 25,
-    "self": 12,
+    "mentions": 33,
+    "self": 19,
     "coll": 12,
-    "none": 1,
-    "medMin": 5040,
-    "withinSla": 33,
-    "w30": 25,
-    "w120": 33,
-    "w1440": 42,
-    "answeredSelf": 12,
-    "handledPct": 96,
+    "none": 2,
+    "medMin": 2021,
+    "withinSla": 26,
+    "w30": 21,
+    "w120": 26,
+    "w1440": 32,
+    "answeredSelf": 19,
+    "handledPct": 94,
     "presale": {
      "mentions": 5,
      "self": 2,
@@ -26612,169 +26115,42 @@
       "chat": 100884,
       "deal": "22244",
       "t": "Сделка: 581376 Пружина ACB1173A конвейер",
-      "ageH": 31.7,
-      "ageDays": 1.3,
+      "ageH": 32.5,
+      "ageDays": 1.4,
       "kind": "тег без ответа"
      }
     ],
     "waitN": 1,
     "waitGt1d": 1,
     "waitGt3d": 0,
-    "waitMaxDays": 1.3,
-    "activeChats": 11,
+    "waitMaxDays": 1.4,
+    "activeChats": 12,
     "lastPostDays": 5.2
    },
-   "124": {
-    "mentions": 120,
-    "self": 89,
-    "coll": 16,
-    "none": 15,
-    "medMin": 48,
-    "withinSla": 62,
-    "w30": 37,
-    "w120": 62,
-    "w1440": 73,
-    "answeredSelf": 89,
-    "handledPct": 88,
-    "presale": {
-     "mentions": 74,
-     "self": 49,
-     "coll": 12,
-     "none": 13,
-     "medMin": 48,
-     "withinSla": 59,
-     "w30": 31,
-     "w120": 59,
-     "w1440": 69,
-     "answeredSelf": 49,
-     "handledPct": 82
-    },
-    "real": {
-     "mentions": 0,
-     "self": 0,
-     "coll": 0,
-     "none": 0,
-     "medMin": null,
-     "withinSla": 0,
-     "w30": 0,
-     "w120": 0,
-     "w1440": 0,
-     "answeredSelf": 0,
-     "handledPct": 0
-    },
-    "waiting": [
-     {
-      "chat": 92946,
-      "deal": "21656",
-      "t": "Сделка: 2133663/2 Клапан Compresseurs a Membrane Corblin",
-      "ageH": 442.8,
-      "ageDays": 18.5,
-      "kind": "его сделка ждёт"
-     },
-     {
-      "chat": 97218,
-      "deal": "21990",
-      "t": "Сделка: 2135654/3 Электрод зажигания Tesi E21RCAB OD 17х30",
-      "ageH": 248.3,
-      "ageDays": 10.3,
-      "kind": "тег без ответа"
-     },
-     {
-      "chat": 96566,
-      "deal": "21944",
-      "t": "Сделка: 4512486 Запрос коммерческих предложений на поставку набор ЗИП ",
-      "ageH": 74.2,
-      "ageDays": 3.1,
-      "kind": "тег без ответа"
-     },
-     {
-      "chat": 94100,
-      "deal": "21730",
-      "t": "Сделка: AUMA - 2135998/2 Электроприводы АГХК",
-      "ageH": 59.1,
-      "ageDays": 2.5,
-      "kind": "тег без ответа"
-     },
-     {
-      "chat": 92166,
-      "deal": "21636",
-      "t": "Сделка: 2135666/2 ЗИП SIAD",
-      "ageH": 30.8,
-      "ageDays": 1.3,
-      "kind": "его сделка ждёт"
-     },
-     {
-      "chat": 97702,
-      "deal": "22022",
-      "t": "Сделка: COM08072600014 790-ОД-2026-РИ(ЭТП) -Поставка запасных частей д",
-      "ageH": 28.0,
-      "ageDays": 1.2,
-      "kind": "его сделка ждёт"
-     },
-     {
-      "chat": 101688,
-      "deal": "22286",
-      "t": "Сделка: 2137581/1 Ремонт НКО ДГП-2",
-      "ageH": 27.4,
-      "ageDays": 1.1,
-      "kind": "тег без ответа"
-     },
-     {
-      "chat": 74850,
-      "deal": "20342",
-      "t": "Сделка: 2131758/5 ЗИП Johnson Controls",
-      "ageH": 26.6,
-      "ageDays": 1.1,
-      "kind": "тег без ответа"
-     },
-     {
-      "chat": 96704,
-      "deal": "21958",
-      "t": "Сделка: 2136640/1 ЗИП по чертежам",
-      "ageH": 10.0,
-      "ageDays": 0.4,
-      "kind": "тег без ответа"
-     },
-     {
-      "chat": 101718,
-      "deal": "22290",
-      "t": "Сделка: 2137515/1 Закупка асинронных электродвигателей",
-      "ageH": 9.0,
-      "ageDays": 0.4,
-      "kind": "тег без ответа"
-     }
-    ],
-    "waitN": 10,
-    "waitGt1d": 8,
-    "waitGt3d": 3,
-    "waitMaxDays": 18.5,
-    "activeChats": 30,
-    "lastPostDays": 1.2
-   },
    "62": {
-    "mentions": 221,
-    "self": 60,
-    "coll": 135,
-    "none": 26,
-    "medMin": 81,
+    "mentions": 217,
+    "self": 58,
+    "coll": 134,
+    "none": 25,
+    "medMin": 80,
     "withinSla": 62,
     "w30": 28,
     "w120": 62,
-    "w1440": 85,
-    "answeredSelf": 60,
+    "w1440": 84,
+    "answeredSelf": 58,
     "handledPct": 88,
     "presale": {
-     "mentions": 40,
+     "mentions": 37,
      "self": 10,
-     "coll": 26,
-     "none": 4,
+     "coll": 24,
+     "none": 3,
      "medMin": 131,
      "withinSla": 50,
      "w30": 20,
      "w120": 50,
      "w1440": 90,
      "answeredSelf": 10,
-     "handledPct": 90
+     "handledPct": 92
     },
     "real": {
      "mentions": 0,
@@ -26794,7 +26170,7 @@
       "chat": 97010,
       "deal": "21980",
       "t": "Сделка: Тест СА-Ю 07.07.",
-      "ageH": 388.3,
+      "ageH": 389.0,
       "ageDays": 16.2,
       "kind": "тег без ответа"
      },
@@ -26802,32 +26178,616 @@
       "chat": 96266,
       "deal": "21922",
       "t": "Сделка: РН60701176 Поставка запасных частей для полного капитального р",
-      "ageH": 197.8,
-      "ageDays": 8.2,
-      "kind": "тег без ответа"
-     },
-     {
-      "chat": 101312,
-      "deal": "22272",
-      "t": "Сделка: Стэк ЭДР Башнефть",
-      "ageH": 54.7,
-      "ageDays": 2.3,
+      "ageH": 198.5,
+      "ageDays": 8.3,
       "kind": "тег без ответа"
      },
      {
       "chat": 93814,
       "deal": "21718",
       "t": "Сделка: Л-ПНОС (бн)/02/ЗИП 2027. Бюджетирование.TARBY",
-      "ageH": 30.9,
+      "ageH": 31.7,
       "ageDays": 1.3,
       "kind": "тег без ответа"
      }
     ],
-    "waitN": 4,
-    "waitGt1d": 4,
+    "waitN": 3,
+    "waitGt1d": 3,
     "waitGt3d": 2,
     "waitMaxDays": 16.2,
-    "activeChats": 70,
+    "activeChats": 69,
+    "lastPostDays": 1.2
+   },
+   "124": {
+    "mentions": 107,
+    "self": 79,
+    "coll": 14,
+    "none": 14,
+    "medMin": 53,
+    "withinSla": 58,
+    "w30": 39,
+    "w120": 58,
+    "w1440": 71,
+    "answeredSelf": 79,
+    "handledPct": 87,
+    "presale": {
+     "mentions": 61,
+     "self": 39,
+     "coll": 10,
+     "none": 12,
+     "medMin": 106,
+     "withinSla": 51,
+     "w30": 33,
+     "w120": 51,
+     "w1440": 64,
+     "answeredSelf": 39,
+     "handledPct": 80
+    },
+    "real": {
+     "mentions": 0,
+     "self": 0,
+     "coll": 0,
+     "none": 0,
+     "medMin": null,
+     "withinSla": 0,
+     "w30": 0,
+     "w120": 0,
+     "w1440": 0,
+     "answeredSelf": 0,
+     "handledPct": 0
+    },
+    "waiting": [
+     {
+      "chat": 92946,
+      "deal": "21656",
+      "t": "Сделка: 2133663/2 Клапан Compresseurs a Membrane Corblin",
+      "ageH": 443.6,
+      "ageDays": 18.5,
+      "kind": "его сделка ждёт"
+     },
+     {
+      "chat": 97218,
+      "deal": "21990",
+      "t": "Сделка: 2135654/3 Электрод зажигания Tesi E21RCAB OD 17х30",
+      "ageH": 249.1,
+      "ageDays": 10.4,
+      "kind": "тег без ответа"
+     },
+     {
+      "chat": 94100,
+      "deal": "21730",
+      "t": "Сделка: AUMA - 2135998/2 Электроприводы АГХК",
+      "ageH": 59.8,
+      "ageDays": 2.5,
+      "kind": "тег без ответа"
+     },
+     {
+      "chat": 92166,
+      "deal": "21636",
+      "t": "Сделка: 2135666/2 ЗИП SIAD",
+      "ageH": 31.6,
+      "ageDays": 1.3,
+      "kind": "его сделка ждёт"
+     },
+     {
+      "chat": 97702,
+      "deal": "22022",
+      "t": "Сделка: COM08072600014 790-ОД-2026-РИ(ЭТП) -Поставка запасных частей д",
+      "ageH": 28.8,
+      "ageDays": 1.2,
+      "kind": "его сделка ждёт"
+     },
+     {
+      "chat": 101688,
+      "deal": "22286",
+      "t": "Сделка: 2137581/1 Ремонт НКО ДГП-2",
+      "ageH": 28.2,
+      "ageDays": 1.2,
+      "kind": "тег без ответа"
+     },
+     {
+      "chat": 74850,
+      "deal": "20342",
+      "t": "Сделка: 2131758/5 ЗИП Johnson Controls",
+      "ageH": 27.3,
+      "ageDays": 1.1,
+      "kind": "тег без ответа"
+     },
+     {
+      "chat": 96704,
+      "deal": "21958",
+      "t": "Сделка: 2136640/1 ЗИП по чертежам",
+      "ageH": 10.8,
+      "ageDays": 0.4,
+      "kind": "тег без ответа"
+     },
+     {
+      "chat": 101718,
+      "deal": "22290",
+      "t": "Сделка: 2137515/1 Закупка асинронных электродвигателей",
+      "ageH": 9.8,
+      "ageDays": 0.4,
+      "kind": "тег без ответа"
+     }
+    ],
+    "waitN": 9,
+    "waitGt1d": 7,
+    "waitGt3d": 2,
+    "waitMaxDays": 18.5,
+    "activeChats": 29,
+    "lastPostDays": 1.2
+   },
+   "56": {
+    "mentions": 453,
+    "self": 375,
+    "coll": 20,
+    "none": 58,
+    "medMin": 28,
+    "withinSla": 70,
+    "w30": 51,
+    "w120": 70,
+    "w1440": 89,
+    "answeredSelf": 375,
+    "handledPct": 87,
+    "presale": {
+     "mentions": 78,
+     "self": 42,
+     "coll": 2,
+     "none": 34,
+     "medMin": 54,
+     "withinSla": 60,
+     "w30": 43,
+     "w120": 60,
+     "w1440": 79,
+     "answeredSelf": 42,
+     "handledPct": 56
+    },
+    "real": {
+     "mentions": 0,
+     "self": 0,
+     "coll": 0,
+     "none": 0,
+     "medMin": null,
+     "withinSla": 0,
+     "w30": 0,
+     "w120": 0,
+     "w1440": 0,
+     "answeredSelf": 0,
+     "handledPct": 0
+    },
+    "waiting": [
+     {
+      "chat": 72988,
+      "deal": "20210",
+      "t": "Сделка: НН-787 Запрос расценки от 24.04.2026 на двигатели для ЗФ",
+      "ageH": 706.3,
+      "ageDays": 29.4,
+      "kind": "тег без ответа"
+     },
+     {
+      "chat": 101268,
+      "deal": "22268",
+      "t": "Сделка: НН-865  Закупка для ЗФ (06)",
+      "ageH": 32.6,
+      "ageDays": 1.4,
+      "kind": "тег без ответа"
+     }
+    ],
+    "waitN": 2,
+    "waitGt1d": 2,
+    "waitGt3d": 1,
+    "waitMaxDays": 29.4,
+    "activeChats": 292,
+    "lastPostDays": 1.4
+   },
+   "1286": {
+    "mentions": 15,
+    "self": 11,
+    "coll": 4,
+    "none": 0,
+    "medMin": 20,
+    "withinSla": 73,
+    "w30": 55,
+    "w120": 73,
+    "w1440": 91,
+    "answeredSelf": 11,
+    "handledPct": 100,
+    "presale": {
+     "mentions": 2,
+     "self": 2,
+     "coll": 0,
+     "none": 0,
+     "medMin": 10102,
+     "withinSla": 50,
+     "w30": 50,
+     "w120": 50,
+     "w1440": 50,
+     "answeredSelf": 2,
+     "handledPct": 100
+    },
+    "real": {
+     "mentions": 0,
+     "self": 0,
+     "coll": 0,
+     "none": 0,
+     "medMin": null,
+     "withinSla": 0,
+     "w30": 0,
+     "w120": 0,
+     "w1440": 0,
+     "answeredSelf": 0,
+     "handledPct": 0
+    },
+    "waiting": [],
+    "waitN": 0,
+    "waitGt1d": 0,
+    "waitGt3d": 0,
+    "waitMaxDays": 0,
+    "activeChats": 12,
+    "lastPostDays": 1.1
+   },
+   "904": {
+    "mentions": 41,
+    "self": 37,
+    "coll": 4,
+    "none": 0,
+    "medMin": 29,
+    "withinSla": 57,
+    "w30": 51,
+    "w120": 57,
+    "w1440": 78,
+    "answeredSelf": 37,
+    "handledPct": 100,
+    "presale": {
+     "mentions": 21,
+     "self": 21,
+     "coll": 0,
+     "none": 0,
+     "medMin": 70,
+     "withinSla": 52,
+     "w30": 43,
+     "w120": 52,
+     "w1440": 86,
+     "answeredSelf": 21,
+     "handledPct": 100
+    },
+    "real": {
+     "mentions": 0,
+     "self": 0,
+     "coll": 0,
+     "none": 0,
+     "medMin": null,
+     "withinSla": 0,
+     "w30": 0,
+     "w120": 0,
+     "w1440": 0,
+     "answeredSelf": 0,
+     "handledPct": 0
+    },
+    "waiting": [
+     {
+      "chat": 89800,
+      "deal": "21428",
+      "t": "Сделка: 578746 Кассета в сборе с мембр.модулями ZW500D для цеха 09 НПЗ",
+      "ageH": 706.2,
+      "ageDays": 29.4,
+      "kind": "его сделка ждёт"
+     },
+     {
+      "chat": 101606,
+      "deal": "22284",
+      "t": "Сделка: 2136585/2 БО. УОО и ЛОС для СИ",
+      "ageH": 53.0,
+      "ageDays": 2.2,
+      "kind": "его сделка ждёт"
+     },
+     {
+      "chat": 84846,
+      "deal": "21210",
+      "t": "Сделка: 2133997/1 Мембранный модуль напорной ультрафильтра",
+      "ageH": 38.3,
+      "ageDays": 1.6,
+      "kind": "его сделка ждёт"
+     },
+     {
+      "chat": 65878,
+      "deal": "19836",
+      "t": "Сделка: ТН-260323-42 Поставка фильтрующих элементов (лот 3) (ОнОбТТУ) ",
+      "ageH": 33.4,
+      "ageDays": 1.4,
+      "kind": "его сделка ждёт"
+     },
+     {
+      "chat": 101798,
+      "deal": "22296",
+      "t": "Сделка: ТН-260721-121 Поставка мембран для котельных ЦДСВН (согл-13407",
+      "ageH": 29.8,
+      "ageDays": 1.2,
+      "kind": "его сделка ждёт"
+     },
+     {
+      "chat": 52904,
+      "deal": "19116",
+      "t": "Сделка: КП000005379 ЗИП к системе водоподготовки ESPA2 MAX, Hydranauti",
+      "ageH": 27.5,
+      "ageDays": 1.1,
+      "kind": "его сделка ждёт"
+     }
+    ],
+    "waitN": 6,
+    "waitGt1d": 6,
+    "waitGt3d": 1,
+    "waitMaxDays": 29.4,
+    "activeChats": 17,
+    "lastPostDays": 1.3
+   },
+   "98": {
+    "mentions": 76,
+    "self": 40,
+    "coll": 30,
+    "none": 6,
+    "medMin": 4773,
+    "withinSla": 32,
+    "w30": 30,
+    "w120": 32,
+    "w1440": 45,
+    "answeredSelf": 40,
+    "handledPct": 92,
+    "presale": {
+     "mentions": 17,
+     "self": 10,
+     "coll": 6,
+     "none": 1,
+     "medMin": 103,
+     "withinSla": 60,
+     "w30": 50,
+     "w120": 60,
+     "w1440": 60,
+     "answeredSelf": 10,
+     "handledPct": 94
+    },
+    "real": {
+     "mentions": 0,
+     "self": 0,
+     "coll": 0,
+     "none": 0,
+     "medMin": null,
+     "withinSla": 0,
+     "w30": 0,
+     "w120": 0,
+     "w1440": 0,
+     "answeredSelf": 0,
+     "handledPct": 0
+    },
+    "waiting": [
+     {
+      "chat": 93814,
+      "deal": "21718",
+      "t": "Сделка: Л-ПНОС (бн)/02/ЗИП 2027. Бюджетирование.TARBY",
+      "ageH": 79.7,
+      "ageDays": 3.3,
+      "kind": "тег без ответа"
+     },
+     {
+      "chat": 93768,
+      "deal": "21702",
+      "t": "Сделка: Л-ПНОС (бн)/02/ЗИП 2027. Бюджетирование.Seepex",
+      "ageH": 35.5,
+      "ageDays": 1.5,
+      "kind": "тег без ответа"
+     },
+     {
+      "chat": 98784,
+      "deal": "22114",
+      "t": "Сделка: Л-Когалым (БН)/02/Поставка подшипника RENK",
+      "ageH": 33.0,
+      "ageDays": 1.4,
+      "kind": "тег без ответа"
+     },
+     {
+      "chat": 101710,
+      "deal": "22288",
+      "t": "Сделка: Л-ЭС (бн)/02/ Дополнительная потребность в ТРУ",
+      "ageH": 11.6,
+      "ageDays": 0.5,
+      "kind": "тег без ответа"
+     },
+     {
+      "chat": 101720,
+      "deal": "22292",
+      "t": "Сделка: Л-ЭС (бн)/02/УРУ_Насосы_2026",
+      "ageH": 11.6,
+      "ageDays": 0.5,
+      "kind": "тег без ответа"
+     },
+     {
+      "chat": 98668,
+      "deal": "22094",
+      "t": "Сделка: Л-ПНОС (бн)/02/лабораторные материалы в 2026",
+      "ageH": 6.9,
+      "ageDays": 0.3,
+      "kind": "тег без ответа"
+     }
+    ],
+    "waitN": 6,
+    "waitGt1d": 3,
+    "waitGt3d": 1,
+    "waitMaxDays": 3.3,
+    "activeChats": 21,
+    "lastPostDays": 8.9
+   },
+   "204": {
+    "mentions": 21,
+    "self": 19,
+    "coll": 1,
+    "none": 1,
+    "medMin": 22,
+    "withinSla": 68,
+    "w30": 53,
+    "w120": 68,
+    "w1440": 74,
+    "answeredSelf": 19,
+    "handledPct": 95,
+    "presale": {
+     "mentions": 13,
+     "self": 12,
+     "coll": 0,
+     "none": 1,
+     "medMin": 22,
+     "withinSla": 75,
+     "w30": 58,
+     "w120": 75,
+     "w1440": 75,
+     "answeredSelf": 12,
+     "handledPct": 92
+    },
+    "real": {
+     "mentions": 0,
+     "self": 0,
+     "coll": 0,
+     "none": 0,
+     "medMin": null,
+     "withinSla": 0,
+     "w30": 0,
+     "w120": 0,
+     "w1440": 0,
+     "answeredSelf": 0,
+     "handledPct": 0
+    },
+    "waiting": [
+     {
+      "chat": 100344,
+      "deal": "22214",
+      "t": "Сделка: Л-ПАО ЛУКОЙЛ (б/н)/03/Запрос на поставку арамидного троса",
+      "ageH": 56.2,
+      "ageDays": 2.3,
+      "kind": "его сделка ждёт"
+     },
+     {
+      "chat": 97960,
+      "deal": "22042",
+      "t": "Сделка: COM09072600099 910-ОД-2026-РИ(ЭТП) Поставка запасных частей Go",
+      "ageH": 35.9,
+      "ageDays": 1.5,
+      "kind": "тег без ответа"
+     }
+    ],
+    "waitN": 2,
+    "waitGt1d": 2,
+    "waitGt3d": 0,
+    "waitMaxDays": 2.3,
+    "activeChats": 5,
+    "lastPostDays": 1.5
+   },
+   "420": {
+    "mentions": 84,
+    "self": 73,
+    "coll": 4,
+    "none": 7,
+    "medMin": 611,
+    "withinSla": 41,
+    "w30": 30,
+    "w120": 41,
+    "w1440": 59,
+    "answeredSelf": 73,
+    "handledPct": 92,
+    "presale": {
+     "mentions": 6,
+     "self": 5,
+     "coll": 1,
+     "none": 0,
+     "medMin": 134,
+     "withinSla": 40,
+     "w30": 40,
+     "w120": 40,
+     "w1440": 60,
+     "answeredSelf": 5,
+     "handledPct": 100
+    },
+    "real": {
+     "mentions": 0,
+     "self": 0,
+     "coll": 0,
+     "none": 0,
+     "medMin": null,
+     "withinSla": 0,
+     "w30": 0,
+     "w120": 0,
+     "w1440": 0,
+     "answeredSelf": 0,
+     "handledPct": 0
+    },
+    "waiting": [
+     {
+      "chat": 73320,
+      "deal": "20232",
+      "t": "Сделка: Л-Став (E2006N)/01/Теплообменник охлаждения пирогаза пропилено",
+      "ageH": 536.0,
+      "ageDays": 22.3,
+      "kind": "тег без ответа"
+     },
+     {
+      "chat": 95996,
+      "deal": "21874",
+      "t": "Сделка: РН60700725 Опрос рынка: Комплект ЗПЧ насосов общепромышленных",
+      "ageH": 439.4,
+      "ageDays": 18.3,
+      "kind": "его сделка ждёт"
+     },
+     {
+      "chat": 97618,
+      "deal": "22016",
+      "t": "Сделка: Л-ЭС (NA)/02/Cummins",
+      "ageH": 364.6,
+      "ageDays": 15.2,
+      "kind": "его сделка ждёт"
+     },
+     {
+      "chat": 68972,
+      "deal": "19990",
+      "t": "Сделка: Л-Став (бн)/02/конусы ЗИА пиролизных частей",
+      "ageH": 222.0,
+      "ageDays": 9.3,
+      "kind": "тег без ответа"
+     },
+     {
+      "chat": 101564,
+      "deal": "22282",
+      "t": "Сделка: Л-ЭС (NA)/01/ASCO",
+      "ageH": 31.2,
+      "ageDays": 1.3,
+      "kind": "его сделка ждёт"
+     },
+     {
+      "chat": 28344,
+      "deal": "16702",
+      "t": "Сделка: Л-Став (4-2025-ОКО)/01/KOBE SEISA Gear",
+      "ageH": 31.0,
+      "ageDays": 1.3,
+      "kind": "тег без ответа"
+     },
+     {
+      "chat": 14862,
+      "deal": "11664",
+      "t": "Сделка: Л-Став (1-2025-07-ОКО)/02/VARIAX вал",
+      "ageH": 27.5,
+      "ageDays": 1.1,
+      "kind": "тег без ответа"
+     },
+     {
+      "chat": 96776,
+      "deal": "21966",
+      "t": "Сделка: Л-Став (K5608C)/01/AERZENER",
+      "ageH": 4.6,
+      "ageDays": 0.2,
+      "kind": "тег без ответа"
+     }
+    ],
+    "waitN": 8,
+    "waitGt1d": 7,
+    "waitGt3d": 4,
+    "waitMaxDays": 22.3,
+    "activeChats": 20,
     "lastPostDays": 1.2
    }
   }
@@ -26954,5 +26914,5 @@
    "nMsgs": 60
   }
  },
- "updated": "2026-07-26T00:03:17"
+ "updated": "2026-07-26T00:48:35"
 }
