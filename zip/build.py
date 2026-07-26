@@ -140,6 +140,16 @@ def build():
     (OUT / "vendor").mkdir(exist_ok=True)
     shutil.copy2(SITE / "vendor" / "supabase.js", OUT / "vendor" / "supabase.js")
 
+    # документы заказов → на сайт (/orders/), с ASCII-именами для чистых URL
+    orders = ROOT / "orders"
+    if orders.exists():
+        (OUT / "orders").mkdir(exist_ok=True)
+        alias = {"ПИЛОТ-ЗАКАЗ-1.pdf": "pilot-order-1.pdf",
+                 "ПИЛОТ-ЗАКАЗ-1.md": "pilot-order-1.md"}
+        for f in orders.iterdir():
+            if f.suffix.lower() in (".pdf", ".csv", ".md", ".html"):
+                shutil.copy2(f, OUT / "orders" / alias.get(f.name, f.name))
+
     size = (OUT / "index.html").stat().st_size
     print(f"zip/public/index.html: {size:,} байт | позиций {n_pos}, "
           f"с ODM {n_with_odm}, ODM-записей {n_odm}, цен {len(prices)}")
