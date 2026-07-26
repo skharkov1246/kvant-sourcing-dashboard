@@ -1,0 +1,204 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+    @page{size:A4;margin:16mm 14mm}
+    body{font:11px/1.45 'DejaVu Sans',Arial,sans-serif;color:#111;margin:0}
+    h1{font-size:20px;margin:0 0 2px} h2{font-size:14px;margin:18px 0 6px;border-bottom:2px solid #1b2330;padding-bottom:3px;page-break-after:avoid}
+    h3{font-size:12px;margin:10px 0 4px;page-break-after:avoid}
+    .mut{color:#555} .small{font-size:9.5px}
+    table{border-collapse:collapse;width:100%;margin:6px 0;page-break-inside:auto}
+    tr{page-break-inside:avoid} th,td{border:1px solid #bbb;padding:3px 5px;text-align:left;vertical-align:top}
+    th{background:#eef2f7;font-size:10px} td{font-size:10px}
+    .cn{text-align:center;white-space:nowrap} .rt{text-align:right;white-space:nowrap}
+    .ok{background:#e7f6ec} .warn{background:#fff7dd} .bad{background:#fde8e8}
+    .kpi{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+    .kpi div{border:1px solid #ccc;border-radius:6px;padding:6px 12px;text-align:center}
+    .kpi b{display:block;font-size:16px}
+    .box{border:1px solid #ccc;border-left:4px solid #1b2330;border-radius:4px;padding:7px 10px;margin:6px 0;page-break-inside:avoid}
+    .red{border-left-color:#c62828} .grn{border-left-color:#1a7f37}
+    ol li,ul li{margin:2px 0}
+    .pb{page-break-before:always}
+    </style></head><body>
+<h1>Пилотный заказ №1 — ЗИП гидроперфораторов</h1>
+<div class="mut">Рекомендации для закупок · 10.07.2026 · КВАНТ, проект локализации ·
+основа: 76 позиций с живыми КП поставщиков + 10 деталей с готовым РКД (COP 3060MUX) · целевые цены = расчётная себестоимость производства +20%</div>
+
+<div class="kpi">
+<div><b>76</b>позиций к заказу</div><div><b>21</b>брать по КП</div><div><b>55</b>торговаться до цели</div>
+<div><b>$95,867</b>сумма по текущим КП</div><div><b>$6,652</b>сумма по целевым</div>
+<div><b>10</b>деталей по РКД ($967)</div>
+</div>
+
+<h2>1. Общие рекомендации</h2>
+<div class="box red"><b>Главное: 42 из 76 лучших КП — перекупщик WMS с ценами уровня OEM</b> (шпилька $110 при себестоимости $0.8;
+кольцо $308 при фабричной цене $0.3 у Sanshan). Эти цены — не рынок производства, а маржа посредника.
+<b>Не принимать.</b> По всем WMS-позициям слать RFQ фабрикам с нашей целевой ценой.</div>
+<ol>
+<li><b>Целевая цена в переговорах</b> — «наша расчётная себестоимость +20%» (колонка «Цель» в таблицах). Фабричные КП Sanshan подтверждают порядок цифр.</li>
+<li><b>Пул поставщиков:</b> Sanshan (фабрика, металл+РТИ, 29 фабричных КП — базовый кандидат) · YLF, Fuxuan (РТИ — для конкуренции) · KAT (втулки). На каждый лот — минимум 2 КП.</li>
+<li><b>Разбить заказ на 2 риск-корзины:</b> (А) РТИ/метизы/мелочь — заказывать сразу, брак некритичен; (Б) ответственные детали (поршень, гильза, шток, втулки, драйвер) — сначала образцы 1-2 шт + входной контроль материала, потом партия.</li>
+<li><b>Материал:</b> все текущие фабричные КП — на <u>китайском материале</u>. Для корзины (Б) параллельно запросить цену на импортном (18CrNiMo7-6 / 40CrNiMoA ESR) — ожидаемо +40-60%.</li>
+<li><b>Цены EXW:</b> до склада РФ добавить логистику/пошлину/НДС ≈ +25-40%. Даже с этим маржа против OEM-рынка кратная.</li>
+<li><b>Оплата:</b> 30% аванс / 70% по фото готовой продукции и отчёту инспекции; новых поставщиков — через Trade Assurance/аккредитив.</li>
+<li><b>Гидромотор — не копировать:</b> это покупной узел ($400-900 реально), в пилот не включать как «изготовление».</li>
+</ol>
+
+<h2>2. Анализ материалов и входной контроль</h2>
+<div class="mut small">Из чего реально изготавливаются классы деталей заказа, что предложат китайские фабрики, и что проверять на приёмке. Полные техкарты и протоколы испытаний — вкладка «Материалы» на kvant-zip.pages.dev.</div>
+<table><tr><th>Класс детали</th><th>Материал (OEM → китайское предложение)</th><th>Входной контроль</th></tr>
+<tr><td><b>Комплект уплотнений</b></td><td>Смесь: NBR-кольца + PU-манжеты + опорные PTFE</td><td>покомпонентная проверка; худший элемент определяет ресурс комплекта</td></tr>
+<tr><td><b>Втулка прочая</b></td><td>Легированная сталь 40Cr/42CrMo + ТО</td><td>твёрдость, размеры</td></tr>
+<tr><td><b>Уплотнение/O-ring NBR</b></td><td>Резина NBR 70-90 ShA (OEM для динамики — HNBR/FKM)</td><td>твёрдость по Шору, геометрия; для динамических — требовать HNBR</td></tr>
+<tr><td><b>Клапан/седло (мелкое)</b></td><td>Инструментальная/подшипниковая сталь, 58-62 HRC</td><td>твёрдость, плоскостность седла — герметичность</td></tr>
+<tr><td><b>Манжета/скребок PU</b></td><td>Полиуретан AU 92-95 ShA (OEM: MDI/PPDI-PU)</td><td>твёрдость, эластичность; дешёвый TPU быстро «плывёт» в гидравлике</td></tr>
+<tr><td><b>Втулка поршня (цементуемая)</b></td><td>Цементуемая Cr-Ni-Mo (18CrNiMo7-6; кит. аналог 20CrNiMo/20CrMnTi)</td><td>глубина слоя 1.2-1.8 мм, 58-62 HRC поверхн., сердцевина 30-45 HRC; сертификат плавки</td></tr>
+<tr><td><b>Прочее (мелкая механика)</b></td><td>Конструкционная сталь</td><td>размеры, твёрдость</td></tr>
+<tr><td><b>Кольцо (резин.)</b></td><td>NBR 70-90 ShA</td><td>твёрдость по Шору, отсутствие облоя</td></tr>
+<tr><td><b>Метиз/пружина</b></td><td>35CrMo/40Cr, класс прочности 10.9-12.9; пружины 60Si2Mn</td><td>твёрдость, момент затяжки на образце; сертификат класса прочности</td></tr>
+<tr><td><b>Втулка направляющая/букса</b></td><td>Цементуемая Cr-Ni-Mo, вариант — бронза БрАЖ для пар трения</td><td>глубина слоя, твёрдость, посадочные размеры</td></tr>
+<tr><td><b>Муфта</b></td><td>Сталь 40Cr + зубообработка + ТО</td><td>твёрдость зубьев, биение</td></tr>
+<tr><td><b>Поршень-ударник</b></td><td>OEM: 18CrNiMo7-6/Sanbar-класс; кит. предложат 40CrNiMoA/23CrNi3Mo</td><td>КРИТИЧНО: сертификат плавки, УЗК на флокены, твёрдость по сечению, шлифовка Ra≤0.4; техкарта — вкладка «Материалы»</td></tr>
+<tr><td><b>Драйвер (вращатель)</b></td><td>Поковка Cr-Ni-Mo + зубофрезеровка + цементация</td><td>КРИТИЧНО: глубина слоя на шлицах, сертификат плавки</td></tr>
+<tr><td><b>Шток</b></td><td>40CrNiMoA/42CrMo + ТВЧ/хромирование</td><td>прямолинейность, твёрдость покрытия, толщина хрома</td></tr>
+<tr><td><b>Диафрагма HNBR армированная</b></td><td>HNBR 44-50% ACN, тканевое армирование (OEM: Therban/Zetpol)</td><td>ИК/ТГА-проверка что это HNBR а не дешёвый NBR; наличие армирования на срезе</td></tr>
+<tr><td><b>Сапун</b></td><td>Сталь + фильтроэлемент</td><td>проходимость, резьба</td></tr>
+<tr><td><b>Гидромотор (узел)</b></td><td>Покупной узел (корпус HT250/сталь, ротор — подшипниковая сталь)</td><td>стендовая проверка давлением/расходом; это НЕ деталь для копирования в пилоте</td></tr>
+<tr><td><b>Кольцо стопорное/распорное (сталь)</b></td><td>Пружинная сталь 65Г/60Si2Mn + ТО</td><td>твёрдость, упругость</td></tr>
+<tr><td><b>Голова промывки</b></td><td>Поковка/пруток легир. стали + ТО</td><td>герметичность каналов, резьбы</td></tr>
+<tr><td><b>Гильза цилиндра</b></td><td>Легированная поковка/труба + ХТО, хонинговка</td><td>КРИТИЧНО: геометрия расточки, УЗК, твёрдость зеркала</td></tr>
+</table>
+<div class="box"><b>Три правила материала для корзины (Б):</b> 1) сертификат плавки (mill certificate) обязателен в контракте;
+2) выборочный спектрометр/искровая проба на приёмке — подмена стали это типовой риск;
+3) для РТИ — дата вулканизации не старше 12 мес, для мембран требовать подтверждение HNBR (ИК-спектр), не NBR.</div>
+
+<h2>3. Где цена реалистична, где нет</h2>
+<div class="mut small">Вердикт по каждому классу: сверка нашей цели (себестоимость+20%) с лучшим ФАБРИЧНЫМ КП (перекуп WMS исключён из сверки).</div>
+<table><tr><th>Класс</th><th class="cn">Позиций</th><th class="rt">Себест. (модель)</th><th class="rt">Цель</th><th class="rt">Мин. фабричное КП</th><th>Вердикт</th></tr>
+<tr class='ok'><td><b>Втулка направляющая/букса</b></td><td class='cn'>7</td><td class='rt'>$20.0</td><td class='rt'><b>$24.0</b></td><td class='rt'>$8.0 (Sanshan)</td><td>цена ПОДТВЕРЖДЕНА фабричным КП</td></tr>
+<tr class='ok'><td><b>Втулка поршня (цементуемая)</b></td><td class='cn'>7</td><td class='rt'>$18.0</td><td class='rt'><b>$21.6</b></td><td class='rt'>$27.6 (KAT)</td><td>цена ПОДТВЕРЖДЕНА фабричным КП</td></tr>
+<tr class='ok'><td><b>Втулка прочая</b></td><td class='cn'>8</td><td class='rt'>$12.0</td><td class='rt'><b>$14.4</b></td><td class='rt'>$11.73 (Sanshan)</td><td>цена ПОДТВЕРЖДЕНА фабричным КП</td></tr>
+<tr class='ok'><td><b>Диафрагма HNBR армированная</b></td><td class='cn'>3</td><td class='rt'>$4.0</td><td class='rt'><b>$4.8</b></td><td class='rt'>$2.07 (Sanshan)</td><td>цена ПОДТВЕРЖДЕНА фабричным КП</td></tr>
+<tr class='ok'><td><b>Драйвер (вращатель)</b></td><td class='cn'>2</td><td class='rt'>$60.0</td><td class='rt'><b>$72.0</b></td><td class='rt'>$41.12 (Sanshan)</td><td>цена ПОДТВЕРЖДЕНА фабричным КП</td></tr>
+<tr class='ok'><td><b>Клапан/седло (мелкое)</b></td><td class='cn'>1</td><td class='rt'>$1.5</td><td class='rt'><b>$1.8</b></td><td class='rt'>$0.83 (Sanshan)</td><td>цена ПОДТВЕРЖДЕНА фабричным КП</td></tr>
+<tr class='ok'><td><b>Кольцо (резин.)</b></td><td class='cn'>4</td><td class='rt'>$0.2</td><td class='rt'><b>$0.24</b></td><td class='rt'>$0.28 (Sanshan)</td><td>цена ПОДТВЕРЖДЕНА фабричным КП</td></tr>
+<tr class='ok'><td><b>Комплект уплотнений</b></td><td class='cn'>12</td><td class='rt'>$12.0</td><td class='rt'><b>$14.4</b></td><td class='rt'>$2.21 (Sanshan)</td><td>цена ПОДТВЕРЖДЕНА фабричным КП</td></tr>
+<tr class='ok'><td><b>Манжета/скребок PU</b></td><td class='cn'>2</td><td class='rt'>$0.8</td><td class='rt'><b>$0.96</b></td><td class='rt'>$0.69 (Sanshan)</td><td>цена ПОДТВЕРЖДЕНА фабричным КП</td></tr>
+<tr class='ok'><td><b>Метиз/пружина</b></td><td class='cn'>9</td><td class='rt'>$0.8</td><td class='rt'><b>$0.96</b></td><td class='rt'>$0.39 (Sanshan)</td><td>цена ПОДТВЕРЖДЕНА фабричным КП</td></tr>
+<tr class='ok'><td><b>Поршень-ударник</b></td><td class='cn'>9</td><td class='rt'>$100.0</td><td class='rt'><b>$120.0</b></td><td class='rt'>$77.28 (Sanshan)</td><td>цена ПОДТВЕРЖДЕНА фабричным КП</td></tr>
+<tr class='ok'><td><b>Сапун</b></td><td class='cn'>1</td><td class='rt'>$2.5</td><td class='rt'><b>$3.0</b></td><td class='rt'>$1.31 (Sanshan)</td><td>цена ПОДТВЕРЖДЕНА фабричным КП</td></tr>
+<tr class='ok'><td><b>Уплотнение/O-ring NBR</b></td><td class='cn'>5</td><td class='rt'>$0.2</td><td class='rt'><b>$0.24</b></td><td class='rt'>$0.28 (Sanshan)</td><td>цена ПОДТВЕРЖДЕНА фабричным КП</td></tr>
+<tr class='warn'><td><b>Муфта</b></td><td class='cn'>1</td><td class='rt'>$20.0</td><td class='rt'><b>$24.0</b></td><td class='rt'>—</td><td>фабрику не котировали — цель проверить RFQ</td></tr>
+<tr class='warn'><td><b>Прочее (мелкая механика)</b></td><td class='cn'>3</td><td class='rt'>$2.0</td><td class='rt'><b>$2.4</b></td><td class='rt'>—</td><td>фабрику не котировали — цель проверить RFQ</td></tr>
+<tr class='warn'><td><b>Шток</b></td><td class='cn'>1</td><td class='rt'>$60.0</td><td class='rt'><b>$72.0</b></td><td class='rt'>—</td><td>фабрику не котировали — цель проверить RFQ</td></tr>
+<tr class='bad'><td><b>Гидромотор (узел)</b></td><td class='cn'>1</td><td class='rt'>$300.0</td><td class='rt'><b>$360.0</b></td><td class='rt'>—</td><td>покупной узел: реальная цена $400-900 — НЕ копировать в пилоте, покупать готовый</td></tr>
+</table>
+<div class="box grn"><b>Зелёное</b> — фабричное КП уже на уровне цели: цена реалистична, заказывать/дожимать чуть-чуть.</div>
+<div class="box"><b>Жёлтое</b> — по классу котировал только перекуп: цель основана на модели, проверяется первым фабричным RFQ (риск умеренный — модель откалибрована по соседним классам).</div>
+<div class="box red"><b>Красное</b> — модель или постановка занижает (сложные узлы): цель пересмотреть, в пилоте — только образцы или покупной узел.</div>
+
+<h2>4. На что обратить внимание (красные флаги)</h2>
+<ul>
+<li><b>Худшие цены WMS для отклонения:</b> шток 3115 6001 66 — $1763 (цель $72) · муфта 3115 2031 00 — $1322 (цель $24) · комплект 3115 9362 00 — $749 (цель $14.4) · кольцо 3115 6010 36 — $308 (цель $0.24) · шпильки — $88-110 (цель $0.96).</li>
+<li><b>Sanshan котирует на китайском материале</b> (их формулировка в переписке) — для корзины (Б) это стартовая цена, не финальная спецификация.</li>
+<li><b>Комплекты уплотнений:</b> цена комплекта скрывает качество компонентов — согласовать состав покомпонентно (какие манжеты PU, какие кольца NBR).</li>
+<li><b>Позиции с одним КП</b> — конкуренции нет: не подписывать до второго КП (YLF/Fuxuan закрывают РТИ быстро).</li>
+<li><b>Таможенный бенчмарк</b> (22 тыс. деклараций РФ): медиана перфораторного импорта 7.2 USD/кг — грубая проверка «цена/вес» при приёмке КП.</li>
+<li><b>Критичные детали (поршень/гильза/хвостовик):</b> ресурс решает термообработка, не только сталь — приёмка по нашей техкарте (цементация: глубина слоя, HRC поверхн./сердцевина, УЗК). Без этого дешёвая деталь = дорогой простой.</li>
+</ul>
+
+<h2 class="pb">5. Приложение А — заказ по позициям с КП (76)</h2>
+<div class="mut small">Кол-во — пилотная партия. «Цель» — цена для переговоров. Вердикт: ✓ = брать по КП, → = торговаться до цели.</div>
+<table><tr><th>П/П</th><th>Артикул</th><th>Деталь</th><th>Класс</th><th class="cn">Кол-во</th><th class="rt">Цель $</th><th class="rt">КП $</th><th>Пост.</th><th class="cn">Верд.</th></tr>
+<tr class='ok'><td class='cn'>424</td><td class='cn'>3115600784</td><td>Поршень уд. 3115 6007 84 Epiroc</td><td>Поршень-ударник</td><td class='cn'>2</td><td class='rt'><b>120.0</b></td><td class='rt'>82.8</td><td>Sanshan</td><td class='cn'>✓</td></tr>
+<tr class='ok'><td class='cn'>499</td><td class='cn'>3115317100</td><td>Поршень 3115 3171 00 Epiroc</td><td>Поршень-ударник</td><td class='cn'>2</td><td class='rt'><b>120.0</b></td><td class='rt'>82.52</td><td>Sanshan</td><td class='cn'>✓</td></tr>
+<tr class='ok'><td class='cn'>396</td><td class='cn'>3115324400</td><td>Поршень 3115 3244 00</td><td>Поршень-ударник</td><td class='cn'>2</td><td class='rt'><b>120.0</b></td><td class='rt'>77.28</td><td>Sanshan</td><td class='cn'>✓</td></tr>
+<tr class='ok'><td class='cn'>495</td><td class='cn'>3115147000</td><td>Драйвер 3115 1470 00 Atlas Copco</td><td>Драйвер (вращатель)</td><td class='cn'>3</td><td class='rt'><b>72.0</b></td><td class='rt'>41.12</td><td>Sanshan</td><td class='cn'>✓</td></tr>
+<tr class='ok'><td class='cn'>501</td><td class='cn'>3115325100</td><td>Направляющая 3115 3251 00 Epiroc</td><td>Втулка направляющая/бу</td><td class='cn'>5</td><td class='rt'><b>24.0</b></td><td class='rt'>14.9</td><td>Sanshan</td><td class='cn'>✓</td></tr>
+<tr class='ok'><td class='cn'>561</td><td class='cn'>3115097000</td><td>Набор уплотн. 3115 0970 00 Atlas Copco</td><td>Комплект уплотнений</td><td class='cn'>10</td><td class='rt'><b>14.4</b></td><td class='rt'>7.45</td><td>Fuxuan</td><td class='cn'>✓</td></tr>
+<tr class='ok'><td class='cn'>372</td><td class='cn'>3115153600</td><td>Втулка 3115 1536 00 Epiroc</td><td>Втулка прочая</td><td class='cn'>5</td><td class='rt'><b>14.4</b></td><td class='rt'>11.73</td><td>Sanshan</td><td class='cn'>✓</td></tr>
+<tr class='ok'><td class='cn'>376</td><td class='cn'>3115901218</td><td>Комплект уплот. 3115 9012 18 Epiroc</td><td>Комплект уплотнений</td><td class='cn'>10</td><td class='rt'><b>14.4</b></td><td class='rt'>4.97</td><td>Sanshan</td><td class='cn'>✓</td></tr>
+<tr class='ok'><td class='cn'>999</td><td class='cn'>3115215000</td><td>Комплект уплот. 3115 2150 00 Atlas Copco</td><td>Комплект уплотнений</td><td class='cn'>10</td><td class='rt'><b>14.4</b></td><td class='rt'>4.11</td><td>Sanshan</td><td class='cn'>✓</td></tr>
+<tr class='ok'><td class='cn'>395</td><td class='cn'>3115183300</td><td>Направляющая 3115 1833 00 Atlas Copco</td><td>Втулка направляющая/бу</td><td class='cn'>5</td><td class='rt'><b>24.0</b></td><td class='rt'>8.0</td><td>Sanshan</td><td class='cn'>✓</td></tr>
+<tr class='ok'><td class='cn'>496</td><td class='cn'>3115361900</td><td>Направляющая 3115 3619 00 Epiroc</td><td>Втулка направляющая/бу</td><td class='cn'>5</td><td class='rt'><b>24.0</b></td><td class='rt'>8.0</td><td>Sanshan</td><td class='cn'>✓</td></tr>
+<tr class='ok'><td class='cn'>498</td><td class='cn'>3115362000</td><td>Направляющая поршня 3115 3620 00 Epiroc</td><td>Втулка направляющая/бу</td><td class='cn'>5</td><td class='rt'><b>24.0</b></td><td class='rt'>8.0</td><td>Sanshan</td><td class='cn'>✓</td></tr>
+<tr class='ok'><td class='cn'>998</td><td class='cn'>3115205500</td><td>Комплект уплот. 3115 2055 00 Atlas Copco</td><td>Комплект уплотнений</td><td class='cn'>10</td><td class='rt'><b>14.4</b></td><td class='rt'>2.21</td><td>Sanshan</td><td class='cn'>✓</td></tr>
+<tr class='ok'><td class='cn'>403</td><td class='cn'>31153593 00</td><td>Диафрагма 3115 3593 00 Atlas Copco</td><td>Диафрагма HNBR армиров</td><td class='cn'>10</td><td class='rt'><b>4.8</b></td><td class='rt'>2.07</td><td>Sanshan</td><td class='cn'>✓</td></tr>
+<tr class='ok'><td class='cn'>421</td><td class='cn'>3115336300</td><td>Манжета 3115 3363 00 Epiroc</td><td>Манжета/скребок PU</td><td class='cn'>30</td><td class='rt'><b>0.96</b></td><td class='rt'>0.69</td><td>Sanshan</td><td class='cn'>✓</td></tr>
+<tr class='ok'><td class='cn'>556</td><td class='cn'>3115182201</td><td>Диафрагма 3115 1822 01 Atlas Copco</td><td>Диафрагма HNBR армиров</td><td class='cn'>10</td><td class='rt'><b>4.8</b></td><td class='rt'>2.07</td><td>Sanshan</td><td class='cn'>✓</td></tr>
+<tr class='ok'><td class='cn'>404</td><td class='cn'>3115600527</td><td>Пыльник 3115 6005 27 Epiroc</td><td>Прочее (мелкая механик</td><td class='cn'>10</td><td class='rt'><b>2.4</b></td><td class='rt'>1.85</td><td>WMS</td><td class='cn'>✓</td></tr>
+<tr class='ok'><td class='cn'>557</td><td class='cn'>3115294500</td><td>Сапун 3115 2945 00 Epiroc</td><td>Сапун</td><td class='cn'>10</td><td class='rt'><b>3.0</b></td><td class='rt'>1.31</td><td>Sanshan</td><td class='cn'>✓</td></tr>
+<tr class='ok'><td class='cn'>1001</td><td class='cn'>3115116500</td><td>Штифт 3115 1165 00 Atlas Copco</td><td>Метиз/пружина</td><td class='cn'>30</td><td class='rt'><b>0.96</b></td><td class='rt'>0.39</td><td>Sanshan</td><td class='cn'>✓</td></tr>
+<tr class='ok'><td class='cn'>378</td><td class='cn'>3115523400</td><td>Втулка поршня 3115 5234 00 Atlas Copco</td><td>Втулка поршня (цементу</td><td class='cn'>5</td><td class='rt'><b>21.6</b></td><td class='rt'>2.03</td><td>WMS</td><td class='cn'>✓</td></tr>
+<tr class='ok'><td class='cn'>374</td><td class='cn'>3115376800</td><td>Клапан 3115 3768 00 Atlas Copco</td><td>Клапан/седло (мелкое)</td><td class='cn'>10</td><td class='rt'><b>1.8</b></td><td class='rt'>0.83</td><td>Sanshan</td><td class='cn'>✓</td></tr>
+<tr class=''><td class='cn'>390</td><td class='cn'>3115601036</td><td>Кольцо 3115 6010 36 Epiroc</td><td>Кольцо (резин.)</td><td class='cn'>50</td><td class='rt'><b>0.24</b></td><td class='rt'>308.6</td><td>WMS</td><td class='cn'>→</td></tr>
+<tr class=''><td class='cn'>409</td><td class='cn'>3115936200</td><td>Комплект уплот. 3115 9362 00 Epiroc</td><td>Комплект уплотнений</td><td class='cn'>10</td><td class='rt'><b>14.4</b></td><td class='rt'>749.46</td><td>WMS</td><td class='cn'>→</td></tr>
+<tr class=''><td class='cn'>388</td><td class='cn'>3115203100</td><td>Муфта 3115 2031 00 Atlas Copco</td><td>Муфта</td><td class='cn'>5</td><td class='rt'><b>24.0</b></td><td class='rt'>1322.58</td><td>WMS</td><td class='cn'>→</td></tr>
+<tr class=''><td class='cn'>401</td><td class='cn'>3115600166</td><td>Шток 3115 6001 66 Epiroc</td><td>Шток</td><td class='cn'>3</td><td class='rt'><b>72.0</b></td><td class='rt'>1763.44</td><td>WMS</td><td class='cn'>→</td></tr>
+<tr class=''><td class='cn'>416</td><td class='cn'>3115305200</td><td>Шпилька 3115 3052 00 Atlas Copco</td><td>Метиз/пружина</td><td class='cn'>30</td><td class='rt'><b>0.96</b></td><td class='rt'>110.22</td><td>WMS</td><td class='cn'>→</td></tr>
+<tr class=''><td class='cn'>562</td><td class='cn'>3115500502</td><td>Шпилька 3115 5005 02 Epiroc</td><td>Метиз/пружина</td><td class='cn'>30</td><td class='rt'><b>0.96</b></td><td class='rt'>110.22</td><td>WMS</td><td class='cn'>→</td></tr>
+<tr class=''><td class='cn'>563</td><td class='cn'>3115500401</td><td>Болт 3115 5004 01 Epiroc</td><td>Метиз/пружина</td><td class='cn'>30</td><td class='rt'><b>0.96</b></td><td class='rt'>110.22</td><td>WMS</td><td class='cn'>→</td></tr>
+<tr class=''><td class='cn'>493</td><td class='cn'>3115522600</td><td>Втулка 3115 5226 00 Atlas Copco</td><td>Втулка прочая</td><td class='cn'>5</td><td class='rt'><b>14.4</b></td><td class='rt'>617.2</td><td>WMS</td><td class='cn'>→</td></tr>
+<tr class=''><td class='cn'>370</td><td class='cn'>3115901163</td><td>Комплект ремон. 3115 9011 63 Epiroc</td><td>Комплект уплотнений</td><td class='cn'>10</td><td class='rt'><b>14.4</b></td><td class='rt'>270.97</td><td>WMS</td><td class='cn'>→</td></tr>
+<tr class=''><td class='cn'>413</td><td class='cn'>3115600116</td><td>Втулка поршня 3115 6001 16 Epiroc</td><td>Втулка поршня (цементу</td><td class='cn'>5</td><td class='rt'><b>21.6</b></td><td class='rt'>529.03</td><td>WMS</td><td class='cn'>→</td></tr>
+<tr class=''><td class='cn'>383</td><td class='cn'>3115305600</td><td>Шпилька 3115 3056 00 Epiroc</td><td>Метиз/пружина</td><td class='cn'>30</td><td class='rt'><b>0.96</b></td><td class='rt'>88.17</td><td>WMS</td><td class='cn'>→</td></tr>
+<tr class=''><td class='cn'>384</td><td class='cn'>3115305500</td><td>Шпилька 3115 3055 00 Atlas Copco</td><td>Метиз/пружина</td><td class='cn'>30</td><td class='rt'><b>0.96</b></td><td class='rt'>88.17</td><td>WMS</td><td class='cn'>→</td></tr>
+<tr class=''><td class='cn'>389</td><td class='cn'>3115355000</td><td>Вращатель 3115 3550 00 Epiroc</td><td>Прочее (мелкая механик</td><td class='cn'>10</td><td class='rt'><b>2.4</b></td><td class='rt'>220.43</td><td>WMS</td><td class='cn'>→</td></tr>
+<tr class=''><td class='cn'>412</td><td class='cn'>3115600115</td><td>Втулка поршня 3115 6001 15 Epiroc</td><td>Втулка поршня (цементу</td><td class='cn'>5</td><td class='rt'><b>21.6</b></td><td class='rt'>440.86</td><td>WMS</td><td class='cn'>→</td></tr>
+<tr class=''><td class='cn'>419</td><td class='cn'>3115600582</td><td>Поршень 3115 6005 82 Epiroc</td><td>Поршень-ударник</td><td class='cn'>2</td><td class='rt'><b>120.0</b></td><td class='rt'>1102.15</td><td>WMS</td><td class='cn'>→</td></tr>
+<tr class=''><td class='cn'>555</td><td class='cn'>3115560600</td><td>Уплотнение 3115 5606 00 Epiroc</td><td>Уплотнение/O-ring NBR</td><td class='cn'>50</td><td class='rt'><b>0.24</b></td><td class='rt'>37.47</td><td>WMS</td><td class='cn'>→</td></tr>
+<tr class=''><td class='cn'>397</td><td class='cn'>3115573000</td><td>Втулка 3115 5730 00 Epiroc</td><td>Втулка прочая</td><td class='cn'>5</td><td class='rt'><b>14.4</b></td><td class='rt'>352.69</td><td>WMS</td><td class='cn'>→</td></tr>
+<tr class=''><td class='cn'>411</td><td class='cn'>3115936204</td><td>Набор уплотнений 3115 9362 04 Epiroc</td><td>Комплект уплотнений</td><td class='cn'>10</td><td class='rt'><b>14.4</b></td><td class='rt'>176.34</td><td>WMS</td><td class='cn'>→</td></tr>
+<tr class=''><td class='cn'>497</td><td class='cn'>3115183600</td><td>Болт 3115 1836 00 Epiroc</td><td>Метиз/пружина</td><td class='cn'>30</td><td class='rt'><b>0.96</b></td><td class='rt'>57.96</td><td>Fuxuan</td><td class='cn'>→</td></tr>
+<tr class=''><td class='cn'>399</td><td class='cn'>3115576401</td><td>Втулка поршня 3115 5764 01 Epiroc</td><td>Втулка поршня (цементу</td><td class='cn'>5</td><td class='rt'><b>21.6</b></td><td class='rt'>330.65</td><td>WMS</td><td class='cn'>→</td></tr>
+<tr class=''><td class='cn'>554</td><td class='cn'>3115560700</td><td>Уплотнение 3115 5607 00 Epiroc</td><td>Уплотнение/O-ring NBR</td><td class='cn'>50</td><td class='rt'><b>0.24</b></td><td class='rt'>33.06</td><td>WMS</td><td class='cn'>→</td></tr>
+<tr class=''><td class='cn'>386</td><td class='cn'>3115359802</td><td>Втулка поршня 3115 3598 02 Atlas Copco</td><td>Втулка поршня (цементу</td><td class='cn'>5</td><td class='rt'><b>21.6</b></td><td class='rt'>309.68</td><td>WMS</td><td class='cn'>→</td></tr>
+<tr class=''><td class='cn'>387</td><td class='cn'>3115357400</td><td>Втулка направляющая 3115 3574 00 Epiroc</td><td>Втулка направляющая/бу</td><td class='cn'>5</td><td class='rt'><b>24.0</b></td><td class='rt'>309.68</td><td>WMS</td><td class='cn'>→</td></tr>
+<tr class=''><td class='cn'>392</td><td class='cn'>3115282300</td><td>Поршень 3115 2823 00 Atlas Copco</td><td>Поршень-ударник</td><td class='cn'>2</td><td class='rt'><b>120.0</b></td><td class='rt'>752.69</td><td>WMS</td><td class='cn'>→</td></tr>
+<tr class=''><td class='cn'>491</td><td class='cn'>3115370300</td><td>Направляющая 3115 3703 00 Epiroc</td><td>Втулка направляющая/бу</td><td class='cn'>5</td><td class='rt'><b>24.0</b></td><td class='rt'>242.47</td><td>WMS</td><td class='cn'>→</td></tr>
+<tr class=''><td class='cn'>422</td><td class='cn'>3115901183</td><td>Комплект уплот. 3115 9011 83 Epiroc</td><td>Комплект уплотнений</td><td class='cn'>10</td><td class='rt'><b>14.4</b></td><td class='rt'>110.22</td><td>WMS</td><td class='cn'>→</td></tr>
+<tr class=''><td class='cn'>490</td><td class='cn'>3115370101</td><td>Направляющая 3115 3701 01 Epiroc</td><td>Втулка направляющая/бу</td><td class='cn'>5</td><td class='rt'><b>24.0</b></td><td class='rt'>220.43</td><td>WMS</td><td class='cn'>→</td></tr>
+<tr class=''><td class='cn'>420</td><td class='cn'>3115574400</td><td>Поршень экстрактора 3115 5744 00 Epiroc</td><td>Поршень-ударник</td><td class='cn'>2</td><td class='rt'><b>120.0</b></td><td class='rt'>529.03</td><td>WMS</td><td class='cn'>→</td></tr>
+<tr class=''><td class='cn'>500</td><td class='cn'>3115600218</td><td>Кольцо 3115 6002 18 Epiroc</td><td>Кольцо (резин.)</td><td class='cn'>50</td><td class='rt'><b>0.24</b></td><td class='rt'>20.42</td><td>Sanshan</td><td class='cn'>→</td></tr>
+<tr class=''><td class='cn'>375</td><td class='cn'>3115901184</td><td>Комплект уплот. 3115 9011 84 Epiroc</td><td>Комплект уплотнений</td><td class='cn'>10</td><td class='rt'><b>14.4</b></td><td class='rt'>99.36</td><td>Sanshan</td><td class='cn'>→</td></tr>
+<tr class=''><td class='cn'>391</td><td class='cn'>3115601035</td><td>Поршень экстрактора 3115601035 Epiroc</td><td>Поршень-ударник</td><td class='cn'>2</td><td class='rt'><b>120.0</b></td><td class='rt'>464.52</td><td>WMS</td><td class='cn'>→</td></tr>
+<tr class=''><td class='cn'>494</td><td class='cn'>3115535601</td><td>Поршень 3115 5356 01 Atlas Copco</td><td>Поршень-ударник</td><td class='cn'>2</td><td class='rt'><b>120.0</b></td><td class='rt'>440.86</td><td>WMS</td><td class='cn'>→</td></tr>
+<tr class=''><td class='cn'>393</td><td class='cn'>3115531400</td><td>Драйвер 3115 5314 00 Atlas Copco</td><td>Драйвер (вращатель)</td><td class='cn'>3</td><td class='rt'><b>72.0</b></td><td class='rt'>288.0</td><td>YLF</td><td class='cn'>→</td></tr>
+<tr class=''><td class='cn'>685</td><td class='cn'>3115524985</td><td>Мотор гидравлический 3115 5249 85 Epiroc</td><td>Гидромотор (узел)</td><td class='cn'>1</td><td class='rt'><b>360.0</b></td><td class='rt'>821.65</td><td>WMS</td><td class='cn'>→</td></tr>
+<tr class=''><td class='cn'>418</td><td class='cn'>3115356800</td><td>Втулка 3115 3568 00 Epiroc</td><td>Втулка прочая</td><td class='cn'>5</td><td class='rt'><b>14.4</b></td><td class='rt'>154.3</td><td>WMS</td><td class='cn'>→</td></tr>
+<tr class=''><td class='cn'>398</td><td class='cn'>3115283100</td><td>Поршень 3115 2831 00 Atlas Copco</td><td>Поршень-ударник</td><td class='cn'>2</td><td class='rt'><b>120.0</b></td><td class='rt'>352.69</td><td>WMS</td><td class='cn'>→</td></tr>
+<tr class=''><td class='cn'>415</td><td class='cn'>3115204600</td><td>Втулка 3115 2046 00 Atlas Copco</td><td>Втулка прочая</td><td class='cn'>5</td><td class='rt'><b>14.4</b></td><td class='rt'>132.26</td><td>WMS</td><td class='cn'>→</td></tr>
+<tr class=''><td class='cn'>560</td><td class='cn'>3115308000</td><td>Комплект уплот. 3115 3080 00 Atlas Copco</td><td>Комплект уплотнений</td><td class='cn'>10</td><td class='rt'><b>14.4</b></td><td class='rt'>33.06</td><td>WMS</td><td class='cn'>→</td></tr>
+<tr class=''><td class='cn'>405</td><td class='cn'>3115304400</td><td>Уплотнение 3115 3044 00 Atlas Copco</td><td>Уплотнение/O-ring NBR</td><td class='cn'>50</td><td class='rt'><b>0.24</b></td><td class='rt'>5.73</td><td>WMS</td><td class='cn'>→</td></tr>
+<tr class=''><td class='cn'>426</td><td class='cn'>3115901219</td><td>Комплект ремон. 3115 9012 19 Epiroc</td><td>Комплект уплотнений</td><td class='cn'>10</td><td class='rt'><b>14.4</b></td><td class='rt'>27.32</td><td>Sanshan</td><td class='cn'>→</td></tr>
+<tr class=''><td class='cn'>394</td><td class='cn'>3115505002</td><td>Втулка поршня 3115 5050 02 Atlas Copco</td><td>Втулка поршня (цементу</td><td class='cn'>5</td><td class='rt'><b>21.6</b></td><td class='rt'>53.82</td><td>KAT</td><td class='cn'>→</td></tr>
+<tr class=''><td class='cn'>1000</td><td class='cn'>3115370902</td><td>Шпилька 3115 3709 02 Epiroc</td><td>Метиз/пружина</td><td class='cn'>30</td><td class='rt'><b>0.96</b></td><td class='rt'>6.61</td><td>WMS</td><td class='cn'>→</td></tr>
+<tr class=''><td class='cn'>371</td><td class='cn'>3115917094</td><td>Комплект ремон. 3115 9170 94 Atlas Copco</td><td>Комплект уплотнений</td><td class='cn'>10</td><td class='rt'><b>14.4</b></td><td class='rt'>19.6</td><td>Sanshan</td><td class='cn'>→</td></tr>
+<tr class=''><td class='cn'>377</td><td class='cn'>3115305900</td><td>Манжета 3115 3059 00 Atlas Copco</td><td>Манжета/скребок PU</td><td class='cn'>30</td><td class='rt'><b>0.96</b></td><td class='rt'>5.73</td><td>WMS</td><td class='cn'>→</td></tr>
+<tr class=''><td class='cn'>400</td><td class='cn'>3115600012</td><td>Втулка поршня 3115 6000 12 Epiroc</td><td>Втулка поршня (цементу</td><td class='cn'>5</td><td class='rt'><b>21.6</b></td><td class='rt'>27.6</td><td>KAT</td><td class='cn'>→</td></tr>
+<tr class=''><td class='cn'>385</td><td class='cn'>3115306400</td><td>Втулка 3115 3064 00 Atlas Copco</td><td>Втулка прочая</td><td class='cn'>5</td><td class='rt'><b>14.4</b></td><td class='rt'>22.04</td><td>WMS</td><td class='cn'>→</td></tr>
+<tr class=''><td class='cn'>492</td><td class='cn'>3115326002</td><td>Втулка 3115 3260 02 Atlas Copco</td><td>Втулка прочая</td><td class='cn'>5</td><td class='rt'><b>14.4</b></td><td class='rt'>21.8</td><td>Sanshan</td><td class='cn'>→</td></tr>
+<tr class=''><td class='cn'>406</td><td class='cn'>3115357200</td><td>Диафрагма 3115 3572 00 Epiroc</td><td>Диафрагма HNBR армиров</td><td class='cn'>10</td><td class='rt'><b>4.8</b></td><td class='rt'>10.76</td><td>Sanshan</td><td class='cn'>→</td></tr>
+<tr class=''><td class='cn'>502</td><td class='cn'>3115600488</td><td>Втулка 3115 6004 88 Epiroc</td><td>Втулка прочая</td><td class='cn'>5</td><td class='rt'><b>14.4</b></td><td class='rt'>17.66</td><td>Sanshan</td><td class='cn'>→</td></tr>
+<tr class=''><td class='cn'>414</td><td class='cn'>3115305100</td><td>Шайба 3115 3051 00 Atlas Copco</td><td>Метиз/пружина</td><td class='cn'>30</td><td class='rt'><b>0.96</b></td><td class='rt'>2.2</td><td>WMS</td><td class='cn'>→</td></tr>
+<tr class=''><td class='cn'>379</td><td class='cn'>3115306000</td><td>Пыльник 3115 3060 00 Atlas Copco</td><td>Прочее (мелкая механик</td><td class='cn'>10</td><td class='rt'><b>2.4</b></td><td class='rt'>2.69</td><td>WMS</td><td class='cn'>→</td></tr>
+<tr class=''><td class='cn'>382</td><td class='cn'>3115328917</td><td>Кольцо 3115 3289 17 Atlas Copco</td><td>Кольцо (резин.)</td><td class='cn'>50</td><td class='rt'><b>0.24</b></td><td class='rt'>0.36</td><td>Sanshan</td><td class='cn'>→</td></tr>
+<tr class=''><td class='cn'>373</td><td class='cn'>3115336500</td><td>Уплотнение 3115 3365 00 Atlas Copco</td><td>Уплотнение/O-ring NBR</td><td class='cn'>50</td><td class='rt'><b>0.24</b></td><td class='rt'>0.28</td><td>Sanshan</td><td class='cn'>→</td></tr>
+<tr class=''><td class='cn'>380</td><td class='cn'>3115233300</td><td>Уплотнение 3115 2333 00 Atlas Copco</td><td>Уплотнение/O-ring NBR</td><td class='cn'>50</td><td class='rt'><b>0.24</b></td><td class='rt'>0.28</td><td>Sanshan</td><td class='cn'>→</td></tr>
+<tr class=''><td class='cn'>381</td><td class='cn'>3115519000</td><td>Кольцо 3115 5190 00 Atlas Copco</td><td>Кольцо (резин.)</td><td class='cn'>50</td><td class='rt'><b>0.24</b></td><td class='rt'>0.28</td><td>Sanshan</td><td class='cn'>→</td></tr>
+</table>
+<h2>6. Приложение Б — заказ по готовому РКД (BOM COP 3060MUX, 10)</h2>
+<table><tr><th>Артикул КВАНТ</th><th>Epiroc PN</th><th>Деталь</th><th>Класс</th><th class="cn">Кол-во</th><th class="rt">Цель $</th><th class="rt">Сумма $</th></tr>
+<tr><td class='cn'>KV30 0007</td><td class='cn'>3115 3050 00</td><td>КОЛПАЧКОВАЯ ГАЙКА</td><td>Метиз/пружина</td><td class='cn'>30</td><td class='rt'><b>0.96</b></td><td class='rt'>28.8</td></tr>
+<tr><td class='cn'>KV30 0008</td><td class='cn'>3115 3051 00</td><td>ШАЙБА</td><td>Метиз/пружина</td><td class='cn'>30</td><td class='rt'><b>0.96</b></td><td class='rt'>28.8</td></tr>
+<tr><td class='cn'>KV30 0009</td><td class='cn'>3115 5005 02</td><td>ШПИЛЬКА</td><td>Метиз/пружина</td><td class='cn'>30</td><td class='rt'><b>0.96</b></td><td class='rt'>28.8</td></tr>
+<tr><td class='cn'>KV30 0010</td><td class='cn'>3115 5004 01</td><td>БОКОВОЙ БОЛТ</td><td>Метиз/пружина</td><td class='cn'>30</td><td class='rt'><b>0.96</b></td><td class='rt'>28.8</td></tr>
+<tr><td class='cn'>KV30 0013</td><td class='cn'>3115 5714 00</td><td>НАПРАВЛЯЮЩАЯ ВТУЛКА</td><td>Втулка направляющая/букс</td><td class='cn'>5</td><td class='rt'><b>24.0</b></td><td class='rt'>120.0</td></tr>
+<tr><td class='cn'>KV30 0019</td><td class='cn'>3115 5717 00</td><td>РАСПОРНОЕ КОЛЬЦО</td><td>Кольцо стопорное/распорн</td><td class='cn'>20</td><td class='rt'><b>1.8</b></td><td class='rt'>36.0</td></tr>
+<tr><td class='cn'></td><td class='cn'>-</td><td>СТОПОРНОЕ КОЛЬЦО (СУХАРЬ)</td><td>Кольцо стопорное/распорн</td><td class='cn'>20</td><td class='rt'><b>1.8</b></td><td class='rt'>36.0</td></tr>
+<tr><td class='cn'>KV30 0032</td><td class='cn'>3115 5728 02</td><td>ГОЛОВА ПРОМЫВКИ</td><td>Голова промывки</td><td class='cn'>3</td><td class='rt'><b>60.0</b></td><td class='rt'>180.0</td></tr>
+<tr><td class='cn'>KV30 0077</td><td class='cn'>3115 3570 00</td><td>ДРАЙВЕР</td><td>Драйвер (вращатель)</td><td class='cn'>3</td><td class='rt'><b>72.0</b></td><td class='rt'>216.0</td></tr>
+<tr><td class='cn'>KV30 0093</td><td class='cn'>3115 5710 00</td><td>ГИЛЬЗА</td><td>Гильза цилиндра</td><td class='cn'>2</td><td class='rt'><b>132.0</b></td><td class='rt'>264.0</td></tr>
+</table>
+<div class="mut small" style="margin-top:14px">Методика: параметрическая оценка себестоимости по классу детали (материал+передел, Китай EXW, китайский материал,
+партия = пилот; точность ±40%) × 1.20 = целевая цена. Данные: рабочая таблица снабжения (КП WMS/Sanshan/YLF/Fuxuan/KAT/Mindrill),
+инженерный BOM COP 3060MUX, таможенная статистика glbs.io (23 тыс. деклараций), стратегия материалов «крепче OEM».
+Живая база: kvant-zip.pages.dev · Сгенерировано 2026-07-10</div>
+</body></html>
