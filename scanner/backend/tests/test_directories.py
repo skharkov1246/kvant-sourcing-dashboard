@@ -65,6 +65,62 @@ class TestDirectoryStructure:
             assert len(set(values)) == len(values), name
 
 
+class TestDirectoryEndpoint:
+    """GET /v1/directories/{name}: раздача с валидацией по ETag.
+
+    Хранилище эндпоинт не трогает — матрица memory/pg здесь не нужна,
+    достаточно одного клиента.
+    """
+
+    @pytest.fixture()
+    def http(self):
+        from fastapi.testclient import TestClient
+
+        from app.main import app
+
+        return TestClient(app)
+
+    def test_returns_directory_with_etag(self, http):
+        from tests.conftest import OPERATOR
+
+        r = http.get("/v1/directories/standard_series", headers=OPERATOR)
+        assert r.status_code == 200
+        doc = r.json()
+        assert doc["directory"] == "standard_series"
+        assert r.headers["ETag"] == f'"standard_series-v{doc["version"]}"'
+
+    def test_if_none_match_returns_304_without_body(self, http):
+        from tests.conftest import OPERATOR
+
+        first = http.get("/v1/directories/standard_series", headers=OPERATOR)
+        second = http.get(
+            "/v1/directories/standard_series",
+            headers={**OPERATOR, "If-None-Match": first.headers["ETag"]},
+        )
+        assert second.status_code == 304
+        assert second.content == b""
+        assert second.headers["ETag"] == first.headers["ETag"]
+
+    def test_stale_etag_returns_fresh_document(self, http):
+        from tests.conftest import OPERATOR
+
+        r = http.get(
+            "/v1/directories/standard_series",
+            headers={**OPERATOR, "If-None-Match": '"standard_series-v0"'},
+        )
+        assert r.status_code == 200
+        assert r.json()["sections"]
+
+    def test_unknown_directory_404(self, http):
+        from tests.conftest import OPERATOR
+
+        r = http.get("/v1/directories/nope", headers=OPERATOR)
+        assert r.status_code == 404
+
+    def test_requires_authentication(self, http):
+        assert http.get("/v1/directories/standard_series").status_code == 401
+
+
 class TestHonestEmptyD1:
     def test_d1_pending_returns_none(self):
         """Пока владелец реестра не заполнил ряд d1 — None, а не пустой список:

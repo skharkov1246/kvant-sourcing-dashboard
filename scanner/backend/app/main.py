@@ -18,6 +18,7 @@ from typing import Any, Literal
 from fastapi import Body, Depends, FastAPI, Header, HTTPException, Path, Request, Response
 from pydantic import BaseModel, Field
 
+from .directories import DirectoryError, load_series_directory
 from .protocol import auto_accept, check_compatibility, is_complete
 from .projections import fold
 from .store import Store, StoredAsset, utcnow
@@ -349,6 +350,40 @@ def get_protocol(code: str, version: int) -> dict[str, Any]:
     if protocol is None:
         raise HTTPException(status_code=404, detail={"code": "not_found", "message": "Протокол не найден"})
     return protocol
+
+
+# Реестр справочников: имя → загрузчик. Новый справочник = строка здесь,
+# файл в data/directories/ и ничего больше (Р-03 разд. 6).
+_DIRECTORIES = {"standard_series": load_series_directory}
+
+
+@app.get("/v1/directories/{name}", tags=["sync"])
+def get_directory(
+    name: str,
+    response: Response,
+    if_none_match: str | None = Header(default=None, alias="If-None-Match"),
+    _: Principal = Depends(current_principal),
+) -> Any:
+    """Раздача справочника на устройство с валидацией по ETag.
+
+    ETag считается из версии справочника: устройство на каждой синхронизации
+    спрашивает с If-None-Match и в обычном случае получает 304 без тела —
+    таблицы стандартов меняются редко, гонять их каждый раз незачем.
+    """
+    loader = _DIRECTORIES.get(name)
+    if loader is None:
+        raise HTTPException(status_code=404, detail={"code": "not_found", "message": "Справочник не найден"})
+    try:
+        doc = loader()
+    except DirectoryError as e:
+        # Сломанный справочник — ошибка развёртывания: честная 500, а не
+        # тихая раздача устаревшей копии.
+        raise HTTPException(status_code=500, detail={"code": "directory_broken", "message": str(e)})
+    etag = f'"{name}-v{doc["version"]}"'
+    if if_none_match == etag:
+        return Response(status_code=304, headers={"ETag": etag})
+    response.headers["ETag"] = etag
+    return doc
 
 
 @app.post("/v1/inbound/tasks", status_code=202, tags=["inbound"])

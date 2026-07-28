@@ -309,6 +309,40 @@ paths:
               schema: { type: object, additionalProperties: true }
         '404': { $ref: '#/components/responses/NotFound' }
 
+  /directories/{name}:
+    get:
+      tags: [sync]
+      summary: Справочник, синхронизируемый на устройство
+      description: |
+        Таблицы стандартов (ряды ГОСТ 6636, сечения колец, толщины листа и
+        т.п.) ведёт владелец реестра как данные — код приложения при их
+        расширении не меняется (Р-03 разд. 6). Устройство запрашивает
+        справочник на каждой синхронизации с `If-None-Match` и в обычном
+        случае получает `304` без тела: версии меняются редко.
+      operationId: getDirectory
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema: { type: string, enum: [standard_series] }
+        - name: If-None-Match
+          in: header
+          required: false
+          schema: { type: string }
+      responses:
+        '200':
+          description: Документ справочника; ETag считается из его версии
+          headers:
+            ETag:
+              schema: { type: string }
+              description: '`"<имя>-v<версия>"`'
+          content:
+            application/json:
+              schema: { type: object, additionalProperties: true }
+        '304':
+          description: Версия на устройстве актуальна, тело не передаётся
+        '404': { $ref: '#/components/responses/NotFound' }
+
   /items/{itemId}:
     get:
       tags: [items]
