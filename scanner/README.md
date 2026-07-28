@@ -34,7 +34,7 @@
 
 ```
 scanner/
-├── docs/                 Проектная документация (10 разделов + ADR + контракты)
+├── docs/                 Проектная документация (13 разделов + ADR + контракты)
 │   ├── api/openapi.yaml            Контракт REST API — валидируется в CI
 │   ├── schemas/                    JSON Schema протокола съёмки + рабочий пример
 │   └── adr/                        Журнал архитектурных решений
@@ -48,7 +48,8 @@ scanner/
 ├── iosApp/               SwiftUI, AVFoundation, ARKit, Vision
 └── backend/              FastAPI: приём событий, медиа, задания, трассировка
     ├── app/schema.sql    Схема PostgreSQL с RLS
-    └── tests/            40 тестов: идемпотентность, изоляция, докачка, протокол
+    ├── app/series.py     Ряды ГОСТ 6636 / ISO 3601, восстановление номиналов
+    └── tests/            66 тестов: идемпотентность, изоляция, докачка, протокол, ряды
 ```
 
 ## Быстрый старт
@@ -107,6 +108,8 @@ validate(read_from_filename('docs/api/openapi.yaml')[0]); print('OpenAPI OK')"
 | Как подключаются складские системы | [09-integrations.md](docs/09-integrations.md) |
 | Этапы, оценки, риски | [10-roadmap.md](docs/10-roadmap.md) |
 | Что дообучается, как система улучшается со временем | [11-model-lifecycle.md](docs/11-model-lifecycle.md) |
+| ИИ-слой, вычислительный конвейер, экономика | [12-ai-compute.md](docs/12-ai-compute.md) |
+| Требования к телефонам и оснастке | [13-device-requirements.md](docs/13-device-requirements.md) |
 
 ## Связь с Sourcing Analyzer
 
