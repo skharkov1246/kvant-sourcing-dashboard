@@ -60,7 +60,7 @@ class PgStore:
     def reset(self) -> None:
         """Полная очистка данных (для тестов). Схему не трогает."""
         self._conn.execute(
-            "TRUNCATE trace_conflict, trace_link, item_record, code_read, "
+            "TRUNCATE review_queue, trace_conflict, trace_link, item_record, code_read, "
             "measurement, asset_chunk, asset, session_event, dead_letter_event, "
             "scan_session, inbound_idempotency, scan_task, capture_protocol, "
             "device, app_user, site, tenant_grant, tenant CASCADE"
@@ -442,3 +442,79 @@ class PgStore:
             }
             for r in rows
         ]
+
+    # ── Очередь ручного ревью ────────────────────────────────────────────────
+
+    _REVIEW_COLUMNS = ("SELECT session_ref, reasons, enqueued_at, resolved_at, "
+                       " verdict, verdict_by, verdict_comment FROM review_queue ")
+
+    @staticmethod
+    def _review_row(r: tuple) -> dict[str, Any]:
+        return {
+            "session_id": r[0],
+            "reasons": r[1],
+            "enqueued_at": r[2].isoformat(),
+            "resolved_at": r[3].isoformat() if r[3] else None,
+            "verdict": r[4],
+            "verdict_by": r[5],
+            "verdict_comment": r[6],
+        }
+
+    def enqueue_review(self, tenant_id: str, session_id: str, reasons: list[str]) -> dict[str, Any]:
+        t = self._tenant(tenant_id)
+        sid = self._session(t, session_id)
+        existing = self._conn.execute(
+            "SELECT reasons, resolved_at FROM review_queue "
+            "WHERE tenant_id = %s AND session_id = %s", (t, sid),
+        ).fetchone()
+        if existing and existing[1] is None:
+            # Повторное срабатывание приёмки — причины сливаются без дублей.
+            merged = list(dict.fromkeys([*existing[0], *reasons]))
+            self._conn.execute(
+                "UPDATE review_queue SET reasons = %s "
+                "WHERE tenant_id = %s AND session_id = %s",
+                (Jsonb(merged), t, sid),
+            )
+        else:
+            # Новая запись или переоткрытие после REWORK: вердикт очищается.
+            self._conn.execute(
+                "INSERT INTO review_queue (tenant_id, session_id, session_ref, reasons) "
+                "VALUES (%s, %s, %s, %s) "
+                "ON CONFLICT (tenant_id, session_id) DO UPDATE SET "
+                " reasons = EXCLUDED.reasons, enqueued_at = now(), resolved_at = NULL, "
+                " verdict = NULL, verdict_by = NULL, verdict_comment = NULL",
+                (t, sid, session_id, Jsonb(list(dict.fromkeys(reasons)))),
+            )
+        return self.get_review(tenant_id, session_id)
+
+    def get_review(self, tenant_id: str, session_id: str) -> dict[str, Any] | None:
+        t = self._tenant(tenant_id)
+        row = self._conn.execute(
+            self._REVIEW_COLUMNS + "WHERE tenant_id = %s AND session_id = %s",
+            (t, _as_uuid(session_id, "session", t)),
+        ).fetchone()
+        return self._review_row(row) if row else None
+
+    def list_review_queue(self, tenant_id: str) -> list[dict[str, Any]]:
+        rows = self._conn.execute(
+            self._REVIEW_COLUMNS +
+            "WHERE tenant_id = %s AND resolved_at IS NULL ORDER BY enqueued_at",
+            (self._tenant(tenant_id),),
+        ).fetchall()
+        return [self._review_row(r) for r in rows]
+
+    def resolve_review(
+        self, tenant_id: str, session_id: str, verdict: str, by: str, comment: str | None = None,
+    ) -> dict[str, Any] | None:
+        """None — записи нет или она уже решена: решение первого контролёра
+        не перезаписывается молча (эндпоинт отдаёт 409)."""
+        t = self._tenant(tenant_id)
+        row = self._conn.execute(
+            "UPDATE review_queue SET verdict = %s, verdict_by = %s, "
+            " verdict_comment = %s, resolved_at = now() "
+            "WHERE tenant_id = %s AND session_id = %s AND resolved_at IS NULL "
+            "RETURNING session_ref, reasons, enqueued_at, resolved_at, "
+            " verdict, verdict_by, verdict_comment",
+            (verdict, by, comment, t, _as_uuid(session_id, "session", t)),
+        ).fetchone()
+        return self._review_row(row) if row else None

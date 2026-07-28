@@ -302,6 +302,30 @@ CREATE TABLE trace_conflict (
 );
 
 -- ─────────────────────────────────────────────────────────────────────────────
+-- Очередь ручного ревью: сюда попадают сессии с вердиктом MANUAL_REVIEW
+-- приёмки (acceptance.py). Правила «правила решают, LLM только флажит»
+-- заканчиваются здесь решением человека-контролёра.
+-- ─────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE review_queue (
+  tenant_id    UUID NOT NULL REFERENCES tenant(id),
+  session_id   UUID NOT NULL REFERENCES scan_session(id),
+  session_ref  TEXT NOT NULL,  -- идентификатор сессии, каким его знает клиент
+  reasons      JSONB NOT NULL DEFAULT '[]',
+  enqueued_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+  resolved_at  TIMESTAMPTZ,
+  verdict      TEXT CHECK (verdict IN ('ACCEPTED','REJECTED','REWORK')),
+  verdict_by   TEXT,
+  verdict_comment TEXT,
+  -- Вердикт и время решения появляются только вместе
+  CONSTRAINT verdict_is_resolution CHECK ((verdict IS NULL) = (resolved_at IS NULL)),
+  PRIMARY KEY (tenant_id, session_id)
+);
+
+CREATE INDEX review_queue_open ON review_queue (tenant_id, enqueued_at)
+  WHERE resolved_at IS NULL;
+
+-- ─────────────────────────────────────────────────────────────────────────────
 -- Аудит (отдельная схема: только INSERT, без UPDATE/DELETE)
 -- ─────────────────────────────────────────────────────────────────────────────
 
@@ -334,7 +358,8 @@ DECLARE t TEXT;
 BEGIN
   FOREACH t IN ARRAY ARRAY[
     'site','app_user','device','scan_task','scan_session','asset',
-    'measurement','code_read','item_record','trace_link','trace_conflict'
+    'measurement','code_read','item_record','trace_link','trace_conflict',
+    'review_queue'
   ] LOOP
     EXECUTE format('ALTER TABLE %I ENABLE ROW LEVEL SECURITY', t);
     EXECUTE format($f$

@@ -343,6 +343,65 @@ paths:
           description: Версия на устройстве актуальна, тело не передаётся
         '404': { $ref: '#/components/responses/NotFound' }
 
+  /review/queue:
+    get:
+      tags: [review]
+      summary: Открытые сессии на ручной проверке
+      description: |
+        Сессии сюда ставит приёмка вердиктом `MANUAL_REVIEW`. Доступно только
+        роли `reviewer`; сотрудник заказчика очередь не видит.
+      operationId: listReviewQueue
+      responses:
+        '200':
+          description: Очередь, старые сверху
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/ReviewEntry' }
+        '403':
+          description: Роль не reviewer
+
+  /review/{sessionId}/verdict:
+    post:
+      tags: [review]
+      summary: Вердикт контролёра по сессии
+      description: |
+        `ACCEPTED` — принято; `REJECTED` — забраковано; `REWORK` — вернуть
+        на пересъёмку (повторная постановка в очередь переоткрывает запись).
+        Повторный вердикт по уже решённой записи — `409`: решение первого
+        контролёра не перезаписывается молча.
+      operationId: postReviewVerdict
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [verdict]
+              properties:
+                verdict: { type: string, enum: [ACCEPTED, REJECTED, REWORK] }
+                comment: { type: string }
+      responses:
+        '200':
+          description: Запись с вынесенным вердиктом
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ReviewEntry' }
+        '403':
+          description: Роль не reviewer
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409':
+          description: Вердикт уже вынесен другим контролёром
+
   /items/{itemId}:
     get:
       tags: [items]
@@ -756,6 +815,21 @@ components:
             declared_by_tenant_id: { type: string, format: uuid }
             declared_by_user_id: { type: string, format: uuid }
             created_at: { type: string, format: date-time }
+
+    ReviewEntry:
+      type: object
+      required: [session_id, reasons, enqueued_at]
+      properties:
+        session_id: { type: string }
+        reasons:
+          type: array
+          items: { type: string }
+          description: Причины постановки от приёмки (флаги LLM, нарушения качества)
+        enqueued_at: { type: string, format: date-time }
+        resolved_at: { type: string, format: date-time, nullable: true }
+        verdict: { type: string, enum: [ACCEPTED, REJECTED, REWORK], nullable: true }
+        verdict_by: { type: string, nullable: true }
+        verdict_comment: { type: string, nullable: true }
 
     ItemRecord:
       type: object

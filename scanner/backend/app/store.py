@@ -68,6 +68,7 @@ class Store:
         self._asset_by_hash: dict[tuple[str, str], str] = {}  # (tenant_id, sha256) -> asset_id
         self.idempotency: dict[tuple[str, str], str] = {}  # (tenant_id, key) -> task_id
         self.trace_links: dict[str, list[dict[str, Any]]] = {}
+        self.review_queue: dict[tuple[str, str], dict[str, Any]] = {}  # (tenant_id, session_id)
 
     # ── Протоколы ────────────────────────────────────────────────────────────
 
@@ -238,6 +239,58 @@ class Store:
     def item_trace(self, item_id: str) -> list[dict[str, Any]]:
         with self._lock:
             return list(self.trace_links.get(item_id, []))
+
+    # ── Очередь ручного ревью ────────────────────────────────────────────────
+    # Сюда попадают сессии с вердиктом MANUAL_REVIEW приёмки (acceptance.py).
+    # Жизненный цикл: enqueue (идемпотентно, причины сливаются) → вердикт
+    # контролёра. Повторная постановка после REWORK переоткрывает запись.
+
+    def enqueue_review(self, tenant_id: str, session_id: str, reasons: list[str]) -> dict[str, Any]:
+        with self._lock:
+            key = (tenant_id, session_id)
+            entry = self.review_queue.get(key)
+            if entry and entry["resolved_at"] is None:
+                # Повторное срабатывание приёмки — причины сливаются без дублей.
+                entry["reasons"] = list(dict.fromkeys([*entry["reasons"], *reasons]))
+            else:
+                self.review_queue[key] = {
+                    "session_id": session_id,
+                    "reasons": list(dict.fromkeys(reasons)),
+                    "enqueued_at": utcnow(),
+                    "resolved_at": None,
+                    "verdict": None,
+                    "verdict_by": None,
+                    "verdict_comment": None,
+                }
+            return dict(self.review_queue[key])
+
+    def get_review(self, tenant_id: str, session_id: str) -> dict[str, Any] | None:
+        with self._lock:
+            entry = self.review_queue.get((tenant_id, session_id))
+            return dict(entry) if entry else None
+
+    def list_review_queue(self, tenant_id: str) -> list[dict[str, Any]]:
+        with self._lock:
+            open_entries = [
+                dict(e) for (t, _), e in self.review_queue.items()
+                if t == tenant_id and e["resolved_at"] is None
+            ]
+            return sorted(open_entries, key=lambda e: e["enqueued_at"])
+
+    def resolve_review(
+        self, tenant_id: str, session_id: str, verdict: str, by: str, comment: str | None = None,
+    ) -> dict[str, Any] | None:
+        """Вердикт по открытой записи; None — записи нет или она уже решена
+        (уже решённую не перезаписываем: второй контролёр должен увидеть 409,
+        а не молча затереть решение первого)."""
+        with self._lock:
+            entry = self.review_queue.get((tenant_id, session_id))
+            if entry is None or entry["resolved_at"] is not None:
+                return None
+            entry.update(
+                verdict=verdict, verdict_by=by, verdict_comment=comment, resolved_at=utcnow(),
+            )
+            return dict(entry)
 
 
 def _payload_digest(event: dict[str, Any]) -> str:

@@ -436,6 +436,58 @@ def inbound_task(
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# Очередь ручного ревью
+# ─────────────────────────────────────────────────────────────────────────────
+
+class ReviewVerdictRequest(BaseModel):
+    verdict: Literal["ACCEPTED", "REJECTED", "REWORK"]
+    comment: str | None = None
+
+
+def _require_reviewer(principal: Principal) -> None:
+    if principal.is_external:
+        raise HTTPException(
+            status_code=403,
+            detail={"code": "forbidden", "message": "Ревью доступно только роли reviewer"},
+        )
+
+
+@app.get("/v1/review/queue", tags=["review"])
+def review_queue(principal: Principal = Depends(current_principal)) -> dict[str, Any]:
+    """Открытые сессии на ручной проверке.
+
+    Сюда сессии ставит приёмка (acceptance.py) вердиктом MANUAL_REVIEW —
+    очередь и есть то место, где «правила решают, LLM только флажит»
+    заканчивается решением человека.
+    """
+    _require_reviewer(principal)
+    return {"items": STORE.list_review_queue(principal.tenant_id)}
+
+
+@app.post("/v1/review/{session_id}/verdict", tags=["review"])
+def review_verdict(
+    session_id: str,
+    body: ReviewVerdictRequest,
+    principal: Principal = Depends(current_principal),
+) -> dict[str, Any]:
+    """Вердикт контролёра. Повторный вердикт — 409: решение первого
+    контролёра не перезаписывается молча."""
+    _require_reviewer(principal)
+    entry = STORE.resolve_review(
+        principal.tenant_id, session_id, body.verdict, principal.user_id, body.comment,
+    )
+    if entry is None:
+        existing = STORE.get_review(principal.tenant_id, session_id)
+        if existing is None:
+            raise HTTPException(status_code=404, detail={"code": "not_found", "message": "Сессии нет в очереди ревью"})
+        raise HTTPException(
+            status_code=409,
+            detail={"code": "already_resolved", "message": f"Вердикт уже вынесен: {existing['verdict']}"},
+        )
+    return entry
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # Трассировка
 # ─────────────────────────────────────────────────────────────────────────────
 
