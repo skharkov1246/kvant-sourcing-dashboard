@@ -146,14 +146,43 @@ class TestCatG:
         assert "g_groove" in [s["id"] for s in visible_steps(cat_g, ctx)]
 
     def test_shore_skipped_on_thin_gasket(self, cat_g):
-        """Р-10 п.12: тоньше 6 мм — показания Шора недостоверны, шаг не появляется."""
+        """Р-10 п.12: тоньше 6 мм — показания Шора недостоверны, шаг не появляется.
+
+        Порог смотрит на avg_thickness_mm НЕ-repeat-шага g_gasket_contour:
+        предикат по полю repeat-шага (g_gasket) запрещён — его payload список,
+        и _resolve_path вернул бы «отсутствует» всегда (находка проработки Р-05).
+        """
         base = {"g_type": _done("g_type", {"rti_type": "прокладка плоская"})}
         thin = SessionContext(results={**base,
-            "g_gasket": _done("g_gasket", {"thickness_mm": 2.0})})
+            "g_gasket_contour": _done("g_gasket_contour", {"avg_thickness_mm": 2.0})})
         assert "g_shore" not in [s["id"] for s in visible_steps(cat_g, thin)]
         thick = SessionContext(results={**base,
-            "g_gasket": _done("g_gasket", {"thickness_mm": 6.0})})
+            "g_gasket_contour": _done("g_gasket_contour", {"avg_thickness_mm": 6.0})})
         assert "g_shore" in [s["id"] for s in visible_steps(cat_g, thick)]
+
+    def test_no_visible_if_references_a_repeat_step_field(self, router, cat_a, cat_g):
+        """Прото-линтер публикации: предикат по полю repeat-шага запрещён во
+        всех протоколах РИ — payload такого шага список, предикат всегда ложен."""
+        for doc in (router, cat_a, cat_g):
+            repeat_ids = {s["id"] for s in doc["steps"] if "repeat" in s}
+
+            def walk(cond):
+                if not isinstance(cond, dict):
+                    return
+                for key in ("all", "any"):
+                    for sub in cond.get(key, []):
+                        walk(sub)
+                if "not" in cond:
+                    walk(cond["not"])
+                if "step" in cond and "field" in cond:
+                    assert cond["step"] not in repeat_ids, (
+                        f"{doc['code']}: предикат по полю repeat-шага {cond['step']}")
+
+            for s in doc["steps"]:
+                walk(s.get("visible_if"))
+            acc = doc.get("acceptance", {})
+            walk(acc.get("auto_accept_if"))
+            walk(acc.get("reject_if"))
 
     def test_aging_only_for_used_parts(self, cat_g):
         new = SessionContext(results={
