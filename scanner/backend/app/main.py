@@ -12,13 +12,16 @@
 from __future__ import annotations
 
 import base64
+import os
 import uuid
 from typing import Any, Literal
 
 from fastapi import Body, Depends, FastAPI, Header, HTTPException, Path, Request, Response
 from pydantic import BaseModel, Field
 
-from .directories import DirectoryError, load_series_directory
+from .acceptance import AcceptancePipeline, AcceptanceService, TransportUnavailable
+from .directories import DirectoryError, load_materials_directory, load_series_directory
+from .model_registry import TenantDataPolicy
 from .protocol import auto_accept, check_compatibility, is_complete
 from .projections import fold
 from .store import Store, StoredAsset, utcnow
@@ -32,6 +35,53 @@ app = FastAPI(
 STORE = Store()
 
 DEFAULT_CHUNK_SIZE = 1 << 20  # 1 МиБ; в проде выбирается по замеру скорости
+
+
+class NullTransport:
+    """Без ключа LLM-плечо честно недоступно: приёмка деградирует в
+    MANUAL_REVIEW с причиной, а не притворяется, что модель посмотрела."""
+
+    def complete(self, **_: Any):
+        raise TransportUnavailable("ANTHROPIC_API_KEY не настроен")
+
+
+def _make_transport():
+    if os.environ.get("ANTHROPIC_API_KEY"):
+        from .acceptance import AnthropicTransport
+
+        return AnthropicTransport()
+    return NullTransport()
+
+
+ACCEPTANCE_PIPELINE = AcceptancePipeline(_make_transport())
+
+
+def _run_acceptance(tenant_id: str, session_id: str) -> None:
+    """Приёмка по завершению сессии.
+
+    Вызывается из приёма событий синхронно: с NullTransport это мгновенно.
+    С живым ключом синхронный LLM-вызов в sync_events нарушил бы принцип
+    «приём отделён от обработки» (§08.4) — при подключении ключа этот вызов
+    уезжает в воркер, контракт (сессия оказывается в очереди) не меняется.
+    """
+    events = STORE.session_events(tenant_id, session_id)
+    protocol_ref = next(
+        (e["payload"].get("protocol") for e in events if e["type"] == "session.started"),
+        None,
+    )
+    protocol = None
+    if protocol_ref and "@" in protocol_ref:
+        code, version = protocol_ref.split("@", 1)
+        protocol = STORE.get_protocol(code, int(version))
+    if protocol is None:
+        # Решать нечего и не по чему — сразу к контролёру, а не в никуда.
+        STORE.enqueue_review(tenant_id, session_id, ["протокол сессии не определён"])
+        return
+    ctx = fold(session_id, events).to_context()
+    AcceptanceService(ACCEPTANCE_PIPELINE, STORE).process(
+        tenant_id, session_id, protocol, ctx,
+        TenantDataPolicy(tenant_id=tenant_id, retention_days=30),
+    )
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -206,10 +256,13 @@ def sync_events(
     пересменку (вся смена одновременно поймала Wi-Fi) не должен ронять приём.
     """
     results: list[dict[str, Any]] = []
+    completed_sessions: list[str] = []
     for event in body.events:
         outcome = STORE.append_event(principal.tenant_id, event.model_dump())
         if outcome == "accepted":
             results.append({"client_event_id": event.client_event_id, "status": "accepted"})
+            if event.type == "session.completed":
+                completed_sessions.append(event.session_id)
         elif outcome == "duplicate":
             # Повтор после потери ответа — успех, а не ошибка.
             results.append({"client_event_id": event.client_event_id, "status": "duplicate"})
@@ -223,6 +276,10 @@ def sync_events(
                     "retryable": False,
                 },
             })
+    # Приёмка стартует после записи ВСЕГО батча: завершение может прийти
+    # в одном батче с последними шагами (и даже раньше их — см. проекцию).
+    for session_id in completed_sessions:
+        _run_acceptance(principal.tenant_id, session_id)
     return {"results": results, "server_time": utcnow()}
 
 
@@ -354,7 +411,10 @@ def get_protocol(code: str, version: int) -> dict[str, Any]:
 
 # Реестр справочников: имя → загрузчик. Новый справочник = строка здесь,
 # файл в data/directories/ и ничего больше (Р-03 разд. 6).
-_DIRECTORIES = {"standard_series": load_series_directory}
+_DIRECTORIES = {
+    "standard_series": load_series_directory,
+    "materials": load_materials_directory,
+}
 
 
 @app.get("/v1/directories/{name}", tags=["sync"])

@@ -324,7 +324,7 @@ paths:
         - name: name
           in: path
           required: true
-          schema: { type: string, enum: [standard_series] }
+          schema: { type: string, enum: [standard_series, materials] }
         - name: If-None-Match
           in: header
           required: false

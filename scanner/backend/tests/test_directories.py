@@ -121,6 +121,42 @@ class TestDirectoryEndpoint:
         assert http.get("/v1/directories/standard_series").status_code == 401
 
 
+class TestMaterialsDirectory:
+    """Справочник материалов (Р-08 разд. 4): строковые ряды, выбор из списка."""
+
+    def test_loads_with_all_sections(self):
+        from app.directories import load_materials_directory
+
+        doc = load_materials_directory()
+        assert doc["directory"] == "materials"
+        for section in ("steel_structural", "cast_iron", "elastomer", "coating"):
+            assert doc["sections"][section]["values"]
+
+    def test_string_rows_have_no_duplicates_or_blanks(self):
+        from app.directories import load_materials_directory
+
+        for name, section in load_materials_directory()["sections"].items():
+            values = section["values"]
+            assert len(set(values)) == len(values), name
+            assert all(v.strip() for v in values), name
+
+    def test_endpoint_serves_materials_with_etag(self):
+        from fastapi.testclient import TestClient
+
+        from app.main import app
+        from tests.conftest import OPERATOR
+
+        http = TestClient(app)
+        r = http.get("/v1/directories/materials", headers=OPERATOR)
+        assert r.status_code == 200
+        assert r.json()["directory"] == "materials"
+        etag = r.headers["ETag"]
+        assert etag == f'"materials-v{r.json()["version"]}"'
+        cached = http.get("/v1/directories/materials",
+                          headers={**OPERATOR, "If-None-Match": etag})
+        assert cached.status_code == 304
+
+
 class TestHonestEmptyD1:
     def test_d1_pending_returns_none(self):
         """Пока владелец реестра не заполнил ряд d1 — None, а не пустой список:

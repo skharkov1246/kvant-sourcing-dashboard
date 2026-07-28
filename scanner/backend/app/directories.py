@@ -33,14 +33,31 @@ _REQUIRED_SECTIONS = frozenset({
 })
 
 
+_MATERIALS_SECTIONS = frozenset({
+    "steel_structural",
+    "steel_stainless",
+    "cast_iron",
+    "bronze_brass",
+    "polymer",
+    "elastomer",
+    "coating",
+})
+
+
 class DirectoryError(RuntimeError):
     """Справочник отсутствует или сломан — это ошибка развёртывания, не данных."""
 
 
-@lru_cache(maxsize=1)
-def load_series_directory(path: Path | None = None) -> dict:
-    """Загрузка и структурная проверка справочника рядов."""
-    p = path or (_DIRECTORY_ROOT / "series_directory.json")
+def _load_and_check(filename: str, required_sections: frozenset[str],
+                    path: Path | None = None) -> dict:
+    """Общая загрузка со структурной проверкой.
+
+    Ряды бывают двух видов, и вид обязан быть однородным в секции:
+      * числовые (ряды размеров) — строго по возрастанию, без дубликатов;
+      * строковые (марки материалов, виды покрытий) — без дубликатов и
+        пустых строк; порядок смысловой, сортировка не навязывается.
+    """
+    p = path or (_DIRECTORY_ROOT / filename)
     try:
         doc = json.loads(p.read_text(encoding="utf-8"))
     except FileNotFoundError as e:
@@ -51,20 +68,39 @@ def load_series_directory(path: Path | None = None) -> dict:
     sections = doc.get("sections")
     if not isinstance(sections, dict):
         raise DirectoryError("В справочнике нет объекта sections")
-    missing = _REQUIRED_SECTIONS - sections.keys()
+    missing = required_sections - sections.keys()
     if missing:
         raise DirectoryError(f"В справочнике нет секций: {sorted(missing)}")
     for name, section in sections.items():
         values = section.get("values")
-        if not isinstance(values, list) or any(
-            not isinstance(v, (int, float)) or isinstance(v, bool) for v in values
-        ):
-            raise DirectoryError(f"Секция {name}: values должен быть списком чисел")
-        if values != sorted(values):
-            raise DirectoryError(f"Секция {name}: значения ряда должны идти по возрастанию")
+        if not isinstance(values, list):
+            raise DirectoryError(f"Секция {name}: values должен быть списком")
+        numeric = [isinstance(v, (int, float)) and not isinstance(v, bool) for v in values]
+        textual = [isinstance(v, str) for v in values]
+        if all(numeric):
+            if values != sorted(values):
+                raise DirectoryError(f"Секция {name}: значения ряда должны идти по возрастанию")
+        elif all(textual):
+            if any(not v.strip() for v in values):
+                raise DirectoryError(f"Секция {name}: пустая строка в ряду")
+        else:
+            raise DirectoryError(f"Секция {name}: ряд должен быть однородным (числа или строки)")
         if len(set(values)) != len(values):
             raise DirectoryError(f"Секция {name}: в ряду есть дубликаты")
     return doc
+
+
+@lru_cache(maxsize=1)
+def load_series_directory(path: Path | None = None) -> dict:
+    """Справочник стандартных рядов (размеры, ГОСТ 6636, кольца, резьбы)."""
+    return _load_and_check("series_directory.json", _REQUIRED_SECTIONS, path)
+
+
+@lru_cache(maxsize=1)
+def load_materials_directory(path: Path | None = None) -> dict:
+    """Справочник материалов и покрытий (Р-08 разд. 4): оператор выбирает
+    марку из списка, а не печатает от руки."""
+    return _load_and_check("materials_directory.json", _MATERIALS_SECTIONS, path)
 
 
 def series_values(section: str) -> Sequence[float]:
