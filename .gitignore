@@ -21,3 +21,8 @@ scheduler/.wrangler/
 # база ЗИП: public/ — артефакт сборки (собирается build.py/CI), в репозиторий не кладём
 zip/public/
 zip/customs/recon/
+
+# сборочные артефакты Gradle (jvm-check и будущие сборки мобильных модулей)
+scanner/**/build/
+scanner/**/.gradle/
+scanner/**/.kotlin/

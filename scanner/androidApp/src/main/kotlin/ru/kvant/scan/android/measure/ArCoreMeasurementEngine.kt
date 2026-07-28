@@ -3,6 +3,9 @@ package ru.kvant.scan.android.measure
 import ru.kvant.scan.domain.AccuracyClass
 import ru.kvant.scan.domain.MeasureMethod
 import ru.kvant.scan.measure.MeasurementEngine
+import ru.kvant.scan.measure.medianDimensions
+import ru.kvant.scan.measure.orientedBoundingBox
+import ru.kvant.scan.measure.trimOutliers
 
 /**
  * Реализация обмера на Android.
