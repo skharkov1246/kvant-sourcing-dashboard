@@ -156,6 +156,12 @@ CREATE TABLE scan_session (
 -- Событийный лог
 -- ─────────────────────────────────────────────────────────────────────────────
 
+-- Без PARTITION BY намеренно: глобальная уникальность (tenant_id,
+-- client_event_id) — это инвариант I-2, а PostgreSQL требует включать ключ
+-- партиционирования во все уникальные ограничения, что разрушило бы
+-- идемпотентность (один и тот же client_event_id в разные месяцы прошёл бы
+-- дважды). Помесячное партиционирование вернётся вместе с переносом дедупа
+-- в отдельную непартиционированную таблицу — см. §08 (архивация).
 CREATE TABLE session_event (
   tenant_id       UUID NOT NULL,
   session_id      UUID NOT NULL REFERENCES scan_session(id),
@@ -166,14 +172,11 @@ CREATE TABLE session_event (
   device_ts       TIMESTAMPTZ NOT NULL,       -- время устройства, может врать
   server_ts       TIMESTAMPTZ NOT NULL DEFAULT now(),
   clock_skew_ms   BIGINT GENERATED ALWAYS AS
-                    (EXTRACT(EPOCH FROM (server_ts - device_ts)) * 1000)::BIGINT STORED,
+                    ((EXTRACT(EPOCH FROM (server_ts - device_ts)) * 1000)::BIGINT) STORED,
   PRIMARY KEY (session_id, seq),
   UNIQUE (tenant_id, client_event_id)         -- I-2: идемпотентность
-) PARTITION BY RANGE (server_ts);
-
--- Партиции создаются планировщиком помесячно; холодные уезжают в архив.
-CREATE TABLE session_event_2026_07 PARTITION OF session_event
-  FOR VALUES FROM ('2026-07-01') TO ('2026-08-01');
+);
+CREATE INDEX session_event_by_time ON session_event (server_ts);
 
 CREATE TABLE dead_letter_event (
   id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
