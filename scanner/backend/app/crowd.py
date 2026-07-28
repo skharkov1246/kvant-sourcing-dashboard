@@ -52,6 +52,7 @@ class Contributor:
 class Submission:
     contributor_id: str
     content_sha256: str
+    campaign_id: str | None = None
     phash: str | None = None
     supplier_claim: dict | None = None
     quality_score: float | None = None
@@ -67,7 +68,20 @@ class LedgerEntry:
     kind: str  # ACCRUAL | BONUS | CLAWBACK | PAYOUT
     amount_cents_eur: int
     submission_id: str | None = None
+    campaign_id: str | None = None
     note: str | None = None
+    id: str = field(default_factory=lambda: str(uuid.uuid4()))
+
+
+@dataclass
+class Campaign:
+    """Кампания — управляемый кран расхода (docs/15 §3): «в этом месяце
+    собираем уплотнения по горнодобыче» с жёстким потолком бюджета.
+    Исчерпание бюджета не принимает скан в оплату — открытого крана нет."""
+
+    title: str
+    budget_cents_eur: int
+    state: str = "ACTIVE"  # ACTIVE | PAUSED | CLOSED
     id: str = field(default_factory=lambda: str(uuid.uuid4()))
 
 
@@ -87,12 +101,34 @@ class CrowdEngine:
         self.ledger: list[LedgerEntry] = []
         self._sha_index: set[str] = set()
         self._phash_index: set[str] = set()
+        self.campaigns: dict[str, Campaign] = {}
 
     # — регистрация —
 
     def register(self, contributor: Contributor) -> Contributor:
         self.contributors[contributor.id] = contributor
         return contributor
+
+    # — кампании —
+
+    def create_campaign(self, campaign: Campaign) -> Campaign:
+        self.campaigns[campaign.id] = campaign
+        return campaign
+
+    def campaign_spent_cents(self, campaign_id: str) -> int:
+        """Расход кампании = положительные строки реестра, привязанные к ней.
+        Клобэк бюджет НЕ возвращает: деньги на фрод уже потрачены операционно."""
+        return sum(e.amount_cents_eur for e in self.ledger
+                   if e.campaign_id == campaign_id and e.amount_cents_eur > 0)
+
+    def set_campaign_state(self, campaign_id: str, state: str) -> Campaign:
+        if state not in ("ACTIVE", "PAUSED", "CLOSED"):
+            raise CrowdError(f"Недопустимое состояние кампании: {state}")
+        campaign = self.campaigns[campaign_id]
+        if campaign.state == "CLOSED":
+            raise CrowdError("Закрытая кампания не открывается заново")
+        campaign.state = state
+        return campaign
 
     # — приём скана —
 
@@ -130,6 +166,18 @@ class CrowdEngine:
         if (sub.quality_score or 0.0) < self.policy.min_quality_score:
             return self._reject(sub, "quality")
 
+        if sub.campaign_id is not None:
+            campaign = self.campaigns.get(sub.campaign_id)
+            if campaign is None:
+                return self._reject(sub, "unknown_campaign")
+            if campaign.state != "ACTIVE":
+                return self._reject(sub, "campaign_inactive")
+            if (self.campaign_spent_cents(campaign.id) + self.policy.base_scan_cents_eur
+                    > campaign.budget_cents_eur):
+                # Потолок жёсткий: скан сверх бюджета не оплачивается —
+                # кампания гаснет в приложении ДО съёмки, а не после.
+                return self._reject(sub, "campaign_budget_exhausted")
+
         return self._accept(sub, c)
 
     def resolve_flagged(self, submission_id: str, verdict_ok: bool) -> Submission:
@@ -150,9 +198,15 @@ class CrowdEngine:
             raise CrowdError("Бонус только по принятому скану")
         if not sub.supplier_claim:
             raise CrowdError("В скане нет заявки о субпоставщике")
+        if sub.campaign_id is not None:
+            campaign = self.campaigns[sub.campaign_id]
+            if (self.campaign_spent_cents(campaign.id) + self.policy.new_supplier_bonus_cents
+                    > campaign.budget_cents_eur):
+                raise CrowdError("Бюджет кампании исчерпан — бонус не начислен")
         return self._post(sub.contributor_id, "BONUS",
                           self.policy.new_supplier_bonus_cents, sub.id,
-                          note="новый субпоставщик подтверждён")
+                          note="новый субпоставщик подтверждён",
+                          campaign_id=sub.campaign_id)
 
     def clawback(self, submission_id: str, reason: str) -> LedgerEntry:
         """Постфактум-аудит нашёл фрод: начисление сторнируется ОТДЕЛЬНОЙ
@@ -209,7 +263,8 @@ class CrowdEngine:
         if sub.phash:
             self._phash_index.add(sub.phash)
         c.accepted += 1
-        self._post(c.id, "ACCRUAL", self.policy.base_scan_cents_eur, sub.id)
+        self._post(c.id, "ACCRUAL", self.policy.base_scan_cents_eur, sub.id,
+                   campaign_id=sub.campaign_id)
         return sub
 
     def _reject(self, sub: Submission, reason: str) -> Submission:
@@ -220,10 +275,11 @@ class CrowdEngine:
         return sub
 
     def _post(self, contributor_id: str, kind: str, amount: int,
-              submission_id: str | None = None, note: str | None = None) -> LedgerEntry:
+              submission_id: str | None = None, note: str | None = None,
+              campaign_id: str | None = None) -> LedgerEntry:
         entry = LedgerEntry(contributor_id=contributor_id, kind=kind,
                             amount_cents_eur=amount, submission_id=submission_id,
-                            note=note)
+                            campaign_id=campaign_id, note=note)
         self.ledger.append(entry)
         return entry
 

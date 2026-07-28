@@ -41,10 +41,22 @@ CREATE TABLE reward_policy (
   audit_sample_pct          INT NOT NULL DEFAULT 10  -- случайная выборка на аудит
 );
 
+-- Кампания: управляемый кран расхода с жёстким потолком (docs/15 §3)
+CREATE TABLE crowd_campaign (
+  id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id        UUID NOT NULL REFERENCES tenant(id),
+  title            TEXT NOT NULL,
+  budget_cents_eur INT  NOT NULL CHECK (budget_cents_eur >= 0),
+  state            TEXT NOT NULL DEFAULT 'ACTIVE'
+                     CHECK (state IN ('ACTIVE','PAUSED','CLOSED')),
+  created_at       TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
 CREATE TABLE crowd_submission (
   id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   tenant_id     UUID NOT NULL REFERENCES tenant(id),
   contributor_id UUID NOT NULL REFERENCES contributor(id),
+  campaign_id   UUID REFERENCES crowd_campaign(id),
   session_id    UUID REFERENCES scan_session(id), -- скан идёт штатным протоколом kv_crowd
   -- Дедуп: точный по содержимому и перцептивный по кадрам
   content_sha256 TEXT NOT NULL,
@@ -67,6 +79,7 @@ CREATE TABLE bounty_ledger (
   tenant_id     UUID NOT NULL REFERENCES tenant(id),
   contributor_id UUID NOT NULL REFERENCES contributor(id),
   submission_id UUID REFERENCES crowd_submission(id),
+  campaign_id   UUID REFERENCES crowd_campaign(id),
   kind          TEXT NOT NULL CHECK (kind IN ('ACCRUAL','BONUS','CLAWBACK','PAYOUT')),
   amount_cents_eur INT NOT NULL,               -- знак: начисления +, клобэк/выплата −
   note          TEXT,
@@ -89,7 +102,14 @@ CREATE TABLE payout_item (
   contributor_id UUID NOT NULL REFERENCES contributor(id),
   amount_cents_eur INT NOT NULL CHECK (amount_cents_eur > 0),
   ledger_entry_id UUID REFERENCES bounty_ledger(id), -- проставляется при EXECUTED
-  PRIMARY KEY (batch_id, contributor_id)
+  -- Чек НПД: N-1 — выплата НПД без чека не существует (npd.py)
+  receipt_id       TEXT,
+  receipt_url      TEXT,
+  amount_rub_kopecks BIGINT,
+  PRIMARY KEY (batch_id, contributor_id),
+  CONSTRAINT npd_payout_needs_receipt CHECK (
+    receipt_id IS NOT NULL OR amount_rub_kopecks IS NULL
+  )
 );
 
 -- Крипто-рельса: за явным флагом тенанта, по умолчанию ВЫКЛЮЧЕНА (C-5)
@@ -100,8 +120,8 @@ DO $$
 DECLARE t TEXT;
 BEGIN
   FOREACH t IN ARRAY ARRAY[
-    'contributor','reward_policy','crowd_submission','bounty_ledger',
-    'payout_batch','payout_item'
+    'contributor','reward_policy','crowd_campaign','crowd_submission',
+    'bounty_ledger','payout_batch','payout_item'
   ] LOOP
     EXECUTE format('ALTER TABLE %I ENABLE ROW LEVEL SECURITY', t);
     IF t <> 'payout_item' THEN
