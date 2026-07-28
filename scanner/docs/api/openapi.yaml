@@ -402,6 +402,54 @@ paths:
         '409':
           description: Вердикт уже вынесен другим контролёром
 
+  /export/sessions:
+    get:
+      tags: [export]
+      summary: Строки реестра по завершённым сессиям (Р-13)
+      description: |
+        Материал для выгрузки во внешние системы (Bitrix, Google Sheets) —
+        форматы таблиц собирают коннекторы. Только завершённые сессии:
+        реестр — про результаты. Доступно роли `reviewer`.
+      operationId: exportSessions
+      parameters:
+        - name: date_from
+          in: query
+          required: false
+          schema: { type: string, format: date-time }
+          description: Нижняя граница по серверному времени завершения
+        - name: date_to
+          in: query
+          required: false
+          schema: { type: string, format: date-time }
+      responses:
+        '200':
+          description: Строки реестра
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count: { type: integer }
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        session_id: { type: string }
+                        task_id: { type: string, nullable: true }
+                        protocol: { type: string }
+                        completed_at: { type: string, format: date-time }
+                        quality_score: { type: number }
+                        steps: { type: object, additionalProperties: { type: string } }
+                        measurements: { type: array, items: { type: object } }
+                        codes: { type: array, items: { type: object } }
+                        asset_ids: { type: array, items: { type: string } }
+                        review:
+                          allOf: [{ $ref: '#/components/schemas/ReviewEntry' }]
+                          nullable: true
+        '403':
+          description: Роль не reviewer
+
   /items/{itemId}:
     get:
       tags: [items]

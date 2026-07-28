@@ -544,7 +544,89 @@ def review_verdict(
             status_code=409,
             detail={"code": "already_resolved", "message": f"Вердикт уже вынесен: {existing['verdict']}"},
         )
+    _apply_verdict_to_task(principal.tenant_id, session_id, body.verdict)
     return entry
+
+
+def _session_task_id(tenant_id: str, session_id: str) -> str | None:
+    events = STORE.session_events(tenant_id, session_id)
+    return next(
+        (e["payload"].get("task_id") for e in events if e["type"] == "session.started"),
+        None,
+    )
+
+
+def _apply_verdict_to_task(tenant_id: str, session_id: str, verdict: str) -> None:
+    """Вердикт двигает жизненный цикл задания.
+
+    REWORK возвращает задание в состояние REWORK — на следующем sync_pull
+    оно снова окажется на устройстве. ACCEPTED и REJECTED — терминальные
+    состояния жизненного цикла задания (schema.sql: scan_task.state); брак —
+    тоже результат: он фиксируется в реестре, а не переснимается бесконечно.
+    Сессия без задания (ad-hoc скан) ничего не двигает.
+    """
+    task_id = _session_task_id(tenant_id, session_id)
+    if not task_id:
+        return
+    task = STORE.get_task(tenant_id, task_id)
+    if task is None:
+        return
+    task["state"] = verdict  # вердикты — подмножество состояний задания
+    STORE.upsert_task(task)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Экспорт реестра (Р-13)
+# ─────────────────────────────────────────────────────────────────────────────
+
+@app.get("/v1/export/sessions", tags=["export"])
+def export_sessions(
+    date_from: str | None = None,
+    date_to: str | None = None,
+    principal: Principal = Depends(current_principal),
+) -> dict[str, Any]:
+    """Строки реестра по завершённым сессиям — материал для выгрузки в
+    Bitrix/Google Sheets (Р-13). Пока JSON; форматы таблиц — на стороне
+    коннекторов.
+
+    В выгрузку попадают только завершённые сессии: реестр — про результаты,
+    незаконченная съёмка результатом не является. Фильтр date_from/date_to —
+    по серверному времени события завершения (ISO 8601).
+    """
+    _require_reviewer(principal)
+    rows: list[dict[str, Any]] = []
+    for session_id in STORE.list_sessions(principal.tenant_id):
+        events = STORE.session_events(principal.tenant_id, session_id)
+        completed_at = next(
+            (e.get("server_ts") for e in events if e["type"] == "session.completed"),
+            None,
+        )
+        if completed_at is None:
+            continue
+        if date_from and completed_at < date_from:
+            continue
+        if date_to and completed_at > date_to:
+            continue
+        state = fold(session_id, events)
+        ctx = state.to_context()
+        protocol_ref = next(
+            (e["payload"].get("protocol") for e in events if e["type"] == "session.started"),
+            None,
+        )
+        review = STORE.get_review(principal.tenant_id, session_id)
+        rows.append({
+            "session_id": session_id,
+            "task_id": _session_task_id(principal.tenant_id, session_id),
+            "protocol": protocol_ref,
+            "completed_at": completed_at,
+            "quality_score": round(ctx.quality_score, 3),
+            "steps": {k: v.status for k, v in state.results.items()},
+            "measurements": [e["payload"] for e in events if e["type"] == "measurement.recorded"],
+            "codes": [e["payload"] for e in events if e["type"] == "code.read"],
+            "asset_ids": sorted(state.asset_ids),
+            "review": review,
+        })
+    return {"items": rows, "count": len(rows)}
 
 
 # ─────────────────────────────────────────────────────────────────────────────

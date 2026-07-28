@@ -149,7 +149,8 @@ CREATE TABLE scan_session (
   duplicate_of        UUID REFERENCES scan_session(id),
   state               TEXT NOT NULL,
   started_at          TIMESTAMPTZ NOT NULL,
-  finished_at         TIMESTAMPTZ
+  finished_at         TIMESTAMPTZ,
+  ext_ref             TEXT  -- идентификатор сессии, каким его знает клиент
 );
 
 -- ─────────────────────────────────────────────────────────────────────────────

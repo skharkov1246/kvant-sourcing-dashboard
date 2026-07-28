@@ -120,13 +120,23 @@ class PgStore:
         sid = _as_uuid(session_text, "session", tenant_uuid)
         self._conn.execute(
             "INSERT INTO scan_session (id, tenant_id, task_id, device_id, user_id, "
-            " protocol_code, protocol_version, state, started_at) "
-            "VALUES (%s, %s, %s, %s, %s, 'unknown', 0, 'ACTIVE', now()) "
+            " protocol_code, protocol_version, state, started_at, ext_ref) "
+            "VALUES (%s, %s, %s, %s, %s, 'unknown', 0, 'ACTIVE', now(), %s) "
             "ON CONFLICT (id) DO NOTHING",
             (sid, tenant_uuid, self._stub_task(tenant_uuid),
-             self._stub_device(tenant_uuid), self._stub_user(tenant_uuid, "ingest")),
+             self._stub_device(tenant_uuid), self._stub_user(tenant_uuid, "ingest"),
+             session_text),
         )
         return sid
+
+    def list_sessions(self, tenant_id: str) -> list[str]:
+        rows = self._conn.execute(
+            "SELECT ext_ref FROM scan_session "
+            "WHERE tenant_id = %s AND ext_ref IS NOT NULL "
+            "ORDER BY started_at, ext_ref",
+            (self._tenant(tenant_id),),
+        ).fetchall()
+        return [r[0] for r in rows]
 
     # ── Протоколы ────────────────────────────────────────────────────────────
 

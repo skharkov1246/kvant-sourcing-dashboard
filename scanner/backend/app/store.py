@@ -166,6 +166,15 @@ class Store:
             )
             return "accepted"
 
+    def list_sessions(self, tenant_id: str) -> list[str]:
+        """Сессии тенанта в порядке появления первого события."""
+        with self._lock:
+            seen: dict[str, None] = {}
+            for e in self.events:
+                if e.tenant_id == tenant_id:
+                    seen.setdefault(e.session_id)
+            return list(seen)
+
     def session_events(self, tenant_id: str, session_id: str, since_seq: int = -1) -> list[dict[str, Any]]:
         with self._lock:
             return [
