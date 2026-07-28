@@ -250,6 +250,28 @@ class AcceptancePipeline:
         )
 
 
+class AcceptanceService:
+    """Обвязка конвейера: решение превращается в действие.
+
+    Конвейер остаётся чистой функцией решения (его матрица тестов не знает
+    о хранилище); сервис же гарантирует, что MANUAL_REVIEW не повисает в
+    воздухе, а оказывается в очереди контролёра (review_queue). REJECTED и
+    AUTO_ACCEPTED очередь не трогают: у них свои маршруты в жизненном цикле
+    сессии.
+    """
+
+    def __init__(self, pipeline: AcceptancePipeline, store: Any) -> None:
+        self._pipeline = pipeline
+        self._store = store
+
+    def process(self, tenant_id: str, session_id: str, protocol: dict[str, Any],
+                ctx: SessionContext, tenant: TenantDataPolicy) -> AcceptanceDecision:
+        decision = self._pipeline.decide(protocol, ctx, tenant)
+        if decision.outcome == "MANUAL_REVIEW":
+            self._store.enqueue_review(tenant_id, session_id, decision.reasons)
+        return decision
+
+
 def _render_session(protocol: dict[str, Any], ctx: SessionContext) -> str:
     """Свёртка сессии для модели: детерминированный JSON (стабильность байтов
     важна и для воспроизводимости логов, и для кэширования)."""

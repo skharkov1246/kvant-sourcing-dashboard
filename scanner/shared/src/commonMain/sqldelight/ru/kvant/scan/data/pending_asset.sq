@@ -1,0 +1,40 @@
+-- Очередь загрузки медиа (§04.2, инвариант I-1: сырьё не теряется).
+-- Файл лежит на диске устройства до подтверждения complete от сервера;
+-- прогресс чанков переживает перезапуск приложения.
+
+CREATE TABLE pending_asset (
+  asset_id     TEXT NOT NULL PRIMARY KEY,
+  session_id   TEXT NOT NULL,
+  step_id      TEXT NOT NULL,
+  kind         TEXT NOT NULL,        -- photo | video | depth_map | point_cloud | audio
+  mime         TEXT NOT NULL,
+  bytes        INTEGER NOT NULL,
+  sha256       TEXT NOT NULL,
+  local_path   TEXT NOT NULL,
+  chunk_size   INTEGER,              -- назначается сервером при init
+  uploaded_chunks TEXT NOT NULL DEFAULT '[]',   -- JSON-массив подтверждённых номеров
+  upload_state TEXT NOT NULL DEFAULT 'PENDING', -- PENDING | UPLOADING | DONE
+  created_at   INTEGER NOT NULL,
+  UNIQUE (session_id, sha256)
+);
+
+insertAsset:
+INSERT OR IGNORE INTO pending_asset (
+  asset_id, session_id, step_id, kind, mime, bytes, sha256, local_path, created_at
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+assignChunkSize:
+UPDATE pending_asset SET chunk_size = ?, upload_state = 'UPLOADING' WHERE asset_id = ?;
+
+recordChunks:
+UPDATE pending_asset SET uploaded_chunks = ? WHERE asset_id = ?;
+
+markDone:
+-- Файл с диска удаляет вызывающая сторона ПОСЛЕ этой отметки, не до.
+UPDATE pending_asset SET upload_state = 'DONE' WHERE asset_id = ?;
+
+pendingUploads:
+SELECT * FROM pending_asset WHERE upload_state != 'DONE' ORDER BY created_at;
+
+purgeDone:
+DELETE FROM pending_asset WHERE upload_state = 'DONE';

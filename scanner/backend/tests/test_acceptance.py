@@ -13,6 +13,7 @@ from app.acceptance import (
     SYSTEM_PROMPT,
     VERDICT_SCHEMA,
     AcceptancePipeline,
+    AcceptanceService,
     TransportResult,
     TransportUnavailable,
 )
@@ -181,3 +182,44 @@ class TestRegistryWiring:
         p2.decide(PROTOCOL, _ctx(), STANDARD)
         assert t1.calls[0]["system"] == SYSTEM_PROMPT == t2.calls[0]["system"]
         assert t1.calls[0]["user_content"] == t2.calls[0]["user_content"]
+
+
+class TestAcceptanceService:
+    """Обвязка: решение конвейера доходит до очереди контролёра."""
+
+    def _service(self, *outcomes):
+        from app.store import Store
+
+        pipeline, _ = _pipeline(*outcomes)
+        store = Store()
+        return AcceptanceService(pipeline, store), store
+
+    def test_manual_review_lands_in_queue(self):
+        service, store = self._service(TransportUnavailable("таймаут 10с"))
+        decision = service.process("t-internal", "s-77", PROTOCOL, _ctx(), STANDARD)
+        assert decision.outcome == "MANUAL_REVIEW"
+        queued = store.list_review_queue("t-internal")
+        assert [e["session_id"] for e in queued] == ["s-77"]
+        assert queued[0]["reasons"] == decision.reasons
+
+    def test_auto_accept_does_not_touch_queue(self):
+        service, store = self._service(_result(_ok_verdict()))
+        decision = service.process("t-internal", "s-78", PROTOCOL, _ctx(), STANDARD)
+        assert decision.outcome == "AUTO_ACCEPTED"
+        assert store.list_review_queue("t-internal") == []
+
+    def test_rejected_does_not_touch_queue(self):
+        """Отклонение регламентом терминально — контролёру тут решать нечего."""
+        service, store = self._service(_result(_ok_verdict()))
+        decision = service.process(
+            "t-internal", "s-79", PROTOCOL, _ctx(label_data={"unreadable": True}), STANDARD)
+        assert decision.outcome == "REJECTED"
+        assert store.list_review_queue("t-internal") == []
+
+    def test_llm_flags_arrive_as_review_reasons(self):
+        """Контролёр видит, ЧТО насторожило модель, а не голый факт постановки."""
+        service, store = self._service(
+            _result(_ok_verdict(quality_flags=["фото этикетки снято с экрана"])))
+        service.process("t-internal", "s-80", PROTOCOL, _ctx(), STANDARD)
+        reasons = store.list_review_queue("t-internal")[0]["reasons"]
+        assert "флаг: фото этикетки снято с экрана" in reasons

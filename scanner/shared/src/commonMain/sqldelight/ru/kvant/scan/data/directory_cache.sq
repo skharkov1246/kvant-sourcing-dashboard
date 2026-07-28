@@ -1,0 +1,17 @@
+-- Кэш справочников (Р-03 разд. 6): подбор по рядам работает офлайн.
+-- Семантика обновления — в DirectoryStore (защита от отката версии).
+
+CREATE TABLE directory_cache (
+  name       TEXT NOT NULL PRIMARY KEY,   -- standard_series, ...
+  etag       TEXT,
+  version    INTEGER NOT NULL,
+  body       TEXT NOT NULL,               -- JSON документа целиком
+  fetched_at INTEGER NOT NULL
+);
+
+upsert:
+INSERT OR REPLACE INTO directory_cache (name, etag, version, body, fetched_at)
+VALUES (?, ?, ?, ?, ?);
+
+byName:
+SELECT * FROM directory_cache WHERE name = ?;
