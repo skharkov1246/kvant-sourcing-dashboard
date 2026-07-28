@@ -1,0 +1,361 @@
+{
+  "schema_version": 1,
+  "code": "kv_cat_g",
+  "version": 1,
+  "status": "active",
+  "scope": "global",
+  "title": "Категория G: РТИ и полимеры",
+  "description": "Р-05 п.5 G + Р-10 п.6, 10, 11, 12: обмер без деформации, условия эксплуатации ОБЯЗАТЕЛЬНЫ (без среды и температуры замер не считается завершённым — это же условие стоит в reject_if), правила округления б/у применяет приложение (сечение O-ring → больший d2, толщина прокладки → вверх к ряду), читаемая маркировка манжеты скрывает весь блок обмера. 22 объявленных шага / 7–9 видимых из-за ветвления по типу изделия.",
+  "applies_to": { "categories": ["ri_cat_g"] },
+  "settings": { "estimated_duration_s": 1200 },
+  "steps": [
+    {
+      "id": "g_service",
+      "kind": "form",
+      "title": "Условия эксплуатации — сначала",
+      "instruction": "Р-10 п.10: без среды и температуры замер РТИ НЕ СЧИТАЕТСЯ завершённым. Если данных нет — связаться с заказчиком до обмера.",
+      "form": {
+        "fields": [
+          { "key": "medium", "type": "enum", "label": "Рабочая среда", "required": true,
+            "source": "media_directory" },
+          { "key": "t_min", "type": "number", "label": "T мин", "unit": "°C", "required": true },
+          { "key": "t_max", "type": "number", "label": "T макс", "unit": "°C", "required": true },
+          { "key": "p_max", "type": "number", "label": "P макс", "unit": "бар", "required": true },
+          { "key": "source", "type": "enum", "label": "Источник данных", "required": true,
+            "options": ["паспорт оборудования", "заказчик", "шильдик", "оценка инженера"] },
+          { "key": "client_contact_confirmed", "type": "bool", "label": "С заказчиком сверено", "required": true }
+        ]
+      }
+    },
+    {
+      "id": "g_type",
+      "kind": "form",
+      "title": "Тип изделия",
+      "form": {
+        "fields": [
+          { "key": "rti_type", "type": "enum", "label": "Тип РТИ", "required": true,
+            "options": ["O-ring", "манжета/сальник", "прокладка плоская", "диафрагма", "сильфон", "седло клапана", "иное"] },
+          { "key": "used", "type": "bool", "label": "Б/у", "required": true, "default": true },
+          { "key": "groove_available", "type": "bool", "label": "Канавка доступна для обмера", "required": false, "default": false }
+        ]
+      }
+    },
+    {
+      "id": "g_soak",
+      "kind": "form",
+      "title": "Выдержка при 23 ± 2 °C",
+      "instruction": "Р-10 п.4: холодная резина «дубеет» — не менее 3 часов при комнатной температуре до обмера.",
+      "form": {
+        "fields": [
+          { "key": "soak_started_at", "type": "date", "label": "Начало выдержки", "required": true },
+          { "key": "temp_ok", "type": "bool", "label": "23 ± 2 °C, не менее 3 ч", "required": true }
+        ]
+      }
+    },
+    {
+      "id": "g_photo_before",
+      "kind": "photo",
+      "title": "Фото ДО очистки",
+      "instruction": "Масштабная линейка В ПЛОСКОСТИ изделия. 4–10 кадров со всех сторон.",
+      "repeat": { "min": 4, "max": 10 },
+      "quality": {
+        "max_blur": 0.3,
+        "min_lux": 60,
+        "require_subject_fill_pct": [25, 90],
+        "on_violation": "warn"
+      }
+    },
+    {
+      "id": "g_mark_seal",
+      "kind": "photo",
+      "title": "Торцевая маркировка манжеты — СНАЧАЛА",
+      "instruction": "Р-10 п.8: сперва ищем маркировку на торце. Кадр блокирующий: читаемая маркировка экономит весь обмер.",
+      "visible_if": { "step": "g_type", "field": "rti_type", "eq": "манжета/сальник" },
+      "repeat": { "min": 1, "max": 4 },
+      "quality": {
+        "max_blur": 0.25,
+        "glare_ratio": 0.12,
+        "on_violation": "block"
+      }
+    },
+    {
+      "id": "g_mark_read",
+      "kind": "form",
+      "title": "Маркировка читаема?",
+      "instruction": "Если читаема — блок обмера ниже скрывается, маршрут = «Подбор». Главная экономия времени по категории G.",
+      "visible_if": { "step": "g_type", "field": "rti_type", "eq": "манжета/сальник" },
+      "form": {
+        "fields": [
+          { "key": "marking_readable", "type": "bool", "label": "Маркировка читаема", "required": true },
+          { "key": "d_x_dd_x_h", "type": "text", "label": "d × D × h с маркировки", "required": false },
+          { "key": "seal_type", "type": "text", "label": "Тип манжеты с маркировки", "required": false },
+          { "key": "material", "type": "enum", "label": "Материал с маркировки", "required": false,
+            "options": ["NBR", "FKM", "EPDM", "MVQ", "PU", "PTFE"] }
+        ]
+      }
+    },
+    {
+      "id": "g_clean_ack",
+      "kind": "confirm",
+      "title": "Правила очистки",
+      "confirm": {
+        "text": "Только тёплая вода с нейтральным мылом, сушка без нагрева. Растворители, бензин, батарея, фен — ЗАПРЕЩЕНЫ (Р-10 п.3)."
+      }
+    },
+    {
+      "id": "g_oring_d2",
+      "kind": "form",
+      "title": "O-ring: сечение d2 (3–6 точек)",
+      "instruction": "Р-10 п.11: мерить ВНЕ блестящих полос обжатия. Б/у сечение занижено — приложение предложит БОЛЬШИЙ d2 ряда.",
+      "visible_if": { "step": "g_type", "field": "rti_type", "eq": "O-ring" },
+      "repeat": { "min": 3, "max": 6 },
+      "form": {
+        "fields": [
+          { "key": "d2_mm", "type": "number", "label": "d2", "unit": "mm", "required": true, "min": 0.5 },
+          { "key": "point_no", "type": "number", "label": "№ точки", "required": true, "min": 1 },
+          { "key": "method", "type": "enum", "label": "Метод", "required": true,
+            "options": ["микрометр с плоскими пятками", "оптически"] },
+          { "key": "outside_contact_band", "type": "bool", "label": "Вне полос обжатия", "required": true }
+        ]
+      }
+    },
+    {
+      "id": "g_oring_d1",
+      "kind": "form",
+      "title": "O-ring: внутренний диаметр d1",
+      "visible_if": { "step": "g_type", "field": "rti_type", "eq": "O-ring" },
+      "form": {
+        "fields": [
+          { "key": "d1_mm", "type": "number", "label": "d1", "unit": "mm", "required": true, "min": 1 },
+          { "key": "method", "type": "enum", "label": "Метод", "required": true,
+            "options": ["конусный калибр", "фото на сканере с линейкой", "через периметр P/π−d2"] }
+        ]
+      }
+    },
+    {
+      "id": "g_groove",
+      "kind": "form",
+      "title": "Канавка — точнее кольца",
+      "instruction": "При доступной канавке d1 берём ПО НЕЙ, а не по изношенному кольцу.",
+      "visible_if": {
+        "all": [
+          { "step": "g_type", "field": "rti_type", "eq": "O-ring" },
+          { "step": "g_type", "field": "groove_available", "eq": true }
+        ]
+      },
+      "form": {
+        "fields": [
+          { "key": "groove_d", "type": "number", "label": "Диаметр канавки", "unit": "mm", "required": true, "min": 1 },
+          { "key": "groove_w", "type": "number", "label": "Ширина", "unit": "mm", "required": true, "min": 0.5 },
+          { "key": "groove_h", "type": "number", "label": "Глубина", "unit": "mm", "required": true, "min": 0.3 }
+        ]
+      }
+    },
+    {
+      "id": "g_oring_series",
+      "kind": "form",
+      "title": "Сверка с рядами ГОСТ 9833 / ISO 3601 / AS568",
+      "instruction": "Сверка офлайн по синхронизированному справочнику; правило округления б/у применяет приложение и показывает предложенный типоразмер. Совпадение = кандидат на категорию A.",
+      "visible_if": { "step": "g_type", "field": "rti_type", "eq": "O-ring" },
+      "form": {
+        "fields": [
+          { "key": "series_match", "type": "enum", "label": "Совпадение с рядом", "required": true,
+            "options": ["ГОСТ 9833", "ISO 3601", "AS568", "нет совпадения"] },
+          { "key": "matched_size", "type": "enum", "label": "Типоразмер", "required": false,
+            "source": "oring_series_directory" }
+        ]
+      }
+    },
+    {
+      "id": "g_gasket",
+      "kind": "form",
+      "title": "Прокладка: толщина (3–8 точек)",
+      "instruction": "Р-10 п.11: мерить по наружной кромке ВНЕ отпечатка фланца. Б/у толщина занижена — приложение округлит ВВЕРХ к ряду 0,5/0,8/1,0/1,5/2,0/3,0.",
+      "visible_if": { "step": "g_type", "field": "rti_type", "eq": "прокладка плоская" },
+      "repeat": { "min": 3, "max": 8 },
+      "form": {
+        "fields": [
+          { "key": "thickness_mm", "type": "number", "label": "Толщина", "unit": "mm", "required": true, "min": 0.1 },
+          { "key": "zone", "type": "enum", "label": "Зона замера", "required": true,
+            "options": ["наружная кромка", "вне отпечатка", "иное"] },
+          { "key": "instrument", "type": "enum", "label": "СИ (номер поверки)", "required": true,
+            "source": "si_directory" }
+        ]
+      }
+    },
+    {
+      "id": "g_gasket_contour",
+      "kind": "form",
+      "title": "Прокладка: контур и отверстия",
+      "visible_if": { "step": "g_type", "field": "rti_type", "eq": "прокладка плоская" },
+      "form": {
+        "fields": [
+          { "key": "id_mm", "type": "number", "label": "Внутренний Ø", "unit": "mm", "required": true, "min": 1 },
+          { "key": "od_mm", "type": "number", "label": "Наружный Ø", "unit": "mm", "required": true, "min": 1 },
+          { "key": "holes_count", "type": "number", "label": "Число отверстий", "required": true, "min": 0 },
+          { "key": "hole_d", "type": "number", "label": "Ø отверстий", "unit": "mm", "required": false },
+          { "key": "bolt_circle_mm", "type": "number", "label": "Ø болтовой окружности", "unit": "mm", "required": false },
+          { "key": "flange_series", "type": "enum", "label": "Ряд фланцев", "required": true,
+            "options": ["ГОСТ 33259", "ASME B16", "нет совпадения"] }
+        ]
+      }
+    },
+    {
+      "id": "g_gasket_photo",
+      "kind": "photo",
+      "title": "Прокладка: фото строго сверху",
+      "instruction": "Масштабная линейка В ПЛОСКОСТИ прокладки, камера перпендикулярно.",
+      "visible_if": { "step": "g_type", "field": "rti_type", "eq": "прокладка плоская" },
+      "hint_overlay": "crosshair",
+      "quality": {
+        "require_subject_fill_pct": [40, 90],
+        "on_violation": "warn"
+      }
+    },
+    {
+      "id": "g_gasket_mat",
+      "kind": "form",
+      "title": "Прокладка: материал",
+      "visible_if": { "step": "g_type", "field": "rti_type", "eq": "прокладка плоская" },
+      "form": {
+        "fields": [
+          { "key": "material", "type": "enum", "label": "Материал", "required": true,
+            "options": ["паронит", "ПТФЭ", "резина", "графит", "спирально-навитая"] },
+          { "key": "spiral_ring_color", "type": "enum", "label": "Цвет колец (спирально-навитая)", "required": false,
+            "options": ["жёлтый", "зелёный", "красный", "серый", "иной"] }
+        ]
+      }
+    },
+    {
+      "id": "g_seal_dims",
+      "kind": "form",
+      "title": "Манжета: посадочные ПО ВАЛУ И КОРПУСУ",
+      "instruction": "Р-10 п.8: размеры берём по валу и корпусу, а не по изношенной манжете.",
+      "visible_if": {
+        "all": [
+          { "step": "g_type", "field": "rti_type", "eq": "манжета/сальник" },
+          { "step": "g_mark_read", "field": "marking_readable", "eq": false }
+        ]
+      },
+      "form": {
+        "fields": [
+          { "key": "shaft_d_mm", "type": "number", "label": "Ø вала", "unit": "mm", "required": true, "min": 1 },
+          { "key": "housing_d_mm", "type": "number", "label": "Ø корпуса", "unit": "mm", "required": true, "min": 1 },
+          { "key": "width_mm", "type": "number", "label": "Ширина", "unit": "mm", "required": true, "min": 1 },
+          { "key": "instrument", "type": "enum", "label": "СИ (номер поверки)", "required": true,
+            "source": "si_directory" }
+        ]
+      }
+    },
+    {
+      "id": "g_seal_profile",
+      "kind": "form",
+      "title": "Манжета: профиль сечения",
+      "visible_if": {
+        "all": [
+          { "step": "g_type", "field": "rti_type", "eq": "манжета/сальник" },
+          { "step": "g_mark_read", "field": "marking_readable", "eq": false }
+        ]
+      },
+      "form": {
+        "fields": [
+          { "key": "method", "type": "enum", "label": "Метод снятия профиля", "required": true,
+            "options": ["срез по согласованию", "оттиск слепочной массой", "оптический проектор"] },
+          { "key": "dust_lip", "type": "bool", "label": "Пыльник есть", "required": true },
+          { "key": "rotation", "type": "enum", "label": "Направление вращения", "required": true,
+            "options": ["правое", "левое", "реверс", "не определено"] },
+          { "key": "spring_type", "type": "enum", "label": "Пружина", "required": true,
+            "options": ["браслетная", "пальцевая", "без пружины", "не определена"] }
+        ]
+      }
+    },
+    {
+      "id": "g_seal_profile_photo",
+      "kind": "photo",
+      "title": "Манжета: фото профиля",
+      "visible_if": {
+        "all": [
+          { "step": "g_type", "field": "rti_type", "eq": "манжета/сальник" },
+          { "step": "g_mark_read", "field": "marking_readable", "eq": false }
+        ]
+      },
+      "repeat": { "min": 1, "max": 4 },
+      "quality": { "max_blur": 0.3, "on_violation": "warn" }
+    },
+    {
+      "id": "g_shore",
+      "kind": "form",
+      "title": "Твёрдость по Шору (3–6 точек)",
+      "instruction": "Р-10 п.12: на образцах тоньше 6 мм показания недостоверны — на тонких шаг не появляется.",
+      "visible_if": {
+        "any": [
+          { "step": "g_gasket", "field": "thickness_mm", "gt": 5.9 },
+          { "step": "g_type", "field": "rti_type", "in": ["седло клапана", "диафрагма", "сильфон"] }
+        ]
+      },
+      "repeat": { "min": 3, "max": 6 },
+      "form": {
+        "fields": [
+          { "key": "value", "type": "number", "label": "Значение", "required": true, "min": 10, "max": 100 },
+          { "key": "scale", "type": "enum", "label": "Шкала", "required": true,
+            "options": ["Шор A", "Шор D"] },
+          { "key": "point_no", "type": "number", "label": "№ точки", "required": true, "min": 1 }
+        ]
+      }
+    },
+    {
+      "id": "g_aging",
+      "kind": "form",
+      "title": "Признаки старения б/у",
+      "instruction": "Р-10 п.10: размеры б/у РТИ ВСЕГДА ориентировочные — сервер пометит все размеры сессии approximate=true.",
+      "visible_if": { "step": "g_type", "field": "used", "eq": true },
+      "form": {
+        "fields": [
+          { "key": "compression_set", "type": "bool", "label": "Остаточная деформация", "required": true },
+          { "key": "swelling", "type": "bool", "label": "Разбухание", "required": true },
+          { "key": "hardening", "type": "bool", "label": "Задубение", "required": true },
+          { "key": "notes", "type": "multiline", "label": "Заметки (можно голосом)", "required": false }
+        ]
+      }
+    },
+    {
+      "id": "g_material",
+      "kind": "form",
+      "title": "Эластомер",
+      "form": {
+        "fields": [
+          { "key": "elastomer", "type": "enum", "label": "Тип эластомера", "required": true,
+            "options": ["NBR", "FKM", "EPDM", "MVQ", "PU", "PTFE", "не определён"] },
+          { "key": "color_marks", "type": "text", "label": "Цветовые метки", "required": false }
+        ]
+      }
+    },
+    {
+      "id": "g_mold_request",
+      "kind": "form",
+      "title": "Запрос на пресс-форму",
+      "required": false,
+      "visible_if": { "step": "g_type", "field": "rti_type", "in": ["манжета/сальник", "седло клапана", "диафрагма"] },
+      "form": {
+        "fields": [
+          { "key": "mold_request_needed", "type": "bool", "label": "Нужен запрос подрядчику о пресс-форме", "required": false }
+        ]
+      }
+    }
+  ],
+  "acceptance": {
+    "auto_accept_if": {
+      "all": [
+        { "step": "g_service" },
+        { "step": "g_material" },
+        { "quality_score_at_least": 0.75 }
+      ]
+    },
+    "reject_if": {
+      "any": [
+        { "step": "g_service", "field": "medium", "exists": false },
+        { "step": "g_service", "field": "t_max", "exists": false }
+      ]
+    }
+  }
+}

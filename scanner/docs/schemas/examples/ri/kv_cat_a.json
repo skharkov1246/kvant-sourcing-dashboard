@@ -1,0 +1,444 @@
+{
+  "schema_version": 1,
+  "code": "kv_cat_a",
+  "version": 1,
+  "status": "active",
+  "scope": "global",
+  "title": "Категория A: стандартные покупные — подбор",
+  "description": "Р-05 п.5 A, маршрут «Идентификация и подбор» (Р-05 п.3): расшифровка маркировки, ключевые размеры по подтипу, аналоги минимум у двух производителей. Полный чертёж и скан НЕ выполняются. Стоп-фактор: размеры не легли ни в один каталожный ряд → деталь нестандартная, переклассификация в C или G (сессия не переписывается — стартует новая, фото переиспользуются).",
+  "applies_to": {
+    "categories": [
+      "ri_cat_a"
+    ]
+  },
+  "settings": {
+    "estimated_duration_s": 360
+  },
+  "steps": [
+    {
+      "id": "a_safety",
+      "kind": "form",
+      "title": "Среда и безопасность",
+      "instruction": "Р-10 п.1: до любых работ уточнить рабочую среду и работать в СИЗ.",
+      "form": {
+        "fields": [
+          {
+            "key": "medium",
+            "type": "enum",
+            "label": "Рабочая среда",
+            "required": true,
+            "source": "media_directory"
+          },
+          {
+            "key": "ppe_ack",
+            "type": "bool",
+            "label": "СИЗ надеты",
+            "required": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "a_overview",
+      "kind": "photo",
+      "title": "Общий вид",
+      "repeat": {
+        "min": 1,
+        "max": 4
+      },
+      "quality": {
+        "max_blur": 0.35,
+        "min_lux": 60,
+        "require_subject_fill_pct": [
+          25,
+          90
+        ],
+        "on_violation": "warn"
+      }
+    },
+    {
+      "id": "a_mark",
+      "kind": "photo",
+      "title": "Маркировка крупно",
+      "repeat": {
+        "min": 1,
+        "max": 6
+      },
+      "quality": {
+        "max_blur": 0.25,
+        "glare_ratio": 0.12,
+        "min_lux": 80,
+        "on_violation": "block"
+      }
+    },
+    {
+      "id": "a_code",
+      "kind": "code",
+      "title": "Штрих-код упаковки (если есть)",
+      "required": false,
+      "code": {
+        "symbologies": [
+          "data_matrix",
+          "qr",
+          "code_128",
+          "ean_13"
+        ],
+        "allow_manual": true
+      }
+    },
+    {
+      "id": "a_decode",
+      "kind": "form",
+      "title": "Расшифровка маркировки",
+      "form": {
+        "fields": [
+          {
+            "key": "producer",
+            "type": "enum",
+            "label": "Производитель",
+            "required": true,
+            "source": "brand_directory"
+          },
+          {
+            "key": "standard",
+            "type": "enum",
+            "label": "Стандарт",
+            "required": true,
+            "options": [
+              "ГОСТ",
+              "ISO",
+              "DIN",
+              "ANSI",
+              "API",
+              "не определён"
+            ]
+          },
+          {
+            "key": "typesize",
+            "type": "text",
+            "label": "Типоразмер по маркировке",
+            "required": true
+          },
+          {
+            "key": "subtype",
+            "type": "enum",
+            "label": "Подтип",
+            "required": true,
+            "options": [
+              "кольцо",
+              "подшипник",
+              "крепёж",
+              "манжета",
+              "стопорное",
+              "шпонка",
+              "фитинг",
+              "прочее"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "a_dim_ring",
+      "kind": "form",
+      "title": "Ключевые размеры кольца",
+      "visible_if": {
+        "step": "a_decode",
+        "field": "subtype",
+        "in": [
+          "кольцо",
+          "стопорное"
+        ]
+      },
+      "form": {
+        "fields": [
+          {
+            "key": "d_mm",
+            "type": "number",
+            "label": "d",
+            "unit": "mm",
+            "required": true,
+            "min": 0.5
+          },
+          {
+            "key": "dd_mm",
+            "type": "number",
+            "label": "D",
+            "unit": "mm",
+            "required": true,
+            "min": 0.5
+          },
+          {
+            "key": "h_mm",
+            "type": "number",
+            "label": "h",
+            "unit": "mm",
+            "required": true,
+            "min": 0.1
+          },
+          {
+            "key": "instrument",
+            "type": "enum",
+            "label": "СИ (номер поверки)",
+            "required": true,
+            "source": "si_directory"
+          }
+        ]
+      }
+    },
+    {
+      "id": "a_dim_bearing",
+      "kind": "form",
+      "title": "Ключевые размеры подшипника",
+      "visible_if": {
+        "step": "a_decode",
+        "field": "subtype",
+        "eq": "подшипник"
+      },
+      "form": {
+        "fields": [
+          {
+            "key": "d_mm",
+            "type": "number",
+            "label": "d",
+            "unit": "mm",
+            "required": true,
+            "min": 1
+          },
+          {
+            "key": "dd_mm",
+            "type": "number",
+            "label": "D",
+            "unit": "mm",
+            "required": true,
+            "min": 1
+          },
+          {
+            "key": "b_mm",
+            "type": "number",
+            "label": "B",
+            "unit": "mm",
+            "required": true,
+            "min": 1
+          },
+          {
+            "key": "instrument",
+            "type": "enum",
+            "label": "СИ (номер поверки)",
+            "required": true,
+            "source": "si_directory"
+          }
+        ]
+      }
+    },
+    {
+      "id": "a_dim_fastener",
+      "kind": "form",
+      "title": "Ключевые размеры крепежа",
+      "visible_if": {
+        "step": "a_decode",
+        "field": "subtype",
+        "eq": "крепёж"
+      },
+      "form": {
+        "fields": [
+          {
+            "key": "thread",
+            "type": "text",
+            "label": "Резьба",
+            "required": true
+          },
+          {
+            "key": "length",
+            "type": "number",
+            "label": "Длина",
+            "unit": "mm",
+            "required": true,
+            "min": 1
+          },
+          {
+            "key": "strength_class",
+            "type": "enum",
+            "label": "Класс прочности",
+            "required": true,
+            "options": [
+              "5.8",
+              "8.8",
+              "10.9",
+              "12.9",
+              "A2",
+              "A4",
+              "не определён"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "a_seal",
+      "kind": "form",
+      "title": "Эластомер и условия среды",
+      "instruction": "Р-05 A: тип эластомера подбирается ПО УСЛОВИЯМ СРЕДЫ, не по цвету.",
+      "visible_if": {
+        "step": "a_decode",
+        "field": "subtype",
+        "in": [
+          "кольцо",
+          "манжета"
+        ]
+      },
+      "form": {
+        "fields": [
+          {
+            "key": "elastomer",
+            "type": "enum",
+            "label": "Эластомер",
+            "required": true,
+            "options": [
+              "NBR",
+              "FKM",
+              "EPDM",
+              "MVQ",
+              "PU",
+              "PTFE",
+              "не определён"
+            ]
+          },
+          {
+            "key": "medium",
+            "type": "enum",
+            "label": "Среда",
+            "required": true,
+            "source": "media_directory"
+          },
+          {
+            "key": "t_min",
+            "type": "number",
+            "label": "T мин",
+            "unit": "°C",
+            "required": true
+          },
+          {
+            "key": "t_max",
+            "type": "number",
+            "label": "T макс",
+            "unit": "°C",
+            "required": true
+          },
+          {
+            "key": "p_max",
+            "type": "number",
+            "label": "P макс",
+            "unit": "бар",
+            "required": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "a_catalog",
+      "kind": "form",
+      "title": "Сверка с каталожным рядом и аналоги",
+      "instruction": "Сверка идёт офлайн по синхронизированному справочнику рядов; series_matched проставляется приложением. Аналог — минимум у ДВУХ производителей (Р-05 A).",
+      "form": {
+        "fields": [
+          {
+            "key": "series_matched",
+            "type": "bool",
+            "label": "Совпал с каталожным рядом",
+            "required": true
+          },
+          {
+            "key": "series_name",
+            "type": "enum",
+            "label": "Ряд",
+            "required": false,
+            "source": "std_directory"
+          },
+          {
+            "key": "analog1_vendor",
+            "type": "text",
+            "label": "Аналог 1: производитель",
+            "required": true
+          },
+          {
+            "key": "analog1_pn",
+            "type": "text",
+            "label": "Аналог 1: артикул",
+            "required": true
+          },
+          {
+            "key": "analog2_vendor",
+            "type": "text",
+            "label": "Аналог 2: производитель",
+            "required": true
+          },
+          {
+            "key": "analog2_pn",
+            "type": "text",
+            "label": "Аналог 2: артикул",
+            "required": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "a_reclass",
+      "kind": "form",
+      "title": "Стоп-фактор: деталь нестандартная",
+      "instruction": "Размеры не совпали ни с одним каталожным рядом (Р-05 A). Выберите целевую категорию: металл → C, резина/полимер → G. Текущая сессия уйдёт со статусом NEEDS_RECLASS, новая стартует с теми же фото.",
+      "visible_if": {
+        "step": "a_catalog",
+        "field": "series_matched",
+        "eq": false
+      },
+      "form": {
+        "fields": [
+          {
+            "key": "target_category",
+            "type": "enum",
+            "label": "Целевая категория",
+            "required": true,
+            "options": [
+              "C",
+              "G"
+            ]
+          },
+          {
+            "key": "reason",
+            "type": "multiline",
+            "label": "Обоснование (можно голосом)",
+            "required": true
+          }
+        ]
+      }
+    }
+  ],
+  "acceptance": {
+    "auto_accept_if": {
+      "all": [
+        {
+          "step": "a_mark"
+        },
+        {
+          "quality_score_at_least": 0.8
+        },
+        {
+          "step": "a_catalog",
+          "field": "series_matched",
+          "eq": true
+        },
+        {
+          "step": "a_catalog",
+          "field": "analog2_pn",
+          "exists": true
+        }
+      ]
+    },
+    "reject_if": {
+      "step": "a_catalog",
+      "field": "series_matched",
+      "eq": false
+    }
+  }
+}
