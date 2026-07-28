@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "code": "kv_crowd",
+  "version": 1,
+  "status": "active",
+  "scope": "global",
+  "title": "Краудскан: деталь и субпоставщик за вознаграждение",
+  "description": "Сокращённый протокол для внешних участников (docs/15): 2–4 минуты на позицию. Платится ПРИНЯТЫЙ УНИКАЛЬНЫЙ скан (C-1): приёмка этим протоколом, дедуп sha256+pHash — сервером, вне протокола. Заявка о субпоставщике входит в трассировку как declared (C-4); бонус — после перекрёстного подтверждения. Классы точности габаритов — только D (рулетка): краудскан — разведка, не РКД.",
+  "applies_to": { "categories": ["crowd"] },
+  "settings": { "estimated_duration_s": 240, "allow_handoff": false },
+  "steps": [
+    {
+      "id": "c_overview",
+      "kind": "photo",
+      "title": "Деталь со всех сторон",
+      "instruction": "2–6 кадров: деталь целиком, крупно, на контрастном фоне. Любой предмет для масштаба рядом (монета, зажигалка).",
+      "repeat": { "min": 2, "max": 6 },
+      "quality": {
+        "max_blur": 0.35,
+        "min_lux": 60,
+        "require_subject_fill_pct": [25, 90],
+        "on_violation": "warn"
+      }
+    },
+    {
+      "id": "c_mark",
+      "kind": "photo",
+      "title": "Маркировка и шильдик крупно",
+      "instruction": "Читаемая маркировка — то, за что платится скан. Нечитаемый кадр не принимается.",
+      "repeat": { "min": 1, "max": 4 },
+      "quality": {
+        "max_blur": 0.25,
+        "glare_ratio": 0.12,
+        "min_lux": 80,
+        "on_violation": "block"
+      }
+    },
+    {
+      "id": "c_code",
+      "kind": "code",
+      "title": "Штрих-код упаковки (если есть)",
+      "required": false,
+      "code": {
+        "symbologies": ["data_matrix", "qr", "code_128", "ean_13"],
+        "allow_manual": true
+      }
+    },
+    {
+      "id": "c_supplier",
+      "kind": "form",
+      "title": "Кто поставщик?",
+      "instruction": "Название с шильдика, упаковки или документов — как написано, не по памяти. Эта заявка проверяется перед бонусом.",
+      "form": {
+        "fields": [
+          { "key": "supplier_name", "type": "text", "label": "Производитель/поставщик", "required": true },
+          { "key": "supplier_country", "type": "enum", "label": "Страна", "required": false,
+            "source": "iso3166_alpha2" },
+          { "key": "evidence", "type": "enum", "label": "Откуда информация", "required": true,
+            "options": ["шильдик", "упаковка", "инвойс/документы", "со слов"] },
+          { "key": "equipment_hint", "type": "text", "label": "С какого оборудования (если знаете)", "required": false }
+        ]
+      }
+    },
+    {
+      "id": "c_evidence_photo",
+      "kind": "photo",
+      "title": "Фото документа-источника",
+      "instruction": "Кадр инвойса/упаковки с именем поставщика. Закройте пальцем цены и личные данные — они не нужны.",
+      "visible_if": { "step": "c_supplier", "field": "evidence", "in": ["инвойс/документы", "упаковка"] },
+      "repeat": { "min": 1, "max": 3 },
+      "quality": { "max_blur": 0.3, "on_violation": "warn" }
+    },
+    {
+      "id": "c_dims",
+      "kind": "form",
+      "title": "Габариты рулеткой",
+      "required": false,
+      "instruction": "Примерно, до миллиметра не нужно — это класс D, размеры пойдут как ориентировочные.",
+      "form": {
+        "fields": [
+          { "key": "length_mm", "type": "number", "label": "Длина", "unit": "mm", "required": true, "min": 1 },
+          { "key": "width_mm", "type": "number", "label": "Ширина", "unit": "mm", "required": true, "min": 1 },
+          { "key": "height_mm", "type": "number", "label": "Высота", "unit": "mm", "required": false, "min": 1 }
+        ]
+      }
+    },
+    {
+      "id": "c_context",
+      "kind": "form",
+      "title": "Где снято",
+      "form": {
+        "fields": [
+          { "key": "location_kind", "type": "enum", "label": "Место", "required": true,
+            "options": ["склад", "ремонтная площадка", "магазин/рынок", "иное"] },
+          { "key": "part_condition", "type": "enum", "label": "Состояние", "required": true,
+            "options": ["новая в упаковке", "новая без упаковки", "б/у", "лом"] }
+        ]
+      }
+    }
+  ],
+  "acceptance": {
+    "auto_accept_if": {
+      "all": [
+        { "step": "c_mark" },
+        { "step": "c_supplier" },
+        { "quality_score_at_least": 0.6 }
+      ]
+    }
+  }
+}
