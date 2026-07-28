@@ -106,6 +106,7 @@ validate(read_from_filename('docs/api/openapi.yaml')[0]); print('OpenAPI OK')"
 | Что происходит при отказах | [08-reliability.md](docs/08-reliability.md) |
 | Как подключаются складские системы | [09-integrations.md](docs/09-integrations.md) |
 | Этапы, оценки, риски | [10-roadmap.md](docs/10-roadmap.md) |
+| Что дообучается, как система улучшается со временем | [11-model-lifecycle.md](docs/11-model-lifecycle.md) |
 
 ## Связь с Sourcing Analyzer
 
