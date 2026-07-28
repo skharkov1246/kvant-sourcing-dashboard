@@ -1,0 +1,765 @@
+openapi: 3.1.0
+info:
+  title: КВАНТ Скан API
+  version: "1.0.0"
+  description: |
+    Контракт между мобильными клиентами, web-консолью, внешними системами
+    и бэкендом платформы «КВАНТ Скан».
+
+    Разделы:
+      * `sync`     — синхронизация устройств (pull изменений, push событий)
+      * `assets`   — чанковая загрузка медиа с докачкой
+      * `tasks`    — задания на сканирование
+      * `protocols`— протоколы съёмки
+      * `items`    — карточки единиц товара и трассировка
+      * `inbound`  — приём заданий из складских систем
+      * `review`   — контроль качества
+
+    Принципы, зафиксированные в контракте:
+      * идемпотентность по `client_event_id` (UUIDv7) и `Idempotency-Key`;
+      * результат по каждому событию отдельно — батч не падает целиком;
+      * неизвестные поля клиенты обязаны игнорировать (аддитивная эволюция).
+
+servers:
+  - url: https://scan.kvant.ru/v1
+    description: Промышленная среда
+  - url: https://scan-stage.kvant.ru/v1
+    description: Тестовая среда
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: sync
+    description: Синхронизация устройств
+  - name: assets
+    description: Загрузка медиа
+  - name: tasks
+    description: Задания
+  - name: protocols
+    description: Протоколы съёмки
+  - name: items
+    description: Карточки единиц товара
+  - name: inbound
+    description: Приём заданий из внешних систем
+  - name: review
+    description: Контроль качества
+
+paths:
+  /sync/pull:
+    post:
+      tags: [sync]
+      summary: Получить изменения с момента курсора
+      description: |
+        Возвращает дельту по заданиям, протоколам и справочникам. Курсор
+        непрозрачен для клиента. Сервер использует `capabilities`, чтобы не
+        выдавать заданий, которые устройство не сможет выполнить.
+      operationId: syncPull
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SyncPullRequest' }
+      responses:
+        '200':
+          description: Дельта изменений
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SyncPullResponse' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+
+  /sync/events:
+    post:
+      tags: [sync]
+      summary: Отправить батч событий сессии
+      description: |
+        Идемпотентно по `client_event_id`. Ответ содержит результат по каждому
+        событию отдельно: `accepted`, `duplicate` (тоже успех) или `rejected`.
+        HTTP 200 возвращается и при наличии отвергнутых событий — транспорт
+        отработал, семантика в теле.
+      operationId: syncPushEvents
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/EventBatchRequest' }
+      responses:
+        '200':
+          description: Результат по каждому событию
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/EventBatchResponse' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '413':
+          description: Батч превышает допустимый размер (по умолчанию 1000 событий / 4 МБ)
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503':
+          description: Backpressure — очередь переполнена, повторить после `Retry-After`
+          headers:
+            Retry-After: { schema: { type: integer }, description: Секунды до повтора }
+
+  /sessions/{sessionId}/log:
+    get:
+      tags: [sync]
+      summary: Лог событий сессии
+      description: |
+        Используется при продолжении сессии на другом устройстве: клиент
+        доигрывает лог локальной проекцией и продолжает с `seq + 1`.
+      operationId: getSessionLog
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+        - name: since_seq
+          in: query
+          schema: { type: integer, minimum: 0 }
+      responses:
+        '200':
+          description: Упорядоченный лог
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [session_id, events]
+                properties:
+                  session_id: { type: string, format: uuid }
+                  protocol_code: { type: string }
+                  protocol_version: { type: integer }
+                  events:
+                    type: array
+                    items: { $ref: '#/components/schemas/StoredEvent' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /assets:
+    post:
+      tags: [assets]
+      summary: Инициировать загрузку медиа
+      description: |
+        Возвращает `asset_id` и параметры чанковой загрузки. Если актив с такой
+        `sha256` уже принят в этом тенанте, возвращается `deduplicated: true`
+        и загрузка не требуется.
+      operationId: initAsset
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AssetInitRequest' }
+      responses:
+        '201':
+          description: Загрузка инициирована
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AssetInitResponse' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /assets/{assetId}/chunks/{n}:
+    put:
+      tags: [assets]
+      summary: Загрузить чанк
+      description: Идемпотентно по паре `(assetId, n)`. Повторная загрузка того же чанка безопасна.
+      operationId: putAssetChunk
+      parameters:
+        - name: assetId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+        - name: n
+          in: path
+          required: true
+          schema: { type: integer, minimum: 0 }
+      requestBody:
+        required: true
+        content:
+          application/octet-stream:
+            schema: { type: string, format: binary }
+      responses:
+        '204': { description: Чанк принят }
+        '409': { description: Размер чанка не совпадает с согласованным }
+
+  /assets/{assetId}/complete:
+    post:
+      tags: [assets]
+      summary: Завершить загрузку и сверить контрольную сумму
+      operationId: completeAsset
+      parameters:
+        - name: assetId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Результат сверки
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status]
+                properties:
+                  status:
+                    type: string
+                    enum: [verified, checksum_mismatch, missing_chunks]
+                  missing_chunks:
+                    type: array
+                    items: { type: integer }
+
+  /assets/{assetId}/status:
+    get:
+      tags: [assets]
+      summary: Состояние загрузки (для докачки)
+      operationId: getAssetStatus
+      parameters:
+        - name: assetId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Полученные чанки
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [asset_id, upload_state, received_chunks]
+                properties:
+                  asset_id: { type: string, format: uuid }
+                  upload_state:
+                    type: string
+                    enum: [pending, uploading, complete, verified]
+                  received_chunks:
+                    type: array
+                    items: { type: integer }
+
+  /tasks:
+    get:
+      tags: [tasks]
+      summary: Список заданий
+      operationId: listTasks
+      parameters:
+        - name: state
+          in: query
+          schema: { $ref: '#/components/schemas/TaskState' }
+        - name: site_id
+          in: query
+          schema: { type: string, format: uuid }
+        - name: assignee_user_id
+          in: query
+          schema: { type: string, format: uuid }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 50, maximum: 500 }
+        - name: cursor
+          in: query
+          schema: { type: string }
+      responses:
+        '200':
+          description: Страница заданий
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/ScanTask' }
+                  next_cursor: { type: string, nullable: true }
+
+  /tasks/{taskId}:
+    get:
+      tags: [tasks]
+      summary: Задание по идентификатору
+      operationId: getTask
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Задание
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ScanTask' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /protocols/{code}/{version}:
+    get:
+      tags: [protocols]
+      summary: Версия протокола съёмки
+      description: |
+        Версии иммутабельны и доступны вечно, включая `deprecated` — иначе
+        невозможно воспроизвести, по каким инструкциям снимали год назад.
+      operationId: getProtocol
+      parameters:
+        - name: code
+          in: path
+          required: true
+          schema: { type: string, pattern: '^[a-z][a-z0-9_]{2,63}$' }
+        - name: version
+          in: path
+          required: true
+          schema: { type: integer, minimum: 1 }
+      responses:
+        '200':
+          description: Документ протокола (см. capture-protocol.schema.json)
+          content:
+            application/json:
+              schema: { type: object, additionalProperties: true }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /items/{itemId}:
+    get:
+      tags: [items]
+      summary: Карточка единицы товара
+      operationId: getItem
+      parameters:
+        - name: itemId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Карточка
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ItemRecord' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /items/{itemId}/trace:
+    post:
+      tags: [items]
+      summary: Добавить связь трассировки
+      description: |
+        Доступно в том числе внешним пользователям — но только с
+        `confidence: declared`. Значение `verified` может проставить лишь
+        роль `reviewer` или машинная сверка с реестром.
+      operationId: addTraceLink
+      parameters:
+        - name: itemId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/TraceLinkInput' }
+      responses:
+        '201':
+          description: Связь добавлена
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TraceLink' }
+        '403':
+          description: Попытка выставить уровень доверия, недоступный роли
+
+  /inbound/tasks:
+    post:
+      tags: [inbound]
+      summary: Принять задание из внешней складской системы
+      description: |
+        Заголовок `Idempotency-Key` обязателен. Повторная доставка того же
+        вебхука возвращает тот же `task_id` и не создаёт дубль. Ключ хранится
+        30 дней.
+      operationId: inboundTask
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: true
+          schema: { type: string, maxLength: 200 }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/InboundTaskRequest' }
+      responses:
+        '202':
+          description: Задание принято (ещё не назначено)
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [task_id, state]
+                properties:
+                  task_id: { type: string, format: uuid }
+                  state: { $ref: '#/components/schemas/TaskState' }
+                  deduplicated:
+                    type: boolean
+                    description: true — задание уже существовало, создан не был
+        '400':
+          description: Ошибка валидации с указанием поля
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  /review/sessions/{sessionId}/verdict:
+    post:
+      tags: [review]
+      summary: Вердикт контроля качества
+      operationId: postVerdict
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [verdict]
+              properties:
+                verdict:
+                  type: string
+                  enum: [accepted, rework, rejected]
+                comment: { type: string, maxLength: 2000 }
+                violations:
+                  type: array
+                  items: { type: string }
+      responses:
+        '200':
+          description: Вердикт записан
+        '409':
+          description: Сессия в состоянии, не допускающем вердикт
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    Unauthorized:
+      description: Токен отсутствует, истёк или отозван
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    NotFound:
+      description: Объект не найден или недоступен в текущем тенанте
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    RateLimited:
+      description: Превышен лимит запросов
+      headers:
+        Retry-After:
+          schema: { type: integer }
+          description: Секунды до повтора
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+
+  schemas:
+    Error:
+      type: object
+      required: [code, message]
+      properties:
+        code: { type: string, example: protocol_version_gone }
+        message: { type: string }
+        field: { type: string, description: Поле, вызвавшее ошибку валидации }
+        retryable: { type: boolean, default: false }
+        trace_id: { type: string }
+
+    DeviceCapabilities:
+      type: object
+      required: [schema_version, app_version]
+      properties:
+        schema_version:
+          type: integer
+          description: Максимальная поддерживаемая версия формата протокола съёмки
+        app_version: { type: string, example: "1.4.0" }
+        platform: { type: string, enum: [android, ios] }
+        depth:
+          type: string
+          enum: [lidar, ar_depth, none]
+          description: Лучший доступный источник глубины
+        max_accuracy_class:
+          type: string
+          enum: [A, B, C, D]
+        camera_mp: { type: number }
+        free_storage_mb: { type: integer }
+
+    SyncPullRequest:
+      type: object
+      required: [device_id, capabilities]
+      properties:
+        cursor: { type: string, nullable: true }
+        device_id: { type: string, format: uuid }
+        capabilities: { $ref: '#/components/schemas/DeviceCapabilities' }
+        scopes:
+          type: array
+          items: { type: string, enum: [tasks, protocols, directories, verdicts] }
+
+    SyncPullResponse:
+      type: object
+      required: [changes, next_cursor, has_more, server_time]
+      properties:
+        changes:
+          type: array
+          items:
+            type: object
+            required: [type, data]
+            properties:
+              type:
+                type: string
+                enum: [task.upsert, task.revoke, protocol.upsert, directory.patch, verdict.upsert]
+              data: { type: object, additionalProperties: true }
+        next_cursor: { type: string }
+        has_more: { type: boolean }
+        server_time: { type: string, format: date-time }
+
+    ClientEvent:
+      type: object
+      required: [client_event_id, session_id, seq, type, device_ts, payload]
+      properties:
+        client_event_id:
+          type: string
+          format: uuid
+          description: UUIDv7, сгенерирован устройством. Единственный ключ идемпотентности.
+        session_id: { type: string, format: uuid }
+        seq:
+          type: integer
+          minimum: 0
+          description: Монотонный номер в рамках сессии. Определяет порядок применения.
+        type:
+          type: string
+          enum:
+            - session.started
+            - step.completed
+            - step.skipped
+            - measurement.recorded
+            - code.read
+            - asset.attached
+            - session.paused
+            - session.completed
+            - session.abandoned
+        device_ts:
+          type: string
+          format: date-time
+          description: Время устройства. Может врать — порядок определяется по seq.
+        payload: { type: object, additionalProperties: true }
+        trace_id: { type: string }
+
+    EventBatchRequest:
+      type: object
+      required: [device_id, events]
+      properties:
+        device_id: { type: string, format: uuid }
+        events:
+          type: array
+          minItems: 1
+          maxItems: 1000
+          items: { $ref: '#/components/schemas/ClientEvent' }
+
+    EventBatchResponse:
+      type: object
+      required: [results, server_time]
+      properties:
+        results:
+          type: array
+          items:
+            type: object
+            required: [client_event_id, status]
+            properties:
+              client_event_id: { type: string, format: uuid }
+              status:
+                type: string
+                enum: [accepted, duplicate, rejected]
+                description: duplicate — это успех, а не ошибка
+              error: { $ref: '#/components/schemas/Error' }
+        server_time: { type: string, format: date-time }
+
+    StoredEvent:
+      allOf:
+        - $ref: '#/components/schemas/ClientEvent'
+        - type: object
+          required: [server_ts]
+          properties:
+            server_ts: { type: string, format: date-time }
+
+    AssetInitRequest:
+      type: object
+      required: [session_id, step_id, kind, mime, bytes, sha256]
+      properties:
+        session_id: { type: string, format: uuid }
+        step_id: { type: string }
+        kind:
+          type: string
+          enum: [photo, video, depth_map, point_cloud, audio]
+        mime: { type: string, example: image/heic }
+        bytes: { type: integer, minimum: 1 }
+        sha256:
+          type: string
+          pattern: '^[0-9a-f]{64}$'
+          description: Считается на устройстве до отправки и сверяется сервером
+        capture_meta:
+          type: object
+          additionalProperties: true
+          description: Интринсики, поза, EXIF, освещённость, blur_score
+
+    AssetInitResponse:
+      type: object
+      required: [asset_id, chunk_size, deduplicated]
+      properties:
+        asset_id: { type: string, format: uuid }
+        chunk_size:
+          type: integer
+          description: Адаптивный размер чанка, выбранный сервером
+        deduplicated:
+          type: boolean
+          description: true — актив с такой sha256 уже принят, загрузка не нужна
+        upload_url: { type: string, format: uri, nullable: true }
+
+    TaskState:
+      type: string
+      enum: [NEW, ASSIGNED, IN_PROGRESS, SUBMITTED, IN_REVIEW, REWORK, ACCEPTED, REJECTED, EXPORTED, CANCELLED, EXPIRED]
+
+    TaskSubject:
+      type: object
+      properties:
+        sku: { type: string }
+        gtin: { type: string }
+        name: { type: string }
+        expected_qty: { type: number }
+        location: { type: string, description: Ячейка хранения }
+        batch: { type: string }
+
+    ScanTask:
+      type: object
+      required: [id, state, protocol_code, subject, created_at]
+      properties:
+        id: { type: string, format: uuid }
+        site_id: { type: string, format: uuid, nullable: true }
+        external_system: { type: string, nullable: true }
+        external_ref: { type: string, nullable: true }
+        protocol_code: { type: string }
+        protocol_version: { type: integer, nullable: true }
+        subject: { $ref: '#/components/schemas/TaskSubject' }
+        priority: { type: integer, default: 100 }
+        due_at: { type: string, format: date-time, nullable: true }
+        assignee_user_id: { type: string, format: uuid, nullable: true }
+        assignee_pool: { type: string, nullable: true }
+        state: { $ref: '#/components/schemas/TaskState' }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+
+    InboundTaskRequest:
+      type: object
+      required: [external_system, external_ref, protocol_code, subject]
+      properties:
+        external_system: { type: string, example: wms-acme }
+        external_ref: { type: string, example: REQ-88213 }
+        site_code: { type: string }
+        protocol_code: { type: string }
+        subject: { $ref: '#/components/schemas/TaskSubject' }
+        priority: { type: integer, default: 100 }
+        due_at: { type: string, format: date-time }
+        assignee:
+          type: object
+          properties:
+            kind: { type: string, enum: [user, pool, role] }
+            value: { type: string }
+
+    Measurement:
+      type: object
+      required: [id, method, accuracy_class, source_asset_ids]
+      properties:
+        id: { type: string, format: uuid }
+        method:
+          type: string
+          enum: [lidar, ar_depth, marker, manual, photogrammetry]
+        accuracy_class: { type: string, enum: [A, B, C, D] }
+        length_mm: { type: number, nullable: true }
+        width_mm: { type: number, nullable: true }
+        height_mm: { type: number, nullable: true }
+        volume_mm3: { type: number, nullable: true }
+        weight_g: { type: number, nullable: true }
+        confidence: { type: number, minimum: 0, maximum: 1, nullable: true }
+        source_asset_ids:
+          type: array
+          items: { type: string, format: uuid }
+        refined_from:
+          type: string
+          format: uuid
+          nullable: true
+          description: Серверное уточнение ссылается на исходный обмер, но не заменяет его
+        created_at: { type: string, format: date-time }
+
+    TraceLinkInput:
+      type: object
+      required: [code_type, code_value]
+      properties:
+        code_type:
+          type: string
+          enum: [gtin, sscc, serial, batch, chestny_znak, gtd, custom]
+        code_value: { type: string }
+        supplier_name: { type: string }
+        supplier_inn: { type: string, pattern: '^\d{10}(\d{2})?$' }
+        supplier_ref: { type: string, description: Идентификатор в справочнике контрагентов }
+        origin_country: { type: string, minLength: 2, maxLength: 2 }
+        evidence_asset_ids:
+          type: array
+          items: { type: string, format: uuid }
+
+    TraceLink:
+      allOf:
+        - $ref: '#/components/schemas/TraceLinkInput'
+        - type: object
+          required: [id, confidence, declared_by_tenant_id, created_at]
+          properties:
+            id: { type: string, format: uuid }
+            confidence:
+              type: string
+              enum: [verified, declared, inferred]
+              description: |
+                verified — подтверждено машинно (реестр, ГИС МТ, УПД);
+                declared — заявлено человеком;
+                inferred — выведено системой (OCR, GS1 Company Prefix).
+            declared_by_tenant_id: { type: string, format: uuid }
+            declared_by_user_id: { type: string, format: uuid }
+            created_at: { type: string, format: date-time }
+
+    ItemRecord:
+      type: object
+      required: [id, session_id, created_at]
+      properties:
+        id: { type: string, format: uuid }
+        task_id: { type: string, format: uuid }
+        session_id: { type: string, format: uuid }
+        identity:
+          type: object
+          properties:
+            gtin: { type: string }
+            serial: { type: string }
+            batch: { type: string }
+            sku: { type: string }
+        measurements:
+          type: array
+          items: { $ref: '#/components/schemas/Measurement' }
+        trace:
+          type: array
+          items: { $ref: '#/components/schemas/TraceLink' }
+        quality:
+          type: object
+          properties:
+            score: { type: number, minimum: 0, maximum: 1 }
+            violations:
+              type: array
+              items: { type: string }
+            auto_accepted: { type: boolean }
+        media_state:
+          type: string
+          enum: [media_pending, media_complete]
+        provenance:
+          type: object
+          description: Кто, чем и по какой инструкции получил данные. Обязательный блок.
+          properties:
+            user_id: { type: string, format: uuid }
+            device_id: { type: string, format: uuid }
+            protocol: { type: string, example: "pallet_general@7" }
+            captured_at: { type: string, format: date-time }
+        created_at: { type: string, format: date-time }
