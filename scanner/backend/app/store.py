@@ -81,6 +81,10 @@ class Store:
             if protocol.get("status") == "active":
                 self.active_protocol[protocol["code"]] = protocol["version"]
 
+    def list_protocols(self) -> list[dict[str, Any]]:
+        with self._lock:
+            return list(self.protocols.values())
+
     def get_protocol(self, code: str, version: int | None = None) -> dict[str, Any] | None:
         with self._lock:
             if version is None:
@@ -192,6 +196,10 @@ class Store:
             self.assets[asset.id] = asset
             self._asset_by_hash[(asset.tenant_id, asset.sha256)] = asset.id
             return asset, False
+
+    def get_asset(self, asset_id: str) -> StoredAsset | None:
+        with self._lock:
+            return self.assets.get(asset_id)
 
     def put_chunk(self, asset_id: str, n: int, data: bytes) -> None:
         with self._lock:

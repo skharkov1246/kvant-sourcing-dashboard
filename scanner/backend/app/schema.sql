@@ -209,6 +209,16 @@ CREATE TABLE asset (
   UNIQUE (tenant_id, sha256)                  -- дедупликация одинаковых кадров
 );
 
+-- Чанки загрузки — референсная реализация докачки до подключения объектного
+-- хранилища: в проде чанки живут в S3 multipart, здесь — для целостности
+-- контракта (сверка sha256 при complete, инвариант I-1).
+CREATE TABLE asset_chunk (
+  asset_id UUID NOT NULL REFERENCES asset(id),
+  n        INT  NOT NULL,
+  data     BYTEA NOT NULL,
+  PRIMARY KEY (asset_id, n)
+);
+
 CREATE TABLE measurement (
   id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   tenant_id        UUID NOT NULL REFERENCES tenant(id),

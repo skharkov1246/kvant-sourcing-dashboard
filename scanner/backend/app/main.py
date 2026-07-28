@@ -153,7 +153,7 @@ def sync_pull(body: SyncPullRequest, principal: Principal = Depends(current_prin
     changes: list[dict[str, Any]] = []
 
     if "protocols" in body.scopes:
-        for (code, version), protocol in STORE.protocols.items():
+        for protocol in STORE.list_protocols():
             if protocol["schema_version"] <= body.capabilities.schema_version:
                 changes.append({"type": "protocol.upsert", "data": protocol})
 
@@ -301,7 +301,7 @@ def init_asset(body: AssetInitRequest, principal: Principal = Depends(current_pr
 @app.put("/v1/assets/{asset_id}/chunks/{n}", status_code=204, tags=["assets"])
 async def put_chunk(request: Request, asset_id: str, n: int, _: Principal = Depends(current_principal)) -> Response:
     """Идемпотентно по паре (asset_id, n) — повторная загрузка чанка безопасна."""
-    if asset_id not in STORE.assets:
+    if STORE.get_asset(asset_id) is None:
         raise HTTPException(status_code=404, detail={"code": "not_found", "message": "Актив не найден"})
     STORE.put_chunk(asset_id, n, await request.body())
     return Response(status_code=204)
@@ -309,14 +309,14 @@ async def put_chunk(request: Request, asset_id: str, n: int, _: Principal = Depe
 
 @app.post("/v1/assets/{asset_id}/complete", tags=["assets"])
 def complete_asset(asset_id: str, _: Principal = Depends(current_principal)) -> dict[str, Any]:
-    if asset_id not in STORE.assets:
+    if STORE.get_asset(asset_id) is None:
         raise HTTPException(status_code=404, detail={"code": "not_found", "message": "Актив не найден"})
     return STORE.complete_asset(asset_id)
 
 
 @app.get("/v1/assets/{asset_id}/status", tags=["assets"])
 def asset_status(asset_id: str, _: Principal = Depends(current_principal)) -> dict[str, Any]:
-    asset = STORE.assets.get(asset_id)
+    asset = STORE.get_asset(asset_id)
     if asset is None:
         raise HTTPException(status_code=404, detail={"code": "not_found", "message": "Актив не найден"})
     return {
@@ -364,7 +364,8 @@ def inbound_task(
     """
     existing_id = STORE.lookup_idempotency(principal.tenant_id, idempotency_key)
     if existing_id:
-        return {"task_id": existing_id, "state": STORE.tasks[existing_id]["state"], "deduplicated": True}
+        existing_task = STORE.get_task(principal.tenant_id, existing_id)
+        return {"task_id": existing_id, "state": existing_task["state"], "deduplicated": True}
 
     existing = STORE.find_task_by_external(principal.tenant_id, body.external_system, body.external_ref)
     if existing:
