@@ -157,6 +157,40 @@ class TestMaterialsDirectory:
         assert cached.status_code == 304
 
 
+class TestSortamentDirectory:
+    """Сортамент проката (kv_cat_h): типоразмер из списка = покупной элемент."""
+
+    def test_loads_with_all_sections(self):
+        from app.directories import load_sortament_directory
+
+        doc = load_sortament_directory()
+        assert doc["directory"] == "sortament"
+        for section in ("angle_equal", "channel", "i_beam", "pipe_round", "pipe_profile"):
+            assert doc["sections"][section]["values"], section
+
+    def test_typesizes_unique_and_non_blank(self):
+        from app.directories import load_sortament_directory
+
+        for name, section in load_sortament_directory()["sections"].items():
+            values = section["values"]
+            assert len(set(values)) == len(values), name
+            assert all(v.strip() for v in values), name
+
+    def test_endpoint_serves_sortament_with_etag(self):
+        from fastapi.testclient import TestClient
+
+        from app.main import app
+        from tests.conftest import OPERATOR
+
+        http = TestClient(app)
+        r = http.get("/v1/directories/sortament", headers=OPERATOR)
+        assert r.status_code == 200
+        etag = r.headers["ETag"]
+        assert etag == f'"sortament-v{r.json()["version"]}"'
+        assert http.get("/v1/directories/sortament",
+                        headers={**OPERATOR, "If-None-Match": etag}).status_code == 304
+
+
 class TestHonestEmptyD1:
     def test_d1_pending_returns_none(self):
         """Пока владелец реестра не заполнил ряд d1 — None, а не пустой список:

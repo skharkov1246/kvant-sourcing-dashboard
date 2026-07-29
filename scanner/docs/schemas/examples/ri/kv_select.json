@@ -1,0 +1,190 @@
+{
+  "schema_version": 1,
+  "code": "kv_select",
+  "version": 1,
+  "status": "active",
+  "scope": "global",
+  "title": "Маршрут «Подбор»: идентификация без реверс-инжиниринга",
+  "description": "Р-05 п.1 и п.3, каталог docs/14: для позиций подбора чертёж и 3D-скан НЕ выполняются — это не экономия, а правило (полный РИ стандартной покупной детали — выброшенные часы). Оператор явно подтверждает, что РИ не запускался. Аналоги минимум у двух производителей подбирает конструктор в kv_desk — с площадки уходят маркировка, расшифровка и ключевые размеры.",
+  "applies_to": {
+    "categories": [
+      "ri_select"
+    ]
+  },
+  "settings": {
+    "estimated_duration_s": 300
+  },
+  "steps": [
+    {
+      "id": "sel_safety",
+      "kind": "form",
+      "title": "Среда и безопасность",
+      "form": {
+        "fields": [
+          {
+            "key": "medium",
+            "type": "enum",
+            "label": "Рабочая среда",
+            "required": true,
+            "source": "media_directory"
+          },
+          {
+            "key": "ppe_ack",
+            "type": "bool",
+            "label": "СИЗ надеты",
+            "required": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "sel_overview",
+      "kind": "photo",
+      "title": "Общий вид с масштабной линейкой",
+      "repeat": {
+        "min": 2,
+        "max": 4
+      },
+      "quality": {
+        "max_blur": 0.35,
+        "min_lux": 60,
+        "require_subject_fill_pct": [
+          25,
+          90
+        ],
+        "on_violation": "warn"
+      }
+    },
+    {
+      "id": "sel_mark",
+      "kind": "photo",
+      "title": "Маркировка крупно",
+      "instruction": "Р-11 п.3.3: шаг маркировки не закрывается молча. Блик не блокируется — выбитые клейма читаются именно за счёт бокового света.",
+      "repeat": {
+        "min": 1,
+        "max": 6
+      },
+      "quality": {
+        "max_blur": 0.25,
+        "min_lux": 80,
+        "on_violation": "warn"
+      }
+    },
+    {
+      "id": "sel_decode",
+      "kind": "form",
+      "title": "Расшифровка",
+      "form": {
+        "fields": [
+          {
+            "key": "producer",
+            "type": "enum",
+            "label": "Производитель",
+            "required": true,
+            "source": "brand_directory"
+          },
+          {
+            "key": "typesize",
+            "type": "text",
+            "label": "Типоразмер по маркировке",
+            "required": true
+          },
+          {
+            "key": "decode_source",
+            "type": "enum",
+            "label": "Источник расшифровки",
+            "required": true,
+            "options": [
+              "маркировка детали",
+              "шильдик установки",
+              "каталог производителя",
+              "со слов заказчика"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "sel_keydims",
+      "kind": "form",
+      "title": "Ключевые размеры (подтверждение типоразмера)",
+      "instruction": "Только размеры, подтверждающие типоразмер, — не полный обмер. По одному на строку.",
+      "repeat": {
+        "min": 1,
+        "max": 6
+      },
+      "form": {
+        "fields": [
+          {
+            "key": "dim_name",
+            "type": "text",
+            "label": "Размер (что меряем)",
+            "required": true
+          },
+          {
+            "key": "value_mm",
+            "type": "number",
+            "label": "Значение",
+            "unit": "mm",
+            "required": true,
+            "min": 0.1
+          },
+          {
+            "key": "instrument",
+            "type": "enum",
+            "label": "СИ (номер поверки)",
+            "required": true,
+            "source": "si_directory"
+          }
+        ]
+      }
+    },
+    {
+      "id": "sel_no_ri_ack",
+      "kind": "form",
+      "title": "РИ не выполняется — подтверждение",
+      "instruction": "Р-05 п.1: для маршрута «Подбор» чертёж и скан запрещены. Подтверждая, вы фиксируете, что полный реверс-инжиниринг по этой позиции не запускался.",
+      "form": {
+        "fields": [
+          {
+            "key": "ri_not_started_ack",
+            "type": "bool",
+            "label": "Чертёж и скан не выполнялись",
+            "required": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "sel_confirm",
+      "kind": "confirm",
+      "title": "Передача в подбор",
+      "confirm": {
+        "text": "Данные достаточны для подбора: маркировка снята, типоразмер расшифрован, ключевые размеры подтверждены. Аналоги минимум у двух производителей подберёт конструктор (kv_desk)."
+      }
+    }
+  ],
+  "acceptance": {
+    "auto_accept_if": {
+      "all": [
+        {
+          "step": "sel_mark"
+        },
+        {
+          "step": "sel_decode"
+        },
+        {
+          "step": "sel_keydims"
+        },
+        {
+          "step": "sel_no_ri_ack",
+          "field": "ri_not_started_ack",
+          "eq": true
+        },
+        {
+          "quality_score_at_least": 0.7
+        }
+      ]
+    }
+  }
+}

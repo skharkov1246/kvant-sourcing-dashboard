@@ -20,7 +20,12 @@ from fastapi import Body, Depends, FastAPI, Header, HTTPException, Path, Request
 from pydantic import BaseModel, Field
 
 from .acceptance import AcceptancePipeline, AcceptanceService, TransportUnavailable
-from .directories import DirectoryError, load_materials_directory, load_series_directory
+from .directories import (
+    DirectoryError,
+    load_materials_directory,
+    load_series_directory,
+    load_sortament_directory,
+)
 from .export import registry_row
 from .model_registry import TenantDataPolicy
 from .protocol import auto_accept, check_compatibility, is_complete
@@ -415,6 +420,7 @@ def get_protocol(code: str, version: int) -> dict[str, Any]:
 _DIRECTORIES = {
     "standard_series": load_series_directory,
     "materials": load_materials_directory,
+    "sortament": load_sortament_directory,
 }
 
 

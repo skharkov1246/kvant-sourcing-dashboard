@@ -44,6 +44,15 @@ _MATERIALS_SECTIONS = frozenset({
 })
 
 
+_SORTAMENT_SECTIONS = frozenset({
+    "angle_equal",
+    "channel",
+    "i_beam",
+    "pipe_round",
+    "pipe_profile",
+})
+
+
 class DirectoryError(RuntimeError):
     """Справочник отсутствует или сломан — это ошибка развёртывания, не данных."""
 
@@ -101,6 +110,13 @@ def load_materials_directory(path: Path | None = None) -> dict:
     """Справочник материалов и покрытий (Р-08 разд. 4): оператор выбирает
     марку из списка, а не печатает от руки."""
     return _load_and_check("materials_directory.json", _MATERIALS_SECTIONS, path)
+
+
+@lru_cache(maxsize=1)
+def load_sortament_directory(path: Path | None = None) -> dict:
+    """Сортамент проката для сверки элементов сварных узлов (kv_cat_h):
+    совпадение с сортаментом = элемент покупной, в РКД — ссылка на стандарт."""
+    return _load_and_check("sortament_directory.json", _SORTAMENT_SECTIONS, path)
 
 
 def series_values(section: str) -> Sequence[float]:
