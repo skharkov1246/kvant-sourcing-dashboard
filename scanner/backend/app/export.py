@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from .gears import analyze_gear
 from .projections import fold
 from .series import analyze_surface, classify_thread
 
@@ -95,7 +96,52 @@ def registry_row(store: Any, tenant_id: str, session_id: str) -> dict[str, Any] 
         "review": store.get_review(tenant_id, session_id),
         "surface_stats": _grid_stats(state) or None,
         "thread_checks": _thread_checks(state) or None,
+        "gear_checks": _gear_checks(state) or None,
     }
+
+
+def gear_checks_from_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Расчёт модуля и смещения по строкам венцов (каталог kv_cat_f).
+
+    Оператор фиксирует z, da и длину общей нормали — модуль и смещение
+    считает сервер: грубая ошибка промера (перепутан обхват, съеден зуб)
+    ловится на месте, а не через неделю у конструктора.
+    """
+    out: list[dict[str, Any]] = []
+    for r in rows:
+        entry: dict[str, Any] = {"venets_no": r.get("venets_no")}
+        try:
+            guess = analyze_gear(
+                z=int(r["z"]),
+                da_mm=float(r["da_mm"]),
+                w_mm=float(r["w_mm"]) if r.get("w_mm") is not None else None,
+                n_w=int(r["n_w"]) if r.get("n_w") is not None else None,
+            )
+        except (ValueError, KeyError, TypeError) as exc:
+            entry["error"] = str(exc)
+        else:
+            entry.update(
+                z=guess.z,
+                module_est=guess.module_est,
+                module_std=guess.module_std,
+                module_deviation=guess.module_deviation,
+                is_standard_module=guess.is_standard_module,
+                x_shift=guess.x_shift,
+                note=guess.note,
+            )
+        out.append(entry)
+    return out
+
+
+def _gear_checks(state: Any) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for res in state.results.values():
+        if isinstance(res.data, list):
+            rows.extend(
+                r for r in res.data
+                if isinstance(r, dict) and "z" in r and "da_mm" in r
+            )
+    return gear_checks_from_rows(rows) if rows else []
 
 
 def thread_checks_from_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
