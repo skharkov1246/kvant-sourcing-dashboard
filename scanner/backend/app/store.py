@@ -69,6 +69,7 @@ class Store:
         self.idempotency: dict[tuple[str, str], str] = {}  # (tenant_id, key) -> task_id
         self.trace_links: dict[str, list[dict[str, Any]]] = {}
         self.review_queue: dict[tuple[str, str], dict[str, Any]] = {}  # (tenant_id, session_id)
+        self.export_queue: dict[tuple[str, str], dict[str, Any]] = {}  # (tenant_id, session_id)
 
     # ── Протоколы ────────────────────────────────────────────────────────────
 
@@ -285,6 +286,59 @@ class Store:
                 if t == tenant_id and e["resolved_at"] is None
             ]
             return sorted(open_entries, key=lambda e: e["enqueued_at"])
+
+    # ── Очередь экспорта (I-8) ───────────────────────────────────────────────
+    # Задание не закрыто, пока внешняя система не подтвердила приём (§09.4).
+    # PENDING → CONFIRMED при подтверждении; DEAD_LETTER после исчерпания
+    # попыток — задание при этом ОСТАЁТСЯ ACCEPTED, теряться результату нельзя.
+
+    def enqueue_export(self, tenant_id: str, session_id: str) -> dict[str, Any]:
+        with self._lock:
+            key = (tenant_id, session_id)
+            if key not in self.export_queue:
+                self.export_queue[key] = {
+                    "session_id": session_id,
+                    "state": "PENDING",
+                    "attempts": 0,
+                    "next_attempt_at": utcnow(),
+                    "last_error": None,
+                    "created_at": utcnow(),
+                    "confirmed_at": None,
+                }
+            return dict(self.export_queue[key])
+
+    def get_export(self, tenant_id: str, session_id: str) -> dict[str, Any] | None:
+        with self._lock:
+            entry = self.export_queue.get((tenant_id, session_id))
+            return dict(entry) if entry else None
+
+    def due_exports(self, tenant_id: str, now: str) -> list[dict[str, Any]]:
+        with self._lock:
+            due = [
+                dict(e) for (t, _), e in self.export_queue.items()
+                if t == tenant_id and e["state"] == "PENDING" and e["next_attempt_at"] <= now
+            ]
+            return sorted(due, key=lambda e: e["created_at"])
+
+    def confirm_export(self, tenant_id: str, session_id: str) -> None:
+        with self._lock:
+            entry = self.export_queue.get((tenant_id, session_id))
+            if entry and entry["state"] == "PENDING":
+                entry.update(state="CONFIRMED", confirmed_at=utcnow(), last_error=None)
+
+    def defer_export(self, tenant_id: str, session_id: str, attempts: int,
+                     next_attempt_at: str, error: str) -> None:
+        with self._lock:
+            entry = self.export_queue.get((tenant_id, session_id))
+            if entry and entry["state"] == "PENDING":
+                entry.update(attempts=attempts, next_attempt_at=next_attempt_at,
+                             last_error=error)
+
+    def dead_letter_export(self, tenant_id: str, session_id: str, error: str) -> None:
+        with self._lock:
+            entry = self.export_queue.get((tenant_id, session_id))
+            if entry and entry["state"] == "PENDING":
+                entry.update(state="DEAD_LETTER", last_error=error)
 
     def resolve_review(
         self, tenant_id: str, session_id: str, verdict: str, by: str, comment: str | None = None,

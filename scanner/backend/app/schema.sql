@@ -327,6 +327,29 @@ CREATE INDEX review_queue_open ON review_queue (tenant_id, enqueued_at)
   WHERE resolved_at IS NULL;
 
 -- ─────────────────────────────────────────────────────────────────────────────
+-- Очередь экспорта (§09.4, инвариант I-8): задание не считается закрытым,
+-- пока внешняя система не подтвердила приём. Иначе «в приложении приёмка
+-- есть, в WMS её нет» — худший класс инцидентов, виден через месяц.
+-- ─────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE export_queue (
+  tenant_id      UUID NOT NULL REFERENCES tenant(id),
+  session_id     UUID NOT NULL REFERENCES scan_session(id),
+  session_ref    TEXT NOT NULL,
+  state          TEXT NOT NULL DEFAULT 'PENDING'
+                   CHECK (state IN ('PENDING','CONFIRMED','DEAD_LETTER')),
+  attempts       INT NOT NULL DEFAULT 0,
+  next_attempt_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  last_error     TEXT,
+  created_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
+  confirmed_at   TIMESTAMPTZ,
+  PRIMARY KEY (tenant_id, session_id)
+);
+
+CREATE INDEX export_queue_due ON export_queue (tenant_id, next_attempt_at)
+  WHERE state = 'PENDING';
+
+-- ─────────────────────────────────────────────────────────────────────────────
 -- Аудит (отдельная схема: только INSERT, без UPDATE/DELETE)
 -- ─────────────────────────────────────────────────────────────────────────────
 
@@ -360,7 +383,7 @@ BEGIN
   FOREACH t IN ARRAY ARRAY[
     'site','app_user','device','scan_task','scan_session','asset',
     'measurement','code_read','item_record','trace_link','trace_conflict',
-    'review_queue'
+    'review_queue','export_queue'
   ] LOOP
     EXECUTE format('ALTER TABLE %I ENABLE ROW LEVEL SECURITY', t);
     EXECUTE format($f$

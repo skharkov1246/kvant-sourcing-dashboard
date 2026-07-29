@@ -60,7 +60,7 @@ class PgStore:
     def reset(self) -> None:
         """Полная очистка данных (для тестов). Схему не трогает."""
         self._conn.execute(
-            "TRUNCATE review_queue, trace_conflict, trace_link, item_record, code_read, "
+            "TRUNCATE export_queue, review_queue, trace_conflict, trace_link, item_record, code_read, "
             "measurement, asset_chunk, asset, session_event, dead_letter_event, "
             "scan_session, inbound_idempotency, scan_task, capture_protocol, "
             "device, app_user, site, tenant_grant, tenant CASCADE"
@@ -512,6 +512,77 @@ class PgStore:
             (self._tenant(tenant_id),),
         ).fetchall()
         return [self._review_row(r) for r in rows]
+
+    # ── Очередь экспорта (I-8) ───────────────────────────────────────────────
+
+    @staticmethod
+    def _export_row(r: tuple) -> dict[str, Any]:
+        return {
+            "session_id": r[0],
+            "state": r[1],
+            "attempts": r[2],
+            "next_attempt_at": r[3].isoformat(),
+            "last_error": r[4],
+            "created_at": r[5].isoformat(),
+            "confirmed_at": r[6].isoformat() if r[6] else None,
+        }
+
+    _EXPORT_COLUMNS = ("SELECT session_ref, state, attempts, next_attempt_at, "
+                       " last_error, created_at, confirmed_at FROM export_queue ")
+
+    def enqueue_export(self, tenant_id: str, session_id: str) -> dict[str, Any]:
+        t = self._tenant(tenant_id)
+        sid = self._session(t, session_id)
+        self._conn.execute(
+            "INSERT INTO export_queue (tenant_id, session_id, session_ref) "
+            "VALUES (%s, %s, %s) ON CONFLICT (tenant_id, session_id) DO NOTHING",
+            (t, sid, session_id),
+        )
+        return self.get_export(tenant_id, session_id)
+
+    def get_export(self, tenant_id: str, session_id: str) -> dict[str, Any] | None:
+        t = self._tenant(tenant_id)
+        row = self._conn.execute(
+            self._EXPORT_COLUMNS + "WHERE tenant_id = %s AND session_id = %s",
+            (t, _as_uuid(session_id, "session", t)),
+        ).fetchone()
+        return self._export_row(row) if row else None
+
+    def due_exports(self, tenant_id: str, now: str) -> list[dict[str, Any]]:
+        rows = self._conn.execute(
+            self._EXPORT_COLUMNS +
+            "WHERE tenant_id = %s AND state = 'PENDING' AND next_attempt_at <= %s::timestamptz "
+            "ORDER BY created_at",
+            (self._tenant(tenant_id), now),
+        ).fetchall()
+        return [self._export_row(r) for r in rows]
+
+    def confirm_export(self, tenant_id: str, session_id: str) -> None:
+        t = self._tenant(tenant_id)
+        self._conn.execute(
+            "UPDATE export_queue SET state = 'CONFIRMED', confirmed_at = now(), "
+            " last_error = NULL "
+            "WHERE tenant_id = %s AND session_id = %s AND state = 'PENDING'",
+            (t, _as_uuid(session_id, "session", t)),
+        )
+
+    def defer_export(self, tenant_id: str, session_id: str, attempts: int,
+                     next_attempt_at: str, error: str) -> None:
+        t = self._tenant(tenant_id)
+        self._conn.execute(
+            "UPDATE export_queue SET attempts = %s, next_attempt_at = %s::timestamptz, "
+            " last_error = %s "
+            "WHERE tenant_id = %s AND session_id = %s AND state = 'PENDING'",
+            (attempts, next_attempt_at, error, t, _as_uuid(session_id, "session", t)),
+        )
+
+    def dead_letter_export(self, tenant_id: str, session_id: str, error: str) -> None:
+        t = self._tenant(tenant_id)
+        self._conn.execute(
+            "UPDATE export_queue SET state = 'DEAD_LETTER', last_error = %s "
+            "WHERE tenant_id = %s AND session_id = %s AND state = 'PENDING'",
+            (error, t, _as_uuid(session_id, "session", t)),
+        )
 
     def resolve_review(
         self, tenant_id: str, session_id: str, verdict: str, by: str, comment: str | None = None,

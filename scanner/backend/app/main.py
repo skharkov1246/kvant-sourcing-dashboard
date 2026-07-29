@@ -21,6 +21,7 @@ from pydantic import BaseModel, Field
 
 from .acceptance import AcceptancePipeline, AcceptanceService, TransportUnavailable
 from .directories import DirectoryError, load_materials_directory, load_series_directory
+from .export import registry_row
 from .model_registry import TenantDataPolicy
 from .protocol import auto_accept, check_compatibility, is_complete
 from .projections import fold
@@ -573,6 +574,10 @@ def _apply_verdict_to_task(tenant_id: str, session_id: str, verdict: str) -> Non
         return
     task["state"] = verdict  # вердикты — подмножество состояний задания
     STORE.upsert_task(task)
+    # I-8: принятый результат задания из внешней системы едет обратно через
+    # очередь экспорта; EXPORTED задание станет только после подтверждения.
+    if verdict == "ACCEPTED" and task.get("external_system"):
+        STORE.enqueue_export(tenant_id, session_id)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -596,42 +601,14 @@ def export_sessions(
     _require_reviewer(principal)
     rows: list[dict[str, Any]] = []
     for session_id in STORE.list_sessions(principal.tenant_id):
-        events = STORE.session_events(principal.tenant_id, session_id)
-        completed_at = next(
-            (e.get("server_ts") for e in events if e["type"] == "session.completed"),
-            None,
-        )
-        if completed_at is None:
+        row = registry_row(STORE, principal.tenant_id, session_id)
+        if row is None:
             continue
-        if date_from and completed_at < date_from:
+        if date_from and row["completed_at"] < date_from:
             continue
-        if date_to and completed_at > date_to:
+        if date_to and row["completed_at"] > date_to:
             continue
-        state = fold(session_id, events)
-        ctx = state.to_context()
-        protocol_ref = next(
-            (e["payload"].get("protocol") for e in events if e["type"] == "session.started"),
-            None,
-        )
-        review = STORE.get_review(principal.tenant_id, session_id)
-        task_id = _session_task_id(principal.tenant_id, session_id)
-        task = STORE.get_task(principal.tenant_id, task_id) if task_id else None
-        rows.append({
-            "session_id": session_id,
-            "task_id": task_id,
-            # Адрес результата во внешней системе — коннектору не нужно
-            # ходить за заданием отдельно (§09.4).
-            "external_system": task.get("external_system") if task else None,
-            "external_ref": task.get("external_ref") if task else None,
-            "protocol": protocol_ref,
-            "completed_at": completed_at,
-            "quality_score": round(ctx.quality_score, 3),
-            "steps": {k: v.status for k, v in state.results.items()},
-            "measurements": [e["payload"] for e in events if e["type"] == "measurement.recorded"],
-            "codes": [e["payload"] for e in events if e["type"] == "code.read"],
-            "asset_ids": sorted(state.asset_ids),
-            "review": review,
-        })
+        rows.append(row)
     return {"items": rows, "count": len(rows)}
 
 
