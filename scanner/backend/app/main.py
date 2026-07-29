@@ -614,9 +614,15 @@ def export_sessions(
             None,
         )
         review = STORE.get_review(principal.tenant_id, session_id)
+        task_id = _session_task_id(principal.tenant_id, session_id)
+        task = STORE.get_task(principal.tenant_id, task_id) if task_id else None
         rows.append({
             "session_id": session_id,
-            "task_id": _session_task_id(principal.tenant_id, session_id),
+            "task_id": task_id,
+            # Адрес результата во внешней системе — коннектору не нужно
+            # ходить за заданием отдельно (§09.4).
+            "external_system": task.get("external_system") if task else None,
+            "external_ref": task.get("external_ref") if task else None,
             "protocol": protocol_ref,
             "completed_at": completed_at,
             "quality_score": round(ctx.quality_score, 3),

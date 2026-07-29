@@ -1,0 +1,330 @@
+{
+  "schema_version": 1,
+  "code": "kv_cat_b",
+  "version": 1,
+  "status": "active",
+  "scope": "global",
+  "title": "Категория B: пружины",
+  "description": "Р-05 п.5 B, каталог docs/14: диаметр проволоки в 3 точках (среднее и кратность ряду считает СЕРВЕР, не оператор), витки и направление навивки, геометрия в свободном состоянии, усилие со стендом при наличии. Разрушенная пружина не обмеряется — reject_if: восстановление номинала по обломкам даёт мусор в РКД.",
+  "applies_to": {
+    "categories": [
+      "ri_cat_b"
+    ]
+  },
+  "settings": {
+    "estimated_duration_s": 720
+  },
+  "steps": [
+    {
+      "id": "b_safety",
+      "kind": "form",
+      "title": "Среда и безопасность",
+      "instruction": "Р-10 п.1: до любых работ уточнить рабочую среду и работать в СИЗ. Сжатые пружины освобождать только в оснастке.",
+      "form": {
+        "fields": [
+          {
+            "key": "medium",
+            "type": "enum",
+            "label": "Рабочая среда",
+            "required": true,
+            "source": "media_directory"
+          },
+          {
+            "key": "ppe_ack",
+            "type": "bool",
+            "label": "СИЗ надеты",
+            "required": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "b_condition",
+      "kind": "form",
+      "title": "Состояние образца",
+      "instruction": "Разрушенная или пластически деформированная пружина не обмеряется: номинал по обломкам не восстанавливается (Р-08 п.3). Зафиксируйте состояние и при браке завершите сессию — деталь пойдёт через конструктора.",
+      "form": {
+        "fields": [
+          {
+            "key": "condition",
+            "type": "enum",
+            "label": "Состояние",
+            "required": true,
+            "options": [
+              "пригодна к обмеру",
+              "износ/коррозия, обмер возможен",
+              "разрушена или деформирована"
+            ]
+          },
+          {
+            "key": "condition_note",
+            "type": "multiline",
+            "label": "Комментарий (можно голосом)",
+            "required": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "b_overview",
+      "kind": "photo",
+      "title": "Общий вид с линейкой",
+      "instruction": "Пружина целиком на контрастном фоне, рядом линейка. Минимум 2 ракурса: вдоль оси и сбоку.",
+      "repeat": {
+        "min": 2,
+        "max": 4
+      },
+      "quality": {
+        "max_blur": 0.35,
+        "min_lux": 60,
+        "require_subject_fill_pct": [
+          25,
+          90
+        ],
+        "on_violation": "warn"
+      }
+    },
+    {
+      "id": "b_mark",
+      "kind": "photo",
+      "title": "Маркировка/бирка (если есть)",
+      "required": false,
+      "repeat": {
+        "min": 1,
+        "max": 4
+      },
+      "quality": {
+        "max_blur": 0.25,
+        "min_lux": 80,
+        "on_violation": "warn"
+      }
+    },
+    {
+      "id": "b_type",
+      "kind": "form",
+      "title": "Тип и навивка",
+      "form": {
+        "fields": [
+          {
+            "key": "spring_type",
+            "type": "enum",
+            "label": "Тип пружины",
+            "required": true,
+            "options": [
+              "сжатия",
+              "растяжения",
+              "кручения",
+              "тарельчатая",
+              "прочее"
+            ]
+          },
+          {
+            "key": "winding",
+            "type": "enum",
+            "label": "Направление навивки",
+            "required": true,
+            "options": [
+              "правое",
+              "левое"
+            ]
+          },
+          {
+            "key": "ends",
+            "type": "enum",
+            "label": "Опорные витки",
+            "required": true,
+            "options": [
+              "поджаты и шлифованы",
+              "поджаты",
+              "свободные",
+              "зацепы (растяжения)",
+              "не применимо"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "b_wire",
+      "kind": "form",
+      "title": "Диаметр проволоки: 3 точки",
+      "instruction": "Р-10 п.4.1: три замера в разных местах вне зоны контакта витков. Среднее и сверку с рядом проволоки считает сервер — не округляйте сами.",
+      "form": {
+        "fields": [
+          {
+            "key": "d1_mm",
+            "type": "number",
+            "label": "d, точка 1",
+            "unit": "mm",
+            "required": true,
+            "min": 0.1
+          },
+          {
+            "key": "d2_mm",
+            "type": "number",
+            "label": "d, точка 2",
+            "unit": "mm",
+            "required": true,
+            "min": 0.1
+          },
+          {
+            "key": "d3_mm",
+            "type": "number",
+            "label": "d, точка 3",
+            "unit": "mm",
+            "required": true,
+            "min": 0.1
+          },
+          {
+            "key": "instrument",
+            "type": "enum",
+            "label": "СИ (номер поверки)",
+            "required": true,
+            "source": "si_directory"
+          }
+        ]
+      }
+    },
+    {
+      "id": "b_geometry",
+      "kind": "form",
+      "title": "Геометрия в свободном состоянии",
+      "form": {
+        "fields": [
+          {
+            "key": "d_outer_mm",
+            "type": "number",
+            "label": "Наружный диаметр D",
+            "unit": "mm",
+            "required": true,
+            "min": 1
+          },
+          {
+            "key": "l_free_mm",
+            "type": "number",
+            "label": "Длина свободная L0",
+            "unit": "mm",
+            "required": true,
+            "min": 1
+          },
+          {
+            "key": "n_total",
+            "type": "number",
+            "label": "Витков полных",
+            "required": true,
+            "min": 1
+          },
+          {
+            "key": "n_work",
+            "type": "number",
+            "label": "Витков рабочих",
+            "required": true,
+            "min": 0.5
+          }
+        ]
+      }
+    },
+    {
+      "id": "b_ends",
+      "kind": "photo",
+      "title": "Концы пружины крупно",
+      "instruction": "Оба конца: опорные витки или зацепы. По ним конструктор восстанавливает исполнение.",
+      "repeat": {
+        "min": 2,
+        "max": 4
+      },
+      "quality": {
+        "max_blur": 0.3,
+        "min_lux": 80,
+        "on_violation": "warn"
+      }
+    },
+    {
+      "id": "b_force",
+      "kind": "form",
+      "title": "Усилие на стенде (при наличии)",
+      "instruction": "Если стенд доступен: усилие при заданной длине сжатия/растяжения. Без стенда шаг пропускается — жёсткость посчитает конструктор по геометрии.",
+      "required": false,
+      "form": {
+        "fields": [
+          {
+            "key": "force_n",
+            "type": "number",
+            "label": "Усилие",
+            "unit": "Н",
+            "required": true,
+            "min": 0.1
+          },
+          {
+            "key": "at_length_mm",
+            "type": "number",
+            "label": "При длине",
+            "unit": "mm",
+            "required": true,
+            "min": 0.1
+          },
+          {
+            "key": "stand",
+            "type": "enum",
+            "label": "Стенд (номер поверки)",
+            "required": true,
+            "source": "si_directory"
+          }
+        ]
+      }
+    },
+    {
+      "id": "b_material",
+      "kind": "form",
+      "title": "Материал и покрытие",
+      "instruction": "Марка проволоки — из справочника материалов; при сомнении «не определена» честнее догадки (Р-08 п.4).",
+      "form": {
+        "fields": [
+          {
+            "key": "wire_material",
+            "type": "enum",
+            "label": "Материал проволоки",
+            "required": true,
+            "source": "materials_directory"
+          },
+          {
+            "key": "coating",
+            "type": "enum",
+            "label": "Покрытие",
+            "required": true,
+            "source": "materials_directory"
+          },
+          {
+            "key": "defects",
+            "type": "multiline",
+            "label": "Дефекты: коррозия, потёртости (можно голосом)",
+            "required": false
+          }
+        ]
+      }
+    }
+  ],
+  "acceptance": {
+    "auto_accept_if": {
+      "all": [
+        {
+          "step": "b_wire"
+        },
+        {
+          "step": "b_geometry"
+        },
+        {
+          "step": "b_type"
+        },
+        {
+          "quality_score_at_least": 0.75
+        }
+      ]
+    },
+    "reject_if": {
+      "step": "b_condition",
+      "field": "condition",
+      "eq": "разрушена или деформирована"
+    }
+  }
+}
