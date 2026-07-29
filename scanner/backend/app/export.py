@@ -10,7 +10,7 @@ from __future__ import annotations
 from typing import Any
 
 from .projections import fold
-from .series import analyze_surface
+from .series import analyze_surface, classify_thread
 
 _SECTION_ORDER = {"край 1": 0, "середина": 1, "край 2": 2}
 
@@ -94,7 +94,49 @@ def registry_row(store: Any, tenant_id: str, session_id: str) -> dict[str, Any] 
         "asset_ids": sorted(state.asset_ids),
         "review": store.get_review(tenant_id, session_id),
         "surface_stats": _grid_stats(state) or None,
+        "thread_checks": _thread_checks(state) or None,
     }
+
+
+def thread_checks_from_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Проверка резьб по строкам замера (Р-10 п.4.4, каталог kv_cat_c).
+
+    Оператор фиксирует длину по виткам и их число — вердикт «метрическая /
+    дюймовая / неоднозначно» выносит сервер, сверяя кратность ОБОИМ рядам.
+    Замер на менее чем 5 витках регламентно недействителен — строка честно
+    помечается ошибкой, а не классифицируется по мусорному шагу.
+    """
+    out: list[dict[str, Any]] = []
+    for r in rows:
+        entry: dict[str, Any] = {
+            "location": r.get("location"),
+            "major_d_mm": r.get("major_d_mm"),
+        }
+        try:
+            guess = classify_thread(float(r["span_mm"]), int(r["turns"]))
+        except (ValueError, KeyError, TypeError) as exc:
+            entry["error"] = str(exc)
+        else:
+            entry.update(
+                pitch_mm=guess.pitch_mm,
+                metric_pitch_mm=guess.metric_pitch_mm,
+                inch_tpi=guess.inch_tpi,
+                verdict=guess.verdict,
+                note=guess.note,
+            )
+        out.append(entry)
+    return out
+
+
+def _thread_checks(state: Any) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for res in state.results.values():
+        if isinstance(res.data, list):
+            rows.extend(
+                r for r in res.data
+                if isinstance(r, dict) and "span_mm" in r and "turns" in r
+            )
+    return thread_checks_from_rows(rows) if rows else []
 
 
 def _grid_stats(state: Any) -> list[dict[str, Any]]:

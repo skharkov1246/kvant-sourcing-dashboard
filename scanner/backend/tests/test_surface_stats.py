@@ -91,3 +91,51 @@ class TestStatsReachRegistry:
         ]}, headers=OPERATOR)
         row = client.get("/v1/export/sessions", headers=REVIEWER).json()["items"][0]
         assert row["surface_stats"] is None
+
+
+class TestThreadChecks:
+    """Проверка резьб по строкам c_thread (Р-10 п.4.4): вердикт выносит сервер."""
+
+    def test_metric_thread_is_recognized(self):
+        from app.export import thread_checks_from_rows
+
+        checks = thread_checks_from_rows([
+            {"location": "ступень 2", "span_mm": 7.5, "turns": 5, "major_d_mm": 20.0}])
+        assert checks[0]["verdict"] == "metric"
+        assert checks[0]["metric_pitch_mm"] == 1.5
+        assert checks[0]["location"] == "ступень 2"
+
+    def test_inch_thread_is_not_rounded_to_metric(self):
+        from app.export import thread_checks_from_rows
+
+        # 8 ниток/дюйм: 5 витков = 15.875 мм — Р-08 п.3.3.3 запрещает «в метрику».
+        checks = thread_checks_from_rows([
+            {"location": "торец", "span_mm": 15.875, "turns": 5, "major_d_mm": 25.4}])
+        assert checks[0]["verdict"] == "inch"
+        assert checks[0]["inch_tpi"] == 8
+        assert "Не переводить в метрику" in checks[0]["note"]
+
+    def test_too_few_turns_is_honest_error(self):
+        from app.export import thread_checks_from_rows
+
+        checks = thread_checks_from_rows([
+            {"location": "х", "span_mm": 6.0, "turns": 4, "major_d_mm": 10.0}])
+        assert "5" in checks[0]["error"]
+        assert "verdict" not in checks[0]
+
+    def test_thread_rows_reach_registry(self, client):
+        import uuid as _uuid
+
+        def ev(seq, etype, payload):
+            return {"client_event_id": str(_uuid.uuid4()), "session_id": "s-thr-1",
+                    "seq": seq, "type": etype,
+                    "device_ts": "2026-07-29T04:00:00Z", "payload": payload}
+
+        client.post("/v1/sync/events", json={"device_id": "d1", "events": [
+            ev(1, "session.started", {"protocol": "pallet_general@7"}),
+            ev(2, "step.completed", {"step_id": "c_thread", "data": [
+                {"location": "ступень 1", "span_mm": 7.5, "turns": 5, "major_d_mm": 20.0}]}),
+            ev(3, "session.completed", {}),
+        ]}, headers=OPERATOR)
+        row = client.get("/v1/export/sessions", headers=REVIEWER).json()["items"][0]
+        assert row["thread_checks"][0]["verdict"] == "metric"
