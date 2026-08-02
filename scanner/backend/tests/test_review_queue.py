@@ -89,6 +89,25 @@ class TestVerdict:
         assert entry["reasons"] == ["после пересъёмки: сверить маркировку"]
 
 
+class TestQueueSummary:
+    def test_empty_queue_summary(self, client):
+        s = client.get("/v1/review/queue/summary", headers=REVIEWER).json()
+        assert s == {"open": 0, "by_reason": {}, "oldest_enqueued_at": None}
+
+    def test_reasons_are_categorized_by_prefix(self, client):
+        _enqueue("s-sum-1", reasons=("llm_unavailable: нет ключа",))
+        _enqueue("s-sum-2", reasons=("llm_unavailable: нет ключа",
+                                     "флаг: фото с экрана"))
+        s = client.get("/v1/review/queue/summary", headers=REVIEWER).json()
+        assert s["open"] == 2
+        assert s["by_reason"] == {"llm_unavailable": 2, "флаг": 1}
+        assert s["oldest_enqueued_at"] is not None
+
+    def test_summary_requires_reviewer(self, client):
+        assert client.get("/v1/review/queue/summary",
+                          headers=OPERATOR).status_code == 403
+
+
 class TestTenantIsolation:
     def test_queues_are_tenant_scoped(self, client):
         _enqueue()

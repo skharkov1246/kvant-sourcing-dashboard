@@ -578,6 +578,28 @@ def review_queue(principal: Principal = Depends(current_principal)) -> dict[str,
     return {"items": STORE.list_review_queue(principal.tenant_id)}
 
 
+@app.get("/v1/review/queue/summary", tags=["review"])
+def review_queue_summary(principal: Principal = Depends(current_principal)) -> dict[str, Any]:
+    """Бейдж дашборда контролёра: сколько открыто и почему.
+
+    Категория причины — префикс до двоеточия («llm_flag», «llm_unavailable»,
+    «правила протокола не дали автоприём»): контролёр видит, чем занята
+    очередь, не открывая её.
+    """
+    _require_reviewer(principal)
+    items = STORE.list_review_queue(principal.tenant_id)
+    by_reason: dict[str, int] = {}
+    for entry in items:
+        for reason in entry["reasons"]:
+            key = reason.split(":", 1)[0].strip()
+            by_reason[key] = by_reason.get(key, 0) + 1
+    return {
+        "open": len(items),
+        "by_reason": dict(sorted(by_reason.items(), key=lambda kv: -kv[1])),
+        "oldest_enqueued_at": items[0]["enqueued_at"] if items else None,
+    }
+
+
 @app.post("/v1/review/{session_id}/verdict", tags=["review"])
 def review_verdict(
     session_id: str,
