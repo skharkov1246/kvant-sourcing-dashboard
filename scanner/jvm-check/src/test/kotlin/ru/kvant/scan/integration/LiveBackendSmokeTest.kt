@@ -159,6 +159,31 @@ class LiveBackendSmokeTest {
     }
 
     @Test
+    fun `живая загрузка ассета - Kotlin sha256 против hashlib сервера`() = runTest {
+        if (!serverIsUp()) {
+            println("SMOKE SKIPPED: uvicorn на :8077 не запущен")
+            return@runTest
+        }
+        val uploader = ru.kvant.scan.sync.AssetUploader(
+            HttpClient(CIO),
+            SyncConfig(
+                baseUrl = baseUrl, tenantId = "t-internal",
+                userId = "u-smoke", deviceId = "d-smoke",
+                capabilities = Json.parseToJsonElement("""{"schema_version":1}""").jsonObject,
+            ),
+        )
+        val bytes = ByteArray(3 * 1024 * 1024 + 17) { (it % 251).toByte() }  // >2 чанков
+        val meta = ru.kvant.scan.sync.AssetUploader.Meta(
+            "s-media-${UUID.randomUUID()}", "overview", "photo", "image/jpeg")
+
+        // complete вернёт verified только если наш sha256 совпал с hashlib.
+        val assetId = uploader.upload(meta, bytes)
+
+        // Повтор тех же байт — мгновенный дедуп по контрольной сумме (§04.4).
+        assertEquals(assetId, uploader.upload(meta, bytes))
+    }
+
+    @Test
     fun `живой ETag-цикл справочника - вторая загрузка обходится в 304`() = runTest {
         if (!serverIsUp()) {
             println("SMOKE SKIPPED: uvicorn на :8077 не запущен")
