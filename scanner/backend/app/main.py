@@ -35,6 +35,7 @@ from .export import registry_row
 from .model_registry import TenantDataPolicy
 from .protocol import auto_accept, check_compatibility, is_complete
 from .projections import fold
+from .si_check import instrument_flags
 from .store import Store, StoredAsset, utcnow
 
 app = FastAPI(
@@ -88,11 +89,23 @@ def _run_acceptance(tenant_id: str, session_id: str) -> None:
         # Решать нечего и не по чему — сразу к контролёру, а не в никуда.
         STORE.enqueue_review(tenant_id, session_id, ["протокол сессии не определён"])
         return
-    ctx = fold(session_id, events).to_context()
+    state = fold(session_id, events)
     AcceptanceService(ACCEPTANCE_PIPELINE, STORE).process(
-        tenant_id, session_id, protocol, ctx,
+        tenant_id, session_id, protocol, state.to_context(),
         TenantDataPolicy(tenant_id=tenant_id, retention_days=30),
     )
+    # Проверка СИ (Р-08) — детерминированное правило СТРОЖЕ автоприёма:
+    # телефон мог месяц не синхронизировать справочник, сервер проверяет то,
+    # что реально пришло. Нарушение отправляет сессию контролёру даже при
+    # идеальном вердикте правил и модели.
+    completed_at = next(
+        (e.get("server_ts") or e.get("device_ts")
+         for e in events if e["type"] == "session.completed"), None,
+    )
+    if completed_at:
+        flags = instrument_flags(state, completed_at[:7])
+        if flags:
+            STORE.enqueue_review(tenant_id, session_id, flags)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
