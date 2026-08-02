@@ -70,6 +70,7 @@ class Store:
         self.trace_links: dict[str, list[dict[str, Any]]] = {}
         self.review_queue: dict[tuple[str, str], dict[str, Any]] = {}  # (tenant_id, session_id)
         self.export_queue: dict[tuple[str, str], dict[str, Any]] = {}  # (tenant_id, session_id)
+        self.audit_log: list[dict[str, Any]] = []  # append-only (§07.4)
 
     # ── Протоколы ────────────────────────────────────────────────────────────
 
@@ -286,6 +287,24 @@ class Store:
                 if t == tenant_id and e["resolved_at"] is None
             ]
             return sorted(open_entries, key=lambda e: e["enqueued_at"])
+
+    # ── Аудит (§07.4): только добавление, метода изменения нет намеренно ────
+
+    def audit(self, tenant_id: str, actor: str, action: str, target: str,
+              details: dict[str, Any] | None = None) -> None:
+        with self._lock:
+            self.audit_log.append({
+                "at": utcnow(),
+                "tenant_id": tenant_id,
+                "actor": actor,
+                "action": action,
+                "target": target,
+                "details": details or {},
+            })
+
+    def list_audit(self, tenant_id: str) -> list[dict[str, Any]]:
+        with self._lock:
+            return [dict(e) for e in self.audit_log if e["tenant_id"] == tenant_id]
 
     # ── Очередь экспорта (I-8) ───────────────────────────────────────────────
     # Задание не закрыто, пока внешняя система не подтвердила приём (§09.4).

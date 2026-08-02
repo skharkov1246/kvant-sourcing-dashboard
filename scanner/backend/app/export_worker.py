@@ -52,6 +52,8 @@ class ExportWorker:
                 if attempts >= self.max_attempts:
                     # I-8: задание НЕ трогаем — оно остаётся ACCEPTED.
                     self.store.dead_letter_export(tenant_id, session_id, str(exc))
+                    self.store.audit(tenant_id, "export-worker", "export.dead_letter",
+                                     session_id, {"error": str(exc), "attempts": attempts})
                     stats["dead_lettered"] += 1
                 else:
                     self.store.defer_export(
@@ -68,6 +70,8 @@ class ExportWorker:
                 continue
             self.store.confirm_export(tenant_id, session_id)
             self._mark_task_exported(tenant_id, row)
+            self.store.audit(tenant_id, "export-worker", "export.confirmed",
+                             session_id, {"external_ref": row.get("external_ref")})
             stats["confirmed"] += 1
         return stats
 

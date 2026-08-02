@@ -620,6 +620,10 @@ def review_verdict(
             status_code=409,
             detail={"code": "already_resolved", "message": f"Вердикт уже вынесен: {existing['verdict']}"},
         )
+    # Аудит §07.4: вердикт — решение с последствиями (двигает задание,
+    # открывает экспорт) и обязан быть восстановим: кто, что, когда.
+    STORE.audit(principal.tenant_id, principal.user_id, "review.verdict",
+                session_id, {"verdict": body.verdict, "comment": body.comment})
     _apply_verdict_to_task(principal.tenant_id, session_id, body.verdict)
     return entry
 
@@ -722,3 +726,42 @@ def get_trace(item_id: str, _: Principal = Depends(current_principal)) -> dict[s
 @app.get("/health", include_in_schema=False)
 def health() -> dict[str, str]:
     return {"status": "ok", "time": utcnow()}
+
+
+@app.get("/health/ready", include_in_schema=False)
+def health_ready(response: Response) -> dict[str, Any]:
+    """Readiness для деплоя: жив ли каждый зависимый контур.
+
+    Отличие от /health: тот отвечает «процесс запущен», этот — «можно
+    подавать трафик». Балансировщик снимает под с ротации по 503 отсюда,
+    не дожидаясь пятисоток у операторов.
+    """
+    checks: dict[str, Any] = {}
+
+    try:
+        checks["directories"] = {
+            "ok": True,
+            "series_version": load_series_directory()["version"],
+            "materials_version": load_materials_directory()["version"],
+        }
+    except DirectoryError as e:
+        checks["directories"] = {"ok": False, "error": str(e)}
+
+    try:
+        checks["protocols"] = {"ok": True, "active": len(STORE.list_protocols())}
+    except Exception as e:  # noqa: BLE001 — readiness обязан пережить любой сбой
+        checks["protocols"] = {"ok": False, "error": str(e)}
+
+    # Хранилище: для PgStore — живой SELECT 1, для памяти — тривиально ок.
+    try:
+        conn = getattr(STORE, "_conn", None)
+        if conn is not None:
+            conn.execute("SELECT 1")
+        checks["store"] = {"ok": True, "kind": type(STORE).__name__}
+    except Exception as e:  # noqa: BLE001
+        checks["store"] = {"ok": False, "error": str(e)}
+
+    ready = all(c.get("ok") for c in checks.values())
+    if not ready:
+        response.status_code = 503
+    return {"ready": ready, "checks": checks, "time": utcnow()}

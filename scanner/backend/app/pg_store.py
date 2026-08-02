@@ -65,6 +65,7 @@ class PgStore:
             "scan_session, inbound_idempotency, scan_task, capture_protocol, "
             "device, app_user, site, tenant_grant, tenant CASCADE"
         )
+        self._conn.execute("TRUNCATE audit.entry")
         self._tenant_cache.clear()
 
     def _tenant(self, code: str) -> str:
@@ -512,6 +513,30 @@ class PgStore:
             (self._tenant(tenant_id),),
         ).fetchall()
         return [self._review_row(r) for r in rows]
+
+    # ── Аудит (§07.4): audit.entry — только INSERT, UPDATE/DELETE отозваны ──
+
+    def audit(self, tenant_id: str, actor: str, action: str, target: str,
+              details: dict[str, Any] | None = None) -> None:
+        t = self._tenant(tenant_id)
+        self._conn.execute(
+            "INSERT INTO audit.entry (tenant_id, actor_id, action, target, details) "
+            "VALUES (%s, %s, %s, %s, %s)",
+            (t, self._stub_user(t, actor), action, target, Jsonb(details or {})),
+        )
+
+    def list_audit(self, tenant_id: str) -> list[dict[str, Any]]:
+        rows = self._conn.execute(
+            "SELECT e.at, u.ext_id, e.action, e.target, e.details "
+            "FROM audit.entry e JOIN app_user u ON u.id = e.actor_id "
+            "WHERE e.tenant_id = %s ORDER BY e.id",
+            (self._tenant(tenant_id),),
+        ).fetchall()
+        return [
+            {"at": r[0].isoformat(), "tenant_id": tenant_id, "actor": r[1],
+             "action": r[2], "target": r[3], "details": r[4]}
+            for r in rows
+        ]
 
     # ── Очередь экспорта (I-8) ───────────────────────────────────────────────
 
