@@ -1,0 +1,13 @@
+{
+  "directory": "brand_directory",
+  "version": 1,
+  "maintainer": "владелец реестра (Р-03 разд. 6)",
+  "comment": "Производители для расшифровки маркировки (kv_select, kv_cat_a). «БРЕНД НЕ ОПРЕДЕЛЁН» — СЛУЖЕБНОЕ значение (Р-11 п.3): это исход работы у детали, по нему сервер создаёт задачу брендинга на 10 р.д.; менеджеру на входе оно недоступно.",
+  "sections": {
+    "brands": {
+      "title": "Производители",
+      "unit": "бренд",
+      "values": ["SKF", "FAG/Schaeffler", "Timken", "NSK", "NTN", "Freudenberg/Simrit", "Trelleborg", "Parker", "James Walker", "Flowserve", "KSB", "Grundfos", "Sulzer", "ГПЗ (отеч.)", "БРЕНД НЕ ОПРЕДЕЛЁН"]
+    }
+  }
+}

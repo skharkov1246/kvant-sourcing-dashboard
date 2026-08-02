@@ -23,9 +23,13 @@ from pydantic import BaseModel, Field
 from .acceptance import AcceptancePipeline, AcceptanceService, TransportUnavailable
 from .directories import (
     DirectoryError,
+    load_brand_directory,
     load_materials_directory,
+    load_media_directory,
     load_series_directory,
+    load_si_directory,
     load_sortament_directory,
+    load_std_directory,
 )
 from .export import registry_row
 from .model_registry import TenantDataPolicy
@@ -469,6 +473,11 @@ _DIRECTORIES = {
     "standard_series": load_series_directory,
     "materials": load_materials_directory,
     "sortament": load_sortament_directory,
+    # Имена совпадают с source-полями протоколов — маппинг не нужен.
+    "media_directory": load_media_directory,
+    "brand_directory": load_brand_directory,
+    "std_directory": load_std_directory,
+    "si_directory": load_si_directory,
 }
 
 

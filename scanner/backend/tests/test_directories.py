@@ -191,6 +191,51 @@ class TestSortamentDirectory:
                         headers={**OPERATOR, "If-None-Match": etag}).status_code == 304
 
 
+class TestOperationalDirectories:
+    """Справочники source-полей протоколов: имя эндпоинта = имя source."""
+
+    def test_all_four_load(self):
+        from app.directories import (
+            load_brand_directory, load_media_directory,
+            load_si_directory, load_std_directory,
+        )
+
+        assert load_media_directory()["sections"]["media"]["values"]
+        assert load_brand_directory()["sections"]["brands"]["values"]
+        assert load_std_directory()["sections"]["series_names"]["values"]
+        assert load_si_directory()["sections"]["instruments"]["values"]
+
+    def test_brand_directory_carries_service_value(self):
+        """«БРЕНД НЕ ОПРЕДЕЛЁН» — служебный исход Р-11 п.3, он обязан быть
+        в справочнике: по нему сервер создаёт задачу брендинга."""
+        from app.directories import load_brand_directory
+
+        assert "БРЕНД НЕ ОПРЕДЕЛЁН" in load_brand_directory()["sections"]["brands"]["values"]
+
+    def test_si_entries_carry_verification_deadline(self):
+        """Каждая строка СИ несёт срок поверки — без него офлайн-отсечка
+        просроченных СИ (docs/14) не сработает."""
+        from app.directories import load_si_directory
+
+        for entry in load_si_directory()["sections"]["instruments"]["values"]:
+            assert "поверка до" in entry, entry
+
+    def test_endpoint_serves_all_with_etag(self):
+        from fastapi.testclient import TestClient
+
+        from app.main import app
+        from tests.conftest import OPERATOR
+
+        http = TestClient(app)
+        for name in ("media_directory", "brand_directory", "std_directory", "si_directory"):
+            r = http.get(f"/v1/directories/{name}", headers=OPERATOR)
+            assert r.status_code == 200, name
+            assert r.headers["ETag"] == f'"{name}-v{r.json()["version"]}"'
+            assert http.get(f"/v1/directories/{name}",
+                            headers={**OPERATOR, "If-None-Match": r.headers["ETag"]},
+                            ).status_code == 304, name
+
+
 class TestHonestEmptyD1:
     def test_d1_pending_returns_none(self):
         """Пока владелец реестра не заполнил ряд d1 — None, а не пустой список:

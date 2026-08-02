@@ -119,6 +119,34 @@ def load_sortament_directory(path: Path | None = None) -> dict:
     return _load_and_check("sortament_directory.json", _SORTAMENT_SECTIONS, path)
 
 
+# Операционные справочники, на которые ссылаются source-поля протоколов
+# (media_directory, brand_directory, std_directory, si_directory): имя
+# эндпоинта совпадает с именем source — приложению не нужна таблица маппинга.
+
+@lru_cache(maxsize=1)
+def load_media_directory(path: Path | None = None) -> dict:
+    """Рабочие среды (Р-10 п.1): шаги безопасности и подбор эластомеров."""
+    return _load_and_check("media_directory.json", frozenset({"media"}), path)
+
+
+@lru_cache(maxsize=1)
+def load_brand_directory(path: Path | None = None) -> dict:
+    """Производители + служебное «БРЕНД НЕ ОПРЕДЕЛЁН» (Р-11 п.3)."""
+    return _load_and_check("brand_directory.json", frozenset({"brands"}), path)
+
+
+@lru_cache(maxsize=1)
+def load_std_directory(path: Path | None = None) -> dict:
+    """Имена каталожных рядов для поля series_name."""
+    return _load_and_check("std_directory.json", frozenset({"series_names"}), path)
+
+
+@lru_cache(maxsize=1)
+def load_si_directory(path: Path | None = None) -> dict:
+    """Парк СИ с номерами и сроками поверки — ссылка каждого шага обмера."""
+    return _load_and_check("si_directory.json", frozenset({"instruments"}), path)
+
+
 def series_values(section: str) -> Sequence[float]:
     """Значения ряда по имени секции; пустой список — «данных нет» (это честно)."""
     doc = load_series_directory()

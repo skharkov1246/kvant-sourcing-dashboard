@@ -324,7 +324,10 @@ paths:
         - name: name
           in: path
           required: true
-          schema: { type: string, enum: [standard_series, materials, sortament] }
+          schema:
+            type: string
+            enum: [standard_series, materials, sortament,
+                   media_directory, brand_directory, std_directory, si_directory]
         - name: If-None-Match
           in: header
           required: false
