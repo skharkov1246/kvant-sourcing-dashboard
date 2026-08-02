@@ -108,6 +108,25 @@ class TestQueueSummary:
                           headers=OPERATOR).status_code == 403
 
 
+class TestDashboardPage:
+    def test_page_renders_queue_for_reviewer(self, client):
+        _enqueue("s-dash-1", reasons=("llm_unavailable: нет ключа",))
+        r = client.get("/review/dashboard", headers=REVIEWER)
+        assert r.status_code == 200
+        assert "text/html" in r.headers["content-type"]
+        assert "s-dash-1" in r.text
+        assert "llm_unavailable" in r.text
+
+    def test_page_requires_reviewer_role(self, client):
+        assert client.get("/review/dashboard", headers=OPERATOR).status_code == 403
+
+    def test_reasons_are_html_escaped(self, client):
+        _enqueue("s-dash-2", reasons=("флаг: <script>alert(1)</script>",))
+        text = client.get("/review/dashboard", headers=REVIEWER).text
+        assert "<script>alert(1)</script>" not in text
+        assert "&lt;script&gt;" in text
+
+
 class TestTenantIsolation:
     def test_queues_are_tenant_scoped(self, client):
         _enqueue()

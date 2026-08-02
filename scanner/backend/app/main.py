@@ -17,6 +17,7 @@ import uuid
 from typing import Any, Literal
 
 from fastapi import Body, Depends, FastAPI, Header, HTTPException, Path, Request, Response
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
 
 from .acceptance import AcceptancePipeline, AcceptanceService, TransportUnavailable
@@ -657,6 +658,89 @@ def _apply_verdict_to_task(tenant_id: str, session_id: str, verdict: str) -> Non
     # очередь экспорта; EXPORTED задание станет только после подтверждения.
     if verdict == "ACCEPTED" and task.get("external_system"):
         STORE.enqueue_export(tenant_id, session_id)
+
+
+@app.get("/review/dashboard", include_in_schema=False, response_class=HTMLResponse)
+def review_dashboard(principal: Principal = Depends(current_principal)) -> HTMLResponse:
+    """Мини-дашборд контролёра: сводка + очередь + кнопки вердиктов.
+
+    Дев-инструмент до промышленного OIDC: страница рендерится сервером по
+    тем же заголовкам тенанта, что и API; кнопки шлют вердикт fetch'ем с
+    теми же заголовками (тенант/пользователь берутся из query, по умолчанию
+    локальная сборка). Один самодостаточный HTML без сборки фронта —
+    в стиле дашборда репозитория.
+    """
+    import html as _html
+
+    _require_reviewer(principal)
+    items = STORE.list_review_queue(principal.tenant_id)
+
+    by_reason: dict[str, int] = {}
+    for entry in items:
+        for reason in entry["reasons"]:
+            key = reason.split(":", 1)[0].strip()
+            by_reason[key] = by_reason.get(key, 0) + 1
+    summary_html = "".join(
+        f"<span class='pill'>{_html.escape(k)}: {v}</span>"
+        for k, v in sorted(by_reason.items(), key=lambda kv: -kv[1])
+    ) or "<span class='pill ok'>очередь пуста</span>"
+
+    rows = "".join(
+        "<tr><td class='sid'>{sid}</td><td>{reasons}</td><td class='ts'>{ts}</td>"
+        "<td class='actions'>"
+        "<button onclick=\"verdict('{sid}','ACCEPTED')\">Принять</button>"
+        "<button class='warn' onclick=\"verdict('{sid}','REWORK')\">Пересъёмка</button>"
+        "<button class='bad' onclick=\"verdict('{sid}','REJECTED')\">Брак</button>"
+        "</td></tr>".format(
+            sid=_html.escape(entry["session_id"]),
+            reasons="<br>".join(_html.escape(r) for r in entry["reasons"]),
+            ts=_html.escape(str(entry["enqueued_at"])[:19]),
+        )
+        for entry in items
+    )
+
+    page = """<!doctype html><html lang="ru"><head><meta charset="utf-8">
+<title>КВАНТ Скан — очередь ревью</title>
+<style>
+body{font:14px/1.45 system-ui,sans-serif;margin:24px;background:#f6f7f9;color:#1c2430}
+h1{font-size:18px;margin:0 0 12px}
+.pill{display:inline-block;background:#e4e9f2;border-radius:12px;padding:2px 10px;margin:0 6px 6px 0;font-size:12px}
+.pill.ok{background:#d9efd9}
+table{border-collapse:collapse;width:100%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+th,td{padding:8px 12px;border-bottom:1px solid #e7eaf0;text-align:left;vertical-align:top}
+th{background:#eef1f6;font-weight:600}
+.sid{font-family:ui-monospace,monospace;font-size:12px}
+.ts{white-space:nowrap;color:#68758a;font-size:12px}
+.actions button{margin-right:6px;padding:4px 10px;border:1px solid #c6cedb;border-radius:6px;background:#fff;cursor:pointer}
+.actions button:hover{background:#eef1f6}
+.actions .warn{border-color:#d9a000}.actions .bad{border-color:#c0392b}
+#msg{margin:10px 0;color:#c0392b}
+</style></head><body>
+<h1>Очередь ручного ревью — открыто: __OPEN__</h1>
+<div>__SUMMARY__</div><div id="msg"></div>
+<table><thead><tr><th>Сессия</th><th>Причины</th><th>Поставлено</th><th>Вердикт</th></tr></thead>
+<tbody>__ROWS__</tbody></table>
+<script>
+const q = new URLSearchParams(location.search);
+const H = {"Content-Type": "application/json",
+           "X-Tenant-Id": q.get("tenant") || "__TENANT__",
+           "X-User-Id": q.get("user") || "__USER__",
+           "X-Roles": "operator,reviewer"};
+async function verdict(sid, v) {
+  const comment = v === "ACCEPTED" ? null : (prompt("Комментарий к вердикту:") || null);
+  const r = await fetch(`/v1/review/${encodeURIComponent(sid)}/verdict`,
+    {method: "POST", headers: H, body: JSON.stringify({verdict: v, comment})});
+  if (r.ok) { location.reload(); }
+  else { document.getElementById("msg").textContent =
+           `Ошибка ${r.status}: ${(await r.json()).detail?.message || ""}`; }
+}
+</script></body></html>"""
+    page = (page.replace("__OPEN__", str(len(items)))
+                .replace("__SUMMARY__", summary_html)
+                .replace("__ROWS__", rows)
+                .replace("__TENANT__", _html.escape(principal.tenant_id))
+                .replace("__USER__", _html.escape(principal.user_id)))
+    return HTMLResponse(page)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
