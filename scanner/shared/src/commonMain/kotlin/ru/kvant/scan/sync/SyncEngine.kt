@@ -96,13 +96,36 @@ class SyncEngine(
         if (toRemove.isNotEmpty()) outbox.remove(toRemove)
         return report.copy(remaining = outbox.depth())
     }
+
+    /**
+     * Один проход pull-канала: страницы дельты применяются к локальному
+     * состоянию до исчерпания has_more. Возвращает курсор для следующего
+     * прохода — хранение курсора за вызывающей стороной (persistence-слой).
+     */
+    suspend fun pullOnce(cursor: String?, applier: PullApplier): String? {
+        var current = cursor
+        while (true) {
+            val page = transport.pull(current)
+            applier.apply(page)
+            current = page.nextCursor
+            if (!page.hasMore) return current
+        }
+    }
 }
 
 /** Транспортный слой. Реализация — Ktor-клиент в платформенном модуле. */
 interface SyncTransport {
     suspend fun sendEvents(events: List<ClientEvent>): List<EventResult>
     suspend fun pull(cursor: String?): PullResult
+    suspend fun fetchDirectory(name: String, etag: String?): DirectoryResponse
 }
+
+/** Ответ GET /v1/directories/{name}: 304 → notModified, 200 → etag + тело. */
+data class DirectoryResponse(
+    val notModified: Boolean,
+    val etag: String? = null,
+    val body: String? = null,
+)
 
 data class PullResult(
     val changes: List<Change>,
