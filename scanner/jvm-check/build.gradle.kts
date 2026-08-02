@@ -6,7 +6,12 @@ plugins {
 kotlin {
     sourceSets {
         main { kotlin.srcDir("../shared/src/commonMain/kotlin") }
-        test { kotlin.srcDir("../shared/src/commonTest/kotlin") }
+        // Общие тесты ядра + собственные интеграционные (только JVM):
+        // в commonTest им нельзя — там код компилируется и для iOS.
+        test {
+            kotlin.srcDir("../shared/src/commonTest/kotlin")
+            kotlin.srcDir("src/test/kotlin")
+        }
     }
 }
 
@@ -21,6 +26,8 @@ dependencies {
     testImplementation(kotlin("test"))
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
     testImplementation("io.ktor:ktor-client-mock:3.0.1")
+    // Живой HTTP-движок для интеграционного смока против локального uvicorn
+    testImplementation("io.ktor:ktor-client-cio:3.0.1")
 }
 
 tasks.test { useJUnitPlatform() }
