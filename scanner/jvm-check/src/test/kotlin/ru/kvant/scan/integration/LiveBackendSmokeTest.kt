@@ -4,7 +4,11 @@ import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.request.get
 import io.ktor.client.request.header
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonArray
@@ -14,7 +18,9 @@ import ru.kvant.scan.domain.Instant
 import ru.kvant.scan.sync.ClientEvent
 import ru.kvant.scan.sync.EventAck
 import ru.kvant.scan.sync.EventType
+import ru.kvant.scan.sync.InMemoryTaskStore
 import ru.kvant.scan.sync.KtorSyncTransport
+import ru.kvant.scan.sync.PullApplier
 import ru.kvant.scan.sync.SyncConfig
 import java.net.Socket
 import java.util.UUID
@@ -51,7 +57,8 @@ class LiveBackendSmokeTest {
             userId = "u-smoke",
             deviceId = "d-smoke",
             capabilities = Json.parseToJsonElement(
-                """{"schema_version": 1, "app_version": "0.1.0"}"""
+                """{"schema_version": 1, "app_version": "0.1.0",
+                    "platform": "android", "max_accuracy_class": "B"}"""
             ).jsonObject,
         ),
     )
@@ -91,6 +98,64 @@ class LiveBackendSmokeTest {
         val sessions = Json.parseToJsonElement(queue).jsonObject["items"]!!
             .jsonArray.map { it.jsonObject["session_id"]!!.jsonPrimitive.content }
         assertTrue(sessionId in sessions, "сессии нет в очереди контролёра: $sessions")
+    }
+
+    @Test
+    fun `полный цикл оператора одним тестом - Bitrix до пересъёмки`() = runTest {
+        if (!serverIsUp()) {
+            println("SMOKE SKIPPED: uvicorn на :8077 не запущен")
+            return@runTest
+        }
+        val client = HttpClient(CIO)
+        val transport = transport(client)
+        val externalRef = "deal-${UUID.randomUUID()}"
+
+        // 1. «Bitrix» отдал задание (дев-сервер знает протокол pallet_general).
+        val inbound = client.post("$baseUrl/v1/inbound/tasks") {
+            header("X-Tenant-Id", "t-internal"); header("X-User-Id", "u-mgr")
+            header("Idempotency-Key", UUID.randomUUID().toString())
+            contentType(ContentType.Application.Json)
+            setBody("""{"external_system": "bitrix24", "external_ref": "$externalRef",
+                        "protocol_code": "pallet_general",
+                        "subject": {"title": "Паллета насосов"}}""")
+        }.bodyAsText()
+        val taskId = Json.parseToJsonElement(inbound)
+            .jsonObject["task_id"]!!.jsonPrimitive.content
+
+        // 2. Устройство подтянуло задание штатным pull через транспорт.
+        val store = InMemoryTaskStore()
+        val applier = PullApplier(store)
+        applier.apply(transport.pull(null))
+        val pulled = store.tasks().first { it.id == taskId }
+        assertEquals("NEW", pulled.state)
+        assertEquals("Паллета насосов", pulled.title)
+
+        // 3. Оператор снял сессию по заданию, сервер поставил её контролёру.
+        val sessionId = "s-loop-${UUID.randomUUID()}"
+        fun event(seq: Long, type: EventType, payload: String) = ClientEvent(
+            clientEventId = UUID.randomUUID().toString(), sessionId = sessionId,
+            seq = seq, type = type, deviceTs = Instant(System.currentTimeMillis()),
+            payload = Json.parseToJsonElement(payload).jsonObject,
+        )
+        transport.sendEvents(listOf(
+            event(1, EventType.SESSION_STARTED,
+                """{"protocol": "pallet_general@7", "task_id": "$taskId"}"""),
+            event(2, EventType.STEP_COMPLETED, """{"step_id": "overview"}"""),
+            event(3, EventType.SESSION_COMPLETED, "{}"),
+        )).forEach { assertEquals(EventAck.ACCEPTED, it.status) }
+
+        // 4. Контролёр вернул на пересъёмку.
+        val verdict = client.post("$baseUrl/v1/review/$sessionId/verdict") {
+            header("X-Tenant-Id", "t-internal"); header("X-User-Id", "u-rev")
+            header("X-Roles", "operator,reviewer")
+            contentType(ContentType.Application.Json)
+            setBody("""{"verdict": "REWORK", "comment": "переснять этикетку"}""")
+        }
+        assertEquals(200, verdict.status.value)
+
+        // 5. Следующий pull устройства видит задание снова — уже как REWORK.
+        applier.apply(transport.pull(null))
+        assertEquals("REWORK", store.tasks().first { it.id == taskId }.state)
     }
 
     @Test
