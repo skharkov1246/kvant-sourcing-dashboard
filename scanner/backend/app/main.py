@@ -286,7 +286,54 @@ def sync_events(
     # в одном батче с последними шагами (и даже раньше их — см. проекцию).
     for session_id in completed_sessions:
         _run_acceptance(principal.tenant_id, session_id)
+        _spawn_service_tasks(principal.tenant_id, session_id)
     return {"results": results, "server_time": utcnow()}
+
+
+# Служебные исходы kv_no_id → задачи с дедлайном в рабочих днях (Р-11 п.3,
+# Р-13 п.5.1). Значения — это ИСХОД работы у детали; задачу создаёт сервер.
+_SERVICE_OUTCOME_DEADLINES_BD = {
+    "БРЕНД НЕ ОПРЕДЕЛЁН": 10,
+    "УСТАНОВКА НЕ ОПРЕДЕЛЕНА": 15,
+}
+
+
+def _spawn_service_tasks(tenant_id: str, session_id: str) -> None:
+    import datetime as dt
+
+    from .buffer import WorkCalendar
+
+    events = STORE.session_events(tenant_id, session_id)
+    state = fold(session_id, events)
+    res = state.results.get("n_outcome")
+    outcome = res.data.get("outcome") if res and isinstance(res.data, dict) else None
+    days = _SERVICE_OUTCOME_DEADLINES_BD.get(outcome or "")
+    if days is None:
+        return
+    # Идемпотентность по (система, ссылка): повтор батча не плодит задачи.
+    external_ref = f"{session_id}:{outcome}"
+    if STORE.find_task_by_external(tenant_id, "kvant-scan", external_ref):
+        return
+    due = WorkCalendar().add_business_days(dt.date.today(), days)
+    STORE.upsert_task({
+        "id": str(uuid.uuid4()),
+        "tenant_id": tenant_id,
+        "site_id": None,
+        "external_system": "kvant-scan",
+        "external_ref": external_ref,
+        # Повторный заход на идентификацию после отработки задачи идёт тем же
+        # маршрутом kv_no_id — либо деталь получает бренд и уходит в router.
+        "protocol_code": "kv_no_id",
+        "protocol_version": None,
+        "subject": {"kind": "service_followup", "outcome": outcome,
+                    "source_session": session_id},
+        "priority": 50,
+        "due_at": due.isoformat(),
+        "assignee_user_id": None,
+        "assignee_pool": "brand_owners" if days == 10 else "site_managers",
+        "state": "NEW",
+        "created_at": utcnow(),
+    })
 
 
 @app.get("/v1/sync/sessions/{session_id}/log", tags=["sync"])

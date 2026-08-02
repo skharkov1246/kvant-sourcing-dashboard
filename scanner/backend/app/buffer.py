@@ -156,6 +156,18 @@ class WorkCalendar:
                 days += 1
         return days
 
+    def add_business_days(self, start: dt.date, n: int) -> dt.date:
+        """Дедлайн через n рабочих дней: сроки регламентов (10/15 р.д. у
+        служебных исходов kv_no_id) считаются по календарю, а не по календарным
+        дням — иначе задача, выданная в пятницу, «горит» все выходные."""
+        d = start
+        added = 0
+        while added < n:
+            d += dt.timedelta(days=1)
+            if self.is_working(d):
+                added += 1
+        return d
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Сущности
