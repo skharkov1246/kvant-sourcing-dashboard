@@ -33,6 +33,9 @@ class CaptureSessionController(
     /** UUIDv7 от платформы: сортируемый, без координации (§04.4). */
     private val newEventId: () -> String,
     deviceMaxAccuracy: AccuracyClass = AccuracyClass.D,
+    /** Контекст session.started: protocol-ref и task_id — по нему сервер
+     * находит протокол для приёмки и двигает задание (см. main.py). */
+    private val startContext: JsonObject = JsonObject(emptyMap()),
 ) {
     private val interpreter = ProtocolInterpreter(protocol, deviceMaxAccuracy)
     private val results = mutableMapOf<String, StepResult>()
@@ -69,7 +72,7 @@ class CaptureSessionController(
     suspend fun start() {
         if (started) return
         started = true
-        emit(EventType.SESSION_STARTED, JsonObject(emptyMap()))
+        emit(EventType.SESSION_STARTED, startContext)
     }
 
     /**

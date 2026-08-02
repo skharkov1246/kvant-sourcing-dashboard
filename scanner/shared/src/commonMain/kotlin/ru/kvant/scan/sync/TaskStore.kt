@@ -60,6 +60,9 @@ interface TaskStore {
 
     suspend fun upsertProtocol(code: String, version: Int, document: JsonObject)
     suspend fun protocol(code: String, version: Int): JsonObject?
+
+    /** Свежайшая синхронизированная версия кода — для заданий без пина версии. */
+    suspend fun latestProtocol(code: String): JsonObject?
 }
 
 class InMemoryTaskStore : TaskStore {
@@ -83,6 +86,10 @@ class InMemoryTaskStore : TaskStore {
 
     override suspend fun protocol(code: String, version: Int): JsonObject? =
         mutex.withLock { protocols[code to version] }
+
+    override suspend fun latestProtocol(code: String): JsonObject? = mutex.withLock {
+        protocols.filterKeys { it.first == code }.maxByOrNull { it.key.second }?.value
+    }
 }
 
 /**
