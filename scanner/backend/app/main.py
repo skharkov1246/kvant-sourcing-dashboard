@@ -20,7 +20,10 @@ from fastapi import Body, Depends, FastAPI, Header, HTTPException, Path, Request
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
 
+import datetime as _dt
+
 from .acceptance import AcceptancePipeline, AcceptanceService, TransportUnavailable
+from .crowd import Campaign, Contributor, CrowdEngine, CrowdError, Submission
 from .directories import (
     DirectoryError,
     load_brand_directory,
@@ -951,6 +954,258 @@ def get_item(item_id: str, principal: Principal = Depends(current_principal)) ->
             card["quality"] = {"score": row["quality_score"]}
             card["surface_stats"] = row["surface_stats"]
     return card
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Краудсорсинг «скан за вознаграждение» (docs/15, schema_crowd.sql)
+# ─────────────────────────────────────────────────────────────────────────────
+# HTTP-обвязка над CrowdEngine; сама логика (дедуп, капы, карантин, реестр
+# вознаграждений) живёт в crowd.py и здесь не дублируется. Контур денежный,
+# поэтому каждый ход — в аудит.
+
+_CROWD_ENGINES: dict[str, CrowdEngine] = {}
+
+
+def _crowd(tenant_id: str) -> CrowdEngine:
+    return _CROWD_ENGINES.setdefault(tenant_id, CrowdEngine())
+
+
+def _crowd_conflict(e: CrowdError) -> HTTPException:
+    return HTTPException(status_code=409, detail={"code": "crowd_rule", "message": str(e)})
+
+
+class ContributorInput(BaseModel):
+    display_name: str
+    phone_hash: str
+    npd_inn: str | None = None
+    gph_details: dict[str, Any] | None = None
+    crypto_wallet: str | None = None
+
+
+class CampaignInput(BaseModel):
+    title: str
+    budget_cents_eur: int
+
+
+class CampaignStateInput(BaseModel):
+    state: str
+
+
+class CrowdSubmissionInput(BaseModel):
+    contributor_id: str
+    content_sha256: str
+    submitted_at: str  # ISO 8601
+    phash: str | None = None
+    quality_score: float | None = None
+    campaign_id: str | None = None
+    supplier_claim: dict[str, Any] | None = None
+
+
+class FlagResolveInput(BaseModel):
+    ok: bool
+
+
+class ClawbackInput(BaseModel):
+    reason: str
+
+
+class PayoutInput(BaseModel):
+    rail: str
+
+
+def _submission_view(sub: Submission) -> dict[str, Any]:
+    return {
+        "id": sub.id,
+        "state": sub.state,
+        "reject_reason": sub.reject_reason,
+        "quality_score": sub.quality_score,
+        "campaign_id": sub.campaign_id,
+    }
+
+
+@app.post("/v1/crowd/contributors", status_code=201, tags=["crowd"])
+def crowd_register_contributor(
+    body: ContributorInput, principal: Principal = Depends(current_principal),
+) -> dict[str, Any]:
+    _require_reviewer(principal)
+    contributor = _crowd(principal.tenant_id).register(Contributor(**body.model_dump()))
+    STORE.audit(principal.tenant_id, principal.user_id, "crowd.contributor.register",
+                contributor.id, {"display_name": contributor.display_name})
+    return {"id": contributor.id, "status": contributor.status,
+            "acceptance_rate": contributor.acceptance_rate}
+
+
+@app.post("/v1/crowd/campaigns", status_code=201, tags=["crowd"])
+def crowd_create_campaign(
+    body: CampaignInput, principal: Principal = Depends(current_principal),
+) -> dict[str, Any]:
+    _require_reviewer(principal)
+    campaign = _crowd(principal.tenant_id).create_campaign(Campaign(**body.model_dump()))
+    STORE.audit(principal.tenant_id, principal.user_id, "crowd.campaign.create",
+                campaign.id, {"budget_cents_eur": campaign.budget_cents_eur})
+    return {"id": campaign.id, "state": campaign.state}
+
+
+@app.get("/v1/crowd/campaigns/{campaign_id}", tags=["crowd"])
+def crowd_campaign(
+    campaign_id: str, principal: Principal = Depends(current_principal),
+) -> dict[str, Any]:
+    """Состояние крана: по остатку бюджета приложение гасит кампанию
+    ДО съёмки, а не отказывает после (docs/15 §3)."""
+    engine = _crowd(principal.tenant_id)
+    campaign = engine.campaigns.get(campaign_id)
+    if campaign is None:
+        raise HTTPException(status_code=404, detail={"code": "not_found", "message": "Кампании нет"})
+    spent = engine.campaign_spent_cents(campaign_id)
+    return {"id": campaign.id, "title": campaign.title, "state": campaign.state,
+            "budget_cents_eur": campaign.budget_cents_eur, "spent_cents_eur": spent,
+            "remaining_cents_eur": max(0, campaign.budget_cents_eur - spent)}
+
+
+@app.post("/v1/crowd/campaigns/{campaign_id}/state", tags=["crowd"])
+def crowd_campaign_state(
+    campaign_id: str, body: CampaignStateInput,
+    principal: Principal = Depends(current_principal),
+) -> dict[str, Any]:
+    _require_reviewer(principal)
+    engine = _crowd(principal.tenant_id)
+    if campaign_id not in engine.campaigns:
+        raise HTTPException(status_code=404, detail={"code": "not_found", "message": "Кампании нет"})
+    try:
+        campaign = engine.set_campaign_state(campaign_id, body.state)
+    except CrowdError as e:
+        raise _crowd_conflict(e) from e
+    STORE.audit(principal.tenant_id, principal.user_id, "crowd.campaign.state",
+                campaign_id, {"state": body.state})
+    return {"id": campaign.id, "state": campaign.state}
+
+
+@app.post("/v1/crowd/submissions", status_code=201, tags=["crowd"])
+def crowd_submit(
+    body: CrowdSubmissionInput, principal: Principal = Depends(current_principal),
+) -> dict[str, Any]:
+    """Приём крауд-скана. Отказ движка (дедуп, кап, качество, бюджет) — это
+    НЕ ошибка HTTP: заявка принята и разобрана, её судьба в state/reject_reason.
+    409 — только нарушение контура (незарегистрированный/приостановленный
+    участник)."""
+    try:
+        submitted_at = _dt.datetime.fromisoformat(body.submitted_at.replace("Z", "+00:00"))
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail={"code": "bad_timestamp", "message": str(e)}) from e
+    sub = Submission(
+        contributor_id=body.contributor_id,
+        content_sha256=body.content_sha256,
+        submitted_at=submitted_at,
+        phash=body.phash,
+        quality_score=body.quality_score,
+        campaign_id=body.campaign_id,
+        supplier_claim=body.supplier_claim,
+    )
+    try:
+        result = _crowd(principal.tenant_id).submit(sub)
+    except CrowdError as e:
+        raise _crowd_conflict(e) from e
+    STORE.audit(principal.tenant_id, principal.user_id, "crowd.submit", result.id,
+                {"state": result.state, "reject_reason": result.reject_reason})
+    return _submission_view(result)
+
+
+@app.post("/v1/crowd/submissions/{submission_id}/resolve", tags=["crowd"])
+def crowd_resolve_flagged(
+    submission_id: str, body: FlagResolveInput,
+    principal: Principal = Depends(current_principal),
+) -> dict[str, Any]:
+    """Вердикт аудитора по карантину velocity_audit: быстрые серии бывают
+    честными — решает человек, до решения деньги не начисляются."""
+    _require_reviewer(principal)
+    engine = _crowd(principal.tenant_id)
+    if submission_id not in engine.submissions:
+        raise HTTPException(status_code=404, detail={"code": "not_found", "message": "Сабмишена нет"})
+    try:
+        result = engine.resolve_flagged(submission_id, body.ok)
+    except CrowdError as e:
+        raise _crowd_conflict(e) from e
+    STORE.audit(principal.tenant_id, principal.user_id, "crowd.resolve",
+                submission_id, {"ok": body.ok, "state": result.state})
+    return _submission_view(result)
+
+
+@app.post("/v1/crowd/submissions/{submission_id}/confirm-supplier", tags=["crowd"])
+def crowd_confirm_supplier(
+    submission_id: str, principal: Principal = Depends(current_principal),
+) -> dict[str, Any]:
+    _require_reviewer(principal)
+    engine = _crowd(principal.tenant_id)
+    if submission_id not in engine.submissions:
+        raise HTTPException(status_code=404, detail={"code": "not_found", "message": "Сабмишена нет"})
+    try:
+        entry = engine.confirm_new_supplier(submission_id)
+    except CrowdError as e:
+        raise _crowd_conflict(e) from e
+    STORE.audit(principal.tenant_id, principal.user_id, "crowd.bonus",
+                submission_id, {"amount_cents_eur": entry.amount_cents_eur})
+    return {"id": entry.id, "kind": entry.kind, "amount_cents_eur": entry.amount_cents_eur}
+
+
+@app.post("/v1/crowd/submissions/{submission_id}/clawback", tags=["crowd"])
+def crowd_clawback(
+    submission_id: str, body: ClawbackInput,
+    principal: Principal = Depends(current_principal),
+) -> dict[str, Any]:
+    _require_reviewer(principal)
+    engine = _crowd(principal.tenant_id)
+    if submission_id not in engine.submissions:
+        raise HTTPException(status_code=404, detail={"code": "not_found", "message": "Сабмишена нет"})
+    try:
+        entry = engine.clawback(submission_id, body.reason)
+    except CrowdError as e:
+        raise _crowd_conflict(e) from e
+    STORE.audit(principal.tenant_id, principal.user_id, "crowd.clawback",
+                submission_id, {"reason": body.reason,
+                                "amount_cents_eur": entry.amount_cents_eur})
+    return {"id": entry.id, "kind": entry.kind, "amount_cents_eur": entry.amount_cents_eur}
+
+
+@app.get("/v1/crowd/contributors/{contributor_id}/ledger", tags=["crowd"])
+def crowd_ledger(
+    contributor_id: str, principal: Principal = Depends(current_principal),
+) -> dict[str, Any]:
+    _require_reviewer(principal)
+    engine = _crowd(principal.tenant_id)
+    if contributor_id not in engine.contributors:
+        raise HTTPException(status_code=404, detail={"code": "not_found", "message": "Участника нет"})
+    entries = [
+        {"id": e.id, "kind": e.kind, "amount_cents_eur": e.amount_cents_eur,
+         "submission_id": e.submission_id, "campaign_id": e.campaign_id, "note": e.note}
+        for e in engine.ledger if e.contributor_id == contributor_id
+    ]
+    return {"contributor_id": contributor_id, "entries": entries,
+            "balance_cents_eur": engine.balance_cents(contributor_id)}
+
+
+@app.post("/v1/crowd/contributors/{contributor_id}/payout", tags=["crowd"])
+def crowd_payout(
+    contributor_id: str, body: PayoutInput,
+    principal: Principal = Depends(current_principal),
+) -> dict[str, Any]:
+    """Выплата остатка. Крипто-рельса по умолчанию ВЫКЛЮЧЕНА (docs/15 §5:
+    для РФ вне правового поля) и включается только явной переменной среды
+    по решению владельца для конкретной юрисдикции."""
+    _require_reviewer(principal)
+    engine = _crowd(principal.tenant_id)
+    if contributor_id not in engine.contributors:
+        raise HTTPException(status_code=404, detail={"code": "not_found", "message": "Участника нет"})
+    try:
+        entry = engine.create_payout(
+            contributor_id, body.rail,
+            crypto_rail_enabled=os.environ.get("KVANT_CRYPTO_RAIL_ENABLED") == "1",
+        )
+    except CrowdError as e:
+        raise _crowd_conflict(e) from e
+    STORE.audit(principal.tenant_id, principal.user_id, "crowd.payout",
+                contributor_id, {"rail": body.rail,
+                                 "amount_cents_eur": entry.amount_cents_eur})
+    return {"id": entry.id, "kind": entry.kind, "amount_cents_eur": entry.amount_cents_eur}
 
 
 @app.get("/health", include_in_schema=False)
