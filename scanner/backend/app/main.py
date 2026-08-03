@@ -235,9 +235,12 @@ def sync_pull(body: SyncPullRequest, principal: Principal = Depends(current_prin
     if "verdicts" in body.scopes:
         # Оператор видит судьбу своих сессий: «принято/брак/пересъёмка»
         # приезжает тем же pull, что и задания, — без отдельного канала.
+        # task_id — чтобы устройство показало комментарий контролёра у
+        # задания, не восстанавливая связь сессия→задание самостоятельно.
         for verdict in STORE.list_verdicts(principal.tenant_id):
             changes.append({"type": "verdict.upsert", "data": {
                 "session_id": verdict["session_id"],
+                "task_id": _session_task_id(principal.tenant_id, verdict["session_id"]),
                 "verdict": verdict["verdict"],
                 "verdict_comment": verdict["verdict_comment"],
                 "resolved_at": verdict["resolved_at"],

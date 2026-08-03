@@ -70,14 +70,20 @@ private struct RootView: View {
     }
 
     @State private var selectedTask: LocalTask?
+    @State private var selectedVerdict: SessionVerdict?
 
     var body: some View {
         NavigationStack {
             TaskListView(model: taskList) { task in
+                selectedVerdict = nil
                 selectedTask = task
+                Task {  // комментарий контролёра — из локального TaskStore
+                    selectedVerdict = try? await container.stack.tasks
+                        .verdictForTask(taskId: task.id)
+                }
             }
             .navigationDestination(item: $selectedTask) { task in
-                TaskDetailView(task: task) { chosen in
+                TaskDetailView(task: task, verdict: selectedVerdict) { chosen in
                     Task { await startCapture(chosen) }
                 }
             }

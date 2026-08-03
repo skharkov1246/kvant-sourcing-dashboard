@@ -101,8 +101,13 @@ private fun TaskCard(task: LocalTask, onClick: () -> Unit) {
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.weight(1f),
                 )
-                if (task.state == "REWORK") {
-                    AssistChip(onClick = onClick, label = { Text("Пересъёмка") })
+                // Судьба задания приезжает pull-каналом как state — бейджу
+                // не нужен отдельный запрос вердикта.
+                when (task.state) {
+                    "REWORK" -> AssistChip(onClick = onClick, label = { Text("Пересъёмка") })
+                    "REJECTED" -> AssistChip(onClick = onClick, label = { Text("Брак") })
+                    "ACCEPTED", "EXPORTED" ->
+                        AssistChip(onClick = onClick, label = { Text("Принято") })
                 }
             }
             Spacer(Modifier.padding(2.dp))

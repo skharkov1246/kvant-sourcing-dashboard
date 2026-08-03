@@ -93,7 +93,7 @@ class PullApplierTest {
         val store = InMemoryTaskStore()
         val summary = PullApplier(store).apply(PullResult(
             changes = listOf(Change("verdict.upsert", obj(
-                """{"session_id": "s-9", "verdict": "REWORK",
+                """{"session_id": "s-9", "task_id": "t-9", "verdict": "REWORK",
                     "verdict_comment": "переснять этикетку",
                     "resolved_at": "2026-08-03T03:00:00+00:00"}"""))),
             nextCursor = "c1", hasMore = false,
@@ -102,7 +102,10 @@ class PullApplierTest {
         val verdict = store.verdict("s-9")
         assertEquals("REWORK", verdict?.verdict)
         assertEquals("переснять этикетку", verdict?.comment)
+        // Доступ по заданию — для бейджа и комментария в деталях.
+        assertEquals("s-9", store.verdictForTask("t-9")?.sessionId)
         assertNull(store.verdict("s-unknown"))
+        assertNull(store.verdictForTask("t-unknown"))
     }
 
     @Test

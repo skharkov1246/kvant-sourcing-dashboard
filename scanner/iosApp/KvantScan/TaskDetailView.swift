@@ -6,6 +6,7 @@ import shared
 /// что прислала внешняя система, включая незнакомые поля (§09.7).
 struct TaskDetailView: View {
     let task: LocalTask
+    var verdict: SessionVerdict?
     let onStartCapture: (LocalTask) -> Void
 
     var body: some View {
@@ -21,10 +22,21 @@ struct TaskDetailView: View {
                     Text("Срок: \(String(due.prefix(10)))")
                         .font(.subheadline)
                 }
-                if task.state == "REWORK" {
+                switch task.state {
+                case "REWORK":
                     Text("Возвращено контролёром на пересъёмку")
+                        .font(.subheadline).foregroundStyle(.red)
+                case "REJECTED":
+                    Text("Забраковано контролёром")
+                        .font(.subheadline).foregroundStyle(.red)
+                case "ACCEPTED", "EXPORTED":
+                    Text("Принято контролёром").font(.subheadline)
+                default:
+                    EmptyView()
+                }
+                if let comment = verdict?.comment, !comment.isEmpty {
+                    Text("Комментарий контролёра: \(comment)")
                         .font(.subheadline)
-                        .foregroundStyle(.red)
                 }
 
                 if let subject = task.raw["subject"] as? KotlinxSerializationJsonJsonObject {

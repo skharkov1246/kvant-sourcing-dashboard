@@ -62,20 +62,27 @@ private fun KvantApp(container: AppContainer) {
             model = taskListModel,
             onTaskClick = { screen = Screen.TaskDetail(it) },
         )
-        is Screen.TaskDetail -> TaskDetailScreen(
-            task = current.task,
-            onStartCapture = { task ->
-                scope.launch {
-                    try {
-                        val controller = container.captureController(task)
-                        screen = Screen.Capture(CaptureViewModel(controller))
-                    } catch (e: CaptureSessionFactory.ProtocolMissing) {
-                        // Честная ошибка ДО съёмки: протокол не синхронизирован.
-                        error = e.message
+        is Screen.TaskDetail -> {
+            // Комментарий контролёра — из локального TaskStore (приехал pull'ом).
+            val verdict by androidx.compose.runtime.produceState<ru.kvant.scan.sync.SessionVerdict?>(
+                initialValue = null, key1 = current.task.id,
+            ) { value = container.stack.tasks.verdictForTask(current.task.id) }
+            TaskDetailScreen(
+                task = current.task,
+                verdict = verdict,
+                onStartCapture = { task ->
+                    scope.launch {
+                        try {
+                            val controller = container.captureController(task)
+                            screen = Screen.Capture(CaptureViewModel(controller))
+                        } catch (e: CaptureSessionFactory.ProtocolMissing) {
+                            // Честная ошибка ДО съёмки: протокол не синхронизирован.
+                            error = e.message
+                        }
                     }
-                }
-            },
-        )
+                },
+            )
+        }
         is Screen.Capture -> CaptureScreen(viewModel = current.viewModel)
     }
     // error показывается тостом/снэкбаром хост-темы; для дев-сборки достаточно

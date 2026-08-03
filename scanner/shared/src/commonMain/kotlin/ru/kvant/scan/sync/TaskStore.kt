@@ -67,10 +67,14 @@ interface TaskStore {
     /** Судьба сессии от контролёра (scope verdicts): «принято/брак/пересъёмка». */
     suspend fun upsertVerdict(verdict: SessionVerdict)
     suspend fun verdict(sessionId: String): SessionVerdict?
+
+    /** Свежайший вердикт по заданию — для бейджа и комментария в деталях. */
+    suspend fun verdictForTask(taskId: String): SessionVerdict?
 }
 
 data class SessionVerdict(
     val sessionId: String,
+    val taskId: String?,
     val verdict: String,
     val comment: String?,
     val resolvedAt: String?,
@@ -110,6 +114,11 @@ class InMemoryTaskStore : TaskStore {
 
     override suspend fun verdict(sessionId: String): SessionVerdict? =
         mutex.withLock { verdicts[sessionId] }
+
+    override suspend fun verdictForTask(taskId: String): SessionVerdict? = mutex.withLock {
+        verdicts.values.filter { it.taskId == taskId }
+            .maxByOrNull { it.resolvedAt ?: "" }
+    }
 }
 
 /**
@@ -157,6 +166,7 @@ class PullApplier(private val tasks: TaskStore) {
                     if (sessionId != null && verdict != null) {
                         tasks.upsertVerdict(SessionVerdict(
                             sessionId = sessionId,
+                            taskId = change.data["task_id"]?.jsonPrimitive?.content,
                             verdict = verdict,
                             comment = change.data["verdict_comment"]?.jsonPrimitive?.content,
                             resolvedAt = change.data["resolved_at"]?.jsonPrimitive?.content,

@@ -42,12 +42,23 @@ private struct TaskRow: View {
                 Text(task.title ?? "Позиция без названия")
                     .font(.headline)
                 Spacer()
-                if task.state == "REWORK" {
-                    Text("Пересъёмка")
-                        .font(.caption)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 3)
+                // Судьба задания приезжает pull-каналом как state —
+                // бейджу не нужен отдельный запрос вердикта.
+                switch task.state {
+                case "REWORK":
+                    Text("Пересъёмка").font(.caption)
+                        .padding(.horizontal, 8).padding(.vertical, 3)
                         .background(.orange.opacity(0.2), in: Capsule())
+                case "REJECTED":
+                    Text("Брак").font(.caption)
+                        .padding(.horizontal, 8).padding(.vertical, 3)
+                        .background(.red.opacity(0.2), in: Capsule())
+                case "ACCEPTED", "EXPORTED":
+                    Text("Принято").font(.caption)
+                        .padding(.horizontal, 8).padding(.vertical, 3)
+                        .background(.green.opacity(0.2), in: Capsule())
+                default:
+                    EmptyView()
                 }
             }
             HStack {

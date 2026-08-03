@@ -26,7 +26,11 @@ import ru.kvant.scan.sync.LocalTask
  * включая поля, о которых это приложение ещё не знает (аддитивность §09.7).
  */
 @Composable
-fun TaskDetailScreen(task: LocalTask, onStartCapture: (LocalTask) -> Unit) {
+fun TaskDetailScreen(
+    task: LocalTask,
+    onStartCapture: (LocalTask) -> Unit,
+    verdict: ru.kvant.scan.sync.SessionVerdict? = null,
+) {
     Column(
         Modifier
             .fillMaxWidth()
@@ -41,10 +45,28 @@ fun TaskDetailScreen(task: LocalTask, onStartCapture: (LocalTask) -> Unit) {
         task.dueAt?.let {
             Text("Срок: ${it.take(10)}", style = MaterialTheme.typography.bodyMedium)
         }
-        if (task.state == "REWORK") {
-            Text(
+        when (task.state) {
+            "REWORK" -> Text(
                 "Возвращено контролёром на пересъёмку",
                 color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(vertical = 4.dp),
+            )
+            "REJECTED" -> Text(
+                "Забраковано контролёром",
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(vertical = 4.dp),
+            )
+            "ACCEPTED", "EXPORTED" -> Text(
+                "Принято контролёром",
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(vertical = 4.dp),
+            )
+        }
+        verdict?.comment?.takeIf { it.isNotBlank() }?.let {
+            Text(
+                "Комментарий контролёра: $it",
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(vertical = 4.dp),
             )
