@@ -10,6 +10,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -30,6 +31,7 @@ fun TaskDetailScreen(
     task: LocalTask,
     onStartCapture: (LocalTask) -> Unit,
     verdict: ru.kvant.scan.sync.SessionVerdict? = null,
+    onAddTrace: (() -> Unit)? = null,
 ) {
     Column(
         Modifier
@@ -94,6 +96,14 @@ fun TaskDetailScreen(
 
         Button(onClick = { onStartCapture(task) }, modifier = Modifier.fillMaxWidth()) {
             Text(if (task.state == "REWORK") "Переснять" else "Начать съёмку")
+        }
+        // Дополнить трассировку можно только у принятой съёмки: карточка
+        // товара материализуется вердиктом ACCEPTED (itm-<session>).
+        if (onAddTrace != null && verdict?.verdict == "ACCEPTED") {
+            OutlinedButton(
+                onClick = onAddTrace,
+                modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+            ) { Text("Дополнить трассировку") }
         }
     }
 }

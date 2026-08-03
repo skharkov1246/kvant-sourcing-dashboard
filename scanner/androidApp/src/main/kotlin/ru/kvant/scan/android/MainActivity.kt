@@ -17,6 +17,7 @@ import ru.kvant.scan.android.ui.CaptureViewModel
 import ru.kvant.scan.android.ui.TaskDetailScreen
 import ru.kvant.scan.android.ui.TaskListScreen
 import ru.kvant.scan.android.ui.TaskListViewModel
+import ru.kvant.scan.android.ui.TraceLinkDialog
 import ru.kvant.scan.capture.CaptureSessionFactory
 import ru.kvant.scan.sync.LocalTask
 
@@ -67,6 +68,7 @@ private fun KvantApp(container: AppContainer) {
             val verdict by androidx.compose.runtime.produceState<ru.kvant.scan.sync.SessionVerdict?>(
                 initialValue = null, key1 = current.task.id,
             ) { value = container.stack.tasks.verdictForTask(current.task.id) }
+            var traceItemId by remember { mutableStateOf<String?>(null) }
             TaskDetailScreen(
                 task = current.task,
                 verdict = verdict,
@@ -81,7 +83,21 @@ private fun KvantApp(container: AppContainer) {
                         }
                     }
                 },
+                // Карточка принятой съёмки детерминирована: itm-<session>.
+                onAddTrace = { verdict?.let { traceItemId = "itm-${it.sessionId}" } },
             )
+            traceItemId?.let { itemId ->
+                val form = remember(itemId) { container.stack.traceLinkForm() }
+                TraceLinkDialog(
+                    form = form,
+                    itemId = itemId,
+                    onDismiss = { traceItemId = null },
+                    onSent = { ok ->
+                        traceItemId = null
+                        if (!ok) error = "Заявка трассировки не отправлена — повторите позже"
+                    },
+                )
+            }
         }
         is Screen.Capture -> CaptureScreen(viewModel = current.viewModel)
     }

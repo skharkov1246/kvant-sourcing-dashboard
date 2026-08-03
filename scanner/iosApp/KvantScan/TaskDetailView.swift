@@ -7,6 +7,7 @@ import shared
 struct TaskDetailView: View {
     let task: LocalTask
     var verdict: SessionVerdict?
+    var onAddTrace: (() -> Void)?
     let onStartCapture: (LocalTask) -> Void
 
     var body: some View {
@@ -59,6 +60,14 @@ struct TaskDetailView: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .frame(maxWidth: .infinity)
+
+                // Дополнить трассировку можно только у принятой съёмки:
+                // карточка товара материализуется вердиктом ACCEPTED.
+                if let onAddTrace, verdict?.verdict == "ACCEPTED" {
+                    Button("Дополнить трассировку", action: onAddTrace)
+                        .buttonStyle(.bordered)
+                        .frame(maxWidth: .infinity)
+                }
             }
             .padding(16)
         }

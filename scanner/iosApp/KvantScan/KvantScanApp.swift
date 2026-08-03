@@ -71,6 +71,7 @@ private struct RootView: View {
 
     @State private var selectedTask: LocalTask?
     @State private var selectedVerdict: SessionVerdict?
+    @State private var traceTarget: TraceTarget?
 
     var body: some View {
         NavigationStack {
@@ -83,13 +84,28 @@ private struct RootView: View {
                 }
             }
             .navigationDestination(item: $selectedTask) { task in
-                TaskDetailView(task: task, verdict: selectedVerdict) { chosen in
+                TaskDetailView(
+                    task: task,
+                    verdict: selectedVerdict,
+                    // Карточка принятой съёмки детерминирована: itm-<session>.
+                    onAddTrace: {
+                        if let verdict = selectedVerdict {
+                            traceTarget = TraceTarget(itemId: "itm-\(verdict.sessionId)")
+                        }
+                    }
+                ) { chosen in
                     Task { await startCapture(chosen) }
                 }
             }
             .navigationDestination(item: $captureModel) { model in
                 CaptureView(model: model)
             }
+        }
+        .sheet(item: $traceTarget) { target in
+            TraceLinkView(
+                form: container.stack.traceLinkForm(),
+                itemId: target.itemId
+            ) { _ in traceTarget = nil }
         }
         .alert("Протокол не синхронизирован", isPresented: .constant(protocolError != nil)) {
             Button("Ок") { protocolError = nil }
@@ -111,3 +127,8 @@ private struct RootView: View {
 extension CaptureViewModel: Identifiable {}
 
 extension LocalTask: Identifiable {}
+
+private struct TraceTarget: Identifiable {
+    let itemId: String
+    var id: String { itemId }
+}

@@ -55,3 +55,28 @@ class SupplierDirectory(val version: Int, private val suppliers: List<Supplier>)
         }
     }
 }
+
+/**
+ * Снапшот справочника поставщиков на устройстве (двойник [DirectoryStore]
+ * для рядов): та же защита от отката версии — устаревший ответ не
+ * перетирает более свежий снапшот.
+ */
+class SupplierDirectoryStore(
+    initial: SupplierDirectory? = null,
+    initialEtag: String? = null,
+) {
+    var current: SupplierDirectory? = initial
+        private set
+    var etag: String? = initialEtag
+        private set
+
+    /** 200 от сервера. Возвращает true, если снапшот обновился. */
+    fun apply(newEtag: String?, body: String): Boolean {
+        val parsed = SupplierDirectory.parse(body)
+        val existing = current
+        if (existing != null && parsed.version < existing.version) return false
+        current = parsed
+        etag = newEtag
+        return true
+    }
+}

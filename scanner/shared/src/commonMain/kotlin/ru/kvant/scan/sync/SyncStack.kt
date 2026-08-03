@@ -3,7 +3,9 @@ package ru.kvant.scan.sync
 import io.ktor.client.HttpClient
 import kotlinx.datetime.Clock
 import ru.kvant.scan.directory.DirectoryStore
+import ru.kvant.scan.directory.SupplierDirectoryStore
 import ru.kvant.scan.domain.Instant
+import ru.kvant.scan.trace.TraceLinkForm
 import kotlin.random.Random
 
 /**
@@ -21,12 +23,14 @@ class SyncStack(val config: SyncConfig) {
 
     val httpClient: HttpClient = HttpClient()
 
-    val transport: SyncTransport = KtorSyncTransport(httpClient, config)
+    private val ktorTransport = KtorSyncTransport(httpClient, config)
+    val transport: SyncTransport = ktorTransport
 
     val tasks: TaskStore = InMemoryTaskStore()
     val outbox: OutboxStore = InMemoryOutboxStore()
     val mediaQueue: MediaQueue = InMemoryMediaQueue()
     val directories: DirectoryStore = DirectoryStore()
+    val suppliers: SupplierDirectoryStore = SupplierDirectoryStore()
 
     val engine: SyncEngine = SyncEngine(
         outbox = outbox,
@@ -46,7 +50,39 @@ class SyncStack(val config: SyncConfig) {
     suspend fun pullOnce() {
         pullCursor = engine.pullOnce(pullCursor, PullApplier(tasks))
         directorySync.syncOnce()
+        syncSuppliers()
     }
+
+    /**
+     * Справочник suppliers публикуется динамически (снапшот из CRM):
+     * до первой публикации сервер честно отвечает 404, при обрыве сети
+     * подсказки просто остаются вчерашними — и то и другое не роняет
+     * основной pull.
+     */
+    private suspend fun syncSuppliers() {
+        try {
+            val response = ktorTransport.fetchDirectory("suppliers", suppliers.etag)
+            if (!response.notModified) {
+                response.body?.let { suppliers.apply(response.etag, it) }
+            }
+        } catch (_: TransportException) {
+        }
+    }
+
+    /** Форма заявленной трассировки поверх снапшота поставщиков (docs/09 §9.5). */
+    fun traceLinkForm(): TraceLinkForm = TraceLinkForm(
+        suppliers = { suppliers.current },
+        send = { draft ->
+            ktorTransport.addTraceLink(
+                itemId = draft.itemId,
+                codeType = draft.codeType,
+                codeValue = draft.codeValue,
+                supplierName = draft.supplierName,
+                supplierInn = draft.supplierInn,
+                supplierRef = draft.supplierRef,
+            )
+        },
+    )
 
     fun now(): Instant = Instant(Clock.System.now().toEpochMilliseconds())
 }
