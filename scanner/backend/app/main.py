@@ -12,6 +12,8 @@
 from __future__ import annotations
 
 import base64
+import csv
+import io
 import os
 import uuid
 from typing import Any, Literal
@@ -870,9 +872,16 @@ def export_sessions(
     по серверному времени события завершения (ISO 8601).
     """
     _require_reviewer(principal)
+    rows = _export_rows(principal.tenant_id, date_from, date_to)
+    return {"items": rows, "count": len(rows)}
+
+
+def _export_rows(
+    tenant_id: str, date_from: str | None, date_to: str | None,
+) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
-    for session_id in STORE.list_sessions(principal.tenant_id):
-        row = registry_row(STORE, principal.tenant_id, session_id)
+    for session_id in STORE.list_sessions(tenant_id):
+        row = registry_row(STORE, tenant_id, session_id)
         if row is None:
             continue
         if date_from and row["completed_at"] < date_from:
@@ -880,7 +889,50 @@ def export_sessions(
         if date_to and row["completed_at"] > date_to:
             continue
         rows.append(row)
-    return {"items": rows, "count": len(rows)}
+    return rows
+
+
+@app.get("/v1/export/sessions.csv", tags=["export"])
+def export_sessions_csv(
+    date_from: str | None = None,
+    date_to: str | None = None,
+    principal: Principal = Depends(current_principal),
+) -> Response:
+    """Плоский реестр для владельца: файл открывается в Excel двойным
+    щелчком (UTF-8 BOM), кириллица и запятые в полях экранируются штатным
+    csv-модулем, а не самодельной склейкой. Источник строк тот же, что у
+    JSON-выгрузки, — registry_row; списочные поля сплющены читаемо.
+    """
+    _require_reviewer(principal)
+    buf = io.StringIO()
+    writer = csv.writer(buf, lineterminator="\r\n")  # convention Excel/RFC 4180
+    writer.writerow([
+        "session_id", "protocol", "completed_at", "verdict", "verdict_by",
+        "verdict_comment", "quality_score", "external_system", "external_ref",
+        "measurements", "codes", "review_reasons",
+    ])
+    for row in _export_rows(principal.tenant_id, date_from, date_to):
+        review = row.get("review") or {}
+        measurements = "; ".join(
+            (m.get("step_id", "?") + ": "
+             + " ".join(f"{k}={v}" for k, v in m.items() if k != "step_id"))
+            for m in row["measurements"]
+        )
+        codes = "; ".join(
+            f"{c.get('code_type', '?')}:{c.get('raw_value', '')}" for c in row["codes"]
+        )
+        writer.writerow([
+            row["session_id"], row["protocol"], row["completed_at"],
+            review.get("verdict"), review.get("verdict_by"),
+            review.get("verdict_comment"), row["quality_score"],
+            row["external_system"], row["external_ref"],
+            measurements, codes, "; ".join(review.get("reasons") or []),
+        ])
+    return Response(
+        content="\ufeff" + buf.getvalue(),  # BOM: Excel распознаёт UTF-8
+        media_type="text/csv; charset=utf-8",
+        headers={"Content-Disposition": 'attachment; filename="kvant-scan-registry.csv"'},
+    )
 
 
 # ─────────────────────────────────────────────────────────────────────────────

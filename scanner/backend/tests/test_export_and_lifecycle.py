@@ -92,6 +92,62 @@ class TestExport:
         assert client.get("/v1/export/sessions", headers=OPERATOR).status_code == 403
 
 
+class TestCsvExport:
+    """CSV-выгрузка реестра: тот же источник строк, что у JSON, но плоско
+    и открываемо в Excel двойным щелчком (UTF-8 BOM, RFC 4180)."""
+
+    def _csv_lines(self, client, query=""):
+        import csv as _csv
+        import io as _io
+
+        r = client.get(f"/v1/export/sessions.csv{query}", headers=REVIEWER)
+        assert r.status_code == 200
+        text = r.content.decode("utf-8")
+        assert text.startswith("\ufeff")  # Excel распознаёт кодировку по BOM
+        return list(_csv.reader(_io.StringIO(text.lstrip("\ufeff"))))
+
+    def test_header_and_flattened_row(self, client):
+        _complete_session(client, "s-csv-1", extra_events=[
+            _event("s-csv-1", 3, "measurement.recorded",
+                   {"step_id": "dims", "accuracy_class": "B", "length_mm": 1200}),
+            _event("s-csv-1", 4, "code.read",
+                   {"step_id": "code", "code_type": "gtin", "raw_value": "4601234567890"}),
+        ])
+        rows = self._csv_lines(client)
+        assert rows[0][:3] == ["session_id", "protocol", "completed_at"]
+        line = dict(zip(rows[0], rows[1]))
+        assert line["session_id"] == "s-csv-1"
+        assert line["protocol"] == "pallet_general@7"
+        assert "length_mm=1200" in line["measurements"]
+        assert line["codes"] == "gtin:4601234567890"
+
+    def test_commas_and_quotes_survive_roundtrip(self, client):
+        """Комментарий контролёра с запятыми и кавычками читается назад
+        БЕЗ потерь — экранирование штатное, а не самодельная склейка."""
+        _complete_session(client, "s-csv-2")
+        comment = 'принято, но: маркировка "К-7", свет слабый'
+        client.post("/v1/review/s-csv-2/verdict", headers=REVIEWER,
+                    json={"verdict": "ACCEPTED", "comment": comment})
+        rows = self._csv_lines(client)
+        line = dict(zip(rows[0], rows[1]))
+        assert line["verdict"] == "ACCEPTED"
+        assert line["verdict_comment"] == comment
+
+    def test_date_filter_bounds_csv(self, client):
+        _complete_session(client, "s-csv-3")
+        assert len(self._csv_lines(client, "?date_to=2000-01-01T00:00:00")) == 1
+        assert len(self._csv_lines(client, "?date_from=2000-01-01T00:00:00")) == 2
+
+    def test_csv_export_requires_reviewer(self, client):
+        assert client.get("/v1/export/sessions.csv",
+                          headers=OPERATOR).status_code == 403
+
+    def test_content_type_and_filename(self, client):
+        r = client.get("/v1/export/sessions.csv", headers=REVIEWER)
+        assert r.headers["content-type"].startswith("text/csv")
+        assert "kvant-scan-registry.csv" in r.headers["content-disposition"]
+
+
 class TestVerdictMovesTask:
     def test_rework_returns_task_to_device(self, client):
         task_id = _make_task(client)
