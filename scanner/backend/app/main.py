@@ -877,6 +877,39 @@ def add_trace(
 def get_trace(item_id: str, _: Principal = Depends(current_principal)) -> dict[str, Any]:
     return {"item_id": item_id, "links": STORE.item_trace(item_id)}
 
+_IDENTITY_CODE_TYPES = {"gtin": "gtin", "serial": "serial", "batch": "batch"}
+
+
+@app.get("/v1/items/{item_id}", tags=["items"])
+def get_item(item_id: str, _: Principal = Depends(current_principal)) -> dict[str, Any]:
+    """Карточка единицы товара (контракт ItemRecord).
+
+    Identity выводится из связей трассировки: gtin/serial/batch — это коды,
+    которые к карточке уже привязаны; отдельного поля «идентичность» никто
+    руками не заполняет (единственный источник — прочитанные коды, I-7).
+    Карточки без единой связи не существует — 404, а не пустышка.
+    """
+    links = STORE.item_trace(item_id)
+    if not links:
+        raise HTTPException(status_code=404, detail={"code": "not_found", "message": "Карточка не найдена"})
+
+    identity: dict[str, str] = {}
+    for link in links:
+        field = _IDENTITY_CODE_TYPES.get(link["code_type"])
+        if field and field not in identity:
+            identity[field] = link["code_value"]
+
+    return {
+        "id": item_id,
+        "identity": identity,
+        "trace": links,
+        # Честные пробелы контракта: замеры и качество привяжутся к карточке
+        # обработчиком item.accepted (§09.4) — его черёд после live-ключа.
+        "measurements": [],
+        "quality": None,
+        "created_at": links[0].get("created_at"),
+    }
+
 
 @app.get("/health", include_in_schema=False)
 def health() -> dict[str, str]:

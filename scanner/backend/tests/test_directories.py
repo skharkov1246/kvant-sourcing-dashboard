@@ -249,3 +249,31 @@ class TestHonestEmptyD1:
         assert match.d1_deviation_mm is None
         assert "не сверялся" in match.note
         assert match.is_standard is False
+
+
+class TestItemCard:
+    """Карточка ItemRecord: identity — только из привязанных кодов (I-7)."""
+
+    def _link(self, http, item, code_type, value, **extra):
+        from tests.conftest import CUSTOMER
+
+        return http.post(f"/v1/items/{item}/trace", headers=CUSTOMER, json={
+            "code_type": code_type, "code_value": value, **extra})
+
+    def test_identity_derived_from_trace_codes(self, client):
+        from tests.conftest import OPERATOR
+
+        self._link(client, "item-77", "gtin", "4601234567890",
+                   supplier_name="Ningbo")
+        self._link(client, "item-77", "serial", "SN-001")
+        card = client.get("/v1/items/item-77", headers=OPERATOR).json()
+        assert card["identity"] == {"gtin": "4601234567890", "serial": "SN-001"}
+        assert len(card["trace"]) == 2
+        # Внешний заявитель — только declared (I-7), карточка это сохраняет.
+        assert {l["confidence"] for l in card["trace"]} == {"declared"}
+        assert card["quality"] is None  # честный пробел до item.accepted
+
+    def test_unknown_item_is_404_not_empty_card(self, client):
+        from tests.conftest import OPERATOR
+
+        assert client.get("/v1/items/ghost", headers=OPERATOR).status_code == 404
