@@ -33,6 +33,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         MediaUploadWorker.schedule(applicationContext)
+        SyncPullWorker.schedule(applicationContext)
         setContent {
             MaterialTheme {
                 Surface { KvantApp(container) }

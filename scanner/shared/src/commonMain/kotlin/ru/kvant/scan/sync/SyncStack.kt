@@ -39,5 +39,14 @@ class SyncStack(val config: SyncConfig) {
 
     val directorySync: DirectorySync = DirectorySync(transport, directories)
 
+    /** Курсор pull; в памяти графа до SQLDelight (directory_cache-стиль). */
+    var pullCursor: String? = null
+
+    /** Один проход pull-канала целиком: задания+протоколы, затем справочники. */
+    suspend fun pullOnce() {
+        pullCursor = engine.pullOnce(pullCursor, PullApplier(tasks))
+        directorySync.syncOnce()
+    }
+
     fun now(): Instant = Instant(Clock.System.now().toEpochMilliseconds())
 }

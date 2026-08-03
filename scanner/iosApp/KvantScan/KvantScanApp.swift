@@ -10,12 +10,16 @@ struct KvantScanApp: App {
 
     init() {
         MediaUploadScheduler.register(stack: container.stack)
+        SyncRefreshScheduler.register(stack: container.stack)
     }
 
     var body: some Scene {
         WindowGroup {
             RootView(container: container)
-                .onAppear { MediaUploadScheduler.submit() }
+                .onAppear {
+                    MediaUploadScheduler.submit()
+                    SyncRefreshScheduler.submit()
+                }
         }
     }
 }

@@ -184,6 +184,36 @@ class LiveBackendSmokeTest {
     }
 
     @Test
+    fun `MediaWorker вживую - файл из очереди доезжает и становится удаляемым`() = runTest {
+        if (!serverIsUp()) {
+            println("SMOKE SKIPPED: uvicorn на :8077 не запущен")
+            return@runTest
+        }
+        val stack = ru.kvant.scan.sync.SyncStack(SyncConfig(
+            baseUrl = baseUrl, tenantId = "t-internal",
+            userId = "u-smoke", deviceId = "d-smoke",
+            capabilities = Json.parseToJsonElement("""{"schema_version":1}""").jsonObject,
+        ))
+        val file = java.io.File.createTempFile("kvant-frame", ".jpg")
+        file.writeBytes(ByteArray(64 * 1024) { (it % 199).toByte() })
+        stack.mediaQueue.enqueue(ru.kvant.scan.sync.PendingMedia(
+            localPath = file.absolutePath,
+            sessionId = "s-mw-${UUID.randomUUID()}",
+            stepId = "overview", kind = "photo", mime = "image/jpeg",
+        ))
+
+        val worker = ru.kvant.scan.sync.MediaWorker(stack.mediaQueue, stack.uploader) { path ->
+            java.io.File(path).takeIf { it.exists() }?.readBytes()
+        }
+        val report = worker.runOnce()
+
+        assertEquals(1, report.uploaded)
+        // Файл стал удаляемым ТОЛЬКО после подтверждения сервера (I-1).
+        assertEquals(listOf(file.absolutePath), stack.mediaQueue.deletablePaths())
+        file.delete()
+    }
+
+    @Test
     fun `живой ETag-цикл справочника - вторая загрузка обходится в 304`() = runTest {
         if (!serverIsUp()) {
             println("SMOKE SKIPPED: uvicorn на :8077 не запущен")
