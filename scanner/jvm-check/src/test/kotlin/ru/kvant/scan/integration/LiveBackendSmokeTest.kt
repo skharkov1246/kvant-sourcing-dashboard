@@ -289,6 +289,39 @@ class LiveBackendSmokeTest {
     }
 
     @Test
+    fun `заявка трассировки вживую - через очередь до сервера и обратно в карточку`() = runTest {
+        if (!serverIsUp()) {
+            println("SMOKE SKIPPED: uvicorn на :8077 не запущен")
+            return@runTest
+        }
+        val stack = ru.kvant.scan.sync.SyncStack(SyncConfig(
+            baseUrl = baseUrl, tenantId = "t-internal",
+            userId = "u-smoke", deviceId = "d-smoke",
+            capabilities = Json.parseToJsonElement(
+                """{"schema_version": 1, "app_version": "0.1.0",
+                    "platform": "android", "max_accuracy_class": "B"}"""
+            ).jsonObject,
+        ))
+        stack.pullOnce()  // снапшот suppliers для подсказок
+
+        val itemId = "item-smoke-${UUID.randomUUID()}"
+        val form = stack.traceLinkForm()
+        form.editSupplierQuery("Ningbo")
+        form.selectSupplier(form.suggestions().single())
+        form.setCodeType("gtin")
+        form.setCodeValue("4609876543210")
+
+        // Сервер жив — submit через очередь доставляет сразу.
+        assertTrue(form.submit(itemId), "заявка не доставлена при живом сервере")
+        assertTrue(stack.traceLinks.pending().isEmpty())
+
+        // Заявка доехала: карточка видит код и контрагента из CRM.
+        val card = stack.fetchItemCard(itemId)!!
+        assertEquals("4609876543210", card.identity["gtin"])
+        assertEquals("Ningbo Seals Co", card.trace.single().supplierName)
+    }
+
+    @Test
     fun `живой ETag-цикл справочника - вторая загрузка обходится в 304`() = runTest {
         if (!serverIsUp()) {
             println("SMOKE SKIPPED: uvicorn на :8077 не запущен")

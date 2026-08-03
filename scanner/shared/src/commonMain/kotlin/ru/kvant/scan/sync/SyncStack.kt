@@ -5,7 +5,10 @@ import kotlinx.datetime.Clock
 import ru.kvant.scan.directory.DirectoryStore
 import ru.kvant.scan.directory.SupplierDirectoryStore
 import ru.kvant.scan.domain.Instant
+import ru.kvant.scan.trace.InMemoryTraceLinkQueue
 import ru.kvant.scan.trace.TraceLinkForm
+import ru.kvant.scan.trace.TraceLinkQueue
+import ru.kvant.scan.trace.TraceLinkWorker
 import kotlin.random.Random
 
 /**
@@ -31,6 +34,19 @@ class SyncStack(val config: SyncConfig) {
     val mediaQueue: MediaQueue = InMemoryMediaQueue()
     val directories: DirectoryStore = DirectoryStore()
     val suppliers: SupplierDirectoryStore = SupplierDirectoryStore()
+    val traceLinks: TraceLinkQueue = InMemoryTraceLinkQueue()
+
+    /** Доставка заявок трассировки; сетевые отказы оставляют заявку в очереди. */
+    val traceLinkWorker: TraceLinkWorker = TraceLinkWorker(traceLinks) { draft ->
+        ktorTransport.addTraceLink(
+            itemId = draft.itemId,
+            codeType = draft.codeType,
+            codeValue = draft.codeValue,
+            supplierName = draft.supplierName,
+            supplierInn = draft.supplierInn,
+            supplierRef = draft.supplierRef,
+        )
+    }
 
     val engine: SyncEngine = SyncEngine(
         outbox = outbox,
@@ -51,6 +67,8 @@ class SyncStack(val config: SyncConfig) {
         pullCursor = engine.pullOnce(pullCursor, PullApplier(tasks))
         directorySync.syncOnce()
         syncSuppliers()
+        // Появилась сеть — уезжают и отложенные заявки трассировки.
+        traceLinkWorker.runOnce()
     }
 
     /**
@@ -72,18 +90,20 @@ class SyncStack(val config: SyncConfig) {
     /** Карточка товара с сервера; null — карточки (ещё) нет, это не ошибка. */
     suspend fun fetchItemCard(itemId: String): ItemCard? = ktorTransport.fetchItem(itemId)
 
-    /** Форма заявленной трассировки поверх снапшота поставщиков (docs/09 §9.5). */
+    /**
+     * Форма заявленной трассировки поверх снапшота поставщиков (docs/09 §9.5).
+     *
+     * submit идёт ЧЕРЕЗ очередь, не напрямую: без сети заявка не теряется,
+     * а ждёт следующего прохода синка. true — доставлено прямо сейчас;
+     * false — заявка в очереди (для UI это «уйдёт при появлении сети»,
+     * не ошибка).
+     */
     fun traceLinkForm(): TraceLinkForm = TraceLinkForm(
         suppliers = { suppliers.current },
         send = { draft ->
-            ktorTransport.addTraceLink(
-                itemId = draft.itemId,
-                codeType = draft.codeType,
-                codeValue = draft.codeValue,
-                supplierName = draft.supplierName,
-                supplierInn = draft.supplierInn,
-                supplierRef = draft.supplierRef,
-            )
+            traceLinks.enqueue(draft)
+            traceLinkWorker.runOnce()
+            traceLinks.isDelivered(draft)
         },
     )
 

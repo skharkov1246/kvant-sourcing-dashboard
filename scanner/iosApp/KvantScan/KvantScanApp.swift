@@ -114,8 +114,17 @@ private struct RootView: View {
         .sheet(item: $traceTarget) { target in
             TraceLinkView(
                 form: container.stack.traceLinkForm(),
-                itemId: target.itemId
-            ) { _ in traceTarget = nil }
+                itemId: target.itemId,
+                onCancel: { traceTarget = nil },
+                onSubmitted: { delivered in
+                    traceTarget = nil
+                    // false — не ошибка: заявка в очереди и уедет со следующим
+                    // проходом синка (офлайн-надёжность, I-1).
+                    if !delivered {
+                        itemCardError = "Сети нет — заявка в очереди, уйдёт автоматически"
+                    }
+                }
+            )
         }
         .alert("Протокол не синхронизирован", isPresented: .constant(protocolError != nil)) {
             Button("Ок") { protocolError = nil }

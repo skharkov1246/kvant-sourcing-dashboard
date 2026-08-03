@@ -116,7 +116,9 @@ private fun KvantApp(container: AppContainer) {
                     onDismiss = { traceItemId = null },
                     onSent = { ok ->
                         traceItemId = null
-                        if (!ok) error = "Заявка трассировки не отправлена — повторите позже"
+                        // false — не ошибка: заявка в очереди и уедет со следующим
+                        // проходом синка (офлайн-надёжность, I-1).
+                        if (!ok) error = "Сети нет — заявка в очереди, уйдёт автоматически"
                     },
                 )
             }

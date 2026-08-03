@@ -8,7 +8,9 @@ import shared
 struct TraceLinkView: View {
     let form: TraceLinkForm
     let itemId: String
-    let onDone: (Bool) -> Void
+    let onCancel: () -> Void
+    /// true — доставлено сейчас; false — заявка в очереди (не ошибка).
+    let onSubmitted: (Bool) -> Void
 
     @State private var query = ""
     @State private var codeType = "gtin"
@@ -53,17 +55,18 @@ struct TraceLinkView: View {
             .navigationTitle("Трассировка")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Отмена") { onDone(false) }
+                    Button("Отмена") { onCancel() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Отправить") {
                         sending = true
                         Task {
-                            // Сеть/сервер: заявка не ушла — форма сообщит хосту.
+                            // submit идёт через очередь ядра: false = «в очереди»,
+                            // заявка не теряется и без сети (I-1).
                             let ok = (try? await form.submit(itemId: itemId))?
                                 .boolValue ?? false
                             sending = false
-                            onDone(ok)
+                            onSubmitted(ok)
                         }
                     }
                     .disabled(sending || !form.canSubmit())
