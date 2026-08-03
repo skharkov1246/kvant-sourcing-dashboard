@@ -157,6 +157,50 @@ class TestMoneyIntegrity:
         assert balance == 0
 
 
+class TestCrowdSessionToReward:
+    """Связка протокола kv_crowd с движком вознаграждений: quality_score
+    сессии становится quality_score сабмишена, и порог 0.6 согласован —
+    что автопринял протокол, то движок оплачивает, и наоборот."""
+
+    def _session_score(self, scores):
+        import json as _json
+        import pathlib
+
+        from app.protocol import SessionContext, StepResult, auto_accept
+
+        doc = _json.loads((pathlib.Path(__file__).resolve().parents[2] / "docs"
+                           / "schemas" / "examples" / "ri" / "kv_crowd.json")
+                          .read_text(encoding="utf-8"))
+        ctx = SessionContext(results={
+            sid: StepResult(step_id=sid, status="COMPLETED",
+                            data={"length_mm": 52} if sid == "c_dims" else {},
+                            quality_score=s)
+            for sid, s in scores.items()
+        })
+        return auto_accept(doc, ctx), ctx.quality_score
+
+    def test_auto_accepted_session_is_paid(self, http):
+        accepted, score = self._session_score(
+            {"c_overview": 0.8, "c_mark": 0.8, "c_dims": 0.8})
+        assert accepted is True
+
+        cid = _contributor(http)
+        r = _submit(http, cid, "sha-kv-ok", quality=score)
+        assert r.json()["state"] == "ACCEPTED"
+
+    def test_below_threshold_session_is_neither_accepted_nor_paid(self, http):
+        """Один порог в обоих контурах: скан, который протокол отправил на
+        ручную проверку, движок вознаграждений тоже не оплачивает молча."""
+        accepted, score = self._session_score(
+            {"c_overview": 0.5, "c_mark": 0.5, "c_dims": 0.5})
+        assert accepted is False
+
+        cid = _contributor(http)
+        r = _submit(http, cid, "sha-kv-low", quality=score)
+        assert r.json()["state"] == "REJECTED"
+        assert r.json()["reject_reason"] == "quality"
+
+
 class TestRolesAndAudit:
     def test_operator_cannot_touch_money_endpoints(self, http):
         assert http.post("/v1/crowd/contributors", headers=OPERATOR, json={

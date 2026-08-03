@@ -42,16 +42,23 @@ def cat_g() -> dict:
     return _load("kv_cat_g.json")
 
 
+@pytest.fixture(scope="module")
+def crowd() -> dict:
+    return _load("kv_crowd.json")
+
+
 def _done(step_id: str, data: dict | None = None, score: float = 1.0) -> StepResult:
     return StepResult(step_id=step_id, status="COMPLETED", data=data or {}, quality_score=score)
 
 
 class TestSchemaValidity:
-    @pytest.mark.parametrize("name", ["kv_router.json", "kv_cat_a.json", "kv_cat_g.json"])
+    @pytest.mark.parametrize("name", ["kv_router.json", "kv_cat_a.json",
+                                      "kv_cat_g.json", "kv_crowd.json"])
     def test_document_matches_schema(self, schema, name):
         jsonschema.validate(_load(name), schema)
 
-    @pytest.mark.parametrize("name", ["kv_router.json", "kv_cat_a.json", "kv_cat_g.json"])
+    @pytest.mark.parametrize("name", ["kv_router.json", "kv_cat_a.json",
+                                      "kv_cat_g.json", "kv_crowd.json"])
     def test_document_is_executable(self, name):
         assert check_compatibility(_load(name)) == {"ok": True}
 
@@ -205,3 +212,55 @@ class TestCatG:
             "g_material": _done("g_material", {"elastomer": "NBR"}, score=0.9),
         })
         assert auto_accept(cat_g, ctx) is True
+
+
+class TestCrowdProtocol:
+    """kv_crowd (docs/15 §15.2): разведка внешними участниками — сокращённый
+    маршрут, порог автоприёма согласован с тарифом вознаграждений."""
+
+    def test_happy_path_auto_accepts_without_supplier_claim(self, crowd):
+        """Заявка о поставщике и код — НЕ условия приёма: разведка ценна и без
+        них, бонус за субпоставщика — отдельный контур (C-4)."""
+        ctx = SessionContext(results={
+            "c_overview": _done("c_overview", score=0.8),
+            "c_mark": _done("c_mark", score=0.8),
+            "c_dims": _done("c_dims", {"length_mm": 52, "measured_with": "рулетка"},
+                            score=0.8),
+        })
+        assert auto_accept(crowd, ctx) is True
+
+    def test_quality_below_tariff_threshold_blocks_auto_accept(self, crowd):
+        """Порог 0.6 в протоколе = reward_policy.min_quality_score: скан,
+        который движок вознаграждений не оплатит, не должен автоприниматься."""
+        ctx = SessionContext(results={
+            "c_overview": _done("c_overview", score=0.5),
+            "c_mark": _done("c_mark", score=0.5),
+            "c_dims": _done("c_dims", {"length_mm": 52}, score=0.5),
+        })
+        assert auto_accept(crowd, ctx) is False
+
+    def test_missing_dims_block_auto_accept(self, crowd):
+        """Габариты по рулетке обязательны: без них запись бесполезна для
+        поиска — именно они отличают разведку от просто фотографии."""
+        ctx = SessionContext(results={
+            "c_overview": _done("c_overview", score=0.9),
+            "c_mark": _done("c_mark", score=0.9),
+        })
+        assert auto_accept(crowd, ctx) is False
+
+    def test_mark_step_declares_blocking_blur(self, crowd):
+        """Нечитаемая маркировка не оплачивается — смаз на шаге маркировки
+        блокирует кадр на устройстве, а не выясняется после отправки."""
+        mark = next(s for s in crowd["steps"] if s["id"] == "c_mark")
+        assert mark["quality"]["on_violation"] == "block"
+        assert mark["quality"]["max_blur"] <= 0.25
+
+    def test_threshold_matches_reward_policy(self, crowd):
+        """Двухстороннее согласование порога: правка тарифа без правки
+        протокола (или наоборот) роняет этот тест, а не молча расходится."""
+        from app.crowd import RewardPolicy
+
+        conditions = crowd["acceptance"]["auto_accept_if"]["all"]
+        threshold = next(c["quality_score_at_least"] for c in conditions
+                         if "quality_score_at_least" in c)
+        assert threshold == RewardPolicy().min_quality_score
