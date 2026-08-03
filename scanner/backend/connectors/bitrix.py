@@ -92,6 +92,17 @@ class BitrixConnector:
             },
         }
 
+    def pull_suppliers(self) -> list[dict[str, Any]]:
+        """Справочник поставщиков из CRM (§9.5, crm.company.list):
+        офлайн-подсказки поставщика в трассировке — устройство предлагает
+        контрагентов из CRM, а не свободный ввод с опечатками."""
+        response = self._call_with_retry("crm.company.list", {"select": ["id", "title", "ufInn"]})
+        return [
+            {"name": c.get("title"), "inn": c.get("ufInn"), "ref": str(c.get("id"))}
+            for c in (response.get("result") or {}).get("items", [])
+            if c.get("title")
+        ]
+
     # ── Обратная запись (§9.4, §9.5) ─────────────────────────────────────────
 
     def push_result(self, row: dict[str, Any],

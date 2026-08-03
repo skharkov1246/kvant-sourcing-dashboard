@@ -71,6 +71,7 @@ class Store:
         self.review_queue: dict[tuple[str, str], dict[str, Any]] = {}  # (tenant_id, session_id)
         self.export_queue: dict[tuple[str, str], dict[str, Any]] = {}  # (tenant_id, session_id)
         self.audit_log: list[dict[str, Any]] = []  # append-only (§07.4)
+        self.dynamic_directories: dict[str, dict[str, Any]] = {}
 
     # ── Протоколы ────────────────────────────────────────────────────────────
 
@@ -315,6 +316,28 @@ class Store:
     def list_audit(self, tenant_id: str) -> list[dict[str, Any]]:
         with self._lock:
             return [dict(e) for e in self.audit_log if e["tenant_id"] == tenant_id]
+
+    # ── Динамические справочники (снапшоты из внешних систем) ────────────────
+
+    def put_dynamic_directory(self, name: str, sections: dict[str, Any]) -> dict[str, Any]:
+        """Версия растёт ТОЛЬКО при изменении контента: ежепятиминутный опрос
+        CRM без изменений не сбрасывает 304-кэш всех устройств."""
+        with self._lock:
+            existing = self.dynamic_directories.get(name)
+            if existing and existing["sections"] == sections:
+                return dict(existing)
+            doc = {
+                "directory": name,
+                "version": (existing["version"] + 1) if existing else 1,
+                "sections": sections,
+            }
+            self.dynamic_directories[name] = doc
+            return dict(doc)
+
+    def get_dynamic_directory(self, name: str) -> dict[str, Any] | None:
+        with self._lock:
+            doc = self.dynamic_directories.get(name)
+            return dict(doc) if doc else None
 
     # ── Очередь экспорта (I-8) ───────────────────────────────────────────────
     # Задание не закрыто, пока внешняя система не подтвердила приём (§09.4).

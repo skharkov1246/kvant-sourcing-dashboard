@@ -60,7 +60,7 @@ class PgStore:
     def reset(self) -> None:
         """Полная очистка данных (для тестов). Схему не трогает."""
         self._conn.execute(
-            "TRUNCATE export_queue, review_queue, trace_conflict, trace_link, item_record, code_read, "
+            "TRUNCATE directory_snapshot, export_queue, review_queue, trace_conflict, trace_link, item_record, code_read, "
             "measurement, asset_chunk, asset, session_event, dead_letter_event, "
             "scan_session, inbound_idempotency, scan_task, capture_protocol, "
             "device, app_user, site, tenant_grant, tenant CASCADE"
@@ -545,6 +545,28 @@ class PgStore:
              "action": r[2], "target": r[3], "details": r[4]}
             for r in rows
         ]
+
+    # ── Динамические справочники (снапшоты из внешних систем) ────────────────
+
+    def put_dynamic_directory(self, name: str, sections: dict[str, Any]) -> dict[str, Any]:
+        existing = self.get_dynamic_directory(name)
+        if existing and existing["sections"] == sections:
+            return existing
+        version = (existing["version"] + 1) if existing else 1
+        doc = {"directory": name, "version": version, "sections": sections}
+        self._conn.execute(
+            "INSERT INTO directory_snapshot (name, version, doc) VALUES (%s, %s, %s) "
+            "ON CONFLICT (name) DO UPDATE SET version = EXCLUDED.version, "
+            " doc = EXCLUDED.doc, updated_at = now()",
+            (name, version, Jsonb(doc)),
+        )
+        return doc
+
+    def get_dynamic_directory(self, name: str) -> dict[str, Any] | None:
+        row = self._conn.execute(
+            "SELECT doc FROM directory_snapshot WHERE name = %s", (name,),
+        ).fetchone()
+        return row[0] if row else None
 
     # ── Очередь экспорта (I-8) ───────────────────────────────────────────────
 

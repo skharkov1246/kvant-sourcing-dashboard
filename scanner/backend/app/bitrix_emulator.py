@@ -22,6 +22,7 @@ class BitrixState:
     def __init__(self) -> None:
         self.items: dict[int, dict[str, Any]] = {}
         self.timeline: list[dict[str, Any]] = []
+        self.companies: dict[int, dict[str, Any]] = {}
         self._next_id = 100
 
     def seed_deal(self, title: str, stage_id: str = "NEED_SCAN",
@@ -37,9 +38,16 @@ class BitrixState:
         self.items[item["id"]] = item
         return item
 
+    def seed_company(self, title: str, inn: str | None = None) -> dict[str, Any]:
+        self._next_id += 1
+        company = {"id": self._next_id, "title": title, "ufInn": inn}
+        self.companies[company["id"]] = company
+        return company
+
     def reset(self) -> None:
         self.items.clear()
         self.timeline.clear()
+        self.companies.clear()
         self._next_id = 100
 
 
@@ -68,6 +76,10 @@ def create_emulator(state: BitrixState | None = None) -> tuple[FastAPI, BitrixSt
         item.update(params.get("fields") or {})
         item["updatedTime"] = dt.datetime.now(dt.timezone.utc).isoformat()
         return {"result": {"item": item}}
+
+    @app.post("/rest/crm.company.list")
+    def company_list(params: dict[str, Any] = Body(...)) -> dict[str, Any]:
+        return {"result": {"items": sorted(state.companies.values(), key=lambda c: c["id"])}}
 
     @app.post("/rest/crm.timeline.comment.add")
     def timeline_add(params: dict[str, Any] = Body(...)) -> dict[str, Any]:

@@ -521,6 +521,16 @@ def get_directory(
     спрашивает с If-None-Match и в обычном случае получает 304 без тела —
     таблицы стандартов меняются редко, гонять их каждый раз незачем.
     """
+    # Динамические (снапшоты из внешних систем) — раньше файловых: справочник
+    # поставщиков обновляется CRM-опросом, а не релизом данных.
+    dynamic = STORE.get_dynamic_directory(name)
+    if dynamic is not None:
+        etag = f'"{name}-v{dynamic["version"]}"'
+        if if_none_match == etag:
+            return Response(status_code=304, headers={"ETag": etag})
+        response.headers["ETag"] = etag
+        return dynamic
+
     loader = _DIRECTORIES.get(name)
     if loader is None:
         raise HTTPException(status_code=404, detail={"code": "not_found", "message": "Справочник не найден"})
@@ -535,6 +545,31 @@ def get_directory(
         return Response(status_code=304, headers={"ETag": etag})
     response.headers["ETag"] = etag
     return doc
+
+
+@app.put("/v1/directories/{name}", tags=["inbound"])
+def put_directory(
+    name: str,
+    body: dict[str, Any] = Body(...),
+    principal: Principal = Depends(current_principal),
+) -> dict[str, Any]:
+    """Загрузка снапшота динамического справочника (поллер CRM).
+
+    Версию считает сервер и растит только при изменении контента —
+    ежепятиминутный опрос без изменений не сбрасывает 304-кэш устройств.
+    Файловые справочники этим путём не перекрываются: имена файловых
+    заняты загрузчиками и динамическая запись под ними запрещена.
+    """
+    _require_reviewer(principal)
+    if name in _DIRECTORIES:
+        raise HTTPException(
+            status_code=409,
+            detail={"code": "reserved_name", "message": "Имя занято файловым справочником"},
+        )
+    sections = body.get("sections")
+    if not isinstance(sections, dict) or not sections:
+        raise HTTPException(status_code=422, detail={"code": "bad_sections", "message": "Нужен объект sections"})
+    return STORE.put_dynamic_directory(name, sections)
 
 
 @app.post("/v1/inbound/tasks", status_code=202, tags=["inbound"])

@@ -23,10 +23,11 @@ POLL_INTERVAL_S = 300
 
 
 class PlatformClient(Protocol):
-    """POST /v1/inbound/tasks платформы; реализация — requests в бою,
-    TestClient в тестах."""
+    """Клиент платформы; реализация — requests в бою, TestClient в тестах."""
 
     def submit_inbound(self, request: dict[str, Any], idempotency_key: str) -> dict[str, Any]: ...
+
+    def put_directory(self, name: str, sections: dict[str, Any]) -> dict[str, Any]: ...
 
 
 @dataclass
@@ -57,6 +58,22 @@ class BitrixPoller:
         if new_cursor:
             self._write_cursor(new_cursor)
         return stats
+
+    def sync_suppliers(self) -> dict[str, Any] | None:
+        """Снапшот поставщиков из CRM → динамический справочник suppliers:
+        офлайн-подсказки в трассировке вместо свободного ввода с опечатками
+        (§9.5). Версию растит сервер только при изменении контента; отказ
+        портала — пропуск, прежний справочник остаётся валиден."""
+        try:
+            suppliers = self.connector.pull_suppliers()
+        except BitrixUnavailable:
+            return None
+        return self.platform.put_directory("suppliers", {
+            "suppliers": {
+                "title": "Поставщики (CRM)",
+                "values": suppliers,
+            },
+        })
 
     def _read_cursor(self) -> str | None:
         try:
@@ -93,6 +110,20 @@ def _main() -> None:  # pragma: no cover — обвязка процесса, л
             response.raise_for_status()
             return response.json()
 
+        def put_directory(self, name: str, sections: dict[str, Any]) -> dict[str, Any]:
+            response = requests.put(
+                f"{self.base_url}/v1/directories/{name}",
+                json={"sections": sections},
+                headers={
+                    "X-Tenant-Id": self.tenant,
+                    "X-User-Id": "bitrix-poller",
+                    "X-Roles": "operator,reviewer",
+                },
+                timeout=30,
+            )
+            response.raise_for_status()
+            return response.json()
+
     class WebhookTransport:
         """POST {webhook}/{method} — форма вызова обкатана на эмуляторе."""
 
@@ -118,7 +149,9 @@ def _main() -> None:  # pragma: no cover — обвязка процесса, л
     )
     while True:
         stats = poller.run_once()
-        print(f"bitrix poll: {stats}", flush=True)
+        directory = poller.sync_suppliers()
+        print(f"bitrix poll: {stats}; suppliers v{directory and directory.get('version')}",
+              flush=True)
         time.sleep(POLL_INTERVAL_S)
 
 
