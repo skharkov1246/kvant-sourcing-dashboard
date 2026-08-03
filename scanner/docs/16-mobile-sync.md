@@ -83,4 +83,4 @@ API — все конвертации живут в адаптерах (`ArCoreS
 | ANTHROPIC_API_KEY | живой прогон acceptance-экстрактора (вместо NullTransport) |
 | Android build-машина | первый APK: SQLDelight-драйвер, ARCore на устройстве |
 | Managed PostgreSQL | применить schema.sql + schema_ri.sql + schema_crowd.sql |
-| Вебхук Bitrix24 | BitrixConnector.pull_tasks по расписанию + экспорт-воркер |
+| Вебхук Bitrix24 | подставить URL в `connectors/bitrix_poller.py` — обе стороны уже обкатаны: поллер (опрос → inbound, курсор в файле, повторы не дублируют) и экспорт-воркер (UF-поля + комментарий с маркером) проверены против HTTP-эмулятора портала (`app/bitrix_emulator.py`) |
