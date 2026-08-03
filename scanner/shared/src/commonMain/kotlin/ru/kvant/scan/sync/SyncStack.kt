@@ -22,7 +22,11 @@ import kotlin.random.Random
  * Хранилища пока in-memory: SQLDelight-реализации встанут на эти же
  * интерфейсы при сборке APK, граф не изменится.
  */
-class SyncStack(val config: SyncConfig) {
+class SyncStack(
+    val config: SyncConfig,
+    /** Переживает рестарт при SQLDelight-реализации; по умолчанию — память. */
+    val syncState: SyncStateStore = InMemorySyncStateStore(),
+) {
 
     val httpClient: HttpClient = HttpClient()
 
@@ -59,12 +63,13 @@ class SyncStack(val config: SyncConfig) {
 
     val directorySync: DirectorySync = DirectorySync(transport, directories)
 
-    /** Курсор pull; в памяти графа до SQLDelight (directory_cache-стиль). */
-    var pullCursor: String? = null
-
     /** Один проход pull-канала целиком: задания+протоколы, затем справочники. */
     suspend fun pullOnce() {
-        pullCursor = engine.pullOnce(pullCursor, PullApplier(tasks))
+        val cursor = syncState.get(SyncStateStore.PULL_CURSOR)
+        val next = engine.pullOnce(cursor, PullApplier(tasks))
+        // Курсор сохраняется ПОСЛЕ применения дельты: упавшая середина не
+        // теряет окно — идемпотентность pull позволяет повторить его целиком.
+        next?.let { syncState.put(SyncStateStore.PULL_CURSOR, it) }
         directorySync.syncOnce()
         syncSuppliers()
         // Появилась сеть — уезжают и отложенные заявки трассировки.

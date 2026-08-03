@@ -1,0 +1,16 @@
+-- Служебное состояние синхронизации (курсор pull и подобное).
+-- Семантика — в SyncStateStore: пустая таблица = первый запуск, pull без
+-- курсора качает всё с начала; курсор пишется ПОСЛЕ применения дельты.
+
+CREATE TABLE sync_state (
+  key        TEXT NOT NULL PRIMARY KEY,   -- pull_cursor, ...
+  value      TEXT NOT NULL,
+  updated_at INTEGER NOT NULL
+);
+
+upsert:
+INSERT OR REPLACE INTO sync_state (key, value, updated_at)
+VALUES (?, ?, ?);
+
+byKey:
+SELECT value FROM sync_state WHERE key = ?;
