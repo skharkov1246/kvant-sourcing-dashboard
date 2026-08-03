@@ -697,7 +697,41 @@ def review_verdict(
     STORE.audit(principal.tenant_id, principal.user_id, "review.verdict",
                 session_id, {"verdict": body.verdict, "comment": body.comment})
     _apply_verdict_to_task(principal.tenant_id, session_id, body.verdict)
+    if body.verdict == "ACCEPTED":
+        _materialize_item(principal.tenant_id, session_id)
     return entry
+
+
+def _materialize_item(tenant_id: str, session_id: str) -> None:
+    """Принятая сессия становится карточкой единицы товара.
+
+    Коды, прочитанные камерой и принятые контролёром, попадают в трассировку
+    с confidence='verified' — это машинное чтение, подтверждённое человеком
+    (I-7). Идентификатор карточки детерминирован от сессии: повторной
+    материализации не бывает (второй вердикт — 409 раньше).
+    """
+    events = STORE.session_events(tenant_id, session_id)
+    for event in events:
+        if event["type"] != "code.read":
+            continue
+        payload = event["payload"]
+        code_type = payload.get("code_type")
+        raw_value = payload.get("raw_value")
+        if code_type in ("gtin", "serial", "batch", "chestny_znak", "sscc") and raw_value:
+            STORE.add_trace_link(f"itm-{session_id}", {
+                "id": str(uuid.uuid4()),
+                "code_type": code_type,
+                "code_value": str(raw_value),
+                "supplier_name": None,
+                "supplier_inn": None,
+                "supplier_ref": None,
+                "origin_country": None,
+                "evidence_asset_ids": payload.get("asset_ids") or [],
+                "confidence": "verified",
+                "declared_by_tenant_id": tenant_id,
+                "declared_by_user_id": "kvant-scan",
+                "created_at": utcnow(),
+            })
 
 
 def _session_task_id(tenant_id: str, session_id: str) -> str | None:
@@ -881,7 +915,7 @@ _IDENTITY_CODE_TYPES = {"gtin": "gtin", "serial": "serial", "batch": "batch"}
 
 
 @app.get("/v1/items/{item_id}", tags=["items"])
-def get_item(item_id: str, _: Principal = Depends(current_principal)) -> dict[str, Any]:
+def get_item(item_id: str, principal: Principal = Depends(current_principal)) -> dict[str, Any]:
     """Карточка единицы товара (контракт ItemRecord).
 
     Identity выводится из связей трассировки: gtin/serial/batch — это коды,
@@ -899,16 +933,24 @@ def get_item(item_id: str, _: Principal = Depends(current_principal)) -> dict[st
         if field and field not in identity:
             identity[field] = link["code_value"]
 
-    return {
+    card: dict[str, Any] = {
         "id": item_id,
         "identity": identity,
         "trace": links,
-        # Честные пробелы контракта: замеры и качество привяжутся к карточке
-        # обработчиком item.accepted (§09.4) — его черёд после live-ключа.
         "measurements": [],
         "quality": None,
         "created_at": links[0].get("created_at"),
     }
+    # Карточка материализованной сессии несёт её замеры и качество:
+    # идентификатор детерминирован (itm-<session>), сессия восстановима.
+    if item_id.startswith("itm-"):
+        row = registry_row(STORE, principal.tenant_id, item_id[4:])
+        if row is not None:
+            card["session_id"] = row["session_id"]
+            card["measurements"] = row["measurements"]
+            card["quality"] = {"score": row["quality_score"]}
+            card["surface_stats"] = row["surface_stats"]
+    return card
 
 
 @app.get("/health", include_in_schema=False)

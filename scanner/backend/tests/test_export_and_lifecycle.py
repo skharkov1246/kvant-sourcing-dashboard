@@ -123,3 +123,75 @@ class TestVerdictMovesTask:
         r = client.post("/v1/review/s-lc-4/verdict", headers=REVIEWER,
                         json={"verdict": "ACCEPTED"})
         assert r.status_code == 200
+
+
+class TestItemMaterialization:
+    """ACCEPTED-сессия становится карточкой единицы товара (itm-<session>).
+
+    Коды, прочитанные камерой и принятые контролёром, — это машинное чтение,
+    подтверждённое человеком: в трассировку они попадают с confidence
+    'verified' (I-7), а замеры сессии закрывают честный пробел measurements.
+    """
+
+    def _accept(self, client, session_id, extra_events=()):
+        _complete_session(client, session_id, extra_events=list(extra_events))
+        r = client.post(f"/v1/review/{session_id}/verdict", headers=REVIEWER,
+                        json={"verdict": "ACCEPTED"})
+        assert r.status_code == 200
+
+    def test_accepted_codes_become_verified_identity(self, client):
+        self._accept(client, "s-itm-1", extra_events=[
+            _event("s-itm-1", 3, "code.read",
+                   {"step_id": "code", "code_type": "gtin",
+                    "raw_value": "4601234567890", "asset_ids": ["a-1"]}),
+            _event("s-itm-1", 4, "code.read",
+                   {"step_id": "code", "code_type": "serial", "raw_value": "SN-42"}),
+        ])
+        r = client.get("/v1/items/itm-s-itm-1", headers=OPERATOR)
+        assert r.status_code == 200
+        card = r.json()
+        assert card["identity"] == {"gtin": "4601234567890", "serial": "SN-42"}
+        # Машинное чтение + вердикт контролёра = verified, не declared.
+        assert {l["confidence"] for l in card["trace"]} == {"verified"}
+        # Доказательная база доехала до связи (pg маппит текстовые id в UUID —
+        # сверяем факт наличия, а не представление идентификатора).
+        gtin = next(l for l in card["trace"] if l["code_type"] == "gtin")
+        assert len(gtin["evidence_asset_ids"]) == 1
+
+    def test_card_carries_session_measurements_and_quality(self, client):
+        self._accept(client, "s-itm-2", extra_events=[
+            _event("s-itm-2", 3, "measurement.recorded",
+                   {"step_id": "dims", "accuracy_class": "B", "length_mm": 1200}),
+            _event("s-itm-2", 4, "code.read",
+                   {"step_id": "code", "code_type": "gtin", "raw_value": "4600000000001"}),
+        ])
+        card = client.get("/v1/items/itm-s-itm-2", headers=OPERATOR).json()
+        assert card["session_id"] == "s-itm-2"
+        assert card["measurements"][0]["length_mm"] == 1200
+        assert card["quality"] == {"score": 0.9}
+
+    def test_rework_does_not_materialize_card(self, client):
+        _complete_session(client, "s-itm-3", extra_events=[
+            _event("s-itm-3", 3, "code.read",
+                   {"step_id": "code", "code_type": "gtin", "raw_value": "4600000000002"}),
+        ])
+        client.post("/v1/review/s-itm-3/verdict", headers=REVIEWER,
+                    json={"verdict": "REWORK", "comment": "переснять код"})
+        assert client.get("/v1/items/itm-s-itm-3", headers=OPERATOR).status_code == 404
+
+    def test_session_without_codes_stays_uncarded(self, client):
+        """Нет прочитанных кодов — нет identity, а карточки без единой связи
+        не существует (404, не пустышка)."""
+        self._accept(client, "s-itm-4")
+        assert client.get("/v1/items/itm-s-itm-4", headers=OPERATOR).status_code == 404
+
+    def test_unknown_code_types_are_not_identity(self, client):
+        self._accept(client, "s-itm-5", extra_events=[
+            _event("s-itm-5", 3, "code.read",
+                   {"step_id": "code", "code_type": "qr_url", "raw_value": "https://x"}),
+            _event("s-itm-5", 4, "code.read",
+                   {"step_id": "code", "code_type": "batch", "raw_value": "LOT-7"}),
+        ])
+        card = client.get("/v1/items/itm-s-itm-5", headers=OPERATOR).json()
+        assert card["identity"] == {"batch": "LOT-7"}
+        assert [l["code_type"] for l in card["trace"]] == ["batch"]

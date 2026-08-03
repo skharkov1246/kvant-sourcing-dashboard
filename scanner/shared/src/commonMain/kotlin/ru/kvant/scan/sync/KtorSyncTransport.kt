@@ -105,6 +105,36 @@ class KtorSyncTransport(
         )
     }
 
+    /**
+     * Заявленная трассировка с устройства (POST /v1/items/{id}/trace).
+     * Уровень доверия НЕ передаётся: сервер сам ставит declared/verified по
+     * роли (I-7) — клиент физически не может заявить «проверено».
+     */
+    suspend fun addTraceLink(
+        itemId: String,
+        codeType: String,
+        codeValue: String,
+        supplierName: String? = null,
+        supplierInn: String? = null,
+        supplierRef: String? = null,
+    ): Boolean {
+        val body = buildJsonObject {
+            put("code_type", codeType)
+            put("code_value", codeValue)
+            supplierName?.let { put("supplier_name", it) }
+            supplierInn?.let { put("supplier_inn", it) }
+            supplierRef?.let { put("supplier_ref", it) }
+        }
+        val response = execute {
+            client.post("${config.baseUrl}/v1/items/$itemId/trace") {
+                commonHeaders()
+                contentType(ContentType.Application.Json)
+                setBody(body.toString())
+            }
+        }
+        return response.status.value == 201
+    }
+
     override suspend fun fetchDirectory(name: String, etag: String?): DirectoryResponse {
         val response = execute(allowNotModified = true) {
             client.get("${config.baseUrl}/v1/directories/$name") {

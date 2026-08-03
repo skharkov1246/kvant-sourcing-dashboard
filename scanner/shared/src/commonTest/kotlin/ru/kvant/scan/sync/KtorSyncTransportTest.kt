@@ -130,6 +130,27 @@ class KtorSyncTransportTest {
     }
 
     @Test
+    fun `addTraceLink шлёт заявку без уровня доверия - его ставит сервер`() = runTest {
+        var captured: HttpRequestData? = null
+        val transport = transport { request ->
+            captured = request
+            respond("""{"id": "l-1", "confidence": "declared"}""",
+                HttpStatusCode.Created,
+                headers = headersOf(HttpHeaders.ContentType, "application/json"))
+        }
+        val created = transport.addTraceLink(
+            itemId = "itm-1", codeType = "gtin", codeValue = "4601234567890",
+            supplierName = "Ningbo", supplierRef = "102",
+        )
+        assertTrue(created)
+        val sent = Json.parseToJsonElement((captured!!.body as TextContent).text).jsonObject
+        assertEquals("gtin", sent["code_type"]!!.jsonPrimitive.content)
+        assertEquals("102", sent["supplier_ref"]!!.jsonPrimitive.content)
+        // Клиент физически не может заявить «проверено» (I-7).
+        assertNull(sent["confidence"])
+    }
+
+    @Test
     fun `fetchDirectory без кэша не шлёт If-None-Match и берёт ETag из ответа`() = runTest {
         var captured: HttpRequestData? = null
         val transport = transport { request ->
