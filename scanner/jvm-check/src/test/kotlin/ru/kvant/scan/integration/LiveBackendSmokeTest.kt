@@ -244,6 +244,51 @@ class LiveBackendSmokeTest {
     }
 
     @Test
+    fun `карточка товара вживую - принятая сессия видна с устройства с verified-кодами`() = runTest {
+        if (!serverIsUp()) {
+            println("SMOKE SKIPPED: uvicorn на :8077 не запущен")
+            return@runTest
+        }
+        val client = HttpClient(CIO)
+        val transport = transport(client)
+        val sessionId = "s-card-${UUID.randomUUID()}"
+
+        // 1. Оператор снял сессию с прочитанным кодом.
+        fun event(seq: Long, type: EventType, payload: String) = ClientEvent(
+            clientEventId = UUID.randomUUID().toString(), sessionId = sessionId,
+            seq = seq, type = type, deviceTs = Instant(System.currentTimeMillis()),
+            payload = Json.parseToJsonElement(payload).jsonObject,
+        )
+        transport.sendEvents(listOf(
+            event(1, EventType.SESSION_STARTED, """{"protocol": "pallet_general@7"}"""),
+            event(2, EventType.STEP_COMPLETED,
+                """{"step_id": "overview", "quality_score": 0.9}"""),
+            event(3, EventType.CODE_READ,
+                """{"step_id": "code", "code_type": "gtin", "raw_value": "4601234567890"}"""),
+            event(4, EventType.SESSION_COMPLETED, "{}"),
+        )).forEach { assertEquals(EventAck.ACCEPTED, it.status) }
+
+        // 2. До вердикта карточки нет — честный null, не пустышка.
+        assertEquals(null, transport.fetchItem("itm-$sessionId"))
+
+        // 3. Контролёр принял — сервер материализовал карточку.
+        val verdict = client.post("$baseUrl/v1/review/$sessionId/verdict") {
+            header("X-Tenant-Id", "t-internal"); header("X-User-Id", "u-rev")
+            header("X-Roles", "operator,reviewer")
+            contentType(ContentType.Application.Json)
+            setBody("""{"verdict": "ACCEPTED", "comment": "ок"}""")
+        }
+        assertEquals(200, verdict.status.value)
+
+        // 4. Устройство видит карточку: identity из кода, verified, качество.
+        val card = transport.fetchItem("itm-$sessionId")!!
+        assertEquals("4601234567890", card.identity["gtin"])
+        assertTrue(card.trace.all { it.confidence == "verified" })
+        assertEquals(sessionId, card.sessionId)
+        assertEquals(0.9, card.qualityScore)
+    }
+
+    @Test
     fun `живой ETag-цикл справочника - вторая загрузка обходится в 304`() = runTest {
         if (!serverIsUp()) {
             println("SMOKE SKIPPED: uvicorn на :8077 не запущен")

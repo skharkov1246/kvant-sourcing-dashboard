@@ -17,6 +17,7 @@ import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.booleanOrNull
+import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -38,6 +39,27 @@ data class SyncConfig(
     val bearerToken: String? = null,
     /** Тело capabilities для /v1/sync/pull (§03.7: фильтрует сервер, не клиент). */
     val capabilities: JsonObject,
+)
+
+/**
+ * Карточка единицы товара на устройстве (контракт ItemRecord, GET /v1/items).
+ * Identity — только из привязанных кодов (I-7); measurements — сырые payload
+ * событий замера принятой сессии (ключи зависят от протокола).
+ */
+data class ItemCard(
+    val id: String,
+    val identity: Map<String, String>,
+    val trace: List<ItemTraceLink>,
+    val measurements: List<JsonObject>,
+    val qualityScore: Double?,
+    val sessionId: String?,
+)
+
+data class ItemTraceLink(
+    val codeType: String,
+    val codeValue: String,
+    val supplierName: String?,
+    val confidence: String,
 )
 
 /**
@@ -133,6 +155,45 @@ class KtorSyncTransport(
             }
         }
         return response.status.value == 201
+    }
+
+    /**
+     * Карточка единицы товара (GET /v1/items/{id}): identity из привязанных
+     * кодов, трассировка с уровнями доверия, замеры принятой сессии.
+     * null — карточки нет (404): сервер не выдаёт пустышек, и клиент
+     * не превращает «нет карточки» в ошибку сети.
+     */
+    suspend fun fetchItem(itemId: String): ItemCard? {
+        val response = try {
+            client.get("${config.baseUrl}/v1/items/$itemId") { commonHeaders() }
+        } catch (e: Exception) {
+            throw TransportException(e.message ?: "сеть недоступна", e)
+        }
+        if (response.status == HttpStatusCode.NotFound) return null
+        if (response.status.value !in 200..299) {
+            throw TransportException("HTTP ${response.status.value} от сервера синхронизации")
+        }
+        val doc = json.parseToJsonElement(response.bodyAsText()).jsonObject
+        return ItemCard(
+            id = doc["id"]?.jsonPrimitive?.content ?: itemId,
+            identity = (doc["identity"]?.jsonObject ?: JsonObject(emptyMap()))
+                .mapValues { it.value.jsonPrimitive.content },
+            trace = (doc["trace"]?.jsonArray ?: emptyList()).map {
+                val link = it.jsonObject
+                ItemTraceLink(
+                    codeType = link["code_type"]?.jsonPrimitive?.content ?: "",
+                    codeValue = link["code_value"]?.jsonPrimitive?.content ?: "",
+                    supplierName = (link["supplier_name"] as? JsonPrimitive)?.contentOrNull,
+                    confidence = link["confidence"]?.jsonPrimitive?.content ?: "declared",
+                )
+            },
+            measurements = (doc["measurements"]?.jsonArray ?: emptyList())
+                .map { it.jsonObject },
+            qualityScore = doc["quality"]?.let { q ->
+                (q as? JsonObject)?.get("score")?.jsonPrimitive?.content?.toDoubleOrNull()
+            },
+            sessionId = doc["session_id"]?.jsonPrimitive?.content,
+        )
     }
 
     override suspend fun fetchDirectory(name: String, etag: String?): DirectoryResponse {

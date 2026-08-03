@@ -151,6 +151,38 @@ class KtorSyncTransportTest {
     }
 
     @Test
+    fun `fetchItem разбирает identity trace и качество карточки`() = runTest {
+        val transport = transport {
+            respond(
+                """{"id": "itm-s-1", "identity": {"gtin": "4601234567890"},
+                    "trace": [{"code_type": "gtin", "code_value": "4601234567890",
+                               "supplier_name": null, "confidence": "verified"},
+                              {"code_type": "serial", "code_value": "SN-1",
+                               "supplier_name": "Ningbo", "confidence": "declared"}],
+                    "measurements": [{"step_id": "dims", "length_mm": 1200}],
+                    "quality": {"score": 0.9}, "session_id": "s-1"}""",
+                headers = headersOf(HttpHeaders.ContentType, "application/json"),
+            )
+        }
+        val card = transport.fetchItem("itm-s-1")!!
+
+        assertEquals(mapOf("gtin" to "4601234567890"), card.identity)
+        assertEquals("s-1", card.sessionId)
+        assertEquals(0.9, card.qualityScore)
+        assertEquals("1200", card.measurements.single()["length_mm"]!!.jsonPrimitive.content)
+        val verified = card.trace.first { it.confidence == "verified" }
+        assertEquals("gtin", verified.codeType)
+        assertNull(verified.supplierName)  // JsonNull не превращается в строку "null"
+        assertEquals("Ningbo", card.trace.first { it.confidence == "declared" }.supplierName)
+    }
+
+    @Test
+    fun `fetchItem на 404 возвращает null а не исключение - карточки просто нет`() = runTest {
+        val transport = transport { respond("не найдено", HttpStatusCode.NotFound) }
+        assertNull(transport.fetchItem("itm-ghost"))
+    }
+
+    @Test
     fun `fetchDirectory без кэша не шлёт If-None-Match и берёт ETag из ответа`() = runTest {
         var captured: HttpRequestData? = null
         val transport = transport { request ->

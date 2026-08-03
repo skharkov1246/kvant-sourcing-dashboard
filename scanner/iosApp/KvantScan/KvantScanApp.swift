@@ -72,6 +72,8 @@ private struct RootView: View {
     @State private var selectedTask: LocalTask?
     @State private var selectedVerdict: SessionVerdict?
     @State private var traceTarget: TraceTarget?
+    @State private var itemCard: ItemCard?
+    @State private var itemCardError: String?
 
     var body: some View {
         NavigationStack {
@@ -92,6 +94,11 @@ private struct RootView: View {
                         if let verdict = selectedVerdict {
                             traceTarget = TraceTarget(itemId: "itm-\(verdict.sessionId)")
                         }
+                    },
+                    onOpenItemCard: {
+                        if let verdict = selectedVerdict {
+                            Task { await openItemCard("itm-\(verdict.sessionId)") }
+                        }
                     }
                 ) { chosen in
                     Task { await startCapture(chosen) }
@@ -99,6 +106,9 @@ private struct RootView: View {
             }
             .navigationDestination(item: $captureModel) { model in
                 CaptureView(model: model)
+            }
+            .navigationDestination(item: $itemCard) { card in
+                ItemCardView(card: card)
             }
         }
         .sheet(item: $traceTarget) { target in
@@ -110,6 +120,23 @@ private struct RootView: View {
         .alert("Протокол не синхронизирован", isPresented: .constant(protocolError != nil)) {
             Button("Ок") { protocolError = nil }
         } message: { Text(protocolError ?? "") }
+        .alert("Карточка товара", isPresented: .constant(itemCardError != nil)) {
+            Button("Ок") { itemCardError = nil }
+        } message: { Text(itemCardError ?? "") }
+    }
+
+    @MainActor
+    private func openItemCard(_ itemId: String) async {
+        do {
+            if let card = try await container.stack.fetchItemCard(itemId: itemId) {
+                itemCard = card
+            } else {
+                // Честное «карточки нет» (сессия без кодов) — не ошибка сети.
+                itemCardError = "Карточка ещё не создана: в сессии не было кодов"
+            }
+        } catch {
+            itemCardError = "Карточка недоступна: \((error as NSError).localizedDescription)"
+        }
     }
 
     @MainActor
@@ -132,3 +159,5 @@ private struct TraceTarget: Identifiable {
     let itemId: String
     var id: String { itemId }
 }
+
+extension ItemCard: Identifiable {}

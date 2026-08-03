@@ -8,6 +8,7 @@ struct TaskDetailView: View {
     let task: LocalTask
     var verdict: SessionVerdict?
     var onAddTrace: (() -> Void)?
+    var onOpenItemCard: (() -> Void)?
     let onStartCapture: (LocalTask) -> Void
 
     var body: some View {
@@ -65,6 +66,11 @@ struct TaskDetailView: View {
                 // карточка товара материализуется вердиктом ACCEPTED.
                 if let onAddTrace, verdict?.verdict == "ACCEPTED" {
                     Button("Дополнить трассировку", action: onAddTrace)
+                        .buttonStyle(.bordered)
+                        .frame(maxWidth: .infinity)
+                }
+                if let onOpenItemCard, verdict?.verdict == "ACCEPTED" {
+                    Button("Карточка товара", action: onOpenItemCard)
                         .buttonStyle(.bordered)
                         .frame(maxWidth: .infinity)
                 }

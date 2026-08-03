@@ -32,6 +32,7 @@ fun TaskDetailScreen(
     onStartCapture: (LocalTask) -> Unit,
     verdict: ru.kvant.scan.sync.SessionVerdict? = null,
     onAddTrace: (() -> Unit)? = null,
+    onOpenItemCard: (() -> Unit)? = null,
 ) {
     Column(
         Modifier
@@ -104,6 +105,12 @@ fun TaskDetailScreen(
                 onClick = onAddTrace,
                 modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
             ) { Text("Дополнить трассировку") }
+        }
+        if (onOpenItemCard != null && verdict?.verdict == "ACCEPTED") {
+            OutlinedButton(
+                onClick = onOpenItemCard,
+                modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+            ) { Text("Карточка товара") }
         }
     }
 }

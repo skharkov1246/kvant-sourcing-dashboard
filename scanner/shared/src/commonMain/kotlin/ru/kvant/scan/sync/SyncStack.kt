@@ -69,6 +69,9 @@ class SyncStack(val config: SyncConfig) {
         }
     }
 
+    /** Карточка товара с сервера; null — карточки (ещё) нет, это не ошибка. */
+    suspend fun fetchItemCard(itemId: String): ItemCard? = ktorTransport.fetchItem(itemId)
+
     /** Форма заявленной трассировки поверх снапшота поставщиков (docs/09 §9.5). */
     fun traceLinkForm(): TraceLinkForm = TraceLinkForm(
         suppliers = { suppliers.current },

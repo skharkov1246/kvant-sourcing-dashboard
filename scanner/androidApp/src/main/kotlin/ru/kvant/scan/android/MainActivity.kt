@@ -17,6 +17,7 @@ import ru.kvant.scan.android.ui.CaptureViewModel
 import ru.kvant.scan.android.ui.TaskDetailScreen
 import ru.kvant.scan.android.ui.TaskListScreen
 import ru.kvant.scan.android.ui.TaskListViewModel
+import ru.kvant.scan.android.ui.ItemCardScreen
 import ru.kvant.scan.android.ui.TraceLinkDialog
 import ru.kvant.scan.capture.CaptureSessionFactory
 import ru.kvant.scan.sync.LocalTask
@@ -47,6 +48,10 @@ private sealed interface Screen {
     data object TaskList : Screen
     data class TaskDetail(val task: LocalTask) : Screen
     data class Capture(val viewModel: CaptureViewModel) : Screen
+    data class ItemCard(
+        val card: ru.kvant.scan.sync.ItemCard,
+        val from: TaskDetail,
+    ) : Screen
 }
 
 @Composable
@@ -85,6 +90,23 @@ private fun KvantApp(container: AppContainer) {
                 },
                 // Карточка принятой съёмки детерминирована: itm-<session>.
                 onAddTrace = { verdict?.let { traceItemId = "itm-${it.sessionId}" } },
+                onOpenItemCard = {
+                    verdict?.let { v ->
+                        scope.launch {
+                            try {
+                                val card = container.stack.fetchItemCard("itm-${v.sessionId}")
+                                if (card != null) {
+                                    screen = Screen.ItemCard(card, current)
+                                } else {
+                                    // Честное «карточки нет» (сессия без кодов) — не ошибка.
+                                    error = "Карточка ещё не создана: в сессии не было кодов"
+                                }
+                            } catch (e: Exception) {
+                                error = "Карточка недоступна: ${e.message}"
+                            }
+                        }
+                    }
+                },
             )
             traceItemId?.let { itemId ->
                 val form = remember(itemId) { container.stack.traceLinkForm() }
@@ -100,6 +122,10 @@ private fun KvantApp(container: AppContainer) {
             }
         }
         is Screen.Capture -> CaptureScreen(viewModel = current.viewModel)
+        is Screen.ItemCard -> {
+            androidx.activity.compose.BackHandler { screen = current.from }
+            ItemCardScreen(card = current.card)
+        }
     }
     // error показывается тостом/снэкбаром хост-темы; для дев-сборки достаточно
     // лога — до APK этот экран не рендерится.
