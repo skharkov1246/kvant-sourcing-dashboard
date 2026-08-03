@@ -44,6 +44,8 @@ tags:
     description: Приём заданий из внешних систем
   - name: review
     description: Контроль качества
+  - name: crowd
+    description: Краудсорсинг «скан за вознаграждение» (docs/15)
 
 paths:
   /sync/pull:
@@ -568,6 +570,288 @@ paths:
           description: Вердикт записан
         '409':
           description: Сессия в состоянии, не допускающем вердикт
+
+  /crowd/contributors:
+    post:
+      tags: [crowd]
+      summary: Зарегистрировать участника краудсорсинга
+      description: Только роль reviewer. Денежный контур — операция в аудите.
+      operationId: crowdRegisterContributor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [display_name, phone_hash]
+              properties:
+                display_name: { type: string }
+                phone_hash: { type: string }
+                npd_inn: { type: string, description: ИНН самозанятого (рельса НПД) }
+                gph_details: { type: object, description: Реквизиты договора ГПХ }
+                crypto_wallet: { type: string }
+      responses:
+        '201':
+          description: Участник зарегистрирован
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id: { type: string, format: uuid }
+                  status: { type: string, enum: [ACTIVE, SUSPENDED, BANNED] }
+                  acceptance_rate: { type: number }
+        '403': { description: Роль без права управлять денежным контуром }
+
+  /crowd/campaigns:
+    post:
+      tags: [crowd]
+      summary: Создать кампанию с жёстким потолком бюджета
+      description: |
+        Кампания — управляемый кран расхода (docs/15 §3). Исчерпание бюджета
+        не принимает скан в оплату; открытого крана нет.
+      operationId: crowdCreateCampaign
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title, budget_cents_eur]
+              properties:
+                title: { type: string }
+                budget_cents_eur: { type: integer, minimum: 0 }
+      responses:
+        '201': { description: Кампания создана (state=ACTIVE) }
+        '403': { description: Роль без права управлять денежным контуром }
+
+  /crowd/campaigns/{campaignId}:
+    get:
+      tags: [crowd]
+      summary: Карточка кампании с остатком бюджета
+      description: |
+        По остатку приложение гасит кампанию ДО съёмки, а не отказывает
+        участнику после неё.
+      operationId: crowdCampaign
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Состояние крана
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id: { type: string, format: uuid }
+                  title: { type: string }
+                  state: { type: string, enum: [ACTIVE, PAUSED, CLOSED] }
+                  budget_cents_eur: { type: integer }
+                  spent_cents_eur: { type: integer }
+                  remaining_cents_eur: { type: integer }
+        '404': { description: Кампании нет }
+
+  /crowd/campaigns/{campaignId}/state:
+    post:
+      tags: [crowd]
+      summary: Перевести кампанию (ACTIVE/PAUSED/CLOSED)
+      description: Закрытая кампания не открывается заново — 409.
+      operationId: crowdCampaignState
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [state]
+              properties:
+                state: { type: string, enum: [ACTIVE, PAUSED, CLOSED] }
+      responses:
+        '200': { description: Состояние изменено }
+        '404': { description: Кампании нет }
+        '409': { description: Недопустимый переход }
+
+  /crowd/submissions:
+    post:
+      tags: [crowd]
+      summary: Принять крауд-скан
+      description: |
+        Платим за ПРИНЯТЫЙ УНИКАЛЬНЫЙ скан. Отказ движка (дедуп по sha256 и
+        phash, суточный кап, качество ниже порога, бюджет кампании) — это НЕ
+        ошибка HTTP: заявка разобрана, судьба в `state`/`reject_reason`.
+        Быстрые серии уходят в карантин FLAGGED (velocity_audit) до вердикта
+        аудитора. 409 — только нарушение контура: незарегистрированный или
+        приостановленный участник.
+      operationId: crowdSubmit
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [contributor_id, content_sha256, submitted_at]
+              properties:
+                contributor_id: { type: string, format: uuid }
+                content_sha256: { type: string }
+                submitted_at: { type: string, format: date-time }
+                phash: { type: string, description: Перцептивный хэш кадра }
+                quality_score: { type: number, minimum: 0, maximum: 1 }
+                campaign_id: { type: string, format: uuid }
+                supplier_claim:
+                  type: object
+                  description: Заявка о новом субпоставщике (остаётся declared, C-4)
+      responses:
+        '201':
+          description: Заявка разобрана
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id: { type: string, format: uuid }
+                  state: { type: string, enum: [ACCEPTED, REJECTED, FLAGGED] }
+                  reject_reason:
+                    type: string
+                    nullable: true
+                    description: duplicate | cap_exceeded | quality | velocity_audit | unknown_campaign | campaign_inactive | campaign_budget_exhausted
+        '409': { description: Нарушение контура (участник не активен) }
+
+  /crowd/submissions/{submissionId}/resolve:
+    post:
+      tags: [crowd]
+      summary: Вердикт аудитора по карантину velocity_audit
+      operationId: crowdResolveFlagged
+      parameters:
+        - name: submissionId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [ok]
+              properties:
+                ok: { type: boolean }
+      responses:
+        '200': { description: Судьба решена (ACCEPTED с начислением или REJECTED) }
+        '404': { description: Сабмишена нет }
+        '409': { description: Сабмишен не в карантине }
+
+  /crowd/submissions/{submissionId}/confirm-supplier:
+    post:
+      tags: [crowd]
+      summary: Начислить бонус за подтверждённого субпоставщика
+      description: Бонус — только после перекрёстной проверки заявки (C-4).
+      operationId: crowdConfirmSupplier
+      parameters:
+        - name: submissionId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200': { description: Бонус начислен строкой реестра }
+        '404': { description: Сабмишена нет }
+        '409': { description: Скан не принят / нет заявки / бюджет исчерпан }
+
+  /crowd/submissions/{submissionId}/clawback:
+    post:
+      tags: [crowd]
+      summary: Сторнировать начисления по фроду
+      description: |
+        Отдельная строка CLAWBACK (C-2) — история не переписывается; участник
+        приостанавливается до разбора.
+      operationId: crowdClawback
+      parameters:
+        - name: submissionId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string }
+      responses:
+        '200': { description: Сторно записано }
+        '404': { description: Сабмишена нет }
+        '409': { description: Нечего сторнировать }
+
+  /crowd/contributors/{contributorId}/ledger:
+    get:
+      tags: [crowd]
+      summary: Реестр вознаграждений и баланс участника
+      operationId: crowdLedger
+      parameters:
+        - name: contributorId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Строки реестра и текущий баланс
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  contributor_id: { type: string, format: uuid }
+                  balance_cents_eur: { type: integer }
+                  entries:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id: { type: string, format: uuid }
+                        kind: { type: string, enum: [ACCRUAL, BONUS, CLAWBACK, PAYOUT] }
+                        amount_cents_eur: { type: integer }
+                        submission_id: { type: string, nullable: true }
+                        campaign_id: { type: string, nullable: true }
+                        note: { type: string, nullable: true }
+        '404': { description: Участника нет }
+
+  /crowd/contributors/{contributorId}/payout:
+    post:
+      tags: [crowd]
+      summary: Выплатить остаток по выбранной рельсе
+      description: |
+        Рельсы: NPD (нужен ИНН самозанятого), GPH (реквизиты договора),
+        CRYPTO — по умолчанию ВЫКЛЮЧЕНА (docs/15 §5: для резидентов РФ вне
+        правового поля, ФЗ-259) и включается только переменной среды по
+        решению владельца для конкретной юрисдикции.
+      operationId: crowdPayout
+      parameters:
+        - name: contributorId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [rail]
+              properties:
+                rail: { type: string, enum: [NPD, GPH, CRYPTO] }
+      responses:
+        '200': { description: Выплата записана строкой PAYOUT (баланс к нулю) }
+        '404': { description: Участника нет }
+        '409': { description: Рельса недоступна или баланс пуст }
 
 components:
   securitySchemes:

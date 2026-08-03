@@ -1,0 +1,162 @@
+{
+  "schema_version": 1,
+  "code": "kv_crowd",
+  "version": 1,
+  "status": "active",
+  "scope": "global",
+  "title": "Краудскан: разведка деталей внешними участниками",
+  "description": "docs/15 §15.2: сокращённый маршрутизатор для внешних участников. Это разведка «что существует и у кого», а не РКД: классы точности C/D, габариты всегда approximate (маркер/рулетка), заявка о субпоставщике остаётся declared (I-7). Порог качества согласован с тарифом (reward_policy.min_quality_score): скан ниже порога не оплачивается — приложение говорит это ДО отправки.",
+  "applies_to": {
+    "categories": [
+      "crowd"
+    ]
+  },
+  "settings": {
+    "estimated_duration_s": 180
+  },
+  "steps": [
+    {
+      "id": "c_overview",
+      "kind": "photo",
+      "title": "Общий вид: 2–4 ракурса",
+      "instruction": "Деталь целиком, при возможности — рядом предмет для масштаба (маркер, монета, рулетка).",
+      "repeat": {
+        "min": 2,
+        "max": 6
+      },
+      "quality": {
+        "max_blur": 0.35,
+        "min_lux": 60,
+        "require_subject_fill_pct": [
+          20,
+          90
+        ],
+        "on_violation": "warn"
+      }
+    },
+    {
+      "id": "c_mark",
+      "kind": "photo",
+      "title": "Маркировка крупно",
+      "instruction": "Шильдик, клеймо или надпись — крупно, в фокусе. Нечитаемая маркировка не оплачивается, поэтому смаз здесь блокирует кадр. Выбитые клейма снимайте с боковым светом.",
+      "repeat": {
+        "min": 1,
+        "max": 6
+      },
+      "quality": {
+        "max_blur": 0.2,
+        "min_lux": 80,
+        "on_violation": "block"
+      }
+    },
+    {
+      "id": "c_code",
+      "kind": "code",
+      "title": "Штрих-код или QR (если есть)",
+      "required": false,
+      "code": {
+        "symbologies": [
+          "data_matrix",
+          "qr",
+          "code_128",
+          "ean_13"
+        ],
+        "allow_manual": true
+      }
+    },
+    {
+      "id": "c_dims",
+      "kind": "form",
+      "title": "Габариты по рулетке (примерно)",
+      "instruction": "Класс точности C/D: рулетка или маркер в кадре. Это ориентировочные размеры для поиска, не замер — точность объявляется approximate всегда.",
+      "form": {
+        "fields": [
+          {
+            "key": "length_mm",
+            "type": "number",
+            "label": "Длина/диаметр, мм (примерно)",
+            "required": true
+          },
+          {
+            "key": "width_mm",
+            "type": "number",
+            "label": "Ширина/высота, мм (примерно)",
+            "required": false
+          },
+          {
+            "key": "measured_with",
+            "type": "enum",
+            "label": "Чем мерили",
+            "required": true,
+            "options": [
+              "рулетка",
+              "линейка",
+              "маркер/предмет для масштаба",
+              "на глаз"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "c_supplier",
+      "kind": "form",
+      "title": "Заявка о поставщике",
+      "instruction": "Кто поставлял или где куплено — со слов или по документам. Заявка входит в трассировку как «заявлено» (I-7); бонус начисляется только после перекрёстного подтверждения (C-4), не в момент отправки.",
+      "form": {
+        "fields": [
+          {
+            "key": "supplier_name",
+            "type": "text",
+            "label": "Название поставщика",
+            "required": false
+          },
+          {
+            "key": "supplier_inn",
+            "type": "text",
+            "label": "ИНН (если известен)",
+            "required": false
+          },
+          {
+            "key": "claim_basis",
+            "type": "enum",
+            "label": "Основание заявки",
+            "required": true,
+            "options": [
+              "документы (накладная, паспорт)",
+              "со слов владельца",
+              "личное знание",
+              "заявки нет"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "c_confirm",
+      "kind": "confirm",
+      "title": "Отправка на приёмку",
+      "confirm": {
+        "text": "Скан уходит на приёмку и дедуп. Вознаграждение начисляется только за ПРИНЯТЫЙ УНИКАЛЬНЫЙ скан (C-1): повтор того же файла или пересъёмка того же кадра не оплачиваются."
+      }
+    }
+  ],
+  "acceptance": {
+    "auto_accept_if": {
+      "all": [
+        {
+          "step": "c_overview"
+        },
+        {
+          "step": "c_mark"
+        },
+        {
+          "step": "c_dims"
+        },
+        {
+          "quality_score_at_least": 0.6
+        }
+      ]
+    }
+  }
+}
