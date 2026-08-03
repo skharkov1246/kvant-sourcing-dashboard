@@ -42,6 +42,8 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
     // Task<...>.await() для адаптеров ML Kit (MlKitAdapters.kt)
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.9.0")
+    // Фоновая доставка медиа (MediaUploadWorker)
+    implementation("androidx.work:work-runtime-ktx:2.9.1")
 
     // Сенсорный слой (адаптеры к фасадам из measure/Facades.kt)
     implementation("com.google.ar:core:1.46.0")

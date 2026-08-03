@@ -28,10 +28,11 @@ import ru.kvant.scan.sync.LocalTask
  */
 class MainActivity : ComponentActivity() {
 
-    private val container by lazy { AppContainer() }
+    private val container get() = AppGraph.container
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        MediaUploadWorker.schedule(applicationContext)
         setContent {
             MaterialTheme {
                 Surface { KvantApp(container) }

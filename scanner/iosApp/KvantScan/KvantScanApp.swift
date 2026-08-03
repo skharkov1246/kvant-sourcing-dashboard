@@ -8,9 +8,14 @@ import shared
 struct KvantScanApp: App {
     private let container = AppContainer()
 
+    init() {
+        MediaUploadScheduler.register(stack: container.stack)
+    }
+
     var body: some Scene {
         WindowGroup {
             RootView(container: container)
+                .onAppear { MediaUploadScheduler.submit() }
         }
     }
 }
@@ -60,18 +65,21 @@ private struct RootView: View {
             store: container.stack.tasks, sync: container.stack.engine))
     }
 
+    @State private var selectedTask: LocalTask?
+
     var body: some View {
         NavigationStack {
             TaskListView(model: taskList) { task in
-                // Навигация значением: NavigationLink не нужен, съёмка
-                // открывается после асинхронной сборки контроллера.
+                selectedTask = task
+            }
+            .navigationDestination(item: $selectedTask) { task in
+                TaskDetailView(task: task) { chosen in
+                    Task { await startCapture(chosen) }
+                }
             }
             .navigationDestination(item: $captureModel) { model in
                 CaptureView(model: model)
             }
-        }
-        .environment(\.openTaskDetail) { task in
-            Task { await startCapture(task) }
         }
         .alert("Протокол не синхронизирован", isPresented: .constant(protocolError != nil)) {
             Button("Ок") { protocolError = nil }
@@ -90,16 +98,6 @@ private struct RootView: View {
     }
 }
 
-/// Хук деталей задания: замыкание в Environment вместо жёсткой навигации.
-private struct OpenTaskDetailKey: EnvironmentKey {
-    static let defaultValue: (LocalTask) -> Void = { _ in }
-}
-
-extension EnvironmentValues {
-    var openTaskDetail: (LocalTask) -> Void {
-        get { self[OpenTaskDetailKey.self] }
-        set { self[OpenTaskDetailKey.self] = newValue }
-    }
-}
-
 extension CaptureViewModel: Identifiable {}
+
+extension LocalTask: Identifiable {}

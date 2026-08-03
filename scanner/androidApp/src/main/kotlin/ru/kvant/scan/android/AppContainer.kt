@@ -15,6 +15,12 @@ import java.util.UUID
  * обязано быть платформенным: идентификатор устройства и адрес дев-стенда
  * (10.0.2.2 — loopback хоста из эмулятора Android).
  */
+/** Единственный экземпляр графа: активити и фоновые воркеры WorkManager
+ * обязаны видеть ОДНУ очередь медиа, а не каждый свою. */
+object AppGraph {
+    val container: AppContainer by lazy { AppContainer() }
+}
+
 class AppContainer(
     baseUrl: String = "http://10.0.2.2:8077",
     tenantId: String = "t-internal",
