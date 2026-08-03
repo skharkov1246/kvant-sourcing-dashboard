@@ -137,3 +137,30 @@ validate(read_from_filename('docs/api/openapi.yaml')[0]); print('OpenAPI OK')"
   проекция сессии), меняется **одновременно в обоих местах**, иначе клиент и
   сервер начнут расходиться в данных;
 - новая функция не принимается без описанной ступени отказа (§08.2).
+
+## Дев-стенд одной инструкцией
+
+Полный локальный контур без внешней инфраструктуры:
+
+```bash
+# 1. Бэкенд с фикстурными протоколами (порт 8077)
+cd scanner/backend && ../.venv/bin/python -m uvicorn app.devserver:app --port 8077 &
+
+# 2. Дашборд контролёра (браузером; дев-заголовки тенанта — из query)
+open "http://127.0.0.1:8077/review/dashboard"   # + curl -H "X-Roles: operator,reviewer" ...
+
+# 3. Готовность контура
+curl -s http://127.0.0.1:8077/health/ready | python3 -m json.tool
+
+# 4. Тесты: Python (нужен локальный PG на /tmp/pgs:5433, иначе pg-половина скипнется)
+cd scanner/backend && ../.venv/bin/python -m pytest -q
+
+# 5. Тесты: Kotlin-ядро + живые смоки против пункта 1
+#    (без запущенного uvicorn смоки честно печатают SKIPPED)
+cd scanner/jvm-check && LANG=C.UTF-8 LC_ALL=C.UTF-8 gradle --no-daemon -q test
+```
+
+Живые смоки (`jvm-check/src/test/.../LiveBackendSmokeTest.kt`) проверяют против
+пункта 1 весь маршрут: задание «из Bitrix» → pull на устройство → события
+съёмки → очередь контролёра → вердикт REWORK → задание снова на устройстве;
+плюс загрузку медиа чанками со сверкой sha256 и ETag-цикл справочников.
