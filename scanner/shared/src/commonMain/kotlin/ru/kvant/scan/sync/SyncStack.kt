@@ -2,6 +2,7 @@ package ru.kvant.scan.sync
 
 import io.ktor.client.HttpClient
 import kotlinx.datetime.Clock
+import ru.kvant.scan.crowd.CrowdApi
 import ru.kvant.scan.directory.DirectoryStore
 import ru.kvant.scan.directory.SupplierDirectoryStore
 import ru.kvant.scan.domain.Instant
@@ -60,6 +61,9 @@ class SyncStack(
     )
 
     val uploader: AssetUploader = AssetUploader(httpClient, config)
+
+    /** Читающий клиент крауд-контура: баланс, реестр, состояние кампаний. */
+    val crowdApi: CrowdApi = CrowdApi(httpClient, config)
 
     val directorySync: DirectorySync = DirectorySync(transport, directories)
 

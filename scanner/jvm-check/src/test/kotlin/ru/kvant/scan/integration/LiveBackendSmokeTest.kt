@@ -322,6 +322,58 @@ class LiveBackendSmokeTest {
     }
 
     @Test
+    fun `крауд-контур вживую - принятый скан виден в балансе и остатке кампании`() = runTest {
+        if (!serverIsUp()) {
+            println("SMOKE SKIPPED: uvicorn на :8077 не запущен")
+            return@runTest
+        }
+        val client = HttpClient(CIO)
+        fun io.ktor.client.request.HttpRequestBuilder.reviewer() {
+            header("X-Tenant-Id", "t-internal"); header("X-User-Id", "u-rev")
+            header("X-Roles", "operator,reviewer")
+            contentType(ContentType.Application.Json)
+        }
+
+        // Админ-сторона: участник и кампания на два скана.
+        val contributor = Json.parseToJsonElement(
+            client.post("$baseUrl/v1/crowd/contributors") {
+                reviewer()
+                setBody("""{"display_name": "Смок", "phone_hash": "ph-${UUID.randomUUID()}"}""")
+            }.bodyAsText()).jsonObject["id"]!!.jsonPrimitive.content
+        val campaign = Json.parseToJsonElement(
+            client.post("$baseUrl/v1/crowd/campaigns") {
+                reviewer()
+                setBody("""{"title": "Смок-кампания", "budget_cents_eur": 1000}""")
+            }.bodyAsText()).jsonObject["id"]!!.jsonPrimitive.content
+
+        // Участник сдал скан.
+        val submitted = client.post("$baseUrl/v1/crowd/submissions") {
+            header("X-Tenant-Id", "t-internal"); header("X-User-Id", "u-crowd")
+            header("X-Roles", "operator")
+            contentType(ContentType.Application.Json)
+            setBody("""{"contributor_id": "$contributor",
+                        "content_sha256": "sha-${UUID.randomUUID()}",
+                        "submitted_at": "2026-08-03T12:00:00+00:00",
+                        "quality_score": 0.9, "campaign_id": "$campaign"}""")
+        }
+        assertEquals(201, submitted.status.value)
+
+        // Читающая сторона участника — через CrowdApi ядра.
+        val api = ru.kvant.scan.crowd.CrowdApi(client, SyncConfig(
+            baseUrl = baseUrl, tenantId = "t-internal",
+            userId = "u-rev", deviceId = "d-smoke", roles = "operator,reviewer",
+            capabilities = Json.parseToJsonElement("""{"schema_version":1}""").jsonObject,
+        ))
+        val ledger = api.fetchLedger(contributor)!!
+        assertEquals(500, ledger.balanceCents)
+        val card = api.fetchCampaign(campaign)!!
+        assertEquals(500, card.remainingCents)
+        // Остатка хватает ровно на один скан — потом съёмка погаснет сама.
+        assertTrue(card.allowsCapture(500))
+        assertFalse(card.allowsCapture(501))
+    }
+
+    @Test
     fun `живой ETag-цикл справочника - вторая загрузка обходится в 304`() = runTest {
         if (!serverIsUp()) {
             println("SMOKE SKIPPED: uvicorn на :8077 не запущен")
