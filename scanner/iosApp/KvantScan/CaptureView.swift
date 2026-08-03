@@ -8,8 +8,29 @@ import shared
 /// поведения между платформами здесь было бы расхождением данных.
 struct CaptureView: View {
     @StateObject var model: CaptureViewModel
+    @State private var showAbandon = false
+    @State private var abandonReason = ""
 
     var body: some View {
+        content
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Прервать…") { showAbandon = true }
+                }
+            }
+            // Прерывание — явное действие с ПРИЧИНОЙ, а не жест «назад»:
+            // события уже в outbox, брошенная молча сессия повисла бы ACTIVE (§04.6).
+            .alert("Прервать сессию?", isPresented: $showAbandon) {
+                TextField("Причина (обязательно)", text: $abandonReason)
+                Button("Прервать", role: .destructive) {
+                    let reason = abandonReason.trimmingCharacters(in: .whitespaces)
+                    if !reason.isEmpty { model.abandonSession(reason: reason) }
+                }
+                Button("Продолжить съёмку", role: .cancel) {}
+            }
+    }
+
+    private var content: some View {
         VStack(alignment: .leading, spacing: 12) {
             ProgressView(value: model.progressFraction)
             Text("Шаг \(model.doneSteps + 1) из \(model.totalSteps)")

@@ -82,6 +82,52 @@ fun CaptureScreen(viewModel: CaptureViewModel) {
                 Text("Пропустить шаг")
             }
         }
+
+        AbandonSessionButton(viewModel)
+    }
+}
+
+@Composable
+private fun AbandonSessionButton(viewModel: CaptureViewModel) {
+    // Прерывание — явное действие с ПРИЧИНОЙ, а не жест «назад»: события уже
+    // в outbox, брошенная молча сессия повисла бы ACTIVE навсегда (§04.6).
+    var showDialog by androidx.compose.runtime.remember {
+        androidx.compose.runtime.mutableStateOf(false)
+    }
+    var reason by androidx.compose.runtime.remember {
+        androidx.compose.runtime.mutableStateOf("")
+    }
+    androidx.compose.material3.TextButton(
+        onClick = { showDialog = true },
+        modifier = Modifier.fillMaxWidth(),
+    ) { Text("Прервать сессию…") }
+
+    if (showDialog) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text("Прервать сессию?") },
+            text = {
+                androidx.compose.material3.OutlinedTextField(
+                    value = reason,
+                    onValueChange = { reason = it },
+                    label = { Text("Причина (обязательно)") },
+                )
+            },
+            confirmButton = {
+                androidx.compose.material3.TextButton(
+                    enabled = reason.isNotBlank(),
+                    onClick = {
+                        viewModel.abandonSession(reason.trim())
+                        showDialog = false
+                    },
+                ) { Text("Прервать") }
+            },
+            dismissButton = {
+                androidx.compose.material3.TextButton(onClick = { showDialog = false }) {
+                    Text("Продолжить съёмку")
+                }
+            },
+        )
     }
 }
 

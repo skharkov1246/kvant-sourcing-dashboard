@@ -81,6 +81,7 @@ class KtorSyncTransport(
             put("capabilities", config.capabilities)
             put("scopes", buildJsonArray {
                 add(JsonPrimitive("tasks")); add(JsonPrimitive("protocols"))
+                add(JsonPrimitive("verdicts"))
             })
         }
         val response = execute {

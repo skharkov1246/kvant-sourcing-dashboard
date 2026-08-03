@@ -514,6 +514,14 @@ class PgStore:
         ).fetchall()
         return [self._review_row(r) for r in rows]
 
+    def list_verdicts(self, tenant_id: str) -> list[dict[str, Any]]:
+        rows = self._conn.execute(
+            self._REVIEW_COLUMNS +
+            "WHERE tenant_id = %s AND resolved_at IS NOT NULL ORDER BY resolved_at",
+            (self._tenant(tenant_id),),
+        ).fetchall()
+        return [self._review_row(r) for r in rows]
+
     # ── Аудит (§07.4): audit.entry — только INSERT, UPDATE/DELETE отозваны ──
 
     def audit(self, tenant_id: str, actor: str, action: str, target: str,

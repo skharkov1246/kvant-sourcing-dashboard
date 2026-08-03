@@ -89,6 +89,23 @@ class PullApplierTest {
     }
 
     @Test
+    fun `verdict upsert - оператор видит судьбу своей сессии`() = runTest {
+        val store = InMemoryTaskStore()
+        val summary = PullApplier(store).apply(PullResult(
+            changes = listOf(Change("verdict.upsert", obj(
+                """{"session_id": "s-9", "verdict": "REWORK",
+                    "verdict_comment": "переснять этикетку",
+                    "resolved_at": "2026-08-03T03:00:00+00:00"}"""))),
+            nextCursor = "c1", hasMore = false,
+        ))
+        assertEquals(1, summary.verdictsApplied)
+        val verdict = store.verdict("s-9")
+        assertEquals("REWORK", verdict?.verdict)
+        assertEquals("переснять этикетку", verdict?.comment)
+        assertNull(store.verdict("s-unknown"))
+    }
+
+    @Test
     fun `битое задание без id пропускается со счётчиком`() = runTest {
         val store = InMemoryTaskStore()
         val summary = PullApplier(store).apply(PullResult(

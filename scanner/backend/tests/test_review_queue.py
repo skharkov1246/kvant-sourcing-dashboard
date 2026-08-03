@@ -127,6 +127,41 @@ class TestDashboardPage:
         assert "&lt;script&gt;" in text
 
 
+class TestVerdictsScope:
+    """scope verdicts в sync_pull: судьба сессии едет тем же каналом."""
+
+    def _pull(self, client, scopes):
+        return client.post("/v1/sync/pull", headers=OPERATOR, json={
+            "device_id": "d1",
+            "capabilities": {"schema_version": 1, "app_version": "0.1.0"},
+            "scopes": scopes,
+        }).json()["changes"]
+
+    def test_resolved_verdict_arrives_via_pull(self, client):
+        _enqueue("s-vp-1")
+        client.post("/v1/review/s-vp-1/verdict", headers=REVIEWER,
+                    json={"verdict": "REWORK", "comment": "переснять"})
+        changes = self._pull(client, ["verdicts"])
+        verdicts = [c for c in changes if c["type"] == "verdict.upsert"]
+        assert len(verdicts) == 1
+        data = verdicts[0]["data"]
+        assert data["session_id"] == "s-vp-1"
+        assert data["verdict"] == "REWORK"
+        assert data["verdict_comment"] == "переснять"
+
+    def test_open_entries_do_not_leak_into_verdicts(self, client):
+        _enqueue("s-vp-2")  # без вердикта
+        changes = self._pull(client, ["verdicts"])
+        assert [c for c in changes if c["type"] == "verdict.upsert"] == []
+
+    def test_default_scopes_exclude_verdicts(self, client):
+        _enqueue("s-vp-3")
+        client.post("/v1/review/s-vp-3/verdict", headers=REVIEWER,
+                    json={"verdict": "ACCEPTED"})
+        changes = self._pull(client, ["tasks", "protocols"])
+        assert [c for c in changes if c["type"] == "verdict.upsert"] == []
+
+
 class TestTenantIsolation:
     def test_queues_are_tenant_scoped(self, client):
         _enqueue()

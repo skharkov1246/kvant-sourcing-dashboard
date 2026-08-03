@@ -63,7 +63,18 @@ interface TaskStore {
 
     /** Свежайшая синхронизированная версия кода — для заданий без пина версии. */
     suspend fun latestProtocol(code: String): JsonObject?
+
+    /** Судьба сессии от контролёра (scope verdicts): «принято/брак/пересъёмка». */
+    suspend fun upsertVerdict(verdict: SessionVerdict)
+    suspend fun verdict(sessionId: String): SessionVerdict?
 }
+
+data class SessionVerdict(
+    val sessionId: String,
+    val verdict: String,
+    val comment: String?,
+    val resolvedAt: String?,
+)
 
 class InMemoryTaskStore : TaskStore {
     private val mutex = Mutex()
@@ -90,6 +101,15 @@ class InMemoryTaskStore : TaskStore {
     override suspend fun latestProtocol(code: String): JsonObject? = mutex.withLock {
         protocols.filterKeys { it.first == code }.maxByOrNull { it.key.second }?.value
     }
+
+    private val verdicts = mutableMapOf<String, SessionVerdict>()
+
+    override suspend fun upsertVerdict(verdict: SessionVerdict): Unit = mutex.withLock {
+        verdicts[verdict.sessionId] = verdict
+    }
+
+    override suspend fun verdict(sessionId: String): SessionVerdict? =
+        mutex.withLock { verdicts[sessionId] }
 }
 
 /**
@@ -104,6 +124,7 @@ class PullApplier(private val tasks: TaskStore) {
     data class Summary(
         val tasksApplied: Int = 0,
         val protocolsApplied: Int = 0,
+        val verdictsApplied: Int = 0,
         val skipped: Int = 0,
     )
 
@@ -126,6 +147,21 @@ class PullApplier(private val tasks: TaskStore) {
                     if (code != null && version != null) {
                         tasks.upsertProtocol(code, version, change.data.jsonObject)
                         summary = summary.copy(protocolsApplied = summary.protocolsApplied + 1)
+                    } else {
+                        summary = summary.copy(skipped = summary.skipped + 1)
+                    }
+                }
+                "verdict.upsert" -> {
+                    val sessionId = change.data["session_id"]?.jsonPrimitive?.content
+                    val verdict = change.data["verdict"]?.jsonPrimitive?.content
+                    if (sessionId != null && verdict != null) {
+                        tasks.upsertVerdict(SessionVerdict(
+                            sessionId = sessionId,
+                            verdict = verdict,
+                            comment = change.data["verdict_comment"]?.jsonPrimitive?.content,
+                            resolvedAt = change.data["resolved_at"]?.jsonPrimitive?.content,
+                        ))
+                        summary = summary.copy(verdictsApplied = summary.verdictsApplied + 1)
                     } else {
                         summary = summary.copy(skipped = summary.skipped + 1)
                     }

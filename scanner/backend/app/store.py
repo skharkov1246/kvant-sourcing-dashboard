@@ -288,6 +288,16 @@ class Store:
             ]
             return sorted(open_entries, key=lambda e: e["enqueued_at"])
 
+    def list_verdicts(self, tenant_id: str) -> list[dict[str, Any]]:
+        """Решённые записи — для scope verdicts в sync_pull: оператор видит
+        «принято/брак/пересъёмка» по своим сессиям."""
+        with self._lock:
+            resolved = [
+                dict(e) for (t, _), e in self.review_queue.items()
+                if t == tenant_id and e["resolved_at"] is not None
+            ]
+            return sorted(resolved, key=lambda e: e["resolved_at"])
+
     # ── Аудит (§07.4): только добавление, метода изменения нет намеренно ────
 
     def audit(self, tenant_id: str, actor: str, action: str, target: str,

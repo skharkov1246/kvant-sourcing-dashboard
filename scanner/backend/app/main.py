@@ -232,6 +232,17 @@ def sync_pull(body: SyncPullRequest, principal: Principal = Depends(current_prin
             if protocol["schema_version"] <= body.capabilities.schema_version:
                 changes.append({"type": "protocol.upsert", "data": protocol})
 
+    if "verdicts" in body.scopes:
+        # Оператор видит судьбу своих сессий: «принято/брак/пересъёмка»
+        # приезжает тем же pull, что и задания, — без отдельного канала.
+        for verdict in STORE.list_verdicts(principal.tenant_id):
+            changes.append({"type": "verdict.upsert", "data": {
+                "session_id": verdict["session_id"],
+                "verdict": verdict["verdict"],
+                "verdict_comment": verdict["verdict_comment"],
+                "resolved_at": verdict["resolved_at"],
+            }})
+
     if "tasks" in body.scopes:
         for task in STORE.list_tasks(principal.tenant_id):
             if task["state"] not in ("NEW", "ASSIGNED", "IN_PROGRESS", "REWORK"):
