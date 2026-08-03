@@ -17,6 +17,13 @@ struct TaskListView: View {
                         .font(.caption)
                         .foregroundStyle(.red)
                 }
+                if model.pendingSync > 0 {
+                    // Офлайн-прозрачность: на устройстве есть незажитое —
+                    // выключать его сейчас нельзя (I-1). Чистое устройство молчит.
+                    Text("Не синхронизировано: \(model.pendingSync)")
+                        .font(.caption)
+                        .foregroundStyle(.orange)
+                }
                 if model.tasks.isEmpty && !model.isRefreshing {
                     Text("Заданий нет. Потяните вниз или отсканируйте деталь без задания.")
                         .font(.body)

@@ -72,6 +72,16 @@ fun TaskListScreen(
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
                 )
             }
+            if (state.pendingSync > 0) {
+                // Офлайн-прозрачность: видно, что на устройстве есть незажитое —
+                // выключать его сейчас нельзя (I-1). Чистое устройство молчит.
+                Text(
+                    "Не синхронизировано: ${state.pendingSync}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.tertiary,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                )
+            }
             if (state.tasks.isEmpty() && !state.isRefreshing) {
                 Text(
                     "Заданий нет. Потяните обновление или отсканируйте деталь без задания.",

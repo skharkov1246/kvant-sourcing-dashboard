@@ -24,12 +24,16 @@ import ru.kvant.scan.sync.TransportException
 class TaskListViewModel(
     private val tasks: TaskStore,
     private val sync: SyncEngine,
+    /** Полный граф — для сводки «что ещё не уехало»; null в лёгких тестах. */
+    private val stack: ru.kvant.scan.sync.SyncStack? = null,
 ) : ViewModel() {
 
     data class UiState(
         val tasks: List<LocalTask> = emptyList(),
         val isRefreshing: Boolean = false,
         val syncError: String? = null,
+        /** Всего записей в офлайн-каналах (события+медиа+трассировка). */
+        val pendingSync: Int = 0,
     )
 
     private val _state = MutableStateFlow(UiState())
@@ -60,6 +64,9 @@ class TaskListViewModel(
     }
 
     private suspend fun reload() {
-        _state.value = _state.value.copy(tasks = tasks.tasks())
+        _state.value = _state.value.copy(
+            tasks = tasks.tasks(),
+            pendingSync = stack?.syncStatus()?.total ?: 0,
+        )
     }
 }

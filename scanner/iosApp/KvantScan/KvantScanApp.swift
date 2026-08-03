@@ -66,7 +66,8 @@ private struct RootView: View {
     init(container: AppContainer) {
         self.container = container
         _taskList = StateObject(wrappedValue: TaskListViewModel(
-            store: container.stack.tasks, sync: container.stack.engine))
+            store: container.stack.tasks, sync: container.stack.engine,
+            stack: container.stack))
     }
 
     @State private var selectedTask: LocalTask?

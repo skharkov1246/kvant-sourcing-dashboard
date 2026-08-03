@@ -107,5 +107,25 @@ class SyncStack(val config: SyncConfig) {
         },
     )
 
+    /**
+     * Сводка «что ещё не уехало» по всем трём офлайн-каналам — для
+     * индикатора синхронизации в UI. Нулевая сводка = устройство чисто,
+     * его можно выключать без потери данных (I-1).
+     */
+    suspend fun syncStatus(): SyncStatus = SyncStatus(
+        outboxEvents = outbox.depth(),
+        pendingMedia = mediaQueue.pending().size,
+        pendingTraceLinks = traceLinks.pending().size,
+    )
+
     fun now(): Instant = Instant(Clock.System.now().toEpochMilliseconds())
+}
+
+data class SyncStatus(
+    val outboxEvents: Int,
+    val pendingMedia: Int,
+    val pendingTraceLinks: Int,
+) {
+    val total: Int get() = outboxEvents + pendingMedia + pendingTraceLinks
+    val clean: Boolean get() = total == 0
 }

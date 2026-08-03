@@ -60,7 +60,7 @@ private fun KvantApp(container: AppContainer) {
     var error by remember { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
     val taskListModel = remember {
-        TaskListViewModel(container.stack.tasks, container.stack.engine)
+        TaskListViewModel(container.stack.tasks, container.stack.engine, container.stack)
     }
 
     when (val current = screen) {
