@@ -12,7 +12,7 @@ from fastapi.testclient import TestClient
 from app.bitrix_emulator import BitrixState, create_emulator
 from connectors.bitrix import BitrixConnector, BitrixUnavailable
 from connectors.bitrix_poller import BitrixPoller
-from tests.conftest import OPERATOR
+from tests.conftest import OPERATOR, REVIEWER
 from tests.test_bitrix_emulator import EmulatorTransport
 
 
@@ -28,6 +28,14 @@ class ClientPlatform:
             headers={**OPERATOR, "Idempotency-Key": idempotency_key},
         )
         assert response.status_code in (200, 202), response.text
+        return response.json()
+
+    def put_directory(self, name, sections):
+        response = self.http.put(
+            f"/v1/directories/{name}", json={"sections": sections},
+            headers=REVIEWER,
+        )
+        assert response.status_code == 200, response.text
         return response.json()
 
 
@@ -108,3 +116,65 @@ class TestPoller:
         )
         stats = restarted.run_once()
         assert stats["created"] == 0  # история не перекачана
+
+
+class TestSuppliersSync:
+    """Снапшот поставщиков CRM → динамический справочник suppliers (§9.5)."""
+
+    def _directory(self, client):
+        return client.get("/v1/directories/suppliers", headers=OPERATOR)
+
+    def test_companies_become_directory(self, poller_env):
+        poller, state, client = poller_env
+        state.seed_company("ООО Уплотнитель", inn="7701234567")
+        state.seed_company("Ningbo Seals Co")
+
+        published = poller.sync_suppliers()
+        assert published["version"] == 1
+
+        doc = self._directory(client).json()
+        values = doc["sections"]["suppliers"]["values"]
+        assert {v["name"] for v in values} == {"ООО Уплотнитель", "Ningbo Seals Co"}
+        seal = next(v for v in values if v["inn"])
+        # ref — id контрагента в CRM: заявка ссылается на реального поставщика.
+        assert seal["inn"] == "7701234567" and seal["ref"]
+
+    def test_unchanged_crm_keeps_version_and_304_cache(self, poller_env):
+        """Ежепятиминутный опрос без изменений в CRM не сбрасывает
+        304-кэш всех устройств: версия растёт только на новом контенте."""
+        poller, state, client = poller_env
+        state.seed_company("ООО Уплотнитель")
+        assert poller.sync_suppliers()["version"] == 1
+        assert poller.sync_suppliers()["version"] == 1
+
+        etag = self._directory(client).headers["ETag"]
+        cached = client.get("/v1/directories/suppliers",
+                            headers={**OPERATOR, "If-None-Match": etag})
+        assert cached.status_code == 304
+
+    def test_new_company_bumps_version(self, poller_env):
+        poller, state, client = poller_env
+        state.seed_company("Первый")
+        poller.sync_suppliers()
+        state.seed_company("Второй")
+        assert poller.sync_suppliers()["version"] == 2
+
+    def test_portal_outage_keeps_previous_snapshot(self, poller_env):
+        poller, state, client = poller_env
+        state.seed_company("ООО Уплотнитель")
+        poller.sync_suppliers()
+
+        class DeadTransport:
+            def call(self, method, params):
+                raise BitrixUnavailable("портал лёг")
+
+        dead = BitrixPoller(
+            connector=BitrixConnector(transport=DeadTransport(),
+                                      retry=poller.connector.retry),
+            platform=poller.platform,
+            cursor_file=poller.cursor_file,
+        )
+        assert dead.sync_suppliers() is None
+        # Прежний справочник остаётся валиден — подсказки не пропадают.
+        doc = self._directory(client).json()
+        assert doc["sections"]["suppliers"]["values"]

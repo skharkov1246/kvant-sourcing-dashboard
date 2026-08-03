@@ -16,3 +16,15 @@ from .main import STORE, app  # noqa: F401  (app — точка входа uvico
 _EXAMPLES = pathlib.Path(__file__).resolve().parents[2] / "docs" / "schemas" / "examples"
 
 STORE.put_protocol(json.loads((_EXAMPLES / "pallet_general_v7.json").read_text(encoding="utf-8")))
+
+# Снапшот поставщиков — как будто его уже опубликовал поллер Bitrix (§9.5):
+# подсказки в форме трассировки работают на дев-стенде без портала.
+STORE.put_dynamic_directory("suppliers", {
+    "suppliers": {
+        "title": "Поставщики (CRM)",
+        "values": [
+            {"name": "ООО Уплотнитель", "inn": "7701234567", "ref": "101"},
+            {"name": "Ningbo Seals Co", "inn": None, "ref": "102"},
+        ],
+    },
+})

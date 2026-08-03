@@ -214,6 +214,36 @@ class LiveBackendSmokeTest {
     }
 
     @Test
+    fun `подсказки поставщиков вживую - pullOnce наполняет форму трассировки`() = runTest {
+        if (!serverIsUp()) {
+            println("SMOKE SKIPPED: uvicorn на :8077 не запущен")
+            return@runTest
+        }
+        val stack = ru.kvant.scan.sync.SyncStack(SyncConfig(
+            baseUrl = baseUrl, tenantId = "t-internal",
+            userId = "u-smoke", deviceId = "d-smoke",
+            capabilities = Json.parseToJsonElement(
+                """{"schema_version": 1, "app_version": "0.1.0",
+                    "platform": "android", "max_accuracy_class": "B"}"""
+            ).jsonObject,
+        ))
+        // Один штатный проход pull-канала: задания, справочники, suppliers.
+        stack.pullOnce()
+
+        val form = stack.traceLinkForm()
+        form.editSupplierQuery("уплотн")
+        val found = form.suggestions()
+        assertTrue(found.isNotEmpty(), "снапшот suppliers не доехал до формы")
+        // Подсказка несёт ref на CRM — заявка ссылается на реального контрагента.
+        assertTrue(found.all { it.ref != null })
+
+        // Повторный проход — версия не изменилась, снапшот не откатился.
+        stack.pullOnce()
+        assertEquals(found.map { it.name },
+            stack.traceLinkForm().apply { editSupplierQuery("уплотн") }.suggestions().map { it.name })
+    }
+
+    @Test
     fun `живой ETag-цикл справочника - вторая загрузка обходится в 304`() = runTest {
         if (!serverIsUp()) {
             println("SMOKE SKIPPED: uvicorn на :8077 не запущен")
