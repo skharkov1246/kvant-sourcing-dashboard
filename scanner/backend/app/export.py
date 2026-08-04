@@ -97,7 +97,29 @@ def registry_row(store: Any, tenant_id: str, session_id: str) -> dict[str, Any] 
         "surface_stats": _grid_stats(state) or None,
         "thread_checks": _thread_checks(state) or None,
         "gear_checks": _gear_checks(state) or None,
+        "service_outcome": _service_outcome(state),
     }
+
+
+def _service_outcome(state: Any) -> dict[str, Any] | None:
+    """Служебный исход kv_no_id (Р-11 п.3, Р-13 п.5.1) отдельным полем.
+
+    «Забраковано» — полноценная запись реестра с обязательной причиной;
+    держать её закопанной в общих данных шага значит потерять при любой
+    плоской выгрузке. None — сессия шла не по маршруту kv_no_id.
+    """
+    res = state.results.get("n_outcome")
+    if res is None or res.status != "COMPLETED" or not isinstance(res.data, dict):
+        return None
+    outcome: dict[str, Any] = {
+        "outcome": res.data.get("outcome"),
+        "basis": res.data.get("basis"),
+    }
+    reject = state.results.get("n_reject_evidence")
+    if reject is not None and reject.status == "COMPLETED" and isinstance(reject.data, dict):
+        outcome["reject_reason"] = reject.data.get("reject_reason")
+        outcome["reject_note"] = reject.data.get("reject_note")
+    return outcome
 
 
 def gear_checks_from_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:

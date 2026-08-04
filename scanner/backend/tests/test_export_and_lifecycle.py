@@ -91,6 +91,32 @@ class TestExport:
     def test_export_requires_reviewer_role(self, client):
         assert client.get("/v1/export/sessions", headers=OPERATOR).status_code == 403
 
+    def test_service_outcome_is_a_first_class_field(self, client):
+        """«Забраковано» kv_no_id — полноценная запись реестра: исход и
+        причина браковки не закопаны в общих данных шага, а лежат отдельным
+        полем — плоская выгрузка их не теряет."""
+        _complete_session(client, "s-exp-svc", extra_events=[
+            _event("s-exp-svc", 3, "step.completed", {
+                "step_id": "n_outcome",
+                "data": {"outcome": "Забраковано", "basis": "лопнула обойма"}}),
+            _event("s-exp-svc", 4, "step.completed", {
+                "step_id": "n_reject_evidence",
+                "data": {"reject_reason": "разрушение — геометрия не восстанавливается",
+                         "reject_note": "трещина через посадочный поясок"}}),
+        ])
+        row = client.get("/v1/export/sessions", headers=REVIEWER).json()["items"][0]
+        assert row["service_outcome"] == {
+            "outcome": "Забраковано",
+            "basis": "лопнула обойма",
+            "reject_reason": "разрушение — геометрия не восстанавливается",
+            "reject_note": "трещина через посадочный поясок",
+        }
+
+    def test_regular_session_has_no_service_outcome(self, client):
+        _complete_session(client, "s-exp-plain")
+        row = client.get("/v1/export/sessions", headers=REVIEWER).json()["items"][0]
+        assert row["service_outcome"] is None
+
 
 class TestCsvExport:
     """CSV-выгрузка реестра: тот же источник строк, что у JSON, но плоско
@@ -146,6 +172,17 @@ class TestCsvExport:
         r = client.get("/v1/export/sessions.csv", headers=REVIEWER)
         assert r.headers["content-type"].startswith("text/csv")
         assert "kvant-scan-registry.csv" in r.headers["content-disposition"]
+
+    def test_service_outcome_column_in_csv(self, client):
+        _complete_session(client, "s-csv-svc", extra_events=[
+            _event("s-csv-svc", 3, "step.completed", {
+                "step_id": "n_outcome",
+                "data": {"outcome": "БРЕНД НЕ ОПРЕДЕЛЁН", "basis": "клейма нет"}}),
+        ])
+        rows = self._csv_lines(client)
+        line = dict(zip(rows[0], rows[1]))
+        assert "outcome=БРЕНД НЕ ОПРЕДЕЛЁН" in line["service_outcome"]
+        assert "basis=клейма нет" in line["service_outcome"]
 
 
 class TestVerdictMovesTask:

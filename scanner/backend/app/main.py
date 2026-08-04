@@ -909,7 +909,7 @@ def export_sessions_csv(
     writer.writerow([
         "session_id", "protocol", "completed_at", "verdict", "verdict_by",
         "verdict_comment", "quality_score", "external_system", "external_ref",
-        "measurements", "codes", "review_reasons",
+        "measurements", "codes", "review_reasons", "service_outcome",
     ])
     for row in _export_rows(principal.tenant_id, date_from, date_to):
         review = row.get("review") or {}
@@ -921,12 +921,14 @@ def export_sessions_csv(
         codes = "; ".join(
             f"{c.get('code_type', '?')}:{c.get('raw_value', '')}" for c in row["codes"]
         )
+        service = row.get("service_outcome") or {}
         writer.writerow([
             row["session_id"], row["protocol"], row["completed_at"],
             review.get("verdict"), review.get("verdict_by"),
             review.get("verdict_comment"), row["quality_score"],
             row["external_system"], row["external_ref"],
             measurements, codes, "; ".join(review.get("reasons") or []),
+            "; ".join(f"{k}={v}" for k, v in service.items() if v),
         ])
     return Response(
         content="\ufeff" + buf.getvalue(),  # BOM: Excel распознаёт UTF-8
