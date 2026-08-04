@@ -374,6 +374,56 @@ class LiveBackendSmokeTest {
     }
 
     @Test
+    fun `служебный исход вживую - kv_no_id рождает задачу с дедлайном и строку реестра`() = runTest {
+        if (!serverIsUp()) {
+            println("SMOKE SKIPPED: uvicorn на :8077 не запущен")
+            return@runTest
+        }
+        val client = HttpClient(CIO)
+        val transport = transport(client)
+        val sessionId = "s-noid-${UUID.randomUUID()}"
+
+        // Оператор дошёл до исхода «БРЕНД НЕ ОПРЕДЕЛЁН» (Р-11 п.3).
+        fun event(seq: Long, type: EventType, payload: String) = ClientEvent(
+            clientEventId = UUID.randomUUID().toString(), sessionId = sessionId,
+            seq = seq, type = type, deviceTs = Instant(System.currentTimeMillis()),
+            payload = Json.parseToJsonElement(payload).jsonObject,
+        )
+        transport.sendEvents(listOf(
+            event(1, EventType.SESSION_STARTED, """{"protocol": "kv_no_id@1"}"""),
+            event(2, EventType.STEP_COMPLETED,
+                """{"step_id": "n_outcome", "quality_score": 0.9,
+                    "data": {"outcome": "БРЕНД НЕ ОПРЕДЕЛЁН",
+                             "basis": "клейма нет, шильдик утрачен"}}"""),
+            event(3, EventType.SESSION_COMPLETED, "{}"),
+        )).forEach { assertEquals(EventAck.ACCEPTED, it.status) }
+
+        // Сервер сам создал задачу брендинга с дедлайном по рабочим дням.
+        val tasks = Json.parseToJsonElement(client.get("$baseUrl/v1/tasks") {
+            header("X-Tenant-Id", "t-internal"); header("X-User-Id", "u-smoke")
+            header("X-Roles", "operator")
+        }.bodyAsText()).jsonObject["items"]!!.jsonArray.map { it.jsonObject }
+        val service = tasks.single {
+            it["external_ref"]?.jsonPrimitive?.content == "$sessionId:БРЕНД НЕ ОПРЕДЕЛЁН"
+        }
+        assertEquals("kvant-scan", service["external_system"]!!.jsonPrimitive.content)
+        assertTrue(service["due_at"]!!.jsonPrimitive.content.length >= 10,
+            "у сервисной задачи должен быть дедлайн")
+
+        // Строка реестра несёт исход отдельным полем — выгрузка его не теряет.
+        val rows = Json.parseToJsonElement(client.get("$baseUrl/v1/export/sessions") {
+            header("X-Tenant-Id", "t-internal"); header("X-User-Id", "u-rev")
+            header("X-Roles", "operator,reviewer")
+        }.bodyAsText()).jsonObject["items"]!!.jsonArray.map { it.jsonObject }
+        val row = rows.single {
+            it["session_id"]?.jsonPrimitive?.content == sessionId
+        }
+        val outcome = row["service_outcome"]!!.jsonObject
+        assertEquals("БРЕНД НЕ ОПРЕДЕЛЁН", outcome["outcome"]!!.jsonPrimitive.content)
+        assertEquals("клейма нет, шильдик утрачен", outcome["basis"]!!.jsonPrimitive.content)
+    }
+
+    @Test
     fun `живой ETag-цикл справочника - вторая загрузка обходится в 304`() = runTest {
         if (!serverIsUp()) {
             println("SMOKE SKIPPED: uvicorn на :8077 не запущен")
