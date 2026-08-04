@@ -64,10 +64,13 @@ def main() -> int:
             # clck → sba.yandex.ru/redirect?url=<enc>; либо сразу disk.yandex.ru/edit/disk/...
             if "url=" in loc:
                 loc = urllib.parse.parse_qs(urllib.parse.urlparse(loc).query).get("url", [""])[0]
-            m = re.search(r"/edit/disk/[^/]+/[^/]+/disk/(.+?)(?:\?|$)", loc)
+            m = re.search(r"/edit/disk/([^?]+)", loc)
             if m:
-                return "/" + urllib.parse.unquote(m.group(1))
-            m = re.search(r"disk\.yandex\.ru/(?:client/)?disk/(.+?)(?:\?|$)", loc)
+                # слэши внутри пути закодированы (%2F) — сначала раскодируем целиком
+                dec = urllib.parse.unquote(m.group(1))
+                if "/disk/" in dec:
+                    return "/" + dec.split("/disk/", 1)[1]
+            m = re.search(r"disk\.yandex\.ru/(?:client/)?disk/([^?]+)", loc)
             if m:
                 return "/" + urllib.parse.unquote(m.group(1))
             print(f"  не распознан Location: {loc[:140]}")
