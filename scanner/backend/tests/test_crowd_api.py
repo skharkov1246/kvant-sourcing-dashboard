@@ -96,6 +96,28 @@ class TestSubmission:
                       headers=REVIEWER, json={"ok": True})
         assert r.status_code == 409
 
+    def test_daily_cap_stops_payment_until_next_day(self, http):
+        """40 оплаченных сканов в день — потолок (daily_cap_scans): 41-й в
+        тот же день отклоняется cap_exceeded, назавтра приём открывается
+        снова. Сканы размазаны по часам, чтобы не задеть часовой карантин —
+        капы независимы и проверяются по отдельности."""
+        cid = _contributor(http)
+        for i in range(40):
+            hour, minute = divmod(i, 4)
+            r = _submit(http, cid, f"sha-day-{i}",
+                        at=f"2026-08-03T{hour:02d}:{minute * 12:02d}:00+00:00")
+            assert r.json()["state"] == "ACCEPTED", r.json()
+        over = _submit(http, cid, "sha-day-41", at="2026-08-03T12:00:00+00:00")
+        assert over.json()["state"] == "REJECTED"
+        assert over.json()["reject_reason"] == "cap_exceeded"
+
+        next_day = _submit(http, cid, "sha-day-42", at="2026-08-04T08:00:00+00:00")
+        assert next_day.json()["state"] == "ACCEPTED"
+        # Деньги — ровно за 41 принятый (40 вчера + 1 сегодня), не за присланное.
+        balance = http.get(f"/v1/crowd/contributors/{cid}/ledger",
+                           headers=REVIEWER).json()["balance_cents_eur"]
+        assert balance == 41 * 500
+
 
 class TestCampaigns:
     def test_budget_is_hard_ceiling(self, http):
