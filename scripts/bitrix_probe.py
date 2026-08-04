@@ -1,119 +1,80 @@
-"""CI-зонд v2: словарь UF-полей, money-поля сделок, товарные позиции заказов, ссылки.
+"""CI-зонд v3: прогон НОВОГО contracts.compute() на живых данных (валидация до мержа).
 
 Запускается ТОЛЬКО вручную (workflow_dispatch, .github/workflows/probe.yml).
-Читает Bitrix через секрет CI и печатает диагностику в лог — сам вебхук не выводит.
-
-Вопросы v2:
-  H. Названия (label) всех UF-полей СДЕЛКИ — что такое UF_CRM_1704981063967 ("362044|CNY"),
-     UF_CRM_1710446284794 ("4754113.13|RUB"), поля-ссылки и т.д.
-  I. Названия ufCrm20_* полей ЗАКАЗА СП-172 (числа-кандидаты на суммы, плановые даты).
-  J. Money-поля по 114 реализованным сделкам: заполненность; закрывают ли они 29 дыр buy=0.
-  K. Товарные позиции заказов с opportunity=0 — лежит ли сумма в товарах.
-  L. Куда ведут короткие ссылки (clck.ru, ~xxx) — HEAD-редирект без авторизации.
+Печатает сводку: вселенная кат.0 (до №917), источники закупки, тайминги, замедленные.
 """
 from __future__ import annotations
 
+import datetime as dt
 import json
 import os
 import sys
-from collections import defaultdict
-
-import requests
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import config
+import contracts
 from bitrix_client import BitrixClient
-from company import _regno
 
 
 def hdr(t):
     print(f"\n{'='*12} {t} {'='*12}")
 
 
-def j(x, cap=8000):
-    s = json.dumps(x, ensure_ascii=False, indent=1, default=str)
-    print(s[:cap] + ("\n…[обрезано]" if len(s) > cap else ""))
-
-
-MONEY_A = "UF_CRM_1704981063967"
-MONEY_B = "UF_CRM_1710446284794"
-LINKS = ["UF_CRM_65F30719CA2A8", "UF_CRM_1733957245242", "UF_CRM_1740133235324"]
-
-
 def main() -> int:
     s = config.Settings.load()
     c = BitrixClient(s.bitrix_webhook_url)
+    t0 = dt.datetime.now()
+    X = contracts.compute(c)
+    print(f"compute() за {(dt.datetime.now()-t0).total_seconds():.0f} сек")
 
-    hdr("H. Словарь UF-полей сделки (crm.deal.fields)")
-    flds = c.call("crm.deal.fields", {}) or {}
-    uf = {k: {"type": v.get("type"), "label": (v.get("formLabel") or v.get("listLabel") or v.get("title") or "")}
-          for k, v in flds.items() if k.startswith("UF_")}
-    interesting = {k: v for k, v in uf.items()
-                   if v["type"] in ("money", "url", "string", "double", "integer", "file", "crm")
-                   or k in LINKS + [MONEY_A, MONEY_B]}
-    j(interesting, 9000)
+    rows = X["rows"]
+    hdr("Вселенная")
+    print(f"строк: {len(rows)} | max seq: {max((r['seq'] for r in rows), default=0)}")
+    print(f"открытых: {sum(1 for r in rows if not r['closed'])} | закрытых: {sum(1 for r in rows if r['closed'])} "
+          f"| вне кат.0: {sum(1 for r in rows if not r['inCat0'])} | без номера: {sum(1 for r in rows if not r['seq'])}")
 
-    hdr("I. Словарь полей заказа СП-172 (crm.item.fields)")
-    f172 = c.call("crm.item.fields", {"entityTypeId": 172}) or {}
-    f172 = f172.get("fields") if isinstance(f172, dict) and "fields" in f172 else f172
-    uf172 = {k: {"type": v.get("type"), "label": (v.get("title") or "")}
-             for k, v in (f172 or {}).items() if k.startswith("ufCrm")}
-    j(uf172, 9000)
+    hdr("KPI")
+    for k in X["kpis"]:
+        print(f"  {k['lbl']}: {k['val']}  ({k['meta']})")
 
-    hdr("J. Money-поля по реализованным сделкам — закрывают ли дыры buy=0")
-    orders = c.list_items(172, filter={">=createdTime": "2026-01-01T00:00:00"},
-                          select=["id", "opportunity", "currencyId", "parentId2", "stageId"])
-    live = [o for o in orders if not str(o.get("stageId", "")).endswith(":FAIL")]
-    buy = defaultdict(float)
-    for o in live:
-        if o.get("parentId2"):
-            buy[str(o["parentId2"])] += float(o.get("opportunity") or 0)
-    deals = c.list_deals_fast(filter={">=DATE_CREATE": "2026-01-01"},
-                              select=["ID", "TITLE", "OPPORTUNITY", "CURRENCY_ID", MONEY_A, MONEY_B])
-    parents = set(buy.keys()) | {str(o.get("parentId2")) for o in live if o.get("parentId2")}
-    realized = [d for d in deals if str(d["ID"]) in parents or _regno(d.get("TITLE")) > 0]
-    def money_val(d, f):
-        v = str(d.get(f) or "")
-        return v if v and v not in ("0", "0|", "|") else ""
-    stats = {"всего реализованных": len(realized),
-             f"{MONEY_A} заполнено": sum(1 for d in realized if money_val(d, MONEY_A)),
-             f"{MONEY_B} заполнено": sum(1 for d in realized if money_val(d, MONEY_B))}
-    zero = [d for d in realized if buy.get(str(d["ID"]), 0.0) == 0]
-    stats["buy=0 всего"] = len(zero)
-    stats[f"buy=0 и есть {MONEY_A}"] = sum(1 for d in zero if money_val(d, MONEY_A))
-    stats[f"buy=0 и есть {MONEY_B}"] = sum(1 for d in zero if money_val(d, MONEY_B))
-    j(stats)
-    print("примеры buy=0 с money-полями (id · A · B):")
-    for d in zero[:10]:
-        print(f"  {d['ID']} · A={money_val(d, MONEY_A) or '—'} · B={money_val(d, MONEY_B) or '—'}")
+    hdr("Закупка: источники")
+    from collections import Counter
+    print(Counter(r["buySrc"] for r in rows))
+    print(f"расхождение заказы≠экономика >20%: {sum(1 for r in rows if r['discrep'])}")
 
-    hdr("K. Товарные позиции заказов с opportunity=0")
-    zero_opp = [o for o in live if float(o.get("opportunity") or 0) == 0][:3]
-    for o in zero_opp:
-        oid = o["id"]
-        for owner_type in ("Tac", "DYNAMIC_172"):
-            try:
-                pr = c.call("crm.item.productrow.list",
-                            {"filter": {"=ownerId": oid, "=ownerType": owner_type}}) or {}
-                rows = pr.get("productRows") if isinstance(pr, dict) else pr
-                print(f"заказ {oid} ownerType={owner_type}: строк={len(rows or [])}")
-                if rows:
-                    j([{k: r.get(k) for k in ("productName", "price", "quantity", "sum")} for r in rows[:4]], 1200)
-                break
-            except Exception as e:
-                print(f"заказ {oid} ownerType={owner_type}: ошибка {e}")
+    hdr("Стадии сделок кат.0 (распределение открытых)")
+    stc = Counter(r["stageName"] for r in rows if not r["closed"])
+    for name, n in stc.most_common(12):
+        print(f"  {n:4} · {name}")
 
-    hdr("L. Куда ведут короткие ссылки (HEAD, без авторизации)")
-    for url in ["https://clck.ru/3RETQu", "https://clck.ru/3RcC4F",
-                "https://kvantpro.bitrix24.ru/~F2LMd", "https://kvantpro.bitrix24.ru/~zZ6JR"]:
-        try:
-            r = requests.head(url, allow_redirects=False, timeout=10)
-            print(f"{url} → {r.status_code} Location: {r.headers.get('Location', '—')[:160]}")
-        except Exception as e:
-            print(f"{url} → ошибка {type(e).__name__}")
+    hdr("Скорость")
+    sp = X["speed"]
+    print(f"медиана цикла заказа: {sp['medCycle']} дн | медиана лага 1-го заказа: {sp['medLag']} дн")
+    print("медианы стадий ЗАКАЗОВ (топ по длительности):")
+    for b in sp["orderBench"][:10]:
+        print(f"  {b['med']:6.1f} дн · {b['name'][:44]} (n={b['n']})")
+    print("медианы стадий СДЕЛКИ в кат.0:")
+    for b in sp["dealBench"][:10]:
+        print(f"  {b['med']:6.1f} дн · {b['name'][:44]} (n={b['n']})")
 
-    print("\n✓ зонд v2 завершён")
+    hdr("Замедленные (топ-10 открытых)")
+    slow = [r for r in rows if r["slow"] and not r["closed"]]
+    print(f"всего замедленных: {len(slow)}")
+    for r in slow[:10]:
+        print(f"  №{r['seq']:4} · {r['title'][:42]} · {r['stageName'][:24]} {r['stageDays']} дн · {r['why'][:80]}")
+
+    hdr("Примеры строк (2 шт, компакт)")
+    for r in rows[:2]:
+        cp = {k: v for k, v in r.items() if k not in ("timeline", "orders")}
+        print(json.dumps(cp, ensure_ascii=False)[:800])
+        print(f"  timeline: {len(r['timeline'])} стадий; orders: {len(r['orders'])}")
+        for t in r["timeline"][:5]:
+            print(f"    {t['at']} → {t['name'][:34]} ({t['days']} дн)")
+        for o in r["orders"][:3]:
+            print(f"    заказ {o['id']} · {o['stageName'][:30]} · {o['days']} дн (порог {o['thr']}) {'SLOW' if o['slow'] else ''}")
+
+    print("\n✓ зонд v3 завершён")
     return 0
 
 
