@@ -237,3 +237,68 @@ class TestAuditSample:
         engine.submit(_sub(c, sha="same"))
         engine.submit(_sub(c, sha="same", minutes=1))  # дубль
         assert len(engine.audit_sample()) == 1
+
+
+class TestNpdReceipts:
+    """Чек самозанятого — часть выплаты НПД, когда провайдер подключён:
+    выплата без чека при обязательных чеках — нарушение НПД, не деградация."""
+
+    class _FakeReceipts:
+        def __init__(self):
+            self.issued = []
+
+        def issue_receipt(self, inn, amount_cents_eur, description):
+            self.issued.append((inn, amount_cents_eur))
+            return "receipt-42"
+
+    class _DeadReceipts:
+        def issue_receipt(self, inn, amount_cents_eur, description):
+            raise CrowdError("«Мой налог» недоступен")
+
+    def test_without_provider_payout_works_as_before(self):
+        """Текущий режим: чеки оформляются вручную вне системы."""
+        engine = CrowdEngine()
+        c = engine.register(_contributor())
+        engine.submit(_sub(c))
+        entry = engine.create_payout(c.id, "NPD")
+        assert entry.note == "rail=NPD"
+
+    def test_provider_issues_receipt_and_it_lands_in_ledger(self):
+        receipts = self._FakeReceipts()
+        engine = CrowdEngine(npd_receipts=receipts)
+        c = engine.register(_contributor())
+        engine.submit(_sub(c))
+        entry = engine.create_payout(c.id, "NPD")
+        assert receipts.issued == [("500100732259", 500)]
+        assert entry.note == "rail=NPD чек=receipt-42"
+
+    def test_failed_receipt_cancels_payout_entirely(self):
+        """Чек ДО строки PAYOUT: упавший провайдер не оставляет в реестре
+        выплату без чека, баланс не тронут."""
+        engine = CrowdEngine(npd_receipts=self._DeadReceipts())
+        c = engine.register(_contributor())
+        engine.submit(_sub(c))
+        with pytest.raises(CrowdError, match="Мой налог"):
+            engine.create_payout(c.id, "NPD")
+        assert engine.balance_cents(c.id) == 500
+        assert all(e.kind != "PAYOUT" for e in engine.ledger)
+
+    def test_unconfigured_stub_fails_honestly(self):
+        """Флаг «чеки обязательны» до интеграции API — честный отказ с
+        причиной, а не тихая выплата без чека."""
+        from app.crowd import UnconfiguredNpdReceipts
+
+        engine = CrowdEngine(npd_receipts=UnconfiguredNpdReceipts())
+        c = engine.register(_contributor())
+        engine.submit(_sub(c))
+        with pytest.raises(CrowdError, match="не подключено"):
+            engine.create_payout(c.id, "NPD")
+
+    def test_receipt_only_for_npd_rail(self):
+        """ГПХ-выплата провайдера чеков не касается — чек НПД про режим
+        самозанятого, а не про выплаты вообще."""
+        engine = CrowdEngine(npd_receipts=self._DeadReceipts())
+        c = engine.register(_contributor(gph_details={"contract": "Д-1"}))
+        engine.submit(_sub(c))
+        entry = engine.create_payout(c.id, "GPH")
+        assert entry.note == "rail=GPH"

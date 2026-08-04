@@ -11,12 +11,35 @@ import datetime as dt
 import hashlib
 import uuid
 from dataclasses import dataclass, field
+from typing import Protocol
 
 BASE_SCAN_CENTS = 500  # 5 € эквивалент за принятый уникальный скан
 
 
 class CrowdError(ValueError):
     """Нарушение контура вознаграждений, которое сервер отклоняет."""
+
+
+class NpdReceiptProvider(Protocol):
+    """Чек самозанятого (API «Мой налог») на сумму выплаты.
+
+    Возвращает идентификатор чека — он ложится в строку PAYOUT реестра.
+    Исключение провайдера отменяет выплату целиком: выплата без чека при
+    обязательных чеках — нарушение НПД, а не деградация.
+    """
+
+    def issue_receipt(self, inn: str, amount_cents_eur: int, description: str) -> str: ...
+
+
+class UnconfiguredNpdReceipts:
+    """Честная заглушка на время до интеграции «Мой налог»: если владелец
+    объявил чеки обязательными, выплата падает с понятной причиной, а не
+    уходит без чека."""
+
+    def issue_receipt(self, inn: str, amount_cents_eur: int, description: str) -> str:
+        raise CrowdError(
+            "API «Мой налог» не подключено — чек НПД не оформить; "
+            "оформите чек вручную или подключите интеграцию")
 
 
 @dataclass
@@ -101,8 +124,12 @@ class CrowdEngine:
     KMP-ядре) до порога тарифа `phash_hamming_threshold`.
     """
 
-    def __init__(self, policy: RewardPolicy | None = None) -> None:
+    def __init__(self, policy: RewardPolicy | None = None,
+                 npd_receipts: NpdReceiptProvider | None = None) -> None:
         self.policy = policy or RewardPolicy()
+        # None — чеки оформляются вручную вне системы (текущий режим);
+        # провайдер делает чек обязательной частью выплаты НПД.
+        self.npd_receipts = npd_receipts
         self.contributors: dict[str, Contributor] = {}
         self.submissions: dict[str, Submission] = {}
         self.ledger: list[LedgerEntry] = []
@@ -262,7 +289,15 @@ class CrowdEngine:
         amount = self.balance_cents(contributor_id)
         if amount <= 0:
             raise CrowdError("Баланс пуст — выплачивать нечего")
-        return self._post(contributor_id, "PAYOUT", -amount, note=f"rail={rail}")
+        note = f"rail={rail}"
+        if rail == "NPD" and self.npd_receipts is not None:
+            # Чек ДО строки PAYOUT: упавший провайдер отменяет выплату
+            # целиком, реестр не получает выплату без чека.
+            receipt_id = self.npd_receipts.issue_receipt(
+                c.npd_inn or "", amount,
+                f"Вознаграждение за принятые сканы, участник {c.display_name}")
+            note = f"rail=NPD чек={receipt_id}"
+        return self._post(contributor_id, "PAYOUT", -amount, note=note)
 
     # — внутреннее —
 

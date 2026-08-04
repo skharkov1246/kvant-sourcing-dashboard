@@ -1051,8 +1051,20 @@ def get_item(item_id: str, principal: Principal = Depends(current_principal)) ->
 _CROWD_ENGINES: dict[str, CrowdEngine] = {}
 
 
+def _npd_receipts():
+    """KVANT_NPD_RECEIPTS_REQUIRED=1 делает чек обязательной частью выплаты
+    НПД: до интеграции «Мой налог» выплата честно падает с причиной, а не
+    уходит без чека. Без флага чеки оформляются вручную вне системы."""
+    if os.environ.get("KVANT_NPD_RECEIPTS_REQUIRED") == "1":
+        from .crowd import UnconfiguredNpdReceipts
+
+        return UnconfiguredNpdReceipts()
+    return None
+
+
 def _crowd(tenant_id: str) -> CrowdEngine:
-    return _CROWD_ENGINES.setdefault(tenant_id, CrowdEngine())
+    return _CROWD_ENGINES.setdefault(
+        tenant_id, CrowdEngine(npd_receipts=_npd_receipts()))
 
 
 def _crowd_conflict(e: CrowdError) -> HTTPException:
