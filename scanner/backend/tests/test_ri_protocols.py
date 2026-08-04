@@ -47,18 +47,25 @@ def crowd() -> dict:
     return _load("kv_crowd.json")
 
 
+@pytest.fixture(scope="module")
+def onboarding() -> dict:
+    return _load("kv_crowd_onboarding.json")
+
+
 def _done(step_id: str, data: dict | None = None, score: float = 1.0) -> StepResult:
     return StepResult(step_id=step_id, status="COMPLETED", data=data or {}, quality_score=score)
 
 
 class TestSchemaValidity:
     @pytest.mark.parametrize("name", ["kv_router.json", "kv_cat_a.json",
-                                      "kv_cat_g.json", "kv_crowd.json"])
+                                      "kv_cat_g.json", "kv_crowd.json",
+                                      "kv_crowd_onboarding.json"])
     def test_document_matches_schema(self, schema, name):
         jsonschema.validate(_load(name), schema)
 
     @pytest.mark.parametrize("name", ["kv_router.json", "kv_cat_a.json",
-                                      "kv_cat_g.json", "kv_crowd.json"])
+                                      "kv_cat_g.json", "kv_crowd.json",
+                                      "kv_crowd_onboarding.json"])
     def test_document_is_executable(self, name):
         assert check_compatibility(_load(name)) == {"ok": True}
 
@@ -264,3 +271,53 @@ class TestCrowdProtocol:
         threshold = next(c["quality_score_at_least"] for c in conditions
                          if "quality_score_at_least" in c)
         assert threshold == RewardPolicy().min_quality_score
+
+
+class TestCrowdOnboarding:
+    """kv_crowd_onboarding (docs/15 §15.2 п.1): регистрация перед первым
+    сканом — реквизиты зависят от рельсы, без реквизитов выбранной рельсы
+    анкета не автопринимается."""
+
+    def test_rail_fields_follow_choice(self, onboarding):
+        """Реквизиты НПД видны только при выборе НПД — и наоборот: лишние
+        поля в анкете это брошенный онбординг."""
+        npd = SessionContext(results={
+            "o_rail": _done("o_rail", {"payout_rail": "НПД (самозанятый)"})})
+        ids = [s["id"] for s in visible_steps(onboarding, npd)]
+        assert "o_npd" in ids and "o_gph" not in ids
+
+        gph = SessionContext(results={
+            "o_rail": _done("o_rail", {"payout_rail": "ГПХ (договор)"})})
+        ids = [s["id"] for s in visible_steps(onboarding, gph)]
+        assert "o_gph" in ids and "o_npd" not in ids
+
+    def test_npd_without_inn_is_not_accepted(self, onboarding):
+        """Выбрал НПД, но не заполнил ИНН — reject_if не пускает анкету
+        в автоприём: рельса без реквизитов бесполезна при выплате."""
+        ctx = SessionContext(results={
+            "o_identity": _done("o_identity", {"display_name": "Иван", "phone": "х"}),
+            "o_rail": _done("o_rail", {"payout_rail": "НПД (самозанятый)"}),
+            "o_offer": _done("o_offer"),
+        })
+        assert auto_accept(onboarding, ctx) is False
+        ctx.results["o_npd"] = _done("o_npd", {"npd_inn": "123456789012"})
+        assert auto_accept(onboarding, ctx) is True
+
+    def test_deferred_rail_accepts_without_details(self, onboarding):
+        """«Решу позже» — валидный онбординг: сканировать и копить баланс
+        можно, реквизиты спросит выплата (create_payout), а не анкета."""
+        ctx = SessionContext(results={
+            "o_identity": _done("o_identity", {"display_name": "Иван", "phone": "х"}),
+            "o_rail": _done("o_rail", {"payout_rail": "решу позже"}),
+            "o_offer": _done("o_offer"),
+        })
+        assert auto_accept(onboarding, ctx) is True
+
+    def test_offer_consent_is_mandatory(self, onboarding):
+        """Без подтверждения оферты автоприёма нет: согласие — юридическое
+        основание всего денежного контура."""
+        ctx = SessionContext(results={
+            "o_identity": _done("o_identity", {"display_name": "Иван", "phone": "х"}),
+            "o_rail": _done("o_rail", {"payout_rail": "решу позже"}),
+        })
+        assert auto_accept(onboarding, ctx) is False

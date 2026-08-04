@@ -1,0 +1,175 @@
+{
+  "schema_version": 1,
+  "code": "kv_crowd_onboarding",
+  "version": 1,
+  "status": "active",
+  "scope": "global",
+  "title": "Онбординг участника краудсорсинга",
+  "description": "docs/15 §15.2 п.1: регистрация перед первым сканом. Телефон хешируется приложением ДО отправки — сырой номер не покидает устройство; реквизиты выплаты зависят от выбранной рельсы (НПД/ГПХ, ветвление visible_if); крипто-рельса в онбординге отсутствует намеренно — она выключена по умолчанию и включается решением владельца по юрисдикции. Итог формы уезжает в POST /v1/crowd/contributors.",
+  "applies_to": {
+    "categories": [
+      "crowd"
+    ]
+  },
+  "settings": {
+    "estimated_duration_s": 240
+  },
+  "steps": [
+    {
+      "id": "o_identity",
+      "kind": "form",
+      "title": "Кто вы",
+      "instruction": "Телефон нужен для связи и защиты от дублей аккаунтов; приложение отправляет только его хеш (docs/15 §15.2) — сырой номер не хранится нигде.",
+      "form": {
+        "fields": [
+          {
+            "key": "display_name",
+            "type": "text",
+            "label": "Имя (как к вам обращаться)",
+            "required": true
+          },
+          {
+            "key": "phone",
+            "type": "text",
+            "label": "Телефон",
+            "required": true
+          },
+          {
+            "key": "occupation",
+            "type": "enum",
+            "label": "Кем работаете",
+            "required": false,
+            "options": [
+              "кладовщик",
+              "ремонтник/механик",
+              "снабженец",
+              "другое"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "o_rail",
+      "kind": "form",
+      "title": "Как получать вознаграждение",
+      "instruction": "НПД — чек самозанятого через «Мой налог»; ГПХ — договор с реквизитами. «Решу позже» — можно сканировать и копить баланс, но выплата не пройдёт без реквизитов.",
+      "form": {
+        "fields": [
+          {
+            "key": "payout_rail",
+            "type": "enum",
+            "label": "Рельса выплаты",
+            "required": true,
+            "options": [
+              "НПД (самозанятый)",
+              "ГПХ (договор)",
+              "решу позже"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "o_npd",
+      "kind": "form",
+      "title": "Реквизиты самозанятого",
+      "visible_if": {
+        "step": "o_rail",
+        "field": "payout_rail",
+        "eq": "НПД (самозанятый)"
+      },
+      "form": {
+        "fields": [
+          {
+            "key": "npd_inn",
+            "type": "text",
+            "label": "ИНН самозанятого",
+            "required": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "o_gph",
+      "kind": "form",
+      "title": "Реквизиты договора ГПХ",
+      "visible_if": {
+        "step": "o_rail",
+        "field": "payout_rail",
+        "eq": "ГПХ (договор)"
+      },
+      "form": {
+        "fields": [
+          {
+            "key": "passport_ref",
+            "type": "text",
+            "label": "Серия и номер паспорта",
+            "required": true
+          },
+          {
+            "key": "bank_details",
+            "type": "multiline",
+            "label": "Банковские реквизиты",
+            "required": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "o_offer",
+      "kind": "confirm",
+      "title": "Договор-оферта",
+      "confirm": {
+        "text": "Подтверждаю согласие с офертой: вознаграждение начисляется только за принятый уникальный скан; заявленные мной сведения о поставщиках проверяются перекрёстно; фрод сторнируется и ведёт к разбору."
+      }
+    }
+  ],
+  "acceptance": {
+    "auto_accept_if": {
+      "all": [
+        {
+          "step": "o_identity"
+        },
+        {
+          "step": "o_rail"
+        },
+        {
+          "step": "o_offer"
+        }
+      ]
+    },
+    "reject_if": {
+      "any": [
+        {
+          "all": [
+            {
+              "step": "o_rail",
+              "field": "payout_rail",
+              "eq": "НПД (самозанятый)"
+            },
+            {
+              "not": {
+                "step": "o_npd"
+              }
+            }
+          ]
+        },
+        {
+          "all": [
+            {
+              "step": "o_rail",
+              "field": "payout_rail",
+              "eq": "ГПХ (договор)"
+            },
+            {
+              "not": {
+                "step": "o_gph"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
