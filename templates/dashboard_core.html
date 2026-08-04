@@ -290,6 +290,23 @@
   .flowbox{flex:1;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px;text-align:center}
   .flowbox .n{font-family:'Archivo';font-weight:800;font-size:22px}.flowbox .l{font-size:11px;color:var(--mut);margin-top:3px}
 
+  /* вкладка «Реализация»: подсветка замедленных, бейджи источника закупки, таймлайн */
+  tr.slowrow td{background:rgba(196,80,62,.08)}
+  tr.slowrow:hover td{background:rgba(196,80,62,.14)}
+  .srcb{font-size:9px;padding:1px 5px;border-radius:4px;background:var(--panel2);color:var(--mut);font-family:var(--mono);white-space:nowrap}
+  .srcb.econ{color:var(--b2);background:rgba(58,166,185,.13)}
+  .srcb.none{color:var(--nr);background:rgba(196,80,62,.13)}
+  .srcb.disc{color:var(--a2);background:rgba(245,165,36,.13)}
+  .stgcell b{font-weight:600;font-size:12px}
+  .stgcell .dep{margin-top:1px}
+  .stgd{font-family:var(--mono);font-weight:600}
+  .stgd.bad{color:var(--nr)}
+  .tlrow{display:flex;gap:10px;align-items:baseline;padding:5px 0;border-bottom:1px solid rgba(42,50,61,.4);font-size:12px}
+  .tlrow .tld{font-family:var(--mono);color:var(--mut);flex:none;width:104px}
+  .tlrow .tln{color:var(--ink);flex:1;min-width:0}
+  .tlrow .tldur{font-family:var(--mono);color:var(--a2);flex:none}
+  .tlrow.cur .tln{font-weight:600}
+
   /* ---- доступность: видимый фокус с клавиатуры ---- */
   .tab:focus-visible,.snb:focus-visible,.sortt:focus-visible,.stchip:focus-visible,.qq:focus-visible,.drw .x:focus-visible{outline:2px solid var(--a);outline-offset:2px}
   .search:focus-visible{outline:2px solid var(--a);outline-offset:1px}
@@ -863,6 +880,8 @@ const METH={
   'd.groups':{t:'Продажи → закупка → маржа',what:'Главная таблица направления по группам отделов.',src:'crm.deal.list (ASSIGNED_BY_ID ∈ UF_DEPARTMENT группы) + Заказы поставщикам СП-172.',formula:'СП-172 = заказы ПОСТАВЩИКАМ (opportunity = закупка). Продажа = сумма родительской сделки. Контракт = сделка с ≥1 заказом. Колонки: сделок (YTD), пайплайн (Σ открытых продаж €), контрактов, продажи (Σ сумм сделок-контрактов €), закупка (Σ заказов €), маржа = продажи − закупка.',note:'Привязка к группе — через владельца сделки-родителя. Клик по строке — сделки и заказы группы.'},
   'd.rev':{t:'Выручка по группам',what:'Ранжирование групп по продажам (выручке).',formula:'Σ сумм сделок-контрактов группы (€); длина бара — относительно максимума в наборе.',note:'Клик — сделки и заказы группы.'},
   'd.people':{t:'До человека',what:'Те же метрики по каждому сотруднику группы.',src:'группировка по ASSIGNED_BY_ID внутри групп.',formula:'Сделки / пайплайн / заказы / выручка / зак-сд по сотруднику.',note:'Клик по сотруднику — его сделки и заказы.'},
+  'ct.speed':{t:'Скорость реализации',what:'Сколько времени сделки и заказы проводят в каждой стадии — где процесс буксует.',src:'crm.stagehistory.list: первый вход в каждую стадию (сделки воронки кат.0 и заказы СП-172), с полным временем.',formula:'Длительность стадии = время до следующего первого входа. Медианы по всем прохождениям (n — сколько раз стадию проходили). «Цикл заказа» = создание → закрытие (SUCCESS). «Лаг первого заказа» = вход сделки в воронку реализации → создание первого заказа СП-172.',note:'Медианы устойчивы к выбросам; редкие стадии (n<5) в графики не попадают.'},
+  'ct.list':{t:'Список контрактов: стадии, закупка, замедленность',what:'Одна строка = одна сделка воронки реализации (кат.0), №№ до текущего максимума.',src:'crm.deal.list (CATEGORY_ID=0) + заказы СП-172 (parentId2) + история стадий + money-поля сделки из экономики проекта.',formula:'«Стадия · дней» — текущая стадия и возраст (от последнего входа). ЗАКУПКА каскадом: Σ заказов СП-172 → поля «Cost (rub)»/«Offer sum … supplier» из экономики (бейдж «эконом.») → «нет данных». Маржа = продажа − закупка, только при наличии источника. ЗАМЕДЛЕНА (красная строка): возраст текущей стадии сделки или любого живого заказа > max(2×медиана этой стадии, 7 дн), либо нет ни одного заказа >7 дн после входа в воронку.',note:'«⚠≠» — заказы и экономика расходятся >20%: стоит сверить. Файл экономики на общем диске Я.360 подключим отдельным источником, когда появится ссылка (ECON_FOLDER_URL).'},
   'a.forecast':{t:'Взвешенный прогноз',what:'Сколько денег ожидать с открытого пайплайна и на какие месяцы.',src:'crm.deal.list (открытые сделки YTD: не проиграны, не в реализации) + CLOSEDATE.',formula:'Каждая открытая сделка × вероятность: базовая = эмпирическая конверсия зрелой когорты-2025 (реализовано ÷ создано); для сделок, дошедших до «ТКП выдано+», вероятность ×3 (потолок 60%). Прогноз раскладывается по месяцу ПЛАНОВОГО закрытия (CLOSEDATE). «Покрытие» = взвешенный пайплайн ÷ средний месячный факт реализации-2026; здоровая норма ≥ 3×.',note:'Вероятность ТКП+ — эвристика (нет истории прохождения стадий по каждой сделке). Сделки без CLOSEDATE в помесячный прогноз не попадают — см. блок «Гигиена».'},
   'a.velocity':{t:'Sales velocity менеджеров',what:'Скорость генерации выручки: у кого воронка реально «крутится».',src:'crm.deal.list (ASSIGNED_BY_ID, YTD) + история стадий (момент перевода в реализацию).',formula:'Velocity = открытые сделки × ср. чек (продажи ÷ реализованные) × win-rate (реал ÷ (реал+проигр)) ÷ медианный цикл (создание → реализация, дней) × 30 → €/мес. Показаны сотрудники с ≥5 сделками за год.',note:'У кого мало реализованных сделок — цифры шумные; velocity 0 = ещё нет ни одной реализации (нет ср. чека и цикла).'},
   'a.lost':{t:'Причины проигрышей',what:'Почему уходят сделки — раскладка проигранных по стадиям отказа.',src:'crm.deal.list (STAGE_SEMANTIC_ID = F) + имена стадий воронок.',formula:'Группировка проигранных YTD по финальной стадии (имя стадии ≈ причина: «экономически неинтересно», «отказ клиента» и т.п.), счёт и Σ сумм.',note:'Если ≥80% проигрышей падают в одну стадию — причины в CRM фактически не заполняются, и этот разрез слепой. Лечится обязательным полем причины при закрытии в минус.'},
@@ -1084,33 +1103,101 @@ function renderReps(R){
   draw();
 }
 // ---- вкладка «Контракты»: один список заказов СП-172 с поиском и сортировкой
+const _stShort=n=>String(n||'').split(' | ')[0];   // короткое имя стадии (до « | »)
+function openContract(x){
+  document.getElementById('drwName').textContent=(x.seq?`№${x.seq} · `:'')+(x.customer!=='—'?x.customer:x.title.slice(0,40));
+  document.getElementById('drwSub').textContent=`${x.title.slice(0,60)} · продажа ${x.saleLbl} · заказов ${x.norders}`;
+  let h='';
+  // статус и скорость
+  h+=`<div class="h">Статус и скорость</div>`;
+  h+=`<div class="mrow-like" style="font-size:12.5px;line-height:1.7">`
+    +`Стадия: <b>${_esc(x.stageName||'—')}</b>${x.stageDays!=null?` — <span class="stgd${x.slow&&x.why.indexOf('стадия')===0?' bad':''}">${x.stageDays} дн</span> <span class="dimv">(порог ${x.stageThr} дн)</span>`:''}<br>`
+    +`Вошла в реализацию: <b>${x.entered||'—'}</b>`
+    +(x.firstLag!=null?` · первый заказ через <b>${x.firstLag} дн</b>`:'')
+    +(x.slow?`<br><span class="flag">⚠ ${_esc(x.why)}</span>`:'')
+    +`</div>`;
+  // таймлайн стадий сделки
+  if((x.timeline||[]).length){
+    h+=`<div class="h">Путь по стадиям воронки</div>`;
+    h+=x.timeline.map((t,i)=>`<div class="tlrow${i===x.timeline.length-1?' cur':''}"><span class="tld">${t.at}</span><span class="tln">${_esc(_stShort(t.name))}</span><span class="tldur">${t.days} дн${i===x.timeline.length-1?' · сейчас':''}</span></div>`).join('');
+  }
+  // закупка: источники
+  h+=`<div class="h">Закупка и маржа</div>`;
+  const srcLbl={orders:'по заказам СП-172',econ:'из экономики проекта (money-поля сделки)',none:'данных нет'};
+  h+=`<div style="font-size:12.5px;line-height:1.75">`
+    +`Продажа: <b>${x.saleLbl}</b>${x.saleCur&&x.saleCur!=='EUR'?` <span class="dimv">(${_esc(x.saleOrig)})</span>`:''}<br>`
+    +`Закупка: <b style="color:var(--a)">${x.buyLbl}</b> <span class="srcb ${x.buySrc}">${srcLbl[x.buySrc]||x.buySrc}</span><br>`
+    +(x.buyOrdersEur||x.buyEconEur?`<span class="dimv">по заказам: ${x.buyOrdersEur?_fmtE(x.buyOrdersEur):'—'} · по экономике: ${x.buyEconEur?_fmtE(x.buyEconEur):'—'}</span>`
+      +(x.discrep?` <span class="srcb disc">⚠ расходятся &gt;20%</span>`:'')+`<br>`:'')
+    +`Маржа: <b style="color:${(x.marginEur||0)<0?'var(--nr)':'var(--ok)'}">${x.marginLbl}</b>${x.marginPct!=null?` <span class="dimv">(${x.marginPct}%)</span>`:''}`
+    +(x.econPaid||x.econRest?`<br><span class="dimv">оплачено ${x.econPaid||'—'} · остаток ${x.econRest||'—'}</span>`:'')
+    +`</div>`;
+  // заказы поставщикам
+  const ords=x.orders||[];
+  h+=`<div class="h">Заказы поставщикам (${ords.length})</div>`;
+  h+=ords.map(o=>`<div class="req"><div class="rt">${_esc(o.title)}</div>`
+    +`<div class="rm"><span class="sp">${_esc(o.sup)}</span><span class="pill${o.slow?' p-no_answer':''}">${_esc(_stShort(o.stageName))}</span>`
+    +(o.days!=null?`<span class="${o.slow?'nrc':''} mono">${o.days} дн${o.live?` <span class="dimv">(порог ${o.thr})</span>`:''}</span>`:'')
+    +`<span class="dimv">создан ${o.created}</span><span class="amt">${o.buyLbl}</span></div></div>`).join('')
+    ||'<div class="dimv">заказов нет'+(x.firstLag!=null&&!x.closed?` — уже ${x.firstLag} дн после входа в реализацию`:'')+'</div>';
+  document.getElementById('drwBody').innerHTML=h;
+  _ovl.classList.add('on');_drw.classList.add('on');_drw.setAttribute('aria-hidden','false');
+}
 function renderContracts(){
   const X=window.__CONTRACTS__, el=document.getElementById('tab-contracts'); if(!el) return;
   if(!X){ el.innerHTML='<div class="note" style="padding:20px 0">нет данных по контрактам</div>'; return; }
-  let sortKey='seq', sortDir=-1, q='';
-  const NUM={seq:1,saleEur:1,buyEur:1,marginEur:1};
-  const COLS=[['customer','Заказчик','l'],['deal','№ сделки / контракт','l'],['saleEur','Сумма сделки','r'],['buyEur','Закупка','r'],['marginEur','Маржа','r']];
+  let sortKey='seq', sortDir=-1, q='', mode='all';
+  const NUM={seq:1,saleEur:1,buyEur:1,marginEur:1,stageDays:1};
+  const COLS=[['customer','Заказчик','l'],['deal','№ сделки / контракт','l'],['stageDays','Стадия · дней','l'],['saleEur','Сумма сделки','r'],['buyEur','Закупка','r'],['marginEur','Маржа','r']];
   const orph=X.orphan&&X.orphan.n?` · ещё ${X.orphan.n} заказов без сделки (закупка ${X.orphan.buy})`:'';
-  el.innerHTML=`<header><div class="eyebrow">Квант · реализация</div><h1>Сделки в реализации</h1><div class="sub"><span>Источник: <b>Bitrix24 · сделки + Заказы поставщикам (СП-172)</b></span><span>Состояние: <b>${X.label}</b> · обновление каждые 2ч</span><span class="dimv">Победные сделки с заказами поставщикам${orph}</span></div></header>`
+  const R=X.rows, byDeal=Object.fromEntries(R.map(r=>[String(r.deal),r]));
+  const nSlow=R.filter(r=>r.slow&&!r.closed).length, nLive=R.filter(r=>!r.closed).length, nDone=R.filter(r=>r.done||r.closed).length;
+  const sp=X.speed||{};
+  let speedHtml='';
+  if((sp.dealBench||[]).length||(sp.orderBench||[]).length){
+    const bl=(items,color)=>{const mx=Math.max(1,...items.map(b=>b.med));return items.map(b=>`<div class="blrow"><div class="blt"><span>${_esc(_stShort(b.name))} <span class="dimv mono">n=${b.n}</span></span><b>${b.med} дн</b></div><div class="bltrack"><i style="width:${(b.med/mx*100).toFixed(0)}%;background:${color}"></i></div></div>`).join('');};
+    speedHtml=`<div class="secttl"><b>·</b> Скорость реализации${qmark('ct.speed')}</div><div class="grid">`
+      +`<section class="card"><h2>Стадии сделки — медианное время</h2><div class="note">Сколько сделка проводит в каждой стадии воронки реализации (медиана по истории). Медиана полного цикла заказа: <b>${sp.medCycle!=null?sp.medCycle+' дн':'—'}</b> · медианный лаг первого заказа: <b>${sp.medLag!=null?sp.medLag+' дн':'—'}</b>.</div><div class="barlist">${bl(sp.dealBench||[],'linear-gradient(90deg,var(--a),var(--a2))')}</div></section>`
+      +`<section class="card"><h2>Стадии заказов — где копится время</h2><div class="note">Медианная длительность стадий заказов поставщикам (СП-172), по убыванию — главные узкие места процесса закупки.</div><div class="barlist">${bl(sp.orderBench||[],'linear-gradient(90deg,var(--b),var(--b2))')}</div></section></div>`;
+  }
+  el.innerHTML=`<header><div class="eyebrow">Квант · реализация</div><h1>Сделки в реализации</h1><div class="sub"><span>Источник: <b>Bitrix24 · сделки + Заказы поставщикам (СП-172)</b></span><span>Состояние: <b>${X.label}</b></span><span class="dimv">Воронка реализации (кат.0)${orph}. Клик по строке — стадии, заказы и закупка сделки.</span></div></header>`
     +`<div class="kpis" style="grid-template-columns:repeat(6,1fr)">${X.kpis.map(p=>`<div class="kpi ${p.clz}"><div class="lbl">${p.lbl}</div><div class="val ${p.clz}">${p.val}</div><div class="meta">${p.meta}</div></div>`).join('')}</div>`
-    +`<div class="secttl"><b>·</b> Список контрактов <span id="ctCount" class="dimv" style="font-weight:400"></span></div>`
-    +`<div class="ctools"><input id="ctSearch" class="search" placeholder="Поиск: заказчик · № сделки · контракт · поставщик…"></div>`
-    +`<section class="card"><div class="note">«№» — порядковый номер сделки в реализации (из начала названия сделки, ведёт отдел). По умолчанию — по убыванию: новые сверху, удобно отслеживать появление. «Сумма сделки» — продажа клиенту. «Закупка» — Σ заказов поставщикам (СП-172). «Маржа» = продажа − закупка. Клик по заголовку — сортировка.</div><table class="ctab"><thead id="ctHead"></thead><tbody id="ctBody"></tbody></table></section>`;
+    +speedHtml
+    +`<div class="secttl"><b>·</b> Список контрактов <span id="ctCount" class="dimv" style="font-weight:400"></span>${qmark('ct.list')}</div>`
+    +`<div class="ctools" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><input id="ctSearch" class="search" style="flex:1;min-width:220px" placeholder="Поиск: заказчик · № сделки · контракт · поставщик…">`
+    +`<div class="statleg" style="margin:0" id="ctChips"><span class="stchip on" data-m="all">Все <b>${R.length}</b></span><span class="stchip" data-m="slow"><i class="dot snr"></i>Замедленные <b>${nSlow}</b></span><span class="stchip" data-m="live">Открытые <b>${nLive}</b></span><span class="stchip" data-m="done">Завершённые <b>${nDone}</b></span></div></div>`
+    +`<section class="card"><div class="note">«№» — порядковый номер сделки в реализации. «Стадия · дней» — текущая стадия воронки и сколько дней сделка в ней (краснеет при превышении порога = 2× медианы стадии). «Закупка» — Σ заказов СП-172, при их отсутствии — из экономики проекта (бейдж «эконом.»); «Маржа» = продажа − закупка, без источника закупки не считается. Красная строка — замедленная (причина в дровере). Клик по строке — детали; по заголовку — сортировка.</div><table class="ctab"><thead id="ctHead"></thead><tbody id="ctBody"></tbody></table></section>`;
   const head=()=>{document.getElementById('ctHead').innerHTML=`<tr><th class="r sortable${sortKey==='seq'?' on':''}" data-sk="seq" style="width:48px">№${sortKey==='seq'?(sortDir<0?' ▾':' ▴'):''}</th>`+COLS.map(c=>`<th class="${c[2]==='r'?'r ':''}sortable${sortKey===c[0]?' on':''}" data-sk="${c[0]}">${c[1]}${sortKey===c[0]?(sortDir<0?' ▾':' ▴'):''}</th>`).join('')+'</tr>';};
-  const mcell=x=>{const cl=x.marginEur<0?'color:var(--nr)':'color:var(--ok)';const pct=x.marginPct==null?'<span class="dimv">—</span>':(x.marginPct+'%');return `<div class="mono" style="${cl}">${x.marginLbl}</div><div class="dep">${pct}</div>`;};
+  const mcell=x=>{const cl=(x.marginEur||0)<0?'color:var(--nr)':'color:var(--ok)';const pct=x.marginPct==null?'<span class="dimv">—</span>':(x.marginPct+'%');return `<div class="mono" style="${x.marginEur==null?'color:var(--dim)':cl}">${x.marginLbl}</div><div class="dep">${pct}</div>`;};
+  const scell=x=>{
+    if(!x.inCat0)return `<div class="dep">вне воронки</div>`;
+    const nm=_esc(_stShort(x.stageName));
+    const d=x.stageDays!=null?`<span class="stgd${x.slow?' bad':''}">${Math.round(x.stageDays)} дн</span>`:'';
+    return `<div class="stgcell"><b>${nm}</b><div class="dep">${d}${x.slow?' <span class="nrc">⚠</span>':''}</div></div>`;};
+  const bcell=x=>{
+    const b=`<div class="mono" style="color:${x.buySrc==='none'?'var(--dim)':'var(--a)'}">${x.buyLbl}</div>`;
+    const tags=(x.buySrc==='econ'?'<span class="srcb econ">эконом.</span>':'')+(x.buySrc==='none'?'<span class="srcb none">нет данных</span>':'')+(x.discrep?' <span class="srcb disc">⚠≠</span>':'');
+    return b+(tags?`<div class="dep">${tags}</div>`:'');};
   function rows(){
-    let r=X.rows;
+    let r=R;
+    if(mode==='slow')r=r.filter(x=>x.slow&&!x.closed);
+    else if(mode==='live')r=r.filter(x=>!x.closed);
+    else if(mode==='done')r=r.filter(x=>x.done||x.closed);
     if(q){const s=q.toLowerCase(); r=r.filter(x=>((x.customer||'')+' '+(x.title||'')+' '+x.deal+' '+(x.suppliers||'')).toLowerCase().includes(s));}
     r=r.slice().sort((a,b)=> NUM[sortKey] ? ((a[sortKey]||0)-(b[sortKey]||0))*sortDir : String(a[sortKey]||'').localeCompare(String(b[sortKey]||''),'ru')*sortDir);
-    document.getElementById('ctCount').textContent=`(${r.length} из ${X.rows.length})`;
-    document.getElementById('ctBody').innerHTML=r.map(x=>`<tr><td class="r mono" style="color:var(--a2)">${x.seq||'—'}</td><td><div class="who">${_esc(x.customer)}</div><div class="dep">${_esc(x.title)}</div></td>`
-      +`<td><div class="mono">${x.deal?('#'+x.deal):'—'}</div><div class="dep">${x.done?'<span class="pill p-selected">завершён</span>':'<span class="pill">в реализации</span>'} ${x.norders}×закуп${x.suppliers?(' · '+_esc(x.suppliers)):''}</div></td>`
+    document.getElementById('ctCount').textContent=`(${r.length} из ${R.length})`;
+    document.getElementById('ctBody').innerHTML=r.map(x=>`<tr class="drill${x.slow&&!x.closed?' slowrow':''}" data-ct="${x.deal}"><td class="r mono" style="color:var(--a2)">${x.seq||'—'}</td><td><div class="who">${_esc(x.customer)}</div><div class="dep">${_esc(x.title)}</div></td>`
+      +`<td><div class="mono">${x.deal?('#'+x.deal):'—'}</div><div class="dep">${x.done?'<span class="pill p-selected">завершён</span>':(x.lost?'<span class="pill p-no_answer">проиграна</span>':'<span class="pill">в реализации</span>')} ${x.norders}×закуп${x.suppliers?(' · '+_esc(x.suppliers)):''}</div></td>`
+      +`<td>${scell(x)}</td>`
       +`<td class="r"><div class="mono" style="color:var(--ink)">${x.saleLbl}</div><div class="dep">${x.saleCur&&x.saleCur!=='EUR'?_esc(x.saleOrig):''}</div></td>`
-      +`<td class="r"><div class="mono" style="color:var(--a)">${x.buyLbl}</div></td>`
-      +`<td class="r">${mcell(x)}</td></tr>`).join('')||'<tr><td colspan="6" class="dimv" style="padding:14px">ничего не найдено</td></tr>';
+      +`<td class="r">${bcell(x)}</td>`
+      +`<td class="r">${mcell(x)}</td></tr>`).join('')||'<tr><td colspan="7" class="dimv" style="padding:14px">ничего не найдено</td></tr>';
   }
   head(); rows();
   document.getElementById('ctSearch').addEventListener('input',e=>{q=e.target.value; rows();});
+  document.getElementById('ctChips').addEventListener('click',e=>{const c=e.target.closest('.stchip'); if(!c)return; mode=c.dataset.m;
+    document.querySelectorAll('#ctChips .stchip').forEach(x=>x.classList.toggle('on',x===c)); rows();});
+  document.getElementById('ctBody').addEventListener('click',e=>{const tr=e.target.closest('tr[data-ct]'); if(!tr)return; const x=byDeal[tr.dataset.ct]; if(x)openContract(x);});
   document.getElementById('ctHead').addEventListener('click',e=>{const th=e.target.closest('th.sortable'); if(!th)return; const kk=th.dataset.sk; if(sortKey===kk)sortDir=-sortDir; else {sortKey=kk; sortDir=(NUM[kk]?-1:1);} head(); rows();});
 }
 // ---- вкладка «Поставщики»: список по обороту (Σ закупок СП-172)
