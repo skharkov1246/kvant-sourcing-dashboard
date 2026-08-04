@@ -29,6 +29,7 @@ BUY_ECON_VAL = "UF_CRM_1704981063967"   # «Offer sum and currency of selected s
 ECON_MARGIN = "UF_CRM_1704981084196"    # «Margin»
 ECON_PAID = "UF_CRM_1713874110281"      # «Оплачено»
 ECON_REST = "UF_CRM_1713874579940"      # «Остаток к оплате»
+ECON_LINK = "UF_CRM_1740133235324"      # ссылка (clck.ru) на файл «Экономика проекта» в Я.Диске
 
 SLOW_MIN_DAYS = 7        # порог замедленности не бывает ниже недели
 SLOW_MULT = 2.0          # … и не ниже 2× медианы по стадии
@@ -125,7 +126,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
     # 3. вселенная: сделки ВОРОНКИ РЕАЛИЗАЦИИ (кат.0) + родители заказов вне её
     DSEL = ["ID", "TITLE", "OPPORTUNITY", "CURRENCY_ID", "COMPANY_ID", "STAGE_ID",
             "STAGE_SEMANTIC_ID", "CATEGORY_ID", "DATE_CREATE",
-            BUY_ECON_RUB, BUY_ECON_VAL, ECON_MARGIN, ECON_PAID, ECON_REST]
+            BUY_ECON_RUB, BUY_ECON_VAL, ECON_MARGIN, ECON_PAID, ECON_REST, ECON_LINK]
     cat0 = client.list_deals_fast(filter={"CATEGORY_ID": 0}, select=DSEL)
     deals: dict[str, dict] = {str(d["ID"]): d for d in cat0}
     extra_ids = [d for d in by_deal if d and d not in deals]
@@ -196,6 +197,9 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
         discrep = (buy_orders > 0 and buy_econ > 0
                    and abs(buy_orders - buy_econ) / max(buy_orders, buy_econ) > 0.2)
         margin = (sale - buy) if (sale and buy_src != "none") else None
+        # красный флаг: экономики проекта нет ни ссылкой на файл, ни money-полями
+        econ_link = str(d.get(ECON_LINK) or "").strip()
+        no_econ = not econ_link and buy_econ <= 0
 
         # --- тайминг стадий сделки в кат.0
         tl = dhist.get(did, [])
@@ -271,7 +275,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
             "saleOrig": _orig(d.get("OPPORTUNITY"), d.get("CURRENCY_ID")), "saleCur": d.get("CURRENCY_ID") or "",
             "buyEur": round(buy), "buyLbl": _money(buy) if buy_src != "none" else "—",
             "buySrc": buy_src, "buyOrdersEur": round(buy_orders), "buyEconEur": round(buy_econ),
-            "discrep": discrep,
+            "discrep": discrep, "econLink": bool(econ_link), "noEcon": no_econ,
             "marginEur": round(margin) if margin is not None else None,
             "marginLbl": _money(margin) if margin is not None else "—",
             "marginPct": round(margin / sale * 100) if (margin is not None and sale) else None,
@@ -305,11 +309,37 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
     med_cycle = _median(cycle_days)
     med_lag = _median(lag_vals)
 
+    # текущая просрочка по стадиям: сколько живых сидит в стадии, сколько из них за порогом
+    # и сколько дней в среднем теряется сверх порога
+    o_now: dict[str, list] = defaultdict(lambda: [0, 0, 0.0])   # stage → [в стадии, просрочено, Σ дней сверх порога]
+    d_now: dict[str, list] = defaultdict(lambda: [0, 0, 0.0])
+    for r in rows:
+        if not r["closed"] and r["inCat0"] and r["stageDays"] is not None:
+            a = d_now[r["stage"]]
+            a[0] += 1
+            if r["stageDays"] > r["stageThr"]:
+                a[1] += 1
+                a[2] += r["stageDays"] - r["stageThr"]
+        for o in r["orders"]:
+            if o["live"] and o["days"] is not None:
+                a = o_now[o["stage"]]
+                a[0] += 1
+                if o["days"] > o["thr"]:
+                    a[1] += 1
+                    a[2] += o["days"] - o["thr"]
+
+    def _now_stats(s: str, now: dict) -> dict:
+        live_n, over_n, lost = now.get(s, [0, 0, 0.0])
+        return {"live": live_n, "over": over_n,
+                "lostAvg": round(lost / over_n, 1) if over_n else 0}
+
     # бенчмарки стадий заказов для графика «где копится время» (только осмысленные стадии)
-    bench = [{"stage": s, "name": _stage_name(s), "med": m, "n": len(odur[s])}
+    bench = [{"stage": s, "name": _stage_name(s), "med": m, "n": len(odur[s]),
+              **_now_stats(s, o_now)}
              for s, m in sorted(omed.items(), key=lambda kv: -kv[1])
              if len(odur[s]) >= 5 and not (s.endswith(":FAIL"))][:14]
-    dbench = [{"stage": s, "name": _stage_name(s), "med": m, "n": len(ddur[s])}
+    dbench = [{"stage": s, "name": _stage_name(s), "med": m, "n": len(ddur[s]),
+               **_now_stats(s, d_now)}
               for s, m in dmed.items() if len(ddur[s]) >= 5]
     dbench.sort(key=lambda x: dorder.get(x["stage"], 99))
 
