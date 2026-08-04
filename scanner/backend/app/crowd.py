@@ -8,6 +8,7 @@
 from __future__ import annotations
 
 import datetime as dt
+import hashlib
 import uuid
 from dataclasses import dataclass, field
 
@@ -63,6 +64,8 @@ class Submission:
     submitted_at: dt.datetime = dt.datetime(2026, 1, 1)
     state: str = "RECEIVED"
     reject_reason: str | None = None
+    # Выборочный постфактум-аудит (docs/15): помечается при приёме.
+    audit_due: bool = False
     id: str = field(default_factory=lambda: str(uuid.uuid4()))
 
 
@@ -273,6 +276,9 @@ class CrowdEngine:
 
     def _accept(self, sub: Submission, c: Contributor) -> Submission:
         sub.state = "ACCEPTED"
+        # Выборка на постфактум-аудит решается В МОМЕНТ приёма и детерминна
+        # от id: повтор запроса или рестарт не меняют судьбу сабмишена.
+        sub.audit_due = _in_audit_sample(sub.id, self.policy.audit_sample_pct)
         self._sha_index.add(sub.content_sha256)
         if sub.phash:
             self._phash_index.add(sub.phash)
@@ -280,6 +286,13 @@ class CrowdEngine:
         self._post(c.id, "ACCRUAL", self.policy.base_scan_cents_eur, sub.id,
                    campaign_id=sub.campaign_id)
         return sub
+
+    def audit_sample(self) -> list[Submission]:
+        """Принятые сканы, попавшие в выборку постфактум-аудита. Фрод по
+        итогам проверки идёт через clawback — начисление сторнируется
+        отдельной строкой, участник приостанавливается (C-2)."""
+        return [s for s in self.submissions.values()
+                if s.state == "ACCEPTED" and s.audit_due]
 
     def _reject(self, sub: Submission, reason: str) -> Submission:
         sub.state = "REJECTED"
@@ -304,6 +317,21 @@ class CrowdEngine:
         if c.status != "ACTIVE":
             raise CrowdError(f"Участник {contributor_id} в статусе {c.status}")
         return c
+
+
+def _in_audit_sample(submission_id: str, pct: int) -> bool:
+    """Детерминированная выборка ~pct% по хешу id сабмишена.
+
+    id уже случаен (uuid4) — хеш даёт равномерность распределения, а
+    детерминизм от id означает воспроизводимость: та же заявка всегда либо
+    в выборке, либо нет, никакого Math.random в денежном контуре.
+    """
+    if pct <= 0:
+        return False
+    if pct >= 100:
+        return True
+    digest = hashlib.sha256(submission_id.encode("utf-8")).digest()
+    return int.from_bytes(digest[:2], "big") % 100 < pct
 
 
 def _phash_distance(a: str, b: str) -> int:

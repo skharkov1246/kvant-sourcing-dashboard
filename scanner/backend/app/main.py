@@ -1220,6 +1220,21 @@ def crowd_clawback(
     return {"id": entry.id, "kind": entry.kind, "amount_cents_eur": entry.amount_cents_eur}
 
 
+@app.get("/v1/crowd/audit-sample", tags=["crowd"])
+def crowd_audit_sample(principal: Principal = Depends(current_principal)) -> dict[str, Any]:
+    """Список принятых сканов на выборочный постфактум-аудит (docs/15,
+    audit_sample_pct тарифа). Фрод по итогам проверки — через clawback:
+    начисление сторнируется отдельной строкой, участник приостанавливается."""
+    _require_reviewer(principal)
+    items = [
+        {"id": s.id, "contributor_id": s.contributor_id,
+         "quality_score": s.quality_score, "campaign_id": s.campaign_id,
+         "content_sha256": s.content_sha256}
+        for s in _crowd(principal.tenant_id).audit_sample()
+    ]
+    return {"items": items, "count": len(items)}
+
+
 @app.get("/v1/crowd/contributors/{contributor_id}/ledger", tags=["crowd"])
 def crowd_ledger(
     contributor_id: str, principal: Principal = Depends(current_principal),

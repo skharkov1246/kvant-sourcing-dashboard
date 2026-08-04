@@ -223,6 +223,35 @@ class TestCrowdSessionToReward:
         assert r.json()["reject_reason"] == "quality"
 
 
+class TestAuditSampleEndpoint:
+    def test_sample_lists_accepted_for_audit(self, http):
+        """При тарифе 100% каждый принятый скан виден аудитору; фрод по
+        итогам проверки идёт существующим clawback."""
+        from app.crowd import CrowdEngine, RewardPolicy
+
+        main_module._CROWD_ENGINES["t-internal"] = CrowdEngine(
+            RewardPolicy(audit_sample_pct=100))
+        cid = _contributor(http)
+        sid = _submit(http, cid, "sha-audit-1").json()["id"]
+
+        sample = http.get("/v1/crowd/audit-sample", headers=REVIEWER).json()
+        assert sample["count"] == 1
+        assert sample["items"][0]["id"] == sid
+        assert sample["items"][0]["contributor_id"] == cid
+
+        # Аудитор нашёл фрод — сторно существующим клобэком: история не
+        # переписывается (C-2), скан остаётся ACCEPTED со строкой CLAWBACK,
+        # а участник приостановлен и новых сканов не сдаст.
+        r = http.post(f"/v1/crowd/submissions/{sid}/clawback",
+                      headers=REVIEWER, json={"reason": "фото с экрана"})
+        assert r.json()["amount_cents_eur"] == -500
+        assert _submit(http, cid, "sha-audit-2").status_code == 409
+
+    def test_audit_sample_requires_reviewer(self, http):
+        assert http.get("/v1/crowd/audit-sample",
+                        headers=OPERATOR).status_code == 403
+
+
 class TestRolesAndAudit:
     def test_operator_cannot_touch_money_endpoints(self, http):
         assert http.post("/v1/crowd/contributors", headers=OPERATOR, json={

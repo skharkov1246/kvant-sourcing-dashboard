@@ -182,3 +182,58 @@ class TestPayouts:
         c = engine.register(_contributor())
         with pytest.raises(CrowdError, match="Баланс пуст"):
             engine.create_payout(c.id, "NPD")
+
+
+class TestAuditSample:
+    """Выборочный постфактум-аудит (audit_sample_pct): детерминированная
+    доля принятых уходит на проверку — без Math.random в денежном контуре."""
+
+    def _wide_policy(self, pct):
+        return RewardPolicy(audit_sample_pct=pct,
+                            daily_cap_scans=10_000, hourly_flag_threshold=10_000)
+
+    def test_sample_share_is_close_to_tariff(self):
+        engine = CrowdEngine(self._wide_policy(10))
+        c = engine.register(_contributor())
+        for i in range(400):
+            engine.submit(_sub(c, sha=f"sha-{i}", minutes=i))
+        share = len(engine.audit_sample()) / 400
+        assert 0.04 <= share <= 0.16, f"доля выборки {share} далека от 10%"
+
+    def test_sampling_is_deterministic_by_id(self):
+        """Та же заявка в двух движках — одна судьба: выборка от id, а не
+        от случайности процесса."""
+        first = CrowdEngine(self._wide_policy(10))
+        second = CrowdEngine(self._wide_policy(10))
+        c1 = first.register(_contributor())
+        c2 = second.register(_contributor())
+        for i in range(50):
+            sid = f"fixed-id-{i}"
+            first.submit(Submission(contributor_id=c1.id, content_sha256=f"a{i}",
+                                    quality_score=0.9, submitted_at=T0, id=sid))
+            second.submit(Submission(contributor_id=c2.id, content_sha256=f"a{i}",
+                                     quality_score=0.9, submitted_at=T0, id=sid))
+        assert ([s.id for s in first.audit_sample()]
+                == [s.id for s in second.audit_sample()])
+
+    def test_clamp_zero_and_hundred(self):
+        none = CrowdEngine(self._wide_policy(0))
+        c = none.register(_contributor())
+        for i in range(20):
+            none.submit(_sub(c, sha=f"z-{i}", minutes=i))
+        assert none.audit_sample() == []
+
+        every = CrowdEngine(self._wide_policy(100))
+        c2 = every.register(_contributor())
+        for i in range(20):
+            every.submit(_sub(c2, sha=f"h-{i}", minutes=i))
+        assert len(every.audit_sample()) == 20
+
+    def test_rejected_scans_never_reach_audit(self):
+        """Аудитим только оплаченное: отклонённый скан денег не получил,
+        проверять его постфактум нечего."""
+        engine = CrowdEngine(self._wide_policy(100))
+        c = engine.register(_contributor())
+        engine.submit(_sub(c, sha="same"))
+        engine.submit(_sub(c, sha="same", minutes=1))  # дубль
+        assert len(engine.audit_sample()) == 1
