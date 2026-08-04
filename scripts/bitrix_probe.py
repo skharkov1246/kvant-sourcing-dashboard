@@ -1,13 +1,10 @@
-"""CI-зонд v9: чей курс валют верен, какое поле коллеги считают дедлайном, и масштаб пропусков.
+"""CI-зонд v10: определить поля «ОСС», «схема поставки», город и дату курса.
 
-1. Курсы валют Битрикса (значение + дата обновления) — источник наших € и их $.
-2. Идентификация поля-дедлайна: сверяем даты из файла коллег со всеми date-полями СП-172.
-3. Масштаб: сколько живых заказов реально просрочено по плановым полям, сколько из них
-   в файле коллег, и сколько из них НАШ движок не пометил бы (свежая стадия < 7 дн).
+Сверяем гипотезы против файла коллег: у них по каждому заказу известны oss / manager /
+schema / delivery_city — ищем, какие поля Битрикса дают ровно эти значения.
 """
 from __future__ import annotations
 
-import datetime as dt
 import json
 import os
 import re
@@ -15,17 +12,7 @@ import re
 import requests
 
 ROWS = json.load(open(os.path.join(os.path.dirname(__file__), "_coll_rows.json"), encoding="utf-8"))
-TODAY = dt.date(2026, 8, 4)
-DEADLINE_FLDS = {
-    "ufCrm20_1728900218435": "Date of deadline to customer",
-    "ufCrm20_1723236261": "Customer delivery date, planned",
-    "ufCrm20_1709294315471": "Inbound Delivery Date, planned",
-    "ufCrm20_1723235828": "Supplier Shipment Date, planned",
-    "ufCrm20_1724941935": "Production end date, budget",
-    "ufCrm20_1724942005": "Customer delivery date, budget",
-    "ufCrm20_1723385006": "Customer Shipment Date, planned",
-    "ufCrm20_1723400865529": "Дата окончания производства",
-}
+FULL = json.load(open(os.path.join(os.path.dirname(__file__), "_coll_full.json"), encoding="utf-8"))
 
 
 def bx(method: str, params: dict | None = None) -> dict:
@@ -58,28 +45,27 @@ def okey(t) -> str:
 
 
 def main() -> int:
-    print("=== 1. КУРСЫ ВАЛЮТ в Битриксе (наш и их источник денег) ===")
-    cur = bx("crm.currency.list", {}).get("result") or []
-    base_cur = None
-    for c in cur:
-        amt, cnt = float(c.get("AMOUNT") or 1), float(c.get("AMOUNT_CNT") or 1)
-        if c.get("BASE") == "Y":
-            base_cur = c.get("CURRENCY")
-        print(f"  {c.get('CURRENCY')}: AMOUNT={c.get('AMOUNT')} CNT={c.get('AMOUNT_CNT')} "
-              f"→ 1 {c.get('CURRENCY')} = {amt/cnt:.4f} базовой  base={c.get('BASE')} "
-              f"обновлено={str(c.get('DATE_UPDATE'))[:10]}")
-    rate = {c.get("CURRENCY"): float(c.get("AMOUNT") or 1) / float(c.get("AMOUNT_CNT") or 1) for c in cur}
-    print(f"  базовая валюта: {base_cur}")
-    if rate.get("USD") and rate.get("RUB"):
-        print(f"  → по Битриксу: 1 USD = {rate['USD']/rate['RUB']:.2f} RUB, "
-              f"1 EUR = {rate.get('EUR',0)/rate['RUB']:.2f} RUB, "
-              f"1 EUR = {rate.get('EUR',0)/rate['USD']:.4f} USD")
-    print("  → у коллег (из расхождений): 1 USD ≈ 73.4 RUB, 1 EUR ≈ 1.146 USD")
+    print("=== 1. Все пользовательские поля СП-172 (кандидаты: схема, город, ОСС) ===")
+    f = bx("crm.item.fields", {"entityTypeId": 172}).get("result", {}).get("fields", {})
+    interesting = {}
+    for k, v in f.items():
+        t = (v.get("title") or "").lower()
+        if any(w in t for w in ("схем", "scheme", "город", "city", "адрес", "достав", "delivery",
+                                "ответствен", "осс", "сопровожд", "менеджер")):
+            interesting[k] = v.get("title")
+            print(f"  {k}: «{v.get('title')}» type={v.get('type')} items={len(v.get('items') or [])}")
+    print(f"  (всего полей в СП-172: {len(f)})")
 
-    # ---------- 2. какое поле = «дедлайн» в их файле ----------
+    print("\n=== 2. Списочные поля СП-172 со значениями (ищем схему поставки) ===")
+    for k, v in f.items():
+        its = v.get("items") or []
+        if its and 2 <= len(its) <= 15:
+            vals = [str(i.get("VALUE"))[:34] for i in its][:9]
+            print(f"  {k} «{str(v.get('title'))[:40]}»: {vals}")
+
+    # ---------- 3. проверка гипотез по данным ----------
     dealids = sorted({r["deal"] for r in ROWS if r["deal"]})
-    OSEL = ["id", "title", "parentId2", "opportunity", "currencyId", "stageId", "movedTime",
-            "createdTime"] + list(DEADLINE_FLDS)
+    OSEL = ["id", "title", "parentId2", "assignedById", "companyId", "stageId"] + list(interesting)
     orders = []
     for i in range(0, len(dealids), 50):
         orders += bx_all("crm.item.list", {"entityTypeId": 172,
@@ -89,83 +75,64 @@ def main() -> int:
         k = okey(o.get("title"))
         if k:
             bykey.setdefault(k, o)
+    deals = {}
+    for i in range(0, len(dealids), 50):
+        for d in bx_all("crm.deal.list", {"filter": {"ID": dealids[i:i + 50]},
+                                          "select": ["ID", "ASSIGNED_BY_ID", "TITLE"]}):
+            deals[str(d["ID"])] = d
 
-    print("\n=== 2. КАКОЕ ПОЛЕ коллеги показывают как «дедлайн» ===")
-    hits = {f: 0 for f in DEADLINE_FLDS}
-    checked = 0
-    for r in ROWS:
-        o = bykey.get(okey(r["order"]))
-        if not o or not r.get("dl"):
+    uids = {str(o.get("assignedById")) for o in orders if o.get("assignedById")}
+    uids |= {str(d.get("ASSIGNED_BY_ID")) for d in deals.values() if d.get("ASSIGNED_BY_ID")}
+    users = {}
+    for u in bx_all("user.get", {"FILTER": {"ID": sorted(uids)}}) or []:
+        users[str(u.get("ID"))] = f"{u.get('NAME') or ''} {u.get('LAST_NAME') or ''}".strip()
+    if not users:                       # user.get не принимает список — добираем поштучно
+        for uid in sorted(uids):
+            u = (bx("user.get", {"ID": uid}).get("result") or [{}])[0]
+            users[uid] = f"{u.get('NAME') or ''} {u.get('LAST_NAME') or ''}".strip()
+
+    print(f"\n=== 3. Сверка с файлом коллег ({len(FULL)} строк) ===")
+    hit_oss_order = hit_mgr_order = hit_oss_deal = hit_mgr_deal = tested = 0
+    schema_hits = {}
+    city_hits = {}
+    for r in FULL:
+        o = bykey.get(okey(r.get("order")))
+        if not o:
             continue
-        checked += 1
-        their = "-".join(r["dl"].split(".")[::-1])          # ДД.ММ.ГГГГ → ГГГГ-ММ-ДД
-        for f in DEADLINE_FLDS:
-            if str(o.get(f) or "")[:10] == their:
-                hits[f] += 1
-    for f, n in sorted(hits.items(), key=lambda kv: -kv[1]):
-        print(f"  {DEADLINE_FLDS[f][:38]:40s} совпало у {n} из {checked} строк")
+        tested += 1
+        resp_o = users.get(str(o.get("assignedById")), "")
+        d = deals.get(str(o.get("parentId2")) or "")
+        resp_d = users.get(str((d or {}).get("ASSIGNED_BY_ID")), "")
+        if r.get("oss") and resp_o and r["oss"].lower() == resp_o.lower():
+            hit_oss_order += 1
+        if r.get("manager") and resp_o and r["manager"].lower() == resp_o.lower():
+            hit_mgr_order += 1
+        if r.get("oss") and resp_d and r["oss"].lower() == resp_d.lower():
+            hit_oss_deal += 1
+        if r.get("manager") and resp_d and r["manager"].lower() == resp_d.lower():
+            hit_mgr_deal += 1
+        for k in interesting:
+            v = o.get(k)
+            if v and r.get("schema") and str(v).strip().lower() == str(r["schema"]).strip().lower():
+                schema_hits[k] = schema_hits.get(k, 0) + 1
+            if v and r.get("delivery_city") and str(v).strip().lower() == str(r["delivery_city"]).strip().lower():
+                city_hits[k] = city_hits.get(k, 0) + 1
+    print(f"  сопоставлено заказов: {tested}")
+    print(f"  «ОСС»      = ответственный ЗАКАЗА: {hit_oss_order} | ответственный СДЕЛКИ: {hit_oss_deal}")
+    print(f"  «Менеджер» = ответственный ЗАКАЗА: {hit_mgr_order} | ответственный СДЕЛКИ: {hit_mgr_deal}")
+    print(f"  «Схема» совпала с полями: {schema_hits or '— не найдено среди отобранных'}")
+    print(f"  «Город» совпал с полями: {city_hits or '— не найдено среди отобранных'}")
 
-    # то же для колонки prod_end
-    hits2 = {f: 0 for f in DEADLINE_FLDS}
-    for r in ROWS:
-        o = bykey.get(okey(r["order"]))
-        pe = r.get("prod_end") if isinstance(r.get("prod_end"), str) else None
-        if not o or not pe:
-            continue
-        their = "-".join(pe.split(".")[::-1])
-        for f in DEADLINE_FLDS:
-            if str(o.get(f) or "")[:10] == their:
-                hits2[f] += 1
-    if any(hits2.values()):
-        print("  (колонка «конец пр-ва»):", {DEADLINE_FLDS[f][:26]: n for f, n in hits2.items() if n})
+    # если схема не нашлась — перебираем ВСЕ строковые/списочные поля одного заказа
+    if not schema_hits:
+        print("\n  --- поиск схемы по всем полям (значения первых 3 заказов) ---")
+        for o in orders[:3]:
+            print(f"   заказ {str(o.get('title'))[:34]}:")
+            for k, v in o.items():
+                if isinstance(v, str) and v and len(v) < 60 and k.startswith("ufCrm"):
+                    print(f"     {k} = {v[:52]}")
 
-    # ---------- 3. масштаб просрочки по всему СП-172 ----------
-    print("\n=== 3. МАСШТАБ: просрочка по всем живым заказам СП-172 ===")
-    allo = bx_all("crm.item.list", {"entityTypeId": 172, "select": OSEL})
-    live = [o for o in allo if not str(o.get("stageId", "")).endswith((":SUCCESS", ":FAIL"))]
-    theirkeys = {okey(r["order"]) for r in ROWS}
-    theirov = {okey(r["order"]) for r in ROWS if r.get("sec") == "overdue"}
-    print(f"  живых заказов всего: {len(live)}; строк у коллег: {len(theirkeys)} (просрочено {len(theirov)})")
-
-    MAIN = "ufCrm20_1728900218435"
-    od = []
-    for o in live:
-        v = str(o.get(MAIN) or "")[:10]
-        if v and v < TODAY.isoformat():
-            days = (TODAY - dt.date.fromisoformat(v)).days
-            od.append((days, o))
-    od.sort(key=lambda x: -x[0])
-    inn = sum(1 for _, o in od if okey(o.get("title")) in theirkeys)
-    print(f"\n  просрочено по «{DEADLINE_FLDS[MAIN]}»: {len(od)} живых заказов")
-    print(f"    из них есть в файле коллег: {inn} ({100*inn//max(len(od),1)}%) → НЕ ПОКРЫТО: {len(od)-inn}")
-    b = {"<30 дн": 0, "30-90": 0, "90-180": 0, ">180": 0}
-    for d, _ in od:
-        b["<30 дн" if d < 30 else "30-90" if d < 90 else "90-180" if d < 180 else ">180"] += 1
-    print(f"    глубина просрочки: {b}")
-
-    # сколько из просроченных наш движок НЕ пометил бы (стадия сменилась недавно)
-    fresh = []
-    for d, o in od:
-        mv = str(o.get("movedTime") or "")[:10]
-        if mv:
-            age = (TODAY - dt.date.fromisoformat(mv)).days
-            if age < 7:                       # ниже нашего минимального порога SLOW_MIN_DAYS
-                fresh.append((d, age, o))
-    print(f"    из них НАШ движок точно не пометит (возраст стадии <7 дн): {len(fresh)}")
-    print("\n  топ-10 самых просроченных (глубина, дн стадии, заказ):")
-    for d, o in od[:10]:
-        mv = str(o.get("movedTime") or "")[:10]
-        age = (TODAY - dt.date.fromisoformat(mv)).days if mv else None
-        mark = "✓в файле" if okey(o.get("title")) in theirkeys else "✗НЕТ в файле"
-        print(f"    -{d:>4} дн | стадия {str(age):>4} дн | {str(o.get('title'))[:44]:46s} {mark}")
-
-    # разрез по «сколько денег» в непокрытой просрочке
-    rate_usd = rate.get("USD") or 1
-    lost = sum(float(o.get("opportunity") or 0) * rate.get(o.get("currencyId"), 1) / rate_usd
-               for _, o in od if okey(o.get("title")) not in theirkeys)
-    print(f"\n  Σ закупки по НЕПОКРЫТОЙ просрочке: ${lost:,.0f}")
-
-    print("\n✓ зонд v9 завершён")
+    print("\n✓ зонд v10 завершён")
     return 0
 
 
