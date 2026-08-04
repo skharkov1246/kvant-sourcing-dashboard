@@ -31,6 +31,16 @@ ECON_PAID = "UF_CRM_1713874110281"      # «Оплачено»
 ECON_REST = "UF_CRM_1713874579940"      # «Остаток к оплате»
 ECON_LINK = "UF_CRM_1740133235324"      # ссылка (clck.ru) на файл «Экономика проекта» в Я.Диске
 
+# плановые даты заказа СП-172 (см. зонд v9: поле дедлайна подтверждено на 72/72 строк
+# выгрузки «Контроль дедлайнов» — коллеги контролируют именно его)
+DL_CUSTOMER = "ufCrm20_1728900218435"   # «Date of deadline to customer» — обещано клиенту
+PROD_END = "ufCrm20_1724941935"         # «Production end date, budget» — плановый конец производства
+INBOUND_PLAN = "ufCrm20_1709294315471"  # «Inbound Delivery Date, planned» — плановое поступление
+SCHEMA_F = "ufCrm20_1724941500"         # «Схема поставки» (справочник, 39 значений)
+CITY_F = "ufCrm20_1742552190053"        # «Город доставки заказчику по бюджету»
+OSS_F = "ufCrm20_1723236618"            # «Deal support specialist» — ОСС заказа (совпал 73/74)
+OSS_DEAL = "UF_CRM_1715604558"          # «Сопровождение сделки» — тот же человек на сделке (74/74)
+
 SLOW_MIN_DAYS = 7        # порог замедленности не бывает ниже недели
 SLOW_MULT = 2.0          # … и не ниже 2× медианы по стадии
 HIST_SINCE = "2024-06-01T00:00:00"  # глубина истории стадий (бенчмарки + таймлайны)
@@ -82,6 +92,15 @@ def _days_between(a: str, b: str) -> float | None:
     return max((db - da).total_seconds() / 86400.0, 0.0)
 
 
+def _pdate(v) -> dt.date | None:
+    """Плановая дата из поля СП-172 ('2026-03-31T03:00:00+03:00' или '2026-03-31') → date."""
+    s = str(v or "")[:10]
+    try:
+        return dt.date.fromisoformat(s)
+    except ValueError:
+        return None
+
+
 def _median(vals: list) -> float | None:
     sv = sorted(v for v in vals if v is not None)
     if not sv:
@@ -108,13 +127,31 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
     curlist = client.call("crm.currency.list", {}) or []
     rate = {x.get("CURRENCY"): (float(x.get("AMOUNT") or 1) / float(x.get("AMOUNT_CNT") or 1)) for x in curlist}
     def eur(o, cu): return float(o or 0) * rate.get(cu, 1.0)
+    # курсы в Битриксе заданы вручную и не тянутся из внешнего источника — показываем дату,
+    # чтобы расхождение с любой другой отчётностью было объяснимо, а не спорно
+    rate_dates = [str(x.get("DATE_UPDATE") or "")[:10] for x in curlist
+                  if x.get("CURRENCY") in ("RUB", "USD", "EUR") and x.get("DATE_UPDATE")]
+    _asof = min(rate_dates) if rate_dates else ""
+    _d = _pdate(_asof)
+    rate_asof = _d.strftime("%d.%m.%Y") if _d else _asof
+    base_cur = next((x.get("CURRENCY") for x in curlist if x.get("BASE") == "Y"), "EUR")
 
     # 1. все непроигранные заказы поставщикам (закупки)
     orders = client.list_items(172, filter={}, select=["id", "title", "companyId", "parentId2",
                                                         "opportunity", "currencyId", "stageId",
-                                                        "createdTime", "movedTime"])
+                                                        "createdTime", "movedTime",
+                                                        "assignedById",
+                                                        DL_CUSTOMER, PROD_END, INBOUND_PLAN,
+                                                        SCHEMA_F, CITY_F, OSS_F])
     orders = [o for o in orders if not str(o.get("stageId", "")).endswith(":FAIL")]
     supl = client.companies_by_ids({str(o["companyId"]) for o in orders if o.get("companyId")})
+    # справочник «Схема поставки»: значения приходят ID-шками
+    try:
+        f172 = (client.call("crm.item.fields", {"entityTypeId": 172}) or {}).get("fields", {})
+        schema_enum = {str(i.get("ID")): i.get("VALUE")
+                       for i in ((f172.get(SCHEMA_F) or {}).get("items") or [])}
+    except Exception:
+        schema_enum = {}
 
     # 2. группировка заказов по сделке
     by_deal: dict[str, list] = defaultdict(list)
@@ -125,7 +162,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
 
     # 3. вселенная: сделки ВОРОНКИ РЕАЛИЗАЦИИ (кат.0) + родители заказов вне её
     DSEL = ["ID", "TITLE", "OPPORTUNITY", "CURRENCY_ID", "COMPANY_ID", "STAGE_ID",
-            "STAGE_SEMANTIC_ID", "CATEGORY_ID", "DATE_CREATE",
+            "STAGE_SEMANTIC_ID", "CATEGORY_ID", "DATE_CREATE", "ASSIGNED_BY_ID", OSS_DEAL,
             BUY_ECON_RUB, BUY_ECON_VAL, ECON_MARGIN, ECON_PAID, ECON_REST, ECON_LINK]
     cat0 = client.list_deals_fast(filter={"CATEGORY_ID": 0}, select=DSEL)
     deals: dict[str, dict] = {str(d["ID"]): d for d in cat0}
@@ -217,9 +254,13 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
         done = sem == "S" or (bool(ords) and all(str(o.get("stageId", "")).endswith(":SUCCESS") for o in ords))
         closed = sem in ("S", "F")
 
-        # --- заказы: стадия, возраст стадии, замедленность
+        # --- заказы: стадия, возраст стадии, дедлайн клиенту, замедленность
         ords_det = []
         slow_orders = 0
+        late_orders = 0            # заказов с просроченным обещанием клиенту
+        worst_late = None          # самая глубокая просрочка по сделке, дн
+        late_buy = 0.0             # закупка под просроченными заказами, €
+        no_dl = 0                  # живых заказов без плановой даты клиенту
         first_order_ts = min((str(o.get("createdTime") or "") for o in ords), default="")
         for o in ords:
             osid = str(o.get("stageId") or "")
@@ -231,16 +272,38 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
             oslow = bool(olive and odays is not None and odays > othr)
             if oslow:
                 slow_orders += 1
+            # обещание клиенту: та же дата, по которой снабжение ведёт «Контроль дедлайнов»
+            dl = _pdate(o.get(DL_CUSTOMER))
+            dl_days = (today - dl).days if dl else None       # >0 — просрочено, <0 — есть запас
+            olate = bool(olive and dl_days is not None and dl_days > 0)
+            obuy = eur(o.get("opportunity"), o.get("currencyId"))
+            if olate:
+                late_orders += 1
+                late_buy += obuy
+                worst_late = dl_days if worst_late is None else max(worst_late, dl_days)
+            if olive and not dl:
+                no_dl += 1
+            pend = _pdate(o.get(PROD_END))
             ords_det.append({
                 "id": str(o.get("id")), "title": str(o.get("title") or "")[:70],
                 "sup": supl.get(str(o.get("companyId"))) or "—",
                 "stage": osid, "stageName": _stage_name(osid),
                 "days": odays, "thr": round(othr, 1), "slow": oslow, "live": olive,
-                "buyLbl": _money(eur(o.get("opportunity"), o.get("currencyId"))),
-                "buyRaw": round(eur(o.get("opportunity"), o.get("currencyId"))),
+                "buyLbl": _money(obuy), "buyRaw": round(obuy),
                 "created": str(o.get("createdTime") or "")[:10],
+                "dl": dl.strftime("%d.%m.%Y") if dl else "",
+                "dlDays": dl_days, "late": olate,
+                "schema": schema_enum.get(str(o.get(SCHEMA_F)), "") if o.get(SCHEMA_F) else "",
+                "city": str(o.get(CITY_F) or ""),
+                "oss": client.user_name(o.get(OSS_F)) if o.get(OSS_F) else "",
+                "prodEnd": pend.strftime("%d.%m.%Y") if pend else "",
+                # план производства заканчивается позже обещания клиенту — план сам себе противоречит
+                "prodAfterDl": bool(pend and dl and pend > dl),
+                "inb": (_pdate(o.get(INBOUND_PLAN)).strftime("%d.%m.%Y")
+                        if _pdate(o.get(INBOUND_PLAN)) else ""),
             })
-        ords_det.sort(key=lambda x: (not x["live"], -(x["days"] or 0)))
+        ords_det.sort(key=lambda x: (not x["live"], -(x["dlDays"] if x["dlDays"] is not None else -9999),
+                                     -(x["days"] or 0)))
 
         # --- лаг заведения первого заказа (вход в кат.0 → первый заказ)
         first_lag = None
@@ -254,8 +317,11 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
         slow_deal = bool(not closed and in_cat0 and stage_days is not None and stage_days > dthr)
         no_orders_slow = bool(not closed and in_cat0 and not ords
                               and first_lag is not None and first_lag > SLOW_MIN_DAYS)
-        slow = slow_deal or slow_orders > 0 or no_orders_slow
+        late = bool(not closed and late_orders)
+        slow = slow_deal or slow_orders > 0 or no_orders_slow or late
         why = []
+        if late:
+            why.append(f"просрочено обещание клиенту: {late_orders} заказ(ов), макс. {worst_late} дн")
         if slow_deal:
             why.append(f"стадия «{_stage_name(cur_stage)}» {stage_days} дн (порог {round(dthr, 1)})")
         if slow_orders:
@@ -282,12 +348,24 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
             "econPaid": _money(_parse_econ_money(d.get(ECON_PAID), rate)) if d.get(ECON_PAID) else "",
             "econRest": _money(_parse_econ_money(d.get(ECON_REST), rate)) if d.get(ECON_REST) else "",
             "norders": len(ords), "suppliers": ", ".join(suppliers)[:70],
+            # разрезы, которые ведёт снабжение: ответственный сделки, схема поставки, город
+            "manager": client.user_name(d.get("ASSIGNED_BY_ID")) or "—",
+            "oss": (", ".join(sorted({o["oss"] for o in ords_det if o["oss"]}))[:60]
+                    or client.user_name(d.get(OSS_DEAL)) or "—"),
+            "schemas": ", ".join(sorted({o["schema"] for o in ords_det if o["schema"]}))[:60],
+            "cities": ", ".join(sorted({o["city"] for o in ords_det if o["city"]}))[:50],
             "done": done, "closed": closed, "lost": sem == "F",
             "inCat0": in_cat0,
             "stage": cur_stage,
             "stageName": _stage_name(cur_stage) if in_cat0 else "вне воронки",
             "stageDays": stage_days, "stageThr": round(dthr, 1),
             "slow": slow, "why": " · ".join(why),
+            # дедлайн клиенту (поле «Date of deadline to customer» заказов СП-172)
+            "late": late, "lateN": late_orders, "lateDays": worst_late,
+            "lateBuy": round(late_buy), "lateBuyLbl": _money(late_buy),
+            "noDl": no_dl,
+            "dlNext": min((o["dl"] for o in ords_det if o["live"] and o["dl"]),
+                          key=lambda s: s[6:] + s[3:5] + s[:2], default=""),
             "firstLag": first_lag,
             "timeline": timeline, "orders": ords_det,
             "hasSale": bool(d.get("OPPORTUNITY")),
@@ -352,6 +430,53 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
     n_nobuy = sum(1 for r in rows if r["buySrc"] == "none")
     orphan_buy = sum(eur(o.get("opportunity"), o.get("currencyId")) for o in orphan)
     n_contracts = sum(1 for r in rows if r["norders"] > 0)
+
+    # --- дедлайны клиенту: сводка по живым заказам (то же поле, что в «Контроле дедлайнов») ---
+    late_rows = [r for r in live_rows if r["late"]]
+    late_buy_sum = sum(r["lateBuy"] for r in late_rows)
+    late_orders_n = sum(r["lateN"] for r in late_rows)
+    nodl_orders_n = sum(r["noDl"] for r in live_rows)
+    live_orders_n = sum(1 for r in live_rows for o in r["orders"] if o["live"])
+    depth = {"<30": 0, "30-90": 0, "90-180": 0, ">180": 0}
+    for r in live_rows:
+        for o in r["orders"]:
+            if o["late"]:
+                dd = o["dlDays"]
+                depth["<30" if dd < 30 else "30-90" if dd < 90 else "90-180" if dd < 180 else ">180"] += 1
+    prod_after = sum(1 for r in live_rows for o in r["orders"] if o["live"] and o["prodAfterDl"])
+
+    # разрезы просрочки: по ответственному сделки и по схеме поставки
+    def _cut(keyfn) -> list:
+        agg: dict[str, list] = defaultdict(lambda: [0, 0, 0.0, 0])   # [просроч. заказов, сделок, € , всего живых заказов]
+        for r in live_rows:
+            for o in r["orders"]:
+                if not o["live"]:
+                    continue
+                k = keyfn(r, o) or "—"
+                agg[k][3] += 1
+                if o["late"]:
+                    agg[k][0] += 1
+                    agg[k][2] += o["buyRaw"]
+            if r["late"]:
+                agg[keyfn(r, r["orders"][0]) if r["orders"] else "—"][1] += 1
+        out = [{"name": k, "lateOrders": v[0], "lateDeals": v[1], "buy": round(v[2]),
+                "buyLbl": _money(v[2]), "liveOrders": v[3],
+                "pct": round(v[0] / v[3] * 100) if v[3] else 0}
+               for k, v in agg.items() if v[0]]
+        out.sort(key=lambda x: -x["lateOrders"])
+        return out[:12]
+
+    deadlines = {
+        "lateDeals": len(late_rows), "lateOrders": late_orders_n,
+        "lateBuy": _money(late_buy_sum), "depth": depth,
+        "noDl": nodl_orders_n, "liveOrders": live_orders_n,
+        "prodAfterDl": prod_after,
+        "field": "Date of deadline to customer",
+        "byManager": _cut(lambda r, o: r["manager"]),
+        "byOss": _cut(lambda r, o: o.get("oss") or r["oss"]),
+        "bySchema": _cut(lambda r, o: o.get("schema")),
+    }
+
     # аддитивно: все прежние KPI сохранены, новые добавлены следом
     kpis = [
         ("Последний №", str(maxseq), "макс. номер в реализации", "ok"),
@@ -365,6 +490,8 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
         ("⚠ Замедлено", str(len(slow_rows)),
          f"{round(len(slow_rows)/len(live_rows)*100) if live_rows else 0}% открытых", "warn" if slow_rows else "ok"),
         ("Медиана цикла заказа", f"{round(med_cycle) if med_cycle else '—'} дн", "создание → закрытие заказа", ""),
+        ("🚩 Просрочен дедлайн", str(len(late_rows)),
+         f"сделок · заказов {late_orders_n} · закупка {_money(late_buy_sum)}", "warn" if late_rows else "ok"),
     ]
 
     # --- агрегация по ПОСТАВЩИКАМ (без изменений) ---
@@ -411,6 +538,12 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
         "label": f"на {today.strftime('%d.%m.%Y')}",
         "rows": rows,
         "kpis": [{"lbl": l, "val": v, "meta": m, "clz": c} for l, v, m, c in kpis],
+        "deadlines": deadlines,
+        # курсы Битрикса заданы вручную; показываем дату, чтобы расхождение с другой
+        # отчётностью было объяснимо (см. сверку с «Контролем дедлайнов»)
+        "fx": {"asOf": rate_asof, "base": base_cur,
+               "usdRub": round(rate.get("USD", 0) / rate["RUB"], 2) if rate.get("RUB") else None,
+               "eurUsd": round(rate.get("EUR", 0) / rate["USD"], 4) if rate.get("USD") else None},
         "speed": {
             "medCycle": round(med_cycle, 1) if med_cycle else None,
             "medLag": round(med_lag, 1) if med_lag is not None else None,

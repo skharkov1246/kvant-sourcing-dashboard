@@ -1,195 +1,137 @@
-"""CI-зонд v7: экономика проекта по последним 20 сделкам реализации (№895–914).
-
-1) Bitrix: сделки кат.0, порядковые номера 895..914, поле-ссылка на экономику (clck.ru).
-2) Разворачиваем clck.ru без выполнения редиректа, классифицируем конечный URL.
-3) Пробуем все маршруты доступа токеном аккаунта:
-   • личный диск (путь как есть),
-   • классические общие папки (могут монтироваться в личный диск — плоский листинг файлов),
-   • публичные ключи (если ссылка публичная),
-   • общий диск Я360 (vd — ожидаемо недоступен, контрольный выстрел).
-4) Всё, что скачалось, парсим openpyxl: листы, ключевые ячейки (закупка/маржа).
-Секреты в лог не выводятся.
-"""
+"""CI-зонд v11: кто такой «ОСС» в файле коллег + значения справочника «Схема поставки»."""
 from __future__ import annotations
 
-import io
+import json
 import os
 import re
 
 import requests
 
-ECON_LINK = "UF_CRM_1740133235324"
-DAPI = "https://cloud-api.yandex.net/v1/disk"
-SEQ_HI = 914
-SEQ_LO = SEQ_HI - 19   # последние 20: 895..914
+FULL = json.load(open(os.path.join(os.path.dirname(__file__), "_coll_full.json"), encoding="utf-8"))
+ROWS = json.load(open(os.path.join(os.path.dirname(__file__), "_coll_rows.json"), encoding="utf-8"))
+SCHEMA_F = "ufCrm20_1724941500"
 
 
 def bx(method: str, params: dict | None = None) -> dict:
     base = os.environ["BITRIX_WEBHOOK_URL"].rstrip("/")
-    r = requests.post(f"{base}/{method}.json", json=params or {}, timeout=60)
-    r.raise_for_status()
-    return r.json()
+    for _ in range(3):
+        try:
+            r = requests.post(f"{base}/{method}.json", json=params or {}, timeout=60)
+            r.raise_for_status()
+            return r.json()
+        except Exception:
+            continue
+    return {}
 
 
-def regno(t) -> int:
-    m = re.match(r"\s*(\d{1,4})(?:/\d+)?\.", str(t or ""))
-    return int(m.group(1)) if m else 0
-
-
-def cat0_deals() -> list[dict]:
+def bx_all(method: str, params: dict) -> list:
     out, start = [], 0
     while True:
-        j = bx("crm.deal.list", {"filter": {"CATEGORY_ID": 0},
-                                 "select": ["ID", "TITLE", ECON_LINK], "start": start})
-        out += j.get("result", [])
+        j = bx(method, {**params, "start": start})
+        res = j.get("result")
+        items = res.get("items") if isinstance(res, dict) and "items" in res else res
+        out += items or []
         if "next" not in j:
             return out
         start = j["next"]
 
 
-def resolve_clck(url: str) -> str:
-    """clck.ru/XXX → конечный URL (без выполнения редиректа дальше 1 шага за раз, до 5)."""
-    cur = url
-    for _ in range(5):
-        try:
-            r = requests.get(cur, allow_redirects=False, timeout=20)
-        except Exception as e:
-            return f"EXC:{type(e).__name__}"
-        loc = r.headers.get("Location")
-        if not loc:
-            return cur
-        cur = loc if loc.startswith("http") else "https://disk.yandex.ru" + loc
-        if "clck.ru" not in cur:
-            return cur
-    return cur
-
-
-def classify(url: str) -> tuple[str, str]:
-    """→ (класс, полезный путь/ключ)."""
-    if url.startswith("EXC:") or not url.startswith("http"):
-        return "err", url
-    if "/edit/disk/" in url or "/client/disk" in url or "/disk/" in url and "yandex" in url:
-        m = re.search(r"/(?:edit/)?disk/([^?]+)", url)
-        if m:
-            path = requests.utils.unquote(requests.utils.unquote(m.group(1)))
-            if path.startswith("vd/") or path.startswith("vd%2F"):
-                return "vd", path
-            return "disk", path
-    if re.search(r"yadi\.sk/[di]/|disk\.yandex\.\w+/[di]/", url):
-        return "public", url.split("?")[0]
-    return "other", url
+def okey(t) -> str:
+    m = re.match(r"\s*(\d{1,4})/(\d+)", str(t or ""))
+    return f"{m.group(1)}/{m.group(2)}" if m else ""
 
 
 def main() -> int:
-    tok = (os.getenv("YADISK_TOKEN") or "").strip()
-    H = {"Authorization": f"OAuth {tok}"} if tok else {}
+    print("=== 1. Справочник «Схема поставки» ===")
+    f172 = bx("crm.item.fields", {"entityTypeId": 172}).get("result", {}).get("fields", {})
+    items = (f172.get(SCHEMA_F) or {}).get("items") or []
+    print(f"  {SCHEMA_F}: {len(items)} значений")
+    for i in items:
+        print(f"    {i.get('ID')} = {i.get('VALUE')}")
 
-    print(f"=== 1. Bitrix: сделки кат.0 c №{SEQ_LO}–{SEQ_HI} и их ссылки на экономику ===")
-    deals = cat0_deals()
-    sel = []
-    for d in deals:
-        n = regno(d.get("TITLE"))
-        if SEQ_LO <= n <= SEQ_HI:
-            sel.append((n, str(d["ID"]), str(d.get("TITLE") or "")[:60],
-                        str(d.get(ECON_LINK) or "").strip()))
-    sel.sort(key=lambda x: -x[0])
-    print(f"всего кат.0: {len(deals)}, в диапазоне: {len(sel)}, со ссылкой: "
-          f"{sum(1 for s in sel if s[3])}")
+    print("\n=== 2. Поля-люди в СДЕЛКАХ (кандидаты на «ОСС») ===")
+    fd = bx("crm.deal.fields", {}).get("result", {}) or {}
+    userf = {k: (v.get("formLabel") or v.get("title") or v.get("listLabel") or "")
+             for k, v in fd.items() if v.get("type") in ("employee", "user")}
+    for k, t in userf.items():
+        print(f"  {k}: «{t}»")
 
-    print("\n=== 2. Разворачиваем clck и классифицируем ===")
-    resolved = []
-    for n, did, title, link in sel:
-        if not link:
-            print(f"  №{n} (deal {did}) — ссылки нет · {title}")
+    print("\n=== 3. Поля-люди в ЗАКАЗАХ СП-172 ===")
+    userf172 = {k: (v.get("title") or "") for k, v in f172.items()
+                if v.get("type") in ("employee", "user")}
+    for k, t in userf172.items():
+        print(f"  {k}: «{t}»")
+
+    # ---------- 4. проверка: чьё имя совпадает с колонкой «ОСС» ----------
+    dealids = sorted({r["deal"] for r in ROWS if r["deal"]})
+    OSEL = ["id", "title", "parentId2", "assignedById", "observers", SCHEMA_F] + list(userf172)
+    orders = []
+    for i in range(0, len(dealids), 50):
+        orders += bx_all("crm.item.list", {"entityTypeId": 172,
+                                           "filter": {"parentId2": dealids[i:i + 50]}, "select": OSEL})
+    bykey = {}
+    for o in orders:
+        k = okey(o.get("title"))
+        if k:
+            bykey.setdefault(k, o)
+    deals = {}
+    for i in range(0, len(dealids), 50):
+        for d in bx_all("crm.deal.list", {"filter": {"ID": dealids[i:i + 50]},
+                                          "select": ["ID"] + list(userf)}):
+            deals[str(d["ID"])] = d
+
+    uids = set()
+    for o in orders:
+        for k in list(userf172) + ["assignedById"]:
+            v = o.get(k)
+            if v:
+                uids |= {str(x) for x in (v if isinstance(v, list) else [v])}
+    for d in deals.values():
+        for k in userf:
+            v = d.get(k)
+            if v:
+                uids |= {str(x) for x in (v if isinstance(v, list) else [v])}
+    uids = {u for u in uids if u.isdigit()}
+    users = {}
+    for uid in sorted(uids):
+        u = (bx("user.get", {"ID": uid}).get("result") or [{}])[0]
+        users[uid] = f"{u.get('NAME') or ''} {u.get('LAST_NAME') or ''}".strip()
+    print(f"\n=== 4. Проверено пользователей: {len(users)} ===")
+
+    hits_o = {k: 0 for k in list(userf172) + ["assignedById"]}
+    hits_d = {k: 0 for k in userf}
+    tested = 0
+    for r in FULL:
+        o = bykey.get(okey(r.get("order")))
+        if not o or not r.get("oss"):
             continue
-        final = resolve_clck(link)
-        cls, path = classify(final)
-        resolved.append((n, did, cls, path))
-        print(f"  №{n} (deal {did}) → [{cls}] {path[:120]}")
+        tested += 1
+        want = r["oss"].strip().lower()
+        for k in hits_o:
+            v = o.get(k)
+            names = [users.get(str(x), "") for x in (v if isinstance(v, list) else [v])] if v else []
+            if any(n.lower() == want for n in names if n):
+                hits_o[k] += 1
+        d = deals.get(str(o.get("parentId2")) or "")
+        for k in hits_d:
+            v = (d or {}).get(k)
+            names = [users.get(str(x), "") for x in (v if isinstance(v, list) else [v])] if v else []
+            if any(n.lower() == want for n in names if n):
+                hits_d[k] += 1
+    print(f"  строк с «ОСС» проверено: {tested}")
+    print("  совпадения в полях ЗАКАЗА:", {k: v for k, v in hits_o.items() if v} or "нет")
+    print("  совпадения в полях СДЕЛКИ:", {k: v for k, v in hits_d.items() if v} or "нет")
 
-    if not tok:
-        print("\nнет YADISK_TOKEN — доступ не проверяем")
-        return 0
+    # схема: сверка значений
+    idv = {str(i.get("ID")): i.get("VALUE") for i in items}
+    sh = 0
+    for r in FULL:
+        o = bykey.get(okey(r.get("order")))
+        if o and r.get("schema") and idv.get(str(o.get(SCHEMA_F))) == r["schema"]:
+            sh += 1
+    print(f"\n  «Схема поставки» совпала: {sh} из {sum(1 for r in FULL if r.get('schema'))}")
 
-    print("\n=== 3. Пробуем доступ токеном ===")
-    got: list[tuple[int, str, bytes]] = []
-    for n, did, cls, path in resolved:
-        if cls == "public":
-            r = requests.get(DAPI + "/public/resources/download",
-                             params={"public_key": path}, headers=H, timeout=30)
-            print(f"  №{n} public → {r.status_code} {r.text[:100]}")
-            if r.ok:
-                href = r.json().get("href")
-                f = requests.get(href, timeout=60)
-                if f.ok:
-                    got.append((n, path, f.content))
-        elif cls == "disk":
-            p = "disk:/" + path.lstrip("/")
-            r = requests.get(DAPI + "/resources/download", params={"path": p}, headers=H, timeout=30)
-            print(f"  №{n} disk path={p[:80]!r} → {r.status_code} {r.text[:100]}")
-            if r.ok:
-                f = requests.get(r.json().get("href"), timeout=60)
-                if f.ok:
-                    got.append((n, p, f.content))
-        elif cls == "vd":
-            r = requests.get(DAPI + "/resources/download", params={"path": "disk:/" + path},
-                             headers=H, timeout=30)
-            print(f"  №{n} vd (контрольный) → {r.status_code} {r.json().get('error', '')[:60] if r.headers.get('content-type','').startswith('application/json') else r.text[:60]}")
-
-    print("\n=== 4. Классические общие папки в личном диске? (плоский листинг xlsx) ===")
-    r = requests.get(DAPI + "/resources/files",
-                     params={"limit": 200, "media_type": "spreadsheet",
-                             "fields": "items.name,items.path,items.size"}, headers=H, timeout=30)
-    if r.ok:
-        items = r.json().get("items", [])
-        econ = [i for i in items if re.match(r"\d{3}_", i.get("name", ""))]
-        print(f"  всего таблиц в личном диске: {len(items)}, похожих на экономики (NNN_): {len(econ)}")
-        for i in econ[:25]:
-            print(f"    {i.get('path')}  ({i.get('size', 0)} B)")
-        # если экономики есть в личном диске — качаем нужные номера
-        want = {n for n, *_ in resolved} | set(range(SEQ_LO, SEQ_HI + 1))
-        for i in econ:
-            m = re.match(r"(\d{3,4})_", i.get("name", ""))
-            if m and int(m.group(1)) in want and len(got) < 25:
-                rr = requests.get(DAPI + "/resources/download", params={"path": i["path"]},
-                                  headers=H, timeout=30)
-                if rr.ok:
-                    f = requests.get(rr.json().get("href"), timeout=60)
-                    if f.ok:
-                        got.append((int(m.group(1)), i["path"], f.content))
-                        print(f"    ✓ скачан {i.get('name')}")
-    else:
-        print(f"  /resources/files → {r.status_code} {r.text[:120]}")
-
-    print("\n=== 5. Корень личного диска (что смонтировано) ===")
-    r = requests.get(DAPI + "/resources", params={"path": "disk:/", "limit": 100,
-                     "fields": "_embedded.items.name,_embedded.items.type"}, headers=H, timeout=30)
-    if r.ok:
-        for i in r.json().get("_embedded", {}).get("items", []):
-            print(f"  [{i.get('type')}] {i.get('name')}")
-    else:
-        print(f"  → {r.status_code} {r.text[:120]}")
-
-    print(f"\n=== 6. Скачано файлов: {len(got)} — парсим openpyxl ===")
-    try:
-        import openpyxl
-    except ImportError:
-        openpyxl = None
-        print("  openpyxl не установлен")
-    for n, src, blob in got if openpyxl else []:
-        try:
-            wb = openpyxl.load_workbook(io.BytesIO(blob), data_only=True, read_only=True)
-            print(f"\n  --- №{n} · {str(src)[:70]} · листы: {wb.sheetnames}")
-            ws = wb[wb.sheetnames[0]]
-            for ri, row in enumerate(ws.iter_rows(min_row=1, max_row=40, max_col=8,
-                                                  values_only=True), 1):
-                cells = [str(c)[:18] for c in row if c is not None]
-                if cells:
-                    print(f"    r{ri}: " + " | ".join(cells))
-        except Exception as e:
-            print(f"  №{n}: ошибка парсинга {type(e).__name__}: {e}")
-
-    print("\n✓ зонд v7 завершён")
+    print("\n✓ зонд v11 завершён")
     return 0
 
 

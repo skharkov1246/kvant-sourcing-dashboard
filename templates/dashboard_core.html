@@ -891,6 +891,7 @@ const METH={
   'd.groups':{t:'Продажи → закупка → маржа',what:'Главная таблица направления по группам отделов.',src:'crm.deal.list (ASSIGNED_BY_ID ∈ UF_DEPARTMENT группы) + Заказы поставщикам СП-172.',formula:'СП-172 = заказы ПОСТАВЩИКАМ (opportunity = закупка). Продажа = сумма родительской сделки. Контракт = сделка с ≥1 заказом. Колонки: сделок (YTD), пайплайн (Σ открытых продаж €), контрактов, продажи (Σ сумм сделок-контрактов €), закупка (Σ заказов €), маржа = продажи − закупка.',note:'Привязка к группе — через владельца сделки-родителя. Клик по строке — сделки и заказы группы.'},
   'd.rev':{t:'Выручка по группам',what:'Ранжирование групп по продажам (выручке).',formula:'Σ сумм сделок-контрактов группы (€); длина бара — относительно максимума в наборе.',note:'Клик — сделки и заказы группы.'},
   'd.people':{t:'До человека',what:'Те же метрики по каждому сотруднику группы.',src:'группировка по ASSIGNED_BY_ID внутри групп.',formula:'Сделки / пайплайн / заказы / выручка / зак-сд по сотруднику.',note:'Клик по сотруднику — его сделки и заказы.'},
+  'ct.dl':{t:'Дедлайны клиенту',what:'Просрочка обещаний заказчику по живым заказам поставщикам — то же измерение, что в ручной выгрузке снабжения «Контроль дедлайнов».',src:'Заказы СП-172, поле «Date of deadline to customer» (ufCrm20_1728900218435). Поле подтверждено сверкой: совпало на 72 строках из 72 в выгрузке снабжения.',formula:'Просрочен = живой заказ (не SUCCESS/FAIL), у которого плановая дата клиенту меньше сегодняшней. Глубина = сегодня − дата. «Закупка под просрочкой» = Σ сумм таких заказов. Сделка помечается 🚩, если просрочен хотя бы один её заказ, и попадает в «Замедленные». «План против плана» = плановый конец производства («Production end date, budget») позже обещанной клиенту даты.',note:'«Без плановой даты» — живые заказы, где поле не заполнено: они не под контролем срока ни у нас, ни в выгрузке снабжения. Разрез «кто срывает» — по ответственному за СДЕЛКУ (в выгрузке снабжения это колонка «Менеджер»); «ОСС» — поле заказа «Deal support specialist» (совпало с выгрузкой снабжения на 73 строках из 74), «Схема поставки» — справочник из 39 значений (74 из 75).'},
   'ct.speed':{t:'Скорость реализации',what:'Сколько времени сделки и заказы проводят в каждой стадии — где процесс буксует.',src:'crm.stagehistory.list: первый вход в каждую стадию (сделки воронки кат.0 и заказы СП-172), с полным временем.',formula:'Длительность стадии = время до следующего первого входа. Медианы по всем прохождениям (n — сколько раз стадию проходили). «Цикл заказа» = создание → закрытие (SUCCESS). «Лаг первого заказа» = вход сделки в воронку реализации → создание первого заказа СП-172.',note:'Бары — МЕДИАННОЕ время стадии (типичная длительность, «где копится время»), а не превышение норматива. Норматив-порог = max(2×медиана, 7 дн) и используется для подсветки замедленных. Медианы устойчивы к выбросам; редкие стадии (n<5) в графики не попадают.'},
     'ct.list':{t:'Список контрактов: стадии, закупка, замедленность',what:'Одна строка = одна сделка воронки реализации (кат.0), №№ до текущего максимума.',src:'crm.deal.list (CATEGORY_ID=0) + заказы СП-172 (parentId2) + история стадий + money-поля сделки + файл «Экономика проекта» (Я.Диск, где получен).',formula:'«Стадия · дней» — текущая стадия и возраст (от последнего входа). ЗАКУПКА каскадом: Σ заказов СП-172 → money-поля сделки («Cost (rub)»/«Offer sum … supplier») → файл экономики проекта → «нет данных». Маржа = продажа − закупка, только при наличии источника. ЗАМЕДЛЕНА (красная строка): возраст текущей стадии сделки или любого живого заказа > max(2×медиана этой стадии, 7 дн), либо нет ни одного заказа >7 дн после входа в воронку.',note:'СВЕРКА ИСТОЧНИКОВ — в карточке сделки: Σ заказов, money-поля и файл экономики показываются рядом с отклонением в %; «⚠≠» — источники расходятся >20%; «✓экон.» — экономика проекта получена и просмотрена (дата в карточке). Клик по строке — стадии, заказы, сверка закупки.'},
   'a.forecast':{t:'Взвешенный прогноз',what:'Сколько денег ожидать с открытого пайплайна и на какие месяцы.',src:'crm.deal.list (открытые сделки YTD: не проиграны, не в реализации) + CLOSEDATE.',formula:'Каждая открытая сделка × вероятность: базовая = эмпирическая конверсия зрелой когорты-2025 (реализовано ÷ создано); для сделок, дошедших до «ТКП выдано+», вероятность ×3 (потолок 60%). Прогноз раскладывается по месяцу ПЛАНОВОГО закрытия (CLOSEDATE). «Покрытие» = взвешенный пайплайн ÷ средний месячный факт реализации-2026; здоровая норма ≥ 3×.',note:'Вероятность ТКП+ — эвристика (нет истории прохождения стадий по каждой сделке). Сделки без CLOSEDATE в помесячный прогноз не попадают — см. блок «Гигиена».'},
@@ -1123,6 +1124,10 @@ function openContract(x){
   h+=`<div class="h">Статус и скорость</div>`;
   h+=`<div class="mrow-like" style="font-size:12.5px;line-height:1.7">`
     +`Стадия: <b>${_esc(x.stageName||'—')}</b>${x.stageDays!=null?` — <span class="stgd${x.slow&&x.why.indexOf('стадия')===0?' bad':''}">${x.stageDays} дн</span> <span class="dimv">(порог ${x.stageThr} дн)</span>`:''}<br>`
+    +(x.lateN?`Дедлайн клиенту: <b class="nrc">🚩 просрочен на ${x.lateDays} дн</b> <span class="dimv">(заказов ${x.lateN}, закупка ${x.lateBuyLbl})</span><br>`
+      :(x.dlNext?`Дедлайн клиенту: <b>${x.dlNext}</b> <span class="dimv">— в срок</span><br>`:''))
+    +(x.noDl?`<span class="dimv">без плановой даты клиенту: ${x.noDl} живых заказ(ов)</span><br>`:'')
+    +(x.manager&&x.manager!=='—'?`Ответственный: <b>${_esc(x.manager)}</b>`+(x.oss&&x.oss!=='—'?` · ОСС: <b>${_esc(x.oss)}</b>`:'')+(x.schemas?` <span class="dimv">· схема: ${_esc(x.schemas)}</span>`:'')+(x.cities?` <span class="dimv">· ${_esc(x.cities)}</span>`:'')+`<br>`:'')
     +`Вошла в реализацию: <b>${x.entered||'—'}</b>`
     +(x.firstLag!=null?` · первый заказ через <b>${x.firstLag} дн</b>`:'')
     +(x.slow?`<br><span class="flag">⚠ ${_esc(x.why)}</span>`:'')
@@ -1163,9 +1168,11 @@ function openContract(x){
   // заказы поставщикам
   const ords=x.orders||[];
   h+=`<div class="h">Заказы поставщикам (${ords.length})</div>`;
-  h+=ords.map(o=>`<div class="req"><div class="rt">${_esc(o.title)}</div>`
-    +`<div class="rm"><span class="sp">${_esc(o.sup)}</span><span class="pill${o.slow?' p-no_answer':''}">${_esc(_stShort(o.stageName))}</span>`
+  h+=ords.map(o=>`<div class="req"><div class="rt">${o.late?'🚩 ':''}${_esc(o.title)}</div>`
+    +`<div class="rm"><span class="sp">${_esc(o.sup)}</span><span class="pill${o.slow||o.late?' p-no_answer':''}">${_esc(_stShort(o.stageName))}</span>`
     +(o.days!=null?`<span class="${o.slow?'nrc':''} mono">${o.days} дн${o.live?` <span class="dimv">(порог ${o.thr})</span>`:''}</span>`:'')
+    +(o.dl?`<span class="${o.late?'nrc':'dimv'} mono">дедлайн ${o.dl}${o.late?` · +${o.dlDays} дн`:''}</span>`:'<span class="dimv">дедлайна нет</span>')
+    +(o.prodAfterDl?`<span class="srcb disc">пр-во до ${o.prodEnd} — позже дедлайна</span>`:'')
     +`<span class="dimv">создан ${o.created}</span><span class="amt">${o.buyLbl}</span></div></div>`).join('')
     ||'<div class="dimv">заказов нет'+(x.firstLag!=null&&!x.closed?` — уже ${x.firstLag} дн после входа в реализацию`:'')+'</div>';
   document.getElementById('drwBody').innerHTML=h;
@@ -1175,11 +1182,11 @@ function renderContracts(){
   const X=window.__CONTRACTS__, el=document.getElementById('tab-contracts'); if(!el) return;
   if(!X){ el.innerHTML='<div class="note" style="padding:20px 0">нет данных по контрактам</div>'; return; }
   let sortKey='seq', sortDir=-1, q='', mode='all';
-  const NUM={seq:1,saleEur:1,buyEur:1,marginEur:1,stageDays:1};
-  const COLS=[['customer','Заказчик','l'],['deal','№ сделки / контракт','l'],['stageDays','Стадия · дней','l'],['saleEur','Сумма сделки','r'],['buyEur','Закупка','r'],['marginEur','Маржа','r']];
+  const NUM={seq:1,saleEur:1,buyEur:1,marginEur:1,stageDays:1,lateDays:1};
+  const COLS=[['customer','Заказчик','l'],['deal','№ сделки / контракт','l'],['stageDays','Стадия · дней','l'],['lateDays','Дедлайн клиенту','l'],['saleEur','Сумма сделки','r'],['buyEur','Закупка','r'],['marginEur','Маржа','r']];
   const orph=X.orphan&&X.orphan.n?` · ещё ${X.orphan.n} заказов без сделки (закупка ${X.orphan.buy})`:'';
   const R=X.rows, byDeal=Object.fromEntries(R.map(r=>[String(r.deal),r]));
-  const nSlow=R.filter(r=>r.slow&&!r.closed).length, nLive=R.filter(r=>!r.closed).length, nDone=R.filter(r=>r.done||r.closed).length, nNoEcon=R.filter(r=>r.noEcon&&!r.closed).length;
+  const nSlow=R.filter(r=>r.slow&&!r.closed).length, nLive=R.filter(r=>!r.closed).length, nDone=R.filter(r=>r.done||r.closed).length, nNoEcon=R.filter(r=>r.noEcon&&!r.closed).length, nLate=R.filter(r=>r.late&&!r.closed).length;
   const sp=X.speed||{};
   let speedHtml='';
   if((sp.dealBench||[]).length||(sp.orderBench||[]).length){
@@ -1188,13 +1195,37 @@ function renderContracts(){
       +`<section class="card"><h2>Стадии сделки — типичное время и просрочка</h2><div class="note">Бар — типичное (медианное) время сделки в стадии: половина сделок проходит её быстрее, половина дольше. Под баром — сколько сделок сидит в стадии сейчас, сколько из них просрочено (за порогом 2×медианы, мин. 7 дн) и сколько дней в среднем теряется сверх порога. Медиана полного цикла заказа: <b>${sp.medCycle!=null?sp.medCycle+' дн':'—'}</b> · медианный лаг первого заказа: <b>${sp.medLag!=null?sp.medLag+' дн':'—'}</b>.</div><div class="barlist">${bl(sp.dealBench||[],'linear-gradient(90deg,var(--a),var(--a2))')}</div></section>`
       +`<section class="card"><h2>Стадии заказов — типичное время и просрочка</h2><div class="note">Бар — типичное (медианное) время заказа в стадии СП-172, по убыванию: где в норме уходит больше всего времени. Под баром — текущая просрочка: сколько заказов за порогом (2×медиана, мин. 7 дн) и средняя потеря в днях сверх порога.</div><div class="barlist">${bl(sp.orderBench||[],'linear-gradient(90deg,var(--b),var(--b2))')}</div></section></div>`;
   }
-  el.innerHTML=`<header><div class="eyebrow">Квант · реализация</div><h1>Сделки в реализации</h1><div class="sub"><span>Источник: <b>Bitrix24 · сделки + Заказы поставщикам (СП-172)</b></span><span>Состояние: <b>${X.label}</b></span><span class="dimv">Воронка реализации (кат.0)${orph}. Клик по строке — стадии, заказы и закупка сделки.</span></div></header>`
+  // блок «Дедлайны клиенту» — то же поле, по которому снабжение ведёт «Контроль дедлайнов»
+  const dl=X.deadlines||{};
+  let dlHtml='';
+  if(dl.lateOrders!=null){
+    const dp=dl.depth||{}, mx=Math.max(1,...Object.values(dp));
+    const bars=[['<30','до 30 дн'],['30-90','30–90 дн'],['90-180','90–180 дн'],['>180','больше 180 дн']]
+      .map(([k,lb])=>`<div class="blrow"><div class="blt"><span>${lb}</span><b>${dp[k]||0}</b></div><div class="bltrack"><i style="width:${((dp[k]||0)/mx*100).toFixed(0)}%;background:linear-gradient(90deg,var(--nr),var(--a2))"></i></div></div>`).join('');
+    const cut=(items,unit)=>(items||[]).length?items.map(m=>`<div class="blrow"><div class="blt"><span>${_esc(m.name)} <span class="dimv mono">${m.liveOrders} ${unit}</span></span><b class="nrc">${m.lateOrders} · ${m.buyLbl}</b></div><div class="bltrack"><i style="width:${m.pct}%;background:linear-gradient(90deg,var(--nr),var(--a2))"></i></div></div>`).join(''):'<div class="dimv">нет данных</div>';
+    dlHtml=`<div class="secttl"><b>·</b> Дедлайны клиенту${qmark('ct.dl')}</div>`
+      +`<div class="kpis" style="grid-template-columns:repeat(5,1fr)">`
+      +`<div class="kpi warn"><div class="lbl">🚩 Просрочено заказов</div><div class="val warn">${dl.lateOrders}</div><div class="meta">из ${dl.liveOrders} живых · сделок ${dl.lateDeals}</div></div>`
+      +`<div class="kpi amber"><div class="lbl">Закупка под просрочкой</div><div class="val amber">${dl.lateBuy}</div><div class="meta">деньги, стоящие за сорванным сроком</div></div>`
+      +`<div class="kpi"><div class="lbl">Без плановой даты</div><div class="val">${dl.noDl}</div><div class="meta">живых заказов вне контроля срока</div></div>`
+      +`<div class="kpi"><div class="lbl">План против плана</div><div class="val">${dl.prodAfterDl}</div><div class="meta">производство кончается позже обещания клиенту</div></div>`
+      +`<div class="kpi"><div class="lbl">Глубже 90 дней</div><div class="val">${(dp['90-180']||0)+(dp['>180']||0)}</div><div class="meta">заказов просрочено более чем на квартал</div></div>`
+      +`</div>`
+      +`<div class="grid" style="margin-top:12px">`
+      +`<section class="card"><h2>Глубина просрочки</h2><div class="note">Сколько живых заказов и насколько перешли обещанную клиенту дату («${_esc(dl.field||'')}»). Это то же поле, по которому снабжение ведёт «Контроль дедлайнов» — цифры сопоставимы напрямую.</div><div class="barlist">${bars}</div></section>`
+      +`<section class="card"><h2>Кто и по какой схеме срывает срок</h2><div class="note">Слева — ответственный за сделку, справа от него: просроченных заказов и закупка под ними; полоса — доля просроченных от всех его живых заказов.</div><div class="barlist">${cut(dl.byManager,'живых')}</div><div class="note" style="margin-top:10px">По ОСС (сопровождение сделки):</div><div class="barlist">${cut(dl.byOss,'живых')}</div><div class="note" style="margin-top:10px">По схеме поставки:</div><div class="barlist">${cut(dl.bySchema,'живых')}</div></section>`
+      +`</div>`;
+  }
+  const fx=X.fx||{};
+  const fxNote=fx.asOf?`<span class="dimv">Деньги — в € по курсам Битрикса от <b>${fx.asOf}</b> (заданы вручную, не обновляются автоматически: 1 USD = ${fx.usdRub} ₽). Другая отчётность может считать по своему курсу — расхождение будет системным.</span>`:'';
+  el.innerHTML=`<header><div class="eyebrow">Квант · реализация</div><h1>Сделки в реализации</h1><div class="sub"><span>Источник: <b>Bitrix24 · сделки + Заказы поставщикам (СП-172)</b></span><span>Состояние: <b>${X.label}</b></span><span class="dimv">Воронка реализации (кат.0)${orph}. Клик по строке — стадии, заказы и закупка сделки.</span>${fxNote}</div></header>`
     +`<div class="kpis" style="grid-template-columns:repeat(6,1fr)">${X.kpis.map(p=>`<div class="kpi ${p.clz}"><div class="lbl">${p.lbl}</div><div class="val ${p.clz}">${p.val}</div><div class="meta">${p.meta}</div></div>`).join('')}</div>`
+    +dlHtml
     +speedHtml
     +`<div class="secttl"><b>·</b> Список контрактов <span id="ctCount" class="dimv" style="font-weight:400"></span>${qmark('ct.list')}</div>`
     +`<div class="ctools" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><input id="ctSearch" class="search" style="flex:1;min-width:220px" placeholder="Поиск: заказчик · № сделки · контракт · поставщик…">`
-    +`<div class="statleg" style="margin:0" id="ctChips"><span class="stchip on" data-m="all">Все <b>${R.length}</b></span><span class="stchip" data-m="slow"><i class="dot snr"></i>Замедленные <b>${nSlow}</b></span><span class="stchip" data-m="live">Открытые <b>${nLive}</b></span><span class="stchip" data-m="done">Завершённые <b>${nDone}</b></span><span class="stchip" data-m="noecon"><i class="dot snr"></i>Без экономики <b>${nNoEcon}</b></span></div></div>`
-    +`<section class="card"><div class="note">«№» — порядковый номер сделки в реализации. «Стадия · дней» — текущая стадия воронки и сколько дней сделка в ней (краснеет при превышении порога = 2× медианы стадии). «Закупка» — Σ заказов СП-172, при их отсутствии — из экономики проекта (бейдж «эконом.»); «Маржа» = продажа − закупка, без источника закупки не считается. Красная строка — замедленная (причина в дровере). Клик по строке — детали; по заголовку — сортировка.</div><table class="ctab"><thead id="ctHead"></thead><tbody id="ctBody"></tbody></table></section>`;
+    +`<div class="statleg" style="margin:0" id="ctChips"><span class="stchip on" data-m="all">Все <b>${R.length}</b></span><span class="stchip" data-m="slow"><i class="dot snr"></i>Замедленные <b>${nSlow}</b></span><span class="stchip" data-m="live">Открытые <b>${nLive}</b></span><span class="stchip" data-m="done">Завершённые <b>${nDone}</b></span><span class="stchip" data-m="late"><i class="dot snr"></i>Просрочен дедлайн <b>${nLate}</b></span><span class="stchip" data-m="noecon"><i class="dot snr"></i>Без экономики <b>${nNoEcon}</b></span></div></div>`
+    +`<section class="card"><div class="note">«№» — порядковый номер сделки в реализации. «Стадия · дней» — текущая стадия воронки и сколько дней сделка в ней (краснеет при превышении порога = 2× медианы стадии). «Дедлайн клиенту» — обещанная заказчику дата по заказам СП-172: 🚩 и глубина просрочки, либо ближайшая дата. «Закупка» — Σ заказов СП-172, при их отсутствии — из экономики проекта (бейдж «эконом.»); «Маржа» = продажа − закупка, без источника закупки не считается. Красная строка — замедленная (причина в дровере). Клик по строке — детали; по заголовку — сортировка.</div><table class="ctab"><thead id="ctHead"></thead><tbody id="ctBody"></tbody></table></section>`;
   const head=()=>{document.getElementById('ctHead').innerHTML=`<tr><th class="r sortable${sortKey==='seq'?' on':''}" data-sk="seq" style="width:48px">№${sortKey==='seq'?(sortDir<0?' ▾':' ▴'):''}</th>`+COLS.map(c=>`<th class="${c[2]==='r'?'r ':''}sortable${sortKey===c[0]?' on':''}" data-sk="${c[0]}">${c[1]}${sortKey===c[0]?(sortDir<0?' ▾':' ▴'):''}</th>`).join('')+'</tr>';};
   const mcell=x=>{const cl=(x.marginEur||0)<0?'color:var(--nr)':'color:var(--ok)';const pct=x.marginPct==null?'<span class="dimv">—</span>':(x.marginPct+'%');return `<div class="mono" style="${x.marginEur==null?'color:var(--dim)':cl}">${x.marginLbl}</div><div class="dep">${pct}</div>`;};
   const scell=x=>{
@@ -1202,6 +1233,10 @@ function renderContracts(){
     const nm=_esc(_stShort(x.stageName));
     const d=x.stageDays!=null?`<span class="stgd${x.slow?' bad':''}">${Math.round(x.stageDays)} дн</span>`:'';
     return `<div class="stgcell"><b>${nm}</b><div class="dep">${d}${x.slow?' <span class="nrc">⚠</span>':''}</div></div>`;};
+  const dcell=x=>{
+    if(!x.lateN&&!x.dlNext)return `<div class="dep">${x.noDl?'нет плановой даты':'—'}</div>`;
+    if(x.lateN)return `<div class="stgcell"><b class="nrc">🚩 ${x.lateDays} дн</b><div class="dep">просрочено заказов: ${x.lateN} · ${x.lateBuyLbl}</div></div>`;
+    return `<div class="stgcell"><b>${x.dlNext}</b><div class="dep">в срок${x.noDl?' · без даты: '+x.noDl:''}</div></div>`;};
   const bcell=x=>{
     const b=`<div class="mono" style="color:${x.buySrc==='none'?'var(--dim)':'var(--a)'}">${x.buyLbl}</div>`;
     const alt=x.discrep?(x.buySrc==='orders'?` <span class="srcb disc">≠ экон. ${_fmtE(x.buyEconEur)}</span>`:` <span class="srcb disc">≠ заказы ${_fmtE(x.buyOrdersEur)}</span>`):'';
@@ -1213,15 +1248,17 @@ function renderContracts(){
     else if(mode==='live')r=r.filter(x=>!x.closed);
     else if(mode==='done')r=r.filter(x=>x.done||x.closed);
     else if(mode==='noecon')r=r.filter(x=>x.noEcon&&!x.closed);
-    if(q){const s=q.toLowerCase(); r=r.filter(x=>((x.customer||'')+' '+(x.title||'')+' '+x.deal+' '+(x.suppliers||'')).toLowerCase().includes(s));}
+    else if(mode==='late')r=r.filter(x=>x.late&&!x.closed);
+    if(q){const s=q.toLowerCase(); r=r.filter(x=>((x.customer||'')+' '+(x.title||'')+' '+x.deal+' '+(x.suppliers||'')+' '+(x.manager||'')+' '+(x.oss||'')+' '+(x.schemas||'')+' '+(x.cities||'')).toLowerCase().includes(s));}
     r=r.slice().sort((a,b)=> NUM[sortKey] ? ((a[sortKey]||0)-(b[sortKey]||0))*sortDir : String(a[sortKey]||'').localeCompare(String(b[sortKey]||''),'ru')*sortDir);
     document.getElementById('ctCount').textContent=`(${r.length} из ${R.length})`;
     document.getElementById('ctBody').innerHTML=r.map(x=>`<tr class="drill${x.slow&&!x.closed?' slowrow':''}" data-ct="${x.deal}"><td class="r mono" style="color:var(--a2)">${x.seq||'—'}</td><td><div class="who">${_esc(x.customer)}</div><div class="dep">${_esc(x.title)}</div></td>`
       +`<td><div class="mono">${x.deal?('#'+x.deal):'—'}</div><div class="dep">${x.done?'<span class="pill p-selected">завершён</span>':(x.lost?'<span class="pill p-no_answer">проиграна</span>':'<span class="pill">в реализации</span>')} ${x.norders}×закуп${x.suppliers?(' · '+_esc(x.suppliers)):''}</div></td>`
       +`<td>${scell(x)}</td>`
+      +`<td>${dcell(x)}</td>`
       +`<td class="r"><div class="mono" style="color:var(--ink)">${x.saleLbl}</div><div class="dep">${x.saleCur&&x.saleCur!=='EUR'?_esc(x.saleOrig):''}</div></td>`
       +`<td class="r">${bcell(x)}</td>`
-      +`<td class="r">${mcell(x)}</td></tr>`).join('')||'<tr><td colspan="7" class="dimv" style="padding:14px">ничего не найдено</td></tr>';
+      +`<td class="r">${mcell(x)}</td></tr>`).join('')||'<tr><td colspan="8" class="dimv" style="padding:14px">ничего не найдено</td></tr>';
   }
   head(); rows();
   document.getElementById('ctSearch').addEventListener('input',e=>{q=e.target.value; rows();});
@@ -1248,7 +1285,7 @@ function renderSuppliers(){
     if(q){const s=q.toLowerCase(); r=r.filter(x=>((x.name||'')+' '+(x.clients||'')).toLowerCase().includes(s));}
     r=r.slice().sort((a,b)=> NUM[sortKey] ? ((a[sortKey]||0)-(b[sortKey]||0))*sortDir : String(a[sortKey]||'').localeCompare(String(b[sortKey]||''),'ru')*sortDir);
     document.getElementById('spCount').textContent=`(${r.length} из ${X.rows.length})`;
-    document.getElementById('spBody').innerHTML=r.map((x,i)=>`<tr><td class="r dimv mono">${i+1}</td><td><div class="who">${_esc(x.name)}</div>${x.clients?`<div class="dep">для: ${_esc(x.clients)}</div>`:''}</td><td class="r"><div class="mono" style="color:var(--a)">${x.buyLbl}</div><div class="dep">${x.curs?_esc(x.curs):''}</div></td><td class="r mono">${x.share}%</td><td class="r mono">${x.norders}</td><td class="r mono">${x.nclients}</td><td class="dep">${x.last||'—'}</td></tr>`).join('')||'<tr><td colspan="7" class="dimv" style="padding:14px">ничего не найдено</td></tr>';
+    document.getElementById('spBody').innerHTML=r.map((x,i)=>`<tr><td class="r dimv mono">${i+1}</td><td><div class="who">${_esc(x.name)}</div>${x.clients?`<div class="dep">для: ${_esc(x.clients)}</div>`:''}</td><td class="r"><div class="mono" style="color:var(--a)">${x.buyLbl}</div><div class="dep">${x.curs?_esc(x.curs):''}</div></td><td class="r mono">${x.share}%</td><td class="r mono">${x.norders}</td><td class="r mono">${x.nclients}</td><td class="dep">${x.last||'—'}</td></tr>`).join('')||'<tr><td colspan="8" class="dimv" style="padding:14px">ничего не найдено</td></tr>';
   }
   head(); rows();
   document.getElementById('spSearch').addEventListener('input',e=>{q=e.target.value; rows();});
