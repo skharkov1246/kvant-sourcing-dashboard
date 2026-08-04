@@ -183,6 +183,68 @@ class BitrixClient:
             start = nxt
         return first
 
+    def stage_history(self, entity_type_id: int, *, category_id: int | None = None,
+                      since: str | None = None) -> dict[str, list[tuple[str, str]]]:
+        """Полная история стадий: {OWNER_ID: [(STAGE_ID, CREATED_TIME), …]} — ПЕРВЫЙ вход
+        в каждую стадию, с полным временем (ISO), в хронологическом порядке.
+        Для замера скорости переходов (сделки кат.0, заказы СП-172 и т.п.)."""
+        params: dict = {
+            "entityTypeId": entity_type_id,
+            "select": ["OWNER_ID", "CREATED_TIME", "STAGE_ID"],
+            "order": {"CREATED_TIME": "ASC"},
+            "filter": {},
+        }
+        if category_id is not None:
+            params["filter"]["CATEGORY_ID"] = category_id
+        if since:
+            params["filter"][">=CREATED_TIME"] = since
+        hist: dict[str, list[tuple[str, str]]] = {}
+        seen: dict[str, set] = {}
+        start = 0
+        fails = 0
+        while True:
+            params["start"] = start
+            self._throttle()
+            try:
+                data = self._session.post(self.base + "crm.stagehistory.list.json",
+                                          json=params, timeout=self.timeout).json()
+            except requests.RequestException:
+                fails += 1
+                if fails > 3:
+                    raise BitrixError("crm.stagehistory.list: сеть недоступна (3 ретрая)")
+                time.sleep(1.0)
+                continue
+            if isinstance(data, dict) and data.get("error"):
+                if data.get("error") in ("QUERY_LIMIT_EXCEEDED", "OPERATION_TIME_LIMIT"):
+                    time.sleep(0.7)
+                    continue
+                raise BitrixError(f"crm.stagehistory.list: {data['error']} {data.get('error_description', '')}")
+            res = (data or {}).get("result") or {}
+            items = res.get("items") if isinstance(res, dict) else res
+            items = items or []
+            for x in items:
+                oid = str(x.get("OWNER_ID"))
+                st = str(x.get("STAGE_ID") or "")
+                if not oid or not st:
+                    continue
+                if st not in seen.setdefault(oid, set()):   # ASC → первый встреченный вход в стадию
+                    seen[oid].add(st)
+                    hist.setdefault(oid, []).append((st, str(x.get("CREATED_TIME") or "")))
+            nxt = data.get("next")
+            if not nxt or not items:
+                break
+            start = nxt
+        return hist
+
+    def deal_stages_cat(self, category_id: int = 0) -> dict[str, str]:
+        """Упорядоченный (по SORT) справочник стадий воронки сделок категории:
+        {STAGE_ID: имя}. Для кат.0 ENTITY_ID='DEAL_STAGE', иначе 'DEAL_STAGE_<cat>'."""
+        ent = "DEAL_STAGE" if int(category_id) == 0 else f"DEAL_STAGE_{category_id}"
+        m: dict[str, str] = {}
+        for s in self.list_paged("crm.status.list", {"filter": {"ENTITY_ID": ent}, "order": {"SORT": "ASC"}}):
+            m[s["STATUS_ID"]] = s.get("NAME") or s["STATUS_ID"]
+        return m
+
     # ----------------------------------------------------------------- smart-process items
     def list_items(
         self,
