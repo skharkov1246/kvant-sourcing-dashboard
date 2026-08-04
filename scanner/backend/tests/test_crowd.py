@@ -62,6 +62,31 @@ class TestAccrual:
         near = engine.submit(_sub(c, sha="b", phash="ph-x", minutes=3))
         assert near.state == "REJECTED" and near.reject_reason == "duplicate"
 
+    def test_similar_phash_within_threshold_is_duplicate(self, engine):
+        """Сдвиг кадрирования меняет пару бит aHash — равенство хешей такое
+        пропустило бы; hamming-дистанция до порога тарифа ловит."""
+        c = engine.register(_contributor())
+        engine.submit(_sub(c, sha="a", phash="00000000000000ff"))
+        # 4 бита разницы (f0 vs ff в младшем байте) — в пределах порога 6.
+        near = engine.submit(_sub(c, sha="b", phash="00000000000000f0", minutes=3))
+        assert near.state == "REJECTED" and near.reject_reason == "duplicate"
+
+    def test_distant_phash_is_a_different_frame(self, engine):
+        """Другая деталь = десятки различающихся бит — принимается."""
+        c = engine.register(_contributor())
+        engine.submit(_sub(c, sha="a", phash="00000000000000ff"))
+        far = engine.submit(_sub(c, sha="b", phash="ffffffff00000000", minutes=3))
+        assert far.state == "ACCEPTED"
+
+    def test_phash_threshold_is_policy_not_constant(self):
+        """Порог — данные тарифа (C-3): ноль превращает похожесть в строгое
+        равенство, и близкий кадр проходит."""
+        engine = CrowdEngine(RewardPolicy(phash_hamming_threshold=0))
+        c = engine.register(_contributor())
+        engine.submit(_sub(c, sha="a", phash="00000000000000ff"))
+        near = engine.submit(_sub(c, sha="b", phash="00000000000000f0", minutes=3))
+        assert near.state == "ACCEPTED"
+
     def test_low_quality_scan_is_not_paid(self, engine):
         c = engine.register(_contributor())
         bad = engine.submit(_sub(c, quality_score=0.3))

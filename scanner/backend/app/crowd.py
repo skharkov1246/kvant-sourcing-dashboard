@@ -28,6 +28,10 @@ class RewardPolicy:
     hourly_flag_threshold: int = 12
     min_quality_score: float = 0.6
     audit_sample_pct: int = 10
+    # Порог похожести перцептивных хешей (hamming по 64 битам aHash):
+    # ≤ порога — пересъёмка того же кадра. 6 — эмпирика aHash 8×8;
+    # тариф — данные, порог правится без релиза (C-3).
+    phash_hamming_threshold: int = 6
 
 
 @dataclass
@@ -89,9 +93,9 @@ class CrowdEngine:
     """Жизненный цикл сабмишена и реестр вознаграждений.
 
     Дедуп здесь двухступенчатый: точный (sha256 — тот же файл) и перцептивный
-    (phash — пересъёмка того же кадра/экрана). Порог похожести phash отдан
-    вызывающей стороне: в проде это hamming-дистанция по кадрам, здесь —
-    равенство строк.
+    (phash — пересъёмка того же кадра/экрана). Похожесть phash — hamming-
+    дистанция 64-битных aHash (устройство считает PerceptualHash.aHash в
+    KMP-ядре) до порога тарифа `phash_hamming_threshold`.
     """
 
     def __init__(self, policy: RewardPolicy | None = None) -> None:
@@ -138,8 +142,10 @@ class CrowdEngine:
 
         if sub.content_sha256 in self._sha_index:
             return self._reject(sub, "duplicate")
-        if sub.phash and sub.phash in self._phash_index:
-            # Пересъёмка того же кадра — главный вектор фрода при оплате за скан
+        if sub.phash and self._phash_seen_nearby(sub.phash):
+            # Пересъёмка того же кадра — главный вектор фрода при оплате за
+            # скан; равенство хешей не ловит сдвиг кадрирования, поэтому
+            # похожесть считается hamming-дистанцией до порога тарифа.
             return self._reject(sub, "duplicate")
 
         day = sub.submitted_at.date()
@@ -257,6 +263,14 @@ class CrowdEngine:
 
     # — внутреннее —
 
+    def _phash_seen_nearby(self, phash: str) -> bool:
+        """Линейный проход по хешам принятых — честно для in-memory движка;
+        индексная структура (BK-tree/LSH) придёт с персистентностью."""
+        return any(
+            _phash_distance(phash, seen) <= self.policy.phash_hamming_threshold
+            for seen in self._phash_index
+        )
+
     def _accept(self, sub: Submission, c: Contributor) -> Submission:
         sub.state = "ACCEPTED"
         self._sha_index.add(sub.content_sha256)
@@ -290,3 +304,17 @@ class CrowdEngine:
         if c.status != "ACTIVE":
             raise CrowdError(f"Участник {contributor_id} в статусе {c.status}")
         return c
+
+
+def _phash_distance(a: str, b: str) -> int:
+    """Hamming-дистанция 64-битных hex-хешей (aHash с устройства).
+
+    Нечитаемый хеш считается непохожим ни на что, кроме точной копии, —
+    строгость здесь означала бы отклонять честные сканы за кривой формат.
+    """
+    if a == b:
+        return 0
+    try:
+        return bin(int(a, 16) ^ int(b, 16)).count("1")
+    except ValueError:
+        return 64
