@@ -1,0 +1,27 @@
+name: Bitrix probe (диагностика данных)
+
+# Разовый диагностический зонд: ТОЛЬКО ручной запуск (workflow_dispatch).
+# Читает Bitrix через секрет CI и печатает диагностику в лог — сам секрет не выводится.
+# Ничего не деплоит, минут ест ~1. Скрипт зонда: scripts/bitrix_probe.py.
+# Запуск на ветке: gh workflow run probe.yml --ref <ветка> — выполнит версию скрипта с той ветки.
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Зонд
+        env:
+          BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
+        run: python scripts/bitrix_probe.py
