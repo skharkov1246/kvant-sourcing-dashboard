@@ -809,6 +809,23 @@ def review_dashboard(principal: Principal = Depends(current_principal)) -> HTMLR
         for entry in items
     )
 
+    # Крауд: выборка постфактум-аудита (audit_sample_pct тарифа) — тем же
+    # серверным HTML и с тем же экранированием, что очередь ревью.
+    audit_items = _crowd(principal.tenant_id).audit_sample()
+    audit_rows = "".join(
+        "<tr><td class='sid'>{sid}</td><td class='sid'>{cid}</td>"
+        "<td>{quality}</td><td class='sid'>{sha}</td>"
+        "<td class='actions'>"
+        "<button class='bad' onclick=\"clawback('{sid}')\">Фрод — сторно</button>"
+        "</td></tr>".format(
+            sid=_html.escape(s.id),
+            cid=_html.escape(s.contributor_id),
+            quality=_html.escape(str(s.quality_score)),
+            sha=_html.escape(s.content_sha256[:16]),
+        )
+        for s in audit_items
+    ) or "<tr><td colspan='5'>выборка пуста</td></tr>"
+
     page = """<!doctype html><html lang="ru"><head><meta charset="utf-8">
 <title>КВАНТ Скан — очередь ревью</title>
 <style>
@@ -830,6 +847,9 @@ th{background:#eef1f6;font-weight:600}
 <div>__SUMMARY__</div><div id="msg"></div>
 <table><thead><tr><th>Сессия</th><th>Причины</th><th>Поставлено</th><th>Вердикт</th></tr></thead>
 <tbody>__ROWS__</tbody></table>
+<h1 style="margin-top:24px">Крауд: на постфактум-аудит — __AUDIT_COUNT__</h1>
+<table><thead><tr><th>Сабмишен</th><th>Участник</th><th>Качество</th><th>sha256</th><th>Действие</th></tr></thead>
+<tbody>__AUDIT_ROWS__</tbody></table>
 <script>
 const q = new URLSearchParams(location.search);
 const H = {"Content-Type": "application/json",
@@ -844,10 +864,21 @@ async function verdict(sid, v) {
   else { document.getElementById("msg").textContent =
            `Ошибка ${r.status}: ${(await r.json()).detail?.message || ""}`; }
 }
+async function clawback(sid) {
+  const reason = prompt("Причина сторно (фрод):");
+  if (!reason) return;
+  const r = await fetch(`/v1/crowd/submissions/${encodeURIComponent(sid)}/clawback`,
+    {method: "POST", headers: H, body: JSON.stringify({reason})});
+  if (r.ok) { location.reload(); }
+  else { document.getElementById("msg").textContent =
+           `Ошибка ${r.status}: ${(await r.json()).detail?.message || ""}`; }
+}
 </script></body></html>"""
     page = (page.replace("__OPEN__", str(len(items)))
                 .replace("__SUMMARY__", summary_html)
                 .replace("__ROWS__", rows)
+                .replace("__AUDIT_COUNT__", str(len(audit_items)))
+                .replace("__AUDIT_ROWS__", audit_rows)
                 .replace("__TENANT__", _html.escape(principal.tenant_id))
                 .replace("__USER__", _html.escape(principal.user_id)))
     return HTMLResponse(page)

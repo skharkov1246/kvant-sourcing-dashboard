@@ -791,6 +791,36 @@ paths:
         '404': { description: Сабмишена нет }
         '409': { description: Нечего сторнировать }
 
+  /crowd/audit-sample:
+    get:
+      tags: [crowd]
+      summary: Принятые сканы на выборочный постфактум-аудит
+      description: |
+        Доля audit_sample_pct тарифа; выборка детерминирована от id
+        сабмишена — повтор запроса её не меняет. Фрод по итогам проверки —
+        через clawback (сторно отдельной строкой, участник приостановлен).
+      operationId: crowdAuditSample
+      responses:
+        '200':
+          description: Список на проверку
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count: { type: integer }
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id: { type: string, format: uuid }
+                        contributor_id: { type: string, format: uuid }
+                        quality_score: { type: number, nullable: true }
+                        campaign_id: { type: string, nullable: true }
+                        content_sha256: { type: string }
+        '403': { description: Роль без права аудита }
+
   /crowd/contributors/{contributorId}/ledger:
     get:
       tags: [crowd]

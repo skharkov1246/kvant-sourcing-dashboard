@@ -251,6 +251,26 @@ class TestAuditSampleEndpoint:
         assert http.get("/v1/crowd/audit-sample",
                         headers=OPERATOR).status_code == 403
 
+    def test_dashboard_shows_audit_section(self, http):
+        """Секция крауд-аудита на дашборде контролёра: тот же серверный HTML
+        и экранирование, что у очереди ревью."""
+        from app.crowd import CrowdEngine, RewardPolicy
+
+        main_module._CROWD_ENGINES["t-internal"] = CrowdEngine(
+            RewardPolicy(audit_sample_pct=100))
+        cid = _contributor(http)
+        sid = _submit(http, cid, "sha-dash-audit").json()["id"]
+
+        page = http.get("/review/dashboard", headers=REVIEWER).text
+        assert "Крауд: на постфактум-аудит — 1" in page
+        assert sid in page
+        assert "Фрод — сторно" in page
+
+    def test_dashboard_audit_section_empty_is_honest(self, http):
+        page = http.get("/review/dashboard", headers=REVIEWER).text
+        assert "Крауд: на постфактум-аудит — 0" in page
+        assert "выборка пуста" in page
+
 
 class TestRolesAndAudit:
     def test_operator_cannot_touch_money_endpoints(self, http):
