@@ -1,17 +1,24 @@
 package ru.kvant.scan.crowd
 
 import io.ktor.client.HttpClient
+import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.get
 import io.ktor.client.request.header
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
+import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.contentType
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.intOrNull
+import kotlinx.serialization.json.put
 import ru.kvant.scan.sync.SyncConfig
 import ru.kvant.scan.sync.TransportException
 
@@ -50,6 +57,16 @@ data class ContributorLedger(
 )
 
 /**
+ * Судьба крауд-заявки. Отказ движка (дубль, кап, качество, бюджет) — это
+ * НЕ ошибка транспорта: заявка разобрана, причина в [rejectReason].
+ */
+data class SubmissionResult(
+    val id: String,
+    val state: String,  // ACCEPTED | REJECTED | FLAGGED
+    val rejectReason: String?,
+)
+
+/**
  * Клиент крауд-контура (/v1/crowd) — читающая сторона участника: баланс,
  * реестр, состояние кампании. Денежные операции (вердикты, клобэк, выплаты)
  * намеренно отсутствуют: они принадлежат аудитору на стороне сервера.
@@ -75,6 +92,48 @@ class CrowdApi(
         )
     }
 
+    /**
+     * Сдача крауд-скана. [phash] — перцептивный хеш кадра
+     * ([PerceptualHash.aHash]): вторая ступень дедупа против пересъёмки
+     * того же кадра; порог похожести решает сервер, устройство только
+     * честно считает и передаёт.
+     */
+    suspend fun submitScan(
+        contributorId: String,
+        contentSha256: String,
+        submittedAtIso: String,
+        phash: String? = null,
+        qualityScore: Double? = null,
+        campaignId: String? = null,
+    ): SubmissionResult {
+        val body = buildJsonObject {
+            put("contributor_id", contributorId)
+            put("content_sha256", contentSha256)
+            put("submitted_at", submittedAtIso)
+            phash?.let { put("phash", it) }
+            qualityScore?.let { put("quality_score", it) }
+            campaignId?.let { put("campaign_id", it) }
+        }
+        val response = try {
+            client.post("${config.baseUrl}/v1/crowd/submissions") {
+                commonHeaders()
+                contentType(ContentType.Application.Json)
+                setBody(body.toString())
+            }
+        } catch (e: Exception) {
+            throw TransportException(e.message ?: "сеть недоступна", e)
+        }
+        if (response.status.value !in 200..299) {
+            throw TransportException("HTTP ${response.status.value} от сервера синхронизации")
+        }
+        val doc = json.parseToJsonElement(response.bodyAsText()).jsonObject
+        return SubmissionResult(
+            id = doc["id"]?.jsonPrimitive?.content ?: "",
+            state = doc["state"]?.jsonPrimitive?.content ?: "REJECTED",
+            rejectReason = doc["reject_reason"]?.jsonPrimitive?.contentOrNull,
+        )
+    }
+
     /** null — участника нет (404). */
     suspend fun fetchLedger(contributorId: String): ContributorLedger? {
         val response = execute(
@@ -96,14 +155,16 @@ class CrowdApi(
         )
     }
 
+    private fun HttpRequestBuilder.commonHeaders() {
+        config.bearerToken?.let { header("Authorization", "Bearer $it") }
+        header("X-Tenant-Id", config.tenantId)
+        header("X-User-Id", config.userId)
+        header("X-Roles", config.roles)
+    }
+
     private suspend fun execute(url: String): HttpResponse? {
         val response = try {
-            client.get(url) {
-                config.bearerToken?.let { header("Authorization", "Bearer $it") }
-                header("X-Tenant-Id", config.tenantId)
-                header("X-User-Id", config.userId)
-                header("X-Roles", config.roles)
-            }
+            client.get(url) { commonHeaders() }
         } catch (e: Exception) {
             throw TransportException(e.message ?: "сеть недоступна", e)
         }

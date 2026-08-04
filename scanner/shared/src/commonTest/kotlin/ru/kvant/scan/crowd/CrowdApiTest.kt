@@ -12,6 +12,7 @@ import io.ktor.http.headersOf
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import ru.kvant.scan.sync.SyncConfig
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -76,6 +77,32 @@ class CrowdApiTest {
     fun `404 по кампании - null а не исключение`() = runTest {
         val api = api { respond("нет", HttpStatusCode.NotFound) }
         assertNull(api.fetchCampaign("ghost"))
+    }
+
+    @Test
+    fun `submitScan несёт phash - вторая ступень дедупа уезжает с заявкой`() = runTest {
+        var captured: HttpRequestData? = null
+        val api = api { request ->
+            captured = request
+            respond(
+                """{"id": "sub-1", "state": "REJECTED", "reject_reason": "duplicate"}""",
+                HttpStatusCode.Created,
+                headers = headersOf(HttpHeaders.ContentType, "application/json"),
+            )
+        }
+        val phash = PerceptualHash.aHash(IntArray(64) { it * 4 }, 8, 8)
+        val result = api.submitScan(
+            contributorId = "c-1", contentSha256 = "sha-1",
+            submittedAtIso = "2026-08-04T05:00:00+00:00",
+            phash = phash, qualityScore = 0.9,
+        )
+
+        val sent = Json.parseToJsonElement(
+            (captured!!.body as io.ktor.content.TextContent).text).jsonObject
+        assertEquals(phash, sent["phash"]!!.jsonPrimitive.content)
+        // Отказ движка — судьба заявки, не исключение транспорта.
+        assertEquals("REJECTED", result.state)
+        assertEquals("duplicate", result.rejectReason)
     }
 
     @Test
