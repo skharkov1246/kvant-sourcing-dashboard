@@ -424,6 +424,59 @@ class LiveBackendSmokeTest {
     }
 
     @Test
+    fun `крауд-дедуп вживую - aHash устройства против hamming-порога сервера`() = runTest {
+        if (!serverIsUp()) {
+            println("SMOKE SKIPPED: uvicorn на :8077 не запущен")
+            return@runTest
+        }
+        val client = HttpClient(CIO)
+
+        val contributor = Json.parseToJsonElement(
+            client.post("$baseUrl/v1/crowd/contributors") {
+                header("X-Tenant-Id", "t-internal"); header("X-User-Id", "u-rev")
+                header("X-Roles", "operator,reviewer")
+                contentType(ContentType.Application.Json)
+                setBody("""{"display_name": "Дедуп", "phone_hash": "ph-${UUID.randomUUID()}"}""")
+            }.bodyAsText()).jsonObject["id"]!!.jsonPrimitive.content
+
+        val api = ru.kvant.scan.crowd.CrowdApi(client, SyncConfig(
+            baseUrl = baseUrl, tenantId = "t-internal",
+            userId = "u-rev", deviceId = "d-smoke", roles = "operator,reviewer",
+            capabilities = Json.parseToJsonElement("""{"schema_version":1}""").jsonObject,
+        ))
+
+        // Кадр A: градиент с пятном; кадр A' — тот же, чуть ярче (другой
+        // файл → другой sha, но aHash инвариантен к сдвигу яркости).
+        fun frame(shift: Int = 0, spotX: Int = 16) = IntArray(64 * 64) { i ->
+            val x = i % 64; val y = i / 64
+            val base = (x + y) * 255 / 128
+            ((base + if (x in spotX..spotX + 8 && y in 20..28) 180 else 0) + shift)
+                .coerceAtMost(255)
+        }
+        val hash = ru.kvant.scan.crowd.PerceptualHash
+
+        val first = api.submitScan(contributor, "sha-A-${UUID.randomUUID()}",
+            "2026-08-04T08:00:00+00:00", phash = hash.aHash(frame(), 64, 64),
+            qualityScore = 0.9)
+        assertEquals("ACCEPTED", first.state)
+
+        val brighter = api.submitScan(contributor, "sha-A2-${UUID.randomUUID()}",
+            "2026-08-04T08:05:00+00:00", phash = hash.aHash(frame(shift = 30), 64, 64),
+            qualityScore = 0.9)
+        assertEquals("REJECTED", brighter.state)
+        assertEquals("duplicate", brighter.rejectReason)
+
+        val different = api.submitScan(contributor, "sha-B-${UUID.randomUUID()}",
+            "2026-08-04T08:10:00+00:00",
+            phash = hash.aHash(IntArray(64 * 64) { i -> if ((i % 64) < 32) 230 else 20 }, 64, 64),
+            qualityScore = 0.9)
+        assertEquals("ACCEPTED", different.state)
+
+        // Деньги — ровно за два принятых кадра, пересъёмка не оплачена.
+        assertEquals(1000, api.fetchLedger(contributor)!!.balanceCents)
+    }
+
+    @Test
     fun `живой ETag-цикл справочника - вторая загрузка обходится в 304`() = runTest {
         if (!serverIsUp()) {
             println("SMOKE SKIPPED: uvicorn на :8077 не запущен")
