@@ -1,0 +1,29 @@
+# TLS и единственная дверь наружу. Домен подставляется переменной среды
+# KVANT_DOMAIN (см. .env.example): для быстрого старта годится
+# <ip-сервера>.nip.io — Let's Encrypt такие имена подписывает, отдельный
+# домен покупать не обязательно.
+{$KVANT_DOMAIN} {
+	encode gzip
+
+	# Дашборд контролёра — пока dev-инструмент без OIDC (§07.2), поэтому
+	# он закрыт HTTP-аутентификацией отдельно от API устройств.
+	@review path /review*
+	basic_auth @review {
+		{$KVANT_REVIEW_USER} {$KVANT_REVIEW_PASSWORD_HASH}
+	}
+
+	# Кадры и видео идут чанками по мегабайту; лимит держим с запасом,
+	# но не бесконечным — иначе один клиент забьёт диск буфера.
+	request_body {
+		max_size 64MB
+	}
+
+	reverse_proxy api:8000
+
+	log {
+		output file /data/access.log {
+			roll_size 50MB
+			roll_keep 5
+		}
+	}
+}
