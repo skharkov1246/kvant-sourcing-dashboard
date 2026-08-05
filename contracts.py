@@ -36,7 +36,6 @@ ECON_LINK = "UF_CRM_1740133235324"      # ссылка (clck.ru) на файл �
 DL_CUSTOMER = "ufCrm20_1728900218435"   # «Date of deadline to customer» — обещано клиенту
 PROD_END = "ufCrm20_1724941935"         # «Production end date, budget» — плановый конец производства
 INBOUND_PLAN = "ufCrm20_1709294315471"  # «Inbound Delivery Date, planned» — плановое поступление
-SCHEMA_F = "ufCrm20_1724941500"         # «Схема поставки» (справочник, 39 значений)
 CITY_F = "ufCrm20_1742552190053"        # «Город доставки заказчику по бюджету»
 OSS_F = "ufCrm20_1723236618"            # «Deal support specialist» — ОСС заказа (совпал 73/74)
 OSS_DEAL = "UF_CRM_1715604558"          # «Сопровождение сделки» — тот же человек на сделке (74/74)
@@ -145,16 +144,9 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
                                                         "createdTime", "movedTime",
                                                         "assignedById",
                                                         DL_CUSTOMER, PROD_END, INBOUND_PLAN,
-                                                        SCHEMA_F, CITY_F, OSS_F])
+                                                        CITY_F, OSS_F])
     orders = [o for o in orders if not str(o.get("stageId", "")).endswith(":FAIL")]
     supl = client.companies_by_ids({str(o["companyId"]) for o in orders if o.get("companyId")})
-    # справочник «Схема поставки»: значения приходят ID-шками
-    try:
-        f172 = (client.call("crm.item.fields", {"entityTypeId": 172}) or {}).get("fields", {})
-        schema_enum = {str(i.get("ID")): i.get("VALUE")
-                       for i in ((f172.get(SCHEMA_F) or {}).get("items") or [])}
-    except Exception:
-        schema_enum = {}
 
     # 2. группировка заказов по сделке
     by_deal: dict[str, list] = defaultdict(list)
@@ -175,8 +167,9 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
     clients = client.companies_by_ids({str(d.get("COMPANY_ID")) for d in deals.values() if d.get("COMPANY_ID")})
 
     # 4. справочники стадий + история стадий (полное время первого входа)
-    dstages = client.deal_stages_cat(0)                    # упорядоченные стадии воронки реализации
-    dorder = {sid: i for i, sid in enumerate(dstages)}
+    dstages = client.deal_stages_cat(0)                    # все стадии — для подписей
+    dproc = client.deal_stages_process(0)                  # только рабочие: без успеха и проигрышей
+    dorder = {sid: i for i, sid in enumerate(dproc)}
     ostages: dict[str, str] = {}                           # стадии всех воронок СП-172
     ocat_ids = sorted({int(o.get("categoryId") or 0) for o in orders if o.get("categoryId")} | {26})
     for cid in ocat_ids:
@@ -317,7 +310,6 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
                 "revEur": round(o_rev), "revLbl": _money(o_rev),
                 "lossEur": round(o_rev * dl_days / 365 * CAP_RATE) if olate else 0,
                 "burnDay": round(o_rev * CAP_RATE / 365, 1) if olive else 0,
-                "schema": schema_enum.get(str(o.get(SCHEMA_F)), "") if o.get(SCHEMA_F) else "",
                 "city": str(o.get(CITY_F) or ""),
                 "oss": client.user_name(o.get(OSS_F)) if o.get(OSS_F) else "",
                 "prodEnd": pend.strftime("%d.%m.%Y") if pend else "",
@@ -376,7 +368,6 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
             "manager": client.user_name(d.get("ASSIGNED_BY_ID")) or "—",
             "oss": (", ".join(sorted({o["oss"] for o in ords_det if o["oss"]}))[:60]
                     or client.user_name(d.get(OSS_DEAL)) or "—"),
-            "schemas": ", ".join(sorted({o["schema"] for o in ords_det if o["schema"]}))[:60],
             "cities": ", ".join(sorted({o["city"] for o in ords_det if o["city"]}))[:50],
             "done": done, "closed": closed, "lost": sem == "F",
             "inCat0": in_cat0,
@@ -448,7 +439,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
              if len(odur[s]) >= 5 and not (s.endswith(":FAIL"))][:14]
     dbench = [{"stage": s, "name": _stage_name(s), "med": m, "n": len(ddur[s]),
                **_now_stats(s, d_now)}
-              for s, m in dmed.items() if len(ddur[s]) >= 5]
+              for s, m in dmed.items() if len(ddur[s]) >= 5 and s in dproc]
     dbench.sort(key=lambda x: dorder.get(x["stage"], 99))
 
     # --- ВОРОНКА: где стоят открытые сделки, на какие деньги и сколько с сорванным сроком ---
@@ -468,7 +459,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
         if r["stageDays"] is not None:
             a["days"].append(r["stageDays"])
     funnel = []
-    for sid, nm in dstages.items():                 # dstages упорядочен по SORT воронки
+    for sid, nm in dproc.items():                   # только рабочие стадии, по порядку воронки
         a = fn_agg.get(sid)
         if not a or not a["n"]:
             continue
@@ -575,7 +566,6 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
         "lateNoSum": late_nosum_n, "costTop": cost_top,
         "byManager": _cut(lambda r, o: r["manager"]),
         "byOss": _cut(lambda r, o: o.get("oss") or r["oss"]),
-        "bySchema": _cut(lambda r, o: o.get("schema")),
     }
 
     # аддитивно: все прежние KPI сохранены, новые добавлены следом

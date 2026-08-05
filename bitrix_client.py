@@ -245,6 +245,20 @@ class BitrixClient:
             m[s["STATUS_ID"]] = s.get("NAME") or s["STATUS_ID"]
         return m
 
+    def deal_stages_process(self, category_id: int = 0) -> dict[str, str]:
+        """Только РАБОЧИЕ стадии воронки (без успеха и без причин проигрыша).
+
+        В кат.0 после «Сделка успешна» идут корзины проигрыша — «Политика»,
+        «Не прошли по цене», «Проблемы с документами» и т.п. Это не шаги процесса,
+        и в измерениях скорости они дают бессмысленные медианы."""
+        ent = "DEAL_STAGE" if int(category_id) == 0 else f"DEAL_STAGE_{category_id}"
+        m: dict[str, str] = {}
+        for s in self.list_paged("crm.status.list", {"filter": {"ENTITY_ID": ent}, "order": {"SORT": "ASC"}}):
+            if str(s.get("SEMANTICS") or "").upper() in ("F", "S"):
+                continue
+            m[s["STATUS_ID"]] = s.get("NAME") or s["STATUS_ID"]
+        return m
+
     # ----------------------------------------------------------------- smart-process items
     def list_items(
         self,
