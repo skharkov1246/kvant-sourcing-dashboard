@@ -260,6 +260,8 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
         late_orders = 0            # заказов с просроченным обещанием клиенту
         worst_late = None          # самая глубокая просрочка по сделке, дн
         late_buy = 0.0             # закупка под просроченными заказами, €
+        late_money_days = 0.0      # €×дни: сколько денег и как долго висит из-за срыва срока
+        late_nosum = 0             # просроченных заказов без суммы (в деньги не попадают)
         no_dl = 0                  # живых заказов без плановой даты клиенту
         first_order_ts = min((str(o.get("createdTime") or "") for o in ords), default="")
         for o in ords:
@@ -280,6 +282,9 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
             if olate:
                 late_orders += 1
                 late_buy += obuy
+                late_money_days += obuy * dl_days
+                if obuy <= 0:
+                    late_nosum += 1
                 worst_late = dl_days if worst_late is None else max(worst_late, dl_days)
             if olive and not dl:
                 no_dl += 1
@@ -363,6 +368,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
             # дедлайн клиенту (поле «Date of deadline to customer» заказов СП-172)
             "late": late, "lateN": late_orders, "lateDays": worst_late,
             "lateBuy": round(late_buy), "lateBuyLbl": _money(late_buy),
+            "lateMoneyDays": round(late_money_days), "lateNoSum": late_nosum,
             "noDl": no_dl,
             "dlNext": min((o["dl"] for o in ords_det if o["live"] and o["dl"]),
                           key=lambda s: s[6:] + s[3:5] + s[:2], default=""),
@@ -445,6 +451,23 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
                 depth["<30" if dd < 30 else "30-90" if dd < 90 else "90-180" if dd < 180 else ">180"] += 1
     prod_after = sum(1 for r in live_rows for o in r["orders"] if o["live"] and o["prodAfterDl"])
 
+    # --- ЦЕНА ПРОСРОЧКИ В ДЕНЬГАХ ---
+    # 1) евро-дни: сколько денег закупки и сколько дней сверх обещания клиенту они висят.
+    #    Это база: умножив на годовую ставку/365, получаем стоимость замороженного капитала.
+    # 2) выручка и маржа сделок, где есть хоть один просроченный заказ — деньги, которые
+    #    должны были закрыться, но ещё не закрылись (риск, а не потеря).
+    money_days = sum(r["lateMoneyDays"] for r in late_rows)
+    late_nosum_n = sum(r["lateNoSum"] for r in late_rows)
+    rev_at_risk = sum(r["saleEur"] for r in late_rows)
+    margin_at_risk = sum(r["marginEur"] for r in late_rows if r["marginEur"] is not None)
+    avg_late = round(money_days / late_buy_sum, 1) if late_buy_sum else 0   # средневзвеш. просрочка, дн
+    # топ сделок по евро-дням — где деньги стоят дольше и больше всего
+    top_cost = sorted(late_rows, key=lambda r: -r["lateMoneyDays"])[:10]
+    cost_top = [{"deal": r["deal"], "seq": r["seq"], "customer": r["customer"],
+                 "days": r["lateDays"], "buyLbl": r["lateBuyLbl"], "buy": r["lateBuy"],
+                 "moneyDays": r["lateMoneyDays"], "saleLbl": r["saleLbl"],
+                 "manager": r["manager"], "oss": r["oss"]} for r in top_cost]
+
     # разрезы просрочки: по ответственному сделки и по схеме поставки
     def _cut(keyfn) -> list:
         agg: dict[str, list] = defaultdict(lambda: [0, 0, 0.0, 0])   # [просроч. заказов, сделок, € , всего живых заказов]
@@ -468,10 +491,13 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
 
     deadlines = {
         "lateDeals": len(late_rows), "lateOrders": late_orders_n,
-        "lateBuy": _money(late_buy_sum), "depth": depth,
+        "lateBuy": _money(late_buy_sum), "lateBuyNum": round(late_buy_sum), "depth": depth,
         "noDl": nodl_orders_n, "liveOrders": live_orders_n,
         "prodAfterDl": prod_after,
         "field": "Date of deadline to customer",
+        "moneyDays": round(money_days), "avgLate": avg_late,
+        "revAtRisk": _money(rev_at_risk), "marginAtRisk": _money(margin_at_risk),
+        "lateNoSum": late_nosum_n, "costTop": cost_top,
         "byManager": _cut(lambda r, o: r["manager"]),
         "byOss": _cut(lambda r, o: o.get("oss") or r["oss"]),
         "bySchema": _cut(lambda r, o: o.get("schema")),
