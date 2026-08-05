@@ -4,17 +4,25 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import kotlinx.coroutines.launch
 import ru.kvant.scan.android.ui.CaptureScreen
 import ru.kvant.scan.android.ui.CaptureViewModel
@@ -38,20 +46,24 @@ class MainActivity : ComponentActivity() {
 
     // Разрешение камеры спрашивается В МОМЕНТ входа в съёмку, а не на старте
     // приложения: человек видит, зачем оно нужно. Отказ — не тупик: список
-    // и детали заданий работают без камеры.
+    // и детали заданий работают без камеры, но молчать об отказе нельзя —
+    // иначе кнопка «Начать съёмку» просто ничего не делает.
     private var afterGrant: (() -> Unit)? = null
+    private var afterDenial: (() -> Unit)? = null
     private val requestCamera = registerForActivityResult(
         ActivityResultContracts.RequestPermission(),
     ) { granted ->
-        if (granted) afterGrant?.invoke()
+        if (granted) afterGrant?.invoke() else afterDenial?.invoke()
         afterGrant = null
+        afterDenial = null
     }
 
-    private fun withCameraPermission(action: () -> Unit) {
+    private fun withCameraPermission(onDenied: () -> Unit, action: () -> Unit) {
         val granted = ContextCompat.checkSelfPermission(
             this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
         if (granted) action() else {
             afterGrant = action
+            afterDenial = onDenied
             requestCamera.launch(Manifest.permission.CAMERA)
         }
     }
@@ -81,21 +93,35 @@ private sealed interface Screen {
 @Composable
 private fun KvantApp(
     container: AppContainer,
-    withCameraPermission: (action: () -> Unit) -> Unit,
+    withCameraPermission: (onDenied: () -> Unit, action: () -> Unit) -> Unit,
 ) {
     var screen by remember { mutableStateOf<Screen>(Screen.TaskList) }
     var error by remember { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
+    val snackbar = remember { SnackbarHostState() }
     val taskListModel = remember {
         TaskListViewModel(container.stack.tasks, container.stack.engine, container.stack)
     }
 
+    // Сообщение об ошибке видит ЧЕЛОВЕК, а не только logcat: тексты писались
+    // для кладовщика в проходе между стеллажами, им место на экране.
+    LaunchedEffect(error) {
+        error?.let {
+            snackbar.showSnackbar(it, withDismissAction = true)
+            error = null
+        }
+    }
+
+    Box(Modifier.fillMaxSize()) {
     when (val current = screen) {
         is Screen.TaskList -> TaskListScreen(
             model = taskListModel,
             onTaskClick = { screen = Screen.TaskDetail(it) },
         )
         is Screen.TaskDetail -> {
+            // Кнопка «назад» телефона возвращает к списку: без этого экран
+            // деталей — тупик, из которого выходят только убийством приложения.
+            BackHandler { screen = Screen.TaskList }
             // Комментарий контролёра — из локального TaskStore (приехал pull'ом).
             val verdict by androidx.compose.runtime.produceState<ru.kvant.scan.sync.SessionVerdict?>(
                 initialValue = null, key1 = current.task.id,
@@ -105,7 +131,11 @@ private fun KvantApp(
                 task = current.task,
                 verdict = verdict,
                 onStartCapture = { task ->
-                    withCameraPermission {
+                    // Первая лямбда — отказ в разрешении, вторая — сама съёмка.
+                    withCameraPermission({
+                        error = "Без доступа к камере съёмка невозможна. " +
+                            "Разрешение можно выдать в настройках телефона."
+                    }) {
                         scope.launch {
                             try {
                                 val controller = container.captureController(task)
@@ -152,13 +182,18 @@ private fun KvantApp(
                 )
             }
         }
-        is Screen.Capture -> CaptureScreen(viewModel = current.viewModel)
+        is Screen.Capture -> {
+            // «Назад» уводит к списку, но НЕ закрывает сессию: события уже в
+            // outbox, закрыть её может только abandon с причиной (§04.6).
+            // Возврат в задание вернёт человека на тот же шаг съёмки.
+            BackHandler { screen = Screen.TaskList }
+            CaptureScreen(viewModel = current.viewModel)
+        }
         is Screen.ItemCard -> {
-            androidx.activity.compose.BackHandler { screen = current.from }
+            BackHandler { screen = current.from }
             ItemCardScreen(card = current.card)
         }
     }
-    // error показывается тостом/снэкбаром хост-темы; для дев-сборки достаточно
-    // лога — до APK этот экран не рендерится.
-    error?.let { android.util.Log.w("KvantScan", it) }
+        SnackbarHost(snackbar, Modifier.align(Alignment.BottomCenter))
+    }
 }
