@@ -145,7 +145,8 @@ def build():
     if orders.exists():
         (OUT / "orders").mkdir(exist_ok=True)
         alias = {"ПИЛОТ-ЗАКАЗ-1.pdf": "pilot-order-1.pdf",
-                 "ПИЛОТ-ЗАКАЗ-1.md": "pilot-order-1.md"}
+                 "ПИЛОТ-ЗАКАЗ-1.md": "pilot-order-1.md",
+                 "ПОСТАВЩИКИ-SGT400.pdf": "sgt400-suppliers.pdf"}
         for f in orders.iterdir():
             if f.suffix.lower() in (".pdf", ".csv", ".md", ".html"):
                 shutil.copy2(f, OUT / "orders" / alias.get(f.name, f.name))
