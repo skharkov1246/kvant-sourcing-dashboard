@@ -1232,6 +1232,84 @@ def installation_tree(key: str,
     return {"key": key, "tree": tree, "gaps": gaps(tree)}
 
 
+class GeometryInput(BaseModel):
+    source: Literal["manual_tape", "photo_marker", "ar_depth", "lidar",
+                    "photogrammetry", "structured_light", "industrial_scanner"]
+    kind: Literal["dimensions", "point_cloud", "mesh", "profile"] = "dimensions"
+    dimensions_mm: dict[str, float] = Field(default_factory=dict)
+    asset_id: str | None = None
+    tolerance_mm: float | None = None
+    instrument_id: str | None = None
+    refined_from: str | None = None
+    evidence_asset_ids: list[str] = Field(default_factory=list)
+
+
+@app.post("/v1/items/{item_id}/geometry", status_code=201, tags=["items"])
+def add_geometry(item_id: str, body: GeometryInput,
+                 principal: Principal = Depends(current_principal)) -> dict[str, Any]:
+    """Замер любым из семи методов — от рулетки до промышленного сканера.
+
+    Единая дверь по построению: цеховой сканер и телефон кладовщика пишут в
+    одну таблицу, каждый со своей заявленной погрешностью. Уточнение НЕ
+    перезаписывает исходный замер (I-5) — это новая запись с refined_from,
+    иначе спор с поставщиком не на чем строить.
+    """
+    from .geometry import GeometryArtifact, GeometryError
+
+    try:
+        artifact = GeometryArtifact(
+            item_id=item_id, source=body.source, kind=body.kind,
+            dimensions_mm=body.dimensions_mm, asset_id=body.asset_id,
+            tolerance_mm=body.tolerance_mm, instrument_id=body.instrument_id,
+            operator_id=principal.user_id, refined_from=body.refined_from,
+            evidence_asset_ids=body.evidence_asset_ids,
+            created_at=utcnow(),
+        )
+    except GeometryError as e:
+        raise HTTPException(status_code=422, detail={
+            "code": "bad_geometry", "message": str(e)}) from e
+
+    stored = STORE.add_geometry(item_id, {
+        **artifact.as_dict(), "tenant_id": principal.tenant_id})
+    STORE.audit(principal.tenant_id, principal.user_id, "item.geometry",
+                item_id, {"source": body.source, "kind": body.kind,
+                          "tolerance_mm": artifact.tolerance_mm})
+    return {"id": stored.get("id"), "source": artifact.source,
+            "tolerance_mm": artifact.tolerance_mm,
+            "accuracy_class": artifact.accuracy_class}
+
+
+@app.get("/v1/items/{item_id}/geometry", tags=["items"])
+def get_geometry(item_id: str,
+                 _: Principal = Depends(current_principal)) -> dict[str, Any]:
+    """Все замеры детали + сводка «лучшее значение по каждому размеру».
+
+    Значение отдаётся С ПРОИСХОЖДЕНИЕМ: чем мерили, с какой погрешностью,
+    какие ещё значения есть. Расхождение больше суммы погрешностей — не
+    «берём точнее», а спор для человека: скорее всего мерили разные детали.
+    """
+    from .geometry import GeometryArtifact, best_dimensions, measurement_conflicts
+
+    stored = STORE.geometry_of(item_id)
+    artifacts = [
+        GeometryArtifact(
+            item_id=item_id, source=a["source"], kind=a["kind"],
+            dimensions_mm=a.get("dimensions_mm") or {}, asset_id=a.get("asset_id"),
+            tolerance_mm=a.get("tolerance_mm"), instrument_id=a.get("instrument_id"),
+            operator_id=a.get("operator_id"), refined_from=a.get("refined_from"),
+            evidence_asset_ids=a.get("evidence_asset_ids") or [],
+            created_at=a.get("created_at"), id=a.get("id"),
+        )
+        for a in stored
+    ]
+    return {
+        "item_id": item_id,
+        "artifacts": [a.as_dict() for a in artifacts],
+        "best_dimensions": best_dimensions(artifacts),
+        "conflicts": measurement_conflicts(artifacts),
+    }
+
+
 @app.get("/v1/items/{item_id}/used-in", tags=["items"])
 def item_used_in(item_id: str,
                  principal: Principal = Depends(current_principal)) -> dict[str, Any]:

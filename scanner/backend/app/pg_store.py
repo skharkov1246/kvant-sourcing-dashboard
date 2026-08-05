@@ -509,6 +509,44 @@ class PgStore:
                  key if node["level"] == "equipment" else None),
             )
 
+    # ── Геометрия (§05.6) ────────────────────────────────────────────────────
+
+    def add_geometry(self, item_id: str, artifact: dict[str, Any]) -> dict[str, Any]:
+        tenant = self._tenant(artifact["tenant_id"])
+        item_uuid = self._stub_item(tenant, item_id)
+        row = self._conn.execute(
+            "INSERT INTO geometry_artifact (tenant_id, item_id, source, kind, "
+            " dimensions_mm, asset_id, tolerance_mm, instrument_id, operator_id, "
+            " refined_from, evidence_asset_ids) "
+            "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id, created_at",
+            (tenant, item_uuid, artifact["source"], artifact["kind"],
+             Jsonb(artifact.get("dimensions_mm") or {}),
+             _as_uuid(artifact["asset_id"], "asset", tenant) if artifact.get("asset_id") else None,
+             artifact["tolerance_mm"], artifact.get("instrument_id"),
+             artifact.get("operator_id"),
+             artifact.get("refined_from"),
+             [_as_uuid(a, "asset", tenant) for a in artifact.get("evidence_asset_ids") or []]),
+        ).fetchone()
+        return {**artifact, "id": str(row[0]), "created_at": row[1].isoformat()}
+
+    def geometry_of(self, item_id: str) -> list[dict[str, Any]]:
+        rows = self._conn.execute(
+            "SELECT id, source, kind, dimensions_mm, asset_id, tolerance_mm, "
+            " instrument_id, operator_id, refined_from, evidence_asset_ids, created_at "
+            "FROM geometry_artifact WHERE item_id = %s ORDER BY created_at",
+            (_as_uuid(item_id, "item"),),
+        ).fetchall()
+        return [
+            {"id": str(r[0]), "source": r[1], "kind": r[2],
+             "dimensions_mm": {k: float(v) for k, v in (r[3] or {}).items()},
+             "asset_id": str(r[4]) if r[4] else None, "tolerance_mm": float(r[5]),
+             "instrument_id": r[6], "operator_id": r[7],
+             "refined_from": str(r[8]) if r[8] else None,
+             "evidence_asset_ids": [str(a) for a in (r[9] or [])],
+             "created_at": r[10].isoformat()}
+            for r in rows
+        ]
+
     def items_of_installation(self, tenant_id: str, key: str) -> list[str]:
         rows = self._conn.execute(
             "SELECT DISTINCT i.ext_ref FROM installation_node n "

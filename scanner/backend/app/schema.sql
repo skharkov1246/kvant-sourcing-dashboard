@@ -333,6 +333,29 @@ CREATE TABLE installation_node (
 
 CREATE INDEX installation_by_key ON installation_node (tenant_id, installation_key);
 
+-- Источники геометрии (§05.6): рулетка, маркер, AR, LiDAR, фотограмметрия,
+-- структурированный свет, промышленный сканер — четыре порядка по точности
+-- в одной таблице. Уточнение НЕ перезаписывает: новая строка с refined_from
+-- (I-5), поэтому UPDATE здесь не предполагается.
+CREATE TABLE geometry_artifact (
+  id                 UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id          UUID NOT NULL REFERENCES tenant(id),
+  item_id            UUID NOT NULL REFERENCES item_record(id),
+  source             TEXT NOT NULL,     -- manual_tape … industrial_scanner
+  kind               TEXT NOT NULL CHECK (kind IN
+                       ('dimensions','point_cloud','mesh','profile')),
+  dimensions_mm      JSONB NOT NULL DEFAULT '{}',
+  asset_id           UUID,              -- облако точек/меш в объектном хранилище
+  tolerance_mm       NUMERIC(10,3) NOT NULL CHECK (tolerance_mm > 0),
+  instrument_id      TEXT,              -- поверяемое средство → отсечка Р-08
+  operator_id        TEXT,
+  refined_from       UUID REFERENCES geometry_artifact(id),
+  evidence_asset_ids UUID[],
+  created_at         TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX geometry_by_item ON geometry_artifact (item_id, created_at);
+
 -- Расхождение между заявленным и подтверждённым — событие для контролёра,
 -- ровно то, ради чего строится трассировка (§06.3).
 CREATE TABLE trace_conflict (

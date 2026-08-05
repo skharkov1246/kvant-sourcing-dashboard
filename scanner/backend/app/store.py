@@ -71,6 +71,7 @@ class Store:
         self.brand_refs: dict[str, list[dict[str, Any]]] = {}
         self.installations: dict[str, list[dict[str, Any]]] = {}
         self.installation_keys: dict[str, str] = {}  # item_id → ключ установки
+        self.geometry: dict[str, list[dict[str, Any]]] = {}
         self.review_queue: dict[tuple[str, str], dict[str, Any]] = {}  # (tenant_id, session_id)
         self.export_queue: dict[tuple[str, str], dict[str, Any]] = {}  # (tenant_id, session_id)
         self.audit_log: list[dict[str, Any]] = []  # append-only (§07.4)
@@ -292,6 +293,18 @@ class Store:
             self.installations[item_id] = [dict(n) for n in nodes]
             if key:
                 self.installation_keys[item_id] = key
+
+    # ── Геометрия: рулетка, LiDAR, фотограмметрия, сканер (§05.6) ────────────
+
+    def add_geometry(self, item_id: str, artifact: dict[str, Any]) -> dict[str, Any]:
+        """Только добавление: уточнение — новая запись с refined_from (I-5)."""
+        with self._lock:
+            self.geometry.setdefault(item_id, []).append(artifact)
+            return dict(artifact)
+
+    def geometry_of(self, item_id: str) -> list[dict[str, Any]]:
+        with self._lock:
+            return [dict(a) for a in self.geometry.get(item_id, [])]
 
     def items_of_installation(self, tenant_id: str, key: str) -> list[str]:
         """Все детали одного обхода — по ключу физической установки."""
