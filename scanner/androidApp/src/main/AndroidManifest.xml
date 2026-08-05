@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Манифест операторского приложения. Разрешения минимальны и объяснимы:
+     камера — съёмка и обмер, интернет — синхронизация; ARCore объявлен
+     optional, чтобы приложение ставилось и на телефоны без него
+     (лестница деградации обмера, §05). -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <uses-feature android:name="android.hardware.camera" android:required="true" />
+
+    <application
+        android:label="КВАНТ Скан"
+        android:theme="@android:style/Theme.Material.Light.NoActionBar"
+        android:allowBackup="false"
+        android:supportsRtl="true">
+
+        <!-- ARCore подтягивается, если есть; без него обмер деградирует
+             на ручной ввод по протоколу — приложение остаётся рабочим. -->
+        <meta-data android:name="com.google.ar.core" android:value="optional" />
+
+        <activity
+            android:name="ru.kvant.scan.android.MainActivity"
+            android:exported="true"
+            android:configChanges="orientation|screenSize|keyboardHidden">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>

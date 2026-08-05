@@ -13,7 +13,11 @@ plugins {
 }
 
 kotlin {
-    androidTarget()
+    androidTarget {
+        compilations.all {
+            kotlinOptions.jvmTarget = "17"
+        }
+    }
     // Статический фреймворк, чтобы iOS-приложение подключалось без лишней обвязки.
     listOf(iosX64(), iosArm64(), iosSimulatorArm64()).forEach { target ->
         target.binaries.framework {
@@ -61,6 +65,10 @@ kotlin {
 android {
     namespace = "ru.kvant.scan.shared"
     compileSdk = 35
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
     defaultConfig {
         // Ниже 26 не имеет смысла: ARCore Depth API, современный CameraX и
         // аппаратное хранилище ключей всё равно недоступны (см. §05.8).

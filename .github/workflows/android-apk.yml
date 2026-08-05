@@ -1,0 +1,41 @@
+# Сборка APK «КВАНТ Скан» в облаке — по ручной кнопке.
+#
+# Намеренно ТОЛЬКО workflow_dispatch: лимит минут Actions общий с деплоем
+# дашборда (CLAUDE.md), APK собирается по требованию, а не на каждый пуш.
+# Запуск: вкладка Actions → Android APK → Run workflow. Готовый APK — в
+# артефактах прогона (kvant-scan-debug-apk), живёт 30 дней.
+name: Android APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      # AGP 8.7.3 требует Gradle >= 8.9 и несовместим с 9.x — версия
+      # закреплена той, на которой сборка проверена вживую.
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.14.3"
+
+      - name: Accept Android SDK licenses
+        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
+
+      - name: Build debug APK
+        working-directory: scanner
+        run: gradle --no-daemon :androidApp:assembleDebug
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: kvant-scan-debug-apk
+          path: scanner/androidApp/build/outputs/apk/debug/androidApp-debug.apk
+          retention-days: 30
