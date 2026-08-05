@@ -75,7 +75,8 @@ def _make_transport():
     return NullTransport()
 
 
-ACCEPTANCE_PIPELINE = AcceptancePipeline(_make_transport())
+LLM_TRANSPORT = _make_transport()
+ACCEPTANCE_PIPELINE = AcceptancePipeline(LLM_TRANSPORT)
 
 
 def _run_acceptance(tenant_id: str, session_id: str) -> None:
@@ -484,6 +485,90 @@ def complete_asset(asset_id: str, _: Principal = Depends(current_principal)) -> 
             result["offloaded"] = False
             result["offload_error"] = str(exc)[:200]
     return result
+
+
+class ScaleRequest(BaseModel):
+    """Опорный маркер в кадре: сторона в мм + опционально два тапа оператора."""
+    marker_size_mm: float = Field(gt=0)
+    points: list[list[float]] | None = Field(default=None, min_length=2, max_length=2)
+
+
+@app.get("/v1/tools/marker.png", tags=["assets"], include_in_schema=True)
+def marker_png(marker_id: int = 7, size: int = 600,
+               _: Principal = Depends(current_principal)) -> Response:
+    """Карточка-маркер для печати (Р-05 «предмет известного размера»):
+    склад печатает сам, сторона квадрата при печати задаёт масштаб."""
+    from .photo_scale import render_marker_png
+
+    return Response(content=render_marker_png(marker_id, size),
+                    media_type="image/png")
+
+
+@app.post("/v1/assets/{asset_id}/scale", tags=["assets"])
+def asset_scale(asset_id: str, body: ScaleRequest,
+                _: Principal = Depends(current_principal)) -> dict[str, Any]:
+    """Масштаб кадра по опорному маркеру: сервер находит карточку и считает
+    мм/пиксель; два тапа оператора (points) превращаются в миллиметры.
+    Класс точности C без AR — расчёт воспроизводим по сохранённому сырью."""
+    import cv2
+    import numpy as np
+
+    from .photo_scale import ScaleError, detect_scale
+
+    asset = STORE.get_asset(asset_id)
+    if asset is None:
+        raise HTTPException(status_code=404, detail={"code": "not_found", "message": "Актив не найден"})
+    payload = STORE.asset_payload(asset_id)
+    if payload is None:
+        raise HTTPException(status_code=409, detail={
+            "code": "not_verified", "message": "Файл ещё не загружен целиком"})
+    image = cv2.imdecode(np.frombuffer(payload, dtype=np.uint8), cv2.IMREAD_COLOR)
+    if image is None:
+        raise HTTPException(status_code=422, detail={
+            "code": "not_an_image", "message": "Файл не декодируется как изображение"})
+    try:
+        scale = detect_scale(image, body.marker_size_mm)
+    except ScaleError as e:
+        raise HTTPException(status_code=422, detail={
+            "code": "marker_not_found", "message": str(e)}) from e
+    out: dict[str, Any] = {
+        "mm_per_px": round(scale.mm_per_px, 5),
+        "marker_id": scale.marker_id,
+        "skew_ratio": round(scale.skew_ratio, 3),
+        "warnings": scale.warnings,
+    }
+    if body.points:
+        p1, p2 = body.points
+        out["distance_mm"] = round(scale.distance_mm((p1[0], p1[1]), (p2[0], p2[1])), 1)
+    return out
+
+
+@app.post("/v1/assets/{asset_id}/nameplate", tags=["assets"])
+def asset_nameplate(asset_id: str,
+                    principal: Principal = Depends(current_principal)) -> dict[str, Any]:
+    """Чтение шильдика зрением модели: кадр → структурные поля (бренд,
+    обозначение, серийник). Модель не угадывает затёртое — null и сигнал
+    на пересъёмку; без ключа/сети — честное available=false, поле остаётся
+    ручному вводу."""
+    from dataclasses import asdict
+
+    from .nameplate import read_nameplate
+
+    asset = STORE.get_asset(asset_id)
+    if asset is None:
+        raise HTTPException(status_code=404, detail={"code": "not_found", "message": "Актив не найден"})
+    payload = STORE.asset_payload(asset_id)
+    if payload is None:
+        raise HTTPException(status_code=409, detail={
+            "code": "not_verified", "message": "Файл ещё не загружен целиком"})
+    reading = read_nameplate(
+        payload, asset.mime, LLM_TRANSPORT,
+        TenantDataPolicy(tenant_id=principal.tenant_id, retention_days=30),
+    )
+    if reading is None:
+        return {"available": False,
+                "message": "ИИ-чтение недоступно — заполните поля вручную"}
+    return {"available": True, "reading": asdict(reading)}
 
 
 @app.get("/v1/assets/{asset_id}/status", tags=["assets"])

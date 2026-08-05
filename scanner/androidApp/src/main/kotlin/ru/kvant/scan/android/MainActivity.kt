@@ -1,8 +1,12 @@
 package ru.kvant.scan.android
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -32,13 +36,33 @@ class MainActivity : ComponentActivity() {
 
     private val container get() = AppGraph.container
 
+    // Разрешение камеры спрашивается В МОМЕНТ входа в съёмку, а не на старте
+    // приложения: человек видит, зачем оно нужно. Отказ — не тупик: список
+    // и детали заданий работают без камеры.
+    private var afterGrant: (() -> Unit)? = null
+    private val requestCamera = registerForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+    ) { granted ->
+        if (granted) afterGrant?.invoke()
+        afterGrant = null
+    }
+
+    private fun withCameraPermission(action: () -> Unit) {
+        val granted = ContextCompat.checkSelfPermission(
+            this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+        if (granted) action() else {
+            afterGrant = action
+            requestCamera.launch(Manifest.permission.CAMERA)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         MediaUploadWorker.schedule(applicationContext)
         SyncPullWorker.schedule(applicationContext)
         setContent {
             MaterialTheme {
-                Surface { KvantApp(container) }
+                Surface { KvantApp(container, ::withCameraPermission) }
             }
         }
     }
@@ -55,7 +79,10 @@ private sealed interface Screen {
 }
 
 @Composable
-private fun KvantApp(container: AppContainer) {
+private fun KvantApp(
+    container: AppContainer,
+    withCameraPermission: (action: () -> Unit) -> Unit,
+) {
     var screen by remember { mutableStateOf<Screen>(Screen.TaskList) }
     var error by remember { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
@@ -78,13 +105,15 @@ private fun KvantApp(container: AppContainer) {
                 task = current.task,
                 verdict = verdict,
                 onStartCapture = { task ->
-                    scope.launch {
-                        try {
-                            val controller = container.captureController(task)
-                            screen = Screen.Capture(CaptureViewModel(controller))
-                        } catch (e: CaptureSessionFactory.ProtocolMissing) {
-                            // Честная ошибка ДО съёмки: протокол не синхронизирован.
-                            error = e.message
+                    withCameraPermission {
+                        scope.launch {
+                            try {
+                                val controller = container.captureController(task)
+                                screen = Screen.Capture(CaptureViewModel(controller))
+                            } catch (e: CaptureSessionFactory.ProtocolMissing) {
+                                // Честная ошибка ДО съёмки: протокол не синхронизирован.
+                                error = e.message
+                            }
                         }
                     }
                 },

@@ -105,7 +105,8 @@ class TransportUnavailable(Exception):
 
 class LlmTransport(Protocol):
     def complete(self, *, params: dict[str, Any], system: str,
-                 user_content: str, schema: dict[str, Any]) -> TransportResult: ...
+                 user_content: str, schema: dict[str, Any],
+                 images: list[tuple[str, str]] | None = None) -> TransportResult: ...
 
 
 class AnthropicTransport:
@@ -126,7 +127,8 @@ class AnthropicTransport:
         self._timeout_s = timeout_s
 
     def complete(self, *, params: dict[str, Any], system: str,
-                 user_content: str, schema: dict[str, Any]) -> TransportResult:
+                 user_content: str, schema: dict[str, Any],
+                 images: list[tuple[str, str]] | None = None) -> TransportResult:
         # output_config собирается из двух источников: формат ответа — забота
         # транспорта, effort — привязки роли (request_params). Слияние здесь,
         # иначе два kwargs 'output_config' сталкиваются на вызове SDK.
@@ -135,6 +137,15 @@ class AnthropicTransport:
             **params.pop("output_config", {}),
             "format": {"type": "json_schema", "schema": schema},
         }
+        # Зрение: кадры идут блоками ПЕРЕД текстом (шильдик сначала видим,
+        # потом спрашиваем) — (mime, base64) без самодеятельности по сжатию.
+        content: Any = user_content
+        if images:
+            content = [
+                {"type": "image", "source": {
+                    "type": "base64", "media_type": mime, "data": data}}
+                for mime, data in images
+            ] + [{"type": "text", "text": user_content}]
         try:
             response = self._client.with_options(
                 timeout=self._timeout_s, max_retries=0
@@ -146,7 +157,7 @@ class AnthropicTransport:
                     # системный промпт стабилен — кэшируем префикс
                     "cache_control": {"type": "ephemeral"},
                 }],
-                messages=[{"role": "user", "content": user_content}],
+                messages=[{"role": "user", "content": content}],
                 output_config=output_config,
                 **params,
             )
