@@ -318,8 +318,49 @@
   .sd.ok{color:var(--ok)} .sd.mid{color:var(--a2)} .sd.bad{color:var(--nr)} .sd.dim{color:var(--dim)}
   .srcb.chk{color:var(--ok);background:rgba(63,167,102,.13)}
 
+  /* ---- плитки «требует решения»: клик = фильтр таблицы ---- */
+  .actile{display:flex;flex-direction:column;gap:3px;padding:13px 14px;border:1px solid var(--line);
+          border-radius:13px;background:var(--panel);cursor:pointer;position:relative;overflow:hidden;
+          transition:border-color .12s,transform .12s}
+  .actile::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--dim)}
+  .actile.bad::before{background:var(--nr)} .actile.warn::before{background:var(--warn)}
+  .actile.amb::before{background:var(--a)}
+  .actile:hover{border-color:var(--a);transform:translateY(-1px)}
+  .actile.on{border-color:var(--a);box-shadow:inset 0 0 0 1px var(--a)}
+  .actile .t{font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--mut);font-weight:600}
+  .actile .v{font-family:'Archivo';font-weight:800;font-size:26px;line-height:1;margin-top:3px}
+  .actile.bad .v{color:var(--nr)} .actile.warn .v{color:var(--warn)} .actile.amb .v{color:var(--a2)}
+  .actile .m{font-size:10.5px;color:var(--dim);margin-top:3px}
+  .actile .t::after{content:" ›";color:var(--a)}
+
+  /* ---- воронка реализации ---- */
+  .fnl{display:flex;flex-direction:column;gap:10px}
+  .fnr{display:grid;grid-template-columns:minmax(150px,270px) 1fr;gap:12px;align-items:center}
+  .fnr .fl{min-width:0}
+  .fnr .fn{font-size:12.5px;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .fnr .fm{font-size:10.5px;color:var(--dim);margin-top:1px}
+  .fnwrap{display:flex;align-items:center;gap:8px;min-width:0;flex:1;width:100%}
+  .fnb{height:20px;border-radius:6px;background:var(--panel2);display:flex;overflow:hidden;
+       flex:none;max-width:calc(100% - 76px)}
+  .fnb i{display:block;height:100%}
+  .fnb .okp{background:linear-gradient(90deg,var(--a),var(--a2))}
+  .fnb .late{background:linear-gradient(90deg,var(--nr),#d9744f)}
+  .fnv{font-family:var(--mono);font-size:11.5px;color:var(--ink);white-space:nowrap;flex:none;
+       width:66px;text-align:right}
+
+  /* ---- сворачиваемые разборы ---- */
+  details.sect{border:1px solid var(--line);border-radius:13px;background:var(--panel);margin-top:12px}
+  details.sect>summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:12.5px;
+                       list-style:none;display:flex;align-items:center;gap:8px;color:var(--ink)}
+  details.sect>summary::-webkit-details-marker{display:none}
+  details.sect>summary::before{content:"▸";color:var(--a);font-size:10px}
+  details.sect[open]>summary::before{content:"▾"}
+  details.sect>summary:hover{color:var(--a2)}
+  details.sect .in{padding:0 16px 16px}
+  details.sect .in .card{background:var(--panel2)}
+
   /* ---- доступность: видимый фокус с клавиатуры ---- */
-  .tab:focus-visible,.snb:focus-visible,.sortt:focus-visible,.stchip:focus-visible,.qq:focus-visible,.drw .x:focus-visible{outline:2px solid var(--a);outline-offset:2px}
+  .actile:focus-visible,details.sect>summary:focus-visible,.tab:focus-visible,.snb:focus-visible,.sortt:focus-visible,.stchip:focus-visible,.qq:focus-visible,.drw .x:focus-visible{outline:2px solid var(--a);outline-offset:2px}
   .search:focus-visible{outline:2px solid var(--a);outline-offset:1px}
 
   /* ---- адаптив: планшет → мобилка (в конце файла — перекрывает базовые правила) ---- */
@@ -331,6 +372,10 @@
     .kpis{grid-template-columns:repeat(2,1fr)!important} /* !important перекрывает inline-стиль #kpisCov */
   }
   @media(max-width:720px){
+    /* воронка: подпись сверху, полоса на всю ширину карточки */
+    .fnr{grid-template-columns:1fr;gap:5px}
+    .fnr .fn{white-space:normal}
+    .actile .v{font-size:22px}
     section.card{overflow-x:auto;padding:16px 16px}
     section.card table{min-width:560px}
     .flow{flex-wrap:wrap}.flowbox{flex:1 1 44%}
@@ -893,6 +938,8 @@ const METH={
   'd.people':{t:'До человека',what:'Те же метрики по каждому сотруднику группы.',src:'группировка по ASSIGNED_BY_ID внутри групп.',formula:'Сделки / пайплайн / заказы / выручка / зак-сд по сотруднику.',note:'Клик по сотруднику — его сделки и заказы.'},
   'ct.cost':{t:'Потери на инвестициях от просрочки',what:'Во что обходятся поздние отгрузки: деньги, которые заказчик оплатил бы раньше, не работают в обороте.',src:'Живые заказы СП-172 с просроченным полем «Date of deadline to customer». Стоимость отгрузки заказа = сумма сделки, разнесённая на заказы пропорционально их закупке (если сумм закупки нет — поровну между живыми заказами сделки).',formula:'ПОТЕРЯ = Σ(стоимость отгрузки × дней сверх обещания) ÷ 365 × ставка. Ставка — 20% годовых (стоимость денег компании). «Сгорает в день» = Σ стоимости зависших отгрузок × 20% ÷ 365 — столько добавляется к потере за каждый следующий день. «Отгружать в первую очередь» — сортировка живых заказов по цене одного дня ожидания.',note:'Это упущенная доходность, а не прямой убыток: деньги не потеряны, но пришли позже и не работали. Пени считаются отдельно и только как прикидка — условий контрактов в Битриксе нет. Заказы без плановой даты клиенту в расчёт не входят вовсе.'},
   'ct.dl':{t:'Дедлайны клиенту',what:'Просрочка обещаний заказчику по живым заказам поставщикам — то же измерение, что в ручной выгрузке снабжения «Контроль дедлайнов».',src:'Заказы СП-172, поле «Date of deadline to customer» (ufCrm20_1728900218435). Поле подтверждено сверкой: совпало на 72 строках из 72 в выгрузке снабжения.',formula:'Просрочен = живой заказ (не SUCCESS/FAIL), у которого плановая дата клиенту меньше сегодняшней. Глубина = сегодня − дата. «Закупка под просрочкой» = Σ сумм таких заказов. Сделка помечается 🚩, если просрочен хотя бы один её заказ, и попадает в «Замедленные». «План против плана» = плановый конец производства («Production end date, budget») позже обещанной клиенту даты.',note:'«Без плановой даты» — живые заказы, где поле не заполнено: они не под контролем срока ни у нас, ни в выгрузке снабжения. Разрез «кто срывает» — по ответственному за СДЕЛКУ (в выгрузке снабжения это колонка «Менеджер»); «ОСС» — поле заказа «Deal support specialist» (совпало с выгрузкой снабжения на 73 строках из 74), «Схема поставки» — справочник из 39 значений (74 из 75).'},
+  'ct.act':{t:'Требует решения',what:'Четыре очага проблем в воронке реализации. Плитка кликабельна — открывает эти сделки в таблице ниже.',src:'Открытые сделки воронки кат.0 и их живые заказы СП-172.',formula:'ПРОСРОЧЕН ДЕДЛАЙН — есть живой заказ, у которого дата «Date of deadline to customer» уже прошла. ЗАМЕДЛЕНО — сделка или её заказ сидят в стадии дольше нормы (2× медианы стадии, минимум 7 дн). БЕЗ ПЛАНОВОЙ ДАТЫ — у живых заказов не заполнена дата клиенту, срок не контролируется вообще. НЕТ ЭКОНОМИКИ — в сделке нет ни ссылки на файл экономики, ни money-полей.',note:'Числа в плитках — СДЕЛКИ, в подписи под ними — заказы. Одна сделка может попасть сразу в несколько плиток.'},
+  'ct.funnel':{t:'Воронка реализации',what:'Где физически стоят открытые сделки и сколько денег стоит на каждой стадии.',src:'Стадии воронки кат.0 в порядке движения (crm.status.list) + история переходов (crm.stagehistory).',formula:'Длина полосы — Σ сумм открытых сделок на стадии относительно самой «денежной» стадии. Красная часть полосы — деньги сделок, у которых сорван срок клиенту. «Типично N дн» — медианная длительность стадии по истории переходов: половина сделок проходит её быстрее.',note:'Показаны только открытые сделки в воронке реализации. Стадии без сделок не выводятся.'},
   'ct.speed':{t:'Скорость реализации',what:'Сколько времени сделки и заказы проводят в каждой стадии — где процесс буксует.',src:'crm.stagehistory.list: первый вход в каждую стадию (сделки воронки кат.0 и заказы СП-172), с полным временем.',formula:'Длительность стадии = время до следующего первого входа. Медианы по всем прохождениям (n — сколько раз стадию проходили). «Цикл заказа» = создание → закрытие (SUCCESS). «Лаг первого заказа» = вход сделки в воронку реализации → создание первого заказа СП-172.',note:'Бары — МЕДИАННОЕ время стадии (типичная длительность, «где копится время»), а не превышение норматива. Норматив-порог = max(2×медиана, 7 дн) и используется для подсветки замедленных. Медианы устойчивы к выбросам; редкие стадии (n<5) в графики не попадают.'},
     'ct.list':{t:'Список контрактов: стадии, закупка, замедленность',what:'Одна строка = одна сделка воронки реализации (кат.0), №№ до текущего максимума.',src:'crm.deal.list (CATEGORY_ID=0) + заказы СП-172 (parentId2) + история стадий + money-поля сделки + файл «Экономика проекта» (Я.Диск, где получен).',formula:'«Стадия · дней» — текущая стадия и возраст (от последнего входа). ЗАКУПКА каскадом: Σ заказов СП-172 → money-поля сделки («Cost (rub)»/«Offer sum … supplier») → файл экономики проекта → «нет данных». Маржа = продажа − закупка, только при наличии источника. ЗАМЕДЛЕНА (красная строка): возраст текущей стадии сделки или любого живого заказа > max(2×медиана этой стадии, 7 дн), либо нет ни одного заказа >7 дн после входа в воронку.',note:'СВЕРКА ИСТОЧНИКОВ — в карточке сделки: Σ заказов, money-поля и файл экономики показываются рядом с отклонением в %; «⚠≠» — источники расходятся >20%; «✓экон.» — экономика проекта получена и просмотрена (дата в карточке). Клик по строке — стадии, заказы, сверка закупки.'},
   'a.forecast':{t:'Взвешенный прогноз',what:'Сколько денег ожидать с открытого пайплайна и на какие месяцы.',src:'crm.deal.list (открытые сделки YTD: не проиграны, не в реализации) + CLOSEDATE.',formula:'Каждая открытая сделка × вероятность: базовая = эмпирическая конверсия зрелой когорты-2025 (реализовано ÷ создано); для сделок, дошедших до «ТКП выдано+», вероятность ×3 (потолок 60%). Прогноз раскладывается по месяцу ПЛАНОВОГО закрытия (CLOSEDATE). «Покрытие» = взвешенный пайплайн ÷ средний месячный факт реализации-2026; здоровая норма ≥ 3×.',note:'Вероятность ТКП+ — эвристика (нет истории прохождения стадий по каждой сделке). Сделки без CLOSEDATE в помесячный прогноз не попадают — см. блок «Гигиена».'},
@@ -1183,75 +1230,109 @@ function renderContracts(){
   const X=window.__CONTRACTS__, el=document.getElementById('tab-contracts'); if(!el) return;
   if(!X){ el.innerHTML='<div class="note" style="padding:20px 0">нет данных по контрактам</div>'; return; }
   let sortKey='seq', sortDir=-1, q='', mode='all';
-  const NUM={seq:1,saleEur:1,buyEur:1,marginEur:1,stageDays:1,lateDays:1};
+  const NUM={seq:1,saleEur:1,buyEur:1,marginEur:1,stageDays:1,lateDays:1,lossEur:1};
   const COLS=[['customer','Заказчик','l'],['deal','№ сделки / контракт','l'],['stageDays','Стадия · дней','l'],['lateDays','Дедлайн клиенту','l'],['saleEur','Сумма сделки','r'],['buyEur','Закупка','r'],['marginEur','Маржа','r']];
-  const orph=X.orphan&&X.orphan.n?` · ещё ${X.orphan.n} заказов без сделки (закупка ${X.orphan.buy})`:'';
   const R=X.rows, byDeal=Object.fromEntries(R.map(r=>[String(r.deal),r]));
-  const nSlow=R.filter(r=>r.slow&&!r.closed).length, nLive=R.filter(r=>!r.closed).length, nDone=R.filter(r=>r.done||r.closed).length, nNoEcon=R.filter(r=>r.noEcon&&!r.closed).length, nLate=R.filter(r=>r.late&&!r.closed).length;
-  const sp=X.speed||{};
-  let speedHtml='';
-  if((sp.dealBench||[]).length||(sp.orderBench||[]).length){
-    const bl=(items,color)=>{const mx=Math.max(1,...items.map(b=>b.med));return items.map(b=>`<div class="blrow"><div class="blt"><span>${_esc(_stShort(b.name))} <span class="dimv mono">n=${b.n}</span></span><b>${b.med} дн</b></div><div class="bltrack"><i style="width:${(b.med/mx*100).toFixed(0)}%;background:${color}"></i></div>${b.over?`<div class="dep" style="margin-top:2px"><span class="nrc">⚠ просрочено ${b.over} из ${b.live||'?'} сейчас в стадии</span> · теряем в среднем <b class="mono">+${b.lostAvg} дн</b> сверх порога</div>`:(b.live?`<div class="dep" style="margin-top:2px">сейчас в стадии: ${b.live} · просроченных нет</div>`:'')}</div>`).join('');};
-    speedHtml=`<div class="secttl"><b>·</b> Скорость реализации${qmark('ct.speed')}</div><div class="grid">`
-      +`<section class="card"><h2>Стадии сделки — типичное время и просрочка</h2><div class="note">Бар — типичное (медианное) время сделки в стадии: половина сделок проходит её быстрее, половина дольше. Под баром — сколько сделок сидит в стадии сейчас, сколько из них просрочено (за порогом 2×медианы, мин. 7 дн) и сколько дней в среднем теряется сверх порога. Медиана полного цикла заказа: <b>${sp.medCycle!=null?sp.medCycle+' дн':'—'}</b> · медианный лаг первого заказа: <b>${sp.medLag!=null?sp.medLag+' дн':'—'}</b>.</div><div class="barlist">${bl(sp.dealBench||[],'linear-gradient(90deg,var(--a),var(--a2))')}</div></section>`
-      +`<section class="card"><h2>Стадии заказов — типичное время и просрочка</h2><div class="note">Бар — типичное (медианное) время заказа в стадии СП-172, по убыванию: где в норме уходит больше всего времени. Под баром — текущая просрочка: сколько заказов за порогом (2×медиана, мин. 7 дн) и средняя потеря в днях сверх порога.</div><div class="barlist">${bl(sp.orderBench||[],'linear-gradient(90deg,var(--b),var(--b2))')}</div></section></div>`;
+  const dl=X.deadlines||{}, sp=X.speed||{}, fx=X.fx||{}, H=X.head||{}, RATE=dl.rate||20;
+  const live=R.filter(r=>!r.closed);
+  const nSlow=live.filter(r=>r.slow).length, nLate=live.filter(r=>r.late).length,
+        nNoEcon=live.filter(r=>r.noEcon).length, nNoDl=live.filter(r=>r.noDl>0).length,
+        nDone=R.filter(r=>r.done||r.closed).length;
+  const orph=X.orphan&&X.orphan.n?` · ещё ${X.orphan.n} заказов без сделки (${X.orphan.buy})`:'';
+  const bl=(items,color)=>{const mx=Math.max(1,...items.map(b=>b.med));return items.map(b=>`<div class="blrow"><div class="blt"><span>${_esc(_stShort(b.name))} <span class="dimv mono">n=${b.n}</span></span><b>${b.med} дн</b></div><div class="bltrack"><i style="width:${(b.med/mx*100).toFixed(0)}%;background:${color}"></i></div>${b.over?`<div class="dep" style="margin-top:2px"><span class="nrc">⚠ ${b.over} из ${b.live||'?'} тянутся дольше нормы</span> · в среднем на <b class="mono">+${b.lostAvg} дн</b></div>`:(b.live?`<div class="dep" style="margin-top:2px">сейчас в стадии: ${b.live} · все в норме</div>`:'')}</div>`).join('');};
+  const cut=items=>(items||[]).length?items.map(m=>`<div class="blrow"><div class="blt"><span>${_esc(m.name)} <span class="dimv mono">${m.liveOrders} живых</span></span><b class="nrc">${m.lateOrders} · ${m.buyLbl}</b></div><div class="bltrack"><i style="width:${m.pct}%;background:linear-gradient(90deg,var(--nr),var(--a2))"></i></div></div>`).join(''):'<div class="dimv">нет данных</div>';
+
+  // ---------- шапка ----------
+  const fxNote=fx.asOf?`<span class="dimv">Деньги — в € по курсам Битрикса от <b>${fx.asOf}</b> (заданы вручную: 1 USD = ${fx.usdRub} ₽). Отчётность с другим курсом разойдётся системно.</span>`:'';
+  let h=`<header><div class="eyebrow">Квант · реализация</div><h1>Сделки в реализации</h1><div class="sub"><span>Источник: <b>Bitrix24 · сделки + заказы поставщикам (СП-172)</b></span><span>Состояние: <b>${X.label}</b></span>${fxNote}</div></header>`;
+
+  // ---------- 1. ИТОГ: четыре числа, ради которых открывают вкладку ----------
+  h+=`<div class="kpis" style="grid-template-columns:repeat(4,1fr)">`
+   +`<div class="kpi ok"><div class="lbl">Σ продажи</div><div class="val ok">${H.sale}</div><div class="meta">выручка сделок воронки, €</div></div>`
+   +`<div class="kpi"><div class="lbl">Σ маржа</div><div class="val ${(H.marginNum||0)<0?'warn':''}">${H.margin}</div><div class="meta">${H.marginPct}% в среднем · продажа − закупка</div></div>`
+   +`<div class="kpi"><div class="lbl">В работе</div><div class="val">${H.live}</div><div class="meta">открытых сделок · всего в воронке ${H.total}</div></div>`
+   +`<div class="kpi warn"><div class="lbl">💸 Потери от просрочки</div><div class="val warn">${H.loss}</div><div class="meta">при ${RATE}% годовых · сгорает ${H.burnDay} в день</div></div>`
+   +`</div>`
+   +`<div class="note" style="margin-top:8px">Последний № <b>${H.maxseq}</b> · контрактов с заказами <b>${H.contracts}</b> · Σ закупки <b>${H.buy}</b> (из экономики ${H.nEcon}, без данных ${H.nNoBuy}) · медиана цикла заказа <b>${H.medCycle!=null?H.medCycle+' дн':'—'}</b> · лаг до первого заказа <b>${H.medLag!=null?H.medLag+' дн':'—'}</b>${orph}</div>`;
+
+  // ---------- 2. ТРЕБУЕТ РЕШЕНИЯ: плитки-фильтры ----------
+  h+=`<div class="secttl"><b>·</b> Требует решения${qmark('ct.act')}</div>`
+   +`<div class="kpis" id="ctAct" style="grid-template-columns:repeat(4,1fr)">`
+   +`<div class="actile bad" data-m="late" tabindex="0"><div class="t">🚩 Просрочен дедлайн</div><div class="v">${nLate}</div><div class="m">сделок · заказов ${dl.lateOrders||0} · потери ${H.loss}</div></div>`
+   +`<div class="actile warn" data-m="slow" tabindex="0"><div class="t">⏳ Замедлено</div><div class="v">${nSlow}</div><div class="m">стадия тянется дольше нормы</div></div>`
+   +`<div class="actile amb" data-m="nodl" tabindex="0"><div class="t">❓ Без плановой даты</div><div class="v">${nNoDl}</div><div class="m">сделок · заказов ${dl.noDl||0} вне контроля срока</div></div>`
+   +`<div class="actile amb" data-m="noecon" tabindex="0"><div class="t">📄 Нет экономики</div><div class="v">${nNoEcon}</div><div class="m">ни файла, ни money-полей в сделке</div></div>`
+   +`</div>`
+   +`<div class="note" style="margin-top:6px">Клик по плитке — список этих сделок в таблице ниже.</div>`;
+
+  // ---------- 3. ДЕНЬГИ ВО ВРЕМЕНИ: что отгружать и во что обходится ожидание ----------
+  h+=`<div class="secttl"><b>·</b> Деньги во времени${qmark('ct.cost')}</div><div class="grid">`
+   +`<section class="card"><h2>Отгружать в первую очередь</h2><div class="note">Каждый день ожидания стоит денег: стоимость отгрузки × ${RATE}% ÷ 365. Сверху — заказы, чья отгрузка вернёт в оборот больше всего; 🚩 — срок клиенту уже сорван.</div>`
+   +((dl.shipFirst||[]).map(t=>`<div class="tlrow"><span class="tld">${t.late?'🚩 ':''}№${t.seq||'—'}</span><span class="tln">${_esc(t.customer)} <span class="dimv">· ${_esc(_stShort(t.stageName))} · ${t.revLbl}${t.late?` · просрочка ${t.dlDays} дн`:(t.dl?` · срок ${t.dl}`:'')}</span></span><span class="tldur">${_fmtE(t.burnDay)}/дн</span></div>`).join('')||'<div class="dimv">просроченных отгрузок нет</div>')
+   +`</section>`
+   +`<section class="card"><h2>Цена просрочки</h2><div class="note">Стоимость отгрузки, которую заказчик оплатил бы раньше, × дни задержки × стоимость денег. Сейчас зависло <b>${dl.lateRev||'—'}</b> в среднем на <b>${dl.avgLate||0} дн</b> сверх обещанного.</div>`
+   +`<div class="srccmp used" style="margin-top:8px"><span class="sl">Потеряно, ${RATE}% год.</span><div class="sb"><i style="width:100%"></i></div><span class="sv"><b style="color:var(--nr)">${dl.loss||'—'}</b></span><span class="sd bad">итого</span></div>`
+   +`<div class="srccmp"><span class="sl">Сгорает каждый день</span><div class="sb"><i style="width:12%"></i></div><span class="sv">${dl.burnDay||'—'}</span><span class="sd mid">в день</span></div>`
+   +`<div class="srccmp"><span class="sl">Набежит за месяц</span><div class="sb"><i style="width:60%"></i></div><span class="sv">${_fmtE((dl.burnDayNum||0)*30)}</span><span class="sd mid">в месяц</span></div>`
+   +`<div class="note" style="margin-top:8px">При другой стоимости денег:</div>`
+   +`<div class="statleg" style="margin:6px 0" id="dlRate">${[10,15,20,25].map(v=>`<span class="stchip${v===RATE?' on':''}" data-r="${v}">${v}% годовых</span>`).join('')}</div>`
+   +`<div id="dlCostBox"></div>`
+   +`<details class="sect" style="margin-top:10px"><summary>Пени по контрактам — прикидка</summary><div class="in"><div class="note">Условий пеней в Битриксе нет. Обычная практика — 0,05–0,1% в день с потолком 10% от суммы.</div><div class="statleg" style="margin:8px 0" id="dlPen">${[0,0.05,0.1].map(v=>`<span class="stchip${v===0?' on':''}" data-p="${v}">${v?v+'% в день':'без пеней'}</span>`).join('')}</div><div id="dlPenBox"></div></div></details>`
+   +`</section></div>`;
+
+  // ---------- 4. ГДЕ СТОИТ ПРОЦЕСС: воронка + узкие места закупки ----------
+  const F=X.funnel||[];
+  if(F.length||(sp.orderBench||[]).length){
+    const mxF=Math.max(1,...F.map(f=>f.sale));
+    const fnl=F.map(f=>{
+      const w=Math.max(f.sale/mxF*100,7), lw=f.sale?Math.min(f.lateSale/f.sale*100,100):0;
+      return `<div class="fnr"><div class="fl"><div class="fn" title="${_esc(f.name)}">${_esc(f.name)}</div>`
+       +`<div class="fm">${f.n} сдел.${f.med?` · типично ${f.med} дн`:''}${f.late?` · <span class="nrc">🚩 ${f.late}</span>`:''}${f.slow&&!f.late?` · <span class="nrc">⏳ ${f.slow}</span>`:''}</div></div>`
+       +`<div class="fnwrap"><div class="fnb" style="width:${w.toFixed(1)}%"><i class="late" style="width:${lw.toFixed(1)}%"></i><i class="okp" style="width:${(100-lw).toFixed(1)}%"></i></div><span class="fnv">${f.saleLbl}</span></div></div>`;
+    }).join('');
+    h+=`<div class="secttl"><b>·</b> Где стоит процесс${qmark('ct.funnel')}</div><div class="grid">`
+     +`<section class="card"><h2>Воронка реализации</h2><div class="note">Открытые сделки по стадиям в порядке движения. Длина полосы — деньги на стадии, красная часть — деньги сделок с сорванным сроком. «Типично» — медианное время стадии по истории переходов.</div><div class="fnl">${fnl||'<div class="dimv">нет открытых сделок</div>'}</div></section>`
+     +`<section class="card"><h2>Узкие места закупки</h2><div class="note">Стадии заказов СП-172 по типичной длительности — где в норме уходит больше всего времени. Под баром: сколько заказов там сейчас и сколько тянутся дольше нормы (порог 2× медианы, мин. 7 дн).</div><div class="barlist">${bl(sp.orderBench||[],'linear-gradient(90deg,var(--b),var(--b2))')}</div>`
+     +`<div class="note" style="margin-top:10px">Медиана полного цикла заказа: <b>${sp.medCycle!=null?sp.medCycle+' дн':'—'}</b> · медианный лаг до первого заказа: <b>${sp.medLag!=null?sp.medLag+' дн':'—'}</b>.</div></section></div>`;
   }
-  // блок «Дедлайны клиенту» — то же поле, по которому снабжение ведёт «Контроль дедлайнов»
-  const dl=X.deadlines||{};
-  let dlHtml='';
-  if(dl.lateOrders!=null){
-    const dp=dl.depth||{}, mx=Math.max(1,...Object.values(dp));
-    const bars=[['<30','до 30 дн'],['30-90','30–90 дн'],['90-180','90–180 дн'],['>180','больше 180 дн']]
-      .map(([k,lb])=>`<div class="blrow"><div class="blt"><span>${lb}</span><b>${dp[k]||0}</b></div><div class="bltrack"><i style="width:${((dp[k]||0)/mx*100).toFixed(0)}%;background:linear-gradient(90deg,var(--nr),var(--a2))"></i></div></div>`).join('');
-    const cut=(items,unit)=>(items||[]).length?items.map(m=>`<div class="blrow"><div class="blt"><span>${_esc(m.name)} <span class="dimv mono">${m.liveOrders} ${unit}</span></span><b class="nrc">${m.lateOrders} · ${m.buyLbl}</b></div><div class="bltrack"><i style="width:${m.pct}%;background:linear-gradient(90deg,var(--nr),var(--a2))"></i></div></div>`).join(''):'<div class="dimv">нет данных</div>';
-    dlHtml=`<div class="secttl"><b>·</b> Дедлайны клиенту${qmark('ct.dl')}</div>`
-      +`<div class="kpis" style="grid-template-columns:repeat(5,1fr)">`
-      +`<div class="kpi warn"><div class="lbl">🚩 Просрочено заказов</div><div class="val warn">${dl.lateOrders}</div><div class="meta">из ${dl.liveOrders} живых · сделок ${dl.lateDeals}</div></div>`
-      +`<div class="kpi amber"><div class="lbl">Закупка под просрочкой</div><div class="val amber">${dl.lateBuy}</div><div class="meta">деньги, стоящие за сорванным сроком</div></div>`
-      +`<div class="kpi"><div class="lbl">Без плановой даты</div><div class="val">${dl.noDl}</div><div class="meta">живых заказов вне контроля срока</div></div>`
-      +`<div class="kpi"><div class="lbl">План против плана</div><div class="val">${dl.prodAfterDl}</div><div class="meta">производство кончается позже обещания клиенту</div></div>`
-      +`<div class="kpi"><div class="lbl">Глубже 90 дней</div><div class="val">${(dp['90-180']||0)+(dp['>180']||0)}</div><div class="meta">заказов просрочено более чем на квартал</div></div>`
-      +`</div>`
-      +`<div class="grid" style="margin-top:12px">`
-      +`<section class="card"><h2>Потери на инвестициях от просрочки${qmark('ct.cost')}</h2>`
-      +`<div class="note">Считаем так: стоимость отгрузки, которую заказчик оплатил бы раньше, умножается на дни задержки и на стоимость денег. Сейчас зависло <b>${dl.lateRev}</b> отгрузок в среднем на <b>${dl.avgLate} дн</b> сверх обещанного срока.</div>`
-      +`<div class="srccmp used" style="margin-top:8px"><span class="sl">Потеряно, ${dl.rate}% год.</span><div class="sb"><i style="width:100%"></i></div><span class="sv"><b style="color:var(--nr)">${dl.loss}</b></span><span class="sd bad">${dl.rate}%</span></div>`
-      +`<div class="srccmp"><span class="sl">Сгорает каждый день</span><div class="sb"><i style="width:${Math.min(100,(dl.burnDayNum||0)/Math.max(1,(dl.lossNum||1))*100*30).toFixed(0)}%"></i></div><span class="sv">${dl.burnDay}</span><span class="sd mid">в день</span></div>`
-      +`<div class="note" style="margin-top:6px">${_fmtE(dl.revDays||0)}×дн ÷ 365 × ${dl.rate}%. Пока отгрузки не закрыты, к этой сумме добавляется <b class="mono">${dl.burnDay}</b> в день и <b class="mono">${_fmtE((dl.burnDayNum||0)*30)}</b> в месяц.</div>`
-      +`<div class="note" style="margin-top:10px">При другой стоимости денег:</div>`
-      +`<div class="statleg" style="margin:6px 0" id="dlRate">${[10,15,20,25].map(v=>`<span class="stchip${v===(dl.rate||20)?' on':''}" data-r="${v}">${v}% годовых</span>`).join('')}</div>`
-      +`<div id="dlCostBox"></div>`
-      +`<div class="note" style="margin-top:12px">Отдельно — пени, если они есть в контрактах (в Битриксе условий нет, это прикидка по выручке сделок с просрочкой):</div>`
-      +`<div class="statleg" style="margin:6px 0" id="dlPen">${[0,0.05,0.1].map(v=>`<span class="stchip${v===0?' on':''}" data-p="${v}">${v?v+'% в день':'без пеней'}</span>`).join('')}</div>`
-      +`<div id="dlPenBox"></div></section>`
-      +`<section class="card"><h2>Глубина просрочки</h2><div class="note">Сколько живых заказов и насколько перешли обещанную клиенту дату («${_esc(dl.field||'')}»). Это то же поле, по которому снабжение ведёт «Контроль дедлайнов» — цифры сопоставимы напрямую.</div><div class="barlist">${bars}</div></section>`
-      +`<section class="card"><h2>Кто и по какой схеме срывает срок</h2><div class="note">Слева — ответственный за сделку, справа от него: просроченных заказов и закупка под ними; полоса — доля просроченных от всех его живых заказов.</div><div class="barlist">${cut(dl.byManager,'живых')}</div><div class="note" style="margin-top:10px">По ОСС (сопровождение сделки):</div><div class="barlist">${cut(dl.byOss,'живых')}</div><div class="note" style="margin-top:10px">По схеме поставки:</div><div class="barlist">${cut(dl.bySchema,'живых')}</div>`
-      +`</section>`
-      +`<section class="card"><h2>Отгружать в первую очередь</h2><div class="note">Заказы, где каждый день ожидания стоит дороже всего: стоимость отгрузки × ${dl.rate}% ÷ 365. Сверху — те, чья отгрузка вернёт больше всего денег в оборот; 🚩 — срок клиенту уже сорван.</div>`
-      +(dl.shipFirst||[]).map(t=>`<div class="tlrow"><span class="tld">${t.late?'🚩 ':''}№${t.seq||'—'}</span><span class="tln">${_esc(t.customer)} <span class="dimv">· ${_esc(_stShort(t.stageName))} · ${t.revLbl}${t.late?` · ${t.dlDays} дн просрочки`:(t.dl?` · срок ${t.dl}`:'')}</span></span><span class="tldur">${_fmtE(t.burnDay)}/дн</span></div>`).join('')
-      +`</section>`
-      +`</div>`;
-  }
-  const fx=X.fx||{};
-  const fxNote=fx.asOf?`<span class="dimv">Деньги — в € по курсам Битрикса от <b>${fx.asOf}</b> (заданы вручную, не обновляются автоматически: 1 USD = ${fx.usdRub} ₽). Другая отчётность может считать по своему курсу — расхождение будет системным.</span>`:'';
-  el.innerHTML=`<header><div class="eyebrow">Квант · реализация</div><h1>Сделки в реализации</h1><div class="sub"><span>Источник: <b>Bitrix24 · сделки + Заказы поставщикам (СП-172)</b></span><span>Состояние: <b>${X.label}</b></span><span class="dimv">Воронка реализации (кат.0)${orph}. Клик по строке — стадии, заказы и закупка сделки.</span>${fxNote}</div></header>`
-    +`<div class="kpis" style="grid-template-columns:repeat(6,1fr)">${X.kpis.map(p=>`<div class="kpi ${p.clz}"><div class="lbl">${p.lbl}</div><div class="val ${p.clz}">${p.val}</div><div class="meta">${p.meta}</div></div>`).join('')}</div>`
-    +dlHtml
-    +speedHtml
-    +`<div class="secttl"><b>·</b> Список контрактов <span id="ctCount" class="dimv" style="font-weight:400"></span>${qmark('ct.list')}</div>`
-    +`<div class="ctools" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><input id="ctSearch" class="search" style="flex:1;min-width:220px" placeholder="Поиск: заказчик · № сделки · контракт · поставщик…">`
-    +`<div class="statleg" style="margin:0" id="ctChips"><span class="stchip on" data-m="all">Все <b>${R.length}</b></span><span class="stchip" data-m="slow"><i class="dot snr"></i>Замедленные <b>${nSlow}</b></span><span class="stchip" data-m="live">Открытые <b>${nLive}</b></span><span class="stchip" data-m="done">Завершённые <b>${nDone}</b></span><span class="stchip" data-m="late"><i class="dot snr"></i>Просрочен дедлайн <b>${nLate}</b></span><span class="stchip" data-m="noecon"><i class="dot snr"></i>Без экономики <b>${nNoEcon}</b></span></div></div>`
-    +`<section class="card"><div class="note">«№» — порядковый номер сделки в реализации. «Стадия · дней» — текущая стадия воронки и сколько дней сделка в ней (краснеет при превышении порога = 2× медианы стадии). «Дедлайн клиенту» — обещанная заказчику дата по заказам СП-172: 🚩 и глубина просрочки, либо ближайшая дата. «Закупка» — Σ заказов СП-172, при их отсутствии — из экономики проекта (бейдж «эконом.»); «Маржа» = продажа − закупка, без источника закупки не считается. Красная строка — замедленная (причина в дровере). Клик по строке — детали; по заголовку — сортировка.</div><table class="ctab"><thead id="ctHead"></thead><tbody id="ctBody"></tbody></table></section>`;
+
+  // ---------- 5. РАЗБОРЫ (свёрнуто) ----------
+  const dp=dl.depth||{}, mxd=Math.max(1,...Object.values(dp));
+  const depthBars=[['<30','до 30 дн'],['30-90','30–90 дн'],['90-180','90–180 дн'],['>180','больше 180 дн']]
+    .map(([k,lb])=>`<div class="blrow"><div class="blt"><span>${lb}</span><b>${dp[k]||0}</b></div><div class="bltrack"><i style="width:${((dp[k]||0)/mxd*100).toFixed(0)}%;background:linear-gradient(90deg,var(--nr),var(--a2))"></i></div></div>`).join('');
+  h+=`<details class="sect"><summary>Кто срывает сроки — по менеджеру, ОСС и схеме поставки</summary><div class="in">`
+   +`<div class="note">Просроченных заказов и закупка под ними; полоса — доля просроченных от всех живых заказов этого человека или схемы.</div>`
+   +`<div class="barlist">${cut(dl.byManager)}</div>`
+   +`<div class="note" style="margin-top:10px">ОСС (сопровождение сделки):</div><div class="barlist">${cut(dl.byOss)}</div>`
+   +`<div class="note" style="margin-top:10px">Схема поставки:</div><div class="barlist">${cut(dl.bySchema)}</div></div></details>`
+   +`<details class="sect"><summary>Глубина просрочки и здоровье данных${qmark('ct.dl')}</summary><div class="in"><div class="grid">`
+   +`<section class="card"><h2>Глубина просрочки</h2><div class="note">Сколько живых заказов и насколько перешли обещанную клиенту дату (поле «${_esc(dl.field||'')}»). Это то же поле, по которому снабжение ведёт «Контроль дедлайнов», — цифры сопоставимы напрямую.</div><div class="barlist">${depthBars}</div></section>`
+   +`<section class="card"><h2>Здоровье данных</h2><div class="note">Пробелы, из-за которых часть картины не считается.</div>`
+   +`<div class="srccmp"><span class="sl">Заказов без даты клиенту</span><div class="sb"><i style="width:${Math.min(100,(dl.noDl||0)/Math.max(1,dl.liveOrders||1)*100).toFixed(0)}%"></i></div><span class="sv">${dl.noDl||0}</span><span class="sd dim">из ${dl.liveOrders||0}</span></div>`
+   +`<div class="srccmp"><span class="sl">План против плана</span><div class="sb"><i style="width:${Math.min(100,(dl.prodAfterDl||0)/Math.max(1,dl.liveOrders||1)*100).toFixed(0)}%"></i></div><span class="sv">${dl.prodAfterDl||0}</span><span class="sd mid">заказов</span></div>`
+   +`<div class="srccmp"><span class="sl">Сделок без экономики</span><div class="sb"><i style="width:${Math.min(100,nNoEcon/Math.max(1,live.length)*100).toFixed(0)}%"></i></div><span class="sv">${nNoEcon}</span><span class="sd dim">из ${live.length}</span></div>`
+   +`<div class="srccmp"><span class="sl">Закупка без источника</span><div class="sb"><i style="width:${Math.min(100,(H.nNoBuy||0)/Math.max(1,H.total||1)*100).toFixed(0)}%"></i></div><span class="sv">${H.nNoBuy||0}</span><span class="sd dim">из ${H.total||0}</span></div>`
+   +`<div class="note" style="margin-top:8px">«План против плана» — плановый конец производства позже обещанной клиенту даты: срок сорван ещё до начала работ.</div></section>`
+   +`</div></div></details>`;
+
+  // ---------- 6. ТАБЛИЦА ----------
+  h+=`<div class="secttl" id="ctSect"><b>·</b> Все сделки в реализации <span id="ctCount" class="dimv" style="font-weight:400"></span>${qmark('ct.list')}</div>`
+   +`<div class="ctools" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><input id="ctSearch" class="search" style="flex:1;min-width:220px" placeholder="Поиск: заказчик · № сделки · поставщик · менеджер · ОСС · город…">`
+   +`<div class="statleg" style="margin:0" id="ctChips"><span class="stchip on" data-m="all">Все <b>${R.length}</b></span><span class="stchip" data-m="live">Открытые <b>${live.length}</b></span><span class="stchip" data-m="late"><i class="dot snr"></i>Просрочен дедлайн <b>${nLate}</b></span><span class="stchip" data-m="slow"><i class="dot snr"></i>Замедленные <b>${nSlow}</b></span><span class="stchip" data-m="nodl">Без плановой даты <b>${nNoDl}</b></span><span class="stchip" data-m="noecon">Без экономики <b>${nNoEcon}</b></span><span class="stchip" data-m="done">Завершённые <b>${nDone}</b></span></div></div>`
+   +`<section class="card"><div class="note">«Стадия · дней» — где сделка сейчас и сколько дней в этой стадии (краснеет при превышении нормы). «Дедлайн клиенту» — обещанная заказчику дата: 🚩 с глубиной просрочки либо ближайший срок. «Закупка» — Σ заказов СП-172, иначе из экономики проекта. Красная строка — требует внимания. Клик по строке — вся сделка целиком; по заголовку — сортировка.</div><table class="ctab"><thead id="ctHead"></thead><tbody id="ctBody"></tbody></table></section>`;
+  el.innerHTML=h;
+
+  // ---------- рендер таблицы ----------
   const head=()=>{document.getElementById('ctHead').innerHTML=`<tr><th class="r sortable${sortKey==='seq'?' on':''}" data-sk="seq" style="width:48px">№${sortKey==='seq'?(sortDir<0?' ▾':' ▴'):''}</th>`+COLS.map(c=>`<th class="${c[2]==='r'?'r ':''}sortable${sortKey===c[0]?' on':''}" data-sk="${c[0]}">${c[1]}${sortKey===c[0]?(sortDir<0?' ▾':' ▴'):''}</th>`).join('')+'</tr>';};
   const mcell=x=>{const cl=(x.marginEur||0)<0?'color:var(--nr)':'color:var(--ok)';const pct=x.marginPct==null?'<span class="dimv">—</span>':(x.marginPct+'%');return `<div class="mono" style="${x.marginEur==null?'color:var(--dim)':cl}">${x.marginLbl}</div><div class="dep">${pct}</div>`;};
   const scell=x=>{
     if(!x.inCat0)return `<div class="dep">вне воронки</div>`;
     const nm=_esc(_stShort(x.stageName));
     const d=x.stageDays!=null?`<span class="stgd${x.slow?' bad':''}">${Math.round(x.stageDays)} дн</span>`:'';
-    return `<div class="stgcell"><b>${nm}</b><div class="dep">${d}${x.slow?' <span class="nrc">⚠</span>':''}</div></div>`;};
+    return `<div class="stgcell"><b>${nm}</b><div class="dep">${d}${x.slow?' <span class="nrc">⏳</span>':''}</div></div>`;};
   const dcell=x=>{
-    if(!x.lateN&&!x.dlNext)return `<div class="dep">${x.noDl?'нет плановой даты':'—'}</div>`;
-    if(x.lateN)return `<div class="stgcell"><b class="nrc">🚩 ${x.lateDays} дн</b><div class="dep">просрочено заказов: ${x.lateN} · ${x.lateBuyLbl}</div></div>`;
+    if(!x.lateN&&!x.dlNext)return `<div class="dep">${x.noDl?'<span class="nrc">нет плановой даты</span>':'—'}</div>`;
+    if(x.lateN)return `<div class="stgcell"><b class="nrc">🚩 ${x.lateDays} дн</b><div class="dep">заказов ${x.lateN} · ${x.lateBuyLbl}${x.lossLbl&&x.lossLbl!=='€0'?` · −${x.lossLbl}`:''}</div></div>`;
     return `<div class="stgcell"><b>${x.dlNext}</b><div class="dep">в срок${x.noDl?' · без даты: '+x.noDl:''}</div></div>`;};
   const bcell=x=>{
     const b=`<div class="mono" style="color:${x.buySrc==='none'?'var(--dim)':'var(--a)'}">${x.buyLbl}</div>`;
@@ -1265,10 +1346,11 @@ function renderContracts(){
     else if(mode==='done')r=r.filter(x=>x.done||x.closed);
     else if(mode==='noecon')r=r.filter(x=>x.noEcon&&!x.closed);
     else if(mode==='late')r=r.filter(x=>x.late&&!x.closed);
+    else if(mode==='nodl')r=r.filter(x=>x.noDl>0&&!x.closed);
     if(q){const s=q.toLowerCase(); r=r.filter(x=>((x.customer||'')+' '+(x.title||'')+' '+x.deal+' '+(x.suppliers||'')+' '+(x.manager||'')+' '+(x.oss||'')+' '+(x.schemas||'')+' '+(x.cities||'')).toLowerCase().includes(s));}
     r=r.slice().sort((a,b)=> NUM[sortKey] ? ((a[sortKey]||0)-(b[sortKey]||0))*sortDir : String(a[sortKey]||'').localeCompare(String(b[sortKey]||''),'ru')*sortDir);
     document.getElementById('ctCount').textContent=`(${r.length} из ${R.length})`;
-    document.getElementById('ctBody').innerHTML=r.map(x=>`<tr class="drill${x.slow&&!x.closed?' slowrow':''}" data-ct="${x.deal}"><td class="r mono" style="color:var(--a2)">${x.seq||'—'}</td><td><div class="who">${_esc(x.customer)}</div><div class="dep">${_esc(x.title)}</div></td>`
+    document.getElementById('ctBody').innerHTML=r.map(x=>`<tr class="drill${(x.late||x.slow)&&!x.closed?' slowrow':''}" data-ct="${x.deal}"><td class="r mono" style="color:var(--a2)">${x.seq||'—'}</td><td><div class="who">${_esc(x.customer)}</div><div class="dep">${_esc(x.title)}</div></td>`
       +`<td><div class="mono">${x.deal?('#'+x.deal):'—'}</div><div class="dep">${x.done?'<span class="pill p-selected">завершён</span>':(x.lost?'<span class="pill p-no_answer">проиграна</span>':'<span class="pill">в реализации</span>')} ${x.norders}×закуп${x.suppliers?(' · '+_esc(x.suppliers)):''}</div></td>`
       +`<td>${scell(x)}</td>`
       +`<td>${dcell(x)}</td>`
@@ -1277,33 +1359,43 @@ function renderContracts(){
       +`<td class="r">${mcell(x)}</td></tr>`).join('')||'<tr><td colspan="8" class="dimv" style="padding:14px">ничего не найдено</td></tr>';
   }
   head(); rows();
+
+  // ---------- фильтр: плитки и чипы — один механизм ----------
+  function setMode(m,scroll){
+    mode=m;
+    document.querySelectorAll('#ctChips .stchip').forEach(x=>x.classList.toggle('on',x.dataset.m===m));
+    document.querySelectorAll('#ctAct .actile').forEach(x=>x.classList.toggle('on',x.dataset.m===m));
+    rows();
+    if(scroll)document.getElementById('ctSect').scrollIntoView({behavior:'smooth',block:'start'});
+  }
   document.getElementById('ctSearch').addEventListener('input',e=>{q=e.target.value; rows();});
-  // «Цена просрочки»: пересчёт под выбранную ставку капитала и ставку пеней
+  document.getElementById('ctChips').addEventListener('click',e=>{const c=e.target.closest('.stchip'); if(c)setMode(c.dataset.m,false);});
+  document.getElementById('ctAct').addEventListener('click',e=>{const c=e.target.closest('.actile'); if(!c)return; setMode(mode===c.dataset.m?'all':c.dataset.m,true);});
+  document.getElementById('ctAct').addEventListener('keydown',e=>{if(e.key!=='Enter'&&e.key!==' ')return; const c=e.target.closest('.actile'); if(!c)return; e.preventDefault(); setMode(mode===c.dataset.m?'all':c.dataset.m,true);});
+  document.getElementById('ctBody').addEventListener('click',e=>{const tr=e.target.closest('tr[data-ct]'); if(!tr)return; const x=byDeal[tr.dataset.ct]; if(x)openContract(x);});
+  document.getElementById('ctHead').addEventListener('click',e=>{const th=e.target.closest('th.sortable'); if(!th)return; const kk=th.dataset.sk; if(sortKey===kk)sortDir=-sortDir; else {sortKey=kk; sortDir=(NUM[kk]?-1:1);} head(); rows();});
+
+  // ---------- пересчёт цены просрочки ----------
   (function(){
     const box=document.getElementById('dlCostBox'), rw=document.getElementById('dlRate');
     const pbox=document.getElementById('dlPenBox'), pw=document.getElementById('dlPen');
     if(!box||!rw) return;
     const rd=dl.revDays||0;
-    const drawCost=r=>{const loss=rd/365*(r/100);
-      box.innerHTML=`<div class="srccmp"><span class="sl">Потери при ${r}% годовых</span><div class="sb"><i style="width:100%"></i></div><span class="sv"><b>${_fmtE(loss)}</b></span><span class="sd">${r}%</span></div>`;};
+    const drawCost=r=>{box.innerHTML=`<div class="srccmp"><span class="sl">Потери при ${r}% годовых</span><div class="sb"><i style="width:100%"></i></div><span class="sv"><b>${_fmtE(rd/365*(r/100))}</b></span><span class="sd">${r}%</span></div>`;};
     rw.addEventListener('click',e=>{const c=e.target.closest('.stchip'); if(!c)return;
       rw.querySelectorAll('.stchip').forEach(x=>x.classList.toggle('on',x===c)); drawCost(+c.dataset.r);});
-    drawCost(dl.rate||20);
+    drawCost(RATE);
     if(pbox&&pw){
-      const revNum=(X.rows||[]).filter(r=>r.late&&!r.closed).reduce((a,r)=>a+(r.saleEur||0),0);
-      const days=(X.rows||[]).filter(r=>r.late&&!r.closed);
-      const calcPen=p=>days.reduce((a,r)=>a+Math.min((r.saleEur||0)*p/100*(r.lateDays||0),(r.saleEur||0)*0.1),0);
+      const lateRows=R.filter(r=>r.late&&!r.closed);
+      const revNum=lateRows.reduce((a,r)=>a+(r.saleEur||0),0);
+      const calcPen=p=>lateRows.reduce((a,r)=>a+Math.min((r.saleEur||0)*p/100*(r.lateDays||0),(r.saleEur||0)*0.1),0);
       const draw=p=>{pbox.innerHTML=p?`<div class="srccmp used"><span class="sl">Потенциальные пени</span><div class="sb"><i style="width:100%"></i></div><span class="sv"><b>${_fmtE(calcPen(p))}</b></span><span class="sd">${p}%/дн</span></div><div class="note" style="margin-top:6px">По каждой сделке: выручка × ${p}% × дней просрочки, но не больше 10% суммы. Выручка под риском — ${_fmtE(revNum)}.</div>`
-        :`<div class="note">Пени не начисляются — тогда прямая денежная потеря только через стоимость капитала выше.</div>`;};
+        :`<div class="note">Пени не начисляются — тогда прямая потеря только через стоимость капитала выше.</div>`;};
       pw.addEventListener('click',e=>{const c=e.target.closest('.stchip'); if(!c)return;
         pw.querySelectorAll('.stchip').forEach(x=>x.classList.toggle('on',x===c)); draw(+c.dataset.p);});
       draw(0);
     }
   })();
-  document.getElementById('ctChips').addEventListener('click',e=>{const c=e.target.closest('.stchip'); if(!c)return; mode=c.dataset.m;
-    document.querySelectorAll('#ctChips .stchip').forEach(x=>x.classList.toggle('on',x===c)); rows();});
-  document.getElementById('ctBody').addEventListener('click',e=>{const tr=e.target.closest('tr[data-ct]'); if(!tr)return; const x=byDeal[tr.dataset.ct]; if(x)openContract(x);});
-  document.getElementById('ctHead').addEventListener('click',e=>{const th=e.target.closest('th.sortable'); if(!th)return; const kk=th.dataset.sk; if(sortKey===kk)sortDir=-sortDir; else {sortKey=kk; sortDir=(NUM[kk]?-1:1);} head(); rows();});
 }
 // ---- вкладка «Поставщики»: список по обороту (Σ закупок СП-172)
 function renderSuppliers(){
