@@ -196,3 +196,122 @@ class TestBrandChainApi:
             "installation": [{"level": "equipment", "brand": "Siemens"}]})
         assert r.status_code == 422
         assert "нет самой детали" in r.json()["detail"]["message"]
+
+
+class TestInstallationWalkdown:
+    """Обход установки: десятки отдельных сессий → одно дерево.
+
+    Каждая деталь снимается своей сессией (прерванный обход не теряет
+    снятое), связывает их ключ с шильдика установки: бренд + обозначение +
+    заводской номер.
+    """
+
+    def _part(self, client, item, *, part_name, assembly=None, position=None,
+              serial="4471-22"):
+        installation = [
+            {"level": "equipment", "brand": "Siemens", "designation": "SST-300",
+             "serial": serial},
+            {"level": "part", "brand": "PALL", "designation": part_name},
+        ]
+        if assembly:
+            installation.insert(1, {"level": "assembly", "brand": "Emerson / Fisher",
+                                    "designation": assembly, "position": position})
+        return client.post(f"/v1/items/{item}/brands", headers=REVIEWER, json={
+            "brands": [{"brand": "PALL", "role": "manufacturer",
+                        "article": f"HC-{part_name}"}],
+            "installation": installation,
+        })
+
+    def test_separate_sessions_assemble_into_one_tree(self, client):
+        self._part(client, "w-1", part_name="фильтр", assembly="насос смазки",
+                   position="поз. 14")
+        self._part(client, "w-2", part_name="торцевое уплотнение",
+                   assembly="насос смазки", position="поз. 14")
+        self._part(client, "w-3", part_name="фильтр возврата",
+                   assembly="насос охлаждения", position="поз. 21")
+
+        found = client.get("/v1/installations", headers=OPERATOR).json()
+        key = found["items"][0]["key"]
+        assert found["items"][0]["items"] == 3
+
+        doc = client.get(f"/v1/installations/{key}/tree", headers=OPERATOR).json()
+        tree = doc["tree"]
+        assert tree["equipment"]["designation"] == "SST-300"
+        assert tree["counts"] == {"assemblies": 2, "parts": 3}
+        by_name = {a["designation"]: len(a["parts"]) for a in tree["assemblies"]}
+        assert by_name == {"насос смазки": 2, "насос охлаждения": 1}
+        assert doc["gaps"] == []
+
+    def test_two_identical_machines_do_not_merge(self, client):
+        """Две турбины SST-300 на площадке — разные обходы: их различает
+        заводской номер, поэтому шаг съёмки шильдика его и просит."""
+        self._part(client, "m1-p1", part_name="фильтр", assembly="насос",
+                   position="поз. 1", serial="4471-22")
+        self._part(client, "m2-p1", part_name="фильтр", assembly="насос",
+                   position="поз. 1", serial="4471-23")
+        assert client.get("/v1/installations", headers=OPERATOR).json()["count"] == 2
+
+    def test_part_without_assembly_is_kept_visible_not_guessed(self, client):
+        """Деталь без узла не приписывается к случайному узлу — висит
+        отдельно и попадает в список пробелов."""
+        self._part(client, "o-1", part_name="фильтр", assembly="насос",
+                   position="поз. 14")
+        self._part(client, "o-2", part_name="прокладка")  # узел не указан
+
+        key = client.get("/v1/installations", headers=OPERATOR).json()["items"][0]["key"]
+        doc = client.get(f"/v1/installations/{key}/tree", headers=OPERATOR).json()
+        assert len(doc["tree"]["parts_without_assembly"]) == 1
+        assert any("без узла" in g for g in doc["gaps"])
+
+    def test_missing_serial_is_reported_while_operator_is_at_the_machine(self, client):
+        self._part(client, "ns-1", part_name="фильтр", assembly="насос",
+                   position="поз. 3", serial=None)
+        key = client.get("/v1/installations", headers=OPERATOR).json()["items"][0]["key"]
+        doc = client.get(f"/v1/installations/{key}/tree", headers=OPERATOR).json()
+        assert any("заводского номера" in g for g in doc["gaps"])
+
+    def test_assembly_without_position_is_a_gap(self, client):
+        """Два одинаковых насоса в одной турбине без позиции станут одним —
+        закажут одну деталь вместо двух."""
+        self._part(client, "np-1", part_name="фильтр", assembly="насос смазки")
+        key = client.get("/v1/installations", headers=OPERATOR).json()["items"][0]["key"]
+        doc = client.get(f"/v1/installations/{key}/tree", headers=OPERATOR).json()
+        assert any("нет позиции" in g for g in doc["gaps"])
+
+    def test_unknown_walkdown_is_404(self, client):
+        assert client.get("/v1/installations/нет-такого/tree",
+                          headers=OPERATOR).status_code == 404
+
+
+class TestCrossInstallationMatching:
+    """«Где ещё стоит эта же деталь» — спрос считается по парку, а не по
+    одной заявке."""
+
+    def _part(self, client, item, *, article, equipment, serial, assembly=None):
+        return client.post(f"/v1/items/{item}/brands", headers=REVIEWER, json={
+            "brands": [{"brand": "PALL", "role": "manufacturer", "article": article}],
+            "installation": [
+                {"level": "equipment", "brand": equipment, "designation": "тип-1",
+                 "serial": serial},
+                {"level": "assembly", "designation": assembly or "насос",
+                 "position": "поз. 1"},
+                {"level": "part", "brand": "PALL", "designation": "фильтр"},
+            ],
+        })
+
+    def test_same_filter_found_across_different_machines(self, client):
+        self._part(client, "u-1", article="HC 9600-FKS",
+                   equipment="Siemens", serial="A-1")
+        self._part(client, "u-2", article="hc9600fks",      # тот же, иначе записан
+                   equipment="Atlas Copco", serial="B-7")
+        self._part(client, "u-3", article="HC-0000-ДРУГОЙ",
+                   equipment="ABB", serial="C-3")
+
+        doc = client.get("/v1/items/u-1/used-in", headers=OPERATOR).json()
+        assert [u["item_id"] for u in doc["used_in"]] == ["u-2"]
+        assert doc["installations"] == 1
+        assert doc["used_in"][0]["equipment"]["brand"] == "Atlas Copco"
+
+    def test_item_without_brands_is_404(self, client):
+        assert client.get("/v1/items/пусто/used-in",
+                          headers=OPERATOR).status_code == 404

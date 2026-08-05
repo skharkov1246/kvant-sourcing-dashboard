@@ -128,6 +128,9 @@ class InstallationNode:
     brand: str | None = None
     designation: str | None = None   # SST-300, D4 Control Valve
     position: str | None = None      # «поз. 14», «нагнетание»
+    #: Заводской номер — только у установки он делает её ОДНОЙ физической
+    #: машиной, а не типом: две турбины SST-300 на площадке — разные обходы.
+    serial: str | None = None
 
     def __post_init__(self) -> None:
         if self.level not in LEVELS:
@@ -140,7 +143,23 @@ class InstallationNode:
             "brand": self.brand,
             "designation": self.designation,
             "position": self.position,
+            "serial": self.serial,
         }
+
+
+def installation_key(node: InstallationNode) -> str | None:
+    """Ключ ФИЗИЧЕСКОЙ установки: бренд + обозначение + заводской номер.
+
+    По нему детали разных сессий собираются в один обход. Без заводского
+    номера ключ всё равно строится (по бренду и обозначению), но тогда две
+    одинаковые машины на площадке сольются в одну — поэтому шаг съёмки
+    шильдика установки просит номер, а не «тип».
+    """
+    if node.level != "equipment":
+        return None
+    parts = [normalize_article(p) for p in
+             (node.brand, node.designation, node.serial) if p]
+    return "|".join(p for p in parts if p) or None
 
 
 def validate_installation(nodes: list[InstallationNode]) -> list[InstallationNode]:

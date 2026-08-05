@@ -1118,6 +1118,7 @@ class InstallationNodeInput(BaseModel):
     brand: str | None = None
     designation: str | None = None
     position: str | None = None
+    serial: str | None = None
 
 
 class BrandChainInput(BaseModel):
@@ -1149,17 +1150,23 @@ def add_brand_chain(item_id: str, body: BrandChainInput,
         ]
         nodes = validate_installation([
             InstallationNode(level=n.level, brand=n.brand,
-                             designation=n.designation, position=n.position)
+                             designation=n.designation, position=n.position,
+                             serial=n.serial)
             for n in body.installation
         ]) if body.installation else []
     except BrandChainError as e:
         raise HTTPException(status_code=422, detail={
             "code": "bad_brand_chain", "message": str(e)}) from e
 
+    from .brand_chain import installation_key
+
     for ref in refs:
         STORE.add_brand_ref(item_id, {**ref.as_dict(), "tenant_id": principal.tenant_id})
     if nodes:
-        STORE.set_installation(item_id, [n.as_dict() for n in nodes])
+        # Ключ установки связывает детали РАЗНЫХ сессий в один обход.
+        key = next((installation_key(n) for n in nodes
+                    if installation_key(n)), None)
+        STORE.set_installation(item_id, [n.as_dict() for n in nodes], key)
     STORE.audit(principal.tenant_id, principal.user_id, "item.brands",
                 item_id, {"brands": len(refs), "levels": len(nodes)})
     return {"item_id": item_id, "brands": len(refs), "installation": len(nodes)}
@@ -1183,6 +1190,96 @@ def get_brand_chain(item_id: str,
         # Два разных изготовителя — спор для контролёра, а не «данные».
         "manufacturer_conflict": conflicting_manufacturers(refs),
     }
+
+
+@app.get("/v1/installations", tags=["items"])
+def list_installations(principal: Principal = Depends(current_principal)) -> dict[str, Any]:
+    """Обходы установок: по каждой машине — сколько деталей уже снято."""
+    items = STORE.list_installations(principal.tenant_id)
+    return {"items": items, "count": len(items)}
+
+
+@app.get("/v1/installations/{key}/tree", tags=["items"])
+def installation_tree(key: str,
+                      principal: Principal = Depends(current_principal)) -> dict[str, Any]:
+    """Дерево обхода: установка → узлы → детали, собранное из ОТДЕЛЬНЫХ
+    сессий по ключу с шильдика установки.
+
+    Вместе с деревом отдаётся список пробелов: узел без деталей, деталь без
+    узла, установка без заводского номера. Обход — работа на часы, и человек
+    должен видеть недостающее ПОКА он у машины, а не через неделю.
+    """
+    from .brand_chain import BrandRef, procurement_paths
+    from .installation import build_tree, gaps
+
+    item_ids = STORE.items_of_installation(principal.tenant_id, key)
+    if not item_ids:
+        raise HTTPException(status_code=404, detail={
+            "code": "not_found", "message": "Обход с таким ключом не найден"})
+    items = []
+    for item_id in item_ids:
+        brands = STORE.brand_refs_of(item_id)
+        items.append({
+            "item_id": item_id,
+            "installation": STORE.installation_of(item_id),
+            "procurement_paths": procurement_paths([
+                BrandRef(brand=b["brand"], article=b.get("article"), role=b["role"],
+                         confidence=b["confidence"], level=b.get("level"))
+                for b in brands
+            ]),
+        })
+    tree = build_tree(items)
+    return {"key": key, "tree": tree, "gaps": gaps(tree)}
+
+
+@app.get("/v1/items/{item_id}/used-in", tags=["items"])
+def item_used_in(item_id: str,
+                 principal: Principal = Depends(current_principal)) -> dict[str, Any]:
+    """Где ещё стоит ЭТА ЖЕ деталь — по всем обходам и установкам.
+
+    Сопоставление идёт по нормализованному артикулу ЛЮБОЙ роли: тот же
+    фильтр под номером изготовителя в турбине Siemens и под номером OEM в
+    компрессоре Atlas Copco — одна позиция, применённая дважды. Это и есть
+    ответ на «сколько таких нам нужно на самом деле»: спрос считается по
+    парку, а не по одной заявке.
+    """
+    own = STORE.brand_refs_of(item_id)
+    if not own:
+        raise HTTPException(status_code=404, detail={
+            "code": "not_found", "message": "У карточки нет брендов для сопоставления"})
+
+    matches: dict[str, set[str]] = {}
+    for ref in own:
+        norm = ref.get("article_norm")
+        if not norm:
+            continue
+        for other in STORE.find_items_by_article(principal.tenant_id, norm):
+            if other != item_id:
+                matches.setdefault(other, set()).add(norm)
+
+    used_in: list[dict[str, Any]] = []
+    for other_id, arts in sorted(matches.items()):
+        nodes = STORE.installation_of(other_id)
+        equipment = next((n for n in nodes if n.get("level") == "equipment"), {})
+        assembly = next((n for n in nodes if n.get("level") == "assembly"), {})
+        used_in.append({
+            "item_id": other_id,
+            "matched_articles": sorted(arts),
+            "equipment": {"brand": equipment.get("brand"),
+                          "designation": equipment.get("designation"),
+                          "serial": equipment.get("serial")},
+            "assembly": {"designation": assembly.get("designation"),
+                         "position": assembly.get("position")},
+        })
+    # Разные ФИЗИЧЕСКИЕ машины считаются по заводскому номеру: два узла в
+    # одной турбине — одна установка, не две.
+    machines = {
+        (u["equipment"]["brand"], u["equipment"]["designation"],
+         u["equipment"]["serial"]) for u in used_in
+        if any(u["equipment"].values())
+    }
+    return {"item_id": item_id, "used_in": used_in,
+            "installations": len(machines), "occurrences": len(used_in)}
 
 
 @app.get("/v1/search/by-article", tags=["items"])

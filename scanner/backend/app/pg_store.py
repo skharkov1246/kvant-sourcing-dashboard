@@ -490,7 +490,8 @@ class PgStore:
             for r in rows
         ]
 
-    def set_installation(self, item_id: str, nodes: list[dict[str, Any]]) -> None:
+    def set_installation(self, item_id: str, nodes: list[dict[str, Any]],
+                         key: str | None = None) -> None:
         item_uuid = _as_uuid(item_id, "item")
         tenant = self._conn.execute(
             "SELECT tenant_id FROM item_record WHERE id = %s", (item_uuid,)
@@ -501,18 +502,42 @@ class PgStore:
         for node in nodes:
             self._conn.execute(
                 "INSERT INTO installation_node (tenant_id, item_id, level, brand, "
-                " designation, position) VALUES (%s,%s,%s,%s,%s,%s)",
+                " designation, position, serial, installation_key) "
+                "VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
                 (tenant[0], item_uuid, node["level"], node.get("brand"),
-                 node.get("designation"), node.get("position")),
+                 node.get("designation"), node.get("position"), node.get("serial"),
+                 key if node["level"] == "equipment" else None),
             )
 
-    def installation_of(self, item_id: str) -> list[dict[str, Any]]:
+    def items_of_installation(self, tenant_id: str, key: str) -> list[str]:
         rows = self._conn.execute(
-            "SELECT level, brand, designation, position FROM installation_node "
-            "WHERE item_id = %s", (_as_uuid(item_id, "item"),),
+            "SELECT DISTINCT i.ext_ref FROM installation_node n "
+            "JOIN item_record i ON i.id = n.item_id "
+            "WHERE n.tenant_id = %s AND n.installation_key = %s",
+            (self._tenant(tenant_id), key),
         ).fetchall()
-        return [{"level": r[0], "brand": r[1], "designation": r[2], "position": r[3]}
-                for r in rows]
+        return sorted(r[0] for r in rows if r[0])
+
+    def list_installations(self, tenant_id: str) -> list[dict[str, Any]]:
+        rows = self._conn.execute(
+            "SELECT installation_key, count(DISTINCT item_id) FROM installation_node "
+            "WHERE tenant_id = %s AND installation_key IS NOT NULL "
+            "GROUP BY installation_key ORDER BY installation_key",
+            (self._tenant(tenant_id),),
+        ).fetchall()
+        return [{"key": r[0], "items": r[1]} for r in rows]
+
+    def installation_of(self, item_id: str) -> list[dict[str, Any]]:
+        # Порядок цепочки — часть контракта (установка → узел → деталь),
+        # а не случайность выборки: memory отдаёт её отсортированной.
+        rows = self._conn.execute(
+            "SELECT level, brand, designation, position, serial FROM installation_node "
+            "WHERE item_id = %s ORDER BY CASE level WHEN 'equipment' THEN 1 "
+            " WHEN 'assembly' THEN 2 ELSE 3 END",
+            (_as_uuid(item_id, "item"),),
+        ).fetchall()
+        return [{"level": r[0], "brand": r[1], "designation": r[2], "position": r[3],
+                 "serial": r[4]} for r in rows]
 
     def find_items_by_article(self, tenant_id: str, article_norm: str) -> list[str]:
         rows = self._conn.execute(

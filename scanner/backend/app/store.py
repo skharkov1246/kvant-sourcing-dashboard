@@ -70,6 +70,7 @@ class Store:
         self.trace_links: dict[str, list[dict[str, Any]]] = {}
         self.brand_refs: dict[str, list[dict[str, Any]]] = {}
         self.installations: dict[str, list[dict[str, Any]]] = {}
+        self.installation_keys: dict[str, str] = {}  # item_id → ключ установки
         self.review_queue: dict[tuple[str, str], dict[str, Any]] = {}  # (tenant_id, session_id)
         self.export_queue: dict[tuple[str, str], dict[str, Any]] = {}  # (tenant_id, session_id)
         self.audit_log: list[dict[str, Any]] = []  # append-only (§07.4)
@@ -285,9 +286,24 @@ class Store:
         with self._lock:
             return [dict(r) for r in self.brand_refs.get(item_id, [])]
 
-    def set_installation(self, item_id: str, nodes: list[dict[str, Any]]) -> None:
+    def set_installation(self, item_id: str, nodes: list[dict[str, Any]],
+                         key: str | None = None) -> None:
         with self._lock:
             self.installations[item_id] = [dict(n) for n in nodes]
+            if key:
+                self.installation_keys[item_id] = key
+
+    def items_of_installation(self, tenant_id: str, key: str) -> list[str]:
+        """Все детали одного обхода — по ключу физической установки."""
+        with self._lock:
+            return sorted(i for i, k in self.installation_keys.items() if k == key)
+
+    def list_installations(self, tenant_id: str) -> list[dict[str, Any]]:
+        with self._lock:
+            counts: dict[str, int] = {}
+            for key in self.installation_keys.values():
+                counts[key] = counts.get(key, 0) + 1
+            return [{"key": k, "items": v} for k, v in sorted(counts.items())]
 
     def installation_of(self, item_id: str) -> list[dict[str, Any]]:
         with self._lock:

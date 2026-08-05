@@ -322,9 +322,16 @@ CREATE TABLE installation_node (
   brand       TEXT,
   designation TEXT,
   position    TEXT,
+  serial      TEXT,             -- заводской номер: только он делает установку
+                                -- ОДНОЙ машиной, а не типом
+  -- Ключ обхода: по нему детали разных сессий собираются в одно дерево.
+  -- Заполняется только у уровня equipment.
+  installation_key TEXT,
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
   UNIQUE (item_id, level)
 );
+
+CREATE INDEX installation_by_key ON installation_node (tenant_id, installation_key);
 
 -- Расхождение между заявленным и подтверждённым — событие для контролёра,
 -- ровно то, ради чего строится трассировка (§06.3).
