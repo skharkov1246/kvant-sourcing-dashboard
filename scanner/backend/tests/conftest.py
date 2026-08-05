@@ -25,6 +25,13 @@ PG_ADMIN_DSN = os.environ.get(
 PG_TEST_DB = "kvant_scan_test"
 
 
+@pytest.fixture(autouse=True)
+def _no_cloud_offload(monkeypatch):
+    """Тесты не ходят в реальный бакет: облако по умолчанию отсутствует.
+    Тесты оффлоада подставляют фейк поверх этой заглушки."""
+    monkeypatch.setattr(main_module, "OBJECT_STORAGE", None)
+
+
 @pytest.fixture()
 def protocol() -> dict:
     return json.loads(PROTOCOL_PATH.read_text(encoding="utf-8"))

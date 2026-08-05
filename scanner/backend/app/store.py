@@ -224,6 +224,15 @@ class Store:
             asset.received_chunks.add(n)
             asset.upload_state = "uploading"
 
+    def asset_payload(self, asset_id: str) -> bytes | None:
+        """Собранные байты подтверждённого файла — для оффлоада в облако.
+        Контракт общий для обоих хранилищ: где лежат чанки — деталь стора."""
+        with self._lock:
+            asset = self.assets.get(asset_id)
+            if asset is None or asset.upload_state != "verified":
+                return None
+            return bytes(asset.data[: asset.bytes])
+
     def complete_asset(self, asset_id: str) -> dict[str, Any]:
         """Сверка контрольной суммы. Несовпадение — повтор целиком, а не тихий приём."""
         with self._lock:

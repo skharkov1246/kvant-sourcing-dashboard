@@ -38,6 +38,7 @@ from .directories import (
 )
 from .export import registry_row
 from .model_registry import TenantDataPolicy
+from .object_storage import object_storage_from_env
 from .protocol import auto_accept, check_compatibility, is_complete
 from .projections import fold
 from .si_check import instrument_flags
@@ -50,6 +51,10 @@ app = FastAPI(
 )
 
 STORE = Store()
+
+# Облачное хранилище файлов (S3); None — файлы остаются в приёмном буфере
+# процесса, поведение дев-стенда без облака не меняется.
+OBJECT_STORAGE = object_storage_from_env()
 
 DEFAULT_CHUNK_SIZE = 1 << 20  # 1 МиБ; в проде выбирается по замеру скорости
 
@@ -459,7 +464,26 @@ async def put_chunk(request: Request, asset_id: str, n: int, _: Principal = Depe
 def complete_asset(asset_id: str, _: Principal = Depends(current_principal)) -> dict[str, Any]:
     if STORE.get_asset(asset_id) is None:
         raise HTTPException(status_code=404, detail={"code": "not_found", "message": "Актив не найден"})
-    return STORE.complete_asset(asset_id)
+    result = STORE.complete_asset(asset_id)
+    # Подтверждённый файл уезжает в облачный бакет (ADR-0005: байты — в
+    # объектном хранилище). Отказ облака НЕ роняет подтверждение: файл
+    # остаётся в приёмном буфере, offloaded=false виден клиенту и оператору;
+    # повторный complete идемпотентно доталкивает.
+    if result.get("status") == "verified" and OBJECT_STORAGE is not None:
+        asset = STORE.get_asset(asset_id)
+        try:
+            OBJECT_STORAGE.put(
+                f"{asset.tenant_id}/{asset.session_id}/{asset.id}",
+                STORE.asset_payload(asset_id) or b"",
+                mime=asset.mime,
+                metadata={"sha256": asset.sha256, "step-id": asset.step_id,
+                          "kind": asset.kind},
+            )
+            result["offloaded"] = True
+        except Exception as exc:  # noqa: BLE001 — облако не должно ронять приём
+            result["offloaded"] = False
+            result["offload_error"] = str(exc)[:200]
+    return result
 
 
 @app.get("/v1/assets/{asset_id}/status", tags=["assets"])

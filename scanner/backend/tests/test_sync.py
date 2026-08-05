@@ -160,3 +160,75 @@ class TestAssetUpload:
         second = client.post("/v1/assets", json=body, headers=OPERATOR).json()
         assert second["deduplicated"] is True
         assert second["asset_id"] == first["asset_id"]
+
+
+class TestCloudOffload:
+    """Подтверждённый файл уезжает в облачный бакет (ADR-0005): ключ
+    детерминирован, отказ облака не роняет подтверждение."""
+
+    class _FakeStorage:
+        def __init__(self, fail=False):
+            self.fail = fail
+            self.puts = []
+
+        def put(self, key, data, *, mime, metadata):
+            if self.fail:
+                raise RuntimeError("бакет недоступен")
+            self.puts.append((key, bytes(data), mime, dict(metadata)))
+
+        def get(self, key):
+            for k, data, *_ in self.puts:
+                if k == key:
+                    return data
+            return None
+
+    def _upload(self, client, session="s-cloud"):
+        payload = b"drawing-bytes" * 100
+        digest = hashlib.sha256(payload).hexdigest()
+        init = client.post("/v1/assets", json={
+            "session_id": session, "step_id": "overview", "kind": "photo",
+            "mime": "image/jpeg", "bytes": len(payload), "sha256": digest,
+        }, headers=OPERATOR).json()
+        client.put(f"/v1/assets/{init['asset_id']}/chunks/0",
+                   content=payload, headers=OPERATOR)
+        return init["asset_id"], payload, digest
+
+    def test_verified_asset_lands_in_bucket_under_deterministic_key(
+            self, client, monkeypatch):
+        import app.main as main_module
+
+        storage = self._FakeStorage()
+        monkeypatch.setattr(main_module, "OBJECT_STORAGE", storage)
+        asset_id, payload, digest = self._upload(client)
+
+        done = client.post(f"/v1/assets/{asset_id}/complete", headers=OPERATOR).json()
+        assert done["status"] == "verified" and done["offloaded"] is True
+
+        key, data, mime, metadata = storage.puts[0]
+        assert key == f"t-internal/s-cloud/{asset_id}"
+        assert data == payload and mime == "image/jpeg"
+        assert metadata["sha256"] == digest
+
+    def test_cloud_failure_keeps_verification_and_reports_honestly(
+            self, client, monkeypatch):
+        """Отказ бакета — не отказ приёмки: файл остаётся в приёмном буфере,
+        offloaded=false виден клиенту, повторный complete доталкивает."""
+        import app.main as main_module
+
+        storage = self._FakeStorage(fail=True)
+        monkeypatch.setattr(main_module, "OBJECT_STORAGE", storage)
+        asset_id, _, _ = self._upload(client, session="s-cloud-2")
+
+        done = client.post(f"/v1/assets/{asset_id}/complete", headers=OPERATOR).json()
+        assert done["status"] == "verified"
+        assert done["offloaded"] is False and "offload_error" in done
+
+        storage.fail = False  # облако ожило — повторный complete доталкивает
+        retry = client.post(f"/v1/assets/{asset_id}/complete", headers=OPERATOR).json()
+        assert retry["offloaded"] is True and len(storage.puts) == 1
+
+    def test_without_cloud_config_behaviour_is_unchanged(self, client):
+        asset_id, _, _ = self._upload(client, session="s-cloud-3")
+        done = client.post(f"/v1/assets/{asset_id}/complete", headers=OPERATOR).json()
+        assert done["status"] == "verified"
+        assert "offloaded" not in done  # облака нет — и поле честно отсутствует

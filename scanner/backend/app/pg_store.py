@@ -338,10 +338,13 @@ class PgStore:
             uuid.UUID(asset_id)
         except ValueError:
             return None
+        # session_id наружу — внешний реф сессии, не внутренний UUID: ключ
+        # файла в бакете обязан быть одинаковым на обоих хранилищах.
         row = self._conn.execute(
-            "SELECT a.id, t.code, a.session_id, a.step_id, a.kind, a.mime, "
+            "SELECT a.id, t.code, s.ext_ref, a.step_id, a.kind, a.mime, "
             " a.bytes, a.sha256, a.capture_meta, a.upload_state "
-            "FROM asset a JOIN tenant t ON t.id = a.tenant_id WHERE a.id = %s",
+            "FROM asset a JOIN tenant t ON t.id = a.tenant_id "
+            "JOIN scan_session s ON s.id = a.session_id WHERE a.id = %s",
             (asset_id,),
         ).fetchone()
         if row is None:
@@ -369,6 +372,18 @@ class PgStore:
             "UPDATE asset SET upload_state = 'uploading' WHERE id = %s AND upload_state = 'pending'",
             (asset_id,),
         )
+
+    def asset_payload(self, asset_id: str) -> bytes | None:
+        """Собранные байты подтверждённого файла — для оффлоада в облако."""
+        state = self._conn.execute(
+            "SELECT upload_state, bytes FROM asset WHERE id = %s", (asset_id,)
+        ).fetchone()
+        if state is None or state[0] != "verified":
+            return None
+        rows = self._conn.execute(
+            "SELECT data FROM asset_chunk WHERE asset_id = %s ORDER BY n", (asset_id,)
+        ).fetchall()
+        return b"".join(bytes(r[0]) for r in rows)[: state[1]]
 
     def complete_asset(self, asset_id: str) -> dict[str, Any]:
         meta = self._conn.execute(
