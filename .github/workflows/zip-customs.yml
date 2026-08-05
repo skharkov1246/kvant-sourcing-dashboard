@@ -43,6 +43,14 @@ on:
         description: "pull: конец периода YYYY-MM-DD (по умолч. 2026-03-31)"
         default: ""
         type: string
+      extra_pn:
+        description: "pull: доп. PN-токены через запятую (прицельный запрос)"
+        default: ""
+        type: string
+      extra_re:
+        description: "pull: доп. regex для weak-матчинга (прицельный запрос)"
+        default: ""
+        type: string
 
 permissions:
   contents: write
@@ -100,6 +108,8 @@ jobs:
           GLBS_MAX_HS: ${{ inputs.max_hs }}
           GLBS_PERIOD_START: ${{ inputs.period_start }}
           GLBS_PERIOD_FINISH: ${{ inputs.period_finish }}
+          GLBS_EXTRA_PN: ${{ inputs.extra_pn }}
+          GLBS_EXTRA_RE: ${{ inputs.extra_re }}
         run: |
           echo "::add-mask::${GLBS_API_KEY:-}"
           if [ -z "${GLBS_API_KEY:-}" ]; then
