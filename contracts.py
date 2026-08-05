@@ -451,6 +451,33 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
               for s, m in dmed.items() if len(ddur[s]) >= 5]
     dbench.sort(key=lambda x: dorder.get(x["stage"], 99))
 
+    # --- ВОРОНКА: где стоят открытые сделки, на какие деньги и сколько с сорванным сроком ---
+    fn_agg: dict[str, dict] = defaultdict(lambda: {"n": 0, "sale": 0.0, "late": 0,
+                                                   "lateSale": 0.0, "slow": 0, "days": []})
+    for r in live_rows:
+        if not r["inCat0"]:
+            continue
+        a = fn_agg[r["stage"]]
+        a["n"] += 1
+        a["sale"] += r["saleEur"]
+        if r["late"]:
+            a["late"] += 1
+            a["lateSale"] += r["saleEur"]
+        if r["slow"]:
+            a["slow"] += 1
+        if r["stageDays"] is not None:
+            a["days"].append(r["stageDays"])
+    funnel = []
+    for sid, nm in dstages.items():                 # dstages упорядочен по SORT воронки
+        a = fn_agg.get(sid)
+        if not a or not a["n"]:
+            continue
+        funnel.append({"stage": sid, "name": nm, "n": a["n"],
+                       "sale": round(a["sale"]), "saleLbl": _money(a["sale"]),
+                       "late": a["late"], "lateSale": round(a["lateSale"]),
+                       "slow": a["slow"], "med": dmed.get(sid, 0),
+                       "nowMed": round(_median(a["days"]) or 0, 1)})
+
     maxseq = max((r["seq"] for r in rows), default=0)
     sale_sum = sum(r["saleEur"] for r in rows)
     buy_sum = sum(r["buyEur"] for r in rows)
@@ -614,6 +641,19 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
     return {
         "label": f"на {today.strftime('%d.%m.%Y')}",
         "rows": rows,
+        "funnel": funnel,
+        # сводка для верхнего блока — чтобы вёрстка не разбирала подписи KPI строками
+        "head": {
+            "sale": _money(sale_sum), "margin": _money(margin_sum), "marginNum": round(margin_sum),
+            "marginPct": round(margin_sum / sale_m * 100) if sale_m else 0,
+            "live": len(live_rows), "total": len(rows), "maxseq": maxseq,
+            "contracts": n_contracts, "buy": _money(buy_sum),
+            "nEcon": n_econ, "nNoBuy": n_nobuy,
+            "medCycle": round(med_cycle) if med_cycle else None,
+            "medLag": round(med_lag, 1) if med_lag is not None else None,
+            "loss": _money(loss_total), "burnDay": _money(burn_day),
+            "slow": len(slow_rows), "lateDeals": len(late_rows),
+        },
         "kpis": [{"lbl": l, "val": v, "meta": m, "clz": c} for l, v, m, c in kpis],
         "deadlines": deadlines,
         # курсы Битрикса заданы вручную; показываем дату, чтобы расхождение с другой
