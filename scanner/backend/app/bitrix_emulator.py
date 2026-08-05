@@ -79,7 +79,13 @@ def create_emulator(state: BitrixState | None = None) -> tuple[FastAPI, BitrixSt
 
     @app.post("/rest/crm.company.list")
     def company_list(params: dict[str, Any] = Body(...)) -> dict[str, Any]:
-        return {"result": {"items": sorted(state.companies.values(), key=lambda c: c["id"])}}
+        # Живой портал отдаёт result СПИСКОМ с ключами в верхнем регистре
+        # (в отличие от crm.item.list) — эмулятор зеркалит реальную форму;
+        # маркера next нет: датасеты эмулятора умещаются в одну страницу.
+        return {"result": [
+            {"ID": c["id"], "TITLE": c["title"], "UF_CRM_INN": c.get("ufInn")}
+            for c in sorted(state.companies.values(), key=lambda c: c["id"])
+        ]}
 
     @app.post("/rest/crm.timeline.comment.add")
     def timeline_add(params: dict[str, Any] = Body(...)) -> dict[str, Any]:

@@ -92,16 +92,42 @@ class BitrixConnector:
             },
         }
 
-    def pull_suppliers(self) -> list[dict[str, Any]]:
+    def pull_suppliers(self, max_pages: int = 20) -> list[dict[str, Any]]:
         """Справочник поставщиков из CRM (§9.5, crm.company.list):
         офлайн-подсказки поставщика в трассировке — устройство предлагает
-        контрагентов из CRM, а не свободный ввод с опечатками."""
-        response = self._call_with_retry("crm.company.list", {"select": ["id", "title", "ufInn"]})
-        return [
-            {"name": c.get("title"), "inn": c.get("ufInn"), "ref": str(c.get("id"))}
-            for c in (response.get("result") or {}).get("items", [])
-            if c.get("title")
-        ]
+        контрагентов из CRM, а не свободный ввод с опечатками.
+
+        Живой портал (kvantpro, 10k+ компаний) показал два отличия от
+        первоначальной модели: result — СПИСОК с ключами в верхнем регистре
+        (а не {items}), и ответ постраничный по 50 с маркером next.
+        max_pages ограничивает аппетит опроса; снапшот всё равно версионный —
+        обрезанный хвост доедет следующими проходами, когда появится
+        серверная пагинация по updatedTime.
+        """
+        suppliers: list[dict[str, Any]] = []
+        start, pages = 0, 0
+        while True:
+            response = self._call_with_retry("crm.company.list", {
+                "select": ["ID", "TITLE", "UF_CRM_INN"],
+                "start": start,
+            })
+            result = response.get("result") or []
+            items = result.get("items", []) if isinstance(result, dict) else result
+            for c in items:
+                title = c.get("title") or c.get("TITLE")
+                if not title:
+                    continue
+                suppliers.append({
+                    "name": title,
+                    "inn": c.get("ufInn") or c.get("UF_CRM_INN"),
+                    "ref": str(c.get("id") or c.get("ID")),
+                })
+            pages += 1
+            next_start = response.get("next")
+            if next_start is None or pages >= max_pages:
+                break
+            start = next_start
+        return suppliers
 
     # ── Обратная запись (§9.4, §9.5) ─────────────────────────────────────────
 
