@@ -124,6 +124,14 @@ class AnthropicTransport:
 
     def complete(self, *, params: dict[str, Any], system: str,
                  user_content: str, schema: dict[str, Any]) -> TransportResult:
+        # output_config собирается из двух источников: формат ответа — забота
+        # транспорта, effort — привязки роли (request_params). Слияние здесь,
+        # иначе два kwargs 'output_config' сталкиваются на вызове SDK.
+        params = dict(params)
+        output_config: dict[str, Any] = {
+            **params.pop("output_config", {}),
+            "format": {"type": "json_schema", "schema": schema},
+        }
         try:
             response = self._client.with_options(
                 timeout=self._timeout_s, max_retries=0
@@ -136,7 +144,7 @@ class AnthropicTransport:
                     "cache_control": {"type": "ephemeral"},
                 }],
                 messages=[{"role": "user", "content": user_content}],
-                output_config={"format": {"type": "json_schema", "schema": schema}},
+                output_config=output_config,
                 **params,
             )
         except (self._anthropic.APITimeoutError,
@@ -146,7 +154,13 @@ class AnthropicTransport:
         except self._anthropic.APIStatusError as exc:
             if exc.status_code >= 500:
                 raise TransportUnavailable(str(exc)) from exc
-            raise  # 4xx — ошибка конфигурации, её надо видеть, а не глотать
+            if "credit balance" in str(exc).lower():
+                # Кончились кредиты — операционный сбой, не конфигурация:
+                # приёмка деградирует в MANUAL_REVIEW с причиной, приём
+                # событий с устройств не падает пятисотками.
+                raise TransportUnavailable(
+                    "кредиты Anthropic API исчерпаны — пополните баланс") from exc
+            raise  # прочие 4xx — ошибка конфигурации, её надо видеть, а не глотать
 
         text = next((b.text for b in response.content if b.type == "text"), "")
         return TransportResult(
