@@ -41,6 +41,10 @@ services:
   caddy:
     image: caddy:2-alpine
     restart: unless-stopped
+    # Caddyfile читает {$KVANT_DOMAIN} и хеш пароля контролёра из своего
+    # окружения — без env_file прокси поднимется на пустом имени и дверь
+    # окажется без TLS и без пароля.
+    env_file: .env
     ports:
       - "80:80"
       - "443:443"
