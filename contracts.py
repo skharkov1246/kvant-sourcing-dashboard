@@ -41,6 +41,9 @@ CITY_F = "ufCrm20_1742552190053"        # «Город доставки зака
 OSS_F = "ufCrm20_1723236618"            # «Deal support specialist» — ОСС заказа (совпал 73/74)
 OSS_DEAL = "UF_CRM_1715604558"          # «Сопровождение сделки» — тот же человек на сделке (74/74)
 
+CAP_RATE = 0.20          # стоимость денег, годовых: по чему считаем упущенную доходность
+                         # от поздней отгрузки (решение владельца)
+
 SLOW_MIN_DAYS = 7        # порог замедленности не бывает ниже недели
 SLOW_MULT = 2.0          # … и не ниже 2× медианы по стадии
 HIST_SINCE = "2024-06-01T00:00:00"  # глубина истории стадий (бенчмарки + таймлайны)
@@ -260,8 +263,13 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
         late_orders = 0            # заказов с просроченным обещанием клиенту
         worst_late = None          # самая глубокая просрочка по сделке, дн
         late_buy = 0.0             # закупка под просроченными заказами, €
+        late_money_days = 0.0      # €×дни закупки: сколько закуплено и как долго висит
+        late_nosum = 0             # просроченных заказов без суммы (в деньги не попадают)
+        late_rev = 0.0             # стоимость отгрузки, зависшей из-за просрочки, €
+        late_rev_days = 0.0        # €×дни выручки — база расчёта упущенной доходности
         no_dl = 0                  # живых заказов без плановой даты клиенту
         first_order_ts = min((str(o.get("createdTime") or "") for o in ords), default="")
+        n_live_ords = sum(1 for o in ords if not str(o.get("stageId", "")).endswith((":SUCCESS", ":FAIL")))
         for o in ords:
             osid = str(o.get("stageId") or "")
             olive = not (osid.endswith(":SUCCESS") or osid.endswith(":FAIL"))
@@ -277,9 +285,22 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
             dl_days = (today - dl).days if dl else None       # >0 — просрочено, <0 — есть запас
             olate = bool(olive and dl_days is not None and dl_days > 0)
             obuy = eur(o.get("opportunity"), o.get("currencyId"))
+            # стоимость отгрузки этого заказа: доля сделки пропорционально закупке
+            # (как в экономике проекта); если сумм закупки нет — поровну между живыми
+            if buy_orders > 0 and obuy > 0:
+                o_rev = sale * (obuy / buy_orders)
+            elif n_live_ords:
+                o_rev = sale / n_live_ords
+            else:
+                o_rev = 0.0
             if olate:
                 late_orders += 1
                 late_buy += obuy
+                late_money_days += obuy * dl_days
+                late_rev += o_rev
+                late_rev_days += o_rev * dl_days
+                if obuy <= 0:
+                    late_nosum += 1
                 worst_late = dl_days if worst_late is None else max(worst_late, dl_days)
             if olive and not dl:
                 no_dl += 1
@@ -293,6 +314,9 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
                 "created": str(o.get("createdTime") or "")[:10],
                 "dl": dl.strftime("%d.%m.%Y") if dl else "",
                 "dlDays": dl_days, "late": olate,
+                "revEur": round(o_rev), "revLbl": _money(o_rev),
+                "lossEur": round(o_rev * dl_days / 365 * CAP_RATE) if olate else 0,
+                "burnDay": round(o_rev * CAP_RATE / 365, 1) if olive else 0,
                 "schema": schema_enum.get(str(o.get(SCHEMA_F)), "") if o.get(SCHEMA_F) else "",
                 "city": str(o.get(CITY_F) or ""),
                 "oss": client.user_name(o.get(OSS_F)) if o.get(OSS_F) else "",
@@ -363,6 +387,12 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
             # дедлайн клиенту (поле «Date of deadline to customer» заказов СП-172)
             "late": late, "lateN": late_orders, "lateDays": worst_late,
             "lateBuy": round(late_buy), "lateBuyLbl": _money(late_buy),
+            "lateMoneyDays": round(late_money_days), "lateNoSum": late_nosum,
+            "lateRev": round(late_rev), "lateRevLbl": _money(late_rev),
+            "lateRevDays": round(late_rev_days),
+            "lossEur": round(late_rev_days / 365 * CAP_RATE),
+            "lossLbl": _money(late_rev_days / 365 * CAP_RATE),
+            "burnDay": round(late_rev * CAP_RATE / 365),
             "noDl": no_dl,
             "dlNext": min((o["dl"] for o in ords_det if o["live"] and o["dl"]),
                           key=lambda s: s[6:] + s[3:5] + s[:2], default=""),
@@ -445,6 +475,42 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
                 depth["<30" if dd < 30 else "30-90" if dd < 90 else "90-180" if dd < 180 else ">180"] += 1
     prod_after = sum(1 for r in live_rows for o in r["orders"] if o["live"] and o["prodAfterDl"])
 
+    # --- ЦЕНА ПРОСРОЧКИ В ДЕНЬГАХ ---
+    # 1) евро-дни: сколько денег закупки и сколько дней сверх обещания клиенту они висят.
+    #    Это база: умножив на годовую ставку/365, получаем стоимость замороженного капитала.
+    # 2) выручка и маржа сделок, где есть хоть один просроченный заказ — деньги, которые
+    #    должны были закрыться, но ещё не закрылись (риск, а не потеря).
+    money_days = sum(r["lateMoneyDays"] for r in late_rows)
+    # ПОТЕРИ НА ИНВЕСТИЦИЯХ: стоимость отгрузки, которую клиент оплатил бы раньше,
+    # умноженная на дни задержки и на ставку — упущенная доходность (методика владельца)
+    rev_days = sum(r["lateRevDays"] for r in late_rows)
+    loss_total = rev_days / 365 * CAP_RATE
+    late_rev_total = sum(r["lateRev"] for r in late_rows)
+    burn_day = late_rev_total * CAP_RATE / 365          # сгорает за каждый следующий день простоя
+    # что отгружать первым: заказы с наибольшей ценой одного дня задержки
+    ship_first = []
+    for r in live_rows:
+        for o in r["orders"]:
+            if o["live"] and o["burnDay"] > 0:
+                ship_first.append({
+                    "seq": r["seq"], "deal": r["deal"], "customer": r["customer"],
+                    "title": o["title"], "sup": o["sup"], "stageName": o["stageName"],
+                    "dl": o["dl"], "dlDays": o["dlDays"], "late": o["late"],
+                    "revLbl": o["revLbl"], "burnDay": o["burnDay"],
+                    "lossLbl": _money(o["lossEur"]), "lossEur": o["lossEur"]})
+    ship_first.sort(key=lambda x: -x["burnDay"])
+    ship_first = ship_first[:12]
+    late_nosum_n = sum(r["lateNoSum"] for r in late_rows)
+    rev_at_risk = sum(r["saleEur"] for r in late_rows)
+    margin_at_risk = sum(r["marginEur"] for r in late_rows if r["marginEur"] is not None)
+    avg_late = round(money_days / late_buy_sum, 1) if late_buy_sum else 0   # средневзвеш. просрочка, дн
+    # топ сделок по евро-дням — где деньги стоят дольше и больше всего
+    top_cost = sorted(late_rows, key=lambda r: -r["lateMoneyDays"])[:10]
+    cost_top = [{"deal": r["deal"], "seq": r["seq"], "customer": r["customer"],
+                 "days": r["lateDays"], "buyLbl": r["lateBuyLbl"], "buy": r["lateBuy"],
+                 "moneyDays": r["lateMoneyDays"], "saleLbl": r["saleLbl"],
+                 "manager": r["manager"], "oss": r["oss"]} for r in top_cost]
+
     # разрезы просрочки: по ответственному сделки и по схеме поставки
     def _cut(keyfn) -> list:
         agg: dict[str, list] = defaultdict(lambda: [0, 0, 0.0, 0])   # [просроч. заказов, сделок, € , всего живых заказов]
@@ -468,10 +534,18 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
 
     deadlines = {
         "lateDeals": len(late_rows), "lateOrders": late_orders_n,
-        "lateBuy": _money(late_buy_sum), "depth": depth,
+        "lateBuy": _money(late_buy_sum), "lateBuyNum": round(late_buy_sum), "depth": depth,
         "noDl": nodl_orders_n, "liveOrders": live_orders_n,
         "prodAfterDl": prod_after,
         "field": "Date of deadline to customer",
+        "moneyDays": round(money_days), "avgLate": avg_late,
+        "rate": round(CAP_RATE * 100),
+        "revDays": round(rev_days), "lateRev": _money(late_rev_total),
+        "loss": _money(loss_total), "lossNum": round(loss_total),
+        "burnDay": _money(burn_day), "burnDayNum": round(burn_day),
+        "shipFirst": ship_first,
+        "revAtRisk": _money(rev_at_risk), "marginAtRisk": _money(margin_at_risk),
+        "lateNoSum": late_nosum_n, "costTop": cost_top,
         "byManager": _cut(lambda r, o: r["manager"]),
         "byOss": _cut(lambda r, o: o.get("oss") or r["oss"]),
         "bySchema": _cut(lambda r, o: o.get("schema")),
@@ -492,6 +566,9 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
         ("Медиана цикла заказа", f"{round(med_cycle) if med_cycle else '—'} дн", "создание → закрытие заказа", ""),
         ("🚩 Просрочен дедлайн", str(len(late_rows)),
          f"сделок · заказов {late_orders_n} · закупка {_money(late_buy_sum)}", "warn" if late_rows else "ok"),
+        ("💸 Потери от просрочки", _money(loss_total),
+         f"упущенная доходность при {round(CAP_RATE*100)}% годовых · сгорает {_money(burn_day)}/день",
+         "warn" if loss_total else "ok"),
     ]
 
     # --- агрегация по ПОСТАВЩИКАМ (без изменений) ---
