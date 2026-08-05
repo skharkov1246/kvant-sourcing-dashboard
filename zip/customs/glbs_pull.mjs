@@ -58,7 +58,17 @@ for (const p of pos) {
     }
   }
 }
-const OEM_RE = /перфоратор|перфоратора|буров|бурильн|drifter|rock ?drill|epiroc|atlas ?copco|sandvik|tamrock|montabert|furukawa|коронк|хвостовик|shank|гидромолот|гидроударн|COP\s?\d|HLX|HL\d{3}|RD\d{3}/i;
+const OEM_RE_BASE = /перфоратор|перфоратора|буров|бурильн|drifter|rock ?drill|epiroc|atlas ?copco|sandvik|tamrock|montabert|furukawa|коронк|хвостовик|shank|гидромолот|гидроударн|COP\s?\d|HLX|HL\d{3}|RD\d{3}/i;
+// разовые прицельные запросы (не ЗИП перфораторов): доп. PN-токены и доп. regex
+// GLBS_EXTRA_PN="MW21215M,MW22316B"  GLBS_EXTRA_RE="SGT|SIEMENS|горелк"
+for (const t of (process.env.GLBS_EXTRA_PN || '').split(',')) {
+  const n = norm(t);
+  if (n.length >= 5) tokenSet.add(n);
+}
+const EXTRA_RE = (process.env.GLBS_EXTRA_RE || '').trim();
+const OEM_RE = EXTRA_RE
+  ? new RegExp(OEM_RE_BASE.source + '|' + EXTRA_RE, 'i')
+  : OEM_RE_BASE;
 
 // поля ответа
 const FIELDS = (process.env.GLBS_FIELDS || '').split(',').map(s => s.trim()).filter(Boolean);
