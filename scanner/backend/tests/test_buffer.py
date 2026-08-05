@@ -243,3 +243,57 @@ class TestFolderNaming:
                                 name="втулка") == "2026-07-28_POS03_втулка"
         with pytest.raises(BufferError):
             temp_folder_name(order_no="З-1041")
+
+
+class TestCrowdIntake:
+    """Краудскан → строка буфера (docs/15 §15.6): дальше штатный путь Р-13,
+    источник помечен, не-принятый скан строкой не становится."""
+
+    def _crowd_pair(self, state="ACCEPTED"):
+        from app.crowd import Contributor, Submission
+
+        contributor = Contributor(display_name="Пётр", phone_hash="ph-9")
+        submission = Submission(
+            contributor_id=contributor.id, content_sha256="sha-c1",
+            quality_score=0.8, state=state,
+            supplier_claim={"name": "Ningbo", "article": "wr-115"},
+        )
+        return submission, contributor
+
+    def test_accepted_scan_becomes_marked_buffer_row(self, buffer):
+        from app.buffer import buffer_row_from_crowd
+
+        submission, contributor = self._crowd_pair()
+        row = buffer.submit(buffer_row_from_crowd(
+            submission, contributor,
+            created_on=dt.date(2026, 8, 4), pos=1, name="вал насоса"))
+
+        assert row.state == "PENDING"  # сырьё есть — сабмишен и есть сырьё
+        assert row.source == "crowd"
+        assert row.unplanned and row.unplanned_by == "Пётр"
+        assert row.added_by == f"crowd:{contributor.id}"
+        assert row.raw_folder_url == f"crowd://submissions/{submission.id}"
+        assert row.article_norm == "wr-115"
+
+    def test_owner_resolves_crowd_row_the_standard_way(self, buffer):
+        """Владелец реестра разбирает крауд-строку как любую другую —
+        отдельного пути в реестр у крауда нет (R-2)."""
+        from app.buffer import buffer_row_from_crowd
+
+        submission, contributor = self._crowd_pair()
+        row = buffer.submit(buffer_row_from_crowd(
+            submission, contributor,
+            created_on=dt.date(2026, 8, 4), pos=2, name="вал насоса"))
+        part = buffer.resolve_as_new(row.id, OWNER, name_ru="Вал насоса",
+                                     keywords=["вал", "насос"])
+        assert part.kv_code.startswith("KV-D-")
+        assert buffer.rows[row.id].state == "CLOSED_CODED"
+
+    def test_rejected_scan_never_reaches_buffer(self, buffer):
+        from app.buffer import buffer_row_from_crowd
+
+        submission, contributor = self._crowd_pair(state="REJECTED")
+        with pytest.raises(BufferError, match="только принятые"):
+            buffer_row_from_crowd(submission, contributor,
+                                  created_on=dt.date(2026, 8, 4), pos=3,
+                                  name="вал насоса")

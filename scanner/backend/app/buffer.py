@@ -198,6 +198,10 @@ class BufferRow:
     name_hint: str | None = None
     unplanned: bool = False
     unplanned_by: str | None = None
+    #: Источник строки: staff — штатный замерщик, crowd — краудскан
+    #: (docs/15 §15.6). Пометка обязана пережить путь до реестра: классы
+    #: точности крауда C/D, строка не должна прикидываться штатным замером.
+    source: str = "staff"
     created_on: dt.date = dt.date(2026, 1, 1)
     state: str = "PENDING"
     returned_reason: str | None = None
@@ -386,6 +390,34 @@ class Buffer:
 class Actor:
     user_id: str
     role: str  # registry_owner | engineer | operator | manager
+
+
+def buffer_row_from_crowd(submission, contributor, *, created_on: dt.date,
+                          pos: int, name: str) -> BufferRow:
+    """Принятый крауд-скан рождает строку буфера (docs/15 §15.6).
+
+    Дальше — штатный путь Р-13: разбирает владелец реестра, код выдаётся
+    как обычно. Краудскан по определению внеплановый (Р-13 п.5.3, «кто
+    передал» — участник), источник сырья — сам сабмишен, пометка source
+    не даёт строке прикидываться штатным замером. Не-принятый скан строкой
+    не становится: деньги и реестр входят через одну и ту же дверь приёмки.
+    """
+    if submission.state != "ACCEPTED":
+        raise BufferError(
+            f"В буфер попадают только принятые крауд-сканы "
+            f"(сабмишен в состоянии {submission.state})")
+    claim = submission.supplier_claim or {}
+    return BufferRow(
+        temp_folder_name=temp_folder_name(date=created_on, pos=pos, name=name),
+        added_by=f"crowd:{contributor.id}",
+        raw_folder_url=f"crowd://submissions/{submission.id}",
+        name_hint=name,
+        article_norm=claim.get("article"),
+        unplanned=True,
+        unplanned_by=contributor.display_name,
+        created_on=created_on,
+        source="crowd",
+    )
 
 
 def _similar(a: str, b: str) -> bool:
