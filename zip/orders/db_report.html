@@ -1,0 +1,132 @@
+<!doctype html><html><head><meta charset="utf-8"><style>@page{size:A4;margin:15mm 14mm}body{font:11px/1.5 'DejaVu Sans',Arial,sans-serif;color:#111}
+h1{font-size:19px;margin:0 0 6px}h2{font-size:14px;margin:16px 0 6px;border-bottom:2px solid #1b2330;padding-bottom:3px;page-break-after:avoid}
+h3{font-size:12px;margin:10px 0 4px;page-break-after:avoid}table{border-collapse:collapse;width:100%;margin:6px 0}
+tr{page-break-inside:avoid}th,td{border:1px solid #bbb;padding:3px 6px;text-align:left;font-size:10px;vertical-align:top}
+th{background:#eef2f7}code{background:#f4f4f4;padding:1px 3px;border-radius:3px;font-size:10px}
+pre{background:#f6f8fa;border:1px solid #ddd;border-radius:5px;padding:7px;font-size:9px;overflow-x:auto;white-space:pre-wrap;page-break-inside:avoid}
+li{margin:2px 0 2px 16px}p{margin:4px 0}</style></head><body><h1>Мировая разведка по ЗИП SGT-400: какие базы купить</h1>
+
+<p>Дата: 2026-08 · Задача: видеть, кто кому в мире продаёт комплектующие к Siemens SGT-400</p>
+<p>(камеры сгорания, DLE-горелки, горячий тракт), и выйти на этих поставщиков.</p>
+
+<h2>1. Структурная проблема, которую надо обойти</h2>
+
+<p><b>Британию и ЕС в shipment-базах не видно.</b> Завод SGT-400 — Siemens Industrial</p>
+<p>Turbomachinery, Линкольн (UK). Ни UK, ни ЕС, ни Япония, ни Корея не публикуют</p>
+<p>пономерные декларации (регламент о конфиденциальности). Ни один провайдер их не</p>
+<p>имеет — кто бы что ни обещал.</p>
+
+<p><b>Обходной путь (рабочий):</b> ловим тех же британцев/немцев как **отправителей</p>
+<p>(shipper) в импортных декларациях стран, которые данные публикуют**. Плюс</p>
+<p>mirror-data ($79) как дешёвый зеркальный слой по развитым странам.</p>
+
+<h2>2. Где искать: пересечение «есть парк SGT-400» × «есть данные»</h2>
+
+<p>Парк: <b>&gt;450 машин, 11,7 млн часов</b> (Siemens Energy). Подтверждённые установки —</p>
+<p>Мексика (Fermaca, 12+ ед.), Бразилия (FPSO Cidade de Itajaí), Египет (Zohr, 3),</p>
+<p>Алжир (Touat, 3), Нигерия (21st Century, 2), Таиланд (PTT Wang Noi, 3),</p>
+<p>Греция+Албания (TAP, 6), Германия/Испания/Италия/Франция (когенерация).</p>
+
+<table>
+<tr><th>Страна</th><th>Парк SGT-400</th><th>Пономерные данные</th><th>Цена HS4=8411 (импорт)</th><th>Приоритет</th></tr>
+<tr><td><b>Мексика</b></td><td>12+ ед. (Fermaca) + <b>TFS Веракрус — первый в мире независимый стенд SGT-400</b></td><td>✅ с 2015</td><td><b>$199</b></td><td><b>A</b></td></tr>
+<tr><td><b>Колумбия</b></td><td>рынок TFS</td><td>✅ с 2007</td><td><b>$99–199</b></td><td><b>A</b></td></tr>
+<tr><td><b>Перу</b></td><td>рынок TFS</td><td>✅ с 2008</td><td><b>$199</b></td><td><b>A</b></td></tr>
+<tr><td><b>Нигерия</b></td><td>2 ед. + канал Centrax/Triumph</td><td>✅</td><td><b>$99</b></td><td><b>A</b></td></tr>
+<tr><td><b>Бразилия</b></td><td>FPSO (2 ед.) + офшор Petrobras</td><td>✅</td><td>$575</td><td>B</td></tr>
+<tr><td>Турция</td><td>нет парка, но хаб реэкспорта</td><td>✅</td><td>$249</td><td>B</td></tr>
+<tr><td>Казахстан</td><td>нет парка — <b>канал реэкспорта в РФ</b></td><td>✅</td><td>$199</td><td>B</td></tr>
+<tr><td>Индия</td><td>парк не подтверждён, но ремонтный хаб</td><td>✅ отличные описания</td><td>$249</td><td>C</td></tr>
+<tr><td>Вьетнам / Индонезия / Таиланд</td><td>Таиланд — 3 ед. PTT</td><td>✅ / ✅ / ⚠️</td><td>$249 / $350 / $575</td><td>C</td></tr>
+<tr><td><b>Египет</b></td><td><b>3 ед. (Zohr)</b></td><td>❌ <b>данных нет</b></td><td>только mirror $79</td><td>—</td></tr>
+<tr><td>Германия, UK, Япония, Корея</td><td>есть парк</td><td>❌ закрыто законом</td><td>mirror $79</td><td>—</td></tr>
+</table>
+
+<p><b>Ключ: TFS Turbine Field Solutions (Веракрус, Мексика)</b> — независимый MRO с</p>
+<p>собственным стендом SGT-400, обслуживает Мексику, Колумбию, Перу, США, Дубай и</p>
+<p>Азию. Значит через мексиканскую таможню идёт регулярный поток горячей части и</p>
+<p>горелок под их ремонты. Это единственная точка, где мировой поток ЗИП SGT-400</p>
+<p>физически виден.</p>
+
+<h2>3. Что покупать (рекомендация)</h2>
+
+<h3>Вариант 1 — точечный, разовый. <b>$775</b> ⭐ рекомендую начать с него</h3>
+<p><b>BillOfLadingData.com</b>, модель pay-per-report: покупка HS4-кода по стране,</p>
+<p><b>пожизненный доступ, без подписки</b>.</p>
+<li>Мексика $199 + Колумбия $199 + Перу $199 + Нигерия $99 + mirror-data $79.</li>
+<li>Даёт: shipper (кто отгружал — включая Линкольн/Хьюстон), consignee (кто получал),</li>
+<p>  описание товара, HS, порты, даты, стоимость.</p>
+<li>Почему так: это ровно те 4 страны, где парк и данные пересекаются, + зеркальный</li>
+<p>  слой по закрытым странам. Дешевле любой годовой подписки в 5–6 раз.</p>
+
+<h3>Вариант 2 — расширение. <b>+$1 272 (итого ~$2 050)</b></h3>
+<p>Бразилия $575 + Турция $249 + Казахстан $199 + Индия $249. Турция и Казахстан —</p>
+<p>не рынки, а <b>каналы реэкспорта в РФ</b>: там видно, кто и через кого завозит.</p>
+
+<h3>Вариант 3 — постоянный мониторинг из РФ. <b>$540/год</b></h3>
+<p><b>52wmb (Китай), тариф Blue Diamond $539,9/год</b>, 39 стран, оплата из России</p>
+<p>проходит без вопросов (UnionPay/Alipay/перевод). Альтернатива — <b>Tendata</b></p>
+<p>($4–8 тыс./год, но есть китайские данные) или <b>TradeAtlas</b> (Турция, от $2 750/год,</p>
+<p>единственный с авто/ж-д/авиа перевозками, а не только морем).</p>
+
+<h3>Что НЕ покупать</h3>
+<li><b>Panjiva/S&amp;P</b> — официально свернули коммерческие операции в РФ (март 2022).</li>
+<li><b>Descartes Datamyne, ImportGenius, Trademo</b> — американская юрисдикция,</li>
+<p>  санкционный скрининг, российские карты не проходят.</p>
+<li><b>Volza SME $4 500/год</b>, TradeData.Pro $2 599–8 699/год — переплата за то же</li>
+<p>  покрытие; брать только при наличии зарубежного юрлица.</p>
+<li><b>GlobalTenders $4 008/год</b>, GTW Market Forecast $4 875, Forecast International,</li>
+<p>  Wood Mackenzie — не решают задачу.</p>
+
+<h3>Отдельно, если нужен список владельцев машин</h3>
+<p><b>McCoy Power Reports, Gas Turbines DB</b> — 26 534 юнита, поле «project owner»,</p>
+<p>обновление ежеквартально. Единственный источник поюнитного реестра владельцев</p>
+<p>SGT-400 в мире = long-list покупателей ЗИП. <b>Цена не публикуется</b>,</p>
+<p>davidh@mccoypower.net, +1 804 677-8900. Вендор нишевой (выручка ~$6 млн) — торг реален.</p>
+<p>Дешёвая замена: <b>Gas Turbine World Handbook $245–345</b> (техбаза + бенчмарк $/кВт,</p>
+<p>но без операторов).</p>
+
+<h2>4. Бесплатные каналы — проверены и работают</h2>
+
+<p><b>TED (тендеры ЕС), открытый API без ключа</b> — проверено запросами:</p>
+<pre>
+POST https://api.ted.europa.eu/v3/notices/search
+{&quot;query&quot;:&quot;FT~\&quot;SGT-400\&quot;&quot;, &quot;fields&quot;:[&quot;publication-number&quot;,&quot;publication-date&quot;,
+ &quot;organisation-name-buyer&quot;,&quot;organisation-name-tenderer&quot;,&quot;tender-value&quot;,&quot;tender-value-cur&quot;],
+ &quot;limit&quot;:50,&quot;scope&quot;:&quot;ALL&quot;}
+</pre>
+<li><code>FT~&quot;SGT-400&quot;</code> → <b>7 извещений</b>, все — GAZ-SYSTEM S.A. (оператор ГТС Польши).</li>
+<li><code>FT~&quot;gas turbine&quot; + notice-type=can-standard</code> → <b>225 award-извещений</b>, с 2024 — 44.</li>
+<li><b>Победители и суммы отдаются</b>: Teplárny Brno → Siemens Energy s.r.o. €14 975 500;</li>
+<p>  MVM Balance → VABEKO Engineering €67 127 580; Fingrid → TGS Finland Oy €1 995 000.</p>
+
+<p>Прочее бесплатное: <b>ImportYeti</b> (морской импорт США, бесплатно без регистрации),</p>
+<p>Казахстан goszakup.gov.kz + <b>zakup.sk.kz</b> (КМГ/QazaqGaz закупают именно там),</p>
+<p>Индия CPPP/GeM/ONGC/GAIL, Индонезия LPSE/Pertamina, Перу SEACE (OCDS-фид),</p>
+<p>Мексика Compranet, Бразилия PNCP, Россия ЕИС zakupki.gov.ru,</p>
+<p><b>Turbomachinery International Handbook</b> (карта независимых сервисников SGT).</p>
+
+<p>Уже есть: <b>glbs.io</b> — таможня РФ/ЕАЭС, оплачен, 23 тыс. деклараций в базе.</p>
+
+<h2>5. Ограничение, которое надо принять</h2>
+
+<p>Парк SGT-400 сидит на <b>LTSA/LTP Siemens Energy</b> — в открытые тендеры выходит не</p>
+<p>«RFQ на партномер», а долгосрочный сервисный договор на агрегат целиком (случай</p>
+<p>GAZ-SYSTEM). Award-извещений с ценой именно по SGT-400 в открытом доступе **нет ни</p>
+<p>одного<b>. Поэтому тендерные порталы дают </b>операторов и сервисных подрядчиков**, а</p>
+<p>цены на детали — только таможня (shipment-level) и прямые КП от заводов.</p>
+
+<h2>6. Итог</h2>
+
+<table>
+<tr><th>Шаг</th><th>Что</th><th>Стоимость</th></tr>
+<tr><td>0</td><td>TED API + ImportYeti + госпорталы (Мексика, Перу, Казахстан, Индия)</td><td><b>$0</b></td></tr>
+<tr><td>1</td><td>BillOfLadingData: Мексика, Колумбия, Перу, Нигерия + mirror</td><td><b>$775 разово</b></td></tr>
+<tr><td>2</td><td>Расширение: Бразилия, Турция, Казахстан, Индия</td><td>+$1 272</td></tr>
+<tr><td>3</td><td>Мониторинг из РФ: 52wmb Blue Diamond</td><td>$540/год</td></tr>
+<tr><td>4</td><td>Опционально: McCoy Gas Turbines DB (реестр владельцев)</td><td>по запросу</td></tr>
+</table>
+
+<p><b>Старт: $775.</b> Этого достаточно, чтобы увидеть реальную цепочку поставок</p>
+<p>камер сгорания и горелок SGT-400 в мире и выйти на поставщиков напрямую.</p>
+</body></html>
