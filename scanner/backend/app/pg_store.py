@@ -419,9 +419,9 @@ class PgStore:
         tenant_id карточки — тенант первого создателя (ON CONFLICT сохраняет)."""
         iid = _as_uuid(item_text, "item")
         self._conn.execute(
-            "INSERT INTO item_record (id, tenant_id, task_id, session_id, provenance) "
-            "VALUES (%s, %s, %s, %s, %s) ON CONFLICT (id) DO NOTHING",
-            (iid, tenant_uuid, self._stub_task(tenant_uuid),
+            "INSERT INTO item_record (id, ext_ref, tenant_id, task_id, session_id, provenance) "
+            "VALUES (%s, %s, %s, %s, %s, %s) ON CONFLICT (id) DO NOTHING",
+            (iid, item_text, tenant_uuid, self._stub_task(tenant_uuid),
              self._session(tenant_uuid, f"item:{item_text}"),
              Jsonb({"source": "trace_stub"})),
         )
@@ -445,6 +445,83 @@ class PgStore:
               for a in link.get("evidence_asset_ids") or []]),
         )
         return link
+
+    # ── Многоуровневый бренд (§06.4) ─────────────────────────────────────────
+
+    def add_brand_ref(self, item_id: str, ref: dict[str, Any]) -> dict[str, Any]:
+        from .brand_chain import CONFIDENCE
+
+        tenant = self._tenant(ref["tenant_id"])
+        item_uuid = self._stub_item(tenant, item_id)
+        existing = self._conn.execute(
+            "SELECT id, confidence FROM brand_ref WHERE item_id = %s AND role = %s "
+            "AND brand = %s AND article_norm IS NOT DISTINCT FROM %s",
+            (item_uuid, ref["role"], ref["brand"], ref.get("article_norm")),
+        ).fetchone()
+        if existing:
+            # Более высокое доверие вытесняет более низкое (см. Store).
+            if CONFIDENCE.index(ref["confidence"]) < CONFIDENCE.index(existing[1]):
+                self._conn.execute(
+                    "UPDATE brand_ref SET confidence = %s, article = %s, level = %s "
+                    "WHERE id = %s",
+                    (ref["confidence"], ref.get("article"), ref.get("level"), existing[0]),
+                )
+            return ref
+        self._conn.execute(
+            "INSERT INTO brand_ref (tenant_id, item_id, brand, article, article_norm, "
+            " role, confidence, level, evidence_asset_ids) "
+            "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+            (tenant, item_uuid, ref["brand"], ref.get("article"),
+             ref.get("article_norm"), ref["role"], ref["confidence"], ref.get("level"),
+             [_as_uuid(a, "asset", tenant) for a in ref.get("evidence_asset_ids") or []]),
+        )
+        return ref
+
+    def brand_refs_of(self, item_id: str) -> list[dict[str, Any]]:
+        rows = self._conn.execute(
+            "SELECT brand, article, article_norm, role, confidence, level, "
+            " evidence_asset_ids FROM brand_ref WHERE item_id = %s ORDER BY created_at",
+            (_as_uuid(item_id, "item"),),
+        ).fetchall()
+        return [
+            {"brand": r[0], "article": r[1], "article_norm": r[2], "role": r[3],
+             "confidence": r[4], "level": r[5],
+             "evidence_asset_ids": [str(a) for a in (r[6] or [])]}
+            for r in rows
+        ]
+
+    def set_installation(self, item_id: str, nodes: list[dict[str, Any]]) -> None:
+        item_uuid = _as_uuid(item_id, "item")
+        tenant = self._conn.execute(
+            "SELECT tenant_id FROM item_record WHERE id = %s", (item_uuid,)
+        ).fetchone()
+        if tenant is None:
+            return
+        self._conn.execute("DELETE FROM installation_node WHERE item_id = %s", (item_uuid,))
+        for node in nodes:
+            self._conn.execute(
+                "INSERT INTO installation_node (tenant_id, item_id, level, brand, "
+                " designation, position) VALUES (%s,%s,%s,%s,%s,%s)",
+                (tenant[0], item_uuid, node["level"], node.get("brand"),
+                 node.get("designation"), node.get("position")),
+            )
+
+    def installation_of(self, item_id: str) -> list[dict[str, Any]]:
+        rows = self._conn.execute(
+            "SELECT level, brand, designation, position FROM installation_node "
+            "WHERE item_id = %s", (_as_uuid(item_id, "item"),),
+        ).fetchall()
+        return [{"level": r[0], "brand": r[1], "designation": r[2], "position": r[3]}
+                for r in rows]
+
+    def find_items_by_article(self, tenant_id: str, article_norm: str) -> list[str]:
+        rows = self._conn.execute(
+            "SELECT DISTINCT i.ext_ref FROM brand_ref b "
+            "JOIN item_record i ON i.id = b.item_id "
+            "WHERE b.tenant_id = %s AND b.article_norm = %s",
+            (self._tenant(tenant_id), article_norm),
+        ).fetchall()
+        return sorted(r[0] for r in rows if r[0])
 
     def item_trace(self, item_id: str) -> list[dict[str, Any]]:
         rows = self._conn.execute(

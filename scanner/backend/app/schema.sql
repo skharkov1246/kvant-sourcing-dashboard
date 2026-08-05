@@ -258,6 +258,7 @@ CREATE TABLE code_read (
 
 CREATE TABLE item_record (
   id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  ext_ref     TEXT,                            -- идентификатор карточки, каким его знает клиент
   tenant_id   UUID NOT NULL REFERENCES tenant(id),
   task_id     UUID NOT NULL REFERENCES scan_task(id),
   session_id  UUID NOT NULL REFERENCES scan_session(id),
@@ -288,6 +289,42 @@ CREATE TABLE trace_link (
 );
 
 CREATE INDEX trace_link_by_code ON trace_link (tenant_id, code_type, code_value);
+
+-- Многоуровневый бренд (§06.4): у ОДНОЙ детали столько пар «бренд+артикул»,
+-- сколько рук её перепродало — изготовитель PALL, OEM узла FISHER, OEM
+-- установки SIEMENS. Это не разные детали, а разные цены на один предмет.
+CREATE TABLE brand_ref (
+  id                 UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id          UUID NOT NULL REFERENCES tenant(id),
+  item_id            UUID NOT NULL REFERENCES item_record(id),
+  brand              TEXT NOT NULL,
+  article            TEXT,                  -- как напечатано
+  article_norm       TEXT,                  -- для сравнения и поиска
+  role               TEXT NOT NULL CHECK (role IN
+                       ('manufacturer','assembly_oem','equipment_oem',
+                        'private_label','distributor')),
+  confidence         TEXT NOT NULL CHECK (confidence IN ('verified','declared','inferred')),
+  level              TEXT CHECK (level IN ('equipment','assembly','part')),
+  evidence_asset_ids UUID[],
+  created_at         TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- Поиск по чужой накладной: артикул → вся семья имён той же детали.
+CREATE INDEX brand_ref_by_article ON brand_ref (tenant_id, article_norm);
+
+-- Цепочка «где стоит»: установка → узел → деталь. Уровень у детали один,
+-- поэтому UNIQUE: две «установки» у одной детали — ошибка ввода.
+CREATE TABLE installation_node (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id   UUID NOT NULL REFERENCES tenant(id),
+  item_id     UUID NOT NULL REFERENCES item_record(id),
+  level       TEXT NOT NULL CHECK (level IN ('equipment','assembly','part')),
+  brand       TEXT,
+  designation TEXT,
+  position    TEXT,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE (item_id, level)
+);
 
 -- Расхождение между заявленным и подтверждённым — событие для контролёра,
 -- ровно то, ради чего строится трассировка (§06.3).

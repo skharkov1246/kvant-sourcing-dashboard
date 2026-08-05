@@ -1104,6 +1104,104 @@ def add_trace(
     return STORE.add_trace_link(item_id, link)
 
 
+class BrandRefInput(BaseModel):
+    brand: str
+    role: Literal["manufacturer", "assembly_oem", "equipment_oem",
+                  "private_label", "distributor"]
+    article: str | None = None
+    level: Literal["equipment", "assembly", "part"] | None = None
+    evidence_asset_ids: list[str] = Field(default_factory=list)
+
+
+class InstallationNodeInput(BaseModel):
+    level: Literal["equipment", "assembly", "part"]
+    brand: str | None = None
+    designation: str | None = None
+    position: str | None = None
+
+
+class BrandChainInput(BaseModel):
+    brands: list[BrandRefInput] = Field(default_factory=list)
+    installation: list[InstallationNodeInput] = Field(default_factory=list)
+
+
+@app.post("/v1/items/{item_id}/brands", status_code=201, tags=["items"])
+def add_brand_chain(item_id: str, body: BrandChainInput,
+                    principal: Principal = Depends(current_principal)) -> dict[str, Any]:
+    """Многоуровневый бренд детали (§06.4): фильтр PALL в насосе FISHER в
+    турбине SIEMENS — три имени одного предмета и три цены на него.
+
+    Уровень доверия НЕ принимается от клиента (тот же инвариант I-7, что в
+    трассировке): внешний сотрудник заявляет, контролёр верифицирует.
+    """
+    from .brand_chain import (
+        BrandChainError, BrandRef, InstallationNode, normalize_article,
+        validate_installation,
+    )
+
+    confidence = "declared" if principal.is_external else "verified"
+    try:
+        refs = [
+            BrandRef(brand=b.brand, article=b.article, role=b.role,
+                     confidence=confidence, level=b.level,
+                     evidence_asset_ids=b.evidence_asset_ids)
+            for b in body.brands
+        ]
+        nodes = validate_installation([
+            InstallationNode(level=n.level, brand=n.brand,
+                             designation=n.designation, position=n.position)
+            for n in body.installation
+        ]) if body.installation else []
+    except BrandChainError as e:
+        raise HTTPException(status_code=422, detail={
+            "code": "bad_brand_chain", "message": str(e)}) from e
+
+    for ref in refs:
+        STORE.add_brand_ref(item_id, {**ref.as_dict(), "tenant_id": principal.tenant_id})
+    if nodes:
+        STORE.set_installation(item_id, [n.as_dict() for n in nodes])
+    STORE.audit(principal.tenant_id, principal.user_id, "item.brands",
+                item_id, {"brands": len(refs), "levels": len(nodes)})
+    return {"item_id": item_id, "brands": len(refs), "installation": len(nodes)}
+
+
+@app.get("/v1/items/{item_id}/brands", tags=["items"])
+def get_brand_chain(item_id: str,
+                    _: Principal = Depends(current_principal)) -> dict[str, Any]:
+    """Пути закупки одной детали, от изготовителя к владельцу установки."""
+    from .brand_chain import BrandRef, conflicting_manufacturers, procurement_paths
+
+    stored = STORE.brand_refs_of(item_id)
+    refs = [BrandRef(brand=r["brand"], article=r.get("article"), role=r["role"],
+                     confidence=r["confidence"], level=r.get("level"),
+                     evidence_asset_ids=r.get("evidence_asset_ids") or [])
+            for r in stored]
+    return {
+        "item_id": item_id,
+        "installation": STORE.installation_of(item_id),
+        "procurement_paths": procurement_paths(refs),
+        # Два разных изготовителя — спор для контролёра, а не «данные».
+        "manufacturer_conflict": conflicting_manufacturers(refs),
+    }
+
+
+@app.get("/v1/search/by-article", tags=["items"])
+def search_by_article(article: str,
+                      principal: Principal = Depends(current_principal)) -> dict[str, Any]:
+    """Поиск по чужой накладной: артикул любого уровня → карточки, где он
+    встречается. Регистр и разделители не значимы: «HC 9600-FKS» и
+    «hc9600fks» — один фильтр."""
+    from .brand_chain import normalize_article
+
+    norm = normalize_article(article)
+    if not norm:
+        raise HTTPException(status_code=422, detail={
+            "code": "empty_article", "message": "Пустой артикул"})
+    items = STORE.find_items_by_article(principal.tenant_id, norm)
+    return {"article": article, "article_norm": norm,
+            "items": items, "count": len(items)}
+
+
 @app.get("/v1/items/{item_id}/trace", tags=["items"])
 def get_trace(item_id: str, _: Principal = Depends(current_principal)) -> dict[str, Any]:
     return {"item_id": item_id, "links": STORE.item_trace(item_id)}
@@ -1121,7 +1219,8 @@ def get_item(item_id: str, principal: Principal = Depends(current_principal)) ->
     Карточки без единой связи не существует — 404, а не пустышка.
     """
     links = STORE.item_trace(item_id)
-    if not links:
+    brands = STORE.brand_refs_of(item_id)
+    if not links and not brands:
         raise HTTPException(status_code=404, detail={"code": "not_found", "message": "Карточка не найдена"})
 
     identity: dict[str, str] = {}
@@ -1130,13 +1229,24 @@ def get_item(item_id: str, principal: Principal = Depends(current_principal)) ->
         if field and field not in identity:
             identity[field] = link["code_value"]
 
+    from .brand_chain import BrandRef, procurement_paths
+
     card: dict[str, Any] = {
         "id": item_id,
         "identity": identity,
         "trace": links,
+        # Многоуровневый бренд рядом с идентичностью: снабженцу нужны обе
+        # половины — чем деталь является и у кого её можно купить (§06.4).
+        "installation": STORE.installation_of(item_id),
+        "procurement_paths": procurement_paths([
+            BrandRef(brand=b["brand"], article=b.get("article"), role=b["role"],
+                     confidence=b["confidence"], level=b.get("level"),
+                     evidence_asset_ids=b.get("evidence_asset_ids") or [])
+            for b in brands
+        ]),
         "measurements": [],
         "quality": None,
-        "created_at": links[0].get("created_at"),
+        "created_at": links[0].get("created_at") if links else None,
     }
     # Карточка материализованной сессии несёт её замеры и качество:
     # идентификатор детерминирован (itm-<session>), сессия восстановима.

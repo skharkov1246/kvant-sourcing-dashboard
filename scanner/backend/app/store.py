@@ -68,6 +68,8 @@ class Store:
         self._asset_by_hash: dict[tuple[str, str], str] = {}  # (tenant_id, sha256) -> asset_id
         self.idempotency: dict[tuple[str, str], str] = {}  # (tenant_id, key) -> task_id
         self.trace_links: dict[str, list[dict[str, Any]]] = {}
+        self.brand_refs: dict[str, list[dict[str, Any]]] = {}
+        self.installations: dict[str, list[dict[str, Any]]] = {}
         self.review_queue: dict[tuple[str, str], dict[str, Any]] = {}  # (tenant_id, session_id)
         self.export_queue: dict[tuple[str, str], dict[str, Any]] = {}  # (tenant_id, session_id)
         self.audit_log: list[dict[str, Any]] = []  # append-only (§07.4)
@@ -256,6 +258,49 @@ class Store:
         with self._lock:
             self.trace_links.setdefault(item_id, []).append(link)
             return link
+
+    # ── Многоуровневый бренд (§06.4) ─────────────────────────────────────────
+
+    def add_brand_ref(self, item_id: str, ref: dict[str, Any]) -> dict[str, Any]:
+        """Идемпотентно по (роль, бренд, нормализованный артикул): повторная
+        съёмка того же шильдика не плодит одинаковые пути закупки."""
+        with self._lock:
+            refs = self.brand_refs.setdefault(item_id, [])
+            key = (ref["role"], ref["brand"], ref.get("article_norm"))
+            for existing in refs:
+                if (existing["role"], existing["brand"],
+                        existing.get("article_norm")) == key:
+                    # Более высокое доверие вытесняет более низкое: подтверждённый
+                    # документом изготовитель сильнее догадки OCR.
+                    from .brand_chain import CONFIDENCE
+
+                    if CONFIDENCE.index(ref["confidence"]) < CONFIDENCE.index(
+                            existing["confidence"]):
+                        existing.update(ref)
+                    return dict(existing)
+            refs.append(ref)
+            return dict(ref)
+
+    def brand_refs_of(self, item_id: str) -> list[dict[str, Any]]:
+        with self._lock:
+            return [dict(r) for r in self.brand_refs.get(item_id, [])]
+
+    def set_installation(self, item_id: str, nodes: list[dict[str, Any]]) -> None:
+        with self._lock:
+            self.installations[item_id] = [dict(n) for n in nodes]
+
+    def installation_of(self, item_id: str) -> list[dict[str, Any]]:
+        with self._lock:
+            return [dict(n) for n in self.installations.get(item_id, [])]
+
+    def find_items_by_article(self, tenant_id: str, article_norm: str) -> list[str]:
+        """Поиск по чужой накладной: артикул → карточки, где он встречается
+        под ЛЮБЫМ брендом (в этом и смысл — найти изготовителя)."""
+        with self._lock:
+            return sorted(
+                item_id for item_id, refs in self.brand_refs.items()
+                if any(r.get("article_norm") == article_norm for r in refs)
+            )
 
     def item_trace(self, item_id: str) -> list[dict[str, Any]]:
         with self._lock:
