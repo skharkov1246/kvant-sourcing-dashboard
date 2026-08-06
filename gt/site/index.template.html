@@ -443,13 +443,18 @@ function buildUnified(){
  }
  const dmap = {};
  for(const [n,v] of Object.entries((DOSSIERS.dossiers)||{})) dmap[nrm(n)] = v;
- const hmap = (BXHIST.history)||{};
+ const hmap = {};
+ for(const hh of (BXHIST.history||[])){
+  const k = nrm(hh.name);
+  if(hmap[k]) hmap[k] = hmap[k].concat(hh.items);
+  else hmap[k] = hh.items;
+ }
  UNI = [...map.values()];
  UNI.forEach(r=>{
   r.bxTotal = Object.values(r.bitrix).reduce((a,b)=>a+b,0);
   r.typ = classify(r);
   r.dossier = dmap[r.key] || null;
-  r.bxHist = (hmap[r.key]||{}).items || null;
+  r.bxHist = hmap[r.key] || null;
   if(r.dossier){
    if((!r.email || /см\. сайт|не найдено|—|^$/.test(r.email)) && r.dossier.contact_email) r.email = r.dossier.contact_email;
    if((!r.phone || /см\. сайт|не найдено|—|^$/.test(r.phone)) && r.dossier.contact_phone) r.phone = r.dossier.contact_phone;
