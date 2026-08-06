@@ -96,6 +96,12 @@ table.sortable th.desc::after{content:" ↓";color:var(--s1)}
 .note{background:var(--chip);border-radius:8px;padding:6px 9px;font-size:12px;color:var(--ink2)}
 .pill{display:inline-block;border:1px solid var(--border);border-radius:10px;padding:1px 9px;font-size:11px;color:var(--ink2);margin:1px 3px 1px 0;white-space:nowrap}
 .pill.typ{border-color:var(--ink2);color:var(--ink)}
+.pill.sc-hi{border-color:var(--good);color:var(--good);font-weight:700}
+.pill.sc-md{border-color:var(--s1);color:var(--s1)}
+.pill.sc-lo{border-color:var(--serious);color:var(--serious)}
+.pill.sc-zero{border-color:var(--mut);color:var(--mut)}
+.dfact{display:inline-block;background:var(--chip);border-radius:7px;padding:1px 8px;font-size:11.5px;color:var(--ink2);margin:1px 4px 1px 0}
+
 .pill.bx{border-color:var(--s1);color:var(--s1);font-weight:700}
 .pill.c-high{border-color:var(--good);color:var(--good)}
 .pill.c-med{border-color:var(--serious);color:var(--serious)}
@@ -147,6 +153,8 @@ const BX_SITES = __BXSITES_JSON__;
 const RESEARCH = __RESEARCH_JSON__;
 const PNCAT = __PNCAT_JSON__;
 const PROFILES = __PROFILES_JSON__;
+const DOSSIERS = __DOSSIERS_JSON__;
+const METHOD = __METHOD_JSON__;
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const FAM_NAME = {SGT:'Siemens SGT', Solar:'Solar', Heavy:'Тяжёлые ГТУ'};
@@ -432,8 +440,15 @@ function buildUnified(){
   const hasSite = r.site && r.site!=='—' && !/не найдено|нет сайта/i.test(r.site);
   if(!hasSite && !r.src.has('мой')) map.delete(k);
  }
+ const dmap = {};
+ for(const [n,v] of Object.entries((DOSSIERS.dossiers)||{})) dmap[nrm(n)] = v;
  UNI = [...map.values()];
- UNI.forEach(r=>{ r.bxTotal = Object.values(r.bitrix).reduce((a,b)=>a+b,0); r.typ = classify(r); });
+ UNI.forEach(r=>{
+  r.bxTotal = Object.values(r.bitrix).reduce((a,b)=>a+b,0);
+  r.typ = classify(r);
+  r.dossier = dmap[r.key] || null;
+  r.score = scoreOf(r);
+ });
 }
 function coversModel(r, m){
  if(r.models.has(m)) return true;
@@ -442,10 +457,41 @@ function coversModel(r, m){
  if(HEAVY_SET.has(m) && r.heavyAll) return true;
  return false;
 }
-const confOrd = {high:0, med:1, low:2, '':3};
+/* ── Факт-скоринг: 0–100 из проверяемых фактов, каждый балл подписан источником ── */
+function scoreOf(r){
+ const d = r.dossier || {};
+ const parts = [];
+ let s = 0;
+ // 1. доказательство поставок турбинному OEM (макс 35)
+ const ev = ((r.evid||'')+' '+(r.link||'')).toLowerCase();
+ let p;
+ if(/\bbol\b|shipment|importyeti|таможн|отгруз/.test(ev) || d.supplied_proof==='shipment'){ p=35; parts.push(['поставка подтверждена first-party (BOL/таможня)', 35]); }
+ else if(r.bxTotal>0){ p=28; parts.push(['есть наши запросы в Bitrix ×'+r.bxTotal, 28]); }
+ else if((d.supplied_to&&d.supplied_to.length) || /кейс|case|our customers|supplier to|поставщик|approved/.test(ev)){ p=25; parts.push(['named OEM-клиент / кейс-стади', 25]); }
+ else if(r.models.size>0){ p=12; parts.push(['каталог с моделями ГТУ', 12]); }
+ else { p=0; }
+ s+=p;
+ // 2. долголетие (макс 20)
+ const yr = d.founded;
+ if(yr){ const age=2026-yr; const v = age>=30?20:age>=15?12:age>=5?6:0; if(v){ s+=v; parts.push([`на рынке с ${yr} (${age} лет)`, v]); } }
+ // 3. профильная конкретика (макс 15)
+ const exact=[...r.models].filter(m=>!m.includes('уточнить'));
+ if(exact.length){ s+=15; parts.push([`названы модели: ${exact.slice(0,3).join(', ')}`, 15]); }
+ // 4. экспортная активность (макс 15)
+ const nx = d.exports_to ? d.exports_to.length : 0;
+ if(nx>=5){ s+=15; parts.push([`экспорт в ${nx}+ стран`, 15]); }
+ else if(nx>=2){ s+=8; parts.push([`экспорт в ${nx} страны`, 8]); }
+ // 5. прослеживаемость цепочки (макс 15)
+ const up=(d.buys_from||[]).length, down=(d.supplied_to||[]).length;
+ if(up&&down){ s+=15; parts.push(['известны и клиенты, и поставщики', 15]); }
+ else if(up||down){ s+=8; parts.push(['известна одна сторона цепочки', 8]); }
+ r.scoreParts = parts;
+ return Math.min(100, s);
+}
+const scoreBand = s => s>=75?['досье полное','sc-hi']:s>=50?['профиль подтверждён','sc-md']:s>=25?['требует раскрутки','sc-lo']:['только сайт','sc-zero'];
 const SORTS = {
- rel:  ['сначала предлагавшие нам', (a,b)=> (b.bxTotal-a.bxTotal) || (confOrd[a.conf]-confOrd[b.conf]) || a.name.localeCompare(b.name)],
- conf: ['по уровню доверия', (a,b)=> (confOrd[a.conf]-confOrd[b.conf]) || (b.bxTotal-a.bxTotal) || a.name.localeCompare(b.name)],
+ score:['по скорингу (факты)', (a,b)=> (b.score-a.score) || (b.bxTotal-a.bxTotal) || a.name.localeCompare(b.name)],
+ rel:  ['сначала предлагавшие нам', (a,b)=> (b.bxTotal-a.bxTotal) || (b.score-a.score) || a.name.localeCompare(b.name)],
  name: ['по алфавиту', (a,b)=> a.name.localeCompare(b.name,'ru')],
  country: ['по стране', (a,b)=> a.country.localeCompare(b.country,'ru') || a.name.localeCompare(b.name)],
 };
@@ -480,17 +526,24 @@ function pkCard(r){
  const src = [...r.src].map(s=>s==='bitrix'
    ? `<span class="pill bx">Bitrix · ${r.bxTotal} запрос${r.bxTotal>4?'ов':(r.bxTotal>1?'а':'')}</span>`
    : `<span class="pill">${esc(s)}</span>`).join('');
- const confP = r.conf?`<span class="pill c-${esc(r.conf)}">доверие ${esc(r.conf)}</span>`:'';
- const prior = r.prior?`<span class="pill">${esc(r.prior)}</span>`:'';
+ const [bandLabel, bandCls] = scoreBand(r.score);
+ const scoreP = `<span class="pill ${bandCls}" title="${esc((r.scoreParts||[]).map(p=>p[0]+' +'+p[1]).join(' · ')||'фактура не собрана')}">${r.score} · ${bandLabel}</span>`;
+ const d = r.dossier || {};
+ const dossierBits = [];
+ if(d.founded) dossierBits.push(`осн. ${d.founded}`);
+ if(d.supplied_to&&d.supplied_to.length) dossierBits.push(`поставлял: ${d.supplied_to.slice(0,3).join(', ')}`);
+ if(d.exports_to&&d.exports_to.length) dossierBits.push(`экспорт: ${d.exports_to.slice(0,5).join(', ')}${d.exports_to.length>5?'…':''}`);
+ if(d.buys_from&&d.buys_from.length) dossierBits.push(`закупает у: ${d.buys_from.slice(0,3).join(', ')}`);
  return `<div class="sup${hidden?' hid':''}" data-k="${esc(r.key)}">
   <div>
    <h4>${esc(r.name)}</h4>
    <div class="mut" style="margin:2px 0 6px">${esc(r.country)}${r.role?' · '+esc(r.role):''}</div>
-   <div><span class="pill typ">${r.typ==='sub' ? 'субпоставщик: '+([...r.subOf].join(', ')||'OEM') : TYPE_NAME[r.typ]}</span>${src}${confP}${prior}</div>
+   <div><span class="pill typ">${r.typ==='sub' ? 'субпоставщик: '+([...r.subOf].join(', ')||'OEM') : TYPE_NAME[r.typ]}</span>${scoreP}${src}</div>
   </div>
   <div>
    <div style="margin-bottom:4px">${[...r.segs].map(id=>`<span class="tag">${esc(SEG_SHORT(id))}</span>`).join('')||'<span class="mut">сегмент не определён</span>'}</div>
    <div style="margin-bottom:6px">${models}${wide}${gen}</div>
+   ${dossierBits.length?`<div style="font-size:12px;margin-bottom:4px">${dossierBits.map(b=>`<span class="dfact">${esc(b)}</span>`).join('')}</div>`:''}
    ${r.what?`<div class="mut" style="font-size:12.5px">${esc(r.what.length>170?r.what.slice(0,170)+'…':r.what)}</div>`:''}
    ${r.evid?`<div class="mut" style="font-size:11.5px;margin-top:3px">Проверка: ${esc(r.evid.length>150?r.evid.slice(0,150)+'…':r.evid)}</div>`:''}
   </div>
@@ -508,7 +561,7 @@ function pkCard(r){
   </div>
  </div>`;
 }
-let pkState = {model:'', seg:'', typ:'', q:'', sort:'rel', showHidden:false};
+let pkState = {model:'', seg:'', typ:'', q:'', sort:'score', showHidden:false};
 function pkFilters(){
  const s = pkState;
  s.model = document.getElementById('pk-model').value;
@@ -826,12 +879,11 @@ function rSuppliers(){
  <div class="filters">
   <input id="cl-q" placeholder="Поиск по чеклисту…" oninput="clFilters()">
   <select id="cl-seg" onchange="clFilters()"><option value="">Сегмент: все</option>${CHECKLIST.segments.map(s=>`<option value="${s.n}">${s.n} — ${esc(s.name)}</option>`).join('')}</select>
-  <select id="cl-conf" onchange="clFilters()"><option value="">Доверие: все</option><option value="high">high</option><option value="med">med</option><option value="low">low</option></select>
   <button class="btn" onclick="clCSV()">⬇ CSV</button>
   <span class="count" id="cl-count"></span>
  </div>
  <div class="tblwrap"><table class="sortable">
-  <tr><th>Приор</th><th>Компания</th><th>Сегм.</th><th>Что делает</th><th>Контакты</th><th>Дов.</th></tr>
+  <tr><th>Приор</th><th>Компания</th><th>Сегм.</th><th>Что делает</th><th>Контакты</th></tr>
   <tbody id="cl-body"></tbody>
  </table></div>
  <div class="mut">Приоритеты: ★ ТАМОЖНЯ — виден в таможенном потоке · ★ TFS — из цепочки TFS · ★ ЛИД — тёплый контакт · ★ — первая волна RFQ · • — вторая волна. Сегмент 7 — РФ/СНГ (сервис, покрытия, реверс).</div>`;
@@ -842,15 +894,13 @@ function clRow(r){
   <td title="${esc(r.seg_name)}">${r.seg}</td>
   <td style="min-width:240px">${esc(r.what)}${r.proof?`<div class="mut" style="font-size:11.5px">${esc(r.proof)}</div>`:''}</td>
   <td style="white-space:nowrap">${esc(r.site)}<br><span class="mut">${esc(r.email)}</span><br><span class="mut">${esc(r.phone)}</span></td>
-  <td>${esc(r.conf)}</td></tr>`;
+  </tr>`;
 }
 function clFilters(){
  const q=document.getElementById('cl-q').value.trim().toLowerCase();
  const seg=document.getElementById('cl-seg').value;
- const conf=document.getElementById('cl-conf').value;
  const rows=CHECKLIST.rows.filter(r=>{
   if(seg && String(r.seg)!==seg) return false;
-  if(conf && r.conf!==conf) return false;
   if(q && ![r.name,r.country,r.what,r.seg_name,r.prior].join(' ').toLowerCase().includes(q)) return false;
   return true;
  });
