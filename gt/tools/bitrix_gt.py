@@ -34,15 +34,15 @@ KEYWORDS = ["SGT", "Solar", "Taurus", "Centaur", "Titan", "Mars", "Saturn",
             "ГТУ", "газотурбин", "газовая турбина", "Typhoon", "Tornado"]
 
 MODEL_RE = [
-    (re.compile(r"SGT[- ]?100", re.I), "SGT-100"),
-    (re.compile(r"SGT[- ]?200", re.I), "SGT-200"),
-    (re.compile(r"SGT[- ]?300", re.I), "SGT-300"),
-    (re.compile(r"SGT[- ]?400", re.I), "SGT-400"),
+    (re.compile(r"SGT[- ]?100|Typhoon", re.I), "SGT-100"),
+    (re.compile(r"SGT[- ]?200|Tornado", re.I), "SGT-200"),
+    (re.compile(r"SGT[- ]?300|Tempest", re.I), "SGT-300"),
+    (re.compile(r"SGT[- ]?400|Cyclone", re.I), "SGT-400"),
     (re.compile(r"SGT[- ]?[5-8]00", re.I), "SGT-500…800 (Финспонг)"),
-    (re.compile(r"Taurus[- ]?60", re.I), "Taurus 60"),
-    (re.compile(r"Taurus[- ]?70", re.I), "Taurus 70"),
-    (re.compile(r"Centaur[- ]?40", re.I), "Centaur 40"),
-    (re.compile(r"Centaur[- ]?50", re.I), "Centaur 50"),
+    (re.compile(r"Taurus\w*[- ]?60", re.I), "Taurus 60"),
+    (re.compile(r"Taurus\w*[- ]?70", re.I), "Taurus 70"),
+    (re.compile(r"Centaur\w*[- ]?40", re.I), "Centaur 40"),
+    (re.compile(r"Centaur\w*[- ]?50", re.I), "Centaur 50"),
     (re.compile(r"Mars[- ]?90", re.I), "Mars 90"),
     (re.compile(r"Mars[- ]?100", re.I), "Mars 100"),
     (re.compile(r"Titan[- ]?130", re.I), "Titan 130"),
@@ -75,7 +75,7 @@ def crm_refs(v) -> list[str]:
 
 def main() -> int:
     settings = Settings.load()
-    client = BitrixClient(settings.bitrix_webhook_url, max_workers=settings.max_workers)
+    client = BitrixClient(settings.bitrix_webhook_url)
 
     # 1. сделки по ключевым словам
     deals: dict[str, dict] = {}
@@ -126,8 +126,12 @@ def main() -> int:
 
     # 4. сборка снапшота
     out_deals = []
+    dropped = 0
     for did, d in sorted(deals.items(), key=lambda kv: -int(kv[0])):
         title = d.get("TITLE") or ""
+        if not tag_models(title):  # ключевое слово сработало, но это не ГТУ (напр. «TITANIUM valve»)
+            dropped += 1
+            continue
         dr = [r for r in rfqs.values() if str(r.get("parentId2") or "") == did]
         out_deals.append({
             "id": did, "title": title, "models": tag_models(title),
@@ -161,6 +165,7 @@ def main() -> int:
                                               sorted(sup.items(), key=lambda kv: -kv[1])]}
                    for m, sup in sorted(offers.items())],
     }, ensure_ascii=False, indent=1), encoding="utf-8")
+    print(f"отброшено не-ГТУ сделок: {dropped}")
     print(f"OK → {OUT}")
     print("дальше: python3 gt/build.py  (пересборка сайта)")
     return 0

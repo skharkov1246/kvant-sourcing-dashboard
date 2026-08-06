@@ -1,16 +1,16 @@
 {
  "updated": "2026-08-06",
- "source": "СИД: названия ГТУ-сделок из data/chat_snapshot.json (снимок чатов). Запросы СП-166 и поставщики подтянутся выгрузкой gt/tools/bitrix_gt.py (нужен BITRIX_WEBHOOK_URL).",
- "live": false,
+ "source": "Bitrix24: сделки по ключевым словам ГТУ + СП-166 «Запросы поставщикам»",
+ "live": true,
  "deals": [
   {
    "id": "22576",
-   "title": "Запрос КП на расходные материалы для инспекции А ГТУ Siemens S",
+   "title": "Запрос КП на расходные материалы для инспекции А ГТУ Siemens SGT-400",
    "models": [
-    "Siemens (модель уточнить)"
+    "SGT-400"
    ],
-   "stage": null,
-   "created": null,
+   "stage": "C4:NEW",
+   "created": "2026-08-05",
    "rfqs": []
   },
   {
@@ -19,69 +19,580 @@
    "models": [
     "GE 9FA (вне фокуса)"
    ],
-   "stage": null,
-   "created": null,
-   "rfqs": []
+   "stage": "C2:EXECUTING",
+   "created": "2026-08-03",
+   "rfqs": [
+    {
+     "id": "40186",
+     "title": "GTS Антон через Саеда",
+     "supplier": "GLOBAL TURBINE SOLUTIONS PVT LTD",
+     "stage": "Price at Work",
+     "sourcer": "Anton Zorin",
+     "models": [
+      "GE 9FA (вне фокуса)"
+     ]
+    }
+   ]
   },
   {
    "id": "22514",
-   "title": "356-499 Закупка газотурбинного двигателя Solar Turbine г.Казан",
+   "title": "356-499 Закупка газотурбинного двигателя Solar Turbine г.Казань.",
    "models": [
     "Solar (модель уточнить)"
    ],
-   "stage": null,
-   "created": null,
-   "rfqs": []
+   "stage": "C2:4",
+   "created": "2026-08-03",
+   "rfqs": [
+    {
+     "id": "40270",
+     "title": "cstc (china)",
+     "supplier": "CSTC China Service Technology (Shandong) Co. Ltd.",
+     "stage": "New Request",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    }
+   ]
   },
   {
    "id": "22242",
-   "title": "ЗП6071591 Поставка Горелки запальной E204529-900 Solar Turbine",
+   "title": "ЗП6071591 Поставка Горелки запальной E204529-900 Solar Turbines в соответствии с техническими требованиями ПАО \"Юнипро\"",
    "models": [
     "Solar (модель уточнить)"
    ],
-   "stage": null,
-   "created": null,
-   "rfqs": []
+   "stage": "C2:4",
+   "created": "2026-07-20",
+   "rfqs": [
+    {
+     "id": "38958",
+     "title": "periparts (usa)",
+     "supplier": "PeriParts",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    },
+    {
+     "id": "38964",
+     "title": "heriss (canada)",
+     "supplier": "Heriss (Canada)",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    },
+    {
+     "id": "38994",
+     "title": "Solar в IMMI",
+     "supplier": "IMMI Turbines",
+     "stage": "Отказ в КП",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    },
+    {
+     "id": "39960",
+     "title": "Solar Turbines India",
+     "supplier": "Solar Turbines India",
+     "stage": "Request Sent",
+     "sourcer": "Sultan Izmailov",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    },
+    {
+     "id": "39964",
+     "title": "One Power Services",
+     "supplier": "One Power Services",
+     "stage": "Request Sent",
+     "sourcer": "Sultan Izmailov",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    },
+    {
+     "id": "39968",
+     "title": "Hangzhou Gas Turbine Parts Co.",
+     "supplier": "Hangzhou HGTP Gas Turbine Parts Co.Ltd",
+     "stage": "Request Sent",
+     "sourcer": "Sultan Izmailov",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    }
+   ]
   },
   {
    "id": "22240",
-   "title": "ЗП6071593 Поставка Комплекта горелок 372308-3500 Solar Turbine",
+   "title": "ЗП6071593 Поставка Комплекта горелок 372308-3500 Solar Turbines в соответствии с техническими требованиями ПАО \"Юнипро\"",
    "models": [
     "Solar (модель уточнить)"
    ],
-   "stage": null,
-   "created": null,
-   "rfqs": []
+   "stage": "C2:2",
+   "created": "2026-07-20",
+   "rfqs": [
+    {
+     "id": "38960",
+     "title": "periparts (usa)",
+     "supplier": "PeriParts",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    },
+    {
+     "id": "38962",
+     "title": "heriss (canada)",
+     "supplier": "Heriss (Canada)",
+     "stage": "Price at Work",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    },
+    {
+     "id": "39962",
+     "title": "Solar Turbines India",
+     "supplier": "Solar Turbines India",
+     "stage": "Request Sent",
+     "sourcer": "Sultan Izmailov",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    },
+    {
+     "id": "39966",
+     "title": "One Power Services",
+     "supplier": "One Power Services",
+     "stage": "Request Sent",
+     "sourcer": "Sultan Izmailov",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    },
+    {
+     "id": "39970",
+     "title": "Hangzhou Gas Turbine Parts Co.",
+     "supplier": "Hangzhou HGTP Gas Turbine Parts Co.Ltd",
+     "stage": "Request Sent",
+     "sourcer": "Sultan Izmailov",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    }
+   ]
   },
   {
    "id": "22178",
-   "title": "ЗП6071057 Газотурбинная установка Solar Turbines типа Titan130",
+   "title": "ЗП6071057 Газотурбинная установка Solar Turbines типа Titan130 по техническим требованиям ПАО \"Юнипро\"",
    "models": [
     "Titan 130"
    ],
-   "stage": null,
-   "created": null,
-   "rfqs": []
+   "stage": "C2:17",
+   "created": "2026-07-16",
+   "rfqs": [
+    {
+     "id": "38808",
+     "title": "WTT Паша tg",
+     "supplier": "Wuxi Weishi Turbine Technology Co., Ltd.",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Titan 130"
+     ]
+    },
+    {
+     "id": "38810",
+     "title": "DTEC WC",
+     "supplier": "Dongturbo Electric Company Ltd",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Titan 130"
+     ]
+    },
+    {
+     "id": "38812",
+     "title": "cstc",
+     "supplier": "CSTC China Service Technology (Shandong) Co. Ltd.",
+     "stage": "Price at Work",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Titan 130"
+     ]
+    },
+    {
+     "id": "39472",
+     "title": "Asian Dragon International",
+     "supplier": "Asian Dragon International",
+     "stage": "Request Sent",
+     "sourcer": "Sultan Izmailov",
+     "models": [
+      "Titan 130"
+     ]
+    },
+    {
+     "id": "39474",
+     "title": "ReflowX FZ-LLC",
+     "supplier": "ReflowX FZ-LLC",
+     "stage": "In Correspondance",
+     "sourcer": "Sultan Izmailov",
+     "models": [
+      "Titan 130"
+     ]
+    }
+   ]
   },
   {
-   "id": "21850",
-   "title": "КГВ (НОВАТЭК): закупка ТЕРМОСТАТА SOLAR, ремкомплекта Лот БП 2",
-   "models": [
-    "Solar (модель уточнить)"
-   ],
-   "stage": null,
-   "created": null,
-   "rfqs": []
-  },
-  {
-   "id": "20898",
-   "title": "РН60504347 Турбина газовая (Ария)",
+   "id": "22084",
+   "title": "RH13072600010 Мониторинг рынка на поставку оборудования для ГТУ LM6000",
    "models": [
     "ГТУ (модель уточнить)"
    ],
-   "stage": null,
-   "created": null,
+   "stage": "C2:NEW",
+   "created": "2026-07-13",
    "rfqs": []
+  },
+  {
+   "id": "21878",
+   "title": "КГВ ЗИП к газовой турбине в комплектации Titan-250 Solar Turbines",
+   "models": [
+    "Titan 250"
+   ],
+   "stage": "C30:EXECUTING",
+   "created": "2026-07-03",
+   "rfqs": [
+    {
+     "id": "37650",
+     "title": "periparts (usa)",
+     "supplier": "PeriParts",
+     "stage": "Price at Work",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Titan 250"
+     ]
+    },
+    {
+     "id": "37806",
+     "title": "turbine.parts ",
+     "supplier": "turbine.parts",
+     "stage": "In Correspondance",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Titan 250"
+     ]
+    },
+    {
+     "id": "37820",
+     "title": "ITS PARTS ROMANIA",
+     "supplier": "Industrial Turbine Services s.r.l",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Titan 250"
+     ]
+    },
+    {
+     "id": "37826",
+     "title": "Gas Turbine Applications (usa)",
+     "supplier": "Gas Turbine Applications",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Titan 250"
+     ]
+    },
+    {
+     "id": "38298",
+     "title": "Air Turbo Service FZE (UAE)",
+     "supplier": "Air Turbo Service FZE",
+     "stage": "Request Sent",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Titan 250"
+     ]
+    },
+    {
+     "id": "38372",
+     "title": "DeveEnergy (uae) через сайт 21878 / 22056",
+     "supplier": "DeveEnergy (UAE)",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Titan 250"
+     ]
+    },
+    {
+     "id": "38374",
+     "title": "PSG (USA) через сайт 21878 / 22056",
+     "supplier": "Power Services Group",
+     "stage": "Request Sent",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Titan 250"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "21850",
+   "title": "КГВ (НОВАТЭК): закупка ТЕРМОСТАТА SOLAR, ремкомплекта Лот БП 26.143",
+   "models": [
+    "Solar (модель уточнить)"
+   ],
+   "stage": "C30:EXECUTING",
+   "created": "2026-07-02",
+   "rfqs": [
+    {
+     "id": "37648",
+     "title": "periparts (usa)",
+     "supplier": "PeriParts",
+     "stage": "Price at Work",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    },
+    {
+     "id": "37810",
+     "title": "Solar в IMMI",
+     "supplier": "IMMI Turbines",
+     "stage": "Price at Work",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    },
+    {
+     "id": "37814",
+     "title": "ITS PARTS ROMANIA",
+     "supplier": "Industrial Turbine Services s.r.l",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    },
+    {
+     "id": "37824",
+     "title": "Gas Turbine Applications (usa)",
+     "supplier": "Gas Turbine Applications",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "21362",
+   "title": "RH10062600032 ОКПД2 28.11.2 Поставка запасных частей к газотурбинной установке для нужд Приморского края, Амурской области (LM6000 PF)",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:2",
+   "created": "2026-06-15",
+   "rfqs": [
+    {
+     "id": "36112",
+     "title": "PROENERGY (usa)",
+     "supplier": "PROENERGY",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "36114",
+     "title": "Ground Power Parts (usa)",
+     "supplier": "Ground Power Parts",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "36116",
+     "title": "GT China",
+     "supplier": "GT China",
+     "stage": "Ответ не получен (в срок)",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "21338",
+   "title": "2130289/1 Инструмент для ВГПЗ (инструмента для газового компрессора Solar C33)",
+   "models": [
+    "Solar (модель уточнить)"
+   ],
+   "stage": "C2:2",
+   "created": "2026-06-11",
+   "rfqs": [
+    {
+     "id": "35888",
+     "title": "periparts (usa)",
+     "supplier": "PeriParts",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    },
+    {
+     "id": "35976",
+     "title": "Инструмент для компрессора Solar C33",
+     "supplier": "IMMI Turbines",
+     "stage": "Отказ в КП",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    },
+    {
+     "id": "36008",
+     "title": "RMS (USA)",
+     "supplier": "Rotating Machinery Services",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    },
+    {
+     "id": "36292",
+     "title": "Southeast Overseas, Inc. (usa)",
+     "supplier": "Southeast Overseas, Inc.",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    },
+    {
+     "id": "36300",
+     "title": "Kian (Iran)",
+     "supplier": "Kian Turbo Tec",
+     "stage": "Ответ не получен (в срок)",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    },
+    {
+     "id": "37532",
+     "title": "Инструмент для компрессора Solar C33",
+     "supplier": "TURBINE.PARTS B.V.",
+     "stage": "Unread Messages",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    },
+    {
+     "id": "38276",
+     "title": "Rathix (NETHERLANDS)",
+     "supplier": "Rathix automation",
+     "stage": "Request Sent",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "21120",
+   "title": "Л-ПНОС (бн)/02/зап.части Solar Turbines 2027",
+   "models": [
+    "Solar (модель уточнить)"
+   ],
+   "stage": "C10:UC_WWSUR7",
+   "created": "2026-06-02",
+   "rfqs": [
+    {
+     "id": "35236",
+     "title": "ЗИП Solar в IMMI",
+     "supplier": "IMMI Turbines",
+     "stage": "Price at Work",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "21020",
+   "title": "РН60504851 Проект Сибирь. Аренда газотурбинного двигателя, проведение ТО",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:9",
+   "created": "2026-06-01",
+   "rfqs": []
+  },
+  {
+   "id": "20906",
+   "title": "RH28052600067 Мониторинг рынка на поставку оборудования для ГТУ LM-6000",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:2",
+   "created": "2026-05-28",
+   "rfqs": [
+    {
+     "id": "34892",
+     "title": "TPS (USA)",
+     "supplier": "Turbine Parts Specialist",
+     "stage": "Ответ не получен (в срок)",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "34894",
+     "title": " Makik Machinery (Turkey)",
+     "supplier": "Makik Machinery Consultancy Foreign Trade Industry Ltd. Co.",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "34908",
+     "title": "ap4 (USA)",
+     "supplier": "AP4 group",
+     "stage": "In Correspondance",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "37284",
+     "title": "Xiamen Jiyang Technology Co., Ltd",
+     "supplier": "Xiamen Ji Yang Technology Co., Ltd.",
+     "stage": "Price at Work",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    }
+   ]
   },
   {
    "id": "20828",
@@ -89,9 +600,142 @@
    "models": [
     "GE 9FA (вне фокуса)"
    ],
-   "stage": null,
-   "created": null,
-   "rfqs": []
+   "stage": "C2:6",
+   "created": "2026-05-26",
+   "rfqs": [
+    {
+     "id": "34490",
+     "title": "TSL (USA)",
+     "supplier": "Turbine Services, Ltd.",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "GE 9FA (вне фокуса)"
+     ]
+    },
+    {
+     "id": "34594",
+     "title": "GTPR (UAE)",
+     "supplier": "Global Turbine Parts Resourse LLC-FZ",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "GE 9FA (вне фокуса)"
+     ]
+    },
+    {
+     "id": "34834",
+     "title": "GTS",
+     "supplier": "GLOBAL TURBINE SOLUTIONS PVT LTD",
+     "stage": "Price at Work",
+     "sourcer": "Anton Zorin",
+     "models": [
+      "GE 9FA (вне фокуса)"
+     ]
+    },
+    {
+     "id": "34836",
+     "title": "Roto Technik (India)",
+     "supplier": "Roto Technik (India) Pvt. Ltd.",
+     "stage": "Price at Work",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "GE 9FA (вне фокуса)"
+     ]
+    },
+    {
+     "id": "35160",
+     "title": "RGS (Italy)",
+     "supplier": "Rotating Global Service s.r.l.",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "GE 9FA (вне фокуса)"
+     ]
+    },
+    {
+     "id": "35478",
+     "title": "WOC (UAE)",
+     "supplier": "World Of Controls FZE",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "GE 9FA (вне фокуса)"
+     ]
+    },
+    {
+     "id": "37402",
+     "title": "Shree Khodal International tg",
+     "supplier": "Shree Khodal International (OPC) Private Limited",
+     "stage": "Price at Work",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "GE 9FA (вне фокуса)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "20752",
+   "title": "Заявка на ремонт ГТД Solar Taurus 60 Мегион бюджет",
+   "models": [
+    "Taurus 60"
+   ],
+   "stage": "C4:PREPAYMENT_INVOICE",
+   "created": "2026-05-22",
+   "rfqs": [
+    {
+     "id": "34044",
+     "title": "Ремонт Solar Taurus 60 в ООО \"ТУРБО СЕРВИС КАЗАНЬ\"",
+     "supplier": "ООО \"ТУРБО СЕРВИС КАЗАНЬ\"",
+     "stage": "Price at Work",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "Taurus 60"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "20726",
+   "title": "32616022829 Поставка воздушных фильтров (фильтров для очистки воздуха) для комплексного воздухоочистительного устройства (КВОУ) газотурбинной установки General Electric для нужд филиала АО Татэнерго» - Казанская ТЭЦ-2",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:15",
+   "created": "2026-05-21",
+   "rfqs": [
+    {
+     "id": "33690",
+     "title": "Camfil (UAE)",
+     "supplier": "Camfil - UAE",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "33692",
+     "title": "AIER ENVIRONMENTAL (China)",
+     "supplier": "Zhangjiagang Aier Environmental Protection Equipment Accessories Co., Ltd.",
+     "stage": "Ответ не получен (в срок)",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "33696",
+     "title": "THENOW (China)",
+     "supplier": "Shanghai Thenow Purification Technology Co., Ltd.",
+     "stage": "Ответ не получен (в срок)",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    }
+   ]
   },
   {
    "id": "20636",
@@ -99,9 +743,61 @@
    "models": [
     "SGT-300"
    ],
-   "stage": null,
-   "created": null,
-   "rfqs": []
+   "stage": "C2:UC_B61SCK",
+   "created": "2026-05-19",
+   "rfqs": [
+    {
+     "id": "33546",
+     "title": "HSGY (China) kvant gtf26",
+     "supplier": "China Nanjing Haosheng Industrial Technology Co., Ltd.",
+     "stage": "Price at Work",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "SGT-300"
+     ]
+    },
+    {
+     "id": "33548",
+     "title": "Genersol (Spain)",
+     "supplier": "Genersol",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "SGT-300"
+     ]
+    },
+    {
+     "id": "33554",
+     "title": "Esporim (Italy)",
+     "supplier": "Esporim S.R.L.",
+     "stage": "Ответ не получен (в срок)",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "SGT-300"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "20556",
+   "title": "КЛП-576395 Выполнение работ/оказание услуг: Капитальный ремонт оборудования на объекте ГТУ -2 ООО «ПЭСТ»",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:17",
+   "created": "2026-05-15",
+   "rfqs": [
+    {
+     "id": "34088",
+     "title": "Ремонт оборудования в ООО ЭР-Сервис",
+     "supplier": "ООО \"ЭР-Сервис\"",
+     "stage": "Price at Work",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    }
+   ]
   },
   {
    "id": "20554",
@@ -109,19 +805,1563 @@
    "models": [
     "Siemens (модель уточнить)"
    ],
-   "stage": null,
-   "created": null,
+   "stage": "C2:17",
+   "created": "2026-05-15",
+   "rfqs": [
+    {
+     "id": "33354",
+     "title": "AoteWell (China)",
+     "supplier": "AoteWell Automation",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Siemens (модель уточнить)"
+     ]
+    },
+    {
+     "id": "33358",
+     "title": "SIPATEC (Serbia)",
+     "supplier": "SIPATEC",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Siemens (модель уточнить)"
+     ]
+    },
+    {
+     "id": "33366",
+     "title": "HGTP (China)",
+     "supplier": "Hangzhou HGTP Gas Turbine Parts Co.Ltd",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Siemens (модель уточнить)"
+     ]
+    },
+    {
+     "id": "34274",
+     "title": "HSGY (China)",
+     "supplier": "China Nanjing Haosheng Industrial Technology Co., Ltd.",
+     "stage": "Price at Work",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Siemens (модель уточнить)"
+     ]
+    },
+    {
+     "id": "34446",
+     "title": "Auto2mation (India)",
+     "supplier": "Auto2mation",
+     "stage": "Не подошло по технике",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Siemens (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "20466",
+   "title": "ГТД Solar Titan 130-20500S (20501S)+редуктор+ЗИП для СМНГШ (от Дубайска)",
+   "models": [
+    "Titan 130"
+   ],
+   "stage": "C30:UC_2V76FC",
+   "created": "2026-05-08",
    "rfqs": []
   },
   {
-   "id": "20084",
-   "title": "ГП628894 Поставка запасных частей производства Solar Turbines",
+   "id": "20462",
+   "title": "Юнипро_Запрос ТКП для ГТУ MS5001 (Ванкор)",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C4:EXECUTING",
+   "created": "2026-05-08",
+   "rfqs": []
+  },
+  {
+   "id": "20380",
+   "title": "Л-ПНОС (бн)/02/ЗИП 2027. Бюджетирование.Solar Turbines",
    "models": [
     "Solar (модель уточнить)"
    ],
-   "stage": null,
-   "created": null,
+   "stage": "C10:UC_QACY8S",
+   "created": "2026-05-05",
+   "rfqs": [
+    {
+     "id": "32348",
+     "title": "Solar в IMMI Turbines",
+     "supplier": "IMMI Turbines",
+     "stage": "Price at Work",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    },
+    {
+     "id": "33544",
+     "title": "Датчик температуры AMETEK в Tesla Power",
+     "supplier": "Tesla Power",
+     "stage": "Unread Messages",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    },
+    {
+     "id": "33552",
+     "title": "Датчик температуры AMETEK в CALTROLS MIDDLE EAST FZCO",
+     "supplier": "CALTROLS Middle East FZCO",
+     "stage": "Отказ в КП",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    },
+    {
+     "id": "33644",
+     "title": "Датчик температуры AMETEK в Hatti Teknik",
+     "supplier": "Hatti Teknik",
+     "stage": "Unread Messages",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    },
+    {
+     "id": "34034",
+     "title": "Датчик температуры AMETEK в Tricon International",
+     "supplier": "Tricon International",
+     "stage": "Отказ в КП",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "20252",
+   "title": "3.2.44 Капитальный ремонт оборудования ГТУ-ТЭС 200 ООО \"ЛУКОЙЛ-Пермнефтеоргсинтез\"",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:10",
+   "created": "2026-04-27",
    "rfqs": []
+  },
+  {
+   "id": "20200",
+   "title": "3.2.50 3.2.50. Инспекция четырех газовых турбин \"Siemens\" SGT-400 Энергоцентра МЛСК им.В.Филановского для нужд СЦ \"Астраханьэнегонефть\"",
+   "models": [
+    "SGT-400"
+   ],
+   "stage": "C2:18",
+   "created": "2026-04-24",
+   "rfqs": [
+    {
+     "id": "31812",
+     "title": "Шефы, расходники и инспекция мексам",
+     "supplier": "Turbine Field Solutions",
+     "stage": "Отказ в КП",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "SGT-400"
+     ]
+    },
+    {
+     "id": "32206",
+     "title": "msr sgt-400",
+     "supplier": "MSR Industrade Pvt. Ltd.",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "SGT-400"
+     ]
+    },
+    {
+     "id": "32228",
+     "title": "Shenzhen Blaze Turbine Co. (China)",
+     "supplier": "Shenzhen Blaze Turbine",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "SGT-400"
+     ]
+    },
+    {
+     "id": "32230",
+     "title": "DIBACo GmbH",
+     "supplier": "Dibaco GmbH",
+     "stage": "Ответ не получен (в срок)",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "SGT-400"
+     ]
+    },
+    {
+     "id": "32232",
+     "title": "ANATCO (UAE)",
+     "supplier": "AL NOOR ALAILI TRADING CO. LLC",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "SGT-400"
+     ]
+    },
+    {
+     "id": "32408",
+     "title": "Расходники SGT-400 в Hecs Store",
+     "supplier": "Hecs Store",
+     "stage": "Price at Work",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "SGT-400"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "20084",
+   "title": "ГП628894 Поставка запасных частей производства Solar Turbines Titan 130",
+   "models": [
+    "Titan 130"
+   ],
+   "stage": "C2:EXECUTING",
+   "created": "2026-04-15",
+   "rfqs": [
+    {
+     "id": "31386",
+     "title": "GTA (USA)",
+     "supplier": "Gas Turbine Applications",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Titan 130"
+     ]
+    },
+    {
+     "id": "31394",
+     "title": "TAI (USA)",
+     "supplier": "Thomassen Amcot International, LLC.",
+     "stage": "Ответ не получен (в срок)",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Titan 130"
+     ]
+    },
+    {
+     "id": "31396",
+     "title": "Global Marine (India)",
+     "supplier": "Global Marine",
+     "stage": "Selected",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Titan 130"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "20078",
+   "title": "ЗП6041406 Выполнение работ по восстановительному ремонту с проведением технического перевооружения газогенератора газотурбинного двигателя.",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:UC_B61SCK",
+   "created": "2026-04-15",
+   "rfqs": []
+  },
+  {
+   "id": "20040",
+   "title": "Датчики для ГТД Solar Titan 130 Кронштадт",
+   "models": [
+    "Titan 130"
+   ],
+   "stage": "C4:LOSE",
+   "created": "2026-04-10",
+   "rfqs": [
+    {
+     "id": "30740",
+     "title": "Датчики Solar Titan 130 в TURBINE.PARTS B.V. + HardToGet.Parts",
+     "supplier": "TURBINE.PARTS B.V.",
+     "stage": "Price at Work",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "Titan 130"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "20008",
+   "title": "SBR063-260750911700036 7451-OD Закупка оборудования систем управления для КТК-Р (Программа замены МНА с ГТУ) / Purchase of control system equipment for CPCR (Program for replacing the MPU with the GTU)",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:LOSE",
+   "created": "2026-04-09",
+   "rfqs": [
+    {
+     "id": "30676",
+     "title": "lila@shme.top",
+     "supplier": "Guilin Sanhua Mechanical and Electrical Control Engineering Co., Ltd",
+     "stage": "Price at Work",
+     "sourcer": "Sergey Shipulev",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "30690",
+     "title": "RFQ Allen-Bradley ",
+     "supplier": "Yantai Wepower Electronic Co., LTD",
+     "stage": "Ответ не получен (в срок)",
+     "sourcer": "Denis Litvinovsky",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "30706",
+     "title": "Instrubiz",
+     "supplier": "InstruBiz",
+     "stage": "Price at Work",
+     "sourcer": "Sergey Shipulev",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "30896",
+     "title": "Heavenlight Electronic",
+     "supplier": "Heavenlight Electronic",
+     "stage": "Ответ не получен (в срок)",
+     "sourcer": "Sergey Shipulev",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "30904",
+     "title": "ADJ DiTec Málaga S.L.",
+     "supplier": "ADJ DiTec Málaga S.L.",
+     "stage": "Ответ не получен (в срок)",
+     "sourcer": "Sergey Shipulev",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "30906",
+     "title": "Litrols",
+     "supplier": "Litrols",
+     "stage": "Отказ в КП",
+     "sourcer": "Sergey Shipulev",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "30912",
+     "title": "Universe Middle East General Trading LLC",
+     "supplier": "Universe Middle East General Trading LLC",
+     "stage": "Ответ не получен (в срок)",
+     "sourcer": "Sergey Shipulev",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "30914",
+     "title": "Atlas Al Sharq Tr Est LLC",
+     "supplier": "Atlas Al Sharq Tr Est LLC",
+     "stage": "Ответ не получен (в срок)",
+     "sourcer": "Sergey Shipulev",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "30918",
+     "title": "Trace Industrial Equipment and Spare Parts Trading LLC",
+     "supplier": "Trace Industrial Equipment and Spare Parts Trading LLC",
+     "stage": "Ответ не получен (в срок)",
+     "sourcer": "Sergey Shipulev",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "30922",
+     "title": "Shenzhen Viyork Technology",
+     "supplier": "Shenzhen Viyork Technology",
+     "stage": "Ответ не получен (в срок)",
+     "sourcer": "Sergey Shipulev",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "30924",
+     "title": "Eusens",
+     "supplier": "Eusence",
+     "stage": "Ответ не получен (в срок)",
+     "sourcer": "Sergey Shipulev",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "30966",
+     "title": "DianBingYuan Technology (Xiamen)",
+     "supplier": "DianBingYuan Technology (Xiamen)",
+     "stage": "Ответ не получен (в срок)",
+     "sourcer": "Sergey Shipulev",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "30968",
+     "title": "Wuhan Xiatong Automation Equipment Co., Ltd.",
+     "supplier": "Wuhan Xiatong Automation Equipment Co., Ltd.",
+     "stage": "Ответ не получен (в срок)",
+     "sourcer": "Sergey Shipulev",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "30970",
+     "title": "Can Electric LTD",
+     "supplier": "Can Electric LTD",
+     "stage": "Ответ не получен (в срок)",
+     "sourcer": "Sergey Shipulev",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "31130",
+     "title": "Amikon",
+     "supplier": "Amikon",
+     "stage": "Price at Work",
+     "sourcer": "Sergey Shipulev",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "31134",
+     "title": "TDK Automation Co.,Limited",
+     "supplier": "TDK Automation Co.,Limited",
+     "stage": "Price at Work",
+     "sourcer": "Sergey Shipulev",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "19904",
+   "title": "РН60400255 Поставка фильтров Mikropor и запчастей и комплектующих ГТУ МОТОР СИЧ 01/04 2027",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:UC_B61SCK",
+   "created": "2026-04-02",
+   "rfqs": [
+    {
+     "id": "30274",
+     "title": "Элба",
+     "supplier": "ООО \"Элба Фильтр Мануфактуринг Рус\"",
+     "stage": "Ответ не получен (в срок)",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "30276",
+     "title": "ЕМВ ",
+     "supplier": "ООО \"ЕМВ фильтртехник рус\"",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "30474",
+     "title": "Mikropor (Turkey)",
+     "supplier": "Mikropor İstanbul",
+     "stage": "Ответ не получен (в срок)",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "19866",
+   "title": "ЗИП на инспекцию горячего тракта v94.3 (SGT5-4000F) Витебскэнерго",
+   "models": [
+    "Siemens (модель уточнить)"
+   ],
+   "stage": "C4:2",
+   "created": "2026-04-01",
+   "rfqs": [
+    {
+     "id": "30224",
+     "title": "Inpirio",
+     "supplier": "Inpirio Ltd.",
+     "stage": "Ответ не получен (в срок)",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Siemens (модель уточнить)"
+     ]
+    },
+    {
+     "id": "30268",
+     "title": "MSR (India) ЕС аналоги",
+     "supplier": "MSR Industrade Pvt. Ltd.",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Siemens (модель уточнить)"
+     ]
+    },
+    {
+     "id": "31634",
+     "title": "Unisys (UAE)",
+     "supplier": "Unisys Group",
+     "stage": "Ответ не получен (в срок)",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Siemens (модель уточнить)"
+     ]
+    },
+    {
+     "id": "31646",
+     "title": "Bowzon (Chine)",
+     "supplier": "Bowzon Turbine",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Siemens (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "19774",
+   "title": "ЗИП SGT-600 Южное Хыльчую Турбосервис",
+   "models": [
+    "SGT-500…800 (Финспонг)"
+   ],
+   "stage": "C4:EXECUTING",
+   "created": "2026-03-26",
+   "rfqs": [
+    {
+     "id": "29838",
+     "title": "PowerTech Turbine Parts",
+     "supplier": "PowerTech Turbine Parts",
+     "stage": "In Correspondance",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "SGT-500…800 (Финспонг)"
+     ]
+    },
+    {
+     "id": "29840",
+     "title": "GTS (Denmark)",
+     "supplier": "Gas Turbine Services",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "SGT-500…800 (Финспонг)"
+     ]
+    },
+    {
+     "id": "29844",
+     "title": "Retrofit (UAE)",
+     "supplier": "Retrofit Turbine PartsTrading FZ (ОАЭ)",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "SGT-500…800 (Финспонг)"
+     ]
+    },
+    {
+     "id": "29860",
+     "title": "MSRI (India) аналоги из ЕС",
+     "supplier": "MSR Industrade Pvt. Ltd.",
+     "stage": "Price at Work",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "SGT-500…800 (Финспонг)"
+     ]
+    },
+    {
+     "id": "29862",
+     "title": "PTT (Czechia)",
+     "supplier": "Power Parts Technology s.r.o.",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "SGT-500…800 (Финспонг)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "19722",
+   "title": "571497 Поставка оборудования METSO для филиала АО «ТГК-16» «Казанская ТЭЦ-3»  ГТУ",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:2",
+   "created": "2026-03-24",
+   "rfqs": [
+    {
+     "id": "29650",
+     "title": "Metso CTENO",
+     "supplier": "Wuxi CTENO Actuators Manufacture Co. Ltd",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "29734",
+     "title": "Edward WeChat",
+     "supplier": "Xiangjing (Shanghai) M&E Technology Co., Ltd",
+     "stage": "Ответ не получен (в срок)",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "30234",
+     "title": "Sally WeChat",
+     "supplier": "Hubei Jomay Automation Co.,Ltd",
+     "stage": "Ответ не получен (в срок)",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "19718",
+   "title": "МГТУ типа Taurus 60 на 5-6 МВт попутный газ Мегион",
+   "models": [
+    "Taurus 60"
+   ],
+   "stage": "C4:2",
+   "created": "2026-03-24",
+   "rfqs": [
+    {
+     "id": "29616",
+     "title": "QNP Китай",
+     "supplier": "Паровые турбины и сервис циннен",
+     "stage": "Не подошло по технике",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Taurus 60"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "19664",
+   "title": "5521075 Запасные части для ГТУ ЭБ-1 для нужд ТТЭЦ-1 ПАО \"Форвард Энерго\" (вспомогательное оборудование)",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:UC_B61SCK",
+   "created": "2026-03-20",
+   "rfqs": [
+    {
+     "id": "29412",
+     "title": "Metso зип",
+     "supplier": "Wuxi CTENO Actuators Manufacture Co. Ltd",
+     "stage": "Selected",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "19646",
+   "title": "ЗИП Taurus 60 КЭР капиталка",
+   "models": [
+    "Taurus 60"
+   ],
+   "stage": "C4:1",
+   "created": "2026-03-19",
+   "rfqs": [
+    {
+     "id": "29344",
+     "title": "ЗИП Taurus 60 SINO-QNP GROUP",
+     "supplier": "Паровые турбины и сервис циннен",
+     "stage": "Ответ не получен (в срок)",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Taurus 60"
+     ]
+    },
+    {
+     "id": "31086",
+     "title": "Global Marine (India)",
+     "supplier": "Global Marine",
+     "stage": "Price at Work",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Taurus 60"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "19598",
+   "title": "5517523 Поставка запасных частей (лопатки) для ГИ ГТУ ЭБ-2 для нужд ТТЭЦ-1 ПАО \"Форвард Энерго\"",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:2",
+   "created": "2026-03-17",
+   "rfqs": [
+    {
+     "id": "29128",
+     "title": "Ансальдо x3 ТЕМА",
+     "supplier": "TEMA Energy",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "29130",
+     "title": "Лопатки Ansaldo Retrofit",
+     "supplier": "Retrofit Turbine PartsTrading FZ (ОАЭ)",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "29142",
+     "title": "Лопатки Ansaldo (GTPS)",
+     "supplier": "GT Power Solutions LLC",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "29146",
+     "title": "Лопатки Ansaldo (Genloop)",
+     "supplier": "Genloop LLC",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "29150",
+     "title": "Лопатки wahtec",
+     "supplier": "WAHTEC",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "29158",
+     "title": "Лопатки Ansaldo (Kraftwerke)",
+     "supplier": "Kraftwerke Asia Inc.",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "29160",
+     "title": "Лопатки Ansaldo (HGTP)",
+     "supplier": "Hangzhou HGTP Gas Turbine Parts Co.Ltd",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "30220",
+     "title": "Inpirio full",
+     "supplier": "Inpirio Ltd.",
+     "stage": "Ответ не получен (в срок)",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "19542",
+   "title": "COM12032600101 Поставка ЗИП для Solar Turbines Centaure 40S",
+   "models": [
+    "Centaur 40"
+   ],
+   "stage": "C2:UC_B61SCK",
+   "created": "2026-03-13",
+   "rfqs": [
+    {
+     "id": "29364",
+     "title": " TURBINE.PARTS B.V.",
+     "supplier": "TURBINE.PARTS B.V.",
+     "stage": "Price at Work",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Centaur 40"
+     ]
+    },
+    {
+     "id": "30742",
+     "title": "Kian TurboTec (UAE)",
+     "supplier": "Kian Turbo Tec",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Centaur 40"
+     ]
+    },
+    {
+     "id": "30744",
+     "title": "Запрос  Allan-Bradly солар",
+     "supplier": "Yangzhou Tongte Technology Co. Ltd.",
+     "stage": "Price at Work",
+     "sourcer": "Mikhail Golubev",
+     "models": [
+      "Centaur 40"
+     ]
+    },
+    {
+     "id": "30746",
+     "title": "Southeast Overseas, Inc.",
+     "supplier": "Southeast Overseas, Inc.",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Centaur 40"
+     ]
+    },
+    {
+     "id": "30752",
+     "title": "PARYPARTS (USA)",
+     "supplier": "PeriParts",
+     "stage": "Price at Work",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Centaur 40"
+     ]
+    },
+    {
+     "id": "30754",
+     "title": "ZIEHL-ABEGG (Китай дистриб)",
+     "supplier": "Shanghai Aize Industiale Equipment Co. Ltd.",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Centaur 40"
+     ]
+    },
+    {
+     "id": "30876",
+     "title": "SKI (India)",
+     "supplier": "Shree Khodal International (OPC) Private Limited",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Centaur 40"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "19540",
+   "title": "АП115734 300/КО - Оказание вспомогательных и подготовительных работ на ГТУ-11, ГТУ-12, генераторах Г-1-1, Г-1-2 Первомайской ТЭЦ (ТЭЦ-14) филиала «Невский» ПАО «ТГК-1» для нужд ООО «ГЭХ Сервис газовых турбин» (26Н44)",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:2",
+   "created": "2026-03-13",
+   "rfqs": []
+  },
+  {
+   "id": "19508",
+   "title": "5512046 Запасные части для ГТУ ЭБ-1 для нужд ТТЭЦ-1 ПАО \"Форвард Энерго\" (вспомогательное оборудование)",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:6",
+   "created": "2026-03-11",
+   "rfqs": [
+    {
+     "id": "29028",
+     "title": "Metso зип",
+     "supplier": "Wuxi CTENO Actuators Manufacture Co. Ltd",
+     "stage": "Selected",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "19506",
+   "title": "5512187 Поставка запасных частей для ГИ ГТУ ЭБ-2 ТТЭЦ-1 ПАО \"Форвард Энерго\" в 2028 году",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:UC_B61SCK",
+   "created": "2026-03-11",
+   "rfqs": [
+    {
+     "id": "29406",
+     "title": "gts spa",
+     "supplier": "GTS S.p.A.",
+     "stage": "Selected",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "19456",
+   "title": "ЗИП Solar Titan 130 для Кронштадта 22-01-2026",
+   "models": [
+    "Titan 130"
+   ],
+   "stage": "C4:LOSE",
+   "created": "2026-03-06",
+   "rfqs": [
+    {
+     "id": "28812",
+     "title": "ЗИП Solar Titan 130 в TURBINE.PARTS B.V.",
+     "supplier": "TURBINE.PARTS B.V.",
+     "stage": "Price at Work",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "Titan 130"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "19416",
+   "title": "Л-Котово (бн)/02/Маслонасосы на SGT-100 (Winkelmann, Albany)",
+   "models": [
+    "SGT-100"
+   ],
+   "stage": "C10:UC_WWSUR7",
+   "created": "2026-03-03",
+   "rfqs": [
+    {
+     "id": "28692",
+     "title": "WINKELMANN в Camis Electronics Limited",
+     "supplier": "Camis Electronics Limited",
+     "stage": "Price at Work",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "SGT-100"
+     ]
+    },
+    {
+     "id": "28698",
+     "title": "Albany Pumps в Fluid Science Dynamics Trading LLC",
+     "supplier": "Fluid Science Dynamics Trading LLC",
+     "stage": "Price at Work",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "SGT-100"
+     ]
+    },
+    {
+     "id": "28808",
+     "title": "WINKELMANN в Fluid Science Dynamics Trading LLC",
+     "supplier": "Fluid Science Dynamics Trading LLC",
+     "stage": "Отказ в КП",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "SGT-100"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "19404",
+   "title": "COM02032600050 Выполнение работ по технической поддержке и проведению 4-х инспекций уровня \"А\" и 1-й инспекции уровня \"D\" на ГТУ №№ 1-5 SGT-600 Siemens Энергоцентра-125 МВт \"Южное Хыльчую\" в 2027 году.",
+   "models": [
+    "SGT-500…800 (Финспонг)"
+   ],
+   "stage": "C2:2",
+   "created": "2026-03-03",
+   "rfqs": []
+  },
+  {
+   "id": "19342",
+   "title": "5509029 Запасные части для ГТУ ЭБ-1 для нужд ТТЭЦ-1 ПАО \"Форвард Энерго\"",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:UC_B61SCK",
+   "created": "2026-02-26",
+   "rfqs": [
+    {
+     "id": "28530",
+     "title": "Ansaldo",
+     "supplier": "GTS S.p.A.",
+     "stage": "Selected",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "19340",
+   "title": "5509032 Запасные части для ГТУ ЭБ-1 для нужд ТТЭЦ-1 ПАО \"Форвард Энерго\" (вспомогательное оборудование)",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:6",
+   "created": "2026-02-26",
+   "rfqs": [
+    {
+     "id": "28630",
+     "title": "RFQ Evanlee Lambor",
+     "supplier": "—",
+     "stage": "Отказ в КП",
+     "sourcer": "Berdy Karaev",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "28632",
+     "title": "RFQ Edward XJ ",
+     "supplier": "Xiangjing (Shanghai) M&E Technology Co., Ltd",
+     "stage": "Отказ в КП",
+     "sourcer": "Berdy Karaev",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "19336",
+   "title": "Запросы ЗЧ_КЭР Холдинг, Taurus 60 через ЕМВ",
+   "models": [
+    "Taurus 60"
+   ],
+   "stage": "C4:1",
+   "created": "2026-02-26",
+   "rfqs": [
+    {
+     "id": "28464",
+     "title": "One Power Services (Singapore)",
+     "supplier": "One Power Services",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Taurus 60"
+     ]
+    },
+    {
+     "id": "28474",
+     "title": "ITS LLC (UAE)",
+     "supplier": "ITS LLC",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Taurus 60"
+     ]
+    },
+    {
+     "id": "28540",
+     "title": "Heriss Corporation Solar Turbines",
+     "supplier": "Heriss (Canada)",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Taurus 60"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "19090",
+   "title": "Поставка газотурбинного двигателя SGT-200-1S ЗАРУБЕЖНЕФТЬ-добыча Харьяга",
+   "models": [
+    "SGT-200"
+   ],
+   "stage": "C4:PREPARATION",
+   "created": "2026-02-11",
+   "rfqs": [
+    {
+     "id": "27740",
+     "title": "SGT-200-1S в ТФС",
+     "supplier": "Turbine Field Solutions",
+     "stage": "Отказ в КП",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "SGT-200"
+     ]
+    },
+    {
+     "id": "28000",
+     "title": "SGT-200-1S Кену (WRIKU)",
+     "supplier": "WRIKU INTERNATIONAL BUSINESS CO LTD",
+     "stage": "In Correspondance",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "SGT-200"
+     ]
+    },
+    {
+     "id": "28656",
+     "title": "ГТД SGT-200-1S DT",
+     "supplier": "Dongturbo Electric Company Ltd",
+     "stage": "Не подошло по технике",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "SGT-200"
+     ]
+    },
+    {
+     "id": "35196",
+     "title": "CSTC (china)",
+     "supplier": "CSTC China Service Technology (Shandong) Co. Ltd.",
+     "stage": "Price at Work",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "SGT-200"
+     ]
+    },
+    {
+     "id": "37410",
+     "title": "WTT tg",
+     "supplier": "Wuxi Weishi Turbine Technology Co., Ltd.",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "SGT-200"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "19050",
+   "title": "АО «ТГК-16» - ЗИП ГТУ GE 9HA.01",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C4:PREPARATION",
+   "created": "2026-02-09",
+   "rfqs": [
+    {
+     "id": "27554",
+     "title": "ЗИП NP",
+     "supplier": "GLOBAL TURBINE SOLUTIONS PVT LTD",
+     "stage": "Request Sent",
+     "sourcer": "Anton Zorin",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "19016",
+   "title": "РН60201275 Открытый опрос рынка на оказание услуг по капитальному ремонту газотурбинного двигателя Rolls Royce Allison 501-KB5 для ГТУ ГТЭС Ардалинского н/м",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:2",
+   "created": "2026-02-06",
+   "rfqs": [
+    {
+     "id": "27542",
+     "title": "Кап ремонт Rolls Royce в TFS",
+     "supplier": "Turbine Field Solutions",
+     "stage": "Unread Messages",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "19004",
+   "title": "Клапаны Solar для турбин Taurus под Славнефть-Мегион",
+   "models": [
+    "Solar (модель уточнить)"
+   ],
+   "stage": "C4:PREPARATION",
+   "created": "2026-02-05",
+   "rfqs": [
+    {
+     "id": "27424",
+     "title": "Клапаны Solar в TURBINE.PARTS B.V.",
+     "supplier": "TURBINE.PARTS B.V.",
+     "stage": "Unread Messages",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "18860",
+   "title": "РН60103698 \tЗИП для газотурбинной установки Solar Mars",
+   "models": [
+    "Solar (модель уточнить)"
+   ],
+   "stage": "C2:UC_B61SCK",
+   "created": "2026-01-29",
+   "rfqs": [
+    {
+     "id": "27206",
+     "title": "RFQ IMMI turbines",
+     "supplier": "IMMI Turbines",
+     "stage": "Price at Work",
+     "sourcer": "Berdy Karaev",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "18710",
+   "title": "Лопатки Solar Taurus 70 для ООО \"ПроТех\"",
+   "models": [
+    "Taurus 70"
+   ],
+   "stage": "C4:PREPARATION",
+   "created": "2026-01-21",
+   "rfqs": [
+    {
+     "id": "26656",
+     "title": "Лопатки Solar Taurus 70 в POWERGEN SOLUTIONS FZE LLC",
+     "supplier": "POWERGEN SOLUTIONS FZE LLC",
+     "stage": "In Correspondance",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "Taurus 70"
+     ]
+    },
+    {
+     "id": "38848",
+     "title": "Паша tg",
+     "supplier": "Wuxi Weishi Turbine Technology Co., Ltd.",
+     "stage": "Price at Work",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Taurus 70"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "18560",
+   "title": "Поставка датчиков температуры ГТУ MS5001 и 6FA",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C4:PREPARATION",
+   "created": "2026-01-14",
+   "rfqs": [
+    {
+     "id": "26152",
+     "title": "RFQ FR 5&6",
+     "supplier": "Thermo Engineering S.r.l.",
+     "stage": "Request Sent",
+     "sourcer": "Anton Zorin",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "26224",
+     "title": "RFQ Thermocouple type K",
+     "supplier": "CORREGE - COTEMP SENSING Company",
+     "stage": "In Correspondance",
+     "sourcer": "Maria Sukhovarova",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "26226",
+     "title": "RFQ Thermocouple type K",
+     "supplier": "RTP power",
+     "stage": "Price at Work",
+     "sourcer": "Maria Sukhovarova",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "26228",
+     "title": "RFQ Thermocouple type K",
+     "supplier": "Unisys Group",
+     "stage": "Ответ не получен (в срок)",
+     "sourcer": "Maria Sukhovarova",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "26260",
+     "title": "RFQ Thermocouple type K",
+     "supplier": "Thermo Est",
+     "stage": "Ответ не получен (в срок)",
+     "sourcer": "Maria Sukhovarova",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "26438",
+     "title": "RFQ Thermostatic sensors",
+     "supplier": "GTSMRO",
+     "stage": "Price at Work",
+     "sourcer": "Maria Sukhovarova",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "26440",
+     "title": "RFQ Temperature sensor (duplex)",
+     "supplier": "H&B Sensors Ltd",
+     "stage": "In Correspondance",
+     "sourcer": "Maria Sukhovarova",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "26442",
+     "title": "RFQ Jumo Temperature sensor",
+     "supplier": "JUMO Automation GmbH",
+     "stage": "Ответ не получен (в срок)",
+     "sourcer": "Maria Sukhovarova",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "26444",
+     "title": "RFQ Dew point sensor",
+     "supplier": "Vaisala",
+     "stage": "Ответ не получен (в срок)",
+     "sourcer": "Maria Sukhovarova",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "18458",
+   "title": "753. Бороскопическая инспекция SGT-400 Лукойл Нижневолжск",
+   "models": [
+    "SGT-400"
+   ],
+   "stage": "LOSE",
+   "created": "2025-12-23",
+   "rfqs": [
+    {
+     "id": "25792",
+     "title": "Бороскопия ГТУ в TFS",
+     "supplier": "Turbine Field Solutions (TFS)",
+     "stage": "Selected",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "SGT-400"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "18454",
+   "title": "Поставка запасных частей для ГТУ типа V64.3А для нужд ТТЭЦ-1 ПАО \"Форвард Энерго\"",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C4:5",
+   "created": "2025-12-23",
+   "rfqs": [
+    {
+     "id": "25810",
+     "title": "RFQ PEG",
+     "supplier": "Progetti Europa & Global S.p.A. (PEG)",
+     "stage": "Request Sent",
+     "sourcer": "Berdy Karaev",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "26786",
+     "title": "RFQ Ansaldo в GTS S.p.A.",
+     "supplier": "GTS S.p.A.",
+     "stage": "Отказ в КП",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "18348",
+   "title": "Запрос КП на фильтры для SGT-400",
+   "models": [
+    "SGT-400"
+   ],
+   "stage": "C4:8",
+   "created": "2025-12-11",
+   "rfqs": [
+    {
+     "id": "25422",
+     "title": "Фильтры Siemens в EU Automation (UAE)",
+     "supplier": "EU Automation (UAE)",
+     "stage": "Ответ не получен (в срок)",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "SGT-400"
+     ]
+    },
+    {
+     "id": "25676",
+     "title": "Фильтр в AWS Corporation",
+     "supplier": "AWS Corporation",
+     "stage": "Ответ не получен (в срок)",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "SGT-400"
+     ]
+    },
+    {
+     "id": "25678",
+     "title": "Фильтры в EMW filtertechnik GmbH",
+     "supplier": "EMW filtertechnik GmbH",
+     "stage": "Ответ не получен (в срок)",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "SGT-400"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "18282",
+   "title": "5490578 Поставка запасных частей для ГТУ типа V64.3А для нужд ТТЭЦ-1 ПАО \"Форвард Энерго\"",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:2",
+   "created": "2025-12-05",
+   "rfqs": [
+    {
+     "id": "25636",
+     "title": "ЗИП к SGT-1000F в Mapa Turbines",
+     "supplier": "Mapa Turbines",
+     "stage": "Ответ не получен (в срок)",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "SGT-100"
+     ]
+    },
+    {
+     "id": "25648",
+     "title": "ЗИП к SGT-1000F в SEALMECH TRADING L.L.C",
+     "supplier": "SEALMECH TRADING L.L.C",
+     "stage": "Ответ не получен (в срок)",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "SGT-100"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "18214",
+   "title": "736. Направляющий аппарат для ГТУ MS5001PA_1St. Stage_ПЭСТ",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "6",
+   "created": "2025-12-02",
+   "rfqs": [
+    {
+     "id": "24762",
+     "title": "MS5001PA High Tech Nozzle Stage 1st",
+     "supplier": "Powergen  Solutions  FZE LLC",
+     "stage": "Selected",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "26030",
+     "title": "Направляющие аппараты для MS5001PA в POWERGEN SOLUTIONS FZE LLC",
+     "supplier": "POWERGEN SOLUTIONS FZE LLC",
+     "stage": "Selected",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "32170",
+     "title": "Монтажный комплект в POWERGEN SOLUTIONS",
+     "supplier": "POWERGEN SOLUTIONS FZE LLC",
+     "stage": "Selected",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    }
+   ]
   },
   {
    "id": "18022",
@@ -129,9 +2369,40 @@
    "models": [
     "Taurus 60"
    ],
-   "stage": null,
-   "created": null,
-   "rfqs": []
+   "stage": "C10:UC_PLDUI9",
+   "created": "2025-11-25",
+   "rfqs": [
+    {
+     "id": "24438",
+     "title": "ЗИП Solar Taurus 60S в TURBINE.PARTS B.V.",
+     "supplier": "TURBINE.PARTS B.V.",
+     "stage": "Unread Messages",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "Taurus 60"
+     ]
+    },
+    {
+     "id": "28340",
+     "title": "ЗИП Solar Taurus 60S в PETRANV",
+     "supplier": "Petran V Energy for Value",
+     "stage": "Unread Messages",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "Taurus 60"
+     ]
+    },
+    {
+     "id": "29710",
+     "title": "ЗИП Taurus 60S в ANTONI International, Inc.",
+     "supplier": "Antoni International, Inc.",
+     "stage": "In Correspondance",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "Taurus 60"
+     ]
+    }
+   ]
   },
   {
    "id": "18020",
@@ -139,9 +2410,40 @@
    "models": [
     "Taurus 70"
    ],
-   "stage": null,
-   "created": null,
-   "rfqs": []
+   "stage": "C10:UC_PLDUI9",
+   "created": "2025-11-25",
+   "rfqs": [
+    {
+     "id": "24654",
+     "title": "ЗИП Solar Taurus 70 MD в IMMI Turbines",
+     "supplier": "IMMI Turbines",
+     "stage": "Price at Work",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "Taurus 70"
+     ]
+    },
+    {
+     "id": "26366",
+     "title": "Taurus 70 MD в Turboaleaciones",
+     "supplier": "Turboaleaciones",
+     "stage": "Unread Messages",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "Taurus 70"
+     ]
+    },
+    {
+     "id": "28350",
+     "title": "ЗИП Solar Taurus 70MD в PETRANV",
+     "supplier": "Petran V Energy for Value",
+     "stage": "Unread Messages",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "Taurus 70"
+     ]
+    }
+   ]
   },
   {
    "id": "18018",
@@ -149,10 +2451,6222 @@
    "models": [
     "Taurus 70"
    ],
-   "stage": null,
-   "created": null,
+   "stage": "C10:UC_PLDUI9",
+   "created": "2025-11-25",
+   "rfqs": [
+    {
+     "id": "24662",
+     "title": "Solar Taurus 70 мексам TFS",
+     "supplier": "Turbine Field Solutions",
+     "stage": "Unread Messages",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "Taurus 70"
+     ]
+    },
+    {
+     "id": "28354",
+     "title": "ЗИП Solar Taurus 70 в PETRANV",
+     "supplier": "Petran V Energy for Value",
+     "stage": "Unread Messages",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "Taurus 70"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "17952",
+   "title": "Зап. части Solar Taurus 60 на Сахалин Турбина Сервис",
+   "models": [
+    "Taurus 60"
+   ],
+   "stage": "C4:PREPARATION",
+   "created": "2025-11-20",
+   "rfqs": [
+    {
+     "id": "25064",
+     "title": "З/ч Solar Taurus 60 в IMMI",
+     "supplier": "IMMI Turbines",
+     "stage": "Ответ не получен (в срок)",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "Taurus 60"
+     ]
+    },
+    {
+     "id": "25068",
+     "title": "З/ч Solar Taurus 60 в TURBINE.PARTS B.V.",
+     "supplier": "TURBINE.PARTS B.V.",
+     "stage": "Unread Messages",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "Taurus 60"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "17872",
+   "title": "Запрос ТКП на поставку SGT-400 (заявка 251113-1)",
+   "models": [
+    "SGT-400"
+   ],
+   "stage": "C4:5",
+   "created": "2025-11-17",
+   "rfqs": []
+  },
+  {
+   "id": "17842",
+   "title": "COM12112500037 Поставка комплектующих для ГТГ Siemens SGT-400 для нужд СЦ \"Астраханьэнергонефть\"",
+   "models": [
+    "SGT-400"
+   ],
+   "stage": "C2:6",
+   "created": "2025-11-13",
+   "rfqs": [
+    {
+     "id": "23958",
+     "title": "Battery Enersys в Enersys U.A.E.",
+     "supplier": "—",
+     "stage": "In Correspondance",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "SGT-400"
+     ]
+    },
+    {
+     "id": "23966",
+     "title": "Battery Enersys в Orogenic ApS",
+     "supplier": "Orogenic ApS",
+     "stage": "In Correspondance",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "SGT-400"
+     ]
+    },
+    {
+     "id": "23968",
+     "title": "Battery Enersys в UK Battery Sales Ltd",
+     "supplier": "UK Battery Sales Ltd",
+     "stage": "Price at Work",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "SGT-400"
+     ]
+    },
+    {
+     "id": "23998",
+     "title": "Pepple+Fuchs в NRwell",
+     "supplier": "NRwell",
+     "stage": "Unread Messages",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "SGT-400"
+     ]
+    },
+    {
+     "id": "23999",
+     "title": "Pepple+Fuchs в Foxmere",
+     "supplier": "Foxmere Technologies Ltd",
+     "stage": "In Correspondance",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "SGT-400"
+     ]
+    },
+    {
+     "id": "24010",
+     "title": "Pepple+Fuchs в Kempston Controls LLC",
+     "supplier": "Kempston Controls LLC",
+     "stage": "In Correspondance",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "SGT-400"
+     ]
+    },
+    {
+     "id": "24012",
+     "title": "Pepple+Fuchs в Gahangan",
+     "supplier": "Gahangan",
+     "stage": "Unread Messages",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "SGT-400"
+     ]
+    },
+    {
+     "id": "24014",
+     "title": "Pepple+Fuchs в TCB Avgidis Automation SA",
+     "supplier": "TCB Avgidis Automation SA",
+     "stage": "Unread Messages",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "SGT-400"
+     ]
+    },
+    {
+     "id": "24212",
+     "title": "Pepple+Fuchs в PLSWISS SA",
+     "supplier": "PLSWISS SA",
+     "stage": "Отказ в КП",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "SGT-400"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "17832",
+   "title": "562813 Поставка насоса гидравлического масла для газовой турбины тип MS5001PA ГТУ-1,2,3 ООО «ПЭСТ»  ",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:LOSE",
+   "created": "2025-11-13",
+   "rfqs": [
+    {
+     "id": "23734",
+     "title": "Quanzhou Delphi Machinery Co., Ltd",
+     "supplier": "—",
+     "stage": "New Request",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "17776",
+   "title": "ЗИП Solar Titan 130 для Кронштадта 10-11-2025",
+   "models": [
+    "Titan 130"
+   ],
+   "stage": "C4:5",
+   "created": "2025-11-10",
+   "rfqs": [
+    {
+     "id": "23556",
+     "title": "Solar Titan 130 в IMMI Turbines",
+     "supplier": "IMMI Turbines",
+     "stage": "Unread Messages",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "Titan 130"
+     ]
+    },
+    {
+     "id": "23574",
+     "title": "Titan 130 в TURBINE.PARTS B.V.",
+     "supplier": "TURBINE.PARTS B.V.",
+     "stage": "Unread Messages",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "Titan 130"
+     ]
+    },
+    {
+     "id": "23590",
+     "title": "Titan 130 в ANTONI INTERNATIONAL, INC.",
+     "supplier": "Antoni International, Inc.",
+     "stage": "In Correspondance",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "Titan 130"
+     ]
+    },
+    {
+     "id": "24720",
+     "title": "Titan 130 в Audax Global Energy",
+     "supplier": "Audax Global Energy",
+     "stage": "Unread Messages",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "Titan 130"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "17732",
+   "title": "ЗИП SGT 400",
+   "models": [
+    "SGT-400"
+   ],
+   "stage": "C4:PREPARATION",
+   "created": "2025-11-06",
+   "rfqs": [
+    {
+     "id": "23606",
+     "title": "RFQ Wirturbo",
+     "supplier": "Wirturbo",
+     "stage": "Request Sent",
+     "sourcer": "Berdy Karaev",
+     "models": [
+      "SGT-400"
+     ]
+    },
+    {
+     "id": "23618",
+     "title": "Requests #23618",
+     "supplier": "ProBusiness SRL",
+     "stage": "Отказ в КП",
+     "sourcer": "Berdy Karaev",
+     "models": [
+      "SGT-400"
+     ]
+    },
+    {
+     "id": "23624",
+     "title": "RFQ",
+     "supplier": "PIPING ROCK ENERGY CORP.",
+     "stage": "Отказ в КП",
+     "sourcer": "Berdy Karaev",
+     "models": [
+      "SGT-400"
+     ]
+    },
+    {
+     "id": "23714",
+     "title": "RFQ Modus",
+     "supplier": "Modus machineering",
+     "stage": "Request Sent",
+     "sourcer": "Berdy Karaev",
+     "models": [
+      "SGT-400"
+     ]
+    },
+    {
+     "id": "23718",
+     "title": "MSRI trade",
+     "supplier": "MSR Industrade Pvt. Ltd.",
+     "stage": "Request Sent",
+     "sourcer": "Berdy Karaev",
+     "models": [
+      "SGT-400"
+     ]
+    },
+    {
+     "id": "23984",
+     "title": "RFQ EPS",
+     "supplier": "EPS (european power systems)",
+     "stage": "Ответ не получен (в срок)",
+     "sourcer": "Berdy Karaev",
+     "models": [
+      "SGT-400"
+     ]
+    },
+    {
+     "id": "24390",
+     "title": "RFQ EU Enerji",
+     "supplier": "Euro-enerji",
+     "stage": "Request Sent",
+     "sourcer": "Berdy Karaev",
+     "models": [
+      "SGT-400"
+     ]
+    },
+    {
+     "id": "24570",
+     "title": "RFQ Green Italy",
+     "supplier": "Green Italy S.r.l.",
+     "stage": "Request Sent",
+     "sourcer": "Berdy Karaev",
+     "models": [
+      "SGT-400"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "17718",
+   "title": "5482997 Поставка запасных частей для ГТУ типа АЕ64.3А ЭБ-2 ТТЭЦ-1 ПАО \"Форвард Энерго\"",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:2",
+   "created": "2025-11-06",
+   "rfqs": [
+    {
+     "id": "24578",
+     "title": "RFQ Green Italy",
+     "supplier": "Green Italy S.r.l.",
+     "stage": "Request Sent",
+     "sourcer": "Berdy Karaev",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "17672",
+   "title": "718. КЛП-560322 Поставка направляющих аппаратов для ГТУ MS5001PA.ООО «ПЭСТ»",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "6",
+   "created": "2025-11-01",
+   "rfqs": [
+    {
+     "id": "23470",
+     "title": "STAGE-1 and 2 NOZZLE ASSY 5001PA",
+     "supplier": "Global Turbine Solutions LLC.",
+     "stage": "Selected",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "24216",
+     "title": "MS5001 High Tech Nozzle Stage 1st",
+     "supplier": "Powergen  Solutions  FZE LLC",
+     "stage": "Selected",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "26070",
+     "title": "Часть крепежа",
+     "supplier": "POWERGEN SOLUTIONS FZE LLC",
+     "stage": "Selected",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "17626",
+   "title": "ЗИП для SGT-400 (заявка 251030-1) Кронштадт ",
+   "models": [
+    "SGT-400"
+   ],
+   "stage": "C4:5",
+   "created": "2025-10-31",
+   "rfqs": [
+    {
+     "id": "25774",
+     "title": "ЗИП SGT-400 в Wirturbo",
+     "supplier": "Wirturbo",
+     "stage": "Ответ не получен (в срок)",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "SGT-400"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "17596",
+   "title": "РН51004476 Запчасти Siemens SGT-300-2S",
+   "models": [
+    "SGT-300"
+   ],
+   "stage": "C2:2",
+   "created": "2025-10-29",
+   "rfqs": []
+  },
+  {
+   "id": "17594",
+   "title": "Поставка турбины SGT-700 для Кронштадта",
+   "models": [
+    "SGT-500…800 (Финспонг)"
+   ],
+   "stage": "C4:5",
+   "created": "2025-10-29",
+   "rfqs": []
+  },
+  {
+   "id": "17322",
+   "title": "РН51002014 Поставка МТР по лоту № 370187 \"Аппарат направляющий 2423483-A SGT-800\"",
+   "models": [
+    "SGT-500…800 (Финспонг)"
+   ],
+   "stage": "C2:LOSE",
+   "created": "2025-10-13",
+   "rfqs": [
+    {
+     "id": "22200",
+     "title": "RFQ VG",
+     "supplier": "VG Engineering",
+     "stage": "Отказ в КП",
+     "sourcer": "Berdy Karaev",
+     "models": [
+      "SGT-500…800 (Финспонг)"
+     ]
+    },
+    {
+     "id": "22354",
+     "title": "RFQ Sealmech",
+     "supplier": "SEALMECH TRADING L.L.C",
+     "stage": "Ответ не получен (в срок)",
+     "sourcer": "Berdy Karaev",
+     "models": [
+      "SGT-500…800 (Финспонг)"
+     ]
+    },
+    {
+     "id": "22364",
+     "title": "RFQ Wirturbo",
+     "supplier": "Wirturbo",
+     "stage": "Отказ в КП",
+     "sourcer": "Berdy Karaev",
+     "models": [
+      "SGT-500…800 (Финспонг)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "17272",
+   "title": "РН51001445 ЗИП для газотурбинной установки Solar Turbines Titan 130",
+   "models": [
+    "Titan 130"
+   ],
+   "stage": "C2:UC_B61SCK",
+   "created": "2025-10-09",
+   "rfqs": [
+    {
+     "id": "22098",
+     "title": "RFQ IMMI",
+     "supplier": "IMMI Turbines",
+     "stage": "Price at Work",
+     "sourcer": "Berdy Karaev",
+     "models": [
+      "Titan 130"
+     ]
+    },
+    {
+     "id": "22102",
+     "title": "RFQ VG",
+     "supplier": "VG Engineering",
+     "stage": "Request Sent",
+     "sourcer": "Berdy Karaev",
+     "models": [
+      "Titan 130"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "17210",
+   "title": "5474496 Поставка запасных частей для ГТУ типа АЕ64.3А ЭБ-2 ТТЭЦ-1 2028 г.",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:2",
+   "created": "2025-10-07",
+   "rfqs": [
+    {
+     "id": "21912",
+     "title": "RFQ Shanh El",
+     "supplier": "Shanghai Electric Machinery Co.Ltd. (Shanghai Electric Group )",
+     "stage": "Отказ в КП",
+     "sourcer": "Berdy Karaev",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "21951",
+     "title": "RFQ JCM ",
+     "supplier": "NEW JCM GROUP CO., LTD",
+     "stage": "Request Sent",
+     "sourcer": "Berdy Karaev",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "21953",
+     "title": "RFQ AP4",
+     "supplier": "AP4 group",
+     "stage": "Отказ в КП",
+     "sourcer": "Berdy Karaev",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "17196",
+   "title": "COM06102500076 Поставка регулятора давления газотопливного пускового воспламенителя для ГТУ Solar №3 СЦ \"Усинскэнергонефть\"",
+   "models": [
+    "Solar (модель уточнить)"
+   ],
+   "stage": "C2:LOSE",
+   "created": "2025-10-07",
+   "rfqs": [
+    {
+     "id": "21862",
+     "title": "Solar в IMMI Turbines",
+     "supplier": "IMMI Turbines",
+     "stage": "Request Sent",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "17036",
+   "title": "ЗИП к SGT-200 для АО «ОХК «УРАЛХИМ»",
+   "models": [
+    "SGT-200"
+   ],
+   "stage": "C4:PREPARATION",
+   "created": "2025-09-30",
+   "rfqs": [
+    {
+     "id": "21578",
+     "title": "ЗИП к SGT-200 в ТФС мексам",
+     "supplier": "Turbine Field Solutions",
+     "stage": "Request Sent",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "SGT-200"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "17026",
+   "title": "ЗИП для ремонта SGT-400 от Кронштадта",
+   "models": [
+    "SGT-400"
+   ],
+   "stage": "C4:9",
+   "created": "2025-09-29",
+   "rfqs": [
+    {
+     "id": "21568",
+     "title": "ЗИП для SGT-400 в ТФС мексам",
+     "supplier": "Turbine Field Solutions",
+     "stage": "Request Sent",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "SGT-400"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "17024",
+   "title": "Л-ПНОС/Поставка ГТУ Solar Mars 100",
+   "models": [
+    "Mars 100"
+   ],
+   "stage": "C10:NEW",
+   "created": "2025-09-29",
+   "rfqs": [
+    {
+     "id": "21610",
+     "title": "Поставка ГТУ Solar Mars в TFS мексам",
+     "supplier": "Turbine Field Solutions",
+     "stage": "Request Sent",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "Mars 100"
+     ]
+    },
+    {
+     "id": "24722",
+     "title": "Поставка Solar Mars 100 - Fin Marine & Energy Solutions International FZCO",
+     "supplier": "FMLS FIN MARINE & ENERGY SOLUTIONS LTD.",
+     "stage": "In Correspondance",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "Mars 100"
+     ]
+    },
+    {
+     "id": "37408",
+     "title": "WTT tg",
+     "supplier": "Wuxi Weishi Turbine Technology Co., Ltd.",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Mars 100"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "16974",
+   "title": "ЗИП к SGT5-4000F для Мосэнерго ТЭЦ-20",
+   "models": [
+    "Siemens (модель уточнить)"
+   ],
+   "stage": "C4:NEW",
+   "created": "2025-09-26",
+   "rfqs": []
+  },
+  {
+   "id": "16772",
+   "title": "РН50902262 \tГазотурбинный двигатель MS5002D DLN",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:UC_B61SCK",
+   "created": "2025-09-16",
+   "rfqs": [
+    {
+     "id": "21016",
+     "title": "RFQ TIRTH ",
+     "supplier": "TIRTH SALES AND POWER SOLUTIONS",
+     "stage": "Request Sent",
+     "sourcer": "Berdy Karaev",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "21028",
+     "title": "RFQ Greentech",
+     "supplier": "GreenTech",
+     "stage": "Price at Work",
+     "sourcer": "Berdy Karaev",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "16710",
+   "title": "Форсунки SGT-700 для Кронштадта",
+   "models": [
+    "SGT-500…800 (Финспонг)"
+   ],
+   "stage": "C4:5",
+   "created": "2025-09-15",
+   "rfqs": []
+  },
+  {
+   "id": "16536",
+   "title": "5463442 Поставка запасных частей для ГТУ типа V64.3А для нужд ТТЭЦ-1 ПАО \"Форвард Энерго\"",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:10",
+   "created": "2025-09-04",
+   "rfqs": []
+  },
+  {
+   "id": "16468",
+   "title": "Поставка запасных частей для ГТУ типа V64.3А для нужд ТТЭЦ-1 ПАО \"Форвард Энерго\"",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C4:PREPARATION",
+   "created": "2025-09-02",
+   "rfqs": [
+    {
+     "id": "20426",
+     "title": "Spare parts for gas turbine",
+     "supplier": "—",
+     "stage": "New Request",
+     "sourcer": "Yana Pavlovskaya",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "16304",
+   "title": "Л-ПНОС (21-643)/03/Solar Turbines. КАП Ремонт MARS-100",
+   "models": [
+    "Mars 100"
+   ],
+   "stage": "C10:UC_PLDUI9",
+   "created": "2025-08-21",
+   "rfqs": [
+    {
+     "id": "24392",
+     "title": "Overhaul Solar Mars 100 в TFS",
+     "supplier": "Turbine Field Solutions",
+     "stage": "In Correspondance",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "Mars 100"
+     ]
+    },
+    {
+     "id": "30472",
+     "title": "Antoni International Inc. (USA)",
+     "supplier": "Antoni International, Inc.",
+     "stage": "Price at Work",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Mars 100"
+     ]
+    },
+    {
+     "id": "30704",
+     "title": "ЗИП Solar Mars в TURBINE.PARTS B.V. + HardToGet.Parts",
+     "supplier": "TURBINE.PARTS B.V.",
+     "stage": "Unread Messages",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "Mars 100"
+     ]
+    },
+    {
+     "id": "30718",
+     "title": "ЗИП Solar Mars в Rotrenza Marine",
+     "supplier": "Rotrenza Marine",
+     "stage": "Unread Messages",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "Mars 100"
+     ]
+    },
+    {
+     "id": "31048",
+     "title": "зип perirarts",
+     "supplier": "PeriParts",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Mars 100"
+     ]
+    },
+    {
+     "id": "31382",
+     "title": "FIN MARINE (UAE)",
+     "supplier": "FMLS FIN MARINE & ENERGY SOLUTIONS LTD.",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Mars 100"
+     ]
+    },
+    {
+     "id": "31488",
+     "title": "ЗИП в Tianjin Bowzon Machinery Electrical Equipment Technology Co., Ltd",
+     "supplier": "Tianjin Bowzon Machinery Electrical Equipment Technology Co., Ltd",
+     "stage": "In Correspondance",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "Mars 100"
+     ]
+    },
+    {
+     "id": "31620",
+     "title": "Phoenix (USA)",
+     "supplier": "Phoenix equipment corp.",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Mars 100"
+     ]
+    },
+    {
+     "id": "31642",
+     "title": "Bowzon (China) WeChat",
+     "supplier": "Bowzon Turbine",
+     "stage": "Price at Work",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Mars 100"
+     ]
+    },
+    {
+     "id": "31644",
+     "title": "ЗИП Mars 100 в MESTEK India",
+     "supplier": "Mestek India",
+     "stage": "Unread Messages",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "Mars 100"
+     ]
+    },
+    {
+     "id": "31826",
+     "title": "Prashant (друг Ильи из GE)",
+     "supplier": "—",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Mars 100"
+     ]
+    },
+    {
+     "id": "37406",
+     "title": "WTT tg",
+     "supplier": "Wuxi Weishi Turbine Technology Co., Ltd.",
+     "stage": "Price at Work",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Mars 100"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "16228",
+   "title": "4135126 Запчасти и комплект лопаток 2-й ступени СТ для ГТУ Siemens SGT-200 Тамань 2026",
+   "models": [
+    "SGT-200"
+   ],
+   "stage": "C2:10",
+   "created": "2025-08-18",
+   "rfqs": [
+    {
+     "id": "19824",
+     "title": "Запчасти к SGT-200 в Hangzhou Gas Turbine Parts Co.Ltd",
+     "supplier": "Hangzhou HGTP Gas Turbine Parts Co.Ltd",
+     "stage": "Request Sent",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "SGT-200"
+     ]
+    },
+    {
+     "id": "19892",
+     "title": "Запчасти к SGT-200 в China power contractor",
+     "supplier": "Leda Greenpower (Beijing) Trading & Engineering Co., Ltd.",
+     "stage": "Request Sent",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "SGT-200"
+     ]
+    },
+    {
+     "id": "19894",
+     "title": "Запчасти к SGT-200 в Makik Machinery",
+     "supplier": "Makik Machinery Consultancy Foreign Trade Industry Ltd. Co.",
+     "stage": "Request Sent",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "SGT-200"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "16218",
+   "title": "240-133 Закупка. Диагностика редуктора ГТУ бороскопом для выявления неисправностей работы ГТУ.",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:2",
+   "created": "2025-08-15",
+   "rfqs": []
+  },
+  {
+   "id": "16080",
+   "title": "4126290 Сервисное обслуживание и ремонт газотурбинных установок (ГТУ № 1, 2, 3, 4)  SGT-400 производства Siemens в котельном цехе БКПРУ-4 ПАО \"Уралкалий\" в 2026-2028 гг.",
+   "models": [
+    "SGT-400"
+   ],
+   "stage": "C2:LOSE",
+   "created": "2025-08-08",
+   "rfqs": [
+    {
+     "id": "20930",
+     "title": "Ремонт SGT-400 в TFS",
+     "supplier": "Turbine Field Solutions (TFS)",
+     "stage": "New Request",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "SGT-400"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "16024",
+   "title": "КП000003357 Лот 410-25 Капитальный ремонт ГТД зав. № 2012-11-092 газотурбинной установки OP-16-DTG-1,8 производства OPRA Turbines B.V.",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:2",
+   "created": "2025-08-05",
+   "rfqs": []
+  },
+  {
+   "id": "16006",
+   "title": "Л-НВН (бн)/03/Siemens, Solar Turbines турбины",
+   "models": [
+    "Solar (модель уточнить)"
+   ],
+   "stage": "C10:5",
+   "created": "2025-08-03",
+   "rfqs": [
+    {
+     "id": "26240",
+     "title": "Requests #26240",
+     "supplier": "FMLS FIN MARINE & ENERGY SOLUTIONS LTD.",
+     "stage": "Request Sent",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    },
+    {
+     "id": "26242",
+     "title": "тест",
+     "supplier": "тет",
+     "stage": "New Request",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    },
+    {
+     "id": "26942",
+     "title": "SGT-400 в generatorpower60",
+     "supplier": "GPOWER SARL",
+     "stage": "Price at Work",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "SGT-400"
+     ]
+    },
+    {
+     "id": "35200",
+     "title": "cstc (china)",
+     "supplier": "CSTC China Service Technology (Shandong) Co. Ltd.",
+     "stage": "Price at Work",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "15922",
+   "title": "048-1148-25 T-64 Выполнение работ по замене газотурбинного двигателя на резервный, работ по техническому обслуживанию при наработке 4000 и 8000 часов, а также услуг по удаленной поддержке при эксплуатации газотурбинных агрегатов Solar Mars 100 ООО \"ЛУКОЙЛ",
+   "models": [
+    "Mars 100"
+   ],
+   "stage": "C2:2",
+   "created": "2025-07-29",
+   "rfqs": [
+    {
+     "id": "19210",
+     "title": "Maintenance, repair and spare parts supply for Solar Mars 100 в Goltens",
+     "supplier": "Goltens",
+     "stage": "Request Sent",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "Mars 100"
+     ]
+    },
+    {
+     "id": "19212",
+     "title": "Maintenance, repair and spare parts supply for Solar Mars 100 в Triveni Turbines",
+     "supplier": "Triveni Turbines",
+     "stage": "Request Sent",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "Mars 100"
+     ]
+    },
+    {
+     "id": "19222",
+     "title": "Maintenance, repair and spare parts supply for Solar Mars 100 в Kian Turbo Tec",
+     "supplier": "Kian Turbo Tec",
+     "stage": "Request Sent",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "Mars 100"
+     ]
+    },
+    {
+     "id": "19224",
+     "title": "Maintenance, repair and spare parts supply for Solar Mars 100 в One Power Services",
+     "supplier": "One Power Services",
+     "stage": "Request Sent",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "Mars 100"
+     ]
+    },
+    {
+     "id": "19226",
+     "title": "ТО, ремонт и поставка зап. частей для газовых турбин Solar Mars 100 в DMEnergy",
+     "supplier": "DMEnergy",
+     "stage": "Request Sent",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "Mars 100"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "15846",
+   "title": "852. Л-ПНОС (бн)/02/Solar ЗЧ на ПНОС",
+   "models": [
+    "Solar (модель уточнить)"
+   ],
+   "stage": "UC_YHGPBY",
+   "created": "2025-07-23",
+   "rfqs": [
+    {
+     "id": "18926",
+     "title": "ЗИП Solar в TFS",
+     "supplier": "Turbine Field Solutions (TFS)",
+     "stage": "Ответ не получен (в срок)",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    },
+    {
+     "id": "18936",
+     "title": "ЗИП Solar в IMMI Turbines",
+     "supplier": "IMMI Turbines",
+     "stage": "Selected",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    },
+    {
+     "id": "38612",
+     "title": "Свеча зажигания Champion в CJ Aerospace",
+     "supplier": "CJ Aerospace",
+     "stage": "Unread Messages",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    },
+    {
+     "id": "38614",
+     "title": "Зажим V-образный Delafield Corporation в Delafield Corporation",
+     "supplier": "Delafield Corporation",
+     "stage": "Отказ в КП",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    },
+    {
+     "id": "38616",
+     "title": "Кольцо DUPONT в Mascot Systems Private Limited",
+     "supplier": "Mascot Systems Private Limited",
+     "stage": "Unread Messages",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    },
+    {
+     "id": "38622",
+     "title": "Комплект для ремонта (Memory Card) Allen Bradley в Nuvision Instrumentation",
+     "supplier": "Nuvision",
+     "stage": "Unread Messages",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    },
+    {
+     "id": "38710",
+     "title": "ЗИП Solar в Hangzhou Gas Turbine Parts Co.Ltd",
+     "supplier": "Hangzhou HGTP Gas Turbine Parts Co.Ltd",
+     "stage": "Unread Messages",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    },
+    {
+     "id": "38722",
+     "title": "ЗИП Solar в TURBINE.PARTS B.V.",
+     "supplier": "TURBINE.PARTS B.V.",
+     "stage": "Unread Messages",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    },
+    {
+     "id": "38752",
+     "title": "ЗИП Solar в Antoni International",
+     "supplier": "Antoni International, Inc.",
+     "stage": "Unread Messages",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    },
+    {
+     "id": "38762",
+     "title": "8 позиций до ноября periparts",
+     "supplier": "PeriParts",
+     "stage": "Отказ в КП",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    },
+    {
+     "id": "38764",
+     "title": "8 позиций до ноября Heriss",
+     "supplier": "Heriss (Canada)",
+     "stage": "Ответ не получен (в срок)",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    },
+    {
+     "id": "38816",
+     "title": "ЗИП Solar в Turbine Parts Corporation",
+     "supplier": "Turbine Parts Corporation",
+     "stage": "Unread Messages",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    },
+    {
+     "id": "38854",
+     "title": "8 позиций до октября wtt Паша tg",
+     "supplier": "Wuxi Weishi Turbine Technology Co., Ltd.",
+     "stage": "Ответ не получен (в срок)",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    },
+    {
+     "id": "38996",
+     "title": "ЗИП Solar в Hecs Store",
+     "supplier": "Hecs Store",
+     "stage": "Selected",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "15714",
+   "title": "551841 Поставка конических, цилиндрических фильтров класса F9 и фильтр-чулков класса G4 для ГТУ-1,2,3 ООО «ПЭСТ»",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:LOSE",
+   "created": "2025-07-14",
+   "rfqs": [
+    {
+     "id": "16610",
+     "title": "Jiangsu Renhe Environmental Equipments Co., Ltd",
+     "supplier": "Jiangsu Renhe Environmental Equipments Co., Ltd",
+     "stage": "Selected",
+     "sourcer": "Yana Mokshina",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "15712",
+   "title": "640. Поставка ЗЧ SGT-400 (новый заказчик бывшая сделка 272)",
+   "models": [
+    "SGT-400"
+   ],
+   "stage": "6",
+   "created": "2025-07-14",
+   "rfqs": [
+    {
+     "id": "18452",
+     "title": "клапаны, двигатели",
+     "supplier": "ООО КВАНТ (поставщик)",
+     "stage": "Selected",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "SGT-400"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "15488",
+   "title": "659. Запрос на горелки SGT-400 от Кронштадта",
+   "models": [
+    "SGT-400"
+   ],
+   "stage": "4",
+   "created": "2025-07-03",
+   "rfqs": [
+    {
+     "id": "17970",
+     "title": "SGT-400 в Gowrings Continental BV",
+     "supplier": "Gowrings Continental B.V.",
+     "stage": "Отказ в КП",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "SGT-400"
+     ]
+    },
+    {
+     "id": "17972",
+     "title": "SGT-400 в TFS",
+     "supplier": "Turbine Field Solutions (TFS)",
+     "stage": "Selected",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "SGT-400"
+     ]
+    },
+    {
+     "id": "17974",
+     "title": "SGT-400 в NITCO",
+     "supplier": "Nikan Industrial Turbine Co. (NITCO)",
+     "stage": "Ответ не получен (в срок)",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "SGT-400"
+     ]
+    },
+    {
+     "id": "17976",
+     "title": " SGT-400 в SkyLine",
+     "supplier": "Skyline Turbine Services b.v.",
+     "stage": "Not Selected",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "SGT-400"
+     ]
+    },
+    {
+     "id": "17980",
+     "title": "SGT-400 в Zirve Türbin Parts Enerji Limited Şirketi",
+     "supplier": "Zirve Türbin Parts Enerji Limited Şirketi",
+     "stage": "Not Selected",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "SGT-400"
+     ]
+    },
+    {
+     "id": "17982",
+     "title": "SGT-400 в ETN Global",
+     "supplier": "Energy & Turbomachinery Network (ETN Global)",
+     "stage": "Отказ в КП",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "SGT-400"
+     ]
+    },
+    {
+     "id": "18134",
+     "title": "Thermocouple tip в AR Thermosensors",
+     "supplier": "AR Thermosensors Ltd",
+     "stage": "Not Selected",
+     "sourcer": "Daria Lysenko",
+     "models": [
+      "SGT-400"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "15306",
+   "title": "2.2.111 Капитальный ремонт ГТУ Solar Turbines Taurus 70 Восточно-Ламбейшорского м/р\n",
+   "models": [
+    "Taurus 70"
+   ],
+   "stage": "C2:2",
+   "created": "2025-06-25",
+   "rfqs": []
+  },
+  {
+   "id": "15302",
+   "title": "2.1.23 Поставка ЗИП для газотурбинного двигателя Solar Centaur 40S\n",
+   "models": [
+    "Centaur 40"
+   ],
+   "stage": "C2:2",
+   "created": "2025-06-25",
+   "rfqs": []
+  },
+  {
+   "id": "15222",
+   "title": "19-06-2025 ЗИП Solar Сибур",
+   "models": [
+    "Solar (модель уточнить)"
+   ],
+   "stage": "C4:PREPARATION",
+   "created": "2025-06-19",
+   "rfqs": [
+    {
+     "id": "17490",
+     "title": "RFQ Drive - IMMI Turbines (Arya)",
+     "supplier": "IMMI Turbines",
+     "stage": "Request Sent",
+     "sourcer": "Berdy Karaev",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    },
+    {
+     "id": "17592",
+     "title": "RFQ Solar - Leda GreenPower (Arya)",
+     "supplier": "Leda Greenpower (Beijing) Trading & Engineering Co., Ltd.",
+     "stage": "Отказ в КП",
+     "sourcer": "Berdy Karaev",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    },
+    {
+     "id": "17844",
+     "title": "RFQ Drive  VG-ENG (AnyRotary)",
+     "supplier": "VG Engineering",
+     "stage": "Request Sent",
+     "sourcer": "Berdy Karaev",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "15214",
+   "title": "4073373 Поставка комплекта оборудования газотубинного энергоагрегата для замены ГТУ SGT-400 Siemens_БКПРУ-4_2028",
+   "models": [
+    "SGT-400"
+   ],
+   "stage": "C2:2",
+   "created": "2025-06-19",
+   "rfqs": [
+    {
+     "id": "17480",
+     "title": "TFS. requests for SGT-400",
+     "supplier": "Turbine Field Solutions (TFS)",
+     "stage": "Request Sent",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "SGT-400"
+     ]
+    },
+    {
+     "id": "17482",
+     "title": "STS.Genset reequest ",
+     "supplier": "Skyline Turbine Services b.v.",
+     "stage": "Request Sent",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "SGT-400"
+     ]
+    },
+    {
+     "id": "17484",
+     "title": "Dongturbo Electric Company Ltd.complete genset purchase",
+     "supplier": "Dongturbo Electric Company Ltd",
+     "stage": "Request Sent",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "SGT-400"
+     ]
+    },
+    {
+     "id": "17486",
+     "title": "Harbin Electric International. Complete Genset request",
+     "supplier": "Harbin Electric International",
+     "stage": "Request Sent",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "SGT-400"
+     ]
+    },
+    {
+     "id": "17488",
+     "title": "SHANGHAI LINENG INDUSTRY AND TRADE CO., LTD. Complete genset request",
+     "supplier": "SHANGHAI LINENG INDUSTRY AND TRADE CO., LTD",
+     "stage": "Request Sent",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "SGT-400"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "14960",
+   "title": "2.2.110 Капитальный ремонт ГТУ Solar Turbines Сеntaure 40S ГТЭС Тэдинского м/р\n",
+   "models": [
+    "Solar (модель уточнить)"
+   ],
+   "stage": "C2:2",
+   "created": "2025-06-05",
+   "rfqs": [
+    {
+     "id": "17206",
+     "title": " RFQ ТСК - Квант",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Berdy Karaev",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "14862",
+   "title": "ГТД SOLAR MARS-100",
+   "models": [
+    "Mars 100"
+   ],
+   "stage": "C30:UC_UFDDZ1",
+   "created": "2025-06-05",
+   "rfqs": [
+    {
+     "id": "17212",
+     "title": "RFQ MARS100- DongTurbo (From Arya)",
+     "supplier": "Dongturbo Electric Company Ltd",
+     "stage": "Request Sent",
+     "sourcer": "Berdy Karaev",
+     "models": [
+      "Mars 100"
+     ]
+    },
+    {
+     "id": "17222",
+     "title": "RFQ MARS 100-  Lei (Arya)",
+     "supplier": "Lei Shing Hong Energy",
+     "stage": "Request Sent",
+     "sourcer": "Berdy Karaev",
+     "models": [
+      "Mars 100"
+     ]
+    },
+    {
+     "id": "17224",
+     "title": "RFQ Mars 100- Saintwah (Arya)",
+     "supplier": "Saintwah Inc.",
+     "stage": "Отказ в КП",
+     "sourcer": "Berdy Karaev",
+     "models": [
+      "Mars 100"
+     ]
+    },
+    {
+     "id": "17226",
+     "title": "RFQ Mars100-USP&E (Arya)",
+     "supplier": "USP&E",
+     "stage": "Request Sent",
+     "sourcer": "Berdy Karaev",
+     "models": [
+      "Mars 100"
+     ]
+    },
+    {
+     "id": "17234",
+     "title": "RFQ Mars100-Wison (Arya)",
+     "supplier": "Wison Engineering Ltd.",
+     "stage": "Отказ в КП",
+     "sourcer": "Berdy Karaev",
+     "models": [
+      "Mars 100"
+     ]
+    },
+    {
+     "id": "17248",
+     "title": "RFQ Mars 100- ShElMachinery (Arya)",
+     "supplier": "Shanghai Electric Machinery Co.Ltd. (Shanghai Electric Group )",
+     "stage": "Отказ в КП",
+     "sourcer": "Berdy Karaev",
+     "models": [
+      "Mars 100"
+     ]
+    },
+    {
+     "id": "17438",
+     "title": "RFQ Solar Turbines - MarisoGT (Arya)",
+     "supplier": "MarisoGT",
+     "stage": "Request Sent",
+     "sourcer": "Berdy Karaev",
+     "models": [
+      "Mars 100"
+     ]
+    },
+    {
+     "id": "17444",
+     "title": "RFQ Solar Mars 100 -  Leda (Arya)",
+     "supplier": "Leda Greenpower (Beijing) Trading & Engineering Co., Ltd.",
+     "stage": "Отказ в КП",
+     "sourcer": "Berdy Karaev",
+     "models": [
+      "Mars 100"
+     ]
+    },
+    {
+     "id": "17698",
+     "title": "RFQ Solar Mars 100- VG (AnyRotary)",
+     "supplier": "VG Engineering",
+     "stage": "Not Selected",
+     "sourcer": "Berdy Karaev",
+     "models": [
+      "Mars 100"
+     ]
+    },
+    {
+     "id": "17708",
+     "title": "RFQ MARS100 Phoenix (Anyrotary)",
+     "supplier": "Phoenix equipment corp.",
+     "stage": "Request Sent",
+     "sourcer": "Berdy Karaev",
+     "models": [
+      "Mars 100"
+     ]
+    },
+    {
+     "id": "17716",
+     "title": "RFQ  Mars100-Bicosyn (Arya)",
+     "supplier": "BICOSYN",
+     "stage": "Request Sent",
+     "sourcer": "Berdy Karaev",
+     "models": [
+      "Mars 100"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "14818",
+   "title": "РН50504813 Опрос рынка на ЗИП для ТО газотурбинного двигателя (LUFKIN)",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:2",
+   "created": "2025-06-03",
+   "rfqs": [
+    {
+     "id": "16926",
+     "title": "ЗИП Lufkin",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Anton Zorin",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "14768",
+   "title": "РН50503812  Фильтр воздушный карманного типа, для газотурбинного двигателя",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:2",
+   "created": "2025-05-30",
+   "rfqs": [
+    {
+     "id": "16750",
+     "title": "RFQ air filter 2-layer",
+     "supplier": "Donaldson Ibérica Soluciones en Filtración, S.L.",
+     "stage": "Отказ в КП",
+     "sourcer": "Stanislav Milovidov",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "14350",
+   "title": "547133 Ремонт оборудования на объекте ГТУ -1,2,3 ООО «ПЭСТ» (местонахождение: 423574, Российская Федерация, Республика Татарстан, Нижнекамский муниципальный район, г. Нижнекамск, промзона (на территории филиала АО «ТГК-16» - «Нижнекамская ТЭЦ (ПТК-1)»).  ",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:2",
+   "created": "2025-05-05",
+   "rfqs": []
+  },
+  {
+   "id": "14240",
+   "title": "РН50405986 Опрос рынка по поставке ЗИП для НКО для ТО газотурбинного двигателя",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:UC_B61SCK",
+   "created": "2025-04-25",
+   "rfqs": [
+    {
+     "id": "15578",
+     "title": "ЗИП NP",
+     "supplier": "Global Turbine Solutions LLC.",
+     "stage": "Request Sent",
+     "sourcer": "Anton Zorin",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "14192",
+   "title": "2.2.100 Сервисное обслуживание оборудования газотурбинных установок Taurus 60, Taurus 70, включая проведение регламентных работ для нужд СЦ «Астраханьэнегонефть»\n",
+   "models": [
+    "Taurus 60",
+    "Taurus 70"
+   ],
+   "stage": "C2:1",
+   "created": "2025-04-22",
+   "rfqs": [
+    {
+     "id": "15482",
+     "title": "Maintenance Solar GTU",
+     "supplier": "PT.NGLTech Services Indonesia",
+     "stage": "Request Sent",
+     "sourcer": "Anton Zorin",
+     "models": [
+      "Taurus 60",
+      "Taurus 70"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "14110",
+   "title": "РН50400449 Лот 1: \"Оказание полного комплекса работ и услуг по сервисному обслуживанию генерирующего оборудования (газотурбинных установок GE) для нужд АО «Сахалинморнефтегаз-Шельф»; Лот 2: «Выполнение комплекса работ и услуг по ремонту, техническому обсл",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:2",
+   "created": "2025-04-16",
+   "rfqs": [
+    {
+     "id": "15332",
+     "title": "RTP POWER SE",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "13810",
+   "title": "\tРН50400087 Опрос рынка- ЗИП для газотурбинной установки GE MS6001B",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:UC_B61SCK",
+   "created": "2025-04-01",
+   "rfqs": [
+    {
+     "id": "14566",
+     "title": "ЗИП NP",
+     "supplier": "Global Turbine Solutions LLC.",
+     "stage": "Request Sent",
+     "sourcer": "Anton Zorin",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "13284",
+   "title": "ЗИП для проведения инспекции «В» на турбине. SGT-100 Пулково",
+   "models": [
+    "SGT-100"
+   ],
+   "stage": "C4:PREPARATION",
+   "created": "2025-03-06",
+   "rfqs": [
+    {
+     "id": "13480",
+     "title": "Инспекция B . Пулково. Бюджет.Безад ",
+     "supplier": "ASH presicion",
+     "stage": "Request Sent",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "SGT-100"
+     ]
+    },
+    {
+     "id": "13482",
+     "title": "Инспекция B . Пулково. Бюджет.Брюс",
+     "supplier": "zhzngt.com",
+     "stage": "Not Selected",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "SGT-100"
+     ]
+    },
+    {
+     "id": "13840",
+     "title": "Инспекция B . Пулково. Бюджет. Sibel",
+     "supplier": "Zirve Türbin Parts Enerji Limited Şirketi",
+     "stage": "Not Selected",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "SGT-100"
+     ]
+    },
+    {
+     "id": "14802",
+     "title": "Turbomachinery Engineering Industries Ltd (India)",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "SGT-100"
+     ]
+    },
+    {
+     "id": "14966",
+     "title": "tfscorp.mx",
+     "supplier": "—",
+     "stage": "Unread Messages",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "SGT-100"
+     ]
+    },
+    {
+     "id": "14988",
+     "title": "Skyline Turbine Services b.v.",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "SGT-100"
+     ]
+    },
+    {
+     "id": "14992",
+     "title": "GAS TURBINE SERVICES",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "SGT-100"
+     ]
+    },
+    {
+     "id": "14994",
+     "title": "AL NOOR ALAILI TRADING CO. LLC",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "SGT-100"
+     ]
+    },
+    {
+     "id": "14996",
+     "title": "Power Parts Technology",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "SGT-100"
+     ]
+    },
+    {
+     "id": "15000",
+     "title": "Turbine Efficiency",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "SGT-100"
+     ]
+    },
+    {
+     "id": "15060",
+     "title": "Dongying Hengxin Turbomachinery",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "SGT-100"
+     ]
+    },
+    {
+     "id": "15120",
+     "title": "Retrofit Turbine Parts Trading FZ-LLC",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "SGT-100"
+     ]
+    },
+    {
+     "id": "15174",
+     "title": "DDS (Oil&Gas 2025)",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "SGT-100"
+     ]
+    },
+    {
+     "id": "15176",
+     "title": "Metalco International Trade Co (Oil&Gas 2025)",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "SGT-100"
+     ]
+    },
+    {
+     "id": "15178",
+     "title": "Weifang Boyuan Power Technology (Oil&Gas 2025)",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "SGT-100"
+     ]
+    },
+    {
+     "id": "15206",
+     "title": "АО \"Гранд Турбо Энерджи\"",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "SGT-100"
+     ]
+    },
+    {
+     "id": "15208",
+     "title": "Trust Turbine Technology",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "SGT-100"
+     ]
+    },
+    {
+     "id": "15442",
+     "title": "SREY CAPITAL LLC",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "SGT-100"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "13226",
+   "title": "32514578228 217583 Замена редуктора ГТУ-1 в цехе ПГУ СП \"ТЭЦ-3\" АО \"ТГК-11\"",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:2",
+   "created": "2025-03-05",
+   "rfqs": [
+    {
+     "id": "13468",
+     "title": "Repair of gearbox",
+     "supplier": "BHEL",
+     "stage": "Request Sent",
+     "sourcer": "Anton Zorin",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "12714",
+   "title": "540283 Проведение работ по восстановительному ремонту запасных частей турбогенераторов типа MS5001РА производства «Nuovo Pignone» Италия  на объекте ГТУ-1,2,3 ООО «ПЭСТ»",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:LOSE",
+   "created": "2025-02-13",
+   "rfqs": [
+    {
+     "id": "12490",
+     "title": "Requests #12490",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "12664",
+   "title": "Потребность_ЗИП_для_ГТД_SIEMENS_SGT_400_1_Кронштадт",
+   "models": [
+    "Siemens (модель уточнить)"
+   ],
+   "stage": "C4:PREPARATION",
+   "created": "2025-02-11",
+   "rfqs": [
+    {
+     "id": "12086",
+     "title": "Requests #12086_Flex line",
+     "supplier": "Turbine Field Solutions (TFS)",
+     "stage": "In Correspondance",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "Siemens (модель уточнить)"
+     ]
+    },
+    {
+     "id": "12168",
+     "title": "Requests #12168_Pearson Hydraulics",
+     "supplier": "Pearson Hydraulics Ltd",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "Siemens (модель уточнить)"
+     ]
+    },
+    {
+     "id": "12170",
+     "title": "Requests #12170_Albany",
+     "supplier": "MEOS CO. L.L.C",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "Siemens (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "12622",
+   "title": "2099796/1 ЗИП Solar Turbines (ЮПГПЗ).",
+   "models": [
+    "Solar (модель уточнить)"
+   ],
+   "stage": "C2:6",
+   "created": "2025-02-10",
+   "rfqs": [
+    {
+     "id": "12030",
+     "title": "ЗИП Solar",
+     "supplier": "Dongturbo Electric Company Ltd",
+     "stage": "Price at Work",
+     "sourcer": "Anton Zorin",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "12574",
+   "title": "537. 539663 Поставка регулирующих клапанов Fisher в сборе для ГТУ-1,2,3 ООО «ПЭСТ»",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "6",
+   "created": "2025-02-06",
+   "rfqs": [
+    {
+     "id": "11912",
+     "title": "Jeff Fisher",
+     "supplier": "Suzhou Coordworx Electromechanical Technology Co , Ltd",
+     "stage": "Not Selected",
+     "sourcer": "Vsevolod Shchurenkov",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "11914",
+     "title": "Itedisa Fisher",
+     "supplier": "Itedisa",
+     "stage": "Selected",
+     "sourcer": "Vsevolod Shchurenkov",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "12562",
+   "title": "Запрос КП на поставку ЗИП SGT-400",
+   "models": [
+    "SGT-400"
+   ],
+   "stage": "C4:2",
+   "created": "2025-02-06",
+   "rfqs": [
+    {
+     "id": "11822",
+     "title": "Requests #11822",
+     "supplier": "Hangzhou HGTP Gas Turbine Parts Co.Ltd",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "SGT-400"
+     ]
+    },
+    {
+     "id": "11832",
+     "title": "Requests #11832",
+     "supplier": "Dibaco GmbH",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "SGT-400"
+     ]
+    },
+    {
+     "id": "11838",
+     "title": "Requests #11838",
+     "supplier": "EthosEnergy",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "SGT-400"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "12428",
+   "title": "Запасные части для ГТУ LM6000 в части АСУ",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C4:EXECUTING",
+   "created": "2025-01-31",
+   "rfqs": [
+    {
+     "id": "11560",
+     "title": "MakikMachinery",
+     "supplier": "Makik Machinery Consultancy Foreign Trade Industry Ltd. Co.",
+     "stage": "Not Selected",
+     "sourcer": "Sergey Shipulev",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "11562",
+     "title": "Zirve Energy",
+     "supplier": "Zirve Energy",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Shipulev",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "11650",
+     "title": "World of Controls",
+     "supplier": "World Of Controls FZE",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Shipulev",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "14752",
+     "title": "Shanxi Runsheng Import and Export",
+     "supplier": "Shanxi Runsheng Import and Export Co., Ltd",
+     "stage": "Price at Work",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "14754",
+     "title": "Shanghai Kongyang Electric Power Technology Co., Ltd.",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "12420",
+   "title": "РН50105290 Открытый опрос рынка на поставку газотурбинного двигателя Solar TAURUS-60 для газотурбинной установки с базисом поставки Ненецкий АО, Заполярный район, Ардалинский НГП в 2025 году.",
+   "models": [
+    "Taurus 60"
+   ],
+   "stage": "C2:8",
+   "created": "2025-01-31",
+   "rfqs": []
+  },
+  {
+   "id": "12382",
+   "title": "РН50102556 Опрос рынка на поставку Выхлопные коллекторы и установочные комплекты для газотурбинной установки Solar Mars",
+   "models": [
+    "Solar (модель уточнить)"
+   ],
+   "stage": "C2:6",
+   "created": "2025-01-30",
+   "rfqs": [
+    {
+     "id": "11454",
+     "title": "ЗИП Solar",
+     "supplier": "Dongturbo Electric Company Ltd",
+     "stage": "Request Sent",
+     "sourcer": "Anton Zorin",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "12368",
+   "title": "Запасные части для ГТУ LM6000PD в части тепломеханики",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C4:2",
+   "created": "2025-01-30",
+   "rfqs": [
+    {
+     "id": "11480",
+     "title": "Makik Machinery",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Shipulev",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "11482",
+     "title": "Zirve Energy",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Shipulev",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "11528",
+     "title": "MFS Netherlands, Headoffice",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Shipulev",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "13798",
+     "title": "Requests #13798_LM6000 parts",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "13800",
+     "title": "Requests #13800_LM6000 parts",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "14496",
+     "title": "Requests #14496_LM6000",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "14502",
+     "title": "Requests #14502_LM6000",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "14512",
+     "title": "Requests #14512_6000",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "14516",
+     "title": "Requests #14516_6000",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "15330",
+     "title": "METALCO (Neftegaz 2025)",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "15476",
+     "title": "Technical Engineering Service Limited (TES)",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "15480",
+     "title": "Drake Controls",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "15612",
+     "title": "MFS",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "15620",
+     "title": "PROENERGY",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "12282",
+   "title": "РН50104115 Опрос рынка по лоту ЗИП для ГТУ GE MS6001B Frame 6",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:UC_B61SCK",
+   "created": "2025-01-27",
+   "rfqs": [
+    {
+     "id": "11230",
+     "title": "ЗИП Nuovo Pignone",
+     "supplier": "Global Turbine Solutions LLC.",
+     "stage": "Price at Work",
+     "sourcer": "Anton Zorin",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "11280",
+     "title": "Запрос Zirve",
+     "supplier": "Zirve Energy",
+     "stage": "Price at Work",
+     "sourcer": "Sergey Polupanov",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "12260",
+   "title": "ЗП501716 Поставка комплекта рабочих лопаток 1-2 ступеней ГТУ",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:LOSE",
+   "created": "2025-01-27",
+   "rfqs": [
+    {
+     "id": "11294",
+     "title": "Запрос в Satarco. направлен через телеграм",
+     "supplier": "Satarco",
+     "stage": "New Request",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "11296",
+     "title": "Запрос в TEC Group",
+     "supplier": "TEC Group",
+     "stage": "Price at Work",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "12254",
+   "title": "3912813 Проведение закупочной процедуры по выбору поставщика Рабочих лопаток 2-й ступени Силовой турбины ГТУ SGT-200-2S -73 шт. (согласно ТЗ-70-0823-0012-01), в рамках реализации проекта по строительству порта Тамань АО \"ТОАЗ\".",
+   "models": [
+    "SGT-200"
+   ],
+   "stage": "C2:6",
+   "created": "2025-01-26",
+   "rfqs": [
+    {
+     "id": "11226",
+     "title": "Requests #11226",
+     "supplier": "—",
+     "stage": "New Request",
+     "sourcer": "Sergey Shipulev",
+     "models": [
+      "SGT-200"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "12236",
+   "title": "РН50103398 Поставка МТР по лоту № 360215 \"Аппарат направляющий 2423483-A SGT-800\"",
+   "models": [
+    "SGT-500…800 (Финспонг)"
+   ],
+   "stage": "C2:6",
+   "created": "2025-01-24",
+   "rfqs": [
+    {
+     "id": "11228",
+     "title": "Requests #11228",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Shipulev",
+     "models": [
+      "SGT-500…800 (Финспонг)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "11474",
+   "title": "3887568 Проведение закупочной процедуры по выбору поставщика ЗИП газовой турбины Siemens SGT-200-2S, в рамках реализации проекта по строительству порта Тамань АО \"ТОАЗ\".",
+   "models": [
+    "SGT-200"
+   ],
+   "stage": "C2:2",
+   "created": "2024-12-17",
+   "rfqs": [
+    {
+     "id": "10248",
+     "title": "SGT-200",
+     "supplier": "zhzngt.com",
+     "stage": "Ответ не получен (в срок)",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "SGT-200"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "11340",
+   "title": "32414322082 Поставка газотурбинной установки Capstone C1000",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:10",
+   "created": "2024-12-12",
+   "rfqs": []
+  },
+  {
+   "id": "11326",
+   "title": "РН41202431 Запрос ТКП (Аппарат направляющий 2423483-A SGT-800)",
+   "models": [
+    "SGT-500…800 (Финспонг)"
+   ],
+   "stage": "C2:UC_B61SCK",
+   "created": "2024-12-12",
+   "rfqs": [
+    {
+     "id": "11776",
+     "title": "Requests #11776",
+     "supplier": "Шамиль(поставщик от Вячеслава)",
+     "stage": "Price at Work",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "SGT-500…800 (Финспонг)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "11220",
+   "title": "Газоохладители генератора 50WY21Z-095 ГТУ",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C4:PREPAYMENT_INVOICE",
+   "created": "2024-12-06",
+   "rfqs": [
+    {
+     "id": "10796",
+     "title": "Betty Jiang",
+     "supplier": "CST Heat Exchanger Co., Ltd.",
+     "stage": "Request Sent",
+     "sourcer": "Vitaly Goryachikh",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "11088",
+   "title": "РН41200010 Поставка контроллеров для ГТД Solar Turbines",
+   "models": [
+    "Solar (модель уточнить)"
+   ],
+   "stage": "C2:UC_B61SCK",
+   "created": "2024-12-02",
+   "rfqs": [
+    {
+     "id": "9464",
+     "title": "RFQ AB 11088-9464 DL  03.12.2024",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Denis Litvinovsky",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    },
+    {
+     "id": "9466",
+     "title": "RFQ AB 11088-9466 DL  03.12.2024",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Denis Litvinovsky",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "11036",
+   "title": "2024-1195350 Закупка услуг шеф-инженерного сопровождения работ по проведению инспекции уровня «С» на 60 000 ЭЧН газотурбинных установок 5ГТЭ-1,2 типа SGT-700 (зав.№В008086, №В008087) производства компании Siemens (c восстановительным ремонтом имеющихся б/",
+   "models": [
+    "SGT-500…800 (Финспонг)"
+   ],
+   "stage": "C2:2",
+   "created": "2024-11-28",
+   "rfqs": [
+    {
+     "id": "9418",
+     "title": "Kian Mazdafar",
+     "supplier": "Nikan Industrial Turbine Co. (NITCO)",
+     "stage": "Request Sent",
+     "sourcer": "Vitaly Goryachikh",
+     "models": [
+      "SGT-500…800 (Финспонг)"
+     ]
+    },
+    {
+     "id": "9820",
+     "title": "Запрос на восстановление лопаток и шеф монтаж для белорусов ",
+     "supplier": "zhzngt.com",
+     "stage": "Request Sent",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "SGT-500…800 (Финспонг)"
+     ]
+    },
+    {
+     "id": "9822",
+     "title": "Запрос на восстановление лопаток и шеф монтаж для белорусов ",
+     "supplier": "Qingdao O.B.T Co., Ltd.",
+     "stage": "Not Selected",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "SGT-500…800 (Финспонг)"
+     ]
+    },
+    {
+     "id": "9838",
+     "title": "Requests #9838",
+     "supplier": "Nikan Industrial Turbine Co. (NITCO)",
+     "stage": "Request Sent",
+     "sourcer": "Vitaly Goryachikh",
+     "models": [
+      "SGT-500…800 (Финспонг)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "10676",
+   "title": "РН41004891 Оказание услуг по техническому обслуживанию генераторных газотурбинных агрегатов Titan 130 (без учета материалов)",
+   "models": [
+    "Titan 130"
+   ],
+   "stage": "C2:10",
+   "created": "2024-11-14",
+   "rfqs": []
+  },
+  {
+   "id": "10580",
+   "title": "496. Поставка запасных частей для ГТУ-1,2,3 ООО «ПЭСТ»",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "6",
+   "created": "2024-11-08",
+   "rfqs": [
+    {
+     "id": "8668",
+     "title": "NP",
+     "supplier": "TECNIFLON S.A.S.",
+     "stage": "Selected",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "8694",
+     "title": "ПЭСТ тендер Syed ",
+     "supplier": "Global Turbine Solutions LLC.",
+     "stage": "Selected",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "8706",
+     "title": "TEC-Group ",
+     "supplier": "tec-group",
+     "stage": "Selected",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "9152",
+     "title": "Jeff Masoneilan",
+     "supplier": "Suzhou Coordworx Electromechanical Technology Co , Ltd",
+     "stage": "Not Selected",
+     "sourcer": "Vsevolod Shchurenkov",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "9154",
+     "title": "Edward Masoneilan",
+     "supplier": "Xiangjing (Shanghai) M&E Technology Co., Ltd",
+     "stage": "Not Selected",
+     "sourcer": "Vsevolod Shchurenkov",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "9250",
+     "title": "Запрос ферису по имеющимся фотографиям ",
+     "supplier": "GuiLin SanHua Import & Export Co., Ltd",
+     "stage": "Not Selected",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "9252",
+     "title": "Запрос ферису по имеющимся фотографиям ",
+     "supplier": "GuiLin SanHua Import & Export Co., Ltd",
+     "stage": "Not Selected",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "9264",
+     "title": "клапаны всаса ",
+     "supplier": "WOODSERV",
+     "stage": "Not Selected",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "10108",
+     "title": "Requests #10108",
+     "supplier": "RTP power",
+     "stage": "Selected",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "11748",
+     "title": "Requests #11748 Brush",
+     "supplier": "Technical Solutions to Industry FZE (TSI)",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "11774",
+     "title": "Requests #11774",
+     "supplier": "Starfish PPS",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "11850",
+     "title": "Requests #11850",
+     "supplier": "BRUSH SEM s.r.o",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "11860",
+     "title": "Requests #11860",
+     "supplier": "Turbine Services, Ltd.",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "11880",
+     "title": "Requests #11880",
+     "supplier": "VBR Turbine Partners",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "11886",
+     "title": "Requests #11886",
+     "supplier": "Energia Parts S.r.l.",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "11890",
+     "title": "Requests #11890",
+     "supplier": "WWGTP",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "11896",
+     "title": "Requests #11896",
+     "supplier": "QINGDAO O.B.T CO., LTD.",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "11900",
+     "title": "Requests #11900",
+     "supplier": "EthosEnergy Abu Dhabi L.L.C.",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "11916",
+     "title": "Requests #11916",
+     "supplier": "—",
+     "stage": "New Request",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "11918",
+     "title": "Requests #11918",
+     "supplier": "N S ENERGY GROUP",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "11924",
+     "title": "Requests #11924",
+     "supplier": "Prime Turbine Parts",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "11926",
+     "title": "Requests #11926",
+     "supplier": "AL NOOR ALAILI TRADING CO. LLC",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "12062",
+     "title": "Requests #12062_Masoneilan",
+     "supplier": "Everest-Instruments",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "12064",
+     "title": "Requests #12064_Masoneilan",
+     "supplier": "TSP Controls",
+     "stage": "In Correspondance",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "12070",
+     "title": "Requests #12070_Masoneilan",
+     "supplier": "Dresser Machinery (Suzhou ) Co., Ltd.",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "12244",
+     "title": "Requests #12244_MS5001PA зип",
+     "supplier": "Allied Power Group (APG)",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "12250",
+     "title": "Requests #12250_MS5001PA зип",
+     "supplier": "HPI",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "12252",
+     "title": "Requests #12252_MS5001PA_зип",
+     "supplier": "TRS SERVICES",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "12272",
+     "title": "Requests #12272_MS5001PA_зип",
+     "supplier": "CEDCO",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "12276",
+     "title": "Requests #12276_MS5001PA_зип",
+     "supplier": "RWG (Repair & Overhauls) Limited",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "12540",
+     "title": "Requests #12540_Westcode Diode",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "12542",
+     "title": "Requests #12542_Westcode diode",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "12614",
+     "title": "Requests #12614_Brush",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "12616",
+     "title": "Requests #12616_Brush",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "12650",
+     "title": "Requests #12650_BRUSH",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "12846",
+     "title": "Requests #12846_MS5001PA_spare parts",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "12868",
+     "title": "Requests #12868_Westcode",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "12970",
+     "title": "Requests #12970_Masoneilan",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "12972",
+     "title": "Requests #12972_Masoneilan",
+     "supplier": "—",
+     "stage": "In Correspondance",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "12974",
+     "title": "Requests #12974_Westcode",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "13132",
+     "title": "Requests #13132_Masoneilan",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "13134",
+     "title": "Requests #13134_Masoneilan",
+     "supplier": "VLV S.r.l.",
+     "stage": "Selected",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "13136",
+     "title": "Requests #13136_Masoneilon",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "13166",
+     "title": "Requests #13166_Westcode",
+     "supplier": "TTI, Inc.",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "13206",
+     "title": "Requests #13206_MS5001PA_зип",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "13288",
+     "title": "Requests #13288_Westcode",
+     "supplier": "iiiC Commercial Co., Ltd.",
+     "stage": "Selected",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "13360",
+     "title": "Requests #13360_Westcode",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "13364",
+     "title": "Requests #13364_MEDC_lamp+horn",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "13370",
+     "title": "Requests #13370_MEDC_lamp+horn",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "13372",
+     "title": "Requests #13372_MEDC",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "13374",
+     "title": "Requests #13374_MEDC",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "13376",
+     "title": "Requests #13376_MEDC",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "13378",
+     "title": "Requests #13378_BRUSH",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "13530",
+     "title": "Requests #13530_MEDC",
+     "supplier": "HWKJ (Tianjin) Ltd.",
+     "stage": "Price at Work",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "13532",
+     "title": "Requests #13532_MEDC",
+     "supplier": "Lavastica International B.V.",
+     "stage": "Selected",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "13536",
+     "title": "Zollern. Labyrinth seal",
+     "supplier": "Weima Electric (Shanghai) Ltd.",
+     "stage": "Selected",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "13548",
+     "title": "Zollern OilSeal. ",
+     "supplier": "ZOLLERN GmbH & Co. KG",
+     "stage": "Отказ в КП",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "13572",
+     "title": "Requests #13572_Westcode",
+     "supplier": "Mouser Electronics, Inc.",
+     "stage": "Price at Work",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "13616",
+     "title": "Requests #13616_Cortem_кнопка",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "13638",
+     "title": "Requests #13638_Semicron+PRX diode",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "13640",
+     "title": "Requests #13640_Semikron+PRX",
+     "supplier": "OMO Electronic Limited",
+     "stage": "Price at Work",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "13678",
+     "title": "Requests #13678_BRUSH",
+     "supplier": "ADJ DiTec Málaga S.L.",
+     "stage": "Selected",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "13732",
+     "title": "Spare parts for Goodrich Coupling",
+     "supplier": "Global Turbine Solutions LLC.",
+     "stage": "Price at Work",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "13790",
+     "title": "Requests #13790_Honeywell",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "13792",
+     "title": "Requests #13792_Honeywell",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "13794",
+     "title": "Requests #13794_Honeywell",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "13848",
+     "title": "Requests #13848_Cortem",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "13860",
+     "title": "Requests #13860_BRUSH",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "13864",
+     "title": "Requests #13864_BRUSH",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "13868",
+     "title": "Requests #13868_Brush",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "13872",
+     "title": "Requests #13872_Brush",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "13934",
+     "title": "Requests #13934_Cortem",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "14020",
+     "title": "Requests #14020_Cortem",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "14022",
+     "title": "Requests #14022_Cortem",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "14124",
+     "title": "Requests #14124_Honeywell",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "14126",
+     "title": "Requests #14126_Honeywell",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "14154",
+     "title": "Requests #14154_Cortem",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "14218",
+     "title": "Requests #14218_Honeywell",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "14224",
+     "title": "Requests #14224_Cortem",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "14294",
+     "title": "Requests #14294_Cortem",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "14296",
+     "title": "Requests #14296_Cortem",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "14304",
+     "title": "Requests #14304_Cortem",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "14528",
+     "title": "Requests #14528_Honeywell",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "14532",
+     "title": "Requests #14532_Honeywell",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "14560",
+     "title": "Requests #14560_Cortem England",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "14640",
+     "title": "ПЭСТ_Syed",
+     "supplier": "Global Turbine Solutions LLC.",
+     "stage": "Selected",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "14648",
+     "title": "Honeywell/Zellweger 2106B1110",
+     "supplier": "Shanxi Runsheng Import and Export Co., Ltd",
+     "stage": "Selected",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "14724",
+     "title": "CORTEM_Italy",
+     "supplier": "CENTRO E SRL",
+     "stage": "Selected",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "15180",
+     "title": "Changsha Aobo Carbon Co.,Ltd.",
+     "supplier": "Changsha Aobo Carbon Co.,Ltd.",
+     "stage": "Selected",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "15810",
+     "title": "Set of oilsealings for bearing",
+     "supplier": "Weima Electric (Shanghai) Ltd.",
+     "stage": "Selected",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "17824",
+     "title": "GTS_STRIP PACKING ( 50FT ROLL)_9 pcs",
+     "supplier": "Global Turbine Solutions LLC.",
+     "stage": "Selected",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    },
+    {
+     "id": "22362",
+     "title": "Honeywell (Zellweger)",
+     "supplier": "Shanxi Runsheng Import and Export Co., Ltd",
+     "stage": "Selected",
+     "sourcer": "Sergey Galushko",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "10530",
+   "title": "РН41101028 Оказание услуг по переоборудованию топливной системы газотурбинного двигателя (Solar Turbines Titan 130)",
+   "models": [
+    "Titan 130"
+   ],
+   "stage": "C2:10",
+   "created": "2024-11-07",
+   "rfqs": []
+  },
+  {
+   "id": "10524",
+   "title": "3846150 «ЗП_Запасные части Газотурбинной установки SGT-400_2025_Манина Ю.С.»",
+   "models": [
+    "SGT-400"
+   ],
+   "stage": "C2:11",
+   "created": "2024-11-07",
+   "rfqs": [
+    {
+     "id": "8592",
+     "title": "Gas shut-off and venting valve",
+     "supplier": "kinetrol",
+     "stage": "Not Selected",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "SGT-400"
+     ]
+    },
+    {
+     "id": "8784",
+     "title": "з/ч Bently Nevada",
+     "supplier": "GuiLin SanHua Import & Export Co., Ltd",
+     "stage": "In Correspondance",
+     "sourcer": "Liliya Shved",
+     "models": [
+      "SGT-400"
+     ]
+    },
+    {
+     "id": "8932",
+     "title": "з/ч ",
+     "supplier": "Turbine Field Solutions (TFS)",
+     "stage": "Request Sent",
+     "sourcer": "Liliya Shved",
+     "models": [
+      "SGT-400"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "10374",
+   "title": "ООО \"ГАЗПРОМНЕФТЬ - ЗАПОЛЯРЬЕ\". потребность  SGT-400",
+   "models": [
+    "SGT-400"
+   ],
+   "stage": "C4:NEW",
+   "created": "2024-10-29",
+   "rfqs": []
+  },
+  {
+   "id": "10348",
+   "title": "5381279 Поставка фильтра комплексной воздухоочистительной установки (КВОУ) ГТУ Ansaldo V64.3A",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:10",
+   "created": "2024-10-29",
+   "rfqs": []
+  },
+  {
+   "id": "10164",
+   "title": "РН41003712 Электрооборудование для ГТУ-ТЭС на 2026г.",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:UC_B61SCK",
+   "created": "2024-10-18",
+   "rfqs": [
+    {
+     "id": "8006",
+     "title": "RFQ Grundfos RN211024",
+     "supplier": "Group Protem DOO",
+     "stage": "Price at Work",
+     "sourcer": "Lyubov Tarasova",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "10056",
+   "title": "951149 ТСР 455. Изготовление бандажей (тепловых экранов) рабочих лопаток турбины ГТУ в соответствии с чертежами (по запросу)",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:LOSE",
+   "created": "2024-10-14",
+   "rfqs": []
+  },
+  {
+   "id": "10046",
+   "title": "1.1.13 «Поставка ЗИП для проведения ТО-4000 и ТО-8000 на ГТУ Solar Taurus 60S, Taurus 70, Taurus 70MD»",
+   "models": [
+    "Taurus 60",
+    "Taurus 70"
+   ],
+   "stage": "C2:2",
+   "created": "2024-10-11",
+   "rfqs": []
+  },
+  {
+   "id": "10018",
+   "title": "24TV0036 Поставка ТМЦ марки SOLAR для ООО «ЛУКОЙЛ-Нижневолжскнефть» на объекты МЛСК-1 им. В. Филановского и МЛСП им. Ю. Корчагина в 2025 году",
+   "models": [
+    "Solar (модель уточнить)"
+   ],
+   "stage": "C2:2",
+   "created": "2024-10-10",
+   "rfqs": []
+  },
+  {
+   "id": "9574",
+   "title": "Фильтры для ГТУ Siemens SGT-300",
+   "models": [
+    "SGT-300"
+   ],
+   "stage": "C4:6",
+   "created": "2024-09-13",
+   "rfqs": [
+    {
+     "id": "6638",
+     "title": "Фильтры для Могилевэнерго. BAMAFILTER",
+     "supplier": "—",
+     "stage": "Price at Work",
+     "sourcer": "Stanislav Milovidov",
+     "models": [
+      "SGT-300"
+     ]
+    },
+    {
+     "id": "6640",
+     "title": "Фильтры для Могилевэнерго. HQFILTRATION",
+     "supplier": "—",
+     "stage": "Price at Work",
+     "sourcer": "Stanislav Milovidov",
+     "models": [
+      "SGT-300"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "9420",
+   "title": "729661 Поставка воспламенителя горелки ГТУ",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:2",
+   "created": "2024-09-06",
+   "rfqs": []
+  },
+  {
+   "id": "9358",
+   "title": "5367925 Поставка деталей горячей части ГТУ для нужд Тюменской ТЭЦ-1 ПАО \"Форвард Энерго\"",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:3",
+   "created": "2024-09-04",
+   "rfqs": [
+    {
+     "id": "6606",
+     "title": "Requests #6606",
+     "supplier": "tec-group",
+     "stage": "Request Sent",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "9356",
+   "title": "5113639 Оказание услуг по проведению технического обслуживания и поставку комплектующих для Газотурбинной установки LM2500+G4 DLE производства General Electric с электрическим генератором BRUSH BDAX71-193ER участка ПГЭС АО \"Мордовцемент\".",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:10",
+   "created": "2024-09-04",
+   "rfqs": []
+  },
+  {
+   "id": "9352",
+   "title": "Техобслуживание (инспекция А) ГТУ SGT-300 (RW119) с заменой расходных материалов ",
+   "models": [
+    "SGT-300"
+   ],
+   "stage": "C4:APOLOGY",
+   "created": "2024-09-04",
+   "rfqs": [
+    {
+     "id": "7750",
+     "title": "NITCO",
+     "supplier": "—",
+     "stage": "New Request",
+     "sourcer": "Vitaly Goryachikh",
+     "models": [
+      "SGT-300"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "9284",
+   "title": "5366677 Поставка деталей горячей части ГТУ (запчасти) для нужд Тюменская ТЭЦ-1 ПАО \"Форвард Энерго\" №2",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:UC_B61SCK",
+   "created": "2024-08-30",
+   "rfqs": []
+  },
+  {
+   "id": "9282",
+   "title": "5366676 Поставка деталей горячей части ГТУ (корпус) для нужд Тюменская ТЭЦ-1 ПАО \"Форвард Энерго\" №1",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:LOSE",
+   "created": "2024-08-30",
+   "rfqs": [
+    {
+     "id": "6206",
+     "title": "Requests #6206",
+     "supplier": "tec-group",
+     "stage": "Price at Work",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "9176",
+   "title": "РН40805111 Запрос (Т)КП на поставку ЗИП для Solar Turbines Installation Kit # 1",
+   "models": [
+    "Solar (модель уточнить)"
+   ],
+   "stage": "C2:10",
+   "created": "2024-08-26",
+   "rfqs": []
+  },
+  {
+   "id": "9124",
+   "title": "Прокладки и резьбовые вставки ГТУ H-25 Белэнергоремналадка",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C4:PREPARATION",
+   "created": "2024-08-20",
+   "rfqs": []
+  },
+  {
+   "id": "9100",
+   "title": "3764317 ЗИП для ГТУ Solar и клапан Fisher (заявка 121-319)",
+   "models": [
+    "Solar (модель уточнить)"
+   ],
+   "stage": "C2:2",
+   "created": "2024-08-19",
+   "rfqs": []
+  },
+  {
+   "id": "9096",
+   "title": "1.2.55 Выполнение комплекса работ по техническому обслуживанию ГТУ SGT-400 SIEMENS на МЛСК им. В. Филановского в объеме инспекций на 2024 г.",
+   "models": [
+    "SGT-400"
+   ],
+   "stage": "C2:11",
+   "created": "2024-08-16",
+   "rfqs": []
+  },
+  {
+   "id": "9022",
+   "title": "2084074/1 Возбудитель зажигания Solar Turbines",
+   "models": [
+    "Solar (модель уточнить)"
+   ],
+   "stage": "C2:10",
+   "created": "2024-08-13",
+   "rfqs": []
+  },
+  {
+   "id": "8910",
+   "title": "32413859361 Выполнение комплекса работ по дефектации и капитальному (восстановительному) ремонту запасных капитальных частей (инв.№ 10МВ002 (б/у)) газовой турбины GE MS6001FA (6FA+E), модель PG 6111 зав. № 875078 ГТУ ТЭЦ ПГУ ГСР Энерго",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:10",
+   "created": "2024-08-05",
+   "rfqs": []
+  },
+  {
+   "id": "8808",
+   "title": "РН40706124 Оказание услуг по техническому обслуживанию генераторных газотурбинных агрегатов Titan 130 (без учета материалов)",
+   "models": [
+    "Titan 130"
+   ],
+   "stage": "C2:UC_B61SCK",
+   "created": "2024-07-29",
+   "rfqs": [
+    {
+     "id": "8482",
+     "title": "Leo Lee",
+     "supplier": "Dongturbo Electric Company Ltd",
+     "stage": "Request Sent",
+     "sourcer": "Vitaly Goryachikh",
+     "models": [
+      "Titan 130"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "8760",
+   "title": "3737961 Запасные части ГТУ 9FA General Electric",
+   "models": [
+    "GE 9FA (вне фокуса)"
+   ],
+   "stage": "C2:2",
+   "created": "2024-07-24",
+   "rfqs": []
+  },
+  {
+   "id": "8746",
+   "title": "РН40705048 Оказание услуг по переоборудованию топливной системы газотурбинного двигателя (Solar Turbines Titan 130)",
+   "models": [
+    "Titan 130"
+   ],
+   "stage": "C2:UC_B61SCK",
+   "created": "2024-07-23",
+   "rfqs": [
+    {
+     "id": "7352",
+     "title": "Запросы поставщикам #7352",
+     "supplier": "Dongturbo Electric Company Ltd",
+     "stage": "Request Sent",
+     "sourcer": "Vitaly Goryachikh",
+     "models": [
+      "Titan 130"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "8742",
+   "title": "136-961 Клапан перепуска SGT-400",
+   "models": [
+    "SGT-400"
+   ],
+   "stage": "C2:2",
+   "created": "2024-07-23",
+   "rfqs": [
+    {
+     "id": "5344",
+     "title": "SGT-400. Valve ",
+     "supplier": "Suzhou Coordworx Electromechanical Technology Co , Ltd",
+     "stage": "Request Sent",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "SGT-400"
+     ]
+    },
+    {
+     "id": "6146",
+     "title": "Valve SGT-400. Ierfzco",
+     "supplier": "International Energy Resources",
+     "stage": "Not Selected",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "SGT-400"
+     ]
+    },
+    {
+     "id": "6148",
+     "title": "Valve SGT-400. TFS",
+     "supplier": "Turbine Field Solutions (TFS)",
+     "stage": "In Correspondance",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "SGT-400"
+     ]
+    },
+    {
+     "id": "6202",
+     "title": "8742-6202 RS SIEMENS 31.08.2024",
+     "supplier": "Gowrings Continental B.V.",
+     "stage": "Not Selected",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "SGT-400"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "8728",
+   "title": "2082689/1 Привод Solar Turbines",
+   "models": [
+    "Solar (модель уточнить)"
+   ],
+   "stage": "C2:6",
+   "created": "2024-07-22",
+   "rfqs": []
+  },
+  {
+   "id": "8692",
+   "title": "Генератор электрический Siemens для ГТУ SGT-800 47.5MW",
+   "models": [
+    "SGT-500…800 (Финспонг)"
+   ],
+   "stage": "C30:UC_UFDDZ1",
+   "created": "2024-07-18",
+   "rfqs": []
+  },
+  {
+   "id": "8660",
+   "title": "32413810881 Поставка комплекта газотурбинного двигателя Taurus 65 версия 8401SA в блочно-модульном исполнении",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:10",
+   "created": "2024-07-16",
+   "rfqs": []
+  },
+  {
+   "id": "8630",
+   "title": "РН40702602 Оказание услуг по сервисному обслуживанию газотурбинных двигателей SIEMENS SGT-300-2S на 2024-2026 г.",
+   "models": [
+    "SGT-300"
+   ],
+   "stage": "C2:2",
+   "created": "2024-07-12",
+   "rfqs": []
+  },
+  {
+   "id": "8590",
+   "title": "2081827/1 Блок питания SOLAR TURBINES",
+   "models": [
+    "Solar (модель уточнить)"
+   ],
+   "stage": "C2:10",
+   "created": "2024-07-11",
+   "rfqs": []
+  },
+  {
+   "id": "8582",
+   "title": "2081827/1 Блок питания SOLAR TURBINES",
+   "models": [
+    "Solar (модель уточнить)"
+   ],
+   "stage": "C2:10",
+   "created": "2024-07-11",
+   "rfqs": []
+  },
+  {
+   "id": "8484",
+   "title": " ТКП на почту Поставка ТМЦ марки SOLAR. ",
+   "models": [
+    "Solar (модель уточнить)"
+   ],
+   "stage": "C2:10",
+   "created": "2024-07-04",
+   "rfqs": []
+  },
+  {
+   "id": "8358",
+   "title": "РН40603834 Запрос (Т)КП на поставку ЗИП ГТУ GE",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:10",
+   "created": "2024-06-26",
+   "rfqs": []
+  },
+  {
+   "id": "8356",
+   "title": "RH25062400004 Мониторинг рынка на поставку оборудования для ГТУ LM6000",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:2",
+   "created": "2024-06-26",
+   "rfqs": []
+  },
+  {
+   "id": "8348",
+   "title": "1.2.31 «Капитальный ремонт газотурбинных двигателей ГТЭС «Solar» СЦ «Усинскэнергонефть»»",
+   "models": [
+    "Solar (модель уточнить)"
+   ],
+   "stage": "C2:2",
+   "created": "2024-06-26",
+   "rfqs": []
+  },
+  {
+   "id": "8210",
+   "title": "32413702067 Диафрагма направляющих лопаток 112E6044G001 для ГТУ PG6581B Челябинской ТЭЦ-1 ПАО \"Форвард Энерго\"",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:LOSE",
+   "created": "2024-06-18",
+   "rfqs": []
+  },
+  {
+   "id": "8074",
+   "title": "РН40601121 Форсунка топливная в сборе (газотурбинная установка Solar Turbines Titan 130)",
+   "models": [
+    "Titan 130"
+   ],
+   "stage": "C2:UC_B61SCK",
+   "created": "2024-06-06",
+   "rfqs": []
+  },
+  {
+   "id": "8034",
+   "title": "2078770/1 Solar Turbines\t",
+   "models": [
+    "Solar (модель уточнить)"
+   ],
+   "stage": "C2:6",
+   "created": "2024-06-04",
+   "rfqs": []
+  },
+  {
+   "id": "8020",
+   "title": "Запасные части для ГТУ Solar (САХАЛИНМОРНЕФТЕГАЗ-ШЕЛЬФ)",
+   "models": [
+    "Solar (модель уточнить)"
+   ],
+   "stage": "C30:UC_UFDDZ1",
+   "created": "2024-06-03",
+   "rfqs": [
+    {
+     "id": "8822",
+     "title": "Requests #8822",
+     "supplier": "Dongturbo Electric Company Ltd",
+     "stage": "Request Sent",
+     "sourcer": "Vitaly Goryachikh",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "8016",
+   "title": "32413663934 Оказание услуг по сервисному обслуживанию четырех газотурбинных установок Казанской ТЭЦ-1 и Казанской ТЭЦ-2",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:LOSE",
+   "created": "2024-06-03",
+   "rfqs": []
+  },
+  {
+   "id": "7886",
+   "title": "2077843/1 Датчика темп Solar Turbines 10655811-200",
+   "models": [
+    "Solar (модель уточнить)"
+   ],
+   "stage": "C2:6",
+   "created": "2024-05-24",
+   "rfqs": []
+  },
+  {
+   "id": "7818",
+   "title": "2069647/1 Центробежные компрессоры - аналоги компрессоров Solar",
+   "models": [
+    "Solar (модель уточнить)"
+   ],
+   "stage": "C2:2",
+   "created": "2024-05-21",
+   "rfqs": []
+  },
+  {
+   "id": "7686",
+   "title": "2077145/1 Solar Turbines",
+   "models": [
+    "Solar (модель уточнить)"
+   ],
+   "stage": "C2:6",
+   "created": "2024-05-14",
+   "rfqs": []
+  },
+  {
+   "id": "7564",
+   "title": "32413573549 Поставка компрессоров для ГТУ SGT-500",
+   "models": [
+    "SGT-500…800 (Финспонг)"
+   ],
+   "stage": "C2:LOSE",
+   "created": "2024-05-06",
+   "rfqs": []
+  },
+  {
+   "id": "7536",
+   "title": "ГП405612 Поставка газогенератора и силовой турбины для газотурбинной установки SIEMENS SGT-200-1S (DLE) TORNADO 6,75МВт",
+   "models": [
+    "SGT-200"
+   ],
+   "stage": "C2:2",
+   "created": "2024-05-03",
+   "rfqs": []
+  },
+  {
+   "id": "7352",
+   "title": "378. Поставка прокладок на ККМ для SGT-400",
+   "models": [
+    "SGT-400"
+   ],
+   "stage": "WON",
+   "created": "2024-04-24",
+   "rfqs": []
+  },
+  {
+   "id": "7148",
+   "title": "32413502982 Поставка запасных частей к ГТУ SGT5-4000F для нужд Няганская ГРЭС ПАО \"Форвард Энерго\"",
+   "models": [
+    "Siemens (модель уточнить)"
+   ],
+   "stage": "C2:10",
+   "created": "2024-04-14",
+   "rfqs": []
+  },
+  {
+   "id": "7066",
+   "title": "Л-ВНПЗ (БН-2024) /02/ Typhoon",
+   "models": [
+    "SGT-100"
+   ],
+   "stage": "C10:2",
+   "created": "2024-04-10",
+   "rfqs": [
+    {
+     "id": "2390",
+     "title": "RFQ -- Typhoon --Siemens Energy Global GmbH & Co. KG 7066-2390 GSA  10.04.2024",
+     "supplier": "Siemens Energy Global GmbH & Co. KG",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Geronok",
+     "models": [
+      "SGT-100"
+     ]
+    },
+    {
+     "id": "2396",
+     "title": "RFQ  Typhoon -- Siemens Energy Dubai 7066-2396 GSA  10.04.2024",
+     "supplier": "Siemens Energy Dubai",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Geronok",
+     "models": [
+      "SGT-100"
+     ]
+    },
+    {
+     "id": "2398",
+     "title": "Siemens Energy Dubai",
+     "supplier": "Siemens Energy Dubai",
+     "stage": "Request Sent",
+     "sourcer": "Sergey Geronok",
+     "models": [
+      "SGT-100"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "7038",
+   "title": "КЛП-515773 Поставка модулей ввода-вывода для нужд ГТУ-1,2,3 ООО «ПЭСТ»",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:2",
+   "created": "2024-04-09",
+   "rfqs": [
+    {
+     "id": "2344",
+     "title": "Requests #2344",
+     "supplier": "—",
+     "stage": "In Correspondance",
+     "sourcer": "Denis Litvinovsky",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "6884",
+   "title": "514963 Поставка конических, цилиндрических фильтров класса F9 для ГТУ-1,2,3 ООО «ПЭСТ»",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:10",
+   "created": "2024-04-02",
+   "rfqs": [
+    {
+     "id": "2268",
+     "title": "RFQ Donaldson 040424",
+     "supplier": "Donaldson Ibérica Soluciones en Filtración, S.L.",
+     "stage": "Request Sent",
+     "sourcer": "Stanislav Milovidov",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "6670",
+   "title": "513656 Поставка расходных материалов для аналитического комплекса METTLER TOLEDO  для нужд ГТУ-1,2,3 ООО «ПЭСТ»",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:6",
+   "created": "2024-03-20",
+   "rfqs": [
+    {
+     "id": "1692",
+     "title": "METTLER электрод",
+     "supplier": "GuiLin SanHua Import & Export Co., Ltd",
+     "stage": "Request Sent",
+     "sourcer": "Liliya Shved",
+     "models": [
+      "ГТУ (модель уточнить)"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "6608",
+   "title": "ГП427690 Поставка ЗИП для Solar",
+   "models": [
+    "Solar (модель уточнить)"
+   ],
+   "stage": "C2:2",
+   "created": "2024-03-18",
+   "rfqs": []
+  },
+  {
+   "id": "6506",
+   "title": "РН40302871 Оказание услуг по сервисному обслуживанию газотурбинных двигателей SIEMENS SGT-300-2s на 2024-2026 гг.",
+   "models": [
+    "SGT-300"
+   ],
+   "stage": "C2:2",
+   "created": "2024-03-12",
+   "rfqs": []
+  },
+  {
+   "id": "6392",
+   "title": "РН40301166 На выполнение работ по техническому обслуживанию газотурбинных двигателей фирмы SOLAR.",
+   "models": [
+    "Solar (модель уточнить)"
+   ],
+   "stage": "C2:2",
+   "created": "2024-03-05",
+   "rfqs": []
+  },
+  {
+   "id": "6382",
+   "title": "2024-1129707 Проведение инспекции уровня \"С\" газотурбинных установок SGT-700 Березовской ГРЭС",
+   "models": [
+    "SGT-500…800 (Финспонг)"
+   ],
+   "stage": "C2:10",
+   "created": "2024-03-05",
+   "rfqs": []
+  },
+  {
+   "id": "6130",
+   "title": "3583539 Проведение закупочной процедуры по выбору поставщика Рабочих лопаток 2-й ступени Силовой турбины ГТУ SGT-200-2S -73 шт. (согласно РКД), в рамках реализации проекта по строительству порта Тамань АО \"ТОАЗ\"»",
+   "models": [
+    "SGT-200"
+   ],
+   "stage": "C2:12",
+   "created": "2024-02-22",
+   "rfqs": [
+    {
+     "id": "9306",
+     "title": "Запрос на изготовление лопаток второй ступени SGT-200s в OBT",
+     "supplier": "Qingdao O.B.T Co., Ltd.",
+     "stage": "Not Selected",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "SGT-200"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "5838",
+   "title": "SGT-600 Минские тепловые сети. Инспекция С ",
+   "models": [
+    "SGT-500…800 (Финспонг)"
+   ],
+   "stage": "C4:PREPAYMENT_INVOICE",
+   "created": "2024-02-15",
+   "rfqs": []
+  },
+  {
+   "id": "5564",
+   "title": "SGT-800 spare parts and consumables",
+   "models": [
+    "SGT-500…800 (Финспонг)"
+   ],
+   "stage": "C4:PREPAYMENT_INVOICE",
+   "created": "2024-01-30",
+   "rfqs": []
+  },
+  {
+   "id": "5496",
+   "title": "РН40103501 Поставка запчастей ГТУ для АО «ВЧНГ»",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:UC_B61SCK",
+   "created": "2024-01-24",
+   "rfqs": []
+  },
+  {
+   "id": "5250",
+   "title": "ЗП3121994 Поставка диагональных завихрителей газотурбинной установки",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:10",
+   "created": "2023-12-20",
+   "rfqs": []
+  },
+  {
+   "id": "5216",
+   "title": "32313092614 №217/КО (23Н191) - X и L -кольца для ГТУ ГТЭ-160 для нужд ООО «ГЭХ Сервис газовых турбин",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:10",
+   "created": "2023-12-15",
+   "rfqs": []
+  },
+  {
+   "id": "5204",
+   "title": "323. ЗЧ для инспекции В SGT-100.Пулково",
+   "models": [
+    "SGT-100"
+   ],
+   "stage": "LOSE",
+   "created": "2023-12-13",
+   "rfqs": [
+    {
+     "id": "76",
+     "title": "ASH presicion",
+     "supplier": "ASH presicion",
+     "stage": "Selected",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "SGT-100"
+     ]
+    },
+    {
+     "id": "560",
+     "title": "Запрос на независимую инспекцию . TÜV Rheinland (ШК кельн)",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "SGT-100"
+     ]
+    },
+    {
+     "id": "562",
+     "title": "Запрос на независимую инспекцию . TÜV SÜD (Германия)",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "SGT-100"
+     ]
+    },
+    {
+     "id": "7268",
+     "title": "SGT-100. запрос в Zirve Energy",
+     "supplier": "Zirve Energy",
+     "stage": "Request Sent",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "SGT-100"
+     ]
+    },
+    {
+     "id": "7744",
+     "title": "Запрос на изготовление переходных элементов",
+     "supplier": "Qingdao O.B.T Co., Ltd.",
+     "stage": "Selected",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "SGT-100"
+     ]
+    },
+    {
+     "id": "8372",
+     "title": "Запрос на изготовление роторных лопаток",
+     "supplier": "Qingdao O.B.T Co., Ltd.",
+     "stage": "Selected",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "SGT-100"
+     ]
+    },
+    {
+     "id": "8470",
+     "title": "Кольцо и горелки",
+     "supplier": "Turbine Field Solutions (TFS)",
+     "stage": "Not Selected",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "SGT-100"
+     ]
+    },
+    {
+     "id": "8646",
+     "title": "Starter Module",
+     "supplier": "—",
+     "stage": "In Correspondance",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "SGT-100"
+     ]
+    },
+    {
+     "id": "8654",
+     "title": "Requests #8654",
+     "supplier": "—",
+     "stage": "In Correspondance",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "SGT-100"
+     ]
+    },
+    {
+     "id": "8658",
+     "title": "Requests #8658",
+     "supplier": "GBS",
+     "stage": "Not Selected",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "SGT-100"
+     ]
+    },
+    {
+     "id": "8660",
+     "title": "Allen Gears info@rotalution.com",
+     "supplier": "—",
+     "stage": "Not Selected",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "SGT-100"
+     ]
+    },
+    {
+     "id": "9470",
+     "title": "Requests #9470",
+     "supplier": "Gowrings Continental B.V.",
+     "stage": "Price at Work",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "SGT-100"
+     ]
+    },
+    {
+     "id": "9472",
+     "title": "Requests #9472",
+     "supplier": "Gowrings Continental B.V.",
+     "stage": "Selected",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "SGT-100"
+     ]
+    },
+    {
+     "id": "9802",
+     "title": "Заказ Carrier Ring",
+     "supplier": "Qingdao O.B.T Co., Ltd.",
+     "stage": "Selected",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "SGT-100"
+     ]
+    },
+    {
+     "id": "10870",
+     "title": "запрос на фильтры",
+     "supplier": "ASH presicion",
+     "stage": "Selected",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "SGT-100"
+     ]
+    },
+    {
+     "id": "12322",
+     "title": "Rotor blades for SGT-100. Ash",
+     "supplier": "ASH presicion",
+     "stage": "In Correspondance",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "SGT-100"
+     ]
+    },
+    {
+     "id": "14146",
+     "title": "Starter module.Ash",
+     "supplier": "ASH presicion",
+     "stage": "Selected",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "SGT-100"
+     ]
+    },
+    {
+     "id": "22232",
+     "title": "лопатки (доработка напыление) ",
+     "supplier": "QINGDAO O.B.T CO., LTD.",
+     "stage": "Selected",
+     "sourcer": "Liliya Shved",
+     "models": [
+      "SGT-100"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "5194",
+   "title": "2064177/1 ЗИП Solar Turbines (ЮПГПЗ)",
+   "models": [
+    "Solar (модель уточнить)"
+   ],
+   "stage": "C2:2",
+   "created": "2023-12-12",
+   "rfqs": []
+  },
+  {
+   "id": "4988",
+   "title": "32312900954 Оказание услуг по долгосрочному сервисному обслуживанию 5-ти газовых турбин SGT-600",
+   "models": [
+    "SGT-500…800 (Финспонг)"
+   ],
+   "stage": "C2:LOSE",
+   "created": "2023-11-15",
+   "rfqs": []
+  },
+  {
+   "id": "4984",
+   "title": "2061903/1 ЗИП Solar Turbines (ЮПГПЗ)",
+   "models": [
+    "Solar (модель уточнить)"
+   ],
+   "stage": "C2:6",
+   "created": "2023-11-15",
+   "rfqs": []
+  },
+  {
+   "id": "4888",
+   "title": "B1909231520126 Оказание услуги по капитальному ремонту газогенератора газотурбинной установки SGT-400 производства SIEMENS",
+   "models": [
+    "SGT-400"
+   ],
+   "stage": "C2:6",
+   "created": "2023-11-02",
+   "rfqs": []
+  },
+  {
+   "id": "4870",
+   "title": "№ 32312913813 Поставка критичного ЗИП АСУ ТП для объекта Энергоцентр-125 МВт \"Южное Хыльчую\" на базе ГТУ SGT-600 Siemens",
+   "models": [
+    "SGT-500…800 (Финспонг)"
+   ],
+   "stage": "C2:LOSE",
+   "created": "2023-10-31",
+   "rfqs": []
+  },
+  {
+   "id": "4776",
+   "title": "102 Расценка ЗФ_Газотурбинный двигатель",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C8:9",
+   "created": "2023-10-20",
+   "rfqs": []
+  },
+  {
+   "id": "4740",
+   "title": "23120012311088 Закупка оригинальных запасных частей газотурбинных компрессорных агрегатов производства «Siemens» (Rolls-Royce) для нужд СП ООО «Asia Trans Gas»",
+   "models": [
+    "Siemens (модель уточнить)"
+   ],
+   "stage": "C2:10",
+   "created": "2023-10-18",
+   "rfqs": []
+  },
+  {
+   "id": "4738",
+   "title": "23120012311098 Оригинальные запасные части газотурбинных компрессорных агрегатов производства «Siemens» (Rolls-Royce) для текущего ремонта и технического обслуживания Уровня 2 ГПА",
+   "models": [
+    "Siemens (модель уточнить)"
+   ],
+   "stage": "C2:10",
+   "created": "2023-10-18",
+   "rfqs": []
+  },
+  {
+   "id": "4666",
+   "title": "ЗП310889 Поставка запасных частей для модернизации ГТУ-11",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:10",
+   "created": "2023-10-13",
+   "rfqs": []
+  },
+  {
+   "id": "4664",
+   "title": "ЗП310879 Поставка комплекта рабочих лопаток 1-2 ступени и комплекта лопаток 4-й ступени ГТУ",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:10",
+   "created": "2023-10-13",
+   "rfqs": []
+  },
+  {
+   "id": "4620",
+   "title": "РН31002295 Оказание услуг по капитальному ремонту ГТУ Solar серии Taurus 60 газотурбинной электростанции ГТЭС Тегусская на месторождении имени Малыка ООО «РН-Уватнефтегаз»",
+   "models": [
+    "Taurus 60"
+   ],
+   "stage": "C2:10",
+   "created": "2023-10-11",
+   "rfqs": []
+  },
+  {
+   "id": "4134",
+   "title": "№ 3448851 Право заключения договора на поставку запасных частей для газовых турбин SGT-800",
+   "models": [
+    "SGT-500…800 (Финспонг)"
+   ],
+   "stage": "C2:2",
+   "created": "2023-10-06",
+   "rfqs": []
+  },
+  {
+   "id": "4092",
+   "title": "Пулково. SGT-100. инспекция B",
+   "models": [
+    "SGT-100"
+   ],
+   "stage": "C4:PREPARATION",
+   "created": "2023-10-03",
+   "rfqs": [
+    {
+     "id": "10246",
+     "title": "Requests #10246",
+     "supplier": "zhzngt.com",
+     "stage": "Ответ не получен (в срок)",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "SGT-100"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "4078",
+   "title": "574437 АО «ВЧНГ» Воспламенение газового топлива ГТА SGT-400 Siemens",
+   "models": [
+    "SGT-400"
+   ],
+   "stage": "C4:PREPAYMENT_INVOICE",
+   "created": "2023-09-28",
+   "rfqs": []
+  },
+  {
+   "id": "4048",
+   "title": "2057730/1 Датчик температуры Solar Turbines (1065811-200)",
+   "models": [
+    "Solar (модель уточнить)"
+   ],
+   "stage": "C2:10",
+   "created": "2023-09-25",
+   "rfqs": []
+  },
+  {
+   "id": "3972",
+   "title": "272. Поставка ЗЧ SGT-400 для ККМ. Заказ 2.",
+   "models": [
+    "SGT-400"
+   ],
+   "stage": "6",
+   "created": "2023-09-15",
+   "rfqs": [
+    {
+     "id": "48",
+     "title": "zhzngt.com",
+     "supplier": "zhzngt.com",
+     "stage": "Request Sent",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "SGT-400"
+     ]
+    },
+    {
+     "id": "180",
+     "title": "HYDRAULIC AXIAL PISTON PUMP(64/07104916/1)",
+     "supplier": "Suzhou Coordworx Electromechanical Technology Co , Ltd",
+     "stage": "Request Sent",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "SGT-400"
+     ]
+    },
+    {
+     "id": "182",
+     "title": "DC MOTOR, EMERGENCY OIL PUMP(64/07001479/7121)",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "SGT-400"
+     ]
+    },
+    {
+     "id": "184",
+     "title": "AC MOTOR, AUXILIARY OIL PUMP(64/07001478/0101)",
+     "supplier": "—",
+     "stage": "Request Sent",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "SGT-400"
+     ]
+    },
+    {
+     "id": "202",
+     "title": "ЗЧ СГТ-400 ККМ. Заказ 2",
+     "supplier": "Turbine Field Solutions (TFS)",
+     "stage": "Request Sent",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "SGT-400"
+     ]
+    },
+    {
+     "id": "8742",
+     "title": "з/ч WEG",
+     "supplier": "aikah",
+     "stage": "Request Sent",
+     "sourcer": "Liliya Shved",
+     "models": [
+      "SGT-400"
+     ]
+    },
+    {
+     "id": "11096",
+     "title": "з/ч Winkelmann",
+     "supplier": "Camis Electronics Limited",
+     "stage": "Selected",
+     "sourcer": "Liliya Shved",
+     "models": [
+      "SGT-400"
+     ]
+    },
+    {
+     "id": "12114",
+     "title": "воспламенители . Ash precsion ",
+     "supplier": "ASH presicion",
+     "stage": "Request Sent",
+     "sourcer": "Ruslan Sitdikov",
+     "models": [
+      "SGT-400"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "3148",
+   "title": "РН30206283 ЗИП к ГТУ Siemens",
+   "models": [
+    "Siemens (модель уточнить)"
+   ],
+   "stage": "C2:6",
+   "created": "2023-04-20",
+   "rfqs": []
+  },
+  {
+   "id": "2952",
+   "title": "168. ЗЧ Siemens SGT400",
+   "models": [
+    "SGT-400"
+   ],
+   "stage": "FINAL_INVOICE",
+   "created": "2022-12-23",
+   "rfqs": []
+  },
+  {
+   "id": "876",
+   "title": "57631-4 ЗИП Газовая турбина GE ФосАгро",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C2:6",
+   "created": "2020-03-26",
    "rfqs": []
   }
  ],
- "offers": []
+ "offers": [
+  {
+   "model": "Centaur 40",
+   "suppliers": [
+    {
+     "name": "TURBINE.PARTS B.V.",
+     "n": 1
+    },
+    {
+     "name": "Kian Turbo Tec",
+     "n": 1
+    },
+    {
+     "name": "Yangzhou Tongte Technology Co. Ltd.",
+     "n": 1
+    },
+    {
+     "name": "Southeast Overseas, Inc.",
+     "n": 1
+    },
+    {
+     "name": "PeriParts",
+     "n": 1
+    },
+    {
+     "name": "Shanghai Aize Industiale Equipment Co. Ltd.",
+     "n": 1
+    },
+    {
+     "name": "Shree Khodal International (OPC) Private Limited",
+     "n": 1
+    }
+   ]
+  },
+  {
+   "model": "GE 9FA (вне фокуса)",
+   "suppliers": [
+    {
+     "name": "GLOBAL TURBINE SOLUTIONS PVT LTD",
+     "n": 2
+    },
+    {
+     "name": "Turbine Services, Ltd.",
+     "n": 1
+    },
+    {
+     "name": "Global Turbine Parts Resourse LLC-FZ",
+     "n": 1
+    },
+    {
+     "name": "Roto Technik (India) Pvt. Ltd.",
+     "n": 1
+    },
+    {
+     "name": "Rotating Global Service s.r.l.",
+     "n": 1
+    },
+    {
+     "name": "World Of Controls FZE",
+     "n": 1
+    },
+    {
+     "name": "Shree Khodal International (OPC) Private Limited",
+     "n": 1
+    }
+   ]
+  },
+  {
+   "model": "Mars 100",
+   "suppliers": [
+    {
+     "name": "Turbine Field Solutions",
+     "n": 2
+    },
+    {
+     "name": "FMLS FIN MARINE & ENERGY SOLUTIONS LTD.",
+     "n": 2
+    },
+    {
+     "name": "Wuxi Weishi Turbine Technology Co., Ltd.",
+     "n": 2
+    },
+    {
+     "name": "Phoenix equipment corp.",
+     "n": 2
+    },
+    {
+     "name": "Antoni International, Inc.",
+     "n": 1
+    },
+    {
+     "name": "TURBINE.PARTS B.V.",
+     "n": 1
+    },
+    {
+     "name": "Rotrenza Marine",
+     "n": 1
+    },
+    {
+     "name": "PeriParts",
+     "n": 1
+    },
+    {
+     "name": "Tianjin Bowzon Machinery Electrical Equipment Technology Co., Ltd",
+     "n": 1
+    },
+    {
+     "name": "Bowzon Turbine",
+     "n": 1
+    },
+    {
+     "name": "Mestek India",
+     "n": 1
+    },
+    {
+     "name": "Goltens",
+     "n": 1
+    },
+    {
+     "name": "Triveni Turbines",
+     "n": 1
+    },
+    {
+     "name": "Kian Turbo Tec",
+     "n": 1
+    },
+    {
+     "name": "One Power Services",
+     "n": 1
+    },
+    {
+     "name": "DMEnergy",
+     "n": 1
+    },
+    {
+     "name": "Dongturbo Electric Company Ltd",
+     "n": 1
+    },
+    {
+     "name": "Lei Shing Hong Energy",
+     "n": 1
+    },
+    {
+     "name": "Saintwah Inc.",
+     "n": 1
+    },
+    {
+     "name": "USP&E",
+     "n": 1
+    },
+    {
+     "name": "Wison Engineering Ltd.",
+     "n": 1
+    },
+    {
+     "name": "Shanghai Electric Machinery Co.Ltd. (Shanghai Electric Group )",
+     "n": 1
+    },
+    {
+     "name": "MarisoGT",
+     "n": 1
+    },
+    {
+     "name": "Leda Greenpower (Beijing) Trading & Engineering Co., Ltd.",
+     "n": 1
+    },
+    {
+     "name": "VG Engineering",
+     "n": 1
+    },
+    {
+     "name": "BICOSYN",
+     "n": 1
+    }
+   ]
+  },
+  {
+   "model": "SGT-100",
+   "suppliers": [
+    {
+     "name": "ASH presicion",
+     "n": 5
+    },
+    {
+     "name": "Qingdao O.B.T Co., Ltd.",
+     "n": 3
+    },
+    {
+     "name": "Fluid Science Dynamics Trading LLC",
+     "n": 2
+    },
+    {
+     "name": "zhzngt.com",
+     "n": 2
+    },
+    {
+     "name": "Siemens Energy Dubai",
+     "n": 2
+    },
+    {
+     "name": "Gowrings Continental B.V.",
+     "n": 2
+    },
+    {
+     "name": "Camis Electronics Limited",
+     "n": 1
+    },
+    {
+     "name": "Mapa Turbines",
+     "n": 1
+    },
+    {
+     "name": "SEALMECH TRADING L.L.C",
+     "n": 1
+    },
+    {
+     "name": "Zirve Türbin Parts Enerji Limited Şirketi",
+     "n": 1
+    },
+    {
+     "name": "Siemens Energy Global GmbH & Co. KG",
+     "n": 1
+    },
+    {
+     "name": "Zirve Energy",
+     "n": 1
+    },
+    {
+     "name": "Turbine Field Solutions (TFS)",
+     "n": 1
+    },
+    {
+     "name": "GBS",
+     "n": 1
+    },
+    {
+     "name": "QINGDAO O.B.T CO., LTD.",
+     "n": 1
+    }
+   ]
+  },
+  {
+   "model": "SGT-200",
+   "suppliers": [
+    {
+     "name": "Turbine Field Solutions",
+     "n": 2
+    },
+    {
+     "name": "WRIKU INTERNATIONAL BUSINESS CO LTD",
+     "n": 1
+    },
+    {
+     "name": "Dongturbo Electric Company Ltd",
+     "n": 1
+    },
+    {
+     "name": "CSTC China Service Technology (Shandong) Co. Ltd.",
+     "n": 1
+    },
+    {
+     "name": "Wuxi Weishi Turbine Technology Co., Ltd.",
+     "n": 1
+    },
+    {
+     "name": "Hangzhou HGTP Gas Turbine Parts Co.Ltd",
+     "n": 1
+    },
+    {
+     "name": "Leda Greenpower (Beijing) Trading & Engineering Co., Ltd.",
+     "n": 1
+    },
+    {
+     "name": "Makik Machinery Consultancy Foreign Trade Industry Ltd. Co.",
+     "n": 1
+    },
+    {
+     "name": "zhzngt.com",
+     "n": 1
+    },
+    {
+     "name": "Qingdao O.B.T Co., Ltd.",
+     "n": 1
+    }
+   ]
+  },
+  {
+   "model": "SGT-300",
+   "suppliers": [
+    {
+     "name": "China Nanjing Haosheng Industrial Technology Co., Ltd.",
+     "n": 1
+    },
+    {
+     "name": "Genersol",
+     "n": 1
+    },
+    {
+     "name": "Esporim S.R.L.",
+     "n": 1
+    }
+   ]
+  },
+  {
+   "model": "SGT-400",
+   "suppliers": [
+    {
+     "name": "Turbine Field Solutions (TFS)",
+     "n": 7
+    },
+    {
+     "name": "Turbine Field Solutions",
+     "n": 2
+    },
+    {
+     "name": "MSR Industrade Pvt. Ltd.",
+     "n": 2
+    },
+    {
+     "name": "Dibaco GmbH",
+     "n": 2
+    },
+    {
+     "name": "Wirturbo",
+     "n": 2
+    },
+    {
+     "name": "Gowrings Continental B.V.",
+     "n": 2
+    },
+    {
+     "name": "Skyline Turbine Services b.v.",
+     "n": 2
+    },
+    {
+     "name": "Suzhou Coordworx Electromechanical Technology Co , Ltd",
+     "n": 2
+    },
+    {
+     "name": "Shenzhen Blaze Turbine",
+     "n": 1
+    },
+    {
+     "name": "AL NOOR ALAILI TRADING CO. LLC",
+     "n": 1
+    },
+    {
+     "name": "Hecs Store",
+     "n": 1
+    },
+    {
+     "name": "EU Automation (UAE)",
+     "n": 1
+    },
+    {
+     "name": "AWS Corporation",
+     "n": 1
+    },
+    {
+     "name": "EMW filtertechnik GmbH",
+     "n": 1
+    },
+    {
+     "name": "Orogenic ApS",
+     "n": 1
+    },
+    {
+     "name": "UK Battery Sales Ltd",
+     "n": 1
+    },
+    {
+     "name": "NRwell",
+     "n": 1
+    },
+    {
+     "name": "Foxmere Technologies Ltd",
+     "n": 1
+    },
+    {
+     "name": "Kempston Controls LLC",
+     "n": 1
+    },
+    {
+     "name": "Gahangan",
+     "n": 1
+    },
+    {
+     "name": "TCB Avgidis Automation SA",
+     "n": 1
+    },
+    {
+     "name": "PLSWISS SA",
+     "n": 1
+    },
+    {
+     "name": "ProBusiness SRL",
+     "n": 1
+    },
+    {
+     "name": "PIPING ROCK ENERGY CORP.",
+     "n": 1
+    },
+    {
+     "name": "Modus machineering",
+     "n": 1
+    },
+    {
+     "name": "EPS (european power systems)",
+     "n": 1
+    },
+    {
+     "name": "Euro-enerji",
+     "n": 1
+    },
+    {
+     "name": "Green Italy S.r.l.",
+     "n": 1
+    },
+    {
+     "name": "GPOWER SARL",
+     "n": 1
+    },
+    {
+     "name": "ООО КВАНТ (поставщик)",
+     "n": 1
+    },
+    {
+     "name": "Nikan Industrial Turbine Co. (NITCO)",
+     "n": 1
+    },
+    {
+     "name": "Zirve Türbin Parts Enerji Limited Şirketi",
+     "n": 1
+    },
+    {
+     "name": "Energy & Turbomachinery Network (ETN Global)",
+     "n": 1
+    },
+    {
+     "name": "AR Thermosensors Ltd",
+     "n": 1
+    },
+    {
+     "name": "Dongturbo Electric Company Ltd",
+     "n": 1
+    },
+    {
+     "name": "Harbin Electric International",
+     "n": 1
+    },
+    {
+     "name": "SHANGHAI LINENG INDUSTRY AND TRADE CO., LTD",
+     "n": 1
+    },
+    {
+     "name": "Hangzhou HGTP Gas Turbine Parts Co.Ltd",
+     "n": 1
+    },
+    {
+     "name": "EthosEnergy",
+     "n": 1
+    },
+    {
+     "name": "kinetrol",
+     "n": 1
+    },
+    {
+     "name": "GuiLin SanHua Import & Export Co., Ltd",
+     "n": 1
+    },
+    {
+     "name": "International Energy Resources",
+     "n": 1
+    },
+    {
+     "name": "zhzngt.com",
+     "n": 1
+    },
+    {
+     "name": "aikah",
+     "n": 1
+    },
+    {
+     "name": "Camis Electronics Limited",
+     "n": 1
+    },
+    {
+     "name": "ASH presicion",
+     "n": 1
+    }
+   ]
+  },
+  {
+   "model": "SGT-500…800 (Финспонг)",
+   "suppliers": [
+    {
+     "name": "Nikan Industrial Turbine Co. (NITCO)",
+     "n": 2
+    },
+    {
+     "name": "PowerTech Turbine Parts",
+     "n": 1
+    },
+    {
+     "name": "Gas Turbine Services",
+     "n": 1
+    },
+    {
+     "name": "Retrofit Turbine PartsTrading FZ (ОАЭ)",
+     "n": 1
+    },
+    {
+     "name": "MSR Industrade Pvt. Ltd.",
+     "n": 1
+    },
+    {
+     "name": "Power Parts Technology s.r.o.",
+     "n": 1
+    },
+    {
+     "name": "VG Engineering",
+     "n": 1
+    },
+    {
+     "name": "SEALMECH TRADING L.L.C",
+     "n": 1
+    },
+    {
+     "name": "Wirturbo",
+     "n": 1
+    },
+    {
+     "name": "Шамиль(поставщик от Вячеслава)",
+     "n": 1
+    },
+    {
+     "name": "zhzngt.com",
+     "n": 1
+    },
+    {
+     "name": "Qingdao O.B.T Co., Ltd.",
+     "n": 1
+    }
+   ]
+  },
+  {
+   "model": "Siemens (модель уточнить)",
+   "suppliers": [
+    {
+     "name": "AoteWell Automation",
+     "n": 1
+    },
+    {
+     "name": "SIPATEC",
+     "n": 1
+    },
+    {
+     "name": "Hangzhou HGTP Gas Turbine Parts Co.Ltd",
+     "n": 1
+    },
+    {
+     "name": "China Nanjing Haosheng Industrial Technology Co., Ltd.",
+     "n": 1
+    },
+    {
+     "name": "Auto2mation",
+     "n": 1
+    },
+    {
+     "name": "Inpirio Ltd.",
+     "n": 1
+    },
+    {
+     "name": "MSR Industrade Pvt. Ltd.",
+     "n": 1
+    },
+    {
+     "name": "Unisys Group",
+     "n": 1
+    },
+    {
+     "name": "Bowzon Turbine",
+     "n": 1
+    },
+    {
+     "name": "Turbine Field Solutions (TFS)",
+     "n": 1
+    },
+    {
+     "name": "Pearson Hydraulics Ltd",
+     "n": 1
+    },
+    {
+     "name": "MEOS CO. L.L.C",
+     "n": 1
+    }
+   ]
+  },
+  {
+   "model": "Solar (модель уточнить)",
+   "suppliers": [
+    {
+     "name": "IMMI Turbines",
+     "n": 9
+    },
+    {
+     "name": "PeriParts",
+     "n": 5
+    },
+    {
+     "name": "Heriss (Canada)",
+     "n": 3
+    },
+    {
+     "name": "Hangzhou HGTP Gas Turbine Parts Co.Ltd",
+     "n": 3
+    },
+    {
+     "name": "TURBINE.PARTS B.V.",
+     "n": 3
+    },
+    {
+     "name": "Dongturbo Electric Company Ltd",
+     "n": 3
+    },
+    {
+     "name": "CSTC China Service Technology (Shandong) Co. Ltd.",
+     "n": 2
+    },
+    {
+     "name": "Solar Turbines India",
+     "n": 2
+    },
+    {
+     "name": "One Power Services",
+     "n": 2
+    },
+    {
+     "name": "Industrial Turbine Services s.r.l",
+     "n": 1
+    },
+    {
+     "name": "Gas Turbine Applications",
+     "n": 1
+    },
+    {
+     "name": "Rotating Machinery Services",
+     "n": 1
+    },
+    {
+     "name": "Southeast Overseas, Inc.",
+     "n": 1
+    },
+    {
+     "name": "Kian Turbo Tec",
+     "n": 1
+    },
+    {
+     "name": "Rathix automation",
+     "n": 1
+    },
+    {
+     "name": "Tesla Power",
+     "n": 1
+    },
+    {
+     "name": "CALTROLS Middle East FZCO",
+     "n": 1
+    },
+    {
+     "name": "Hatti Teknik",
+     "n": 1
+    },
+    {
+     "name": "Tricon International",
+     "n": 1
+    },
+    {
+     "name": "FMLS FIN MARINE & ENERGY SOLUTIONS LTD.",
+     "n": 1
+    },
+    {
+     "name": "тет",
+     "n": 1
+    },
+    {
+     "name": "Turbine Field Solutions (TFS)",
+     "n": 1
+    },
+    {
+     "name": "CJ Aerospace",
+     "n": 1
+    },
+    {
+     "name": "Delafield Corporation",
+     "n": 1
+    },
+    {
+     "name": "Mascot Systems Private Limited",
+     "n": 1
+    },
+    {
+     "name": "Nuvision",
+     "n": 1
+    },
+    {
+     "name": "Antoni International, Inc.",
+     "n": 1
+    },
+    {
+     "name": "Turbine Parts Corporation",
+     "n": 1
+    },
+    {
+     "name": "Wuxi Weishi Turbine Technology Co., Ltd.",
+     "n": 1
+    },
+    {
+     "name": "Hecs Store",
+     "n": 1
+    },
+    {
+     "name": "Leda Greenpower (Beijing) Trading & Engineering Co., Ltd.",
+     "n": 1
+    },
+    {
+     "name": "VG Engineering",
+     "n": 1
+    }
+   ]
+  },
+  {
+   "model": "Taurus 60",
+   "suppliers": [
+    {
+     "name": "Паровые турбины и сервис циннен",
+     "n": 2
+    },
+    {
+     "name": "TURBINE.PARTS B.V.",
+     "n": 2
+    },
+    {
+     "name": "ООО \"ТУРБО СЕРВИС КАЗАНЬ\"",
+     "n": 1
+    },
+    {
+     "name": "Global Marine",
+     "n": 1
+    },
+    {
+     "name": "One Power Services",
+     "n": 1
+    },
+    {
+     "name": "ITS LLC",
+     "n": 1
+    },
+    {
+     "name": "Heriss (Canada)",
+     "n": 1
+    },
+    {
+     "name": "Petran V Energy for Value",
+     "n": 1
+    },
+    {
+     "name": "Antoni International, Inc.",
+     "n": 1
+    },
+    {
+     "name": "IMMI Turbines",
+     "n": 1
+    },
+    {
+     "name": "PT.NGLTech Services Indonesia",
+     "n": 1
+    }
+   ]
+  },
+  {
+   "model": "Taurus 70",
+   "suppliers": [
+    {
+     "name": "Petran V Energy for Value",
+     "n": 2
+    },
+    {
+     "name": "POWERGEN SOLUTIONS FZE LLC",
+     "n": 1
+    },
+    {
+     "name": "Wuxi Weishi Turbine Technology Co., Ltd.",
+     "n": 1
+    },
+    {
+     "name": "IMMI Turbines",
+     "n": 1
+    },
+    {
+     "name": "Turboaleaciones",
+     "n": 1
+    },
+    {
+     "name": "Turbine Field Solutions",
+     "n": 1
+    },
+    {
+     "name": "PT.NGLTech Services Indonesia",
+     "n": 1
+    }
+   ]
+  },
+  {
+   "model": "Titan 130",
+   "suppliers": [
+    {
+     "name": "Dongturbo Electric Company Ltd",
+     "n": 3
+    },
+    {
+     "name": "TURBINE.PARTS B.V.",
+     "n": 3
+    },
+    {
+     "name": "IMMI Turbines",
+     "n": 2
+    },
+    {
+     "name": "Wuxi Weishi Turbine Technology Co., Ltd.",
+     "n": 1
+    },
+    {
+     "name": "CSTC China Service Technology (Shandong) Co. Ltd.",
+     "n": 1
+    },
+    {
+     "name": "Asian Dragon International",
+     "n": 1
+    },
+    {
+     "name": "ReflowX FZ-LLC",
+     "n": 1
+    },
+    {
+     "name": "Gas Turbine Applications",
+     "n": 1
+    },
+    {
+     "name": "Thomassen Amcot International, LLC.",
+     "n": 1
+    },
+    {
+     "name": "Global Marine",
+     "n": 1
+    },
+    {
+     "name": "Antoni International, Inc.",
+     "n": 1
+    },
+    {
+     "name": "Audax Global Energy",
+     "n": 1
+    },
+    {
+     "name": "VG Engineering",
+     "n": 1
+    }
+   ]
+  },
+  {
+   "model": "Titan 250",
+   "suppliers": [
+    {
+     "name": "PeriParts",
+     "n": 1
+    },
+    {
+     "name": "turbine.parts",
+     "n": 1
+    },
+    {
+     "name": "Industrial Turbine Services s.r.l",
+     "n": 1
+    },
+    {
+     "name": "Gas Turbine Applications",
+     "n": 1
+    },
+    {
+     "name": "Air Turbo Service FZE",
+     "n": 1
+    },
+    {
+     "name": "DeveEnergy (UAE)",
+     "n": 1
+    },
+    {
+     "name": "Power Services Group",
+     "n": 1
+    }
+   ]
+  },
+  {
+   "model": "ГТУ (модель уточнить)",
+   "suppliers": [
+    {
+     "name": "Global Turbine Solutions LLC.",
+     "n": 8
+    },
+    {
+     "name": "Wuxi CTENO Actuators Manufacture Co. Ltd",
+     "n": 3
+    },
+    {
+     "name": "Xiangjing (Shanghai) M&E Technology Co., Ltd",
+     "n": 3
+    },
+    {
+     "name": "GTS S.p.A.",
+     "n": 3
+    },
+    {
+     "name": "POWERGEN SOLUTIONS FZE LLC",
+     "n": 3
+    },
+    {
+     "name": "Shanxi Runsheng Import and Export Co., Ltd",
+     "n": 3
+    },
+    {
+     "name": "tec-group",
+     "n": 3
+    },
+    {
+     "name": "GuiLin SanHua Import & Export Co., Ltd",
+     "n": 3
+    },
+    {
+     "name": "Makik Machinery Consultancy Foreign Trade Industry Ltd. Co.",
+     "n": 2
+    },
+    {
+     "name": "AP4 group",
+     "n": 2
+    },
+    {
+     "name": "ADJ DiTec Málaga S.L.",
+     "n": 2
+    },
+    {
+     "name": "RTP power",
+     "n": 2
+    },
+    {
+     "name": "Powergen  Solutions  FZE LLC",
+     "n": 2
+    },
+    {
+     "name": "Donaldson Ibérica Soluciones en Filtración, S.L.",
+     "n": 2
+    },
+    {
+     "name": "Suzhou Coordworx Electromechanical Technology Co , Ltd",
+     "n": 2
+    },
+    {
+     "name": "Zirve Energy",
+     "n": 2
+    },
+    {
+     "name": "Weima Electric (Shanghai) Ltd.",
+     "n": 2
+    },
+    {
+     "name": "PROENERGY",
+     "n": 1
+    },
+    {
+     "name": "Ground Power Parts",
+     "n": 1
+    },
+    {
+     "name": "GT China",
+     "n": 1
+    },
+    {
+     "name": "Turbine Parts Specialist",
+     "n": 1
+    },
+    {
+     "name": "Xiamen Ji Yang Technology Co., Ltd.",
+     "n": 1
+    },
+    {
+     "name": "Camfil - UAE",
+     "n": 1
+    },
+    {
+     "name": "Zhangjiagang Aier Environmental Protection Equipment Accessories Co., Ltd.",
+     "n": 1
+    },
+    {
+     "name": "Shanghai Thenow Purification Technology Co., Ltd.",
+     "n": 1
+    },
+    {
+     "name": "ООО \"ЭР-Сервис\"",
+     "n": 1
+    },
+    {
+     "name": "Guilin Sanhua Mechanical and Electrical Control Engineering Co., Ltd",
+     "n": 1
+    },
+    {
+     "name": "Yantai Wepower Electronic Co., LTD",
+     "n": 1
+    },
+    {
+     "name": "InstruBiz",
+     "n": 1
+    },
+    {
+     "name": "Heavenlight Electronic",
+     "n": 1
+    },
+    {
+     "name": "Litrols",
+     "n": 1
+    },
+    {
+     "name": "Universe Middle East General Trading LLC",
+     "n": 1
+    },
+    {
+     "name": "Atlas Al Sharq Tr Est LLC",
+     "n": 1
+    },
+    {
+     "name": "Trace Industrial Equipment and Spare Parts Trading LLC",
+     "n": 1
+    },
+    {
+     "name": "Shenzhen Viyork Technology",
+     "n": 1
+    },
+    {
+     "name": "Eusence",
+     "n": 1
+    },
+    {
+     "name": "DianBingYuan Technology (Xiamen)",
+     "n": 1
+    },
+    {
+     "name": "Wuhan Xiatong Automation Equipment Co., Ltd.",
+     "n": 1
+    },
+    {
+     "name": "Can Electric LTD",
+     "n": 1
+    },
+    {
+     "name": "Amikon",
+     "n": 1
+    },
+    {
+     "name": "TDK Automation Co.,Limited",
+     "n": 1
+    },
+    {
+     "name": "ООО \"Элба Фильтр Мануфактуринг Рус\"",
+     "n": 1
+    },
+    {
+     "name": "ООО \"ЕМВ фильтртехник рус\"",
+     "n": 1
+    },
+    {
+     "name": "Mikropor İstanbul",
+     "n": 1
+    },
+    {
+     "name": "Hubei Jomay Automation Co.,Ltd",
+     "n": 1
+    },
+    {
+     "name": "TEMA Energy",
+     "n": 1
+    },
+    {
+     "name": "Retrofit Turbine PartsTrading FZ (ОАЭ)",
+     "n": 1
+    },
+    {
+     "name": "GT Power Solutions LLC",
+     "n": 1
+    },
+    {
+     "name": "Genloop LLC",
+     "n": 1
+    },
+    {
+     "name": "WAHTEC",
+     "n": 1
+    },
+    {
+     "name": "Kraftwerke Asia Inc.",
+     "n": 1
+    },
+    {
+     "name": "Hangzhou HGTP Gas Turbine Parts Co.Ltd",
+     "n": 1
+    },
+    {
+     "name": "Inpirio Ltd.",
+     "n": 1
+    },
+    {
+     "name": "GLOBAL TURBINE SOLUTIONS PVT LTD",
+     "n": 1
+    },
+    {
+     "name": "Turbine Field Solutions",
+     "n": 1
+    },
+    {
+     "name": "Thermo Engineering S.r.l.",
+     "n": 1
+    },
+    {
+     "name": "CORREGE - COTEMP SENSING Company",
+     "n": 1
+    },
+    {
+     "name": "Unisys Group",
+     "n": 1
+    },
+    {
+     "name": "Thermo Est",
+     "n": 1
+    },
+    {
+     "name": "GTSMRO",
+     "n": 1
+    },
+    {
+     "name": "H&B Sensors Ltd",
+     "n": 1
+    },
+    {
+     "name": "JUMO Automation GmbH",
+     "n": 1
+    },
+    {
+     "name": "Vaisala",
+     "n": 1
+    },
+    {
+     "name": "Progetti Europa & Global S.p.A. (PEG)",
+     "n": 1
+    },
+    {
+     "name": "Green Italy S.r.l.",
+     "n": 1
+    },
+    {
+     "name": "Shanghai Electric Machinery Co.Ltd. (Shanghai Electric Group )",
+     "n": 1
+    },
+    {
+     "name": "NEW JCM GROUP CO., LTD",
+     "n": 1
+    },
+    {
+     "name": "TIRTH SALES AND POWER SOLUTIONS",
+     "n": 1
+    },
+    {
+     "name": "GreenTech",
+     "n": 1
+    },
+    {
+     "name": "Jiangsu Renhe Environmental Equipments Co., Ltd",
+     "n": 1
+    },
+    {
+     "name": "BHEL",
+     "n": 1
+    },
+    {
+     "name": "Itedisa",
+     "n": 1
+    },
+    {
+     "name": "World Of Controls FZE",
+     "n": 1
+    },
+    {
+     "name": "Satarco",
+     "n": 1
+    },
+    {
+     "name": "TEC Group",
+     "n": 1
+    },
+    {
+     "name": "CST Heat Exchanger Co., Ltd.",
+     "n": 1
+    },
+    {
+     "name": "TECNIFLON S.A.S.",
+     "n": 1
+    },
+    {
+     "name": "WOODSERV",
+     "n": 1
+    },
+    {
+     "name": "Technical Solutions to Industry FZE (TSI)",
+     "n": 1
+    },
+    {
+     "name": "Starfish PPS",
+     "n": 1
+    },
+    {
+     "name": "BRUSH SEM s.r.o",
+     "n": 1
+    },
+    {
+     "name": "Turbine Services, Ltd.",
+     "n": 1
+    },
+    {
+     "name": "VBR Turbine Partners",
+     "n": 1
+    },
+    {
+     "name": "Energia Parts S.r.l.",
+     "n": 1
+    },
+    {
+     "name": "WWGTP",
+     "n": 1
+    },
+    {
+     "name": "QINGDAO O.B.T CO., LTD.",
+     "n": 1
+    },
+    {
+     "name": "EthosEnergy Abu Dhabi L.L.C.",
+     "n": 1
+    },
+    {
+     "name": "N S ENERGY GROUP",
+     "n": 1
+    },
+    {
+     "name": "Prime Turbine Parts",
+     "n": 1
+    },
+    {
+     "name": "AL NOOR ALAILI TRADING CO. LLC",
+     "n": 1
+    },
+    {
+     "name": "Everest-Instruments",
+     "n": 1
+    },
+    {
+     "name": "TSP Controls",
+     "n": 1
+    },
+    {
+     "name": "Dresser Machinery (Suzhou ) Co., Ltd.",
+     "n": 1
+    },
+    {
+     "name": "Allied Power Group (APG)",
+     "n": 1
+    },
+    {
+     "name": "HPI",
+     "n": 1
+    },
+    {
+     "name": "TRS SERVICES",
+     "n": 1
+    },
+    {
+     "name": "CEDCO",
+     "n": 1
+    },
+    {
+     "name": "RWG (Repair & Overhauls) Limited",
+     "n": 1
+    },
+    {
+     "name": "VLV S.r.l.",
+     "n": 1
+    },
+    {
+     "name": "TTI, Inc.",
+     "n": 1
+    },
+    {
+     "name": "iiiC Commercial Co., Ltd.",
+     "n": 1
+    },
+    {
+     "name": "HWKJ (Tianjin) Ltd.",
+     "n": 1
+    },
+    {
+     "name": "Lavastica International B.V.",
+     "n": 1
+    },
+    {
+     "name": "ZOLLERN GmbH & Co. KG",
+     "n": 1
+    },
+    {
+     "name": "Mouser Electronics, Inc.",
+     "n": 1
+    },
+    {
+     "name": "OMO Electronic Limited",
+     "n": 1
+    },
+    {
+     "name": "CENTRO E SRL",
+     "n": 1
+    },
+    {
+     "name": "Changsha Aobo Carbon Co.,Ltd.",
+     "n": 1
+    },
+    {
+     "name": "Group Protem DOO",
+     "n": 1
+    }
+   ]
+  }
+ ]
 }
