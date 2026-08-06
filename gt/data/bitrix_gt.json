@@ -25,6 +25,7 @@
     {
      "id": "40186",
      "title": "GTS Антон через Саеда",
+     "created": "2026-08-05",
      "supplier": "GLOBAL TURBINE SOLUTIONS PVT LTD",
      "stage": "Price at Work",
      "sourcer": "Anton Zorin",
@@ -36,21 +37,22 @@
   },
   {
    "id": "22514",
-   "title": "356-499 Закупка газотурбинного двигателя Solar Turbine г.Казань.",
+   "title": "356-499 Закупка газотурбинного двигателя Solar Turbine г.Казань. (Taurus 60 КЭР-Холдинг)",
    "models": [
-    "Solar (модель уточнить)"
+    "Taurus 60"
    ],
-   "stage": "C2:4",
+   "stage": "C2:EXECUTING",
    "created": "2026-08-03",
    "rfqs": [
     {
      "id": "40270",
      "title": "cstc (china)",
+     "created": "2026-08-06",
      "supplier": "CSTC China Service Technology (Shandong) Co. Ltd.",
      "stage": "New Request",
      "sourcer": "Ekaterina Kornilova",
      "models": [
-      "Solar (модель уточнить)"
+      "Taurus 60"
      ]
     }
    ]
@@ -67,6 +69,7 @@
     {
      "id": "38958",
      "title": "periparts (usa)",
+     "created": "2026-07-20",
      "supplier": "PeriParts",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -77,6 +80,7 @@
     {
      "id": "38964",
      "title": "heriss (canada)",
+     "created": "2026-07-20",
      "supplier": "Heriss (Canada)",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -87,6 +91,7 @@
     {
      "id": "38994",
      "title": "Solar в IMMI",
+     "created": "2026-07-21",
      "supplier": "IMMI Turbines",
      "stage": "Отказ в КП",
      "sourcer": "Daria Lysenko",
@@ -97,6 +102,7 @@
     {
      "id": "39960",
      "title": "Solar Turbines India",
+     "created": "2026-08-02",
      "supplier": "Solar Turbines India",
      "stage": "Request Sent",
      "sourcer": "Sultan Izmailov",
@@ -107,6 +113,7 @@
     {
      "id": "39964",
      "title": "One Power Services",
+     "created": "2026-08-02",
      "supplier": "One Power Services",
      "stage": "Request Sent",
      "sourcer": "Sultan Izmailov",
@@ -117,9 +124,21 @@
     {
      "id": "39968",
      "title": "Hangzhou Gas Turbine Parts Co.",
+     "created": "2026-08-02",
      "supplier": "Hangzhou HGTP Gas Turbine Parts Co.Ltd",
      "stage": "Request Sent",
      "sourcer": "Sultan Izmailov",
+     "models": [
+      "Solar (модель уточнить)"
+     ]
+    },
+    {
+     "id": "40328",
+     "title": "PASPL (india)",
+     "created": "2026-08-06",
+     "supplier": "Precision Asset Solutions Pvt. Ltd.",
+     "stage": "Request Sent",
+     "sourcer": "Ekaterina Kornilova",
      "models": [
       "Solar (модель уточнить)"
      ]
@@ -138,6 +157,7 @@
     {
      "id": "38960",
      "title": "periparts (usa)",
+     "created": "2026-07-20",
      "supplier": "PeriParts",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -148,6 +168,7 @@
     {
      "id": "38962",
      "title": "heriss (canada)",
+     "created": "2026-07-20",
      "supplier": "Heriss (Canada)",
      "stage": "Price at Work",
      "sourcer": "Ekaterina Kornilova",
@@ -158,6 +179,7 @@
     {
      "id": "39962",
      "title": "Solar Turbines India",
+     "created": "2026-08-02",
      "supplier": "Solar Turbines India",
      "stage": "Request Sent",
      "sourcer": "Sultan Izmailov",
@@ -168,6 +190,7 @@
     {
      "id": "39966",
      "title": "One Power Services",
+     "created": "2026-08-02",
      "supplier": "One Power Services",
      "stage": "Request Sent",
      "sourcer": "Sultan Izmailov",
@@ -178,6 +201,7 @@
     {
      "id": "39970",
      "title": "Hangzhou Gas Turbine Parts Co.",
+     "created": "2026-08-02",
      "supplier": "Hangzhou HGTP Gas Turbine Parts Co.Ltd",
      "stage": "Request Sent",
      "sourcer": "Sultan Izmailov",
@@ -199,6 +223,7 @@
     {
      "id": "38808",
      "title": "WTT Паша tg",
+     "created": "2026-07-16",
      "supplier": "Wuxi Weishi Turbine Technology Co., Ltd.",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -209,6 +234,7 @@
     {
      "id": "38810",
      "title": "DTEC WC",
+     "created": "2026-07-16",
      "supplier": "Dongturbo Electric Company Ltd",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -219,6 +245,7 @@
     {
      "id": "38812",
      "title": "cstc",
+     "created": "2026-07-16",
      "supplier": "CSTC China Service Technology (Shandong) Co. Ltd.",
      "stage": "Price at Work",
      "sourcer": "Ekaterina Kornilova",
@@ -229,6 +256,7 @@
     {
      "id": "39472",
      "title": "Asian Dragon International",
+     "created": "2026-07-28",
      "supplier": "Asian Dragon International",
      "stage": "Request Sent",
      "sourcer": "Sultan Izmailov",
@@ -239,6 +267,7 @@
     {
      "id": "39474",
      "title": "ReflowX FZ-LLC",
+     "created": "2026-07-28",
      "supplier": "ReflowX FZ-LLC",
      "stage": "In Correspondance",
      "sourcer": "Sultan Izmailov",
@@ -270,6 +299,7 @@
     {
      "id": "37650",
      "title": "periparts (usa)",
+     "created": "2026-07-03",
      "supplier": "PeriParts",
      "stage": "Price at Work",
      "sourcer": "Ekaterina Kornilova",
@@ -280,6 +310,7 @@
     {
      "id": "37806",
      "title": "turbine.parts ",
+     "created": "2026-07-07",
      "supplier": "turbine.parts",
      "stage": "In Correspondance",
      "sourcer": "Ekaterina Kornilova",
@@ -290,6 +321,7 @@
     {
      "id": "37820",
      "title": "ITS PARTS ROMANIA",
+     "created": "2026-07-07",
      "supplier": "Industrial Turbine Services s.r.l",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -300,6 +332,7 @@
     {
      "id": "37826",
      "title": "Gas Turbine Applications (usa)",
+     "created": "2026-07-07",
      "supplier": "Gas Turbine Applications",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -310,6 +343,7 @@
     {
      "id": "38298",
      "title": "Air Turbo Service FZE (UAE)",
+     "created": "2026-07-10",
      "supplier": "Air Turbo Service FZE",
      "stage": "Request Sent",
      "sourcer": "Ekaterina Kornilova",
@@ -320,6 +354,7 @@
     {
      "id": "38372",
      "title": "DeveEnergy (uae) через сайт 21878 / 22056",
+     "created": "2026-07-13",
      "supplier": "DeveEnergy (UAE)",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -330,6 +365,7 @@
     {
      "id": "38374",
      "title": "PSG (USA) через сайт 21878 / 22056",
+     "created": "2026-07-13",
      "supplier": "Power Services Group",
      "stage": "Request Sent",
      "sourcer": "Ekaterina Kornilova",
@@ -351,6 +387,7 @@
     {
      "id": "37648",
      "title": "periparts (usa)",
+     "created": "2026-07-03",
      "supplier": "PeriParts",
      "stage": "Price at Work",
      "sourcer": "Ekaterina Kornilova",
@@ -361,6 +398,7 @@
     {
      "id": "37810",
      "title": "Solar в IMMI",
+     "created": "2026-07-07",
      "supplier": "IMMI Turbines",
      "stage": "Price at Work",
      "sourcer": "Daria Lysenko",
@@ -371,6 +409,7 @@
     {
      "id": "37814",
      "title": "ITS PARTS ROMANIA",
+     "created": "2026-07-07",
      "supplier": "Industrial Turbine Services s.r.l",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -381,6 +420,7 @@
     {
      "id": "37824",
      "title": "Gas Turbine Applications (usa)",
+     "created": "2026-07-07",
      "supplier": "Gas Turbine Applications",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -402,6 +442,7 @@
     {
      "id": "36112",
      "title": "PROENERGY (usa)",
+     "created": "2026-06-16",
      "supplier": "PROENERGY",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -412,6 +453,7 @@
     {
      "id": "36114",
      "title": "Ground Power Parts (usa)",
+     "created": "2026-06-16",
      "supplier": "Ground Power Parts",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -422,6 +464,7 @@
     {
      "id": "36116",
      "title": "GT China",
+     "created": "2026-06-16",
      "supplier": "GT China",
      "stage": "Ответ не получен (в срок)",
      "sourcer": "Ekaterina Kornilova",
@@ -443,6 +486,7 @@
     {
      "id": "35888",
      "title": "periparts (usa)",
+     "created": "2026-06-11",
      "supplier": "PeriParts",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -453,6 +497,7 @@
     {
      "id": "35976",
      "title": "Инструмент для компрессора Solar C33",
+     "created": "2026-06-15",
      "supplier": "IMMI Turbines",
      "stage": "Отказ в КП",
      "sourcer": "Daria Lysenko",
@@ -463,6 +508,7 @@
     {
      "id": "36008",
      "title": "RMS (USA)",
+     "created": "2026-06-15",
      "supplier": "Rotating Machinery Services",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -473,6 +519,7 @@
     {
      "id": "36292",
      "title": "Southeast Overseas, Inc. (usa)",
+     "created": "2026-06-17",
      "supplier": "Southeast Overseas, Inc.",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -483,6 +530,7 @@
     {
      "id": "36300",
      "title": "Kian (Iran)",
+     "created": "2026-06-17",
      "supplier": "Kian Turbo Tec",
      "stage": "Ответ не получен (в срок)",
      "sourcer": "Ekaterina Kornilova",
@@ -493,6 +541,7 @@
     {
      "id": "37532",
      "title": "Инструмент для компрессора Solar C33",
+     "created": "2026-07-02",
      "supplier": "TURBINE.PARTS B.V.",
      "stage": "Unread Messages",
      "sourcer": "Daria Lysenko",
@@ -503,6 +552,7 @@
     {
      "id": "38276",
      "title": "Rathix (NETHERLANDS)",
+     "created": "2026-07-10",
      "supplier": "Rathix automation",
      "stage": "Request Sent",
      "sourcer": "Ekaterina Kornilova",
@@ -524,6 +574,7 @@
     {
      "id": "35236",
      "title": "ЗИП Solar в IMMI",
+     "created": "2026-06-04",
      "supplier": "IMMI Turbines",
      "stage": "Price at Work",
      "sourcer": "Daria Lysenko",
@@ -555,6 +606,7 @@
     {
      "id": "34892",
      "title": "TPS (USA)",
+     "created": "2026-06-02",
      "supplier": "Turbine Parts Specialist",
      "stage": "Ответ не получен (в срок)",
      "sourcer": "Ekaterina Kornilova",
@@ -565,6 +617,7 @@
     {
      "id": "34894",
      "title": " Makik Machinery (Turkey)",
+     "created": "2026-06-02",
      "supplier": "Makik Machinery Consultancy Foreign Trade Industry Ltd. Co.",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -575,6 +628,7 @@
     {
      "id": "34908",
      "title": "ap4 (USA)",
+     "created": "2026-06-02",
      "supplier": "AP4 group",
      "stage": "In Correspondance",
      "sourcer": "Ekaterina Kornilova",
@@ -585,6 +639,7 @@
     {
      "id": "37284",
      "title": "Xiamen Jiyang Technology Co., Ltd",
+     "created": "2026-06-30",
      "supplier": "Xiamen Ji Yang Technology Co., Ltd.",
      "stage": "Price at Work",
      "sourcer": "Ekaterina Kornilova",
@@ -606,6 +661,7 @@
     {
      "id": "34490",
      "title": "TSL (USA)",
+     "created": "2026-05-29",
      "supplier": "Turbine Services, Ltd.",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -616,6 +672,7 @@
     {
      "id": "34594",
      "title": "GTPR (UAE)",
+     "created": "2026-06-01",
      "supplier": "Global Turbine Parts Resourse LLC-FZ",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -626,6 +683,7 @@
     {
      "id": "34834",
      "title": "GTS",
+     "created": "2026-06-02",
      "supplier": "GLOBAL TURBINE SOLUTIONS PVT LTD",
      "stage": "Price at Work",
      "sourcer": "Anton Zorin",
@@ -636,6 +694,7 @@
     {
      "id": "34836",
      "title": "Roto Technik (India)",
+     "created": "2026-06-02",
      "supplier": "Roto Technik (India) Pvt. Ltd.",
      "stage": "Price at Work",
      "sourcer": "Ekaterina Kornilova",
@@ -646,6 +705,7 @@
     {
      "id": "35160",
      "title": "RGS (Italy)",
+     "created": "2026-06-04",
      "supplier": "Rotating Global Service s.r.l.",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -656,6 +716,7 @@
     {
      "id": "35478",
      "title": "WOC (UAE)",
+     "created": "2026-06-08",
      "supplier": "World Of Controls FZE",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -666,6 +727,7 @@
     {
      "id": "37402",
      "title": "Shree Khodal International tg",
+     "created": "2026-07-01",
      "supplier": "Shree Khodal International (OPC) Private Limited",
      "stage": "Price at Work",
      "sourcer": "Ekaterina Kornilova",
@@ -687,6 +749,7 @@
     {
      "id": "34044",
      "title": "Ремонт Solar Taurus 60 в ООО \"ТУРБО СЕРВИС КАЗАНЬ\"",
+     "created": "2026-05-26",
      "supplier": "ООО \"ТУРБО СЕРВИС КАЗАНЬ\"",
      "stage": "Price at Work",
      "sourcer": "Daria Lysenko",
@@ -708,6 +771,7 @@
     {
      "id": "33690",
      "title": "Camfil (UAE)",
+     "created": "2026-05-22",
      "supplier": "Camfil - UAE",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -718,6 +782,7 @@
     {
      "id": "33692",
      "title": "AIER ENVIRONMENTAL (China)",
+     "created": "2026-05-22",
      "supplier": "Zhangjiagang Aier Environmental Protection Equipment Accessories Co., Ltd.",
      "stage": "Ответ не получен (в срок)",
      "sourcer": "Ekaterina Kornilova",
@@ -728,6 +793,7 @@
     {
      "id": "33696",
      "title": "THENOW (China)",
+     "created": "2026-05-22",
      "supplier": "Shanghai Thenow Purification Technology Co., Ltd.",
      "stage": "Ответ не получен (в срок)",
      "sourcer": "Ekaterina Kornilova",
@@ -749,6 +815,7 @@
     {
      "id": "33546",
      "title": "HSGY (China) kvant gtf26",
+     "created": "2026-05-21",
      "supplier": "China Nanjing Haosheng Industrial Technology Co., Ltd.",
      "stage": "Price at Work",
      "sourcer": "Ekaterina Kornilova",
@@ -759,6 +826,7 @@
     {
      "id": "33548",
      "title": "Genersol (Spain)",
+     "created": "2026-05-21",
      "supplier": "Genersol",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -769,6 +837,7 @@
     {
      "id": "33554",
      "title": "Esporim (Italy)",
+     "created": "2026-05-21",
      "supplier": "Esporim S.R.L.",
      "stage": "Ответ не получен (в срок)",
      "sourcer": "Ekaterina Kornilova",
@@ -790,6 +859,7 @@
     {
      "id": "34088",
      "title": "Ремонт оборудования в ООО ЭР-Сервис",
+     "created": "2026-05-27",
      "supplier": "ООО \"ЭР-Сервис\"",
      "stage": "Price at Work",
      "sourcer": "Daria Lysenko",
@@ -811,6 +881,7 @@
     {
      "id": "33354",
      "title": "AoteWell (China)",
+     "created": "2026-05-20",
      "supplier": "AoteWell Automation",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -821,6 +892,7 @@
     {
      "id": "33358",
      "title": "SIPATEC (Serbia)",
+     "created": "2026-05-20",
      "supplier": "SIPATEC",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -831,6 +903,7 @@
     {
      "id": "33366",
      "title": "HGTP (China)",
+     "created": "2026-05-20",
      "supplier": "Hangzhou HGTP Gas Turbine Parts Co.Ltd",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -841,6 +914,7 @@
     {
      "id": "34274",
      "title": "HSGY (China)",
+     "created": "2026-05-28",
      "supplier": "China Nanjing Haosheng Industrial Technology Co., Ltd.",
      "stage": "Price at Work",
      "sourcer": "Ekaterina Kornilova",
@@ -851,6 +925,7 @@
     {
      "id": "34446",
      "title": "Auto2mation (India)",
+     "created": "2026-05-29",
      "supplier": "Auto2mation",
      "stage": "Не подошло по технике",
      "sourcer": "Ekaterina Kornilova",
@@ -892,6 +967,7 @@
     {
      "id": "32348",
      "title": "Solar в IMMI Turbines",
+     "created": "2026-05-07",
      "supplier": "IMMI Turbines",
      "stage": "Price at Work",
      "sourcer": "Daria Lysenko",
@@ -902,6 +978,7 @@
     {
      "id": "33544",
      "title": "Датчик температуры AMETEK в Tesla Power",
+     "created": "2026-05-21",
      "supplier": "Tesla Power",
      "stage": "Unread Messages",
      "sourcer": "Daria Lysenko",
@@ -912,6 +989,7 @@
     {
      "id": "33552",
      "title": "Датчик температуры AMETEK в CALTROLS MIDDLE EAST FZCO",
+     "created": "2026-05-21",
      "supplier": "CALTROLS Middle East FZCO",
      "stage": "Отказ в КП",
      "sourcer": "Daria Lysenko",
@@ -922,6 +1000,7 @@
     {
      "id": "33644",
      "title": "Датчик температуры AMETEK в Hatti Teknik",
+     "created": "2026-05-22",
      "supplier": "Hatti Teknik",
      "stage": "Unread Messages",
      "sourcer": "Daria Lysenko",
@@ -932,6 +1011,7 @@
     {
      "id": "34034",
      "title": "Датчик температуры AMETEK в Tricon International",
+     "created": "2026-05-26",
      "supplier": "Tricon International",
      "stage": "Отказ в КП",
      "sourcer": "Daria Lysenko",
@@ -963,6 +1043,7 @@
     {
      "id": "31812",
      "title": "Шефы, расходники и инспекция мексам",
+     "created": "2026-04-28",
      "supplier": "Turbine Field Solutions",
      "stage": "Отказ в КП",
      "sourcer": "Daria Lysenko",
@@ -973,6 +1054,7 @@
     {
      "id": "32206",
      "title": "msr sgt-400",
+     "created": "2026-05-05",
      "supplier": "MSR Industrade Pvt. Ltd.",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -983,6 +1065,7 @@
     {
      "id": "32228",
      "title": "Shenzhen Blaze Turbine Co. (China)",
+     "created": "2026-05-05",
      "supplier": "Shenzhen Blaze Turbine",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -993,6 +1076,7 @@
     {
      "id": "32230",
      "title": "DIBACo GmbH",
+     "created": "2026-05-05",
      "supplier": "Dibaco GmbH",
      "stage": "Ответ не получен (в срок)",
      "sourcer": "Ekaterina Kornilova",
@@ -1003,6 +1087,7 @@
     {
      "id": "32232",
      "title": "ANATCO (UAE)",
+     "created": "2026-05-05",
      "supplier": "AL NOOR ALAILI TRADING CO. LLC",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -1013,6 +1098,7 @@
     {
      "id": "32408",
      "title": "Расходники SGT-400 в Hecs Store",
+     "created": "2026-05-07",
      "supplier": "Hecs Store",
      "stage": "Price at Work",
      "sourcer": "Daria Lysenko",
@@ -1034,6 +1120,7 @@
     {
      "id": "31386",
      "title": "GTA (USA)",
+     "created": "2026-04-17",
      "supplier": "Gas Turbine Applications",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -1044,6 +1131,7 @@
     {
      "id": "31394",
      "title": "TAI (USA)",
+     "created": "2026-04-17",
      "supplier": "Thomassen Amcot International, LLC.",
      "stage": "Ответ не получен (в срок)",
      "sourcer": "Ekaterina Kornilova",
@@ -1054,6 +1142,7 @@
     {
      "id": "31396",
      "title": "Global Marine (India)",
+     "created": "2026-04-17",
      "supplier": "Global Marine",
      "stage": "Selected",
      "sourcer": "Ekaterina Kornilova",
@@ -1085,6 +1174,7 @@
     {
      "id": "30740",
      "title": "Датчики Solar Titan 130 в TURBINE.PARTS B.V. + HardToGet.Parts",
+     "created": "2026-04-10",
      "supplier": "TURBINE.PARTS B.V.",
      "stage": "Price at Work",
      "sourcer": "Daria Lysenko",
@@ -1106,6 +1196,7 @@
     {
      "id": "30676",
      "title": "lila@shme.top",
+     "created": "2026-04-09",
      "supplier": "Guilin Sanhua Mechanical and Electrical Control Engineering Co., Ltd",
      "stage": "Price at Work",
      "sourcer": "Sergey Shipulev",
@@ -1116,6 +1207,7 @@
     {
      "id": "30690",
      "title": "RFQ Allen-Bradley ",
+     "created": "2026-04-10",
      "supplier": "Yantai Wepower Electronic Co., LTD",
      "stage": "Ответ не получен (в срок)",
      "sourcer": "Denis Litvinovsky",
@@ -1126,6 +1218,7 @@
     {
      "id": "30706",
      "title": "Instrubiz",
+     "created": "2026-04-10",
      "supplier": "InstruBiz",
      "stage": "Price at Work",
      "sourcer": "Sergey Shipulev",
@@ -1136,6 +1229,7 @@
     {
      "id": "30896",
      "title": "Heavenlight Electronic",
+     "created": "2026-04-13",
      "supplier": "Heavenlight Electronic",
      "stage": "Ответ не получен (в срок)",
      "sourcer": "Sergey Shipulev",
@@ -1146,6 +1240,7 @@
     {
      "id": "30904",
      "title": "ADJ DiTec Málaga S.L.",
+     "created": "2026-04-13",
      "supplier": "ADJ DiTec Málaga S.L.",
      "stage": "Ответ не получен (в срок)",
      "sourcer": "Sergey Shipulev",
@@ -1156,6 +1251,7 @@
     {
      "id": "30906",
      "title": "Litrols",
+     "created": "2026-04-13",
      "supplier": "Litrols",
      "stage": "Отказ в КП",
      "sourcer": "Sergey Shipulev",
@@ -1166,6 +1262,7 @@
     {
      "id": "30912",
      "title": "Universe Middle East General Trading LLC",
+     "created": "2026-04-13",
      "supplier": "Universe Middle East General Trading LLC",
      "stage": "Ответ не получен (в срок)",
      "sourcer": "Sergey Shipulev",
@@ -1176,6 +1273,7 @@
     {
      "id": "30914",
      "title": "Atlas Al Sharq Tr Est LLC",
+     "created": "2026-04-13",
      "supplier": "Atlas Al Sharq Tr Est LLC",
      "stage": "Ответ не получен (в срок)",
      "sourcer": "Sergey Shipulev",
@@ -1186,6 +1284,7 @@
     {
      "id": "30918",
      "title": "Trace Industrial Equipment and Spare Parts Trading LLC",
+     "created": "2026-04-13",
      "supplier": "Trace Industrial Equipment and Spare Parts Trading LLC",
      "stage": "Ответ не получен (в срок)",
      "sourcer": "Sergey Shipulev",
@@ -1196,6 +1295,7 @@
     {
      "id": "30922",
      "title": "Shenzhen Viyork Technology",
+     "created": "2026-04-13",
      "supplier": "Shenzhen Viyork Technology",
      "stage": "Ответ не получен (в срок)",
      "sourcer": "Sergey Shipulev",
@@ -1206,6 +1306,7 @@
     {
      "id": "30924",
      "title": "Eusens",
+     "created": "2026-04-13",
      "supplier": "Eusence",
      "stage": "Ответ не получен (в срок)",
      "sourcer": "Sergey Shipulev",
@@ -1216,6 +1317,7 @@
     {
      "id": "30966",
      "title": "DianBingYuan Technology (Xiamen)",
+     "created": "2026-04-14",
      "supplier": "DianBingYuan Technology (Xiamen)",
      "stage": "Ответ не получен (в срок)",
      "sourcer": "Sergey Shipulev",
@@ -1226,6 +1328,7 @@
     {
      "id": "30968",
      "title": "Wuhan Xiatong Automation Equipment Co., Ltd.",
+     "created": "2026-04-14",
      "supplier": "Wuhan Xiatong Automation Equipment Co., Ltd.",
      "stage": "Ответ не получен (в срок)",
      "sourcer": "Sergey Shipulev",
@@ -1236,6 +1339,7 @@
     {
      "id": "30970",
      "title": "Can Electric LTD",
+     "created": "2026-04-14",
      "supplier": "Can Electric LTD",
      "stage": "Ответ не получен (в срок)",
      "sourcer": "Sergey Shipulev",
@@ -1246,6 +1350,7 @@
     {
      "id": "31130",
      "title": "Amikon",
+     "created": "2026-04-15",
      "supplier": "Amikon",
      "stage": "Price at Work",
      "sourcer": "Sergey Shipulev",
@@ -1256,6 +1361,7 @@
     {
      "id": "31134",
      "title": "TDK Automation Co.,Limited",
+     "created": "2026-04-15",
      "supplier": "TDK Automation Co.,Limited",
      "stage": "Price at Work",
      "sourcer": "Sergey Shipulev",
@@ -1277,6 +1383,7 @@
     {
      "id": "30274",
      "title": "Элба",
+     "created": "2026-04-02",
      "supplier": "ООО \"Элба Фильтр Мануфактуринг Рус\"",
      "stage": "Ответ не получен (в срок)",
      "sourcer": "Ekaterina Kornilova",
@@ -1287,6 +1394,7 @@
     {
      "id": "30276",
      "title": "ЕМВ ",
+     "created": "2026-04-02",
      "supplier": "ООО \"ЕМВ фильтртехник рус\"",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -1297,6 +1405,7 @@
     {
      "id": "30474",
      "title": "Mikropor (Turkey)",
+     "created": "2026-04-07",
      "supplier": "Mikropor İstanbul",
      "stage": "Ответ не получен (в срок)",
      "sourcer": "Ekaterina Kornilova",
@@ -1318,6 +1427,7 @@
     {
      "id": "30224",
      "title": "Inpirio",
+     "created": "2026-04-02",
      "supplier": "Inpirio Ltd.",
      "stage": "Ответ не получен (в срок)",
      "sourcer": "Ekaterina Kornilova",
@@ -1328,6 +1438,7 @@
     {
      "id": "30268",
      "title": "MSR (India) ЕС аналоги",
+     "created": "2026-04-02",
      "supplier": "MSR Industrade Pvt. Ltd.",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -1338,6 +1449,7 @@
     {
      "id": "31634",
      "title": "Unisys (UAE)",
+     "created": "2026-04-24",
      "supplier": "Unisys Group",
      "stage": "Ответ не получен (в срок)",
      "sourcer": "Ekaterina Kornilova",
@@ -1348,6 +1460,7 @@
     {
      "id": "31646",
      "title": "Bowzon (Chine)",
+     "created": "2026-04-24",
      "supplier": "Bowzon Turbine",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -1369,6 +1482,7 @@
     {
      "id": "29838",
      "title": "PowerTech Turbine Parts",
+     "created": "2026-03-27",
      "supplier": "PowerTech Turbine Parts",
      "stage": "In Correspondance",
      "sourcer": "Ekaterina Kornilova",
@@ -1379,6 +1493,7 @@
     {
      "id": "29840",
      "title": "GTS (Denmark)",
+     "created": "2026-03-27",
      "supplier": "Gas Turbine Services",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -1389,6 +1504,7 @@
     {
      "id": "29844",
      "title": "Retrofit (UAE)",
+     "created": "2026-03-27",
      "supplier": "Retrofit Turbine PartsTrading FZ (ОАЭ)",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -1399,6 +1515,7 @@
     {
      "id": "29860",
      "title": "MSRI (India) аналоги из ЕС",
+     "created": "2026-03-27",
      "supplier": "MSR Industrade Pvt. Ltd.",
      "stage": "Price at Work",
      "sourcer": "Ekaterina Kornilova",
@@ -1409,6 +1526,7 @@
     {
      "id": "29862",
      "title": "PTT (Czechia)",
+     "created": "2026-03-27",
      "supplier": "Power Parts Technology s.r.o.",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -1430,6 +1548,7 @@
     {
      "id": "29650",
      "title": "Metso CTENO",
+     "created": "2026-03-24",
      "supplier": "Wuxi CTENO Actuators Manufacture Co. Ltd",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -1440,6 +1559,7 @@
     {
      "id": "29734",
      "title": "Edward WeChat",
+     "created": "2026-03-25",
      "supplier": "Xiangjing (Shanghai) M&E Technology Co., Ltd",
      "stage": "Ответ не получен (в срок)",
      "sourcer": "Ekaterina Kornilova",
@@ -1450,6 +1570,7 @@
     {
      "id": "30234",
      "title": "Sally WeChat",
+     "created": "2026-04-02",
      "supplier": "Hubei Jomay Automation Co.,Ltd",
      "stage": "Ответ не получен (в срок)",
      "sourcer": "Ekaterina Kornilova",
@@ -1471,6 +1592,7 @@
     {
      "id": "29616",
      "title": "QNP Китай",
+     "created": "2026-03-24",
      "supplier": "Паровые турбины и сервис циннен",
      "stage": "Не подошло по технике",
      "sourcer": "Ekaterina Kornilova",
@@ -1492,6 +1614,7 @@
     {
      "id": "29412",
      "title": "Metso зип",
+     "created": "2026-03-20",
      "supplier": "Wuxi CTENO Actuators Manufacture Co. Ltd",
      "stage": "Selected",
      "sourcer": "Ekaterina Kornilova",
@@ -1513,6 +1636,7 @@
     {
      "id": "29344",
      "title": "ЗИП Taurus 60 SINO-QNP GROUP",
+     "created": "2026-03-19",
      "supplier": "Паровые турбины и сервис циннен",
      "stage": "Ответ не получен (в срок)",
      "sourcer": "Ekaterina Kornilova",
@@ -1523,6 +1647,7 @@
     {
      "id": "31086",
      "title": "Global Marine (India)",
+     "created": "2026-04-15",
      "supplier": "Global Marine",
      "stage": "Price at Work",
      "sourcer": "Ekaterina Kornilova",
@@ -1544,6 +1669,7 @@
     {
      "id": "29128",
      "title": "Ансальдо x3 ТЕМА",
+     "created": "2026-03-17",
      "supplier": "TEMA Energy",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -1554,6 +1680,7 @@
     {
      "id": "29130",
      "title": "Лопатки Ansaldo Retrofit",
+     "created": "2026-03-17",
      "supplier": "Retrofit Turbine PartsTrading FZ (ОАЭ)",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -1564,6 +1691,7 @@
     {
      "id": "29142",
      "title": "Лопатки Ansaldo (GTPS)",
+     "created": "2026-03-17",
      "supplier": "GT Power Solutions LLC",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -1574,6 +1702,7 @@
     {
      "id": "29146",
      "title": "Лопатки Ansaldo (Genloop)",
+     "created": "2026-03-17",
      "supplier": "Genloop LLC",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -1584,6 +1713,7 @@
     {
      "id": "29150",
      "title": "Лопатки wahtec",
+     "created": "2026-03-17",
      "supplier": "WAHTEC",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -1594,6 +1724,7 @@
     {
      "id": "29158",
      "title": "Лопатки Ansaldo (Kraftwerke)",
+     "created": "2026-03-17",
      "supplier": "Kraftwerke Asia Inc.",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -1604,6 +1735,7 @@
     {
      "id": "29160",
      "title": "Лопатки Ansaldo (HGTP)",
+     "created": "2026-03-17",
      "supplier": "Hangzhou HGTP Gas Turbine Parts Co.Ltd",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -1614,6 +1746,7 @@
     {
      "id": "30220",
      "title": "Inpirio full",
+     "created": "2026-04-02",
      "supplier": "Inpirio Ltd.",
      "stage": "Ответ не получен (в срок)",
      "sourcer": "Ekaterina Kornilova",
@@ -1635,6 +1768,7 @@
     {
      "id": "29364",
      "title": " TURBINE.PARTS B.V.",
+     "created": "2026-03-19",
      "supplier": "TURBINE.PARTS B.V.",
      "stage": "Price at Work",
      "sourcer": "Ekaterina Kornilova",
@@ -1645,6 +1779,7 @@
     {
      "id": "30742",
      "title": "Kian TurboTec (UAE)",
+     "created": "2026-04-10",
      "supplier": "Kian Turbo Tec",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -1655,6 +1790,7 @@
     {
      "id": "30744",
      "title": "Запрос  Allan-Bradly солар",
+     "created": "2026-04-10",
      "supplier": "Yangzhou Tongte Technology Co. Ltd.",
      "stage": "Price at Work",
      "sourcer": "Mikhail Golubev",
@@ -1665,6 +1801,7 @@
     {
      "id": "30746",
      "title": "Southeast Overseas, Inc.",
+     "created": "2026-04-10",
      "supplier": "Southeast Overseas, Inc.",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -1675,6 +1812,7 @@
     {
      "id": "30752",
      "title": "PARYPARTS (USA)",
+     "created": "2026-04-10",
      "supplier": "PeriParts",
      "stage": "Price at Work",
      "sourcer": "Ekaterina Kornilova",
@@ -1685,6 +1823,7 @@
     {
      "id": "30754",
      "title": "ZIEHL-ABEGG (Китай дистриб)",
+     "created": "2026-04-10",
      "supplier": "Shanghai Aize Industiale Equipment Co. Ltd.",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -1695,6 +1834,7 @@
     {
      "id": "30876",
      "title": "SKI (India)",
+     "created": "2026-04-13",
      "supplier": "Shree Khodal International (OPC) Private Limited",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -1726,6 +1866,7 @@
     {
      "id": "29028",
      "title": "Metso зип",
+     "created": "2026-03-13",
      "supplier": "Wuxi CTENO Actuators Manufacture Co. Ltd",
      "stage": "Selected",
      "sourcer": "Ekaterina Kornilova",
@@ -1747,6 +1888,7 @@
     {
      "id": "29406",
      "title": "gts spa",
+     "created": "2026-03-20",
      "supplier": "GTS S.p.A.",
      "stage": "Selected",
      "sourcer": "Ekaterina Kornilova",
@@ -1768,6 +1910,7 @@
     {
      "id": "28812",
      "title": "ЗИП Solar Titan 130 в TURBINE.PARTS B.V.",
+     "created": "2026-03-10",
      "supplier": "TURBINE.PARTS B.V.",
      "stage": "Price at Work",
      "sourcer": "Daria Lysenko",
@@ -1789,6 +1932,7 @@
     {
      "id": "28692",
      "title": "WINKELMANN в Camis Electronics Limited",
+     "created": "2026-03-04",
      "supplier": "Camis Electronics Limited",
      "stage": "Price at Work",
      "sourcer": "Daria Lysenko",
@@ -1799,6 +1943,7 @@
     {
      "id": "28698",
      "title": "Albany Pumps в Fluid Science Dynamics Trading LLC",
+     "created": "2026-03-04",
      "supplier": "Fluid Science Dynamics Trading LLC",
      "stage": "Price at Work",
      "sourcer": "Daria Lysenko",
@@ -1809,6 +1954,7 @@
     {
      "id": "28808",
      "title": "WINKELMANN в Fluid Science Dynamics Trading LLC",
+     "created": "2026-03-10",
      "supplier": "Fluid Science Dynamics Trading LLC",
      "stage": "Отказ в КП",
      "sourcer": "Daria Lysenko",
@@ -1840,6 +1986,7 @@
     {
      "id": "28530",
      "title": "Ansaldo",
+     "created": "2026-02-27",
      "supplier": "GTS S.p.A.",
      "stage": "Selected",
      "sourcer": "Ekaterina Kornilova",
@@ -1861,6 +2008,7 @@
     {
      "id": "28630",
      "title": "RFQ Evanlee Lambor",
+     "created": "2026-03-02",
      "supplier": "—",
      "stage": "Отказ в КП",
      "sourcer": "Berdy Karaev",
@@ -1871,6 +2019,7 @@
     {
      "id": "28632",
      "title": "RFQ Edward XJ ",
+     "created": "2026-03-02",
      "supplier": "Xiangjing (Shanghai) M&E Technology Co., Ltd",
      "stage": "Отказ в КП",
      "sourcer": "Berdy Karaev",
@@ -1892,6 +2041,7 @@
     {
      "id": "28464",
      "title": "One Power Services (Singapore)",
+     "created": "2026-02-26",
      "supplier": "One Power Services",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -1902,6 +2052,7 @@
     {
      "id": "28474",
      "title": "ITS LLC (UAE)",
+     "created": "2026-02-26",
      "supplier": "ITS LLC",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -1912,6 +2063,7 @@
     {
      "id": "28540",
      "title": "Heriss Corporation Solar Turbines",
+     "created": "2026-02-27",
      "supplier": "Heriss (Canada)",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -1933,6 +2085,7 @@
     {
      "id": "27740",
      "title": "SGT-200-1S в ТФС",
+     "created": "2026-02-12",
      "supplier": "Turbine Field Solutions",
      "stage": "Отказ в КП",
      "sourcer": "Daria Lysenko",
@@ -1943,6 +2096,7 @@
     {
      "id": "28000",
      "title": "SGT-200-1S Кену (WRIKU)",
+     "created": "2026-02-17",
      "supplier": "WRIKU INTERNATIONAL BUSINESS CO LTD",
      "stage": "In Correspondance",
      "sourcer": "Daria Lysenko",
@@ -1953,6 +2107,7 @@
     {
      "id": "28656",
      "title": "ГТД SGT-200-1S DT",
+     "created": "2026-03-03",
      "supplier": "Dongturbo Electric Company Ltd",
      "stage": "Не подошло по технике",
      "sourcer": "Ekaterina Kornilova",
@@ -1963,6 +2118,7 @@
     {
      "id": "35196",
      "title": "CSTC (china)",
+     "created": "2026-06-04",
      "supplier": "CSTC China Service Technology (Shandong) Co. Ltd.",
      "stage": "Price at Work",
      "sourcer": "Ekaterina Kornilova",
@@ -1973,6 +2129,7 @@
     {
      "id": "37410",
      "title": "WTT tg",
+     "created": "2026-07-01",
      "supplier": "Wuxi Weishi Turbine Technology Co., Ltd.",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -1994,6 +2151,7 @@
     {
      "id": "27554",
      "title": "ЗИП NP",
+     "created": "2026-02-09",
      "supplier": "GLOBAL TURBINE SOLUTIONS PVT LTD",
      "stage": "Request Sent",
      "sourcer": "Anton Zorin",
@@ -2015,6 +2173,7 @@
     {
      "id": "27542",
      "title": "Кап ремонт Rolls Royce в TFS",
+     "created": "2026-02-09",
      "supplier": "Turbine Field Solutions",
      "stage": "Unread Messages",
      "sourcer": "Daria Lysenko",
@@ -2036,6 +2195,7 @@
     {
      "id": "27424",
      "title": "Клапаны Solar в TURBINE.PARTS B.V.",
+     "created": "2026-02-06",
      "supplier": "TURBINE.PARTS B.V.",
      "stage": "Unread Messages",
      "sourcer": "Daria Lysenko",
@@ -2057,6 +2217,7 @@
     {
      "id": "27206",
      "title": "RFQ IMMI turbines",
+     "created": "2026-02-02",
      "supplier": "IMMI Turbines",
      "stage": "Price at Work",
      "sourcer": "Berdy Karaev",
@@ -2078,6 +2239,7 @@
     {
      "id": "26656",
      "title": "Лопатки Solar Taurus 70 в POWERGEN SOLUTIONS FZE LLC",
+     "created": "2026-01-22",
      "supplier": "POWERGEN SOLUTIONS FZE LLC",
      "stage": "In Correspondance",
      "sourcer": "Daria Lysenko",
@@ -2088,6 +2250,7 @@
     {
      "id": "38848",
      "title": "Паша tg",
+     "created": "2026-07-17",
      "supplier": "Wuxi Weishi Turbine Technology Co., Ltd.",
      "stage": "Price at Work",
      "sourcer": "Ekaterina Kornilova",
@@ -2109,6 +2272,7 @@
     {
      "id": "26152",
      "title": "RFQ FR 5&6",
+     "created": "2026-01-13",
      "supplier": "Thermo Engineering S.r.l.",
      "stage": "Request Sent",
      "sourcer": "Anton Zorin",
@@ -2119,6 +2283,7 @@
     {
      "id": "26224",
      "title": "RFQ Thermocouple type K",
+     "created": "2026-01-15",
      "supplier": "CORREGE - COTEMP SENSING Company",
      "stage": "In Correspondance",
      "sourcer": "Maria Sukhovarova",
@@ -2129,6 +2294,7 @@
     {
      "id": "26226",
      "title": "RFQ Thermocouple type K",
+     "created": "2026-01-15",
      "supplier": "RTP power",
      "stage": "Price at Work",
      "sourcer": "Maria Sukhovarova",
@@ -2139,6 +2305,7 @@
     {
      "id": "26228",
      "title": "RFQ Thermocouple type K",
+     "created": "2026-01-15",
      "supplier": "Unisys Group",
      "stage": "Ответ не получен (в срок)",
      "sourcer": "Maria Sukhovarova",
@@ -2149,6 +2316,7 @@
     {
      "id": "26260",
      "title": "RFQ Thermocouple type K",
+     "created": "2026-01-15",
      "supplier": "Thermo Est",
      "stage": "Ответ не получен (в срок)",
      "sourcer": "Maria Sukhovarova",
@@ -2159,6 +2327,7 @@
     {
      "id": "26438",
      "title": "RFQ Thermostatic sensors",
+     "created": "2026-01-20",
      "supplier": "GTSMRO",
      "stage": "Price at Work",
      "sourcer": "Maria Sukhovarova",
@@ -2169,6 +2338,7 @@
     {
      "id": "26440",
      "title": "RFQ Temperature sensor (duplex)",
+     "created": "2026-01-20",
      "supplier": "H&B Sensors Ltd",
      "stage": "In Correspondance",
      "sourcer": "Maria Sukhovarova",
@@ -2179,6 +2349,7 @@
     {
      "id": "26442",
      "title": "RFQ Jumo Temperature sensor",
+     "created": "2026-01-20",
      "supplier": "JUMO Automation GmbH",
      "stage": "Ответ не получен (в срок)",
      "sourcer": "Maria Sukhovarova",
@@ -2189,6 +2360,7 @@
     {
      "id": "26444",
      "title": "RFQ Dew point sensor",
+     "created": "2026-01-20",
      "supplier": "Vaisala",
      "stage": "Ответ не получен (в срок)",
      "sourcer": "Maria Sukhovarova",
@@ -2210,6 +2382,7 @@
     {
      "id": "25792",
      "title": "Бороскопия ГТУ в TFS",
+     "created": "2025-12-23",
      "supplier": "Turbine Field Solutions (TFS)",
      "stage": "Selected",
      "sourcer": "Daria Lysenko",
@@ -2231,6 +2404,7 @@
     {
      "id": "25810",
      "title": "RFQ PEG",
+     "created": "2025-12-23",
      "supplier": "Progetti Europa & Global S.p.A. (PEG)",
      "stage": "Request Sent",
      "sourcer": "Berdy Karaev",
@@ -2241,6 +2415,7 @@
     {
      "id": "26786",
      "title": "RFQ Ansaldo в GTS S.p.A.",
+     "created": "2026-01-26",
      "supplier": "GTS S.p.A.",
      "stage": "Отказ в КП",
      "sourcer": "Daria Lysenko",
@@ -2262,6 +2437,7 @@
     {
      "id": "25422",
      "title": "Фильтры Siemens в EU Automation (UAE)",
+     "created": "2025-12-15",
      "supplier": "EU Automation (UAE)",
      "stage": "Ответ не получен (в срок)",
      "sourcer": "Daria Lysenko",
@@ -2272,6 +2448,7 @@
     {
      "id": "25676",
      "title": "Фильтр в AWS Corporation",
+     "created": "2025-12-21",
      "supplier": "AWS Corporation",
      "stage": "Ответ не получен (в срок)",
      "sourcer": "Daria Lysenko",
@@ -2282,6 +2459,7 @@
     {
      "id": "25678",
      "title": "Фильтры в EMW filtertechnik GmbH",
+     "created": "2025-12-21",
      "supplier": "EMW filtertechnik GmbH",
      "stage": "Ответ не получен (в срок)",
      "sourcer": "Daria Lysenko",
@@ -2303,6 +2481,7 @@
     {
      "id": "25636",
      "title": "ЗИП к SGT-1000F в Mapa Turbines",
+     "created": "2025-12-18",
      "supplier": "Mapa Turbines",
      "stage": "Ответ не получен (в срок)",
      "sourcer": "Daria Lysenko",
@@ -2313,6 +2492,7 @@
     {
      "id": "25648",
      "title": "ЗИП к SGT-1000F в SEALMECH TRADING L.L.C",
+     "created": "2025-12-18",
      "supplier": "SEALMECH TRADING L.L.C",
      "stage": "Ответ не получен (в срок)",
      "sourcer": "Daria Lysenko",
@@ -2334,6 +2514,7 @@
     {
      "id": "24762",
      "title": "MS5001PA High Tech Nozzle Stage 1st",
+     "created": "2025-12-02",
      "supplier": "Powergen  Solutions  FZE LLC",
      "stage": "Selected",
      "sourcer": "Sergey Galushko",
@@ -2344,6 +2525,7 @@
     {
      "id": "26030",
      "title": "Направляющие аппараты для MS5001PA в POWERGEN SOLUTIONS FZE LLC",
+     "created": "2026-01-08",
      "supplier": "POWERGEN SOLUTIONS FZE LLC",
      "stage": "Selected",
      "sourcer": "Daria Lysenko",
@@ -2354,6 +2536,7 @@
     {
      "id": "32170",
      "title": "Монтажный комплект в POWERGEN SOLUTIONS",
+     "created": "2026-05-04",
      "supplier": "POWERGEN SOLUTIONS FZE LLC",
      "stage": "Selected",
      "sourcer": "Daria Lysenko",
@@ -2375,6 +2558,7 @@
     {
      "id": "24438",
      "title": "ЗИП Solar Taurus 60S в TURBINE.PARTS B.V.",
+     "created": "2025-11-26",
      "supplier": "TURBINE.PARTS B.V.",
      "stage": "Unread Messages",
      "sourcer": "Daria Lysenko",
@@ -2385,6 +2569,7 @@
     {
      "id": "28340",
      "title": "ЗИП Solar Taurus 60S в PETRANV",
+     "created": "2026-02-25",
      "supplier": "Petran V Energy for Value",
      "stage": "Unread Messages",
      "sourcer": "Daria Lysenko",
@@ -2395,6 +2580,7 @@
     {
      "id": "29710",
      "title": "ЗИП Taurus 60S в ANTONI International, Inc.",
+     "created": "2026-03-25",
      "supplier": "Antoni International, Inc.",
      "stage": "In Correspondance",
      "sourcer": "Daria Lysenko",
@@ -2416,6 +2602,7 @@
     {
      "id": "24654",
      "title": "ЗИП Solar Taurus 70 MD в IMMI Turbines",
+     "created": "2025-12-01",
      "supplier": "IMMI Turbines",
      "stage": "Price at Work",
      "sourcer": "Daria Lysenko",
@@ -2426,6 +2613,7 @@
     {
      "id": "26366",
      "title": "Taurus 70 MD в Turboaleaciones",
+     "created": "2026-01-18",
      "supplier": "Turboaleaciones",
      "stage": "Unread Messages",
      "sourcer": "Daria Lysenko",
@@ -2436,6 +2624,7 @@
     {
      "id": "28350",
      "title": "ЗИП Solar Taurus 70MD в PETRANV",
+     "created": "2026-02-25",
      "supplier": "Petran V Energy for Value",
      "stage": "Unread Messages",
      "sourcer": "Daria Lysenko",
@@ -2457,6 +2646,7 @@
     {
      "id": "24662",
      "title": "Solar Taurus 70 мексам TFS",
+     "created": "2025-12-01",
      "supplier": "Turbine Field Solutions",
      "stage": "Unread Messages",
      "sourcer": "Daria Lysenko",
@@ -2467,6 +2657,7 @@
     {
      "id": "28354",
      "title": "ЗИП Solar Taurus 70 в PETRANV",
+     "created": "2026-02-25",
      "supplier": "Petran V Energy for Value",
      "stage": "Unread Messages",
      "sourcer": "Daria Lysenko",
@@ -2488,6 +2679,7 @@
     {
      "id": "25064",
      "title": "З/ч Solar Taurus 60 в IMMI",
+     "created": "2025-12-05",
      "supplier": "IMMI Turbines",
      "stage": "Ответ не получен (в срок)",
      "sourcer": "Daria Lysenko",
@@ -2498,6 +2690,7 @@
     {
      "id": "25068",
      "title": "З/ч Solar Taurus 60 в TURBINE.PARTS B.V.",
+     "created": "2025-12-05",
      "supplier": "TURBINE.PARTS B.V.",
      "stage": "Unread Messages",
      "sourcer": "Daria Lysenko",
@@ -2529,6 +2722,7 @@
     {
      "id": "23958",
      "title": "Battery Enersys в Enersys U.A.E.",
+     "created": "2025-11-18",
      "supplier": "—",
      "stage": "In Correspondance",
      "sourcer": "Daria Lysenko",
@@ -2539,6 +2733,7 @@
     {
      "id": "23966",
      "title": "Battery Enersys в Orogenic ApS",
+     "created": "2025-11-18",
      "supplier": "Orogenic ApS",
      "stage": "In Correspondance",
      "sourcer": "Daria Lysenko",
@@ -2549,6 +2744,7 @@
     {
      "id": "23968",
      "title": "Battery Enersys в UK Battery Sales Ltd",
+     "created": "2025-11-18",
      "supplier": "UK Battery Sales Ltd",
      "stage": "Price at Work",
      "sourcer": "Daria Lysenko",
@@ -2559,6 +2755,7 @@
     {
      "id": "23998",
      "title": "Pepple+Fuchs в NRwell",
+     "created": "2025-11-18",
      "supplier": "NRwell",
      "stage": "Unread Messages",
      "sourcer": "Daria Lysenko",
@@ -2569,6 +2766,7 @@
     {
      "id": "23999",
      "title": "Pepple+Fuchs в Foxmere",
+     "created": "2025-11-18",
      "supplier": "Foxmere Technologies Ltd",
      "stage": "In Correspondance",
      "sourcer": "Daria Lysenko",
@@ -2579,6 +2777,7 @@
     {
      "id": "24010",
      "title": "Pepple+Fuchs в Kempston Controls LLC",
+     "created": "2025-11-18",
      "supplier": "Kempston Controls LLC",
      "stage": "In Correspondance",
      "sourcer": "Daria Lysenko",
@@ -2589,6 +2788,7 @@
     {
      "id": "24012",
      "title": "Pepple+Fuchs в Gahangan",
+     "created": "2025-11-18",
      "supplier": "Gahangan",
      "stage": "Unread Messages",
      "sourcer": "Daria Lysenko",
@@ -2599,6 +2799,7 @@
     {
      "id": "24014",
      "title": "Pepple+Fuchs в TCB Avgidis Automation SA",
+     "created": "2025-11-19",
      "supplier": "TCB Avgidis Automation SA",
      "stage": "Unread Messages",
      "sourcer": "Daria Lysenko",
@@ -2609,6 +2810,7 @@
     {
      "id": "24212",
      "title": "Pepple+Fuchs в PLSWISS SA",
+     "created": "2025-11-21",
      "supplier": "PLSWISS SA",
      "stage": "Отказ в КП",
      "sourcer": "Daria Lysenko",
@@ -2630,6 +2832,7 @@
     {
      "id": "23734",
      "title": "Quanzhou Delphi Machinery Co., Ltd",
+     "created": "2025-11-13",
      "supplier": "—",
      "stage": "New Request",
      "sourcer": "Sergey Galushko",
@@ -2651,6 +2854,7 @@
     {
      "id": "23556",
      "title": "Solar Titan 130 в IMMI Turbines",
+     "created": "2025-11-10",
      "supplier": "IMMI Turbines",
      "stage": "Unread Messages",
      "sourcer": "Daria Lysenko",
@@ -2661,6 +2865,7 @@
     {
      "id": "23574",
      "title": "Titan 130 в TURBINE.PARTS B.V.",
+     "created": "2025-11-10",
      "supplier": "TURBINE.PARTS B.V.",
      "stage": "Unread Messages",
      "sourcer": "Daria Lysenko",
@@ -2671,6 +2876,7 @@
     {
      "id": "23590",
      "title": "Titan 130 в ANTONI INTERNATIONAL, INC.",
+     "created": "2025-11-11",
      "supplier": "Antoni International, Inc.",
      "stage": "In Correspondance",
      "sourcer": "Daria Lysenko",
@@ -2681,6 +2887,7 @@
     {
      "id": "24720",
      "title": "Titan 130 в Audax Global Energy",
+     "created": "2025-12-02",
      "supplier": "Audax Global Energy",
      "stage": "Unread Messages",
      "sourcer": "Daria Lysenko",
@@ -2702,6 +2909,7 @@
     {
      "id": "23606",
      "title": "RFQ Wirturbo",
+     "created": "2025-11-11",
      "supplier": "Wirturbo",
      "stage": "Request Sent",
      "sourcer": "Berdy Karaev",
@@ -2712,6 +2920,7 @@
     {
      "id": "23618",
      "title": "Requests #23618",
+     "created": "2025-11-11",
      "supplier": "ProBusiness SRL",
      "stage": "Отказ в КП",
      "sourcer": "Berdy Karaev",
@@ -2722,6 +2931,7 @@
     {
      "id": "23624",
      "title": "RFQ",
+     "created": "2025-11-11",
      "supplier": "PIPING ROCK ENERGY CORP.",
      "stage": "Отказ в КП",
      "sourcer": "Berdy Karaev",
@@ -2732,6 +2942,7 @@
     {
      "id": "23714",
      "title": "RFQ Modus",
+     "created": "2025-11-13",
      "supplier": "Modus machineering",
      "stage": "Request Sent",
      "sourcer": "Berdy Karaev",
@@ -2742,6 +2953,7 @@
     {
      "id": "23718",
      "title": "MSRI trade",
+     "created": "2025-11-13",
      "supplier": "MSR Industrade Pvt. Ltd.",
      "stage": "Request Sent",
      "sourcer": "Berdy Karaev",
@@ -2752,6 +2964,7 @@
     {
      "id": "23984",
      "title": "RFQ EPS",
+     "created": "2025-11-18",
      "supplier": "EPS (european power systems)",
      "stage": "Ответ не получен (в срок)",
      "sourcer": "Berdy Karaev",
@@ -2762,6 +2975,7 @@
     {
      "id": "24390",
      "title": "RFQ EU Enerji",
+     "created": "2025-11-26",
      "supplier": "Euro-enerji",
      "stage": "Request Sent",
      "sourcer": "Berdy Karaev",
@@ -2772,6 +2986,7 @@
     {
      "id": "24570",
      "title": "RFQ Green Italy",
+     "created": "2025-11-28",
      "supplier": "Green Italy S.r.l.",
      "stage": "Request Sent",
      "sourcer": "Berdy Karaev",
@@ -2793,6 +3008,7 @@
     {
      "id": "24578",
      "title": "RFQ Green Italy",
+     "created": "2025-11-28",
      "supplier": "Green Italy S.r.l.",
      "stage": "Request Sent",
      "sourcer": "Berdy Karaev",
@@ -2814,6 +3030,7 @@
     {
      "id": "23470",
      "title": "STAGE-1 and 2 NOZZLE ASSY 5001PA",
+     "created": "2025-11-10",
      "supplier": "Global Turbine Solutions LLC.",
      "stage": "Selected",
      "sourcer": "Sergey Galushko",
@@ -2824,6 +3041,7 @@
     {
      "id": "24216",
      "title": "MS5001 High Tech Nozzle Stage 1st",
+     "created": "2025-11-21",
      "supplier": "Powergen  Solutions  FZE LLC",
      "stage": "Selected",
      "sourcer": "Sergey Galushko",
@@ -2834,6 +3052,7 @@
     {
      "id": "26070",
      "title": "Часть крепежа",
+     "created": "2026-01-12",
      "supplier": "POWERGEN SOLUTIONS FZE LLC",
      "stage": "Selected",
      "sourcer": "Sergey Galushko",
@@ -2855,6 +3074,7 @@
     {
      "id": "25774",
      "title": "ЗИП SGT-400 в Wirturbo",
+     "created": "2025-12-23",
      "supplier": "Wirturbo",
      "stage": "Ответ не получен (в срок)",
      "sourcer": "Daria Lysenko",
@@ -2896,6 +3116,7 @@
     {
      "id": "22200",
      "title": "RFQ VG",
+     "created": "2025-10-14",
      "supplier": "VG Engineering",
      "stage": "Отказ в КП",
      "sourcer": "Berdy Karaev",
@@ -2906,6 +3127,7 @@
     {
      "id": "22354",
      "title": "RFQ Sealmech",
+     "created": "2025-10-17",
      "supplier": "SEALMECH TRADING L.L.C",
      "stage": "Ответ не получен (в срок)",
      "sourcer": "Berdy Karaev",
@@ -2916,6 +3138,7 @@
     {
      "id": "22364",
      "title": "RFQ Wirturbo",
+     "created": "2025-10-17",
      "supplier": "Wirturbo",
      "stage": "Отказ в КП",
      "sourcer": "Berdy Karaev",
@@ -2937,6 +3160,7 @@
     {
      "id": "22098",
      "title": "RFQ IMMI",
+     "created": "2025-10-10",
      "supplier": "IMMI Turbines",
      "stage": "Price at Work",
      "sourcer": "Berdy Karaev",
@@ -2947,6 +3171,7 @@
     {
      "id": "22102",
      "title": "RFQ VG",
+     "created": "2025-10-10",
      "supplier": "VG Engineering",
      "stage": "Request Sent",
      "sourcer": "Berdy Karaev",
@@ -2968,6 +3193,7 @@
     {
      "id": "21912",
      "title": "RFQ Shanh El",
+     "created": "2025-10-07",
      "supplier": "Shanghai Electric Machinery Co.Ltd. (Shanghai Electric Group )",
      "stage": "Отказ в КП",
      "sourcer": "Berdy Karaev",
@@ -2978,6 +3204,7 @@
     {
      "id": "21951",
      "title": "RFQ JCM ",
+     "created": "2025-10-08",
      "supplier": "NEW JCM GROUP CO., LTD",
      "stage": "Request Sent",
      "sourcer": "Berdy Karaev",
@@ -2988,6 +3215,7 @@
     {
      "id": "21953",
      "title": "RFQ AP4",
+     "created": "2025-10-08",
      "supplier": "AP4 group",
      "stage": "Отказ в КП",
      "sourcer": "Berdy Karaev",
@@ -3009,6 +3237,7 @@
     {
      "id": "21862",
      "title": "Solar в IMMI Turbines",
+     "created": "2025-10-07",
      "supplier": "IMMI Turbines",
      "stage": "Request Sent",
      "sourcer": "Daria Lysenko",
@@ -3030,6 +3259,7 @@
     {
      "id": "21578",
      "title": "ЗИП к SGT-200 в ТФС мексам",
+     "created": "2025-09-30",
      "supplier": "Turbine Field Solutions",
      "stage": "Request Sent",
      "sourcer": "Daria Lysenko",
@@ -3051,6 +3281,7 @@
     {
      "id": "21568",
      "title": "ЗИП для SGT-400 в ТФС мексам",
+     "created": "2025-09-30",
      "supplier": "Turbine Field Solutions",
      "stage": "Request Sent",
      "sourcer": "Daria Lysenko",
@@ -3072,6 +3303,7 @@
     {
      "id": "21610",
      "title": "Поставка ГТУ Solar Mars в TFS мексам",
+     "created": "2025-09-30",
      "supplier": "Turbine Field Solutions",
      "stage": "Request Sent",
      "sourcer": "Daria Lysenko",
@@ -3082,6 +3314,7 @@
     {
      "id": "24722",
      "title": "Поставка Solar Mars 100 - Fin Marine & Energy Solutions International FZCO",
+     "created": "2025-12-02",
      "supplier": "FMLS FIN MARINE & ENERGY SOLUTIONS LTD.",
      "stage": "In Correspondance",
      "sourcer": "Daria Lysenko",
@@ -3092,6 +3325,7 @@
     {
      "id": "37408",
      "title": "WTT tg",
+     "created": "2026-07-01",
      "supplier": "Wuxi Weishi Turbine Technology Co., Ltd.",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -3123,6 +3357,7 @@
     {
      "id": "21016",
      "title": "RFQ TIRTH ",
+     "created": "2025-09-16",
      "supplier": "TIRTH SALES AND POWER SOLUTIONS",
      "stage": "Request Sent",
      "sourcer": "Berdy Karaev",
@@ -3133,6 +3368,7 @@
     {
      "id": "21028",
      "title": "RFQ Greentech",
+     "created": "2025-09-16",
      "supplier": "GreenTech",
      "stage": "Price at Work",
      "sourcer": "Berdy Karaev",
@@ -3174,6 +3410,7 @@
     {
      "id": "20426",
      "title": "Spare parts for gas turbine",
+     "created": "2025-09-02",
      "supplier": "—",
      "stage": "New Request",
      "sourcer": "Yana Pavlovskaya",
@@ -3195,6 +3432,7 @@
     {
      "id": "24392",
      "title": "Overhaul Solar Mars 100 в TFS",
+     "created": "2025-11-26",
      "supplier": "Turbine Field Solutions",
      "stage": "In Correspondance",
      "sourcer": "Daria Lysenko",
@@ -3205,6 +3443,7 @@
     {
      "id": "30472",
      "title": "Antoni International Inc. (USA)",
+     "created": "2026-04-07",
      "supplier": "Antoni International, Inc.",
      "stage": "Price at Work",
      "sourcer": "Ekaterina Kornilova",
@@ -3215,6 +3454,7 @@
     {
      "id": "30704",
      "title": "ЗИП Solar Mars в TURBINE.PARTS B.V. + HardToGet.Parts",
+     "created": "2026-04-10",
      "supplier": "TURBINE.PARTS B.V.",
      "stage": "Unread Messages",
      "sourcer": "Daria Lysenko",
@@ -3225,6 +3465,7 @@
     {
      "id": "30718",
      "title": "ЗИП Solar Mars в Rotrenza Marine",
+     "created": "2026-04-10",
      "supplier": "Rotrenza Marine",
      "stage": "Unread Messages",
      "sourcer": "Daria Lysenko",
@@ -3235,6 +3476,7 @@
     {
      "id": "31048",
      "title": "зип perirarts",
+     "created": "2026-04-15",
      "supplier": "PeriParts",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -3245,6 +3487,7 @@
     {
      "id": "31382",
      "title": "FIN MARINE (UAE)",
+     "created": "2026-04-17",
      "supplier": "FMLS FIN MARINE & ENERGY SOLUTIONS LTD.",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -3255,6 +3498,7 @@
     {
      "id": "31488",
      "title": "ЗИП в Tianjin Bowzon Machinery Electrical Equipment Technology Co., Ltd",
+     "created": "2026-04-22",
      "supplier": "Tianjin Bowzon Machinery Electrical Equipment Technology Co., Ltd",
      "stage": "In Correspondance",
      "sourcer": "Daria Lysenko",
@@ -3265,6 +3509,7 @@
     {
      "id": "31620",
      "title": "Phoenix (USA)",
+     "created": "2026-04-24",
      "supplier": "Phoenix equipment corp.",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -3275,6 +3520,7 @@
     {
      "id": "31642",
      "title": "Bowzon (China) WeChat",
+     "created": "2026-04-24",
      "supplier": "Bowzon Turbine",
      "stage": "Price at Work",
      "sourcer": "Ekaterina Kornilova",
@@ -3285,6 +3531,7 @@
     {
      "id": "31644",
      "title": "ЗИП Mars 100 в MESTEK India",
+     "created": "2026-04-24",
      "supplier": "Mestek India",
      "stage": "Unread Messages",
      "sourcer": "Daria Lysenko",
@@ -3295,6 +3542,7 @@
     {
      "id": "31826",
      "title": "Prashant (друг Ильи из GE)",
+     "created": "2026-04-28",
      "supplier": "—",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -3305,6 +3553,7 @@
     {
      "id": "37406",
      "title": "WTT tg",
+     "created": "2026-07-01",
      "supplier": "Wuxi Weishi Turbine Technology Co., Ltd.",
      "stage": "Price at Work",
      "sourcer": "Ekaterina Kornilova",
@@ -3326,6 +3575,7 @@
     {
      "id": "19824",
      "title": "Запчасти к SGT-200 в Hangzhou Gas Turbine Parts Co.Ltd",
+     "created": "2025-08-20",
      "supplier": "Hangzhou HGTP Gas Turbine Parts Co.Ltd",
      "stage": "Request Sent",
      "sourcer": "Daria Lysenko",
@@ -3336,6 +3586,7 @@
     {
      "id": "19892",
      "title": "Запчасти к SGT-200 в China power contractor",
+     "created": "2025-08-21",
      "supplier": "Leda Greenpower (Beijing) Trading & Engineering Co., Ltd.",
      "stage": "Request Sent",
      "sourcer": "Daria Lysenko",
@@ -3346,6 +3597,7 @@
     {
      "id": "19894",
      "title": "Запчасти к SGT-200 в Makik Machinery",
+     "created": "2025-08-21",
      "supplier": "Makik Machinery Consultancy Foreign Trade Industry Ltd. Co.",
      "stage": "Request Sent",
      "sourcer": "Daria Lysenko",
@@ -3377,6 +3629,7 @@
     {
      "id": "20930",
      "title": "Ремонт SGT-400 в TFS",
+     "created": "2025-09-15",
      "supplier": "Turbine Field Solutions (TFS)",
      "stage": "New Request",
      "sourcer": "Daria Lysenko",
@@ -3408,6 +3661,7 @@
     {
      "id": "26240",
      "title": "Requests #26240",
+     "created": "2026-01-15",
      "supplier": "FMLS FIN MARINE & ENERGY SOLUTIONS LTD.",
      "stage": "Request Sent",
      "sourcer": "Ruslan Sitdikov",
@@ -3418,6 +3672,7 @@
     {
      "id": "26242",
      "title": "тест",
+     "created": "2026-01-15",
      "supplier": "тет",
      "stage": "New Request",
      "sourcer": "Ruslan Sitdikov",
@@ -3428,6 +3683,7 @@
     {
      "id": "26942",
      "title": "SGT-400 в generatorpower60",
+     "created": "2026-01-28",
      "supplier": "GPOWER SARL",
      "stage": "Price at Work",
      "sourcer": "Daria Lysenko",
@@ -3438,6 +3694,7 @@
     {
      "id": "35200",
      "title": "cstc (china)",
+     "created": "2026-06-04",
      "supplier": "CSTC China Service Technology (Shandong) Co. Ltd.",
      "stage": "Price at Work",
      "sourcer": "Ekaterina Kornilova",
@@ -3459,6 +3716,7 @@
     {
      "id": "19210",
      "title": "Maintenance, repair and spare parts supply for Solar Mars 100 в Goltens",
+     "created": "2025-08-04",
      "supplier": "Goltens",
      "stage": "Request Sent",
      "sourcer": "Daria Lysenko",
@@ -3469,6 +3727,7 @@
     {
      "id": "19212",
      "title": "Maintenance, repair and spare parts supply for Solar Mars 100 в Triveni Turbines",
+     "created": "2025-08-04",
      "supplier": "Triveni Turbines",
      "stage": "Request Sent",
      "sourcer": "Daria Lysenko",
@@ -3479,6 +3738,7 @@
     {
      "id": "19222",
      "title": "Maintenance, repair and spare parts supply for Solar Mars 100 в Kian Turbo Tec",
+     "created": "2025-08-04",
      "supplier": "Kian Turbo Tec",
      "stage": "Request Sent",
      "sourcer": "Daria Lysenko",
@@ -3489,6 +3749,7 @@
     {
      "id": "19224",
      "title": "Maintenance, repair and spare parts supply for Solar Mars 100 в One Power Services",
+     "created": "2025-08-04",
      "supplier": "One Power Services",
      "stage": "Request Sent",
      "sourcer": "Daria Lysenko",
@@ -3499,6 +3760,7 @@
     {
      "id": "19226",
      "title": "ТО, ремонт и поставка зап. частей для газовых турбин Solar Mars 100 в DMEnergy",
+     "created": "2025-08-04",
      "supplier": "DMEnergy",
      "stage": "Request Sent",
      "sourcer": "Daria Lysenko",
@@ -3520,6 +3782,7 @@
     {
      "id": "18926",
      "title": "ЗИП Solar в TFS",
+     "created": "2025-07-25",
      "supplier": "Turbine Field Solutions (TFS)",
      "stage": "Ответ не получен (в срок)",
      "sourcer": "Daria Lysenko",
@@ -3530,6 +3793,7 @@
     {
      "id": "18936",
      "title": "ЗИП Solar в IMMI Turbines",
+     "created": "2025-07-28",
      "supplier": "IMMI Turbines",
      "stage": "Selected",
      "sourcer": "Daria Lysenko",
@@ -3540,6 +3804,7 @@
     {
      "id": "38612",
      "title": "Свеча зажигания Champion в CJ Aerospace",
+     "created": "2026-07-15",
      "supplier": "CJ Aerospace",
      "stage": "Unread Messages",
      "sourcer": "Daria Lysenko",
@@ -3550,6 +3815,7 @@
     {
      "id": "38614",
      "title": "Зажим V-образный Delafield Corporation в Delafield Corporation",
+     "created": "2026-07-15",
      "supplier": "Delafield Corporation",
      "stage": "Отказ в КП",
      "sourcer": "Daria Lysenko",
@@ -3560,6 +3826,7 @@
     {
      "id": "38616",
      "title": "Кольцо DUPONT в Mascot Systems Private Limited",
+     "created": "2026-07-15",
      "supplier": "Mascot Systems Private Limited",
      "stage": "Unread Messages",
      "sourcer": "Daria Lysenko",
@@ -3570,6 +3837,7 @@
     {
      "id": "38622",
      "title": "Комплект для ремонта (Memory Card) Allen Bradley в Nuvision Instrumentation",
+     "created": "2026-07-15",
      "supplier": "Nuvision",
      "stage": "Unread Messages",
      "sourcer": "Daria Lysenko",
@@ -3580,6 +3848,7 @@
     {
      "id": "38710",
      "title": "ЗИП Solar в Hangzhou Gas Turbine Parts Co.Ltd",
+     "created": "2026-07-16",
      "supplier": "Hangzhou HGTP Gas Turbine Parts Co.Ltd",
      "stage": "Unread Messages",
      "sourcer": "Daria Lysenko",
@@ -3590,6 +3859,7 @@
     {
      "id": "38722",
      "title": "ЗИП Solar в TURBINE.PARTS B.V.",
+     "created": "2026-07-16",
      "supplier": "TURBINE.PARTS B.V.",
      "stage": "Unread Messages",
      "sourcer": "Daria Lysenko",
@@ -3600,6 +3870,7 @@
     {
      "id": "38752",
      "title": "ЗИП Solar в Antoni International",
+     "created": "2026-07-16",
      "supplier": "Antoni International, Inc.",
      "stage": "Unread Messages",
      "sourcer": "Daria Lysenko",
@@ -3610,6 +3881,7 @@
     {
      "id": "38762",
      "title": "8 позиций до ноября periparts",
+     "created": "2026-07-16",
      "supplier": "PeriParts",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
@@ -3620,6 +3892,7 @@
     {
      "id": "38764",
      "title": "8 позиций до ноября Heriss",
+     "created": "2026-07-16",
      "supplier": "Heriss (Canada)",
      "stage": "Ответ не получен (в срок)",
      "sourcer": "Ekaterina Kornilova",
@@ -3630,6 +3903,7 @@
     {
      "id": "38816",
      "title": "ЗИП Solar в Turbine Parts Corporation",
+     "created": "2026-07-16",
      "supplier": "Turbine Parts Corporation",
      "stage": "Unread Messages",
      "sourcer": "Daria Lysenko",
@@ -3640,6 +3914,7 @@
     {
      "id": "38854",
      "title": "8 позиций до октября wtt Паша tg",
+     "created": "2026-07-17",
      "supplier": "Wuxi Weishi Turbine Technology Co., Ltd.",
      "stage": "Ответ не получен (в срок)",
      "sourcer": "Ekaterina Kornilova",
@@ -3650,6 +3925,7 @@
     {
      "id": "38996",
      "title": "ЗИП Solar в Hecs Store",
+     "created": "2026-07-21",
      "supplier": "Hecs Store",
      "stage": "Selected",
      "sourcer": "Daria Lysenko",
@@ -3671,6 +3947,7 @@
     {
      "id": "16610",
      "title": "Jiangsu Renhe Environmental Equipments Co., Ltd",
+     "created": "2025-05-28",
      "supplier": "Jiangsu Renhe Environmental Equipments Co., Ltd",
      "stage": "Selected",
      "sourcer": "Yana Mokshina",
@@ -3692,6 +3969,7 @@
     {
      "id": "18452",
      "title": "клапаны, двигатели",
+     "created": "2025-07-14",
      "supplier": "ООО КВАНТ (поставщик)",
      "stage": "Selected",
      "sourcer": "Sergey Galushko",
@@ -3713,6 +3991,7 @@
     {
      "id": "17970",
      "title": "SGT-400 в Gowrings Continental BV",
+     "created": "2025-07-03",
      "supplier": "Gowrings Continental B.V.",
      "stage": "Отказ в КП",
      "sourcer": "Daria Lysenko",
@@ -3723,6 +4002,7 @@
     {
      "id": "17972",
      "title": "SGT-400 в TFS",
+     "created": "2025-07-03",
      "supplier": "Turbine Field Solutions (TFS)",
      "stage": "Selected",
      "sourcer": "Daria Lysenko",
@@ -3733,6 +4013,7 @@
     {
      "id": "17974",
      "title": "SGT-400 в NITCO",
+     "created": "2025-07-03",
      "supplier": "Nikan Industrial Turbine Co. (NITCO)",
      "stage": "Ответ не получен (в срок)",
      "sourcer": "Daria Lysenko",
@@ -3743,6 +4024,7 @@
     {
      "id": "17976",
      "title": " SGT-400 в SkyLine",
+     "created": "2025-07-03",
      "supplier": "Skyline Turbine Services b.v.",
      "stage": "Not Selected",
      "sourcer": "Daria Lysenko",
@@ -3753,6 +4035,7 @@
     {
      "id": "17980",
      "title": "SGT-400 в Zirve Türbin Parts Enerji Limited Şirketi",
+     "created": "2025-07-03",
      "supplier": "Zirve Türbin Parts Enerji Limited Şirketi",
      "stage": "Not Selected",
      "sourcer": "Daria Lysenko",
@@ -3763,6 +4046,7 @@
     {
      "id": "17982",
      "title": "SGT-400 в ETN Global",
+     "created": "2025-07-03",
      "supplier": "Energy & Turbomachinery Network (ETN Global)",
      "stage": "Отказ в КП",
      "sourcer": "Daria Lysenko",
@@ -3773,6 +4057,7 @@
     {
      "id": "18134",
      "title": "Thermocouple tip в AR Thermosensors",
+     "created": "2025-07-08",
      "supplier": "AR Thermosensors Ltd",
      "stage": "Not Selected",
      "sourcer": "Daria Lysenko",
@@ -3814,6 +4099,7 @@
     {
      "id": "17490",
      "title": "RFQ Drive - IMMI Turbines (Arya)",
+     "created": "2025-06-20",
      "supplier": "IMMI Turbines",
      "stage": "Request Sent",
      "sourcer": "Berdy Karaev",
@@ -3824,6 +4110,7 @@
     {
      "id": "17592",
      "title": "RFQ Solar - Leda GreenPower (Arya)",
+     "created": "2025-06-24",
      "supplier": "Leda Greenpower (Beijing) Trading & Engineering Co., Ltd.",
      "stage": "Отказ в КП",
      "sourcer": "Berdy Karaev",
@@ -3834,6 +4121,7 @@
     {
      "id": "17844",
      "title": "RFQ Drive  VG-ENG (AnyRotary)",
+     "created": "2025-07-01",
      "supplier": "VG Engineering",
      "stage": "Request Sent",
      "sourcer": "Berdy Karaev",
@@ -3855,6 +4143,7 @@
     {
      "id": "17480",
      "title": "TFS. requests for SGT-400",
+     "created": "2025-06-19",
      "supplier": "Turbine Field Solutions (TFS)",
      "stage": "Request Sent",
      "sourcer": "Ruslan Sitdikov",
@@ -3865,6 +4154,7 @@
     {
      "id": "17482",
      "title": "STS.Genset reequest ",
+     "created": "2025-06-19",
      "supplier": "Skyline Turbine Services b.v.",
      "stage": "Request Sent",
      "sourcer": "Ruslan Sitdikov",
@@ -3875,6 +4165,7 @@
     {
      "id": "17484",
      "title": "Dongturbo Electric Company Ltd.complete genset purchase",
+     "created": "2025-06-19",
      "supplier": "Dongturbo Electric Company Ltd",
      "stage": "Request Sent",
      "sourcer": "Ruslan Sitdikov",
@@ -3885,6 +4176,7 @@
     {
      "id": "17486",
      "title": "Harbin Electric International. Complete Genset request",
+     "created": "2025-06-19",
      "supplier": "Harbin Electric International",
      "stage": "Request Sent",
      "sourcer": "Ruslan Sitdikov",
@@ -3895,6 +4187,7 @@
     {
      "id": "17488",
      "title": "SHANGHAI LINENG INDUSTRY AND TRADE CO., LTD. Complete genset request",
+     "created": "2025-06-19",
      "supplier": "SHANGHAI LINENG INDUSTRY AND TRADE CO., LTD",
      "stage": "Request Sent",
      "sourcer": "Ruslan Sitdikov",
@@ -3916,6 +4209,7 @@
     {
      "id": "17206",
      "title": " RFQ ТСК - Квант",
+     "created": "2025-06-10",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Berdy Karaev",
@@ -3937,6 +4231,7 @@
     {
      "id": "17212",
      "title": "RFQ MARS100- DongTurbo (From Arya)",
+     "created": "2025-06-10",
      "supplier": "Dongturbo Electric Company Ltd",
      "stage": "Request Sent",
      "sourcer": "Berdy Karaev",
@@ -3947,6 +4242,7 @@
     {
      "id": "17222",
      "title": "RFQ MARS 100-  Lei (Arya)",
+     "created": "2025-06-10",
      "supplier": "Lei Shing Hong Energy",
      "stage": "Request Sent",
      "sourcer": "Berdy Karaev",
@@ -3957,6 +4253,7 @@
     {
      "id": "17224",
      "title": "RFQ Mars 100- Saintwah (Arya)",
+     "created": "2025-06-10",
      "supplier": "Saintwah Inc.",
      "stage": "Отказ в КП",
      "sourcer": "Berdy Karaev",
@@ -3967,6 +4264,7 @@
     {
      "id": "17226",
      "title": "RFQ Mars100-USP&E (Arya)",
+     "created": "2025-06-10",
      "supplier": "USP&E",
      "stage": "Request Sent",
      "sourcer": "Berdy Karaev",
@@ -3977,6 +4275,7 @@
     {
      "id": "17234",
      "title": "RFQ Mars100-Wison (Arya)",
+     "created": "2025-06-10",
      "supplier": "Wison Engineering Ltd.",
      "stage": "Отказ в КП",
      "sourcer": "Berdy Karaev",
@@ -3987,6 +4286,7 @@
     {
      "id": "17248",
      "title": "RFQ Mars 100- ShElMachinery (Arya)",
+     "created": "2025-06-11",
      "supplier": "Shanghai Electric Machinery Co.Ltd. (Shanghai Electric Group )",
      "stage": "Отказ в КП",
      "sourcer": "Berdy Karaev",
@@ -3997,6 +4297,7 @@
     {
      "id": "17438",
      "title": "RFQ Solar Turbines - MarisoGT (Arya)",
+     "created": "2025-06-19",
      "supplier": "MarisoGT",
      "stage": "Request Sent",
      "sourcer": "Berdy Karaev",
@@ -4007,6 +4308,7 @@
     {
      "id": "17444",
      "title": "RFQ Solar Mars 100 -  Leda (Arya)",
+     "created": "2025-06-19",
      "supplier": "Leda Greenpower (Beijing) Trading & Engineering Co., Ltd.",
      "stage": "Отказ в КП",
      "sourcer": "Berdy Karaev",
@@ -4017,6 +4319,7 @@
     {
      "id": "17698",
      "title": "RFQ Solar Mars 100- VG (AnyRotary)",
+     "created": "2025-06-25",
      "supplier": "VG Engineering",
      "stage": "Not Selected",
      "sourcer": "Berdy Karaev",
@@ -4027,6 +4330,7 @@
     {
      "id": "17708",
      "title": "RFQ MARS100 Phoenix (Anyrotary)",
+     "created": "2025-06-26",
      "supplier": "Phoenix equipment corp.",
      "stage": "Request Sent",
      "sourcer": "Berdy Karaev",
@@ -4037,6 +4341,7 @@
     {
      "id": "17716",
      "title": "RFQ  Mars100-Bicosyn (Arya)",
+     "created": "2025-06-26",
      "supplier": "BICOSYN",
      "stage": "Request Sent",
      "sourcer": "Berdy Karaev",
@@ -4058,6 +4363,7 @@
     {
      "id": "16926",
      "title": "ЗИП Lufkin",
+     "created": "2025-06-03",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Anton Zorin",
@@ -4079,6 +4385,7 @@
     {
      "id": "16750",
      "title": "RFQ air filter 2-layer",
+     "created": "2025-05-30",
      "supplier": "Donaldson Ibérica Soluciones en Filtración, S.L.",
      "stage": "Отказ в КП",
      "sourcer": "Stanislav Milovidov",
@@ -4110,6 +4417,7 @@
     {
      "id": "15578",
      "title": "ЗИП NP",
+     "created": "2025-04-29",
      "supplier": "Global Turbine Solutions LLC.",
      "stage": "Request Sent",
      "sourcer": "Anton Zorin",
@@ -4132,6 +4440,7 @@
     {
      "id": "15482",
      "title": "Maintenance Solar GTU",
+     "created": "2025-04-25",
      "supplier": "PT.NGLTech Services Indonesia",
      "stage": "Request Sent",
      "sourcer": "Anton Zorin",
@@ -4154,6 +4463,7 @@
     {
      "id": "15332",
      "title": "RTP POWER SE",
+     "created": "2025-04-21",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -4175,6 +4485,7 @@
     {
      "id": "14566",
      "title": "ЗИП NP",
+     "created": "2025-04-01",
      "supplier": "Global Turbine Solutions LLC.",
      "stage": "Request Sent",
      "sourcer": "Anton Zorin",
@@ -4196,6 +4507,7 @@
     {
      "id": "13480",
      "title": "Инспекция B . Пулково. Бюджет.Безад ",
+     "created": "2025-03-09",
      "supplier": "ASH presicion",
      "stage": "Request Sent",
      "sourcer": "Ruslan Sitdikov",
@@ -4206,6 +4518,7 @@
     {
      "id": "13482",
      "title": "Инспекция B . Пулково. Бюджет.Брюс",
+     "created": "2025-03-09",
      "supplier": "zhzngt.com",
      "stage": "Not Selected",
      "sourcer": "Ruslan Sitdikov",
@@ -4216,6 +4529,7 @@
     {
      "id": "13840",
      "title": "Инспекция B . Пулково. Бюджет. Sibel",
+     "created": "2025-03-18",
      "supplier": "Zirve Türbin Parts Enerji Limited Şirketi",
      "stage": "Not Selected",
      "sourcer": "Ruslan Sitdikov",
@@ -4226,6 +4540,7 @@
     {
      "id": "14802",
      "title": "Turbomachinery Engineering Industries Ltd (India)",
+     "created": "2025-04-07",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -4236,6 +4551,7 @@
     {
      "id": "14966",
      "title": "tfscorp.mx",
+     "created": "2025-04-10",
      "supplier": "—",
      "stage": "Unread Messages",
      "sourcer": "Sergey Galushko",
@@ -4246,6 +4562,7 @@
     {
      "id": "14988",
      "title": "Skyline Turbine Services b.v.",
+     "created": "2025-04-10",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -4256,6 +4573,7 @@
     {
      "id": "14992",
      "title": "GAS TURBINE SERVICES",
+     "created": "2025-04-10",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -4266,6 +4584,7 @@
     {
      "id": "14994",
      "title": "AL NOOR ALAILI TRADING CO. LLC",
+     "created": "2025-04-10",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -4276,6 +4595,7 @@
     {
      "id": "14996",
      "title": "Power Parts Technology",
+     "created": "2025-04-10",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -4286,6 +4606,7 @@
     {
      "id": "15000",
      "title": "Turbine Efficiency",
+     "created": "2025-04-10",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -4296,6 +4617,7 @@
     {
      "id": "15060",
      "title": "Dongying Hengxin Turbomachinery",
+     "created": "2025-04-12",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -4306,6 +4628,7 @@
     {
      "id": "15120",
      "title": "Retrofit Turbine Parts Trading FZ-LLC",
+     "created": "2025-04-14",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -4316,6 +4639,7 @@
     {
      "id": "15174",
      "title": "DDS (Oil&Gas 2025)",
+     "created": "2025-04-15",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -4326,6 +4650,7 @@
     {
      "id": "15176",
      "title": "Metalco International Trade Co (Oil&Gas 2025)",
+     "created": "2025-04-15",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -4336,6 +4661,7 @@
     {
      "id": "15178",
      "title": "Weifang Boyuan Power Technology (Oil&Gas 2025)",
+     "created": "2025-04-15",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -4346,6 +4672,7 @@
     {
      "id": "15206",
      "title": "АО \"Гранд Турбо Энерджи\"",
+     "created": "2025-04-16",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -4356,6 +4683,7 @@
     {
      "id": "15208",
      "title": "Trust Turbine Technology",
+     "created": "2025-04-16",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -4366,6 +4694,7 @@
     {
      "id": "15442",
      "title": "SREY CAPITAL LLC",
+     "created": "2025-04-24",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -4387,6 +4716,7 @@
     {
      "id": "13468",
      "title": "Repair of gearbox",
+     "created": "2025-03-07",
      "supplier": "BHEL",
      "stage": "Request Sent",
      "sourcer": "Anton Zorin",
@@ -4408,6 +4738,7 @@
     {
      "id": "12490",
      "title": "Requests #12490",
+     "created": "2025-02-18",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -4429,6 +4760,7 @@
     {
      "id": "12086",
      "title": "Requests #12086_Flex line",
+     "created": "2025-02-11",
      "supplier": "Turbine Field Solutions (TFS)",
      "stage": "In Correspondance",
      "sourcer": "Sergey Galushko",
@@ -4439,6 +4771,7 @@
     {
      "id": "12168",
      "title": "Requests #12168_Pearson Hydraulics",
+     "created": "2025-02-13",
      "supplier": "Pearson Hydraulics Ltd",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -4449,6 +4782,7 @@
     {
      "id": "12170",
      "title": "Requests #12170_Albany",
+     "created": "2025-02-13",
      "supplier": "MEOS CO. L.L.C",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -4470,6 +4804,7 @@
     {
      "id": "12030",
      "title": "ЗИП Solar",
+     "created": "2025-02-10",
      "supplier": "Dongturbo Electric Company Ltd",
      "stage": "Price at Work",
      "sourcer": "Anton Zorin",
@@ -4491,6 +4826,7 @@
     {
      "id": "11912",
      "title": "Jeff Fisher",
+     "created": "2025-02-07",
      "supplier": "Suzhou Coordworx Electromechanical Technology Co , Ltd",
      "stage": "Not Selected",
      "sourcer": "Vsevolod Shchurenkov",
@@ -4501,6 +4837,7 @@
     {
      "id": "11914",
      "title": "Itedisa Fisher",
+     "created": "2025-02-07",
      "supplier": "Itedisa",
      "stage": "Selected",
      "sourcer": "Vsevolod Shchurenkov",
@@ -4522,6 +4859,7 @@
     {
      "id": "11822",
      "title": "Requests #11822",
+     "created": "2025-02-06",
      "supplier": "Hangzhou HGTP Gas Turbine Parts Co.Ltd",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -4532,6 +4870,7 @@
     {
      "id": "11832",
      "title": "Requests #11832",
+     "created": "2025-02-06",
      "supplier": "Dibaco GmbH",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -4542,6 +4881,7 @@
     {
      "id": "11838",
      "title": "Requests #11838",
+     "created": "2025-02-06",
      "supplier": "EthosEnergy",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -4563,6 +4903,7 @@
     {
      "id": "11560",
      "title": "MakikMachinery",
+     "created": "2025-01-31",
      "supplier": "Makik Machinery Consultancy Foreign Trade Industry Ltd. Co.",
      "stage": "Not Selected",
      "sourcer": "Sergey Shipulev",
@@ -4573,6 +4914,7 @@
     {
      "id": "11562",
      "title": "Zirve Energy",
+     "created": "2025-01-31",
      "supplier": "Zirve Energy",
      "stage": "Request Sent",
      "sourcer": "Sergey Shipulev",
@@ -4583,6 +4925,7 @@
     {
      "id": "11650",
      "title": "World of Controls",
+     "created": "2025-02-03",
      "supplier": "World Of Controls FZE",
      "stage": "Request Sent",
      "sourcer": "Sergey Shipulev",
@@ -4593,6 +4936,7 @@
     {
      "id": "14752",
      "title": "Shanxi Runsheng Import and Export",
+     "created": "2025-04-04",
      "supplier": "Shanxi Runsheng Import and Export Co., Ltd",
      "stage": "Price at Work",
      "sourcer": "Sergey Galushko",
@@ -4603,6 +4947,7 @@
     {
      "id": "14754",
      "title": "Shanghai Kongyang Electric Power Technology Co., Ltd.",
+     "created": "2025-04-04",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -4634,6 +4979,7 @@
     {
      "id": "11454",
      "title": "ЗИП Solar",
+     "created": "2025-01-30",
      "supplier": "Dongturbo Electric Company Ltd",
      "stage": "Request Sent",
      "sourcer": "Anton Zorin",
@@ -4655,6 +5001,7 @@
     {
      "id": "11480",
      "title": "Makik Machinery",
+     "created": "2025-01-31",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Shipulev",
@@ -4665,6 +5012,7 @@
     {
      "id": "11482",
      "title": "Zirve Energy",
+     "created": "2025-01-31",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Shipulev",
@@ -4675,6 +5023,7 @@
     {
      "id": "11528",
      "title": "MFS Netherlands, Headoffice",
+     "created": "2025-01-31",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Shipulev",
@@ -4685,6 +5034,7 @@
     {
      "id": "13798",
      "title": "Requests #13798_LM6000 parts",
+     "created": "2025-03-17",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -4695,6 +5045,7 @@
     {
      "id": "13800",
      "title": "Requests #13800_LM6000 parts",
+     "created": "2025-03-17",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -4705,6 +5056,7 @@
     {
      "id": "14496",
      "title": "Requests #14496_LM6000",
+     "created": "2025-03-31",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -4715,6 +5067,7 @@
     {
      "id": "14502",
      "title": "Requests #14502_LM6000",
+     "created": "2025-03-31",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -4725,6 +5078,7 @@
     {
      "id": "14512",
      "title": "Requests #14512_6000",
+     "created": "2025-03-31",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -4735,6 +5089,7 @@
     {
      "id": "14516",
      "title": "Requests #14516_6000",
+     "created": "2025-03-31",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -4745,6 +5100,7 @@
     {
      "id": "15330",
      "title": "METALCO (Neftegaz 2025)",
+     "created": "2025-04-21",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -4755,6 +5111,7 @@
     {
      "id": "15476",
      "title": "Technical Engineering Service Limited (TES)",
+     "created": "2025-04-25",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -4765,6 +5122,7 @@
     {
      "id": "15480",
      "title": "Drake Controls",
+     "created": "2025-04-25",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -4775,6 +5133,7 @@
     {
      "id": "15612",
      "title": "MFS",
+     "created": "2025-04-30",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -4785,6 +5144,7 @@
     {
      "id": "15620",
      "title": "PROENERGY",
+     "created": "2025-04-30",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -4806,6 +5166,7 @@
     {
      "id": "11230",
      "title": "ЗИП Nuovo Pignone",
+     "created": "2025-01-27",
      "supplier": "Global Turbine Solutions LLC.",
      "stage": "Price at Work",
      "sourcer": "Anton Zorin",
@@ -4816,6 +5177,7 @@
     {
      "id": "11280",
      "title": "Запрос Zirve",
+     "created": "2025-01-28",
      "supplier": "Zirve Energy",
      "stage": "Price at Work",
      "sourcer": "Sergey Polupanov",
@@ -4837,6 +5199,7 @@
     {
      "id": "11294",
      "title": "Запрос в Satarco. направлен через телеграм",
+     "created": "2025-01-29",
      "supplier": "Satarco",
      "stage": "New Request",
      "sourcer": "Ruslan Sitdikov",
@@ -4847,6 +5210,7 @@
     {
      "id": "11296",
      "title": "Запрос в TEC Group",
+     "created": "2025-01-29",
      "supplier": "TEC Group",
      "stage": "Price at Work",
      "sourcer": "Ruslan Sitdikov",
@@ -4868,6 +5232,7 @@
     {
      "id": "11226",
      "title": "Requests #11226",
+     "created": "2025-01-27",
      "supplier": "—",
      "stage": "New Request",
      "sourcer": "Sergey Shipulev",
@@ -4889,6 +5254,7 @@
     {
      "id": "11228",
      "title": "Requests #11228",
+     "created": "2025-01-27",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Shipulev",
@@ -4910,6 +5276,7 @@
     {
      "id": "10248",
      "title": "SGT-200",
+     "created": "2024-12-19",
      "supplier": "zhzngt.com",
      "stage": "Ответ не получен (в срок)",
      "sourcer": "Ruslan Sitdikov",
@@ -4941,6 +5308,7 @@
     {
      "id": "11776",
      "title": "Requests #11776",
+     "created": "2025-02-05",
      "supplier": "Шамиль(поставщик от Вячеслава)",
      "stage": "Price at Work",
      "sourcer": "Ruslan Sitdikov",
@@ -4962,6 +5330,7 @@
     {
      "id": "10796",
      "title": "Betty Jiang",
+     "created": "2025-01-17",
      "supplier": "CST Heat Exchanger Co., Ltd.",
      "stage": "Request Sent",
      "sourcer": "Vitaly Goryachikh",
@@ -4983,6 +5352,7 @@
     {
      "id": "9464",
      "title": "RFQ AB 11088-9464 DL  03.12.2024",
+     "created": "2024-12-03",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Denis Litvinovsky",
@@ -4993,6 +5363,7 @@
     {
      "id": "9466",
      "title": "RFQ AB 11088-9466 DL  03.12.2024",
+     "created": "2024-12-03",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Denis Litvinovsky",
@@ -5014,6 +5385,7 @@
     {
      "id": "9418",
      "title": "Kian Mazdafar",
+     "created": "2024-12-03",
      "supplier": "Nikan Industrial Turbine Co. (NITCO)",
      "stage": "Request Sent",
      "sourcer": "Vitaly Goryachikh",
@@ -5024,6 +5396,7 @@
     {
      "id": "9820",
      "title": "Запрос на восстановление лопаток и шеф монтаж для белорусов ",
+     "created": "2024-12-10",
      "supplier": "zhzngt.com",
      "stage": "Request Sent",
      "sourcer": "Ruslan Sitdikov",
@@ -5034,6 +5407,7 @@
     {
      "id": "9822",
      "title": "Запрос на восстановление лопаток и шеф монтаж для белорусов ",
+     "created": "2024-12-10",
      "supplier": "Qingdao O.B.T Co., Ltd.",
      "stage": "Not Selected",
      "sourcer": "Ruslan Sitdikov",
@@ -5044,6 +5418,7 @@
     {
      "id": "9838",
      "title": "Requests #9838",
+     "created": "2024-12-11",
      "supplier": "Nikan Industrial Turbine Co. (NITCO)",
      "stage": "Request Sent",
      "sourcer": "Vitaly Goryachikh",
@@ -5075,6 +5450,7 @@
     {
      "id": "8668",
      "title": "NP",
+     "created": "2024-11-11",
      "supplier": "TECNIFLON S.A.S.",
      "stage": "Selected",
      "sourcer": "Ruslan Sitdikov",
@@ -5085,6 +5461,7 @@
     {
      "id": "8694",
      "title": "ПЭСТ тендер Syed ",
+     "created": "2024-11-12",
      "supplier": "Global Turbine Solutions LLC.",
      "stage": "Selected",
      "sourcer": "Ruslan Sitdikov",
@@ -5095,6 +5472,7 @@
     {
      "id": "8706",
      "title": "TEC-Group ",
+     "created": "2024-11-12",
      "supplier": "tec-group",
      "stage": "Selected",
      "sourcer": "Ruslan Sitdikov",
@@ -5105,6 +5483,7 @@
     {
      "id": "9152",
      "title": "Jeff Masoneilan",
+     "created": "2024-11-27",
      "supplier": "Suzhou Coordworx Electromechanical Technology Co , Ltd",
      "stage": "Not Selected",
      "sourcer": "Vsevolod Shchurenkov",
@@ -5115,6 +5494,7 @@
     {
      "id": "9154",
      "title": "Edward Masoneilan",
+     "created": "2024-11-27",
      "supplier": "Xiangjing (Shanghai) M&E Technology Co., Ltd",
      "stage": "Not Selected",
      "sourcer": "Vsevolod Shchurenkov",
@@ -5125,6 +5505,7 @@
     {
      "id": "9250",
      "title": "Запрос ферису по имеющимся фотографиям ",
+     "created": "2024-11-28",
      "supplier": "GuiLin SanHua Import & Export Co., Ltd",
      "stage": "Not Selected",
      "sourcer": "Ruslan Sitdikov",
@@ -5135,6 +5516,7 @@
     {
      "id": "9252",
      "title": "Запрос ферису по имеющимся фотографиям ",
+     "created": "2024-11-28",
      "supplier": "GuiLin SanHua Import & Export Co., Ltd",
      "stage": "Not Selected",
      "sourcer": "Ruslan Sitdikov",
@@ -5145,6 +5527,7 @@
     {
      "id": "9264",
      "title": "клапаны всаса ",
+     "created": "2024-11-28",
      "supplier": "WOODSERV",
      "stage": "Not Selected",
      "sourcer": "Ruslan Sitdikov",
@@ -5155,6 +5538,7 @@
     {
      "id": "10108",
      "title": "Requests #10108",
+     "created": "2024-12-17",
      "supplier": "RTP power",
      "stage": "Selected",
      "sourcer": "Ruslan Sitdikov",
@@ -5165,6 +5549,7 @@
     {
      "id": "11748",
      "title": "Requests #11748 Brush",
+     "created": "2025-02-05",
      "supplier": "Technical Solutions to Industry FZE (TSI)",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5175,6 +5560,7 @@
     {
      "id": "11774",
      "title": "Requests #11774",
+     "created": "2025-02-05",
      "supplier": "Starfish PPS",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5185,6 +5571,7 @@
     {
      "id": "11850",
      "title": "Requests #11850",
+     "created": "2025-02-06",
      "supplier": "BRUSH SEM s.r.o",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5195,6 +5582,7 @@
     {
      "id": "11860",
      "title": "Requests #11860",
+     "created": "2025-02-06",
      "supplier": "Turbine Services, Ltd.",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5205,6 +5593,7 @@
     {
      "id": "11880",
      "title": "Requests #11880",
+     "created": "2025-02-07",
      "supplier": "VBR Turbine Partners",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5215,6 +5604,7 @@
     {
      "id": "11886",
      "title": "Requests #11886",
+     "created": "2025-02-07",
      "supplier": "Energia Parts S.r.l.",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5225,6 +5615,7 @@
     {
      "id": "11890",
      "title": "Requests #11890",
+     "created": "2025-02-07",
      "supplier": "WWGTP",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5235,6 +5626,7 @@
     {
      "id": "11896",
      "title": "Requests #11896",
+     "created": "2025-02-07",
      "supplier": "QINGDAO O.B.T CO., LTD.",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5245,6 +5637,7 @@
     {
      "id": "11900",
      "title": "Requests #11900",
+     "created": "2025-02-07",
      "supplier": "EthosEnergy Abu Dhabi L.L.C.",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5255,6 +5648,7 @@
     {
      "id": "11916",
      "title": "Requests #11916",
+     "created": "2025-02-07",
      "supplier": "—",
      "stage": "New Request",
      "sourcer": "Sergey Galushko",
@@ -5265,6 +5659,7 @@
     {
      "id": "11918",
      "title": "Requests #11918",
+     "created": "2025-02-07",
      "supplier": "N S ENERGY GROUP",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5275,6 +5670,7 @@
     {
      "id": "11924",
      "title": "Requests #11924",
+     "created": "2025-02-07",
      "supplier": "Prime Turbine Parts",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5285,6 +5681,7 @@
     {
      "id": "11926",
      "title": "Requests #11926",
+     "created": "2025-02-07",
      "supplier": "AL NOOR ALAILI TRADING CO. LLC",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5295,6 +5692,7 @@
     {
      "id": "12062",
      "title": "Requests #12062_Masoneilan",
+     "created": "2025-02-11",
      "supplier": "Everest-Instruments",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5305,6 +5703,7 @@
     {
      "id": "12064",
      "title": "Requests #12064_Masoneilan",
+     "created": "2025-02-11",
      "supplier": "TSP Controls",
      "stage": "In Correspondance",
      "sourcer": "Sergey Galushko",
@@ -5315,6 +5714,7 @@
     {
      "id": "12070",
      "title": "Requests #12070_Masoneilan",
+     "created": "2025-02-11",
      "supplier": "Dresser Machinery (Suzhou ) Co., Ltd.",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5325,6 +5725,7 @@
     {
      "id": "12244",
      "title": "Requests #12244_MS5001PA зип",
+     "created": "2025-02-14",
      "supplier": "Allied Power Group (APG)",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5335,6 +5736,7 @@
     {
      "id": "12250",
      "title": "Requests #12250_MS5001PA зип",
+     "created": "2025-02-14",
      "supplier": "HPI",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5345,6 +5747,7 @@
     {
      "id": "12252",
      "title": "Requests #12252_MS5001PA_зип",
+     "created": "2025-02-14",
      "supplier": "TRS SERVICES",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5355,6 +5758,7 @@
     {
      "id": "12272",
      "title": "Requests #12272_MS5001PA_зип",
+     "created": "2025-02-14",
      "supplier": "CEDCO",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5365,6 +5769,7 @@
     {
      "id": "12276",
      "title": "Requests #12276_MS5001PA_зип",
+     "created": "2025-02-14",
      "supplier": "RWG (Repair & Overhauls) Limited",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5375,6 +5780,7 @@
     {
      "id": "12540",
      "title": "Requests #12540_Westcode Diode",
+     "created": "2025-02-19",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5385,6 +5791,7 @@
     {
      "id": "12542",
      "title": "Requests #12542_Westcode diode",
+     "created": "2025-02-19",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5395,6 +5802,7 @@
     {
      "id": "12614",
      "title": "Requests #12614_Brush",
+     "created": "2025-02-19",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5405,6 +5813,7 @@
     {
      "id": "12616",
      "title": "Requests #12616_Brush",
+     "created": "2025-02-19",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5415,6 +5824,7 @@
     {
      "id": "12650",
      "title": "Requests #12650_BRUSH",
+     "created": "2025-02-20",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5425,6 +5835,7 @@
     {
      "id": "12846",
      "title": "Requests #12846_MS5001PA_spare parts",
+     "created": "2025-02-24",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5435,6 +5846,7 @@
     {
      "id": "12868",
      "title": "Requests #12868_Westcode",
+     "created": "2025-02-24",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5445,6 +5857,7 @@
     {
      "id": "12970",
      "title": "Requests #12970_Masoneilan",
+     "created": "2025-02-26",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5455,6 +5868,7 @@
     {
      "id": "12972",
      "title": "Requests #12972_Masoneilan",
+     "created": "2025-02-26",
      "supplier": "—",
      "stage": "In Correspondance",
      "sourcer": "Sergey Galushko",
@@ -5465,6 +5879,7 @@
     {
      "id": "12974",
      "title": "Requests #12974_Westcode",
+     "created": "2025-02-26",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5475,6 +5890,7 @@
     {
      "id": "13132",
      "title": "Requests #13132_Masoneilan",
+     "created": "2025-02-28",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5485,6 +5901,7 @@
     {
      "id": "13134",
      "title": "Requests #13134_Masoneilan",
+     "created": "2025-02-28",
      "supplier": "VLV S.r.l.",
      "stage": "Selected",
      "sourcer": "Sergey Galushko",
@@ -5495,6 +5912,7 @@
     {
      "id": "13136",
      "title": "Requests #13136_Masoneilon",
+     "created": "2025-02-28",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5505,6 +5923,7 @@
     {
      "id": "13166",
      "title": "Requests #13166_Westcode",
+     "created": "2025-03-03",
      "supplier": "TTI, Inc.",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5515,6 +5934,7 @@
     {
      "id": "13206",
      "title": "Requests #13206_MS5001PA_зип",
+     "created": "2025-03-03",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5525,6 +5945,7 @@
     {
      "id": "13288",
      "title": "Requests #13288_Westcode",
+     "created": "2025-03-05",
      "supplier": "iiiC Commercial Co., Ltd.",
      "stage": "Selected",
      "sourcer": "Sergey Galushko",
@@ -5535,6 +5956,7 @@
     {
      "id": "13360",
      "title": "Requests #13360_Westcode",
+     "created": "2025-03-06",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5545,6 +5967,7 @@
     {
      "id": "13364",
      "title": "Requests #13364_MEDC_lamp+horn",
+     "created": "2025-03-06",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5555,6 +5978,7 @@
     {
      "id": "13370",
      "title": "Requests #13370_MEDC_lamp+horn",
+     "created": "2025-03-06",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5565,6 +5989,7 @@
     {
      "id": "13372",
      "title": "Requests #13372_MEDC",
+     "created": "2025-03-06",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5575,6 +6000,7 @@
     {
      "id": "13374",
      "title": "Requests #13374_MEDC",
+     "created": "2025-03-06",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5585,6 +6011,7 @@
     {
      "id": "13376",
      "title": "Requests #13376_MEDC",
+     "created": "2025-03-06",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5595,6 +6022,7 @@
     {
      "id": "13378",
      "title": "Requests #13378_BRUSH",
+     "created": "2025-03-06",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5605,6 +6033,7 @@
     {
      "id": "13530",
      "title": "Requests #13530_MEDC",
+     "created": "2025-03-10",
      "supplier": "HWKJ (Tianjin) Ltd.",
      "stage": "Price at Work",
      "sourcer": "Sergey Galushko",
@@ -5615,6 +6044,7 @@
     {
      "id": "13532",
      "title": "Requests #13532_MEDC",
+     "created": "2025-03-10",
      "supplier": "Lavastica International B.V.",
      "stage": "Selected",
      "sourcer": "Sergey Galushko",
@@ -5625,6 +6055,7 @@
     {
      "id": "13536",
      "title": "Zollern. Labyrinth seal",
+     "created": "2025-03-11",
      "supplier": "Weima Electric (Shanghai) Ltd.",
      "stage": "Selected",
      "sourcer": "Ruslan Sitdikov",
@@ -5635,6 +6066,7 @@
     {
      "id": "13548",
      "title": "Zollern OilSeal. ",
+     "created": "2025-03-11",
      "supplier": "ZOLLERN GmbH & Co. KG",
      "stage": "Отказ в КП",
      "sourcer": "Ruslan Sitdikov",
@@ -5645,6 +6077,7 @@
     {
      "id": "13572",
      "title": "Requests #13572_Westcode",
+     "created": "2025-03-11",
      "supplier": "Mouser Electronics, Inc.",
      "stage": "Price at Work",
      "sourcer": "Sergey Galushko",
@@ -5655,6 +6088,7 @@
     {
      "id": "13616",
      "title": "Requests #13616_Cortem_кнопка",
+     "created": "2025-03-12",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5665,6 +6099,7 @@
     {
      "id": "13638",
      "title": "Requests #13638_Semicron+PRX diode",
+     "created": "2025-03-12",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5675,6 +6110,7 @@
     {
      "id": "13640",
      "title": "Requests #13640_Semikron+PRX",
+     "created": "2025-03-12",
      "supplier": "OMO Electronic Limited",
      "stage": "Price at Work",
      "sourcer": "Sergey Galushko",
@@ -5685,6 +6121,7 @@
     {
      "id": "13678",
      "title": "Requests #13678_BRUSH",
+     "created": "2025-03-13",
      "supplier": "ADJ DiTec Málaga S.L.",
      "stage": "Selected",
      "sourcer": "Sergey Galushko",
@@ -5695,6 +6132,7 @@
     {
      "id": "13732",
      "title": "Spare parts for Goodrich Coupling",
+     "created": "2025-03-14",
      "supplier": "Global Turbine Solutions LLC.",
      "stage": "Price at Work",
      "sourcer": "Ruslan Sitdikov",
@@ -5705,6 +6143,7 @@
     {
      "id": "13790",
      "title": "Requests #13790_Honeywell",
+     "created": "2025-03-17",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5715,6 +6154,7 @@
     {
      "id": "13792",
      "title": "Requests #13792_Honeywell",
+     "created": "2025-03-17",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5725,6 +6165,7 @@
     {
      "id": "13794",
      "title": "Requests #13794_Honeywell",
+     "created": "2025-03-17",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5735,6 +6176,7 @@
     {
      "id": "13848",
      "title": "Requests #13848_Cortem",
+     "created": "2025-03-18",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5745,6 +6187,7 @@
     {
      "id": "13860",
      "title": "Requests #13860_BRUSH",
+     "created": "2025-03-18",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5755,6 +6198,7 @@
     {
      "id": "13864",
      "title": "Requests #13864_BRUSH",
+     "created": "2025-03-18",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5765,6 +6209,7 @@
     {
      "id": "13868",
      "title": "Requests #13868_Brush",
+     "created": "2025-03-18",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5775,6 +6220,7 @@
     {
      "id": "13872",
      "title": "Requests #13872_Brush",
+     "created": "2025-03-18",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5785,6 +6231,7 @@
     {
      "id": "13934",
      "title": "Requests #13934_Cortem",
+     "created": "2025-03-19",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5795,6 +6242,7 @@
     {
      "id": "14020",
      "title": "Requests #14020_Cortem",
+     "created": "2025-03-20",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5805,6 +6253,7 @@
     {
      "id": "14022",
      "title": "Requests #14022_Cortem",
+     "created": "2025-03-20",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5815,6 +6264,7 @@
     {
      "id": "14124",
      "title": "Requests #14124_Honeywell",
+     "created": "2025-03-23",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5825,6 +6275,7 @@
     {
      "id": "14126",
      "title": "Requests #14126_Honeywell",
+     "created": "2025-03-23",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5835,6 +6286,7 @@
     {
      "id": "14154",
      "title": "Requests #14154_Cortem",
+     "created": "2025-03-24",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5845,6 +6297,7 @@
     {
      "id": "14218",
      "title": "Requests #14218_Honeywell",
+     "created": "2025-03-25",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5855,6 +6308,7 @@
     {
      "id": "14224",
      "title": "Requests #14224_Cortem",
+     "created": "2025-03-25",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5865,6 +6319,7 @@
     {
      "id": "14294",
      "title": "Requests #14294_Cortem",
+     "created": "2025-03-26",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5875,6 +6330,7 @@
     {
      "id": "14296",
      "title": "Requests #14296_Cortem",
+     "created": "2025-03-26",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5885,6 +6341,7 @@
     {
      "id": "14304",
      "title": "Requests #14304_Cortem",
+     "created": "2025-03-27",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5895,6 +6352,7 @@
     {
      "id": "14528",
      "title": "Requests #14528_Honeywell",
+     "created": "2025-04-01",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5905,6 +6363,7 @@
     {
      "id": "14532",
      "title": "Requests #14532_Honeywell",
+     "created": "2025-04-01",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5915,6 +6374,7 @@
     {
      "id": "14560",
      "title": "Requests #14560_Cortem England",
+     "created": "2025-04-01",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
@@ -5925,6 +6385,7 @@
     {
      "id": "14640",
      "title": "ПЭСТ_Syed",
+     "created": "2025-04-03",
      "supplier": "Global Turbine Solutions LLC.",
      "stage": "Selected",
      "sourcer": "Sergey Galushko",
@@ -5935,6 +6396,7 @@
     {
      "id": "14648",
      "title": "Honeywell/Zellweger 2106B1110",
+     "created": "2025-04-03",
      "supplier": "Shanxi Runsheng Import and Export Co., Ltd",
      "stage": "Selected",
      "sourcer": "Sergey Galushko",
@@ -5945,6 +6407,7 @@
     {
      "id": "14724",
      "title": "CORTEM_Italy",
+     "created": "2025-04-04",
      "supplier": "CENTRO E SRL",
      "stage": "Selected",
      "sourcer": "Sergey Galushko",
@@ -5955,6 +6418,7 @@
     {
      "id": "15180",
      "title": "Changsha Aobo Carbon Co.,Ltd.",
+     "created": "2025-04-15",
      "supplier": "Changsha Aobo Carbon Co.,Ltd.",
      "stage": "Selected",
      "sourcer": "Sergey Galushko",
@@ -5965,6 +6429,7 @@
     {
      "id": "15810",
      "title": "Set of oilsealings for bearing",
+     "created": "2025-05-12",
      "supplier": "Weima Electric (Shanghai) Ltd.",
      "stage": "Selected",
      "sourcer": "Sergey Galushko",
@@ -5975,6 +6440,7 @@
     {
      "id": "17824",
      "title": "GTS_STRIP PACKING ( 50FT ROLL)_9 pcs",
+     "created": "2025-06-30",
      "supplier": "Global Turbine Solutions LLC.",
      "stage": "Selected",
      "sourcer": "Sergey Galushko",
@@ -5985,6 +6451,7 @@
     {
      "id": "22362",
      "title": "Honeywell (Zellweger)",
+     "created": "2025-10-17",
      "supplier": "Shanxi Runsheng Import and Export Co., Ltd",
      "stage": "Selected",
      "sourcer": "Sergey Galushko",
@@ -6016,6 +6483,7 @@
     {
      "id": "8592",
      "title": "Gas shut-off and venting valve",
+     "created": "2024-11-07",
      "supplier": "kinetrol",
      "stage": "Not Selected",
      "sourcer": "Ruslan Sitdikov",
@@ -6026,6 +6494,7 @@
     {
      "id": "8784",
      "title": "з/ч Bently Nevada",
+     "created": "2024-11-14",
      "supplier": "GuiLin SanHua Import & Export Co., Ltd",
      "stage": "In Correspondance",
      "sourcer": "Liliya Shved",
@@ -6036,6 +6505,7 @@
     {
      "id": "8932",
      "title": "з/ч ",
+     "created": "2024-11-20",
      "supplier": "Turbine Field Solutions (TFS)",
      "stage": "Request Sent",
      "sourcer": "Liliya Shved",
@@ -6077,6 +6547,7 @@
     {
      "id": "8006",
      "title": "RFQ Grundfos RN211024",
+     "created": "2024-10-21",
      "supplier": "Group Protem DOO",
      "stage": "Price at Work",
      "sourcer": "Lyubov Tarasova",
@@ -6129,6 +6600,7 @@
     {
      "id": "6638",
      "title": "Фильтры для Могилевэнерго. BAMAFILTER",
+     "created": "2024-09-13",
      "supplier": "—",
      "stage": "Price at Work",
      "sourcer": "Stanislav Milovidov",
@@ -6139,6 +6611,7 @@
     {
      "id": "6640",
      "title": "Фильтры для Могилевэнерго. HQFILTRATION",
+     "created": "2024-09-13",
      "supplier": "—",
      "stage": "Price at Work",
      "sourcer": "Stanislav Milovidov",
@@ -6170,6 +6643,7 @@
     {
      "id": "6606",
      "title": "Requests #6606",
+     "created": "2024-09-12",
      "supplier": "tec-group",
      "stage": "Request Sent",
      "sourcer": "Ruslan Sitdikov",
@@ -6201,6 +6675,7 @@
     {
      "id": "7750",
      "title": "NITCO",
+     "created": "2024-10-11",
      "supplier": "—",
      "stage": "New Request",
      "sourcer": "Vitaly Goryachikh",
@@ -6232,6 +6707,7 @@
     {
      "id": "6206",
      "title": "Requests #6206",
+     "created": "2024-09-01",
      "supplier": "tec-group",
      "stage": "Price at Work",
      "sourcer": "Ruslan Sitdikov",
@@ -6313,6 +6789,7 @@
     {
      "id": "8482",
      "title": "Leo Lee",
+     "created": "2024-11-05",
      "supplier": "Dongturbo Electric Company Ltd",
      "stage": "Request Sent",
      "sourcer": "Vitaly Goryachikh",
@@ -6344,6 +6821,7 @@
     {
      "id": "7352",
      "title": "Запросы поставщикам #7352",
+     "created": "2024-10-02",
      "supplier": "Dongturbo Electric Company Ltd",
      "stage": "Request Sent",
      "sourcer": "Vitaly Goryachikh",
@@ -6365,6 +6843,7 @@
     {
      "id": "5344",
      "title": "SGT-400. Valve ",
+     "created": "2024-07-24",
      "supplier": "Suzhou Coordworx Electromechanical Technology Co , Ltd",
      "stage": "Request Sent",
      "sourcer": "Ruslan Sitdikov",
@@ -6375,6 +6854,7 @@
     {
      "id": "6146",
      "title": "Valve SGT-400. Ierfzco",
+     "created": "2024-08-29",
      "supplier": "International Energy Resources",
      "stage": "Not Selected",
      "sourcer": "Ruslan Sitdikov",
@@ -6385,6 +6865,7 @@
     {
      "id": "6148",
      "title": "Valve SGT-400. TFS",
+     "created": "2024-08-29",
      "supplier": "Turbine Field Solutions (TFS)",
      "stage": "In Correspondance",
      "sourcer": "Ruslan Sitdikov",
@@ -6395,6 +6876,7 @@
     {
      "id": "6202",
      "title": "8742-6202 RS SIEMENS 31.08.2024",
+     "created": "2024-08-31",
      "supplier": "Gowrings Continental B.V.",
      "stage": "Not Selected",
      "sourcer": "Ruslan Sitdikov",
@@ -6546,6 +7028,7 @@
     {
      "id": "8822",
      "title": "Requests #8822",
+     "created": "2024-11-15",
      "supplier": "Dongturbo Electric Company Ltd",
      "stage": "Request Sent",
      "sourcer": "Vitaly Goryachikh",
@@ -6647,6 +7130,7 @@
     {
      "id": "2390",
      "title": "RFQ -- Typhoon --Siemens Energy Global GmbH & Co. KG 7066-2390 GSA  10.04.2024",
+     "created": "2024-04-10",
      "supplier": "Siemens Energy Global GmbH & Co. KG",
      "stage": "Request Sent",
      "sourcer": "Sergey Geronok",
@@ -6657,6 +7141,7 @@
     {
      "id": "2396",
      "title": "RFQ  Typhoon -- Siemens Energy Dubai 7066-2396 GSA  10.04.2024",
+     "created": "2024-04-10",
      "supplier": "Siemens Energy Dubai",
      "stage": "Request Sent",
      "sourcer": "Sergey Geronok",
@@ -6667,6 +7152,7 @@
     {
      "id": "2398",
      "title": "Siemens Energy Dubai",
+     "created": "2024-04-10",
      "supplier": "Siemens Energy Dubai",
      "stage": "Request Sent",
      "sourcer": "Sergey Geronok",
@@ -6688,6 +7174,7 @@
     {
      "id": "2344",
      "title": "Requests #2344",
+     "created": "2024-04-09",
      "supplier": "—",
      "stage": "In Correspondance",
      "sourcer": "Denis Litvinovsky",
@@ -6709,6 +7196,7 @@
     {
      "id": "2268",
      "title": "RFQ Donaldson 040424",
+     "created": "2024-04-04",
      "supplier": "Donaldson Ibérica Soluciones en Filtración, S.L.",
      "stage": "Request Sent",
      "sourcer": "Stanislav Milovidov",
@@ -6730,6 +7218,7 @@
     {
      "id": "1692",
      "title": "METTLER электрод",
+     "created": "2024-03-20",
      "supplier": "GuiLin SanHua Import & Export Co., Ltd",
      "stage": "Request Sent",
      "sourcer": "Liliya Shved",
@@ -6791,6 +7280,7 @@
     {
      "id": "9306",
      "title": "Запрос на изготовление лопаток второй ступени SGT-200s в OBT",
+     "created": "2024-11-30",
      "supplier": "Qingdao O.B.T Co., Ltd.",
      "stage": "Not Selected",
      "sourcer": "Ruslan Sitdikov",
@@ -6862,6 +7352,7 @@
     {
      "id": "76",
      "title": "ASH presicion",
+     "created": "2023-12-20",
      "supplier": "ASH presicion",
      "stage": "Selected",
      "sourcer": "Ruslan Sitdikov",
@@ -6872,6 +7363,7 @@
     {
      "id": "560",
      "title": "Запрос на независимую инспекцию . TÜV Rheinland (ШК кельн)",
+     "created": "2024-02-15",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Ruslan Sitdikov",
@@ -6882,6 +7374,7 @@
     {
      "id": "562",
      "title": "Запрос на независимую инспекцию . TÜV SÜD (Германия)",
+     "created": "2024-02-15",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Ruslan Sitdikov",
@@ -6892,6 +7385,7 @@
     {
      "id": "7268",
      "title": "SGT-100. запрос в Zirve Energy",
+     "created": "2024-09-30",
      "supplier": "Zirve Energy",
      "stage": "Request Sent",
      "sourcer": "Ruslan Sitdikov",
@@ -6902,6 +7396,7 @@
     {
      "id": "7744",
      "title": "Запрос на изготовление переходных элементов",
+     "created": "2024-10-11",
      "supplier": "Qingdao O.B.T Co., Ltd.",
      "stage": "Selected",
      "sourcer": "Ruslan Sitdikov",
@@ -6912,6 +7407,7 @@
     {
      "id": "8372",
      "title": "Запрос на изготовление роторных лопаток",
+     "created": "2024-10-31",
      "supplier": "Qingdao O.B.T Co., Ltd.",
      "stage": "Selected",
      "sourcer": "Ruslan Sitdikov",
@@ -6922,6 +7418,7 @@
     {
      "id": "8470",
      "title": "Кольцо и горелки",
+     "created": "2024-11-04",
      "supplier": "Turbine Field Solutions (TFS)",
      "stage": "Not Selected",
      "sourcer": "Ruslan Sitdikov",
@@ -6932,6 +7429,7 @@
     {
      "id": "8646",
      "title": "Starter Module",
+     "created": "2024-11-11",
      "supplier": "—",
      "stage": "In Correspondance",
      "sourcer": "Ruslan Sitdikov",
@@ -6942,6 +7440,7 @@
     {
      "id": "8654",
      "title": "Requests #8654",
+     "created": "2024-11-11",
      "supplier": "—",
      "stage": "In Correspondance",
      "sourcer": "Ruslan Sitdikov",
@@ -6952,6 +7451,7 @@
     {
      "id": "8658",
      "title": "Requests #8658",
+     "created": "2024-11-11",
      "supplier": "GBS",
      "stage": "Not Selected",
      "sourcer": "Ruslan Sitdikov",
@@ -6962,6 +7462,7 @@
     {
      "id": "8660",
      "title": "Allen Gears info@rotalution.com",
+     "created": "2024-11-11",
      "supplier": "—",
      "stage": "Not Selected",
      "sourcer": "Ruslan Sitdikov",
@@ -6972,6 +7473,7 @@
     {
      "id": "9470",
      "title": "Requests #9470",
+     "created": "2024-12-03",
      "supplier": "Gowrings Continental B.V.",
      "stage": "Price at Work",
      "sourcer": "Ruslan Sitdikov",
@@ -6982,6 +7484,7 @@
     {
      "id": "9472",
      "title": "Requests #9472",
+     "created": "2024-12-03",
      "supplier": "Gowrings Continental B.V.",
      "stage": "Selected",
      "sourcer": "Ruslan Sitdikov",
@@ -6992,6 +7495,7 @@
     {
      "id": "9802",
      "title": "Заказ Carrier Ring",
+     "created": "2024-12-10",
      "supplier": "Qingdao O.B.T Co., Ltd.",
      "stage": "Selected",
      "sourcer": "Ruslan Sitdikov",
@@ -7002,6 +7506,7 @@
     {
      "id": "10870",
      "title": "запрос на фильтры",
+     "created": "2025-01-20",
      "supplier": "ASH presicion",
      "stage": "Selected",
      "sourcer": "Ruslan Sitdikov",
@@ -7012,6 +7517,7 @@
     {
      "id": "12322",
      "title": "Rotor blades for SGT-100. Ash",
+     "created": "2025-02-17",
      "supplier": "ASH presicion",
      "stage": "In Correspondance",
      "sourcer": "Ruslan Sitdikov",
@@ -7022,6 +7528,7 @@
     {
      "id": "14146",
      "title": "Starter module.Ash",
+     "created": "2025-03-24",
      "supplier": "ASH presicion",
      "stage": "Selected",
      "sourcer": "Ruslan Sitdikov",
@@ -7032,6 +7539,7 @@
     {
      "id": "22232",
      "title": "лопатки (доработка напыление) ",
+     "created": "2025-10-15",
      "supplier": "QINGDAO O.B.T CO., LTD.",
      "stage": "Selected",
      "sourcer": "Liliya Shved",
@@ -7173,6 +7681,7 @@
     {
      "id": "10246",
      "title": "Requests #10246",
+     "created": "2024-12-19",
      "supplier": "zhzngt.com",
      "stage": "Ответ не получен (в срок)",
      "sourcer": "Ruslan Sitdikov",
@@ -7214,6 +7723,7 @@
     {
      "id": "48",
      "title": "zhzngt.com",
+     "created": "2023-11-27",
      "supplier": "zhzngt.com",
      "stage": "Request Sent",
      "sourcer": "Ruslan Sitdikov",
@@ -7224,6 +7734,7 @@
     {
      "id": "180",
      "title": "HYDRAULIC AXIAL PISTON PUMP(64/07104916/1)",
+     "created": "2024-01-24",
      "supplier": "Suzhou Coordworx Electromechanical Technology Co , Ltd",
      "stage": "Request Sent",
      "sourcer": "Ruslan Sitdikov",
@@ -7234,6 +7745,7 @@
     {
      "id": "182",
      "title": "DC MOTOR, EMERGENCY OIL PUMP(64/07001479/7121)",
+     "created": "2024-01-24",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Ruslan Sitdikov",
@@ -7244,6 +7756,7 @@
     {
      "id": "184",
      "title": "AC MOTOR, AUXILIARY OIL PUMP(64/07001478/0101)",
+     "created": "2024-01-24",
      "supplier": "—",
      "stage": "Request Sent",
      "sourcer": "Ruslan Sitdikov",
@@ -7254,6 +7767,7 @@
     {
      "id": "202",
      "title": "ЗЧ СГТ-400 ККМ. Заказ 2",
+     "created": "2024-01-26",
      "supplier": "Turbine Field Solutions (TFS)",
      "stage": "Request Sent",
      "sourcer": "Ruslan Sitdikov",
@@ -7264,6 +7778,7 @@
     {
      "id": "8742",
      "title": "з/ч WEG",
+     "created": "2024-11-12",
      "supplier": "aikah",
      "stage": "Request Sent",
      "sourcer": "Liliya Shved",
@@ -7274,6 +7789,7 @@
     {
      "id": "11096",
      "title": "з/ч Winkelmann",
+     "created": "2025-01-23",
      "supplier": "Camis Electronics Limited",
      "stage": "Selected",
      "sourcer": "Liliya Shved",
@@ -7284,6 +7800,7 @@
     {
      "id": "12114",
      "title": "воспламенители . Ash precsion ",
+     "created": "2025-02-12",
      "supplier": "ASH presicion",
      "stage": "Request Sent",
      "sourcer": "Ruslan Sitdikov",
@@ -7950,16 +8467,16 @@
      "n": 3
     },
     {
-     "name": "CSTC China Service Technology (Shandong) Co. Ltd.",
-     "n": 2
-    },
-    {
      "name": "Solar Turbines India",
      "n": 2
     },
     {
      "name": "One Power Services",
      "n": 2
+    },
+    {
+     "name": "Precision Asset Solutions Pvt. Ltd.",
+     "n": 1
     },
     {
      "name": "Industrial Turbine Services s.r.l",
@@ -8007,6 +8524,10 @@
     },
     {
      "name": "тет",
+     "n": 1
+    },
+    {
+     "name": "CSTC China Service Technology (Shandong) Co. Ltd.",
      "n": 1
     },
     {
@@ -8065,6 +8586,10 @@
     {
      "name": "TURBINE.PARTS B.V.",
      "n": 2
+    },
+    {
+     "name": "CSTC China Service Technology (Shandong) Co. Ltd.",
+     "n": 1
     },
     {
      "name": "ООО \"ТУРБО СЕРВИС КАЗАНЬ\"",

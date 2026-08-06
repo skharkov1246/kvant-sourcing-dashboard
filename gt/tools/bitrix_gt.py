@@ -138,6 +138,7 @@ def main() -> int:
             "stage": d.get("STAGE_ID"), "created": (d.get("DATE_CREATE") or "")[:10],
             "rfqs": [{
                 "id": str(r["id"]), "title": r.get("title"),
+                "created": (r.get("createdTime") or "")[:10],
                 "supplier": ", ".join(filter(None, (
                     [comp_names.get(str(r.get("companyId") or ""), "")] +
                     [comp_names.get(cid, cid) for cid in crm_refs(r.get("ufCrm18Supplier"))]))) or "—",

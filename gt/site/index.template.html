@@ -71,6 +71,12 @@ td b{font-weight:700}
 .gridln{stroke:var(--grid);stroke-width:1}
 .baseln{stroke:var(--axis);stroke-width:1}
 .btn{border:1px solid var(--border);background:var(--surface);color:var(--ink2);padding:6px 12px;border-radius:8px;font:600 12px system-ui;cursor:pointer}
+table.sortable th{cursor:pointer;user-select:none}
+table.sortable th:hover{color:var(--ink)}
+table.sortable th.asc::after{content:" ↑";color:var(--s1)}
+table.sortable th.desc::after{content:" ↓";color:var(--s1)}
+.explink{cursor:pointer;color:var(--s1)}
+.explink:hover{text-decoration:underline}
 footer{padding:0 22px 24px;color:var(--mut);font-size:11.5px}
 @media (max-width:700px){main,header,nav{padding-left:12px;padding-right:12px}}
 </style>
@@ -95,6 +101,26 @@ const CHECKLIST = __CHECKLIST_JSON__;
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const famTag = f => `<span class="tag ${f==='SGT'?'sgt':'solar'}">${f==='SGT'?'Siemens SGT':'Solar'}</span>`;
 const critCls = c => c==='A'?'critA':(c==='B'?'critB':'critC');
+
+/* сортировка любых таблиц класса .sortable кликом по заголовку (число/текст, ↑↓) */
+document.addEventListener('click', e=>{
+ const th = e.target.closest('table.sortable th'); if(!th) return;
+ const table = th.closest('table');
+ const tbody = table.tBodies.length>1 ? table.tBodies[table.tBodies.length-1] : table.tBodies[0];
+ const idx = [...th.parentNode.children].indexOf(th);
+ const dir = th.classList.contains('asc') ? -1 : 1;
+ table.querySelectorAll('th').forEach(h=>h.classList.remove('asc','desc'));
+ th.classList.add(dir>0?'asc':'desc');
+ const rows = [...tbody.rows].filter(r=>r.cells.length && r.cells[0].tagName==='TD');
+ const val = r=>{
+  const t = (r.cells[idx]?.textContent||'').trim();
+  const n = parseFloat(t.replace(/[\s ]/g,'').replace(',','.'));
+  return (!isNaN(n) && /^[−\-\d]/.test(t)) ? n : t.toLowerCase();
+ };
+ rows.sort((a,b)=>{ const x=val(a), y=val(b);
+  return (typeof x==='number' && typeof y==='number' ? x-y : String(x).localeCompare(String(y),'ru'))*dir; });
+ rows.forEach(r=>tbody.appendChild(r));
+});
 
 const TABS = [
  ['picker','Подбор поставщика'],['overview','Обзор'],['machines','Машины'],['parts','Номенклатура ЗИП'],['pn','Шифровки PN'],
@@ -249,7 +275,7 @@ function rPicker(){
   <button class="btn" onclick="pkCSV()">⬇ CSV</button>
   <span class="count" id="pk-count"></span>
  </div>
- <div class="tblwrap"><table>
+ <div class="tblwrap"><table class="sortable">
   <tr><th>Компания</th><th>Сегменты</th><th>Модели (синее — предлагал нам)</th><th>Что делает</th><th>Контакты</th><th>Источник</th></tr>
   <tbody id="pk-body"></tbody>
  </table></div>
@@ -376,7 +402,7 @@ function rSuppliers(){
   <button class="btn" onclick="exportCSV()">⬇ CSV</button>
   <span class="count" id="sup-count"></span>
  </div>
- <div class="tblwrap"><table>
+ <div class="tblwrap"><table class="sortable">
   <tr><th>Компания</th><th>Гео</th><th>Роль / категории</th><th>Что делает / возил · след в РФ</th><th>Контакты</th><th>Уровень</th><th>Примечание</th></tr>
   <tbody id="sup-body"></tbody>
  </table></div>
@@ -390,7 +416,7 @@ function rSuppliers(){
   <button class="btn" onclick="clCSV()">⬇ CSV</button>
   <span class="count" id="cl-count"></span>
  </div>
- <div class="tblwrap"><table>
+ <div class="tblwrap"><table class="sortable">
   <tr><th>Приор</th><th>Компания</th><th>Сегм.</th><th>Что делает</th><th>Контакты</th><th>Дов.</th></tr>
   <tbody id="cl-body"></tbody>
  </table></div>
@@ -429,13 +455,6 @@ function rBitrix(){
  const b=BITRIX;
  const nRfq=b.deals.reduce((a,d)=>a+d.rfqs.length,0);
  const exact=d=>d.models.filter(m=>!m.endsWith('уточнить)'));
- // группировка сделок по моделям
- const byModel={};
- for(const d of b.deals) for(const m of d.models) (byModel[m]=byModel[m]||[]).push(d);
- const order=Object.keys(byModel).sort((a,b2)=>{
-  const ga=a.includes('уточнить')||a.includes('вне фокуса'), gb=b2.includes('уточнить')||b2.includes('вне фокуса');
-  return ga!==gb ? (ga?1:-1) : a.localeCompare(b2,'ru');
- });
  let h=`<div class="mut">${esc(b.source)} · обновлено ${esc(b.updated)}</div>
  <div class="k">
   <div class="tile"><b>${b.deals.length}</b><span>ГТУ-сделок в Bitrix</span></div>
@@ -445,22 +464,50 @@ function rBitrix(){
  </div>`;
  if(!b.live) h+=`<div class="box warn"><b>Это сид-снимок</b> (названия сделок из снимка чатов): привязанные запросы СП-166 с поставщиками и стадиями подтянет выгрузка <b>gt/tools/bitrix_gt.py</b> — нужен BITRIX_WEBHOOK_URL в .env, затем <code>python3 gt/build.py</code>. Тогда здесь появится «кто к чему предлагает» по каждой модели.</div>`;
  if((b.offers||[]).length){
-  h+=`<h2>Кто к чему предлагает (по запросам СП-166)</h2><div class="tblwrap"><table><tr><th>Модель</th><th>Поставщики (число запросов)</th></tr>`;
+  h+=`<h2>Кто к чему предлагает (по запросам СП-166)</h2><div class="tblwrap"><table class="sortable"><tr><th>Модель</th><th>Поставщики (число запросов)</th></tr>`;
   for(const o of b.offers) h+=`<tr><td><b>${esc(o.model)}</b></td><td>${o.suppliers.map(s=>`<span class="tag">${esc(s.name)} · ${s.n}</span>`).join(' ')}</td></tr>`;
   h+=`</table></div>`;
  }
- h+=`<h2>Спрос по моделям (наши сделки)</h2>`;
- for(const m of order){
-  const ds=byModel[m];
-  h+=`<div class="card"><b>${esc(m)}</b> <span class="mut">· сделок: ${ds.length}</span><div class="tblwrap" style="margin-top:6px"><table><tr><th style="width:8%">Сделка</th><th>Название</th><th style="width:34%">Запросы СП-166 → поставщики</th></tr>`;
-  for(const d of ds){
-   const r=d.rfqs.length?d.rfqs.map(r=>`<div>${esc(r.supplier)} <span class="mut">· ${esc(r.stage||'')} ${r.sourcer?'· '+esc(r.sourcer):''}</span></div>`).join(''):'<span class="mut">—</span>';
-   h+=`<tr><td>${esc(d.id)}</td><td>${esc(d.title)}</td><td>${r}</td></tr>`;
-  }
-  h+=`</table></div></div>`;
- }
+ const bxModels=[...new Set(b.deals.flatMap(d=>d.models))].sort((a,b2)=>{
+  const ga=a.includes('уточнить')||a.includes('вне фокуса'), gb=b2.includes('уточнить')||b2.includes('вне фокуса');
+  return ga!==gb ? (ga?1:-1) : a.localeCompare(b2,'ru');
+ });
+ h+=`<h2>Наши сделки и запросы</h2>
+ <div class="filters">
+  <select id="bx-model" onchange="bxFilters()"><option value="">Модель: любая</option>${bxModels.map(m=>`<option>${esc(m)}</option>`).join('')}</select>
+  <input id="bx-q" placeholder="Поиск: сделка, поставщик, сорсер…" oninput="bxFilters()">
+  <label style="font-size:12.5px;color:var(--ink2)"><input type="checkbox" id="bx-rfq" onchange="bxFilters()"> только с запросами СП-166</label>
+  <span class="count" id="bx-count"></span>
+ </div>
+ <div class="tblwrap"><table class="sortable">
+  <thead><tr><th>Сделка</th><th>Создана</th><th>Модель</th><th>Название</th><th>Запросы СП-166: когда · кому · стадия · сорсер</th></tr></thead>
+  <tbody id="bx-body"></tbody>
+ </table></div>
+ <div class="mut">Клик по заголовку — сортировка. Даты запросов — создание записи в СП-166.</div>`;
  h+=`<div class="box info"><b>Что уже дал этот срез:</b> подтверждённые PN Solar из наших закупок — комплект горелок <b>372308-3500</b> (ЗП6071593) и запальная горелка <b>E204529-900</b> (ЗП6071591) → формат зашит во вкладку «Шифровки PN». Спрос по моделям: Taurus 60/70 (Л-НВН), Titan 130, SGT-300-2S (Ария), плюс общий ЗИП Solar/Siemens (ГП, НОВАТЭК).</div>`;
  return h;
+}
+function bxFilters(){
+ const m=document.getElementById('bx-model').value;
+ const q=document.getElementById('bx-q').value.trim().toLowerCase();
+ const onlyR=document.getElementById('bx-rfq').checked;
+ const ds=BITRIX.deals.filter(d=>{
+  if(m && !d.models.includes(m)) return false;
+  if(onlyR && !d.rfqs.length) return false;
+  if(q){
+   const hay=[d.id,d.title,d.models.join(' '),...d.rfqs.map(r=>r.supplier+' '+(r.sourcer||''))].join(' ').toLowerCase();
+   if(!hay.includes(q)) return false;
+  }
+  return true;
+ });
+ document.getElementById('bx-body').innerHTML = ds.map(d=>{
+  const rf = d.rfqs.length ? d.rfqs.map(r=>
+   `<div><span class="mut">${esc(r.created||'')}</span> · <b>${esc(r.supplier)}</b> <span class="mut">· ${esc(r.stage||'')}${r.sourcer?' · '+esc(r.sourcer):''}</span></div>`).join('') : '<span class="mut">—</span>';
+  return `<tr><td>${esc(d.id)}</td><td style="white-space:nowrap">${esc(d.created||'')}</td>
+   <td>${d.models.map(x=>`<span class="tag">${esc(x)}</span>`).join('')}</td>
+   <td style="min-width:230px">${esc(d.title)}</td><td style="min-width:260px">${rf}</td></tr>`;
+ }).join('') || `<tr><td colspan="5" class="mut">Ничего не найдено.</td></tr>`;
+ document.getElementById('bx-count').textContent=`${ds.length} из ${BITRIX.deals.length} сделок · запросов: ${ds.reduce((a,d)=>a+d.rfqs.length,0)}`;
 }
 
 /* ---------- Таможня ---------- */
@@ -487,7 +534,7 @@ function barChart(data){
 }
 function rCustoms(){
  const c=CUSTOMS;
- const t=(rows,cols)=>`<div class="tblwrap"><table><tr>${cols.map(x=>`<th>${x}</th>`).join('')}</tr>${rows}</table></div>`;
+ const t=(rows,cols)=>`<div class="tblwrap"><table class="sortable"><tr>${cols.map(x=>`<th>${x}</th>`).join('')}</tr>${rows}</table></div>`;
  return `
  <div class="mut">Источник: glbs.io (Глобус-ВЭД, официальные данные таможни РФ) · HS ${esc(c.hs)} · период ${esc(c.period)}. Режим search: имена импортёров и суммы частично маскированы; в выборку вкладки попали записи, отфильтрованные по профилю ЗИП (${c.visible_records} из ${c.total_records.toLocaleString('ru')}).</div>
  <div class="k">
@@ -497,13 +544,32 @@ function rCustoms(){
  </div>
  <div class="viz-root"><h3>Записи выборки по годам</h3><div class="mut" style="margin-bottom:6px">штук деклараций (наведение — тоннаж)</div>${barChart(c.by_year)}</div>
  <h2>Топ экспортёров (по выборке)</h2>
- ${t(c.top_exporters.map(e=>`<tr><td><b>${esc(e.name)}</b></td><td>${e.n}</td></tr>`).join(''),['Экспортёр','Записей'])}
+ <div class="mut" style="margin-bottom:4px">Клик по экспортёру — все его записи в таможне РФ (что и когда ввозилось).</div>
+ ${t(c.top_exporters.map(e=>`<tr><td><b class="explink" data-ex="${esc(e.name)}">${esc(e.name)}</b></td><td>${e.n}</td></tr>`).join(''),['Экспортёр','Записей'])}
+ <div id="cust-detail"></div>
  <h2>Топ импортёров РФ</h2>
  ${t(c.top_importers.map(e=>`<tr><td><b>${esc(e.name)}</b></td><td>${e.n}</td></tr>`).join(''),['Импортёр (маскирован источником)','Записей'])}
  <h2>Упоминания моделей в декларациях</h2>
  ${t(c.models.map(m=>`<tr><td><b>${esc(m.model)}</b></td><td>${m.n}</td><td class="mut">${m.exporters.map(esc).join(' · ')}</td></tr>`).join(''),['Модель','Записей','Экспортёры'])}
  <div class="box info">Solar в таможне РФ 2023–2026 почти не виден (2 записи — ЗИП Mars/Taurus от самого Solar Turbines до ухода): канал ЗИП Solar шёл напрямую от OEM и умер с санкциями. Это подтверждает ставку на независимые MRO и мировые базы (вкладка «Базы данных»).</div>`;
 }
+function showExp(name){
+ const recs = CUSTOMS.records.filter(r=>r.ex===name);
+ const rows = recs.map(r=>`<tr><td style="white-space:nowrap">${esc(r.d)}</td><td>${esc(r.hs)}</td>
+  <td style="min-width:260px;font-size:12px">${esc(r.ds)}</td><td>${esc(r.im)}</td>
+  <td style="text-align:right">${esc(r.kg)}</td><td style="text-align:right">${esc(r.uk)}</td><td>${esc(r.co)}</td></tr>`).join('');
+ document.getElementById('cust-detail').innerHTML = `
+ <div class="card" style="border-left:4px solid var(--s1)">
+  <b>${esc(name)}</b> <span class="mut">· ${recs.length} записей в таможне РФ (2023–2026) · суммы/имена частично маскированы источником</span>
+  <div class="tblwrap" style="margin-top:6px"><table class="sortable">
+   <tr><th>Дата</th><th>HS</th><th>Описание из декларации</th><th>Импортёр РФ</th><th>Нетто, кг</th><th>USD/кг</th><th>Откуда</th></tr>
+   ${rows}</table></div></div>`;
+ document.getElementById('cust-detail').scrollIntoView({behavior:'smooth', block:'start'});
+}
+document.addEventListener('click', e=>{
+ const el = e.target.closest('.explink');
+ if(el && el.dataset.ex) showExp(el.dataset.ex);
+});
 
 /* ---------- Базы данных ---------- */
 function rDB(){
@@ -534,7 +600,7 @@ function show(id){
   document.querySelector(`[data-t="${tid}"]`).classList.toggle('on', tid===id);
   document.getElementById(`s-${tid}`).classList.toggle('on', tid===id);
  }
- if(!rendered[id]){ document.getElementById(`s-${id}`).innerHTML = R[id](); rendered[id]=1; if(id==='suppliers'){ applyFilters(); clFilters(); } if(id==='picker') pkFilters(); }
+ if(!rendered[id]){ document.getElementById(`s-${id}`).innerHTML = R[id](); rendered[id]=1; if(id==='suppliers'){ applyFilters(); clFilters(); } if(id==='picker') pkFilters(); if(id==='bitrix') bxFilters(); }
  location.hash = id;
 }
 nav.addEventListener('click', e=>{ const b=e.target.closest('button'); if(b) show(b.dataset.t); });

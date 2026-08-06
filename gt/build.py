@@ -35,6 +35,7 @@ def customs_summary():
     importers = Counter()
     countries = Counter()
     model_hits = defaultdict(Counter)  # модель -> экспортёры
+    records = []  # компактные записи для drill-down по экспортёру на сайте
     for f in CUSTOMS_FILES:
         d = json.loads(f.read_text())
         total += int(d.get("total_records") or 0)
@@ -47,8 +48,9 @@ def customs_summary():
                     kg_by_year[y] += float(rec.get("net_kg") or 0)
                 except ValueError:
                     pass
-            if rec.get("exporter"):
-                exporters[norm_name(rec["exporter"])] += 1
+            ex_key = norm_name(rec.get("exporter"))
+            if ex_key:
+                exporters[ex_key] += 1
             if rec.get("importer"):
                 importers[norm_name(rec["importer"])] += 1
             if rec.get("dispatch"):
@@ -56,7 +58,19 @@ def customs_summary():
             desc = f"{rec.get('desc') or ''} {rec.get('brand') or ''}"
             for m in set(x.upper().replace(" ", "-") for x in MODEL_RE.findall(desc)):
                 model_hits[m][rec.get("exporter") or "?"] += 1
+            records.append({
+                "d": rec.get("date") or "",
+                "ex": ex_key,
+                "im": norm_name(rec.get("importer")),
+                "ds": (rec.get("desc") or "")[:220],
+                "kg": rec.get("net_kg") or "",
+                "uk": rec.get("usd_kg") or "",
+                "hs": rec.get("hs10") or "",
+                "co": rec.get("dispatch") or "",
+            })
+    records.sort(key=lambda r: r["d"], reverse=True)
     return {
+        "records": records,
         "hs": "8411 (турбины газовые и их части: 841181/841182/841199)",
         "period": "2023-01 … 2026-03",
         "total_records": total,
