@@ -27,7 +27,10 @@
       "segment": 1,
       "confidence": "высокая",
       "confirm": "Panjiva sample bill of lading в ОБЕ стороны (профили 60746074 и 62749451) + таблица поставщиков ImportKey. Двусторонний поток = маршрутизация ремонта горячей части.",
-      "site": "liburdi.com", "email": "info@liburdi.com", "phone": "+1 905 689 0734"
+      "site": "liburdi.com",
+      "email": "info@liburdi.com",
+      "phone": "+1 905 689 0734",
+      "block": "C"
     },
     {
       "company": "WBS Trading & Manufacturing Pte. Ltd.",
@@ -38,7 +41,10 @@
       "segment": 1,
       "confidence": "средне-высокая",
       "confirm": "ImportKey — товарные описания отгрузок в адрес TFS. Профиля в Panjiva нет (там связка не подтверждается).",
-      "site": "wbs.com.sg", "email": "sales@wbs.com.sg", "phone": "+65 6863 1978"
+      "site": "wbs.com.sg",
+      "email": "sales@wbs.com.sg",
+      "phone": "+65 6863 1978",
+      "block": "A"
     },
     {
       "company": "Turbine Engineering Services Ltd",
@@ -52,7 +58,8 @@
       "site": "turbineengineeringservices.co.uk (не отвечает)",
       "email": "не найдено",
       "phone": "01386 555630 (из бизнес-справочников, независимо не подтверждён)",
-      "address": "Units 10–13 Aintree Road, Keytec 7 Business Park, Pershore, Worcestershire WR10 2JN"
+      "address": "Units 10–13 Aintree Road, Keytec 7 Business Park, Pershore, Worcestershire WR10 2JN",
+      "block": "G"
     },
     {
       "company": "Heinzmann UK Limited",
@@ -63,7 +70,10 @@
       "segment": 1,
       "confidence": "средняя",
       "confirm": "Таблица поставщиков ImportKey (единичная поставка).",
-      "site": "heinzmann-re.com", "email": "sales@heinzmann-re.com", "phone": "+44 1206 799556"
+      "site": "heinzmann-re.com",
+      "email": "sales@heinzmann-re.com",
+      "phone": "+44 1206 799556",
+      "block": "B"
     },
     {
       "company": "Sifco Applied Surface Concepts LLC",
@@ -74,7 +84,10 @@
       "segment": 3,
       "confidence": "средняя",
       "confirm": "Volza — сводка профиля TFS из поисковой выдачи (сама страница закрыта WAF).",
-      "site": "sifcoasc.com", "email": "не найдено", "phone": "не найдено"
+      "site": "sifcoasc.com",
+      "email": "не найдено",
+      "phone": "не найдено",
+      "block": "E"
     },
     {
       "company": "ITS — Industrial Turbine Services GmbH",
@@ -85,7 +98,10 @@
       "segment": 1,
       "confidence": "подтверждена компания, связь с TFS НЕ подтверждена",
       "confirm": "ImportKey — импорт в Мексику по HS деталей ГТУ, но получатели иные (Proveedores Industriales, Strom, Dervsa). Контакты с сайта компании.",
-      "site": "turbineservices.at", "email": "contact@turbineservices.de", "phone": "+49 201 43728-0"
+      "site": "turbineservices.at",
+      "email": "contact@turbineservices.de",
+      "phone": "+49 201 43728-0",
+      "block": "B"
     },
     {
       "company": "Finework (Hunan) New Energy Technology Co. Ltd",
@@ -96,7 +112,9 @@
       "segment": 1,
       "confidence": "НИЗКАЯ — вероятно ложный след",
       "confirm": "Проверка Panjiva (профиль 71125343): 132 отгрузки в США, заказчики уровня LM Wind Power — это ВЕТРОЭНЕРГЕТИКА, не ГТУ. Связь с TFS и с горячей частью SGT-400 не подтверждается.",
-      "site": "fineworkchina.com", "email": "sales@fineworkchina.com", "phone": "+86 731 8873 8080"
+      "site": "fineworkchina.com",
+      "email": "sales@fineworkchina.com",
+      "phone": "+86 731 8873 8080"
     },
     {
       "company": "Suzhou Escott Machinery Equipment / Wuhan Rayvanbo / Henan Sante Furnace / Shandong Luzhong Machine Tool",
@@ -107,24 +125,74 @@
       "segment": 0,
       "confidence": "высокая (но нерелевантно нашей номенклатуре)",
       "confirm": "ImportKey / Panjiva.",
-      "site": "", "email": "", "phone": ""
+      "site": "",
+      "email": "",
+      "phone": ""
     }
   ],
   "customers": [
-    {"company": "TFS Turbine Field Solutions Colombia (NIT 901438430)", "country": "Колумбия", "hs": "4009220501, 8205599999, 8204119900", "note": "Аффилиат. Шланги с фитингами, специнструмент для обслуживания роторов ГТУ, оснастка для сборки/разборки дисков"},
-    {"company": "Gas Turbine Products LLC", "country": "не установлена", "hs": "8411820100", "note": "151 отгрузка от TFS. Юрлицо найти не удалось — ни регистрации, ни сайта; возможно, торговое имя в декларации. НЕ путать с World Wide Gas Turbine Products Inc. (Нью-Йорк) — совпадение не подтверждено"},
-    {"company": "Oleoducto Central S.A. (Ocensa)", "country": "Колумбия", "hs": "8411820100", "note": "Трубопроводный оператор — конечный эксплуатант"},
-    {"company": "PTTEP International Ltd", "country": "Таиланд", "note": "Нефтегазовый оператор — конечный эксплуатант"},
-    {"company": "POSCO International Corporation", "country": "Ю. Корея", "hs": "3926.40", "note": "Веракрус → Хьюстон; через них — мьянманское направление"}
+    {
+      "company": "TFS Turbine Field Solutions Colombia (NIT 901438430)",
+      "country": "Колумбия",
+      "hs": "4009220501, 8205599999, 8204119900",
+      "note": "Аффилиат. Шланги с фитингами, специнструмент для обслуживания роторов ГТУ, оснастка для сборки/разборки дисков"
+    },
+    {
+      "company": "Gas Turbine Products LLC",
+      "country": "не установлена",
+      "hs": "8411820100",
+      "note": "151 отгрузка от TFS. Юрлицо найти не удалось — ни регистрации, ни сайта; возможно, торговое имя в декларации. НЕ путать с World Wide Gas Turbine Products Inc. (Нью-Йорк) — совпадение не подтверждено"
+    },
+    {
+      "company": "Oleoducto Central S.A. (Ocensa)",
+      "country": "Колумбия",
+      "hs": "8411820100",
+      "note": "Трубопроводный оператор — конечный эксплуатант"
+    },
+    {
+      "company": "PTTEP International Ltd",
+      "country": "Таиланд",
+      "note": "Нефтегазовый оператор — конечный эксплуатант"
+    },
+    {
+      "company": "POSCO International Corporation",
+      "country": "Ю. Корея",
+      "hs": "3926.40",
+      "note": "Веракрус → Хьюстон; через них — мьянманское направление"
+    }
   ],
   "leads": [
+    {
+      "company": "DURAG Group / HEGWEIN",
+      "country": "Германия",
+      "segment": 1,
+      "ships": "Запальники и системы розжига камер сгорания ГТУ (HEGWEIN M22D), горелки, контроль пламени",
+      "why": "Профильный изготовитель систем розжига камер сгорания промышленных ГТУ; патент ignition generator for gas turbines. Связка с TFS по отгрузкам не пробита.",
+      "site": "durag.com",
+      "email": "info@durag.com",
+      "phone": "+49 40 554218-0",
+      "block": "B"
+    },
+    {
+      "company": "Sonkit (Shanghai)",
+      "country": "Китай",
+      "segment": 1,
+      "ships": "Металлические уплотнения C-ring камеры сгорания и горячего тракта, уплотнительные кольца",
+      "why": "Профильный изготовитель металлических уплотнений для ГТУ. Связка с TFS по отгрузкам не пробита.",
+      "site": "sonkit.com",
+      "email": "sales@sonkit.com",
+      "phone": "+86 21 5439 9299",
+      "block": "D"
+    },
     {
       "company": "Gas Turbine Services A/S",
       "country": "Дания (Эсбьерг) + площадка Линкольн, UK",
       "why": "Volza показывает Данию среди трёх основных направлений экспорта TFS. GTS A/S — крупнейший независимый сервис по линейке Siemens (Lincoln) SGT / Ruston, то есть ровно наш завод-изготовитель SGT-400. Прямая запись отгрузки TFS↔GTS не пробита — это гипотеза, требующая проверки.",
-      "site": "gasturbineservices.com", "email": "gts@gasturbineservices.com",
+      "site": "gasturbineservices.com",
+      "email": "gts@gasturbineservices.com",
       "phone": "+45 7546 8030 (Дания), +44 1522 842700 (Линкольн)",
-      "address": "Murervej 2-6, 6710 Esbjerg V, Дания / New Horizons, Teal Park, Lincoln LN6 3AD"
+      "address": "Murervej 2-6, 6710 Esbjerg V, Дания / New Horizons, Teal Park, Lincoln LN6 3AD",
+      "block": "G"
     }
   ],
   "sources": [

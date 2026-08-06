@@ -150,7 +150,9 @@ def build():
                  "БАЗЫ-ДАННЫХ-ЗАКУПКА.pdf": "trade-databases.pdf",
                  "БАЗЫ-ДАННЫХ-ЗАКУПКА.md": "trade-databases.md",
                  "sgt400_world_suppliers.csv": "sgt400-world-suppliers.csv",
-                 "sourcer_checklist_sgt400.csv": "sgt400-sourcer-checklist.csv"}
+                 "sourcer_checklist_sgt400.csv": "sgt400-sourcer-checklist.csv",
+                 "ПОСТАВЩИКИ-ПО-БЛОКАМ.pdf": "suppliers-by-block.pdf",
+                 "ПОСТАВЩИКИ-ПО-БЛОКАМ.html": "suppliers-by-block.html"}
         for f in orders.iterdir():
             if f.suffix.lower() in (".pdf", ".csv", ".md", ".html"):
                 shutil.copy2(f, OUT / "orders" / alias.get(f.name, f.name))
