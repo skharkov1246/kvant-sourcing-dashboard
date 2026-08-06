@@ -101,6 +101,7 @@ def main():
         "__TFSSUB_JSON__": (ROOT / "data/tfs_subsuppliers.json").read_text(encoding="utf-8"),
         "__BXSITES_JSON__": (ROOT / "data/bitrix_supplier_sites.json").read_text(encoding="utf-8"),
         "__RESEARCH_JSON__": (ROOT / "data/research_suppliers.json").read_text(encoding="utf-8"),
+        "__PNCAT_JSON__": (ROOT / "data/pn_catalog.json").read_text(encoding="utf-8"),
         "__CUSTOMS_JSON__": json.dumps(customs_summary(), ensure_ascii=False),
         "__BUILT_AT__": date.today().isoformat(),
     }

@@ -145,6 +145,7 @@ const HEAVY_SUPS = __HEAVY_JSON__;
 const TFS_SUB = __TFSSUB_JSON__;
 const BX_SITES = __BXSITES_JSON__;
 const RESEARCH = __RESEARCH_JSON__;
+const PNCAT = __PNCAT_JSON__;
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const FAM_NAME = {SGT:'Siemens SGT', Solar:'Solar', Heavy:'Тяжёлые ГТУ'};
@@ -721,7 +722,36 @@ function rPN(){
   }
   h += `</table></div>`;
  }
+ const pnModels=[...new Set(PNCAT.rows.map(r=>r.model).filter(Boolean))].sort();
+ h += `<h2>Каталог партномеров из открытых источников — ${PNCAT.rows.length}</h2>
+ <div class="mut" style="margin-bottom:6px">${esc(PNCAT.source)}</div>
+ <div class="filters">
+  <div class="f-field"><label>Модель</label>
+   <select id="pn-model" onchange="pnFilters()"><option value="">любая</option>${pnModels.map(m=>`<option>${esc(m)}</option>`).join('')}</select></div>
+  <div class="f-field" style="flex:1;min-width:200px"><label>Поиск</label>
+   <input id="pn-q" placeholder="PN, деталь, система…" oninput="pnFilters()"></div>
+  <span class="count" id="pn-count"></span>
+ </div>
+ <div class="tblwrap"><table class="sortable">
+  <tr><th>PN</th><th>Деталь</th><th>Модель</th><th>Система</th><th>Источник</th></tr>
+  <tbody id="pn-body"></tbody>
+ </table></div>
+ ${(PNCAT.format_notes||[]).length?`<div class="box info" style="font-size:12.5px"><b>Наблюдения о структуре номеров:</b><br>${PNCAT.format_notes.map(n=>esc(n)).join('<br>')}</div>`:''}`;
  return h;
+}
+function pnFilters(){
+ const m=document.getElementById('pn-model').value;
+ const q=document.getElementById('pn-q').value.trim().toLowerCase();
+ const rows=PNCAT.rows.filter(r=>{
+  if(m && r.model!==m) return false;
+  if(q && ![r.pn,r.desc,r.system,r.model].join(' ').toLowerCase().includes(q)) return false;
+  return true;
+ });
+ document.getElementById('pn-body').innerHTML=rows.map(r=>`<tr><td style="white-space:nowrap"><b>${esc(r.pn)}</b></td>
+  <td style="min-width:220px">${esc(r.desc)}</td><td style="white-space:nowrap">${esc(r.model)}</td>
+  <td>${esc(r.system)}</td><td class="mut" style="font-size:11.5px">${esc(r.source)}</td></tr>`).join('')
+  || `<tr><td colspan="5" class="mut">Не найдено.</td></tr>`;
+ document.getElementById('pn-count').textContent=`${rows.length} из ${PNCAT.rows.length}`;
 }
 
 /* ---------- Поставщики ---------- */
@@ -975,7 +1005,7 @@ function show(id){
   document.querySelector(`[data-t="${tid}"]`).classList.toggle('on', tid===id);
   document.getElementById(`s-${tid}`).classList.toggle('on', tid===id);
  }
- if(!rendered[id]){ document.getElementById(`s-${id}`).innerHTML = R[id](); rendered[id]=1; if(id==='suppliers'){ applyFilters(); clFilters(); } if(id==='picker') pkFilters(); if(id==='bitrix') bxFilters(); }
+ if(!rendered[id]){ document.getElementById(`s-${id}`).innerHTML = R[id](); rendered[id]=1; if(id==='suppliers'){ applyFilters(); clFilters(); } if(id==='picker') pkFilters(); if(id==='bitrix') bxFilters(); if(id==='pn') pnFilters(); }
  location.hash = id;
 }
 nav.addEventListener('click', e=>{ const b=e.target.closest('button'); if(b) show(b.dataset.t); });
