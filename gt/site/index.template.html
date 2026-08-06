@@ -84,6 +84,7 @@ const PARTS = __PARTS_JSON__;
 const PN = __PN_JSON__;
 const CUSTOMS = __CUSTOMS_JSON__;
 const BITRIX = __BITRIX_JSON__;
+const CHECKLIST = __CHECKLIST_JSON__;
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const famTag = f => `<span class="tag ${f==='SGT'?'sgt':'solar'}">${f==='SGT'?'Siemens SGT':'Solar'}</span>`;
@@ -101,7 +102,8 @@ function rOverview(){
  const nModels = MODELS.families.reduce((a,f)=>a+f.models.length,0);
  return `
  <div class="k">
-  <div class="tile"><b>${SUPPLIERS.length}</b><span>компаний в библиотеке</span></div>
+  <div class="tile"><b>${SUPPLIERS.length}</b><span>компаний в ядре библиотеки</span></div>
+  <div class="tile"><b>${CHECKLIST.rows.length}</b><span>в мировом чеклисте SGT-400</span></div>
   <div class="tile"><b>${nSGT} / ${nSolar}</b><span>по Siemens SGT / по Solar</span></div>
   <div class="tile"><b>${nModels}</b><span>моделей турбин</span></div>
   <div class="tile"><b>${PARTS.systems.length}</b><span>систем в номенклатуре ЗИП</span></div>
@@ -217,7 +219,48 @@ function rSuppliers(){
   <tr><th>Компания</th><th>Гео</th><th>Роль / категории</th><th>Что делает / возил · след в РФ</th><th>Контакты</th><th>Уровень</th><th>Примечание</th></tr>
   <tbody id="sup-body"></tbody>
  </table></div>
- <div class="mut">Уровни: П1 — прямое попадание (Китай, реально для РФ) · П2 — профильные UK/EU (санкционный риск, через посредника) · П2-Иран — лицензиаты Siemens · П3 — прочие/трейдеры · S1–S3 — Solar-блок (S1 — якорные MRO). Контакты SGT-блока верифицированы 05.08.2026; Solar-блок — брать с сайта.</div>`;
+ <div class="mut">Уровни: П1 — прямое попадание (Китай, реально для РФ) · П2 — профильные UK/EU (санкционный риск, через посредника) · П2-Иран — лицензиаты Siemens · П3 — прочие/трейдеры · S1–S3 — Solar-блок (S1 — якорные MRO). Контакты SGT-блока верифицированы 05.08.2026; Solar-блок — брать с сайта.</div>
+ <h2 id="cl-h">Мировой чеклист SGT-400 — ${CHECKLIST.rows.length} компаний по ${CHECKLIST.segments.length} сегментам</h2>
+ <div class="mut" style="margin-bottom:6px">${esc(CHECKLIST.source)}</div>
+ <div class="filters">
+  <input id="cl-q" placeholder="Поиск по чеклисту…" oninput="clFilters()">
+  <select id="cl-seg" onchange="clFilters()"><option value="">Сегмент: все</option>${CHECKLIST.segments.map(s=>`<option value="${s.n}">${s.n} — ${esc(s.name)}</option>`).join('')}</select>
+  <select id="cl-conf" onchange="clFilters()"><option value="">Доверие: все</option><option value="high">high</option><option value="med">med</option><option value="low">low</option></select>
+  <button class="btn" onclick="clCSV()">⬇ CSV</button>
+  <span class="count" id="cl-count"></span>
+ </div>
+ <div class="tblwrap"><table>
+  <tr><th>Приор</th><th>Компания</th><th>Сегм.</th><th>Что делает</th><th>Контакты</th><th>Дов.</th></tr>
+  <tbody id="cl-body"></tbody>
+ </table></div>
+ <div class="mut">Приоритеты: ★ ТАМОЖНЯ — виден в таможенном потоке · ★ TFS — из цепочки TFS · ★ ЛИД — тёплый контакт · ★ — первая волна RFQ · • — вторая волна. Сегмент 7 — РФ/СНГ (сервис, покрытия, реверс).</div>`;
+}
+function clRow(r){
+ return `<tr><td style="white-space:nowrap">${esc(r.prior)}</td>
+  <td><b>${esc(r.name)}</b><br><span class="mut">${esc(r.country)}</span></td>
+  <td title="${esc(r.seg_name)}">${r.seg}</td>
+  <td style="min-width:240px">${esc(r.what)}${r.proof?`<div class="mut" style="font-size:11.5px">${esc(r.proof)}</div>`:''}</td>
+  <td style="white-space:nowrap">${esc(r.site)}<br><span class="mut">${esc(r.email)}</span><br><span class="mut">${esc(r.phone)}</span></td>
+  <td>${esc(r.conf)}</td></tr>`;
+}
+function clFilters(){
+ const q=document.getElementById('cl-q').value.trim().toLowerCase();
+ const seg=document.getElementById('cl-seg').value;
+ const conf=document.getElementById('cl-conf').value;
+ const rows=CHECKLIST.rows.filter(r=>{
+  if(seg && String(r.seg)!==seg) return false;
+  if(conf && r.conf!==conf) return false;
+  if(q && ![r.name,r.country,r.what,r.seg_name,r.prior].join(' ').toLowerCase().includes(q)) return false;
+  return true;
+ });
+ document.getElementById('cl-body').innerHTML=rows.map(clRow).join('')||`<tr><td colspan="6" class="mut">Ничего не найдено.</td></tr>`;
+ document.getElementById('cl-count').textContent=`${rows.length} из ${CHECKLIST.rows.length}`;
+}
+function clCSV(){
+ const cols=['seg','prior','name','country','what','site','email','phone','conf','proof'];
+ const lines=[cols.join(';')].concat(CHECKLIST.rows.map(r=>cols.map(c=>'"'+String(r[c]??'').replace(/"/g,'""')+'"').join(';')));
+ const blob=new Blob(["﻿"+lines.join('\r\n')],{type:'text/csv;charset=utf-8'});
+ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='sgt400_checklist.csv'; a.click();
 }
 
 /* ---------- Наши запросы (Bitrix) ---------- */
@@ -330,7 +373,7 @@ function show(id){
   document.querySelector(`[data-t="${tid}"]`).classList.toggle('on', tid===id);
   document.getElementById(`s-${tid}`).classList.toggle('on', tid===id);
  }
- if(!rendered[id]){ document.getElementById(`s-${id}`).innerHTML = R[id](); rendered[id]=1; if(id==='suppliers') applyFilters(); }
+ if(!rendered[id]){ document.getElementById(`s-${id}`).innerHTML = R[id](); rendered[id]=1; if(id==='suppliers'){ applyFilters(); clFilters(); } }
  location.hash = id;
 }
 nav.addEventListener('click', e=>{ const b=e.target.closest('button'); if(b) show(b.dataset.t); });

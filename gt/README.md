@@ -19,6 +19,10 @@ gt/
                         + Solar-блок (публичные данные, контакты с сайтов)
   data/models.json      модельные ряды: 4×SGT + 9×Solar (мощность/КПД ≈, ISO)
   data/parts.json       номенклатура ЗИП: 8 систем, критичность, EN-термины для RFQ
+  data/sgt400_checklist.json  мировой чеклист SGT-400: 141 компания по 7 сегментам
+                        (камеры/DLE, лопатки, покрытия, материалы, MRO, трейдеры,
+                        РФ/СНГ) с приоритетами и уровнями доверия — импорт из
+                        сессии «Перфы» (ветка claude/project-continuation-drfnkf)
   data/pn_guide.json    шифровки PN: формат Линкольна (MW#####X), legacy-имена
                         (Typhoon/Tornado/Tempest/Cyclone), правила Solar, методика
   data/bitrix_gt.json   наши ГТУ-запросы из Bitrix: сделки с разметкой моделей и
