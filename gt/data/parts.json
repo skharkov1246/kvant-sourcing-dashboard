@@ -1,0 +1,91 @@
+{
+ "note": "Универсальная номенклатура ЗИП промышленной ГТУ 1–25 МВт (Solar + SGT). Критичность: A — останавливает машину / длинный срок, B — плановая замена, C — расходник. «Aftermarket» — реальная доступность вне OEM по опыту разведки 2026.",
+ "systems": [
+  {
+   "id": "hot", "title": "Горячий тракт (камера сгорания)", "crit": "A",
+   "aftermarket": "широкий: Китай (Blaze, O.B.T, Dongturbo), Италия (SAMIC), сервис UK/NL (Score, Skyline)",
+   "components": [
+    {"ru": "Камера сгорания (в сборе)", "en": "combustion chamber / combustor assembly", "note": "фокус закупки КВАНТ: SGT-400 → PN MW21215M", "crit": "A"},
+    {"ru": "Жаровая труба", "en": "combustion liner / can", "note": "главный ресурсный элемент; реверс освоен в Китае", "crit": "A"},
+    {"ru": "Основная горелка DLE", "en": "main burner (DLE)", "note": "SGT-400 DUAL DLE → PN MW22316B/01; ремонт — Score Energy (единственный Siemens-одобренный не-OEM цех)", "crit": "A"},
+    {"ru": "Пилотная горелка", "en": "pilot burner", "note": "есть в прайсе Leda Greenpower по SGT-400", "crit": "A"},
+    {"ru": "Переходной патрубок", "en": "transition piece / duct", "note": "литьё+жаропрочная сварка; O.B.T Qingdao делает по SGT-400", "crit": "A"},
+    {"ru": "Запальник / свеча", "en": "igniter / spark plug", "note": "узкая ниша — TESI IGNITERS (Италия)", "crit": "B"},
+    {"ru": "Топливные форсунки", "en": "fuel injectors / nozzles", "note": "у Solar — ключевой регулярный расходник, замена на каждом ТО", "crit": "A"}
+   ]
+  },
+  {
+   "id": "turbine", "title": "Турбина (ВД + силовая)", "crit": "A",
+   "aftermarket": "узкий: реверс-заводы лопаток (Blaze, Bowzon, MAPNA PARTO), восстановление (Liburdi, Sulzer, Henan GTET)",
+   "components": [
+    {"ru": "Рабочие лопатки ТВД", "en": "HP turbine blades", "note": "монокристалл/направленная кристаллизация + покрытие — самая сложная деталь машины", "crit": "A"},
+    {"ru": "Сопловые (направляющие) аппараты", "en": "nozzle guide vanes (NGV)", "note": "литьё по выплавляемым моделям; восстанавливаются сваркой", "crit": "A"},
+    {"ru": "Лопатки силовой турбины", "en": "power turbine blades", "note": "проще ТВД (ниже температура) — первый кандидат на реверс", "crit": "A"},
+    {"ru": "Диски турбины", "en": "turbine discs", "note": "Blaze заявляет диски SGT-400; поковка + мехобработка (GFM)", "crit": "A"},
+    {"ru": "Уплотнительные сегменты / бандажи", "en": "shroud / tip seal segments", "note": "", "crit": "B"}
+   ]
+  },
+  {
+   "id": "compressor", "title": "Осевой компрессор", "crit": "B",
+   "aftermarket": "средний: лопатки — реверс-заводы; клапаны/актуаторы — универсальные",
+   "components": [
+    {"ru": "Лопатки компрессора (рабочие/статорные)", "en": "compressor blades / stator vanes", "note": "нерж. стали — проще турбинных", "crit": "B"},
+    {"ru": "Входной направляющий аппарат + привод", "en": "inlet guide vanes (IGV) + actuator", "note": "", "crit": "B"},
+    {"ru": "Антипомпажные / сбросные клапаны", "en": "bleed / blow-off valves", "note": "универсальные компоненты — покупаются вне OEM", "crit": "B"}
+   ]
+  },
+  {
+   "id": "rotor", "title": "Ротор, опоры, уплотнения", "crit": "B",
+   "aftermarket": "средний: подшипники — специализированные заводы; DGS — John Crane/Eagle-класс aftermarket",
+   "components": [
+    {"ru": "Подшипники опорные (баббит)", "en": "journal bearings", "note": "перезаливка баббита — освоенная услуга и в РФ", "crit": "B"},
+    {"ru": "Подшипник упорный", "en": "thrust bearing", "note": "", "crit": "B"},
+    {"ru": "Сухие газовые уплотнения ЦБК", "en": "dry gas seals (DGS)", "note": "для приводных компрессоров; в прайсе Leda по SGT-400", "crit": "A"},
+    {"ru": "Муфты / торсионный вал", "en": "couplings", "note": "", "crit": "B"},
+    {"ru": "Лабиринтные уплотнения", "en": "labyrinth seals", "note": "", "crit": "C"}
+   ]
+  },
+  {
+   "id": "fuel", "title": "Топливная система", "crit": "B",
+   "aftermarket": "широкий: клапаны/арматура — универсальные позиции",
+   "components": [
+    {"ru": "Клапаны дозирования топлива", "en": "fuel metering / control valves", "note": "", "crit": "A"},
+    {"ru": "Стопорные/отсечные клапаны", "en": "shut-off valves", "note": "", "crit": "A"},
+    {"ru": "Топливные коллекторы и гибкие подводы", "en": "fuel manifolds / flex hoses", "note": "", "crit": "B"},
+    {"ru": "Фильтры топливного газа", "en": "fuel gas filters", "note": "расходник", "crit": "C"}
+   ]
+  },
+  {
+   "id": "controls", "title": "САУ, КИП, электрика", "crit": "B",
+   "aftermarket": "широкий по датчикам (универсальные); ретрофит САУ — Petrotech и аналоги",
+   "components": [
+    {"ru": "Контроллер САУ", "en": "control system / PLC", "note": "Solar: Turbotronic (закрытая) — при недоступности OEM смотреть ретрофит на открытые ПЛК", "crit": "A"},
+    {"ru": "Термопары выхлопа (Т5/EGT)", "en": "exhaust thermocouples", "note": "регулярный расходник, универсальные аналоги", "crit": "C"},
+    {"ru": "Вибродатчики / проксиметры", "en": "vibration probes (Bently Nevada class)", "note": "стандартные позиции — вне OEM", "crit": "B"},
+    {"ru": "Соленоиды, актуаторы, конечники", "en": "solenoids / actuators / switches", "note": "", "crit": "B"},
+    {"ru": "Датчики пламени / УФ", "en": "flame scanners", "note": "", "crit": "B"}
+   ]
+  },
+  {
+   "id": "consumables", "title": "Фильтры и расходники", "crit": "C",
+   "aftermarket": "максимально широкий: универсальные производители фильтрации (Camfil/Donaldson-класс, есть аналоги РФ/КНР)",
+   "components": [
+    {"ru": "Фильтры КВОУ (воздух на входе)", "en": "inlet air filters", "note": "самый массовый расходник; аналоги подбираются по размеру/классу EPA/HEPA", "crit": "C"},
+    {"ru": "Маслофильтры / сепараторы", "en": "lube oil filters / separators", "note": "", "crit": "C"},
+    {"ru": "Прокладки, уплотнения, метизы", "en": "gaskets / seals / hardware", "note": "", "crit": "C"},
+    {"ru": "Турбинное масло", "en": "turbine oil", "note": "по спецификации OEM, аналоги есть", "crit": "C"}
+   ]
+  },
+  {
+   "id": "package", "title": "Пакет / вспомсистемы (BOP)", "crit": "B",
+   "aftermarket": "широкий: общепромышленные узлы; пакеты SGT-300/400 делает и Centrax",
+   "components": [
+    {"ru": "Стартер (пневмо/гидро/электро)", "en": "starter system", "note": "", "crit": "B"},
+    {"ru": "Маслонасосы (главный/резервный/аварийный)", "en": "lube oil pumps", "note": "", "crit": "B"},
+    {"ru": "АВО / теплообменники масла", "en": "oil coolers", "note": "", "crit": "C"},
+    {"ru": "Редуктор (привод генератора)", "en": "gearbox", "note": "", "crit": "B"},
+    {"ru": "Вентиляция кожуха, газоанализ, пожаротушение", "en": "enclosure ventilation / F&G / fire suppression", "note": "универсальные системы", "crit": "B"}
+   ]
+  }
+ ]
+}

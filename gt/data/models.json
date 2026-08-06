@@ -1,0 +1,32 @@
+{
+ "note": "Мощности/КПД — ISO, по открытым данным Siemens Energy и Solar Turbines (≈, зависят от исполнения и года выпуска). Сверять с Gas Turbine World Handbook и паспортом конкретного агрегата.",
+ "families": [
+  {
+   "id": "sgt",
+   "title": "Siemens SGT-100…400 (завод Линкольн, Великобритания)",
+   "history": "Линия малых промышленных ГТУ Ruston → European Gas Turbines → Alstom → Siemens (2003, ребрендинг в SGT). Наследственные имена (Typhoon/Tornado/Tempest/Cyclone) до сих пор живут в каталогах, у сервисников и в таможенных описаниях — при поиске ЗИП использовать ОБА имени. Не путать со шведской линией SGT-500/600/700/800 (ex-ABB STAL, Финспонг) — там другая конструкция и нумерация деталей (наследие GT10/GT35).",
+   "models": [
+    {"name": "SGT-100", "legacy": "Typhoon", "power": "≈5,1–5,7 МВт", "eff": "≈31%", "shafts": "1 вал (ген.) / 2 вала (мех. привод, SGT-100-2S)", "use": "малые КС, электростанции, когенерация", "zip_note": "широчайший aftermarket в UK (EthosEnergy, Turbine Efficiency, SJE, Task-Pro) — искать и как Typhoon"},
+    {"name": "SGT-200", "legacy": "Tornado", "power": "≈6,75 МВт", "eff": "≈31,5%", "shafts": "1 / 2 вала", "use": "ГПА, генерация", "zip_note": "б/у машины и обменные двигатели доступны (GTS, Siemens Lincoln возил б/у в РФ)"},
+    {"name": "SGT-300", "legacy": "Tempest", "power": "≈7,9–8,2 МВт", "eff": "≈30,6%", "shafts": "1 вал (ген.) / 2 вала (-2S)", "use": "генерация, когенерация", "zip_note": "пакетируется также Centrax (генсеты CX300)"},
+    {"name": "SGT-400", "legacy": "Cyclone", "power": "≈12,9–14,3 МВт", "eff": "≈34,8–35,4%", "shafts": "2 вала", "use": "ГПА, генерация — фокус КВАНТ", "zip_note": "текущая закупка: камера сгорания MW21215M ×12 + горелка DUAL DLE MW22316B/01 ×12; Китай — Blaze/O.B.T/Leda; сервис UK/NL — Score, Skyline; пакеты — Centrax CX400"}
+   ]
+  },
+  {
+   "id": "solar",
+   "title": "Solar Turbines (Сан-Диего, США — Caterpillar)",
+   "history": "Крупнейший в мире парк промышленных ГТУ 1–23 МВт (>16 000 машин). Вертикальная модель OEM: запчасти и сервис — только через сеть Solar/Caterpillar, независимый aftermarket заметно тоньше, чем у Siemens: ключевые не-OEM игроки — S&S Turbine Services (Канада), Alba Power/Sulzer (UK), реверс в Китае (Bicosyn и др.). После ухода из РФ (2022) канал ЗИП — независимые MRO, б/у рынок, третьи страны.",
+   "models": [
+    {"name": "Saturn 20", "legacy": "", "power": "≈1,2 МВт", "eff": "≈24%", "shafts": "1 вал", "use": "малая генерация, старые ГПА", "zip_note": "парк возрастной, много б/у и обменных двигателей у независимых MRO"},
+    {"name": "Centaur 40", "legacy": "", "power": "≈3,5 МВт", "eff": "≈28%", "shafts": "1 / 2 вала", "use": "ГПА, генерация", "zip_note": "самый массовый «старый» Solar — рабочая лошадка aftermarket"},
+    {"name": "Centaur 50", "legacy": "", "power": "≈4,6 МВт", "eff": "≈29%", "shafts": "1 / 2 вала", "use": "ГПА, генерация", "zip_note": ""},
+    {"name": "Taurus 60", "legacy": "", "power": "≈5,7 МВт", "eff": "≈30%", "shafts": "1 / 2 вала", "use": "ГПА, генерация, офшор", "zip_note": "в таможне РФ 2023–2026 виден импорт ЗИП Taurus от самого Solar (до ухода)"},
+    {"name": "Taurus 70", "legacy": "", "power": "≈8,0 МВт", "eff": "≈34%", "shafts": "1 / 2 вала", "use": "ГПА, генерация", "zip_note": ""},
+    {"name": "Mars 90", "legacy": "", "power": "≈9,4 МВт", "eff": "≈32%", "shafts": "2 вала", "use": "ГПА, офшор (Сахалин и др.)", "zip_note": "в таможне РФ виден импорт ЗИП Mars"},
+    {"name": "Mars 100", "legacy": "", "power": "≈11,4 МВт", "eff": "≈33%", "shafts": "2 вала", "use": "ГПА, офшор", "zip_note": ""},
+    {"name": "Titan 130", "legacy": "", "power": "≈16,5 МВт", "eff": "≈35%", "shafts": "1 / 2 вала", "use": "ГПА, генерация", "zip_note": ""},
+    {"name": "Titan 250", "legacy": "", "power": "≈23 МВт", "eff": "≈39%", "shafts": "2 вала", "use": "ГПА", "zip_note": "новейшая машина — ЗИП практически только OEM"}
+   ]
+  }
+ ]
+}

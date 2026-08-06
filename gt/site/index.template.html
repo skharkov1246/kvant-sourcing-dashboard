@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ГТУ-библиотека — поставщики Solar и Siemens SGT-100…400</title>
+<style>
+:root{
+  color-scheme:light;
+  --page:#f9f9f7; --surface:#fcfcfb; --ink:#0b0b0b; --ink2:#52514e; --mut:#898781;
+  --grid:#e1e0d9; --axis:#c3c2b7; --border:rgba(11,11,11,.10);
+  --s1:#2a78d6; --s1-soft:#cde2fb; --good:#0ca30c; --warn:#fab219; --crit:#d03b3b; --serious:#ec835a;
+  --chip:#eef2f7;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    color-scheme:dark;
+    --page:#0d0d0d; --surface:#1a1a19; --ink:#fff; --ink2:#c3c2b7; --mut:#898781;
+    --grid:#2c2c2a; --axis:#383835; --border:rgba(255,255,255,.10);
+    --s1:#3987e5; --s1-soft:#184f95; --chip:#262624;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:14px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
+a{color:var(--s1);text-decoration:none} a:hover{text-decoration:underline}
+header{padding:18px 22px 0}
+h1{font-size:21px;margin:0 0 2px}
+.sub{color:var(--ink2);font-size:12.5px}
+nav{position:sticky;top:0;z-index:5;background:var(--page);display:flex;gap:4px;flex-wrap:wrap;padding:10px 22px;border-bottom:1px solid var(--grid)}
+nav button{border:1px solid var(--border);background:var(--surface);color:var(--ink2);padding:6px 13px;border-radius:18px;font:600 13px system-ui;cursor:pointer}
+nav button.on{background:var(--s1);border-color:var(--s1);color:#fff}
+main{padding:16px 22px 40px;max-width:1280px}
+section{display:none} section.on{display:block}
+h2{font-size:16px;margin:20px 0 8px}
+h3{font-size:14px;margin:16px 0 6px}
+.mut{color:var(--mut);font-size:12px}
+.k{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+.tile{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 16px;min-width:130px}
+.tile b{display:block;font-size:22px}
+.tile span{color:var(--ink2);font-size:12px}
+.box{background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--good);border-radius:8px;padding:10px 14px;margin:10px 0;font-size:13px}
+.box.warn{border-left-color:var(--crit)}
+.box.info{border-left-color:var(--s1)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin:8px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
+.tblwrap{overflow-x:auto;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin:8px 0}
+table{border-collapse:collapse;width:100%;font-size:12.5px}
+th{background:var(--chip);text-align:left;font-size:11.5px;color:var(--ink2);white-space:nowrap}
+th,td{padding:6px 9px;border-bottom:1px solid var(--grid);vertical-align:top}
+tr:last-child td{border-bottom:0}
+td b{font-weight:700}
+.tag{display:inline-block;background:var(--chip);border-radius:9px;padding:1px 8px;font-size:11px;color:var(--ink2);margin:1px 2px 1px 0;white-space:nowrap}
+.tag.sgt{background:var(--s1-soft);color:var(--ink)}
+.tag.solar{background:var(--chip);border:1px solid var(--s1)}
+.critA{color:var(--crit);font-weight:700}.critB{color:var(--serious);font-weight:700}.critC{color:var(--ink2)}
+.filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0}
+.filters input,.filters select{background:var(--surface);color:var(--ink);border:1px solid var(--border);border-radius:8px;padding:6px 10px;font:13px system-ui}
+.filters input{min-width:220px}
+.count{color:var(--ink2);font-size:12px;margin-left:auto}
+.viz-root{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin:10px 0}
+.viz-root h3{margin:0 0 2px;font-size:13px}
+.bar{fill:var(--s1)}
+.axis-t{fill:var(--mut);font-size:11px}
+.val-t{fill:var(--ink2);font-size:11px;font-variant-numeric:tabular-nums}
+.gridln{stroke:var(--grid);stroke-width:1}
+.baseln{stroke:var(--axis);stroke-width:1}
+.btn{border:1px solid var(--border);background:var(--surface);color:var(--ink2);padding:6px 12px;border-radius:8px;font:600 12px system-ui;cursor:pointer}
+footer{padding:0 22px 24px;color:var(--mut);font-size:11.5px}
+@media (max-width:700px){main,header,nav{padding-left:12px;padding-right:12px}}
+</style>
+</head>
+<body>
+<header>
+  <h1>ГТУ-библиотека: поставщики и ЗИП — Solar &amp; Siemens SGT-100…400</h1>
+  <div class="sub">Справочник для сорсеров КВАНТ: машины · номенклатура ЗИП · шифровки PN · библиотека производителей (OEM / независимые / реверс) · таможня РФ · мировые базы. Сборка: __BUILT_AT__</div>
+</header>
+<nav id="nav"></nav>
+<main id="main"></main>
+<footer>Контакты SGT-блока верифицированы 05.08.2026 (таможня РФ HS 8411 + сайты компаний); Solar-блок — публичные данные, контакты брать с сайтов при первом RFQ. Полная таможенная база и ЗИП-платформа: kvant-zip.pages.dev</footer>
+<script>
+const SUPPLIERS = __SUPPLIERS_JSON__;
+const MODELS = __MODELS_JSON__;
+const PARTS = __PARTS_JSON__;
+const PN = __PN_JSON__;
+const CUSTOMS = __CUSTOMS_JSON__;
+
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const famTag = f => `<span class="tag ${f==='SGT'?'sgt':'solar'}">${f==='SGT'?'Siemens SGT':'Solar'}</span>`;
+const critCls = c => c==='A'?'critA':(c==='B'?'critB':'critC');
+
+const TABS = [
+ ['overview','Обзор'],['machines','Машины'],['parts','Номенклатура ЗИП'],['pn','Шифровки PN'],
+ ['suppliers','Поставщики'],['customs','Таможня РФ'],['db','Базы данных']
+];
+
+/* ---------- Обзор ---------- */
+function rOverview(){
+ const nSGT = SUPPLIERS.filter(s=>s.families.includes('SGT')).length;
+ const nSolar = SUPPLIERS.filter(s=>s.families.includes('Solar')).length;
+ const nModels = MODELS.families.reduce((a,f)=>a+f.models.length,0);
+ return `
+ <div class="k">
+  <div class="tile"><b>${SUPPLIERS.length}</b><span>компаний в библиотеке</span></div>
+  <div class="tile"><b>${nSGT} / ${nSolar}</b><span>по Siemens SGT / по Solar</span></div>
+  <div class="tile"><b>${nModels}</b><span>моделей турбин</span></div>
+  <div class="tile"><b>${PARTS.systems.length}</b><span>систем в номенклатуре ЗИП</span></div>
+  <div class="tile"><b>${CUSTOMS.total_records.toLocaleString('ru')}</b><span>деклараций HS 8411 в базе (2023–2026)</span></div>
+ </div>
+ <div class="box info"><b>Зачем эта библиотека.</b> Solar Turbines и Siemens Energy ушли из РФ — ЗИП для парка Solar (Saturn…Titan) и SGT-100…400 покупается только через независимый «автомаркет»: реверс-заводы Китая, сервисники UK/EU (через посредников), лицензиатов Ирана и б/у рынок. Здесь собрано, <b>кому идти за каким типом запчастей</b>, и как читать шифровки партномеров.</div>
+ <h2>Алгоритм сорсера — 4 шага</h2>
+ <div class="grid">
+  <div class="card"><b>1. Определи машину</b><div class="mut" style="font-size:12.5px">Модель + серийник пакета. Помни legacy-имена: SGT-400 = Cyclone, SGT-100 = Typhoon — вкладка «Машины».</div></div>
+  <div class="card"><b>2. Определи систему и PN</b><div class="mut" style="font-size:12.5px">К какой из ${PARTS.systems.length} систем относится деталь и какова её критичность — вкладка «Номенклатура». PN расшифруй по вкладке «Шифровки PN».</div></div>
+  <div class="card"><b>3. Выбери канал</b><div class="mut" style="font-size:12.5px">Горячий тракт → Китай/Италия; лопатки → реверс-заводы/восстановление; расходники/КИП → универсальные. Фильтры на вкладке «Поставщики».</div></div>
+  <div class="card"><b>4. RFQ по правилам</b><div class="mut" style="font-size:12.5px">PN + модель + серийник, кол-во, фото/чертёж или б/у образец на обмер. Проверяй, что поставщик знает нужную ЛИНИЮ (Линкольн ≠ Финспонг).</div></div>
+ </div>
+ <h2>Горячие задачи</h2>
+ <div class="box"><b>SGT-400 — первый залп RFQ:</b> ① Blaze Shenzhen — peter@turbineblade.net (камеры сгорания SGT-400 в каталоге) · ② O.B.T Qingdao — lisa@obtcasting.com (литьё камер Siemens) · ③ Leda Greenpower — WhatsApp +86 138 0121 8512 (прайс burner assembly / pilot burner SGT-400) · ④ Dongturbo — WhatsApp +86 139-0807-3010 (возил камеру сгорания SGT-600 в РФ). Позиции: камера сгорания <b>MW21215M</b> ×12 + горелка DUAL DLE <b>MW22316B/01</b> ×12.</div>
+ <div class="box"><b>Solar — с чего начать:</b> якорные независимые MRO — S&amp;S Turbine Services (Канада) и Alba Power/Sulzer (UK) — работают со всем модельным рядом Saturn…Mars; из Китая по Solar заявляется Bicosyn (клиенты CNOOC/Shell). Санкционные юрисдикции — заход через посредника. Контакты — с сайтов, верификация при первом RFQ.</div>
+ <div class="box warn"><b>Не работать напрямую:</b> Foshan Xinchuang и Homedia (Zhangzhou) — трейдеры-прокладки российского импортёра, не производители.</div>`;
+}
+
+/* ---------- Машины ---------- */
+function rMachines(){
+ let h = `<div class="mut">${esc(MODELS.note)}</div>`;
+ for(const f of MODELS.families){
+  h += `<h2>${esc(f.title)}</h2><div class="box info" style="font-size:12.5px">${esc(f.history)}</div><div class="grid">`;
+  for(const m of f.models){
+   h += `<div class="card"><b>${esc(m.name)}</b>${m.legacy?` <span class="tag">${esc(m.legacy)}</span>`:''}
+    <div style="margin:4px 0 2px"><b>${esc(m.power)}</b> · КПД ${esc(m.eff)}</div>
+    <div class="mut">${esc(m.shafts)} · ${esc(m.use)}</div>
+    ${m.zip_note?`<div style="font-size:12px;margin-top:5px;border-top:1px solid var(--grid);padding-top:5px">ЗИП: ${esc(m.zip_note)}</div>`:''}</div>`;
+  }
+  h += `</div>`;
+ }
+ return h;
+}
+
+/* ---------- Номенклатура ---------- */
+function rParts(){
+ let h = `<div class="mut">${esc(PARTS.note)}</div>`;
+ for(const s of PARTS.systems){
+  h += `<div class="card"><h3 style="margin:0">${esc(s.title)} <span class="${critCls(s.crit)}">крит. ${esc(s.crit)}</span></h3>
+   <div class="mut" style="margin:3px 0 7px">Aftermarket: ${esc(s.aftermarket)}</div>
+   <div class="tblwrap"><table><tr><th>Деталь</th><th>Термин для RFQ (EN)</th><th>Крит.</th><th>Примечание</th></tr>`;
+  for(const c of s.components){
+   h += `<tr><td><b>${esc(c.ru)}</b></td><td>${esc(c.en)}</td><td class="${critCls(c.crit)}">${esc(c.crit)}</td><td class="mut" style="font-size:12px">${esc(c.note)}</td></tr>`;
+  }
+  h += `</table></div></div>`;
+ }
+ return h;
+}
+
+/* ---------- Шифровки PN ---------- */
+function rPN(){
+ let h = `<div class="box info">${esc(PN.intro)}</div>`;
+ for(const s of PN.sections){
+  h += `<h2>${esc(s.title)}</h2><div class="tblwrap"><table><tr><th style="width:18%">Шифр / правило</th><th style="width:38%">Что означает</th><th style="width:28%">Примеры</th><th>Статус</th></tr>`;
+  for(const r of s.rules){
+   h += `<tr><td><b>${esc(r.pattern)}</b></td><td>${esc(r.meaning)}</td><td class="mut" style="font-size:12px">${esc(r.examples)}</td><td style="font-size:12px">${esc(r.status)}</td></tr>`;
+  }
+  h += `</table></div>`;
+ }
+ return h;
+}
+
+/* ---------- Поставщики ---------- */
+function supplierRow(s){
+ return `<tr>
+  <td><b>${esc(s.name)}</b><br>${s.families.map(famTag).join('')}</td>
+  <td>${esc(s.country)}<br><span class="mut">${esc(s.city)}</span></td>
+  <td>${esc(s.role)}<br>${(s.cats||[]).map(c=>`<span class="tag">${esc(c)}</span>`).join('')}</td>
+  <td style="min-width:220px">${esc(s.models)}${s.ru_buyers?`<div class="mut" style="font-size:11.5px">РФ-покупатели: ${esc(s.ru_buyers)} · отгрузок: ${esc(s.shipments)} (${esc(s.years)})</div>`:''}</td>
+  <td style="white-space:nowrap">${esc(s.site)}<br><span class="mut">${esc(s.email)}</span><br><span class="mut">${esc(s.phone)}</span></td>
+  <td>${esc(s.tier)}</td>
+  <td class="mut" style="font-size:11.5px;min-width:180px">${esc(s.note)}</td></tr>`;
+}
+function applyFilters(){
+ const q = document.getElementById('f-q').value.trim().toLowerCase();
+ const fam = document.getElementById('f-fam').value;
+ const ctr = document.getElementById('f-ctr').value;
+ const rows = SUPPLIERS.filter(s=>{
+  if(fam && !s.families.includes(fam)) return false;
+  if(ctr && s.country!==ctr) return false;
+  if(q){
+   const hay = [s.name,s.country,s.city,s.role,s.models,s.note,(s.cats||[]).join(' '),s.tier].join(' ').toLowerCase();
+   if(!hay.includes(q)) return false;
+  }
+  return true;
+ });
+ document.getElementById('sup-body').innerHTML = rows.map(supplierRow).join('') ||
+  `<tr><td colspan="7" class="mut">Ничего не найдено — ослабьте фильтры.</td></tr>`;
+ document.getElementById('sup-count').textContent = `${rows.length} из ${SUPPLIERS.length}`;
+}
+function exportCSV(){
+ const cols = ['name','country','city','role','families','cats','models','site','email','phone','tier','note'];
+ const lines = [cols.join(';')].concat(SUPPLIERS.map(s=>cols.map(c=>{
+  let v = s[c]; if(Array.isArray(v)) v = v.join(', ');
+  return '"'+String(v??'').replace(/"/g,'""')+'"';
+ }).join(';')));
+ const blob = new Blob(["﻿"+lines.join('\r\n')],{type:'text/csv;charset=utf-8'});
+ const a = document.createElement('a');
+ a.href = URL.createObjectURL(blob); a.download = 'gt_suppliers.csv'; a.click();
+}
+function rSuppliers(){
+ const countries = [...new Set(SUPPLIERS.map(s=>s.country))].sort((a,b)=>a.localeCompare(b,'ru'));
+ return `
+ <div class="filters">
+  <input id="f-q" placeholder="Поиск: компания, модель, деталь, роль…" oninput="applyFilters()">
+  <select id="f-fam" onchange="applyFilters()"><option value="">Семейство: все</option><option value="SGT">Siemens SGT</option><option value="Solar">Solar</option></select>
+  <select id="f-ctr" onchange="applyFilters()"><option value="">Страна: все</option>${countries.map(c=>`<option>${esc(c)}</option>`).join('')}</select>
+  <button class="btn" onclick="exportCSV()">⬇ CSV</button>
+  <span class="count" id="sup-count"></span>
+ </div>
+ <div class="tblwrap"><table>
+  <tr><th>Компания</th><th>Гео</th><th>Роль / категории</th><th>Что делает / возил · след в РФ</th><th>Контакты</th><th>Уровень</th><th>Примечание</th></tr>
+  <tbody id="sup-body"></tbody>
+ </table></div>
+ <div class="mut">Уровни: П1 — прямое попадание (Китай, реально для РФ) · П2 — профильные UK/EU (санкционный риск, через посредника) · П2-Иран — лицензиаты Siemens · П3 — прочие/трейдеры · S1–S3 — Solar-блок (S1 — якорные MRO). Контакты SGT-блока верифицированы 05.08.2026; Solar-блок — брать с сайта.</div>`;
+}
+
+/* ---------- Таможня ---------- */
+function barChart(data){
+ const W=640,H=230,P={t:14,r:14,b:30,l:44};
+ const iw=W-P.l-P.r, ih=H-P.t-P.b;
+ const max=Math.max(...data.map(d=>d.n))*1.15;
+ const bw=Math.min(64,iw/data.length-14);
+ const ticks=4;
+ let g='';
+ for(let i=1;i<=ticks;i++){
+  const y=P.t+ih-ih*i/ticks;
+  g+=`<line class="gridln" x1="${P.l}" y1="${y}" x2="${W-P.r}" y2="${y}"/><text class="axis-t" x="${P.l-6}" y="${y+4}" text-anchor="end">${Math.round(max*i/ticks)}</text>`;
+ }
+ let bars='';
+ data.forEach((d,i)=>{
+  const x=P.l+iw*(i+.5)/data.length-bw/2;
+  const h=ih*d.n/max, y=P.t+ih-h;
+  bars+=`<rect class="bar" x="${x}" y="${y}" width="${bw}" height="${h}" rx="4"><title>${d.year}: ${d.n} записей · ${d.kg.toLocaleString('ru')} кг</title></rect>
+   <text class="val-t" x="${x+bw/2}" y="${y-5}" text-anchor="middle">${d.n}</text>
+   <text class="axis-t" x="${x+bw/2}" y="${P.t+ih+18}" text-anchor="middle">${d.year}</text>`;
+ });
+ return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;max-width:680px" role="img" aria-label="Поставки по годам">${g}<line class="baseln" x1="${P.l}" y1="${P.t+ih}" x2="${W-P.r}" y2="${P.t+ih}"/>${bars}</svg>`;
+}
+function rCustoms(){
+ const c=CUSTOMS;
+ const t=(rows,cols)=>`<div class="tblwrap"><table><tr>${cols.map(x=>`<th>${x}</th>`).join('')}</tr>${rows}</table></div>`;
+ return `
+ <div class="mut">Источник: glbs.io (Глобус-ВЭД, официальные данные таможни РФ) · HS ${esc(c.hs)} · период ${esc(c.period)}. Режим search: имена импортёров и суммы частично маскированы; в выборку вкладки попали записи, отфильтрованные по профилю ЗИП (${c.visible_records} из ${c.total_records.toLocaleString('ru')}).</div>
+ <div class="k">
+  <div class="tile"><b>${c.total_records.toLocaleString('ru')}</b><span>деклараций всего в базе</span></div>
+  <div class="tile"><b>${c.visible_records}</b><span>записей в выборке ЗИП ГТУ</span></div>
+  <div class="tile"><b>${c.top_exporters.length}+</b><span>активных экспортёров</span></div>
+ </div>
+ <div class="viz-root"><h3>Записи выборки по годам</h3><div class="mut" style="margin-bottom:6px">штук деклараций (наведение — тоннаж)</div>${barChart(c.by_year)}</div>
+ <h2>Топ экспортёров (по выборке)</h2>
+ ${t(c.top_exporters.map(e=>`<tr><td><b>${esc(e.name)}</b></td><td>${e.n}</td></tr>`).join(''),['Экспортёр','Записей'])}
+ <h2>Топ импортёров РФ</h2>
+ ${t(c.top_importers.map(e=>`<tr><td><b>${esc(e.name)}</b></td><td>${e.n}</td></tr>`).join(''),['Импортёр (маскирован источником)','Записей'])}
+ <h2>Упоминания моделей в декларациях</h2>
+ ${t(c.models.map(m=>`<tr><td><b>${esc(m.model)}</b></td><td>${m.n}</td><td class="mut">${m.exporters.map(esc).join(' · ')}</td></tr>`).join(''),['Модель','Записей','Экспортёры'])}
+ <div class="box info">Solar в таможне РФ 2023–2026 почти не виден (2 записи — ЗИП Mars/Taurus от самого Solar Turbines до ухода): канал ЗИП Solar шёл напрямую от OEM и умер с санкциями. Это подтверждает ставку на независимые MRO и мировые базы (вкладка «Базы данных»).</div>`;
+}
+
+/* ---------- Базы данных ---------- */
+function rDB(){
+ return `
+ <div class="box info"><b>Задача:</b> видеть, кто кому в мире продаёт комплектующие Solar/Siemens (shipper → consignee), и выйти на этих производителей напрямую. Британия/ЕС/Япония пономерные декларации не публикуют — их ловим как <b>отправителей в импорте стран, которые публикуют</b> (Мексика, LATAM, Нигерия, Индия…). Полный разбор: «БАЗЫ-ДАННЫХ-ЗАКУПКА» (kvant-zip.pages.dev/orders/).</div>
+ <h2>План закупки (решение 08.2026)</h2>
+ <div class="tblwrap"><table>
+  <tr><th>Шаг</th><th>Что</th><th>Стоимость</th><th>Что даёт</th></tr>
+  <tr><td>0</td><td><b>Бесплатное:</b> TED API (тендеры ЕС), ImportYeti (морской импорт США), госзакупки Мексики/Перу/Казахстана/Индии</td><td><b>$0</b></td><td>операторы парка и сервисные подрядчики; TED по «SGT-400» уже дал GAZ-SYSTEM (Польша)</td></tr>
+  <tr><td>1 ⭐</td><td><b>BillOfLadingData</b>: Мексика + Колумбия + Перу + Нигерия + mirror-data (pay-per-report, пожизненно)</td><td><b>$775 разово</b></td><td>ключ — Мексика: TFS Веракрус, единственный независимый стенд SGT-400 в мире → виден весь поток горячей части</td></tr>
+  <tr><td>2</td><td>Расширение: Бразилия, Турция, Казахстан, Индия</td><td>+$1 272</td><td>Турция/Казахстан — каналы реэкспорта в РФ: видно, кто и через кого завозит</td></tr>
+  <tr><td>3</td><td><b>52wmb</b> Blue Diamond (Китай), 39 стран — постоянный мониторинг, оплата из РФ проходит</td><td>$540/год</td><td>регулярное слежение за потоками</td></tr>
+  <tr><td>4</td><td>McCoy Power Reports «Gas Turbines DB» — пономерной реестр владельцев машин (26 534 юнита)</td><td>по запросу</td><td>long-list покупателей ЗИП; дешёвая замена — GT World Handbook $245–345</td></tr>
+ </table></div>
+ <div class="box warn"><b>Не покупать:</b> Panjiva/S&amp;P (ушли из РФ), Descartes Datamyne / ImportGenius / Trademo (юрисдикция США, карты РФ не проходят), Volza SME $4,5k и TradeData.Pro (переплата за то же покрытие), GlobalTenders / Wood Mackenzie (не решают задачу).</div>
+ <div class="box"><b>Ограничение, которое принять:</b> парк SGT сидит на долгосрочных сервисных договорах Siemens (LTSA) — открытых тендеров «на партномер» нет. Тендерные порталы дают операторов и подрядчиков, а цены на детали — только shipment-базы и прямые КП заводов. Уже работает: glbs.io — таможня РФ/ЕАЭС, ${CUSTOMS.total_records.toLocaleString('ru')} деклараций HS 8411 в базе.</div>`;
+}
+
+/* ---------- Каркас ---------- */
+const R = {overview:rOverview, machines:rMachines, parts:rParts, pn:rPN, suppliers:rSuppliers, customs:rCustoms, db:rDB};
+const nav = document.getElementById('nav'), main = document.getElementById('main');
+nav.innerHTML = TABS.map(([id,t])=>`<button data-t="${id}">${t}</button>`).join('');
+main.innerHTML = TABS.map(([id])=>`<section id="s-${id}"></section>`).join('');
+const rendered = {};
+function show(id){
+ for(const [tid] of TABS){
+  document.querySelector(`[data-t="${tid}"]`).classList.toggle('on', tid===id);
+  document.getElementById(`s-${tid}`).classList.toggle('on', tid===id);
+ }
+ if(!rendered[id]){ document.getElementById(`s-${id}`).innerHTML = R[id](); rendered[id]=1; if(id==='suppliers') applyFilters(); }
+ location.hash = id;
+}
+nav.addEventListener('click', e=>{ const b=e.target.closest('button'); if(b) show(b.dataset.t); });
+show(TABS.some(([id])=>id===location.hash.slice(1)) ? location.hash.slice(1) : 'overview');
+</script>
+</body>
+</html>

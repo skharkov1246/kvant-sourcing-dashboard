@@ -1,0 +1,1352 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ГТУ-библиотека — поставщики Solar и Siemens SGT-100…400</title>
+<style>
+:root{
+  color-scheme:light;
+  --page:#f9f9f7; --surface:#fcfcfb; --ink:#0b0b0b; --ink2:#52514e; --mut:#898781;
+  --grid:#e1e0d9; --axis:#c3c2b7; --border:rgba(11,11,11,.10);
+  --s1:#2a78d6; --s1-soft:#cde2fb; --good:#0ca30c; --warn:#fab219; --crit:#d03b3b; --serious:#ec835a;
+  --chip:#eef2f7;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    color-scheme:dark;
+    --page:#0d0d0d; --surface:#1a1a19; --ink:#fff; --ink2:#c3c2b7; --mut:#898781;
+    --grid:#2c2c2a; --axis:#383835; --border:rgba(255,255,255,.10);
+    --s1:#3987e5; --s1-soft:#184f95; --chip:#262624;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:14px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
+a{color:var(--s1);text-decoration:none} a:hover{text-decoration:underline}
+header{padding:18px 22px 0}
+h1{font-size:21px;margin:0 0 2px}
+.sub{color:var(--ink2);font-size:12.5px}
+nav{position:sticky;top:0;z-index:5;background:var(--page);display:flex;gap:4px;flex-wrap:wrap;padding:10px 22px;border-bottom:1px solid var(--grid)}
+nav button{border:1px solid var(--border);background:var(--surface);color:var(--ink2);padding:6px 13px;border-radius:18px;font:600 13px system-ui;cursor:pointer}
+nav button.on{background:var(--s1);border-color:var(--s1);color:#fff}
+main{padding:16px 22px 40px;max-width:1280px}
+section{display:none} section.on{display:block}
+h2{font-size:16px;margin:20px 0 8px}
+h3{font-size:14px;margin:16px 0 6px}
+.mut{color:var(--mut);font-size:12px}
+.k{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+.tile{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 16px;min-width:130px}
+.tile b{display:block;font-size:22px}
+.tile span{color:var(--ink2);font-size:12px}
+.box{background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--good);border-radius:8px;padding:10px 14px;margin:10px 0;font-size:13px}
+.box.warn{border-left-color:var(--crit)}
+.box.info{border-left-color:var(--s1)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin:8px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
+.tblwrap{overflow-x:auto;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin:8px 0}
+table{border-collapse:collapse;width:100%;font-size:12.5px}
+th{background:var(--chip);text-align:left;font-size:11.5px;color:var(--ink2);white-space:nowrap}
+th,td{padding:6px 9px;border-bottom:1px solid var(--grid);vertical-align:top}
+tr:last-child td{border-bottom:0}
+td b{font-weight:700}
+.tag{display:inline-block;background:var(--chip);border-radius:9px;padding:1px 8px;font-size:11px;color:var(--ink2);margin:1px 2px 1px 0;white-space:nowrap}
+.tag.sgt{background:var(--s1-soft);color:var(--ink)}
+.tag.solar{background:var(--chip);border:1px solid var(--s1)}
+.critA{color:var(--crit);font-weight:700}.critB{color:var(--serious);font-weight:700}.critC{color:var(--ink2)}
+.filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0}
+.filters input,.filters select{background:var(--surface);color:var(--ink);border:1px solid var(--border);border-radius:8px;padding:6px 10px;font:13px system-ui}
+.filters input{min-width:220px}
+.count{color:var(--ink2);font-size:12px;margin-left:auto}
+.viz-root{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin:10px 0}
+.viz-root h3{margin:0 0 2px;font-size:13px}
+.bar{fill:var(--s1)}
+.axis-t{fill:var(--mut);font-size:11px}
+.val-t{fill:var(--ink2);font-size:11px;font-variant-numeric:tabular-nums}
+.gridln{stroke:var(--grid);stroke-width:1}
+.baseln{stroke:var(--axis);stroke-width:1}
+.btn{border:1px solid var(--border);background:var(--surface);color:var(--ink2);padding:6px 12px;border-radius:8px;font:600 12px system-ui;cursor:pointer}
+footer{padding:0 22px 24px;color:var(--mut);font-size:11.5px}
+@media (max-width:700px){main,header,nav{padding-left:12px;padding-right:12px}}
+</style>
+</head>
+<body>
+<header>
+  <h1>ГТУ-библиотека: поставщики и ЗИП — Solar &amp; Siemens SGT-100…400</h1>
+  <div class="sub">Справочник для сорсеров КВАНТ: машины · номенклатура ЗИП · шифровки PN · библиотека производителей (OEM / независимые / реверс) · таможня РФ · мировые базы. Сборка: 2026-08-06</div>
+</header>
+<nav id="nav"></nav>
+<main id="main"></main>
+<footer>Контакты SGT-блока верифицированы 05.08.2026 (таможня РФ HS 8411 + сайты компаний); Solar-блок — публичные данные, контакты брать с сайтов при первом RFQ. Полная таможенная база и ЗИП-платформа: kvant-zip.pages.dev</footer>
+<script>
+const SUPPLIERS = [
+ {
+  "name": "Dongturbo Electric Co. Ltd (DTEC)",
+  "country": "Китай",
+  "city": "Чэнду/Дэян (Сычуань)",
+  "role": "ПРОИЗВОДИТЕЛЬ",
+  "families": [
+   "SGT"
+  ],
+  "cats": [
+   "Горячий тракт",
+   "Камеры сгорания",
+   "Капремонт"
+  ],
+  "models": "SGT-600/GT10B, SGT-700; камера сгорания SGT-600; предлагает ЗИП+капремонт SGT-100/200/300",
+  "shipments": "21 (6 по SGT)",
+  "years": "2023-2024",
+  "ru_buyers": "ООО СТС; ООО СА***; ООО ПРО***",
+  "site": "dongturbo.com (зерк.: steamturbo.net, chinaturbo.net)",
+  "email": "dqzhanghaoyue@vip.126.com",
+  "phone": "+86 139-0807-3010 (WhatsApp); +86 185-8083-7560",
+  "profile": "dongturbo.en.alibaba.com",
+  "tier": "П1",
+  "note": "Главный кандидат: открыто продаёт ЗИП Siemens SGT; камеру сгорания уже возил в РФ",
+  "verified": "таможня РФ HS 8411 (2023–2026) + веб-верификация контактов, 05.08.2026"
+ },
+ {
+  "name": "Suzhou Fuhang Machinery Co. Ltd",
+  "country": "Китай",
+  "city": "Сучжоу (Цзянсу)",
+  "role": "экспортёр/посредник",
+  "families": [
+   "SGT"
+  ],
+  "cats": [
+   "Канал поставки (горелки)"
+  ],
+  "models": "SGT-400 запчасти (2 отгрузки, 27-32 кг — масштаб горелок)",
+  "shipments": "2",
+  "years": "2023",
+  "ru_buyers": "ООО СТС",
+  "site": "нет сайта",
+  "email": "не найдено",
+  "phone": "не найдено (есть в платной Volza: 139 отгрузок, осн. рынок РФ)",
+  "profile": "volza.com/company-profile/suzhou-fuhang-machinery-co-ltd-65331122",
+  "tier": "П1",
+  "note": "Единственный, кто возил именно SGT-400; контакты добыть через Volza-подписку или через их покупателя (СТС)",
+  "verified": "таможня РФ HS 8411 (2023–2026) + веб-верификация контактов, 05.08.2026"
+ },
+ {
+  "name": "Henan Gas Turbine Energy Technology Co. Ltd",
+  "country": "Китай",
+  "city": "Чжэнчжоу (Хэнань)",
+  "role": "ПОСТАВЩИК non-OEM ЗИП",
+  "families": [
+   "SGT"
+  ],
+  "cats": [
+   "Горячий тракт",
+   "Лопатки",
+   "Ремонт/покрытия"
+  ],
+  "models": "Siemens Gas Turbine Parts (hot gas path), GE Parts; ремонт HGP/роторов, покрытия",
+  "shipments": "1",
+  "years": "2023",
+  "ru_buyers": "ООО ГЭХ Сервис ГТ",
+  "site": "henangtet.com",
+  "email": "services@henangtet.com",
+  "phone": "+86 136-6385-6033",
+  "profile": "—",
+  "tier": "П1",
+  "note": "На сайте отдельный раздел ЗИП Siemens; сервис-инженеры, капремонты",
+  "verified": "таможня РФ HS 8411 (2023–2026) + веб-верификация контактов, 05.08.2026"
+ },
+ {
+  "name": "SAMIC S.p.A.",
+  "country": "Италия",
+  "city": "Lonate Ceppino (Varese)",
+  "role": "ПРОИЗВОДИТЕЛЬ горячего тракта",
+  "families": [
+   "SGT"
+  ],
+  "cats": [
+   "Камеры сгорания",
+   "Горелки",
+   "Жаровые трубы"
+  ],
+  "models": "Камеры сгорания, горелки, жаровые трубы, liners для heavy-duty ГТУ (Ansaldo/Siemens-дизайн)",
+  "shipments": "1",
+  "years": "2023",
+  "ru_buyers": "ООО ГЭХ Сервис ГТ",
+  "site": "samic.it",
+  "email": "info@samic.it",
+  "phone": "+39 0331-842483",
+  "profile": "—",
+  "tier": "П2",
+  "note": "Профильный завод по камерам сгорания с 1965; Inconel/Ni-сплавы; санкц. риск ЕС — через посредника",
+  "verified": "таможня РФ HS 8411 (2023–2026) + веб-верификация контактов, 05.08.2026"
+ },
+ {
+  "name": "GFM S.p.A.",
+  "country": "Италия",
+  "city": "Mapello (Bergamo)",
+  "role": "ПРОИЗВОДИТЕЛЬ мехобработки",
+  "families": [
+   "SGT"
+  ],
+  "cats": [
+   "Мехобработка"
+  ],
+  "models": "Комплекты деталей heavy-duty ГТУ; официально работал с Siemens и GE (AE64.3A = лиц. Siemens V64.3A)",
+  "shipments": "1",
+  "years": "2023",
+  "ru_buyers": "ООО АЭР",
+  "site": "gfmspa.com",
+  "email": "info@gfmspa.com",
+  "phone": "+39 035 499-5401 (офис); +39 035 761059 (пр-во)",
+  "profile": "—",
+  "tier": "П2",
+  "note": "Подтверждённая Siemens-компетенция; санкц. риск ЕС",
+  "verified": "таможня РФ HS 8411 (2023–2026) + веб-верификация контактов, 05.08.2026"
+ },
+ {
+  "name": "TESI Group / TESI IGNITERS S.r.l.",
+  "country": "Италия",
+  "city": "Vermezzo (Milano)",
+  "role": "ПРОИЗВОДИТЕЛЬ зажигания",
+  "families": [
+   "SGT"
+  ],
+  "cats": [
+   "Зажигание"
+  ],
+  "models": "Запальники/свечи камер сгорания ГТУ",
+  "shipments": "1",
+  "years": "2023",
+  "ru_buyers": "ООО Петро***",
+  "site": "tesigroup.com",
+  "email": "tesi.global@tesigroup.com",
+  "phone": "+39 02 9440501",
+  "profile": "—",
+  "tier": "П2",
+  "note": "Узкая ниша: воспламенители для камер сгорания",
+  "verified": "таможня РФ HS 8411 (2023–2026) + веб-верификация контактов, 05.08.2026"
+ },
+ {
+  "name": "Ansaldo Energia S.p.A.",
+  "country": "Италия",
+  "city": "Генуя",
+  "role": "OEM",
+  "families": [
+   "SGT"
+  ],
+  "cats": [
+   "OEM-альтернатива (лицензия Siemens)"
+  ],
+  "models": "AE64.3A (лиц. Siemens V64.3A), AE94.2/94.3A; запчасти/ремонт",
+  "shipments": "1",
+  "years": "2023",
+  "ru_buyers": "ООО АЭР",
+  "site": "ansaldoenergia.com",
+  "email": "info@ansaldoenergia.com",
+  "phone": "+39 010 6551",
+  "profile": "—",
+  "tier": "П3",
+  "note": "OEM; напрямую с РФ работать не будет — канал через посредников",
+  "verified": "таможня РФ HS 8411 (2023–2026) + веб-верификация контактов, 05.08.2026"
+ },
+ {
+  "name": "Siemens Energy Industrial Turbomachinery Ltd",
+  "country": "Великобритания",
+  "city": "Линкольн (Ruston House)",
+  "role": "OEM (завод SGT-100/200/300/400)",
+  "families": [
+   "SGT"
+  ],
+  "cats": [
+   "OEM",
+   "Б/у машины"
+  ],
+  "models": "Б/у турбины SGT-100/200 + запчасти",
+  "shipments": "4+",
+  "years": "2023-2025",
+  "ru_buyers": "ООО СТС; АО К***; ООО Зарубеж***",
+  "site": "siemens-energy.com/uk",
+  "email": "contact@siemens-energy.com",
+  "phone": "+44 1522 584000; сервис 24/7 +49 911 7044-4470",
+  "profile": "—",
+  "tier": "П3",
+  "note": "Домашний завод SGT-400; официально ушли из РФ — отгрузки 23-25 гг = параллельный канал",
+  "verified": "таможня РФ HS 8411 (2023–2026) + веб-верификация контактов, 05.08.2026"
+ },
+ {
+  "name": "Siemens Energy Global GmbH & Co. KG",
+  "country": "Германия",
+  "city": "Мюнхен",
+  "role": "OEM",
+  "families": [
+   "SGT"
+  ],
+  "cats": [
+   "OEM"
+  ],
+  "models": "ЗИП SGT-800",
+  "shipments": "1",
+  "years": "2024",
+  "ru_buyers": "ООО ЮН***",
+  "site": "siemens-energy.com",
+  "email": "contact@siemens-energy.com",
+  "phone": "+49 89 7805-0",
+  "profile": "—",
+  "tier": "П3",
+  "note": "Параллельный канал",
+  "verified": "таможня РФ HS 8411 (2023–2026) + веб-верификация контактов, 05.08.2026"
+ },
+ {
+  "name": "Foshan Xinchuang Industrial Co. Ltd",
+  "country": "Китай",
+  "city": "Фошань (Гуандун)",
+  "role": "ТРЕЙДЕР-прокладка",
+  "families": [
+   "SGT"
+  ],
+  "cats": [
+   "Трейдер (избегать)"
+  ],
+  "models": "«Части ГТД» + GE Frame 7 MS7001EA; 500+ экспортных записей от копиров до промоборудования",
+  "shipments": "27",
+  "years": "2023-2024",
+  "ru_buyers": "ООО СТС",
+  "site": "нет сайта",
+  "email": "не найдено",
+  "phone": "не найдено (платные D&B/ImportGenius)",
+  "profile": "—",
+  "tier": "П3",
+  "note": "Агент параллельного импорта СТС; не производитель",
+  "verified": "таможня РФ HS 8411 (2023–2026) + веб-верификация контактов, 05.08.2026"
+ },
+ {
+  "name": "Homedia (Zhangzhou) Import & Export Co. Ltd",
+  "country": "Китай",
+  "city": "Чжанчжоу (Фуцзянь)",
+  "role": "ТРЕЙДЕР-прокладка",
+  "families": [
+   "SGT"
+  ],
+  "cats": [
+   "Трейдер (избегать)"
+  ],
+  "models": "Сопла/переходные патрубки Frame 7; осн. бизнес — жестяная упаковка",
+  "shipments": "15",
+  "years": "2023-2024",
+  "ru_buyers": "ООО СТС",
+  "site": "homedia.en.alibaba.com",
+  "email": "через форму Alibaba (CEO Mr. Brook Lau)",
+  "phone": "не найдено",
+  "profile": "homedia.goldsupplier.com",
+  "tier": "П3",
+  "note": "Экспортный агент; профильным поставщиком не является",
+  "verified": "таможня РФ HS 8411 (2023–2026) + веб-верификация контактов, 05.08.2026"
+ },
+ {
+  "name": "Shenzhen Blaze Turbine Co. Ltd",
+  "country": "Китай",
+  "city": "Шэньчжэнь",
+  "role": "ЗАВОД (реверс-инжиниринг)",
+  "families": [
+   "SGT"
+  ],
+  "cats": [
+   "Лопатки",
+   "Диски",
+   "Камеры сгорания",
+   "Форсунки"
+  ],
+  "models": "SGT-400: лопатки, диски, КАМЕРЫ СГОРАНИЯ, форсунки; SGT-100..800",
+  "shipments": "—",
+  "years": "—",
+  "ru_buyers": "—",
+  "site": "turbineblade.net",
+  "email": "peter@turbineblade.net",
+  "phone": "+86 135 4409 5201",
+  "profile": "—",
+  "tier": "П1-SGT400",
+  "note": "Нужен чертёж или б/у образец; 5-ось CNC, направленная кристаллизация, пром-КТ",
+  "verified": "таможня РФ HS 8411 (2023–2026) + веб-верификация контактов, 05.08.2026"
+ },
+ {
+  "name": "Leda Greenpower",
+  "country": "Китай",
+  "city": "Пекин",
+  "role": "ТРЕЙДЕР/EPC",
+  "families": [
+   "SGT"
+  ],
+  "cats": [
+   "Горелки",
+   "Сухие газовые уплотнения",
+   "Прайс SGT-400"
+  ],
+  "models": "Готовый прайс SGT-400: burner assembly, gas core, PILOT BURNER, dry gas seal, VGV",
+  "shipments": "—",
+  "years": "—",
+  "ru_buyers": "—",
+  "site": "china-power-contractor.cn",
+  "email": "форма на сайте",
+  "phone": "WhatsApp/WeChat +86 138 0121 8512",
+  "profile": "—",
+  "tier": "П1-SGT400",
+  "note": "Aftermarket, не OEM-партнёр — открыто пишут",
+  "verified": "таможня РФ HS 8411 (2023–2026) + веб-верификация контактов, 05.08.2026"
+ },
+ {
+  "name": "Qingdao O.B.T Power Co. Ltd",
+  "country": "Китай",
+  "city": "Циндао",
+  "role": "ЗАВОД точного литья",
+  "families": [
+   "SGT"
+  ],
+  "cats": [
+   "Точное литьё",
+   "Камеры сгорания",
+   "Transition ducts"
+  ],
+  "models": "Камеры сгорания Siemens (SGT-500 корпус+жаровая труба), transition ducts SGT-400; Ni/Co сплавы, ТБ-покрытия",
+  "shipments": "—",
+  "years": "—",
+  "ru_buyers": "—",
+  "site": "obtmetalwork.com",
+  "email": "lisa@obtcasting.com",
+  "phone": "+86 186 6185 9609",
+  "profile": "blazemetalwork.en.made-in-china.com",
+  "tier": "П1-SGT400",
+  "note": "ISO9001, Audited Supplier, Diamond Member с 2007",
+  "verified": "таможня РФ HS 8411 (2023–2026) + веб-верификация контактов, 05.08.2026"
+ },
+ {
+  "name": "Hangzhou Gas Turbine Parts (Dawopu)",
+  "country": "Китай",
+  "city": "Ханчжоу",
+  "role": "ПОСТАВЩИК aftermarket",
+  "families": [
+   "SGT"
+  ],
+  "cats": [
+   "Aftermarket ЗИП (перечни)"
+  ],
+  "models": "Перечни ЗИП SGT-400/700/800, GE/Siemens/Westinghouse",
+  "shipments": "—",
+  "years": "—",
+  "ru_buyers": "—",
+  "site": "gas-turbine-parts.com",
+  "email": "info@gas-turbine-parts.com",
+  "phone": "+86 571 8996-7020; +86 158 6910 9368",
+  "profile": "—",
+  "tier": "П1-SGT400",
+  "note": "Трейдер/поставщик, не литейка",
+  "verified": "таможня РФ HS 8411 (2023–2026) + веб-верификация контактов, 05.08.2026"
+ },
+ {
+  "name": "Score Energy Ltd",
+  "country": "Великобритания",
+  "city": "Питерхед",
+  "role": "СЕРВИС (Siemens-одобрен)",
+  "families": [
+   "SGT"
+  ],
+  "cats": [
+   "Горелки DLE",
+   "Сервис"
+  ],
+  "models": "DLE centre of excellence — единств. одобренный Siemens цех ремонта ГОРЕЛОК малых SGT; Typhoon/Tornado/Cyclone=SGT-100..400",
+  "shipments": "—",
+  "years": "—",
+  "ru_buyers": "—",
+  "site": "score-group.com",
+  "email": "не найдено",
+  "phone": "+44 1779 480000",
+  "profile": "—",
+  "tier": "П2-DLE",
+  "note": "Санкц. риск UK — через посредника",
+  "verified": "таможня РФ HS 8411 (2023–2026) + веб-верификация контактов, 05.08.2026"
+ },
+ {
+  "name": "Skyline Turbine Services BV",
+  "country": "Нидерланды",
+  "city": "Пулдейк",
+  "role": "СЕРВИС/ремонт",
+  "families": [
+   "SGT"
+  ],
+  "cats": [
+   "Жаровые трубы",
+   "Transition pieces",
+   "DLE-калибровка"
+  ],
+  "models": "SGT-100..400: жаровые трубы/liners, transition pieces, DLE NOx-калибровка",
+  "shipments": "—",
+  "years": "—",
+  "ru_buyers": "—",
+  "site": "sts-bv.com",
+  "email": "info@sts-bv.com",
+  "phone": "+31 174 280 875",
+  "profile": "—",
+  "tier": "П2-SGT400",
+  "note": "Санкц. риск ЕС",
+  "verified": "таможня РФ HS 8411 (2023–2026) + веб-верификация контактов, 05.08.2026"
+ },
+ {
+  "name": "EthosEnergy Light Turbines Ltd",
+  "country": "Великобритания",
+  "city": "Абердин",
+  "role": "СЕРВИС",
+  "families": [
+   "SGT"
+  ],
+  "cats": [
+   "Сервис",
+   "Горячий тракт"
+  ],
+  "models": "Крупнейший не-OEM сервис Siemens <15МВт: SGT-100/200/300, горячий тракт",
+  "shipments": "—",
+  "years": "—",
+  "ru_buyers": "—",
+  "site": "ethosenergy.com",
+  "email": "форма",
+  "phone": "не найдено",
+  "profile": "—",
+  "tier": "П2",
+  "note": "Санкц. риск",
+  "verified": "таможня РФ HS 8411 (2023–2026) + веб-верификация контактов, 05.08.2026"
+ },
+ {
+  "name": "Centrax Gas Turbines",
+  "country": "Великобритания",
+  "city": "Ньютон-Эббот",
+  "role": "ПЭКЕДЖЕР",
+  "families": [
+   "SGT"
+  ],
+  "cats": [
+   "Пакеты/генсеты",
+   "ЗИП пакетов"
+  ],
+  "models": "Генсеты CX300/CX400 на базе SGT-300/SGT-400; ЗИП пакетов",
+  "shipments": "—",
+  "years": "—",
+  "ru_buyers": "—",
+  "site": "centraxgt.com",
+  "email": "uksupport@centraxgt.com",
+  "phone": "+44 1626 358000",
+  "profile": "—",
+  "tier": "П2-SGT400",
+  "note": "Санкц. риск",
+  "verified": "таможня РФ HS 8411 (2023–2026) + веб-верификация контактов, 05.08.2026"
+ },
+ {
+  "name": "Gas Turbine Services (GTS)",
+  "country": "Дания/UK",
+  "city": "Эсбьерг + Линкольн",
+  "role": "СЕРВИС/склад ЗИП",
+  "families": [
+   "SGT"
+  ],
+  "cats": [
+   "Overhaul",
+   "Обменные двигатели",
+   "Склад ЗИП"
+  ],
+  "models": "TB5000 и SGT-100..400: overhaul, обменные двигатели, склад",
+  "shipments": "—",
+  "years": "—",
+  "ru_buyers": "—",
+  "site": "gasturbineservices.com",
+  "email": "gts@gasturbineservices.com",
+  "phone": "+45 7546 8030; +44 1522 842700",
+  "profile": "—",
+  "tier": "П2-SGT400",
+  "note": "Санкц. риск",
+  "verified": "таможня РФ HS 8411 (2023–2026) + веб-верификация контактов, 05.08.2026"
+ },
+ {
+  "name": "Turbine Efficiency Group",
+  "country": "Великобритания",
+  "city": "Линкольн (+Дубай)",
+  "role": "СЕРВИС",
+  "families": [
+   "SGT"
+  ],
+  "cats": [
+   "Сервис",
+   "DLE"
+  ],
+  "models": "SGT-100/200 вкл. DLE, SGT-300; LTSA",
+  "shipments": "—",
+  "years": "—",
+  "ru_buyers": "—",
+  "site": "turbine-efficiency.co.uk",
+  "email": "info@turbineefficiency.com",
+  "phone": "+44 1522 696980",
+  "profile": "—",
+  "tier": "П2-DLE",
+  "note": "Офис в Дубае — возможный канал",
+  "verified": "таможня РФ HS 8411 (2023–2026) + веб-верификация контактов, 05.08.2026"
+ },
+ {
+  "name": "SJE Engineering Ltd",
+  "country": "Великобритания",
+  "city": "Линкольн",
+  "role": "ЗИП",
+  "families": [
+   "SGT"
+  ],
+  "cats": [
+   "ЗИП legacy (TB/Typhoon)"
+  ],
+  "models": "TB4000/5000, Typhoon/Tornado (SGT-100/200)",
+  "shipments": "—",
+  "years": "—",
+  "ru_buyers": "—",
+  "site": "sje-engineering.co.uk",
+  "email": "sales@sje-engineering.co.uk",
+  "phone": "не найдено",
+  "profile": "—",
+  "tier": "П3",
+  "note": "—",
+  "verified": "таможня РФ HS 8411 (2023–2026) + веб-верификация контактов, 05.08.2026"
+ },
+ {
+  "name": "Task-Pro Ltd",
+  "country": "Великобритания",
+  "city": "Абердиншир",
+  "role": "ЗИП/overhaul",
+  "families": [
+   "SGT"
+  ],
+  "cats": [
+   "ЗИП",
+   "Overhaul"
+  ],
+  "models": "TA1750–TB5400 и SGT-100..400",
+  "shipments": "—",
+  "years": "—",
+  "ru_buyers": "—",
+  "site": "task-pro.co.uk",
+  "email": "info@task-pro.co.uk",
+  "phone": "+44 1467 641440",
+  "profile": "—",
+  "tier": "П3",
+  "note": "—",
+  "verified": "таможня РФ HS 8411 (2023–2026) + веб-верификация контактов, 05.08.2026"
+ },
+ {
+  "name": "MAPNA TUGA",
+  "country": "Иран",
+  "city": "Тегеран",
+  "role": "OEM по лицензии Siemens",
+  "families": [
+   "SGT"
+  ],
+  "cats": [
+   "OEM по лицензии",
+   "Капремонт"
+  ],
+  "models": "V94.2 (SGT5-2000E) полный ЖЦ + запчасти",
+  "shipments": "—",
+  "years": "—",
+  "ru_buyers": "—",
+  "site": "mapnaturbine.com",
+  "email": "не найдено (@mapnaturbine.com)",
+  "phone": "+98 21 2471 1870",
+  "profile": "—",
+  "tier": "П2-Иран",
+  "note": "Реальный канал; не-долларовые схемы",
+  "verified": "таможня РФ HS 8411 (2023–2026) + веб-верификация контактов, 05.08.2026"
+ },
+ {
+  "name": "MAPNA PARTO",
+  "country": "Иран",
+  "city": "Карадж",
+  "role": "ЗАВОД лопаток",
+  "families": [
+   "SGT"
+  ],
+  "cats": [
+   "Лопатки"
+  ],
+  "models": "Лопатки/направляющие ГТУ 14000 шт/год (стартовали с лицензии Siemens)",
+  "shipments": "—",
+  "years": "—",
+  "ru_buyers": "—",
+  "site": "mapnablade.com",
+  "email": "не найдено",
+  "phone": "+98 26 3619 2000",
+  "profile": "—",
+  "tier": "П2-Иран",
+  "note": "В списке Iran Watch — только не-USD",
+  "verified": "таможня РФ HS 8411 (2023–2026) + веб-верификация контактов, 05.08.2026"
+ },
+ {
+  "name": "OTC Oil Turbo Compressor",
+  "country": "Иран",
+  "city": "Тегеран",
+  "role": "СЕРВИС/ЗИП",
+  "families": [
+   "SGT"
+  ],
+  "cats": [
+   "Сервис",
+   "ЗИП"
+  ],
+  "models": "Запчасти, капремонт ГТУ; Siemens-компетенция в штате",
+  "shipments": "—",
+  "years": "—",
+  "ru_buyers": "—",
+  "site": "otc-irco.com",
+  "email": "не найдено (@otc-ir.com)",
+  "phone": "не найдено",
+  "profile": "—",
+  "tier": "П3-Иран",
+  "note": "—",
+  "verified": "таможня РФ HS 8411 (2023–2026) + веб-верификация контактов, 05.08.2026"
+ },
+ {
+  "name": "Tianjin Bowzon Turbine Co. Ltd",
+  "country": "Китай",
+  "city": "Тяньцзинь",
+  "role": "ЗАВОД лопаток",
+  "families": [
+   "SGT"
+  ],
+  "cats": [
+   "Лопатки",
+   "Реверс-инжиниринг"
+  ],
+  "models": "80000+ лопаток/год; реверс без чертежей; материалы по SGT-800",
+  "shipments": "—",
+  "years": "—",
+  "ru_buyers": "—",
+  "site": "bowzonturbine.com",
+  "email": "service@bowzonturbine.com",
+  "phone": "+86 157 3330 3169",
+  "profile": "—",
+  "tier": "П3",
+  "note": "—",
+  "verified": "таможня РФ HS 8411 (2023–2026) + веб-верификация контактов, 05.08.2026"
+ },
+ {
+  "name": "Shenzhen Bicosyn Enterprises",
+  "country": "Китай",
+  "city": "Шэньчжэнь",
+  "role": "СЕРВИС/ЗИП",
+  "families": [
+   "SGT",
+   "Solar"
+  ],
+  "cats": [
+   "Сервис",
+   "ЗИП"
+  ],
+  "models": "С 1998: Typhoon/Tornado (SGT-100/200), Solar; клиенты CNOOC/Shell",
+  "shipments": "—",
+  "years": "—",
+  "ru_buyers": "—",
+  "site": "bicosyn.com",
+  "email": "скрыт на сайте",
+  "phone": "+86 755 2664-0316",
+  "profile": "bicosynenergy.en.made-in-china.com",
+  "tier": "П3",
+  "note": "—",
+  "verified": "таможня РФ HS 8411 (2023–2026) + веб-верификация контактов, 05.08.2026"
+ },
+ {
+  "name": "SAINTWAH INC.",
+  "country": "Китай",
+  "city": "Пекин",
+  "role": "ТРЕЙДЕР",
+  "families": [
+   "SGT"
+  ],
+  "cats": [
+   "Трейдер (целые машины)"
+  ],
+  "models": "Целые SGT-200/300/800 + ЗИП",
+  "shipments": "—",
+  "years": "—",
+  "ru_buyers": "—",
+  "site": "saintwah.en.made-in-china.com",
+  "email": "форма m-i-c",
+  "phone": "не найдено",
+  "profile": "—",
+  "tier": "П3",
+  "note": "—",
+  "verified": "таможня РФ HS 8411 (2023–2026) + веб-верификация контактов, 05.08.2026"
+ },
+ {
+  "name": "GT-China",
+  "country": "Китай",
+  "city": "не найдено",
+  "role": "ЗАЯВЛЯЕТ ЗИП SGT100-800",
+  "families": [
+   "SGT"
+  ],
+  "cats": [
+   "Лид (заявляет ЗИП SGT100-800)"
+  ],
+  "models": "HPT-лопатки, форсунки, жаровые трубы, transition pieces",
+  "shipments": "—",
+  "years": "—",
+  "ru_buyers": "—",
+  "site": "gt-china.net",
+  "email": "не найдено",
+  "phone": "не найдено",
+  "profile": "—",
+  "tier": "лид",
+  "note": "Сайт нестабилен — дозапросить",
+  "verified": "таможня РФ HS 8411 (2023–2026) + веб-верификация контактов, 05.08.2026"
+ },
+ {
+  "name": "Solar Turbines Incorporated",
+  "country": "США",
+  "city": "Сан-Диего (Caterpillar)",
+  "role": "OEM",
+  "families": [
+   "Solar"
+  ],
+  "cats": [
+   "OEM"
+  ],
+  "models": "Saturn 20, Centaur 40/50, Taurus 60/70, Mars 90/100, Titan 130/250",
+  "site": "solarturbines.com",
+  "tier": "справочно",
+  "note": "Оригинал. Ушёл из РФ (санкции): прямых поставок и поддержки нет — каналы: независимые MRO, б/у рынок, третьи страны.",
+  "shipments": "",
+  "years": "",
+  "ru_buyers": "",
+  "email": "см. сайт",
+  "phone": "см. сайт",
+  "profile": "",
+  "verified": "публичные данные компании (сайт/пресса); контакты в этой сессии НЕ верифицировались — взять с сайта при первом RFQ"
+ },
+ {
+  "name": "S&S Turbine Services Ltd.",
+  "country": "Канада",
+  "city": "Fort St. John (BC)",
+  "role": "СЕРВИС (независимый капремонт)",
+  "families": [
+   "Solar"
+  ],
+  "cats": [
+   "Overhaul",
+   "Обменные двигатели",
+   "ЗИП"
+  ],
+  "models": "Saturn, Centaur 40/50, Taurus 60/70, Mars 90/100 — крупнейший не-OEM цех по машинам Solar",
+  "site": "sandsturbine.com",
+  "tier": "S1",
+  "note": "Ключевой независимый игрок по Solar в мире. Санкционный риск (Канада) — заход через посредника.",
+  "shipments": "",
+  "years": "",
+  "ru_buyers": "",
+  "email": "см. сайт",
+  "phone": "см. сайт",
+  "profile": "",
+  "verified": "публичные данные компании (сайт/пресса); контакты в этой сессии НЕ верифицировались — взять с сайта при первом RFQ"
+ },
+ {
+  "name": "Alba Power (в составе Sulzer)",
+  "country": "Великобритания",
+  "city": "Абердин",
+  "role": "СЕРВИС",
+  "families": [
+   "Solar",
+   "SGT"
+  ],
+  "cats": [
+   "Overhaul",
+   "Горячий тракт",
+   "ЗИП"
+  ],
+  "models": "Solar: Saturn/Centaur/Taurus/Mars; лёгкие Siemens (Typhoon/Tornado = SGT-100/200)",
+  "site": "albapower.com",
+  "tier": "S1",
+  "note": "Независимый сервис обеих наших семей; с 2018 в группе Sulzer.",
+  "shipments": "",
+  "years": "",
+  "ru_buyers": "",
+  "email": "см. сайт",
+  "phone": "см. сайт",
+  "profile": "",
+  "verified": "публичные данные компании (сайт/пресса); контакты в этой сессии НЕ верифицировались — взять с сайта при первом RFQ"
+ },
+ {
+  "name": "Sulzer Turbo Services",
+  "country": "США / Нидерланды",
+  "city": "La Porte (TX) / Роттердам",
+  "role": "СЕРВИС (мультибренд)",
+  "families": [
+   "Solar",
+   "SGT"
+  ],
+  "cats": [
+   "Overhaul",
+   "Лопатки",
+   "Ремонт/покрытия"
+  ],
+  "models": "Solar, Siemens, GE — независимый MRO полного цикла",
+  "site": "sulzer.com",
+  "tier": "S2",
+  "note": "Швейцарская группа; работа с РФ ограничена — через региональные цеха/посредников.",
+  "shipments": "",
+  "years": "",
+  "ru_buyers": "",
+  "email": "см. сайт",
+  "phone": "см. сайт",
+  "profile": "",
+  "verified": "публичные данные компании (сайт/пресса); контакты в этой сессии НЕ верифицировались — взять с сайта при первом RFQ"
+ },
+ {
+  "name": "Liburdi Turbine Services",
+  "country": "Канада",
+  "city": "Dundas (Ontario)",
+  "role": "РЕМОНТ лопаток",
+  "families": [
+   "Solar",
+   "SGT"
+  ],
+  "cats": [
+   "Лопатки",
+   "Ремонт/восстановление",
+   "Сварка Ni-сплавов"
+  ],
+  "models": "Восстановление лопаток/сопловых аппаратов любых ОЕМ (LPM-технология)",
+  "site": "liburdi.com",
+  "tier": "S2",
+  "note": "Не новые детали, а восстановление ресурса — альтернатива закупке ЗИП горячего тракта.",
+  "shipments": "",
+  "years": "",
+  "ru_buyers": "",
+  "email": "см. сайт",
+  "phone": "см. сайт",
+  "profile": "",
+  "verified": "публичные данные компании (сайт/пресса); контакты в этой сессии НЕ верифицировались — взять с сайта при первом RFQ"
+ },
+ {
+  "name": "Chromalloy",
+  "country": "США",
+  "city": "Palm Beach Gardens (FL)",
+  "role": "ПРОИЗВОДИТЕЛЬ aftermarket",
+  "families": [
+   "Solar",
+   "SGT"
+  ],
+  "cats": [
+   "Горячий тракт",
+   "Покрытия",
+   "Лопатки"
+  ],
+  "models": "Детали и покрытия горячего тракта промышленных ГТУ (aftermarket-класс)",
+  "site": "chromalloy.com",
+  "tier": "S3",
+  "note": "Американская юрисдикция — напрямую недоступен; ориентир по технологии/ценам.",
+  "shipments": "",
+  "years": "",
+  "ru_buyers": "",
+  "email": "см. сайт",
+  "phone": "см. сайт",
+  "profile": "",
+  "verified": "публичные данные компании (сайт/пресса); контакты в этой сессии НЕ верифицировались — взять с сайта при первом RFQ"
+ },
+ {
+  "name": "Petrotech Inc.",
+  "country": "США",
+  "city": "Новый Орлеан (LA)",
+  "role": "САУ / ретрофит",
+  "families": [
+   "Solar",
+   "SGT"
+  ],
+  "cats": [
+   "САУ",
+   "Ретрофит управления"
+  ],
+  "models": "Замена штатных САУ (в т.ч. Solar Turbotronic) на открытые контроллеры",
+  "site": "petrotechinc.com",
+  "tier": "S3",
+  "note": "Решает проблему закрытой САУ Solar без OEM; юрисдикция США — через посредника/аналог.",
+  "shipments": "",
+  "years": "",
+  "ru_buyers": "",
+  "email": "см. сайт",
+  "phone": "см. сайт",
+  "profile": "",
+  "verified": "публичные данные компании (сайт/пресса); контакты в этой сессии НЕ верифицировались — взять с сайта при первом RFQ"
+ }
+];
+const MODELS = {
+ "note": "Мощности/КПД — ISO, по открытым данным Siemens Energy и Solar Turbines (≈, зависят от исполнения и года выпуска). Сверять с Gas Turbine World Handbook и паспортом конкретного агрегата.",
+ "families": [
+  {
+   "id": "sgt",
+   "title": "Siemens SGT-100…400 (завод Линкольн, Великобритания)",
+   "history": "Линия малых промышленных ГТУ Ruston → European Gas Turbines → Alstom → Siemens (2003, ребрендинг в SGT). Наследственные имена (Typhoon/Tornado/Tempest/Cyclone) до сих пор живут в каталогах, у сервисников и в таможенных описаниях — при поиске ЗИП использовать ОБА имени. Не путать со шведской линией SGT-500/600/700/800 (ex-ABB STAL, Финспонг) — там другая конструкция и нумерация деталей (наследие GT10/GT35).",
+   "models": [
+    {"name": "SGT-100", "legacy": "Typhoon", "power": "≈5,1–5,7 МВт", "eff": "≈31%", "shafts": "1 вал (ген.) / 2 вала (мех. привод, SGT-100-2S)", "use": "малые КС, электростанции, когенерация", "zip_note": "широчайший aftermarket в UK (EthosEnergy, Turbine Efficiency, SJE, Task-Pro) — искать и как Typhoon"},
+    {"name": "SGT-200", "legacy": "Tornado", "power": "≈6,75 МВт", "eff": "≈31,5%", "shafts": "1 / 2 вала", "use": "ГПА, генерация", "zip_note": "б/у машины и обменные двигатели доступны (GTS, Siemens Lincoln возил б/у в РФ)"},
+    {"name": "SGT-300", "legacy": "Tempest", "power": "≈7,9–8,2 МВт", "eff": "≈30,6%", "shafts": "1 вал (ген.) / 2 вала (-2S)", "use": "генерация, когенерация", "zip_note": "пакетируется также Centrax (генсеты CX300)"},
+    {"name": "SGT-400", "legacy": "Cyclone", "power": "≈12,9–14,3 МВт", "eff": "≈34,8–35,4%", "shafts": "2 вала", "use": "ГПА, генерация — фокус КВАНТ", "zip_note": "текущая закупка: камера сгорания MW21215M ×12 + горелка DUAL DLE MW22316B/01 ×12; Китай — Blaze/O.B.T/Leda; сервис UK/NL — Score, Skyline; пакеты — Centrax CX400"}
+   ]
+  },
+  {
+   "id": "solar",
+   "title": "Solar Turbines (Сан-Диего, США — Caterpillar)",
+   "history": "Крупнейший в мире парк промышленных ГТУ 1–23 МВт (>16 000 машин). Вертикальная модель OEM: запчасти и сервис — только через сеть Solar/Caterpillar, независимый aftermarket заметно тоньше, чем у Siemens: ключевые не-OEM игроки — S&S Turbine Services (Канада), Alba Power/Sulzer (UK), реверс в Китае (Bicosyn и др.). После ухода из РФ (2022) канал ЗИП — независимые MRO, б/у рынок, третьи страны.",
+   "models": [
+    {"name": "Saturn 20", "legacy": "", "power": "≈1,2 МВт", "eff": "≈24%", "shafts": "1 вал", "use": "малая генерация, старые ГПА", "zip_note": "парк возрастной, много б/у и обменных двигателей у независимых MRO"},
+    {"name": "Centaur 40", "legacy": "", "power": "≈3,5 МВт", "eff": "≈28%", "shafts": "1 / 2 вала", "use": "ГПА, генерация", "zip_note": "самый массовый «старый» Solar — рабочая лошадка aftermarket"},
+    {"name": "Centaur 50", "legacy": "", "power": "≈4,6 МВт", "eff": "≈29%", "shafts": "1 / 2 вала", "use": "ГПА, генерация", "zip_note": ""},
+    {"name": "Taurus 60", "legacy": "", "power": "≈5,7 МВт", "eff": "≈30%", "shafts": "1 / 2 вала", "use": "ГПА, генерация, офшор", "zip_note": "в таможне РФ 2023–2026 виден импорт ЗИП Taurus от самого Solar (до ухода)"},
+    {"name": "Taurus 70", "legacy": "", "power": "≈8,0 МВт", "eff": "≈34%", "shafts": "1 / 2 вала", "use": "ГПА, генерация", "zip_note": ""},
+    {"name": "Mars 90", "legacy": "", "power": "≈9,4 МВт", "eff": "≈32%", "shafts": "2 вала", "use": "ГПА, офшор (Сахалин и др.)", "zip_note": "в таможне РФ виден импорт ЗИП Mars"},
+    {"name": "Mars 100", "legacy": "", "power": "≈11,4 МВт", "eff": "≈33%", "shafts": "2 вала", "use": "ГПА, офшор", "zip_note": ""},
+    {"name": "Titan 130", "legacy": "", "power": "≈16,5 МВт", "eff": "≈35%", "shafts": "1 / 2 вала", "use": "ГПА, генерация", "zip_note": ""},
+    {"name": "Titan 250", "legacy": "", "power": "≈23 МВт", "eff": "≈39%", "shafts": "2 вала", "use": "ГПА", "zip_note": "новейшая машина — ЗИП практически только OEM"}
+   ]
+  }
+ ]
+}
+;
+const PARTS = {
+ "note": "Универсальная номенклатура ЗИП промышленной ГТУ 1–25 МВт (Solar + SGT). Критичность: A — останавливает машину / длинный срок, B — плановая замена, C — расходник. «Aftermarket» — реальная доступность вне OEM по опыту разведки 2026.",
+ "systems": [
+  {
+   "id": "hot", "title": "Горячий тракт (камера сгорания)", "crit": "A",
+   "aftermarket": "широкий: Китай (Blaze, O.B.T, Dongturbo), Италия (SAMIC), сервис UK/NL (Score, Skyline)",
+   "components": [
+    {"ru": "Камера сгорания (в сборе)", "en": "combustion chamber / combustor assembly", "note": "фокус закупки КВАНТ: SGT-400 → PN MW21215M", "crit": "A"},
+    {"ru": "Жаровая труба", "en": "combustion liner / can", "note": "главный ресурсный элемент; реверс освоен в Китае", "crit": "A"},
+    {"ru": "Основная горелка DLE", "en": "main burner (DLE)", "note": "SGT-400 DUAL DLE → PN MW22316B/01; ремонт — Score Energy (единственный Siemens-одобренный не-OEM цех)", "crit": "A"},
+    {"ru": "Пилотная горелка", "en": "pilot burner", "note": "есть в прайсе Leda Greenpower по SGT-400", "crit": "A"},
+    {"ru": "Переходной патрубок", "en": "transition piece / duct", "note": "литьё+жаропрочная сварка; O.B.T Qingdao делает по SGT-400", "crit": "A"},
+    {"ru": "Запальник / свеча", "en": "igniter / spark plug", "note": "узкая ниша — TESI IGNITERS (Италия)", "crit": "B"},
+    {"ru": "Топливные форсунки", "en": "fuel injectors / nozzles", "note": "у Solar — ключевой регулярный расходник, замена на каждом ТО", "crit": "A"}
+   ]
+  },
+  {
+   "id": "turbine", "title": "Турбина (ВД + силовая)", "crit": "A",
+   "aftermarket": "узкий: реверс-заводы лопаток (Blaze, Bowzon, MAPNA PARTO), восстановление (Liburdi, Sulzer, Henan GTET)",
+   "components": [
+    {"ru": "Рабочие лопатки ТВД", "en": "HP turbine blades", "note": "монокристалл/направленная кристаллизация + покрытие — самая сложная деталь машины", "crit": "A"},
+    {"ru": "Сопловые (направляющие) аппараты", "en": "nozzle guide vanes (NGV)", "note": "литьё по выплавляемым моделям; восстанавливаются сваркой", "crit": "A"},
+    {"ru": "Лопатки силовой турбины", "en": "power turbine blades", "note": "проще ТВД (ниже температура) — первый кандидат на реверс", "crit": "A"},
+    {"ru": "Диски турбины", "en": "turbine discs", "note": "Blaze заявляет диски SGT-400; поковка + мехобработка (GFM)", "crit": "A"},
+    {"ru": "Уплотнительные сегменты / бандажи", "en": "shroud / tip seal segments", "note": "", "crit": "B"}
+   ]
+  },
+  {
+   "id": "compressor", "title": "Осевой компрессор", "crit": "B",
+   "aftermarket": "средний: лопатки — реверс-заводы; клапаны/актуаторы — универсальные",
+   "components": [
+    {"ru": "Лопатки компрессора (рабочие/статорные)", "en": "compressor blades / stator vanes", "note": "нерж. стали — проще турбинных", "crit": "B"},
+    {"ru": "Входной направляющий аппарат + привод", "en": "inlet guide vanes (IGV) + actuator", "note": "", "crit": "B"},
+    {"ru": "Антипомпажные / сбросные клапаны", "en": "bleed / blow-off valves", "note": "универсальные компоненты — покупаются вне OEM", "crit": "B"}
+   ]
+  },
+  {
+   "id": "rotor", "title": "Ротор, опоры, уплотнения", "crit": "B",
+   "aftermarket": "средний: подшипники — специализированные заводы; DGS — John Crane/Eagle-класс aftermarket",
+   "components": [
+    {"ru": "Подшипники опорные (баббит)", "en": "journal bearings", "note": "перезаливка баббита — освоенная услуга и в РФ", "crit": "B"},
+    {"ru": "Подшипник упорный", "en": "thrust bearing", "note": "", "crit": "B"},
+    {"ru": "Сухие газовые уплотнения ЦБК", "en": "dry gas seals (DGS)", "note": "для приводных компрессоров; в прайсе Leda по SGT-400", "crit": "A"},
+    {"ru": "Муфты / торсионный вал", "en": "couplings", "note": "", "crit": "B"},
+    {"ru": "Лабиринтные уплотнения", "en": "labyrinth seals", "note": "", "crit": "C"}
+   ]
+  },
+  {
+   "id": "fuel", "title": "Топливная система", "crit": "B",
+   "aftermarket": "широкий: клапаны/арматура — универсальные позиции",
+   "components": [
+    {"ru": "Клапаны дозирования топлива", "en": "fuel metering / control valves", "note": "", "crit": "A"},
+    {"ru": "Стопорные/отсечные клапаны", "en": "shut-off valves", "note": "", "crit": "A"},
+    {"ru": "Топливные коллекторы и гибкие подводы", "en": "fuel manifolds / flex hoses", "note": "", "crit": "B"},
+    {"ru": "Фильтры топливного газа", "en": "fuel gas filters", "note": "расходник", "crit": "C"}
+   ]
+  },
+  {
+   "id": "controls", "title": "САУ, КИП, электрика", "crit": "B",
+   "aftermarket": "широкий по датчикам (универсальные); ретрофит САУ — Petrotech и аналоги",
+   "components": [
+    {"ru": "Контроллер САУ", "en": "control system / PLC", "note": "Solar: Turbotronic (закрытая) — при недоступности OEM смотреть ретрофит на открытые ПЛК", "crit": "A"},
+    {"ru": "Термопары выхлопа (Т5/EGT)", "en": "exhaust thermocouples", "note": "регулярный расходник, универсальные аналоги", "crit": "C"},
+    {"ru": "Вибродатчики / проксиметры", "en": "vibration probes (Bently Nevada class)", "note": "стандартные позиции — вне OEM", "crit": "B"},
+    {"ru": "Соленоиды, актуаторы, конечники", "en": "solenoids / actuators / switches", "note": "", "crit": "B"},
+    {"ru": "Датчики пламени / УФ", "en": "flame scanners", "note": "", "crit": "B"}
+   ]
+  },
+  {
+   "id": "consumables", "title": "Фильтры и расходники", "crit": "C",
+   "aftermarket": "максимально широкий: универсальные производители фильтрации (Camfil/Donaldson-класс, есть аналоги РФ/КНР)",
+   "components": [
+    {"ru": "Фильтры КВОУ (воздух на входе)", "en": "inlet air filters", "note": "самый массовый расходник; аналоги подбираются по размеру/классу EPA/HEPA", "crit": "C"},
+    {"ru": "Маслофильтры / сепараторы", "en": "lube oil filters / separators", "note": "", "crit": "C"},
+    {"ru": "Прокладки, уплотнения, метизы", "en": "gaskets / seals / hardware", "note": "", "crit": "C"},
+    {"ru": "Турбинное масло", "en": "turbine oil", "note": "по спецификации OEM, аналоги есть", "crit": "C"}
+   ]
+  },
+  {
+   "id": "package", "title": "Пакет / вспомсистемы (BOP)", "crit": "B",
+   "aftermarket": "широкий: общепромышленные узлы; пакеты SGT-300/400 делает и Centrax",
+   "components": [
+    {"ru": "Стартер (пневмо/гидро/электро)", "en": "starter system", "note": "", "crit": "B"},
+    {"ru": "Маслонасосы (главный/резервный/аварийный)", "en": "lube oil pumps", "note": "", "crit": "B"},
+    {"ru": "АВО / теплообменники масла", "en": "oil coolers", "note": "", "crit": "C"},
+    {"ru": "Редуктор (привод генератора)", "en": "gearbox", "note": "", "crit": "B"},
+    {"ru": "Вентиляция кожуха, газоанализ, пожаротушение", "en": "enclosure ventilation / F&G / fire suppression", "note": "универсальные системы", "crit": "B"}
+   ]
+  }
+ ]
+}
+;
+const PN = {
+ "intro": "Шифровки партномеров (PN) — ключ к библиотеке: сорсер должен по номеру понять, к какой машине и системе относится деталь, и под какими ещё именами её искать. Ниже — то, что подтверждено закупками/таможней, и методика проверки остального.",
+ "sections": [
+  {
+   "id": "siemens",
+   "title": "Siemens SGT-100…400 (линия Линкольн)",
+   "rules": [
+    {"pattern": "MW#####X[/NN]", "meaning": "Современный формат завода Линкольн: префикс MW + 5 цифр + буква ревизии конструкции; «/NN» — вариант исполнения.", "examples": "MW21215M — камера сгорания SGT-400 (закупка КВАНТ, 12 шт); MW22316B/01 — главная горелка DUAL DLE SGT-400 (12 шт)", "status": "подтверждено закупкой"},
+    {"pattern": "Typhoon / Tornado / Tempest / Cyclone", "meaning": "Наследственные имена машин (до ребрендинга 2003): SGT-100=Typhoon, SGT-200=Tornado, SGT-300=Tempest, SGT-400=Cyclone. Aftermarket-склады и базы часто индексируют детали по старым именам — поиск по «Cyclone» даёт больше не-OEM результатов, чем по «SGT-400».", "examples": "SJE Engineering, Task-Pro каталогизируют по Typhoon/Tornado", "status": "подтверждено (каталоги сервисников)"},
+    {"pattern": "TA / TB (напр. TB5000)", "meaning": "Ещё более старая нумерация машин Ruston (TA1750…TB5400). Детали этих машин — отдельная ветка номеров; сервисники по TB — те же, что по SGT-100/200.", "examples": "GTS (Дания/UK) держит склад и по TB5000, и по SGT-100…400", "status": "подтверждено (профили сервисников)"},
+    {"pattern": "⚠ SGT-500/600/700/800", "meaning": "Шведская линия (ex-ABB STAL, Финспонг) — другая конструкция и другая система PN (наследие GT10/GT35). Не смешивать RFQ: поставщик «по SGT» может знать только одну из линий.", "examples": "Dongturbo силён по SGT-600/GT10B — это НЕ гарантирует компетенцию по SGT-400", "status": "правило для RFQ"}
+   ]
+  },
+  {
+   "id": "solar",
+   "title": "Solar Turbines",
+   "rules": [
+    {"pattern": "числовой PN + «-суффикс»", "meaning": "PN Solar — числовые (6–7 цифр), суффикс через дефис задаёт исполнение/конфигурацию, ревизии — буквами. Деталь существует на двух уровнях: engine part (двигатель) и package part (пакет) — в RFQ указывать уровень.", "examples": "формат вида 1234567-100; конкретные PN брать из IPC агрегата", "status": "⚠ проверить на первом реальном IPC/КП"},
+    {"pattern": "привязка к серийнику", "meaning": "Конфигурация машины Solar жёстко привязана к серийному номеру пакета — один и тот же узел на разных серийниках может иметь разные PN. В RFQ всегда: модель + серийный номер пакета + PN.", "examples": "", "status": "правило для RFQ"},
+    {"pattern": "каналы каталогов", "meaning": "IPC (Illustrated Parts Catalog) и сервисные бюллетени — у эксплуатанта агрегата; кросс-номера умеют независимые MRO (S&S Turbine Services, Alba Power/Sulzer). Дилерская сеть Caterpillar для РФ закрыта.", "examples": "", "status": "план действий"}
+   ]
+  },
+  {
+   "id": "method",
+   "title": "Методика верификации PN (для сорсера)",
+   "rules": [
+    {"pattern": "1. Таможня", "meaning": "В описании декларации (графа 31) часто указан PN и модель — база на вкладке «Таможня» и kvant-zip.pages.dev.", "examples": "1 347 деклараций HS 8411 за 2023–2026 уже в базе", "status": "работает"},
+    {"pattern": "2. Перечни поставщиков", "meaning": "Blaze, Dawopu, Leda публикуют номенклатуру с PN — сверять написание и ревизию.", "examples": "", "status": "работает"},
+    {"pattern": "3. Физическая деталь", "meaning": "Фото шильдика/маркировки + обмер б/у образца — прикладывать к RFQ; китайские заводы делают по образцу без чертежа.", "examples": "Bowzon: реверс без чертежей", "status": "работает"},
+    {"pattern": "4. Карточка в библиотеке", "meaning": "Единый формат карточки детали КВАНТ: [семейство]-[система]-[PN OEM] + название рус/англ + альтернативные имена (legacy) + подтверждённые поставщики. Пополняется по мере КП.", "examples": "SGT400-HOT-MW21215M «Камера сгорания / combustion chamber (Cyclone)»", "status": "стандарт библиотеки"}
+   ]
+  }
+ ]
+}
+;
+const CUSTOMS = {"hs": "8411 (турбины газовые и их части: 841181/841182/841199)", "period": "2023-01 … 2026-03", "total_records": 1347, "visible_records": 650, "by_year": [{"year": "2023", "n": 484, "kg": 7456}, {"year": "2024", "n": 160, "kg": 2240}, {"year": "2025", "n": 6, "kg": 156}], "top_exporters": [{"name": "АО МОТОР СИЧ", "n": 76}, {"name": "GE HUNGARY KFT", "n": 54}, {"name": "GE HUNGARY KGT", "n": 41}, {"name": "NUOVO PIGNONE INTERNATIONAL S.R.L.", "n": 33}, {"name": "GE ENERGY PRODUCTS FRANCE SNC", "n": 32}, {"name": "FOSHAN XINCHUANG INDUSTRIAL COMPANY LIMITED", "n": 18}, {"name": "DONGTURBO ELECTRIC COMPANY LTD.", "n": 13}, {"name": "ALLIED SIGNAL AEROSPACE", "n": 12}, {"name": "HONEYWELL", "n": 11}, {"name": "АО МОТОР СИЧ УКРАИНА", "n": 10}, {"name": "HONEYWELL INTERNATIONAL INC.", "n": 10}, {"name": "ПАО МОТОР СИЧ", "n": 10}, {"name": "MITSUBISHI CORPORATION", "n": 8}, {"name": "HOMEDIA(ZHANGZHOU) IMPORT AND EXPORT CO. LTD", "n": 8}, {"name": "АО ОДК-КЛИМОВ", "n": 7}], "top_importers": [{"name": "ООО РГТ", "n": 131}, {"name": "ООО СТС", "n": 64}, {"name": "АО Р****", "n": 48}, {"name": "АО ЮТЭЙР************", "n": 44}, {"name": "АО УР******* ЗАВОД ГРАЖ******* АВИ*****", "n": 25}, {"name": "ООО ДЖИИ РУС", "n": 21}, {"name": "ПАО АВИ********* Ю*****", "n": 14}, {"name": "АО ЮТЭЙР************ УС*****", "n": 11}, {"name": "ООО ПРО*******", "n": 10}, {"name": "ООО АВИ*********", "n": 10}, {"name": "ООО АЭР", "n": 10}, {"name": "ООО ТА*******", "n": 10}, {"name": "ООО ГТ ИНЖИ*******", "n": 9}, {"name": "ООО САХ******** ЭНЕ*****", "n": 9}, {"name": "ООО С 7 ИНЖИ*******", "n": 8}], "countries": [{"code": "CN", "n": 131}, {"code": "NL", "n": 56}, {"code": "HU", "n": 48}, {"code": "LT", "n": 40}, {"code": "AE", "n": 38}, {"code": "TR", "n": 34}, {"code": "PL", "n": 27}, {"code": "IN", "n": 26}, {"code": "UZ", "n": 26}, {"code": "MV", "n": 23}], "models": [{"model": "GT10", "n": 5, "exporters": ["DONGTURBO ELECTRIC COMPANY LTD."]}, {"model": "SGT-600", "n": 4, "exporters": ["DONGTURBO ELECTRIC COMPANY LTD."]}, {"model": "SGT-100", "n": 3, "exporters": ["SIEMENS INDUSTRIAL TURBOMACHINERY LTD.", "SIEMENS ENERGY INDUSTRIAL TURBOMACHINERY LTD", "SIEMENS ENERGY AG."]}, {"model": "SGT-400", "n": 2, "exporters": ["SUZHOU FUHANG MACHINERY CO.LTD"]}, {"model": "SGT-200", "n": 1, "exporters": ["SIEMENS INDUSTRIAL TURBOMACHINERY LTD. UK"]}, {"model": "SGT-700", "n": 1, "exporters": ["DONGTURBO ELECTRIC COMPANY LTD"]}, {"model": "TAURUS", "n": 1, "exporters": ["SOLAR TURBINES"]}, {"model": "MARS", "n": 1, "exporters": ["SOLAR TURBINES"]}, {"model": "SGT-800", "n": 1, "exporters": ["SIEMENS ENERGY GLOBAL GMBH & CO. KG."]}]};
+
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const famTag = f => `<span class="tag ${f==='SGT'?'sgt':'solar'}">${f==='SGT'?'Siemens SGT':'Solar'}</span>`;
+const critCls = c => c==='A'?'critA':(c==='B'?'critB':'critC');
+
+const TABS = [
+ ['overview','Обзор'],['machines','Машины'],['parts','Номенклатура ЗИП'],['pn','Шифровки PN'],
+ ['suppliers','Поставщики'],['customs','Таможня РФ'],['db','Базы данных']
+];
+
+/* ---------- Обзор ---------- */
+function rOverview(){
+ const nSGT = SUPPLIERS.filter(s=>s.families.includes('SGT')).length;
+ const nSolar = SUPPLIERS.filter(s=>s.families.includes('Solar')).length;
+ const nModels = MODELS.families.reduce((a,f)=>a+f.models.length,0);
+ return `
+ <div class="k">
+  <div class="tile"><b>${SUPPLIERS.length}</b><span>компаний в библиотеке</span></div>
+  <div class="tile"><b>${nSGT} / ${nSolar}</b><span>по Siemens SGT / по Solar</span></div>
+  <div class="tile"><b>${nModels}</b><span>моделей турбин</span></div>
+  <div class="tile"><b>${PARTS.systems.length}</b><span>систем в номенклатуре ЗИП</span></div>
+  <div class="tile"><b>${CUSTOMS.total_records.toLocaleString('ru')}</b><span>деклараций HS 8411 в базе (2023–2026)</span></div>
+ </div>
+ <div class="box info"><b>Зачем эта библиотека.</b> Solar Turbines и Siemens Energy ушли из РФ — ЗИП для парка Solar (Saturn…Titan) и SGT-100…400 покупается только через независимый «автомаркет»: реверс-заводы Китая, сервисники UK/EU (через посредников), лицензиатов Ирана и б/у рынок. Здесь собрано, <b>кому идти за каким типом запчастей</b>, и как читать шифровки партномеров.</div>
+ <h2>Алгоритм сорсера — 4 шага</h2>
+ <div class="grid">
+  <div class="card"><b>1. Определи машину</b><div class="mut" style="font-size:12.5px">Модель + серийник пакета. Помни legacy-имена: SGT-400 = Cyclone, SGT-100 = Typhoon — вкладка «Машины».</div></div>
+  <div class="card"><b>2. Определи систему и PN</b><div class="mut" style="font-size:12.5px">К какой из ${PARTS.systems.length} систем относится деталь и какова её критичность — вкладка «Номенклатура». PN расшифруй по вкладке «Шифровки PN».</div></div>
+  <div class="card"><b>3. Выбери канал</b><div class="mut" style="font-size:12.5px">Горячий тракт → Китай/Италия; лопатки → реверс-заводы/восстановление; расходники/КИП → универсальные. Фильтры на вкладке «Поставщики».</div></div>
+  <div class="card"><b>4. RFQ по правилам</b><div class="mut" style="font-size:12.5px">PN + модель + серийник, кол-во, фото/чертёж или б/у образец на обмер. Проверяй, что поставщик знает нужную ЛИНИЮ (Линкольн ≠ Финспонг).</div></div>
+ </div>
+ <h2>Горячие задачи</h2>
+ <div class="box"><b>SGT-400 — первый залп RFQ:</b> ① Blaze Shenzhen — peter@turbineblade.net (камеры сгорания SGT-400 в каталоге) · ② O.B.T Qingdao — lisa@obtcasting.com (литьё камер Siemens) · ③ Leda Greenpower — WhatsApp +86 138 0121 8512 (прайс burner assembly / pilot burner SGT-400) · ④ Dongturbo — WhatsApp +86 139-0807-3010 (возил камеру сгорания SGT-600 в РФ). Позиции: камера сгорания <b>MW21215M</b> ×12 + горелка DUAL DLE <b>MW22316B/01</b> ×12.</div>
+ <div class="box"><b>Solar — с чего начать:</b> якорные независимые MRO — S&amp;S Turbine Services (Канада) и Alba Power/Sulzer (UK) — работают со всем модельным рядом Saturn…Mars; из Китая по Solar заявляется Bicosyn (клиенты CNOOC/Shell). Санкционные юрисдикции — заход через посредника. Контакты — с сайтов, верификация при первом RFQ.</div>
+ <div class="box warn"><b>Не работать напрямую:</b> Foshan Xinchuang и Homedia (Zhangzhou) — трейдеры-прокладки российского импортёра, не производители.</div>`;
+}
+
+/* ---------- Машины ---------- */
+function rMachines(){
+ let h = `<div class="mut">${esc(MODELS.note)}</div>`;
+ for(const f of MODELS.families){
+  h += `<h2>${esc(f.title)}</h2><div class="box info" style="font-size:12.5px">${esc(f.history)}</div><div class="grid">`;
+  for(const m of f.models){
+   h += `<div class="card"><b>${esc(m.name)}</b>${m.legacy?` <span class="tag">${esc(m.legacy)}</span>`:''}
+    <div style="margin:4px 0 2px"><b>${esc(m.power)}</b> · КПД ${esc(m.eff)}</div>
+    <div class="mut">${esc(m.shafts)} · ${esc(m.use)}</div>
+    ${m.zip_note?`<div style="font-size:12px;margin-top:5px;border-top:1px solid var(--grid);padding-top:5px">ЗИП: ${esc(m.zip_note)}</div>`:''}</div>`;
+  }
+  h += `</div>`;
+ }
+ return h;
+}
+
+/* ---------- Номенклатура ---------- */
+function rParts(){
+ let h = `<div class="mut">${esc(PARTS.note)}</div>`;
+ for(const s of PARTS.systems){
+  h += `<div class="card"><h3 style="margin:0">${esc(s.title)} <span class="${critCls(s.crit)}">крит. ${esc(s.crit)}</span></h3>
+   <div class="mut" style="margin:3px 0 7px">Aftermarket: ${esc(s.aftermarket)}</div>
+   <div class="tblwrap"><table><tr><th>Деталь</th><th>Термин для RFQ (EN)</th><th>Крит.</th><th>Примечание</th></tr>`;
+  for(const c of s.components){
+   h += `<tr><td><b>${esc(c.ru)}</b></td><td>${esc(c.en)}</td><td class="${critCls(c.crit)}">${esc(c.crit)}</td><td class="mut" style="font-size:12px">${esc(c.note)}</td></tr>`;
+  }
+  h += `</table></div></div>`;
+ }
+ return h;
+}
+
+/* ---------- Шифровки PN ---------- */
+function rPN(){
+ let h = `<div class="box info">${esc(PN.intro)}</div>`;
+ for(const s of PN.sections){
+  h += `<h2>${esc(s.title)}</h2><div class="tblwrap"><table><tr><th style="width:18%">Шифр / правило</th><th style="width:38%">Что означает</th><th style="width:28%">Примеры</th><th>Статус</th></tr>`;
+  for(const r of s.rules){
+   h += `<tr><td><b>${esc(r.pattern)}</b></td><td>${esc(r.meaning)}</td><td class="mut" style="font-size:12px">${esc(r.examples)}</td><td style="font-size:12px">${esc(r.status)}</td></tr>`;
+  }
+  h += `</table></div>`;
+ }
+ return h;
+}
+
+/* ---------- Поставщики ---------- */
+function supplierRow(s){
+ return `<tr>
+  <td><b>${esc(s.name)}</b><br>${s.families.map(famTag).join('')}</td>
+  <td>${esc(s.country)}<br><span class="mut">${esc(s.city)}</span></td>
+  <td>${esc(s.role)}<br>${(s.cats||[]).map(c=>`<span class="tag">${esc(c)}</span>`).join('')}</td>
+  <td style="min-width:220px">${esc(s.models)}${s.ru_buyers?`<div class="mut" style="font-size:11.5px">РФ-покупатели: ${esc(s.ru_buyers)} · отгрузок: ${esc(s.shipments)} (${esc(s.years)})</div>`:''}</td>
+  <td style="white-space:nowrap">${esc(s.site)}<br><span class="mut">${esc(s.email)}</span><br><span class="mut">${esc(s.phone)}</span></td>
+  <td>${esc(s.tier)}</td>
+  <td class="mut" style="font-size:11.5px;min-width:180px">${esc(s.note)}</td></tr>`;
+}
+function applyFilters(){
+ const q = document.getElementById('f-q').value.trim().toLowerCase();
+ const fam = document.getElementById('f-fam').value;
+ const ctr = document.getElementById('f-ctr').value;
+ const rows = SUPPLIERS.filter(s=>{
+  if(fam && !s.families.includes(fam)) return false;
+  if(ctr && s.country!==ctr) return false;
+  if(q){
+   const hay = [s.name,s.country,s.city,s.role,s.models,s.note,(s.cats||[]).join(' '),s.tier].join(' ').toLowerCase();
+   if(!hay.includes(q)) return false;
+  }
+  return true;
+ });
+ document.getElementById('sup-body').innerHTML = rows.map(supplierRow).join('') ||
+  `<tr><td colspan="7" class="mut">Ничего не найдено — ослабьте фильтры.</td></tr>`;
+ document.getElementById('sup-count').textContent = `${rows.length} из ${SUPPLIERS.length}`;
+}
+function exportCSV(){
+ const cols = ['name','country','city','role','families','cats','models','site','email','phone','tier','note'];
+ const lines = [cols.join(';')].concat(SUPPLIERS.map(s=>cols.map(c=>{
+  let v = s[c]; if(Array.isArray(v)) v = v.join(', ');
+  return '"'+String(v??'').replace(/"/g,'""')+'"';
+ }).join(';')));
+ const blob = new Blob(["﻿"+lines.join('\r\n')],{type:'text/csv;charset=utf-8'});
+ const a = document.createElement('a');
+ a.href = URL.createObjectURL(blob); a.download = 'gt_suppliers.csv'; a.click();
+}
+function rSuppliers(){
+ const countries = [...new Set(SUPPLIERS.map(s=>s.country))].sort((a,b)=>a.localeCompare(b,'ru'));
+ return `
+ <div class="filters">
+  <input id="f-q" placeholder="Поиск: компания, модель, деталь, роль…" oninput="applyFilters()">
+  <select id="f-fam" onchange="applyFilters()"><option value="">Семейство: все</option><option value="SGT">Siemens SGT</option><option value="Solar">Solar</option></select>
+  <select id="f-ctr" onchange="applyFilters()"><option value="">Страна: все</option>${countries.map(c=>`<option>${esc(c)}</option>`).join('')}</select>
+  <button class="btn" onclick="exportCSV()">⬇ CSV</button>
+  <span class="count" id="sup-count"></span>
+ </div>
+ <div class="tblwrap"><table>
+  <tr><th>Компания</th><th>Гео</th><th>Роль / категории</th><th>Что делает / возил · след в РФ</th><th>Контакты</th><th>Уровень</th><th>Примечание</th></tr>
+  <tbody id="sup-body"></tbody>
+ </table></div>
+ <div class="mut">Уровни: П1 — прямое попадание (Китай, реально для РФ) · П2 — профильные UK/EU (санкционный риск, через посредника) · П2-Иран — лицензиаты Siemens · П3 — прочие/трейдеры · S1–S3 — Solar-блок (S1 — якорные MRO). Контакты SGT-блока верифицированы 05.08.2026; Solar-блок — брать с сайта.</div>`;
+}
+
+/* ---------- Таможня ---------- */
+function barChart(data){
+ const W=640,H=230,P={t:14,r:14,b:30,l:44};
+ const iw=W-P.l-P.r, ih=H-P.t-P.b;
+ const max=Math.max(...data.map(d=>d.n))*1.15;
+ const bw=Math.min(64,iw/data.length-14);
+ const ticks=4;
+ let g='';
+ for(let i=1;i<=ticks;i++){
+  const y=P.t+ih-ih*i/ticks;
+  g+=`<line class="gridln" x1="${P.l}" y1="${y}" x2="${W-P.r}" y2="${y}"/><text class="axis-t" x="${P.l-6}" y="${y+4}" text-anchor="end">${Math.round(max*i/ticks)}</text>`;
+ }
+ let bars='';
+ data.forEach((d,i)=>{
+  const x=P.l+iw*(i+.5)/data.length-bw/2;
+  const h=ih*d.n/max, y=P.t+ih-h;
+  bars+=`<rect class="bar" x="${x}" y="${y}" width="${bw}" height="${h}" rx="4"><title>${d.year}: ${d.n} записей · ${d.kg.toLocaleString('ru')} кг</title></rect>
+   <text class="val-t" x="${x+bw/2}" y="${y-5}" text-anchor="middle">${d.n}</text>
+   <text class="axis-t" x="${x+bw/2}" y="${P.t+ih+18}" text-anchor="middle">${d.year}</text>`;
+ });
+ return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;max-width:680px" role="img" aria-label="Поставки по годам">${g}<line class="baseln" x1="${P.l}" y1="${P.t+ih}" x2="${W-P.r}" y2="${P.t+ih}"/>${bars}</svg>`;
+}
+function rCustoms(){
+ const c=CUSTOMS;
+ const t=(rows,cols)=>`<div class="tblwrap"><table><tr>${cols.map(x=>`<th>${x}</th>`).join('')}</tr>${rows}</table></div>`;
+ return `
+ <div class="mut">Источник: glbs.io (Глобус-ВЭД, официальные данные таможни РФ) · HS ${esc(c.hs)} · период ${esc(c.period)}. Режим search: имена импортёров и суммы частично маскированы; в выборку вкладки попали записи, отфильтрованные по профилю ЗИП (${c.visible_records} из ${c.total_records.toLocaleString('ru')}).</div>
+ <div class="k">
+  <div class="tile"><b>${c.total_records.toLocaleString('ru')}</b><span>деклараций всего в базе</span></div>
+  <div class="tile"><b>${c.visible_records}</b><span>записей в выборке ЗИП ГТУ</span></div>
+  <div class="tile"><b>${c.top_exporters.length}+</b><span>активных экспортёров</span></div>
+ </div>
+ <div class="viz-root"><h3>Записи выборки по годам</h3><div class="mut" style="margin-bottom:6px">штук деклараций (наведение — тоннаж)</div>${barChart(c.by_year)}</div>
+ <h2>Топ экспортёров (по выборке)</h2>
+ ${t(c.top_exporters.map(e=>`<tr><td><b>${esc(e.name)}</b></td><td>${e.n}</td></tr>`).join(''),['Экспортёр','Записей'])}
+ <h2>Топ импортёров РФ</h2>
+ ${t(c.top_importers.map(e=>`<tr><td><b>${esc(e.name)}</b></td><td>${e.n}</td></tr>`).join(''),['Импортёр (маскирован источником)','Записей'])}
+ <h2>Упоминания моделей в декларациях</h2>
+ ${t(c.models.map(m=>`<tr><td><b>${esc(m.model)}</b></td><td>${m.n}</td><td class="mut">${m.exporters.map(esc).join(' · ')}</td></tr>`).join(''),['Модель','Записей','Экспортёры'])}
+ <div class="box info">Solar в таможне РФ 2023–2026 почти не виден (2 записи — ЗИП Mars/Taurus от самого Solar Turbines до ухода): канал ЗИП Solar шёл напрямую от OEM и умер с санкциями. Это подтверждает ставку на независимые MRO и мировые базы (вкладка «Базы данных»).</div>`;
+}
+
+/* ---------- Базы данных ---------- */
+function rDB(){
+ return `
+ <div class="box info"><b>Задача:</b> видеть, кто кому в мире продаёт комплектующие Solar/Siemens (shipper → consignee), и выйти на этих производителей напрямую. Британия/ЕС/Япония пономерные декларации не публикуют — их ловим как <b>отправителей в импорте стран, которые публикуют</b> (Мексика, LATAM, Нигерия, Индия…). Полный разбор: «БАЗЫ-ДАННЫХ-ЗАКУПКА» (kvant-zip.pages.dev/orders/).</div>
+ <h2>План закупки (решение 08.2026)</h2>
+ <div class="tblwrap"><table>
+  <tr><th>Шаг</th><th>Что</th><th>Стоимость</th><th>Что даёт</th></tr>
+  <tr><td>0</td><td><b>Бесплатное:</b> TED API (тендеры ЕС), ImportYeti (морской импорт США), госзакупки Мексики/Перу/Казахстана/Индии</td><td><b>$0</b></td><td>операторы парка и сервисные подрядчики; TED по «SGT-400» уже дал GAZ-SYSTEM (Польша)</td></tr>
+  <tr><td>1 ⭐</td><td><b>BillOfLadingData</b>: Мексика + Колумбия + Перу + Нигерия + mirror-data (pay-per-report, пожизненно)</td><td><b>$775 разово</b></td><td>ключ — Мексика: TFS Веракрус, единственный независимый стенд SGT-400 в мире → виден весь поток горячей части</td></tr>
+  <tr><td>2</td><td>Расширение: Бразилия, Турция, Казахстан, Индия</td><td>+$1 272</td><td>Турция/Казахстан — каналы реэкспорта в РФ: видно, кто и через кого завозит</td></tr>
+  <tr><td>3</td><td><b>52wmb</b> Blue Diamond (Китай), 39 стран — постоянный мониторинг, оплата из РФ проходит</td><td>$540/год</td><td>регулярное слежение за потоками</td></tr>
+  <tr><td>4</td><td>McCoy Power Reports «Gas Turbines DB» — пономерной реестр владельцев машин (26 534 юнита)</td><td>по запросу</td><td>long-list покупателей ЗИП; дешёвая замена — GT World Handbook $245–345</td></tr>
+ </table></div>
+ <div class="box warn"><b>Не покупать:</b> Panjiva/S&amp;P (ушли из РФ), Descartes Datamyne / ImportGenius / Trademo (юрисдикция США, карты РФ не проходят), Volza SME $4,5k и TradeData.Pro (переплата за то же покрытие), GlobalTenders / Wood Mackenzie (не решают задачу).</div>
+ <div class="box"><b>Ограничение, которое принять:</b> парк SGT сидит на долгосрочных сервисных договорах Siemens (LTSA) — открытых тендеров «на партномер» нет. Тендерные порталы дают операторов и подрядчиков, а цены на детали — только shipment-базы и прямые КП заводов. Уже работает: glbs.io — таможня РФ/ЕАЭС, ${CUSTOMS.total_records.toLocaleString('ru')} деклараций HS 8411 в базе.</div>`;
+}
+
+/* ---------- Каркас ---------- */
+const R = {overview:rOverview, machines:rMachines, parts:rParts, pn:rPN, suppliers:rSuppliers, customs:rCustoms, db:rDB};
+const nav = document.getElementById('nav'), main = document.getElementById('main');
+nav.innerHTML = TABS.map(([id,t])=>`<button data-t="${id}">${t}</button>`).join('');
+main.innerHTML = TABS.map(([id])=>`<section id="s-${id}"></section>`).join('');
+const rendered = {};
+function show(id){
+ for(const [tid] of TABS){
+  document.querySelector(`[data-t="${tid}"]`).classList.toggle('on', tid===id);
+  document.getElementById(`s-${tid}`).classList.toggle('on', tid===id);
+ }
+ if(!rendered[id]){ document.getElementById(`s-${id}`).innerHTML = R[id](); rendered[id]=1; if(id==='suppliers') applyFilters(); }
+ location.hash = id;
+}
+nav.addEventListener('click', e=>{ const b=e.target.closest('button'); if(b) show(b.dataset.t); });
+show(TABS.some(([id])=>id===location.hash.slice(1)) ? location.hash.slice(1) : 'overview');
+</script>
+</body>
+</html>
