@@ -30,6 +30,10 @@ ECON_MARGIN = "UF_CRM_1704981084196"    # «Margin»
 ECON_PAID = "UF_CRM_1713874110281"      # «Оплачено»
 ECON_REST = "UF_CRM_1713874579940"      # «Остаток к оплате»
 ECON_LINK = "UF_CRM_1740133235324"      # ссылка (clck.ru) на файл «Экономика проекта» в Я.Диске
+BUDGET_LINK = "UF_CRM_1577100780"       # «Transaction budget + product conditions» — бюджет
+                                        # сделки в Google Sheets: единственное место, где
+                                        # может лежать ПОЛНАЯ себестоимость (логистика,
+                                        # таможня, НДС). Заполнен у ~90% открытых сделок.
 
 # плановые даты заказа СП-172 (см. зонд v9: поле дедлайна подтверждено на 72/72 строк
 # выгрузки «Контроль дедлайнов» — коллеги контролируют именно его)
@@ -158,7 +162,8 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
     # 3. вселенная: сделки ВОРОНКИ РЕАЛИЗАЦИИ (кат.0) + родители заказов вне её
     DSEL = ["ID", "TITLE", "OPPORTUNITY", "CURRENCY_ID", "COMPANY_ID", "STAGE_ID",
             "STAGE_SEMANTIC_ID", "CATEGORY_ID", "DATE_CREATE", "ASSIGNED_BY_ID", OSS_DEAL,
-            BUY_ECON_RUB, BUY_ECON_VAL, ECON_MARGIN, ECON_PAID, ECON_REST, ECON_LINK]
+            BUY_ECON_RUB, BUY_ECON_VAL, ECON_MARGIN, ECON_PAID, ECON_REST, ECON_LINK,
+            BUDGET_LINK]
     cat0 = client.list_deals_fast(filter={"CATEGORY_ID": 0}, select=DSEL)
     deals: dict[str, dict] = {str(d["ID"]): d for d in cat0}
     extra_ids = [d for d in by_deal if d and d not in deals]
@@ -358,6 +363,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
             "buyEur": round(buy), "buyLbl": _money(buy) if buy_src != "none" else "—",
             "buySrc": buy_src, "buyOrdersEur": round(buy_orders), "buyEconEur": round(buy_econ),
             "discrep": discrep, "econLink": bool(econ_link), "noEcon": no_econ,
+            "hasBudget": str(d.get(BUDGET_LINK) or "").startswith("http"),
             "marginEur": round(margin) if margin is not None else None,
             "marginLbl": _money(margin) if margin is not None else "—",
             "marginPct": round(margin / sale * 100) if (margin is not None and sale) else None,
@@ -478,6 +484,8 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
     n_nobuy = sum(1 for r in rows if r["buySrc"] == "none")
     orphan_buy = sum(eur(o.get("opportunity"), o.get("currencyId")) for o in orphan)
     n_contracts = sum(1 for r in rows if r["norders"] > 0)
+    n_budget = sum(1 for r in rows if r["hasBudget"])
+    n_budget_live = sum(1 for r in live_rows if r["hasBudget"])
 
     # --- дедлайны клиенту: сводка по живым заказам (то же поле, что в «Контроле дедлайнов») ---
     late_rows = [r for r in live_rows if r["late"]]
@@ -575,7 +583,8 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
         ("Σ продажи", _money(sale_sum), "сумма сделок (выручка), €", "ok"),
         ("Σ закупки", _money(buy_sum),
          f"заказы {len(rows)-n_econ-n_nobuy} · из экономики {n_econ} · нет данных {n_nobuy}", "amber"),
-        ("Σ маржа", _money(margin_sum), "продажа − закупка (где есть данные), €", "ok" if margin_sum >= 0 else "warn"),
+        ("Σ валовая маржа", _money(margin_sum),
+         "продажа − закупка · БЕЗ логистики, таможни и НДС", "ok" if margin_sum >= 0 else "warn"),
         ("Ср. маржа", f"{round(margin_sum/sale_m*100) if sale_m else 0}%", "по сумме, валовая", ""),
         ("В работе", f"{len(live_rows)}", "открытых сделок в воронке", ""),
         ("⚠ Замедлено", str(len(slow_rows)),
@@ -642,6 +651,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
             "medCycle": round(med_cycle) if med_cycle else None,
             "medLag": round(med_lag, 1) if med_lag is not None else None,
             "loss": _money(loss_total), "burnDay": _money(burn_day),
+            "budget": n_budget, "budgetLive": n_budget_live,
             "slow": len(slow_rows), "lateDeals": len(late_rows),
         },
         "kpis": [{"lbl": l, "val": v, "meta": m, "clz": c} for l, v, m, c in kpis],
