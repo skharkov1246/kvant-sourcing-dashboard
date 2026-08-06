@@ -1045,6 +1045,73 @@ async function clawback(sid) {
     return HTMLResponse(page)
 
 
+@app.get("/review/parts", include_in_schema=False, response_class=HTMLResponse)
+def review_parts(q: str = "",
+                 principal: Principal = Depends(current_principal)) -> HTMLResponse:
+    """Реестр деталей: исторический архив компании, загруженный в платформу.
+
+    Источник — data/knowledge/registry_seed.json (переваренный «Реестр
+    деталей и замеров» из Битрикса). Страница показывает позиции с
+    цепочками производителей и артикулами и даёт по ним поиск; живые
+    бренд-цепочки лежат в базе (см. /v1/search/by-article).
+    """
+    import html as _html
+    import json as _json
+    from pathlib import Path as _Path
+
+    _require_reviewer(principal)
+    seed_path = _Path(__file__).resolve().parent.parent / "data" / "knowledge" / "registry_seed.json"
+    rows: list[dict[str, Any]] = []
+    if seed_path.exists():
+        rows = _json.loads(seed_path.read_text(encoding="utf-8"))
+    needle = q.strip().lower()
+    if needle:
+        rows = [r for r in rows if needle in _json.dumps(r, ensure_ascii=False).lower()]
+
+    def esc(v: Any) -> str:
+        return _html.escape(str(v)) if v else ""
+
+    body = []
+    for r in rows:
+        link = r.get("ССЫЛКА НА ДИСК") or ""
+        link_html = (f'<a href="{esc(link)}" target="_blank">диск</a>'
+                     if str(link).startswith("http") else "")
+        body.append(
+            "<tr>"
+            f"<td>{esc(r.get('№ п/п'))}</td>"
+            f"<td>{esc(r.get('Номер сделки'))}</td>"
+            f"<td>{esc(r.get('Заказчик'))}</td>"
+            f"<td>{esc(r.get('Название детали'))}</td>"
+            f"<td>{esc(r.get('Производитель'))}</td>"
+            f"<td>{esc(r.get('Артикул производителя'))}</td>"
+            f"<td>{esc(r.get('Модель'))}</td>"
+            f"<td>{link_html}</td>"
+            "</tr>"
+        )
+    page = f"""<!doctype html><html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Реестр деталей — КВАНТ Скан</title>
+<style>
+ body{{font:14px/1.5 system-ui,sans-serif;margin:24px;background:#f5f6f8;color:#1c2126}}
+ h1{{font-size:20px;margin:0 0 4px}} .sub{{color:#5b6570;margin:0 0 16px}}
+ form{{margin:0 0 14px}} input{{padding:7px 10px;border:1px solid #cdd5dd;border-radius:8px;width:280px}}
+ table{{border-collapse:collapse;width:100%;background:#fff;border-radius:10px;overflow:hidden}}
+ th,td{{text-align:left;padding:7px 10px;border-bottom:1px solid #e7ebef;vertical-align:top;font-size:13px}}
+ th{{background:#eef1f4;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:#5b6570}}
+ a{{color:#a75110}}
+</style></head><body>
+<h1>Реестр деталей</h1>
+<p class="sub">Исторический архив «Реестр деталей и замеров», загруженный в платформу: {len(rows)} позиций.
+ <a href="/review/dashboard">← к очереди ревью</a></p>
+<form method="get"><input name="q" value="{esc(q)}" placeholder="Поиск: бренд, артикул, заказчик…">
+</form>
+<table><tr><th>№</th><th>Сделка</th><th>Заказчик</th><th>Деталь</th><th>Производитель</th>
+<th>Артикул</th><th>Модель</th><th>Файлы</th></tr>
+{''.join(body)}
+</table></body></html>"""
+    return HTMLResponse(page)
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # Экспорт реестра (Р-13)
 # ─────────────────────────────────────────────────────────────────────────────
