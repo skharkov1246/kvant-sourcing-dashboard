@@ -140,6 +140,7 @@ const PN = __PN_JSON__;
 const CUSTOMS = __CUSTOMS_JSON__;
 const BITRIX = __BITRIX_JSON__;
 const CHECKLIST = __CHECKLIST_JSON__;
+const HEAVY_SUPS = __HEAVY_JSON__;
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const FAM_NAME = {SGT:'Siemens SGT', Solar:'Solar', Heavy:'Тяжёлые ГТУ'};
@@ -275,6 +276,20 @@ function buildUnified(){
   segsOf(t).forEach(x=>r.segs.add(x));
   const mm = pickModels(t);
   if(mm.size) mm.forEach(x=>r.models.add(x)); else r.models.add('SGT-400');
+ }
+ for(const c of HEAVY_SUPS.rows){
+  const t = [c.name,c.role,c.what].join(' · ');
+  const r = get(c.name, c.country);
+  if(!r.role) r.role = c.role;
+  if(!r.site) r.site = c.site;
+  if(!r.email) r.email = c.email;
+  if(!r.phone) r.phone = c.phone;
+  if(!r.what) r.what = c.what;
+  r.conf = r.conf || c.conf; r.src.add('тяжёлые-база');
+  segsOf(t).forEach(x=>r.segs.add(x));
+  const mm = pickModels(t);
+  if(mm.size) mm.forEach(x=>r.models.add(x));
+  r.heavyAll = true;
  }
  for(const o of (BITRIX.offers||[])){
   for(const s of o.suppliers){
