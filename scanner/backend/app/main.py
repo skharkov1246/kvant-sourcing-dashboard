@@ -1045,71 +1045,273 @@ async function clawback(sid) {
     return HTMLResponse(page)
 
 
-@app.get("/review/parts", include_in_schema=False, response_class=HTMLResponse)
-def review_parts(q: str = "",
-                 principal: Principal = Depends(current_principal)) -> HTMLResponse:
-    """Реестр деталей: исторический архив компании, загруженный в платформу.
+def _registry_rows() -> list[dict[str, Any]]:
+    import json as _json
+    from pathlib import Path as _Path
+    p = _Path(__file__).resolve().parent.parent / "data" / "knowledge" / "registry_seed.json"
+    return _json.loads(p.read_text(encoding="utf-8")) if p.exists() else []
 
-    Источник — data/knowledge/registry_seed.json (переваренный «Реестр
-    деталей и замеров» из Битрикса). Страница показывает позиции с
-    цепочками производителей и артикулами и даёт по ним поиск; живые
-    бренд-цепочки лежат в базе (см. /v1/search/by-article).
+
+def _photo_index() -> dict[str, list[str]]:
+    import json as _json
+    from pathlib import Path as _Path
+    p = _Path(__file__).resolve().parent.parent / "data" / "knowledge" / "photo_index.json"
+    return _json.loads(p.read_text(encoding="utf-8")) if p.exists() else {}
+
+
+def _row_completeness(r: dict[str, Any], photo_idx: dict[str, list[str]]) -> dict[str, bool]:
+    """Карта комплектности позиции: что у неё уже есть, а чего не хватает.
+
+    Это и есть смысл базы (в отличие от плоской таблицы): дыры видны сразу
+    и по ним можно родить задание на досъёмку.
     """
+    deal = str(r.get("Номер сделки") or "").replace("/", "_")
+    return {
+        "фото": bool(photo_idx.get(deal)) or bool(r.get("Фото")),
+        "замеры": bool(r.get("Первичные замеры")),
+        "чертёж": bool(r.get("Чертежи")),
+        "3D": bool(r.get("3D-модель")),
+        "ревизия": bool(r.get("Ревизия финального документа")),
+    }
+
+
+@app.get("/review/parts", include_in_schema=False, response_class=HTMLResponse)
+def review_parts(q: str = "", gap: str = "",
+                 principal: Principal = Depends(current_principal)) -> HTMLResponse:
+    """База деталей: не зеркало старой таблицы, а карта работы.
+
+    Каждая позиция несёт комплектность (фото/замеры/чертёж/3D/ревизия);
+    фильтры показывают дыры, карточка позиции умеет родить задание на
+    досъёмку прямо на телефон кладовщика.
+    """
+    import html as _html
+    import json as _json
+
+    _require_reviewer(principal)
+    rows = _registry_rows()
+    photo_idx = _photo_index()
+
+    total = len(rows)
+    for r in rows:
+        r["_done"] = _row_completeness(r, photo_idx)
+    stats = {k: sum(1 for r in rows if not r["_done"][k]) for k in
+             ("фото", "замеры", "чертёж", "3D")}
+
+    needle = q.strip().lower()
+    if needle:
+        rows = [r for r in rows if needle in _json.dumps(
+            {k: v for k, v in r.items() if k != "_done"}, ensure_ascii=False).lower()]
+    if gap in ("фото", "замеры", "чертёж", "3D"):
+        rows = [r for r in rows if not r["_done"][gap]]
+
+    def esc(v: Any) -> str:
+        return _html.escape(str(v)) if v else ""
+
+    def chip(g: str, label: str) -> str:
+        act = ' class="on"' if gap == g else ""
+        return f'<a{act} href="/review/parts?gap={g}&q={esc(q)}">{label}</a>'
+
+    body = []
+    for r in rows:
+        d = r["_done"]
+        marks = " ".join(
+            f'<span class="{ "ok" if v else "no" }">{k}</span>' for k, v in d.items())
+        deal = str(r.get("Номер сделки") or "").replace("/", "_")
+        n_ph = len(photo_idx.get(deal, []))
+        photos = (f'<a href="/review/parts/photos?deal={esc(deal)}">{n_ph} фото</a>'
+                  if n_ph else "—")
+        num = r.get("№ п/п")
+        body.append(
+            "<tr>"
+            f'<td><a href="/review/parts/item?n={esc(num)}">{esc(r.get("Название детали"))}</a><br>'
+            f'<span class="dim">{esc(r.get("Производитель"))}'
+            f'{" · арт. " + esc(r.get("Артикул производителя")) if r.get("Артикул производителя") else ""}</span></td>'
+            f'<td>{esc(r.get("Заказчик"))}<br><span class="dim">сделка {esc(r.get("Номер сделки"))}</span></td>'
+            f"<td>{marks}</td>"
+            f"<td>{photos}</td>"
+            "</tr>"
+        )
+    page = f"""<!doctype html><html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>База деталей — КВАНТ Скан</title>
+<style>
+ body{{font:14px/1.5 system-ui,sans-serif;margin:24px;background:#f5f6f8;color:#1c2126}}
+ h1{{font-size:20px;margin:0 0 4px}} .sub{{color:#5b6570;margin:0 0 14px}}
+ .chips{{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}}
+ .chips a{{border:1px solid #cdd5dd;border-radius:16px;padding:4px 12px;text-decoration:none;color:#1c2126;background:#fff}}
+ .chips a.on{{background:#fcefe4;border-color:#c95f14;color:#a75110;font-weight:600}}
+ form{{margin:0 0 12px}} input{{padding:7px 10px;border:1px solid #cdd5dd;border-radius:8px;width:280px}}
+ table{{border-collapse:collapse;width:100%;background:#fff;border-radius:10px;overflow:hidden}}
+ th,td{{text-align:left;padding:8px 10px;border-bottom:1px solid #e7ebef;vertical-align:top;font-size:13px}}
+ th{{background:#eef1f4;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:#5b6570}}
+ a{{color:#a75110}} .dim{{color:#5b6570;font-size:12px}}
+ .ok,.no{{display:inline-block;border-radius:9px;padding:1px 8px;font-size:11px;margin:1px}}
+ .ok{{background:#e6f4ea;color:#1d5c34}} .no{{background:#fdecea;color:#8c1d18}}
+</style></head><body>
+<h1>База деталей</h1>
+<p class="sub">{total} позиций из архива. Дыры, которые надо закрывать съёмкой:
+ без замеров — {stats["замеры"]}, без чертежей — {stats["чертёж"]}, без 3D — {stats["3D"]}, без фото — {stats["фото"]}.
+ <a href="/review/dashboard">Очередь ревью →</a></p>
+<div class="chips">{chip("", "Все")}{chip("замеры", f"Без замеров ({stats['замеры']})")}
+{chip("фото", f"Без фото ({stats['фото']})")}{chip("чертёж", f"Без чертежей ({stats['чертёж']})")}
+{chip("3D", f"Без 3D ({stats['3D']})")}</div>
+<form method="get"><input name="q" value="{esc(q)}" placeholder="Поиск: бренд, артикул, заказчик…">
+<input type="hidden" name="gap" value="{esc(gap)}"></form>
+<table><tr><th>Деталь</th><th>Заказчик</th><th>Комплектность</th><th>Фото</th></tr>
+{"".join(body)}
+</table></body></html>"""
+    return HTMLResponse(page)
+
+
+@app.get("/review/parts/item", include_in_schema=False, response_class=HTMLResponse)
+def review_parts_item(n: str,
+                      principal: Principal = Depends(current_principal)) -> HTMLResponse:
+    """Карточка позиции базы: всё о детали + кнопка «задание на досъёмку»."""
+    import html as _html
+
+    _require_reviewer(principal)
+    row = next((r for r in _registry_rows() if str(r.get("№ п/п")) == str(n)), None)
+    if row is None:
+        raise HTTPException(status_code=404, detail={"code": "not_found", "message": "Нет такой позиции"})
+    photo_idx = _photo_index()
+    done = _row_completeness(row, photo_idx)
+    deal = str(row.get("Номер сделки") or "").replace("/", "_")
+    photos = photo_idx.get(deal, [])
+
+    def esc(v: Any) -> str:
+        return _html.escape(str(v)) if v else "—"
+
+    refs = STORE.brand_refs_of(f"itm-reg-{n}")
+    chain = " → ".join(r_["brand"] for r_ in refs) if refs else esc(row.get("Производитель"))
+    existing = STORE.find_task_by_external("t-internal", "registry", f"reg-{n}")
+    task_html = (
+        f'<p class="okmsg">Задание на досъёмку уже создано (статус: {existing["state"]}) — оно в списке на телефоне.</p>'
+        if existing else
+        f'<form method="post" action="/review/parts/item/task?n={esc(n)}">'
+        f'<button>Создать задание на досъёмку</button>'
+        f'<span class="dim"> — появится в приложении кладовщика</span></form>'
+    )
+    marks = " ".join(f'<span class="{ "ok" if v else "no" }">{k}</span>' for k, v in done.items())
+    gallery = "".join(
+        f'<a href="/review/parts/photo?key={_html.escape(k)}">'
+        f'<img src="/review/parts/photo?key={_html.escape(k)}" loading="lazy"></a>'
+        for k in photos)
+    kv = "".join(
+        f"<tr><th>{label}</th><td>{esc(row.get(col))}</td></tr>"
+        for label, col in [
+            ("Заказчик", "Заказчик"), ("Сделка", "Номер сделки"),
+            ("Оборудование", "Вид оборудования"), ("Модель", "Модель"),
+            ("Артикул", "Артикул производителя"), ("Производство", "Производство"),
+            ("Контакты", "Контакты"),
+        ])
+    page = f"""<!doctype html><html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{esc(row.get("Название детали"))}</title>
+<style>
+ body{{font:14px/1.5 system-ui,sans-serif;margin:24px;background:#f5f6f8;color:#1c2126;max-width:900px}}
+ h1{{font-size:19px;margin:0 0 2px}} a{{color:#a75110}} .dim{{color:#5b6570;font-size:12px}}
+ table{{border-collapse:collapse;background:#fff;border-radius:10px;overflow:hidden;margin:12px 0}}
+ th,td{{text-align:left;padding:7px 12px;border-bottom:1px solid #e7ebef;font-size:13px}}
+ th{{color:#5b6570;font-weight:600;width:130px}}
+ .ok,.no{{display:inline-block;border-radius:9px;padding:1px 8px;font-size:11px;margin:1px}}
+ .ok{{background:#e6f4ea;color:#1d5c34}} .no{{background:#fdecea;color:#8c1d18}}
+ .grid{{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin-top:10px}}
+ .grid img{{width:100%;border-radius:10px;display:block}}
+ button{{background:#c95f14;color:#fff;border:0;border-radius:8px;padding:8px 16px;font-size:14px;cursor:pointer}}
+ .okmsg{{color:#1d5c34}}
+</style></head><body>
+<p><a href="/review/parts">← к базе деталей</a></p>
+<h1>{esc(row.get("Название детали"))}</h1>
+<p class="dim">Цепочка производителей: {chain}</p>
+<p>{marks}</p>
+{task_html}
+<table>{kv}</table>
+<h3>Фото ({len(photos)})</h3>
+<div class="grid">{gallery}</div>
+</body></html>"""
+    return HTMLResponse(page)
+
+
+@app.post("/review/parts/item/task", include_in_schema=False)
+def review_parts_item_task(n: str,
+                           principal: Principal = Depends(current_principal)) -> Response:
+    """Дыра в комплектности → задание на телефон. Идемпотентно по позиции."""
+    _require_reviewer(principal)
+    row = next((r for r in _registry_rows() if str(r.get("№ п/п")) == str(n)), None)
+    if row is None:
+        raise HTTPException(status_code=404, detail={"code": "not_found", "message": "Нет такой позиции"})
+    if not STORE.find_task_by_external("t-internal", "registry", f"reg-{n}"):
+        STORE.upsert_task({
+            "id": str(uuid.uuid4()),
+            "tenant_id": "t-internal",
+            "site_id": None,
+            "external_system": "registry",
+            "external_ref": f"reg-{n}",
+            "protocol_code": "kv_router",
+            "protocol_version": None,
+            "subject": {
+                "title": f"{row.get('Название детали')} — доснять и домерить",
+                "Заказчик": row.get("Заказчик"),
+                "Сделка": row.get("Номер сделки"),
+                "Артикул": row.get("Артикул производителя"),
+            },
+            "priority": 50,
+            "due_at": None,
+            "assignee_pool": None,
+            "state": "NEW",
+            "created_at": utcnow(),
+        })
+        STORE.audit("t-internal", principal.user_id, "registry.task_created",
+                    f"reg-{n}", {"part": row.get("Название детали")})
+    return Response(status_code=303, headers={"Location": f"/review/parts/item?n={n}"})
+
+
+@app.get("/review/parts/photos", include_in_schema=False, response_class=HTMLResponse)
+def review_parts_photos(deal: str,
+                        principal: Principal = Depends(current_principal)) -> HTMLResponse:
+    """Галерея фотографий одной сделки из архива — из хранилища платформы."""
     import html as _html
     import json as _json
     from pathlib import Path as _Path
 
     _require_reviewer(principal)
-    seed_path = _Path(__file__).resolve().parent.parent / "data" / "knowledge" / "registry_seed.json"
-    rows: list[dict[str, Any]] = []
-    if seed_path.exists():
-        rows = _json.loads(seed_path.read_text(encoding="utf-8"))
-    needle = q.strip().lower()
-    if needle:
-        rows = [r for r in rows if needle in _json.dumps(r, ensure_ascii=False).lower()]
-
-    def esc(v: Any) -> str:
-        return _html.escape(str(v)) if v else ""
-
-    body = []
-    for r in rows:
-        link = r.get("ССЫЛКА НА ДИСК") or ""
-        link_html = (f'<a href="{esc(link)}" target="_blank">диск</a>'
-                     if str(link).startswith("http") else "")
-        body.append(
-            "<tr>"
-            f"<td>{esc(r.get('№ п/п'))}</td>"
-            f"<td>{esc(r.get('Номер сделки'))}</td>"
-            f"<td>{esc(r.get('Заказчик'))}</td>"
-            f"<td>{esc(r.get('Название детали'))}</td>"
-            f"<td>{esc(r.get('Производитель'))}</td>"
-            f"<td>{esc(r.get('Артикул производителя'))}</td>"
-            f"<td>{esc(r.get('Модель'))}</td>"
-            f"<td>{link_html}</td>"
-            "</tr>"
-        )
+    idx_path = _Path(__file__).resolve().parent.parent / "data" / "knowledge" / "photo_index.json"
+    idx = _json.loads(idx_path.read_text(encoding="utf-8")) if idx_path.exists() else {}
+    keys = idx.get(deal, [])
+    imgs = "".join(
+        f'<a href="/review/parts/photo?key={_html.escape(k)}">'
+        f'<img src="/review/parts/photo?key={_html.escape(k)}" loading="lazy"></a>'
+        for k in keys
+    )
     page = f"""<!doctype html><html lang="ru"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Реестр деталей — КВАНТ Скан</title>
-<style>
- body{{font:14px/1.5 system-ui,sans-serif;margin:24px;background:#f5f6f8;color:#1c2126}}
- h1{{font-size:20px;margin:0 0 4px}} .sub{{color:#5b6570;margin:0 0 16px}}
- form{{margin:0 0 14px}} input{{padding:7px 10px;border:1px solid #cdd5dd;border-radius:8px;width:280px}}
- table{{border-collapse:collapse;width:100%;background:#fff;border-radius:10px;overflow:hidden}}
- th,td{{text-align:left;padding:7px 10px;border-bottom:1px solid #e7ebef;vertical-align:top;font-size:13px}}
- th{{background:#eef1f4;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:#5b6570}}
- a{{color:#a75110}}
-</style></head><body>
-<h1>Реестр деталей</h1>
-<p class="sub">Исторический архив «Реестр деталей и замеров», загруженный в платформу: {len(rows)} позиций.
- <a href="/review/dashboard">← к очереди ревью</a></p>
-<form method="get"><input name="q" value="{esc(q)}" placeholder="Поиск: бренд, артикул, заказчик…">
-</form>
-<table><tr><th>№</th><th>Сделка</th><th>Заказчик</th><th>Деталь</th><th>Производитель</th>
-<th>Артикул</th><th>Модель</th><th>Файлы</th></tr>
-{''.join(body)}
-</table></body></html>"""
+<title>Фото сделки {_html.escape(deal)}</title>
+<style>body{{font:14px system-ui;margin:24px;background:#f5f6f8}}
+.grid{{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}}
+img{{width:100%;border-radius:10px;display:block}}
+a.back{{color:#a75110}}</style></head><body>
+<p><a class="back" href="/review/parts">← к реестру</a></p>
+<h2>Сделка {_html.escape(deal)} — {len(keys)} фото</h2>
+<div class="grid">{imgs}</div></body></html>"""
     return HTMLResponse(page)
+
+
+@app.get("/review/parts/photo", include_in_schema=False)
+def review_parts_photo(key: str,
+                       principal: Principal = Depends(current_principal)) -> Response:
+    """Отдача фото из хранилища платформы. Только каталог знаний и только
+    контролёру: произвольные ключи бакета отсюда не читаются."""
+    _require_reviewer(principal)
+    if not key.startswith("knowledge/photos/") or ".." in key:
+        raise HTTPException(status_code=404, detail={"code": "not_found", "message": "Нет такого фото"})
+    if OBJECT_STORAGE is None:
+        raise HTTPException(status_code=503, detail={
+            "code": "storage_unavailable", "message": "Хранилище не настроено"})
+    data = OBJECT_STORAGE.get(key)
+    if data is None:
+        raise HTTPException(status_code=404, detail={"code": "not_found", "message": "Фото не найдено"})
+    return Response(content=data, media_type="image/jpeg",
+                    headers={"Cache-Control": "private, max-age=86400"})
 
 
 # ─────────────────────────────────────────────────────────────────────────────
