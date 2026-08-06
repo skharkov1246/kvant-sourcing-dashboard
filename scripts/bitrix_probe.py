@@ -1,36 +1,29 @@
-"""CI-зонд v16: найти «Бюджет сделки» — с показом ошибок API, а не молчком.
+"""CI-зонд v17: бюджеты сделок — сами ссылки и их доступность.
 
-1. crm.type.list с выводом сырого ответа (вдруг отказ в доступе).
-2. Все PARENT_ID_* на сделке — это связи с другими смарт-процессами.
-3. Поля со словом «бюджет/budget» в сделках и заказах + их заполняемость.
+UF_CRM_1577100780 «Transaction budget + product conditions» заполнен у 833 сделок кат.0
+и ведёт на Google Sheets. Достаём образцы ссылок и проверяем, открываются ли они
+без авторизации (export?format=csv). Заодно — покрытие по стадиям.
 """
 from __future__ import annotations
 
 import os
 import re
+from collections import Counter
 
 import requests
 
-BKEYS = ("бюджет", "budget")
+BUD = "UF_CRM_1577100780"
 
 
-def bx(method: str, params: dict | None = None, *, loud: bool = False) -> dict:
+def bx(method: str, params: dict | None = None) -> dict:
     base = os.environ["BITRIX_WEBHOOK_URL"].rstrip("/")
-    last = None
     for _ in range(3):
         try:
             r = requests.post(f"{base}/{method}.json", json=params or {}, timeout=60)
-            j = r.json() if r.content else {}
-            if r.status_code >= 400 or (isinstance(j, dict) and j.get("error")):
-                last = f"HTTP {r.status_code} · {str(j)[:200]}"
-                if loud:
-                    print(f"    ! {method}: {last}")
-                return j if isinstance(j, dict) else {}
-            return j
-        except Exception as e:
-            last = f"{type(e).__name__}: {e}"
-    if loud and last:
-        print(f"    ! {method}: {last}")
+            r.raise_for_status()
+            return r.json()
+        except Exception:
+            continue
     return {}
 
 
@@ -46,76 +39,51 @@ def bx_all(method: str, params: dict) -> list:
         start = j["next"]
 
 
+def regno(t) -> int:
+    m = re.match(r"\s*(\d{1,4})(?:/\d+)?\.", str(t or ""))
+    return int(m.group(1)) if m else 0
+
+
 def main() -> int:
-    print("=== 1. crm.type.list — сырой ответ ===")
-    j = bx("crm.type.list", {}, loud=True)
-    res = j.get("result")
-    print(f"  ключи ответа: {list(j.keys())}")
-    types = (res or {}).get("types") if isinstance(res, dict) else None
-    if types:
-        for t in types:
-            print(f"  entityTypeId={t.get('entityTypeId')} · «{t.get('title')}»")
-    else:
-        print(f"  result: {str(res)[:300]}")
+    deals = bx_all("crm.deal.list", {"filter": {"CATEGORY_ID": 0},
+                                     "select": ["ID", "TITLE", "STAGE_ID", "STAGE_SEMANTIC_ID",
+                                                "OPPORTUNITY", "CURRENCY_ID", BUD]})
+    have = [d for d in deals if str(d.get(BUD) or "").startswith("http")]
+    print(f"=== 1. Покрытие: {len(have)} из {len(deals)} сделок кат.0 имеют ссылку на бюджет ===")
+    live = [d for d in deals if (d.get("STAGE_SEMANTIC_ID") or "") not in ("S", "F")]
+    live_have = [d for d in live if str(d.get(BUD) or "").startswith("http")]
+    print(f"  среди открытых: {len(live_have)} из {len(live)}")
 
-    print("\n=== 2. Связи сделки с другими смарт-процессами (PARENT_ID_*) ===")
-    fd = bx("crm.deal.fields", {}).get("result", {}) or {}
-    parents = {k: (fd[k].get("formLabel") or fd[k].get("title") or k)
-               for k in fd if k.startswith("PARENT_ID_")}
-    for k, t in parents.items():
-        tid = k.replace("PARENT_ID_", "")
-        print(f"  {k} → entityTypeId {tid}: «{t}»")
-        info = bx("crm.type.get", {"id": tid})
-        ti = (info.get("result") or {}).get("type") or {}
-        if ti:
-            print(f"      подтверждение: «{ti.get('title')}» (код {ti.get('name')})")
+    print("\n=== 2. Куда ведут ссылки (домены) ===")
+    dom = Counter(re.sub(r"^https?://([^/]+)/.*$", r"\1", str(d.get(BUD))) for d in have)
+    for k, v in dom.most_common():
+        print(f"  {v:>4} — {k}")
 
-    print("\n=== 3. Поля со словом «бюджет/budget» в СДЕЛКАХ ===")
-    dbud = {k: str(fd[k].get("formLabel") or fd[k].get("title") or k) for k in fd
-            if any(w in str(fd[k].get("formLabel") or fd[k].get("title") or "").lower() for w in BKEYS)}
-    for k, t in dbud.items():
-        print(f"  {k} [{fd[k].get('type')}]: «{t[:70]}»")
-    if not dbud:
-        print("  нет")
+    print("\n=== 3. Образцы: свежие сделки с бюджетом ===")
+    have.sort(key=lambda d: -regno(d.get("TITLE")))
+    samples = have[:12]
+    for d in samples:
+        print(f"  №{regno(d.get('TITLE')):>3} · сделка #{d['ID']} · {str(d.get('TITLE'))[:40]}")
+        print(f"      {str(d.get(BUD))[:150]}")
 
-    print("\n=== 4. Поля со словом «бюджет/budget» в ЗАКАЗАХ СП-172 ===")
-    f172 = bx("crm.item.fields", {"entityTypeId": 172}).get("result", {}).get("fields", {})
-    obud = {k: str(v.get("title") or k) for k, v in f172.items()
-            if any(w in str(v.get("title") or "").lower() for w in BKEYS)}
-    for k, t in obud.items():
-        print(f"  {k} [{f172[k].get('type')}]: «{t[:70]}»")
-    if not obud:
-        print("  нет")
+    print("\n=== 4. Открываются ли без авторизации? ===")
+    for d in samples[:6]:
+        url = str(d.get(BUD))
+        m = re.search(r"/spreadsheets/d/([a-zA-Z0-9-_]+)", url)
+        if not m:
+            print(f"  #{d['ID']}: не Google Sheets → {url[:70]}")
+            continue
+        sid = m.group(1)
+        exp = f"https://docs.google.com/spreadsheets/d/{sid}/export?format=csv"
+        try:
+            r = requests.get(exp, timeout=30, allow_redirects=True)
+            ct = r.headers.get("content-type", "")[:40]
+            body = r.text[:120].replace("\n", " ") if "text" in ct or "csv" in ct else ""
+            print(f"  #{d['ID']}: {r.status_code} · {ct} · {len(r.content)}Б · {body}")
+        except Exception as e:
+            print(f"  #{d['ID']}: EXC {type(e).__name__}")
 
-    print("\n=== 5. Заполняемость бюджетных полей ===")
-    if dbud:
-        deals = bx_all("crm.deal.list", {"filter": {"CATEGORY_ID": 0},
-                                         "select": ["ID", "TITLE", "STAGE_ID"] + list(dbud)})
-        print(f"  сделок кат.0: {len(deals)}")
-        for k, t in dbud.items():
-            vals = [d.get(k) for d in deals if d.get(k) not in (None, "", 0, "0", "[]")]
-            if vals:
-                print(f"    {k} «{t[:44]}»: заполнено {len(vals)} · примеры: {[str(v)[:26] for v in vals[:3]]}")
-    if obud:
-        orders = bx_all("crm.item.list", {"entityTypeId": 172,
-                                          "select": ["id", "stageId"] + list(obud)})
-        live = [o for o in orders if not str(o.get("stageId", "")).endswith((":SUCCESS", ":FAIL"))]
-        print(f"  заказов: {len(orders)}, живых: {len(live)}")
-        for k, t in obud.items():
-            n = sum(1 for o in orders if o.get(k) not in (None, "", 0, "0", "[]"))
-            nl = sum(1 for o in live if o.get(k) not in (None, "", 0, "0", "[]"))
-            if n:
-                ex = [str(o.get(k))[:26] for o in orders if o.get(k) not in (None, "", 0, "0", "[]")][:3]
-                print(f"    {k} «{t[:40]}»: всего {n}, живых {nl} · {ex}")
-
-    print("\n=== 6. Все смарт-процессы перебором entityTypeId (128…200) ===")
-    for tid in range(128, 201):
-        info = bx("crm.type.get", {"id": tid})
-        ti = (info.get("result") or {}).get("type") or {}
-        if ti and ti.get("title"):
-            print(f"  {tid}: «{ti.get('title')}»")
-
-    print("\n✓ зонд v16 завершён")
+    print("\n✓ зонд v17 завершён")
     return 0
 
 
