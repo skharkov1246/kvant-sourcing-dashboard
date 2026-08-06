@@ -5,6 +5,16 @@
 {$KVANT_DOMAIN} {
 	encode gzip
 
+	# Защитные заголовки: браузерная поверхность (/review) не должна
+	# встраиваться в чужие фреймы и угадывать типы содержимого.
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "no-referrer"
+		-Server
+	}
+
 	# Дашборд контролёра и API ревью — пока dev-инструмент без OIDC (§07.2),
 	# поэтому закрыты HTTP-аутентификацией отдельно от API устройств.
 	# После аутентификации прокси сам утверждает субъект: заголовки

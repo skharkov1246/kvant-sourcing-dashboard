@@ -50,6 +50,41 @@ app = FastAPI(
     description="Бэкенд платформы сбора первичных данных о единицах товара на складе.",
 )
 
+
+# ── Ограничение частоты запросов ─────────────────────────────────────────────
+# Один сломанный или взбесившийся клиент не должен занимать стенд целиком.
+# Скользящее окно на процесс: приблизительно (воркеров два), но достаточно,
+# чтобы срезать шторм. Лимит щедрый — синхронизация устройства шлёт чанки
+# файлов пачками, и это законно. /health исключён: его дёргают проверки.
+_RATE_WINDOW_S = 10
+_RATE_MAX = 300          # на IP за окно: ~30 rps устойчиво
+_rate_hits: dict[str, list[float]] = {}
+
+
+@app.middleware("http")
+async def _rate_limit(request, call_next):
+    path = request.url.path
+    if not path.startswith("/health"):
+        import time as _time
+        now = _time.monotonic()
+        ip = (request.client.host if request.client else "?")
+        hits = _rate_hits.setdefault(ip, [])
+        cutoff = now - _RATE_WINDOW_S
+        while hits and hits[0] < cutoff:
+            hits.pop(0)
+        if len(hits) >= _RATE_MAX:
+            from fastapi.responses import JSONResponse
+            return JSONResponse(
+                status_code=429,
+                content={"code": "rate_limited",
+                         "message": "Слишком много запросов — подождите и повторите"},
+                headers={"Retry-After": str(_RATE_WINDOW_S)},
+            )
+        hits.append(now)
+        if len(_rate_hits) > 10_000:   # защита памяти от миллиона IP
+            _rate_hits.clear()
+    return await call_next(request)
+
 def _make_store() -> Any:
     """Хранилище прода — PostgreSQL, если задана строка подключения.
 
