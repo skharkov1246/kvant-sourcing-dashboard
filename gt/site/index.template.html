@@ -146,6 +146,7 @@ const TFS_SUB = __TFSSUB_JSON__;
 const BX_SITES = __BXSITES_JSON__;
 const RESEARCH = __RESEARCH_JSON__;
 const PNCAT = __PNCAT_JSON__;
+const PROFILES = __PROFILES_JSON__;
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const FAM_NAME = {SGT:'Siemens SGT', Solar:'Solar', Heavy:'Тяжёлые ГТУ'};
@@ -408,10 +409,22 @@ function buildUnified(){
  // сайты Bitrix-компаний из веб-верификации; правило владельца: без сайта — вон из подбора
  const bxs = {};
  for(const [n,v] of Object.entries(BX_SITES.confirmed||{})) bxs[nrm(n)] = v;
+ const pmap = {};
+ for(const [n,v] of Object.entries(PROFILES.profiles||{})) pmap[nrm(n)] = v;
  for(const r of map.values()){
   if(!r.site || /^—$|не найдено|нет сайта/.test(r.site)){
    const v = bxs[r.key];
    if(v){ r.site = v.site; if(!r.email || r.email==='—') r.email = v.email || r.email; r.src.add('сайт✓'); }
+  }
+  const p = pmap[r.key];
+  if(p){
+   if(p.ok===false && r.src.has('bitrix') && r.src.size<=2){ r.site=''; continue; } // мёртвый сайт → вон
+   if(!r.what || r.what.length<25) r.what = p.desc;
+   if(!r.evid) r.evid = p.desc;
+   const mtxt = p.desc + ' ' + (p.models||'');
+   pickModels(mtxt).forEach(x=>r.models.add(x));
+   segsOf(mtxt).forEach(x=>r.segs.add(x));
+   if(/Solar/i.test(p.models||'')) r.solarAll = true;
   }
  }
  for(const k of [...map.keys()]){
