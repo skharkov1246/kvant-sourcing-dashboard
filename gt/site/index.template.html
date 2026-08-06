@@ -668,7 +668,7 @@ function rOverview(){
   <div class="tile"><b>${PARTS.systems.length}</b><span>систем в номенклатуре ЗИП</span></div>
   <div class="tile"><b>${CUSTOMS.total_records.toLocaleString('ru')}</b><span>деклараций HS 8411 в базе (2023–2026)</span></div>
  </div>
- <div class="box info"><b>Зачем эта библиотека.</b> Solar Turbines и Siemens Energy ушли из РФ — ЗИП для парка Solar (Saturn…Titan) и SGT-100…400 покупается только через независимый «автомаркет»: реверс-заводы Китая, сервисники UK/EU (через посредников), лицензиатов Ирана и б/у рынок. Здесь собрано, <b>кому идти за каким типом запчастей</b>, и как читать шифровки партномеров.</div>
+ <div class="box info"><b>Зачем эта библиотека.</b> Solar Turbines и Siemens Energy ушли из РФ — ЗИП для парка Solar (Saturn…Titan) и SGT-100…400 покупается только через независимый «автомаркет»: реверс-заводы Китая, сервисники UK/EU (через посредников) и б/у рынок. Здесь собрано, <b>кому идти за каким типом запчастей</b>, и как читать шифровки партномеров.</div>
  <h2>Алгоритм сорсера — 4 шага</h2>
  <div class="grid">
   <div class="card"><b>1. Определи машину</b><div class="mut" style="font-size:12.5px">Модель + серийник пакета. Помни legacy-имена: SGT-400 = Cyclone, SGT-100 = Typhoon — вкладка «Машины».</div></div>
@@ -807,7 +807,7 @@ function rSuppliers(){
   <tr><th>Компания</th><th>Гео</th><th>Роль / категории</th><th>Что делает / возил · след в РФ</th><th>Контакты</th><th>Уровень</th><th>Примечание</th></tr>
   <tbody id="sup-body"></tbody>
  </table></div>
- <div class="mut">Уровни: П1 — прямое попадание (Китай, реально для РФ) · П2 — профильные UK/EU (санкционный риск, через посредника) · П2-Иран — лицензиаты Siemens · П3 — прочие/трейдеры · S1–S3 — Solar-блок (S1 — якорные MRO). Контакты SGT-блока верифицированы 05.08.2026; Solar-блок — брать с сайта.</div>
+ <div class="mut">Уровни: П1 — прямое попадание (Китай, реально для РФ) · П2 — профильные UK/EU (санкционный риск, через посредника) · П3 — прочие/трейдеры · S1–S3 — Solar-блок (S1 — якорные MRO). Контакты SGT-блока верифицированы 05.08.2026; Solar-блок — брать с сайта.</div>
  <h2 id="cl-h">Мировой чеклист SGT-400 — ${CHECKLIST.rows.length} компаний по ${CHECKLIST.segments.length} сегментам</h2>
  <div class="mut" style="margin-bottom:6px">${esc(CHECKLIST.source)}</div>
  <div class="filters">
