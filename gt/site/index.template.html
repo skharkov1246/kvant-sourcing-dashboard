@@ -218,19 +218,39 @@ const CL_SEG = {1:['hot'],2:['blades'],3:['coat'],4:['mat'],5:['mro'],6:['trade'
 const STATUSES = [['','без статуса'],['work','в работе'],['rfq','RFQ отправлен'],['kp','есть КП'],['no','отказ']];
 const TYPES = [
  ['oem','OEM — оригинальный производитель'],
- ['auth','авторизованный сервис-провайдер'],
- ['serv','независимый сервис-провайдер'],
+ ['sub','субпоставщик OEM — любой'],
+ ['sub:Solar','субпоставщик Solar'],
+ ['sub:Линкольн','субпоставщик Siemens (Линкольн)'],
+ ['sub:Финспонг','субпоставщик Siemens (Финспонг)'],
+ ['sub:GE','субпоставщик GE'],
+ ['sub:TFS','субпоставщик TFS'],
  ['mfg','производитель деталей'],
- ['aft','автомаркет запчастей / трейдер'],
+ ['trader','трейдер'],
+ ['mro','сервис / ремонт'],
 ];
 const TYPE_NAME = Object.fromEntries(TYPES);
 function classify(r){
- const t = (r.role+' '+(r.what||'')).toLowerCase();
- if(/\boem\b|пэкеджер|оригинальн/.test(t) && !/не-oem|non-oem/.test(t)) return 'oem';
- if(/одобрен|авториз|authorized|licens|лиценз/.test(t)) return 'auth';
- if(/завод|производитель|производств|лить[её]|мехообработк|мехобработк|manufactur|casting|поковк|precision|станочн/.test(t)) return 'mfg';
- if(/сервис|mro|ремонт|overhaul|капремонт|восстановлен|service|обслуж|стенд|инспекци/.test(t)) return 'serv';
- return 'aft';
+ // 1) явный tier из research/TFS-вееров
+ if(r.tierRaw){
+  if(r.tierRaw==='oem_sub'||r.tierRaw==='packager') return 'sub';
+  if(r.tierRaw==='component_specialist') return 'mfg';
+  if(r.tierRaw==='aftermarket'||r.tierRaw==='surplus') return 'trader';
+  if(r.tierRaw==='mro') return 'mro';
+ }
+ // 2) явные роли ядра (КАПСОМ из верифицированных данных)
+ const role=(r.role||'');
+ if(/^OEM\b|^ОЕМ|OEM \(завод|OEM по лицензии/.test(role) && r.src.has('ядро')) return 'oem';
+ if(/ПРОИЗВОДИТЕЛЬ|ЗАВОД/.test(role)) return 'mfg';
+ if(/ТРЕЙДЕР|ЭКСПОРТЁР|экспортёр|посредник/.test(role)) return 'trader';
+ if(/СЕРВИС|MRO-хаб|РЕМОНТ/.test(role)) return 'mro';
+ // 3) сегмент чеклиста (1-4 производственные, 5/7 сервис, 6 трейдеры)
+ if(r.clSeg){ if(r.clSeg===6) return 'trader'; if(r.clSeg===5||r.clSeg===7) return 'mro'; return 'mfg'; }
+ // 4) вердикт верификации Bitrix-компаний (evidence)
+ const ev=(r.evid||r.what||'').toLowerCase();
+ if(/производител|завод|manufactur|изготовл|литьё|литье|casting|precision/.test(ev)) return 'mfg';
+ if(/сервис|ремонт|капремонт|overhaul|mro|service provider/.test(ev)) return 'mro';
+ if(/поставщик|трейдер|торгов|supplier|trading|дилер|stock|склад/.test(ev)) return 'trader';
+ return 'trader';
 }
 const ST_NAME = Object.fromEntries(STATUSES);
 const ALIASES = [
@@ -238,6 +258,12 @@ const ALIASES = [
  ['blazeturbine','blaze'],['ledagreenpower','leda'],['immiturbine','immi'],['liburdi','liburdi'],
  ['bicosyn','bicosyn'],['bowzon','bowzon'],['dawopu','dawopu'],['hangzhouhgtp','dawopu'],['hangzhougasturbineparts','dawopu'],
  ['motorсич','motorsich'],['моторсич','motorsich'],['ethosenergy','ethosenergy'],['scoreenergy','score'],
+ ['scoregroup','score'],['youngfranklin','youngfranklin'],['turbineefficiency','turbineefficiency'],
+ ['gasturbineservices','gasturbineservices'],['taskpro','taskpro'],['sjeengineering','sje'],
+ ['petrotech','petrotech'],['centrax','centrax'],['camfil','camfil'],['doncasters','doncasters'],
+ ['allengears','allengears'],['randhsupply','randh'],['oilturbocompressor','otc'],
+ ['anatco','anatco'],['alnooralaili','anatco'],['itsparts','itsparts'],['industrialturbineservices','itsparts'],
+ ['patentedsystems','patentedsystems'],['hpillc','hpi'],['glmenergy','glm'],['sulzer','sulzer'],
 ];
 const nrm = s => {
  let k = String(s||'').toLowerCase().replace(/[^a-zа-я0-9]/g,'').replace(/(coltd|colimited|ltd|llc|inc|gmbh|srl|spa|bv|sa|sadecv|corp|company|limited|group)+$/,'');
@@ -268,6 +294,7 @@ function buildUnified(){
   const k = nrm(name);
   if(!map.has(k)) map.set(k,{key:k, name, country: country||'—', role:'', segs:new Set(), models:new Set(),
     sgtAll:false, solarAll:false, heavyAll:false, src:new Set(), conf:'', prior:'', tier:'',
+    tierRaw:'', subOf:new Set(), clSeg:0, evid:'',
     site:'', email:'', phone:'', what:'', bitrix:{}});
   return map.get(k);
  };
@@ -291,6 +318,7 @@ function buildUnified(){
   if(!r.phone) r.phone = c.phone;
   if(!r.what) r.what = c.what;
   r.conf = r.conf || c.conf; r.prior = r.prior || c.prior; r.src.add('чеклист');
+  if(!r.clSeg) r.clSeg = c.seg;
   (CL_SEG[c.seg]||[]).forEach(x=>r.segs.add(x));
   segsOf(t).forEach(x=>r.segs.add(x));
   const mm = pickModels(t);
@@ -318,6 +346,8 @@ function buildUnified(){
   if(!r.email) r.email = c.email;
   if(!r.what) r.what = c.what;
   r.conf = r.conf || c.conf; r.src.add('TFS-цепочка');
+  if(!r.tierRaw) r.tierRaw='oem_sub';
+  r.subOf.add('TFS');
   segsOf(t).forEach(x=>r.segs.add(x));
   pickModels(t).forEach(x=>r.models.add(x));
   if(/GECOLSA/i.test(c.name)) r.solarAll = true;
@@ -332,11 +362,21 @@ function buildUnified(){
   if(!r.email) r.email = c.email;
   if(!r.what) r.what = c.what + (c.link?(' · Связь: '+c.link):'') + (c.risk?(' · Риск: '+c.risk):'');
   r.src.add('research');
+  if(!r.tierRaw) r.tierRaw = c.tier;
+  r.evid = r.evid || (c.link||'');
   segsOf(t).forEach(x=>r.segs.add(x));
   pickModels(t).forEach(x=>r.models.add(x));
-  const a = c.angle||'';
-  if(/solar/.test(a)) r.solarAll = true;
-  if(/siemens|sgt|heritage/.test(a)) r.sgtAll = true;
+  const a = (c.angle||'') + ' ' + (c.link||'');
+  if(/solar/i.test(a)) r.solarAll = true;
+  if(/siemens|sgt|heritage/i.test(a)) r.sgtAll = true;
+  if(c.tier==='oem_sub'||c.tier==='packager'){
+   if(/solar|turbomach/i.test(a)) r.subOf.add('Solar');
+   if(/lincoln|линкольн|ruston|egt/i.test(a)) r.subOf.add('Линкольн');
+   if(/finspong|финспонг|stal|abb/i.test(a)) r.subOf.add('Финспонг');
+   if(/siemens/i.test(a) && !r.subOf.size) r.subOf.add('Линкольн');
+   if(/\bGE\b|дженерал/i.test(a)) r.subOf.add('GE');
+   if(!r.subOf.size) r.subOf.add('OEM');
+  }
  }
  for(const o of (BITRIX.offers||[])){
   for(const s of o.suppliers){
@@ -428,12 +468,13 @@ function pkCard(r){
   <div>
    <h4>${esc(r.name)}</h4>
    <div class="mut" style="margin:2px 0 6px">${esc(r.country)}${r.role?' · '+esc(r.role):''}</div>
-   <div><span class="pill typ">${TYPE_NAME[r.typ]}</span>${src}${confP}${prior}</div>
+   <div><span class="pill typ">${r.typ==='sub' ? 'субпоставщик: '+([...r.subOf].join(', ')||'OEM') : TYPE_NAME[r.typ]}</span>${src}${confP}${prior}</div>
   </div>
   <div>
    <div style="margin-bottom:4px">${[...r.segs].map(id=>`<span class="tag">${esc(SEG_SHORT(id))}</span>`).join('')||'<span class="mut">сегмент не определён</span>'}</div>
    <div style="margin-bottom:6px">${models}${wide}${gen}</div>
    ${r.what?`<div class="mut" style="font-size:12.5px">${esc(r.what.length>170?r.what.slice(0,170)+'…':r.what)}</div>`:''}
+   ${r.evid?`<div class="mut" style="font-size:11.5px;margin-top:3px">Проверка: ${esc(r.evid.length>150?r.evid.slice(0,150)+'…':r.evid)}</div>`:''}
   </div>
   <div class="sup-side">
    <div class="contact">${contactLinks(r)}</div>
@@ -462,7 +503,11 @@ function pkFilters(){
   if(!s.showHidden && EDITS.hide[r.key]) return false;
   if(s.model && !coversModel(r,s.model)) return false;
   if(s.seg && !r.segs.has(s.seg)) return false;
-  if(s.typ && r.typ!==s.typ) return false;
+  if(s.typ){
+   if(s.typ==='sub'){ if(r.typ!=='sub') return false; }
+   else if(s.typ.startsWith('sub:')){ if(r.typ!=='sub' || !r.subOf.has(s.typ.slice(4))) return false; }
+   else if(r.typ!==s.typ) return false;
+  }
   if(s.q && ![r.name,r.country,r.role,r.what,r.site,EDITS.note[r.key]||''].join(' ').toLowerCase().includes(s.q)) return false;
   return true;
  });
@@ -493,7 +538,7 @@ function pkClear(k){
 function pkCSV(){
  const lines = ['компания;страна;тип;сегменты;модели;bitrix_запросов;доверие;статус;заметка;сайт;email;телефон;что делает'];
  for(const r of UNI){
-  lines.push([r.name,r.country,TYPE_NAME[r.typ],[...r.segs].map(SEG_SHORT).join(','),
+  lines.push([r.name,r.country,(r.typ==='sub'?'субпоставщик: '+[...r.subOf].join('/'):TYPE_NAME[r.typ]),[...r.segs].map(SEG_SHORT).join(','),
    [...r.models].join(',')+(r.sgtAll?',SGT-все':'')+(r.solarAll?',Solar-все':'')+(r.heavyAll?',тяжёлые':''),
    r.bxTotal,r.conf,ST_NAME[EDITS.st[r.key]||''],EDITS.note[r.key]||'',r.site,r.email,r.phone,r.what]
    .map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(';'));
