@@ -1,9 +1,8 @@
-"""CI-зонд v14: чем закрыть разрыв между валовой и плановой маржой.
+"""CI-зонд v15: сущность «Бюджет сделки» — есть ли там полная себестоимость.
 
-Ищем в Битриксе всё, что похоже на затраты между закупкой и продажей:
-логистика, таможня, пошлины, НДС, агентские, страховка, сертификация.
-Меряем не только наличие полей, но и ЗАПОЛНЯЕМОСТЬ — модель на пустых полях бесполезна.
-Плюс проверяем тождество «Margin = сумма сделки − Cost (rub)» на живых данных.
+В воронке реализации есть стадия «Бюджет сделки согласован | Оплата поставщикам»,
+а в заказах СП-172 — даты «…, budget». Значит бюджет ведётся отдельно.
+Ищем его смарт-процесс, разбираем поля затрат и меряем заполняемость.
 """
 from __future__ import annotations
 
@@ -13,12 +12,10 @@ from collections import Counter
 
 import requests
 
-KEYS = ("доставк", "логист", "таможн", "пошлин", "ндс", "vat", "сбор", "агент", "комисс",
-        "страхов", "сертиф", "себестоим", "cost", "margin", "маржа", "наценк", "коэф",
-        "транспорт", "фрахт", "брокер", "склад", "услуг", "затрат", "расход", "price", "цена")
-DEAL_COST = "UF_CRM_1710446284794"    # Cost (rub)
-DEAL_OFFER = "UF_CRM_1704981063967"   # Offer sum and currency of selected supplier
-DEAL_MARGIN = "UF_CRM_1704981084196"  # Margin
+KEYS = ("логист", "доставк", "таможн", "пошлин", "ндс", "vat", "сбор", "агент", "комисс",
+        "страхов", "сертиф", "себестоим", "cost", "margin", "маржа", "наценк", "транспорт",
+        "фрахт", "брокер", "склад", "затрат", "расход", "бюджет", "budget", "прибыл", "profit",
+        "выручк", "revenue", "закуп", "продаж")
 
 
 def bx(method: str, params: dict | None = None) -> dict:
@@ -45,137 +42,67 @@ def bx_all(method: str, params: dict) -> list:
         start = j["next"]
 
 
-def num(v):
-    """Из строкового поля вытащить число: '1 234,56 EUR' → 1234.56."""
-    s = str(v or "").replace("\xa0", " ").strip()
-    if not s:
-        return None
-    s = s.split("|")[0]
-    m = re.search(r"-?\d[\d  ]*(?:[.,]\d+)?", s)
-    if not m:
-        return None
-    try:
-        return float(m.group(0).replace(" ", "").replace(" ", "").replace(",", "."))
-    except ValueError:
-        return None
-
-
 def main() -> int:
-    print("=== 1. Поля-кандидаты в ЗАКАЗАХ СП-172 ===")
-    f172 = bx("crm.item.fields", {"entityTypeId": 172}).get("result", {}).get("fields", {})
-    cand172 = {k: (v.get("title") or "") for k, v in f172.items()
-               if any(w in (v.get("title") or "").lower() for w in KEYS)}
-    for k, t in cand172.items():
-        print(f"  {k} [{f172[k].get('type')}]: «{t[:66]}»")
+    print("=== 1. Все смарт-процессы портала ===")
+    types = (bx("crm.type.list", {}).get("result") or {}).get("types") or []
+    budget_ids = []
+    for t in types:
+        tid = t.get("entityTypeId")
+        title = str(t.get("title") or "")
+        print(f"  entityTypeId={tid} · «{title}» (код {t.get('name')})")
+        if any(w in title.lower() for w in ("бюджет", "budget", "эконом")):
+            budget_ids.append((tid, title))
+    print(f"\n  похоже на бюджет/экономику: {budget_ids or 'не найдено'}")
 
-    print("\n=== 2. Поля-кандидаты в СДЕЛКАХ ===")
-    fd = bx("crm.deal.fields", {}).get("result", {}) or {}
-    candd = {k: (fd[k].get("formLabel") or fd[k].get("title") or k) for k in fd
-             if any(w in str(fd[k].get("formLabel") or fd[k].get("title") or "").lower() for w in KEYS)}
-    for k, t in candd.items():
-        print(f"  {k} [{fd[k].get('type')}]: «{str(t)[:66]}»")
+    for tid, title in budget_ids or []:
+        print(f"\n=== 2. Поля «{title}» (entityTypeId={tid}) ===")
+        f = bx("crm.item.fields", {"entityTypeId": tid}).get("result", {}).get("fields", {})
+        print(f"  всего полей: {len(f)}")
+        money = {k: v for k, v in f.items()
+                 if v.get("type") in ("money", "double", "integer")
+                 or any(w in (v.get("title") or "").lower() for w in KEYS)}
+        for k, v in money.items():
+            print(f"    {k} [{v.get('type')}]: «{str(v.get('title'))[:60]}»")
 
-    print("\n=== 3. ЗАПОЛНЯЕМОСТЬ полей заказов (живые заказы) ===")
-    sel = ["id", "title", "stageId", "opportunity", "currencyId", "parentId2"] + list(cand172)
-    orders = bx_all("crm.item.list", {"entityTypeId": 172, "select": sel})
-    live = [o for o in orders if not str(o.get("stageId", "")).endswith((":SUCCESS", ":FAIL"))]
-    print(f"  всего заказов {len(orders)}, живых {len(live)}")
-    for k, t in cand172.items():
-        n_all = sum(1 for o in orders if o.get(k) not in (None, "", 0, "0"))
-        n_live = sum(1 for o in live if o.get(k) not in (None, "", 0, "0"))
-        if n_all:
-            ex = [str(o.get(k))[:26] for o in orders if o.get(k) not in (None, "", 0, "0")][:3]
-            print(f"  {k} «{t[:40]}»: всего {n_all}, живых {n_live} · примеры: {ex}")
-
-    print("\n=== 4. ЗАПОЛНЯЕМОСТЬ полей сделок (воронка реализации, кат.0) ===")
-    dsel = ["ID", "TITLE", "OPPORTUNITY", "CURRENCY_ID", "STAGE_SEMANTIC_ID",
-            DEAL_COST, DEAL_OFFER, DEAL_MARGIN] + list(candd)
-    dsel = list(dict.fromkeys(dsel))
-    deals = bx_all("crm.deal.list", {"filter": {"CATEGORY_ID": 0}, "select": dsel})
-    print(f"  сделок кат.0: {len(deals)}")
-    for k in candd:
-        n = sum(1 for d in deals if d.get(k) not in (None, "", 0, "0", "0|RUB", "0.00|RUB"))
-        if n:
-            ex = [str(d.get(k))[:24] for d in deals if d.get(k) not in (None, "", 0, "0", "0|RUB", "0.00|RUB")][:3]
-            print(f"  {k} «{str(candd[k])[:40]}»: заполнено {n} · примеры: {ex}")
-
-    print("\n=== 5. Сходится ли «Margin = сумма сделки − Cost (rub)»? ===")
-    cur = bx("crm.currency.list", {}).get("result") or []
-    rate = {c.get("CURRENCY"): float(c.get("AMOUNT") or 1) / float(c.get("AMOUNT_CNT") or 1) for c in cur}
-    def eur(v, c): return float(v or 0) * rate.get(c, 1.0)
-    def money(s):
-        s = str(s or "")
-        if "|" not in s:
-            return None, None
-        a, c = s.split("|", 1)
+        print(f"\n=== 3. Записи «{title}»: сколько и как связаны со сделками ===")
+        sel = ["id", "title", "stageId", "createdTime", "opportunity", "currencyId",
+               "parentId2"] + list(money)
         try:
-            return float(a or 0), c
-        except ValueError:
-            return None, None
-    ok = bad = nodata = 0
-    shown = 0
-    for d in deals:
-        cost, ccur = money(d.get(DEAL_COST))
-        marg, mcur = money(d.get(DEAL_MARGIN))
-        if not cost or marg is None:
-            nodata += 1
+            items = bx_all("crm.item.list", {"entityTypeId": tid, "select": sel})
+        except Exception as e:
+            print(f"    ошибка выгрузки: {type(e).__name__}")
             continue
-        sale = eur(d.get("OPPORTUNITY"), d.get("CURRENCY_ID"))
-        c_e, m_e = eur(cost, ccur), eur(marg, mcur)
-        if sale and abs((sale - c_e) - m_e) / max(abs(sale), 1) < 0.02:
-            ok += 1
-        else:
-            bad += 1
-            if shown < 8:
-                shown += 1
-                print(f"    #{d['ID']} продажа {sale:,.0f}€ − cost {c_e:,.0f}€ = {sale-c_e:,.0f}€, "
-                      f"а в поле Margin {m_e:,.0f}€ · {str(d.get('TITLE'))[:34]}")
-    print(f"  тождество выполняется: {ok} · не сходится: {bad} · нет данных: {nodata}")
-
-    print("\n=== 6. Cost (rub) против Σ заказов поставщикам — это одно и то же? ===")
-    by_deal = {}
-    for o in orders:
-        did = str(o.get("parentId2") or "")
-        if did:
-            by_deal.setdefault(did, []).append(o)
-    same = higher = lower = 0
-    ratios = []
-    shown = 0
-    for d in deals:
-        did = str(d["ID"])
-        cost, ccur = money(d.get(DEAL_COST))
-        ords = by_deal.get(did) or []
-        if not cost or not ords:
-            continue
-        so = sum(eur(o.get("opportunity"), o.get("currencyId")) for o in ords)
-        c_e = eur(cost, ccur)
-        if not so or not c_e:
-            continue
-        r = c_e / so
-        ratios.append(r)
-        if abs(r - 1) < 0.03:
-            same += 1
-        elif r > 1:
-            higher += 1
-            if shown < 8:
-                shown += 1
-                print(f"    #{d['ID']} Cost {c_e:,.0f}€ ВЫШЕ Σ заказов {so:,.0f}€ (×{r:.2f}) · {str(d.get('TITLE'))[:32]}")
-        else:
-            lower += 1
-    ratios.sort()
-    med = ratios[len(ratios) // 2] if ratios else 0
-    print(f"  сопоставимых сделок: {len(ratios)} · совпадает ±3%: {same} · "
-          f"Cost выше: {higher} · Cost ниже: {lower} · медиана Cost/Σзаказов: {med:.3f}")
-
-    print("\n=== 7. Товарные позиции в сделках (crm.item.productrow) — есть ли строки затрат? ===")
-    sample = [str(d["ID"]) for d in deals[:6]]
-    for did in sample:
-        rows = bx("crm.item.productrow.list", {"filter": {"=ownerType": "D", "=ownerId": did}}).get("result", {})
-        items = (rows or {}).get("productRows") or []
+        print(f"    записей: {len(items)}")
+        withparent = sum(1 for i in items if i.get("parentId2"))
+        print(f"    привязано к сделке (parentId2): {withparent}")
         if items:
-            print(f"    сделка #{did}: {len(items)} строк · " +
-                  ", ".join(f"{str(i.get('productName'))[:24]}={i.get('price')}" for i in items[:3]))
-    print("\n✓ зонд v14 завершён")
+            ex = items[0]
+            print(f"    пример записи #{ex.get('id')}: «{str(ex.get('title'))[:50]}» "
+                  f"стадия={ex.get('stageId')} сделка={ex.get('parentId2')}")
+            print("    --- заполняемость полей затрат ---")
+            for k, v in money.items():
+                n = sum(1 for i in items if i.get(k) not in (None, "", 0, "0", "0.00"))
+                if n:
+                    vals = [str(i.get(k))[:22] for i in items
+                            if i.get(k) not in (None, "", 0, "0", "0.00")][:3]
+                    print(f"      {k} «{str(v.get('title'))[:38]}»: {n} из {len(items)} · {vals}")
+            print("    --- все непустые поля первой записи (что реально ведут) ---")
+            full = bx("crm.item.get", {"entityTypeId": tid, "id": ex.get("id")}).get("result", {})
+            it = (full or {}).get("item") or {}
+            for k, v in it.items():
+                if v not in (None, "", 0, "0", [], {}) and not k.startswith("ufCrm"):
+                    print(f"      {k} = {str(v)[:44]}")
+            for k, v in it.items():
+                if v not in (None, "", 0, "0", [], {}) and k.startswith("ufCrm"):
+                    ttl = (f.get(k) or {}).get("title") or ""
+                    print(f"      {k} «{str(ttl)[:34]}» = {str(v)[:34]}")
+
+    print("\n=== 4. Сколько сделок кат.0 дошли до стадии «Бюджет согласован» и дальше ===")
+    deals = bx_all("crm.deal.list", {"filter": {"CATEGORY_ID": 0},
+                                     "select": ["ID", "STAGE_ID", "STAGE_SEMANTIC_ID"]})
+    print(f"  сделок кат.0: {len(deals)} · по стадиям: {dict(Counter(d.get('STAGE_ID') for d in deals))}")
+
+    print("\n✓ зонд v15 завершён")
     return 0
 
 
