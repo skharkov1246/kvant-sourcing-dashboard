@@ -18,7 +18,7 @@ CUSTOMS_FILES = sorted((REPO / "zip/customs/out").glob("customs_8411*.json"))
 MODEL_RE = re.compile(
     r"(SOLAR|TAURUS|CENTAUR|MARS\b|TITAN|SATURN|SGT[- ]?\d{3,4}\w?|TYPHOON|TORNADO|TEMPEST|CYCLONE"
     r"|GT10|GT13|GT35|GTX100|TB\d{4}|MS\s?\d{4}|FRAME\s?\d|9F[AB]?\b|6F\.?03|6FA|7EA|\b6B\b"
-    r"|V94\.?[23]|V64\.?3|ГТЭ[- ]?160)",
+    r"|V94\.?[23]|V64\.?3|ГТЭ[- ]?160|LM[- ]?2500|LM[- ]?6000|PGT[- ]?25|RB[- ]?211)",
     re.I,
 )
 

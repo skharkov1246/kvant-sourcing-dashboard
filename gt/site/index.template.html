@@ -187,6 +187,7 @@ const MRX = [
  [/Mars[- ]?100/i,'Mars 100'],[/Titan[- ]?130/i,'Titan 130'],[/Titan[- ]?250/i,'Titan 250'],
  [/SGT5[- ]?2000E|V94\.?2|ГТЭ[- ]?160/i,'SGT5-2000E (V94.2/ГТЭ-160)'],[/SGT5[- ]?4000F|V94\.?3/i,'SGT5-4000F (V94.3A)'],
  [/V64\.?3|AE64/i,'V64.3A (AE64.3A)'],[/GT13/i,'GT13E2'],
+ [/LM[- ]?2500|PGT[- ]?25/i,'LM2500 (PGT25)'],[/LM[- ]?6000/i,'LM6000'],[/RB[- ]?211|SGT-A35/i,'RB211 (SGT-A35)'],
  [/9F[AB]?\b|MS9001/i,'GE 9F/9FA'],[/6F\.?03|6FA/i,'GE 6F.03 (6FA)'],
  [/MS7001|7EA|Frame\s?7/i,'GE Frame 7 (MS7001)'],[/MS6001|Frame\s?6|\b6B\b/i,'GE Frame 6B (MS6001)'],
  [/MS5002|Frame\s?5/i,'GE MS5002'],[/MS5001/i,'GE MS5001'],
@@ -195,10 +196,12 @@ const MODEL_GROUPS = [
  ['Siemens SGT — Линкольн', ['SGT-100','SGT-200','SGT-300','SGT-400']],
  ['Siemens SGT — Финспонг', ['SGT-500','SGT-600','SGT-700','SGT-750','SGT-800']],
  ['Solar Turbines', ['Saturn 20','Centaur 40','Centaur 50','Taurus 60','Taurus 70','Mars 90','Mars 100','Titan 130','Titan 250']],
+ ['Аэродеривативы (GE / RR)', ['LM2500 (PGT25)','LM6000','RB211 (SGT-A35)']],
  ['Тяжёлые (GE / Siemens / Alstom)', ['GE MS5001','GE MS5002','GE Frame 6B (MS6001)','GE 6F.03 (6FA)','GE Frame 7 (MS7001)','GE 9F/9FA','SGT5-2000E (V94.2/ГТЭ-160)','SGT5-4000F (V94.3A)','V64.3A (AE64.3A)','GT13E2']],
 ];
-const LINC_SET = new Set(MODEL_GROUPS[0][1]), FIN_SET = new Set(MODEL_GROUPS[1][1]),
-      SOLAR_SET = new Set(MODEL_GROUPS[2][1]), HEAVY_SET = new Set(MODEL_GROUPS[3][1]);
+const GRP = Object.fromEntries(MODEL_GROUPS.map(g=>[g[0],g[1]]));
+const LINC_SET = new Set(GRP['Siemens SGT — Линкольн']), FIN_SET = new Set(GRP['Siemens SGT — Финспонг']),
+      SOLAR_SET = new Set(GRP['Solar Turbines']), HEAVY_SET = new Set(GRP['Тяжёлые (GE / Siemens / Alstom)']);
 const SEGS = [
  ['hot','Горячий тракт: камеры, горелки, зажигание', /камер|горелк|жаров|liner|burner|combust|transition|запальн|зажиган|igniter|форсунк|cupula|купол/i],
  ['blades','Лопатки и сопловые (литьё, диски)', /лопатк|соплов|blade|vane|nozzle|литьё|литье|casting|диск|монокрист/i],
