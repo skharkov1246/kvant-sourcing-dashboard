@@ -234,7 +234,7 @@ private fun KvantApp(
                 BackHandler { cameraStep = null }
                 CameraCaptureScreen(
                     step = step,
-                    storageDir = filesDir,
+                    storageDir = androidx.compose.ui.platform.LocalContext.current.filesDir,
                     onShot = { file ->
                         shotFiles += file
                         // Кадр сразу в очередь медиа: файл принадлежит очереди
