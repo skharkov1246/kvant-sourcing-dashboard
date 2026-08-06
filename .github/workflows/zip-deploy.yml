@@ -6,7 +6,7 @@ name: ZIP base deploy
 on:
   push:
     branches: [main]
-    paths: ["zip/**", ".github/workflows/zip-deploy.yml"]
+    paths: ["zip/**", "gt/**", ".github/workflows/zip-deploy.yml"]
   workflow_dispatch: {}
 
 permissions:
