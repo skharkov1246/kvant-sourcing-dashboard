@@ -447,6 +447,10 @@ function buildUnified(){
   r.bxTotal = Object.values(r.bitrix).reduce((a,b)=>a+b,0);
   r.typ = classify(r);
   r.dossier = dmap[r.key] || null;
+  if(r.dossier){
+   if((!r.email || /см\. сайт|не найдено|—|^$/.test(r.email)) && r.dossier.contact_email) r.email = r.dossier.contact_email;
+   if((!r.phone || /см\. сайт|не найдено|—|^$/.test(r.phone)) && r.dossier.contact_phone) r.phone = r.dossier.contact_phone;
+  }
   r.score = scoreOf(r);
  });
 }
@@ -534,6 +538,7 @@ function pkCard(r){
  if(d.supplied_to&&d.supplied_to.length) dossierBits.push(`поставлял: ${d.supplied_to.slice(0,3).join(', ')}`);
  if(d.exports_to&&d.exports_to.length) dossierBits.push(`экспорт: ${d.exports_to.slice(0,5).join(', ')}${d.exports_to.length>5?'…':''}`);
  if(d.buys_from&&d.buys_from.length) dossierBits.push(`закупает у: ${d.buys_from.slice(0,3).join(', ')}`);
+ if(d.contact_person) dossierBits.push(`контакт: ${d.contact_person}`);
  return `<div class="sup${hidden?' hid':''}" data-k="${esc(r.key)}">
   <div>
    <h4>${esc(r.name)}</h4>
@@ -546,6 +551,7 @@ function pkCard(r){
    ${dossierBits.length?`<div style="font-size:12px;margin-bottom:4px">${dossierBits.map(b=>`<span class="dfact">${esc(b)}</span>`).join('')}</div>`:''}
    ${r.what?`<div class="mut" style="font-size:12.5px">${esc(r.what.length>170?r.what.slice(0,170)+'…':r.what)}</div>`:''}
    ${r.evid?`<div class="mut" style="font-size:11.5px;margin-top:3px">Проверка: ${esc(r.evid.length>150?r.evid.slice(0,150)+'…':r.evid)}</div>`:''}
+   ${d.hook?`<div style="font-size:12px;margin-top:4px;border-left:3px solid var(--good);padding-left:8px">✍ Зацепка для письма: ${esc(d.hook)}</div>`:''}
   </div>
   <div class="sup-side">
    <div class="contact">${contactLinks(r)}</div>
