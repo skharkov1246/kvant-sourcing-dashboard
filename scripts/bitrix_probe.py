@@ -1,32 +1,36 @@
-"""CI-зонд v15: сущность «Бюджет сделки» — есть ли там полная себестоимость.
+"""CI-зонд v16: найти «Бюджет сделки» — с показом ошибок API, а не молчком.
 
-В воронке реализации есть стадия «Бюджет сделки согласован | Оплата поставщикам»,
-а в заказах СП-172 — даты «…, budget». Значит бюджет ведётся отдельно.
-Ищем его смарт-процесс, разбираем поля затрат и меряем заполняемость.
+1. crm.type.list с выводом сырого ответа (вдруг отказ в доступе).
+2. Все PARENT_ID_* на сделке — это связи с другими смарт-процессами.
+3. Поля со словом «бюджет/budget» в сделках и заказах + их заполняемость.
 """
 from __future__ import annotations
 
 import os
 import re
-from collections import Counter
 
 import requests
 
-KEYS = ("логист", "доставк", "таможн", "пошлин", "ндс", "vat", "сбор", "агент", "комисс",
-        "страхов", "сертиф", "себестоим", "cost", "margin", "маржа", "наценк", "транспорт",
-        "фрахт", "брокер", "склад", "затрат", "расход", "бюджет", "budget", "прибыл", "profit",
-        "выручк", "revenue", "закуп", "продаж")
+BKEYS = ("бюджет", "budget")
 
 
-def bx(method: str, params: dict | None = None) -> dict:
+def bx(method: str, params: dict | None = None, *, loud: bool = False) -> dict:
     base = os.environ["BITRIX_WEBHOOK_URL"].rstrip("/")
+    last = None
     for _ in range(3):
         try:
             r = requests.post(f"{base}/{method}.json", json=params or {}, timeout=60)
-            r.raise_for_status()
-            return r.json()
-        except Exception:
-            continue
+            j = r.json() if r.content else {}
+            if r.status_code >= 400 or (isinstance(j, dict) and j.get("error")):
+                last = f"HTTP {r.status_code} · {str(j)[:200]}"
+                if loud:
+                    print(f"    ! {method}: {last}")
+                return j if isinstance(j, dict) else {}
+            return j
+        except Exception as e:
+            last = f"{type(e).__name__}: {e}"
+    if loud and last:
+        print(f"    ! {method}: {last}")
     return {}
 
 
@@ -43,66 +47,75 @@ def bx_all(method: str, params: dict) -> list:
 
 
 def main() -> int:
-    print("=== 1. Все смарт-процессы портала ===")
-    types = (bx("crm.type.list", {}).get("result") or {}).get("types") or []
-    budget_ids = []
-    for t in types:
-        tid = t.get("entityTypeId")
-        title = str(t.get("title") or "")
-        print(f"  entityTypeId={tid} · «{title}» (код {t.get('name')})")
-        if any(w in title.lower() for w in ("бюджет", "budget", "эконом")):
-            budget_ids.append((tid, title))
-    print(f"\n  похоже на бюджет/экономику: {budget_ids or 'не найдено'}")
+    print("=== 1. crm.type.list — сырой ответ ===")
+    j = bx("crm.type.list", {}, loud=True)
+    res = j.get("result")
+    print(f"  ключи ответа: {list(j.keys())}")
+    types = (res or {}).get("types") if isinstance(res, dict) else None
+    if types:
+        for t in types:
+            print(f"  entityTypeId={t.get('entityTypeId')} · «{t.get('title')}»")
+    else:
+        print(f"  result: {str(res)[:300]}")
 
-    for tid, title in budget_ids or []:
-        print(f"\n=== 2. Поля «{title}» (entityTypeId={tid}) ===")
-        f = bx("crm.item.fields", {"entityTypeId": tid}).get("result", {}).get("fields", {})
-        print(f"  всего полей: {len(f)}")
-        money = {k: v for k, v in f.items()
-                 if v.get("type") in ("money", "double", "integer")
-                 or any(w in (v.get("title") or "").lower() for w in KEYS)}
-        for k, v in money.items():
-            print(f"    {k} [{v.get('type')}]: «{str(v.get('title'))[:60]}»")
+    print("\n=== 2. Связи сделки с другими смарт-процессами (PARENT_ID_*) ===")
+    fd = bx("crm.deal.fields", {}).get("result", {}) or {}
+    parents = {k: (fd[k].get("formLabel") or fd[k].get("title") or k)
+               for k in fd if k.startswith("PARENT_ID_")}
+    for k, t in parents.items():
+        tid = k.replace("PARENT_ID_", "")
+        print(f"  {k} → entityTypeId {tid}: «{t}»")
+        info = bx("crm.type.get", {"id": tid})
+        ti = (info.get("result") or {}).get("type") or {}
+        if ti:
+            print(f"      подтверждение: «{ti.get('title')}» (код {ti.get('name')})")
 
-        print(f"\n=== 3. Записи «{title}»: сколько и как связаны со сделками ===")
-        sel = ["id", "title", "stageId", "createdTime", "opportunity", "currencyId",
-               "parentId2"] + list(money)
-        try:
-            items = bx_all("crm.item.list", {"entityTypeId": tid, "select": sel})
-        except Exception as e:
-            print(f"    ошибка выгрузки: {type(e).__name__}")
-            continue
-        print(f"    записей: {len(items)}")
-        withparent = sum(1 for i in items if i.get("parentId2"))
-        print(f"    привязано к сделке (parentId2): {withparent}")
-        if items:
-            ex = items[0]
-            print(f"    пример записи #{ex.get('id')}: «{str(ex.get('title'))[:50]}» "
-                  f"стадия={ex.get('stageId')} сделка={ex.get('parentId2')}")
-            print("    --- заполняемость полей затрат ---")
-            for k, v in money.items():
-                n = sum(1 for i in items if i.get(k) not in (None, "", 0, "0", "0.00"))
-                if n:
-                    vals = [str(i.get(k))[:22] for i in items
-                            if i.get(k) not in (None, "", 0, "0", "0.00")][:3]
-                    print(f"      {k} «{str(v.get('title'))[:38]}»: {n} из {len(items)} · {vals}")
-            print("    --- все непустые поля первой записи (что реально ведут) ---")
-            full = bx("crm.item.get", {"entityTypeId": tid, "id": ex.get("id")}).get("result", {})
-            it = (full or {}).get("item") or {}
-            for k, v in it.items():
-                if v not in (None, "", 0, "0", [], {}) and not k.startswith("ufCrm"):
-                    print(f"      {k} = {str(v)[:44]}")
-            for k, v in it.items():
-                if v not in (None, "", 0, "0", [], {}) and k.startswith("ufCrm"):
-                    ttl = (f.get(k) or {}).get("title") or ""
-                    print(f"      {k} «{str(ttl)[:34]}» = {str(v)[:34]}")
+    print("\n=== 3. Поля со словом «бюджет/budget» в СДЕЛКАХ ===")
+    dbud = {k: str(fd[k].get("formLabel") or fd[k].get("title") or k) for k in fd
+            if any(w in str(fd[k].get("formLabel") or fd[k].get("title") or "").lower() for w in BKEYS)}
+    for k, t in dbud.items():
+        print(f"  {k} [{fd[k].get('type')}]: «{t[:70]}»")
+    if not dbud:
+        print("  нет")
 
-    print("\n=== 4. Сколько сделок кат.0 дошли до стадии «Бюджет согласован» и дальше ===")
-    deals = bx_all("crm.deal.list", {"filter": {"CATEGORY_ID": 0},
-                                     "select": ["ID", "STAGE_ID", "STAGE_SEMANTIC_ID"]})
-    print(f"  сделок кат.0: {len(deals)} · по стадиям: {dict(Counter(d.get('STAGE_ID') for d in deals))}")
+    print("\n=== 4. Поля со словом «бюджет/budget» в ЗАКАЗАХ СП-172 ===")
+    f172 = bx("crm.item.fields", {"entityTypeId": 172}).get("result", {}).get("fields", {})
+    obud = {k: str(v.get("title") or k) for k, v in f172.items()
+            if any(w in str(v.get("title") or "").lower() for w in BKEYS)}
+    for k, t in obud.items():
+        print(f"  {k} [{f172[k].get('type')}]: «{t[:70]}»")
+    if not obud:
+        print("  нет")
 
-    print("\n✓ зонд v15 завершён")
+    print("\n=== 5. Заполняемость бюджетных полей ===")
+    if dbud:
+        deals = bx_all("crm.deal.list", {"filter": {"CATEGORY_ID": 0},
+                                         "select": ["ID", "TITLE", "STAGE_ID"] + list(dbud)})
+        print(f"  сделок кат.0: {len(deals)}")
+        for k, t in dbud.items():
+            vals = [d.get(k) for d in deals if d.get(k) not in (None, "", 0, "0", "[]")]
+            if vals:
+                print(f"    {k} «{t[:44]}»: заполнено {len(vals)} · примеры: {[str(v)[:26] for v in vals[:3]]}")
+    if obud:
+        orders = bx_all("crm.item.list", {"entityTypeId": 172,
+                                          "select": ["id", "stageId"] + list(obud)})
+        live = [o for o in orders if not str(o.get("stageId", "")).endswith((":SUCCESS", ":FAIL"))]
+        print(f"  заказов: {len(orders)}, живых: {len(live)}")
+        for k, t in obud.items():
+            n = sum(1 for o in orders if o.get(k) not in (None, "", 0, "0", "[]"))
+            nl = sum(1 for o in live if o.get(k) not in (None, "", 0, "0", "[]"))
+            if n:
+                ex = [str(o.get(k))[:26] for o in orders if o.get(k) not in (None, "", 0, "0", "[]")][:3]
+                print(f"    {k} «{t[:40]}»: всего {n}, живых {nl} · {ex}")
+
+    print("\n=== 6. Все смарт-процессы перебором entityTypeId (128…200) ===")
+    for tid in range(128, 201):
+        info = bx("crm.type.get", {"id": tid})
+        ti = (info.get("result") or {}).get("type") or {}
+        if ti and ti.get("title"):
+            print(f"  {tid}: «{ti.get('title')}»")
+
+    print("\n✓ зонд v16 завершён")
     return 0
 
 
