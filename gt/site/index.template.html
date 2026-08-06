@@ -142,6 +142,7 @@ const CUSTOMS = __CUSTOMS_JSON__;
 const BITRIX = __BITRIX_JSON__;
 const CHECKLIST = __CHECKLIST_JSON__;
 const HEAVY_SUPS = __HEAVY_JSON__;
+const TFS_SUB = __TFSSUB_JSON__;
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const FAM_NAME = {SGT:'Siemens SGT', Solar:'Solar', Heavy:'Тяжёлые ГТУ'};
@@ -306,6 +307,18 @@ function buildUnified(){
   const mm = pickModels(t);
   if(mm.size) mm.forEach(x=>r.models.add(x));
   r.heavyAll = true;
+ }
+ for(const c of TFS_SUB.rows){
+  const t = [c.name,c.module,c.what].join(' · ');
+  const r = get(c.name, c.country);
+  if(!r.role) r.role = 'субпоставщик TFS: '+c.module;
+  if(!r.site) r.site = c.site;
+  if(!r.email) r.email = c.email;
+  if(!r.what) r.what = c.what;
+  r.conf = r.conf || c.conf; r.src.add('TFS-цепочка');
+  segsOf(t).forEach(x=>r.segs.add(x));
+  pickModels(t).forEach(x=>r.models.add(x));
+  if(/GECOLSA/i.test(c.name)) r.solarAll = true;
  }
  for(const o of (BITRIX.offers||[])){
   for(const s of o.suppliers){

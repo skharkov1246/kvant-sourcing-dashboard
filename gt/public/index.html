@@ -12898,6 +12898,43 @@ const HEAVY_SUPS = {
   }
  ]
 };
+const TFS_SUB = {
+ "updated": "2026-08-06",
+ "source": "Субпоставщики TFS по модулям — фото владельца (чат с Е. Корниловой) + zip/data/tfs_supply_chain.json (сессия «Перфы»). Сайты подтверждены веб-верификацией 06.08.2026; Gas Turbine Products LLC, Panamerican Service, HMT Inc не подтвердились и не включены.",
+ "rows": [
+  {"name": "DURAG Group", "country": "Германия", "module": "Розжиг и КИП",
+   "what": "Воспламенители/свечи розжига M22D и M30D — узел системы розжига камеры сгорания (именно их TFS ставит на SGT-400)",
+   "site": "durag.com", "email": "", "conf": "high"},
+  {"name": "SIFCO Applied Surface Concepts", "country": "США (Independence, OH)", "module": "Покрытия и переделы",
+   "what": "Селективное гальванопокрытие (brush plating) — восстановление посадочных мест и деталей; в тройке крупнейших поставщиков TFS",
+   "site": "sifcoasc.com", "email": "info@sifcoasc.com", "conf": "high"},
+  {"name": "GECOLSA", "country": "Колумбия", "module": "Канал Solar",
+   "what": "Единственный авторизованный дилер Caterpillar/Solar Turbines в Колумбии — запчасти Solar; канал, которым пользуется TFS",
+   "site": "gecolsa.com", "email": "", "conf": "high"},
+  {"name": "Dunlop Oil & Marine (ContiTech/Continental)", "country": "Великобритания (Гримсби)", "module": "Уплотнения и метизы",
+   "what": "Рукава высокого давления для нефтегаза; ныне в составе Continental (continental-industry.com, energy hoses)",
+   "site": "continental-industry.com", "email": "", "conf": "high"},
+  {"name": "HMi Elements", "country": "Великобритания", "module": "Розжиг и КИП",
+   "what": "Промышленные HMI-панели и компьютеры с ATEX/IECEx (взрывозащита) — панели управления пакетов",
+   "site": "hmielements.com", "email": "", "conf": "high"},
+  {"name": "SONKIT (Shanghai) Industry Tech", "country": "Китай (Шанхай)", "module": "Уплотнения и метизы",
+   "what": "Металлические уплотнения и прокладки (metal seals) — возит TFS",
+   "site": "sonkitsealing.com", "email": "johnny@sonkit.cn", "conf": "high"},
+  {"name": "Finework (Hunan) New Energy Technology", "country": "Китай (Хунань)", "module": "Уплотнения и метизы",
+   "what": "Суперсплавный крепёж, шпильки, компоненты топливных форсунок ГТУ и авиадвигателей; публичная компания (301232.SZ)",
+   "site": "hnfinework.com", "email": "info@shfinework.com", "conf": "high"},
+  {"name": "SYZ Machine (Shanghai Yong Zheng)", "country": "Китай (Шанхай)", "module": "Механика и подшипники",
+   "what": "Сферические подшипники, подшипниковые узлы, вкладыши, rod ends — возит TFS",
+   "site": "syzmachine.com", "email": "", "conf": "high"},
+  {"name": "Energy International (EIC)", "country": "США (Мичиган)", "module": "Механика и подшипники",
+   "what": "Насосы (Armstrong и др.), КИП и промышленное снабжение проектов; экспорт в MENA",
+   "site": "energyintl.com", "email": "", "conf": "high"},
+  {"name": "Guangzhou Senke Electronics", "country": "Китай (Гуанчжоу)", "module": "Розжиг и КИП",
+   "what": "Промышленные сенсорные панельные ПК и touch-мониторы — интерфейсы САУ",
+   "site": "touchsenke.com", "email": "Phoenixfeng@touchdis.com", "conf": "high"}
+ ]
+}
+;
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const FAM_NAME = {SGT:'Siemens SGT', Solar:'Solar', Heavy:'Тяжёлые ГТУ'};
@@ -13062,6 +13099,18 @@ function buildUnified(){
   const mm = pickModels(t);
   if(mm.size) mm.forEach(x=>r.models.add(x));
   r.heavyAll = true;
+ }
+ for(const c of TFS_SUB.rows){
+  const t = [c.name,c.module,c.what].join(' · ');
+  const r = get(c.name, c.country);
+  if(!r.role) r.role = 'субпоставщик TFS: '+c.module;
+  if(!r.site) r.site = c.site;
+  if(!r.email) r.email = c.email;
+  if(!r.what) r.what = c.what;
+  r.conf = r.conf || c.conf; r.src.add('TFS-цепочка');
+  segsOf(t).forEach(x=>r.segs.add(x));
+  pickModels(t).forEach(x=>r.models.add(x));
+  if(/GECOLSA/i.test(c.name)) r.solarAll = true;
  }
  for(const o of (BITRIX.offers||[])){
   for(const s of o.suppliers){
