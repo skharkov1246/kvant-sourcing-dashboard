@@ -38,27 +38,38 @@ WEST = {"сша", "великобритания", "германия", "итал�
         "швейцария", "нидерланды", "испания", "чехия", "румыния", "япония"}
 CIS = {"россия", "беларусь"}
 
-# Поставщики, подтверждённые как контрагенты TFS (Веракрус) по компонентам —
-# идут в сегмент 1 с меткой TFS независимо от эвристики.
+# Поставщики TFS (Веракрус) — идут в сегмент 1 с меткой TFS независимо от эвристики.
+# «★ ТАМОЖНЯ» = связка подтверждена записями отгрузок (Panjiva/ImportKey/Volza,
+# публичные страницы, см. zip/data/tfs_supply_chain.json);
+# «★ TFS» = профильный контрагент по открытым источникам, отгрузки не пробиты.
 TFS = [
+    dict(seg=1, star="★ ТАМОЖНЯ", comp="Turbine Engineering Services Ltd", country="Великобритания",
+         does="Крупнейший канал TFS: 471 запись связки, детали ГТУ, происхождение UK/Нидерланды/Швейцария",
+         site="не подтверждён", email="не найдено", phone="не найдено"),
+    dict(seg=1, star="★ ТАМОЖНЯ", comp="WBS Trading & Manufacturing", country="Сингапур (отгрузка из Китая)",
+         does="Купол камеры сгорания (cupula), кольца дисков 1/2 ступени, уплотнительные пластины",
+         site="wbs.com.sg", email="sales@wbs.com.sg", phone="+65 6863 1978"),
+    dict(seg=1, star="★ ТАМОЖНЯ", comp="Liburdi Turbine Services", country="Канада (происх. UK/Италия)",
+         does="Сегменты сопловых аппаратов и лопатки, авиадоставка в Мехико, HS 8411999900",
+         site="liburdi.com", email="info@liburdi.com", phone="+1 905 689 0734"),
+    dict(seg=1, star="★ ТАМОЖНЯ", comp="Finework (Hunan) New Energy Technology", country="Китай",
+         does="Суперсплавный крепёж и компоненты топливных форсунок камеры сгорания",
+         site="fineworkchina.com", email="sales@fineworkchina.com", phone="+86 731 8873 8080"),
+    dict(seg=1, star="★ ТАМОЖНЯ", comp="Heinzmann UK Limited", country="Великобритания",
+         does="Системы зажигания PROMETHEUS и свечи розжига камеры сгорания",
+         site="heinzmann-re.com", email="sales@heinzmann-re.com", phone="+44 1206 799556"),
+    dict(seg=1, star="★ ТАМОЖНЯ", comp="ITS — Industrial Turbine Services GmbH", country="Австрия",
+         does="Датчики и сканеры пламени ГТУ, детали ГТУ (HS 8411999900 / 9032899900)",
+         site="не подтверждён", email="не найдено", phone="не найдено"),
+    dict(seg=3, star="★ ТАМОЖНЯ", comp="Sifco Applied Surface Concepts", country="США",
+         does="Селективное гальванопокрытие (brush plating) — восстановление деталей горячей части",
+         site="sifcoasc.com", email="не найдено", phone="не найдено"),
     dict(seg=1, star="★ TFS", comp="DURAG Group / HEGWEIN", country="Германия",
          does="Запальники и системы розжига камер сгорания ГТУ (HEGWEIN M22D), патент ignition generator",
          site="durag.com", email="info@durag.com", phone="+49 40 554218-0"),
-    dict(seg=1, star="★ TFS", comp="Heinzmann RE / Turbine Controls", country="Великобритания",
-         does="Система зажигания PROMETHEUS для ГТУ + свечи розжига камеры сгорания",
-         site="heinzmann-re.com", email="sales@heinzmann-re.com", phone="+44 1206 799556"),
-    dict(seg=1, star="★ TFS", comp="WBS Trading & Manufacturing", country="Сингапур",
-         does="Combustion chamber seals и Hot Gas Parts из Ni/Co-суперсплавов",
-         site="wbs.com.sg", email="sales@wbs.com.sg", phone="+65 6863 1978"),
     dict(seg=1, star="★ TFS", comp="Sonkit (Shanghai)", country="Китай",
          does="Металлические уплотнения (C-ring) камеры сгорания / горячей части",
          site="sonkit.com", email="sales@sonkit.com", phone="+86 21 5439 9299"),
-    dict(seg=1, star="★ TFS", comp="Finework (Hunan)", country="Китай",
-         does="Суперсплавный крепёж (шпильки/болты) и fuel nozzle-компоненты камеры сгорания",
-         site="fineworkchina.com", email="sales@fineworkchina.com", phone="+86 731 8873 8080"),
-    dict(seg=1, star="★ TFS", comp="Liburdi Turbine Services", country="Канада",
-         does="Ремонт камер сгорания/лопаток/сопел, Siemens-approved, линейка SGT-400",
-         site="liburdi.com", email="info@liburdi.com", phone="+1 905 689 0734"),
 ]
 
 # --- ключевые слова функций (порядок = приоритет присвоения сегмента) ---
@@ -152,7 +163,7 @@ def main():
         buckets[seg].append((p, comp, country, does, r["Сайт"].strip(),
                              r["Email"].strip(), r["Телефон"].strip()))
     # сортировка внутри сегмента: ★ → • → пусто, затем по стране
-    order = {"★ TFS": 0, "★": 1, "•": 2, "": 3}
+    order = {"★ ТАМОЖНЯ": 0, "★ TFS": 1, "★": 2, "•": 3, "": 4}
 
     # дедуп по нормализованному имени (латиница/кириллица/CJK сохраняем),
     # оставляем лучшую строку: приоритетнее ★ и с контактом
