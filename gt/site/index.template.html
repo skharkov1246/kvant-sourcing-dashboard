@@ -95,6 +95,7 @@ table.sortable th.desc::after{content:" ↓";color:var(--s1)}
 .contact a,.contact span{display:block;font-size:12.5px;margin:1px 0;word-break:break-word}
 .note{background:var(--chip);border-radius:8px;padding:6px 9px;font-size:12px;color:var(--ink2)}
 .pill{display:inline-block;border:1px solid var(--border);border-radius:10px;padding:1px 9px;font-size:11px;color:var(--ink2);margin:1px 3px 1px 0;white-space:nowrap}
+.pill.typ{border-color:var(--ink2);color:var(--ink)}
 .pill.bx{border-color:var(--s1);color:var(--s1);font-weight:700}
 .pill.c-high{border-color:var(--good);color:var(--good)}
 .pill.c-med{border-color:var(--serious);color:var(--serious)}
@@ -195,7 +196,6 @@ const MODEL_GROUPS = [
 ];
 const LINC_SET = new Set(MODEL_GROUPS[0][1]), FIN_SET = new Set(MODEL_GROUPS[1][1]),
       SOLAR_SET = new Set(MODEL_GROUPS[2][1]), HEAVY_SET = new Set(MODEL_GROUPS[3][1]);
-const QUICK_MODELS = ['SGT-400','Taurus 60','Titan 130','SGT-600','SGT-800','SGT5-2000E (V94.2/ГТЭ-160)'];
 const SEGS = [
  ['hot','Горячий тракт: камеры, горелки, зажигание', /камер|горелк|жаров|liner|burner|combust|transition|запальн|зажиган|igniter|форсунк|cupula|купол/i],
  ['blades','Лопатки и сопловые (литьё, диски)', /лопатк|соплов|blade|vane|nozzle|литьё|литье|casting|диск|монокрист/i],
@@ -213,6 +213,22 @@ const SEG_NAME = Object.fromEntries(SEGS.map(([id,n])=>[id,n]));
 const SEG_SHORT = id => (SEG_NAME[id]||id).split(':')[0].split(',')[0];
 const CL_SEG = {1:['hot'],2:['blades'],3:['coat'],4:['mat'],5:['mro'],6:['trade'],7:['mro']};
 const STATUSES = [['','без статуса'],['work','в работе'],['rfq','RFQ отправлен'],['kp','есть КП'],['no','отказ']];
+const TYPES = [
+ ['oem','OEM — оригинальный производитель'],
+ ['auth','авторизованный сервис-провайдер'],
+ ['serv','независимый сервис-провайдер'],
+ ['mfg','производитель деталей'],
+ ['aft','автомаркет запчастей / трейдер'],
+];
+const TYPE_NAME = Object.fromEntries(TYPES);
+function classify(r){
+ const t = (r.role+' '+(r.what||'')).toLowerCase();
+ if(/\boem\b|пэкеджер|оригинальн/.test(t) && !/не-oem|non-oem/.test(t)) return 'oem';
+ if(/одобрен|авториз|authorized|licens|лиценз/.test(t)) return 'auth';
+ if(/завод|производитель|производств|лить[её]|мехообработк|мехобработк|manufactur|casting|поковк|precision|станочн/.test(t)) return 'mfg';
+ if(/сервис|mro|ремонт|overhaul|капремонт|восстановлен|service|обслуж|стенд|инспекци/.test(t)) return 'serv';
+ return 'aft';
+}
 const ST_NAME = Object.fromEntries(STATUSES);
 const ALIASES = [
  ['turbinefieldsolutions','tfs'],['dongturbo','dongturbo'],['qingdaoobt','qingdaoobt'],['obtpower','qingdaoobt'],
@@ -314,7 +330,7 @@ function buildUnified(){
   (a.segs||[]).forEach(x=>r.segs.add(x));
  }
  UNI = [...map.values()];
- UNI.forEach(r=>{ r.bxTotal = Object.values(r.bitrix).reduce((a,b)=>a+b,0); });
+ UNI.forEach(r=>{ r.bxTotal = Object.values(r.bitrix).reduce((a,b)=>a+b,0); r.typ = classify(r); });
 }
 function coversModel(r, m){
  if(r.models.has(m)) return true;
@@ -367,7 +383,7 @@ function pkCard(r){
   <div>
    <h4>${esc(r.name)}</h4>
    <div class="mut" style="margin:2px 0 6px">${esc(r.country)}${r.role?' · '+esc(r.role):''}</div>
-   <div>${src}${confP}${prior}</div>
+   <div><span class="pill typ">${TYPE_NAME[r.typ]}</span>${src}${confP}${prior}</div>
   </div>
   <div>
    <div style="margin-bottom:4px">${[...r.segs].map(id=>`<span class="tag">${esc(SEG_SHORT(id))}</span>`).join('')||'<span class="mut">сегмент не определён</span>'}</div>
@@ -388,21 +404,20 @@ function pkCard(r){
   </div>
  </div>`;
 }
-let pkState = {model:'', seg:'', st:'', q:'', sort:'rel', showHidden:false};
+let pkState = {model:'', seg:'', typ:'', q:'', sort:'rel', showHidden:false};
 function pkFilters(){
  const s = pkState;
  s.model = document.getElementById('pk-model').value;
  s.seg = document.getElementById('pk-seg').value;
- s.st = document.getElementById('pk-st').value;
+ s.typ = document.getElementById('pk-typ').value;
  s.q = document.getElementById('pk-q').value.trim().toLowerCase();
  s.sort = document.getElementById('pk-sort').value;
  s.showHidden = document.getElementById('pk-hid').checked;
- document.querySelectorAll('#pk-quick .chip').forEach(c=>c.classList.toggle('on', c.dataset.m===s.model));
  let rows = UNI.filter(r=>{
   if(!s.showHidden && EDITS.hide[r.key]) return false;
   if(s.model && !coversModel(r,s.model)) return false;
   if(s.seg && !r.segs.has(s.seg)) return false;
-  if(s.st && (EDITS.st[r.key]||'')!==s.st) return false;
+  if(s.typ && r.typ!==s.typ) return false;
   if(s.q && ![r.name,r.country,r.role,r.what,r.site,EDITS.note[r.key]||''].join(' ').toLowerCase().includes(s.q)) return false;
   return true;
  });
@@ -416,7 +431,7 @@ function pkFilters(){
  const active = [];
  if(s.model) active.push(['model','Модель: '+s.model]);
  if(s.seg) active.push(['seg','Сегмент: '+SEG_SHORT(s.seg)]);
- if(s.st) active.push(['st','Статус: '+ST_NAME[s.st]]);
+ if(s.typ) active.push(['typ','Тип: '+TYPE_NAME[s.typ]]);
  if(s.q) active.push(['q','Поиск: '+s.q]);
  document.getElementById('pk-active').innerHTML = active.length
   ? active.map(([k,t])=>`<span class="chip on" data-clear="${k}">${esc(t)} ✕</span>`).join('') +
@@ -426,14 +441,14 @@ function pkFilters(){
 function pkClear(k){
  if(k==='model'||k==='all') document.getElementById('pk-model').value='';
  if(k==='seg'||k==='all') document.getElementById('pk-seg').value='';
- if(k==='st'||k==='all') document.getElementById('pk-st').value='';
+ if(k==='typ'||k==='all') document.getElementById('pk-typ').value='';
  if(k==='q'||k==='all') document.getElementById('pk-q').value='';
  pkFilters();
 }
 function pkCSV(){
- const lines = ['компания;страна;сегменты;модели;bitrix_запросов;доверие;статус;заметка;сайт;email;телефон;что делает'];
+ const lines = ['компания;страна;тип;сегменты;модели;bitrix_запросов;доверие;статус;заметка;сайт;email;телефон;что делает'];
  for(const r of UNI){
-  lines.push([r.name,r.country,[...r.segs].map(SEG_SHORT).join(','),
+  lines.push([r.name,r.country,TYPE_NAME[r.typ],[...r.segs].map(SEG_SHORT).join(','),
    [...r.models].join(',')+(r.sgtAll?',SGT-все':'')+(r.solarAll?',Solar-все':'')+(r.heavyAll?',тяжёлые':''),
    r.bxTotal,r.conf,ST_NAME[EDITS.st[r.key]||''],EDITS.note[r.key]||'',r.site,r.email,r.phone,r.what]
    .map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(';'));
@@ -485,15 +500,12 @@ function rPicker(){
    </select></div>
   <div class="f-field"><label>Сегмент ЗИП</label>
    <select id="pk-seg" onchange="pkFilters()"><option value="">любой</option>${SEGS.map(([id,n])=>`<option value="${id}">${esc(n)}</option>`).join('')}</select></div>
-  <div class="f-field"><label>Статус работы</label>
-   <select id="pk-st" onchange="pkFilters()"><option value="">любой</option>${STATUSES.slice(1).map(([v,n])=>`<option value="${v}">${n}</option>`).join('')}</select></div>
+  <div class="f-field"><label>Тип поставщика</label>
+   <select id="pk-typ" onchange="pkFilters()"><option value="">любой</option>${TYPES.map(([v,n])=>`<option value="${v}">${n}</option>`).join('')}</select></div>
   <div class="f-field"><label>Сортировка</label>
    <select id="pk-sort" onchange="pkFilters()">${Object.entries(SORTS).map(([v,[n]])=>`<option value="${v}">${n}</option>`).join('')}</select></div>
   <div class="f-field" style="flex:1;min-width:220px"><label>Поиск</label>
    <input id="pk-q" placeholder="компания, страна, деталь, заметка…" oninput="pkFilters()"></div>
- </div>
- <div class="chips" id="pk-quick" style="margin:4px 0 2px">
-  ${QUICK_MODELS.map(m=>`<span class="chip" data-m="${esc(m)}">${esc(m)}</span>`).join('')}
  </div>
  <div class="chips" id="pk-active" style="margin:6px 0"></div>
  <div class="filters" style="margin-top:2px">
@@ -521,12 +533,6 @@ function rPicker(){
  <div id="pk-body"></div>`;
 }
 document.addEventListener('click', e=>{
- const chip = e.target.closest('#pk-quick .chip');
- if(chip){
-  const sel = document.getElementById('pk-model');
-  sel.value = sel.value===chip.dataset.m ? '' : chip.dataset.m;
-  pkFilters(); return;
- }
  const cl = e.target.closest('#pk-active .chip');
  if(cl){ pkClear(cl.dataset.clear); return; }
  const btn = e.target.closest('.sup [data-act]');
