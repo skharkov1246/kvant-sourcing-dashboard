@@ -31,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import ru.kvant.scan.sync.LocalTask
+import ru.kvant.scan.sync.TaskDisplay
 
 /**
  * Экран списка заданий (двойник — iOS TaskListView.swift).
@@ -96,11 +97,19 @@ fun TaskListScreen(
                 )
             }
             if (state.tasks.isEmpty() && !state.isRefreshing) {
-                Text(
-                    "Заданий нет. Потяните обновление или отсканируйте деталь без задания.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(24.dp),
-                )
+                // Первый экран нового пользователя: три предложения о том,
+                // как всё устроено, вместо пустоты.
+                Column(Modifier.padding(24.dp)) {
+                    Text("Заданий пока нет", style = MaterialTheme.typography.titleMedium)
+                    Spacer(Modifier.padding(4.dp))
+                    Text(
+                        "Задания на съёмку приходят сюда сами — из офиса. " +
+                            "Появится задание — телефон покажет, что и как снимать, шаг за шагом.\n\n" +
+                            "Есть деталь под рукой? Нажмите «Сканировать» внизу — " +
+                            "съёмка без задания тоже попадает в базу.",
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                }
             }
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -136,13 +145,12 @@ private fun TaskCard(task: LocalTask, onClick: () -> Unit) {
             Spacer(Modifier.padding(2.dp))
             Row {
                 Text(
-                    task.protocolCode +
-                        (task.protocolVersion?.let { "@$it" } ?: ""),
+                    TaskDisplay.protocolName(task.protocolCode),
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.weight(1f),
                 )
                 task.dueAt?.let {
-                    Text("до ${it.take(10)}", style = MaterialTheme.typography.bodySmall)
+                    Text("до ${TaskDisplay.humanDate(it)}", style = MaterialTheme.typography.bodySmall)
                 }
             }
         }

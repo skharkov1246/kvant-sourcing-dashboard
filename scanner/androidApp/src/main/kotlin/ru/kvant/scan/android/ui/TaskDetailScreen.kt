@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import ru.kvant.scan.sync.LocalTask
+import ru.kvant.scan.sync.TaskDisplay
 
 /**
  * Детали задания (двойник — iOS TaskDetailView.swift).
@@ -41,11 +42,11 @@ fun TaskDetailScreen(
     ) {
         Text(task.title ?: "Позиция без названия", style = MaterialTheme.typography.headlineSmall)
         Text(
-            task.protocolCode + (task.protocolVersion?.let { "@$it" } ?: ""),
+            "Сценарий: ${TaskDisplay.protocolName(task.protocolCode)}",
             style = MaterialTheme.typography.bodyMedium,
         )
         task.dueAt?.let {
-            Text("Срок: ${it.take(10)}", style = MaterialTheme.typography.bodyMedium)
+            Text("Срок: до ${TaskDisplay.humanDate(it)}", style = MaterialTheme.typography.bodyMedium)
         }
         when (task.state) {
             "REWORK" -> Text(
@@ -78,14 +79,17 @@ fun TaskDetailScreen(
             Card(Modifier.fillMaxWidth().padding(vertical = 12.dp)) {
                 Column(Modifier.padding(12.dp)) {
                     subject.forEach { (key, value) ->
+                        // Служебные ключи внешней системы переводятся на язык
+                        // кладовщика; незнакомые показываются как есть.
+                        val raw = (value as? JsonPrimitive)?.content ?: value.toString()
                         Row(Modifier.padding(vertical = 2.dp)) {
                             Text(
-                                key,
+                                TaskDisplay.fieldLabel(key),
                                 style = MaterialTheme.typography.bodySmall,
                                 modifier = Modifier.weight(1f),
                             )
                             Text(
-                                (value as? JsonPrimitive)?.content ?: value.toString(),
+                                TaskDisplay.fieldValue(key, raw),
                                 style = MaterialTheme.typography.bodySmall,
                             )
                         }
