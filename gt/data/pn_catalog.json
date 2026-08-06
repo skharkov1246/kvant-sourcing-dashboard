@@ -1,0 +1,1319 @@
+{
+ "updated": "2026-08-06",
+ "source": "Партномера из публичных каталогов aftermarket и тендерных перечней (веер 06.08.2026). Написание PN сверять с каталогом-источником при RFQ.",
+ "format_notes": [
+  "[pn-solar] Структура PN Solar: 1) Основная система — числовая база + дефис-суффикс. Разрядность базы растёт хронологически: 5 разрядов 2xxxx–4xxxx (Saturn, 1960–70-е), 6 разрядов 1xxxxx (Centaur/Taurus/Mars, 1970–90-е), 2xxxxx–4xxxxx (поздние узлы, SoLoNOx, УЗК-диски Mars 410xxx), 7 разрядов 10xxxxx (современные пакетные/электрика/КИП, 1990-е+). 2) Дефис-суффиксы: -0/-1/-2… — вариант/исполнение детали; трёхзначные -100/-101/-201/-300 и т.п. — уровень сборки (сотни = конфигурация: -100 базовая сборка, -101/-102 варианты, -200/-300 следующие конфигурации); встречается двойной суффикс (117994-101-90, 30694-3-900); четырёхзначные -1000/-1200/-1900/-4000 — киты и спецкомплектации; -785 у дисков Mars — код УЗК-инспекции. 3) Буквенные суффиксы — наследие International Harvester (Solar была подразделением IH до 1981): C1/C2/C3 — ревизия детали (903316C1), C91–C96 — сборка/комплект (902291C91 fuel manifold, 914337C94 power turbine, 907988C95); R1/R92 — стандартный крепёж, фитинги и ремкомплекты (23818R1, 8007917R92 repair kit); B2/B86 — электронные блоки (895122B2, 899856B86). 4) Kit-номера вида K+номер+ревизия: 1016093K100B, 179824K100B, 068713J099A (J-серия). 5) Буквенные префиксы: E — на инжекторах/обменных узлах (E301380-600 fuel injector Titan 130); серия 70-30xxx-x — покупные вспомогательные изделия пакета (датчики, фильтры, лампы); 83G1039/83G1040 — шланги (G-серия). 6) Переиндексация: Solar перевыпускает номера — старый 219611-2 → новый 136908-2 (лопатка 1 ст. Taurus 60), суффиксная логика сохраняется; -204 vs -2 — варианты одной лопатки. 7) На surplus-рынке встречаются кроссы NSN: диск H410-3 = NSN 2835-00-317-8955. 8) Диапазоны серий грубо маркируют модель: 22xxx/24xxx/27xxx/29xxx = Saturn; 116xxx–127xxx = Centaur 40; 136xxx/196xxx = Centaur 50/Taurus 60; 127949/191xxx/410xxx = Mars; 300xxx–304xxx = поздние Taurus/Titan; 10xxxxx(7 разрядов) = пакетные системы всех моделей.",
+  "[pn-sgt] ЛИНКОЛЬН (Ruston-наследие, SGT-100/200/300/400, TA1750/TB5000). 1) Чертёжные PN с буквенным префиксом двигателя: MW##### — Cyclone/SGT-400; RM/RU/RT##### — Typhoon/SGT-100 (RM — основной чертёж, RU — узлы турбины, RT — воздухозабор); RW — общие с SGT-400 узлы; TB/TA##### — TB5000/TA1750; BM встречается для Tempest/SGT-300. Первые цифры кодируют модуль: 12xxx/13xxx компрессор и механизация ВНА, 14xxx воздухозабор/фильтры, 21xxx-22xxx камера сгорания и горелки, 31xxx ротор/лопатки, 32xxx подшипники, 33xxx турбина ВД, 34xxx диффузор, 35xxx силовая турбина, 54xxx BOV, 62xxx/71xxx прочее, 83xxx выхлоп. 2) Буквенный суффикс = ревизия чертежа (MW21215G, RM31035D, 2405043-A/B — чем дальше буква, тем новее). 3) «/NN» = исполнение/позиция в сборке или вариант (MW35024B/01, RM22303Z/01, MW22357/015, MW13023A/1 — нижняя половина, /2 — верхняя). 4) Покупные изделия пакеджа: коды вида 64/XXXXXXXX/N (зажигание, барьеры, датчики, модули AB/Bently), также 74/, 75/, 76/ — вспомсистемы; CT#### и CT9####X/NN — расходники, шланги, клапаны, электроника пакеджа; SP###### — сервис-киты и фильтры; M17/##### — сопловые лопатки SGT-100. 5) Чисто цифровые 9-значные коды — стандартный крепёж, размер зашит в код (115612055 = болт M12x55, 119410045 = винт M10x45, 219562012 = гайка M12). ФИНСПОНГ (SGT-500/600/700/800): 7-значные чертёжные номера 24xxxxx/25xxxxx с суффиксом «-буква» (ревизия: 2415650-C, 2423483-A) или «-цифра» (вариант: 2461292-1, 2415332-1); 8-значная серия 51xxxxxx-N; материальные/стандартные коды A#######-NNN (O-rings A2842152-591), T39xx-xxx (стопорные шайбы), 1CSA/SCA xxxxx-1 (трубные комплекты); новые номера SAP-формата E1B1########. Кириллическая «А» иногда подменяет латинскую в русскоязычных тендерных ведомостях (2461700-А) — при матчинге нормализовать."
+ ],
+ "rows": [
+  {
+   "pn": "22610-201",
+   "desc": "Assembly, Wheel, Turbine, 2nd — колесо турбины 2-й ступени в сборе",
+   "model": "Saturn 20",
+   "system": "горячий тракт",
+   "source": "salvex.com (лот 182999003, Solar Turbines Parts 747 items)"
+  },
+  {
+   "pn": "172896-1",
+   "desc": "Nozzle, Turbine 3rd Stage — сопловой аппарат турбины 3-й ступени",
+   "model": "Saturn 20",
+   "system": "горячий тракт",
+   "source": "salvex.com (лот 182999003)"
+  },
+  {
+   "pn": "22625-1",
+   "desc": "Nozzle, 3rd Stage (RH) — сопловой аппарат 3-й ступени (правый)",
+   "model": "Saturn 20",
+   "system": "горячий тракт",
+   "source": "salvex.com (лот 182999003)"
+  },
+  {
+   "pn": "22546-3",
+   "desc": "Tip Shoe, 1st Stage (.020 under) — надроторное уплотнение (tip shoe) 1-й ступени, ремонтный размер",
+   "model": "Saturn 20",
+   "system": "горячий тракт",
+   "source": "salvex.com (лот 182999003)"
+  },
+  {
+   "pn": "24578-0",
+   "desc": "Disc, Compressor, 7th — диск компрессора 7-й ступени",
+   "model": "Saturn 20",
+   "system": "компрессор",
+   "source": "salvex.com (лот 182999003)"
+  },
+  {
+   "pn": "24583-0",
+   "desc": "Disc, Compressor, 6th — диск компрессора 6-й ступени",
+   "model": "Saturn 20",
+   "system": "компрессор",
+   "source": "salvex.com (лот 182999003)"
+  },
+  {
+   "pn": "22581-101",
+   "desc": "Stator, 4th Stage (coated) — статор (лопаточный венец) компрессора 4-й ступени с покрытием",
+   "model": "Saturn 20",
+   "system": "компрессор",
+   "source": "salvex.com (лот 182999003)"
+  },
+  {
+   "pn": "22577-100",
+   "desc": "Stator, 3rd Stage (4x4) — статор компрессора 3-й ступени",
+   "model": "Saturn 20",
+   "system": "компрессор",
+   "source": "salvex.com (лот 182999003)"
+  },
+  {
+   "pn": "30694-3-900",
+   "desc": "Assembly, Turbine Shaft — вал турбины в сборе",
+   "model": "Saturn 20",
+   "system": "ротор",
+   "source": "salvex.com (лот 182999003)"
+  },
+  {
+   "pn": "27471-3",
+   "desc": "Spring, Loader, Fuel Control — пружина нагружателя топливного регулятора",
+   "model": "Saturn 20",
+   "system": "топливо",
+   "source": "salvex.com (лот 182999003)"
+  },
+  {
+   "pn": "710048-2",
+   "desc": "Teflon Seal (whole) — тефлоновое уплотнение",
+   "model": "Saturn 20",
+   "system": "уплотнения",
+   "source": "salvex.com (лот 182999003)"
+  },
+  {
+   "pn": "903443C1",
+   "desc": "Stud, Housing, MkII Accessory — шпилька корпуса коробки приводов MkII",
+   "model": "Saturn 20",
+   "system": "привод агрегатов",
+   "source": "salvex.com (лот 182999003)"
+  },
+  {
+   "pn": "124293-100",
+   "desc": "Assembly, Wheel, Turbine — колесо турбины в сборе",
+   "model": "Centaur 40",
+   "system": "горячий тракт",
+   "source": "salvex.com (лот 182999003)"
+  },
+  {
+   "pn": "116691-104",
+   "desc": "Disc, Compressor, 1st Stage — диск компрессора 1-й ступени",
+   "model": "Centaur 40",
+   "system": "компрессор",
+   "source": "salvex.com (лот 182999003)"
+  },
+  {
+   "pn": "117994-101-90",
+   "desc": "Disc, Compressor, 3rd Stage — диск компрессора 3-й ступени",
+   "model": "Centaur 40",
+   "system": "компрессор",
+   "source": "salvex.com (лот 182999003)"
+  },
+  {
+   "pn": "127387-401",
+   "desc": "Assembly, Disc, Compressor — диск компрессора в сборе",
+   "model": "Centaur 40",
+   "system": "компрессор",
+   "source": "salvex.com (лот 182999003)"
+  },
+  {
+   "pn": "302234-100",
+   "desc": "Stator, 4th Stage — статор компрессора 4-й ступени",
+   "model": "Centaur 40",
+   "system": "компрессор",
+   "source": "salvex.com (лот 182999003)"
+  },
+  {
+   "pn": "127373-800",
+   "desc": "Stator, 10th Stage — статор компрессора 10-й ступени",
+   "model": "Centaur 40",
+   "system": "компрессор",
+   "source": "salvex.com (лот 182999003)"
+  },
+  {
+   "pn": "191145-100",
+   "desc": "Ring, Outer, Variable, 1st Stage — наружное кольцо ВНА (поворотных лопаток) 1-й ступени",
+   "model": "Centaur 40",
+   "system": "компрессор / механизация ВНА",
+   "source": "salvex.com (лот 182999003)"
+  },
+  {
+   "pn": "116311-102",
+   "desc": "Injector, Gas — газовая топливная форсунка",
+   "model": "Centaur 40",
+   "system": "топливо",
+   "source": "salvex.com (лот 182999003)"
+  },
+  {
+   "pn": "903335C1",
+   "desc": "Stud, 1/2-13 x 1.75, Bleed Valve — шпилька клапана перепуска воздуха",
+   "model": "Centaur 40",
+   "system": "воздушная система",
+   "source": "salvex.com (лот 182999003)"
+  },
+  {
+   "pn": "196562-1",
+   "desc": "Disc, Turbine, 2nd Stg. Split — диск турбины 2-й ступени (разъёмный)",
+   "model": "Centaur 50",
+   "system": "горячий тракт",
+   "source": "salvex.com (лот 182999003)"
+  },
+  {
+   "pn": "136108-301",
+   "desc": "Stator, 8th Stage — статор компрессора 8-й ступени",
+   "model": "Centaur 50",
+   "system": "компрессор",
+   "source": "salvex.com (лот 182999003)"
+  },
+  {
+   "pn": "302490-101",
+   "desc": "Injector, SoLoNOx Dual Fuel — двухтопливная форсунка SoLoNOx",
+   "model": "Taurus 60",
+   "system": "топливо",
+   "source": "salvex.com (лот 182999003)"
+  },
+  {
+   "pn": "740020-2",
+   "desc": "Strip, Seal, Uncut — уплотнительная лента (неразрезанная)",
+   "model": "Taurus 60",
+   "system": "уплотнения",
+   "source": "salvex.com (лот 182999003)"
+  },
+  {
+   "pn": "136908-204",
+   "desc": "Turbine Blade, Stage 1 — рабочая лопатка турбины 1-й ступени (с паспортами, factory removed)",
+   "model": "Taurus 60",
+   "system": "лопатки",
+   "source": "ebay.com/itm/235395691314"
+  },
+  {
+   "pn": "219611-2",
+   "desc": "Turbine Blade, Stage 1 (старый PN; новый — 136908-2) — рабочая лопатка турбины 1-й ступени",
+   "model": "Taurus 60",
+   "system": "лопатки",
+   "source": "ebay.com (объявления surplus-лопаток Taurus 60)"
+  },
+  {
+   "pn": "70-30481-5",
+   "desc": "Disposable Filter Element, PF Taurus Gas Turbine mod GSI-TA — одноразовый фильтроэлемент",
+   "model": "Taurus 60",
+   "system": "маслосистема/фильтрация",
+   "source": "southeastoverseas.com/solar2.html"
+  },
+  {
+   "pn": "410030-785",
+   "desc": "Disc, Turbine, 1st (ultrasonic inspected) — диск турбины 1-й ступени (УЗК-контроль)",
+   "model": "Mars 90/100",
+   "system": "горячий тракт",
+   "source": "salvex.com (лот 182999003)"
+  },
+  {
+   "pn": "410031-785",
+   "desc": "Disc, Turbine, 2nd (ultrasonic) — диск турбины 2-й ступени",
+   "model": "Mars 90/100",
+   "system": "горячий тракт",
+   "source": "salvex.com (лот 182999003)"
+  },
+  {
+   "pn": "410032-785",
+   "desc": "Disc, Turbine, 3rd (ultrasonic) — диск турбины 3-й ступени",
+   "model": "Mars 90/100",
+   "system": "горячий тракт",
+   "source": "salvex.com (лот 182999003)"
+  },
+  {
+   "pn": "410033-785",
+   "desc": "Disc, Turbine, 4th (ultrasonic) — диск турбины 4-й ступени",
+   "model": "Mars 90/100",
+   "system": "горячий тракт",
+   "source": "salvex.com (лот 182999003)"
+  },
+  {
+   "pn": "1009417-1",
+   "desc": "Coupling, Starter, AC — муфта стартера (AC)",
+   "model": "Mars 90/100",
+   "system": "пусковая система",
+   "source": "salvex.com (лот 182999003)"
+  },
+  {
+   "pn": "1027931-100",
+   "desc": "Assembly, Bleed Valve — клапан перепуска воздуха в сборе",
+   "model": "Mars 90/100",
+   "system": "воздушная система",
+   "source": "salvex.com (лот 182999003)"
+  },
+  {
+   "pn": "127949-103",
+   "desc": "Housing Assy, Bearing, Fwd — корпус переднего подшипника в сборе",
+   "model": "Mars 90/100",
+   "system": "подшипники",
+   "source": "salvex.com (лот 182999003)"
+  },
+  {
+   "pn": "191567-200",
+   "desc": "Stator, 7th Stage (half) — статор компрессора 7-й ступени (половина)",
+   "model": "Mars 90/100",
+   "system": "компрессор",
+   "source": "salvex.com (лот 182999003)"
+  },
+  {
+   "pn": "916151C2",
+   "desc": "Actuator, Electrohydraulic — электрогидравлический актуатор",
+   "model": "Mars 90/100",
+   "system": "КИП/управление",
+   "source": "salvex.com (лот 182999003)"
+  },
+  {
+   "pn": "301296-1",
+   "desc": "Gasket, Copper, Mars Gas Manifold — медная прокладка газового коллектора",
+   "model": "Mars 90/100",
+   "system": "топливо",
+   "source": "salvex.com (лот 183041483)"
+  },
+  {
+   "pn": "E301380-600",
+   "desc": "Fuel Injector — топливная форсунка (префикс E)",
+   "model": "Titan 130",
+   "system": "топливо",
+   "source": "salvex.com (лот 183041483, Titan 130 PG spare parts)"
+  },
+  {
+   "pn": "300489-1203",
+   "desc": "Torch, Dual — двухтопливный факельный воспламенитель (torch)",
+   "model": "Titan 130",
+   "system": "зажигание",
+   "source": "salvex.com (лот 183041483)"
+  },
+  {
+   "pn": "917560C2",
+   "desc": "Exciter, Ignition — агрегат зажигания (ignition exciter)",
+   "model": "Titan 130",
+   "system": "зажигание",
+   "source": "salvex.com (лот 183041483)"
+  },
+  {
+   "pn": "951577C1",
+   "desc": "Igniter Injector — воспламенитель-форсунка",
+   "model": "Titan 130",
+   "system": "зажигание",
+   "source": "salvex.com (лот 183041483)"
+  },
+  {
+   "pn": "903316C1",
+   "desc": "Spark Plug — свеча зажигания",
+   "model": "Titan 130 (также в общем каталоге Saturn–Mars)",
+   "system": "зажигание",
+   "source": "salvex.com (лот 183041483); southeastoverseas.com/solar3.html"
+  },
+  {
+   "pn": "136579-1",
+   "desc": "Orifice, Torch Igniter — жиклёр факельного воспламенителя",
+   "model": "Titan 130",
+   "system": "зажигание",
+   "source": "salvex.com (лот 183041483)"
+  },
+  {
+   "pn": "304223-100",
+   "desc": "Gasket, Injector — прокладка форсунки",
+   "model": "Titan 130",
+   "system": "топливо",
+   "source": "salvex.com (лот 183041483)"
+  },
+  {
+   "pn": "204311-103",
+   "desc": "Plug Assy, Borescope — заглушка бороскопического порта в сборе",
+   "model": "Titan 130",
+   "system": "корпус/инспекция",
+   "source": "salvex.com (лот 183041483)"
+  },
+  {
+   "pn": "122221-201",
+   "desc": "Plug, Pyrometer — заглушка пирометра",
+   "model": "Titan 130",
+   "system": "КИП",
+   "source": "salvex.com (лот 183041483)"
+  },
+  {
+   "pn": "136544-4",
+   "desc": "Sensor, Speed, Passive — пассивный датчик оборотов",
+   "model": "Titan 130",
+   "system": "КИП",
+   "source": "salvex.com (лот 183041483)"
+  },
+  {
+   "pn": "190817-191",
+   "desc": "Proximitor 3300XL System (Bently Nevada) — проксиметр системы вибромониторинга",
+   "model": "Titan 130",
+   "system": "КИП/вибрация",
+   "source": "salvex.com (лот 183041483)"
+  },
+  {
+   "pn": "1023031-4",
+   "desc": "Probe, Proximity — датчик приближения (вибрация/осевой сдвиг)",
+   "model": "Titan 130",
+   "system": "КИП/вибрация",
+   "source": "salvex.com (лот 183041483)"
+  },
+  {
+   "pn": "1058190",
+   "desc": "UV Fire Sensor — УФ-датчик пламени пожарной системы",
+   "model": "Titan 130",
+   "system": "пожарная система",
+   "source": "salvex.com (лот 183041483)"
+  },
+  {
+   "pn": "127147-2",
+   "desc": "Synchroscope 60 Hz — синхроноскоп",
+   "model": "Titan 130 (генераторный пакет)",
+   "system": "электрика пакета",
+   "source": "salvex.com (лот 183041483)"
+  },
+  {
+   "pn": "127982-100",
+   "desc": "Fuel Injector Assy — топливная форсунка в сборе",
+   "model": "не указана (каталог Saturn–Mars)",
+   "system": "топливо",
+   "source": "southeastoverseas.com/solar1.html"
+  },
+  {
+   "pn": "127983-100",
+   "desc": "Injector, Dual Fuel — двухтопливная форсунка",
+   "model": "не указана (каталог Saturn–Mars)",
+   "system": "топливо",
+   "source": "southeastoverseas.com/solar1.html"
+  },
+  {
+   "pn": "242081-300",
+   "desc": "Injector ANSI Assy, Dual Fuel — двухтопливная форсунка ANSI в сборе",
+   "model": "не указана (вероятно Centaur/Taurus)",
+   "system": "топливо",
+   "source": "southeastoverseas.com/solar2.html"
+  },
+  {
+   "pn": "906494C2",
+   "desc": "Dual Fuel Injector — двухтопливная форсунка (C-суффикс, ранние модели)",
+   "model": "Saturn/Centaur (эпоха IH)",
+   "system": "топливо",
+   "source": "southeastoverseas.com/solar3.html"
+  },
+  {
+   "pn": "127670-300",
+   "desc": "Turbine Assy (Power), Gas — силовая турбина в сборе",
+   "model": "не указана (вероятно Mars)",
+   "system": "горячий тракт",
+   "source": "southeastoverseas.com/solar1.html"
+  },
+  {
+   "pn": "135406-6",
+   "desc": "1st Stage Tip Shoe — надроторное уплотнение 1-й ступени",
+   "model": "не указана (Centaur/Taurus)",
+   "system": "горячий тракт",
+   "source": "southeastoverseas.com/solar1.html"
+  },
+  {
+   "pn": "192016-100",
+   "desc": "BRG Power Turbine — подшипник силовой турбины",
+   "model": "не указана",
+   "system": "подшипники",
+   "source": "southeastoverseas.com/solar2.html"
+  },
+  {
+   "pn": "131877-300",
+   "desc": "Bearing, Tilt Pad — сегментный (tilt pad) подшипник",
+   "model": "не указана",
+   "system": "подшипники",
+   "source": "southeastoverseas.com/solar1.html"
+  },
+  {
+   "pn": "131878-300",
+   "desc": "Bearing, Tilt Pad — сегментный подшипник (парный к 131877-300)",
+   "model": "не указана",
+   "system": "подшипники",
+   "source": "southeastoverseas.com/solar1.html"
+  },
+  {
+   "pn": "196592-402",
+   "desc": "Rotor Assy — ротор в сборе",
+   "model": "не указана (Centaur 50 по серии 196xxx)",
+   "system": "ротор",
+   "source": "southeastoverseas.com/solar2.html"
+  },
+  {
+   "pn": "29450-4000",
+   "desc": "Rotor Assy, Balancing, P.T. — ротор силовой турбины (балансировка)",
+   "model": "Saturn (серия 2xxxx)",
+   "system": "ротор",
+   "source": "southeastoverseas.com/solar2.html"
+  },
+  {
+   "pn": "117850-104",
+   "desc": "Accessory Drive Assy — коробка приводов агрегатов в сборе",
+   "model": "не указана (Centaur по серии 117xxx)",
+   "system": "привод агрегатов",
+   "source": "southeastoverseas.com/solar1.html"
+  },
+  {
+   "pn": "1016093K100B",
+   "desc": "Governor Assy, Model E6B2C — регулятор оборотов в сборе",
+   "model": "не указана",
+   "system": "управление/топливо",
+   "source": "southeastoverseas.com/solar1.html"
+  },
+  {
+   "pn": "179824K100B",
+   "desc": "Pump, Lube Oil Assy — маслонасос в сборе (kit-номер K...B)",
+   "model": "не указана",
+   "system": "маслосистема",
+   "source": "southeastoverseas.com/solar1.html"
+  },
+  {
+   "pn": "1056842-200",
+   "desc": "Motor, Solar Turbine Start System — электродвигатель пусковой системы",
+   "model": "не указана (совр. пакеты)",
+   "system": "пусковая система",
+   "source": "southeastoverseas.com/solar1.html"
+  },
+  {
+   "pn": "124990-201",
+   "desc": "Starter Pneumatic Assy — пневматический стартер в сборе",
+   "model": "не указана (aero-derivate)",
+   "system": "пусковая система",
+   "source": "its-parts.com/parts/"
+  },
+  {
+   "pn": "136239-201",
+   "desc": "Harness Thermocouple/Dual Fuel Assy — жгут термопар/двухтопливной системы",
+   "model": "не указана (Centaur/Taurus)",
+   "system": "КИП",
+   "source": "southeastoverseas.com/solar1.html"
+  },
+  {
+   "pn": "117979-101",
+   "desc": "Thermocouple T/7 — термопара Т7",
+   "model": "не указана",
+   "system": "КИП",
+   "source": "southeastoverseas.com/solar1.html"
+  },
+  {
+   "pn": "120738-5",
+   "desc": "Thermocouple, Dual Tip, T5 — двухэлементная термопара Т5",
+   "model": "пакетная (мульти-модель)",
+   "system": "КИП",
+   "source": "salvex.com (лот 182999003)"
+  },
+  {
+   "pn": "44785-0",
+   "desc": "Valve, Bleed, Stg-6 — клапан перепуска воздуха 6-й ступени",
+   "model": "Saturn (серия 4xxxx)",
+   "system": "воздушная система",
+   "source": "southeastoverseas.com/solar2.html"
+  },
+  {
+   "pn": "22572-0",
+   "desc": "Stator Assy, 2nd Stage — статор компрессора 2-й ступени",
+   "model": "Saturn (серия 225xx подтверждена Salvex)",
+   "system": "компрессор",
+   "source": "southeastoverseas.com/solar2.html"
+  },
+  {
+   "pn": "22609-1",
+   "desc": "Seal, 2nd Stage Turbine — уплотнение турбины 2-й ступени",
+   "model": "Saturn",
+   "system": "уплотнения",
+   "source": "southeastoverseas.com/solar2.html"
+  },
+  {
+   "pn": "45714-1000",
+   "desc": "Starter Jaw Kit — комплект кулачковой муфты стартера",
+   "model": "Saturn/Centaur",
+   "system": "пусковая система",
+   "source": "southeastoverseas.com/solar2.html"
+  },
+  {
+   "pn": "902291C91",
+   "desc": "Fuel Manifold Assy — топливный коллектор в сборе",
+   "model": "Saturn/Centaur (эпоха IH)",
+   "system": "топливо",
+   "source": "southeastoverseas.com/solar3.html"
+  },
+  {
+   "pn": "901141C96",
+   "desc": "Gas Fuel Control Valve — регулирующий клапан газового топлива",
+   "model": "Saturn/Centaur (эпоха IH)",
+   "system": "топливо",
+   "source": "southeastoverseas.com/solar3.html"
+  },
+  {
+   "pn": "899856B86",
+   "desc": "Valve Assy, Fuel Control — топливный регулирующий клапан в сборе",
+   "model": "не указана",
+   "system": "топливо",
+   "source": "southeastoverseas.com/solar3.html"
+  },
+  {
+   "pn": "914337C94",
+   "desc": "Power Turbine Assy-RH — силовая турбина в сборе (правая)",
+   "model": "Saturn/Centaur (эпоха IH)",
+   "system": "горячий тракт",
+   "source": "southeastoverseas.com/solar3.html"
+  },
+  {
+   "pn": "907988C95",
+   "desc": "Bearing Support, Turbine — опора подшипника турбины",
+   "model": "Saturn/Centaur (эпоха IH)",
+   "system": "подшипники",
+   "source": "southeastoverseas.com/solar3.html"
+  },
+  {
+   "pn": "901599C2",
+   "desc": "Nozzle, TBG, 3rd Stage — сопловой аппарат 3-й ступени",
+   "model": "Saturn/Centaur (эпоха IH)",
+   "system": "горячий тракт",
+   "source": "southeastoverseas.com/solar3.html"
+  },
+  {
+   "pn": "906986C1",
+   "desc": "Liner Assy, Outer — наружная жаровая труба (лайнер) в сборе",
+   "model": "Saturn/Centaur (эпоха IH)",
+   "system": "камера сгорания",
+   "source": "southeastoverseas.com/solar3.html"
+  },
+  {
+   "pn": "906988C1",
+   "desc": "Liner Assy, Inner — внутренняя жаровая труба в сборе",
+   "model": "Saturn/Centaur (эпоха IH)",
+   "system": "камера сгорания",
+   "source": "southeastoverseas.com/solar3.html"
+  },
+  {
+   "pn": "103076-102",
+   "desc": "Stator Assy, Intermediate (2B Stage) — статор промежуточной ступени компрессора (нагнетателя)",
+   "model": "центробежный компрессор Solar (C-серия)",
+   "system": "компрессор",
+   "source": "southeastoverseas.com/solar1.html"
+  },
+  {
+   "pn": "122429-102",
+   "desc": "Impeller, A Stage — рабочее колесо ступени A",
+   "model": "центробежный компрессор Solar",
+   "system": "компрессор",
+   "source": "salvex.com (лот 182999003)"
+  },
+  {
+   "pn": "101758-101",
+   "desc": "Impeller, D Stage — рабочее колесо ступени D",
+   "model": "центробежный компрессор Solar",
+   "system": "компрессор",
+   "source": "salvex.com (лот 182999003)"
+  },
+  {
+   "pn": "MW21215G",
+   "desc": "Combustion Chamber — камера сгорания",
+   "model": "SGT-400 (Cyclone)",
+   "system": "горячий тракт / камера сгорания",
+   "source": "turbineblade.net (Blaze)"
+  },
+  {
+   "pn": "MW22315A",
+   "desc": "Swirler — завихритель горелки",
+   "model": "SGT-400",
+   "system": "топливо / горелка",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "MW22353",
+   "desc": "Gas Core — газовое ядро горелки",
+   "model": "SGT-400",
+   "system": "топливо / горелка",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "MW22357/015",
+   "desc": "Spray gun assembly — форсуночный узел (распылитель)",
+   "model": "SGT-400",
+   "system": "топливо",
+   "source": "поиск по china-power-contractor / aftermarket-листам"
+  },
+  {
+   "pn": "MW31002/01",
+   "desc": "Bladed disc assembly — облопаченный диск турбины",
+   "model": "SGT-400",
+   "system": "лопатки / ротор",
+   "source": "aftermarket-листы (china-power-contractor)"
+  },
+  {
+   "pn": "MW31081",
+   "desc": "Blades/buckets assembly — комплект рабочих лопаток",
+   "model": "SGT-400",
+   "system": "лопатки",
+   "source": "aftermarket-листы (china-power-contractor)"
+  },
+  {
+   "pn": "MW33311",
+   "desc": "Turbine Casing Upstream — корпус турбины (входной)",
+   "model": "SGT-400",
+   "system": "горячий тракт / корпус",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "MW33048",
+   "desc": "Plug Borescope CT1 Nozzle — бороскопическая заглушка соплового аппарата 1 ст.",
+   "model": "SGT-400",
+   "system": "горячий тракт",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "MW33324",
+   "desc": "Borescope Plug Block — блок бороскопической заглушки",
+   "model": "SGT-400",
+   "system": "горячий тракт",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "MW33314",
+   "desc": "Plug Borescope CT2 Nozzle Downstream — бороскоп. заглушка СА 2 ст.",
+   "model": "SGT-400",
+   "system": "горячий тракт",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "MW35024B/01",
+   "desc": "PT1 Borescope Plug Assy — бороскоп. заглушка силовой турбины 1 ст.",
+   "model": "SGT-400",
+   "system": "силовая турбина",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "MW35025A/01",
+   "desc": "PT2 Borescope Plug Assy — бороскоп. заглушка силовой турбины 2 ст.",
+   "model": "SGT-400",
+   "system": "силовая турбина",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "MW13023A",
+   "desc": "Unison Ring IGV — кольцо привода ВНА",
+   "model": "SGT-400",
+   "system": "компрессор / ВНА",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "MW13037A",
+   "desc": "Unison Ring Stage Zero — кольцо привода НА нулевой ступени",
+   "model": "SGT-400",
+   "system": "компрессор",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "MW13024",
+   "desc": "Unison Ring Stage 1 — кольцо привода НА 1 ст.",
+   "model": "SGT-400",
+   "system": "компрессор",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "MW13039D",
+   "desc": "Distribution Shaft (one piece) — распределительный вал привода ВНА",
+   "model": "SGT-400",
+   "system": "компрессор / механизация",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "MW13052C",
+   "desc": "IGV Indicator Scale Lever — рычаг со шкалой указателя ВНА",
+   "model": "SGT-400",
+   "system": "компрессор",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "MW12017A",
+   "desc": "Labyrinth Seal Compressor Inlet — лабиринтное уплотнение входа компрессора",
+   "model": "SGT-400",
+   "system": "компрессор / уплотнения",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "MW32611C",
+   "desc": "Bearing Housing — корпус подшипника",
+   "model": "SGT-400",
+   "system": "подшипники",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "MW32617D",
+   "desc": "Labyrinth Seal — лабиринтное уплотнение",
+   "model": "SGT-400",
+   "system": "уплотнения",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "MW32618B/02",
+   "desc": "Thrust Bearing Retainer Sub-Assy — узел фиксации упорного подшипника",
+   "model": "SGT-400",
+   "system": "подшипники",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "MW34009/01",
+   "desc": "Bearing Insert / Diffuser Assy — вставка подшипника с диффузором",
+   "model": "SGT-400",
+   "system": "выхлоп / диффузор",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "MW83011/1",
+   "desc": "Exhaust Flexible Joint — гибкий компенсатор выхлопа",
+   "model": "SGT-400",
+   "system": "выхлоп",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "MW21221",
+   "desc": "Disc Spring — тарельчатая пружина камеры сгорания",
+   "model": "SGT-400",
+   "system": "камера сгорания / крепёж",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "MW62018",
+   "desc": "Joint — прокладка/соединение",
+   "model": "SGT-400",
+   "system": "прокладки",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "MW71047/3",
+   "desc": "Shim — регулировочная прокладка",
+   "model": "SGT-400",
+   "system": "крепёж",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "MW14511/1",
+   "desc": "Filter — фильтр",
+   "model": "SGT-400",
+   "system": "воздушный тракт",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "RW22314/12",
+   "desc": "C-Seal — С-образное уплотнение",
+   "model": "SGT-400",
+   "system": "уплотнения",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "RW21222/2",
+   "desc": "Capscrew — винт камеры сгорания",
+   "model": "SGT-400",
+   "system": "крепёж",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "64/07001510/1",
+   "desc": "Ignition Unit — блок зажигания",
+   "model": "SGT-400",
+   "system": "зажигание",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "CT92470D/4810",
+   "desc": "Overspeed Trip Module — модуль защиты от разноса",
+   "model": "SGT-400",
+   "system": "КИП / защиты",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "CT3116/1",
+   "desc": "Thermocouple Probe — термопарный зонд",
+   "model": "SGT-400",
+   "system": "КИП",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "RM31035D",
+   "desc": "HP Rotor Blades CMSX-4, triple fin (61 шт.) — рабочие лопатки ТВД, монокристалл CMSX-4",
+   "model": "SGT-100 (Typhoon)",
+   "system": "лопатки",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "RM31001A/813",
+   "desc": "Spare blade set axial CMSX-4 — комплект лопаток (осевой), CMSX-4",
+   "model": "SGT-100",
+   "system": "лопатки",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "RM21023P",
+   "desc": "Flame Tube Assembly DLE — жаровая труба (DLE)",
+   "model": "SGT-100",
+   "system": "камера сгорания",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "RM22303Z/01",
+   "desc": "Main Burner Assembly, gold seals — основная горелка (золотые уплотнения)",
+   "model": "SGT-100",
+   "system": "топливо / горелки",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "RM22326C/01",
+   "desc": "Pilot Burner Assembly — дежурная (пилотная) горелка",
+   "model": "SGT-100",
+   "system": "топливо / горелки",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "RM22130B/02",
+   "desc": "Pilot Burner Assembly — пилотная горелка (исполнение B/02)",
+   "model": "SGT-100",
+   "system": "топливо / горелки",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "RM22343/01",
+   "desc": "Liquid Fuel Lance Assembly — форсунка жидкого топлива",
+   "model": "SGT-100",
+   "system": "топливо",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "RM33011T",
+   "desc": "Transition Duct — переходной канал (газосборник)",
+   "model": "SGT-100",
+   "system": "горячий тракт",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "RM33030C",
+   "desc": "Transition Duct Clamp Assembly — хомут переходного канала",
+   "model": "SGT-100",
+   "system": "горячий тракт",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "M17/33181",
+   "desc": "HP Nozzle — сопловая лопатка ТВД (локализующая)",
+   "model": "SGT-100 / SGT-100-2S",
+   "system": "горячий тракт / СА",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "M17/33182",
+   "desc": "HP Nozzle non-locating — сопловая лопатка ТВД",
+   "model": "SGT-100",
+   "system": "горячий тракт / СА",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "M17/33183",
+   "desc": "HP Nozzle borescope — сопловая лопатка ТВД (с бороскоп. отверстием)",
+   "model": "SGT-100",
+   "system": "горячий тракт / СА",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "RU33333C",
+   "desc": "Rotor Tip Seal HP — сотовое надбандажное уплотнение ТВД",
+   "model": "SGT-100",
+   "system": "уплотнения",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "RU33334C",
+   "desc": "Rotor Tip Seal HP LH borescope — сотовая вставка (левая, бороскоп)",
+   "model": "SGT-100",
+   "system": "уплотнения",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "RM33041B",
+   "desc": "Sealing Strip — уплотнительная полоса",
+   "model": "SGT-100",
+   "system": "уплотнения",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "RM33313B/01",
+   "desc": "Borescope Plug Assembly LP U/S — бороскоп. заглушка ТНД",
+   "model": "SGT-100",
+   "system": "горячий тракт",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "RM22207",
+   "desc": "Seal Ring (O-ring) T99 turbine — уплотнительное кольцо",
+   "model": "SGT-100",
+   "system": "уплотнения",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "RM54003",
+   "desc": "BOV Joint Gasket — прокладка антипомпажного клапана",
+   "model": "SGT-100",
+   "system": "воздушный тракт",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "64/51004015/3",
+   "desc": "Thermocouple Assembly — термопара в сборе",
+   "model": "SGT-100",
+   "system": "КИП",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "SP036027",
+   "desc": "5 micron Filter Element — фильтроэлемент 5 мкм",
+   "model": "SGT-100 / SGT-400",
+   "system": "маслосистема",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "RT14012B",
+   "desc": "Air intake protective mesh — защитная сетка воздухозабора",
+   "model": "SGT-100 (Typhoon)",
+   "system": "воздушный тракт",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "CT94371B/04",
+   "desc": "Electronic Turbine Control Unit (ECU) — электронный блок управления",
+   "model": "SGT-100-2S / SGT-400",
+   "system": "САУ",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "64/51031004/6",
+   "desc": "Proximitor/Seismic Monitor 3500/42-02-00 (Bently Nevada) — модуль вибромониторинга",
+   "model": "SGT-100-2S",
+   "system": "КИП / вибрация",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "64/52004053/023",
+   "desc": "Processor Module 1756-L63 (Allen-Bradley) — процессорный модуль САУ",
+   "model": "SGT-100-2S",
+   "system": "САУ",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "64/09001062/122",
+   "desc": "Safety Barrier KFD2-SOT2-Ex2 — барьер искрозащиты",
+   "model": "SGT-100-2S",
+   "system": "КИП",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "RU09000C/PT13650",
+   "desc": "Overspeed Shutdown Module — модуль останова по разносу",
+   "model": "SGT-100-2S",
+   "system": "защиты",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "64/09001191/6",
+   "desc": "Electronic Control Unit — электронный блок управления",
+   "model": "SGT-200 (Tornado)",
+   "system": "САУ",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "64/05010071/10",
+   "desc": "Emergency Oil Pump (Albany) — аварийный маслонасос",
+   "model": "SGT-200",
+   "system": "маслосистема",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "64/07001510/2",
+   "desc": "High-voltage Ignition Unit — высоковольтный блок зажигания",
+   "model": "SGT-200",
+   "system": "зажигание",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "CT94138B/011150",
+   "desc": "Main Fuel Control Valve — основной топливный регулирующий клапан",
+   "model": "SGT-200",
+   "system": "топливо",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "64/60003032/2",
+   "desc": "PT200 Pressure Transducer — датчик давления",
+   "model": "SGT-200",
+   "system": "КИП",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "TA54090B",
+   "desc": "Blow-Off Valve — антипомпажный (сбросной) клапан",
+   "model": "TA1750 / TB5000 / SGT-200 Tornado",
+   "system": "воздушный тракт",
+   "source": "task-pro.co.uk"
+  },
+  {
+   "pn": "TB-52103D",
+   "desc": "Gas Fuel Throttle Valve component — узел газового дроссельного клапана",
+   "model": "TB5000",
+   "system": "топливо",
+   "source": "task-pro.co.uk"
+  },
+  {
+   "pn": "TB52116E",
+   "desc": "Gas Fuel Throttle Valve component — узел газового дроссельного клапана",
+   "model": "TB5000",
+   "system": "топливо",
+   "source": "task-pro.co.uk"
+  },
+  {
+   "pn": "TB05251G",
+   "desc": "Flexi Hose Assembly — гибкий рукав",
+   "model": "TB5000",
+   "system": "трубопроводы",
+   "source": "task-pro.co.uk"
+  },
+  {
+   "pn": "64/60020020/2",
+   "desc": "Fire Safe Shut-off Ball Valve — пожаробезопасный отсечной шаровой кран",
+   "model": "TB5000 / Ruston line",
+   "system": "топливо",
+   "source": "task-pro.co.uk"
+  },
+  {
+   "pn": "64/51001096",
+   "desc": "Igniter coil pack — катушка зажигания",
+   "model": "TA1750 / TB5000 / TB5400",
+   "system": "зажигание",
+   "source": "task-pro.co.uk"
+  },
+  {
+   "pn": "TA23119",
+   "desc": "Igniter Plug — свеча зажигания",
+   "model": "TA1750 / TB5000",
+   "system": "зажигание",
+   "source": "task-pro.co.uk, supply.parts"
+  },
+  {
+   "pn": "CT95245A/01",
+   "desc": "Fuel Valve Actuator — привод топливного клапана",
+   "model": "TB5000 / Ruston line",
+   "system": "топливо",
+   "source": "task-pro.co.uk"
+  },
+  {
+   "pn": "2423483-A",
+   "desc": "Guide Vane stage 1/2 — направляющая лопатка 1–2 ст.",
+   "model": "SGT-800",
+   "system": "лопатки / СА",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "2424101-B",
+   "desc": "Combustion Chamber — камера сгорания",
+   "model": "SGT-800",
+   "system": "камера сгорания",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "2428811-A",
+   "desc": "Burner (30 шт. на комплект) — горелка",
+   "model": "SGT-800",
+   "system": "топливо / горелки",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "2423974-B",
+   "desc": "Rotor blade stage 1 — рабочая лопатка 1 ст.",
+   "model": "SGT-800",
+   "system": "лопатки",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "2423768-C",
+   "desc": "Rotor blade stage 2 — рабочая лопатка 2 ст.",
+   "model": "SGT-800",
+   "system": "лопатки",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "2423313-1",
+   "desc": "Thermal shield (heat shield) st.1–3 — тепловой экран",
+   "model": "SGT-800",
+   "system": "горячий тракт",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "2420470-5",
+   "desc": "Outer guide (segment) — наружный сегмент",
+   "model": "SGT-800",
+   "system": "горячий тракт",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "2420129-1",
+   "desc": "Coupling Bolt — стяжной болт муфты",
+   "model": "SGT-800",
+   "system": "ротор / крепёж",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "SCA 20286-1",
+   "desc": "Reducer Oil Pipe Kit item — элемент комплекта маслопроводов редуктора",
+   "model": "SGT-800",
+   "system": "маслосистема",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "2415650-C",
+   "desc": "Combustion Chamber — камера сгорания",
+   "model": "SGT-700",
+   "system": "камера сгорания",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "2461017-A",
+   "desc": "Burner — горелка",
+   "model": "SGT-700",
+   "system": "топливо / горелки",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "2460801-A",
+   "desc": "Turbine Blade stage 1 — рабочая лопатка 1 ст.",
+   "model": "SGT-700",
+   "system": "лопатки",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "2462071-A",
+   "desc": "Turbine Blade stage 2 — рабочая лопатка 2 ст.",
+   "model": "SGT-700",
+   "system": "лопатки",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "2462219-B",
+   "desc": "Turbine Blade stage 3 — рабочая лопатка 3 ст.",
+   "model": "SGT-700",
+   "system": "лопатки",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "2461700-A",
+   "desc": "Vane stage 1 — сопловая лопатка 1 ст.",
+   "model": "SGT-700",
+   "system": "лопатки / СА",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "2462333-A",
+   "desc": "Vane stage 2 — сопловая лопатка 2 ст.",
+   "model": "SGT-700",
+   "system": "лопатки / СА",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "E1B100006241",
+   "desc": "Heat Shields stage 1 — тепловые экраны 1 ст. (новый SAP-формат PN)",
+   "model": "SGT-700",
+   "system": "горячий тракт",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "2415445-B",
+   "desc": "External Segments stage 1 — наружные сегменты 1 ст.",
+   "model": "SGT-700",
+   "system": "горячий тракт",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "2415335-2",
+   "desc": "Vane stage 3 — сопловая лопатка 3 ст.",
+   "model": "SGT-700",
+   "system": "лопатки / СА",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "2511628",
+   "desc": "Turbine Blade stage 1 — рабочая лопатка 1 ст.",
+   "model": "SGT-600",
+   "system": "лопатки",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "2409801",
+   "desc": "Turbine Blade stage 2 — рабочая лопатка 2 ст.",
+   "model": "SGT-600",
+   "system": "лопатки",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "2510426",
+   "desc": "Turbine Blades stage 4 — рабочие лопатки 4 ст.",
+   "model": "SGT-600",
+   "system": "лопатки",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "2409798",
+   "desc": "Guide Vanes stage 1 — направляющие лопатки 1 ст.",
+   "model": "SGT-600",
+   "system": "лопатки / СА",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "2407531",
+   "desc": "Guide Vanes stage 2 — направляющие лопатки 2 ст.",
+   "model": "SGT-600",
+   "system": "лопатки / СА",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "2409539-K",
+   "desc": "Combustion Chamber — камера сгорания",
+   "model": "SGT-600",
+   "system": "камера сгорания",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "2405043-A",
+   "desc": "Segment (turbine) — сегмент турбины",
+   "model": "SGT-600",
+   "system": "горячий тракт",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "51054955-A",
+   "desc": "Segment — сегмент (8-значная серия 51xxxxxx)",
+   "model": "SGT-600",
+   "system": "горячий тракт",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "2511598-A",
+   "desc": "Weighed set of turbine blades stage 3 — взвешенный комплект лопаток 3 ст.",
+   "model": "SGT-600",
+   "system": "лопатки",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "A2842152-591",
+   "desc": "O-ring — уплотнительное кольцо (материальный код A-серии)",
+   "model": "SGT-600",
+   "system": "уплотнения",
+   "source": "turbineblade.net"
+  },
+  {
+   "pn": "T3904-178",
+   "desc": "Locking washer — стопорная шайба (стандартный код T-серии)",
+   "model": "SGT-600",
+   "system": "крепёж",
+   "source": "turbineblade.net"
+  }
+ ]
+}
