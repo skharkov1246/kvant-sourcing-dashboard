@@ -1192,9 +1192,10 @@ def review_parts_item(n: str,
         f'<span class="dim"> — появится в приложении кладовщика</span></form>'
     )
     marks = " ".join(f'<span class="{ "ok" if v else "no" }">{k}</span>' for k, v in done.items())
+    from urllib.parse import quote as _q
     gallery = "".join(
-        f'<a href="/review/parts/photo?key={_html.escape(k)}">'
-        f'<img src="/review/parts/photo?key={_html.escape(k)}" loading="lazy"></a>'
+        f'<a href="/review/parts/photo?key={_q(k)}">'
+        f'<img src="/review/parts/photo?key={_q(k)}" loading="lazy"></a>'
         for k in photos)
     kv = "".join(
         f"<tr><th>{label}</th><td>{esc(row.get(col))}</td></tr>"
@@ -1278,9 +1279,10 @@ def review_parts_photos(deal: str,
     idx_path = _Path(__file__).resolve().parent.parent / "data" / "knowledge" / "photo_index.json"
     idx = _json.loads(idx_path.read_text(encoding="utf-8")) if idx_path.exists() else {}
     keys = idx.get(deal, [])
+    from urllib.parse import quote as _q
     imgs = "".join(
-        f'<a href="/review/parts/photo?key={_html.escape(k)}">'
-        f'<img src="/review/parts/photo?key={_html.escape(k)}" loading="lazy"></a>'
+        f'<a href="/review/parts/photo?key={_q(k)}">'
+        f'<img src="/review/parts/photo?key={_q(k)}" loading="lazy"></a>'
         for k in keys
     )
     page = f"""<!doctype html><html lang="ru"><head><meta charset="utf-8">
