@@ -39,10 +39,13 @@ PROTOCOL = {
 
 
 def _ctx(quality=0.9, label_data=None):
+    # Кадры в счастливом пути обязаны быть: сессия «фото-шаги завершены,
+    # а кадров нет» — это дыра из живого архива, её ловит предохранитель.
     return SessionContext(results={
-        "overview": StepResult("overview", "COMPLETED", quality_score=quality),
+        "overview": StepResult("overview", "COMPLETED", quality_score=quality,
+                               asset_ids=["a-overview"]),
         "label": StepResult("label", "COMPLETED", data=label_data or {},
-                            quality_score=quality),
+                            quality_score=quality, asset_ids=["a-label"]),
     })
 
 

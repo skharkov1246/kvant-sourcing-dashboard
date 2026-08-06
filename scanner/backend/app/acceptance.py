@@ -197,6 +197,32 @@ class AcceptanceDecision:
     downgraded_from: str | None = None
 
 
+def archive_lesson_flags(protocol: dict[str, Any], ctx: SessionContext) -> list[str]:
+    """Предохранители, выведенные из живого архива «Реестр деталей и замеров».
+
+    В старом архиве замеры были у 4 позиций из 102, масштабная опора — на
+    16 кадрах из 87: деталь сфотографирована, а размеры не восстановить.
+    Эти дыры детерминированно ловятся ДО модели: если протокол предусматривал
+    обмер, а сессия завершилась без единого замера — контролёр обязан это
+    увидеть, даже когда остальные правила дали автоприём.
+    """
+    flags: list[str] = []
+    steps = protocol.get("steps") or []
+    has_measure_step = any(s.get("kind") == "measure" for s in steps)
+    if has_measure_step and not ctx.measurement_accuracy:
+        flags.append("нет ни одного замера — размеры не восстановить")
+    # Фото-шаги «завершены», а кадров во всей сессии нет: галочки есть,
+    # снимков нет. Уровень сессии, не шага: кадр законно может прикрепляться
+    # позже отдельным событием (asset.attached).
+    photo_done = [
+        r for s in steps if s.get("kind") == "photo"
+        if (r := ctx.results.get(s.get("id", ""))) is not None and r.status == "COMPLETED"
+    ]
+    if photo_done and not any(r.asset_ids for r in ctx.results.values()):
+        flags.append("фото-шаги завершены, но в сессии нет ни одного кадра")
+    return flags
+
+
 class AcceptancePipeline:
     def __init__(self, transport: LlmTransport,
                  registry: Registry | None = None) -> None:
@@ -217,6 +243,7 @@ class AcceptancePipeline:
                 reasons=["reject_if протокола: условие регламента нарушено"],
             )
         rules_accept = auto_accept(protocol, ctx)
+        lesson_flags = archive_lesson_flags(protocol, ctx)
 
         # Эшелон 2: извлечение вердикта моделью из реестра ролей.
         resolution = self._registry.resolve("acceptance-extractor", tenant)
@@ -252,11 +279,12 @@ class AcceptancePipeline:
         if verdict is None:
             return AcceptanceDecision(
                 outcome="MANUAL_REVIEW",
-                reasons=[llm_reason or "llm_unavailable"],
+                reasons=[llm_reason or "llm_unavailable"]
+                        + [f"урок архива: {f}" for f in lesson_flags],
                 model_used=model_used,
                 downgraded_from=resolution.downgraded_from,
             )
-        if rules_accept and verdict.session_ok and not verdict.quality_flags:
+        if rules_accept and not lesson_flags and verdict.session_ok and not verdict.quality_flags:
             return AcceptanceDecision(
                 outcome="AUTO_ACCEPTED",
                 verdict=verdict,
@@ -266,6 +294,7 @@ class AcceptancePipeline:
         reasons = []
         if not rules_accept:
             reasons.append("правила протокола не дали автоприём")
+        reasons.extend(f"урок архива: {f}" for f in lesson_flags)
         if not verdict.session_ok:
             reasons.append("вето извлекателя: " + "; ".join(verdict.missing_items or ["без деталей"]))
         reasons.extend(f"флаг: {f}" for f in verdict.quality_flags)
