@@ -5,12 +5,17 @@
 {$KVANT_DOMAIN} {
 	encode gzip
 
-	# Дашборд контролёра — пока dev-инструмент без OIDC (§07.2), поэтому
-	# он закрыт HTTP-аутентификацией отдельно от API устройств.
-	@review path /review*
+	# Дашборд контролёра и API ревью — пока dev-инструмент без OIDC (§07.2),
+	# поэтому закрыты HTTP-аутентификацией отдельно от API устройств.
+	# После аутентификации прокси сам утверждает субъект: заголовки
+	# перезаписываются, чтобы клиент не мог назначить себе роль снаружи.
+	@review path /review* /v1/review*
 	basic_auth @review {
 		{$KVANT_REVIEW_USER} {$KVANT_REVIEW_PASSWORD_HASH}
 	}
+	request_header @review X-Tenant-Id "t-internal"
+	request_header @review X-User-Id "reviewer"
+	request_header @review X-Roles "reviewer"
 
 	# Кадры и видео идут чанками по мегабайту; лимит держим с запасом,
 	# но не бесконечным — иначе один клиент забьёт диск буфера.
