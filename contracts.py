@@ -288,10 +288,20 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
         plan = (plan_by_seq.get(seq) if seq else None) or plan_by_id.get(did)
         plan_md = plan_pct = plan_profit = plan_ppct = plan_rev = None
         plan_susp = False
+        plan_psrc = None
+        plan_break = None
         if plan and rub:
             _rev = plan.get("revenue_net") or plan.get("revenue")
             _md = plan.get("margin_income_net") if plan.get("margin_income_net") is not None else plan.get("margin_income")
-            _pf = plan.get("deal_profit_net") if plan.get("deal_profit_net") is not None else plan.get("deal_profit")
+            # «Прибыль по сделке» заполнена лишь у 118 книг, «Операционная прибыль» — у 234.
+            # Берём каскадом: обе уже ПОСЛЕ прямых переменных и прочих прямых расходов.
+            def _nz(v):
+                return v if isinstance(v, (int, float)) and v else None
+            _pf = _nz(plan.get("deal_profit_net")) or _nz(plan.get("deal_profit"))
+            plan_psrc = "deal" if _pf is not None else None
+            if _pf is None:
+                _pf = _nz(plan.get("op_profit_net")) or _nz(plan.get("op_profit"))
+                plan_psrc = "op" if _pf is not None else None
             plan_rev = _rev * rub if _rev else None
             plan_md = _md * rub if _md is not None else None
             plan_profit = _pf * rub if _pf is not None else None
@@ -300,6 +310,24 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
             plan_ppct = round(plan.get("profit_pct") * 100, 1) if plan.get("profit_pct") is not None else None
             # бюджет не бьётся с суммой сделки в разы — вероятно, книга-заготовка или не та сделка
             plan_susp = bool(sale > 1000 and plan_rev and not 0.25 <= plan_rev / sale <= 4.0)
+            def _e(*names):
+                for n in names:
+                    v = plan.get(n)
+                    if isinstance(v, (int, float)) and v:
+                        return round(v * rub)
+                return None
+            plan_break = {
+                "rev": _e("revenue_net", "revenue"),
+                "buy": _e("purchase_net", "purchase"),
+                "logi": _e("intl_logistics_net", "intl_logistics"),
+                "direct": _e("direct_costs_net", "direct_costs"),
+                "md": _e("margin_income_net", "margin_income"),
+                "other": _e("other_costs_net", "other_costs"),
+                "op": _e("op_profit_net", "op_profit"),
+                "deal": _e("deal_profit_net", "deal_profit"),
+                "normMd": plan.get("margin_norm"), "normPf": plan.get("profit_norm"),
+                "status": plan.get("status") or "", "executor": plan.get("executor") or "",
+            }
 
         # --- тайминг стадий сделки в кат.0
         tl = dhist.get(did, [])
@@ -437,7 +465,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
             "planProfitLbl": _money(plan_profit) if plan_profit is not None else "—",
             "planProfitPct": plan_ppct,
             "planRevEur": round(plan_rev) if plan_rev is not None else None,
-            "planSusp": plan_susp,
+            "planSusp": plan_susp, "planPSrc": plan_psrc, "planBreak": plan_break,
             "planMod": str((plan or {}).get("modified") or ""),
             "econPaid": _money(_parse_econ_money(d.get(ECON_PAID), rate)) if d.get(ECON_PAID) else "",
             "econRest": _money(_parse_econ_money(d.get(ECON_REST), rate)) if d.get(ECON_REST) else "",
