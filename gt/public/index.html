@@ -1017,8 +1017,8 @@ const PARTS = {
    "components": [
     {"ru": "Камера сгорания (в сборе)", "en": "combustion chamber / combustor assembly", "note": "фокус закупки КВАНТ: SGT-400 → PN MW21215M", "crit": "A"},
     {"ru": "Жаровая труба", "en": "combustion liner / can", "note": "главный ресурсный элемент; реверс освоен в Китае", "crit": "A"},
-    {"ru": "Основная горелка DLE", "en": "main burner (DLE)", "note": "SGT-400 DUAL DLE → PN MW22316B/01; ремонт — Score Energy (единственный Siemens-одобренный не-OEM цех)", "crit": "A"},
-    {"ru": "Пилотная горелка", "en": "pilot burner", "note": "есть в прайсе Leda Greenpower по SGT-400", "crit": "A"},
+    {"ru": "Основная горелка DLE / комплект горелок", "en": "main burner (DLE) / burner kit", "note": "SGT-400 DUAL DLE → PN MW22316B/01, ремонт — Score Energy (единственный Siemens-одобренный не-OEM цех); Solar: комплект горелок 372308-3500 (наша сделка ЗП6071593)", "crit": "A"},
+    {"ru": "Пилотная / запальная горелка", "en": "pilot burner", "note": "есть в прайсе Leda Greenpower по SGT-400; Solar: горелка запальная E204529-900 (наша сделка ЗП6071591)", "crit": "A"},
     {"ru": "Переходной патрубок", "en": "transition piece / duct", "note": "литьё+жаропрочная сварка; O.B.T Qingdao делает по SGT-400", "crit": "A"},
     {"ru": "Запальник / свеча", "en": "igniter / spark plug", "note": "узкая ниша — TESI IGNITERS (Италия)", "crit": "B"},
     {"ru": "Топливные форсунки", "en": "fuel injectors / nozzles", "note": "у Solar — ключевой регулярный расходник, замена на каждом ТО", "crit": "A"}
@@ -1117,7 +1117,7 @@ const PN = {
    "id": "solar",
    "title": "Solar Turbines",
    "rules": [
-    {"pattern": "числовой PN + «-суффикс»", "meaning": "PN Solar — числовые (6–7 цифр), суффикс через дефис задаёт исполнение/конфигурацию, ревизии — буквами. Деталь существует на двух уровнях: engine part (двигатель) и package part (пакет) — в RFQ указывать уровень.", "examples": "формат вида 1234567-100; конкретные PN брать из IPC агрегата", "status": "⚠ проверить на первом реальном IPC/КП"},
+    {"pattern": "числовой PN + «-суффикс»", "meaning": "PN Solar — числовой базовый номер (6 цифр, у части позиций буквенный префикс, напр. E) + суффикс исполнения через дефис (3–4 цифры); ревизии — буквами. Деталь существует на двух уровнях: engine part (двигатель) и package part (пакет) — в RFQ указывать уровень.", "examples": "372308-3500 — комплект горелок (наша сделка ЗП6071593); E204529-900 — горелка запальная (ЗП6071591)", "status": "подтверждено сделками Bitrix 2026"},
     {"pattern": "привязка к серийнику", "meaning": "Конфигурация машины Solar жёстко привязана к серийному номеру пакета — один и тот же узел на разных серийниках может иметь разные PN. В RFQ всегда: модель + серийный номер пакета + PN.", "examples": "", "status": "правило для RFQ"},
     {"pattern": "каналы каталогов", "meaning": "IPC (Illustrated Parts Catalog) и сервисные бюллетени — у эксплуатанта агрегата; кросс-номера умеют независимые MRO (S&S Turbine Services, Alba Power/Sulzer). Дилерская сеть Caterpillar для РФ закрыта.", "examples": "", "status": "план действий"}
    ]
@@ -1136,6 +1136,164 @@ const PN = {
 }
 ;
 const CUSTOMS = {"hs": "8411 (турбины газовые и их части: 841181/841182/841199)", "period": "2023-01 … 2026-03", "total_records": 1347, "visible_records": 650, "by_year": [{"year": "2023", "n": 484, "kg": 7456}, {"year": "2024", "n": 160, "kg": 2240}, {"year": "2025", "n": 6, "kg": 156}], "top_exporters": [{"name": "АО МОТОР СИЧ", "n": 76}, {"name": "GE HUNGARY KFT", "n": 54}, {"name": "GE HUNGARY KGT", "n": 41}, {"name": "NUOVO PIGNONE INTERNATIONAL S.R.L.", "n": 33}, {"name": "GE ENERGY PRODUCTS FRANCE SNC", "n": 32}, {"name": "FOSHAN XINCHUANG INDUSTRIAL COMPANY LIMITED", "n": 18}, {"name": "DONGTURBO ELECTRIC COMPANY LTD.", "n": 13}, {"name": "ALLIED SIGNAL AEROSPACE", "n": 12}, {"name": "HONEYWELL", "n": 11}, {"name": "АО МОТОР СИЧ УКРАИНА", "n": 10}, {"name": "HONEYWELL INTERNATIONAL INC.", "n": 10}, {"name": "ПАО МОТОР СИЧ", "n": 10}, {"name": "MITSUBISHI CORPORATION", "n": 8}, {"name": "HOMEDIA(ZHANGZHOU) IMPORT AND EXPORT CO. LTD", "n": 8}, {"name": "АО ОДК-КЛИМОВ", "n": 7}], "top_importers": [{"name": "ООО РГТ", "n": 131}, {"name": "ООО СТС", "n": 64}, {"name": "АО Р****", "n": 48}, {"name": "АО ЮТЭЙР************", "n": 44}, {"name": "АО УР******* ЗАВОД ГРАЖ******* АВИ*****", "n": 25}, {"name": "ООО ДЖИИ РУС", "n": 21}, {"name": "ПАО АВИ********* Ю*****", "n": 14}, {"name": "АО ЮТЭЙР************ УС*****", "n": 11}, {"name": "ООО ПРО*******", "n": 10}, {"name": "ООО АВИ*********", "n": 10}, {"name": "ООО АЭР", "n": 10}, {"name": "ООО ТА*******", "n": 10}, {"name": "ООО ГТ ИНЖИ*******", "n": 9}, {"name": "ООО САХ******** ЭНЕ*****", "n": 9}, {"name": "ООО С 7 ИНЖИ*******", "n": 8}], "countries": [{"code": "CN", "n": 131}, {"code": "NL", "n": 56}, {"code": "HU", "n": 48}, {"code": "LT", "n": 40}, {"code": "AE", "n": 38}, {"code": "TR", "n": 34}, {"code": "PL", "n": 27}, {"code": "IN", "n": 26}, {"code": "UZ", "n": 26}, {"code": "MV", "n": 23}], "models": [{"model": "GT10", "n": 5, "exporters": ["DONGTURBO ELECTRIC COMPANY LTD."]}, {"model": "SGT-600", "n": 4, "exporters": ["DONGTURBO ELECTRIC COMPANY LTD."]}, {"model": "SGT-100", "n": 3, "exporters": ["SIEMENS INDUSTRIAL TURBOMACHINERY LTD.", "SIEMENS ENERGY INDUSTRIAL TURBOMACHINERY LTD", "SIEMENS ENERGY AG."]}, {"model": "SGT-400", "n": 2, "exporters": ["SUZHOU FUHANG MACHINERY CO.LTD"]}, {"model": "SGT-200", "n": 1, "exporters": ["SIEMENS INDUSTRIAL TURBOMACHINERY LTD. UK"]}, {"model": "SGT-700", "n": 1, "exporters": ["DONGTURBO ELECTRIC COMPANY LTD"]}, {"model": "TAURUS", "n": 1, "exporters": ["SOLAR TURBINES"]}, {"model": "MARS", "n": 1, "exporters": ["SOLAR TURBINES"]}, {"model": "SGT-800", "n": 1, "exporters": ["SIEMENS ENERGY GLOBAL GMBH & CO. KG."]}]};
+const BITRIX = {
+ "updated": "2026-08-06",
+ "source": "СИД: названия ГТУ-сделок из data/chat_snapshot.json (снимок чатов). Запросы СП-166 и поставщики подтянутся выгрузкой gt/tools/bitrix_gt.py (нужен BITRIX_WEBHOOK_URL).",
+ "live": false,
+ "deals": [
+  {
+   "id": "22576",
+   "title": "Запрос КП на расходные материалы для инспекции А ГТУ Siemens S",
+   "models": [
+    "Siemens (модель уточнить)"
+   ],
+   "stage": null,
+   "created": null,
+   "rfqs": []
+  },
+  {
+   "id": "22524",
+   "title": "ЗП6072608 ЗиП ГТУ (крепеж для лопаток) ЮНИПРО 9FA",
+   "models": [
+    "GE 9FA (вне фокуса)"
+   ],
+   "stage": null,
+   "created": null,
+   "rfqs": []
+  },
+  {
+   "id": "22514",
+   "title": "356-499 Закупка газотурбинного двигателя Solar Turbine г.Казан",
+   "models": [
+    "Solar (модель уточнить)"
+   ],
+   "stage": null,
+   "created": null,
+   "rfqs": []
+  },
+  {
+   "id": "22242",
+   "title": "ЗП6071591 Поставка Горелки запальной E204529-900 Solar Turbine",
+   "models": [
+    "Solar (модель уточнить)"
+   ],
+   "stage": null,
+   "created": null,
+   "rfqs": []
+  },
+  {
+   "id": "22240",
+   "title": "ЗП6071593 Поставка Комплекта горелок 372308-3500 Solar Turbine",
+   "models": [
+    "Solar (модель уточнить)"
+   ],
+   "stage": null,
+   "created": null,
+   "rfqs": []
+  },
+  {
+   "id": "22178",
+   "title": "ЗП6071057 Газотурбинная установка Solar Turbines типа Titan130",
+   "models": [
+    "Titan 130"
+   ],
+   "stage": null,
+   "created": null,
+   "rfqs": []
+  },
+  {
+   "id": "21850",
+   "title": "КГВ (НОВАТЭК): закупка ТЕРМОСТАТА SOLAR, ремкомплекта Лот БП 2",
+   "models": [
+    "Solar (модель уточнить)"
+   ],
+   "stage": null,
+   "created": null,
+   "rfqs": []
+  },
+  {
+   "id": "20898",
+   "title": "РН60504347 Турбина газовая (Ария)",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": null,
+   "created": null,
+   "rfqs": []
+  },
+  {
+   "id": "20828",
+   "title": "ЗП6052138 ЗиП ГТУ (крепеж для лопаток) 9FA Юнипро",
+   "models": [
+    "GE 9FA (вне фокуса)"
+   ],
+   "stage": null,
+   "created": null,
+   "rfqs": []
+  },
+  {
+   "id": "20636",
+   "title": "РН60502723 \tЗапасные части к Siemens SGT-300-2S (Ария)",
+   "models": [
+    "SGT-300"
+   ],
+   "stage": null,
+   "created": null,
+   "rfqs": []
+  },
+  {
+   "id": "20554",
+   "title": "ЗП605895 Поставка ЗИП для ГТУ Siemens",
+   "models": [
+    "Siemens (модель уточнить)"
+   ],
+   "stage": null,
+   "created": null,
+   "rfqs": []
+  },
+  {
+   "id": "20084",
+   "title": "ГП628894 Поставка запасных частей производства Solar Turbines",
+   "models": [
+    "Solar (модель уточнить)"
+   ],
+   "stage": null,
+   "created": null,
+   "rfqs": []
+  },
+  {
+   "id": "18022",
+   "title": "Л-НВН (NA)/02/Solar Turbines Taurus 60S",
+   "models": [
+    "Taurus 60"
+   ],
+   "stage": null,
+   "created": null,
+   "rfqs": []
+  },
+  {
+   "id": "18020",
+   "title": "Л-НВН (NA)/02/Solar Turbines Taurus 70MD",
+   "models": [
+    "Taurus 70"
+   ],
+   "stage": null,
+   "created": null,
+   "rfqs": []
+  },
+  {
+   "id": "18018",
+   "title": "Л-НВН (NA)/02/Solar Turbines Taurus 70",
+   "models": [
+    "Taurus 70"
+   ],
+   "stage": null,
+   "created": null,
+   "rfqs": []
+  }
+ ],
+ "offers": []
+};
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const famTag = f => `<span class="tag ${f==='SGT'?'sgt':'solar'}">${f==='SGT'?'Siemens SGT':'Solar'}</span>`;
@@ -1143,7 +1301,7 @@ const critCls = c => c==='A'?'critA':(c==='B'?'critB':'critC');
 
 const TABS = [
  ['overview','Обзор'],['machines','Машины'],['parts','Номенклатура ЗИП'],['pn','Шифровки PN'],
- ['suppliers','Поставщики'],['customs','Таможня РФ'],['db','Базы данных']
+ ['suppliers','Поставщики'],['bitrix','Наши запросы'],['customs','Таможня РФ'],['db','Базы данных']
 ];
 
 /* ---------- Обзор ---------- */
@@ -1272,6 +1430,45 @@ function rSuppliers(){
  <div class="mut">Уровни: П1 — прямое попадание (Китай, реально для РФ) · П2 — профильные UK/EU (санкционный риск, через посредника) · П2-Иран — лицензиаты Siemens · П3 — прочие/трейдеры · S1–S3 — Solar-блок (S1 — якорные MRO). Контакты SGT-блока верифицированы 05.08.2026; Solar-блок — брать с сайта.</div>`;
 }
 
+/* ---------- Наши запросы (Bitrix) ---------- */
+function rBitrix(){
+ const b=BITRIX;
+ const nRfq=b.deals.reduce((a,d)=>a+d.rfqs.length,0);
+ const exact=d=>d.models.filter(m=>!m.endsWith('уточнить)'));
+ // группировка сделок по моделям
+ const byModel={};
+ for(const d of b.deals) for(const m of d.models) (byModel[m]=byModel[m]||[]).push(d);
+ const order=Object.keys(byModel).sort((a,b2)=>{
+  const ga=a.includes('уточнить')||a.includes('вне фокуса'), gb=b2.includes('уточнить')||b2.includes('вне фокуса');
+  return ga!==gb ? (ga?1:-1) : a.localeCompare(b2,'ru');
+ });
+ let h=`<div class="mut">${esc(b.source)} · обновлено ${esc(b.updated)}</div>
+ <div class="k">
+  <div class="tile"><b>${b.deals.length}</b><span>ГТУ-сделок в Bitrix</span></div>
+  <div class="tile"><b>${b.deals.filter(d=>exact(d).length).length}</b><span>с точной моделью</span></div>
+  <div class="tile"><b>${nRfq}</b><span>запросов СП-166 подтянуто</span></div>
+  <div class="tile"><b>${(b.offers||[]).length}</b><span>моделей с предложениями</span></div>
+ </div>`;
+ if(!b.live) h+=`<div class="box warn"><b>Это сид-снимок</b> (названия сделок из снимка чатов): привязанные запросы СП-166 с поставщиками и стадиями подтянет выгрузка <b>gt/tools/bitrix_gt.py</b> — нужен BITRIX_WEBHOOK_URL в .env, затем <code>python3 gt/build.py</code>. Тогда здесь появится «кто к чему предлагает» по каждой модели.</div>`;
+ if((b.offers||[]).length){
+  h+=`<h2>Кто к чему предлагает (по запросам СП-166)</h2><div class="tblwrap"><table><tr><th>Модель</th><th>Поставщики (число запросов)</th></tr>`;
+  for(const o of b.offers) h+=`<tr><td><b>${esc(o.model)}</b></td><td>${o.suppliers.map(s=>`<span class="tag">${esc(s.name)} · ${s.n}</span>`).join(' ')}</td></tr>`;
+  h+=`</table></div>`;
+ }
+ h+=`<h2>Спрос по моделям (наши сделки)</h2>`;
+ for(const m of order){
+  const ds=byModel[m];
+  h+=`<div class="card"><b>${esc(m)}</b> <span class="mut">· сделок: ${ds.length}</span><div class="tblwrap" style="margin-top:6px"><table><tr><th style="width:8%">Сделка</th><th>Название</th><th style="width:34%">Запросы СП-166 → поставщики</th></tr>`;
+  for(const d of ds){
+   const r=d.rfqs.length?d.rfqs.map(r=>`<div>${esc(r.supplier)} <span class="mut">· ${esc(r.stage||'')} ${r.sourcer?'· '+esc(r.sourcer):''}</span></div>`).join(''):'<span class="mut">—</span>';
+   h+=`<tr><td>${esc(d.id)}</td><td>${esc(d.title)}</td><td>${r}</td></tr>`;
+  }
+  h+=`</table></div></div>`;
+ }
+ h+=`<div class="box info"><b>Что уже дал этот срез:</b> подтверждённые PN Solar из наших закупок — комплект горелок <b>372308-3500</b> (ЗП6071593) и запальная горелка <b>E204529-900</b> (ЗП6071591) → формат зашит во вкладку «Шифровки PN». Спрос по моделям: Taurus 60/70 (Л-НВН), Titan 130, SGT-300-2S (Ария), плюс общий ЗИП Solar/Siemens (ГП, НОВАТЭК).</div>`;
+ return h;
+}
+
 /* ---------- Таможня ---------- */
 function barChart(data){
  const W=640,H=230,P={t:14,r:14,b:30,l:44};
@@ -1332,7 +1529,7 @@ function rDB(){
 }
 
 /* ---------- Каркас ---------- */
-const R = {overview:rOverview, machines:rMachines, parts:rParts, pn:rPN, suppliers:rSuppliers, customs:rCustoms, db:rDB};
+const R = {overview:rOverview, machines:rMachines, parts:rParts, pn:rPN, suppliers:rSuppliers, bitrix:rBitrix, customs:rCustoms, db:rDB};
 const nav = document.getElementById('nav'), main = document.getElementById('main');
 nav.innerHTML = TABS.map(([id,t])=>`<button data-t="${id}">${t}</button>`).join('');
 main.innerHTML = TABS.map(([id])=>`<section id="s-${id}"></section>`).join('');

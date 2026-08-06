@@ -83,6 +83,7 @@ const MODELS = __MODELS_JSON__;
 const PARTS = __PARTS_JSON__;
 const PN = __PN_JSON__;
 const CUSTOMS = __CUSTOMS_JSON__;
+const BITRIX = __BITRIX_JSON__;
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const famTag = f => `<span class="tag ${f==='SGT'?'sgt':'solar'}">${f==='SGT'?'Siemens SGT':'Solar'}</span>`;
@@ -90,7 +91,7 @@ const critCls = c => c==='A'?'critA':(c==='B'?'critB':'critC');
 
 const TABS = [
  ['overview','Обзор'],['machines','Машины'],['parts','Номенклатура ЗИП'],['pn','Шифровки PN'],
- ['suppliers','Поставщики'],['customs','Таможня РФ'],['db','Базы данных']
+ ['suppliers','Поставщики'],['bitrix','Наши запросы'],['customs','Таможня РФ'],['db','Базы данных']
 ];
 
 /* ---------- Обзор ---------- */
@@ -219,6 +220,45 @@ function rSuppliers(){
  <div class="mut">Уровни: П1 — прямое попадание (Китай, реально для РФ) · П2 — профильные UK/EU (санкционный риск, через посредника) · П2-Иран — лицензиаты Siemens · П3 — прочие/трейдеры · S1–S3 — Solar-блок (S1 — якорные MRO). Контакты SGT-блока верифицированы 05.08.2026; Solar-блок — брать с сайта.</div>`;
 }
 
+/* ---------- Наши запросы (Bitrix) ---------- */
+function rBitrix(){
+ const b=BITRIX;
+ const nRfq=b.deals.reduce((a,d)=>a+d.rfqs.length,0);
+ const exact=d=>d.models.filter(m=>!m.endsWith('уточнить)'));
+ // группировка сделок по моделям
+ const byModel={};
+ for(const d of b.deals) for(const m of d.models) (byModel[m]=byModel[m]||[]).push(d);
+ const order=Object.keys(byModel).sort((a,b2)=>{
+  const ga=a.includes('уточнить')||a.includes('вне фокуса'), gb=b2.includes('уточнить')||b2.includes('вне фокуса');
+  return ga!==gb ? (ga?1:-1) : a.localeCompare(b2,'ru');
+ });
+ let h=`<div class="mut">${esc(b.source)} · обновлено ${esc(b.updated)}</div>
+ <div class="k">
+  <div class="tile"><b>${b.deals.length}</b><span>ГТУ-сделок в Bitrix</span></div>
+  <div class="tile"><b>${b.deals.filter(d=>exact(d).length).length}</b><span>с точной моделью</span></div>
+  <div class="tile"><b>${nRfq}</b><span>запросов СП-166 подтянуто</span></div>
+  <div class="tile"><b>${(b.offers||[]).length}</b><span>моделей с предложениями</span></div>
+ </div>`;
+ if(!b.live) h+=`<div class="box warn"><b>Это сид-снимок</b> (названия сделок из снимка чатов): привязанные запросы СП-166 с поставщиками и стадиями подтянет выгрузка <b>gt/tools/bitrix_gt.py</b> — нужен BITRIX_WEBHOOK_URL в .env, затем <code>python3 gt/build.py</code>. Тогда здесь появится «кто к чему предлагает» по каждой модели.</div>`;
+ if((b.offers||[]).length){
+  h+=`<h2>Кто к чему предлагает (по запросам СП-166)</h2><div class="tblwrap"><table><tr><th>Модель</th><th>Поставщики (число запросов)</th></tr>`;
+  for(const o of b.offers) h+=`<tr><td><b>${esc(o.model)}</b></td><td>${o.suppliers.map(s=>`<span class="tag">${esc(s.name)} · ${s.n}</span>`).join(' ')}</td></tr>`;
+  h+=`</table></div>`;
+ }
+ h+=`<h2>Спрос по моделям (наши сделки)</h2>`;
+ for(const m of order){
+  const ds=byModel[m];
+  h+=`<div class="card"><b>${esc(m)}</b> <span class="mut">· сделок: ${ds.length}</span><div class="tblwrap" style="margin-top:6px"><table><tr><th style="width:8%">Сделка</th><th>Название</th><th style="width:34%">Запросы СП-166 → поставщики</th></tr>`;
+  for(const d of ds){
+   const r=d.rfqs.length?d.rfqs.map(r=>`<div>${esc(r.supplier)} <span class="mut">· ${esc(r.stage||'')} ${r.sourcer?'· '+esc(r.sourcer):''}</span></div>`).join(''):'<span class="mut">—</span>';
+   h+=`<tr><td>${esc(d.id)}</td><td>${esc(d.title)}</td><td>${r}</td></tr>`;
+  }
+  h+=`</table></div></div>`;
+ }
+ h+=`<div class="box info"><b>Что уже дал этот срез:</b> подтверждённые PN Solar из наших закупок — комплект горелок <b>372308-3500</b> (ЗП6071593) и запальная горелка <b>E204529-900</b> (ЗП6071591) → формат зашит во вкладку «Шифровки PN». Спрос по моделям: Taurus 60/70 (Л-НВН), Titan 130, SGT-300-2S (Ария), плюс общий ЗИП Solar/Siemens (ГП, НОВАТЭК).</div>`;
+ return h;
+}
+
 /* ---------- Таможня ---------- */
 function barChart(data){
  const W=640,H=230,P={t:14,r:14,b:30,l:44};
@@ -279,7 +319,7 @@ function rDB(){
 }
 
 /* ---------- Каркас ---------- */
-const R = {overview:rOverview, machines:rMachines, parts:rParts, pn:rPN, suppliers:rSuppliers, customs:rCustoms, db:rDB};
+const R = {overview:rOverview, machines:rMachines, parts:rParts, pn:rPN, suppliers:rSuppliers, bitrix:rBitrix, customs:rCustoms, db:rDB};
 const nav = document.getElementById('nav'), main = document.getElementById('main');
 nav.innerHTML = TABS.map(([id,t])=>`<button data-t="${id}">${t}</button>`).join('');
 main.innerHTML = TABS.map(([id])=>`<section id="s-${id}"></section>`).join('');

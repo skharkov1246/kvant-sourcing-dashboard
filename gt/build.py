@@ -79,6 +79,7 @@ def main():
         "__MODELS_JSON__": (ROOT / "data/models.json").read_text(encoding="utf-8"),
         "__PARTS_JSON__": (ROOT / "data/parts.json").read_text(encoding="utf-8"),
         "__PN_JSON__": (ROOT / "data/pn_guide.json").read_text(encoding="utf-8"),
+        "__BITRIX_JSON__": (ROOT / "data/bitrix_gt.json").read_text(encoding="utf-8"),
         "__CUSTOMS_JSON__": json.dumps(customs_summary(), ensure_ascii=False),
         "__BUILT_AT__": date.today().isoformat(),
     }
