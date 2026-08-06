@@ -15,6 +15,15 @@ PROTOCOL_PATH = (
 SCHEMA_PATH = pathlib.Path(__file__).resolve().parents[1] / "app" / "schema.sql"
 
 OPERATOR = {"X-Tenant-Id": "t-internal", "X-User-Id": "u-1", "X-Roles": "operator"}
+
+@pytest.fixture(autouse=True)
+def _rate_limit_off(monkeypatch):
+    """Тесты законно штормят API с одного адреса — лимит частоты здесь
+    отключается. Тесты самого лимитера ставят свой маленький порог поверх."""
+    from app import main as m
+    monkeypatch.setattr(m, "_RATE_MAX", 10**9)
+    m._rate_hits.clear()
+
 REVIEWER = {"X-Tenant-Id": "t-internal", "X-User-Id": "u-2", "X-Roles": "operator,reviewer"}
 CUSTOMER = {"X-Tenant-Id": "t-acme", "X-User-Id": "u-9", "X-Roles": "operator"}
 
