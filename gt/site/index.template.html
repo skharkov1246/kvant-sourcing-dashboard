@@ -144,6 +144,7 @@ const CHECKLIST = __CHECKLIST_JSON__;
 const HEAVY_SUPS = __HEAVY_JSON__;
 const TFS_SUB = __TFSSUB_JSON__;
 const BX_SITES = __BXSITES_JSON__;
+const RESEARCH = __RESEARCH_JSON__;
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const FAM_NAME = {SGT:'Siemens SGT', Solar:'Solar', Heavy:'Тяжёлые ГТУ'};
@@ -320,6 +321,22 @@ function buildUnified(){
   segsOf(t).forEach(x=>r.segs.add(x));
   pickModels(t).forEach(x=>r.models.add(x));
   if(/GECOLSA/i.test(c.name)) r.solarAll = true;
+ }
+ const TIER_ROLE = {oem_sub:'поставщик на конвейер OEM (производитель)', component_specialist:'узкий производитель компонентов',
+  aftermarket:'автомаркет / поставщик ЗИП', mro:'независимый сервис (MRO)'};
+ for(const c of RESEARCH.rows){
+  const t = [c.name,c.what,c.link].join(' · ');
+  const r = get(c.name, c.country);
+  if(!r.role) r.role = TIER_ROLE[c.tier]||c.tier;
+  if(!r.site) r.site = c.site;
+  if(!r.email) r.email = c.email;
+  if(!r.what) r.what = c.what + (c.link?(' · Связь: '+c.link):'') + (c.risk?(' · Риск: '+c.risk):'');
+  r.src.add('research');
+  segsOf(t).forEach(x=>r.segs.add(x));
+  pickModels(t).forEach(x=>r.models.add(x));
+  const a = c.angle||'';
+  if(/solar/.test(a)) r.solarAll = true;
+  if(/siemens|sgt|heritage/.test(a)) r.sgtAll = true;
  }
  for(const o of (BITRIX.offers||[])){
   for(const s of o.suppliers){
