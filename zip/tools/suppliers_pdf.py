@@ -21,6 +21,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "orders" / "sgt400_world_suppliers.csv"
+SRC_HEAVY = ROOT / "orders" / "heavy_duty_suppliers.csv"   # добор по тяжёлым машинам
 TFS = ROOT / "data" / "tfs_supply_chain.json"
 OUT = ROOT / "orders"
 e = lambda s: html.escape(str(s or ""))
@@ -38,6 +39,23 @@ AGNOSTIC = re.compile(
     r"металлург|металлоцентр|мастер-?сплав|шихтов|лист|пруток|поковк|прокат|"
     r"покрыти|напылени|coating|порошк|сплав", re.I)
 
+HEAVY_CANON = [
+    (r"9HA|7HA", "GE 9HA/7HA"), (r"\b9FA\b|\b9F\b", "GE 9FA"),
+    (r"\b7FA\b|\b7F\b", "GE 7FA"), (r"\b7EA\b|\b7E\b", "GE 7EA"),
+    (r"\b9E\b", "GE 9E"), (r"Frame\s?9", "GE Frame 9"),
+    (r"Frame\s?7", "GE Frame 7"), (r"Frame\s?6|\b6B\b|\b6FA\b", "GE Frame 6"),
+    (r"Frame\s?5", "GE Frame 5"), (r"Frame\s?3", "GE Frame 3"),
+    (r"SGT5-?\s?4000|SGT5-?\s?2000|SGT5", "Siemens SGT5"),
+    (r"SGT6-?\s?5000|SGT6", "Siemens SGT6"),
+    (r"V94\.?[23]|V94", "Siemens V94"), (r"AE94\.?3A|AE94", "Ansaldo AE94"),
+    (r"M701[FGJ]?", "MHI M701"), (r"M501[FGJ]?", "MHI M501"),
+    (r"GT13E2|GT13", "Alstom GT13"), (r"GT26", "Alstom GT26"),
+    (r"GT11N2|GT11", "Alstom GT11"),
+    (r"ГТЭ-?110|ГТД-?110", "ГТЭ/ГТД-110"), (r"ГТЭ-?160", "ГТЭ-160"),
+    (r"ГТЭ-?65", "ГТЭ-65"),
+    (r"тяжёл|тяжел|heavy.?duty", "тяжёлые (класс заявлен, модель не названа)"),
+]
+
 MODEL_CANON = [
     (r"SGT-?\s?400", "SGT-400"), (r"SGT-?\s?300", "SGT-300"),
     (r"SGT-?\s?200", "SGT-200"), (r"SGT-?\s?100", "SGT-100"),
@@ -52,12 +70,31 @@ MODEL_CANON = [
 ]
 
 
-def models_of(txt):
+def _match(txt, canon):
     out = []
-    for pat, name in MODEL_CANON:
+    for pat, name in canon:
         if re.search(pat, txt, re.I) and name not in out:
             out.append(name)
     return out
+
+
+def models_of(txt):
+    return _match(txt, MODEL_CANON)
+
+
+def heavy_of(txt):
+    return _match(txt, HEAVY_CANON)
+
+
+def klass(light, heavy, agnostic):
+    """Класс машин: Л — лёгкие, Т — тяжёлые, Л+Т — оба."""
+    if light and heavy:
+        return "Л+Т"
+    if light:
+        return "Л"
+    if heavy:
+        return "Т"
+    return "—" if agnostic else "?"
 
 
 # --- блоки оборудования (порядок = приоритет присвоения) -------------------
@@ -147,6 +184,12 @@ def clean(v):
 
 def main():
     rows = list(csv.DictReader(open(SRC, encoding="utf-8-sig"), delimiter=";"))
+    if SRC_HEAVY.exists():                       # второй источник: тяжёлые ГТУ
+        hv = list(csv.DictReader(open(SRC_HEAVY, encoding="utf-8-sig"), delimiter=";"))
+        for r in hv:                             # привести к схеме основного файла
+            r.setdefault("Релевантность SGT-400", r.get("Релевантность", ""))
+        rows += hv
+        print(f"добор по тяжёлым ГТУ: +{len(hv)} компаний")
     groups = {c: [] for c, _, _, _ in BLOCKS}
     groups["I"] = []
     skipped_heavy, skipped_nocontact = [], []
@@ -156,22 +199,21 @@ def main():
         typ, rel = r["Тип"].strip(), r["Релевантность SGT-400"].strip()
         txt = rel + " " + typ
         site, phone = clean(r["Сайт"]), clean(r["Телефон"])
-        mods = models_of(txt)
+        mods, hmods = models_of(txt), heavy_of(txt)
         agn = bool(AGNOSTIC.search(typ))
-        if not mods and not agn:                   # не подтверждена лёгкая ГТУ
-            skipped_heavy.append((comp, country, "модель не подтверждена"))
-            continue
-        if not mods and HEAVY.search(txt):
-            skipped_heavy.append((comp, country, "только тяжёлые машины"))
-            continue
         if not site and not phone:                 # каталог для прозвона — без контакта бесполезен
             skipped_nocontact.append((comp, country))
             continue
+        k = klass(mods, hmods, agn)
+        if k == "?":                               # ни одной модели и не сырьё
+            k, shown = "?", "модель не подтверждена"
+        elif k == "—":
+            shown = "материал/процесс — любая модель"
+        else:
+            shown = ", ".join((mods + hmods)[:6])
         groups[block_of(typ, rel, country)].append({
             "comp": comp, "country": country.split("/")[0].split("(")[0].strip()[:22],
-            "site": site, "phone": phone,
-            "models": ", ".join(mods[:5]) if mods else "материал/процесс — модель-агностично",
-            "tfs": "",
+            "site": site, "phone": phone, "klass": k, "models": shown, "tfs": "",
         })
 
     # поставщики TFS, подтверждённые таможней
@@ -186,7 +228,7 @@ def main():
         ships = s.get("ships", "") + " " + s.get("why", "")
         code = s.get("block") or block_of(ships, ships, s.get("country", ""))
         rec = {"comp": s["company"], "country": s["country"].split("(")[0].strip()[:22],
-               "site": site, "phone": phone,
+               "site": site, "phone": phone, "klass": "Л",
                "models": ("SGT-400 — цепочка TFS, пробита таможней" if mark
                           else "SGT/Ruston — профильный лид, отгрузки не пробиты"),
                "tfs": mark}
@@ -210,19 +252,28 @@ def main():
          padding:6px 10px;margin:6px 0;font-size:10px;page-break-inside:avoid}
     .warn{border-left-color:#c62828}
     b{color:#0b3d91} .tfs{color:#1a7f37;font-weight:700}
+    .kl{background:#e7f4ea;color:#1a7f37;font-weight:700;text-align:center}
+    .klt{background:#fff4e0;color:#a15c00;font-weight:700;text-align:center}
+    .kt{background:#eaf0fb;color:#0b3d91;font-weight:700;text-align:center}
+    .kq{color:#888;text-align:center}
     """
     tot = sum(len(v) for v in groups.values())
     H = [f"""<!doctype html><html><head><meta charset="utf-8"><style>{css}</style></head><body>
-<h1>Поставщики ЗИП по блокам оборудования — лёгкие промышленные ГТУ</h1>
+<h1>Поставщики ЗИП по блокам оборудования — лёгкие и тяжёлые ГТУ</h1>
 <div class="mut">Цель: камера сгорания <b>MW21215M</b> (12 шт) + главная горелка DUAL DLE
 <b>MW22316B/01</b> (12 шт), Siemens SGT-400 · {date.today().strftime('%d.%m.%Y')} · компаний: {tot}</div>
-<div class="box"><b>Проверка профиля (главное):</b> в каталог включены только компании, у которых
-подтверждена работа по <b>лёгким промышленным ГТУ</b> — Siemens SGT-100…800, Ruston
+<div class="box"><b>Как читать колонку «Класс»:</b>
+<span class="kl">&nbsp;Л&nbsp;</span> — <b>лёгкие</b> промышленные ГТУ: Siemens SGT-100…800, Ruston
 Typhoon/Tornado/Tempest/Cyclone, Solar Taurus/Centaur/Mars/Saturn/Titan, Allison, Dresser-Rand.
-Колонка «Модели» показывает, чем именно подтверждено. Поставщики тяжёлых машин
-(GE Frame 5/6/7/9, 7FA/9FA, Siemens SGT5/SGT6, V94, Mitsubishi M501/M701, Alstom GT13/GT26)
-и чистая авиация — <b>исключены</b>. Металлурги и цеха покрытий помечены
-«материал/процесс — модель-агностично»: их продукт не привязан к модели турбины.
+Это наша цель — с них начинать. &nbsp;
+<span class="klt">&nbsp;Л+Т&nbsp;</span> — работает и с лёгкими, и с тяжёлыми: у таких шире цех и
+обычно есть свободные мощности. &nbsp;
+<span class="kt">&nbsp;Т&nbsp;</span> — <b>тяжёлые</b>: GE Frame 5/6/7/9, 7EA/7FA/9E/9FA/9HA,
+Siemens SGT5/SGT6, V94, Ansaldo AE94, Mitsubishi M501/M701, Alstom GT11/GT13/GT26, ГТЭ-110/160.
+Технология горячей части общая (те же сплавы, литьё, покрытия, сварка), поэтому под наши
+камеру сгорания и горелку они пригодны — но им нужны наши чертежи/ВРКД, каталожного аналога нет. &nbsp;
+<span class="kq">?</span> — модель в открытых источниках не заявлена; <b>—</b> материал или
+процесс, к модели турбины не привязан.
 <span class="tfs">✔</span> — поставщик подтверждён таможенными записями по цепочке TFS (Веракрус).</div>"""]
 
     # дедуп по нормализованному имени сквозь весь документ (APG встречался трижды)
@@ -239,7 +290,8 @@ Typhoon/Tornado/Tempest/Cyclone, Solar Taurus/Centaur/Mars/Saturn/Titan, Allison
     seen = set()
     for code in list(groups):
         uniq = []
-        for x in sorted(groups[code], key=lambda x: (x["tfs"] == "", x["country"])):
+        KORD = {"Л": 0, "Л+Т": 1, "—": 2, "Т": 3, "?": 4}
+        for x in sorted(groups[code], key=lambda x: (x["tfs"] == "", KORD.get(x["klass"], 5), x["country"])):
             k = domkey(x)
             if k and k not in ("n:", "d:") and k in seen:
                 continue
@@ -252,12 +304,15 @@ Typhoon/Tornado/Tempest/Cyclone, Solar Taurus/Centaur/Mars/Saturn/Titan, Allison
         if not rs:
             continue
         H.append(f'<h2>БЛОК {code} — {e(title)} · {len(rs)}</h2><div class="sub">{e(note)}</div>'
-                 '<table><tr><th style="width:26%">Компания</th><th style="width:12%">Страна</th>'
-                 '<th style="width:21%">Сайт</th><th style="width:18%">Телефон</th>'
-                 '<th style="width:23%">Модели (подтверждение)</th></tr>')
+                 '<table><tr><th style="width:24%">Компания</th><th style="width:11%">Страна</th>'
+                 '<th style="width:5%">Класс</th><th style="width:19%">Сайт</th>'
+                 '<th style="width:16%">Телефон</th>'
+                 '<th style="width:25%">Модели (подтверждение)</th></tr>')
         for x in rs:
             mark = '<span class="tfs">✔ </span>' if x["tfs"] else ""
+            kc = {"Л": "kl", "Л+Т": "klt", "Т": "kt"}.get(x["klass"], "kq")
             H.append(f'<tr><td>{mark}<b>{e(x["comp"])}</b></td><td>{e(x["country"])}</td>'
+                     f'<td class="{kc}">{e(x["klass"])}</td>'
                      f'<td>{e(x["site"]) or "—"}</td><td>{e(x["phone"]) or "—"}</td>'
                      f'<td class="mut">{e(x["models"])}</td></tr>')
         H.append("</table>")
