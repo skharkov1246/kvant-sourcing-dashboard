@@ -13766,7 +13766,7 @@ const BX_SITES = {
 };
 const RESEARCH = {
  "updated": "2026-08-06",
- "source": "Research-вееры 06.08.2026: 12 углов (субпоставщики OEM Solar/Siemens, автомаркет по брендам и моделям, узкие специалисты по элементам, РФ/СНГ/Иран/Турция) + 3 угла наследия (Линкольн Ruston/EGT, Финспонг STAL/ABB, диаспора лицензиатов). Каждая компания — с подтверждённым официальным сайтом. + веер «рабочие юрисдикции/пэкеджеры/б-у» 06.08.2026. + веер глубоких субпоставщиков (shipment-данные ImportYeti, кейс-стади, сеть Caterpillar) 06.08.2026. + harvest раскрутки цепочек, волна 1.",
+ "source": "Research-вееры 06.08.2026: 12 углов (субпоставщики OEM Solar/Siemens, автомаркет по брендам и моделям, узкие специалисты по элементам, РФ/СНГ/Иран/Турция) + 3 угла наследия (Линкольн Ruston/EGT, Финспонг STAL/ABB, диаспора лицензиатов). Каждая компания — с подтверждённым официальным сайтом. + веер «рабочие юрисдикции/пэкеджеры/б-у» 06.08.2026. + веер глубоких субпоставщиков (shipment-данные ImportYeti, кейс-стади, сеть Caterpillar) 06.08.2026. + harvest раскрутки цепочек, волна 1. Harvest волны 2.",
  "rows": [
   {
    "name": "AMT, Inc. (Advanced Machining & Tooling)",
@@ -17892,6 +17892,919 @@ const RESEARCH = {
    "tier": "component_specialist",
    "angle": "harvest:unwind1",
    "risk": ""
+  },
+  {
+   "name": "Flowserve Corporation",
+   "country": "USA",
+   "site": "www.flowserve.com",
+   "email": "",
+   "what": "Flow-control and rotating-equipment major; runs Greenray as an industrial gas turbine aftermarket brand",
+   "link": "Acquirer/parent of Greenray Turbine Solutions (Dec 2025, ~$72M); Owns Greenray's Ruston TA / GEC legacy industrial GT aftermarket business",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Aero Engine Corporation of China (AECC)",
+   "country": "China",
+   "site": "www.aecc.cn",
+   "email": "",
+   "what": "State-owned aero-engine and gas turbine group (est. 2016, 46+ subsidiaries)",
+   "link": "Parent of AECC Gas Turbine Co.; OEM supplier to Soar Power; Manufactures QD70 (7 MW) and QD128 (12 MW) industrial gas turbines",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "KJ Power Generator",
+   "country": "Turkey",
+   "site": "kj.com.tr/en",
+   "email": "",
+   "what": "Diesel/gas generator manufacturer since 1996, exports to 120+ countries",
+   "link": "Generator supplier/partner of ADN Global; Genset packaging (engine-based; turbine link indirect)",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Hyundai Heavy Industries (HHI)",
+   "country": "South Korea",
+   "site": "www.hyundai-holdings.com",
+   "email": "",
+   "what": "Heavy industry / power equipment manufacturer",
+   "link": "Reference brand cited by Soar Power; Power generation gensets and engine/turbine packaging",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Chromalloy Gas Turbine Corporation",
+   "country": "USA",
+   "site": "chromalloy.com",
+   "email": "",
+   "what": "Ремонт, покрытия и производство компонентов горячего тракта ГТУ (аэро и industrial)",
+   "link": "Приобрёл долю/связь с MJB International (Masaood John Brown) в 2000; OEM-alternative запчасти и ремонт лопаток/сопел для GE, PW, Siemens турбин",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Hanwha Power Systems",
+   "country": "South Korea",
+   "site": "hanwhapowersystems.com",
+   "email": "",
+   "what": "Компрессоры, турбо-оборудование и энергосистемы",
+   "link": "Материнская/сестринская структура PSM (слияние в Hanwha Power); Владелец PSM — не-OEM combustion и hot gas path для GE/Siemens ГТУ",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "PT Dirgantara Indonesia (Indonesian Aerospace)",
+   "country": "Indonesia",
+   "site": "indonesian-aerospace.com",
+   "email": "",
+   "what": "Авиастроение и аэрокосмический MRO",
+   "link": "Материнская компания PT Nusantara Turbin dan Propulsi (PT NTP); Владелец NTP — MRO аэро и промышленных газотурбинных двигателей",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Renewal Parts Maintenance (RPM)",
+   "country": "USA",
+   "site": "mdaturbines.com",
+   "email": "",
+   "what": "Ремонт и восстановление турбинных запчастей (Willoughby, Ohio)",
+   "link": "Поглощена MD&A, входит в её сеть сервис-центров; Запчасти и ремонт паровых/газовых турбин в составе MD&A",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Bently Nevada (Baker Hughes)",
+   "country": "USA",
+   "site": "www.bakerhughes.com/bently-nevada",
+   "email": "",
+   "what": "Turbine vibration/condition monitoring systems",
+   "link": "brand stocked/sold by World of Controls; Monitoring hardware on GE and other gas turbines",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Rolls-Royce",
+   "country": "UK",
+   "site": "www.rolls-royce.com",
+   "email": "",
+   "what": "OEM of RB211/Avon industrial aeroderivative gas turbines",
+   "link": "OEM supported by Holland Controls; listed as client; Direct gas turbine OEM (RB211)",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Power Machines (Силовые машины)",
+   "country": "Russia",
+   "site": "www.power-m.ru",
+   "email": "",
+   "what": "Russian power equipment manufacturer",
+   "link": "35% co-owner of СТГТ; Gas/steam turbine manufacturing JV",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Inter RAO",
+   "country": "Russia",
+   "site": "www.interrao.ru",
+   "email": "",
+   "what": "Russian power generation/utility group",
+   "link": "acquired Siemens stake in СТГТ (2022); Owner/operator of gas turbine fleet and СТГТ",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Equinor",
+   "country": "Norway",
+   "site": "www.equinor.com",
+   "email": "",
+   "what": "Oil & gas operator running offshore gas turbines",
+   "link": "named client of Holland Controls; Operator of RB211/LM2500 turbine compressor trains",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "National Gas Transmission",
+   "country": "UK",
+   "site": "www.nationalgas.com",
+   "email": "",
+   "what": "UK gas transmission network operator",
+   "link": "named client of Holland Controls; RB211-driven compressor stations",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "TotalEnergies",
+   "country": "France",
+   "site": "www.totalenergies.com",
+   "email": "",
+   "what": "Energy major with offshore/onshore gas turbines",
+   "link": "named client of Holland Controls; Operator of gas turbine driven equipment",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Tatenergo",
+   "country": "Russia",
+   "site": "www.tatenergo.ru",
+   "email": "",
+   "what": "Tatarstan regional power generation utility",
+   "link": "core client of КЭР-Холдинг; Operator of gas turbines serviced/overhauled by КЭР",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Solar Turbines Inc. (Caterpillar)",
+   "country": "USA",
+   "site": "www.solarturbines.com",
+   "email": "",
+   "what": "OEM of industrial gas turbines (Saturn/Centaur/Taurus/Mars/Titan)",
+   "link": "OEM/supplier to Shanghai Lishun (MarisoGT), Lei Shing Hong Energy and ЗКМК; Core turbine OEM — packaging associates & authorized reps sell/service its gensets and spares",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "China Huadian Corporation",
+   "country": "China",
+   "site": "www.chd.com.cn",
+   "email": "",
+   "what": "State power utility operating large gas & steam turbine fleets",
+   "link": "Parent/JV partner of Huarui (Jiangsu) Gas Turbine Service; Owns E/F-class GT power plants serviced by the Huarui JV",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Uniper Engineering (Uniper SE)",
+   "country": "Germany",
+   "site": "www.uniper.energy",
+   "email": "",
+   "what": "Utility engineering & turbine/generator services",
+   "link": "Joint service-offering partner of Fortum eNext; Co-delivers steam/gas turbine MRO to utilities with Fortum eNext",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Siemens Energy AG",
+   "country": "Germany",
+   "site": "www.siemens-energy.com",
+   "email": "",
+   "what": "OEM of SGT / SGT-A aeroderivative and industrial gas turbines",
+   "link": "OEM/supplier authorizing Jereh as SGT-A05 packager; Turbine OEM whose SGT-A05 cores Jereh packages into gensets",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "INNIO Jenbacher",
+   "country": "Austria",
+   "site": "www.innio.com",
+   "email": "",
+   "what": "OEM of Jenbacher gas engines / distributed power gensets",
+   "link": "Jereh is its authorized Platinum Integrator; Adjacent gas-genset OEM in Jereh's distributed-energy packaging portfolio",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Karachaganak Petroleum Operating B.V. (KPO)",
+   "country": "Kazakhstan",
+   "site": "www.kpo.kz",
+   "email": "",
+   "what": "Oil & gas operator running gas-turbine compressor/power stations",
+   "link": "Client / localization driver for ЗКМК machining & GT service; Operates GE gas-turbine driven equipment serviced/localized via ЗКМК",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Shenzhen Bicosyn Enterprises Co., Ltd. (BiCoSyn)",
+   "country": "China",
+   "site": "www.bicosyn.com",
+   "email": "",
+   "what": "Сервис и запчасти газовых турбин для пользователей в Китае с 1998; работает по рамам GE, Alstom, Siemens, MHI",
+   "link": "Прямой конкурент/аналог China Power Contractor (Pauway) на китайском рынке ЗИП ГТ; Обслуживание фреймов GE / Siemens / Alstom / MHI",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Dongturbo Electric (chinaturbo.net)",
+   "country": "China",
+   "site": "www.chinaturbo.net",
+   "email": "",
+   "what": "Производитель компонентов и деталей газотурбинных электростанций (кастом)",
+   "link": "Потенциальный поставщик/производитель ЗИП для трейдеров типа China Power Contractor; Gas Turbine Power Plant Components and Parts",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Transcorp Ughelli Power Limited",
+   "country": "Nigeria",
+   "site": "www.transcorppower.com",
+   "email": "",
+   "what": "Оператор газовой электростанции Ughelli (GE-турбины), клиент O&M-подрядчиков",
+   "link": "Названный клиент Thomassen Group (Service Gulf); Эксплуатирует парк газовых турбин (референс Thomassen по ГТ)",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Akenerji",
+   "country": "Turkey",
+   "site": "www.akenerji.com.tr",
+   "email": "",
+   "what": "Турецкий производитель электроэнергии, парк газовых ТЭС комбинированного цикла",
+   "link": "Названный клиент Thomassen Group; Владелец NGCC-станций с газовыми турбинами",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Solar Turbines International Company (STICO / Solar Turbines, Caterpillar)",
+   "country": "USA",
+   "site": "www.solarturbines.com",
+   "email": "",
+   "what": "OEM промышленных газовых турбин (Saturn, Centaur, Mercury, Taurus, Mars, Titan), подразделение Caterpillar",
+   "link": "OEM-принципал Indoturbine, Turboservices, DMLieferant, ПРОМИМПОРТ, GTA, Alturdyne; СП-партнёр Deleum (2015); Прямой производитель ГТУ Solar — ядро всей исследуемой цепочки",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "PT Dirgantara Indonesia (IPTN)",
+   "country": "Indonesia",
+   "site": "www.indonesian-aerospace.com",
+   "email": "",
+   "what": "Индонезийский авиастроитель; с 1987 г. выполняет overhaul турбинных двигателей",
+   "link": "Партнёр Indoturbine по капремонту турбинных двигателей внутри страны (с 1987); Overhaul газотурбинных двигателей (ранее только в США)",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Pertamina",
+   "country": "Indonesia",
+   "site": "www.pertamina.com",
+   "email": "",
+   "what": "Государственная нефтегазовая компания Индонезии",
+   "link": "Клиент Indoturbine (эксплуатант турбин Solar); Оператор газотурбинных пакетов Solar в нефтегазе",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Lukoil (ПАО «Лукойл»)",
+   "country": "Russia",
+   "site": "www.lukoil.com",
+   "email": "",
+   "what": "Крупная российская нефтегазовая компания",
+   "link": "Клиент DMLieferant (поставка ЗИП, апрель 2016); Эксплуатант турбин Solar Centaur 50 (получал фильтроэлементы Indufil)",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Ariel Corporation",
+   "country": "USA",
+   "site": "www.arielcorp.com",
+   "email": "",
+   "what": "Крупнейший производитель поршневых газовых компрессоров",
+   "link": "Поставщик компрессорных фреймов для Enerflex; Компрессорные фреймы в газокомпрессорных пакетах (турбинный/моторный привод)",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "INNIO (Jenbacher / Waukesha)",
+   "country": "Austria / USA",
+   "site": "www.innio.com",
+   "email": "",
+   "what": "OEM газопоршневых двигателей и генераторов Jenbacher и Waukesha",
+   "link": "Поставщик приводных двигателей для Enerflex; Приводы энергоблоков/компрессии (альтернатива ГТУ-приводу)",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Gas Turbine Parts & Services Indonesia (GTPSI)",
+   "country": "Indonesia",
+   "site": "www.gtpsi.com",
+   "email": "",
+   "what": "Индонезийский поставщик запчастей и сервиса газовых турбин",
+   "link": "Конкурент/аналог PT Macro Petro Energy того же профиля; Запчасти и сервис ГТУ для энергетики и нефтегаза",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "PT Gas Turbine Center Indonesia (GE Vernova)",
+   "country": "Indonesia",
+   "site": "www.gevernova.com",
+   "email": "",
+   "what": "Сервис-центр газовых турбин GE в Индонезии",
+   "link": "Конкурент Macro Petro / Indoturbine на индонезийском рынке ГТУ; Авторизованный сервис-центр ГТУ GE",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Vibro-Meter (Parker Meggitt)",
+   "country": "Switzerland",
+   "site": "www.parker.com",
+   "email": "",
+   "what": "Turbine vibration/condition-monitoring sensors and instrumentation",
+   "link": "Component brand distributed/stocked by AP4 Group; Speedtronic/gas-turbine vibration monitoring for GE, Alstom, ABB units",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Advanced Atomization Technologies (AAT)",
+   "country": "USA",
+   "site": "www.advancedatomization.com",
+   "email": "",
+   "what": "Fuel nozzles and atomizers for gas turbines (Parker/GE JV)",
+   "link": "Component brand distributed by AP4 Group; Fuel nozzles for GE and other industrial gas turbines",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Turbotect Ltd",
+   "country": "Switzerland",
+   "site": "www.turbotect.com",
+   "email": "",
+   "what": "Compressor cleaning chemicals and injection systems for gas turbines",
+   "link": "Product brand distributed by AP4 Group; Online/offline compressor wash for GE, Siemens, Alstom GTs",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Wyman-Gordon Plzen",
+   "country": "Czech Republic",
+   "site": "www.wyman.com",
+   "email": "",
+   "what": "Heavy forgings plant (turbine/compressor disks)",
+   "link": "Sister plant of Wyman-Gordon UK Lincoln (PCC group); Forged disks for industrial gas turbines",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Resolux",
+   "country": "Denmark",
+   "site": "www.resolux.com",
+   "email": "",
+   "what": "Supply-chain / kitting and components for energy sector",
+   "link": "Group brand under Gexpro Services; Renewables/industrial-power supply chain (Gexpro Industrial Power)",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "East Kentucky Power Cooperative",
+   "country": "USA",
+   "site": "www.ekpc.coop",
+   "email": "",
+   "what": "Generation & transmission electric cooperative",
+   "link": "Client of NADC (H.L. Spurlock Station decommission work); Owner/operator of coal & gas generating units (turbine/generator assets)",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Repowerlab",
+   "country": "USA",
+   "site": "repowerlab.com",
+   "email": "",
+   "what": "Second-life power equipment / repowering services",
+   "link": "US operations partner of Repowering Solutions; Secondary-market gas/wind power plant equipment",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Siemens Industrial Turbomachinery AB / Siemens Energy AB (Finspång)",
+   "country": "Sweden",
+   "site": "www.siemens-energy.com",
+   "email": "",
+   "what": "Gas & steam turbine OEM; medium gas turbines SGT-500/600/700/750/800, steam SST-700/900; ~2,800-3,000 staff in Finspång",
+   "link": "Central client of Jernbro, Etteplan, Start-Up, Skill, Rörmokaren and Norrköpings Hamn; Turbine OEM itself (the hub of this Finspång supply chain)",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Goodwin International Ltd",
+   "country": "United Kingdom",
+   "site": "goodwininternational.co.uk",
+   "email": "",
+   "what": "Machining/engineering sister firm of Goodwin Steel Castings; turbine shells, Main Steam Valves",
+   "link": "Sister company of Goodwin Steel Castings; supplier to GE and Larsen & Toubro; Selected for GE 7HA.02 gas turbine components since 2014; 1000MW turbine shells",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "PCC Airfoils, LLC",
+   "country": "USA",
+   "site": "www.pccairfoils.com",
+   "email": "",
+   "what": "Investment-cast turbine airfoils for aero & industrial gas turbines",
+   "link": "Parent/owner of AETC Ltd (acquired 1996); Hot-gas-path turbine blade/vane castings for IGT and aero OEMs",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Precision Castparts Corp.",
+   "country": "USA",
+   "site": "www.precast.com",
+   "email": "",
+   "what": "Global manufacturer of complex metal castings and forged components",
+   "link": "Ultimate parent of AETC / PCC Airfoils (Berkshire Hathaway owned); Major supplier of turbine and aero-engine castings/forgings",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Enapter",
+   "country": "Germany / Italy",
+   "site": "www.enapter.com",
+   "email": "",
+   "what": "AEM modular electrolyzers for green hydrogen production",
+   "link": "Supplier whose electrolyzers Euromekanik distributes; Hydrogen supply relevant to H2-ready gas turbines and test rigs",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Accelleron Industries",
+   "country": "Switzerland",
+   "site": "www.accelleron-industries.com",
+   "email": "",
+   "what": "Turbochargers and related engine/energy service (former ABB Turbocharging)",
+   "link": "2024 partner of SOMAS for butterfly-valve servicing; Turbomachinery/turbocharging for power and marine engines",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Instalco AB",
+   "country": "Sweden",
+   "site": "www.instalco.se",
+   "email": "",
+   "what": "Nordic installation group (HVAC, piping, electrical, industry) with 6,000+ staff",
+   "link": "Parent group of Rörmokaren AB and Start-Up AB; Owns firms servicing Siemens turbine facilities in Finspång",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "GE Vernova (General Electric)",
+   "country": "USA",
+   "site": "www.gevernova.com",
+   "email": "",
+   "what": "Gas turbine OEM (7HA class heavy-duty gas turbines) and power equipment",
+   "link": "Customer of Goodwin International (7HA.02 castings) and Munters (inlet cooling); Major gas turbine OEM",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Larsen & Toubro",
+   "country": "India",
+   "site": "www.larsentoubro.com",
+   "email": "",
+   "what": "Engineering & heavy-manufacturing conglomerate; power plant equipment",
+   "link": "Client of Goodwin International (660MW steam turbine Main Steam Valves); Steam turbine valve/component procurement",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Indutrade AB",
+   "country": "Sweden",
+   "site": "www.indutrade.com",
+   "email": "",
+   "what": "Listed industrial-technology group; portfolio owner of temperature-sensor maker Pentronic",
+   "link": "Parent/owner of Pentronic AB; Owns Pentronic whose sensors go into gas turbines",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "PR electronics",
+   "country": "Denmark",
+   "site": "www.prelectronics.com",
+   "email": "",
+   "what": "Signal conditioning / temperature transmitters",
+   "link": "Long-term supplier/partner to Pentronic AB; Signal conditioning for temperature measurement chains",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Sintavia",
+   "country": "USA",
+   "site": "sintavia.com",
+   "email": "",
+   "what": "Metal additive-manufacturing production for aerospace/defense",
+   "link": "Customer of Quintus Technologies (bought HIP press); AM of superalloy turbine/engine parts requiring HIP densification",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Wallwork Heat Treatment",
+   "country": "United Kingdom",
+   "site": "www.wallworkht.com",
+   "email": "",
+   "what": "Heat treatment, coatings and HIP services",
+   "link": "Customer of Quintus Technologies (added 2nd HIP press); HIP densification of aerospace/turbine castings",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Carrier Global",
+   "country": "USA",
+   "site": "www.corporate.carrier.com",
+   "email": "",
+   "what": "HVAC and fire & security conglomerate",
+   "link": "Parent/owner of Marioff Corporation Oy; Owns Marioff HI-FOG protecting GE gas turbine enclosures",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Mitsubishi Materials Corporation",
+   "country": "Japan",
+   "site": "www.mmc.co.jp",
+   "email": "",
+   "what": "Advanced materials & copper products group",
+   "link": "Parent/owner of Luvata; Owns Luvata (rotor/hollow copper for turbogenerators)",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Meyer Tool Inc.",
+   "country": "USA",
+   "site": "www.meyertool.com",
+   "email": "",
+   "what": "Turbine hot-section machining and repair",
+   "link": "Parent/owner of AMK Welding (since 2017); Machining/finishing of gas turbine airfoils and components",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Innova Global",
+   "country": "Canada",
+   "site": "www.innova-global.com",
+   "email": "",
+   "what": "Emissions and noise control for gas turbines and industry",
+   "link": "Acquirer/owner of Braden; GT inlet, exhaust, silencing and SCR systems",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "hyperdrives GmbH",
+   "country": "Germany",
+   "site": "www.hyperdrives.de",
+   "email": "",
+   "what": "Direct-cooled electric machines using copper hollow conductors",
+   "link": "Customer of Luvata (oxygen-free hollow conductors); High-performance electrical machines (generator/rotor tech)",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "GF Precicast",
+   "country": "Switzerland",
+   "site": "www.gfprecicast.com",
+   "email": "",
+   "what": "Investment casting and additive manufacturing of aero-engine and industrial gas turbine hot-section parts (Novazzano/Stabio CH, Arad RO, ~600 employees)",
+   "link": "Subsidiary/brand of GF Casting Solutions; being acquired by Consolidated Precision Products (CPP); References incl. GE, Safran, MHI, Rolls-Royce, Siemens, Ansaldo IGT/aero engines",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Peter Brotherhood",
+   "country": "United Kingdom",
+   "site": "www.peterbrotherhood.com",
+   "email": "",
+   "what": "Steam turbines, turbo-compressors and combined rotating equipment packages",
+   "link": "Named engine/gearbox in Hilliard starter-fleet experience; Turbomachinery OEM (steam turbines & compressor trains)",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "CFM International",
+   "country": "France / USA",
+   "site": "www.cfmaeroengines.com",
+   "email": "",
+   "what": "50/50 СП GE Aerospace и Safran — двигатели CFM56 и LEAP",
+   "link": "СП/клиент Safran и GE; Авиадвигатель-OEM; крупнейшая программа турбовентиляторов (54000+ заказов)",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "InterGen",
+   "country": "USA / Netherlands",
+   "site": "www.intergen.com",
+   "email": "",
+   "what": "IPP-разработчик и оператор электростанций",
+   "link": "BOO-партнёр ENKA по турецким ПГУ; Владеет/оперирует ПГУ на газовых турбинах GE F-class (Gebze/Adapazarı/İzmir)",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Bechtel",
+   "country": "USA",
+   "site": "www.bechtel.com",
+   "email": "",
+   "what": "Глобальный EPC-подрядчик энергообъектов",
+   "link": "Turnkey EPC-партнёр ENKA; Монтаж газотурбинных ПГУ GE 9FA под ключ",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Schmidt + Clemens",
+   "country": "Germany",
+   "site": "www.schmidt-clemens.com",
+   "email": "",
+   "what": "Центробежное литьё высоколегированных жаропрочных сплавов",
+   "link": "Поставщик технологии Uni Abex; Жаропрочные сплавы/литьё для энергетики и нефтехимии (термонагруженные компоненты)",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Uni Deritend",
+   "country": "India",
+   "site": "unideritend.com",
+   "email": "",
+   "what": "Литьё паровых турбин: сопловые сегменты, направляющие/рабочие лопатки, airfoils, клапаны",
+   "link": "Компания Neterwala Group; поставщик power-generation OEM; Прямые компоненты паровых турбин для энергомашиностроения Европы/США/Азии",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "MW Components",
+   "country": "USA",
+   "site": "www.mwcomponents.com",
+   "email": "",
+   "what": "Крепёж, пружины, прецизионные металлокомпоненты (бренды Accurate Screw, Addison, Ohio Rod и др.)",
+   "link": "Материнская к Elgin Fastener Group (покупка 2023); Обслуживает Energy/Oil & Gas — крепёж для энергетического оборудования",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Calpine",
+   "country": "USA",
+   "site": "www.calpine.com",
+   "email": "",
+   "what": "Крупнейший в США оператор газовых ПГУ и геотермики",
+   "link": "Клиент IST (OTSG); Эксплуатирует парк газовых турбин GE/Siemens в комбинированном цикле",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Moog Inc.",
+   "country": "USA",
+   "site": "moog.com",
+   "email": "",
+   "what": "Servovalves and electrohydraulic actuators for turbomachinery",
+   "link": "поставщик/бренд, дистрибутируемый Gas Turbine Valves Pte; servoactuation for gas & steam turbine control",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "BHEL-GE Gas Turbine Services (BGGTS)",
+   "country": "India",
+   "site": "bggts.com",
+   "email": "",
+   "what": "Gas-turbine aftermarket engineering, repair & maintenance",
+   "link": "50:50 JV BHEL и GE; dedicated GT services JV for GE-frame turbines in India",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "John Zink Hamworthy Combustion",
+   "country": "USA",
+   "site": "johnzink.com",
+   "email": "",
+   "what": "Combustion, burners, flares and emissions-control systems",
+   "link": "дочерняя Koch Engineered Solutions; combustion/emissions tech adjacent to GT (DLE/burner) applications",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Freudenberg Group",
+   "country": "Germany",
+   "site": "freudenberg.com",
+   "email": "",
+   "what": "Sealing & vibration-control technologies group",
+   "link": "со-владелец/материнская группа EagleBurgmann; parent of dry-gas-seal supplier to turbo-compressors/turbines",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "ProvibTech / PVTVM",
+   "country": "USA",
+   "site": "www.provibtech.com",
+   "email": "",
+   "what": "Производитель вибромониторинга и защиты роторных машин (API 670), proximity probes, transmitters",
+   "link": "поставщик (принципал) VibraVista — та мастер-дистрибьютор; Оборудование защиты для паровых/гидро турбин и компрессоров",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "MeeFog (Mee Industries)",
+   "country": "USA",
+   "site": "www.meefog.com",
+   "email": "",
+   "what": "Системы inlet fogging и evaporative cooling для повышения мощности ГТУ",
+   "link": "поставщик, дистрибутируемый Thomassen Energy; Прямое применение на газовых турбинах (охлаждение на входе)",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Roper Pumps",
+   "country": "USA",
+   "site": "www.roperpumps.com",
+   "email": "",
+   "what": "Насосы жидкого топлива и flow dividers",
+   "link": "поставщик, дистрибутируемый Thomassen Energy; Топливные насосы для газовых турбин",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Franke-Filter",
+   "country": "Germany",
+   "site": "www.franke-filter.com",
+   "email": "",
+   "what": "Сепараторы масляного тумана (oil mist separators)",
+   "link": "поставщик, дистрибутируемый Thomassen Energy; Оборудование для смазочных систем ГТУ",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Stork Turbo Blading (Stork Thermeq)",
+   "country": "Netherlands",
+   "site": "www.storkturboblading.com",
+   "email": "",
+   "what": "Производство и реверс-инжиниринг лопаток турбомашин",
+   "link": "поставщик, дистрибутируемый Thomassen Energy; Лопатки для газовых и паровых турбин (aftermarket)",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Australasia Turbomachinery Services",
+   "country": "Australia",
+   "site": "www.ats-services.com.au",
+   "email": "",
+   "what": "Полевой сервис турбомашин (плановые/аварийные остановы)",
+   "link": "полевой сервис-партнёр Thomassen Energy; Обслуживание ГТУ на месте эксплуатации",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Land Instruments International",
+   "country": "United Kingdom",
+   "site": "www.ametek-land.com",
+   "email": "",
+   "what": "Инфракрасная термометрия и пирометры для промышленности",
+   "link": "бренд/дочка AMETEK (приобретён 2006); Температурный мониторинг горячих секций / горелок",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Napier Turbochargers",
+   "country": "United Kingdom",
+   "site": "www.napier-turbochargers.com",
+   "email": "",
+   "what": "Крупные промышленные турбонагнетатели для судовой и энергетической генерации",
+   "link": "дочка Wabtec (с 2013); ранее принадлежала Siemens; Турбонаддув энергетических/судовых двигателей; корни в Ruston Gas Turbines/Alstom",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Aviadvigatel",
+   "country": "Russia",
+   "site": "www.avid.ru",
+   "email": "",
+   "what": "КБ авиадвигателей (PD-14) и промышленных ГТУ / ГПА",
+   "link": "дочка ОДК (UEC); Разработчик газотурбинных двигателей и энергетических ГТУ",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Kawasaki Heavy Industries — Gas Turbine Division",
+   "country": "Japan",
+   "site": "global.kawasaki.com",
+   "email": "",
+   "what": "Промышленные газовые турбины (GPB series), когенерация",
+   "link": "конкурент/аналог Niigata Power Systems в японском энергомаше; Прямой OEM промышленных ГТУ",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
+  },
+  {
+   "name": "Furon Corporation",
+   "country": "USA",
+   "site": "www.saint-gobain.com",
+   "email": "",
+   "what": "Spring-energized seals и полимерные уплотнения (ныне в составе Saint-Gobain Performance Plastics)",
+   "link": "поставщик-принципал Seal Tech (Japan) с 1987; Высокоэффективные уплотнения для энергетических/fluid-control применений",
+   "tier": "component_specialist",
+   "angle": "harvest:unwind2",
+   "risk": ""
   }
  ]
 };
@@ -20047,7 +20960,7 @@ const PROFILES = {
 };
 const DOSSIERS = {
  "updated": "2026-08-06",
- "source": "Досье компаний (факты для скоринга): год основания, кому поставляли, экспорт, поставщики. Движок раскрутки цепочек, волна 1 — 06.08.2026.",
+ "source": "Досье компаний (факты для скоринга): год основания, кому поставляли, экспорт, поставщики. Движок раскрутки цепочек, волна 1 — 06.08.2026. Волна 2.",
  "dossiers": {
   "AMT, Inc. (Advanced Machining & Tooling)": {
    "founded": 1990,
@@ -21632,7 +22545,7 @@ const DOSSIERS = {
    ],
    "buys_from": [],
    "supplied_proof": "shipment",
-   "note": "Корейское стальное литьё (주강); таможенные записи (ImportGenius) подтверждают контейнерные поставки деталей на Solar Turbines в Сан-Диего — сильнейшее прямое доказательство. Лин��я идёт от Dae Yang Stainless (1966)."
+   "note": "Корейское стальное литьё (주강); таможенные записи (ImportGenius) подтверждают контейнерные поставки деталей на Solar Turbines в Сан-Диего — сильнейшее прямое доказательство. Линя идёт от Dae Yang Stainless (1966)."
   },
   "Paralloy Ltd (T/A FVC, Paralloy & Firth Vickers)": {
    "founded": 1935,
@@ -22424,6 +23337,2652 @@ const DOSSIERS = {
    ],
    "supplied_proof": "named_client",
    "note": "High-integrity machining of gas-turbine rotor parts — discs, shafts, aerofoils, bearings; AMRC's first-ever spin-out (University of Sheffield)."
+  },
+  "Surplus Generation Equipment, LLC (SIRGEN)": {
+   "founded": 0,
+   "supplied_to": [
+    "operators buying used Solar (Saturn, Taurus, Centaur, Titan) gensets",
+    "GE Frame 5 buyers"
+   ],
+   "exports_to": [
+    "worldwide (markets used power equipment to buyers globally)"
+   ],
+   "buys_from": [
+    "surplus/OEM sources across ABB, GE, Solar, Mitsubishi, Rolls-Royce, Ruston, Dresser-Rand, Wartsila, Jenbacher, Caterpillar"
+   ],
+   "supplied_proof": "catalog",
+   "note": "Alpharetta, Georgia (USA) broker of used/surplus and refurbished Solar and GE gas turbine gensets and complete power plants; inventory pages list specific Solar Saturn/Taurus/Centaur/Titan 130 and GE Frame 5 units."
+  },
+  "Greenray Turbine Solutions": {
+   "founded": 1981,
+   "supplied_to": [
+    "operators of legacy Ruston TA and GEC/EGT industrial gas turbine fleets",
+    "Middle East & North Africa oil/energy customers (historical drilling roots)"
+   ],
+   "exports_to": [
+    "United Kingdom",
+    "Middle East",
+    "North Africa",
+    "global aftermarket"
+   ],
+   "buys_from": [
+    "access to original GEC/EGT (now Siemens) drawings and OEM archive"
+   ],
+   "supplied_proof": "named_client",
+   "note": "Lincoln, UK; founded 1981 by ex-GEC Gas Turbines staff. Holds licensed OEM stewardship of the Ruston TA fleet and supports legacy GEC/European Gas Turbines packages. Acquired by Flowserve Corporation in December 2025 for ~$72M."
+  },
+  "Gas Turbine Resources": {
+   "founded": 2008,
+   "supplied_to": [
+    "Shell Petroleum & Development Company of Nigeria",
+    "BNFL (British Nuclear Fuels) UK",
+    "Siemens SGT200 / TB5000 / TB5400 operators"
+   ],
+   "exports_to": [
+    "United Kingdom",
+    "Spain (Barcelona facility)",
+    "global (case studies across multiple continents)"
+   ],
+   "buys_from": [],
+   "supplied_proof": "named_client",
+   "note": "Founded 2008; facilities in Barcelona (Spain) and Saxilby (UK). Rotor overhaul and high-speed balancing for industrial gas turbines (Siemens/Ruston TB series, GE Gemini). Named end clients include Shell Nigeria and BNFL."
+  },
+  "Special Parts": {
+   "founded": 2018,
+   "supplied_to": [
+    "industrial gas turbine operators needing heavy-duty (frame) and aeroderivative capital parts",
+    "overhaul shops needing combustion chambers and hot-section parts"
+   ],
+   "exports_to": [
+    "United Kingdom",
+    "international"
+   ],
+   "buys_from": [
+    "investment-casting foundries and superalloy machining/coating subcontractors (managed supply chain)"
+   ],
+   "supplied_proof": "catalog",
+   "note": "Whitstable/Chestfield, Kent, UK. Legal entity incorporated 2018 but ~20 years reverse-engineering expertise. Maintains a spare-parts database for heavy-duty and aeroderivative GTs; makes combustion chambers in Hastelloy X / Nimonic to OEM standards, managing casting-machining-coating chain."
+  },
+  "Gas Turbine Applications, Inc. (GTA)": {
+   "founded": 1984,
+   "supplied_to": [
+    "upstream and midstream oil & gas operators running Solar Saturn and Centaur turbines"
+   ],
+   "exports_to": [
+    "United States",
+    "international (via Turbine Efficiency Group network)"
+   ],
+   "buys_from": [],
+   "supplied_proof": "catalog",
+   "note": "Calera, Oklahoma; founded 1984. Independent overhaul/repair/test provider for Solar Saturn and Centaur industrial gas turbines with a 16,000 sq ft shop and Saturn/Centaur test cell. Part of Turbine Efficiency Group."
+  },
+  "Industrial Motor Power Corporation (IMP)": {
+   "founded": 1981,
+   "supplied_to": [
+    "global buyers of new-surplus and used turbogenerator sets and engines (Solar, GE Energy, Kawasaki, Rolls-Royce, Mitsubishi among brands traded)"
+   ],
+   "exports_to": [
+    "worldwide (immediate global access, international market)"
+   ],
+   "buys_from": [
+    "surplus/OEM sources across Caterpillar, Cummins, Rolls-Royce, Solar, GE Energy, Kawasaki, Wartsila, MAN, Mitsubishi, MTU"
+   ],
+   "supplied_proof": "catalog",
+   "note": "Since 1981; buy-sell-rent of new-surplus and used power generation equipment including gas turbine gensets. Long brand list includes Solar, GE Energy, Kawasaki, Rolls-Royce turbines."
+  },
+  "FIN Marine & Energy Solutions Ltd.": {
+   "founded": 0,
+   "supplied_to": [
+    "buyers of used Solar Titan 130 and Mars 100 gas turbine gensets",
+    "Wartsila 20V34SG / 32 power-plant buyers",
+    "Siemens and GE gas turbine buyers"
+   ],
+   "exports_to": [
+    "worldwide (offices/warehouses in Istanbul and Dubai)"
+   ],
+   "buys_from": [
+    "Wartsila engines/gensets and full power plants; Solar, Siemens, GE used gas turbines sourced from stock and network"
+   ],
+   "supplied_proof": "catalog",
+   "note": "Global trader of used power equipment with warehouses in Istanbul and Dubai. Live catalog lists specific units: 15 MW Solar Titan 130, Solar Mars 100 gensets, Wartsila 20V34SG combined-cycle plants."
+  },
+  "Gas Turbine Resources (GTR)": {
+   "founded": 2008,
+   "supplied_to": [
+    "Shell Petroleum & Development Company of Nigeria",
+    "BNFL UK",
+    "Siemens SGT200 / TB5000 operators; GE Gemini and Ruston fleets"
+   ],
+   "exports_to": [
+    "United Kingdom",
+    "Spain",
+    "global"
+   ],
+   "buys_from": [],
+   "supplied_proof": "named_client",
+   "note": "Same entity as #3 (gasturbineresources.com, founded 2008). Broader offering: new & refurbished spares, overhauls, turbine leasing, hot-section repair, rotor balancing, life extension, LTSAs. Named clients Shell Nigeria and BNFL."
+  },
+  "ADN Global (ADN Ltd. Şirketi)": {
+   "founded": 0,
+   "supplied_to": [
+    "operators needing Siemens Energy SGT-300 gas turbine spare parts (7.9 MWe / 8.4-9.1 MW shaft)"
+   ],
+   "exports_to": [
+    "20 countries (exact list not disclosed)"
+   ],
+   "buys_from": [
+    "KJ Power (generators); Wilo, Netafim, Lowara (non-turbine partner brands)"
+   ],
+   "supplied_proof": "catalog",
+   "note": "Turkey-based diversified trader (generators, agri, metals, railway). Turbine relevance is a dedicated Gas Turbines & Spare Parts line explicitly listing Siemens SGT-300 parts; claims export to 20 countries. Generator arm partnered with KJ Power."
+  },
+  "International Energy Resources (IER FZCO)": {
+   "founded": 2002,
+   "supplied_to": [
+    "operators of Siemens SGT500 / SGT400, Rolls-Royce Avon, and GE LM2500 gas turbines needing refurbished core engines and capital parts"
+   ],
+   "exports_to": [
+    "operates in 20 countries globally"
+   ],
+   "buys_from": [],
+   "supplied_proof": "catalog",
+   "note": "Dubai free-zone company (FZCO), copyright since 2002. Stocks refurbished gas turbine core engines and capital parts: Siemens SGT500/SGT400, Rolls-Royce Avon, GE LM2500 in various (incl. dual-fuel/DLE) configurations."
+  },
+  "AECC Gas Turbine Co., Ltd (центр обслуживания импортных ГТУ)": {
+   "founded": 0,
+   "supplied_to": [
+    "operators of imported/western small-medium industrial gas turbines (per stated profile)",
+    "AECC / Chinese domestic industrial GT users"
+   ],
+   "exports_to": [
+    "China (domestic); export subcontracting via AECC group"
+   ],
+   "buys_from": [
+    "parent Aero Engine Corporation of China (AECC) industrial gas turbine programs (QD70, QD128)"
+   ],
+   "supplied_proof": "claim",
+   "note": "Domain aeccgt.com did not resolve at time of check; unverifiable independently. Positioned as a maintenance/service unit under state-owned Aero Engine Corporation of China (AECC, est. 2016), which manufactures QD70 (7 MW) and QD128 (12 MW) industrial gas turbines. Western-turbine service role is self-stated, not evidenced online."
+  },
+  "Soar Power Group (China) Ltd": {
+   "founded": 0,
+   "supplied_to": [
+    "power/oil-gas/marine buyers of gas turbine gensets and power plants 1-590 MW (new and used)",
+    "distributor of AECC Industrial Gas Turbines (QD70 7 MW, QD128 12 MW)"
+   ],
+   "exports_to": [
+    "China (Dongguan base); international project supply"
+   ],
+   "buys_from": [
+    "AECC (industrial gas turbines); references MAN, Hyundai Heavy Industries (HHI), Caterpillar/FG Wilson"
+   ],
+   "supplied_proof": "catalog",
+   "note": "Dongguan-based trader/EPC (斯奥动力集团). Catalog spans gas turbine gensets 1-590 MW plus gas/HFO/diesel engines and marine propulsion. Acts as distributor for AECC industrial gas turbines; provides install/commissioning/after-sales and EPC."
+  },
+  "Prashaant Steel & Alloys": {
+   "founded": 1983,
+   "supplied_to": [
+    "oil & gas industry buyers of superalloy fasteners, fittings and flanges (Nimonic, Inconel 718, Incoloy, Hastelloy, Monel)"
+   ],
+   "exports_to": [
+    "international (exports desk; specific countries not listed)"
+   ],
+   "buys_from": [
+    "associated Indian manufacturing units (unnamed)"
+   ],
+   "supplied_proof": "claim",
+   "note": "India (Mumbai) manufacturer-stockist since 1983, ISO 9001:2015 / PED certified. Produces bolts, studs, nuts, fasteners, flanges in Nimonic 80A/75, Inconel 718 (ASTM B637), Incoloy, Hastelloy - grades used in gas turbines, but site names only 'oil and gas' generally with no turbine-OEM client evidence."
+  },
+  "Hex Forge Inc": {
+   "founded": 0,
+   "supplied_to": [],
+   "exports_to": [
+    "UAE",
+    "UK",
+    "USA",
+    "Italy",
+    "China",
+    "Australia",
+    "Spain",
+    "Germany",
+    "France",
+    "Brazil",
+    "Argentina",
+    "Japan"
+   ],
+   "buys_from": [],
+   "supplied_proof": "catalog",
+   "note": "Индийский производитель крепежа/фланцев/труб из Inconel, Monel, Hastelloy, титана; каталог перекрывает high-temp болтинг, но именных турбинных OEM-клиентов на сайте нет — экспорт в 17 стран заявлен."
+  },
+  "Extreme Bolt & Fastener": {
+   "founded": 0,
+   "supplied_to": [],
+   "exports_to": [],
+   "buys_from": [],
+   "supplied_proof": "catalog",
+   "note": "Поставщик экзотического крепежа (Inconel, Hastelloy, Nimonic, тантал, цирконий) для Power & Energy, Aerospace, Oil & Gas; каталог с турбинными сплавами есть, конкретных OEM-клиентов сайт не называет."
+  },
+  "Lightning Bolt & Supply": {
+   "founded": 1994,
+   "supplied_to": [],
+   "exports_to": [
+    "Worldwide (jobsites all over the world)"
+   ],
+   "buys_from": [],
+   "supplied_proof": "catalog",
+   "note": "Baton Rouge, LA; основан 1994 (Sharon Valverde). Крепёж из Waspaloy, Inconel, A-286, MP35N, Hastelloy C276, Monel для Power-Generation/Oil&Gas/MRO. ISO с 2000, QSLM Class 2/3 с 1997. Именных турбинных клиентов нет."
+  },
+  "MD&A (Mechanical Dynamics & Analysis) — Parts Division": {
+   "founded": 1982,
+   "supplied_to": [
+    "Утилиты и промышленные операторы ГТУ/ПТУ (power generators worldwide, OEM-alternative)"
+   ],
+   "exports_to": [
+    "Worldwide"
+   ],
+   "buys_from": [],
+   "supplied_proof": "named_client",
+   "note": "Основана 01.06.1982 (Jim Lindsey). Независимый афтермаркет запчастей и ремонта газовых/паровых турбин и генераторов; combustion и hot gas path компоненты, склад крепежа. Рост через поглощения (RPM, Turbo Parts, PGS, PWPS IGT, NovaTech)."
+  },
+  "Masaood John Brown (MJB International)": {
+   "founded": 1979,
+   "supplied_to": [
+    "Abu Dhabi Water & Electricity Authority (ADWEA)",
+    "Dubai Electricity & Water Authority (DEWA)",
+    "Sharjah Electricity & Water Authority (SEWA)",
+    "Saudi Electricity Company (SEC)"
+   ],
+   "exports_to": [
+    "UAE",
+    "Saudi Arabia",
+    "Middle East",
+    "Worldwide",
+    "UK (Glasgow)"
+   ],
+   "buys_from": [
+    "GE (лицензионные frame-турбины через John Brown с 1968)"
+   ],
+   "supplied_proof": "named_client",
+   "note": "СП 1979 Mohammed bin Masaood & Sons (UAE) + John Brown Engineering (UK). Крупнейший независимый сервис индустриальных ГТУ дизайна GE: combustion hardware, сопла, диафрагмы, роторы, склад запчастей. С 2000 связь с Chromalloy Gas Turbine."
+  },
+  "Allied Dynamics Corp": {
+   "founded": 0,
+   "supplied_to": [
+    "Операторы power generation глобально (single-source для industrial gas turbine parts)"
+   ],
+   "exports_to": [
+    "Worldwide"
+   ],
+   "buys_from": [],
+   "supplied_proof": "catalog",
+   "note": "Farmingdale, Long Island, NY; основан 'over three decades ago'. Новые запчасти OEM-качества (liners, transition pieces, fuel nozzles, buckets, диафрагмы) под GE Frame 3/5/6/7/9, Siemens V94.2/501F, Westinghouse W-серия, Mitsubishi, FIAT TG, Alstom 13E2, ABB, Hitachi."
+  },
+  "MD&A (Mechanical Dynamics & Analysis)": {
+   "founded": 1982,
+   "supplied_to": [
+    "Утилиты и промышленные операторы ГТУ/ПТУ (power generators worldwide)"
+   ],
+   "exports_to": [
+    "Worldwide"
+   ],
+   "buys_from": [],
+   "supplied_proof": "named_client",
+   "note": "Тот же субъект, что и Parts Division (mdaturbines.com, осн. 1982). Полный OEM-alternative по combustion-частям: end caps, liners, flow sleeves, transition pieces; сервис-центры в US (San Antonio IGT, Malta NY Turbo Parts). 40+ лет."
+  },
+  "PSM (Power Systems Mfg, Hanwha Power)": {
+   "founded": 1999,
+   "supplied_to": [
+    "Операторы GE 7F/9F/6B/7EA/9E/Frame 5, Siemens/MHI 501F/501D (350+ апгрейдов в 30+ странах)"
+   ],
+   "exports_to": [
+    "USA (Jupiter, FL)",
+    "Netherlands",
+    "UAE",
+    "South Korea",
+    "Americas",
+    "Europe",
+    "Middle East",
+    "Asia (30+ стран)"
+   ],
+   "buys_from": [],
+   "supplied_proof": "named_client",
+   "note": "Основана 1999, Jupiter FL; часть Hanwha Power (слияние PSM + Hanwha Power Systems, ex-Thomassen). Не-OEM combustion (FlameSheet, LEC III), hot gas path GTOP, AutoTune, 100+ патентов. Аффилированы Thomassen Energy, PSM Thomassen Gulf."
+  },
+  "J P Engineering": {
+   "founded": 0,
+   "supplied_to": [
+    "Операторы турбин, компрессоров и крупных электродвигателей (применение баббитовых подшипников)"
+   ],
+   "exports_to": [
+    "India",
+    "экспорт по стандартам ASTM/AISI/BS/DIN/JIS"
+   ],
+   "buys_from": [],
+   "supplied_proof": "catalog",
+   "note": "Индия (Chhattisgarh/Kolkata). Производство и перезаливка баббитовых/белометаллических подшипников, gunmetal bush, non-ferrous castings для турбин, компрессоров, моторов. Именных OEM-клиентов нет; связь с ГТУ по номенклатуре."
+  },
+  "NASH Mechanical Seal Services Ltd.": {
+   "founded": 0,
+   "supplied_to": [
+    "Операторы turbomachinery, насосов, миксеров (ремонт уплотнений 'any brand')"
+   ],
+   "exports_to": [],
+   "buys_from": [],
+   "supplied_proof": "catalog",
+   "note": "Bolton, Lancashire, UK (рег. № 01803027). Независимый ремонт/апгрейд/замена механических и сухих газовых уплотнений всех брендов для турбомашин, ретрофит компрессоров. Именных клиентов и OEM на сайте нет."
+  },
+  "Turbo Control Solutions (TCS)": {
+   "founded": 0,
+   "supplied_to": [
+    "Операторы industrial gas/steam turbines, генераторов, компрессоров в Power Gen и Oil&Gas"
+   ],
+   "exports_to": [
+    "Malaysia (Kuala Lumpur)",
+    "глобально (global provider)"
+   ],
+   "buys_from": [
+    "GE Speedtronic",
+    "Siemens Controls",
+    "Woodward Controls (системы, которые обслуживают)"
+   ],
+   "supplied_proof": "named_client",
+   "note": "Turbo Control Solutions Sdn Bhd, KL, Malaysia (tcssb.com). Ремонт топливных форсунок, fuel/metering/bleed-air valves, GE Speedtronic и Siemens/Woodward контроль. Ранее в TCS Enterprise/TCCS group (дивестиция)."
+  },
+  "MJB International / Al Masaood John Brown": {
+   "founded": 1979,
+   "supplied_to": [
+    "Abu Dhabi Water & Electricity Authority (ADWEA)",
+    "Dubai Electricity & Water Authority (DEWA)",
+    "Sharjah Electricity & Water Authority (SEWA)",
+    "Saudi Electricity Company (SEC)"
+   ],
+   "exports_to": [
+    "UAE",
+    "Saudi Arabia",
+    "Middle East",
+    "UK (Glasgow)",
+    "Worldwide"
+   ],
+   "buys_from": [
+    "GE (frame-турбины по лицензии John Brown)",
+    "Chromalloy Gas Turbine Corp (с 2000)"
+   ],
+   "supplied_proof": "named_client",
+   "note": "Тот же субъект, что #5 (mjbi.com). Независимый сервис тяжёлых ГТУ GE: капремонт, склад запчастей (топливная аппаратура, камеры сгорания). Main workshop в Дубае + Глазго."
+  },
+  "PT Nusantara Turbin dan Propulsi (PT NTP)": {
+   "founded": 1998,
+   "supplied_to": [
+    "200+ клиентов worldwide (аэро и промышленные операторы)",
+    "операторы Solar Turbines, Rolls-Royce, Pratt & Whitney двигателей"
+   ],
+   "exports_to": [
+    "Indonesia (Bandung)",
+    "South East Asia",
+    "worldwide (200+ customers)"
+   ],
+   "buys_from": [],
+   "supplied_proof": "named_client",
+   "note": "Основана как UMC (division of IPTN) 1986, выделена в PT NTP 1998; субсидиар PT Dirgantara Indonesia. MRO аэро и промышленных ГТУ, test cell (в т.ч. Solar turbine test cell, jet cell до 100k lb). ISO/FAA/EASA, 36+ лет."
+  },
+  "PSM (Power Systems Mfg., Hanwha Power Systems)": {
+   "founded": 1999,
+   "supplied_to": [
+    "GE (7F, 9F, 6B, 7EA, 9E, Frame 5 fleets)",
+    "Siemens/MHI 501F operators"
+   ],
+   "exports_to": [
+    "Americas",
+    "Europe",
+    "Middle East",
+    "Asia",
+    "30+ countries"
+   ],
+   "buys_from": [
+    "Hanwha Group (parent)"
+   ],
+   "supplied_proof": "catalog",
+   "note": "Founded 1999 in Jupiter FL, now Hanwha Power; independent aftermarket combustion/hot-gas-path parts (FlameSheet, LEC III combustor, buckets/nozzles), 350+ upgrades installed for GE and Siemens/MHI frames worldwide."
+  },
+  "World of Controls (WOC)": {
+   "founded": 0,
+   "supplied_to": [
+    "GE Speedtronic-equipped turbine operators",
+    "GE Excitation (EX2000/EX2100) users"
+   ],
+   "exports_to": [
+    "UAE base (RAKEZ, Ras Al Khaimah)",
+    "international"
+   ],
+   "buys_from": [
+    "GE / GE Drives",
+    "Bently Nevada"
+   ],
+   "supplied_proof": "catalog",
+   "note": "UAE-based independent stockist of GE Speedtronic Mark boards, EX2000/EX2100(e) excitation, GE Drives and Bently Nevada; large surplus/repair inventory for legacy GE turbine controls."
+  },
+  "Holland Controls": {
+   "founded": 1969,
+   "supplied_to": [
+    "Equinor",
+    "TotalEnergies",
+    "Harbour Energy",
+    "National Gas Transmission",
+    "Stadtwerke Munster",
+    "OMV",
+    "Petrofac",
+    "Canadian Natural"
+   ],
+   "exports_to": [
+    "Netherlands",
+    "UK",
+    "North Sea",
+    "Europe",
+    "global oil & gas"
+   ],
+   "buys_from": [],
+   "supplied_proof": "named_client",
+   "note": "Founded 1969, Hengelo NL; independent gas-turbine control retrofits documented for Rolls-Royce RB211, Siemens SGT-A35, GE LM2500+ and Solar Taurus 60 SoLoNOx, with 25+ named blue-chip operators."
+  },
+  "Tri-Sen Systems": {
+   "founded": 1976,
+   "supplied_to": [
+    "Steam and gas turbine operators in process/power industries"
+   ],
+   "exports_to": [
+    "USA (Houston HQ)",
+    "Netherlands/EMEA",
+    "Singapore/APAC",
+    "Dubai/Middle East",
+    "India",
+    "China"
+   ],
+   "buys_from": [],
+   "supplied_proof": "catalog",
+   "note": "Founded 1976, Houston; digital turbine governors/controllers (TS300, 310sv, TetraSentry, TSODS overspeed, GEMINI compressor monitor) and antisurge/actuator retrofits for steam and gas turbines globally."
+  },
+  "GTC Control Solutions": {
+   "founded": 0,
+   "supplied_to": [
+    "GE Speedtronic Mark II-VIe turbine operators"
+   ],
+   "exports_to": [
+    "USA (Hawthorne NY HQ)",
+    "India (Bangalore)",
+    "UK (London)",
+    "Malaysia",
+    "UAE (Dubai)",
+    "Argentina (Buenos Aires)"
+   ],
+   "buys_from": [
+    "GE",
+    "ABB",
+    "Siemens",
+    "Honeywell",
+    "Allen Bradley",
+    "Westinghouse"
+   ],
+   "supplied_proof": "catalog",
+   "note": "Independent stock/repair of GE Speedtronic Mark II-VIe boards, modules and HMIs (plus ABB/Siemens/Westinghouse), 6 regional offices; positions as low-cost alternative to OEM turbine-control spares."
+  },
+  "ООО «СТГТ» (Современные технологии газовых турбин)": {
+   "founded": 2011,
+   "supplied_to": [
+    "Russian & CIS power generators",
+    "Inter RAO (owner/customer)",
+    "Siemens (technology licensor)"
+   ],
+   "exports_to": [
+    "Russia",
+    "CIS"
+   ],
+   "buys_from": [
+    "Siemens Energy (technology/licence)",
+    "Power Machines / Силовые машины"
+   ],
+   "supplied_proof": "named_client",
+   "note": "Founded Dec 2011 St. Petersburg as Siemens (65%)/Power Machines (35%) JV; makes and services SGT5-2000E (100+ MW), localization ~62% with planned hot-path blade production; Siemens stake bought by Inter RAO in Oct 2022."
+  },
+  "EuroNato": {
+   "founded": 0,
+   "supplied_to": [
+    "Solar Turbines fleet operators (Centaur 40/50/60/70, Saturn, Mars 100/130)",
+    "Siemens and GE turbine operators"
+   ],
+   "exports_to": [
+    "Russia",
+    "CIS"
+   ],
+   "buys_from": [
+    "Solar Turbines (parts sourced/traded)"
+   ],
+   "supplied_proof": "catalog",
+   "note": "Engineering company building gas-turbine/gas-piston power plants; also sells/overhauls Solar (Saturn, Centaur, Mars), Siemens and GE turbines, spare parts incl. monocrystalline hot-section blades and burners; reverse-engineered ZIP."
+  },
+  "DMLieferant (ДМ Лиферант)": {
+   "founded": 2009,
+   "supplied_to": [
+    "270 recurring industrial customers (unnamed)"
+   ],
+   "exports_to": [
+    "Russia (Moscow base)"
+   ],
+   "buys_from": [
+    "3000+ partner brands / 300+ manufacturers of imported industrial equipment"
+   ],
+   "supplied_proof": "claim",
+   "note": "Founded 2009, Moscow; supplies imported ZIP/components for foreign GTUs and arranges turbine/compressor repair; broad multi-brand distribution but no turbine OEM or client named on site."
+  },
+  "ООО «Газтурботэк»": {
+   "founded": 2013,
+   "supplied_to": [
+    "Gas-turbine and gas-piston engine operators (unnamed)"
+   ],
+   "exports_to": [
+    "Russia (Nizhny Novgorod, Surgut)"
+   ],
+   "buys_from": [],
+   "supplied_proof": "claim",
+   "note": "Since 2013, Nizhny Novgorod/Surgut; scheduled maintenance and overhaul of gas-turbine and gas-piston engines (documented CAT G3306-G3516 gas-piston work); turbine-specific OEM/clients not disclosed."
+  },
+  "ООО «ТурбоИнжиниринг»": {
+   "founded": 2014,
+   "supplied_to": [
+    "Operators of Kharkov Turbine Works (ХТЗ) steam turbines K-150-130, K-160-130"
+   ],
+   "exports_to": [
+    "Russia (St. Petersburg base)",
+    "CIS (EN/RU site)"
+   ],
+   "buys_from": [],
+   "supplied_proof": "catalog",
+   "note": "Founded 2014, St. Petersburg; design/manufacture of spare parts (control valves, seals, diaphragms) for steam and gas turbines, generators and compressors, with documented ХТЗ K-150/160-130 components."
+  },
+  "Станберг (SB)": {
+   "founded": 0,
+   "supplied_to": [
+    "Turbo-unit operators (gas turbine component repair, unnamed)"
+   ],
+   "exports_to": [
+    "Russia (Moscow base)"
+   ],
+   "buys_from": [
+    "Multiple metal-working equipment OEM brands (distributed)"
+   ],
+   "supplied_proof": "claim",
+   "note": "Supplier of high-tech metal-working equipment plus turbomachinery service: gas-turbine component repair (blades, fuel valves, casings), control-system (ASU) modernization and rotor balancing; no turbine OEM/client named."
+  },
+  "КЭР-Холдинг": {
+   "founded": 1960,
+   "supplied_to": [
+    "Tatenergo",
+    "Setevaya Kompaniya (Сетевая компания)",
+    "Tatarstan power fleet (7056 MW serviced)"
+   ],
+   "exports_to": [
+    "Russia (Tatarstan, Kazan base)"
+   ],
+   "buys_from": [],
+   "supplied_proof": "named_client",
+   "note": "Roots from 1960, holding formed 2001 (KR Group, 7+ companies, 2400+ staff); by 2024 performed 45+ overhauls across 11 foreign gas-turbine models; core contractor to Tatenergo and Setevaya Kompaniya."
+  },
+  "Turbin Bakim San. Ltd.": {
+   "founded": 0,
+   "supplied_to": [
+    "Gas turbine & compressor operators in Africa and CIS"
+   ],
+   "exports_to": [
+    "Turkey (base)",
+    "Africa",
+    "CIS"
+   ],
+   "buys_from": [],
+   "supplied_proof": "claim",
+   "note": "Turkey-based gas-turbine and compressor repair (on-site and in-shop) plus parts supply to OEM specification for clients across Africa and CIS; specific turbine OEM/clients not named on site."
+  },
+  "Tuğran Enerji A.Ş.": {
+   "founded": 0,
+   "supplied_to": [
+    "Karachi Nuclear Power Station (Pakistan) — turbine/generator major maintenance",
+    "Afşin-Elbistan Thermal Power Plant (Turkey)"
+   ],
+   "exports_to": [
+    "Pakistan",
+    "Turkey"
+   ],
+   "buys_from": [],
+   "supplied_proof": "named_client",
+   "note": "Brand-independent 24/7 MRO of gas/steam/hydro turbines and generators; completed a 165 MW gas turbine major overhaul in 2023; claims ~32-40 years experience but no explicit founding year on site."
+  },
+  "АО «ЗКМК» (Западно-Казахстанская машиностроительная компания)": {
+   "founded": 2003,
+   "supplied_to": [
+    "GE Oil & Gas (licensed service partner, Central Asia + Azerbaijan)",
+    "Solar Turbines Europe S.A. (signed cooperation agreement, per KASE)",
+    "Karachaganak Petroleum Operating (KPO)",
+    "GE Frame 5 gas turbine overhaul (first service-center order)"
+   ],
+   "exports_to": [
+    "Azerbaijan",
+    "Kyrgyzstan",
+    "Turkmenistan",
+    "Uzbekistan"
+   ],
+   "buys_from": [
+    "GE Oil & Gas (repair licenses/technology, GE10/GE10-11MW localization)",
+    "Solar Turbines"
+   ],
+   "supplied_proof": "named_client",
+   "note": "Uralsk-based plant founded 2003 on ex-'Metallist' defense works; service center from 2011 (staff trained in USA/Italy) doing GE gas turbine & compressor overhauls under GE Oil & Gas license; Solar Turbines Europe agreement confirmed via KASE."
+  },
+  "Patented Systems, Inc.": {
+   "founded": 1984,
+   "supplied_to": [
+    "Operators of Ruston TA/TB gas turbines (oil rigs, ships in port, offshore)"
+   ],
+   "exports_to": [
+    "Argentina",
+    "Canada",
+    "Ecuador",
+    "Mexico",
+    "Nigeria",
+    "Oman",
+    "USA",
+    "Venezuela"
+   ],
+   "buys_from": [],
+   "supplied_proof": "catalog",
+   "note": "~40+ years in business; niche aftermarket manufacturer for Ruston TA/TB gas turbines — parts catalogs (A/B/C), ignition systems, thermocouples, blade coatings, refurbished equipment and upgrades."
+  },
+  "Fortum Turbine and Generator Services (Fortum eNext)": {
+   "founded": 0,
+   "supplied_to": [
+    "Nordic/European utilities (multi-OEM steam & gas turbine + generator overhauls)",
+    "First turbine+generator overhaul in Czech Republic (2019)",
+    "Radial steam-turbine fleet customer in Sweden (rotor/stator rewind, 2021)"
+   ],
+   "exports_to": [
+    "Finland",
+    "Sweden",
+    "Germany",
+    "Czech Republic",
+    "Nordics"
+   ],
+   "buys_from": [],
+   "supplied_proof": "named_client",
+   "note": "Independent (OEM-agnostic) MRO with own workshops in Naantali (Finland, turbines) and Västerås (Sweden, generators); only independent high-speed rotor balancing facility in the Nordics; acquired Generator Service Sweden AB (2022); joint service offering with Uniper Engineering; ~150+ specialists."
+  },
+  "Euroturbine B.V.": {
+   "founded": 0,
+   "supplied_to": [
+    "Power plants using GE MS5001 and MS9001E",
+    "Siemens V93.1 and V94.2 operators",
+    "Mitsubishi 701B/701D operators",
+    "ABB 13D operators"
+   ],
+   "exports_to": [
+    "Europe"
+   ],
+   "buys_from": [
+    "Western European casting/machining/coating alliance partners (subcontract manufacturing)"
+   ],
+   "supplied_proof": "catalog",
+   "note": "Weert (NL) one-stop aftermarket; 15+ years serving power plants; in-house re-engineering (3D scanning, rapid prototyping) of hot-section parts — blades, vanes, shrouds, liners, transition pieces — for named GE/Siemens/Mitsubishi/ABB frames under ISO 9001:2015."
+  },
+  "Infinity Engineering Solutions Ltd": {
+   "founded": 2016,
+   "supplied_to": [
+    "Oil & gas and petrochemical rotating-equipment operators (claimed SGT-600/GT10B support)"
+   ],
+   "exports_to": [],
+   "buys_from": [],
+   "supplied_proof": "claim",
+   "note": "UK (founded 2016) field service and workshop revisions of rotating equipment/industrial gas turbines and auxiliaries; SGT-600 (GT10B) support asserted but no named turbine OEM clients or models published on site."
+  },
+  "ICME (International Consultant for Maintenance & Engineering)": {
+   "founded": 2016,
+   "supplied_to": [
+    "GE Frame 5 gas turbine — full train major overhaul",
+    "SGT-500 (GT3) major overhaul reference",
+    "Harouge Oil Operations",
+    "Ras Lanuf Oil & Gas",
+    "Sirte Oil Company",
+    "Mellitah Oil & Gas",
+    "Zueitina Oil Company",
+    "Waha Oil Company"
+   ],
+   "exports_to": [
+    "Libya",
+    "Canada",
+    "Europe"
+   ],
+   "buys_from": [],
+   "supplied_proof": "named_client",
+   "note": "Libya-based (founded 2016, Canada branch) MRO of energy equipment for oil & gas fields; documented GE Frame 5 full-train major overhaul and SGT-500 overhaul reference; extensive named Libyan NOC client base."
+  },
+  "GumaTech Marine Services": {
+   "founded": 0,
+   "supplied_to": [
+    "Second-hand marine/industrial machinery buyers worldwide (gas turbine stock category)"
+   ],
+   "exports_to": [
+    "Sweden",
+    "India",
+    "UAE",
+    "China",
+    "Bangladesh"
+   ],
+   "buys_from": [
+    "Ships/installations sent for demolition (source of used spares)"
+   ],
+   "supplied_proof": "catalog",
+   "note": "Stockist & re-conditioner of ships' spares sourced from vessels for demolition; stocklist includes a dedicated 'Gas Turbine' category; ISO 9001/14001/45001; sells via eBay/Machinio/Kitmondo/ShipServ/MESPAS; no named turbine OEM clients."
+  },
+  "Shanghai Lishun Gas Turbine Technology Co., Ltd (上海力顺燃机科技, MarisoGT)": {
+   "founded": 1999,
+   "supplied_to": [
+    "Solar Turbines (China market-development authorized representative since 1999)",
+    "Solar gas-turbine power stations in China (packaging, commissioning, O&M, spares)"
+   ],
+   "exports_to": [
+    "China (domestic)",
+    "international trade import/export"
+   ],
+   "buys_from": [
+    "Solar Turbines (Solar industrial gas turbine gensets & spare parts)",
+    "ABB (generator spare parts)"
+   ],
+   "supplied_proof": "named_client",
+   "note": "Operates as Shanghai Mariso Turbomachine Service; authorized China representative of Solar Turbines since 1999 — Solar genset market development, power-station packaging, commissioning, training, maintenance and Solar/ABB spare parts (Centaur/Taurus/Mars class)."
+  },
+  "Lei Shing Hong Energy (Kunshan) Co., Ltd (利星行能源)": {
+   "founded": 2017,
+   "supplied_to": [
+    "Solar Turbines (Packaging Associate for China since 2017)",
+    "Distributed/gas-fired power & CHP projects in China"
+   ],
+   "exports_to": [
+    "China",
+    "overseas sales/service offices (multiple countries)"
+   ],
+   "buys_from": [
+    "Solar Turbines (industrial gas turbines for domestic packaging)"
+   ],
+   "supplied_proof": "named_client",
+   "note": "Founded 2017, part of Lei Shing Hong (LSH) Group / Lei Shing Hong Machinery; Solar Turbines Packaging Associate doing domestic packaging (国内成套) of Solar industrial GTs plus distributed energy, PV, storage and O&M; 10+ energy subsidiaries."
+  },
+  "Jereh Group (烟台杰瑞, Yantai Jereh)": {
+   "founded": 1999,
+   "supplied_to": [
+    "Oil & gas fields, industrial parks, mobile/emergency power users",
+    "LM2500-based Power2Go JT25 25MW mobile genset customers"
+   ],
+   "exports_to": [
+    "Global (Jereh Global export arm)"
+   ],
+   "buys_from": [
+    "Siemens Energy (authorized packager of SGT-A05 aeroderivative GT)",
+    "GE (LM2500 aeroderivative core for JT25)",
+    "INNIO Jenbacher & Waukesha (authorized Platinum Integrator, gas engines)"
+   ],
+   "supplied_proof": "named_client",
+   "note": "Founded 1999; packages 2-30 MW gas-turbine gensets incl. mobile units; authorized Siemens SGT-A05 packager and GE LM2500-based mobile genset developer; INNIO/Waukesha Platinum Integrator."
+  },
+  "Huarui (Jiangsu) Gas Turbine Service Co., Ltd (华瑞燃机, China Huadian)": {
+   "founded": 2014,
+   "supplied_to": [
+    "China Huadian gas-turbine power plants (E- and F-class)",
+    "Non-OEM hot-section component repair & new capital parts customers"
+   ],
+   "exports_to": [
+    "China"
+   ],
+   "buys_from": [
+    "Sulzer (JV partner — repair technology transfer)"
+   ],
+   "supplied_proof": "named_client",
+   "note": "Nantong-based JV of Sulzer and China Huadian, established 2014; localized systematic hot-section repair for E/F-class GTs (GE/Siemens/MHI frames), non-OEM maintenance standards, TBC inspection, one-stop non-OEM parts supply."
+  },
+  "Jereh Group / Jereh Distributed Energy (杰瑞)": {
+   "founded": 1999,
+   "supplied_to": [
+    "Coal mines, oil & gas fields, hospitals, airports, data centers, industrial parks",
+    "Yantai eco-industrial park combined energy station (SGT-A05)"
+   ],
+   "exports_to": [
+    "China",
+    "55 countries (via Siemens SGT-A05 fleet applications)"
+   ],
+   "buys_from": [
+    "Siemens Energy (authorized packager of SGT-A05 aeroderivative GT)",
+    "INNIO Jenbacher & Waukesha (Platinum Integrator, gas engines)"
+   ],
+   "supplied_proof": "named_client",
+   "note": "Jereh Combined Energy Co. (wholly-owned Jereh subsidiary): EPC/O&M packager of distributed gas-turbine energy blocks; authorized Siemens Energy SGT-A05 packager; building Yantai's first combined energy station on SGT-A05."
+  },
+  "China Power Contractor (Pauway Corporation)": {
+   "founded": 0,
+   "supplied_to": [
+    "Fortune 500 Chinese EPC contractors (unnamed)"
+   ],
+   "exports_to": [
+    "global / world market"
+   ],
+   "buys_from": [
+    "Siemens",
+    "GE",
+    "MAN",
+    "Mitsubishi",
+    "Hyundai",
+    "Bently Nevada",
+    "GE-Fanuc / Speedtronic",
+    "Yokogawa"
+   ],
+   "supplied_proof": "catalog",
+   "note": "Трейдер ЗИП и комплектных машин: каталог с конкретными моделями GE Frame 6B (PG6541/6551/6581B), 9E (PG9171E), Siemens SGT5-2000E/4000F, SGT200, LM2500; 400+ OEM-брендов КИПиА."
+  },
+  "Xi'an Thermal Power Research Institute (TPRI, China Huaneng)": {
+   "founded": 1951,
+   "supplied_to": [
+    "China Huaneng Group power plants"
+   ],
+   "exports_to": [],
+   "buys_from": [],
+   "supplied_proof": "claim",
+   "note": "Отраслевой НИИ энергетики Huaneng (осн. 1951): НИОКР и техсервис по газовым турбинам, оценка остаточного ресурса и восстановление деталей горячего тракта; конкретные OEM на сайте не раскрыты."
+  },
+  "Zinde Power": {
+   "founded": 1985,
+   "supplied_to": [
+    "Ambarlı NGCC",
+    "Hamitabat DGKÇ",
+    "Yatağan TPP",
+    "Soma TPP",
+    "Yeniköy TPP",
+    "Çatalağzı TPP",
+    "OMP/FBY/SEKAY Biomass plants"
+   ],
+   "exports_to": [
+    "Turkey (домашний рынок)"
+   ],
+   "buys_from": [],
+   "supplied_proof": "named_client",
+   "note": "40+ лет ТОиР газовых/паровых турбин и генераторов; 20 турецких электростанций в референсах, но турбинные OEM поимённо не названы."
+  },
+  "Turbix Energy": {
+   "founded": 2025,
+   "supplied_to": [
+    "Istanbul Natural Gas Combined Cycle Power Plant-A",
+    "Zwitina Gas Turbine Power Plant (Libya)"
+   ],
+   "exports_to": [
+    "Libya"
+   ],
+   "buys_from": [],
+   "supplied_proof": "named_client",
+   "note": "Молодая инжиниринговая фирма (2025) с командой ~20 лет опыта; ТОиР ГТ/ПТ, котлов, генераторов и BOP; названы конкретные проекты-станции."
+  },
+  "Tuğran Enerji San. ve Tic. A.Ş.": {
+   "founded": 0,
+   "supplied_to": [
+    "45+ компаний, 120+ электростанций и промобъектов (поимённо не раскрыты)"
+   ],
+   "exports_to": [
+    "15 стран"
+   ],
+   "buys_from": [],
+   "supplied_proof": "claim",
+   "note": "40 лет: ремонт генераторов/электродвигателей и производство запчастей; сервис газовых турбин начат в 2022 г. Год основания на сайте не указан."
+  },
+  "BNC Enerji": {
+   "founded": 1994,
+   "supplied_to": [
+    "Yatağan TPP",
+    "Ambarlı NGCC",
+    "Orhaneli TPP (Çelikler Holding)",
+    "Yeniköy TPP",
+    "Çatalağzı TPP",
+    "Mimsan Biomass",
+    "BEMKA Energy",
+    "Ranteko Energy"
+   ],
+   "exports_to": [
+    "China (проект паровой турбины 10 МВт)"
+   ],
+   "buys_from": [
+    "Siemens",
+    "Jenbacher"
+   ],
+   "supplied_proof": "named_client",
+   "note": "~30 лет сервиса и монтажа паровых/газовых турбин и генераторов 24/7; в галерее — капремонт ротора газовой турбины Siemens; ряд названных станций."
+  },
+  "Zack Power Systems": {
+   "founded": 0,
+   "supplied_to": [
+    "647 MW González Ortega CCPP (Mexicali, Mexico)",
+    "4.5 MW Sabiya Power Plant (Kuwait)",
+    "13 MW Çorlu Textile Zone GT commissioning (Turkey)"
+   ],
+   "exports_to": [
+    "Mexico",
+    "Kuwait",
+    "Turkey",
+    "Asia",
+    "Europe",
+    "Africa"
+   ],
+   "buys_from": [],
+   "supplied_proof": "named_client",
+   "note": "Инжиниринг: монтаж, пусконаладка и ТО газовых турбин, когенерация, энергоменеджмент; конкретные проекты-станции в 4 регионах, но OEM поимённо не названы."
+  },
+  "Aynur Enerji (Aynur Energy)": {
+   "founded": 0,
+   "supplied_to": [
+    "энергетические электростанции (турнкей-проекты, клиенты поимённо не раскрыты)"
+   ],
+   "exports_to": [],
+   "buys_from": [],
+   "supplied_proof": "claim",
+   "note": "ТО и электромонтаж газовых турбин и вспомогательных систем (воздухозабор, фильтры, воздуховоды), запчасти паровых турбин, GIS/ОРУ; референсы без имён клиентов."
+  },
+  "IER — International Energy Resources FZCO": {
+   "founded": 2002,
+   "supplied_to": [
+    "global aftermarket (20 стран, клиенты поимённо не раскрыты)"
+   ],
+   "exports_to": [
+    "20 стран"
+   ],
+   "buys_from": [
+    "Siemens",
+    "Rolls-Royce"
+   ],
+   "supplied_proof": "catalog",
+   "note": "Независимый aftermarket из Дубая (осн. 2002, ~$100 млн выручки): каталог core-двигателей и модулей — GE Frame 3/5/6/9E, LM2500, Siemens SGT500/SGT400, Rolls-Royce/Siemens Avon 1533/1534/1535/200."
+  },
+  "Megawatt Trading LLC": {
+   "founded": 2007,
+   "supplied_to": [
+    "проекты Power Plants / Desalination & RO / Oil&Gas / Cement (клиенты поимённо не раскрыты)"
+   ],
+   "exports_to": [
+    "MENA / глобально"
+   ],
+   "buys_from": [
+    "GE (non-OEM replacement)",
+    "aftermarket-производители фильтров, компенсаторов, клапанов, насосов"
+   ],
+   "supplied_proof": "catalog",
+   "note": "Трейдер с 2007 (через Turbine Services Ltd): non-OEM запчасти для тяжёлых газовых турбин GE, фильтры, компенсаторы, клапаны, насосы + капитальное оборудование."
+  },
+  "Durub Alkhudra Goods Wholesalers L.L.C": {
+   "founded": 0,
+   "supplied_to": [
+    "Oil&Gas, петрохимия, электростанции, металлургия (клиенты поимённо не раскрыты)"
+   ],
+   "exports_to": [
+    "UAE / регион"
+   ],
+   "buys_from": [
+    "Siemens",
+    "GE",
+    "Mitsubishi (заявленные бренды ГТ)"
+   ],
+   "supplied_proof": "claim",
+   "note": "Оптовик ЗИП ГТ (камеры сгорания, лопатки, подшипники, форсунки) плюс насосы/компрессоры/клапаны/теплообменники ведущих брендов; год основания и конкретные модели на сайте не раскрыты."
+  },
+  "Powergas Oilfield Equipments LLC (Power Gas Global)": {
+   "founded": 2007,
+   "supplied_to": [
+    "Oil&Gas, Power Generation, петрохимия, Marine, пищепром (клиенты поимённо не раскрыты)"
+   ],
+   "exports_to": [
+    "UAE",
+    "MENA"
+   ],
+   "buys_from": [
+    "Pedrollo",
+    "Xylem",
+    "Goulds",
+    "Lowara",
+    "Grundfos",
+    "Megasun"
+   ],
+   "supplied_proof": "claim",
+   "note": "Aftermarket с 2007 (Абу-Даби/Дубай/Шарджа), ISO 9001/14001/45001: запчасти ГТ + КИПиА, клапаны, компрессоры, насосы; турбинные OEM на странице не названы (раскрыты в основном бренды насосов)."
+  },
+  "Thomassen Group (Thomassen Service Gulf)": {
+   "founded": 1998,
+   "supplied_to": [
+    "PDO (Petroleum Development Oman)",
+    "Transcorp Ughelli Power (Nigeria)",
+    "Bressons Magboro IPP",
+    "Akenerji",
+    "ORPIC",
+    "Indorama"
+   ],
+   "exports_to": [
+    "UAE",
+    "Oman",
+    "Nigeria",
+    "Africa",
+    "Australia"
+   ],
+   "buys_from": [],
+   "supplied_proof": "named_client",
+   "note": "O&M и ремонт ГТ (осн. 1998, НЕ связана с Thomassen Energy BV, NL): GE Frame 5P/6B/6FA/9E, LM2500/LM6000, Hitachi H25, Siemens V94.2; 5285 МВт под управлением, 40 O&M-референсов, 900+ ремонтов, собственный склад восстановленных деталей."
+  },
+  "PT Macro Petro Energy": {
+   "founded": 0,
+   "supplied_to": [],
+   "exports_to": [],
+   "buys_from": [
+    "Mpower",
+    "GPE",
+    "Gorman-Rupp",
+    "Detcon",
+    "CPI"
+   ],
+   "supplied_proof": "claim",
+   "note": "Индонезийский инженерный поставщик/торговый представитель для нефтегаза; заявляет ТО, сервис и overhaul ГТУ (power/oil&gas/industrial) через партнёров, доступ к складам новых capital parts и used serviceable parts, но конкретных OEM-клиентов и турбинных брендов на сайте не раскрывает — дистрибутирует помпы/КИП (Gorman-Rupp, Detcon, CPI и др.)."
+  },
+  "PT Sulzer Indonesia (Sulzer Turbo Services, Purwakarta)": {
+   "founded": 1994,
+   "supplied_to": [],
+   "exports_to": [],
+   "buys_from": [],
+   "supplied_proof": "catalog",
+   "note": "Сервис-центр роторного оборудования Sulzer в Пурвакарте, основан в 1994 г.; OEM-agnostic реманufacturing, ремонт, апгрейд и recondition газовых и паровых турбин, компрессоров (центробежные/осевые/винтовые), экспандеров, генераторов/моторов. Часть глобальной сети Sulzer Turbo Services. Именных клиентов на странице нет, но профиль строго турбинный."
+  },
+  "PT Indoturbine": {
+   "founded": 1973,
+   "supplied_to": [
+    "Solar Turbines (авторизованный дистрибьютор/пэкеджер)",
+    "Pertamina",
+    "нефтегазовые операторы Индонезии"
+   ],
+   "exports_to": [
+    "Indonesia (внутренний рынок)"
+   ],
+   "buys_from": [
+    "Solar Turbines (USA)"
+   ],
+   "supplied_proof": "named_client",
+   "note": "Основана 06.06.1973 как агент Solar Turbines в Индонезии с началом офшорной нефтегазодобычи; продажа пакетов Solar, капремонт, ТО, ЗИП, EPC. Марка Solar получила отклик у Pertamina и мировых нефтегазовых компаний. С 1987 г. кооперация с IPTN (ныне PT Dirgantara Indonesia) по overhaul турбинных двигателей внутри страны. Входит в группу Indomobil."
+  },
+  "Turboservices Sdn Bhd / Turboservices Overhaul Sdn Bhd (группа Deleum)": {
+   "founded": 2005,
+   "supplied_to": [
+    "Solar Turbines (Solar Turbines Integrated Service Centre)",
+    "нефтегазовые операторы Малайзии и региона"
+   ],
+   "exports_to": [
+    "Malaysia",
+    "Юго-Восточная Азия (регион)"
+   ],
+   "buys_from": [
+    "Solar Turbines International Company (STICO)"
+   ],
+   "supplied_proof": "named_client",
+   "note": "Дочка Deleum Berhad; Turboservices Overhaul основана в 2005 г., завод (RM20 млн, 30 000 sq ft, Tuanku Jaafar Industrial Estate, Senawang) официально открыт в 2008 г. как Solar Turbines Integrated Service Centre — капремонт двигателей Solar, сервис и ЗИП. В 2015 г. создано СП с Solar Turbines International Company (STICO), вошедшей в капитал Turboservices Overhaul."
+  },
+  "Enerflex Ltd. (включая поглощённую Exterran)": {
+   "founded": 1980,
+   "supplied_to": [
+    "нефтегазовые операторы (contract compression, свыше 3 млн л.с. электромоторной компрессии в мире)"
+   ],
+   "exports_to": [
+    "North America",
+    "международные рынки (проекты глобально)"
+   ],
+   "buys_from": [
+    "Ariel (компрессорные фреймы)",
+    "Caterpillar",
+    "Jenbacher (INNIO)",
+    "Waukesha (INNIO)",
+    "Solar Turbines (турбинный привод через наследие Exterran)"
+   ],
+   "supplied_proof": "catalog",
+   "note": "Независимый пэкеджер компрессорных станций и энергоблоков, работает с 1980 г.; основные приводы — поршневые (Ariel/Cat/Jenbacher/Waukesha) и электромоторы. Турбинная связь идёт через поглощённую в 2022 г. Exterran, паковавшую газокомпрессорные пакеты на приводе Solar (в т.ч. Titan). 45 лет экспертизы по компрессии."
+  },
+  "Propak Systems Ltd.": {
+   "founded": 1976,
+   "supplied_to": [
+    "нефтегазовые операторы Северной Америки и международных проектов (Китай, Северная Африка)"
+   ],
+   "exports_to": [
+    "Canada",
+    "North America",
+    "China",
+    "Северная Африка"
+   ],
+   "buys_from": [],
+   "supplied_proof": "claim",
+   "note": "Основана в 1976 г., заводы в Airdrie (Alberta) и Cambridge (Ontario), ~1500 сотрудников. Пэкеджер газоперерабатывающих заводов, компрессорных станций и энергоблоков; power generation 300 кВт–3.7 МВт (диапазон Saturn/Centaur). На сайте описаны engine-driven power gen и компрессоры 100–10 000 л.с.; конкретный турбинный OEM (Solar) в открытых материалах прямо не назван."
+  },
+  "Alturdyne International": {
+   "founded": 1971,
+   "supplied_to": [
+    "коммерческие и военные заказчики (custom packaged turbine engine drive systems)"
+   ],
+   "exports_to": [],
+   "buys_from": [],
+   "supplied_proof": "catalog",
+   "note": "Основана в 1971 г. для пакетирования газотурбинных систем для коммерческого и государственного рынков; площадки в Сан-Диего (Калифорния) и Далласе (Техас). Профиль: Airborne & Marine Systems и Ground Based Power Generation — кастомные пакеты турбинных приводов (наземные, морские, военные), а также поршневые энергосистемы. Именных клиентов и OEM на сайте нет."
+  },
+  "DMLieferant (ООО «ДМ Лиферант»)": {
+   "founded": 2009,
+   "supplied_to": [
+    "ПАО «Лукойл» (поставка ЗИП, апрель 2016 — картриджи фильтров Indufil для Centaur 50)"
+   ],
+   "exports_to": [
+    "Russia (импорт в РФ)"
+   ],
+   "buys_from": [
+    "Solar Turbines (ЗИП для приводов Solar)",
+    "Indufil (фильтроэлементы)"
+   ],
+   "supplied_proof": "shipment",
+   "note": "Действующий импортёр ЗИП для газотурбинных приводов Solar (Saturn 10, Centaur 40/50, Taurus 60, Mars 90/100, Titan 130), Москва, работает с 2009 г. Документирована поставка апреля 2016 г. в адрес ПАО «Лукойл» — фильтроэлементы Indufil для турбин Centaur 50; комплекс услуг по ремонту газовых турбин."
+  },
+  "ПРОМИМПОРТ": {
+   "founded": 0,
+   "supplied_to": [
+    "операторы ГТУ и турбокомпрессоров в РФ"
+   ],
+   "exports_to": [
+    "Russia (импорт в РФ)"
+   ],
+   "buys_from": [
+    "Solar Turbines (все шесть семейств)"
+   ],
+   "supplied_proof": "catalog",
+   "note": "Импортёр оборудования и запчастей Solar Turbines в РФ (Москва): каталог всех шести семейств — Saturn, Centaur, Mercury, Taurus, Mars, Titan (1–39 МВт) плюс центробежные компрессоры Solar (C33, C40, C41D, C45, C50, C51, C61, C65, C75, C85). Поставка ЗИП и комплектующих для ГТУ и турбокомпрессоров, ремонт комплектующих. Год основания на странице не указан."
+  },
+  "USP&E Global": {
+   "founded": 2002,
+   "supplied_to": [
+    "GE Power and Water (подписанные letters of support)",
+    "Siemens Energy (letters of support)",
+    "заказчики 150+ энергопроектов в 35+ странах, включая ЦОД и utility"
+   ],
+   "exports_to": [
+    "Africa",
+    "35+ стран (США, ЮАР и глобально)"
+   ],
+   "buys_from": [
+    "GE",
+    "Siemens",
+    "Solar Turbines",
+    "Rolls-Royce",
+    "Mitsubishi",
+    "Hitachi",
+    "Kawasaki"
+   ],
+   "supplied_proof": "named_client",
+   "note": "Основана в 2002 г. (William Gruver); один из крупнейших независимых складов б/у энергоагрегатов — >600 МВт инвентаря ГТУ и двигателей (TM2500, LM6000, LM2500, Siemens E/F class, SGT-400, Solar Taurus/Centaur/Titan/Mars). Подписанные letters of support от GE Power and Water и Siemens Energy; офисы в США и ЮАР, 150+ проектов в 35+ странах."
+  },
+  "Wabash Power Equipment Co.": {
+   "founded": 1949,
+   "supplied_to": [
+    "промышленные и энергетические заказчики США (покупка/аренда)"
+   ],
+   "exports_to": [
+    "USA",
+    "международные поставки"
+   ],
+   "buys_from": [
+    "GE",
+    "Siemens",
+    "Solar Turbines (б/у и surplus ГТ-генераторы разных OEM)"
+   ],
+   "supplied_proof": "catalog",
+   "note": "Основана в 1949 г., штаб в Wheeling (Illinois), офис в Майами, склады в Saginaw (MI), Tyler (TX) и Южной Калифорнии. Стокист б/у и surplus энергооборудования: газотурбинные генераторы 200 кВт–100 МВт, паровые турбины, дизель-генераторы, котлы, мельницы. Продажа и аренда."
+  },
+  "Gas Turbine Applications, LLC (GTA Turbines)": {
+   "founded": 1984,
+   "supplied_to": [
+    "операторы Solar Saturn/Centaur в upstream и midstream (300+ капремонтов Saturn, 150+ Centaur с 1984 г.)"
+   ],
+   "exports_to": [
+    "USA",
+    "международные заказчики"
+   ],
+   "buys_from": [],
+   "supplied_proof": "catalog",
+   "note": "Независимый сервис-провайдер с 1984 г., Calera (Oklahoma), цех 16 000 sq ft с испытательным стендом Saturn/Centaur и мехобработкой. Оверхол, ремонт и испытания промышленных ГТ Solar (Saturn, Centaur), собственный склад двигателей и пакетов. С 1984 г. выполнено >300 overhaul Saturn и >150 Centaur. Приобретена Turbine Efficiency Group."
+  },
+  "Used Power Plants": {
+   "founded": 0,
+   "supplied_to": [
+    "покупатели б/у электростанций и энергоагрегатов (маркетплейс)"
+   ],
+   "exports_to": [
+    "United Arab Emirates (RAK)",
+    "международные сделки"
+   ],
+   "buys_from": [
+    "Solar (Taurus 60)",
+    "Wärtsilä",
+    "Caterpillar",
+    "MWM"
+   ],
+   "supplied_proof": "catalog",
+   "note": "Дилер/маркетплейс б/у электростанций и энергоагрегатов (базируется в RAK, ОАЭ): тысячи листингов power plants, turbines, engines. В инвентаре, среди прочего, Solar Taurus 60 T7301, а также Wärtsilä, Caterpillar, MWM (8.6–100 МВт). Покупка, продажа, демонтаж и декомиссия станций. Год основания на сайте не раскрыт."
+  },
+  "Gas Turbine Services BV (GTS)": {
+   "founded": 1985,
+   "supplied_to": [
+    "Siemens (SGT / Ruston aeroderivative & light-industrial fleet operators)",
+    "Ruston/RB211/Avon engine operators worldwide"
+   ],
+   "exports_to": [
+    "Worldwide",
+    "Europe",
+    "Denmark",
+    "United Kingdom",
+    "offshore/onshore oil & gas"
+   ],
+   "buys_from": [],
+   "supplied_proof": "catalog",
+   "note": "Independent aftermarket house focused exclusively on the Siemens SGT/Ruston (ex-Lincoln) engine line: core-engine overhaul and exchange units; facilities in Denmark and the UK."
+  },
+  "AP4 Group / GTC Control Solutions": {
+   "founded": 0,
+   "supplied_to": [
+    "GE (Frame & aeroderivative gas turbines; Speedtronic Mark II/IV/V/VI controls)",
+    "Alstom",
+    "ABB",
+    "Emerson (Ovation controls installed base)"
+   ],
+   "exports_to": [
+    "Worldwide",
+    "North America",
+    "global surplus/legacy parts distribution"
+   ],
+   "buys_from": [
+    "Parker Meggitt / Vibro-Meter",
+    "Ametek",
+    "Advanced Atomization Technologies",
+    "Turbotect",
+    "Unison Industries",
+    "Voith",
+    "Triumph"
+   ],
+   "supplied_proof": "catalog",
+   "note": "World's largest independent stockist of legacy/surplus GE Speedtronic Mark II-VI control spares; also distributes named OEM component brands (Vibro-Meter, Unison, AAT, Turbotect). Umbrella brands: GTC, AP+M, Hughes Technical Services, TC&E, Maine Automation."
+  },
+  "Heritage Global Partners (HGP)": {
+   "founded": 1937,
+   "supplied_to": [],
+   "exports_to": [
+    "North America",
+    "global industrial-asset auctions"
+   ],
+   "buys_from": [],
+   "supplied_proof": "claim",
+   "note": "Industrial auction house (subsidiary of Heritage Global Inc., NASDAQ: HGBL). Runs an 'Energy & Power' auction category incl. whole power plants and surplus generation gear, but no specific turbine OEM or plant client named on-site."
+  },
+  "Repowering Solutions": {
+   "founded": 0,
+   "supplied_to": [
+    "Secondary-market buyers across 40 countries (combined-cycle gas, cogeneration, wind assets)"
+   ],
+   "exports_to": [
+    "40 countries",
+    "Spain (HQ)",
+    "Colombia (LatAm office)",
+    "Latin America",
+    "United States (via Repowerlab)"
+   ],
+   "buys_from": [
+    "Vestas (used units)",
+    "Gamesa",
+    "Ecotecnia",
+    "Made"
+   ],
+   "supplied_proof": "catalog",
+   "note": "Spain-based dealer in used/second-life power plants: buys, dismantles, relocates and restarts combined-cycle gas, cogeneration and wind assets. Inventory strongly wind (Vestas V52/V47, Gamesa G58) plus thermal/CCGT. Partners: Repowerlab (US), Colgeolica."
+  },
+  "North American Dismantling Corp. (NADC)": {
+   "founded": 1984,
+   "supplied_to": [
+    "East Kentucky Power Cooperative (H.L. Spurlock Station, Maysville KY)",
+    "utilities operating Far Rockaway Station",
+    "owners of the Arapahoe power station (4 units, 50-100 MW)"
+   ],
+   "exports_to": [
+    "North America",
+    "United States",
+    "Canada"
+   ],
+   "buys_from": [],
+   "supplied_proof": "named_client",
+   "note": "Power-plant decommissioning/demolition since 1984 (coal, nuclear, natural-gas) with asset recovery of turbines and generators. Turbine link is via demolition/salvage, not OEM manufacture."
+  },
+  "Accrofab Ltd": {
+   "founded": 2018,
+   "supplied_to": [
+    "GE Power / GE Vernova (Hot Gas Path & combustion components)",
+    "Siemens Energy (Hot Gas Path & combustion components)"
+   ],
+   "exports_to": [
+    "United Kingdom",
+    "supplies GE & Siemens Energy gas-turbine programmes"
+   ],
+   "buys_from": [],
+   "supplied_proof": "named_client",
+   "note": "Strategic supplier of fabricated/machined hot-gas-path and combustion hardware (liners, transitions) to both GE Power and Siemens Energy; special processes EDM & laser. Sites: Alcester, Derby, Welwyn Garden City. Integrated H Beesley (2014); Alcester/Derby acquired by Endless LLC (Enact fund) Aug 2023. AS9100/NADCAP accredited."
+  },
+  "Howmet Aerospace (экс-Alcoa Power and Propulsion)": {
+   "founded": 0,
+   "supplied_to": [
+    "Industrial gas turbine OEMs (airfoils, rings, disks, forgings) — GE, Siemens, Rolls-Royce, MHI class (industry-standard IGT airfoil supplier)"
+   ],
+   "exports_to": [
+    "United States",
+    "United Kingdom",
+    "France",
+    "Germany",
+    "Hungary",
+    "Czech Republic",
+    "Ireland",
+    "Morocco",
+    "Japan",
+    "China",
+    "Mexico",
+    "Canada"
+   ],
+   "buys_from": [
+    "Vacuum-melted superalloy feedstock (nickel superalloys)"
+   ],
+   "supplied_proof": "catalog",
+   "note": "Investment-cast airfoils (rotating & nozzle) plus rings/disks/forgings for aero and industrial gas turbines; vacuum-melted superalloys, performance coatings, HIP. Spun out of Arconic/Alcoa in 2020. OEM customers not named on site but Howmet is a top-tier global airfoil source."
+  },
+  "Gexpro Services": {
+   "founded": 0,
+   "supplied_to": [
+    "Siemens Energy (won Siemens Energy AGT Supplier Award for Innovation & Cost Benefit)"
+   ],
+   "exports_to": [
+    "Global",
+    "North America",
+    "serves Industrial Power & Renewables sectors worldwide"
+   ],
+   "buys_from": [
+    "Fastener/Class-C manufacturers (via group brands)"
+   ],
+   "supplied_proof": "named_client",
+   "note": "Class-C parts (fasteners/hardware) and VMI supply-chain services to gas-turbine/industrial-power production. Named Siemens Energy AGT supplier. Group brands: Resolux, Omni Fasteners, Frontier Technologies, National Engineered Fasteners, State Industrial Solutions (SIS), TCR."
+  },
+  "iLockerz Ltd": {
+   "founded": 0,
+   "supplied_to": [
+    "Caterpillar",
+    "Cummins",
+    "Jaguar Land Rover",
+    "Metropolitan Police / West Midlands Police",
+    "National Highways",
+    "Arriva Trains Wales",
+    "universities (Sheffield, UCL, Oxford Brookes)"
+   ],
+   "exports_to": [
+    "United Kingdom"
+   ],
+   "buys_from": [],
+   "supplied_proof": "none",
+   "note": "Smart locker asset-management systems (tool/radio issue & tracking). Customer roster is industrial/automotive/public-sector (Caterpillar, Cummins, JLR); no confirmed gas-turbine OEM link on site. '10+ years expertise', no founding year published. Group: iLockerz Sport, 1Locker, Digilockerz, Smart Locker Hire."
+  },
+  "Lindum Group": {
+   "founded": 1956,
+   "supplied_to": [
+    "Siemens (Lincoln / Teal Park industrial buildings — per external attribution; not confirmed on Lindum's own About page)"
+   ],
+   "exports_to": [
+    "United Kingdom (Lincoln, York, Peterborough)"
+   ],
+   "buys_from": [],
+   "supplied_proof": "claim",
+   "note": "Regional construction/contractor founded 1956. Portfolio on site is housing, education, commercial; the Siemens Teal Park (Lincoln) turbine-factory construction link is asserted externally but NOT evidenced on Lindum's current site."
+  },
+  "Wyman-Gordon UK (Lincoln) — Precision Castparts Corp": {
+   "founded": 1929,
+   "supplied_to": [
+    "Industrial gas turbine OEMs (IGT turbine disks up to 12,000 lb, compressor/fan disks, shafts)",
+    "aerospace & energy markets globally"
+   ],
+   "exports_to": [
+    "Worldwide",
+    "United Kingdom",
+    "aerospace, power generation, oil & gas, nuclear"
+   ],
+   "buys_from": [
+    "Nickel superalloy billet (e.g. Special Metals grades)"
+   ],
+   "supplied_proof": "catalog",
+   "note": "Heavy stamped forgings — turbine/compressor/fan disks and spacers for industrial gas turbines. Originated as Smith-Clayton Forge (1929); acquired UEF 2000; part of Precision Castparts Corp. Europe's largest counterblow hammer (DG90, 900 kJ). Sister plants: Wyman-Gordon Livingston (UK), Plzen (Czech Republic)."
+  },
+  "Howmet Aerospace (экс-Alcoa Power and Propulsion / Howmet Castings)": {
+   "founded": 0,
+   "supplied_to": [
+    "Heavy-duty & industrial gas turbine OEMs — single-crystal / DS / equiaxed blades and nozzle guide vanes (GE, Siemens, MHI, Rolls-Royce class)"
+   ],
+   "exports_to": [
+    "United States",
+    "United Kingdom",
+    "France",
+    "Germany",
+    "Hungary",
+    "Czech Republic",
+    "Japan",
+    "China",
+    "Mexico",
+    "Morocco",
+    "Ireland"
+   ],
+   "buys_from": [
+    "Vacuum-melted nickel superalloys"
+   ],
+   "supplied_proof": "catalog",
+   "note": "Investment-casting division: single-crystal and directionally-solidified superalloy blades and nozzle guide vanes for heavy/industrial gas turbines. Same corporate entity as entry 7 (Howmet Aerospace Inc.); listed separately in the source list for the castings scope."
+  },
+  "Special Metals Wiggin Ltd (Hereford, группа Special Metals/PCC)": {
+   "founded": 0,
+   "supplied_to": [
+    "Gas turbine OEMs & tier-1s using NIMONIC/INCONEL — blades, discs, combustion hardware (aerospace & power-gen supply chain; NIMONIC developed as the classic jet/gas-turbine superalloy, historically Rolls-Royce)"
+   ],
+   "exports_to": [
+    "Worldwide",
+    "United Kingdom",
+    "aerospace, power generation, oil & gas markets"
+   ],
+   "buys_from": [],
+   "supplied_proof": "catalog",
+   "note": "High-temperature nickel superalloys (NIMONIC, INCONEL, INCOLOY, UDIMET, NILO) in bar/sheet/wire for turbine blades, discs and combustors. Wiggin lineage 100+ years (foundry 170+ yrs; Henry Wiggin origins). Part of Special Metals Corp / Precision Castparts Corp. Claims invention of 80%+ of nickel alloys."
+  },
+  "AETC Ltd (PCC Airfoils)": {
+   "founded": 0,
+   "supplied_to": [
+    "Industrial gas turbine OEMs (E-, F- and H-Class engine frames)"
+   ],
+   "exports_to": [],
+   "buys_from": [],
+   "supplied_proof": "catalog",
+   "note": "Casts Equiax hot-gas-path Ni/Co superalloy blades (stages 1-4), vanes (1-3) and heatshields for IGTs; UK sites in Yeadon/Leeds (casting+blade machining) and Leicester (NGV). Acquired by PCC Airfoils in 1996; part of Precision Castparts Corp. 50+ years' experience but no OEM named publicly."
+  },
+  "Goodwin Steel Castings (Goodwin PLC)": {
+   "founded": 1883,
+   "supplied_to": [
+    "GE (7HA.02 gas turbine components, via sister Goodwin International since 2014)",
+    "Larsen & Toubro (steam turbine Main Steam Valves, via Goodwin International)",
+    "Shenhua Guohua Jiujiang power station (1000MW turbine shells)"
+   ],
+   "exports_to": [
+    "China",
+    "India"
+   ],
+   "buys_from": [],
+   "supplied_proof": "named_client",
+   "note": "UK steel/nickel-alloy foundry (est. 1883); high-integrity castings up to 40t for steam & gas turbines incl. advanced ultra-supercritical duty; G130 gamma-prime nickel alloy for 700C. Sister firm Goodwin International selected for GE 7HA.02."
+  },
+  "Jernbro Industrial Services AB": {
+   "founded": 1868,
+   "supplied_to": [
+    "Siemens Industrial Turbomachinery / Siemens Energy (welded pipe systems for gas turbines, Finspång; framework agreement renewed for 3 more years)"
+   ],
+   "exports_to": [],
+   "buys_from": [],
+   "supplied_proof": "named_client",
+   "note": "Industrial maintenance/service group (~1,300 staff, ~2.7bn SEK); roots to Sköfde Gjuteri 1868, 'Jernbro' brand formed ~2015. 20+ years delivering welded pipe systems used in Siemens turbines."
+  },
+  "Elektromontage AB": {
+   "founded": 0,
+   "supplied_to": [
+    "Gas turbine facilities (complete control rooms, 12-unit series delivered to Texas, USA)"
+   ],
+   "exports_to": [
+    "USA"
+   ],
+   "buys_from": [],
+   "supplied_proof": "claim",
+   "note": "Söderköping, Sweden. MCCs, control cabinets, switchgear, DC systems for Power Generation, Shipping and Industrial Machinery; documented gas-turbine control-room project (Texas) but no OEM named."
+  },
+  "SOMAS Instrument AB": {
+   "founded": 1945,
+   "supplied_to": [
+    "Power/energy sector (butterfly & control valves listed for steam and gas turbines)"
+   ],
+   "exports_to": [
+    "operates own offices in 5 countries plus worldwide reps/service partners"
+   ],
+   "buys_from": [],
+   "supplied_proof": "claim",
+   "note": "Säffle, Sweden; founded 1945 (Sliperi Och Mekaniska Arbeten Säffle) by Sven Ragnar Hägg & Folke Carlén, valves from late 1940s. Stainless butterfly/ball/segment/control valves; core market pulp&paper, growing in power. 2024 partnership with Accelleron for butterfly-valve servicing. No turbine OEM named."
+  },
+  "Start-Up AB": {
+   "founded": 0,
+   "supplied_to": [
+    "Siemens Industrial Turbomachinery (factory testing & commissioning of gas turbines in Finspång and start-up worldwide)",
+    "Fortum Värme",
+    "E.ON Värme",
+    "Boliden Rönnskär",
+    "SKB (Swedish Nuclear Fuel)",
+    "Eskilstuna Energi & Miljö"
+   ],
+   "exports_to": [
+    "Sweden",
+    "Norway",
+    "Finland",
+    "worldwide turbine start-up"
+   ],
+   "buys_from": [],
+   "supplied_proof": "named_client",
+   "note": "Commissioning/automation/I&C consultancy, part of Instalco. Explicit reference: long experience commissioning Siemens gas turbines in Swedish workshop tests and start-up around the world."
+  },
+  "Etteplan (Etteplan Sweden AB)": {
+   "founded": 1983,
+   "supplied_to": [
+    "Siemens Industrial Turbomachinery / Siemens Energy (2018 order: DfAM design of 3D-printable gas turbine auxiliary-system components; 'preferred engineering partner')"
+   ],
+   "exports_to": [
+    "Finland",
+    "Sweden",
+    "Netherlands",
+    "Germany",
+    "Poland",
+    "Denmark",
+    "China",
+    "USA"
+   ],
+   "buys_from": [],
+   "supplied_proof": "named_client",
+   "note": "Engineering services group (~4,000 staff, €361.4m 2025, ~80 offices/8 countries). Documented Siemens gas-turbine additive-manufacturing design engagement."
+  },
+  "Euromekanik AB": {
+   "founded": 0,
+   "supplied_to": [
+    "Industrial hydrogen/energy-gas users (electrolysis, H2 compression/storage, gas ramps, steam & process-fluid systems)"
+   ],
+   "exports_to": [],
+   "buys_from": [
+    "Enapter (AEM modular electrolyzers, e.g. EL2.1) — distributed by Euromekanik"
+   ],
+   "supplied_proof": "claim",
+   "note": "Gothenburg + Umeå, Sweden; TÜV-certified. Energy-gas/H2 systems and gas ramps relevant to turbine test rigs, but no turbine OEM customer disclosed on site."
+  },
+  "Skill Kompetenspartner AB": {
+   "founded": 1997,
+   "supplied_to": [
+    "Siemens Energy (Finspång — staffing/recruitment of Process System Engineers, Mechanical Integrity Engineers, Service Application Engineers, buyers, warehouse for gas-turbine operations)"
+   ],
+   "exports_to": [],
+   "buys_from": [],
+   "supplied_proof": "named_client",
+   "note": "Swedish recruitment/staffing firm founded 1997; strong ongoing staffing relationship with Siemens Energy's ~3,000-employee Finspång turbine site; operations in Norrköping."
+  },
+  "Norrköpings Hamn AB": {
+   "founded": 0,
+   "supplied_to": [
+    "Siemens Energy Finspång (ships ~90% of Finspång-made gas turbines, ~85t each, to customers worldwide via 350-ton heavy-lift crane)"
+   ],
+   "exports_to": [
+    "worldwide (Siemens gas turbine export gateway)"
+   ],
+   "buys_from": [],
+   "supplied_proof": "shipment",
+   "note": "Swedish port; 350-ton heavy-lift crane enables Siemens Finspång to export heavy turbines globally. ~50 turbines/year routed through the port; turbine loads up to ~400t on trailer."
+  },
+  "Rörmokaren AB (Instalco Group)": {
+   "founded": 0,
+   "supplied_to": [
+    "Siemens (Lavalverkstad, Finspång — reconstruction of heating & cooling / HVAC-piping systems at turbine works)"
+   ],
+   "exports_to": [],
+   "buys_from": [],
+   "supplied_proof": "named_client",
+   "note": "Norrköping HVAC/industrial piping contractor, part of Instalco. Reference project: heat/cooling rebuild at Siemens Lavalverkstad, Finspång (facility-side, not turbine part itself)."
+  },
+  "Munters AB": {
+   "founded": 1955,
+   "supplied_to": [
+    "General Electric (gas turbine OEM)",
+    "Siemens (gas turbine OEM)"
+   ],
+   "exports_to": [
+    "global (power industry)"
+   ],
+   "buys_from": [],
+   "supplied_proof": "named_client",
+   "note": "Swedish air-treatment group (founded 1955 by Carl Munters). GTEC gas-turbine inlet evaporative coolers with CELdek/GLASdek/TURBOdek media; site states OEM customers are gas turbine suppliers such as GE and Siemens; boosts output/efficiency up to ~20%."
+  },
+  "Sandvik Coromant (Sandvik AB)": {
+   "founded": 1942,
+   "supplied_to": [
+    "Gas & steam turbine manufacturers (dedicated turbine-blade & turbine-disc machining solutions)",
+    "Aerospace aero-engine makers (close partnership since 1942)"
+   ],
+   "exports_to": [
+    "150+ countries"
+   ],
+   "buys_from": [],
+   "supplied_proof": "catalog",
+   "note": "Cutting-tool division of Sandvik (founded 1942, Sandviken). CoroMill 600 (roughing/semi-finishing of power-industry turbine blades), CoroMill 490, PrimeTurning; dedicated power-generation gas/steam turbine blade & disc application solutions; 54,000+ products, aerospace & power gen focus."
+  },
+  "Pentronic AB": {
+   "founded": 1965,
+   "supplied_to": [
+    "Manufacturers of gas turbines and engines (power-generation segment; a single gas turbine can carry up to ~150 Pentronic sensors)"
+   ],
+   "exports_to": [
+    "Global (via parent Indutrade AB)",
+    "Netherlands"
+   ],
+   "buys_from": [],
+   "supplied_proof": "claim",
+   "note": "Swedish maker of thermocouples/Pt100 for industrial temperature incl. gas turbine exhaust; part of listed group Indutrade AB since 2001; acquired Thermo Electric Instrumentation (NL)."
+  },
+  "Quintus Technologies AB": {
+   "founded": 1953,
+   "supplied_to": [
+    "Sintavia (metal AM foundry, USA)",
+    "Wallwork Heat Treatment (UK)",
+    "Aerospace/energy foundries running HIP on turbine & compressor blades, blisks, disks, castings"
+   ],
+   "exports_to": [
+    "45 countries worldwide"
+   ],
+   "buys_from": [],
+   "supplied_proof": "catalog",
+   "note": "HIP presses that densify cast/AM turbine blades; spin-off of ASEA's wire-wound pressure-vessel tech, formerly part of ABB Group / Avure; HQ Vasteras, first press 1953, SEK1.4bn sales 2024."
+  },
+  "Marioff Corporation Oy": {
+   "founded": 1985,
+   "supplied_to": [
+    "GE (HI-FOG protects hundreds of GE gas turbines & compressors worldwide via MAU skids and GPU containers, 10+ years)"
+   ],
+   "exports_to": [
+    "Worldwide"
+   ],
+   "buys_from": [],
+   "supplied_proof": "named_client",
+   "note": "HI-FOG water-mist fire suppression (introduced 1991) with extended FM Approval for combustion-turbine enclosures up to 2300 m3; part of Carrier."
+  },
+  "Luvata (завод Luvata Pori Oy)": {
+   "founded": 1910,
+   "supplied_to": [
+    "Power-generation OEMs (rotor coil copper & hollow conductors for turbogenerator rotors and high-performance electrical machines)",
+    "hyperdrives GmbH (EV traction, hollow conductors)"
+   ],
+   "exports_to": [
+    "Global (plants in Finland, UK, USA, Brazil, China, Malaysia)"
+   ],
+   "buys_from": [],
+   "supplied_proof": "catalog",
+   "note": "Oxygen-free copper hollow conductors & rotor coil copper made in Pori, Finland; group company of Mitsubishi Materials Corp."
+  },
+  "PCC Airfoils (Precision Castparts Corp.)": {
+   "founded": 1949,
+   "supplied_to": [
+    "GE (52+ year investment-casting relationship)",
+    "Pratt & Whitney",
+    "Industrial gas turbine hot-section: blades, vanes, shrouds, heat shields, fairings"
+   ],
+   "exports_to": [
+    "USA, Mexico, England (manufacturing); global supply"
+   ],
+   "buys_from": [],
+   "supplied_proof": "named_client",
+   "note": "Founded 1949, Beachwood OH; modern form from PCC's 1986 purchase of TRW casting division; equiax/DS/SX airfoils for aero and industrial gas turbines; 22 locations."
+  },
+  "Howmet Aerospace (Engine Products)": {
+   "founded": 1926,
+   "supplied_to": [
+    "GE (single-crystal vanes & blades used in GE 9H heavy-duty combined-cycle gas turbine)",
+    "Aero and land-based industrial gas turbine OEMs (airfoils, rings, disks, forgings)"
+   ],
+   "exports_to": [
+    "Global"
+   ],
+   "buys_from": [],
+   "supplied_proof": "named_client",
+   "note": "Leading global producer of single-crystal superalloy turbine airfoils for aerospace and IGT; vacuum-melted superalloys, HIP, coatings, ceramic cores. Howmet Aerospace Inc. spun off from Arconic in 2020; airfoil-casting heritage traces to 1926."
+  },
+  "Wuxi Turbine Blade Co., Ltd. (WTB, Shanghai Electric Group)": {
+   "founded": 1980,
+   "supplied_to": [
+    "GE Vernova / General Electric",
+    "Siemens Energy",
+    "Mitsubishi (MHI)",
+    "Ansaldo",
+    "Doosan"
+   ],
+   "exports_to": [
+    "Japan",
+    "Germany",
+    "United States"
+   ],
+   "buys_from": [
+    "Starrag (5-axis blade machining lines / retrofit)"
+   ],
+   "supplied_proof": "named_client",
+   "note": "Founded 15 Apr 1980; core subsidiary of Shanghai Prime Machinery / Shanghai Electric Group; blades and discs for steam & gas turbines and aero forgings; >80% domestic share of large power-station turbine blades."
+  },
+  "Linari G. S.r.l.": {
+   "founded": 0,
+   "supplied_to": [
+    "Turbine & compressor OEMs / Tier-1s as CNC machining subcontractor"
+   ],
+   "exports_to": [
+    "Italy (Florence / Campi Bisenzio area)"
+   ],
+   "buys_from": [
+    "Mazak (5 CNC lathes, 3 Mazak centres incl. 800 VTC 5-axis)"
+   ],
+   "supplied_proof": "claim",
+   "note": "Italian mechanical subcontractor specialised in machining of turbine and compressor components; no named OEM published."
+  },
+  "AMK Welding, Inc.": {
+   "founded": 1964,
+   "supplied_to": [
+    "Global aerospace and ground-based (land) gas turbine industry; also oil & gas (rotor/stator structural weldments)"
+   ],
+   "exports_to": [
+    "USA-based; supplies global turbine OEMs"
+   ],
+   "buys_from": [],
+   "supplied_proof": "claim",
+   "note": "EB / GTAW (TIG) welding plus vacuum heat treatment, ~40,000 sq ft, South Windsor CT; acquired by Meyer Tool in Jan 2017; no OEM name published though positioned for ground-based turbines."
+  },
+  "Woodward, Inc.": {
+   "founded": 1870,
+   "supplied_to": [
+    "Industrial / heavy-frame, aeroderivative and small gas turbines (SonicFlo & GS-series gas fuel metering valves, control/shutoff valves, fuel nozzles, controls)"
+   ],
+   "exports_to": [
+    "Global"
+   ],
+   "buys_from": [],
+   "supplied_proof": "catalog",
+   "note": "Founded 1870, Fort Collins CO; Tier-1 fuel-system and control supplier with full gas-turbine valve/nozzle catalogue; specific OEM names not published on site but is a serial GT supplier."
+  },
+  "Braden (экс-Braden Manufacturing / Global Power Equipment Group)": {
+   "founded": 1923,
+   "supplied_to": [
+    "Air-intake filtration on 750+ gas turbines worldwide; inlet filter houses, silencing, exhaust systems, SCR/CO catalyst, diverter dampers, plenums for power-generation gas turbines"
+   ],
+   "exports_to": [
+    "Americas, Europe, UK (offices in Tulsa OK, Auburn MA, Heerlen NL)"
+   ],
+   "buys_from": [],
+   "supplied_proof": "catalog",
+   "note": "Founded 1923, Tulsa OK; GT auxiliary systems for new units and retrofit; was subsidiary of Global Power Equipment Group, later acquired by Innova Global."
+  },
+  "SIFCO Industries (T&W Forge)": {
+   "founded": 1913,
+   "supplied_to": [
+    "Industrial gas turbine OEMs (forged IGT blades, vanes, stators <500 lb, many alloys)",
+    "Aero-derivative and land-based gas & steam turbines"
+   ],
+   "exports_to": [
+    "Multiple countries"
+   ],
+   "buys_from": [],
+   "supplied_proof": "catalog",
+   "note": "Founded 1913, Cleveland OH; acquired T&W Forge (500,000 sq ft, Alliance OH) on 10 Dec 2010 to enter IGT forging; hammer cells up to 25,000 lb per public sources; no single named OEM published."
+  },
+  "Voith Turbo (BHS Gear, Зонтхофен)": {
+   "founded": 1867,
+   "supplied_to": [
+    "Siemens (delivered 100th BHS turbo gearbox in 2017; AD 114-2 gearbox drives Siemens SGT-800 gas turbine, ~57 MW, 6,609->1,500 rpm)",
+    "Distributed power-generation OEMs since 2009"
+   ],
+   "exports_to": [
+    "Germany -> Sweden (Finspang) and worldwide"
+   ],
+   "buys_from": [],
+   "supplied_proof": "named_client",
+   "note": "Voith founded 1867; BHS Getriebe (Sonthofen) turbo/reduction gearboxes between turbine and generator, MTBF >100 yrs, >90 yrs gear experience."
+  },
+  "SSS Clutch Company / SSS Gears Ltd": {
+   "founded": 0,
+   "supplied_to": [
+    "Siemens (single-shaft CCGT sets: SGT5-4000F, SGT6-8000H)",
+    "Mitsubishi Power / MHI (single-shaft CC)",
+    "GE",
+    "Alstom",
+    "Moxie Energy Patriot & Liberty plants (Siemens SGT6-8000H sets)"
+   ],
+   "exports_to": [
+    "USA",
+    "UK",
+    "Europe",
+    "Global (400+ single-shaft GT plants worldwide)"
+   ],
+   "buys_from": [],
+   "supplied_proof": "named_client",
+   "note": "SSS Synchro-Self-Shifting overrunning clutches installed in 400+ single-shaft gas turbine plants and 600+ synchronous-condenser sites; standard between GT and generator/steam turbine; HQ Sunbury-on-Thames UK, mfg Tamworth, sister co SSS Clutch Inc (Delaware, USA)."
+  },
+  "Unison Industries": {
+   "founded": 0,
+   "supplied_to": [
+    "GE Aerospace (parent)",
+    "World's leading aero-engine OEMs and operators"
+   ],
+   "exports_to": [
+    "Global (aerospace worldwide)"
+   ],
+   "buys_from": [],
+   "supplied_proof": "named_client",
+   "note": "Ignition systems (exciters, igniters, leads) for aeroderivative/aero gas turbines; over a century in aerospace; wholly-owned GE Aerospace business (footer © General Electric Company)."
+  },
+  "Kop-Flex (Regal Rexnord)": {
+   "founded": 0,
+   "supplied_to": [
+    "Steam & gas turbine trains",
+    "Compressors, generators, boiler feed pumps",
+    "Petrochemical, refinery, power plant, LNG, gas-pipeline operators"
+   ],
+   "exports_to": [
+    "Global (oil & gas industry 30+ years)"
+   ],
+   "buys_from": [],
+   "supplied_proof": "catalog",
+   "note": "High-performance API 671 / ISO 10441 disc & gear couplings for turbomachinery; brand serves turbomachinery >50 years (gear coupling invented by Gustav Fast 1918); 1B+ operating hours in API 671 service; now a Regal Rexnord brand."
+  },
+  "TDI — Tech Development Inc.": {
+   "founded": 0,
+   "supplied_to": [
+    "Gas turbine engines for electrical power generation",
+    "Industrial drives & marine propulsion",
+    "Volvo, Pratt & Whitney engine applications (starter fitments)"
+   ],
+   "exports_to": [
+    "Global (world's #1 air starter for stationary power gen, gas transmission, oil & gas, mining, marine)"
+   ],
+   "buys_from": [],
+   "supplied_proof": "catalog",
+   "note": "TurboTwin/TurboStart air/gas turbine starters; precision turbine air simulators since late 1950s; pioneered turbine air starters in 1979."
+  },
+  "Det-Tronics (Carrier)": {
+   "founded": 1973,
+   "supplied_to": [
+    "Power Generation & Mechanical Drives sector",
+    "Oil, gas, petrochemical, aerospace, munitions, chemical industries"
+   ],
+   "exports_to": [
+    "Global (sales/service offices worldwide)"
+   ],
+   "buys_from": [],
+   "supplied_proof": "claim",
+   "note": "Flame/gas detection and hazard mitigation since 1973; Eagle Quantum Premier (EQP) fault-tolerant safety controller (FM approved, NFPA 72); serves turbine enclosure fire & gas protection; part of Carrier (parent not stated on About page)."
+  },
+  "Donaldson Company (Gas Turbine Systems)": {
+   "founded": 1915,
+   "supplied_to": [
+    "Multiple gas turbine OEMs (self-described 'the partner for multiple OEMs')",
+    "Large/small turbines, microturbines, industrial compressors"
+   ],
+   "exports_to": [
+    "Global (multi-language, global HQ Bloomington MN)"
+   ],
+   "buys_from": [],
+   "supplied_proof": "catalog",
+   "note": "Turbo-Tek / GTS air inlet filtration systems and elements for industrial GT; company founded 1915; specific OEM names not disclosed on GTS page."
+  },
+  "ABB (Large Motors & Generators, Вестерос)": {
+   "founded": 0,
+   "supplied_to": [
+    "Power utilities",
+    "Paper mills, sugar plants",
+    "Oil & gas facilities",
+    "Steam and gas turbine trains"
+   ],
+   "exports_to": [
+    "Global (thousands of turbine-driven synchronous generators delivered worldwide)"
+   ],
+   "buys_from": [],
+   "supplied_proof": "catalog",
+   "note": "AMS-series air-cooled synchronous turbogenerators for GT/ST; ABB group formed 1988; thousands of installations but named GT OEM customers not disclosed on public pages."
+  },
+  "The Hilliard Corporation": {
+   "founded": 1905,
+   "supplied_to": [
+    "General Electric",
+    "Siemens",
+    "Solar Turbines",
+    "MAN Diesel & Turbo",
+    "Pratt & Whitney",
+    "Peter Brotherhood"
+   ],
+   "exports_to": [
+    "Global (serves customers worldwide from Elmira, NY)"
+   ],
+   "buys_from": [],
+   "supplied_proof": "named_client",
+   "note": "High-speed starter overrunning clutch drives for gas/diesel engines and gas turbines plus HILCO oil filtration; founded 1905; explicit starter-fleet experience on GE, Siemens, Solar, MAN, P&W, Peter Brotherhood engines and auxiliary gearboxes."
+  },
+  "GKN Aerospace": {
+   "founded": 1759,
+   "supplied_to": [
+    "GE Aerospace",
+    "Rolls-Royce",
+    "Pratt & Whitney (trusted partner to all global engine OEMs)",
+    "Space rocket engine programs"
+   ],
+   "exports_to": [
+    "Global (Trollhättan Sweden, USA, UK; worldwide engine OEMs)"
+   ],
+   "buys_from": [],
+   "supplied_proof": "named_client",
+   "note": "Vacuum-cast/shell-molded superalloy components (turbine blades, combustors, intermediate & exhaust cases) for gas turbines, aero and industrial turbines; GKN group history spans 250+ years (roots 1759); engines division supplies all major aero-engine OEMs."
+  },
+  "Doncasters Group": {
+   "founded": 1778,
+   "supplied_to": [
+    "GE Aerospace",
+    "GE Vernova",
+    "Rolls-Royce",
+    "Safran",
+    "Honeywell",
+    "Pratt & Whitney",
+    "Siemens Energy",
+    "Ansaldo Energia"
+   ],
+   "exports_to": [
+    "Global (14 principal facilities; UK, USA and more)"
+   ],
+   "buys_from": [],
+   "supplied_proof": "named_client",
+   "note": "Vertically integrated precision cast turbine blades/vanes, engine structural castings and Ni/Co superalloys for aerospace and IGT; ~250 years of technical expertise; ~70% revenue under long-term OEM agreements incl. 15-year blades/vanes deal; three in-house superalloy plants."
+  },
+  "Avio Aero": {
+   "founded": 1908,
+   "supplied_to": [
+    "GE Aerospace (parent)",
+    "Czech Aircraft Industries (40x H80/H85 turboprops for L410)",
+    "Aero-engine and rotorcraft propulsion programs"
+   ],
+   "exports_to": [
+    "Global (plants in Italy, Czech Republic, Poland, USA, Canada)"
+   ],
+   "buys_from": [],
+   "supplied_proof": "named_client",
+   "note": "Founded 1908; GE acquired Avio's aviation business 2013 for $4.3B and renamed it Avio Aero (GE Aerospace subsidiary); makes turbines, combustors, mechanical transmissions, turboprops; 6,400+ employees; 2026 doubled turbine-disk output (20→38/week) at Rivalta di Torino."
+  },
+  "Wärtsilä": {
+   "founded": 1834,
+   "supplied_to": [
+    "Power utilities and IPPs (engine-based power plants, energy storage)",
+    "Marine sector: cruise, ferries, merchant, navy, offshore, tugs, yachts"
+   ],
+   "exports_to": [
+    "Global (Finland HQ; worldwide marine & energy)"
+   ],
+   "buys_from": [],
+   "supplied_proof": "catalog",
+   "note": "Founded 1834 (Tohmajärvi sawmill), diesel era from 1938 Krupp license; grew via NOHAB (1978), SACM, Stork-Werkspoor (1989); reciprocating gas/multi-fuel engines and power plants rather than gas turbines, plus energy storage and lifecycle services."
+  },
+  "GF Casting Solutions (Georg Fischer)": {
+   "founded": 1802,
+   "supplied_to": [
+    "GE",
+    "Safran",
+    "MHI",
+    "Rolls-Royce",
+    "Siemens",
+    "Ansaldo"
+   ],
+   "exports_to": [
+    "Global (Switzerland, Romania; aero & IGT OEMs worldwide)"
+   ],
+   "buys_from": [],
+   "supplied_proof": "named_client",
+   "note": "Parent of GF Precicast (investment casting/AM, Novazzano/Stabio CH + Arad RO, ~600 staff) making aero-engine and industrial gas turbine parts; references incl. GE, Safran, MHI, RR, Siemens, Ansaldo; Georg Fischer founded 1802; the aero/IGT Precicast business is being divested to Consolidated Precision Products (CPP), closing ~end 2026; automotive business sold to Nemak ($336M)."
+  },
+  "MTU Aero Engines": {
+   "founded": 1934,
+   "supplied_to": [
+    "Pratt & Whitney (GTF/PW1000G, PW2000/4000 partner)",
+    "GE Aerospace (GE9X, GEnx, GE90, CF6/CF34 partner)",
+    "Rolls-Royce (EJ200, TP400-D6 consortium)",
+    "Safran Aircraft Engines",
+    "270+ airline MRO customers"
+   ],
+   "exports_to": [
+    "Global",
+    "USA",
+    "Europe",
+    "Asia"
+   ],
+   "buys_from": [],
+   "supplied_proof": "named_client",
+   "note": "MRO лидер по LM2500 (с 1981) и LM6000 (с 1996) — индустриальные ГТУ на базе авиадвигателей GE CF6."
+  },
+  "ITP Aero": {
+   "founded": 1989,
+   "supplied_to": [
+    "Rolls-Royce (Trent programmes, RRSP risk-sharing partner, Trent 1000 LPT MRO)",
+    "Pratt & Whitney (executive ties)"
+   ],
+   "exports_to": [
+    "Spain",
+    "UK",
+    "Mexico",
+    "India",
+    "USA",
+    "Norway"
+   ],
+   "buys_from": [],
+   "supplied_proof": "named_client",
+   "note": "Ведёт отдельный сегмент 'Industrial turbines' (industrial gas turbine modules), ключевой RRSP-партнёр Rolls-Royce."
+  },
+  "MAN Energy Solutions": {
+   "founded": 1758,
+   "supplied_to": [
+    "Mitsui E&S",
+    "Seaspan",
+    "BC Ferries",
+    "Azule Energy (Angola)"
+   ],
+   "exports_to": [
+    "Global",
+    "Japan",
+    "Canada",
+    "Angola",
+    "Europe"
+   ],
+   "buys_from": [],
+   "supplied_proof": "catalog",
+   "note": "Сам OEM газовых (линейка MGT/MAN Gas Turbines), паровых турбин и компрессоров; с 2026 ребрендинг в Everllence (man-es.com → everllence.com)."
+  },
+  "Collins Aerospace": {
+   "founded": 2018,
+   "supplied_to": [
+    "Pratt & Whitney (sister RTX, engine nacelles)",
+    "Boeing (787 nacelles)",
+    "Airbus (A350, A320neo, A220 nacelles)",
+    "Embraer (E2)"
+   ],
+   "exports_to": [
+    "Global"
+   ],
+   "buys_from": [],
+   "supplied_proof": "named_client",
+   "note": "Бизнес RTX; проектирует и строит гондолы/inlet/fan cowl и опорные структуры для авиадвигателей (P&W)."
+  },
+  "Safran": {
+   "founded": 2005,
+   "supplied_to": [
+    "GE Aerospace (50/50 СП CFM International — CFM56 и LEAP)",
+    "Airbus (A320 family)",
+    "Boeing (737 family)",
+    "вертолётные заказчики (Safran Helicopter Engines)"
+   ],
+   "exports_to": [
+    "Global"
+   ],
+   "buys_from": [],
+   "supplied_proof": "named_client",
+   "note": "Snecma (осн. 1945) внутри Safran; CFM International с GE даёт 54000+ заказанных двигателей — крупнейший турбинный альянс."
+  },
+  "Magellan Aerospace": {
+   "founded": 1996,
+   "supplied_to": [
+    "Pratt & Whitney Canada (долгосрочные контракты на мех.обработку до 2034)",
+    "GE Aerospace (revenue-sharing на F414-GE-400K для KF-21)"
+   ],
+   "exports_to": [
+    "Canada",
+    "USA",
+    "UK",
+    "India (Tumakuru, Karnataka)"
+   ],
+   "buys_from": [],
+   "supplied_proof": "named_client",
+   "note": "Engine cold/hot section, валы, спецматериалы; прямые named-agreements с P&W Canada и GE."
+  },
+  "Hindustan Aeronautics (HAL)": {
+   "founded": 1940,
+   "supplied_to": [
+    "Indian Navy (LM2500 на P-17/P-17A/IAC-1 фрегатах/авианосце)",
+    "GE (лицензионная сборка/AIT LM2500)"
+   ],
+   "exports_to": [
+    "India (в осн. внутренний оборонный рынок)"
+   ],
+   "buys_from": [
+    "GE Aerospace (LM2500 marine gas turbine kits, по лицензии)"
+   ],
+   "supplied_proof": "named_client",
+   "note": "IMGT Division Bangalore с 1986 собирает/тестирует морскую ГТУ GE LM2500; поставлено 22+ турбины для 11 кораблей ВМС Индии."
+  },
+  "Uni Abex Alloy Products Limited": {
+   "founded": 1972,
+   "supplied_to": [
+    "OEM/EPC/Turnkey подрядчики нефтегаза, нефтехима, удобрений, чёрной металлургии",
+    "нефтяной мейджор в Индии",
+    "европейский производитель декантеров"
+   ],
+   "exports_to": [
+    "Two Star Export House",
+    "Europe",
+    "Asia"
+   ],
+   "buys_from": [
+    "Abex Corporation (США, технология)",
+    "Schmidt + Clemens (Германия, технология центробежного литья)"
+   ],
+   "supplied_proof": "claim",
+   "note": "Центробежное/статическое литьё жаро-, износо-, коррозионностойких сплавов (reformer tubes и т.п.); прямой связи с турбинными OEM не заявлено — 'Power' лишь как сегмент."
+  },
+  "Neterwala Group": {
+   "founded": 0,
+   "supplied_to": [
+    "power generation majors Европы/США/Азии (через Uni Deritend — литьё паровых турбин: сопловые сегменты, направляющие лопатки, airfoils)",
+    "аэрокосмические заказчики (Uni Tritech, NADCAP 2023)"
+   ],
+   "exports_to": [
+    "Europe",
+    "USA",
+    "Asia"
+   ],
+   "buys_from": [],
+   "supplied_proof": "catalog",
+   "note": "Конгломерат 70+ лет; металлургия (Uni Abex, Uni Deritend, Uni Tritech, Tritech Precision), 3000+ клиентов; Uni Deritend льёт лопатки/airfoils паровых турбин для энергомашиностроения."
+  },
+  "Elgin Fastener Group": {
+   "founded": 0,
+   "supplied_to": [
+    "рынки: aerospace, energy, military, diesel engine & transmission, industrial"
+   ],
+   "exports_to": [
+    "USA",
+    "global distribution (через MW Components)"
+   ],
+   "buys_from": [],
+   "supplied_proof": "claim",
+   "note": "Спецкрепёж малых серий; заводы Telefast, Ohio Rod, Rockford Fastener и др.; с 08.09.2023 куплен MW Components. Энергетика заявлена рынком, но турбинных OEM не названо."
+  },
+  "Howmet Aerospace": {
+   "founded": 2020,
+   "supplied_to": [
+    "производители авиадвигателей и индустриальных ГТУ (aero engine & industrial gas turbine components: airfoils, rings, disks, forgings)"
+   ],
+   "exports_to": [
+    "USA",
+    "UK",
+    "France",
+    "Germany",
+    "Hungary",
+    "Czech Republic",
+    "China",
+    "Japan",
+    "Mexico",
+    "Morocco",
+    "Canada",
+    "Australia"
+   ],
+   "buys_from": [],
+   "supplied_proof": "catalog",
+   "note": "Литьё лопаток/airfoils точным литьём для авиа- и индустриальных газовых турбин + fastening systems; выделен из Arconic в 2020, металлургическое наследие с 1926/1948."
+  },
+  "Innovative Steam Technologies (IST)": {
+   "founded": 1992,
+   "supplied_to": [
+    "Solar Turbines (Pennsylvania)",
+    "Calpine",
+    "TransAlta",
+    "Black Hills Energy",
+    "Encana Power",
+    "Kauai Island Utility",
+    "Manx Electrical Authority",
+    "ALSTOM-PREPA (Puerto Rico)"
+   ],
+   "exports_to": [
+    "19 стран",
+    "USA",
+    "Canada",
+    "Caribbean",
+    "Hawaii",
+    "Australia",
+    "Italy (Gorizia)",
+    "Germany (Wuppertal)",
+    "India"
+   ],
+   "buys_from": [],
+   "supplied_proof": "named_client",
+   "note": "OTSG/HRSG для ГТУ 5-100 МВт; напрямую спарены с GE LM6000/LM2500 (аэродеривативы); подразделение Propak Systems Ltd."
+  },
+  "ENKA İnşaat ve Sanayi": {
+   "founded": 1957,
+   "supplied_to": [
+    "собственные BOO-электростанции Gebze (4× GE PG9351FA), Adapazarı (2× GE PG9351FA), İzmir — суммарно 4000 МВт",
+    "InterGen (партнёр BOO)"
+   ],
+   "exports_to": [
+    "61 страна",
+    "Türkiye",
+    "Europe",
+    "Middle East",
+    "CIS"
+   ],
+   "buys_from": [
+    "GE (газовые турбины PG9351FA / 9FA)"
+   ],
+   "supplied_proof": "named_client",
+   "note": "EPC-подрядчик (turnkey с Bechtel), установил флот GE F-class 9FA; Adapazarı — мировой рекорд доступности 99.8% в F-class ГТУ."
+  },
+  "Çimtaş Machining (Cimtas Precision)": {
+   "founded": 1971,
+   "supplied_to": [
+    "GE / GE Vernova (7HA & 9HA H-class heavy-duty turbines, 7HA.03 advanced gas path upgrade)",
+    "Siemens (Rotating Olefins Cracker Ph-2)"
+   ],
+   "exports_to": [
+    "worldwide (aero, aero-derivative and heavy-duty GT OEMs)"
+   ],
+   "buys_from": [],
+   "supplied_proof": "named_client",
+   "note": "ENKA/Çimtaş Group subsidiary in Bursa Free Zone; machines performance-critical & rotating parts (combustion casings, end covers, liners, discs) for aero/aeroderivative/heavy-duty gas turbines. 1971 = group founding (53 yrs)."
+  },
+  "IHI Corporation": {
+   "founded": 1853,
+   "supplied_to": [
+    "Rolls-Royce (Trent series — 787, A330neo, A350XWB RRSPs)",
+    "GE Aerospace (GEnx ~13% incl. LP turbine rotating members, HP compressor airfoils, fan mid-shaft; GE9X; CF34)",
+    "Pratt & Whitney (PW1100G-JM GTF, V2500)"
+   ],
+   "exports_to": [
+    "global (Japan, US, Europe civil aero-engine programs)"
+   ],
+   "buys_from": [],
+   "supplied_proof": "named_client",
+   "note": "Risk-and-revenue-sharing partner on every major Western civil engine family; supplies rotating LP-turbine modules, HP compressor airfoils and shafts. Founded 1853."
+  },
+  "Mitsubishi Power (MHI)": {
+   "founded": 1884,
+   "supplied_to": [
+    "JERA / JERA Power Anegasaki (3× M701JAC GTCC, 1,950 MW)",
+    "Chubu Electric / Tokyo Electric (JERA parents)",
+    "utilities in Asia, US, Mexico, South America (M501JAC, 14 GW+)"
+   ],
+   "exports_to": [
+    "global (US plant: Savannah Machinery Works, Pooler GA; Takasago works, Japan)"
+   ],
+   "buys_from": [],
+   "supplied_proof": "named_client",
+   "note": "OEM of industrial gas turbines (M501/M701 G/GAC & J/JAC, up to 64% CC efficiency). GT lineage from 1961 Westinghouse technical partnership; MHI founded 1884, Mitsubishi Power brand since 2020."
+  },
+  "EagleBurgmann (Feodor Burgmann)": {
+   "founded": 1884,
+   "supplied_to": [
+    "turbo-compressor & turbomachinery OEMs (CobaDGS dry gas seals)",
+    "EthosEnergy (compressor installation/maintenance projects — Siemens Energy JV heritage)",
+    "power-plant operators (boiler feed pump & nuclear plant seals)"
+   ],
+   "exports_to": [
+    "86 countries (48+ subsidiaries, 250+ service/sales sites)"
+   ],
+   "buys_from": [
+    "parent groups: Freudenberg (Germany) & EKK / Eagle Industry (Japan)"
+   ],
+   "supplied_proof": "named_client",
+   "note": "Mechanical & dry gas seals for compressors/turbines. Feodor Burgmann founded 1884 (Dresden); EagleBurgmann formed 2004 by Burgmann Industries + Eagle Industry merger. €918M sales, 5,650+ staff."
+  },
+  "Atlas Copco (Wuxi) Compressor Co., Ltd.": {
+   "founded": 1994,
+   "supplied_to": [
+    "general industrial market (small/medium industrial air & oil-free compressors, portable diesel/electric compressors & generators)"
+   ],
+   "exports_to": [
+    "global (first Atlas Copco production base in China; exports from Wuxi)"
+   ],
+   "buys_from": [
+    "parent Atlas Copco Group (Sweden, est. 1873)"
+   ],
+   "supplied_proof": "none",
+   "note": "Wuxi entity (est. 1994, 600+ staff) makes standard industrial/portable air compressors — no direct gas-turbine product line found. GT relevance only via broader Atlas Copco Gas & Process division (separate entity)."
+  },
+  "Hangzhou Turbine (Hangzhou Steam Turbine)": {
+   "founded": 1958,
+   "supplied_to": [
+    "Kunshan GCL Blue Sky distributed-energy project (2× Siemens SGT-800, incl. LTP service)",
+    "industrial steam-turbine customers across China",
+    "distributed-energy / natural gas projects"
+   ],
+   "exports_to": [
+    "China + export markets"
+   ],
+   "buys_from": [
+    "Siemens (industrial steam-turbine license since 1970s, 3 renewals; general supplier of Siemens gas turbines SGT-800/300/700/2000E in China)"
+   ],
+   "supplied_proof": "named_client",
+   "note": "Hangzhou Turbine Power Group (HTC), formerly Hangzhou Steam Turbine Works, est. 1958, listed Shenzhen 1998 (200771). Steam-turbine OEM + Siemens GT integrator/service in China."
+  },
+  "BHEL (Bharat Heavy Electricals Ltd)": {
+   "founded": 1964,
+   "supplied_to": [
+    "power utilities in India and abroad (GE-frame & Siemens-design gas turbines since 1986)",
+    "aftermarket via BGGTS (BHEL-GE JV, 50:50)"
+   ],
+   "exports_to": [
+    "India and export markets (Asia/world)"
+   ],
+   "buys_from": [
+    "GE, USA (1986 Technical Collaboration Agreement — rotors & hot-gas-path components)",
+    "Siemens, Germany (ongoing TCA — gas turbine design)"
+   ],
+   "supplied_proof": "named_client",
+   "note": "State-owned Indian OEM est. 1964; builds GE-frame and Siemens-design gas turbines under license plus steam turbines & power equipment."
+  },
+  "Shanghai Electric": {
+   "founded": 2004,
+   "supplied_to": [
+    "Chinese market (~40 gas turbines activated 2014-2019)",
+    "Bengang & Shenzhen Energy (AE94), GCL Power (AE64)"
+   ],
+   "exports_to": [
+    "China (JV domestic focus) + group global power-gen exports"
+   ],
+   "buys_from": [
+    "Ansaldo Energia (40% stake since 2014; GT tech — AE64/AE94/GT26/GT36 models, Siemens & Alstom/GE lineage)"
+   ],
+   "supplied_proof": "named_client",
+   "note": "Shanghai Electric Group Co. (est. 2004). Shanghai Electric Gas Turbine Co. (SGC) = Nov-2014 JV with Ansaldo Energia; also steam-turbine & power-gen OEM."
+  },
+  "Gas Turbine Valves Pte Ltd": {
+   "founded": 2001,
+   "supplied_to": [
+    "GE gas turbines (SRV/GCV/IGV, transfer/splitter/bleed valves)",
+    "Hitachi, John Brown, Alstom/GE derivative fleets"
+   ],
+   "exports_to": [
+    "SE Asia (branches Thailand, Indonesia) since 2001; Europe since 2016"
+   ],
+   "buys_from": [
+    "Young & Franklin (Y&F)",
+    "JASC",
+    "Moog",
+    "Woodward",
+    "Roper",
+    "Nakakita",
+    "Sentech",
+    "Milwaukee Cylinder"
+   ],
+   "supplied_proof": "named_client",
+   "note": "Singapore-based (est. 2001) supplier/integrator of hydraulically-operated fuel & control valves for GE-heritage industrial gas turbines; distributes multiple OEM valve/actuator brands."
+  },
+  "Roten Group": {
+   "founded": 1945,
+   "supplied_to": [
+    "pump, compressor & mixer builders (elastomeric/metal-bellows mechanical seals)"
+   ],
+   "exports_to": [
+    "worldwide (offices globally, 200+ employees)"
+   ],
+   "buys_from": [],
+   "supplied_proof": "catalog",
+   "note": "Founded 1945 in Milan (Carlo Fontanella). Group = ROTEN, AVES, EUROCARBO, MOLINOX, COEMI. Seal catalog covers rotating equipment incl. compressors; direct gas-turbine link is indirect (rotating-equipment seals)."
+  },
+  "Tactair Fluid Controls": {
+   "founded": 0,
+   "supplied_to": [
+    "fixed & rotary-wing business/commuter/transport & military aircraft (engine/nacelle, bleed-air, flight-control valves & actuators)",
+    "industrial gas-turbine market via parent Young & Franklin (turbine air & fuel control)"
+   ],
+   "exports_to": [
+    "global"
+   ],
+   "buys_from": [],
+   "supplied_proof": "claim",
+   "note": "Aerospace hydraulic/pneumatic controls maker, subsidiary of Young & Franklin (acquired 1986, Liverpool NY). Founded ~1970 (\"over 50 years\"); absorbed Phoenix Controls, Teledyne Hydra-Power, Kaiser, York aerospace lines. GT link runs through parent Y&F."
+  },
+  "Koch Engineered Solutions": {
+   "founded": 0,
+   "supplied_to": [
+    "oil, gas, petrochemical & power plants (combustion/emissions via John Zink; mass transfer via Koch-Glitsch; utility solar/storage via DEPCOM)"
+   ],
+   "exports_to": [
+    "North & South America and global"
+   ],
+   "buys_from": [],
+   "supplied_proof": "none",
+   "note": "Engineering holding within Koch Industries (Wichita KS); units: Koch-Glitsch, John Zink (combustion/burners/flares/DLE), Koch Specialty Plant Services, OPD, Koch Technology Solutions, DEPCOM Power, DarkVision. Combustion/emissions relevance, no direct GT product."
+  },
+  "Allied International": {
+   "founded": 0,
+   "supplied_to": [
+    "gas-turbine operators (igniters, exciters, ignition leads)",
+    "European helicopter & business-jet gas-turbine engines (installed base); aeroderivative industrial turbine igniters"
+   ],
+   "exports_to": [
+    "Europe + expanding to North America"
+   ],
+   "buys_from": [
+    "AEVA (part of AEC Group) — absorbed igniter brands LABEM, ECET, EYQUEM"
+   ],
+   "supplied_proof": "catalog",
+   "note": "Family-owned aerospace supply/distributor of gas-turbine ignition systems (AEVA/AEC catalog); markets 'aeroderivative industrial turbine igniters last 2x longer at same cost.'"
+  },
+  "Baker Hughes / Bently Nevada": {
+   "founded": 1961,
+   "supplied_to": [
+    "GE heavy-duty gas turbines",
+    "Braskem",
+    "QAFCO",
+    "Acelen",
+    "oil & gas / power generation operators (combined cycle, LNG, refining)"
+   ],
+   "exports_to": [
+    "Global"
+   ],
+   "buys_from": [
+    "Augury (Machine Health analytics partnership integrated into System 1)"
+   ],
+   "supplied_proof": "catalog",
+   "note": "Основана Дональдом Бентли (Minden, Nevada) в 1961; изобретатель eddy-current proximity probe; линейки 3300XL/3500 и System 1 — де-факто стандарт вибромониторинга роторных машин и heavy-duty ГТУ. Куплена GE Energy в 2002, ныне бренд Baker Hughes."
+  },
+  "Seal Tech": {
+   "founded": 1987,
+   "supplied_to": [
+    "промышленность (энергетика, космос, бытовые применения) — конкретные turbine OEM не раскрыты"
+   ],
+   "exports_to": [
+    "Japan (импортирует из США/мира, продаёт на внутреннем рынке)"
+   ],
+   "buys_from": [
+    "Furon Corporation (US) — spring-energized seals, дистрибуция с 1987",
+    "глобальные поставщики fluid-control компонентов"
+   ],
+   "supplied_proof": "claim",
+   "note": "Yokohama-based специализированная торговая компания по уплотнениям и fluid-control (seal packing, rotary joints, slip rings, thermal valves, bellows, filters). Связь именно с ГТУ на сайте не подтверждена — самозаявление про энергетические применения."
+  },
+  "Niigata Power Systems": {
+   "founded": 2003,
+   "supplied_to": [
+    "marine / power generation / railway vehicle рынки",
+    "операторы через сеть после-продажного сервиса"
+   ],
+   "exports_to": [
+    "China (Shanghai)",
+    "South Korea (Seoul)",
+    "Netherlands (Rotterdam)",
+    "Singapore",
+    "Philippines (Manila)"
+   ],
+   "buys_from": [],
+   "supplied_proof": "catalog",
+   "note": "Производитель ГТУ и двигателей; корни Niigata Engineering (1895/1910, первый пром. дизель Японии 1919), газотурбинный завод с 1994. В 2003 бизнес двигателей/турбин передан в структуру IHI. Каталог включает газовые турбины, газовые/дизельные двигатели."
+  },
+  "Thomassen Energy": {
+   "founded": 0,
+   "supplied_to": [
+    "EnergyAustralia",
+    "Engie",
+    "Woodside Energy",
+    "Esso",
+    "AGL",
+    "Origin Energy",
+    "Synergy",
+    "Alcoa"
+   ],
+   "exports_to": [
+    "Australia / Australasia"
+   ],
+   "buys_from": [
+    "MeeFog Systems (inlet fogging)",
+    "JASC (fuel check/thermal relief valves, controls)",
+    "Roper Pumps (liquid fuel pumps, flow dividers)",
+    "GTC Control Solutions (turbine controls/monitoring)",
+    "Thermo Electric Instrumentation (temp sensors)",
+    "Franke Filter (oil mist separators)",
+    "Stork Turbo Blading (лопатки)"
+   ],
+   "supplied_proof": "named_client",
+   "note": "Сервис/апгрейды ГТУ (GE-frame, Siemens-Westinghouse, Rolls-Royce), дистрибуция OEM и aftermarket-компонентов; полевой сервис через партнёра Australasia Turbomachinery Services. Названные энергокомпании-клиенты."
+  },
+  "VibraVista": {
+   "founded": 2006,
+   "supplied_to": [
+    "операторы steam turbines, hydro turbines, compressors",
+    "petrochemical, utilities, metallurgy, electric power (конкретные имена не названы)"
+   ],
+   "exports_to": [
+    "USA (HQ Houston)",
+    "Germany",
+    "India",
+    "China",
+    "worldwide"
+   ],
+   "buys_from": [
+    "PVTVM (ex-Provibtech) — мастер-дистрибьютор для Западного полушария с 2006"
+   ],
+   "supplied_proof": "catalog",
+   "note": "Системы вибромониторинга и защиты API 670 (TR/DTM transmitters, PT500 switches, proximity probes, PCM360). Мастер-дистрибьютор ProvibTech/PVTVM. Named OEM-клиенты не раскрыты — доказательство на уровне каталога под турбины/компрессоры."
+  },
+  "AMETEK": {
+   "founded": 1930,
+   "supplied_to": [
+    "производители/операторы газовых турбин для электрогенерации (gas turbine thermocouples, flame sensors, engine sensors)",
+    "energy, aerospace, power, industrial markets"
+   ],
+   "exports_to": [
+    "Global (150+ площадок)"
+   ],
+   "buys_from": [
+    "рост через M&A: 100+ брендов, в т.ч. Land Instruments International (2006)"
+   ],
+   "supplied_proof": "catalog",
+   "note": "Основан 1930 как American Machine and Metals. Electronic Instruments + Electromechanical. Прямая линейка Gas Turbine Thermocouples и Flame/Engine Sensors для ГТУ электрогенерации (AMETEK Power Instruments)."
+  },
+  "Uptime-I": {
+   "founded": 0,
+   "supplied_to": [
+    "Oil & Gas, Petrochemicals, Power Generation, Heavy Industries (конкретные имена не раскрыты)"
+   ],
+   "exports_to": [
+    "Egypt",
+    "UAE",
+    "Jordan",
+    "Sudan"
+   ],
+   "buys_from": [
+    "неназванные OEM-партнёры высококачественного оборудования condition monitoring"
+   ],
+   "supplied_proof": "claim",
+   "note": "Региональная (Ближний Восток/Сев.Африка) сервисная группа по надёжности: вибродиагностика, лазерная центровка, полевая балансировка. Ни OEM-клиенты, ни представляемые бренды на сайте не названы."
+  },
+  "Solar Turbines": {
+   "founded": 1927,
+   "supplied_to": [
+    "операторы onshore/offshore электрогенерации",
+    "нефтегаз (добыча, переработка, транспорт газа)",
+    "морская пропульсия"
+   ],
+   "exports_to": [
+    "Global"
+   ],
+   "buys_from": [
+    "часть Caterpillar Inc. (с 1981)"
+   ],
+   "supplied_proof": "catalog",
+   "note": "Основана 13.11.1927 (Prudden-San Diego → Solar Aircraft), с 1981 дочка Caterpillar. Промышленные ГТУ: Saturn, Centaur, Mercury, Taurus, Mars, Titan (до Titan 350). Один из ключевых turbine OEM в списке."
+  },
+  "Pyrotech Group": {
+   "founded": 1976,
+   "supplied_to": [
+    "power, nuclear, petrochemical, cement, steel, glass, defense",
+    "через Tempsens — заказчики в 70+ странах"
+   ],
+   "exports_to": [
+    "70+ countries (через Tempsens)"
+   ],
+   "buys_from": [],
+   "supplied_proof": "catalog",
+   "note": "Основана в 1976 в Удайпуре 4 технократами; головной бизнес — control panels/automation + термометрия. Дочка Tempsens Instruments — термопары, RTD, термокарманы, пирометры (в т.ч. для газотурбинной термометрии), заводы в Индии/Германии/Индонезии."
+  },
+  "ОДК-Сатурн (UEC-Saturn)": {
+   "founded": 2001,
+   "supplied_to": [
+    "энергетика и газовая отрасль (ГТУ малой/средней мощности, ГТД-110М)",
+    "Газпром / ТЭС (через энергетические ГТУ)",
+    "входит в контур локализации горячего тракта больших ГТУ"
+   ],
+   "exports_to": [
+    "Russia (преим.); компоненты для российских и зарубежных двигателей"
+   ],
+   "buys_from": [
+    "получал документацию Siemens по лопаткам для локализации (контекст трансфера технологий горячего тракта)"
+   ],
+   "supplied_proof": "catalog",
+   "note": "Рыбинск, входит в ОДК/Ростех. В 2019 открыт крупнейший в РФ литейный центр турбинных лопаток (авиа/морские/промышленные ГТД). Продукция: ГТУ, ГТД-110М, лопатки горячего тракта."
+  },
+  "ПАО «Силовые машины» (Power Machines)": {
+   "founded": 1857,
+   "supplied_to": [
+    "Кашира ГРЭС (4 × ГТЭ-170, 2024-2026)",
+    "Хабаровская ТЭЦ-4 (ГТЭ-170)",
+    "российские ТЭС/ГРЭС"
+   ],
+   "exports_to": [
+    "Russia (крупные ГТУ); исторически экспорт паровых турбин ЛМЗ"
+   ],
+   "buys_from": [
+    "ранее — лицензия/СП с Siemens (Siemens Gas Turbine Technologies); ныне собственная технология ГТЭ-65/ГТЭ-170"
+   ],
+   "supplied_proof": "named_client",
+   "note": "Крупный российский OEM паровых и газовых турбин (площадка ЛМЗ, корни 1857). Локализация ГТУ большой мощности: первая коммерческая ГТЭ-170 изготовлена; поставки на Каширу и Хабаровск."
+  },
+  "ОДК (United Engine Corporation / UEC)": {
+   "founded": 2008,
+   "supplied_to": [
+    "гражданская/военная авиация, космос",
+    "энергетика и газовая отрасль (энергетические ГТУ, ГПА — газоперекачивающие агрегаты)",
+    "Газпром (ГПА на базе авиадвигателей)",
+    "ВМФ (морские ГТУ)"
+   ],
+   "exports_to": [
+    "экспорт двигателей (под санкционными ограничениями)"
+   ],
+   "buys_from": [
+    "консолидирует 85%+ активов двигателестроения РФ; дочки Aviadvigatel, Пермский моторный завод и др."
+   ],
+   "supplied_proof": "catalog",
+   "note": "Основана 2008, холдинг Ростеха. PD-14, PS-90A, AL-31ST; промышленные/энергетические ГТУ, ГПА и морские газотурбинные установки. Материнская структура ОДК-Сатурна."
+  },
+  "Wabtec Corporation": {
+   "founded": 1869,
+   "supplied_to": [
+    "marine, power generation, rail рынки (турбонагнетатели Napier)",
+    "операторы судовых/энергетических дизелей и газовых двигателей"
+   ],
+   "exports_to": [
+    "Global"
+   ],
+   "buys_from": [
+    "Napier Turbochargers — куплена у Primary Capital в январе 2013 (ранее принадлежала Siemens до 2008)"
+   ],
+   "supplied_proof": "named_client",
+   "note": "Глобальная rail/industrial группа (155+ лет). С 2013 владеет Napier Turbochargers (корни Napier с 1808) — крупные промышленные турбонагнетатели для судовой и энергетической генерации; линия происходит из Ruston/Alstom/Siemens."
   }
  }
 };
