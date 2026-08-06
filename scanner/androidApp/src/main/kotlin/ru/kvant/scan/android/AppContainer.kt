@@ -50,4 +50,14 @@ class AppContainer(
             // сортируемый v7-генератор придёт вместе с SQLDelight-слоем.
             newEventId = { UUID.randomUUID().toString() },
         )
+
+    /** Инициативная сессия без задания: кладовщик наполняет базу сам. */
+    suspend fun initiativeCaptureController(): CaptureSessionController =
+        CaptureSessionFactory.initiative(
+            tasks = stack.tasks,
+            sessionId = "s-" + UUID.randomUUID(),
+            outbox = stack.outbox,
+            clock = stack::now,
+            newEventId = { UUID.randomUUID().toString() },
+        )
 }

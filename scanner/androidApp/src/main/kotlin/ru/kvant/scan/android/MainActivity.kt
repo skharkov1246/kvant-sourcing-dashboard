@@ -117,6 +117,21 @@ private fun KvantApp(
         is Screen.TaskList -> TaskListScreen(
             model = taskListModel,
             onTaskClick = { screen = Screen.TaskDetail(it) },
+            onInitiativeScan = {
+                withCameraPermission({
+                    error = "Без доступа к камере съёмка невозможна. " +
+                        "Разрешение можно выдать в настройках телефона."
+                }) {
+                    scope.launch {
+                        try {
+                            val controller = container.initiativeCaptureController()
+                            screen = Screen.Capture(CaptureViewModel(controller))
+                        } catch (e: CaptureSessionFactory.ProtocolMissing) {
+                            error = e.message
+                        }
+                    }
+                }
+            },
         )
         is Screen.TaskDetail -> {
             // Кнопка «назад» телефона возвращает к списку: без этого экран

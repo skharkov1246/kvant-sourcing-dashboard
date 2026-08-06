@@ -59,4 +59,39 @@ object CaptureSessionFactory {
             },
         )
     }
+
+    /**
+     * Инициативная сессия — без задания. Кладовщик оказался у стеллажа и
+     * решил наполнить базу сам: съёмка идёт по протоколу-маршрутизатору
+     * (он сам определяет категорию детали), в session.started нет task_id,
+     * зато есть origin=initiative — сервер и контролёр видят, что это
+     * добровольный вклад, а не работа по заданию.
+     */
+    suspend fun initiative(
+        tasks: TaskStore,
+        sessionId: String,
+        outbox: OutboxStore,
+        clock: () -> Instant,
+        newEventId: () -> String,
+        deviceMaxAccuracy: AccuracyClass = AccuracyClass.D,
+        protocolCode: String = "kv_router",
+    ): CaptureSessionController {
+        val document = tasks.latestProtocol(protocolCode)
+            ?: throw ProtocolMissing(
+                "Протокол $protocolCode не синхронизирован — обновите список заданий")
+        val protocol = json.decodeFromJsonElement(CaptureProtocol.serializer(), document)
+        val version = document["version"]?.jsonPrimitive?.intOrNull ?: protocol.version
+        return CaptureSessionController(
+            protocol = protocol,
+            sessionId = sessionId,
+            outbox = outbox,
+            clock = clock,
+            newEventId = newEventId,
+            deviceMaxAccuracy = deviceMaxAccuracy,
+            startContext = buildJsonObject {
+                put("protocol", "$protocolCode@$version")
+                put("origin", "initiative")
+            },
+        )
+    }
 }

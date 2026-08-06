@@ -20,7 +20,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -42,6 +44,7 @@ import ru.kvant.scan.sync.LocalTask
 fun TaskListScreen(
     model: TaskListViewModel,
     onTaskClick: (LocalTask) -> Unit,
+    onInitiativeScan: (() -> Unit)? = null,
 ) {
     val state by model.state.collectAsState()
 
@@ -59,6 +62,17 @@ fun TaskListScreen(
                     }
                 },
             )
+        },
+        floatingActionButton = {
+            // Инициативный скан: база наполняется и без заданий сверху —
+            // оказался у стеллажа, отснял, контролёр примет как обычно.
+            onInitiativeScan?.let {
+                ExtendedFloatingActionButton(
+                    onClick = it,
+                    icon = { Icon(Icons.Filled.Add, contentDescription = null) },
+                    text = { Text("Сканировать") },
+                )
+            }
         },
     ) { padding ->
         Column(Modifier.padding(padding).fillMaxSize()) {
