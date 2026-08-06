@@ -27,7 +27,7 @@ import ru.kvant.scan.sync.OutboxStore
  */
 class CaptureSessionController(
     private val protocol: CaptureProtocol,
-    private val sessionId: String,
+    val sessionId: String,
     private val outbox: OutboxStore,
     private val clock: () -> Instant,
     /** UUIDv7 от платформы: сортируемый, без координации (§04.4). */

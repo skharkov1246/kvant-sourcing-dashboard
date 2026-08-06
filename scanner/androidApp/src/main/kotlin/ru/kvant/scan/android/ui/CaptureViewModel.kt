@@ -23,6 +23,8 @@ class CaptureViewModel(
     private val controller: CaptureSessionController,
 ) : ViewModel() {
 
+    val sessionId: String get() = controller.sessionId
+
     private val _state = MutableStateFlow(controller.state())
     val state: StateFlow<CaptureSessionController.UiState> = _state.asStateFlow()
 

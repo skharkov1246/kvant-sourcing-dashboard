@@ -17,6 +17,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -24,7 +25,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import kotlinx.coroutines.launch
+import ru.kvant.scan.android.ui.CameraCaptureScreen
 import ru.kvant.scan.android.ui.CaptureScreen
+import ru.kvant.scan.android.ui.CaptureActions
+import ru.kvant.scan.android.ui.LocalCaptureActions
 import ru.kvant.scan.android.ui.CaptureViewModel
 import ru.kvant.scan.android.ui.TaskDetailScreen
 import ru.kvant.scan.android.ui.TaskListScreen
@@ -202,7 +206,59 @@ private fun KvantApp(
             // outbox, закрыть её может только abandon с причиной (§04.6).
             // Возврат в задание вернёт человека на тот же шаг съёмки.
             BackHandler { screen = Screen.TaskList }
-            CaptureScreen(viewModel = current.viewModel)
+            var cameraStep by remember { mutableStateOf<ru.kvant.scan.protocol.CaptureStep?>(null) }
+            val shotFiles = remember { mutableStateListOf<java.io.File>() }
+            val actions = remember(current.viewModel) {
+                object : CaptureActions {
+                    override fun launchPhoto(step: ru.kvant.scan.protocol.CaptureStep) {
+                        shotFiles.clear()
+                        cameraStep = step
+                    }
+                    // Видео/обмер/код подключаются следующими сборками — честно
+                    // говорим об этом, а не молчим и не падаем.
+                    override fun launchVideo(step: ru.kvant.scan.protocol.CaptureStep) {
+                        error = "Видеошаг появится в следующей сборке"
+                    }
+                    override fun launchMeasure(step: ru.kvant.scan.protocol.CaptureStep) {
+                        error = "AR-обмер появится в следующей сборке; размеры можно ввести на шаге формы"
+                    }
+                    override fun launchCodeScan(step: ru.kvant.scan.protocol.CaptureStep) {
+                        error = "Сканер кодов появится в следующей сборке; введите код вручную"
+                    }
+                }
+            }
+            androidx.compose.runtime.CompositionLocalProvider(LocalCaptureActions provides actions) {
+                CaptureScreen(viewModel = current.viewModel)
+            }
+            cameraStep?.let { step ->
+                BackHandler { cameraStep = null }
+                CameraCaptureScreen(
+                    step = step,
+                    storageDir = filesDir,
+                    onShot = { file ->
+                        shotFiles += file
+                        // Кадр сразу в очередь медиа: файл принадлежит очереди
+                        // до подтверждения сервера (I-1), загрузка — фоном.
+                        scope.launch { container.stack.mediaQueue.enqueue(
+                            ru.kvant.scan.sync.PendingMedia(
+                                localPath = file.absolutePath,
+                                sessionId = current.viewModel.sessionId,
+                                stepId = step.id,
+                                kind = "photo",
+                                mime = "image/jpeg",
+                            )
+                        ) }
+                    },
+                    onDone = { shots ->
+                        cameraStep = null
+                        current.viewModel.completeCurrentStep(
+                            assetIds = shotFiles.map { it.nameWithoutExtension },
+                        )
+                        shotFiles.clear()
+                    },
+                    onCancel = { cameraStep = null },
+                )
+            }
         }
         is Screen.ItemCard -> {
             BackHandler { screen = current.from }
