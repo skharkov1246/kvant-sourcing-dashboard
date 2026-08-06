@@ -155,6 +155,7 @@ const PNCAT = __PNCAT_JSON__;
 const PROFILES = __PROFILES_JSON__;
 const DOSSIERS = __DOSSIERS_JSON__;
 const METHOD = __METHOD_JSON__;
+const BXHIST = __BXHIST_JSON__;
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const FAM_NAME = {SGT:'Siemens SGT', Solar:'Solar', Heavy:'Тяжёлые ГТУ'};
@@ -442,11 +443,22 @@ function buildUnified(){
  }
  const dmap = {};
  for(const [n,v] of Object.entries((DOSSIERS.dossiers)||{})) dmap[nrm(n)] = v;
+ const hmap = {};
+ for(const hh of (BXHIST.history||[])){
+  const k = nrm(hh.name);
+  if(hmap[k]) hmap[k] = hmap[k].concat(hh.items);
+  else hmap[k] = hh.items;
+ }
  UNI = [...map.values()];
  UNI.forEach(r=>{
   r.bxTotal = Object.values(r.bitrix).reduce((a,b)=>a+b,0);
   r.typ = classify(r);
   r.dossier = dmap[r.key] || null;
+  r.bxHist = hmap[r.key] || null;
+  if(r.dossier){
+   if((!r.email || /см\. сайт|не найдено|—|^$/.test(r.email)) && r.dossier.contact_email) r.email = r.dossier.contact_email;
+   if((!r.phone || /см\. сайт|не найдено|—|^$/.test(r.phone)) && r.dossier.contact_phone) r.phone = r.dossier.contact_phone;
+  }
   r.score = scoreOf(r);
  });
 }
@@ -534,6 +546,7 @@ function pkCard(r){
  if(d.supplied_to&&d.supplied_to.length) dossierBits.push(`поставлял: ${d.supplied_to.slice(0,3).join(', ')}`);
  if(d.exports_to&&d.exports_to.length) dossierBits.push(`экспорт: ${d.exports_to.slice(0,5).join(', ')}${d.exports_to.length>5?'…':''}`);
  if(d.buys_from&&d.buys_from.length) dossierBits.push(`закупает у: ${d.buys_from.slice(0,3).join(', ')}`);
+ if(d.contact_person) dossierBits.push(`контакт: ${d.contact_person}`);
  return `<div class="sup${hidden?' hid':''}" data-k="${esc(r.key)}">
   <div>
    <h4>${esc(r.name)}</h4>
@@ -546,6 +559,12 @@ function pkCard(r){
    ${dossierBits.length?`<div style="font-size:12px;margin-bottom:4px">${dossierBits.map(b=>`<span class="dfact">${esc(b)}</span>`).join('')}</div>`:''}
    ${r.what?`<div class="mut" style="font-size:12.5px">${esc(r.what.length>170?r.what.slice(0,170)+'…':r.what)}</div>`:''}
    ${r.evid?`<div class="mut" style="font-size:11.5px;margin-top:3px">Проверка: ${esc(r.evid.length>150?r.evid.slice(0,150)+'…':r.evid)}</div>`:''}
+   ${d.hook?`<div style="font-size:12px;margin-top:4px;border-left:3px solid var(--good);padding-left:8px">✍ Зацепка для письма: ${esc(d.hook)}</div>`:''}
+   ${r.bxHist?`<details style="margin-top:5px"><summary style="cursor:pointer;color:var(--s1);font-size:12px">Bitrix: наши запросы к компании (${r.bxHist.length}) — контекст общения</summary>
+    <div class="tblwrap" style="margin-top:4px"><table>
+     <tr><th>Когда</th><th>Сделка</th><th>Модель</th><th>Чем закончилось</th><th>Сорсер</th></tr>
+     ${r.bxHist.map(h=>`<tr><td style="white-space:nowrap">${esc(h.date)}</td><td style="font-size:11.5px">#${esc(h.deal)} ${esc(h.deal_t)}</td><td>${(h.models||[]).map(m=>`<span class="tag">${esc(m)}</span>`).join('')}</td><td>${esc(h.stage)}</td><td class="mut">${esc(h.sourcer)}</td></tr>`).join('')}
+    </table></div></details>`:''}
   </div>
   <div class="sup-side">
    <div class="contact">${contactLinks(r)}</div>

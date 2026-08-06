@@ -105,6 +105,7 @@ def main():
         "__PROFILES_JSON__": (ROOT / "data/site_profiles.json").read_text(encoding="utf-8"),
         "__DOSSIERS_JSON__": (ROOT / "data/dossiers.json").read_text(encoding="utf-8"),
         "__METHOD_JSON__": (ROOT / "data/methodology.json").read_text(encoding="utf-8"),
+        "__BXHIST_JSON__": (ROOT / "data/bitrix_history.json").read_text(encoding="utf-8"),
         "__CUSTOMS_JSON__": json.dumps(customs_summary(), ensure_ascii=False),
         "__BUILT_AT__": date.today().isoformat(),
     }
