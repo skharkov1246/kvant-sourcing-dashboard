@@ -47,13 +47,51 @@ def _as_uuid(value: str, *scope: str) -> str:
         return _u5(*scope, value)
 
 
+class _Conn:
+    """Обёртка соединения с самолечением. Управляемые облачные базы рвут
+    простаивающие соединения (у Timeweb — примерно через час тишины), и без
+    переподключения первый же запрос после простоя валится с «the connection
+    is closed». Повтор одного стейтмента безопасен: autocommit + констрейнты
+    (UNIQUE/ON CONFLICT) гасят дубль, если стейтмент успел примениться до
+    обрыва ответа."""
+
+    __slots__ = ("_store",)
+
+    def __init__(self, store: "PgStore") -> None:
+        self._store = store
+
+    def execute(self, *args: Any, **kwargs: Any):
+        store = self._store
+        if store._raw.closed:
+            store._raw = store._connect()
+        try:
+            return store._raw.execute(*args, **kwargs)
+        except psycopg.OperationalError:
+            store._raw = store._connect()
+            return store._raw.execute(*args, **kwargs)
+
+
 class PgStore:
     """Синхронная реализация поверх psycopg3. Одно соединение, autocommit:
     каждая операция — атомарный стейтмент, конфликты решают констрейнты."""
 
     def __init__(self, dsn: str) -> None:
-        self._conn = psycopg.connect(dsn, autocommit=True)
+        self._dsn = dsn
+        self._raw = self._connect()
         self._tenant_cache: dict[str, str] = {}
+
+    def _connect(self) -> psycopg.Connection:
+        # TCP keepalive, чтобы NAT/файрвол по пути не считал соединение мёртвым
+        # раньше, чем сама база.
+        return psycopg.connect(
+            self._dsn, autocommit=True,
+            keepalives=1, keepalives_idle=60,
+            keepalives_interval=10, keepalives_count=3,
+        )
+
+    @property
+    def _conn(self) -> _Conn:
+        return _Conn(self)
 
     # ── Служебное ────────────────────────────────────────────────────────────
 
