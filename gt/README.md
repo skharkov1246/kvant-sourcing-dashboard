@@ -25,6 +25,13 @@ gt/
                         сессии «Перфы» (ветка claude/project-continuation-drfnkf)
   data/heavy_suppliers.json  добор по тяжёлым ГТУ: 35 компаний (Запад/MENA/Иран/РФ-СНГ)
                         из сессии «Перфы» (ветка project-continuation, 5e021d0)
+  data/research_suppliers.json  136 компаний из research-вееров 06.08.2026:
+                        субпоставщики OEM Solar/Siemens, автомаркет по моделям,
+                        узкие специалисты (крепёж/лопатки/уплотнения/форсунки/САУ),
+                        наследие Линкольн-Ruston и Финспонг-STAL, РФ/СНГ/Иран
+  data/bitrix_supplier_sites.json  верифицированные сайты Bitrix-компаний (165)
+                        + список not_found (39, убраны из подбора)
+  data/tfs_subsuppliers.json  10 субпоставщиков TFS по модулям (фото владельца)
   data/pn_guide.json    шифровки PN: формат Линкольна (MW#####X), legacy-имена
                         (Typhoon/Tornado/Tempest/Cyclone), правила Solar, методика
   data/bitrix_gt.json   наши ГТУ-запросы из Bitrix: сделки с разметкой моделей и

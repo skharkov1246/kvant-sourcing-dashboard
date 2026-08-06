@@ -4,7 +4,7 @@
   {
    "id": "sgt",
    "title": "Siemens SGT-100…400 (завод Линкольн, Великобритания)",
-   "history": "Линия малых промышленных ГТУ Ruston → European Gas Turbines → Alstom → Siemens (2003, ребрендинг в SGT). Наследственные имена (Typhoon/Tornado/Tempest/Cyclone) до сих пор живут в каталогах, у сервисников и в таможенных описаниях — при поиске ЗИП использовать ОБА имени. Не путать со шведской линией SGT-500/600/700/800 (ex-ABB STAL, Финспонг) — там другая конструкция и нумерация деталей (наследие GT10/GT35).",
+   "history": "Хронология собственников (проверена, 08.2026): 1857 Ruston Proctor & Co → 1918 Ruston & Hornsby (промышленные ГТ с 1946: серии TA/TB) → 1966 English Electric → 1968 GEC (Ruston Gas Turbines: TB5000, Typhoon, Tornado) → 1989 GEC-Alsthom → нач. 1990-х European Gas Turbines (Tempest, Cyclone) → 1998 Alstom → 2003 Siemens (промтурбины Alstom за ~€1,1 млрд) → с 2020 Siemens Energy. Субпоставщики пережили всех собственников — искать по наследию (кузница Smith-Clayton/Bifrangi у самого завода, Doncasters-литьё, Allen Gears-редукторы, Brush-генераторы). Legacy-имена живут в каталогах: при поиске ЗИП использовать ОБА имени (Cyclone ≠ только SGT-400).",
    "models": [
     {"name": "SGT-100", "legacy": "Typhoon", "power": "≈5,1–5,7 МВт", "eff": "≈31%", "shafts": "1 вал (ген.) / 2 вала (мех. привод, SGT-100-2S)", "use": "малые КС, электростанции, когенерация", "zip_note": "широчайший aftermarket в UK (EthosEnergy, Turbine Efficiency, SJE, Task-Pro) — искать и как Typhoon"},
     {"name": "SGT-200", "legacy": "Tornado", "power": "≈6,75 МВт", "eff": "≈31,5%", "shafts": "1 / 2 вала", "use": "ГПА, генерация", "zip_note": "б/у машины и обменные двигатели доступны (GTS, Siemens Lincoln возил б/у в РФ)"},
@@ -15,7 +15,7 @@
   {
    "id": "finspong",
    "title": "Siemens SGT-500…800 (завод Финспонг, Швеция — ex-ABB STAL)",
-   "history": "Средние промышленные ГТУ 19–62 МВт. Другая конструкторская школа и другая система партномеров, чем у Линкольна (наследие GT10/GT35/GTX100) — RFQ не смешивать. В РФ парк заметный: SGT-600 (Южное Хыльчую), SGT-700 (Кронштадт), SGT-800 (Роснефть и энергетика). Китайский aftermarket силён именно по этой линии (Dongturbo — SGT-600/700, Bowzon — материалы SGT-800).",
+   "history": "Хронология собственников (проверена, 08.2026): STAL основана 1913 (братья Юнгстрём) → контроль ASEA с 1916 → 1959 слияние с AB de Lavals Ångturbin → 1962 STAL-LAVAL Turbin AB → 1984–88 ASEA STAL → ABB STAL (GT10/GT35) → 1999 ABB Alstom Power → 2000 Alstom (GTX100) → 2003 Siemens. Шведский кластер субпоставщиков жив: литьё TPC Components (Hallstahammar), поковки Björneborg Steel, HIP Bodycote Surahammar, механика Motala Verkstad (40 км от завода). Другая конструкторская школа и система PN, чем у Линкольна — RFQ не смешивать. В РФ парк заметный: SGT-600 (Южное Хыльчую), SGT-700 (Кронштадт), SGT-800 (Роснефть). Китайский aftermarket силён именно по этой линии (Dongturbo, Bowzon).",
    "models": [
     {"name": "SGT-500", "legacy": "GT35", "power": "≈19 МВт", "eff": "≈32%", "shafts": "2 вала", "use": "ГПА, офшор, генерация", "zip_note": "возрастной парк; O.B.T лил корпус+жаровую трубу камеры сгорания SGT-500"},
     {"name": "SGT-600", "legacy": "GT10B", "power": "≈24,5 МВт", "eff": "≈33,6%", "shafts": "2 вала", "use": "ГПА, генерация", "zip_note": "Dongturbo уже возил камеру сгорания SGT-600 в РФ — проверенный канал; спрос РФ подтверждён (Южное Хыльчую)"},

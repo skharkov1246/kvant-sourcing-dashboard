@@ -142,6 +142,9 @@ const CUSTOMS = __CUSTOMS_JSON__;
 const BITRIX = __BITRIX_JSON__;
 const CHECKLIST = __CHECKLIST_JSON__;
 const HEAVY_SUPS = __HEAVY_JSON__;
+const TFS_SUB = __TFSSUB_JSON__;
+const BX_SITES = __BXSITES_JSON__;
+const RESEARCH = __RESEARCH_JSON__;
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const FAM_NAME = {SGT:'Siemens SGT', Solar:'Solar', Heavy:'Тяжёлые ГТУ'};
@@ -307,6 +310,34 @@ function buildUnified(){
   if(mm.size) mm.forEach(x=>r.models.add(x));
   r.heavyAll = true;
  }
+ for(const c of TFS_SUB.rows){
+  const t = [c.name,c.module,c.what].join(' · ');
+  const r = get(c.name, c.country);
+  if(!r.role) r.role = 'субпоставщик TFS: '+c.module;
+  if(!r.site) r.site = c.site;
+  if(!r.email) r.email = c.email;
+  if(!r.what) r.what = c.what;
+  r.conf = r.conf || c.conf; r.src.add('TFS-цепочка');
+  segsOf(t).forEach(x=>r.segs.add(x));
+  pickModels(t).forEach(x=>r.models.add(x));
+  if(/GECOLSA/i.test(c.name)) r.solarAll = true;
+ }
+ const TIER_ROLE = {oem_sub:'поставщик на конвейер OEM (производитель)', component_specialist:'узкий производитель компонентов',
+  aftermarket:'автомаркет / поставщик ЗИП', mro:'независимый сервис (MRO)'};
+ for(const c of RESEARCH.rows){
+  const t = [c.name,c.what,c.link].join(' · ');
+  const r = get(c.name, c.country);
+  if(!r.role) r.role = TIER_ROLE[c.tier]||c.tier;
+  if(!r.site) r.site = c.site;
+  if(!r.email) r.email = c.email;
+  if(!r.what) r.what = c.what + (c.link?(' · Связь: '+c.link):'') + (c.risk?(' · Риск: '+c.risk):'');
+  r.src.add('research');
+  segsOf(t).forEach(x=>r.segs.add(x));
+  pickModels(t).forEach(x=>r.models.add(x));
+  const a = c.angle||'';
+  if(/solar/.test(a)) r.solarAll = true;
+  if(/siemens|sgt|heritage/.test(a)) r.sgtAll = true;
+ }
  for(const o of (BITRIX.offers||[])){
   for(const s of o.suppliers){
    const r = get(s.name);
@@ -328,6 +359,20 @@ function buildUnified(){
   if(a.phone) r.phone = a.phone;
   if(a.what){ r.what = a.what; segsOf(a.what).forEach(x=>r.segs.add(x)); pickModels(a.what).forEach(x=>r.models.add(x)); }
   (a.segs||[]).forEach(x=>r.segs.add(x));
+ }
+ // сайты Bitrix-компаний из веб-верификации; правило владельца: без сайта — вон из подбора
+ const bxs = {};
+ for(const [n,v] of Object.entries(BX_SITES.confirmed||{})) bxs[nrm(n)] = v;
+ for(const r of map.values()){
+  if(!r.site || /^—$|не найдено|нет сайта/.test(r.site)){
+   const v = bxs[r.key];
+   if(v){ r.site = v.site; if(!r.email || r.email==='—') r.email = v.email || r.email; r.src.add('сайт✓'); }
+  }
+ }
+ for(const k of [...map.keys()]){
+  const r = map.get(k);
+  const hasSite = r.site && r.site!=='—' && !/не найдено|нет сайта/i.test(r.site);
+  if(!hasSite && !r.src.has('мой')) map.delete(k);
  }
  UNI = [...map.values()];
  UNI.forEach(r=>{ r.bxTotal = Object.values(r.bitrix).reduce((a,b)=>a+b,0); r.typ = classify(r); });
