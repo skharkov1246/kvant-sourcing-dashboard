@@ -22,7 +22,8 @@ object AppGraph {
 }
 
 class AppContainer(
-    baseUrl: String = "http://10.0.2.2:8077",
+    // Живой стенд. Для локальной отладки на эмуляторе — "http://10.0.2.2:8077".
+    baseUrl: String = "https://89.23.102.183.nip.io",
     tenantId: String = "t-internal",
     userId: String = "u-operator",
 ) {
