@@ -1,0 +1,60 @@
+{
+ "note": "Мощности/КПД — ISO, по открытым данным Siemens Energy и Solar Turbines (≈, зависят от исполнения и года выпуска). Сверять с Gas Turbine World Handbook и паспортом конкретного агрегата.",
+ "families": [
+  {
+   "id": "sgt",
+   "title": "Siemens SGT-100…400 (завод Линкольн, Великобритания)",
+   "history": "Хронология собственников (проверена, 08.2026): 1857 Ruston Proctor & Co → 1918 Ruston & Hornsby (промышленные ГТ с 1946: серии TA/TB) → 1966 English Electric → 1968 GEC (Ruston Gas Turbines: TB5000, Typhoon, Tornado) → 1989 GEC-Alsthom → нач. 1990-х European Gas Turbines (Tempest, Cyclone) → 1998 Alstom → 2003 Siemens (промтурбины Alstom за ~€1,1 млрд) → с 2020 Siemens Energy. Субпоставщики пережили всех собственников — искать по наследию (кузница Smith-Clayton/Bifrangi у самого завода, Doncasters-литьё, Allen Gears-редукторы, Brush-генераторы). Legacy-имена живут в каталогах: при поиске ЗИП использовать ОБА имени (Cyclone ≠ только SGT-400).",
+   "models": [
+    {"name": "SGT-100", "legacy": "Typhoon", "power": "≈5,1–5,7 МВт", "eff": "≈31%", "shafts": "1 вал (ген.) / 2 вала (мех. привод, SGT-100-2S)", "use": "малые КС, электростанции, когенерация", "zip_note": "широчайший aftermarket в UK (EthosEnergy, Turbine Efficiency, SJE, Task-Pro) — искать и как Typhoon"},
+    {"name": "SGT-200", "legacy": "Tornado", "power": "≈6,75 МВт", "eff": "≈31,5%", "shafts": "1 / 2 вала", "use": "ГПА, генерация", "zip_note": "б/у машины и обменные двигатели доступны (GTS, Siemens Lincoln возил б/у в РФ)"},
+    {"name": "SGT-300", "legacy": "Tempest", "power": "≈7,9–8,2 МВт", "eff": "≈30,6%", "shafts": "1 вал (ген.) / 2 вала (-2S)", "use": "генерация, когенерация", "zip_note": "пакетируется также Centrax (генсеты CX300)"},
+    {"name": "SGT-400", "legacy": "Cyclone", "power": "≈12,9–14,3 МВт", "eff": "≈34,8–35,4%", "shafts": "2 вала", "use": "ГПА, генерация — фокус КВАНТ", "zip_note": "текущая закупка: камера сгорания MW21215M ×12 + горелка DUAL DLE MW22316B/01 ×12; Китай — Blaze/O.B.T/Leda; сервис UK/NL — Score, Skyline; пакеты — Centrax CX400"}
+   ]
+  },
+  {
+   "id": "finspong",
+   "title": "Siemens SGT-500…800 (завод Финспонг, Швеция — ex-ABB STAL)",
+   "history": "Хронология собственников (проверена, 08.2026): STAL основана 1913 (братья Юнгстрём) → контроль ASEA с 1916 → 1959 слияние с AB de Lavals Ångturbin → 1962 STAL-LAVAL Turbin AB → 1984–88 ASEA STAL → ABB STAL (GT10/GT35) → 1999 ABB Alstom Power → 2000 Alstom (GTX100) → 2003 Siemens. Шведский кластер субпоставщиков жив: литьё TPC Components (Hallstahammar), поковки Björneborg Steel, HIP Bodycote Surahammar, механика Motala Verkstad (40 км от завода). Другая конструкторская школа и система PN, чем у Линкольна — RFQ не смешивать. В РФ парк заметный: SGT-600 (Южное Хыльчую), SGT-700 (Кронштадт), SGT-800 (Роснефть). Китайский aftermarket силён именно по этой линии (Dongturbo, Bowzon).",
+   "models": [
+    {"name": "SGT-500", "legacy": "GT35", "power": "≈19 МВт", "eff": "≈32%", "shafts": "2 вала", "use": "ГПА, офшор, генерация", "zip_note": "возрастной парк; O.B.T лил корпус+жаровую трубу камеры сгорания SGT-500"},
+    {"name": "SGT-600", "legacy": "GT10B", "power": "≈24,5 МВт", "eff": "≈33,6%", "shafts": "2 вала", "use": "ГПА, генерация", "zip_note": "Dongturbo уже возил камеру сгорания SGT-600 в РФ — проверенный канал; спрос РФ подтверждён (Южное Хыльчую)"},
+    {"name": "SGT-700", "legacy": "GT10C", "power": "≈33 МВт", "eff": "≈37,2%", "shafts": "2 вала", "use": "ГПА, генерация", "zip_note": "спрос РФ: турбина для Кронштадта (наша сделка); лопатки компрессора видны в таможне"},
+    {"name": "SGT-800", "legacy": "GTX100", "power": "≈47–62 МВт", "eff": "≈37–39%", "shafts": "1 вал", "use": "генерация, когенерация", "zip_note": "6 наших сделок (РН и др.); Siemens Global возил ЗИП в РФ в 2024 (параллельный канал); материалы — Bowzon"}
+   ]
+  },
+  {
+   "id": "heavy",
+   "title": "Тяжёлые ГТУ (GE / Siemens / Alstom) — энергетика и большие ГПА",
+   "history": "Машины 25–300 МВт. Спрос КВАНТ подтверждён сделками (9FA Юнипро, MS5001 Ванкор, MS6001B, V64.3А, SGT5-4000F) и таможней (111 записей по 6F.03 — стратегический запас, 54 по MS5002). Aftermarket-каналы: Иран (MAPNA — лицензия V94.2 = ГТЭ-160), Италия (Ansaldo — лицензии Siemens V-серии; SAMIC/GFM — горячая часть heavy-duty), Китай (Henan GTET — GE hot gas path; Frame 7 возился в РФ через Foshan/Homedia), Венгрия/Франция/Италия — GE-заводы, видимые в таможне РФ (GE Hungary, GE Energy Products France, Nuovo Pignone).",
+   "models": [
+    {"name": "GE MS5001", "legacy": "Frame 5 (1 вал)", "power": "≈26,8 МВт", "eff": "≈28,5%", "shafts": "1 вал", "use": "генерация на промыслах", "zip_note": "наша сделка: Юнипро/Ванкор — запрос ТКП"},
+    {"name": "GE MS5002", "legacy": "Frame 5 (2 вала)", "power": "≈32–38 МВт", "eff": "≈29–32%", "shafts": "2 вала", "use": "большие ГПА (Ямал и др.)", "zip_note": "54 записи в таможне РФ — живой поток ЗИП; вариант MS5002E 32 МВт"},
+    {"name": "GE Frame 6B (MS6001)", "legacy": "PG6581B", "power": "≈42–45 МВт", "eff": "≈33%", "shafts": "1 вал", "use": "генерация, ПГУ", "zip_note": "наши сделки: опрос рынка ЗИП MS6001B; части 6B видны в таможне"},
+    {"name": "GE 6F.03 (6FA)", "legacy": "", "power": "≈82 МВт", "eff": "≈35,5%", "shafts": "1 вал", "use": "ПГУ", "zip_note": "111 записей в таможне 2023–2026 «стратегический запас» — крупнейший поток ЗИП тяжёлых машин в РФ"},
+    {"name": "GE Frame 7 (MS7001EA)", "legacy": "7EA", "power": "≈85–90 МВт", "eff": "≈33%", "shafts": "1 вал", "use": "генерация", "zip_note": "переходные патрубки Frame 7 возились в РФ (через трейдеров Foshan/Homedia)"},
+    {"name": "GE 9F/9FA", "legacy": "MS9001FA", "power": "≈255–265 МВт", "eff": "≈36,5%", "shafts": "1 вал", "use": "большая энергетика (Юнипро и др.)", "zip_note": "наши сделки: крепёж лопаток 9FA Юнипро (2 захода)"},
+    {"name": "SGT5-2000E (V94.2 / ГТЭ-160)", "legacy": "V94.2", "power": "≈187 МВт", "eff": "≈36,2%", "shafts": "1 вал", "use": "энергетика (ГТЭ-160 = лицензия ЛМЗ)", "zip_note": "ГЛАВНЫЙ иранский канал: MAPNA TUGA делает полный ЖЦ V94.2 по лицензии Siemens; X/L-кольца ГТЭ-160 — наша сделка"},
+    {"name": "SGT5-4000F (V94.3A)", "legacy": "V94.3", "power": "≈292 МВт", "eff": "≈39,8%", "shafts": "1 вал", "use": "большая энергетика", "zip_note": "наша сделка: ЗИП на инспекцию горячего тракта (Витебскэнерго)"},
+    {"name": "V64.3A (AE64.3A)", "legacy": "", "power": "≈70 МВт", "eff": "≈36,8%", "shafts": "1 вал", "use": "генерация (ТТЭЦ и др.)", "zip_note": "лицензия у Ansaldo (AE64.3A) — итальянский канал; GFM делал комплекты деталей; 5 наших сделок"},
+    {"name": "GT13E2 (Alstom)", "legacy": "", "power": "≈182–210 МВт", "eff": "≈38%", "shafts": "1 вал", "use": "энергетика", "zip_note": "части видны в таможне РФ; сервис-наследник — Ansaldo/EthosEnergy"}
+   ]
+  },
+  {
+   "id": "solar",
+   "title": "Solar Turbines (Сан-Диего, США — Caterpillar)",
+   "history": "Крупнейший в мире парк промышленных ГТУ 1–23 МВт (>16 000 машин). Вертикальная модель OEM: запчасти и сервис — только через сеть Solar/Caterpillar, независимый aftermarket заметно тоньше, чем у Siemens: ключевые не-OEM игроки — S&S Turbine Services (Канада), Alba Power/Sulzer (UK), реверс в Китае (Bicosyn и др.). После ухода из РФ (2022) канал ЗИП — независимые MRO, б/у рынок, третьи страны.",
+   "models": [
+    {"name": "Saturn 20", "legacy": "", "power": "≈1,2 МВт", "eff": "≈24%", "shafts": "1 вал", "use": "малая генерация, старые ГПА", "zip_note": "парк возрастной, много б/у и обменных двигателей у независимых MRO"},
+    {"name": "Centaur 40", "legacy": "", "power": "≈3,5 МВт", "eff": "≈28%", "shafts": "1 / 2 вала", "use": "ГПА, генерация", "zip_note": "самый массовый «старый» Solar — рабочая лошадка aftermarket"},
+    {"name": "Centaur 50", "legacy": "", "power": "≈4,6 МВт", "eff": "≈29%", "shafts": "1 / 2 вала", "use": "ГПА, генерация", "zip_note": ""},
+    {"name": "Taurus 60", "legacy": "", "power": "≈5,7 МВт", "eff": "≈30%", "shafts": "1 / 2 вала", "use": "ГПА, генерация, офшор", "zip_note": "в таможне РФ 2023–2026 виден импорт ЗИП Taurus от самого Solar (до ухода)"},
+    {"name": "Taurus 70", "legacy": "", "power": "≈8,0 МВт", "eff": "≈34%", "shafts": "1 / 2 вала", "use": "ГПА, генерация", "zip_note": ""},
+    {"name": "Mars 90", "legacy": "", "power": "≈9,4 МВт", "eff": "≈32%", "shafts": "2 вала", "use": "ГПА, офшор (Сахалин и др.)", "zip_note": "в таможне РФ виден импорт ЗИП Mars"},
+    {"name": "Mars 100", "legacy": "", "power": "≈11,4 МВт", "eff": "≈33%", "shafts": "2 вала", "use": "ГПА, офшор", "zip_note": ""},
+    {"name": "Titan 130", "legacy": "", "power": "≈16,5 МВт", "eff": "≈35%", "shafts": "1 / 2 вала", "use": "ГПА, генерация", "zip_note": ""},
+    {"name": "Titan 250", "legacy": "", "power": "≈23 МВт", "eff": "≈39%", "shafts": "2 вала", "use": "ГПА", "zip_note": "новейшая машина — ЗИП практически только OEM"}
+   ]
+  }
+ ]
+}

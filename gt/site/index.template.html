@@ -1,0 +1,937 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ГТУ-библиотека — поставщики Solar и Siemens SGT-100…400</title>
+<style>
+:root{
+  color-scheme:light;
+  --page:#f9f9f7; --surface:#fcfcfb; --ink:#0b0b0b; --ink2:#52514e; --mut:#898781;
+  --grid:#e1e0d9; --axis:#c3c2b7; --border:rgba(11,11,11,.10);
+  --s1:#2a78d6; --s1-soft:#cde2fb; --good:#0ca30c; --warn:#fab219; --crit:#d03b3b; --serious:#ec835a;
+  --chip:#eef2f7;
+}
+@media (prefers-color-scheme: dark){
+  :root:where(:not([data-theme="light"])){
+    color-scheme:dark;
+    --page:#0d0d0d; --surface:#1a1a19; --ink:#fff; --ink2:#c3c2b7; --mut:#898781;
+    --grid:#2c2c2a; --axis:#383835; --border:rgba(255,255,255,.10);
+    --s1:#3987e5; --s1-soft:#184f95; --chip:#262624;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --page:#0d0d0d; --surface:#1a1a19; --ink:#fff; --ink2:#c3c2b7; --mut:#898781;
+  --grid:#2c2c2a; --axis:#383835; --border:rgba(255,255,255,.10);
+  --s1:#3987e5; --s1-soft:#184f95; --chip:#262624;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:14px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
+a{color:var(--s1);text-decoration:none} a:hover{text-decoration:underline}
+header{padding:18px 22px 0}
+h1{font-size:21px;margin:0 0 2px}
+.sub{color:var(--ink2);font-size:12.5px}
+nav{position:sticky;top:0;z-index:5;background:var(--page);display:flex;gap:4px;flex-wrap:wrap;padding:10px 22px;border-bottom:1px solid var(--grid)}
+nav button{border:1px solid var(--border);background:var(--surface);color:var(--ink2);padding:6px 13px;border-radius:18px;font:600 13px system-ui;cursor:pointer}
+nav button.on{background:var(--s1);border-color:var(--s1);color:#fff}
+main{padding:16px 22px 40px;max-width:1280px}
+section{display:none} section.on{display:block}
+h2{font-size:16px;margin:20px 0 8px}
+h3{font-size:14px;margin:16px 0 6px}
+.mut{color:var(--mut);font-size:12px}
+.k{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+.tile{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 16px;min-width:130px}
+.tile b{display:block;font-size:22px}
+.tile span{color:var(--ink2);font-size:12px}
+.box{background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--good);border-radius:8px;padding:10px 14px;margin:10px 0;font-size:13px}
+.box.warn{border-left-color:var(--crit)}
+.box.info{border-left-color:var(--s1)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin:8px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
+.tblwrap{overflow-x:auto;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin:8px 0}
+table{border-collapse:collapse;width:100%;font-size:12.5px}
+th{background:var(--chip);text-align:left;font-size:11.5px;color:var(--ink2);white-space:nowrap}
+th,td{padding:6px 9px;border-bottom:1px solid var(--grid);vertical-align:top}
+tr:last-child td{border-bottom:0}
+td b{font-weight:700}
+.tag{display:inline-block;background:var(--chip);border-radius:9px;padding:1px 8px;font-size:11px;color:var(--ink2);margin:1px 2px 1px 0;white-space:nowrap}
+.tag.sgt{background:var(--s1-soft);color:var(--ink)}
+.tag.solar{background:var(--chip);border:1px solid var(--s1)}
+.critA{color:var(--crit);font-weight:700}.critB{color:var(--serious);font-weight:700}.critC{color:var(--ink2)}
+.filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0}
+.filters input,.filters select{background:var(--surface);color:var(--ink);border:1px solid var(--border);border-radius:8px;padding:6px 10px;font:13px system-ui}
+.filters input{min-width:220px}
+.count{color:var(--ink2);font-size:12px;margin-left:auto}
+.viz-root{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin:10px 0}
+.viz-root h3{margin:0 0 2px;font-size:13px}
+.bar{fill:var(--s1)}
+.axis-t{fill:var(--mut);font-size:11px}
+.val-t{fill:var(--ink2);font-size:11px;font-variant-numeric:tabular-nums}
+.gridln{stroke:var(--grid);stroke-width:1}
+.baseln{stroke:var(--axis);stroke-width:1}
+.btn{border:1px solid var(--border);background:var(--surface);color:var(--ink2);padding:6px 12px;border-radius:8px;font:600 12px system-ui;cursor:pointer}
+table.sortable th{cursor:pointer;user-select:none}
+table.sortable th:hover{color:var(--ink)}
+table.sortable th.asc::after{content:" ↑";color:var(--s1)}
+table.sortable th.desc::after{content:" ↓";color:var(--s1)}
+.explink{cursor:pointer;color:var(--s1)}
+.explink:hover{text-decoration:underline}
+/* — человеческие фильтры, карточки, статусы — */
+.f-field{display:flex;flex-direction:column;gap:3px}
+.f-field label{font-size:10.5px;color:var(--mut);text-transform:uppercase;letter-spacing:.05em}
+.filters{align-items:flex-end}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--border);border-radius:16px;padding:4px 12px;font-size:12.5px;cursor:pointer;background:var(--surface);color:var(--ink2);user-select:none}
+.chip:hover{border-color:var(--s1);color:var(--ink)}
+.chip.on{background:var(--s1);border-color:var(--s1);color:#fff}
+.sup{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 16px;margin:10px 0;display:grid;grid-template-columns:minmax(200px,1fr) 1.6fr minmax(230px,1fr);gap:8px 18px}
+.sup:hover{border-color:var(--s1)}
+.sup.hid{opacity:.55}
+.sup h4{margin:0;font-size:14.5px}
+.sup-side{display:flex;flex-direction:column;gap:6px}
+.sup-ctl{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.sup-ctl select{background:var(--surface);color:var(--ink);border:1px solid var(--border);border-radius:8px;padding:4px 8px;font:12px system-ui}
+.contact a,.contact span{display:block;font-size:12.5px;margin:1px 0;word-break:break-word}
+.note{background:var(--chip);border-radius:8px;padding:6px 9px;font-size:12px;color:var(--ink2)}
+.pill{display:inline-block;border:1px solid var(--border);border-radius:10px;padding:1px 9px;font-size:11px;color:var(--ink2);margin:1px 3px 1px 0;white-space:nowrap}
+.pill.typ{border-color:var(--ink2);color:var(--ink)}
+.pill.bx{border-color:var(--s1);color:var(--s1);font-weight:700}
+.pill.c-high{border-color:var(--good);color:var(--good)}
+.pill.c-med{border-color:var(--serious);color:var(--serious)}
+.pill.c-low{border-color:var(--mut)}
+.pill.st-work,.pill.st-rfq{border-color:var(--s1);color:var(--s1)}
+.pill.st-kp{border-color:var(--good);color:var(--good);font-weight:700}
+.pill.st-no{border-color:var(--crit);color:var(--crit)}
+.btn.primary{background:var(--s1);color:#fff;border-color:var(--s1)}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;margin-top:8px}
+.form-grid input,#pk-addform input{background:var(--surface);color:var(--ink);border:1px solid var(--border);border-radius:8px;padding:7px 10px;font:13px system-ui}
+.acc{border:1px solid var(--border);border-radius:10px;background:var(--surface);margin:8px 0;overflow:hidden}
+.acc-row{display:grid;grid-template-columns:minmax(180px,2fr) 3fr auto auto;gap:12px;align-items:center;padding:9px 14px;cursor:pointer;border-top:1px solid var(--grid)}
+.acc-item:first-child .acc-row{border-top:0}
+.acc-row:hover{background:var(--chip)}
+.acc-bar{height:7px;border-radius:4px;background:var(--s1);min-width:3px;justify-self:start}
+.acc-n{font-variant-numeric:tabular-nums;color:var(--ink2);font-size:12.5px;white-space:nowrap}
+.chev{color:var(--mut);transition:transform .15s}
+.acc-item.open .chev{transform:rotate(90deg)}
+.acc-body{display:none;padding:2px 14px 12px;border-top:1px dashed var(--grid)}
+.acc-item.open .acc-body{display:block}
+td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.tblwrap{max-height:75vh;overflow:auto}
+.tblwrap th{position:sticky;top:0;z-index:2}
+table.sortable th::after{content:" ↕";opacity:.4}
+@media(max-width:900px){.sup{grid-template-columns:1fr}.acc-row{grid-template-columns:1fr auto auto}.acc-bar{display:none}}
+footer{padding:0 22px 24px;color:var(--mut);font-size:11.5px}
+@media (max-width:700px){main,header,nav{padding-left:12px;padding-right:12px}}
+</style>
+</head>
+<body>
+<header>
+  <h1>ГТУ-библиотека: поставщики и ЗИП — Solar &amp; Siemens SGT-100…400</h1>
+  <div class="sub">Справочник для сорсеров КВАНТ: машины · номенклатура ЗИП · шифровки PN · библиотека производителей (OEM / независимые / реверс) · таможня РФ · мировые базы. Сборка: __BUILT_AT__</div>
+</header>
+<nav id="nav"></nav>
+<main id="main"></main>
+<footer>Контакты SGT-блока верифицированы 05.08.2026 (таможня РФ HS 8411 + сайты компаний); Solar-блок — публичные данные, контакты брать с сайтов при первом RFQ. Полная таможенная база и ЗИП-платформа: kvant-zip.pages.dev</footer>
+<script>
+const SUPPLIERS = __SUPPLIERS_JSON__;
+const MODELS = __MODELS_JSON__;
+const PARTS = __PARTS_JSON__;
+const PN = __PN_JSON__;
+const CUSTOMS = __CUSTOMS_JSON__;
+const BITRIX = __BITRIX_JSON__;
+const CHECKLIST = __CHECKLIST_JSON__;
+const HEAVY_SUPS = __HEAVY_JSON__;
+const TFS_SUB = __TFSSUB_JSON__;
+const BX_SITES = __BXSITES_JSON__;
+const RESEARCH = __RESEARCH_JSON__;
+
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const FAM_NAME = {SGT:'Siemens SGT', Solar:'Solar', Heavy:'Тяжёлые ГТУ'};
+const famTag = f => `<span class="tag ${f==='SGT'?'sgt':'solar'}">${FAM_NAME[f]||f}</span>`;
+const critCls = c => c==='A'?'critA':(c==='B'?'critB':'critC');
+
+/* сортировка любых таблиц класса .sortable кликом по заголовку (число/текст, ↑↓) */
+document.addEventListener('click', e=>{
+ const th = e.target.closest('table.sortable th'); if(!th) return;
+ const table = th.closest('table');
+ const tbody = table.tBodies.length>1 ? table.tBodies[table.tBodies.length-1] : table.tBodies[0];
+ const idx = [...th.parentNode.children].indexOf(th);
+ const dir = th.classList.contains('asc') ? -1 : 1;
+ table.querySelectorAll('th').forEach(h=>h.classList.remove('asc','desc'));
+ th.classList.add(dir>0?'asc':'desc');
+ const rows = [...tbody.rows].filter(r=>r.cells.length && r.cells[0].tagName==='TD');
+ const val = r=>{
+  const t = (r.cells[idx]?.textContent||'').trim();
+  const n = parseFloat(t.replace(/[\s ]/g,'').replace(',','.'));
+  return (!isNaN(n) && /^[−\-\d]/.test(t)) ? n : t.toLowerCase();
+ };
+ rows.sort((a,b)=>{ const x=val(a), y=val(b);
+  return (typeof x==='number' && typeof y==='number' ? x-y : String(x).localeCompare(String(y),'ru'))*dir; });
+ rows.forEach(r=>tbody.appendChild(r));
+});
+
+const TABS = [
+ ['picker','Подбор поставщика'],['overview','Обзор'],['machines','Машины'],['parts','Номенклатура ЗИП'],['pn','Шифровки PN'],
+ ['suppliers','Поставщики'],['bitrix','Наши запросы'],['customs','Таможня РФ'],['db','Базы данных']
+];
+
+/* ---------- Подбор поставщика: модель × сегмент → кто предлагает ---------- */
+const MRX = [
+ [/SGT[- ]?100|Typhoon/i,'SGT-100'],[/SGT[- ]?200|Tornado/i,'SGT-200'],[/SGT[- ]?300|Tempest/i,'SGT-300'],
+ [/SGT[- ]?400|Cyclone/i,'SGT-400'],
+ [/SGT[- ]?500|GT35/i,'SGT-500'],[/SGT[- ]?600|GT10B?\b/i,'SGT-600'],[/SGT[- ]?700|GT10C/i,'SGT-700'],
+ [/SGT[- ]?750/i,'SGT-750'],[/SGT[- ]?800|GTX100/i,'SGT-800'],
+ [/Saturn/i,'Saturn 20'],[/Centaur\w*[- ]?40/i,'Centaur 40'],[/Centaur\w*[- ]?50/i,'Centaur 50'],
+ [/Taurus\w*[- ]?60/i,'Taurus 60'],[/Taurus\w*[- ]?70/i,'Taurus 70'],[/Mars[- ]?90/i,'Mars 90'],
+ [/Mars[- ]?100/i,'Mars 100'],[/Titan[- ]?130/i,'Titan 130'],[/Titan[- ]?250/i,'Titan 250'],
+ [/SGT5[- ]?2000E|V94\.?2|ГТЭ[- ]?160/i,'SGT5-2000E (V94.2/ГТЭ-160)'],[/SGT5[- ]?4000F|V94\.?3/i,'SGT5-4000F (V94.3A)'],
+ [/V64\.?3|AE64/i,'V64.3A (AE64.3A)'],[/GT13/i,'GT13E2'],
+ [/9F[AB]?\b|MS9001/i,'GE 9F/9FA'],[/6F\.?03|6FA/i,'GE 6F.03 (6FA)'],
+ [/MS7001|7EA|Frame\s?7/i,'GE Frame 7 (MS7001)'],[/MS6001|Frame\s?6|\b6B\b/i,'GE Frame 6B (MS6001)'],
+ [/MS5002|Frame\s?5/i,'GE MS5002'],[/MS5001/i,'GE MS5001'],
+];
+const MODEL_GROUPS = [
+ ['Siemens SGT — Линкольн', ['SGT-100','SGT-200','SGT-300','SGT-400']],
+ ['Siemens SGT — Финспонг', ['SGT-500','SGT-600','SGT-700','SGT-750','SGT-800']],
+ ['Solar Turbines', ['Saturn 20','Centaur 40','Centaur 50','Taurus 60','Taurus 70','Mars 90','Mars 100','Titan 130','Titan 250']],
+ ['Тяжёлые (GE / Siemens / Alstom)', ['GE MS5001','GE MS5002','GE Frame 6B (MS6001)','GE 6F.03 (6FA)','GE Frame 7 (MS7001)','GE 9F/9FA','SGT5-2000E (V94.2/ГТЭ-160)','SGT5-4000F (V94.3A)','V64.3A (AE64.3A)','GT13E2']],
+];
+const LINC_SET = new Set(MODEL_GROUPS[0][1]), FIN_SET = new Set(MODEL_GROUPS[1][1]),
+      SOLAR_SET = new Set(MODEL_GROUPS[2][1]), HEAVY_SET = new Set(MODEL_GROUPS[3][1]);
+const SEGS = [
+ ['hot','Горячий тракт: камеры, горелки, зажигание', /камер|горелк|жаров|liner|burner|combust|transition|запальн|зажиган|igniter|форсунк|cupula|купол/i],
+ ['blades','Лопатки и сопловые (литьё, диски)', /лопатк|соплов|blade|vane|nozzle|литьё|литье|casting|диск|монокрист/i],
+ ['coat','Покрытия и спецпроцессы', /покрыти|coating|TBC|MCrAlY|гальван|спецпроцесс/i],
+ ['mat','Материалы: сплавы, поковки', /материал|сплав|hastelloy|nimonic|inconel|поковк|forg|пруток|лист/i],
+ ['mro','MRO: капремонт, сервис, стенды', /ремонт|сервис|overhaul|MRO|восстановлен|обменн|стенд|полев/i],
+ ['rotor','Ротор, подшипники, уплотнения', /подшипник|уплотнен|\bseal|ротор|муфт|dry gas/i],
+ ['fuel','Топливная система, клапаны', /клапан|valve|топливн|fuel/i],
+ ['ctrl','САУ, КИП, электрика', /САУ|контроллер|датчик|КИП|control|turbotronic|ретрофит|термостат|свеч/i],
+ ['cons','Фильтры и расходники', /фильтр|масл|расходн|filter|метиз|прокладк/i],
+ ['bop','Пакет / навесное (BOP)', /пакет|генсет|редуктор|стартер|насос|package|теплообменн|генератор|турбогенератор/i],
+ ['trade','Трейдеры, каналы завоза, б/у', /трейдер|брокер|канал|б\/у|посредник|trading|экспортёр|целые/i],
+];
+const SEG_NAME = Object.fromEntries(SEGS.map(([id,n])=>[id,n]));
+const SEG_SHORT = id => (SEG_NAME[id]||id).split(':')[0].split(',')[0];
+const CL_SEG = {1:['hot'],2:['blades'],3:['coat'],4:['mat'],5:['mro'],6:['trade'],7:['mro']};
+const STATUSES = [['','без статуса'],['work','в работе'],['rfq','RFQ отправлен'],['kp','есть КП'],['no','отказ']];
+const TYPES = [
+ ['oem','OEM — оригинальный производитель'],
+ ['auth','авторизованный сервис-провайдер'],
+ ['serv','независимый сервис-провайдер'],
+ ['mfg','производитель деталей'],
+ ['aft','автомаркет запчастей / трейдер'],
+];
+const TYPE_NAME = Object.fromEntries(TYPES);
+function classify(r){
+ const t = (r.role+' '+(r.what||'')).toLowerCase();
+ if(/\boem\b|пэкеджер|оригинальн/.test(t) && !/не-oem|non-oem/.test(t)) return 'oem';
+ if(/одобрен|авториз|authorized|licens|лиценз/.test(t)) return 'auth';
+ if(/завод|производитель|производств|лить[её]|мехообработк|мехобработк|manufactur|casting|поковк|precision|станочн/.test(t)) return 'mfg';
+ if(/сервис|mro|ремонт|overhaul|капремонт|восстановлен|service|обслуж|стенд|инспекци/.test(t)) return 'serv';
+ return 'aft';
+}
+const ST_NAME = Object.fromEntries(STATUSES);
+const ALIASES = [
+ ['turbinefieldsolutions','tfs'],['dongturbo','dongturbo'],['qingdaoobt','qingdaoobt'],['obtpower','qingdaoobt'],
+ ['blazeturbine','blaze'],['ledagreenpower','leda'],['immiturbine','immi'],['liburdi','liburdi'],
+ ['bicosyn','bicosyn'],['bowzon','bowzon'],['dawopu','dawopu'],['hangzhouhgtp','dawopu'],['hangzhougasturbineparts','dawopu'],
+ ['motorсич','motorsich'],['моторсич','motorsich'],['ethosenergy','ethosenergy'],['scoreenergy','score'],
+];
+const nrm = s => {
+ let k = String(s||'').toLowerCase().replace(/[^a-zа-я0-9]/g,'').replace(/(coltd|colimited|ltd|llc|inc|gmbh|srl|spa|bv|sa|sadecv|corp|company|limited|group)+$/,'');
+ for(const [pat,canon] of ALIASES) if(k.includes(pat)) return canon;
+ return k;
+};
+
+/* правки пользователя: статусы, заметки, скрытые, свои поставщики — в localStorage этого браузера */
+let EDITS;
+try{ EDITS = JSON.parse(localStorage.getItem('gt_edits_v2')) || {}; }catch(e){ EDITS = {}; }
+EDITS.st = EDITS.st||{}; EDITS.note = EDITS.note||{}; EDITS.hide = EDITS.hide||{}; EDITS.add = EDITS.add||[];
+function saveEdits(){ try{ localStorage.setItem('gt_edits_v2', JSON.stringify(EDITS)); }catch(e){} }
+
+function pickModels(text){
+ const out = new Set();
+ for(const [rx,m] of MRX) if(rx.test(text)) out.add(m);
+ return out;
+}
+function segsOf(text){
+ const out = new Set();
+ for(const [id,,rx] of SEGS) if(rx.test(text)) out.add(id);
+ return out;
+}
+let UNI = null;
+function buildUnified(){
+ const map = new Map();
+ const get = (name,country)=>{
+  const k = nrm(name);
+  if(!map.has(k)) map.set(k,{key:k, name, country: country||'—', role:'', segs:new Set(), models:new Set(),
+    sgtAll:false, solarAll:false, heavyAll:false, src:new Set(), conf:'', prior:'', tier:'',
+    site:'', email:'', phone:'', what:'', bitrix:{}});
+  return map.get(k);
+ };
+ for(const s of SUPPLIERS){
+  const t = [s.role,(s.cats||[]).join(' '),s.models,s.note].join(' · ');
+  const r = get(s.name, s.country);
+  r.role = s.role; r.tier = s.tier; r.site = s.site; r.email = s.email; r.phone = s.phone;
+  r.what = s.models; r.src.add('ядро');
+  segsOf(t).forEach(x=>r.segs.add(x));
+  pickModels(t).forEach(x=>r.models.add(x));
+  if(s.families.includes('SGT')) r.sgtAll = true;
+  if(s.families.includes('Solar')) r.solarAll = true;
+  if(s.families.includes('Heavy')) r.heavyAll = true;
+ }
+ for(const c of CHECKLIST.rows){
+  const t = [c.name,c.what,c.proof].join(' · ');
+  const r = get(c.name, c.country);
+  if(!r.role) r.role = c.seg_name;
+  if(!r.site) r.site = c.site;
+  if(!r.email) r.email = c.email;
+  if(!r.phone) r.phone = c.phone;
+  if(!r.what) r.what = c.what;
+  r.conf = r.conf || c.conf; r.prior = r.prior || c.prior; r.src.add('чеклист');
+  (CL_SEG[c.seg]||[]).forEach(x=>r.segs.add(x));
+  segsOf(t).forEach(x=>r.segs.add(x));
+  const mm = pickModels(t);
+  if(mm.size) mm.forEach(x=>r.models.add(x)); else r.models.add('SGT-400');
+ }
+ for(const c of HEAVY_SUPS.rows){
+  const t = [c.name,c.role,c.what].join(' · ');
+  const r = get(c.name, c.country);
+  if(!r.role) r.role = c.role;
+  if(!r.site) r.site = c.site;
+  if(!r.email) r.email = c.email;
+  if(!r.phone) r.phone = c.phone;
+  if(!r.what) r.what = c.what;
+  r.conf = r.conf || c.conf; r.src.add('тяжёлые-база');
+  segsOf(t).forEach(x=>r.segs.add(x));
+  const mm = pickModels(t);
+  if(mm.size) mm.forEach(x=>r.models.add(x));
+  r.heavyAll = true;
+ }
+ for(const c of TFS_SUB.rows){
+  const t = [c.name,c.module,c.what].join(' · ');
+  const r = get(c.name, c.country);
+  if(!r.role) r.role = 'субпоставщик TFS: '+c.module;
+  if(!r.site) r.site = c.site;
+  if(!r.email) r.email = c.email;
+  if(!r.what) r.what = c.what;
+  r.conf = r.conf || c.conf; r.src.add('TFS-цепочка');
+  segsOf(t).forEach(x=>r.segs.add(x));
+  pickModels(t).forEach(x=>r.models.add(x));
+  if(/GECOLSA/i.test(c.name)) r.solarAll = true;
+ }
+ const TIER_ROLE = {oem_sub:'поставщик на конвейер OEM (производитель)', component_specialist:'узкий производитель компонентов',
+  aftermarket:'автомаркет / поставщик ЗИП', mro:'независимый сервис (MRO)'};
+ for(const c of RESEARCH.rows){
+  const t = [c.name,c.what,c.link].join(' · ');
+  const r = get(c.name, c.country);
+  if(!r.role) r.role = TIER_ROLE[c.tier]||c.tier;
+  if(!r.site) r.site = c.site;
+  if(!r.email) r.email = c.email;
+  if(!r.what) r.what = c.what + (c.link?(' · Связь: '+c.link):'') + (c.risk?(' · Риск: '+c.risk):'');
+  r.src.add('research');
+  segsOf(t).forEach(x=>r.segs.add(x));
+  pickModels(t).forEach(x=>r.models.add(x));
+  const a = c.angle||'';
+  if(/solar/.test(a)) r.solarAll = true;
+  if(/siemens|sgt|heritage/.test(a)) r.sgtAll = true;
+ }
+ for(const o of (BITRIX.offers||[])){
+  for(const s of o.suppliers){
+   const r = get(s.name);
+   r.src.add('bitrix');
+   r.bitrix[o.model] = (r.bitrix[o.model]||0) + s.n;
+   if(/Solar/.test(o.model) && o.model.includes('уточнить')) r.solarAll = true;
+   else if(/Siemens/.test(o.model) && o.model.includes('уточнить')) r.sgtAll = true;
+   else if(!o.model.includes('уточнить')){
+    pickModels(o.model).forEach(x=>r.models.add(x));
+   }
+  }
+ }
+ for(const a of EDITS.add){
+  const r = get(a.name, a.country);
+  r.src.add('мой');
+  if(a.role) r.role = a.role;
+  if(a.site) r.site = a.site;
+  if(a.email) r.email = a.email;
+  if(a.phone) r.phone = a.phone;
+  if(a.what){ r.what = a.what; segsOf(a.what).forEach(x=>r.segs.add(x)); pickModels(a.what).forEach(x=>r.models.add(x)); }
+  (a.segs||[]).forEach(x=>r.segs.add(x));
+ }
+ // сайты Bitrix-компаний из веб-верификации; правило владельца: без сайта — вон из подбора
+ const bxs = {};
+ for(const [n,v] of Object.entries(BX_SITES.confirmed||{})) bxs[nrm(n)] = v;
+ for(const r of map.values()){
+  if(!r.site || /^—$|не найдено|нет сайта/.test(r.site)){
+   const v = bxs[r.key];
+   if(v){ r.site = v.site; if(!r.email || r.email==='—') r.email = v.email || r.email; r.src.add('сайт✓'); }
+  }
+ }
+ for(const k of [...map.keys()]){
+  const r = map.get(k);
+  const hasSite = r.site && r.site!=='—' && !/не найдено|нет сайта/i.test(r.site);
+  if(!hasSite && !r.src.has('мой')) map.delete(k);
+ }
+ UNI = [...map.values()];
+ UNI.forEach(r=>{ r.bxTotal = Object.values(r.bitrix).reduce((a,b)=>a+b,0); r.typ = classify(r); });
+}
+function coversModel(r, m){
+ if(r.models.has(m)) return true;
+ if((LINC_SET.has(m)||FIN_SET.has(m)) && r.sgtAll) return true;
+ if(SOLAR_SET.has(m) && r.solarAll) return true;
+ if(HEAVY_SET.has(m) && r.heavyAll) return true;
+ return false;
+}
+const confOrd = {high:0, med:1, low:2, '':3};
+const SORTS = {
+ rel:  ['сначала предлагавшие нам', (a,b)=> (b.bxTotal-a.bxTotal) || (confOrd[a.conf]-confOrd[b.conf]) || a.name.localeCompare(b.name)],
+ conf: ['по уровню доверия', (a,b)=> (confOrd[a.conf]-confOrd[b.conf]) || (b.bxTotal-a.bxTotal) || a.name.localeCompare(b.name)],
+ name: ['по алфавиту', (a,b)=> a.name.localeCompare(b.name,'ru')],
+ country: ['по стране', (a,b)=> a.country.localeCompare(b.country,'ru') || a.name.localeCompare(b.name)],
+};
+function contactLinks(r){
+ const out = [];
+ const site = (r.site||'').trim();
+ if(site && site!=='—' && !/нет сайта|не найдено/i.test(site)){
+  const dom = site.replace(/^https?:\/\//,'').split(/[\s(]/)[0];
+  out.push(`<a href="https://${esc(dom)}" target="_blank" rel="noopener">🌐 ${esc(dom)}</a>`);
+ }
+ const em = (r.email||'').trim();
+ if(em.includes('@')) out.push(`<a href="mailto:${esc(em.split(/[;,\s]/)[0])}">✉ ${esc(em)}</a>`);
+ else if(em && em!=='—' && !/не найдено|см\. сайт|форма|скрыт/i.test(em)) out.push(`<span>✉ ${esc(em)}</span>`);
+ const ph = (r.phone||'').trim();
+ if(/^\+?[\d(]/.test(ph)) out.push(`<a href="tel:${esc(ph.replace(/[^+\d]/g,'').slice(0,16))}">☎ ${esc(ph)}</a>`);
+ else if(ph && ph!=='—' && !/не найдено|см\. сайт/i.test(ph)) out.push(`<span>☎ ${esc(ph)}</span>`);
+ return out.length ? out.join('') : '<span class="mut">контакты — в карточке CRM / на сайте</span>';
+}
+function pkCard(r){
+ const st = EDITS.st[r.key]||'';
+ const note = EDITS.note[r.key]||'';
+ const hidden = !!EDITS.hide[r.key];
+ const models = [...r.models].map(m=>{
+  const n = r.bitrix[m];
+  return `<span class="tag${n?' sgt':''}" title="${n?('предлагал нам: '+n+' запрос(ов)'):''}">${esc(m)}${n?' ×'+n:''}</span>`;
+ }).join('');
+ const wide = [r.sgtAll?'<span class="tag">Siemens SGT — линейка</span>':'',
+               r.solarAll?'<span class="tag">Solar — линейка</span>':'',
+               r.heavyAll?'<span class="tag">тяжёлые — да</span>':''].join('');
+ const gen = Object.entries(r.bitrix).filter(([m])=>m.includes('уточнить'))
+   .map(([m,n])=>`<span class="tag">${esc(m)} ×${n}</span>`).join('');
+ const src = [...r.src].map(s=>s==='bitrix'
+   ? `<span class="pill bx">Bitrix · ${r.bxTotal} запрос${r.bxTotal>4?'ов':(r.bxTotal>1?'а':'')}</span>`
+   : `<span class="pill">${esc(s)}</span>`).join('');
+ const confP = r.conf?`<span class="pill c-${esc(r.conf)}">доверие ${esc(r.conf)}</span>`:'';
+ const prior = r.prior?`<span class="pill">${esc(r.prior)}</span>`:'';
+ return `<div class="sup${hidden?' hid':''}" data-k="${esc(r.key)}">
+  <div>
+   <h4>${esc(r.name)}</h4>
+   <div class="mut" style="margin:2px 0 6px">${esc(r.country)}${r.role?' · '+esc(r.role):''}</div>
+   <div><span class="pill typ">${TYPE_NAME[r.typ]}</span>${src}${confP}${prior}</div>
+  </div>
+  <div>
+   <div style="margin-bottom:4px">${[...r.segs].map(id=>`<span class="tag">${esc(SEG_SHORT(id))}</span>`).join('')||'<span class="mut">сегмент не определён</span>'}</div>
+   <div style="margin-bottom:6px">${models}${wide}${gen}</div>
+   ${r.what?`<div class="mut" style="font-size:12.5px">${esc(r.what.length>170?r.what.slice(0,170)+'…':r.what)}</div>`:''}
+  </div>
+  <div class="sup-side">
+   <div class="contact">${contactLinks(r)}</div>
+   <div class="sup-ctl">
+    <select data-act="status" title="статус работы">
+     ${STATUSES.map(([v,n])=>`<option value="${v}"${v===st?' selected':''}>${n}</option>`).join('')}
+    </select>
+    <button class="btn" data-act="note" title="заметка">${note?'✏ заметка':'+ заметка'}</button>
+    <button class="btn" data-act="hide" title="${hidden?'вернуть в список':'скрыть из списка'}">${hidden?'↩ вернуть':'✕ скрыть'}</button>
+   </div>
+   ${note?`<div class="note">${esc(note)}</div>`:''}
+   ${st?`<div class="pill st-${st}" style="margin-top:6px">${ST_NAME[st]}</div>`:''}
+  </div>
+ </div>`;
+}
+let pkState = {model:'', seg:'', typ:'', q:'', sort:'rel', showHidden:false};
+function pkFilters(){
+ const s = pkState;
+ s.model = document.getElementById('pk-model').value;
+ s.seg = document.getElementById('pk-seg').value;
+ s.typ = document.getElementById('pk-typ').value;
+ s.q = document.getElementById('pk-q').value.trim().toLowerCase();
+ s.sort = document.getElementById('pk-sort').value;
+ s.showHidden = document.getElementById('pk-hid').checked;
+ let rows = UNI.filter(r=>{
+  if(!s.showHidden && EDITS.hide[r.key]) return false;
+  if(s.model && !coversModel(r,s.model)) return false;
+  if(s.seg && !r.segs.has(s.seg)) return false;
+  if(s.typ && r.typ!==s.typ) return false;
+  if(s.q && ![r.name,r.country,r.role,r.what,r.site,EDITS.note[r.key]||''].join(' ').toLowerCase().includes(s.q)) return false;
+  return true;
+ });
+ rows.sort(SORTS[s.sort][1]);
+ document.getElementById('pk-body').innerHTML = rows.slice(0,300).map(pkCard).join('') ||
+  `<div class="box" style="border-left-color:var(--warn)">Никого не нашлось. Попробуйте убрать сегмент (он определён не у всех) или снять фильтры.</div>`;
+ const hid = UNI.filter(r=>EDITS.hide[r.key]).length;
+ const stn = UNI.filter(r=>EDITS.st[r.key]).length;
+ document.getElementById('pk-count').textContent =
+  `${rows.length} из ${UNI.length}${stn?` · со статусом: ${stn}`:''}${hid?` · скрыто: ${hid}`:''}${rows.length>300?' · показаны первые 300':''}`;
+ const active = [];
+ if(s.model) active.push(['model','Модель: '+s.model]);
+ if(s.seg) active.push(['seg','Сегмент: '+SEG_SHORT(s.seg)]);
+ if(s.typ) active.push(['typ','Тип: '+TYPE_NAME[s.typ]]);
+ if(s.q) active.push(['q','Поиск: '+s.q]);
+ document.getElementById('pk-active').innerHTML = active.length
+  ? active.map(([k,t])=>`<span class="chip on" data-clear="${k}">${esc(t)} ✕</span>`).join('') +
+    `<span class="chip" data-clear="all">сбросить всё</span>`
+  : '';
+}
+function pkClear(k){
+ if(k==='model'||k==='all') document.getElementById('pk-model').value='';
+ if(k==='seg'||k==='all') document.getElementById('pk-seg').value='';
+ if(k==='typ'||k==='all') document.getElementById('pk-typ').value='';
+ if(k==='q'||k==='all') document.getElementById('pk-q').value='';
+ pkFilters();
+}
+function pkCSV(){
+ const lines = ['компания;страна;тип;сегменты;модели;bitrix_запросов;доверие;статус;заметка;сайт;email;телефон;что делает'];
+ for(const r of UNI){
+  lines.push([r.name,r.country,TYPE_NAME[r.typ],[...r.segs].map(SEG_SHORT).join(','),
+   [...r.models].join(',')+(r.sgtAll?',SGT-все':'')+(r.solarAll?',Solar-все':'')+(r.heavyAll?',тяжёлые':''),
+   r.bxTotal,r.conf,ST_NAME[EDITS.st[r.key]||''],EDITS.note[r.key]||'',r.site,r.email,r.phone,r.what]
+   .map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(';'));
+ }
+ const blob = new Blob(["﻿"+lines.join('\r\n')],{type:'text/csv;charset=utf-8'});
+ const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='gtu_podbor.csv'; a.click();
+}
+function pkExportEdits(){
+ const blob = new Blob([JSON.stringify(EDITS,null,1)],{type:'application/json'});
+ const a = document.createElement('a'); a.href=URL.createObjectURL(blob);
+ a.download='gtu_edits_'+new Date().toISOString().slice(0,10)+'.json'; a.click();
+}
+function pkImportEdits(inp){
+ const f = inp.files && inp.files[0]; if(!f) return;
+ f.text().then(t=>{
+  try{
+   const e = JSON.parse(t);
+   Object.assign(EDITS.st, e.st||{}); Object.assign(EDITS.note, e.note||{}); Object.assign(EDITS.hide, e.hide||{});
+   for(const a of (e.add||[])) if(!EDITS.add.some(x=>nrm(x.name)===nrm(a.name))) EDITS.add.push(a);
+   saveEdits(); UNI=null; buildUnified(); pkFilters();
+  }catch(err){ alert('Не удалось прочитать файл правок: '+err.message); }
+ });
+}
+function pkAddForm(){
+ const el = document.getElementById('pk-addform');
+ el.style.display = el.style.display==='none' ? '' : 'none';
+}
+function pkAddSave(){
+ const g = id=>document.getElementById(id).value.trim();
+ const name = g('af-name');
+ if(!name){ alert('Название компании обязательно'); return; }
+ EDITS.add.push({name, country:g('af-country'), role:g('af-role'), site:g('af-site'),
+  email:g('af-email'), phone:g('af-phone'), what:g('af-what'),
+  segs:[...document.querySelectorAll('#pk-addform .chip.on')].map(c=>c.dataset.seg)});
+ saveEdits(); UNI=null; buildUnified();
+ document.getElementById('pk-addform').style.display='none';
+ ['af-name','af-country','af-role','af-site','af-email','af-phone','af-what'].forEach(id=>document.getElementById(id).value='');
+ document.querySelectorAll('#pk-addform .chip.on').forEach(c=>c.classList.remove('on'));
+ pkFilters();
+}
+function rPicker(){
+ if(!UNI) buildUnified();
+ return `
+ <div class="box info" style="margin-top:12px"><b>Один вопрос — один список.</b> Выберите модель и сегмент — получите всех известных поставщиков: ядро библиотеки, мировой чеклист и те, кто уже давал нам предложения (Bitrix — стоят первыми). Статусы, заметки и свои поставщики сохраняются в этом браузере; «⬇ правки» выгружает их файлом для внесения в общую базу.</div>
+ <div class="filters" id="pk-filters">
+  <div class="f-field"><label>Модель турбины</label>
+   <select id="pk-model" onchange="pkFilters()"><option value="">любая</option>
+   ${MODEL_GROUPS.map(([g,items])=>`<optgroup label="${esc(g)}">${items.map(m=>`<option>${esc(m)}</option>`).join('')}</optgroup>`).join('')}
+   </select></div>
+  <div class="f-field"><label>Сегмент ЗИП</label>
+   <select id="pk-seg" onchange="pkFilters()"><option value="">любой</option>${SEGS.map(([id,n])=>`<option value="${id}">${esc(n)}</option>`).join('')}</select></div>
+  <div class="f-field"><label>Тип поставщика</label>
+   <select id="pk-typ" onchange="pkFilters()"><option value="">любой</option>${TYPES.map(([v,n])=>`<option value="${v}">${n}</option>`).join('')}</select></div>
+  <div class="f-field"><label>Сортировка</label>
+   <select id="pk-sort" onchange="pkFilters()">${Object.entries(SORTS).map(([v,[n]])=>`<option value="${v}">${n}</option>`).join('')}</select></div>
+  <div class="f-field" style="flex:1;min-width:220px"><label>Поиск</label>
+   <input id="pk-q" placeholder="компания, страна, деталь, заметка…" oninput="pkFilters()"></div>
+ </div>
+ <div class="chips" id="pk-active" style="margin:6px 0"></div>
+ <div class="filters" style="margin-top:2px">
+  <button class="btn primary" onclick="pkAddForm()">+ Добавить поставщика</button>
+  <button class="btn" onclick="pkCSV()">⬇ CSV</button>
+  <button class="btn" onclick="pkExportEdits()" title="статусы, заметки и добавленные компании — файлом">⬇ правки</button>
+  <label class="btn" style="cursor:pointer">⬆ импорт правок<input type="file" accept=".json" style="display:none" onchange="pkImportEdits(this)"></label>
+  <label style="font-size:12.5px;color:var(--ink2);display:flex;align-items:center;gap:5px"><input type="checkbox" id="pk-hid" onchange="pkFilters()"> показывать скрытых</label>
+  <span class="count" id="pk-count"></span>
+ </div>
+ <div id="pk-addform" class="card" style="display:none">
+  <b>Новый поставщик</b> <span class="mut">— сохранится в вашем браузере; для общей базы выгрузите «⬇ правки»</span>
+  <div class="form-grid">
+   <input id="af-name" placeholder="Название компании *">
+   <input id="af-country" placeholder="Страна">
+   <input id="af-role" placeholder="Роль (завод / сервис / трейдер…)">
+   <input id="af-site" placeholder="Сайт">
+   <input id="af-email" placeholder="Email">
+   <input id="af-phone" placeholder="Телефон">
+  </div>
+  <input id="af-what" style="width:100%;margin-top:8px" placeholder="Что делает, какие модели (модели распознаются автоматически: SGT-400, Taurus 60…)">
+  <div class="chips" style="margin:8px 0">${SEGS.map(([id,n])=>`<span class="chip" data-seg="${id}" onclick="this.classList.toggle('on')">${esc(SEG_SHORT(id))}</span>`).join('')}</div>
+  <button class="btn primary" onclick="pkAddSave()">Сохранить</button>
+ </div>
+ <div id="pk-body"></div>`;
+}
+document.addEventListener('click', e=>{
+ const cl = e.target.closest('#pk-active .chip');
+ if(cl){ pkClear(cl.dataset.clear); return; }
+ const btn = e.target.closest('.sup [data-act]');
+ if(btn && btn.tagName==='BUTTON'){
+  const k = btn.closest('.sup').dataset.k;
+  if(btn.dataset.act==='note'){
+   const cur = EDITS.note[k]||'';
+   const v = prompt('Заметка по поставщику (пусто — удалить):', cur);
+   if(v!==null){ if(v.trim()) EDITS.note[k]=v.trim(); else delete EDITS.note[k]; saveEdits(); pkFilters(); }
+  }
+  if(btn.dataset.act==='hide'){
+   if(EDITS.hide[k]) delete EDITS.hide[k]; else EDITS.hide[k]=1;
+   saveEdits(); pkFilters();
+  }
+ }
+});
+document.addEventListener('change', e=>{
+ const sel = e.target.closest('.sup select[data-act="status"]');
+ if(sel){
+  const k = sel.closest('.sup').dataset.k;
+  if(sel.value) EDITS.st[k]=sel.value; else delete EDITS.st[k];
+  saveEdits(); pkFilters();
+ }
+});
+
+/* ---------- Обзор ---------- */
+function rOverview(){
+ const nSGT = SUPPLIERS.filter(s=>s.families.includes('SGT')).length;
+ const nSolar = SUPPLIERS.filter(s=>s.families.includes('Solar')).length;
+ const nHeavy = SUPPLIERS.filter(s=>s.families.includes('Heavy')).length;
+ const nModels = MODELS.families.reduce((a,f)=>a+f.models.length,0);
+ return `
+ <div class="k">
+  <div class="tile"><b>${SUPPLIERS.length}</b><span>компаний в ядре библиотеки</span></div>
+  <div class="tile"><b>${CHECKLIST.rows.length}</b><span>в мировом чеклисте SGT-400</span></div>
+  <div class="tile"><b>${nSGT} / ${nSolar} / ${nHeavy}</b><span>SGT / Solar / тяжёлые</span></div>
+  <div class="tile"><b>${nModels}</b><span>моделей турбин</span></div>
+  <div class="tile"><b>${PARTS.systems.length}</b><span>систем в номенклатуре ЗИП</span></div>
+  <div class="tile"><b>${CUSTOMS.total_records.toLocaleString('ru')}</b><span>деклараций HS 8411 в базе (2023–2026)</span></div>
+ </div>
+ <div class="box info"><b>Зачем эта библиотека.</b> Solar Turbines и Siemens Energy ушли из РФ — ЗИП для парка Solar (Saturn…Titan) и SGT-100…400 покупается только через независимый «автомаркет»: реверс-заводы Китая, сервисники UK/EU (через посредников), лицензиатов Ирана и б/у рынок. Здесь собрано, <b>кому идти за каким типом запчастей</b>, и как читать шифровки партномеров.</div>
+ <h2>Алгоритм сорсера — 4 шага</h2>
+ <div class="grid">
+  <div class="card"><b>1. Определи машину</b><div class="mut" style="font-size:12.5px">Модель + серийник пакета. Помни legacy-имена: SGT-400 = Cyclone, SGT-100 = Typhoon — вкладка «Машины».</div></div>
+  <div class="card"><b>2. Определи систему и PN</b><div class="mut" style="font-size:12.5px">К какой из ${PARTS.systems.length} систем относится деталь и какова её критичность — вкладка «Номенклатура». PN расшифруй по вкладке «Шифровки PN».</div></div>
+  <div class="card"><b>3. Выбери канал</b><div class="mut" style="font-size:12.5px">Горячий тракт → Китай/Италия; лопатки → реверс-заводы/восстановление; расходники/КИП → универсальные. Фильтры на вкладке «Поставщики».</div></div>
+  <div class="card"><b>4. RFQ по правилам</b><div class="mut" style="font-size:12.5px">PN + модель + серийник, кол-во, фото/чертёж или б/у образец на обмер. Проверяй, что поставщик знает нужную ЛИНИЮ (Линкольн ≠ Финспонг).</div></div>
+ </div>
+ <h2>Горячие задачи</h2>
+ <div class="box"><b>SGT-400 — первый залп RFQ:</b> ① Blaze Shenzhen — peter@turbineblade.net (камеры сгорания SGT-400 в каталоге) · ② O.B.T Qingdao — lisa@obtcasting.com (литьё камер Siemens) · ③ Leda Greenpower — WhatsApp +86 138 0121 8512 (прайс burner assembly / pilot burner SGT-400) · ④ Dongturbo — WhatsApp +86 139-0807-3010 (возил камеру сгорания SGT-600 в РФ). Позиции: камера сгорания <b>MW21215M</b> ×12 + горелка DUAL DLE <b>MW22316B/01</b> ×12.</div>
+ <div class="box"><b>Solar — с чего начать:</b> якорные независимые MRO — S&amp;S Turbine Services (Канада) и Alba Power/Sulzer (UK) — работают со всем модельным рядом Saturn…Mars; из Китая по Solar заявляется Bicosyn (клиенты CNOOC/Shell). Санкционные юрисдикции — заход через посредника. Контакты — с сайтов, верификация при первом RFQ.</div>
+ <div class="box warn"><b>Не работать напрямую:</b> Foshan Xinchuang и Homedia (Zhangzhou) — трейдеры-прокладки российского импортёра, не производители.</div>`;
+}
+
+/* ---------- Машины ---------- */
+function rMachines(){
+ let h = `<div class="mut">${esc(MODELS.note)}</div>`;
+ for(const f of MODELS.families){
+  h += `<h2>${esc(f.title)}</h2><div class="box info" style="font-size:12.5px">${esc(f.history)}</div><div class="grid">`;
+  for(const m of f.models){
+   h += `<div class="card"><b>${esc(m.name)}</b>${m.legacy?` <span class="tag">${esc(m.legacy)}</span>`:''}
+    <div style="margin:4px 0 2px"><b>${esc(m.power)}</b> · КПД ${esc(m.eff)}</div>
+    <div class="mut">${esc(m.shafts)} · ${esc(m.use)}</div>
+    ${m.zip_note?`<div style="font-size:12px;margin-top:5px;border-top:1px solid var(--grid);padding-top:5px">ЗИП: ${esc(m.zip_note)}</div>`:''}</div>`;
+  }
+  h += `</div>`;
+ }
+ return h;
+}
+
+/* ---------- Номенклатура ---------- */
+function rParts(){
+ let h = `<div class="mut">${esc(PARTS.note)}</div>`;
+ for(const s of PARTS.systems){
+  h += `<div class="card"><h3 style="margin:0">${esc(s.title)} <span class="${critCls(s.crit)}">крит. ${esc(s.crit)}</span></h3>
+   <div class="mut" style="margin:3px 0 7px">Aftermarket: ${esc(s.aftermarket)}</div>
+   <div class="tblwrap"><table><tr><th>Деталь</th><th>Термин для RFQ (EN)</th><th>Крит.</th><th>Примечание</th></tr>`;
+  for(const c of s.components){
+   h += `<tr><td><b>${esc(c.ru)}</b></td><td>${esc(c.en)}</td><td class="${critCls(c.crit)}">${esc(c.crit)}</td><td class="mut" style="font-size:12px">${esc(c.note)}</td></tr>`;
+  }
+  h += `</table></div></div>`;
+ }
+ return h;
+}
+
+/* ---------- Шифровки PN ---------- */
+function rPN(){
+ let h = `<div class="box info">${esc(PN.intro)}</div>`;
+ for(const s of PN.sections){
+  h += `<h2>${esc(s.title)}</h2><div class="tblwrap"><table><tr><th style="width:18%">Шифр / правило</th><th style="width:38%">Что означает</th><th style="width:28%">Примеры</th><th>Статус</th></tr>`;
+  for(const r of s.rules){
+   h += `<tr><td><b>${esc(r.pattern)}</b></td><td>${esc(r.meaning)}</td><td class="mut" style="font-size:12px">${esc(r.examples)}</td><td style="font-size:12px">${esc(r.status)}</td></tr>`;
+  }
+  h += `</table></div>`;
+ }
+ return h;
+}
+
+/* ---------- Поставщики ---------- */
+function supplierRow(s){
+ return `<tr>
+  <td><b>${esc(s.name)}</b><br>${s.families.map(famTag).join('')}</td>
+  <td>${esc(s.country)}<br><span class="mut">${esc(s.city)}</span></td>
+  <td>${esc(s.role)}<br>${(s.cats||[]).map(c=>`<span class="tag">${esc(c)}</span>`).join('')}</td>
+  <td style="min-width:220px">${esc(s.models)}${s.ru_buyers?`<div class="mut" style="font-size:11.5px">РФ-покупатели: ${esc(s.ru_buyers)} · отгрузок: ${esc(s.shipments)} (${esc(s.years)})</div>`:''}</td>
+  <td style="white-space:nowrap">${esc(s.site)}<br><span class="mut">${esc(s.email)}</span><br><span class="mut">${esc(s.phone)}</span></td>
+  <td>${esc(s.tier)}</td>
+  <td class="mut" style="font-size:11.5px;min-width:180px">${esc(s.note)}</td></tr>`;
+}
+function applyFilters(){
+ const q = document.getElementById('f-q').value.trim().toLowerCase();
+ const fam = document.getElementById('f-fam').value;
+ const ctr = document.getElementById('f-ctr').value;
+ const rows = SUPPLIERS.filter(s=>{
+  if(fam && !s.families.includes(fam)) return false;
+  if(ctr && s.country!==ctr) return false;
+  if(q){
+   const hay = [s.name,s.country,s.city,s.role,s.models,s.note,(s.cats||[]).join(' '),s.tier].join(' ').toLowerCase();
+   if(!hay.includes(q)) return false;
+  }
+  return true;
+ });
+ document.getElementById('sup-body').innerHTML = rows.map(supplierRow).join('') ||
+  `<tr><td colspan="7" class="mut">Ничего не найдено — ослабьте фильтры.</td></tr>`;
+ document.getElementById('sup-count').textContent = `${rows.length} из ${SUPPLIERS.length}`;
+}
+function exportCSV(){
+ const cols = ['name','country','city','role','families','cats','models','site','email','phone','tier','note'];
+ const lines = [cols.join(';')].concat(SUPPLIERS.map(s=>cols.map(c=>{
+  let v = s[c]; if(Array.isArray(v)) v = v.join(', ');
+  return '"'+String(v??'').replace(/"/g,'""')+'"';
+ }).join(';')));
+ const blob = new Blob(["﻿"+lines.join('\r\n')],{type:'text/csv;charset=utf-8'});
+ const a = document.createElement('a');
+ a.href = URL.createObjectURL(blob); a.download = 'gt_suppliers.csv'; a.click();
+}
+function rSuppliers(){
+ const countries = [...new Set(SUPPLIERS.map(s=>s.country))].sort((a,b)=>a.localeCompare(b,'ru'));
+ return `
+ <div class="filters">
+  <input id="f-q" placeholder="Поиск: компания, модель, деталь, роль…" oninput="applyFilters()">
+  <select id="f-fam" onchange="applyFilters()"><option value="">Семейство: все</option><option value="SGT">Siemens SGT</option><option value="Solar">Solar</option></select>
+  <select id="f-ctr" onchange="applyFilters()"><option value="">Страна: все</option>${countries.map(c=>`<option>${esc(c)}</option>`).join('')}</select>
+  <button class="btn" onclick="exportCSV()">⬇ CSV</button>
+  <span class="count" id="sup-count"></span>
+ </div>
+ <div class="tblwrap"><table class="sortable">
+  <tr><th>Компания</th><th>Гео</th><th>Роль / категории</th><th>Что делает / возил · след в РФ</th><th>Контакты</th><th>Уровень</th><th>Примечание</th></tr>
+  <tbody id="sup-body"></tbody>
+ </table></div>
+ <div class="mut">Уровни: П1 — прямое попадание (Китай, реально для РФ) · П2 — профильные UK/EU (санкционный риск, через посредника) · П2-Иран — лицензиаты Siemens · П3 — прочие/трейдеры · S1–S3 — Solar-блок (S1 — якорные MRO). Контакты SGT-блока верифицированы 05.08.2026; Solar-блок — брать с сайта.</div>
+ <h2 id="cl-h">Мировой чеклист SGT-400 — ${CHECKLIST.rows.length} компаний по ${CHECKLIST.segments.length} сегментам</h2>
+ <div class="mut" style="margin-bottom:6px">${esc(CHECKLIST.source)}</div>
+ <div class="filters">
+  <input id="cl-q" placeholder="Поиск по чеклисту…" oninput="clFilters()">
+  <select id="cl-seg" onchange="clFilters()"><option value="">Сегмент: все</option>${CHECKLIST.segments.map(s=>`<option value="${s.n}">${s.n} — ${esc(s.name)}</option>`).join('')}</select>
+  <select id="cl-conf" onchange="clFilters()"><option value="">Доверие: все</option><option value="high">high</option><option value="med">med</option><option value="low">low</option></select>
+  <button class="btn" onclick="clCSV()">⬇ CSV</button>
+  <span class="count" id="cl-count"></span>
+ </div>
+ <div class="tblwrap"><table class="sortable">
+  <tr><th>Приор</th><th>Компания</th><th>Сегм.</th><th>Что делает</th><th>Контакты</th><th>Дов.</th></tr>
+  <tbody id="cl-body"></tbody>
+ </table></div>
+ <div class="mut">Приоритеты: ★ ТАМОЖНЯ — виден в таможенном потоке · ★ TFS — из цепочки TFS · ★ ЛИД — тёплый контакт · ★ — первая волна RFQ · • — вторая волна. Сегмент 7 — РФ/СНГ (сервис, покрытия, реверс).</div>`;
+}
+function clRow(r){
+ return `<tr><td style="white-space:nowrap">${esc(r.prior)}</td>
+  <td><b>${esc(r.name)}</b><br><span class="mut">${esc(r.country)}</span></td>
+  <td title="${esc(r.seg_name)}">${r.seg}</td>
+  <td style="min-width:240px">${esc(r.what)}${r.proof?`<div class="mut" style="font-size:11.5px">${esc(r.proof)}</div>`:''}</td>
+  <td style="white-space:nowrap">${esc(r.site)}<br><span class="mut">${esc(r.email)}</span><br><span class="mut">${esc(r.phone)}</span></td>
+  <td>${esc(r.conf)}</td></tr>`;
+}
+function clFilters(){
+ const q=document.getElementById('cl-q').value.trim().toLowerCase();
+ const seg=document.getElementById('cl-seg').value;
+ const conf=document.getElementById('cl-conf').value;
+ const rows=CHECKLIST.rows.filter(r=>{
+  if(seg && String(r.seg)!==seg) return false;
+  if(conf && r.conf!==conf) return false;
+  if(q && ![r.name,r.country,r.what,r.seg_name,r.prior].join(' ').toLowerCase().includes(q)) return false;
+  return true;
+ });
+ document.getElementById('cl-body').innerHTML=rows.map(clRow).join('')||`<tr><td colspan="6" class="mut">Ничего не найдено.</td></tr>`;
+ document.getElementById('cl-count').textContent=`${rows.length} из ${CHECKLIST.rows.length}`;
+}
+function clCSV(){
+ const cols=['seg','prior','name','country','what','site','email','phone','conf','proof'];
+ const lines=[cols.join(';')].concat(CHECKLIST.rows.map(r=>cols.map(c=>'"'+String(r[c]??'').replace(/"/g,'""')+'"').join(';')));
+ const blob=new Blob(["﻿"+lines.join('\r\n')],{type:'text/csv;charset=utf-8'});
+ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='sgt400_checklist.csv'; a.click();
+}
+
+/* ---------- Наши запросы (Bitrix) ---------- */
+function rBitrix(){
+ const b=BITRIX;
+ const nRfq=b.deals.reduce((a,d)=>a+d.rfqs.length,0);
+ const exact=d=>d.models.filter(m=>!m.endsWith('уточнить)'));
+ let h=`<div class="mut">${esc(b.source)} · обновлено ${esc(b.updated)}</div>
+ <div class="k">
+  <div class="tile"><b>${b.deals.length}</b><span>ГТУ-сделок в Bitrix</span></div>
+  <div class="tile"><b>${b.deals.filter(d=>exact(d).length).length}</b><span>с точной моделью</span></div>
+  <div class="tile"><b>${nRfq}</b><span>запросов СП-166 подтянуто</span></div>
+  <div class="tile"><b>${(b.offers||[]).length}</b><span>моделей с предложениями</span></div>
+ </div>`;
+ if(!b.live) h+=`<div class="box warn"><b>Это сид-снимок</b> (названия сделок из снимка чатов): привязанные запросы СП-166 с поставщиками и стадиями подтянет выгрузка <b>gt/tools/bitrix_gt.py</b> — нужен BITRIX_WEBHOOK_URL в .env, затем <code>python3 gt/build.py</code>. Тогда здесь появится «кто к чему предлагает» по каждой модели.</div>`;
+ if((b.offers||[]).length){
+  h+=`<h2>Кто к чему предлагает (по запросам СП-166)</h2><div class="tblwrap"><table class="sortable"><tr><th>Модель</th><th>Поставщики (число запросов)</th></tr>`;
+  for(const o of b.offers) h+=`<tr><td><b>${esc(o.model)}</b></td><td>${o.suppliers.map(s=>`<span class="tag">${esc(s.name)} · ${s.n}</span>`).join(' ')}</td></tr>`;
+  h+=`</table></div>`;
+ }
+ const bxModels=[...new Set(b.deals.flatMap(d=>d.models))].sort((a,b2)=>{
+  const ga=a.includes('уточнить')||a.includes('вне фокуса'), gb=b2.includes('уточнить')||b2.includes('вне фокуса');
+  return ga!==gb ? (ga?1:-1) : a.localeCompare(b2,'ru');
+ });
+ h+=`<h2>Наши сделки и запросы</h2>
+ <div class="filters">
+  <select id="bx-model" onchange="bxFilters()"><option value="">Модель: любая</option>${bxModels.map(m=>`<option>${esc(m)}</option>`).join('')}</select>
+  <input id="bx-q" placeholder="Поиск: сделка, поставщик, сорсер…" oninput="bxFilters()">
+  <label style="font-size:12.5px;color:var(--ink2)"><input type="checkbox" id="bx-rfq" onchange="bxFilters()"> только с запросами СП-166</label>
+  <span class="count" id="bx-count"></span>
+ </div>
+ <div class="tblwrap"><table class="sortable">
+  <thead><tr><th>Сделка</th><th>Создана</th><th>Модель</th><th>Название</th><th>Запросы СП-166: когда · кому · стадия · сорсер</th></tr></thead>
+  <tbody id="bx-body"></tbody>
+ </table></div>
+ <div class="mut">Клик по заголовку — сортировка. Даты запросов — создание записи в СП-166.</div>`;
+ h+=`<div class="box info"><b>Что уже дал этот срез:</b> подтверждённые PN Solar из наших закупок — комплект горелок <b>372308-3500</b> (ЗП6071593) и запальная горелка <b>E204529-900</b> (ЗП6071591) → формат зашит во вкладку «Шифровки PN». Спрос по моделям: Taurus 60/70 (Л-НВН), Titan 130, SGT-300-2S (Ария), плюс общий ЗИП Solar/Siemens (ГП, НОВАТЭК).</div>`;
+ return h;
+}
+function bxFilters(){
+ const m=document.getElementById('bx-model').value;
+ const q=document.getElementById('bx-q').value.trim().toLowerCase();
+ const onlyR=document.getElementById('bx-rfq').checked;
+ const ds=BITRIX.deals.filter(d=>{
+  if(m && !d.models.includes(m)) return false;
+  if(onlyR && !d.rfqs.length) return false;
+  if(q){
+   const hay=[d.id,d.title,d.models.join(' '),...d.rfqs.map(r=>r.supplier+' '+(r.sourcer||''))].join(' ').toLowerCase();
+   if(!hay.includes(q)) return false;
+  }
+  return true;
+ });
+ document.getElementById('bx-body').innerHTML = ds.map(d=>{
+  const rf = d.rfqs.length ? d.rfqs.map(r=>
+   `<div><span class="mut">${esc(r.created||'')}</span> · <b>${esc(r.supplier)}</b> <span class="mut">· ${esc(r.stage||'')}${r.sourcer?' · '+esc(r.sourcer):''}</span></div>`).join('') : '<span class="mut">—</span>';
+  return `<tr><td>${esc(d.id)}</td><td style="white-space:nowrap">${esc(d.created||'')}</td>
+   <td>${d.models.map(x=>`<span class="tag">${esc(x)}</span>`).join('')}</td>
+   <td style="min-width:230px">${esc(d.title)}</td><td style="min-width:260px">${rf}</td></tr>`;
+ }).join('') || `<tr><td colspan="5" class="mut">Ничего не найдено.</td></tr>`;
+ document.getElementById('bx-count').textContent=`${ds.length} из ${BITRIX.deals.length} сделок · запросов: ${ds.reduce((a,d)=>a+d.rfqs.length,0)}`;
+}
+
+/* ---------- Таможня ---------- */
+function barChart(data){
+ const W=640,H=230,P={t:14,r:14,b:30,l:44};
+ const iw=W-P.l-P.r, ih=H-P.t-P.b;
+ const max=Math.max(...data.map(d=>d.n))*1.15;
+ const bw=Math.min(64,iw/data.length-14);
+ const ticks=4;
+ let g='';
+ for(let i=1;i<=ticks;i++){
+  const y=P.t+ih-ih*i/ticks;
+  g+=`<line class="gridln" x1="${P.l}" y1="${y}" x2="${W-P.r}" y2="${y}"/><text class="axis-t" x="${P.l-6}" y="${y+4}" text-anchor="end">${Math.round(max*i/ticks)}</text>`;
+ }
+ let bars='';
+ data.forEach((d,i)=>{
+  const x=P.l+iw*(i+.5)/data.length-bw/2;
+  const h=ih*d.n/max, y=P.t+ih-h;
+  bars+=`<rect class="bar" x="${x}" y="${y}" width="${bw}" height="${h}" rx="4"><title>${d.year}: ${d.n} записей · ${d.kg.toLocaleString('ru')} кг</title></rect>
+   <text class="val-t" x="${x+bw/2}" y="${y-5}" text-anchor="middle">${d.n}</text>
+   <text class="axis-t" x="${x+bw/2}" y="${P.t+ih+18}" text-anchor="middle">${d.year}</text>`;
+ });
+ return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;max-width:680px" role="img" aria-label="Поставки по годам">${g}<line class="baseln" x1="${P.l}" y1="${P.t+ih}" x2="${W-P.r}" y2="${P.t+ih}"/>${bars}</svg>`;
+}
+function rCustoms(){
+ const c=CUSTOMS;
+ const t=(rows,cols)=>`<div class="tblwrap"><table class="sortable"><tr>${cols.map(x=>`<th>${x}</th>`).join('')}</tr>${rows}</table></div>`;
+ return `
+ <div class="mut">Источник: glbs.io (Глобус-ВЭД, официальные данные таможни РФ) · HS ${esc(c.hs)} · период ${esc(c.period)}. Режим search: имена импортёров и суммы частично маскированы; в выборку вкладки попали записи, отфильтрованные по профилю ЗИП (${c.visible_records} из ${c.total_records.toLocaleString('ru')}).</div>
+ <div class="k">
+  <div class="tile"><b>${c.total_records.toLocaleString('ru')}</b><span>деклараций всего в базе</span></div>
+  <div class="tile"><b>${c.visible_records}</b><span>записей в выборке ЗИП ГТУ</span></div>
+  <div class="tile"><b>${c.top_exporters.length}+</b><span>активных экспортёров</span></div>
+ </div>
+ <div class="viz-root"><h3>Записи выборки по годам</h3><div class="mut" style="margin-bottom:6px">штук деклараций (наведение — тоннаж)</div>${barChart(c.by_year)}</div>
+ <h2>Топ экспортёров — раскройте строку, чтобы увидеть поставки</h2>
+ ${(()=>{const mx=Math.max(...c.top_exporters.map(e=>e.n));
+  return `<div class="acc">${c.top_exporters.map(e=>`
+   <div class="acc-item" data-ex="${esc(e.name)}">
+    <div class="acc-row"><b>${esc(e.name)}</b><div class="acc-bar" style="width:${Math.round(e.n/mx*100)}%"></div><span class="acc-n">${e.n} запис.</span><span class="chev">▶</span></div>
+    <div class="acc-body"></div>
+   </div>`).join('')}</div>`})()}
+ <h2>Топ импортёров РФ</h2>
+ ${t(c.top_importers.map(e=>`<tr><td><b>${esc(e.name)}</b></td><td>${e.n}</td></tr>`).join(''),['Импортёр (маскирован источником)','Записей'])}
+ <h2>Упоминания моделей в декларациях</h2>
+ ${t(c.models.map(m=>`<tr><td><b>${esc(m.model)}</b></td><td>${m.n}</td><td class="mut">${m.exporters.map(esc).join(' · ')}</td></tr>`).join(''),['Модель','Записей','Экспортёры'])}
+ <div class="box info">Solar в таможне РФ 2023–2026 почти не виден (2 записи — ЗИП Mars/Taurus от самого Solar Turbines до ухода): канал ЗИП Solar шёл напрямую от OEM и умер с санкциями. Это подтверждает ставку на независимые MRO и мировые базы (вкладка «Базы данных»).</div>`;
+}
+document.addEventListener('click', e=>{
+ const row = e.target.closest('.acc-row');
+ if(!row) return;
+ const item = row.closest('.acc-item');
+ item.classList.toggle('open');
+ const body = item.querySelector('.acc-body');
+ if(item.classList.contains('open') && !body.dataset.done){
+  const name = item.dataset.ex;
+  const recs = CUSTOMS.records.filter(r=>r.ex===name);
+  body.innerHTML = `<div class="mut" style="margin:8px 0 4px">${recs.length} записей · суммы и часть имён маскированы источником · клик по заголовку — сортировка</div>
+  <div class="tblwrap"><table class="sortable">
+   <tr><th>Дата</th><th>HS</th><th>Описание из декларации</th><th>Импортёр РФ</th><th>Нетто, кг</th><th>USD/кг</th><th>Откуда</th></tr>
+   ${recs.map(r=>`<tr><td style="white-space:nowrap">${esc(r.d)}</td><td>${esc(r.hs)}</td>
+    <td style="min-width:260px;font-size:12px">${esc(r.ds)}</td><td>${esc(r.im)}</td>
+    <td class="num">${esc(r.kg)}</td><td class="num">${esc(r.uk)}</td><td>${esc(r.co)}</td></tr>`).join('')}
+  </table></div>`;
+  body.dataset.done=1;
+ }
+});
+
+/* ---------- Базы данных ---------- */
+function rDB(){
+ return `
+ <div class="box info"><b>Задача:</b> видеть, кто кому в мире продаёт комплектующие Solar/Siemens (shipper → consignee), и выйти на этих производителей напрямую. Британия/ЕС/Япония пономерные декларации не публикуют — их ловим как <b>отправителей в импорте стран, которые публикуют</b> (Мексика, LATAM, Нигерия, Индия…). Полный разбор: «БАЗЫ-ДАННЫХ-ЗАКУПКА» (kvant-zip.pages.dev/orders/).</div>
+ <h2>План закупки (решение 08.2026)</h2>
+ <div class="tblwrap"><table>
+  <tr><th>Шаг</th><th>Что</th><th>Стоимость</th><th>Что даёт</th></tr>
+  <tr><td>0</td><td><b>Бесплатное:</b> TED API (тендеры ЕС), ImportYeti (морской импорт США), госзакупки Мексики/Перу/Казахстана/Индии</td><td><b>$0</b></td><td>операторы парка и сервисные подрядчики; TED по «SGT-400» уже дал GAZ-SYSTEM (Польша)</td></tr>
+  <tr><td>1 ⭐</td><td><b>BillOfLadingData</b>: Мексика + Колумбия + Перу + Нигерия + mirror-data (pay-per-report, пожизненно)</td><td><b>$775 разово</b></td><td>ключ — Мексика: TFS Веракрус, единственный независимый стенд SGT-400 в мире → виден весь поток горячей части</td></tr>
+  <tr><td>2</td><td>Расширение: Бразилия, Турция, Казахстан, Индия</td><td>+$1 272</td><td>Турция/Казахстан — каналы реэкспорта в РФ: видно, кто и через кого завозит</td></tr>
+  <tr><td>3</td><td><b>52wmb</b> Blue Diamond (Китай), 39 стран — постоянный мониторинг, оплата из РФ проходит</td><td>$540/год</td><td>регулярное слежение за потоками</td></tr>
+  <tr><td>4</td><td>McCoy Power Reports «Gas Turbines DB» — пономерной реестр владельцев машин (26 534 юнита)</td><td>по запросу</td><td>long-list покупателей ЗИП; дешёвая замена — GT World Handbook $245–345</td></tr>
+ </table></div>
+ <div class="box"><b>Обновление 06.08.2026 — триал Volza отработал (разведка TFS, PDF в gt/docs/).</b> Company-360 по TFS вскрыт бесплатно: карта 25 поставщиков, импорт $15,98 млн за 3 года, канал б/у SGT-400 от OCENSA. Итоговые дозакупки по результатам: ① <b>Veritrade Мексика</b> (~$1–3 тыс./год) — педименты по RFC: все ~3 000 операций TFS помесячно, вскрывает 103 сборных груза «Z To Order» ($1,19 млн) и поток из США 2019–2024 ($17 млн); вторым модулем — Колумбия (там TFS Colombia и OCENSA). ② ImportGenius ($199–399/мес) — альтернатива, если нужен ещё рынок США. ③ Полный Volza ($1,5–3 тыс./год) — только если нужны Excel-выгрузка и контакты из профилей. Мониторинг: алерты Volza на 3 варианта имени TFS + Mejicali/Optimum + поставщиков Liburdi/Azad/Siemens Energy в Мексику, еженедельно.</div>
+ <div class="box warn"><b>Не покупать:</b> Panjiva/S&amp;P (ушли из РФ), Descartes Datamyne / ImportGenius / Trademo (юрисдикция США, карты РФ не проходят), Volza SME $4,5k и TradeData.Pro (переплата за то же покрытие), GlobalTenders / Wood Mackenzie (не решают задачу).</div>
+ <div class="box"><b>Ограничение, которое принять:</b> парк SGT сидит на долгосрочных сервисных договорах Siemens (LTSA) — открытых тендеров «на партномер» нет. Тендерные порталы дают операторов и подрядчиков, а цены на детали — только shipment-базы и прямые КП заводов. Уже работает: glbs.io — таможня РФ/ЕАЭС, ${CUSTOMS.total_records.toLocaleString('ru')} деклараций HS 8411 в базе.</div>`;
+}
+
+/* ---------- Каркас ---------- */
+const R = {picker:rPicker, overview:rOverview, machines:rMachines, parts:rParts, pn:rPN, suppliers:rSuppliers, bitrix:rBitrix, customs:rCustoms, db:rDB};
+const nav = document.getElementById('nav'), main = document.getElementById('main');
+nav.innerHTML = TABS.map(([id,t])=>`<button data-t="${id}">${t}</button>`).join('');
+main.innerHTML = TABS.map(([id])=>`<section id="s-${id}"></section>`).join('');
+const rendered = {};
+function show(id){
+ for(const [tid] of TABS){
+  document.querySelector(`[data-t="${tid}"]`).classList.toggle('on', tid===id);
+  document.getElementById(`s-${tid}`).classList.toggle('on', tid===id);
+ }
+ if(!rendered[id]){ document.getElementById(`s-${id}`).innerHTML = R[id](); rendered[id]=1; if(id==='suppliers'){ applyFilters(); clFilters(); } if(id==='picker') pkFilters(); if(id==='bitrix') bxFilters(); }
+ location.hash = id;
+}
+nav.addEventListener('click', e=>{ const b=e.target.closest('button'); if(b) show(b.dataset.t); });
+show(TABS.some(([id])=>id===location.hash.slice(1)) ? location.hash.slice(1) : 'picker');
+</script>
+</body>
+</html>

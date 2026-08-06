@@ -10,6 +10,8 @@
 """
 import json
 import shutil
+import subprocess
+import sys
 from datetime import date
 from pathlib import Path
 
@@ -152,6 +154,15 @@ def build():
         for f in orders.iterdir():
             if f.suffix.lower() in (".pdf", ".csv", ".md", ".html"):
                 shutil.copy2(f, OUT / "orders" / alias.get(f.name, f.name))
+
+    # ГТУ-библиотека (gt/) → публикуется на этом же проекте Pages по пути /gt/
+    try:
+        subprocess.run([sys.executable, str(ROOT.parent / "gt" / "build.py")], check=True)
+        (OUT / "gt").mkdir(exist_ok=True)
+        shutil.copy2(ROOT.parent / "gt" / "public" / "index.html", OUT / "gt" / "index.html")
+        print("gt: сайт ГТУ-библиотеки → zip/public/gt/index.html")
+    except Exception as e:  # ГТУ-сайт не должен ронять деплой базы ЗИП
+        print(f"gt: пропущен ({e})")
 
     size = (OUT / "index.html").stat().st_size
     print(f"zip/public/index.html: {size:,} байт | позиций {n_pos}, "
