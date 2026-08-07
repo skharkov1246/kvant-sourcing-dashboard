@@ -318,10 +318,44 @@
   .sd.ok{color:var(--ok)} .sd.mid{color:var(--a2)} .sd.bad{color:var(--nr)} .sd.dim{color:var(--dim)}
   .srcb.chk{color:var(--ok);background:rgba(63,167,102,.13)}
 
+  /* ---- таблица контрактов: скроллится внутри карточки, а не ломает её ---- */
+  .tscroll{overflow-x:auto;overscroll-behavior-x:contain;margin-top:12px}
+  .tsnote{display:none;margin-top:10px}
+  @media(max-width:900px){.tsnote{display:block}}
+  .tscroll table{margin-top:0;min-width:780px}
+  .ctab td{padding:7px 6px}
+  .ctab th{padding:0 6px 9px}
+  .ctab td:nth-child(2)>div{max-width:290px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .ctab td:nth-child(3) .stgcell b{display:block;max-width:150px;overflow:hidden;
+       text-overflow:ellipsis;white-space:nowrap}
+  /* сумма контракта — главное число строки */
+  .ctab .amt1{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--ink)}
+
   /* в дровере пояснения должны быть мелкими, как в карточках */
   .drw .note{font-size:11.5px;line-height:1.55;color:var(--dim);margin:0}
   .drw .tlrow{font-size:11.5px}
   .drw .tlrow .tld{width:88px}
+
+  /* ---- экономика сделки: своя рамка + цепочка «продали → косты → прибыль» ---- */
+  .drw .ecard{border:1px solid var(--line);border-radius:13px;background:var(--panel2);
+       padding:13px 14px;margin:8px 0 6px}
+  .drw .ecard.bad{border-color:var(--nr);box-shadow:inset 0 0 0 1px rgba(196,80,62,.25)}
+  .drw .h2e{font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--mut);
+       font-weight:600;margin:14px 0 6px}
+  .chain{display:flex;flex-wrap:wrap;align-items:stretch;gap:6px}
+  .chain .cstep{flex:1 1 108px;min-width:100px;background:var(--panel);border:1px solid var(--line);
+       border-radius:10px;padding:8px 10px}
+  .chain .cstep .cl{font-size:9px;letter-spacing:.05em;text-transform:uppercase;color:var(--mut);line-height:1.3}
+  .chain .cstep .cv{font-family:var(--mono);font-size:15px;font-weight:700;margin-top:4px;color:var(--ink)}
+  .chain .cstep.minus .cv{color:var(--a2)}
+  .chain .cstep.res{border-color:rgba(63,167,102,.4)}
+  .chain .cstep.res .cv{color:var(--ok)}
+  .chain .cstep.res.bad{border-color:var(--nr)}
+  .chain .cstep.res.bad .cv{color:var(--nr)}
+  .chain .arw{align-self:center;color:var(--dim);font-size:13px;flex:none}
+  .drw .ewarn{margin-top:7px;font-size:11.5px;color:var(--nr);line-height:1.5}
+  .drw .ewarn.amber{color:var(--a2)}
+  @media(max-width:720px){.chain .arw{display:none}.chain .cstep{flex:1 1 44%}}
 
   /* ---- сверка трёх источников заработка ---- */
   .thr{display:grid;grid-template-columns:minmax(120px,1fr) 82px 92px 108px;gap:8px;align-items:baseline;
@@ -385,6 +419,19 @@
   @media(max-width:880px){
     .grid{grid-template-columns:1fr}
     .kpis{grid-template-columns:repeat(2,1fr)!important} /* !important перекрывает inline-стиль #kpisCov */
+  }
+  @media(max-width:900px){
+    /* узкий экран: прячем закупку и валовую маржу — они есть в карточке сделки,
+       а на экране должно остаться главное: сумма контракта и плановая прибыль */
+    .ctab th:nth-child(6),.ctab td:nth-child(6){display:none}
+    .tscroll table{min-width:560px}
+  }
+  @media(max-width:560px){
+    /* телефон: остаются заказчик, срок клиенту, сумма и прибыль */
+    .ctab th:nth-child(3),.ctab td:nth-child(3){display:none}
+    .ctab td:nth-child(2)>div{max-width:150px}
+    .tscroll table{min-width:0}
+    .ctab td,.ctab th{padding:6px 4px;font-size:12px}
   }
   @media(max-width:720px){
     /* воронка: подпись сверху, полоса на всю ширину карточки */
@@ -953,10 +1000,11 @@ const METH={
   'd.people':{t:'До человека',what:'Те же метрики по каждому сотруднику группы.',src:'группировка по ASSIGNED_BY_ID внутри групп.',formula:'Сделки / пайплайн / заказы / выручка / зак-сд по сотруднику.',note:'Клик по сотруднику — его сделки и заказы.'},
   'ct.cost':{t:'Потери на инвестициях от просрочки',what:'Во что обходятся поздние отгрузки: деньги, которые заказчик оплатил бы раньше, не работают в обороте.',src:'Живые заказы СП-172 с просроченным полем «Date of deadline to customer». Стоимость отгрузки заказа = сумма сделки, разнесённая на заказы пропорционально их закупке (если сумм закупки нет — поровну между живыми заказами сделки).',formula:'ПОТЕРЯ = Σ(стоимость отгрузки × дней сверх обещания) ÷ 365 × ставка. Ставка — 20% годовых (стоимость денег компании). «Сгорает в день» = Σ стоимости зависших отгрузок × 20% ÷ 365 — столько добавляется к потере за каждый следующий день. «Отгружать в первую очередь» — сортировка живых заказов по цене одного дня ожидания.',note:'Это упущенная доходность, а не прямой убыток: деньги не потеряны, но пришли позже и не работали. Пени считаются отдельно и только как прикидка — условий контрактов в Битриксе нет. Заказы без плановой даты клиенту в расчёт не входят вовсе.'},
   'ct.dl':{t:'Дедлайны клиенту',what:'Просрочка обещаний заказчику по живым заказам поставщикам — то же измерение, что в ручной выгрузке снабжения «Контроль дедлайнов».',src:'Заказы СП-172, поле «Date of deadline to customer» (ufCrm20_1728900218435). Поле подтверждено сверкой: совпало на 72 строках из 72 в выгрузке снабжения.',formula:'Просрочен = живой заказ (не SUCCESS/FAIL), у которого плановая дата клиенту меньше сегодняшней. Глубина = сегодня − дата. «Закупка под просрочкой» = Σ сумм таких заказов. Сделка помечается 🚩, если просрочен хотя бы один её заказ, и попадает в «Замедленные». «План против плана» = плановый конец производства («Production end date, budget») позже обещанной клиенту даты.',note:'«Без плановой даты» — живые заказы, где поле не заполнено: они не под контролем срока ни у нас, ни в выгрузке снабжения. Разрез «кто срывает» — по ответственному за СДЕЛКУ (в выгрузке снабжения это колонка «Менеджер»); «ОСС» — поле заказа «Deal support specialist» (совпало с выгрузкой снабжения на 73 строках из 74).'},
-  'ct.three':{t:'Три источника заработка: Битрикс, экономика проекта, бюджет',what:'Одна и та же сделка глазами трёх систем — чтобы видеть, где цифры расходятся и какой из них верить.',src:'БИТРИКС — сумма сделки и Σ заказов поставщикам СП-172. ЭКОНОМИКА ПРОЕКТА — money-поля сделки («Cost (rub)», «Offer sum … supplier»), продублированные из файла экономики. БЮДЖЕТ СДЕЛКИ — лист «Бюджет» из книги в Google Drive (снимок в репозитории).',formula:'Битрикс и экономика дают только ВАЛОВЫЙ заработок: продажа − закупка, без логистики, таможни, НДС и прочих расходов. Бюджет даёт ПОЛНУЮ картину: выручка − закуп − международная логистика − прочие прямые переменные = маржинальный доход; минус прочие прямые расходы = операционная прибыль; далее — прибыль по сделке. В колонке «Плановая прибыль» показывается прибыль по сделке, а если её в книге нет — операционная (заполнена у 234 книг против 118).',note:'Расхождения нормальны и информативны: валовая всегда выше плановой ровно на величину косвенных затрат. Флаг «выручка бюджета расходится с суммой сделки» ловит книги, скопированные из чужой сделки, — такие в сводные показатели не берутся. Суммы в книгах ведутся в рублях и переведены в евро по курсу Битрикса.'},
+  'ct.three':{t:'Экономика сделки',what:'Как из суммы контракта получается плановая прибыль, и что об этой сделке думают три разные системы.',src:'БИТРИКС — сумма сделки и Σ заказов поставщикам СП-172. ЭКОНОМИКА ПРОЕКТА — money-поля сделки («Cost (rub)»). БЮДЖЕТ СДЕЛКИ — лист «Бюджет» из книги в Google Drive (снимок в репозитории).',formula:'ЦЕПОЧКА: продали за (выручка бюджета, иначе сумма сделки) − закупка у поставщика − всё остальное (международная логистика, таможня, прочие прямые расходы) = плановая прибыль. Битрикс и экономика проекта дают только ВАЛОВЫЙ заработок — продажа минус закупка, без косвенных затрат; бюджет даёт полный. В колонке таблицы показывается прибыль по сделке, а если её в книге нет — операционная.',note:'КРАСНАЯ РАМКА — когда плановая прибыль не выдерживает проверки на разумность: она отрицательная, либо рентабельность меньше половины нормы, заданной в самом бюджете, либо наоборот выше 60% — такое обычно означает ошибку в книге. Рядом всегда написана причина. Валовая маржа сохранена рядом с плановой намеренно: разница между ними и есть цена логистики, таможни и накладных.'},
   'ct.margin':{t:'Почему это ВАЛОВАЯ маржа, а не прибыль',what:'Показатель считается как продажа − закупка. Это спред до затрат на доведение товара до клиента, а не заработок сделки.',src:'Продажа — сумма сделки в Битриксе. Закупка — Σ заказов поставщикам СП-172, при их отсутствии — money-поля сделки из экономики проекта.',formula:'ВАЛОВАЯ МАРЖА = продажа − закупка. В неё НЕ входят: доставка до РФ и по РФ, таможенные платежи и сборы, сертификация, НДС, агентское вознаграждение, страхование, хранение.',note:'Почему не считаем чистую: (1) в файле «Экономика проекта» затрат нет вообще — это калькулятор наценки, оффер поставщика × коэффициент = наше КП; (2) поля затрат в заказах СП-172 («Стоимость доставки до РФ», «ТП, таможенные сборы, сертификаты, ТО», «НДС») заведены, но заполнены у 2 заказов из 1136 — среди живых ни у одного; (3) поле «Margin» на сделке пустое у всех 916 сделок, «Cost (rub)» заполнено у 619, но в медиане равно закупке, то есть логистику не включает. Полная себестоимость есть только в бюджете сделки — и она теперь читается: см. соседний показатель «План МД по бюджетам» (снимок бюджетов из папки Google Drive). ВАЖНО: продажа берётся как есть из Битрикса; если сумма сделки указана с НДС, а закупка без — валовая маржа завышена ещё и на ставку налога.'},
   'ct.plan':{t:'План МД по бюджетам сделок',what:'Плановый маржинальный доход из «Бюджета сделки» — книги, которую сорсер заполняет по каждой сделке (папка на Google Drive). В отличие от валовой маржи здесь учтена ПОЛНАЯ плановая себестоимость.',src:'Лист «Бюджет» книги: блок «Показатели» (суммы в ₽, переведены в € по курсу Битрикса). Связь со сделкой — по ссылке на Битрикс в шапке книги, без угадывания по названию. Снимок папки собирается скриптом scripts/budget_snapshot.py и лежит в data/budget_snapshot.json.',formula:'ПЛАН МД = выручка − прямые переменные затраты (закуп, международная логистика, таможенная пошлина и сбор, НДС в ФТС, СВХ, брокер). В карточке сделки дополнительно: ПЛАН ПРИБЫЛЬ = МД − премии, страховые взносы, сертификаты, прочие расходы − стоимость денег. KPI суммирует МД по открытым сделкам с внятным бюджетом.',note:'⚠ «не бьётся» — плановая выручка бюджета расходится с суммой сделки в Битриксе больше чем в 4 раза (книга-заготовка или устаревшая) — такие сделки в сумму KPI не входят. Снимок обновляется не сам: дата — в строке фактов под KPI. Суммы книг в рублях; пересчёт в € добавляет расхождение на разницу курсов.'},
   'ct.act':{t:'Требует решения',what:'Четыре очага проблем в воронке реализации. Плитка кликабельна — открывает эти сделки в таблице ниже.',src:'Открытые сделки воронки кат.0 и их живые заказы СП-172.',formula:'ПРОСРОЧЕН ДЕДЛАЙН — есть живой заказ, у которого дата «Date of deadline to customer» уже прошла. ЗАМЕДЛЕНО — сделка или её заказ сидят в стадии дольше нормы (2× медианы стадии, минимум 7 дн). БЕЗ ПЛАНОВОЙ ДАТЫ — у живых заказов не заполнена дата клиенту, срок не контролируется вообще. НЕТ ЭКОНОМИКИ — в сделке нет ни ссылки на файл экономики, ни money-полей.',note:'Числа в плитках — СДЕЛКИ, в подписи под ними — заказы. Одна сделка может попасть сразу в несколько плиток.'},
+  'ct.gross':{t:'Занижена закупка',what:'Сделки, где валовая маржа неправдоподобно высока — обычно потому, что заведены не все заказы поставщикам.',src:'Сделки с закупкой, собранной из заказов СП-172 (не из money-полей), с суммой больше €1000.',formula:'Порог берётся от самих данных: max(65%, 1,5 × медианной валовой маржи по таким сделкам). Всё, что выше, помечается флагом «мало заказов?».',note:'Это подозрение, а не диагноз: бывают сделки с реально высокой маржой. Но чаще это значит, что часть заказов поставщикам ещё не заведена — тогда закупка занижена, а прибыль в отчёте завышена. Проверять надо в карточке: сколько заказов у сделки и покрывают ли они всю поставку.'},
   'ct.funnel':{t:'Воронка реализации',what:'Где физически стоят открытые сделки и сколько денег стоит на каждой стадии.',src:'Стадии воронки кат.0 в порядке движения (crm.status.list) + история переходов (crm.stagehistory).',formula:'Длина полосы — Σ сумм открытых сделок на стадии относительно самой «денежной» стадии. Красная часть полосы — деньги сделок, у которых сорван срок клиенту. «Типично N дн» — медианная длительность стадии по истории переходов: половина сделок проходит её быстрее.',note:'Показаны только открытые сделки в воронке реализации. Стадии без сделок не выводятся.'},
   'ct.speed':{t:'Скорость реализации',what:'Сколько времени сделки и заказы проводят в каждой стадии — где процесс буксует.',src:'crm.stagehistory.list: первый вход в каждую стадию (сделки воронки кат.0 и заказы СП-172), с полным временем.',formula:'Длительность стадии = время до следующего первого входа. Медианы по всем прохождениям (n — сколько раз стадию проходили). «Цикл заказа» = создание → закрытие (SUCCESS). «Лаг первого заказа» = вход сделки в воронку реализации → создание первого заказа СП-172.',note:'Бары — МЕДИАННОЕ время стадии (типичная длительность, «где копится время»), а не превышение норматива. Норматив-порог = max(2×медиана, 7 дн) и используется для подсветки замедленных. Медианы устойчивы к выбросам; редкие стадии (n<5) в графики не попадают.'},
     'ct.list':{t:'Список контрактов: стадии, закупка, замедленность',what:'Одна строка = одна сделка воронки реализации (кат.0), №№ до текущего максимума.',src:'crm.deal.list (CATEGORY_ID=0) + заказы СП-172 (parentId2) + история стадий + money-поля сделки + файл «Экономика проекта» (Я.Диск, где получен).',formula:'«Стадия · дней» — текущая стадия и возраст (от последнего входа). ЗАКУПКА каскадом: Σ заказов СП-172 → money-поля сделки («Cost (rub)»/«Offer sum … supplier») → файл экономики проекта → «нет данных». Маржа = продажа − закупка, только при наличии источника. ЗАМЕДЛЕНА (красная строка): возраст текущей стадии сделки или любого живого заказа > max(2×медиана этой стадии, 7 дн), либо нет ни одного заказа >7 дн после входа в воронку.',note:'СВЕРКА ИСТОЧНИКОВ — в карточке сделки: Σ заказов, money-поля и файл экономики показываются рядом с отклонением в %; «⚠≠» — источники расходятся >20%; «✓экон.» — экономика проекта получена и просмотрена (дата в карточке). Клик по строке — стадии, заказы, сверка закупки.'},
@@ -1203,33 +1251,39 @@ function openContract(x){
     h+=`<div class="h">Путь по стадиям воронки</div>`;
     h+=x.timeline.map((t,i)=>`<div class="tlrow${i===x.timeline.length-1?' cur':''}"><span class="tld">${t.at}</span><span class="tln">${_esc(_stShort(t.name))}</span><span class="tldur">${t.days} дн${i===x.timeline.length-1?' · сейчас':''}</span></div>`).join('');
   }
-  // закупка: сверка источников (заказы · money-поля · файл экономики)
-  h+=`<div class="h">Закупка и маржа — сверка источников</div>`;
-  const srcLbl={orders:'по заказам СП-172',econ:'из money-полей сделки',file:'из файла экономики',none:'данных нет'};
-  h+=`<div style="font-size:12.5px;line-height:1.75">`
-    +`Продажа: <b>${x.saleLbl}</b>${x.saleCur&&x.saleCur!=='EUR'?` <span class="dimv">(${_esc(x.saleOrig)})</span>`:''}<br>`
-    +`Закупка: <b style="color:var(--a)">${x.buyLbl}</b> <span class="srcb ${x.buySrc}">${srcLbl[x.buySrc]||x.buySrc}</span>`
-    +(x.econAt?` <span class="srcb chk">✓ экономика получена и просмотрена ${x.econAt}</span>`:'')
-    +`</div>`;
-  const srcs=[['orders','Σ заказов СП-172',x.buyOrdersEur],['econ','Money-поля сделки',x.buyEconEur],['file','Файл экономики проекта',x.buyFileEur]];
-  const avail=srcs.filter(s=>s[2]>0), mx=Math.max(1,...avail.map(s=>s[2]));
-  const used=x.buyEur||0;
-  if(avail.length){
-    h+=srcs.map(([k,lb,v])=>{
-      if(!(v>0)) return `<div class="srccmp"><span class="sl">${lb}</span><div class="sb"></div><span class="sv dimv">—</span><span class="sd dim">${k==='file'&&!x.econAt?'не получен':'нет'}</span></div>`;
-      const isUsed=k===x.buySrc;
-      const d=used>0&&!isUsed?Math.round((v-used)/used*100):null;
-      const dc=d==null?'':Math.abs(d)<=5?'ok':Math.abs(d)<=20?'mid':'bad';
-      return `<div class="srccmp${isUsed?' used':''}"><span class="sl">${lb}</span><div class="sb"><i style="width:${(v/mx*100).toFixed(0)}%"></i></div><span class="sv">${_fmtE(v)}</span><span class="sd ${dc}">${isUsed?'✓ исп.':(d>0?'+':'')+d+'%'}</span></div>`;
-    }).join('');
-    if(x.discrep) h+=`<div style="margin-top:5px"><span class="srcb disc">⚠ источники расходятся &gt;20% — сверить с экономикой проекта</span></div>`;
-    if(x.econOnly) h+=`<div style="margin-top:5px"><span class="srcb disc">⚠ в экономике есть, в полях сделки нет</span></div>`;
-  }
-  if(x.noEcon) h+=`<div style="margin-top:5px"><span class="srcb none">🚩 Экономика проекта не заведена — нет ни ссылки на файл, ни money-полей в сделке</span></div>`;
-  // ---- ТРИ ИСТОЧНИКА: Битрикс · экономика проекта · бюджет сделки ----
+  // ---------- ЭКОНОМИКА СДЕЛКИ: отдельная рамка ----------
   const B=x.planBreak||null;
-  h+=`<div class="h">Сколько заработаем: три источника${qmark('ct.three')}</div>`;
-  const nn=v=>v==null?null:v, ab=v=>v==null?null:Math.abs(v);
+  const RV=(B&&B.rev)||x.saleEur||0;
+  const PF=x.planProfitEur;
+  const pct=(PF!=null&&RV)?PF/RV:null;
+  const norm=B?(B.normPf||B.normMd||null):null;
+  let ebad=false, ewhy='';
+  if(PF!=null){
+    if(PF<0){ebad=true;ewhy='плановая прибыль отрицательная — сделка спланирована в убыток';}
+    else if(norm&&pct!=null&&pct<norm*0.5){ebad=true;ewhy=`рентабельность ${Math.round(pct*100)}% — меньше половины нормы ${Math.round(norm*100)}%`;}
+    else if(pct!=null&&pct>0.6){ebad=true;ewhy=`рентабельность ${Math.round(pct*100)}% — неправдоподобно высокая, проверьте бюджет`;}
+  }
+  // всё, что не закуп: логистика, таможня, прочие прямые
+  const eBuy=B&&B.buy!=null?Math.abs(B.buy):(x.buyEur||null);
+  const eRest=(B&&B.direct!=null)?Math.abs(B.direct)+Math.abs(B.other||0)-Math.abs(B.buy||0):null;
+  h+=`<div class="h">Экономика сделки${qmark('ct.three')}</div>`;
+  h+=`<div class="ecard${ebad?' bad':''}">`;
+  // цепочка: продали → минус закуп → минус прочие → плановая прибыль
+  h+=`<div class="chain">`
+    +`<div class="cstep"><div class="cl">продали за</div><div class="cv">${RV?_fmtE(RV):'—'}</div></div>`
+    +`<div class="arw">→</div>`
+    +`<div class="cstep minus"><div class="cl">− закупка</div><div class="cv">${eBuy!=null?_fmtE(eBuy):'—'}</div></div>`
+    +`<div class="arw">→</div>`
+    +`<div class="cstep minus"><div class="cl">− логистика, таможня, прочее</div><div class="cv">${eRest!=null?_fmtE(eRest):'—'}</div></div>`
+    +`<div class="arw">=</div>`
+    +`<div class="cstep res${ebad?' bad':''}"><div class="cl">плановая прибыль</div><div class="cv">${PF!=null?_fmtE(PF):'—'}${pct!=null?` <span style="font-size:11px;font-weight:400">${Math.round(pct*100)}%</span>`:''}</div></div>`
+    +`</div>`;
+  if(ebad) h+=`<div class="ewarn">⚠ ${ewhy}</div>`;
+  else if(norm&&pct!=null) h+=`<div class="note">Норма по бюджету — ${Math.round(norm*100)}%, факт плана ${Math.round(pct*100)}%.</div>`;
+  if(eRest==null) h+=`<div class="note">Затраты сверх закупки не расписаны: бюджет сделки ${x.hasBudget?'заведён, но не распознан снимком':'не заведён'}. Пока его нет, заработок считается только валовым — продажа минус закупка.</div>`;
+
+  // --- сверка трёх источников
+  h+=`<div class="h2e">Сколько заработаем: три источника</div>`;
   const line=(lb,rev,cost,prof,tag,cls)=>{
     const pv=prof==null?'<span class="dimv">—</span>':`<b style="color:${prof<0?'var(--nr)':'var(--ok)'}">${_fmtE(prof)}</b>`;
     const pc=(prof!=null&&rev)?` <span class="dimv">(${Math.round(prof/rev*100)}%)</span>`:'';
@@ -1238,24 +1292,40 @@ function openContract(x){
       +`<span class="tv">${cost==null?'<span class="dimv">—</span>':_fmtE(cost)}</span>`
       +`<span class="tv">${pv}${pc}</span></div>`;};
   h+=`<div class="thr thead"><span class="tl">источник</span><span class="tv">выручка</span><span class="tv">себестоимость</span><span class="tv">заработок</span></div>`;
-  // 1. Битрикс: сумма сделки минус сумма заказов поставщикам
   h+=line('Битрикс: сделка и заказы', x.saleEur||null, x.buyOrdersEur||null,
-          (x.saleEur&&x.buyOrdersEur)?x.saleEur-x.buyOrdersEur:null, 'валовая, без косвенных', '');
-  // 2. Экономика проекта: money-поля сделки (Cost rub / Offer sum)
+          (x.saleEur&&x.buyOrdersEur)?x.saleEur-x.buyOrdersEur:null, 'валовая', '');
   h+=line('Экономика проекта', null, x.buyEconEur||null,
-          (x.saleEur&&x.buyEconEur)?x.saleEur-x.buyEconEur:null, 'валовая, без косвенных', '');
-  // 3. Бюджет сделки: полная плановая экономика
-  h+=line('Бюджет сделки', B?B.rev:null, B&&B.direct!=null?ab(B.direct):null,
-          x.planProfitEur!=null?x.planProfitEur:null,
-          B?(x.planPSrc==='deal'?'все косты учтены':'после всех прямых'):'нет бюджета',
-          x.planProfitEur!=null?'best':'');
-  if(x.planSusp) h+=`<div style="margin-top:5px"><span class="srcb disc">⚠ выручка бюджета расходится с суммой сделки более чем вчетверо — бюджет, скорее всего, от другой сделки</span></div>`;
-  if(B&&x.saleEur&&B.rev){const dv=Math.round((B.rev-x.saleEur)/x.saleEur*100);
-    if(Math.abs(dv)>5) h+=`<div style="margin-top:5px"><span class="srcb disc">⚠ выручка в бюджете на ${dv>0?'+':''}${dv}% отличается от суммы сделки в Битриксе</span></div>`;}
-  // раскладка бюджета: из чего сложилась прибыль
+          (x.saleEur&&x.buyEconEur)?x.saleEur-x.buyEconEur:null, 'валовая', '');
+  h+=line('Бюджет сделки', B?B.rev:null, B&&B.direct!=null?Math.abs(B.direct):null,
+          PF!=null?PF:null, B?(x.planPSrc==='deal'?'все косты':'после прямых'):'нет бюджета',
+          PF!=null?'best':'');
+  if(x.grossSusp) h+=`<div class="ewarn amber">⚠ ${_esc(x.grossWhy)}. Проверьте, все ли заказы поставщикам заведены — если нет, закупка занижена, а прибыль завышена.</div>`;
+  if(x.planSusp) h+=`<div class="ewarn">⚠ выручка бюджета расходится с суммой сделки более чем вчетверо — книга, скорее всего, от другой сделки</div>`;
+  else if(B&&x.saleEur&&B.rev){const dv=Math.round((B.rev-x.saleEur)/x.saleEur*100);
+    if(Math.abs(dv)>5) h+=`<div class="ewarn amber">⚠ выручка в бюджете на ${dv>0?'+':''}${dv}% отличается от суммы сделки в Битриксе</div>`;}
+
+  // --- откуда взялась закупка
+  const srcLbl={orders:'по заказам СП-172',econ:'из money-полей сделки',file:'из файла экономики',none:'данных нет'};
+  const srcs=[['orders','Σ заказов СП-172',x.buyOrdersEur],['econ','Money-поля сделки',x.buyEconEur],['file','Файл экономики проекта',x.buyFileEur]];
+  const avail=srcs.filter(s=>s[2]>0), mx=Math.max(1,...avail.map(s=>s[2]));
+  const used=x.buyEur||0;
+  if(avail.length){
+    h+=`<div class="h2e">Откуда взялась закупка <span class="srcb ${x.buySrc}">${srcLbl[x.buySrc]||x.buySrc}</span></div>`;
+    h+=srcs.map(([k,lb,v])=>{
+      if(!(v>0)) return `<div class="srccmp"><span class="sl">${lb}</span><div class="sb"></div><span class="sv dimv">—</span><span class="sd dim">${k==='file'&&!x.econAt?'не получен':'нет'}</span></div>`;
+      const isUsed=k===x.buySrc;
+      const d=used>0&&!isUsed?Math.round((v-used)/used*100):null;
+      const dc=d==null?'':Math.abs(d)<=5?'ok':Math.abs(d)<=20?'mid':'bad';
+      return `<div class="srccmp${isUsed?' used':''}"><span class="sl">${lb}</span><div class="sb"><i style="width:${(v/mx*100).toFixed(0)}%"></i></div><span class="sv">${_fmtE(v)}</span><span class="sd ${dc}">${isUsed?'✓ исп.':(d>0?'+':'')+d+'%'}</span></div>`;
+    }).join('');
+    if(x.discrep) h+=`<div class="ewarn amber">⚠ источники закупки расходятся более чем на 20%</div>`;
+  }
+  if(x.noEcon) h+=`<div class="ewarn">🚩 Экономика проекта не заведена — нет ни ссылки на файл, ни money-полей в сделке</div>`;
+
+  // --- разложение бюджета
   if(B){
-    const rowb=(lb,v,acc)=>v==null?'':`<div class="tlrow"><span class="tld">${acc?'=':'−'}</span><span class="tln">${lb}</span><span class="tldur"${acc?' style="color:var(--ok)"':''}>${_fmtE(acc?v:Math.abs(v))}</span></div>`;
-    h+=`<div class="note" style="margin-top:10px">Из чего сложилась плановая прибыль (по бюджету${x.planMod?`, изменён ${x.planMod}`:''}):</div>`
+    const rowb=(lb,v)=>v==null?'':`<div class="tlrow"><span class="tld">−</span><span class="tln">${lb}</span><span class="tldur">${_fmtE(Math.abs(v))}</span></div>`;
+    h+=`<div class="h2e">Строки бюджета${x.planMod?` <span class="dimv" style="font-weight:400">· изменён ${x.planMod}</span>`:''}</div>`
       +(B.rev!=null?`<div class="tlrow"><span class="tld">выручка</span><span class="tln">план по бюджету</span><span class="tldur">${_fmtE(B.rev)}</span></div>`:'')
       +rowb('закуп у поставщика',B.buy)
       +rowb('международная логистика',B.logi)
@@ -1265,12 +1335,8 @@ function openContract(x){
       +(B.op!=null?`<div class="tlrow"><span class="tld">=</span><span class="tln"><b>операционная прибыль</b></span><span class="tldur" style="color:var(--ok)">${_fmtE(B.op)}</span></div>`:'')
       +(B.deal!=null?`<div class="tlrow"><span class="tld">=</span><span class="tln"><b>прибыль по сделке</b>${B.normPf?` <span class="dimv">норма ${Math.round(B.normPf*100)}%</span>`:''}</span><span class="tldur" style="color:var(--ok)">${_fmtE(B.deal)}</span></div>`:'')
       +((B.status||B.executor)?`<div class="note" style="margin-top:6px">Статус в бюджете: <b>${_esc(B.status||'—')}</b>${B.executor?` · ведёт <b>${_esc(B.executor)}</b>`:''}</div>`:'');
-  } else {
-    h+=`<div class="note" style="margin-top:8px">Бюджет сделки ${x.hasBudget?'заведён, но не распознан снимком — вероятно, старый формат журнала проводок':'не заведён'}. Пока его нет, заработок считается только валовым: продажа минус закупка, без логистики, таможни и НДС.</div>`;
   }
-    +(avail.length>1&&x.saleEur?` <span class="dimv">· если считать по: ${avail.map(([k,,v])=>`${({orders:'заказам',econ:'полям',file:'файлу'})[k]} ${Math.round((x.saleEur-v)/x.saleEur*100)}%`).join(' · ')}</span>`:'')
-    +(x.econPaid||x.econRest?`<br><span class="dimv">оплачено ${x.econPaid||'—'} · остаток ${x.econRest||'—'}</span>`:'')
-    +`</div>`;
+  h+=`</div>`;
   // заказы поставщикам
   const ords=x.orders||[];
   h+=`<div class="h">Заказы поставщикам (${ords.length})</div>`;
@@ -1289,12 +1355,13 @@ function renderContracts(){
   if(!X){ el.innerHTML='<div class="note" style="padding:20px 0">нет данных по контрактам</div>'; return; }
   let sortKey='seq', sortDir=-1, q='', mode='all';
   const NUM={seq:1,saleEur:1,buyEur:1,marginEur:1,planMdEur:1,planProfitEur:1,stageDays:1,lateDays:1,lossEur:1};
-  const COLS=[['customer','Заказчик','l'],['deal','№ сделки / контракт','l'],['stageDays','Стадия · дней','l'],['lateDays','Дедлайн клиенту','l'],['saleEur','Сумма сделки','r'],['buyEur','Закупка','r'],['marginEur','Валовая маржа','r'],['planProfitEur','Плановая прибыль','r']];
+  const COLS=[['customer','Заказчик · контракт','l'],['stageDays','Стадия · дней','l'],['lateDays','Дедлайн клиенту','l'],['saleEur','Сумма сделки','r'],['buyEur','Закупка','r'],['planProfitEur','Прибыль: план / валовая','r']];
   const R=X.rows, byDeal=Object.fromEntries(R.map(r=>[String(r.deal),r]));
   const dl=X.deadlines||{}, sp=X.speed||{}, fx=X.fx||{}, H=X.head||{}, RATE=dl.rate||20;
   const live=R.filter(r=>!r.closed);
   const nSlow=live.filter(r=>r.slow).length, nLate=live.filter(r=>r.late).length,
         nNoEcon=live.filter(r=>r.noEcon).length, nNoDl=live.filter(r=>r.noDl>0).length,
+        nGross=live.filter(r=>r.grossSusp).length,
         nDone=R.filter(r=>r.done||r.closed).length;
   const orph=X.orphan&&X.orphan.n?` · ещё ${X.orphan.n} заказов без сделки (${X.orphan.buy})`:'';
   const bl=(items,color)=>{const mx=Math.max(1,...items.map(b=>b.med));return items.map(b=>`<div class="blrow"><div class="blt"><span>${_esc(_stShort(b.name))} <span class="dimv mono">n=${b.n}</span></span><b>${b.med} дн</b></div><div class="bltrack"><i style="width:${(b.med/mx*100).toFixed(0)}%;background:${color}"></i></div>${b.over?`<div class="dep" style="margin-top:2px"><span class="nrc">⚠ ${b.over} из ${b.live||'?'} тянутся дольше нормы</span> · в среднем на <b class="mono">+${b.lostAvg} дн</b></div>`:(b.live?`<div class="dep" style="margin-top:2px">сейчас в стадии: ${b.live} · все в норме</div>`:'')}</div>`).join('');};
@@ -1377,22 +1444,24 @@ function renderContracts(){
   // ---------- 6. ТАБЛИЦА ----------
   h+=`<div class="secttl" id="ctSect"><b>·</b> Все сделки в реализации <span id="ctCount" class="dimv" style="font-weight:400"></span>${qmark('ct.list')}</div>`
    +`<div class="ctools" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><input id="ctSearch" class="search" style="flex:1;min-width:220px" placeholder="Поиск: заказчик · № сделки · поставщик · менеджер · ОСС · город…">`
-   +`<div class="statleg" style="margin:0" id="ctChips"><span class="stchip on" data-m="all">Все <b>${R.length}</b></span><span class="stchip" data-m="live">Открытые <b>${live.length}</b></span><span class="stchip" data-m="late"><i class="dot snr"></i>Просрочен дедлайн <b>${nLate}</b></span><span class="stchip" data-m="slow"><i class="dot snr"></i>Замедленные <b>${nSlow}</b></span><span class="stchip" data-m="nodl">Без плановой даты <b>${nNoDl}</b></span><span class="stchip" data-m="noecon">Без экономики <b>${nNoEcon}</b></span><span class="stchip" data-m="done">Завершённые <b>${nDone}</b></span></div></div>`
-   +`<section class="card"><div class="note">«Стадия · дней» — где сделка сейчас и сколько дней в этой стадии (краснеет при превышении нормы). «Дедлайн клиенту» — обещанная заказчику дата: 🚩 с глубиной просрочки либо ближайший срок. «Закупка» — Σ заказов СП-172, иначе из экономики проекта. «Валовая маржа» = продажа − закупка: логистика, таможня, пошлины и НДС в неё НЕ входят. Красная строка — требует внимания. Клик по строке — вся сделка целиком; по заголовку — сортировка.</div><table class="ctab"><thead id="ctHead"></thead><tbody id="ctBody"></tbody></table></section>`;
+   +`<div class="statleg" style="margin:0" id="ctChips"><span class="stchip on" data-m="all">Все <b>${R.length}</b></span><span class="stchip" data-m="live">Открытые <b>${live.length}</b></span><span class="stchip" data-m="late"><i class="dot snr"></i>Просрочен дедлайн <b>${nLate}</b></span><span class="stchip" data-m="slow"><i class="dot snr"></i>Замедленные <b>${nSlow}</b></span><span class="stchip" data-m="nodl">Без плановой даты <b>${nNoDl}</b></span><span class="stchip" data-m="noecon">Без экономики <b>${nNoEcon}</b></span><span class="stchip" data-m="gross"><i class="dot snr"></i>Занижена закупка <b>${nGross}</b></span><span class="stchip" data-m="done">Завершённые <b>${nDone}</b></span></div></div>`
+   +`<section class="card"><div class="note">«Стадия · дней» — где сделка сейчас и сколько дней в этой стадии (краснеет при превышении нормы). «Дедлайн клиенту» — обещанная заказчику дата: 🚩 с глубиной просрочки либо ближайший срок. «Закупка» — Σ заказов СП-172, иначе из экономики проекта. «Валовая маржа» = продажа − закупка: логистика, таможня, пошлины и НДС в неё НЕ входят. Красная строка — требует внимания. Клик по строке — вся сделка целиком; по заголовку — сортировка.</div><div class="note tsnote">На узком экране таблица прокручивается вбок; часть колонок скрыта — все цифры есть в карточке сделки.</div><div class="tscroll"><table class="ctab"><thead id="ctHead"></thead><tbody id="ctBody"></tbody></table></div></section>`;
   el.innerHTML=h;
 
   // ---------- рендер таблицы ----------
   const head=()=>{document.getElementById('ctHead').innerHTML=`<tr><th class="r sortable${sortKey==='seq'?' on':''}" data-sk="seq" style="width:48px">№${sortKey==='seq'?(sortDir<0?' ▾':' ▴'):''}</th>`+COLS.map(c=>`<th class="${c[2]==='r'?'r ':''}sortable${sortKey===c[0]?' on':''}" data-sk="${c[0]}">${c[1]}${sortKey===c[0]?(sortDir<0?' ▾':' ▴'):''}</th>`).join('')+'</tr>';};
   const mcell=x=>{const cl=(x.marginEur||0)<0?'color:var(--nr)':'color:var(--ok)';const pct=x.marginPct==null?'<span class="dimv">—</span>':(x.marginPct+'%');return `<div class="mono" style="${x.marginEur==null?'color:var(--dim)':cl}">${x.marginLbl}</div><div class="dep">${pct}</div>`;};
   const pcell=x=>{
+    const gross=x.marginEur==null?'':`<div class="dep">валовая ${x.marginLbl}${x.marginPct!=null?` · ${x.marginPct}%`:''}`
+      +(x.grossSusp?' <span class="srcb disc" title="'+_esc(x.grossWhy)+'">⚠ мало заказов?</span>':'')+`</div>`;
     if(x.planProfitEur==null&&x.planMdEur==null)
-      return `<div class="mono" style="color:var(--dim)">—</div><div class="dep">${x.hasBudget?'бюджет не прочитан':'нет бюджета'}</div>`;
+      return `<div class="mono" style="color:var(--dim)">${x.hasBudget?'бюджет не прочитан':'нет бюджета'}</div>`+gross;
     if(x.planProfitEur==null)
-      return `<div class="mono" style="color:var(--dim)">—</div><div class="dep">только МД ${x.planMdLbl}</div>`;
+      return `<div class="mono" style="color:var(--dim)">только МД ${x.planMdLbl}</div>`+gross;
     const cl=x.planProfitEur<0?'color:var(--nr)':'color:var(--ok)';
-    const src=x.planPSrc==='deal'?'по сделке':'операционная';
-    return `<div class="mono" style="${cl}">${x.planProfitLbl}</div>`
-      +`<div class="dep">${x.planProfitPct!=null?x.planProfitPct+'% · ':''}${src}${x.planSusp?' <span class="nrc">⚠</span>':''}</div>`;};
+    return `<div class="mono" style="${cl};font-weight:700">${x.planProfitLbl}`
+      +`${x.planProfitPct!=null?` <span style="font-weight:400;font-size:11px">${x.planProfitPct}%</span>`:''}`
+      +`${x.planSusp?' <span class="nrc">⚠</span>':''}</div>`+gross;};
   const scell=x=>{
     if(!x.inCat0)return `<div class="dep">вне воронки</div>`;
     const nm=_esc(_stShort(x.stageName));
@@ -1404,7 +1473,14 @@ function renderContracts(){
     return `<div class="stgcell"><b>${x.dlNext}</b><div class="dep">в срок${x.noDl?' · без даты: '+x.noDl:''}</div></div>`;};
   const bcell=x=>{
     const b=`<div class="mono" style="color:${x.buySrc==='none'?'var(--dim)':'var(--a)'}">${x.buyLbl}</div>`;
-    const alt=x.discrep?(x.buySrc==='orders'?` <span class="srcb disc">≠ экон. ${_fmtE(x.buyEconEur)}</span>`:` <span class="srcb disc">≠ заказы ${_fmtE(x.buyOrdersEur)}</span>`):'';
+    // если альтернативный источник не бьётся с масштабом сделки (больше 3× суммы или
+    // меньше 3% от неё) — это не «другая оценка», а мусор в поле; числом не показываем
+    const wild=v=>x.saleEur>0&&v>0&&(v>x.saleEur*3||v<x.saleEur*0.03);
+    const altV=x.buySrc==='orders'?x.buyEconEur:x.buyOrdersEur;
+    const altN=x.buySrc==='orders'?'экон.':'заказы';
+    const alt=!x.discrep?'':(wild(altV)
+      ? ` <span class="srcb disc" title="${altN} ${_fmtE(altV)} против суммы сделки ${x.saleLbl}">⚠ ${altN}: сумма не сходится</span>`
+      : ` <span class="srcb disc">≠ ${altN} ${_fmtE(altV)}</span>`);
     const tags=(x.buySrc==='econ'?'<span class="srcb econ">эконом.</span>':'')+(x.buySrc==='file'?'<span class="srcb econ">файл</span>':'')+(x.buySrc==='none'&&!x.noEcon?'<span class="srcb none">нет данных</span>':'')+(x.noEcon?'<span class="srcb none">🚩 нет экономики</span>':'')+alt+(x.econAt?' <span class="srcb chk">✓экон.</span>':'');
     return b+(tags?`<div class="dep">${tags}</div>`:'');};
   function rows(){
@@ -1415,17 +1491,17 @@ function renderContracts(){
     else if(mode==='noecon')r=r.filter(x=>x.noEcon&&!x.closed);
     else if(mode==='late')r=r.filter(x=>x.late&&!x.closed);
     else if(mode==='nodl')r=r.filter(x=>x.noDl>0&&!x.closed);
+    else if(mode==='gross')r=r.filter(x=>x.grossSusp);
     if(q){const s=q.toLowerCase(); r=r.filter(x=>((x.customer||'')+' '+(x.title||'')+' '+x.deal+' '+(x.suppliers||'')+' '+(x.manager||'')+' '+(x.oss||'')+' '+(x.cities||'')).toLowerCase().includes(s));}
     r=r.slice().sort((a,b)=> NUM[sortKey] ? ((a[sortKey]||0)-(b[sortKey]||0))*sortDir : String(a[sortKey]||'').localeCompare(String(b[sortKey]||''),'ru')*sortDir);
     document.getElementById('ctCount').textContent=`(${r.length} из ${R.length})`;
-    document.getElementById('ctBody').innerHTML=r.map(x=>`<tr class="drill${(x.late||x.slow)&&!x.closed?' slowrow':''}" data-ct="${x.deal}"><td class="r mono" style="color:var(--a2)">${x.seq||'—'}</td><td><div class="who">${_esc(x.customer)}</div><div class="dep">${_esc(x.title)}</div></td>`
-      +`<td><div class="mono">${x.deal?('#'+x.deal):'—'}</div><div class="dep">${x.done?'<span class="pill p-selected">завершён</span>':(x.lost?'<span class="pill p-no_answer">проиграна</span>':'<span class="pill">в реализации</span>')} ${x.norders}×закуп${x.suppliers?(' · '+_esc(x.suppliers)):''}</div></td>`
+    document.getElementById('ctBody').innerHTML=r.map(x=>`<tr class="drill${(x.late||x.slow)&&!x.closed?' slowrow':''}" data-ct="${x.deal}"><td class="r mono" style="color:var(--a2)">${x.seq||'—'}</td><td><div class="who">${_esc(x.customer)}</div><div class="dep">${_esc(x.title)}</div>`
+      +`<div class="dep">${x.done?'<span class="pill p-selected">завершён</span>':(x.lost?'<span class="pill p-no_answer">проиграна</span>':'<span class="pill">в реализации</span>')} ${x.norders}×закуп${x.suppliers?(' · '+_esc(x.suppliers)):''}</div></td>`
       +`<td>${scell(x)}</td>`
       +`<td>${dcell(x)}</td>`
-      +`<td class="r"><div class="mono" style="color:var(--ink)">${x.saleLbl}</div><div class="dep">${x.saleCur&&x.saleCur!=='EUR'?_esc(x.saleOrig):''}</div></td>`
+      +`<td class="r"><div class="amt1">${x.saleLbl}</div><div class="dep">${x.saleCur&&x.saleCur!=='EUR'?_esc(x.saleOrig):''}</div></td>`
       +`<td class="r">${bcell(x)}</td>`
-      +`<td class="r">${mcell(x)}</td>`
-      +`<td class="r">${pcell(x)}</td></tr>`).join('')||'<tr><td colspan="9" class="dimv" style="padding:14px">ничего не найдено</td></tr>';
+      +`<td class="r">${pcell(x)}</td></tr>`).join('')||'<tr><td colspan="7" class="dimv" style="padding:14px">ничего не найдено</td></tr>';
   }
   head(); rows();
 
