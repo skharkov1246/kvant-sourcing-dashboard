@@ -10748,6 +10748,171 @@
 "tier": "component_specialist",
 "angle": "harvest:unwind8",
 "risk": ""
+},
+{
+"name": "Turbine Supply Co",
+"country": "США",
+"site": "https://turbinesupply.com/",
+"email": "",
+"what": "Поставщик запчастей для газовых турбин",
+"link": "Конкурент того же профиля, что R&H Supply (найден при поиске поставщиков turbine parts)",
+"tier": "component_specialist",
+"angle": "harvest:unwind8",
+"risk": ""
+},
+{
+"name": "One Equity Partners",
+"country": "США",
+"site": "https://www.oneequity.com/",
+"email": "",
+"what": "Private-equity фонд",
+"link": "Владелец EthosEnergy (выкупил JV у Wood Group и Siemens Energy в 2024)",
+"tier": "component_specialist",
+"angle": "harvest:unwind8",
+"risk": ""
+},
+{
+"name": "TFS Aero",
+"country": "Мексика",
+"site": "https://www.tfscorp.com.mx/",
+"email": "",
+"what": "Аэрокосмическое подразделение TFS (AS9100D)",
+"link": "Дочерняя структура TFS Turbine Field Solutions",
+"tier": "component_specialist",
+"angle": "harvest:unwind8",
+"risk": ""
+},
+{
+"name": "Hanwha Power Systems Manufacturing (PSM)",
+"country": "США",
+"site": "https://www.psm.com",
+"email": "",
+"what": "Не-OEM детали горячего тракта и апгрейды для GE 7E/EA/7F, Siemens 501F и MHI ГТУ",
+"link": "Конкурент того же профиля для MD&A, Allied Power Group и ProEnergy; сестринская компания Thomassen Energy",
+"tier": "component_specialist",
+"angle": "harvest:unwind8",
+"risk": ""
+},
+{
+"name": "Mitsubishi Power Americas (экс-MHPS Americas)",
+"country": "США",
+"site": "https://power.mhi.com",
+"email": "",
+"what": "OEM газовых турбин 501F/G/J и сервис",
+"link": "Названный клиент Advanced Turbine Support (инспекции)",
+"tier": "component_specialist",
+"angle": "harvest:unwind8",
+"risk": ""
+},
+{
+"name": "AETC Ltd",
+"country": "Великобритания",
+"site": "https://www.aetc.co.uk",
+"email": "",
+"what": "Производство и обработка турбинных лопаток/airfoils (Leeds)",
+"link": "Компания того же профиля, что Doncasters (всплыла при исследовании Doncasters)",
+"tier": "component_specialist",
+"angle": "harvest:unwind8",
+"risk": ""
+},
+{
+"name": "MJB International",
+"country": "ОАЭ (Шарджа/Дубай)",
+"site": "https://www.mjbinternational.com",
+"email": "",
+"what": "Независимый ремонт тяжёлых промышленных ГТУ: полный ремонт роторов компрессора и силовой секции всех GE frame-машин и роторов ABB",
+"link": "Партнёрская мастерская Control Systems Co. (CSC, Саудовская Аравия) — на её площадке CSC выполняет работы по роторам",
+"tier": "component_specialist",
+"angle": "harvest:unwind8",
+"risk": ""
+},
+{
+"name": "Hegwein GmbH",
+"country": "Германия (Штутгарт)",
+"site": "https://www.durag.com/en/about-hegwein-981.htm",
+"email": "",
+"what": "Газовые и электрические воспламенители, запальные горелки для промышленных горелочных систем",
+"link": "Компания DURAG Group (с 1996) — смежная продуктовая линейка розжига",
+"tier": "component_specialist",
+"angle": "harvest:unwind8",
+"risk": ""
+},
+{
+"name": "АО «Газэнергосервис»",
+"country": "Россия (Москва/Брянск)",
+"site": "https://www.gesturbo.ru",
+"email": "",
+"what": "Ремонт и изготовление запчастей для газоперекачивающих агрегатов и газовых турбин, ремонтные заводы по ГПА",
+"link": "Сестринская компания ООО «ГЭХ СГТ» в контуре «Газпром энергохолдинг индустриальные активы» (gehia.ru)",
+"tier": "component_specialist",
+"angle": "harvest:unwind8",
+"risk": ""
+},
+{
+"name": "SACOM",
+"country": "Саудовская Аравия (Джубайль)",
+"site": "https://sacom.sa",
+"email": "",
+"what": "Производство компонентов вращающегося оборудования (rotating equipment components manufacturer)",
+"link": "Всплыл при раскрутке CSC — саудовский производитель того же профиля (локализация деталей)",
+"tier": "component_specialist",
+"angle": "harvest:unwind8",
+"risk": ""
+},
+{
+"name": "Heggemann AG",
+"country": "Германия",
+"site": "https://www.heggemann.com",
+"email": "",
+"what": "Аэроструктуры и прецизионные металлические узлы для aerospace/automotive",
+"link": "Партнёр Finework (Hunan) — соглашение о совместном предприятии, июнь 2025",
+"tier": "component_specialist",
+"angle": "harvest:unwind8",
+"risk": ""
+},
+{
+"name": "Armstrong Fluid Technology",
+"country": "Канада/США",
+"site": "https://www.armstrongfluidtechnology.com",
+"email": "",
+"what": "Насосы, чиллерные установки, теплообменники, Design Envelope",
+"link": "Бренд, который дистрибутирует Energy International (EIC) на Ближнем Востоке",
+"tier": "component_specialist",
+"angle": "harvest:unwind8",
+"risk": ""
+},
+{
+"name": "Exloc Instruments UK",
+"country": "Великобритания",
+"site": "https://exloc.co.uk",
+"email": "",
+"what": "Дистрибьютор КИП и взрывозащищённого оборудования (ATEX/IECEx)",
+"link": "Дистрибьютор/реселлер ATEX HMI-панелей HMi Elements",
+"tier": "component_specialist",
+"angle": "harvest:unwind8",
+"risk": ""
+},
+{
+"name": "ATEXShop (iECEx BV)",
+"country": "Нидерланды",
+"site": "https://www.atexshop.com",
+"email": "",
+"what": "Онлайн-дистрибьютор взрывозащищённого оборудования ATEX Zone 1/2",
+"link": "Реселлер панелей HMi Elements (490-Z1, 1301-Z1)",
+"tier": "component_specialist",
+"angle": "harvest:unwind8",
+"risk": ""
+},
+{
+"name": "JST Group",
+"country": "Нидерланды",
+"site": "https://www.jst-group.com",
+"email": "",
+"what": "Поставщик offshore/marine оборудования, SPM-систем и морских рукавов",
+"link": "Дистрибьютор/партнёр Dunlop Oil & Marine — распространяет их каталог GMPHOM 2009 marine hoses",
+"tier": "component_specialist",
+"angle": "harvest:unwind8",
+"risk": ""
 }
 ]
 }
