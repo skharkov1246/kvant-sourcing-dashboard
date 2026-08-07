@@ -499,6 +499,22 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
         })
     rows.sort(key=lambda r: -r["seq"])
 
+    # --- аномально высокая валовая маржа = скорее всего заведены не все заказы поставщикам.
+    # Порог берём от самих данных: полторы медианы по сделкам, где закупка собрана из заказов,
+    # но не ниже 65% — ниже этого высокая маржа ещё правдоподобна.
+    _gross = [r["marginPct"] for r in rows
+              if r["buySrc"] == "orders" and r["marginPct"] is not None and r["saleEur"] > 1000]
+    med_gross = _median(_gross)
+    gross_thr = max(65.0, round((med_gross or 0) * 1.5, 1))
+    for r in rows:
+        r["grossSusp"] = bool(
+            not r["closed"] and r["buySrc"] == "orders" and r["norders"] > 0
+            and r["marginPct"] is not None and r["saleEur"] > 1000
+            and r["marginPct"] > gross_thr)
+        r["grossWhy"] = (f"валовая {r['marginPct']}% при типичной {round(med_gross or 0)}% — "
+                         f"похоже, заведены не все заказы поставщикам "
+                         f"(сейчас {r['norders']})") if r["grossSusp"] else ""
+
     live_rows = [r for r in rows if not r["closed"]]
     slow_rows = [r for r in live_rows if r["slow"]]
 
@@ -766,6 +782,8 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
             "medLag": round(med_lag, 1) if med_lag is not None else None,
             "loss": _money(loss_total), "burnDay": _money(burn_day),
             "budget": n_budget, "budgetLive": n_budget_live,
+            "grossThr": gross_thr, "grossMed": round(med_gross or 0),
+            "grossSusp": sum(1 for r in live_rows if r["grossSusp"]),
             "slow": len(slow_rows), "lateDeals": len(late_rows),
             # план по бюджетам сделок (снимок Google Drive)
             "planMd": _money(plan_md_live), "planMdNum": round(plan_md_live),
