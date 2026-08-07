@@ -320,10 +320,13 @@
 
   /* ---- таблица контрактов: скроллится внутри карточки, а не ломает её ---- */
   .tscroll{overflow-x:auto;overscroll-behavior-x:contain;margin-top:12px}
-  .tscroll table{margin-top:0;min-width:900px}
-  .ctab td:nth-child(2)>div,.ctab td:nth-child(3)>div{max-width:250px;overflow:hidden;
-       text-overflow:ellipsis;white-space:nowrap}
-  .ctab td:nth-child(4) .stgcell b{display:block;max-width:170px;overflow:hidden;
+  .tsnote{display:none;margin-top:10px}
+  @media(max-width:900px){.tsnote{display:block}}
+  .tscroll table{margin-top:0;min-width:780px}
+  .ctab td{padding:7px 6px}
+  .ctab th{padding:0 6px 9px}
+  .ctab td:nth-child(2)>div{max-width:290px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .ctab td:nth-child(3) .stgcell b{display:block;max-width:150px;overflow:hidden;
        text-overflow:ellipsis;white-space:nowrap}
   /* сумма контракта — главное число строки */
   .ctab .amt1{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--ink)}
@@ -416,6 +419,19 @@
   @media(max-width:880px){
     .grid{grid-template-columns:1fr}
     .kpis{grid-template-columns:repeat(2,1fr)!important} /* !important перекрывает inline-стиль #kpisCov */
+  }
+  @media(max-width:900px){
+    /* узкий экран: прячем закупку и валовую маржу — они есть в карточке сделки,
+       а на экране должно остаться главное: сумма контракта и плановая прибыль */
+    .ctab th:nth-child(6),.ctab td:nth-child(6){display:none}
+    .tscroll table{min-width:560px}
+  }
+  @media(max-width:560px){
+    /* телефон: остаются заказчик, срок клиенту, сумма и прибыль */
+    .ctab th:nth-child(3),.ctab td:nth-child(3){display:none}
+    .ctab td:nth-child(2)>div{max-width:150px}
+    .tscroll table{min-width:0}
+    .ctab td,.ctab th{padding:6px 4px;font-size:12px}
   }
   @media(max-width:720px){
     /* воронка: подпись сверху, полоса на всю ширину карточки */
@@ -1337,7 +1353,7 @@ function renderContracts(){
   if(!X){ el.innerHTML='<div class="note" style="padding:20px 0">нет данных по контрактам</div>'; return; }
   let sortKey='seq', sortDir=-1, q='', mode='all';
   const NUM={seq:1,saleEur:1,buyEur:1,marginEur:1,planMdEur:1,planProfitEur:1,stageDays:1,lateDays:1,lossEur:1};
-  const COLS=[['customer','Заказчик','l'],['deal','№ сделки / контракт','l'],['stageDays','Стадия · дней','l'],['lateDays','Дедлайн клиенту','l'],['saleEur','Сумма сделки','r'],['buyEur','Закупка','r'],['marginEur','Валовая маржа','r'],['planProfitEur','Плановая прибыль','r']];
+  const COLS=[['customer','Заказчик · контракт','l'],['stageDays','Стадия · дней','l'],['lateDays','Дедлайн клиенту','l'],['saleEur','Сумма сделки','r'],['buyEur','Закупка','r'],['planProfitEur','Прибыль: план / валовая','r']];
   const R=X.rows, byDeal=Object.fromEntries(R.map(r=>[String(r.deal),r]));
   const dl=X.deadlines||{}, sp=X.speed||{}, fx=X.fx||{}, H=X.head||{}, RATE=dl.rate||20;
   const live=R.filter(r=>!r.closed);
@@ -1426,21 +1442,22 @@ function renderContracts(){
   h+=`<div class="secttl" id="ctSect"><b>·</b> Все сделки в реализации <span id="ctCount" class="dimv" style="font-weight:400"></span>${qmark('ct.list')}</div>`
    +`<div class="ctools" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><input id="ctSearch" class="search" style="flex:1;min-width:220px" placeholder="Поиск: заказчик · № сделки · поставщик · менеджер · ОСС · город…">`
    +`<div class="statleg" style="margin:0" id="ctChips"><span class="stchip on" data-m="all">Все <b>${R.length}</b></span><span class="stchip" data-m="live">Открытые <b>${live.length}</b></span><span class="stchip" data-m="late"><i class="dot snr"></i>Просрочен дедлайн <b>${nLate}</b></span><span class="stchip" data-m="slow"><i class="dot snr"></i>Замедленные <b>${nSlow}</b></span><span class="stchip" data-m="nodl">Без плановой даты <b>${nNoDl}</b></span><span class="stchip" data-m="noecon">Без экономики <b>${nNoEcon}</b></span><span class="stchip" data-m="done">Завершённые <b>${nDone}</b></span></div></div>`
-   +`<section class="card"><div class="note">«Стадия · дней» — где сделка сейчас и сколько дней в этой стадии (краснеет при превышении нормы). «Дедлайн клиенту» — обещанная заказчику дата: 🚩 с глубиной просрочки либо ближайший срок. «Закупка» — Σ заказов СП-172, иначе из экономики проекта. «Валовая маржа» = продажа − закупка: логистика, таможня, пошлины и НДС в неё НЕ входят. Красная строка — требует внимания. Клик по строке — вся сделка целиком; по заголовку — сортировка.</div><div class="tscroll"><table class="ctab"><thead id="ctHead"></thead><tbody id="ctBody"></tbody></table></div></section>`;
+   +`<section class="card"><div class="note">«Стадия · дней» — где сделка сейчас и сколько дней в этой стадии (краснеет при превышении нормы). «Дедлайн клиенту» — обещанная заказчику дата: 🚩 с глубиной просрочки либо ближайший срок. «Закупка» — Σ заказов СП-172, иначе из экономики проекта. «Валовая маржа» = продажа − закупка: логистика, таможня, пошлины и НДС в неё НЕ входят. Красная строка — требует внимания. Клик по строке — вся сделка целиком; по заголовку — сортировка.</div><div class="note tsnote">На узком экране таблица прокручивается вбок; часть колонок скрыта — все цифры есть в карточке сделки.</div><div class="tscroll"><table class="ctab"><thead id="ctHead"></thead><tbody id="ctBody"></tbody></table></div></section>`;
   el.innerHTML=h;
 
   // ---------- рендер таблицы ----------
   const head=()=>{document.getElementById('ctHead').innerHTML=`<tr><th class="r sortable${sortKey==='seq'?' on':''}" data-sk="seq" style="width:48px">№${sortKey==='seq'?(sortDir<0?' ▾':' ▴'):''}</th>`+COLS.map(c=>`<th class="${c[2]==='r'?'r ':''}sortable${sortKey===c[0]?' on':''}" data-sk="${c[0]}">${c[1]}${sortKey===c[0]?(sortDir<0?' ▾':' ▴'):''}</th>`).join('')+'</tr>';};
   const mcell=x=>{const cl=(x.marginEur||0)<0?'color:var(--nr)':'color:var(--ok)';const pct=x.marginPct==null?'<span class="dimv">—</span>':(x.marginPct+'%');return `<div class="mono" style="${x.marginEur==null?'color:var(--dim)':cl}">${x.marginLbl}</div><div class="dep">${pct}</div>`;};
   const pcell=x=>{
+    const gross=x.marginEur==null?'':`<div class="dep">валовая ${x.marginLbl}${x.marginPct!=null?` · ${x.marginPct}%`:''}</div>`;
     if(x.planProfitEur==null&&x.planMdEur==null)
-      return `<div class="mono" style="color:var(--dim)">—</div><div class="dep">${x.hasBudget?'бюджет не прочитан':'нет бюджета'}</div>`;
+      return `<div class="mono" style="color:var(--dim)">${x.hasBudget?'бюджет не прочитан':'нет бюджета'}</div>`+gross;
     if(x.planProfitEur==null)
-      return `<div class="mono" style="color:var(--dim)">—</div><div class="dep">только МД ${x.planMdLbl}</div>`;
+      return `<div class="mono" style="color:var(--dim)">только МД ${x.planMdLbl}</div>`+gross;
     const cl=x.planProfitEur<0?'color:var(--nr)':'color:var(--ok)';
-    const src=x.planPSrc==='deal'?'по сделке':'операционная';
-    return `<div class="mono" style="${cl}">${x.planProfitLbl}</div>`
-      +`<div class="dep">${x.planProfitPct!=null?x.planProfitPct+'% · ':''}${src}${x.planSusp?' <span class="nrc">⚠</span>':''}</div>`;};
+    return `<div class="mono" style="${cl};font-weight:700">${x.planProfitLbl}`
+      +`${x.planProfitPct!=null?` <span style="font-weight:400;font-size:11px">${x.planProfitPct}%</span>`:''}`
+      +`${x.planSusp?' <span class="nrc">⚠</span>':''}</div>`+gross;};
   const scell=x=>{
     if(!x.inCat0)return `<div class="dep">вне воронки</div>`;
     const nm=_esc(_stShort(x.stageName));
@@ -1452,7 +1469,14 @@ function renderContracts(){
     return `<div class="stgcell"><b>${x.dlNext}</b><div class="dep">в срок${x.noDl?' · без даты: '+x.noDl:''}</div></div>`;};
   const bcell=x=>{
     const b=`<div class="mono" style="color:${x.buySrc==='none'?'var(--dim)':'var(--a)'}">${x.buyLbl}</div>`;
-    const alt=x.discrep?(x.buySrc==='orders'?` <span class="srcb disc">≠ экон. ${_fmtE(x.buyEconEur)}</span>`:` <span class="srcb disc">≠ заказы ${_fmtE(x.buyOrdersEur)}</span>`):'';
+    // если альтернативный источник не бьётся с масштабом сделки (больше 3× суммы или
+    // меньше 3% от неё) — это не «другая оценка», а мусор в поле; числом не показываем
+    const wild=v=>x.saleEur>0&&v>0&&(v>x.saleEur*3||v<x.saleEur*0.03);
+    const altV=x.buySrc==='orders'?x.buyEconEur:x.buyOrdersEur;
+    const altN=x.buySrc==='orders'?'экон.':'заказы';
+    const alt=!x.discrep?'':(wild(altV)
+      ? ` <span class="srcb disc" title="${altN} ${_fmtE(altV)} против суммы сделки ${x.saleLbl}">⚠ ${altN}: сумма не сходится</span>`
+      : ` <span class="srcb disc">≠ ${altN} ${_fmtE(altV)}</span>`);
     const tags=(x.buySrc==='econ'?'<span class="srcb econ">эконом.</span>':'')+(x.buySrc==='file'?'<span class="srcb econ">файл</span>':'')+(x.buySrc==='none'&&!x.noEcon?'<span class="srcb none">нет данных</span>':'')+(x.noEcon?'<span class="srcb none">🚩 нет экономики</span>':'')+alt+(x.econAt?' <span class="srcb chk">✓экон.</span>':'');
     return b+(tags?`<div class="dep">${tags}</div>`:'');};
   function rows(){
@@ -1466,14 +1490,13 @@ function renderContracts(){
     if(q){const s=q.toLowerCase(); r=r.filter(x=>((x.customer||'')+' '+(x.title||'')+' '+x.deal+' '+(x.suppliers||'')+' '+(x.manager||'')+' '+(x.oss||'')+' '+(x.cities||'')).toLowerCase().includes(s));}
     r=r.slice().sort((a,b)=> NUM[sortKey] ? ((a[sortKey]||0)-(b[sortKey]||0))*sortDir : String(a[sortKey]||'').localeCompare(String(b[sortKey]||''),'ru')*sortDir);
     document.getElementById('ctCount').textContent=`(${r.length} из ${R.length})`;
-    document.getElementById('ctBody').innerHTML=r.map(x=>`<tr class="drill${(x.late||x.slow)&&!x.closed?' slowrow':''}" data-ct="${x.deal}"><td class="r mono" style="color:var(--a2)">${x.seq||'—'}</td><td><div class="who">${_esc(x.customer)}</div><div class="dep">${_esc(x.title)}</div></td>`
-      +`<td><div class="mono">${x.deal?('#'+x.deal):'—'}</div><div class="dep">${x.done?'<span class="pill p-selected">завершён</span>':(x.lost?'<span class="pill p-no_answer">проиграна</span>':'<span class="pill">в реализации</span>')} ${x.norders}×закуп${x.suppliers?(' · '+_esc(x.suppliers)):''}</div></td>`
+    document.getElementById('ctBody').innerHTML=r.map(x=>`<tr class="drill${(x.late||x.slow)&&!x.closed?' slowrow':''}" data-ct="${x.deal}"><td class="r mono" style="color:var(--a2)">${x.seq||'—'}</td><td><div class="who">${_esc(x.customer)}</div><div class="dep">${_esc(x.title)}</div>`
+      +`<div class="dep">${x.done?'<span class="pill p-selected">завершён</span>':(x.lost?'<span class="pill p-no_answer">проиграна</span>':'<span class="pill">в реализации</span>')} ${x.norders}×закуп${x.suppliers?(' · '+_esc(x.suppliers)):''}</div></td>`
       +`<td>${scell(x)}</td>`
       +`<td>${dcell(x)}</td>`
       +`<td class="r"><div class="amt1">${x.saleLbl}</div><div class="dep">${x.saleCur&&x.saleCur!=='EUR'?_esc(x.saleOrig):''}</div></td>`
       +`<td class="r">${bcell(x)}</td>`
-      +`<td class="r">${mcell(x)}</td>`
-      +`<td class="r">${pcell(x)}</td></tr>`).join('')||'<tr><td colspan="9" class="dimv" style="padding:14px">ничего не найдено</td></tr>';
+      +`<td class="r">${pcell(x)}</td></tr>`).join('')||'<tr><td colspan="7" class="dimv" style="padding:14px">ничего не найдено</td></tr>';
   }
   head(); rows();
 
