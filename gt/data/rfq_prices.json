@@ -1,0 +1,830 @@
+{
+"updated": "2026-08-08",
+"prices": [
+{
+"pn": "5373898",
+"usd_lo": 90,
+"usd_hi": 330,
+"conf": "A",
+"basis": "retail: SLE Equipment $326.50 (OEM); eBay/китайские аналоги от ~$90",
+"url": "https://sleequipment.com/catalog/product/view/id/4113372/s/5373898-cummins-2023/",
+"note": "Свеча зажигания Cummins K38/QSV81/QSV91 (газопоршневые). Есть азиатские кроссы (sparkplugsfactory) значительно дешевле OEM"
+},
+{
+"pn": "GI3-3",
+"usd_lo": 55,
+"usd_hi": 110,
+"conf": "B",
+"basis": "retail: Amazon/DensoProducts/Splugs — цена серии Denso GI3-x, точная цена скрыта",
+"url": "https://www.densoproducts.com/denso-6116-gi3-3-industrial-plug",
+"note": "Промышленная свеча Denso GI3-3 (6116) для газовых двигателей; кросс RB77WPCC (Champion). Серия GI3-1/GI3-5 в рознице $55-110"
+},
+{
+"pn": "4970773",
+"usd_lo": 3,
+"usd_hi": 15,
+"conf": "C",
+"basis": "экспертная вилка по типу детали (аналог Cummins 3920773 sealing washer от $5.51, aftermarket.supply)",
+"url": "https://aftermarket.supply/cummins/3920773.html",
+"note": "Уплотнительная шайба свечи зажигания — мелкая метизная позиция, OEM у дилера дороже, Азия дешевле"
+},
+{
+"pn": "4380132",
+"usd_lo": 200,
+"usd_hi": 835,
+"conf": "A",
+"basis": "retail: Reliable Industries $835.13 (OEM); Азия/eBay заметно дешевле",
+"url": "https://store.reliableindustries.com/engine-parts/cummins/4089629-plug-spark/",
+"note": "Свеча зажигания Cummins (QSK60G и пр.), OEM очень дорогая; китайские кроссы (sparkplugsfactory) ~$150-300"
+},
+{
+"pn": "4351035",
+"usd_lo": 30,
+"usd_hi": 70,
+"conf": "A",
+"basis": "retail: FinditParts MSRP $50.72",
+"url": "https://www.finditparts.com/products/8857694/cummins-4351035",
+"note": "Колпачок (boot) свечи зажигания QSK60G; есть кросс Denso 97-8200/674-1000 (MurCal)"
+},
+{
+"pn": "4067146",
+"usd_lo": 5,
+"usd_hi": 25,
+"conf": "C",
+"basis": "экспертная вилка по типу детали (мелкая прокладка Cummins OEM)",
+"note": "Прокладка под катушку зажигания; у дилера Cummins обычно $10-25, Азия $2-8"
+},
+{
+"pn": "102981",
+"usd_lo": 2,
+"usd_hi": 15,
+"conf": "C",
+"basis": "экспертная вилка по типу детали (о-кольцо Jenbacher, OEM ONERGYS vs Азия)",
+"note": "Уплотнительное кольцо Jenbacher; типовой Viton/NBR о-ринг, есть недорогие аналоги по размеру"
+},
+{
+"pn": "334976-433894",
+"usd_lo": 250,
+"usd_hi": 500,
+"conf": "A",
+"basis": "retail/Азия: Weyeah/eBay ~$299 за 433894; оригинал ONERGYS дороже",
+"url": "https://www.weyeahmotor.com/Pre-chamber-gas-valve-433894-for-Jenbacher-gas-engine-pd45013014.html",
+"note": "Клапан газовый форкамеры Jenbacher Type 6 (J612/J616/J620). Кросс/замена 321631; альтернативы ONERGYS ONE222082 дешевле оригинала"
+},
+{
+"pn": "404492-1214569",
+"usd_lo": 320,
+"usd_hi": 650,
+"conf": "A",
+"basis": "retail: eChoiceParts $347.66 за к-кт 4 шт; eBay EU ~€165/шт; Китай ~$100/шт MOQ20",
+"url": "https://echoiceparts.com/item/JEN--1214569",
+"note": "К-кт 4 свечей Denso 518 в банке (Jenbacher 1214569) для J620; цена за комплект. Много подделок — оригинал в жестяной банке дороже"
+},
+{
+"pn": "3420932",
+"usd_lo": 10,
+"usd_hi": 40,
+"conf": "C",
+"basis": "экспертная вилка по типу детали (прокладка Cummins QSV, точной retail-цены нет)",
+"note": "Прокладка Cummins для газового QSV; OEM у дилера, кроссов мало"
+},
+{
+"pn": "LF9050",
+"usd_lo": 60,
+"usd_hi": 134,
+"conf": "A",
+"basis": "retail: eBay $60, buyparts.online $79.30, Amazon $125.25",
+"url": "https://www.amazon.com/Cummins-Filtration-Fleetguard-LF9050-Filter/dp/B0844KW4L6",
+"note": "Масляный фильтр Fleetguard (комби full-flow+bypass, K38/K50). Кроссы: Donaldson/Baldwin B7577 дешевле"
+},
+{
+"pn": "319737",
+"usd_lo": 2,
+"usd_hi": 15,
+"conf": "C",
+"basis": "экспертная вилка по типу детали (о-кольцо Jenbacher)",
+"note": "О-кольцо Jenbacher; типовой эластомер, доступны аналоги по размеру/материалу"
+},
+{
+"pn": "3430009",
+"usd_lo": 2,
+"usd_hi": 10,
+"conf": "C",
+"basis": "экспертная вилка по типу детали (о-ринг Cummins OEM)",
+"note": "О-кольцо болта крышки клапанов QSV; копеечная деталь, у дилера $3-10"
+},
+{
+"pn": "3336259",
+"usd_lo": 2,
+"usd_hi": 10,
+"conf": "C",
+"basis": "экспертная вилка по типу детали (о-ринг Cummins OEM)",
+"note": "О-кольцо колодца свечи верхнее (QSV/QSK); аналоги по размеру из Viton дешевле"
+},
+{
+"pn": "3087911",
+"usd_lo": 2,
+"usd_hi": 10,
+"conf": "C",
+"basis": "экспертная вилка по типу детали (о-ринг Cummins OEM)",
+"note": "О-кольцо колодца свечи нижнее; типовой о-ринг"
+},
+{
+"pn": "3428767",
+"usd_lo": 2,
+"usd_hi": 12,
+"conf": "C",
+"basis": "экспертная вилка по типу детали (о-ринг Cummins OEM)",
+"note": "О-кольцо крышки распредвала QSV; типовой о-ринг"
+},
+{
+"pn": "DCA4",
+"usd_lo": 220,
+"usd_hi": 350,
+"conf": "A",
+"basis": "retail: FinditParts MSRP $346.31 за DCA75L (18.9 л); Deere/дистрибьюторы дешевле",
+"url": "https://www.finditparts.com/products/7893501/fleetguard-dca75l",
+"note": "Присадка SCA Fleetguard DCA4, ведро 5 гал (DCA75L). Цена за ведро 18.9 л; аналог Penray/Baldwin SCA дешевле"
+},
+{
+"pn": "LF16031",
+"usd_lo": 80,
+"usd_hi": 232,
+"conf": "A",
+"basis": "retail: Filter Service & Supply $232.00; Азия/aftermarket от ~$80",
+"url": "https://www.filterserviceandsupply.com/fleetguard-lf16031-oil-filter/",
+"note": "Картридж масляного фильтра (кросс Cummins 3420742, QSV91). Китайские кроссы существенно дешевле OEM Fleetguard"
+},
+{
+"pn": "3422444",
+"usd_lo": 2,
+"usd_hi": 12,
+"conf": "C",
+"basis": "экспертная вилка по типу детали (о-ринг Cummins OEM)",
+"note": "О-кольцо фланца колодца свечи QSV; типовой о-ринг"
+},
+{
+"pn": "112197",
+"usd_lo": 3,
+"usd_hi": 20,
+"conf": "C",
+"basis": "экспертная вилка по типу детали (уплотнение Jenbacher OEM vs аналог)",
+"note": "Уплотнение Jenbacher; недорогая расходная позиция, есть неоригинальные аналоги (ONERGYS alternative)"
+},
+{
+"pn": "AF25544",
+"usd_lo": 200,
+"usd_hi": 320,
+"conf": "A",
+"basis": "retail: Modern Shop $247.57, G&T $254.83, Big Rig World $317.24, eBay от $199.99",
+"url": "https://shop.moderngroup.com/af25544-air-filter-primary/",
+"note": "Воздушный фильтр первичный Fleetguard (QSV/QSK); кроссы Donaldson P546615/Baldwin дешевле"
+},
+{
+"pn": "CT91035/368",
+"usd_lo": 1,
+"usd_hi": 8,
+"conf": "C",
+"basis": "экспертная вилка по типу детали (обжимной контакт разъёма, типовые Harting/Amphenol-контакты)",
+"note": "Обжимной контакт для разъёмов Siemens SGT-400; за штуку копеечная позиция, продаётся упаковками; точный PN только через Siemens Energy"
+},
+{
+"pn": "15508.2",
+"usd_lo": 25,
+"usd_hi": 90,
+"conf": "C",
+"basis": "экспертная вилка по типу детали (промышленное реле в шкаф Siemens PMS; точный PN не находится в открытых каталогах)",
+"note": "Реле из шкафа управления Siemens; PN внутренний (проектный). По типу — миниатюрное 4-полюсное реле класса Releco C9/Siemens LZX, розница $25-90"
+},
+{
+"pn": "4010887",
+"usd_lo": 15,
+"usd_hi": 30,
+"conf": "A",
+"basis": "retail: Modern Shop $21.80",
+"url": "https://shop.moderngroup.com/4010887-element-oil-bypass-filter/",
+"note": "Бумажная вставка центрифуги (element oil bypass) Cummins K38/K50, кросс 3393592/401088700; дешёвая расходная позиция"
+},
+{
+"pn": "657541",
+"usd_lo": 20,
+"usd_hi": 280,
+"conf": "B",
+"basis": "retail EU: PowerUp ~€256 (оригинал); Азия (Weyeah/Zuhon) $15-40 аналог",
+"url": "https://www.powerup.at/shop/product/spark-plug-pup-jenbacher-s3-4-v6-4-pcs/",
+"note": "Наконечник (connector) запальной свечи Jenbacher Type 2/3/4; оригинал дорого, китайские кроссы (657540/657541) в разы дешевле"
+},
+{
+"pn": "12211061",
+"usd_lo": 2,
+"usd_hi": 10,
+"conf": "C",
+"basis": "экспертная вилка по типу детали (уплотнительное кольцо свечи MWM/Deutz TCG2020)",
+"note": "Кольцо свечи зажигания Deutz/MWM; расходник, есть аналоги"
+},
+{
+"pn": "1180993",
+"usd_lo": 10,
+"usd_hi": 40,
+"conf": "C",
+"basis": "экспертная вилка по типу детали (уплотнение клапанной коробки MWM/Deutz)",
+"note": "Уплотнение клапанной коробки TCG2020; OEM через MWM/Motortech, аналоги дешевле"
+},
+{
+"pn": "12032892",
+"usd_lo": 10,
+"usd_hi": 40,
+"conf": "C",
+"basis": "экспертная вилка по типу детали (прокладка клапанной коробки MWM/Deutz)",
+"note": "Прокладка клапанной крышки TCG2020; OEM через MWM, есть неоригинал"
+},
+{
+"pn": "12420480",
+"usd_lo": 40,
+"usd_hi": 140,
+"conf": "B",
+"basis": "дистрибьюторы MOPA/ONERGYS (цена по запросу) + вилка по аналогам промышленных свечей MWM/Denso",
+"url": "https://www.mopamotorparts.com/spark-plug-12420480-suitable-for-mwm-deutz-engines/12420480",
+"note": "Свеча зажигания MWM/Deutz TBG616/620, TCG2016/2020; китайские кроссы (Torch S-R6A12) $20-40, оригинал €90-130"
+},
+{
+"pn": "C9-A41FX/DC24V + S9-M",
+"usd_lo": 35,
+"usd_hi": 80,
+"conf": "B",
+"basis": "retail: Newark C9-A41FX24D, Amazon C9-A41 DX $62.68, eBay $35 + сокет S9-M ~$10-15",
+"url": "https://www.newark.com/releco/c9-a41fx24d/relay-4pdt-250vac-30vdc-5a/dp/80K9569",
+"note": "Реле Releco/Comat C9 4PDT 24VDC с LED + колодка S9-M (в шкафах Siemens ставится как Siemens PMS PN). Цена за комплект реле+сокет"
+},
+{
+"pn": "379932",
+"usd_lo": 3,
+"usd_hi": 20,
+"conf": "C",
+"basis": "экспертная вилка по типу детали (уплотнение Jenbacher)",
+"note": "Уплотнение Jenbacher; типовой расходник, есть аналоги"
+},
+{
+"pn": "497431",
+"usd_lo": 2,
+"usd_hi": 15,
+"conf": "C",
+"basis": "экспертная вилка по типу детали (о-кольцо Jenbacher)",
+"note": "О-кольцо Jenbacher; типовой эластомер"
+},
+{
+"pn": "231400",
+"usd_lo": 25,
+"usd_hi": 120,
+"conf": "C",
+"basis": "экспертная вилка по типу детали (вкладыш фильтра Jenbacher с о-кольцом; Азия vs оригинал ONERGYS)",
+"note": "Вкладыш фильтра с о-кольцом Jenbacher; китайские аналоги (Weyeah и пр.) $20-50, оригинал заметно дороже"
+},
+{
+"pn": "265174-263174",
+"usd_lo": 60,
+"usd_hi": 220,
+"conf": "C",
+"basis": "экспертная вилка по классу Jenbacher фильтр-картриджей (GLMW/ONERGYS — цены только по логину)",
+"url": "https://shopglmw.com/product/filter-insert-for-jenbacher-1219670/",
+"note": "Фильтр-вкладыш Type 6E+F DN25, кросс на новый PN 1219670; аналоги GLMW/PowerUP дешевле оригинала INNIO"
+},
+{
+"pn": "328577",
+"usd_lo": 6,
+"usd_hi": 40,
+"conf": "B",
+"basis": "дистрибьюторы TME/Digi-Key по серии Schrack RT (реле в списках ЗИП JMS620 фигурирует как RT580024)",
+"url": "https://www.tme.com/us/en-us/katalog/relays_40/p,schrack_188/",
+"note": "Реле Schrack (TE) под Jenbacher-артикулом; компонент стоит $5-10, через канал INNIO — заметно дороже"
+},
+{
+"pn": "201601",
+"usd_lo": 90,
+"usd_hi": 250,
+"conf": "B",
+"basis": "каталог запчастей Jenbacher 208GS (2009): €196 за 201601 + текущие площадки аналогов",
+"url": "https://www.scribd.com/document/480669661/02-208-xls",
+"note": "Масляный фильтр-вкладыш Jenbacher; аftermarket (PowerUP, Китай) — нижняя граница, оригинал INNIO — верхняя"
+},
+{
+"pn": "3420807",
+"usd_lo": 3,
+"usd_hi": 15,
+"conf": "C",
+"basis": "экспертная вилка по аналогичным кольцевым уплотнениям Cummins QSK/QSV (анкер — найденная цена 120554: $6.5-14.5)",
+"note": "Мелкое O-ring уплотнение; на shop.cummins/аftermarket такие кольца $3-15"
+},
+{
+"pn": "245488-631265",
+"usd_lo": 60,
+"usd_hi": 354,
+"conf": "A",
+"basis": "retail eChoiceParts $284-354 (оригинал); нижняя — азиатский аналог fridayparts/eBay",
+"url": "https://echoiceparts.com/item/JEN%20631265",
+"note": "Масляный фильтр-элемент с O-ring (631265=245488, кросс SH65459V); китайские аналоги ~$60-90"
+},
+{
+"pn": "CT91035/17",
+"usd_lo": 1,
+"usd_hi": 6,
+"conf": "C",
+"basis": "экспертная вилка по типу детали (кабельные стяжки нерж./термостойкие, OEM-артикул Siemens SGT-400)",
+"note": "Цена за штуку; как OEM-позиция Siemens может продаваться упаковками и в разы дороже"
+},
+{
+"pn": "238.527 188137",
+"usd_lo": 20,
+"usd_hi": 60,
+"conf": "B",
+"basis": "остатки/NOS на Amazon.de и eBay ~€25-50 (снят с производства)",
+"url": "https://www.amazon.de/Vossloh-Schwabe-ELXe-238-527-EVG/dp/B00K7YBKK8",
+"note": "Электронный ЭПРА Vossloh-Schwabe ELXe 238.527 для T8 30-38Вт; заменяем современными ЭПРА других брендов (Tridonic, Osram)"
+},
+{
+"pn": "344542-431447",
+"usd_lo": 55,
+"usd_hi": 145,
+"conf": "B",
+"basis": "кросс MANN LC 15 001 x — list-цена €130.48 (ONERGYS); аftermarket дешевле",
+"url": "https://www.onergys.de/en/bluefriday/filter-cartridge-mann-lc-15-001-x.html",
+"note": "Фильтр вентиляции картера (blow-by); прямой кросс MANN LC 15 001 x — брать по нему значительно дешевле оригинала"
+},
+{
+"pn": "AF25545",
+"usd_lo": 90,
+"usd_hi": 162,
+"conf": "A",
+"basis": "retail: Modern Shop $111.88, eBay $90, Irontime $162",
+"url": "https://shop.moderngroup.com/af25545-air-filter-secondary/",
+"note": "Вторичный воздушный фильтр Fleetguard; есть кроссы Donaldson/Baldwin/WIX — обычно на 20-30% дешевле"
+},
+{
+"pn": "3332291",
+"usd_lo": 8,
+"usd_hi": 30,
+"conf": "C",
+"basis": "экспертная вилка по классу (прокладка/уплотнение крышки клапанов Cummins; листинги точного PN на eBay без открытой цены)",
+"url": "https://www.ebay.com/itm/257016955080",
+"note": "Фактически прокладка клапанной крышки (gasket rocker cover), не мелкое O-ring; есть аftermarket-аналоги"
+},
+{
+"pn": "120554",
+"usd_lo": 6.5,
+"usd_hi": 14.5,
+"conf": "A",
+"basis": "retail: Modern Equipment Parts $6.47, FinditParts $14.49",
+"url": "https://modernequipmentparts.com/120554-cummins-oem-o-ring-seal/",
+"note": "O-ring колодца свечи (верхнее), оригинал Cummins; широко доступно"
+},
+{
+"pn": "3651213",
+"usd_lo": 3,
+"usd_hi": 15,
+"conf": "C",
+"basis": "экспертная вилка по аналогичным O-ring Cummins (анкер — цена 120554 той же группы)",
+"note": "O-ring колодца свечи (нижнее); класс цены идентичен 120554"
+},
+{
+"pn": "4010888",
+"usd_lo": 20,
+"usd_hi": 80,
+"conf": "C",
+"basis": "экспертная вилка по типу детали (ремкомплект уплотнений центрифуги Cummins QSK/QSV)",
+"note": "Комплект уплотнений центробежного маслофильтра; точной публичной цены нет, у дилеров Cummins по запросу"
+},
+{
+"pn": "QR-C",
+"usd_lo": 15,
+"usd_hi": 45,
+"conf": "B",
+"basis": "retail Amazon $23.16 (Releco C9-A41X 24VDC, 4 переключающих контакта), новые C7/C9 $23-42, сток/б-у от $6.5",
+"url": "https://www.amazon.com/C9A41X24D-RELECO-Relay-LAMP-24VDC/dp/B07HCL81SC",
+"note": "QR-C — серия реле Releco (не Siemens); под 4CO 24VDC подходит C9-A41X 24D, доступно у дистрибьюторов"
+},
+{
+"pn": "VS-4-57",
+"usd_lo": 150,
+"usd_hi": 600,
+"conf": "C",
+"basis": "экспертная вилка по типу детали (электрод розжига промышленной горелки, Victory Energy SparkMax — цены только по запросу)",
+"note": "Электрод розжига горелки котла Victory Vision; OEM-канал, публичных цен нет; изготовление по образцу возможно дешевле"
+},
+{
+"pn": "Renata CR2477N",
+"usd_lo": 2,
+"usd_hi": 8,
+"conf": "A",
+"basis": "retail: American Perfit $1.97, PartsSource $5.08, Walmart $5.98-6.99",
+"url": "https://www.walmart.com/ip/Renata-CR2477N-3V-Lithium-Battery/398233521",
+"note": "Литиевая таблетка 3V 950mAh; массовый товар, при опте <$2/шт"
+},
+{
+"pn": "SP006612",
+"usd_lo": 30,
+"usd_hi": 120,
+"conf": "C",
+"basis": "экспертная вилка: панельный/карманный фильтр класса M 24x24x4\" — generic $25-60, как OEM-позиция Siemens дороже",
+"note": "Воздушный фильтр КВОУ; по размеру 610x610x100 мм подбирается у Camfil/AAF/Freudenberg значительно дешевле OEM"
+},
+{
+"pn": "CC2602M",
+"usd_lo": 55,
+"usd_hi": 61,
+"conf": "A",
+"basis": "retail: Modern Shop $60.18, Walmart $60.99 — за флакон 50 полосок",
+"url": "https://shop.moderngroup.com/cc2602m-coolant-analysis/",
+"note": "3-way тест-полоски ОЖ Fleetguard, метрическая версия; цена за упаковку (50 шт), т.е. ~$1.2/полоска"
+},
+{
+"pn": "55.34.9.024.0040 с розеткой 94.74",
+"usd_lo": 16,
+"usd_hi": 30,
+"conf": "A",
+"basis": "дистрибьюторы: реле Newark $13.68 / RS $13.88 / Southern Controls $11.13 + розетка 94.74 ~$5-9",
+"url": "https://www.newark.com/finder/55-34-9-024-0040/relay-power-4pdt-24vdc-7a-socket/dp/08X7197",
+"note": "Реле Finder 55.34 4PDT 7A 24VDC + розетка 94.74; массовая позиция, доступна у RS/TME/Digi-Key"
+},
+{
+"pn": "3AXD50000426157",
+"usd_lo": 800,
+"usd_hi": 2500,
+"conf": "C",
+"basis": "экспертная вилка по классу ABB Preventive Maintenance Kit для ACS800 (идентифицирован как ACS800 MODULE PCB KIT 4); аналогичные платы/киты ACS800 на вторичке $400-2850",
+"url": "https://eltra-trade.com/products/abb-3axd",
+"note": "Ремкомплект плат ACS800 (PM Kit 4); цена сильно зависит от габарита привода, у дистрибьюторов ABB по запросу"
+},
+{
+"pn": "1236100",
+"usd_lo": 55,
+"usd_hi": 90,
+"conf": "A",
+"basis": "Alibaba $280 за банку 4 шт (~$70/шт); eChoiceParts (PowerUP-аналог) $301.37 за 4 шт",
+"url": "https://echoiceparts.com/item/POW%201109190",
+"note": "Свеча P611 для J6/J9; PN 1236100 = жестянка 4 свечи (~$280-300), цена в строке — за 1 свечу; аналоги: PowerUP Green S6, Denso 436782"
+},
+{
+"pn": "SAFT LS14250 3PF",
+"usd_lo": 8,
+"usd_hi": 12,
+"conf": "A",
+"basis": "retail: BatteryStore $8.00, Industrial Battery Pros $9.95 (опт от $8)",
+"url": "https://www.batterystore.com/ls14250-3pf-1-2aa-saft-lithium-battery-w-2-pin-positive/",
+"note": "Li-SOCl2 1/2AA 3.6V с 3 выводами под пайку; следить за конфигурацией пинов (3PF vs 3PF-RP)"
+},
+{
+"pn": "3420802",
+"usd_lo": 3,
+"usd_hi": 15,
+"conf": "C",
+"basis": "экспертная вилка по аналогичным O-ring Cummins QSK/QSV (анкер — найденная цена 120554)",
+"note": "Кольцевое уплотнение; класс цены как у прочих O-ring Cummins"
+},
+{
+"pn": "CT91035/16",
+"usd_lo": 1,
+"usd_hi": 5,
+"conf": "C",
+"basis": "экспертная вилка по типу детали (кабельные стяжки, OEM-артикул Siemens SGT-400)",
+"note": "Цена за штуку; функциональный аналог — стандартные нерж. стяжки (ABB Ty-Rap, HellermannTyton) за центы-доллары"
+},
+{
+"pn": "SP107762",
+"usd_lo": 80,
+"usd_hi": 250,
+"conf": "C",
+"basis": "экспертная вилка по классу AAF HydroCel (картриджный фильтр КВОУ газовой турбины; цены AAF только по запросу)",
+"url": "https://www.aafintl.com/en/industry/energy-product/hydrocel-offshore-gt-filter/",
+"note": "Фильтр-элемент HydroCel 95 — производитель AAF International; брать напрямую у AAF/дистрибьюторов дешевле, чем через Siemens"
+},
+{
+"pn": "1292103",
+"usd_lo": 15,
+"usd_hi": 80,
+"conf": "C",
+"basis": "экспертная вилка по типу детали (прокладка/шайба crosshead liner насоса NOV 12-P-160; китайские изготовители ЗИП 12-P-160 — нижняя граница)",
+"url": "https://www.mudpump-parts.com/sale-12976888-nov-12-p-160-fliud-end-suction-mud-pump-module-1292243-1292244-for-drilling-rigs.html",
+"note": "По каталогу 12-P-160 поз. 150 — shim/gasket; масса китайских кроссов на этот насос"
+},
+{
+"pn": "04-1817",
+"usd_lo": 10,
+"usd_hi": 60,
+"conf": "C",
+"basis": "экспертная вилка по типу детали (спецболт крепления вибромотора вибросита Mi Swaco; аналоги у H-Screening/китайских поставщиков)",
+"url": "https://www.h-screening.com/parts/mi-swaco-mongoose-shale-shaker-parts/",
+"note": "Высокопрочный болт крепления вибродвигателя; неоригинальные поставщики ЗИП Mongoose заметно дешевле OEM SLB"
+},
+{
+"pn": "4011521",
+"usd_lo": 400,
+"usd_hi": 1120,
+"conf": "A",
+"basis": "retail Diesel Parts Direct: MSRP $1122.39, sale $1010.16; нижняя — азиатские аналоги для QSV",
+"url": "https://www.dieselpartsdirect.com/4011521",
+"note": "Элемент сапуна картера (крупный, для газовых QSV/QSK); дорогая оригинальная позиция, есть смысл искать кросс Fleetguard/аftermarket"
+},
+{
+"pn": "628477",
+"usd_lo": 110,
+"usd_hi": 200,
+"conf": "A",
+"basis": "retail: Weyeah/FridayParts $110.5 (аналог), ONERGYS list €182.98 (оригинал)",
+"url": "https://www.onergys.de/en/engines/for-jenbacher-engines/filter-cartridge-jenbacher-628477-original.html",
+"note": "Воздушный фильтр-патрон для J612/J616/J620; китайские аналоги — нижняя граница"
+},
+{
+"pn": "12128936",
+"usd_lo": 25,
+"usd_hi": 90,
+"conf": "B",
+"basis": "экспертная вилка по классу spin-on фильтров MWM/Deutz TCG2020/TBG616 (точный PN подтверждён в каталогах, цены по запросу; есть кроссы)",
+"url": "https://www.oilfilter-crossreference.com/convert/DEUTZ/12128936",
+"note": "Масляный spin-on фильтр MWM-Deutz (TBD/TBG616/620, TCG2020); есть кроссы Mann/Hengst/Fleetguard дешевле"
+},
+{
+"pn": "4327849",
+"usd_lo": 100,
+"usd_hi": 400,
+"conf": "C",
+"basis": "экспертная вилка по классу катушек зажигания Cummins для газовых двигателей (точный PN в наличии у S1 Parts Center/777parts, цены по запросу)",
+"url": "https://s1partscenter.com/brands/cummins/electrical/4327849",
+"note": "Катушка зажигания газового Cummins; аналогичные OEM-катушки $150-400, азиатские аналоги от ~$80"
+},
+{
+"pn": "RI40390738-02",
+"usd_lo": 150,
+"usd_hi": 800,
+"conf": "C",
+"basis": "экспертная вилка: седла клапанов буровых насосов 12T1600 — китайские кроссы (Made-in-China) $100-300, оригинал Drillmec (Италия) кратно дороже",
+"url": "https://jxpetro.en.made-in-china.com/product/yFkGBqjKKNUs/China-Drillmec-12t1600-with-12p160-Valve-Covers-Liners-Gaskets-Valve-Seats-Inserts-Pistons.html",
+"note": "Седло клапана 12T1600 (взаимозаменяем с 12-P-160 типоразмерами); масса китайских изготовителей ЗИП"
+},
+{
+"pn": "01917713",
+"usd_lo": 20,
+"usd_hi": 100,
+"conf": "C",
+"basis": "экспертная вилка по типу детали (уплотнение крышки клапана бурового насоса; китайские кроссы для 12T1600/12-P-160 — нижняя граница)",
+"note": "Резиновое уплотнение клапанной крышки; расходник, доступен у неоригинальных поставщиков ЗИП"
+},
+{
+"pn": "RI40390738-03",
+"usd_lo": 15,
+"usd_hi": 80,
+"conf": "C",
+"basis": "экспертная вилка по типу детали + азиатские аналоги (Made-in-China: клапанные пружины буровых насосов API-6)",
+"note": "Пружина клапана из клапанного комплекта RI40390738 (API 6\" triplex, насос 12T1600). Точной цены нет; каталог подтверждён (CR191117). Китайские кроссы пружин API-6 $10-30, OEM Drillmec дороже."
+},
+{
+"pn": "RI40390738-04",
+"usd_lo": 10,
+"usd_hi": 50,
+"conf": "C",
+"basis": "экспертная вилка по типу детали (уплотнение/gasket клапана бурового насоса)",
+"note": "Уплотнение из того же клапанного комплекта RI40390738. Китайский aftermarket для клапанов API-6 заметно дешевле OEM."
+},
+{
+"pn": "5634409",
+"usd_lo": 120,
+"usd_hi": 400,
+"conf": "C",
+"basis": "экспертная вилка по серии катушек Cummins для газовых двигателей (соседний PN 5634407 в продаже на shop.cummins.com и Modern Shop, цена по запросу)",
+"url": "https://shop.cummins.com/SC/product/cummins-ignition-coil-5634407/01tKY000001zp81YAA",
+"note": "Точный PN 5634409 в открытой рознице не найден за 2 попытки. Аналогичные катушки Cummins (5310990 и др.) $80-150 aftermarket, OEM для газовых QSK/QSV дороже."
+},
+{
+"pn": "CT91035/239",
+"usd_lo": 1.5,
+"usd_hi": 10,
+"conf": "C",
+"basis": "экспертная вилка: высокотемпературные кабельные стяжки (нерж. сталь/PEEK), цена за шт",
+"note": "Внутренний PN пакета Siemens SGT-400, скорее всего перемаркированная стяжка (SS316/PEEK). Прямые кроссы (HellermannTyton MBT, Panduit MLT) $1-5/шт в рознице."
+},
+{
+"pn": "518532000",
+"usd_lo": 15,
+"usd_hi": 90,
+"conf": "C",
+"basis": "экспертная вилка по типу детали (коническая винтовая пружина, цементировочный агрегат SLB CPS-763)",
+"note": "OEM PN Schlumberger, публичной розницы нет — только по запросу у SLB/брокеров ЗИП. Изготовление по образцу у пружинных производств заметно дешевле."
+},
+{
+"pn": "439334000-1",
+"usd_lo": 15,
+"usd_hi": 90,
+"conf": "C",
+"basis": "экспертная вилка по типу детали (коническая винтовая пружина, SLB CPS-763)",
+"note": "Аналогично 518532000 — цена только по запросу у SLB; возможен заказ по чертежу/образцу."
+},
+{
+"pn": "68569591",
+"usd_lo": 1000,
+"usd_hi": 3870,
+"conf": "A",
+"basis": "дистрибьютор wiautomation (SAR 14 504,87 ≈ $3 868) + сток/eBay (комплект в наличии, обычно $1000-1800)",
+"url": "https://sa.wiautomation.com/abb/modules/68569591",
+"note": "IGBT-комплект FS450R17KE3/AGDR-71C (Infineon модуль + плата драйвера ABB) для приводов ACS800. Голый модуль Infineon FS450R17KE3 $300-600, драйвер AGDR-71C отдельно $400-900 — сборный кросс дешевле OEM-кита."
+},
+{
+"pn": "AF899M",
+"usd_lo": 120,
+"usd_hi": 420,
+"conf": "A",
+"basis": "розница США: SimplyFilter $416.36 (free shipping), Amazon/eBay aftermarket дешевле",
+"url": "https://www.simplyfilter.com/af899m-fleetguard-air-filter-p/af899m.htm",
+"note": "Крупный первичный воздушный фильтр Fleetguard. Есть азиатский aftermarket ($100-180); кроссы Donaldson/Baldwin по размеру дешевле оригинала."
+},
+{
+"pn": "585703",
+"usd_lo": 5,
+"usd_hi": 35,
+"conf": "C",
+"basis": "экспертная вилка по типу детали (скоба/хомут Jenbacher, мелкий крепёж) — по уровню цен Onergys/Weyeah на мелочёвку INNIO",
+"note": "Скоба 585703. Публичной цены нет; мелкие оригинальные детали INNIO у Onergys обычно €5-30. Китайские поставщики (Weyeah) дешевле."
+},
+{
+"pn": "BELIMO AF24-SR-S",
+"usd_lo": 400,
+"usd_hi": 775,
+"conf": "B",
+"basis": "цена близкого варианта AF24-SR US: Radwell $610-773 (new), HVAC-дистрибьюторы США новый ~$450-600",
+"url": "https://www.radwell.com/Buy/BELIMO/BELIMO/AF24-SR%20US",
+"note": "Пружинно-возвратный привод 24В 2-10В с доп. выключателями (-S). Точное исполнение 'L' не котируется публично; текущая замена в линейке — AFX24-SR-S/AFB24-SR-S по близкой цене."
+},
+{
+"pn": "SP106914",
+"usd_lo": 15,
+"usd_hi": 60,
+"conf": "C",
+"basis": "экспертная вилка: миниатюрный автоматический выключатель 6А (перемаркировка пакета Siemens SGT-400)",
+"note": "Внутренний PN пакетной поставки SGT-400; сам автомат — типовой MCB 6A (Siemens 5SY/5SJ и аналоги ABB/Eaton $10-30 в рознице), надбавка за OEM-маркировку."
+},
+{
+"pn": "55109-08-C",
+"usd_lo": 5,
+"usd_hi": 40,
+"conf": "C",
+"basis": "экспертная вилка по типу детали (винт NOV для гидроключа ST-80)",
+"note": "Крепёж NOV продаётся только через NOV/брокеров ЗИП, публичной розницы нет. По геометрии обычно кроссится на стандартный крепёж класса 12.9 значительно дешевле."
+},
+{
+"pn": "SQ0365-0009",
+"usd_lo": 14,
+"usd_hi": 21,
+"conf": "A",
+"basis": "розница РФ: ChipDip/Promelec/tdme.ru 1158-1638 RUB (~$14-20 по курсу ~80 RUB/USD)",
+"url": "https://www.chipdip.ru/product0/8020082173",
+"note": "ПРА (дроссель) для ламп ДНаТ/ДРИ-70 Вт, TDM Electric (РФ) — локальная позиция, не импорт. Широко доступна."
+},
+{
+"pn": "VS-6-82",
+"usd_lo": 80,
+"usd_hi": 300,
+"conf": "C",
+"basis": "экспертная вилка: электрод розжига промышленной горелки котла (Victory Energy Vision, тип SparkMax)",
+"note": "Электрод розжига. Victory Energy продаёт только напрямую/через Apex Industrial, публичных цен нет. Типовые электроды промышленных горелок (Durag/Chentronics аналоги) $75-250."
+},
+{
+"pn": "9090490700",
+"usd_lo": 20,
+"usd_hi": 120,
+"conf": "C",
+"basis": "экспертная вилка: крупногабаритное О-кольцо для плашечного превентора 18-3/4\" (Drilltech Cangzhou, Китай)",
+"note": "Китайский производитель БОП — запросная позиция через Alibaba/Made-in-China, там кольца NBR/HNBR такого типоразмера $10-60; с сертификатами API дороже."
+},
+{
+"pn": "337295",
+"usd_lo": 44,
+"usd_hi": 85,
+"conf": "A",
+"basis": "дистрибьютор: Onergys.de €75 (~$82, оригинал), Weyeah (Китай) $43.91",
+"url": "https://www.onergys.de/en/topseller/jenbacher/cylinder-head-gasket-jenbacher-337295-original.html",
+"note": "Прокладка ГБЦ Jenbacher Type 6. Есть кросс Elring 047.630 (~$40-50) — дешевле оригинала INNIO."
+},
+{
+"pn": "ERVOR 7200001",
+"usd_lo": 40,
+"usd_hi": 150,
+"conf": "C",
+"basis": "экспертная вилка: фильтроэлемент поршневого пускового компрессора ERVOR (Франция); адаптируемые фильтры на envirofluides.com для соседних PN",
+"note": "Точный PN не котируется публично; envirofluides.com продаёт адаптируемые фильтры для ERVOR ENVEE (соседние PN 7200017, 8970050) — неоригинал заметно дешевле."
+},
+{
+"pn": "ERVOR 8970040",
+"usd_lo": 60,
+"usd_hi": 250,
+"conf": "C",
+"basis": "экспертная вилка: ремкомплект обратного клапана компрессора (ERVOR, только по запросу у завода/Envirofluides)",
+"note": "Публичной цены нет. Типовые ремкомплекты клапанов поршневых компрессоров $50-200; оригинал ERVOR — верх вилки."
+},
+{
+"pn": "SDN10-24-100P",
+"usd_lo": 585,
+"usd_hi": 792,
+"conf": "A",
+"basis": "дистрибьюторы США: Wistex $585.21, MRO Supply $596.53, RS $730.41, wiautomation $792.24",
+"url": "https://www.wistexllc.com/power-supplies-ups/sdn10-24-100p.html",
+"note": "Блок питания DIN 24В 10А 240Вт SolaHD (Emerson). Широко доступен (DigiKey тоже). Функциональные кроссы (Phoenix QUINT, Mean Well SDR-240-24 ~$100-150) существенно дешевле, если бренд не критичен."
+},
+{
+"pn": "CT91012/118",
+"usd_lo": 3,
+"usd_hi": 15,
+"conf": "C",
+"basis": "экспертная вилка: предохранитель 2А anti-surge (типовой картриджный, перемаркировка пакета SGT-400)",
+"note": "Скорее всего стандартный предохранитель T2A (Bussmann/Littelfuse $1-5); OEM-маркировка Siemens даёт наценку."
+},
+{
+"pn": "SP107965",
+"usd_lo": 150,
+"usd_hi": 500,
+"conf": "C",
+"basis": "экспертная вилка: фильтроэлемент вспомогательных систем ГТУ SGT-400 (только через Siemens Energy/брокеров: Hangzhou Gas Turbine Parts, Blaze Turbine)",
+"note": "Публичных цен нет; типовые элементы (Peco/Parker/Hilco base) $100-400, OEM-канал Siemens — верх вилки. Китайские брокеры дешевле."
+},
+{
+"pn": "SP107964",
+"usd_lo": 150,
+"usd_hi": 500,
+"conf": "C",
+"basis": "экспертная вилка: фильтроэлемент SGT-400, аналогично SP107965",
+"note": "Парная позиция к SP107965, тот же канал поставки и уровень цен."
+},
+{
+"pn": "64/05002092/2",
+"usd_lo": 150,
+"usd_hi": 500,
+"conf": "C",
+"basis": "экспертная вилка: элемент маслофильтра ГТУ SGT-400 (обычно основа Hilco/Pall)",
+"note": "Старый формат PN Alstom/Ruston для SGT-400. По базовому элементу (Hilco/Pall) кросс дешевле; OEM Siemens — верх вилки."
+},
+{
+"pn": "64/05002096/6",
+"usd_lo": 150,
+"usd_hi": 500,
+"conf": "C",
+"basis": "экспертная вилка: фильтроэлемент SGT-400, аналогично 64/05002092/2",
+"note": "Та же серия PN и канал поставки, что у 64/05002092/2."
+},
+{
+"pn": "6ES7 132-4HB10-0AB0",
+"usd_lo": 31,
+"usd_hi": 123,
+"conf": "A",
+"basis": "сток/брокеры: all4sps.com $31.34; розница США: Relectric $122.76; много предложений на eBay/Amazon",
+"url": "https://www.relectric.com/6es7132-4hb10-0ab0",
+"note": "Модуль ET200S 2DO (релейный). Снят с производства (замена ET200SP), но складских остатков много — низ вилки реален при закупке у брокеров."
+},
+{
+"pn": "019811534",
+"usd_lo": 30,
+"usd_hi": 150,
+"conf": "C",
+"basis": "экспертная вилка: сухарь (die/jaw insert) гидравлического трубного ключа Drillmec PCT130",
+"note": "Публичной розницы нет; типовые сухари/плашки для гидроключей (китайские кроссы для ключей типа ZQ/TQ) $20-80, OEM Drillmec дороже."
+},
+{
+"pn": "337550",
+"usd_lo": 8,
+"usd_hi": 45,
+"conf": "C",
+"basis": "экспертная вилка по уровню цен мелких уплотнений Jenbacher у Onergys/Weyeah (аналогичные кольца €5-40)",
+"note": "Уплотнительное кольцо INNIO Jenbacher; точный PN в открытых каталогах не найден. Китайские поставщики (Weyeah, xbaza) дешевле оригинала."
+},
+{
+"pn": "22002000",
+"usd_lo": 15,
+"usd_hi": 90,
+"conf": "C",
+"basis": "экспертная вилка: уплотнительное кольцо системы P-Quip (liner/rod retention) бурового насоса",
+"note": "P-Quip (Forum Energy) продаёт через дилеров, публичных цен нет. Кроссы уплотнений для насосов 12T1600 доступны у китайских производителей ЗИП дешевле."
+},
+{
+"pn": "16002300",
+"usd_lo": 15,
+"usd_hi": 90,
+"conf": "C",
+"basis": "экспертная вилка: уплотнительное кольцо P-Quip, аналогично 22002000",
+"note": "Та же система P-Quip, тот же канал поставки."
+},
+{
+"pn": "WF2075",
+"usd_lo": 12,
+"usd_hi": 45,
+"conf": "A",
+"basis": "розница: shop.cummins.com $40.85, Trodo €29.67 (~$32), eBay/Amazon aftermarket от ~$12",
+"url": "https://shop.cummins.com/SC/product/fleetguard-water-spinon-filter-wf2075/01t4N0000048p26QAA",
+"note": "Фильтр охлаждающей жидкости Fleetguard (spin-on). Кроссы Baldwin BW5075/WIX 24075 типа — дешевле; массовая позиция."
+},
+{
+"pn": "487181",
+"usd_lo": 220,
+"usd_hi": 300,
+"conf": "A",
+"basis": "дистрибьютор: Onergys.de €251.86 (~$275, оригинал новый); eBay б/у $220",
+"url": "https://www.onergys.de/en/engine-technology/spark-plugs-ignition-system/ignition-coil-jenbacher-487181-original.html",
+"note": "Катушка зажигания (M-Coil) Jenbacher Type 2/3/4/6/9. Есть кросс MOTORTECH (серия 06.50.xxx) — обычно дешевле оригинала INNIO."
+}
+]
+}
