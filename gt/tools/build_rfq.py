@@ -52,6 +52,18 @@ def build_pool():
             e["what"] = e["what"] or (v.get("ev") or "")
 
     pool = {}
+    # компании из research без досье (свежий улов, в т.ч. волна по недостающим направлениям)
+    for x in D("research_suppliers.json")["rows"]:
+        k = nn(x.get("name", ""))
+        if not k:
+            continue
+        pool[k] = {
+            "name": x["name"], "country": x.get("country", ""), "site": x.get("site", ""),
+            "email": x.get("email", ""), "phone": "", "person": "",
+            "hook": "", "note": x.get("link", ""),
+            "what": (x.get("what", "") + " " + (x.get("link") or "")).strip(),
+            "prank": 4, "bx": 0, "bx_answered": False, "bx_models": [],
+        }
     for name, d in dossiers.items():
         k = nn(name)
         it = hist.get(k, [])
