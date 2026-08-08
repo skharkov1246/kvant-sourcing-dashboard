@@ -173,8 +173,34 @@ DIR_RULES = {
     "НВН: Liebherr (краны)": ("any", r"LIEBHERR|кран\b|crane|канат|такелаж|гидроцилиндр"),
     "НВН: Drilltech Cangzhou (буровое, реверс)": ("any", r"DRILLTECH|бурово|drilling|CANGZHOU|реверс"),
     "НВН: насосы (Bornemann/MarFlex)": ("any", r"BORNEMANN|MARFLEX|насос|pump"),
-    "НВН: прочие производители": ("nonprofile", r"."),
+    "НВН: прочие производители": ("any", r"."),
 }
+
+# «Прочее» — не категория, а мешок. Разбираем его по типу самой детали: из наименований
+# позиций достаём терминов-триггеры и требуем, чтобы профиль поставщика им отвечал.
+PART_TERMS = [
+    (r"сканер факела|детектор пламени|контрол\w* пламени|flame scan", r"сканер|flame|пламен|горелоч|burner|combustion|детектор"),
+    (r"газов\w* регистр|горелк", r"горелк|burner|регистр|register|combustion"),
+    (r"нагреват|подогреват|обогрев", r"нагреват|heater|подогрев|обогрев|heating element|thermal"),
+    (r"извещател|пожарн|обнаружени\w* пожара|газоанализ", r"пожар|fire|извещател|flame detect|gas detect|газоанализ|detector"),
+    (r"указател\w* уровня|уровнемер|гидрозатвор|смотров\w* стекл", r"уровн|level gauge|sight glass|смотров|indicator|gauge"),
+    (r"коммутатор|scalance|switch|брандмауэр|firewall|simatic ipc", r"коммутатор|switch|scalance|network|ethernet|промышленн\w* сет|simatic|automation|плк|plc"),
+    (r"наконечник|разъ[ёе]м|обжимн|контакт\b|стяжк", r"наконечник|разъ[ёе]м|connector|контакт|терминал|обжим|crimp|cable|кабель"),
+    (r"мультистанц|монитор|hmi|панел\w* оператора|дисплей", r"hmi|панел|дисплей|monitor|операторск|scada|визуализ"),
+    (r"экран|фильтр\w* воздухозабор|воздухозаборн", r"воздухозабор|air inlet|фильтр|filter|сетк|screen|mesh"),
+    (r"сигнализатор|барьер|искробезопасн", r"барьер|искробезопасн|intrinsic|сигнализатор|signal condition"),
+    (r"расцепител|выключател|3ah|3ak|3ae", r"выключател|switchgear|breaker|расцепител|коммутационн|вакуумн"),
+    (r"сервоклапан|servo|moog", r"сервоклапан|servo|гидравлик|hydraulic|пропорциональн"),
+    (r"канат|трос", r"канат|трос|rope|wire rope|такелаж"),
+    (r"джойстик|энкодер", r"джойстик|энкодер|encoder|joystick|датчик положени"),
+]
+
+
+def batch_profile(items):
+    """Регексп профиля поставщика, собранный из типов деталей конкретной пачки."""
+    blob = " ".join((i.get("name") or "") + " " + (i.get("model") or "") for i in items).lower()
+    pats = [sup_pat for trig, sup_pat in PART_TERMS if re.search(trig, blob, re.I)]
+    return "|".join(pats) if pats else None
 
 
 def model_match(sup, direction):
@@ -361,6 +387,15 @@ def main():
         # в предметную пачку — ТОЛЬКО специалисты, у кого эта номенклатура в профиле
         cands = [card(s, direction, cat, r) for s, r in spec if cat in sup_cats(s)]
         fallback = False
+        # «прочее»/«смешанная» — подбираем по типам деталей самой пачки, а не по категории
+        if cat in ("прочее", "смешанная пачка (мелкие категории)"):
+            prof = batch_profile(items)
+            if prof:
+                byparts = [card(s, direction, cat, r) for s, r in spec
+                           if re.search(prof, s["what"] + " " + s["note"] + " " + s["name"], re.I)]
+                if byparts:
+                    seen_n = {c["name"] for c in cands}
+                    cands += [c for c in byparts if c["name"] not in seen_n]
         if not cands:
             # профильного специалиста по этой номенклатуре в базе нет — показываем
             # специалистов направления с честной пометкой, чтобы пачка не висела пустой
