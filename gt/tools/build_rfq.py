@@ -206,6 +206,23 @@ MAKER_RE = re.compile(
     r"выпускает|reverse.?engineer|реверс-инжинир", re.I)
 
 
+# Кто понимает запрос ПО КОДУ (PN), а кому код чужого OEM ничего не говорит.
+# У нас чертежей нет — значит субпоставщику, работающему по чертежам заказчика,
+# запрос по PN отправлять бессмысленно: с ним разговор о номенклатуре и образце.
+PN_OK_RE = re.compile(
+    r"трейдер|trading|trade\b|дистрибьютор|distributor|дилер|dealer|реселлер|reseller|сток|stock|"
+    r"склад|каталог|catalog|запчаст|spare part|aftermarket|реверс|reverse.?engineer|"
+    r"кросс|cross.?refer|эквивалент|equivalent|interchangeable|взаимозаменя|"
+    r"собственн\w* чертеж|по своим чертежам|own drawing|own design|"
+    r"oem|авторизован|authorized|официальн\w* (дилер|партн)", re.I)
+
+
+def ask_mode(sup):
+    """'pn' — понимает запрос по каталожному номеру; 'nomen' — только по номенклатуре."""
+    blob = sup["what"] + " " + sup["note"] + " " + sup["name"]
+    return "pn" if PN_OK_RE.search(blob) else "nomen"
+
+
 def sup_cats(sup):
     """Категории ЗИП, которые реально видны в профиле поставщика."""
     blob = sup["what"] + " " + sup["note"] + " " + sup["name"]
@@ -323,7 +340,7 @@ def main():
         p, why = probability(sup, direction, cat)
         return {**{k: sup[k] for k in ("name", "country", "site", "email", "phone", "person", "hook")},
                 "p": p, "why": why, "bx": sup["bx"], "prank": sup["prank"], "role": role,
-                "cats": sorted(sup_cats(sup))[:4]}
+                "cats": sorted(sup_cats(sup))[:4], "ask": ask_mode(sup)}
 
     # адресаты направления, разложенные по ролям (считаем один раз на направление)
     by_dir = {}
