@@ -159,8 +159,9 @@ def build():
     try:
         subprocess.run([sys.executable, str(ROOT.parent / "gt" / "build.py")], check=True)
         (OUT / "gt").mkdir(exist_ok=True)
-        shutil.copy2(ROOT.parent / "gt" / "public" / "index.html", OUT / "gt" / "index.html")
-        print("gt: сайт ГТУ-библиотеки → zip/public/gt/index.html")
+        for page in (ROOT.parent / "gt" / "public").glob("*.html"):
+            shutil.copy2(page, OUT / "gt" / page.name)
+            print(f"gt: {page.name} → zip/public/gt/{page.name}")
     except Exception as e:  # ГТУ-сайт не должен ронять деплой базы ЗИП
         print(f"gt: пропущен ({e})")
 
