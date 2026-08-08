@@ -100,6 +100,11 @@ table.sortable th.desc::after{content:" ↓";color:var(--s1)}
 .pill.sc-md{border-color:var(--s1);color:var(--s1)}
 .pill.sc-lo{border-color:var(--serious);color:var(--serious)}
 .pill.sc-zero{border-color:var(--mut);color:var(--mut)}
+.sup.ex-go{border-left:4px solid var(--good);background:color-mix(in srgb,var(--good) 6%,var(--surface))}
+.sup.ex-hold{border-left:4px solid var(--warn);background:color-mix(in srgb,var(--warn) 9%,var(--surface))}
+.exbtn{cursor:pointer;font-size:12px;border:1px solid var(--border);border-radius:6px;padding:3px 8px;background:none;color:var(--ink2)}
+.exbtn.on-go{background:var(--good);border-color:var(--good);color:#08130a;font-weight:700}
+.exbtn.on-hold{background:var(--warn);border-color:var(--warn);color:#1a1405;font-weight:700}
 .pill.pr{font-weight:800;letter-spacing:.2px}
 .pill.pr1{background:var(--good);border-color:var(--good);color:#08130a}
 .pill.pr2{border-color:var(--good);color:var(--good)}
@@ -294,7 +299,7 @@ const nrm = s => {
 /* правки пользователя: статусы, заметки, скрытые, свои поставщики — в localStorage этого браузера */
 let EDITS;
 try{ EDITS = JSON.parse(localStorage.getItem('gt_edits_v2')) || {}; }catch(e){ EDITS = {}; }
-EDITS.st = EDITS.st||{}; EDITS.note = EDITS.note||{}; EDITS.hide = EDITS.hide||{}; EDITS.add = EDITS.add||[];
+EDITS.st = EDITS.st||{}; EDITS.note = EDITS.note||{}; EDITS.hide = EDITS.hide||{}; EDITS.add = EDITS.add||[]; EDITS.ex = EDITS.ex||{};
 function saveEdits(){ try{ localStorage.setItem('gt_edits_v2', JSON.stringify(EDITS)); }catch(e){} }
 
 function pickModels(text){
@@ -532,6 +537,7 @@ function pkCard(r){
  const st = EDITS.st[r.key]||'';
  const note = EDITS.note[r.key]||'';
  const hidden = !!EDITS.hide[r.key];
+ const ex = EDITS.ex[r.key]||'';
  const models = [...r.models].map(m=>{
   const n = r.bitrix[m];
   return `<span class="tag${n?' sgt':''}" title="${n?('предлагал нам: '+n+' запрос(ов)'):''}">${esc(m)}${n?' ×'+n:''}</span>`;
@@ -555,7 +561,7 @@ function pkCard(r){
  if(d.exports_to&&d.exports_to.length) dossierBits.push(`экспорт: ${d.exports_to.slice(0,5).join(', ')}${d.exports_to.length>5?'…':''}`);
  if(d.buys_from&&d.buys_from.length) dossierBits.push(`закупает у: ${d.buys_from.slice(0,3).join(', ')}`);
  if(d.contact_person) dossierBits.push(`контакт: ${d.contact_person}`);
- return `<div class="sup${hidden?' hid':''}" data-k="${esc(r.key)}">
+ return `<div class="sup${hidden?' hid':''}${ex==='go'?' ex-go':ex==='hold'?' ex-hold':''}" data-k="${esc(r.key)}">
   <div>
    <h4>${esc(r.name)}</h4>
    <div class="mut" style="margin:2px 0 6px">${esc(r.country)}${r.role?' · '+esc(r.role):''}</div>
@@ -576,6 +582,10 @@ function pkCard(r){
   </div>
   <div class="sup-side">
    <div class="contact">${contactLinks(r)}</div>
+   <div class="sup-ctl" style="margin-bottom:5px">
+    <button class="exbtn${ex==='go'?' on-go':''}" data-act="ex-go" title="оценка эксперта: этой компании стоит отправлять запросы">🟢 запрашивать</button>
+    <button class="exbtn${ex==='hold'?' on-hold':''}" data-act="ex-hold" title="оценка эксперта: запросы не отправлять (компания остаётся в базе)">🟡 не запрашивать</button>
+   </div>
    <div class="sup-ctl">
     <select data-act="status" title="статус работы">
      ${STATUSES.map(([v,n])=>`<option value="${v}"${v===st?' selected':''}>${n}</option>`).join('')}
@@ -588,17 +598,20 @@ function pkCard(r){
   </div>
  </div>`;
 }
-let pkState = {model:'', seg:'', typ:'', q:'', sort:'score', showHidden:false};
+let pkState = {model:'', seg:'', typ:'', ex:'', q:'', sort:'score', showHidden:false};
 function pkFilters(){
  const s = pkState;
  s.model = document.getElementById('pk-model').value;
  s.seg = document.getElementById('pk-seg').value;
  s.typ = document.getElementById('pk-typ').value;
+ s.ex = document.getElementById('pk-ex').value;
  s.q = document.getElementById('pk-q').value.trim().toLowerCase();
  s.sort = document.getElementById('pk-sort').value;
  s.showHidden = document.getElementById('pk-hid').checked;
  let rows = UNI.filter(r=>{
   if(!s.showHidden && EDITS.hide[r.key]) return false;
+  if(s.ex==='none'){ if(EDITS.ex[r.key]) return false; }
+  else if(s.ex){ if(EDITS.ex[r.key]!==s.ex) return false; }
   if(s.model && !coversModel(r,s.model)) return false;
   if(s.seg && !r.segs.has(s.seg)) return false;
   if(s.typ){
@@ -614,12 +627,15 @@ function pkFilters(){
   `<div class="box" style="border-left-color:var(--warn)">Никого не нашлось. Попробуйте убрать сегмент (он определён не у всех) или снять фильтры.</div>`;
  const hid = UNI.filter(r=>EDITS.hide[r.key]).length;
  const stn = UNI.filter(r=>EDITS.st[r.key]).length;
+ const exGo = UNI.filter(r=>EDITS.ex[r.key]==='go').length;
+ const exHold = UNI.filter(r=>EDITS.ex[r.key]==='hold').length;
  document.getElementById('pk-count').textContent =
-  `${rows.length} из ${UNI.length}${stn?` · со статусом: ${stn}`:''}${hid?` · скрыто: ${hid}`:''}${rows.length>300?' · показаны первые 300':''}`;
+  `${rows.length} из ${UNI.length}${exGo?` · 🟢 ${exGo}`:''}${exHold?` · 🟡 ${exHold}`:''}${stn?` · со статусом: ${stn}`:''}${hid?` · скрыто: ${hid}`:''}${rows.length>300?' · показаны первые 300':''}`;
  const active = [];
  if(s.model) active.push(['model','Модель: '+s.model]);
  if(s.seg) active.push(['seg','Сегмент: '+SEG_SHORT(s.seg)]);
  if(s.typ) active.push(['typ','Тип: '+TYPE_NAME[s.typ]]);
+ if(s.ex) active.push(['ex','Эксперт: '+(s.ex==='go'?'🟢 запрашивать':s.ex==='hold'?'🟡 не запрашивать':'без отметки')]);
  if(s.q) active.push(['q','Поиск: '+s.q]);
  document.getElementById('pk-active').innerHTML = active.length
   ? active.map(([k,t])=>`<span class="chip on" data-clear="${k}">${esc(t)} ✕</span>`).join('') +
@@ -630,15 +646,16 @@ function pkClear(k){
  if(k==='model'||k==='all') document.getElementById('pk-model').value='';
  if(k==='seg'||k==='all') document.getElementById('pk-seg').value='';
  if(k==='typ'||k==='all') document.getElementById('pk-typ').value='';
+ if(k==='ex'||k==='all') document.getElementById('pk-ex').value='';
  if(k==='q'||k==='all') document.getElementById('pk-q').value='';
  pkFilters();
 }
 function pkCSV(){
- const lines = ['компания;страна;тип;сегменты;модели;bitrix_запросов;доверие;статус;заметка;сайт;email;телефон;что делает'];
+ const lines = ['компания;страна;тип;сегменты;модели;bitrix_запросов;доверие;оценка_эксперта;статус;заметка;сайт;email;телефон;что делает'];
  for(const r of UNI){
   lines.push([r.name,r.country,(r.typ==='sub'?'субпоставщик: '+[...r.subOf].join('/'):TYPE_NAME[r.typ]),[...r.segs].map(SEG_SHORT).join(','),
    [...r.models].join(',')+(r.sgtAll?',SGT-все':'')+(r.solarAll?',Solar-все':'')+(r.heavyAll?',тяжёлые':''),
-   r.bxTotal,r.conf,ST_NAME[EDITS.st[r.key]||''],EDITS.note[r.key]||'',r.site,r.email,r.phone,r.what]
+   r.bxTotal,r.conf,EDITS.ex[r.key]==='go'?'запрашивать':EDITS.ex[r.key]==='hold'?'не запрашивать':'',ST_NAME[EDITS.st[r.key]||''],EDITS.note[r.key]||'',r.site,r.email,r.phone,r.what]
    .map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(';'));
  }
  const blob = new Blob(["﻿"+lines.join('\r\n')],{type:'text/csv;charset=utf-8'});
@@ -654,7 +671,7 @@ function pkImportEdits(inp){
  f.text().then(t=>{
   try{
    const e = JSON.parse(t);
-   Object.assign(EDITS.st, e.st||{}); Object.assign(EDITS.note, e.note||{}); Object.assign(EDITS.hide, e.hide||{});
+   Object.assign(EDITS.st, e.st||{}); Object.assign(EDITS.note, e.note||{}); Object.assign(EDITS.hide, e.hide||{}); Object.assign(EDITS.ex, e.ex||{});
    for(const a of (e.add||[])) if(!EDITS.add.some(x=>nrm(x.name)===nrm(a.name))) EDITS.add.push(a);
    saveEdits(); UNI=null; buildUnified(); pkFilters();
   }catch(err){ alert('Не удалось прочитать файл правок: '+err.message); }
@@ -697,6 +714,8 @@ function rPicker(){
    <select id="pk-seg" onchange="pkFilters()"><option value="">любой</option>${SEGS.map(([id,n])=>`<option value="${id}">${esc(n)}</option>`).join('')}</select></div>
   <div class="f-field"><label>Тип поставщика</label>
    <select id="pk-typ" onchange="pkFilters()"><option value="">любой</option>${TYPES.map(([v,n])=>`<option value="${v}">${n}</option>`).join('')}</select></div>
+  <div class="f-field"><label>Оценка эксперта</label>
+   <select id="pk-ex" onchange="pkFilters()"><option value="">любая</option><option value="go">🟢 запрашивать</option><option value="hold">🟡 не запрашивать</option><option value="none">без отметки</option></select></div>
   <div class="f-field"><label>Сортировка</label>
    <select id="pk-sort" onchange="pkFilters()">${Object.entries(SORTS).map(([v,[n]])=>`<option value="${v}">${n}</option>`).join('')}</select></div>
   <div class="f-field" style="flex:1;min-width:220px"><label>Поиск</label>
@@ -740,6 +759,11 @@ document.addEventListener('click', e=>{
   }
   if(btn.dataset.act==='hide'){
    if(EDITS.hide[k]) delete EDITS.hide[k]; else EDITS.hide[k]=1;
+   saveEdits(); pkFilters();
+  }
+  if(btn.dataset.act==='ex-go'||btn.dataset.act==='ex-hold'){
+   const v = btn.dataset.act==='ex-go'?'go':'hold';
+   if(EDITS.ex[k]===v) delete EDITS.ex[k]; else EDITS.ex[k]=v;  // повторный клик снимает отметку
    saveEdits(); pkFilters();
   }
  }
