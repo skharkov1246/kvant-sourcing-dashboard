@@ -199,9 +199,51 @@ def probability(sup, direction, cat):
     return min(85, max(3, p)), "; ".join(why)
 
 
+def load_prices():
+    """Цены с пометкой проверки: verified — источник открыт и подтверждён скептиком."""
+    try:
+        raw = D("rfq_prices.json")
+    except FileNotFoundError:
+        return {}
+    checks = {c["pn"].strip().upper(): c for c in raw.get("checks", []) if c.get("pn")}
+    out = {}
+    for p in raw.get("prices", []):
+        pn = (p.get("pn") or "").strip().upper()
+        if not pn:
+            continue
+        c = checks.get(pn)
+        e = dict(p)
+        if c:
+            e["verdict"] = c["verdict"]
+            e["in_stock"] = c.get("in_stock", "unknown")
+            e["seller"] = c.get("seller", "")
+            e["seller_url"] = c.get("seller_url") or p.get("url", "")
+            e["stock_qty"] = c.get("stock_qty", "")
+            e["lead_time"] = c.get("lead_time", "")
+            e["check_note"] = c.get("note", "")
+            if c["verdict"] == "confirmed":
+                e["trust"] = "проверено"
+                if c.get("real_lo"):
+                    e["usd_lo"], e["usd_hi"] = c["real_lo"], c.get("real_hi") or c["real_lo"]
+            elif c["verdict"] == "price_differs" and c.get("real_lo"):
+                e["trust"] = "цена уточнена при проверке"
+                e["usd_lo"], e["usd_hi"] = c["real_lo"], c.get("real_hi") or c["real_lo"]
+            else:
+                e["trust"] = "источник не подтвердился"
+                e["conf"] = "C"
+        else:
+            e["verdict"] = ""
+            e["trust"] = "не проверено" if p.get("conf") in ("A", "B") else "экспертная вилка"
+            e["in_stock"] = "unknown"
+            e["seller_url"] = p.get("url", "")
+        out[pn] = e
+    return out
+
+
 def main():
     demand = D("rfq_demand.json")
     pool = build_pool()
+    prices = load_prices()
 
     # пачки: направление × категория; мелочь внутри направления сливаем в «смешанную» пачку
     batches = {}
@@ -232,16 +274,45 @@ def main():
         out_batches.append({
             "dir": direction, "cat": cat, "n": qty,
             "qty_total": sum(i["qty"] if isinstance(i["qty"], (int, float)) else 0 for i in items),
-            "items": [{"name": i["name"][:160], "pn": i["pn"], "qty": i["qty"], "unit": i["unit"], "model": i["model"][:60]} for i in items],
+            "items": [dict({"name": i["name"][:160], "pn": i["pn"], "qty": i["qty"],
+                            "unit": i["unit"], "model": i["model"][:60]},
+                           **({"pr": prices[(i["pn"] or "").strip().upper()]}
+                              if (i["pn"] or "").strip().upper() in prices else {}))
+                      for i in items],
             "sups": cands,
             "covered": len(cands),
         })
 
+    # склад: позиции, по которым проверкой подтверждён живой продавец с наличием
+    stock = []
+    for r in demand["rows"]:
+        pn = (r["pn"] or "").strip().upper()
+        p = prices.get(pn)
+        if not p or p.get("verdict") not in ("confirmed", "price_differs"):
+            continue
+        if p.get("in_stock") != "yes":
+            continue
+        qty = r["qty"] if isinstance(r["qty"], (int, float)) else 0
+        stock.append({
+            "name": r["name"][:140], "pn": r["pn"], "qty": qty, "unit": r["unit"],
+            "man": r["man"], "model": r["model"][:40], "dir": dir_of(r), "cat": r["cat"],
+            "lo": p.get("usd_lo"), "hi": p.get("usd_hi"),
+            "seller": p.get("seller", ""), "url": p.get("seller_url", ""),
+            "stock_qty": p.get("stock_qty", ""), "lead": p.get("lead_time", ""),
+            "note": p.get("check_note", "")[:160],
+        })
+    stock.sort(key=lambda s: -((s["hi"] or 0) * (s["qty"] or 0)))
+
+    priced = sum(1 for r in demand["rows"] if (r["pn"] or "").strip().upper() in prices)
+    verified = sum(1 for p in prices.values() if p.get("verdict") == "confirmed")
+
     tpl = (ROOT / "site" / "rfq.template.html").read_text(encoding="utf-8")
     tpl = tpl.replace("__BATCHES_JSON__", json.dumps(out_batches, ensure_ascii=False))
+    tpl = tpl.replace("__STOCK_JSON__", json.dumps(stock, ensure_ascii=False))
     tpl = tpl.replace("__META_JSON__", json.dumps({
         "updated": demand["updated"], "source": demand["source"],
         "total": len(demand["rows"]),
+        "priced": priced, "verified": verified, "stock": len(stock),
         "dirs": sorted({b["dir"] for b in out_batches}),
     }, ensure_ascii=False))
     out = ROOT / "public" / "rfq.html"
