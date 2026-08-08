@@ -52,7 +52,19 @@ def build_pool():
             e["what"] = e["what"] or (v.get("ev") or "")
 
     pool = {}
-    # компании из research без досье (свежий улов, в т.ч. волна по недостающим направлениям)
+    # непрофильные поставщики — ОТДЕЛЬНЫЙ файл, в ГТУ-базу не попадают
+    for x in D("rfq_suppliers.json")["rows"]:
+        k = nn(x.get("name", ""))
+        if not k:
+            continue
+        pool[k] = {
+            "name": x["name"], "country": x.get("country", ""), "site": x.get("site", ""),
+            "email": x.get("email", ""), "phone": "", "person": "",
+            "hook": "", "note": x.get("resp_note", ""),
+            "what": (x.get("what", "") + " " + (x.get("relation") or "")).strip(),
+            "prank": 4, "bx": 0, "bx_answered": False, "bx_models": [],
+        }
+    # компании из research без досье (профильный улов)
     for x in D("research_suppliers.json")["rows"]:
         k = nn(x.get("name", ""))
         if not k:
