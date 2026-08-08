@@ -11518,6 +11518,50 @@
 "tier": "component_specialist",
 "angle": "harvest:unwind10",
 "risk": ""
+},
+{
+"name": "Doosan Turbomachinery Services",
+"country": "США (Хьюстон)",
+"site": "https://www.doosanturbo.com",
+"email": "",
+"what": "Независимый ремонт роторов и компонентов ГТ, включая Siemens/Westinghouse W251 и W501",
+"link": "Сервисник парка W251/W501 — тех же машин, что Fiat строил как TG20/TG50",
+"tier": "component_specialist",
+"angle": "harvest:fiatavio",
+"risk": ""
+},
+{
+"name": "Rotating Machinery Services (RMS)",
+"country": "США",
+"site": "https://rotatingmachinery.com",
+"email": "",
+"what": "Инжиниринг и MRO паровых турбин и центробежных компрессоров; возрождённый бренд TurboCare Steam & Compression",
+"link": "Выкупил у EthosEnergy паротурбинный/компрессорный бизнес с корнями TurboCare (экс-Fiat Avio сервисная ветка)",
+"tier": "component_specialist",
+"angle": "harvest:fiatavio",
+"risk": ""
+},
+{
+"name": "EnergyLink International",
+"country": "Канада",
+"site": "https://energylinkinternational.com",
+"email": "",
+"what": "Вспомогательные системы ГТ (auxiliary skids, впуск/выхлоп) для OEM-платформ, включая W501/SGT6",
+"link": "Субпоставщик обвязки для машин родословной W501 (Fiat TG50)",
+"tier": "component_specialist",
+"angle": "harvest:fiatavio",
+"risk": ""
+},
+{
+"name": "Avio Aero (GE Aerospace)",
+"country": "Италия (Турин/Ривальта)",
+"site": "https://www.avioaero.com",
+"email": "",
+"what": "Авиационные двигатели и трансмиссии; аддитивное производство; наследник авиационной части Fiat Avio",
+"link": "Наследник авиационного бизнеса Fiat Avio (Carlyle/Finmeccanica 2003 → Avio → GE 2013); туринский промышленный кластер, потенциал по прецизионным компонентам",
+"tier": "component_specialist",
+"angle": "harvest:fiatavio",
+"risk": ""
 }
 ]
 }
