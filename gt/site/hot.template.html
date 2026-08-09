@@ -93,6 +93,9 @@ th{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--mu
 
 <div id="list"></div>
 
+<h3 style="margin-top:26px">🏬 Складские находки (каждый лот открыт и проверен агентом)</h3>
+<div id="stock"></div>
+
 <h3 style="margin-top:26px">Таможенные прецеденты по горячей части (HS 8411, 2023–2026)</h3>
 <div class="tblwrap"><table id="cust"></table></div>
 </div>
@@ -153,6 +156,19 @@ function render(){
   [nc,'кандидатов в шорт-листах'],
   [marked,'отправок отмечено'],[kp,'получено КП']]
   .map(([b,s])=>`<div class="tile"><b>${b}</b><span>${s}</span></div>`).join('');
+ document.getElementById('stock').innerHTML = Object.entries(HOT.stock||{}).map(([g,v])=>`
+  <div class="pos"><div class="p-head"><span class="p-title">${esc(g)}</span><span class="mut small">${v.finds.length} наход${v.finds.length===1?'ка':'ок'}</span></div>
+   <div class="p-body">
+    ${v.finds.map(f=>`<div class="cand" style="grid-template-columns:minmax(70px,auto) minmax(200px,2fr) minmax(180px,1.2fr)">
+      <div><span class="pn" style="background:${f.pn_match==='exact'?'#d9f2d9':'var(--chip)'}">${f.pn_match==='exact'?'точный PN':f.pn_match==='family'?'та же серия':'аналог'}</span>${f.cn?'<div class="ask a-nom" style="margin:4px 0 0">Китай — обсудить отдельно</div>':''}</div>
+      <div><b>${esc(f.what)}</b>
+       <div class="mut small">${esc(f.condition||'')}${f.qty?' · '+esc(f.qty):''}${f.price?' · '+esc(f.price):''}</div>
+       ${f.note?`<div class="ev">${esc(f.note)}</div>`:''}</div>
+      <div>${esc(f.seller)}<div class="mut small">${esc(f.country||'')}</div>
+       ${f.url?`<a class="small" href="${esc(f.url)}" target="_blank" rel="noopener">→ лот</a>`:''}</div>
+     </div>`).join('')}
+    ${v.note?`<div class="risk" style="border-left-color:var(--s1)"><b>Итог поиска:</b> ${esc(v.note)}</div>`:''}
+   </div></div>`).join('');
  document.getElementById('cust').innerHTML =
   '<tr><th>Дата</th><th>Экспортёр</th><th>Импортёр</th><th>Страна</th><th>Описание</th></tr>'+
   CUSTOMS.map(r=>`<tr><td style="white-space:nowrap">${esc(r.d)}</td><td>${esc(r.ex)}</td><td class="mut">${esc(r.im)}</td><td>${esc(r.co)}</td><td class="mut">${esc(r.ds)}</td></tr>`).join('');
