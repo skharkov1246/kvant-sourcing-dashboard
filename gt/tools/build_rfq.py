@@ -161,8 +161,10 @@ def dir_of(row):
 # ОБЯЗАТЕЛЬНО: категория сама по себе адресата не оправдывает — иначе трейдер турбинных
 # лопаток попадает в рассылку по реле Finder только за слово «control» в описании.
 DIR_RULES = {
-    "SGT-400": ("turbine", r"SGT|CYCLONE|ЛИНКОЛЬН|LINCOLN|SIEMENS|ТУРБИН|TURBINE"),
-    "Solar Taurus 60S/70/70MD": ("turbine", r"TAURUS|SOLAR|CENTAUR|MARS|TITAN|SATURN|СОЛАР|ТУРБИН|TURBINE"),
+    # ВАЖНО: только конкретика брендов/моделей. Родовое «турбины» сюда нельзя —
+    # иначе «Силовые машины» (ГТЭ-170) становятся поставщиком прокладок на Taurus.
+    "SGT-400": ("turbine", r"SGT|CYCLONE|ЛИНКОЛЬН|LINCOLN|SIEMENS"),
+    "Solar Taurus 60S/70/70MD": ("turbine", r"TAURUS|SOLAR TURBINES|CENTAUR|MARS \d|TITAN \d|SATURN \d|СОЛАР|\bSOLAR\b"),
     "Siemens: шкафы и электрика": ("any", r"SIMATIC|\bS7\b|SITRANS|SIEMENS|OBSOLETE|промэлектрон|industrial electronic|автоматизаци|switchgear|шкаф"),
     "Cummins/Fleetguard (ГПУ)": ("any", r"CUMMINS|FLEETGUARD|ГПУ|GAS ENGINE|газопоршн|DONALDSON|BALDWIN|фильтр"),
     "Jenbacher INNIO (ГПУ)": ("any", r"JENBACHER|INNIO|ГПУ|GAS ENGINE|газопоршн|MWM|свеч"),

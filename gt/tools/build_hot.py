@@ -33,8 +33,24 @@ def customs_hits():
     return out
 
 
+CN = re.compile(r"кита|china|chin[ae]se|шэньчжэн|shenzhen|чэнду|chengdu|ханчжоу|hangzhou|guangzhou|beijing|шанха|shangha", re.I)
+
+
 def main():
     data = json.load(open(ROOT / "data/hot_parts.json"))
+    # правило владельца 09.08.2026: по камерам и горелкам китайский реверс не рассматриваем —
+    # только Европа или подтверждённый склад
+    for pos in data["positions"]:
+        keep, dropped = [], []
+        for c in pos.get("candidates") or []:
+            blob = (c.get("country") or "") + " " + (c.get("name") or "") + " " + (c.get("site") or "")
+            if CN.search(blob):
+                dropped.append(c.get("name"))
+            else:
+                keep.append(c)
+        pos["candidates"] = keep
+        if dropped:
+            pos["excluded_cn"] = dropped
     tpl = (ROOT / "site/hot.template.html").read_text(encoding="utf-8")
     subs = {
         "__HOT_JSON__": json.dumps(data, ensure_ascii=False),
