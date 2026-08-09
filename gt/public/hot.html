@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Камеры сгорания и горелки — глубокий разбор лота</title>
+<style>
+:root{
+  color-scheme:light;
+  --page:#f9f9f7; --surface:#fcfcfb; --ink:#0b0b0b; --ink2:#52514e; --mut:#898781;
+  --border:rgba(11,11,11,.10); --s1:#2a78d6; --good:#0ca30c; --warn:#fab219; --crit:#d03b3b;
+  --chip:#eef2f7; --hot:#b8431a;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:14px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1150px;margin:0 auto;padding:0 16px 80px}
+header{border-bottom:2px solid var(--hot);padding:20px 0 12px;margin-bottom:14px}
+h1{font-size:22px;margin:0 0 4px;letter-spacing:-.01em}
+.mut{color:var(--mut)} .small{font-size:12.5px}
+a{color:var(--s1);text-underline-offset:3px}
+a:focus-visible,button:focus-visible{outline:2px solid var(--s1);outline-offset:2px}
+.box{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--hot);border-radius:8px;padding:12px 16px;margin:12px 0}
+.k{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:12px 0}
+.tile{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:11px 13px}
+.tile b{font-size:21px;font-variant-numeric:tabular-nums;display:block}
+.tile span{font-size:12px;color:var(--ink2)}
+.btn{cursor:pointer;font-size:12.5px;border:1px solid var(--border);border-radius:7px;padding:5px 10px;background:var(--surface);color:var(--ink)}
+.btn:hover{border-color:var(--s1)}
+/* позиция */
+.pos{background:var(--surface);border:1px solid var(--border);border-radius:10px;margin:14px 0;overflow:hidden}
+.p-head{padding:13px 16px;border-bottom:1px solid var(--border);display:flex;gap:14px;flex-wrap:wrap;align-items:baseline}
+.p-title{font-weight:750;font-size:15.5px}
+.p-qty{font-variant-numeric:tabular-nums;background:var(--hot);color:#fff;border-radius:6px;padding:2px 9px;font-weight:700;font-size:13px}
+.pn{font-family:ui-monospace,Menlo,monospace;background:var(--chip);border-radius:5px;padding:1px 7px;font-size:12.5px}
+.p-body{padding:12px 16px}
+.risk{border-left:3px solid var(--warn);background:var(--chip);padding:8px 12px;border-radius:0 6px 6px 0;font-size:13px;margin:8px 0}
+h3{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink2);margin:14px 0 8px}
+/* кандидат */
+.cand{display:grid;grid-template-columns:26px minmax(180px,1.1fr) minmax(220px,2fr) minmax(210px,1fr);gap:6px 14px;padding:9px 0;border-bottom:1px dashed var(--border);align-items:start}
+.cand:last-child{border-bottom:none}
+.rank{font-weight:800;font-variant-numeric:tabular-nums;color:var(--hot);font-size:15px}
+.rank.r2{color:var(--ink2)} .rank.r3{color:var(--mut)}
+.cname{font-weight:650}
+.ask{font-size:10.5px;border-radius:4px;padding:1px 6px;margin-left:5px;white-space:nowrap;cursor:help}
+.a-pn{background:#dbe9fb;color:#124a86}
+.a-sample{background:#e6f2df;color:#2c5e14}
+.a-nom{background:#fdeecd;color:#7a5200;font-weight:600}
+.ev{font-size:12px;color:var(--ink2)}
+.ev a{word-break:break-all}
+.price{font-size:12.5px;font-weight:600}
+.stbar{display:flex;gap:4px;margin-top:5px;flex-wrap:wrap}
+.st{cursor:pointer;font-size:11.5px;border:1px solid var(--border);border-radius:6px;padding:2px 7px;background:none;color:var(--ink2)}
+.st.on-sent{background:#dbe9fb;border-color:var(--s1);color:#124a86;font-weight:700}
+.st.on-rep{background:#fdeecd;border-color:var(--warn);color:#7a5200;font-weight:700}
+.st.on-kp{background:#d9f2d9;border-color:var(--good);color:#0a5c0a;font-weight:700}
+.st.on-no{background:#f6dcdc;border-color:var(--crit);color:#8c1f1f;font-weight:700}
+.snote{font-size:12px;color:var(--ink2);margin-top:3px;font-style:italic}
+details.facts{margin-top:10px}
+details.facts summary{cursor:pointer;color:var(--s1);font-size:12.5px}
+.fact{font-size:12.5px;margin:4px 0;padding-left:10px;border-left:2px solid var(--border)}
+.tblwrap{overflow-x:auto;margin:8px 0}
+table{border-collapse:collapse;width:100%;font-size:12.5px}
+th,td{padding:5px 9px;text-align:left;border-bottom:1px solid var(--border);vertical-align:top}
+th{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);white-space:nowrap}
+@media(max-width:820px){.cand{grid-template-columns:22px 1fr}.cand>div:nth-child(3),.cand>div:nth-child(4){grid-column:2}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+ <h1>🔥 Камеры сгорания и горелки — глубокий разбор</h1>
+ <div class="mut small">Самые дорогие позиции лота — здесь ошибка в поставщике стоит дороже всего. Кандидаты ранжированы: №1 — кому писать первым. <a href="./rfq">← весь план лота</a> · <a href="./">библиотека поставщиков</a></div>
+</header>
+
+<div class="k" id="tiles"></div>
+
+<div class="box">
+ <b>Как работать с этим списком.</b> На каждую позицию — свой шорт-лист: кандидаты проверены ресерчем, у каждого доказательство (страница каталога, таможенный прецедент, кейс) и режим запроса:
+ <span class="ask a-pn">по PN</span> — понимает каталожный номер;
+ <span class="ask a-sample">по образцу</span> — изготовит по размерам/образцу (чертежей у нас нет, но образец дать можем);
+ <span class="ask a-nom">по номенклатуре</span> — только разговор «делаете ли такое».
+ Отметки (📨 отправлено → 💬 ответил → 📄 КП → ❌ отказ) живут в браузере, «⬇ выгрузка» собирает их файлом.
+</div>
+
+<div class="box" style="border-left-color:var(--good)">
+ <b>Таможенный прецедент №1:</b> Dongturbo Electric (Чэнду) в июне 2023 реально ввёз в РФ камеру сгорания SGT-600 — канал «китайский реверс камер Siemens» не теория, а свершившаяся поставка. Все прецеденты по горячей части — в таблице внизу страницы.
+</div>
+
+<div class="filters" style="display:flex;gap:8px;margin:10px 0">
+ <button class="btn" onclick="exportMarks()">⬇ выгрузка отметок</button>
+ <label class="btn" style="cursor:pointer">⬆ импорт<input type="file" accept=".json" style="display:none" onchange="importMarks(this)"></label>
+</div>
+
+<div id="list"></div>
+
+<h3 style="margin-top:26px">Таможенные прецеденты по горячей части (HS 8411, 2023–2026)</h3>
+<div class="tblwrap"><table id="cust"></table></div>
+</div>
+
+<script>
+const HOT = {"updated": "2026-08-09", "positions": [{"key": "kg2", "man": "Siemens", "model": "газотурбинный двигатель Dresser Rand KG2-3E", "name": "Труба жаровая внутренняя (32997041_К)", "pn": "32997041_К", "qty": 2, "unit": "шт.", "facts": [], "candidates": [], "risks": ""}, {"key": "victory", "man": "Victory Energy", "model": "Vision", "name": "Завихритель пламени горелки", "pn": "VS-4-57", "qty": 92, "unit": "шт.", "facts": [], "candidates": [], "risks": ""}, {"key": "victory", "man": "Victory Energy", "model": "Vision", "name": "Завихритель пламени горелки", "pn": "VS-6-82", "qty": 37, "unit": "шт.", "facts": [], "candidates": [], "risks": ""}, {"key": "victory", "man": "Victory Energy", "model": "Vision", "name": "Выравнивающие устройства для балансировки распределения подаваемого к горелке воздушного потока", "pn": "VS-6-82", "qty": 18, "unit": "шт.", "facts": [], "candidates": [], "risks": ""}, {"key": "mw21215m", "man": "Siemens", "model": "SGT-400", "name": "КАМЕРА СГОРАНИЯ Сименс SGT-400 MW21215M", "pn": "MW21215M", "qty": 12, "unit": "шт", "facts": [], "candidates": [], "risks": ""}, {"key": "mw22316b", "man": "Siemens", "model": "SGT-400", "name": "ГЛАВНАЯ ГОРЕЛКА В СБОРЕ - DUAL DLE - ЗОЛОТОЕ УПЛОТНЕНИЕ Сименс SGT-400 MW22316B/01", "pn": "MW22316B/01", "qty": 12, "unit": "шт", "facts": [], "candidates": [], "risks": ""}, {"key": "purge-valve", "man": "Siemens", "model": "SGT-400", "name": "Клапан продувки/дренажа жидкотопливной горелки СИМЕНС SGT-400 64/60082038/1", "pn": "64/60082038/1", "qty": 4, "unit": "шт", "facts": [], "candidates": [], "risks": ""}]};
+const CUSTOMS = [{"d": "2024-07-29", "ex": "АО \"МОТОР СИЧ\"", "im": "АО \"БО*******", "ds": "ГАЗОТУРБИННАЯ УСТАНОВКА — МАЛОРАЗМЕРНЫЙ ОДНОВАЛЬНЫЙ ГАЗОТУРБИННЫЙ ДВИГАТЕЛЬ С КОМПРЕССОРОМ, КОЛЬЦЕВОЙ КАМЕРОЙ СГОРАНИЯ И ТУРБИНОЙ, ОСНАЩЕННЫЙ ОБОРУДОВАНИЕМ, НЕОБХОДИМЫМ ДЛЯ ГЕНЕРИР", "co": "TR"}, {"d": "2024-07-02", "ex": "GENERAL ELECTRIC COMPANY.", "im": "ООО \"ЕВМ ГР****", "ds": "СЕГМЕНТЫ ВТОРОЙ СТУПЕНИ СОПЛОВОГО АППАРАТА ГАЗОВОЙ ТУРБИНЫ GENERAL ELECTRIC LM6000, МОЖНОСТЬЮ 47.. 5 МВТ, ПРЕДНАЗНАЧЕН ДЛЯ РАСПРЕДЕЛЕНИЯ ПОТОКА ГОРЯИХ ГАЗОВ НА ВЫХОДЕ ИЗ КАМЕРЫ СГО", "co": "TR"}, {"d": "2024-06-18", "ex": "GREEN ENERGY", "im": "ООО \"А**** ЭН*****", "ds": "ЧАСТИ ГАЗОВЫХ ТУРБИН: КАМЕРА СГОРАНИЯ ГАЗОТУРБИННОГО ДВИГАТЕЛЯ ТУРБОГЕНЕРАТОРА МОЩНОСТЬЮ 65КВТ, ИЗГОТОВЛЕНА ИЗ ВЫСОКОЛЕГИРОВАННОЙ ЖАРОПРОЧНОЙ СТАЛИ [521985-101] — КАМЕРА СГОРАНИЯ Т", "co": "CO"}, {"d": "2024-05-20", "ex": "HAMILTON SUNDSTRAND.", "im": "АО \"АК \"ПО****** АВИ*******", "ds": "ТОПЛИВНАЯ ФОРСУНКА.. ПАРТ.. № 169111-2.. ДЛЯ ГРАЖДАНСКОГО ПАССАЖИРСКОГО ВС BOMBARDIER DHC-8 (Q300).. ТОПЛИВНАЯ ФОРСУНКА ДЛЯ ВОСПЛАМЕНИТЕЛЯ КАМЕРЫ СГОРАНИЯ ГАЗОТУРБИННОГО ДВИГАТЕЛЯ ", "co": "IN"}, {"d": "2024-03-27", "ex": "GE EN**** SWIT******* GmbH", "im": "ООО \"ДЖИИ РУС\"", "ds": "ЧАСТИ НЕАВИАЦИОНЫХ ГАЗОВЫХ ТУРБИН: ПЕРЕДНИЙ СЕГМЕНТ ТЕРМОЗАЩИТНОГО ЭКРАНА КАМЕРЫ СГОРАНИЯ ГАЗОВОЙ ТУРБИНЫ GT13E2 (МОЩНОСТЬ 180МВТ).. ПРЕДНАЗНАЧЕН ДЛЯ ЗАЩИТЫ ВНЕШНЕГО КОРПУСА КАМЕРЫ", "co": ""}, {"d": "2024-03-14", "ex": "SOLAR TURBINES", "im": "ООО \"ДНД-*********", "ds": "ЧАСТИ ГАЗОВЫХ ТУРБИН: ФОРСУНКА ТОПЛИВНАЯ ГАЗОТУРБИННОГО ДВИГАТЕЛЯ TAURUS 70, MARS 100, MARS, СБОРНОЙ КОНСТРУКЦИИ, ИЗ ЛЕГИРОВАННОЙ СТАЛИ, ДЛЯ ПОДАЧИ И РАСПЫЛЕНИЯ ГАЗООБРАЗНОГО ТОПЛИ", "co": "TR"}, {"d": "2023-12-27", "ex": "GENERAL ELECTRIC COMPANY СОЕДИНЕННЫЕ ШТАТЫ", "im": "ООО \"ТИС\"", "ds": "Часть газовой турбины мощностью более 50000 квт, гражданского назначения-направляющие камеры сгорания из стали для подачи воспламенного потока газа на ротор газовой турбины, см.. Д", "co": "TR"}, {"d": "2023-12-15", "ex": "HARBIN GUANGHAN GAS TURBINE CO. LTD", "im": "ООО \"А***** СПГ \"", "ds": "Части камера сгорания газовой турбины, для оборудования завода по производству, хранению, отгрузке спг и сгк на огт.. Ввозится в рамках строительства завода спг проекта \"арктик спг", "co": "CN"}, {"d": "2023-10-31", "ex": "GE USA", "im": "ООО \"ПА******", "ds": "ЧАСТИ ГАЗОВОЙ ТУРБИННОЙ УСТАНОВКИ 6F.03 (6FA) МОЩНОСТЬЮ 82000КВТ: ЗАПАЛЬНЫЙ РАЗРЯДНЫЙ ЭЛЕКТРОД ИЗ ЖАРОПРОЧНОЙ СТАЛИ НЕ СОДЕРЖАЩИЙ ИЗОЛИРУЮЩЕЙ АРМАТУРЫ. ПРИМЕНЯЕТСЯ ДЛЯ ВОСПЛАМЕНЕНИ", "co": "TR"}, {"d": "2023-10-24", "ex": "АО МОТОР СИЧ", "im": "АО \"БО*******", "ds": "ГАЗОТУРБИННАЯ УСТАНОВКА - МАЛОРАЗМЕРНЫЙ ОДНОВАЛЬНЫЙ ГАЗОТУРБИННЫЙ ДВИГАТЕЛЬ С КОМПРЕССОРОМ, КОЛЬЦЕВОЙ КАМЕРОЙ СГОРАНИЯ И ТУРБИНОЙ, ОСНАЩЕННЫЙ ОБОРУДОВАНИЕМ, НЕОБХОДИМЫМ ДЛЯ ГЕНЕРИР", "co": "MV"}, {"d": "2023-08-31", "ex": "GFM SPA", "im": "ООО \"АЭР\"", "ds": "ЧАСТИ, ПРЕДНАЗНАЧЕНННЫЕ ДЛЯ ПРОВЕДЕНИЯ РЕМОНТА ГАЗОТУРБИН-НОЙ УСТАНОВКИ (ГТУ) МОД.АЕ64.3A, МОЩНОСТЬЮ 65МВТ, УСТАНОВЛЕННОЙ НА ЮГО-ЗАПАДНОЙ ТЭЦ СПБ: ВСТАВКА ГОРЕЛКИ - ЧАСТЬ КАМЕРЫ СГ", "co": "IT"}, {"d": "2023-08-30", "ex": "АОМОТОР СИЧ", "im": "АО \"БО*******", "ds": "ГАЗОТУРБИННАЯ УСТАНОВКА - МАЛОРАЗМЕРНЫЙ ОДНОВАЛЬНЫЙ ГАЗОТУРБИННЫЙ ДВИГАТЕЛЬ С КОМПРЕССОРОМ, КОЛЬЦЕВОЙ КАМЕРОЙ СГОРАНИЯ И ТУРБИНОЙ, ОСНАЩЕННЫЙ ОБОРУДОВАНИЕМ, НЕОБХОДИМЫМ ДЛЯ ГЕНЕРИР", "co": "TR"}, {"d": "2023-08-28", "ex": "GENERAL ELECTRIC COMPANY", "im": "ООО \"СПЕЦ**********", "ds": "ПАТРУБКИ КАМЕРЫ СГОРАНИЯ ГАЗОВОЙ ТУРБИНЫ. ПОСТАВЛЯЮТСЯ В КАЧЕСТВЕ ЗАПАСНЫХ ЧАСТЕЙ ДЛЯ РЕМОНТА/ЗАМЕНЫ НАСОСНО-КОМПРЕССОРНОГО И ДИНАМИЧЕСКОГО ОБОРУДОВАНИЯ ЗАВОДА СПГ:", "co": "AE"}, {"d": "2023-08-15", "ex": "MITSUBISHI HITACHI POWER", "im": "ООО \"САХ******** ЭНЕ*****", "ds": "ЧАСТЬ ГАЗОВОЙ ТУРБИНЫ МОДЕЛИ Н25 МОЩНОСТЬЮ НЕ БОЛЕЕ 5000 КВТ- ЖАРОВАЯ ТРУБА ДЛЯ КАМЕРЫ СГОРАНИЯ, ПРЕДНАЗНАЧЕНА ДЛЯ РЕМОНТА И ТЕХНИЧЕСКОГО ОБСЛУЖИВАНИЯ ТЕХНОЛОГИЧЕСКОГО ОБОРУДОВАНИЯ", "co": "JP"}, {"d": "2023-08-11", "ex": "GREEN ENERGY", "im": "ООО \"А**** ЭН*****", "ds": "ЧАСТИ ГАЗОВЫХ ТУРБИН: КАМЕРА СГОРАНИЯ ГАЗОТУРБИННОГО ДВИГАТЕЛЯ ТУРБОГЕНЕРАТОРА МОЩНОСТЬЮ 65КВТ, ИЗГОТОВЛЕНА ИЗ ВЫСОКОЛЕГИРОВАННОЙ ЖАРОПРОЧНОЙ СТАЛИ", "co": "ML"}, {"d": "2023-08-01", "ex": "GFM SPA", "im": "ООО \"АЭР\"", "ds": "ЧАСТИ, ПРЕДНАЗНАЧЕНННЫЕ ДЛЯ ПРОВЕДЕНИЯ РЕМОНТА ГАЗОТУРБИН-НОЙ УСТАНОВКИ (ГТУ) МОД.АЕ64.3A, МОЩНОСТЬЮ 65МВТ, УСТАНОВЛЕННОЙ НА ЮГО-ЗАПАДНОЙ ТЭЦ СПБ: ВСТАВКА ГОРЕЛКИ - ЧАСТЬ КАМЕРЫ СГ", "co": "IT"}, {"d": "2023-06-26", "ex": "DONGTURBO ELECTRIC COMPANY LTD.", "im": "ООО \"ПРО*********", "ds": "КАМЕРА СГОРАНИЯ ДЛЯ ПРОМЫШЛЕННОЙ ГАЗОТУРБИННОЙ УСТАНОВКИ SGT-600 (GT10B) МОЩНОСТЬ 25 400 КВТ. НЕ ЯВЛЯЮТСЯ ТОВАРОМ ВОЕННОГО И ДВОЙНОГО НАЗНАЧЕНИЯ:", "co": "CN"}, {"d": "2023-06-15", "ex": "TESI SRL", "im": "ООО \"ПЕТРО***********", "ds": "ЧАСТИ-БЛОК КАМЕРЫ СГОРАНИЯ (ВОСПЛАМЕНИТЕЛЬ СВЕЧИ ЗАЖИГАНИЯ), ПРЕДНАЗНАЧЕНЫ ДЛЯ ГАЗОТУРБИННОЙ УСТАНОВКИ MS5002E", "co": "MV"}, {"d": "2023-05-17", "ex": "НЕИЗВЕСТНО", "im": "ООО \"С 7 ИНЖИ*******", "ds": "КАМЕРА СГОРАНИЯ КОЛЬЦЕВАЯ, В СБОРЕ, ДВИГАТЕЛЯ CFM56-5B КОТОРЫЙ УСТАНАВЛИВАЕТСЯ НА ПАССАЖИРСКИЙ ВС ГА A319/A320/A321. ВЫПОЛНЕНО ИЗ КОРРОЗИОННОСТОЙКОЙ И ЖАРОПРОЧНОЙ СТАЛИ. ЯВЛЯЕТСЯ Ч", "co": "TR"}, {"d": "2023-04-26", "ex": "MITSUBISHI CORPORATION", "im": "ООО \"ЛУКОЙЛ**************", "ds": "ЧАСТИ ГАЗОВОЙ ТУРБИНЫ ГАЗОТУРБИННОЙ УСТАНОВКИ M701F4, ВХОДЯЩЕЙ В СОСТАВ ПАРОГАЗОВОЙ УСТАНОВКИ ПГУ-410 КРАСНОДАРСКОЙ ТЭЦ - КОРЗИНЫ КАМЕР СГОРАНИЯ - 20 ШТ. ПРЕДСТАВЛЯЕТ СОБОЙ ДЕТАЛЬ ", "co": "AE"}, {"d": "2023-01-24", "ex": "НЕ УСТАНОВЛЕН", "im": "ФИ**** КОМ***** ЭКСОН НЕФ***** ЛИ*****", "ds": "ЧАСТИ ГАЗОТУРБИННОЙ УСТАНОВКИ НЕФТЕДОБЫВАЮЩЕГО ОБЪЕКТА - КАМЕРА СГОРАНИЯ ДЛЯ ТОПОЧНОЙ КАМЕРЫ, В КОТОРОЙ ПРОИСХОДИТ ГОРЕНИЕ ОСНОВНОЙ МАССЫ ТОПЛИВА И РАСПОЛОЖЕНА ЗОНА МАКСИМАЛЬНЫХ ТЕ", "co": "IT"}, {"d": "2023-01-24", "ex": "НЕ УСТАНОВЛЕН", "im": "ФИ**** КОМ***** ЭКСОН НЕФ***** ЛИ*****", "ds": "ЧАСТИ ГАЗОТУРБИННОЙ УСТАНОВКИ НЕФТЕДОБЫВАЮЩЕГО ОБЪЕКТА - КАМЕРА СГОРАНИЯ ДЛЯ ТОПОЧНОЙ КАМЕРЫ, В КОТОРОЙ ПРОИСХОДИТ ГОРЕНИЕ ОСНОВНОЙ МАССЫ ТОПЛИВА И РАСПОЛОЖЕНА ЗОНА МАКСИМАЛЬНЫХ ТЕ", "co": "IT"}, {"d": "2023-01-24", "ex": "НЕ УСТАНОВЛЕН", "im": "ФИ**** КОМ***** ЭКСОН НЕФ***** ЛИ*****", "ds": "ЧАСТИ ГАЗОТУРБИННОЙ УСТАНОВКИ НЕФТЕДОБЫВАЮЩЕГО ОБЪЕКТА -КАМЕРА СГОРАНИЯ ДЛЯ ТОПОЧНОЙ КАМЕРЫ, В КОТОРОЙ ПРОИСХОДИТ ГОРЕНИЕ ОСНОВНОЙ МАССЫ ТОПЛИВА И РАСПОЛОЖЕНА ЗОНА МАКСИМАЛЬНЫХ ТЕМ", "co": "IT"}, {"d": "2023-01-24", "ex": "НЕ УСТАНОВЛЕН", "im": "ФИ**** КОМ***** ЭКСОН НЕФ***** ЛИ*****", "ds": "ЧАСТИ ГАЗОТУРБИННОЙ УСТАНОВКИ НЕФТЕДОБЫВАЮЩЕГО ОБЪЕКТА- КАМЕРА СГОРАНИЯ ДЛЯ ТОПОЧНОЙ КАМЕРЫ, В КОТОРОЙ ПРОИСХОДИТ ГОРЕНИЕ ОСНОВНОЙ МАССЫ ТОПЛИВА И РАСПОЛОЖЕНА ЗОНА МАКСИМАЛЬНЫХ ТЕМ", "co": "IT"}, {"d": "2023-01-24", "ex": "НЕ УСТАНОВЛЕН", "im": "ФИ**** КОМ***** ЭКСОН НЕФ***** ЛИ*****", "ds": "ЧАСТИ ГАЗОТУРБИННОЙ УСТАНОВКИ НЕФТЕДОБЫВАЮЩЕГО ОБЪЕКТА - КАМЕРА СГОРАНИЯ ДЛЯ ТОПОЧНОЙ КАМЕРЫ, В КОТОРОЙ ПРОИСХОДИТ ГОРЕНИЕ ОСНОВНОЙ МАССЫ ТОПЛИВА И РАСПОЛОЖЕНА ЗОНА МАКСИМАЛЬНЫХ ТЕ", "co": "IT"}];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let M;
+try{ M = JSON.parse(localStorage.getItem('gt_hot_v1')) || {}; }catch(e){ M = {}; }
+M.st = M.st||{}; M.note = M.note||{};
+const save=()=>{ try{ localStorage.setItem('gt_hot_v1', JSON.stringify(M)); }catch(e){} };
+const ST=[['sent','📨 отправлено'],['rep','💬 ответил'],['kp','📄 КП'],['no','❌ отказ']];
+const ASK={pn:['по PN','a-pn','понимает каталожный номер — шлём PN и ждём цену/срок'],
+ sample:['по образцу','a-sample','изготовит по размерам или образцу — чертежей не обещаем, образец можем дать'],
+ nomen:['по номенклатуре','a-nom','только разговор «делаете ли такую деталь», PN не поймёт']};
+
+function candRow(pk, c){
+ const k=pk+'|'+c.name, st=M.st[k]||'', note=M.note[k]||'';
+ const a=ASK[c.ask]||ASK.nomen;
+ return `<div class="cand" data-k="${esc(k)}">
+  <div class="rank r${c.rank}">${c.rank}</div>
+  <div><div class="cname">${esc(c.name)} <span class="ask ${a[1]}" title="${esc(a[2])}">${a[0]}</span></div>
+   <div class="mut small">${esc(c.country||'')}</div>
+   ${c.email?`<div class="small"><a href="mailto:${esc(c.email)}">✉ ${esc(c.email)}</a></div>`:''}
+   ${c.site?`<div class="small"><a href="${esc(/^https?:/.test(c.site)?c.site:'https://'+c.site)}" target="_blank" rel="noopener">🌐 ${esc(c.site.replace(/^https?:\/\//,'').slice(0,34))}</a></div>`:''}</div>
+  <div><div>${esc(c.can_do)}</div>
+   ${c.evidence?`<div class="ev">Доказательство: ${esc(c.evidence).replace(/(https?:\/\/\S+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>')}</div>`:''}
+   ${c.price_hint?`<div class="price">💰 ${esc(c.price_hint)}</div>`:''}</div>
+  <div><div class="stbar">${ST.map(([v,n])=>`<button class="st${st===v?' on-'+v:''}" data-st="${v}">${n}</button>`).join('')}
+   <button class="st" data-st="note">✏</button></div>
+   ${note?`<div class="snote">${esc(note)}</div>`:''}</div>
+ </div>`;
+}
+function render(){
+ document.getElementById('list').innerHTML = HOT.positions.map(p=>`
+  <div class="pos">
+   <div class="p-head">
+    <span class="p-qty">×${esc(p.qty)}</span>
+    <span class="p-title">${esc(p.name)}</span>
+    <span class="pn">${esc(p.pn)}</span>
+    <span class="mut small">${esc(p.man)} ${esc(p.model)}</span>
+   </div>
+   <div class="p-body">
+    ${p.risks?`<div class="risk"><b>Риски:</b> ${esc(p.risks)}</div>`:''}
+    <h3>Кому писать (№1 — первым)</h3>
+    ${(p.candidates||[]).sort((a,b)=>a.rank-b.rank).map(c=>candRow(p.key,c)).join('')||'<div class="mut">ресерч в работе — кандидаты появятся после проверки</div>'}
+    ${(p.facts&&p.facts.length)?`<details class="facts"><summary>Фактура ресерча (${p.facts.length})</summary>
+     ${p.facts.map(f=>`<div class="fact">${esc(f.claim)}${f.source?` <a href="${esc(f.source)}" target="_blank" rel="noopener">→</a>`:''}</div>`).join('')}</details>`:''}
+   </div>
+  </div>`).join('');
+ const marked=Object.values(M.st).filter(Boolean).length;
+ const kp=Object.values(M.st).filter(v=>v==='kp').length;
+ const nc=HOT.positions.reduce((a,p)=>a+(p.candidates||[]).length,0);
+ document.getElementById('tiles').innerHTML=[
+  [HOT.positions.length,'позиций горячей части'],
+  [HOT.positions.reduce((a,p)=>a+(+p.qty||0),0),'штук суммарно'],
+  [nc,'кандидатов в шорт-листах'],
+  [marked,'отправок отмечено'],[kp,'получено КП']]
+  .map(([b,s])=>`<div class="tile"><b>${b}</b><span>${s}</span></div>`).join('');
+ document.getElementById('cust').innerHTML =
+  '<tr><th>Дата</th><th>Экспортёр</th><th>Импортёр</th><th>Страна</th><th>Описание</th></tr>'+
+  CUSTOMS.map(r=>`<tr><td style="white-space:nowrap">${esc(r.d)}</td><td>${esc(r.ex)}</td><td class="mut">${esc(r.im)}</td><td>${esc(r.co)}</td><td class="mut">${esc(r.ds)}</td></tr>`).join('');
+}
+document.addEventListener('click', e=>{
+ const st=e.target.closest('.st'); if(!st) return;
+ const k=st.closest('.cand').dataset.k;
+ if(st.dataset.st==='note'){
+  const v=prompt('Заметка:', M.note[k]||'');
+  if(v!==null){ v.trim()?M.note[k]=v.trim():delete M.note[k]; save(); render(); }
+  return;
+ }
+ M.st[k]===st.dataset.st ? delete M.st[k] : M.st[k]=st.dataset.st;
+ save(); render();
+});
+function exportMarks(){
+ const blob=new Blob([JSON.stringify(M,null,1)],{type:'application/json'});
+ const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+ a.download='hot_marks_'+new Date().toISOString().slice(0,10)+'.json'; a.click();
+}
+function importMarks(inp){
+ const f=inp.files&&inp.files[0]; if(!f) return;
+ f.text().then(t=>{ try{
+  const e=JSON.parse(t); Object.assign(M.st,e.st||{}); Object.assign(M.note,e.note||{}); save(); render();
+ }catch(err){ alert('Не прочитал файл: '+err.message); } });
+}
+render();
+</script>
+</body>
+</html>
