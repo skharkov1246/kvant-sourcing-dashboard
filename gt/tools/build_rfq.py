@@ -161,8 +161,10 @@ def dir_of(row):
 # ОБЯЗАТЕЛЬНО: категория сама по себе адресата не оправдывает — иначе трейдер турбинных
 # лопаток попадает в рассылку по реле Finder только за слово «control» в описании.
 DIR_RULES = {
-    "SGT-400": ("turbine", r"SGT|CYCLONE|ЛИНКОЛЬН|LINCOLN|SIEMENS|ТУРБИН|TURBINE"),
-    "Solar Taurus 60S/70/70MD": ("turbine", r"TAURUS|SOLAR|CENTAUR|MARS|TITAN|SATURN|СОЛАР|ТУРБИН|TURBINE"),
+    # ВАЖНО: только конкретика брендов/моделей. Родовое «турбины» сюда нельзя —
+    # иначе «Силовые машины» (ГТЭ-170) становятся поставщиком прокладок на Taurus.
+    "SGT-400": ("turbine", r"SGT|CYCLONE|ЛИНКОЛЬН|LINCOLN|SIEMENS"),
+    "Solar Taurus 60S/70/70MD": ("turbine", r"TAURUS|SOLAR TURBINES|CENTAUR|MARS \d|TITAN \d|SATURN \d|СОЛАР|\bSOLAR\b"),
     "Siemens: шкафы и электрика": ("any", r"SIMATIC|\bS7\b|SITRANS|SIEMENS|OBSOLETE|промэлектрон|industrial electronic|автоматизаци|switchgear|шкаф"),
     "Cummins/Fleetguard (ГПУ)": ("any", r"CUMMINS|FLEETGUARD|ГПУ|GAS ENGINE|газопоршн|DONALDSON|BALDWIN|фильтр"),
     "Jenbacher INNIO (ГПУ)": ("any", r"JENBACHER|INNIO|ГПУ|GAS ENGINE|газопоршн|MWM|свеч"),
@@ -343,10 +345,37 @@ def load_prices():
     return out
 
 
+def load_overrides():
+    """Вердикты проверки актуальности (глазами сорсера): drop / doubt / send."""
+    try:
+        return D("rfq_overrides.json")["overrides"]
+    except FileNotFoundError:
+        return {}
+
+
 def main():
     demand = D("rfq_demand.json")
     pool = build_pool()
     prices = load_prices()
+    overrides = load_overrides()
+    # применяем вердикты к пулу ДО раскладки
+    dropped = 0
+    for k in list(pool.keys()):
+        sup = pool[k]
+        ov = overrides.get(sup["name"])
+        if not ov:
+            continue
+        if ov["verdict"] == "drop":
+            del pool[k]
+            dropped += 1
+            continue
+        if ov.get("new_site"):
+            sup["site"] = ov["new_site"]
+        sup["ov_verdict"] = ov["verdict"]
+        sup["ov_note"] = ov.get("note", "")
+        sup["ov_flags"] = ov.get("red_flags", "")
+    print(f"проверка актуальности: вычеркнуто {dropped}, помечено doubt "
+          f"{sum(1 for s in pool.values() if s.get('ov_verdict') == 'doubt')}")
 
     # пачки: направление × категория; мелочь внутри направления сливаем в «смешанную» пачку
     batches = {}
@@ -364,9 +393,16 @@ def main():
     # кандидаты на пачку
     def card(sup, direction, cat, role):
         p, why = probability(sup, direction, cat)
+        ov = sup.get("ov_verdict", "")
+        if ov == "doubt":
+            p = max(3, p - 10)
+            why += "; ⚠ проверка: " + (sup.get("ov_note") or "профиль под вопросом")[:160]
+        elif ov == "send":
+            why += "; ✓ актуальность подтверждена проверкой"
+        # комплаенс-оценки — зона сорсеров (распоряжение 09.08), в карточки не выносим
         return {**{k: sup[k] for k in ("name", "country", "site", "email", "phone", "person", "hook")},
                 "p": p, "why": why, "bx": sup["bx"], "prank": sup["prank"], "role": role,
-                "cats": sorted(sup_cats(sup))[:4], "ask": ask_mode(sup)}
+                "cats": sorted(sup_cats(sup))[:4], "ask": ask_mode(sup), "ov": ov}
 
     # адресаты направления, разложенные по ролям (считаем один раз на направление)
     by_dir = {}
