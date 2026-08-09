@@ -1,0 +1,437 @@
+{
+ "updated": "2026-08-09",
+ "model": "Siemens SGT5-4000F (V94.3A)",
+ "facts": [
+  {
+   "claim": "Завод Siemens Energy в Берлине (Huttenstraße) — головная площадка по газовым турбинам: выпускает SGT5-8000H, SGT5-4000F, SGT5-2000E; первая ГТ отгружена в 1972, отгружена 1000-я турбина (~220 ГВт в 65 странах). Горелочные/камерные узлы — берлинская специализация.",
+   "source": "https://www.powermag.com/historic-and-trend-setting-siemens-turbine-manufacturing-plant-hits-milestone/ ; https://www.power-eng.com/gas/turbines/siemens-ships-1-000th-gas-turbine-manufactured-at-berlin-factory/"
+  },
+  {
+   "claim": "SGT5-4000F: 329 МВт (SC), 15-ступенчатый компрессор, кольцевая камера сгорания с 24 гибридными горелками и полностью керамическим теплозащитным экраном (индивидуально заменяемые плитки), полностью воздушно-охлаждаемая 4-ступенчатая турбина; продано >380 машин, наработка >29 млн часов, надёжность >99%.",
+   "source": "https://www.siemens-energy.com/global/en/home/products-services/product/sgt5-4000f.html"
+  },
+  {
+   "claim": "Ротор 4000F — дисковый, с хиртовым (Hirth) зацеплением дисков компрессора и турбины и центральным стяжным болтом; первые три ступени турбины с термобарьерным покрытием (TBC). Обозначения ступеней горячего тракта — Vane 1–4 / Blade 1–4.",
+   "source": "https://cfnewsads.thomasnet.com/spec/40003/40003290.pdf"
+  },
+  {
+   "claim": "Хронология: V94 (первое поколение) — с начала 1970-х; V94.3 — начало 1990-х; серия Vx4.3A (V84.3A/V94.3A) с кольцевой КС введена в 1996; проточная часть 3A разработана в сотрудничестве с Pratt & Whitney; продано >130 V94.3A к середине 2000-х. В 2005 при ребрендинге Siemens V94.3A получила обозначение SGT5-4000F.",
+   "source": "https://www.forecastinternational.com/archive/disp_pdf.cfm?DACH_RECNO=604 ; https://www.osti.gov/biblio/20050978 ; https://www.ccj-online.com/v94-84-2-v94-84-3a-gas-turbines-ccj-launches-global-coverage-of-gt-user-groups/"
+  },
+  {
+   "claim": "Горелка HR3 (развитие гибридной горелки) внедрялась сначала на V84.3A, затем перенесена на V94.3A — ключевая ревизия камеры сгорания серии 3A.",
+   "source": "https://www.researchgate.net/publication/267483264_Advanced_Burner_Development_for_the_Vx43A_Gas_Turbines"
+  },
+  {
+   "claim": "Ansaldo Energia строила V94.3A по лицензии Siemens; лицензия действовала до октября 2004, после чего Ansaldo получила право использовать и развивать технологию без ограничений; арбитраж ICC 29.07.2016 подтвердил неограниченные права Ansaldo на технологию тяжёлых ГТ Siemens. Машина продаётся как AE94.3A (>5 млн экв. часов парка, водородные версии до 40% H2).",
+   "source": "https://www.turbomachinerymag.com/view/ansaldo-can-continue-using-siemens-technology-tribunal ; https://www.ansaldoenergia.com/offering/equipment/turbomachinery/heavy-duty-gas-turbine/ae943a"
+  },
+  {
+   "claim": "Shanghai Electric в мае 2014 купила 40% Ansaldo Energia (€400 млн) и создала СП Shanghai Electric Gas Turbine Co. (ноябрь 2014); линейка СП: AE94.2, AE94.3A, AE64.3A; за 5 лет партнёрства — заказы на ~40 ГТ для рынка КНР (~€0,5 млрд производства в Генуе).",
+   "source": "https://www.modernpowersystems.com/news/shanghai-electric-to-buy-40-stake-in-ansaldo-energia-4264458/ ; https://shanghaielectric-smec.com/2-1-4-gas-turbines/ ; https://www.ansaldoenergia.com/about-us/media-center/press-releases/detail-press-releases/ansaldo-energia-wins-new-orders-in-china-five-year"
+  },
+  {
+   "claim": "BHEL (Индия) — лицензиат Siemens по V94.2 (и V64.3), но НЕ по V94.3A: «advanced class» машины BHEL для Pragati-III (Бавана, Дели) — это GE Frame 9FA, а не V94.3A. Из полных лицензиатов V94.3A вне Siemens в допустимом поле остаются Ansaldo (и через неё Shanghai Electric); иранская ветка исключена из проработки по правилам задачи.",
+   "source": "https://www.bhel.com/bhels-first-250-mw-advanced-class-gas-turbine-placed-foundation-pragati-iii-combined-cycle-power ; https://www.osti.gov/biblio/380856"
+  },
+  {
+   "claim": "~80% поставленных SGT5/6-4000F находятся под долгосрочными сервисными контрактами (LTSA) Siemens — независимый aftermarket сосредоточен на оставшихся ~20% и на выходящих из LTSA блоках; всего в мире работает ~1000 V-машин (V94/84.2 + Vx4.3A).",
+   "source": "https://www.ccj-online.com/v94-84-2-v94-84-3a-gas-turbines-ccj-launches-global-coverage-of-gt-user-groups/ ; https://www.turbomachinerymag.com/view/v94-3a-2022-user-conference"
+  },
+  {
+   "claim": "Роль завода Siemens Energy в Мюльхайме (роторы/сборка 4000F) в этом прогоне напрямую с официальной страницы подтвердить не удалось — принимать как рабочую гипотезу; косвенное подтверждение цепочки роторов: Saarschmiede (Фёльклинген, группа Saarstahl) куёт диски ГТ и по таможенным записям отгружала продукцию в адрес Siemens Energy Inc.",
+   "source": "https://www.importgenius.com/suppliers/saarschmiede-gmbh ; https://www.saarschmiede.de/"
+  },
+  {
+   "claim": "Экосистема независимого сервиса парка V94.3A группируется вокруг конференций GTUsers/CCJ; спонсоры-участники: ARNOLD Group, Sulzer, APG, MD&A, Freudenberg, Liburdi, Dekomte, Trinity Turbine Technology, Gas Turbine Controls — готовый список адресатов RFQ.",
+   "source": "https://www.ccj-online.com/v94-84-2-v94-84-3a-gas-turbines-ccj-launches-global-coverage-of-gt-user-groups/ ; https://www.mdaturbines.com/resources/tradeshows/sgt5-4000f-user-group-v94-3a-conference-2026/"
+  },
+  {
+   "claim": "Sulzer инспектирует и ремонтирует V-машины по всему миру и производит эквивалентные новые части для V94.2/V84.2 (лопатки, компоненты КС вкл. керамические плитки); для 94.3A крупные новые части в текущем портфеле не заявлены — только ремонт/полевой сервис.",
+   "source": "https://www.ccj-online.com/sulzer-inspects-repairs-v-engines-worldwide/ ; https://www.sulzer.com/spain/-/media/files/services/spare-parts/brochures/siemens_v942_v842_equivalent_new_parts_manufacturing_en_122014web.pdf?la=en"
+  },
+  {
+   "claim": "Doncasters Precision Castings Bochum (570 сотрудников) специализируется на вакуумном литье лопаток промышленных газовых турбин и сам плавит суперсплавы; обслуживает ведущих OEM в секторе IGT — ближайший к Siemens Berlin (завод SGT5-4000F) литейный субпоставщик в Германии",
+   "source": "https://www.zeiss.com/metrology/en/industries/success-stories/doncasters-precision-castings-bochum.html (проверено WebFetch); https://www.doncasters.com/contact/location/doncasters-precision-castings-bochum-germany (сайт отдаёт 403 на прямой fetch)"
+  },
+  {
+   "claim": "Первые ступени турбины SGT5-4000F — монокристаллические лопатки с TBC и плёночным охлаждением; первые три ступени с термобарьерным покрытием",
+   "source": "https://www.siemens-energy.com/global/en/home/products-services/product/sgt5-4000f.html (сниппет поиска)"
+  },
+  {
+   "claim": "Howmet (экс-Alcoa/Howmet Corp.) — крупнейший в мире производитель литых лопаток для авиадвигателей и наземных ГТ; литьё IGT на площадках Hampton VA, Whitehall MI, La Porte IN, Exeter UK, Gennevilliers FR, Székesfehérvár HU, Nomi (Япония). Hampton VA исторически лил лопатки по контрактам GE, Siemens, Alstom, Mitsubishi. «Alcoa» отдельно искать не нужно — это та же Howmet",
+   "source": "https://www.howmet.com/howmet-engine-systems/ (проверено WebFetch); https://www.michiganbusiness.org/reports-data/success-stories/howmet/"
+  },
+  {
+   "claim": "PCC Airfoils (Precision Castparts) льёт лопатки категории Power Generation Engines; в структуру входит Cannon-Muskegon — производитель сплавов CM247LC/CMSX, из которых льют DS/SX лопатки F-класса",
+   "source": "https://www.pccairfoils.com/ (проверено WebFetch)"
+  },
+  {
+   "claim": "CPP (Consolidated Precision Products) прямо заявляет литьё «large industrial gas turbine blades and vanes», включая multi-wall DS и SX аэродинамические профили",
+   "source": "https://www.cppcorp.com/airfoils (проверено WebFetch)"
+  },
+  {
+   "claim": "GF Precicast SA (Novazzano, Швейцария, группа Georg Fischer) — точное литьё суперсплавов equiax/DS/single crystal для OEM газовых турбин; в списке клиентов Siemens и Alstom; precicast.com редиректит на georgfischer.com",
+   "source": "https://giesserei-verband.ch/en/member/precicast-sa/ (проверено WebFetch)"
+  },
+  {
+   "claim": "EMA — Europea Microfusioni Aerospaziali (Morra De Sanctis, Италия, под управлением Rolls-Royce plc) — одна из немногих литеек мира с SX/DS/EXQ, льёт рабочие и направляющие лопатки в т.ч. для энергетики; итальянская локация делает её естественным кандидатом цепочки Ansaldo, но прямая связь с AE94.3A публично не подтверждена",
+   "source": "https://www.emaht.com/ (проверено WebFetch); https://marketplace.aviationweek.com/suppliers/europea-microfusioni-aerospaziali-spa/"
+  },
+  {
+   "claim": "Ansaldo Energia (Генуя) — лицензиатская линия V94.3A: турбина AE94.3A это та же платформа 94.3A (>5 млн EOH), Ansaldo делает для неё сервис, апгрейды и запчасти независимо от Siemens; первая ступень GT36/AE-линейки — монокристаллическое литьё",
+   "source": "https://www.ansaldoenergia.com/offering/equipment/turbomachinery/heavy-duty-gas-turbine/ae943a (проверено WebFetch); https://gasturbineworld.com/new-gt36-has-completed-validation-testing/"
+  },
+  {
+   "claim": "Wuxi Turbine Blade (WTB, Китай) заявляет производство лопаток тяжёлых ГТ E/F/H/HL-класса под требования GE Vernova, Siemens Energy, Mitsubishi, Ansaldo и Doosan; сайт turblade.com из нашей сети не открылся (503), проверка только по поисковым сниппетам",
+   "source": "https://www.turblade.com/en/energy/101.html (fetch 503 — верификация неполная)"
+  },
+  {
+   "claim": "MD&A (Mechanical Dynamics & Analysis) — самый предметный независимый игрок по V94.3A: ремонт рабочих и направляющих лопаток ступеней 1-4, наружных уплотнений, а также «enhanced V94.3A new parts» собственной разработки; активно спонсирует user group SGT5-4000F (Роттердам 2026, Дубай 2025)",
+   "source": "https://www.mdaturbines.com/siemens-v943a-turbine/; https://www.mdaturbines.com/parts/gas-turbine/v-class-parts-solutions/ (страница существует, контент подгружается JS); https://www.mdaturbines.com/resources/tradeshows/sgt5-4000f-user-group-v94-3a-conference-2026/"
+  },
+  {
+   "claim": "Sulzer инспектирует и ремонтирует V-двигатели (V94.2/84.2, 94.3A) по всему миру, но новые крупные детали делает только для V94.2/84.2, V64.3A и AE64.3A — новых деталей 94.3A в оферте нет; ремонт горячего тракта и изготовление эквивалентных лопаток подтверждены брошюрами",
+   "source": "https://www.sulzer.com/en/shared/services/gas-turbine-parts (проверено WebFetch); https://www.ccj-online.com/sulzer-inspects-repairs-v-engines-worldwide/"
+  },
+  {
+   "claim": "Chromalloy HIT обслуживает тяжёлые промышленные турбины ABB, GE, Siemens, Westinghouse — ремонт и покрытия горячего тракта, программа LifeX (PMA-детали и глубокие ремонты); конкретно 4000F на сайте не назван (контент обрезается)",
+   "source": "https://www.chromalloy.com/energy/; https://www.power-eng.com/gas/turbines/special-focus-gas-turbine-maintenance-repair-shop-listings/"
+  },
+  {
+   "claim": "Liburdi поддерживает 22 модели Siemens, включая V84.2 и V84.3A1 (американская сестра 4000F), но V94.3A/SGT5-4000F в списке НЕ значится; технологии ремонта лопаток FSR и Liburdi Powder Metallurgy применимы к тому же классу DS/SX",
+   "source": "https://www.liburditurbineservices.com/supported-gas-turbine-models/siemens-gas-turbines (проверено WebFetch)"
+  },
+  {
+   "claim": "Doosan Turbomachinery Services (La Porte, TX, с 1996) — ремонт компонентов и роторов ГТ, включая линейку Siemens/Westinghouse 501; сайты doosanturbo.com и doosanturbomachineryservices.com блокируют наш fetch (403/503) — верификация по сниппетам",
+   "source": "https://www.doosanturbomachineryservices.com/engines/w501/ (fetch недоступен)"
+  },
+  {
+   "claim": "Masaood John Brown (Джебель-Али, ОАЭ, цех 8000 м²) ремонтирует компоненты тяжёлых ГТ: GE MS3002-9001FA, Westinghouse W251/W501, MHI M501/M701, ABB 11D/13E и Siemens V64.3; V94 в списке НЕ заявлен — годится как региональная площадка для переговоров, не как готовый 4000F-шоп",
+   "source": "https://mjbi.com/component-repair-service/ (проверено WebFetch)"
+  },
+  {
+   "claim": "MTU Maintenance Berlin-Brandenburg — только аэродеривативы GE LM2500/LM5000/LM6000 (Level IV depot), тяжёлые рамные машины типа 4000F не ремонтирует — из списка исключён",
+   "source": "https://www.mtu.de/maintenance/industrial-gas-turbines/"
+  },
+  {
+   "claim": "TurbineAero — исключительно APU MRO (ВСУ самолётов), к тяжёлым ГТ отношения не имеет — из списка исключён",
+   "source": "https://www.turbineaero.com/ (проверено WebFetch)"
+  },
+  {
+   "claim": "EthosEnergy позиционируется по тяжёлым ГТ парков GE и Fiat/Westinghouse; подтверждения работ по V94.3A нет, сайт отдаёт 503 — в шорт-лист не включён",
+   "source": "https://ethosenergy.com/services/heavy-duty-gas-turbines (fetch 503)"
+  },
+  {
+   "claim": "Иранские игроки цепочки V94.2/94.3 (MAPNA/TUGA/Parto) намеренно исключены из выборки полностью, согласно правилам задачи",
+   "source": "условие задачи"
+  },
+  {
+   "claim": "PSM (Hanwha) делает aftermarket-детали для 501F (SGT6-5000F), а не для 4000F — не включён",
+   "source": "https://www.psm.com/products/f-class-frames/501f"
+  },
+  {
+   "claim": "Ориентир по подходу к литейкам: все они льют по чертежам OEM и без прав на дизайн 4000F продавать «в рынок» не могут — реалистичный запрос это номенклатурный (какие платформы/ступени льёте, под чьим IP, готовы ли к RE-проекту), а не PN-запрос",
+   "source": "вывод из бизнес-модели отрасли (EPRI Guideline 1020580 описывает варианты aftermarket-закупки по V84.3A: https://www.epri.com/#/pages/product/1020580/)"
+  }
+ ],
+ "companies": [
+  {
+   "name": "Siemens Energy AG",
+   "country": "Германия",
+   "site": "https://www.siemens-energy.com",
+   "email": "",
+   "what": "OEM SGT5-4000F: производство горячего тракта и горелок (Берлин, Huttenstraße), LTP/капремонты, оригинальные запчасти, реконд компонентов",
+   "relation": "OEM (полная машина и оригинальный aftermarket)",
+   "evidence": "https://www.siemens-energy.com/global/en/home/products-services/product/sgt5-4000f.html",
+   "ask": "pn",
+   "rank": 3
+  },
+  {
+   "name": "Ansaldo Energia S.p.A.",
+   "country": "Италия",
+   "site": "https://www.ansaldoenergia.com",
+   "email": "",
+   "what": "Полная машина AE94.3A (экс-лицензия Siemens, с 2016 неограниченные права по решению ICC): новые ГТ, запчасти горячего тракта, апгрейды MXL2/AirFlex, сервис",
+   "relation": "лицензиат (Siemens), с 2005/2016 — независимый изготовитель полной машины",
+   "evidence": "https://www.ansaldoenergia.com/offering/equipment/turbomachinery/heavy-duty-gas-turbine/ae943a",
+   "ask": "nomen",
+   "rank": 1
+  },
+  {
+   "name": "Shanghai Electric (SEPG / Shanghai Electric Gas Turbine Co.)",
+   "country": "Китай",
+   "site": "https://shanghaielectric-smec.com",
+   "email": "",
+   "what": "Производство и сервис AE94.3A/AE94.2/AE64.3A в КНР через СП с Ansaldo (40% акционер Ansaldo Energia с 2014)",
+   "relation": "лицензиат-партнёр (через СП с Ansaldo)",
+   "evidence": "https://shanghaielectric-smec.com/2-1-4-gas-turbines/",
+   "ask": "nomen",
+   "rank": 2
+  },
+  {
+   "name": "MD&A (Mechanical Dynamics & Analysis)",
+   "country": "США",
+   "site": "https://www.mdaturbines.com",
+   "email": "",
+   "what": "Независимый сервис V94.3A: инспекции КС/ГГТ, ремонт компонентов горячего тракта (Хьюстон, Сан-Антонио), ремонт роторов (Сент-Луис), enhanced новые части V-класса; организатор конференций SGT5-4000F User Group. Сайт живой, но контент рендерится JS — страницы подтверждены поиском",
+   "relation": "независимый ремонтник + изготовитель улучшенных частей",
+   "evidence": "https://www.mdaturbines.com/siemens-v943a-turbine/ ; https://www.mdaturbines.com/parts/gas-turbine/v-class-parts-solutions/",
+   "ask": "pn",
+   "rank": 1
+  },
+  {
+   "name": "Sulzer (Rotating Equipment Services)",
+   "country": "Швейцария (цеха глобально)",
+   "site": "https://www.sulzer.com/en/services/rotating-equipment-services/gas-turbine-services",
+   "email": "",
+   "what": "Инспекции, цеховой ремонт компонентов и полевой сервис V94/84.2 и V94/84.3A по миру; новые эквивалентные части — для V94.2 (для 94.3A только ремонт)",
+   "relation": "независимый ремонтник (для V94.2 также изготовитель эквивалентных частей)",
+   "evidence": "https://www.ccj-online.com/sulzer-inspects-repairs-v-engines-worldwide/",
+   "ask": "pn",
+   "rank": 2
+  },
+  {
+   "name": "Allied Power Group (APG)",
+   "country": "США",
+   "site": "https://alliedpg.com",
+   "email": "sales@alliedpg.com",
+   "what": "Ремонт компонентов ГТ и полевой сервис Siemens V-фреймов (страница решений Siemens V94; 133 тыс. кв. футов цехов в Хьюстоне); новые и восстановленные части",
+   "relation": "независимый ремонтник",
+   "evidence": "https://alliedpg.com/solutions/siemens-v94-gas-turbine/",
+   "ask": "sample",
+   "rank": 3
+  },
+  {
+   "name": "EUGEN ARNOLD GmbH (ARNOLD Group)",
+   "country": "Германия",
+   "site": "https://www.arnoldgroup.com",
+   "email": "info@arnoldgroup.com",
+   "what": "Изоляционные системы для V94.3A/SGT5-4000F: >180 установленных систем, разработчик изоляции первой V94.3A (испытательный стенд Seabank, UK); также ремонт/полевой сервис по 94.3A",
+   "relation": "специализированный субпоставщик/сервис (изоляция корпусов)",
+   "evidence": "https://www.arnoldgroup.com/insulation-systems/insulation-systems-for-gas-turbines/v94-3a-sgt5-4000f/?lang=en",
+   "ask": "nomen",
+   "rank": 1
+  },
+  {
+   "name": "Liburdi Turbine Services",
+   "country": "Канада",
+   "site": "https://www.liburditurbineservices.com",
+   "email": "",
+   "what": "Ремонт лопаток/сопловых/камер сгорания Siemens; в списке поддерживаемых моделей — V84.2, V84.3A1 (горячий тракт семейства Vx4.3A); спонсор V94.3A user group",
+   "relation": "независимый ремонтник (компонентный, металлургия/LPM-наплавка)",
+   "evidence": "https://www.liburditurbineservices.com/supported-gas-turbine-models/siemens-gas-turbines ; https://www.turbomachinerymag.com/view/v94-3a-2022-user-conference",
+   "ask": "sample",
+   "rank": 4
+  },
+  {
+   "name": "Doncasters Precision Castings (Bochum)",
+   "country": "Великобритания / Германия",
+   "site": "https://www.doncasters.com",
+   "email": "",
+   "what": "Вакуумное литьё SX/DS/CC лопаток и сопловых для тяжёлых IGT (завод Бохум, инвестиции $52 млн в крупногабаритное IGT-литьё); вероятный литейный субпоставщик уровня Siemens/Ansaldo — прямая привязка к 4000F не опубликована. Основной сайт отдаёт 403 на WebFetch, страницы подтверждены поиском и пресс-релизом",
+   "relation": "OEM-субпоставщик литья (вероятный; европейские IGT OEM)",
+   "evidence": "https://www.doncasters.com/doncasters-announces-52-million-investment-in-bochum-manufacturing-facility/",
+   "ask": "sample",
+   "rank": 2
+  },
+  {
+   "name": "Saarschmiede GmbH Freiformschmiede",
+   "country": "Германия",
+   "site": "https://www.saarschmiede.de",
+   "email": "saarschmiede@saarschmiede.com",
+   "what": "Свободная ковка: диски ГТ и роторные валы из жаропрочных сталей; таможенные записи показывают отгрузки в адрес Siemens Energy Inc. — кандидат в цепочку роторов 4000F (Мюльхайм)",
+   "relation": "OEM-субпоставщик поковок (Siemens Energy — по импортным записям)",
+   "evidence": "https://www.importgenius.com/suppliers/saarschmiede-gmbh",
+   "ask": "nomen",
+   "rank": 3
+  },
+  {
+   "name": "UNICA",
+   "country": "Россия",
+   "site": "https://unica.ru.com/gasturbines/en",
+   "email": "info@unica.eu.com",
+   "what": "ТРЕЙДЕР. Поставка запчастей SGT5-4000F/V94.3A: лопатки/сопловые горячего тракта, горелки, пламенные трубы, керамические плитки, подшипники; работает с 1986",
+   "relation": "трейдер (РФ, «выстроенная цепочка поставок»)",
+   "evidence": "https://unica.ru.com/gasturbines/en",
+   "ask": "pn",
+   "rank": 1
+  },
+  {
+   "name": "INTECH GmbH (ООО «Интех ГмбХ»)",
+   "country": "Россия",
+   "site": "https://intech-gmbh.ru",
+   "email": "info@intech-gmbh.ru",
+   "what": "ТРЕЙДЕР/инжиниринг. Основная номенклатура — V94.2 (крепёж, уплотнительные ленты, колодки подшипников, комплекты под замену лопаток); по V94.3A (SGT5-4000F) — консалтинг и подбор",
+   "relation": "трейдер + инжиниринговая компания",
+   "evidence": "https://intech-gmbh.ru/en/complex_service/gas_turbines_spare_parts_supply_siemens/",
+   "ask": "nomen",
+   "rank": 2
+  },
+  {
+   "name": "Theta Tech International Trading Ltd. (TTI)",
+   "country": "Тайвань",
+   "site": "https://www.ttitl.net",
+   "email": "sales@ttitl.net",
+   "what": "ТРЕЙДЕР. OEM и aftermarket запчасти для Siemens V94.2 и V94.3A (также BHEL, GE, Hitachi) для энергетики и нефтегаза",
+   "relation": "трейдер",
+   "evidence": "https://www.ttitl.net/products-gas-turbine-parts/",
+   "ask": "pn",
+   "rank": 3
+  },
+  {
+   "name": "Gasre Oy",
+   "country": "Финляндия",
+   "site": "https://gasre.com",
+   "email": "info@GASRE.com",
+   "what": "Сервис-консалтинг по обслуживанию парка V94.3A и ПО учёта частей TMMonitor (трекинг ресурса компонентов ГТ); организует V94.3A-вебинары — источник fleet-intelligence и контактов операторов",
+   "relation": "сервис-консультант (не изготовитель)",
+   "evidence": "https://gasre.com/v943a-webinar-october-2021",
+   "ask": "nomen",
+   "rank": 5
+  },
+  {
+   "name": "Howmet Aerospace (Engine Systems, экс-Alcoa/Howmet)",
+   "country": "США/Великобритания/Франция/Венгрия",
+   "site": "https://www.howmet.com/howmet-engine-systems/",
+   "email": "",
+   "what": "Крупнейший мировой литейщик лопаток для наземных ГТ (SX/DS); IGT-литьё в Hampton VA, Whitehall MI, Exeter UK, Gennevilliers FR, Székesfehérvár HU; лил по контрактам GE/Siemens/Alstom/Mitsubishi",
+   "relation": "OEM-субпоставщик (мульти-OEM, вкл. Siemens)",
+   "evidence": "https://www.michiganbusiness.org/reports-data/success-stories/howmet/",
+   "ask": "nomen",
+   "rank": 2
+  },
+  {
+   "name": "PCC Airfoils LLC (Precision Castparts Corp.)",
+   "country": "США/Великобритания",
+   "site": "https://www.pccairfoils.com/",
+   "email": "",
+   "what": "Инвестиционное литьё лопаток категории Power Generation (IGT), площадки Minerva/Douglas/UK; вертикальная интеграция от сплава до мехобработки",
+   "relation": "OEM-субпоставщик (мульти-OEM)",
+   "evidence": "https://www.pccairfoils.com/",
+   "ask": "nomen",
+   "rank": 3
+  },
+  {
+   "name": "CPP — Consolidated Precision Products",
+   "country": "США",
+   "site": "https://www.cppcorp.com/airfoils",
+   "email": "",
+   "what": "Литьё крупногабаритных рабочих и направляющих лопаток IGT, включая multi-wall DS и SX профили горячего тракта",
+   "relation": "OEM-субпоставщик (мульти-OEM)",
+   "evidence": "https://www.cppcorp.com/airfoils",
+   "ask": "nomen",
+   "rank": 4
+  },
+  {
+   "name": "GF Precicast SA (Georg Fischer, Novazzano)",
+   "country": "Швейцария",
+   "site": "https://www.gfprecicast.com/",
+   "email": "info.GFPrecicast@georgfischer.com",
+   "what": "Точное литьё суперсплавов equiax/DS/SX для OEM газовых турбин; клиенты Siemens, Alstom, Rolls-Royce, Safran; логичный узел европейской/Ansaldo цепочки",
+   "relation": "OEM-субпоставщик (Siemens/Alstom в клиентах)",
+   "evidence": "https://giesserei-verband.ch/en/member/precicast-sa/",
+   "ask": "nomen",
+   "rank": 5
+  },
+  {
+   "name": "EMA — Europea Microfusioni Aerospaziali S.p.A.",
+   "country": "Италия",
+   "site": "https://www.emaht.com/",
+   "email": "info@emaht.com",
+   "what": "Литейка SX/DS/EXQ лопаток и статоров, в т.ч. для энергетики; единственный завод в Morra De Sanctis (Авеллино); кандидат итальянской цепочки Ansaldo (прямая связь с 94.3A не подтверждена)",
+   "relation": "OEM-субпоставщик (группа Rolls-Royce; Ansaldo-цепочка вероятна, не доказана)",
+   "evidence": "https://www.emaht.com/",
+   "ask": "nomen",
+   "rank": 6
+  },
+  {
+   "name": "Cannon-Muskegon Corporation (в составе PCC)",
+   "country": "США",
+   "site": "https://www.pccairfoils.com/",
+   "email": "",
+   "what": "Производитель суперсплавов CM247LC/CMSX-4 и др. — базовые сплавы DS/SX лопаток F-класса; вход в цепочку через сплав, а не готовую деталь",
+   "relation": "OEM-субпоставщик сплавов",
+   "evidence": "https://www.pccairfoils.com/",
+   "ask": "nomen",
+   "rank": 7
+  },
+  {
+   "name": "Wuxi Turbine Blade Co., Ltd (WTB)",
+   "country": "Китай",
+   "site": "https://www.turblade.com/en/",
+   "email": "",
+   "what": "Лопатки тяжёлых ГТ E/F/H/HL-класса, заявленные клиенты GE Vernova, Siemens Energy, Ansaldo, Mitsubishi, Doosan; ВНИМАНИЕ: сайт не открылся через наш fetch (503), верификация только по сниппетам — проверить перед RFQ",
+   "relation": "независимый изготовитель / субпоставщик мульти-OEM (верификация неполная)",
+   "evidence": "https://www.turblade.com/en/energy/101.html",
+   "ask": "nomen",
+   "rank": 8
+  },
+  {
+   "name": "Sulzer Turbo Services",
+   "country": "Швейцария/Нидерланды/США",
+   "site": "https://www.sulzer.com/en/shared/services/gas-turbine-parts",
+   "email": "",
+   "what": "Инспекции и ремонты V-парка (вкл. 94.3A) по миру; новые эквивалентные детали — только V94.2/84.2, V64.3A, AE64.3A (не 94.3A); ремонт лопаток/НА горячего тракта, покрытия",
+   "relation": "независимый ремонтник (новые детали 94.3A не делает)",
+   "evidence": "https://www.ccj-online.com/sulzer-inspects-repairs-v-engines-worldwide/",
+   "ask": "sample",
+   "rank": 2
+  },
+  {
+   "name": "Chromalloy (Chromalloy HIT)",
+   "country": "США",
+   "site": "https://www.chromalloy.com/energy/",
+   "email": "",
+   "what": "Ремонт и покрытия горячего тракта тяжёлых промышленных ГТ ABB/GE/Siemens/Westinghouse; PMA-детали и ремонты LifeX; конкретно 4000F на сайте не назван — уточнять запросом",
+   "relation": "независимый ремонтник + PMA-изготовитель",
+   "evidence": "https://www.power-eng.com/gas/turbines/special-focus-gas-turbine-maintenance-repair-shop-listings/",
+   "ask": "sample",
+   "rank": 4
+  },
+  {
+   "name": "Doosan Turbomachinery Services",
+   "country": "США",
+   "site": "https://www.doosanturbo.com/",
+   "email": "",
+   "what": "Ремонт компонентов и роторов тяжёлых ГТ, включая Siemens/Westinghouse 501-линейку, цех 100 000+ фт² в La Porte TX; сайт блокирует наш fetch — данные по сниппетам, перепроверить",
+   "relation": "независимый ремонтник (верификация неполная)",
+   "evidence": "https://www.doosanturbomachineryservices.com/engines/w501/",
+   "ask": "sample",
+   "rank": 6
+  },
+  {
+   "name": "Masaood John Brown (MJB International)",
+   "country": "ОАЭ",
+   "site": "https://mjbi.com/component-repair-service/",
+   "email": "",
+   "what": "Ремонт компонентов тяжёлых ГТ (GE, W251/W501, M501/M701, ABB 11D/13E, Siemens V64.3), TBC/HVOF покрытия, реблейдинг роторов; V94 не заявлен — региональный (Дубай) вариант под переговоры",
+   "relation": "независимый ремонтник (фокус GE; 94.3A не подтверждён)",
+   "evidence": "https://mjbi.com/component-repair-service/",
+   "ask": "sample",
+   "rank": 7
+  },
+  {
+   "name": "INTECH GmbH",
+   "country": "Россия",
+   "site": "https://intech-gmbh.ru/en/complex_service/gas_turbines_spare_parts_supply_siemens/",
+   "email": "info@intech-gmbh.ru",
+   "what": "ТРЕЙДЕР: поставка запчастей и «консалтинг по лопаткам и НА» для Siemens V94.2, V94.3A (SGT5-4000F), SGT-600/700/800; заявляется производственно-инжиниринговой компанией, фактически посредник; база РФ",
+   "relation": "трейдер",
+   "evidence": "https://intech-gmbh.ru/en/complex_service/gas_turbines_spare_parts_supply_siemens/",
+   "ask": "pn",
+   "rank": 8
+  },
+  {
+   "name": "ReflowX",
+   "country": "ОАЭ",
+   "site": "https://www.reflowx.com/power-generation/siemens-sgt5-4000f-v943a2-gas-turbine-2004-gt11",
+   "email": "info@reflowx.com",
+   "what": "ТРЕЙДЕР/маркетплейс б/у энергооборудования: две б/у SGT5-4000F (2004 г., 105 тыс. часов, локация Китай) — потенциальный источник доноров лопаток/узлов",
+   "relation": "трейдер (б/у оборудование)",
+   "evidence": "https://www.reflowx.com/power-generation/siemens-sgt5-4000f-v943a2-gas-turbine-2004-gt11",
+   "ask": "pn",
+   "rank": 10
+  }
+ ]
+}
