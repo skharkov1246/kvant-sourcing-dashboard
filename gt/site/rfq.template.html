@@ -371,6 +371,17 @@ function exportCSV(){
  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='rfq_plan.csv'; a.click();
 }
 render();
+/* глубокие ссылки из меню лота: #stock, #trade, #dir=<направление> */
+(function(){
+ const h=decodeURIComponent(location.hash.slice(1));
+ if(h==='stock'){ showPane('stock'); }
+ else if(h==='trade'){ const el=document.getElementById('f-cat'); 
+  for(const o of el.options) if(o.value.startsWith('трейдеры')) { el.value=o.value; break; }
+  render(); }
+ else if(h.startsWith('dir=')){ const v=h.slice(4); const el=document.getElementById('f-dir');
+  for(const o of el.options) if(o.value===v){ el.value=v; break; }
+  render(); }
+})();
 </script>
 </body>
 </html>
