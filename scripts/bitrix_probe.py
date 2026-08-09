@@ -1,18 +1,25 @@
-"""CI-зонд v17: бюджеты сделок — сами ссылки и их доступность.
+"""CI-зонд v18: материал для проектирования оргструктуры коммерческого блока.
 
-UF_CRM_1577100780 «Transaction budget + product conditions» заполнен у 833 сделок кат.0
-и ведёт на Google Sheets. Достаём образцы ссылок и проверяем, открываются ли они
-без авторизации (export?format=csv). Заодно — покрытие по стадиям.
+Собираем факты, а не мнения: дерево отделов, люди, деньги по отделам и воронкам,
+пересечения отделов на одних клиентах, заполняемость ролевых полей.
 """
 from __future__ import annotations
 
+import datetime as dt
 import os
 import re
-from collections import Counter
+from collections import Counter, defaultdict
 
 import requests
 
-BUD = "UF_CRM_1577100780"
+YTD = "2026-01-01"
+ROLES = {
+    "UF_CRM_1736926032": "KAM", "UF_CRM_1740390857": "КАМ(2)",
+    "UF_CRM_1779187335": "Сорсер", "UF_CRM_1779187425": "Product leader",
+    "UF_CRM_1776169420": "Head of sourcing", "UF_CRM_1781863844": "Тендерный специалист",
+    "UF_CRM_1781863815": "Рук. тендерного", "UF_CRM_1781858627": "Ответственный за реализацию",
+    "UF_CRM_1715604558": "Сопровождение сделки (ОСС)",
+}
 
 
 def bx(method: str, params: dict | None = None) -> dict:
@@ -39,51 +46,107 @@ def bx_all(method: str, params: dict) -> list:
         start = j["next"]
 
 
-def regno(t) -> int:
-    m = re.match(r"\s*(\d{1,4})(?:/\d+)?\.", str(t or ""))
-    return int(m.group(1)) if m else 0
-
-
 def main() -> int:
-    deals = bx_all("crm.deal.list", {"filter": {"CATEGORY_ID": 0},
-                                     "select": ["ID", "TITLE", "STAGE_ID", "STAGE_SEMANTIC_ID",
-                                                "OPPORTUNITY", "CURRENCY_ID", BUD]})
-    have = [d for d in deals if str(d.get(BUD) or "").startswith("http")]
-    print(f"=== 1. Покрытие: {len(have)} из {len(deals)} сделок кат.0 имеют ссылку на бюджет ===")
-    live = [d for d in deals if (d.get("STAGE_SEMANTIC_ID") or "") not in ("S", "F")]
-    live_have = [d for d in live if str(d.get(BUD) or "").startswith("http")]
-    print(f"  среди открытых: {len(live_have)} из {len(live)}")
+    print("=== 1. ДЕРЕВО ОТДЕЛОВ ===")
+    deps = bx_all("department.get", {})
+    byid = {str(d["ID"]): d for d in deps}
+    kids = defaultdict(list)
+    for d in deps:
+        kids[str(d.get("PARENT") or "")].append(str(d["ID"]))
+    users = bx_all("user.get", {"FILTER": {"ACTIVE": "Y"}})
+    upd = defaultdict(list)
+    uname, udept = {}, {}
+    for u in users:
+        uid = str(u["ID"])
+        uname[uid] = f"{u.get('NAME') or ''} {u.get('LAST_NAME') or ''}".strip()
+        for d in (u.get("UF_DEPARTMENT") or []):
+            upd[str(d)].append(uid)
+            udept[uid] = str(d)
 
-    print("\n=== 2. Куда ведут ссылки (домены) ===")
-    dom = Counter(re.sub(r"^https?://([^/]+)/.*$", r"\1", str(d.get(BUD))) for d in have)
-    for k, v in dom.most_common():
-        print(f"  {v:>4} — {k}")
+    def walk(did, depth=0):
+        d = byid.get(did)
+        if not d:
+            return
+        n = len(upd.get(did, []))
+        head = uname.get(str(d.get("UF_HEAD") or ""), "")
+        print(f"  {'  '*depth}{did:>5} · {str(d.get('NAME'))[:44]:46s} люди:{n:>3}"
+              + (f" · рук. {head}" if head else ""))
+        for k in sorted(kids.get(did, []), key=lambda x: int(x)):
+            walk(k, depth + 1)
 
-    print("\n=== 3. Образцы: свежие сделки с бюджетом ===")
-    have.sort(key=lambda d: -regno(d.get("TITLE")))
-    samples = have[:12]
-    for d in samples:
-        print(f"  №{regno(d.get('TITLE')):>3} · сделка #{d['ID']} · {str(d.get('TITLE'))[:40]}")
-        print(f"      {str(d.get(BUD))[:150]}")
+    roots = [str(d["ID"]) for d in deps if not d.get("PARENT")]
+    for r in roots:
+        walk(r)
+    print(f"  всего отделов: {len(deps)} · активных сотрудников: {len(users)}")
 
-    print("\n=== 4. Открываются ли без авторизации? ===")
-    for d in samples[:6]:
-        url = str(d.get(BUD))
-        m = re.search(r"/spreadsheets/d/([a-zA-Z0-9-_]+)", url)
-        if not m:
-            print(f"  #{d['ID']}: не Google Sheets → {url[:70]}")
+    print("\n=== 2. ВОРОНКИ СДЕЛОК ===")
+    cats = bx("crm.category.list", {"entityTypeId": 2}).get("result", {}).get("categories", []) or []
+    for c in cats:
+        print(f"  cat {c.get('id')}: «{c.get('name')}»")
+
+    print(f"\n=== 3. СДЕЛКИ С {YTD}: деньги по отделам ===")
+    deals = bx_all("crm.deal.list", {
+        "filter": {">=DATE_CREATE": YTD},
+        "select": ["ID", "TITLE", "CATEGORY_ID", "STAGE_SEMANTIC_ID", "OPPORTUNITY",
+                   "CURRENCY_ID", "ASSIGNED_BY_ID", "COMPANY_ID"] + list(ROLES)})
+    cur = bx("crm.currency.list", {}).get("result") or []
+    rate = {c.get("CURRENCY"): float(c.get("AMOUNT") or 1) / float(c.get("AMOUNT_CNT") or 1) for c in cur}
+    def eur(v, c): return float(v or 0) * rate.get(c, 1.0)
+    print(f"  сделок с {YTD}: {len(deals)}")
+    print(f"  по воронкам: {dict(Counter(str(d.get('CATEGORY_ID')) for d in deals).most_common())}")
+
+    agg = defaultdict(lambda: {"n": 0, "sum": 0.0, "won": 0, "wonsum": 0.0, "people": set()})
+    for d in deals:
+        uid = str(d.get("ASSIGNED_BY_ID") or "")
+        did = udept.get(uid) or "—"
+        a = agg[did]
+        a["n"] += 1
+        a["sum"] += eur(d.get("OPPORTUNITY"), d.get("CURRENCY_ID"))
+        a["people"].add(uid)
+        if d.get("STAGE_SEMANTIC_ID") == "S":
+            a["won"] += 1
+            a["wonsum"] += eur(d.get("OPPORTUNITY"), d.get("CURRENCY_ID"))
+    print(f"\n  {'отдел':>6} {'название':44s} {'чел':>4} {'сделок':>7} {'Σ €':>12} {'выиграно':>9} {'Σ выигр €':>12}")
+    for did, a in sorted(agg.items(), key=lambda kv: -kv[1]["sum"])[:25]:
+        nm = str(byid.get(did, {}).get("NAME") or ("без отдела" if did == "—" else did))[:44]
+        print(f"  {did:>6} {nm:44s} {len(a['people']):>4} {a['n']:>7} {a['sum']:>12,.0f} "
+              f"{a['won']:>9} {a['wonsum']:>12,.0f}")
+
+    print("\n=== 4. ПЕРЕСЕЧЕНИЯ: сколько отделов ведут одного клиента ===")
+    comp = bx_all("crm.company.list", {"select": ["ID", "TITLE"]})
+    cname = {str(c["ID"]): c.get("TITLE") or "" for c in comp}
+    HOLD = [(r"лукойл", "Лукойл"), (r"норильск|кольская|быстринск", "Норникель"),
+            (r"таиф", "ТАИФ"), (r"сибур|ставролен|запсиб|казаньоргсинтез|нижнекамскнефтехим", "Сибур"),
+            (r"\bрн-|роснефт|башнефт", "Роснефть"), (r"газпром", "Газпром"),
+            (r"новат[эе]к|сахалинск|ямал\s*спг|арктик\s*спг", "Новатэк/Сахалин")]
+    def hold(cid):
+        t = (cname.get(str(cid)) or "").lower()
+        for rx, nm in HOLD:
+            if re.search(rx, t):
+                return nm
+        return None
+    hdep = defaultdict(lambda: defaultdict(lambda: [0, 0.0]))
+    for d in deals:
+        h = hold(d.get("COMPANY_ID"))
+        if not h:
             continue
-        sid = m.group(1)
-        exp = f"https://docs.google.com/spreadsheets/d/{sid}/export?format=csv"
-        try:
-            r = requests.get(exp, timeout=30, allow_redirects=True)
-            ct = r.headers.get("content-type", "")[:40]
-            body = r.text[:120].replace("\n", " ") if "text" in ct or "csv" in ct else ""
-            print(f"  #{d['ID']}: {r.status_code} · {ct} · {len(r.content)}Б · {body}")
-        except Exception as e:
-            print(f"  #{d['ID']}: EXC {type(e).__name__}")
+        did = udept.get(str(d.get("ASSIGNED_BY_ID") or "")) or "—"
+        cell = hdep[h][did]
+        cell[0] += 1
+        cell[1] += eur(d.get("OPPORTUNITY"), d.get("CURRENCY_ID"))
+    for h, dd in sorted(hdep.items(), key=lambda kv: -sum(v[1] for v in kv[1].values())):
+        tot = sum(v[1] for v in dd.values())
+        print(f"\n  {h}: Σ {tot:,.0f} € · отделов-участников: {len(dd)}")
+        for did, v in sorted(dd.items(), key=lambda kv: -kv[1][1])[:6]:
+            nm = str(byid.get(did, {}).get("NAME") or ("без отдела" if did == "—" else did))[:40]
+            print(f"      {did:>5} {nm:42s} {v[0]:>4} сделок · {v[1]:>12,.0f} €")
 
-    print("\n✓ зонд v17 завершён")
+    print("\n=== 5. РОЛЕВЫЕ ПОЛЯ: заполняемость на сделках этого года ===")
+    for f, nm in ROLES.items():
+        n = sum(1 for d in deals if d.get(f) not in (None, "", 0, "0", []))
+        print(f"  {nm:32s} {n:>5} из {len(deals)}")
+
+    print("\n✓ зонд v18 завершён")
     return 0
 
 
