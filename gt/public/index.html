@@ -13776,7 +13776,7 @@ const BX_SITES = {
  ]
 };
 const RESEARCH = {
-"updated": "2026-08-08",
+"updated": "2026-08-09",
 "source": "Research-вееры 06.08.2026: 12 углов (субпоставщики OEM Solar/Siemens, автомаркет по брендам и моделям, узкие специалисты по элементам, РФ/СНГ/Иран/Турция) + 3 угла наследия (Линкольн Ruston/EGT, Финспонг STAL/ABB, диаспора лицензиатов). Каждая компания — с подтверждённым официальным сайтом. + веер «рабочие юрисдикции/пэкеджеры/б-у» 06.08.2026. + веер глубоких субпоставщиков (shipment-данные ImportYeti, кейс-стади, сеть Caterpillar) 06.08.2026. + harvest раскрутки цепочек, волна 1. Harvest волны 2.",
 "rows": [
 {
@@ -27350,6 +27350,160 @@ const RESEARCH = {
 "angle": "harvest:gapmfg",
 "risk": "",
 "own_pn": "нет — работают по номерам Siemens (SIE-3AY1510-5F = 3AY1510-5F). Запрос по коду поймут; своих аналогов не делают"
+},
+{
+"name": "Shanghai Electric (SEPG / Shanghai Electric Gas Turbine Co.)",
+"country": "Китай",
+"site": "https://shanghaielectric-smec.com",
+"email": "",
+"what": "Производство и сервис AE94.3A/AE94.2/AE64.3A в КНР через СП с Ansaldo (40% акционер Ansaldo Energia с 2014) | SGT5-4000F/V94.3A",
+"link": "лицензиат-партнёр (через СП с Ansaldo)",
+"tier": "component_specialist",
+"angle": "harvest:sgt4000f",
+"risk": ""
+},
+{
+"name": "Sulzer (Rotating Equipment Services)",
+"country": "Швейцария (цеха глобально)",
+"site": "https://www.sulzer.com/en/services/rotating-equipment-services/gas-turbine-services",
+"email": "",
+"what": "Инспекции, цеховой ремонт компонентов и полевой сервис V94/84.2 и V94/84.3A по миру; новые эквивалентные части — для V94.2 (для 94.3A только ремонт) | SGT5-4000F/V94.3A",
+"link": "независимый ремонтник (для V94.2 также изготовитель эквивалентных частей)",
+"tier": "component_specialist",
+"angle": "harvest:sgt4000f",
+"risk": ""
+},
+{
+"name": "EUGEN ARNOLD GmbH (ARNOLD Group)",
+"country": "Германия",
+"site": "https://www.arnoldgroup.com",
+"email": "info@arnoldgroup.com",
+"what": "Изоляционные системы для V94.3A/SGT5-4000F: >180 установленных систем, разработчик изоляции первой V94.3A (испытательный стенд Seabank, UK); также ремонт/полевой сервис по 94.3A | SGT5-4000F/V94.3A",
+"link": "специализированный субпоставщик/сервис (изоляция корпусов)",
+"tier": "component_specialist",
+"angle": "harvest:sgt4000f",
+"risk": ""
+},
+{
+"name": "Doncasters Precision Castings (Bochum)",
+"country": "Великобритания / Германия",
+"site": "https://www.doncasters.com",
+"email": "",
+"what": "Вакуумное литьё SX/DS/CC лопаток и сопловых для тяжёлых IGT (завод Бохум, инвестиции $52 млн в крупногабаритное IGT-литьё); вероятный литейный субпоставщик уровня Siemens/Ansaldo — прямая привязка к 4000F не опубликована. Основной сайт отдаёт 403 на ",
+"link": "OEM-субпоставщик литья (вероятный; европейские IGT OEM)",
+"tier": "component_specialist",
+"angle": "harvest:sgt4000f",
+"risk": ""
+},
+{
+"name": "INTECH GmbH (ООО «Интех ГмбХ»)",
+"country": "Россия",
+"site": "https://intech-gmbh.ru",
+"email": "info@intech-gmbh.ru",
+"what": "ТРЕЙДЕР/инжиниринг. Основная номенклатура — V94.2 (крепёж, уплотнительные ленты, колодки подшипников, комплекты под замену лопаток); по V94.3A (SGT5-4000F) — консалтинг и подбор | SGT5-4000F/V94.3A",
+"link": "трейдер + инжиниринговая компания",
+"tier": "component_specialist",
+"angle": "harvest:sgt4000f",
+"risk": ""
+},
+{
+"name": "Theta Tech International Trading Ltd. (TTI)",
+"country": "Тайвань",
+"site": "https://www.ttitl.net",
+"email": "sales@ttitl.net",
+"what": "ТРЕЙДЕР. OEM и aftermarket запчасти для Siemens V94.2 и V94.3A (также BHEL, GE, Hitachi) для энергетики и нефтегаза | SGT5-4000F/V94.3A",
+"link": "трейдер",
+"tier": "component_specialist",
+"angle": "harvest:sgt4000f",
+"risk": ""
+},
+{
+"name": "Gasre Oy",
+"country": "Финляндия",
+"site": "https://gasre.com",
+"email": "info@GASRE.com",
+"what": "Сервис-консалтинг по обслуживанию парка V94.3A и ПО учёта частей TMMonitor (трекинг ресурса компонентов ГТ); организует V94.3A-вебинары — источник fleet-intelligence и контактов операторов | SGT5-4000F/V94.3A",
+"link": "сервис-консультант (не изготовитель)",
+"tier": "component_specialist",
+"angle": "harvest:sgt4000f",
+"risk": ""
+},
+{
+"name": "Howmet Aerospace (Engine Systems, экс-Alcoa/Howmet)",
+"country": "США/Великобритания/Франция/Венгрия",
+"site": "https://www.howmet.com/howmet-engine-systems/",
+"email": "",
+"what": "Крупнейший мировой литейщик лопаток для наземных ГТ (SX/DS); IGT-литьё в Hampton VA, Whitehall MI, Exeter UK, Gennevilliers FR, Székesfehérvár HU; лил по контрактам GE/Siemens/Alstom/Mitsubishi | SGT5-4000F/V94.3A",
+"link": "OEM-субпоставщик (мульти-OEM, вкл. Siemens)",
+"tier": "component_specialist",
+"angle": "harvest:sgt4000f",
+"risk": ""
+},
+{
+"name": "PCC Airfoils LLC (Precision Castparts Corp.)",
+"country": "США/Великобритания",
+"site": "https://www.pccairfoils.com/",
+"email": "",
+"what": "Инвестиционное литьё лопаток категории Power Generation (IGT), площадки Minerva/Douglas/UK; вертикальная интеграция от сплава до мехобработки | SGT5-4000F/V94.3A",
+"link": "OEM-субпоставщик (мульти-OEM)",
+"tier": "component_specialist",
+"angle": "harvest:sgt4000f",
+"risk": ""
+},
+{
+"name": "CPP — Consolidated Precision Products",
+"country": "США",
+"site": "https://www.cppcorp.com/airfoils",
+"email": "",
+"what": "Литьё крупногабаритных рабочих и направляющих лопаток IGT, включая multi-wall DS и SX профили горячего тракта | SGT5-4000F/V94.3A",
+"link": "OEM-субпоставщик (мульти-OEM)",
+"tier": "component_specialist",
+"angle": "harvest:sgt4000f",
+"risk": ""
+},
+{
+"name": "GF Precicast SA (Georg Fischer, Novazzano)",
+"country": "Швейцария",
+"site": "https://www.gfprecicast.com/",
+"email": "info.GFPrecicast@georgfischer.com",
+"what": "Точное литьё суперсплавов equiax/DS/SX для OEM газовых турбин; клиенты Siemens, Alstom, Rolls-Royce, Safran; логичный узел европейской/Ansaldo цепочки | SGT5-4000F/V94.3A",
+"link": "OEM-субпоставщик (Siemens/Alstom в клиентах)",
+"tier": "component_specialist",
+"angle": "harvest:sgt4000f",
+"risk": ""
+},
+{
+"name": "EMA — Europea Microfusioni Aerospaziali S.p.A.",
+"country": "Италия",
+"site": "https://www.emaht.com/",
+"email": "info@emaht.com",
+"what": "Литейка SX/DS/EXQ лопаток и статоров, в т.ч. для энергетики; единственный завод в Morra De Sanctis (Авеллино); кандидат итальянской цепочки Ansaldo (прямая связь с 94.3A не подтверждена) | SGT5-4000F/V94.3A",
+"link": "OEM-субпоставщик (группа Rolls-Royce; Ansaldo-цепочка вероятна, не доказана)",
+"tier": "component_specialist",
+"angle": "harvest:sgt4000f",
+"risk": ""
+},
+{
+"name": "Cannon-Muskegon Corporation (в составе PCC)",
+"country": "США",
+"site": "https://www.pccairfoils.com/",
+"email": "",
+"what": "Производитель суперсплавов CM247LC/CMSX-4 и др. — базовые сплавы DS/SX лопаток F-класса; вход в цепочку через сплав, а не готовую деталь | SGT5-4000F/V94.3A",
+"link": "OEM-субпоставщик сплавов",
+"tier": "component_specialist",
+"angle": "harvest:sgt4000f",
+"risk": ""
+},
+{
+"name": "Chromalloy (Chromalloy HIT)",
+"country": "США",
+"site": "https://www.chromalloy.com/energy/",
+"email": "",
+"what": "Ремонт и покрытия горячего тракта тяжёлых промышленных ГТ ABB/GE/Siemens/Westinghouse; PMA-детали и ремонты LifeX; конкретно 4000F на сайте не назван — уточнять запросом | SGT5-4000F/V94.3A",
+"link": "независимый ремонтник + PMA-изготовитель",
+"tier": "component_specialist",
+"angle": "harvest:sgt4000f",
+"risk": ""
 }
 ]
 };
