@@ -143,6 +143,11 @@ function render(){
     ${p.risks?`<div class="risk"><b>Риски:</b> ${esc(p.risks)}</div>`:''}
     <h3>Кому писать (№1 — первым)</h3>
     ${(p.candidates||[]).sort((a,b)=>a.rank-b.rank).map(c=>candRow(p.key,c)).join('')||'<div class="mut">ресерч в работе — кандидаты появятся после проверки</div>'}
+    ${(p.pn_map&&p.pn_map.length)?`<h3>Карта кодов — что на что ложится</h3>
+     <div class="tblwrap"><table><tr><th>Код</th><th>Куда ложится</th><th>Чем отличается</th><th>Взаимозаменяемость</th></tr>
+     ${p.pn_map.map(m=>`<tr><td class="pn" style="white-space:nowrap">${esc(m.pn)}</td><td>${esc(m.fits)}</td><td class="mut">${esc(m.differs||'')}</td><td class="mut">${esc(m.interchange||'')}</td></tr>`).join('')}
+     </table></div>`:''}
+    ${p.advice?`<div class="risk" style="border-left-color:var(--good)"><b>Как запрашивать:</b> ${esc(p.advice)}</div>`:''}
     ${(p.facts&&p.facts.length)?`<details class="facts"><summary>Фактура ресерча (${p.facts.length})</summary>
      ${p.facts.map(f=>`<div class="fact">${esc(f.claim)}${f.source?` <a href="${esc(f.source)}" target="_blank" rel="noopener">→</a>`:''}</div>`).join('')}</details>`:''}
    </div>

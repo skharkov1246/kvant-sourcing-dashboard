@@ -9,9 +9,63 @@
    "pn": "32997041_К",
    "qty": 2,
    "unit": "шт.",
-   "facts": [],
+   "facts": [
+    {
+     "claim": "В самой заявке (лист «Энергосети») позиция значится как «Труба жаровая внутренняя (32997041_К)», производитель указан «Siemens», модель — «газотурбинный двигатель Dresser Rand KG2-3E», 2 шт. Суффикс «_К» — кириллическая буква, т.е. добавлен на российской стороне (учётная система заказчика/ЛУКОЙЛ), в западных каталогах такого написания быть не может.",
+     "source": "внутренние данные проекта: /home/user/kvant-sourcing-dashboard/gt/data/rfq_demand.json и gt/data/hot_parts.json"
+    },
+    {
+     "claim": "Базовый код 32997041 в открытом вебе не индексируется ни как Dresser-Rand PN, ни в российских тендерах — ноль совпадений по всем проверкам (Google-поиск по «32997041» в связках с KG2/Dresser/жаровая/liner/тендер). Атрибуция формата возможна только косвенно: 8-значный цифровой код без букв соответствует стилю материальных номеров Dresser-Rand/Kongsberg (сама машина маркируется буквенно: KG2-3E), но это НЕ подтверждено документально — подтверждение даст только OEM или независимый стокист по IPC.",
+     "source": "серия проверок WebSearch 09.08.2026 — нулевые выдачи по PN; отрицательный результат зафиксирован"
+    },
+    {
+     "claim": "Генеалогия машины: КG2 разработан Kongsberg Våpenfabrikk (решение о разработке — 1964 г.), фирменная черта — полностью радиальный ротор; ~80 двигателей продано в морском исполнении к октябрю 1973; Dresser-Rand сначала стал партнёром, а затем (1987) выкупил газотурбинный бизнес Kongsberg. KG2-3G — прямой преемник KG2-3C и KG2-3E.",
+     "source": "ASME GT2018 «Kongsberg Gas Turbines Through Fifty Years» — https://www.researchgate.net/publication/327330782 и https://asmedigitalcollection.asme.org/GT/proceedings/GT2018/51173/V008T26A002/272658"
+    },
+    {
+     "claim": "Конструкция KG2: single-shaft, одноступенчатый компрессор + одноступенчатая (радиальная) турбина, консольный ротор — «no hot bearings»; камера сгорания ОДНА (в датащите Power Oxidizer «replaces the combustor» — в единственном числе), т.е. жаровая труба на машину одна. Парк ~1000 установленных машин, >25 млн наработанных часов.",
+     "source": "фирменный датащит Dresser-Rand KG2-3G/PO (текст извлечён из PDF) — https://www.ener-core.com/wp-content/uploads/2016/02/19002_KG2-3G_Ener-Core.pdf"
+    },
+    {
+     "claim": "Отличия вариантов по горячей части: KG2-3E — 1900–1934 кВт, диффузионная камера, dual fuel (газ, в т.ч. попутный с серой до 2,5%, и жидкое топливо, включая смеси), ресурс до капремонта ~5 лет; KG2-3G — 2 МВт с DLE-камерой (≤24 vppm NOx), 26% КПД против 18% у 3E; KG2-3G(EF)/PO — 1,85 МВт, вместо камеры сгорания внешний power oxidizer/внешняя топка (обозначение EF = externally fired). Жаровая DLE-машины и externally-fired исполнения конструктивно иная — с 3E не взаимозаменяема.",
+     "source": "https://www.oborudunion.ru/catalog/gazoturbinnaya-ustanovka-kg2-3-e-dresser-rand-moschnost-1900-kvt-999590519/ (ХансаЭнерго, 1900 кВт, сера 2,5%), http://gasandsteamturbines.blogspot.com/2017/03/dresser-rand-kg2-gas-turbines.html (1.934 МВт/18% vs 2 "
+    },
+    {
+     "claim": "Куда идти сегодня: Siemens купил Dresser-Rand в 2015; линейка KG2 продаётся Siemens Energy как SGT-50 (ядро SGT-50 — «Dresser-Rand KG2-3G unit»); завод/сервис — Kongsberg Service Center Siemens Energy, Kirkegårdsveien 45, 3616 Kongsberg, Норвегия: new build SGT-50, ремонты, запчасти («Parts — commercial transaction of components»), full load test, балансировка роторов.",
+     "source": "https://en.wikipedia.org/wiki/Dresser-Rand ; https://www.siemens-energy.com/us/en/home/products-services/product/sgt-50.html ; брошюра Kongsberg Service Center (текст извлечён из PDF) https://assets.siemens-energy.com/dam/4904ca1f-9450-4025-8fb9-b30c"
+    },
+    {
+     "claim": "Независимые каналы по жаровым KG2: Antoni International (Хьюстон) — «specializes independently in the supply of spare parts for KONGSBERG DRESSER RAND applications», двигатели известны также как VIKING и NATCO (North American Turbine Corporation); R&H Supply (Хьюстон + Абердин) прямо перечисляет KG2-3C, KG2-3E, KG2-3R и hot gas path/combustion parts. Доноры горячей части — целые машины с малой наработкой на вторичке (IMP #10111 KG2-3C <80 ч; sirgen — 3×KG2-3A 695 ч).",
+     "source": "http://www.antoni-intl.com/Kongsberg+Dresser/id/38 (проверено curl 09.08.2026) ; https://randhsupply.com/gas-turbines/ ; https://www.impcorporation.com/en-us/inventory/details/10111/1978-kongsberg-kg-2-3-c-generator-set ; http://www.sirgen.com/GT0700"
+    },
+    {
+     "claim": "Парк KG2 в РФ: документально подтверждён у ООО «ЛУКОЙЛ-ЭНЕРГОСЕТИ» (Усинск, Республика Коми) — Леккерское нефтяное месторождение (ЛУКОЙЛ-Коми): тендер 223-ФЗ «Капитальный ремонт Dresser Rand KG2-3E ГТУ-3 Леккерского н/м», НМЦ 40 953 339 руб., приём заявок до 08.11.2023, итоги 15.12.2023 (обозначение ГТУ-3 указывает минимум на 3 агрегата на площадке). Привязок к Оренбургу или Каспию в открытых источниках не найдено. Тендеров именно с PN 32997041 в агрегаторах не найдено — заявка «Энергосети» с эт",
+     "source": "https://torgi223.ru/purchaseInfo/?procedureId=OA-4233 (заказчик, объект, цена, даты — проверено WebFetch); отрицательные результаты поиска по PN в тендерных агрегаторах"
+    },
+    {
+     "claim": "Ориентир по цифре мощности для запроса поставщику: KG2-3E — это ~1,9 МВт (1900–1934 кВт), а НЕ 13,4 МВт; цифра 13,4 МВт относится к машинам класса SGT-400 из соседних позиций заявки — смешение этих параметров в RFQ приведёт к неверной идентификации детали.",
+     "source": "https://www.oborudunion.ru/catalog/gazoturbinnaya-ustanovka-kg2-3-e-dresser-rand-moschnost-1900-kvt-999590519/ ; внутренний файл gt/data/hot_parts.json (соседние позиции SGT-400)"
+    }
+   ],
    "candidates": [],
-   "risks": ""
+   "risks": "",
+   "pn_map": [
+    {
+     "pn": "32997041_К",
+     "fits": "запись в учётной системе заказчика (ЛУКОЙЛ-ЭНЕРГОСЕТИ) для «Трубы жаровой внутренней» ГТД Dresser-Rand KG2-3E, 2 шт.",
+     "differs": "от базового кода отличается только кириллическим суффиксом «_К» — это российский складской/НСИ-довесок (маркер дубля/копии записи в MDM), а не ревизия OEM; в переписке с западным поставщиком его использовать нельзя",
+     "interchange": "1:1 соответствует базовому 32997041 — суффикс на физическую деталь не влияет, но требует сверки карточки НСИ у заказчика (не скрывается ли за «_К» иная ревизия, внесённая при дублировании записи)",
+     "evidence": "внутренние данные: /home/user/kvant-sourcing-dashboard/gt/data/rfq_demand.json (лист «Энергосети»), gt/data/hot_parts.json"
+    },
+    {
+     "pn": "32997041",
+     "fits": "предположительно материальный номер Dresser-Rand/Kongsberg на внутреннюю жаровую трубу (inner combustion liner) единственной камеры сгорания KG2-3E (~1,9 МВт, диффузионная dual-fuel камера). ВНИМАНИЕ: в открытых каталогах/стоках код не находится — принадлежность и актуальная ревизия НЕ подтверждены, только через IPC OEM (Siemens Energy Kongsberg) и",
+     "differs": "жаровая KG2-3E не совпадает с горячей частью KG2-3G (DLE-камера, ≤24 vppm NOx, другой цикл: 26% против 18% КПД), с KG2-3GEF/PO (камера вообще заменена внешним оксидайзером) и, вероятно, с ранними KG2-3/3C (меньшая мощность 1,4–1,5 МВт); «внутренняя» труба — отдельная позиция от наружного кожуха камеры",
+     "interchange": "внутри KG2-3E — по interchangeability list OEM (возможны суперсессии номера за 30+ лет выпуска); с 3C/3G/3GEF — считать НЕвзаимозаменяемой до письменного подтверждения OEM; источники детали: Siemens Energy Kongsberg Service Center (OEM, parts + service exchange), Antoni International (Хьюстон, независимый, KG2/VIKING/NATCO), R&H Supply (Хьюстон/Абе",
+     "evidence": "отрицательная проверка PN по вебу (WebSearch 09.08.2026); архитектура и отличия вариантов: https://www.ener-core.com/wp-content/uploads/2016/02/19002_KG2-3G_Ener-Core.pdf, http://gasandsteamturbines.blogspot.com/2017/03/dresser-rand-kg2-gas-turbines.html; каналы: http://www.antoni-intl.com/Kongsberg+Dresser/id/38, https://randhsupply.com/gas-turbin"
+    }
+   ],
+   "advice": "В RFQ давать базовый код 32997041 (суффикс «_К» убрать — это кириллический довесок НСИ ЛУКОЙЛа, западный поставщик по нему ничего не найдёт), но приложить полное русское наименование из заявки для трассировки. Поскольку код в открытых каталогах не подтверждается, обязательный вопрос поставщику (Siemens Energy Kongsberg Service Center как OEM; параллельно Antoni International и R&H Supply): «Подтвердите по вашему IPC применимость P/N 32997041 (inner combustion liner / труба жаровая внутренняя, 2 шт.) именно к Dresser-Rand KG2-3E рейтинга ~1,9 МВт в dual-fuel исполнении с конвенциональной (диффузионной) камерой сгорания — НЕ DLE и НЕ externally-fired; укажите, действует ли номер или заменён (superseded) более поздней ревизией, и приложите interchangeability list с указанием, с каких серийных номеров/модификаций применяется каждая ревизия». Дополнительно запросить подтверждение применимости"
   },
   {
    "key": "victory",
@@ -57,9 +111,85 @@
    "pn": "MW21215M",
    "qty": 12,
    "unit": "шт",
-   "facts": [],
+   "facts": [
+    {
+     "claim": "MW21215M — «Combustion chamber SGT-400 Siemens», количество 6 шт. на машину (кан-аннулярная КС SGT-400 имеет 6 жаровых труб). Фигурирует в RFQ на запчасти SGT-400 вместе с горелками MW22316B/01, воспламенителем MW22357/01, клапаном MW54000B/02.",
+     "source": "https://www.industrialmarinepower.com/siemens-sgt-400-gas-turbines-spare-part-requiremnets-21050/ (проверено WebFetch); зеркало того же RFQ: http://www.rig123.com/?article=detail&id=34133 (проверено curl, MW21215M присутствует в тексте)"
+    },
+    {
+     "claim": "MW21215M — «COMBUSTION CHAMBER», 6 sets, в заявке на запчасти SGT-400 с указанием машины «12 to 13.5 MW», в одном списке с «MW22301A/01 BURNER ASSEMBLY - GAS DLE» — т.е. код закупался под DLE-машины базового рейтинга 12,9 МВт(э)/13,4 МВт (вал).",
+     "source": "https://www.industrialmarinepower.com/wanted-spare-parts-@turbine-sgt400-15567/ (проверено WebFetch)"
+    },
+    {
+     "claim": "MW21215G — «SIEMENS COMBUSTION CHAMBER MW21215G», Qty 6, в каталоге запчастей SGT-400 китайского aftermarket-поставщика Shenzhen Blaze Turbine.",
+     "source": "https://turbineblade.net/siemens-sgt-400-turbine-part-numbers/ (проверено WebFetch)"
+    },
+    {
+     "claim": "MW21215G — «COMBUSTION CHAMBER P/N:MW21215G 2SET» и MW21215F — «COMBUSTION CHAMBER (LINER)» перечислены в списке запчастей SGT400 (рядом с диском Т1 MW31002A/04, сегментами соплового аппарата MW33081J).",
+     "source": "https://www.china-power-contractor.cn/SIEMENS-SGT400-spare-parts.html (проверено curl, оба кода найдены в HTML дословно)"
+    },
+    {
+     "claim": "MW21215H — «Жаровая труба» (в машинном переводе 'Fry pipe'), тег SGT-400; MW21215G — «Combustion chamber», тег SGT-400; MW21215M — «Combustion Chamber», тег «SGT-423» у российского поставщика НВ ГРУПП (nvsnab.ru). ВНИМАНИЕ: теги моделей у nvsnab автогенерируются (SGT-421/423/424/425/430…434 не существуют как модели Siemens — сайт присваивает их подряд разным позициям), поэтому «SGT-423» — это мусорный тег, а не реальная применимость.",
+     "source": "https://nvsnab.ru/catalog/sistema_sgoraniya_i_oborudovanie и https://nvsnab.ru/product/combustion_chamber_mw21215m, https://nvsnab.ru/product/combustion_chamber (проверено WebFetch через translate-прокси, т.к. сайт блокирует не-РФ регионы)"
+    },
+    {
+     "claim": "SGT-400 выпускается ТОЛЬКО с DLE-камерой сгорания: «NOTE: SGT400 is DLE ONLY», «The combustion system on the SGT400 is DLE only», «Dual Fuel DLE Combustion System. Can annular combustion system» — т.е. деления суффиксов на DLE/конвенциональные для SGT-400 НЕ существует; все жаровые трубы семейства MW21215 — DLE, dual-fuel-способные.",
+     "source": "Учебный курс Siemens Industrial Turbomachinery Ltd, Lincoln, 2006: https://kh.aquaenergyexpo.com/wp-content/uploads/2023/02/SIEMENS-Gas-Turbine-Components-SGT400.pdf (PDF скачан, текст извлечён и процитирован дословно)"
+    },
+    {
+     "claim": "КС SGT-400 — кан-аннулярная, 6 противоточных трубчатых жаровых труб, высокоэнергетический воспламенитель в каждой; каждая труба работает на газе, жидком топливе или в dual fuel.",
+     "source": "https://www.siemens-energy.com/us/en/home/products-services/product/sgt-400.html (сниппет поиска)"
+    },
+    {
+     "claim": "Исполнения машины: базовая версия SGT-400 (Cyclone-наследие, выпуск 1997/1999) — 12,90 МВт(э) генераторный / 13,40 МВт мехпривод; модифицированная версия 2010 г. — 14,33 МВт(э) / 14,92 МВт (маркетинговое «15 МВт», доступна заказчикам с 2011 г.).",
+     "source": "https://asmedigitalcollection.asme.org/POWER/proceedings/POWER2010/49354/267/360138 (SGT-400 Power Enhancement to 15MW); https://www.siemens-energy.com/us/en/home/products-services/service/sgt-400-power-upgrade.html; https://datasheets.globalspec.com"
+    },
+    {
+     "claim": "При апрейте 13 МВт → 15 МВт «в конструкцию камеры сгорания существенных изменений не вносилось; были оптимизированы её эксплуатационные параметры, чтобы разделить поток воздуха на пилотный/основной… увеличен расход топлива» — т.е. железо КС между рейтингами близкое, различия уходят в ревизии/настройку, что и объясняет «плавающие» буквенные суффиксы одного чертёжного номера MW21215.",
+     "source": "Журнал «Турбины и Дизели», статья Siemens AG (Ян Эймос, Б. Перевай), 2016: http://www.turbine-diesel.ru/node/4362 (текст скачан curl, цитата дословная)"
+    },
+    {
+     "claim": "Коды MW21215 без суффикса, MW21215/01, MW21215A/B/C/L/N в открытых источниках (тендерные архивы, aftermarket-каталоги, экспортные данные, find-tender, иранские/казахстанские площадки) НЕ обнаружены. Публично подтверждённое семейство: MW21215F, MW21215G, MW21215H, MW21215M. Буквенный суффикс — это ревизия чертежа линкольновской (Ruston/Alstom Cyclone) системы нумерации; последовательность F→G→H→M согласуется с историей мод-стандартов, но сама привязка «буква = рейтинг» нигде публично не задокумен",
+     "source": "Совокупность поисков: zakupki.gov.ru (недоступен из-за геоблокировки), find-tender.service.gov.uk API (совпадения оказались ложными), en.52wmb.com/supplier/196140355 (нет 21215 в отгрузках), turbineblade.net, gas-turbine-parts.com (сертификат истёк/5"
+    },
+    {
+     "claim": "Применимость к платформе им. Филановского открытыми источниками не подтверждена (публикаций с привязкой SGT-400 к ЛСП Филановского в выдаче нет) — рейтинг и build-standard машин заказчика надо брать из паспортов ГТУ, а не из прессы.",
+     "source": "Поиск «Филановского платформа Siemens SGT-400» — прямых подтверждений не найдено"
+    }
+   ],
    "candidates": [],
-   "risks": ""
+   "risks": "",
+   "pn_map": [
+    {
+     "pn": "MW21215F",
+     "fits": "SGT-400 (кан-аннулярная DLE КС, 6 труб на машину); конкретный рейтинг в открытых источниках не указан — по положению в ревизионном ряду это ранний build-standard (машины ранних годов выпуска, база 12,9/13,4 МВт)",
+     "differs": "Обозначена как «COMBUSTION CHAMBER (LINER)» — жаровая труба/лайнер; самая ранняя из публично видимых ревизий семейства",
+     "interchange": "Ожидаемо заменяется более поздними ревизиями (G/H/M) по сервисным бюллетеням Siemens, но направление «новая → старая машина» требует подтверждения ОЕМ; обратная установка F на поздние машины — нет",
+     "evidence": "https://www.china-power-contractor.cn/SIEMENS-SGT400-spare-parts.html — дословно «MW21215F COMBUSTION CHAMBER (LINER)»"
+    },
+    {
+     "pn": "MW21215G",
+     "fits": "SGT-400; в aftermarket-каталогах (Blaze, china-power-contractor, nvsnab) идёт как «текущая» позиция для парка SGT-400 без уточнения рейтинга; qty 6 на машину",
+     "differs": "Следующая за F ревизия жаровой трубы; в списках соседствует с деталями горячего тракта базовой машины (диск Т1 MW31002A/04)",
+     "interchange": "С MW21215M — вероятно прямое суперседирование (одна базовая геометрия, SGT-400 DLE-only), но официального supersession-чейна в открытом доступе нет — подтверждать у ОЕМ/пакетера",
+     "evidence": "https://turbineblade.net/siemens-sgt-400-turbine-part-numbers/ («SIEMENS COMBUSTION CHAMBER MW21215G», Qty 6); https://www.china-power-contractor.cn/SIEMENS-SGT400-spare-parts.html; https://nvsnab.ru/product/combustion_chamber (тег SGT-400)"
+    },
+    {
+     "pn": "MW21215H",
+     "fits": "SGT-400; рейтинг в открытых источниках не указан",
+     "differs": "У nvsnab заведена отдельно от G и M как «Жаровая труба» — промежуточная ревизия между G и M",
+     "interchange": "Публичных данных нет; трактовать только как ревизию того же чертежа MW21215",
+     "evidence": "https://nvsnab.ru/catalog/sistema_sgoraniya_i_oborudovanie (позиция «Fry pipe» MW21215H, тег SGT-400; проверено через translate-прокси)"
+    },
+    {
+     "pn": "MW21215M",
+     "fits": "Заявленный вам PN. Самая поздняя публично видимая ревизия; в живых RFQ 2016–2025 гг. закупается под SGT-400 «12 to 13.5 MW» (т.е. база 12,9 МВт(э)/13,4 МВт вал) в DLE dual fuel комплектации, 6 шт./машина. Поскольку при апрейте до 14,3/15 МВт конструкция КС «существенно не менялась» (Турбины и Дизели/Siemens), M-ревизия с высокой вероятностью и есть",
+     "differs": "От F/G/H — более поздний мод-стандарт (типично: материал/покрытие TBC, охлаждение, доработки под эмиссии); от «SGT-423» на nvsnab — игнорировать, это автогенерированный тег сайта, не модель Siemens",
+     "interchange": "Как последняя ревизия обычно ставится вместо F/G/H (retrofit по SB), возможно с сопутствующими деталями (горелки MW22316B/MW22301A, воспламенитель MW22357/01, уплотнения/переходник M10/33098) — комплектность замены подтверждать у ОЕМ",
+     "evidence": "https://www.industrialmarinepower.com/siemens-sgt-400-gas-turbines-spare-part-requiremnets-21050/ (6 шт.); https://www.industrialmarinepower.com/wanted-spare-parts-@turbine-sgt400-15567/ (6 sets, машина «12 to 13.5 MW», рядом DLE-горелки MW22301A/01); https://nvsnab.ru/product/combustion_chamber_mw21215m"
+    }
+   ],
+   "advice": "Запрашивать MW21215M (6 шт. на машину), но НЕ по одному лишь коду, а с обязательной валидацией по машине. Вопрос поставщику (дословно): «Подтвердите письменно применимость предлагаемой камеры сгорания к нашим конкретным ГТУ: Siemens SGT-400, серийные номера двигателей [указать ESN с шильдика], build standard/rating [12,9 МВт(э) / 13,4 МВт вал — уточнить по паспорту, машины НЕ апрейченные до 14,3 МВт], камера DLE dual fuel (газ + дизель), морское исполнение. (1) Какая ревизия MW21215 (F/G/H/M или более поздняя) является текущей заменой для этого ESN по последнему Siemens IPC/service bulletin — приложите выписку из IPC с supersession-чейном; (2) если предлагаете MW21215M на машину, где стояла F/G/H — подтвердите прямую взаимозаменяемость one-for-one или перечислите обязательные сопутствующие детали (горелки MW22316B/01 или MW22301A/01, воспламенитель MW22357/01, переходной канал M10/33098,"
   },
   {
    "key": "mw22316b",
@@ -69,9 +199,99 @@
    "pn": "MW22316B/01",
    "qty": 12,
    "unit": "шт",
-   "facts": [],
+   "facts": [
+    {
+     "claim": "MW22316B/01 расшифровывается дословно как «MAIN BURNER ASSY - DUAL DLE - GOLD SEALS» (основная горелочная сборка, dual-fuel DLE, золочёные уплотнения), позиция 42, кол-во 12 шт — что соответствует 2 комплектам по 6 камер сгорания SGT-400",
+     "source": "Открытый spare-list Hangzhou Gas Turbine Parts Co.: http://www.gas-turbine-parts.com/News/Product_FAQ/151.html (строка: «42 MW22316B/01 MAIN BURNER ASSY - DUAL DLE - GOLD SEALS 12 pcs»)"
+    },
+    {
+     "claim": "В том же списке смежные позиции горелочного узла: MW22340D/01 «PILOT BURNER ASSEMBLY - DUAL FUEL» (12 шт), MW22354B/01 «LIQUID CORE ASSEMBLY» (12 шт), MW22333/1 и MW22333/2 «C SEAL» (по 12 шт), RW22314/11 «C SEAL» — т.е. B/01 идёт в комплекте dual-fuel DLE конфигурации вместе с пилотом и жидкостным ядром",
+     "source": "http://www.gas-turbine-parts.com/News/Product_FAQ/151.html"
+    },
+    {
+     "claim": "MW22316B/01 фигурирует в запросе запчастей как «Burner assembly SGT-400 Siemens» рядом с MW22340D/01, MW21215M (combustion chamber), MW22357/01 (ignition device), MW22357/015 (spray gun assy)",
+     "source": "https://www.industrialmarinepower.com/siemens-sgt-400-gas-turbines-spare-part-requiremnets-21050/"
+    },
+    {
+     "claim": "Российский aftermarket (nvsnab.ru) продаёт «Burner MW22316B/01 Siemens для ГТУ SGT-424» — код живой на рынке РФ; сайт геоблокирован извне, данные из поисковой выдачи",
+     "source": "https://nvsnab.ru/product/burner_mw22316b01 (заголовок из выдачи; прямой доступ из-за рубежа — 403/geo-block)"
+    },
+    {
+     "claim": "Китайский трейдер Xian Hedele перечисляет тот же согласованный набор: MW22316B/01, MW22340D/01, MW22354B/01, MW22357/01, MW22333/1 — набор dual-fuel DLE камеры сгорания SGT-400",
+     "source": "http://www.rig123.com/?article=detail&id=34133"
+    },
+    {
+     "claim": "SGT-400 — это переименованный Alstom Cyclone: ГТУ 13,4 МВт (вал) / 12,9 МВт(э), twin-shaft, дериватив Tempest (SGT-300), запуск 1997, коммерческая эксплуатация с 2000; переименована после покупки Siemens промышленного ГТ-бизнеса Alstom",
+     "source": "ASME GT2002 «Design, Development and Operational Experience of the ALSTOM's 13.4MW Cyclone Gas Turbine»: https://asmedigitalcollection.asme.org/GT/proceedings/GT2002/36096/243/294974"
+    },
+    {
+     "claim": "SGT-400 имеет кан-аннулярную систему сгорания с шестью reverse-flow камерами (отсюда кратность 6 горелок на машину); DLE-камера сжигает газ и жидкое топливо (true dual fuel), H2 до 30% с DLE-горелками",
+     "source": "https://www.siemens-energy.com/global/en/home/products-services/product/sgt-400.html"
+    },
+    {
+     "claim": "«Gold seal» в горелочных сборках — золочение металлических C-ring уплотнений: мягкое покрытие (золото/серебро) заполняет микронеровности сопрягаемых поверхностей, даёт минимальные утечки на топливных стыках высокого давления и стойкость к температуре/коррозии; C-rings штатно применяются на fuel nozzles ГТУ",
+     "source": "Parker Hannifin: https://discover.parker.com/Overcoming-gas-turbine-metal-sealing-challenges ; Sonkit: https://www.sonkitsealing.com/Technical-Articles/Metal-C-Ring-Seal-High-Performance-Guide"
+    },
+    {
+     "claim": "У SGT-400 DLE исторически существовали ВАРИАНТЫ горелок под разные составы топлива; программа Siemens (ASME GT2018) расширила стандартную производственную горелку на Wobbe 30–49 МДж/м3 именно чтобы сократить число вариантов — т.е. суффикс кода горелки реально привязан к топливной конфигурации",
+     "source": "ASME GT2018 «Reduction of Burner Variants for Differing Fuel Compositions... Siemens SGT-400 DLE»: https://asmedigitalcollection.asme.org/GT/proceedings/GT2018/51067/V04BT04A010/271274"
+    },
+    {
+     "claim": "Публичных подтверждений существования MW22316A, MW22316B/02 или MW22316C НЕ найдено — во всех открытых источниках (3 независимых трейдера + запросы) семейство MW22316 представлено единственно кодом MW22316B/01. Паттерн нумерации (буква = ревизия чертежа, /NN = вариант/деталь на чертеже) подтверждается соседями: пилот дошёл до буквы D (MW22340D/01), клапан имеет dash /02 (MW54000B/02)",
+     "source": "Совокупно: gas-turbine-parts.com/News/Product_FAQ/151.html, industrialmarinepower.com, rig123.com, nvsnab.ru; отсутствие A/C/B02 — результат целевых поисков по точным строкам (негативный результат, а не доказательство несуществования внутри Siemens I"
+    },
+    {
+     "claim": "MW-префикс — легаси-нумерация линкольнской конструкторской школы (Ruston/European Gas Turbines/Alstom), унаследованная Siemens вместе с Cyclone; в SGT-400 списках MW-номера соседствуют с RW- (Tempest/SGT-300 легаси — Cyclone дериватив Tempest) и CT-номерами. Прямого опубликованного словаря префиксов нет — это вывод из структуры списков",
+     "source": "Вывод (inference) из: http://www.gas-turbine-parts.com/News/Product_FAQ/151.html (смесь MW/RW/CT в одном SGT-400 листе) + ASME GT2002 (Cyclone = дериватив Tempest, Lincoln)"
+    }
+   ],
    "candidates": [],
-   "risks": ""
+   "risks": "",
+   "pn_map": [
+    {
+     "pn": "MW22316B/01",
+     "fits": "Основная (main) горелка DLE в исполнении DUAL FUEL для SGT-400 (ex-Alstom Cyclone, 12,9 МВт(э)/13,4 МВт вал и аплифтовые рейтинги); 6 шт на машину (6 камер). Российский aftermarket привязывает её к исполнению «SGT-424»",
+     "differs": "Единственный публично подтверждённый код семейства MW22316. «B» — ревизия (issue) чертежа основной горелки, «/01» — номер варианта/детали на чертеже. «GOLD SEALS» — поставляется в исполнении с золочёными металлическими C-уплотнениями топливных стыков",
+     "interchange": "Гипотетический переход B/01→B/02 публично не зафиксирован (B/02 в открытых источниках не существует). Правило для этой системы нумерации: смена буквы (A→B) = ревизия конструкции, обратная применимость только по подтверждению OEM service bulletin; смена dash-номера (/01→/02) = другой вариант исполнения, НЕ считать взаимозаменяемым по умолчанию. Для ",
+     "evidence": "gas-turbine-parts.com FAQ 151: «MAIN BURNER ASSY - DUAL DLE - GOLD SEALS»; industrialmarinepower.com/siemens-sgt-400-gas-turbines-spare-part-requiremnets-21050/; nvsnab.ru/product/burner_mw22316b01"
+    },
+    {
+     "pn": "MW22340D/01",
+     "fits": "Пилотная горелка (PILOT BURNER ASSEMBLY - DUAL FUEL) той же dual-fuel DLE камеры SGT-400; 6 шт на машину. Работает в паре с MW22316B/01",
+     "differs": "Пилот, не main; буква D показывает, что пилот прошёл больше ревизий (A→D), чем main burner (→B) — подтверждение того, что буквенный суффикс в этой серии = ревизия",
+     "interchange": "Заказывать комплектно с main burner той же конфигурации; ревизии пилота и main должны соответствовать одному билду камеры (единый dressing standard) — сверять по IPC на серийный номер машины",
+     "evidence": "gas-turbine-parts.com FAQ 151: «43 MW22340D/01 PILOT BURNER ASSEMBLY - DUAL FUEL 12 pcs»; industrialmarinepower.com"
+    },
+    {
+     "pn": "MW22354B/01",
+     "fits": "LIQUID CORE ASSEMBLY — жидкостное ядро (тракт жидкого топлива) горелки для dual-fuel исполнения SGT-400; 6 шт на машину. У nvsnab привязан к «SGT-425»",
+     "differs": "Именно наличие этого ядра в комплекте отличает dual-fuel билд от gas-only; для чисто газовой машины не нужен",
+     "interchange": "Комплектная позиция dual-fuel набора; на gas-only не ставится",
+     "evidence": "gas-turbine-parts.com FAQ 151: «44 MW22354B/01 LIQUID CORE ASSEMBLY 12 pcs»; nvsnab.ru/product/core_mw22354b01"
+    },
+    {
+     "pn": "MW22333/1 и MW22333/2",
+     "fits": "C SEAL — металлические C-уплотнения горелочного узла SGT-400 (по 12 шт на 2 комплекта), расходники при каждой переустановке горелки; вероятная физическая суть «золотых уплотнений» из описания MW22316B/01 (золочёные C-rings)",
+     "differs": "/1 и /2 — два типоразмера уплотнения на одном чертеже MW22333",
+     "interchange": "Одноразовые (metal C-seal обжимается при затяжке) — заказывать свежие под каждый монтаж; /1 и /2 не взаимозаменяемы между собой",
+     "evidence": "gas-turbine-parts.com FAQ 151: «46 MW22333/2 C SEAL; 47 MW22333/1 C SEAL»; о золочении C-rings на топливных стыках ГТУ — discover.parker.com/Overcoming-gas-turbine-metal-sealing-challenges"
+    },
+    {
+     "pn": "RW22314/11",
+     "fits": "C SEAL горелочной зоны SGT-400 c RW-префиксом (легаси Tempest/SGT-300 — Cyclone является его деривативом, часть деталей общая)",
+     "differs": "RW-префикс = чертёжная серия более ранней машины, унаследованная Cyclone/SGT-400",
+     "interchange": "Расходник, по IPC конкретной машины",
+     "evidence": "gas-turbine-parts.com FAQ 151: «52 RW22314/11 C SEAL»; родство Cyclone-Tempest: ASME GT2002 asmedigitalcollection.asme.org/GT/proceedings/GT2002/36096/243/294974"
+    },
+    {
+     "pn": "MW22357/01 (и MW22357/015)",
+     "fits": "Igniter / ignition device (в др. списке /015 назван spray gun assembly) камеры сгорания SGT-400 — high energy igniter в каждой из 6 камер",
+     "differs": "Смежная позиция того же узла, не входит в MW22316-семейство",
+     "interchange": "По IPC; siemens-energy.com подтверждает high-energy igniter на каждый комбустор",
+     "evidence": "nvsnab.ru/product/igniter_mw2235701; industrialmarinepower.com/siemens-sgt-400-gas-turbines-spare-part-requiremnets-21050/"
+    }
+   ],
+   "advice": "Запрашивать именно MW22316B/01 «MAIN BURNER ASSY - DUAL DLE - GOLD SEALS» и НЕ принимать «эквиваленты» без документов: публично существует только ревизия B/01, любые предложенные A/x, B/02 или C — проверять по Siemens IPC. Поставщику задать дословно: (1) «Подтвердите письмом применимость MW22316B/01 к нашей машине: укажите серийный номер пакета SGT-400 (ex-Cyclone, рейтинг ~12,9–13,4 МВт), исполнение DLE DUAL FUEL — сверка по Siemens Illustrated Parts Catalogue на этот serial number, с выпиской строки IPC»; (2) «Подтвердите, что предлагаемая деталь — именно issue B, variant /01, а не иная ревизия чертежа MW22316; если Siemens выпускал superseding-ревизию или service bulletin по этой горелке — приложите номер SB и заявление о взаимозаменяемости (one-way / two-way)»; (3) «Входят ли в поставку золочёные C-уплотнения (gold-plated C-seals, чертёжные позиции типа MW22333/1, MW22333/2, RW22314/"
   },
   {
    "key": "purge-valve",

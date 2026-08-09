@@ -399,12 +399,10 @@ def main():
             why += "; ⚠ проверка: " + (sup.get("ov_note") or "профиль под вопросом")[:160]
         elif ov == "send":
             why += "; ✓ актуальность подтверждена проверкой"
-        if sup.get("ov_flags"):
-            why += "; 🚩 " + sup["ov_flags"][:120]
+        # комплаенс-оценки — зона сорсеров (распоряжение 09.08), в карточки не выносим
         return {**{k: sup[k] for k in ("name", "country", "site", "email", "phone", "person", "hook")},
                 "p": p, "why": why, "bx": sup["bx"], "prank": sup["prank"], "role": role,
-                "cats": sorted(sup_cats(sup))[:4], "ask": ask_mode(sup),
-                "ov": ov, "flags": bool(sup.get("ov_flags"))}
+                "cats": sorted(sup_cats(sup))[:4], "ask": ask_mode(sup), "ov": ov}
 
     # адресаты направления, разложенные по ролям (считаем один раз на направление)
     by_dir = {}
