@@ -258,8 +258,11 @@ function card(b, bi){
   const ask = s.ask==='pn'
     ? '<span class="ask a-pn" title="Работает по каталожным номерам: трейдер, сток, реверс-производитель со своими кроссами или официальный канал. Шлём таблицу PN и ждём цену и срок.">запрос по PN</span>'
     : '<span class="ask a-nom" title="Делает по чертежам своего заказчика — чужой каталожный номер ему ничего не скажет, а чертежей у нас нет. Спрашиваем по номенклатуре: делаете ли такую деталь для этой машины, на каких условиях беретесь, нужен ли образец.">только по номенклатуре — PN не поймёт</span>';
+  const ovb = s.ov==='send' ? '<span class="ask" style="background:#d9f2d9;color:#0a5c0a" title="компания и профиль проверены агентом: живая, занимается именно этим">✓ проверен</span>'
+    : s.ov==='doubt' ? '<span class="ask a-nom" title="проверка нашла натяжку — читай пояснение в тултипе вероятности">⚠ с оговоркой</span>' : '';
+  const flagb = s.flags ? '<span class="ask" style="background:#f6dcdc;color:#8c1f1f" title="есть комплаенс/санкционный флаг — детали в тултипе вероятности">🚩</span>' : '';
   return `<div class="srow" data-k="${esc(k)}">
-   <div><div class="sname">${esc(s.name)} <span class="role ${rl[1]}">${rl[0]}</span>${ask}</div>
+   <div><div class="sname">${esc(s.name)} <span class="role ${rl[1]}">${rl[0]}</span>${ask}${ovb}${flagb}</div>
     <div class="mut small">${esc(s.country||'')}${s.bx?` · Bitrix ×${s.bx}`:''} · П${s.prank}${s.cats&&s.cats.length?' · делает: '+esc(s.cats.join(', ')):''}</div>
     ${s.hook?`<div class="hook">✍ ${esc(s.hook)}</div>`:''}</div>
    <div><span class="pbadge ${pcls(s.p)}" title="${esc(s.why)}">${s.p}%</span></div>

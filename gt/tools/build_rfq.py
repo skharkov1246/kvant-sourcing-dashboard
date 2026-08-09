@@ -345,10 +345,37 @@ def load_prices():
     return out
 
 
+def load_overrides():
+    """Вердикты проверки актуальности (глазами сорсера): drop / doubt / send."""
+    try:
+        return D("rfq_overrides.json")["overrides"]
+    except FileNotFoundError:
+        return {}
+
+
 def main():
     demand = D("rfq_demand.json")
     pool = build_pool()
     prices = load_prices()
+    overrides = load_overrides()
+    # применяем вердикты к пулу ДО раскладки
+    dropped = 0
+    for k in list(pool.keys()):
+        sup = pool[k]
+        ov = overrides.get(sup["name"])
+        if not ov:
+            continue
+        if ov["verdict"] == "drop":
+            del pool[k]
+            dropped += 1
+            continue
+        if ov.get("new_site"):
+            sup["site"] = ov["new_site"]
+        sup["ov_verdict"] = ov["verdict"]
+        sup["ov_note"] = ov.get("note", "")
+        sup["ov_flags"] = ov.get("red_flags", "")
+    print(f"проверка актуальности: вычеркнуто {dropped}, помечено doubt "
+          f"{sum(1 for s in pool.values() if s.get('ov_verdict') == 'doubt')}")
 
     # пачки: направление × категория; мелочь внутри направления сливаем в «смешанную» пачку
     batches = {}
@@ -366,9 +393,18 @@ def main():
     # кандидаты на пачку
     def card(sup, direction, cat, role):
         p, why = probability(sup, direction, cat)
+        ov = sup.get("ov_verdict", "")
+        if ov == "doubt":
+            p = max(3, p - 10)
+            why += "; ⚠ проверка: " + (sup.get("ov_note") or "профиль под вопросом")[:160]
+        elif ov == "send":
+            why += "; ✓ актуальность подтверждена проверкой"
+        if sup.get("ov_flags"):
+            why += "; 🚩 " + sup["ov_flags"][:120]
         return {**{k: sup[k] for k in ("name", "country", "site", "email", "phone", "person", "hook")},
                 "p": p, "why": why, "bx": sup["bx"], "prank": sup["prank"], "role": role,
-                "cats": sorted(sup_cats(sup))[:4], "ask": ask_mode(sup)}
+                "cats": sorted(sup_cats(sup))[:4], "ask": ask_mode(sup),
+                "ov": ov, "flags": bool(sup.get("ov_flags"))}
 
     # адресаты направления, разложенные по ролям (считаем один раз на направление)
     by_dir = {}
