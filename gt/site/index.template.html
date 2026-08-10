@@ -301,6 +301,8 @@ const nrm = s => {
 let EDITS;
 try{ EDITS = JSON.parse(localStorage.getItem('gt_edits_v2')) || {}; }catch(e){ EDITS = {}; }
 EDITS.st = EDITS.st||{}; EDITS.note = EDITS.note||{}; EDITS.hide = EDITS.hide||{}; EDITS.add = EDITS.add||[]; EDITS.ex = EDITS.ex||{};
+EDITS.why = EDITS.why||{};      // причины скрытия: ключ → {act, why, name, at}
+EDITS.exwhy = EDITS.exwhy||{};  // причины «не запрашивать»
 function saveEdits(){ try{ localStorage.setItem('gt_edits_v2', JSON.stringify(EDITS)); }catch(e){} }
 
 function pickModels(text){
@@ -630,8 +632,9 @@ function pkFilters(){
  const stn = UNI.filter(r=>EDITS.st[r.key]).length;
  const exGo = UNI.filter(r=>EDITS.ex[r.key]==='go').length;
  const exHold = UNI.filter(r=>EDITS.ex[r.key]==='hold').length;
+ pkRenderLists();
  document.getElementById('pk-count').textContent =
-  `${rows.length} из ${UNI.length}${exGo?` · 🟢 ${exGo}`:''}${exHold?` · 🟡 ${exHold}`:''}${stn?` · со статусом: ${stn}`:''}${hid?` · скрыто: ${hid}`:''}${rows.length>300?' · показаны первые 300':''}`;
+  `${rows.length} из ${UNI.length}${exGo?` · 🟢 ${exGo}`:''}${exHold?` · 🟡 ${exHold}`:''}${stn?` · со статусом: ${stn}`:''}${hid?` · скрыто: ${hid}`:''}${(exHold||hid)?' · см. «Списки исключений»':''}${rows.length>300?' · показаны первые 300':''}`;
  const active = [];
  if(s.model) active.push(['model','Модель: '+s.model]);
  if(s.seg) active.push(['seg','Сегмент: '+SEG_SHORT(s.seg)]);
@@ -673,11 +676,56 @@ function pkImportEdits(inp){
   try{
    const e = JSON.parse(t);
    Object.assign(EDITS.st, e.st||{}); Object.assign(EDITS.note, e.note||{}); Object.assign(EDITS.hide, e.hide||{}); Object.assign(EDITS.ex, e.ex||{});
+   Object.assign(EDITS.why, e.why||{}); Object.assign(EDITS.exwhy, e.exwhy||{});
    for(const a of (e.add||[])) if(!EDITS.add.some(x=>nrm(x.name)===nrm(a.name))) EDITS.add.push(a);
    saveEdits(); UNI=null; buildUnified(); pkFilters();
   }catch(err){ alert('Не удалось прочитать файл правок: '+err.message); }
  });
 }
+/* ── Списки исключений: скрытые и «не запрашивать» — с причиной и возвратом ── */
+function pkLists(){
+ const el = document.getElementById('pk-lists');
+ if(el.style.display!=='none'){ el.style.display='none'; return; }
+ el.style.display='';
+ pkRenderLists();
+}
+function pkRenderLists(){
+ const el = document.getElementById('pk-lists');
+ if(el.style.display==='none') return;
+ const nameOf = k => (UNI.find(r=>r.key===k)||{}).name || (EDITS.why[k]||EDITS.exwhy[k]||{}).name || k;
+ const rows = (obj, wobj, act, label) => {
+  const keys = Object.keys(obj).filter(k=>obj[k]);
+  if(!keys.length) return `<div class="mut" style="font-size:12.5px">пусто</div>`;
+  return `<div class="tblwrap"><table>
+   <tr><th>Компания</th><th>Причина</th><th>Когда</th><th></th></tr>
+   ${keys.map(k=>{
+     const w = wobj[k]||{};
+     return `<tr><td><b>${esc(nameOf(k))}</b></td>
+      <td class="mut">${esc(w.why||'причина не указана')}</td>
+      <td class="mut" style="white-space:nowrap">${esc(w.at||'')}</td>
+      <td><button class="btn" data-list-act="${act}" data-k="${esc(k)}">↩ вернуть</button></td></tr>`;
+   }).join('')}
+  </table></div>`;
+ };
+ const nh = Object.keys(EDITS.hide).filter(k=>EDITS.hide[k]).length;
+ const nx = Object.keys(EDITS.ex).filter(k=>EDITS.ex[k]==='hold').length;
+ const holds = {}; for(const k in EDITS.ex) if(EDITS.ex[k]==='hold') holds[k]=1;
+ el.innerHTML = `
+  <b>Списки исключений</b> <span class="mut">— компании не удалены из базы, их всегда можно вернуть</span>
+  <h3 style="font-size:13px;margin:12px 0 6px">🟡 Не запрашивать — ${nx}</h3>
+  ${rows(holds, EDITS.exwhy, 'unhold')}
+  <h3 style="font-size:13px;margin:14px 0 6px">✕ Скрытые из подбора — ${nh}</h3>
+  ${rows(EDITS.hide, EDITS.why, 'unhide')}
+  <div class="mut" style="font-size:12px;margin-top:10px">Оба списка уезжают в «⬇ правки» и приезжают импортом — коллеги видят и причины, и кто что исключил.</div>`;
+}
+document.addEventListener('click', e=>{
+ const b = e.target.closest('#pk-lists [data-list-act]');
+ if(!b) return;
+ const k = b.dataset.k;
+ if(b.dataset.listAct==='unhide'){ delete EDITS.hide[k]; delete EDITS.why[k]; }
+ else { delete EDITS.ex[k]; delete EDITS.exwhy[k]; }
+ saveEdits(); pkFilters();
+});
 function pkAddForm(){
  const el = document.getElementById('pk-addform');
  el.style.display = el.style.display==='none' ? '' : 'none';
@@ -728,9 +776,11 @@ function rPicker(){
   <button class="btn" onclick="pkCSV()">⬇ CSV</button>
   <button class="btn" onclick="pkExportEdits()" title="статусы, заметки и добавленные компании — файлом">⬇ правки</button>
   <label class="btn" style="cursor:pointer">⬆ импорт правок<input type="file" accept=".json" style="display:none" onchange="pkImportEdits(this)"></label>
+  <button class="btn" onclick="pkLists()" id="pk-lists-btn">📋 Списки исключений</button>
   <label style="font-size:12.5px;color:var(--ink2);display:flex;align-items:center;gap:5px"><input type="checkbox" id="pk-hid" onchange="pkFilters()"> показывать скрытых</label>
   <span class="count" id="pk-count"></span>
  </div>
+ <div id="pk-lists" class="card" style="display:none"></div>
  <div id="pk-addform" class="card" style="display:none">
   <b>Новый поставщик</b> <span class="mut">— сохранится в вашем браузере; для общей базы выгрузите «⬇ правки»</span>
   <div class="form-grid">
@@ -759,14 +809,32 @@ document.addEventListener('click', e=>{
    if(v!==null){ if(v.trim()) EDITS.note[k]=v.trim(); else delete EDITS.note[k]; saveEdits(); pkFilters(); }
   }
   if(btn.dataset.act==='hide'){
-   if(EDITS.hide[k]) delete EDITS.hide[k]; else EDITS.hide[k]=1;
+   const nm = btn.closest('.sup').querySelector('h4').textContent;
+   if(EDITS.hide[k]){                       // возврат — без лишних вопросов
+    delete EDITS.hide[k]; delete EDITS.why[k];
+   } else {                                 // скрытие — только с причиной
+    const why = prompt(`Скрыть «${nm}» из подбора?\n\nКомпания останется в базе и попадёт в список скрытых — вернуть можно в любой момент.\nУкажите причину (для коллег):`, '');
+    if(why===null) return;                  // отмена — ничего не делаем
+    EDITS.hide[k]=1; EDITS.why[k]={act:'hide', why:why.trim(), name:nm, at:new Date().toISOString().slice(0,10)};
+   }
    saveEdits(); pkFilters();
   }
   if(btn.dataset.act==='ex-go'||btn.dataset.act==='ex-hold'){
    const v = btn.dataset.act==='ex-go'?'go':'hold';
-   if(EDITS.ex[k]===v) delete EDITS.ex[k]; else EDITS.ex[k]=v;  // повторный клик снимает отметку
+   const nm = btn.closest('.sup').querySelector('h4').textContent;
+   if(EDITS.ex[k]===v){                     // повторный клик снимает отметку
+    delete EDITS.ex[k]; delete EDITS.exwhy[k];
+   } else if(v==='hold'){                   // «не запрашивать» — только с причиной
+    const why = prompt(`Пометить «${nm}» как НЕ ЗАПРАШИВАТЬ?\n\nКомпания останется в базе и попадёт в отдельный список — снять отметку можно в любой момент.\nУкажите причину (для коллег):`, '');
+    if(why===null) return;
+    EDITS.ex[k]='hold'; EDITS.exwhy[k]={why:why.trim(), name:nm, at:new Date().toISOString().slice(0,10)};
+   } else {
+    EDITS.ex[k]='go'; delete EDITS.exwhy[k];
+   }
    saveEdits(); pkFilters();
   }
+  if(btn.dataset.act==='unhide'){ delete EDITS.hide[k]; delete EDITS.why[k]; saveEdits(); pkFilters(); }
+  if(btn.dataset.act==='unhold'){ delete EDITS.ex[k]; delete EDITS.exwhy[k]; saveEdits(); pkFilters(); }
  }
 });
 document.addEventListener('change', e=>{
