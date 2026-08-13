@@ -113,13 +113,14 @@ def main() -> int:
     names = client.companies_by_ids(comp_ids) if comp_ids else {}
 
     def pack(r):
+        # Сайт публикуется в открытом доступе, поэтому наружу отдаём только то, что
+        # нужно сорсингу для решения «идти к этой компании или нет»: компания, стадия,
+        # дата. Имена сорсеров, названия и ID запросов остаются в Bitrix — по компании
+        # и дате запрос находится в CRM за секунду.
         return {
-            "id": r["id"],
-            "title": (r.get("title") or "")[:160],
             "company": names.get(str(r.get("companyId"))) or r.get("ufCrm18Supplier") or "—",
             "stage": stage(r.get("stageId")),
             "created": str(r.get("createdTime"))[:10],
-            "sourcer": who(r.get("assignedById")),
         }
 
     classes = {
@@ -153,7 +154,6 @@ def main() -> int:
             items.sort(key=lambda x: str(x.get("createdTime")), reverse=True)
             pool.append({
                 "query": cand,
-                "id": c["ID"],
                 "name": c.get("TITLE"),
                 "n": len(items),
                 "last": str(items[0].get("createdTime"))[:10] if items else "",

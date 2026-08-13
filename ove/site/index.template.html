@@ -309,6 +309,7 @@ function rEquip(){
   EQ.items.forEach(i=>{byLot[i.lot]=(byLot[i.lot]||0)+1});
   return `
   <div class="box info"><b>Источник:</b> ${esc(EQ.source)}. Позиции с пометкой «вне БИ» в конкурс не входят, но стоят в том же периметре стройки и нужны для увязки границ.</div>
+  ${EQ.normalization?`<div class="box amber"><b>Нормализация данных.</b> ${esc(EQ.normalization)}</div>`:''}
   <div class="k">
     ${[1,2,3,4].map(n=>`<div class="tile"><b>${byLot[n]||0}</b><span>позиций — Лот №${n}</span></div>`).join('')}
     <div class="tile"><b>${byLot[0]||0}</b><span>позиций вне БИ</span></div>
@@ -362,7 +363,9 @@ function rSup(){
       <td>${(p.world||[]).map(x=>`<span class="tag">${esc(x)}</span>`).join('')||'<span class="mut">—</span>'}</td>
       <td>${(p.cn||[]).map(x=>`<span class="tag">${esc(x)}</span>`).join('')||'<span class="mut">—</span>'}</td>
       <td>${(p.ru||[]).map(x=>`<span class="tag">${esc(x)}</span>`).join('')||'<span class="mut">—</span>'}</td>
-      <td class="num">${bx.length?`<b>${bx.length}</b>`:'<span class="mut">0</span>'}</td>
+      <td>${bx.length
+        ? `<b>${bx.length}</b> запр.<div class="mut">${[...new Set(bx.map(r=>r.company))].filter(c=>c&&c!=='—').slice(0,3).map(esc).join('<br>')||'компания не указана'}</div>`
+        : '<span class="mut">0</span>'}</td>
       <td class="mut">${esc(p.ask)}</td>
     </tr>`;}).join('');
 
