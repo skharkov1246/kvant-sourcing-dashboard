@@ -19,20 +19,21 @@ export default {
     const user = env.BASIC_AUTH_USER || "kvant";
     const pass = env.BASIC_AUTH_PASS;
 
-    // Секрет не задан. Сюда попадёт и администратор, и рядовой сотрудник —
-    // страница должна объяснять обоим, что происходит и что делать.
+    // ⚠ ВРЕМЕННЫЙ РЕЖИМ, распоряжение владельца 13.08.2026: «выкладывай пока всё
+    // без пароля, запаролю утром завтра». Пока секрет BASIC_AUTH_PASS не задан —
+    // сайт открыт. Как только владелец добавит секрет в Cloudflare, гейт включается
+    // сам: ни правок в коде, ни пересборки не нужно.
+    //
+    // Это fail-OPEN, и как постоянное решение он опасен: если секрет когда-нибудь
+    // удалят, сайт молча откроется. После того как владелец подтвердит, что пароль
+    // задан и вход работает, вернуть здесь fail-closed (отдавать 503 без секрета).
     if (!pass) {
-      return new Response(page(
-        "Сайт ещё не открыт",
-        "<p>Доступ к материалам проекта ОВЭ-75 закрывается паролем, и пароль пока не задан.</p>" +
-        "<p><b>Сотрудникам:</b> обратитесь к владельцу — он выдаст логин и пароль. " +
-        "Технической ошибки здесь нет, сайт цел.</p>" +
-        "<p><b>Администратору:</b> Cloudflare → Pages → проект <code>kvant-ove</code> → Settings → " +
-        "Environment variables → Production → добавить <code>BASIC_AUTH_PASS</code> → Save → " +
-        "Retry deployment. Логин задаётся переменной <code>BASIC_AUTH_USER</code>, " +
-        "по умолчанию <code>kvant</code>.</p>"),
-        { status: 503, headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" } },
-      );
+      const resp = await env.ASSETS.fetch(request);
+      const open = new Response(resp.body, resp);
+      open.headers.set("Cache-Control", "no-store");
+      open.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
+      open.headers.set("Referrer-Policy", "no-referrer");
+      return open;
     }
 
     const got = request.headers.get("Authorization") || "";
