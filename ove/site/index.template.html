@@ -153,6 +153,7 @@ const SW = __SOFTWARE_JSON__;
 const ANS = __ANSWERS_JSON__;   // ответы, уже сведённые в общую версию
 const RF = __REFRAME_JSON__;
 const DISC = __DISC_JSON__;
+const DELIV = __DELIV_JSON__;
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const nf = (n,d=0) => (n===''||n===null||n===undefined||isNaN(n)) ? '—' : Number(n).toLocaleString('ru-RU',{minimumFractionDigits:d,maximumFractionDigits:d});
@@ -1344,15 +1345,125 @@ function rDisc(){
   <div id="dbody"></div>`;
 }
 
+/* ============ Состав БИ: что остаётся, что переносим в детальный ============ */
+const DV_V = {bi:['остаётся в БИ','lot3'], partial:['частично → ДИ','lot2'],
+              detail:['перенести в ДИ','lot1'], question:['вопрос Заказчику','lot4']};
+let vF = {g:'', v:'', lot:'', q:''};
+function vRows(){
+  const t = vF.q.toLowerCase();
+  return DELIV.items.filter(x =>
+    (vF.g===''||x.group===vF.g) && (vF.v===''||x.verdict===vF.v) &&
+    (vF.lot===''||(x.lots||[]).includes(Number(vF.lot))) &&
+    (!t||[x.id,x.name,x.req.q,x.intl,x.propose,ansOf(x.id)].join(' ').toLowerCase().includes(t)));
+}
+function vPaint(){
+  const el = document.getElementById('vbody'); if(!el) return;
+  const rows = vRows();
+  el.innerHTML = rows.map(x=>`<div class="card qcard">
+    <h3><span class="tag ${DV_V[x.verdict][1]}">${esc(x.id)}</span> ${esc(x.name)}
+      ${(x.lots||[]).map(lotTag).join('')}<span class="tag">${esc(x.group)}</span>
+      <span class="tag ${DV_V[x.verdict][1]}">${DV_V[x.verdict][0]}</span>
+      ${ansOf(x.id).trim()?'<span class="tag lot3">закрыто</span>':''}</h3>
+    <div class="quote">«${esc(x.req.q)}»</div>
+    <div class="mut">${esc(x.req.where)}</div>
+    <p><b>Международная практика:</b> ${esc(x.intl)}</p>
+    <div class="box ${x.verdict==='bi'?'info':'warn'}"><b>Наше предложение:</b> ${esc(x.propose)}</div>
+    ${x.effect&&x.effect!=='—'?`<p class="mut"><b>Эффект:</b> ${esc(x.effect)}</p>`:''}
+    ${x.note?`<p class="mut"><b>Примечание:</b> ${esc(x.note)}</p>`:''}
+    <div>${(x.refs||[]).map(r=>`<span class="tag">${esc(r)}</span>`).join('')}</div>
+    ${x.verdict!=='bi'?`<div class="qgrid">
+      <label>Статус
+        <select class="mini qf" data-id="${esc(x.id)}" data-f="st">
+          ${Q_ST.map(([v,n])=>`<option value="${v}"${v===stOf(x.id)?' selected':''}>${n}</option>`).join('')}</select></label>
+      <label>Решение (что согласовали с Заказчиком)
+        <textarea class="mini qf" data-id="${esc(x.id)}" data-f="ans" rows="2"
+          placeholder="итог переговоров по объёму — дословно, с датой">${esc(ansOf(x.id))}</textarea></label>
+      <label>Комментарий инженера
+        <textarea class="mini qf" data-id="${esc(x.id)}" data-f="eng" rows="2"
+          placeholder="что учитываем в ТКП/договоре">${esc(engOf(x.id))}</textarea></label>
+    </div>`:''}
+  </div>`).join('') || '<div class="box mut">Под фильтр ничего не попало</div>';
+  document.getElementById('vcount').textContent =
+    `${rows.length} из ${DELIV.items.length}`;
+}
+function vLetter(){
+  const ord = {detail:0, partial:1, question:2};
+  const pick = DELIV.items.filter(x=>x.verdict!=='bi')
+    .sort((a,b)=>(ord[a.verdict]??9)-(ord[b.verdict]??9)||a.id.localeCompare(b.id));
+  const txt = 'Предложения по составу и глубине документации Базового инжиниринга\n'
+    + 'Объект: АО «Кольская ГМК», комплекс ОВЭ-75. К ТЗ на БИ v3.6 и приложениям.\n'
+    + 'Основание: международная практика Basic Engineering / FEED (AACE 18R-97, IPA FEL-3,\n'
+    + 'EN 16310:2013) и разделение ПД/РД по ГОСТ Р 21.101-2020. Предлагается зафиксировать\n'
+    + 'уровень проработки позиций на этапе БИ и порядок их доведения на детальном инжиниринге.\n\n'
+    + pick.map((x,i)=>`${i+1}. ${x.name} [${x.id}] — ${DV_V[x.verdict][0]}\n`
+      + `   Пункт ТЗ: «${x.req.q}» (${x.req.where})\n`
+      + `   Предложение: ${x.propose}\n`
+      + `   Обоснование: ${x.intl}${x.refs&&x.refs.length?' ['+x.refs.join('; ')+']':''}\n`).join('\n');
+  const blob = new Blob([txt],{type:'text/plain;charset=utf-8'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='ove_sostav_bi.txt'; a.click();
+}
+function bindDeliv(){
+  if(!DELIV) return;
+  ['vg','vv','vlot'].forEach(id=>document.getElementById(id)
+    .addEventListener('change', e=>{ vF[{vg:'g',vv:'v',vlot:'lot'}[id]]=e.target.value; vPaint(); }));
+  document.getElementById('vq').addEventListener('input', e=>{ vF.q=e.target.value; vPaint(); });
+  const root=document.getElementById('vbody');
+  root.addEventListener('change', e=>{ const el=e.target.closest('.qf'); if(!el) return;
+    QA[el.dataset.f][el.dataset.id]=el.value; saveQA(); vPaint(); });
+  root.addEventListener('input', e=>{ const el=e.target.closest('textarea.qf'); if(!el) return;
+    QA[el.dataset.f][el.dataset.id]=el.value; saveQA(); });
+  document.getElementById('vlet').addEventListener('click', vLetter);
+  document.getElementById('vwho').addEventListener('input', e=>{ QA.who=e.target.value; saveQA(); });
+  document.getElementById('vsend').addEventListener('click', ()=>qSend('vsendst','vsend'));
+  vPaint();
+}
+function rDeliv(){
+  if(!DELIV) return '<div class="box warn">Раздел собирается.</div>';
+  const byV = {}; DELIV.items.forEach(x=>{byV[x.verdict]=(byV[x.verdict]||0)+1});
+  const groups = [...new Set(DELIV.items.map(x=>x.group))];
+  return `
+  <div class="box warn"><b>Зачем эта вкладка.</b> Заказчик перечислил в ТЗ и приложениях, какие документы
+  обязан выдать Исполнитель БИ. Здесь каждый пункт этого перечня сверен с международной практикой:
+  что действительно входит в Basic Engineering / FEED, а что во всём мире делается на детальном
+  инжиниринге — по данным выбранных изготовителей оборудования. Это НЕ отказ от объёма: по каждой
+  позиции — готовая формулировка «что даём на БИ, что и когда доводим на ДИ». Так мы снижаем цену
+  и срок нашего ТКП и снимаем с Заказчика риск двойной работы. Договорённости фиксируются в полях
+  решений и коммитятся кнопкой «⚡ в общую базу» (id общие с реестром вопросов).</div>
+  <div class="box info"><b>Система координат (${esc(DELIV.basis.title)}).</b> ${esc(DELIV.basis.text)}
+    <ul>${DELIV.basis.frameworks.map(f=>`<li><b>${esc(f.ref)}</b> — ${esc(f.what)}</li>`).join('')}</ul></div>
+  <div class="k">
+    <div class="tile"><b>${byV.bi||0}</b><span>остаётся в БИ</span></div>
+    <div class="tile"><b class="mid">${byV.partial||0}</b><span>частично → ДИ</span></div>
+    <div class="tile"><b class="hi">${byV.detail||0}</b><span>перенести в ДИ</span></div>
+    <div class="tile"><b>${byV.question||0}</b><span>вопрос Заказчику</span></div>
+    <div class="tile"><b>${DELIV.items.length}</b><span>всего позиций</span></div>
+  </div>
+  <div class="filters">
+    <input type="text" id="vq" placeholder="Поиск по пунктам, цитатам, предложениям…">
+    <select id="vg"><option value="">Все разделы</option>${groups.map(g=>`<option value="${esc(g)}">${esc(g)}</option>`).join('')}</select>
+    <select id="vv"><option value="">Любой вердикт</option>${Object.entries(DV_V).map(([k,v])=>`<option value="${k}">${v[0]} (${byV[k]||0})</option>`).join('')}</select>
+    <select id="vlot"><option value="">Все лоты</option><option value="1">Лот 1</option><option value="2">Лот 2</option><option value="3">Лот 3</option><option value="4">Лот 4</option></select>
+    <button class="btn" id="vlet" title="позиции с переносом/уточнением — текстом для письма Заказчику">⬇ предложение по объёму</button>
+    <span class="count" id="vcount"></span>
+  </div>
+  <div class="filters">
+    <input type="text" id="vwho" placeholder="ваше имя — попадёт в коммит как автор" value="${esc(QA.who||'')}">
+    <button class="btn" id="vsend" title="закоммитить решения в репозиторий">⚡ в общую базу</button>
+    <span class="count" id="vsendst"></span>
+  </div>
+  <div id="vbody"></div>`;
+}
+
 /* ================= Каркас ================= */
 const TABS = [
   ['overview','Обзор'], ['stages','Этапы'], ['blocks','Блоки и лоты'], ['bi','Базовый проект'],
+  ['deliv','Состав БИ'],
   ['equip','Оборудование'], ['disc','Расхождения ТЗ'], ['questions','Вопросы Заказчику'], ['sup','Поставщики'],
   ['market','Маркетинг'], ['soft','ПО: сами или подряд'], ['alt','Альтернатива'],
   ['auto','Автоматизация'], ['world','Мировой опыт'], ['china','Китай'],
   ['partner','Партнёр'], ['competitor','Конкурент'], ['tender','Торги за БИ'], ['capex','Стройка · CAPEX']
 ];
-const R = {overview:rOverview, stages:rStages, blocks:rBlocks, bi:rBI, equip:rEquip,
+const R = {overview:rOverview, stages:rStages, blocks:rBlocks, bi:rBI, deliv:rDeliv, equip:rEquip,
            disc:rDisc, questions:rQ, sup:rSup, market:rMarket, soft:rSoft, alt:rAlt, auto:rAuto,
            world:rWorld, china:rChina, partner:rPartner, competitor:rComp,
            tender:rTender, capex:rCapex};
@@ -1402,6 +1513,7 @@ function show(id){
     if(id==='sup') bindSup();
     if(id==='questions') bindQ();
     if(id==='disc') bindDisc();
+    if(id==='deliv') bindDeliv();
   }
   location.hash = id;
   window.scrollTo(0,0);
