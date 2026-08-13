@@ -144,7 +144,7 @@ footer{padding:0 22px 24px;color:var(--mut);font-size:11.5px}
 <body>
 <header>
   <h1>ГТУ-библиотека: поставщики и ЗИП — Solar &amp; Siemens SGT-100…400</h1>
-  <div class="sub">Справочник для сорсеров КВАНТ: машины · номенклатура ЗИП · шифровки PN · библиотека производителей (OEM / независимые / реверс) · таможня РФ · мировые базы. Сборка: 2026-08-10</div>
+  <div class="sub">Справочник для сорсеров КВАНТ: машины · номенклатура ЗИП · шифровки PN · библиотека производителей (OEM / независимые / реверс) · таможня РФ · мировые базы. Сборка: 2026-08-13</div>
   <div class="sub" style="margin-top:6px"><a href="./lot" style="font-weight:700">→ Лот ЛУКОЙЛ: рабочее меню</a> — горячая часть · план рассылки · склады · трейдеры · блоки по направлениям</div>
 </header>
 <nav id="nav"></nav>
@@ -13776,7 +13776,7 @@ const BX_SITES = {
  ]
 };
 const RESEARCH = {
-"updated": "2026-08-09",
+"updated": "2026-08-10",
 "source": "Research-вееры 06.08.2026: 12 углов (субпоставщики OEM Solar/Siemens, автомаркет по брендам и моделям, узкие специалисты по элементам, РФ/СНГ/Иран/Турция) + 3 угла наследия (Линкольн Ruston/EGT, Финспонг STAL/ABB, диаспора лицензиатов). Каждая компания — с подтверждённым официальным сайтом. + веер «рабочие юрисдикции/пэкеджеры/б-у» 06.08.2026. + веер глубоких субпоставщиков (shipment-данные ImportYeti, кейс-стади, сеть Caterpillar) 06.08.2026. + harvest раскрутки цепочек, волна 1. Harvest волны 2.",
 "rows": [
 {
@@ -27976,6 +27976,644 @@ const RESEARCH = {
 "link": "оператор / арендодатель парка (не изготовитель, не ремонтник)",
 "tier": "component_specialist",
 "angle": "harvest:lm6000",
+"risk": ""
+},
+{
+"name": "Sulzer (Sulzer Turbo Services / Rotating Equipment Services)",
+"country": "Швейцария / Нидерланды (площадка Turbo Services Venlo, Lomm)",
+"site": "https://www.sulzer.com/en/shared/services/gas-turbine-parts",
+"email": "sulzertsvenlo@sulzer.com",
+"what": "ЕДИНСТВЕННЫЙ проверенный независимый ИЗГОТОВИТЕЛЬ новых деталей горячего тракта именно под V64.3A/SGT-1000F и Ansaldo AE64.3A: рабочие лопатки ст.1 (Ni-суперсплав, серпантин + fan-shape перфорация, 100% TBC + внутр. алюминид), ст.2 и ст.3 (15 радиаль",
+"link": "независимый изготовитель (не OEM)",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "ARNOLD Group (ARNOLD Isoliersysteme)",
+"country": "Германия",
+"site": "https://www.arnoldgroup.com/insulation-systems/insulation-systems-for-gas-turbines/v64-3a-sgt-1000f/?lang=en",
+"email": "info@arnoldgroup.com",
+"what": "Единственный поставщик с ОТДЕЛЬНОЙ страницей продукта под V64.3A (SGT-1000F). НО предмет — только системы изоляции (ARNOLD Single Layer Insulation System), горячую часть не делают. Ценность двойная: (1) закрывают изоляцию при вскрытии машины, (2) сам",
+"link": "независимый изготовитель (не OEM)",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "Турбинаспецсервис (ООО ТСС)",
+"country": "Россия (Уфа)",
+"site": "https://turbinass.ru/",
+"email": "info@turbinass.ru",
+"what": "ПОДТВЕРЖДЕНО: в 2025 г. локализовал ВСЕ компоненты горячей части КОЛЬЦЕВОЙ камеры сгорания AE64.3A в РФ и выполнил капремонт камеры для АО «Юго-Западная ТЭЦ». Это ровно тот угол, который не закрывает Sulzer. Заявляет реверс-инжиниринг и изготовление ",
+"link": "независимый изготовитель + ремонтник",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "Deloro Microfusione (быв. Microfusione Stellite S.p.A., Deloro Wear Solutions)",
+"country": "Италия (Pieve Emanuele, Milano)",
+"site": "https://www.deloro.com/our-companies/deloro-microfusione/",
+"email": "microfusione@deloro.com",
+"what": "Литьё по выплавляемым моделям в Ni- и Co-суперсплавах: ЛОПАТКИ, СОПЛОВЫЕ АППАРАТЫ (nozzles), ТЕПЛОВЫЕ ЭКРАНЫ (heat shields) и КОМПОНЕНТЫ КАМЕРЫ СГОРАНИЯ массой до 75 кг. Воздушное и вакуумное литьё, сплошное и со стержнями (охлаждаемые полости), равн",
+"link": "независимый изготовитель (литейка), потенциальный субпоставщик итальянского кластера; прямая связь с Ansaldo публично не заявлена",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "PowerTech B.V.",
+"country": "Нидерланды (Waalwijk / Nieuwkuijk)",
+"site": "https://powertechnl.com/",
+"email": "info@powertechnl.com",
+"what": "ЯВНО заявляет реверс-инжиниринг любого компонента по запросу: анализ материала и покрытия, 3D-сканирование детали, прочностной расчёт, изготовление моделей и оснастки, пробная установка для проверки прилегания. Покрытие: SGT600/GT-10B (ВСЁ — камеры с",
+"link": "независимый изготовитель и ремонтник",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "АО «РЭП Холдинг» (Санкт-Петербург)",
+"country": "Россия",
+"site": "https://www.reph.ru",
+"email": "",
+"what": "По соглашению от 07.06.2019 СП получило от Ansaldo ИСКЛЮЧИТЕЛЬНЫЕ права на производство, продажу и сервис ГТ/ПТ в РФ, СНГ и согласованных странах и ПОЛНУЮ техническую документацию на турбины и системы управления. Линейка ГТ 70–340 МВт (нижняя точка 7",
+"link": "лицензиат/СП Ansaldo — единственный резидент РФ с переданной официальной техдокументацией Ansaldo",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "Lincotek Surface Solutions (ex Turbocoating S.p.A.)",
+"country": "Италия",
+"site": "https://www.turbocoating.com/surfacesolutions/surface-treatments/",
+"email": "",
+"what": "Ровно те покрытия, которые указаны в спецификации Sulzer для V64.3A: TBC из иттрий-стабилизированного ZrO2 на лопатки, НАПРАВЛЯЮЩИЕ АППАРАТЫ и КАМЕРЫ СГОРАНИЯ; MCrAlY подслой/покрытие методами LPPS и HVOF; алюминидные диффузионные покрытия green-pack",
+"link": "независимый ремонтник / специализированные покрытия горячего тракта",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "GBL — Global Energy Technologies",
+"country": "ОАЭ (Jebel Ali Free Zone, Дубай)",
+"site": "https://gblenergy.com/",
+"email": "info@gblenergy.com",
+"what": "Публично заявляет изготовление по V64.3 / V64.3A: лопатки компрессора, наружные и внутренние кольца компрессора, диафрагмы компрессора, уплотнительные кольца в 10 секторах, комплектующие жаровой трубы (insert rings, bottom plates, с покрытием и без),",
+"link": "независимый изготовитель (реверс-инжиниринг)",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "GF Precicast (Precicast SA, GF Casting Solutions)",
+"country": "Швейцария, италоязычный Тичино (Novazzano, Stabio) + Arad, Румыния",
+"site": "https://www.georgfischer.com/en/service/campaigns/novazzano.html",
+"email": "",
+"what": "Точное литьё лопаток, сопловых аппаратов и структурных деталей горячей части для авиа- и ПРОМЫШЛЕННЫХ ГТУ. Равноосное (до 700 мм), направленная кристаллизация и монокристалл (до 500 мм). Сплавы IN738LC, Rene 80, IN718, CMSX-4, Rene N5, HS25, Mar-M509",
+"link": "независимый изготовитель (литейка, ныне в GF); географически и технологически — прямой сосед генуэзского кластера",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "Gearforce Tecnia / Egear Force",
+"country": "Панама (HQ) / США (логистика, Майами)",
+"site": "https://www.egearforce.com/product/turbine-solutions/blades-vanes",
+"email": "info@egearforce.com",
+"what": "В списке моделей ПРЯМО указан 'SGT-1000F (V64.3)'. Заявляют производство лопаток и сопловых аппаратов начиная 'от чертежа ИЛИ от реального образца реверс-инжиниринга' — то есть работают без чертежей OEM, что нам и нужно. Кованые лопатки, литьё по вып",
+"link": "независимый изготовитель",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "MAPA Turbines Sp. z o.o.",
+"country": "Польша (Люблин)",
+"site": "https://mapaturbines.com/",
+"email": "sales@mapaturbines.com",
+"what": "Полноценный завод 5000 м²: ремонт компонентов, покрытия HVOF/APS, вакуумная термообработка, NDT, ИЗГОТОВЛЕНИЕ новых деталей. Родословная Elbar BV (2002) → Sulzer Turbo Services (2008) — то есть техпроцессы наследованы у того самого Sulzer, который де",
+"link": "независимый ремонтник + изготовитель новых деталей",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "Stork Turbo Blading B.V.",
+"country": "Нидерланды (Снек)",
+"site": "https://storkturboblading.com/en/capabilities/equipment-manufacturing-repair/turbine-blades-components/find-your-model/siemens-sgt-1000f",
+"email": "",
+"what": "«Крупнейший независимый изготовитель турбинных и компрессорных лопаток» с 1962. Прямо заявляет компрессорные лопатки, НА и ВНА (IGV) для крупнорамных промышленных ГТУ, работает по Siemens/GE/Westinghouse/MHI/Alstom. 64.3A не назван — нужен запрос на ",
+"link": "независимый изготовитель / ремонтник",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "INTECH GmbH (ИНТЕХ ГмбХ)",
+"country": "Россия (Москва)",
+"site": "https://intech-gmbh.ru/en/",
+"email": "info@intech-gmbh.ru",
+"what": "Поставка ЗИП для газовых турбин Siemens (в номенклатуре указан ряд V64.3–V64.3A / SGT6-1000F), точное литьё компонентов турбин, производство и восстановление лопаток ГТУ. Русскоязычный вход в цепочку, удобен для оформления поставки в РФ. | V64.3A/AE6",
+"link": "независимый поставщик/инжиниринг с литейно-лопаточной кооперацией",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "Ansaldo Thomassen B.V. (Rheden) / Ansaldo Thomassen Gulf",
+"country": "Нидерланды / ОАЭ",
+"site": "https://power-serv.com/ansaldo-thomassen/",
+"email": "",
+"what": "ПРОВЕРЕНО, РЕЗУЛЬТАТ ОТРИЦАТЕЛЬНЫЙ ПО ПРОФИЛЮ: производит капитальные детали (горячий тракт, камера сгорания, топливные форсунки), делает полевой сервис, ремонт, конверсии, апгрейды, ремануфактуринг и релокацию ГТУ — но ИСКЛЮЧИТЕЛЬНО по газовым турби",
+"link": "дочерняя структура Ansaldo Energia (куплена 2006, переименована 2008)",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "EthosEnergy Torino (быв. TurboCare S.p.A.)",
+"country": "Италия (Турин)",
+"site": "https://ethosenergy.com/our-locations/torino",
+"email": "",
+"what": "Площадка >35 000 м², наследие Fiat Grandi Motori → Fiat Avio → GTT → TurboCare. Ремонт и капремонт компонентов турбин, обширный склад ЗИП, инжиниринг, реабилитация и перенос энергоблоков; изготовлено >350 ГТУ (>12 000 МВт). Есть подтверждённый опыт п",
+"link": "независимый ремонтник/изготовитель (не OEM по 64.3A); опыт по 64.3A не подтверждён публично",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "Wikov Group (Wikov Gear)",
+"country": "Чехия (Прага, Пльзень) + Канада",
+"site": "https://www.wikov.com/en/gearbox-service/industrial-gearboxes/flender-graffenstaden-gearboxes/flender-graffenstaden-tx71-4c",
+"email": "sales@wikov.com",
+"what": "Закрывает позицию «редуктор ТН80/1С» из свежего тендера Форвард Энерго по ТТЭЦ-1: ремонт и оптимизация быстроходных редукторов Flender-Graffenstaden, ИЗГОТОВЛЕНИЕ полных зубчатых пар, перезаливка баббитовых подшипников, контроль геометрии зубьев на К",
+"link": "независимый ремонтник / изготовитель ЗИП",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "ZOLLERN GmbH & Co. KG (Zollern Giesserei)",
+"country": "Германия (Лаухерталь)",
+"site": "https://www.zollern.com/en/products/castings/castings/",
+"email": "",
+"what": "Вакуумное литьё лопаток и направляющих аппаратов сложной формы плюс корпусных деталей для промышленных ГТУ. Сплавы прямо названы: Inconel 739 (IN738), Hastelloy X, Nimonic, MAR M247 — это ровно материальная база горячей части 64.3A. Среди заказчиков ",
+"link": "субпоставщик (литьё) OEM Siemens/GE — доступен независимо",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "Shanghai SMEC Enterprise (Shanghai Electric Group)",
+"country": "КНР (Шанхай)",
+"site": "http://shanghaielectric-smec.com/2-1-3-f-class-gas-turbine/",
+"email": "",
+"what": "Держит AE64.3A (79 МВт, КПД 36.5%) в собственной линейке F-класса и по китайским данным ведёт долгосрочное сервисное обслуживание блоков AE64.3A в КНР. Потенциальный источник новых узлов горячего тракта и целых машин вне ЕС. | V64.3A/AE64.3A",
+"link": "лицензионный изготовитель / сервис (не независимый — аффилирован с Ansaldo)",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "Hanwha Power (Power Systems Mfg., LLC / PSM), Jupiter, Флорида",
+"country": "США",
+"site": "https://www.psm.com/products",
+"email": "",
+"what": "Мульти-OEM производитель неоригинального горячего тракта: лопатки, сопловые аппараты, бандажи, жаровые трубы, переходные патрубки, топливные форсунки, ретрофиты камеры сгорания FlameSheet и LEC III, компрессорные лопатки, роторные сервисы, покрытия. ",
+"link": "независимый изготовитель неоригинальных деталей — БЫВШАЯ дочка Ansaldo Energia (2016–2021, продана Hanwha)",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "GTS S.p.A. (General Turbine Solutions)",
+"country": "Италия (Grassobbio, Бергамо)",
+"site": "http://www.gtsspa.eu/web/",
+"email": "",
+"what": "РЕАЛЬНЫЙ ПРОФИЛЬ ВЫЯСНЕН: малая итальянская фирма (осн. 2009, 11-50 чел., P.IVA 06473320965) — ЗИП газовых и паровых турбин + СПЕЦИНСТРУМЕНТ для обслуживания, «производство спецматериалов и высокоточных деталей», консалтинг по расходу ЗИП. Модели не ",
+"link": "независимый поставщик ЗИП/спецоснастки (не изготовитель горячего тракта)",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "NEW JCM Group",
+"country": "Китай",
+"site": "https://en.newjcmgroup.com/aboutus/2.html",
+"email": "",
+"what": "MRO-ориентированный холдинг: изготовление ключевых компонентов, поставка ЗИП, капремонты, мощность 4-6 капремонтов ГТУ в год. В июле 2026 взяли контракт на ТО 8 ГТУ DG-90L2 для ГК «Туркменгаз» — доказанная работа на постсоветском рынке и политическая",
+"link": "независимый ремонтник + изготовитель компонентов",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "Turbo Machined Products, Inc.",
+"country": "США (Frankfort, NY)",
+"site": "https://www.turbomp.com/",
+"email": "",
+"what": "5-осевая прецизионная механообработка лопаток и направляющих аппаратов турбомашин, блиски и рабочие колёса до 30\", AS9100/ITAR, от единичного прототипа до серии. Конкретных моделей ГТУ не заявляет — кандидат на изготовление механообрабатываемых позиц",
+"link": "независимый изготовитель (механообработка)",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "MAAG Gear AG",
+"country": "Швейцария (Цюрих)",
+"site": "https://www.flsmidth.com/",
+"email": "",
+"what": "Редуктор типа HET (high efficiency turbogear) для V64.3A: понижение 5400 -> 3600 об/мин (60 Гц), паспорт 85 МВт, сервис-фактор 1.3 по API 613. Применён на трёх блоках GUD1S.64.3A в San Pedro de Macoris. Указан в справочнике как поставщик 'Load Gear S",
+"link": "субпоставщик (Siemens) — нагрузочный редуктор",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "RENK AG",
+"country": "Германия (Аугсбург)",
+"site": "https://www.renk.com/",
+"email": "",
+"what": "Указан в отраслевом справочнике как поставщик турборедукторного узла (Turbo Gear Unit) для SGT-1000/V64.3A. Второй источник по редукторной группе помимо Flender-Graffenstaden и MAAG — полезно для конкуренции в тендере на редуктор | V64.3A/AE64.3A",
+"link": "субпоставщик (Siemens) — турборедуктор",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "Boldrocchi Group",
+"country": "Италия (Биассоно)",
+"site": "https://www.boldrocchigroup.com/gas-turbine-systems/",
+"email": "",
+"what": "Задокументированный поставщик систем воздухозабора и выхлопа для SGT-1000/V64.3A. Есть прямая референция: баржевая электростанция с ГТУ Siemens V64.3A, система воздухозабора и шумоглушённого выхлопа. Одна из немногих компаний в мире, закрывающих всё ",
+"link": "субпоставщик (Siemens/Ansaldo) — воздухозабор и выхлоп",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "Thomassen Group Middle East",
+"country": "ОАЭ (Дубай) + Оман (Низва)",
+"site": "https://thomassen-me.com/spare-parts/",
+"email": "",
+"what": "Держат складской запас ВОССТАНОВЛЕННОГО горячего тракта и собственные ремонтные мощности в Дубае и Низве по топливным форсункам, актуаторам и HGP-компонентам. Из Siemens покрывают только V94.2, 64.3A нет — но мощности по ремонту КС и форсунок в досту",
+"link": "независимый ремонтник + складской поставщик (близок к орбите Ansaldo Thomassen)",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "Fox Innovation & Technologies",
+"country": "США (Хьюстон) + Бразилия + ИТАЛИЯ",
+"site": "https://www.foxinnovation.com/heavy-duty-industrial-gas-turbine-services",
+"email": "",
+"what": "Инспекции (combustion/HGP/major), ремонт компонентов и роторов, поставка новых/восстановленных/модернизированных деталей, обработка на месте, 24/7. Проверено: список ограничен GE Frame, Siemens SGT5/SGT6, MHI M501/M701, Alstom GT24/26 — 64.3A нет. Ин",
+"link": "независимый ремонтник / сервис-провайдер",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "ATS Microfusione S.r.l.",
+"country": "Италия",
+"site": "https://www.gfmspa.com/en/azienda/partnership/",
+"email": "",
+"what": "Литьё по выплавляемым моделям: сталь, алюминий, спецсплавы, сложная геометрия, масса от 1 г до более 60 кг, жёсткие допуски, включая аэрокосмические требования. Создано в 2022 на базе исторического ATS (Sasso Marconi, BO). ПРАВИЛЬНЫЙ ЗАХОД — через GF",
+"link": "субпоставщик (СП GFM + Gruppo Cividale, литьё)",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "Europea Microfusioni Aerospaziali S.p.A. (EMA)",
+"country": "Италия",
+"site": "https://it.linkedin.com/company/europea-microfusione-aerospaziale-s.p.a.",
+"email": "",
+"what": "Прецизионное литьё статорных и роторных лопаток из спецсплавов, завод 20 000 м² в Morra De Sanctis (AV). Более двух третей продукции идёт Rolls-Royce, AgustaWestland, ANSALDO ENERGIA, Avio, TURBOCARE, SIEMENS, MAN — то есть это документально подтверж",
+"link": "субпоставщик (литьё) для Ansaldo Energia, Siemens, TurboCare — входит в группу Rolls-Royce",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "Boldrocchi S.r.l. (Boldrocchi Group)",
+"country": "Италия (Biassono, Милан)",
+"site": "https://www.boldrocchigroup.com/gas-turbine-systems/",
+"email": "boldrocchi@boldrocchi.eu",
+"what": "В справочнике Forecast International прямо указан как поставщик системы воздухозабора и выхлопа для семейства V64. Делает КВОУ, фильтры, абсорбционные и резонансные глушители, диверторы, дымовые трубы, кожухи — >1000 вспомогательных систем ГТУ в мире",
+"link": "независимый изготовитель / субпоставщик Siemens по V64",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "FOMAS Group (FOMAS S.p.A.)",
+"country": "Италия (Osnago, LC; + Busano TO, Villamarzana RO, Biassono MB)",
+"site": "http://www.fomasgroup.com/en",
+"email": "info@fomasgroup.com",
+"what": "Поковки, БЕСШОВНЫЕ РАСКАТНЫЕ КОЛЬЦА и металлические порошки; Power Generation — один из четырёх ключевых секторов («компоненты турбин и энергосистем»). Кандидат на диски ротора, кольцевые обоймы, фланцы корпусов. 8 заводов на 3 континентах, порошково",
+"link": "независимый изготовитель поковок; связь с Ansaldo публично не подтверждена",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "ASO Group — ASONEXT / ASOFORGE",
+"country": "Италия (Ospitaletto, BS)",
+"site": "https://www.asonext.com/",
+"email": "info@asonext.com",
+"what": "Спецстали и поковки; Power Generation прямо в списке обслуживаемых отраслей. ЭДП 50 т, 150 000 т/год, 170 000 м². Кандидат на заготовки дисков, валов, крупных колец (в связке с ASOFORGE). По никелевым суперсплавам и конкретно ГТУ-номенклатуре сайт мо",
+"link": "независимый металлург/кузнец, субпоставщик 2-го уровня; связь с Ansaldo не подтверждена",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "Saldomeccanica Srl",
+"country": "Италия (Генуя)",
+"site": "https://www.saldomeccanica.com/it/pages-9/referenze",
+"email": "info@saldomeccanica.com",
+"what": "Механообработка (токарка, фрезеровка, расточка) и сварные металлоконструкции, генуэзская мастерская. ЕДИНСТВЕННЫЙ из проверенных итальянских поставщиков, кто ПУБЛИЧНО указывает «Soc. Gruppo ANSALDO» в списке референций. Профиль общемашиностроительный",
+"link": "субпоставщик группы Ansaldo (подтверждено референцией на их сайте); НЕ производитель турбинных деталей горячего тракта",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "AGT Repair Center, Шанхай (СП Ansaldo Energia × Shanghai Electric)",
+"country": "КНР",
+"site": "https://www.ansaldoenergia.com/fileadmin/Brochure/AnsaldoEnergia-GlobalRepair-20220912.pdf",
+"email": "service@ansaldoenergia.com / info@ansaldoenergia.com",
+"what": "Ремцентр группы Ansaldo в Шанхае: «end to end refurbishment» лопаток и направляющих (B&V) для китайского рынка. Опирается на реальный китайский парк AE64.3A: 2 машины для SPIC (площадка Jieyang, Гуандун) и 2 машины для GCL Power (проект Gaochun, Цзян",
+"link": "СП/дочерняя ремонтная структура Ansaldo в КНР",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "UNICA LLC (ООО «ЮНИКА»)",
+"country": "Россия (трейдер)",
+"site": "https://unica.ru.com/gasturbines/en",
+"email": "info@unica.eu.com",
+"what": "ЕДИНСТВЕННЫЙ найденный поставщик, публично указывающий V64.3A (АЕ64.3A) в каталоге. По системе сгорания заявляет ровно наши позиции: КЕРАМИЧЕСКИЕ ПЛИТКИ И МЕТАЛЛИЧЕСКИЕ ЭКРАНЫ, ДЕРЖАТЕЛИ ПЛИТОК, горелки, газовые/топливные распределители, внутренний к",
+"link": "ТРЕЙДЕР (не изготовитель) — явно помечен",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "THETA TECH INTERNATIONAL TRADING LTD.",
+"country": "Тайвань",
+"site": "https://ttitl.net/stock-gas-turbine-parts/",
+"email": "sales@ttitl.net",
+"what": "ТРЕЙДЕР. В маркетинговом описании заявляет поставку по моделям Siemens V64.2, V94.3A и V64.3A в состояниях New, Unused, refurbished и repairable. ОДНАКО в опубликованных складских таблицах фактических позиций по V64.3A/SGT-1000F нет — там преимуществ",
+"link": "ТРЕЙДЕР (склад ЗИП) — явно помечен",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "WAHTEC / WISTER",
+"country": "КНР",
+"site": "https://wahtec.com/ansaldo-gasturbine.html",
+"email": "",
+"what": "Каталог деталей Ansaldo с явным перечнем моделей AE64.3A, AE94.3A, AE94.2, GT36, GT26: жаровые трубы/combustion liners, лопатки, сопла, бандажи, теплозащитные экраны. Происхождение деталей не раскрывается — проверять на подлинность и происхождение. |",
+"link": "трейдер (заявляет OEM-детали Ansaldo)",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "Industrial Surplus World (GasTurbineNozzles.com / GasTurbineBuckets.com / GasTurbinePartsAndServices.com)",
+"country": "США (Хьюстон, TX / Fort Lauderdale, FL)",
+"site": "https://gasturbinenozzles.com/",
+"email": "surplus713@gmail.com",
+"what": "Скупка и продажа б/у и ремонтопригодного горячего тракта (nozzles, vanes, buckets, кольца, лом жаропрочных сплавов) в состояниях new/serviceable/repairable/scrap; занимаются декоммишенингом и ликвидацией активов. Канал, через который физически проход",
+"link": "трейдер/скупщик б/у горячего тракта",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "TTI International Limited (Тайбэй)",
+"country": "Тайвань",
+"site": "https://ttitl.net/stock-gas-turbine-parts/",
+"email": "sales@ttitl.net",
+"what": "В описании специализации прямо указывают модели Siemens V64.2, V64.3 A, V94.3A. ПРОВЕРЕНО: в опубликованных складских таблицах на сайте по 64.3A ничего нет — там только GE Frame 3/5/6B/7/9E, бандажи и роторный крепёж MS5001/5002/6001B/9001E, а также ",
+"link": "ТРЕЙДЕР / складской брокер (не изготовитель)",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "UNICA (ООО «ЮНИКА»)",
+"country": "Россия",
+"site": "https://unica.ru.com/gasturbines/en",
+"email": "info@unica.eu.com",
+"what": "ТРЕЙДЕР. Прямо публикует позицию «V64.3A (АЕ64.3A) (on request)» с деталями горячей части — лопатки, бандажи, опорные кольца — и элементами камеры сгорания: горелки, жаровые трубы, топливные распределители. Собственного производства и реверс-инжинири",
+"link": "ТРЕЙДЕР",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "AMCOR GmbH",
+"country": "Россия (при немецком нейминге — ИНН 1655427282, ОГРН 1191690093198)",
+"site": "https://amcor.ru/reinzhiniring-ae64-3a",
+"email": "",
+"what": "ТРЕЙДЕР / сервисно-торговая компания. Держит отдельные страницы «Реинжиниринг AE64.3A» и каталог AE64.3A, обещает подбор капитальных запчастей по серийному номеру, диагностику наработки и международную логистику. По факту опирается на «заводскую доку",
+"link": "ТРЕЙДЕР / интегратор услуг (не изготовитель)",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "AMCOR GmbH / amcor.ru",
+"country": "Россия",
+"site": "https://amcor.ru/reinzhiniring-ae64-3a",
+"email": "",
+"what": "Имеет ВЫДЕЛЕННУЮ посадочную страницу «Реинжиниринг AE64.3A»: диагностика, подбор компонентов по серийным номерам, восстановление элементов камеры сгорания, ступеней турбины, деталей проточной части и лопаточного аппарата, оптимизация горячей части. П",
+"link": "ТРЕЙДЕР / посредник-интегратор (не изготовитель — проверено)",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "Rotrenza Marine (Чайырова, Коджаэли)",
+"country": "Турция",
+"site": "https://rotrenzamarine.com/engine/ansaldo-energia",
+"email": "info@rotrenzamarine.com",
+"what": "Отдельная страница по Ansaldo Energia с явным упоминанием AE64.3A и AE94.3A: поставка запчастей, ТО и ремонт, капремонт и монтаж, работы на площадке. Собственного производства нет, работают «через глобальных партнёров». Ценность строго как турецкий л",
+"link": "ТРЕЙДЕР / сервисный посредник (не изготовитель — проверено)",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "Leda Greenpower (China Power Contractor)",
+"country": "КНР (Пекин)",
+"site": "http://www.china-power-contractor.cn/Siemens-V-series-Gas-Turbine-SGT5-2000-spare-parts.html",
+"email": "",
+"what": "Китайский поставщик ЗИП по Siemens V-серии, в списке моделей указан SGT5-1000 (V64.3A); по V94.2/V94.3A есть детальные перечни (seal strip, insert ring, tile holder, ceramic bricks, refurbishment лопаток) — по 64.3A номенклатуру нужно запрашивать. | ",
+"link": "трейдер/дистрибьютор",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "Mayin Co., Ltd. (Mayin Supply)",
+"country": "КНР (Чжуншань)",
+"site": "https://mayinsupply.com/",
+"email": "",
+"what": "Продажа б/у деталей ГТУ + собственные тяжёлые переделы (ковка, термообработка, прецизионная механообработка). В каталоге GE 6F/9E/9F, Siemens SGT-800/SGT6-2000E/SGT5-4000F, RB211 — 64.3A нет, но заявленная производственная база позволяет работать по ",
+"link": "трейдер б/у + изготовитель (механообработка)",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "CEDCO GmbH",
+"country": "Германия",
+"site": "https://www.cedco.de/products/spare-parts/gas-turbine.html",
+"email": "",
+"what": "Aftermarket-компоненты для промышленных газовых и паровых турбин: лопатки компрессора и турбины, роторы, детали камеры сгорания, топливные форсунки, жаровые трубы, арматура, уплотнения, крепёж, датчики. По Siemens указаны V94.2, V94.3, SGT-600 — V64.",
+"link": "ТРЕЙДЕР (не изготовитель) — помечено явно; опыт по 64.3A не подтверждён",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "Ethos Automotive Machinery Trading & Rental L.L.C",
+"country": "ОАЭ (Дубай, Deira)",
+"site": "https://ethosmachinery.com/",
+"email": "",
+"what": "Дубайский трейдер б/у и восстановленных газовых турбин и генераторов (склад по SGT-100…SGT-800, SGT-2000E). По 64.3A позиций нет — но это рабочий ближневосточный канал для поиска машины и узлов. | V64.3A/AE64.3A",
+"link": "трейдер (ОАЭ)",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "Power Plants Online (RMA Global)",
+"country": "США (Орегон)",
+"site": "https://www.powerplantsonline.com/",
+"email": "milt@rmaglobal.com",
+"what": "Американская площадка по продаже ГТУ, станций и запчастей турбин. Текущий сток — FT4C, GE Frame 6001 ПГУ, LM2500; по 64.3A ничего нет. Использовать для размещения wanted-заявки. | V64.3A/AE64.3A",
+"link": "трейдер/площадка",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "Freudenberg Filtration Technologies",
+"country": "Германия + Италия",
+"site": "https://www.freudenberg-filter.com/en/markets/industrial/gas-turbines-and-compressors/references/new-gt-36-ansaldo-gas-turbine/",
+"email": "",
+"what": "Действующий поставщик систем фильтрации воздухозабора для ГТУ Ansaldo (референция по GT36 на Porto Marghera): 3-ступенчатая схема — карманные фильтры ISO coarse 70%/G4, кассетные ISO ePM1 85%/F9, кассетные ISO ePM1 >95%/E10. Фильтры — расходник, не п",
+"link": "субпоставщик (Ansaldo) — фильтрация воздухозабора",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "Yingliu AeroTech / 应流航源 (Yingliu Co., Ltd., 603308)",
+"country": "КНР (пров. Аньхой)",
+"site": "https://www.linkedin.com/posts/gasturbine-focus%EF%BC%88gtf%EF%BC%89_gasturbinefocusconference-gtf2026-gasturbine-activity-7404341920036237312-YFBt",
+"email": "",
+"what": "Изготовитель литых турбинных лопаток горячего тракта; с 09.12.2025 долгосрочное соглашение с Ansaldo Energia на серийную поставку лопаток именно по AE64.3A, AE94.3A и серии GT; статус designated core supplier. Реальный владелец технологии литья лопат",
+"link": "субпоставщик (Ansaldo Energia; также Siemens Energy, Baker Hughes)",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "ООО «АНСАЛЬДО ЭНЕРДЖИА РАША» (ИНН 7710954396)",
+"country": "Россия",
+"site": "https://energybase.ru/vendor/ansaldoenergia",
+"email": "",
+"what": "Действующий и РАСТУЩИЙ канал: выручка 2024 — 1,61 млрд руб., 2025 — 2,43 млрд руб., прибыль 2025 — 261 млн руб., штат 14 чел. Профиль — ГТУ, техобслуживание и ремонт газовых турбин, инспекции, капремонты, поставка запчастей. Активна на Челябинской ТЭ",
+"link": "OEM — 100% дочерняя структура Ansaldo Energia S.p.A. в РФ",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "Forgital Group (Forgital Italy S.p.A.)",
+"country": "Италия (Velo d'Astico, VI) + Франция, США",
+"site": "https://www.forgital.com/power-generation-page/",
+"email": "",
+"what": "Кованые/раскатные КОЛЬЦА для газовых турбин по прямому перечню: кожухи и ДИАФРАГМЕННЫЕ КОЛЬЦА, кольца НАПРАВЛЯЮЩИХ АППАРАТОВ и ДИФФУЗОРА, уплотнительные и опорные кольца, ТЕПЛОВЫЕ ЭКРАНЫ и кольца вентилятора. Прямо ложится на статорные обоймы, диффуз",
+"link": "независимый изготовитель поковок/колец; заказчики-OEM на сайте не названы, связь с Ansaldo не подтверждена",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "Rössl e Duso S.r.l.",
+"country": "Италия (Vedelago, TV)",
+"site": "https://www.rossleduso.com/",
+"email": "info@rossleduso.com",
+"what": "Высокоточная механообработка СРЕДНИХ И КРУПНЫХ деталей из поковок, отливок и листовой стали на ЧПУ (расточка, фрезеровка, токарка, шлифовка, сборка). В заявленных секторах — энергетика, включая ТЕПЛОВУЮ и паровую. Реальный кандидат на корпуса, обоймы",
+"link": "независимый механообрабатывающий субпоставщик; заказчики не названы, связь с Ansaldo не подтверждена",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "KESH sh.a. — ТЭС Vlora (оператор)",
+"country": "Албания (Тирана)",
+"site": "https://www.kesh.al/en/asset/tec-vlora/",
+"email": "info@kesh.al",
+"what": "Владелец законсервированной ПГУ Vlora 97 МВт на AE64.3A+, которая с 2011 «has never produced any power». Практически ненаработанная машина 64.3A — единственный найденный реальный кандидат на целую машину / ротор / направляющие аппараты на разбор или ",
+"link": "оператор (источник целой машины и узлов)",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "Antro Group bvba",
+"country": "Бельгия (Брюссель)",
+"site": "https://antrogroup.com/",
+"email": "info@antrogroup.com",
+"what": "Бельгийский брокер энергооборудования и turn-key декоммишенинга: «we can currently offer more than 30 Combined Cycle Power Plants ... in the range of 400 MW per each group». Позиций по 64.3A на сайте нет — ставить адресную wanted-заявку на AE64.3A/V6",
+"link": "трейдер/брокер (демонтаж и перепродажа станций)",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "PRIOS Group (Prios Industry Systems & Services)",
+"country": "Европа (регистрация не раскрыта на сайте)",
+"site": "https://priosgroup.com/",
+"email": "info@priosgroup.com",
+"what": "Брокер «Buy. Sell. Relocate. Develop.» по электростанциям, в портфеле ПГУ и ГТУ Siemens (SGT600/SGT800, 388 МВт ПГУ и др.), делает концепции демонтажа и релокации ТЭС. По 64.3A лотов нет — канал для поиска выводимого блока. | V64.3A/AE64.3A",
+"link": "трейдер/брокер станций",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "Gazprom Energoholding / Адлерская ТЭС",
+"country": "Россия (Сочи)",
+"site": "https://energybase.ru/en/power-plant/adlerskaya-tpp",
+"email": "",
+"what": "Оператор ближайшего к нам парка: 4 x AE64.3A в многовальной схеме, 360 МВт, 4 котла-утилизатора, 2 паровые турбины, пусконаладка ГТУ завершена в начале 2013. Топливо — газ или жидкое. Ценность двойная: (а) единственный в РФ носитель практического опы",
+"link": "оператор (парк 4 x AE64.3A)",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "PLN (Perusahaan Listrik Negara) — ТЭС Muara Tawar",
+"country": "Индонезия (Бекаси, Западная Ява)",
+"site": "https://www.forecastinternational.com/archive/disp_pdf.cfm?DACH_RECNO=604",
+"email": "",
+"what": "Крупнейший единый парк 64.3A в мире: в апреле 2003 заказаны шесть блоков 2+1 Multi, то есть 12 ГТУ V64.3A для расширения ТЭС Muara Tawar. Машины ранней конфигурации (17-ступенчатый компрессор). Наиболее вероятный в мире источник (а) снятых образцов д",
+"link": "оператор (крупнейший парк — 12 x V64.3A)",
+"tier": "component_specialist",
+"angle": "harvest:v643a",
 "risk": ""
 }
 ]
