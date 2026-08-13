@@ -152,6 +152,7 @@ const TX = __TIANXIN_JSON__;
 const SW = __SOFTWARE_JSON__;
 const ANS = __ANSWERS_JSON__;   // ответы, уже сведённые в общую версию
 const RF = __REFRAME_JSON__;
+const DISC = __DISC_JSON__;
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const nf = (n,d=0) => (n===''||n===null||n===undefined||isNaN(n)) ? '—' : Number(n).toLocaleString('ru-RU',{minimumFractionDigits:d,maximumFractionDigits:d});
@@ -1059,9 +1060,9 @@ function qImport(inp){
 }
 /* отправка локальных черновиков в общую базу: воркер коммитит их в репозиторий,
    автосборка запекает в страницу — ответы становятся видны всей команде */
-async function qSend(){
-  const st = document.getElementById('qsendst');
-  const btn = document.getElementById('qsend');
+async function qSend(stId, btnId){
+  const st = document.getElementById(stId || 'qsendst');
+  const btn = document.getElementById(btnId || 'qsend');
   const who = (QA.who||'').trim();
   if(!who){ st.textContent = 'Впишите имя в поле слева — оно попадёт в коммит как автор.'; return; }
   const out = {who, ans:{}, eng:{}, st:{}};
@@ -1127,7 +1128,7 @@ function bindQ(){
   document.getElementById('qlet').addEventListener('click', qLetter);
   document.getElementById('qimp').addEventListener('change', function(){ qImport(this); });
   document.getElementById('qwho').addEventListener('input', e=>{ QA.who = e.target.value; saveQA(); });
-  document.getElementById('qsend').addEventListener('click', qSend);
+  document.getElementById('qsend').addEventListener('click', ()=>qSend('qsendst','qsend'));
   qPaint();
 }
 function rQ(){
@@ -1234,16 +1235,124 @@ function rSoft(){
   <div class="mut">Обновлено ${esc(SW.updated||'')}.</div>`;
 }
 
+/* ============ Расхождения ТЗ с самим собой (вычистка с Заказчиком) ============ */
+let dF = {cat:'', sev:'', st:'', q:''};
+function dRows(){
+  const t = dF.q.toLowerCase();
+  return DISC.items.filter(x =>
+    (dF.cat===''||x.cat===dF.cat) && (dF.sev===''||x.sev===dF.sev) &&
+    (dF.st===''||(dF.st==='open' ? !ansOf(x.id).trim() : !!ansOf(x.id).trim())) &&
+    (!t||[x.title,x.a.q,x.b.q,x.essence,x.ask,ansOf(x.id),engOf(x.id)].join(' ').toLowerCase().includes(t)));
+}
+function dPaint(){
+  const el = document.getElementById('dbody'); if(!el) return;
+  const rows = dRows();
+  el.innerHTML = rows.map(x=>`<div class="card qcard">
+    <h3><span class="${SEV[x.sev][1]}">${esc(x.id)}</span> ${esc(x.title)}
+      ${lotTag(x.lot)}<span class="tag">${esc(DISC.cats[x.cat]||x.cat)}</span><span class="tag">${SEV[x.sev][0]}</span>
+      ${ansOf(x.id).trim()?'<span class="tag lot3">решено</span>':''}</h3>
+    <div class="vs">
+      <div><b>Редакция А:</b><div class="quote">«${esc(x.a.q)}»</div>${x.a.where?`<div class="mut">${esc(x.a.where)}</div>`:''}</div>
+      <div><b>Редакция Б:</b><div class="quote">«${esc(x.b.q)}»</div>${x.b.where?`<div class="mut">${esc(x.b.where)}</div>`:''}</div>
+    </div>
+    <p class="mut"><b>На что влияет:</b> ${esc(x.essence)}</p>
+    <div class="box info"><b>Вопрос Заказчику:</b> ${esc(x.ask)}</div>
+    ${x.src?`<div class="mut">источник: ${esc(x.src)}</div>`:''}
+    ${(ANS&&ANS.meta&&ANS.meta[x.id])?`<div class="mut">в общей базе: ${esc(ANS.meta[x.id].by)} · ${esc(ANS.meta[x.id].at)}</div>`:''}
+    <div class="filters" style="margin:6px 0 0">
+      <button class="btn dpick" data-id="${esc(x.id)}" data-v="Заказчик подтвердил редакцию А.">✓ верна А</button>
+      <button class="btn dpick" data-id="${esc(x.id)}" data-v="Заказчик подтвердил редакцию Б.">✓ верна Б</button>
+      <button class="btn dpick" data-id="${esc(x.id)}" data-v="Обе редакции неверны, принято иное решение: ">✗ иное</button>
+    </div>
+    <div class="qgrid">
+      <label>Статус
+        <select class="mini qf" data-id="${esc(x.id)}" data-f="st">
+          ${Q_ST.map(([v,n])=>`<option value="${v}"${v===stOf(x.id)?' selected':''}>${n}</option>`).join('')}</select></label>
+      <label>Решение Заказчика
+        <textarea class="mini qf" data-id="${esc(x.id)}" data-f="ans" rows="2"
+          placeholder="что подтвердил Заказчик — дословно, с датой и от кого">${esc(ansOf(x.id))}</textarea></label>
+      <label>Комментарий инженера
+        <textarea class="mini qf" data-id="${esc(x.id)}" data-f="eng" rows="2"
+          placeholder="что меняем у себя после решения">${esc(engOf(x.id))}</textarea></label>
+    </div>
+  </div>`).join('') || '<div class="box mut">Под фильтр ничего не попало</div>';
+  const done = DISC.items.filter(x=>ansOf(x.id).trim()).length;
+  document.getElementById('dcount').textContent = `${rows.length} из ${DISC.items.length} · решено ${done}`;
+}
+function dLetter(){
+  const pick = DISC.items.filter(x=>stOf(x.id)!=='closed' && !ansOf(x.id).trim());
+  const txt = 'Реестр расхождений конкурсной документации, требующих решения Заказчика\n'
+    + 'Объект: АО «Кольская ГМК», комплекс ОВЭ-75, Базовый инжиниринг (ТЗ v3.6 + приложения)\n\n'
+    + pick.map((x,i)=>`${i+1}. ${x.title} [${x.id}]\n`
+      + `   Редакция А: «${x.a.q}»${x.a.where?' ('+x.a.where+')':''}\n`
+      + `   Редакция Б: «${x.b.q}»${x.b.where?' ('+x.b.where+')':''}\n`
+      + `   Влияние: ${x.essence}\n   Вопрос: ${x.ask}\n`).join('\n');
+  const blob = new Blob([txt],{type:'text/plain;charset=utf-8'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='ove_rashozhdenia.txt'; a.click();
+}
+function bindDisc(){
+  ['dcat','dsev','dst'].forEach(id=>document.getElementById(id)
+    .addEventListener('change', e=>{ dF[id.slice(1)]=e.target.value; dPaint(); }));
+  document.getElementById('dq').addEventListener('input', e=>{ dF.q=e.target.value; dPaint(); });
+  const root=document.getElementById('dbody');
+  root.addEventListener('change', e=>{ const el=e.target.closest('.qf'); if(!el) return;
+    QA[el.dataset.f][el.dataset.id]=el.value; saveQA(); dPaint(); });
+  root.addEventListener('input', e=>{ const el=e.target.closest('textarea.qf'); if(!el) return;
+    QA[el.dataset.f][el.dataset.id]=el.value; saveQA(); });
+  root.addEventListener('click', e=>{ const b=e.target.closest('.dpick'); if(!b) return;
+    const id=b.dataset.id, cur=(QA.ans[id]||'').trim();
+    QA.ans[id] = cur ? cur+' '+b.dataset.v : b.dataset.v;
+    if(!QA.st[id]) QA.st[id]='answered';
+    saveQA(); dPaint(); });
+  document.getElementById('dlet').addEventListener('click', dLetter);
+  document.getElementById('dwho').addEventListener('input', e=>{ QA.who=e.target.value; saveQA(); });
+  document.getElementById('dsend').addEventListener('click', ()=>qSend('dsendst','dsend'));
+  dPaint();
+}
+function rDisc(){
+  if(!DISC) return '<div class="box warn">Реестр собирается.</div>';
+  const bySev = {}; DISC.items.forEach(x=>{bySev[x.sev]=(bySev[x.sev]||0)+1});
+  const byCat = {}; DISC.items.forEach(x=>{byCat[x.cat]=(byCat[x.cat]||0)+1});
+  return `
+  <div class="box warn"><b>Зачем эта вкладка.</b> Здесь ТОЛЬКО расхождения документов Заказчика с самими
+  собой: где ТЗ противоречит ИД и приложениям, где разные марки стали об одном и том же, где числа не
+  сходятся, где битые ссылки и опечатки, меняющие смысл. Каждая позиция — две дословные цитаты с указанием
+  места. Задача — пройти список с Заказчиком и зафиксировать, что он на самом деле хочет: кнопки
+  «✓ верна А / Б / иное» плюс поле решения. Решения коммитятся той же кнопкой «⚡ в общую базу» — id общие
+  с вкладкой «Вопросы Заказчику», ответ в одном месте виден в обоих.</div>
+  <div class="k">
+    <div class="tile"><b class="hi">${bySev.blocker||0}</b><span>блокирующих</span></div>
+    <div class="tile"><b class="mid">${bySev.major||0}</b><span>существенных</span></div>
+    <div class="tile"><b>${bySev.minor||0}</b><span>формальных</span></div>
+    <div class="tile"><b>${DISC.items.filter(x=>ansOf(x.id).trim()).length}</b><span>решено с Заказчиком</span></div>
+    <div class="tile"><b>${DISC.items.length}</b><span>всего в реестре</span></div>
+  </div>
+  <div class="filters">
+    <input type="text" id="dq" placeholder="Поиск по цитатам и решениям…">
+    <select id="dcat"><option value="">Все категории</option>${Object.entries(DISC.cats).map(([k,v])=>`<option value="${k}">${esc(v)} (${byCat[k]||0})</option>`).join('')}</select>
+    <select id="dsev"><option value="">Любая важность</option><option value="blocker">Блокирующие</option><option value="major">Существенные</option><option value="minor">Формальные</option></select>
+    <select id="dst"><option value="">Все</option><option value="open">без решения</option><option value="done">решённые</option></select>
+    <button class="btn" id="dlet" title="все нерешённые расхождения одним документом">⬇ реестр для Заказчика</button>
+    <span class="count" id="dcount"></span>
+  </div>
+  <div class="filters">
+    <input type="text" id="dwho" placeholder="ваше имя — попадёт в коммит как автор" value="${esc(QA.who||'')}">
+    <button class="btn" id="dsend" title="закоммитить решения в репозиторий">⚡ в общую базу</button>
+    <span class="count" id="dsendst"></span>
+  </div>
+  <div id="dbody"></div>`;
+}
+
 /* ================= Каркас ================= */
 const TABS = [
   ['overview','Обзор'], ['stages','Этапы'], ['blocks','Блоки и лоты'], ['bi','Базовый проект'],
-  ['equip','Оборудование'], ['questions','Вопросы Заказчику'], ['sup','Поставщики'],
+  ['equip','Оборудование'], ['disc','Расхождения ТЗ'], ['questions','Вопросы Заказчику'], ['sup','Поставщики'],
   ['market','Маркетинг'], ['soft','ПО: сами или подряд'], ['alt','Альтернатива'],
   ['auto','Автоматизация'], ['world','Мировой опыт'], ['china','Китай'],
   ['partner','Партнёр'], ['competitor','Конкурент'], ['tender','Торги за БИ'], ['capex','Стройка · CAPEX']
 ];
 const R = {overview:rOverview, stages:rStages, blocks:rBlocks, bi:rBI, equip:rEquip,
-           questions:rQ, sup:rSup, market:rMarket, soft:rSoft, alt:rAlt, auto:rAuto,
+           disc:rDisc, questions:rQ, sup:rSup, market:rMarket, soft:rSoft, alt:rAlt, auto:rAuto,
            world:rWorld, china:rChina, partner:rPartner, competitor:rComp,
            tender:rTender, capex:rCapex};
 const nav = document.getElementById('nav'), main = document.getElementById('main');
@@ -1291,6 +1400,7 @@ function show(id){
     if(id==='bi') bindBI();
     if(id==='sup') bindSup();
     if(id==='questions') bindQ();
+    if(id==='disc') bindDisc();
   }
   location.hash = id;
   window.scrollTo(0,0);

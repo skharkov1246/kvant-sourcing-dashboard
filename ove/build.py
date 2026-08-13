@@ -49,6 +49,7 @@ OPTIONAL = {
     "__SOFTWARE_JSON__": "software.json",
     "__ANSWERS_JSON__": "questions_answers.json",
     "__REFRAME_JSON__": "reframe.json",
+    "__DISC_JSON__": "discrepancies.json",
 }
 
 
