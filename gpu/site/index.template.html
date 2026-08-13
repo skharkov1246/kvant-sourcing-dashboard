@@ -143,6 +143,18 @@ footer{padding:0 22px 24px;color:var(--mut);font-size:11.5px}
   <div class="box info" id="st-thesis"></div>
   <h3>Четыре актива, которые накапливаются</h3>
   <div class="grid" id="st-assets"></div>
+  <h3>Кому идти первым — адресный расчёт по владельцам парка</h3>
+  <p class="mut" id="tg-src"></p>
+  <div class="k" id="tg-tiles"></div>
+  <div class="box warn" id="tg-caveat"></div>
+  <p class="mut">Клик по строке — объекты группы и заготовка письма с подставленными цифрами.</p>
+  <div class="tblwrap"><table class="sortable" id="tg-tbl"><thead><tr>
+    <th data-k="group">Группа владельцев</th><th data-k="mw" class="num">МВт</th>
+    <th data-k="objects_n" class="num">Объектов</th><th data-k="usd_year" class="num">$ ЗИП в год</th>
+    <th data-k="plugs" class="num">Свечей в год</th><th data-k="warm">Отношения</th>
+  </tr></thead><tbody id="tg-body"></tbody></table></div>
+  <div id="tg-detail"></div>
+
   <h3>Метрики</h3>
   <div class="tblwrap"><table><thead><tr><th>Что меряем</th><th class="num">Сейчас</th><th class="num">Цель за квартал</th><th>Зачем</th></tr></thead><tbody id="st-metrics"></tbody></table></div>
   <h3 id="st-plan-t"></h3>
@@ -421,6 +433,7 @@ const MARKET   = __MARKET_JSON__;
 const COMPET   = __COMPETITORS_JSON__;
 const STOCK    = __STOCK_JSON__;
 const STRATEGY = __STRATEGY_JSON__;
+const TARGETS  = __TARGETS_JSON__;
 const BUILT_AT = "__BUILT_AT__";
 
 const $ = s => document.querySelector(s);
@@ -551,6 +564,68 @@ function fillSelect(sel, values, allLabel) {
     <div><span class="pill">сейчас</span> ${esc(a.now)}</div>
     <div style="margin-top:3px"><span class="pill a">цель</span> ${esc(a.goal)}</div>
     <div class="note" style="margin-top:6px">${esc(a.how)}</div></div>`).join("");
+  // ── адресный расчёт по владельцам ──
+  const TG = TARGETS, TT = TG.totals;
+  $("#tg-src").textContent = TG.source;
+  $("#tg-caveat").innerHTML = "<b>Как читать.</b> " + esc(TG.caveat);
+  $("#tg-tiles").innerHTML = [
+    [TT.groups, "групп владельцев"], [num(TT.mw) + " МВт", "парк в расчёте"],
+    ["$" + (TT.usd_year / 1e6).toFixed(1) + " млн", "ЗИП в год по этим группам"],
+    ["$" + (TT.warm_usd_year / 1e6).toFixed(1) + " млн", "там, где отношения уже есть"],
+    [TT.warm_share + " %", "доля «тёплого» рынка"],
+  ].map(([b, s]) => `<div class="tile"><b>${esc(b)}</b><span>${esc(s)}</span></div>`).join("");
+
+  const tgRows = () => TG.targets.map(t => ({ ...t, plugs: t.qty_year.plug,
+    warm: t.our_customer.startsWith("★") ? "действующий" : t.our_customer ? "профиль совпал" : "—" }));
+  function tgRender(list) {
+    $("#tg-body").innerHTML = list.map(t => `<tr data-g="${esc(t.group)}" style="cursor:pointer">
+      <td><b>${esc(t.group)}</b>${t.mw_building ? `<div class="mut">+${t.mw_building} МВт строится</div>` : ""}</td>
+      <td class="num">${t.mw}</td><td class="num">${t.objects_n}</td>
+      <td class="num"><b>${usd(t.usd_year)}</b></td><td class="num">${num(t.plugs)}</td>
+      <td>${t.our_customer.startsWith("★") ? '<span class="pill a">действующий</span>'
+        : t.our_customer ? '<span class="pill b">профиль совпал</span>' : '<span class="pill lo">холодный</span>'}</td>
+    </tr>`).join("");
+    $("#tg-body").querySelectorAll("tr").forEach(tr => tr.onclick = () => {
+      const t = TG.targets.find(x => x.group === tr.dataset.g);
+      const q = t.qty_year, nm = TG.item_names;
+      $("#tg-detail").innerHTML = `<div class="card">
+        <h4>${esc(t.group)} — ${t.mw} МВт, ${t.objects_n} объектов</h4>
+        ${t.our_customer ? `<div class="note">${esc(t.our_customer)}</div>` : ""}
+        <p class="mut">Газ в расчёте: ${t.gas === "associated" ? "попутный (расход ×1,5)" : "природный"} ·
+          удельный расход $${t.usd_per_kw}/кВт·год · итого <b>${usd(t.usd_year)}</b> в год</p>
+        <div class="tblwrap"><table><thead><tr><th>Позиция</th><th class="num">шт в год</th></tr></thead>
+        <tbody>${Object.entries(q).map(([k, v]) => `<tr><td>${esc(nm[k] || k)}</td>
+          <td class="num"><b>${num(v)}</b></td></tr>`).join("")}</tbody></table></div>
+        <h4 style="margin-top:12px">Объекты</h4>
+        <div class="tblwrap"><table><thead><tr><th>Объект</th><th>Юрлицо</th><th class="num">МВт</th><th>Статус</th></tr></thead>
+        <tbody>${t.objects.map(o => `<tr><td>${esc(o.name)}</td><td class="mut">${esc(o.owner)}</td>
+          <td class="num">${o.mw}</td><td class="mut">${esc(o.status)}</td></tr>`).join("")}</tbody></table></div>
+        <h4 style="margin-top:12px">${esc(TG.outreach.title)}</h4>
+        <p class="mut">${esc(TG.outreach.note)}</p>
+        <pre id="tg-letter">${esc(TG.outreach.text
+          .replace(/\{ГРУППА\}/g, t.group)
+          .replace("{N}", t.objects_n).replace("{МВт}", Math.round(t.mw))
+          .replace("{ПЕРЕЧИСЛИТЬ 2-3 КРУПНЕЙШИХ}", t.objects.slice(0, 3).map(o => o.name).join(", "))
+          .replace("{СВЕЧИ}", num(q.plug)).replace("{ФИЛЬТРЫ}", num(q.oil_filter))
+          .replace("{ФОРКАМЕРА}", num(q.prechamber_valve)).replace("{ГБЦ}", num(q.head))
+          .replace("{СУММА}", usd(t.usd_year)))}</pre>
+        <button class="btn" id="tg-copy">скопировать письмо</button>
+        <h4 style="margin-top:12px">Что спросить первым письмом</h4>
+        <ul>${TG.outreach.first_questions.map(x => `<li>${esc(x)}</li>`).join("")}</ul>
+        <div class="note"><b>Почему это работает.</b> ${esc(TG.outreach.why_it_works)}</div>
+      </div>`;
+      const cp = $("#tg-copy");
+      if (cp) cp.onclick = () => {
+        const txt = $("#tg-letter").textContent;
+        if (navigator.clipboard) navigator.clipboard.writeText(txt).then(() => {
+          cp.textContent = "скопировано ✓"; setTimeout(() => cp.textContent = "скопировать письмо", 1500);
+        });
+      };
+      $("#tg-detail").scrollIntoView({ behavior: "smooth", block: "nearest" });
+    });
+  }
+  sortable($("#tg-tbl"), tgRows, tgRender, "priority")();
+
   $("#st-metrics").innerHTML = T.metrics.map(m => `<tr><td><b>${esc(m.name)}</b></td>
     <td class="num">${num(m.now)}</td><td class="num"><b>${num(m.q1)}</b></td>
     <td class="mut">${esc(m.why)}</td></tr>`).join("");
