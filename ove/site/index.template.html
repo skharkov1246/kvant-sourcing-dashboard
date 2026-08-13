@@ -1014,6 +1014,7 @@ function qPaint(){
       <div><b>А здесь говорит иначе:</b><div class="quote">${esc(x.b)}</div></div></div>`:''}
     ${x.why?`<p class="mut"><b>Почему это важно:</b> ${esc(x.why)}</p>`:''}
     <div class="box info"><b>Формулировка вопроса:</b> ${esc(x.ask)}</div>
+    ${(ANS&&ANS.meta&&ANS.meta[x.id])?`<div class="mut">в общей базе: ${esc(ANS.meta[x.id].by)} · ${esc(ANS.meta[x.id].at)}</div>`:''}
     <div class="qgrid">
       <label>Статус
         <select class="mini qf" data-id="${esc(x.id)}" data-f="st">
@@ -1056,6 +1057,46 @@ function qImport(inp){
     saveQA(); qPaint();
   }catch(err){ alert('Не удалось прочитать файл ответов: '+err.message); } });
 }
+/* отправка локальных черновиков в общую базу: воркер коммитит их в репозиторий,
+   автосборка запекает в страницу — ответы становятся видны всей команде */
+async function qSend(){
+  const st = document.getElementById('qsendst');
+  const btn = document.getElementById('qsend');
+  const who = (QA.who||'').trim();
+  if(!who){ st.textContent = 'Впишите имя в поле слева — оно попадёт в коммит как автор.'; return; }
+  const out = {who, ans:{}, eng:{}, st:{}};
+  let n = 0;
+  for(const x of QS.items){
+    const a=(QA.ans[x.id]||'').trim(), e=(QA.eng[x.id]||'').trim(), s=QA.st[x.id]||'';
+    if(a){ out.ans[x.id]=a; n++; }
+    if(e){ out.eng[x.id]=e; n++; }
+    if(s){ out.st[x.id]=s; n++; }
+  }
+  if(!n){ st.textContent = 'Локальных изменений нет — либо поля пусты, либо всё уже отправлено и запечено.'; return; }
+  btn.disabled = true; st.textContent = 'Отправка…';
+  try{
+    const r = await fetch('/api/answers', {method:'POST',
+      headers:{'Content-Type':'application/json'}, body: JSON.stringify(out)});
+    const j = await r.json().catch(()=>({}));
+    if(r.ok && j.ok){
+      st.textContent = `Закоммичено (${j.commit}), изменений: ${j.total}. Сайт пересоберётся сам за ~3 минуты — тогда ответы увидит вся команда.`;
+      setTimeout(()=>{ btn.disabled = false; }, 60000);  // защита от серии коммитов подряд
+      return;
+    }
+    btn.disabled = false;
+    if(j.error==='submit_disabled_no_password')
+      st.textContent = 'Отправка включится, когда владелец установит пароль на сайт. Пока: «⬇ ответы» файлом — и передать владельцу.';
+    else if(j.error==='no_token')
+      st.textContent = 'В Cloudflare Pages (kvant-ove) не задан секрет GH_ANSWERS_TOKEN — попросите владельца добавить.';
+    else if(r.status===401)
+      st.textContent = 'Нужна авторизация: обновите страницу и введите логин и пароль.';
+    else
+      st.textContent = 'Не отправилось: ' + (j.error || ('HTTP '+r.status)) + '. Резерв: «⬇ ответы» файлом.';
+  }catch(e){
+    btn.disabled = false;
+    st.textContent = 'Сеть не пустила — отправка работает только с сайта, не из локального файла. Резерв: «⬇ ответы».';
+  }
+}
 function qLetter(){
   const pick = QS.items.filter(x=>['blocker','major','minor'].includes(x.sev) && stOf(x.id)!=='closed');
   const txt = 'Запрос разъяснений по конкурсной документации\n'
@@ -1085,6 +1126,8 @@ function bindQ(){
   document.getElementById('qcsv').addEventListener('click', qCSV);
   document.getElementById('qlet').addEventListener('click', qLetter);
   document.getElementById('qimp').addEventListener('change', function(){ qImport(this); });
+  document.getElementById('qwho').addEventListener('input', e=>{ QA.who = e.target.value; saveQA(); });
+  document.getElementById('qsend').addEventListener('click', qSend);
   qPaint();
 }
 function rQ(){
@@ -1093,9 +1136,11 @@ function rQ(){
   return `
   <div class="box warn"><b>Зачем эта вкладка.</b> Всё, что расходится внутри документов Заказчика или требует
   разъяснения, собрано в один реестр. По каждому пункту — где именно противоречие, почему это важно и
-  готовая формулировка вопроса. Ответы Заказчика и комментарии инженеров вносятся прямо здесь: они
-  сохраняются в вашем браузере, «⬇ ответы» выгружает их файлом. Собранные файлы возвращаются в общую
-  версию, и тогда ответы видит вся команда, а не только тот, кто их вписал.</div>
+  готовая формулировка вопроса. Ответы Заказчика и комментарии инженеров вносятся прямо здесь и
+  <b>коммитятся в репозиторий</b>: впишите имя, нажмите «⚡ в общую базу» — каждая отправка становится
+  git-коммитом с вашим именем в авторе, сайт пересобирается автоматически, и через ~3 минуты ответы
+  видит вся команда. До отправки черновики живут в вашем браузере. Резервный путь, если отправка
+  недоступна: «⬇ ответы» файлом — и передать файл владельцу.</div>
   <div class="k">
     <div class="tile"><b class="hi">${c.blocker}</b><span>блокирующих — без ответа нельзя проектировать</span></div>
     <div class="tile"><b class="mid">${c.major}</b><span>существенных — влияют на решения и стоимость</span></div>
@@ -1109,9 +1154,14 @@ function rQ(){
     <select id="qst"><option value="">Любой статус</option>${Q_ST.map(([v,n])=>`<option value="${v}">${n}</option>`).join('')}</select>
     <button class="btn" id="qlet" title="письмо со всеми незакрытыми разночтениями">⬇ запрос Заказчику</button>
     <button class="btn" id="qcsv">⬇ CSV</button>
-    <button class="btn" id="qexp" title="ответы и комментарии — файлом">⬇ ответы</button>
+    <button class="btn" id="qexp" title="резерв: ответы и комментарии — файлом">⬇ ответы</button>
     <label class="btn" style="cursor:pointer">⬆ импорт<input type="file" accept=".json" id="qimp" style="display:none"></label>
     <span class="count" id="qcount"></span>
+  </div>
+  <div class="filters">
+    <input type="text" id="qwho" placeholder="ваше имя — попадёт в коммит как автор" value="${esc(QA.who||'')}">
+    <button class="btn" id="qsend" title="закоммитить ответы и комментарии в репозиторий">⚡ в общую базу</button>
+    <span class="count" id="qsendst"></span>
   </div>
   <div id="qbody"></div>`;
 }

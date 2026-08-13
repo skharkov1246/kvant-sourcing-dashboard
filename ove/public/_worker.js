@@ -14,8 +14,22 @@
 // Самообновления и счётчика визитов тут намеренно нет — это статический
 // разбор тендерного пакета, а не живой дашборд.
 
+// ── Приём ответов с вкладки «Вопросы Заказчику» ──────────────────────────────
+// POST /api/answers коммитит ответы Заказчика и комментарии инженеров в
+// ove/data/questions_answers.json ветки main через GitHub Contents API.
+// Каждая отправка = настоящий git-коммит с именем инженера в авторе; пуш в
+// main триггерит ove-deploy, и через ~3 минуты ответы запечены в страницу для
+// всей команды. Нужен секрет проекта GH_ANSWERS_TOKEN — fine-grained PAT этого
+// репозитория с правом Contents: Read and write. Путь файла зашит в код:
+// токен шире, но воркер физически не умеет писать никуда, кроме этого файла.
+// Отправка требует Basic Auth: пока пароль сайта не задан (временное открытое
+// окно), эндпоинт отвечает 503 — анонимные коммиты в репозиторий недопустимы.
+
 export default {
   async fetch(request, env) {
+    const url = new URL(request.url);
+    if (url.pathname === "/api/answers") return handleAnswers(request, env);
+
     const user = env.BASIC_AUTH_USER || "kvant";
     const pass = env.BASIC_AUTH_PASS;
 
@@ -66,6 +80,124 @@ export default {
     return out;
   },
 };
+
+// ── /api/answers ─────────────────────────────────────────────────────────────
+const GH_REPO = "skharkov1246/kvant-sourcing-dashboard";
+const GH_PATH = "ove/data/questions_answers.json";
+const GH_BRANCH = "main";
+const ST_ALLOWED = new Set(["sent", "answered", "closed"]);
+
+async function handleAnswers(request, env) {
+  const json = (o, status = 200, extra = {}) => new Response(JSON.stringify(o), {
+    status,
+    headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store", ...extra },
+  });
+  if (request.method !== "POST") return json({ ok: false, error: "post_only" }, 405);
+
+  const user = env.BASIC_AUTH_USER || "kvant";
+  const pass = env.BASIC_AUTH_PASS;
+  // без пароля сайта отправка выключена: иначе кто угодно коммитил бы в репозиторий
+  if (!pass) return json({ ok: false, error: "submit_disabled_no_password" }, 503);
+  const got = request.headers.get("Authorization") || "";
+  if (!timingSafeEqual(got, "Basic " + btoa(`${user}:${pass}`))) {
+    return json({ ok: false, error: "auth" }, 401,
+      { "WWW-Authenticate": 'Basic realm="OVE-75 KVANT", charset="UTF-8"' });
+  }
+  if (!env.GH_ANSWERS_TOKEN) return json({ ok: false, error: "no_token" }, 503);
+
+  let body;
+  try { body = await request.json(); } catch { return json({ ok: false, error: "bad_json" }, 400); }
+  const who = String(body.who || "").trim().slice(0, 80);
+  if (!who) return json({ ok: false, error: "no_name" }, 400);
+
+  // только валидные id и непустые значения; жёсткие потолки против мусора
+  const clean = (src, isStatus) => {
+    const out = {};
+    let n = 0;
+    for (const k of Object.keys(src || {})) {
+      if (!/^[A-Za-z0-9][A-Za-z0-9-]{0,23}$/.test(k)) continue;
+      const v = String(src[k]).trim().slice(0, 4000);
+      if (!v) continue;
+      if (isStatus && !ST_ALLOWED.has(v)) continue;
+      out[k] = v;
+      if (++n >= 400) break;
+    }
+    return out;
+  };
+  const ans = clean(body.ans), eng = clean(body.eng), st = clean(body.st, true);
+  const total = Object.keys(ans).length + Object.keys(eng).length + Object.keys(st).length;
+  if (!total) return json({ ok: false, error: "empty" }, 400);
+
+  // две попытки: между GET и PUT кто-то мог закоммитить свои ответы (409 по sha)
+  for (let attempt = 0; attempt < 2; attempt++) {
+    let cur;
+    try { cur = await ghGetFile(env); } catch (e) { return json({ ok: false, error: String(e.message || e) }, 502); }
+    const d = cur.data;
+    d.ans = { ...(d.ans || {}), ...ans };
+    d.eng = { ...(d.eng || {}), ...eng };
+    d.st = { ...(d.st || {}), ...st };
+    d.meta = d.meta || {};
+    const today = new Date().toISOString().slice(0, 10);
+    for (const k of new Set([...Object.keys(ans), ...Object.keys(eng), ...Object.keys(st)])) {
+      d.meta[k] = { by: who, at: today };
+    }
+    d.updated = today;
+    const res = await ghPutFile(env, d, cur.sha, who, total);
+    if (res.ok) {
+      const j = await res.json();
+      return json({ ok: true, commit: ((j.commit && j.commit.sha) || "").slice(0, 7), total });
+    }
+    if (res.status !== 409) return json({ ok: false, error: "github_" + res.status }, 502);
+  }
+  return json({ ok: false, error: "conflict" }, 502);
+}
+
+function ghHeaders(env) {
+  return {
+    "Authorization": `Bearer ${env.GH_ANSWERS_TOKEN}`,
+    "Accept": "application/vnd.github+json",
+    "User-Agent": "kvant-ove-answers",
+    "X-GitHub-Api-Version": "2022-11-28",
+  };
+}
+
+async function ghGetFile(env) {
+  const r = await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${GH_PATH}?ref=${GH_BRANCH}`,
+    { headers: ghHeaders(env) });
+  if (r.status === 404) return { sha: undefined, data: { updated: "", note: "", ans: {}, eng: {}, st: {}, meta: {} } };
+  if (!r.ok) throw new Error("github_get_" + r.status);
+  const j = await r.json();
+  return { sha: j.sha, data: JSON.parse(b64decodeUtf8(j.content)) };
+}
+
+function ghPutFile(env, data, sha, who, total) {
+  const body = {
+    message: `ОВЭ-75: ответы и комментарии по вопросам — ${who} (+${total})`,
+    content: b64encodeUtf8(JSON.stringify(data, null, 1) + "\n"),
+    branch: GH_BRANCH,
+    committer: { name: "OVE-75 answers", email: "ove-answers@users.noreply.github.com" },
+    author: { name: who, email: "ove-answers@users.noreply.github.com" },
+  };
+  if (sha) body.sha = sha;
+  return fetch(`https://api.github.com/repos/${GH_REPO}/contents/${GH_PATH}`,
+    { method: "PUT", headers: { ...ghHeaders(env), "Content-Type": "application/json" }, body: JSON.stringify(body) });
+}
+
+// base64 для UTF-8: btoa/atob сами по себе кириллицу не переваривают
+function b64encodeUtf8(str) {
+  const bytes = new TextEncoder().encode(str);
+  let bin = "";
+  for (let i = 0; i < bytes.length; i += 0x8000) {
+    bin += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+  }
+  return btoa(bin);
+}
+function b64decodeUtf8(b64) {
+  const bin = atob(String(b64).replace(/\s+/g, ""));
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return new TextDecoder().decode(bytes);
+}
 
 // служебная страница в стиле сайта: светлая и тёмная тема, без внешних ресурсов
 function page(title, body) {
