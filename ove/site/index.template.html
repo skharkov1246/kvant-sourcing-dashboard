@@ -151,6 +151,7 @@ const QS = __QUESTIONS_JSON__;
 const TX = __TIANXIN_JSON__;
 const SW = __SOFTWARE_JSON__;
 const ANS = __ANSWERS_JSON__;   // ответы, уже сведённые в общую версию
+const RF = __REFRAME_JSON__;
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const nf = (n,d=0) => (n===''||n===null||n===undefined||isNaN(n)) ? '—' : Number(n).toLocaleString('ru-RU',{minimumFractionDigits:d,maximumFractionDigits:d});
@@ -933,8 +934,29 @@ function rAlt(){
   if(!ALT) return `<div class="box warn"><b>Раздел собирается.</b> Здесь будет аргументационный блок для нашего БИ и ТКП: почему зашитые в исходные данные решения Hatch и Дельты — не обязательные, а один из вариантов. Юридическая опора из самих документов Заказчика, честная матрица сравнения китайской альтернативы с решениями Дельты по десяти критериям — включая те, где выигрывает Дельта, готовые формулировки для пояснительной записки, ТКП и запроса Заказчику, и риски нашего же предложения.</div>`;
   const wcls = w => w==='КНР'?'tierA':(w==='паритет'?'tierB':'tierC');
   const fav = f => f==='нас'?'<span class="tag lot3">в нашу пользу</span>':(f==='Заказчика'?'<span class="tag lot1">против нас</span>':'<span class="tag">нейтрально</span>');
+  const st = s => s==='подтверждено'?'tierA':(s==='опровергнуто'?'tierC':'tierB');
+  const rf = RF ? `
+  <div class="box amber"><b>Переоценка рамки — ${esc(RF.verdict)}.</b>
+    ${md(RF.summary).replace(/\n{2,}/g,'</p><p>').replace(/^/,'<p>').replace(/$/,'</p>')}</div>
+  <h2>Проверка тезиса «у Дельты нет мощностей, значит тоже Китай»</h2>
+  <div class="tblwrap"><table><thead><tr><th>Утверждение</th><th>Статус</th><th>Что выяснилось</th><th>Источник</th></tr></thead>
+  <tbody>${RF.facts.map(f=>`<tr><td><b>${esc(f.claim)}</b></td><td class="${st(f.status)}">${esc(f.status)}</td>
+    <td>${esc(f.detail)}</td><td class="mut">${srcLink(f.src)}${f.checked?` · ${esc(f.checked)}`:''}</td></tr>`).join('')}</tbody></table></div>
+  <div class="card"><h3>Новая рамка</h3><p>${esc(RF.newframe.text)}</p>
+    <h3>В чём тогда наше реальное преимущество</h3>
+    ${(RF.newframe.our_edge||[]).map(e=>`<div class="box"><b>${esc(e.title)}.</b> ${esc(e.text)}</div>`).join('')}
+    <h3>Где этот аргумент не работает</h3>
+    ${(RF.newframe.limits||[]).map(e=>`<div class="box warn"><b>${esc(e.title)}.</b> ${esc(e.text)}</div>`).join('')}</div>
+  ${(RF.matrix_changes||[]).length?`<h3>Что переоценивается в матрице ниже</h3>
+    <div class="tblwrap"><table><thead><tr><th>Объект</th><th>Критерий</th><th>Было</th><th>Становится</th><th>Почему</th></tr></thead>
+    <tbody>${RF.matrix_changes.map(c=>`<tr><td>${esc(c.object)}</td><td><b>${esc(c.criterion)}</b></td>
+      <td class="mut">${esc(c.was)}</td><td class="tierA">${esc(c.becomes)}</td><td class="mut">${esc(c.why)}</td></tr>`).join('')}</tbody></table></div>`:''}
+  ${(RF.wording||[]).length?`<h3>Формулировки под новую рамку</h3>
+    ${RF.wording.map(w=>`<div class="card"><h3>${esc(w.target)}</h3><div class="quote">${esc(w.text)}</div></div>`).join('')}`:''}
+  ` : '';
   return `
   <div class="box info">${md(ALT.summary).replace(/\n{2,}/g,'</p><p>').replace(/^/,'<p>').replace(/$/,'</p>')}</div>
+  ${rf}
   <h2>На каком основании мы вправе предлагать альтернативу</h2>
   <div class="tblwrap"><table><thead><tr><th>Цитата из документов Заказчика</th><th>Где</th><th>Как читается</th><th>Кому в пользу</th></tr></thead>
   <tbody>${(ALT.legal||[]).map(l=>`<tr><td class="quote" style="border:0;padding:6px 9px">«${esc(l.quote)}»</td>
