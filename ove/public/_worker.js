@@ -19,23 +19,40 @@ export default {
     const user = env.BASIC_AUTH_USER || "kvant";
     const pass = env.BASIC_AUTH_PASS;
 
+    // Секрет не задан. Сюда попадёт и администратор, и рядовой сотрудник —
+    // страница должна объяснять обоим, что происходит и что делать.
     if (!pass) {
-      return new Response(
-        "Доступ не настроен: задайте секрет BASIC_AUTH_PASS в проекте Cloudflare Pages «kvant-ove».",
-        { status: 503, headers: { "Cache-Control": "no-store" } },
+      return new Response(page(
+        "Сайт ещё не открыт",
+        "<p>Доступ к материалам проекта ОВЭ-75 закрывается паролем, и пароль пока не задан.</p>" +
+        "<p><b>Сотрудникам:</b> обратитесь к владельцу — он выдаст логин и пароль. " +
+        "Технической ошибки здесь нет, сайт цел.</p>" +
+        "<p><b>Администратору:</b> Cloudflare → Pages → проект <code>kvant-ove</code> → Settings → " +
+        "Environment variables → Production → добавить <code>BASIC_AUTH_PASS</code> → Save → " +
+        "Retry deployment. Логин задаётся переменной <code>BASIC_AUTH_USER</code>, " +
+        "по умолчанию <code>kvant</code>.</p>"),
+        { status: 503, headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" } },
       );
     }
 
     const got = request.headers.get("Authorization") || "";
     const want = "Basic " + btoa(`${user}:${pass}`);
     if (!timingSafeEqual(got, want)) {
-      return new Response("Требуется авторизация", {
-        status: 401,
-        headers: {
-          "WWW-Authenticate": 'Basic realm="ОВЭ-75 · КВАНТ", charset="UTF-8"',
-          "Cache-Control": "no-store",
-        },
-      });
+      return new Response(page(
+        "ОВЭ-75 · КВАНТ",
+        "<p>Материалы проекта «обжиг – выщелачивание – электроэкстракция» для АО «Кольская ГМК».</p>" +
+        "<p>Введите логин и пароль в окне браузера. Если окно не появилось — обновите страницу. " +
+        "Логин и пароль выдаёт владелец.</p>"),
+        {
+          status: 401,
+          headers: {
+            // realm только ASCII: значения HTTP-заголовков — ByteString (Latin-1),
+            // кириллица здесь роняет ответ и окно ввода пароля не появляется
+            "WWW-Authenticate": 'Basic realm="OVE-75 KVANT", charset="UTF-8"',
+            "Content-Type": "text/html; charset=utf-8",
+            "Cache-Control": "no-store",
+          },
+        });
     }
 
     const resp = await env.ASSETS.fetch(request);
@@ -48,6 +65,21 @@ export default {
     return out;
   },
 };
+
+// служебная страница в стиле сайта: светлая и тёмная тема, без внешних ресурсов
+function page(title, body) {
+  return `<!doctype html><html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1"><title>${title}</title>
+<style>:root{color-scheme:light;--page:#f9f9f7;--surface:#fcfcfb;--ink:#0b0b0b;--ink2:#52514e;--b:rgba(11,11,11,.10);--s1:#2a78d6}
+@media(prefers-color-scheme:dark){:root{color-scheme:dark;--page:#0d0d0d;--surface:#1a1a19;--ink:#fff;--ink2:#c3c2b7;--b:rgba(255,255,255,.10);--s1:#3987e5}}
+body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;
+background:var(--page);color:var(--ink);font:15px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
+.c{background:var(--surface);border:1px solid var(--b);border-left:4px solid var(--s1);border-radius:12px;
+padding:22px 26px;max-width:620px}h1{font-size:19px;margin:0 0 10px}p{margin:9px 0;color:var(--ink2)}
+code{background:var(--page);border:1px solid var(--b);border-radius:5px;padding:1px 5px;font-size:13px;
+overflow-wrap:anywhere}b{color:var(--ink)}</style></head>
+<body><div class="c"><h1>${title}</h1>${body}</div></body></html>`;
+}
 
 // сравнение за постоянное время — чтобы по времени ответа нельзя было подбирать пароль
 function timingSafeEqual(a, b) {
