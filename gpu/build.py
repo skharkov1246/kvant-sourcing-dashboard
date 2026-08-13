@@ -44,6 +44,7 @@ FILES = {
     "__STRATEGY_JSON__": "strategy.json",
     "__TARGETS_JSON__": "targets.json",
     "__CONSUMABLES_JSON__": "consumables.json",
+    "__MACHINES_JSON__": "machines.json",
 }
 
 
