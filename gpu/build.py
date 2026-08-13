@@ -33,6 +33,7 @@ FILES = {
     "__BITRIX_JSON__": "bitrix_gpu.json",
     "__CUSTOMS_JSON__": "customs.json",
     "__PLAYBOOK_JSON__": "playbook.json",
+    "__MTCROSS_JSON__": "motortech_cross.json",
 }
 
 

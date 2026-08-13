@@ -195,6 +195,19 @@ footer{padding:0 22px 24px;color:var(--mut);font-size:11.5px}
     <div class="card"><h4>Чеклист проверки аналога</h4><ol id="an-check"></ol></div>
     <div class="card"><h4>Красные флаги</h4><ul id="an-red"></ul></div>
   </div>
+  <h3>Каталог применяемости MOTORTECH — машинный разбор</h3>
+  <div class="box info" id="mt-note"></div>
+  <div class="k" id="mt-tiles"></div>
+  <div class="filters">
+    <div class="f-field"><label>номер OEM или MOTORTECH</label><input id="mt-q" placeholder="418-4861, 06.50.151, 4W-6747…"></div>
+    <div class="f-field"><label>каталог</label><select id="mt-guide"></select></div>
+    <div class="f-field"><label>тип детали</label><select id="mt-part"></select></div>
+    <span class="count" id="mt-count"></span>
+  </div>
+  <div class="tblwrap"><table><thead><tr>
+    <th>Деталь</th><th>Двигатели</th><th>MOTORTECH P/N</th><th>Заменяет (OEM и ALTRONIC)</th><th>Каталог</th>
+  </tr></thead><tbody id="mt-body"></tbody></table></div>
+
   <h3>Семейства кросс-номеров</h3>
   <div class="filters">
     <div class="f-field"><label>поиск по номеру или тексту</label><input id="an-q" placeholder="4380132, 334976, MOTORTECH…"></div>
@@ -303,6 +316,7 @@ const PN       = __PN_JSON__;
 const BITRIX   = __BITRIX_JSON__;
 const CUSTOMS  = __CUSTOMS_JSON__;
 const PLAYBOOK = __PLAYBOOK_JSON__;
+const MTCROSS  = __MTCROSS_JSON__;
 const BUILT_AT = "__BUILT_AT__";
 
 const $ = s => document.querySelector(s);
@@ -506,12 +520,36 @@ function fillSelect(sel, values, allLabel) {
     </tr>`).join("");
     $("#dm-body").querySelectorAll("tr").forEach(tr => tr.onclick = () => detail(DEMAND.rows[+tr.dataset.i]));
   }
+  // ── маршрутизация: кому слать запрос по конкретной позиции ──
+  const OEM_OF = { "Cummins": "Cummins", "Jenbacher/INNIO": "Jenbacher", "Caterpillar": "Caterpillar" };
+  function routeFor(r) {
+    const oem = OEM_OF[r.man] || r.man;
+    const cands = SUPPLIERS.companies.filter(c => (c.oem || []).includes(oem));
+    const exact = cands.filter(c => (c.sys || []).includes(r.sys));
+    const pool = (exact.length >= 3 ? exact : cands).slice().sort((a, b) => b.score - a.score);
+    // класс позиции определяет, чем торгуем: критичным дорогим — оригинал, мелочью — Азия
+    const big = (r.lot_hi || 0) >= 50000, critical = ["gas", "air", "head", "crank", "cpg"].includes(r.sys);
+    const strategy = critical && big
+      ? "Класс A — критично и дорого. Оригинал или аналог уровня A (изготовитель компонента). Пробную партию не пропускать, но и китайский реверс первым заходом не брать."
+      : (r.sys === "seals" || r.sys === "hardware" || r.sys === "hoses")
+        ? "Класс C — мелочь. Быстрее и дешевле изготовить/подобрать по размеру и материалу, чем искать по номеру OEM. Собрать все такие позиции в один лот."
+        : "Класс B — расходник с ресурсом. Аналог уровня A/B от изготовителя компонента (Denso, Champion, MANN, Donaldson, MOTORTECH) — те же заводы без наценки OEM.";
+    return { top: pool.slice(0, 4), strategy, n: pool.length };
+  }
+
   function detail(r) {
+    const rt = routeFor(r);
     const d = $("#dm-detail");
     d.innerHTML = `<div class="card"><h4>${esc(r.pn)} — ${esc(r.name)}</h4>
       <div class="mut">${esc(r.man)} · ${esc(DEMAND.systems[r.sys] || r.sys)} · ${num(r.qty)} ${esc(r.unit)}</div>
       ${r.note ? `<p>${esc(r.note)}</p>` : ""}
       ${r.basis ? `<p class="note"><b>Основание вилки:</b> ${esc(r.basis)}${r.url ? ` — <a href="${esc(r.url)}" target="_blank" rel="noopener">источник</a>` : ""}</p>` : ""}
+      <div class="box info"><b>Кому слать запрос.</b> ${esc(rt.strategy)}
+        <div style="margin-top:6px">${rt.top.map(c => `<span class="pill ${c.score >= 80 ? "hi" : c.score >= 60 ? "md" : "lo"}">${c.score}</span>
+          <b>${esc(c.name)}</b> <span class="mut">— ${esc(c.region)}${c.email ? ", " + esc(c.email) : c.site ? ", " + esc(c.site.replace(/^https?:\/\//, "")) : ""}</span><br>`).join("")}
+        </div>
+        <div class="mut" style="margin-top:4px">Всего в пуле по ${esc(r.man)}: ${rt.n}. Слать минимум в три канала параллельно — разброс цен по нашим позициям 2–14×.</div>
+      </div>
       ${r.checks.length ? `<h4 style="margin-top:10px">Живые проверки продавцов</h4>` + r.checks.map(c => `
         <div class="note" style="margin:4px 0">
           <b>${esc(c.seller || "—")}</b> <span class="pill ${c.verdict === "confirmed" ? "a" : c.verdict === "price_differs" ? "c" : "d"}">${esc(c.verdict)}</span>
@@ -537,6 +575,38 @@ function fillSelect(sel, values, allLabel) {
      <div>${esc(l.what)}</div><div class="note" style="margin-top:6px"><b>Как относимся:</b> ${esc(l.trust)}</div></div>`).join("");
   $("#an-check").innerHTML = ANALOGS.rules.checklist.map(c => `<li>${esc(c)}</li>`).join("");
   $("#an-red").innerHTML = ANALOGS.rules.red_flags.map(c => `<li>${esc(c)}</li>`).join("");
+
+  // ── машинный разбор каталогов MOTORTECH ──
+  const MT = MTCROSS.records || [];
+  $("#mt-note").innerHTML = `<b>Кросс уровня A — от самого изготовителя компонента.</b> ${esc(MTCROSS.source)}
+    Каталоги: ${(MTCROSS.guides || []).map(g => `<a href="${esc(g.url)}" target="_blank" rel="noopener">${esc(g.name)}</a>`).join(" · ")}.
+    Пересобрать: <span class="mono">python3 gpu/tools/parse_motortech.py</span>`;
+  const S = MTCROSS.stats || {};
+  $("#mt-tiles").innerHTML = [
+    [S.records, "записей каталога"], [S.oem_pns, "номеров OEM"],
+    ...Object.entries(S.by_brand || {}).map(([b, n]) => [n, "номеров " + b]),
+  ].map(([b, s]) => `<div class="tile"><b>${esc(b)}</b><span>${esc(s)}</span></div>`).join("");
+  fillSelect($("#mt-guide"), [...new Set(MT.map(r => r.guide))], "все каталоги");
+  fillSelect($("#mt-part"), [...new Set(MT.map(r => r.part).filter(Boolean))].sort(), "любая деталь");
+  function mtPaint() {
+    const q = $("#mt-q").value.trim().toLowerCase();
+    const g = $("#mt-guide").value, pt = $("#mt-part").value;
+    const list = MT.filter(r => {
+      if (g && r.guide !== g) return false;
+      if (pt && r.part !== pt) return false;
+      if (!q) return true;
+      return (r.motortech.join(" ") + " " + r.cross.map(c => c.brand + " " + c.pns.join(" ")).join(" ") + " " + r.part + " " + r.engines).toLowerCase().includes(q);
+    });
+    $("#mt-count").textContent = `${list.length} из ${MT.length}`;
+    $("#mt-body").innerHTML = list.map(r => `<tr>
+      <td>${esc(r.part || "—")}</td>
+      <td class="mut">${esc(r.engines || "—")}</td>
+      <td class="mono"><b>${r.motortech.map(esc).join("<br>") || "—"}</b></td>
+      <td>${r.cross.map(c => `<div><span class="tag">${esc(c.brand)}</span> <span class="mono">${c.pns.map(esc).join(", ")}</span></div>`).join("")}</td>
+      <td class="mut"><a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.guide)}</a></td>
+    </tr>`).join("");
+  }
+  $("#mt-q").oninput = mtPaint; $("#mt-guide").onchange = mtPaint; $("#mt-part").onchange = mtPaint; mtPaint();
 
   const oems = [...new Set(ANALOGS.families.map(f => f.oem))];
   fillSelect($("#an-oem"), oems, "все OEM");
