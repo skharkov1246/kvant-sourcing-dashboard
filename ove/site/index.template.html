@@ -1332,7 +1332,8 @@ function rDisc(){
     <select id="dcat"><option value="">Все категории</option>${Object.entries(DISC.cats).map(([k,v])=>`<option value="${k}">${esc(v)} (${byCat[k]||0})</option>`).join('')}</select>
     <select id="dsev"><option value="">Любая важность</option><option value="blocker">Блокирующие</option><option value="major">Существенные</option><option value="minor">Формальные</option></select>
     <select id="dst"><option value="">Все</option><option value="open">без решения</option><option value="done">решённые</option></select>
-    <button class="btn" id="dlet" title="все нерешённые расхождения одним документом">⬇ реестр для Заказчика</button>
+    <a class="btn" href="docs/ove75-reestr.docx" download title="сводный Word: реестр расхождений + вопросы, с решениями из общей базы">⬇ Word для встречи</a>
+    <button class="btn" id="dlet" title="все нерешённые расхождения простым текстом">⬇ текстом</button>
     <span class="count" id="dcount"></span>
   </div>
   <div class="filters">
