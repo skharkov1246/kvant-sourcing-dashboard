@@ -436,6 +436,7 @@ function supPaint(){
         <td><input class="mini note" data-k="${esc(c.key)}" data-f="note" value="${esc(ED.note[c.key]||'')}" placeholder="цена, срок, контакт…"></td>
       </tr>`).join('') : '<tr><td colspan="5" class="mut">Кандидатов нет — искать с нуля</td></tr>'}</tbody></table></div>
       ${noteRows(p).length?`<div class="mut">${noteRows(p).map(esc).join(' · ')}</div>`:''}
+      ${p.gift?`<div class="box amber"><b>Подсказка из документов Заказчика:</b> ${esc(p.gift)}</div>`:''}
       <div class="box"><b>Что спрашивать:</b> ${esc(p.ask)}</div>
       <div class="addrow"><input class="mini" id="add_${esc(p.cls)}" placeholder="добавить своего поставщика">
         <button class="btn addbtn" data-cls="${esc(p.cls)}">+ добавить</button></div>

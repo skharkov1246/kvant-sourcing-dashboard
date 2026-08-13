@@ -56,17 +56,26 @@ def build() -> None:
     for key, name in FILES.items():
         assert key in tpl, f"нет плейсхолдера {key} в шаблоне"
         tpl = tpl.replace(key, compact(DATA / name))
-    pending = []
+    pending, held = [], []
     for key, name in OPTIONAL.items():
         assert key in tpl, f"нет плейсхолдера {key} в шаблоне"
         path = DATA / name
-        if path.exists():
-            tpl = tpl.replace(key, compact(path))
-        else:
+        if not path.exists():
             tpl = tpl.replace(key, "null")
             pending.append(name)
+            continue
+        obj = json.loads(path.read_text(encoding="utf-8"))
+        # publish:false — файл есть, но на открытый сайт не идёт (персональные
+        # и финансовые данные). Снимается переключением одного значения.
+        if isinstance(obj, dict) and obj.get("publish") is False:
+            tpl = tpl.replace(key, "null")
+            held.append(name)
+            continue
+        tpl = tpl.replace(key, compact(path))
     if pending:
         print("в работе (пока null):", ", ".join(pending))
+    if held:
+        print("НЕ публикуется (publish=false):", ", ".join(held))
     tpl = tpl.replace("__BUILT_AT__", date.today().isoformat())
     assert "__" + "JSON__" not in tpl, "остались незаменённые плейсхолдеры"
 
