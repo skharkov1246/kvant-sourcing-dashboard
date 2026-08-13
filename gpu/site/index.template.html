@@ -64,7 +64,9 @@ table.sortable th{cursor:pointer;user-select:none}
 table.sortable th::after{content:" ↕";opacity:.35}
 table.sortable th.asc::after{content:" ↑";color:var(--s1);opacity:1}
 table.sortable th.desc::after{content:" ↓";color:var(--s1);opacity:1}
-.tag{display:inline-block;background:var(--chip);border-radius:9px;padding:1px 8px;font-size:11px;color:var(--ink2);margin:1px 2px 1px 0;white-space:nowrap}
+.tag{display:inline-block;background:var(--chip);border-radius:9px;padding:1px 8px;font-size:11px;color:var(--ink2);margin:1px 2px 1px 0;white-space:nowrap;max-width:100%;vertical-align:top}
+/* длинные технические строки (номера OEM, имена каналов) переносим — иначе на 390px чип уезжает за экран */
+.tag.wrap{white-space:normal}
 .pill{display:inline-block;border:1px solid var(--border);border-radius:10px;padding:1px 9px;font-size:11px;color:var(--ink2);margin:1px 3px 1px 0;white-space:nowrap}
 .pill.a{border-color:var(--good);color:var(--good);font-weight:700}
 .pill.b{border-color:var(--s1);color:var(--s1)}
@@ -231,6 +233,27 @@ footer{padding:0 22px 24px;color:var(--mut);font-size:11.5px}
   <div class="card"><h4>Правила</h4><ul id="sk-rules"></ul></div>
   <div id="sk-tiers"></div>
   <div class="box" id="sk-first"></div>
+</section>
+
+<section id="t-cons">
+  <h2>Расходники по брендам — кому можно доверять</h2>
+  <p id="cb-intro"></p>
+  <h3 id="cb-trust-t"></h3>
+  <div class="grid" id="cb-tiers"></div>
+  <div class="box warn" id="cb-rule"></div>
+
+  <h3>Выбор бренда двигателя</h3>
+  <div class="chips" id="cb-pick"></div>
+  <div id="cb-oem"></div>
+
+  <h3 id="cb-uni-t"></h3>
+  <p class="mut" id="cb-uni-note"></p>
+  <div class="tblwrap"><table><thead><tr><th>Класс детали</th><th>Кто это делает в мире</th></tr></thead><tbody id="cb-uni"></tbody></table></div>
+
+  <h3 id="cb-mx-t"></h3>
+  <div class="tblwrap"><table><thead><tr>
+    <th>Класс</th><th>Первый выбор</th><th>Второй</th><th>Бюджетный</th><th>Риск</th>
+  </tr></thead><tbody id="cb-mx"></tbody></table></div>
 </section>
 
 <section id="t-models">
@@ -434,6 +457,7 @@ const COMPET   = __COMPETITORS_JSON__;
 const STOCK    = __STOCK_JSON__;
 const STRATEGY = __STRATEGY_JSON__;
 const TARGETS  = __TARGETS_JSON__;
+const CONSUM_B = __CONSUMABLES_JSON__;
 const BUILT_AT = "__BUILT_AT__";
 
 const $ = s => document.querySelector(s);
@@ -447,7 +471,7 @@ $("#built").textContent = BUILT_AT; $("#built2").textContent = BUILT_AT;
 const TABS = [
   ["t-over", "Обзор"], ["t-strategy", "Стратегия"], ["t-market", "Рынок"],
   ["t-fleet", "Парк"], ["t-consum", "Потребление"],
-  ["t-models", "Машины"], ["t-parts", "Номенклатура"],
+  ["t-cons", "Расходники"], ["t-models", "Машины"], ["t-parts", "Номенклатура"],
   ["t-demand", "Наш спрос"], ["t-analogs", "Аналоги"], ["t-subs", "Субпоставщики"],
   ["t-sup", "Поставщики"], ["t-chan", "Каналы"], ["t-pn", "Шифровки PN"],
   ["t-bx", "Наши запросы"], ["t-cust", "Таможня"], ["t-play", "Плейбук"],
@@ -767,6 +791,63 @@ function fillSelect(sel, values, allLabel) {
       <td>${esc(i.why)}</td></tr>`).join("")}</tbody></table></div></div>`).join("");
   $("#sk-first").innerHTML = `<b>${esc(STOCK.first_stock.title)}.</b> ${esc(STOCK.first_stock.text)}
     <div class="note" style="margin-top:6px">${esc(STOCK.first_stock.candidates)}</div>`;
+})();
+
+/* ── Расходники по брендам ─────────────────────────────────────────────── */
+(function () {
+  const C = CONSUM_B;
+  $("#cb-intro").textContent = C.intro;
+  $("#cb-trust-t").textContent = C.trust.title;
+  const TIER = { OE: "a", "OE-ALT": "b", SPEC: "b", REV: "c", NO: "d" };
+  $("#cb-tiers").innerHTML = C.trust.tiers.map(t => `<div class="card">
+    <h4><span class="pill ${TIER[t.code] || "b"}">${esc(t.code)}</span> ${esc(t.name)}</h4>
+    <p>${esc(t.what)}</p>
+    <div class="note"><b>Риск:</b> ${esc(t.risk)} · <b>Когда брать:</b> ${esc(t.when)}</div></div>`).join("");
+  $("#cb-rule").innerHTML = "<b>Правило.</b> " + esc(C.trust.rule);
+
+  $("#cb-uni-t").textContent = C.universal.title;
+  $("#cb-uni-note").textContent = C.universal.note;
+  $("#cb-uni").innerHTML = C.universal.by_class.map(b => `<tr>
+    <td><b>${esc(b.class)}</b></td>
+    <td>${b.makers.map(m => `<span class="tag wrap">${esc(m)}</span>`).join("")}</td></tr>`).join("");
+
+  $("#cb-mx-t").textContent = C.buy_matrix.title;
+  $("#cb-mx").innerHTML = C.buy_matrix.rows.map(r => `<tr>
+    <td><b>${esc(r.class)}</b></td><td>${esc(r.first)}</td><td class="mut">${esc(r.second)}</td>
+    <td class="mut">${esc(r.budget)}</td>
+    <td>${r.risk.startsWith("★") ? `<span class="pill d">${esc(r.risk)}</span>` : esc(r.risk)}</td></tr>`).join("");
+
+  // переключатель бренда
+  let cur = C.oems[0].key;
+  const host = $("#cb-pick");
+  function renderOem() {
+    const o = C.oems.find(x => x.key === cur);
+    $("#cb-oem").innerHTML = `<div class="card">
+      <h4>${esc(o.name)}</h4>
+      <p>${esc(o.ecosystem)}</p>
+      <div class="box info"><b>Масло — допуск ${esc(o.oil_spec.spec)}.</b> ${esc(o.oil_spec.note)}</div>
+    </div>` + o.classes.map(c => `<div class="card">
+      <h4>${esc(c.class)} <span class="mut">· ${esc(c.en)}</span></h4>
+      <p class="note"><b>Номера OEM:</b> ${c.oem_pns.map(p => `<span class="tag mono wrap">${esc(p)}</span>`).join("")}</p>
+      <p class="mut">${esc(c.volume)}</p>
+      <div class="tblwrap"><table><thead><tr><th>Бренд</th><th>Что брать</th><th>Ур.</th><th>Почему ему можно доверять</th></tr></thead>
+      <tbody>${c.respected.map(r => `<tr>
+        <td><b>${esc(r.brand)}</b></td><td class="mono">${esc(r.pn)}</td>
+        <td><span class="pill ${TIER[r.level] || "b"}">${esc(r.level)}</span></td>
+        <td>${esc(r.why)}${r.url ? ` <a href="${esc(r.url)}" target="_blank" rel="noopener">↗</a>` : ""}</td>
+      </tr>`).join("")}</tbody></table></div>
+      <p><b>Где брать:</b> ${c.where.map(w => `<span class="tag wrap">${esc(w)}</span>`).join("")}</p>
+      <div class="box"><b>Что проверить:</b><ul>${c.check.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>
+      <div class="box warn"><b>Чего не делать:</b><ul>${c.avoid.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>
+    </div>`).join("");
+  }
+  host.innerHTML = "";
+  C.oems.forEach(o => {
+    const ch = el("div", "chip" + (o.key === cur ? " on" : ""), esc(o.name));
+    ch.onclick = () => { cur = o.key; host.querySelectorAll(".chip").forEach(x => x.classList.remove("on")); ch.classList.add("on"); renderOem(); };
+    host.append(ch);
+  });
+  renderOem();
 })();
 
 /* ── Машины ────────────────────────────────────────────────────────────── */
