@@ -36,6 +36,12 @@ FILES = {
     "__MTCROSS_JSON__": "motortech_cross.json",
     "__PARTLISTS_JSON__": "partlists.json",
     "__LOTREVIEW_JSON__": "lot_review.json",
+    "__FLEET_JSON__": "fleet.json",
+    "__CONSUMPTION_JSON__": "consumption.json",
+    "__MARKET_JSON__": "market.json",
+    "__COMPETITORS_JSON__": "competitors.json",
+    "__STOCK_JSON__": "stock.json",
+    "__STRATEGY_JSON__": "strategy.json",
 }
 
 
