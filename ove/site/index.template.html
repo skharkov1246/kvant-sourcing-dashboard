@@ -137,6 +137,8 @@ const BX = __BITRIX_JSON__;
 const BI = [__BI1_JSON__, __BI2_JSON__, __BI3_JSON__, __BI4_JSON__].filter(Boolean);
 const COMP = __COMPETITOR_JSON__;
 const PARTNER = __PARTNER_JSON__;
+const MKT = __MARKET_JSON__;
+const ALT = __ALT_JSON__;
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const nf = (n,d=0) => (n===''||n===null||n===undefined||isNaN(n)) ? '—' : Number(n).toLocaleString('ru-RU',{minimumFractionDigits:d,maximumFractionDigits:d});
@@ -843,16 +845,115 @@ function rPartner(){
   <div class="mut">Обновлено ${esc(PARTNER.updated||'')}.</div>`;
 }
 
+/* ================= Маркетинг: купить или сделать самим ================= */
+const kindTag = k => k==='факт' ? '<span class="tag lot3">факт</span>' : '<span class="tag">оценка</span>';
+const VCLS = {'купить':'tierA','изготовить в РФ':'tierB','гибрид':'tierC'};
+let mbFilter = '';
+function mbPaint(){
+  const el = document.getElementById('mbbody'); if(!el) return;
+  const rows = MKT.makeorbuy.filter(x=>!mbFilter||x.verdict===mbFilter);
+  el.innerHTML = rows.map(x=>`<div class="card">
+    <h3>${lotTag(x.lot)} ${esc(x.name)} <span class="${VCLS[x.verdict]||''}">${esc(x.verdict)}</span></h3>
+    <p><b>Почему:</b> ${esc(x.why)}</p>
+    <div class="grid2">
+      <div class="card" style="margin:0"><h3>Купить готовое ${kindTag(x.buy.kind)}</h3>
+        <p><b>${esc(x.buy.price)}</b></p>
+        <p class="mut">${(x.buy.who||[]).map(esc).join(' · ')||'—'}</p>
+        ${x.buy.lead?`<p class="mut">Срок: ${esc(x.buy.lead)}</p>`:''}
+        ${(x.buy.risks||[]).length?`<ul class="mut">${x.buy.risks.map(r=>`<li>${esc(r)}</li>`).join('')}</ul>`:''}
+        ${x.buy.src?`<p class="mut">${srcLink(x.buy.src)}</p>`:''}</div>
+      <div class="card" style="margin:0"><h3>Изготовить в РФ ${x.make_ru?kindTag(x.make_ru.kind):''}</h3>
+        ${x.make_ru?`<p><b>${x.make_ru.feasible?'Реально':'Не реально'}</b>${x.make_ru.price?` — ${esc(x.make_ru.price)}`:''}</p>
+        <p class="mut">${(x.make_ru.who||[]).map(esc).join(' · ')||'—'}</p>
+        ${(x.make_ru.risks||[]).length?`<ul class="mut">${x.make_ru.risks.map(r=>`<li>${esc(r)}</li>`).join('')}</ul>`:''}`:'<p class="mut">—</p>'}</div>
+    </div>
+    ${x.make_self?`<div class="box"><b>Сделать самим:</b> ${x.make_self.feasible?'реально':'не реально'} — ${esc(x.make_self.note||'')}</div>`:''}
+  </div>`).join('') || '<div class="box mut">Под фильтр ничего не попало</div>';
+  document.getElementById('mbcount').textContent = `${rows.length} из ${MKT.makeorbuy.length}`;
+}
+function bindMkt(){
+  if(!MKT) return;
+  document.getElementById('mbverdict').addEventListener('change', e=>{ mbFilter = e.target.value; mbPaint(); });
+  mbPaint();
+}
+function rMarket(){
+  if(!MKT) return `<div class="box warn"><b>Раздел собирается.</b> Здесь будет рыночный разбор: по каждой ключевой позиции — купить готовое против изготовить в России по нашему заданию, с ценовыми ориентирами и рисками; сравнение сплавов Hastelloy G-35, 904L и 316L, которое определяет стоимость гидрометаллургии кратно; картина рынка после ухода западных поставщиков; методика приведения предложений партнёров к одной базе для честного сравнения по цене; и позиции с наибольшим разбросом цен, где сорсинг даёт максимальный эффект.</div>`;
+  const cnt = {}; MKT.makeorbuy.forEach(x=>{cnt[x.verdict]=(cnt[x.verdict]||0)+1});
+  return `
+  <div class="box info">${md(MKT.summary).replace(/\n{2,}/g,'</p><p>').replace(/^/,'<p>').replace(/$/,'</p>')}</div>
+  <div class="k">
+    ${Object.entries(cnt).map(([v,n])=>`<div class="tile"><b class="${VCLS[v]||''}">${n}</b><span>${esc(v)}</span></div>`).join('')}
+    <div class="tile"><b>${MKT.makeorbuy.length}</b><span>позиций разобрано</span></div>
+  </div>
+
+  <h2>Сплавы: чем определяется стоимость гидрометаллургии</h2>
+  <div class="box amber"><b>Главный рычаг сметы.</b> ИД требует Hastelloy G-35 для горячих кислых концентрированных растворов, но тут же допускает замену: «взамен Hastelloy G-35 возможно использование стали 904L». Разница в цене между этими двумя допустимыми вариантами — кратная, и она целиком в нашей власти на стадии БИ.</div>
+  <div class="tblwrap"><table><thead><tr><th>Сплав</th><th>Против 316L</th><th>Цена</th><th>Тип</th><th>Источник</th></tr></thead>
+  <tbody>${MKT.materials.map(m=>`<tr><td><b>${esc(m.alloy)}</b></td><td class="hi">${esc(m.vs316l)}</td>
+    <td>${esc(m.price)}</td><td>${kindTag(m.kind)}</td><td class="mut">${srcLink(m.src)}${m.checked?` · ${esc(m.checked)}`:''}</td></tr>`).join('')}</tbody></table></div>
+
+  <h2>Купить или сделать самим</h2>
+  <div class="filters">
+    <select id="mbverdict"><option value="">Все вердикты</option>${Object.keys(cnt).map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('')}</select>
+    <span class="count" id="mbcount"></span>
+  </div>
+  <div id="mbbody"></div>
+
+  <h2>Картина рынка</h2>
+  ${MKT.market.map(m=>`<div class="card"><h3>${esc(m.class)} ${kindTag(m.kind)}</h3><p>${esc(m.picture)}</p>
+    <p class="mut">${srcLink(m.src)}${m.checked?` · ${esc(m.checked)}`:''}</p></div>`).join('')}
+
+  <h2>Как сравнивать партнёров по цене честно</h2>
+  <div class="card"><div class="quote">${esc(MKT.partner_method.formula)}</div>
+    <p>${esc(MKT.partner_method.text)}</p>
+    <h3>Что обязательно включать в запрос, иначе предложения несопоставимы</h3>
+    <ol>${MKT.partner_method.checklist.map(c=>`<li>${esc(c)}</li>`).join('')}</ol></div>
+
+  <h2>Где делается маржа</h2>
+  <div class="tblwrap"><table><thead><tr><th>Позиция</th><th>Разброс цен</th><th>Почему</th></tr></thead>
+  <tbody>${MKT.margin.map(m=>`<tr><td><b>${esc(m.position)}</b></td><td class="hi">${esc(m.spread)}</td><td>${esc(m.why)}</td></tr>`).join('')}</tbody></table></div>
+  <div class="mut">Обновлено ${esc(MKT.updated||'')}. Цен в тендерном пакете нет — все ориентиры помечены как оценка и требуют подтверждения ТКП.</div>`;
+}
+
+/* ================= Альтернатива зашитому решению ================= */
+function rAlt(){
+  if(!ALT) return `<div class="box warn"><b>Раздел собирается.</b> Здесь будет аргументационный блок для нашего БИ и ТКП: почему зашитые в исходные данные решения Hatch и Дельты — не обязательные, а один из вариантов. Юридическая опора из самих документов Заказчика, честная матрица сравнения китайской альтернативы с решениями Дельты по десяти критериям — включая те, где выигрывает Дельта, готовые формулировки для пояснительной записки, ТКП и запроса Заказчику, и риски нашего же предложения.</div>`;
+  const wcls = w => w==='КНР'?'tierA':(w==='паритет'?'tierB':'tierC');
+  const fav = f => f==='нас'?'<span class="tag lot3">в нашу пользу</span>':(f==='Заказчика'?'<span class="tag lot1">против нас</span>':'<span class="tag">нейтрально</span>');
+  return `
+  <div class="box info">${md(ALT.summary).replace(/\n{2,}/g,'</p><p>').replace(/^/,'<p>').replace(/$/,'</p>')}</div>
+  <h2>На каком основании мы вправе предлагать альтернативу</h2>
+  <div class="tblwrap"><table><thead><tr><th>Цитата из документов Заказчика</th><th>Где</th><th>Как читается</th><th>Кому в пользу</th></tr></thead>
+  <tbody>${(ALT.legal||[]).map(l=>`<tr><td class="quote" style="border:0;padding:6px 9px">«${esc(l.quote)}»</td>
+    <td class="mut">${esc(l.where)}</td><td>${esc(l.reading)}</td><td>${fav(l.favors)}</td></tr>`).join('')}</tbody></table></div>
+
+  ${(ALT.matrix||[]).map(m=>{
+    const w = {}; m.criteria.forEach(c=>{w[c.winner]=(w[c.winner]||0)+1});
+    return `<h2>${esc(m.object)}</h2>
+    <div class="k">${Object.entries(w).map(([k,v])=>`<div class="tile"><b class="${wcls(k)}">${v}</b><span>${k==='КНР'?'за китайский вариант':(k==='паритет'?'паритет':'за решение Дельты')}</span></div>`).join('')}</div>
+    <div class="tblwrap"><table><thead><tr><th>№</th><th>Критерий</th><th>Китайский вариант</th><th>Решение Дельты / Hatch</th><th>Кто сильнее</th><th>Обоснование</th></tr></thead>
+    <tbody>${m.criteria.map(c=>`<tr><td>${c.n}</td><td><b>${esc(c.name)}</b></td><td>${esc(c.cn)}</td><td>${esc(c.delta)}</td>
+      <td class="${wcls(c.winner)}">${esc(c.winner)}</td><td class="mut">${esc(c.why)} ${kindTag(c.kind)}</td></tr>`).join('')}</tbody></table></div>`;}).join('')}
+
+  <h2>Готовые формулировки в документы</h2>
+  ${(ALT.wording||[]).map(w=>`<div class="card"><h3>${esc(w.target)}</h3><div class="quote">${esc(w.text)}</div></div>`).join('')}
+
+  <h2>Чем рискуем мы сами, предлагая альтернативу</h2>
+  ${(ALT.risks||[]).map(r=>`<div class="card"><h3>${esc(r.title)}</h3><p>${esc(r.text)}</p>
+    <p><b>Что делать:</b> ${esc(r.mitigation)}</p></div>`).join('')}
+  <div class="mut">Обновлено ${esc(ALT.updated||'')}.</div>`;
+}
+
 /* ================= Каркас ================= */
 const TABS = [
   ['overview','Обзор'], ['stages','Этапы'], ['blocks','Блоки и лоты'], ['bi','Базовый проект'],
-  ['equip','Оборудование'], ['sup','Поставщики'], ['auto','Автоматизация'],
-  ['world','Мировой опыт'], ['china','Китай'], ['partner','Партнёр'], ['competitor','Конкурент'],
-  ['tender','Торги за БИ'], ['capex','Стройка · CAPEX']
+  ['equip','Оборудование'], ['sup','Поставщики'], ['market','Маркетинг'], ['alt','Альтернатива'],
+  ['auto','Автоматизация'], ['world','Мировой опыт'], ['china','Китай'],
+  ['partner','Партнёр'], ['competitor','Конкурент'], ['tender','Торги за БИ'], ['capex','Стройка · CAPEX']
 ];
 const R = {overview:rOverview, stages:rStages, blocks:rBlocks, bi:rBI, equip:rEquip, sup:rSup,
-           auto:rAuto, world:rWorld, china:rChina, partner:rPartner, competitor:rComp,
-           tender:rTender, capex:rCapex};
+           market:rMarket, alt:rAlt, auto:rAuto, world:rWorld, china:rChina,
+           partner:rPartner, competitor:rComp, tender:rTender, capex:rCapex};
 const nav = document.getElementById('nav'), main = document.getElementById('main');
 nav.innerHTML = TABS.map(([id,t])=>`<button data-t="${id}">${esc(t)}</button>`).join('');
 main.innerHTML = TABS.map(([id])=>`<section id="s-${id}"></section>`).join('');

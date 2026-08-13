@@ -42,6 +42,8 @@ OPTIONAL = {
     "__BI4_JSON__": "bi_lot4.json",
     "__COMPETITOR_JSON__": "competitor.json",
     "__PARTNER_JSON__": "partner.json",
+    "__MARKET_JSON__": "market.json",
+    "__ALT_JSON__": "alternative.json",
 }
 
 
