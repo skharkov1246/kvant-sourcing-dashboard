@@ -395,12 +395,20 @@ function fillSelect(sel, values, allLabel) {
 (function () {
   const S = DEMAND.stats, fams = ANALOGS.families.length;
   const crosses = ANALOGS.families.reduce((s, f) => s + f.analogs.length, 0);
+  // все номера, которые вообще есть на сайте — по ним работает поиск
+  const allPn = new Set();
+  ANALOGS.families.forEach(f => { f.oem_pns.forEach(p => allPn.add(p)); f.analogs.forEach(a => allPn.add(a.pn)); });
+  (MTCROSS.records || []).forEach(r => { r.motortech.forEach(p => allPn.add(p)); r.cross.forEach(c => c.pns.forEach(p => allPn.add(p))); });
+  (PARTLISTS.lists || []).forEach(L => L.groups.forEach(g => g.rows.forEach(r => allPn.add(r.pn))));
+  DEMAND.rows.forEach(r => allPn.add(String(r.pn)));
   const tiles = [
+    [allPn.size, "номеров деталей в базе"],
     [S.positions, "позиций в нашем лоте"],
     [usd(S.lot_usd_lo).replace("$", "$ "), "лот по нижней границе"],
     [usd(S.lot_usd_hi).replace("$", "$ "), "лот по верхней границе"],
     [S.checked, "живых проверок продавцов"],
     [fams + " / " + crosses, "семейств аналогов / кроссов"],
+    [(MTCROSS.stats || {}).oem_pns || 0, "кроссов из каталогов MOTORTECH"],
     [SUPPLIERS.companies.length, "поставщиков в пуле"],
     [MODELS.oems.reduce((s, o) => s + o.models.length, 0), "моделей машин"],
   ];
