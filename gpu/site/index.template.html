@@ -167,6 +167,14 @@ footer{padding:0 22px 24px;color:var(--mut);font-size:11.5px}
   <p class="mut" id="dm-src"></p>
   <div class="k" id="dm-tiles"></div>
   <div class="box warn" id="dm-caveat"></div>
+
+  <h3>Сходимость заявки — что спросить у заказчика до рассылки RFQ</h3>
+  <p id="lr-intro"></p>
+  <div class="box info" id="lr-why"></div>
+  <div id="lr-find"></div>
+  <p class="mut" id="lr-method"></p>
+
+  <h3>Позиции лота</h3>
   <div class="chips" id="dm-sys"></div>
   <div class="filters">
     <div class="f-field"><label>поиск</label><input id="dm-q" placeholder="номер, наименование…"></div>
@@ -323,6 +331,7 @@ const CUSTOMS  = __CUSTOMS_JSON__;
 const PLAYBOOK = __PLAYBOOK_JSON__;
 const MTCROSS  = __MTCROSS_JSON__;
 const PARTLISTS= __PARTLISTS_JSON__;
+const LOTREVIEW= __LOTREVIEW_JSON__;
 const BUILT_AT = "__BUILT_AT__";
 
 const $ = s => document.querySelector(s);
@@ -505,6 +514,20 @@ function fillSelect(sel, values, allLabel) {
     [usd(S.lot_usd_lo), "по нижней границе"], [usd(S.lot_usd_hi), "по верхней границе"],
     [S.priced, "с оценкой цены"], [S.checked, "с живой проверкой"],
   ].map(([b, s]) => `<div class="tile"><b>${esc(b)}</b><span>${esc(s)}</span></div>`).join("");
+
+  // ── сходимость заявки ──
+  $("#lr-intro").textContent = LOTREVIEW.intro;
+  $("#lr-why").innerHTML = "<b>Зачем это делать.</b> " + esc(LOTREVIEW.why);
+  $("#lr-method").textContent = LOTREVIEW.method;
+  const LVL = { ok: ["a", "сходится"], info: ["b", "к сведению"], warn: ["c", "уточнить"], crit: ["d", "критично"] };
+  $("#lr-find").innerHTML = LOTREVIEW.findings.map(f => {
+    const [cls, label] = LVL[f.level] || ["b", f.level];
+    return `<div class="card" style="border-left:4px solid var(--${f.level === "crit" ? "crit" : f.level === "warn" ? "serious" : f.level === "ok" ? "good" : "s1"})">
+      <h4><span class="pill ${cls}">${esc(label)}</span> ${esc(f.title)}</h4>
+      <p>${esc(f.detail)}</p>
+      <div class="note"><b>Что делать:</b> ${esc(f.action)}</div>
+    </div>`;
+  }).join("");
 
   let sysFilter = "";
   const sysHost = $("#dm-sys");
