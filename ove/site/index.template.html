@@ -101,6 +101,11 @@ ul,ol{margin:6px 0;padding-left:20px} li{margin:3px 0}
 .doc .body p{margin:0 0 9px}
 .doc .tblwrap,.doc .box{max-width:100%}
 .quote{border-left:3px solid var(--warn);padding:4px 0 4px 12px;margin:2px 0 8px;font-style:italic;color:var(--ink2);overflow-wrap:anywhere}
+/* регуляторы сорсера в таблице кандидатов */
+select.mini,input.mini{background:var(--surface);color:var(--ink);border:1px solid var(--border);border-radius:7px;padding:3px 7px;font:12px system-ui;max-width:100%}
+input.mini.note{min-width:min(150px,100%);width:100%}
+.addrow{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.addrow input{flex:1 1 200px;min-width:0}
 footer{padding:0 22px 24px;color:var(--mut);font-size:11.5px;max-width:1280px}
 @media (max-width:700px){
   main,header,nav,footer{padding-left:12px;padding-right:12px}
@@ -363,23 +368,131 @@ function rEquip(){
 }
 
 /* ================= Поставщики ================= */
-function rSup(){
-  const bxCls = BX.classes || {};
-  const rows = SUP.positions.map(p=>{
-    const bx = bxCls[p.cls] || [];
-    return `<tr>
-      <td>${lotTag(p.lot)}</td>
-      <td><b>${esc(p.name)}</b><div class="mut">${esc(p.spec)}</div></td>
-      <td class="tier${esc(p.tier)}">${esc(p.tier)}</td>
-      <td>${(p.world||[]).map(x=>`<span class="tag">${esc(x)}</span>`).join('')||'<span class="mut">—</span>'}</td>
-      <td>${(p.cn||[]).map(x=>`<span class="tag">${esc(x)}</span>`).join('')||'<span class="mut">—</span>'}</td>
-      <td>${(p.ru||[]).map(x=>`<span class="tag">${esc(x)}</span>`).join('')||'<span class="mut">—</span>'}</td>
-      <td>${bx.length
-        ? `<b>${bx.length}</b> запр.<div class="mut">${[...new Set(bx.map(r=>r.company))].filter(c=>c&&c!=='—').slice(0,3).map(esc).join('<br>')||'компания не указана'}</div>`
-        : '<span class="mut">0</span>'}</td>
-      <td class="mut">${esc(p.ask)}</td>
-    </tr>`;}).join('');
+/* Правки сорсера: статус запроса, статус работы, заметка — в localStorage этого
+   браузера. Механика та же, что в ГТУ-библиотеке: «⬇ правки» выгружает файлом,
+   «⬆ импорт» объединяет чужой файл, CSV — для выгрузки в работу. */
+let ED;
+try{ ED = JSON.parse(localStorage.getItem('ove_edits_v1')) || {}; }catch(e){ ED = {}; }
+ED.rfq = ED.rfq||{}; ED.work = ED.work||{}; ED.note = ED.note||{}; ED.add = ED.add||[];
+function saveED(){ try{ localStorage.setItem('ove_edits_v1', JSON.stringify(ED)); }catch(e){} }
 
+const RFQ_ST  = [['','не запрашивали'],['sent','запросили'],['no','не запрашивать']];
+const WORK_ST = [['','не работаем'],['yes','работаем'],['kp','есть КП'],['stop','отказ']];
+const RFQ_NAME = Object.fromEntries(RFQ_ST), WORK_NAME = Object.fromEntries(WORK_ST);
+const nrm = s => String(s||'').toLowerCase().replace(/[«»"'.,()]/g,' ').replace(/\s+/g,' ').trim();
+const ckey = (cls,name) => cls+'|'+nrm(name);
+
+/* в колонках Мир/КНР/РФ иногда стоит не компания, а пояснение — на них регуляторы не вешаем */
+const NOT_CAND = ['уточн','см.','полный перечень','кандидат-партнёр','типовое изделие','рынок рф',
+                  'отечественные','профильные','типоряд','рассмотреть','рынок кнр'];
+const isCand = n => { const t = nrm(n); return t.length>2 && t.length<=60 && !NOT_CAND.some(p=>t.startsWith(p)); };
+
+function candsOf(p){
+  const bx = (BX.classes||{})[p.cls] || [];
+  const out = new Map();
+  const put = (name, origin) => {
+    if(!isCand(name)) return;
+    const k = ckey(p.cls, name);
+    if(!out.has(k)) out.set(k, {key:k, name, origins:new Set()});
+    out.get(k).origins.add(origin);
+  };
+  (p.world||[]).forEach(n=>put(n,'Мир'));
+  (p.cn||[]).forEach(n=>put(n,'КНР'));
+  (p.ru||[]).forEach(n=>put(n,'РФ'));
+  [...new Set(bx.map(r=>r.company))].filter(c=>c&&c!=='—').forEach(n=>put(n,'Bitrix'));
+  (ED.add||[]).filter(a=>a.cls===p.cls).forEach(a=>put(a.name,'свой'));
+  return [...out.values()];
+}
+const noteRows = p => [...(p.world||[]),...(p.cn||[]),...(p.ru||[])].filter(n=>!isCand(n));
+
+function supPaint(){
+  const el = document.getElementById('supbody'); if(!el) return;
+  const fl = document.getElementById('suplot').value;
+  const ft = document.getElementById('suptier').value;
+  const fs = document.getElementById('supst').value;
+  const pos = SUP.positions.filter(p=>(fl===''||String(p.lot)===fl) && (ft===''||p.tier===ft));
+  let shown = 0, nCand = 0, nSent = 0, nWork = 0;
+  const html = pos.map(p=>{
+    let cands = candsOf(p);
+    if(fs==='sent') cands = cands.filter(c=>ED.rfq[c.key]==='sent');
+    else if(fs==='none') cands = cands.filter(c=>!ED.rfq[c.key]);
+    else if(fs==='work') cands = cands.filter(c=>ED.work[c.key]==='yes'||ED.work[c.key]==='kp');
+    if(fs!=='' && !cands.length) return '';
+    shown++;
+    nCand += cands.length;
+    cands.forEach(c=>{ if(ED.rfq[c.key]==='sent') nSent++; if(ED.work[c.key]==='yes'||ED.work[c.key]==='kp') nWork++; });
+    return `<div class="card">
+      <h3>${lotTag(p.lot)} ${esc(p.name)} <span class="tier${esc(p.tier)}">уровень ${esc(p.tier)}</span></h3>
+      <div class="mut">${esc(p.spec)}</div>
+      <div class="tblwrap"><table><thead><tr>
+        <th>Кандидат</th><th>Откуда</th><th>Запрос</th><th>Работа</th><th>Заметка</th></tr></thead>
+      <tbody>${cands.length ? cands.map(c=>`<tr>
+        <td><b>${esc(c.name)}</b></td>
+        <td>${[...c.origins].map(o=>`<span class="tag${o==='Bitrix'?' lot3':''}">${esc(o)}</span>`).join('')}</td>
+        <td><select class="mini" data-k="${esc(c.key)}" data-f="rfq">
+          ${RFQ_ST.map(([v,n])=>`<option value="${v}"${v===(ED.rfq[c.key]||'')?' selected':''}>${n}</option>`).join('')}</select></td>
+        <td><select class="mini" data-k="${esc(c.key)}" data-f="work">
+          ${WORK_ST.map(([v,n])=>`<option value="${v}"${v===(ED.work[c.key]||'')?' selected':''}>${n}</option>`).join('')}</select></td>
+        <td><input class="mini note" data-k="${esc(c.key)}" data-f="note" value="${esc(ED.note[c.key]||'')}" placeholder="цена, срок, контакт…"></td>
+      </tr>`).join('') : '<tr><td colspan="5" class="mut">Кандидатов нет — искать с нуля</td></tr>'}</tbody></table></div>
+      ${noteRows(p).length?`<div class="mut">${noteRows(p).map(esc).join(' · ')}</div>`:''}
+      <div class="box"><b>Что спрашивать:</b> ${esc(p.ask)}</div>
+      <div class="addrow"><input class="mini" id="add_${esc(p.cls)}" placeholder="добавить своего поставщика">
+        <button class="btn addbtn" data-cls="${esc(p.cls)}">+ добавить</button></div>
+    </div>`;}).join('');
+  el.innerHTML = html || '<div class="box mut">Под фильтр ничего не попало</div>';
+  document.getElementById('supcount').textContent =
+    `${shown} из ${SUP.positions.length} позиций · ${nCand} кандидатов · запросили ${nSent} · работаем ${nWork}`;
+}
+function supCSV(){
+  const lines = ['лот;позиция;уровень;кандидат;откуда;запрос;работа;заметка'];
+  for(const p of SUP.positions) for(const c of candsOf(p))
+    lines.push([p.lot,p.name,p.tier,c.name,[...c.origins].join('/'),
+      RFQ_NAME[ED.rfq[c.key]||''],WORK_NAME[ED.work[c.key]||''],ED.note[c.key]||'']
+      .map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(';'));
+  const blob = new Blob(["﻿"+lines.join('\r\n')],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='ove_sourcing.csv'; a.click();
+}
+function supExport(){
+  const blob = new Blob([JSON.stringify(ED,null,1)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='ove_edits_'+new Date().toISOString().slice(0,10)+'.json'; a.click();
+}
+function supImport(inp){
+  const f = inp.files && inp.files[0]; if(!f) return;
+  f.text().then(t=>{
+    try{
+      const e = JSON.parse(t);
+      Object.assign(ED.rfq, e.rfq||{}); Object.assign(ED.work, e.work||{}); Object.assign(ED.note, e.note||{});
+      for(const a of (e.add||[])) if(!ED.add.some(x=>x.cls===a.cls && nrm(x.name)===nrm(a.name))) ED.add.push(a);
+      saveED(); supPaint();
+    }catch(err){ alert('Не удалось прочитать файл правок: '+err.message); }
+  });
+}
+function bindSup(){
+  ['suplot','suptier','supst'].forEach(id=>document.getElementById(id).addEventListener('change', supPaint));
+  const root = document.getElementById('supbody');
+  root.addEventListener('change', e=>{
+    const el = e.target.closest('select.mini'); if(!el) return;
+    ED[el.dataset.f][el.dataset.k] = el.value; saveED(); supPaint();
+  });
+  root.addEventListener('input', e=>{
+    const el = e.target.closest('input.note'); if(!el) return;
+    ED.note[el.dataset.k] = el.value; saveED();
+  });
+  root.addEventListener('click', e=>{
+    const b = e.target.closest('.addbtn'); if(!b) return;
+    const inp = document.getElementById('add_'+b.dataset.cls);
+    const name = (inp.value||'').trim();
+    if(!name) return;
+    ED.add.push({cls:b.dataset.cls, name}); saveED(); supPaint();
+  });
+  document.getElementById('supcsv').addEventListener('click', supCSV);
+  document.getElementById('supexp').addEventListener('click', supExport);
+  document.getElementById('supimp').addEventListener('change', function(){ supImport(this); });
+  supPaint();
+}
+function rSup(){
   const bxBlock = BX.live
     ? `<div class="box"><b>Живая выгрузка из Bitrix24</b> от ${esc(BX.updated)}: найдено ${nf(BX.n_rfq)} запросов СП-166 по классам оборудования ОВЭ-75, ${nf((BX.companies||[]).length)} компаний.</div>
        ${(BX.companies||[]).length?`<div class="tblwrap"><table><thead><tr><th>Компания</th><th>Запросов</th><th>Последний</th><th>Классы оборудования</th></tr></thead>
@@ -399,10 +512,18 @@ function rSup(){
   </div>
   <div class="grid">${Object.entries(SUP.legend).map(([k,v])=>`<div class="card"><h3 class="tier${k}">Уровень ${k}</h3><p class="mut">${esc(v)}</p></div>`).join('')}</div>
 
-  <h2>План сорсинга по позициям</h2>
-  <div class="tblwrap"><table><thead><tr>
-    <th>Лот</th><th>Позиция</th><th>Ур.</th><th>Мир</th><th>КНР</th><th>РФ</th><th>Bitrix</th><th>Что спрашивать</th>
-  </tr></thead><tbody>${rows}</tbody></table></div>
+  <h2>План сорсинга: кого запросили и с кем работаем</h2>
+  <div class="box info"><b>Как пользоваться.</b> По каждому кандидату ставьте статус запроса и статус работы, рядом — заметка для цены, срока или контакта. Всё сохраняется в вашем браузере. Кнопка «⬇ правки» выгружает их файлом, «⬆ импорт» объединяет файл коллеги, «⬇ CSV» отдаёт таблицу в работу. Своего поставщика можно дописать в любую позицию.</div>
+  <div class="filters">
+    <select id="suplot"><option value="">Все лоты</option>${[1,2,3,4].map(n=>`<option value="${n}">Лот №${n} — ${esc(lotName(n))}</option>`).join('')}<option value="0">Вне БИ</option><option value="9">Все лоты (КИПиА, ПЛК)</option></select>
+    <select id="suptier"><option value="">Любой уровень</option><option value="A">A — рынок широкий</option><option value="B">B — рынок узкий</option><option value="C">C — дефицит</option></select>
+    <select id="supst"><option value="">Любой статус</option><option value="none">не запрашивали</option><option value="sent">запросили</option><option value="work">работаем или есть КП</option></select>
+    <button class="btn" id="supcsv" title="таблица кандидатов со статусами">⬇ CSV</button>
+    <button class="btn" id="supexp" title="статусы, заметки и добавленные поставщики — файлом">⬇ правки</button>
+    <label class="btn" style="cursor:pointer">⬆ импорт<input type="file" accept=".json" id="supimp" style="display:none"></label>
+    <span class="count" id="supcount"></span>
+  </div>
+  <div id="supbody"></div>
 
   <h2>Правила сбора ТКП</h2>
   <ol>${SUP.sourcing_rules.map(r=>`<li>${esc(r)}</li>`).join('')}</ol>
@@ -774,6 +895,7 @@ function show(id){
     if(id==='equip') bindEquip();
     if(id==='capex') bindCapex();
     if(id==='bi') bindBI();
+    if(id==='sup') bindSup();
   }
   location.hash = id;
   window.scrollTo(0,0);
