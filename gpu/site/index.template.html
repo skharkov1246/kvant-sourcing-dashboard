@@ -145,11 +145,11 @@ footer{padding:0 22px 24px;color:var(--mut);font-size:11.5px}
   <div class="box info" id="st-thesis"></div>
   <h3>Четыре актива, которые накапливаются</h3>
   <div class="grid" id="st-assets"></div>
-  <h3>Кому идти первым — адресный расчёт по владельцам парка</h3>
+  <h3>Годовая потребность по владельцам парка</h3>
   <p class="mut" id="tg-src"></p>
   <div class="k" id="tg-tiles"></div>
   <div class="box warn" id="tg-caveat"></div>
-  <p class="mut">Клик по строке — объекты группы и заготовка письма с подставленными цифрами.</p>
+  <p class="mut">Клик по строке — объекты группы и раскладка годовой потребности по позициям.</p>
   <div class="tblwrap"><table class="sortable" id="tg-tbl"><thead><tr>
     <th data-k="group">Группа владельцев</th><th data-k="mw" class="num">МВт</th>
     <th data-k="objects_n" class="num">Объектов</th><th data-k="usd_year" class="num">$ ЗИП в год</th>
@@ -254,6 +254,15 @@ footer{padding:0 22px 24px;color:var(--mut);font-size:11.5px}
   <div class="tblwrap"><table><thead><tr>
     <th>Класс</th><th>Первый выбор</th><th>Второй</th><th>Бюджетный</th><th>Риск</th>
   </tr></thead><tbody id="cb-mx"></tbody></table></div>
+</section>
+
+<section id="t-mach">
+  <h2>Разбор машин по узлам</h2>
+  <p id="mc-intro"></p>
+  <div class="box info" id="mc-verify"></div>
+  <div class="chips" id="mc-pick"></div>
+  <div id="mc-body"></div>
+  <div class="card"><h4>Как этим пользоваться</h4><ol id="mc-how"></ol></div>
 </section>
 
 <section id="t-models">
@@ -458,6 +467,7 @@ const STOCK    = __STOCK_JSON__;
 const STRATEGY = __STRATEGY_JSON__;
 const TARGETS  = __TARGETS_JSON__;
 const CONSUM_B = __CONSUMABLES_JSON__;
+const MACHINES = __MACHINES_JSON__;
 const BUILT_AT = "__BUILT_AT__";
 
 const $ = s => document.querySelector(s);
@@ -471,7 +481,7 @@ $("#built").textContent = BUILT_AT; $("#built2").textContent = BUILT_AT;
 const TABS = [
   ["t-over", "Обзор"], ["t-strategy", "Стратегия"], ["t-market", "Рынок"],
   ["t-fleet", "Парк"], ["t-consum", "Потребление"],
-  ["t-cons", "Расходники"], ["t-models", "Машины"], ["t-parts", "Номенклатура"],
+  ["t-cons", "Расходники"], ["t-mach", "Разбор машин"], ["t-models", "Машины"], ["t-parts", "Номенклатура"],
   ["t-demand", "Наш спрос"], ["t-analogs", "Аналоги"], ["t-subs", "Субпоставщики"],
   ["t-sup", "Поставщики"], ["t-chan", "Каналы"], ["t-pn", "Шифровки PN"],
   ["t-bx", "Наши запросы"], ["t-cust", "Таможня"], ["t-play", "Плейбук"],
@@ -624,27 +634,7 @@ function fillSelect(sel, values, allLabel) {
         <div class="tblwrap"><table><thead><tr><th>Объект</th><th>Юрлицо</th><th class="num">МВт</th><th>Статус</th></tr></thead>
         <tbody>${t.objects.map(o => `<tr><td>${esc(o.name)}</td><td class="mut">${esc(o.owner)}</td>
           <td class="num">${o.mw}</td><td class="mut">${esc(o.status)}</td></tr>`).join("")}</tbody></table></div>
-        <h4 style="margin-top:12px">${esc(TG.outreach.title)}</h4>
-        <p class="mut">${esc(TG.outreach.note)}</p>
-        <pre id="tg-letter">${esc(TG.outreach.text
-          .replace(/\{ГРУППА\}/g, t.group)
-          .replace("{N}", t.objects_n).replace("{МВт}", Math.round(t.mw))
-          .replace("{ПЕРЕЧИСЛИТЬ 2-3 КРУПНЕЙШИХ}", t.objects.slice(0, 3).map(o => o.name).join(", "))
-          .replace("{СВЕЧИ}", num(q.plug)).replace("{ФИЛЬТРЫ}", num(q.oil_filter))
-          .replace("{ФОРКАМЕРА}", num(q.prechamber_valve)).replace("{ГБЦ}", num(q.head))
-          .replace("{СУММА}", usd(t.usd_year)))}</pre>
-        <button class="btn" id="tg-copy">скопировать письмо</button>
-        <h4 style="margin-top:12px">Что спросить первым письмом</h4>
-        <ul>${TG.outreach.first_questions.map(x => `<li>${esc(x)}</li>`).join("")}</ul>
-        <div class="note"><b>Почему это работает.</b> ${esc(TG.outreach.why_it_works)}</div>
       </div>`;
-      const cp = $("#tg-copy");
-      if (cp) cp.onclick = () => {
-        const txt = $("#tg-letter").textContent;
-        if (navigator.clipboard) navigator.clipboard.writeText(txt).then(() => {
-          cp.textContent = "скопировано ✓"; setTimeout(() => cp.textContent = "скопировать письмо", 1500);
-        });
-      };
       $("#tg-detail").scrollIntoView({ behavior: "smooth", block: "nearest" });
     });
   }
@@ -848,6 +838,49 @@ function fillSelect(sel, values, allLabel) {
     host.append(ch);
   });
   renderOem();
+})();
+
+/* ── Разбор машин по узлам ─────────────────────────────────────────────── */
+(function () {
+  const M = MACHINES, LV = { OE: "a", "OE-ALT": "b", SPEC: "b", REV: "c" };
+  $("#mc-intro").textContent = M.intro;
+  $("#mc-verify").innerHTML = "<b>Контроль данных.</b> " + esc(M.verify_note);
+  $("#mc-how").innerHTML = M.how_to_use.map(x => `<li>${esc(x)}</li>`).join("");
+  let cur = M.machines[0].key;
+  const host = $("#mc-pick");
+  function render() {
+    const m = M.machines.find(x => x.key === cur), P = m.passport;
+    $("#mc-body").innerHTML = `<div class="card">
+      <h4>${esc(m.oem)} ${esc(m.model)}</h4>
+      <p>${esc(m.why)}</p>
+      <div class="tblwrap"><table><thead><tr><th>Параметр</th><th>Значение</th></tr></thead><tbody>
+        <tr><td>Цилиндры</td><td><b>${esc(P.cyl)}</b></td></tr>
+        <tr><td>Диаметр × ход</td><td><b>Ø${P.bore_mm} × ${P.stroke_mm} мм</b></td></tr>
+        <tr><td>Объём на цилиндр</td><td>${P.disp_cyl_l} л</td></tr>
+        <tr><td>Рабочий объём</td><td><b>${P.disp_l} л</b></td></tr>
+        <tr><td>Обороты</td><td>${esc(P.rpm)} об/мин</td></tr>
+        <tr><td>Мощность эл.</td><td>${esc(P.kwe)} кВт</td></tr>
+        <tr><td>КПД эл.</td><td>${esc(P.eff)}</td></tr>
+        <tr><td>Сгорание</td><td>${esc(P.combustion)}</td></tr>
+        <tr><td>Наддув</td><td>${esc(P.charge)}</td></tr>
+      </tbody></table></div>
+    </div>` + m.units.map(u => `<div class="card">
+      <h4>${esc(u.unit)}</h4>
+      <p class="mut">${esc(u.what)}</p>
+      <p class="note"><b>Номера:</b> ${u.pns.map(p => `<span class="tag mono wrap">${esc(p)}</span>`).join("")}</p>
+      <div class="tblwrap"><table><thead><tr><th>Кто делает / у кого брать</th><th>Ур.</th><th>Что именно</th></tr></thead>
+      <tbody>${u.makers.map(k => `<tr><td><b>${esc(k.b)}</b></td>
+        <td><span class="pill ${LV[k.lvl] || "b"}">${esc(k.lvl)}</span></td>
+        <td>${esc(k.n)}</td></tr>`).join("")}</tbody></table></div>
+      ${u.check ? `<div class="box warn"><b>Что проверить:</b> ${esc(u.check)}</div>` : ""}
+    </div>`).join("");
+  }
+  M.machines.forEach(m => {
+    const ch = el("div", "chip" + (m.key === cur ? " on" : ""), esc(m.oem.split(" ")[0] + " " + m.model.split(" ")[0]));
+    ch.onclick = () => { cur = m.key; host.querySelectorAll(".chip").forEach(x => x.classList.remove("on")); ch.classList.add("on"); render(); };
+    host.append(ch);
+  });
+  render();
 })();
 
 /* ── Машины ────────────────────────────────────────────────────────────── */
