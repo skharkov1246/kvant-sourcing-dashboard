@@ -1,0 +1,82 @@
+name: GPU library deploy
+
+# Сборка ГПУ-библиотеки (gpu/) и деплой на Cloudflare Pages (проект kvant-gpu).
+# Отдельный домен, отдельный проект Pages — дашборд сорсеров, база ЗИП и сайт
+# ОВЭ-75 не затрагиваются.
+#
+# Перед сборкой пытаемся обновить выгрузку запросов из Bitrix24; если секрета нет
+# или Bitrix недоступен — используется закоммиченный сид gpu/data/bitrix_gpu.json,
+# сборка не падает.
+on:
+  push:
+    branches: [main]
+    paths: ["gpu/**", ".github/workflows/gpu-deploy.yml"]
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gpu-deploy
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Зависимости
+        run: pip install --quiet requests pydantic python-dotenv
+
+      - name: Выгрузка запросов по ГПУ из Bitrix24 (не роняет сборку)
+        env:
+          BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
+        continue-on-error: true
+        run: python gpu/tools/bitrix_gpu.py
+
+      - name: Пересборка датасета спроса из рабочей заявки
+        run: python gpu/tools/build_demand.py
+
+      - name: Сборка index.html из шаблона и данных
+        run: |
+          set -euo pipefail
+          python gpu/build.py
+          test -f gpu/public/index.html
+          test -f gpu/public/_worker.js
+
+      - name: Деплой на Cloudflare Pages (kvant-gpu)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          BASIC_AUTH_PASS: ${{ secrets.BASIC_AUTH_PASS }}
+        run: |
+          set -euo pipefail
+          # создать проект, если его ещё нет (иначе тихо пропустить)
+          npx --yes wrangler@latest pages project create kvant-gpu \
+            --production-branch=main 2>/dev/null || true
+          # пароль гейта берём из GitHub-секрета и кладём в секрет Pages
+          # (в репозитории пароля нет). Если пуст — деплой не падает, но гейт вернёт 503.
+          if [ -n "${BASIC_AUTH_PASS:-}" ]; then
+            printf '%s' "$BASIC_AUTH_PASS" \
+              | npx --yes wrangler@latest pages secret put BASIC_AUTH_PASS --project-name=kvant-gpu \
+              || echo "⚠ не удалось задать секрет в CI — задайте BASIC_AUTH_PASS в Cloudflare Pages → Settings"
+          else
+            echo "⚠ GitHub-секрет BASIC_AUTH_PASS пуст — гейт закрыт (503), пока не зададите пароль"
+          fi
+          # ASCII commit-message: иначе wrangler цепляет кириллицу git-коммита → CF отвергает (8000111).
+          # Автоповтор: Cloudflare изредка отдаёт транзиентную ошибку публикации Function.
+          ok=0
+          for i in 1 2 3; do
+            if npx --yes wrangler@latest pages deploy gpu/public \
+                 --project-name=kvant-gpu --branch=main \
+                 --commit-dirty=true --commit-message="gpu auto deploy"; then
+              ok=1; break
+            fi
+            echo "⚠ деплой упал (попытка $i/3) — повтор через 20с…"; sleep 20
+          done
+          [ "$ok" = 1 ] || { echo "::error::деплой не удался после 3 попыток"; exit 1; }

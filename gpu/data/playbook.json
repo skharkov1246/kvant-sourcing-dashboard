@@ -1,0 +1,54 @@
+{
+  "updated": "2026-08-13",
+  "intro": "Готовые формулировки и порядок действий. Цель — чтобы новый сорсер закрыл заявку по ГПУ, не изобретая процесс заново.",
+  "flow": [
+    {"step": 1, "title": "Понять, что за машина", "what": "Модель двигателя С БУКВОЙ версии (G3516C, а не G3516), серийный номер двигателя (ESN) и номер модуля, тип газа (природный / попутный / биогаз / свалочный / шахтный), наработка в моточасах.", "why": "Без версии и ESN половина номеров подбирается неправильно. Тип газа определяет исполнение свечей.", "ask": "«Пришлите, пожалуйста, фото шильдика двигателя и генератора, серийный номер модуля и тип газа. По ним подберём точно, иначе рискуем привезти неподходящую партию.»"},
+    {"step": 2, "title": "Снять шильдики узлов", "what": "Фото табличек: турбина, генератор, теплообменники/интеркулер, катушки и блок зажигания, газовый регулятор/смеситель, муфта, крупные датчики.", "why": "Правило шильдика: на этих узлах стоит имя РЕАЛЬНОГО изготовителя. Это открывает прямой каталог вместо каталога OEM и цену в 2–10 раз ниже.", "ask": "«Для точного подбора нужны фото табличек на турбокомпрессоре, генераторе, теплообменнике и катушках зажигания — там указан изготовитель узла и его тип.»"},
+    {"step": 3, "title": "Разобрать номера", "what": "Каждый номер отнести к владельцу: OEM / изготовитель компонента / продавец. Развернуть цепочки замен. Развести «жестянка/штука».", "why": "Запрос по чужому номеру уходит в пустоту; ошибка «банка vs штука» даёт расхождение в 4 раза."},
+    {"step": 4, "title": "Разбить лот на классы", "what": "A — критичные и дорогие (турбина, ГБЦ, клапан форкамеры, расходомер газа, катушки). B — расходники с ресурсом (свечи, фильтры, масло). C — мелочь (о-кольца, шайбы, колпачки, крепёж, шланги).", "why": "Классы идут разными маршрутами и по разным правилам качества. Смешивать их в одном запросе — терять и деньги, и время."},
+    {"step": 5, "title": "Разослать параллельно в 3+ канала", "what": "Турция (İggnita, BMF), Китай (TECHIE, Weyeah), ЕАЭС (Borusan Cat, HARTEX). Плюс снять ценовой репер с открытой розницы США.", "why": "Разброс цен по нашим позициям — от 2× до 14×. Одно КП не даёт даже понимания порядка величины."},
+    {"step": 6, "title": "Проверить предложение", "what": "Фото маркировки детали, страна происхождения, дата производства, ресурс в моточасах, условия возврата.", "why": "Коробка врёт, маркировка — нет."},
+    {"step": 7, "title": "Пробная партия на аналоги", "what": "Для уровня C (китайский реверс) — партия на один модуль с фиксацией наработки.", "why": "96 неподходящих свечей — это не экономия, а списание."}
+  ],
+  "templates": [
+    {
+      "key": "rfq_en",
+      "name": "RFQ на английском (базовый)",
+      "text": "Subject: RFQ — spare parts for gas engine {ENGINE MODEL}, ESN {ESN}\n\nDear Sir/Madam,\n\nWe are sourcing spare parts for a stationary gas engine:\n- Engine: {MAKE MODEL, e.g. Cummins QSV91G / Caterpillar G3516C / INNIO Jenbacher J420}\n- Engine serial number (ESN): {ESN}\n- Genset/module serial number: {MODULE S/N}\n- Fuel gas: {natural gas / associated gas / biogas / landfill gas / coal mine methane}\n- Operating hours: {HOURS}\n\nPlease quote the following positions:\n{No. | Part number(s) incl. superseded numbers | Description (EN) | Qty | Unit}\n\nFor each position please confirm:\n1. Whether you offer GENUINE OEM, OEM-supplier branded, or ALTERNATIVE part — state clearly which.\n2. Manufacturer and brand of the offered part.\n3. Photo of the part marking (not the box).\n4. Country of origin and production date.\n5. For spark plugs: electrode type (J-gap / 4-ground / prechamber), electrode material, and expected service life in operating hours.\n6. For gaskets and seals: material (NBR / FKM-Viton / MLS) and temperature range.\n7. For ignition coils: primary resistance, energy, and compatible ignition controller.\n8. Unit price, price for the full quantity, currency and Incoterms.\n9. Stock availability and lead time.\n10. Return conditions if the part does not fit.\n\nWe order in volume and are ready to discuss a volume discount. Please indicate your best price for the full quantity.\n\nBest regards,\n{NAME}, {COMPANY}"
+    },
+    {
+      "key": "rfq_plugs",
+      "name": "RFQ на свечи (там, где основные деньги)",
+      "text": "Additional questions for spark plugs — please answer all:\n1. Exact OEM numbers your plug replaces (full supersession chain).\n2. Electrode configuration and materials (Ir/Pt, Ir/Ir, Au/Pd, prechamber design).\n3. Guaranteed service life in operating hours at BMEP {X} bar on {GAS TYPE}.\n4. Are the plugs supplied loose or in tins of 4? Quote BOTH: price per piece and price per tin.\n5. Gap setting as delivered, and whether re-gapping is required.\n6. Production date of the batch you would ship (plugs older than 2 years — we need to know).\n7. Sample terms: can you supply {16-20} pcs for a trial on one module before the main order?"
+    },
+    {
+      "key": "counter",
+      "name": "Ответ на завышенную цену",
+      "text": "Thank you for the quotation. For reference, the US retail price for this exact OEM part is {PRICE} (source: {URL}), which includes full OEM margin and US logistics. Your offer is {X}% above that level.\n\nWe are ordering {QTY} pcs and are ready to place the order this week. Please revise your price for the full quantity, or advise which alternative brand you can offer with confirmed cross-reference and service life data."
+    },
+    {
+      "key": "ru_customer",
+      "name": "Письмо заказчику про аналоги",
+      "text": "По части позиций оригинал сегодня либо недоступен, либо идёт со сроком {N} недель и наценкой {X}×. По ним предлагаем рассмотреть проверенные аналоги.\n\nМы разделили спецификацию на три класса:\n• Критичные узлы (турбокомпрессор, ГБЦ, клапан форкамеры, расходомер газа) — предлагаем только оригинал или аналог от изготовителя компонента с опубликованным кросс-номером.\n• Расходники с ресурсом (свечи, фильтры) — предлагаем аналог уровня «изготовитель компонента» (Denso, Champion, MANN, Donaldson, MOTORTECH): это те же заводы, что поставляют OEM, но без его наценки.\n• Мелочь (уплотнения, шайбы, колпачки, шланги) — предлагаем изготовление или подбор по размеру и материалу, экономия здесь кратная при нулевом техническом риске.\n\nПо аналогам даём: фото маркировки, страну происхождения, материал/ресурс и условие возврата, если деталь не встала. По желанию — пробная партия на один модуль до основной поставки.\n\nОтдельно отмечаем: даже официальный дистрибьютор INNIO в РФ открыто работает с проверенными аналогами — это стандартная практика рынка, а не компромисс по качеству."
+    }
+  ],
+  "questions_to_customer": [
+    "Модель двигателя с буквой версии и серийный номер (ESN); серийный номер модуля.",
+    "Тип газа и его состав (сера, силоксаны, хлор) — от этого зависит исполнение свечей и интервалы.",
+    "Наработка в моточасах и дата последнего ТО/оверхола.",
+    "Экранированная система зажигания или нет (для CAT — принципиально).",
+    "Какой контроллер зажигания стоит: родной OEM, MOTORTECH MIC, Altronic CPU95?",
+    "Допускаются ли аналоги, и по каким позициям заказчик настаивает на оригинале.",
+    "Годовая потребность по расходникам — чтобы торговаться объёмом, а не разовой партией.",
+    "Есть ли каталог запчастей на машину (у Cummins он сам имеет номер, напр. QSV91G — 4021362)."
+  ],
+  "red_flags_supplier": [
+    "Не может сказать, что именно продаёт: оригинал, OEM-бренд или аналог.",
+    "Отказывается прислать фото маркировки детали.",
+    "Цена вдвое ниже нижней рыночной границы.",
+    "Трактует номер-цепочку (334976-433894) как один артикул.",
+    "Даёт цену за жестянку, а спецификация в штуках (или наоборот).",
+    "«Всё есть на складе» по редким позициям без подтверждения фото со склада.",
+    "Не даёт условий возврата на аналог."
+  ]
+}
