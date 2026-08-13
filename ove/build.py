@@ -33,6 +33,23 @@ FILES = {
     "__BITRIX_JSON__": "bitrix_ove.json",
 }
 
+# Файлы, которых может ещё не быть: собираются агентами. Пока файла нет —
+# на его место идёт null, и вкладка честно показывает «раздел в работе».
+OPTIONAL = {
+    "__BI1_JSON__": "bi_lot1.json",
+    "__BI2_JSON__": "bi_lot2.json",
+    "__BI3_JSON__": "bi_lot3.json",
+    "__BI4_JSON__": "bi_lot4.json",
+    "__COMPETITOR_JSON__": "competitor.json",
+    "__PARTNER_JSON__": "partner.json",
+    "__MARKET_JSON__": "market.json",
+    "__ALT_JSON__": "alternative.json",
+    "__QUESTIONS_JSON__": "questions.json",
+    "__TIANXIN_JSON__": "tianxin.json",
+    "__SOFTWARE_JSON__": "software.json",
+    "__ANSWERS_JSON__": "questions_answers.json",
+}
+
 
 def compact(path: Path) -> str:
     """Валидируем JSON и вставляем компактно; </ нейтрализуем — данные едут в <script>."""
@@ -45,6 +62,26 @@ def build() -> None:
     for key, name in FILES.items():
         assert key in tpl, f"нет плейсхолдера {key} в шаблоне"
         tpl = tpl.replace(key, compact(DATA / name))
+    pending, held = [], []
+    for key, name in OPTIONAL.items():
+        assert key in tpl, f"нет плейсхолдера {key} в шаблоне"
+        path = DATA / name
+        if not path.exists():
+            tpl = tpl.replace(key, "null")
+            pending.append(name)
+            continue
+        obj = json.loads(path.read_text(encoding="utf-8"))
+        # publish:false — файл есть, но на открытый сайт не идёт (персональные
+        # и финансовые данные). Снимается переключением одного значения.
+        if isinstance(obj, dict) and obj.get("publish") is False:
+            tpl = tpl.replace(key, "null")
+            held.append(name)
+            continue
+        tpl = tpl.replace(key, compact(path))
+    if pending:
+        print("в работе (пока null):", ", ".join(pending))
+    if held:
+        print("НЕ публикуется (publish=false):", ", ".join(held))
     tpl = tpl.replace("__BUILT_AT__", date.today().isoformat())
     assert "__" + "JSON__" not in tpl, "остались незаменённые плейсхолдеры"
 
