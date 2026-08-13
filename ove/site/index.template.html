@@ -1,0 +1,677 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ОВЭ-75 — комплекс обжиг · выщелачивание · электроэкстракция, КГМК Мончегорск</title>
+<style>
+:root{
+  color-scheme:light;
+  --page:#f9f9f7; --surface:#fcfcfb; --ink:#0b0b0b; --ink2:#52514e; --mut:#898781;
+  --grid:#e1e0d9; --axis:#c3c2b7; --border:rgba(11,11,11,.10);
+  --s1:#2a78d6; --s1-soft:#cde2fb; --good:#0ca30c; --warn:#fab219; --crit:#d03b3b; --serious:#ec835a;
+  --chip:#eef2f7;
+  --l1:#e2653c; --l2:#3f7fd0; --l3:#159c72; --l4:#8b5cd6;
+}
+@media (prefers-color-scheme: dark){
+  :root:where(:not([data-theme="light"])){
+    color-scheme:dark;
+    --page:#0d0d0d; --surface:#1a1a19; --ink:#fff; --ink2:#c3c2b7; --mut:#898781;
+    --grid:#2c2c2a; --axis:#383835; --border:rgba(255,255,255,.10);
+    --s1:#3987e5; --s1-soft:#184f95; --chip:#262624;
+    --l1:#f0805c; --l2:#5d99e2; --l3:#2fb98d; --l4:#a47ce6;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --page:#0d0d0d; --surface:#1a1a19; --ink:#fff; --ink2:#c3c2b7; --mut:#898781;
+  --grid:#2c2c2a; --axis:#383835; --border:rgba(255,255,255,.10);
+  --s1:#3987e5; --s1-soft:#184f95; --chip:#262624;
+  --l1:#f0805c; --l2:#5d99e2; --l3:#2fb98d; --l4:#a47ce6;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:14px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;overflow-x:hidden}
+a{color:var(--s1);text-decoration:none} a:hover{text-decoration:underline}
+header{padding:18px 22px 0}
+h1{font-size:21px;margin:0 0 2px}
+.sub{color:var(--ink2);font-size:12.5px}
+nav{position:sticky;top:0;z-index:5;background:var(--page);display:flex;gap:4px;flex-wrap:wrap;padding:10px 22px;border-bottom:1px solid var(--grid)}
+nav button{border:1px solid var(--border);background:var(--surface);color:var(--ink2);padding:6px 13px;border-radius:18px;font:600 13px system-ui;cursor:pointer}
+nav button.on{background:var(--s1);border-color:var(--s1);color:#fff}
+main{padding:16px 22px 40px;max-width:1280px}
+section{display:none} section.on{display:block}
+h2{font-size:16px;margin:20px 0 8px}
+h3{font-size:14px;margin:16px 0 6px}
+p{margin:8px 0}
+.mut{color:var(--mut);font-size:12px}
+.k{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+.tile{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 16px;min-width:132px;flex:1 1 132px}
+.tile b{display:block;font-size:21px;line-height:1.2}
+.tile span{color:var(--ink2);font-size:12px}
+.box{background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--good);border-radius:8px;padding:10px 14px;margin:10px 0;font-size:13px}
+.box.warn{border-left-color:var(--crit)}
+.box.info{border-left-color:var(--s1)}
+.box.amber{border-left-color:var(--warn)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin:8px 0;min-width:0}
+.card h3{margin-top:0}
+.card p,.card li,.box{overflow-wrap:anywhere}
+a.src{overflow-wrap:anywhere}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:10px}
+.tblwrap{overflow-x:auto;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin:8px 0;max-width:100%}
+table{border-collapse:collapse;width:100%;font-size:12.5px}
+th{background:var(--chip);text-align:left;font-size:11.5px;color:var(--ink2);white-space:nowrap;position:sticky;top:0}
+th,td{padding:6px 9px;border-bottom:1px solid var(--grid);vertical-align:top}
+tr:last-child td{border-bottom:0}
+td b{font-weight:700}
+.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.tag{display:inline-block;background:var(--chip);border-radius:9px;padding:1px 8px;font-size:11px;color:var(--ink2);margin:1px 2px 1px 0;white-space:nowrap}
+.lot1{background:var(--l1);color:#fff}.lot2{background:var(--l2);color:#fff}.lot3{background:var(--l3);color:#fff}.lot4{background:var(--l4);color:#fff}
+.lot0{background:var(--chip);color:var(--ink2);border:1px dashed var(--axis)}
+.tierA{color:var(--good);font-weight:700}.tierB{color:var(--warn);font-weight:700}.tierC{color:var(--crit);font-weight:700}
+.hi{color:var(--crit);font-weight:700}.mid{color:var(--warn);font-weight:700}.lo{color:var(--ink2)}
+.filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0}
+.filters input,.filters select{background:var(--surface);color:var(--ink);border:1px solid var(--border);border-radius:8px;padding:6px 10px;font:13px system-ui;max-width:100%}
+.filters input[type=text]{min-width:min(240px,100%)}
+.count{color:var(--ink2);font-size:12px;margin-left:auto}
+.btn{border:1px solid var(--border);background:var(--surface);color:var(--ink2);padding:6px 12px;border-radius:8px;font:600 12px system-ui;cursor:pointer}
+.btn.on{background:var(--s1);border-color:var(--s1);color:#fff}
+ul,ol{margin:6px 0;padding-left:20px} li{margin:3px 0}
+.flow{display:flex;gap:6px;flex-wrap:wrap;align-items:stretch;margin:10px 0}
+.step{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:8px 11px;flex:1 1 190px;min-width:0;border-top:3px solid var(--axis)}
+.step.bi{border-top-color:var(--s1)}
+.step b{font-size:12.5px;display:block;margin-bottom:3px}
+.step .mut{font-size:11px}
+.tl{border-left:2px solid var(--grid);margin-left:9px;padding-left:16px}
+.tl .ev{position:relative;margin:0 0 14px}
+.tl .ev::before{content:'';position:absolute;left:-22px;top:4px;width:10px;height:10px;border-radius:50%;background:var(--axis);border:2px solid var(--page)}
+.tl .ev.now::before{background:var(--s1)}
+.tl .ev h3{margin:0 0 2px}
+.rng{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:6px 0}
+.rng label{font-size:12.5px;color:var(--ink2);min-width:min(230px,100%)}
+.rng input[type=range]{flex:1 1 160px;min-width:120px;accent-color:var(--s1)}
+.rng output{font-variant-numeric:tabular-nums;font-weight:700;min-width:56px;text-align:right}
+.bar{height:9px;border-radius:5px;background:var(--chip);overflow:hidden;min-width:70px}
+.bar i{display:block;height:100%;background:var(--s1)}
+footer{padding:0 22px 24px;color:var(--mut);font-size:11.5px;max-width:1280px}
+@media (max-width:700px){
+  main,header,nav,footer{padding-left:12px;padding-right:12px}
+  h1{font-size:18px} .tile b{font-size:18px}
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>ОВЭ-75 — обжиг · выщелачивание · электроэкстракция</h1>
+  <div class="sub">АО «Кольская ГМК», г. Мончегорск · комплекс на 75 000 т катодной меди в год · разбор тендерного пакета Базового инжиниринга (ТЗ v3.6 + приложения №1–7). Сборка: __BUILT_AT__</div>
+</header>
+<nav id="nav"></nav>
+<main id="main"></main>
+<footer id="foot"></footer>
+<script>
+const P = __PROJECT_JSON__;
+const LOTS = __LOTS_JSON__;
+const EQ = __EQUIP_JSON__;
+const FLOW = __FLOW_JSON__;
+const RES = __RES_JSON__;
+const AUTO = __AUTO_JSON__;
+const WORLD = __WORLD_JSON__;
+const CHINA = __CHINA_JSON__;
+const TENDER = __TENDER_JSON__;
+const CAPEX = __CAPEX_JSON__;
+const SUP = __SUP_JSON__;
+const BX = __BITRIX_JSON__;
+
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const nf = (n,d=0) => (n===''||n===null||n===undefined||isNaN(n)) ? '—' : Number(n).toLocaleString('ru-RU',{minimumFractionDigits:d,maximumFractionDigits:d});
+/* **жирный** в текстах данных — единственная разметка, которую пропускаем */
+const md = s => esc(s).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
+const lotTag = n => n===0||n===null||n===undefined ? '<span class="tag lot0">вне БИ</span>'
+  : (n===9 ? '<span class="tag">все лоты</span>' : `<span class="tag lot${n}">Лот №${n}</span>`);
+const lotName = n => (LOTS.lots.find(l=>l.id===n)||{}).name || 'Вне БИ';
+/* ссылка на источник: показываем хост, а не полный URL — длинные URL рвут вёрстку на узких экранах */
+function srcLink(u){
+  if(!/^https?:/.test(String(u||''))) return esc(u);
+  let host = u; try{ host = new URL(u).hostname.replace(/^www\./,''); }catch(e){}
+  return `<a class="src" href="${esc(u)}" target="_blank" rel="noopener">${esc(host)}</a>`;
+}
+
+/* ================= Обзор ================= */
+function rOverview(){
+  const feed = P.feed.map(f=>`<tr><td><b>${esc(f.name)}</b><div class="mut">${esc(f.source)}</div></td>
+    <td class="num">${nf(f.t_year)}</td><td>${esc(f.chem)}</td><td>${esc(f.moisture)}</td><td>${esc(f.transport)}</td></tr>`).join('');
+  const bi = LOTS.objects.filter(o=>o.bi).length, tot = LOTS.objects.length;
+  return `
+  <div class="k">
+    <div class="tile"><b>75 000 т</b><span>катодной меди М00к в год</span></div>
+    <div class="tile"><b>4</b><span>лота Базового инжиниринга</span></div>
+    <div class="tile"><b>${bi} из ${tot}</b><span>объектов требуют БИ</span></div>
+    <div class="tile"><b>180</b><span>электролизных ванн</span></div>
+    <div class="tile"><b>107,9 тыс. т</b><span>сырья в год (сух.)</span></div>
+    <div class="tile"><b>2–3 ТКП</b><span>на каждую позицию оборудования</span></div>
+  </div>
+  <div class="box info"><b>Что это за проект.</b> ${esc(P.title)}. Заказчик — ${esc(P.customer)}, генеральный проектировщик — ${esc(P.genproject)}. ${esc(P.executor)}. Шифр проекта: <b>${esc(P.code)}</b>.</div>
+  <div class="box amber"><b>Первый этап — торги за Базовый инжиниринг.</b> Разыгрывается четырьмя лотами: Цех обжига, Участок купоросов, Отделение электроэкстракции, Склад готовой продукции. Разбор требований и план подготовки — на вкладке «Торги за БИ».</div>
+
+  <h2>Технологическая цепочка</h2>
+  <div class="flow">${FLOW.chain.map(c=>`<div class="step ${c.bi?'bi':''}">
+    <b>${esc(c.area)}</b>${c.lot?lotTag(c.lot):'<span class="tag lot0">вне БИ</span>'}
+    <div class="mut">${c.ops.length} операц${c.ops.length===1?'ия':(c.ops.length<5?'ии':'ий')}</div></div>`).join('')}</div>
+  <div class="mut">Синяя рамка сверху — объект входит в периметр Базового инжиниринга. Подробности по каждому — вкладка «Блоки и лоты».</div>
+
+  <h2>Сырьё</h2>
+  <div class="tblwrap"><table><thead><tr><th>Компонент / источник</th><th>т/год (сух.)</th><th>Химический состав, %</th><th>Влажность</th><th>Как поступает</th></tr></thead>
+  <tbody>${feed}</tbody></table></div>
+  <div class="mut">Медный концентрат ОРФ: ${nf(P.feed[0].to_roast_t_year)} т/год идёт на шихту для обжига, ${nf(P.feed[0].bypass_t_year)} т/год — в Гидрометаллургический цех без обжига.</div>
+
+  <h2>Продукция</h2>
+  <div class="grid">
+    <div class="card"><h3>${esc(P.product.name)}</h3>
+      <p>${esc(P.product.grade)}</p>
+      <p class="mut">Мощность: <b>${nf(P.product.capacity_t_year)} т/год</b>. SEN ${esc(P.product.sen)}. Сумма примесей по ГОСТ ${esc(P.product.impurities_sum_gost)}.</p>
+      <p class="mut">Ожидаемые примеси: ${esc(P.product.impurities_expected)}</p></div>
+    ${P.byproducts.map(b=>`<div class="card"><h3>${esc(b.name)}</h3><p>→ ${esc(b.dest)}</p><p class="mut">${esc(b.note)}</p></div>`).join('')}
+  </div>
+
+  <h2>Площадка строительства</h2>
+  <div class="grid">
+    <div class="card"><h3>Климат и нагрузки</h3><ul>
+      <li>Строительно-климатическая зона: ${esc(P.site.climate_zone)}</li>
+      <li>Температура наиболее холодных суток: ${esc(P.site.t_cold_day_098)} (обесп. 0,98) / ${esc(P.site.t_cold_day_092)} (0,92)</li>
+      <li>Наиболее холодная пятидневка: ${esc(P.site.t_cold_5day_098)} (0,98) / ${esc(P.site.t_cold_5day_092)} (0,92)</li>
+      <li>Отопительный период: ${esc(P.site.heating_period)}</li>
+      <li>Снег: ${esc(P.site.snow)}</li>
+      <li>Ветер: ${esc(P.site.wind)}</li>
+      <li>Сейсмичность: ${esc(P.site.seismic)}</li>
+      <li>Грунты: ${esc(P.site.soils)}</li>
+    </ul></div>
+    <div class="card"><h3>Расположение и ограничения</h3>
+      <p>${esc(P.location)}</p>
+      <p class="mut">${esc(P.site.geomorphology)}</p>
+      <p><b>${esc(P.site.grid)}</b></p>
+      <h3>Режимы работы</h3><ul>${P.regimes.map(r=>`<li><b>${esc(r.unit)}</b>: ${r.days} дней/год, ${nf(r.hours)} ч — ${esc(r.note)}</li>`).join('')}</ul>
+      <p class="mut">${esc(P.losses)}</p></div>
+  </div>
+
+  <h2>Предыстория проекта</h2>
+  ${P.background.map(b=>`<div class="box">${md(b)}</div>`).join('')}
+  <h3>Документы-предшественники, на которые опираются ИД</h3>
+  <ul class="mut">${P.history_refs.map(h=>`<li>${esc(h)}</li>`).join('')}</ul>
+
+  <h2>Состав тендерного пакета</h2>
+  <div class="tblwrap"><table><thead><tr><th>№</th><th>Приложение</th><th>Что внутри</th></tr></thead>
+  <tbody>${LOTS.appendices.map(a=>`<tr><td><b>${esc(a.n)}</b></td><td>${esc(a.name)}</td><td class="mut">${esc(a.note)}</td></tr>`).join('')}</tbody></table></div>`;
+}
+
+/* ================= Этапы ================= */
+const STAGES = __STAGES_JSON__;
+function rStages(){
+  return `
+  <div class="box info">${esc(STAGES.note)}</div>
+  <h2>Жизненный цикл проекта</h2>
+  <div class="tl">${STAGES.stages.map(s=>`<div class="ev ${s.now?'now':''}">
+    <h3>${s.n}. ${esc(s.name)} <span class="tag">${esc(s.code)}</span>${s.now?'<span class="tag lot3">сейчас</span>':''}</h3>
+    <p>${esc(s.definition)}</p>
+    ${s.who?`<p class="mut"><b>Кто:</b> ${esc(s.who)}</p>`:''}
+    ${s.output?`<p class="mut"><b>На выходе:</b></p><ul class="mut">${s.output.map(o=>`<li>${esc(o)}</li>`).join('')}</ul>`:''}
+    ${s.handover?`<p class="mut"><b>Передача:</b> ${esc(s.handover)}</p>`:''}
+    ${s.risk?`<div class="box warn" style="margin:6px 0"><b>Риск:</b> ${esc(s.risk)}</div>`:''}
+  </div>`).join('')}</div>
+
+  <h2>Как устроен сам этап БИ — от ИД до сдачи</h2>
+  <div class="tblwrap"><table><thead><tr><th>Шаг</th><th>Содержание</th></tr></thead>
+  <tbody>${STAGES.bi_workflow.map((w,i)=>`<tr><td><b>${i+1}. ${esc(w.step)}</b></td><td>${esc(w.what)}</td></tr>`).join('')}</tbody></table></div>
+
+  <h2>Прочие условия ТЗ</h2>
+  ${LOTS.other_terms.map(t=>`<div class="box">${esc(t)}</div>`).join('')}`;
+}
+
+/* ================= Блоки и лоты ================= */
+function rBlocks(){
+  const obj = LOTS.objects.map(o=>`<tr>
+    <td>${esc(o.n)}</td>
+    <td><b>${esc(o.name)}</b>${o.parts?`<div class="mut">${o.parts.map(esc).join(' · ')}</div>`:''}</td>
+    <td>${esc(o.build)}</td>
+    <td>${o.bi?lotTag(o.lot):'<span class="mut">не требуется</span>'}</td></tr>`).join('');
+  const lots = LOTS.lots.map(l=>`<div class="card" id="lot${l.id}">
+    <h3>${lotTag(l.id)} ${esc(l.name)} <span class="tag">${esc(l.tag)}</span></h3>
+    <p class="mut">Режим: ${esc(l.regime)}</p>
+    <p>${md(l.scope)}</p>
+    <h3>Участки</h3><ul>${l.areas.map(a=>`<li>${esc(a)}</li>`).join('')}</ul>
+    <div class="grid2">
+      <div><h3>Вход</h3><ul class="mut">${l.feed.map(f=>`<li>${esc(f)}</li>`).join('')}</ul></div>
+      <div><h3>Выход</h3><ul class="mut">${l.products.map(f=>`<li>${esc(f)}</li>`).join('')}</ul></div>
+    </div>
+    <h3>Границы проектирования</h3>
+    <div class="tblwrap"><table><thead><tr><th>№</th><th>Продукт / ресурс</th><th>Граница</th></tr></thead>
+      <tbody>${l.boundaries.map(b=>`<tr><td>${esc(b.n)}</td><td>${esc(b.item)}</td><td class="mut">${esc(b.border)}</td></tr>`).join('')}</tbody></table></div>
+    ${l.special?`<div class="box amber"><b>Особое требование:</b> ${md(l.special)}</div>`:''}
+    ${l.pack_req?`<div class="box"><b>Требование сбыта:</b> ${esc(l.pack_req)}</div>`:''}
+    ${l.not_in_bi?`<div class="box warn"><b>НЕ входит в состав БИ по этому лоту</b> (приведено в ТЗ для сведения Исполнителя): ${l.not_in_bi.map(esc).join(' · ')}</div>`:''}
+    ${l.extra_pz&&l.extra_pz.length?`<h3>Сверх общего состава — пояснительная записка</h3><ul>${l.extra_pz.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:''}
+    ${l.extra_gr&&l.extra_gr.length?`<h3>Сверх общего состава — графическая часть</h3><ul>${l.extra_gr.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:''}
+    ${l.no_pid?`<div class="mut">Единственный лот, для которого ТЗ не требует P&amp;ID.</div>`:''}
+  </div>`).join('');
+
+  return `
+  <h2>Перечень объектов комплекса</h2>
+  <div class="tblwrap"><table><thead><tr><th>№ п/п</th><th>Объект</th><th>Строительство</th><th>Базовый инжиниринг</th></tr></thead>
+  <tbody>${obj}</tbody></table></div>
+
+  <h2>Технологическая цепочка по операциям</h2>
+  ${FLOW.chain.map(c=>`<div class="card">
+    <h3>${esc(c.area)} ${c.lot?lotTag(c.lot):'<span class="tag lot0">вне БИ</span>'}</h3>
+    <ol>${c.ops.map(o=>`<li>${esc(o)}</li>`).join('')}</ol></div>`).join('')}
+
+  <h2>Материальные потоки между переделами</h2>
+  <div class="tblwrap"><table><thead><tr><th>Откуда</th><th>Куда</th><th>Что</th><th>Количество / граница</th></tr></thead>
+  <tbody>${FLOW.streams.map(s=>`<tr${s.key?' style="font-weight:600"':''}><td>${esc(s.from)}</td><td>${esc(s.to)}</td><td>${esc(s.what)}</td><td class="mut">${esc(s.qty)}</td></tr>`).join('')}</tbody></table></div>
+
+  <h2>Лоты Базового инжиниринга</h2>
+  ${lots}
+
+  <h2>Общий состав БИ — одинаков для всех лотов</h2>
+  <div class="grid2">
+    <div class="card"><h3>Пояснительная записка</h3><ul>${LOTS.common_pz.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
+    <div class="card"><h3>Графическая часть и приложения</h3><ul>${LOTS.common_gr.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
+  </div>
+  <div class="card"><h3>Стоимость поставки — требуется по каждому лоту</h3><ul>${LOTS.cost_req.map(x=>`<li>${md(x)}</li>`).join('')}</ul></div>`;
+}
+
+/* ================= Оборудование ================= */
+let eqFilter = {lot:'', q:'', key:false};
+function eqRows(){
+  const t = eqFilter.q.toLowerCase();
+  return EQ.items.filter(i=>
+    (eqFilter.lot===''||String(i.lot)===eqFilter.lot) &&
+    (!eqFilter.key||i.key) &&
+    (!t||[i.name,i.model,i.area,i.purpose,i.material,i.status,i.note].join(' ').toLowerCase().includes(t)));
+}
+function eqPaint(){
+  const rows = eqRows();
+  const el = document.getElementById('eqbody');
+  if(!el) return;
+  el.innerHTML = rows.map(i=>`<tr>
+    <td>${lotTag(i.lot)}<div class="mut">${esc(i.area)}</div></td>
+    <td><b>${esc(i.name)}</b>${i.key?' <span class="tag lot1">ключевое</span>':''}
+        ${i.model&&i.model!=='—'?`<div class="mut">${esc(i.model)}</div>`:''}
+        ${i.pos?`<div class="mut">поз. ${esc(i.pos)}</div>`:''}</td>
+    <td>${esc(i.param)}</td>
+    <td class="num">${esc(i.qty)}</td>
+    <td>${esc(i.dims||'—')}${i.power?`<div class="mut">${esc(i.power)}</div>`:''}</td>
+    <td>${esc(i.material||'—')}</td>
+    <td>${esc(i.status)}${i.note?`<div class="mut">${esc(i.note)}</div>`:''}</td>
+  </tr>`).join('') || '<tr><td colspan="7" class="mut">Ничего не найдено</td></tr>';
+  document.getElementById('eqcount').textContent = `${rows.length} из ${EQ.items.length}`;
+}
+function rEquip(){
+  const byLot = {};
+  EQ.items.forEach(i=>{byLot[i.lot]=(byLot[i.lot]||0)+1});
+  return `
+  <div class="box info"><b>Источник:</b> ${esc(EQ.source)}. Позиции с пометкой «вне БИ» в конкурс не входят, но стоят в том же периметре стройки и нужны для увязки границ.</div>
+  <div class="k">
+    ${[1,2,3,4].map(n=>`<div class="tile"><b>${byLot[n]||0}</b><span>позиций — Лот №${n}</span></div>`).join('')}
+    <div class="tile"><b>${byLot[0]||0}</b><span>позиций вне БИ</span></div>
+    <div class="tile"><b>${EQ.items.filter(i=>i.key).length}</b><span>ключевых позиций</span></div>
+  </div>
+  <div class="filters">
+    <input type="text" id="eqq" placeholder="Поиск: название, модель, материал…">
+    <select id="eqlot"><option value="">Все лоты</option>${[1,2,3,4].map(n=>`<option value="${n}">Лот №${n} — ${esc(lotName(n))}</option>`).join('')}<option value="0">Вне БИ</option></select>
+    <button class="btn" id="eqkey">Только ключевые</button>
+    <span class="count" id="eqcount"></span>
+  </div>
+  <div class="tblwrap"><table><thead><tr>
+    <th>Лот / участок</th><th>Оборудование</th><th>Расчётный показатель</th><th>Кол-во</th><th>Габарит / мощность</th><th>Материал</th><th>Статус</th>
+  </tr></thead><tbody id="eqbody"></tbody></table></div>
+
+  <h2>Что означает статус</h2>
+  <div class="grid">${Object.entries(EQ.status_legend).map(([k,v])=>`<div class="card"><h3>${esc(k)}</h3><p class="mut">${esc(v)}</p></div>`).join('')}</div>
+
+  <h2>Нормы расхода материалов, реагентов и энергоресурсов</h2>
+  <div class="box">${esc(RES.base_note)}</div>
+  <div class="tblwrap"><table><thead><tr><th>№</th><th>Реагент / ресурс</th><th>Ед.</th><th>Годовой расход</th><th>На т Cu</th><th>Группа</th></tr></thead>
+  <tbody>${RES.total.map(r=>`<tr${r.key?' style="font-weight:600"':''}>
+    <td>${r.n}</td><td>${esc(r.name)}${r.note?`<div class="mut">${esc(r.note)}</div>`:''}</td>
+    <td>${esc(r.unit)}</td><td class="num">${nf(r.year, r.year<100?1:0)}</td><td class="num">${nf(r.per_t,3)}</td>
+    <td>${r.out?'<span class="tag lot3">выход</span>':`<span class="tag">${esc(r.group)}</span>`}</td></tr>`).join('')}</tbody></table></div>
+
+  <h2>Дутьевой режим печи КС</h2>
+  <div class="grid2">
+    <div class="card"><h3>Основной вариант</h3><p>${esc(RES.blast.main)}</p></div>
+    <div class="card"><h3>Вспомогательный вариант</h3><p>${esc(RES.blast.aux)}</p></div>
+    <div class="card"><h3>Компрессорный воздух</h3><p>${esc(RES.blast.compressed_air)}</p></div>
+    <div class="card"><h3>Разогрев печи</h3><p>${esc(RES.blast.heatup)}</p></div>
+  </div>
+
+  <h2>Электропотребление цеха обжига по аппаратам</h2>
+  <div class="tblwrap"><table><thead><tr><th>Участок</th><th>Аппарат</th><th>кВт</th><th>кВт·ч/год</th><th>На т Cu</th></tr></thead>
+  <tbody>${RES.roast_detail.flatMap(a=>a.items.map((it,ix)=>`<tr${it.key?' style="font-weight:600"':''}>
+    ${ix===0?`<td rowspan="${a.items.length}"><b>${esc(a.area)}</b></td>`:''}
+    <td>${esc(it.name)}</td><td class="num">${nf(it.kw,1)}</td><td class="num">${nf(it.year_kwh)}</td><td class="num">${nf(it.per_t,3)}</td></tr>`)).join('')}</tbody></table></div>`;
+}
+
+/* ================= Поставщики ================= */
+function rSup(){
+  const bxCls = BX.classes || {};
+  const rows = SUP.positions.map(p=>{
+    const bx = bxCls[p.cls] || [];
+    return `<tr>
+      <td>${lotTag(p.lot)}</td>
+      <td><b>${esc(p.name)}</b><div class="mut">${esc(p.spec)}</div></td>
+      <td class="tier${esc(p.tier)}">${esc(p.tier)}</td>
+      <td>${(p.world||[]).map(x=>`<span class="tag">${esc(x)}</span>`).join('')||'<span class="mut">—</span>'}</td>
+      <td>${(p.cn||[]).map(x=>`<span class="tag">${esc(x)}</span>`).join('')||'<span class="mut">—</span>'}</td>
+      <td>${(p.ru||[]).map(x=>`<span class="tag">${esc(x)}</span>`).join('')||'<span class="mut">—</span>'}</td>
+      <td class="num">${bx.length?`<b>${bx.length}</b>`:'<span class="mut">0</span>'}</td>
+      <td class="mut">${esc(p.ask)}</td>
+    </tr>`;}).join('');
+
+  const bxBlock = BX.live
+    ? `<div class="box"><b>Живая выгрузка из Bitrix24</b> от ${esc(BX.updated)}: найдено ${nf(BX.n_rfq)} запросов СП-166 по классам оборудования ОВЭ-75, ${nf((BX.companies||[]).length)} компаний.</div>
+       ${(BX.companies||[]).length?`<div class="tblwrap"><table><thead><tr><th>Компания</th><th>Запросов</th><th>Последний</th><th>Классы оборудования</th></tr></thead>
+       <tbody>${BX.companies.map(c=>`<tr><td><b>${esc(c.name)}</b></td><td class="num">${c.n}</td><td class="mut">${esc(c.last)}</td>
+       <td>${(c.classes||[]).map(x=>`<span class="tag">${esc(x)}</span>`).join('')}</td></tr>`).join('')}</tbody></table></div>`:''}
+       ${(BX.pool||[]).length?`<h3>Компании мирового и китайского пула, заведённые в CRM</h3>
+       <div class="tblwrap"><table><thead><tr><th>Искали по</th><th>Компания в CRM</th><th>Запросов СП-166</th><th>Последний</th></tr></thead>
+       <tbody>${BX.pool.map(c=>`<tr><td class="mut">${esc(c.query)}</td><td><b>${esc(c.name)}</b></td><td class="num">${c.n}</td><td class="mut">${esc(c.last)||'—'}</td></tr>`).join('')}</tbody></table></div>`:''}`
+    : `<div class="box warn"><b>Живая выгрузка из Bitrix24 ещё не выполнялась.</b> ${esc(BX.note)}</div>`;
+
+  return `
+  <div class="box info">${esc(SUP.note)}</div>
+  <div class="k">
+    ${['A','B','C'].map(t=>`<div class="tile"><b class="tier${t}">${SUP.positions.filter(p=>p.tier===t).length}</b><span>позиций уровня ${t}</span></div>`).join('')}
+    <div class="tile"><b>${SUP.positions.length}</b><span>закупочных позиций всего</span></div>
+    <div class="tile"><b>${BX.live?nf(BX.n_rfq):'—'}</b><span>запросов СП-166 в Bitrix</span></div>
+  </div>
+  <div class="grid">${Object.entries(SUP.legend).map(([k,v])=>`<div class="card"><h3 class="tier${k}">Уровень ${k}</h3><p class="mut">${esc(v)}</p></div>`).join('')}</div>
+
+  <h2>План сорсинга по позициям</h2>
+  <div class="tblwrap"><table><thead><tr>
+    <th>Лот</th><th>Позиция</th><th>Ур.</th><th>Мир</th><th>КНР</th><th>РФ</th><th>Bitrix</th><th>Что спрашивать</th>
+  </tr></thead><tbody>${rows}</tbody></table></div>
+
+  <h2>Правила сбора ТКП</h2>
+  <ol>${SUP.sourcing_rules.map(r=>`<li>${esc(r)}</li>`).join('')}</ol>
+
+  <h2>Поставщики из Bitrix24</h2>
+  ${bxBlock}
+
+  <h2>Утверждённые Заказчиком производители автоматизации</h2>
+  <div class="box">${esc(AUTO.approved.note)}</div>
+  ${AUTO.approved.groups.map(g=>`<div class="card"><h3>${esc(g.cat)}</h3>
+    <div class="mut">${esc(g.doc)}</div>
+    <div class="tblwrap"><table><thead><tr><th>Наименование</th><th>Производитель</th></tr></thead>
+    <tbody>${g.items.map(i=>`<tr><td>${esc(i.name)}</td><td>${esc(i.vendor)}</td></tr>`).join('')}</tbody></table></div>
+    ${g.rule?`<div class="box">${esc(g.rule)}</div>`:''}</div>`).join('')}`;
+}
+
+/* ================= Мировой опыт ================= */
+function rWorld(){
+  return `
+  <div class="box info">${esc(WORLD.honesty)}</div>
+  <div class="card"><h3>${esc(WORLD.tech_position.title)}</h3>
+    <p>${esc(WORLD.tech_position.text)}</p>
+    <h3>Что делает проект нетиповым</h3>
+    <ul>${WORLD.tech_position.signature.map(s=>`<li>${esc(s)}</li>`).join('')}</ul></div>
+
+  <h2>Мировые аналоги и школы процесса</h2>
+  ${WORLD.analogues.map(a=>`<div class="card"><h3>${esc(a.name)}</h3>
+    <p class="mut">${esc(a.who)}</p>
+    <p><b>Факт:</b> ${esc(a.fact)}</p>
+    <p><b>Отношение к ОВЭ-75:</b> ${esc(a.relevance)}</p>
+    <p class="mut">Источник: ${srcLink(a.src)} · проверено ${esc(a.checked)}</p></div>`).join('')}
+
+  <h2>Мировые поставщики по классам оборудования</h2>
+  <div class="tblwrap"><table><thead><tr><th>Класс оборудования</th><th>Кто в мире</th><th>Замечание</th></tr></thead>
+  <tbody>${WORLD.vendor_classes.map(v=>`<tr><td><b>${esc(v.class)}</b></td>
+    <td>${v.world.map(x=>`<span class="tag">${esc(x)}</span>`).join('')}</td>
+    <td class="mut">${esc(v.note)}</td></tr>`).join('')}</tbody></table></div>
+
+  <h2>Выводы, которые стоит держать в голове</h2>
+  ${WORLD.lessons.map(l=>`<div class="box amber"><b>${esc(l.title)}.</b> ${esc(l.text)}</div>`).join('')}`;
+}
+
+/* ================= Китай ================= */
+function rChina(){
+  const tier = t => t==='A'?'tierA':'tierB';
+  return `
+  <div class="box info">${esc(CHINA.honesty)}</div>
+  <div class="card"><h3>${esc(CHINA.why.title)}</h3><ul>${CHINA.why.points.map(p=>`<li>${md(p)}</li>`).join('')}</ul></div>
+
+  <h2>Инжиниринг и EPC</h2>
+  <div class="grid2">${CHINA.epc.map(c=>`<div class="card">
+    <h3>${esc(c.name)} <span class="tag ${tier(c.tier)}">уровень ${esc(c.tier)}</span></h3>
+    <p class="mut">${esc(c.profile)}</p>
+    <p><b>Факт:</b> ${esc(c.fact)}</p>
+    <p><b>Применимость:</b> ${esc(c.fit)}</p>
+    <p class="mut"><a href="${esc(c.src)}" target="_blank" rel="noopener">источник</a> · проверено ${esc(c.checked)}</p></div>`).join('')}</div>
+
+  <h2>Производители оборудования</h2>
+  <div class="grid2">${CHINA.equipment.map(c=>`<div class="card">
+    <h3>${esc(c.name)} <span class="tag ${tier(c.tier)}">уровень ${esc(c.tier)}</span></h3>
+    <p class="mut">${esc(c.class)} · ${(c.lot||[]).map(l=>lotTag(l)).join('')}</p>
+    <p><b>Факт:</b> ${esc(c.fact)}</p>
+    <p><b>Целевая позиция:</b> ${esc(c.target)}</p>
+    ${c.note?`<p><b>Важно:</b> ${esc(c.note)}</p>`:''}
+    <p class="mut"><a href="${esc(c.src)}" target="_blank" rel="noopener">источник</a> · проверено ${esc(c.checked)}</p></div>`).join('')}</div>
+
+  <h2>Дыры — где кандидатов пока нет</h2>
+  <div class="tblwrap"><table><thead><tr><th>Класс оборудования</th><th>Статус</th><th>Что делать</th></tr></thead>
+  <tbody>${CHINA.gaps.map(g=>`<tr><td><b>${esc(g.class)}</b></td><td class="hi">${esc(g.status)}</td><td>${esc(g.action)}</td></tr>`).join('')}</tbody></table></div>
+
+  <h2>Как работать с китайским периметром</h2>
+  ${CHINA.playbook.map(s=>`<div class="box"><b>${s.step}. ${esc(s.title)}.</b> ${esc(s.text)}</div>`).join('')}`;
+}
+
+/* ================= Торги за БИ ================= */
+function rTender(){
+  const lvl = l => l==='Высокий'?'hi':(l==='Средний'?'mid':'lo');
+  const chk = TENDER.checklist.map(g=>`<div class="card"><h3>${esc(g.group)}</h3>
+    <div class="tblwrap"><table><thead><tr><th>Требование ТЗ</th><th>Лоты</th></tr></thead>
+    <tbody>${g.items.map(i=>`<tr${i.critical?' style="font-weight:600"':''}><td>${md(i.req)}</td>
+      <td>${i.lots.map(l=>lotTag(l)).join('')}</td></tr>`).join('')}</tbody></table></div></div>`).join('');
+  return `
+  <div class="box amber"><b>${esc(TENDER.title)}.</b> ${esc(TENDER.basis)}</div>
+  <div class="box info"><b>Площадка: ${esc(TENDER.platform.name)}.</b> ${esc(TENDER.platform.note)} <span class="mut">Проверено ${esc(TENDER.platform.checked)}.</span></div>
+
+  <h2>Четыре лота — чем отличаются</h2>
+  <div class="tblwrap"><table><thead><tr><th>Лот</th><th>Вес</th><th>Что в нём трудного</th><th>Особенность</th></tr></thead>
+  <tbody>${TENDER.lots_summary.map(l=>`<tr><td>${lotTag(l.lot)}<div><b>${esc(l.name)}</b></div></td>
+    <td>${esc(l.weight)}</td><td>${esc(l.hard)}</td><td class="mut">${esc(l.note)}</td></tr>`).join('')}</tbody></table></div>
+
+  <h2>Чеклист требований ТЗ к составу БИ</h2>
+  ${chk}
+
+  <h2>Риски</h2>
+  ${TENDER.risks.map(r=>`<div class="card">
+    <h3><span class="${lvl(r.level)}">${esc(r.level)}</span> — ${esc(r.title)}</h3>
+    <p><b>Почему:</b> ${esc(r.why)}</p>
+    <p><b>Что делать:</b> ${esc(r.action)}</p></div>`).join('')}
+
+  <h2>Стратегия участия</h2>
+  ${TENDER.strategy.map(s=>`<div class="box"><b>${s.n}. ${esc(s.title)}.</b> ${esc(s.text)}</div>`).join('')}
+
+  <h2>План действий</h2>
+  <div class="tblwrap"><table><thead><tr><th>Когда</th><th>Что сделать</th><th>Кто</th></tr></thead>
+  <tbody>${TENDER.actions.map(a=>`<tr><td><b>${esc(a.when)}</b></td><td>${esc(a.what)}</td><td class="mut">${esc(a.owner)}</td></tr>`).join('')}</tbody></table></div>
+
+  <h2>Вопросы, которые надо задать Заказчику до подачи</h2>
+  <ol>${TENDER.questions_to_customer.map(q=>`<li>${esc(q)}</li>`).join('')}</ol>`;
+}
+
+/* ================= CAPEX ================= */
+const CP = {fx:CAPEX.params.fx.value, lang:CAPEX.params.lang.value, cont:CAPEX.params.cont.value};
+function capexCalc(){
+  const eq = CAPEX.equipment.reduce((a,e)=>({low:a.low+e.low, base:a.base+e.base, high:a.high+e.high}), {low:0,base:0,high:0});
+  const direct = CAPEX.nonequip.filter(n=>n.mode==='direct')
+    .reduce((a,n)=>({low:a.low+n.low, base:a.base+n.base, high:a.high+n.high}), {low:0,base:0,high:0});
+  const out = {};
+  for(const k of ['low','base','high']){
+    const eqInst = eq[k]*CP.lang;              // оборудование → смонтированный объект
+    const tic = eqInst + direct[k];            // + прямые строительные и сетевые затраты
+    let soft = 0;
+    for(const n of CAPEX.nonequip){
+      if(n.mode==='pct_tic') soft += tic*n.pct/100;
+      if(n.mode==='pct_eq')  soft += eq[k]*n.pct/100;
+    }
+    const sub = tic + soft;
+    out[k] = {eq:eq[k], eqInst, direct:direct[k], tic, soft, sub, cont:sub*CP.cont/100, total:sub*(1+CP.cont/100)};
+  }
+  return out;
+}
+function capexPaint(){
+  const c = capexCalc(), el = document.getElementById('cpres');
+  if(!el) return;
+  const usd = v => nf(v,1)+' млн $';
+  const rub = v => nf(v*CP.fx/1000,2)+' млрд ₽';
+  const row = (label,key,note)=>`<tr><td><b>${esc(label)}</b>${note?`<div class="mut">${esc(note)}</div>`:''}</td>
+    <td class="num">${usd(c.low[key])}</td><td class="num"><b>${usd(c.base[key])}</b></td><td class="num">${usd(c.high[key])}</td>
+    <td class="num">${rub(c.base[key])}</td></tr>`;
+  const perT = c.base.total*1e6/75000;
+  const eqShare = c.base.eqInst/c.base.total*100;
+  const lot3 = CAPEX.equipment.filter(e=>e.lot===3).reduce((a,e)=>a+e.base,0);
+  const lot3Share = lot3/c.base.eq*100;
+  el.innerHTML = `
+  <div class="tblwrap"><table><thead><tr><th>Статья</th><th>Низ</th><th>База</th><th>Верх</th><th>База, ₽</th></tr></thead><tbody>
+    ${row('Оборудование (поставка)','eq','Сумма строк оценки по всем лотам и вне-БИ периметру')}
+    ${row('Оборудование смонтированное','eqInst',`Оборудование × коэффициент обвязки ${nf(CP.lang,1)} (монтаж, трубопроводы, КИП, электрика — без зданий)`)}
+    ${row('Здания, реконструкция, внешние сети','direct','Прямые строительные затраты')}
+    ${row('Итого стоимость строительства (TIC)','tic','')}
+    ${row('Проектирование, ПНР, ЗИП','soft','Доли от TIC и от стоимости оборудования')}
+    ${row('Подытог','sub','')}
+    ${row(`Резерв ${CP.cont} %`,'cont','')}
+  </tbody><tfoot><tr style="font-weight:700;background:var(--chip)">
+    <td>ВСЕГО CAPEX</td><td class="num">${usd(c.low.total)}</td><td class="num">${usd(c.base.total)}</td>
+    <td class="num">${usd(c.high.total)}</td><td class="num">${rub(c.base.total)}</td></tr></tfoot></table></div>
+  <div class="k">
+    <div class="tile"><b>${nf(c.base.total,0)} млн $</b><span>база, весь комплекс</span></div>
+    <div class="tile"><b>${nf(c.base.total*CP.fx/1000,1)} млрд ₽</b><span>по курсу ${CP.fx} ₽/$</span></div>
+    <div class="tile"><b>${nf(perT,0)} $/т</b><span>на тонну годовой мощности</span></div>
+    <div class="tile"><b>${nf(eqShare,0)} %</b><span>доля смонтированного оборудования</span></div>
+    <div class="tile"><b>${nf(lot3Share,0)} %</b><span>доля Лота №3 в оборудовании</span></div>
+  </div>
+  <div class="box ${perT<8000?'':(perT<12000?'amber':'warn')}"><b>Перекрёстная проверка.</b> Ориентир для greenfield медного завода полного цикла — 8 000–12 000 $ на тонну годовой мощности. Модель даёт <b>${nf(perT,0)} $/т</b>. ${
+    perT<8000 ? 'Ниже ориентира — ожидаемо: ОВЭ-75 не строит плавку и частично использует существующие здания ЦЭМ и ГМУ.'
+  : perT<12000 ? 'Внутри ориентира. Для проекта без плавки и с частичным использованием существующих зданий это скорее верхняя граница разумного — стоит перепроверить коэффициент обвязки и строительные строки.'
+  : 'Выше ориентира — при таких параметрах модель почти наверняка завышает. Проверьте коэффициент обвязки, строительные строки и резерв.'}</div>`;
+}
+function rCapex(){
+  const d = CAPEX.disclaimer;
+  const byLot = {};
+  CAPEX.equipment.forEach(e=>{byLot[e.lot]=(byLot[e.lot]||0)+e.base});
+  const maxLot = Math.max(...Object.values(byLot));
+  return `
+  <div class="box warn"><b>${esc(d.class)} · точность ${esc(d.accuracy)}.</b> ${esc(d.text)}</div>
+  <div class="box info"><b>Метод.</b> ${esc(d.method)} ${esc(d.basis_note)}</div>
+
+  <h2>Параметры расчёта</h2>
+  <div class="card">
+    ${Object.entries(CAPEX.params).map(([k,p])=>`<div class="rng">
+      <label for="cp_${k}">${esc(p.label)}</label>
+      <input type="range" id="cp_${k}" min="${p.min}" max="${p.max}" step="${p.step}" value="${p.value}">
+      <output id="cpo_${k}">${p.value}</output>
+    </div><div class="mut" style="margin:-2px 0 8px">${esc(p.note)}</div>`).join('')}
+  </div>
+
+  <h2>Результат</h2>
+  <div id="cpres"></div>
+
+  <h2>Структура стоимости оборудования по лотам</h2>
+  <div class="tblwrap"><table><thead><tr><th>Лот</th><th>Оборудование, млн $ (база)</th><th></th></tr></thead>
+  <tbody>${Object.entries(byLot).sort((a,b)=>b[1]-a[1]).map(([l,v])=>`<tr>
+    <td>${lotTag(Number(l))} ${esc(lotName(Number(l)))}</td><td class="num"><b>${nf(v,1)}</b></td>
+    <td style="width:40%"><div class="bar"><i style="width:${v/maxLot*100}%"></i></div></td></tr>`).join('')}</tbody></table></div>
+
+  <h2>Оборудование — построчно</h2>
+  <div class="tblwrap"><table><thead><tr>
+    <th>Лот</th><th>Позиция</th><th>Кол-во</th><th>Низ</th><th>База</th><th>Верх</th><th>Уверенность</th><th>Основание</th>
+  </tr></thead><tbody>${CAPEX.equipment.map(e=>`<tr${e.key?' style="font-weight:600"':''}>
+    <td>${lotTag(e.lot)}</td><td>${esc(e.name)}${e.optional?' <span class="tag">опция</span>':''}</td><td>${esc(e.qty)}</td>
+    <td class="num">${nf(e.low,1)}</td><td class="num">${nf(e.base,1)}</td><td class="num">${nf(e.high,1)}</td>
+    <td class="${e.conf==='высокая'?'tierA':(e.conf==='средняя'?'tierB':'tierC')}">${esc(e.conf)}</td>
+    <td class="mut">${esc(e.basis)}</td></tr>`).join('')}</tbody></table></div>
+  <div class="mut">Суммы в млн долларов США. «Уверенность» — насколько надёжна оценка до получения ТКП.</div>
+
+  <h2>Затраты помимо оборудования</h2>
+  <div class="tblwrap"><table><thead><tr><th>Статья</th><th>Способ счёта</th><th>Значение</th><th>Основание</th></tr></thead>
+  <tbody>${CAPEX.nonequip.map(n=>`<tr><td><b>${esc(n.name)}</b></td>
+    <td>${n.mode==='direct'?'прямая сумма':(n.mode==='pct_tic'?'% от стоимости строительства':'% от стоимости оборудования')}</td>
+    <td class="num">${n.mode==='direct'?`${nf(n.low,0)} … <b>${nf(n.base,0)}</b> … ${nf(n.high,0)} млн $`:`<b>${n.pct} %</b>`}</td>
+    <td class="mut">${esc(n.basis)}</td></tr>`).join('')}</tbody></table></div>
+
+  <h2>Что в модель не входит</h2>
+  <ul>${CAPEX.notes.map(n=>`<li>${esc(n)}</li>`).join('')}</ul>`;
+}
+
+/* ================= Автоматизация (в составе «Этапов») ================= */
+function rAuto(){
+  return `
+  <div class="box info"><b>Источник:</b> ${esc(AUTO.source)}</div>
+  <div class="box amber"><b>${esc(AUTO.ml_requirement.title)}.</b> ${esc(AUTO.ml_requirement.text)} <span class="mut">${esc(AUTO.ml_requirement.source)}</span></div>
+
+  <h2>Системы, которые надо предусмотреть</h2>
+  ${AUTO.systems.map(s=>`<div class="card"><h3>${esc(s.code)} — ${esc(s.name)}</h3>
+    <p class="mut">Структура: ${esc(s.structure)}</p>
+    ${s.levels.length?`<div class="tblwrap"><table><thead><tr><th>Уровень</th><th>Состав и функции</th></tr></thead>
+      <tbody>${s.levels.map(l=>`<tr><td><b>${esc(l.lvl)}</b></td><td>${esc(l.what)}</td></tr>`).join('')}</tbody></table></div>`:''}
+    ${s.functions.length?`<h3>Функции</h3><ul>${s.functions.map(f=>`<li>${esc(f)}</li>`).join('')}</ul>`:''}
+    <h3>Ключевые требования</h3><ul>${s.key_reqs.map(f=>`<li>${md(f)}</li>`).join('')}</ul></div>`).join('')}
+
+  <h2>Электропитание</h2><ul>${AUTO.power.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>
+  <h2>Защита от внешних воздействий и шкафное оборудование</h2><ul>${AUTO.protection.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>
+  <h2>Сетевое оборудование</h2><ul>${AUTO.network.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>
+  <h2>Документация по автоматизации</h2><ul>${AUTO.docs.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>
+  <h2>Метрологическое обеспечение</h2><ul>${AUTO.metrology.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>
+  <div class="mut">Утверждённые Заказчиком производители — на вкладке «Поставщики».</div>`;
+}
+
+/* ================= Каркас ================= */
+const TABS = [
+  ['overview','Обзор'], ['stages','Этапы'], ['blocks','Блоки и лоты'], ['equip','Оборудование'],
+  ['sup','Поставщики'], ['auto','Автоматизация'], ['world','Мировой опыт'], ['china','Китай'],
+  ['tender','Торги за БИ'], ['capex','Стройка · CAPEX']
+];
+const R = {overview:rOverview, stages:rStages, blocks:rBlocks, equip:rEquip, sup:rSup,
+           auto:rAuto, world:rWorld, china:rChina, tender:rTender, capex:rCapex};
+const nav = document.getElementById('nav'), main = document.getElementById('main');
+nav.innerHTML = TABS.map(([id,t])=>`<button data-t="${id}">${esc(t)}</button>`).join('');
+main.innerHTML = TABS.map(([id])=>`<section id="s-${id}"></section>`).join('');
+document.getElementById('foot').innerHTML =
+  `Разбор тендерного пакета «ТЗ на БИ ОВЭ-75 v.3.6» и приложений №1–7 (ИД ч.1 и ч.2, электроснабжение, ЦИМ, ОАСУ, здания ЦЭМ и ГМУ). ` +
+  `Технологические данные — из документов Заказчика и ИД ООО «Институт Гипроникель». Внешние факты о компаниях проверены 13.08.2026 и снабжены ссылками. ` +
+  `Оценка CAPEX — модель порядка величины, не смета. Сборка: __BUILT_AT__`;
+
+const rendered = {};
+function bindEquip(){
+  const q=document.getElementById('eqq'), s=document.getElementById('eqlot'), k=document.getElementById('eqkey');
+  q.addEventListener('input', ()=>{eqFilter.q=q.value; eqPaint();});
+  s.addEventListener('change', ()=>{eqFilter.lot=s.value; eqPaint();});
+  k.addEventListener('click', ()=>{eqFilter.key=!eqFilter.key; k.classList.toggle('on',eqFilter.key); eqPaint();});
+  eqPaint();
+}
+function bindCapex(){
+  for(const key of Object.keys(CAPEX.params)){
+    const el=document.getElementById('cp_'+key), out=document.getElementById('cpo_'+key);
+    el.addEventListener('input', ()=>{ CP[key]=Number(el.value); out.textContent=el.value; capexPaint(); });
+  }
+  capexPaint();
+}
+function show(id){
+  for(const [tid] of TABS){
+    document.querySelector(`[data-t="${tid}"]`).classList.toggle('on', tid===id);
+    document.getElementById(`s-${tid}`).classList.toggle('on', tid===id);
+  }
+  if(!rendered[id]){
+    document.getElementById(`s-${id}`).innerHTML = R[id]();
+    rendered[id]=1;
+    if(id==='equip') bindEquip();
+    if(id==='capex') bindCapex();
+  }
+  location.hash = id;
+  window.scrollTo(0,0);
+}
+nav.addEventListener('click', e=>{ const b=e.target.closest('button'); if(b) show(b.dataset.t); });
+show(TABS.some(([id])=>id===location.hash.slice(1)) ? location.hash.slice(1) : 'overview');
+</script>
+</body>
+</html>

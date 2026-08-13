@@ -1,0 +1,10 @@
+{
+ "live": false,
+ "updated": "",
+ "source": "Bitrix24, смарт-процесс 166 «Запросы поставщикам» + crm.company.list",
+ "note": "Сид. Живая выгрузка выполняется при сборке в GitHub Actions (ove/tools/bitrix_ove.py, секрет BITRIX_WEBHOOK_URL). Пока выгрузка не прошла — таблицы пустые, и это честнее, чем показывать выдуманные данные.",
+ "n_rfq": 0,
+ "classes": {},
+ "companies": [],
+ "pool": []
+}
