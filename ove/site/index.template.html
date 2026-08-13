@@ -93,6 +93,14 @@ ul,ol{margin:6px 0;padding-left:20px} li{margin:3px 0}
 .rng output{font-variant-numeric:tabular-nums;font-weight:700;min-width:56px;text-align:right}
 .bar{height:9px;border-radius:5px;background:var(--chip);overflow:hidden;min-width:70px}
 .bar i{display:block;height:100%;background:var(--s1)}
+/* «Базовый проект» — читаемый документ, а не таблица */
+.doc{max-width:78ch}
+.doc .sec{border-top:1px solid var(--grid);padding-top:12px;margin-top:18px}
+.doc .sec:first-child{border-top:0;margin-top:4px}
+.doc .body{font-size:13.5px;line-height:1.62;overflow-wrap:anywhere}
+.doc .body p{margin:0 0 9px}
+.doc .tblwrap,.doc .box{max-width:100%}
+.quote{border-left:3px solid var(--warn);padding:4px 0 4px 12px;margin:2px 0 8px;font-style:italic;color:var(--ink2);overflow-wrap:anywhere}
 footer{padding:0 22px 24px;color:var(--mut);font-size:11.5px;max-width:1280px}
 @media (max-width:700px){
   main,header,nav,footer{padding-left:12px;padding-right:12px}
@@ -121,6 +129,9 @@ const TENDER = __TENDER_JSON__;
 const CAPEX = __CAPEX_JSON__;
 const SUP = __SUP_JSON__;
 const BX = __BITRIX_JSON__;
+const BI = [__BI1_JSON__, __BI2_JSON__, __BI3_JSON__, __BI4_JSON__].filter(Boolean);
+const COMP = __COMPETITOR_JSON__;
+const PARTNER = __PARTNER_JSON__;
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const nf = (n,d=0) => (n===''||n===null||n===undefined||isNaN(n)) ? '—' : Number(n).toLocaleString('ru-RU',{minimumFractionDigits:d,maximumFractionDigits:d});
@@ -628,14 +639,98 @@ function rAuto(){
   <div class="mut">Утверждённые Заказчиком производители — на вкладке «Поставщики».</div>`;
 }
 
+/* ================= Базовый проект (черновик БИ) ================= */
+let biLot = 0;
+function biPaint(){
+  const el = document.getElementById('bibody');
+  if(!el) return;
+  const d = BI[biLot];
+  if(!d){ el.innerHTML = '<div class="box warn">Раздел ещё собирается.</div>'; return; }
+  const KIND = {pz:'Пояснительная записка', graf:'Графическая часть', calc:'Расчёт'};
+  el.innerHTML = `<div class="doc">${d.sections.map((s,i)=>`<div class="sec">
+    <h3>${i+1}. ${esc(s.title)} <span class="tag">${esc(KIND[s.kind]||s.kind||'')}</span></h3>
+    <div class="body">${md(s.body||'').replace(/\n{2,}/g,'</p><p>').replace(/^/,'<p>').replace(/$/,'</p>')}</div>
+    ${(s.items&&s.items.length)?`<div class="tblwrap"><table><thead><tr><th>Показатель</th><th>Значение</th><th>Источник</th></tr></thead>
+      <tbody>${s.items.map(x=>`<tr><td>${esc(x.label)}</td><td><b>${esc(x.value)}</b></td><td class="mut">${esc(x.src||'')}</td></tr>`).join('')}</tbody></table></div>`:''}
+    ${(s.gost&&s.gost.length)?`<div class="box info"><b>Нормативная база.</b><ul>${s.gost.map(g=>`<li><b>${esc(g.doc)}</b> — ${esc(g.what)}</li>`).join('')}</ul></div>`:''}
+    ${(s.open&&s.open.length)?`<div class="box amber"><b>Определяется на стадии БИ:</b><ul>${s.open.map(o=>`<li>${esc(o)}</li>`).join('')}</ul></div>`:''}
+  </div>`).join('')}</div>`;
+}
+function rBI(){
+  if(!BI.length) return `<div class="box warn"><b>Раздел собирается.</b> Здесь будет черновик Базового инжиниринга по каждому лоту: описание техпроцесса по операциям, материальные и тепловые балансы, PFD и P&amp;ID с контурами регулирования и блокировками, компоновочные решения с нагрузками на конструкции и фундаменты, спецификации оборудования и КИПиА, схема КТС АСУ — с привязкой каждого раздела к действующим ГОСТ, СП, ПУЭ и ФНП.</div>`;
+  const nSec = BI.reduce((a,d)=>a+d.sections.length,0);
+  const nOpen = BI.reduce((a,d)=>a+d.sections.reduce((b,s)=>b+((s.open||[]).length),0),0);
+  const nGost = new Set(BI.flatMap(d=>d.sections.flatMap(s=>(s.gost||[]).map(g=>g.doc)))).size;
+  return `
+  <div class="box info"><b>Что это.</b> Черновик Базового инжиниринга, собранный по составу из ТЗ v3.6 на данных ИД Гипроникеля. Это рабочий материал для заявки и для последующей разработки, а не выпущенный документ: каждое число прослежено до ИД, каждый раздел привязан к нормативу, а всё, чего в ИД нет, честно вынесено в «определяется на стадии БИ».</div>
+  <div class="k">
+    <div class="tile"><b>${BI.length}</b><span>лота проработано</span></div>
+    <div class="tile"><b>${nSec}</b><span>разделов</span></div>
+    <div class="tile"><b>${nGost}</b><span>нормативов привязано</span></div>
+    <div class="tile"><b>${nOpen}</b><span>открытых вопросов</span></div>
+  </div>
+  <div class="filters">${BI.map((d,i)=>`<button class="btn bilot${i===biLot?' on':''}" data-i="${i}">${lotTag(d.lot)} ${esc(d.name)}</button>`).join('')}</div>
+  <div id="bibody"></div>`;
+}
+
+/* ================= Конкурент ================= */
+function rComp(){
+  if(!COMP) return `<div class="box warn"><b>Раздел собирается.</b> Досье на главного конкурента — ДЕЛЬТА Инжиниринг (по имеющимся сведениям, преемник российского подразделения Hatch Ltd.). Ключевой факт, который здесь будет развёрнут: их работа уже вшита в исходные данные Заказчика — Приложение В к ИД части 2 называется «ДЕЛЬТА Инжиниринг и Консалтинг. Исходные требования на изготовление и поставку оборудования. Ванны электролизные», а таблица 4.2 задаёт «Ванны ДЕЛЬТА, 84 катода, 85 анодов». То есть конструкция ванн Лота №3 в тендерном пакете — уже их разработка. Раздел разберёт, даёт ли это им решающее преимущество по Лоту №3, есть ли здесь конфликт интересов, по каким лотам их позиция слабее и как строить своё предложение.</div>`;
+  return `
+  <div class="box warn"><b>Главный вывод.</b> ${md(COMP.summary).replace(/\n{2,}/g,'</p><p>').replace(/^/,'<p>').replace(/$/,'</p>')}</div>
+  ${(COMP.in_tender||[]).length?`<h2>Конкурент уже внутри тендерного пакета</h2>
+    ${COMP.in_tender.map(q=>`<div class="card"><div class="quote">«${esc(q.quote)}»</div>
+      <div class="mut">${esc(q.where)}</div><p><b>Что это значит:</b> ${esc(q.meaning)}</p></div>`).join('')}`:''}
+  ${(COMP.profile||[]).length?`<h2>Профиль</h2><div class="tblwrap"><table><thead><tr><th>Факт</th><th>Тип</th><th>Источник</th></tr></thead>
+    <tbody>${COMP.profile.map(p=>`<tr><td>${esc(p.fact)}</td><td>${p.kind==='оценка'?'<span class="tag">оценка</span>':'<span class="tag lot3">факт</span>'}</td>
+    <td class="mut">${srcLink(p.src)}${p.checked?` · ${esc(p.checked)}`:''}</td></tr>`).join('')}</tbody></table></div>`:''}
+  ${(COMP.hatch||[]).length?`<h2>Связь с Hatch</h2><div class="tblwrap"><table><thead><tr><th>Факт</th><th>Источник</th></tr></thead>
+    <tbody>${COMP.hatch.map(p=>`<tr><td>${esc(p.fact)}</td><td class="mut">${srcLink(p.src)}${p.checked?` · ${esc(p.checked)}`:''}</td></tr>`).join('')}</tbody></table></div>`:''}
+  <div class="grid2">
+    ${(COMP.strength||[]).length?`<div class="card"><h3>Их сильные стороны</h3><ul>${COMP.strength.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`:''}
+    ${(COMP.weakness||[]).length?`<div class="card"><h3>Их слабые стороны</h3><ul>${COMP.weakness.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`:''}
+  </div>
+  ${(COMP.implications||[]).length?`<h2>Что из этого следует</h2>${COMP.implications.map(x=>`<div class="box amber"><b>${esc(x.title)}.</b> ${esc(x.text)}</div>`).join('')}`:''}
+  ${(COMP.our_moves||[]).length?`<h2>Наши ходы</h2>${COMP.our_moves.map(x=>`<div class="box"><b>${x.n}. ${esc(x.title)}.</b> ${esc(x.text)}</div>`).join('')}`:''}
+  <div class="mut">Обновлено ${esc(COMP.updated||'')}. Факты — со ссылками; всё, что не подтверждено открытыми источниками, помечено.</div>`;
+}
+
+/* ================= Партнёр ================= */
+function rPartner(){
+  if(!PARTNER) return `<div class="box warn"><b>Раздел собирается.</b> Опыт в квалификационной части заявки прикладывается не КВАНТ, а китайского партнёра, который идёт вместе с нами. Здесь будет: досье на кандидатов — China Nerin Engineering и связанная Jiangxi Nerin Equipment, а также поставщик по линии подготовки катодных основ; их проверяемые референсы по меди с названиями проектов, мощностями и годами; соответствие опыта каждому из четырёх лотов по отдельности; перечень документов, которые надо запросить у партнёра для квалификационной части (референс-листы с контактами заказчиков, сертификаты, лицензии, финотчётность, подтверждение мощностей); и риски самой схемы — как Заказчик отнесётся к тому, что опыт не у заявителя, и нужна ли консорциальная или субподрядная конструкция.</div>`;
+  const tcls = t => t==='A'?'tierA':(t==='B'?'tierB':'tierC');
+  return `
+  <div class="box info"><b>Решение.</b> ${md(PARTNER.decision).replace(/\n{2,}/g,'</p><p>').replace(/^/,'<p>').replace(/$/,'</p>')}</div>
+  <h2>Кандидаты в партнёры</h2>
+  ${(PARTNER.candidates||[]).map(c=>`<div class="card">
+    <h3>${esc(c.name)} <span class="tag ${tcls(c.tier)}">уровень ${esc(c.tier)}</span> <span class="tag">${esc(c.role)}</span></h3>
+    <p>${esc(c.profile)}</p>
+    ${(c.refs||[]).length?`<div class="tblwrap"><table><thead><tr><th>Проект</th><th>Что сделано</th><th>Год</th><th>Источник</th></tr></thead>
+      <tbody>${c.refs.map(r=>`<tr><td><b>${esc(r.project)}</b></td><td>${esc(r.what)}</td><td class="mut">${esc(r.year)}</td>
+      <td class="mut">${srcLink(r.src)}${r.checked?` · ${esc(r.checked)}`:''}</td></tr>`).join('')}</tbody></table></div>`:''}
+    ${c.fit?`<div class="tblwrap"><table><thead><tr>${[1,2,3,4].map(n=>`<th>Лот №${n}</th>`).join('')}</tr></thead>
+      <tbody><tr>${[1,2,3,4].map(n=>`<td>${esc(c.fit['lot'+n]||'—')}</td>`).join('')}</tr></tbody></table></div>`:''}
+  </div>`).join('')}
+  ${(PARTNER.already_contacted||[]).length?`<h2>С кем мы уже контактировали</h2>
+    <div class="tblwrap"><table><thead><tr><th>Компания</th><th>Классы оборудования</th><th>Примечание</th></tr></thead>
+    <tbody>${PARTNER.already_contacted.map(c=>`<tr><td><b>${esc(c.company)}</b></td>
+    <td>${(c.classes||[]).map(x=>`<span class="tag">${esc(x)}</span>`).join('')}</td><td class="mut">${esc(c.note||'')}</td></tr>`).join('')}</tbody></table></div>`:''}
+  ${(PARTNER.docs_to_request||[]).length?`<h2>Что запросить у партнёра для квалификационной части</h2><ol>${PARTNER.docs_to_request.map(x=>`<li>${esc(x)}</li>`).join('')}</ol>`:''}
+  ${(PARTNER.risks||[]).length?`<h2>Риски партнёрской схемы</h2>${PARTNER.risks.map(r=>`<div class="card"><h3>${esc(r.title)}</h3>
+    <p>${esc(r.text)}</p><p><b>Что делать:</b> ${esc(r.action)}</p></div>`).join('')}`:''}
+  <div class="mut">Обновлено ${esc(PARTNER.updated||'')}.</div>`;
+}
+
 /* ================= Каркас ================= */
 const TABS = [
-  ['overview','Обзор'], ['stages','Этапы'], ['blocks','Блоки и лоты'], ['equip','Оборудование'],
-  ['sup','Поставщики'], ['auto','Автоматизация'], ['world','Мировой опыт'], ['china','Китай'],
+  ['overview','Обзор'], ['stages','Этапы'], ['blocks','Блоки и лоты'], ['bi','Базовый проект'],
+  ['equip','Оборудование'], ['sup','Поставщики'], ['auto','Автоматизация'],
+  ['world','Мировой опыт'], ['china','Китай'], ['partner','Партнёр'], ['competitor','Конкурент'],
   ['tender','Торги за БИ'], ['capex','Стройка · CAPEX']
 ];
-const R = {overview:rOverview, stages:rStages, blocks:rBlocks, equip:rEquip, sup:rSup,
-           auto:rAuto, world:rWorld, china:rChina, tender:rTender, capex:rCapex};
+const R = {overview:rOverview, stages:rStages, blocks:rBlocks, bi:rBI, equip:rEquip, sup:rSup,
+           auto:rAuto, world:rWorld, china:rChina, partner:rPartner, competitor:rComp,
+           tender:rTender, capex:rCapex};
 const nav = document.getElementById('nav'), main = document.getElementById('main');
 nav.innerHTML = TABS.map(([id,t])=>`<button data-t="${id}">${esc(t)}</button>`).join('');
 main.innerHTML = TABS.map(([id])=>`<section id="s-${id}"></section>`).join('');
@@ -651,6 +746,15 @@ function bindEquip(){
   s.addEventListener('change', ()=>{eqFilter.lot=s.value; eqPaint();});
   k.addEventListener('click', ()=>{eqFilter.key=!eqFilter.key; k.classList.toggle('on',eqFilter.key); eqPaint();});
   eqPaint();
+}
+function bindBI(){
+  if(!BI.length) return;
+  document.querySelectorAll('.bilot').forEach(b=>b.addEventListener('click', ()=>{
+    biLot = Number(b.dataset.i);
+    document.querySelectorAll('.bilot').forEach(x=>x.classList.toggle('on', x===b));
+    biPaint();
+  }));
+  biPaint();
 }
 function bindCapex(){
   for(const key of Object.keys(CAPEX.params)){
@@ -669,6 +773,7 @@ function show(id){
     rendered[id]=1;
     if(id==='equip') bindEquip();
     if(id==='capex') bindCapex();
+    if(id==='bi') bindBI();
   }
   location.hash = id;
   window.scrollTo(0,0);

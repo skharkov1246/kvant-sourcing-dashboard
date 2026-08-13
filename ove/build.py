@@ -33,6 +33,17 @@ FILES = {
     "__BITRIX_JSON__": "bitrix_ove.json",
 }
 
+# Файлы, которых может ещё не быть: собираются агентами. Пока файла нет —
+# на его место идёт null, и вкладка честно показывает «раздел в работе».
+OPTIONAL = {
+    "__BI1_JSON__": "bi_lot1.json",
+    "__BI2_JSON__": "bi_lot2.json",
+    "__BI3_JSON__": "bi_lot3.json",
+    "__BI4_JSON__": "bi_lot4.json",
+    "__COMPETITOR_JSON__": "competitor.json",
+    "__PARTNER_JSON__": "partner.json",
+}
+
 
 def compact(path: Path) -> str:
     """Валидируем JSON и вставляем компактно; </ нейтрализуем — данные едут в <script>."""
@@ -45,6 +56,17 @@ def build() -> None:
     for key, name in FILES.items():
         assert key in tpl, f"нет плейсхолдера {key} в шаблоне"
         tpl = tpl.replace(key, compact(DATA / name))
+    pending = []
+    for key, name in OPTIONAL.items():
+        assert key in tpl, f"нет плейсхолдера {key} в шаблоне"
+        path = DATA / name
+        if path.exists():
+            tpl = tpl.replace(key, compact(path))
+        else:
+            tpl = tpl.replace(key, "null")
+            pending.append(name)
+    if pending:
+        print("в работе (пока null):", ", ".join(pending))
     tpl = tpl.replace("__BUILT_AT__", date.today().isoformat())
     assert "__" + "JSON__" not in tpl, "остались незаменённые плейсхолдеры"
 
