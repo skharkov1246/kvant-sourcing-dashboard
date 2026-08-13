@@ -44,6 +44,10 @@ OPTIONAL = {
     "__PARTNER_JSON__": "partner.json",
     "__MARKET_JSON__": "market.json",
     "__ALT_JSON__": "alternative.json",
+    "__QUESTIONS_JSON__": "questions.json",
+    "__TIANXIN_JSON__": "tianxin.json",
+    "__SOFTWARE_JSON__": "software.json",
+    "__ANSWERS_JSON__": "questions_answers.json",
 }
 
 

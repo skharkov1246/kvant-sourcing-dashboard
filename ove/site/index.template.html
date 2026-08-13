@@ -106,6 +106,14 @@ select.mini,input.mini{background:var(--surface);color:var(--ink);border:1px sol
 input.mini.note{min-width:min(150px,100%);width:100%}
 .addrow{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
 .addrow input{flex:1 1 200px;min-width:0}
+/* вопросы Заказчику */
+.qcard .vs{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;margin:6px 0}
+.qgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin-top:8px}
+.qgrid label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--ink2);min-width:0}
+.qgrid textarea.mini{resize:vertical;font:12.5px/1.4 system-ui;width:100%}
+.qgrid select.mini{width:100%}
+pre.letter{white-space:pre-wrap;overflow-wrap:anywhere;font:12px/1.5 ui-monospace,monospace;background:var(--chip);
+  border-radius:8px;padding:10px;margin:6px 0;max-width:100%;overflow-x:auto}
 footer{padding:0 22px 24px;color:var(--mut);font-size:11.5px;max-width:1280px}
 @media (max-width:700px){
   main,header,nav,footer{padding-left:12px;padding-right:12px}
@@ -139,6 +147,10 @@ const COMP = __COMPETITOR_JSON__;
 const PARTNER = __PARTNER_JSON__;
 const MKT = __MARKET_JSON__;
 const ALT = __ALT_JSON__;
+const QS = __QUESTIONS_JSON__;
+const TX = __TIANXIN_JSON__;
+const SW = __SOFTWARE_JSON__;
+const ANS = __ANSWERS_JSON__;   // ответы, уже сведённые в общую версию
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const nf = (n,d=0) => (n===''||n===null||n===undefined||isNaN(n)) ? '—' : Number(n).toLocaleString('ru-RU',{minimumFractionDigits:d,maximumFractionDigits:d});
@@ -842,6 +854,7 @@ function rPartner(){
   ${(PARTNER.docs_to_request||[]).length?`<h2>Что запросить у партнёра для квалификационной части</h2><ol>${PARTNER.docs_to_request.map(x=>`<li>${esc(x)}</li>`).join('')}</ol>`:''}
   ${(PARTNER.risks||[]).length?`<h2>Риски партнёрской схемы</h2>${PARTNER.risks.map(r=>`<div class="card"><h3>${esc(r.title)}</h3>
     <p>${esc(r.text)}</p><p><b>Что делать:</b> ${esc(r.action)}</p></div>`).join('')}`:''}
+  ${rTianxin()}
   <div class="mut">Обновлено ${esc(PARTNER.updated||'')}.</div>`;
 }
 
@@ -944,16 +957,223 @@ function rAlt(){
   <div class="mut">Обновлено ${esc(ALT.updated||'')}.</div>`;
 }
 
+/* ============ Вопросы Заказчику и разночтения с ТЗ ============
+   Ответы Заказчика и комментарии инженеров живут в localStorage браузера и
+   выгружаются файлом; собранный файл возвращается в ove/data/questions_answers.json
+   и попадает в общую версию — тогда его видят все, а не только автор. */
+let QA;
+try{ QA = JSON.parse(localStorage.getItem('ove_answers_v1')) || {}; }catch(e){ QA = {}; }
+QA.ans = QA.ans||{}; QA.eng = QA.eng||{}; QA.st = QA.st||{}; QA.who = QA.who||'';
+function saveQA(){ try{ localStorage.setItem('ove_answers_v1', JSON.stringify(QA)); }catch(e){} }
+/* сведённые ответы из общей версии — база, поверх неё локальные правки */
+const ansOf = id => QA.ans[id] ?? ((ANS&&ANS.ans&&ANS.ans[id]) || '');
+const engOf = id => QA.eng[id] ?? ((ANS&&ANS.eng&&ANS.eng[id]) || '');
+const stOf  = id => QA.st[id]  ?? ((ANS&&ANS.st&&ANS.st[id])  || '');
+
+const Q_ST = [['','не задан'],['sent','задан Заказчику'],['answered','получен ответ'],['closed','снят']];
+const SEV = {blocker:['Блокирующее','hi'],major:['Существенное','mid'],minor:['Формальное','lo'],open:['Открытый вопрос БИ','lo']};
+let qFilter = {sev:'', lot:'', st:'', q:''};
+
+function qRows(){
+  const t = qFilter.q.toLowerCase();
+  return QS.items.filter(x =>
+    (qFilter.sev===''||x.sev===qFilter.sev) &&
+    (qFilter.lot===''||String(x.lot)===qFilter.lot) &&
+    (qFilter.st===''||stOf(x.id)===qFilter.st) &&
+    (!t||[x.title,x.a,x.b,x.why,x.ask,ansOf(x.id),engOf(x.id)].join(' ').toLowerCase().includes(t)));
+}
+function qPaint(){
+  const el = document.getElementById('qbody'); if(!el) return;
+  const rows = qRows();
+  el.innerHTML = rows.slice(0,300).map(x=>`<div class="card qcard">
+    <h3><span class="${SEV[x.sev][1]}">${esc(x.id)}</span> ${esc(x.title)}
+      ${lotTag(x.lot)}<span class="tag">${esc(x.kind)}</span><span class="tag">${SEV[x.sev][0]}</span></h3>
+    ${x.a?`<div class="vs"><div><b>Документ говорит:</b><div class="quote">${esc(x.a)}</div></div>
+      <div><b>А здесь говорит иначе:</b><div class="quote">${esc(x.b)}</div></div></div>`:''}
+    ${x.why?`<p class="mut"><b>Почему это важно:</b> ${esc(x.why)}</p>`:''}
+    <div class="box info"><b>Формулировка вопроса:</b> ${esc(x.ask)}</div>
+    <div class="qgrid">
+      <label>Статус
+        <select class="mini qf" data-id="${esc(x.id)}" data-f="st">
+          ${Q_ST.map(([v,n])=>`<option value="${v}"${v===stOf(x.id)?' selected':''}>${n}</option>`).join('')}</select></label>
+      <label>Ответ Заказчика
+        <textarea class="mini qf" data-id="${esc(x.id)}" data-f="ans" rows="2"
+          placeholder="что ответили — дословно, с датой и от кого">${esc(ansOf(x.id))}</textarea></label>
+      <label>Комментарий инженера
+        <textarea class="mini qf" data-id="${esc(x.id)}" data-f="eng" rows="2"
+          placeholder="что с этим делаем в проекте">${esc(engOf(x.id))}</textarea></label>
+    </div>
+  </div>`).join('') || '<div class="box mut">Под фильтр ничего не попало</div>';
+  const answered = QS.items.filter(x=>ansOf(x.id).trim()).length;
+  document.getElementById('qcount').textContent =
+    `${rows.length} из ${QS.items.length}${rows.length>300?' (показаны первые 300)':''} · с ответом ${answered}`;
+}
+function qExport(){
+  const out = {updated:new Date().toISOString().slice(0,10), who:QA.who||'', ans:{}, eng:{}, st:{}};
+  for(const x of QS.items){
+    if(ansOf(x.id).trim()) out.ans[x.id]=ansOf(x.id);
+    if(engOf(x.id).trim()) out.eng[x.id]=engOf(x.id);
+    if(stOf(x.id)) out.st[x.id]=stOf(x.id);
+  }
+  const blob = new Blob([JSON.stringify(out,null,1)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='ove_answers_'+new Date().toISOString().slice(0,10)+'.json'; a.click();
+}
+function qCSV(){
+  const lines=['id;важность;лот;тип;вопрос;формулировка;статус;ответ заказчика;комментарий инженера'];
+  for(const x of QS.items) lines.push([x.id,SEV[x.sev][0],x.lot,x.kind,x.title,x.ask,
+    (Object.fromEntries(Q_ST))[stOf(x.id)],ansOf(x.id),engOf(x.id)]
+    .map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(';'));
+  const blob=new Blob(["﻿"+lines.join('\r\n')],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='ove_voprosy.csv'; a.click();
+}
+function qImport(inp){
+  const f=inp.files&&inp.files[0]; if(!f) return;
+  f.text().then(t=>{ try{ const e=JSON.parse(t);
+    Object.assign(QA.ans,e.ans||{}); Object.assign(QA.eng,e.eng||{}); Object.assign(QA.st,e.st||{});
+    saveQA(); qPaint();
+  }catch(err){ alert('Не удалось прочитать файл ответов: '+err.message); } });
+}
+function qLetter(){
+  const pick = QS.items.filter(x=>['blocker','major','minor'].includes(x.sev) && stOf(x.id)!=='closed');
+  const txt = 'Запрос разъяснений по конкурсной документации\n'
+    + 'Объект: АО «Кольская ГМК», комплекс ОВЭ-75, Базовый инжиниринг\n'
+    + 'Основание: ТЗ на БИ v3.6, приложения №1–7\n\n'
+    + 'В ходе проработки конкурсной документации выявлены расхождения и вопросы,\n'
+    + 'требующие разъяснения Заказчика до подачи предложения.\n\n'
+    + pick.map((x,i)=>`${i+1}. ${x.title}\n`
+        + (x.a?`   Источник А: ${x.a}\n   Источник Б: ${x.b}\n`:'')
+        + (x.why?`   Обоснование: ${x.why}\n`:'')
+        + `   Вопрос: ${x.ask}\n`).join('\n');
+  const blob=new Blob([txt],{type:'text/plain;charset=utf-8'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='ove_zapros_zakazchiku.txt'; a.click();
+}
+function bindQ(){
+  ['qsev','qlot','qst'].forEach(id=>document.getElementById(id)
+    .addEventListener('change', e=>{ qFilter[id.slice(1)]=e.target.value; qPaint(); }));
+  document.getElementById('qq').addEventListener('input', e=>{ qFilter.q=e.target.value; qPaint(); });
+  const root=document.getElementById('qbody');
+  const upd = e => { const el=e.target.closest('.qf'); if(!el) return;
+    QA[el.dataset.f][el.dataset.id]=el.value; saveQA();
+    if(el.dataset.f==='st'||el.dataset.f==='ans') qPaint(); };
+  root.addEventListener('change', upd);
+  root.addEventListener('input', e=>{ const el=e.target.closest('textarea.qf'); if(!el) return;
+    QA[el.dataset.f][el.dataset.id]=el.value; saveQA(); });
+  document.getElementById('qexp').addEventListener('click', qExport);
+  document.getElementById('qcsv').addEventListener('click', qCSV);
+  document.getElementById('qlet').addEventListener('click', qLetter);
+  document.getElementById('qimp').addEventListener('change', function(){ qImport(this); });
+  qPaint();
+}
+function rQ(){
+  if(!QS) return '<div class="box warn">Реестр собирается.</div>';
+  const c = QS.counts;
+  return `
+  <div class="box warn"><b>Зачем эта вкладка.</b> Всё, что расходится внутри документов Заказчика или требует
+  разъяснения, собрано в один реестр. По каждому пункту — где именно противоречие, почему это важно и
+  готовая формулировка вопроса. Ответы Заказчика и комментарии инженеров вносятся прямо здесь: они
+  сохраняются в вашем браузере, «⬇ ответы» выгружает их файлом. Собранные файлы возвращаются в общую
+  версию, и тогда ответы видит вся команда, а не только тот, кто их вписал.</div>
+  <div class="k">
+    <div class="tile"><b class="hi">${c.blocker}</b><span>блокирующих — без ответа нельзя проектировать</span></div>
+    <div class="tile"><b class="mid">${c.major}</b><span>существенных — влияют на решения и стоимость</span></div>
+    <div class="tile"><b>${c.minor}</b><span>формальных — всплывут на экспертизе</span></div>
+    <div class="tile"><b>${c.open}</b><span>открытых вопросов из проработки БИ</span></div>
+  </div>
+  <div class="filters">
+    <input type="text" id="qq" placeholder="Поиск по вопросам и ответам…">
+    <select id="qsev"><option value="">Любая важность</option>${Object.entries(SEV).map(([k,v])=>`<option value="${k}">${v[0]}</option>`).join('')}</select>
+    <select id="qlot"><option value="">Все лоты</option>${[1,2,3,4].map(n=>`<option value="${n}">Лот №${n}</option>`).join('')}<option value="0">Общие</option></select>
+    <select id="qst"><option value="">Любой статус</option>${Q_ST.map(([v,n])=>`<option value="${v}">${n}</option>`).join('')}</select>
+    <button class="btn" id="qlet" title="письмо со всеми незакрытыми разночтениями">⬇ запрос Заказчику</button>
+    <button class="btn" id="qcsv">⬇ CSV</button>
+    <button class="btn" id="qexp" title="ответы и комментарии — файлом">⬇ ответы</button>
+    <label class="btn" style="cursor:pointer">⬆ импорт<input type="file" accept=".json" id="qimp" style="display:none"></label>
+    <span class="count" id="qcount"></span>
+  </div>
+  <div id="qbody"></div>`;
+}
+
+/* ================= Партнёр Tianxin (в составе вкладки «Партнёр») ================= */
+function rTianxin(){
+  if(!TX) return '';
+  const kc = k => k==='факт'?'<span class="tag lot3">факт</span>'
+    : k==='самодекларация'?'<span class="tag lot1">самодекларация</span>':'<span class="tag">оценка</span>';
+  const lv = l => l==='полностью'?'tierA':(l==='частично'?'tierB':'tierC');
+  return `
+  <h2>${esc(TX.name)} — партнёр по линии подготовки основ</h2>
+  <div class="box info">${md(TX.summary).replace(/\n{2,}/g,'</p><p>').replace(/^/,'<p>').replace(/$/,'</p>')}</div>
+  <div class="card"><h3>Роль в заявке</h3>
+    <p><b>${esc(TX.role.recommendation)}</b></p><p>${esc(TX.role.why)}</p>
+    <p><b>Как оформить:</b> ${esc(TX.role.structure)}</p></div>
+  <h3>Покрытие позиций Лота №3</h3>
+  <div class="tblwrap"><table><thead><tr><th>Позиция</th><th>Закрывают</th><th>Обоснование</th></tr></thead>
+  <tbody>${TX.coverage.map(c=>`<tr><td><b>${esc(c.position)}</b></td><td class="${lv(c.level)}">${esc(c.level)}</td>
+    <td class="mut">${esc(c.why)}</td></tr>`).join('')}</tbody></table></div>
+  <h3>Профиль</h3>
+  <div class="tblwrap"><table><thead><tr><th>Факт</th><th>Тип</th><th>Источник</th></tr></thead>
+  <tbody>${TX.profile.map(p=>`<tr><td>${esc(p.fact)}</td><td>${kc(p.kind)}</td>
+    <td class="mut">${srcLink(p.src)}${p.checked?` · ${esc(p.checked)}`:''}</td></tr>`).join('')}</tbody></table></div>
+  ${(TX.refs||[]).length?`<h3>Референсы</h3><div class="tblwrap"><table><thead><tr><th>Проект</th><th>Заказчик</th><th>Мощность</th><th>Год</th><th>Тип</th><th>Источник</th></tr></thead>
+  <tbody>${TX.refs.map(r=>`<tr><td><b>${esc(r.project)}</b></td><td>${esc(r.customer||'—')}</td><td>${esc(r.capacity||'—')}</td>
+    <td>${esc(r.year||'—')}</td><td>${kc(r.kind)}</td><td class="mut">${srcLink(r.src)}</td></tr>`).join('')}</tbody></table></div>`:''}
+  <h3>Что запросить у них сейчас</h3><ol>${TX.request_docs.map(d=>`<li>${esc(d)}</li>`).join('')}</ol>
+  <h3>Риски по этой компании</h3>
+  ${TX.risks.map(r=>`<div class="card"><h3>${esc(r.title)}</h3><p>${esc(r.text)}</p>
+    <p><b>Что делать:</b> ${esc(r.mitigation)}</p></div>`).join('')}
+  ${TX.letter?`<h3>Письмо-реактивация контакта</h3>
+    <div class="card"><p><b>Тема:</b> ${esc(TX.letter.subject)}</p>
+    <pre class="letter">${esc(TX.letter.body)}</pre></div>`:''}`;
+}
+
+/* ================= ПО: сами или подряд ================= */
+function rSoft(){
+  if(!SW) return `<div class="box warn"><b>Раздел собирается.</b> Разбор по каждому программному компоненту проекта — прикладное ПО контроллеров Regul и АБАК, верхний уровень Alpha.Scada, контур машинного обучения для обжига, ППО электролиза с машинным зрением, АСУ склада с адресным хранением, АИС весоизмерения с интеграцией в PIMS, ЦИМ на российском BIM-стеке — что разрабатывать своими силами, что отдавать на подряд российскому интегратору, а где есть готовое решение. С трудоёмкостью, сроком, ценой и вердиктом по каждому.</div>`;
+  const vc = {'сами':'tierA','гибрид':'tierB','подряд':'tierC','коробка':'tierA'};
+  const cnt={}; SW.components.forEach(c=>{cnt[c.verdict]=(cnt[c.verdict]||0)+1});
+  return `
+  <div class="box info">${md(SW.summary).replace(/\n{2,}/g,'</p><p>').replace(/^/,'<p>').replace(/$/,'</p>')}</div>
+  <div class="k">${Object.entries(cnt).map(([v,n])=>`<div class="tile"><b class="${vc[v]||''}">${n}</b><span>${esc(v)}</span></div>`).join('')}
+    <div class="tile"><b>${SW.components.length}</b><span>компонентов</span></div></div>
+  ${SW.constraint?`<div class="box amber"><b>Ограничение, которое определяет всё.</b> ${esc(SW.constraint.text)}
+    <ul>${(SW.constraint.impact||[]).map(i=>`<li>${esc(i)}</li>`).join('')}</ul></div>`:''}
+  ${SW.components.map(c=>`<div class="card">
+    <h3>${c.n}. ${esc(c.name)} ${lotTag(c.lot)} <span class="${vc[c.verdict]||''}">${esc(c.verdict)}</span></h3>
+    <p>${esc(c.what)}</p><p><b>Почему так:</b> ${esc(c.why)}</p>
+    <div class="grid2">
+      <div class="card" style="margin:0"><h3>Своими силами</h3>
+        <p><b>${esc(c.self.team||'')}</b> · ${esc(c.self.months||'')} · ${esc(c.self.cost||'')}</p>
+        <p class="mut">${(c.self.skills||[]).map(esc).join(' · ')}</p>
+        ${(c.self.risks||[]).length?`<ul class="mut">${c.self.risks.map(r=>`<li>${esc(r)}</li>`).join('')}</ul>`:''}</div>
+      <div class="card" style="margin:0"><h3>Подряд</h3>
+        <p><b>${esc(c.outsource.cost||'')}</b> · ${esc(c.outsource.months||'')}</p>
+        <p class="mut">${(c.outsource.who||[]).map(esc).join(' · ')||'—'}</p>
+        ${(c.outsource.risks||[]).length?`<ul class="mut">${c.outsource.risks.map(r=>`<li>${esc(r)}</li>`).join('')}</ul>`:''}
+        ${c.outsource.src?`<p class="mut">${srcLink(c.outsource.src)}</p>`:''}</div>
+    </div>
+    ${c.boxed?`<div class="box"><b>Готовое решение:</b> ${c.boxed.exists?'есть':'нет'} — ${esc(c.boxed.note||'')}</div>`:''}
+  </div>`).join('')}
+  ${(SW.rates||[]).length?`<h2>Рыночные ставки, на которых считали</h2>
+    <div class="tblwrap"><table><thead><tr><th>Роль</th><th>Ставка</th><th>Источник</th></tr></thead>
+    <tbody>${SW.rates.map(r=>`<tr><td>${esc(r.role)}</td><td><b>${esc(r.rate)}</b></td>
+    <td class="mut">${srcLink(r.src)}${r.checked?` · ${esc(r.checked)}`:''}</td></tr>`).join('')}</tbody></table></div>`:''}
+  ${(SW.strategy||[]).length?`<h2>Где КВАНТ создаёт собственную компетенцию</h2>
+    ${SW.strategy.map(s=>`<div class="box"><b>${esc(s.title)}.</b> ${esc(s.text)}</div>`).join('')}`:''}
+  <div class="mut">Обновлено ${esc(SW.updated||'')}.</div>`;
+}
+
 /* ================= Каркас ================= */
 const TABS = [
   ['overview','Обзор'], ['stages','Этапы'], ['blocks','Блоки и лоты'], ['bi','Базовый проект'],
-  ['equip','Оборудование'], ['sup','Поставщики'], ['market','Маркетинг'], ['alt','Альтернатива'],
+  ['equip','Оборудование'], ['questions','Вопросы Заказчику'], ['sup','Поставщики'],
+  ['market','Маркетинг'], ['soft','ПО: сами или подряд'], ['alt','Альтернатива'],
   ['auto','Автоматизация'], ['world','Мировой опыт'], ['china','Китай'],
   ['partner','Партнёр'], ['competitor','Конкурент'], ['tender','Торги за БИ'], ['capex','Стройка · CAPEX']
 ];
-const R = {overview:rOverview, stages:rStages, blocks:rBlocks, bi:rBI, equip:rEquip, sup:rSup,
-           market:rMarket, alt:rAlt, auto:rAuto, world:rWorld, china:rChina,
-           partner:rPartner, competitor:rComp, tender:rTender, capex:rCapex};
+const R = {overview:rOverview, stages:rStages, blocks:rBlocks, bi:rBI, equip:rEquip,
+           questions:rQ, sup:rSup, market:rMarket, soft:rSoft, alt:rAlt, auto:rAuto,
+           world:rWorld, china:rChina, partner:rPartner, competitor:rComp,
+           tender:rTender, capex:rCapex};
 const nav = document.getElementById('nav'), main = document.getElementById('main');
 nav.innerHTML = TABS.map(([id,t])=>`<button data-t="${id}">${esc(t)}</button>`).join('');
 main.innerHTML = TABS.map(([id])=>`<section id="s-${id}"></section>`).join('');
@@ -998,6 +1218,7 @@ function show(id){
     if(id==='capex') bindCapex();
     if(id==='bi') bindBI();
     if(id==='sup') bindSup();
+    if(id==='questions') bindQ();
   }
   location.hash = id;
   window.scrollTo(0,0);
