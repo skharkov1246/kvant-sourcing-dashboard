@@ -50,6 +50,7 @@ OPTIONAL = {
     "__ANSWERS_JSON__": "questions_answers.json",
     "__REFRAME_JSON__": "reframe.json",
     "__DISC_JSON__": "discrepancies.json",
+    "__DELIV_JSON__": "deliverables.json",
 }
 
 
