@@ -155,6 +155,11 @@ footer{padding:0 22px 24px;color:var(--mut);font-size:11.5px}
   <div class="tblwrap"><table><thead><tr><th>Моточасы</th><th>Что делают / что закупается</th></tr></thead><tbody id="pt-int"></tbody></table></div>
   <h3>Системы</h3>
   <div class="acc" id="pt-sys"></div>
+
+  <h3>Ведомости ЗИП по машинам — с количеством на двигатель</h3>
+  <p id="pl-intro"></p>
+  <div class="card"><h4>Как этим пользоваться</h4><ol id="pl-how"></ol></div>
+  <div id="pl-lists"></div>
 </section>
 
 <section id="t-demand">
@@ -317,6 +322,7 @@ const BITRIX   = __BITRIX_JSON__;
 const CUSTOMS  = __CUSTOMS_JSON__;
 const PLAYBOOK = __PLAYBOOK_JSON__;
 const MTCROSS  = __MTCROSS_JSON__;
+const PARTLISTS= __PARTLISTS_JSON__;
 const BUILT_AT = "__BUILT_AT__";
 
 const $ = s => document.querySelector(s);
@@ -458,6 +464,18 @@ function fillSelect(sel, values, allLabel) {
   $("#pt-int-note").innerHTML = esc(PARTS.intervals_note);
   $("#pt-int").innerHTML = PARTS.intervals.map(i =>
     `<tr><td><b>${esc(i.h)}</b></td><td>${esc(i.what)}</td></tr>`).join("");
+  $("#pl-intro").textContent = PARTLISTS.intro;
+  $("#pl-how").innerHTML = PARTLISTS.how_to_use.map(s => `<li>${esc(s)}</li>`).join("");
+  $("#pl-lists").innerHTML = PARTLISTS.lists.map(L => `<div class="card">
+    <h4>${esc(L.engine)}</h4>
+    <div class="mut">${esc(L.source)} ${L.url ? `— <a href="${esc(L.url)}" target="_blank" rel="noopener">источник</a>` : ""}</div>
+    <div class="box warn" style="margin:8px 0">${esc(L.note)}</div>
+    ${L.groups.map(g => `<h4 style="margin-top:12px">${esc(g.name)} <span class="mut">· ${esc(g.en)}</span></h4>
+      <div class="tblwrap"><table><thead><tr><th>Позиция</th><th>Номер</th><th class="num">На двигатель</th><th>Примечание</th></tr></thead>
+      <tbody>${g.rows.map(r => `<tr><td>${esc(r.desc)}</td><td class="mono"><b>${esc(r.pn)}</b></td>
+        <td class="num">${esc(r.qty)}</td><td class="mut">${esc(r.comment || "")}</td></tr>`).join("")}</tbody></table></div>`).join("")}
+  </div>`).join("");
+
   acc($("#pt-sys"), PARTS.systems.map(s => ({
     title: s.name,
     sub: `<span class="pill">${esc(s.crit)}</span>`,

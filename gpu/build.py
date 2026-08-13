@@ -34,6 +34,7 @@ FILES = {
     "__CUSTOMS_JSON__": "customs.json",
     "__PLAYBOOK_JSON__": "playbook.json",
     "__MTCROSS_JSON__": "motortech_cross.json",
+    "__PARTLISTS_JSON__": "partlists.json",
 }
 
 
