@@ -12,6 +12,9 @@ on:
     - cron: "7 */6 * * *"      # backup каждые 6 часов в :07 UTC (реже — экономия минут Actions; GitHub может пропускать)
   push:
     branches: [main]           # коммит в main → немедленная пересборка/деплой
+    paths-ignore: ["ove/**"]   # сайт ОВЭ-75 собирает свой workflow (ove-deploy.yml); его коммиты,
+                               # включая автокоммиты ответов с сайта, дашборд не трогают — не жжём ~8 мин
+                               # Actions на каждый. Согласовано владельцем 13.08.2026.
   workflow_dispatch: {}        # ручной запуск (вкладка Actions / gh workflow run)
 
 permissions:
