@@ -91,6 +91,13 @@ def build() -> None:
     out = OUT / "index.html"
     out.write_text(tpl, encoding="utf-8")
 
+    # сводный Word-документ для выгрузки командой (реестр расхождений + вопросы);
+    # решения из общей базы вшиваются автоматически при каждой пересборке
+    import sys as _sys
+    _sys.path.insert(0, str(ROOT / "tools"))
+    import build_docx
+    build_docx.build()
+
     bx = json.loads((DATA / "bitrix_ove.json").read_text(encoding="utf-8"))
     eq = json.loads((DATA / "equipment.json").read_text(encoding="utf-8"))
     sup = json.loads((DATA / "suppliers.json").read_text(encoding="utf-8"))
