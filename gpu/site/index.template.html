@@ -138,6 +138,89 @@ footer{padding:0 22px 24px;color:var(--mut);font-size:11.5px}
   <div class="card" id="ov-src"></div>
 </section>
 
+<section id="t-strategy">
+  <h2 id="st-title"></h2>
+  <div class="box info" id="st-thesis"></div>
+  <h3>Четыре актива, которые накапливаются</h3>
+  <div class="grid" id="st-assets"></div>
+  <h3>Метрики</h3>
+  <div class="tblwrap"><table><thead><tr><th>Что меряем</th><th class="num">Сейчас</th><th class="num">Цель за квартал</th><th>Зачем</th></tr></thead><tbody id="st-metrics"></tbody></table></div>
+  <h3 id="st-plan-t"></h3>
+  <div id="st-plan"></div>
+  <h3 id="st-funnel-t"></h3>
+  <p id="st-funnel-x"></p>
+  <div class="tblwrap"><table><thead><tr><th>Стадия</th><th>Критерий перехода</th><th>Артефакт</th><th class="num">Сейчас</th></tr></thead><tbody id="st-funnel"></tbody></table></div>
+  <div class="box warn" id="st-funnel-rule"></div>
+  <h3 id="st-trial-t"></h3>
+  <div class="card"><ol id="st-trial"></ol><div class="note" id="st-trial-why"></div></div>
+  <h3>Принципы</h3>
+  <div class="card"><ul id="st-principles"></ul></div>
+</section>
+
+<section id="t-market">
+  <h2>Рынок и ёмкость</h2>
+  <p id="mk-intro"></p>
+  <div class="box warn" id="mk-persp"></div>
+  <div class="card"><h4>Как считаем</h4><div id="mk-method"></div></div>
+  <div class="tblwrap"><table><thead><tr><th>Периметр</th><th class="num">МВт</th><th class="num">$ в год</th><th>Комментарий</th></tr></thead><tbody id="mk-size"></tbody></table></div>
+  <h3>Сегменты</h3>
+  <div id="mk-seg"></div>
+  <h3>Почему у нас есть шанс</h3>
+  <div class="card"><ul id="mk-win"></ul></div>
+  <h3>Риски</h3>
+  <div id="mk-risks"></div>
+  <h3>Конкуренты</h3>
+  <p id="cp-intro"></p>
+  <div id="cp-land"></div>
+  <div class="box info" id="cp-pos"></div>
+  <div class="card"><h4>Что делает нас экспертом</h4><ul id="cp-exp"></ul></div>
+</section>
+
+<section id="t-fleet">
+  <h2>Парк ГПУ в России</h2>
+  <p id="fl-intro"></p>
+  <div class="box warn" id="fl-status"></div>
+  <div class="box info" id="fl-insight"></div>
+  <h3>Опорные цифры источников</h3>
+  <div id="fl-anchors"></div>
+  <div class="k" id="fl-tiles"></div>
+  <h3>Реестр объектов</h3>
+  <div class="filters">
+    <div class="f-field"><label>поиск</label><input id="fl-q" placeholder="владелец, объект…"></div>
+    <div class="f-field"><label>сегмент</label><select id="fl-seg"></select></div>
+    <span class="count" id="fl-count"></span>
+  </div>
+  <div class="tblwrap"><table class="sortable" id="fl-tbl"><thead><tr>
+    <th data-k="name">Объект</th><th data-k="owner">Владелец</th><th data-k="mw" class="num">МВт</th>
+    <th data-k="seg">Сегмент</th><th data-k="status">Статус</th></tr></thead><tbody id="fl-body"></tbody></table></div>
+  <h3>Как достроить реестр</h3>
+  <div class="card"><ol id="fl-how"></ol></div>
+</section>
+
+<section id="t-consum">
+  <h2>Модель потребления: из моточасов в деньги</h2>
+  <p class="mut" id="cn-src"></p>
+  <div class="box info" id="cn-method"></div>
+  <div class="k" id="cn-tiles"></div>
+  <h3>Допущения — их и надо оспаривать</h3>
+  <div class="tblwrap"><table><thead><tr><th>Параметр</th><th>Значение</th><th>Пояснение</th></tr></thead><tbody id="cn-assum"></tbody></table></div>
+  <h3>Годовое потребление по машинам</h3>
+  <p class="mut">Клик по строке — раскладка по позициям.</p>
+  <div class="tblwrap"><table class="sortable" id="cn-tbl"><thead><tr>
+    <th data-k="model">Машина</th><th data-k="oem">OEM</th><th data-k="cyl" class="num">Цил.</th>
+    <th data-k="kwe" class="num">кВт эл.</th><th data-k="gas_name">Газ</th>
+    <th data-k="usd_year" class="num">$ ЗИП в год</th><th data-k="usd_per_kw_year" class="num">$/кВт</th>
+    <th data-k="usd_per_mwh" class="num">$/МВт·ч</th></tr></thead><tbody id="cn-body"></tbody></table></div>
+  <div id="cn-detail"></div>
+  <h3>Складская стратегия</h3>
+  <p id="sk-intro"></p>
+  <div class="box info" id="sk-pareto"></div>
+  <div class="tblwrap"><table><thead><tr><th>Позиция</th><th class="num">шт/год</th><th class="num">$/год</th><th class="num">доля</th></tr></thead><tbody id="sk-top"></tbody></table></div>
+  <div class="card"><h4>Правила</h4><ul id="sk-rules"></ul></div>
+  <div id="sk-tiers"></div>
+  <div class="box" id="sk-first"></div>
+</section>
+
 <section id="t-models">
   <h2>Машины</h2>
   <p class="mut" id="md-src"></p>
@@ -332,6 +415,12 @@ const PLAYBOOK = __PLAYBOOK_JSON__;
 const MTCROSS  = __MTCROSS_JSON__;
 const PARTLISTS= __PARTLISTS_JSON__;
 const LOTREVIEW= __LOTREVIEW_JSON__;
+const FLEET    = __FLEET_JSON__;
+const CONSUM   = __CONSUMPTION_JSON__;
+const MARKET   = __MARKET_JSON__;
+const COMPET   = __COMPETITORS_JSON__;
+const STOCK    = __STOCK_JSON__;
+const STRATEGY = __STRATEGY_JSON__;
 const BUILT_AT = "__BUILT_AT__";
 
 const $ = s => document.querySelector(s);
@@ -343,7 +432,9 @@ $("#built").textContent = BUILT_AT; $("#built2").textContent = BUILT_AT;
 
 /* ── вкладки ───────────────────────────────────────────────────────────── */
 const TABS = [
-  ["t-over", "Обзор"], ["t-models", "Машины"], ["t-parts", "Номенклатура"],
+  ["t-over", "Обзор"], ["t-strategy", "Стратегия"], ["t-market", "Рынок"],
+  ["t-fleet", "Парк"], ["t-consum", "Потребление"],
+  ["t-models", "Машины"], ["t-parts", "Номенклатура"],
   ["t-demand", "Наш спрос"], ["t-analogs", "Аналоги"], ["t-subs", "Субпоставщики"],
   ["t-sup", "Поставщики"], ["t-chan", "Каналы"], ["t-pn", "Шифровки PN"],
   ["t-bx", "Наши запросы"], ["t-cust", "Таможня"], ["t-play", "Плейбук"],
@@ -448,6 +539,159 @@ function fillSelect(sel, values, allLabel) {
     <p><b>Поставщики.</b> ${esc(SUPPLIERS.source)}</p>
     <p><b>Bitrix.</b> ${esc(BITRIX.source)}</p>
     <p class="mut">Где источник не проверен или проверка не удалась — это написано прямо в карточке (значок ⚠). Ничего не додумано.</p>`;
+})();
+
+/* ── Стратегия ─────────────────────────────────────────────────────────── */
+(function () {
+  const T = STRATEGY;
+  $("#st-title").textContent = T.thesis.title;
+  $("#st-thesis").innerHTML = esc(T.thesis.text);
+  $("#st-assets").innerHTML = T.thesis.four_assets.map(a => `<div class="card">
+    <h4>${esc(a.name)}</h4>
+    <div><span class="pill">сейчас</span> ${esc(a.now)}</div>
+    <div style="margin-top:3px"><span class="pill a">цель</span> ${esc(a.goal)}</div>
+    <div class="note" style="margin-top:6px">${esc(a.how)}</div></div>`).join("");
+  $("#st-metrics").innerHTML = T.metrics.map(m => `<tr><td><b>${esc(m.name)}</b></td>
+    <td class="num">${num(m.now)}</td><td class="num"><b>${num(m.q1)}</b></td>
+    <td class="mut">${esc(m.why)}</td></tr>`).join("");
+  $("#st-plan-t").textContent = T.plan_90.title;
+  $("#st-plan").innerHTML = T.plan_90.blocks.map(b => `<div class="card">
+    <h4>${esc(b.period)}</h4><ol>${b.items.map(i => `<li>${esc(i)}</li>`).join("")}</ol></div>`).join("");
+  $("#st-funnel-t").textContent = T.supplier_funnel.title;
+  $("#st-funnel-x").textContent = T.supplier_funnel.text;
+  $("#st-funnel").innerHTML = T.supplier_funnel.stages.map(s => `<tr>
+    <td><b>${s.stage}. ${esc(s.name)}</b></td><td>${esc(s.criteria)}</td>
+    <td class="mut">${esc(s.artifact)}</td>
+    <td class="num"><span class="pill ${s.now ? "a" : "lo"}">${s.now}</span></td></tr>`).join("");
+  $("#st-funnel-rule").innerHTML = "<b>Правило.</b> " + esc(T.supplier_funnel.rule);
+  $("#st-trial-t").textContent = T.trial_protocol.title;
+  $("#st-trial").innerHTML = T.trial_protocol.steps.map(s => `<li>${esc(s)}</li>`).join("");
+  $("#st-trial-why").innerHTML = "<b>Зачем.</b> " + esc(T.trial_protocol.why);
+  $("#st-principles").innerHTML = T.principles.map(p => `<li>${esc(p)}</li>`).join("");
+})();
+
+/* ── Рынок и конкуренты ────────────────────────────────────────────────── */
+(function () {
+  $("#mk-intro").textContent = MARKET.intro;
+  $("#mk-persp").innerHTML = `<b>${esc(MARKET.perspective.title)}.</b> ${esc(MARKET.perspective.text)}`;
+  $("#mk-method").innerHTML = `<p class="mono">${esc(MARKET.method.formula)}</p>
+    <p><b>Парк.</b> ${esc(MARKET.method.fleet)}</p>
+    <p><b>Удельный расход.</b> ${esc(MARKET.method.rate)}</p>
+    <p class="note">${esc(MARKET.method.honesty)}</p>`;
+  const mln = v => "$" + (v / 1e6).toFixed(1) + " млн";
+  $("#mk-size").innerHTML = MARKET.sizing.map(s => `<tr>
+    <td><b>${esc(s.scope)}</b></td>
+    <td class="num">${num(s.mw_lo)} – ${num(s.mw_hi)}</td>
+    <td class="num"><b>${mln(s.usd_lo)} – ${mln(s.usd_hi)}</b></td>
+    <td class="mut">${esc(s.note)}</td></tr>`).join("");
+  $("#mk-seg").innerHTML = MARKET.segments.map(s => `<div class="card">
+    <h4>${esc(s.name)} <span class="pill">${esc(s.share)}</span></h4>
+    <p>${esc(s.why)}</p>
+    <p class="mut"><b>Кто:</b> ${esc(s.who)}</p>
+    <div class="note"><b>Наш доступ:</b> ${esc(s.our_access)}</div></div>`).join("");
+  $("#mk-win").innerHTML = MARKET.why_we_can_win.map(w => `<li>${esc(w)}</li>`).join("");
+  $("#mk-risks").innerHTML = MARKET.risks.map(r => `<div class="card">
+    <h4>${esc(r.risk)}</h4><div class="note">${esc(r.mitigation)}</div></div>`).join("");
+
+  $("#cp-intro").textContent = COMPET.intro;
+  $("#cp-land").innerHTML = COMPET.landscape.map(l => `<div class="card">
+    <h4>${esc(l.type)}</h4>
+    <div style="margin:4px 0">${l.who.map(w => `<span class="tag">${esc(w)}</span>`).join("")}</div>
+    <p><b>Сильны:</b> ${esc(l.strength)}</p>
+    <p><b>Слабы:</b> ${esc(l.weakness)}</p>
+    <div class="note"><b>Наш ход:</b> ${esc(l.our_move)}</div></div>`).join("");
+  $("#cp-pos").innerHTML = `<b>${esc(COMPET.positioning.title)}.</b> ${esc(COMPET.positioning.text)}
+    <ul style="margin-top:6px">${COMPET.positioning.proof_points.map(p => `<li>${esc(p)}</li>`).join("")}</ul>`;
+  $("#cp-exp").innerHTML = COMPET.what_makes_us_expert.map(p => `<li>${esc(p)}</li>`).join("");
+})();
+
+/* ── Парк ──────────────────────────────────────────────────────────────── */
+(function () {
+  $("#fl-intro").textContent = FLEET.intro;
+  $("#fl-status").innerHTML = "<b>Статус сбора.</b> " + esc(FLEET.status) + `<div class="mut" style="margin-top:4px">${esc(FLEET.source)}</div>`;
+  $("#fl-insight").innerHTML = `<b>${esc(FLEET.insight.title)}.</b> ${esc(FLEET.insight.text)}
+    <div class="note" style="margin-top:6px"><b>Доказательство:</b> ${esc(FLEET.insight.proof)}</div>
+    <div class="note" style="margin-top:4px"><b>Что делать:</b> ${esc(FLEET.insight.action)}</div>`;
+  $("#fl-anchors").innerHTML = FLEET.anchors.map(a => `<div class="card">
+    <p>${esc(a.claim)}</p>
+    <div class="note"><b>Что это нам даёт:</b> ${esc(a.why)}</div>
+    ${a.url ? `<div class="mut" style="margin-top:4px"><a href="${esc(a.url)}" target="_blank" rel="noopener">${esc(a.url)}</a></div>` : ""}</div>`).join("");
+  const E = FLEET.estimate;
+  $("#fl-tiles").innerHTML = [
+    [E.collected_objects, "объектов собрано"], [num(Math.round(E.collected_mw)) + " МВт", "суммарно"],
+    [E.avg_mw + " МВт", "средний объект"], [E.catalogue_total, "объектов в каталоге"],
+    [num(E.range_mw[0]) + "–" + num(E.range_mw[1]) + " МВт", "оценка парка РФ"],
+  ].map(([b, s]) => `<div class="tile"><b>${esc(b)}</b><span>${esc(s)}</span></div>`).join("");
+  fillSelect($("#fl-seg"), [...new Set(FLEET.objects.map(o => o.seg))].sort(), "все сегменты");
+  const rows = () => FLEET.objects.filter(o => {
+    const seg = $("#fl-seg").value; if (seg && o.seg !== seg) return false;
+    const q = $("#fl-q").value.trim().toLowerCase();
+    return !q || (o.name + " " + o.owner).toLowerCase().includes(q);
+  });
+  function render(list) {
+    $("#fl-count").textContent = `${list.length} из ${FLEET.objects.length} · ${Math.round(list.reduce((s, o) => s + o.mw, 0))} МВт`;
+    $("#fl-body").innerHTML = list.map(o => `<tr${o.flag ? ' style="background:color-mix(in srgb,var(--warn) 12%,transparent)"' : ""}>
+      <td><b>${esc(o.name)}</b>${o.flag ? `<div class="mut">${esc(o.flag)}</div>` : ""}</td>
+      <td>${esc(o.owner)}</td><td class="num">${o.mw}</td>
+      <td><span class="tag">${esc(o.seg)}</span></td><td class="mut">${esc(o.status)}</td></tr>`).join("");
+  }
+  const paint = sortable($("#fl-tbl"), rows, render, "mw");
+  $("#fl-q").oninput = paint; $("#fl-seg").onchange = paint; paint();
+  $("#fl-how").innerHTML = FLEET.how_to_complete.map(h => `<li>${esc(h)}</li>`).join("");
+})();
+
+/* ── Потребление и склад ───────────────────────────────────────────────── */
+(function () {
+  $("#cn-src").textContent = CONSUM.source;
+  $("#cn-method").innerHTML = "<b>Метод.</b> " + esc(CONSUM.assumptions.method) +
+    "<br><b>Цены.</b> " + esc(CONSUM.assumptions.prices);
+  $("#cn-tiles").innerHTML = [
+    [CONSUM.hours_per_year + " ч", "наработка в год (база)"],
+    ["$" + CONSUM.avg_usd_per_kw_year, "средний расход ЗИП на кВт в год"],
+    [CONSUM.engines.length, "просчитанных машин"],
+  ].map(([b, s]) => `<div class="tile"><b>${esc(b)}</b><span>${esc(s)}</span></div>`).join("");
+  const A = CONSUM.assumptions;
+  $("#cn-assum").innerHTML =
+    `<tr><td><b>Наработка</b></td><td class="num">${A.hours_per_year.base} ч/год</td><td>${esc(A.hours_per_year.note)}</td></tr>` +
+    Object.values(A.gas_severity).map(g =>
+      `<tr><td><b>${esc(g.name)}</b></td><td class="num">×${g.k}</td><td>${esc(g.note)}</td></tr>`).join("");
+
+  const rows = () => CONSUM.engines;
+  function render(list) {
+    $("#cn-body").innerHTML = list.map(e => `<tr data-m="${esc(e.model)}" style="cursor:pointer">
+      <td><b>${esc(e.model)}</b></td><td>${esc(e.oem)}</td><td class="num">${e.cyl}</td>
+      <td class="num">${num(e.kwe)}</td><td class="mut">${esc(e.gas_name)}</td>
+      <td class="num"><b>${usd(e.usd_year)}</b></td><td class="num">${e.usd_per_kw_year}</td>
+      <td class="num">${e.usd_per_mwh}</td></tr>`).join("");
+    $("#cn-body").querySelectorAll("tr").forEach(tr => tr.onclick = () => {
+      const e = CONSUM.engines.find(x => x.model === tr.dataset.m);
+      $("#cn-detail").innerHTML = `<div class="card"><h4>${esc(e.model)} — что съедает за год</h4>
+        <div class="mut">${e.cyl} цилиндров · ${num(e.kwe)} кВт эл. · ${esc(e.gas_name)} · ${CONSUM.hours_per_year} ч/год</div>
+        <div class="tblwrap"><table><thead><tr><th>Позиция</th><th class="num">шт/год</th>
+        <th class="num">интервал, ч</th><th class="num">$/шт</th><th class="num">$/год</th></tr></thead>
+        <tbody>${e.items.map(i => `<tr><td>${esc(i.name)}${i.note ? `<div class="mut">${esc(i.note)}</div>` : ""}</td>
+          <td class="num">${i.qty_year}</td><td class="num">${num(i.interval)}</td>
+          <td class="num">${usd(i.usd_unit)}</td><td class="num"><b>${usd(i.usd_year)}</b></td></tr>`).join("")}</tbody>
+        </table></div></div>`;
+      $("#cn-detail").scrollIntoView({ behavior: "smooth", block: "nearest" });
+    });
+  }
+  sortable($("#cn-tbl"), rows, render, "usd_year")();
+
+  $("#sk-intro").textContent = STOCK.intro;
+  $("#sk-pareto").innerHTML = `<b>${esc(STOCK.pareto.title)}.</b> ${esc(STOCK.pareto.text)}
+    <div class="mut" style="margin-top:4px">Опорный парк — ${STOCK.reference.fleet_mw} МВт, ${usd(STOCK.reference.usd_year)} в год. ${esc(STOCK.reference.note)}</div>`;
+  $("#sk-top").innerHTML = STOCK.pareto.top.map(t => `<tr><td><b>${esc(t.name)}</b></td>
+    <td class="num">${num(t.qty)}</td><td class="num">${usd(t.usd)}</td>
+    <td class="num"><b>${t.share} %</b></td></tr>`).join("");
+  $("#sk-rules").innerHTML = STOCK.rules.map(r => `<li>${esc(r)}</li>`).join("");
+  $("#sk-tiers").innerHTML = STOCK.tiers.map(t => `<div class="card">
+    <h4>${esc(t.tier)}</h4><p class="mut">${esc(t.why)}</p>
+    <div class="tblwrap"><table><thead><tr><th>Позиция</th><th class="num">шт/год</th><th>Почему</th></tr></thead>
+    <tbody>${t.items.map(i => `<tr><td><b>${esc(i.name)}</b></td><td class="num">${num(i.qty_year)}</td>
+      <td>${esc(i.why)}</td></tr>`).join("")}</tbody></table></div></div>`).join("");
+  $("#sk-first").innerHTML = `<b>${esc(STOCK.first_stock.title)}.</b> ${esc(STOCK.first_stock.text)}
+    <div class="note" style="margin-top:6px">${esc(STOCK.first_stock.candidates)}</div>`;
 })();
 
 /* ── Машины ────────────────────────────────────────────────────────────── */
