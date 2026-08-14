@@ -154,6 +154,7 @@ const ANS = __ANSWERS_JSON__;   // ответы, уже сведённые в о
 const RF = __REFRAME_JSON__;
 const DISC = __DISC_JSON__;
 const DELIV = __DELIV_JSON__;
+const CALC = __CALC_JSON__;
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const nf = (n,d=0) => (n===''||n===null||n===undefined||isNaN(n)) ? '—' : Number(n).toLocaleString('ru-RU',{minimumFractionDigits:d,maximumFractionDigits:d});
@@ -1454,16 +1455,88 @@ function rDeliv(){
   <div id="vbody"></div>`;
 }
 
+/* ============ Расчёты: независимая модель КВАНТ против ИД ============ */
+const RC_V = {ok:['сходится','lot3'], warn:['в допуске','lot2'], question:['вопрос','lot1']};
+const RC_SEV = {info:['к сведению','tag'], minor:['уточнить','tag lot2'], major:['важно','tag lot1']};
+let rcF = {lot:'', v:''};
+function rcN(x){
+  if(x===null||x===undefined) return '';
+  const a = Math.abs(x);
+  const d = a>=1000?0:(a>=10?1:(a>=1?2:3));
+  return x.toLocaleString('ru-RU',{maximumFractionDigits:d});
+}
+function rcRows(){
+  return CALC.blocks.filter(b =>
+    (rcF.lot===''||String(b.lot)===rcF.lot) &&
+    (rcF.v===''||b.checks.some(c=>c.verdict===rcF.v)));
+}
+function rcPaint(){
+  const el = document.getElementById('rcbody'); if(!el) return;
+  const rows = rcRows();
+  el.innerHTML = rows.map(b=>`<div class="card qcard">
+    <h3><span class="tag">${esc(b.id)}</span> ${esc(b.title)} ${b.lot?lotTag(b.lot):'<span class="tag">комплекс</span>'}</h3>
+    <p class="mut"><b>Входные данные:</b> ${b.inputs.map(i=>`${esc(i.n)}: ${esc(i.v)} <i>(${esc(i.src)})</i>`).join(' · ')}</p>
+    <div class="box info" style="font-size:12.5px">${b.steps.map(s=>`<div><b>${esc(s.d)}:</b> ${esc(s.f)}</div>`).join('')}</div>
+    <div class="tblwrap"><table><thead><tr><th>Проверка</th><th>Наш расчёт</th><th>Значение ИД</th><th>Δ, %</th><th></th></tr></thead><tbody>
+      ${b.checks.map(c=>`<tr><td>${esc(c.what)}${c.comment?`<div class="mut">${esc(c.comment)}</div>`:''}</td>
+        <td>${rcN(c.ours)}</td><td>${rcN(c.idv)}</td>
+        <td>${c.dev>0?'+':''}${String(c.dev).replace('.',',')}</td>
+        <td><span class="tag ${RC_V[c.verdict][1]}">${RC_V[c.verdict][0]}</span></td></tr>`).join('')}
+    </tbody></table></div>
+    <p><b>Вывод:</b> ${esc(b.concl)}</p>
+  </div>`).join('') || '<div class="box mut">Под фильтр ничего не попало</div>';
+  document.getElementById('rccount').textContent = `${rows.length} из ${CALC.blocks.length} блоков`;
+}
+function rcLetter(){
+  const txt = 'Находки независимого пересчёта БИ ОВЭ-75 (КВАНТ) — вопросы к ИД\n\n'
+    + CALC.flags.map((f,i)=>`${i+1}. [${f.id}] ${f.t}\n   ${f.d}\n`).join('\n')
+    + '\nПолные расчёты: вкладка «Расчёты» и записка ove75-raschet.docx.';
+  const blob = new Blob([txt],{type:'text/plain;charset=utf-8'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='ove_raschet_voprosy.txt'; a.click();
+}
+function bindRasch(){
+  if(!CALC) return;
+  document.getElementById('rclot').addEventListener('change', e=>{ rcF.lot=e.target.value; rcPaint(); });
+  document.getElementById('rcv').addEventListener('change', e=>{ rcF.v=e.target.value; rcPaint(); });
+  document.getElementById('rclet').addEventListener('click', rcLetter);
+  rcPaint();
+}
+function rRasch(){
+  if(!CALC) return '<div class="box warn">Раздел собирается.</div>';
+  const s = CALC.summary;
+  return `
+  <div class="box warn"><b>Что это.</b> ${esc(CALC.note)}</div>
+  <div class="k">
+    <div class="tile"><b>${s.blocks}</b><span>расчётных блоков</span></div>
+    <div class="tile"><b style="color:var(--good)">${s.ok}</b><span>сверок сходится (≤1,5 %)</span></div>
+    <div class="tile"><b class="mid">${s.warn}</b><span>в допуске модели</span></div>
+    <div class="tile"><b class="hi">${s.question}</b><span>вопросов к ИД</span></div>
+    <div class="tile"><b>${s.flags}</b><span>находок для Гипроникеля</span></div>
+  </div>
+  <div class="card"><h3>Находки — что несём Гипроникелю/Заказчику</h3>
+    ${CALC.flags.map(f=>`<div class="box ${f.sev==='major'?'warn':'info'}" style="margin:6px 0">
+      <b><span class="tag ${RC_SEV[f.sev][1]}">${RC_SEV[f.sev][0]}</span> ${esc(f.t)}</b><br>${esc(f.d)}</div>`).join('')}
+  </div>
+  <div class="filters">
+    <select id="rclot"><option value="">Все лоты</option><option value="1">Лот 1</option><option value="2">Лот 2</option><option value="3">Лот 3</option><option value="4">Лот 4</option><option value="0">Комплекс</option></select>
+    <select id="rcv"><option value="">Любой вердикт</option><option value="ok">сходится</option><option value="warn">в допуске</option><option value="question">вопросы</option></select>
+    <a class="btn" href="docs/ove75-raschet.docx" download title="расчётная записка Word: все блоки, шаги и сверки">⬇ записка (Word)</a>
+    <button class="btn" id="rclet" title="находки-вопросы простым текстом">⬇ вопросы текстом</button>
+    <span class="count" id="rccount"></span>
+  </div>
+  <div id="rcbody"></div>`;
+}
+
 /* ================= Каркас ================= */
 const TABS = [
   ['overview','Обзор'], ['stages','Этапы'], ['blocks','Блоки и лоты'], ['bi','Базовый проект'],
-  ['deliv','Состав БИ'],
+  ['deliv','Состав БИ'], ['rasch','Расчёты'],
   ['equip','Оборудование'], ['disc','Расхождения ТЗ'], ['questions','Вопросы Заказчику'], ['sup','Поставщики'],
   ['market','Маркетинг'], ['soft','ПО: сами или подряд'], ['alt','Альтернатива'],
   ['auto','Автоматизация'], ['world','Мировой опыт'], ['china','Китай'],
   ['partner','Партнёр'], ['competitor','Конкурент'], ['tender','Торги за БИ'], ['capex','Стройка · CAPEX']
 ];
-const R = {overview:rOverview, stages:rStages, blocks:rBlocks, bi:rBI, deliv:rDeliv, equip:rEquip,
+const R = {overview:rOverview, stages:rStages, blocks:rBlocks, bi:rBI, deliv:rDeliv, rasch:rRasch, equip:rEquip,
            disc:rDisc, questions:rQ, sup:rSup, market:rMarket, soft:rSoft, alt:rAlt, auto:rAuto,
            world:rWorld, china:rChina, partner:rPartner, competitor:rComp,
            tender:rTender, capex:rCapex};
@@ -1514,6 +1587,7 @@ function show(id){
     if(id==='questions') bindQ();
     if(id==='disc') bindDisc();
     if(id==='deliv') bindDeliv();
+    if(id==='rasch') bindRasch();
   }
   location.hash = id;
   window.scrollTo(0,0);

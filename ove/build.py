@@ -51,6 +51,7 @@ OPTIONAL = {
     "__REFRAME_JSON__": "reframe.json",
     "__DISC_JSON__": "discrepancies.json",
     "__DELIV_JSON__": "deliverables.json",
+    "__CALC_JSON__": "calc.json",
 }
 
 
@@ -98,6 +99,9 @@ def build() -> None:
     _sys.path.insert(0, str(ROOT / "tools"))
     import build_docx
     build_docx.build()
+    # расчётная записка (независимый пересчёт КВАНТ) — из calc.json
+    import build_calcnote
+    build_calcnote.build()
 
     bx = json.loads((DATA / "bitrix_ove.json").read_text(encoding="utf-8"))
     eq = json.loads((DATA / "equipment.json").read_text(encoding="utf-8"))
