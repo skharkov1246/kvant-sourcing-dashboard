@@ -35,7 +35,12 @@ a{color:var(--s1);text-decoration:none} a:hover{text-decoration:underline}
 header{padding:18px 22px 0}
 h1{font-size:21px;margin:0 0 2px}
 .sub{color:var(--ink2);font-size:12.5px}
-nav{position:sticky;top:0;z-index:5;background:var(--page);display:flex;gap:4px;flex-wrap:wrap;padding:10px 22px;border-bottom:1px solid var(--grid)}
+nav{position:sticky;top:0;z-index:5;background:var(--page);padding:8px 22px 6px;border-bottom:1px solid var(--grid)}
+nav .grow,nav .subrow{display:flex;gap:4px;flex-wrap:wrap}
+nav .grow button{font:700 13.5px system-ui}
+nav .subrow{margin-top:6px;padding-top:6px;border-top:1px dashed var(--grid)}
+nav .subrow button{padding:4px 11px;font:600 12.5px system-ui;border-radius:14px}
+nav .subrow button.on{background:var(--chip);border-color:var(--s1);color:var(--s1)}
 nav button{border:1px solid var(--border);background:var(--surface);color:var(--ink2);padding:6px 13px;border-radius:18px;font:600 13px system-ui;cursor:pointer}
 nav button.on{background:var(--s1);border-color:var(--s1);color:#fff}
 main{padding:16px 22px 40px;max-width:1280px}
@@ -1662,23 +1667,26 @@ function rHedge(){
   <div id="hgbody"></div>`;
 }
 
-/* ================= Каркас ================= */
-const TABS = [
-  ['overview','Обзор'], ['stages','Этапы'], ['blocks','Блоки и лоты'], ['bi','Базовый проект'],
-  ['deliv','Состав БИ'], ['rasch','Расчёты'],
-  ['equip','Оборудование'], ['disc','Расхождения ТЗ'], ['questions','Вопросы Заказчику'], ['sup','Поставщики'],
-  ['market','Маркетинг'], ['soft','ПО: сами или подряд'], ['alt','Альтернатива'],
-  ['auto','Автоматизация'], ['world','Мировой опыт'], ['china','Китай'],
-  ['partner','Партнёр'], ['competitor','Конкурент'], ['hedge','Закладки Дельты'],
-  ['tender','Торги за БИ'], ['capex','Стройка · CAPEX']
+/* ================= Каркас: 5 групп × подвкладки ================= */
+const GROUPS = [
+  ['project','Проект', [['overview','Обзор'],['stages','Этапы'],['blocks','Блоки и лоты'],['capex','Стройка · CAPEX']]],
+  ['eng','Инжиниринг', [['bi','Базовый проект'],['rasch','Расчёты'],['equip','Оборудование'],['auto','Автоматизация'],['soft','ПО: сами или подряд']]],
+  ['client','Заказчику', [['disc','Расхождения ТЗ'],['questions','Вопросы'],['deliv','Состав БИ']]],
+  ['bid','Торги', [['tender','Процедура'],['competitor','Конкурент'],['hedge','Закладки Дельты'],['alt','Альтернатива'],['partner','Партнёр']]],
+  ['buy','Закупки', [['sup','Поставщики'],['market','Маркетинг'],['china','Китай'],['world','Мировой опыт']]],
 ];
+const TABS = GROUPS.flatMap(g=>g[2]);
+const GOF = {}; GROUPS.forEach(g=>g[2].forEach(([id])=>GOF[id]=g[0]));
 const R = {overview:rOverview, stages:rStages, blocks:rBlocks, bi:rBI, deliv:rDeliv, rasch:rRasch, equip:rEquip,
            disc:rDisc, questions:rQ, sup:rSup, market:rMarket, soft:rSoft, alt:rAlt, auto:rAuto,
            world:rWorld, china:rChina, partner:rPartner, competitor:rComp, hedge:rHedge,
            tender:rTender, capex:rCapex};
 const nav = document.getElementById('nav'), main = document.getElementById('main');
-nav.innerHTML = TABS.map(([id,t])=>`<button data-t="${id}">${esc(t)}</button>`).join('');
+nav.innerHTML =
+  `<div class="grow">${GROUPS.map(([gid,gt])=>`<button data-g="${gid}">${esc(gt)}</button>`).join('')}</div>` +
+  `<div class="subrow" id="subnav"></div>`;
 main.innerHTML = TABS.map(([id])=>`<section id="s-${id}"></section>`).join('');
+const LASTTAB = {};   // последняя открытая подвкладка каждой группы
 document.getElementById('foot').innerHTML =
   `Разбор тендерного пакета «ТЗ на БИ ОВЭ-75 v.3.6» и приложений №1–7 (ИД ч.1 и ч.2, электроснабжение, ЦИМ, ОАСУ, здания ЦЭМ и ГМУ). ` +
   `Технологические данные — из документов Заказчика и ИД ООО «Институт Гипроникель». Внешние факты о компаниях проверены 13.08.2026 и снабжены ссылками. ` +
@@ -1709,8 +1717,13 @@ function bindCapex(){
   capexPaint();
 }
 function show(id){
+  const gid = GOF[id] || GROUPS[0][0];
+  LASTTAB[gid] = id;
+  document.querySelectorAll('nav .grow button').forEach(b=>b.classList.toggle('on', b.dataset.g===gid));
+  const tabs = GROUPS.find(g=>g[0]===gid)[2];
+  document.getElementById('subnav').innerHTML =
+    tabs.map(([tid,t])=>`<button data-t="${tid}"${tid===id?' class="on"':''}>${esc(t)}</button>`).join('');
   for(const [tid] of TABS){
-    document.querySelector(`[data-t="${tid}"]`).classList.toggle('on', tid===id);
     document.getElementById(`s-${tid}`).classList.toggle('on', tid===id);
   }
   if(!rendered[id]){
@@ -1729,7 +1742,18 @@ function show(id){
   location.hash = id;
   window.scrollTo(0,0);
 }
-nav.addEventListener('click', e=>{ const b=e.target.closest('button'); if(b) show(b.dataset.t); });
+nav.addEventListener('click', e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  if(b.dataset.t) show(b.dataset.t);
+  else if(b.dataset.g){
+    const g=GROUPS.find(x=>x[0]===b.dataset.g);
+    show(LASTTAB[b.dataset.g] || g[2][0][0]);
+  }
+});
+window.addEventListener('hashchange', ()=>{
+  const id = location.hash.slice(1);
+  if(TABS.some(([tid])=>tid===id) && !document.getElementById(`s-${id}`).classList.contains('on')) show(id);
+});
 show(TABS.some(([id])=>id===location.hash.slice(1)) ? location.hash.slice(1) : 'overview');
 </script>
 </body>
