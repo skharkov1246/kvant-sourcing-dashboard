@@ -1517,6 +1517,13 @@ function rRasch(){
     ${CALC.flags.map(f=>`<div class="box ${f.sev==='major'?'warn':'info'}" style="margin:6px 0">
       <b><span class="tag ${RC_SEV[f.sev][1]}">${RC_SEV[f.sev][0]}</span> ${esc(f.t)}</b><br>${esc(f.d)}</div>`).join('')}
   </div>
+  ${CALC.guarantees?`<div class="card"><h3>Гарантийная рамка — консервативные значения для ТКП и договора</h3>
+  <p class="mut">За гарантийные показатели спрашивают на испытаниях. Правило рамки: гарантируем границу с запасом
+  к расчёту, условия — на сырьё и данные изготовителей; расчётные значения оставляем справочными.</p>
+  <div class="tblwrap"><table><thead><tr><th>Параметр</th><th>Расчёт / ИД</th><th>Рекомендуемая гарантия</th><th>Базис</th></tr></thead><tbody>
+    ${CALC.guarantees.map(g=>`<tr><td><b>${esc(g.param)}</b></td><td>${esc(g.calc)}</td>
+      <td class="hi" style="font-weight:600">${esc(g.guar)}</td><td class="mut">${esc(g.basis)}</td></tr>`).join('')}
+  </tbody></table></div></div>`:''}
   <div class="filters">
     <select id="rclot"><option value="">Все лоты</option><option value="1">Лот 1</option><option value="2">Лот 2</option><option value="3">Лот 3</option><option value="4">Лот 4</option><option value="0">Комплекс</option></select>
     <select id="rcv"><option value="">Любой вердикт</option><option value="ok">сходится</option><option value="warn">в допуске</option><option value="question">вопросы</option></select>
