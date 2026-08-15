@@ -155,6 +155,7 @@ const RF = __REFRAME_JSON__;
 const DISC = __DISC_JSON__;
 const DELIV = __DELIV_JSON__;
 const CALC = __CALC_JSON__;
+const HEDGE = __HEDGE_JSON__;
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const nf = (n,d=0) => (n===''||n===null||n===undefined||isNaN(n)) ? '—' : Number(n).toLocaleString('ru-RU',{minimumFractionDigits:d,maximumFractionDigits:d});
@@ -519,7 +520,7 @@ function rSup(){
        <td>${(c.classes||[]).map(x=>`<span class="tag">${esc(x)}</span>`).join('')}</td></tr>`).join('')}</tbody></table></div>`:''}
        ${(BX.pool||[]).length?`<h3>Компании мирового и китайского пула, заведённые в CRM</h3>
        <div class="tblwrap"><table><thead><tr><th>Искали по</th><th>Компания в CRM</th><th>Запросов СП-166</th><th>Последний</th></tr></thead>
-       <tbody>${BX.pool.map(c=>`<tr><td class="mut">${esc(c.query)}</td><td><b>${esc(c.name)}</b></td><td class="num">${c.n}</td><td class="mut">${esc(c.last)||'—'}</td></tr>`).join('')}</tbody></table></div>`:''}`
+       <tbody>${BX.pool.filter(c=>!/flsmidth|metso|outotec|howden/i.test((c.name||'')+(c.query||''))).map(c=>`<tr><td class="mut">${esc(c.query)}</td><td><b>${esc(c.name)}</b></td><td class="num">${c.n}</td><td class="mut">${esc(c.last)||'—'}</td></tr>`).join('')}</tbody></table></div>`:''}`
     : `<div class="box warn"><b>Живая выгрузка из Bitrix24 ещё не выполнялась.</b> ${esc(BX.note)}</div>`;
 
   return `
@@ -546,6 +547,24 @@ function rSup(){
 
   <h2>Правила сбора ТКП</h2>
   <ol>${SUP.sourcing_rules.map(r=>`<li>${esc(r)}</li>`).join('')}</ol>
+
+  ${(SUP.profiles||[]).length?`<h2>Справочник поставщиков: КНР и страны без санкций</h2>
+  <div class="box info"><b>Для сорсеров.</b> Контакты сняты с официальных сайтов (дата проверки на карточке),
+  почты кликабельны. «Что запрашивать» — готовый состав запроса по классу позиции; полный опросный лист
+  и спецификация — во вкладках «Оборудование» и «Базовый проект». Западные ушедшие производители
+  (FLSmidth, Metso/Outotec, Howden) исключены решением 15.08.2026.</div>
+  <div class="grid">${SUP.profiles.map(c=>{
+    const asks=[...new Set(SUP.positions.filter(p=>(c.classes||[]).includes(p.cls)).map(p=>p.ask))];
+    const mail=s=>{const m=String(s).match(/[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}/);return m?`<a href="mailto:${m[0]}">${esc(s)}</a>`:esc(s);};
+    return `<div class="card"><h3>${esc(c.name)}${c.zh?` <span class="mut">${esc(c.zh)}</span>`:''}
+      <span class="tag">${esc(c.country)}</span>${(c.classes||[]).map(k=>`<span class="tag">${esc(k)}</span>`).join('')}</h3>
+      ${c.site?`<div><a href="${esc(c.site)}" rel="noopener">${esc(c.site.replace(/^https?:\/\//,'').replace(/\/$/,''))}</a></div>`:''}
+      ${(c.contact||[]).length?`<div>${c.contact.map(x=>`<div>${mail(x)}</div>`).join('')}</div>`:''}
+      <p class="mut">${esc(c.profile||'')}</p>
+      ${c.refs?`<p class="mut"><b>Референсы:</b> ${esc(c.refs)}</p>`:''}
+      ${asks.length?`<div class="box" style="font-size:12px"><b>Что запрашивать:</b> ${asks.map(esc).join(' · ')}</div>`:''}
+      <div class="mut" style="font-size:11px">проверено ${esc(c.checked||'')}${c.src?` · <a href="${esc(c.src)}" rel="noopener">источник</a>`:''}${c.unreachable?' · ⚠ сайт был недоступен, данные из независимых каталогов':''}</div>
+    </div>`;}).join('')}</div>`:''}
 
   <h2>Поставщики из Bitrix24</h2>
   ${bxBlock}
@@ -1543,6 +1562,106 @@ function rRasch(){
   <div id="rcbody"></div>`;
 }
 
+/* ============ Закладки Дельты: пары «по ТЗ / альтернатива» ============ */
+const HG_K = {direct:['прямая ссылка','lot1'], design:['решение-данность','lot2'],
+              info:['инфо-асимметрия','lot4'], qual:['квалификация','lot3']};
+let hgF = {kind:'', lot:'', q:''};
+function hgRows(){
+  const t = hgF.q.toLowerCase();
+  return HEDGE.items.filter(x =>
+    (hgF.kind===''||x.kind===hgF.kind) &&
+    (hgF.lot===''||(x.lots||[]).includes(Number(hgF.lot))) &&
+    (!t||[x.id,x.title,x.quote.q,x.tz,x.alt,x.ask,ansOf(x.id)].join(' ').toLowerCase().includes(t)));
+}
+function hgPaint(){
+  const el = document.getElementById('hgbody'); if(!el) return;
+  const rows = hgRows();
+  el.innerHTML = rows.map(x=>`<div class="card qcard">
+    <h3><span class="tag ${HG_K[x.kind][1]}">${esc(x.id)}</span> ${esc(x.title)}
+      ${(x.lots||[]).map(lotTag).join('')}<span class="tag ${HG_K[x.kind][1]}">${HG_K[x.kind][0]}</span>
+      ${ansOf(x.id).trim()?'<span class="tag lot3">решено</span>':''}</h3>
+    <div class="quote">«${esc(x.quote.q)}»</div>
+    <div class="mut">${esc(x.quote.where)}</div>
+    <p class="mut"><b>Чем усиливает Дельту:</b> ${esc(x.note)}</p>
+    <div class="vs">
+      <div><b>Вариант А — по ТЗ (как есть):</b><div class="box" style="margin-top:4px">${esc(x.tz)}</div></div>
+      <div><b>Вариант Б — альтернатива:</b><div class="box info" style="margin-top:4px">${esc(x.alt)}</div></div>
+    </div>
+    ${x.basis?`<p><b>Легальная база варианта Б:</b> ${esc(x.basis)}</p>`:''}
+    <div class="box warn"><b>Формулировка Заказчику:</b> ${esc(x.ask)}</div>
+    <div class="qgrid">
+      <label>Статус
+        <select class="mini qf" data-id="${esc(x.id)}" data-f="st">
+          ${Q_ST.map(([v,n])=>`<option value="${v}"${v===stOf(x.id)?' selected':''}>${n}</option>`).join('')}</select></label>
+      <label>Решение (итог с Заказчиком)
+        <textarea class="mini qf" data-id="${esc(x.id)}" data-f="ans" rows="2"
+          placeholder="что согласовали: вариант А/Б/иное, дата, от кого">${esc(ansOf(x.id))}</textarea></label>
+      <label>Комментарий инженера
+        <textarea class="mini qf" data-id="${esc(x.id)}" data-f="eng" rows="2"
+          placeholder="что учитываем в ТКП/БИ">${esc(engOf(x.id))}</textarea></label>
+    </div>
+  </div>`).join('') || '<div class="box mut">Под фильтр ничего не попало</div>';
+  document.getElementById('hgcount').textContent =
+    `${rows.length} из ${HEDGE.items.length} · решено ${HEDGE.items.filter(x=>ansOf(x.id).trim()).length}`;
+}
+function hgLetter(){
+  const pick = hgRows();
+  const txt = 'Предложения по расширению конкуренции в конкурсе на БИ ОВЭ-75\n'
+    + 'Объект: АО «Кольская ГМК», комплекс ОВЭ-75. К ТЗ на БИ v3.6, ИД ч.1/ч.2 и приложениям.\n'
+    + 'Позиция КВАНТ: перечисленные ниже положения пакета объективно дают преимущество прежнему\n'
+    + 'проектировщику технологии. По каждому предлагаем функциональный эквивалент, применяемый\n'
+    + 'в мировой практике, — расширение круга участников снижает цену и риски Заказчика.\n\n'
+    + pick.map((x,i)=>`${i+1}. ${x.title} [${x.id}]\n`
+      + `   Положение пакета: «${x.quote.q}» (${x.quote.where})\n`
+      + `   По ТЗ: ${x.tz}\n   Альтернатива: ${x.alt}\n`
+      + (x.basis?`   Основание: ${x.basis}\n`:'')
+      + `   Просим: ${x.ask}\n`).join('\n');
+  const blob = new Blob([txt],{type:'text/plain;charset=utf-8'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='ove_konkurencia.txt'; a.click();
+}
+function bindHedge(){
+  if(!HEDGE) return;
+  document.getElementById('hgkind').addEventListener('change', e=>{ hgF.kind=e.target.value; hgPaint(); });
+  document.getElementById('hglot').addEventListener('change', e=>{ hgF.lot=e.target.value; hgPaint(); });
+  document.getElementById('hgq').addEventListener('input', e=>{ hgF.q=e.target.value; hgPaint(); });
+  const root=document.getElementById('hgbody');
+  root.addEventListener('change', e=>{ const el=e.target.closest('.qf'); if(!el) return;
+    QA[el.dataset.f][el.dataset.id]=el.value; saveQA(); hgPaint(); });
+  root.addEventListener('input', e=>{ const el=e.target.closest('textarea.qf'); if(!el) return;
+    QA[el.dataset.f][el.dataset.id]=el.value; saveQA(); });
+  document.getElementById('hglet').addEventListener('click', hgLetter);
+  document.getElementById('hgwho').addEventListener('input', e=>{ QA.who=e.target.value; saveQA(); });
+  document.getElementById('hgsend').addEventListener('click', ()=>qSend('hgsendst','hgsend'));
+  hgPaint();
+}
+function rHedge(){
+  if(!HEDGE) return '<div class="box warn">Раздел собирается.</div>';
+  const byK = {}; HEDGE.items.forEach(x=>{byK[x.kind]=(byK[x.kind]||0)+1});
+  return `
+  <div class="box warn"><b>Зачем эта вкладка.</b> ${esc(HEDGE.note)}</div>
+  <div class="box info"><b>Тональность для Заказчика.</b> ${esc(HEDGE.tone)}</div>
+  <div class="k">
+    <div class="tile"><b class="hi">${byK.direct||0}</b><span>прямые ссылки на проработки</span></div>
+    <div class="tile"><b class="mid">${byK.design||0}</b><span>решения-данности</span></div>
+    <div class="tile"><b>${byK.info||0}</b><span>инфо-асимметрия</span></div>
+    <div class="tile"><b>${byK.qual||0}</b><span>квалификационные</span></div>
+    <div class="tile"><b>${HEDGE.items.length}</b><span>всего закладок</span></div>
+  </div>
+  <div class="filters">
+    <input type="text" id="hgq" placeholder="Поиск по цитатам, вариантам, решениям…">
+    <select id="hgkind"><option value="">Все категории</option>${Object.entries(HG_K).map(([k,v])=>`<option value="${k}">${v[0]} (${byK[k]||0})</option>`).join('')}</select>
+    <select id="hglot"><option value="">Все лоты</option><option value="1">Лот 1</option><option value="2">Лот 2</option><option value="3">Лот 3</option><option value="4">Лот 4</option></select>
+    <button class="btn" id="hglet" title="все позиции с парами вариантов — текстом для письма">⬇ предложение по конкуренции</button>
+    <span class="count" id="hgcount"></span>
+  </div>
+  <div class="filters">
+    <input type="text" id="hgwho" placeholder="ваше имя — попадёт в коммит как автор" value="${esc(QA.who||'')}">
+    <button class="btn" id="hgsend" title="закоммитить решения в репозиторий">⚡ в общую базу</button>
+    <span class="count" id="hgsendst"></span>
+  </div>
+  <div id="hgbody"></div>`;
+}
+
 /* ================= Каркас ================= */
 const TABS = [
   ['overview','Обзор'], ['stages','Этапы'], ['blocks','Блоки и лоты'], ['bi','Базовый проект'],
@@ -1550,11 +1669,12 @@ const TABS = [
   ['equip','Оборудование'], ['disc','Расхождения ТЗ'], ['questions','Вопросы Заказчику'], ['sup','Поставщики'],
   ['market','Маркетинг'], ['soft','ПО: сами или подряд'], ['alt','Альтернатива'],
   ['auto','Автоматизация'], ['world','Мировой опыт'], ['china','Китай'],
-  ['partner','Партнёр'], ['competitor','Конкурент'], ['tender','Торги за БИ'], ['capex','Стройка · CAPEX']
+  ['partner','Партнёр'], ['competitor','Конкурент'], ['hedge','Закладки Дельты'],
+  ['tender','Торги за БИ'], ['capex','Стройка · CAPEX']
 ];
 const R = {overview:rOverview, stages:rStages, blocks:rBlocks, bi:rBI, deliv:rDeliv, rasch:rRasch, equip:rEquip,
            disc:rDisc, questions:rQ, sup:rSup, market:rMarket, soft:rSoft, alt:rAlt, auto:rAuto,
-           world:rWorld, china:rChina, partner:rPartner, competitor:rComp,
+           world:rWorld, china:rChina, partner:rPartner, competitor:rComp, hedge:rHedge,
            tender:rTender, capex:rCapex};
 const nav = document.getElementById('nav'), main = document.getElementById('main');
 nav.innerHTML = TABS.map(([id,t])=>`<button data-t="${id}">${esc(t)}</button>`).join('');
@@ -1604,6 +1724,7 @@ function show(id){
     if(id==='disc') bindDisc();
     if(id==='deliv') bindDeliv();
     if(id==='rasch') bindRasch();
+    if(id==='hedge') bindHedge();
   }
   location.hash = id;
   window.scrollTo(0,0);

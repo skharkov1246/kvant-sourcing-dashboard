@@ -52,6 +52,7 @@ OPTIONAL = {
     "__DISC_JSON__": "discrepancies.json",
     "__DELIV_JSON__": "deliverables.json",
     "__CALC_JSON__": "calc.json",
+    "__HEDGE_JSON__": "hedge.json",
 }
 
 
