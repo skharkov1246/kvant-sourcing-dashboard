@@ -429,6 +429,31 @@ function candsOf(p){
 }
 const noteRows = p => [...(p.world||[]),...(p.cn||[]),...(p.ru||[])].filter(n=>!isCand(n));
 
+/* контакты из справочника — прямо в строку кандидата плана сорсинга */
+const PROF_BY = {}; (SUP.profiles||[]).forEach(c=>{ PROF_BY[nrm(c.name)] = c; });
+function profOf(name){
+  const n = nrm(name);
+  if(PROF_BY[n]) return PROF_BY[n];
+  for(const k in PROF_BY){
+    if(k.slice(0,16)===n.slice(0,16) || k.includes(n) || n.includes(k)) return PROF_BY[k];
+  }
+  return null;
+}
+function contactLine(name){
+  const pr = profOf(name); if(!pr) return '';
+  const parts = [];
+  if(pr.site) parts.push(`<a href="${esc(pr.site)}" rel="noopener">${esc(pr.site.replace(/^https?:\/\//,'').replace(/\/.*$/,''))}</a>`);
+  (pr.contact||[]).forEach(x=>{
+    const m = String(x).match(/[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}/);
+    const t = String(x).match(/\+?[\d][\d\s()-]{7,}[\d]/);
+    if(m) parts.push(`✉ <a href="mailto:${m[0]}">${m[0]}</a>`);
+    else if(t) parts.push(`☎ <a href="tel:${t[0].replace(/[\s()-]/g,'')}">${esc(t[0])}</a>`);
+    else if(/форма/i.test(x)) parts.push('запрос — форма на сайте');
+  });
+  if(!parts.length) return '';
+  return `<div class="mut" style="font-size:11px;font-weight:400;line-height:1.5">${parts.join(' · ')}</div>`;
+}
+
 function supPaint(){
   const el = document.getElementById('supbody'); if(!el) return;
   const fl = document.getElementById('suplot').value;
@@ -451,7 +476,7 @@ function supPaint(){
       <div class="tblwrap"><table><thead><tr>
         <th>Кандидат</th><th>Откуда</th><th>Запрос</th><th>Работа</th><th>Заметка</th></tr></thead>
       <tbody>${cands.length ? cands.map(c=>`<tr>
-        <td><b>${esc(c.name)}</b></td>
+        <td><b>${esc(c.name)}</b>${contactLine(c.name)}</td>
         <td>${[...c.origins].map(o=>`<span class="tag${o==='Bitrix'?' lot3':''}">${esc(o)}</span>`).join('')}</td>
         <td><select class="mini" data-k="${esc(c.key)}" data-f="rfq">
           ${RFQ_ST.map(([v,n])=>`<option value="${v}"${v===(ED.rfq[c.key]||'')?' selected':''}>${n}</option>`).join('')}</select></td>
