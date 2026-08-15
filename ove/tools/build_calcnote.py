@@ -96,7 +96,27 @@ def build() -> Path:
         body.append(bd.table(grows, gw))
         body.append(bd.p([]))
 
-    body.append(bd.p([bd.run("3. Расчётные блоки и сверки", bold=True, size=28)], style="Heading1"))
+    if calc.get("mc"):
+        mc = calc["mc"]
+        body.append(bd.p([bd.run(f"3. Неопределённость: Монте-Карло {mc['n']:,} прогонов".replace(",", " "),
+                                 bold=True, size=28)], style="Heading1"))
+        body.append(bd.p([bd.run(mc["note"], italic=True, size=19)]))
+        mw = [2700, 1200, 1200, 1200, 1100, 2238]
+        mhead = ["Показатель", "P10", "P50", "P90", "Размах", "Что уточнять"]
+        mrows = [[bd.cell([bd.p([bd.run(h, bold=True, size=19)])], w, shade="EFEFEF")
+                  for h, w in zip(mhead, mw)]]
+        for r in mc["rows"]:
+            vals = [bd.p([bd.run(r["name"], bold=True, size=19)]),
+                    bd.p([bd.run(num(r["p10"]), size=19)]),
+                    bd.p([bd.run(num(r["p50"]), bold=True, size=19)]),
+                    bd.p([bd.run(num(r["p90"]), size=19)]),
+                    bd.p([bd.run(f"{r['span_pct']} %".replace(".", ","), size=19)]),
+                    bd.p([bd.run(r["fix"], size=18)])]
+            mrows.append([bd.cell([v], w) for v, w in zip(vals, mw)])
+        body.append(bd.table(mrows, mw))
+        body.append(bd.p([]))
+
+    body.append(bd.p([bd.run("4. Расчётные блоки и сверки", bold=True, size=28)], style="Heading1"))
     for b in calc["blocks"]:
         body.append(block_xml(b))
 

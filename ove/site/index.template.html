@@ -1517,6 +1517,15 @@ function rRasch(){
     ${CALC.flags.map(f=>`<div class="box ${f.sev==='major'?'warn':'info'}" style="margin:6px 0">
       <b><span class="tag ${RC_SEV[f.sev][1]}">${RC_SEV[f.sev][0]}</span> ${esc(f.t)}</b><br>${esc(f.d)}</div>`).join('')}
   </div>
+  ${CALC.mc?`<div class="card"><h3>Неопределённость: Монте-Карло ${CALC.mc.n.toLocaleString('ru-RU')} прогонов</h3>
+  <p class="mut">${esc(CALC.mc.note)}</p>
+  <div class="tblwrap"><table><thead><tr><th>Показатель</th><th>P10</th><th>P50</th><th>P90</th><th>Размах</th><th>Доминирует (ρ)</th><th>Что уточнять в первую очередь</th></tr></thead><tbody>
+    ${CALC.mc.rows.map(r=>`<tr><td><b>${esc(r.name)}</b></td>
+      <td>${r.p10.toLocaleString('ru-RU')}</td><td><b>${r.p50.toLocaleString('ru-RU')}</b></td><td>${r.p90.toLocaleString('ru-RU')}</td>
+      <td class="${r.span_pct>15?'hi':(r.span_pct>8?'mid':'')}">${String(r.span_pct).replace('.',',')} %</td>
+      <td>${r.sens.map(s=>`${esc(s.n)} (${String(s.rho).replace('.',',')})`).join('<br>')}</td>
+      <td class="mut">${esc(r.fix)}</td></tr>`).join('')}
+  </tbody></table></div></div>`:''}
   ${CALC.guarantees?`<div class="card"><h3>Гарантийная рамка — консервативные значения для ТКП и договора</h3>
   <p class="mut">За гарантийные показатели спрашивают на испытаниях. Правило рамки: гарантируем границу с запасом
   к расчёту, условия — на сырьё и данные изготовителей; расчётные значения оставляем справочными.</p>
