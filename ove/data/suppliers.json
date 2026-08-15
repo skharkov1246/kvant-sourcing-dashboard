@@ -15,7 +15,11 @@
    "world": [],
    "cn": [
     "China Nerin Engineering Co., Ltd.",
-    "China ENFI Engineering Corp."
+    "China ENFI Engineering Corp.",
+    "NFC (China Nonferrous Metal Industry's Foreign Engineering and Construction)",
+    "Kunming Engineering & Research Institute of Nonferrous Metallurgy (KMY)",
+    "BGRIMM Technology Group",
+    "CINF Engineering (Changsha Nonferrous Metallurgy Design & Research Institute)"
    ],
    "ru": [],
    "ask": "Референс именно по сульфатизирующему обжигу медного сырья в КС (не окислительный обжиг цинковых концентратов); подтверждение работы на дутье с 96 % O₂",
@@ -31,10 +35,15 @@
    "name": "Котёл-утилизатор до 30 000 нм³/ч, пар 1,9 МПа / 375 °С",
    "spec": "Улавливание «грубой» пыли, объём бункера пылесборника 15 м³; в ИД помечен «перепроектируется»",
    "tier": "B",
-   "world": [],
+   "world": [
+    "Thermax Limited",
+    "Isgec Heavy Engineering Ltd."
+   ],
    "cn": [
     "Hangzhou Boiler Group (с 2022 — Xizi Clean Energy)",
-    "Thermax Limited"
+    "Thermax Limited",
+    "Suzhou Hailu Heavy Industry Co., Ltd.",
+    "Wuxi Huaguang Environment & Energy Group"
    ],
    "ru": [],
    "ask": "Опыт КУ за печью КС цветной металлургии с пылевым режимом; наличие существующего проекта под переработку",
@@ -51,11 +60,15 @@
    "spec": "Аналог УГТ1-20-4, сталь 12Х18Н10Т, питание 80 кВ, бункер 10 м³",
    "tier": "A",
    "world": [
-    "Thermax"
+    "Thermax",
+    "Enviropol Engineers Pvt. Ltd.",
+    "Isgec Heavy Engineering Ltd.",
+    "Bharat Heavy Electricals Limited (BHEL)"
    ],
    "cn": [
     "Fujian Longking Co., Ltd.",
-    "Zhejiang Feida Environmental Science & Technology"
+    "Zhejiang Feida Environmental Science & Technology",
+    "Tengy Environmental Technology (Zhejiang Tianjie)"
    ],
    "ru": [
     "Профильные заводы газоочистки РФ — уточнить"
@@ -71,9 +84,13 @@
    "name": "Одиночный циклон до 32 000 м³/ч",
    "spec": "СЦН-50-1800×1УП, сталь 12Х18Н10Т, бункер 8,5 м³",
    "tier": "A",
-   "world": [],
+   "world": [
+    "Rieco Industries Ltd.",
+    "Techflow Enterprises Pvt. Ltd."
+   ],
    "cn": [
-    "Fujian Longking Co., Ltd."
+    "Fujian Longking Co., Ltd.",
+    "Sinosteel Tiancheng Environmental Protection Science & Technology Co., Ltd."
    ],
    "ru": [
     "Типовое изделие — рынок РФ"
@@ -90,7 +107,10 @@
    "cn": [
     "Chongqing General Industry (Group) Co., Ltd.",
     "Shenyang Blower Works Group / SBW (Shengu Group)",
-    "Xinxiang SIMO Blower Co., Ltd."
+    "Xinxiang SIMO Blower Co., Ltd.",
+    "Xi'an Shaangu Power Co., Ltd.",
+    "Zhejiang Shangfeng Special Blower Industrial Co., Ltd.",
+    "Zibo Hongcheng Fan Co., Ltd."
    ],
    "ru": [
     "Типовой отечественный типоразмер"
@@ -106,10 +126,15 @@
    "name": "Рукавные фильтры аспирации + дымососы на свечу",
    "spec": "Объём уточняется в БИ; выбросы приводятся до и после очистки",
    "tier": "A",
-   "world": [],
+   "world": [
+    "Rieco Industries Ltd.",
+    "Techflow Enterprises Pvt. Ltd.",
+    "Enviropol Engineers Pvt. Ltd."
+   ],
    "cn": [
     "Fujian Longking Co., Ltd.",
-    "Zhejiang Feida Environmental Science & Technology"
+    "Zhejiang Feida Environmental Science & Technology",
+    "Tengy Environmental Technology (Zhejiang Tianjie)"
    ],
    "ru": [
     "Рынок РФ по аспирации"
@@ -125,7 +150,11 @@
    "world": [],
    "cn": [
     "Yantai Jinpeng Mining Machinery Co., Ltd.",
-    "Nuclear Industry Yantai Toncin Group Co., Ltd."
+    "Nuclear Industry Yantai Toncin Group Co., Ltd.",
+    "Xinxiang Yinuo Machineries Co., Ltd.",
+    "Yantai Hexin Environmental Protection Equipment Co., Ltd.",
+    "Jiangxi Shicheng Mine Machinery Factory (JXSC)",
+    "Shandong Xinhai Mining Technology & Equipment Inc."
    ],
    "ru": [],
    "ask": "Гарантия влажности кека 10 % на концентрате крупностью 25,5 мкм при 70 % тв. в питании",
@@ -142,7 +171,10 @@
    "world": [],
    "cn": [
     "Henan Pingyuan Mining Machinery (PK Machinery)",
-    "Henan Zhengzhou Mining Machinery (ZK Corp)"
+    "Henan Zhengzhou Mining Machinery (ZK Corp)",
+    "Shanghai Ku Qiao Equipment Co., Ltd. (SKE)",
+    "Henan Excellent Machinery Co., Ltd. (EXCT)",
+    "Northern Heavy Industries Group Co., Ltd. (NHI)"
    ],
    "ru": [
     "УКВ и 4488 ДН-У — отечественные типоряды"
@@ -155,10 +187,18 @@
    "name": "Мазутные горелки ГМ-4,5 и МГМГ-10",
    "spec": "ГМ-4,5 до 464 кг/ч (подогрев дутья); МГМГ-10 до 940 кг/ч, 3 шт. (разогрев печи)",
    "tier": "A",
-   "world": [],
-   "cn": [],
+   "world": [
+    "Termo Isı Sistemleri A.Ş. (Ecostar)",
+    "The Wesman Engineering Co. Pvt. Ltd."
+   ],
+   "cn": [
+    "Zhengzhou Bona Thermal Energy Equipment Co., Ltd. (BNTET)",
+    "EBICO (China) Environment Co., Ltd."
+   ],
    "ru": [
-    "Отечественные типоряды"
+    "Отечественные типоряды",
+    "Бийский котельный завод (БиКЗ)",
+    "Бийский Котельный Завод «Генерация»"
    ],
    "ask": "Коэффициент рабочего регулирования тепловой мощности"
   },
@@ -171,7 +211,10 @@
    "world": [],
    "cn": [
     "Myande Group Co., Ltd.",
-    "Shandong Tianli Energy Co., Ltd."
+    "Shandong Tianli Energy Co., Ltd.",
+    "Hebei Leheng Energy Saving Equipment Co., Ltd.",
+    "Hangzhou Enco Machinery Co., Ltd.",
+    "Jiangsu Sunkaier Industrial Technology Co., Ltd."
    ],
    "ru": [],
    "ask": "Обязательно указывать материал контактных частей 904L и напряжённость по соковому пару, иначе предложения несопоставимы",
@@ -189,7 +232,11 @@
    "tier": "B",
    "world": [],
    "cn": [
-    "Jiangsu Huada Centrifuge Co., Ltd."
+    "Jiangsu Huada Centrifuge Co., Ltd.",
+    "Jiangsu Saideli Pharmaceutical Machinery Co., Ltd.",
+    "Jiangsu Hanpu Mechanical Technology Co., Ltd.",
+    "Zhangjiagang City Peony Machinery Co., Ltd.",
+    "Chongqing Jiangbei Machinery Co., Ltd. (JBMACH)"
    ],
    "ru": [],
    "ask": "Пульсирующая выгрузка; материал 904L; подтверждение остаточной влажности кристаллов 4–6 %",
@@ -208,7 +255,10 @@
    "world": [],
    "cn": [
     "Nantong Xingqiu Graphite Co., Ltd.",
-    "Siping Juyuan Hanyang Plate Heat Exchanger (THT)"
+    "Siping Juyuan Hanyang Plate Heat Exchanger (THT)",
+    "Lanpec Technologies Limited",
+    "Qingdao Ruipute (REAPTER) Heat Exchange Equipment",
+    "Nantong Sunshine Graphite Equipment Technology Co., Ltd."
    ],
    "ru": [],
    "ask": "Комплектность вакуумной схемы под две независимые нитки кристаллизации",
@@ -224,12 +274,15 @@
    "spec": "Внутр. 8485 × 1155 × 1650 мм; 84 катода / 85 анодов; интегрированный бортовой отсос и съёмный колпак; дно с уклоном к центру и донной пробкой",
    "tier": "B",
    "world": [
-    "CSI Mining SA (UNICELL®)"
+    "CSI Mining SA (UNICELL®)",
+    "CSI Mining SA"
    ],
    "cn": [
     "Hengshui Gains Trade Co., Ltd.",
     "Hengshui Jiubo Composites Co., Ltd.",
-    "Sichuan Precision Technology Co., Ltd. (PRS)"
+    "Sichuan Precision Technology Co., Ltd. (PRS)",
+    "Hunan CHMM Metallurgy Engineering Co., Ltd.",
+    "Hangzhou Sannai Environmental Technology Co., Ltd."
    ],
    "ru": [],
    "ask": "ИД называет Unicell поимённо — аналог придётся доказывать по конструкции и материалу (монолитный винилэфирный композит)"
@@ -241,10 +294,13 @@
    "spec": "Pb-Ca / Pb-Ag; 85 шт. на ванну; годовой расход замещения 2300 шт.",
    "tier": "B",
    "world": [
-    "CSI Mining SA"
+    "CSI Mining SA",
+    "Supercon India"
    ],
    "cn": [
-    "Unionsum International Industrial Co., Ltd."
+    "Unionsum International Industrial Co., Ltd.",
+    "Xi'an Howah Industry Technology Co., Ltd",
+    "Hunan SM International Industrial Co., Ltd."
    ],
    "ru": [
     "ЛМЗ им. К. Либкнехта"
@@ -268,7 +324,9 @@
    "cn": [
     "Hengshui Gains Trade Co., Ltd.",
     "Jiangxi Tianxin Metallurgical Equipment Technology Co., Ltd.",
-    "Sanmen Sanyou Technology Inc."
+    "Sanmen Sanyou Technology Inc.",
+    "Hunan CHMM Metallurgy Engineering Co., Ltd.",
+    "Tongling Huierpu Technology Co., Ltd."
    ],
    "ru": [],
    "ask": "Совместимость с выбранной КСМ; требование сбыта — разделение двух пластин без сращивания по нижней кромке",
@@ -282,10 +340,14 @@
    "name": "Ошиновка ванн с двойным контактом",
    "spec": "2 серии × 90 ванн; I факт 42,45 кА; уравнительная шина для анодов и/или катодов",
    "tier": "B",
-   "world": [],
+   "world": [
+    "C-Flo Copper"
+   ],
    "cn": [
     "Sichuan Precision Technology Co., Ltd. (PRS)",
-    "Zhejiang Bridgold Copper Tech Co., Ltd."
+    "Zhejiang Bridgold Copper Tech Co., Ltd.",
+    "Hunan CHMM Metallurgy Engineering Co., Ltd.",
+    "Fabmann (Keyi Industrial)"
    ],
    "ru": [],
    "ask": "ИД прямо ссылается на конструкцию ошиновки прежнего западного поставщика (см. «Закладки Дельты») — аналог доказывать по равномерности распределения тока по ваннам, падению напряжения на контактах и совместимости с изоляторами ванн",
@@ -303,7 +365,8 @@
    "cn": [
     "Jiangxi Tianxin Metallurgical Equipment Technology Co., Ltd.",
     "Sanmen Sanyou Technology Inc.",
-    "Sichuan Precision Technology Co., Ltd. (PRS)"
+    "Sichuan Precision Technology Co., Ltd. (PRS)",
+    "Hunan CHMM Metallurgy Engineering Co., Ltd."
    ],
    "ru": [],
    "ask": "Обязательные требования: разделение двух пластин без сращивания по нижней кромке; «перфорация» пакета профилированием листов; формирование партий с сопроводительной документацией",
@@ -321,7 +384,10 @@
    "world": [],
    "cn": [
     "Henan Mine Crane Co., Ltd.",
-    "Weihua Group (Henan Weihua Heavy Machinery)"
+    "Weihua Group (Henan Weihua Heavy Machinery)",
+    "Nucleon (Xinxiang) Crane Co., Ltd.",
+    "Yuantai Crane / Henan Dongqi Machinery (одна группа)",
+    "Taiyuan Heavy Industry Co., Ltd. (TYHI)"
    ],
    "ru": [
     "Рассмотреть модернизацию существующих кранов ЦЭМ"
@@ -343,7 +409,9 @@
    "cn": [
     "Green Power Co., Ltd. (Beijing Green Power Technology)",
     "Sichuan Injet Electric Co., Ltd.",
-    "Xi'an Zhong Dian Power Rectifier Works Co., Ltd."
+    "Xi'an Zhong Dian Power Rectifier Works Co., Ltd.",
+    "Hunan Kori Convertors Co., Ltd.",
+    "Zhengzhou Liyuan Haina Rectifier Co., Ltd."
    ],
    "ru": [
     "Отечественные производители преобразовательных агрегатов — уточнить"
@@ -363,7 +431,9 @@
    "tier": "A",
    "world": [],
    "cn": [
-    "Jiangxi Tianxin Metallurgical Equipment Technology Co., Ltd."
+    "Jiangxi Tianxin Metallurgical Equipment Technology Co., Ltd.",
+    "Xiangtan Lufeng Machinery Co., Ltd.",
+    "Changsha Metalcess Intelligent Equipment Co., Ltd."
    ],
    "ru": [],
    "ask": "Входит ли правка и обрамление основ в комплект поставки КСМ или это отдельная линия — от ответа зависит граница поставки по Лоту №3",
@@ -378,10 +448,17 @@
    "name": "Весовое оборудование коммерческого учёта",
    "spec": "Класс точности «высокий»; открытые программные компоненты для автоматической передачи данных; комплект калибровочных грузов и ЗИП на 2 года",
    "tier": "A",
-   "world": [],
-   "cn": [],
+   "world": [
+    "Essae-Teraoka Pvt. Ltd."
+   ],
+   "cn": [
+    "Ningbo Keli Sensing Technology Co., Ltd.",
+    "Shanghai Yaohua Weighing System Co., Ltd."
+   ],
    "ru": [
-    "См. Приложение №5, раздел «Измерение массы» — утверждённый перечень"
+    "См. Приложение №5, раздел «Измерение массы» — утверждённый перечень",
+    "ООО «Тензо-М»",
+    "ГК «Невские весы» (ООО «ВесСервис»)"
    ],
    "ask": "Наличие в Госреестре СИ РФ и поставка с первичной поверкой — обязательно"
   },
@@ -393,7 +470,10 @@
    "tier": "A",
    "world": [],
    "cn": [
-    "Jingjin Equipment Inc."
+    "Jingjin Equipment Inc.",
+    "Dazhang Filtration Equipment Co., Ltd.",
+    "Zhongda Bright Filter Press Co., Ltd.",
+    "Zhengzhou Toper Industrial Equipment Co., Ltd."
    ],
    "ru": [],
    "ask": "Jingjin документирует поставки в РФ — снимает часть рисков логистики и договорной работы",
@@ -411,7 +491,11 @@
    "world": [],
    "cn": [
     "Yantai Jinpeng Mining Machinery Co., Ltd.",
-    "Nuclear Industry Yantai Toncin Group Co., Ltd."
+    "Nuclear Industry Yantai Toncin Group Co., Ltd.",
+    "Yantai Hexin Environmental Protection Equipment Co., Ltd.",
+    "Jiangxi Shicheng Mine Machinery Factory (JXSC)",
+    "Weihai Haiwang Hydrocyclone Co., Ltd.",
+    "Shandong Xinhai Mining Technology & Equipment Inc."
    ],
    "ru": [],
    "ask": "Исполнение под кислую абразивную пульпу",
@@ -427,7 +511,10 @@
    "tier": "B",
    "world": [],
    "cn": [
-    "Zhejiang Greatwall Mixers Co., Ltd."
+    "Zhejiang Greatwall Mixers Co., Ltd.",
+    "Weihai Chemical Machinery Co., Ltd.",
+    "Jiangsu New Tengyu Fluid Equipment Manufacturing Co., Ltd.",
+    "Suzhou Sealok Fluid Equipment Co., Ltd."
    ],
    "ru": [],
    "ask": "ИД исключает 316L для этих позиций — только Hastelloy G-35 (Haynes Int.) или аналог, допустимо 904L",
@@ -445,7 +532,10 @@
    "world": [],
    "cn": [
     "Nantong Xingqiu Graphite Co., Ltd.",
-    "Siping Juyuan Hanyang Plate Heat Exchanger (THT)"
+    "Siping Juyuan Hanyang Plate Heat Exchanger (THT)",
+    "Lanpec Technologies Limited",
+    "Qingdao Ruipute (REAPTER) Heat Exchange Equipment",
+    "Nantong Sunshine Graphite Equipment Technology Co., Ltd."
    ],
    "ru": [
     "Отечественные производители пластинчатых ТО"
@@ -466,12 +556,16 @@
    "world": [],
    "cn": [],
    "ru": [
-    "ООО «РегЛаб» (Regul R050/R400/R500)",
+    "ООО «Прософт-Системы»",
     "АО НИЦ «Инкомсистем» (АБАК К2/К3)",
     "АО «Атомик Софт» (Alpha.Platform)",
     "АО «ЭлеСи» (Integrity SCADA)",
     "ООО «Прософт-Системы» (ARIS)",
-    "ООО НПП «ЭКРА» (EKRA A01/A02)"
+    "ООО НПП «ЭКРА» (EKRA A01/A02)",
+    "АО НИЦ «Инкомсистем»",
+    "АО «Атомик Софт»",
+    "АО «ЭлеСи»",
+    "ООО НПП «ЭКРА»"
    ],
    "ask": "Утверждённый перечень Приложения №5; для значимых объектов КИИ — проверка записи в реестре Минпромторга на момент экспертизы"
   },
@@ -495,7 +589,9 @@
     "ЗАО «Росма»",
     "ООО «УЛЬТРАМАШ»",
     "ООО «НПП КуйбышевТелеком-Метрология»",
-    "ООО «КОНВЕЛС Автоматизация»"
+    "ООО «КОНВЕЛС Автоматизация»",
+    "АО «Промышленная группа «Метран»",
+    "АО «ЭМИС»"
    ],
    "ask": "Полные перечни — в Приложении №5 по каждому виду измерений; все СИ из Госреестра, с первичной поверкой"
   }
@@ -1045,7 +1141,8 @@
    "profile": "Листинговая компания (SSE 601369), Сиань. Один из двух главных производителей КНР осевых/центробежных компрессоров и воздуходувок для металлургии, TRT-турбины; ~2000 моделей.",
    "refs": "Классический поставщик металлургического дутья.",
    "classes": [
-    "blower"
+    "blower",
+    "fan"
    ],
    "src": "http://www.shaangu.com/",
    "checked": "2026-08-15"
@@ -1236,6 +1333,1421 @@
    ],
    "src": "https://csiza.co.za/ (главная, блок контактов)",
    "checked": "2026-08-15"
+  },
+  {
+   "key": "prosoft",
+   "name": "ООО «Прософт-Системы»",
+   "zh": "",
+   "country": "РФ",
+   "site": "https://prosoftsystems.ru",
+   "contact": [
+    "info@prosoftsystems.ru",
+    "+7 (343) 356-51-11",
+    "отдел продаж ПЛК REGUL (reglab.ru): sales@reglab.ru, +7 (343) 270-23-35"
+   ],
+   "profile": "Екатеринбург: разработчик российских ПЛК REGUL (R500 — флагман отказоустойчивых АСУТП с полным резервированием, R500S — ПАЗ до SIL3), противоаварийная автоматика, ПО «Энергосфера». Линейка REGUL — на продуктовом сайте reglab.ru (ООО «РегЛаб»).",
+   "refs": "отрасли REGUL: электроэнергетика, металлургия, горнодобыча, нефтегаз; именованные референсы — запрашивать презентацию у продаж",
+   "classes": [
+    "plc"
+   ],
+   "src": "https://prosoftsystems.ru/contact; https://reglab.ru/product/plk_regul_rx00/",
+   "checked": "2026-08-15"
+  },
+  {
+   "key": "incomsystem",
+   "name": "АО НИЦ «Инкомсистем»",
+   "zh": "",
+   "country": "РФ",
+   "site": "https://incomsystem.ru",
+   "contact": [
+    "mail@incomsystem.ru",
+    "продажи ПЛК АБАК: sales.abak@incomsystem.ru",
+    "8 (843) 212-50-10"
+   ],
+   "profile": "Казань, с 1991 г., 550+ сотрудников, 600+ проектов: системный интегратор АСУТП и метрологии, разработчик и производитель контроллеров АБАК (ПЛК и измерительно-вычислительные комплексы).",
+   "refs": "нефтегаз/нефтехимия, внедрения в 100+ городах; металлургию уточнять при квалификации",
+   "classes": [
+    "plc"
+   ],
+   "src": "https://incomsystem.ru/contacts/",
+   "checked": "2026-08-15"
+  },
+  {
+   "key": "elemer",
+   "name": "ООО НПП «ЭЛЕМЕР»",
+   "zh": "",
+   "country": "РФ",
+   "site": "https://www.elemer.ru",
+   "contact": [
+    "elemer@elemer.ru",
+    "selling@elemer.ru",
+    "+7 495 988-48-55",
+    "8 800 100-51-47"
+   ],
+   "profile": "Зеленоград, с 1992 г. — один из крупнейших российских производителей КИПиА: датчики давления и температуры, уровнемеры, расходомеры (электромагнитные, вихревые, УЗ), калибраторы; 20+ представительств.",
+   "refs": "клиенты: Газпром, Роснефть, Росатом, Северсталь (по сайту)",
+   "classes": [
+    "instr"
+   ],
+   "src": "https://elemer.ru/contacts/",
+   "checked": "2026-08-15"
+  },
+  {
+   "key": "metran",
+   "name": "АО «Промышленная группа «Метран»",
+   "zh": "",
+   "country": "РФ",
+   "site": "https://www.metran.ru",
+   "contact": [
+    "info@metran.ru, +7 (351) 24-24-444",
+    "support@metran.ru, +7 (351) 24-24-000",
+    "сервис СИ: 8-800-200-16-55"
+   ],
+   "profile": "Челябинск: датчики давления, кориолисовые/электромагнитные/вихреакустические расходомеры, датчики температуры, уровнемеры. Собственность: в 2023 г. выкуплен у Emerson российским менеджментом (ООО «Метран холдинг», подтверждено Интерфакс/74.ru) — самостоятельная российская компания.",
+   "refs": "широкая установленная база в энергетике, нефтегазе, металлургии; собственный сервис средств измерений",
+   "classes": [
+    "instr"
+   ],
+   "src": "https://www.metran.ru/contacts/",
+   "checked": "2026-08-15"
+  },
+  {
+   "key": "tenso-m",
+   "name": "ООО «Тензо-М»",
+   "zh": "",
+   "country": "РФ",
+   "site": "https://www.tenso-m.ru",
+   "contact": [
+    "sales@tenso-m.ru",
+    "tenso@tenso-m.ru",
+    "8 800 555 65 30"
+   ],
+   "profile": "Московская обл., с 1990 г.: ведущий российский производитель весовой техники — 40 000 тензодатчиков и 3 500 весов в год. Под ОВЭ-75: платформенные и крановые (пакеты катодов 2,5 т), вагонные и автомобильные весы, дозаторы, терминалы.",
+   "refs": "55 000 клиентов; собственное производство тензодатчиков",
+   "classes": [
+    "scale"
+   ],
+   "src": "https://www.tenso-m.ru/kontakty/",
+   "checked": "2026-08-15"
+  },
+  {
+   "key": "nevskie-vesy",
+   "name": "ГК «Невские весы» (ООО «ВесСервис»)",
+   "zh": "",
+   "country": "РФ",
+   "site": "https://vesservice.com",
+   "contact": [
+    "sale@vesservice.com",
+    "8-800-775-84-02"
+   ],
+   "profile": "Петербургский завод весов полного цикла (с 1999 г.): платформенные ВСП4 до 10 т, автомобильные 20–100 т, вагонные, крановые. Включён вместо «Масса-К» — у той номенклатура до ~2 т, вагонных/автомобильных нет (проверено по massa.ru).",
+   "refs": "весы коммерческого учёта: платформенные, автомобильные, вагонные, крановые",
+   "classes": [
+    "scale"
+   ],
+   "src": "https://vesservice.com/company/contacts/",
+   "checked": "2026-08-15"
+  },
+  {
+   "key": "bikz",
+   "name": "Бийский котельный завод (БиКЗ)",
+   "zh": "",
+   "country": "РФ",
+   "site": "https://bikz.ru",
+   "contact": [
+    "sibir@bikz.ru",
+    "secretary_comm@bikz.ru, +7 (3854) 777-522",
+    "+7 (800) 333-19-19"
+   ],
+   "profile": "Старейший котельный завод России (1942 г., 135 000+ котлов): паровые и водогрейные котлы 1–200 МВт. В каталоге отдельный раздел газомазутных горелок под газ и мазут (типоряд ГМ/ГМП — запрашивать перечень в продажах).",
+   "refs": "Старорусприбор проверен и по классу НЕ подходит (ГМГ/МГМГ в актуальном каталоге нет, жидкотопливные — только дизель)",
+   "classes": [
+    "burner"
+   ],
+   "src": "https://www.bikz.ru/contacts/",
+   "checked": "2026-08-15"
+  },
+  {
+   "key": "bikz-generation",
+   "name": "Бийский Котельный Завод «Генерация»",
+   "zh": "",
+   "country": "РФ",
+   "site": "https://bikzg.ru",
+   "contact": [
+    "zakaz@bikzg.ru",
+    "8 (800) 600-76-56"
+   ],
+   "profile": "Бийск: серийные газомазутные горелки классического типоряда ГМ для раздельного сжигания газа и топочного мазута — ГМ-2,5/4,5/7/10, ГМП-16 (карточки с ценами на сайте). Ровно типоряд из ИД ОВЭ-75 (ГМ-4,5, МГМГ).",
+   "refs": "в Бийске несколько одноимённых заводов — при квалификации запросить реквизиты юрлица и площадку",
+   "classes": [
+    "burner"
+   ],
+   "src": "https://bikzg.ru/catalog/gorelki/gorelki-gm/",
+   "checked": "2026-08-15"
+  },
+  {
+   "key": "tiancheng",
+   "name": "Sinosteel Tiancheng Environmental Protection Science & Technology Co., Ltd.",
+   "zh": "中钢天澄",
+   "country": "КНР",
+   "site": "http://www.tianchengep.com/",
+   "unreachable": true,
+   "contact": [
+    "tiancheng@sinosteel.com (каталог — сайт из РФ недоступен, перепроверить перед ТКП)",
+    "+86 27-5990-8247 (каталог)"
+   ],
+   "profile": "Ухань, контур Sinosteel/Baowu: промышленная газоочистка чёрной и цветной металлургии — ЭФ, рукавные фильтры, десульфуризация, EPC; 2 национальных техцентра, 50+ патентов. Комплектацию горячего циклонного тракта 750–900 °C уточнять при ТКП.",
+   "refs": "газоочистка металлургических печей (по англ. сайту материнской Sinosteel E&T)",
+   "classes": [
+    "cyclone"
+   ],
+   "src": "https://m.trjcn.com/cyxm/69686.html (каталог; сайт недоступен через прокси)",
+   "checked": "2026-08-15"
+  },
+  {
+   "key": "saideli",
+   "name": "Jiangsu Saideli Pharmaceutical Machinery Co., Ltd.",
+   "zh": "赛德力",
+   "country": "КНР",
+   "site": "https://www.saideli-centrifuge.com",
+   "contact": [
+    "sales@saideli.com",
+    "+86-523-84808886"
+   ],
+   "profile": "Цзянсу, с 1953 г.: пульсирующие (pusher) центрифуги серии HR выпускает с 1965 г., >7000 машин; HR400–HR1000, 1–50 т/ч, непрерывная выгрузка с промывкой осадка. Исполнение 904L под медный купорос — вопрос к ТКП.",
+   "refs": "химия, минудобрения, соли (Na₂SO₄, NaCl), фарма",
+   "classes": [
+    "centrifuge"
+   ],
+   "src": "https://www.saideli-centrifuge.com/contact.html",
+   "checked": "2026-08-15"
+  },
+  {
+   "key": "howah",
+   "name": "Xi'an Howah Industry Technology Co., Ltd",
+   "zh": "",
+   "country": "КНР",
+   "site": "https://www.howahanode.com",
+   "contact": [
+    "mia@howahmetal.com",
+    "+86-29-86680870"
+   ],
+   "profile": "Сиань: специализированный производитель электродов — свинцовые аноды Pb-Ca-Sn (прокатанные, размер под заказ) для электроэкстракции меди/кобальта/никеля, MMO-титановые аноды. 232 инженера, 80 патентов, 1000+ заказчиков.",
+   "refs": "продуктовая линейка lead alloy anode for copper/cobalt/nickel electrowinning (официальный сайт)",
+   "classes": [
+    "anode"
+   ],
+   "src": "https://www.howahanode.com/contact-us/",
+   "checked": "2026-08-15"
+  },
+  {
+   "key": "lufeng",
+   "name": "Xiangtan Lufeng Machinery Co., Ltd.",
+   "zh": "",
+   "country": "КНР",
+   "site": "https://www.xtlfjx.com",
+   "contact": [
+    "zhouchun@xtlfjx.com",
+    "davis@xtlfjx.com",
+    "+86-13317323162"
+   ],
+   "profile": "Сянтань (Хунань): комплектные системы электролиза меди — линии съёма катодных основ со стальных матриц 60/200/300 шт/ч (роботы, стриппер, конвейер, плющильная машина), машины отливки анодов, электролизные ванны.",
+   "refs": "поставки медеплавильным заводам КНР и за рубеж (сайт; конкретные заводы не названы)",
+   "classes": [
+    "starter"
+   ],
+   "src": "https://www.xtlfjx.com/contact.html",
+   "checked": "2026-08-15"
+  },
+  {
+   "key": "dazhang",
+   "name": "Dazhang Filtration Equipment Co., Ltd.",
+   "zh": "大张过滤",
+   "country": "КНР",
+   "site": "https://www.dazhangfilterpress.com",
+   "contact": [
+    "admin@dazhangfilterpress.com",
+    "+86-15038273580"
+   ],
+   "profile": "Хэнань, с 2004 г.: один из крупнейших производителей фильтр-прессов КНР — 5 баз (570 000 м²), мембранные/камерные/ленточные, модели 250–2000, 100+ типоразмеров.",
+   "refs": "горнодобыча, металлургия, химия, экология",
+   "classes": [
+    "filterpress"
+   ],
+   "src": "https://www.dazhangfilterpress.com/contact-us/",
+   "checked": "2026-08-15"
+  },
+  {
+   "key": "weihai",
+   "name": "Weihai Chemical Machinery Co., Ltd.",
+   "zh": "",
+   "country": "КНР",
+   "site": "https://www.weihaicm.com",
+   "contact": [
+    "sales@weihaicm.com",
+    "+86-21-59886617"
+   ],
+   "profile": "Шаньдун, с 1975 г., 900+ сотрудников: промышленные перемешивающие системы и агитаторы (верхний/боковой ввод), реакторы высокого давления; совместные НИОКР по перемешиванию с Harbin Institute of Technology. Кислотостойкое исполнение — вопрос к ТКП.",
+   "refs": "квалифицированный поставщик Sinopec с 2007 г.; нефтехимия, металлургия",
+   "classes": [
+    "agitator"
+   ],
+   "src": "https://www.weihaicm.com/about-us",
+   "checked": "2026-08-15"
+  },
+  {
+   "key": "bntet",
+   "name": "Zhengzhou Bona Thermal Energy Equipment Co., Ltd. (BNTET)",
+   "zh": "",
+   "country": "КНР",
+   "site": "https://www.bntet-burner.com",
+   "contact": [
+    "info@bntet.com",
+    "+86-156-3978-1876"
+   ],
+   "profile": "Чжэнчжоу, с 2006 г.: промышленные горелки 30 кВт–70 МВт — мазутные (heavy oil), газовые, комбинированные, низко-NOx; >600 000 выпущено, 1300 предприятий-партнёров.",
+   "refs": "котельные, промышленные печи, обжиговые установки",
+   "classes": [
+    "burner"
+   ],
+   "src": "https://www.bntet-burner.com/",
+   "checked": "2026-08-15"
+  },
+  {
+   "key": "nfc",
+   "name": "NFC (China Nonferrous Metal Industry's Foreign Engineering and Construction)",
+   "zh": "中色股份",
+   "country": "КНР",
+   "site": "https://nfc.cnmc.com.cn",
+   "contact": [
+    "+86-10-84427755 (почты на странице контактов нет)"
+   ],
+   "profile": "Пекин, группа CNMC, листинг SZ 000758, 50+ стран: EPC-подрядчик цветной металлургии «под ключ» — печные переделы в составе комплексов по проектам китайских институтов.",
+   "refs": "медный завод Amin (Индонезия, акт 21.07.2026), алюминиевый Dak Nong (Вьетнам)",
+   "classes": [
+    "roaster"
+   ],
+   "src": "https://nfc.cnmc.com.cn/jsen/lxwm/lxwm2/A028002008Gone1.html",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "kmy",
+   "name": "Kunming Engineering & Research Institute of Nonferrous Metallurgy (KMY)",
+   "zh": "昆明有色冶金设计研究院",
+   "country": "КНР",
+   "site": "https://kmy.chinalco.com.cn",
+   "contact": [
+    "+86-871-63163755 (почты на странице контактов нет)"
+   ],
+   "profile": "Куньмин, с 1953 г., контур Chinalco: отраслевой проектный институт первого класса — рудники, металлургические и химико-металлургические производства, ТЭО, EPC/PM.",
+   "refs": "референсы печей на сайте не раскрыты — запрашивать",
+   "classes": [
+    "roaster"
+   ],
+   "src": "https://kmy.chinalco.com.cn/en/lxwmen/202012/t20201229_72378.html",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "bgrimm",
+   "name": "BGRIMM Technology Group",
+   "zh": "矿冶科技集团",
+   "country": "КНР",
+   "site": "http://www.bgrimm.com",
+   "contact": [
+    "infonet@bgrimm.com",
+    "+86-10-63299888"
+   ],
+   "profile": "Пекин, с 1956 г., центральный государственный горно-металлургический НИИ: НИОКР, проектирование, EPC и оборудование обогащения и металлургии цветных металлов; научно-инжиниринговый центр технологий обжига/плавки.",
+   "refs": "как чистый проектант печей КС слабее ENFI/Nerin — включён как НИОКР-центр",
+   "classes": [
+    "roaster"
+   ],
+   "src": "http://www.bgrimm.com/",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "cinf",
+   "name": "CINF Engineering (Changsha Nonferrous Metallurgy Design & Research Institute)",
+   "zh": "长沙有色冶金设计研究院",
+   "country": "КНР",
+   "site": "http://www.cinf.com.cn",
+   "unreachable": true,
+   "contact": [
+    "контакты НЕ верифицированы — сайт 503 из-за рубежа; из ведущих институтов отрасли, проверить сорсером"
+   ],
+   "profile": "Чанша, с 1953 г., дочка CHALIECO, 800+ сотрудников: полный цикл проектирования рудников, фабрик и плавильных производств вкл. пирометаллургию — наряду с ENFI и Nerin из ведущих институтов.",
+   "refs": ">10 000 проектов (по каталожным данным)",
+   "classes": [
+    "roaster"
+   ],
+   "src": "https://baike.baidu.com/en/item/… (каталог; сайт не сфетчен)",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "hailu",
+   "name": "Suzhou Hailu Heavy Industry Co., Ltd.",
+   "zh": "苏州海陆重工",
+   "country": "КНР",
+   "site": "https://www.hailu-boiler.com",
+   "contact": [
+    "hailu-sales@hailu-boiler.cn",
+    "yangmm@hailu-boiler.cn, +86-512-56158541"
+   ],
+   "profile": "Чжанцзяган, листинг SZ 002255, ~70 лет: специализированный производитель котлов-утилизаторов; на сайте выделена линейка «non-ferrous heat recovery boilers» — КУ за печами цветной металлургии; также сосуды давления и оборудование АЭС.",
+   "refs": "КУ для цветмета, нефтепереработки, сталеплавильного передела",
+   "classes": [
+    "whb"
+   ],
+   "src": "https://www.hailu-boiler.com/contact.html",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "huaguang",
+   "name": "Wuxi Huaguang Environment & Energy Group",
+   "zh": "无锡华光",
+   "country": "КНР",
+   "site": "https://www.hghngroup.com",
+   "unreachable": true,
+   "contact": [
+    "контакты НЕ верифицированы — оба домена гео-блокируют (504/418); проверить из РФ"
+   ],
+   "profile": "Уси, с 1958 г. (Wuxi Boiler Works), листинг SSE 600475: котлы-утилизаторы, ЦКС, мусоросжигательные и биомассовые котлы, энергосервис.",
+   "refs": "по каталогу листинга",
+   "classes": [
+    "whb"
+   ],
+   "src": "https://stockanalysis.com/quote/sha/600475/company/",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "tengy",
+   "name": "Tengy Environmental Technology (Zhejiang Tianjie)",
+   "zh": "浙江天洁",
+   "country": "КНР",
+   "site": "https://www.tengy.com",
+   "contact": [
+    "tianjie@tianjie.net",
+    "+86-575-87051061"
+   ],
+   "profile": "Чжуцзи (Чжэцзян), листинг HKEX 1527: сухие электрофильтры, рукавные и электро-рукавные фильтры, сероочистка, деNOx; 150+ крупных проектов в энергетике, металлургии, химии. Циклонной линейки в актуальной номенклатуре нет.",
+   "refs": "продуктовые страницы ЭФ и рукавных фильтров",
+   "classes": [
+    "esp",
+    "baghouse"
+   ],
+   "src": "https://www.tengy.com/",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "rieco",
+   "name": "Rieco Industries Ltd.",
+   "zh": "",
+   "country": "Индия",
+   "site": "https://www.rieco.com",
+   "contact": [
+    "почта скрыта защитой — форма rieco.com/contact-us",
+    "+91-7888004462"
+   ],
+   "profile": "Пуна, 45+ лет, 10 000+ инсталляций в 40+ странах: циклоны и мультициклоны, рукавные и картриджные фильтры, ЭФ, скрубберы, пневмотранспорт, EPC.",
+   "refs": "отдельные продуктовые страницы Cyclone Separator и Multiclone",
+   "classes": [
+    "cyclone",
+    "baghouse"
+   ],
+   "src": "https://www.rieco.com/solutions/air-pollution-control",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "techflow",
+   "name": "Techflow Enterprises Pvt. Ltd.",
+   "zh": "",
+   "country": "Индия",
+   "site": "https://techflow.net",
+   "contact": [
+    "sales@techflow.net",
+    "info@techflow.net",
+    "+91-78747-19999"
+   ],
+   "profile": "Ахмедабад: рукавные фильтры, циклоны и мультициклоны (Cyclone MDC), ЭФ, вентиляторы, пневмотранспорт; контакты сверены по официальному продуктовому микросайту.",
+   "refs": "раздел инсталляций Cyclone MDC",
+   "classes": [
+    "cyclone",
+    "baghouse"
+   ],
+   "src": "https://www.bagfilterforboiler.com/",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "enviropol",
+   "name": "Enviropol Engineers Pvt. Ltd.",
+   "zh": "",
+   "country": "Индия",
+   "site": "https://www.enviropolengineers.in",
+   "contact": [
+    "marketing@enviropolengineers.in",
+    "+91-7678684207"
+   ],
+   "profile": "Нойда, с 2003 г.: сухие и мокрые электрофильтры (ESP/WESP), рукавные фильтры, скрубберы, FGD; 500+ инсталляций в 30+ странах, выделен сегмент mining & metals.",
+   "refs": "линейки ESP/WESP/Bag Filter/FGD",
+   "classes": [
+    "esp",
+    "baghouse"
+   ],
+   "src": "https://www.enviropolengineers.in/",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "shangfeng",
+   "name": "Zhejiang Shangfeng Special Blower Industrial Co., Ltd.",
+   "zh": "",
+   "country": "КНР",
+   "site": "https://en.sz-gf.com.cn",
+   "contact": [
+    "songff@infore.com (Industrial Sales)",
+    "sfgk@infore.com",
+    "+86 575-82530856"
+   ],
+   "profile": "Шаосин, история с 1974 г., первая вентиляторная компания КНР на бирже: осевые, центробежные и шкафные вентиляторы вкл. ядерный класс. Коррозионное исполнение под SO₂ и 400 кВт — подтверждать техзапросом.",
+   "refs": "АЭС, тоннели, промвентиляция",
+   "classes": [
+    "fan"
+   ],
+   "src": "https://en.sz-gf.com.cn/contact1.html",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "hongcheng",
+   "name": "Zibo Hongcheng Fan Co., Ltd.",
+   "zh": "",
+   "country": "КНР",
+   "site": "https://www.hongchengfan.com",
+   "contact": [
+    "wangcheng@hongchengfan.com",
+    "+86-13361597190"
+   ],
+   "profile": "Цзыбо (вентиляторный кластер Шаньдуна): коррозионностойкие вентиляторы — FRP/стеклопластик, нержавейка, титан; износостойкие центробежные, дымососы. Компания малая — для машин 400 кВт проверять референсы и мощности.",
+   "refs": "горная, химия, металлургия",
+   "classes": [
+    "fan"
+   ],
+   "src": "https://www.hongchengfan.com/",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "ebico",
+   "name": "EBICO (China) Environment Co., Ltd.",
+   "zh": "",
+   "country": "КНР",
+   "site": "https://www.ebico.com",
+   "contact": [
+    "info@ebico.com",
+    "+86-510-85187552",
+    "WhatsApp +86-18900630022"
+   ],
+   "profile": "Уси (Цзянсу), с 1998 г.: горелки на тяжёлом жидком топливе (мазут), дизеле, газе, комбинированные и низко-NOx, нестандартные крупные для котлов и печей. Бренд итальянского происхождения, но юрлицо и завод — китайские (санкционный риск поставки снят).",
+   "refs": "промышленные котлы и печи",
+   "classes": [
+    "burner"
+   ],
+   "src": "https://www.ebico.com/contact.html",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "ecostar",
+   "name": "Termo Isı Sistemleri A.Ş. (Ecostar)",
+   "zh": "",
+   "country": "Турция",
+   "site": "https://www.ecostar.com.tr/en",
+   "contact": [
+    "почты скрыты защитой — форма ecostar.com.tr/en/contact",
+    "+90 282 685 44 80 (завод Чорлу)",
+    "+90 216 442 93 00 (Стамбул)"
+   ],
+   "profile": "Крупнейший турецкий производитель горелок (с 1967 г.): моноблочные и дуоблочные промышленные горелки на газе, дизеле, мазуте — линейки 12 кВт–12 МВт. Прямой несанкционный аналог итальянских Ecoflam/Baltur.",
+   "refs": "мазутные линейки до 12 МВт (страница heavy-oil-burners)",
+   "classes": [
+    "burner"
+   ],
+   "src": "https://www.ecostar.com.tr/en/contact",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "wesman",
+   "name": "The Wesman Engineering Co. Pvt. Ltd.",
+   "zh": "",
+   "country": "Индия",
+   "site": "https://www.wesman.com",
+   "contact": [
+    "contact@wesman.com",
+    "+91 (33) 40020300"
+   ],
+   "profile": "Калькутта, с 1951 г., два завода, ISO 9001 с 1998 г.: жидкотопливные, газовые и двухтопливные горелки для печей и котлов (вкл. регенеративные), системы топливоподачи и шкафы управления горением; силён в печных применениях.",
+   "refs": "печи нагрева и термообработки металла",
+   "classes": [
+    "burner"
+   ],
+   "src": "https://wesman.com/contactus",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "ske",
+   "name": "Shanghai Ku Qiao Equipment Co., Ltd. (SKE)",
+   "zh": "",
+   "country": "КНР",
+   "site": "https://www.skemachinery.com",
+   "contact": [
+    "info@skecon.com",
+    "+86 21-38473059",
+    "WhatsApp +86 18916089629"
+   ],
+   "profile": "Шанхай, с 2013 г., ~60 000 м²: ленточные конвейеры и системы для сыпучих (стационарные, длиннодистанционные, штабелирование), ролики, EPC. Термостойкое исполнение под горячий огарок — согласовывать ТЗ.",
+   "refs": "ТЭС, цемент, порты",
+   "classes": [
+    "conveyor"
+   ],
+   "src": "https://www.skemachinery.com/contact-us.htm",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "exct",
+   "name": "Henan Excellent Machinery Co., Ltd. (EXCT)",
+   "zh": "",
+   "country": "КНР",
+   "site": "https://www.exctmach.com",
+   "contact": [
+    "info@exctmach.com",
+    "+86 373 5828866",
+    "WhatsApp +86-18153098776"
+   ],
+   "profile": "Синьсян (Хэнань), 30+ лет по элеваторам: ленточные (трубчатые, крутонаклонные), шнековые и цепные конвейеры, тяжёлые апронные питатели — подходящий класс для горячих абразивных материалов.",
+   "refs": "горная, металлургия, порты, энергетика",
+   "classes": [
+    "conveyor"
+   ],
+   "src": "https://www.exctmach.com/",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "nhi",
+   "name": "Northern Heavy Industries Group Co., Ltd. (NHI)",
+   "zh": "北方重工",
+   "country": "КНР",
+   "site": "http://www.nhi.com.cn",
+   "contact": [
+    "jsyxzx@nhi.com.cn",
+    "+86-24-67859163 (продажи)"
+   ],
+   "profile": "Шэньян, госконцерн >10 000 сотрудников: дивизион сыпучих материалов — ленточные конвейеры, пластинчатые/апронные питатели, стакеры-реклаймеры тяжёлого класса. Сайт только http и только на китайском — переписку вести по почте.",
+   "refs": "металлургия, ГОК, угольные терминалы",
+   "classes": [
+    "conveyor"
+   ],
+   "src": "http://www.nhi.com.cn/ (раздел 散料装备)",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "yinuo",
+   "name": "Xinxiang Yinuo Machineries Co., Ltd.",
+   "zh": "",
+   "country": "КНР",
+   "site": "https://www.vacuumdrumfilters.com",
+   "contact": [
+    "info@vacuumdrumfilters.com",
+    "+86-13837359848",
+    "WhatsApp +86-17329378900"
+   ],
+   "profile": "Синьсян, с 2007 г.: узкопрофильный завод вакуум-фильтров — барабанные, дисковые, ленточные, керамические + запчасти.",
+   "refs": "нефтехимия, литиевые материалы, минеральные концентраты",
+   "classes": [
+    "vacfilter"
+   ],
+   "src": "https://www.vacuumdrumfilters.com/Contact-Us.html",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "hexin",
+   "name": "Yantai Hexin Environmental Protection Equipment Co., Ltd.",
+   "zh": "",
+   "country": "КНР",
+   "site": "https://www.hexin-filter.com",
+   "contact": [
+    "sales@hexin-filter.com",
+    "+86-15589506528 (тел./WhatsApp/WeChat)"
+   ],
+   "profile": "Яньтай: керамические дисковые (DF) и горизонтальные (BF) вакуум-фильтры, автоматические пресс-фильтры, комплексы сухого складирования хвостов; дополнительно сгустители NGZ — перекрывает и класс thickener.",
+   "refs": "обезвоживание концентратов и хвостов",
+   "classes": [
+    "vacfilter",
+    "thickener"
+   ],
+   "src": "https://www.hexin-filter.com/",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "jxsc",
+   "name": "Jiangxi Shicheng Mine Machinery Factory (JXSC)",
+   "zh": "",
+   "country": "КНР",
+   "site": "https://www.jxscmachine.com",
+   "contact": [
+    "machine@jxsc.com",
+    "+86-13879771862"
+   ],
+   "profile": "Ганьчжоу (Цзянси), 30+ лет: дисковые вакуум-фильтры, сгустители, обезвоживающие грохоты, фильтр-прессы — бюджетная альтернатива яньтайским для малых/средних фабрик.",
+   "refs": "обогатительное оборудование мокрого передела",
+   "classes": [
+    "vacfilter",
+    "thickener"
+   ],
+   "src": "https://www.jxscmachine.com/contact/",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "haiwang",
+   "name": "Weihai Haiwang Hydrocyclone Co., Ltd.",
+   "zh": "海王",
+   "country": "КНР",
+   "site": "https://www.haiwanggroup.com",
+   "contact": [
+    "почта скрыта защитой — форма haiwanggroup.com/contact/",
+    "+86 18763140706",
+    "+86 631 5621557"
+   ],
+   "profile": "Вэйхай, с 1989 г., мировой бренд гидроциклонов (70+ стран): пастовые сгустители HWPT, циклонные станции, износостойкие трубопроводы. По D 15 м запросить типоразмерный ряд HWPT/high-rate.",
+   "refs": "HWPT Series Paste Thickener (страница продукта)",
+   "classes": [
+    "thickener"
+   ],
+   "src": "https://www.haiwanggroup.com/product/hwpt-series-paste-thickener/",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "xinhai",
+   "name": "Shandong Xinhai Mining Technology & Equipment Inc.",
+   "zh": "鑫海矿装",
+   "country": "КНР",
+   "site": "https://www.xinhaimining.com",
+   "unreachable": true,
+   "contact": [
+    "контакты НЕ верифицированы — сайт 503 из-за рубежа; проверить сорсером из РФ"
+   ],
+   "profile": "Яньтай, с 1993 г., NEEQ 836079: один из крупнейших производителей обогатительного оборудования и EPC+M — глубококонусные сгустители, вакуум-фильтры, флотомашины, мельницы (кандидат на оба класса).",
+   "refs": "Efficient Deep Cone Thickener (по выдаче)",
+   "classes": [
+    "thickener",
+    "vacfilter"
+   ],
+   "src": "поисковая верификация; сайт не сфетчен",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "leheng",
+   "name": "Hebei Leheng Energy Saving Equipment Co., Ltd.",
+   "zh": "",
+   "country": "КНР",
+   "site": "https://www.lhevaporator.com",
+   "contact": [
+    "+86-316-7788168",
+    "форма: lhevaporator.com/contact-us"
+   ],
+   "profile": "Хэбэй (40 км от Пекина): MVR-выпарные установки (падающая/восходящая плёнка) и MVR-кристаллизаторы с принудительной циркуляцией, паровые турбокомпрессоры — высокосолевые стоки и вакуум-соль. Материалы 904L — вопрос к ТКП.",
+   "refs": "профильные выпарные под кристаллизацию солей",
+   "classes": [
+    "evaporator"
+   ],
+   "src": "https://www.lhevaporator.com/contact-us",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "enco",
+   "name": "Hangzhou Enco Machinery Co., Ltd.",
+   "zh": "",
+   "country": "КНР",
+   "site": "https://www.encocn.com",
+   "contact": [
+    "Kelvin@cnenco.com",
+    "rxx@cnenco.com",
+    "+86-185-9344-9637"
+   ],
+   "profile": "Чжэцзян: MVR-выпарные кристаллизаторы с принудительной циркуляцией; на официальной странице прямо заявлены CuSO₄, NiSO₄, CoSO₄, Na₂SO₄ — точное попадание в купоросный передел ОВЭ-75. 904L — вопрос к ТКП.",
+   "refs": "кристаллизация сульфатов меди/никеля/кобальта (страница продукта)",
+   "classes": [
+    "evaporator"
+   ],
+   "src": "https://www.encocn.com/mvr-evaporator/mvr-forced-circulation-evaporator.html",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "sunkaier",
+   "name": "Jiangsu Sunkaier Industrial Technology Co., Ltd.",
+   "zh": "",
+   "country": "КНР",
+   "site": "https://www.sunkaier.com",
+   "unreachable": true,
+   "contact": [
+    "контакты НЕ сняты — сайт отдаёт 403 из-за рубежа; проверить сорсером напрямую"
+   ],
+   "profile": "Цзянсу: выпарные системы, DTB-кристаллизаторы, агитаторы, реакторы (по выдаче собственного сайта). Включён как след — реальность компании видна, контакты не верифицированы.",
+   "refs": "НЕ верифицировано",
+   "classes": [
+    "evaporator"
+   ],
+   "src": "https://www.sunkaier.com/contact (HTTP 403)",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "hanpu",
+   "name": "Jiangsu Hanpu Mechanical Technology Co., Ltd.",
+   "zh": "",
+   "country": "КНР",
+   "site": "https://www.hanputech.com",
+   "contact": [
+    "hanpu@hanputech.com",
+    "+86-512-58586977"
+   ],
+   "profile": "Цзянсу: пульсирующие (pusher) фильтрующие центрифуги серии PP (PP-40…85), непрерывная подача; заявлены спецнержавейки, медные сплавы, титан — Hastelloy уточнять.",
+   "refs": "профильные pusher-центрифуги",
+   "classes": [
+    "centrifuge"
+   ],
+   "src": "https://www.hanputech.com/centrifuge/horizontal-centrifuge/pp-series-pusher-centrifuge.html",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "peony",
+   "name": "Zhangjiagang City Peony Machinery Co., Ltd.",
+   "zh": "",
+   "country": "КНР",
+   "site": "https://www.separator-centrifuge.com",
+   "contact": [
+    "peony@peonyfns.com",
+    "+86-512-56998960"
+   ],
+   "profile": "Чжанцзяган, с 2008 г.: pusher-, корзиночные и декантерные центрифуги; 3 площадки, экспорт в 35+ стран.",
+   "refs": "экспортный производитель центрифуг",
+   "classes": [
+    "centrifuge"
+   ],
+   "src": "https://www.separator-centrifuge.com/aboutus.html",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "jiangbei",
+   "name": "Chongqing Jiangbei Machinery Co., Ltd. (JBMACH)",
+   "zh": "",
+   "country": "КНР",
+   "site": "https://en.jiangbeimach.com",
+   "unreachable": true,
+   "contact": [
+    "контакты НЕ сняты — сайт 503 из-за рубежа; ключевой кандидат класса, проверить сорсером"
+   ],
+   "profile": "Чунцин, производитель сепарационной техники с 1941 г., председательская компания отраслевой ассоциации КНР: pusher-, peeler-центрифуги, декантеры.",
+   "refs": "старейший профильный завод КНР",
+   "classes": [
+    "centrifuge"
+   ],
+   "src": "https://en.jiangbeimach.com/ (HTTP 503)",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "lanpec",
+   "name": "Lanpec Technologies Limited",
+   "zh": "兰石",
+   "country": "КНР",
+   "site": "https://en.lanpec.com",
+   "contact": [
+    "lanpec-office@lanpec.com",
+    "+86-21-51855797 (Шанхай)"
+   ],
+   "profile": "Ланьчжоу, листинговое машиностроение (SHA:601798, группа SINOMACH): сварные пластинчатые и пластинчато-кожуховые ТО, кожухотрубные, АВО — нефтехимия/химия, подбор сплава под агрессивные среды.",
+   "refs": "крупное листинговое машиностроение",
+   "classes": [
+    "hx"
+   ],
+   "src": "https://en.lanpec.com/",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "reapter",
+   "name": "Qingdao Ruipute (REAPTER) Heat Exchange Equipment",
+   "zh": "瑞普特",
+   "country": "КНР",
+   "site": "https://www.reapter-phe.com",
+   "contact": [
+    "sales@reapter-phe.com",
+    "400-6699-197"
+   ],
+   "profile": "Циндао: пластинчатые и пластинчато-кожуховые ТО; на сайте кейсы титановых ТО и plate-shell из Hastelloy C276 — прямое попадание под кислые среды ОВЭ-75.",
+   "refs": "кейсы Ti и Hastelloy C276 (официальный сайт)",
+   "classes": [
+    "hx"
+   ],
+   "src": "https://www.reapter-phe.com/",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "nt-sunshine",
+   "name": "Nantong Sunshine Graphite Equipment Technology Co., Ltd.",
+   "zh": "",
+   "country": "КНР",
+   "site": "http://www.sunshine-graphite.com",
+   "unreachable": true,
+   "contact": [
+    "контакты НЕ сняты — оба сайта 503; резерв к Nantong Xingqiu, проверить сорсером"
+   ],
+   "profile": "Наньтун, с 1996 г.: графитовые теплообменники, конденсаторы и абсорберы для кислых сред, экспорт в 20+ стран.",
+   "refs": "профильный графитовый кластер Наньтуна",
+   "classes": [
+    "hx"
+   ],
+   "src": "http://www.sunshine-graphite.com/ (HTTP 503)",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "zhongda",
+   "name": "Zhongda Bright Filter Press Co., Ltd.",
+   "zh": "中大贝特",
+   "country": "КНР",
+   "site": "https://www.brightfilterpress.com",
+   "contact": [
+    "export@brightfilterpress.com",
+    "+86-534-2299120"
+   ],
+   "profile": "Дэчжоу (Шаньдун), 24+ года, 1500+ сотрудников, 600 тыс. м²: мембранные фильтр-прессы (ручные/гидравлические/автоматические), фильтровальные плиты; 2000+ клиентов в 50+ странах.",
+   "refs": "крупный профильный завод",
+   "classes": [
+    "filterpress"
+   ],
+   "src": "https://www.brightfilterpress.com/about_us",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "toper",
+   "name": "Zhengzhou Toper Industrial Equipment Co., Ltd.",
+   "zh": "",
+   "country": "КНР",
+   "site": "https://www.industrial-filterpress.com",
+   "contact": [
+    "service@hi-toper.com",
+    "+86-150-9307-0185"
+   ],
+   "profile": "Чжэнчжоу, с 2006 г.: мембранные, камерные и автоматические фильтр-прессы, ленточные прессы; поставки в 30+ стран. Масштаб меньше Jingjin/Zhongda — резервный поставщик.",
+   "refs": "экспортный производитель",
+   "classes": [
+    "filterpress"
+   ],
+   "src": "https://www.industrial-filterpress.com/aboutus.html",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "tengyu",
+   "name": "Jiangsu New Tengyu Fluid Equipment Manufacturing Co., Ltd.",
+   "zh": "",
+   "country": "КНР",
+   "site": "https://www.chinatengyu.com",
+   "contact": [
+    "sales@chinatengyu.com",
+    "+86-137-7778-9498"
+   ],
+   "profile": "Цзянсу (Шуян): верхнеприводные агитаторы для химии/минерального сырья/водоочистки, магнитные и центробежные насосы, изготовление под заказ. Hastelloy/904L — вопрос к ТКП.",
+   "refs": "профильные top-entry агитаторы",
+   "classes": [
+    "agitator"
+   ],
+   "src": "https://www.chinatengyu.com/",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "sealok",
+   "name": "Suzhou Sealok Fluid Equipment Co., Ltd.",
+   "zh": "",
+   "country": "КНР",
+   "site": "https://www.sealokagitator.com",
+   "contact": [
+    "sales@360pv.com",
+    "+86-512-58728158"
+   ],
+   "profile": "Чжанцзяган, с 2009 г.: верхне-, боково- и нижнеприводные агитаторы, мешалки реакторов + собственные торцевые уплотнения.",
+   "refs": "агитаторы + уплотнения своего производства",
+   "classes": [
+    "agitator"
+   ],
+   "src": "https://www.sealokagitator.com/",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "chmm",
+   "name": "Hunan CHMM Metallurgy Engineering Co., Ltd.",
+   "zh": "",
+   "country": "КНР",
+   "site": "https://www.chmme.com",
+   "contact": [
+    "info@chmme.com",
+    "+86 185 0731 5516",
+    "+86 188 0208 9630 (WhatsApp)"
+   ],
+   "profile": "Чанша (Хунань), комплектный поставщик танкхауса: полимербетонные ванны (винилэфирная смола, виброформование), постоянные катоды 316L (штанга Cu-SS, лазерная сварка, ресурс полотна 10–15 лет), медная ошиновка (busbar/end bar под проект), автоматическая КСМ до 500 шт/ч (мойка-сдирка-взвешивание-маркировка, роботы опцией, поставка 3–6 мес).",
+   "refs": "EW/ER меди и цинка; изготовление под проект",
+   "classes": [
+    "cell",
+    "cathode",
+    "busbar",
+    "stripper"
+   ],
+   "src": "https://www.chmme.com/electrolytic-cell/; /cathode-plate/; /busbar/; /copper-electrolysis-machine/",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "sannai",
+   "name": "Hangzhou Sannai Environmental Technology Co., Ltd.",
+   "zh": "三耐环保",
+   "country": "КНР",
+   "site": "http://www.3nff.com",
+   "unreachable": true,
+   "contact": [
+    "форма на официальной витрине made-in-china.com/showroom/hz3nff/ (менеджер Mr. Jiang) — сайт 3nff.com из РФ недоступен"
+   ],
+   "profile": "Ханчжоу, с 1997 г., NEEQ 833070: фактический лидер КНР по винилэфирным полимербетонным ваннам — >3100 ванн для 30 заводов цветмета, экспорт в Казахстан и Конго; комплектные электролизные системы.",
+   "refs": "крупнейший профильный производитель ванн КНР; идентичность подтверждена официальной витриной",
+   "classes": [
+    "cell"
+   ],
+   "src": "https://www.made-in-china.com/showroom/hz3nff/",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "sm-intl",
+   "name": "Hunan SM International Industrial Co., Ltd.",
+   "zh": "",
+   "country": "КНР",
+   "site": "https://cssmindustry.com",
+   "contact": [
+    "почта скрыта защитой сайта — телефон/WhatsApp",
+    "+86 731 6515 2558 (HQ)",
+    "+86 173 0849 3887 (WhatsApp/WeChat)"
+   ],
+   "profile": "Чанша (HQ) + завод в Дунгуане: прокатные свинцовые аноды Pb-Sn1,5%-Ca0,08% для цехов электроэкстракции меди; штанги ETP-медь с покрытием Pb-Sb.",
+   "refs": "профильные аноды EW; данные с официального сайта",
+   "classes": [
+    "anode"
+   ],
+   "src": "https://cssmindustry.com (страница оборудования)",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "supercon",
+   "name": "Supercon India",
+   "zh": "",
+   "country": "Индия",
+   "site": "https://superconindia.com",
+   "contact": [
+    "anodes@superconindia.com",
+    "+91 93733 91493"
+   ],
+   "profile": "Пуна (Индия): свинцовые аноды для электроэкстракции меди — сплавы Pb-Ca (жёсткость, малая деформация) и Pb-Sn (стойкость к пассивации).",
+   "refs": "профильная страница lead anodes for electrowinning",
+   "classes": [
+    "anode"
+   ],
+   "src": "https://superconindia.com/lead-anodes-for-electro-winning.php",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "huierpu",
+   "name": "Tongling Huierpu Technology Co., Ltd.",
+   "zh": "",
+   "country": "КНР",
+   "site": "http://tlhuierpu.com",
+   "unreachable": true,
+   "contact": [
+    "форма на официальном профиле huierpu.en.made-in-china.com (June Hu) — сайт отдаёт 403"
+   ],
+   "profile": "Тунлин (Аньхой, «город меди»): профильный завод постоянных катодных матриц 316L — медно-стальные штанги (проводимость 99–99,9%), кромочные ленты PPO/ABS (3+ года), услуга восстановления полотен; патенты.",
+   "refs": "специализация именно на катодах 316L с восстановлением",
+   "classes": [
+    "cathode"
+   ],
+   "src": "https://huierpu.en.made-in-china.com/company-Tongling-Huierpu-Technology-Co-Ltd-.html",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "fabmann",
+   "name": "Fabmann (Keyi Industrial)",
+   "zh": "",
+   "country": "КНР",
+   "site": "https://www.fabmann.com",
+   "contact": [
+    "sales@keyiindustrial.com",
+    "+86-21-2281-1110"
+   ],
+   "profile": "Шанхай: изготовление медных шин по чертежам — сечения до 400×80 мм, гибка/CNC/сверловка, прямолинейность ≤0,5 мм/м, покрытия Sn/Ni/Ag/Pb. Не отраслевой специалист по электролизу — ошиновка 40+ кА с двойным контактом по чертежам проектанта.",
+   "refs": "универсальный квалифицированный изготовитель шин",
+   "classes": [
+    "busbar"
+   ],
+   "src": "https://www.fabmann.com/copper-products/copper-busbar.html",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "c-flo",
+   "name": "C-Flo Copper",
+   "zh": "",
+   "country": "Индия",
+   "site": "https://www.c-flo.com",
+   "contact": [
+    "sales@c-flo.com",
+    "+91 91373 78760"
+   ],
+   "profile": "Мумбаи: медные шины Cu-ETP 99,9% (≥97% IACS), ширина 10–200 мм, сечения до 3000 мм², лужение/серебрение, IS/BS EN/ASTM. Электролизная спецификация — по чертежам заказчика.",
+   "refs": "универсальный изготовитель шин",
+   "classes": [
+    "busbar"
+   ],
+   "src": "https://www.c-flo.com/copper-bus-bars.html",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "metalcess",
+   "name": "Changsha Metalcess Intelligent Equipment Co., Ltd.",
+   "zh": "",
+   "country": "КНР",
+   "site": "https://www.mts-intelligent.com",
+   "unreachable": true,
+   "contact": [
+    "контакты НЕ верифицированы — сайт недоступен (503), кандидат для ручной проверки сорсером"
+   ],
+   "profile": "Чанша: по поисковой выдаче — оборудование ER/EW меди (анодные плиты, постоянные катоды, комплектные цеха). Продукт не верифицирован с официального сайта — включён только как след для ручной проверки.",
+   "refs": "НЕ верифицировано",
+   "classes": [
+    "starter"
+   ],
+   "src": "поисковая выдача (страница не сфетчена)",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "kori",
+   "name": "Hunan Kori Convertors Co., Ltd.",
+   "zh": "",
+   "country": "КНР",
+   "site": "http://www.kori.cn",
+   "unreachable": true,
+   "contact": [
+    "форма на витрине made-in-china.com/showroom/zhuzhoukori/ (Mr. Frank Ding) — сайты kori.cn/korirectifier.com из РФ недоступны"
+   ],
+   "profile": "Чжучжоу, с 1998 г., нацстатус «маленький гигант»: высокоамперные выпрямительные системы для электролиза Mn/Cu/Zn/Al и хлор-щёлочи — один из немногих в КНР реальных игроков смелтерного класса (наш агрегат 47 кА/250 В ≈ 12 МВт).",
+   "refs": "экспорт в 40+ стран; электролиз цветных металлов заявлен явно",
+   "classes": [
+    "rectifier"
+   ],
+   "src": "https://www.made-in-china.com/showroom/zhuzhoukori/",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "liyuan",
+   "name": "Zhengzhou Liyuan Haina Rectifier Co., Ltd.",
+   "zh": "",
+   "country": "КНР",
+   "site": "https://www.lyrectifier.com",
+   "contact": [
+    "sale@lyrectifier.com",
+    "+86-371-66859535",
+    "WhatsApp +86 15738891027"
+   ],
+   "profile": "Чжэнчжоу, с 1997 г. (завод в Цзюцзяне, офисы в США/Таиланде): IGBT/SCR-выпрямители; в каталоге медный электролизный агрегат 50 кА/0–45 В с водяным охлаждением (стабильность тока ≤1 %). Основной масштаб — гальваника: под 47 кА/250 В требовать смелтерные референсы и схему последовательных секций.",
+   "refs": "кейсы: медный электролиз (Индия), цинк (Дубай)",
+   "classes": [
+    "rectifier"
+   ],
+   "src": "https://www.lyrectifier.com/product/45v-50ka-copper-electrolysis-rectifier/",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "nucleon",
+   "name": "Nucleon (Xinxiang) Crane Co., Ltd.",
+   "zh": "",
+   "country": "КНР",
+   "site": "https://www.nucleon.com.cn/eng/",
+   "contact": [
+    "nucleon@nucleon.com.cn",
+    "+86-373-8622016"
+   ],
+   "profile": "Крановый кластер Чанъюаня (Хэнань): мостовые двухбалочные, козловые, тали; спецкраны — автоматизированные «smart», металлургические и краны линий цинкования (опыт агрессивных сред и автоматики).",
+   "refs": "разделы Special Crane на официальном сайте",
+   "classes": [
+    "crane"
+   ],
+   "src": "https://www.nucleon.com.cn/eng/",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "yuantai-dongqi",
+   "name": "Yuantai Crane / Henan Dongqi Machinery (одна группа)",
+   "zh": "",
+   "country": "КНР",
+   "site": "https://www.ytcrane.com",
+   "contact": [
+    "почты скрыты Cloudflare — формы ytcrane.com/contact/ и dqcranes.com/contact/",
+    "+86-371-65760775",
+    "WhatsApp +86-18137185267"
+   ],
+   "profile": "ВАЖНО: Dongqi (завод) и Yuantai (внешнеторговая) — одна группа, общий адрес в крановом парке Чанъюаня; 240 000 м², 3600+ сотрудников, до 10 000 кранов/год, мостовые 5–500 т. В тендере считать ОДНИМ ТКП.",
+   "refs": "1000+ крановых проектов, 120+ стран",
+   "classes": [
+    "crane"
+   ],
+   "src": "https://www.ytcrane.com/contact/",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "tyhi",
+   "name": "Taiyuan Heavy Industry Co., Ltd. (TYHI)",
+   "zh": "太原重工",
+   "country": "КНР",
+   "site": "http://www.tyhi.com",
+   "unreachable": true,
+   "contact": [
+    "контакты НЕ верифицированы — все домены TYHI отдают 503 из-за рубежа; добрать из сети КНР/через партнёра"
+   ],
+   "profile": "Тайюань, флагманский тяжмаш КНР — единственный кандидат тяжёлого металлургического класса вне чанъюаньского кластера: металлургические краны (заливочные, завалочные, магнитные) в т.ч. для медных производств; доминирует в классе главного подъёма 300+ т.",
+   "refs": "~20 литейных/мостовых кранов для ESSAR (Индия), вкл. 450-т заливочный (сниппеты официальных страниц)",
+   "classes": [
+    "crane"
+   ],
+   "src": "http://www.tyhi.com/ (503; профиль по сниппетам product.tyhi.com)",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "keli",
+   "name": "Ningbo Keli Sensing Technology Co., Ltd.",
+   "zh": "柯力传感",
+   "country": "КНР",
+   "site": "https://www.kelichina.com",
+   "contact": [
+    "почта не опубликована — телефоны: +86-574-87562286 (продажи)",
+    "сервис (КНР) 400-887-4165"
+   ],
+   "profile": "Нинбо, листинг SSE 603662: крупнейший в мире производитель стальных тензодатчиков — датчики и системы для автомобильных, вагонных и платформенных весов, индикаторы, IoT; 27 дочерних компаний, 7 баз. Для коммерческого учёта в РФ проверить актуальность типов СИ в Госреестре.",
+   "refs": "масштаб подтверждён официальным сайтом; НЕ путать с kelisensing.com (посторонний домен)",
+   "classes": [
+    "scale"
+   ],
+   "src": "https://www.kelichina.com/about/contact/",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "yaohua",
+   "name": "Shanghai Yaohua Weighing System Co., Ltd.",
+   "zh": "",
+   "country": "КНР",
+   "site": "http://www.yaohua.cc",
+   "contact": [
+    "sales@yaohua.com.cn",
+    "+86-21-67282822"
+   ],
+   "profile": "Шанхай, с 1992 г.: весовые индикаторы XK3190 (фактический отраслевой стандарт в КНР и СНГ), автомобильные, платформенные и вагонные весы; разработчик нацстандартов КНР. Сайт работает только по http.",
+   "refs": "индикаторы Yaohua исторически имеют утверждённые типы СИ в РФ — проверить актуальность",
+   "classes": [
+    "scale"
+   ],
+   "src": "http://www.yaohua.cc/",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "essae",
+   "name": "Essae-Teraoka Pvt. Ltd.",
+   "zh": "",
+   "country": "Индия",
+   "site": "https://essae.com",
+   "contact": [
+    "info@essae.com",
+    "+91 80 2511 3021",
+    "WhatsApp +91 78488 12346"
+   ],
+   "profile": "Бангалор, с 1986 г.: платформенные, крановые (DS-350) и прецизионные весы; 1,9 млн+ инсталляций, 39 филиалов. ФЛАГ КОМПЛАЕНСА: СП с японской Teraoka (юрлицо индийское — учесть при проверке); тяжёлые авто/ЖД-мосты у сестринской Essae Digitronics (её сайты недоступны — вход через Essae-Teraoka).",
+   "refs": "линейка и масштаб с официального сайта",
+   "classes": [
+    "scale"
+   ],
+   "src": "https://essae.com/",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "isgec",
+   "name": "Isgec Heavy Engineering Ltd.",
+   "zh": "",
+   "country": "Индия",
+   "site": "https://www.isgec.com",
+   "contact": [
+    "ijtsales@isgec.co.in",
+    "ravi.wadhawan@isgec.com (+91-120-408-5433)",
+    "+91-120-4085500"
+   ],
+   "profile": "Нойда, ~90 лет, поставки в 92 страны: один из крупнейших в Индии производителей котлов-утилизаторов (850+ котельных инсталляций в 50 странах), электрофильтры/DeNOx, сосуды, EPC. Третий кандидат по КУ после Xizi и Thermax.",
+   "refs": "WHRB-линейка подтверждена; референсы котла за печью КС цветмета запрашивать отдельно",
+   "classes": [
+    "whb",
+    "esp"
+   ],
+   "src": "https://www.isgec.com/boilers/ba-boilers-contacts.php",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "bhel",
+   "name": "Bharat Heavy Electricals Limited (BHEL)",
+   "zh": "",
+   "country": "Индия",
+   "site": "https://www.bhel.com",
+   "contact": [
+    "exports@bhel.in",
+    "industry@bhel.in",
+    "+91-11-6633-7597"
+   ],
+   "profile": "Крупнейший госконцерн энергомаша Индии; электрофильтры — завод Boiler Auxiliaries Plant в Ранипете (с 1980): ESP до 99,97 % и 15 мг/нм³, воздухоподогреватели, дымососы, FGD. Референсы в основном угольная энергетика — под сернистый обжиговый газ (точка росы H₂SO₄) требовать отдельное подтверждение.",
+   "refs": "ESP Ранипета подтверждён официальными страницами (Darlipali 2×800 МВт и др.)",
+   "classes": [
+    "esp"
+   ],
+   "src": "https://www.bhel.com/contact-us; https://bap.bhel.com/",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "atomiksoft",
+   "name": "АО «Атомик Софт»",
+   "zh": "",
+   "country": "РФ",
+   "site": "https://automiq.ru",
+   "contact": [
+    "info@automiq.ru",
+    "sales@automiq.ru",
+    "+7 (3822) 281-914"
+   ],
+   "profile": "Томск, из утверждённого перечня НТС Норникеля: «Альфа платформа» (Alpha.SCADA) — клиент-серверная резервируемая SCADA для АСУТП, плюс Alpha.Historian/Reports/SmartControl; сеть интеграторов и учебных центров.",
+   "refs": "ВСТО-II, ПГУ Нижнетуринской ГРЭС, Московский метрополитен",
+   "classes": [
+    "plc"
+   ],
+   "src": "http://automiq.ru/contacts/",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "elesy",
+   "name": "АО «ЭлеСи»",
+   "zh": "",
+   "country": "РФ",
+   "site": "https://elesy.ru",
+   "contact": [
+    "elesy@elesy.ru",
+    "product@elesy.ru",
+    "+7 (3822) 601-000"
+   ],
+   "profile": "Томск, из перечня НТС Норникеля: SCADA Infinity и Integrity SCADA, серийная промавтоматика, инжиниринг АСУТП; ISO 9001, выделенные отделы продаж/сервиса.",
+   "refs": "список внедрений в металлургии запрашивать напрямую",
+   "classes": [
+    "plc"
+   ],
+   "src": "https://elesy.ru/contacts.aspx",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "ekra",
+   "name": "ООО НПП «ЭКРА»",
+   "zh": "",
+   "country": "РФ",
+   "site": "https://ekra.ru",
+   "unreachable": true,
+   "contact": [
+    "КОНТАКТЫ НЕ ВЕРИФИЦИРОВАНЫ — сайт блокирует зарубежный трафик (502); добрать вручную из сети РФ: ekra.ru/contacts/"
+   ],
+   "profile": "Чебоксары: РЗА, шкафы защиты и контроллеры EKRA; в перечне НТС Норникеля по классу ПЛК. Профиль по каталогам — страницы сайта из среды проверки не открылись.",
+   "refs": "проверить из сети РФ перед рассылкой",
+   "classes": [
+    "plc"
+   ],
+   "src": "https://ekra.ru/contacts/ — не сфетчена (гео-блок)",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "emis",
+   "name": "АО «ЭМИС»",
+   "zh": "",
+   "country": "РФ",
+   "site": "https://emis-kip.ru",
+   "contact": [
+    "sales@emis-kip.ru",
+    "+7 (351) 729-99-12",
+    "8 (800) 301-66-88"
+   ],
+   "profile": "Челябинск, две площадки: кориолисовые и вихревые расходомеры, датчики давления, уровнемеры, счётчики газа и тепла — коммерческий и технологический учёт.",
+   "refs": "Татнефть (ЭМИС-ВИХРЬ 200)",
+   "classes": [
+    "instr"
+   ],
+   "src": "https://emis-kip.ru/kon/",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "vzljot",
+   "name": "ГК «Взлёт»",
+   "zh": "",
+   "country": "РФ",
+   "site": "https://vzljot.ru",
+   "contact": [
+    "mail@vzljot.ru",
+    "8-800-333-888-7",
+    "+7 (812) 714-81-14"
+   ],
+   "profile": "Санкт-Петербург, ~30 лет: ультразвуковые и электромагнитные расходомеры, теплосчётчики «ВЗЛЕТ ТСРВ», уровнемеры; на сайте отдельный отраслевой раздел «Металлургия».",
+   "refs": "профильный отраслевой раздел для меткомбинатов",
+   "classes": [
+    "instr"
+   ],
+   "src": "https://vzljot.ru/kontakty/",
+   "checked": "2026-08-16"
+  },
+  {
+   "key": "elmetro",
+   "name": "ООО «ЭлМетро-Инжиниринг»",
+   "zh": "",
+   "country": "РФ",
+   "site": "https://www.elmetro.ru",
+   "contact": [
+    "info@elmetro.ru",
+    "+7 (800) 222-14-19",
+    "+7 (351) 220-12-34 (продажи — доб. 6400)"
+   ],
+   "profile": "Челябинск: кориолисовые расходомеры, плотномеры, уровнемеры, регистраторы, калибровочное оборудование; линии техподдержки по КИПиА/метрологии/сервису.",
+   "refs": "отзывы ПАО «Акрон» и АО «Апатит»; металлургия заявлена отраслью поставок",
+   "classes": [
+    "instr"
+   ],
+   "src": "https://www.elmetro.ru/contact/",
+   "checked": "2026-08-16"
   }
- ]
+ ],
+ "market_notes": {
+  "roaster": "Проектирование печей КС цветмета в несанкционном контуре сосредоточено в китайских институтах: ENFI, Nerin (в базе) + CINF, KMY, NFC (EPC), BGRIMM (НИОКР). CITIC HIC сознательно не включён — изготовитель по чужим проектам. В Индии/Турции/Бразилии проектантов обжига цветмета нет.",
+  "whb": "Zhengzhou Boiler и Sitong не включены — экспортные SEO-сайты, специализация на металлургических КУ не подтверждается.",
+  "cyclone": "Недобор честный: горячие циклоны почти всегда идут в составе печного острова (проектант печи) или от мейджоров газоочистки (Longking/Feida в базе). Отдельные изготовители — Rieco и Techflow (Индия). Мелкие цеха Ботоу/Цанчжоу сознательно не добирались.",
+  "esp": "Kelin не верифицирован (листинг под вопросом, сайт 503); Sinoma — цементный профиль, не включён.",
+  "fan": "Yilida/Yuton отклонены (HVAC, не дымососы коррозионного газа), «Sichuan Weida» не существует. Shaangu — топ-класс для нагнетателей SO₂, но сайт недоступен из-за рубежа.",
+  "burner": "Ecoflam/Baltur — Италия (санкционные): несанкционный аналог — турецкий Ecostar. EBICO — итальянский бренд с китайским юрлицом и заводом. Чжэнчжоуские «производители» в основном трейдеры — не включены.",
+  "conveyor": "LIBO недоступен для верификации (connection reset) — вместо него NHI (тяжёлый класс, апронные питатели под горячий огарок).",
+  "vacfilter": "«Beijing GreenTech» не существует; Tangshan Dacheng отклонён (размытый профиль).",
+  "thickener": "CITIC HIC отклонён — на официальном англ. сайте сгустители не листятся (проверено фетчем). Класс перекрыт Haiwang + Xinhai (unreachable) + Hexin + JXSC.",
+  "evaporator": "Enco — лучшее совпадение (прямо заявляет кристаллизацию CuSO₄/NiSO₄). Wenzhou Chinz не включён — профиль фарма/пищёвка, кислые растворы не подтверждены.",
+  "centrifuge": "Рынок pusher узкий: Huada (в базе) + Saideli + Hanpu + Peony + Jiangbei (сайт лежит — с пометкой). Hastelloy открыто почти никто не заявляет — только RFQ.",
+  "hx": "«Defon 帝峰» не существует (искажённое имя); наньтунский графитовый кластер (Shanjian, Chenguang, Xinbao, Hengtai, Sunshine) — все сайты 503 из-за рубежа. Барометрические конденсаторы обычно поставляют сами выпарщики в составе установки.",
+  "filterpress": "«Landsky» как производитель не существует (торговая марка). Класс закрыт связкой Jingjin + DIBO + Zhongda Bright + Dazhang + Toper.",
+  "agitator": "Mixel (Suzhou) ИСКЛЮЧЁН — французская Mixel France SAS (с 2023 в группе GMM Pfaudler). Для больших реакторов рациональнее Weihai CM (реактор+мешалка одним контрактом).",
+  "cell": "Рынок узкий: лидер КНР Hangzhou Sannai (>3100 ванн) найден, но сайт из РФ недоступен — контакт через официальную витрину. Новых производителей в Юньнани/Куньмине нет (там электродные заводы).",
+  "anode": "Отсечены три замаскированных дубля: cuepc.com и anodeplate.com = Sichuan Precision, yndzdj.com = Unionsum.",
+  "busbar": "Специализированную электролизную ошиновку из новых делает только CHMM; Fabmann и C-Flo — изготовители по чертежам (нужны чертежи КВАНТ). Отдельной индустрии «электролизных шин» вне интеграторов не существует.",
+  "starter": "РЫНОК СВЕРХУЗКИЙ, до 5 честно не добить: Tianxin (в базе) + Lufeng (линия для свинцовых основ, медные — уточнять) + Metalcess (не верифицирован). Западные производители — санкционные.",
+  "stripper": "Полностью роботизированные КСМ из новых — только CHMM (до 500 шт/ч, роботы опцией); Lufeng — полуавтомат. Рынок узкий.",
+  "rectifier": "Смелтерный класс (47 кА/250 В) узкий: Injet + Zhong Dian + Green Power (в базе) + Kori (сайт недоступен) + Liyuan (гальванический масштаб — требовать смелтерные референсы). Chint/Sanle/Xinfengguang/TEDRI проверены и отклонены (непрофильные). Резерв: Beijing Chunshu (без своего сайта), CRRC-центр Чжучжоу (503).",
+  "crane": "Почти все кандидаты — один кластер Чанъюаня (Weihua, Henan Mine, Nucleon, Yuantai/Dongqi); Yuantai и Dongqi — ОДНА ГРУППА, считать одним ТКП. Диверсификация — TYHI (Тайюань, сайт недоступен). Любому финалисту: референс автоматического крана именно в электролизном цехе (кислые аэрозоли) — это спецзаказ, не серия.",
+  "scale": "Для коммерческого учёта обязателен Госреестр СИ РФ и поверка: у Keli и Yaohua исторически есть утверждённые типы — проверить актуальность до ТКП. Essae — флаг СП с японской Teraoka.",
+  "plc": "Перечень НТС Норникеля закрыт карточками: Прософт (REGUL), Инкомсистем (АБАК), Атомик Софт (Alpha), ЭлеСи (Integrity), ЭКРА (гео-блок — добрать из РФ).",
+  "instr": "В класс взяты ЭМИС + Взлёт + ЭлМетро (сайты работают, у двух — явные металлургические референсы); РИЗУР не потребовался."
+ }
 }
