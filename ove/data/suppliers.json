@@ -1,5 +1,5 @@
 {
- "note": "План сорсинга под требование ТЗ «не менее 2–3 ТКП на каждую позицию оборудования». Колонка «Bitrix» заполняется живой выгрузкой (ove/tools/bitrix_ove.py) по коду класса. Имена в колонках Мир / КНР / РФ — кандидаты для запроса, а не подтверждённые поставщики: подтверждение = полученное ТКП. Решением владельца 15.08.2026 из справочника исключены FLSmidth, Metso (вкл. ex-Outotec) и Howden — ушли из РФ и не поставляют; ориентир — КНР и страны без санкционных ограничений.",
+ "note": "Справочник кандидатов очищен по санкционному признаку (решение владельца 15.08.2026): остались только компании со штаб-квартирами в странах, не вводивших санкции против РФ (КНР, Индия, Бразилия, ЮАР) и российские производители. Исключённые западные компании сохранены в скрытом поле excluded_sanctioned для истории и в CRM-архиве. Каждый кандидат КНР и дружественных стран имеет карточку в справочнике: сайт, контакты с официальных страниц (с датой проверки), справка и «что запрашивать».",
  "legend": {
   "A": "Позиция закрывается серийным оборудованием, рынок широкий — 2–3 ТКП собираются штатно",
   "B": "Рынок узкий, кандидатов мало — сбор ТКП требует отдельной работы",
@@ -12,19 +12,18 @@
    "name": "Печь кипящего слоя 10–16 т/ч, кислородное дутьё",
    "spec": "Единомоментно 139 т огарка; корпус углеродистая сталь + асбест + шамот; подина жаропрочная сталь и бетон",
    "tier": "C",
-   "world": [
-    "Andritz",
-    "Sumitomo Heavy Industries",
-    "Dowa"
-   ],
+   "world": [],
    "cn": [
-    "China Nerin Engineering",
-    "China ENFI Engineering",
-    "China ENFI Engineering Corp.",
-    "China Nerin Engineering Co., Ltd."
+    "China Nerin Engineering Co., Ltd.",
+    "China ENFI Engineering Corp."
    ],
    "ru": [],
-   "ask": "Референс именно по сульфатизирующему обжигу медного сырья в КС (не окислительный обжиг цинковых концентратов); подтверждение работы на дутье с 96 % O₂"
+   "ask": "Референс именно по сульфатизирующему обжигу медного сырья в КС (не окислительный обжиг цинковых концентратов); подтверждение работы на дутье с 96 % O₂",
+   "excluded_sanctioned": [
+    "Andritz",
+    "Dowa",
+    "Sumitomo Heavy Industries"
+   ]
   },
   {
    "cls": "whb",
@@ -32,17 +31,18 @@
    "name": "Котёл-утилизатор до 30 000 нм³/ч, пар 1,9 МПа / 375 °С",
    "spec": "Улавливание «грубой» пыли, объём бункера пылесборника 15 м³; в ИД помечен «перепроектируется»",
    "tier": "B",
-   "world": [
-    "GE Steam Power",
-    "Bosch Industriekessel",
-    "Balcke-Dürr"
-   ],
+   "world": [],
    "cn": [
-    "Hangzhou Boiler Group",
+    "Hangzhou Boiler Group (с 2022 — Xizi Clean Energy)",
     "Thermax Limited"
    ],
    "ru": [],
-   "ask": "Опыт КУ за печью КС цветной металлургии с пылевым режимом; наличие существующего проекта под переработку"
+   "ask": "Опыт КУ за печью КС цветной металлургии с пылевым режимом; наличие существующего проекта под переработку",
+   "excluded_sanctioned": [
+    "Balcke-Dürr",
+    "Bosch Industriekessel",
+    "GE Steam Power"
+   ]
   },
   {
    "cls": "esp",
@@ -51,19 +51,19 @@
    "spec": "Аналог УГТ1-20-4, сталь 12Х18Н10Т, питание 80 кВ, бункер 10 м³",
    "tier": "A",
    "world": [
-    "Balcke-Dürr",
     "Thermax"
    ],
    "cn": [
-    "Fujian Longking",
-    "Zhejiang Feida",
     "Fujian Longking Co., Ltd.",
     "Zhejiang Feida Environmental Science & Technology"
    ],
    "ru": [
     "Профильные заводы газоочистки РФ — уточнить"
    ],
-   "ask": "Гарантированная остаточная запылённость на выходе; исполнение под сернистые газы с точкой росы"
+   "ask": "Гарантированная остаточная запылённость на выходе; исполнение под сернистые газы с точкой росы",
+   "excluded_sanctioned": [
+    "Balcke-Dürr"
+   ]
   },
   {
    "cls": "cyclone",
@@ -73,7 +73,6 @@
    "tier": "A",
    "world": [],
    "cn": [
-    "Fujian Longking",
     "Fujian Longking Co., Ltd."
    ],
    "ru": [
@@ -87,18 +86,19 @@
    "name": "Дымососы до 78 000 м³/ч, 400 кВт / 6 кВ, 2 шт.",
    "spec": "ДН-15БНЖ, сталь 12Х18Н10Т",
    "tier": "A",
-   "world": [
-    "TLT-Turbo"
-   ],
+   "world": [],
    "cn": [
-    "Chongqing General Industry",
-    "Shenyang Blower Works Group / SBW",
+    "Chongqing General Industry (Group) Co., Ltd.",
+    "Shenyang Blower Works Group / SBW (Shengu Group)",
     "Xinxiang SIMO Blower Co., Ltd."
    ],
    "ru": [
     "Типовой отечественный типоразмер"
    ],
-   "ask": "Комплектация электроприводом 6 кВ и системой регулирования производительности"
+   "ask": "Комплектация электроприводом 6 кВ и системой регулирования производительности",
+   "excluded_sanctioned": [
+    "TLT-Turbo"
+   ]
   },
   {
    "cls": "baghouse",
@@ -108,7 +108,6 @@
    "tier": "A",
    "world": [],
    "cn": [
-    "Fujian Longking",
     "Fujian Longking Co., Ltd.",
     "Zhejiang Feida Environmental Science & Technology"
    ],
@@ -123,17 +122,16 @@
    "name": "Барабанные вакуум-фильтры пульпы медного концентрата",
    "spec": "Влажность кека после фильтрации 10 %; система вакуумирования, отвода фильтрата и выгрузки кека в шнековый смеситель",
    "tier": "A",
-   "world": [
-    "Andritz Separation"
-   ],
+   "world": [],
    "cn": [
-    "Yantai Jinpeng",
-    "Zhejiang Xingyuan",
-    "Nuclear Industry Yantai Toncin Group Co., Ltd.",
-    "Yantai Jinpeng Mining Machinery Co., Ltd."
+    "Yantai Jinpeng Mining Machinery Co., Ltd.",
+    "Nuclear Industry Yantai Toncin Group Co., Ltd."
    ],
    "ru": [],
-   "ask": "Гарантия влажности кека 10 % на концентрате крупностью 25,5 мкм при 70 % тв. в питании"
+   "ask": "Гарантия влажности кека 10 % на концентрате крупностью 25,5 мкм при 70 % тв. в питании",
+   "excluded_sanctioned": [
+    "Andritz Separation"
+   ]
   },
   {
    "cls": "conveyor",
@@ -143,8 +141,8 @@
    "tier": "A",
    "world": [],
    "cn": [
-    "Henan Pingyuan Mining Machinery",
-    "Henan Zhengzhou Mining Machinery"
+    "Henan Pingyuan Mining Machinery (PK Machinery)",
+    "Henan Zhengzhou Mining Machinery (ZK Corp)"
    ],
    "ru": [
     "УКВ и 4488 ДН-У — отечественные типоряды"
@@ -170,17 +168,18 @@
    "name": "Испарители I и II ступени (4 шт.), 904L",
    "spec": "Медный купорос D = 2,0 м (22 800 и 22 000 м³/(м²·ч)); смешанный купорос D = 1,3 м; t 40 и 20 °С",
    "tier": "B",
-   "world": [
-    "GEA Messo",
-    "Veolia HPD",
-    "Swenson Technology"
-   ],
+   "world": [],
    "cn": [
     "Myande Group Co., Ltd.",
     "Shandong Tianli Energy Co., Ltd."
    ],
    "ru": [],
-   "ask": "Обязательно указывать материал контактных частей 904L и напряжённость по соковому пару, иначе предложения несопоставимы"
+   "ask": "Обязательно указывать материал контактных частей 904L и напряжённость по соковому пару, иначе предложения несопоставимы",
+   "excluded_sanctioned": [
+    "GEA Messo",
+    "Swenson Technology",
+    "Veolia HPD"
+   ]
   },
   {
    "cls": "centrifuge",
@@ -188,16 +187,17 @@
    "name": "Пульсирующие фильтрующие центрифуги, 4 шт., 904L",
    "spec": "2 шт. на медный купорос (2,5 т/ч), 2 шт. на смешанный (1,5 т/ч) с промывкой первичным раствором",
    "tier": "B",
-   "world": [
-    "Siebtechnik Tema",
-    "Andritz Separation",
-    "Ferrum AG"
-   ],
+   "world": [],
    "cn": [
     "Jiangsu Huada Centrifuge Co., Ltd."
    ],
    "ru": [],
-   "ask": "Пульсирующая выгрузка; материал 904L; подтверждение остаточной влажности кристаллов 4–6 %"
+   "ask": "Пульсирующая выгрузка; материал 904L; подтверждение остаточной влажности кристаллов 4–6 %",
+   "excluded_sanctioned": [
+    "Andritz Separation",
+    "Ferrum AG",
+    "Siebtechnik Tema"
+   ]
   },
   {
    "cls": "hx",
@@ -205,16 +205,17 @@
    "name": "Барометрические конденсаторы, паровые эжекторы, ПЭБ",
    "spec": "P = 0,013 атм (эжекторы) и 0,075 атм (конденсаторы); ПЭБ = эжектор + конденсатор + вакуум-насос",
    "tier": "B",
-   "world": [
-    "GEA",
-    "Körting Hannover"
-   ],
+   "world": [],
    "cn": [
     "Nantong Xingqiu Graphite Co., Ltd.",
-    "Siping Juyuan Hanyang Plate Heat Exchanger"
+    "Siping Juyuan Hanyang Plate Heat Exchanger (THT)"
    ],
    "ru": [],
-   "ask": "Комплектность вакуумной схемы под две независимые нитки кристаллизации"
+   "ask": "Комплектность вакуумной схемы под две независимые нитки кристаллизации",
+   "excluded_sanctioned": [
+    "GEA",
+    "Körting Hannover"
+   ]
   },
   {
    "cls": "cell",
@@ -226,11 +227,9 @@
     "CSI Mining SA (UNICELL®)"
    ],
    "cn": [
-    "Hengshui Gains Trade",
-    "Jiubo Composites",
     "Hengshui Gains Trade Co., Ltd.",
     "Hengshui Jiubo Composites Co., Ltd.",
-    "Sichuan Precision Technology Co., Ltd."
+    "Sichuan Precision Technology Co., Ltd. (PRS)"
    ],
    "ru": [],
    "ask": "ИД называет Unicell поимённо — аналог придётся доказывать по конструкции и материалу (монолитный винилэфирный композит)"
@@ -242,19 +241,20 @@
    "spec": "Pb-Ca / Pb-Ag; 85 шт. на ванну; годовой расход замещения 2300 шт.",
    "tier": "B",
    "world": [
-    "RSR Anodes",
-    "CSI Mining SA",
-    "Britannia Refined Metals"
+    "CSI Mining SA"
    ],
    "cn": [
-    "Union Sum International Industrial Co., Ltd.",
     "Unionsum International Industrial Co., Ltd."
    ],
    "ru": [
     "ЛМЗ им. К. Либкнехта"
    ],
    "ask": "Состав сплава, срок службы, гарантия по скорости коррозии и выходу свинцового шлама",
-   "gift": "Прямая подсказка из ИД ч.2 (приложение В): «Ранее в ГМУ МЦ КГМК испытывались, но массово не закупались аноды производства Ленинградского механического завода имени Карла Либкнехта и аноды китайского производителя Union sum International industrial Co., Ltd. Со слов производственников КГМК, претензий к указанным анодам выявлено не было». Заказчик сам назвал двух проверенных поставщиков — начинать надо с них, к чертежу ЛМЗ в ИД приложена копия с маркировкой."
+   "gift": "Прямая подсказка из ИД ч.2 (приложение В): «Ранее в ГМУ МЦ КГМК испытывались, но массово не закупались аноды производства Ленинградского механического завода имени Карла Либкнехта и аноды китайского производителя Union sum International industrial Co., Ltd. Со слов производственников КГМК, претензий к указанным анодам выявлено не было». Заказчик сам назвал двух проверенных поставщиков — начинать надо с них, к чертежу ЛМЗ в ИД приложена копия с маркировкой.",
+   "excluded_sanctioned": [
+    "Britannia Refined Metals",
+    "RSR Anodes"
+   ]
   },
   {
    "cls": "cathode",
@@ -263,17 +263,18 @@
    "spec": "Система SPLIT; масса катода 76,8 кг (6 сут) / 89,7 кг (7 сут); годовой расход замещения 1150 шт.",
    "tier": "B",
    "world": [
-    "Glencore Technology (ISAKIDD)",
     "CSI Mining SA"
    ],
    "cn": [
-    "Hengshui Gains Trade",
     "Hengshui Gains Trade Co., Ltd.",
     "Jiangxi Tianxin Metallurgical Equipment Technology Co., Ltd.",
     "Sanmen Sanyou Technology Inc."
    ],
    "ru": [],
-   "ask": "Совместимость с выбранной КСМ; требование сбыта — разделение двух пластин без сращивания по нижней кромке"
+   "ask": "Совместимость с выбранной КСМ; требование сбыта — разделение двух пластин без сращивания по нижней кромке",
+   "excluded_sanctioned": [
+    "Glencore Technology (ISAKIDD)"
+   ]
   },
   {
    "cls": "busbar",
@@ -281,15 +282,16 @@
    "name": "Ошиновка ванн с двойным контактом",
    "spec": "2 серии × 90 ванн; I факт 42,45 кА; уравнительная шина для анодов и/или катодов",
    "tier": "B",
-   "world": [
-    "Glencore Technology"
-   ],
+   "world": [],
    "cn": [
-    "Sichuan Precision Technology Co., Ltd.",
+    "Sichuan Precision Technology Co., Ltd. (PRS)",
     "Zhejiang Bridgold Copper Tech Co., Ltd."
    ],
    "ru": [],
-   "ask": "ИД прямо ссылается на конструкцию Outotec — аналог доказывать по равномерности распределения тока и достижимой плотности тока"
+   "ask": "ИД прямо ссылается на конструкцию ошиновки прежнего западного поставщика (см. «Закладки Дельты») — аналог доказывать по равномерности распределения тока по ваннам, падению напряжения на контактах и совместимости с изоляторами ванн",
+   "excluded_sanctioned": [
+    "Glencore Technology"
+   ]
   },
   {
    "cls": "stripper",
@@ -297,17 +299,18 @@
    "name": "Роботизированная КСМ 120 шт./ч",
    "spec": "Промывка в 2 стадии, сдирка, оптический контроль с машинным зрением, электронный реестр матриц, пакетирование, автопробоотбор; 125 кВт установленной мощности",
    "tier": "C",
-   "world": [
-    "Glencore Technology (ISAKIDD)",
-    "Mesa International"
-   ],
+   "world": [],
    "cn": [
     "Jiangxi Tianxin Metallurgical Equipment Technology Co., Ltd.",
     "Sanmen Sanyou Technology Inc.",
-    "Sichuan Precision Technology Co., Ltd."
+    "Sichuan Precision Technology Co., Ltd. (PRS)"
    ],
    "ru": [],
-   "ask": "Обязательные требования: разделение двух пластин без сращивания по нижней кромке; «перфорация» пакета профилированием листов; формирование партий с сопроводительной документацией"
+   "ask": "Обязательные требования: разделение двух пластин без сращивания по нижней кромке; «перфорация» пакета профилированием листов; формирование партий с сопроводительной документацией",
+   "excluded_sanctioned": [
+    "Glencore Technology (ISAKIDD)",
+    "Mesa International"
+   ]
   },
   {
    "cls": "crane",
@@ -315,19 +318,20 @@
    "name": "Специальные автоматические краны, 2 шт.",
    "spec": "Автопозиционирование по графику выгрузки; съём/установка колпаков; выгрузка 1/3 матриц с выдержкой на стекание; нерж. 316L; ИК-датчики контроля КЗ в ваннах",
    "tier": "C",
-   "world": [
-    "Konecranes",
-    "Kranbau Köthen",
-    "Sicoma"
-   ],
+   "world": [],
    "cn": [
     "Henan Mine Crane Co., Ltd.",
-    "Weihua Group"
+    "Weihua Group (Henan Weihua Heavy Machinery)"
    ],
    "ru": [
     "Рассмотреть модернизацию существующих кранов ЦЭМ"
    ],
-   "ask": "Референс именно в электролизном цехе меди в автоматическом режиме; коррозионностойкое исполнение под кислые аэрозоли"
+   "ask": "Референс именно в электролизном цехе меди в автоматическом режиме; коррозионностойкое исполнение под кислые аэрозоли",
+   "excluded_sanctioned": [
+    "Konecranes",
+    "Kranbau Köthen",
+    "Sicoma"
+   ]
   },
   {
    "cls": "rectifier",
@@ -335,20 +339,21 @@
    "name": "Выпрямители 250 В / 47 кА, 3 шт. (вне БИ)",
    "spec": "2 рабочих + 1 резервный; ошиновка позволяет резервному работать на любую серию",
    "tier": "B",
-   "world": [
-    "ABB",
-    "Hitachi Energy",
-    "AEG Power Solutions"
-   ],
+   "world": [],
    "cn": [
-    "Green Power Co., Ltd.",
+    "Green Power Co., Ltd. (Beijing Green Power Technology)",
     "Sichuan Injet Electric Co., Ltd.",
     "Xi'an Zhong Dian Power Rectifier Works Co., Ltd."
    ],
    "ru": [
     "Отечественные производители преобразовательных агрегатов — уточнить"
    ],
-   "ask": "Не входит в БИ по Лоту №3, но обязателен для пуска — учитывать в общей стройке"
+   "ask": "Не входит в БИ по Лоту №3, но обязателен для пуска — учитывать в общей стройке",
+   "excluded_sanctioned": [
+    "ABB",
+    "AEG Power Solutions",
+    "Hitachi Energy"
+   ]
   },
   {
    "cls": "starter",
@@ -356,15 +361,16 @@
    "name": "Линия подготовки катодных основ",
    "spec": "Правка, обрамление и подготовка катодных основ/матриц; в ИД упомянуты стеллажи для правки и обрамления катодных основ, если это оборудование не входит в состав стрип-машины",
    "tier": "A",
-   "world": [
-    "Glencore Technology (ISAKIDD)"
-   ],
+   "world": [],
    "cn": [
     "Jiangxi Tianxin Metallurgical Equipment Technology Co., Ltd."
    ],
    "ru": [],
    "ask": "Входит ли правка и обрамление основ в комплект поставки КСМ или это отдельная линия — от ответа зависит граница поставки по Лоту №3",
-   "gift": "Партнёр назван владельцем 13.08.2026: Jiangxi Tianxin Metallurgical Equipment Technology — тот самый поставщик по линии подготовки основ. У них же КСМ, машины подготовки анодов и спецкраны электролизного цеха, то есть одна компания закрывает несколько позиций Лота №3. В Bitrix уже есть запрос спецкрана от 11.10.2025 в стадии «Price at Work» — контакт живой, но запросу почти год, надо освежать."
+   "gift": "Партнёр назван владельцем 13.08.2026: Jiangxi Tianxin Metallurgical Equipment Technology — тот самый поставщик по линии подготовки основ. У них же КСМ, машины подготовки анодов и спецкраны электролизного цеха, то есть одна компания закрывает несколько позиций Лота №3. В Bitrix уже есть запрос спецкрана от 11.10.2025 в стадии «Price at Work» — контакт живой, но запросу почти год, надо освежать.",
+   "excluded_sanctioned": [
+    "Glencore Technology (ISAKIDD)"
+   ]
   },
   {
    "cls": "scale",
@@ -385,16 +391,16 @@
    "name": "Мембранные фильтр-прессы песков (вне БИ)",
    "spec": "S = 8 м² × 2, глубина камеры 50 мм, параллельная работа; удельная нагрузка 145,3 кг/(м²·ч)",
    "tier": "A",
-   "world": [
-    "Andritz Separation",
-    "Diemme Filtration"
-   ],
+   "world": [],
    "cn": [
-    "Jingjin Equipment",
     "Jingjin Equipment Inc."
    ],
    "ru": [],
-   "ask": "Jingjin документирует поставки в РФ — снимает часть рисков логистики и договорной работы"
+   "ask": "Jingjin документирует поставки в РФ — снимает часть рисков логистики и договорной работы",
+   "excluded_sanctioned": [
+    "Andritz Separation",
+    "Diemme Filtration"
+   ]
   },
   {
    "cls": "thickener",
@@ -402,16 +408,16 @@
    "name": "Сгуститель D = 15 м (вне БИ)",
    "spec": "Удельная нагрузка 12,0 кг/(м²·ч); поток 1717,1 кг/ч",
    "tier": "A",
-   "world": [
-    "McLanahan"
-   ],
+   "world": [],
    "cn": [
-    "Yantai Jinpeng",
-    "Nuclear Industry Yantai Toncin Group Co., Ltd.",
-    "Yantai Jinpeng Mining Machinery Co., Ltd."
+    "Yantai Jinpeng Mining Machinery Co., Ltd.",
+    "Nuclear Industry Yantai Toncin Group Co., Ltd."
    ],
    "ru": [],
-   "ask": "Исполнение под кислую абразивную пульпу"
+   "ask": "Исполнение под кислую абразивную пульпу",
+   "excluded_sanctioned": [
+    "McLanahan"
+   ]
   },
   {
    "cls": "agitator",
@@ -419,15 +425,16 @@
    "name": "Реакторы каскада выщелачивания, Hastelloy G-35 / 904L (вне БИ)",
    "spec": "2 головных репульпатора 10 м³ с максимальной удельной мощностью мешалок и рециркуляцией + 4 основных реактора 90 м³ + буферный",
    "tier": "B",
-   "world": [
-    "Ekato",
-    "Philadelphia Mixing"
-   ],
+   "world": [],
    "cn": [
     "Zhejiang Greatwall Mixers Co., Ltd."
    ],
    "ru": [],
-   "ask": "ИД исключает 316L для этих позиций — только Hastelloy G-35 (Haynes Int.) или аналог, допустимо 904L"
+   "ask": "ИД исключает 316L для этих позиций — только Hastelloy G-35 (Haynes Int.) или аналог, допустимо 904L",
+   "excluded_sanctioned": [
+    "Ekato",
+    "Philadelphia Mixing"
+   ]
   },
   {
    "cls": "hx",
@@ -435,19 +442,20 @@
    "name": "Пластинчатые теплообменники (вне БИ)",
    "spec": "Подогрев бедного электролита 1500 кВт + холодильники электролита 2 × 2500 кВт; секционное исполнение с резервной секцией на чистку от гипсовых инкрустаций",
    "tier": "A",
-   "world": [
-    "Alfa Laval",
-    "SPX FLOW APV",
-    "Kelvion"
-   ],
+   "world": [],
    "cn": [
     "Nantong Xingqiu Graphite Co., Ltd.",
-    "Siping Juyuan Hanyang Plate Heat Exchanger"
+    "Siping Juyuan Hanyang Plate Heat Exchanger (THT)"
    ],
    "ru": [
     "Отечественные производители пластинчатых ТО"
    ],
-   "ask": "Система переключения каждой секции на промывку специальным раствором и водой; обходные линии для тонкого регулирования"
+   "ask": "Система переключения каждой секции на промывку специальным раствором и водой; обходные линии для тонкого регулирования",
+   "excluded_sanctioned": [
+    "Alfa Laval",
+    "Kelvion",
+    "SPX FLOW APV"
+   ]
   },
   {
    "cls": "plc",
@@ -1207,6 +1215,26 @@
     "motor"
    ],
    "src": "https://www.weg.net/ (403 при проверке)",
+   "checked": "2026-08-15"
+  },
+  {
+   "key": "csi",
+   "name": "CSI Mining SA",
+   "zh": "",
+   "country": "ЮАР",
+   "site": "https://csiza.co.za",
+   "contact": [
+    "+27 10 003 0127",
+    "+27 71 840 1773",
+    "почта скрыта защитой сайта — запрос через форму на csiza.co.za"
+   ],
+   "profile": "Производитель коррозионностойких электролизных ванн и оборудования танкхауса, владелец технологии UNICELL® (монолитный полимербетон) — более 40 000 ванн в эксплуатации по миру, работает с 1993 года. Именно UNICELL® названы в ИД ч.2 как референс («Unicell или аналогами»).",
+   "refs": "медь/кобальт/цинк, танкхаусы Африки и мира; технология из ИД ОВЭ-75",
+   "classes": [
+    "cell",
+    "cathode"
+   ],
+   "src": "https://csiza.co.za/ (главная, блок контактов)",
    "checked": "2026-08-15"
   }
  ]
