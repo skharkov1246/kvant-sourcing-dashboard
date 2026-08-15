@@ -420,7 +420,7 @@ function candsOf(p){
     if(!out.has(k)) out.set(k, {key:k, name, origins:new Set()});
     out.get(k).origins.add(origin);
   };
-  (p.world||[]).forEach(n=>put(n,'Мир'));
+  (p.world||[]).forEach(n=>put(n,'Мир · без санкций'));
   (p.cn||[]).forEach(n=>put(n,'КНР'));
   (p.ru||[]).forEach(n=>put(n,'РФ'));
   [...new Set(bx.map(r=>r.company))].filter(c=>c&&c!=='—').forEach(n=>put(n,'Bitrix'));
@@ -556,8 +556,8 @@ function rSup(){
   ${(SUP.profiles||[]).length?`<h2>Справочник поставщиков: КНР и страны без санкций</h2>
   <div class="box info"><b>Для сорсеров.</b> Контакты сняты с официальных сайтов (дата проверки на карточке),
   почты кликабельны. «Что запрашивать» — готовый состав запроса по классу позиции; полный опросный лист
-  и спецификация — во вкладках «Оборудование» и «Базовый проект». Западные ушедшие производители
-  (FLSmidth, Metso/Outotec, Howden) исключены решением 15.08.2026.</div>
+  и спецификация — во вкладках «Оборудование» и «Базовый проект». Компании со штаб-квартирами
+  в санкционных юрисдикциях исключены из справочника решением 15.08.2026.</div>
   <div class="grid">${SUP.profiles.map(c=>{
     const asks=[...new Set(SUP.positions.filter(p=>(c.classes||[]).includes(p.cls)).map(p=>p.ask))];
     const mail=s=>{const m=String(s).match(/[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}/);return m?`<a href="mailto:${m[0]}">${esc(s)}</a>`:esc(s);};
