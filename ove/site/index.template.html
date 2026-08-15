@@ -473,6 +473,7 @@ function supPaint(){
     return `<div class="card">
       <h3>${lotTag(p.lot)} ${esc(p.name)} <span class="tier${esc(p.tier)}">уровень ${esc(p.tier)}</span></h3>
       <div class="mut">${esc(p.spec)}</div>
+      ${SUP.market_notes&&SUP.market_notes[p.cls]?`<div class="mut" style="font-size:11.5px;margin:4px 0"><b>Рынок:</b> ${esc(SUP.market_notes[p.cls])}</div>`:''}
       <div class="tblwrap"><table><thead><tr>
         <th>Кандидат</th><th>Откуда</th><th>Запрос</th><th>Работа</th><th>Заметка</th></tr></thead>
       <tbody>${cands.length ? cands.map(c=>`<tr>
