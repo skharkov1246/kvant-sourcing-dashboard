@@ -78,7 +78,25 @@ def build() -> Path:
         body.append(bd.p([bd.run(f["d"], size=20)]))
     body.append(bd.p([]))
 
-    body.append(bd.p([bd.run("2. Расчётные блоки и сверки", bold=True, size=28)], style="Heading1"))
+    if calc.get("guarantees"):
+        body.append(bd.p([bd.run("2. Гарантийная рамка — консервативные значения для ТКП и договора",
+                                 bold=True, size=28)], style="Heading1"))
+        body.append(bd.p([bd.run("Правило: гарантируем границу с запасом к расчёту; условия — на сырьё и данные "
+                                 "изготовителей; расчётные значения — справочные.", italic=True, size=19)]))
+        gw = [2600, 2900, 2900, 1238]
+        ghead = ["Параметр", "Расчёт / ИД", "Гарантия (рекомендация)", "Базис"]
+        grows = [[bd.cell([bd.p([bd.run(h, bold=True, size=19)])], w, shade="EFEFEF")
+                  for h, w in zip(ghead, gw)]]
+        for g in calc["guarantees"]:
+            vals = [bd.p([bd.run(g["param"], bold=True, size=19)]),
+                    bd.p([bd.run(g["calc"], size=19)]),
+                    bd.p([bd.run(g["guar"], bold=True, size=19, color="8B0000")]),
+                    bd.p([bd.run(g["basis"], size=18)])]
+            grows.append([bd.cell([v], w) for v, w in zip(vals, gw)])
+        body.append(bd.table(grows, gw))
+        body.append(bd.p([]))
+
+    body.append(bd.p([bd.run("3. Расчётные блоки и сверки", bold=True, size=28)], style="Heading1"))
     for b in calc["blocks"]:
         body.append(block_xml(b))
 
