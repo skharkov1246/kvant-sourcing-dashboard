@@ -1755,26 +1755,6 @@
 "comp": "ротор, подшипники, редукторы"
 },
 {
-"name": "MC Systems Energy (МС Системы Энергетика)",
-"site": "https://mcenergy.ru",
-"what": "ТРЕЙДЕР+сервис (Москва): обслуживание СУ газотурбин, плановые инспекции, капремонт ГТД, ремонт лопаток и перепускных клапанов, поставка ЗИП; отдельный раздел «Газотурбинное оборудование Solar» (Centaur 50 / Taurus 60)",
-"relation": "трейдер/сервис параллельного импорта в РФ",
-"rank": 13,
-"models": [
-"Centaur 50",
-"Taurus 60"
-],
-"evidence": "https://mcenergy.ru/equipment/solar/centaur-50-taurus-60/",
-"ask": "pn",
-"country": "Россия (Москва)",
-"email": "",
-"tier": "trader",
-"comps": [
-"САУ, КИП, топливная арматура"
-],
-"comp": "САУ, КИП, топливная арматура"
-},
-{
 "name": "Curtiss-Wright Surface Technologies (CCRS)",
 "site": "https://surfacetechnologies.curtisswright.com/",
 "what": "Компонентный ремонт и покрытия (диффузионные, thermal spray) лопаток и сопловых аппаратов газовых турбин; в описании сервиса заявлен опыт ремонта Solar. Страница отдаёт 403 боту — подтверждено только поисковым сниппетом, нужна ручная верификация моделей.",
@@ -1802,25 +1782,6 @@
 "evidence": "https://precisionasset.in/gas-turbine-spares/",
 "models": [],
 "ask": "pn",
-"tier": "trader",
-"comps": [
-"прочее"
-],
-"comp": "прочее"
-},
-{
-"name": "AMCOR GmbH / АМКОР",
-"site": "https://amcor.ru",
-"what": "ТРЕЙДЕР+инжиниринг (РФ): «поставка капчастей Titan 130», расходники, реинжиниринг узлов ГТУ Solar с привязкой к заводской документации и OEM-сертификатам — прямо декларируют работу по спецификации без чертежей",
-"relation": "трейдер/реинжиниринг для РФ",
-"rank": 14,
-"models": [
-"Titan 130"
-],
-"evidence": "https://amcor.ru/katalog/solar-turbines/titan-130",
-"ask": "pn",
-"country": "Россия",
-"email": "",
 "tier": "trader",
 "comps": [
 "прочее"
@@ -1868,50 +1829,6 @@
 "comp": "САУ, КИП, топливная арматура"
 },
 {
-"name": "DM Lieferant (ДМ Лиферант)",
-"site": "https://dmliefer.ru",
-"what": "ТРЕЙДЕР промышленного импорта (РФ): сервис и поставка по ГТУ Solar, отдельные страницы по Titan 130 и линейке Saturn 10/Centaur 40-50/Taurus 60/Mars 90-100",
-"relation": "трейдер параллельного импорта",
-"rank": 15,
-"models": [
-"Titan 130",
-"Centaur 40/50",
-"Taurus 60",
-"Mars 90/100"
-],
-"evidence": "https://dmliefer.ru/news/solar-titan130",
-"evidence2": "https://dmliefer.ru/gazovye-turbiny-solar",
-"ask": "pn",
-"country": "Россия",
-"email": "",
-"tier": "trader",
-"comps": [
-"прочее"
-],
-"comp": "прочее"
-},
-{
-"name": "Промимпорт",
-"site": "https://promimport.info",
-"what": "ТРЕЙДЕР (Москва): раздел «Газовые турбины Solar Turbines», поставка ЗИП для ГТУ и турбокомпрессоров, ремонт комплектующих, модернизация СУ, антипомпажное регулирование",
-"relation": "трейдер параллельного импорта",
-"rank": 16,
-"models": [
-"Centaur 50",
-"Titan 130"
-],
-"evidence": "https://promimport.info/partners/solar-turbine/",
-"evidence2": "https://promimport.info/partners/solar-turbine/centaur-50/",
-"ask": "pn",
-"country": "Россия (Москва)",
-"email": "info@promimport.info",
-"tier": "trader",
-"comps": [
-"прочее"
-],
-"comp": "прочее"
-},
-{
 "name": "Dongturbo Electric Co Ltd (DTEC)",
 "site": "https://www.dongturbo.com",
 "what": "Уже предлагали нам (7 запросов). КИТАЙ — фиксируем с пометкой: как КАНАЛ реверс-ЗИП не предлагать (правило владельца); реальный опыт по Solar подтверждён: продают б/у пакеты Taurus 70 (генсет 2004 г., 10 тыс. часов, $2,95 млн с рефабрикейтом), Taurus 60, Saturn 20 и системы обвязки (маслосистема, топливный газ, воздухозабор). Допустимое применение — целые машины/доноры, не реверс-детали",
@@ -1932,26 +1849,6 @@
 "двигатели и агрегаты целиком"
 ],
 "comp": "САУ, КИП, топливная арматура"
-},
-{
-"name": "Далкос (Dalkos)",
-"site": "https://dalkos.ru",
-"what": "ТРЕЙДЕР широкого профиля (Москва/Екатеринбург/Краснодар/Казань): каталожная категория «Газовые турбины Solar Turbines» (Centaur 50, Taurus 60) среди сотен импортных брендов — типовой канал параллельного импорта, глубина Solar-экспертизы не доказана",
-"relation": "трейдер параллельного импорта (широкий каталог)",
-"rank": 17,
-"models": [
-"Centaur 50",
-"Taurus 60"
-],
-"evidence": "https://dalkos.ru/catalog/kompressory/gazovye-turbiny/gazovye-turbiny-solar-turbines/",
-"ask": "pn",
-"country": "Россия",
-"email": "",
-"tier": "trader",
-"comps": [
-"прочее"
-],
-"comp": "прочее"
 },
 {
 "name": "Hangzhou HGTP Gas Turbine Parts Co Ltd",
@@ -1979,26 +1876,6 @@
 "КВОУ, фильтры, навесное"
 ],
 "comp": "камера: жаровые, форсунки, SoLoNOx"
-},
-{
-"name": "EuroNato (Евронато)",
-"site": "https://www.euronato.ru",
-"what": "ТРЕЙДЕР/арендодатель электростанций (РФ): страница «Solar газовые турбины — поставка в России, продажа, ремонт», импорт ГТУ, аренда; также статьи по Titan 130 в России",
-"relation": "трейдер/аренда, параллельный импорт",
-"rank": 18,
-"models": [
-"Titan 130"
-],
-"evidence": "https://www.euronato.ru/special/solar_turbines/",
-"evidence2": "https://www.euronato.ru/about/news/solar_titan_130_gazovaya_turbina_v_rossii_osobennosti_preimushhestva_opisanie_konstrukcii/",
-"ask": "pn",
-"country": "Россия",
-"email": "",
-"tier": "trader",
-"comps": [
-"прочее"
-],
-"comp": "прочее"
 },
 {
 "name": "Astrum Energy",
