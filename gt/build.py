@@ -103,6 +103,7 @@ def main():
         "__RESEARCH_JSON__": (ROOT / "data/research_suppliers.json").read_text(encoding="utf-8"),
         "__PNCAT_JSON__": (ROOT / "data/pn_catalog.json").read_text(encoding="utf-8"),
         "__PROFILES_JSON__": (ROOT / "data/site_profiles.json").read_text(encoding="utf-8"),
+        "__BADGEOVR_JSON__": (ROOT / "data/badge_overrides.json").read_text(encoding="utf-8"),
         "__DOSSIERS_JSON__": (ROOT / "data/dossiers.json").read_text(encoding="utf-8"),
         "__METHOD_JSON__": (ROOT / "data/methodology.json").read_text(encoding="utf-8"),
         "__BXHIST_JSON__": (ROOT / "data/bitrix_history.json").read_text(encoding="utf-8"),

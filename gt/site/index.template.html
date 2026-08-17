@@ -164,6 +164,7 @@ const BX_SITES = __BXSITES_JSON__;
 const RESEARCH = __RESEARCH_JSON__;
 const PNCAT = __PNCAT_JSON__;
 const PROFILES = __PROFILES_JSON__;
+const BADGEOVR = __BADGEOVR_JSON__; /* вердикты скептика по плашкам моделей: канонический набор вместо регэксповых */
 const DOSSIERS = __DOSSIERS_JSON__;
 const METHOD = __METHOD_JSON__;
 const BXHIST = __BXHIST_JSON__;
@@ -290,6 +291,11 @@ const ALIASES = [
  ['anatco','anatco'],['alnooralaili','anatco'],['itsparts','itsparts'],['industrialturbineservices','itsparts'],
  ['advancedmachiningtooling','amt'],['amtincadvanced','amt'],['abbab','abb'],['abbmotors','abb'],['abboy','abb'],
  ['patentedsystems','patentedsystems'],['hpillc','hpi'],['glmenergy','glm'],['sulzer','sulzer'],
+ /* схлопывание дублей-вариантов, найденных при скептик-проверке плашек 17.08.2026 */
+ ['gasturbineapplications','gta'],['paralloy','paralloy'],['nusantaraturbin','ntp'],
+ ['rollswood','rwg'],['lincotek','lincotek'],['turbocoating','lincotek'],['hitemco','lincotek'],
+ ['uspe','uspe'],
+ ['turbineservicesltdtsl','turbineservices'],['turbineserviceslimitedglasgow','turbineservices'],['turbineservicestsl','turbineservices'],
 ];
 const nrm = s => {
  let k = String(s||'').toLowerCase().replace(/[^a-zа-я0-9]/g,'').replace(/(coltd|colimited|ltd|llc|inc|gmbh|srl|spa|bv|sa|sadecv|corp|company|limited|group)+$/,'');
@@ -463,7 +469,15 @@ function buildUnified(){
   else hmap[k] = hh.items;
  }
  UNI = [...map.values()];
+ const bovr = {};
+ for(const [n,v] of Object.entries(BADGEOVR.checks||{})) bovr[nrm(n)] = v;
  UNI.forEach(r=>{
+  const o = bovr[r.key];
+  if(o){ // проверенный набор плашек заменяет регэксповый; влияет и на скоринг ниже
+   r.models = new Set(o.models||[]);
+   (o.fams_off||[]).forEach(f=>{ r[f]=false; });
+   r.badgecheck = o;
+  }
   r.bxTotal = Object.values(r.bitrix).reduce((a,b)=>a+b,0);
   r.typ = classify(r);
   r.dossier = dmap[r.key] || null;
@@ -572,7 +586,7 @@ function pkCard(r){
   </div>
   <div>
    <div style="margin-bottom:4px">${[...r.segs].map(id=>`<span class="tag">${esc(SEG_SHORT(id))}</span>`).join('')||'<span class="mut">сегмент не определён</span>'}</div>
-   <div style="margin-bottom:6px">${models}${wide}${gen}</div>
+   <div style="margin-bottom:6px">${models}${wide}${gen}${r.badgecheck?`<span class="tag" style="border:1px solid ${r.badgecheck.verdict==='confirmed_broad'?'#0ca30c':'#b8431a'}" title="${esc((r.badgecheck.note||'')+' · '+(r.badgecheck.url||''))}">${r.badgecheck.verdict==='confirmed_broad'?'✓ плашки проверены':'✂ плашки урезаны проверкой'}</span>`:''}</div>
    ${dossierBits.length?`<div style="font-size:12px;margin-bottom:4px">${dossierBits.map(b=>`<span class="dfact">${esc(b)}</span>`).join('')}</div>`:''}
    ${r.what?`<div class="mut" style="font-size:12.5px">${esc(r.what.length>170?r.what.slice(0,170)+'…':r.what)}</div>`:''}
    ${r.evid?`<div class="mut" style="font-size:11.5px;margin-top:3px">Проверка: ${esc(r.evid.length>150?r.evid.slice(0,150)+'…':r.evid)}</div>`:''}
