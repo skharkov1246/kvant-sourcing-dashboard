@@ -31,6 +31,14 @@ gt/
                         наследие Линкольн-Ruston и Финспонг-STAL, РФ/СНГ/Иран
   data/bitrix_supplier_sites.json  верифицированные сайты Bitrix-компаний (165)
                         + список not_found (39, убраны из подбора)
+  data/cummins_qsk60.json  ОТДЕЛЬНАЯ СТРАНИЦА /gt/cummins (не ГТУ): свечи зажигания
+                        и масляные фильтры Cummins QSK60G — 2 позиции заказчика,
+                        карта номеров (ERS/Hatraco 18.049-01 ↔ Cummins 4380132/
+                        4390446/5544762; Fleetguard LF9050 ↔ Donaldson P554560),
+                        30 кандидатов по миру с доказательствами и отметкой
+                        «запрашивал ли уже сорсинг» (живая сверка с Bitrix СП-166
+                        зондом scripts/bitrix_probe.py, 11.08.2026).
+                        Сборка: python3 gt/tools/build_cummins.py
   data/tfs_subsuppliers.json  10 субпоставщиков TFS по модулям (фото владельца)
   data/pn_guide.json    шифровки PN: формат Линкольна (MW#####X), legacy-имена
                         (Typhoon/Tornado/Tempest/Cyclone), правила Solar, методика

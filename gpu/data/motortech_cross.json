@@ -1,0 +1,3215 @@
+{
+ "updated": "2026-08-13",
+ "source": "Application Guides MOTORTECH (PDF), разобраны gpu/tools/parse_motortech.py. Кросс уровня A: изготовитель компонента сам заявляет эквивалентность номеру OEM.",
+ "guides": [
+  {
+   "name": "CAT G3500",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3500-Series-01.00.011-EN-2017-08.pdf"
+  },
+  {
+   "name": "CAT G3400",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3400-Series-01.00.010-EN-2016-07_01.pdf"
+  },
+  {
+   "name": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf"
+  }
+ ],
+ "stats": {
+  "records": 134,
+  "oem_pns": 296,
+  "by_brand": {
+   "CATERPILLAR": 57,
+   "ALTRONIC": 64,
+   "MOTORTECH": 18,
+   "MOT/CAT": 5,
+   "CHAMPION": 1,
+   "IMPCO": 2,
+   "WAUKESHA": 73
+  }
+ },
+ "records": [
+  {
+   "guide": "CAT G3500",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3500-Series-01.00.011-EN-2017-08.pdf",
+   "kind": "Equivalent to",
+   "part": "ignition coil",
+   "engines": "G3508",
+   "motortech": [
+    "06.50.034"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "7W-4377"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "591012"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3500",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3500-Series-01.00.011-EN-2017-08.pdf",
+   "kind": "Equivalent to",
+   "part": "ignition coil",
+   "engines": "G3508",
+   "motortech": [
+    "06.50.151"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "418-4861",
+      "232-6346",
+      "165-1589",
+      "124-0749"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3500",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3500-Series-01.00.011-EN-2017-08.pdf",
+   "kind": "Equivalent to",
+   "part": "ignition coil",
+   "engines": "G3516B",
+   "motortech": [
+    "06.50.153"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "437-4106",
+      "232-6350",
+      "199-9011"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3500",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3500-Series-01.00.011-EN-2017-08.pdf",
+   "kind": "Equivalent to",
+   "part": "ignition coil",
+   "engines": "G3512E",
+   "motortech": [
+    "06.50.159"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "356-3701"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3500",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3500-Series-01.00.011-EN-2017-08.pdf",
+   "kind": "Equivalent to",
+   "part": "ignition coil",
+   "engines": "G3508",
+   "motortech": [
+    "06.50.152"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "437-4047",
+      "232-6347",
+      "165-1590"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3500",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3500-Series-01.00.011-EN-2017-08.pdf",
+   "kind": "Equivalent to",
+   "part": "ignition coil",
+   "engines": "G3508/B",
+   "motortech": [
+    "06.50.154"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "418-4862",
+      "259-2078"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3500",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3500-Series-01.00.011-EN-2017-08.pdf",
+   "kind": "Fits Ignition Coil",
+   "part": "Lip seal",
+   "engines": "",
+   "motortech": [
+    "06.50.151",
+    "06.50.152",
+    "06.50.153",
+    "06.50.154",
+    "06.50.159",
+    "06.80.751",
+    "06.80.752",
+    "06.80.753",
+    "06.80.754",
+    "06.80.764"
+   ],
+   "cross": [
+    {
+     "brand": "MOTORTECH",
+     "pns": [
+      "06.50.151"
+     ]
+    },
+    {
+     "brand": "MOTORTECH",
+     "pns": [
+      "06.50.152"
+     ]
+    },
+    {
+     "brand": "MOTORTECH",
+     "pns": [
+      "06.50.153"
+     ]
+    },
+    {
+     "brand": "MOTORTECH",
+     "pns": [
+      "06.50.154"
+     ]
+    },
+    {
+     "brand": "MOTORTECH",
+     "pns": [
+      "06.50.159"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3500",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3500-Series-01.00.011-EN-2017-08.pdf",
+   "kind": "Equivalent to",
+   "part": "ignition coil",
+   "engines": "G3512E",
+   "motortech": [
+    "06.50.164"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "438-5682",
+      "310-3180",
+      "283-5269",
+      "232-6351",
+      "191-9346"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3500",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3500-Series-01.00.011-EN-2017-08.pdf",
+   "kind": "Equivalent to",
+   "part": "Camshaft Trigger Magnet",
+   "engines": "",
+   "motortech": [
+    "06.60.925"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "142-8608"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "260605",
+      "260604"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3500",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3500-Series-01.00.011-EN-2017-08.pdf",
+   "kind": "Equivalent to",
+   "part": "Ignition coil",
+   "engines": "",
+   "motortech": [
+    "95.01.020-60"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "1N-3735"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "593027-60"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3500",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3500-Series-01.00.011-EN-2017-08.pdf",
+   "kind": "Equivalent to",
+   "part": "Ignition coil",
+   "engines": "",
+   "motortech": [
+    "95.01.020-72"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "1N-3736"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "593027-72"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3500",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3500-Series-01.00.011-EN-2017-08.pdf",
+   "kind": "Equivalent to",
+   "part": "",
+   "engines": "",
+   "motortech": [
+    "95.01.020-84"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "1N-3738"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "593027-84"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3500",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3500-Series-01.00.011-EN-2017-08.pdf",
+   "kind": "Equivalent to",
+   "part": "",
+   "engines": "",
+   "motortech": [
+    "95.01.020-96"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "1N-3739"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "593027-96"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3500",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3500-Series-01.00.011-EN-2017-08.pdf",
+   "kind": "Equivalent to",
+   "part": "Primary Leads",
+   "engines": "",
+   "motortech": [
+    "95.01.020-108"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "1N-3740"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "593027-108"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3500",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3500-Series-01.00.011-EN-2017-08.pdf",
+   "kind": "Equivalent to",
+   "part": "Primary Leads",
+   "engines": "",
+   "motortech": [
+    "95.01.020-120"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "1N-3741"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "593027-120"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3500",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3500-Series-01.00.011-EN-2017-08.pdf",
+   "kind": "Equivalent to",
+   "part": "Primary Leads",
+   "engines": "",
+   "motortech": [
+    "95.01.020-48"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "4W-5467"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "593027-48"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3500",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3500-Series-01.00.011-EN-2017-08.pdf",
+   "kind": "Equivalent to",
+   "part": "",
+   "engines": "",
+   "motortech": [
+    "95.01.020-12"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "4W-6741"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "593027-12"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3500",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3500-Series-01.00.011-EN-2017-08.pdf",
+   "kind": "Equivalent to",
+   "part": "",
+   "engines": "",
+   "motortech": [
+    "95.01.020-24"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "4W-6742"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "593027-24"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3500",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3500-Series-01.00.011-EN-2017-08.pdf",
+   "kind": "Equivalent to",
+   "part": "Primary Leads",
+   "engines": "",
+   "motortech": [
+    "95.01.020-42"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "4W-6743"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "593027-42"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3500",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3500-Series-01.00.011-EN-2017-08.pdf",
+   "kind": "Equivalent to",
+   "part": "Primary Leads",
+   "engines": "",
+   "motortech": [
+    "95.01.020-54"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "4W-6744"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "593027-54"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3500",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3500-Series-01.00.011-EN-2017-08.pdf",
+   "kind": "Equivalent to",
+   "part": "Primary Leads",
+   "engines": "",
+   "motortech": [
+    "95.01.020-132"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "4W-6745"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "593027-132"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3500",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3500-Series-01.00.011-EN-2017-08.pdf",
+   "kind": "Equivalent to",
+   "part": "",
+   "engines": "",
+   "motortech": [
+    "95.01.020-138"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "4W-6746"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "593027-138"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3500",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3500-Series-01.00.011-EN-2017-08.pdf",
+   "kind": "Equivalent to",
+   "part": "",
+   "engines": "",
+   "motortech": [
+    "95.01.020-150"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "4W-6747"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "593027-150"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3500",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3500-Series-01.00.011-EN-2017-08.pdf",
+   "kind": "Fits Ignition Coil",
+   "part": "ignition coils",
+   "engines": "",
+   "motortech": [
+    "02.85.870",
+    "02.85.881",
+    "06.50.151",
+    "06.50.152",
+    "06.50.153",
+    "06.50.154",
+    "06.50.159"
+   ],
+   "cross": [
+    {
+     "brand": "MOT/CAT",
+     "pns": [
+      "06.50.152",
+      "06.50.154",
+      "06.50.159",
+      "232-6347",
+      "259-2078",
+      "165-1590"
+     ]
+    },
+    {
+     "brand": "MOT/CAT",
+     "pns": [
+      "06.50.151",
+      "06.50.153",
+      "232-6346",
+      "232-6350",
+      "165-1589",
+      "124-0749"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3500",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3500-Series-01.00.011-EN-2017-08.pdf",
+   "kind": "Equivalent to",
+   "part": "ignition coils",
+   "engines": "G3508",
+   "motortech": [
+    "06.81.051"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "135-2651"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3500",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3500-Series-01.00.011-EN-2017-08.pdf",
+   "kind": "Equivalent to",
+   "part": "spark plug",
+   "engines": "G3512E",
+   "motortech": [
+    "06.80.459H"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "308-1380",
+      "283-5271",
+      "264-5323",
+      "150-2050"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3500",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3500-Series-01.00.011-EN-2017-08.pdf",
+   "kind": "Fits Ignition Coil",
+   "part": "spark plug",
+   "engines": "G3512E",
+   "motortech": [
+    "06.50.161"
+   ],
+   "cross": [
+    {
+     "brand": "MOT/CAT",
+     "pns": [
+      "06.50.161",
+      "283-5270"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3500",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3500-Series-01.00.011-EN-2017-08.pdf",
+   "kind": "Fits Ignition Coil",
+   "part": "spark plug",
+   "engines": "",
+   "motortech": [
+    "06.50.164",
+    "06.80.600"
+   ],
+   "cross": [
+    {
+     "brand": "MOTORTECH",
+     "pns": [
+      "06.50.164"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3500",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3500-Series-01.00.011-EN-2017-08.pdf",
+   "kind": "Equivalent to",
+   "part": "spark plug",
+   "engines": "",
+   "motortech": [],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "301-6663",
+      "243-4291",
+      "194-8518"
+     ]
+    },
+    {
+     "brand": "CHAMPION",
+     "pns": [
+      "RB77WPCC",
+      "KB77WPCC"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3500",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3500-Series-01.00.011-EN-2017-08.pdf",
+   "kind": "Equivalent to",
+   "part": "",
+   "engines": "G3508",
+   "motortech": [
+    "56.01.092-28",
+    "75.30.046"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "383-2989",
+      "241-9591",
+      "175-5341",
+      "6I-0407"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3500",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3500-Series-01.00.011-EN-2017-08.pdf",
+   "kind": "Equivalent to",
+   "part": "Oxygen sensor",
+   "engines": "G3508",
+   "motortech": [
+    "19.60.027"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "196-5391",
+      "3E-7639"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3400",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3400-Series-01.00.010-EN-2016-07_01.pdf",
+   "kind": "Equivalent to",
+   "part": "ignition controller",
+   "engines": "",
+   "motortech": [
+    "66.00.357-12"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "163-6164"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3400",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3400-Series-01.00.010-EN-2016-07_01.pdf",
+   "kind": "Equivalent to",
+   "part": "ignition controller",
+   "engines": "",
+   "motortech": [
+    "66.00.357-12"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "163-6108"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3400",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3400-Series-01.00.010-EN-2016-07_01.pdf",
+   "kind": "Fits Ignition Coil",
+   "part": "Lip seal",
+   "engines": "",
+   "motortech": [
+    "06.50.141",
+    "06.50.142",
+    "06.50.143",
+    "06.50.144",
+    "06.80.741",
+    "06.80.742",
+    "06.80.743",
+    "06.80.744",
+    "95.09.222-6"
+   ],
+   "cross": [
+    {
+     "brand": "MOTORTECH",
+     "pns": [
+      "06.50.141"
+     ]
+    },
+    {
+     "brand": "MOTORTECH",
+     "pns": [
+      "06.50.142"
+     ]
+    },
+    {
+     "brand": "MOTORTECH",
+     "pns": [
+      "06.50.143"
+     ]
+    },
+    {
+     "brand": "MOTORTECH",
+     "pns": [
+      "06.50.144"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3400",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3400-Series-01.00.010-EN-2016-07_01.pdf",
+   "kind": "Equivalent to",
+   "part": "Ignition Coils",
+   "engines": "",
+   "motortech": [
+    "95.09.222-12"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "107-2400"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "591011A"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3400",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3400-Series-01.00.010-EN-2016-07_01.pdf",
+   "kind": "Equivalent to",
+   "part": "Ignition Coils",
+   "engines": "",
+   "motortech": [
+    "95.09.223-6"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "215-2434"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "591011B",
+      "591011C"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3400",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3400-Series-01.00.010-EN-2016-07_01.pdf",
+   "kind": "Equivalent to",
+   "part": "",
+   "engines": "",
+   "motortech": [
+    "06.84.026",
+    "06.84.090"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "4W-4959"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "591007"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3400",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3400-Series-01.00.010-EN-2016-07_01.pdf",
+   "kind": "Equivalent to",
+   "part": "spark plug",
+   "engines": "",
+   "motortech": [
+    "95.70.002-250"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "7E-0079"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3400",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3400-Series-01.00.010-EN-2016-07_01.pdf",
+   "kind": "Equivalent to",
+   "part": "pickup",
+   "engines": "",
+   "motortech": [
+    "95.01.020-60"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "116-6806"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "791050-2"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3400",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3400-Series-01.00.010-EN-2016-07_01.pdf",
+   "kind": "Equivalent to",
+   "part": "Ignition coil",
+   "engines": "",
+   "motortech": [
+    "95.01.020-60"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "1N-3735"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "593027-60"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3400",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3400-Series-01.00.010-EN-2016-07_01.pdf",
+   "kind": "Equivalent to",
+   "part": "Ignition coil",
+   "engines": "",
+   "motortech": [
+    "95.01.020-72"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "1N-3736"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "593027-72"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3400",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3400-Series-01.00.010-EN-2016-07_01.pdf",
+   "kind": "Equivalent to",
+   "part": "",
+   "engines": "",
+   "motortech": [
+    "95.01.020-84"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "1N-3738"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "593027-84"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3400",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3400-Series-01.00.010-EN-2016-07_01.pdf",
+   "kind": "Equivalent to",
+   "part": "",
+   "engines": "",
+   "motortech": [
+    "95.01.020-96"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "1N-3739"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "593027-96"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3400",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3400-Series-01.00.010-EN-2016-07_01.pdf",
+   "kind": "Equivalent to",
+   "part": "",
+   "engines": "",
+   "motortech": [
+    "95.01.020-108"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "1N-3740"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "593027-108"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3400",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3400-Series-01.00.010-EN-2016-07_01.pdf",
+   "kind": "Equivalent to",
+   "part": "Primary Leads",
+   "engines": "",
+   "motortech": [
+    "95.01.020-120"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "1N-3741"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "593027-120"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3400",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3400-Series-01.00.010-EN-2016-07_01.pdf",
+   "kind": "Equivalent to",
+   "part": "Primary Leads",
+   "engines": "",
+   "motortech": [
+    "95.01.020-48"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "4W-5467"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "593027-48"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3400",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3400-Series-01.00.010-EN-2016-07_01.pdf",
+   "kind": "Equivalent to",
+   "part": "Primary Leads",
+   "engines": "",
+   "motortech": [
+    "95.01.020-12"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "4W-6741"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "593027-12"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3400",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3400-Series-01.00.010-EN-2016-07_01.pdf",
+   "kind": "Equivalent to",
+   "part": "",
+   "engines": "",
+   "motortech": [
+    "95.01.020-24"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "4W-6742"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "593027-24"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3400",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3400-Series-01.00.010-EN-2016-07_01.pdf",
+   "kind": "Equivalent to",
+   "part": "",
+   "engines": "",
+   "motortech": [
+    "95.01.020-42"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "4W-6743"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "593027-42"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3400",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3400-Series-01.00.010-EN-2016-07_01.pdf",
+   "kind": "Equivalent to",
+   "part": "Primary Leads",
+   "engines": "",
+   "motortech": [
+    "95.01.020-54"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "4W-6744"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "593027-54"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3400",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3400-Series-01.00.010-EN-2016-07_01.pdf",
+   "kind": "Equivalent to",
+   "part": "Primary Leads",
+   "engines": "",
+   "motortech": [
+    "95.01.020-132"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "4W-6745"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "593027-132"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3400",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3400-Series-01.00.010-EN-2016-07_01.pdf",
+   "kind": "Equivalent to",
+   "part": "Primary Leads",
+   "engines": "",
+   "motortech": [
+    "95.01.020-138"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "4W-6746"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "593027-138"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3400",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3400-Series-01.00.010-EN-2016-07_01.pdf",
+   "kind": "Equivalent to",
+   "part": "",
+   "engines": "",
+   "motortech": [
+    "95.01.020-150"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "4W-6747"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "593027-150"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3400",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3400-Series-01.00.010-EN-2016-07_01.pdf",
+   "kind": "Equivalent to",
+   "part": "ignition coil",
+   "engines": "",
+   "motortech": [
+    "06.85.751-18"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "7W-8542",
+      "262-4855",
+      "250-2149"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3400",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3400-Series-01.00.010-EN-2016-07_01.pdf",
+   "kind": "Fits Ignition Coil",
+   "part": "Lip seal",
+   "engines": "",
+   "motortech": [
+    "06.50.141",
+    "06.50.142",
+    "06.50.143",
+    "06.50.144",
+    "06.80.419H",
+    "06.80.420H",
+    "06.80.741",
+    "06.80.742",
+    "06.80.743",
+    "06.80.744",
+    "06.81.051"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "232-6348",
+      "165-1591",
+      "131-3277",
+      "129-8802",
+      "108-0615"
+     ]
+    },
+    {
+     "brand": "MOTORTECH",
+     "pns": [
+      "06.50.141"
+     ]
+    },
+    {
+     "brand": "MOT/CAT",
+     "pns": [
+      "06.50.142",
+      "232-6349",
+      "165-1592",
+      "122-8070"
+     ]
+    },
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "232-6352",
+      "213-7443"
+     ]
+    },
+    {
+     "brand": "MOTORTECH",
+     "pns": [
+      "06.50.143"
+     ]
+    },
+    {
+     "brand": "MOT/CAT",
+     "pns": [
+      "06.50.144",
+      "232-6353",
+      "213-7444"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3400",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3400-Series-01.00.010-EN-2016-07_01.pdf",
+   "kind": "Equivalent to",
+   "part": "Spark Plugs",
+   "engines": "",
+   "motortech": [],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "2N-2839"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3400",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3400-Series-01.00.010-EN-2016-07_01.pdf",
+   "kind": "Equivalent to",
+   "part": "ignition coils",
+   "engines": "",
+   "motortech": [],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "4W-2256"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3400",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3400-Series-01.00.010-EN-2016-07_01.pdf",
+   "kind": "Equivalent to",
+   "part": "Throttle body",
+   "engines": "",
+   "motortech": [
+    "30.40.101-68AT2"
+   ],
+   "cross": [
+    {
+     "brand": "IMPCO",
+     "pns": [
+      "AT2-7"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3400",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3400-Series-01.00.010-EN-2016-07_01.pdf",
+   "kind": "To replace",
+   "part": "Throttle body",
+   "engines": "",
+   "motortech": [
+    "30.40.141-94AT2"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "7C-1147"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3400",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3400-Series-01.00.010-EN-2016-07_01.pdf",
+   "kind": "Equivalent to",
+   "part": "Throttle body",
+   "engines": "",
+   "motortech": [
+    "30.40.141-94AT2"
+   ],
+   "cross": [
+    {
+     "brand": "IMPCO",
+     "pns": [
+      "AT2-9"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3400",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3400-Series-01.00.010-EN-2016-07_01.pdf",
+   "kind": "To replace",
+   "part": "Throttle body",
+   "engines": "",
+   "motortech": [
+    "19.60.027"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "7W-1501"
+     ]
+    },
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "7W-1513"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3400",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3400-Series-01.00.010-EN-2016-07_01.pdf",
+   "kind": "Equivalent to",
+   "part": "Oxygen sensor",
+   "engines": "",
+   "motortech": [
+    "19.60.029"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "196-5391"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "ignition controller",
+   "engines": "",
+   "motortech": [
+    "06.00.515-6",
+    "66.00.358-8"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "740608A",
+      "740608"
+     ]
+    },
+    {
+     "brand": "MOTORTECH",
+     "pns": [
+      "06.00.515-6"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "harness",
+   "engines": "",
+   "motortech": [
+    "06.31.030-1"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "69703",
+      "178622"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "393018-1"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "harness",
+   "engines": "",
+   "motortech": [
+    "06.31.030-2"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "269717B"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "393018-2"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "harness",
+   "engines": "",
+   "motortech": [
+    "06.31.032-2"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "69692B"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "393023-2"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "harness",
+   "engines": "",
+   "motortech": [
+    "06.77.006-72"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "209728"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "593041-1"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "harness",
+   "engines": "",
+   "motortech": [
+    "95.30.007-1"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "178788",
+      "208502E"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "393013-1",
+      "393013-3",
+      "393013-7"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "harness",
+   "engines": "",
+   "motortech": [
+    "95.30.007-4"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "178788A"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "393013-4"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "harness",
+   "engines": "",
+   "motortech": [
+    "95.30.008-3"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "178803"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "393014-3"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "harness",
+   "engines": "",
+   "motortech": [
+    "95.30.008-4"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "208502C"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "393014-4"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "harness",
+   "engines": "",
+   "motortech": [
+    "95.30.008-8"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "178804"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "393014-8"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "pickup",
+   "engines": "",
+   "motortech": [
+    "95.30.008-8"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "A740749"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "pickup",
+   "engines": "",
+   "motortech": [],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "A740750"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "Harness",
+   "engines": "",
+   "motortech": [],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "740744"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "Harness",
+   "engines": "",
+   "motortech": [],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "740753"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "ignition controllers",
+   "engines": "",
+   "motortech": [
+    "06.50.054"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "69694B"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "591010"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "ignition controllers",
+   "engines": "",
+   "motortech": [
+    "06.50.055"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "69694"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "501061"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "ignition controllers",
+   "engines": "",
+   "motortech": [
+    "06.50.034"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "69694F"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "591012"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "",
+   "engines": "",
+   "motortech": [
+    "06.50.035-30",
+    "06.50.035-36",
+    "95.09.155-30",
+    "95.09.155-36"
+   ],
+   "cross": [
+    {
+     "brand": "MOTORTECH",
+     "pns": [
+      "06.50.035-30-A"
+     ]
+    },
+    {
+     "brand": "MOTORTECH",
+     "pns": [
+      "06.50.035-36-E"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "ignition controllers",
+   "engines": "",
+   "motortech": [
+    "95.09.054"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "69694C"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "591010-S"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "spark plug",
+   "engines": "",
+   "motortech": [],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "211749",
+      "NOTE"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "ignition controllers",
+   "engines": "",
+   "motortech": [
+    "95.09.222-12"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "69694D"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "591011B",
+      "591011C"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "ignition controllers",
+   "engines": "",
+   "motortech": [
+    "95.09.122-11",
+    "95.09.222-12"
+   ],
+   "cross": [
+    {
+     "brand": "MOTORTECH",
+     "pns": [
+      "95.09.222-12"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "pickup",
+   "engines": "",
+   "motortech": [
+    "95.70.001-250"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "A295844D",
+      "208007A",
+      "168273G"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "691118-2"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "pickup",
+   "engines": "",
+   "motortech": [
+    "95.70.001-400"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "295844E"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "691118-4"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "pickup",
+   "engines": "",
+   "motortech": [
+    "95.70.002-175"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "295844"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "791050-1"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "pickup",
+   "engines": "",
+   "motortech": [
+    "95.70.002-250"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "295844A"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "791050-2"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "pickup",
+   "engines": "",
+   "motortech": [
+    "95.70.002-450"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "295844B"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "791050-4"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "pickup",
+   "engines": "",
+   "motortech": [],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "A740749"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "pickup",
+   "engines": "",
+   "motortech": [],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "A740750"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "Pickups",
+   "engines": "",
+   "motortech": [
+    "06.20.069-6"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "305805R"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "",
+   "engines": "",
+   "motortech": [
+    "06.20.069-12",
+    "06.20.069-6"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "305805P"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "",
+   "engines": "",
+   "motortech": [
+    "06.20.070"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "A168368E"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "",
+   "engines": "",
+   "motortech": [
+    "06.20.025"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "305805F"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "",
+   "engines": "",
+   "motortech": [
+    "06.20.026"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "305805G"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "",
+   "engines": "",
+   "motortech": [
+    "06.20.252"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "305805N"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "Ignition coil",
+   "engines": "",
+   "motortech": [
+    "95.01.010-18"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "178789"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "593022-18"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "Ignition coil",
+   "engines": "",
+   "motortech": [
+    "95.01.010-24"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "178789A"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "593022-24"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "",
+   "engines": "",
+   "motortech": [
+    "95.01.010-36"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "178789B"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "593022-36"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "",
+   "engines": "",
+   "motortech": [
+    "95.01.010-42"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "178789C"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "593022-42"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "Primary Leads",
+   "engines": "",
+   "motortech": [
+    "95.01.010-30"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "178789G"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "593022-30"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "Primary Leads",
+   "engines": "",
+   "motortech": [
+    "95.01.010-15"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "178789H"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "593022-15"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "Primary Leads",
+   "engines": "",
+   "motortech": [
+    "95.01.010-18"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "208503B"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "593022-18"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "",
+   "engines": "",
+   "motortech": [
+    "95.01.010-30"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "208503G"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "593022-30"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "",
+   "engines": "",
+   "motortech": [
+    "95.01.020-30"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "208503K"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "593027-30"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "Primary Leads",
+   "engines": "",
+   "motortech": [
+    "95.01.020-36"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "208503L"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "593027-36"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "Primary Leads",
+   "engines": "",
+   "motortech": [
+    "95.01.020-30"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "208503T"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "593027-30"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "Primary Leads",
+   "engines": "",
+   "motortech": [],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "A740746",
+      "740746D"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "spark plug",
+   "engines": "",
+   "motortech": [
+    "06.80.321-T",
+    "44.99.912"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "211357P",
+      "211357U",
+      "A211797H",
+      "A211797P",
+      "A211797R"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "spark plug",
+   "engines": "",
+   "motortech": [
+    "06.80.340-T"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "211797A",
+      "A211797G"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "Spark plug extension",
+   "engines": "",
+   "motortech": [
+    "44.99.912"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "474053"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "spark plug",
+   "engines": "",
+   "motortech": [
+    "06.80.321-T",
+    "06.80.340-T",
+    "06.84.040-100"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "740011A"
+     ]
+    },
+    {
+     "brand": "MOTORTECH",
+     "pns": [
+      "06.80.321-T",
+      "06.80.340-T"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "ignition coil",
+   "engines": "",
+   "motortech": [
+    "06.80.321-T",
+    "06.80.340-T",
+    "06.81.138-100"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "296178A"
+     ]
+    },
+    {
+     "brand": "MOTORTECH",
+     "pns": [
+      "06.80.321-T",
+      "06.80.340-T"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "harness",
+   "engines": "",
+   "motortech": [
+    "77.75.066"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "214036D"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "harness",
+   "engines": "",
+   "motortech": [
+    "64.40.038",
+    "77.75.066"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "194929"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "",
+   "engines": "",
+   "motortech": [
+    "56.01.094-23",
+    "56.01.094-59",
+    "77.75.068-50"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "211288S"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "Oxygen sensor",
+   "engines": "",
+   "motortech": [
+    "19.60.022",
+    "19.60.023"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "A740106E",
+      "A740106D",
+      "A740106C"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "",
+   "engines": "",
+   "motortech": [
+    "25.00.009-50"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "489501"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "",
+   "engines": "",
+   "motortech": [
+    "25.00.009-50",
+    "25.00.018-50"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "489625"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "",
+   "engines": "",
+   "motortech": [
+    "25.00.018-50",
+    "25.00.109-50"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "489508"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "",
+   "engines": "",
+   "motortech": [
+    "25.00.310-14",
+    "25.00.310-4",
+    "25.00.310-7"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "167602B"
+     ]
+    },
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "167602B"
+     ]
+    },
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "167602B"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "",
+   "engines": "",
+   "motortech": [
+    "25.00.311-4",
+    "25.00.311-7"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "168660B",
+      "489493"
+     ]
+    },
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "168660B",
+      "489493"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "",
+   "engines": "",
+   "motortech": [
+    "25.00.312-1"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "208472B",
+      "489488"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "Lube Oil Filtration",
+   "engines": "",
+   "motortech": [
+    "25.00.313-1"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "208472C",
+      "489489"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "",
+   "engines": "",
+   "motortech": [
+    "25.00.310-4",
+    "25.00.314-10"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "168660H"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "",
+   "engines": "",
+   "motortech": [
+    "25.00.310-WA",
+    "25.00.311-4"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "167602B"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "",
+   "engines": "",
+   "motortech": [
+    "25.00.311-WA",
+    "25.00.312-1"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "168660B",
+      "489493"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "Lube Oil Filtration",
+   "engines": "",
+   "motortech": [
+    "25.00.312-WA",
+    "25.00.313-1"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "208472B",
+      "489488"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "Lube Oil Filtration",
+   "engines": "",
+   "motortech": [
+    "25.00.313-WA",
+    "25.00.314-10"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "208472C",
+      "489489"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "",
+   "engines": "",
+   "motortech": [
+    "25.00.314-WA"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "168660H"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "",
+   "engines": "",
+   "motortech": [
+    "25.00.315-WA"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "489491",
+      "305351E"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "",
+   "engines": "",
+   "motortech": [
+    "25.00.316-WA"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "489495",
+      "304126"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "Waukesha VHP",
+   "oem": "Waukesha",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf",
+   "kind": "Equivalent to",
+   "part": "Lube Oil Filtration",
+   "engines": "",
+   "motortech": [
+    "25.00.317-WA"
+   ],
+   "cross": [
+    {
+     "brand": "WAUKESHA",
+     "pns": [
+      "489490",
+      "305315C"
+     ]
+    }
+   ]
+  }
+ ]
+}

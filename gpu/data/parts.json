@@ -1,0 +1,187 @@
+{
+  "updated": "2026-08-13",
+  "source": "Номенклатура собрана из состава нашей реальной заявки (94 позиции по Cummins и Jenbacher), кросс-каталогов MOTORTECH, публикаций сервисных компаний по интервалам ТО (RS Motor, Clarke Energy) и открытых материалов OEM.",
+  "intervals_note": "Интервалы — типовые для природного газа. На биогазе, свалочном и шахтном газе (сера, силоксаны, хлор) они сокращаются в 1,5–3 раза. Точные значения — только из сервисной документации конкретной машины; здесь ориентир для планирования закупки, а не регламент.",
+  "intervals": [
+    {"h": "ежесменно / 250", "what": "Осмотр, уровни, слив конденсата, контроль по DIA.NE / ADEM / PowerCommand"},
+    {"h": "1 000 – 2 000", "what": "Масло, масляные и воздушные фильтры, фильтр ОЖ, свечи (на тяжёлых газах — чаще). Это основная повторяющаяся закупка."},
+    {"h": "2 000 – 4 000", "what": "Свечи зажигания в штатном режиме, регулировка клапанов, проверка зажигания и детонации"},
+    {"h": "10 000", "what": "Промежуточное ТО: катушки/провода/удлинители, форсунки форкамеры, датчики, шланги, ремкомплекты удлинителей"},
+    {"h": "20 000 – 30 000", "what": "Верхний ремонт (top overhaul): ГБЦ или их восстановление, клапаны, сёдла, поршневые кольца, турбо-инспекция"},
+    {"h": "60 000", "what": "Капитальный ремонт: полная разборка, коленвал, коренные и шатунные вкладыши, гильзы, поршни, восстановление блока"}
+  ],
+  "systems": [
+    {
+      "key": "ignition",
+      "name": "Зажигание",
+      "crit": "критично",
+      "en": "ignition system: spark plug, ignition coil, spark plug extension / boot, primary lead, ignition controller, pickup, trigger magnet",
+      "items": [
+        {"ru": "Свеча зажигания (предкамерная / J-Gap / 4-ground)", "en": "spark plug (prechamber / J-gap / 4-ground)", "note": "Главная расходная позиция ГПУ. Cummins — 7-значный PN; Jenbacher — жестянка на 4 шт; CAT — M18×1,5 (G3500) или M14×1,25 (G3400)."},
+        {"ru": "Колпачок / удлинитель свечи", "en": "spark plug boot / extension", "note": "Идёт в паре с катушкой. Ремкомплект (тефлон + уплотнение + подпружиненная клемма) дешевле нового удлинителя."},
+        {"ru": "Катушка зажигания", "en": "ignition coil", "note": "Экранированное и неэкранированное исполнения не взаимозаменяемы."},
+        {"ru": "Первичный провод", "en": "primary lead", "note": "Длина зашита в номер (дюймы). Составлять ведомость длин по цилиндрам."},
+        {"ru": "Блок / контроллер зажигания", "en": "ignition controller / module", "note": "MIC3+/MIC4, Altronic CPU95/DISN, Jenbacher MORIS, Cummins ICM."},
+        {"ru": "Датчик Холла / магнитный пикап, магнит триггера", "en": "hall effect pickup / magnetic pickup / trigger magnet", "note": "Типовые резьбы 5/8\"-18 UNF, M8×1,25 — часто закрываются приборостроителями."},
+        {"ru": "Уплотнения колодца свечи, шайбы", "en": "spark plug well o-ring, sealing washer", "note": "Массовая мелочь с максимальной OEM-наценкой; собирать одним лотом."}
+      ]
+    },
+    {
+      "key": "gas",
+      "name": "Газовый тракт и смесеобразование",
+      "crit": "критично",
+      "en": "gas train: prechamber gas valve, gas mixer / carburetor, throttle body, gas pressure regulator, gas filter element, shut-off valve",
+      "items": [
+        {"ru": "Клапан газовый форкамеры", "en": "prechamber gas valve", "note": "Jenbacher Type 6 — цепочка 334976 → 433894 и семейство 321631/321627/299142/306515/309391/312845."},
+        {"ru": "Газосмеситель / карбюратор", "en": "gas mixer / carburetor", "note": "На CAT часто IMPCO; альтернатива — MOTORTECH VariFuel2."},
+        {"ru": "Дроссельная заслонка", "en": "throttle body", "note": "CAT 7C-1147 → IMPCO AT2-7; CAT 7W-1501 → IMPCO AT2-9."},
+        {"ru": "Регулятор давления газа, отсечной клапан", "en": "gas pressure regulator, shut-off valve"},
+        {"ru": "Элемент газового фильтра", "en": "gas filter element", "note": "Cummins 4011553 — дорогая позиция ($350–1850)."},
+        {"ru": "Датчик массового расхода газа", "en": "gas mass flow sensor", "note": "Cummins 3929955 / 3929935 — $500–1600, аналогов практически нет."}
+      ]
+    },
+    {
+      "key": "air",
+      "name": "Воздух и наддув",
+      "crit": "критично",
+      "en": "air/charge system: turbocharger, cartridge/CHRA, intercooler / mixture cooler, air filter, wastegate, compressor bypass",
+      "items": [
+        {"ru": "Турбокомпрессор", "en": "turbocharger", "note": "Cummins 4025166 = Holset HX82 Dry, ~$16,5 тыс. Ремонт картриджа обычно дешевле."},
+        {"ru": "Картридж турбины (CHRA)", "en": "turbocharger cartridge / CHRA", "note": "Требовать протокол балансировки."},
+        {"ru": "Интеркулер / охладитель смеси", "en": "intercooler / mixture cooler", "note": "Jenbacher: 1238393 (J616/J620), 1202340 и 1244655 (J420), 1212197 и 641424 (J320)."},
+        {"ru": "Воздушный фильтр", "en": "air filter element", "note": "Fleetguard AF899M и аналоги Donaldson."}
+      ]
+    },
+    {
+      "key": "cpg",
+      "name": "ЦПГ: поршень, гильза, кольца",
+      "crit": "капремонт",
+      "en": "power cylinder: piston, piston rings, cylinder liner, piston pin, anti-polishing ring",
+      "items": [
+        {"ru": "Поршень (в т.ч. с галерейным охлаждением)", "en": "piston, gallery-cooled"},
+        {"ru": "Кольца поршневые, маслосъёмное", "en": "piston ring set, oil control ring"},
+        {"ru": "Гильза цилиндра", "en": "cylinder liner, induction hardened"},
+        {"ru": "Антиполировочное кольцо (APR / scraper ring)", "en": "anti-polishing ring", "note": "Jenbacher 311221 проходит у поставщиков именно как scraper/APR ring."},
+        {"ru": "Палец поршневой, стопорные кольца", "en": "piston pin, circlips"}
+      ]
+    },
+    {
+      "key": "crank",
+      "name": "КШМ",
+      "crit": "капремонт",
+      "en": "crank train: main bearings, connecting rod bearings, connecting rod, crankshaft, thrust washers",
+      "items": [
+        {"ru": "Вкладыши коренные и шатунные", "en": "main and connecting rod bearing shells", "note": "Обязательно указывать ремонтный размер."},
+        {"ru": "Шатун", "en": "connecting rod"},
+        {"ru": "Коленчатый вал, упорные полукольца", "en": "crankshaft, thrust washers"}
+      ]
+    },
+    {
+      "key": "head",
+      "name": "ГБЦ и клапаны",
+      "crit": "верхний ремонт",
+      "en": "cylinder head: complete head, intake/exhaust valve, valve seat insert, valve guide, valve spring, rocker, head gasket",
+      "items": [
+        {"ru": "Головка блока цилиндров (новая или восстановленная)", "en": "cylinder head, new or reconditioned", "note": "Cummins ГБЦ в нашем лоте оценена в $1200–6000."},
+        {"ru": "Клапан впускной / выпускной", "en": "intake / exhaust valve", "note": "Jenbacher Type 6: 334781 / 334782."},
+        {"ru": "Седло, направляющая, пружина клапана", "en": "valve seat insert, valve guide, valve spring"},
+        {"ru": "Прокладка ГБЦ, набор прокладок", "en": "cylinder head gasket, head gasket set", "note": "Jenbacher 337295 = Elring 047.630; Cummins 4012662 (взаимозаменяем с 4011502)."}
+      ]
+    },
+    {
+      "key": "filtration",
+      "name": "Фильтрация",
+      "crit": "расходники",
+      "en": "filtration: lube oil filter, oil centrifuge element, air filter, coolant filter, crankcase breather / blow-by filter, gas filter",
+      "items": [
+        {"ru": "Фильтр масляный (в т.ч. комби full-flow + bypass)", "en": "lube oil filter", "note": "Fleetguard LF9050."},
+        {"ru": "Вставка центрифуги масла", "en": "oil centrifuge paper element", "note": "Cummins 4010887 / 3393592."},
+        {"ru": "Фильтр охлаждающей жидкости", "en": "coolant filter", "note": "Fleetguard WF2075."},
+        {"ru": "Фильтр вентиляции картера (blow-by)", "en": "crankcase breather / blow-by filter", "note": "Jenbacher 344542/431447 = MANN LC 15 001 x; Cummins 4011521 ($400–1120)."},
+        {"ru": "Фильтр-патрон, фильтр-вкладыш", "en": "filter cartridge / element"}
+      ]
+    },
+    {
+      "key": "seals",
+      "name": "Уплотнения и прокладки",
+      "crit": "расходники",
+      "en": "seals and gaskets: o-ring, lip seal, gasket, sealing washer, valve cover gasket",
+      "items": [
+        {"ru": "О-кольца (колодец свечи, крышка клапанов, распредвал)", "en": "o-ring", "note": "Материал критичен: FKM/Viton, не NBR."},
+        {"ru": "Прокладка крышки клапанов", "en": "valve cover gasket"},
+        {"ru": "Манжеты, сальники", "en": "lip seal, shaft seal"},
+        {"ru": "Комплект уплотнений маслофильтра-центрифуги", "en": "centrifuge seal kit", "note": "Cummins 4010888."}
+      ]
+    },
+    {
+      "key": "cooling",
+      "name": "Охлаждение",
+      "crit": "важно",
+      "en": "cooling: water pump, thermostat, heat exchanger, radiator, coolant heater, hoses",
+      "items": [
+        {"ru": "Насос охлаждающей жидкости (ВТК / НТК)", "en": "coolant pump, HT / LT circuit", "note": "Cummins 4089332 (НТК, Gilkes) и 4376121 (ВТК) — в нашем списке помечены «возможен аналог»."},
+        {"ru": "Подогреватель ОЖ (ТЭН)", "en": "coolant / engine heater", "note": "Cummins 3423495."},
+        {"ru": "Теплообменник, радиатор", "en": "heat exchanger, radiator", "note": "Читать шильдик изготовителя (Funke, Kelvion, API, AKG)."},
+        {"ru": "Термостат, шланги контура", "en": "thermostat, coolant hoses"}
+      ]
+    },
+    {
+      "key": "sensors",
+      "name": "Датчики и КИП",
+      "crit": "важно",
+      "en": "sensors: pressure sensor/transducer, temperature sensor, speed sensor, camshaft position sensor, differential pressure sensor, knock sensor, oxygen sensor",
+      "items": [
+        {"ru": "Датчик давления / преобразователь 4–20 мА", "en": "pressure sensor / transducer", "note": "Cummins 3160404/3160587 (семейство QSK, идут вместе); Jenbacher 285263/285285/385919."},
+        {"ru": "Датчик температуры", "en": "temperature sensor", "note": "Cummins 3408345 = PAI 050675; 3408346 — самая дешёвая позиция лота."},
+        {"ru": "Датчик оборотов / положения распредвала", "en": "speed / camshaft position sensor", "note": "Jenbacher 200673 — magnetic pickup 5/8\"-18 UNF, 2,50\"; Cummins 3865350."},
+        {"ru": "Датчик детонации", "en": "knock sensor"},
+        {"ru": "Кислородный датчик", "en": "oxygen sensor / lambda probe", "note": "CAT 196-5391 (неэкран.), 141-2494 (экран.)."}
+      ]
+    },
+    {
+      "key": "control",
+      "name": "САУ и электрика",
+      "crit": "важно",
+      "en": "control: engine control module, ignition control module, wiring harness, connectors, HMI, battery",
+      "items": [
+        {"ru": "Модуль управления зажиганием", "en": "ignition control module", "note": "Cummins 2866883."},
+        {"ru": "Жгуты, кабельные разделки, разъёмы", "en": "wiring harness, cable assembly, connector", "note": "Jenbacher 635148 (14 м, тип 4); 436392 — это разъём TB12.X20, а не «питающий»."},
+        {"ru": "Элементы питания контроллеров", "en": "backup battery", "note": "SAFT LS14250 3PF, Renata CR2477N — массовый товар, не покупать у дилера ГПУ."},
+        {"ru": "Мотор установочный / серводвигатель (Stellmotor)", "en": "actuator / servo motor", "note": "Jenbacher 581336 и 9000799 (заменяет 246183) — дорогие позиции, $0,9–3,5 тыс."}
+      ]
+    },
+    {
+      "key": "hoses",
+      "name": "Шланги и трубопроводы",
+      "crit": "расходники",
+      "en": "hoses and lines: oil hose, vapour hose, air starter line, fittings",
+      "items": [
+        {"ru": "Шланги масляной системы", "en": "lube oil hose", "note": "Cummins 4012423 / 4012442 — парные позиции одного контура."},
+        {"ru": "Шланг пароотводной / вентиляции картера", "en": "vapour / breather hose"},
+        {"ru": "Патрубок пневмостартера", "en": "air starter line", "note": "Часто закрывается изготовителем РВД по образцу — дешевле в разы."}
+      ]
+    },
+    {
+      "key": "exhaust",
+      "name": "Выхлоп и катализ",
+      "crit": "по проекту",
+      "en": "exhaust: oxidation catalyst, SCR, exhaust bellows, silencer, heat recovery boiler",
+      "items": [
+        {"ru": "Блок окислительного катализатора", "en": "oxidation catalyst element", "note": "Расходник с ресурсом; меняется отдельно от корпуса."},
+        {"ru": "Компенсатор, сильфон выхлопа", "en": "exhaust bellows / expansion joint"},
+        {"ru": "Котёл-утилизатор", "en": "heat recovery boiler / exhaust heat exchanger"}
+      ]
+    },
+    {
+      "key": "gen",
+      "name": "Генератор и муфта",
+      "crit": "по состоянию",
+      "en": "generator: alternator, AVR, bearings, coupling elements",
+      "items": [
+        {"ru": "Подшипники генератора", "en": "generator bearings"},
+        {"ru": "Регулятор напряжения (AVR)", "en": "automatic voltage regulator"},
+        {"ru": "Упругие элементы муфты", "en": "coupling rubber elements", "note": "Vulkan / Centa / Geislinger — заказ по каталогу изготовителя муфты."}
+      ]
+    }
+  ]
+}
