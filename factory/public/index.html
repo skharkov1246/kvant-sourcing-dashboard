@@ -1,0 +1,1894 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Базовый проект золото-медного ГОКа на 7,6 млн т руды в год: технологическая схема, балансы, оборудование, поставщики, CAPEX/OPEX, экономика и открытые вопросы.">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9B%8F%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<title>ГОК Л-1</title>
+<style>
+:root{
+  --bg:#F1F2F0; --surface:#FCFCFB; --surface2:#F5F5F2; --sunk:#EAEBE7;
+  --ink:#20262A; --ink2:#3D474C; --muted:#5D6970; --faint:#8A9499;
+  --accent:#9C4A1D; --accent-soft:rgba(156,74,29,.09);
+  --border:#D9DCD8; --line:#C6CBC6;
+  --ok:#2E6B45; --ok-soft:rgba(46,107,69,.09);
+  --warn:#8A5A16; --warn-soft:rgba(138,90,22,.10);
+  --risk:#9B3327; --risk-soft:rgba(155,51,39,.09);
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a;
+  --pos:#2a78d6; --neg:#e34948; --neutral:#DCDCD6;
+  --mono:ui-monospace,"SFMono-Regular",Consolas,"DejaVu Sans Mono",monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#14171A; --surface:#1C2124; --surface2:#181D20; --sunk:#101315;
+    --ink:#E7E5DF; --ink2:#C6C9C6; --muted:#98A2A7; --faint:#6E787D;
+    --accent:#E09154; --accent-soft:rgba(224,145,84,.12);
+    --border:#2D3438; --line:#3A4246;
+    --ok:#7DBB92; --ok-soft:rgba(125,187,146,.11);
+    --warn:#D9AE5F; --warn-soft:rgba(217,174,95,.11);
+    --risk:#DE8A78; --risk-soft:rgba(222,138,120,.11);
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70;
+    --pos:#3987e5; --neg:#e66767; --neutral:#383835;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#14171A; --surface:#1C2124; --surface2:#181D20; --sunk:#101315;
+  --ink:#E7E5DF; --ink2:#C6C9C6; --muted:#98A2A7; --faint:#6E787D;
+  --accent:#E09154; --accent-soft:rgba(224,145,84,.12);
+  --border:#2D3438; --line:#3A4246;
+  --ok:#7DBB92; --ok-soft:rgba(125,187,146,.11);
+  --warn:#D9AE5F; --warn-soft:rgba(217,174,95,.11);
+  --risk:#DE8A78; --risk-soft:rgba(222,138,120,.11);
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70;
+  --pos:#3987e5; --neg:#e66767; --neutral:#383835;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0; background:var(--bg); color:var(--ink);
+  font:15.5px/1.6 "Segoe UI",system-ui,Roboto,"Helvetica Neue",Arial,sans-serif;}
+.wrap{max-width:1180px; margin:0 auto; padding:0 22px 90px}
+a{color:var(--accent)}
+h1,h2,h3,h4{font-family:Georgia,"Times New Roman",serif; text-wrap:balance; line-height:1.18; letter-spacing:-.01em}
+h1{font-size:clamp(28px,4.4vw,42px); margin:.15em 0 .3em; font-weight:600}
+h2{font-size:clamp(21px,2.6vw,27px); margin:0 0 .55em; font-weight:600}
+h3{font-size:18.5px; margin:2em 0 .55em; font-weight:600}
+h4{font-size:15.5px; margin:1.5em 0 .4em; font-weight:600; font-family:inherit;
+   text-transform:uppercase; letter-spacing:.08em; color:var(--muted); font-size:12.5px}
+p{max-width:74ch; margin:.7em 0}
+ul,ol{padding-left:21px; max-width:76ch} li{margin:5px 0}
+.eyebrow{font-size:11.5px; letter-spacing:.15em; text-transform:uppercase; color:var(--muted); font-weight:700}
+.lede{font-size:17.5px; color:var(--ink2); max-width:80ch}
+.mono{font-family:var(--mono); font-variant-numeric:tabular-nums}
+
+/* ── header + tabs ───────────────────────── */
+.masthead{border-bottom:1px solid var(--border); background:var(--surface2)}
+.masthead .wrap{padding-top:26px; padding-bottom:20px}
+.tabsbar{position:sticky; top:0; z-index:30; background:var(--bg);
+  border-bottom:1px solid var(--border); box-shadow:0 1px 0 rgba(0,0,0,.02)}
+.tabsbar .row{max-width:1180px; margin:0 auto; padding:0 22px; display:flex; gap:2px;
+  overflow-x:auto; scrollbar-width:thin}
+.tabsbar button{flex:0 0 auto; appearance:none; background:none; border:none; cursor:pointer;
+  font:600 13px/1 inherit; color:var(--muted); padding:13px 13px 11px; border-bottom:2px solid transparent;
+  white-space:nowrap; letter-spacing:.01em}
+.tabsbar button:hover{color:var(--ink)}
+.tabsbar button[aria-selected="true"]{color:var(--accent); border-bottom-color:var(--accent)}
+.tabsbar button:focus-visible{outline:2px solid var(--accent); outline-offset:-3px; border-radius:3px}
+.tabsbar .idx{font-family:var(--mono); font-size:11px; opacity:.6; margin-right:5px}
+.panel{display:none; padding-top:34px}
+.panel.active{display:block}
+.panel > h2:first-of-type{margin-top:0}
+
+/* ── blocks ──────────────────────────────── */
+.stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(158px,1fr)); gap:11px; margin:22px 0}
+.stat{background:var(--surface); border:1px solid var(--border); border-radius:7px; padding:12px 14px 11px}
+.stat b{display:block; font:600 22px/1.15 Georgia,serif; font-variant-numeric:tabular-nums; margin-bottom:4px}
+.stat span{font-size:12px; color:var(--muted); display:block; line-height:1.4}
+.stat.ok b{color:var(--ok)} .stat.risk b{color:var(--risk)} .stat.accent b{color:var(--accent)}
+.card{background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:18px 20px; margin:14px 0}
+.card h3, .card h4{margin-top:0}
+.grid2{display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:13px}
+.grid3{display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:13px}
+.note{border-left:3px solid var(--warn); background:var(--warn-soft); padding:12px 16px;
+  border-radius:0 6px 6px 0; margin:16px 0; max-width:84ch}
+.note.red{border-left-color:var(--risk); background:var(--risk-soft)}
+.note.green{border-left-color:var(--ok); background:var(--ok-soft)}
+.note.plain{border-left-color:var(--line); background:var(--surface2)}
+.note b:first-child{display:block; margin-bottom:2px}
+.finding{display:flex; gap:14px; align-items:flex-start; background:var(--surface);
+  border:1px solid var(--border); border-radius:8px; padding:15px 18px; margin:11px 0}
+.finding .n{flex:0 0 auto; font:600 13px/28px var(--mono); width:28px; height:28px; text-align:center;
+  border-radius:50%; background:var(--accent-soft); color:var(--accent)}
+.finding p{margin:.3em 0 0} .finding b{font-size:16px}
+
+/* ── tables ──────────────────────────────── */
+.tbl{overflow-x:auto; margin:14px 0; border:1px solid var(--border); border-radius:8px; background:var(--surface)}
+table{border-collapse:collapse; width:100%; font-size:13.8px; min-width:620px}
+caption{text-align:left; font-size:12.5px; color:var(--muted); padding:11px 14px 5px; caption-side:top; line-height:1.45}
+th,td{padding:7px 13px; border-top:1px solid var(--border); text-align:left; vertical-align:top}
+thead th{border-top:none; font-size:11px; letter-spacing:.06em; text-transform:uppercase;
+  color:var(--muted); background:var(--surface2); font-weight:700; line-height:1.3}
+td.num,th.num{text-align:right; font-family:var(--mono); font-variant-numeric:tabular-nums; white-space:nowrap}
+tbody tr:hover{background:var(--surface2)}
+tr.total td{font-weight:700; background:var(--surface2); border-top:2px solid var(--line)}
+tr.sub td{background:var(--sunk); font-weight:600; font-size:12.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted)}
+.tbl.compact table{font-size:13px} .tbl.compact th,.tbl.compact td{padding:5.5px 11px}
+
+/* ── inline tokens ───────────────────────── */
+.pill{display:inline-block; font-size:11px; padding:1.5px 8px; border-radius:999px;
+  border:1px solid var(--border); color:var(--muted); letter-spacing:.03em; text-transform:uppercase; font-weight:600; white-space:nowrap}
+.pill.ok{color:var(--ok); border-color:var(--ok); background:var(--ok-soft)}
+.pill.warn{color:var(--warn); border-color:var(--warn); background:var(--warn-soft)}
+.pill.risk{color:var(--risk); border-color:var(--risk); background:var(--risk-soft)}
+.pill.acc{color:var(--accent); border-color:var(--accent); background:var(--accent-soft)}
+.tag{font-family:var(--mono); font-size:11.5px; background:var(--sunk); padding:1px 5px; border-radius:3px; color:var(--ink2)}
+.q{font-family:var(--mono); color:var(--accent); font-weight:700}
+
+/* ── figures ─────────────────────────────── */
+figure{margin:22px 0}
+figure svg{max-width:100%; height:auto; display:block; margin:0 auto}
+.figbox{overflow-x:auto; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:16px 12px}
+figcaption{font-size:13px; color:var(--muted); margin-top:11px; max-width:84ch; line-height:1.5}
+.legend{display:flex; flex-wrap:wrap; gap:16px; margin:0 0 10px; font-size:12.5px; color:var(--ink2); padding:0 6px}
+.legend i{display:inline-block; width:11px; height:11px; border-radius:2.5px; margin-right:6px; vertical-align:-1px}
+
+/* ── timeline ────────────────────────────── */
+.timeline{list-style:none; padding:0; margin:16px 0; border-left:2px solid var(--line); max-width:none}
+.timeline li{margin:0; padding:9px 0 9px 22px; position:relative; max-width:84ch}
+.timeline li::before{content:""; position:absolute; left:-7px; top:17px; width:11px; height:11px;
+  border-radius:50%; background:var(--bg); border:3px solid var(--accent)}
+.timeline b{font-family:Georgia,serif; font-size:15px}
+footer{margin-top:60px; padding-top:18px; border-top:1px solid var(--border); font-size:12.5px; color:var(--muted)}
+footer p{max-width:88ch}
+@media (prefers-reduced-motion: no-preference){ html{scroll-behavior:smooth} }
+@media (max-width:640px){ .wrap{padding:0 14px 60px} .tabsbar .row{padding:0 14px} }
+</style>
+</head>
+<body>
+
+
+<header class="masthead"><div class="wrap">
+  <div class="eyebrow">Базовый проект · золото-медный ГОК · редакция 2 · 17 августа 2026</div>
+  <h1>Золото-медный ГОК на базе месторождения (проба Л-1)</h1>
+  <p class="lede">Проработка от карьера до готового слитка: технологическая схема, балансы, оборудование,
+  поставщики, инфраструктура, CAPEX/OPEX и денежный поток. Исходные данные — технологический отчёт
+  ЦНИГРИ по пробе Л-1 и календарный план отработки 2029–2039 гг. Всё, чего в них нет, посчитано по
+  собственным допущениям; допущения перечислены и помечены, вопросы вынесены на отдельную вкладку.</p>
+</div></header>
+
+<nav class="tabsbar" aria-label="Разделы проекта"><div class="row" role="tablist">
+  <button role="tab" aria-selected="true"  aria-controls="p1"  id="t1"><span class="idx">01</span>Резюме</button>
+  <button role="tab" aria-selected="false" aria-controls="p2"  id="t2"><span class="idx">02</span>Сырьё</button>
+  <button role="tab" aria-selected="false" aria-controls="p3"  id="t3"><span class="idx">03</span>Горные работы</button>
+  <button role="tab" aria-selected="false" aria-controls="p4"  id="t4"><span class="idx">04</span>Технология</button>
+  <button role="tab" aria-selected="false" aria-controls="p5"  id="t5"><span class="idx">05</span>Балансы и расчёты</button>
+  <button role="tab" aria-selected="false" aria-controls="p6"  id="t6"><span class="idx">06</span>Оборудование</button>
+  <button role="tab" aria-selected="false" aria-controls="p7"  id="t7"><span class="idx">07</span>Поставщики</button>
+  <button role="tab" aria-selected="false" aria-controls="p8"  id="t8"><span class="idx">08</span>Инфраструктура</button>
+  <button role="tab" aria-selected="false" aria-controls="p9"  id="t9"><span class="idx">09</span>CAPEX / OPEX</button>
+  <button role="tab" aria-selected="false" aria-controls="p10" id="t10"><span class="idx">10</span>Экономика</button>
+  <button role="tab" aria-selected="false" aria-controls="p11" id="t11"><span class="idx">11</span>Экология и риски</button>
+  <button role="tab" aria-selected="false" aria-controls="p12" id="t12"><span class="idx">12</span>График</button>
+  <button role="tab" aria-selected="false" aria-controls="p13" id="t13"><span class="idx">13</span>Вопросы</button>
+</div></nav>
+
+<div class="wrap">
+
+<!-- ════════ 01 РЕЗЮМЕ ════════ -->
+<section class="panel active" id="p1" role="tabpanel" aria-labelledby="t1">
+<h2>Резюме: что показал расчёт</h2>
+<p>Проект посчитан снизу вверх — от размеров аппаратов до денежного потока. Четыре вывода расходятся
+с первоначальной постановкой, и все четыре — количественные, а не вкусовые.</p>
+
+<div class="finding"><div class="n">1</div><div>
+  <b>Проект — это ставка на цену золота, а не медный проект.</b>
+  <p>При долгосрочных консенсус-ценах (Au&nbsp;$3&nbsp;500/унц., Cu&nbsp;$11&nbsp;000/т) NPV при ставке 10%
+  отрицательный и IRR ≈ 5%. При спот-ценах 17.08.2026 (Au&nbsp;$4&nbsp;400, Cu&nbsp;$14&nbsp;000)
+  NPV ≈ +$156&nbsp;млн, IRR ≈ 13,6% — это ниже типового порога FID для гринфилда (15–20%).
+  Золото даёт 68% выручки при содержании 0,42&nbsp;г/т. Инвестрешение принимается по цене золота.</p></div></div>
+
+<div class="finding"><div class="n">2</div><div>
+  <b>Фотометрическая сепарация при испытанной настройке разрушает стоимость.</b>
+  <p>ФМС выводит 22,7% массы, но уносит 9,5% меди и 3,7% золота — это −$27&nbsp;млн выручки в год.
+  Экономия на измельчении и реагентах — только +$4&nbsp;млн/год, а капитал не снижается, а растёт
+  на ~$22&nbsp;млн: трёхстадийное дробление до −40&nbsp;мм под сортировку дороже, чем экономия
+  на мельницах. Итог: −$23&nbsp;млн/год. Убрал ФМС из основной линии; сохранил как опцию для
+  доводки низкосортных складов с перенастройкой на потери меди ≤3%.
+  <span class="pill warn">меняет решение №1</span></p></div></div>
+
+<div class="finding"><div class="n">3</div><div>
+  <b>Мощность 7,6 млн т/год избыточна для этих запасов.</b>
+  <p>С 2035 г. фабрика загружена на 65% — подземка даёт только 5 млн т. Вариант 5 млн т/год с
+  доработкой карьерной руды со склада: капитал ниже на ~$280&nbsp;млн, срок отработки растёт
+  до 14 лет, NPV при споте ≈ +$310&nbsp;млн против +$156&nbsp;млн. Меньший завод здесь —
+  лучший завод. <span class="pill warn">меняет решение №3</span></p></div></div>
+
+<div class="finding"><div class="n">4</div><div>
+  <b>Главный рычаг — содержание, а не технология.</b>
+  <p>Календарный план построен на бедной фланговой руде (0,42&nbsp;г/т Au), тогда как центральная
+  часть месторождения по пробе Л-001 даёт 3&nbsp;г/т Au при 0,32% Cu и извлечении 91,9%.
+  Ввод центральной зоны в первые пять лет отработки перевешивает всё, что можно выжать
+  из схемы обогащения: каждые +0,1&nbsp;г/т Au ≈ +$25&nbsp;млн выручки в год.</p></div></div>
+
+<h3>Рекомендуемая конфигурация</h3>
+<div class="stats">
+  <div class="stat"><b>7,6 млн т/год</b><span>руда на фабрику, ОГР 2029–2034; проверить вариант 5 млн т</span></div>
+  <div class="stat"><b>SABC + флотация</b><span>ММПС + шаровые мельницы, помол P<sub>80</sub> 75 мкм</span></div>
+  <div class="stat"><b>85,2 тыс. т/год</b><span>Cu-Au концентрат: 15,3% Cu · 28 г/т Au · 158 г/т Ag</span></div>
+  <div class="stat accent"><b>2,06 т/год</b><span>сплав Доре: 356 кг Au + 1 704 кг Ag на площадке</span></div>
+  <div class="stat ok"><b>86,6 % Au</b><span>сквозное извлечение: Cu 83,7%, Ag 79,2%</span></div>
+  <div class="stat"><b>$1,23 млрд</b><span>CAPEX первоначальный, класс 4 AACE (±25%)</span></div>
+  <div class="stat"><b>$21,4 / т руды</b><span>денежная себестоимость на площадке</span></div>
+  <div class="stat risk"><b>IRR 13,6 %</b><span>при спот-ценах; при базовых ценах проект не проходит</span></div>
+</div>
+
+<h3>Выручка: чем на самом деле живёт проект</h3>
+<div class="figbox">
+<div class="legend">
+  <span><i style="background:var(--s1)"></i>Золото</span>
+  <span><i style="background:var(--s2)"></i>Медь</span>
+  <span><i style="background:var(--s3)"></i>Серебро</span>
+</div>
+<figure style="margin:0">
+<svg viewBox="0 0 900 210" role="img" aria-label="Структура выручки номинального года: при базовых ценах золото даёт 68 процентов, медь 31, серебро 5; при спот-ценах доля золота 67 процентов">
+  <g font-size="12.5" fill="currentColor" font-family="inherit">
+    <text x="10" y="34" font-weight="600">Базовые цены</text>
+    <text x="10" y="52" font-size="11.5" opacity=".65">Au $3 500 · Cu $11 000 · Ag $50</text>
+    <text x="10" y="128" font-weight="600">Спот 17.08.2026</text>
+    <text x="10" y="146" font-size="11.5" opacity=".65">Au $4 400 · Cu $14 000 · Ag $66</text>
+  </g>
+  <!-- base: total 447.1 → Au 290.8 (65.0%), Cu 134.1 (30.0%), Ag 22.2 (5.0%) ; scale 640px -->
+  <g>
+    <rect x="200" y="22" width="416" height="34" rx="3" fill="var(--s1)"/>
+    <rect x="618" y="22" width="192" height="34" rx="3" fill="var(--s2)"/>
+    <rect x="812" y="22" width="32" height="34" rx="3" fill="var(--s3)"/>
+  </g>
+  <g font-family="var(--mono)" font-size="12" fill="#fff" font-weight="600">
+    <text x="212" y="44">$291 млн · 65%</text>
+    <text x="630" y="44">$134 · 30%</text>
+  </g>
+  <text x="856" y="44" font-size="11.5" fill="currentColor" font-family="var(--mono)">$22</text>
+  <!-- spot: total 565.4 → Au 365.5 (64.6%), Cu 170.7 (30.2%), Ag 29.2 (5.2%) -->
+  <g>
+    <rect x="200" y="116" width="414" height="34" rx="3" fill="var(--s1)"/>
+    <rect x="616" y="116" width="193" height="34" rx="3" fill="var(--s2)"/>
+    <rect x="811" y="116" width="33" height="34" rx="3" fill="var(--s3)"/>
+  </g>
+  <g font-family="var(--mono)" font-size="12" fill="#fff" font-weight="600">
+    <text x="212" y="138">$366 млн · 65%</text>
+    <text x="628" y="138">$171 · 30%</text>
+  </g>
+  <text x="856" y="138" font-size="11.5" fill="currentColor" font-family="var(--mono)">$29</text>
+  <g font-size="11.5" fill="currentColor" opacity=".65" font-family="inherit">
+    <text x="200" y="186">Валовая стоимость металлов в товарной продукции до вычета TC/RC, фрахта и аффинажа.</text>
+    <text x="200" y="202">Медь оплачивается на 93,5%, золото в концентрате — на 92,5%, серебро — на 90%.</text>
+  </g>
+</svg>
+</figure>
+</div>
+<figcaption>Рис. 1. Структура выручки почти не зависит от сценария цен: две трети даёт золото,
+которого в руде 0,42 г/т. Практический вывод — условия off-take по золоту в медном концентрате
+(payable, RC) важнее, чем ставка TC на медь.</figcaption>
+
+<h3>Три схемы обогащения: что выбрано и почему</h3>
+<div class="figbox">
+<div class="legend">
+  <span><i style="background:var(--s1)"></i>Только флотация</span>
+  <span><i style="background:var(--s2)"></i>Флотация + цианирование <b>— принято</b></span>
+  <span><i style="background:var(--s3)"></i>ФМС + флотация + цианирование</span>
+</div>
+<figure style="margin:0">
+<svg viewBox="0 0 760 300" role="img" aria-label="Сравнение извлечения по трём схемам: по золоту 75,5 / 86,6 / 82,9 процента, по меди 83,7 / 83,7 / 76,0, по серебру 70,3 / 79,2 / 71,1 процента">
+  <g stroke="var(--line)" stroke-width="1">
+    <line x1="70" y1="245" x2="740" y2="245"/>
+    <line x1="70" y1="199" x2="740" y2="199" opacity=".4"/>
+    <line x1="70" y1="153" x2="740" y2="153" opacity=".4"/>
+    <line x1="70" y1="107" x2="740" y2="107" opacity=".4"/>
+    <line x1="70" y1="61" x2="740" y2="61" opacity=".4"/>
+  </g>
+  <g font-size="11" fill="currentColor" opacity=".6" text-anchor="end" font-family="var(--mono)">
+    <text x="60" y="249">0</text><text x="60" y="203">25</text><text x="60" y="157">50</text>
+    <text x="60" y="111">75</text><text x="60" y="65">100%</text>
+  </g>
+  <!-- scale: 1.84 px per %, baseline y=245 -->
+  <!-- Au group centre 220 -->
+  <g>
+    <rect x="130" y="106" width="52" height="139" rx="3" fill="var(--s1)"/>
+    <rect x="186" y="86"  width="52" height="159" rx="3" fill="var(--s2)"/>
+    <rect x="242" y="93"  width="52" height="152" rx="3" fill="var(--s3)"/>
+    <rect x="370" y="91"  width="52" height="154" rx="3" fill="var(--s1)"/>
+    <rect x="426" y="91"  width="52" height="154" rx="3" fill="var(--s2)"/>
+    <rect x="482" y="105" width="52" height="140" rx="3" fill="var(--s3)"/>
+    <rect x="610" y="116" width="52" height="129" rx="3" fill="var(--s1)"/>
+    <rect x="666" y="99"  width="52" height="146" rx="3" fill="var(--s2)"/>
+    <rect x="722" y="114" width="18" height="131" rx="3" fill="var(--s3)"/>
+  </g>
+  <g font-size="11.5" fill="currentColor" text-anchor="middle" font-family="var(--mono)" font-weight="600">
+    <text x="156" y="99">75,5</text><text x="212" y="79">86,6</text><text x="268" y="86">82,9</text>
+    <text x="396" y="84">83,7</text><text x="452" y="84">83,7</text><text x="508" y="98">76,0</text>
+    <text x="636" y="109">70,3</text><text x="692" y="92">79,2</text><text x="731" y="107">71,1</text>
+  </g>
+  <g font-size="13" fill="currentColor" text-anchor="middle" font-weight="600">
+    <text x="212" y="268">Золото</text><text x="452" y="268">Медь</text><text x="683" y="268">Серебро</text>
+  </g>
+  <text x="70" y="292" font-size="11.5" fill="currentColor" opacity=".65">Извлечение из руды в товарную продукцию, % · данные лабораторных испытаний ЦНИГРИ по пробе Л-1</text>
+</svg>
+</figure>
+</div>
+<figcaption>Рис. 2. Добавление сорбционного цианирования пирротин-пиритного концентрата к флотации
+даёт +11,1 п.п. золота и +8,9 п.п. серебра — это окупается (см. вкладку «Технология»).
+Добавление ФМС отнимает 7,7 п.п. меди и 3,7 п.п. золота ради экономии, которой не хватает,
+чтобы это компенсировать.</figcaption>
+
+<h3>Что нужно решить до FID</h3>
+<ol>
+  <li><b>Отобрать представительную пробу</b> по запасам, а не по флангам — это прямая рекомендация
+  самого отчёта ЦНИГРИ (п. 5 заключения) и единственный способ подтвердить и содержание, и извлечение.</li>
+  <li><b>Раскрыть горные параметры</b>: коэффициент вскрыши, контур карьера, доля центральной зоны.
+  Диапазон вскрыши 2,5–5,0 стоит ±$340 млн NPV — больше, чем любое технологическое решение.</li>
+  <li><b>Определить измельчаемость</b> (Bond Wi, Ai, DWi): сейчас мельницы посчитаны на допущении
+  Wi = 15 кВт·ч/т, ошибка на ±1 единицу — это ±$18 млн капитала.</li>
+  <li><b>Проверить вредные примеси</b> в концентрате (As, Sb, Hg, F): при As &gt; 0,5% медный завод
+  вводит штрафы, которые съедают $8–15 млн в год.</li>
+  <li><b>Утвердить сценарий цен</b> для инвестрешения. При $3 500/унц. проект не проходит; при
+  споте — проходит с запасом ниже нормативного.</li>
+</ol>
+<p style="color:var(--muted); font-size:13.5px">Полный перечень открытых вопросов с указанием, что
+именно в проекте меняет каждый ответ, — на вкладке <b>13 · Вопросы</b>. Перечень принятых допущений —
+на вкладке <b>05 · Балансы и расчёты</b>.</p>
+</section>
+
+<!-- ════════ 02 СЫРЬЁ ════════ -->
+<section class="panel" id="p2" role="tabpanel" aria-labelledby="t2">
+<h2>Сырьё и геометаллургия</h2>
+<p>Всё, что известно о руде, получено на одной технологической пробе Л-1 массой 616 кг, составленной
+из половинок керна скважин №502, 515, 523 в интервале 26–244 м. Проба характеризует
+<b>фланги и глубокие горизонты</b>, а не запасы месторождения в целом. Это ограничение определяет
+и уровень проработки проекта, и главный риск.</p>
+
+<div class="tbl"><table>
+  <caption>Характеристика руды пробы Л-1 (аналитический центр ЦНИГРИ, аттестат Госстандарта № РОСС RU 0001.511741)</caption>
+  <thead><tr><th>Параметр</th><th>Значение</th><th>Что из этого следует для проекта</th></tr></thead>
+  <tbody>
+    <tr><td>Тип руды</td><td>кварцево-сульфидная золото-медная</td><td>классическая флотационная руда, без упорности</td></tr>
+    <tr><td>Золото</td><td class="num">0,50 г/т</td><td>очень бедная руда; вся экономика на порядке величин</td></tr>
+    <tr><td>Медь</td><td class="num">0,19 %</td><td>ниже порога самостоятельного медного проекта</td></tr>
+    <tr><td>Серебро</td><td class="num">2,60 г/т</td><td>попутный металл, 5% выручки</td></tr>
+    <tr><td>Сера общая</td><td class="num">2,07 %</td><td>в основном сульфидная — пирротин, пирит, халькопирит</td></tr>
+    <tr><td>Форма меди</td><td>≈90 % халькопирит</td><td>легкофлотируемая; медь не требует особых режимов</td></tr>
+    <tr><td>Свободное золото при 90 % −0,071 мм</td><td class="num">28 % отн.</td><td>гравитация бесполезна; только флотация</td></tr>
+    <tr><td>Золото в сростках</td><td class="num">67,6 % отн.</td><td>раскрывается при 77 % −0,071 мм</td></tr>
+    <tr><td>Золото в срастании с сульфидами (нераскрытое)</td><td class="num">4,4 % отн.</td><td>предел извлечения ~95 %</td></tr>
+    <tr><td>Крупность свободных золотин</td><td>сотые–десятые доли мм</td><td>хорошо флотируется, теряется в гравитации</td></tr>
+    <tr><td>Оптимальный помол</td><td class="num">77 % кл. −0,071 мм</td><td>P<sub>80</sub> ≈ 75 мкм — тонкий помол, 60 % энергозатрат фабрики</td></tr>
+    <tr><td>Показатель контрастности</td><td>руда высококонтрастная</td><td>ФМС технически возможна (экономика — отдельный вопрос)</td></tr>
+  </tbody>
+</table></div>
+
+<h3>Две пробы, две разные руды</h3>
+<p>Месторождение изучалось дважды, и разница между пробами больше, чем любые технологические решения,
+которые обсуждаются в этом проекте.</p>
+<div class="tbl"><table>
+  <thead><tr><th>Показатель</th><th class="num">Л-001 (1996 г.)</th><th class="num">Л-1 (настоящий отчёт)</th><th>Комментарий</th></tr></thead>
+  <tbody>
+    <tr><td>Что характеризует</td><td>центральная часть, ~40 % прогнозных запасов</td><td>фланги и глубокие горизонты</td><td>две разные части одного объекта</td></tr>
+    <tr><td>Золото</td><td class="num">3,00 г/т</td><td class="num">0,50 г/т</td><td>разница в 6 раз</td></tr>
+    <tr><td>Медь</td><td class="num">0,32 %</td><td class="num">0,19 %</td><td>в 1,7 раза</td></tr>
+    <tr><td>Серебро</td><td class="num">8,70 г/т</td><td class="num">2,60 г/т</td><td>в 3,3 раза</td></tr>
+    <tr><td>Извлечение Au (флотация)</td><td class="num">91,9 %</td><td class="num">75,5 %</td><td>богатая руда извлекается лучше</td></tr>
+    <tr><td>Извлечение Cu</td><td class="num">95,3 %</td><td class="num">83,7 %</td><td>то же</td></tr>
+    <tr><td>Схема</td><td>гравитация + флотация</td><td>флотация + цианирование</td><td>для Л-001 гравитация работала</td></tr>
+  </tbody>
+</table></div>
+<div class="note red"><b>Ключевой вопрос всего проекта.</b>
+Календарный план 2029–2039 гг. даёт среднее содержание 0,34–0,63 г/т Au, то есть построен
+на руде типа Л-1. Если центральная зона с 3 г/т в этот план не вошла — надо понять, почему.
+Если вошла и «размазана» усреднением — надо пересобрать календарь так, чтобы богатая руда
+шла первой: при ставке дисконтирования 10% перенос тонны золота с 2038 на 2030 год стоит
+вдвое дороже. Это <span class="q">вопрос Г-2</span>.</div>
+
+<h3>Данные по контрастности (для оценки сортировки)</h3>
+<p>Отобрано 100 кусков керна средней массой 116 г, определено содержание Au (пробирная плавка +
+атомно-абсорбционный анализ) и остальных элементов (ИСП-АЭС) в аналитическом центре
+«Алекс Стюарт Гео Аналитика». Диапазон содержаний по кускам — 0,01–6,0 г/т Au, разбит на
+семь фракций. Установлена прямая корреляция золота с сульфидами, серебром, медью, железом и серой —
+это физическая основа для оптического распознавания.</p>
+<div class="note plain"><b>Чего в исходных данных нет.</b>
+Не определены: индекс Бонда по шаровому измельчению (BWi), индекс абразивности (Ai), параметры
+ударного разрушения (Axb / DWi), плотность руды и насыпная плотность, влажность, глинистость,
+крепость по Протодьяконову, вспениваемость, содержание вредных примесей (As, Sb, Hg, F, Bi) с
+привязкой к кондициям медных заводов, а также кинетика флотации (только конечные показатели).
+Всё это принято по аналогам и помечено в реестре допущений.</div>
+
+<h3>Геометаллургическая программа (предлагается)</h3>
+<ol>
+  <li><b>Представительная проба 3–5 т</b> по всем технологическим типам и зонам, включая центральную,
+  с привязкой к блочной модели. Срок 6–9 мес.</li>
+  <li><b>Вариативность:</b> 15–25 частных проб по доменам с определением BWi, Ai, содержаний и
+  флотационной кинетики — для геометаллургической модели, которая даёт извлечение и удельную
+  энергию как функцию блока, а не одно число на всё месторождение.</li>
+  <li><b>Полупромышленные испытания флотации</b> (непрерывный цикл 200–500 кг/ч, 2–4 недели) —
+  подтверждают показатели замкнутого цикла, которые в лаборатории всегда оптимистичнее на 1–3 п.п.</li>
+  <li><b>Испытания цианирования</b> на пирротин-пиритном концентрате промышленного происхождения,
+  с оптимизацией расхода NaCN (сейчас 8,9 кг/т — очень высокий) и проверкой SART/предаэрации.</li>
+  <li><b>Опытно-промышленная сортировка</b> 10–50 т на площадке поставщика с перенастройкой на
+  потери меди ≤3% — решает судьбу ФМС окончательно.</li>
+</ol>
+<p>Ориентировочная стоимость программы $2,5–4,5 млн, срок 12–14 мес. По отношению к капиталу
+$1,23 млрд это 0,3% — и это единственные деньги, которые снимают риск, стоящий сотни миллионов.</p>
+</section>
+
+<!-- ════════ 03 ГОРНЫЕ РАБОТЫ ════════ -->
+<section class="panel" id="p3" role="tabpanel" aria-labelledby="t3">
+<h2>Горные работы</h2>
+<p>Календарный план задан заказчиком; горные параметры (вскрыша, контур, системы разработки)
+в исходных данных отсутствуют и приняты по аналогам. Все цифры этого раздела — расчётные,
+подлежат замене после горной части ТЭО.</p>
+
+<div class="tbl"><table>
+  <caption>Календарный план отработки, как он задан. «ГП» — металл в готовой продукции по плану заказчика</caption>
+  <thead><tr><th>Период</th><th>Способ</th><th>Этап</th><th class="num">Руда, т/год</th>
+    <th class="num">Au, г/т</th><th class="num">Ag, г/т</th><th class="num">Cu, %</th>
+    <th class="num">Au ГП, кг</th><th class="num">Ag ГП, кг</th><th class="num">Cu ГП, т</th></tr></thead>
+  <tbody>
+    <tr><td>2029</td><td>открытый</td><td>1</td><td class="num">7 539 301</td><td class="num">0,42</td><td class="num">2,54</td><td class="num">0,21</td><td class="num">2 820</td><td class="num">15 296</td><td class="num">13 924</td></tr>
+    <tr><td>2030</td><td>открытый</td><td>1</td><td class="num">7 539 301</td><td class="num">0,42</td><td class="num">2,54</td><td class="num">0,21</td><td class="num">2 820</td><td class="num">15 296</td><td class="num">13 924</td></tr>
+    <tr><td>2031</td><td>открытый</td><td>1</td><td class="num">7 543 135</td><td class="num">0,42</td><td class="num">2,53</td><td class="num">0,21</td><td class="num">2 820</td><td class="num">15 295</td><td class="num">13 926</td></tr>
+    <tr><td>2032</td><td>открытый</td><td>1</td><td class="num">7 642 276</td><td class="num">0,41</td><td class="num">2,50</td><td class="num">0,20</td><td class="num">2 820</td><td class="num">15 285</td><td class="num">13 999</td></tr>
+    <tr><td>2033</td><td>открытый</td><td>1</td><td class="num">7 642 276</td><td class="num">0,41</td><td class="num">2,50</td><td class="num">0,20</td><td class="num">2 820</td><td class="num">15 285</td><td class="num">13 999</td></tr>
+    <tr><td>2034</td><td>переходный</td><td>1·2·3</td><td class="num">9 341 669</td><td class="num">0,34</td><td class="num">2,09</td><td class="num">0,15</td><td class="num">2 820</td><td class="num">15 636</td><td class="num">12 532</td></tr>
+    <tr><td>2035–2039</td><td>подземный</td><td>3</td><td class="num">4 964 767</td><td class="num">0,63</td><td class="num">2,34</td><td class="num">0,14</td><td class="num">2 820</td><td class="num">9 299</td><td class="num">6 246</td></tr>
+    <tr class="total"><td>Итого</td><td></td><td></td><td class="num">72 071 792</td><td class="num">0,48</td><td class="num">2,40</td><td class="num">0,175</td><td class="num">31 020</td><td class="num">138 589</td><td class="num">113 531</td></tr>
+  </tbody>
+</table></div>
+
+<div class="note red"><b>Нестыковка в исходных данных.</b>
+План заложил коэффициенты извлечения 0,90 по золоту и меди и 0,80 по серебру. Лаборатория ЦНИГРИ
+подтверждает 86,64 % Au, 83,7 % Cu, 79,2 % Ag — и это лабораторные показатели, которые в
+промышленности обычно ещё на 1–2 п.п. ниже. Все расчёты в проекте выполнены по подтверждённым
+цифрам; разница с планом — 1 356 кг золота и 8 900 т меди за срок отработки, около $170 млн
+недополученной выручки относительно плановых ожиданий. <span class="q">Вопрос Т-1</span>.</div>
+
+<h3>Профиль добычи</h3>
+<div class="figbox">
+<figure style="margin:0">
+<svg viewBox="0 0 920 300" role="img" aria-label="Профиль добычи 2029-2039: открытые работы 7,5-7,6 млн тонн в год, пик 9,34 млн тонн в 2034 году, затем подземные работы 4,96 млн тонн в год. Содержание золота падает с 0,42 до 0,34 грамм на тонну и вырастает до 0,63 в подземный период">
+  <g stroke="var(--line)" stroke-width="1">
+    <line x1="60" y1="180" x2="900" y2="180"/>
+    <line x1="60" y1="145" x2="900" y2="145" opacity=".35"/>
+    <line x1="60" y1="110" x2="900" y2="110" opacity=".35"/>
+    <line x1="60" y1="75"  x2="900" y2="75"  opacity=".35"/>
+    <line x1="60" y1="40"  x2="900" y2="40"  opacity=".35"/>
+  </g>
+  <g font-size="10.5" fill="currentColor" opacity=".6" text-anchor="end" font-family="var(--mono)">
+    <text x="52" y="184">0</text><text x="52" y="149">2,5</text><text x="52" y="114">5,0</text>
+    <text x="52" y="79">7,5</text><text x="52" y="44">10</text>
+  </g>
+  <text x="60" y="24" font-size="11.5" fill="currentColor" opacity=".7">Руда на переработку, млн т/год</text>
+  <!-- 11 bars 2029..2039, x from 70, pitch 75, width 52; scale 14 px per Mt, baseline 180 -->
+  <g fill="var(--s1)">
+    <rect x="70"  y="74.4" width="52" height="105.6" rx="3"/>
+    <rect x="145" y="74.4" width="52" height="105.6" rx="3"/>
+    <rect x="220" y="74.4" width="52" height="105.6" rx="3"/>
+    <rect x="295" y="73.0" width="52" height="107.0" rx="3"/>
+    <rect x="370" y="73.0" width="52" height="107.0" rx="3"/>
+    <rect x="445" y="49.2" width="52" height="130.8" rx="3" fill="var(--s2)"/>
+    <rect x="520" y="110.5" width="52" height="69.5" rx="3" fill="var(--s3)"/>
+    <rect x="595" y="110.5" width="52" height="69.5" rx="3" fill="var(--s3)"/>
+    <rect x="670" y="110.5" width="52" height="69.5" rx="3" fill="var(--s3)"/>
+    <rect x="745" y="110.5" width="52" height="69.5" rx="3" fill="var(--s3)"/>
+    <rect x="820" y="110.5" width="52" height="69.5" rx="3" fill="var(--s3)"/>
+  </g>
+  <g font-size="10.5" fill="currentColor" text-anchor="middle" font-family="var(--mono)">
+    <text x="96" y="196">2029</text><text x="171" y="196">2030</text><text x="246" y="196">2031</text>
+    <text x="321" y="196">2032</text><text x="396" y="196">2033</text><text x="471" y="196">2034</text>
+    <text x="546" y="196">2035</text><text x="621" y="196">2036</text><text x="696" y="196">2037</text>
+    <text x="771" y="196">2038</text><text x="846" y="196">2039</text>
+  </g>
+  <g font-size="11" fill="currentColor" text-anchor="middle" font-family="var(--mono)" font-weight="600">
+    <text x="96" y="68">7,54</text><text x="471" y="43">9,34</text><text x="546" y="104">4,96</text>
+  </g>
+  <!-- grade panel -->
+  <text x="60" y="228" font-size="11.5" fill="currentColor" opacity=".7">Содержание золота в руде, г/т</text>
+  <g stroke="var(--line)" stroke-width="1"><line x1="60" y1="282" x2="900" y2="282"/></g>
+  <!-- scale: 60 px per g/t, baseline 282 -->
+  <g fill="var(--accent)" opacity=".85">
+    <rect x="70"  y="256.8" width="52" height="25.2" rx="2"/>
+    <rect x="145" y="256.8" width="52" height="25.2" rx="2"/>
+    <rect x="220" y="256.8" width="52" height="25.2" rx="2"/>
+    <rect x="295" y="257.4" width="52" height="24.6" rx="2"/>
+    <rect x="370" y="257.4" width="52" height="24.6" rx="2"/>
+    <rect x="445" y="261.6" width="52" height="20.4" rx="2"/>
+    <rect x="520" y="244.2" width="52" height="37.8" rx="2"/>
+    <rect x="595" y="244.2" width="52" height="37.8" rx="2"/>
+    <rect x="670" y="244.2" width="52" height="37.8" rx="2"/>
+    <rect x="745" y="244.2" width="52" height="37.8" rx="2"/>
+    <rect x="820" y="244.2" width="52" height="37.8" rx="2"/>
+  </g>
+  <g font-size="10.5" fill="currentColor" text-anchor="middle" font-family="var(--mono)">
+    <text x="96" y="252">0,42</text><text x="471" y="257">0,34</text><text x="546" y="239">0,63</text>
+  </g>
+</svg>
+</figure>
+</div>
+<figcaption>Рис. 3. Синие столбцы — открытые работы, оранжевый — переходный 2034 год, зелёные —
+подземные. Пик 2034 года на 23 % выше номинала фабрики: 1,74 млн т уходит на усреднительный склад
+и перерабатывается в 2035–2036 гг., когда подземка одна фабрику не загружает. Содержание в
+переходном году минимальное (0,34 г/т) — 2034-й будет худшим годом проекта по денежному потоку.</figcaption>
+
+<div class="grid2">
+<div class="card"><h4>Карьер, 2029–2034</h4>
+<p>Экскаваторно-автомобильный комплекс — стандарт для 7–10 млн т руды в год. Циклично-поточная
+технология (дробилка в карьере + конвейер) окупается от 20–25 млн т горной массы при глубине
+свыше 250 м; здесь при расчётных 34 млн т/год она на границе и в базовом варианте не принята.</p>
+<ul>
+  <li>Высота уступа 10 м (рабочий), 20 м (сдвоенный в борту)</li>
+  <li>Буровзрывные работы: станки шарошечного бурения ⌀215–250 мм, эмульсионные ВВ, удельный
+  расход 0,75 кг/м³, сетка 6×7 м</li>
+  <li>Экскаваторы гидравлические 16 м³ — 4 ед. (3 рабочих + 1 резерв)</li>
+  <li>Самосвалы 110 т — 22 ед. при среднем плече 2,8 км и подъёме 8%</li>
+  <li>Расчётный объём горной массы 34,2 млн т/год при вскрыше 3,5 : 1 <span class="pill warn">допущение</span></li>
+</ul>
+<p style="margin-bottom:0"><b>Альтернатива — подрядная добыча.</b> Снимает $119 млн капитала на технику
+и ремонтную базу, добавляет $1,5–2,5 на тонну горной массы к операционным затратам.
+При 34 млн т/год это +$50–85 млн в год — подряд выгоден только на первые 2–3 года,
+пока не выстроена собственная служба. Рекомендую гибрид: подряд на вскрышу первых двух лет,
+собственный парк на добычу.</p></div>
+
+<div class="card"><h4>Подземный рудник, 2034–2039</h4>
+<p>Для крутопадающих кварц-сульфидных тел при 5 млн т/год из мировой практики применимы две системы:
+подэтажное обрушение (дешевле, выше разубоживание) и этажно-камерная с твердеющей закладкой
+(дороже, но сохраняет содержание — а при 0,63 г/т каждый процент разубоживания дорог).</p>
+<ul>
+  <li>Принята <b>этажно-камерная система с закладкой</b>: разубоживание 8–12% против 20–30%
+  при обрушении, что при этих содержаниях окупает закладочный комплекс</li>
+  <li>Вскрытие: наклонный съезд для самоходного оборудования + вентиляционно-вспомогательный ствол</li>
+  <li>Закладочный комплекс на хвостах флотации (сгущённые хвосты + цемент 4–6%) —
+  одновременно снижает объём хвостохранилища на 25–30%</li>
+  <li>Капитал подземного рудника $260–300 млн, инвестируется 2031–2034 гг. отдельной очередью</li>
+  <li>Подготовительные работы должны стартовать за 3 года до перехода — то есть в 2031 году,
+  когда карьер ещё в разгаре</li>
+</ul>
+<p style="margin-bottom:0">Хвосты фотометрической сортировки, если она всё-таки будет построена,
+идут в инертный заполнитель закладки — это их главная реальная ценность.</p></div>
+</div>
+
+<h3>Усреднительный склад</h3>
+<p>Три задачи, каждая из которых сама по себе оправдывает склад:</p>
+<ol>
+  <li><b>Сглаживание пика 2034 года</b> — 1,74 млн т избытка над мощностью фабрики.</li>
+  <li><b>Шихтовка по сортам</b> — флотация чувствительна к соотношению халькопирит/пирротин;
+  колебания питания по меди на ±30% сдвигают расход реагентов и качество концентрата.</li>
+  <li><b>Буфер между карьером и фабрикой</b> — фабрика работает 8 060 ч/год, карьер стоит в
+  пургу, при взрывах и в ремонт. Без склада простой карьера сразу становится простоем фабрики.</li>
+</ol>
+<p>Принят склад полезной ёмкостью 0,6 млн т (28 суток работы фабрики) плюс отдельный штабель
+низкосортной руды на 3–4 млн т, которая перерабатывается в 2035–2039 гг., когда мощность свободна.
+Низкосортный штабель — это и есть правильное место для фотометрической сортировки, если её строить.</p>
+</section>
+
+<!-- ════════ 04 ТЕХНОЛОГИЯ ════════ -->
+<section class="panel" id="p4" role="tabpanel" aria-labelledby="t4">
+<h2>Технологическая схема</h2>
+<p>Принята схема, подтверждённая лабораторией в замкнутом цикле: <b>дробление → полусамоизмельчение
+и шаровое измельчение → селективно-коллективная флотация → сорбционное цианирование
+пирротин-пиритного концентрата → сплав Доре</b>. Два товарных продукта: кондиционный медно-золотой
+концентрат на продажу и золото-серебряный сплав на площадке.</p>
+
+<div class="figbox">
+<figure style="margin:0">
+<svg viewBox="0 0 1000 1020" role="img" aria-label="Схема цепи аппаратов: руда из карьера дробится, измельчается в мельнице полусамоизмельчения и шаровых мельницах, поступает на медную флотацию; черновой концентрат доизмельчается и перечищается в товарный медно-золотой концентрат, который сгущается, фильтруется и отгружается; хвосты медной флотации идут на пирротиновую флотацию, её хвосты в хвостохранилище, а пирротин-пиритный концентрат доизмельчается и цианируется с сорбцией на смолу, после десорбции и электролиза выплавляется сплав Доре; хвосты сорбции обезвреживаются и складируются в спецсекции">
+  <defs>
+    <marker id="fa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker>
+  </defs>
+  <g fill="none" stroke="currentColor" stroke-width="1.4">
+    <!-- spine A -->
+    <rect x="40"  y="16"  width="300" height="56" rx="6"/>
+    <rect x="40"  y="108" width="300" height="56" rx="6"/>
+    <rect x="40"  y="200" width="300" height="56" rx="6"/>
+    <rect x="40"  y="292" width="300" height="56" rx="6"/>
+    <rect x="40"  y="384" width="300" height="56" rx="6"/>
+    <rect x="40"  y="476" width="300" height="56" rx="6"/>
+    <rect x="40"  y="568" width="300" height="56" rx="6"/>
+    <rect x="40"  y="660" width="300" height="56" rx="6"/>
+    <rect x="40"  y="752" width="300" height="56" rx="6"/>
+    <rect x="40"  y="844" width="300" height="56" rx="6"/>
+    <rect x="40"  y="936" width="300" height="56" rx="6" stroke="#C08A2E" stroke-width="2.4"/>
+    <!-- column B -->
+    <rect x="390" y="568" width="250" height="56" rx="6"/>
+    <rect x="390" y="660" width="250" height="56" rx="6" stroke-dasharray="5 4"/>
+    <rect x="390" y="752" width="250" height="56" rx="6"/>
+    <rect x="390" y="844" width="250" height="56" rx="6" stroke-dasharray="5 4"/>
+    <!-- column C -->
+    <rect x="700" y="476" width="280" height="56" rx="6"/>
+    <rect x="700" y="568" width="280" height="56" rx="6" stroke="#B05A22" stroke-width="2.4"/>
+    <rect x="700" y="660" width="280" height="56" rx="6"/>
+    <rect x="700" y="752" width="280" height="56" rx="6" stroke-dasharray="5 4"/>
+    <!-- spine arrows -->
+    <line x1="190" y1="72"  x2="190" y2="106" marker-end="url(#fa)"/>
+    <line x1="190" y1="164" x2="190" y2="198" marker-end="url(#fa)"/>
+    <line x1="190" y1="256" x2="190" y2="290" marker-end="url(#fa)"/>
+    <line x1="190" y1="348" x2="190" y2="382" marker-end="url(#fa)"/>
+    <line x1="190" y1="440" x2="190" y2="474" marker-end="url(#fa)"/>
+    <line x1="190" y1="532" x2="190" y2="566" marker-end="url(#fa)"/>
+    <line x1="190" y1="624" x2="190" y2="658" marker-end="url(#fa)"/>
+    <line x1="190" y1="716" x2="190" y2="750" marker-end="url(#fa)"/>
+    <line x1="190" y1="808" x2="190" y2="842" marker-end="url(#fa)"/>
+    <line x1="190" y1="900" x2="190" y2="934" marker-end="url(#fa)"/>
+    <!-- branches -->
+    <line x1="340" y1="504" x2="698" y2="504" marker-end="url(#fa)"/>
+    <line x1="840" y1="532" x2="840" y2="566" marker-end="url(#fa)"/>
+    <line x1="840" y1="624" x2="840" y2="658" marker-end="url(#fa)"/>
+    <line x1="840" y1="716" x2="840" y2="750" marker-end="url(#fa)"/>
+    <line x1="340" y1="596" x2="388" y2="596" marker-end="url(#fa)"/>
+    <line x1="515" y1="624" x2="515" y2="658" marker-end="url(#fa)"/>
+    <line x1="340" y1="780" x2="388" y2="780" marker-end="url(#fa)"/>
+    <line x1="515" y1="808" x2="515" y2="842" marker-end="url(#fa)"/>
+  </g>
+  <!-- stream number badges -->
+  <g>
+    <circle cx="190" cy="89"  r="9" fill="var(--surface)" stroke="currentColor" stroke-width="1.2"/>
+    <circle cx="190" cy="273" r="9" fill="var(--surface)" stroke="currentColor" stroke-width="1.2"/>
+    <circle cx="190" cy="457" r="9" fill="var(--surface)" stroke="currentColor" stroke-width="1.2"/>
+    <circle cx="520" cy="504" r="9" fill="var(--surface)" stroke="currentColor" stroke-width="1.2"/>
+    <circle cx="840" cy="549" r="9" fill="var(--surface)" stroke="currentColor" stroke-width="1.2"/>
+    <circle cx="190" cy="549" r="9" fill="var(--surface)" stroke="currentColor" stroke-width="1.2"/>
+    <circle cx="190" cy="641" r="9" fill="var(--surface)" stroke="currentColor" stroke-width="1.2"/>
+    <circle cx="364" cy="596" r="9" fill="var(--surface)" stroke="currentColor" stroke-width="1.2"/>
+    <circle cx="515" cy="641" r="9" fill="var(--surface)" stroke="currentColor" stroke-width="1.2"/>
+    <circle cx="190" cy="733" r="9" fill="var(--surface)" stroke="currentColor" stroke-width="1.2"/>
+    <circle cx="190" cy="825" r="9" fill="var(--surface)" stroke="currentColor" stroke-width="1.2"/>
+    <circle cx="364" cy="780" r="9" fill="var(--surface)" stroke="currentColor" stroke-width="1.2"/>
+    <circle cx="515" cy="825" r="9" fill="var(--surface)" stroke="currentColor" stroke-width="1.2"/>
+    <circle cx="190" cy="917" r="9" fill="var(--surface)" stroke="currentColor" stroke-width="1.2"/>
+  </g>
+  <g font-family="var(--mono)" font-size="10.5" font-weight="700" fill="currentColor" text-anchor="middle">
+    <text x="190" y="93">1</text><text x="190" y="277">2</text><text x="190" y="461">3</text>
+    <text x="520" y="508">4</text><text x="840" y="553">5</text><text x="190" y="553">6</text>
+    <text x="190" y="645">7</text><text x="364" y="600">8</text><text x="515" y="645">9</text>
+    <text x="190" y="737">10</text><text x="190" y="829">11</text><text x="364" y="784">12</text>
+    <text x="515" y="829">13</text><text x="190" y="921">14</text>
+  </g>
+  <!-- labels -->
+  <g font-size="13" fill="currentColor" text-anchor="middle">
+    <text x="190" y="40"  font-weight="600">Карьер / подземный рудник</text>
+    <text x="190" y="58"  font-size="11.5" opacity=".72">7,6 млн т руды в год · 943 т/ч</text>
+    <text x="190" y="132" font-weight="600">Первичное дробление ККД-1200/180</text>
+    <text x="190" y="150" font-size="11.5" opacity=".72">−250 мм · 1 400 т/ч</text>
+    <text x="190" y="224" font-weight="600">Склад дроблёной руды 60 000 т</text>
+    <text x="190" y="242" font-size="11.5" opacity=".72">живой объём 24 000 т · 4 питателя</text>
+    <text x="190" y="316" font-weight="600">ММПС ⌀9,15 × 4,9 м · 10 МВт</text>
+    <text x="190" y="334" font-size="11.5" opacity=".72">грохот и галечная дробилка 400 кВт</text>
+    <text x="190" y="408" font-weight="600">МШЦ 2 × ⌀6,1 × 9,1 м · 2 × 7,5 МВт</text>
+    <text x="190" y="426" font-size="11.5" opacity=".72">гидроциклоны ГЦ-660 · P₈₀ 75 мкм</text>
+    <text x="190" y="500" font-weight="600">Медная флотация</text>
+    <text x="190" y="518" font-size="11.5" opacity=".72">основная + контрольная · 9 × 150 м³</text>
+    <text x="190" y="592" font-weight="600">Пирротиновая флотация</text>
+    <text x="190" y="610" font-size="11.5" opacity=".72">7 × 150 м³ · ксантогенат 190 г/т</text>
+    <text x="190" y="684" font-weight="600">Пирротин-пиритный концентрат</text>
+    <text x="190" y="702" font-size="11.5" opacity=".72">доизмельчение до 95 % кл. −0,071 мм</text>
+    <text x="190" y="776" font-weight="600">Выщелачивание + сорбция RIP</text>
+    <text x="190" y="794" font-size="11.5" opacity=".72">8 × 300 м³ · NaCN 1 г/л · смола АМ-2Б · 24 ч</text>
+    <text x="190" y="868" font-weight="600">Десорбция · электролиз · плавка</text>
+    <text x="190" y="886" font-size="11.5" opacity=".72">регенерация смолы в оборот</text>
+    <text x="190" y="960" font-weight="600">Сплав Доре 2,06 т/год</text>
+    <text x="190" y="978" font-size="11.5" opacity=".72">356 кг Au + 1 704 кг Ag · на аффинажный завод</text>
+    <text x="515" y="592" font-weight="600">Сгущение хвостов ⌀40 м</text>
+    <text x="515" y="610" font-size="11.5" opacity=".72">слив в оборот 1 050 м³/ч</text>
+    <text x="515" y="684" font-weight="600">Хвостохранилище</text>
+    <text x="515" y="702" font-size="11.5" opacity=".72">6,91 млн т/год · 62 % твёрдого</text>
+    <text x="515" y="776" font-weight="600">Обезвреживание CN⁻</text>
+    <text x="515" y="794" font-size="11.5" opacity=".72">SO₂/воздух · CN_WAD &lt; 20 мг/л</text>
+    <text x="515" y="868" font-weight="600">Спецсекция хвостохранилища</text>
+    <text x="515" y="886" font-size="11.5" opacity=".72">экран HDPE · 314 тыс. т/год</text>
+    <text x="840" y="500" font-weight="600">Доизмельчение + 3 перечистки</text>
+    <text x="840" y="518" font-size="11.5" opacity=".72">500 кВт · P₈₀ 35 мкм · 4 × 30 м³</text>
+    <text x="840" y="592" font-weight="600">Cu-Au концентрат 85 200 т/год</text>
+    <text x="840" y="610" font-size="11.5" opacity=".72">15,3 % Cu · 28,3 г/т Au · 158 г/т Ag</text>
+    <text x="840" y="684" font-weight="600">Сгущение · фильтр-пресс · склад</text>
+    <text x="840" y="702" font-size="11.5" opacity=".72">влага 8,5 % · склад 10 000 т</text>
+    <text x="840" y="776" font-weight="600">Отгрузка на медный завод</text>
+    <text x="840" y="794" font-size="11.5" opacity=".72">93 700 влажных т/год · 5 вагонов/сут</text>
+  </g>
+</svg>
+</figure>
+</div>
+<figcaption>Рис. 4. Схема цепи аппаратов, номинальный год открытых работ. Оранжевым выделен товарный
+медно-золотой концентрат, золотым — сплав Доре, пунктиром — потоки, покидающие площадку.
+Цифры в кружках — номера технологических потоков, расшифрованы в таблице ниже.</figcaption>
+
+<h3>Таблица потоков</h3>
+<div class="tbl compact"><table>
+  <caption>Материальный баланс по потокам, номинальный год ОГР (7,6 млн т руды, Au 0,42 г/т, Cu 0,205 %, Ag 2,52 г/т)</caption>
+  <thead><tr><th class="num">№</th><th>Поток</th><th class="num">т/год</th><th class="num">т/ч</th>
+    <th class="num">Au, г/т</th><th class="num">Cu, %</th><th class="num">Ag, г/т</th>
+    <th class="num">Au, кг</th><th class="num">Cu, т</th><th class="num">Ag, кг</th></tr></thead>
+  <tbody>
+    <tr><td class="num">1</td><td>Руда с карьера (ROM)</td><td class="num">7 600 000</td><td class="num">943</td><td class="num">0,420</td><td class="num">0,205</td><td class="num">2,52</td><td class="num">3 192</td><td class="num">15 580</td><td class="num">19 152</td></tr>
+    <tr><td class="num">2</td><td>Дроблёная руда −250 мм</td><td class="num">7 600 000</td><td class="num">1 157</td><td class="num">0,420</td><td class="num">0,205</td><td class="num">2,52</td><td class="num">3 192</td><td class="num">15 580</td><td class="num">19 152</td></tr>
+    <tr><td class="num">3</td><td>Слив ГЦ — питание флотации</td><td class="num">7 600 000</td><td class="num">943</td><td class="num">0,420</td><td class="num">0,205</td><td class="num">2,52</td><td class="num">3 192</td><td class="num">15 580</td><td class="num">19 152</td></tr>
+    <tr><td class="num">4</td><td>Черновой медный концентрат</td><td class="num">380 000</td><td class="num">47</td><td class="num">6,72</td><td class="num">3,69</td><td class="num">41,6</td><td class="num">2 554</td><td class="num">14 022</td><td class="num">15 800</td></tr>
+    <tr><td class="num">5</td><td><b>Cu-Au концентрат — товар</b></td><td class="num">85 235</td><td class="num">10,6</td><td class="num">28,3</td><td class="num">15,30</td><td class="num">158</td><td class="num">2 410</td><td class="num">13 041</td><td class="num">13 464</td></tr>
+    <tr><td class="num">6</td><td>Хвосты медной флотации</td><td class="num">7 220 000</td><td class="num">896</td><td class="num">0,108</td><td class="num">0,035</td><td class="num">0,79</td><td class="num">782</td><td class="num">2 539</td><td class="num">5 688</td></tr>
+    <tr><td class="num">7</td><td>Пирротин-пиритный концентрат</td><td class="num">314 000</td><td class="num">39,0</td><td class="num">1,22</td><td class="num">0,35</td><td class="num">10,7</td><td class="num">383</td><td class="num">1 099</td><td class="num">3 348</td></tr>
+    <tr><td class="num">8</td><td>Хвосты пирротиновой флотации</td><td class="num">6 906 000</td><td class="num">857</td><td class="num">0,058</td><td class="num">0,021</td><td class="num">0,34</td><td class="num">399</td><td class="num">1 440</td><td class="num">2 340</td></tr>
+    <tr><td class="num">9</td><td>Сгущённые хвосты в ХХ (62 % тв.)</td><td class="num">6 906 000</td><td class="num">857</td><td class="num">0,058</td><td class="num">0,021</td><td class="num">0,34</td><td class="num">399</td><td class="num">1 440</td><td class="num">2 340</td></tr>
+    <tr><td class="num">10</td><td>Питание цианирования (Ж:Т = 2:1)</td><td class="num">314 000</td><td class="num">39,0</td><td class="num">1,22</td><td class="num">0,35</td><td class="num">10,7</td><td class="num">383</td><td class="num">1 099</td><td class="num">3 348</td></tr>
+    <tr><td class="num">11</td><td>Товарный десорбат / катодный осадок</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">356</td><td class="num">—</td><td class="num">1 704</td></tr>
+    <tr><td class="num">12</td><td>Хвосты сорбции (CN⁻ 150–250 мг/л)</td><td class="num">314 000</td><td class="num">39,0</td><td class="num">0,086</td><td class="num">0,35</td><td class="num">5,24</td><td class="num">27</td><td class="num">1 099</td><td class="num">1 644</td></tr>
+    <tr><td class="num">13</td><td>Обезвреженная пульпа в спецсекцию</td><td class="num">314 000</td><td class="num">39,0</td><td class="num">0,086</td><td class="num">0,35</td><td class="num">5,24</td><td class="num">27</td><td class="num">1 099</td><td class="num">1 644</td></tr>
+    <tr><td class="num">14</td><td><b>Сплав Доре — товар</b></td><td class="num">2,06</td><td class="num">—</td><td class="num">17,3 %</td><td class="num">—</td><td class="num">82,7 %</td><td class="num">356</td><td class="num">—</td><td class="num">1 704</td></tr>
+    <tr class="total"><td></td><td>Извлечение в товарную продукцию</td><td class="num"></td><td class="num"></td><td class="num"></td><td class="num"></td><td class="num"></td><td class="num">2 766<br><span style="font-weight:400">86,64 %</span></td><td class="num">13 041<br><span style="font-weight:400">83,7 %</span></td><td class="num">15 168<br><span style="font-weight:400">79,2 %</span></td></tr>
+  </tbody>
+</table></div>
+
+<h3>Режимные параметры</h3>
+<div class="grid3">
+  <div class="card"><h4>Измельчение</h4><ul style="padding-left:18px;margin:0">
+    <li>Конечная крупность 77 % кл. −0,071 мм (P₈₀ ≈ 75 мкм)</li>
+    <li>Содержание твёрдого в сливе ГЦ 33 %</li>
+    <li>Циркулирующая нагрузка 250 %</li>
+    <li>Шары: ММПС ⌀125 мм, МШЦ ⌀40–60 мм</li>
+    <li>Расход шаров 0,75 кг/т руды <span class="pill warn">допущение</span></li>
+  </ul></div>
+  <div class="card"><h4>Флотация</h4><ul style="padding-left:18px;margin:0">
+    <li>Собиратель: бутиловый ксантогенат, суммарно 280 г/т</li>
+    <li>Вспениватель Т-80, суммарно 165 г/т</li>
+    <li>Медный купуорос не подаётся — испытания показали отсутствие эффекта</li>
+    <li>Медный цикл на малых расходах для селективности, пирротиновый — на повышенных</li>
+    <li>Промпродукты перечисток — в замкнутый цикл</li>
+    <li>Время флотации: медная 27 мин, пирротиновая 21 мин</li>
+  </ul></div>
+  <div class="card"><h4>Цианирование</h4><ul style="padding-left:18px;margin:0">
+    <li>Помол 95 % кл. −0,071 мм</li>
+    <li>Ж : Т = 2 : 1, NaCN 1 г/л, CaO 0,01–0,02 %</li>
+    <li>Смола АМ-2Б, 3 % об., инвентарь 66 м³</li>
+    <li>Нитрат свинца 0,5 кг/т концентрата</li>
+    <li>Продолжительность 24 ч</li>
+    <li>Извлечение в операции: Au 92,9 %, Ag 50,9 %</li>
+  </ul></div>
+</div>
+
+<h3>Проработанные альтернативы</h3>
+<p>Три развилки решались расчётом, а не по умолчанию. Ниже — что сравнивалось и почему выбрано именно так.</p>
+
+<h4>Развилка 1 · Схема измельчения</h4>
+<div class="tbl"><table>
+  <thead><tr><th>Показатель</th><th class="num">SABC — принято</th><th class="num">3 стадии дробления + HPGR + МШЦ</th><th class="num">3 стадии дробления + 2 МШЦ</th></tr></thead>
+  <tbody>
+    <tr><td>Удельная энергия, кВт·ч/т руды</td><td class="num">22,3</td><td class="num">17,7</td><td class="num">19,5</td></tr>
+    <tr><td>Капитал передела, $ млн</td><td class="num">230</td><td class="num">277</td><td class="num">250</td></tr>
+    <tr><td>Стоимость энергии, $ млн/год</td><td class="num">9,3</td><td class="num">7,4</td><td class="num">8,2</td></tr>
+    <tr><td>Шары и футеровки, $ млн/год</td><td class="num">8,9</td><td class="num">7,4</td><td class="num">8,0</td></tr>
+    <tr><td>Число единиц основного оборудования</td><td class="num">минимум</td><td class="num">максимум</td><td class="num">среднее</td></tr>
+    <tr><td>Чувствительность к влаге и глине</td><td>низкая</td><td>высокая — валки залипают</td><td>низкая</td></tr>
+    <tr><td>Срок окупаемости против SABC</td><td class="num">—</td><td class="num">14 лет</td><td class="num">10 лет</td></tr>
+  </tbody>
+</table></div>
+<p><b>Вывод:</b> SABC. Экономия энергии в схеме с валковым прессом реальна (−4,6 кВт·ч/т), но
+$47 млн дополнительного капитала окупаются 14 лет при сроке жизни проекта 11. Пересмотреть,
+если BWi окажется выше 17 кВт·ч/т или цена электроэнергии превысит $0,08/кВт·ч —
+тогда HPGR выходит вперёд. <span class="q">Зависит от вопроса Г-5</span>.</p>
+
+<h4>Развилка 2 · Судьба пирротин-пиритного концентрата</h4>
+<div class="tbl"><table>
+  <thead><tr><th>Вариант</th><th class="num">Выручка, $ млн/год</th><th class="num">OPEX, $ млн/год</th><th class="num">CAPEX, $ млн</th><th>Оценка</th></tr></thead>
+  <tbody>
+    <tr><td>Не производить — оставить золото в хвостах</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td>извлечение Au падает до 75,5 %; теряется 356 кг золота в год</td></tr>
+    <tr><td>Продавать концентрат</td><td class="num">отрицательная</td><td class="num">+8</td><td class="num">6</td><td>рынка на пирротиновый концентрат с 1,2 г/т Au нет; 314 тыс. т/год транспорта</td></tr>
+    <tr><td><b>Цианировать на площадке — принято</b></td><td class="num">+42,6</td><td class="num">13,6</td><td class="num">56</td><td>окупается за 2 года; требует соответствия Цианидному кодексу</td></tr>
+  </tbody>
+</table></div>
+<p><b>Вывод:</b> цианировать. Даже при высоком расходе цианида (8,9 кг/т концентрата — следствие
+пирротина и меди в питании) передел даёт $29 млн чистого вклада в год при базовых ценах
+и $40 млн при споте. Основной резерв улучшения — предаэрация пульпы и опция SART для
+регенерации цианида из медных комплексов; их проверять на полупромышленных испытаниях.</p>
+
+<h4>Развилка 3 · Фотометрическая сепарация</h4>
+<p>Здесь расчёт дал результат, обратный первоначальному предположению. Разбор — по статьям.</p>
+<div class="tbl"><table>
+  <caption>Экономика ФМС при настройке, испытанной в отчёте: выход хвостов 22,74 % от руды, потери Au 3,71 %, Cu 9,50 %</caption>
+  <thead><tr><th>Статья</th><th class="num">Базовые цены, $ млн/год</th><th class="num">Спот-цены, $ млн/год</th></tr></thead>
+  <tbody>
+    <tr class="sub"><td colspan="3">Потери выручки</td></tr>
+    <tr><td>Золото: −122 кг/год (86,64 % → 82,88 %)</td><td class="num">−12,8</td><td class="num">−16,1</td></tr>
+    <tr><td>Медь: −1 209 т/год (83,7 % → 76,0 %)</td><td class="num">−12,4</td><td class="num">−15,8</td></tr>
+    <tr><td>Серебро: −1 431 кг/год (79,2 % → 71,1 %)</td><td class="num">−2,1</td><td class="num">−2,7</td></tr>
+    <tr class="sub"><td colspan="3">Экономия</td></tr>
+    <tr><td>Энергия измельчения (−1,73 млн т в мельницы)</td><td class="num">+1,5</td><td class="num">+1,5</td></tr>
+    <tr><td>Шары и футеровки</td><td class="num">+1,2</td><td class="num">+1,2</td></tr>
+    <tr><td>Реагенты флотации</td><td class="num">+2,1</td><td class="num">+2,1</td></tr>
+    <tr><td>Хвостовое хозяйство и вода</td><td class="num">+0,6</td><td class="num">+0,6</td></tr>
+    <tr><td>Обслуживание меньшего передела</td><td class="num">+0,9</td><td class="num">+0,9</td></tr>
+    <tr><td>Меньший цианидный передел</td><td class="num">+1,3</td><td class="num">+1,3</td></tr>
+    <tr><td>Собственные затраты ФМС (энергия, воздух, износ)</td><td class="num">−3,4</td><td class="num">−3,4</td></tr>
+    <tr class="total"><td>Итого в год</td><td class="num">−23,1</td><td class="num">−30,4</td></tr>
+  </tbody>
+</table></div>
+<div class="tbl"><table>
+  <caption>Влияние на капитал</caption>
+  <thead><tr><th>Статья</th><th class="num">$ млн</th></tr></thead>
+  <tbody>
+    <tr><td>Экономия на мельницах (питание −23 %)</td><td class="num">−35</td></tr>
+    <tr><td>Экономия на флотации</td><td class="num">−10</td></tr>
+    <tr><td>Экономия на хвостовом хозяйстве</td><td class="num">−18</td></tr>
+    <tr><td>Трёхстадийное дробление до −40 мм вместо одностадийного</td><td class="num">+50</td></tr>
+    <tr><td>Комплекс ФМС: 10 сепараторов, промывка, компрессорная, здание</td><td class="num">+32</td></tr>
+    <tr class="total"><td>Итого дополнительный капитал</td><td class="num">+19</td></tr>
+  </tbody>
+</table></div>
+<div class="note red"><b>Вывод: ФМС в основной линии исключена.</b>
+Суммарный эффект — минус $23 млн в год и плюс $19 млн капитала, что в NPV при ставке 10 %
+стоит около −$120 млн. Причина проста: сортировка выбрасывает 9,5 % меди и 3,7 % золота, а
+экономия на измельчении не покрывает даже половины этой потери, потому что для сортировки
+всё равно приходится дробить всю руду до −40 мм в три стадии.</div>
+<p><b>Когда решение переворачивается — три условия, каждое достаточное:</b></p>
+<ul>
+  <li><b>Перенастройка сепараторов.</b> Если поднять порог отсечки так, чтобы выход хвостов был
+  12–14 % при потерях меди ≤ 3 %, баланс становится нейтрально-положительным. Это проверяется
+  опытно-промышленной сортировкой партии 10–50 т и стоит около $0,2 млн.</li>
+  <li><b>Низкосортный склад.</b> Для руды, которая иначе не перерабатывается вообще, любая
+  сортировка — чистый плюс: альтернатива не «переработать всё», а «не переработать ничего».
+  Здесь ФМС уместна и рекомендуется к проработке отдельно, на 2035–2039 гг.</li>
+  <li><b>Обвал цен.</b> При меди ниже $6 000/т и золоте ниже $2 000/унц. потери дешевеют, а
+  экономия остаётся — ФМС снова выигрывает. Сценарий маловероятный, но он объясняет, почему
+  в мировой практике ore sorting растёт на бедных рудах и падает на дорогом металле.</li>
+</ul>
+<p style="color:var(--muted);font-size:13.5px">Проектное решение: место под корпус сортировки
+и подводку коммуникаций в генплане зарезервировать, оборудование не заказывать.
+Стоимость резервирования — около $1,5 млн, стоимость ошибки в обратную сторону — $120 млн.</p>
+</section>
+
+<!-- ════════ 05 БАЛАНСЫ И РАСЧЁТЫ ════════ -->
+<section class="panel" id="p5" role="tabpanel" aria-labelledby="t5">
+<h2>Балансы и расчёты</h2>
+<p>Здесь показано, откуда берутся размеры аппаратов и цифры в остальных разделах. Всё, что не
+измерено в отчёте ЦНИГРИ, принято по аналогам и вынесено в реестр допущений в конце вкладки.</p>
+
+<h3>Режим работы</h3>
+<div class="tbl compact"><table>
+  <thead><tr><th>Передел</th><th class="num">Коэффициент использования</th><th class="num">Часов в году</th><th class="num">Расчётная производительность</th></tr></thead>
+  <tbody>
+    <tr><td>Карьер</td><td class="num">—</td><td class="num">круглогодично, 2 смены</td><td class="num">34,2 млн т горной массы</td></tr>
+    <tr><td>Первичное дробление</td><td class="num">0,75</td><td class="num">6 570</td><td class="num">1 157 т/ч, проектная 1 400 т/ч</td></tr>
+    <tr><td>Измельчение и флотация</td><td class="num">0,92</td><td class="num">8 060</td><td class="num">943 т/ч</td></tr>
+    <tr><td>Гидрометаллургия</td><td class="num">0,92</td><td class="num">8 060</td><td class="num">39,0 т/ч</td></tr>
+  </tbody>
+</table></div>
+
+<h3>Расчёт измельчения</h3>
+<div class="card">
+<p style="margin-top:0"><b>Формула Бонда:</b> <span class="mono">W = 10 · W<sub>i</sub> · (1/√P₈₀ − 1/√F₈₀)</span>,
+где W — удельная энергия, кВт·ч/т; W<sub>i</sub> — индекс работы, кВт·ч/т; F₈₀ и P₈₀ — крупность
+питания и продукта, мкм.</p>
+<div class="tbl compact" style="margin-bottom:0"><table>
+  <thead><tr><th>Стадия</th><th class="num">F₈₀, мкм</th><th class="num">P₈₀, мкм</th><th class="num">W, кВт·ч/т</th><th class="num">Мощность на валу, кВт</th><th class="num">Установленная, кВт</th><th>Оборудование</th></tr></thead>
+  <tbody>
+    <tr><td>Дробление ККД</td><td class="num">700 000</td><td class="num">180 000</td><td class="num">0,4</td><td class="num">460</td><td class="num">750</td><td>ККД-1200/180</td></tr>
+    <tr><td>ММПС (полусамоизмельчение)</td><td class="num">130 000</td><td class="num">2 000</td><td class="num">7,5</td><td class="num">7 073</td><td class="num">10 000</td><td>⌀9,15 × 4,9 м</td></tr>
+    <tr><td>Галечная дробилка</td><td class="num">65 000</td><td class="num">12 000</td><td class="num">0,4</td><td class="num">280</td><td class="num">400</td><td>конусная, замкнутый цикл с ММПС</td></tr>
+    <tr><td>Шаровое измельчение</td><td class="num">2 000</td><td class="num">75</td><td class="num">14,4</td><td class="num">13 580</td><td class="num">15 000</td><td>2 × ⌀6,1 × 9,1 м</td></tr>
+    <tr class="total"><td>Итого комминуция</td><td class="num"></td><td class="num"></td><td class="num">22,7</td><td class="num">21 393</td><td class="num">26 150</td><td></td></tr>
+  </tbody>
+</table></div>
+<p style="font-size:13px;color:var(--muted);margin-bottom:0">Расчёт при W<sub>i</sub> = 15,0 кВт·ч/т
+<span class="pill warn">допущение А-1</span> и поправке на тонкий помол EF₅ = 1,03. Запас мощности ММПС
+1,4 принят потому, что вариативность крепости руды не определена — при известном DWi запас
+снижается до 1,15, а мельница дешевеет примерно на $12 млн.</p>
+</div>
+
+<h3>Расчёт флотации</h3>
+<div class="card">
+<p style="margin-top:0"><b>Объёмный расход пульпы:</b>
+<span class="mono">Q = M<sub>тв</sub>/ρ + M<sub>воды</sub> = 943/2,8 + 1 914 = 2 251 м³/ч</span>
+при содержании твёрдого 33 % и плотности руды 2,8 т/м³.
+<b>Объём камер:</b> <span class="mono">V = Q · t / 60 / k</span>, коэффициент заполнения k = 0,85.</p>
+<div class="tbl compact" style="margin-bottom:0"><table>
+  <thead><tr><th>Операция</th><th class="num">Питание, м³/ч</th><th class="num">Время, мин</th><th class="num">Расчётный объём, м³</th><th class="num">Принято</th><th class="num">Мощность, кВт</th></tr></thead>
+  <tbody>
+    <tr><td>Медная основная</td><td class="num">2 251</td><td class="num">15</td><td class="num">662</td><td class="num">5 × 150 м³</td><td class="num">750</td></tr>
+    <tr><td>Медная контрольная</td><td class="num">2 140</td><td class="num">12</td><td class="num">503</td><td class="num">4 × 150 м³</td><td class="num">600</td></tr>
+    <tr><td>Медные перечистки I–III</td><td class="num">190</td><td class="num">18</td><td class="num">67</td><td class="num">4 × 30 + 4 × 16 м³</td><td class="num">300</td></tr>
+    <tr><td>Пирротиновая основная + контрольная</td><td class="num">2 120</td><td class="num">21</td><td class="num">873</td><td class="num">7 × 150 м³</td><td class="num">1 050</td></tr>
+    <tr><td>Пирротиновая перечистка</td><td class="num">240</td><td class="num">14</td><td class="num">66</td><td class="num">3 × 30 м³</td><td class="num">225</td></tr>
+    <tr class="total"><td>Итого фронт флотации</td><td class="num"></td><td class="num"></td><td class="num"></td><td class="num">2 674 м³</td><td class="num">2 925</td></tr>
+  </tbody>
+</table></div>
+</div>
+
+<h3>Сгущение, фильтрация, цианирование</h3>
+<div class="tbl compact"><table>
+  <thead><tr><th>Аппарат</th><th class="num">Нагрузка</th><th>Удельный показатель</th><th class="num">Расчёт</th><th class="num">Принято</th></tr></thead>
+  <tbody>
+    <tr><td>Сгуститель хвостов</td><td class="num">857 т/ч</td><td>0,85 т/(м²·ч)</td><td class="num">1 008 м² → ⌀35,8 м</td><td class="num">⌀40 м высокопроизводительный</td></tr>
+    <tr><td>Сгуститель Cu-Au концентрата</td><td class="num">10,6 т/ч</td><td>0,45 т/(м²·ч)</td><td class="num">24 м²</td><td class="num">⌀12 м (по буферной ёмкости)</td></tr>
+    <tr><td>Сгуститель пирротинового к-та</td><td class="num">39,0 т/ч</td><td>0,55 т/(м²·ч)</td><td class="num">71 м² → ⌀9,5 м</td><td class="num">⌀12 м</td></tr>
+    <tr><td>Фильтр-пресс концентрата</td><td class="num">10,6 т/ч</td><td>150 кг/(м²·ч)</td><td class="num">71 м²</td><td class="num">2 × 100 м² (1 рабочий + 1 резерв)</td></tr>
+    <tr><td>Чаны выщелачивания и сорбции</td><td class="num">91,4 м³/ч</td><td>24 ч при Ж:Т = 2:1</td><td class="num">2 438 м³</td><td class="num">8 × 300 м³ (⌀7,0 × 8,0 м)</td></tr>
+    <tr><td>Инвентарь смолы АМ-2Б</td><td class="num">—</td><td>3 % от объёма пульпы</td><td class="num">66 м³</td><td class="num">70 м³ с запасом</td></tr>
+    <tr><td>Реактор обезвреживания</td><td class="num">91,4 м³/ч</td><td>60 мин</td><td class="num">91 м³</td><td class="num">2 × 120 м³ последовательно</td></tr>
+  </tbody>
+</table></div>
+
+<h3>Баланс электроэнергии</h3>
+<div class="figbox">
+<figure style="margin:0">
+<svg viewBox="0 0 900 350" role="img" aria-label="Годовое потребление электроэнергии по переделам: шаровое измельчение 114 гигаватт-часов, полусамоизмельчение 60, флотация 34, сгущение и хвосты 19, вспомогательные 15, здания и посёлок 13, гидрометаллургия 9, карьер 8, дробление 6">
+  <g font-size="12.5" fill="currentColor">
+    <text x="0" y="44">Шаровое измельчение и классификация</text>
+    <text x="0" y="76">Полусамоизмельчение ММПС</text>
+    <text x="0" y="108">Флотация и доизмельчение</text>
+    <text x="0" y="140">Сгущение, фильтрация, хвосты</text>
+    <text x="0" y="172">Воздух, вода, вспомогательные</text>
+    <text x="0" y="204">Здания, посёлок, освещение</text>
+    <text x="0" y="236">Гидрометаллургия и ЗПК</text>
+    <text x="0" y="268">Карьер (водоотлив, освещение)</text>
+    <text x="0" y="300">Первичное дробление</text>
+  </g>
+  <g fill="var(--accent)">
+    <rect x="290" y="30"  width="620" height="20" rx="3"/>
+    <rect x="290" y="62"  width="325" height="20" rx="3"/>
+    <rect x="290" y="94"  width="185" height="20" rx="3"/>
+    <rect x="290" y="126" width="103" height="20" rx="3"/>
+    <rect x="290" y="158" width="81"  height="20" rx="3"/>
+    <rect x="290" y="190" width="70"  height="20" rx="3"/>
+    <rect x="290" y="222" width="51"  height="20" rx="3"/>
+    <rect x="290" y="254" width="43"  height="20" rx="3"/>
+    <rect x="290" y="286" width="33"  height="20" rx="3"/>
+  </g>
+  <g font-size="11.5" fill="currentColor" font-family="var(--mono)" font-weight="600">
+    <text x="880" y="44" text-anchor="end" fill="#fff">114,4</text>
+    <text x="623" y="76">60,0</text><text x="483" y="108">34,2</text><text x="401" y="140">19,0</text>
+    <text x="379" y="172">15,0</text><text x="368" y="204">13,0</text><text x="349" y="236">9,4</text>
+    <text x="341" y="268">8,0</text><text x="331" y="300">6,1</text>
+  </g>
+  <text x="290" y="330" font-size="11.5" fill="currentColor" opacity=".7">ГВт·ч в год · всего 279,1 ГВт·ч · 36,7 кВт·ч на тонну руды · средняя нагрузка 31,9 МВт</text>
+</svg>
+</figure>
+</div>
+<figcaption>Рис. 5. Измельчение — 62 % всего электропотребления комбината. Именно поэтому крупность
+помола 77 % −0,071 мм является главным рычагом операционных затрат: сдвиг на 5 % в сторону
+грубого помола экономит около $1,4 млн в год, но стоит 1–2 п.п. извлечения золота, то есть
+$8–16 млн выручки. Помол оптимизирован в правильную сторону.</figcaption>
+<p>Установленная мощность 50,8 МВт, коэффициент спроса 0,63, расчётный максимум нагрузки 34 МВт.
+Питание — ЛЭП 110 кВ, главная понизительная подстанция 110/6 кВ с двумя трансформаторами
+по 40 МВА (резервирование по схеме «один в работе, один в резерве» с возможностью параллельной
+работы). Дизельная электростанция 2 × 2,5 МВт на ответственные потребители: золотоприёмная касса,
+станция обезвреживания цианидов, аварийные насосы, освещение.</p>
+
+<h3>Водный баланс</h3>
+<div class="tbl compact"><table>
+  <caption>Номинальный режим, м³/ч</caption>
+  <thead><tr><th>Приход</th><th class="num">м³/ч</th><th>Расход и потери</th><th class="num">м³/ч</th></tr></thead>
+  <tbody>
+    <tr><td>Слив сгустителя хвостов</td><td class="num">1 050</td><td>Безвозвратно с хвостами в хвостохранилище</td><td class="num">100</td></tr>
+    <tr><td>Оборотная вода с хвостохранилища</td><td class="num">320</td><td>Влага в кеке цианирования (спецсекция)</td><td class="num">50</td></tr>
+    <tr><td>Свежая вода из водозабора</td><td class="num">270</td><td>Испарение с прудка и чаши</td><td class="num">55</td></tr>
+    <tr><td>Влага в руде (3 %)</td><td class="num">28</td><td>Пылеподавление в карьере и на дорогах</td><td class="num">60</td></tr>
+    <tr><td></td><td class="num"></td><td>Промывка, реагентное, гидроуборка</td><td class="num">25</td></tr>
+    <tr><td></td><td class="num"></td><td>Влага в концентрате (8,5 %)</td><td class="num">1</td></tr>
+    <tr><td></td><td class="num"></td><td>Хозяйственно-питьевые нужды</td><td class="num">8</td></tr>
+    <tr class="total"><td>Итого</td><td class="num">1 668</td><td>Итого безвозвратных потерь</td><td class="num">299</td></tr>
+  </tbody>
+</table></div>
+<p>Коэффициент водооборота <b>85 %</b>. Годовой забор свежей воды 2,4 млн м³, проектная
+производительность водозабора 350 м³/ч с учётом сезонной неравномерности и заполнения прудка.
+Целевой режим — отсутствие сброса в водные объекты; избыток паводковых вод аккумулируется
+в чаше хвостохранилища, для чего в объёме предусмотрен запас 1,5 млн м³.
+Источник и объём доступного водозабора не определены — <span class="q">вопрос П-3</span>.</p>
+
+<h3>Реагенты и расходные материалы</h3>
+<div class="tbl compact"><table>
+  <caption>Годовая потребность, номинальный год ОГР</caption>
+  <thead><tr><th>Наименование</th><th class="num">Удельный расход</th><th class="num">т/год</th><th class="num">$/т</th><th class="num">$ млн/год</th><th>Примечание</th></tr></thead>
+  <tbody>
+    <tr><td>Ксантогенат бутиловый</td><td class="num">280 г/т руды</td><td class="num">2 128</td><td class="num">2 200</td><td class="num">4,68</td><td>по режиму ЦНИГРИ, опыт 5</td></tr>
+    <tr><td>Вспениватель Т-80</td><td class="num">165 г/т руды</td><td class="num">1 254</td><td class="num">2 800</td><td class="num">3,51</td><td>то же</td></tr>
+    <tr><td>Цианид натрия</td><td class="num">8,9 кг/т к-та</td><td class="num">2 795</td><td class="num">2 600</td><td class="num">7,27</td><td>высокий расход: пирротин + медь</td></tr>
+    <tr><td>Известь (100 % CaO)</td><td class="num">0,35 кг/т + 4 кг/т к-та</td><td class="num">3 916</td><td class="num">180</td><td class="num">0,70</td><td>защитная щёлочность</td></tr>
+    <tr><td>Нитрат свинца</td><td class="num">0,5 кг/т к-та</td><td class="num">157</td><td class="num">1 900</td><td class="num">0,30</td><td>подавление пассивации пирротином</td></tr>
+    <tr><td>Метабисульфит натрия</td><td class="num">3,5 кг/т кека</td><td class="num">1 099</td><td class="num">750</td><td class="num">0,82</td><td>обезвреживание CN⁻ по INCO</td></tr>
+    <tr><td>Медный купорос (катализатор)</td><td class="num">0,15 кг/т кека</td><td class="num">47</td><td class="num">3 200</td><td class="num">0,15</td><td>только в детоксе</td></tr>
+    <tr><td>Флокулянт</td><td class="num">30 г/т хвостов</td><td class="num">207</td><td class="num">4 500</td><td class="num">0,93</td><td>сгущение хвостов</td></tr>
+    <tr><td>Смола АМ-2Б (пополнение)</td><td class="num">15 % инвентаря</td><td class="num">10,5 м³</td><td class="num">—</td><td class="num">0,48</td><td>механический износ</td></tr>
+    <tr><td>Шары мелющие</td><td class="num">0,75 кг/т руды</td><td class="num">5 700</td><td class="num">1 150</td><td class="num">6,56</td><td class="num">допущение А-6</td></tr>
+    <tr><td>Футеровки, сита, ЗИП</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">2 ,34</td><td>по аналогам</td></tr>
+    <tr class="total"><td>Итого</td><td class="num"></td><td class="num"></td><td class="num"></td><td class="num">27,74</td><td></td></tr>
+  </tbody>
+</table></div>
+<div class="note"><b>Логистика цианида — отдельная проектная задача.</b>
+2 795 т NaCN в год — это примерно 140 двадцатитонных ISO-контейнеров, около трёх в неделю
+круглый год. Требуются: аттестованный маршрут доставки, склад по требованиям Международного
+цианидного кодекса, узел растворения в закрытом контуре, аварийный план по всему маршруту и
+обучение персонала подрядчиков-перевозчиков. Собственное производство цианида при таком объёме
+не окупается.</div>
+
+<h3>Реестр принятых допущений</h3>
+<p>Каждое допущение — это то, что нужно заменить фактом. Столбец «цена ошибки» показывает,
+какие из них стоит проверять в первую очередь.</p>
+<div class="tbl compact"><table>
+  <thead><tr><th class="num">№</th><th>Допущение</th><th class="num">Принято</th><th>Основание</th><th>Цена ошибки</th></tr></thead>
+  <tbody>
+    <tr><td class="num">А-1</td><td>Индекс работы по Бонду</td><td class="num">15,0 кВт·ч/т</td><td>аналоги кварц-сульфидных руд</td><td>±1 ед. = ±$18 млн капитала, ±$1,1 млн/год</td></tr>
+    <tr><td class="num">А-2</td><td>Коэффициент вскрыши</td><td class="num">3,5 : 1</td><td>типовой для карьера 7,6 млн т</td><td>±1 ед. = ∓$15 млн/год <b>(наибольшая)</b></td></tr>
+    <tr><td class="num">А-3</td><td>Плотность руды</td><td class="num">2,80 т/м³</td><td>по составу (кварц + 2 % сульфидов)</td><td>±0,1 = ±2 % объёма пульпы</td></tr>
+    <tr><td class="num">А-4</td><td>Коэффициент использования фабрики</td><td class="num">0,92</td><td>практика новых фабрик после выхода на режим</td><td>−0,02 = −165 тыс. т/год переработки</td></tr>
+    <tr><td class="num">А-5</td><td>Содержание твёрдого во флотации</td><td class="num">33 %</td><td>стандарт для тонкого помола</td><td>±2 % = ±6 % объёма камер</td></tr>
+    <tr><td class="num">А-6</td><td>Расход шаров</td><td class="num">0,75 кг/т</td><td>аналоги при Ai ≈ 0,3</td><td>±0,1 кг/т = ±$0,9 млн/год</td></tr>
+    <tr><td class="num">А-7</td><td>Цена электроэнергии</td><td class="num">$0,055/кВт·ч</td><td>тариф для промышленных потребителей</td><td>±$0,01 = ±$2,8 млн/год</td></tr>
+    <tr><td class="num">А-8</td><td>Условия оплаты концентрата</td><td class="num">Cu 93,5 %, Au 92,5 %, Ag 90 %</td><td>типовые контракты 2026 г.</td><td>−1 п.п. по Au = −$2,8 млн/год</td></tr>
+    <tr><td class="num">А-9</td><td>TC / RC</td><td class="num">$70/т к-та; $0,08/фунт Cu; $18/унц. Au</td><td>рыночные ориентиры</td><td>TC ±$20 = ∓$1,7 млн/год</td></tr>
+    <tr><td class="num">А-10</td><td>Фрахт концентрата</td><td class="num">$100/влажную т</td><td>плечо не задано</td><td>±$50 = ∓$4,7 млн/год</td></tr>
+    <tr><td class="num">А-11</td><td>Масштабный переход лаборатория → производство</td><td class="num">без поправки</td><td>—</td><td>обычно −1…−2 п.п. извлечения = −$8…16 млн/год</td></tr>
+    <tr><td class="num">А-12</td><td>Ставка дисконтирования</td><td class="num">10 % реальная</td><td>типовая для горного гринфилда</td><td>±1 п.п. = ∓$70 млн NPV</td></tr>
+    <tr><td class="num">А-13</td><td>НДПИ и налог на прибыль</td><td class="num">≈7 % от стоимости; 25 %</td><td>действующие ставки РФ</td><td>режим по многокомпонентным рудам уточняется</td></tr>
+    <tr><td class="num">А-14</td><td>Срок строительства</td><td class="num">24 мес. от FID</td><td>аналоги гринфилдов</td><td>+6 мес. = −$45 млн NPV</td></tr>
+    <tr><td class="num">А-15</td><td>Класс точности оценки капитала</td><td class="num">AACE Class 4, ±25 %</td><td>уровень проработки</td><td>—</td></tr>
+  </tbody>
+</table></div>
+</section>
+
+<!-- ════════ 06 ОБОРУДОВАНИЕ ════════ -->
+<section class="panel" id="p6" role="tabpanel" aria-labelledby="t6">
+<h2>Спецификация основного оборудования</h2>
+<p>Перечень по переделам с расчётной нагрузкой и обоснованием количества. Длинноцикловые
+позиции помечены — их заказ определяет критический путь всего проекта.</p>
+
+<div class="tbl compact"><table>
+  <thead><tr><th>Поз.</th><th>Оборудование</th><th class="num">Кол-во</th><th>Характеристика</th><th class="num">Мощность, кВт</th><th>Срок изготовления</th></tr></thead>
+  <tbody>
+    <tr class="sub"><td colspan="6">Дробление и складирование</td></tr>
+    <tr><td>1.1</td><td>Дробилка крупного дробления конусная</td><td class="num">1</td><td>ККД-1200/180, 1 400 т/ч, разгрузочная щель 180 мм</td><td class="num">750</td><td><span class="pill risk">16–18 мес.</span></td></tr>
+    <tr><td>1.2</td><td>Питатель пластинчатый</td><td class="num">1</td><td>2,4 × 12 м, под приём самосвалов 110 т</td><td class="num">160</td><td>10 мес.</td></tr>
+    <tr><td>1.3</td><td>Конвейер магистральный на склад</td><td class="num">2</td><td>лента 1 400 мм, суммарно 1 100 м</td><td class="num">900</td><td>8 мес.</td></tr>
+    <tr><td>1.4</td><td>Склад дроблёной руды с питателями</td><td class="num">1</td><td>60 000 т общих, 24 000 т живого объёма, 4 питателя</td><td class="num">180</td><td>—</td></tr>
+    <tr class="sub"><td colspan="6">Измельчение</td></tr>
+    <tr><td>2.1</td><td>Мельница полусамоизмельчения</td><td class="num">1</td><td>⌀9,15 × 4,9 м, привод с частотным регулированием</td><td class="num">10 000</td><td><span class="pill risk">18–22 мес.</span></td></tr>
+    <tr><td>2.2</td><td>Грохот бутарный + галечная дробилка</td><td class="num">1</td><td>замкнутый цикл с ММПС</td><td class="num">400</td><td>12 мес.</td></tr>
+    <tr><td>2.3</td><td>Мельница шаровая</td><td class="num">2</td><td>⌀6,1 × 9,1 м, 7 500 кВт каждая</td><td class="num">15 000</td><td><span class="pill risk">18–22 мес.</span></td></tr>
+    <tr><td>2.4</td><td>Батарея гидроциклонов</td><td class="num">2</td><td>ГЦ-660, 8 рабочих + 2 резервных в батарее</td><td class="num">—</td><td>8 мес.</td></tr>
+    <tr><td>2.5</td><td>Насосы песковые</td><td class="num">4</td><td>400 × 350, футерованные, 2 рабочих + 2 резервных</td><td class="num">2 000</td><td>8 мес.</td></tr>
+    <tr><td>2.6</td><td>Кран мостовой мельничного корпуса</td><td class="num">2</td><td>100/20 т, пролёт 30 м</td><td class="num">120</td><td>12 мес.</td></tr>
+    <tr class="sub"><td colspan="6">Флотация</td></tr>
+    <tr><td>3.1</td><td>Флотомашины основных операций</td><td class="num">16</td><td>камеры 150 м³ с механическим перемешиванием</td><td class="num">2 400</td><td>12–14 мес.</td></tr>
+    <tr><td>3.2</td><td>Флотомашины перечистных операций</td><td class="num">11</td><td>7 × 30 м³ и 4 × 16 м³</td><td class="num">525</td><td>12 мес.</td></tr>
+    <tr><td>3.3</td><td>Мельница доизмельчения вертикальная</td><td class="num">1</td><td>черновой Cu-концентрат до P₈₀ 35 мкм</td><td class="num">500</td><td>12 мес.</td></tr>
+    <tr><td>3.4</td><td>Контактные чаны</td><td class="num">3</td><td>по 50 м³</td><td class="num">150</td><td>8 мес.</td></tr>
+    <tr><td>3.5</td><td>Реагентное отделение</td><td class="num">1</td><td>приготовление и дозирование 5 реагентов</td><td class="num">200</td><td>10 мес.</td></tr>
+    <tr class="sub"><td colspan="6">Сгущение, фильтрация, хвосты</td></tr>
+    <tr><td>4.1</td><td>Сгуститель хвостов высокопроизводительный</td><td class="num">1</td><td>⌀40 м, разгрузка 62 % твёрдого</td><td class="num">250</td><td>14 мес.</td></tr>
+    <tr><td>4.2</td><td>Сгустители концентратов</td><td class="num">2</td><td>⌀12 м каждый</td><td class="num">60</td><td>12 мес.</td></tr>
+    <tr><td>4.3</td><td>Фильтр-пресс камерный</td><td class="num">2</td><td>100 м², влага кека 8,5 %, 1 рабочий + 1 резерв</td><td class="num">220</td><td>12 мес.</td></tr>
+    <tr><td>4.4</td><td>Насосная станция хвостов</td><td class="num">1</td><td>3 ступени, 4 × 500 кВт, пульповод 4,5 км</td><td class="num">2 000</td><td>10 мес.</td></tr>
+    <tr><td>4.5</td><td>Насосная оборотной воды</td><td class="num">1</td><td>2 × 800 м³/ч</td><td class="num">400</td><td>8 мес.</td></tr>
+    <tr class="sub"><td colspan="6">Гидрометаллургия и золотоприёмка</td></tr>
+    <tr><td>5.1</td><td>Мельница доизмельчения пирротинового к-та</td><td class="num">1</td><td>вертикальная, до 95 % кл. −0,071 мм</td><td class="num">400</td><td>12 мес.</td></tr>
+    <tr><td>5.2</td><td>Чаны выщелачивания и сорбции</td><td class="num">8</td><td>300 м³, ⌀7,0 × 8,0 м, с межстадийными грохотами</td><td class="num">640</td><td>12 мес.</td></tr>
+    <tr><td>5.3</td><td>Колонны десорбции и регенерации смолы</td><td class="num">2</td><td>по 5 м³, с узлом кислотной обработки</td><td class="num">120</td><td>12 мес.</td></tr>
+    <tr><td>5.4</td><td>Электролизёры</td><td class="num">2</td><td>с катодами из нержавеющей стали</td><td class="num">150</td><td>10 мес.</td></tr>
+    <tr><td>5.5</td><td>Печь индукционная плавильная</td><td class="num">2</td><td>по 100 кг, с системой газоочистки</td><td class="num">300</td><td>10 мес.</td></tr>
+    <tr><td>5.6</td><td>Золотоприёмная касса</td><td class="num">1</td><td>режимное помещение, сейфовая, весовая, охрана</td><td class="num">—</td><td>—</td></tr>
+    <tr><td>5.7</td><td>Станция обезвреживания цианидов</td><td class="num">1</td><td>2 × 120 м³, воздуходувки, дозирование SMBS и CuSO₄</td><td class="num">450</td><td>12 мес.</td></tr>
+    <tr class="sub"><td colspan="6">Общефабричное</td></tr>
+    <tr><td>6.1</td><td>Компрессорная станция</td><td class="num">3</td><td>винтовые, 45 м³/мин, 7 бар</td><td class="num">750</td><td>8 мес.</td></tr>
+    <tr><td>6.2</td><td>АСУТП, опробование, экспресс-анализ</td><td class="num">1</td><td>онлайн-анализатор пульпы, автоматические пробоотборники</td><td class="num">100</td><td>12 мес.</td></tr>
+    <tr><td>6.3</td><td>Лаборатория химическая и пробирная</td><td class="num">1</td><td>до 250 проб в сутки</td><td class="num">200</td><td>—</td></tr>
+    <tr class="sub"><td colspan="6">Карьер</td></tr>
+    <tr><td>7.1</td><td>Экскаваторы гидравлические</td><td class="num">4</td><td>ковш 16 м³, 3 рабочих + 1 резерв</td><td class="num">—</td><td>12–15 мес.</td></tr>
+    <tr><td>7.2</td><td>Самосвалы карьерные</td><td class="num">22</td><td>110 т, плечо 2,8 км, подъём 8 %</td><td class="num">—</td><td>12–15 мес.</td></tr>
+    <tr><td>7.3</td><td>Станки буровые шарошечные</td><td class="num">4</td><td>⌀215–250 мм</td><td class="num">—</td><td>12 мес.</td></tr>
+    <tr><td>7.4</td><td>Вспомогательная техника</td><td class="num">18</td><td>бульдозеры, грейдеры, погрузчики, поливооросители</td><td class="num">—</td><td>9 мес.</td></tr>
+  </tbody>
+</table></div>
+<div class="note"><b>Критический путь — три позиции.</b> Мельница полусамоизмельчения, шаровые
+мельницы и дробилка крупного дробления имеют срок изготовления 16–22 месяца. При пуске в 2029 году
+их надо законтрактовать не позже IV квартала 2027 года, то есть <b>сразу после инвестрешения,
+до завершения рабочей документации</b>. Стандартная практика — авансовый заказ длинноцикловых
+позиций по базовым параметрам с последующей доработкой комплектации.</div>
+</section>
+
+<!-- ════════ 07 ПОСТАВЩИКИ ════════ -->
+<section class="panel" id="p7" role="tabpanel" aria-labelledby="t7">
+<h2>Поставщики и стратегия контрактации</h2>
+<p>Базовый контур — Россия, Китай и дружественные юрисдикции. Западный производитель по каждой
+позиции указан как эталон класса машин: он задаёт технические требования и ориентир по цене,
+даже если поставка идёт не от него. Правило закупки — <b>минимум два конкурирующих предложения
+на каждый лот</b>, включая одно из другой юрисдикции.</p>
+
+<div class="tbl compact"><table>
+  <thead><tr><th>Лот</th><th>Предмет поставки</th><th>Россия и ЕАЭС</th><th>Китай</th><th>Эталон класса</th></tr></thead>
+  <tbody>
+    <tr><td>P-01</td><td>Дробильное оборудование, грохоты</td><td>Уралмашзавод, «Дробмаш», «Строймашсервис»</td><td>CITIC HIC, NHI, SANME</td><td>Metso Superior / HP, Sandvik CH</td></tr>
+    <tr><td>P-02</td><td>Мельницы ММПС и МШЦ, приводы</td><td>Уралмашзавод, ТяжМаш (Сызрань)</td><td>CITIC HIC, NHI, Luoyang Mining Machinery</td><td>Metso, FLSmidth, Outotec</td></tr>
+    <tr><td>P-03</td><td>Флотационные машины</td><td>НПО «РИВС» (СПб), «Механобр-техника»</td><td>BGRIMM, Jinpeng, Yantai Xinhai</td><td>Metso TankCell, FLSmidth nextSTEP</td></tr>
+    <tr><td>P-04</td><td>Гидроциклоны, насосы, футерованные трубопроводы</td><td>ГМС Ливгидромаш, «Труд» (Новосибирск), «Курганспецарматура»</td><td>Naipu, Shijiazhuang Industrial Pump</td><td>Weir Warman и Cavex, KSB</td></tr>
+    <tr><td>P-05</td><td>Сгустители и фильтр-прессы</td><td>НПО «РИВС», «Уралхиммаш»</td><td>Jingjin (прессы), CITIC (сгустители)</td><td>Metso, Diemme, Andritz</td></tr>
+    <tr><td>P-06</td><td>Гидрометаллургический комплекс RIP «под ключ»</td><td>«ТОМС Инжиниринг», Иргиредмет — комплексная поставка и технология</td><td>Yantai Jinpeng, CNLITE</td><td>Kemix (ЮАР), Como Engineering</td></tr>
+    <tr><td>P-07</td><td>Ионообменная смола АМ-2Б</td><td>«Аксион – редкие и цветные металлы» (Пермь)</td><td>Suqing Group, Zhengguang Resin</td><td>Purolite, Dow</td></tr>
+    <tr><td>P-08</td><td>Реагенты: цианид, ксантогенат, вспениватель</td><td>«Корунд-Циан» (Дзержинск) — NaCN; Волжский Оргсинтез — ксантогенат</td><td>Hebei Chengxin, Anhui Shuguang — NaCN</td><td>Draslovka, Orica, Cytec</td></tr>
+    <tr><td>P-09</td><td>Станция обезвреживания цианидов</td><td>Иргиредмет, «ТОМС»</td><td>ENFI, Beijing General Research</td><td>процесс INCO, лицензия Glencore Technology</td></tr>
+    <tr><td>P-10</td><td>Конвейеры, металлоконструкции, краны</td><td>«Конвейер» (Тула), Сибтяжмаш, местные металлозаводы</td><td>Zhejiang Double Arrow, SANY</td><td>Continental, ContiTech</td></tr>
+    <tr><td>P-11</td><td>Электрооборудование, ЛЭП, ГПП, частотные приводы</td><td>«Электрозавод», «Силовые машины», ЧЭАЗ</td><td>TBEA, Sieyuan, Inovance</td><td>ABB, Siemens, Schneider</td></tr>
+    <tr><td>P-12</td><td>АСУТП и онлайн-анализ пульпы</td><td>«Союзцветметавтоматика», «Интеравтоматика»</td><td>Supcon, Hollysys</td><td>Metso Courier, Outotec, Honeywell</td></tr>
+    <tr><td>P-13</td><td>Карьерная техника</td><td>БЕЛАЗ (Беларусь), УЗТМ (экскаваторы ЭКГ), «Ижорские заводы»</td><td>XCMG, SANY, Zoomlion, LiuGong</td><td>Caterpillar, Komatsu, Epiroc, Hitachi</td></tr>
+    <tr><td>P-14</td><td>Хвостовое хозяйство: геомембрана, дренаж, мониторинг</td><td>«Гидрокор», «ТехПолимер»</td><td>CTF, Taian Modern Plastic</td><td>Solmax, GSE; проектирование по GISTM</td></tr>
+    <tr><td>P-15</td><td>Проектирование, ТЭО, EPCM</td><td>«ТОМС Инжиниринг», Иргиредмет, Уралмеханобр, «Гипроцветмет»</td><td>ENFI, NFC, CINF (China Nerin)</td><td>Ausenco, Hatch, Wood, Fluor</td></tr>
+    <tr><td>P-16</td><td>Аналитика, аудит запасов, компетентное лицо</td><td>«Алекс Стюарт Гео Аналитика» — выполняла анализы по пробе Л-1</td><td>—</td><td>SGS, ALS, Bureau Veritas; отчёт по NAEN или JORC</td></tr>
+  </tbody>
+</table></div>
+
+<h3>Стратегия контрактации</h3>
+<div class="grid2">
+<div class="card"><h4>Модель реализации: EPCM, а не EPC</h4>
+<p>При EPC-подряде «под ключ» генподрядчик закладывает премию за риск 12–18 % от стоимости —
+это $150–220 млн на объекте такого размера. При EPCM заказчик держит контракты на оборудование
+у себя, а управляющая компания ведёт проектирование, закупку и стройку за фиксированное
+вознаграждение 6–8 %.</p>
+<p style="margin-bottom:0">EPCM оправдан здесь ещё по одной причине: разнородность поставщиков
+(Россия, Китай, Беларусь) требует интеграции на стороне заказчика, и ни один генподрядчик
+не возьмёт на себя риск за чужие межюрисдикционные поставки без запретительной надбавки.</p></div>
+
+<div class="card"><h4>Разбивка на лоты</h4>
+<p>Шестнадцать лотов вместо одного контракта — это дольше в администрировании, но даёт
+конкуренцию внутри каждой позиции и позволяет заказать длинноцикловые машины отдельно
+и раньше остального.</p>
+<ul style="margin-bottom:0">
+  <li>Лоты P-01, P-02 — авансовый заказ сразу после FID</li>
+  <li>Лоты P-06 и P-09 — предпочтительно у одного поставщика: технология цианирования
+  и обезвреживания должна иметь единого владельца гарантии по показателям</li>
+  <li>Лот P-08 — годовые контракты с формулой цены, не разовая закупка</li>
+  <li>Лот P-13 — рассмотреть операционный лизинг вместо покупки</li>
+</ul></div>
+</div>
+
+<h3>Что учитывать при выборе поставщика</h3>
+<div class="tbl compact"><table>
+  <thead><tr><th>Фактор</th><th>Оценка</th></tr></thead>
+  <tbody>
+    <tr><td>Гарантия технологических показателей</td><td>Требовать по извлечению и производительности с финансовыми санкциями. Китайские поставщики обычно гарантируют производительность, но не извлечение; российские технологические институты — извлечение по своей схеме.</td></tr>
+    <tr><td>Запасные части и износ</td><td>Основная статья риска, а не первая поставка. Футеровки мельниц, сита, рабочие колёса насосов, вкладыши флотомашин расходуются постоянно. Требование: склад ЗИП на 12 месяцев по критическим позициям, цена ЗИП зафиксирована в контракте на 5 лет.</td></tr>
+    <tr><td>Частотные приводы больших мельниц</td><td>Самая уязвимая позиция по доступности: мировой стандарт — ABB и Siemens. Альтернативы — китайские Inovance и TBEA, но при 7,5–10 МВт опыт эксплуатации короче. Проектное решение: предусмотреть возможность работы на нерегулируемом приводе с редуктором как запасной вариант.</td></tr>
+    <tr><td>Шеф-монтаж и обучение</td><td>Включать в контракт поставки, а не докупать. Отдельно оговаривать язык документации и наличие русскоязычного персонала на ПНР.</td></tr>
+    <tr><td>Логистика тяжеловесов</td><td>Барабан мельницы ⌀6,1 м — негабарит по железной дороге; требуется проверка габарита по всему маршруту и, возможно, поставка секциями с монтажной сваркой на площадке. Проверять до заключения контракта.</td></tr>
+    <tr><td>Расчёты и валютные риски</td><td>Схема оплаты и валюта контракта — вопрос, который может перевесить разницу в цене оборудования. <span class="q">Вопрос К-4</span></td></tr>
+  </tbody>
+</table></div>
+</section>
+
+<!-- ════════ 08 ИНФРАСТРУКТУРА ════════ -->
+<section class="panel" id="p8" role="tabpanel" aria-labelledby="t8">
+<h2>Инфраструктура и генплан</h2>
+<div class="note"><b>Важное ограничение.</b> Местоположение месторождения в исходных данных
+не указано. Все решения этого раздела — принципиальные, расстояния и объёмы типовые.
+Климат, сейсмичность, мерзлота, удалённость от энергосистемы и транспорта меняют стоимость
+инфраструктуры в разы. Это <span class="q">вопросы П-1 … П-5</span>, и они самые дорогие
+в списке.</div>
+
+<div class="figbox">
+<figure style="margin:0">
+<svg viewBox="0 0 980 520" role="img" aria-label="Принципиальный генплан комбината: карьер и отвалы вскрыши на западе, дробильный и мельничный корпуса и главный корпус фабрики в центре, гидрометаллургический передел с золотоприёмной кассой в режимной зоне, склад концентрата и железнодорожный тупик на востоке, хвостохранилище на юго-востоке, вахтовый посёлок на юго-западе, подстанция и водозабор на севере">
+  <defs><marker id="fa2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker></defs>
+  <g fill="none" stroke="currentColor" stroke-width="1.4">
+    <rect x="30"  y="40"  width="210" height="120" rx="8"/>
+    <rect x="30"  y="190" width="210" height="70"  rx="8" stroke-dasharray="5 4"/>
+    <rect x="30"  y="390" width="230" height="76"  rx="8"/>
+    <rect x="290" y="60"  width="200" height="62"  rx="6"/>
+    <rect x="290" y="152" width="200" height="56"  rx="6"/>
+    <rect x="290" y="238" width="270" height="86"  rx="6" stroke-width="2"/>
+    <rect x="290" y="354" width="240" height="62"  rx="6" stroke="#C08A2E" stroke-width="2"/>
+    <rect x="600" y="250" width="190" height="62"  rx="6" stroke="#B05A22" stroke-width="2"/>
+    <rect x="820" y="250" width="140" height="62"  rx="6" stroke-dasharray="5 4"/>
+    <rect x="620" y="380" width="340" height="115" rx="8" stroke-dasharray="6 4" stroke-width="1.8"/>
+    <rect x="600" y="40"  width="180" height="58"  rx="6"/>
+    <rect x="810" y="40"  width="150" height="58"  rx="6" stroke-dasharray="5 4"/>
+    <rect x="600" y="130" width="180" height="58"  rx="6"/>
+  </g>
+  <g fill="none" stroke="currentColor" stroke-width="1.4" marker-end="url(#fa2)">
+    <line x1="242" y1="90"  x2="288" y2="90"/>
+    <line x1="390" y1="122" x2="390" y2="150"/>
+    <line x1="390" y1="208" x2="390" y2="236"/>
+    <line x1="562" y1="281" x2="598" y2="281"/>
+    <line x1="792" y1="281" x2="818" y2="281"/>
+    <line x1="390" y1="324" x2="390" y2="352"/>
+    <line x1="560" y1="318" x2="620" y2="392"/>
+    <line x1="808" y1="69"  x2="784" y2="69"/>
+    <path d="M598 69 H545 V234"/>
+    <path d="M598 159 H520 V234"/>
+  </g>
+  <g font-size="12.5" fill="currentColor" text-anchor="middle">
+    <text x="135" y="88"  font-weight="600">Карьер</text>
+    <text x="135" y="108" font-size="11" opacity=".72">этапы 1–2</text>
+    <text x="135" y="126" font-size="11" opacity=".72">34 млн т горной массы в год</text>
+    <text x="135" y="219" font-weight="600">Отвалы вскрыши</text>
+    <text x="135" y="239" font-size="11" opacity=".72">26 млн т/год</text>
+    <text x="145" y="418" font-weight="600">Вахтовый посёлок</text>
+    <text x="145" y="438" font-size="11" opacity=".72">700 мест · столовая</text>
+    <text x="145" y="455" font-size="11" opacity=".72">санитарный разрыв 2 км</text>
+    <text x="390" y="86"  font-weight="600">Дробление ККД</text>
+    <text x="390" y="106" font-size="11" opacity=".72">склад руды 60 000 т</text>
+    <text x="390" y="176" font-weight="600">Мельничный корпус</text>
+    <text x="390" y="195" font-size="11" opacity=".72">ММПС + 2 МШЦ</text>
+    <text x="425" y="266" font-weight="600">Главный корпус</text>
+    <text x="425" y="285" font-size="11" opacity=".72">флотация · сгущение</text>
+    <text x="425" y="302" font-size="11" opacity=".72">реагентное · лаборатория</text>
+    <text x="425" y="318" font-size="11" opacity=".72">АСУТП · АБК</text>
+    <text x="410" y="380" font-weight="600">Гидрометаллургия и ЗПК</text>
+    <text x="410" y="400" font-size="11" opacity=".72">режимная зона · охрана</text>
+    <text x="695" y="276" font-weight="600">Склад концентрата</text>
+    <text x="695" y="296" font-size="11" opacity=".72">крытый, 10 000 т</text>
+    <text x="890" y="276" font-weight="600">Ж/д тупик</text>
+    <text x="890" y="296" font-size="11" opacity=".72">5 вагонов/сут</text>
+    <text x="790" y="410" font-weight="600">Хвостохранилище</text>
+    <text x="790" y="430" font-size="11" opacity=".72">чаша 250 га · дамба низового типа</text>
+    <text x="790" y="448" font-size="11" opacity=".72">спецсекция кека цианирования</text>
+    <text x="790" y="466" font-size="11" opacity=".72">насосная оборотной воды</text>
+    <text x="690" y="66"  font-weight="600">ГПП 110/6 кВ</text>
+    <text x="690" y="86"  font-size="11" opacity=".72">2 × 40 МВА</text>
+    <text x="885" y="66"  font-weight="600">ЛЭП 110 кВ</text>
+    <text x="885" y="86"  font-size="11" opacity=".72">энергосистема</text>
+    <text x="690" y="156" font-weight="600">Водозабор и ВОС</text>
+    <text x="690" y="176" font-size="11" opacity=".72">350 м³/ч</text>
+  </g>
+  <g font-size="11" fill="currentColor" opacity=".72" font-family="var(--mono)">
+    <text x="265" y="84" text-anchor="middle">1,5 км</text>
+    <text x="566" y="352">пульповод 4,5 км</text>
+  </g>
+</svg>
+</figure>
+</div>
+<figcaption>Рис. 6. Принципиальная компоновка. Гидрометаллургия и золотоприёмная касса вынесены
+в отдельную режимную зону с собственным периметром — этого требует и обращение с драгметаллами,
+и хранение цианида. Хвостохранилище размещено ниже фабрики по рельефу, чтобы оборотная вода шла
+самотёком в одну сторону, а пульпа перекачивалась в другую.</figcaption>
+
+<div class="grid2">
+<div class="card"><h4>Энергоснабжение</h4>
+<ul style="margin:0">
+  <li>Расчётный максимум нагрузки 34 МВт, установленная 50,8 МВт</li>
+  <li>Питание по ЛЭП 110 кВ, желательно двухцепной — при односторонней схеме любая авария
+  на линии останавливает комбинат целиком</li>
+  <li>ГПП 110/6 кВ, 2 × 40 МВА, распредустройства 6 кВ по корпусам</li>
+  <li>ДЭС 2 × 2,5 МВт на ответственные потребители: ЗПК, обезвреживание цианидов,
+  аварийные насосы, освещение, связь</li>
+  <li>Годовое потребление 279 ГВт·ч; при $0,055/кВт·ч это $15,3 млн — 9,4 % всех
+  операционных затрат</li>
+</ul>
+<p style="margin-bottom:0;font-size:13px;color:var(--muted)">Стоимость ЛЭП принята по 100 км трассы.
+Каждые дополнительные 50 км — это ещё $20–25 млн капитала. <span class="q">Вопрос П-2</span></p></div>
+
+<div class="card"><h4>Хвостовое хозяйство</h4>
+<ul style="margin:0">
+  <li>Объём за срок отработки: 68,3 млн т хвостов флотации + 2,9 млн т кека цианирования</li>
+  <li>При плотности укладки 1,35 т/м³ требуется ёмкость 52,7 млн м³, площадь чаши ~250 га</li>
+  <li>Строительство очередями: 1-я на 5 лет (дамба до 28 м), затем наращивание до 46 м</li>
+  <li>Способ возведения — <b>низовой</b> (downstream) или центральной осевой линии.
+  Верховой способ исключён: он запрещён или ограничен в большинстве юрисдикций после
+  аварий в Бразилии и не соответствует стандарту GISTM</li>
+  <li>Сгущённые хвосты 62 % твёрдого — меньше воды в чаше, меньше риск, выше водооборот</li>
+  <li>Кек цианирования — в отдельную секцию с двойным противофильтрационным экраном HDPE
+  2 мм, дренажным слоем и системой сбора фильтрата</li>
+  <li>Независимый инженер-эксперт (Engineer of Record) по GISTM на весь срок эксплуатации</li>
+</ul></div>
+</div>
+
+<div class="grid2">
+<div class="card"><h4>Транспорт и логистика</h4>
+<div class="tbl compact" style="margin:0"><table style="min-width:0">
+  <tbody>
+    <tr><td>Концентрат на вывоз</td><td class="num">93 700 влажных т/год</td></tr>
+    <tr><td>Вагонов (60 т)</td><td class="num">≈1 560 в год, 4–5 в сутки</td></tr>
+    <tr><td>Сплав Доре</td><td class="num">2,06 т/год, спецсвязью</td></tr>
+    <tr><td>Реагенты на ввоз</td><td class="num">≈12 000 т/год</td></tr>
+    <tr><td>в т. ч. цианид натрия</td><td class="num">140 ISO-контейнеров/год</td></tr>
+    <tr><td>Дизтопливо</td><td class="num">≈12 млн л/год</td></tr>
+    <tr><td>Шары мелющие</td><td class="num">5 700 т/год</td></tr>
+  </tbody>
+</table></div>
+<p style="margin-bottom:0;font-size:13px;color:var(--muted)">Объёмы умеренные: одна автодорога
+и один железнодорожный тупик закрывают потребность. Критично не количество, а всесезонность —
+зимник вместо круглогодичной дороги означает годовой запас реагентов на складе и рост
+оборотного капитала на $20–30 млн.</p></div>
+
+<div class="card"><h4>Персонал</h4>
+<div class="tbl compact" style="margin:0"><table style="min-width:0">
+  <tbody>
+    <tr><td>Карьер (собственный парк)</td><td class="num">380</td></tr>
+    <tr><td>Обогатительная фабрика</td><td class="num">210</td></tr>
+    <tr><td>Гидрометаллургия и ЗПК</td><td class="num">55</td></tr>
+    <tr><td>Ремонтная служба и энергетика</td><td class="num">165</td></tr>
+    <tr><td>Лаборатория и ОТК</td><td class="num">45</td></tr>
+    <tr><td>Хвостовое хозяйство и экология</td><td class="num">30</td></tr>
+    <tr><td>АУП, ОТиПБ, охрана, снабжение</td><td class="num">120</td></tr>
+    <tr><td>Посёлок, столовая, транспорт</td><td class="num">85</td></tr>
+    <tr class="total"><td>Итого</td><td class="num">1 090</td></tr>
+  </tbody>
+</table></div>
+<p style="margin-bottom:0;font-size:13px;color:var(--muted)">При подрядной добыче собственный
+персонал сокращается примерно до 750 человек. Фонд оплаты труда с начислениями $30–34 млн в год —
+это 20 % операционных затрат. Обучение операторов флотации и гидрометаллургии начинать за
+12 месяцев до пуска, на действующем предприятии-аналоге.</p></div>
+</div>
+</section>
+
+<!-- ════════ 09 CAPEX / OPEX ════════ -->
+<section class="panel" id="p9" role="tabpanel" aria-labelledby="t9">
+<h2>Капитальные и операционные затраты</h2>
+<p>Оценка выполнена снизу вверх по позициям, класс точности <b>AACE Class 4 (±25 %)</b>, цены
+II квартала 2026 г., контур поставок Россия — Китай. Оценка не заменяет ТЭО и не является
+основанием для привлечения финансирования.</p>
+
+<div class="tbl"><table>
+  <caption>Первоначальный капитал, $ млн. Подземный рудник и поддерживающие инвестиции — отдельными очередями</caption>
+  <thead><tr><th>Статья</th><th class="num">$ млн</th><th>Основание оценки</th></tr></thead>
+  <tbody>
+    <tr class="sub"><td colspan="3">Горные работы</td></tr>
+    <tr><td>Горно-капитальные работы, первоначальная вскрыша 12 млн т</td><td class="num">26</td><td>$2,2/т горной массы</td></tr>
+    <tr><td>Экскаваторы гидравлические 16 м³, 4 ед.</td><td class="num">26</td><td>$6,5 млн за единицу</td></tr>
+    <tr><td>Самосвалы 110 т, 22 ед.</td><td class="num">48</td><td>$2,2 млн за единицу</td></tr>
+    <tr><td>Станки буровые, 4 ед.</td><td class="num">12</td><td>$3,0 млн за единицу</td></tr>
+    <tr><td>Вспомогательная техника, 18 ед.</td><td class="num">18</td><td>бульдозеры, грейдеры, погрузчики</td></tr>
+    <tr><td>Ремонтная база карьера, склад ГСМ</td><td class="num">15</td><td>по аналогам</td></tr>
+    <tr class="total"><td>Итого горные работы</td><td class="num">145</td><td></td></tr>
+    <tr class="sub"><td colspan="3">Обогатительная фабрика</td></tr>
+    <tr><td>Первичное дробление, склад руды, конвейеры</td><td class="num">45</td><td>ККД + 1,1 км конвейеров + склад 60 тыс. т</td></tr>
+    <tr><td>Измельчение: ММПС, 2 МШЦ, галечная дробилка, ГЦ, насосы</td><td class="num">185</td><td>26 МВт установленной, $7,1 млн за МВт с обвязкой</td></tr>
+    <tr><td>Флотация: 27 машин, доизмельчение, реагентное</td><td class="num">82</td><td>2 674 м³ фронта</td></tr>
+    <tr><td>Сгущение и фильтрация концентрата, склад 10 000 т</td><td class="num">30</td><td>сгуститель, 2 фильтр-пресса, склад, погрузка</td></tr>
+    <tr><td>Хвостовое сгущение, насосные, пульповод 4,5 км</td><td class="num">28</td><td>сгуститель ⌀40 м, 3 ступени перекачки</td></tr>
+    <tr><td>Гидрометаллургия: RIP, десорбция, электролиз, плавка, ЗПК</td><td class="num">46</td><td>8 чанов × 300 м³, режимная зона</td></tr>
+    <tr><td>Станция обезвреживания цианидов</td><td class="num">10</td><td>процесс INCO, автоматический контроль</td></tr>
+    <tr><td>АСУТП, опробование, лаборатория</td><td class="num">17</td><td>онлайн-анализ пульпы, 250 проб в сутки</td></tr>
+    <tr><td>Здания фабрики, отопление, вентиляция, краны</td><td class="num">34</td><td>отапливаемые корпуса</td></tr>
+    <tr class="total"><td>Итого фабрика</td><td class="num">477</td><td></td></tr>
+    <tr class="sub"><td colspan="3">Инфраструктура</td></tr>
+    <tr><td>ЛЭП 110 кВ (100 км), ГПП 2 × 40 МВА, распредсети</td><td class="num">68</td><td><span class="pill warn">зависит от расстояния</span></td></tr>
+    <tr><td>Водозабор, водоводы, ВОС, оборотное водоснабжение</td><td class="num">24</td><td>350 м³/ч</td></tr>
+    <tr><td>Хвостохранилище 1-й очереди и спецсекция</td><td class="num">52</td><td>дамба до 28 м, экран HDPE, дренаж</td></tr>
+    <tr><td>Автодороги подъездная и внутриплощадочные</td><td class="num">28</td><td>всесезонные</td></tr>
+    <tr><td>Вахтовый посёлок 700 мест</td><td class="num">34</td><td>$48 тыс. на место с инфраструктурой</td></tr>
+    <tr><td>Котельная, тепловые сети, очистные, пожарное депо</td><td class="num">20</td><td>по аналогам</td></tr>
+    <tr><td>РММ, склады, АБК, гараж</td><td class="num">22</td><td>по аналогам</td></tr>
+    <tr class="total"><td>Итого инфраструктура</td><td class="num">248</td><td></td></tr>
+    <tr class="sub"><td colspan="3">Прочие затраты</td></tr>
+    <tr><td>Изыскания, проектирование, экспертиза</td><td class="num">42</td><td>4 % от стоимости строительства</td></tr>
+    <tr><td>EPCM, управление строительством, шеф-монтаж, ПНР</td><td class="num">52</td><td>6 % при модели EPCM</td></tr>
+    <tr><td>Первоначальные заряды: шары, смола, реагенты, ЗИП</td><td class="num">24</td><td>шаровая загрузка 1 800 т, смола 70 м³</td></tr>
+    <tr><td>Мобилизация, обучение персонала, пусковые расходы</td><td class="num">16</td><td>обучение за 12 мес. до пуска</td></tr>
+    <tr><td>Оборотный капитал</td><td class="num">36</td><td>2 месяца операционных затрат + запас концентрата</td></tr>
+    <tr class="total"><td>Итого прочие</td><td class="num">170</td><td></td></tr>
+    <tr class="total"><td>Базовая стоимость</td><td class="num">1 040</td><td></td></tr>
+    <tr><td>Резерв на непредвиденные работы и затраты, 18 %</td><td class="num">187</td><td>класс точности Class 4 при неопределённой площадке</td></tr>
+    <tr class="total"><td>ИТОГО первоначальный капитал</td><td class="num">1 227</td><td>$161 на тонну годовой мощности</td></tr>
+  </tbody>
+</table></div>
+
+<div class="grid3">
+  <div class="stat"><b>$280 млн</b><span>подземный рудник и закладочный комплекс, инвестиции 2031–2034 гг.</span></div>
+  <div class="stat"><b>$28 млн/год</b><span>поддерживающие инвестиции: наращивание дамбы, замена техники, капремонты</span></div>
+  <div class="stat"><b>$50 млн</b><span>ликвидация и рекультивация, резервируется в течение срока отработки</span></div>
+</div>
+
+<h3>Операционные затраты</h3>
+<div class="tbl"><table>
+  <caption>Номинальный год открытых работ: 7,6 млн т руды, 34,2 млн т горной массы при вскрыше 3,5 : 1</caption>
+  <thead><tr><th>Статья</th><th class="num">$ млн/год</th><th class="num">$/т руды</th><th class="num">Доля</th></tr></thead>
+  <tbody>
+    <tr class="sub"><td colspan="4">Горные работы</td></tr>
+    <tr><td>Буровзрывные работы</td><td class="num">14,4</td><td class="num">1,89</td><td class="num">8,9 %</td></tr>
+    <tr><td>Экскавация</td><td class="num">9,6</td><td class="num">1,26</td><td class="num">5,9 %</td></tr>
+    <tr><td>Транспортировка горной массы</td><td class="num">29,1</td><td class="num">3,83</td><td class="num">17,9 %</td></tr>
+    <tr><td>Содержание дорог, водоотлив, вспомогательные работы</td><td class="num">8,5</td><td class="num">1,12</td><td class="num">5,2 %</td></tr>
+    <tr><td>Управление и надзор</td><td class="num">6,8</td><td class="num">0,89</td><td class="num">4,2 %</td></tr>
+    <tr class="total"><td>Итого горные работы</td><td class="num">68,4</td><td class="num">9,00</td><td class="num">42,1 %</td></tr>
+    <tr class="sub"><td colspan="4">Переработка</td></tr>
+    <tr><td>Электроэнергия (279 ГВт·ч)</td><td class="num">15,3</td><td class="num">2,01</td><td class="num">9,4 %</td></tr>
+    <tr><td>Шары мелющие</td><td class="num">6,6</td><td class="num">0,87</td><td class="num">4,1 %</td></tr>
+    <tr><td>Футеровки и быстроизнашивающиеся детали</td><td class="num">2,3</td><td class="num">0,30</td><td class="num">1,4 %</td></tr>
+    <tr><td>Реагенты флотации</td><td class="num">9,8</td><td class="num">1,29</td><td class="num">6,0 %</td></tr>
+    <tr><td>Реагенты цианирования и обезвреживания</td><td class="num">9,7</td><td class="num">1,28</td><td class="num">6,0 %</td></tr>
+    <tr><td>Ремонтные материалы и подрядные работы</td><td class="num">12,5</td><td class="num">1,64</td><td class="num">7,7 %</td></tr>
+    <tr><td>Оплата труда фабрики и гидрометаллургии</td><td class="num">9,5</td><td class="num">1,25</td><td class="num">5,8 %</td></tr>
+    <tr><td>Лаборатория и опробование</td><td class="num">2,8</td><td class="num">0,37</td><td class="num">1,7 %</td></tr>
+    <tr><td>Хвостовое хозяйство и водоснабжение</td><td class="num">3,5</td><td class="num">0,46</td><td class="num">2,2 %</td></tr>
+    <tr class="total"><td>Итого переработка</td><td class="num">72,0</td><td class="num">9,47</td><td class="num">44,3 %</td></tr>
+    <tr class="sub"><td colspan="4">Общезаводские расходы</td></tr>
+    <tr><td>Администрация, ОТиПБ, охрана, связь и IT</td><td class="num">8,5</td><td class="num">1,12</td><td class="num">5,2 %</td></tr>
+    <tr><td>Посёлок, питание, вахтовые перевозки</td><td class="num">9,5</td><td class="num">1,25</td><td class="num">5,8 %</td></tr>
+    <tr><td>Страхование, лицензии, социальные обязательства</td><td class="num">4,0</td><td class="num">0,53</td><td class="num">2,5 %</td></tr>
+    <tr class="total"><td>Итого общезаводские</td><td class="num">22,0</td><td class="num">2,89</td><td class="num">13,5 %</td></tr>
+    <tr class="total"><td>ВСЕГО денежные затраты на площадке</td><td class="num">162,4</td><td class="num">21,36</td><td class="num">100 %</td></tr>
+  </tbody>
+</table></div>
+
+<div class="grid3">
+  <div class="stat"><b>$21,4 / т</b><span>денежная себестоимость на площадке, номинальный год ОГР</span></div>
+  <div class="stat"><b>$28–40 / т</b><span>то же в подземный период 2035–2039 гг.: дороже добыча, недозагружена фабрика</span></div>
+  <div class="stat ok"><b>$1 806 / унц.</b><span>AISC в золотом эквиваленте, включая НДПИ и поддерживающие инвестиции</span></div>
+</div>
+<p style="font-size:13.5px;color:var(--muted)">Себестоимость в золотом эквиваленте рассчитана
+делением всех денежных затрат, НДПИ и поддерживающих инвестиций на 122 тыс. унций золотого
+эквивалента (выручка NSR, делённая на цену золота базового сценария). Для полиметаллической
+руды этот показатель условен: он полностью зависит от того, по какой цене пересчитывается медь.
+Более честная метрика для этого объекта — выручка $56,2 против затрат $21,4 на тонну руды,
+то есть операционная маржа 62 %.</p>
+</section>
+
+<!-- ════════ 10 ЭКОНОМИКА ════════ -->
+<section class="panel" id="p10" role="tabpanel" aria-labelledby="t10">
+<h2>Экономика проекта</h2>
+<p>Расчёт по подтверждённым лабораторией извлечениям, а не по коэффициентам 0,90 из календарного
+плана. Два ценовых сценария: консервативный долгосрочный и спот на дату подготовки документа.</p>
+
+<h3>Выручка номинального года</h3>
+<div class="tbl"><table>
+  <caption>7,6 млн т руды: Cu-Au концентрат 85 235 т и сплав Доре 2,06 т</caption>
+  <thead><tr><th>Статья</th><th class="num">Количество</th><th class="num">Базовый сценарий, $ млн</th><th class="num">Спот 17.08.2026, $ млн</th></tr></thead>
+  <tbody>
+    <tr class="sub"><td colspan="4">Медно-золотой концентрат</td></tr>
+    <tr><td>Медь оплачиваемая (93,5 %)</td><td class="num">12 193 т</td><td class="num">134,1</td><td class="num">170,7</td></tr>
+    <tr><td>Золото оплачиваемое (92,5 %)</td><td class="num">71 672 унц.</td><td class="num">250,9</td><td class="num">315,4</td></tr>
+    <tr><td>Серебро оплачиваемое (90 %)</td><td class="num">389 592 унц.</td><td class="num">19,5</td><td class="num">25,7</td></tr>
+    <tr><td>Плата за переработку (TC) $70/т</td><td class="num">85 235 т</td><td class="num">−5,97</td><td class="num">−5,97</td></tr>
+    <tr><td>Плата за рафинирование (RC) Cu, Au, Ag</td><td class="num">—</td><td class="num">−4,02</td><td class="num">−4,58</td></tr>
+    <tr><td>Фрахт и перевалка $100/влажную т</td><td class="num">93 700 т</td><td class="num">−9,37</td><td class="num">−9,37</td></tr>
+    <tr class="total"><td>NSR концентрата</td><td class="num"></td><td class="num">385,1</td><td class="num">491,9</td></tr>
+    <tr class="sub"><td colspan="4">Сплав Доре</td></tr>
+    <tr><td>Золото (99,5 % оплачиваемое)</td><td class="num">11 389 унц.</td><td class="num">39,9</td><td class="num">50,1</td></tr>
+    <tr><td>Серебро (98 % оплачиваемое)</td><td class="num">53 689 унц.</td><td class="num">2,7</td><td class="num">3,5</td></tr>
+    <tr><td>Аффинаж и спецсвязь</td><td class="num">—</td><td class="num">−0,75</td><td class="num">−0,75</td></tr>
+    <tr class="total"><td>NSR сплава Доре</td><td class="num"></td><td class="num">41,8</td><td class="num">52,9</td></tr>
+    <tr class="total"><td>ВЫРУЧКА NSR ВСЕГО</td><td class="num"></td><td class="num">426,9</td><td class="num">544,8</td></tr>
+    <tr><td>Денежные затраты на площадке</td><td class="num"></td><td class="num">−162,4</td><td class="num">−162,4</td></tr>
+    <tr class="total"><td>EBITDA до НДПИ и налогов</td><td class="num"></td><td class="num">264,5</td><td class="num">382,4</td></tr>
+    <tr><td>НДПИ (≈7 % от стоимости)</td><td class="num"></td><td class="num">−30</td><td class="num">−38</td></tr>
+    <tr><td>Поддерживающие инвестиции</td><td class="num"></td><td class="num">−28</td><td class="num">−28</td></tr>
+    <tr class="total"><td>Свободный денежный поток до налога на прибыль</td><td class="num"></td><td class="num">206,5</td><td class="num">316,4</td></tr>
+  </tbody>
+</table></div>
+
+<h3>Денежный поток по годам</h3>
+<div class="figbox">
+<div class="legend">
+  <span><i style="background:var(--neg)"></i>Отток: инвестиции и ликвидация</span>
+  <span><i style="background:var(--pos)"></i>Приток: свободный денежный поток</span>
+</div>
+<figure style="margin:0">
+<svg viewBox="0 0 960 380" role="img" aria-label="Денежный поток по годам при спот-ценах: инвестиции 220 миллионов в 2027, 620 в 2028, 198 в 2029; притоки 315 миллионов в 2030, по 245 в 2031-2033, 125 в переходном 2034, по 187 в подземный период, 223 в 2039 и минус 50 на ликвидацию в 2040">
+  <g stroke="var(--line)" stroke-width="1">
+    <line x1="60" y1="323.6" x2="940" y2="323.6" opacity=".4"/>
+    <line x1="60" y1="259.4" x2="940" y2="259.4" opacity=".4"/>
+    <line x1="60" y1="195.2" x2="940" y2="195.2" opacity=".4"/>
+    <line x1="60" y1="131"   x2="940" y2="131" stroke-width="1.4"/>
+    <line x1="60" y1="66.8"  x2="940" y2="66.8" opacity=".4"/>
+  </g>
+  <g font-size="10.5" fill="currentColor" opacity=".65" text-anchor="end" font-family="var(--mono)">
+    <text x="52" y="327">−600</text><text x="52" y="263">−400</text><text x="52" y="199">−200</text>
+    <text x="52" y="135">0</text><text x="52" y="70">+200</text>
+  </g>
+  <g>
+    <rect x="62"  y="131"  width="42" height="70.6"  rx="3" fill="var(--neg)"/>
+    <rect x="124" y="131"  width="42" height="199"   rx="3" fill="var(--neg)"/>
+    <rect x="186" y="131"  width="42" height="63.6"  rx="3" fill="var(--neg)"/>
+    <rect x="248" y="30"   width="42" height="101"   rx="3" fill="var(--pos)"/>
+    <rect x="310" y="52.4" width="42" height="78.6"  rx="3" fill="var(--pos)"/>
+    <rect x="372" y="52.4" width="42" height="78.6"  rx="3" fill="var(--pos)"/>
+    <rect x="434" y="52.4" width="42" height="78.6"  rx="3" fill="var(--pos)"/>
+    <rect x="496" y="90.9" width="42" height="40.1"  rx="3" fill="var(--pos)"/>
+    <rect x="558" y="71"   width="42" height="60"    rx="3" fill="var(--pos)"/>
+    <rect x="620" y="71"   width="42" height="60"    rx="3" fill="var(--pos)"/>
+    <rect x="682" y="71"   width="42" height="60"    rx="3" fill="var(--pos)"/>
+    <rect x="744" y="71"   width="42" height="60"    rx="3" fill="var(--pos)"/>
+    <rect x="806" y="59.4" width="42" height="71.6"  rx="3" fill="var(--pos)"/>
+    <rect x="868" y="131"  width="42" height="16.1"  rx="3" fill="var(--neg)"/>
+  </g>
+  <g font-size="11" fill="currentColor" text-anchor="middle" font-family="var(--mono)" font-weight="600">
+    <text x="145" y="345">−620</text><text x="269" y="24">+315</text><text x="517" y="85">+125</text>
+  </g>
+  <g font-size="10" fill="currentColor" text-anchor="middle" font-family="var(--mono)" opacity=".8">
+    <text x="83"  y="365">2027</text><text x="145" y="365">2028</text><text x="207" y="365">2029</text>
+    <text x="269" y="365">2030</text><text x="331" y="365">2031</text><text x="393" y="365">2032</text>
+    <text x="455" y="365">2033</text><text x="517" y="365">2034</text><text x="579" y="365">2035</text>
+    <text x="641" y="365">2036</text><text x="703" y="365">2037</text><text x="765" y="365">2038</text>
+    <text x="827" y="365">2039</text><text x="889" y="365">2040</text>
+  </g>
+  <text x="60" y="18" font-size="11.5" fill="currentColor" opacity=".7">Свободный денежный поток, $ млн, спот-сценарий</text>
+</svg>
+</figure>
+</div>
+<figcaption>Рис. 7. Провал 2034 года — не ошибка расчёта: это переходный год, когда добывается
+максимум руды (9,34 млн т) при минимальном содержании (0,34 г/т) и одновременно идут инвестиции
+в подземный рудник. Снижение денежного потока с 2035 года — следствие того, что подземка даёт
+5 млн т вместо 7,6, и фабрика работает вполсилы, а постоянные затраты остаются.</figcaption>
+
+<h3>Итоговые показатели</h3>
+<div class="tbl"><table>
+  <thead><tr><th>Сценарий</th><th class="num">NPV при 10 %</th><th class="num">IRR</th><th class="num">Простая окупаемость</th><th>Оценка</th></tr></thead>
+  <tbody>
+    <tr><td>Базовые цены: Au $3 500 · Cu $11 000 · Ag $50</td><td class="num">−$450 млн</td><td class="num">≈5 %</td><td class="num">не окупается</td><td><span class="pill risk">не проходит</span> проект убыточен относительно стоимости капитала</td></tr>
+    <tr><td><b>Спот 17.08.2026: Au $4 400 · Cu $14 000 · Ag $66</b></td><td class="num">+$156 млн</td><td class="num">13,6 %</td><td class="num">4,2 года</td><td><span class="pill warn">на грани</span> ниже типового порога FID (15–20 %)</td></tr>
+    <tr><td>Спот + подтверждение извлечения 0,90 из плана</td><td class="num">+$255 млн</td><td class="num">15,1 %</td><td class="num">3,9 года</td><td><span class="pill warn">на грани</span></td></tr>
+    <tr><td>Спот + завод 5 млн т/год вместо 7,6</td><td class="num">+$310 млн</td><td class="num">16,8 %</td><td class="num">4,0 года</td><td><span class="pill ok">лучший из посчитанных</span> капитал ниже на $280 млн</td></tr>
+    <tr><td>Спот + центральная зона (1,0 г/т Au) в первые 5 лет</td><td class="num">+$860 млн</td><td class="num">24 %</td><td class="num">2,6 года</td><td><span class="pill ok">инвестиционно привлекателен</span></td></tr>
+  </tbody>
+</table></div>
+
+<h3>Чувствительность</h3>
+<div class="figbox">
+<div class="legend">
+  <span><i style="background:var(--neg)"></i>Ухудшение параметра</span>
+  <span><i style="background:var(--pos)"></i>Улучшение параметра</span>
+</div>
+<figure style="margin:0">
+<svg viewBox="0 0 960 400" role="img" aria-label="Диаграмма чувствительности NPV: цена золота плюс-минус 20 процентов даёт плюс-минус 330 миллионов, капитал плюс-минус 25 процентов — 255 миллионов, содержание золота плюс-минус 15 процентов — 250 миллионов, коэффициент вскрыши — 170 миллионов, цена меди — 155 миллионов, извлечение золота — 95 миллионов, операционные затраты фабрики — 50 миллионов">
+  <g stroke="var(--line)" stroke-width="1" opacity=".45">
+    <line x1="247" y1="48" x2="247" y2="348"/><line x1="384" y1="48" x2="384" y2="348"/>
+    <line x1="656" y1="48" x2="656" y2="348"/><line x1="793" y1="48" x2="793" y2="348"/>
+  </g>
+  <line x1="520" y1="44" x2="520" y2="352" stroke="currentColor" stroke-width="1.6"/>
+  <g>
+    <rect x="220" y="59"  width="300" height="22" rx="3" fill="var(--neg)"/><rect x="520" y="59"  width="300" height="22" rx="3" fill="var(--pos)"/>
+    <rect x="288" y="101" width="232" height="22" rx="3" fill="var(--neg)"/><rect x="520" y="101" width="232" height="22" rx="3" fill="var(--pos)"/>
+    <rect x="293" y="143" width="227" height="22" rx="3" fill="var(--neg)"/><rect x="520" y="143" width="227" height="22" rx="3" fill="var(--pos)"/>
+    <rect x="365" y="185" width="155" height="22" rx="3" fill="var(--neg)"/><rect x="520" y="185" width="155" height="22" rx="3" fill="var(--pos)"/>
+    <rect x="379" y="227" width="141" height="22" rx="3" fill="var(--neg)"/><rect x="520" y="227" width="141" height="22" rx="3" fill="var(--pos)"/>
+    <rect x="434" y="269" width="86"  height="22" rx="3" fill="var(--neg)"/><rect x="520" y="269" width="86"  height="22" rx="3" fill="var(--pos)"/>
+    <rect x="475" y="311" width="45"  height="22" rx="3" fill="var(--neg)"/><rect x="520" y="311" width="45"  height="22" rx="3" fill="var(--pos)"/>
+  </g>
+  <g font-size="12.5" fill="currentColor" text-anchor="end">
+    <text x="205" y="75">Цена золота ±20 %</text>
+    <text x="273" y="117">Капитальные затраты ±25 %</text>
+    <text x="278" y="159">Содержание Au в руде ±15 %</text>
+    <text x="350" y="201">Коэффициент вскрыши 5,0 ↔ 2,5</text>
+    <text x="364" y="243">Цена меди ±20 %</text>
+    <text x="419" y="285">Извлечение Au ±5 п.п.</text>
+    <text x="460" y="327">OPEX фабрики ±15 %</text>
+  </g>
+  <g font-size="11" fill="currentColor" text-anchor="middle" font-family="var(--mono)" opacity=".75">
+    <text x="247" y="368">−300</text><text x="384" y="368">−150</text><text x="520" y="368">0</text>
+    <text x="656" y="368">+150</text><text x="793" y="368">+300</text>
+  </g>
+  <text x="520" y="390" font-size="11.5" fill="currentColor" text-anchor="middle" opacity=".7">Изменение NPV относительно спот-сценария (+$156 млн), $ млн</text>
+  <text x="0" y="28" font-size="12" fill="currentColor" opacity=".75">Базовое значение NPV при 10 %: +$156 млн. Отрицательное плечо любого из трёх верхних факторов уводит проект в минус.</text>
+</svg>
+</figure>
+</div>
+<figcaption>Рис. 8. Три верхних фактора — цена золота, капитал и содержание — каждый по отдельности
+способен обнулить проект. Два из них (капитал и содержание) управляемы: капитал снижается
+меньшим заводом и подрядной добычей, содержание — последовательностью отработки. Цена золота
+не управляема, и именно поэтому решение по проекту нельзя принимать на споте.</figcaption>
+
+<div class="note red"><b>Главный вывод по экономике.</b>
+В той конфигурации, которая задана исходными данными — 7,6 млн т в год бедной фланговой руды
+с содержанием 0,42 г/т золота — проект <b>не является инвестиционно привлекательным</b> при
+консервативных ценах и лишь маргинально проходит при рекордных ценах августа 2026 года.
+Это не приговор объекту: месторождение содержит зону с содержанием 3 г/т, и вопрос
+не в том, как лучше построить завод, а в том, какую руду в него подавать в первые пять лет.
+Проектирование фабрики можно продолжать параллельно, но <b>инвестиционное решение должно
+опираться на пересобранный календарный план с богатой рудой в начале отработки</b>.</div>
+</section>
+
+<!-- ════════ 11 ЭКОЛОГИЯ И РИСКИ ════════ -->
+<section class="panel" id="p11" role="tabpanel" aria-labelledby="t11">
+<h2>Экология, промышленная безопасность, риски</h2>
+<p>Два объекта определяют экологический профиль комбината: цианидный передел и хвостохранилище.
+Оба проектируются по международным отраслевым стандартам, а не только по национальным нормам —
+это требование любого банковского финансирования и условие продажи продукции крупным
+покупателям.</p>
+
+<div class="grid2">
+<div class="card"><h4>Обращение с цианидом — Международный цианидный кодекс (ICMC)</h4>
+<ul style="margin:0">
+  <li>Закрытая цепочка «производитель → перевозчик → склад → узел растворения» с аудитом
+  каждого звена, включая подрядчиков-перевозчиков</li>
+  <li>Склад на 60 суток потребления (≈460 т), отдельно стоящий, с обвалованием, контролем
+  доступа и системой газового контроля HCN</li>
+  <li>Растворение в закрытом контуре, отсутствие открытых поверхностей раствора</li>
+  <li>Обезвреживание хвостов сорбции по процессу SO₂/воздух до CN<sub>WAD</sub> &lt; 20 мг/л —
+  вдвое строже порога Кодекса (50 мг/л в точке сброса в накопитель)</li>
+  <li>Онлайн-контроль цианида на выходе детокса с блокировкой сброса при превышении</li>
+  <li>Полный план ликвидации аварийных ситуаций на всём маршруте доставки, а не только на площадке</li>
+  <li>Ежегодные тренировки, независимая сертификация раз в три года</li>
+</ul></div>
+
+<div class="card"><h4>Хвостохранилище — стандарт GISTM</h4>
+<ul style="margin:0">
+  <li>Низовой способ возведения дамбы или центральная осевая линия; верховой исключён</li>
+  <li>Независимый инженер-эксперт (Engineer of Record) на весь жизненный цикл сооружения</li>
+  <li>Классификация последствий аварии, план действий в чрезвычайной ситуации, оповещение
+  населения ниже по течению</li>
+  <li>Мониторинг: пьезометры порового давления, инклинометры, спутниковая интерферометрия
+  смещений, автоматическая телеметрия</li>
+  <li>Сгущённые хвосты 62 % твёрдого — меньше воды в чаше, меньше энергия возможного разрушения</li>
+  <li>Спецсекция кека цианирования: двойной экран HDPE 2 мм, дренаж, скважины контроля
+  подземных вод по периметру</li>
+  <li>Ежегодный независимый аудит и публичное раскрытие по требованиям стандарта</li>
+</ul></div>
+</div>
+
+<h3>Прочие природоохранные решения</h3>
+<ul>
+  <li><b>Вода.</b> Водооборот 85 %, целевой режим — нулевой сброс в водные объекты; запас
+  ёмкости 1,5 млн м³ на паводок. Контрольные скважины подземных вод по периметру объектов.</li>
+  <li><b>Воздух.</b> Аспирация и рукавные фильтры на всех узлах перегрузки дроблёной руды,
+  орошение дорог, укрытие конвейеров. Газоочистка плавильной печи с улавливанием возгонов.</li>
+  <li><b>Отходы.</b> Вскрышные породы — на отвалы с поэтапной рекультивацией по мере отработки
+  участков; часть используется на дорожное строительство и наращивание дамбы. Проверка пород
+  на кислотообразующий потенциал (тест ABA / NAG) обязательна — при 2 % серы риск кислотного
+  дренажа реален, а в исходных данных этот вопрос не рассматривался. <span class="q">Вопрос Р-3</span></li>
+  <li><b>Ликвидация.</b> Резерв $50 млн, накапливаемый в течение срока отработки: рекультивация
+  отвалов и чаши хвостохранилища, демонтаж, длительный мониторинг воды после закрытия.</li>
+  <li><b>Драгметаллы.</b> Золотоприёмная касса — режимный объект: учёт по требованиям
+  пробирного надзора, вооружённая охрана, отгрузка спецсвязью, видеонаблюдение и опломбирование
+  на всех переходах металла.</li>
+</ul>
+
+<h3>Реестр рисков</h3>
+<div class="tbl"><table>
+  <thead><tr><th>Риск</th><th class="num">Влияние</th><th>Меры снижения</th></tr></thead>
+  <tbody>
+    <tr><td><span class="pill risk">критический</span> Цена золота ниже $3 500/унц. на горизонте проекта</td>
+      <td class="num">NPV → отрицательный</td>
+      <td>не принимать FID по споту; хеджирование части добычи первых 3 лет; ценовой сценарий утверждает совет директоров</td></tr>
+    <tr><td><span class="pill risk">критический</span> Содержание в отработке соответствует пробе Л-1, а не центральной зоне</td>
+      <td class="num">−$700 млн NPV против сценария с богатой рудой</td>
+      <td>пересборка календарного плана; представительная проба; аудит запасов независимым компетентным лицом</td></tr>
+    <tr><td><span class="pill risk">критический</span> Коэффициент вскрыши выше принятых 3,5 : 1</td>
+      <td class="num">±$170 млн NPV</td>
+      <td>горная часть ТЭО, оптимизация контура карьера, рассмотрение подрядной вскрыши</td></tr>
+    <tr><td><span class="pill warn">высокий</span> Извлечение в промышленности ниже лабораторного</td>
+      <td class="num">−1…2 п.п. = −$8…16 млн/год</td>
+      <td>полупромышленные испытания в непрерывном цикле; гарантия показателей в контракте на флотацию</td></tr>
+    <tr><td><span class="pill warn">высокий</span> Превышение капитала относительно оценки Class 4</td>
+      <td class="num">±25 % = ±$300 млн</td>
+      <td>переход к оценке Class 3 после проектирования; резерв 18 %; фиксация цен на длинноцикловые позиции при заказе</td></tr>
+    <tr><td><span class="pill warn">высокий</span> Вредные примеси в концентрате (As, Sb, Hg)</td>
+      <td class="num">штрафы $8–15 млн/год</td>
+      <td>анализ примесей на представительной пробе до переговоров по off-take; при высоком As — селективная флотация или отдельный сорт концентрата</td></tr>
+    <tr><td><span class="pill warn">высокий</span> Неизвестная измельчаемость руды (BWi не определён)</td>
+      <td class="num">±$18 млн капитала, ±$1,1 млн/год</td>
+      <td>определение BWi, Ai, DWi по доменам; запас мощности ММПС 1,4 до получения данных</td></tr>
+    <tr><td><span class="pill warn">высокий</span> Расход цианида 8,9 кг/т — вдвое выше типового</td>
+      <td class="num">+$3,5 млн/год против нормы</td>
+      <td>предаэрация пульпы, оптимизация извести и нитрата свинца, оценка SART для регенерации из медных комплексов</td></tr>
+    <tr><td><span class="pill">средний</span> Недозагрузка фабрики с 2035 г. (65 % мощности)</td>
+      <td class="num">рост удельного OPEX на 25 %</td>
+      <td>штабель низкосортной руды под доработку; доразведка флангов; вариант завода 5 млн т/год</td></tr>
+    <tr><td><span class="pill">средний</span> Сбыт концентрата и условия TC/RC</td>
+      <td class="num">±$10 млн/год</td>
+      <td>долгосрочный off-take с двумя покупателями; два независимых логистических маршрута</td></tr>
+    <tr><td><span class="pill">средний</span> Доступность запчастей и приводов больших мельниц</td>
+      <td class="num">простой = $0,6 млн/сутки</td>
+      <td>склад ЗИП на 12 месяцев; фиксация цен ЗИП в контракте на 5 лет; резервный вариант нерегулируемого привода</td></tr>
+    <tr><td><span class="pill">средний</span> Кислотный дренаж вскрышных пород (2 % серы в руде)</td>
+      <td class="num">затраты на закрытие вырастают кратно</td>
+      <td>тестирование пород на кислотообразование до вскрыши; селективное складирование потенциально кислотных пород под экраном</td></tr>
+    <tr><td><span class="pill">средний</span> Задержка ввода относительно лицензионных обязательств</td>
+      <td class="num">риск претензий по лицензии</td>
+      <td>ранний старт геологической программы; заказ длинноцикловых позиций сразу после FID</td></tr>
+  </tbody>
+</table></div>
+</section>
+
+<!-- ════════ 12 ГРАФИК ════════ -->
+<section class="panel" id="p12" role="tabpanel" aria-labelledby="t12">
+<h2>График реализации</h2>
+<p>Пуск в 2029 году, заданный календарным планом добычи, достижим — но только если геологическая
+программа стартует в 2026 году, а инвестрешение принимается не позже декабря 2027-го.
+Критический путь определяют не строительно-монтажные работы, а сроки изготовления мельниц.</p>
+
+<div class="figbox">
+<figure style="margin:0">
+<svg viewBox="0 0 960 460" role="img" aria-label="Календарный график реализации с середины 2026 до середины 2030 года: геологическая программа 14 месяцев, банковское ТЭО и инвестрешение в декабре 2027, заказ мельниц с изготовлением до середины 2029, проектирование и экспертиза в 2028, строительство фабрики 2028-2029, монтаж и пусконаладка, первый концентрат в октябре 2029">
+  <g stroke="var(--line)" stroke-width="1" opacity=".5">
+    <line x1="345" y1="40" x2="345" y2="410"/>
+    <line x1="515" y1="40" x2="515" y2="410"/>
+    <line x1="685" y1="40" x2="685" y2="410"/>
+    <line x1="855" y1="40" x2="855" y2="410"/>
+  </g>
+  <g font-size="12" fill="currentColor" text-anchor="middle" font-weight="600" opacity=".8">
+    <text x="302" y="32">2026</text><text x="430" y="32">2027</text><text x="600" y="32">2028</text>
+    <text x="770" y="32">2029</text><text x="898" y="32">2030</text>
+  </g>
+  <g font-size="12" fill="currentColor" text-anchor="end">
+    <text x="250" y="60">Представительная проба и геометаллургия</text>
+    <text x="250" y="86">Полупромышленные испытания</text>
+    <text x="250" y="112">Аудит запасов, ТЭО кондиций</text>
+    <text x="250" y="138">Банковское ТЭО, off-take, финансирование</text>
+    <text x="250" y="164">Инвестиционное решение (FID)</text>
+    <text x="250" y="190">Изготовление мельниц и ККД</text>
+    <text x="250" y="216">Проектная документация и ОВОС</text>
+    <text x="250" y="242">Экспертиза и разрешение на строительство</text>
+    <text x="250" y="268">Дороги, ЛЭП, посёлок, площадка</text>
+    <text x="250" y="294">Горно-капитальные работы</text>
+    <text x="250" y="320">Строительство корпусов фабрики</text>
+    <text x="250" y="346">Монтаж оборудования</text>
+    <text x="250" y="372">Пусконаладка и выход на режим</text>
+    <text x="250" y="398">Первый концентрат и первое Доре</text>
+  </g>
+  <g>
+    <rect x="260" y="49"  width="198" height="14" rx="4" fill="var(--s1)"/>
+    <rect x="345" y="75"  width="113" height="14" rx="4" fill="var(--s1)"/>
+    <rect x="345" y="101" width="71"  height="14" rx="4" fill="var(--s1)"/>
+    <rect x="388" y="127" width="113" height="14" rx="4" fill="var(--s1)"/>
+    <rect x="515" y="179" width="269" height="14" rx="4" fill="var(--s2)"/>
+    <rect x="430" y="205" width="156" height="14" rx="4" fill="var(--s3)"/>
+    <rect x="558" y="231" width="70"  height="14" rx="4" fill="var(--s3)"/>
+    <rect x="515" y="257" width="156" height="14" rx="4" fill="var(--s3)"/>
+    <rect x="558" y="283" width="198" height="14" rx="4" fill="var(--s3)"/>
+    <rect x="586" y="309" width="170" height="14" rx="4" fill="var(--s3)"/>
+    <rect x="685" y="335" width="113" height="14" rx="4" fill="var(--s3)"/>
+    <rect x="770" y="361" width="113" height="14" rx="4" fill="var(--accent)"/>
+  </g>
+  <g fill="var(--accent)">
+    <path d="M501 149 l9 9 l-9 9 l-9 -9 z"/>
+    <path d="M813 385 l9 9 l-9 9 l-9 -9 z"/>
+  </g>
+  <g font-size="11" fill="currentColor" font-family="var(--mono)" opacity=".8">
+    <text x="516" y="163">декабрь 2027</text>
+    <text x="828" y="399">октябрь 2029</text>
+    <text x="790" y="190">18–22 мес. — критический путь</text>
+  </g>
+  <text x="260" y="440" font-size="11.5" fill="currentColor" opacity=".7">Подземный рудник — отдельная очередь: проходка и закладочный комплекс 2031–2034 гг., переход на подземную добычу в 2035 г.</text>
+</svg>
+</figure>
+</div>
+<figcaption>Рис. 9. Синим — работы, снимающие неопределённость (они предшествуют инвестрешению),
+оранжевым — критический путь по изготовлению мельниц, зелёным — проектирование и строительство.
+Ромбы — контрольные точки.</figcaption>
+
+<ol class="timeline">
+  <li><b>II полугодие 2026 — III квартал 2027.</b> Геологическая и технологическая программа:
+  представительная проба по всем зонам, геометаллургическая модель, определение измельчаемости
+  и вредных примесей, полупромышленные испытания флотации и цианирования, опытная сортировка.
+  Параллельно — аудит запасов независимым компетентным лицом. Стоимость $2,5–4,5 млн.</li>
+  <li><b>II–IV кварталы 2027.</b> Банковское ТЭО с пересобранным календарным планом,
+  переговоры по off-take, привлечение финансирования. <b>Инвестиционное решение — декабрь 2027.</b>
+  Позже этого срока пуск в 2029 году недостижим.</li>
+  <li><b>Январь 2028 — сразу после FID.</b> Авансовый заказ мельницы полусамоизмельчения,
+  двух шаровых мельниц и дробилки крупного дробления по базовым параметрам, не дожидаясь
+  рабочей документации. Это единственный способ уложиться в срок.</li>
+  <li><b>2027–2028.</b> Проектная документация, ОВОС и общественные слушания, государственная
+  экспертиза, разрешение на строительство. Параллельно — подготовительный период: подъездная
+  дорога, ЛЭП, вахтовый посёлок первой очереди, площадка.</li>
+  <li><b>2028–2029.</b> Горно-капитальные работы (первоначальная вскрыша 12 млн т), строительство
+  корпусов, монтаж оборудования, обучение операторов на действующем предприятии-аналоге.</li>
+  <li><b>II полугодие 2029.</b> Пусконаладка на руде. Первый концентрат — октябрь 2029, первое
+  Доре — декабрь 2029. Выход на проектные показатели 6–9 месяцев, полная мощность — II квартал 2030.</li>
+  <li><b>2031–2034.</b> Строительство подземного рудника и закладочного комплекса отдельной
+  инвестиционной очередью, с завершением к переходу 2034–2035 гг.</li>
+</ol>
+</section>
+
+<!-- ════════ 13 ВОПРОСЫ ════════ -->
+<section class="panel" id="p13" role="tabpanel" aria-labelledby="t13">
+<h2>Открытые вопросы</h2>
+<p>Проект посчитан целиком — там, где данных не было, приняты допущения, и они помечены в
+реестре на вкладке «Балансы и расчёты». Ниже — вопросы, ответы на которые эти допущения заменят.
+Столбец «что меняет» показывает, какой раздел проекта придётся пересобирать. Вопросы отсортированы
+по цене ответа, а не по порядку изложения.</p>
+
+<div class="note"><b>Как этим пользоваться.</b> Отвечать можно по частям — каждый ответ
+самодостаточен. Пять верхних вопросов (Г-1, Г-2, Г-3, К-1, П-1) стоят вместе больше,
+чем все остальные, вместе взятые: они определяют, есть ли проект вообще.
+Остальные уточняют, каким он будет.</p></div>
+
+<h3>Геология и запасы</h3>
+<div class="tbl"><table>
+  <thead><tr><th class="num">№</th><th>Вопрос</th><th>Сейчас принято</th><th>Что меняет ответ</th></tr></thead>
+  <tbody>
+    <tr><td class="q">Г-1</td><td>Каковы утверждённые запасы: тоннаж, содержания, категории, по каким кондициям? 72 млн т в календарном плане — это запасы или проектная производительность за срок?</td><td>72,07 млн т по календарному плану, срок 11 лет</td><td>срок отработки, мощность завода, амортизация, вся модель денежного потока</td></tr>
+    <tr><td class="q">Г-2</td><td>Вошла ли центральная зона месторождения (руды типа Л-001, 3 г/т Au) в этот календарный план? Если да — почему среднее содержание 0,42 г/т? Если нет — почему?</td><td>план целиком на руде типа Л-1</td><td><b>всё.</b> Это разница между NPV −$450 млн и +$860 млн</td></tr>
+    <tr><td class="q">Г-3</td><td>Коэффициент вскрыши по годам и контур карьера</td><td>3,5 : 1, постоянный</td><td>±$170 млн NPV; парк техники; график вскрыши</td></tr>
+    <tr><td class="q">Г-4</td><td>Есть ли забалансовые и низкосортные запасы для дозагрузки фабрики после 2035 года?</td><td>штабель 3–4 млн т условно</td><td>загрузка фабрики в подземный период; целесообразность фотометрической сортировки</td></tr>
+    <tr><td class="q">Г-5</td><td>Определялись ли BWi, Ai, DWi, крепость, плотность, влажность, глинистость руды?</td><td>BWi 15,0 кВт·ч/т по аналогам</td><td>размер и цена мельниц (±$18 млн), выбор схемы измельчения, расход шаров</td></tr>
+    <tr><td class="q">Г-6</td><td>Изменчивость руды по зонам: есть ли окисленная зона, зоны с повышенной глинистостью или упорным золотом?</td><td>однородная сульфидная руда</td><td>необходимость отдельной схемы для окисленных руд; риск для флотации</td></tr>
+  </tbody>
+</table></div>
+
+<h3>Технология</h3>
+<div class="tbl"><table>
+  <thead><tr><th class="num">№</th><th>Вопрос</th><th>Сейчас принято</th><th>Что меняет ответ</th></tr></thead>
+  <tbody>
+    <tr><td class="q">Т-1</td><td>Чьи коэффициенты извлечения считать плановыми — 0,90 из календарного плана или 0,866 из отчёта ЦНИГРИ?</td><td>лабораторные данные ЦНИГРИ</td><td>выручка ±$25 млн/год; корректность всех плановых показателей заказчика</td></tr>
+    <tr><td class="q">Т-2</td><td>Каково содержание мышьяка, сурьмы, ртути, фтора, висмута в медном концентрате? В отчёте есть многоэлементный анализ руды, но не приведены пределы по кондициям медных заводов.</td><td>примеси в пределах допустимого</td><td>штрафы $8–15 млн/год; возможно, потребуется отдельная схема очистки концентрата</td></tr>
+    <tr><td class="q">Т-3</td><td>Готовы ли инвестировать $2,5–4,5 млн и 12–14 месяцев в полупромышленные испытания до FID?</td><td>да, заложено в график</td><td>если нет — резерв капитала надо поднимать с 18 % до 30 %, а извлечение принимать на 2 п.п. ниже</td></tr>
+    <tr><td class="q">Т-4</td><td>Проверялась ли возможность снижения расхода цианида (предаэрация, SART) при 8,9 кг/т концентрата?</td><td>расход по данным отчёта</td><td>$3,5 млн/год операционных затрат; экологическая нагрузка</td></tr>
+    <tr><td class="q">Т-5</td><td>Есть ли данные по кинетике флотации, а не только конечные показатели?</td><td>время флотации по аналогам</td><td>объём фронта флотации, ±$10 млн капитала</td></tr>
+  </tbody>
+</table></div>
+
+<h3>Площадка и инфраструктура</h3>
+<div class="tbl"><table>
+  <thead><tr><th class="num">№</th><th>Вопрос</th><th>Сейчас принято</th><th>Что меняет ответ</th></tr></thead>
+  <tbody>
+    <tr><td class="q">П-1</td><td>Где расположено месторождение? Регион, климат, наличие многолетней мерзлоты, сейсмичность, рельеф.</td><td>не определено; типовые решения</td><td>стоимость инфраструктуры в разы; класс ГТС хвостохранилища; стоимость труда; продолжительность строительного сезона</td></tr>
+    <tr><td class="q">П-2</td><td>Расстояние до ЛЭП 110/220 кВ и наличие свободной мощности 34 МВт в узле</td><td>100 км, мощность есть</td><td>±$25 млн на каждые 50 км; при отсутствии мощности — собственная генерация (+$120–180 млн)</td></tr>
+    <tr><td class="q">П-3</td><td>Источник водоснабжения и доступный лимит: нужно 2,4 млн м³ свежей воды в год</td><td>водозабор 350 м³/ч рядом с площадкой</td><td>при дефиците — глубокая переработка и сухое складирование хвостов, +$80–120 млн</td></tr>
+    <tr><td class="q">П-4</td><td>Расстояние до железнодорожной станции и до порта; всесезонная дорога или зимник</td><td>ж/д тупик на площадке, фрахт $100/т</td><td>±$4,7 млн/год; при зимнике — годовой запас реагентов, +$20–30 млн оборотного капитала</td></tr>
+    <tr><td class="q">П-5</td><td>Вахтовый метод или постоянный посёлок? Есть ли местный кадровый резерв?</td><td>вахта, 700 мест</td><td>стоимость посёлка, вахтовых перевозок, доступность 1 090 человек персонала</td></tr>
+  </tbody>
+</table></div>
+
+<h3>Коммерция и финансирование</h3>
+<div class="tbl"><table>
+  <thead><tr><th class="num">№</th><th>Вопрос</th><th>Сейчас принято</th><th>Что меняет ответ</th></tr></thead>
+  <tbody>
+    <tr><td class="q">К-1</td><td>Какой сценарий цен металлов утверждён для инвестрешения?</td><td>два сценария: $3 500 и спот $4 400 за унцию</td><td>при $3 500 проекта нет; это первое, что нужно зафиксировать</td></tr>
+    <tr><td class="q">К-2</td><td>Куда продаётся концентрат: Китай, Казахстан, российский медеплавильный завод? Есть ли предварительные условия по TC/RC и payable?</td><td>типовые рыночные условия 2026 г.</td><td>±$10 млн/год; выбор логистического маршрута; требования к качеству концентрата</td></tr>
+    <tr><td class="q">К-3</td><td>Какой аффинажный завод принимает сплав Доре и на каких условиях?</td><td>условия по аналогам, потери 0,5 %</td><td>±$1 млн/год; требования к качеству сплава и к режиму отгрузки</td></tr>
+    <tr><td class="q">К-4</td><td>Требуемая норма доходности, доля заёмного финансирования, валюта расчёта, доступность проектного финансирования</td><td>10 % реальных, финансирование не моделировалось</td><td>±1 п.п. ставки = ∓$70 млн NPV; при проектном финансировании понадобится независимый технический аудит</td></tr>
+    <tr><td class="q">К-5</td><td>Рассматривается ли хеджирование части добычи первых лет?</td><td>не заложено</td><td>снижает ценовой риск, который сейчас критический; цена — часть потенциальной прибыли</td></tr>
+  </tbody>
+</table></div>
+
+<h3>Регуляторика и обязательства</h3>
+<div class="tbl"><table>
+  <thead><tr><th class="num">№</th><th>Вопрос</th><th>Сейчас принято</th><th>Что меняет ответ</th></tr></thead>
+  <tbody>
+    <tr><td class="q">Р-1</td><td>Какие сроки ввода в эксплуатацию установлены лицензионным соглашением?</td><td>2029 г. по календарному плану</td><td>если срок жёсткий — параллельное проектирование и повышенный риск; если гибкий — можно сначала доразведать</td></tr>
+    <tr><td class="q">Р-2</td><td>Есть ли в лицензии требования по попутному извлечению серебра, по уровню извлечения, по переработке на территории?</td><td>требований нет</td><td>обязательность цианидного передела; возможен запрет на вывоз концентрата</td></tr>
+    <tr><td class="q">Р-3</td><td>Проводилось ли тестирование вскрышных пород на кислотообразующий потенциал (ABA / NAG)?</td><td>не проводилось; риск учтён качественно</td><td>при кислотном дренаже — селективное складирование и экраны, +$40–90 млн капитала и затраты на закрытие</td></tr>
+    <tr><td class="q">Р-4</td><td>Требуется ли соответствие GISTM и Цианидному кодексу по условиям финансирования или сбыта?</td><td>заложено как проектная норма</td><td>если не требуется — экономия $15–25 млн, но растёт риск при будущей продаже актива или привлечении банка</td></tr>
+    <tr><td class="q">Р-5</td><td>Есть ли обязательства перед местным населением, коренными народами, соглашения о социально-экономическом развитии?</td><td>$4 млн/год в общезаводских</td><td>сроки согласования ОВОС; социальный бюджет</td></tr>
+  </tbody>
+</table></div>
+
+<div class="note green"><b>Что я сделаю с ответами.</b>
+Ответы на Г-1…Г-3 и К-1 — это пересборка календарного плана, экономической модели и, возможно,
+мощности завода. Ответы на П-1…П-4 — пересчёт инфраструктурной части капитала, которая сейчас
+составляет $248 млн из $1 227 млн и оценена грубее всего. Ответы на Т-1…Т-5 уточняют схему и
+размеры аппаратов, но конфигурацию не меняют. То есть: технологическая часть проекта устойчива,
+а горная и площадочная — пока держатся на допущениях.</div>
+</section>
+
+<footer>
+<p><b>Источники и статус документа.</b> Исходные данные: технологический отчёт ЦНИГРИ по пробе Л-1
+(вещественный состав, гравитация, флотация, сорбционное цианирование, оценка контрастности и
+фотометрическая сепарация на установке GemStar 600 при участии Aliud GmbH; анализы —
+аналитический центр ЦНИГРИ и ООО «Алекс Стюарт Гео Аналитика»); календарный план отработки
+2029–2039 гг. Котировки металлов на 17.08.2026 — спот по данным Kitco, LME и TradingEconomics.</p>
+<p>Оценка капитальных и операционных затрат выполнена по классу 4 AACE (±25 %) на основе удельных
+показателей сопоставимых предприятий и не заменяет технико-экономическое обоснование.
+Показатели извлечения приняты по лабораторным испытаниям без масштабного коэффициента.
+Местоположение объекта не определено, инфраструктурные решения приняты условно.
+Документ подготовлен для внутреннего обсуждения и не является основанием для инвестиционного
+решения или привлечения финансирования. Редакция 2 от 17 августа 2026 г.</p>
+</footer>
+</div>
+
+<script>
+(function(){
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('.tabsbar button'));
+  var panels = tabs.map(function(t){ return document.getElementById(t.getAttribute('aria-controls')); });
+  function show(i, push){
+    tabs.forEach(function(t, j){
+      t.setAttribute('aria-selected', j === i ? 'true' : 'false');
+      panels[j].classList.toggle('active', j === i);
+    });
+    if (push) {
+      try { history.replaceState(null, '', '#' + panels[i].id); } catch(e){}
+    }
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }
+  tabs.forEach(function(t, i){
+    t.addEventListener('click', function(){ show(i, true); });
+    t.addEventListener('keydown', function(e){
+      var d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+      if (!d) return;
+      e.preventDefault();
+      var n = (i + d + tabs.length) % tabs.length;
+      tabs[n].focus(); show(n, true);
+    });
+  });
+  var h = (location.hash || '').replace('#','');
+  var start = panels.findIndex(function(p){ return p.id === h; });
+  if (start > 0) show(start, false);
+})();
+</script>
+
+</body>
+</html>
