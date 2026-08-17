@@ -1,0 +1,1237 @@
+{
+"updated": "2026-08-10",
+"model": "GE Frame 6B (MS6001B / PG6541B…6581B / 6B.03)",
+"facts": [
+{
+"claim": "Платформа MS6001 выпущена в 1978 г. (первая модель MS6431A, ~31–31,8 тыс. кВт, firing 1850°F); сегодня GE Vernova заявляет >1200 установленных 6B с 1978 г., >55 млн часов наработки, 45 МВт simple cycle (6B.03), >51% КПД в ПГУ",
+"source": "https://www.gevernova.com/gas-power/products/gas-turbines/6b (WebFetch: '>1,200 6B units installed since 1978', '45 MW', '>51%')",
+"cross": "GER-4217B (копия: https://pdf4pro.com/file/11d6cf/content_dam_gepower_new_global_en_US_downloads_gas_new_site_resources_reference_ger_4217b_uprate_options_ms6001_heavy_duty_gas_turbine.pdf.pdf): 'introduced in 1978' с MS6431A"
+},
+{
+"claim": "Лестница рейтингов 6B по GER-4217B: PG6541B (1987) — 38 140 кВт, firing 2020°F/1104°C; PG6561B — 39 620 кВт, 2020°F; PG6571B (1997) — 40 590 кВт, 2077°F/1136°C; PG6581B — 41 460 кВт, 2084°F/1140°C (позднейшие 6581B по паспорту до 42 100 кВт). Рост мощности шёл через повышение firing temperature + улучшение охлаждения и материалов горячего тракта",
+"source": "GER-4217B Uprate Options for the MS6001 (pdf4pro копия, см. выше; оригинал https://www.gevernova.com/content/dam/gepower-new/global/en_US/downloads/gas-new-site/resources/reference/ger-4217b-uprate-options-ms6001-heavy-duty-gas-turbine.pdf)",
+"cross": "Salvex-лоты 4x PG6581B: '42,100 kW, 5163 rpm' (https://www.salvex.com/listings/listing_detail.cfm/aucid/182971800/); тех.спека PG6581B у china-power-contractor.cn"
+},
+{
+"claim": "Расшифровка обозначений: MS6001B = Model Series 6001, модель B; пакетные обозначения PG65x1B — «6» = Frame 6, средние цифры растут с рейтингом (6521→6581), «1» = одновальная, суффикс B = модель. GE Vernova официально перечисляет как прежние имена одной машины: Frame 6B, 6B-3/3-Series, 6521(B)–6581(B), PG6521B–PG6581B, MS6001(B)",
+"source": "https://www.gevernova.com/gas-power/products/gas-turbines/6b — блок 'former names' (проверено WebFetch)",
+"cross": ""
+},
+{
+"claim": "GE декларирует «interchangeability of components for a given frame size»: новый горячий тракт старших рейтингов ретрофитится в старые 6B с минимальными доработками — на этом построены uprate-пакеты (конверсии 6541B→6581B-уровня). Практическое следствие для ЗИП: HGP-детали между рейтингами 6541–6581 во многом кросс-применимы (с учётом комплектности набора), а компрессор/корпуса единые по frame size",
+"source": "GER-4217B (pdf4pro копия): цитата об interchangeability и ретрофите нового hardware в старые машины",
+"cross": "https://www.gevernova.com/gas-power/services/gas-turbines/upgrades/advanced-gas-path-6b — AGP как ретрофит-пакет на существующий парк 6B"
+},
+{
+"claim": "Uprate-канал GE сегодня: 6B Advanced Gas Path (AGP) — прирост мощности 4–16%, heat rate до −4…5%, выхлопная энергия +2–9%, интервалы до 32 000 FFH в связке с Advanced Extendor; 9 новых капитальных позиций HGP, технологии E/F/H-классов. Машина после AGP маркетируется как 6B.03 (45 МВт)",
+"source": "https://www.gevernova.com/gas-power/services/gas-turbines/upgrades/advanced-gas-path-6b (сниппеты поиска; сайт отдаёт 503 ботам)",
+"cross": "6B AGP Fact Sheet (https://www.scribd.com/document/548742259/6b-Agp-Fact-Sheet); https://www.turbomachinerymag.com/view/ge-to-implement-upgrade-on-6b-gas-turbines"
+},
+{
+"claim": "6B ≠ 6F: 6F.03 (экс-6FA, MS6001FA, PG6111FA) — 88 МВт simple cycle, масштабированная F/H-технология, 220+ единиц, — конструктивно другая машина; ЗИП горячего тракта и компрессора с 6B НЕ взаимозаменяем. В таможенных записях КВАНТ Frame 6B и 6FA надо вести как два отдельных парка",
+"source": "https://www.gevernova.com/gas-power/products/gas-turbines/6f-03 (WebFetch: 88 MW, former names MS6001FA/PG6111FA, 'scaled H and F-Class technology')",
+"cross": "https://www.gevernova.com/gas-power/products/gas-turbines/6b (45 MW, E-class родословная)"
+},
+{
+"claim": "OEM-канал сегодня держит GE Vernova (Gas Power). Площадка Veresegyház (GE Hungary, осн. 2001) — крупнейшая производственная база Gas Power вне США: производство и прецизионный ремонт компонентов ГТ (роботизированная сварка, термопокрытия), в 2026 г. — модернизация и расширение $25+ млн. Это объясняет 92 из 114 записей таможни РФ-2023 с экспортёром GE Hungary Kft",
+"source": "https://www.gevernova.com/news/press-releases/ge-vernova-modernizes-its-veresegyhaz-hub-boost-energy-independence-lean-production",
+"cross": "https://www.turbomachinerymag.com/view/ge-vernova-unveils-more-than-25-million-expansion-at-turbomachinery-manufacturing-facility-in-hungary"
+},
+{
+"claim": "Belfort (GE Energy Products France SNC) — центр экспертизы GE по 50-Гц газовым турбинам и штаб-квартира в Европе; Frame 6B физически собирались в Бельфоре (подтверждение: 4 новые PG6581B 2012 г. выпуска 'Origin: Belfort, France' в лоте Salvex). Второй экспортёр по таможне РФ-2023 (17 записей)",
+"source": "https://www.ge.com/news/press-releases/ge-energy-opens-new-technology-center-belfort-international-team-engineers-develop ('global center of excellence for 50 Hertz gas turbines')",
+"cross": "https://www.salvex.com/listings/listing_detail.cfm/aucid/182971800/ — год 2012, происхождение Belfort"
+},
+{
+"claim": "Исторические лицензиаты/сборщики Frame 6: Thomassen (NL) строил GE-design Frame 6 ~38 МВт; Nuovo Pignone (Флоренция) — Frame 6B для нефтегаза; Hitachi (Япония); BHEL (Индия) — производит GE-design газовые турбины по соглашению с GE с 1986 г. (Frame 6B в продуктовой линейке BHEL Hyderabad); John Brown Engineering (Клайдбанк) — упаковщик GE frames (наследие живёт в Masaood John Brown). Китай: PG6581B собирались Nanjing Turbine & Electric Machinery (NTC) по поставке GE",
+"source": "https://www.power-technology.com/contractors/operations/al-masaood/ (Frame-3/5/6 сервис, John Brown наследие); https://www.bhel.com/bhel-extends-cooperation-general-electric-gas-turbines (с 1986 г.); https://hpep.bhel.com/product.jsp?prod=gt&sub=TYPE&subtype=FRAME_6B&LAN=EN",
+"cross": "Exapro-лот PG6581B: 'provided by GE, assembled by Nanjing Turbine & Electric Machinery (Group) Co., Ltd.' (https://www.exapro.com/general-electric-pg-6581-b-p241128004/); Thomassen ~38 МВт Frame 6 — thomassen.energy"
+},
+{
+"claim": "Nuovo Pignone-ветка жива у Baker Hughes: продукт «Frame 6/1B» 44 МВт, 50/60 Гц, >1150 установленных единиц (simple cycle, когенерация, LNG) — параллельный OEM-подобный канал по 6B для нефтегазовых приводов, отдельный от GE Vernova",
+"source": "https://www.bakerhughes.com/gas-turbines/frame-technology/frame-61b (WebFetch: 44 MW, 1,150+ units)",
+"cross": ""
+},
+{
+"claim": "В Индии сервис Frame 6B ведёт BGGTS — СП BHEL и GE (осн. 1997), ремонтная база Dundigal (Хайдарабад), покрывает Frame 3/5/6B/6FA/9E; для КВАНТ канал рискован из-за прямого участия GE в СП",
+"source": "https://www.bggts.com/about-bggts",
+"cross": "https://www.gevernova.com/gas-power/services/service-centers/asia/india (BGGTS как официальный сервис-центр GE)"
+},
+{
+"claim": "Thomassen Energy (Rheden, NL) и PSM (Jupiter, FL) с 2021 г. принадлежат Hanwha и работают как единый aftermarket-блок «Hanwha Power»: по 6B — комбустор LEC III (<5 ppm NOx), HGP ступени 1–3, ремонт/реманufacturing роторов, интервалы до 32 000 FFH; поддержка операторов 6B из Rheden с 2004 г.",
+"source": "https://www.psm.com/products/b-e-class-frames/6b (WebFetch: Jupiter — LEC III, Rheden — HGP/роторы, 'since 2004')",
+"cross": "https://thomassen.energy/acquisition-thomassen-energy-completed/ (закрытие сделки Hanwha)"
+},
+{
+"claim": "SATARCO (satarco.com, «Premium Gas Turbine Parts & Hot Gas Path Components», активно индексируется по MS6001) — страну зарегистрировать не удалось (сайт скрывает адрес); по косвенным признакам иранский поставщик — в harvest НЕ включён до проверки (правило исключения Ирана)",
+"source": "https://satarco.com/ (WebFetch — адрес/страна не раскрыты)",
+"cross": ""
+},
+{
+"claim": "Форматы PN GE для 6B: номер чертежа <3 цифры><буква><4 цифры> + суффикс Gxxx (сборка/группа) или Pxxx (деталь). Крупные узлы горячего тракта 6B идут сериями 1xxE/1xxT (117E82xx — liners/TP, 112E6xxx — buckets/nozzle-киты, 116E1215 — топливные форсунки, 101T13xx — комплекты лопаток), мелочь/hardware — сериями 2xxA/2xxB/2xxC/3xxA (251B1572P001, 207C3768P001, 315A4045P001). Серии 315A/361A/362A — это малоформатные (A-size) чертежи: в тендерах 6B встречаются на hardware и детали форсунок, а капитальные части чаще всплывают как 1xxE...G/P",
+"source": "https://www.turbinemarketplace.com/home/detail/208 + https://makikmachinery.com/wanted-misc-frame6-parts-001/ (WebFetch, реальные PN листинги)",
+"cross": "https://drillingbase.com/ge-frame-6b-gas-turbines-parts-list/ (251B1572P001, 207C3768P001, 227C5795G01, 105E9283G06); https://sealmech.com/product/ge-turbine-replacement-spare-parts/ (315A4045P001, 215A4237P001 — по сниппету поиска, сайт блокирует бо"
+},
+{
+"claim": "Жаровые трубы (combustion liners) MS6001B, стандартная камера: PN 117E8214G001…G004; комплект на машину — 10 шт (10 камер)",
+"source": "https://www.turbinemarketplace.com/home/detail/208 (WebFetch: листинг 117E8214G001-4)",
+"cross": "https://www.turbineservices.com/products/tsl/ms6001/ (TSL: liners std и DLN в номенклатуре MS6001)"
+},
+{
+"claim": "Переходные патрубки (transition pieces) MS6001B: PN серии 117E8207 (пример 117E8207G004), 10 шт на машину",
+"source": "поисковая выдача по turbinemarketplace/globalspec: «MS6001B transition pieces 117E8207G004»",
+"cross": "https://www.turbineservices.com/products/tsl/ms6001/ (transition pieces в номенклатуре TSL MS6001)"
+},
+{
+"claim": "Рабочие лопатки 1-й ступени 6B: комплект 92 шт, сплав GTD-111DS, PN примеры 112E6034P001 (rejuvenated, 16 охлаждающих каналов) и 105E9495P1; комплекты в сборе 101T1326G004 (ст.1), 101T1327G004 (ст.2), 314B7164G019 (ст.3)",
+"source": "https://www.turbinemarketplace.com/home/detail/203 и /detail/6 (WebFetch)",
+"cross": "https://www.salvex.com/listings/listing_detail.cfm/aucid/182986342/ (1st stage — 92 blades); https://makikmachinery.com/wanted-misc-frame6-parts-001/ (101T1326G004, 101T1327G004, 314B7164G019)"
+},
+{
+"claim": "Сопловые аппараты 6B: ст.1 — кобальтовый сплав (FSX-414 класс) с TBC, ст.2-3 — никелевые сплавы; Chromalloy изготавливает все три ступени 6B методом точного литья. Номерные примеры узловых китов: 112E6044G001, 119E2094G033, 112E6642G007",
+"source": "поисковая выдача по https://www.scribd.com/document/489731608/Frame-6001B-Nozzles (Chromalloy 6B nozzle overview; сам scribd не грузится)",
+"cross": "https://makikmachinery.com/wanted-misc-frame6-parts-001/ (PN китов, WebFetch); https://www.chromalloy.com/energy/ (LifeX parts, страница подтверждена частично)"
+},
+{
+"claim": "Топливные форсунки 6B: сборка 116E1215G009, primary nozzles (DLN1) 116E1215G002; деталировка стандартной форсунки — cone 251B1572P001, air swirler 207C3768P001, cartridge assy 227C5795G01, tip assy 91170529G02",
+"source": "https://makikmachinery.com/wanted-misc-frame6-parts-001/ (WebFetch)",
+"cross": "https://drillingbase.com/ge-frame-6b-gas-turbines-parts-list/ (WebFetch)"
+},
+{
+"claim": "Полная номенклатура горячего тракта/камеры 6B у независимых: liners (std/DLN), fuel nozzles, transition pieces, crossfire tubes, forward flow sleeves, buckets ст.1-3, nozzles ст.1-3, shrouds ст.1-3, support rings — так её ведёт TSL/EthosEnergy",
+"source": "https://www.turbineservices.com/products/tsl/ms6001/ (WebFetch)",
+"cross": "https://ethosenergy.com/ge-frame-6b-gas-turbine-parts (проверено curl: Hot Gas Path Parts, Combustion Components, Fuel Nozzles, Buckets/Nozzles/Shrouds 1-3, Liners, Flow sleeves, Transition pieces, Primary/Secondary fuel nozzles)"
+},
+{
+"claim": "Интервалы GER-3620 Rev P (2021), Fig.36, базовые (газ, base load, factored): 6B.03 — Combustion (не-DLN) 12000 ч/600 пусков; Combustion (DLN) 12000 ч/450 пусков; HGPI 32000 ч/1200 пусков; Major 64000 ч/2400 пусков. В теле документа для парка с прежним железом типовые значения: HGPI 24000 ч/1200, MI 48000 ч/2400",
+"source": "https://www.gevernova.com/content/dam/gepower-new/global/en_US/downloads/gas-new-site/resources/reference/GER-3620-P.pdf (PDF скачан, таблица извлечена дословно)",
+"cross": "https://gasturbinespares.com/frame-6-series/ (сервис HGP 6B «каждые 24,000 часов»); https://ethosenergy.com/news-and-events/understanding-gas-turbine-maintenance-intervals"
+},
+{
+"claim": "DLN-1 — двухступенчатая предварительно-перемешанная камера GE (6B/7E/9E): 4 главных компонента — система впрыска топлива, liner с вентури, cap/centerbody assembly; на камеру 6 primary + 1 secondary форсунка (с суб-пилотом), деление топлива примерно 50/50, 4 режима работы (primary/lean-lean/secondary/premix)",
+"source": "https://www.netl.doe.gov/sites/default/files/gas-turbine-handbook/3-2-1-2.pdf (PDF скачан и извлечён)",
+"cross": "https://www.modernpowersystems.com/analysis/achieving-sub-5-ppm-nox-with-e-class-turbines/ (WebFetch: 6 primary nozzles, secondary nozzle с sub-pilot, venturi как стабилизатор пламени, применение на 6B)"
+},
+{
+"claim": "Разница комплектации DLN1 vs стандартная камера 6B (10 камер): DLN1 = 60 primary + 10 secondary форсунок, 10 вентури-лайнеров, 10 cap/centerbody, свои flow sleeves и end covers; стандарт = 10 одиночных форсунок (или dual fuel assy типа 91021812G40), обычные liners 117E8214 без вентури/centerbody. Crossfire tubes и TP есть в обоих. Отсюда: CI по DLN дороже по деталям и чаще по пускам (450 против 600 factored starts)",
+"source": "https://www.netl.doe.gov/sites/default/files/gas-turbine-handbook/3-2-1-2.pdf + GER-3620-P Fig.36",
+"cross": "https://www.turbineservices.com/products/tsl/view_part/301 (TSL: отдельный MS6001 DLN combustion liner как OEM-equivalent позиция)"
+},
+{
+"claim": "MS6001B: одновальная ГТУ ~40-42 МВт, 17-ступенчатый компрессор, реверсивная камера с 10 камерами и индивидуальными форсунками, 3-ступенчатая турбина с воздушным охлаждением; парк >900 машин, >40 млн наработанных часов — вторичный рынок частей активен",
+"source": "https://pdf.directindustry.com/pdf/ge-vernova/frame-6-gas-turbine/34155-387869.html (брошюра GE, по выдаче)",
+"cross": "https://etn.global/gas-turbine-products/ms6001b/"
+},
+{
+"claim": "Независимая альтернатива OEM-камере для 6B: PSM LEC III — sub-5 ppm NOx на газе, 100+ инсталляций по B/E-классу, интервалы инспекций до 32000 FFH; поддержка 6B с 2004 г., HGP ст.1-3 производится на площадке Rheden (Нидерланды, экс-Thomassen)",
+"source": "https://www.psm.com/products/b-e-class-frames/6b (WebFetch)",
+"cross": "https://thomassen.energy/product-portfolio/b-e-class-frames/frame-6b/ (сайт отдавал 503 через прокси — перепроверить вручную)"
+},
+{
+"claim": "PSM (Hanwha Power) держит полную независимую линейку 6B: комбустор LEC III (sub-5 ppm NOx, 100+ инсталляций, прямая замена DLN 1.0, совместим с 6581B), HGP ступени 1-3 (buckets, nozzles, shroud blocks) из завода в Rheden (Нидерланды, экс-Thomassen), компрессорное железо, роторные сервисы с продлением интервала до 32 000 FFH",
+"source": "https://www.psm.com/products/b-e-class-frames/6b (проверено WebFetch)",
+"cross": "https://www.psm.com/retrofits-and-upgrades/lec-iii-ultra-low-emission-combustion-system (проверено WebFetch: 6B/6581B в списке рамок, 100+ систем, HyFlex до 25% H2)"
+},
+{
+"claim": "TSL (подразделение EthosEnergy) поставляет полный ряд НОВЫХ запчастей MS6001: buckets/nozzles/shrouds рядов 1-3, support ring, combustion liners (std и DLN), transition pieces, crossfire tubes, fuel nozzles, компрессорные лопатки и IGV — 'standard and uprated new replacement parts'",
+"source": "https://www.turbineservices.com/products/tsl/ms6001/ (проверено WebFetch)",
+"cross": "https://www.hydrocarbonengineering.com/petrochemicals/27042020/ethosenergy-awarded-contract-by-maruzen-petrochemicals/ (проверено: 4-летний многомиллионный LTSA на Frame 6B в Японии — новые части, ремонт, филд-сервис)"
+},
+{
+"claim": "EthosEnergy выполняла обмен ротора Frame 6B: контракт на поставку полностью восстановленного ротора GE Frame 6B для ПГУ в Германии",
+"source": "https://www.powermag.com/press-releases/ethosenergy-awarded-rotor-exchange-contract-in-germany/ (найдено поиском; сам ethosenergy.com стабильно отдаёт 503 за Cloudflare)",
+"cross": ""
+},
+{
+"claim": "Turbine Parts Corporation (Хьюстон) производит и capital parts (nozzles, buckets, rotors, transition pieces, shrouds), и расходники для PG6581(B) 'по собственным чертежам и спецификациям' (proprietary drawings) — чертежи заказчика не нужны",
+"source": "https://www.turbineparts.com/ (проверено WebFetch: цитата 'All products are produced from Turbine Parts Corporation's proprietary drawings and specifications')",
+"cross": "https://www.turbineparts.com/gas-turbine-parts (проверено: Frame 6: 6B в списке рамок, buckets и nozzles)"
+},
+{
+"claim": "UNEW (Stuart, FL) ре-инжинирила 6B-линейку в 2003 и делает non-OEM детали 6B (модели 6541-6581) дольше любой aftermarket-компании; отдельно закрывает снятые с производства legacy-детали для машин, не апгрейженных до 2084F",
+"source": "https://unew.com/6b/ (проверено WebFetch)",
+"cross": "https://unew.com/turbine-parts/ (проверено: 6B 6541-6581 в списке рамок; собственные улучшенные конструкции)"
+},
+{
+"claim": "ОТРИЦАТЕЛЬНЫЙ ФАКТ: Sulzer в своей номенклатуре новых деталей НЕ заявляет 6B — только эквиваленты GE MS6001FA+e (т.е. 6FA), MS7001FA+e, MS9001E, Siemens V94.2/V64.3A, GT13E2; новые blades/vanes/liners делает для этих рамок. Для 6B у Sulzer только общий ремонт компонентов. Для 6FA-части таможенных записей КВАНТ Sulzer подходит, для 6B — нет",
+"source": "https://www.sulzer.com/en/shared/services/gas-turbine-parts (проверено WebFetch)",
+"cross": ""
+},
+{
+"claim": "Chromalloy (по обзорному документу о сопловых 6B) отливает сопловые всех трёх ступеней Frame 6B: 1-я ступень — кобальтовый сплав + TBC, 2-3-я — никелевый сплав. Но текущий сайт chromalloy.com/energy акцентирует LM2500/LM6000; статус 6B-линейки надо подтверждать прямым запросом",
+"source": "https://www.scribd.com/document/489731608/Frame-6001B-Nozzles (полный fetch недоступен, данные из поисковой выдачи)",
+"cross": "https://www.chromalloy.com/energy/ (LifeX PMA parts; страница усечена при fetch — 6B прямо не подтверждён)"
+},
+{
+"claim": "Allied Power Group (Хьюстон) — ремонт, не новое производство: 90+ отремонтированных buckets Frame 6, 50+ nozzles, 55+ transition pieces, 25+ shroud blocks; роторные работы; reverse engineering устаревших деталей",
+"source": "https://alliedpg.com/frames/ge-frame-6b/ (проверено WebFetch)",
+"cross": ""
+},
+{
+"claim": "Doosan Turbomachinery Services (La Porte, TX) ремонтирует компоненты GE frames 6B, 7EA, 7FA, D11; цех 100 000+ кв. футов: вакуумная термообработка, EDM, flow-тест сопел, квалифицированная сварка",
+"source": "https://www.powerindustrymarketplace.com/directory/suppliers/65bd1e8339103e095161f436/doosan-turbomachinery-services (проверено WebFetch)",
+"cross": "https://www.doosanturbo.com/services/component/ (fetch 403; поисковый сниппет подтверждает 'expertise with GE Frame 6')"
+},
+{
+"claim": "ОТРИЦАТЕЛЬНЫЙ ФАКТ: Score Energy (Peterhead) — дом аэродеривативов (Avon, RB211, Olympus, LM-серия); 'Frame' у них проходит только по топливным системам/аксессуарам GE. Как источник капдеталей 6B не годится",
+"source": "брошюра https://cdn.scoreltd.com/pdf/brochure/Score%20Energy%20brochure%20English%20Rev%201.pdf (PDF скачан и извлечён текст)",
+"cross": ""
+},
+{
+"claim": "TurbineTech GmbH (Nettetal, Германия) — изготовитель (не трейдер) деталей Eq. MS6001B: blades (buckets) + shroud segments, vanes (nozzles) + labyrinth blocks, combustion liners, transition pieces, подшипники; свои производственные компетенции (лазерная наплавка, 3D-моделирование). ЕС-юрисдикция — отдельный плюс для логистики КВАНТ",
+"source": "https://www.turbinetech.de/products/General-Electric/Eq.-MS6001B (проверено WebFetch)",
+"cross": ""
+},
+{
+"claim": "Dongturbo (DTEC, Чэнду) — qualified supplier жаровых труб/liners, топливных форсунок и вкладышей подшипников 'suitable for MS6001B' (а также MS9001E, PG6561-L, MS5000, PGT10, 251B) — комбусторные и расходники, capital HGP не заявлен",
+"source": "https://www.chinaturbo.net/gas-turbine-power-plant/gas-turbine-power-plant-components-and-parts/gas-turbine-flame-tube.html (проверено WebFetch, прямая цитата)",
+"cross": "https://www.dongturbo.com/gas-turbine-fuel-nozzle (fetch 403; поисковый сниппет: fuel nozzles для 251B и MS6001B)"
+},
+{
+"claim": "BVPL Turbine Parts (Бангалор) серийно изготавливает шрауды GE для Frames 5, 6, 7, 9 на рынки Европы, США и Ближнего Востока (материалы SS310/SS410/HR120 и др., hardface/honeycomb) и работает на глобальных aftermarket-лидеров; линейка: шрауды, shroud shoe tiles, сопловые, диафрагмы из Ni/Co сплавов до 1100C",
+"source": "https://locations.bvplturbineparts.com/products/industrial-gas-turbine-shrouds-shroud-shoe-tiles-nozzles-and-diaphragms/41 (проверено WebFetch)",
+"cross": "https://www.exportersindia.com/bvpl-turbine-parts/ (поисковый сниппет: 'GE Gas Turbine Shrouds for Frames 5, 6, 7 and 9')"
+},
+{
+"claim": "MD&A обслуживает топливные форсунки GE Frame 6 (standard, MNQC, DLN 1.0) и поставляет buckets/nozzles/shrouds с крепежом как 'competitive alternatives to the OEM' (вкл. refurbished); центры в Сан-Антонио и Хьюстоне",
+"source": "https://www.mdaturbines.com/parts/gas-turbine/fuel-nozzles/ (сайт отдаёт пустую страницу боту — подтверждено поисковыми сниппетами)",
+"cross": "https://www.mdaturbines.com/parts/gas-turbine/turbine-parts/ (второй сниппет: buckets, nozzles, shrouds + pins and seals)"
+},
+{
+"claim": "Рынок surplus по 6B живой: на Salvex продавался пакет капдеталей 6B (сопловые/лопатки/шрауды ст.1-3, до 92 лопаток в сете, 48-72 тыс. часов, часть GE Refurbished) оценкой $170 872 — листинг уже закрыт",
+"source": "https://www.salvex.com/listings/listing_detail.cfm/aucid/182986342/ (проверено WebFetch: 'no longer available')",
+"cross": "https://www.reflowx.com/power-generation/turbine/ge-frame-6b-gas-turbine-generator-plant (проверено: целый 6B-плант 39 МВт в продаже)"
+},
+{
+"claim": "Парк GE 6B — один из самых массовых в классе 40 МВт: 900+ установленных машин, 40+ млн наработанных часов; MS6001 в эксплуатации с 1978, модификация MS6001B — с 1981",
+"source": "https://etn.global/gas-turbine-products/ms6001b/",
+"cross": "https://www.turbineservices.com/products/tsl/ms6001/"
+},
+{
+"claim": "Горячая часть 6B: 10 индивидуальных камер сгорания с переходниками (transition pieces), 3-ступенчатая турбина, воздушное охлаждение рабочих и сопловых лопаток 1-2 ступеней — это и есть основной ремонтный номенклатурный контур (жаровые, переходники, сопловые, лопатки)",
+"source": "https://etn.global/gas-turbine-products/ms6001b/",
+"cross": "https://www.turbineservices.com/products/tsl/ms6001/"
+},
+{
+"claim": "Chromalloy в энергосегменте сегодня сфокусирован на аэропроизводных LM2500/LM2500+/LM6000 (LifeX parts, DER-ремонты); тяжёлые рамные машины 6B на сайте не заявлены — как кандидат по 6B НЕ подходит, вопреки исторической репутации по IGT",
+"source": "https://www.chromalloy.com/energy/ (проверено 17.08.2026, только LM-серия)",
+"cross": ""
+},
+{
+"claim": "ProEnergy (Sedalia, MO) также переориентирован на аэропроизводные (LM6000/PE6000) — по 6B горячей части не кандидат",
+"source": "https://www.proenergyservices.com/solutions/manufactured-equipment/pe6000/",
+"cross": ""
+},
+{
+"claim": "satarco.com продвигает услуги по MS6001 — признаки иранского происхождения (не верифицировано до конца); согласно правилу «Иран исключить» в список не включён до выяснения юрисдикции",
+"source": "https://satarco.com/ms6001/",
+"cross": ""
+},
+{
+"claim": "Allied Power Group изготавливает переходники 6B из сплава Nimonic (вместо Hastelloy X) с полной внутренней TBC и хром-карбидным покрытием входной кромки; 800+ переходников Frame 6 установлено — крупнейший независимый референс по этой позиции",
+"source": "https://alliedpg.com/transition-pieces/",
+"cross": "https://alliedpg.com/frames/ge-frame-6b/"
+},
+{
+"claim": "EthosEnergy изготавливает новые роторы 6B (Phoenix Rotor): кейс НПЗ в Калифорнии — возврат к 200k factored-fired hours, ~40% экономии CAPEX против нового ротора OEM, 24k часов наработки после замены",
+"source": "https://ethosenergy.com/case-studies/first-frame-6b-phoenix-rotorstm-still-going-strong",
+"cross": "https://ethosenergy.com/ge-6b-gas-turbine-solutions"
+},
+{
+"claim": "Hanwha PSM — единственный независимый с собственной малоэмиссионной камерой сгорания для 6B (LEC III: sub-5 ppm NOx на газе, 100+ инсталляций по B/E-классу); HGP-компоненты 1-3 ступеней производятся в Rheden (Нидерланды)",
+"source": "https://www.psm.com/products/b-e-class-frames/6b",
+"cross": "https://www.psm.com/services/repair"
+},
+{
+"claim": "MJB (Jebel Ali, Дубай) держит полный собственный техпроцесс ремонта горячей части GE-фреймов включая MS6001: плазменное напыление TBC, лазерная порошковая наплавка, индукционная и камерная сварка, вакуумные печи; цеха 8000 м²",
+"source": "https://mjbi.com/component-repairs-service/",
+"cross": "https://mjbi.com/refurbished-gas-turbine-packages/ (refurb-пакеты Frame 3/5/6/7/9, ротор до zero-hour)"
+},
+{
+"claim": "Sulzer La Porte (285,000 ft²) ремонтирует горячую часть IGT «всех марок и моделей»: жаровые, переходники, сопловые, лопатки; собственный HICoat (роботизированные plasma TBC и HVOF), вакуумные печи, weld/braze rebuild, CNC EDM охлаждающих отверстий. 6B поимённо на сайте не выделен — при контакте запросить референс-лист по MS6001B",
+"source": "https://www.sulzer.com/en/-/media/files/services/rotating-equipment-services/gas-turbine-services/brochures/gasturbinecomponentrepair_en_e10399_9_2016_web.pdf",
+"cross": "https://www.sulzer.com/en/shared/services/houston-service-center"
+},
+{
+"claim": "MD&A ведёт флит-саппорт GE Frame 3/5/6B/6FA/7EA/7FA/9E/9FA; ремонт КС и HGP-компонентов — Сан-Антонио, форсунки Frame 6 (standard, MNQC, DLN 1.0/2.0/2.6) — отдельное подразделение Fuel Nozzle Services, роторный ремонт 6B",
+"source": "https://www.mdaturbines.com/parts/gas-turbine/fuel-nozzles/",
+"cross": "https://www.mdaturbines.com/resources/gas-turbine-parts-solutions/"
+},
+{
+"claim": "Вторичный рынок 6B живой: 3 комплекта б/у жаровых 117E8214G001-4 (20k часов на газе) по $55k/комплект из Сингапура; 92 шт. восстановленных лопаток 1-й ст. GTD111DS (FSR-реювенация, CoNiCrAlY + внутренний алюминид) за $330k из Канады — ориентир цен для торга",
+"source": "https://www.turbinemarketplace.com/home/detail/208",
+"cross": "https://www.turbinemarketplace.com/home/detail/203"
+},
+{
+"claim": "MS6001B (Frame 6B) — одновальная ГТУ класса ~40 МВт (диапазон 35–44 МВт), 50/60 Гц, 10 камер сгорания, применяется и как мехпривод ~50 000 л.с.",
+"source": "https://www.doosanturbo.com/engines/ge-frame-6/",
+"cross": "https://www.turbineservices.com/products/tsl/ms6001/"
+},
+{
+"claim": "Turbine Services Ltd (TSL, Saratoga Springs, NY) — подразделение EthosEnergy; выпускает полную линейку новых (не-OEM) запчастей MS6001: лопатки/сопловые/бандажи 1–3 ст., жаровые (в т.ч. DLN), переходники, форсунки, компрессорные лопатки",
+"source": "https://www.turbineservices.com/products/tsl/ms6001/",
+"cross": "https://ethosenergy.com/ge-frame-6b-gas-turbine-parts (сайт EthosEnergy отдаёт 503 ботам, но страница 6B подтверждена поисковой выдачей)"
+},
+{
+"claim": "Hanwha Power (PSM/Thomassen Energy) поддерживает операторов 6B с 2004 г. из Rheden (Нидерланды): HGP-компоненты ступеней 1–3 (buckets, nozzles, shroud blocks), камера LEC III с NOx <5 ppm, роторные услуги (инспекция, rebuild, продление ресурса)",
+"source": "https://www.psm.com/products/b-e-class-frames/6b",
+"cross": "https://www.psm.com/services/rotor-services (6B прямо назван в списке рам для rotor life extension)"
+},
+{
+"claim": "Allied Power Group (Хьюстон) имеет доказанный ремонтный опыт по Frame 6: 90+ отремонтированных лопаток, 50+ сопловых, 55+ переходников, 25+ бандажных блоков; полный цикл: ротор, HGP, камера сгорания, корпуса",
+"source": "https://alliedpg.com/frames/ge-frame-6b/",
+"cross": ""
+},
+{
+"claim": "Ценовой бенчмарк: комплект HGP 6B со снятия (сопловые+лопатки+бандажи 1–3 ст., 72 000 ч, time-expired) оценивался в $170 872 wholesale value — лот Salvex 182986342 (уже закрыт)",
+"source": "https://www.salvex.com/listings/listing_detail.cfm/aucid/182986342/",
+"cross": ""
+},
+{
+"claim": "Вторичные цены б/у 6B: жаровые трубы 117E8214G001-4 (20 000 ч) — $55 000/комплект ($150 000 за 3 комплекта, Сингапур, объявление 2015 г.); комплект рабочих лопаток 2-й ст. (72 000 ч) — $4 000 (Индонезия, объявление 2014 г.) — объявления старые, использовать только как ориентир",
+"source": "https://www.turbinemarketplace.com/home/detail/208",
+"cross": "http://www.turbinemarketplace.com/home/detail/11"
+},
+{
+"claim": "На eBay живых лотов по запросу MS6001B нет (0 результатов на 17.08.2026); в категории Gas Turbines на Salvex — 0 активных лотов на ту же дату",
+"source": "https://www.ebay.com/sch/i.html?_nkw=MS6001B",
+"cross": "https://www.salvex.com/listings/index.cfm/catid/1053/"
+},
+{
+"claim": "Turbinetech GmbH (Nettetal, Германия) изготавливает (новое производство) HGP-компоненты для MS6001B: лопатки, сопловые, бандажные сегменты, лабиринтные блоки, жаровые, переходники, подшипники",
+"source": "https://www.turbinetech.de/products/General-Electric/Eq.-MS6001B",
+"cross": ""
+},
+{
+"claim": "MJB International / Masaood John Brown (Дубай, ОАЭ) — независимый сервис по рамным ГТ GE (Frame 3/5/6/7/9): полный ремонт роторов «до нулевого часа», ремонт вращающихся и статорных деталей, 2000+ человеко-лет OEM-опыта, цех 8000+ м2",
+"source": "https://mjbi.com/rotor-overhaul-services/",
+"cross": "https://www.power-technology.com/contractors/operations/al-masaood/"
+},
+{
+"claim": "Сигнал спроса на роторы 6B: на Industrial Marine Power активна заявка на покупку ротора Frame 6B (PG6541B) — новый или б/у после overhaul (Frank Guler, 11.2024) — б/у роторы ликвидны",
+"source": "https://www.industrialmarinepower.com/rotor-frame-6b-ms6001b-type-pg6541b-22586/",
+"cross": ""
+},
+{
+"claim": "Doosan Turbomachinery Services (La Porte, TX) декларирует «накопленный широкий опыт» по GE Frame 6B и полный сервис: ремонт компонентов, overhaul роторов, покрытия",
+"source": "https://www.doosanturbo.com/engines/ge-frame-6/ (открыто через curl, HTTP 200; WebFetch блокируется анти-ботом)",
+"cross": ""
+},
+{
+"claim": "Shenzhen Blaze Turbine (Китай) продаёт две б/у ГТУ GE MS6001B-PG6581B, конвертированные на природный газ; параллельно компания производит турбинные лопатки (направленная кристаллизация, монокристалл, точная штамповка)",
+"source": "https://turbineblade.net/ge-ms6001b-frame-6b-gas-turbines/",
+"cross": ""
+},
+{
+"claim": "Завод GE (Vernova) в Верешедьхазе (GE Hungary Kft) — крупнейшая производственно-ремонтная площадка GE Gas Power за пределами США: производство и ремонт компонентов газовых турбин (роботизированная сварка, прецизионная мехобработка, термопокрытия); в 2025-26 расширение на $25 млн под ремонт камер сгорания. Это подтверждает логику таможенных данных КВАНТ-2023 (92 из 114 записей ЗИП 6B/6FA — экспортёр GE Hungary Kft).",
+"source": "https://www.turbomachinerymag.com/view/ge-vernova-unveils-more-than-25-million-expansion-at-turbomachinery-manufacturing-facility-in-hungary",
+"cross": "https://genewsroom.com/press-releases/ges-veresegyh%C3%A1z-factory-improves-its-efficiency-its-own-digital-solutions (завод GE Power в Верешедьхазе — крупнейший вне США, производит ГТУ малой/средней мощности и компоненты)"
+},
+{
+"claim": "TSL (Turbine Services Ltd.) сегодня — подразделение EthosEnergy Power Plant Services LLC (Саратога-Спрингс, штат Нью-Йорк, sales@turbineservices.com); держит полную линейку новых замещающих запчастей MS6001 (Frame 6 Model B–FA): рабочие лопатки R1-3, сопловые аппараты, шрауды, камеры сгорания (в т.ч. DLN), переходники, компрессорные лопатки, подшипники и вспомогательные части.",
+"source": "https://www.turbineservices.com/products/tsl/ms6001/",
+"cross": "https://www.turbineservices.com/products/ (список GE frames 3-9, шапка 'A Division of EthosEnergy Power Plant Services, LLC')"
+},
+{
+"claim": "PSM (Hanwha Power Systems) — полноценная non-OEM альтернатива по 6B: камера сгорания LEC III (<5 ppm NOx) и LEC NextGen (<9 ppm), HGP ступени 1-3 (лопатки, сопла, шрауды) и компрессорное железо с завода в Нидерландах, роторные сервисы; 100+ инсталляций по B/E-классу, 350+ апгрейдов ГТ суммарно у Hanwha Power.",
+"source": "https://www.psm.com/products/b-e-class-frames/6b",
+"cross": "https://thomassen.energy/product-portfolio/b-e-class-frames/frame-6b/ (сестринская Thomassen Energy, Нидерланды, Hanwha — отдельная страница Frame 6B; сайт отдаёт 503 через прокси, найден поиском)"
+},
+{
+"claim": "UNEW (Стюарт, Флорида) производит re-engineered детали Frame 6B моделей 6541-6581 с 2003 г. («дольше, чем любая aftermarket-компания»), включая снятые с производства legacy-компоненты, модульные апгрейды HGP и вариант для машин без апгрейда 2084F; долгосрочные контракты с аварийным запасом.",
+"source": "https://unew.com/turbine-parts/ (info@unew.com, 3321 SE Gran Park Way, Stuart FL)",
+"cross": ""
+},
+{
+"claim": "Turbine Parts Corporation (Хьюстон, мехобработка в Мишн-Вьехо, Калифорния) — независимый изготовитель по собственным чертежам и спецификациям (OEM-номера только как кросс-референс); ISO 9001:2015; на сайте выставлена комплектная ГТУ GE Frame 6 PG6581(B) 42 100 кВт с генератором и вспомогательными системами.",
+"source": "https://www.turbineparts.com/product-page/ge-gas-turbine-frame-6-pg6581-b",
+"cross": "https://www.turbineparts.com/ (заявление о proprietary drawings, независимость от GE/Siemens/Westinghouse)"
+},
+{
+"claim": "Makik Machinery Ltd. (Измир, Турция) — живой турецкий трейдер вторичного рынка, прямо сейчас закупает номенклатуру Frame 6B по GE part numbers: 26 позиций combustion inspection (форсунки 116E1215G009, flow sleeves, crossfire tubes, liners) и 20 позиций major parts (1st stg nozzle kit F6B 112E6044G001 x18, комплекты шраудов и лопаток); работает по Турции, Ираку, Грузии, Ближнему Востоку и Африке (заявляют и Иран — учитывать комплаенс).",
+"source": "https://makikmachinery.com/wanted-misc-frame6-parts-001/ (info@makikmachinery.com, +90 532 293 62 43, Folkart Towers, İzmir)",
+"cross": "https://makikmachinery.com/about-us/ (профиль: obsolete/used/new surplus ЗИП GE, Jenbacher, Ansaldo; рынки TR/Iraq/Iran/Georgia/ME/Africa)"
+},
+{
+"claim": "Dongturbo Electric (DTEC, Чэнду, офис в Гонконге) — китайский изготовитель, серийно предлагает под MS6001B: переходники (transition pieces), жаровые трубы (flame tubes), топливные форсунки, вкладыши подшипников — «leading manufacturer and supplier in China», собственное производство.",
+"source": "https://www.chinaturbo.net/gas-turbine-power-plant/gas-turbine-power-plant-components-and-parts/gas-turbine-transition-piece.html (email dqzhanghaoyue@vip.126.com, +86-139-0807-3010)",
+"cross": "https://www.dongturbo.com/gas-turbine-flame-tube (второй домен DTEC: жаровые трубы под MS6001B/MS9001E/PG6561-L; основной домен отдаёт 403 через прокси, подтверждено поисковой выдачей)"
+},
+{
+"claim": "Sulzer (Rotating Equipment Services) производит non-OEM новые детали горячего тракта для GE-машин, в каталоге брошюры по MS6001FA+e (лопатки, сопла, шрауды, камера сгорания — прямо релевантно линии 6FA из таможенных 114 записей КВАНТ) и MS9001E; позиционирование — «дешевле и быстрее OEM».",
+"source": "https://www.sulzer.com/en/shared/services/gas-turbine-parts",
+"cross": ""
+},
+{
+"claim": "MJB / Masaood John Brown (Дубай Jebel Ali + Абу-Даби + Глазго) — независимый сервис по GE heavy-duty: ремонт камер сгорания, сопловых аппаратов и диафрагм Frame 3/5/6/7/9, восстановление роторов Frame 3/5/6; держит «substantial computerised inventory» ЗИП GE-дизайна с отгрузкой ex-stock (лопатки, шрауд-блоки, камеры сгорания, диффузоры).",
+"source": "https://mjbi.com/spare-replacement-parts/",
+"cross": "https://www.protenders.com/companies/masaood-john-brown-international-ltd-gas-turbine-services (профиль Jebel Ali Repair Facility: ремонт combustion/nozzles/diaphragms GE Frame 3-9, роторы Frame 3/5/6)"
+},
+{
+"claim": "BGGTS — совместное предприятие BHEL и GE в Индии, предлагает по Frame 6B пакет Extendor (до +13,17% мощности, −4,35% heat rate) и AGP по 9E. Это OEM-канал (JV с GE) — для обхода OEM-ограничений НЕ подходит, но маркирует индийский рынок 6B.",
+"source": "https://www.bggts.com/oem-parts",
+"cross": ""
+},
+{
+"claim": "BVPL Turbine Parts (Пиния, Бангалор, Индия) — прецизионный изготовитель: серийно производит шрауды для GE Frame 5/6/7/9 (материалы SS310/SS410/SS304/SS316/HR120), регулярные поставки в Европу, США и на Ближний Восток; с 2001 г. специализация — лопатки и точные детали для аэро- и промышленных турбин.",
+"source": "https://www.exportersindia.com/bvpl-turbine-parts/ (профиль производителя шраудов Frame 5/6/7/9)",
+"cross": "https://bvplturbineparts.com/turbine-shrouds/ (собственный сайт: precision-engineered gas turbine shrouds; деталей по frame на странице меньше — уточнять запросом)"
+},
+{
+"claim": "Allied Power Group (Хьюстон, 2 площадки) — специализированный ремонт GE Frame 6B: разборка/инспекция/ребилд ротора, ремонт лопаток и сопловых аппаратов, combustion-апгрейды; трек-рекорд: 90+ отремонтированных F6 лопаток, 50+ сопловых, 55+ переходников, 25+ шрауд-блоков.",
+"source": "https://alliedpg.com/frames/ge-frame-6b/ (sales@alliedpg.com, 281-444-3535)",
+"cross": ""
+},
+{
+"claim": "Genersol (Уругвай) — латиноамериканский трейдер/сервис, в явном списке поддерживаемых машин «GE - Frame 3, 5, 6B, 6FA, 7E, 7FA, 9E, 9F» плюс LM-серия; горячие части, бороскопия, ремонт СУ; дружественная юрисдикция.",
+"source": "https://www.genersol.com/en/products-and-services/Gas-turbine-p389601644 (genersol@genersol.com)",
+"cross": ""
+},
+{
+"claim": "Henan GTET (Henan Gas Turbine Energy Technology Co., Ltd, henangtet.com) — китайский поставщик non-OEM ЗИП и покрытий для промышленных ГТ через альянсы с производителями Европы/Америки/Азии/БВ; сайт блокирует наш прокси (503), профиль подтверждён поисковой выдачей по henangtet.com/about-us; по контексту КВАНТ уже возил GE hot gas path в РФ — приоритетный кандидат на прямой канал.",
+"source": "https://henangtet.com/about-us/ (fetch 503; контент верифицирован через поисковый сниппет, тел. +86 136 6385 6033)",
+"cross": ""
+},
+{
+"claim": "Global Turbine Solutions LLC из пайплайна КВАНТ: действующего сайта в выдаче нет (домен мёртв) — в поиске по 6B-нишам компания не всплывает ни разу; считать канал потерянным, замещать Makik/MJB/WWGTP.",
+"source": "поисковая выдача WebSearch по нишевым запросам Frame 6B (12+ запросов, ни одного упоминания)",
+"cross": ""
+},
+{
+"claim": "MS6001B (Frame 6B / PG6581B) — одновальная тяжёлая ГТУ ~40-42 МВт, выпускается с 1978 г.; в эксплуатации свыше 900-1200 машин, суммарная наработка 40+ млн ч. Применения: генерация и механический привод (компрессорные тренды).",
+"source": "https://etn.global/gas-turbine-products/ms6001b/",
+"cross": "https://pdf.directindustry.com/pdf/ge-vernova/frame-6-gas-turbine/34155-387869.html"
+},
+{
+"claim": "Пакетировщики 6B различаются по регионам: GE (США), John Brown Engineering (Шотландия), Thomassen (Нидерланды, Rheden), Nuovo Pignone (Италия), EGT / GE Power Systems Europe (Belfort, Франция). У Thomassen-машин собственные обозначения и конфигурация обвязки — важно при подборе ЗИП.",
+"source": "https://www.industrialmarinepower.com/selling-ms6001b-gas-turbine-generating-set/",
+"cross": "https://inventory.freeoilfieldquote.com/product/thomassen-frame-ms-6001b-35mw-gas-turbine-generator-set"
+},
+{
+"claim": "Thomassen (Rheden, NL) — исторический европейский пакетировщик 6B; с 2004 самостоятельно делает роторы, компрессорное железо и HGP (лопатки, сопла, шрауды) для Frame 6B. Прошёл путь Thomassen → Ansaldo Thomassen → ныне Hanwha Power (объединён с PSM).",
+"source": "https://www.power-technology.com/contractors/operations/ansaldo-thomassen/",
+"cross": "https://www.psm.com/products/b-e-class-frames/6b"
+},
+{
+"claim": "Nuovo Pignone (Италия) — лицензионный производитель GE Frame по лицензии GE USA; GE Power Systems получила контроль над Nuovo Pignone в 1994 г. Именно Nuovo Pignone пакетировал многие агрегаты Frame для КС/объектов СНГ и Газпрома; ныне подразделение Baker Hughes. Значим как источник альтернативной номенклатуры ЗИП по машинам итальянской сборки.",
+"source": "https://www.ogj.com/home/article/17242478/new-versions-of-gas-turbine-being-shipped",
+"cross": "https://rtppower.com/portfolio/ge-nuovo-pignone/"
+},
+{
+"claim": "Karachaganak power station (KPO, Западный Казахстан, нефтегаз) — 168 МВт, четыре ГТУ мощностью <50 МВт каждая (~42 МВт = класс Frame 6B), действующая станция на нефтегазовом промысле. Подтверждённая площадка парка 6B в СНГ.",
+"source": "https://www.gem.wiki/Karachaganak_power_station",
+"cross": "https://www.gevernova.com/news/press-releases/ges-gas-turbines-will-power-the-first-combined-heat-and-power-plant-in-kazakhstan"
+},
+{
+"claim": "ВНИМАНИЕ по гипотезе парка: ГТ-ТЭЦ ЛУКОЙЛ-Пермнефтеоргсинтез (пущена 2015) — 200 МВт, восемь ГТУ по 25 МВт, а это НЕ Frame 6B (6B ~40 МВт). Гипотезу «6B на ЛУКОЙЛ ПНОС» источники не подтверждают — там турбины другого класса.",
+"source": "https://ru.wikipedia.org/wiki/Лукойл-Пермнефтеоргсинтез",
+"cross": ""
+},
+{
+"claim": "Контекст сделки КВАНТ: «опрос рынка ЗИП MS6001B» Роснефть (РН50104115) — процедуры Роснефти идут через реестр закупок zakupki.rosneft.ru и ЭТП ТЭК-Торг (формат «открытый опрос рынка» / (Т)КП).",
+"source": "http://zakupki.rosneft.ru/zakupki",
+"cross": "https://www.tektorg.ru/rosnefttkp/procedures"
+},
+{
+"claim": "Chromalloy — независимый производитель FAA-PMA деталей; отливает сопла (nozzles) всех трёх ступеней Frame 6B инвестиционным литьём: 1-я ступень — кобальтовый сплав + TBC, 2-я и 3-я — усовершенствованный никелевый сплав. Позиционируется как единственная независимая PMA-альтернатива OEM в горячем тракте.",
+"source": "https://www.chromalloy.com/energy/",
+"cross": "https://www.scribd.com/document/489731608/Frame-6001B-Nozzles"
+},
+{
+"claim": "Hanwha Power (ex-PSM, Jupiter FL + ex-Thomassen, Rheden NL) — полный независимый (non-OEM) афтемаркет для 6B: камера сгорания LEC III (sub-5 ppm NOx, 100+ инсталляций), ковши/сопла/шрауды 1-3 ст., компрессорное железо, ремонт и ремануфактуринг роторов, шеф-монтаж.",
+"source": "https://www.psm.com/products/b-e-class-frames/6b",
+"cross": ""
+},
+{
+"claim": "На рынке доступны б/у агрегаты MS6001B (в т.ч. пакетировки Thomassen 35 МВт) и складские детали 6B с конкретными GE-номерами у независимых стокистов — ориентир по номенклатуре при отсутствии чертежей.",
+"source": "https://energiaparts.com/index.php/stocked-ms5001-pa-spare-parts/",
+"cross": "https://inventory.freeoilfieldquote.com/product/thomassen-frame-ms-6001b-35mw-gas-turbine-generator-set"
+},
+{
+"claim": "Thomassen (Нидерланды) был многолетним manufacturing associate GE и в период кооперации сам производил газовые турбины Frame 5 и Frame 6, которые Thomassen Energy обслуживает до сих пор — т.е. в Rheden есть собственное производственно-документационное наследие по Frame 6.",
+"source": "https://thomassen.energy/about/ («During its cooperation with GE, the company produced Frame 5 and 6 gas turbines that Thomassen Energy still services today»)",
+"cross": "https://www.power-technology.com/contractors/operations/ansaldo-thomassen/ (проверено WebFetch: «a history of a long-standing and successful manufacturing associate agreement with General Electric», портфель услуг Frame 9E, 6B, 5, 3, 9F, ~50 лет опыт"
+},
+{
+"claim": "Цепочка правопреемства Thomassen: Thomassen International → Thomassen Turbine Systems → Ansaldo Thomassen (в составе Ansaldo Energia) → 22.03.2021 куплена Hanwha и переименована в Thomassen Energy BV; сегодня работает под брендом Hanwha Power вместе с сестринской PSM (США).",
+"source": "https://www.cbinsights.com/company/ansaldo-thomassen (Ansaldo Thomassen acquired by Hanwha 22.03.2021)",
+"cross": "https://www.psm.com/about (Hanwha приобрела PSM и Thomassen Energy в 2021, ребрендинг в Hanwha Power)"
+},
+{
+"claim": "Гольфское плечо Thomassen — Ansaldo Thomassen Gulf (Абу-Даби) — сейчас называется Hanwha Power (ранее PSM Thomassen Gulf): региональный хаб MENA с собственным ремонтным цехом в Абу-Даби, обслуживает в т.ч. Frame 6B.",
+"source": "https://www.psm.com/ptg (проверено WebFetch: Абу-Даби, on-site repair shop, фреймы 6B/7EA/9E/9FA и др., основана 1999)",
+"cross": "https://www.power-technology.com/contractors/operations/ansaldo-thomassen/ (упоминает Ansaldo Thomassen Gulf, Abu Dhabi как региональный офис)"
+},
+{
+"claim": "John Brown Engineering (Клайдбанк, Шотландия) производил тяжёлые ГТ по лицензии GE с 1967 г.; после покупки JBE концерном Kvaerner компания GE в 2000 г. приобрела Kvaerner Energy (без доли в СП Masaood John Brown). Юрлицо John Brown Engineering Gas Turbines Ltd (SC216773) ликвидировано 03.10.2015 — как производитель JBE не существует.",
+"source": "https://turbineserviceslimited.com/history.htm (проверено WebFetch: лицензия GE с 1967, СП Masaood John Brown 1979, GE купила Kvaerner Energy в 2000)",
+"cross": "https://find-and-update.company-information.service.gov.uk/company/SC216773 (проверено WebFetch: Dissolved 3 October 2015) и https://mjbi.com/history/ (проверено WebFetch: GE-сделка 2000 не включала долю в MJB)"
+},
+{
+"claim": "Сервисное наследие John Brown живёт в двух независимых компаниях: (1) MJB International / Masaood John Brown (ОАЭ, Jebel Ali) — персонал экс-JBE, >2000 человеко-лет OEM-опыта по GE-фреймам; (2) Turbine Services Ltd (Глазго) — экс-сотрудники JBE, была дочкой Chromalloy, сейчас подразделение EthosEnergy Power Plant Services.",
+"source": "https://mjbi.com/history/ (проверено WebFetch: «senior personnel and engineers retained from the previous shareholder, formerly John Brown Engineering»)",
+"cross": "https://www.turbineservices.com/products/tsl/ms6001/ (проверено WebFetch: футер «TSL - A Division of EthosEnergy Power Plant Services, LLC») + https://turbineserviceslimited.com/history.htm («wholly owned subsidiary of Chromalloy» в прежний период)"
+},
+{
+"claim": "BHEL (Индия, з-д Хайдарабад) производит ГТ конструкции GE по лицензии с 1986 г., поставлено ~200 машин, в номенклатуре есть Frame 6B — это действующий не-GE производитель НОВЫХ 6B с производственными правами.",
+"source": "https://hpep.bhel.com/product.jsp?prod=gt&sub=TYPE&subtype=FRAME_6B&LAN=EN (официальная продуктовая страница BHEL Frame 6B; при проверке WebFetch сайт отдал 503 — гео/бот-фильтр, перепроверить вручную)",
+"cross": "https://www.bhel.com/bhel-extends-cooperation-general-electric-gas-turbines (пресс-релиз: производство по лицензии GE с 1986, ~200 units) и https://bggts.com/ («BGGTS caters to Frame 3, 5, 6B, 6FA & 9E Gas Turbines based on GE design»)"
+}
+],
+"companies": [
+{
+"name": "Turbinetech GmbH",
+"country": "Германия (Nettetal)",
+"site": "https://www.turbinetech.de",
+"email": "info@turbinetech.de",
+"what": "НОВАЯ НАХОДКА: изготовитель Eq. MS6001B — buckets + shroud segments, nozzles + labyrinth blocks, liners, TPs, подшипники; лазерная наплавка, 3D-моделирование. ЕС-юрисдикция, малый изготовитель — потенциально сговорчив",
+"relation": "новая (не в базе); независимый изготовитель, ЕС",
+"evidence": "https://www.turbinetech.de/products/General-Electric/Eq.-MS6001B",
+"ask": "nomen",
+"rank": 1,
+"tier": "indep_proven_maker",
+"comp": "лопатки и сопловые (buckets/nozzles)",
+"comps": [
+"лопатки и сопловые (buckets/nozzles)"
+],
+"check": "confirmed",
+"check_seen": "Живая страница (HTTP 200): категория «Eq. MS6001B»; текст: «Frame 6 (MS6001) is 35 to 44 MW gas turbine capable of serving both 50 and 60 Hz market», «MS6001 is a fuel-flexible, heavy-duty single-shaft gas turbine»; в но"
+},
+{
+"name": "PSM / Hanwha Power (Jupiter FL + Rheden NL)",
+"country": "США + Нидерланды",
+"site": "https://www.psm.com",
+"email": "через thomassen.energy/contact (HGP) ; тел. +1 561 354 1100 (Jupiter)",
+"what": "6B-страница: камера сгорания LEC III (sub-5 ppm NOx, 100+ инсталляций), HGP 1-3 ст. (лопатки, сопловые, полки), компрессорные апгрейды, роторные сервисы. Свои техпроцессы: 5-осевой CNC, лазерная наплавка DMD, thermal spray, вакуумные печи, EDM, пайка (Jupiter FL, 105,000 ft², AS9100)",
+"relation": "уже в базе — подтверждена, углублена (двухплощадочная структура Jupiter/Rheden)",
+"evidence": "https://www.psm.com/products/b-e-class-frames/6b",
+"ask": "nomen",
+"rank": 1,
+"tier": "indep_proven_maker",
+"comp": "лопатки и сопловые (buckets/nozzles)",
+"comps": [
+"лопатки и сопловые (buckets/nozzles)",
+"покрытия и ремонт компонентов",
+"роторы и капремонт"
+],
+"check": "confirmed",
+"check_seen": "6B-страница: «LEC III ultra-low-emission combustion system», «LEC NextGen», «Stage 1-3 buckets, nozzles, and shroud blocks», compressor upgrades, rotor services. Evidence2 (psm.com/ptg): «Based in Abu Dhabi, our facility"
+},
+{
+"name": "Thomassen Energy (Hanwha Power Netherlands)",
+"country": "Нидерланды (Rheden)",
+"site": "https://thomassen.energy",
+"email": "",
+"what": "Экс-производитель Frame 5/6 по соглашению с GE — собственная документация и ~50 лет наследия; по 6B: горячий тракт (бакеты/сопла/шрауды ст.1-3), камеры сгорания (через LEC III/FlameSheet линейку Hanwha), инспекции/ремонт/ремануфактуринг роторов в Rheden, полевой сервис",
+"relation": "новая как отдельное юрлицо (в базе была через PSM/TSL); экс-лицензиат",
+"evidence": "https://thomassen.energy/product-portfolio/b-e-class-frames/frame-6b/ (сайт отдаёт 503 ботам — контент подтверждён через поисковые сниппеты и psm.com)",
+"ask": "nomen",
+"rank": 1,
+"tier": "indep_proven_maker",
+"comp": "роторы и капремонт",
+"comps": [
+"роторы и капремонт",
+"камера: жаровые, переходники, форсунки",
+"лопатки и сопловые (buckets/nozzles)",
+"покрытия и ремонт компонентов"
+],
+"check": "confirmed",
+"check_seen": "Evidence-страница psm.com живая: 6B «Stage 1-3 buckets, nozzles, and shroud blocks», rotor services, и прямое указание, что «Rheden, Netherlands facility handles hot gas path components, rotor services, and field support"
+},
+{
+"name": "TSL — Turbine Services Ltd (division of EthosEnergy)",
+"country": "США (Saratoga Springs, NY)",
+"site": "https://www.turbineservices.com",
+"email": "sales@turbineservices.com",
+"what": "Полная независимая экосистема 6B: новые OEM-эквивалентные капчасти (TSL — полная линейка по MS6001), ремонт HGP, Phoenix Rotor (200k FFH/5k FFS), продление ресурса ротора, специализированные 6B-цеха Torino/Houston/Oberhausen; TSL несёт наследие John Brown Engineering",
+"relation": "уже в базе — подтверждена (uprated parts = ответ на разницу рейтингов 6541–6581)",
+"evidence": "https://www.turbineservices.com/products/tsl/ms6001/",
+"ask": "pn",
+"rank": 1,
+"tier": "indep_proven_maker",
+"comp": "лопатки и сопловые (buckets/nozzles)",
+"comps": [
+"лопатки и сопловые (buckets/nozzles)",
+"роторы и капремонт"
+],
+"check": "confirmed",
+"check_seen": "TSL-страница: полная линейка MS6001 (buckets/nozzles/shrouds Row 1-3, combustion liner в т.ч. DLN, transition piece, fuel nozzles, rotor blades, IGV), подпись «A Division of EthosEnergy». Evidence2 (ethosenergy.com/ge-6b"
+},
+{
+"name": "Allied Power Group (APG)",
+"country": "США (Houston, TX)",
+"site": "https://alliedpg.com",
+"email": "sales@alliedpg.com",
+"what": "Компонентный ремонт 6B: 90+ лопаток, 50+ сопловых, 55+ переходников, 25+ shroud blocks отремонтировано; собственное ИЗГОТОВЛЕНИЕ переходников 6B (Nimonic + TBC + хром-карбид, 800+ установлено); свои TBC/антикоррозионные покрытия, сварка/мехобработка",
+"relation": "новая; независимый ремонтный цех",
+"evidence": "https://alliedpg.com/frames/ge-frame-6b/",
+"ask": "nomen",
+"rank": 2,
+"tier": "indep_proven_maker",
+"comp": "лопатки и сопловые (buckets/nozzles)",
+"comps": [
+"лопатки и сопловые (buckets/nozzles)"
+],
+"check": "confirmed",
+"check_seen": "Живая страница GE Frame 6B со счётчиками: «90+ GE Frame 6 Buckets Repaired», «50+ GE Frame 6 Nozzles Repaired», «55+ GE Frame 6 Transition Pieces Repaired», «25+ GE Frame 6 Shroud Blocks Repaired»; «full-scope, engineere"
+},
+{
+"name": "Chromalloy",
+"country": "США (Tampa, FL — литейный центр)",
+"site": "https://www.chromalloy.com",
+"email": "",
+"what": "Изготовитель сопловых аппаратов Frame 6B всех 3 ступеней (собственное литьё: кобальт+TBC ст.1, Ni-сплав ст.2/3, улучшенное охлаждение); собственный литейный центр IGT (equiaxed/DS/SC) — классический «изготовитель конкретного компонента» без чертежей заказчика",
+"relation": "независимый изготовитель компонентов",
+"evidence": "https://www.chromalloy.com/energy/",
+"ask": "pn",
+"rank": 2,
+"tier": "indep_proven_maker",
+"comp": "лопатки и сопловые (buckets/nozzles)",
+"comps": [
+"лопатки и сопловые (buckets/nozzles)"
+],
+"check": "doubt",
+"check_seen": "Сайт жив, страница /energy/ открывается, но в её тексте НЕТ ни Frame 6B, ни MS6001, ни Frame 6 вообще. Явно названы только аэродеривативы: «Chromalloy supports the full range of LM2500, LM2500+/+G4, and LM6000 gas turbin"
+},
+{
+"name": "UNEW",
+"country": "США (Stuart, FL)",
+"site": "https://unew.com",
+"email": "info@unew.com",
+"what": "Re-engineered детали 6B (6541-6581) с 2003 — дольше всех в aftermarket; HGP-апгрейды; закрывает legacy-детали для машин без апгрейда 2084F (важно для старых 6541-6561 в РФ). Capital parts по своим чертежам",
+"relation": "независимый изготовитель; из базы КВАНТ",
+"evidence": "https://unew.com/6b/ (проверено)",
+"ask": "nomen",
+"rank": 3,
+"tier": "indep_proven_maker",
+"comp": "прочее",
+"comps": [
+"прочее"
+]
+},
+{
+"name": "Turbine Parts Corporation (TPc)",
+"country": "США (Хьюстон)",
+"site": "https://www.turbineparts.com",
+"email": "sales@turbineparts.com",
+"what": "Capital parts (nozzles, buckets, rotors, TPs, shrouds) и расходники для PG6581(B) по СОБСТВЕННЫМ чертежам («proprietary drawings and specifications» — чертежи заказчика не нужны); плюс сорсинг с контрактной кооперацией и склад new/used/refurb (Houston TX + Mission Viejo CA)",
+"relation": "независимый изготовитель; из базы КВАНТ",
+"evidence": "https://www.turbineparts.com/ (проверено, цитата о proprietary drawings)",
+"ask": "nomen",
+"rank": 4,
+"tier": "indep_proven_maker",
+"comp": "лопатки и сопловые (buckets/nozzles)",
+"comps": [
+"лопатки и сопловые (buckets/nozzles)",
+"прочее"
+]
+},
+{
+"name": "Shenzhen Blaze Turbine Co., Ltd",
+"country": "Китай (Shenzhen)",
+"site": "https://turbineblade.net",
+"email": "peter@turbineblade.net",
+"what": "Китайский изготовитель лопаток/дисков/сегментов (направленная кристаллизация, монокристалл, ковка); заявляет опыт по 6B 2005–2008 (переходники, жаровые, сопла 1 ст., рабочие лопатки) — но 6B-номенклатура собственного производства на сайте не показана, проверять образцом. Также продаёт 2 б/у агрегата MS6001B-PG6581B",
+"relation": "заявленный изготовитель, опыт на 6B не доказан документально; качество проверять образцом",
+"evidence": "https://turbineblade.net/ge-ms6001b-frame-6b-gas-turbines/",
+"ask": "sample",
+"rank": 8,
+"tier": "maker",
+"comp": "камера: жаровые, переходники, форсунки",
+"comps": [
+"камера: жаровые, переходники, форсунки",
+"прочее"
+]
+},
+{
+"name": "Dongturbo Electric (DTEC)",
+"country": "Китай (Чэнду) + офис в Гонконге",
+"site": "https://www.chinaturbo.net",
+"email": "dqzhanghaoyue@vip.126.com",
+"what": "Собственное производство под MS6001B: переходники, жаровые трубы, топливные форсунки, вкладыши подшипников (также MS9001E, PG6561, MS5000, PGT10, 251B); делают по образцам заказчика — совпадает с прежней заявкой в базе КВАНТ",
+"relation": "независимый изготовитель (комбустор/расходники); из базы КВАНТ",
+"evidence": "https://www.chinaturbo.net/gas-turbine-power-plant/gas-turbine-power-plant-components-and-parts/gas-turbine-flame-tube.html (проверено, цитата про MS6001B)",
+"ask": "sample",
+"rank": 6,
+"tier": "indep_proven_maker",
+"comp": "камера: жаровые, переходники, форсунки",
+"comps": [
+"камера: жаровые, переходники, форсунки"
+]
+},
+{
+"name": "Sulzer (Turbo Services)",
+"country": "Швейцария (глобально)",
+"site": "https://www.sulzer.com",
+"email": "",
+"what": "Горячая часть IGT «всех марок и моделей»: жаровые, переходники, сопловые, лопатки; HICoat — роботизированные plasma TBC (Class B/C, abradable), HVOF, алюминид, вакуумная диффузия; weld/braze rebuild, вакуумные печи, CNC EDM охлаждающих отверстий, металлургическая лаборатория. 6B поимённо не выделен — запросить референс-лист MS6001B",
+"relation": "новая; по 6B прямых страниц нет — сила в 6FA-эквивалентах и роторах, ранг понижен",
+"evidence": "https://www.sulzer.com/russia/-/media/files/services/spare-parts/brochures/new_parts_manufacturing_equivalent_to_ge_ms6001fa.pdf",
+"ask": "nomen",
+"rank": 7,
+"tier": "indep_proven_maker",
+"comp": "роторы и капремонт",
+"comps": [
+"роторы и капремонт",
+"лопатки и сопловые (buckets/nozzles)"
+]
+},
+{
+"name": "Young & Franklin",
+"country": "США (Liverpool, NY)",
+"site": "https://yf.com",
+"email": "",
+"what": "Изготовитель клапанов и приводов Frame 6B (поставщик этой номенклатуры в OEM-канал): SRV/GCV 9500, gas splitter 8550, liquid fuel stop 3937, IGV-актуаторы 7645/8277 и электрические EMA-аналоги — закрывает угол «топливная арматура/IGV» без чертежей",
+"relation": "новая; изготовитель компонентов (не HGP)",
+"evidence": "https://yf.com/application/frame-6b/",
+"ask": "pn",
+"rank": 9,
+"tier": "indep_proven_maker",
+"comp": "САУ и электрика",
+"comps": [
+"САУ и электрика"
+]
+},
+{
+"name": "BVPL Turbine Parts",
+"country": "Индия (Бангалор)",
+"site": "https://bvplturbineparts.com",
+"email": "thanmai@bvplturbineparts.com",
+"what": "Изготовитель шраудов, shroud shoe tiles, сопловых и диафрагм для GE Frames 5/6/7/9 (Ni/Co сплавы, honeycomb, hardface) — субпоставщик глобальных aftermarket-лидеров. Дружественная юрисдикция; работают по образцам/ТЗ",
+"relation": "независимый изготовитель-субподрядчик; из базы КВАНТ (шрауды Frame 6)",
+"evidence": "https://locations.bvplturbineparts.com/products/industrial-gas-turbine-shrouds-shroud-shoe-tiles-nozzles-and-diaphragms/41 (проверено)",
+"ask": "sample",
+"rank": 10,
+"tier": "indep_proven_maker",
+"comp": "лопатки и сопловые (buckets/nozzles)",
+"comps": [
+"лопатки и сопловые (buckets/nozzles)"
+]
+},
+{
+"name": "Hangzhou Gas Turbine Parts (HGTP / Dawopu)",
+"country": "Китай (Ханчжоу)",
+"site": "http://gas-turbine-parts.com",
+"email": "",
+"what": "Китайский профильный сайт по ЗИП GE Frame 6/6B: жаровые (ремонт/восстановление/изготовление «альтернатива OEM»), HGP-части, форсунки, BOM-страницы MS6001B. Глубина (изготовитель vs трейдер) не раскрыта, сайт отдаёт 503 ботам — проверять запросом и аудитом происхождения отливок",
+"relation": "заявленный изготовитель/ремонтник (КНР), факт собственного производства не доказан",
+"evidence": "http://gas-turbine-parts.com/?m=home&c=View&a=index&aid=549",
+"ask": "nomen",
+"rank": 13,
+"tier": "maker",
+"comp": "камера: жаровые, переходники, форсунки",
+"comps": [
+"камера: жаровые, переходники, форсунки",
+"лопатки и сопловые (buckets/nozzles)"
+],
+"evidence2": "https://gas-turbine-parts.com/?a=index&aid=551&c=View&m=home (сайт отдаёт 503 через прокси; страницы 6B подтверждены поисковой выдачей)"
+},
+{
+"name": "Trinity Turbine Technology",
+"country": "США (Rosharon/Humble, TX)",
+"site": "https://www.trinityturbineservice.com",
+"email": "Sales@TrinityTurbine.com",
+"what": "Ремонт и покрытия компонентов GE F3, 5, 6B, 7B/E/EA, 7FA — полный цикл in-house (сварка, термообработка, машобработка, thermal spray). Ремонт, не производство",
+"relation": "независимый ремонтный цех",
+"evidence": "https://www.trinityturbineservice.com/capabilities/ (проверено: 6B в списке)",
+"ask": "nomen",
+"rank": 14,
+"tier": "indep_proven_maker",
+"comp": "покрытия и ремонт компонентов",
+"comps": [
+"покрытия и ремонт компонентов"
+]
+},
+{
+"name": "MJB International / Masaood John Brown",
+"country": "ОАЭ (Dubai, JAFZA)",
+"site": "https://mjbi.com",
+"email": "",
+"what": "Ремонт стационарных и вращающихся компонентов GE-фреймов MS3002/5001/5002/6001/7001/9001 + FA/DLN; свои техпроцессы: плазменный TBC, лазерная порошковая наплавка, камерная сварка суперсплавов, вакуумные печи, термообработка; refurb-пакеты Frame 6 «до zero-hour»; команда экс-John Brown Engineering (лицензиат GE). Цеха 8000 м², Jebel Ali",
+"relation": "новая; независимый (наследие John Brown Engineering), удобная юрисдикция ОАЭ",
+"evidence": "https://mjbi.com/spare-replacement-parts/",
+"ask": "pn",
+"rank": 3,
+"tier": "indep_proven",
+"comp": "камера: жаровые, переходники, форсунки",
+"comps": [
+"камера: жаровые, переходники, форсунки",
+"лопатки и сопловые (buckets/nozzles)"
+]
+},
+{
+"name": "Doosan Turbomachinery Services",
+"country": "США (Houston, TX)",
+"site": "https://www.doosanturbomachineryservices.com",
+"email": "",
+"what": "Отдельная страница GE Frame 6: «накоплен широкий опыт по этим машинам, закрываем все потребности 6B»; компонентный ремонт HGP, роторные overhauls, thermal/air spray coating; цех 100,000+ ft² (La Porte). Сайт закрыт от ботов — проверено через curl",
+"relation": "новая; независимый ремонтник (Doosan Group)",
+"evidence": "https://www.doosanturbomachineryservices.com/engines/ge-frame-6/ (сайт блокирует ботов 503/403 — контент подтверждён поисковыми сниппетами)",
+"ask": "nomen",
+"rank": 5,
+"tier": "indep_proven",
+"comp": "роторы и капремонт",
+"comps": [
+"роторы и капремонт"
+]
+},
+{
+"name": "MD&A (Mechanical Dynamics & Analysis)",
+"country": "США",
+"site": "https://www.mdaturbines.com",
+"email": "",
+"what": "Frame 6 fuel nozzles (standard, MNQC, DLN 1.0) — сервис и поставка; buckets/nozzles/shrouds + крепёж как альтернатива OEM (в т.ч. refurbished). Скорее parts+repair дом, чем литейщик",
+"relation": "независимый поставщик+ремонт (сайт блокирует ботов — подтверждено сниппетами, перепроверить вручную)",
+"evidence": "https://www.mdaturbines.com/parts/gas-turbine/fuel-nozzles/",
+"ask": "pn",
+"rank": 5,
+"tier": "indep_proven",
+"comp": "лопатки и сопловые (buckets/nozzles)",
+"comps": [
+"лопатки и сопловые (buckets/nozzles)"
+]
+},
+{
+"name": "Liburdi Turbine Services",
+"country": "Канада (Dundas, ON)",
+"site": "https://www.liburdi.com",
+"email": "",
+"what": "GE Frame 6 в списке поддерживаемых IGT (hot section + combustion); фирменные техпроцессы: LPM (порошковая металлургия для восстановления суперсплавов, вкл. DS), DED-наплавка, защитные покрытия, Full Solution Rejuvenation. 6B-кейсов на сайте нет — запросить референсы",
+"relation": "независимый ремонт/инжиниринг",
+"evidence": "https://www.liburdi.com/",
+"ask": "nomen",
+"rank": 9,
+"tier": "indep_proven",
+"comp": "камера: жаровые, переходники, форсунки",
+"comps": [
+"камера: жаровые, переходники, форсунки"
+]
+},
+{
+"name": "BGGTS (BHEL-GE Gas Turbine Services JV)",
+"country": "Индия (Hyderabad)",
+"site": "https://www.bggts.com",
+"email": "",
+"what": "Единственный действующий не-GE завод, СТРОЯЩИЙ новые Frame 6B по лицензии (с 1986, ~200 GE-design машин): комплектные ГТ, ротора, капчасти собственного производства",
+"relation": "новая; ОСТОРОЖНО: СП с GE — канал для РФ высокорисковый, использовать только как источник информации/связку на BHEL",
+"evidence": "https://www.bggts.com/about-bggts",
+"ask": "nomen",
+"rank": 2,
+"tier": "licensee",
+"comp": "покрытия и ремонт компонентов",
+"comps": [
+"покрытия и ремонт компонентов",
+"роторы и капремонт"
+]
+},
+{
+"name": "Henan GTET (Henan Gas Turbine Energy Technology)",
+"country": "Китай (Хэнань)",
+"site": "https://henangtet.com",
+"email": "",
+"what": "Non-OEM ЗИП и сервис для промышленных ГТ через альянсы с производителями Европы/Америки/Азии/БВ; специализация — покрытия горячего тракта; по данным КВАНТ уже возил GE hot gas path в РФ — кандидат №1 на прямой РФ-канал",
+"relation": "трейдер/интегратор с собственными покрытиями (ТРЕЙДЕР, помечен)",
+"evidence": "https://henangtet.com/about-us/ (сайт отдаёт 503 через наш прокси; профиль верифицирован поисковыми сниппетами, тел. +86 136 6385 6033)",
+"ask": "nomen",
+"rank": 5,
+"tier": "trader",
+"comp": "покрытия и ремонт компонентов",
+"comps": [
+"покрытия и ремонт компонентов"
+]
+},
+{
+"name": "Energia Parts S.r.l.",
+"country": "Италия (Генуя)",
+"site": "https://energiaparts.com/index.php/stocked-ms5001-pa-spare-parts/",
+"email": "",
+"what": "Складские детали Frame 6 (MS6001) с реальными GE P/N: сопла 3 ст. 112E6642G007, ковши 2 ст. 101T1327G001, шрауды 1 ст. 329A3228G04, сопла 1 ст. 109E3327G09/948E731G01, жаровые трубы 899E116G24-27; MRO, лазерная центровка",
+"relation": "Стокист + MRO-услуги (approved), частично трейдер — держит склад с P/N",
+"evidence": "https://energiaparts.com/index.php/stocked-ms5001-pa-spare-parts/",
+"ask": "pn",
+"rank": 5,
+"tier": "trader",
+"comp": "лопатки и сопловые (buckets/nozzles)",
+"comps": [
+"лопатки и сопловые (buckets/nozzles)"
+]
+},
+{
+"name": "World Wide Gas Turbine Products (WWGTP)",
+"country": "США (Clifton Park, NY)",
+"site": "https://www.wwgtp.com",
+"email": "",
+"what": "Стокист/сорсер ЗИП GE и Westinghouse с 2003 г.; по Frame 6B на складе hardware, bullhorns, nozzle components, crossfire tubes, форсунки, подшипники — «тысячи common spare parts on hand»; гарантия 1 год на материал/изготовление",
+"relation": "новая; стокист/трейдер — помечен как трейдер",
+"evidence": "https://www.wwgtp.com/blog/frame-6b-parts/ (сайт отдаёт 503 ботам — подтверждено сниппетами)",
+"ask": "pn",
+"rank": 7,
+"tier": "trader",
+"comp": "прочее",
+"comps": [
+"прочее",
+"лопатки и сопловые (buckets/nozzles)"
+]
+},
+{
+"name": "Caledonian Turbine Services (CTS)",
+"country": "Великобритания (Глазго)",
+"site": "https://caledonianturbineservices.com",
+"email": "info@cts-int.com",
+"what": "Большой склад новых и восстановленных деталей Frame 5/Frame 6, капитальный ЗИП, платы Speedtronic Mark I-VIe, б/у детали с ремонтом/инспекцией специалистами",
+"relation": "ТРЕЙДЕР/стокист, не изготовитель",
+"evidence": "https://caledonianturbineservices.com/products/ (проверено)",
+"ask": "pn",
+"rank": 7,
+"tier": "trader",
+"comp": "покрытия и ремонт компонентов",
+"comps": [
+"покрытия и ремонт компонентов"
+]
+},
+{
+"name": "Gas Turbine Spares (gasturbinespares.com)",
+"country": "Великобритания (юрисдикцию уточнить при запросе)",
+"site": "https://gasturbinespares.com/frame-6-series/",
+"email": "",
+"what": "Трейдер/брокер б/у и as-removed ЗИП Frame 6/6B: HGP (buckets, nozzles, shrouds, support rings), топливные форсунки, камера (liners, TP, flow sleeves), детекторы пламени",
+"relation": "ТРЕЙДЕР/брокер (surplus)",
+"evidence": "https://gasturbinespares.com/frame-6-series/",
+"ask": "pn",
+"rank": 9,
+"tier": "trader",
+"comp": "лопатки и сопловые (buckets/nozzles)",
+"comps": [
+"лопатки и сопловые (buckets/nozzles)"
+]
+},
+{
+"name": "Makik Machinery (Makik Makine)",
+"country": "Турция (Измир)",
+"site": "https://makikmachinery.com/wanted-misc-frame6-parts-001/",
+"email": "info@makikmachinery.com",
+"what": "Трейдер б/у/surplus деталей Frame 6/MS6001B с конкретными P/N: форсунки 116E1215G009/G002, киты сопел 112E6044G001/119E2094G033/112E6642G007, лопатки 101T1326G004/101T1327G004, flow sleeves, liners, caps, crossfire tubes, ковши/шрауды 1–3 ст. Ведёт закупки под CI-24000h — полезен и как канал сбыта/обмена",
+"relation": "ТРЕЙДЕР (pre-owned/surplus)",
+"evidence": "https://makikmachinery.com/wanted-misc-frame6-parts-001/",
+"ask": "pn",
+"rank": 10,
+"tier": "trader",
+"comp": "лопатки и сопловые (buckets/nozzles)",
+"comps": [
+"лопатки и сопловые (buckets/nozzles)"
+]
+},
+{
+"name": "DM Lieferant / dm.energy / ПРОМИМПОРТ",
+"country": "Россия (Москва)",
+"site": "https://dmliefer.ru/ge-frame",
+"email": "info@dmliefer.ru",
+"what": "Импорт/поставка ЗИП по GE Frame 6B (лопатки ротора/статора, детали горячей секции, элементы топливной системы), заявляют ремонт ГТУ — канал параллельного импорта в РФ",
+"relation": "ТРЕЙДЕР (РФ, параллельный импорт) — не изготовитель",
+"evidence": "https://dmliefer.ru/ge-frame",
+"ask": "pn",
+"rank": 11,
+"tier": "trader",
+"comp": "лопатки и сопловые (buckets/nozzles)",
+"comps": [
+"лопатки и сопловые (buckets/nozzles)"
+]
+},
+{
+"name": "Salvex",
+"country": "США (Хьюстон)",
+"site": "https://www.salvex.com",
+"email": "sales@salvex.com",
+"what": "Аукционная площадка surplus/salvage; проходили комплектные лоты 6B HGP (пример: лот 182986342, S1–S3 nozzles/buckets/shrouds, $170 872 wholesale value — закрыт); сейчас в категории ГТ активных лотов 0 — мониторить",
+"relation": "маркетплейс/брокер (трейдер)",
+"evidence": "https://www.salvex.com/listings/listing_detail.cfm/aucid/182986342/",
+"ask": "nomen",
+"rank": 12,
+"tier": "trader",
+"comp": "лопатки и сопловые (buckets/nozzles)",
+"comps": [
+"лопатки и сопловые (buckets/nozzles)"
+]
+},
+{
+"name": "Intercon Enerji",
+"country": "Турция (Стамбул) + Великобритания (Лондон)",
+"site": "https://www.intercon-tr.com",
+"email": "",
+"what": "Турецкий независимый поставщик горячего тракта GE-парка: лопатки MS5001P/NT, MS9001 1-й ступени, роторы MS5002D, V94.2 — прямой 6B-номенклатуры на сайте нет, но профиль (GE HGP, Стамбул+Лондон) даёт основание запросить 6B",
+"relation": "ТРЕЙДЕР (помечен), 6B не подтверждён",
+"evidence": "https://www.intercon-tr.com/eng/article/maximizing-efficiency-and-reliability-in-power-generation-the-essential-role-of-aftermarket-gas-turbine-spare-parts/",
+"ask": "pn",
+"rank": 17,
+"tier": "trader",
+"comp": "лопатки и сопловые (buckets/nozzles)",
+"comps": [
+"лопатки и сопловые (buckets/nozzles)"
+]
+},
+{
+"name": "ReflowX",
+"country": "ОАЭ (Дубай)",
+"site": "https://www.reflowx.com",
+"email": "info@reflowx.com",
+"what": "Брокер вторичного оборудования: целая ГТУ 6B 39 МВт (1997, 68 448 ч) на складе; потенциальный источник комплектов HGP с разборки",
+"relation": "ТРЕЙДЕР/брокер",
+"evidence": "https://www.reflowx.com/power-generation/turbine/ge-frame-6b-gas-turbine-generator-plant",
+"ask": "nomen",
+"rank": 18,
+"tier": "trader",
+"comp": "прочее",
+"comps": [
+"прочее"
+]
+},
+{
+"name": "Genersol",
+"country": "Уругвай",
+"site": "https://www.genersol.com",
+"email": "genersol@genersol.com",
+"what": "Латиноамериканский канал: в явном перечне GE Frame 3, 5, 6B, 6FA, 7E/7FA, 9E/9F + LM-серия; горячие части, бороскопия, ремонты СУ; нейтральная юрисдикция (Уругвай)",
+"relation": "ТРЕЙДЕР/сервис (помечен)",
+"evidence": "https://www.genersol.com/en/products-and-services/Gas-turbine-p389601644",
+"ask": "pn",
+"rank": 18,
+"tier": "trader",
+"comp": "покрытия и ремонт компонентов",
+"comps": [
+"покрытия и ремонт компонентов"
+]
+},
+{
+"name": "EPDE Industry",
+"country": "Канада (Торонто)",
+"site": "https://www.epde.us",
+"email": "info@epde.us",
+"what": "Прокьюрмент-агент по частям GE Frame 3/5/6/7/9 и LM-серии (HGP, лопатки, валы, корпуса); мелкий канал, полезен как запасной для труднодоставаемых P/N",
+"relation": "ТРЕЙДЕР-прокьюрмент (помечен)",
+"evidence": "https://www.epde.us/turbine/",
+"ask": "pn",
+"rank": 20,
+"tier": "trader",
+"comp": "лопатки и сопловые (buckets/nozzles)",
+"comps": [
+"лопатки и сопловые (buckets/nozzles)"
+]
+},
+{
+"name": "Baker Hughes / Nuovo Pignone",
+"country": "Италия (Флоренция)",
+"site": "https://www.bakerhughes.com/gas-turbines/frame-technology/frame-61b",
+"email": "",
+"what": "Действующая OEM-линия Frame 6/1B (44 МВт): новые машины, капчасти, апгрейды (DLN1+ до 4 ppm, H2 до 100%), сервис флота >1150 машин — держатель полной документации по «нефтегазовой» ветке 6B",
+"relation": "OEM-аффилирован (экс-GE Oil & Gas) — пометить: не независимый канал",
+"evidence": "https://www.bakerhughes.com/gas-turbines/frame-technology/frame-61b (проверено WebFetch)",
+"ask": "nomen",
+"rank": 5,
+"tier": "oem_or_user",
+"comp": "прочее",
+"comps": [
+"прочее"
+]
+}
+],
+"stock": [
+{
+"what": "2x PG6581B (42 МВт, 50 Гц, 2004–2005 г.в., сборка Nanjing Turbine по поставке GE), ~17,9–18,4 тыс. часов, ~890 стартов, конверсия на природный газ",
+"seller": "Exapro (площадка; продавец в Китае)",
+"country": "Китай",
+"url": "https://www.exapro.com/general-electric-pg-6581-b-p241128004/",
+"price": "€12 942 000 за пару (торг)",
+"condition": "б/у, малая наработка, рабочие",
+"note": "Те же машины кросс-листингованы на ReflowX (info@reflowx.com): https://www.reflowx.com/power-generation/ge-6b-pg6581b-frame-6b-gas-turbine-generator-set-42-mw-50-hz-2005-unit-2 — простой с 2018 г., полные генсеты с ВСУ"
+},
+{
+"what": "4x PG6581B новые, никогда не эксплуатировались (2012 г.в., происхождение Belfort, Франция), 42 100 кВт, 50 Гц, single fuel gas; в заводской упаковке GE, активная консервация",
+"seller": "Salvex (трейдер Elif Aksoy, +1-832-603-4782)",
+"country": "",
+"url": "https://www.salvex.com/listings/listing_detail.cfm/aucid/182971800/",
+"price": "запрашивали $13,2 млн (wholesale $30 млн)",
+"condition": "новые, unused",
+"note": "Листинг помечен 'No longer available' — проверить актуальность/куда ушли; продажа AS IS, конечный пункт назначения требует одобрения по требованиям GE (санкционный фильтр)"
+},
+{
+"what": "Генсет Frame 6B (PG6541B), 40 МВт, 50 Гц, генератор GEC Alsthom 11 кВ, Mark V; 25 108 часов после капремонта 2012 г.; полная обвязка (КВОУ, выхлоп, газовый скид, CO2-пожаротушение)",
+"seller": "Phoenix Equipment Corporation",
+"country": "США (Red Bank, NJ)",
+"url": "https://www.phxequip.com/equipment/28633/ge-frame-6-gas-turbine-generator-50hz",
+"price": "по запросу (sales@phxequip.com)",
+"condition": "б/у после overhaul",
+"note": "Донор ЗИП/ротора для парка 6541B либо целиком"
+},
+{
+"what": "3 комплекта жаровых труб MS6001B, P/N 117E8214G001-4, наработка 20 000 часов на газе",
+"seller": "Turbine Marketplace (продавец в Сингапуре)",
+"country": "Сингапур",
+"url": "https://www.turbinemarketplace.com/home/detail/208",
+"price": "$150 000 за 3 комплекта / $55 000 за комплект",
+"condition": "б/у, заявлен остаточный ресурс ~8 000 часов",
+"note": "Объявление 2015 г. — актуальность обязательно перепроверить; площадка-трейдер"
+},
+{
+"what": "Лопатки ст.1 6B, rejuvenated, GTD-111DS, PN 112E6034P001, 92 шт (полный комплект)",
+"seller": "продавец через Turbine Marketplace",
+"country": "Канада",
+"url": "https://www.turbinemarketplace.com/home/detail/203",
+"price": "$330 096",
+"condition": "refurbished (dimensional repair, rejuvenation, aluminide, balancing)",
+"note": "проверено WebFetch"
+},
+{
+"what": "Комплект лопаток ст.1 MS6B, PN 105E9495P1, снят после 48 000 ч (газ, baseload)",
+"seller": "продавец через Turbine Marketplace",
+"country": "Индонезия",
+"url": "http://turbinemarketplace.com/home/detail/6",
+"price": "$30 000",
+"condition": "used",
+"note": "листинг 2014 г. — вероятно устарел, но канал живой"
+},
+{
+"what": "Пакет 6B: nozzles/buckets/shrouds ст.1-3 (48-72 тыс. ч, часть refurbished)",
+"seller": "Salvex (аукцион), контакт Felipe Bezerra, WhatsApp +1 832-429-2840",
+"country": "США",
+"url": "https://www.salvex.com/listings/listing_detail.cfm/aucid/182986342/",
+"price": "wholesale value $170 872",
+"condition": "used/refurbished, AS IS",
+"note": "листинг закрыт (no longer available) — Salvex как площадку мониторить"
+},
+{
+"what": "Целая ГТУ GE Frame 6B 39 МВт dual fuel (1997, 68 448 ч / 2 166 пусков, полные записи CI/HGPI/MI)",
+"seller": "ReflowX",
+"country": "ОАЭ (Дубай), +971 503846311",
+"url": "https://www.reflowx.com/power-generation/turbine/ge-frame-6b-gas-turbine-generator-plant",
+"price": "по запросу",
+"condition": "в хранении, готова к отгрузке",
+"note": "источник комплектов HGP с разборки; проверено WebFetch"
+},
+{
+"what": "Ротор GE 6B (unit rotor / 'Phoenix rotor') на продажу",
+"seller": "EthosEnergy",
+"country": "США/Великобритания",
+"url": "https://ethosenergy.com/parts-and-equipment/ge-6b-unit-rotor-phoenix-rotor",
+"price": "",
+"condition": "не подтверждено — сайт стабильно отдаёт 503 (Cloudflare), листинг виден в поисковой выдаче",
+"note": "Запросить состояние/наработку напрямую; коррелирует с их программой рефурб-роторов 6B (powermag)"
+},
+{
+"what": "Складской сток новых и refurbished запчастей Frame 5 / Frame 6 (широкая номенклатура)",
+"seller": "Caledonian Turbine Services",
+"country": "Великобритания (Глазго)",
+"url": "https://caledonianturbineservices.com/products/",
+"price": "",
+"condition": "новые + б/у с инспекцией/ремонтом, гарантия от 12 месяцев",
+"note": "info@cts-int.com — запрашивать наличие по конкретным P/N. Страница проверена WebFetch"
+},
+{
+"what": "2 x б/у ГТУ GE MS6001B-PG6581B, конвертированы на природный газ, «профессионально обслужены» — кандидат на разборку/доноры (ротор, HGP, корпуса)",
+"seller": "Shenzhen Blaze Turbine Co. (Peter, peter@turbineblade.net, +86 135 4409 5201)",
+"country": "Китай",
+"url": "https://turbineblade.net/ge-ms6001b-frame-6b-gas-turbines/",
+"price": "по запросу",
+"condition": "б/у, в рабочем состоянии",
+"note": "Страница открыта и проверена 17.08.2026; наработка/год выпуска уточнять"
+},
+{
+"what": "Целая ГТУ GE Frame 6 PG6581(B) — в наличии (used, in stock), плюс прочий surplus-сток по GE",
+"seller": "Turbine Parts Corporation (TPI), sales@turbineparts.com, +1 888 850 8630",
+"country": "США (Хьюстон, TX)",
+"url": "https://www.turbineparts.com/",
+"price": "по запросу",
+"condition": "б/у",
+"note": "Позиция видна в инвентарной секции главной страницы; отдельная страница /turbine-inventory/ даёт 404 — запрашивать сток-лист письмом"
+},
+{
+"what": "Комплект рабочих лопаток 2-й ступени MS6B (p/n E614P1H1A), снят после 72 000 ч (газ, базовая нагрузка)",
+"seller": "продавец на Turbine Marketplace (Индонезия)",
+"country": "Индонезия",
+"url": "http://www.turbinemarketplace.com/home/detail/11",
+"price": "$4 000 за комплект",
+"condition": "б/у, time-expired кандидат на восстановление",
+"note": "Объявление 2014 г. — старое; ценовой ориентир нижней границы"
+},
+{
+"what": "Газотурбинный энергоблок 37,5 МВт GE MS6001B DLN-1, 1995 г., 50 268 л.с. / 3600 об/мин, 13,8 кВ / 60 Гц, 1 шт.",
+"seller": "USP&E Global (info@uspeglobal.com, +27 65 744 1119), листинг на Machinio",
+"country": "продавец ЮАР/США, локация блока уточняется",
+"url": "https://www.machinio.com/general-electric/ms6001b-dln-1/turbines",
+"price": "по запросу",
+"condition": "б/у",
+"note": "ОГОВОРКА: Machinio и uspeglobal.com отдают 403 автоматическим запросам — лот подтверждён только поисковой выдачей Machinio от 17.08.2026; открыть вручную в браузере перед контактом"
+},
+{
+"what": "Комплектная ГТУ GE Frame 6 PG6581(B), 42 100 кВт: турбина + генератор + СУ + вспомогательные системы (КВОУ, топливный скид, пожаротушение)",
+"seller": "Turbine Parts Corporation (Хьюстон, США)",
+"country": "США",
+"url": "https://www.turbineparts.com/product-page/ge-gas-turbine-frame-6-pg6581-b",
+"price": "по запросу",
+"condition": "не указано на странице (уточнять: новая сборка/refurb)",
+"note": "Верифицировано WebFetch. Продавец — изготовитель по своим чертежам, ISO 9001:2015; sales@turbineparts.com"
+},
+{
+"what": "Складские позиции Frame 6B: hardware, bullhorns, nozzle components, crossfire tubes, топливные форсунки, подшипники, свечи («тысячи common spare parts on hand»)",
+"seller": "WWGTP — World Wide Gas Turbine Products (Клифтон-Парк, NY)",
+"country": "США",
+"url": "https://www.wwgtp.com/blog/frame-6b-parts/",
+"price": "",
+"condition": "новые/surplus (mix, уточнять по P/N)",
+"note": "Сайт блокирует наш прокси (503) — сток подтверждён поисковыми сниппетами и LinkedIn; sales@wwgtp.com, +1 518 877 7200"
+},
+{
+"what": "ЗИП GE-дизайна ex-stock: лопатки (стационарные и рабочие), шрауд-блоки, combustion, выхлопные диффузоры, вспомогательные части — компьютеризированный склад под Frame 3-9",
+"seller": "MJB / Masaood John Brown (Дубай, Джебель-Али)",
+"country": "ОАЭ",
+"url": "https://mjbi.com/spare-replacement-parts/",
+"price": "",
+"condition": "новые + refurb",
+"note": "Верифицировано WebFetch. Ближайший к СНГ крупный независимый склад GE-ЗИП; запрос через форму Quotation Enquiry"
+},
+{
+"what": "Б/у ГТГ Thomassen Frame MS6001B 35 МВт (пакетировка Thomassen — свои обозначения)",
+"seller": "FreeOilfieldQuote (инвентарь)",
+"country": "—",
+"url": "https://inventory.freeoilfieldquote.com/product/thomassen-frame-ms-6001b-35mw-gas-turbine-generator-set",
+"price": "по запросу",
+"condition": "used",
+"note": "Референс по обвязке/обозначениям Thomassen-машин"
+},
+{
+"what": "Б/у ГТУ GE Frame 6B (MS6001B) для генерации",
+"seller": "Fumar (fumartech.pl)",
+"country": "Польша",
+"url": "https://fumartech.pl/products/used-ge-frame-6b-ms6001b-gas-turbine-for-sale-reliable-power-generation-solution/",
+"price": "по запросу",
+"condition": "used",
+"note": "Целый агрегат/донор ЗИП"
+},
+{
+"what": "Складские детали Frame 6 (MS6001) с GE P/N: сопла/ковши/шрауды/жаровые трубы",
+"seller": "Energia Parts S.r.l.",
+"country": "Италия",
+"url": "https://energiaparts.com/index.php/stocked-ms5001-pa-spare-parts/",
+"price": "по запросу",
+"condition": "new/refurb",
+"note": "Готовые P/N — база для сопоставления номенклатуры без чертежей"
+},
+{
+"what": "Рефурбишированные пакеты Frame 6 (полный major overhaul: ротор, редуктор/генератор, перепроводка, апгрейд САУ) + «Stock Units» для fast-track проектов",
+"seller": "MJB International (Masaood John Brown), Jebel Ali",
+"country": "ОАЭ",
+"url": "https://mjbi.com/refurbished-gas-turbine-packages/",
+"price": "",
+"condition": "refurbished, с гарантией, «maintenance cycle как у новой»",
+"note": "Проверено WebFetch; конкретное наличие 6B в стоке — по запросу котировки"
+},
+{
+"what": "ГТУ GEC/MS6001B в составе предложения (генераторный пакет, 50 Гц)",
+"seller": "CFAS Enterprises Inc.",
+"country": "США",
+"url": "https://cfaspower.com/wp-content/uploads/2022/08/GTG_1458GR_GEC-MS6001B.doc",
+"price": "",
+"condition": "б/у, surplus",
+"note": "ТРЕЙДЕР surplus-оборудования; документ 2022 г. — актуальность наличия проверять напрямую"
+}
+]
+}
