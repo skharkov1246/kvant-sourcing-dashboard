@@ -1,5 +1,5 @@
 {
-"updated": "2026-08-10",
+"updated": "2026-08-17",
 "source": "Research-вееры 06.08.2026: 12 углов (субпоставщики OEM Solar/Siemens, автомаркет по брендам и моделям, узкие специалисты по элементам, РФ/СНГ/Иран/Турция) + 3 угла наследия (Линкольн Ruston/EGT, Финспонг STAL/ABB, диаспора лицензиатов). Каждая компания — с подтверждённым официальным сайтом. + веер «рабочие юрисдикции/пэкеджеры/б-у» 06.08.2026. + веер глубоких субпоставщиков (shipment-данные ImportYeti, кейс-стади, сеть Caterpillar) 06.08.2026. + harvest раскрутки цепочек, волна 1. Harvest волны 2.",
 "rows": [
 {
@@ -14837,6 +14837,28 @@
 "link": "оператор (крупнейший парк — 12 x V64.3A)",
 "tier": "component_specialist",
 "angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "Turbine Parts Corporation (TPc)",
+"country": "США (Хьюстон)",
+"site": "https://www.turbineparts.com",
+"email": "sales@turbineparts.com",
+"what": "Capital parts (nozzles, buckets, rotors, TPs, shrouds) и расходники для PG6581(B) по СОБСТВЕННЫМ чертежам («proprietary drawings and specifications» — чертежи заказчика не нужны); плюс сорсинг с контрактной кооперацией и",
+"link": "независимый изготовитель; из базы КВАНТ",
+"tier": "component_specialist",
+"angle": "harvest:ms6001b",
+"risk": ""
+},
+{
+"name": "Caledonian Turbine Services (CTS)",
+"country": "Великобритания (Глазго)",
+"site": "https://caledonianturbineservices.com",
+"email": "info@cts-int.com",
+"what": "Большой склад новых и восстановленных деталей Frame 5/Frame 6, капитальный ЗИП, платы Speedtronic Mark I-VIe, б/у детали с ремонтом/инспекцией специалистами",
+"link": "ТРЕЙДЕР/стокист, не изготовитель",
+"tier": "component_specialist",
+"angle": "harvest:ms6001b",
 "risk": ""
 }
 ]
