@@ -550,6 +550,14 @@ function contactLinks(r){
  else if(ph && ph!=='—' && !/не найдено|см\. сайт/i.test(ph)) out.push(`<span>☎ ${esc(ph)}</span>`);
  return out.length ? out.join('') : '<span class="mut">контакты — в карточке CRM / на сайте</span>';
 }
+/* бейдж скептик-проверки плашек: что именно увидел проверяющий — в подсказке */
+const BC_LABEL = {confirmed_broad:['✓ плашки проверены','#0ca30c'], partial:['✂ плашки урезаны проверкой','#b8431a'],
+                  bullshit:['⚠ плашки сняты проверкой','#b8431a'], site_dead:['⌛ сайт не отвечает','#898781']};
+function bcTag(bc){
+ const [label,color] = BC_LABEL[bc.verdict] || ['проверено','#898781'];
+ const tip = [bc.note, bc.quote?'Увидел: «'+bc.quote+'»':'', bc.url].filter(Boolean).join(' · ');
+ return `<span class="tag" style="border:1px solid ${color}" title="${esc(tip)}">${label}</span>`;
+}
 function pkCard(r){
  const st = EDITS.st[r.key]||'';
  const note = EDITS.note[r.key]||'';
@@ -586,7 +594,7 @@ function pkCard(r){
   </div>
   <div>
    <div style="margin-bottom:4px">${[...r.segs].map(id=>`<span class="tag">${esc(SEG_SHORT(id))}</span>`).join('')||'<span class="mut">сегмент не определён</span>'}</div>
-   <div style="margin-bottom:6px">${models}${wide}${gen}${r.badgecheck?`<span class="tag" style="border:1px solid ${r.badgecheck.verdict==='confirmed_broad'?'#0ca30c':'#b8431a'}" title="${esc((r.badgecheck.note||'')+' · '+(r.badgecheck.url||''))}">${r.badgecheck.verdict==='confirmed_broad'?'✓ плашки проверены':'✂ плашки урезаны проверкой'}</span>`:''}</div>
+   <div style="margin-bottom:6px">${models}${wide}${gen}${r.badgecheck?bcTag(r.badgecheck):''}</div>
    ${dossierBits.length?`<div style="font-size:12px;margin-bottom:4px">${dossierBits.map(b=>`<span class="dfact">${esc(b)}</span>`).join('')}</div>`:''}
    ${r.what?`<div class="mut" style="font-size:12.5px">${esc(r.what.length>170?r.what.slice(0,170)+'…':r.what)}</div>`:''}
    ${r.evid?`<div class="mut" style="font-size:11.5px;margin-top:3px">Проверка: ${esc(r.evid.length>150?r.evid.slice(0,150)+'…':r.evid)}</div>`:''}

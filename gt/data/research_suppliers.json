@@ -14860,6 +14860,204 @@
 "tier": "component_specialist",
 "angle": "harvest:ms6001b",
 "risk": ""
+},
+{
+"name": "NNG Energy",
+"country": "Турция (Стамбул + Ялова)",
+"site": "https://nngenergy.com",
+"email": "info@nngenergy.com",
+"what": "Турецкий независимый сервис/поставщик Solar: рефурбишмент и поставка турбин, package assembly, core engine services, 24/7 поддержка. Заявленная экспертиза: Taurus 60, Taurus 70, Centaur 50, Mars 100, Titan 130 — единстве",
+"link": "независимый сервис/поставщик, НОВЫЙ (нет в CRM)",
+"tier": "component_specialist",
+"angle": "harvest:solar",
+"risk": ""
+},
+{
+"name": "Classic Automation",
+"country": "США (Rochester, NY)",
+"site": "https://www.classicautomation.com",
+"email": "",
+"what": "Obsolete-электроника платформы Turbotronic 1–4: склад снятых с производства Allen-Bradley PLC-5 (тестированные, гарантия 2 года) + ремонт модулей. Канал поддержки старых Turbotronic без OEM.",
+"link": "стокист/ремонт obsolete-электроники (трейдер)",
+"tier": "component_specialist",
+"angle": "harvest:solar",
+"risk": ""
+},
+{
+"name": "TMS Ltd. (Alberta-TMS)",
+"country": "Канада",
+"site": "http://www.lincoln-tms.com/equipment-sales/",
+"email": "",
+"what": "Склад агрегатов и обменных двигателей Solar в Альберте: Titan 130S 15 МВт new surplus, Mars 90 9,5 МВт, 2×Taurus T7901S 5,67 МВт 60 Гц new surplus + 2×50 Гц, Centaur T5901S/T4701S/T4501, Saturn T1301; exchange-двигатели ",
+"link": "независимый пэкеджер/дилер б/у и new-surplus оборудования с гарантией; Альберта, Канада",
+"tier": "component_specialist",
+"angle": "harvest:solar",
+"risk": ""
+},
+{
+"name": "Heriss Corporation",
+"country": "Канада",
+"site": "https://heriss.com",
+"email": "sales@heriss.com",
+"what": "Уже предлагали нам (4 запроса). Трейдер-стокист: >4000 позиций ЗИП Solar на складе; Saturn 10/20, Centaur 4500 и 50 (с SoLoNOx и без), Taurus 65/70, Mars — как запчасти, так и целые новые/zero-hour/б.у. двигатели и компл",
+"link": "трейдер/дистрибьютор со стоком, уже в CRM (4 запроса)",
+"tier": "component_specialist",
+"angle": "harvest:solar",
+"risk": ""
+},
+{
+"name": "Philadelphia Gear (Timken Power Systems)",
+"country": "США",
+"site": "https://www.philagear.com",
+"email": "",
+"what": "Ремонт/rebuild редукторов любых брендов, включая планетарные/эпициклические — альтернативный канал ремонта редукторов Solar-пакетов (repair-of-non-PG программа).",
+"link": "независимый сервис редукторов",
+"tier": "component_specialist",
+"angle": "harvest:solar",
+"risk": ""
+},
+{
+"name": "Turbine Resources International (TRI)",
+"country": "США",
+"site": "http://turbineresourcesintl.com/parts-sales/",
+"email": "",
+"what": "New/used/OEM surplus/aftermarket/refurbished запчасти на Solar Saturn, Centaur, Taurus и Solar-пакеты (по поисковому индексу). Домен при проверке не резолвился (ENOTFOUND) — статус компании проверить перед контактом.",
+"link": "трейдер",
+"tier": "component_specialist",
+"angle": "harvest:solar",
+"risk": ""
+},
+{
+"name": "Wogen Engineering",
+"country": "ОАЭ",
+"site": "https://wogenengg.com/gas-turbine-spare-parts.html",
+"email": "Info@wogenengg.com",
+"what": "Hot Gas Path (HGP) и inspection kits, компоненты камеры сгорания для Solar: Titan 130, Titan 250, Mars 100, Taurus 60, Centaur 40; new/surplus/refurbished/used",
+"link": "трейдер/стокист (industrial trading division), Аджман, ОАЭ",
+"tier": "component_specialist",
+"angle": "harvest:solar",
+"risk": ""
+},
+{
+"name": "NGT Gasturbinentechnik GmbH & Co. KG",
+"country": "Германия",
+"site": "http://www.ngt-gasturbinentechnik.com/",
+"email": "info@ngt-gasturbinentechnik.com",
+"what": "Единственный найденный независимый Solar-шоп в Германии: zero-hour турбины, major overhaul, ТО и инспекции Centaur 40/50 и Taurus 60; модернизация САУ Solar-агрегатов как VAR Valmet. Удобный ЕС-канал.",
+"link": "независимый сервис, Мёрс (Moers), Германия",
+"tier": "component_specialist",
+"angle": "harvest:solar",
+"risk": ""
+},
+{
+"name": "Kato Engineering (Nidec)",
+"country": "США (North Mankato, MN)",
+"site": "https://www.nidec.com/en/katoengineering/",
+"email": "",
+"what": "Производитель синхронных генераторов 100 кВт–25 МВт для газотурбинных генсетов (диапазон Saturn—Titan 130); тысячи машин на FPSO/платформах; генераторные концы Kato массово встречаются в б/у турбинных генсетах — пакетиро",
+"link": "изготовитель компонентов (генераторы)",
+"tier": "component_specialist",
+"angle": "harvest:solar",
+"risk": ""
+},
+{
+"name": "SoEnergy International (Used Equipment)",
+"country": "США",
+"site": "https://surplusrecord.com/listing/5200-kw-solar-turbines-tarus-60-mobile-generator-set-both-1500-rpm-11000v-10-hours-2001-637827/",
+"email": "",
+"what": "ТРЕЙДЕР (дилер Surplus Record): электростанция 2× Solar Centaur 40 по 3,0 МВт 13,8 кВ — капремонт 2020, смонтированы и не эксплуатировались (<800 ч на генконцах), со switchgear и панелями. Контакт: Victor Flores +1 904-3",
+"link": "трейдер (Silver-дилер Surplus Record с 2022), Хьюстон, Техас, США",
+"tier": "component_specialist",
+"angle": "harvest:solar",
+"risk": ""
+},
+{
+"name": "Prime Turbine Support",
+"country": "США",
+"site": "https://prime-turbinesupport.com/",
+"email": "sales@prime-turbinesupport.com",
+"what": "ЗИП по всем линейкам Solar (Saturn, Centaur, Taurus, Mars, Titan), фокус — платформа Taurus: hot section, форсунки, подшипники, уплотнения; новые/refurb/serviceable used; ответ на RFQ за 24 ч",
+"link": "ТРЕЙДЕР/сорсинг-партнёр (не изготовитель), Fort Lauderdale, FL, США",
+"tier": "component_specialist",
+"angle": "harvest:solar",
+"risk": ""
+},
+{
+"name": "Ideal Electric Power Co.",
+"country": "США (Mansfield, OH)",
+"site": "https://www.idealec.com",
+"email": "",
+"what": "Производитель/ремонт генераторов 0,4–25 МВт (Мансфилд, Огайо); б/у генсеты Solar Centaur 40 на рынке идут в связке «Solar Centaur 40 + Ideal Electric» — исторический пакетируемый генератор для Solar; свежих пруфов новых ",
+"link": "изготовитель генераторов (историч. пакетирование с Solar)",
+"tier": "component_specialist",
+"angle": "harvest:solar",
+"risk": ""
+},
+{
+"name": "Energy Parts Solutions",
+"country": "США (Schaumburg, IL)",
+"site": "https://www.energypartssolutions.com/services/reverse-engineering/",
+"email": "",
+"what": "Изготовитель: прецизионная механообработка и производство лопаток, сопловых, диафрагм; reverse engineering по изношенной детали-образцу (CMM, CAD/CAM, 50+ лет опыта) — вариант для позиций, где OEM недоступен; прямых Sola",
+"link": "независимый изготовитель по образцу (Solar-опыт не доказан — проверять запросом)",
+"tier": "component_specialist",
+"angle": "harvest:solar",
+"risk": ""
+},
+{
+"name": "Al Waseet Oil Equipment Trading",
+"country": "ОАЭ (Абу-Даби)",
+"site": "https://www.alwaseetoil.com",
+"email": "sales@alwaseetoil.com",
+"what": "НОВЫЙ. Абу-Даби, ISO 9001, 30+ лет поддержки Solar Saturn и Centaur; инвентарь ЗИП пакетов и аксессуаров (стартеры TDI/POW-R-QUIK, клапаны ASCO/Velan, фильтры AAF/Donaldson/Camfil, SKF, метизы/уплотнения) — хороший канал",
+"link": "ТРЕЙДЕР/дистрибьютор, НОВЫЙ",
+"tier": "component_specialist",
+"angle": "harvest:solar",
+"risk": ""
+},
+{
+"name": "Global Power Supply (globalpwr.com)",
+"country": "США",
+"site": "https://www.globalpwr.com",
+"email": "",
+"what": "ТРЕЙДЕР/стокист энергоблоков: маркетирует скид-пакеты Solar Taurus 60 (размещает полные спецификации Solar TPS60GS), торгует турбинными и дизельными генсетами из наличия",
+"link": "трейдер/стокист",
+"tier": "component_specialist",
+"angle": "harvest:solar",
+"risk": ""
+},
+{
+"name": "Curtiss-Wright Surface Technologies (CCRS)",
+"country": "Великобритания/США",
+"site": "https://surfacetechnologies.curtisswright.com/",
+"email": "",
+"what": "Компонентный ремонт и покрытия (диффузионные, thermal spray) лопаток и сопловых аппаратов газовых турбин; в описании сервиса заявлен опыт ремонта Solar. Страница отдаёт 403 боту — подтверждено только поисковым сниппетом,",
+"link": "независимый компонентный/покрытийный подрядчик; слабое доказательство — проверить вручную",
+"tier": "component_specialist",
+"angle": "harvest:solar",
+"risk": ""
+},
+{
+"name": "Далкос (Dalkos)",
+"country": "Россия",
+"site": "https://dalkos.ru",
+"email": "",
+"what": "ТРЕЙДЕР широкого профиля (Москва/Екатеринбург/Краснодар/Казань): каталожная категория «Газовые турбины Solar Turbines» (Centaur 50, Taurus 60) среди сотен импортных брендов — типовой канал параллельного импорта, глубина ",
+"link": "трейдер параллельного импорта (широкий каталог)",
+"tier": "component_specialist",
+"angle": "harvest:solar",
+"risk": ""
+},
+{
+"name": "Astrum Energy",
+"country": "Германия (Дюссельдорф)",
+"site": "http://astrum-energy.com",
+"email": "info@astrum-energy.com",
+"what": "ТРЕЙДЕР (Дюссельдорф, ФРГ; всплывает в казахстанских выдачах): продуктовая страница Solar Turbines (генераторные модули MGP, lifecycle-сервис), торгует турбинами/генсетами — потенциальный нейтральный канал ЕС→ЦА",
+"link": "трейдер",
+"tier": "component_specialist",
+"angle": "harvest:solar",
+"risk": ""
 }
 ]
 }
