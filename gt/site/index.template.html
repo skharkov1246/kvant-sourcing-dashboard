@@ -321,6 +321,51 @@ function segsOf(text){
  for(const [id,,rx] of SEGS) if(rx.test(text)) out.add(id);
  return out;
 }
+/* Один сайт = одна компания. Разные источники дают имя по-своему («PSM (Power Systems Mfg)»,
+   «Hanwha Power Systems Americas (PSM)» — 17 вариантов на psm.com), и nrm их не схлопывает.
+   Площадки-агрегаторы исключены: там на одном домене живут РАЗНЫЕ поставщики. */
+const PLATFORMS = /(made-in-china|alibaba|aliexpress|indiamart|tradeindia|exportersindia|globalsources|europages|thomasnet|linkedin|facebook|instagram|twitter|ebay|machinio|salvex|surplusrecord|dieselgeneratordirect|power-technology|energy-xprt|directindustry|wikipedia|google|youtube|tildacdn|en\.made)/i;
+const siteDomain = s => {
+ const m = String(s||'').toLowerCase().trim().match(/(?:https?:\/\/)?(?:www\.)?([a-z0-9.\-]+\.[a-z]{2,})/);
+ return m ? m[1] : '';
+};
+function mergeByDomain(map){
+ const byDom = new Map();
+ for(const [k,r] of map){
+  const d = siteDomain(r.site);
+  if(!d || PLATFORMS.test(d)) continue;
+  if(!byDom.has(d)) byDom.set(d, []);
+  byDom.get(d).push([k,r]);
+ }
+ for(const [,group] of byDom){
+  if(group.length < 2) continue;
+  // данные держит карточка с наибольшим числом источников…
+  group.sort((a,b)=> (b[1].src.size - a[1].src.size) || (a[1].name.length - b[1].name.length));
+  const [, keep] = group[0];
+  // …а показываем самое «головное» имя: без географии филиала и без скобочных пояснений
+  const GEO = /\b(dubai|india|americas?|middle east|europe|fzco|fze|llc|gmbh|s\.?a\.?s|berlin|brandenburg|france|shanghai|дубай|индия)\b|\(.*(быв|экс|ex-|incl|вкл)/i;
+  const allNames = group.map(g=>g[1].name);
+  const plain = n => n.replace(/\s*\([^()]*\)/g,'').trim();
+  const cands = allNames.filter(n=>!GEO.test(n));
+  // головное имя — то, которое чаще всего встречается внутри остальных вариантов
+  // («Baker Hughes» сидит в шести именах группы, «Allen Gears» — в одном), при равенстве короче
+  const inOthers = n => allNames.filter(o=>o.toLowerCase().includes(plain(n).toLowerCase())).length;
+  const pick = (cands.length?cands:allNames).slice()
+    .sort((a,b)=> (inOthers(b)-inOthers(a)) || (plain(a).length - plain(b).length))[0];
+  if(pick && pick!==keep.name){ keep.altNames = keep.altNames||[]; keep.altNames.push(keep.name); keep.name = pick; }
+  for(const [k,r] of group.slice(1)){
+   ['segs','models','src','subOf'].forEach(f=>{ if(r[f]&&keep[f]) r[f].forEach(x=>keep[f].add(x)); });
+   ['sgtAll','solarAll','heavyAll'].forEach(f=>{ if(r[f]) keep[f]=true; });
+   for(const [m,n] of Object.entries(r.bitrix||{})) keep.bitrix[m] = (keep.bitrix[m]||0) + n;
+   ['role','email','phone','what','evid','conf','prior','tier','tierRaw'].forEach(f=>{ if(!keep[f] && r[f]) keep[f]=r[f]; });
+   if(!keep.clSeg && r.clSeg) keep.clSeg = r.clSeg;
+   keep.altNames = keep.altNames || [];
+   if(!keep.altNames.includes(r.name)) keep.altNames.push(r.name);
+   if(r.altNames) r.altNames.forEach(n=>{ if(!keep.altNames.includes(n)) keep.altNames.push(n); });
+   map.delete(k);
+  }
+ }
+}
 let UNI = null;
 function buildUnified(){
  const map = new Map();
@@ -460,6 +505,7 @@ function buildUnified(){
   const hasSite = r.site && r.site!=='—' && !/не найдено|нет сайта/i.test(r.site);
   if(!hasSite && !r.src.has('мой')) map.delete(k);
  }
+ mergeByDomain(map);
  const dmap = {};
  for(const [n,v] of Object.entries((DOSSIERS.dossiers)||{})) dmap[nrm(n)] = v;
  const hmap = {};
@@ -472,11 +518,18 @@ function buildUnified(){
  const bovr = {};
  for(const [n,v] of Object.entries(BADGEOVR.checks||{})) bovr[nrm(n)] = v;
  UNI.forEach(r=>{
-  const o = bovr[r.key];
-  if(o){ // проверенный набор плашек заменяет регэксповый; влияет и на скоринг ниже
-   r.models = new Set(o.models||[]);
-   (o.fams_off||[]).forEach(f=>{ r[f]=false; });
-   r.badgecheck = o;
+  // вердикт мог быть выписан на любое из имён компании (до схлопывания дублей по домену)
+  const hits = [r.name, ...(r.altNames||[])].map(n=>bovr[nrm(n)]).filter(Boolean);
+  if(hits.length){
+   // проверенный набор плашек ЗАМЕНЯЕТ регэксповый (стирая и раздувание от слитых дублей)
+   const models = new Set(hits.flatMap(o=>o.models||[]));
+   r.models = models;
+   ['sgtAll','solarAll','heavyAll'].forEach(f=>{
+    const off = hits.filter(o=>(o.fams_off||[]).includes(f)).length;
+    if(off && off*2 >= hits.length) r[f] = false;   // снимаем, если так решило большинство проверок
+   });
+   r.badgecheck = hits.sort((a,b)=>(b.models||[]).length-(a.models||[]).length)[0];
+   if(hits.length>1) r.badgechecks = hits;
   }
   r.bxTotal = Object.values(r.bitrix).reduce((a,b)=>a+b,0);
   r.typ = classify(r);
@@ -590,6 +643,7 @@ function pkCard(r){
   <div>
    <h4>${esc(r.name)}</h4>
    <div class="mut" style="margin:2px 0 6px">${esc(r.country)}${r.role?' · '+esc(r.role):''}</div>
+   ${r.altNames&&r.altNames.length?`<div class="mut small" style="margin:-4px 0 6px" title="Один сайт = одна компания: карточки этих названий объединены">в базе также как: ${esc(r.altNames.slice(0,4).join(' · '))}${r.altNames.length>4?` и ещё ${r.altNames.length-4}`:''}</div>`:''}
    <div><span class="pill typ">${r.typ==='sub' ? 'субпоставщик: '+([...r.subOf].join(', ')||'OEM') : TYPE_NAME[r.typ]}</span>${scoreP}${src}</div>
   </div>
   <div>
@@ -644,7 +698,7 @@ function pkFilters(){
    else if(s.typ.startsWith('sub:')){ if(r.typ!=='sub' || !r.subOf.has(s.typ.slice(4))) return false; }
    else if(r.typ!==s.typ) return false;
   }
-  if(s.q && ![r.name,r.country,r.role,r.what,r.site,EDITS.note[r.key]||''].join(' ').toLowerCase().includes(s.q)) return false;
+  if(s.q && ![r.name,...(r.altNames||[]),r.country,r.role,r.what,r.site,EDITS.note[r.key]||''].join(' ').toLowerCase().includes(s.q)) return false;
   return true;
  });
  rows.sort(SORTS[s.sort][1]);

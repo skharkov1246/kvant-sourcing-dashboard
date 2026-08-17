@@ -121,6 +121,15 @@ def main():
             continue
         src = uni.get(k) or sample.get(k)
         if not src:
+            # агент часто дописывает страну: «Doosan Enerbility (Республика Корея)» —
+            # отрезаем последнюю скобку, затем пробуем однозначное совпадение по префиксу
+            bare = nrm(re.sub(r"\s*\([^()]*\)\s*$", "", name))
+            src = uni.get(bare) or sample.get(bare)
+            if not src and len(bare) >= 6:
+                cand = [v for kk, v in uni.items() if kk.startswith(bare) or bare.startswith(kk)]
+                if len({v["name"] for v in cand}) == 1:
+                    src = cand[0]
+        if not src:
             unmatched.append(name)
             continue
         had = [f for f in FAMS if (src.get(f) if isinstance(src, dict) else False)]
