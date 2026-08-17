@@ -321,6 +321,18 @@ function segsOf(text){
  for(const [id,,rx] of SEGS) if(rx.test(text)) out.add(id);
  return out;
 }
+/* Российские компании — конкуренты КВАНТ, в подборе поставщиков не показываются
+   (распоряжение владельца 17.08.2026). Данные вычищены gt/tools/drop_ru.py, а этот фильтр
+   ловит тех, кто приходит из CRM-снапшота и таможни. Соседи (Казахстан, Узбекистан,
+   Беларусь и др.) — не «русские» в этом смысле и остаются. */
+const RU_NEIGHBOURS = /Казахстан|Узбекистан|Беларус|Belarus|Kazakh|Uzbek|Азербайджан|Армени|Киргиз|Туркмен|Грузи/i;
+function isRU(r){
+ const name = r.name||'', country = r.country||'', site = (r.site||'').replace(/^https?:\/\//,'').split('/')[0];
+ if(RU_NEIGHBOURS.test(name+' '+country)) return false;
+ if(/^\s*(Россия|РФ|Russia|Russian)/i.test(country)) return true;
+ if(/(^|[\s(])(ООО|ОАО|ЗАО|ПАО|АО|РУП|ФГУП|НПО|УК)\s*[«"„]?/.test(name) && !/^[A-Za-z]{3,}/.test(name.trim())) return true;
+ return /(^|\.)(ru|рф)$/i.test(site) || /\.(ru|рф)\b/i.test(site);
+}
 /* Один сайт = одна компания. Разные источники дают имя по-своему («PSM (Power Systems Mfg)»,
    «Hanwha Power Systems Americas (PSM)» — 17 вариантов на psm.com), и nrm их не схлопывает.
    Площадки-агрегаторы исключены: там на одном домене живут РАЗНЫЕ поставщики. */
@@ -504,6 +516,7 @@ function buildUnified(){
   const r = map.get(k);
   const hasSite = r.site && r.site!=='—' && !/не найдено|нет сайта/i.test(r.site);
   if(!hasSite && !r.src.has('мой')) map.delete(k);
+  else if(isRU(r)) map.delete(k);   // российские — конкуренты, в подбор не идут (см. gt/tools/drop_ru.py)
  }
  mergeByDomain(map);
  const dmap = {};
