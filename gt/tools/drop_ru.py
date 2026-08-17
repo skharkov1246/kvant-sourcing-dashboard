@@ -56,7 +56,9 @@ def domain(site):
 
 
 def is_ru(name="", country="", site="", extra=""):
-    if NEIGHBOURS.search(f"{name} {country} {extra}"):
+    # соседей ищем ТОЛЬКО в названии и стране: у российских компаний в описании часто
+    # висит «info@amcor.kz» или «объекты в Узбекистане», и по тексту они бы спаслись
+    if NEIGHBOURS.search(f"{name} {country}"):
         return False
     if RU_COUNTRY.search(country or ""):
         return True
@@ -117,9 +119,15 @@ def main():
     D = json.loads(p.read_text(encoding="utf-8"))
     dd = D["dossiers"]
 
+    # У досье нет поля «страна», поэтому решаем по тексту. Правило: явный признак РФ
+    # (ИНН/ОГРН, «Россия», московский/питерский адрес) сильнее упоминания соседа —
+    # иначе российская компания с казахстанским почтовым ящиком спасается от чистки,
+    # а узбекский завод с русским названием, наоборот, попадает под неё.
+    STRONG_RU = re.compile(r"\bИНН\b|\bОГРН\b|Росси|\bРФ\b|Москв|Петербург|Челябинск|Казан[ьи]", re.I)
+
     def ru_dossier(n, v):
         blob = json.dumps(v, ensure_ascii=False)
-        if NEIGHBOURS.search(n + " " + blob[:600]):
+        if NEIGHBOURS.search(n + " " + blob[:500]) and not STRONG_RU.search(blob[:900]):
             return False
         if re.sub(r"[^a-zа-яё0-9]", "", n.lower()) in gone:
             return True
