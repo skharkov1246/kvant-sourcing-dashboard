@@ -1125,17 +1125,6 @@
 "risk": "Турция — рабочая юрисдикция для закупок из РФ"
 },
 {
-"name": "АО «ЗКМК» (Западно-Казахстанская машиностроительная компания)",
-"country": "Казахстан (Уральск)",
-"site": "zkmk.kz",
-"email": "",
-"what": "Сервисный центр (с 2011 г., 100+ чел., обучение персонала в США и Италии): сервисное обслуживание и капитальный ремонт ГПА и ГТУ, механообработка, балансировка",
-"link": "Ремонт оборудования GE (основной партнёр), Solar Turbines, Siemens, MAN Turbo, Ekol, Зоря-Машпроект",
-"tier": "mro",
-"angle": "ru-cis-asia",
-"risk": "Казахстан (ЕАЭС) — рабочая юрисдикция для РФ; осторожность с GE-авторизованными работами (комплаенс)"
-},
-{
 "name": "Patented Systems, Inc.",
 "country": "США",
 "site": "patented-systems.com",
@@ -4111,7 +4100,7 @@
 "site": "www.solarturbines.com",
 "email": "",
 "what": "OEM of industrial gas turbines (Saturn/Centaur/Taurus/Mars/Titan)",
-"link": "OEM/supplier to Shanghai Lishun (MarisoGT), Lei Shing Hong Energy and ЗКМК; Core turbine OEM — packaging associates & authorized reps sell/service its gensets and spares",
+"link": "OEM/supplier to Shanghai Lishun (MarisoGT) and Lei Shing Hong Energy; Core turbine OEM — packaging associates & authorized reps sell/service its gensets and spares",
 "tier": "component_specialist",
 "angle": "harvest:unwind2",
 "risk": ""
@@ -4156,17 +4145,6 @@
 "email": "",
 "what": "OEM of Jenbacher gas engines / distributed power gensets",
 "link": "Jereh is its authorized Platinum Integrator; Adjacent gas-genset OEM in Jereh's distributed-energy packaging portfolio",
-"tier": "component_specialist",
-"angle": "harvest:unwind2",
-"risk": ""
-},
-{
-"name": "Karachaganak Petroleum Operating B.V. (KPO)",
-"country": "Kazakhstan",
-"site": "www.kpo.kz",
-"email": "",
-"what": "Oil & gas operator running gas-turbine compressor/power stations",
-"link": "Client / localization driver for ЗКМК machining & GT service; Operates GE gas-turbine driven equipment serviced/localized via ЗКМК",
 "tier": "component_specialist",
 "angle": "harvest:unwind2",
 "risk": ""
@@ -5289,17 +5267,6 @@
 "email": "",
 "what": "Инфраструктура ЦОД (питание/охлаждение)",
 "link": "Партнёр Solar Turbines по решениям энергоснабжения дата-центров; Интеграция ГТУ Solar Turbines в энергосистемы ЦОД",
-"tier": "component_specialist",
-"angle": "harvest:unwind3",
-"risk": ""
-},
-{
-"name": "ETS-Astana (TM Energo)",
-"country": "Казахстан",
-"site": "www.tmenergo.kz",
-"email": "",
-"what": "Энергетические решения, поставка и сервис газопоршневых/энергоустановок",
-"link": "Официальный партнёр INNIO в Казахстане; Дистрибуция Jenbacher; рынок распределённой генерации Казахстана (рядом с KPO)",
 "tier": "component_specialist",
 "angle": "harvest:unwind3",
 "risk": ""
@@ -7356,7 +7323,7 @@
 "site": "https://glensol.az",
 "email": "",
 "what": "O&M и MRO газовых турбин, компрессоров и вращающегося оборудования; дочка Nobel Energy Group (с 2012)",
-"link": "Соучредитель/материнская компания Alensol (СП с казахстанской AIMS)",
+"link": "Соучредитель совместных предприятий в регионе",
 "tier": "component_specialist",
 "angle": "harvest:unwind5",
 "risk": ""
@@ -7390,17 +7357,6 @@
 "email": "",
 "what": "Промышленное оборудование и сервис (родственная компания Wirturbo — держит копирайт её сайта)",
 "link": "Партнёр/аффилированная структура Wirturbo",
-"tier": "component_specialist",
-"angle": "harvest:unwind5",
-"risk": ""
-},
-{
-"name": "Intergas Central Asia",
-"country": "Казахстан",
-"site": "https://intergas.kz",
-"email": "",
-"what": "Оператор магистральных газопроводов Казахстана (группа QazaqGaz) с сетью компрессорных станций",
-"link": "Названный клиент Alensol",
 "tier": "component_specialist",
 "angle": "harvest:unwind5",
 "risk": ""
@@ -7516,17 +7472,6 @@
 "risk": ""
 },
 {
-"name": "АО «Завод Узбекхиммаш»",
-"country": "Узбекистан (Чирчик)",
-"site": "https://uzbekhimmash.uz",
-"email": "",
-"what": "Завод технологического оборудования для нефтегазовой и химической промышленности (осн. 1941): ёмкостное, теплообменное оборудование, насосы; info@uzbekhimmash.uz, +998 70 719-92-05",
-"link": "Учредитель (51%) СП «Сервисный Центр UNGM-DR» (№8 списка)",
-"tier": "component_specialist",
-"angle": "harvest:unwind5",
-"risk": ""
-},
-{
 "name": "BRUSH Group",
 "country": "Великобритания",
 "site": "https://www.brush.eu",
@@ -7544,17 +7489,6 @@
 "email": "",
 "what": "Международная площадка б/у станков и оборудования (125+ лотов турбин)",
 "link": "Аналог Kitmondo/Exapro — всплыла при поиске лотов SGT",
-"tier": "component_specialist",
-"angle": "harvest:unwind5",
-"risk": ""
-},
-{
-"name": "NCOC (North Caspian Operating Company)",
-"country": "Казахстан",
-"site": "https://www.ncoc.kz",
-"email": "",
-"what": "Оператор месторождения Кашаган, эксплуатирует парк промышленных газовых турбин",
-"link": "Именованный клиент ООО «СТС» (Сахалин Турбина Сервис)",
 "tier": "component_specialist",
 "angle": "harvest:unwind5",
 "risk": ""
@@ -8094,17 +8028,6 @@
 "email": "",
 "what": "OEM вертолётных газотурбинных двигателей (экс-Turbomeca)",
 "link": "Партнёр по СП и сертифицирующий OEM для Global Turbine Asia из списка",
-"tier": "component_specialist",
-"angle": "harvest:unwind6",
-"risk": ""
-},
-{
-"name": "QazaqGaz",
-"country": "Казахстан",
-"site": "https://www.qazaqgaz.kz",
-"email": "",
-"what": "Национальная газовая компания Казахстана (экс-KazTransGas): добыча, транспортировка, экспорт газа",
-"link": "Материнская группа Intergas Central Asia из списка",
 "tier": "component_specialist",
 "angle": "harvest:unwind6",
 "risk": ""

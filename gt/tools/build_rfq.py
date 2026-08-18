@@ -18,12 +18,12 @@ def nn(s):
     return re.sub(r"[^a-zа-яё0-9]", "", (s or "").lower())
 
 
-# ── фильтр российских компаний (конкуренты, в рассылку не идут) ──────────────
-RU_COUNTRY = re.compile(r"^\s*(Россия|РФ|Russia|Russian)", re.I)
+# ── фильтр компаний-конкурентов: РФ, Казахстан, Беларусь, Узбекистан ─────────
+RU_COUNTRY = re.compile(
+    r"^\s*(Россия|РФ|Russia|Russian|Казахстан|Kazakh|Беларус|Белорус|Belarus|Узбекистан|Uzbek)", re.I)
 RU_ORG = re.compile(r"(^|[\s(])(ООО|ОАО|ЗАО|ПАО|АО|РУП|ФГУП|НПО|УК)\s*[«\"„]?")
-RU_DOM = re.compile(r"\.(ru|рф)(/|$|\b)", re.I)
-RU_NEIGHBOURS = re.compile(
-    r"Казахстан|Узбекистан|Беларус|Belarus|Kazakh|Uzbek|Азербайджан|Армени|Киргиз|Туркмен|Грузи", re.I)
+RU_DOM = re.compile(r"\.(ru|рф|kz|by|uz)(/|$|\b)", re.I)
+RU_NEIGHBOURS = re.compile(r"Азербайджан|Армени|Киргиз|Кыргыз|Туркмен|Грузи|Молдав", re.I)
 
 
 def is_ru(name="", country="", site="", extra=""):
@@ -118,7 +118,7 @@ def build_pool():
             "prank": prank, "bx": len(it), "bx_answered": answered,
             "bx_models": sorted(models), "domain": "turbine",
         }
-    # российские компании — конкуренты КВАНТ, адресатами запросов не становятся
+    # компании РФ/КЗ/РБ/УЗ — конкуренты КВАНТ, адресатами запросов не становятся
     # (распоряжение владельца 17.08.2026; данные вычищены gt/tools/drop_ru.py,
     #  этот фильтр ловит приходящих из CRM-истории)
     dropped = [k for k, v in pool.items()

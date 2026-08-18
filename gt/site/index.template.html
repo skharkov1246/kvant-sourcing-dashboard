@@ -321,15 +321,17 @@ function segsOf(text){
  for(const [id,,rx] of SEGS) if(rx.test(text)) out.add(id);
  return out;
 }
-/* Российские компании — конкуренты КВАНТ, в подборе поставщиков не показываются
-   (распоряжение владельца 17.08.2026). Данные вычищены gt/tools/drop_ru.py, а этот фильтр
-   ловит тех, кто приходит из CRM-снапшота и таможни. Соседи (Казахстан, Узбекистан,
-   Беларусь и др.) — не «русские» в этом смысле и остаются. */
-const RU_NEIGHBOURS = /Казахстан|Узбекистан|Беларус|Belarus|Kazakh|Uzbek|Азербайджан|Армени|Киргиз|Туркмен|Грузи/i;
+/* Компании-конкуренты (РФ, Казахстан, Беларусь, Узбекистан) в подборе поставщиков
+   не показываются: распоряжение владельца 17.08.2026, расширенное тем же днём.
+   Данные вычищены gt/tools/drop_ru.py, а этот фильтр ловит приходящих из CRM-снапшота
+   и таможни. Прочие соседи (Азербайджан, Армения, Киргизия, Туркмения, Грузия,
+   Молдова) владельцем не названы и остаются. */
+const RU_NEIGHBOURS = /Азербайджан|Армени|Киргиз|Кыргыз|Туркмен|Грузи|Молдав/i;
 function isRU(r){
  const name = r.name||'', country = r.country||'', site = (r.site||'').replace(/^https?:\/\//,'').split('/')[0];
  if(RU_NEIGHBOURS.test(name+' '+country)) return false;
- if(/^\s*(Россия|РФ|Russia|Russian)/i.test(country)) return true;
+ if(/^\s*(Россия|РФ|Russia|Russian|Казахстан|Kazakh|Беларус|Белорус|Belarus|Узбекистан|Uzbek)/i.test(country)) return true;
+ if(/\.(kz|by|uz)$/i.test(site)) return true;
  if(/(^|[\s(])(ООО|ОАО|ЗАО|ПАО|АО|РУП|ФГУП|НПО|УК)\s*[«"„]?/.test(name) && !/^[A-Za-z]{3,}/.test(name.trim())) return true;
  return /(^|\.)(ru|рф)$/i.test(site) || /\.(ru|рф)\b/i.test(site);
 }
