@@ -141,8 +141,9 @@ function coRow(c){
  const a=ASK[c.ask]||ASK.nomen;
  const comps=(c.comps&&c.comps.length?c.comps:[c.comp]).map(x=>`<span class="badge b-comp">${esc(x)}</span>`).join('');
  const chk = c.check==='confirmed' ? `<span class="badge" style="background:#d9f2d9;color:#0a5c0a" title="Скептик открыл страницу и видел Solar-номенклатуру своими глазами: ${esc(c.check_seen||'')}">✓ проверено скептиком</span>` : c.check==='doubt' ? '<span class="badge b-ask-nomen" title="скептик не нашёл прямого подтверждения по Solar — понижено в ранге">⚠</span>' : '';
+ const custb = c.customs ? `<span class="badge" style="background:#e6f0ff;color:#1d4ed8;border:1px solid #1d4ed8" title="Доказано отгрузкой: таможня РФ HS 8411, экспортёр «${esc(c.customs.exporter)}», ${c.customs.n} записей (${(c.customs.years||[]).join(', ')})">📦 возил в РФ ×${c.customs.n}</span>` : '';
  return `<div class="co" data-k="${esc(k)}">
-  <div><div class="cn">${esc(c.name)} <span class="badge ${a[1]}">${a[0]}</span>${chk}</div>
+  <div><div class="cn">${esc(c.name)} <span class="badge ${a[1]}">${a[0]}</span>${chk}${custb}</div>
    <div class="mut small">${esc(c.country||'')} · ${esc(c.relation||'')}</div>
    <div style="margin-top:4px">${comps}</div>
    ${c.email?`<div class="small"><a href="mailto:${esc(c.email)}">✉ ${esc(c.email)}</a></div>`:''}
