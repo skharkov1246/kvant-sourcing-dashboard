@@ -380,6 +380,46 @@ function mergeByDomain(map){
   }
  }
 }
+
+// Вторая склейка — по базовому имени (до скобки), для дублей на РАЗНЫХ доменах или без сайта.
+// Родовые слова исключены, чтобы не слить разные компании («Solar Turbines» ≠ «Solar Manufacturing»,
+// «Allied Power Group» ≠ «Allied International»): база берётся до первой скобки/запятой целиком.
+const NAMEBASE_GENERIC = new Set(['gasturbine','turbine','turbines','solar','power','energy','allied','resources','controls','services','shanghaielectric','general','industrial']);
+function nameBase(n){
+ let b = n.split('(')[0].split(',')[0].toLowerCase().trim();
+ b = b.replace(/\b(gmbh|co kg|co ltd|ltd|llc|inc|s r l|srl|s p a|spa|sa|sas|bv|ab|as|plc|corp|gruppe|group)\b/g,'');
+ return b.replace(/[^a-z0-9а-яё]/g,'');
+}
+function mergeByNameBase(map){
+ const byBase = new Map();
+ for(const [k,r] of map){
+  const b = nameBase(r.name);
+  if(b.length < 6 || NAMEBASE_GENERIC.has(b)) continue;
+  if(!byBase.has(b)) byBase.set(b, []);
+  byBase.get(b).push([k,r]);
+ }
+ for(const [,group] of byBase){
+  if(group.length < 2) continue;
+  group.sort((a,b)=> (b[1].src.size - a[1].src.size) || (a[1].name.length - b[1].name.length));
+  const [, keep] = group[0];
+  const plain = n => n.replace(/\s*\([^()]*\)/g,'').trim();
+  // головное имя — самое короткое «чистое» (без скобок), обычно это и есть база
+  const pick = group.map(g=>g[1].name).slice().sort((a,b)=> plain(a).length - plain(b).length)[0];
+  if(pick && pick!==keep.name){ keep.altNames = keep.altNames||[]; keep.altNames.push(keep.name); keep.name = pick; }
+  for(const [k,r] of group.slice(1)){
+   ['segs','models','src','subOf'].forEach(f=>{ if(r[f]&&keep[f]) r[f].forEach(x=>keep[f].add(x)); });
+   ['sgtAll','solarAll','heavyAll'].forEach(f=>{ if(r[f]) keep[f]=true; });
+   for(const [m,n] of Object.entries(r.bitrix||{})) keep.bitrix[m] = (keep.bitrix[m]||0) + n;
+   ['role','email','phone','what','evid','conf','prior','tier','tierRaw','site'].forEach(f=>{ if(!keep[f] && r[f]) keep[f]=r[f]; });
+   if(!keep.clSeg && r.clSeg) keep.clSeg = r.clSeg;
+   keep.altNames = keep.altNames || [];
+   if(!keep.altNames.includes(r.name)) keep.altNames.push(r.name);
+   if(r.altNames) r.altNames.forEach(n=>{ if(!keep.altNames.includes(n)) keep.altNames.push(n); });
+   map.delete(k);
+  }
+ }
+}
+
 let UNI = null;
 function buildUnified(){
  const map = new Map();
@@ -521,6 +561,7 @@ function buildUnified(){
   else if(isRU(r)) map.delete(k);   // российские — конкуренты, в подбор не идут (см. gt/tools/drop_ru.py)
  }
  mergeByDomain(map);
+ mergeByNameBase(map);
  const dmap = {};
  for(const [n,v] of Object.entries((DOSSIERS.dossiers)||{})) dmap[nrm(n)] = v;
  const hmap = {};
