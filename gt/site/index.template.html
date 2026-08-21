@@ -420,6 +420,24 @@ function mergeByNameBase(map){
  }
 }
 
+// Экспортёры из таможни РФ (HS 8411): считаем по всем записям, ключ — нормализованное имя
+const CUST_EXPORTERS = (()=>{
+ const m = {};
+ for(const rec of (CUSTOMS.records||[])){
+  const name = rec.ex; if(!name) continue;
+  const k = nrm(name); if(k.length<5) continue;
+  if(!m[k]) m[k] = { n:0, ex:name };
+  m[k].n++;
+ }
+ return m;
+})();
+// подобрать экспортёра под компанию: точное или подстрочное совпадение нормализованных имён
+function custMatch(key){
+ if(CUST_EXPORTERS[key]) return CUST_EXPORTERS[key];
+ for(const k in CUST_EXPORTERS){ if((key.includes(k)||k.includes(key)) && Math.min(key.length,k.length)>=6) return CUST_EXPORTERS[k]; }
+ return null;
+}
+
 let UNI = null;
 function buildUnified(){
  const map = new Map();
@@ -599,6 +617,8 @@ function buildUnified(){
    r.bxReplied=rep; r.bxNoReply=no;
    r.bxRate = (rep+no)>0 ? Math.round(100*rep/(rep+no)) : null;
   }
+  const cm = custMatch(r.key);
+  if(cm) r.customs = cm;   // доказано отгрузкой: таможня РФ HS 8411
   if(r.dossier){
    if((!r.email || /см\. сайт|не найдено|—|^$/.test(r.email)) && r.dossier.contact_email) r.email = r.dossier.contact_email;
    if((!r.phone || /см\. сайт|не найдено|—|^$/.test(r.phone)) && r.dossier.contact_phone) r.phone = r.dossier.contact_phone;
@@ -719,6 +739,11 @@ function pkCard(r){
    <div style="margin-bottom:4px">${[...r.segs].map(id=>`<span class="tag">${esc(SEG_SHORT(id))}</span>`).join('')||'<span class="mut">сегмент не определён</span>'}</div>
    <div style="margin-bottom:6px">${models}${wide}${gen}${r.badgecheck?bcTag(r.badgecheck):''}</div>
    ${dossierBits.length?`<div style="font-size:12px;margin-bottom:4px">${dossierBits.map(b=>`<span class="dfact">${esc(b)}</span>`).join('')}</div>`:''}
+   ${(()=>{ const ev=[];
+     if(r.customs) ev.push(`<span class="dfact" style="background:#e6f0ff;color:#1d4ed8" title="Таможня РФ HS 8411: экспортёр «${esc(r.customs.ex)}», ${r.customs.n} записей">📦 возил в РФ ×${r.customs.n}</span>`);
+     if(r.badgecheck&&r.badgecheck.quote) ev.push(`<span class="dfact" style="background:#d9f2d9;color:#0a5c0a" title="${esc(r.badgecheck.quote)}">👁 скептик видел на сайте</span>`);
+     if(r.bxReplied>0) ev.push(`<span class="dfact" style="background:#fdeecd;color:#7a5200" title="Отвечали по существу ${r.bxReplied} из ${r.bxReplied+r.bxNoReply} наших запросов">💬 отвечали нам ×${r.bxReplied}</span>`);
+     return ev.length?`<div style="font-size:12px;margin-bottom:4px">${ev.join('')}</div>`:''; })()}
    ${r.what?`<div class="mut" style="font-size:12.5px">${esc(r.what.length>170?r.what.slice(0,170)+'…':r.what)}</div>`:''}
    ${r.evid?`<div class="mut" style="font-size:11.5px;margin-top:3px">Проверка: ${esc(r.evid.length>150?r.evid.slice(0,150)+'…':r.evid)}</div>`:''}
    ${d.hook?`<div style="font-size:12px;margin-top:4px;border-left:3px solid var(--good);padding-left:8px">✍ Зацепка для письма: ${esc(d.hook)}</div>`:''}
