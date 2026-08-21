@@ -144,7 +144,7 @@ footer{padding:0 22px 24px;color:var(--mut);font-size:11.5px}
 <body>
 <header>
   <h1>ГТУ-библиотека: поставщики и ЗИП — Solar &amp; Siemens SGT-100…400</h1>
-  <div class="sub">Справочник для сорсеров КВАНТ: машины · номенклатура ЗИП · шифровки PN · библиотека производителей (OEM / независимые / реверс) · таможня РФ · мировые базы. Сборка: 2026-08-20</div>
+  <div class="sub">Справочник для сорсеров КВАНТ: машины · номенклатура ЗИП · шифровки PN · библиотека производителей (OEM / независимые / реверс) · таможня РФ · мировые базы. Сборка: 2026-08-21</div>
   <div class="sub" style="margin-top:6px"><a href="./lot" style="font-weight:700">→ Лот ЛУКОЙЛ: рабочее меню</a> — горячая часть · план рассылки · склады · трейдеры · блоки по направлениям</div>
 </header>
 <nav id="nav"></nav>
@@ -61489,6 +61489,64 @@ function mergeByDomain(map){
   }
  }
 }
+
+// Вторая склейка — по базовому имени (до скобки), для дублей на РАЗНЫХ доменах или без сайта.
+// Родовые слова исключены, чтобы не слить разные компании («Solar Turbines» ≠ «Solar Manufacturing»,
+// «Allied Power Group» ≠ «Allied International»): база берётся до первой скобки/запятой целиком.
+const NAMEBASE_GENERIC = new Set(['gasturbine','turbine','turbines','solar','power','energy','allied','resources','controls','services','shanghaielectric','general','industrial']);
+function nameBase(n){
+ let b = n.split('(')[0].split(',')[0].toLowerCase().trim();
+ b = b.replace(/\b(gmbh|co kg|co ltd|ltd|llc|inc|s r l|srl|s p a|spa|sa|sas|bv|ab|as|plc|corp|gruppe|group)\b/g,'');
+ return b.replace(/[^a-z0-9а-яё]/g,'');
+}
+function mergeByNameBase(map){
+ const byBase = new Map();
+ for(const [k,r] of map){
+  const b = nameBase(r.name);
+  if(b.length < 6 || NAMEBASE_GENERIC.has(b)) continue;
+  if(!byBase.has(b)) byBase.set(b, []);
+  byBase.get(b).push([k,r]);
+ }
+ for(const [,group] of byBase){
+  if(group.length < 2) continue;
+  group.sort((a,b)=> (b[1].src.size - a[1].src.size) || (a[1].name.length - b[1].name.length));
+  const [, keep] = group[0];
+  const plain = n => n.replace(/\s*\([^()]*\)/g,'').trim();
+  // головное имя — самое короткое «чистое» (без скобок), обычно это и есть база
+  const pick = group.map(g=>g[1].name).slice().sort((a,b)=> plain(a).length - plain(b).length)[0];
+  if(pick && pick!==keep.name){ keep.altNames = keep.altNames||[]; keep.altNames.push(keep.name); keep.name = pick; }
+  for(const [k,r] of group.slice(1)){
+   ['segs','models','src','subOf'].forEach(f=>{ if(r[f]&&keep[f]) r[f].forEach(x=>keep[f].add(x)); });
+   ['sgtAll','solarAll','heavyAll'].forEach(f=>{ if(r[f]) keep[f]=true; });
+   for(const [m,n] of Object.entries(r.bitrix||{})) keep.bitrix[m] = (keep.bitrix[m]||0) + n;
+   ['role','email','phone','what','evid','conf','prior','tier','tierRaw','site'].forEach(f=>{ if(!keep[f] && r[f]) keep[f]=r[f]; });
+   if(!keep.clSeg && r.clSeg) keep.clSeg = r.clSeg;
+   keep.altNames = keep.altNames || [];
+   if(!keep.altNames.includes(r.name)) keep.altNames.push(r.name);
+   if(r.altNames) r.altNames.forEach(n=>{ if(!keep.altNames.includes(n)) keep.altNames.push(n); });
+   map.delete(k);
+  }
+ }
+}
+
+// Экспортёры из таможни РФ (HS 8411): считаем по всем записям, ключ — нормализованное имя
+const CUST_EXPORTERS = (()=>{
+ const m = {};
+ for(const rec of (CUSTOMS.records||[])){
+  const name = rec.ex; if(!name) continue;
+  const k = nrm(name); if(k.length<5) continue;
+  if(!m[k]) m[k] = { n:0, ex:name };
+  m[k].n++;
+ }
+ return m;
+})();
+// подобрать экспортёра под компанию: точное или подстрочное совпадение нормализованных имён
+function custMatch(key){
+ if(CUST_EXPORTERS[key]) return CUST_EXPORTERS[key];
+ for(const k in CUST_EXPORTERS){ if((key.includes(k)||k.includes(key)) && Math.min(key.length,k.length)>=6) return CUST_EXPORTERS[k]; }
+ return null;
+}
+
 let UNI = null;
 function buildUnified(){
  const map = new Map();
@@ -61630,6 +61688,7 @@ function buildUnified(){
   else if(isRU(r)) map.delete(k);   // российские — конкуренты, в подбор не идут (см. gt/tools/drop_ru.py)
  }
  mergeByDomain(map);
+ mergeByNameBase(map);
  const dmap = {};
  for(const [n,v] of Object.entries((DOSSIERS.dossiers)||{})) dmap[nrm(n)] = v;
  const hmap = {};
@@ -61659,6 +61718,16 @@ function buildUnified(){
   r.typ = classify(r);
   r.dossier = dmap[r.key] || null;
   r.bxHist = hmap[r.key] || null;
+  if(r.bxHist){
+   const REPLIED=/Price at Work|Selected|Correspondance|Not Selected|Отказ в КП|Не подошло по технике/;
+   const NOREPLY=/Ответ не получен|Unread Messages/;
+   let rep=0,no=0;
+   for(const h of r.bxHist){ const st=h.stage||''; if(REPLIED.test(st)) rep++; else if(NOREPLY.test(st)) no++; }
+   r.bxReplied=rep; r.bxNoReply=no;
+   r.bxRate = (rep+no)>0 ? Math.round(100*rep/(rep+no)) : null;
+  }
+  const cm = custMatch(r.key);
+  if(cm) r.customs = cm;   // доказано отгрузкой: таможня РФ HS 8411
   if(r.dossier){
    if((!r.email || /см\. сайт|не найдено|—|^$/.test(r.email)) && r.dossier.contact_email) r.email = r.dossier.contact_email;
    if((!r.phone || /см\. сайт|не найдено|—|^$/.test(r.phone)) && r.dossier.contact_phone) r.phone = r.dossier.contact_phone;
@@ -61709,6 +61778,7 @@ const scoreBand = s => s>=75?['досье полное','sc-hi']:s>=50?['про�
 const SORTS = {
  score:['по рангу и фактам', (a,b)=> (a.prank-b.prank) || (b.score-a.score) || (b.bxTotal-a.bxTotal) || a.name.localeCompare(b.name)],
  rel:  ['сначала предлагавшие нам', (a,b)=> (b.bxTotal-a.bxTotal) || (b.score-a.score) || a.name.localeCompare(b.name)],
+ resp: ['сначала реально отвечающие', (a,b)=> ((b.bxReplied||0)-(a.bxReplied||0)) || ((b.bxRate??-1)-(a.bxRate??-1)) || (b.bxTotal-a.bxTotal) || a.name.localeCompare(b.name)],
  name: ['по алфавиту', (a,b)=> a.name.localeCompare(b.name,'ru')],
  country: ['по стране', (a,b)=> a.country.localeCompare(b.country,'ru') || a.name.localeCompare(b.name)],
 };
@@ -61752,6 +61822,10 @@ function pkCard(r){
  const src = [...r.src].map(s=>s==='bitrix'
    ? `<span class="pill bx">Bitrix · ${r.bxTotal} запрос${r.bxTotal>4?'ов':(r.bxTotal>1?'а':'')}</span>`
    : `<span class="pill">${esc(s)}</span>`).join('');
+ // отклик по CRM: реально отвечают N из (ответили+молчание)
+ const respP = (r.bxReplied!=null && (r.bxReplied+r.bxNoReply)>0)
+   ? `<span class="pill" style="background:${r.bxRate>=60?'#d9f2d9':r.bxRate>=30?'#fdeecd':'#f6dcdc'};color:${r.bxRate>=60?'#0a5c0a':r.bxRate>=30?'#7a5200':'#8c1f1f'}" title="По нашей истории в Bitrix: ответили по существу (цена/КП/переписка/мотивированный отказ) ${r.bxReplied}, промолчали/не прочли ${r.bxNoReply}">отвечают ${r.bxReplied}/${r.bxReplied+r.bxNoReply} · ${r.bxRate}%</span>`
+   : '';
  const [bandLabel, bandCls] = scoreBand(r.score);
  const PRANK = {1:['П1 · поставки доказаны','наша сделка в Bitrix или BOL/таможенная запись'],2:['П2 · назван клиент-OEM','кейс-стади, референс или пресс-релиз с именем клиента'],3:['П3 · профильный каталог','каталог с моделями/деталями ГТУ, но без имён клиентов'],4:['П4 · не доказано','только самозаявление на сайте']};
  const prankP = `<span class="pill pr pr${r.prank}" title="${esc(PRANK[r.prank][1])}">${PRANK[r.prank][0]}</span>`;
@@ -61768,12 +61842,17 @@ function pkCard(r){
    <h4>${esc(r.name)}</h4>
    <div class="mut" style="margin:2px 0 6px">${esc(r.country)}${r.role?' · '+esc(r.role):''}</div>
    ${r.altNames&&r.altNames.length?`<div class="mut small" style="margin:-4px 0 6px" title="Один сайт = одна компания: карточки этих названий объединены">в базе также как: ${esc(r.altNames.slice(0,4).join(' · '))}${r.altNames.length>4?` и ещё ${r.altNames.length-4}`:''}</div>`:''}
-   <div><span class="pill typ">${r.typ==='sub' ? 'субпоставщик: '+([...r.subOf].join(', ')||'OEM') : TYPE_NAME[r.typ]}</span>${scoreP}${src}</div>
+   <div><span class="pill typ">${r.typ==='sub' ? 'субпоставщик: '+([...r.subOf].join(', ')||'OEM') : TYPE_NAME[r.typ]}</span>${scoreP}${respP}${src}</div>
   </div>
   <div>
    <div style="margin-bottom:4px">${[...r.segs].map(id=>`<span class="tag">${esc(SEG_SHORT(id))}</span>`).join('')||'<span class="mut">сегмент не определён</span>'}</div>
    <div style="margin-bottom:6px">${models}${wide}${gen}${r.badgecheck?bcTag(r.badgecheck):''}</div>
    ${dossierBits.length?`<div style="font-size:12px;margin-bottom:4px">${dossierBits.map(b=>`<span class="dfact">${esc(b)}</span>`).join('')}</div>`:''}
+   ${(()=>{ const ev=[];
+     if(r.customs) ev.push(`<span class="dfact" style="background:#e6f0ff;color:#1d4ed8" title="Таможня РФ HS 8411: экспортёр «${esc(r.customs.ex)}», ${r.customs.n} записей">📦 возил в РФ ×${r.customs.n}</span>`);
+     if(r.badgecheck&&r.badgecheck.quote) ev.push(`<span class="dfact" style="background:#d9f2d9;color:#0a5c0a" title="${esc(r.badgecheck.quote)}">👁 скептик видел на сайте</span>`);
+     if(r.bxReplied>0) ev.push(`<span class="dfact" style="background:#fdeecd;color:#7a5200" title="Отвечали по существу ${r.bxReplied} из ${r.bxReplied+r.bxNoReply} наших запросов">💬 отвечали нам ×${r.bxReplied}</span>`);
+     return ev.length?`<div style="font-size:12px;margin-bottom:4px">${ev.join('')}</div>`:''; })()}
    ${r.what?`<div class="mut" style="font-size:12.5px">${esc(r.what.length>170?r.what.slice(0,170)+'…':r.what)}</div>`:''}
    ${r.evid?`<div class="mut" style="font-size:11.5px;margin-top:3px">Проверка: ${esc(r.evid.length>150?r.evid.slice(0,150)+'…':r.evid)}</div>`:''}
    ${d.hook?`<div style="font-size:12px;margin-top:4px;border-left:3px solid var(--good);padding-left:8px">✍ Зацепка для письма: ${esc(d.hook)}</div>`:''}
