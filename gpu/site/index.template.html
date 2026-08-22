@@ -140,6 +140,14 @@ footer{padding:0 22px 24px;color:var(--mut);font-size:11.5px}
   <div class="card" id="ov-src"></div>
 </section>
 
+<section id="t-find">
+  <h2>Поиск по номеру</h2>
+  <p class="mut">Один номер — всё, что о нём знает библиотека: наш лот, аналоги, каталоги MOTORTECH, ведомости, машины, поставщики, живые проверки. Пробелы, дефисы и точки в номере игнорируются.</p>
+  <div class="filters"><div class="f-field" style="flex:1"><label>номер детали или название</label>
+    <input id="fx-q" placeholder="4380132 · 06.50.151 · 334976 · LF9050 · 12453572 · P611…" style="width:100%;font-size:16px;padding:10px 12px"></div></div>
+  <div id="fx-out"></div>
+</section>
+
 <section id="t-strategy">
   <h2 id="st-title"></h2>
   <div class="box info" id="st-thesis"></div>
@@ -410,6 +418,8 @@ footer{padding:0 22px 24px;color:var(--mut);font-size:11.5px}
   <h3>Смежное</h3>
   <div id="bx-adj"></div>
   <div class="card" id="bx-hist"></div>
+  <h3 id="bx-sup-t" style="display:none">К кому уже ходили: запросы СП-166 по поставщикам</h3>
+  <div class="tblwrap" id="bx-sup-w" style="display:none"><table><thead><tr><th>Поставщик</th><th class="num">Запросов</th><th>Последний</th><th>Стадии</th></tr></thead><tbody id="bx-sup"></tbody></table></div>
   <h3 id="bx-pool-t" style="display:none">Мировой пул в нашей базе</h3>
   <div class="tblwrap" id="bx-pool-w" style="display:none"><table><thead><tr><th>Компания</th><th class="num">Запросов</th><th>Последний</th></tr></thead><tbody id="bx-pool"></tbody></table></div>
 </section>
@@ -428,6 +438,16 @@ footer{padding:0 22px 24px;color:var(--mut);font-size:11.5px}
 
 <section id="t-play">
   <h2>Плейбук: как вести заявку по ГПУ</h2>
+
+  <h3>RFQ-пакет: пробные запросы — осталось отправить</h3>
+  <p id="rp-intro"></p>
+  <div class="card"><h4>Правила захода</h4><ol id="rp-rules"></ol></div>
+  <div class="k" id="rp-tiles"></div>
+  <div class="tblwrap"><table><thead><tr><th>Позиция</th><th>Номера</th><th>Количество</th></tr></thead><tbody id="rp-pos"></tbody></table></div>
+  <p class="mut">Клик по адресату — готовое письмо с его позициями и персональной строкой.</p>
+  <div class="chips" id="rp-pick"></div>
+  <div id="rp-letter"></div>
+  <div class="box info" id="rp-track"></div>
   <p id="pb-intro"></p>
   <div id="pb-flow"></div>
   <h3>Что спросить у заказчика</h3>
@@ -468,6 +488,7 @@ const STRATEGY = __STRATEGY_JSON__;
 const TARGETS  = __TARGETS_JSON__;
 const CONSUM_B = __CONSUMABLES_JSON__;
 const MACHINES = __MACHINES_JSON__;
+const RFQPACK  = __RFQPACK_JSON__;
 const BUILT_AT = "__BUILT_AT__";
 
 const $ = s => document.querySelector(s);
@@ -479,7 +500,7 @@ $("#built").textContent = BUILT_AT; $("#built2").textContent = BUILT_AT;
 
 /* ── вкладки ───────────────────────────────────────────────────────────── */
 const TABS = [
-  ["t-over", "Обзор"], ["t-strategy", "Стратегия"], ["t-market", "Рынок"],
+  ["t-over", "Обзор"], ["t-find", "Поиск"], ["t-strategy", "Стратегия"], ["t-market", "Рынок"],
   ["t-fleet", "Парк"], ["t-consum", "Потребление"],
   ["t-cons", "Расходники"], ["t-mach", "Разбор машин"], ["t-models", "Машины"], ["t-parts", "Номенклатура"],
   ["t-demand", "Наш спрос"], ["t-analogs", "Аналоги"], ["t-subs", "Субпоставщики"],
@@ -586,6 +607,50 @@ function fillSelect(sel, values, allLabel) {
     <p><b>Поставщики.</b> ${esc(SUPPLIERS.source)}</p>
     <p><b>Bitrix.</b> ${esc(BITRIX.source)}</p>
     <p class="mut">Где источник не проверен или проверка не удалась — это написано прямо в карточке (значок ⚠). Ничего не додумано.</p>`;
+})();
+
+/* ── Глобальный поиск по номеру ────────────────────────────────────────── */
+(function () {
+  const norm = s => String(s || "").toUpperCase().replace(/[\s.\-–—_/]/g, "");
+  // индекс: [нормализованный ключ, группа, заголовок, html-детали, вкладка]
+  const IDX = [];
+  const add = (key, grp, title, html, tab) => { const k = norm(key); if (k.length >= 3) IDX.push([k, grp, title, html, tab]); };
+
+  DEMAND.rows.forEach(r => add(r.pn, "Наш лот", `${r.pn} — ${r.name}`,
+    `${esc(r.man)} · ${num(r.qty)} ${esc(r.unit)} · ${r.usd_lo != null ? usd(r.usd_lo) + "–" + num(r.usd_hi) + " за шт" : "цена не оценена"}${r.checks.length ? " · есть живые проверки продавцов" : ""}`, "t-demand"));
+  ANALOGS.families.forEach(f => {
+    f.oem_pns.forEach(p => add(p, "Аналоги", f.title, `OEM-номер в семействе. Аналоги: ${f.analogs.map(a => esc(a.brand) + " " + esc(a.pn)).join("; ")}`, "t-analogs"));
+    f.analogs.forEach(a => add(a.pn, "Аналоги", `${a.brand} ${a.pn}`, `Аналог в семействе «${esc(f.title)}» (уровень ${esc(a.level)}). Заменяет: ${f.oem_pns.map(esc).join(", ")}`, "t-analogs"));
+  });
+  (MTCROSS.records || []).forEach(r => {
+    const all = r.cross.map(c => `${esc(c.brand)}: ${c.pns.map(esc).join(", ")}`).join(" · ");
+    r.motortech.forEach(p => add(p, "Каталог MOTORTECH", `MOTORTECH ${p}`, `${esc(r.part || "позиция")} (${esc(r.guide)}${r.engines ? ", " + esc(r.engines) : ""}). Эквиваленты: ${all}`, "t-analogs"));
+    r.cross.forEach(c => c.pns.forEach(p => add(p, "Каталог MOTORTECH", `${c.brand} ${p}`, `${esc(r.part || "позиция")} (${esc(r.guide)}). MOTORTECH: ${r.motortech.map(esc).join(", ") || "—"}. Все эквиваленты: ${all}`, "t-analogs")));
+  });
+  (PARTLISTS.lists || []).forEach(L => L.groups.forEach(g => g.rows.forEach(r =>
+    add(r.pn, "Ведомости", `${r.pn} — ${r.desc}`, `${esc(L.engine)}, ${esc(g.name)}: ${esc(r.qty)} на двигатель${r.comment ? " · " + esc(r.comment) : ""}`, "t-parts"))));
+  MACHINES.machines.forEach(m => m.units.forEach(u => u.pns.forEach(p => {
+    const pn = String(p).split(" ")[0].split("(")[0];
+    add(pn, "Разбор машин", `${m.oem} ${m.model} — ${u.unit}`, `${esc(p)}. Кто делает: ${u.makers.map(k => esc(k.b)).join("; ")}`, "t-mach");
+  })));
+  SUPPLIERS.companies.forEach(c => add(c.name, "Поставщики", c.name, `${esc(c.country)} · рейтинг ${c.score} · ${esc((c.what || "").slice(0, 140))}…`, "t-sup"));
+
+  const grpOrder = ["Наш лот", "Аналоги", "Каталог MOTORTECH", "Ведомости", "Разбор машин", "Поставщики"];
+  function paint() {
+    const q = norm($("#fx-q").value);
+    const out = $("#fx-out");
+    if (q.length < 3) { out.innerHTML = `<p class="mut">Введите минимум 3 символа. В индексе ${num(IDX.length)} записей.</p>`; return; }
+    const hits = IDX.filter(x => x[0].includes(q));
+    if (!hits.length) { out.innerHTML = `<div class="box warn"><b>Ничего не найдено.</b> Это тоже информация: номера нет в базе — разберите его и добавьте (правило: каждая заявка оставляет след).</div>`; return; }
+    const seen = new Set(), groups = {};
+    hits.forEach(x => { const k = x[1] + "|" + x[2] + "|" + x[3]; if (seen.has(k)) return; seen.add(k); (groups[x[1]] = groups[x[1]] || []).push(x); });
+    out.innerHTML = grpOrder.filter(g => groups[g]).map(g => `<div class="card"><h4>${esc(g)} <span class="mut">· ${groups[g].length}</span></h4>` +
+      groups[g].slice(0, 25).map(x => `<div style="padding:6px 0;border-top:1px solid var(--grid)">
+        <b>${esc(x[2])}</b> <button class="btn" style="float:right;padding:2px 8px" onclick="document.querySelector('nav button:nth-child(${TABS.findIndex(t => t[0] === x[4]) + 1})').click()">открыть →</button>
+        <div class="mut" style="margin-top:2px">${x[3]}</div></div>`).join("") +
+      (groups[g].length > 25 ? `<div class="mut">…и ещё ${groups[g].length - 25}</div>` : "") + `</div>`).join("");
+  }
+  $("#fx-q").oninput = paint; paint();
 })();
 
 /* ── Стратегия ─────────────────────────────────────────────────────────── */
@@ -1147,6 +1212,17 @@ function fillSelect(sel, values, allLabel) {
     <div class="tblwrap"><table><thead><tr><th>Ось</th><th class="num">Вес</th><th>Как оценивается</th></tr></thead>
     <tbody>${M.axes.map(a => `<tr><td><b>${esc(a.name)}</b></td><td class="num">${a.w}</td><td>${esc(a.how)}</td></tr>`).join("")}</tbody></table></div>`;
 
+  // статистика Bitrix по поставщику: матчинг by_supplier/pool по алиасам
+  const bxNorm = s => String(s || "").toLowerCase();
+  function bxStat(c) {
+    const src = (BITRIX.by_supplier || []).concat((BITRIX.pool || []).map(p => ({ name: p.name, n: p.rfqs, last: p.last })));
+    if (!src.length) return null;   // сид без живой выгрузки — бейджи не показываем
+    const als = (c.aliases || []).map(bxNorm);
+    let best = null;
+    src.forEach(s => { const nm = bxNorm(s.name);
+      if (als.some(a => nm.includes(a))) { if (!best || (s.n || 0) > best.n) best = { n: s.n || 0, last: s.last || "" }; } });
+    return best || { n: 0, last: "" };
+  }
   const regions = [...new Set(SUPPLIERS.companies.map(c => c.region))];
   const oems = [...new Set(SUPPLIERS.companies.flatMap(c => c.oem || []))].sort();
   const types = [...new Set(SUPPLIERS.companies.map(c => c.type))];
@@ -1170,6 +1246,7 @@ function fillSelect(sel, values, allLabel) {
       const cls = c.score >= 80 ? "hi" : c.score >= 60 ? "md" : "lo";
       const bar = (label, v) => `<div class="barrow"><span>${esc(label)}</span>
         <span class="bartrack"><span class="barfill" style="width:${(v / 5) * 100}%"></span></span><span>${v}</span></div>`;
+      const bx = bxStat(c);
       return `<div class="sup">
         <div>
           <h4>${esc(c.name)}</h4>
@@ -1178,6 +1255,7 @@ function fillSelect(sel, values, allLabel) {
             <span class="pill ${cls}">${c.score}</span>
             <span class="pill">${esc(c.type)}</span>
             <span class="pill">${esc(c.region)}</span>
+            ${bx ? `<span class="pill ${bx.n ? "a" : "lo"}" title="по живой выгрузке Bitrix">Bitrix: ${bx.n ? bx.n + " запр., посл. " + esc(bx.last) : "не ходили"}</span>` : ""}
           </div>
           <div style="margin-top:5px">${(c.oem || []).map(o => `<span class="tag">${esc(o)}</span>`).join("")}</div>
         </div>
@@ -1256,6 +1334,12 @@ function fillSelect(sel, values, allLabel) {
     ${a.note ? `<div class="note">${esc(a.note)}</div>` : ""}
   </div>`).join("");
   $("#bx-hist").innerHTML = esc(BITRIX.history_note || "");
+  if ((BITRIX.by_supplier || []).length) {
+    $("#bx-sup-t").style.display = ""; $("#bx-sup-w").style.display = "";
+    $("#bx-sup").innerHTML = BITRIX.by_supplier.map(s => `<tr><td><b>${esc(s.name)}</b></td>
+      <td class="num">${s.n}</td><td>${esc(s.last || "—")}</td>
+      <td class="mut">${Object.entries(s.stages || {}).map(([k, v]) => esc(k) + " ×" + v).join(", ")}</td></tr>`).join("");
+  }
   if ((BITRIX.pool || []).length) {
     $("#bx-pool-t").style.display = ""; $("#bx-pool-w").style.display = "";
     $("#bx-pool").innerHTML = BITRIX.pool.map(p =>
@@ -1273,6 +1357,47 @@ function fillSelect(sel, values, allLabel) {
     <ol>${CUSTOMS.how_to_pull.steps.map(s => `<li class="mono">${esc(s)}</li>`).join("")}</ol>
     <div class="box warn">${esc(CUSTOMS.how_to_pull.cost)}</div>`;
   $("#cu-look").innerHTML = CUSTOMS.what_to_look_for.map(s => `<li>${esc(s)}</li>`).join("");
+})();
+
+/* ── RFQ-пакет ─────────────────────────────────────────────────────────── */
+(function () {
+  const P = RFQPACK;
+  $("#rp-intro").textContent = P.intro;
+  $("#rp-rules").innerHTML = P.rules.map(r => `<li>${esc(r)}</li>`).join("");
+  $("#rp-tiles").innerHTML = [[P.positions.length, "позиции"], [P.recipients.length, "адресатов"],
+    [P.recipients.filter(r => r.to).length, "с прямым email"]]
+    .map(([b, s]) => `<div class="tile"><b>${esc(b)}</b><span>${esc(s)}</span></div>`).join("");
+  $("#rp-pos").innerHTML = P.positions.map(p => `<tr><td><b>${esc(p.short)}</b><div class="mut">${esc(p.title)}</div></td>
+    <td class="mono">${esc(p.pns)}</td><td>${esc(p.qty)}</td></tr>`).join("");
+  const host = $("#rp-pick");
+  let cur = 0;
+  function letter(i) {
+    const r = P.recipients[i];
+    const tpl = r.lang === "ru" ? P.template_ru : P.template_en;
+    const pos = r.pos.map(k => P.positions.find(p => p.key === k));
+    const block = pos.map((p, n) => `${n + 1}) ${p.title}\n   P/N: ${p.pns}\n   Qty: ${p.qty}`).join("\n");
+    const asks = [...new Set(pos.flatMap(p => p.asks))].map((a, n) => `${n + 1}. ${a}`).join("\n");
+    const txt = tpl.replace("{SHORT}", pos.map(p => p.short).join(" + "))
+      .replace("{NAME}", r.name).replace("{PERSONAL}", r.personal)
+      .replace("Position: {TITLE}\nPart numbers: {PNS}\nQuantity: {QTY}", block)
+      .replace("Позиция: {TITLE}\nНомера: {PNS}\nКоличество: {QTY}", block)
+      .replace("{ASKS}", asks);
+    $("#rp-letter").innerHTML = `<div class="card"><h4>${esc(r.name)}
+      ${r.to ? `— <a href="mailto:${esc(r.to)}">${esc(r.to)}</a>` : r.form ? `— <a href="${esc(r.form)}" target="_blank" rel="noopener">через форму на сайте ↗</a>` : ""}</h4>
+      <div class="mut">Позиции: ${pos.map(p => esc(p.short)).join(" · ")} · язык: ${r.lang.toUpperCase()}</div>
+      <pre id="rp-txt">${esc(txt)}</pre>
+      <button class="btn" id="rp-copy">скопировать письмо</button>
+      <span class="mut" style="margin-left:8px">Подпись {SIGNATURE} сорсер вставляет свою.</span></div>`;
+    $("#rp-copy").onclick = () => { if (navigator.clipboard) navigator.clipboard.writeText($("#rp-txt").textContent)
+      .then(() => { $("#rp-copy").textContent = "скопировано ✓"; setTimeout(() => $("#rp-copy").textContent = "скопировать письмо", 1500); }); };
+  }
+  P.recipients.forEach((r, i) => {
+    const ch = el("div", "chip" + (i === 0 ? " on" : ""), esc(r.name));
+    ch.onclick = () => { cur = i; host.querySelectorAll(".chip").forEach(x => x.classList.remove("on")); ch.classList.add("on"); letter(i); };
+    host.append(ch);
+  });
+  letter(0);
+  $("#rp-track").innerHTML = "<b>Учёт.</b> " + esc(P.tracking_note);
 })();
 
 /* ── Плейбук ───────────────────────────────────────────────────────────── */

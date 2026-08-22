@@ -45,6 +45,7 @@ FILES = {
     "__TARGETS_JSON__": "targets.json",
     "__CONSUMABLES_JSON__": "consumables.json",
     "__MACHINES_JSON__": "machines.json",
+    "__RFQPACK_JSON__": "rfq_pack.json",
 }
 
 
