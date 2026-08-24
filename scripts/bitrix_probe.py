@@ -1,25 +1,21 @@
-"""CI-зонд v18: материал для проектирования оргструктуры коммерческого блока.
+"""CI-зонд v19: сколько заказов и денег мы разместили у поставщика «Конан»
+(Suzhou Conan / FlowServe и пр.) в 2026 году.
 
-Собираем факты, а не мнения: дерево отделов, люди, деньги по отделам и воронкам,
-пересечения отделов на одних клиентах, заполняемость ролевых полей.
+Ищем компании-поставщики по маскам (конан/conan/сучжоу/suzhou/flowserve),
+плюс заказы СП-172, где flowserve упомянут в названии, но компания другая.
+Считаем: штуки, суммы в валютах заказа и в EUR, по месяцам, по стадиям,
+по сделкам/клиентам; место поставщика в общем рейтинге закупок 2026.
 """
 from __future__ import annotations
 
-import datetime as dt
 import os
 import re
-from collections import Counter, defaultdict
+from collections import defaultdict
 
 import requests
 
-YTD = "2026-01-01"
-ROLES = {
-    "UF_CRM_1736926032": "KAM", "UF_CRM_1740390857": "КАМ(2)",
-    "UF_CRM_1779187335": "Сорсер", "UF_CRM_1779187425": "Product leader",
-    "UF_CRM_1776169420": "Head of sourcing", "UF_CRM_1781863844": "Тендерный специалист",
-    "UF_CRM_1781863815": "Рук. тендерного", "UF_CRM_1781858627": "Ответственный за реализацию",
-    "UF_CRM_1715604558": "Сопровождение сделки (ОСС)",
-}
+Y = "2026-01-01"
+MASKS = ("конан", "conan", "сучжоу", "suzhou", "flowserve", "флоусерв", "флаусерв")
 
 
 def bx(method: str, params: dict | None = None) -> dict:
@@ -47,106 +43,106 @@ def bx_all(method: str, params: dict) -> list:
 
 
 def main() -> int:
-    print("=== 1. ДЕРЕВО ОТДЕЛОВ ===")
-    deps = bx_all("department.get", {})
-    byid = {str(d["ID"]): d for d in deps}
-    kids = defaultdict(list)
-    for d in deps:
-        kids[str(d.get("PARENT") or "")].append(str(d["ID"]))
-    users = bx_all("user.get", {"FILTER": {"ACTIVE": "Y"}})
-    upd = defaultdict(list)
-    uname, udept = {}, {}
-    for u in users:
-        uid = str(u["ID"])
-        uname[uid] = f"{u.get('NAME') or ''} {u.get('LAST_NAME') or ''}".strip()
-        for d in (u.get("UF_DEPARTMENT") or []):
-            upd[str(d)].append(uid)
-            udept[uid] = str(d)
-
-    def walk(did, depth=0):
-        d = byid.get(did)
-        if not d:
-            return
-        n = len(upd.get(did, []))
-        head = uname.get(str(d.get("UF_HEAD") or ""), "")
-        print(f"  {'  '*depth}{did:>5} · {str(d.get('NAME'))[:44]:46s} люди:{n:>3}"
-              + (f" · рук. {head}" if head else ""))
-        for k in sorted(kids.get(did, []), key=lambda x: int(x)):
-            walk(k, depth + 1)
-
-    roots = [str(d["ID"]) for d in deps if not d.get("PARENT")]
-    for r in roots:
-        walk(r)
-    print(f"  всего отделов: {len(deps)} · активных сотрудников: {len(users)}")
-
-    print("\n=== 2. ВОРОНКИ СДЕЛОК ===")
-    cats = bx("crm.category.list", {"entityTypeId": 2}).get("result", {}).get("categories", []) or []
-    for c in cats:
-        print(f"  cat {c.get('id')}: «{c.get('name')}»")
-
-    print(f"\n=== 3. СДЕЛКИ С {YTD}: деньги по отделам ===")
-    deals = bx_all("crm.deal.list", {
-        "filter": {">=DATE_CREATE": YTD},
-        "select": ["ID", "TITLE", "CATEGORY_ID", "STAGE_SEMANTIC_ID", "OPPORTUNITY",
-                   "CURRENCY_ID", "ASSIGNED_BY_ID", "COMPANY_ID"] + list(ROLES)})
     cur = bx("crm.currency.list", {}).get("result") or []
     rate = {c.get("CURRENCY"): float(c.get("AMOUNT") or 1) / float(c.get("AMOUNT_CNT") or 1) for c in cur}
     def eur(v, c): return float(v or 0) * rate.get(c, 1.0)
-    print(f"  сделок с {YTD}: {len(deals)}")
-    print(f"  по воронкам: {dict(Counter(str(d.get('CATEGORY_ID')) for d in deals).most_common())}")
 
-    agg = defaultdict(lambda: {"n": 0, "sum": 0.0, "won": 0, "wonsum": 0.0, "people": set()})
-    for d in deals:
-        uid = str(d.get("ASSIGNED_BY_ID") or "")
-        did = udept.get(uid) or "—"
-        a = agg[did]
-        a["n"] += 1
-        a["sum"] += eur(d.get("OPPORTUNITY"), d.get("CURRENCY_ID"))
-        a["people"].add(uid)
-        if d.get("STAGE_SEMANTIC_ID") == "S":
-            a["won"] += 1
-            a["wonsum"] += eur(d.get("OPPORTUNITY"), d.get("CURRENCY_ID"))
-    print(f"\n  {'отдел':>6} {'название':44s} {'чел':>4} {'сделок':>7} {'Σ €':>12} {'выиграно':>9} {'Σ выигр €':>12}")
-    for did, a in sorted(agg.items(), key=lambda kv: -kv[1]["sum"])[:25]:
-        nm = str(byid.get(did, {}).get("NAME") or ("без отдела" if did == "—" else did))[:44]
-        print(f"  {did:>6} {nm:44s} {len(a['people']):>4} {a['n']:>7} {a['sum']:>12,.0f} "
-              f"{a['won']:>9} {a['wonsum']:>12,.0f}")
-
-    print("\n=== 4. ПЕРЕСЕЧЕНИЯ: сколько отделов ведут одного клиента ===")
+    print("=== 1. Компании по маскам ===")
     comp = bx_all("crm.company.list", {"select": ["ID", "TITLE"]})
     cname = {str(c["ID"]): c.get("TITLE") or "" for c in comp}
-    HOLD = [(r"лукойл", "Лукойл"), (r"норильск|кольская|быстринск", "Норникель"),
-            (r"таиф", "ТАИФ"), (r"сибур|ставролен|запсиб|казаньоргсинтез|нижнекамскнефтехим", "Сибур"),
-            (r"\bрн-|роснефт|башнефт", "Роснефть"), (r"газпром", "Газпром"),
-            (r"новат[эе]к|сахалинск|ямал\s*спг|арктик\s*спг", "Новатэк/Сахалин")]
-    def hold(cid):
-        t = (cname.get(str(cid)) or "").lower()
-        for rx, nm in HOLD:
-            if re.search(rx, t):
-                return nm
-        return None
-    hdep = defaultdict(lambda: defaultdict(lambda: [0, 0.0]))
-    for d in deals:
-        h = hold(d.get("COMPANY_ID"))
-        if not h:
-            continue
-        did = udept.get(str(d.get("ASSIGNED_BY_ID") or "")) or "—"
-        cell = hdep[h][did]
-        cell[0] += 1
-        cell[1] += eur(d.get("OPPORTUNITY"), d.get("CURRENCY_ID"))
-    for h, dd in sorted(hdep.items(), key=lambda kv: -sum(v[1] for v in kv[1].values())):
-        tot = sum(v[1] for v in dd.values())
-        print(f"\n  {h}: Σ {tot:,.0f} € · отделов-участников: {len(dd)}")
-        for did, v in sorted(dd.items(), key=lambda kv: -kv[1][1])[:6]:
-            nm = str(byid.get(did, {}).get("NAME") or ("без отдела" if did == "—" else did))[:40]
-            print(f"      {did:>5} {nm:42s} {v[0]:>4} сделок · {v[1]:>12,.0f} €")
+    hits = {cid: t for cid, t in cname.items() if any(m in t.lower() for m in MASKS)}
+    for cid, t in sorted(hits.items(), key=lambda kv: int(kv[0])):
+        print(f"  компания {cid}: «{t}»")
+    if not hits:
+        print("  по маскам не найдено ни одной компании")
 
-    print("\n=== 5. РОЛЕВЫЕ ПОЛЯ: заполняемость на сделках этого года ===")
-    for f, nm in ROLES.items():
-        n = sum(1 for d in deals if d.get(f) not in (None, "", 0, "0", []))
-        print(f"  {nm:32s} {n:>5} из {len(deals)}")
+    print("\n=== 2. Заказы СП-172 за 2026 ===")
+    orders = bx_all("crm.item.list", {"entityTypeId": 172,
+        "filter": {">=createdTime": Y},
+        "select": ["id", "title", "companyId", "parentId2", "opportunity", "currencyId",
+                   "stageId", "createdTime", "assignedById"]})
+    print(f"  всего заказов, заведённых с {Y}: {len(orders)}")
 
-    print("\n✓ зонд v18 завершён")
+    stages = {}
+    for s in bx("crm.status.list", {"filter": {"ENTITY_ID": "DYNAMIC_172_STAGE_26"}}).get("result") or []:
+        stages[s.get("STATUS_ID")] = s.get("NAME")
+    def stname(sid): return stages.get(sid) or str(sid)
+
+    konan = [o for o in orders if str(o.get("companyId")) in hits]
+    fsw = [o for o in orders if str(o.get("companyId")) not in hits
+           and any(m in str(o.get("title") or "").lower() for m in ("flowserve", "флоусерв", "флаусерв"))]
+
+    users = {str(u["ID"]): f"{u.get('NAME') or ''} {u.get('LAST_NAME') or ''}".strip()
+             for u in bx_all("user.get", {})}
+
+    dids = {str(o.get("parentId2")) for o in konan + fsw if o.get("parentId2")}
+    deals = {}
+    if dids:
+        for d in bx_all("crm.deal.list", {"filter": {"ID": sorted(dids)},
+                "select": ["ID", "TITLE", "COMPANY_ID", "CATEGORY_ID", "STAGE_ID"]}):
+            deals[str(d["ID"])] = d
+
+    def block(name, oo):
+        print(f"\n=== {name}: {len(oo)} заказов ===")
+        tot_eur = 0.0
+        by_cur = defaultdict(float)
+        by_mon = defaultdict(lambda: [0, 0.0])
+        by_stage = defaultdict(lambda: [0, 0.0])
+        by_deal = defaultdict(lambda: [0, 0.0])
+        for o in oo:
+            v, c = float(o.get("opportunity") or 0), o.get("currencyId")
+            e = eur(v, c)
+            tot_eur += e
+            by_cur[c] += v
+            m = str(o.get("createdTime") or "")[:7]
+            by_mon[m][0] += 1; by_mon[m][1] += e
+            sn = stname(o.get("stageId"))
+            by_stage[sn][0] += 1; by_stage[sn][1] += e
+            did = str(o.get("parentId2") or "—")
+            by_deal[did][0] += 1; by_deal[did][1] += e
+        print(f"  Σ в EUR (по курсам Битрикса): {tot_eur:,.0f} €")
+        print("  по валютам заказов: " + " · ".join(f"{c}: {v:,.0f}" for c, v in sorted(by_cur.items())))
+        print("  по месяцам: " + " · ".join(f"{m}: {n} шт / {e:,.0f}€" for m, (n, e) in sorted(by_mon.items())))
+        print("  по стадиям:")
+        for sn, (n, e) in sorted(by_stage.items(), key=lambda kv: -kv[1][1]):
+            print(f"    {sn[:40]:42s} {n:>3} шт · {e:>12,.0f} €")
+        print("  по сделкам:")
+        for did, (n, e) in sorted(by_deal.items(), key=lambda kv: -kv[1][1])[:15]:
+            d = deals.get(did) or {}
+            cl = cname.get(str(d.get("COMPANY_ID")), "—")
+            print(f"    сделка {did} «{str(d.get('TITLE') or '—')[:44]}» клиент «{cl[:28]}» "
+                  f"кат.{d.get('CATEGORY_ID','—')}: {n} шт · {e:,.0f} €")
+        print("  сами заказы:")
+        for o in sorted(oo, key=lambda o: -eur(o.get("opportunity"), o.get("currencyId")))[:20]:
+            print(f"    #{o.get('id')} {str(o.get('createdTime'))[:10]} "
+                  f"{float(o.get('opportunity') or 0):>14,.0f} {o.get('currencyId')} "
+                  f"· {stname(o.get('stageId'))[:24]:26s} · отв. {users.get(str(o.get('assignedById')), '—')[:20]:22s}"
+                  f" · «{str(o.get('title') or '')[:52]}»")
+
+    block("ЗАКАЗЫ У «КОНАНА» (по компании)", konan)
+    if fsw:
+        block("FLOWSERVE в названии, но компания другая", fsw)
+        for o in fsw[:10]:
+            print(f"    ↳ #{o.get('id')} компания: «{cname.get(str(o.get('companyId')), '—')[:50]}»")
+
+    print("\n=== 3. Место в рейтинге закупок 2026 ===")
+    agg = defaultdict(float)
+    cnt = defaultdict(int)
+    for o in orders:
+        cid = str(o.get("companyId") or "—")
+        agg[cid] += eur(o.get("opportunity"), o.get("currencyId"))
+        cnt[cid] += 1
+    rank = sorted(agg.items(), key=lambda kv: -kv[1])
+    total = sum(agg.values())
+    print(f"  всего закупок 2026 (все поставщики): {total:,.0f} € · поставщиков: {len(agg)}")
+    for i, (cid, e) in enumerate(rank[:12], 1):
+        mark = "  ← ОН" if cid in hits else ""
+        print(f"  {i:>2}. {cname.get(cid, '—')[:44]:46s} {cnt[cid]:>4} шт · {e:>12,.0f} € · {e/total*100:4.1f}%{mark}")
+    for i, (cid, e) in enumerate(rank, 1):
+        if cid in hits and i > 12:
+            print(f"  {i:>2}. {cname.get(cid, '—')[:44]:46s} {cnt[cid]:>4} шт · {e:>12,.0f} € · {e/total*100:4.1f}%  ← ОН")
+
+    print("\n✓ зонд v19 завершён")
     return 0
 
 
