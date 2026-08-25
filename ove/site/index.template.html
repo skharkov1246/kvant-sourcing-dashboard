@@ -45,6 +45,19 @@ nav button{border:1px solid var(--border);background:var(--surface);color:var(--
 nav button.on{background:var(--s1);border-color:var(--s1);color:#fff}
 main{padding:16px 22px 40px;max-width:1280px}
 section{display:none} section.on{display:block}
+.xsp{flex:1 1 auto}
+nav .subrow .xbtn{border-style:dashed;opacity:.85}
+/* печать = «Сохранить как PDF»: только активная вкладка, без навигации и полей ввода */
+@media print{
+  :root{--page:#fff;--surface:#fff;--ink:#111;--ink2:#444;--border:#bbb;--grid:#ccc;--chip:#eee;
+        --s1:#2a5c9e;--s1-soft:#dde6f2;--good:#0a7a0a;--warn:#8a6200;--crit:#a32626;--serious:#a34e2e}
+  body{background:#fff;color:#111}
+  nav,#foot,.filters,.qgrid,button,textarea,select,input{display:none !important}
+  .tblwrap{overflow:visible;border:none}
+  .card,.box,.tile,tr{break-inside:avoid}
+  a{color:inherit;text-decoration:none}
+  @page{size:A4;margin:12mm}
+}
 h2{font-size:16px;margin:20px 0 8px}
 h3{font-size:14px;margin:16px 0 6px}
 p{margin:8px 0}
@@ -1735,6 +1748,156 @@ function rHedge(){
 }
 
 /* ================= Каркас: 5 групп × подвкладки ================= */
+/* ══════════ Выгрузка активной вкладки: Excel (.xlsx без библиотек) и PDF (печать) ══════════
+   .xlsx собирается вручную: ZIP без сжатия (store) + минимальный OOXML. Структурные листы —
+   для реестров (XP); для остальных вкладок — универсальный разбор DOM (таблицы, карточки, плитки). */
+const CRC_T = (()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=(c&1)?(0xEDB88320^(c>>>1)):(c>>>1);t[n]=c;}return t;})();
+const crc32 = b=>{let c=0xFFFFFFFF;for(let i=0;i<b.length;i++)c=CRC_T[(c^b[i])&0xFF]^(c>>>8);return (c^0xFFFFFFFF)>>>0;};
+function zipStore(files){
+  const parts=[], cd=[]; let off=0;
+  const u16=v=>[v&255,(v>>>8)&255], u32=v=>[v&255,(v>>>8)&255,(v>>>16)&255,(v>>>24)&255];
+  for(const [name,data] of files){
+    const n=new TextEncoder().encode(name), crc=crc32(data);
+    const loc=new Uint8Array([0x50,0x4B,3,4,20,0,0,8,0,0,0,0,33,89,...u32(crc),...u32(data.length),...u32(data.length),...u16(n.length),0,0]);
+    parts.push(loc,n,data);
+    cd.push(new Uint8Array([0x50,0x4B,1,2,20,0,20,0,0,8,0,0,0,0,33,89,...u32(crc),...u32(data.length),...u32(data.length),...u16(n.length),0,0,0,0,0,0,0,0,0,0,0,0,...u32(off)]),n);
+    off += loc.length+n.length+data.length;
+  }
+  const cdLen = cd.reduce((s,a)=>s+a.length,0);
+  const eocd = new Uint8Array([0x50,0x4B,5,6,0,0,0,0,...u16(files.length),...u16(files.length),...u32(cdLen),...u32(off),0,0]);
+  const total = off+cdLen+eocd.length, out = new Uint8Array(total); let p=0;
+  for(const a of [...parts,...cd,eocd]){ out.set(a,p); p+=a.length; }
+  return out;
+}
+const xEsc = s => String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/[\u0000-\u0008\u000B-\u001F]/g,' ');
+const colRef = i => (i<26?'':String.fromCharCode(64+Math.floor(i/26)))+String.fromCharCode(65+i%26);
+function sheetXml(rows){
+  const cols = rows.reduce((m,r)=>Math.max(m,r.length),1);
+  const widths=[]; for(let c=0;c<cols;c++){let w=9;for(const r of rows){const L=String(r[c]??'').split('\n')[0].length;if(L>w)w=L;}widths.push(Math.min(70,Math.round(w*0.95)));}
+  const colXml = '<cols>'+widths.map((w,i)=>`<col min="${i+1}" max="${i+1}" width="${w}" customWidth="1"/>`).join('')+'</cols>';
+  const body = rows.map((r,ri)=>'<row r="'+(ri+1)+'">'+r.map((v,ci)=>{
+    if(typeof v==='number'&&isFinite(v)) return `<c r="${colRef(ci)+(ri+1)}" t="n"${ri===0?' s="1"':''}><v>${v}</v></c>`;
+    const s=String(v??''); if(!s) return '';
+    return `<c r="${colRef(ci)+(ri+1)}" t="inlineStr"${ri===0?' s="1"':''}><is><t xml:space="preserve">${xEsc(s)}</t></is></c>`;
+  }).join('')+'</row>').join('');
+  return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'+colXml+'<sheetData>'+body+'</sheetData></worksheet>';
+}
+function xlsxBlob(sheets){
+  const enc = s=>new TextEncoder().encode(s), seen={};
+  sheets = sheets.filter(s=>s&&s.rows&&s.rows.length).map(s=>{
+    let n=String(s.name||'Лист').replace(/[\[\]:*?\/\\]/g,' ').slice(0,31).trim()||'Лист';
+    if(seen[n]) n=(n.slice(0,28)+' '+(++seen[n])); else seen[n]=1;
+    return {name:n, rows:s.rows};
+  });
+  if(!sheets.length) sheets=[{name:'Пусто',rows:[['нет данных']]}];
+  const NS='http://schemas.openxmlformats.org/spreadsheetml/2006/main';
+  const wb = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="${NS}" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>`+
+    sheets.map((s,i)=>`<sheet name="${xEsc(s.name)}" sheetId="${i+1}" r:id="rId${i+1}"/>`).join('')+'</sheets></workbook>';
+  const wbRels = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'+
+    sheets.map((s,i)=>`<Relationship Id="rId${i+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i+1}.xml"/>`).join('')+
+    `<Relationship Id="rIdS" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`;
+  const styles = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="${NS}"><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts><fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="2"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/></cellXfs></styleSheet>`;
+  const ct = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>'+
+    sheets.map((s,i)=>`<Override PartName="/xl/worksheets/sheet${i+1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join('')+'</Types>';
+  const rels = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>';
+  const files = [['[Content_Types].xml',enc(ct)],['_rels/.rels',enc(rels)],['xl/workbook.xml',enc(wb)],['xl/_rels/workbook.xml.rels',enc(wbRels)],['xl/styles.xml',enc(styles)]];
+  sheets.forEach((s,i)=>files.push([`xl/worksheets/sheet${i+1}.xml`,enc(sheetXml(s.rows))]));
+  return new Blob([zipStore(files)],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+}
+const xFlat = v => v==null?'':Array.isArray(v)?v.map(xFlat).join('; '):(typeof v==='object'?Object.entries(v).map(([k,x])=>k+': '+xFlat(x)).join(' · '):v);
+function objSheet(name,list){
+  if(!Array.isArray(list)||!list.length) return null;
+  const keys=[]; list.forEach(o=>{if(o&&typeof o==='object')Object.keys(o).forEach(k=>{if(!keys.includes(k))keys.push(k)})});
+  if(!keys.length) return {name,rows:list.map(x=>[xFlat(x)])};
+  return {name, rows:[keys, ...list.map(o=>keys.map(k=>typeof o[k]==='number'?o[k]:String(xFlat(o[k]))))]};
+}
+function domSheets(sec,label){
+  const out=[];
+  [...sec.querySelectorAll('table')].forEach((t,i)=>{
+    const rows=[...t.rows].map(r=>[...r.cells].map(c=>c.innerText.replace(/\s+/g,' ').trim()));
+    if(rows.length) out.push({name:'Таблица '+(i+1),rows});
+  });
+  const cards=[...sec.querySelectorAll('.card')];
+  if(cards.length){
+    const rows=[['Заголовок','Содержимое']];
+    cards.forEach(c=>{
+      const h=c.querySelector('h1,h2,h3'); const title=h?h.innerText.replace(/\s+/g,' ').trim():'';
+      const cl=c.cloneNode(true); cl.querySelectorAll('h1,h2,h3,textarea,select,input,button,.qgrid').forEach(x=>x.remove());
+      rows.push([title, cl.innerText.replace(/\n{2,}/g,'\n').trim()]);
+    });
+    out.push({name:'Карточки',rows});
+  }
+  const tiles=[...sec.querySelectorAll('.tile')];
+  if(tiles.length) out.push({name:'Сводка',rows:[['Показатель','Значение'],
+    ...tiles.map(t=>{const b=t.querySelector('b'),s=t.querySelector('span');
+      return [s?s.innerText.trim():t.innerText.trim(), b?b.innerText.trim():''];})]});
+  if(!out.length) out.push({name:(label||'Вкладка').slice(0,31),
+    rows:sec.innerText.split('\n').map(l=>[l.trim()]).filter(r=>r[0])});
+  return out;
+}
+const stName = v => (Q_ST.find(x=>x[0]===v)||[,''])[1]||'';
+const XP = {
+  disc: ()=> DISC && [{name:'Расхождения ТЗ', rows:[
+    ['ID','Важность','Лот','Категория','Заголовок','Редакция А','Где А','Редакция Б','Где Б','На что влияет','Вопрос Заказчику','Статус по v4.1','Решение Заказчика','Комментарий инженера','Статус'],
+    ...DISC.items.map(x=>[x.id,SEV[x.sev][0],x.lot,DISC.cats[x.cat]||x.cat,x.title,x.a.q,x.a.where||'',x.b.q,x.b.where||'',x.essence,x.ask,
+      x.v41?(V41[x.v41.s][0]+' — '+x.v41.t):'',ansOf(x.id),engOf(x.id),stName(stOf(x.id))])]}],
+  questions: ()=> QS && [{name:'Вопросы Заказчику', rows:[
+    ['ID','Тип','Важность','Лот','Заголовок','Документ говорит','Здесь говорит иначе','Почему важно','Формулировка вопроса','Ответ Заказчика','Комментарий инженера','Статус'],
+    ...QS.items.map(x=>[x.id,x.kind,SEV[x.sev][0],x.lot,x.title,x.a||'',x.b||'',x.why||'',x.ask,ansOf(x.id),engOf(x.id),stName(stOf(x.id))])]}],
+  deliv: ()=> DELIV && [{name:'Состав БИ', rows:[
+    ['ID','Раздел','Позиция','Лоты','Вердикт','Этап','Требование ТЗ (цитата)','Адрес','Международная практика','Наше предложение','Эффект','Учтено в v4.1','Примечание','Решение','Комментарий инженера','Статус'],
+    ...DELIV.items.map(x=>[x.id,x.group,x.name,(x.lots||[]).join(', '),DV_V[x.verdict][0],x.stage?('Этап '+x.stage):'',x.req.q,x.req.where||'',x.intl||'',x.propose||'',x.effect||'',
+      x.v41?((x.v41.s==='ok'?'полностью':'частично')+' — '+x.v41.t):'',x.note||'',ansOf(x.id),engOf(x.id),stName(stOf(x.id))])]}],
+  hedge: ()=> HEDGE && [{name:'Закладки', rows:[
+    ['ID','Вид','Лоты','Заголовок','Положение пакета (цитата)','Где','Почему закладка','Вариант по ТЗ','Альтернатива','Обоснование','Просим','Решение','Комментарий инженера'],
+    ...HEDGE.items.map(x=>[x.id,x.kind||'',(x.lots||[]).join(', '),x.title,(x.quote||{}).q||'',(x.quote||{}).where||'',x.note||'',
+      String(xFlat(x.tz)),String(xFlat(x.alt)),String(xFlat(x.basis)),x.ask||'',ansOf(x.id),engOf(x.id)])]}],
+  rasch: ()=>{ if(!CALC) return null;
+    const rows=[['Блок','Лот','Проверка','Наш результат','Значение ИД','Отклонение, %','Вердикт','Источник','Комментарий']];
+    CALC.blocks.forEach(b=>(b.checks||[]).forEach(c=>rows.push([b.id,b.lot??'',c.what,c.ours,c.idv,c.dev,c.verdict,c.src||'',c.comment||''])));
+    const s=[{name:'Проверки',rows}];
+    const f=objSheet('Находки',CALC.flags); if(f)s.push(f);
+    const g=objSheet('Гарантии',CALC.guarantees); if(g)s.push(g);
+    return s; },
+  equip: ()=> EQ && [objSheet('Оборудование',EQ.items)],
+  sup: ()=>{ if(!SUP) return null;
+    const s=[objSheet('План сорсинга',SUP.positions), objSheet('Справочник поставщиков',SUP.profiles)];
+    if(SUP.market_notes) s.push({name:'Рынок по классам',rows:[['Класс','Справка'],...Object.entries(SUP.market_notes)]});
+    if(BX&&Array.isArray(BX.companies)&&BX.companies.length) s.push(objSheet('Bitrix — компании',BX.companies));
+    return s; },
+  capex: ()=>{ if(!CAPEX) return null;
+    const s=[objSheet('Оборудование',CAPEX.equipment), objSheet('Прочие затраты',CAPEX.nonequip), objSheet('Бенчмарк',CAPEX.benchmark)];
+    if(CAPEX.params) s.push({name:'Параметры модели',rows:[['Параметр','Значение'],...Object.entries(CAPEX.params).map(([k,v])=>[k,String(xFlat(v))])]});
+    if(CAPEX.notes) s.push({name:'Примечания',rows:(Array.isArray(CAPEX.notes)?CAPEX.notes:[CAPEX.notes]).map(x=>[String(xFlat(x))])});
+    return s; },
+  tender: ()=>{ if(!TENDER) return null;
+    const s=[objSheet('Чек-лист',TENDER.checklist), objSheet('Риски',TENDER.risks), objSheet('Действия',TENDER.actions)];
+    s.push({name:'Вопросы Заказчику',rows:[['№','Вопрос'],...(TENDER.questions_to_customer||[]).map((q,i)=>['Q-'+String(i+1).padStart(2,'0'),q])]});
+    return s; },
+  bi: ()=>{ const d=BI[biLot]; if(!d) return null;
+    const rows=[['Раздел','Поле','Значение','Источник']];
+    d.sections.forEach(sec=>{
+      rows.push([sec.title,'','','']);
+      if(sec.body) rows.push(['','описание',sec.body,'']);
+      (sec.items||[]).forEach(i=>rows.push(['',i.label||'',String(xFlat(i.value)),i.src||'']));
+      (sec.gost||[]).forEach(g=>rows.push(['','норматив',String(xFlat(g)),'']));
+      (sec.open||[]).forEach(o=>rows.push(['','открытый вопрос',String(xFlat(o)),'']));
+    });
+    return [{name:'Лот '+d.lot,rows}]; },
+};
+function exportXlsx(){
+  const sec=document.querySelector('section.on'); if(!sec) return;
+  const id=sec.id.slice(2), label=(TABS.find(([t])=>t===id)||['',id])[1];
+  let sheets=null;
+  try{ if(XP[id]) sheets=XP[id]; sheets=sheets?sheets():null; }catch(e){ console.warn('экспорт: провайдер упал, беру DOM', e); sheets=null; }
+  if(sheets) sheets=sheets.filter(Boolean).filter(s=>s.rows&&s.rows.length);
+  if(!sheets||!sheets.length) sheets=domSheets(sec,label);
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(xlsxBlob(sheets));
+  a.download='ove75_'+id+'_'+new Date().toISOString().slice(0,10)+'.xlsx';
+  a.click();
+}
+
 const GROUPS = [
   ['project','Проект', [['overview','Обзор'],['stages','Этапы'],['blocks','Блоки и лоты'],['capex','Стройка · CAPEX']]],
   ['eng','Инжиниринг', [['bi','Базовый проект'],['rasch','Расчёты'],['equip','Оборудование'],['auto','Автоматизация'],['soft','ПО: сами или подряд']]],
@@ -1789,7 +1952,11 @@ function show(id){
   document.querySelectorAll('nav .grow button').forEach(b=>b.classList.toggle('on', b.dataset.g===gid));
   const tabs = GROUPS.find(g=>g[0]===gid)[2];
   document.getElementById('subnav').innerHTML =
-    tabs.map(([tid,t])=>`<button data-t="${tid}"${tid===id?' class="on"':''}>${esc(t)}</button>`).join('');
+    tabs.map(([tid,t])=>`<button data-t="${tid}"${tid===id?' class="on"':''}>${esc(t)}</button>`).join('')
+    + `<span class="xsp"></span>`
+    + `<button class="xbtn" data-x="xlsx" title="выгрузить данные вкладки файлом Excel (.xlsx)">⬇ Excel</button>`
+    + `<button class="xbtn" data-x="pdf" title="сохранить вкладку в PDF: откроется диалог печати — выберите «Сохранить как PDF»">⬇ PDF</button>`;
+  document.title = 'ОВЭ-75 · ' + ((TABS.find(([t])=>t===id)||[])[1] || id);
   for(const [tid] of TABS){
     document.getElementById(`s-${tid}`).classList.toggle('on', tid===id);
   }
@@ -1811,6 +1978,7 @@ function show(id){
 }
 nav.addEventListener('click', e=>{
   const b=e.target.closest('button'); if(!b) return;
+  if(b.dataset.x){ b.dataset.x==='pdf' ? window.print() : exportXlsx(); return; }
   if(b.dataset.t) show(b.dataset.t);
   else if(b.dataset.g){
     const g=GROUPS.find(x=>x[0]===b.dataset.g);
