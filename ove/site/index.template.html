@@ -1511,6 +1511,8 @@ function rDeliv(){
     (${esc(DELIV.stages.source)}).
     <p style="margin:6px 0 2px">${esc(DELIV.stages.term1)}.</p>
     <p style="margin:2px 0 6px">${esc(DELIV.stages.term2)}.</p>
+    ${DELIV.stages.req?`<p style="margin:2px 0 6px;color:var(--good)"><b>⏱ ${esc(DELIV.stages.req)}</b></p>`:''}
+    ${DELIV.stages.prio?`<p class="mut" style="margin:2px 0 6px">🔒 ${esc(DELIV.stages.prio)}</p>`:''}
     Метки «Этап 1 / Этап 2» проставлены на карточках ниже. <b>Что этапность подтверждает:</b>
     <ul>${DELIV.stages.good.map(g=>`<li>${esc(g)}</li>`).join('')}</ul></div>
   <div class="box warn"><b>Чего в этапности нет (пробелы — вынесены Заказчику вопросом Q-11):</b>
