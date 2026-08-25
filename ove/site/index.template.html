@@ -1432,6 +1432,7 @@ function vPaint(){
       ${(x.lots||[]).map(lotTag).join('')}<span class="tag">${esc(x.group)}</span>
       <span class="tag ${DV_V[x.verdict][1]}">${DV_V[x.verdict][0]}</span>
       ${x.v41?`<span class="tag lot3">✓ v4.1${x.v41.s==='part'?' частично':''}</span>`:''}
+      ${x.stage?`<span class="tag lot4">Этап ${x.stage}</span>`:''}
       ${ansOf(x.id).trim()?'<span class="tag lot3">закрыто</span>':''}</h3>
     <div class="quote">«${esc(x.req.q)}»</div>
     <div class="mut">${esc(x.req.where)}</div>
@@ -1506,6 +1507,16 @@ function rDeliv(){
   зелёная метка «✓ v4.1» — Заказчик уже учёл нашу позицию (в т.ч. дословно: line list ±20-30 %,
   предварительные динамические нагрузки «с запасом»); такие позиции в письмо-предложение не попадают.
   Цитаты требований — по v3.6, история переговоров сохранена.</div>
+  ${DELIV.stages?`<div class="box info"><b>Этапность выполнения — проект Заказчика от ${esc(DELIV.stages.date)}</b>
+    (${esc(DELIV.stages.source)}).
+    <p style="margin:6px 0 2px">${esc(DELIV.stages.term1)}.</p>
+    <p style="margin:2px 0 6px">${esc(DELIV.stages.term2)}.</p>
+    Метки «Этап 1 / Этап 2» проставлены на карточках ниже. <b>Что этапность подтверждает:</b>
+    <ul>${DELIV.stages.good.map(g=>`<li>${esc(g)}</li>`).join('')}</ul></div>
+  <div class="box warn"><b>Чего в этапности нет (пробелы — вынесены Заказчику вопросом Q-11):</b>
+    <ul>${DELIV.stages.gaps.map(g=>`<li><b>${esc(g.id)}:</b> ${esc(g.t)}</li>`).join('')}</ul>
+    <b>Открытые условия:</b>
+    <ul>${DELIV.stages.open.map(o=>`<li>${esc(o)}</li>`).join('')}</ul></div>`:''}
   <div class="box info"><b>Система координат (${esc(DELIV.basis.title)}).</b> ${esc(DELIV.basis.text)}
     <ul>${DELIV.basis.frameworks.map(f=>`<li><b>${esc(f.ref)}</b> — ${esc(f.what)}</li>`).join('')}</ul></div>
   <div class="k">
