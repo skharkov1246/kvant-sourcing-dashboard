@@ -1,0 +1,52 @@
+{
+ "updated": "2026-08-14",
+ "intro": "Готовый пакет пробных RFQ: три позиции, отобранные так, чтобы одним заходом замерить все главные каналы. Письма уже собраны с номерами, количествами и персональной строкой под каждого адресата — сорсеру остаётся вставить подпись и отправить со своей почты. Цель первого захода — не купить, а замерить: кто отвечает, за сколько дней, насколько внятно. Каждое полученное КП — строка в ценовую книгу.",
+ "rules": [
+  "Отправлять с рабочей почты сорсера, подпись — своя. Тема письма — как в пакете, чтобы ответы легко матчить.",
+  "Фиксировать в таблице: дата отправки → дата ответа → цена → срок → условия → внятность (1–5).",
+  "Ответившим в течение 3 рабочих дней — плюс к рейтингу; молчунам через неделю один follow-up, дальше вниз.",
+  "Цену не называть первыми. На вопрос о целевой цене — «сравниваем предложения по рынку».",
+  "Каждое КП заносить в ценовую книгу сразу, а не «потом»: это и есть накопление актива."
+ ],
+ "positions": [
+  {"key":"plug","short":"Свеча QSK60G","title":"Spark plug Cummins QSK60G (1.54 MW)",
+   "pns":"Cummins 4380132 → 4390446 → 5544762 (supersession chain); alternative: ERS/Hatraco 18.049-01 (FT00196)",
+   "qty":"Trial: 20 pcs. Annual requirement: ~770 pcs — please quote both.",
+   "asks":["GENUINE / OEM-brand / ALTERNATIVE — state clearly which","photo of plug marking (not the box)","electrode type (prechamber) and materials","expected service life (operating hours) on associated gas","production date of the batch","price per pc for 20 and for 770, currency, Incoterms","stock and lead time","return terms if the plug does not fit"]},
+  {"key":"pcv","short":"Клапан форкамеры Type 6","title":"Prechamber gas valve, INNIO Jenbacher Type 6 (J612/J616/J620)",
+   "pns":"Jenbacher 334976 → 433894 (supersession chain; family incl. 321631)",
+   "qty":"Trial: 20 pcs. Annual requirement: ~650 pcs — please quote both.",
+   "asks":["GENUINE / alternative (e.g. ONE222082-class) — state which","photo of valve marking","material and seat design","price per pc for 20 and for 650, currency, Incoterms","stock and lead time","return terms"]},
+  {"key":"filter","short":"Фильтр LF9050","title":"Lube oil filter Fleetguard LF9050 (Cummins K38/K50, combo full-flow + bypass)",
+   "pns":"Fleetguard/Atmus LF9050; cross-references per Donaldson / Baldwin catalogues acceptable — state exact brand and P/N offered",
+   "qty":"Trial: 48 pcs. Annual requirement: ~480 pcs — please quote both.",
+   "asks":["brand actually supplied (Fleetguard/Atmus, Donaldson, Baldwin, other)","production date","price per pc for 48 and for 480, currency, Incoterms","stock and lead time"]}
+ ],
+ "template_en":"Subject: RFQ — {SHORT} — KVANT\n\nDear {NAME},\n\n{PERSONAL}\n\nWe are sourcing the following position for stationary gas engines:\n\nPosition: {TITLE}\nPart numbers: {PNS}\nQuantity: {QTY}\n\nFor the quotation please confirm:\n{ASKS}\n\nWe order regularly and are building long-term supply lines for gas engine spare parts (Cummins, Caterpillar, INNIO Jenbacher/Waukesha, MWM). A clear first quotation is the best start.\n\nBest regards,\n{SIGNATURE}",
+ "template_ru":"Тема: Запрос цены — {SHORT} — КВАНТ\n\nЗдравствуйте!\n\n{PERSONAL}\n\nПросим предложение по позиции для стационарных газопоршневых двигателей:\n\nПозиция: {TITLE}\nНомера: {PNS}\nКоличество: {QTY}\n\nВ предложении просим указать:\n{ASKS}\n\nЗакупаем регулярно, выстраиваем постоянные линии снабжения по ЗИП ГПУ.\n\nС уважением,\n{SIGNATURE}",
+ "recipients": [
+  {"name":"İggnita","to":"info@iggnita.com","lang":"en","pos":["plug","pcv","filter"],
+   "personal":"We have seen the pre-chamber gas valve Jenbacher 334976 (original) and ignition parts listed on iggnita.com — please quote from that range where applicable."},
+  {"name":"BMF Enerji","to":"info@bmfenerji.com","lang":"en","pos":["plug","pcv","filter"],
+   "personal":"You list Jenbacher and MWM spare parts in original / OEM / alternative versions — please state clearly which version you quote for each line."},
+  {"name":"TECHIE Power Parts","to":"info@techiepowerparts.com","lang":"en","pos":["plug","pcv"],
+   "personal":"Your application chart lists TICS9145 (for Cummins 5634407) and Type 6 valves — for the QSK60G plug please confirm whether you have a cross for the 4380132/4390446/5544762 chain specifically, and quote TISS-series where applicable with service life data."},
+  {"name":"Wuhan Weyeah","to":"info@weyeahengine.com","lang":"en","pos":["pcv","plug","filter"],
+   "personal":"We have seen the pre-chamber gas valve 321631/433894 for Jenbacher Type 6 on weyeahmotor.com — please quote it, stating original or alternative."},
+  {"name":"SparkPlugsFactory (Jinhua Sizhouda)","to":"tiffany@sparkplugsfactory.com","lang":"en","pos":["plug"],
+   "personal":"You produce industrial spark plugs with declared 5000+ h life — for the Cummins QSK60G chain 4380132/4390446/5544762 please confirm an exact cross, gap setting and life data."},
+  {"name":"EB Machinery","to":"info@eb-machinery.com","lang":"en","pos":["plug","filter"],
+   "personal":"You trade genuine Cummins (CCEC/DCEC) ranges — please quote genuine where available and state country of origin."},
+  {"name":"InstruBiz (Dubai)","to":"inquiry@instrubiz.com","lang":"en","pos":["filter"],
+   "personal":"You stock Fleetguard filters and ship to Kazakhstan/CIS — please quote LF9050 ex-stock with lead time to Kazakhstan."},
+  {"name":"R M Walsh","to":"", "form":"https://www.rmwalshltd.co.uk/products/spark-plug-for-qsk60-1-54-mw", "lang":"en","pos":["plug"],
+   "personal":"You list the ERS spark plug 18.049-01/FT00196 for Cummins QSK60-1.54 MW — please quote per box of 4 and for 770 pcs annual, with current lead time."},
+  {"name":"Zuhon Technology","to":"info@zuhonpower.com","lang":"en","pos":["pcv"],
+   "personal":"You list Jenbacher valves and gas-train parts — please quote stating original or alternative and manufacturer."},
+  {"name":"Energy Assistance (Москва)","to":"info@energyassistance.ru","lang":"ru","pos":["plug"],
+   "personal":"У вас на сайте есть Bosch 7305 (MR3DII360) с применяемостью по Cummins QSV/QSK. Просим предложение по цепочке Cummins 4380132/4390446/5544762 (QSK60G 1,54 МВт): оригинал и/или подтверждённый аналог, с указанием изготовителя."},
+  {"name":"NIDS Group","to":"support@nids-group.com","lang":"en","pos":["filter"],
+   "personal":"You manufacture and export Cummins aftermarket since 1980 — please quote filtration if available, stating brand supplied."}
+ ],
+ "tracking_note":"После рассылки вести один файл: адресат / позиции / дата отправки / дата ответа / цена / срок / условия / внятность. Через две недели этот файл — первая версия ценовой книги и обновление рейтинга поставщиков по факту."
+}

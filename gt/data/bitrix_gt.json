@@ -1,8 +1,51 @@
 {
- "updated": "2026-08-06",
+ "updated": "2026-08-24",
  "source": "Bitrix24: сделки по ключевым словам ГТУ + СП-166 «Запросы поставщикам»",
  "live": true,
  "deals": [
+  {
+   "id": "22866",
+   "title": "5565875 Запрос ТКП (Выполнение комплекса работ по проведению инспекций ГТУ типа V64.3A ЭБ ст.№ 2, генератора WY8Z-066 ЭБ ст.№ 2, редуктора ТХ80/1С и восстановительному ремонту капитальных запасных частей газовой турбины)",
+   "models": [
+    "V64.3A (AE64.3A)"
+   ],
+   "stage": "C2:NEW",
+   "created": "2026-08-21",
+   "rfqs": []
+  },
+  {
+   "id": "22726",
+   "title": "Топливные форсунки Solar Turbines Titan 130 Юнипро",
+   "models": [
+    "Titan 130"
+   ],
+   "stage": "C4:PREPARATION",
+   "created": "2026-08-13",
+   "rfqs": [
+    {
+     "id": "41130",
+     "title": "heriss (canada) fuel nozzle titan 130",
+     "created": "2026-08-13",
+     "supplier": "Heriss (Canada)",
+     "stage": "Price at Work",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Titan 130"
+     ]
+    },
+    {
+     "id": "41592",
+     "title": "WTT Паша tg",
+     "created": "2026-08-18",
+     "supplier": "Wuxi Weishi Turbine Technology Co., Ltd.",
+     "stage": "In Correspondance",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Titan 130"
+     ]
+    }
+   ]
+  },
   {
    "id": "22576",
    "title": "Запрос КП на расходные материалы для инспекции А ГТУ Siemens SGT-400",
@@ -32,6 +75,17 @@
      "models": [
       "GE 9F/9FA"
      ]
+    },
+    {
+     "id": "41614",
+     "title": "GTF26 HW (China)",
+     "created": "2026-08-19",
+     "supplier": "Liaoning Hanwen Power Technology Co. Ltd.",
+     "stage": "Request Sent",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "GE 9F/9FA"
+     ]
     }
    ]
   },
@@ -49,7 +103,7 @@
      "title": "cstc (china)",
      "created": "2026-08-06",
      "supplier": "CSTC China Service Technology (Shandong) Co. Ltd.",
-     "stage": "New Request",
+     "stage": "Price at Work",
      "sourcer": "Ekaterina Kornilova",
      "models": [
       "Taurus 60"
@@ -63,7 +117,7 @@
    "models": [
     "Solar (модель уточнить)"
    ],
-   "stage": "C2:4",
+   "stage": "C2:2",
    "created": "2026-07-20",
    "rfqs": [
     {
@@ -283,7 +337,7 @@
    "models": [
     "LM6000"
    ],
-   "stage": "C2:NEW",
+   "stage": "C2:UC_B61SCK",
    "created": "2026-07-13",
    "rfqs": []
   },
@@ -312,7 +366,7 @@
      "title": "turbine.parts ",
      "created": "2026-07-07",
      "supplier": "turbine.parts",
-     "stage": "In Correspondance",
+     "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
      "models": [
       "Titan 250"
@@ -345,7 +399,7 @@
      "title": "Air Turbo Service FZE (UAE)",
      "created": "2026-07-10",
      "supplier": "Air Turbo Service FZE",
-     "stage": "Request Sent",
+     "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
      "models": [
       "Titan 250"
@@ -367,7 +421,7 @@
      "title": "PSG (USA) через сайт 21878 / 22056",
      "created": "2026-07-13",
      "supplier": "Power Services Group",
-     "stage": "Request Sent",
+     "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
      "models": [
       "Titan 250"
@@ -554,7 +608,7 @@
      "title": "Rathix (NETHERLANDS)",
      "created": "2026-07-10",
      "supplier": "Rathix automation",
-     "stage": "Request Sent",
+     "stage": "Ответ не получен (в срок)",
      "sourcer": "Ekaterina Kornilova",
      "models": [
       "Solar (модель уточнить)"
@@ -961,7 +1015,7 @@
    "models": [
     "Solar (модель уточнить)"
    ],
-   "stage": "C10:UC_QACY8S",
+   "stage": "C10:UC_AC3F06",
    "created": "2026-05-05",
    "rfqs": [
     {
@@ -1144,7 +1198,7 @@
      "title": "Global Marine (India)",
      "created": "2026-04-17",
      "supplier": "Global Marine",
-     "stage": "Selected",
+     "stage": "Price at Work",
      "sourcer": "Ekaterina Kornilova",
      "models": [
       "Titan 130"
@@ -1616,7 +1670,7 @@
      "title": "Metso зип",
      "created": "2026-03-20",
      "supplier": "Wuxi CTENO Actuators Manufacture Co. Ltd",
-     "stage": "Selected",
+     "stage": "Price at Work",
      "sourcer": "Ekaterina Kornilova",
      "models": [
       "ГТУ (модель уточнить)"
@@ -1868,7 +1922,7 @@
      "title": "Metso зип",
      "created": "2026-03-13",
      "supplier": "Wuxi CTENO Actuators Manufacture Co. Ltd",
-     "stage": "Selected",
+     "stage": "Price at Work",
      "sourcer": "Ekaterina Kornilova",
      "models": [
       "ГТУ (модель уточнить)"
@@ -1890,7 +1944,7 @@
      "title": "gts spa",
      "created": "2026-03-20",
      "supplier": "GTS S.p.A.",
-     "stage": "Selected",
+     "stage": "Price at Work",
      "sourcer": "Ekaterina Kornilova",
      "models": [
       "ГТУ (модель уточнить)"
@@ -1988,7 +2042,7 @@
      "title": "Ansaldo",
      "created": "2026-02-27",
      "supplier": "GTS S.p.A.",
-     "stage": "Selected",
+     "stage": "Price at Work",
      "sourcer": "Ekaterina Kornilova",
      "models": [
       "ГТУ (модель уточнить)"
@@ -2447,7 +2501,7 @@
     {
      "id": "25422",
      "title": "Фильтры Siemens в EU Automation (UAE)",
-     "created": "2025-12-15",
+     "created": "2025-12-16",
      "supplier": "EU Automation (UAE)",
      "stage": "Ответ не получен (в срок)",
      "sourcer": "Daria Lysenko",
@@ -2537,7 +2591,7 @@
     {
      "id": "26030",
      "title": "Направляющие аппараты для MS5001PA в POWERGEN SOLUTIONS FZE LLC",
-     "created": "2026-01-08",
+     "created": "2026-01-09",
      "supplier": "POWERGEN SOLUTIONS FZE LLC",
      "stage": "Selected",
      "sourcer": "Daria Lysenko",
@@ -2789,7 +2843,7 @@
     {
      "id": "24010",
      "title": "Pepple+Fuchs в Kempston Controls LLC",
-     "created": "2025-11-18",
+     "created": "2025-11-19",
      "supplier": "Kempston Controls LLC",
      "stage": "In Correspondance",
      "sourcer": "Daria Lysenko",
@@ -2800,7 +2854,7 @@
     {
      "id": "24012",
      "title": "Pepple+Fuchs в Gahangan",
-     "created": "2025-11-18",
+     "created": "2025-11-19",
      "supplier": "Gahangan",
      "stage": "Unread Messages",
      "sourcer": "Daria Lysenko",
@@ -3944,6 +3998,17 @@
      "models": [
       "Solar (модель уточнить)"
      ]
+    },
+    {
+     "id": "41364",
+     "title": "tks pro 8поз. Mars 100 ПНОС",
+     "created": "2026-08-17",
+     "supplier": "TKS PRO GmbH",
+     "stage": "Request Sent",
+     "sourcer": "Ekaterina Kornilova",
+     "models": [
+      "Mars 100"
+     ]
     }
    ]
   },
@@ -4520,7 +4585,7 @@
      "id": "13480",
      "title": "Инспекция B . Пулково. Бюджет.Безад ",
      "created": "2025-03-09",
-     "supplier": "ASH presicion",
+     "supplier": "[Dont trust]  ASH presicion",
      "stage": "Request Sent",
      "sourcer": "Ruslan Sitdikov",
      "models": [
@@ -4927,7 +4992,7 @@
      "id": "11562",
      "title": "Zirve Energy",
      "created": "2025-01-31",
-     "supplier": "Zirve Energy",
+     "supplier": "[Dont trust] Zirve Energy",
      "stage": "Request Sent",
      "sourcer": "Sergey Shipulev",
      "models": [
@@ -5190,7 +5255,7 @@
      "id": "11280",
      "title": "Запрос Zirve",
      "created": "2025-01-28",
-     "supplier": "Zirve Energy",
+     "supplier": "[Dont trust] Zirve Energy",
      "stage": "Price at Work",
      "sourcer": "Sergey Polupanov",
      "models": [
@@ -5420,7 +5485,7 @@
      "id": "9822",
      "title": "Запрос на восстановление лопаток и шеф монтаж для белорусов ",
      "created": "2024-12-10",
-     "supplier": "Qingdao O.B.T Co., Ltd.",
+     "supplier": "[Dont trust]  Qingdao O.B.T Co., Ltd.",
      "stage": "Not Selected",
      "sourcer": "Ruslan Sitdikov",
      "models": [
@@ -5550,7 +5615,7 @@
     {
      "id": "10108",
      "title": "Requests #10108",
-     "created": "2024-12-17",
+     "created": "2024-12-18",
      "supplier": "RTP power",
      "stage": "Selected",
      "sourcer": "Ruslan Sitdikov",
@@ -5639,7 +5704,7 @@
      "id": "11896",
      "title": "Requests #11896",
      "created": "2025-02-07",
-     "supplier": "QINGDAO O.B.T CO., LTD.",
+     "supplier": "[Dont trust] QINGDAO O.B.T CO., LTD.",
      "stage": "Request Sent",
      "sourcer": "Sergey Galushko",
      "models": [
@@ -7294,7 +7359,7 @@
      "id": "9306",
      "title": "Запрос на изготовление лопаток второй ступени SGT-200s в OBT",
      "created": "2024-11-30",
-     "supplier": "Qingdao O.B.T Co., Ltd.",
+     "supplier": "[Dont trust]  Qingdao O.B.T Co., Ltd.",
      "stage": "Not Selected",
      "sourcer": "Ruslan Sitdikov",
      "models": [
@@ -7366,7 +7431,7 @@
      "id": "76",
      "title": "ASH presicion",
      "created": "2023-12-20",
-     "supplier": "ASH presicion",
+     "supplier": "[Dont trust]  ASH presicion",
      "stage": "Selected",
      "sourcer": "Ruslan Sitdikov",
      "models": [
@@ -7399,7 +7464,7 @@
      "id": "7268",
      "title": "SGT-100. запрос в Zirve Energy",
      "created": "2024-09-30",
-     "supplier": "Zirve Energy",
+     "supplier": "[Dont trust] Zirve Energy",
      "stage": "Request Sent",
      "sourcer": "Ruslan Sitdikov",
      "models": [
@@ -7410,7 +7475,7 @@
      "id": "7744",
      "title": "Запрос на изготовление переходных элементов",
      "created": "2024-10-11",
-     "supplier": "Qingdao O.B.T Co., Ltd.",
+     "supplier": "[Dont trust]  Qingdao O.B.T Co., Ltd.",
      "stage": "Selected",
      "sourcer": "Ruslan Sitdikov",
      "models": [
@@ -7421,7 +7486,7 @@
      "id": "8372",
      "title": "Запрос на изготовление роторных лопаток",
      "created": "2024-10-31",
-     "supplier": "Qingdao O.B.T Co., Ltd.",
+     "supplier": "[Dont trust]  Qingdao O.B.T Co., Ltd.",
      "stage": "Selected",
      "sourcer": "Ruslan Sitdikov",
      "models": [
@@ -7509,7 +7574,7 @@
      "id": "9802",
      "title": "Заказ Carrier Ring",
      "created": "2024-12-10",
-     "supplier": "Qingdao O.B.T Co., Ltd.",
+     "supplier": "[Dont trust]  Qingdao O.B.T Co., Ltd.",
      "stage": "Selected",
      "sourcer": "Ruslan Sitdikov",
      "models": [
@@ -7520,7 +7585,7 @@
      "id": "10870",
      "title": "запрос на фильтры",
      "created": "2025-01-20",
-     "supplier": "ASH presicion",
+     "supplier": "[Dont trust]  ASH presicion",
      "stage": "Selected",
      "sourcer": "Ruslan Sitdikov",
      "models": [
@@ -7531,7 +7596,7 @@
      "id": "12322",
      "title": "Rotor blades for SGT-100. Ash",
      "created": "2025-02-17",
-     "supplier": "ASH presicion",
+     "supplier": "[Dont trust]  ASH presicion",
      "stage": "In Correspondance",
      "sourcer": "Ruslan Sitdikov",
      "models": [
@@ -7542,7 +7607,7 @@
      "id": "14146",
      "title": "Starter module.Ash",
      "created": "2025-03-24",
-     "supplier": "ASH presicion",
+     "supplier": "[Dont trust]  ASH presicion",
      "stage": "Selected",
      "sourcer": "Ruslan Sitdikov",
      "models": [
@@ -7553,7 +7618,7 @@
      "id": "22232",
      "title": "лопатки (доработка напыление) ",
      "created": "2025-10-15",
-     "supplier": "QINGDAO O.B.T CO., LTD.",
+     "supplier": "[Dont trust] QINGDAO O.B.T CO., LTD.",
      "stage": "Selected",
      "sourcer": "Liliya Shved",
      "models": [
@@ -7814,7 +7879,7 @@
      "id": "12114",
      "title": "воспламенители . Ash precsion ",
      "created": "2025-02-12",
-     "supplier": "ASH presicion",
+     "supplier": "[Dont trust]  ASH presicion",
      "stage": "Request Sent",
      "sourcer": "Ruslan Sitdikov",
      "models": [
@@ -7937,6 +8002,10 @@
      "n": 2
     },
     {
+     "name": "Liaoning Hanwen Power Technology Co. Ltd.",
+     "n": 1
+    },
+    {
      "name": "Turbine Services, Ltd.",
      "n": 1
     },
@@ -7970,7 +8039,7 @@
      "n": 2
     },
     {
-     "name": "Zirve Energy",
+     "name": "[Dont trust] Zirve Energy",
      "n": 1
     }
    ]
@@ -8093,7 +8162,7 @@
      "n": 1
     },
     {
-     "name": "Zirve Energy",
+     "name": "[Dont trust] Zirve Energy",
      "n": 1
     },
     {
@@ -8174,6 +8243,10 @@
      "n": 1
     },
     {
+     "name": "TKS PRO GmbH",
+     "n": 1
+    },
+    {
      "name": "Dongturbo Electric Company Ltd",
      "n": 1
     },
@@ -8219,11 +8292,11 @@
    "model": "SGT-100",
    "suppliers": [
     {
-     "name": "ASH presicion",
+     "name": "[Dont trust]  ASH presicion",
      "n": 5
     },
     {
-     "name": "Qingdao O.B.T Co., Ltd.",
+     "name": "[Dont trust]  Qingdao O.B.T Co., Ltd.",
      "n": 3
     },
     {
@@ -8263,7 +8336,7 @@
      "n": 1
     },
     {
-     "name": "Zirve Energy",
+     "name": "[Dont trust] Zirve Energy",
      "n": 1
     },
     {
@@ -8275,7 +8348,7 @@
      "n": 1
     },
     {
-     "name": "QINGDAO O.B.T CO., LTD.",
+     "name": "[Dont trust] QINGDAO O.B.T CO., LTD.",
      "n": 1
     }
    ]
@@ -8320,7 +8393,7 @@
      "n": 1
     },
     {
-     "name": "Qingdao O.B.T Co., Ltd.",
+     "name": "[Dont trust]  Qingdao O.B.T Co., Ltd.",
      "n": 1
     }
    ]
@@ -8526,7 +8599,7 @@
      "n": 1
     },
     {
-     "name": "ASH presicion",
+     "name": "[Dont trust]  ASH presicion",
      "n": 1
     }
    ]
@@ -8568,7 +8641,7 @@
      "n": 1
     },
     {
-     "name": "Qingdao O.B.T Co., Ltd.",
+     "name": "[Dont trust]  Qingdao O.B.T Co., Ltd.",
      "n": 1
     }
    ]
@@ -8887,11 +8960,15 @@
      "n": 3
     },
     {
+     "name": "Wuxi Weishi Turbine Technology Co., Ltd.",
+     "n": 2
+    },
+    {
      "name": "IMMI Turbines",
      "n": 2
     },
     {
-     "name": "Wuxi Weishi Turbine Technology Co., Ltd.",
+     "name": "Heriss (Canada)",
      "n": 1
     },
     {
@@ -9246,7 +9323,7 @@
      "n": 1
     },
     {
-     "name": "QINGDAO O.B.T CO., LTD.",
+     "name": "[Dont trust] QINGDAO O.B.T CO., LTD.",
      "n": 1
     },
     {

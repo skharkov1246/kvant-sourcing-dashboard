@@ -1,5 +1,5 @@
 {
-"updated": "2026-08-10",
+"updated": "2026-08-17",
 "source": "Research-вееры 06.08.2026: 12 углов (субпоставщики OEM Solar/Siemens, автомаркет по брендам и моделям, узкие специалисты по элементам, РФ/СНГ/Иран/Турция) + 3 угла наследия (Линкольн Ruston/EGT, Финспонг STAL/ABB, диаспора лицензиатов). Каждая компания — с подтверждённым официальным сайтом. + веер «рабочие юрисдикции/пэкеджеры/б-у» 06.08.2026. + веер глубоких субпоставщиков (shipment-данные ImportYeti, кейс-стади, сеть Caterpillar) 06.08.2026. + harvest раскрутки цепочек, волна 1. Harvest волны 2.",
 "rows": [
 {
@@ -1103,116 +1103,6 @@
 "risk": "Высокий: США"
 },
 {
-"name": "ООО «СТГТ» (Современные технологии газовых турбин)",
-"country": "Россия (Горелово, Ленинградская обл.)",
-"site": "mgtt.ru",
-"email": "",
-"what": "Производство, сервис и модернизация газовых турбин большой мощности (100+ МВт), локализация SGT5-2000E до ~62%, ремонт компонентов на бывшем заводе Siemens",
-"link": "Экс-СП «Сименс Технологии Газовых Турбин»: SGT5-2000E (V94.2), сервис парка Siemens в РФ и СНГ",
-"tier": "mro",
-"angle": "ru-cis-asia",
-"risk": "Российская юрисдикция (вышла из-под Siemens) — рабочая для РФ, под санкционным давлением Запада"
-},
-{
-"name": "ООО «ТСЗП» (Технологические системы защитных покрытий)",
-"country": "Россия (Москва, Щербинка)",
-"site": "tspc.ru",
-"email": "",
-"what": "Газотермическое напыление и лазерная наплавка: термобарьерные покрытия камер сгорания и лопаток ГТУ, восстановление и ремонт лопаток газовых турбин",
-"link": "Ремонт/покрытия деталей горячего тракта импортных и российских ГТУ (профильная статья о восстановлении лопаток газовых турбин на сайте)",
-"tier": "component_specialist",
-"angle": "ru-cis-asia",
-"risk": "Российская юрисдикция — рабочая для закупок из РФ"
-},
-{
-"name": "АО «Плакарт»",
-"country": "Россия (Москва, Пермь, Наб. Челны, Тюмень)",
-"site": "plakart.pro",
-"email": "",
-"what": "Термобарьерные, жаростойкие и уплотнительные покрытия лопаток ГТД/ГТУ, плазменное напыление, лазерная наплавка, восстановительный ремонт; 5 производственных центров",
-"link": "Производство сертифицировано GE, ОДК и «Силовыми машинами»; покрытия деталей горячего тракта ГТУ",
-"tier": "component_specialist",
-"angle": "ru-cis-asia",
-"risk": "Российская юрисдикция — рабочая для закупок из РФ"
-},
-{
-"name": "EuroNato",
-"country": "Россия (Ивантеевка, Московская обл.)",
-"site": "euronato.ru",
-"email": "",
-"what": "Реверс-инжиниринг и копирование узлов газовых турбин, организация производства ЗИП (в т.ч. монокристаллических лопаток по аналогам, кооперация с Китаем), капремонт ГТУ 2–100 МВт, продажа запчастей",
-"link": "Siemens, GE, Solar (Saturn/Centaur/Taurus/Titan) — запчасти, лопатки, ремонт горячего тракта",
-"tier": "aftermarket",
-"angle": "ru-cis-asia",
-"risk": "Российская юрисдикция — рабочая для РФ; каналы ЗИП через КНР"
-},
-{
-"name": "ООО «РОТЕК КМ»",
-"country": "Россия (Москва / Химки)",
-"site": "rtecm.ru",
-"email": "",
-"what": "Производство компонентов турбин: сотовые уплотнения, кольца, сопловые элементы, расходные детали газовых и паровых турбин; 300+ наименований, 25 патентов",
-"link": "Компоненты для 20 типов авиадвигателей и ГТУ; замещение расходных деталей иностранных турбин в контуре сервиса РОТЕК",
-"tier": "component_specialist",
-"angle": "ru-cis-asia",
-"risk": "Российская юрисдикция — рабочая для закупок из РФ"
-},
-{
-"name": "DMLieferant (ДМ Лиферант)",
-"country": "Россия (Москва)",
-"site": "dmliefer.ru",
-"email": "info@dmliefer.ru",
-"what": "Поставка ЗИП и комплектующих для импортных ГТУ, работает с 2009 г., организация ремонта турбин",
-"link": "Solar Turbines: Saturn 10, Centaur 40/50, Taurus 60, Mars 90/100 — запчасти для приводов ГПА",
-"tier": "aftermarket",
-"angle": "ru-cis-asia",
-"risk": "Российская юрисдикция — рабочая; риск в происхождении товара (US-origin детали Solar)"
-},
-{
-"name": "ООО «Газтурботэк»",
-"country": "Россия (Нижний Новгород)",
-"site": "газтурботэк.рф",
-"email": "",
-"what": "ТО и ремонт газотурбинных и газопоршневых двигателей: регламентные ТО, капремонты, топливные и воздушные системы; ISO 9001:2015",
-"link": "Solar Taurus 60S, Titan 130, Caterpillar G3306–G3516, а также ПС-90, НК-12СТ/НК-16СТ, ДГ-90 — прямой сервис приводов западных и советских ГПА",
-"tier": "mro",
-"angle": "ru-cis-asia",
-"risk": "Российская юрисдикция — рабочая для закупок из РФ"
-},
-{
-"name": "ООО «ТурбоИнжиниринг»",
-"country": "Россия (Санкт-Петербург)",
-"site": "turbina.spb.ru",
-"email": "",
-"what": "Проектно-производственное предприятие: изготовление запчастей к паровым и газовым турбинам, генераторам, компрессорам; разработка РКД (реверс по образцам), ремонт и восстановление лопаток",
-"link": "Изготовление ЗИП по чертежам/образцам для турбин разных производителей; методичка по восстановлению газотурбинных лопаток на сайте",
-"tier": "aftermarket",
-"angle": "ru-cis-asia",
-"risk": "Российская юрисдикция — рабочая для закупок из РФ"
-},
-{
-"name": "Станберг (SB)",
-"country": "Россия (Москва)",
-"site": "stanberg.ru",
-"email": "",
-"what": "Сервис турбоагрегатов и ремонт компонентов газовых турбин (лопатки, топливные клапаны, корпусные детали), поставка компонентов Meggitt, Woodward; станочное оборудование для турбомашин",
-"link": "Ремонт компонентов импортных ГТУ; канал по регуляторам/клапанам Woodward — критичный ЗИП для Solar и Siemens",
-"tier": "mro",
-"angle": "ru-cis-asia",
-"risk": "Российская юрисдикция — рабочая; компоненты Woodward/Meggitt — US/UK-origin, риск в канале поставки"
-},
-{
-"name": "КЭР-Холдинг",
-"country": "Россия (Казань, Татарстан)",
-"site": "ker-holding.ru",
-"email": "",
-"what": "Энергетический инжиниринговый холдинг (12 бизнес-единиц, 2400+ сотрудников): ремонт и обслуживание газовых турбин, ЭПС-проекты, производство оборудования",
-"link": "Заявлен ремонт ГТУ Solar (Taurus 60, Mars 100, Titan 130) и других иностранных производителей",
-"tier": "mro",
-"angle": "ru-cis-asia",
-"risk": "Российская юрисдикция — рабочая для закупок из РФ"
-},
-{
 "name": "Turbin Bakim San. Ltd.",
 "country": "Турция (Стамбул)",
 "site": "turbinbakim.com",
@@ -1233,17 +1123,6 @@
 "tier": "mro",
 "angle": "ru-cis-asia",
 "risk": "Турция — рабочая юрисдикция для закупок из РФ"
-},
-{
-"name": "АО «ЗКМК» (Западно-Казахстанская машиностроительная компания)",
-"country": "Казахстан (Уральск)",
-"site": "zkmk.kz",
-"email": "",
-"what": "Сервисный центр (с 2011 г., 100+ чел., обучение персонала в США и Италии): сервисное обслуживание и капитальный ремонт ГПА и ГТУ, механообработка, балансировка",
-"link": "Ремонт оборудования GE (основной партнёр), Solar Turbines, Siemens, MAN Turbo, Ekol, Зоря-Машпроект",
-"tier": "mro",
-"angle": "ru-cis-asia",
-"risk": "Казахстан (ЕАЭС) — рабочая юрисдикция для РФ; осторожность с GE-авторизованными работами (комплаенс)"
 },
 {
 "name": "Patented Systems, Inc.",
@@ -1948,28 +1827,6 @@
 "tier": "packager",
 "angle": "solar-packagers",
 "risk": "Высокий: США; практическая ценность — обменные малые ГТД и нестандартные пакеты"
-},
-{
-"name": "DMLieferant (ООО «ДМ Лиферант»)",
-"country": "Россия (Москва)",
-"site": "dmliefer.ru/gazovye-turbiny-solar",
-"email": "info@dmliefer.ru",
-"what": "Действующий импортёр ЗИП для газотурбинных приводов Solar (Saturn, Centaur, Taurus, Mars, Titan): типовые запчасти для ТО и ремонта, организация ремонтов",
-"link": "Не связан с OEM; параллельный импорт запчастей Solar в РФ — публикует реальные отгрузки (фильтры-картриджи Centaur 50 для ПАО «Лукойл»)",
-"tier": "aftermarket",
-"angle": "solar-packagers",
-"risk": "Минимальный для покупателя из РФ: уже работает с российскими нефтегазовыми заказчиками; риск — цена, сроки и подлинность компонентов"
-},
-{
-"name": "ПРОМИМПОРТ",
-"country": "Россия (Москва)",
-"site": "promimport.info/partners/solar-turbine",
-"email": "info@promimport.info",
-"what": "Импорт оборудования и запчастей Solar Turbines в РФ: все шесть семейств турбин (Saturn, Centaur, Mercury, Taurus, Mars, Titan, 1–39 МВт) и компрессоры C33–C85; логистика, таможня, документация",
-"link": "Не связан с OEM; профильная партнёрская страница по Solar Turbines с полной номенклатурой турбин и компрессоров",
-"tier": "aftermarket",
-"angle": "solar-packagers",
-"risk": "Минимальный для покупателя из РФ: российский посредник, берёт на себя ввоз; проверять реальную способность достать оригинальные детали"
 },
 {
 "name": "USP&E Global",
@@ -3534,39 +3391,6 @@
 "risk": ""
 },
 {
-"name": "ОДК-Сатурн (UEC-Saturn)",
-"country": "Russia",
-"site": "uec-saturn.ru",
-"email": "",
-"what": "Gas turbine engine & turbine-blade manufacturer (Rostec/UEC); received Siemens blade documentation for localization",
-"link": "Peer / potential customer of coating houses TSZP and Plakart; supplier of Russian GTU/GTE; Produces gas turbine engines and hot-section blades requiring TBC coatings",
-"tier": "component_specialist",
-"angle": "harvest:unwind1",
-"risk": ""
-},
-{
-"name": "ПАО «Силовые машины» (Power Machines)",
-"country": "Russia",
-"site": "www.power-m.ru",
-"email": "",
-"what": "Major Russian steam & gas turbine OEM (LMZ), localizing large-capacity gas turbines",
-"link": "Prospective client of TSZP / Plakart / ROTEK KM (blades, coatings, seals); Steam and gas turbine original equipment manufacturer",
-"tier": "component_specialist",
-"angle": "harvest:unwind1",
-"risk": ""
-},
-{
-"name": "ОДК (United Engine Corporation / UEC)",
-"country": "Russia",
-"site": "www.uecrus.com",
-"email": "",
-"what": "Rostec engine-building holding (PD-14, PS-90A, AL-31ST etc.)",
-"link": "Customer of ROTEK KM honeycomb/brush seals; parent of UEC-Saturn; Builds aero & industrial gas turbine engines using bought-in seals/components",
-"tier": "component_specialist",
-"angle": "harvest:unwind1",
-"risk": ""
-},
-{
 "name": "Wabtec Corporation",
 "country": "USA",
 "site": "www.wabteccorp.com",
@@ -4238,28 +4062,6 @@
 "risk": ""
 },
 {
-"name": "Power Machines (Силовые машины)",
-"country": "Russia",
-"site": "www.power-m.ru",
-"email": "",
-"what": "Russian power equipment manufacturer",
-"link": "35% co-owner of СТГТ; Gas/steam turbine manufacturing JV",
-"tier": "component_specialist",
-"angle": "harvest:unwind2",
-"risk": ""
-},
-{
-"name": "Inter RAO",
-"country": "Russia",
-"site": "www.interrao.ru",
-"email": "",
-"what": "Russian power generation/utility group",
-"link": "acquired Siemens stake in СТГТ (2022); Owner/operator of gas turbine fleet and СТГТ",
-"tier": "component_specialist",
-"angle": "harvest:unwind2",
-"risk": ""
-},
-{
 "name": "Equinor",
 "country": "Norway",
 "site": "www.equinor.com",
@@ -4293,23 +4095,12 @@
 "risk": ""
 },
 {
-"name": "Tatenergo",
-"country": "Russia",
-"site": "www.tatenergo.ru",
-"email": "",
-"what": "Tatarstan regional power generation utility",
-"link": "core client of КЭР-Холдинг; Operator of gas turbines serviced/overhauled by КЭР",
-"tier": "component_specialist",
-"angle": "harvest:unwind2",
-"risk": ""
-},
-{
 "name": "Solar Turbines Inc. (Caterpillar)",
 "country": "USA",
 "site": "www.solarturbines.com",
 "email": "",
 "what": "OEM of industrial gas turbines (Saturn/Centaur/Taurus/Mars/Titan)",
-"link": "OEM/supplier to Shanghai Lishun (MarisoGT), Lei Shing Hong Energy and ЗКМК; Core turbine OEM — packaging associates & authorized reps sell/service its gensets and spares",
+"link": "OEM/supplier to Shanghai Lishun (MarisoGT) and Lei Shing Hong Energy; Core turbine OEM — packaging associates & authorized reps sell/service its gensets and spares",
 "tier": "component_specialist",
 "angle": "harvest:unwind2",
 "risk": ""
@@ -4354,17 +4145,6 @@
 "email": "",
 "what": "OEM of Jenbacher gas engines / distributed power gensets",
 "link": "Jereh is its authorized Platinum Integrator; Adjacent gas-genset OEM in Jereh's distributed-energy packaging portfolio",
-"tier": "component_specialist",
-"angle": "harvest:unwind2",
-"risk": ""
-},
-{
-"name": "Karachaganak Petroleum Operating B.V. (KPO)",
-"country": "Kazakhstan",
-"site": "www.kpo.kz",
-"email": "",
-"what": "Oil & gas operator running gas-turbine compressor/power stations",
-"link": "Client / localization driver for ЗКМК machining & GT service; Operates GE gas-turbine driven equipment serviced/localized via ЗКМК",
 "tier": "component_specialist",
 "angle": "harvest:unwind2",
 "risk": ""
@@ -4419,7 +4199,7 @@
 "site": "www.solarturbines.com",
 "email": "",
 "what": "OEM промышленных газовых турбин (Saturn, Centaur, Mercury, Taurus, Mars, Titan), подразделение Caterpillar",
-"link": "OEM-принципал Indoturbine, Turboservices, DMLieferant, ПРОМИМПОРТ, GTA, Alturdyne; СП-партнёр Deleum (2015); Прямой производитель ГТУ Solar — ядро всей исследуемой цепочки",
+"link": "OEM-принципал Indoturbine, Turboservices, GTA, Alturdyne; СП-партнёр Deleum (2015); Прямой производитель ГТУ Solar — ядро всей исследуемой цепочки",
 "tier": "component_specialist",
 "angle": "harvest:unwind2",
 "risk": ""
@@ -4442,17 +4222,6 @@
 "email": "",
 "what": "Государственная нефтегазовая компания Индонезии",
 "link": "Клиент Indoturbine (эксплуатант турбин Solar); Оператор газотурбинных пакетов Solar в нефтегазе",
-"tier": "component_specialist",
-"angle": "harvest:unwind2",
-"risk": ""
-},
-{
-"name": "Lukoil (ПАО «Лукойл»)",
-"country": "Russia",
-"site": "www.lukoil.com",
-"email": "",
-"what": "Крупная российская нефтегазовая компания",
-"link": "Клиент DMLieferant (поставка ЗИП, апрель 2016); Эксплуатант турбин Solar Centaur 50 (получал фильтроэлементы Indufil)",
 "tier": "component_specialist",
 "angle": "harvest:unwind2",
 "risk": ""
@@ -5008,17 +4777,6 @@
 "risk": ""
 },
 {
-"name": "Aviadvigatel",
-"country": "Russia",
-"site": "www.avid.ru",
-"email": "",
-"what": "КБ авиадвигателей (PD-14) и промышленных ГТУ / ГПА",
-"link": "дочка ОДК (UEC); Разработчик газотурбинных двигателей и энергетических ГТУ",
-"tier": "component_specialist",
-"angle": "harvest:unwind2",
-"risk": ""
-},
-{
 "name": "Kawasaki Heavy Industries — Gas Turbine Division",
 "country": "Japan",
 "site": "global.kawasaki.com",
@@ -5426,28 +5184,6 @@
 "risk": ""
 },
 {
-"name": "Татнефть",
-"country": "Россия",
-"site": "www.tatneft.ru",
-"email": "",
-"what": "Нефтяная компания с собственной энергетикой (Нижнекамская ТЭЦ)",
-"link": "первый заказчик ГТЭ-170 у «Силовых машин» (поставка конец 2023); покупатель газовой турбины ГТЭ-170",
-"tier": "component_specialist",
-"angle": "harvest:unwind3",
-"risk": ""
-},
-{
-"name": "РусГидро",
-"country": "Россия",
-"site": "www.rushydro.ru",
-"email": "",
-"what": "Энергохолдинг (ГЭС + тепловая генерация Дальнего Востока)",
-"link": "заказчик 4×ГТЭ-170 у «Силовых машин» (2025–2026); первая турбина для ТЭЦ РусГидро собрана на ЛМЗ; покупатель газовых турбин ГТЭ-170",
-"tier": "component_specialist",
-"angle": "harvest:unwind3",
-"risk": ""
-},
-{
 "name": "Trinity Turbine Technology",
 "country": "США",
 "site": "www.trinityturbinetechnology.com",
@@ -5531,17 +5267,6 @@
 "email": "",
 "what": "Инфраструктура ЦОД (питание/охлаждение)",
 "link": "Партнёр Solar Turbines по решениям энергоснабжения дата-центров; Интеграция ГТУ Solar Turbines в энергосистемы ЦОД",
-"tier": "component_specialist",
-"angle": "harvest:unwind3",
-"risk": ""
-},
-{
-"name": "ETS-Astana (TM Energo)",
-"country": "Казахстан",
-"site": "www.tmenergo.kz",
-"email": "",
-"what": "Энергетические решения, поставка и сервис газопоршневых/энергоустановок",
-"link": "Официальный партнёр INNIO в Казахстане; Дистрибуция Jenbacher; рынок распределённой генерации Казахстана (рядом с KPO)",
 "tier": "component_specialist",
 "angle": "harvest:unwind3",
 "risk": ""
@@ -6372,28 +6097,6 @@
 "risk": ""
 },
 {
-"name": "Силовые машины (Power Machines)",
-"country": "Россия",
-"site": "power-m.ru",
-"email": "",
-"what": "Производитель паровых и газовых турбин (ЛМЗ), первая серийная отечественная тяжёлая ГТУ ГТЭ-170; план — 10 газовых турбин в год с 2027",
-"link": "поставщик турбин для Татнефти (Нижнекамская ТЭЦ) и РусГидро (Хабаровская ТЭЦ-4) из списка; OEM тяжёлых ГТУ ГТЭ-170/ГТЭ-65 — ключевой узел российской газотурбинной цепочки",
-"tier": "component_specialist",
-"angle": "harvest:unwind4",
-"risk": ""
-},
-{
-"name": "ТГК-16",
-"country": "Россия",
-"site": "www.tgc16.ru",
-"email": "",
-"what": "Генерирующая компания группы Татнефть (Казанская ТЭЦ-3, Нижнекамская ТЭЦ ПТК-1)",
-"link": "энергетическая «дочка» Татнефти из списка — фактический эксплуатант станций; эксплуатирует ГТУ (на Казанской ТЭЦ-3 установлена крупнейшая в РФ ГТУ) — заказчик запчастей и сервиса",
-"tier": "component_specialist",
-"angle": "harvest:unwind4",
-"risk": ""
-},
-{
 "name": "TC Energy",
 "country": "Канада",
 "site": "www.tcenergy.com",
@@ -7175,17 +6878,6 @@
 "risk": ""
 },
 {
-"name": "BVK LLC (БВК)",
-"country": "Россия",
-"site": "https://bvk74.ru",
-"email": "",
-"what": "Слитки, литые заготовки для трубопроводной арматуры (Челябинск)",
-"link": "Российское предприятие Gruppo Cividale",
-"tier": "component_specialist",
-"angle": "harvest:unwind5",
-"risk": ""
-},
-{
 "name": "KOSPO (Korea Southern Power)",
 "country": "Южная Корея",
 "site": "https://www.kospo.co.kr",
@@ -7631,7 +7323,7 @@
 "site": "https://glensol.az",
 "email": "",
 "what": "O&M и MRO газовых турбин, компрессоров и вращающегося оборудования; дочка Nobel Energy Group (с 2012)",
-"link": "Соучредитель/материнская компания Alensol (СП с казахстанской AIMS)",
+"link": "Соучредитель совместных предприятий в регионе",
 "tier": "component_specialist",
 "angle": "harvest:unwind5",
 "risk": ""
@@ -7665,17 +7357,6 @@
 "email": "",
 "what": "Промышленное оборудование и сервис (родственная компания Wirturbo — держит копирайт её сайта)",
 "link": "Партнёр/аффилированная структура Wirturbo",
-"tier": "component_specialist",
-"angle": "harvest:unwind5",
-"risk": ""
-},
-{
-"name": "Intergas Central Asia",
-"country": "Казахстан",
-"site": "https://intergas.kz",
-"email": "",
-"what": "Оператор магистральных газопроводов Казахстана (группа QazaqGaz) с сетью компрессорных станций",
-"link": "Названный клиент Alensol",
 "tier": "component_specialist",
 "angle": "harvest:unwind5",
 "risk": ""
@@ -7791,17 +7472,6 @@
 "risk": ""
 },
 {
-"name": "АО «Завод Узбекхиммаш»",
-"country": "Узбекистан (Чирчик)",
-"site": "https://uzbekhimmash.uz",
-"email": "",
-"what": "Завод технологического оборудования для нефтегазовой и химической промышленности (осн. 1941): ёмкостное, теплообменное оборудование, насосы; info@uzbekhimmash.uz, +998 70 719-92-05",
-"link": "Учредитель (51%) СП «Сервисный Центр UNGM-DR» (№8 списка)",
-"tier": "component_specialist",
-"angle": "harvest:unwind5",
-"risk": ""
-},
-{
 "name": "BRUSH Group",
 "country": "Великобритания",
 "site": "https://www.brush.eu",
@@ -7813,56 +7483,12 @@
 "risk": ""
 },
 {
-"name": "ООО «Газпром энергохолдинг индустриальные активы» (ГЭХ ИА)",
-"country": "Россия",
-"site": "https://www.gehia.ru",
-"email": "",
-"what": "Машиностроительный дивизион Газпром энергохолдинга (включая РЭП Холдинг): производство и сервис энергомашиностроительного оборудования",
-"link": "Материнская структура ГЭХ СГТ (№10 списка)",
-"tier": "component_specialist",
-"angle": "harvest:unwind5",
-"risk": ""
-},
-{
-"name": "ООО «Форвард Энерго» (экс-Fortum Россия)",
-"country": "Россия",
-"site": "https://www.forward-energo.ru",
-"email": "",
-"what": "Генерирующая компания (ТЭЦ/ПГУ Урала и Западной Сибири)",
-"link": "Назван клиентом Турбинаспецсервис (№13 списка)",
-"tier": "component_specialist",
-"angle": "harvest:unwind5",
-"risk": ""
-},
-{
 "name": "resale.info (Maschinensucher/б/у площадка)",
 "country": "Германия",
 "site": "https://www.resale.info",
 "email": "",
 "what": "Международная площадка б/у станков и оборудования (125+ лотов турбин)",
 "link": "Аналог Kitmondo/Exapro — всплыла при поиске лотов SGT",
-"tier": "component_specialist",
-"angle": "harvest:unwind5",
-"risk": ""
-},
-{
-"name": "NCOC (North Caspian Operating Company)",
-"country": "Казахстан",
-"site": "https://www.ncoc.kz",
-"email": "",
-"what": "Оператор месторождения Кашаган, эксплуатирует парк промышленных газовых турбин",
-"link": "Именованный клиент ООО «СТС» (Сахалин Турбина Сервис)",
-"tier": "component_specialist",
-"angle": "harvest:unwind5",
-"risk": ""
-},
-{
-"name": "Сахалин Энерджи",
-"country": "Россия",
-"site": "https://www.sakhalinenergy.ru",
-"email": "",
-"what": "Оператор проекта «Сахалин-2»: морские платформы и СПГ-завод с газотурбинными приводами",
-"link": "Клиент ООО «СТС» с 2019 года",
 "tier": "component_specialist",
 "angle": "harvest:unwind5",
 "risk": ""
@@ -8038,18 +7664,7 @@
 "site": "https://gruppocividale.com",
 "email": "",
 "what": "Металлургическая группа (Удине): литьё, поковки, крупногабаритные заготовки для энергомаша",
-"link": "С 2021 владеет 100% Rössl & Duso; соучредитель БВК (Челябинск) вместе с КОНАР",
-"tier": "component_specialist",
-"angle": "harvest:unwind6",
-"risk": ""
-},
-{
-"name": "КОНАР (Промышленная группа KONAR)",
-"country": "Россия",
-"site": "https://konar.ru",
-"email": "",
-"what": "Челябинская промышленная группа: трубопроводная арматура, насосно-компрессорное оборудование, индустриальный парк «Станкомаш»",
-"link": "Учредитель и материнская структура БВК (совместно с Cividale S.p.A.)",
+"link": "С 2021 владеет 100% Rössl & Duso; соучредитель БВК (Челябинск)",
 "tier": "component_specialist",
 "angle": "harvest:unwind6",
 "risk": ""
@@ -8418,17 +8033,6 @@
 "risk": ""
 },
 {
-"name": "QazaqGaz",
-"country": "Казахстан",
-"site": "https://www.qazaqgaz.kz",
-"email": "",
-"what": "Национальная газовая компания Казахстана (экс-KazTransGas): добыча, транспортировка, экспорт газа",
-"link": "Материнская группа Intergas Central Asia из списка",
-"tier": "component_specialist",
-"angle": "harvest:unwind6",
-"risk": ""
-},
-{
 "name": "Parker Hannifin (Gas Turbine Filtration)",
 "country": "США",
 "site": "https://www.parker.com",
@@ -8534,17 +8138,6 @@
 "email": "",
 "what": "Промышленный дистрибьютор, представляет бренд Eagle Filters",
 "link": "дистрибьютор Eagle Filters",
-"tier": "component_specialist",
-"angle": "harvest:unwind6",
-"risk": ""
-},
-{
-"name": "АО «Невский завод» (НЗЛ)",
-"country": "Россия",
-"site": "https://www.nzl.ru",
-"email": "",
-"what": "Производитель газоперекачивающего и компрессорного оборудования, турбин",
-"link": "дочка ГЭХ ИА (через РЭП Холдинг)",
 "tier": "component_specialist",
 "angle": "harvest:unwind6",
 "risk": ""
@@ -10552,17 +10145,6 @@
 "risk": ""
 },
 {
-"name": "Intech GmbH",
-"country": "Россия/Германия",
-"site": "https://intech-gmbh.ru",
-"email": "",
-"what": "Комплексные поставки запчастей и быстроизнашиваемых компонентов для газовых турбин Siemens",
-"link": "Конкурент/аналог Bowzon Turbine, канал поставок Siemens-запчастей",
-"tier": "component_specialist",
-"angle": "harvest:unwind8",
-"risk": ""
-},
-{
 "name": "Renco S.p.A.",
 "country": "Италия",
 "site": "https://www.renco.it",
@@ -10822,17 +10404,6 @@
 "email": "",
 "what": "Газовые и электрические воспламенители, запальные горелки для промышленных горелочных систем",
 "link": "Компания DURAG Group (с 1996) — смежная продуктовая линейка розжига",
-"tier": "component_specialist",
-"angle": "harvest:unwind8",
-"risk": ""
-},
-{
-"name": "АО «Газэнергосервис»",
-"country": "Россия (Москва/Брянск)",
-"site": "https://www.gesturbo.ru",
-"email": "",
-"what": "Ремонт и изготовление запчастей для газоперекачивающих агрегатов и газовых турбин, ремонтные заводы по ГПА",
-"link": "Сестринская компания ООО «ГЭХ СГТ» в контуре «Газпром энергохолдинг индустриальные активы» (gehia.ru)",
 "tier": "component_specialist",
 "angle": "harvest:unwind8",
 "risk": ""
@@ -11872,17 +11443,6 @@
 "risk": ""
 },
 {
-"name": "UNICA",
-"country": "Россия",
-"site": "https://unica.ru.com/gasturbines/en",
-"email": "",
-"what": "Запчасти для GE Frame 5 MS5001/MS5002 и др. с 1986 г.; услуги re-engineering, ремонта и восстановления; своя цепочка поставок",
-"link": "поставщик с услугой реверс-инжиниринга (степень собственного производства уточнить)",
-"tier": "component_specialist",
-"angle": "harvest:nuovopignone",
-"risk": ""
-},
-{
 "name": "JTI Group",
 "country": "США (Хьюстон)",
 "site": "https://www.jtigroup.net/",
@@ -11922,17 +11482,6 @@
 "email": "",
 "what": "Независимый полный сервис GE heavy-duty фреймов: склад запчастей, component exchange, ремонт, LTSA. Своих чертежей не декларирует",
 "link": "независимый сервис + сток запчастей (частично трейдер)",
-"tier": "component_specialist",
-"angle": "harvest:nuovopignone",
-"risk": ""
-},
-{
-"name": "DMEnergy (ДМЭнерджи)",
-"country": "Россия (Казань)",
-"site": "https://dm.energy/",
-"email": "",
-"what": "Сервисный центр ГТУ до 32 МВт: капремонт Solar Taurus 60/70, Mars 130, Centrax Allison 501-KB5/KB7; восстановление лопаток (сварка, пайка, покрытия), поставка запчастей; локализованные форсунки AMCOR",
-"link": "независимый сервис/восстановление + поставка (РФ, удобен для КВАНТ)",
 "tier": "component_specialist",
 "angle": "harvest:nuovopignone",
 "risk": ""
@@ -11988,28 +11537,6 @@
 "email": "",
 "what": "Неоригинальные запчасти «flange-to-flange» для GE Frame 5, включая MS5002 A-D и MS5001; собственный инжиниринг (Product Engineering, Project Manufacturing) — т.е. производство по своим чертежам/реверс",
 "link": "независимый изготовитель запчастей (реверс по своим чертежам), входит в EthosEnergy",
-"tier": "component_specialist",
-"angle": "harvest:nuovopignone",
-"risk": ""
-},
-{
-"name": "РЭП Холдинг (ЗАО «РЭПХ», Невский завод)",
-"country": "Россия (Санкт-Петербург)",
-"site": "https://www.reph.ru",
-"email": "",
-"what": "Производит ГПА-32 «Ладога» на базе турбины MS5002E (Т32) по лицензии GE Oil & Gas (Nuovo Pignone SpA) — локализованное производство с лицензионной документацией; программа до 20 агрегатов/год под реконструкцию ГТС Газпро",
-"link": "лицензиат Nuovo Pignone/GE по MS5002E — российский производитель и сервис",
-"tier": "component_specialist",
-"angle": "harvest:nuovopignone",
-"risk": ""
-},
-{
-"name": "KTS Engineering",
-"country": "Украина/Словакия/Узбекистан/Австрия/Болгария",
-"site": "https://www.kts-eng.com",
-"email": "",
-"what": "Официальный дистрибьютор Baker Hughes (бренды Nuovo Pignone и Thermodyn): поставка запчастей и компонентов, сервис, модернизация турбин и центробежных компрессоров 20-100 МВт; своих чертежей нет — OEM-канал",
-"link": "официальный дистрибьютор BH/NP (трейдер) по СНГ/Восточной Европе",
 "tier": "component_specialist",
 "angle": "harvest:nuovopignone",
 "risk": ""
@@ -12735,30 +12262,6 @@
 "own_pn": "да — свои артикулы (SICOM3000A-…). Код Siemens не поймут, подбор по ТТХ. Плюс для КВАНТ: есть выделенный русскоязычный канал продаж — ru@kyland.com"
 },
 {
-"name": "Fastwel (АО «ПРОСОФТ», ГК Fastwel)",
-"country": "Россия (Москва, ул. Профсоюзная, 108)",
-"site": "https://www.fastwel.ru",
-"email": "info@fastwel.ru",
-"what": "Российское производство: встраиваемые и бортовые промышленные компьютеры для жёстких условий (аналог класса SIMATIC IPC MicroBox/Rack), процессорные модули стандартных форм-факторов CompactPCI и PC/104, программируемые контроллеры Fastwel I/O и Fastwel F800, п",
-"link": "производитель (собственная разработка и сборка в РФ, «российская электроника для ответственных применений»); работает по ТЗ заказчика, т.е. может выступать субпоставщиком по спецификации",
-"tier": "component_specialist",
-"angle": "harvest:gapmfg",
-"risk": "",
-"own_pn": "да — свои артикулы (CPC-серия, NIM-серия). Код 6AG4…/6GK5… не поймут. Ключевой плюс при отсутствии чертежей: Fastwel штатно подбирает изделие по ТЗ на интерфейсы/климатику/монтаж и делает конструктив под заказчика"
-},
-{
-"name": "ООО «Предприятие «Элтекс» (Eltex)",
-"country": "Россия (Новосибирск, ул. Окружная, 29В)",
-"site": "https://eltex.ru",
-"email": "eltex@eltex.ru (общий), remont@eltex.ru (сервис/ремонт)",
-"what": "Российское производство телеком- и промышленного сетевого оборудования. Промышленные управляемые Ethernet-коммутаторы серий MES2300DI-28 (L3, 24×1G RJ-45 + 4×1G Combo, два сменных БП, расширенный температурный диапазон), MES2328I, MES3300-xx с поддержкой PTP и",
-"link": "производитель (собственная разработка ПО и производство, Новосибирск)",
-"tier": "component_specialist",
-"angle": "harvest:gapmfg",
-"risk": "",
-"own_pn": "да — свои артикулы (MES2300DI-28, MES2328I). Код SCALANCE не распознают. Подбор по портам/резервированию/климатике; наличие PRP/PTP важно для сетей АСУ ТП генерации"
-},
-{
 "name": "PLC Exchange",
 "country": "США (Шарлотт, Северная Каролина)",
 "site": "https://plcexchange.net",
@@ -12985,18 +12488,6 @@
 "angle": "harvest:gapmfg",
 "risk": "",
 "own_pn": "да — свои коды (NM8-125S/3300, NXB-63 C16 и т.д.). Код ABB не понимают напрямую, но кросс-таблицы ABB→CHINT широко распространены; подбор по номиналу/полюсности/Icu делается по шильдику без чертежей."
-},
-{
-"name": "ООО «Инстарт»",
-"country": "Россия (Санкт-Петербург)",
-"site": "https://instart-info.ru",
-"email": "info@instart-info.ru",
-"what": "Российское производство преобразователей частоты (серии VCI, NCI, SDI, LCI, MCI, INPRIME, INPRIME MX, INVENT) и устройств плавного пуска (SSI, SBI, SBIM, SSIP, SBIP, SNI). Заявлено собственное производство и контроль качества.",
-"link": "производитель функциональных аналогов ABB ACS / PSR-PSE-PST (импортозамещение)",
-"tier": "component_specialist",
-"angle": "harvest:gapmfg",
-"risk": "",
-"own_pn": "да — собственные каталожные обозначения (VCI-..., SSI-...). Код ABB не поймут, но подбирают по кВт/току/напряжению; для КВАНТ важно, что общаются по-русски и берут запрос по шильдику."
 },
 {
 "name": "FINDER S.p.A.",
@@ -13619,17 +13110,6 @@
 "risk": ""
 },
 {
-"name": "INTECH GmbH (ООО «Интех ГмбХ»)",
-"country": "Россия",
-"site": "https://intech-gmbh.ru",
-"email": "info@intech-gmbh.ru",
-"what": "ТРЕЙДЕР/инжиниринг. Основная номенклатура — V94.2 (крепёж, уплотнительные ленты, колодки подшипников, комплекты под замену лопаток); по V94.3A (SGT5-4000F) — консалтинг и подбор | SGT5-4000F/V94.3A",
-"link": "трейдер + инжиниринговая компания",
-"tier": "component_specialist",
-"angle": "harvest:sgt4000f",
-"risk": ""
-},
-{
 "name": "Theta Tech International Trading Ltd. (TTI)",
 "country": "Тайвань",
 "site": "https://www.ttitl.net",
@@ -13751,45 +13231,12 @@
 "risk": ""
 },
 {
-"name": "ООО «ЦентрИнжиниринг» (+ Уфимский турбинный завод в холдинге)",
-"country": "Россия (Москва, 4-я ул. 8 Марта 6А; юр. Саратов; завод в Уфе)",
-"site": "https://centring.ru/",
-"email": "info@centring.ru",
-"what": "Капремонт и модульный ремонт газогенератора LM6000 (КНД/КВД/ТВД/ТНД), обслуживание DLE, бороскопия, диагностика, ПНР. ГЛАВНОЕ: публично заявленный реинжиниринг конкретных узлов LM6000 — горелочное устройство DLE, промывочная форсунка, клапан перепуск",
-"link": "независимый ремонтник + независимый изготовитель (реинжиниринг узлов), РФ",
-"tier": "component_specialist",
-"angle": "harvest:lm6000",
-"risk": ""
-},
-{
-"name": "УК «КЭР-Холдинг» / KR Group (КР Газтурбосервис)",
-"country": "Россия (Казань, тел. +7 843 572-09-99)",
-"site": "https://www.ker-holding.ru/services/remont-i-obsluzhivanie-gazovykh-turbin/",
-"email": "",
-"what": "Весь комплекс капремонта и сервиса ГТУ, в списке моделей прямо указан General Electric (LM 6000, MS5001 и др.), а также Solar, Siemens, MAN, Мотор Сич, ПАО Кузнецов. В составе группы собственные производственные площади (КАМЭНЕРГОМАШ — изготовление и",
-"link": "независимый ремонтник + собственное производство/обратный инжиниринг, РФ",
-"tier": "component_specialist",
-"angle": "harvest:lm6000",
-"risk": ""
-},
-{
 "name": "UGS (Universal Gas Solutions / ugsus.com)",
 "country": "Нидерланды + США (1435 Banks Road, Margate, FL 33063)",
 "site": "https://ugsus.com/lm6000-spare-parts/",
 "email": "carlos@ugsus.com; тел. +1 954 953 8713, моб. +1 954 740 7944",
 "what": "Поставка OEM и «equivalent» (эквивалентных, не-OEM) запчастей LM6000/LM2500 плюс капремонт компонентов: топливные форсунки, клапаны, детали горячей части. Глобальный полевой сервис и логистика. | LM6000",
 "link": "независимый поставщик + ремонтник компонентов; заявляет и производственную составляющую по «equivalent» деталям",
-"tier": "component_specialist",
-"angle": "harvest:lm6000",
-"risk": ""
-},
-{
-"name": "АО «РИР Энерго» (сервисный центр Росатома)",
-"country": "Россия (энергообъекты Росатома, центральные регионы)",
-"site": "https://nprom.online/news/rosatom-osvoil-servees-importnyh-gtu/",
-"email": "",
-"what": "Освоен полный комплекс работ по импортным ГТУ: бороскопические обследования, плановое ТО, средние и капитальные ремонты, устранение непредвиденных дефектов, контроль техсостояния ГТУ и дожимных компрессорных станций — по GE LM2500 и LM6000, Siemens S",
-"link": "независимый ремонтник (госструктура Росатома), РФ",
 "tier": "component_specialist",
 "angle": "harvest:lm6000",
 "risk": ""
@@ -14224,17 +13671,6 @@
 "risk": ""
 },
 {
-"name": "Турбинаспецсервис (ООО ТСС)",
-"country": "Россия (Уфа)",
-"site": "https://turbinass.ru/",
-"email": "info@turbinass.ru",
-"what": "ПОДТВЕРЖДЕНО: в 2025 г. локализовал ВСЕ компоненты горячей части КОЛЬЦЕВОЙ камеры сгорания AE64.3A в РФ и выполнил капремонт камеры для АО «Юго-Западная ТЭЦ». Это ровно тот угол, который не закрывает Sulzer. Заявляет реверс-инжиниринг и изготовление ",
-"link": "независимый изготовитель + ремонтник",
-"tier": "component_specialist",
-"angle": "harvest:v643a",
-"risk": ""
-},
-{
 "name": "Deloro Microfusione (быв. Microfusione Stellite S.p.A., Deloro Wear Solutions)",
 "country": "Италия (Pieve Emanuele, Milano)",
 "site": "https://www.deloro.com/our-companies/deloro-microfusione/",
@@ -14252,17 +13688,6 @@
 "email": "info@powertechnl.com",
 "what": "ЯВНО заявляет реверс-инжиниринг любого компонента по запросу: анализ материала и покрытия, 3D-сканирование детали, прочностной расчёт, изготовление моделей и оснастки, пробная установка для проверки прилегания. Покрытие: SGT600/GT-10B (ВСЁ — камеры с",
 "link": "независимый изготовитель и ремонтник",
-"tier": "component_specialist",
-"angle": "harvest:v643a",
-"risk": ""
-},
-{
-"name": "АО «РЭП Холдинг» (Санкт-Петербург)",
-"country": "Россия",
-"site": "https://www.reph.ru",
-"email": "",
-"what": "По соглашению от 07.06.2019 СП получило от Ansaldo ИСКЛЮЧИТЕЛЬНЫЕ права на производство, продажу и сервис ГТ/ПТ в РФ, СНГ и согласованных странах и ПОЛНУЮ техническую документацию на турбины и системы управления. Линейка ГТ 70–340 МВт (нижняя точка 7",
-"link": "лицензиат/СП Ansaldo — единственный резидент РФ с переданной официальной техдокументацией Ansaldo",
 "tier": "component_specialist",
 "angle": "harvest:v643a",
 "risk": ""
@@ -14329,17 +13754,6 @@
 "email": "",
 "what": "«Крупнейший независимый изготовитель турбинных и компрессорных лопаток» с 1962. Прямо заявляет компрессорные лопатки, НА и ВНА (IGV) для крупнорамных промышленных ГТУ, работает по Siemens/GE/Westinghouse/MHI/Alstom. 64.3A не назван — нужен запрос на ",
 "link": "независимый изготовитель / ремонтник",
-"tier": "component_specialist",
-"angle": "harvest:v643a",
-"risk": ""
-},
-{
-"name": "INTECH GmbH (ИНТЕХ ГмбХ)",
-"country": "Россия (Москва)",
-"site": "https://intech-gmbh.ru/en/",
-"email": "info@intech-gmbh.ru",
-"what": "Поставка ЗИП для газовых турбин Siemens (в номенклатуре указан ряд V64.3–V64.3A / SGT6-1000F), точное литьё компонентов турбин, производство и восстановление лопаток ГТУ. Русскоязычный вход в цепочку, удобен для оформления поставки в РФ. | V64.3A/AE6",
-"link": "независимый поставщик/инжиниринг с литейно-лопаточной кооперацией",
 "tier": "component_specialist",
 "angle": "harvest:v643a",
 "risk": ""
@@ -14576,17 +13990,6 @@
 "risk": ""
 },
 {
-"name": "UNICA LLC (ООО «ЮНИКА»)",
-"country": "Россия (трейдер)",
-"site": "https://unica.ru.com/gasturbines/en",
-"email": "info@unica.eu.com",
-"what": "ЕДИНСТВЕННЫЙ найденный поставщик, публично указывающий V64.3A (АЕ64.3A) в каталоге. По системе сгорания заявляет ровно наши позиции: КЕРАМИЧЕСКИЕ ПЛИТКИ И МЕТАЛЛИЧЕСКИЕ ЭКРАНЫ, ДЕРЖАТЕЛИ ПЛИТОК, горелки, газовые/топливные распределители, внутренний к",
-"link": "ТРЕЙДЕР (не изготовитель) — явно помечен",
-"tier": "component_specialist",
-"angle": "harvest:v643a",
-"risk": ""
-},
-{
 "name": "THETA TECH INTERNATIONAL TRADING LTD.",
 "country": "Тайвань",
 "site": "https://ttitl.net/stock-gas-turbine-parts/",
@@ -14626,39 +14029,6 @@
 "email": "sales@ttitl.net",
 "what": "В описании специализации прямо указывают модели Siemens V64.2, V64.3 A, V94.3A. ПРОВЕРЕНО: в опубликованных складских таблицах на сайте по 64.3A ничего нет — там только GE Frame 3/5/6B/7/9E, бандажи и роторный крепёж MS5001/5002/6001B/9001E, а также ",
 "link": "ТРЕЙДЕР / складской брокер (не изготовитель)",
-"tier": "component_specialist",
-"angle": "harvest:v643a",
-"risk": ""
-},
-{
-"name": "UNICA (ООО «ЮНИКА»)",
-"country": "Россия",
-"site": "https://unica.ru.com/gasturbines/en",
-"email": "info@unica.eu.com",
-"what": "ТРЕЙДЕР. Прямо публикует позицию «V64.3A (АЕ64.3A) (on request)» с деталями горячей части — лопатки, бандажи, опорные кольца — и элементами камеры сгорания: горелки, жаровые трубы, топливные распределители. Собственного производства и реверс-инжинири",
-"link": "ТРЕЙДЕР",
-"tier": "component_specialist",
-"angle": "harvest:v643a",
-"risk": ""
-},
-{
-"name": "AMCOR GmbH",
-"country": "Россия (при немецком нейминге — ИНН 1655427282, ОГРН 1191690093198)",
-"site": "https://amcor.ru/reinzhiniring-ae64-3a",
-"email": "",
-"what": "ТРЕЙДЕР / сервисно-торговая компания. Держит отдельные страницы «Реинжиниринг AE64.3A» и каталог AE64.3A, обещает подбор капитальных запчастей по серийному номеру, диагностику наработки и международную логистику. По факту опирается на «заводскую доку",
-"link": "ТРЕЙДЕР / интегратор услуг (не изготовитель)",
-"tier": "component_specialist",
-"angle": "harvest:v643a",
-"risk": ""
-},
-{
-"name": "AMCOR GmbH / amcor.ru",
-"country": "Россия",
-"site": "https://amcor.ru/reinzhiniring-ae64-3a",
-"email": "",
-"what": "Имеет ВЫДЕЛЕННУЮ посадочную страницу «Реинжиниринг AE64.3A»: диагностика, подбор компонентов по серийным номерам, восстановление элементов камеры сгорания, ступеней турбины, деталей проточной части и лопаточного аппарата, оптимизация горячей части. П",
-"link": "ТРЕЙДЕР / посредник-интегратор (не изготовитель — проверено)",
 "tier": "component_specialist",
 "angle": "harvest:v643a",
 "risk": ""
@@ -14752,17 +14122,6 @@
 "risk": ""
 },
 {
-"name": "ООО «АНСАЛЬДО ЭНЕРДЖИА РАША» (ИНН 7710954396)",
-"country": "Россия",
-"site": "https://energybase.ru/vendor/ansaldoenergia",
-"email": "",
-"what": "Действующий и РАСТУЩИЙ канал: выручка 2024 — 1,61 млрд руб., 2025 — 2,43 млрд руб., прибыль 2025 — 261 млн руб., штат 14 чел. Профиль — ГТУ, техобслуживание и ремонт газовых турбин, инспекции, капремонты, поставка запчастей. Активна на Челябинской ТЭ",
-"link": "OEM — 100% дочерняя структура Ansaldo Energia S.p.A. в РФ",
-"tier": "component_specialist",
-"angle": "harvest:v643a",
-"risk": ""
-},
-{
 "name": "Forgital Group (Forgital Italy S.p.A.)",
 "country": "Италия (Velo d'Astico, VI) + Франция, США",
 "site": "https://www.forgital.com/power-generation-page/",
@@ -14818,17 +14177,6 @@
 "risk": ""
 },
 {
-"name": "Gazprom Energoholding / Адлерская ТЭС",
-"country": "Россия (Сочи)",
-"site": "https://energybase.ru/en/power-plant/adlerskaya-tpp",
-"email": "",
-"what": "Оператор ближайшего к нам парка: 4 x AE64.3A в многовальной схеме, 360 МВт, 4 котла-утилизатора, 2 паровые турбины, пусконаладка ГТУ завершена в начале 2013. Топливо — газ или жидкое. Ценность двойная: (а) единственный в РФ носитель практического опы",
-"link": "оператор (парк 4 x AE64.3A)",
-"tier": "component_specialist",
-"angle": "harvest:v643a",
-"risk": ""
-},
-{
 "name": "PLN (Perusahaan Listrik Negara) — ТЭС Muara Tawar",
 "country": "Индонезия (Бекаси, Западная Ява)",
 "site": "https://www.forecastinternational.com/archive/disp_pdf.cfm?DACH_RECNO=604",
@@ -14837,6 +14185,215 @@
 "link": "оператор (крупнейший парк — 12 x V64.3A)",
 "tier": "component_specialist",
 "angle": "harvest:v643a",
+"risk": ""
+},
+{
+"name": "Turbine Parts Corporation (TPc)",
+"country": "США (Хьюстон)",
+"site": "https://www.turbineparts.com",
+"email": "sales@turbineparts.com",
+"what": "Capital parts (nozzles, buckets, rotors, TPs, shrouds) и расходники для PG6581(B) по СОБСТВЕННЫМ чертежам («proprietary drawings and specifications» — чертежи заказчика не нужны); плюс сорсинг с контрактной кооперацией и",
+"link": "независимый изготовитель; из базы КВАНТ",
+"tier": "component_specialist",
+"angle": "harvest:ms6001b",
+"risk": ""
+},
+{
+"name": "Caledonian Turbine Services (CTS)",
+"country": "Великобритания (Глазго)",
+"site": "https://caledonianturbineservices.com",
+"email": "info@cts-int.com",
+"what": "Большой склад новых и восстановленных деталей Frame 5/Frame 6, капитальный ЗИП, платы Speedtronic Mark I-VIe, б/у детали с ремонтом/инспекцией специалистами",
+"link": "ТРЕЙДЕР/стокист, не изготовитель",
+"tier": "component_specialist",
+"angle": "harvest:ms6001b",
+"risk": ""
+},
+{
+"name": "NNG Energy",
+"country": "Турция (Стамбул + Ялова)",
+"site": "https://nngenergy.com",
+"email": "info@nngenergy.com",
+"what": "Турецкий независимый сервис/поставщик Solar: рефурбишмент и поставка турбин, package assembly, core engine services, 24/7 поддержка. Заявленная экспертиза: Taurus 60, Taurus 70, Centaur 50, Mars 100, Titan 130 — единстве",
+"link": "независимый сервис/поставщик, НОВЫЙ (нет в CRM)",
+"tier": "component_specialist",
+"angle": "harvest:solar",
+"risk": ""
+},
+{
+"name": "Classic Automation",
+"country": "США (Rochester, NY)",
+"site": "https://www.classicautomation.com",
+"email": "",
+"what": "Obsolete-электроника платформы Turbotronic 1–4: склад снятых с производства Allen-Bradley PLC-5 (тестированные, гарантия 2 года) + ремонт модулей. Канал поддержки старых Turbotronic без OEM.",
+"link": "стокист/ремонт obsolete-электроники (трейдер)",
+"tier": "component_specialist",
+"angle": "harvest:solar",
+"risk": ""
+},
+{
+"name": "TMS Ltd. (Alberta-TMS)",
+"country": "Канада",
+"site": "http://www.lincoln-tms.com/equipment-sales/",
+"email": "",
+"what": "Склад агрегатов и обменных двигателей Solar в Альберте: Titan 130S 15 МВт new surplus, Mars 90 9,5 МВт, 2×Taurus T7901S 5,67 МВт 60 Гц new surplus + 2×50 Гц, Centaur T5901S/T4701S/T4501, Saturn T1301; exchange-двигатели ",
+"link": "независимый пэкеджер/дилер б/у и new-surplus оборудования с гарантией; Альберта, Канада",
+"tier": "component_specialist",
+"angle": "harvest:solar",
+"risk": ""
+},
+{
+"name": "Heriss Corporation",
+"country": "Канада",
+"site": "https://heriss.com",
+"email": "sales@heriss.com",
+"what": "Уже предлагали нам (4 запроса). Трейдер-стокист: >4000 позиций ЗИП Solar на складе; Saturn 10/20, Centaur 4500 и 50 (с SoLoNOx и без), Taurus 65/70, Mars — как запчасти, так и целые новые/zero-hour/б.у. двигатели и компл",
+"link": "трейдер/дистрибьютор со стоком, уже в CRM (4 запроса)",
+"tier": "component_specialist",
+"angle": "harvest:solar",
+"risk": ""
+},
+{
+"name": "Philadelphia Gear (Timken Power Systems)",
+"country": "США",
+"site": "https://www.philagear.com",
+"email": "",
+"what": "Ремонт/rebuild редукторов любых брендов, включая планетарные/эпициклические — альтернативный канал ремонта редукторов Solar-пакетов (repair-of-non-PG программа).",
+"link": "независимый сервис редукторов",
+"tier": "component_specialist",
+"angle": "harvest:solar",
+"risk": ""
+},
+{
+"name": "Turbine Resources International (TRI)",
+"country": "США",
+"site": "http://turbineresourcesintl.com/parts-sales/",
+"email": "",
+"what": "New/used/OEM surplus/aftermarket/refurbished запчасти на Solar Saturn, Centaur, Taurus и Solar-пакеты (по поисковому индексу). Домен при проверке не резолвился (ENOTFOUND) — статус компании проверить перед контактом.",
+"link": "трейдер",
+"tier": "component_specialist",
+"angle": "harvest:solar",
+"risk": ""
+},
+{
+"name": "Wogen Engineering",
+"country": "ОАЭ",
+"site": "https://wogenengg.com/gas-turbine-spare-parts.html",
+"email": "Info@wogenengg.com",
+"what": "Hot Gas Path (HGP) и inspection kits, компоненты камеры сгорания для Solar: Titan 130, Titan 250, Mars 100, Taurus 60, Centaur 40; new/surplus/refurbished/used",
+"link": "трейдер/стокист (industrial trading division), Аджман, ОАЭ",
+"tier": "component_specialist",
+"angle": "harvest:solar",
+"risk": ""
+},
+{
+"name": "NGT Gasturbinentechnik GmbH & Co. KG",
+"country": "Германия",
+"site": "http://www.ngt-gasturbinentechnik.com/",
+"email": "info@ngt-gasturbinentechnik.com",
+"what": "Единственный найденный независимый Solar-шоп в Германии: zero-hour турбины, major overhaul, ТО и инспекции Centaur 40/50 и Taurus 60; модернизация САУ Solar-агрегатов как VAR Valmet. Удобный ЕС-канал.",
+"link": "независимый сервис, Мёрс (Moers), Германия",
+"tier": "component_specialist",
+"angle": "harvest:solar",
+"risk": ""
+},
+{
+"name": "Kato Engineering (Nidec)",
+"country": "США (North Mankato, MN)",
+"site": "https://www.nidec.com/en/katoengineering/",
+"email": "",
+"what": "Производитель синхронных генераторов 100 кВт–25 МВт для газотурбинных генсетов (диапазон Saturn—Titan 130); тысячи машин на FPSO/платформах; генераторные концы Kato массово встречаются в б/у турбинных генсетах — пакетиро",
+"link": "изготовитель компонентов (генераторы)",
+"tier": "component_specialist",
+"angle": "harvest:solar",
+"risk": ""
+},
+{
+"name": "SoEnergy International (Used Equipment)",
+"country": "США",
+"site": "https://surplusrecord.com/listing/5200-kw-solar-turbines-tarus-60-mobile-generator-set-both-1500-rpm-11000v-10-hours-2001-637827/",
+"email": "",
+"what": "ТРЕЙДЕР (дилер Surplus Record): электростанция 2× Solar Centaur 40 по 3,0 МВт 13,8 кВ — капремонт 2020, смонтированы и не эксплуатировались (<800 ч на генконцах), со switchgear и панелями. Контакт: Victor Flores +1 904-3",
+"link": "трейдер (Silver-дилер Surplus Record с 2022), Хьюстон, Техас, США",
+"tier": "component_specialist",
+"angle": "harvest:solar",
+"risk": ""
+},
+{
+"name": "Prime Turbine Support",
+"country": "США",
+"site": "https://prime-turbinesupport.com/",
+"email": "sales@prime-turbinesupport.com",
+"what": "ЗИП по всем линейкам Solar (Saturn, Centaur, Taurus, Mars, Titan), фокус — платформа Taurus: hot section, форсунки, подшипники, уплотнения; новые/refurb/serviceable used; ответ на RFQ за 24 ч",
+"link": "ТРЕЙДЕР/сорсинг-партнёр (не изготовитель), Fort Lauderdale, FL, США",
+"tier": "component_specialist",
+"angle": "harvest:solar",
+"risk": ""
+},
+{
+"name": "Ideal Electric Power Co.",
+"country": "США (Mansfield, OH)",
+"site": "https://www.idealec.com",
+"email": "",
+"what": "Производитель/ремонт генераторов 0,4–25 МВт (Мансфилд, Огайо); б/у генсеты Solar Centaur 40 на рынке идут в связке «Solar Centaur 40 + Ideal Electric» — исторический пакетируемый генератор для Solar; свежих пруфов новых ",
+"link": "изготовитель генераторов (историч. пакетирование с Solar)",
+"tier": "component_specialist",
+"angle": "harvest:solar",
+"risk": ""
+},
+{
+"name": "Energy Parts Solutions",
+"country": "США (Schaumburg, IL)",
+"site": "https://www.energypartssolutions.com/services/reverse-engineering/",
+"email": "",
+"what": "Изготовитель: прецизионная механообработка и производство лопаток, сопловых, диафрагм; reverse engineering по изношенной детали-образцу (CMM, CAD/CAM, 50+ лет опыта) — вариант для позиций, где OEM недоступен; прямых Sola",
+"link": "независимый изготовитель по образцу (Solar-опыт не доказан — проверять запросом)",
+"tier": "component_specialist",
+"angle": "harvest:solar",
+"risk": ""
+},
+{
+"name": "Al Waseet Oil Equipment Trading",
+"country": "ОАЭ (Абу-Даби)",
+"site": "https://www.alwaseetoil.com",
+"email": "sales@alwaseetoil.com",
+"what": "НОВЫЙ. Абу-Даби, ISO 9001, 30+ лет поддержки Solar Saturn и Centaur; инвентарь ЗИП пакетов и аксессуаров (стартеры TDI/POW-R-QUIK, клапаны ASCO/Velan, фильтры AAF/Donaldson/Camfil, SKF, метизы/уплотнения) — хороший канал",
+"link": "ТРЕЙДЕР/дистрибьютор, НОВЫЙ",
+"tier": "component_specialist",
+"angle": "harvest:solar",
+"risk": ""
+},
+{
+"name": "Global Power Supply (globalpwr.com)",
+"country": "США",
+"site": "https://www.globalpwr.com",
+"email": "",
+"what": "ТРЕЙДЕР/стокист энергоблоков: маркетирует скид-пакеты Solar Taurus 60 (размещает полные спецификации Solar TPS60GS), торгует турбинными и дизельными генсетами из наличия",
+"link": "трейдер/стокист",
+"tier": "component_specialist",
+"angle": "harvest:solar",
+"risk": ""
+},
+{
+"name": "Curtiss-Wright Surface Technologies (CCRS)",
+"country": "Великобритания/США",
+"site": "https://surfacetechnologies.curtisswright.com/",
+"email": "",
+"what": "Компонентный ремонт и покрытия (диффузионные, thermal spray) лопаток и сопловых аппаратов газовых турбин; в описании сервиса заявлен опыт ремонта Solar. Страница отдаёт 403 боту — подтверждено только поисковым сниппетом,",
+"link": "независимый компонентный/покрытийный подрядчик; слабое доказательство — проверить вручную",
+"tier": "component_specialist",
+"angle": "harvest:solar",
+"risk": ""
+},
+{
+"name": "Astrum Energy",
+"country": "Германия (Дюссельдорф)",
+"site": "http://astrum-energy.com",
+"email": "info@astrum-energy.com",
+"what": "ТРЕЙДЕР (Дюссельдорф, ФРГ; всплывает в казахстанских выдачах): продуктовая страница Solar Turbines (генераторные модули MGP, lifecycle-сервис), торгует турбинами/генсетами — потенциальный нейтральный канал ЕС→ЦА",
+"link": "трейдер",
+"tier": "component_specialist",
+"angle": "harvest:solar",
 "risk": ""
 }
 ]

@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>КВАНТ · База PN ГТУ — расшифровка и субпоставщики</title>
+<style>
+:root{--bg:#0e1116;--panel:#161b23;--panel2:#1c232e;--line:#2a3341;--txt:#e6ebf2;--mut:#8b98a9;--acc:#4a9eff;--acc2:#2f6fd0;--ok:#3fb97c;--warn:#d9a63f;--bad:#d05f5f;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--txt);font:14px/1.45 "Segoe UI",system-ui,sans-serif}
+header{padding:14px 20px;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:12px;align-items:center;background:var(--panel)}
+h1{font-size:18px;font-weight:600}
+h1 small{color:var(--mut);font-weight:400;font-size:13px;margin-left:8px}
+.stats{display:flex;gap:14px;color:var(--mut);font-size:13px;flex-wrap:wrap}
+.stats b{color:var(--txt)}
+.btns{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+button{background:var(--panel2);color:var(--txt);border:1px solid var(--line);border-radius:8px;padding:7px 12px;cursor:pointer;font-size:13px}
+button:hover{border-color:var(--acc)}
+button.primary{background:var(--acc2);border-color:var(--acc2)}
+nav{display:flex;gap:4px;padding:10px 20px 0;border-bottom:1px solid var(--line);background:var(--panel);flex-wrap:wrap}
+nav button{border:none;background:none;padding:8px 14px;color:var(--mut);border-bottom:2px solid transparent;border-radius:0}
+nav button.on{color:var(--txt);border-bottom-color:var(--acc)}
+.wrap{padding:16px 20px;max-width:1560px;margin:0 auto}
+.filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
+.filters input[type=text],.filters select{background:var(--panel2);border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:8px 10px;font-size:13px}
+.filters input[type=text]{width:300px}
+label.ck{color:var(--mut);font-size:13px;display:flex;gap:6px;align-items:center}
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--mut);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;position:sticky;top:0;background:var(--bg);z-index:2}
+tr.row{cursor:pointer}
+tr.row:hover{background:var(--panel2)}
+th.sortable{cursor:pointer;user-select:none}
+th.sortable:hover{color:var(--txt)}
+th.sortable .smark{color:var(--acc);font-size:11px}
+.pn{font-family:Consolas,monospace;color:var(--acc);white-space:nowrap}
+.mut{color:var(--mut)}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;white-space:nowrap}
+.p1{background:#123b2a;color:var(--ok)}.p2{background:#15304a;color:var(--acc)}.p3{background:#3d331a;color:var(--warn)}.p4{background:#3a2323;color:var(--bad)}.p0{background:var(--panel2);color:var(--mut)}
+.st{border:1px solid var(--line);border-radius:10px;padding:2px 8px;font-size:11px;color:var(--mut);white-space:nowrap}
+.st.work{color:var(--warn)}.st.rfq{color:var(--acc)}.st.kp{color:var(--ok)}.st.no{color:var(--bad)}
+.drawer{position:fixed;top:0;right:-580px;width:560px;max-width:95vw;height:100%;background:var(--panel);border-left:1px solid var(--line);transition:right .25s;overflow-y:auto;padding:20px;z-index:10;box-shadow:-8px 0 30px rgba(0,0,0,.5)}
+.drawer.open{right:0}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;z-index:9}
+.overlay.on{display:block}
+.dr-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.dr-head h2{font-size:17px;font-family:Consolas,monospace;color:var(--acc);word-break:break-all}
+.kv{display:grid;grid-template-columns:160px 1fr;gap:6px 12px;margin:14px 0;font-size:13px}
+.kv div:nth-child(odd){color:var(--mut)}
+.sec{margin-top:16px;border-top:1px solid var(--line);padding-top:12px}
+.sec h3{font-size:13px;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.drawer input[type=text],.drawer textarea,.drawer select{width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:8px 10px;font-size:13px;margin-bottom:8px}
+.note{border-left:3px solid var(--acc2);background:var(--panel2);padding:8px 10px;margin-bottom:6px;border-radius:0 8px 8px 0;font-size:13px}
+.note small{color:var(--mut);display:block}
+.fam{font-family:Consolas,monospace;font-size:12px}
+.fam span{display:inline-block;background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:2px 8px;margin:2px;cursor:pointer}
+.fam span:hover{border-color:var(--acc)}
+.rule{margin-bottom:16px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px}
+.rule h3{color:var(--acc);margin-bottom:8px;font-size:15px}
+.rule table th{position:static}
+.rule p{font-size:13px;color:var(--mut);white-space:pre-wrap}
+a{color:var(--acc)}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--acc2);padding:10px 18px;border-radius:8px;display:none;z-index:20}
+.dim{opacity:.35}
+.card2{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:12px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+@media(max-width:800px){.kv{grid-template-columns:1fr}.filters input[type=text]{width:100%}}
+</style>
+</head>
+<body>
+<header>
+  <h1>КВАНТ · База PN ГТУ<small>заказные парт-номера · расшифровка · субпоставщики OEM</small></h1>
+  <div class="stats" id="stats"></div>
+  <div class="btns">
+    <button class="primary" onclick="openAdd()">+ Добавить PN</button>
+    <button class="primary" style="background:#1a7f4b;border-color:#1a7f4b" onclick="openRFQ()">📨 RFQ-пакеты</button>
+    <button onclick="exportCSV()">⬇ CSV</button>
+    <button onclick="exportEdits()">⬇ правки</button>
+    <button onclick="document.getElementById('impFile').click()">⬆ импорт правок</button>
+    <input type="file" id="impFile" accept=".json" style="display:none" onchange="importEdits(this)">
+  </div>
+</header>
+<nav>
+  <button class="on" data-tab="base" onclick="switchTab('base',this)">База PN</button>
+  <button data-tab="rules" onclick="switchTab('rules',this)">Шифровки OEM</button>
+  <button data-tab="vendors" onclick="switchTab('vendors',this)">Субпоставщики</button>
+  <a href="guide.html" style="color:var(--mut);padding:8px 14px;font-size:13px;text-decoration:none;border-bottom:2px solid transparent">📖 Справочник</a>
+  <button data-tab="requests" onclick="switchTab('requests',this)">Запросы Кими <span id="reqBadge" class="badge p2" style="display:none"></span></button>
+</nav>
+<div class="wrap">
+  <div id="tab-base">
+    <div class="filters">
+      <input type="text" id="q" placeholder="Забейте парт-номер — сразу покажу производителя и заказной номер" oninput="render(true)" onkeydown="if(event.key==='Enter'){const q=normQ(this.value);const r=DATA.map(ov).find(r=>r.pn===q||r.pn.replace(/[-/]/g,'')===q.replace(/[-/]/g,''));if(r)openPN(r.pn)}">
+      <select id="fOem" onchange="render(true)"></select>
+      <select id="fSeg" onchange="render(true)"></select>
+      <select id="fEv" onchange="render(true)">
+        <option value="">Доказанность: любая</option><option>П1</option><option>П2</option><option>П3</option><option>П4</option><option value="none">не атрибутировано</option>
+      </select>
+      <label class="ck"><input type="checkbox" id="fAttr" onchange="render(true)"> только с субпоставщиком</label>
+      <label class="ck"><input type="checkbox" id="fHidden" onchange="render(true)"> показывать скрытые</label>
+      <span class="mut" id="cnt"></span>
+    </div>
+    <div id="answerBox"></div>
+    <div class="card2" id="helpBox" style="border-left:3px solid var(--acc2)">
+      <div style="display:flex;justify-content:space-between;cursor:pointer" onclick="document.getElementById('helpBody').style.display=document.getElementById('helpBody').style.display==='none'?'':'none'">
+        <b>Как устроена база и как ей пользоваться</b><span class="mut">свернуть/развернуть</span>
+      </div>
+      <div id="helpBody" style="margin-top:8px;font-size:13px;color:var(--mut);display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px 24px">
+        <div><b style="color:var(--txt)">1 · Что за строки.</b> Каждая строка — уникальный парт-номер из потребности заказчиков (ЛУКОЙЛ НВН/Энергосети, НОВАТЭК, Криогаз) и открытых каталогов. PN нормализованы: кириллица→латиница, регистр, пробелы — поэтому «903315С1» и «903315C1» для базы одно и то же.</div>
+        <div><b style="color:var(--txt)">2 · Семейства.</b> У PN есть «база» — общий чертёж без ревизии. В карточке видны все варианты семейства (напр. 1064851-1/-2/-4/-10) — это один узел в разных исполнениях, заказывать надо точный вариант.</div>
+        <div><b style="color:var(--txt)">3 · Главный сценарий.</b> Забейте PN в поиск — сверху всплывёт карточка-ответ: <b>реальный производитель</b>, <b style="color:var(--ok)">заказной номер у него</b> (зелёным) и каналы (кто давал КП, кто вёз по таможне). Enter — полная карточка. Уровни: <span class="badge p1">П1</span> NSN/таможня · <span class="badge p2">П2</span> листинг · <span class="badge p3">П3</span> OE-статус · <span class="badge p4">П4</span> эвристика. <b style="color:var(--ok)">✓×2</b> — 2+ источника.</div>
+        <div><b style="color:var(--txt)">4 · Работа сорсера.</b> Открыл карточку → проверил атрибуцию → поставил статус (в работе / RFQ отправлен / есть КП / отказ) → заметка. Всё хранится в этом браузере; «⬇ правки» передаёт наработки коллеге.</div>
+        <div><b style="color:var(--txt)">5 · Вопросы Кими.</b> Если по PN нужны ответы — блок «Вопрос Кими» в карточке. Пакет вопросов выгружается одним файлом, Кими возвращает пакет ответов — сайт сам применяет исправления атрибуции.</div>
+        <div><b style="color:var(--txt)">6 · Сортировка и фильтры.</b> Клик по заголовку колонки сортирует (ещё клик — в обратную сторону). Фильтры комбинируются: например «Solar + только с субпоставщиком + П1/П2» — готовый лист проверенных заказов.</div>
+      </div>
+    </div>
+    <table><thead><tr>
+      <th><input type="checkbox" title="Выбрать/снять видимые для RFQ" onchange="document.querySelectorAll('.rfqck').forEach(c=>{c.checked=this.checked;rfqToggle(c.dataset.pn,c)})"></th>
+      <th data-s="pn" class="sortable">PN <span class="smark"></span></th>
+      <th data-s="desc" class="sortable">Описание <span class="smark"></span></th>
+      <th data-s="oem" class="sortable">OEM <span class="smark"></span></th>
+      <th data-s="mach" class="sortable">Машины <span class="smark"></span></th>
+      <th data-s="seg" class="sortable">Сегмент <span class="smark"></span></th>
+      <th data-s="mk" class="sortable">Субпоставщик <span class="smark"></span></th>
+      <th data-s="ev" class="sortable">Док-во <span class="smark"></span></th>
+      <th data-s="st" class="sortable">Статус <span class="smark"></span></th>
+    </tr></thead><tbody id="tbody"></tbody></table>
+  </div>
+  <div id="tab-rules" style="display:none"></div>
+  <div id="tab-vendors" style="display:none"></div>
+  <div id="tab-requests" style="display:none">
+    <div class="card2">
+      <b>Как работает контур вопросов</b>
+      <p class="mut" style="margin-top:6px;font-size:13px">1. Инженер в карточке PN жмёт «Вопрос Кими», выбирает тип и пишет суть — запрос падает в очередь (этот браузер).<br>
+      2. «⬇ Пакет вопросов» выгружает все новые запросы одним JSON-файлом — его содержимое вставляется в чат с Кими (или файл присылается в чат).<br>
+      3. Кими отрабатывает каждый запрос и возвращает «пакет ответов» JSON — его загружают через «⬆ Ответы Кими».<br>
+      4. Сайт ставит запросам статус «отвечено», показывает ответы в карточках PN и автоматически применяет исправления атрибуции от Кими (с пометкой в заметках).</p>
+      <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="primary" onclick="exportRequests()">⬇ Пакет вопросов для Кими</button>
+        <button onclick="document.getElementById('ansFile').click()">⬆ Ответы Кими</button>
+        <input type="file" id="ansFile" accept=".json" style="display:none" onchange="importAnswers(this)">
+      </div>
+    </div>
+    <div id="reqList"></div>
+  </div>
+</div>
+<div class="overlay" id="ovl" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer"></div>
+<div class="toast" id="toast"></div>
+<script src="data.js"></script>
+<script>
+/* ===== справочник шифровок (все OEM, включая углублённые правила из ГТУ-библиотеки) ===== */
+const RULES = [
+ {oem:'Solar Turbines (Saturn/Centaur/Taurus/Mars/Titan)', note:'База растёт хронологически: 5 разрядов 2xxxx–4xxxx = Saturn (1960–70-е), 6 разрядов 1xxxxx = Centaur/Taurus/Mars, 7 разрядов 10xxxxx = современный пакет/КИП. Диапазоны: 22xxx/24xxx/27xxx/29xxx = Saturn; 116xxx–127xxx = Centaur 40; 136xxx/196xxx = Centaur 50/Taurus 60; 127949/191xxx/410xxx = Mars; 300xxx–304xxx = поздние Taurus/Titan.', rows:[
+  ['NNNNNNN-D(D)','основной формат: чертёж + dash-вариант; сотни (-100/-200/-300) — уровень конфигурации сборки','1089034-3, 186212-100'],
+  ['…-785','код УЗК-инспекции у дисков Mars','диски Mars 410xxx'],
+  ['…-1000/-4000','киты и спецкомплектации','—'],
+  ['C1/C2/C3','ревизия детали (наследие International Harvester, Solar была подразделением IH до 1981)','903316C1'],
+  ['C91–C96','сборка/комплект (IH-наследие)','902291C91 fuel manifold, 914337C94 power turbine'],
+  ['R1/R92','стандартный крепёж, фитинги, ремкомплекты','23818R1, 8007917R92 repair kit'],
+  ['B2/B86','электронные блоки','895122B2'],
+  ['K+номер+ревизия','kit-номера','1016093K100B, 068713J099A (J-серия)'],
+  ['E-префикс','обменные узлы/инжекторы','E301380-600 fuel injector Titan 130'],
+  ['70-30xxx-x','покупные вспомогательные изделия пакета (датчики, фильтры, лампы)','—'],
+  ['83G10xx','шланги (G-серия)','83G1039/83G1040'],
+  ['FTNNNNN','Field Tooling — оснастка','FT20026-100'],
+  ['переиндексация','Solar перевыпускает номера, суффиксная логика сохраняется','219611-2 → 136908-2 (лопатка 1 ст. Taurus 60)'],
+  ['NSN-кроссы','surplus-рынок','диск H410-3 = NSN 2835-00-317-8955']]},
+ {oem:'Siemens SGT-100/200/300/400 (Линкольн, Ruston-наследие)', note:'Префикс двигателя: MW = Cyclone/SGT-400; RM/RU/RT = Typhoon/SGT-100 (RM — основной чертёж, RU — узлы турбины, RT — воздухозабор); RW — общие с SGT-400 узлы; TB/TA = TB5000/TA1750; BM — Tempest/SGT-300. Первые цифры кодируют модуль: 12xxx/13xxx — компрессор и механизация ВНА · 14xxx — воздухозабор/фильтры · 21xxx–22xxx — камера сгорания и горелки · 31xxx — ротор/лопатки · 32xxx — подшипники · 33xxx — турбина ВД · 34xxx — диффузор · 35xxx — силовая турбина · 54xxx — BOV · 83xxx — выхлоп.', rows:[
+  ['MW/RW/RM/RU/RT + 5 цифр','чертёжная серия; суффикс-буква = ревизия (чем дальше, тем новее)','MW21215M камера, RM31035D, MW33326B'],
+  ['…/NN','исполнение/позиция в сборке (/1 — нижняя половина, /2 — верхняя)','MW35024B/01, MW13023A/1'],
+  ['64/NNNNNNNN/N','материальный номер покупных изделий пакета (зажигание, барьеры, датчики, модули AB/Bently)','64/60009030/2'],
+  ['74/, 75/, 76/…','вспомогательные системы пакета','—'],
+  ['SP0NNNNN','сервис-киты и фильтры; пара: ESP-код (внутренний складской)','SP044584 ↔ ESP000641'],
+  ['CT####, CT9####X/NN','расходники, шланги, клапаны, электроника пакета','CT95230/01 = Rockwell 1756-L55M24; CT886/13 = Loctite 572'],
+  ['M17/#####','сопловые лопатки SGT-100','—'],
+  ['NNNNNNNNN (9 цифр)','стандартный крепёж, размер зашит в код','115612055 = болт M12x55, 219562012 = гайка M12']]},
+ {oem:'Siemens SGT-500/600/700/800 (Финспонг, STAL-наследие)', note:'7-значные чертёжные номера 24xxxxx/25xxxxx.', rows:[
+  ['NNNNNNN-L','чертёж + буква ревизии','2415650-C, 2423483-A'],
+  ['NNNNNNN-N','чертёж + цифра варианта','2461292-1, 2415332-1'],
+  ['51xxxxxx-N','8-значная серия (прокладки, уплотнения)','51085529-1'],
+  ['A#######-NNN','материальные/стандартные коды (O-rings, герметики)','A2842152-591'],
+  ['T39xx-xxx','стопорные шайбы','T3904-178'],
+  ['1CSA/SCA xxxxx-1','трубные комплекты','1CSA7596-1'],
+  ['E1B1########','новые номера SAP-формата','E1B100006241'],
+  ['—','кириллическая «А» подменяет латинскую в РФ-ведомостях — нормализовать при матчинге','2461700-А']]},
+ {oem:'Siemens SGT5/SGT6 (KWU, V94.2/V94.3A)', note:'', rows:[
+  ['E1A/E1B…','материальные коды KWU, теплозащита','E1B100006241'],
+  ['3AX/3RH/6ES7','классическая электрика Siemens, SIMATIC; САУ — SPPA-T3000','3AX1103-2E']]},
+ {oem:'GE Frame (MS5001/5002, 6B, 7EA, 6F/7F, 9E/9FA)', note:'Классическая система GE: серия + буква группы + порядковый + P-piece (деталь) / G (сборка). Кластеры серий по нашей базе: 185A = O-rings, 302A = спиральные прокладки, 328A = термопары/датчики, 312A = сервоклапаны (Moog), 114A = сальники Garlock, 261A = flame-детекторы, 91600478 = piece-варианты P150-P162 (лопатки по ступеням). Piece-номер обязателен!', rows:[
+  ['NNNABNNNNPNNN','основной чертёж','328A7187P003, 302A7009P009'],
+  ['NNNNNNNNPNNN','8-значная серия (эра Frame 5/6)','91600478P161'],
+  ['NNNYNNNPNNN','Y-серия, электрика/КИП','113Y687P001'],
+  ['…GNN','сборка (Group)','91204241G01'],
+  ['N…AP/P…','стандартный крепёж','N733AP44080'],
+  ['H…','покупное изделие','H1978A006'],
+  ['DS200/DS3800','платы Mark V / Mark IV','DS200TCCAG1BAA'],
+  ['IS200/IS215','платы Mark VI / VIe','IS200TBAIH1C']]},
+ {oem:'GE LM (2500/5000/6000, LMS100)', note:'Авиационная система (Cincinnati/Lynn). Субпоставщики из парт-листов: Woodward (8200-серии), Rosemount (1151), Arkwin (VSV-актуаторы), Dataforth.', rows:[
+  ['NNNNMNNPNN','основной формат детали','9173M87P02'],
+  ['J…P/B','стандартный крепёж','J221P904'],
+  ['K…P/GNN','детали LM (лопатки HPC)','K024G02'],
+  ['LNNNNNP/GNN','крупные узлы, LM6000-серия','L47552G13, L43418P03'],
+  ['682LNNNGNN','комплекты лопаток','682L929G08']]},
+ {oem:'Rolls-Royce (Avon/RB211/Trent)', note:'Префикс кодирует серию/узел. Для аэродеривационных — FAA PMA-базы: одобренные аналоги с привязкой к OEM PN.', rows:[
+  ['AG + 5 цифр','лопатки, узлы','AG56587'],
+  ['BR + 5 цифр','сегменты, кольца','BR9044'],
+  ['BA + 5 цифр','крепёж, шайбы','BA34641'],
+  ['LJ/LK/FW','трубопроводы RB211','LJ35347'],
+  ['AE…-N','трубки с ревизией','AE709623-1']]},
+ {oem:'Pratt & Whitney (GG4/FT4/FT8)', note:'', rows:[
+  ['6-7 цифр + суффикс','чертёж + ревизия','1083042 (форсунка)'],
+  ['ST + 4 цифры -NN','стандартная арматура','ST1141-41'],
+  ['MS/AN/AS','военные стандарты — покупаются без P&W','MS9061-08'],
+  ['IPC/IPD','коммерческие рукава','IPD21306-24-2']]},
+ {oem:'Alstom GT13E2 / Ansaldo / MHI', note:'Alstom = наследие BBC→ABB (один PN в нескольких чертёжных системах эпох). Ansaldo AE64.3A/AE94.x = лицензии V64.3A/V94.x — применять правила Siemens. M501/M701 = наследие Westinghouse 501.', rows:[
+  ['1SBL…R','коды ABB (электрика)','1SBL281001R8832'],
+  ['910-304-xxx-000','коды AEG (контакторы)','910-304-426-000'],
+  ['JIS-крепёж (MHI)','заказ напрямую в Японии/Китае','—']]}];
+const VENDOR_HINTS = [['Bently Nevada','виброконтроль всех пакетов'],['Woodward','топливные регуляторы, приводы'],['Meggitt','топливные клапаны (Solar 1019431 = VL4000S)'],['Champion/Unison/Chentronics','зажигание всех OEM'],['Emerson Rosemount','КИП давления (1151/3051)'],['Parker Hannifin','уплотнения, O-rings'],['Pall/Donaldson/PECOFacet/Fleetguard','фильтры'],['Rockwell (ControlLogix)','САУ пакетов Siemens (CT95230)'],['Pepperl+Fuchs/MTL','барьеры искрозащиты'],['RENK/SKF/Miba','подшипники'],['Henkel Loctite','герметики (Siemens CT886/ST886)'],['PSM/EthosEnergy/AGT/BDB/ZURN/INTECH','независимый горячий тракт']];
+const SOURCES = [['WBParts — NSN/CAGE кросс-референсы','https://www.wbparts.com'],['PartsLogistics — FAA PMA аналоги','https://www.partslogistics.com'],['Solar Parts Store — официальные замены','https://shop.solarturbines.com'],['TurbineBlade — парт-листы SGT/LM/Avon','https://turbineblade.net'],['Gas-Turbine-Parts — парт-листы с ESP-кодами','http://www.gas-turbine-parts.com'],['Volza — таможенные записи по PN','https://www.volza.com'],['Chentronics — зажигание всех OEM','https://www.chentronics.com'],['Supply.Parts — чужие RFQ','https://supply.parts']];
+
+/* ===== состояние и правки (localStorage) ===== */
+const LS='kvant_pn_v2';
+let store = JSON.parse(localStorage.getItem(LS)||'{"status":{},"notes":{},"hidden":{},"added":[],"over":{},"requests":[],"author":""}');
+store.requests = store.requests||[]; store.author = store.author||'';
+const save=()=>localStorage.setItem(LS,JSON.stringify(store));
+const normQ=s=>{const m={'А':'A','В':'B','С':'C','Е':'E','К':'K','М':'M','Н':'H','О':'O','Р':'P','Т':'T','Х':'X'};return (s||'').toUpperCase().split('').map(c=>m[c]||c).join('').replace(/[\s\u00a0]/g,'')};
+/* живые ссылки на компании в Bitrix */
+const BXLINK='https://kvantpro.bitrix24.ru/crm/company/details/';
+function bxLinks(text){
+ if(typeof BX_COMPANIES==='undefined'||!text) return text;
+ let out=String(text);
+ const names=Object.keys(BX_COMPANIES).sort((a,b)=>b.length-a.length);
+ for(const nm of names){
+  if(nm.length<4) continue;
+  const rx=new RegExp('(^|[\\s;,«(])('+nm.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')(?=[\\s;,»).]|$)','i');
+  out=out.replace(rx,(m,p1,p2)=>`${p1}<a href="${BXLINK}${BX_COMPANIES[nm]}/" target="_blank" rel="noopener" style="color:var(--acc)">${p2}</a>`);
+ }
+ return out;
+}
+let DATA = PN_DATA.concat(store.added);
+function ov(r){const o=store.over[r.pn];return o?Object.assign({},r,o):r}
+const evLevel=r=>{const e=(r.ev||'').trim();return e.startsWith('П1')?'П1':e.startsWith('П2')?'П2':e.startsWith('П3')?'П3':e.startsWith('П4')?'П4':''};
+const evBadge=r=>{const l=evLevel(r);const vf=r.vf===2?' <span title="Проверено по 2+ независимым источникам" style="color:var(--ok)">✓×2</span>':'';return (l?`<span class="badge ${l.toLowerCase()}">${l}</span>`:'<span class="badge p0">—</span>')+vf};
+const stBadge=pn=>{const s=store.status[pn];const m={'в работе':'work','RFQ отправлен':'rfq','есть КП':'kp','отказ':'no'};return s?`<span class="st ${m[s]||''}">${s}</span>`:''};
+</script>
+<script>
+/* ===== фильтры и рендер ===== */
+const PAGE=200;let shown=PAGE,cur=null;
+/* ===== сортировка по клику на заголовок ===== */
+let sortCol=null,sortDir=1;
+const SORT_FN={
+ pn:(a,b)=>a.pn.localeCompare(b.pn,'ru',{numeric:true}),
+ desc:(a,b)=>(a.desc||'').localeCompare(b.desc||'','ru'),
+ oem:(a,b)=>(a.oem||'').localeCompare(b.oem||'','ru'),
+ mach:(a,b)=>(a.mach||'').localeCompare(b.mach||'','ru'),
+ seg:(a,b)=>(a.seg||'').localeCompare(b.seg||'','ru'),
+ mk:(a,b)=>(a.mk||'~').localeCompare(b.mk||'~','ru'),
+ ev:(a,b)=>(evLevel(a)||'~').localeCompare(evLevel(b)||'~','ru'),
+ st:(a,b)=>((store.status[a.pn]||'~').localeCompare(store.status[b.pn]||'~','ru')),
+};
+document.addEventListener('click',e=>{
+ const th=e.target.closest('th.sortable'); if(!th)return;
+ const c=th.dataset.s;
+ if(sortCol===c)sortDir=-sortDir; else{sortCol=c;sortDir=1;}
+ document.querySelectorAll('th.sortable .smark').forEach(s=>s.textContent='');
+ th.querySelector('.smark').textContent=sortDir>0?'▲':'▼';
+ render();
+});
+function fillFilters(){
+ const oems=[...new Set(DATA.map(r=>r.oem).filter(Boolean))].sort();
+ const segs=[...new Set(DATA.map(r=>r.seg).filter(Boolean))].sort();
+ fOem.innerHTML='<option value="">OEM: любой</option>'+oems.map(o=>`<option>${o}</option>`).join('');
+ fSeg.innerHTML='<option value="">Сегмент: любой</option>'+segs.map(o=>`<option>${o}</option>`).join('');
+ const att=DATA.filter(r=>r.mk).length;
+ const tq=DATA.filter(r=>r.qt).length, tc=DATA.filter(r=>r.cu).length;
+ stats.innerHTML=`<span>PN: <b>${DATA.length}</b></span><span>атрибутировано: <b>${att}</b></span><span>П1–П2: <b>${DATA.filter(r=>['П1','П2'].includes(evLevel(r))).length}</b></span><span>спрос: <b>${DATA.filter(r=>r.dq).length}</b></span><span>с КП: <b>${tq}</b></span><span>таможня: <b>${tc}</b></span><span>правок: <b>${Object.keys(store.over).length+store.added.length}</b></span>`;
+}
+function filtered(){
+ const q=normQ(document.getElementById('q').value),o=fOem.value,s=fSeg.value,e=fEv.value,a=fAttr.checked,h=fHidden.checked;
+ return DATA.map(ov).filter(r=>{
+   if(!h&&store.hidden[r.pn])return false;
+   if(o&&r.oem!==o)return false; if(s&&r.seg!==s)return false;
+   if(a&&!r.mk)return false;
+   if(e==='none'&&r.mk)return false; if(e&&e!=='none'&&evLevel(r)!==e)return false;
+   if(q){const hay=normQ(r.pn)+' '+normQ(r.desc)+' '+normQ(r.mk)+' '+normQ(r.mpn)+' '+normQ(r.mach); if(!hay.includes(q))return false;}
+   return true;
+ });
+}
+/* ===== мгновенный ответ по PN (hero) ===== */
+function answerCard(){
+ const box=document.getElementById('answerBox');
+ const q=normQ(document.getElementById('q').value);
+ if(!q||q.length<4){box.innerHTML='';return;}
+ const exact=DATA.map(ov).filter(r=>r.pn===q||r.pn.replace(/[-/]/g,'')===q.replace(/[-/]/g,''));
+ if(!exact.length){box.innerHTML='';return;}
+ const r=exact[0];
+ const chans=[];
+ if(r.cli) chans.push(`<b>КП/заказчики:</b> ${bxLinks(r.cli)}`);
+ if(r.channel) chans.push(`<b>Канал по таможне:</b> ${bxLinks(r.channel)}`);
+ const fam=DATA.filter(x=>x.b===r.b&&x.pn!==r.pn).slice(0,10);
+ box.innerHTML=`<div class="card2" style="border-left:4px solid var(--ok);padding:16px 18px;margin-bottom:14px">
+  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+   <span class="pn" style="font-size:19px;font-weight:700">${r.pn}</span>
+   ${evBadge(r)}
+   <span class="mut">${r.oem||''}</span><span class="mut">${r.mach||''}</span>
+   <span style="margin-left:auto">${stBadge(r.pn)}</span>
+  </div>
+  <div style="margin:6px 0 4px;color:var(--txt)">${r.desc||''}</div>
+  ${r.pat?`<div style="font-size:12.5px;color:var(--mut);margin-bottom:4px">🔍 <span style="color:var(--acc)">${r.pat}</span></div>`:''}
+  <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;font-size:12px">
+   <span class="badge ${r.dq?'p1':'p0'}" title="Заказчик спрашивал (потребность НВН/Энергосети/НОВАТЭК/Криогаз)">спрос ${r.dq?'✓':'—'}</span>
+   <span class="badge ${r.qt?'p2':'p0'}" title="Поставщик предлагал в КП">КП ${r.qt?'✓':'—'}</span>
+   <span class="badge ${r.cu?'p1':'p0'}" title="Реально ввозили (таможенная декларация)">таможня ${r.cu?'✓':'—'}</span>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px">
+   <div style="background:var(--panel2);border-radius:10px;padding:12px">
+    <div class="mut" style="font-size:12px">РЕАЛЬНЫЙ ПРОИЗВОДИТЕЛЬ</div>
+    <div style="font-size:17px;font-weight:600;margin-top:4px">${r.mk||'<span class="mut">не атрибутирован — жмите «Вопрос Кими» в карточке</span>'}</div>
+   </div>
+   <div style="background:var(--panel2);border-radius:10px;padding:12px">
+    <div class="mut" style="font-size:12px">ОБРАЩАТЬСЯ ПО НОМЕРУ</div>
+    ${r.mpn&&['П1','П2'].includes(evLevel(r))?`<div class="pn" style="font-size:17px;font-weight:700;color:var(--ok);margin-top:4px">${r.mpn}</div>`:''}
+    ${r.mpn&&!['П1','П2'].includes(evLevel(r))?`<div style="font-size:13px;color:var(--warn);margin-top:4px">направление: ${r.mpn}<br><span class="mut">П3/П4 — не заказной номер, проверить</span></div>`:''}
+    ${!r.mpn?'<div class="mut" style="font-size:13px;margin-top:4px">нет данных — шлите OEM-номер вендору или «Вопрос Кими»</div>':''}
+   </div>
+   <div style="background:var(--panel2);border-radius:10px;padding:12px">
+    <div class="mut" style="font-size:12px">КАНАЛЫ / КОНТАКТЫ</div>
+    <div style="font-size:13px;margin-top:4px">${chans.length?chans.join('<br>'):'<span class="mut">канал не зафиксирован — стартуйте с вендора или его дистрибьютора</span>'}</div>
+    <div class="mut" style="font-size:11.5px;margin-top:6px">${r.sn||''}${r.su?` · <a href="${r.su}" target="_blank" rel="noopener">источник</a>`:''}</div>
+   </div>
+  </div>
+  ${fam.length?`<div style="margin-top:10px;font-size:12.5px" class="fam"><span class="mut">варианты чертежа:</span> ${fam.map(x=>`<span onclick="document.getElementById('q').value='${x.pn}';render(true)">${x.pn}</span>`).join('')}</div>`:''}
+  <div style="margin-top:10px"><button class="primary" onclick="openPN('${r.pn}')">Открыть карточку: статус, заметки, вопрос Кими →</button></div>
+ </div>`;
+}
+function render(reset){
+ if(reset)shown=PAGE;
+ answerCard();
+ const f=filtered();
+ if(sortCol)f.sort((a,b)=>SORT_FN[sortCol](a,b)*sortDir);
+ cnt.textContent=`${f.length} из ${DATA.length}`;
+ let html=f.slice(0,shown).map(r=>`<tr class="row ${store.hidden[r.pn]?'dim':''}" onclick="openPN('${r.pn.replace(/'/g,"\\'")}')">
+  <td onclick="event.stopPropagation()"><input type="checkbox" class="rfqck" data-pn="${r.pn}" ${RFQ.sel.has(r.pn)?'checked':''} onchange="rfqToggle('${r.pn}',this)"></td>
+  <td class="pn">${r.pn}</td><td>${r.desc||'<span class=mut>—</span>'}</td><td class="mut">${r.oem||''}</td>
+  <td class="mut" style="font-size:12px">${r.mach||''}</td><td class="mut" style="font-size:12px">${r.seg||''}</td>
+  <td style="font-size:12.5px">${r.mk||''}${r.mpn?`<br><span class="mut" style="font-size:11.5px">${r.mpn}</span>`:''}</td>
+  <td>${evBadge(r)}</td><td>${stBadge(r.pn)}</td></tr>`).join('');
+ if(f.length>shown)html+=`<tr><td colspan="9" style="text-align:center"><button onclick="shown+=500;render()">Показать ещё (${f.length-shown})</button></td></tr>`;
+ tbody.innerHTML=html;
+}
+/* ===== карточка PN (drawer, CRUD) ===== */
+function openPN(pn){
+ cur=pn;
+ const r=ov(DATA.find(x=>x.pn===pn)); if(!r)return;
+ const fam=DATA.filter(x=>x.b===r.b&&x.pn!==pn).slice(0,12);
+ const notes=(store.notes[pn]||[]);
+ const isAdded=store.added.some(x=>x.pn===pn);
+ drawer.innerHTML=`
+ <div class="dr-head"><h2>${r.pn}</h2><button onclick="closeDrawer()">✕</button></div>
+ <div style="margin:8px 0">${evBadge(r)} ${stBadge(pn)} ${store.hidden[pn]?'<span class="st no">скрыт</span>':''}</div>
+ <div class="kv">
+  <div>Описание</div><div>${r.desc||'—'}</div>
+  <div>OEM</div><div>${r.oem||'—'}</div>
+  <div>Шифровка</div><div>${r.pat||'—'}</div>
+  <div>Семейство (база)</div><div class="pn">${r.b||'—'}</div>
+  <div>Машины</div><div>${r.mach||'—'}</div>
+  <div>Сегмент ЗИП</div><div>${r.seg||'—'}</div>
+  <div>Спрос, шт</div><div>${r.qty||0}</div>
+  <div>Заказчики / КП</div><div>${bxLinks(r.cli)||'—'}</div>
+  <div>Источник</div><div>${r.sn||'—'}${r.su?` · <a href="${r.su}" target="_blank" rel="noopener">ссылка</a>`:''}<br><span class="mut" style="font-size:11.5px">${r.org||''}</span></div>
+ </div>
+ <div class="sec"><h3>Где заказывать</h3>
+  ${r.mk?`<div style="background:var(--panel2);border:1px solid var(--line);border-left:3px solid var(--ok);border-radius:8px;padding:10px 12px;margin-bottom:10px">
+   <div style="font-size:12px;color:var(--mut)">ПРОИЗВОДИТЕЛЬ</div>
+   <div style="font-size:15px;font-weight:600">${r.mk}</div>
+   ${r.mpn&&['П1','П2'].includes(evLevel(r))?`<div style="font-size:12px;color:var(--mut);margin-top:8px">ЗАКАЗНОЙ НОМЕР У ПРОИЗВОДИТЕЛЯ</div>
+   <div class="pn" style="font-size:15px;font-weight:600;color:var(--ok)">${r.mpn}</div>`:''}
+   ${r.mpn&&!['П1','П2'].includes(evLevel(r))?`<div style="font-size:12px;color:var(--warn);margin-top:8px">НАПРАВЛЕНИЕ (П3/П4 — проверить перед заказом): ${r.mpn}</div>`:''}
+   ${r.alias&&r.alias!==r.mpn?`<div style="font-size:12px;color:var(--mut);margin-top:6px">То же изделие под номером: <a href="javascript:void(0)" onclick="openPN('${r.alias}')">${r.alias}</a></div>`:''}
+   <div style="font-size:12px;color:var(--mut);margin-top:8px">${r.mpn?'Заказывать у производителя или его дистрибьютора под этим номером.':'Заказного номера пока нет — слать RFQ производителю с OEM-номером «'+r.pn+'»: официальные дистрибьюторы кроссят по своим таблицам. Кнопка «Вопрос Кими» ниже — добью заказной номер.'}</div>
+  </div>`:`<div class="mut" style="font-size:13px;margin-bottom:8px">Субпоставщик не атрибутирован. Кнопка «Вопрос Кими» ниже — поставлю в очередь на расшифровку.</div>`}
+  <div class="kv">
+   <div>Реальный производитель</div><div><input type="text" id="e_mk" value="${(r.mk||'').replace(/"/g,'&quot;')}" placeholder="напр. Bently Nevada"></div>
+   <div>Заказной номер</div><div><input type="text" id="e_mpn" value="${(r.mpn||'').replace(/"/g,'&quot;')}" placeholder="напр. 330101-00-08-20-12-05"></div>
+   <div>Доказанность</div><div><select id="e_ev"><option value="">—</option>${['П1 — NSN/CAGE/таможня','П2 — прямой листинг','П3 — OE-статус/профиль','П4 — эвристика'].map(o=>`<option ${r.ev===o?'selected':''}>${o}</option>`).join('')}</select></div>
+   <div>Источник</div><div style="font-size:12px">${r.sn||'—'}${r.su?` · <a href="${r.su}" target="_blank" rel="noopener">ссылка</a>`:''}</div>
+  </div>
+  <button class="primary" onclick="saveAttr()">Сохранить атрибуцию</button>
+ </div>
+ ${fam.length?`<div class="sec"><h3>Семейство (варианты чертежа ${r.b})</h3><div class="fam">${fam.map(x=>`<span onclick="openPN('${x.pn}')">${x.pn}</span>`).join('')}</div></div>`:''}
+ <div class="sec"><h3>Статус проработки</h3>
+  <select onchange="setStatus('${pn}',this.value)">
+   <option value="">без статуса</option>
+   ${['в работе','RFQ отправлен','есть КП','отказ'].map(s=>`<option ${store.status[pn]===s?'selected':''}>${s}</option>`).join('')}
+  </select>
+ </div>
+ <div class="sec"><h3>Заметки</h3>
+  ${notes.map(n=>`<div class="note">${n.t}<small>${n.d}</small></div>`).join('')}
+  <textarea id="noteTxt" rows="2" placeholder="Добавить заметку…"></textarea>
+  <button onclick="addNote()">+ заметка</button>
+ </div>
+ <div class="sec"><h3>Вопрос Кими</h3>
+  ${store.requests.filter(q=>q.pn===pn).map(q=>`<div class="note" style="border-left-color:${q.status==='отвечено'?'var(--ok)':'var(--warn)'}"><b>${q.type}</b>: ${q.text}<small>${q.author} · ${q.at} · ${q.status}${q.answer?`<br>💬 <b>Кими:</b> ${q.answer}`:''}</small></div>`).join('')}
+  <select id="q_type">
+   <option>Уточнить субпоставщика</option>
+   <option>Ошибка в атрибуции</option>
+   <option>Расшифровать PN</option>
+   <option>Найти канал закупки</option>
+   <option>Проверить взаимозаменяемость</option>
+   <option>Другое</option>
+  </select>
+  <textarea id="q_text" rows="2" placeholder="Суть вопроса: что проверить/найти по этому PN…"></textarea>
+  <input type="text" id="q_author" placeholder="Ваше имя (инженер)" value="${store.author.replace(/"/g,'&quot;')}">
+  <button class="primary" onclick="submitRequest('${pn}')">В очередь к Кими</button>
+ </div>
+ <div class="sec">
+  <button onclick="toggleHide('${pn}')">${store.hidden[pn]?'Показать':'✕ Скрыть'}</button>
+  ${isAdded?`<button onclick="delAdded('${pn}')" style="color:var(--bad)">Удалить запись</button>`:''}
+ </div>`;
+ drawer.classList.add('open'); ovl.classList.add('on');
+}
+function closeDrawer(){drawer.classList.remove('open');ovl.classList.remove('on');cur=null}
+function saveAttr(){
+ store.over[cur]=Object.assign(store.over[cur]||{},{mk:e_mk.value.trim(),mpn:e_mpn.value.trim(),ev:e_ev.value});
+ save();toast('Атрибуция сохранена');fillFilters();render();openPN(cur);
+}
+function setStatus(pn,v){if(v)store.status[pn]=v;else delete store.status[pn];save();render();openPN(pn)}
+function addNote(){const t=noteTxt.value.trim();if(!t)return;(store.notes[cur]=store.notes[cur]||[]).unshift({t,d:new Date().toLocaleString('ru')});save();openPN(cur)}
+function toggleHide(pn){store.hidden[pn]=!store.hidden[pn];if(!store.hidden[pn])delete store.hidden[pn];save();render();openPN(pn)}
+function delAdded(pn){store.added=store.added.filter(x=>x.pn!==pn);DATA=DATA.filter(x=>x.pn!==pn);save();closeDrawer();fillFilters();render(true);toast('Запись удалена')}
+function openAdd(){
+ cur=null;
+ drawer.innerHTML=`<div class="dr-head"><h2>Новый PN</h2><button onclick="closeDrawer()">✕</button></div>
+ <div class="sec">
+ <input type="text" id="a_pn" placeholder="PN (как в запросе)">
+ <input type="text" id="a_desc" placeholder="Описание">
+ <select id="a_oem"><option>Solar Turbines</option><option>Siemens Energy</option><option>GE</option><option>Rolls-Royce</option><option>Pratt & Whitney</option><option>Alstom</option><option>Ansaldo</option><option>MHI</option><option>Cryostar</option><option>Ebara</option><option>Прочие</option></select>
+ <input type="text" id="a_mach" placeholder="Машина (Taurus 60, SGT-400…)">
+ <input type="text" id="a_seg" placeholder="Сегмент ЗИП">
+ <input type="text" id="a_mk" placeholder="Реальный производитель (если известен)">
+ <input type="text" id="a_mpn" placeholder="PN производителя">
+ <button class="primary" onclick="saveAdd()">Добавить в базу</button></div>`;
+ drawer.classList.add('open');ovl.classList.add('on');
+}
+function saveAdd(){
+ let pn=normQ(a_pn.value); if(!pn)return toast('Укажите PN');
+ if(DATA.some(x=>x.pn===pn))return toast('Такой PN уже есть');
+ const r={pn,b:pn.split(/[-/]/)[0],pat:'',oem:a_oem.value,mach:a_mach.value,seg:a_seg.value,desc:a_desc.value,qty:0,src:0,cli:'',mk:a_mk.value,mpn:a_mpn.value,ev:'',sn:'вручную',su:'',org:'добавлено вручную'};
+ store.added.push(r);DATA.push(r);save();closeDrawer();fillFilters();render(true);toast('PN добавлен');
+}
+/* ===== экспорт/импорт ===== */
+function dl(name,content,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([content],{type}));a.download=name;a.click()}
+function exportCSV(){
+ const f=filtered();
+ const esc=s=>'"'+String(s||'').replace(/"/g,'""')+'"';
+ const head='PN;Семейство;Шифровка;OEM;Машины;Сегмент;Описание;Спрос;Субпоставщик;PN производителя;Доказанность;Статус;Источник;URL';
+ const rows=f.map(r=>[r.pn,r.b,r.pat,r.oem,r.mach,r.seg,r.desc,r.qty,r.mk,r.mpn,r.ev,store.status[r.pn]||'',r.sn,r.su].map(esc).join(';'));
+ dl('kvant_pn_export.csv','\ufeff'+head+'\n'+rows.join('\n'),'text/csv');toast('CSV: '+f.length+' строк');
+}
+function exportEdits(){dl('kvant_pn_edits.json',JSON.stringify(store,null,1),'application/json');toast('Правки выгружены')}
+function importEdits(inp){
+ const f=inp.files[0];if(!f)return;
+ const rd=new FileReader();
+ rd.onload=()=>{try{const j=JSON.parse(rd.result);
+  store={status:j.status||{},notes:j.notes||{},hidden:j.hidden||{},added:j.added||[],over:j.over||{},requests:j.requests||store.requests||[],author:j.author||store.author||''};
+  DATA=PN_DATA.concat(store.added);save();fillFilters();render(true);updateReqBadge();toast('Правки импортированы');
+ }catch(e){toast('Ошибка файла')}};rd.readAsText(f);
+}
+function toast(t){const el=document.getElementById('toast');el.textContent=t;el.style.display='block';setTimeout(()=>el.style.display='none',2200)}
+/* ===== RFQ-пакеты по производителям (готово к рассылке) ===== */
+let RFQ = {sel:new Set()};
+function rfqToggle(pn, cb){ cb.checked ? RFQ.sel.add(pn) : RFQ.sel.delete(pn); }
+function openRFQ(){
+ cur=null;
+ const rows=DATA.map(ov).filter(r=>r.mk);
+ const scope = RFQ.sel.size ? rows.filter(r=>RFQ.sel.has(r.pn)) : rows;
+ const byMk={};
+ scope.forEach(r=>{ (byMk[r.mk]=byMk[r.mk]||[]).push(r); });
+ const mks=Object.entries(byMk).sort((a,b)=>b[1].length-a[1].length);
+ drawer.innerHTML=`<div class="dr-head"><h2 style="font-family:inherit;color:var(--txt)">📨 RFQ-пакеты по производителям</h2><button onclick="closeDrawer()">✕</button></div>
+ <div class="card2" style="font-size:12.5px" ><span class="mut">${RFQ.sel.size?`Выбрано вручную: ${RFQ.sel.size} PN`:'Все атрибутированные позиции'} → <b>${scope.length}</b> PN → <b>${mks.length}</b> производителей. Для каждого — готовое английское письмо с таблицей позиций (OEM PN + заказной номер + кол-во). Уровни П1–П2 помечены, П3–П4 — «please verify».</span></div>
+ <div style="display:flex;gap:8px;margin-bottom:10px">
+  <button class="primary" onclick="dlRFQAll()">⬇ Все пакеты одним файлом</button>
+  <button onclick="dlRFQCSV()">⬇ CSV (все)</button>
+ </div>
+ ${mks.map(([mk,rows])=>{
+  const id='rfq_'+mk.replace(/[^a-z0-9]/gi,'_');
+  return `<div class="card2">
+   <b>${mk}</b> <span class="mut">— ${rows.length} PN</span>
+   <div style="margin-top:6px;display:flex;gap:8px">
+    <button class="btn" onclick="copyRFQ('${id}')">📋 Копировать письмо</button>
+    <button class="btn" onclick="dlRFQ('${id}','${mk.replace(/[^a-z0-9а-яё ]/gi,'').trim()}')">⬇ TXT</button>
+   </div>
+   <pre id="${id}" style="white-space:pre-wrap;font-size:12px;background:var(--panel2);border-radius:8px;padding:10px;margin-top:8px;max-height:220px;overflow:auto">${rfqText(mk,rows)}</pre>
+  </div>`}).join('')}`;
+ drawer.classList.add('open');ovl.classList.add('on');
+}
+function rfqText(mk,rows){
+ const lines = rows.map(r=>{
+  const lvl=(r.ev||'').split(' ')[0];
+  return `${r.pn}\t${(r.desc||'').replace(/\t/g,' ')}\t${r.mpn||'-'}\t${r.qty||''}\t${lvl}${r.vf===2?' ✓x2':''}`;
+ });
+ return `Subject: RFQ — Gas Turbine Spare Parts (OEM cross-reference attached)\n\nDear ${mk} team,\n\nWe are an operator/servicer of industrial gas turbines (Solar Turbines, Siemens SGT, GE) in Russia/CIS.\nPlease quote the following positions. Where available we list your own part number (column 3) — if it differs from current, please advise the superseding PN.\n\nOEM PN\tDescription\tYour PN\tQty\tEvidence\n${lines.join('\n')}\n\nPlease indicate: price, lead time, condition (new/overhauled), Incoterms DAP/DAP Moscow region.\nBest regards,\nKVANT sourcing`;
+}
+function copyRFQ(id){navigator.clipboard.writeText(document.getElementById(id).textContent).then(()=>toast('Письмо скопировано'))}
+function dlRFQ(id,name){dl('RFQ_'+name+'.txt', document.getElementById(id).textContent, 'text/plain');toast('Скачан RFQ: '+name)}
+function dlRFQAll(){
+ const rows=DATA.map(ov).filter(r=>r.mk);
+ const scope = RFQ.sel.size ? rows.filter(r=>RFQ.sel.has(r.pn)) : rows;
+ const byMk={}; scope.forEach(r=>{(byMk[r.mk]=byMk[r.mk]||[]).push(r)});
+ const txt=Object.entries(byMk).sort((a,b)=>b[1].length-a[1].length).map(([mk,rows])=>rfqText(mk,rows)).join('\n\n'+'='.repeat(80)+'\n\n');
+ dl('RFQ_all_'+new Date().toISOString().slice(0,10)+'.txt', txt, 'text/plain');toast('Все RFQ-пакеты скачаны');
+}
+function dlRFQCSV(){
+ const rows=DATA.map(ov).filter(r=>r.mk);
+ const scope = RFQ.sel.size ? rows.filter(r=>RFQ.sel.has(r.pn)) : rows;
+ const esc=s=>'"'+String(s||'').replace(/"/g,'""')+'"';
+ const head='Manufacturer;OEM PN;Maker PN;Description;Qty;Evidence;Source;URL';
+ const lines=scope.map(r=>[r.mk,r.pn,r.mpn,r.desc,r.qty||'',r.ev,r.sn,r.su].map(esc).join(';'));
+ dl('RFQ_all.csv','\ufeff'+head+'\n'+lines.join('\n'),'text/csv');toast('CSV: '+scope.length+' строк');
+}
+/* ===== контур запросов к Кими ===== */
+function submitRequest(pn){
+ const type=q_type.value, text=q_text.value.trim(), author=q_author.value.trim();
+ if(!text)return toast('Напишите суть вопроса');
+ store.author=author;
+ store.requests.push({id:'Q'+Date.now().toString(36)+Math.floor(Math.random()*99), pn, type, text, author, at:new Date().toLocaleString('ru'), status:'новый', answer:''});
+ save();updateReqBadge();toast('Запрос в очереди — выгрузите пакет вопросов');openPN(pn);
+}
+function updateReqBadge(){
+ const n=store.requests.filter(q=>q.status!=='отвечено').length;
+ const b=document.getElementById('reqBadge');
+ b.style.display=n?'':'none'; b.textContent=n;
+}
+function renderRequests(){
+ const stName={'новый':['p3','новый'],'отправлен':['p2','отправлен'],'отвечено':['p1','отвечено']};
+ const rows=[...store.requests].reverse();
+ document.getElementById('reqList').innerHTML = rows.length? `<table><thead><tr><th>ID</th><th>PN</th><th>Тип</th><th>Вопрос</th><th>Автор</th><th>Когда</th><th>Статус</th><th>Ответ Кими</th></tr></thead><tbody>${
+  rows.map(q=>`<tr><td class="mut">${q.id}</td><td class="pn" style="cursor:pointer" onclick="openPN('${q.pn}')">${q.pn}</td><td>${q.type}</td>
+   <td>${q.text}</td><td class="mut">${q.author}</td><td class="mut">${q.at}</td>
+   <td><span class="badge ${stName[q.status][0]}">${stName[q.status][1]}</span></td>
+   <td style="font-size:12.5px">${q.answer||'<span class="mut">—</span>'}</td></tr>`).join('')}</tbody></table>`
+  : '<div class="card2 mut">Очередь пуста. Вопросы создаются из карточки PN (клик по строке в базе).</div>';
+}
+function exportRequests(){
+ const fresh=store.requests.filter(q=>q.status!=='отвечено');
+ if(!fresh.length)return toast('Нет новых запросов');
+ const pack={app:'kvant-pn',kind:'questions',created:new Date().toISOString(),
+  instruction:'Отработай каждый запрос по PN: найди/проверь субпоставщика, расшифруй, оцени канал закупки. Верни JSON: {"kimi_answers":[{"id":..., "answer":"текст ответа инженеру", "over":{"mk":"","mpn":"","ev":""} — если атрибуция подтверждена/исправлена, иначе опусти over}]}',
+  questions:fresh};
+ dl('kvant_questions_'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify(pack,null,1),'application/json');
+ store.requests.forEach(q=>{if(q.status==='новый')q.status='отправлен'});
+ save();updateReqBadge();renderRequests();toast('Пакет выгружен: '+fresh.length+' вопросов');
+}
+function importAnswers(inp){
+ const f=inp.files[0];if(!f)return;
+ const rd=new FileReader();
+ rd.onload=()=>{try{
+  const j=JSON.parse(rd.result);
+  const arr=j.kimi_answers||j.answers||[];
+  let ok=0,applied=0;
+  for(const a of arr){
+   const q=store.requests.find(x=>x.id===a.id); if(!q)continue;
+   q.status='отвечено'; q.answer=a.answer||''; ok++;
+   if(a.over&&(a.over.mk||a.over.mpn)){
+    store.over[q.pn]=Object.assign(store.over[q.pn]||{},a.over); applied++;
+   }
+   (store.notes[q.pn]=store.notes[q.pn]||[]).unshift({t:'💬 Кими ('+q.type+'): '+(a.answer||''),d:new Date().toLocaleString('ru')});
+  }
+  save();updateReqBadge();renderRequests();fillFilters();render(true);
+  toast('Принято ответов: '+ok+(applied?', атрибуций применено: '+applied:''));
+ }catch(e){toast('Ошибка файла ответов')}};rd.readAsText(f);
+}
+/* ===== вкладки ===== */
+function switchTab(t,btn){
+ document.querySelectorAll('nav button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');
+ ['base','rules','vendors','requests'].forEach(x=>document.getElementById('tab-'+x).style.display=x===t?'':'none');
+ if(t==='rules')renderRules(); if(t==='vendors')renderVendors(); if(t==='requests')renderRequests();
+}
+function renderRules(){
+ document.getElementById('tab-rules').innerHTML=
+  RULES.map(g=>`<div class="rule"><h3>${g.oem}</h3>${g.note?`<p>${g.note}</p>`:''}<table><thead><tr><th>Паттерн</th><th>Что это</th><th>Пример</th></tr></thead><tbody>${g.rows.map(r=>`<tr><td class="pn">${r[0]}</td><td>${r[1]}</td><td class="mut">${r[2]}</td></tr>`).join('')}</tbody></table></div>`).join('')
+  +`<div class="rule"><h3>Универсальные субпоставщики</h3><table><tbody>${VENDOR_HINTS.map(v=>`<tr><td><b>${v[0]}</b></td><td class="mut">${v[1]}</td></tr>`).join('')}</tbody></table></div>
+  <div class="rule"><h3>Методика атрибуции</h3><p>П1 — NSN/FLIS (wbparts.com; CAGE: 66195=Solar, 81873=Woodward, 02697=Parker) и таможня · П2 — прямой листинг «OEM PN ↔ maker PN» · П3 — OE-статус в сегменте · П4 — эвристика, проверять перед заказом. Для аэродеривационных (LM, RB211, FT4/FT8) — FAA PMA-базы: одобренные аналоги с привязкой к OEM PN.</p></div>
+  <div class="rule"><h3>Источники</h3><table><tbody>${SOURCES.map(s=>`<tr><td>${s[0]}</td><td><a href="${s[1]}" target="_blank" rel="noopener">${s[1]}</a></td></tr>`).join('')}</tbody></table></div>`;
+}
+function renderVendors(){
+ const m={};
+ DATA.map(ov).forEach(r=>{if(!r.mk)return;const k=r.mk.replace(/\s*\(тип\.\)|\s*\(по типу\)|\s*\(по семейству\)/g,'');
+  (m[k]=m[k]||{n:0,p12:0,pns:[]});m[k].n++;if(['П1','П2'].includes(evLevel(r)))m[k].p12++;if(m[k].pns.length<5)m[k].pns.push(r.pn);});
+ const rows=Object.entries(m).sort((a,b)=>b[1].n-a[1].n);
+ document.getElementById('tab-vendors').innerHTML=`<div class="card2" style="border-left:3px solid var(--acc2)"><b>Как читать этот список.</b> <span class="mut" style="font-size:13px">Субпоставщики, расшифрованные за парт-номерами базы. «PN в базе» — сколько позиций за ним закреплено; «из них П1–П2» — сколько подтверждено документально (NSN/CAGE, листинги, таможня). Строки с пометкой «(тип.)/(по типу)» — эвристика по сегменту: кандидаты на проверку, а не подтверждённые факты. Клик по PN — переход к позиции в базе.</span></div><table><thead><tr><th>Субпоставщик</th><th>PN в базе</th><th>из них П1–П2</th><th>Примеры PN</th></tr></thead><tbody>${
+  rows.map(([k,v])=>`<tr><td><b>${bxLinks(k)}</b></td><td>${v.n}</td><td>${v.p12||'—'}</td><td class="fam">${v.pns.map(p=>`<span onclick="document.querySelector('nav button').click();document.getElementById('q').value='${p}';render(true)">${p}</span>`).join('')}</td></tr>`).join('')}</tbody></table>`
+  + (typeof BITRIX_FM!=='undefined' ? `<div class="card2" style="border-left:3px solid var(--warn);margin-top:14px"><b>Битрикс: исходы запросов по моделям</b> <span class="mut" style="font-size:12.5px">(все ГТУ-запросы СП-166; «нет отв.» = поставщик не ответил в срок — приоритет добивки)</span>
+  <table style="margin-top:8px"><thead><tr><th>Модель</th><th>Запросов</th><th>КП получено</th><th>Отказ в КП</th><th>Нет ответа</th><th>Не выбран</th></tr></thead><tbody>${
+   Object.entries(BITRIX_FM).sort((a,b)=>Object.values(b[1]).reduce((x,y)=>x+y,0)-Object.values(a[1]).reduce((x,y)=>x+y,0))
+   .map(([m,c])=>`<tr><td><b>${m}</b></td><td>${Object.values(c).reduce((x,y)=>x+y,0)}</td><td>${c['КП получено']||0}</td><td style="color:var(--bad)">${c['Отказ в КП']||0}</td><td style="color:var(--warn)">${c['Ответ не получен (в срок)']||0}</td><td>${c['Not Selected']||0}</td></tr>`).join('')}</tbody></table></div>` : '');
+}
+fillFilters();render(true);updateReqBadge();
+</script>
+</body>
+</html>

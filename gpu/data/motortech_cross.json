@@ -1,5 +1,5 @@
 {
- "updated": "2026-08-13",
+ "updated": "2026-08-22",
  "source": "Application Guides MOTORTECH (PDF), разобраны gpu/tools/parse_motortech.py. Кросс уровня A: изготовитель компонента сам заявляет эквивалентность номеру OEM.",
  "guides": [
   {
@@ -16,16 +16,21 @@
    "name": "Waukesha VHP",
    "oem": "Waukesha",
    "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf"
+  },
+  {
+   "name": "CAT G3600",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3600-Series-01.00.012-EN-2017-08.pdf"
   }
  ],
  "stats": {
-  "records": 134,
-  "oem_pns": 296,
+  "records": 161,
+  "oem_pns": 352,
   "by_brand": {
-   "CATERPILLAR": 57,
-   "ALTRONIC": 64,
+   "CATERPILLAR": 83,
+   "ALTRONIC": 79,
    "MOTORTECH": 18,
-   "MOT/CAT": 5,
+   "MOT/CAT": 6,
    "CHAMPION": 1,
    "IMPCO": 2,
    "WAUKESHA": 73
@@ -3207,6 +3212,626 @@
      "pns": [
       "489490",
       "305315C"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3600",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3600-Series-01.00.012-EN-2017-08.pdf",
+   "kind": "Equivalent to",
+   "part": "ignition coil",
+   "engines": "G3606",
+   "motortech": [
+    "06.50.034"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "7W-4377"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "591012"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3600",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3600-Series-01.00.012-EN-2017-08.pdf",
+   "kind": "Equivalent to",
+   "part": "ignition coil",
+   "engines": "G3606",
+   "motortech": [
+    "06.50.164"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "438-5682",
+      "310-3180",
+      "283-5269",
+      "232-6351",
+      "191-9346"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3600",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3600-Series-01.00.012-EN-2017-08.pdf",
+   "kind": "Equivalent to",
+   "part": "pickup",
+   "engines": "",
+   "motortech": [
+    "95.70.012-175"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "145-7982"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "591014-1"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3600",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3600-Series-01.00.012-EN-2017-08.pdf",
+   "kind": "Equivalent to",
+   "part": "Camshaft Trigger Magnet",
+   "engines": "",
+   "motortech": [
+    "06.60.925"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "142-8608"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3600",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3600-Series-01.00.012-EN-2017-08.pdf",
+   "kind": "Equivalent to",
+   "part": "Ignition coil",
+   "engines": "",
+   "motortech": [
+    "95.01.020-60"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "1N-3735"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "593027-60"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3600",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3600-Series-01.00.012-EN-2017-08.pdf",
+   "kind": "Equivalent to",
+   "part": "Ignition coil",
+   "engines": "",
+   "motortech": [
+    "95.01.020-72"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "1N-3736"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "593027-72"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3600",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3600-Series-01.00.012-EN-2017-08.pdf",
+   "kind": "Equivalent to",
+   "part": "",
+   "engines": "",
+   "motortech": [
+    "95.01.020-84"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "1N-3738"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "593027-84"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3600",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3600-Series-01.00.012-EN-2017-08.pdf",
+   "kind": "Equivalent to",
+   "part": "",
+   "engines": "",
+   "motortech": [
+    "95.01.020-96"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "1N-3739"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "593027-96"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3600",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3600-Series-01.00.012-EN-2017-08.pdf",
+   "kind": "Equivalent to",
+   "part": "Primary Leads",
+   "engines": "",
+   "motortech": [
+    "95.01.020-108"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "1N-3740"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "593027-108"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3600",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3600-Series-01.00.012-EN-2017-08.pdf",
+   "kind": "Equivalent to",
+   "part": "Primary Leads",
+   "engines": "",
+   "motortech": [
+    "95.01.020-120"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "1N-3741"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "593027-120"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3600",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3600-Series-01.00.012-EN-2017-08.pdf",
+   "kind": "Equivalent to",
+   "part": "Primary Leads",
+   "engines": "",
+   "motortech": [
+    "95.01.020-48"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "4W-5467"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "593027-48"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3600",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3600-Series-01.00.012-EN-2017-08.pdf",
+   "kind": "Equivalent to",
+   "part": "",
+   "engines": "",
+   "motortech": [
+    "95.01.020-12"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "4W-6741"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "593027-12"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3600",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3600-Series-01.00.012-EN-2017-08.pdf",
+   "kind": "Equivalent to",
+   "part": "",
+   "engines": "",
+   "motortech": [
+    "95.01.020-24"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "4W-6742"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "593027-24"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3600",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3600-Series-01.00.012-EN-2017-08.pdf",
+   "kind": "Equivalent to",
+   "part": "Primary Leads",
+   "engines": "",
+   "motortech": [
+    "95.01.020-42"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "4W-6743"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "593027-42"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3600",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3600-Series-01.00.012-EN-2017-08.pdf",
+   "kind": "Equivalent to",
+   "part": "Primary Leads",
+   "engines": "",
+   "motortech": [
+    "95.01.020-54"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "4W-6744"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "593027-54"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3600",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3600-Series-01.00.012-EN-2017-08.pdf",
+   "kind": "Equivalent to",
+   "part": "Primary Leads",
+   "engines": "",
+   "motortech": [
+    "95.01.020-132"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "4W-6745"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "593027-132"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3600",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3600-Series-01.00.012-EN-2017-08.pdf",
+   "kind": "Equivalent to",
+   "part": "",
+   "engines": "",
+   "motortech": [
+    "95.01.020-150"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "4W-6747"
+     ]
+    },
+    {
+     "brand": "ALTRONIC",
+     "pns": [
+      "593027-150"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3600",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3600-Series-01.00.012-EN-2017-08.pdf",
+   "kind": "Equivalent to",
+   "part": "ignition coils",
+   "engines": "",
+   "motortech": [
+    "95.01.030-10"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "7E-3056"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3600",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3600-Series-01.00.012-EN-2017-08.pdf",
+   "kind": "Equivalent to",
+   "part": "spark plug",
+   "engines": "G3606",
+   "motortech": [
+    "06.80.319-T",
+    "44.99.912"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "207-4509",
+      "207-4508",
+      "123-8641"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3600",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3600-Series-01.00.012-EN-2017-08.pdf",
+   "kind": "Equivalent to",
+   "part": "spark plug",
+   "engines": "G3606",
+   "motortech": [
+    "06.80.459H"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "308-1380",
+      "283-5271",
+      "264-5323",
+      "150-2050"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3600",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3600-Series-01.00.012-EN-2017-08.pdf",
+   "kind": "Fits Ignition Coil",
+   "part": "spark plug",
+   "engines": "G3606",
+   "motortech": [
+    "06.50.161"
+   ],
+   "cross": [
+    {
+     "brand": "MOT/CAT",
+     "pns": [
+      "06.50.161",
+      "283-5270"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3600",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3600-Series-01.00.012-EN-2017-08.pdf",
+   "kind": "Equivalent to",
+   "part": "primary leads",
+   "engines": "",
+   "motortech": [
+    "95.75.108",
+    "95.75.108-B"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "213-6308"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3600",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3600-Series-01.00.012-EN-2017-08.pdf",
+   "kind": "Equivalent to",
+   "part": "primary leads",
+   "engines": "",
+   "motortech": [
+    "95.75.103",
+    "95.75.103-B"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "219-9946"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3600",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3600-Series-01.00.012-EN-2017-08.pdf",
+   "kind": "Equivalent to",
+   "part": "primary leads",
+   "engines": "",
+   "motortech": [
+    "95.75.106",
+    "95.75.106-B"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "191-5007"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3600",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3600-Series-01.00.012-EN-2017-08.pdf",
+   "kind": "Equivalent to",
+   "part": "primary leads",
+   "engines": "",
+   "motortech": [
+    "95.75.107",
+    "95.75.107-B"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "198-2938"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3600",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3600-Series-01.00.012-EN-2017-08.pdf",
+   "kind": "Equivalent to",
+   "part": "spark plug",
+   "engines": "",
+   "motortech": [],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "301-6663",
+      "243-4291",
+      "194-8518",
+      "149-9931"
+     ]
+    }
+   ]
+  },
+  {
+   "guide": "CAT G3600",
+   "oem": "Caterpillar",
+   "url": "https://www.motortech.de/fileadmin/user_upload/applicationguides/MOTORTECH-Application-Guide-CATERPILLAR-G3600-Series-01.00.012-EN-2017-08.pdf",
+   "kind": "Equivalent to",
+   "part": "Spark Plugs",
+   "engines": "G3606",
+   "motortech": [
+    "56.01.098-34"
+   ],
+   "cross": [
+    {
+     "brand": "CATERPILLAR",
+     "pns": [
+      "383-2988",
+      "152-0807"
      ]
     }
    ]

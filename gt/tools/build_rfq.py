@@ -18,6 +18,25 @@ def nn(s):
     return re.sub(r"[^a-zа-яё0-9]", "", (s or "").lower())
 
 
+# ── фильтр компаний-конкурентов: РФ, Казахстан, Беларусь, Узбекистан ─────────
+RU_COUNTRY = re.compile(
+    r"^\s*(Россия|РФ|Russia|Russian|Казахстан|Kazakh|Беларус|Белорус|Belarus|Узбекистан|Uzbek)", re.I)
+RU_ORG = re.compile(r"(^|[\s(])(ООО|ОАО|ЗАО|ПАО|АО|РУП|ФГУП|НПО|УК)\s*[«\"„]?")
+RU_DOM = re.compile(r"\.(ru|рф|kz|by|uz)(/|$|\b)", re.I)
+RU_NEIGHBOURS = re.compile(r"Азербайджан|Армени|Киргиз|Кыргыз|Туркмен|Грузи|Молдав", re.I)
+
+
+def is_ru(name="", country="", site="", extra=""):
+    if RU_NEIGHBOURS.search(f"{name} {country} {extra}"):
+        return False
+    if RU_COUNTRY.search(country or ""):
+        return True
+    if RU_ORG.search(name or "") and not re.match(r"^[A-Za-z]{3,}", (name or "").strip()):
+        return True
+    dom = re.sub(r"^https?://", "", (site or "").strip().lower()).split("/")[0]
+    return bool(RU_DOM.search(dom))
+
+
 # ── пул поставщиков ──────────────────────────────────────────────────────────
 def build_pool():
     dossiers = D("dossiers.json")["dossiers"]
@@ -99,6 +118,15 @@ def build_pool():
             "prank": prank, "bx": len(it), "bx_answered": answered,
             "bx_models": sorted(models), "domain": "turbine",
         }
+    # компании РФ/КЗ/РБ/УЗ — конкуренты КВАНТ, адресатами запросов не становятся
+    # (распоряжение владельца 17.08.2026; данные вычищены gt/tools/drop_ru.py,
+    #  этот фильтр ловит приходящих из CRM-истории)
+    dropped = [k for k, v in pool.items()
+               if is_ru(v.get("name", ""), v.get("country", ""), v.get("site", ""), v.get("note", ""))]
+    for k in dropped:
+        del pool[k]
+    if dropped:
+        print(f"пул: отфильтровано российских — {len(dropped)}")
     return pool
 
 

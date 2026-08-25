@@ -36,6 +36,7 @@ GUIDES = {
     "CAT G3500": ("MOTORTECH-Application-Guide-CATERPILLAR-G3500-Series-01.00.011-EN-2017-08.pdf", "Caterpillar"),
     "CAT G3400": ("MOTORTECH-Application-Guide-CATERPILLAR-G3400-Series-01.00.010-EN-2016-07_01.pdf", "Caterpillar"),
     "Waukesha VHP": ("MOTORTECH-Application-Guide-WAUKESHA-VHP-Series-01.00.014-EN-2018-02.pdf", "Waukesha"),
+    "CAT G3600": ("MOTORTECH-Application-Guide-CATERPILLAR-G3600-Series-01.00.012-EN-2017-08.pdf", "Caterpillar"),
 }
 
 BRANDS = r"(CATERPILLAR|ALTRONIC|WAUKESHA|CHAMPION|DENSO|IMPCO|MOTORTECH|MOT/CAT|MOT/WAU)"

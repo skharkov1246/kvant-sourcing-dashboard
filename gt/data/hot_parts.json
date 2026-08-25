@@ -75,30 +75,11 @@
      "source": "поиск \"32997041\" по Google/Volza — нулевые релевантные результаты"
     },
     {
-     "claim": "В РФ есть подтверждённые каналы реверс-производства жаровых труб иностранных ГТУ: EuroNato (Москва) заявляет обратный инжиниринг узлов Siemens/Solar/GE на китайских заводах, в списке поддерживаемых машин фигурирует «SGT50-800»; АО «Металлист-Самара» серийно делает камеры сгорания ГТУ, включая локализованные для SGT-600 и GT-10A",
-     "source": "https://www.euronato.ru/about/news/gazovye_turbiny_i_texnologii_proizvodstva_zapasnyx_chastej_iz_kitaya_v_rossii_postavka_prodazha_remont_obsluzhivanie/ ; http://www.metallist-s.ru/products/main"
-    },
-    {
-     "claim": "Российские трейдеры, публично работающие по бренду Dresser-Rand: «Далкос» (Москва, хостит фирменную брошюру KG2-3E, каталожная страница «Газовая турбина Dresser Rand KG2-3E»), Indatech/siemensb2b.ru (параллельный импорт «6-8 недель из Германии», мин. заказ 3000 евро)",
-     "source": "https://dalkos.ru/catalog/kompressory/gazovye-turbiny/gazovye-turbiny-dresser-rand/-dresser-rand-kg2-3e/ ; https://siemensb2b.ru/products/energetics/energy-production/gas-turbines/dresser-rand-kg2.html"
-    },
-    {
      "claim": "На вторичном рынке встречаются целые агрегаты KG2 как доноры запчастей: Belyea Co (США) — б/у 1600 кВт KG2-3C dual fuel; AmasEnergy — листинги KG2-3E/KG2 (позиции помечены как проданные/отсутствующие)",
      "source": "https://www.usedequip.com/q/nlist/=,000920,20343919 (листинг в индексе, сайт отдаёт 403 ботам); https://www.amasenergy.com/2988-equipment-materials-industrial-gas-turbine-dresser-rand-kg2-3e"
     }
    ],
    "candidates": [
-    {
-     "name": "ЗАО «Хансаэнерго» / Hansa Power",
-     "country": "Россия (СПб) / Финляндия",
-     "site": "https://www.hansapower.fi/ru/turbiny/",
-     "email": "тел. +7 812 932-62-61 (email через форму сайта)",
-     "can_do": "Пэкеджер и поставщик именно KG2-3E: сам поставил 5 агрегатов в РФ в 2012-13. Знает состав ЗИП и нумерацию D-R Kongsberg, исторический канал к заводу в Конгсберге; первым скажет, чей это PN и где брали жаровые ранее",
-     "evidence": "Каталожная карточка KG2-3E с текстом «в 2012-13 гг наша компания поставила в Россию 5 таких агрегатов»: https://www.oborudunion.ru/catalog/gazoturbinnaya-ustanovka-kg2-3-e-dresser-rand-moschnost-1900-kvt-999590519/",
-     "price_hint": "",
-     "ask": "pn",
-     "rank": 1
-    },
     {
      "name": "R&H Supply",
      "country": "США (Хьюстон) + Абердин",
@@ -122,39 +103,6 @@
      "rank": 2
     },
     {
-     "name": "ООО «Далкос» (трейдер)",
-     "country": "Россия (Москва)",
-     "site": "https://dalkos.ru/catalog/kompressory/gazovye-turbiny/gazovye-turbiny-dresser-rand/-dresser-rand-kg2-3e/",
-     "email": "тел. +7 (495) 145-66-93",
-     "can_do": "Публично работает по бренду Dresser-Rand, держит карточку KG2-3E и фирменную брошюру; параллельный импорт запчастей D-R под заказ. Проверить: реальный канал или витрина",
-     "evidence": "Карточка «Газовая турбина Dresser Rand KG2-3E» и брошюра https://dalkos.ru/upload/documents/Dresser-Rand_KG2-3E.pdf",
-     "price_hint": "",
-     "ask": "pn",
-     "rank": 2
-    },
-    {
-     "name": "EuroNato (трейдер-интегратор, производство в Китае)",
-     "country": "Россия (МО) + заводы КНР",
-     "site": "https://www.euronato.ru/",
-     "email": "info@euronato.ru, +7 (495) 979-05-44",
-     "can_do": "Обратный инжиниринг узлов ГТУ Siemens/Solar/GE на китайских заводах, включая камеры сгорания и восстановление горячих частей; в списке машин заявлен «SGT50» (= KG2-3G/наследник). Жаровая KG2 — листовая сварная Ni-деталь, типовой объект для их китайской кооперации по образцу",
-     "evidence": "https://www.euronato.ru/about/news/gazovye_turbiny_i_texnologii_proizvodstva_zapasnyx_chastej_iz_kitaya_v_rossii_postavka_prodazha_remont_obsluzhivanie/ (упоминание SGT50-800, обратный инжиниринг, камеры сгорания)",
-     "price_hint": "реверс по образцу — ориентировочно 3-6 мес. цикл (оценка, требует подтверждения)",
-     "ask": "sample",
-     "rank": 2
-    },
-    {
-     "name": "АО «Металлист-Самара»",
-     "country": "Россия (Самара)",
-     "site": "http://www.metallist-s.ru/products/main",
-     "email": "через приёмную завода (контакты на metallist-s.ru)",
-     "can_do": "Серийный производитель камер сгорания ГТД/ГТУ (НК-серия, а также локализованные камеры для иностранных SGT-600 и GT-10A) — есть технологии сварки жаропрочных сплавов, перфорации охлаждения, оснастка под единичные заказы. Кандидат №1 на изготовление жаровой трубы KG2 по образцу в РФ",
-     "evidence": "Страница продукции: камеры сгорания для НК-38СТ/НК-14СТ, ГТ-10А и SGT-600 (http://www.metallist-s.ru/products/main; подтверждено также https://bizorg.su/samara-rg/c268867-metallistsamara-oao/kamery-sgoraniya-gazovykh-turbin-i-uzly-k-nim)",
-     "price_hint": "единичное изготовление по образцу — дороже серийного OEM, срок от 4-6 мес. (оценка)",
-     "ask": "sample",
-     "rank": 2
-    },
-    {
      "name": "Siemens Energy Turbomachinery AS — Kongsberg Service Center (OEM)",
      "country": "Норвегия",
      "site": "https://www.siemens-energy.com/us/en/home/products-services/product/sgt-50.html",
@@ -166,17 +114,6 @@
      "rank": 3
     },
     {
-     "name": "DMEnergy (сервис/поставка, частично трейдер)",
-     "country": "Россия (Москва)",
-     "site": "https://dm.energy/gazovye-turbiny/komponenty-gtu/kamera-sgoraniya/zharovye-truby",
-     "email": "info@dm.energy, +7 (800) 551-28-42",
-     "can_do": "Профильная страница «Жаровые трубы» для иностранных ГТУ, сервис и поставка горячего тракта (в основном GE, но заявляют «и другие производители»); канал на восстановление/изготовление лайнеров. По KG2 — запрос по номенклатуре с образцом",
-     "evidence": "Каталог жаровых труб dm.energy + профиль компании (сервис иностранных ГТУ, LTSA, HGPI): https://parts.dm.energy/ , https://www.orgpage.ru/moskva/dmenergy-6122104.html",
-     "price_hint": "",
-     "ask": "nomen",
-     "rank": 3
-    },
-    {
      "name": "ComPro Energy (трейдер/брокер)",
      "country": "ОАЭ (Абу-Даби)",
      "site": "https://comproenergy.com/dresser-rand-spare-parts/",
@@ -184,17 +121,6 @@
      "can_do": "Брокер по запчастям Dresser-Rand (компрессоры, turbine internals); заявляет sourcing genuine OEM и «OEM-equivalent manufacture» для снятых с производства legacy-позиций D-R — удобная нейтральная юрисдикция для запроса по PN",
      "evidence": "Страница Dresser-Rand Spare Parts (проверено WebFetch): OEM и OEM-equivalent для legacy D-R",
      "price_hint": "",
-     "ask": "pn",
-     "rank": 3
-    },
-    {
-     "name": "Indatech / siemensb2b.ru (трейдер, параллельный импорт)",
-     "country": "Россия (Москва/Екатеринбург)",
-     "site": "https://siemensb2b.ru/products/energetics/energy-production/gas-turbines/dresser-rand-kg2.html",
-     "email": "order@siemensb2b.ru, +7 (495) 101-47-02",
-     "can_do": "Витрина Dresser-Rand KG2, параллельный импорт «6-8 недель из Германии», мин. заказ 3000 евро. Запасной канал на случай, если жаровую можно взять со склада Siemens Energy в ЕС через прокладку",
-     "evidence": "Страница Dresser-Rand KG2 на siemensb2b.ru (проверено WebFetch: Indatech, ИНН 6658486743, order@siemensb2b.ru)",
-     "price_hint": "мин. заказ 3000 EUR, 6-8 недель",
      "ask": "pn",
      "rank": 3
     },
@@ -306,17 +232,6 @@
      "rank": 1
     },
     {
-     "name": "ООО «Ильмарине»",
-     "country": "Россия (Санкт-Петербург)",
-     "site": "https://ilmarine.spb.ru",
-     "email": "Info@ilmarine.spb.ru",
-     "can_do": "Завод горелочных устройств: серийно делает газомазутные горелки ГМУ-7/10/15 (конструкции ЦКТИ) с аксиальными и радиальными лопаточными завихрителями, компоненты продаются отдельно. Технологически то же изделие, что завихритель Vision — реально заказать изготовление по образцу без экспортных рисков.",
-     "evidence": "Страница горелочных устройств с завихрителями в составе: https://ilmarine.spb.ru/gorelochnyye-ustroystva",
-     "price_hint": "тел. 8 (812) 305-20-20",
-     "ask": "sample",
-     "rank": 1
-    },
-    {
      "name": "EBICO (China) Environment Co., Ltd",
      "country": "Китай (Уси)",
      "site": "https://www.ebico.com",
@@ -324,17 +239,6 @@
      "can_do": "OEM крупных промышленных low-NOx горелок (класс мощности сопоставим с Vision), собственное производство узлов смешения/завихрения; отгружает запчасти на экспорт морем/авиа. Может и изготовить завихрители по образцу, и предложить альтернативу — замену горелки целиком при провале ЗИП-канала.",
      "evidence": "Профиль производителя и экспорт запчастей: https://ebicoburner.en.made-in-china.com/ ; https://www.ebico.com/",
      "price_hint": "",
-     "ask": "sample",
-     "rank": 2
-    },
-    {
-     "name": "Котельный завод «БийскКотлоСтрой»",
-     "country": "Россия (Бийск)",
-     "site": "https://biyskiykotelnyuzavod.ru",
-     "email": "zakaz@bikz.pro",
-     "can_do": "Производит горелки ГМГ с завихрителями первичного/вторичного воздуха с прямыми лопатками — у завода есть именно та оснастка и сварочное производство, что нужны для VS-4/VS-6 и воздушных выравнивателей по образцу. Продажу завихрителей отдельно подтвердить по телефону.",
-     "evidence": "Описание ГМГ с завихрителями: https://biyskiykotelnyuzavod.ru/equipment/gorelki-gazomazutnye-gmg/",
-     "price_hint": "WhatsApp/Telegram +7 923 658-22-07",
      "ask": "sample",
      "rank": 2
     },
@@ -473,17 +377,6 @@
      "rank": 1
     },
     {
-     "name": "ООО «Ильмарине»",
-     "country": "Россия (Санкт-Петербург)",
-     "site": "https://ilmarine.spb.ru",
-     "email": "Info@ilmarine.spb.ru",
-     "can_do": "Завод горелочных устройств: серийно делает газомазутные горелки ГМУ-7/10/15 (конструкции ЦКТИ) с аксиальными и радиальными лопаточными завихрителями, компоненты продаются отдельно. Технологически то же изделие, что завихритель Vision — реально заказать изготовление по образцу без экспортных рисков.",
-     "evidence": "Страница горелочных устройств с завихрителями в составе: https://ilmarine.spb.ru/gorelochnyye-ustroystva",
-     "price_hint": "тел. 8 (812) 305-20-20",
-     "ask": "sample",
-     "rank": 1
-    },
-    {
      "name": "EBICO (China) Environment Co., Ltd",
      "country": "Китай (Уси)",
      "site": "https://www.ebico.com",
@@ -491,17 +384,6 @@
      "can_do": "OEM крупных промышленных low-NOx горелок (класс мощности сопоставим с Vision), собственное производство узлов смешения/завихрения; отгружает запчасти на экспорт морем/авиа. Может и изготовить завихрители по образцу, и предложить альтернативу — замену горелки целиком при провале ЗИП-канала.",
      "evidence": "Профиль производителя и экспорт запчастей: https://ebicoburner.en.made-in-china.com/ ; https://www.ebico.com/",
      "price_hint": "",
-     "ask": "sample",
-     "rank": 2
-    },
-    {
-     "name": "Котельный завод «БийскКотлоСтрой»",
-     "country": "Россия (Бийск)",
-     "site": "https://biyskiykotelnyuzavod.ru",
-     "email": "zakaz@bikz.pro",
-     "can_do": "Производит горелки ГМГ с завихрителями первичного/вторичного воздуха с прямыми лопатками — у завода есть именно та оснастка и сварочное производство, что нужны для VS-4/VS-6 и воздушных выравнивателей по образцу. Продажу завихрителей отдельно подтвердить по телефону.",
-     "evidence": "Описание ГМГ с завихрителями: https://biyskiykotelnyuzavod.ru/equipment/gorelki-gazomazutnye-gmg/",
-     "price_hint": "WhatsApp/Telegram +7 923 658-22-07",
      "ask": "sample",
      "rank": 2
     },
@@ -640,17 +522,6 @@
      "rank": 1
     },
     {
-     "name": "ООО «Ильмарине»",
-     "country": "Россия (Санкт-Петербург)",
-     "site": "https://ilmarine.spb.ru",
-     "email": "Info@ilmarine.spb.ru",
-     "can_do": "Завод горелочных устройств: серийно делает газомазутные горелки ГМУ-7/10/15 (конструкции ЦКТИ) с аксиальными и радиальными лопаточными завихрителями, компоненты продаются отдельно. Технологически то же изделие, что завихритель Vision — реально заказать изготовление по образцу без экспортных рисков.",
-     "evidence": "Страница горелочных устройств с завихрителями в составе: https://ilmarine.spb.ru/gorelochnyye-ustroystva",
-     "price_hint": "тел. 8 (812) 305-20-20",
-     "ask": "sample",
-     "rank": 1
-    },
-    {
      "name": "EBICO (China) Environment Co., Ltd",
      "country": "Китай (Уси)",
      "site": "https://www.ebico.com",
@@ -658,17 +529,6 @@
      "can_do": "OEM крупных промышленных low-NOx горелок (класс мощности сопоставим с Vision), собственное производство узлов смешения/завихрения; отгружает запчасти на экспорт морем/авиа. Может и изготовить завихрители по образцу, и предложить альтернативу — замену горелки целиком при провале ЗИП-канала.",
      "evidence": "Профиль производителя и экспорт запчастей: https://ebicoburner.en.made-in-china.com/ ; https://www.ebico.com/",
      "price_hint": "",
-     "ask": "sample",
-     "rank": 2
-    },
-    {
-     "name": "Котельный завод «БийскКотлоСтрой»",
-     "country": "Россия (Бийск)",
-     "site": "https://biyskiykotelnyuzavod.ru",
-     "email": "zakaz@bikz.pro",
-     "can_do": "Производит горелки ГМГ с завихрителями первичного/вторичного воздуха с прямыми лопатками — у завода есть именно та оснастка и сварочное производство, что нужны для VS-4/VS-6 и воздушных выравнивателей по образцу. Продажу завихрителей отдельно подтвердить по телефону.",
-     "evidence": "Описание ГМГ с завихрителями: https://biyskiykotelnyuzavod.ru/equipment/gorelki-gazomazutnye-gmg/",
-     "price_hint": "WhatsApp/Telegram +7 923 658-22-07",
      "ask": "sample",
      "rank": 2
     },
@@ -1210,17 +1070,6 @@
      "rank": 3
     },
     {
-     "name": "НВ Групп / nvsnab.ru (трейдер)",
-     "country": "Россия (Екатеринбург)",
-     "site": "https://nvsnab.ru/product/burner_mw22316b01",
-     "email": "",
-     "can_do": "Трейдер с готовой карточкой именно Burner MW22316B/01 «с доставкой по РФ» — уже возили/предлагали эту позицию, канал с готовой логистикой и таможней в РФ. Источник у них наверняка Китай/ОАЭ — требовать раскрытия происхождения и комплектности (gold seals).",
-     "evidence": "Карточка товара Burner MW22316B/01: https://nvsnab.ru/product/burner_mw22316b01 (сайт отдаёт 403 ботам, но карточка индексируется поисковиками)",
-     "price_hint": "Цена по запросу",
-     "ask": "pn",
-     "rank": 3
-    },
-    {
      "name": "OBT Power Co., Ltd (O.B.T)",
      "country": "Китай",
      "site": "https://www.obtturbine.com",
@@ -1548,18 +1397,6 @@
      "condition": "new surplus",
      "qty": "3 (одним лотом)",
      "note": "Объявление от 12/2021, но комментарии покупателей до 2025 г. — статус подтверждать. Проверено WebFetch, страница живая.",
-     "cn": false
-    },
-    {
-     "what": "Каталожные страницы с ТОЧНЫМИ PN: Combustion Chamber MW21215M и Burner MW22316B/01",
-     "pn_match": "exact",
-     "seller": "НВ-Снаб (nvsnab.ru)",
-     "country": "Россия",
-     "url": "https://nvsnab.ru/product/combustion_chamber_mw21215m",
-     "price": "по запросу",
-     "condition": "неизвестно (вероятно под заказ)",
-     "qty": "не указано",
-     "note": "ЕДИНСТВЕННОЕ буквальное совпадение обоих PN в открытом вебе (вторая страница: nvsnab.ru/product/burner_mw22316b01). ВНИМАНИЕ: сайт отдаёт 403 ботам — содержимое проверить WebFetch не удалось; по структуре это каталог-агрегатор, скорее «под заказ», чем склад. Проверять звонком.",
      "cn": false
     }
    ],

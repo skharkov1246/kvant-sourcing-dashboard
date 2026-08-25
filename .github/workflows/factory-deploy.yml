@@ -1,0 +1,68 @@
+name: GOK project deploy
+
+# Деплой сайта базового проекта золото-медного ГОКа (factory/) на Cloudflare Pages
+# (проект kvant-gok). Отдельный домен, отдельный проект Pages — дашборд сорсеров,
+# база ЗИП, сайт ОВЭ-75 и ГПУ-библиотека не затрагиваются.
+#
+# ВНИМАНИЕ: у этого сайта НЕТ гейта доступа. В factory/public намеренно нет
+# _worker.js, поэтому Cloudflare Pages отдаёт статику всем без пароля.
+# Так распорядился владелец 17.08.2026 («клади на публичный, в открытом доступе»).
+# Если понадобится закрыть — скопировать ove/public/_worker.js в factory/public/
+# и добавить в этот workflow шаг записи секрета BASIC_AUTH_PASS (см. gpu-deploy.yml).
+#
+# Сборки нет: страница самодостаточна (весь CSS, JS и графика встроены),
+# деплоится как есть.
+on:
+  push:
+    branches: [main]
+    paths: ["factory/**", ".github/workflows/factory-deploy.yml"]
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: factory-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Проверка страницы
+        run: |
+          set -euo pipefail
+          test -f factory/public/index.html
+          # гейта быть не должно: наличие _worker.js молча закрыло бы сайт
+          if [ -f factory/public/_worker.js ]; then
+            echo "::error::в factory/public появился _worker.js — сайт задуман открытым, проверьте намеренно ли это"
+            exit 1
+          fi
+          # страница обязана быть самодостаточной: внешние ресурсы в Pages не подтянутся
+          if grep -Eq '(src|href)="https?://' factory/public/index.html; then
+            echo "::error::в странице есть ссылки на внешние ресурсы — встройте их"
+            exit 1
+          fi
+
+      - name: Деплой на Cloudflare Pages (kvant-gok)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          # создать проект, если его ещё нет (иначе тихо пропустить)
+          npx --yes wrangler@latest pages project create kvant-gok \
+            --production-branch=main 2>/dev/null || true
+          # ASCII commit-message: иначе wrangler цепляет кириллицу git-коммита → CF отвергает (8000111).
+          ok=0
+          for i in 1 2 3; do
+            if npx --yes wrangler@latest pages deploy factory/public \
+                 --project-name=kvant-gok --branch=main \
+                 --commit-dirty=true --commit-message="gok project deploy"; then
+              ok=1; break
+            fi
+            echo "⚠ деплой упал (попытка $i/3) — повтор через 20с…"; sleep 20
+          done
+          [ "$ok" = 1 ] || { echo "::error::деплой не удался после 3 попыток"; exit 1; }
