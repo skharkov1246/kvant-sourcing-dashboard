@@ -129,7 +129,7 @@ footer{padding:0 22px 24px;color:var(--mut);font-size:11.5px;max-width:1280px}
 <body>
 <header>
   <h1>ОВЭ-75 — обжиг · выщелачивание · электроэкстракция</h1>
-  <div class="sub">АО «Кольская ГМК», г. Мончегорск · комплекс на 75 000 т катодной меди в год · разбор тендерного пакета Базового инжиниринга (ТЗ v3.6 + приложения №1–7). Сборка: __BUILT_AT__</div>
+  <div class="sub">АО «Кольская ГМК», г. Мончегорск · комплекс на 75 000 т катодной меди в год · разбор тендерного пакета Базового инжиниринга (ТЗ на БИ v4.1 от 25.08.2026 + ТЗ на ЦИМ ред.2 + приложения; сверка с v3.6 сохранена). Сборка: __BUILT_AT__</div>
 </header>
 <nav id="nav"></nav>
 <main id="main"></main>
@@ -852,7 +852,7 @@ function rBI(){
   const nOpen = BI.reduce((a,d)=>a+d.sections.reduce((b,s)=>b+((s.open||[]).length),0),0);
   const nGost = new Set(BI.flatMap(d=>d.sections.flatMap(s=>(s.gost||[]).map(g=>g.doc)))).size;
   return `
-  <div class="box info"><b>Что это.</b> Черновик Базового инжиниринга, собранный по составу из ТЗ v3.6 на данных ИД Гипроникеля. Это рабочий материал для заявки и для последующей разработки, а не выпущенный документ: каждое число прослежено до ИД, каждый раздел привязан к нормативу, а всё, чего в ИД нет, честно вынесено в «определяется на стадии БИ».</div>
+  <div class="box info"><b>Что это.</b> Черновик Базового инжиниринга, собранный по составу из ТЗ (v3.6, сверено с v4.1 от 25.08.2026) на данных ИД Гипроникеля. Это рабочий материал для заявки и для последующей разработки, а не выпущенный документ: каждое число прослежено до ИД, каждый раздел привязан к нормативу, а всё, чего в ИД нет, честно вынесено в «определяется на стадии БИ».</div>
   <div class="k">
     <div class="tile"><b>${BI.length}</b><span>лота проработано</span></div>
     <div class="tile"><b>${nSec}</b><span>разделов</span></div>
@@ -1154,7 +1154,7 @@ function qLetter(){
   const pick = QS.items.filter(x=>['blocker','major','minor'].includes(x.sev) && stOf(x.id)!=='closed');
   const txt = 'Запрос разъяснений по конкурсной документации\n'
     + 'Объект: АО «Кольская ГМК», комплекс ОВЭ-75, Базовый инжиниринг\n'
-    + 'Основание: ТЗ на БИ v3.6, приложения №1–7\n\n'
+    + 'Основание: ТЗ на БИ v4.1 от 25.08.2026, приложения (адреса цитат в исторических позициях — по v3.6)\n\n'
     + 'В ходе проработки конкурсной документации выявлены расхождения и вопросы,\n'
     + 'требующие разъяснения Заказчика до подачи предложения.\n\n'
     + pick.map((x,i)=>`${i+1}. ${x.title}\n`
@@ -1288,13 +1288,18 @@ function rSoft(){
 }
 
 /* ============ Расхождения ТЗ с самим собой (вычистка с Заказчиком) ============ */
+const V41 = {off:['снято в v4.1','tag lot3'], part:['v4.1: частично','tag lot2'],
+             keep:['в v4.1 сохраняется','tag'], "new":['новое в v4.1','tag lot4']};
+const v41Tag = x => x.v41 ? `<span class="${V41[x.v41.s][1]}">${V41[x.v41.s][0]}</span>` : '';
+const v41Box = x => (x.v41 && x.v41.s!=='new')
+  ? `<div class="box ${x.v41.s==='off'?'info':'warn'}"><b>ТЗ v4.1 / ЦИМ ред.2 (25.08.2026):</b> ${esc(x.v41.t)}</div>` : '';
 let dF = {cat:'', sev:'', st:'', q:''};
 function dRows(){
   const t = dF.q.toLowerCase();
   return DISC.items.filter(x =>
     (dF.cat===''||x.cat===dF.cat) && (dF.sev===''||x.sev===dF.sev) &&
     (dF.st===''||(dF.st==='open' ? !ansOf(x.id).trim() : !!ansOf(x.id).trim())) &&
-    (!t||[x.title,x.a.q,x.b.q,x.essence,x.ask,ansOf(x.id),engOf(x.id)].join(' ').toLowerCase().includes(t)));
+    (!t||[x.id,x.title,x.a.q,x.b.q,x.essence,x.ask,(x.v41&&x.v41.t)||'',ansOf(x.id),engOf(x.id)].join(' ').toLowerCase().includes(t)));
 }
 function dPaint(){
   const el = document.getElementById('dbody'); if(!el) return;
@@ -1302,12 +1307,13 @@ function dPaint(){
   el.innerHTML = rows.map(x=>`<div class="card qcard">
     <h3><span class="${SEV[x.sev][1]}">${esc(x.id)}</span> ${esc(x.title)}
       ${lotTag(x.lot)}<span class="tag">${esc(DISC.cats[x.cat]||x.cat)}</span><span class="tag">${SEV[x.sev][0]}</span>
-      ${ansOf(x.id).trim()?'<span class="tag lot3">решено</span>':''}</h3>
+      ${v41Tag(x)}${ansOf(x.id).trim()?'<span class="tag lot3">решено</span>':''}</h3>
     <div class="vs">
       <div><b>Редакция А:</b><div class="quote">«${esc(x.a.q)}»</div>${x.a.where?`<div class="mut">${esc(x.a.where)}</div>`:''}</div>
       <div><b>Редакция Б:</b><div class="quote">«${esc(x.b.q)}»</div>${x.b.where?`<div class="mut">${esc(x.b.where)}</div>`:''}</div>
     </div>
     <p class="mut"><b>На что влияет:</b> ${esc(x.essence)}</p>
+    ${v41Box(x)}
     <div class="box info"><b>Вопрос Заказчику:</b> ${esc(x.ask)}</div>
     ${x.src?`<div class="mut">источник: ${esc(x.src)}</div>`:''}
     ${(ANS&&ANS.meta&&ANS.meta[x.id])?`<div class="mut">в общей базе: ${esc(ANS.meta[x.id].by)} · ${esc(ANS.meta[x.id].at)}</div>`:''}
@@ -1332,13 +1338,18 @@ function dPaint(){
   document.getElementById('dcount').textContent = `${rows.length} из ${DISC.items.length} · решено ${done}`;
 }
 function dLetter(){
-  const pick = DISC.items.filter(x=>stOf(x.id)!=='closed' && !ansOf(x.id).trim());
+  const pick = DISC.items.filter(x=>stOf(x.id)!=='closed' && !ansOf(x.id).trim()
+    && !(x.v41 && x.v41.s==='off'));
   const txt = 'Реестр расхождений конкурсной документации, требующих решения Заказчика\n'
-    + 'Объект: АО «Кольская ГМК», комплекс ОВЭ-75, Базовый инжиниринг (ТЗ v3.6 + приложения)\n\n'
+    + 'Объект: АО «Кольская ГМК», комплекс ОВЭ-75, Базовый инжиниринг\n'
+    + 'К ТЗ на БИ v4.1 от 25.08.2026 и ТЗ на ЦИМ ред.2 (адреса цитат в исторических позициях — по v3.6;\n'
+    + 'позиции, уже снятые редакцией v4.1, в реестр не включены)\n\n'
     + pick.map((x,i)=>`${i+1}. ${x.title} [${x.id}]\n`
       + `   Редакция А: «${x.a.q}»${x.a.where?' ('+x.a.where+')':''}\n`
       + `   Редакция Б: «${x.b.q}»${x.b.where?' ('+x.b.where+')':''}\n`
-      + `   Влияние: ${x.essence}\n   Вопрос: ${x.ask}\n`).join('\n');
+      + `   Влияние: ${x.essence}\n`
+      + (x.v41&&x.v41.s!=='new'?`   Статус по v4.1: ${x.v41.t}\n`:'')
+      + `   Вопрос: ${x.ask}\n`).join('\n');
   const blob = new Blob([txt],{type:'text/plain;charset=utf-8'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='ove_rashozhdenia.txt'; a.click();
 }
@@ -1371,11 +1382,17 @@ function rDisc(){
   сходятся, где битые ссылки и опечатки, меняющие смысл. Каждая позиция — две дословные цитаты с указанием
   места. Задача — пройти список с Заказчиком и зафиксировать, что он на самом деле хочет: кнопки
   «✓ верна А / Б / иное» плюс поле решения. Решения коммитятся той же кнопкой «⚡ в общую базу» — id общие
-  с вкладкой «Вопросы Заказчику», ответ в одном месте виден в обоих.</div>
+  с вкладкой «Вопросы Заказчику», ответ в одном месте виден в обоих.
+  <b>25.08.2026 вышли ТЗ на БИ v4.1 и ТЗ на ЦИМ ред.2:</b> реестр сверен с новой редакцией — снятые позиции
+  помечены зелёным (в письмо не выгружаются), новые расхождения самой v4.1 — C-94…C-101. Нумерация пунктов ТЗ
+  сместилась (границы: Лот 1 — п. 4.5, Лот 2 — п. 5.3, Лот 3 — п. 6.2, Лот 4 — п. 7.2); адреса цитат в
+  исторических позициях — по v3.6.</div>
   <div class="k">
     <div class="tile"><b class="hi">${bySev.blocker||0}</b><span>блокирующих</span></div>
     <div class="tile"><b class="mid">${bySev.major||0}</b><span>существенных</span></div>
     <div class="tile"><b>${bySev.minor||0}</b><span>формальных</span></div>
+    <div class="tile"><b style="color:var(--good)">${DISC.items.filter(x=>x.v41&&x.v41.s==='off').length}</b><span>снято редакцией v4.1</span></div>
+    <div class="tile"><b class="mid">${DISC.items.filter(x=>x.v41&&x.v41.s==='new').length}</b><span>новых в v4.1</span></div>
     <div class="tile"><b>${DISC.items.filter(x=>ansOf(x.id).trim()).length}</b><span>решено с Заказчиком</span></div>
     <div class="tile"><b>${DISC.items.length}</b><span>всего в реестре</span></div>
   </div>
@@ -1414,11 +1431,13 @@ function vPaint(){
     <h3><span class="tag ${DV_V[x.verdict][1]}">${esc(x.id)}</span> ${esc(x.name)}
       ${(x.lots||[]).map(lotTag).join('')}<span class="tag">${esc(x.group)}</span>
       <span class="tag ${DV_V[x.verdict][1]}">${DV_V[x.verdict][0]}</span>
+      ${x.v41?`<span class="tag lot3">✓ v4.1${x.v41.s==='part'?' частично':''}</span>`:''}
       ${ansOf(x.id).trim()?'<span class="tag lot3">закрыто</span>':''}</h3>
     <div class="quote">«${esc(x.req.q)}»</div>
     <div class="mut">${esc(x.req.where)}</div>
     <p><b>Международная практика:</b> ${esc(x.intl)}</p>
     <div class="box ${x.verdict==='bi'?'info':'warn'}"><b>Наше предложение:</b> ${esc(x.propose)}</div>
+    ${x.v41?`<div class="box info"><b>Учтено Заказчиком в редакции 25.08.2026${x.v41.s==='part'?' (частично)':''}:</b> ${esc(x.v41.t)}</div>`:''}
     ${x.effect&&x.effect!=='—'?`<p class="mut"><b>Эффект:</b> ${esc(x.effect)}</p>`:''}
     ${x.note?`<p class="mut"><b>Примечание:</b> ${esc(x.note)}</p>`:''}
     <div>${(x.refs||[]).map(r=>`<span class="tag">${esc(r)}</span>`).join('')}</div>
@@ -1439,16 +1458,19 @@ function vPaint(){
 }
 function vLetter(){
   const ord = {detail:0, partial:1, question:2};
-  const pick = DELIV.items.filter(x=>x.verdict!=='bi')
+  const pick = DELIV.items.filter(x=>x.verdict!=='bi' && !(x.v41 && x.v41.s==='ok'))
     .sort((a,b)=>(ord[a.verdict]??9)-(ord[b.verdict]??9)||a.id.localeCompare(b.id));
   const txt = 'Предложения по составу и глубине документации Базового инжиниринга\n'
-    + 'Объект: АО «Кольская ГМК», комплекс ОВЭ-75. К ТЗ на БИ v3.6 и приложениям.\n'
+    + 'Объект: АО «Кольская ГМК», комплекс ОВЭ-75. К ТЗ на БИ v4.1 от 25.08.2026 и приложениям.\n'
     + 'Основание: международная практика Basic Engineering / FEED (AACE 18R-97, IPA FEL-3,\n'
     + 'EN 16310:2013) и разделение ПД/РД по ГОСТ Р 21.101-2020. Предлагается зафиксировать\n'
-    + 'уровень проработки позиций на этапе БИ и порядок их доведения на детальном инжиниринге.\n\n'
+    + 'уровень проработки позиций на этапе БИ и порядок их доведения на детальном инжиниринге.\n'
+    + 'Позиции, уже учтённые Заказчиком в редакции v4.1 полностью, в письмо не включены —\n'
+    + 'спасибо за принятые уточнения.\n\n'
     + pick.map((x,i)=>`${i+1}. ${x.name} [${x.id}] — ${DV_V[x.verdict][0]}\n`
       + `   Пункт ТЗ: «${x.req.q}» (${x.req.where})\n`
       + `   Предложение: ${x.propose}\n`
+      + (x.v41?`   Учтено в v4.1 частично: ${x.v41.t}\n`:'')
       + `   Обоснование: ${x.intl}${x.refs&&x.refs.length?' ['+x.refs.join('; ')+']':''}\n`).join('\n');
   const blob = new Blob([txt],{type:'text/plain;charset=utf-8'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='ove_sostav_bi.txt'; a.click();
@@ -1479,7 +1501,11 @@ function rDeliv(){
   инжиниринге — по данным выбранных изготовителей оборудования. Это НЕ отказ от объёма: по каждой
   позиции — готовая формулировка «что даём на БИ, что и когда доводим на ДИ». Так мы снижаем цену
   и срок нашего ТКП и снимаем с Заказчика риск двойной работы. Договорённости фиксируются в полях
-  решений и коммитятся кнопкой «⚡ в общую базу» (id общие с реестром вопросов).</div>
+  решений и коммитятся кнопкой «⚡ в общую базу» (id общие с реестром вопросов).
+  <b>Сверено с редакцией 25.08.2026 (ТЗ на БИ v4.1 + ТЗ на ЦИМ ред.2 + новое Прил.1 LOD/LOI стадии БИ):</b>
+  зелёная метка «✓ v4.1» — Заказчик уже учёл нашу позицию (в т.ч. дословно: line list ±20-30 %,
+  предварительные динамические нагрузки «с запасом»); такие позиции в письмо-предложение не попадают.
+  Цитаты требований — по v3.6, история переговоров сохранена.</div>
   <div class="box info"><b>Система координат (${esc(DELIV.basis.title)}).</b> ${esc(DELIV.basis.text)}
     <ul>${DELIV.basis.frameworks.map(f=>`<li><b>${esc(f.ref)}</b> — ${esc(f.what)}</li>`).join('')}</ul></div>
   <div class="k">
@@ -1487,6 +1513,8 @@ function rDeliv(){
     <div class="tile"><b class="mid">${byV.partial||0}</b><span>частично → ДИ</span></div>
     <div class="tile"><b class="hi">${byV.detail||0}</b><span>перенести в ДИ</span></div>
     <div class="tile"><b>${byV.question||0}</b><span>вопрос Заказчику</span></div>
+    <div class="tile"><b style="color:var(--good)">${DELIV.items.filter(x=>x.v41&&x.v41.s==='ok').length}</b><span>принято в v4.1</span></div>
+    <div class="tile"><b class="mid">${DELIV.items.filter(x=>x.v41&&x.v41.s==='part').length}</b><span>принято частично</span></div>
     <div class="tile"><b>${DELIV.items.length}</b><span>всего позиций</span></div>
   </div>
   <div class="filters">
@@ -1638,7 +1666,7 @@ function hgPaint(){
 function hgLetter(){
   const pick = hgRows();
   const txt = 'Предложения по расширению конкуренции в конкурсе на БИ ОВЭ-75\n'
-    + 'Объект: АО «Кольская ГМК», комплекс ОВЭ-75. К ТЗ на БИ v3.6, ИД ч.1/ч.2 и приложениям.\n'
+    + 'Объект: АО «Кольская ГМК», комплекс ОВЭ-75. К ТЗ на БИ v4.1 (25.08.2026), ИД ч.1/ч.2 и приложениям.\n'
     + 'Позиция КВАНТ: перечисленные ниже положения пакета объективно дают преимущество прежнему\n'
     + 'проектировщику технологии. По каждому предлагаем функциональный эквивалент, применяемый\n'
     + 'в мировой практике, — расширение круга участников снижает цену и риски Заказчика.\n\n'
@@ -1714,7 +1742,7 @@ nav.innerHTML =
 main.innerHTML = TABS.map(([id])=>`<section id="s-${id}"></section>`).join('');
 const LASTTAB = {};   // последняя открытая подвкладка каждой группы
 document.getElementById('foot').innerHTML =
-  `Разбор тендерного пакета «ТЗ на БИ ОВЭ-75 v.3.6» и приложений №1–7 (ИД ч.1 и ч.2, электроснабжение, ЦИМ, ОАСУ, здания ЦЭМ и ГМУ). ` +
+  `Разбор тендерного пакета «ТЗ на БИ ОВЭ-75» v4.1 от 25.08.2026 (пересмотр v3.6 — сверка в реестрах), ТЗ на ЦИМ ред.2 и приложений (ИД ч.1 и ч.2, электроснабжение, LOD/LOI стадии БИ, ОАСУ, здания ЦЭМ и ГМУ). ` +
   `Технологические данные — из документов Заказчика и ИД ООО «Институт Гипроникель». Внешние факты о компаниях проверены 13.08.2026 и снабжены ссылками. ` +
   `Оценка CAPEX — модель порядка величины, не смета. Сборка: __BUILT_AT__`;
 
