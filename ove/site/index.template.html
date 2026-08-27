@@ -52,8 +52,14 @@ nav .subrow .xbtn{border-style:dashed;opacity:.85}
   :root{--page:#fff;--surface:#fff;--ink:#111;--ink2:#444;--border:#bbb;--grid:#ccc;--chip:#eee;
         --s1:#2a5c9e;--s1-soft:#dde6f2;--good:#0a7a0a;--warn:#8a6200;--crit:#a32626;--serious:#a34e2e}
   body{background:#fff;color:#111}
-  nav,#foot,.filters,.qgrid,button,textarea,select,input{display:none !important}
+  nav,#foot,.filters .btn,.filters input,.filters select,.filters label,.filters .count,.qgrid,button,textarea,select,input{display:none !important}
   .tblwrap{overflow:visible;border:none}
+  /* широкие таблицы (CAPEX «построчно» и т.п.) ужимаем в A4: не хватает ~40px */
+  .tblwrap table{font-size:11.5px}
+  .tblwrap th,.tblwrap td{padding:4px 6px}
+  td.mut{overflow-wrap:anywhere}
+  /* значения селектов/заметок плана сорсинга — текстом (сами поля скрыты выше) */
+  .pv{display:inline !important}
   svg.gsvg{width:100% !important;height:auto !important}
   .card,.box,.tile,tr{break-inside:avoid}
   a{color:inherit;text-decoration:none}
@@ -93,6 +99,7 @@ td b{font-weight:700}
 .filters input,.filters select{background:var(--surface);color:var(--ink);border:1px solid var(--border);border-radius:8px;padding:6px 10px;font:13px system-ui;max-width:100%}
 .filters input[type=text]{min-width:min(240px,100%)}
 .count{color:var(--ink2);font-size:12px;margin-left:auto}
+.pv{display:none} /* печатный дубль значения select/input — виден только в @media print */
 .btn{border:1px solid var(--border);background:var(--surface);color:var(--ink2);padding:6px 12px;border-radius:8px;font:600 12px system-ui;cursor:pointer}
 .btn.on{background:var(--s1);border-color:var(--s1);color:#fff}
 ul,ol{margin:6px 0;padding-left:20px} li{margin:3px 0}
@@ -181,6 +188,7 @@ const GANTT = __GANTT_JSON__;
 const READY = __READY_JSON__;
 const REVS = __REVS_JSON__;
 const ECO = __ECO_JSON__;
+const AUDIT = __AUDIT_JSON__;
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const nf = (n,d=0) => (n===''||n===null||n===undefined||isNaN(n)) ? '—' : Number(n).toLocaleString('ru-RU',{minimumFractionDigits:d,maximumFractionDigits:d});
@@ -189,11 +197,25 @@ const md = s => esc(s).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
 const lotTag = n => n===0||n===null||n===undefined ? '<span class="tag lot0">вне БИ</span>'
   : (n===9 ? '<span class="tag">все лоты</span>' : `<span class="tag lot${n}">Лот №${n}</span>`);
 const lotName = n => (LOTS.lots.find(l=>l.id===n)||{}).name || 'Вне БИ';
-/* ссылка на источник: показываем хост, а не полный URL — длинные URL рвут вёрстку на узких экранах */
+/* русское склонение: plural(3,'черновик','черновика','черновиков') */
+const plural = (n,one,few,many) => n%10===1&&n%100!==11 ? one : (n%10>=2&&n%10<=4&&(n%100<12||n%100>14) ? few : many);
+/* ссылка на источник: показываем хост, а не полный URL — длинные URL рвут вёрстку на узких экранах.
+   Строка может содержать несколько URL через « ; » и приписки («403 при проверке» и т.п.) —
+   в href идут ТОЛЬКО валидные URL (каждый отдельной ссылкой), приписки и обрезанные «…» URL — текстом. */
 function srcLink(u){
-  if(!/^https?:/.test(String(u||''))) return esc(u);
-  let host = u; try{ host = new URL(u).hostname.replace(/^www\./,''); }catch(e){}
-  return `<a class="src" href="${esc(u)}" target="_blank" rel="noopener">${esc(host)}</a>`;
+  const s = String(u ?? '').trim(); if(!s) return '';
+  const links = [];
+  let rest = s.replace(/https?:\/\/[^\s;«»]+/g, m => {
+    if(m.includes('…')) return m;                       // обрезанный URL — оставляем текстом, не ссылкой
+    const url = m.replace(/[.,:)»]+$/,'');
+    let host; try{ host = new URL(url).hostname.replace(/^www\./,''); }catch(e){ return m; }
+    links.push(`<a class="src" href="${esc(url)}" target="_blank" rel="noopener">${esc(host)}</a>`);
+    return ' ';
+  });
+  if(!links.length) return esc(s);
+  rest = rest.replace(/\s*;\s*/g,' · ').replace(/\s{2,}/g,' ')
+             .replace(/^[\s·—–-]+|[\s·—–-]+$/g,'').trim();
+  return links.join(' · ') + (rest ? ` <span class="mut">${esc(rest)}</span>` : '');
 }
 
 /* ================= Обзор ================= */
@@ -376,7 +398,7 @@ function rEquip(){
     <div class="tile"><b>${EQ.items.filter(i=>i.key).length}</b><span>ключевых позиций</span></div>
   </div>
   <div class="filters">
-    <input type="text" id="eqq" placeholder="Поиск: название, модель, материал…">
+    <input type="text" id="eqq" placeholder="Поиск по оборудованию…">
     <select id="eqlot"><option value="">Все лоты</option>${[1,2,3,4].map(n=>`<option value="${n}">Лот №${n} — ${esc(lotName(n))}</option>`).join('')}<option value="0">Вне БИ</option></select>
     <button class="btn" id="eqkey">Только ключевые</button>
     <span class="count" id="eqcount"></span>
@@ -424,7 +446,9 @@ const RFQ_ST  = [['','не запрашивали'],['sent','запросили'
 const WORK_ST = [['','не работаем'],['yes','работаем'],['kp','есть КП'],['stop','отказ']];
 const RFQ_NAME = Object.fromEntries(RFQ_ST), WORK_NAME = Object.fromEntries(WORK_ST);
 const nrm = s => String(s||'').toLowerCase().replace(/[«»"'.,()]/g,' ').replace(/\s+/g,' ').trim();
-const ckey = (cls,name) => cls+'|'+nrm(name);
+/* продуктовый суффикс в скобках («CSI Mining SA (UNICELL®)») срезаем — иначе одна компания
+   даёт две строки кандидатов с раздельными статусами */
+const ckey = (cls,name) => cls+'|'+nrm(String(name||'').replace(/\s*\([^)]*\)\s*$/,''));
 
 /* в колонках Мир/КНР/РФ иногда стоит не компания, а пояснение — на них регуляторы не вешаем */
 const NOT_CAND = ['уточн','см.','полный перечень','кандидат-партнёр','типовое изделие','рынок рф',
@@ -500,10 +524,10 @@ function supPaint(){
         <td><b>${esc(c.name)}</b>${contactLine(c.name)}</td>
         <td>${[...c.origins].map(o=>`<span class="tag${o==='Bitrix'?' lot3':''}">${esc(o)}</span>`).join('')}</td>
         <td><select class="mini" data-k="${esc(c.key)}" data-f="rfq">
-          ${RFQ_ST.map(([v,n])=>`<option value="${v}"${v===(ED.rfq[c.key]||'')?' selected':''}>${n}</option>`).join('')}</select></td>
+          ${RFQ_ST.map(([v,n])=>`<option value="${v}"${v===(ED.rfq[c.key]||'')?' selected':''}>${n}</option>`).join('')}</select><span class="pv">${esc(RFQ_NAME[ED.rfq[c.key]||''])}</span></td>
         <td><select class="mini" data-k="${esc(c.key)}" data-f="work">
-          ${WORK_ST.map(([v,n])=>`<option value="${v}"${v===(ED.work[c.key]||'')?' selected':''}>${n}</option>`).join('')}</select></td>
-        <td><input class="mini note" data-k="${esc(c.key)}" data-f="note" value="${esc(ED.note[c.key]||'')}" placeholder="цена, срок, контакт…"></td>
+          ${WORK_ST.map(([v,n])=>`<option value="${v}"${v===(ED.work[c.key]||'')?' selected':''}>${n}</option>`).join('')}</select><span class="pv">${esc(WORK_NAME[ED.work[c.key]||''])}</span></td>
+        <td><input class="mini note" data-k="${esc(c.key)}" data-f="note" value="${esc(ED.note[c.key]||'')}" placeholder="цена, срок, контакт…"><span class="pv">${esc(ED.note[c.key]||'')}</span></td>
       </tr>`).join('') : '<tr><td colspan="5" class="mut">Кандидатов нет — искать с нуля</td></tr>'}</tbody></table></div>
       ${noteRows(p).length?`<div class="mut">${noteRows(p).map(esc).join(' · ')}</div>`:''}
       ${p.gift?`<div class="box amber"><b>Подсказка из документов Заказчика:</b> ${esc(p.gift)}</div>`:''}
@@ -567,7 +591,7 @@ function rSup(){
   const bxBlock = BX.live
     ? `<div class="box"><b>Живая выгрузка из Bitrix24</b> от ${esc(BX.updated)}: найдено ${nf(BX.n_rfq)} запросов СП-166 по классам оборудования ОВЭ-75, ${nf((BX.companies||[]).length)} компаний.</div>
        ${(BX.companies||[]).length?`<div class="tblwrap"><table><thead><tr><th>Компания</th><th>Запросов</th><th>Последний</th><th>Классы оборудования</th></tr></thead>
-       <tbody>${BX.companies.map(c=>`<tr><td><b>${esc(c.name)}</b></td><td class="num">${c.n}</td><td class="mut">${esc(c.last)}</td>
+       <tbody>${BX.companies.map(c=>`<tr><td>${c.name==='—'?'<span class="mut">(компания не указана в CRM)</span>':`<b>${esc(c.name)}</b>`}</td><td class="num">${c.n}</td><td class="mut">${esc(c.last)}</td>
        <td>${(c.classes||[]).map(x=>`<span class="tag">${esc(x)}</span>`).join('')}</td></tr>`).join('')}</tbody></table></div>`:''}
        ${(BX.pool||[]).length?`<h3>Компании мирового и китайского пула, заведённые в CRM</h3>
        <div class="tblwrap"><table><thead><tr><th>Искали по</th><th>Компания в CRM</th><th>Запросов СП-166</th><th>Последний</th></tr></thead>
@@ -614,7 +638,7 @@ function rSup(){
       <p class="mut">${esc(c.profile||'')}</p>
       ${c.refs?`<p class="mut"><b>Референсы:</b> ${esc(c.refs)}</p>`:''}
       ${asks.length?`<div class="box" style="font-size:12px"><b>Что запрашивать:</b> ${asks.map(esc).join(' · ')}</div>`:''}
-      <div class="mut" style="font-size:11px">проверено ${esc(c.checked||'')}${c.src?` · <a href="${esc(c.src)}" rel="noopener">источник</a>`:''}${c.unreachable?' · ⚠ сайт был недоступен, данные из независимых каталогов':''}</div>
+      <div class="mut" style="font-size:11px">проверено ${esc(c.checked||'')}${c.src?` · ${srcLink(c.src)}`:''}${c.unreachable?' · ⚠ сайт был недоступен, данные из независимых каталогов':''}</div>
     </div>`;}).join('')}</div>`:''}
 
   <h2>Поставщики из Bitrix24</h2>
@@ -668,7 +692,7 @@ function rChina(){
     <p class="mut">${esc(c.profile)}</p>
     <p><b>Факт:</b> ${esc(c.fact)}</p>
     <p><b>Применимость:</b> ${esc(c.fit)}</p>
-    <p class="mut"><a href="${esc(c.src)}" target="_blank" rel="noopener">источник</a> · проверено ${esc(c.checked)}</p></div>`).join('')}</div>
+    <p class="mut">${c.src?`Источник: ${srcLink(c.src)} · `:''}проверено ${esc(c.checked)}</p></div>`).join('')}</div>
 
   <h2>Производители оборудования</h2>
   <div class="grid2">${CHINA.equipment.map(c=>`<div class="card">
@@ -677,7 +701,7 @@ function rChina(){
     <p><b>Факт:</b> ${esc(c.fact)}</p>
     <p><b>Целевая позиция:</b> ${esc(c.target)}</p>
     ${c.note?`<p><b>Важно:</b> ${esc(c.note)}</p>`:''}
-    <p class="mut"><a href="${esc(c.src)}" target="_blank" rel="noopener">источник</a> · проверено ${esc(c.checked)}</p></div>`).join('')}</div>
+    <p class="mut">${c.src?`Источник: ${srcLink(c.src)} · `:''}проверено ${esc(c.checked)}</p></div>`).join('')}</div>
 
   <h2>Дыры — где кандидатов пока нет</h2>
   <div class="tblwrap"><table><thead><tr><th>Класс оборудования</th><th>Статус</th><th>Что делать</th></tr></thead>
@@ -924,39 +948,41 @@ function rGantt(){
   for(let d=new Date(min); d<max; d=new Date(+d+MS))
     if(d.getDay()===1){ const x=X(d).toFixed(1);
       g+=`<line x1="${x}" y1="${HH}" x2="${x}" y2="${H-26}" stroke="var(--border)" stroke-width=".5" opacity=".45"/>`; }
-  /* строки */
+  /* строки: графика (зебра, бары, ромбы) — в g, все тексты — в gt, чтобы тексты рисовались ПОСЛЕ баров */
+  let gt='';
   let y=HH, ri=0;
   for(const r of rows){
     if(r.lane){
-      g+=`<line x1="4" y1="${y+RH-4}" x2="${W-6}" y2="${y+RH-4}" stroke="${r.lane.color}" stroke-width="1" opacity=".55"/>`
-        +`<text x="6" y="${y+15}" font-size="11.5" font-weight="800" fill="${r.lane.color}">${esc(r.lane.name).toUpperCase()}</text>`;
+      g+=`<line x1="4" y1="${y+RH-4}" x2="${W-6}" y2="${y+RH-4}" stroke="${r.lane.color}" stroke-width="1" opacity=".55"/>`;
+      gt+=`<text x="6" y="${y+15}" font-size="11.5" font-weight="800" fill="${r.lane.color}">${esc(r.lane.name).toUpperCase()}</text>`;
       y+=RH; ri=0; continue;
     }
     if(ri%2) g+=`<rect x="4" y="${y}" width="${W-10}" height="${RH}" fill="rgba(127,127,127,.05)"/>`;
     const t=r.t, s=D(t.start), e=D(t.end||t.start);
-    const nm=t.name.length>56?t.name.slice(0,55)+'…':t.name;
-    g+=`<text x="14" y="${y+15}" font-size="11" fill="var(--ink)">${esc(nm)}</text>`;
+    const nm=t.name.length>48?t.name.slice(0,47)+'…':t.name;
+    gt+=`<text x="14" y="${y+15}" font-size="11" fill="var(--ink)">${esc(nm)}</text>`;
     if(t.milestone){
       const x=X(s), cy=y+RH/2;
-      g+=`<path d="M${x} ${cy-7} L${x+7} ${cy} L${x} ${cy+7} L${x-7} ${cy} Z" fill="${r.l.color}" stroke="var(--ink)" stroke-width="1.2"/>`
-        +`<text x="${x+11}" y="${y+15}" font-size="10" font-weight="700" fill="var(--ink2)">${fmt(s)}</text>`;
+      g+=`<path d="M${x} ${cy-7} L${x+7} ${cy} L${x} ${cy+7} L${x-7} ${cy} Z" fill="${r.l.color}" stroke="var(--ink)" stroke-width="1.2"/>`;
+      gt+=`<text x="${x+11}" y="${y+15}" font-size="10" font-weight="700" fill="var(--ink2)">${fmt(s)}</text>`;
     }else{
       const x1=X(s), x2=X(new Date(+e+MS)), bw=Math.max(x2-x1,3);
       g+=`<rect x="${x1.toFixed(1)}" y="${y+5}" width="${bw.toFixed(1)}" height="${RH-10}" rx="4" fill="${r.l.color}" opacity=".9"${t.crit?' stroke="var(--crit)" stroke-width="1.8"':''}/>`;
       const lbl=fmt(s)+'–'+fmt(e);
-      g+= (x2+62<LW+CW) ? `<text x="${(x2+5).toFixed(1)}" y="${y+15}" font-size="9.5" fill="var(--mut)">${lbl}</text>`
-                        : `<text x="${(x1-5).toFixed(1)}" y="${y+15}" font-size="9.5" fill="var(--mut)" text-anchor="end">${lbl}</text>`;
+      gt+= (x2+62<LW+CW) ? `<text x="${(x2+5).toFixed(1)}" y="${y+15}" font-size="9.5" fill="var(--mut)">${lbl}</text>`
+                         : `<text x="${(x1-5).toFixed(1)}" y="${y+15}" font-size="9.5" fill="var(--mut)" text-anchor="end">${lbl}</text>`;
     }
     y+=RH; ri++;
   }
-  /* линии T0, Новый год, сегодня */
-  const mark=(d,color,lbl,dash)=>{ if(d<min||d>max) return '';
+  /* линии T0, Новый год, сегодня: сами линии — в g (ДО текстов дат), подписи — в gt */
+  const mark=(d,color,lbl,dash)=>{ if(d<min||d>max) return;
     const x=X(d).toFixed(1);
-    return `<line x1="${x}" y1="${HH-14}" x2="${x}" y2="${H-26}" stroke="${color}" stroke-width="1.4"${dash?' stroke-dasharray="5 4"':''}/>`
-      +`<text x="${x}" y="${H-14}" font-size="10" font-weight="700" fill="${color}" text-anchor="middle">${lbl}</text>`; };
-  g+=mark(D(GANTT.t0),'var(--ink2)','T0 — старт работ',0);
-  g+=mark(new Date(2026,11,31,12),'var(--crit)','НГ',1);
-  const now=new Date(); if(now>min&&now<max) g+=mark(now,'var(--warn)','сегодня',1);
+    g+=`<line x1="${x}" y1="${HH-14}" x2="${x}" y2="${H-26}" stroke="${color}" stroke-width="1.4"${dash?' stroke-dasharray="5 4"':''}/>`;
+    gt+=`<text x="${x}" y="${H-14}" font-size="10" font-weight="700" fill="${color}" text-anchor="middle">${lbl}</text>`; };
+  mark(D(GANTT.t0),'var(--ink2)','T0 — старт работ',0);
+  mark(new Date(2026,11,31,12),'var(--crit)','НГ',1);
+  const now=new Date(); if(now>min&&now<max) mark(now,'var(--warn)','сегодня',1);
+  g+=gt;
   return `
   <h2>График выполнения БИ (план до Нового года)</h2>
   <div class="box info"><b>Гант.</b> ${esc(GANTT.note)}</div>
@@ -982,13 +1008,13 @@ function svgPfd1(){
   let g='';
   /* верхний ряд — газовый тракт */
   g+=bx(315,60,150,66,'ПЕЧЬ КС','обжиг в кипящем слое|шихта 15,45 т/ч (ИД табл. 23)|автогенно: 36,7 ГДж/ч','hot');
-  g+=bx(520,60,128,66,'КОТЁЛ-УТИЛИЗАТОР','газ 882,8 → 400 °C|пар 1,9 МПа / 375 °C|~4,1 т/ч','hot');
-  g+=bx(690,60,96,66,'ЦИКЛОНЫ','пыль|8 165 т/год','dust');
-  g+=bx(826,60,110,66,'ЭЛЕКТРОФИЛЬТР','пыль 2 916 т/год|очистка до СКЦ','dust');
+  g+=bx(508,60,154,66,'КОТЁЛ-УТИЛИЗАТОР','газ 882,8 → 400 °C|пар 1,9 МПа / 375 °C|~4,1 т/ч','hot');
+  g+=bx(700,60,96,66,'ЦИКЛОНЫ','пыль|8 165 т/год','dust');
+  g+=bx(820,60,124,66,'ЭЛЕКТРОФИЛЬТР','пыль 2 916 т/год|очистка до СКЦ','dust');
   g+=bx(976,72,86,44,'ДЫМОСОС','','hot');
   g+=bx(1090,48,84,90,'В СКЦ','13 262 нм³/ч|387 °C, Ø1100|сера в газ|21,3 тыс. т/год','out');
-  g+=ar(465,93,520,93,'газ 882,8 °C','gas'); g+=ar(648,93,690,93,'400 °C','gas');
-  g+=ar(786,93,826,93,'','gas'); g+=ar(936,93,976,93,'387 °C','gas'); g+=ar(1062,93,1090,93,'','gas');
+  g+=ar(465,93,508,93,'882,8 °C','gas'); g+=ar(662,93,700,93,'400 °C','gas');
+  g+=ar(796,93,820,93,'','gas'); g+=ar(944,93,976,93,'387 °C','gas'); g+=ar(1062,93,1090,93,'','gas');
   /* подготовка кека — левый столбец вниз */
   g+=bx(20,40,150,50,'ФИЛЬТРАЦИЯ КЕКА','вакуум-фильтры 2×32 м²|фильтрат → возврат в ОРФ');
   g+=bx(20,130,150,44,'КОНВЕЙЕРЫ КЕКА','сборный + наклонный');
@@ -1001,12 +1027,12 @@ function svgPfd1(){
   g+=`<path d="M340 300 L340 126" fill="none" stroke="var(--mut)" stroke-width="1.7" marker-end="url(#mkA)"/>`
     +`<text x="345" y="220" font-size="9.3" fill="var(--mut)">дутьё в возд. коробку</text>`;
   /* огарок вниз от печи */
-  g+=bx(460,210,150,50,'ХОЛОДИЛЬНИКИ ОГАРКА','донная выгрузка печи|огарок 19,5 % расхода','hot');
+  g+=bx(450,210,190,50,'ХОЛОДИЛЬНИКИ ОГАРКА','донная выгрузка печи|огарок 19,5 % расхода','hot');
   g+=bx(660,210,150,50,'КОНВЕЙЕРЫ ОГАРКА','тракт огарка и пыли');
   g+=bx(880,196,214,78,'НА ВЫЩЕЛАЧИВАНИЕ','огарок 81,9 тыс. т/год (77,0 %)|+ пыли 20,2 тыс. т/год (19,0 %)|сера: в огарке 0,2 %, в пыли 2,2 %|граница проектирования Лота №1','out');
-  g+=`<path d="M395 126 L395 235 L460 235" fill="none" stroke="#e07f2e" stroke-width="1.7" marker-end="url(#mkA)"/>`
+  g+=`<path d="M395 126 L395 235 L450 235" fill="none" stroke="#e07f2e" stroke-width="1.7" marker-end="url(#mkA)"/>`
     +`<text x="400" y="180" font-size="9.3" fill="#e07f2e">огарок</text>`;
-  g+=ar(610,235,660,235,'','sol'); g+=ar(810,235,880,235,'','sol');
+  g+=ar(640,235,660,235,'','sol'); g+=ar(810,235,880,235,'','sol');
   /* пыли КУ/циклонов/ЭФ вниз в тракт */
   g+=`<path d="M584 126 L584 168 L720 168 L720 210" fill="none" stroke="#a34e9e" stroke-width="1.5" marker-end="url(#mkA)"/>`
     +`<path d="M738 126 L738 210" fill="none" stroke="#a34e9e" stroke-width="1.5" marker-end="url(#mkA)"/>`
@@ -1014,7 +1040,7 @@ function svgPfd1(){
     +`<text x="598" y="160" font-size="9.3" fill="#a34e9e">пыль КУ 9 081 т/год</text>`
     +`<text x="775" y="200" font-size="9.3" fill="#a34e9e">пыли циклонов и ЭФ</text>`;
   /* аспирация */
-  g+=bx(460,300,330,44,'АСПИРАЦИЯ УЗЛОВ ПЕРЕСЫПКИ','рукавные фильтры; уловленная пыль — в тракт огарка (в СКЦ 14 т/год)','aux');
+  g+=bx(460,300,330,44,'АСПИРАЦИЯ УЗЛОВ ПЕРЕСЫПКИ','рукавные фильтры; пыль — в тракт огарка (в СКЦ 14 т/год)','aux');
   return `<svg id="pfd1-svg" class="gsvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1190 400" style="width:1190px;max-width:none;display:block;font-family:system-ui,sans-serif">
     <defs><marker id="mkA" markerWidth="9" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0 0 L9 4 L0 8 Z" fill="context-stroke"/></marker></defs>
     <rect x="0" y="0" width="1190" height="400" fill="var(--surface)"/>
@@ -1058,8 +1084,8 @@ function svgEwPlan(){
     +`<circle cx="${px(95)}" cy="${py(36)+6+6.5*S}" r="${4.2*S}" fill="none" stroke="#a34e9e" stroke-width="1.2"/>`
     +`<circle cx="${px(106)}" cy="${py(36)+6+6.5*S}" r="${4.2*S}" fill="none" stroke="#a34e9e" stroke-width="1.2"/>`
     +`<text x="${px(101)}" y="${py(36)+6+13*S+13}" font-size="9.5" fill="#a34e9e" text-anchor="middle">баковое хозяйство: циркбаки 2 × 300 м³ (отметка ниже ванн — самотёк), узлы реагентов</text>`;
-  g+=`<rect x="${px(30)}" y="${py(0)-8-9*S}" width="${140*S}" height="${9*S}" fill="none" stroke="var(--warn)" stroke-width="1.2" stroke-dasharray="6 4" transform="translate(0,-26)"/>`;
-  g+=`<text x="${px(100)}" y="${py(0)-14-9*S-26+5.2*S}" font-size="9.5" fill="var(--warn)" text-anchor="middle">зона выпрямительных агрегатов и КТП (интерфейс: ток серии ≤ 47 кА, U ≤ 225 В; поставка — вне лота)</text>`;
+  g+=`<rect x="${px(30)}" y="${py(0)-8-9*S}" width="${140*S}" height="${9*S}" fill="none" stroke="var(--warn)" stroke-width="1.2" stroke-dasharray="6 4" transform="translate(0,-32)"/>`;
+  g+=`<text x="${px(100)}" y="${py(0)-14-9*S-32+5.2*S}" font-size="9.5" fill="var(--warn)" text-anchor="middle">зона выпрямительных агрегатов и КТП (интерфейс: ток серии ≤ 47 кА, U ≤ 225 В; поставка — вне лота)</text>`;
   /* размерные линии */
   const dim=(x1,y1,x2,y2,t,vert)=>{
     g+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="var(--ink2)" stroke-width=".9" marker-start="url(#mkB)" marker-end="url(#mkB)"/>`
@@ -1110,10 +1136,10 @@ function svgPid3(){
     +`<text x="792" y="199" font-size="9.3" fill="var(--s1)" text-anchor="middle">1600–1650 м³/ч (обе серии)</text>`;
   g+=er(370,165,382)+er(920,165,932);
   /* --- циркбаки, богатый фильтрат, отсечка --- */
-  g+=bx(495,235,200,80,'ЦИРКУЛЯЦИОННЫЕ БАКИ','2 × 300 м³ (запас 1,25 · 0,25 ч)|приём промвод, H2SO4 и воды по балансу|LIC: LL — стоп насосов (сухой ход)','main');
+  g+=bx(479,235,232,80,'ЦИРКУЛЯЦИОННЫЕ БАКИ','2 × 300 м³ (запас 1,25 · 0,25 ч)|приём промвод, H2SO4 и воды по балансу|LIC: LL — стоп насосов (сухой ход)','main');
   g+=bx(168,250,154,66,'БОГАТЫЙ ФИЛЬТРАТ','контрольная фильтрация|124–125 м³/ч · 65–75 °С|102,9 кг/м³ Cu','out');
-  g+=pr('M322 283 L491 283','main')+`<text x="405" y="277" font-size="9.3" fill="var(--s1)" text-anchor="middle">вход в контур</text>`
-    +`<text x="405" y="297" font-size="8.5" fill="var(--mut)" text-anchor="middle">(через т/о поз. 4.1.17, вне БИ)</text>`;
+  g+=pr('M322 283 L475 283','main')+`<text x="399" y="277" font-size="9.3" fill="var(--s1)" text-anchor="middle">вход в контур</text>`
+    +`<text x="399" y="297" font-size="8.5" fill="var(--mut)" text-anchor="middle">(через т/о поз. 4.1.17, вне БИ)</text>`;
   g+=pr('M595 315 L595 428','main');
   g+=bx(505,430,180,62,'НА ВЫЩЕЛАЧИВАНИЕ','отсечка 124,7 м³/ч (1038 тыс. м³/год)|+ купорос 3,2–3,5 м³/ч','out');
   /* --- левая нитка: насос, холодильник, напорный коллектор --- */
@@ -1201,7 +1227,7 @@ function svgPid3(){
 /* --- эскиз: поперечный разрез нового корпуса ЭЭ (Лот №3, сценарий Б) — по черновику ПЗ Лота №3, раздел «Компоновка» --- */
 function svgSec3(){
   /* сетка: 1 м = 22 px; ось А x=176, Б x=572, В x=968; отм. 0,000 y=540 */
-  const T=(x,y,t,o)=>{o=o||{};return `<text x="${x}" y="${y}" font-size="${o.s||9}" fill="${o.f||'var(--ink2)'}"${o.w?` font-weight="${o.w}"`:''}${o.a?` text-anchor="${o.a}"`:''}${o.r?` transform="rotate(-90 ${x} ${y})"`:''}>${t}</text>`;};
+  const T=(x,y,t,o)=>{o=o||{};return `<text x="${x}" y="${y}" font-size="${o.s||9}" fill="${o.f||'var(--ink2)'}"${o.w?` font-weight="${o.w}"`:''}${o.a?` text-anchor="${o.a}"`:''}${o.r?` transform="rotate(-90 ${x} ${y})"`:''}${o.bg?' stroke="var(--surface)" stroke-width="3" paint-order="stroke" stroke-linejoin="round"':''}>${t}</text>`;};
   const L=(x1,y1,x2,y2,o)=>{o=o||{};return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${o.f||'var(--ink2)'}" stroke-width="${o.w||1}"${o.d?` stroke-dasharray="${o.d}"`:''}${o.m?` marker-start="url(#mkd-sec3)" marker-end="url(#mkd-sec3)"`:''}${o.e?` marker-end="url(#mk-sec3)"`:''}/>`;};
   const R=(x,y,w,h,o)=>{o=o||{};return `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${o.fl||'none'}" stroke="${o.f||'var(--ink2)'}" stroke-width="${o.w||1}"${o.d?` stroke-dasharray="${o.d}"`:''}/>`;};
   let g='';
@@ -1282,14 +1308,14 @@ function svgSec3(){
   for(const x of [342,362,386,406]) g+=L(x,404,x,433,{w:1})+R(x-3.5,433,7,22,{fl:'var(--border)',w:.8});
   /* кран Б-В: крюк поднят */
   g+=L(770,262,770,332,{w:1})+`<circle cx="770" cy="335" r="2.6" fill="var(--ink2)"/>`+L(770,338,770,343,{w:1.2});
-  g+=T(374,240,'мостовой кран пролёта А-Б — обслуживание ванн (отм. подкрановых путей уточняется)',{f:'var(--crit)',a:'middle'});
+  g+=T(374,240,'мостовой кран пролёта А-Б — обслуживание ванн (отм. путей уточняется)',{f:'var(--crit)',a:'middle',bg:1});
   g+=T(770,240,'мостовой кран пролёта Б-В — аналогично',{f:'var(--crit)',a:'middle'});
   g+=T(418,412,'траверса с матрицами:',{s:8.5});
   g+=T(418,423,'штанга 1,325 м + полотно 1,0 м,',{s:8.5});
   g+=T(418,434,'подъём над колпаками ванн',{s:8.5});
   /* подписи пролёта Б-В: габариты ванны, проходы */
   g+=T(770,458,'обслуживающие площадки вдоль ванн; ширины проходов — предложение БИ',{s:8.5,f:'var(--mut)',a:'middle'});
-  g+=T(770,474,'ванна: наружный габарит 8,645 × 1,315 м · глубина 1,65 м · стенка 80 мм (внутренний 8485 × 1155 × 1650 мм)',{s:8.5,a:'middle'});
+  g+=T(770,474,'ванна: наружный габарит 8,645 × 1,315 м · глубина 1,65 м · стенка 80 мм (внутр. 8485 × 1155 × 1650 мм)',{s:8.5,a:'middle',bg:1});
   g+=L(675,516,675,487,{w:.6})+L(865,516,865,487,{w:.6});
   g+=L(675,492,865,492,{m:1,w:.9})+T(770,487,'8 645',{s:9,w:700,a:'middle'});
   /* отметки слева столбиком */
@@ -1349,9 +1375,9 @@ function svgKts(){
   g+=ln(100,176,100,222,BLU,2)+ln(470,176,470,222,BLU,2)+ln(640,176,640,222,BLU,2)+ln(908,176,908,222,BLU,2);
   g+=txt(914,205,'SNMP',M,8);
   g+=bx(36,92,215,84,'СЕРВЕРЫ SCADA ×2','AlphaScada · АО «Атомик Софт» · ОС Linux|горячее резервирование верхнего уровня|ИВК: сбор, обработка, хранение,|диагностика; история процесса',BLU,{shadow:1});
-  g+=bx(286,92,190,84,'АРМ ОПЕРАТОРОВ','безвентиляторные, не более 2 мониторов|дистанционное управление, блокировки|мнемосхемы, тренды, история|сигнализация с квитированием',BLU);
+  g+=bx(274,92,220,84,'АРМ ОПЕРАТОРОВ','безвентиляторные, не более 2 мониторов|дистанционное управление, блокировки|мнемосхемы, тренды, история|сигнализация с квитированием',BLU);
   g+=bx(506,92,150,84,'ИНЖЕНЕРНАЯ СТАНЦИЯ','питание — I «особая»|категория (с ИБП)',BLU);
-  g+=bx(692,92,232,84,'ИБП ДВОЙНОГО ПРЕОБРАЗОВАНИЯ','I «особая» категория · АВР «на сеть»|автоматический байпас · Ethernet + SNMP|230 В, 50 Гц стабилизированное, 10 мин и более',WRN,{shadow:1});
+  g+=bx(672,92,252,84,'ИБП ДВОЙНОГО ПРЕОБРАЗОВАНИЯ','I «особая» категория · АВР «на сеть»|автоматический байпас · Ethernet + SNMP|230 В, 50 Гц стабилизированное, 10 мин и более',WRN,{shadow:1});
   /* ── средний уровень ── */
   g+=ln(188,232,188,296,BLU,2.4)+ln(635,232,635,318,BLU,2.4);
   g+=`<circle cx="188" cy="228" r="3" fill="${BLU}"/><circle cx="635" cy="228" r="3" fill="${BLU}"/>`;
@@ -1457,14 +1483,14 @@ function svgVys1(){
   g+=rc(210,396,168,18,'var(--s1)',1.3)
     +tx(290,408,'питатели + весовые дозаторы · +7…8',6.8,'var(--ink2)','m');
   g+=arw('M294 414 L294 434','var(--s1)',1.4);
-  g+=rc(246,436,84,26,'var(--s1)',1.6)
+  g+=rc(240,436,96,26,'var(--s1)',1.6)
     +tx(288,446,'СМЕСИТЕЛЬ СШ-25',8.5,'var(--ink)','m',700)+tx(288,457,'отм. +5',7,'var(--ink2)','m');
   g+=rc(190,506,160,40,'var(--mut)',1.4)
     +tx(270,518,'станция растаривания биг-бэгов;',7,'var(--ink2)','m')
     +tx(270,529,'пост разгрузки цементной меди',7,'var(--ink2)','m')
     +tx(270,540,'0,000 · у ворот (граница по ТЗ)',6.5,'var(--mut)','m');
   /* наклонный конвейер на расходные бункеры */
-  g+=arw('M330 450 L446 308','var(--s1)',2);
+  g+=arw('M336 450 L446 308','var(--s1)',2);
   g+=tx(262,479,'наклонный конвейер УКВ-320-Ц-95',7,'var(--s1)','m')
     +tx(262,490,'→ на расходные бункеры у печи',7,'var(--s1)','m');
 
@@ -1520,9 +1546,9 @@ function svgVys1(){
   /* огарок из порога печи → холодильник */
   g+=arw('M580 422 L614 456',HOT,2)+tx(600,432,'огарок',7,HOT);
   /* холодильник огарка */
-  g+=rc(610,458,90,26,'var(--s1)',1.6)
-    +tx(655,468,'ХОЛОДИЛЬНИК D2424-6',7.5,'var(--ink)','m',700)
-    +tx(655,478,'огарок+пыль 837,6→70 °C',6.5,'var(--ink2)','m');
+  g+=rc(600,458,102,26,'var(--s1)',1.6)
+    +tx(651,468,'ХОЛОДИЛЬНИК D2424-6',7,'var(--ink)','m',700)
+    +tx(651,478,'огарок+пыль 837,6→70 °C',6.5,'var(--ink2)','m');
   g+=tx(655,496,'загруз. патрубок +5,2…5,5 (уточняется по КД печи)',7,'var(--ink2)','m');
   g+=tx(655,506,'выдача: шнеками в силосные башни →',7,'var(--s1)','m');
 
@@ -1550,14 +1576,15 @@ function svgVys1(){
   g+=ln(800,456,950,456,DUST,1.5);
   for(const x of [800,936]) g+=ln(x,456,x,550,'var(--ink2)',1.2);
   g+=tx(878,192,'ЭЛЕКТРОФИЛЬТРЫ УГТ1-20-4',9,'var(--ink)','m',700)
-    +tx(878,205,'2 шт. — рабочий/резерв (второй за плоскостью разреза)',7,'var(--ink2)','m')
+    +tx(878,205,'2 шт. — рабочий/резерв (второй за разрезом)',7,'var(--ink2)','m')
     +tx(878,218,'в плане 18,1 × 4,8 м · высота 18,7 м',7,'var(--ink2)','m');
   g+=arw('M878 456 L878 500',DUST,1.6)+tx(872,482,'тонкая пыль',7,DUST,'e');
   /* холодильник тонкой пыли */
-  g+=rc(832,502,96,44,DUST,1.4)
-    +tx(880,514,'ХОЛОДИЛЬНИК ТОНКОЙ ПЫЛИ',7,'var(--ink)','m',700)
-    +tx(880,525,'S710-4 · 387→70 °C',6.5,'var(--ink2)','m')
-    +tx(880,536,'→ силос 10 м³ / в оборотные',6.5,'var(--ink2)','m');
+  g+=rc(828,502,104,44,DUST,1.4)
+    +tx(880,512,'ХОЛОДИЛЬНИК',7,'var(--ink)','m',700)
+    +tx(880,521,'ТОНКОЙ ПЫЛИ',7,'var(--ink)','m',700)
+    +tx(880,531,'S710-4 · 387→70 °C',6.5,'var(--ink2)','m')
+    +tx(880,541,'→ силос 10 м³, в оборотные',6.5,'var(--ink2)','m');
   /* газ: ЭФ → дымососы (разрыв на кран-балке) */
   g+=pa('M969 300 L990 300 L990 468',HOT,2.6)+arw('M990 490 L990 502',HOT,2.6);
   /* дымососы */
@@ -1646,33 +1673,33 @@ function svgPfd2(){
   g+=bx(342,56,168,66,'ПОДОГРЕВАТЕЛЬ 63 м²','глухой пар 2,1 т/ч (0,6 МПа)|Q = 1,22 МВт · ΔT прохода 1,7 К|циркуляция 633 м³/ч · 22 кВт','main',1);
   g+=bx(540,56,168,66,'ИСПАРИТЕЛЬ I СТ.','D 2,0 м · V 34,5 м³ · 40 °C|0,06–0,08 атм · сок. пар 2,2 т/ч|ж:т 9,18 · твёрдое до 0,2 т/м³','main',1);
   g+=bx(738,56,168,66,'ИСПАРИТЕЛЬ II СТ.','самоиспарение · 20 °C|0,013–0,02 атм · сок. пар 0,29 т/ч|ж:т 2,45 · кристаллы до 2 мм','main',1);
-  g+=bx(936,56,140,66,'СОЛЕВЫЕ КОЛОННЫ','гидрозатворы пульпы|столб 7,0–7,9 м');
-  g+=ln('M178 89 L208 89')+ln('M312 89 L342 89')+ln('M510 89 L540 89')+ln('M708 89 L738 89')+ln('M906 89 L936 89');
+  g+=bx(930,56,152,66,'СОЛЕВЫЕ КОЛОННЫ','гидрозатворы пульпы|столб 7,0–7,9 м');
+  g+=ln('M178 89 L208 89')+ln('M312 89 L342 89')+ln('M510 89 L540 89')+ln('M708 89 L738 89')+ln('M906 89 L930 89');
   /* пар 0,6 МПа — ввод (граница 4.3.3) и линии к подогревателям */
   g+=bx(20,170,150,66,'ПАР 0,6 МПа — ВВОД','граница 4.3.3 —|фланец на стене цеха|подогр. 3,0 + эжект. 1,36 т/ч','out');
   g+=ln('M95 170 L95 146 L426 146 L426 122','stm')+tx(240,141,'пар 2,1 т/ч','#e07f2e');
   g+=ln('M40 236 L40 470 L505 470 L505 448','stm')+tx(250,465,'пар 0,85–0,95 т/ч','#e07f2e');
   /* ряд B — вакуумная система нитки 1 */
   g+=bx(210,170,180,66,'ПЭБ НИТКИ 1','эжектор 0,27 т/ч (6 атм)|конденсатор D 0,5 м — 32 м³/ч|вакуум-насос ВВН1-6 · отсос ПГС','vac');
-  g+=bx(430,170,170,66,'БАРОМ. КОНДЕНСАТОР 1','0,075 атм · нагрузка 3,24 т/ч|Q = 2,17 МВт|вода 380 м³/ч · 22,5 → 27,4 °C','vac');
+  g+=bx(424,170,184,66,'БАРОМ. КОНДЕНСАТОР 1','0,075 атм · нагрузка 3,24 т/ч|Q = 2,17 МВт|вода 380 м³/ч · 22,5 → 27,4 °C','vac');
   g+=bx(700,170,160,66,'ЭЖЕКТОР II СТ. 1','рабочий пар 0,75 т/ч (6 атм)|производит. 0,375 т/ч сок. пара|коэфф. эжекции u = 0,5','vac');
   g+=bx(936,170,140,44,'РЕПУЛЬПАТОР','поз. 3 · 2,5 м³');
   g+=ln('M560 122 L560 170','vac')+tx(566,150,'сок. пар 2,2 т/ч','#a34e9e');
   g+=ln('M790 122 L790 170','vac')+tx(784,150,'сок. пар 0,29 т/ч','#a34e9e',9.3,'end');
   g+=con(845,147)+ln('M845 150 L845 170','stm')+tx(852,156,'пар 6 атм · 0,75 т/ч','#e07f2e');
   g+=conW(445,147)+ln('M445 150 L445 170','aux')+tx(439,160,'вода СОВ 380 м³/ч','var(--mut)',9.3,'end');
-  g+=ln('M700 203 L600 203','vac')+tx(650,197,'выхлоп','#a34e9e',9.3,'middle');
-  g+=ln('M430 203 L390 203','vac')+tx(410,197,'ПГС','#a34e9e',9.3,'middle');
+  g+=ln('M700 203 L608 203','vac')+tx(654,197,'выхлоп','#a34e9e',9.3,'middle');
+  g+=ln('M424 203 L390 203','vac')+tx(407,197,'ПГС','#a34e9e',9.3,'middle');
   g+=ln('M1006 122 L1006 170')+tx(1012,150,'кристаллы','var(--s1)');
   /* ряд C — СОВ, растворение (за границей), центрифуги нитки 1 */
   g+=bx(210,272,250,66,'КИСЛАЯ СОВ — ГИДРОЗАТВОРЫ','орошение конденсаторов 568 м³/ч (сумм.)|тёплая вода → градирня кислой СОВ|профицит ≈4,7 м³/ч — в производство','aux');
-  g+=ln('M300 236 L300 272','vac')+tx(306,256,'труба Dу 100–125','#a34e9e');
-  g+=ln('M450 236 L450 272','vac')+tx(456,264,'баром. труба Dу 350–400 · H ≈ 10,5 м','#a34e9e');
+  g+=ln('M300 236 L300 272','vac')+tx(306,256,'труба Ду 100–125','#a34e9e');
+  g+=ln('M450 236 L450 272','vac')+tx(456,264,'баром. труба Ду 350–400 · H ≈ 10,5 м','#a34e9e');
   g+=bx(480,272,270,66,'МЕДНЫЙ КУПОРОС — ГРАНИЦА 4.3.4','14 139 т/год (1,70 т/ч) · фланец центрифуг|растворение: 65–75 °C · эл-т 3,2–3,5 м³/ч|р-р Cu 95–120 кг/м³ → возврат на КФ','out');
-  g+=bx(936,272,140,66,'ЦЕНТРИФУГИ 2×2,5 Т/Ч','пульсирующие, раб. + рез.|1800 об/мин · 15 кВт|влажность осадка 4–6 %');
+  g+=bx(922,272,168,66,'ЦЕНТРИФУГИ 2×2,5 Т/Ч','пульсирующие, раб. + рез.|1800 об/мин · 15 кВт|влажность осадка 4–6 %');
   g+=ln('M1006 214 L1006 272')+tx(1012,244,'пульпа','var(--s1)');
-  g+=ln('M936 305 L750 305')+tx(843,299,'медный купорос','var(--s1)',9.3,'middle');
-  g+=ln('M1076 305 L1120 305 L1120 89 L1076 89','sol',1.4)
+  g+=ln('M922 305 L750 305')+tx(836,299,'медный купорос','var(--s1)',9.3,'middle');
+  g+=ln('M1090 305 L1120 305 L1120 89 L1082 89','sol',1.4)
     +`<text x="1130" y="197" font-size="9" fill="var(--s1)" text-anchor="middle" transform="rotate(-90 1130 197)">фугат — бак поз. 7, в сол. колонны и II ст.</text>`;
   /* маточник-1: нитка 1 → нитка 2 */
   g+=ln('M906 110 L920 110 L920 352 L300 352 L300 378')+tx(610,347,'маточник-1 · 11,81 тыс. м³/год · на нитку 2','var(--s1)',9.3,'middle');
@@ -1681,24 +1708,24 @@ function svgPfd2(){
   g+=bx(390,382,170,66,'ПОДОГРЕВАТЕЛЬ 25 м²','глухой пар 0,85–0,95 т/ч|Q = 0,52 МВт · ΔT прохода 1,8 К|циркуляция 251 м³/ч · 11 кВт','main',1);
   g+=bx(590,382,150,66,'ИСПАРИТЕЛЬ I СТ.','D 1,3 м · V 8,9 м³ · 40 °C|0,06–0,10 атм|сок. пар 0,7–0,8 т/ч','main',1);
   g+=bx(770,382,150,66,'ИСПАРИТЕЛЬ II СТ.','самоиспарение · 20 °C|0,013–0,02 атм|сок. пар 0,07 т/ч · ж:т 1,70','main',1);
-  g+=bx(950,382,170,66,'ЦЕНТРИФУГИ 2×1,5 Т/Ч','рабочая + резервная|промывка фильтратом 0,15 м³/т|влажность осадка 4–6 %');
-  g+=ln('M350 415 L390 415')+ln('M560 415 L590 415')+ln('M740 415 L770 415')+ln('M920 415 L950 415');
+  g+=bx(946,382,178,66,'ЦЕНТРИФУГИ 2×1,5 Т/Ч','рабочая + резервная|промывка фильтратом 0,15 м³/т|влажность осадка 4–6 %');
+  g+=ln('M350 415 L390 415')+ln('M560 415 L590 415')+ln('M740 415 L770 415')+ln('M920 415 L946 415');
   /* ряд E — вакуумная система нитки 2, фасовка */
   g+=bx(230,492,180,66,'ПЭБ НИТКИ 2','эжектор 0,16 т/ч (6 атм)|конденсатор D 0,5 м — 18 м³/ч|вакуум-насос ВВН1-3 · отсос ПГС','vac');
-  g+=bx(450,492,170,66,'БАРОМ. КОНДЕНСАТОР 2','0,075 атм · нагрузка 1,0 т/ч|Q = 0,67 МВт|вода 138 м³/ч · ΔT ≈ 4,2 К','vac');
+  g+=bx(444,492,184,66,'БАРОМ. КОНДЕНСАТОР 2','0,075 атм · нагрузка 1,0 т/ч|Q = 0,67 МВт|вода 138 м³/ч · ΔT ≈ 4,2 К','vac');
   g+=bx(700,492,160,66,'ЭЖЕКТОР II СТ. 2','рабочий пар 0,18 т/ч (6 атм)|производит. 0,090 т/ч сок. пара|коэфф. эжекции u = 0,5','vac');
-  g+=bx(950,492,170,66,'ФАСОВКА — ГРАНИЦА 4.3.5','биг-беги с ПЭ-вкладышем|взвешивание · пробоотбор|через склад → NNH','out');
+  g+=bx(938,492,204,66,'ФАСОВКА — ГРАНИЦА 4.3.5','биг-беги с ПЭ-вкладышем|взвешивание · пробоотбор|через склад → NNH','out');
   g+=ln('M610 448 L610 492','vac')+tx(616,478,'сок. пар 0,7–0,8 т/ч','#a34e9e');
   g+=ln('M800 448 L800 492','vac');
   g+=conW(560,467)+ln('M560 470 L560 492','aux')+tx(554,481,'вода СОВ 138 м³/ч','var(--mut)',9.3,'end');
   g+=con(730,467)+ln('M730 470 L730 492','stm')+tx(722,462,'пар 6 атм · 0,18 т/ч','#e07f2e',9.3,'end');
   g+=ln('M1035 448 L1035 492')+tx(1041,478,'смеш. купорос 0,80 т/ч','var(--s1)');
-  g+=ln('M700 525 L620 525','vac')+tx(660,519,'выхлоп','#a34e9e',9.3,'middle');
-  g+=ln('M450 525 L410 525','vac')+tx(430,519,'ПГС','#a34e9e',9.3,'middle');
+  g+=ln('M700 525 L628 525','vac')+tx(664,519,'выхлоп','#a34e9e',9.3,'middle');
+  g+=ln('M444 525 L410 525','vac')+tx(427,519,'ПГС','#a34e9e',9.3,'middle');
   /* нижняя полоса — сливы и выходы */
   g+=bx(180,568,250,44,'В КИСЛУЮ СОВ','на градирню кислой СОВ','aux');
   g+=ln('M300 558 L300 568','vac');
-  g+=ln('M470 558 L470 590 L430 590','vac')+tx(478,580,'баром. труба Dу 200–250','#a34e9e');
+  g+=ln('M470 558 L470 590 L430 590','vac')+tx(478,580,'баром. труба Ду 200–250','#a34e9e');
   g+=bx(650,568,230,44,'ПРОЧИЕ ГРАНИЦЫ ЛОТА','4.3.2 воздух · 4.3.6 вода · 4.3.7 эл. 0,4 кВ','out');
   g+=bx(950,568,170,44,'МАТОЧНИК-2 — В ЦЭН','1,8 тыс. м³/год · бак поз. 4.1.26','out');
   g+=ln('M895 448 L895 590 L950 590')
@@ -1726,13 +1753,13 @@ function svgPfd4(){
   const tx=(x,y,t,fill,anch,fs)=>`<text x="${x}" y="${y}" font-size="${fs||8.5}" fill="${fill||'var(--mut)'}" text-anchor="${anch||'middle'}">${t}</text>`;
   let g='';
   /* --- ряд 1: приём — взвешивание — маркировка --- */
-  g+=bx(18,52,176,90,'ИЗ ЭЭ — ЛОТ №3','выходной конвейер КСМ|катоды М00к · 75 000 т/год|пакет 2500 ± 50 кг · 1,0 × 1,0 м|56–64 листа (при номинале ≈54) · 3 ленты|приёмка 358 сут (8585 ч/год)','out');
+  g+=bx(18,52,184,104,'ИЗ ЭЭ — ЛОТ №3','выходной конвейер КСМ|катоды М00к · 75 000 т/год|пакет 2500 ± 50 кг · 1,0 × 1,0 м|56–64 листа (при номинале ≈54)|3 ленты увязки|приёмка 358 сут (8585 ч/год)','out');
   g+=`<line x1="208" y1="46" x2="208" y2="160" stroke="var(--good)" stroke-width="1.2" stroke-dasharray="6 4"/>`;
   g+=tx(208,40,'передаточные ворота — граница проектирования (ТЗ п. 6.2)','var(--good)','middle',8);
   g+=bx(236,56,158,72,'КОНВЕЙЕР ПРИЁМКИ','3,5 пакета/ч средний|пик до 7 пакетов/ч|идентификация — QR с КСМ');
   g+=bx(452,56,176,72,'ВЕСЫ ПРИЁМКИ','платформенные · НПВ 3 т|класс точности «высокий»|допуск 2500 ± 50 кг → АИС');
   g+=bx(690,56,200,80,'УВЯЗКА И МАРКИРОВКА','контроль/дотяжка 3 лент увязки|2 этикетки с QR на пакет|принтеры: термо (Zebra) + лазерный|маркировка — ГОСТ 14192-96');
-  g+=ar('M194 94 L236 94')+ar('M394 94 L452 94')+ar('M628 94 L690 94');
+  g+=ar('M202 94 L236 94')+ar('M394 94 L452 94')+ar('M628 94 L690 94');
   g+=tx(423,88,'84 пак./сут','var(--s1)','middle',8);
   /* --- ряд 2: разбраковка, хранение, комплектация, отгрузка --- */
   g+=ar('M540 128 L540 168 L311 168 L311 196');
@@ -1896,7 +1923,7 @@ function svgPid1(){
     +`<text x="208" y="464" font-size="8" font-weight="700" fill="var(--crit)" text-anchor="end">ПАЗ: отсечка дутья →</text>`
     +`<text x="208" y="476" font-size="8" font-weight="700" fill="var(--crit)" text-anchor="end">N₂ в линию O₂</text>`;
   /* топка — вспомогательный вариант */
-  g+=bx(330,470,290,42,'ТОПКА ГМ-4,5 — ВСПОМ. ВАРИАНТ','мазут 300 кг/ч → дутьё 455 °C · TIC-309 · ПАЗ горелки по ФНП','hot',1);
+  g+=bx(330,470,322,42,'ТОПКА ГМ-4,5 — ВСПОМ. ВАРИАНТ','мазут 300 кг/ч → дутьё 455 °C · TIC-309 · ПАЗ горелки по ФНП','hot',1);
   g+=`<path d="M330 484 L300 484 L300 361" fill="none" stroke="#e07f2e" stroke-width="1.2" stroke-dasharray="6 4" marker-end="url(#mk-pid1)"/>`;
   /* ================= легенда ================= */
   let L='';
@@ -1975,7 +2002,7 @@ function svgEl3(){
   g+=tx(595,266,'резерв — на любую серию (перекрёстная ошиновка; вне лота)',8.8,'var(--warn)');
   g+=tx(252,280,'магистральные шины —',8.8,'var(--mut)','start')+tx(252,291,'вне лота / интерфейс',8.8,'var(--mut)','start');
   g+=tx(952,280,'магистральные шины —',8.8,'var(--mut)','start')+tx(952,291,'вне лота / интерфейс',8.8,'var(--mut)','start');
-  g+=tx(595,298,'размещение ВА — у торца корпуса ЭЭ 36 × 190 м (сценарий Б, блок NB-EW): короткие магистральные шины',8.5);
+  g+=tx(595,298,'размещение ВА — у торца корпуса ЭЭ 36 × 190 м (сценарий Б, блок L3-NB): короткие магистральные шины',8.5);
   /* ---- граница поставки лота ---- */
   g+=`<line x1="20" y1="318" x2="1132" y2="318" stroke="var(--good)" stroke-width="1.6" stroke-dasharray="10 6"/>`;
   g+=tx(24,311,'ГРАНИЦА ПОСТАВКИ ЛОТА №3 — контактные площадки концевых сборных шин первой/последней ванны серии',10,'var(--good)','start',1);
@@ -2001,12 +2028,12 @@ function svgEl3(){
   g+=ln('M760 512 L800 512','s1',0,2,1);
   /* интерфейс АСУ — выпрямители (Modbus TCP, пересекает границу лота) */
   g+=ln('M1140 505 L1158 505 L1158 184 L1070 184','s1',1,1.6,1);
-  g+=`<text x="1150" y="344" font-size="8.8" fill="var(--s1)" text-anchor="middle" transform="rotate(-90 1150 344)">Modbus TCP (JIC-08): задание/телеметрия · I ≤ 47,0 кА · U серии ≤ 225 В</text>`;
+  g+=`<text x="1147" y="358" font-size="8.8" fill="var(--s1)" text-anchor="middle" transform="rotate(-90 1147 358)">Modbus TCP (JIC-08): задание/телеметрия · I ≤ 47,0 кА · U серии ≤ 225 В</text>`;
   return `<svg id="el3-svg" class="gsvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1190 590" style="width:1190px;max-width:none;display:block;font-family:system-ui,sans-serif">
     <defs><marker id="mk-el3" markerWidth="9" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0 0 L9 4 L0 8 Z" fill="context-stroke"/></marker></defs>
     <rect x="0" y="0" width="1190" height="590" fill="var(--surface)"/>
     <rect x="6" y="6" width="1178" height="578" fill="none" stroke="var(--border)"/>
-    <text x="20" y="576" font-size="10" fill="var(--mut)">ЭСКИЗ — не для строительства · однолинейная схема-интерфейс электроснабжения отделения ЭЭ (Лот №3) · источники: bi_lot3.json; calc.json (NB-EW, EL-TOTAL); automation.json · КВАНТ, черновик БИ</text>
+    <text x="20" y="576" font-size="10" fill="var(--mut)">ЭСКИЗ — не для строительства · однолинейная схема-интерфейс электроснабжения отделения ЭЭ (Лот №3) · источники: bi_lot3.json; calc.json (L3-NB, EL-TOTAL); automation.json · КВАНТ, черновик БИ</text>
     <text x="1174" y="30" font-size="12" font-weight="800" fill="var(--ink2)" text-anchor="end">ОДНОЛИНЕЙНАЯ СХЕМА · ЛОТ №3 — ЭЛЕКТРОСНАБЖЕНИЕ ОТДЕЛЕНИЯ ЭЭ</text>
     ${g}</svg>`;
 }
@@ -2050,7 +2077,7 @@ function svgPid2(){
   g+=bx(280,78,185,92,'ИСПАРИТЕЛЬ I СТУПЕНИ','40 °C · 0,06–0,08 атм|соковый пар 2,2 т/ч (расчёт 2,08)|самоиспарение 70→40 °C: 261 кг/ч','main');
   g+=tap('M268 158 L280 158')+bub(253,158,'TIC','01');
   g+=sig('M253 173 L253 188 L118 188 L113 212');
-  g+=bx(132,200,164,74,'ПОДОГРЕВАТЕЛЬ F = 63 м²','Q = 1,22 МВт · ΔT прохода 1,7 К|K треб ≈ 160 Вт/(м²·К), запас ×5–7|трубки 904L · без кипения','hot');
+  g+=bx(128,196,172,76,'ПОДОГРЕВАТЕЛЬ 63 м²','Q = 1,22 МВт · ΔT прохода 1,7 К|K треб ≈ 160 Вт/(м²·К)|запас по K — ×5–7|трубки 904L · без кипения','hot');
   g+=ln('M350 170 L350 285 L312 285','main');
   g+=`<circle cx="300" cy="285" r="12" fill="var(--surface)" stroke="var(--ink2)" stroke-width="1.4"/><path d="M306 278 L306 292 L294 285 Z" fill="var(--ink2)"/>`;
   g+=pr('M288 285 L215 285 L215 276','main');
@@ -2058,11 +2085,11 @@ function svgPid2(){
   g+=T(300,309,'циркнасос I ст. · 633 м³/ч',{a:'middle'})+T(300,320,'кратность циркуляции 125',{a:'middle',f:'var(--mut)'});
   g+=tap('M350 225 L372 225')+bub(387,225,'DIC','01')+T(387,247,'байпас',{a:'middle',s:8,f:'var(--mut)'});
   /* греющий пар и конденсат */
-  g+=pr('M55 225 L96 225','hot')+ln('M110 225 L132 225','hot');
+  g+=pr('M55 225 L96 225','hot')+ln('M110 225 L128 225','hot');
   g+=vlvH(108,225,'hot');
   g+=tap('M75 211 L75 225')+bub(75,196,'FIQ');
   g+=T(58,240,'греющий пар',{f:C.hot})+T(58,251,'0,6 МПа · 2,1 т/ч',{f:C.hot})+T(58,262,'T нас ≈ 159 °C',{f:C.hot});
-  g+=pr('M132 268 L95 268','hot',1.3)+T(93,280,'конденсат',{f:C.hot,a:'end'});
+  g+=pr('M128 268 L95 268','hot',1.3)+T(93,280,'конденсат',{f:C.hot,a:'end'});
   /* ---------- перетек раствора в II ступень ---------- */
   g+=pr('M465 110 L491 110','main');
   g+=vlvH(478,110,'main',1);
@@ -2081,8 +2108,8 @@ function svgPid2(){
   g+=ln('M631 170 L631 370','main',1.6)+ln('M640 170 L640 370','main',1.6);
   const dm=(x,y1,y2)=>`<line x1="${x}" y1="${y1}" x2="${x}" y2="${y2}" stroke="var(--ink2)" stroke-width=".9" marker-start="url(#mkd-pid2)" marker-end="url(#mkd-pid2)"/>`;
   g+=dm(660,170,370)+T(670,300,'столб пульпы H ≈ 7,0–7,9 м',{r:1,a:'middle'})+T(622,270,'солевая колонна',{r:1,a:'middle',f:C.main});
-  g+=bx(560,370,160,46,'РЕПУЛЬПАТОР ВЫГРУЗКИ','пульпа плотностью до 1,45 т/м³','main');
-  g+=pr('M720 393 L760 393','out')+T(764,396,'пульпа на центрифуги',{f:'var(--good)'});
+  g+=bx(544,370,194,46,'РЕПУЛЬПАТОР ВЫГРУЗКИ','пульпа плотностью до 1,45 т/м³','main');
+  g+=pr('M738 393 L768 393','out')+T(772,396,'пульпа на центрифуги',{f:'var(--good)'});
   /* ---------- эжектор II ступени ---------- */
   g+=pr('M680 100 L768 100','vac');
   g+=T(684,114,'соковый пар II ст.',{f:C.vac})+T(684,126,'0,29 т/ч',{f:C.vac})+T(684,138,'0,013–0,02 атм',{f:C.vac});
@@ -2095,20 +2122,20 @@ function svgPid2(){
   g+=tap('M724 71 L724 100')+bub(724,56,'PIC','02');
   g+=sig('M739 58 L768 62');
   /* ---------- барометрический конденсатор ---------- */
-  g+=bx(836,84,160,92,'БАРОМЕТРИЧ. КОНДЕНСАТОР','смешивающий · 0,075 атм|пар 3,24 т/ч · Q = 2,17 МВт|вода 380 м³/ч · 22,5 → 27,4 °C|недогрев до 40,3 °C ≈ 13 К','vac');
+  g+=bx(828,84,176,92,'БАРОМ. КОНДЕНСАТОР','смешивающий · 0,075 атм|пар 3,24 т/ч · Q = 2,17 МВт|вода 380 м³/ч · 22,5 → 27,4 °C|недогрев до 40,3 °C ≈ 13 К','vac');
   g+=pr('M965 54 L965 82','main')+T(973,60,'кислая СОВ 380 м³/ч')+T(973,71,'подача 22,5 °C');
   g+=tap('M933 77 L933 84')+bub(933,62,'PIC','01');
   g+=sig('M948 58 L985 46 L1058 46 L1067 58');
   /* ---------- барометрическая труба и гидрозатвор нитки 1 ---------- */
   g+=ln('M920 176 L920 430','main',2.2);
-  g+=T(908,303,'барометрич. труба Dу 350–400 · V ≈ 1,0 м³',{r:1,a:'middle',f:C.main});
+  g+=T(908,303,'барометрич. труба Ду 350–400 · V ≈ 1,0 м³',{r:1,a:'middle',f:C.main});
   g+=dm(948,176,430)+T(958,303,'H ≈ 10,5 м (H мин = 9,56 м)',{r:1,a:'middle'});
-  g+=bx(843,430,154,48,'ГИДРОЗАТВОР НИТКИ 1','бак ≥ 1,5–2 м³ (≥1,5 V трубы)|LIC уровня · против срыва затвора','main');
-  g+=pr('M843 455 L790 455','main');
+  g+=bx(810,430,192,48,'ГИДРОЗАТВОР НИТКИ 1','бак ≥ 1,5–2 м³ (≥1,5 V трубы)|LIC уровня · против срыва затвора','main');
+  g+=pr('M810 455 L790 455','main');
   g+=T(786,449,'на градирню кислой СОВ · 27,4 °C',{a:'end'})+T(786,461,'участок итого: 568 м³/ч · ≈3,1–3,2 МВт',{a:'end',f:'var(--mut)'});
   /* ---------- ПЭБ ---------- */
-  g+=pr('M996 100 L1062 100','vac');
-  g+=T(1000,113,'парогазовая',{f:C.vac})+T(1000,124,'смесь (ПГС)',{f:C.vac})+T(1000,135,'0,06–0,08 атм',{f:'var(--mut)',s:8});
+  g+=pr('M1004 100 L1062 100','vac');
+  g+=T(1008,113,'парогазовая',{f:C.vac})+T(1008,124,'смесь (ПГС)',{f:C.vac})+T(1008,135,'0,06–0,08 атм',{f:'var(--mut)',s:8});
   g+=`<rect x="1064" y="88" width="32" height="24" fill="none" stroke="${C.vac}" stroke-width="1.4"/>`
     +`<path d="M1070 112 L1090 112 L1094 140 L1066 140 Z" fill="none" stroke="${C.vac}" stroke-width="1.4"/>`;
   g+=ln('M1080 44 L1080 53','hot')+vlvV(1080,62,'hot')+pr('M1080 71 L1080 86','hot');
@@ -2119,7 +2146,7 @@ function svgPid2(){
   g+=bx(1090,238,88,64,'ВВН1-6','водокольцевой|вакуум-насос|неконденс. газы','vac');
   g+=pr('M1134 302 L1134 322','vac',1.3)+T(1134,334,'выхлоп',{a:'middle',f:C.vac});
   g+=ln('M1045 214 L1045 446','main',1.8);
-  g+=T(1036,322,'труба ПЭБ Dу 100–125',{r:1,a:'middle',f:C.main});
+  g+=T(1036,322,'труба ПЭБ Ду 100–125',{r:1,a:'middle',f:C.main});
   g+=bx(1006,446,96,44,'ГИДРОЗАТВОР','ПЭБ · LIC уровня','main');
   
   /* ================= легенда ================= */
@@ -2183,7 +2210,7 @@ function svgLay2(){
   for(const a of AX) for(let k=0;k<=18;k++) g+=`<rect x="${px(a)-1.3}" y="${pz(k*6)-1.3}" width="2.6" height="2.6" fill="var(--ink2)"/>`;
   g+=`<rect x="${px(0)}" y="${pz(0)}" width="${96*PS}" height="${108*PS}" fill="none" stroke="var(--ink)" stroke-width="1.8"/>`;
   /* блок участка в среднем 24-м пролёте (оси 48–72), 3 шага (18 м) */
-  g+=ko(216,177,132,12)+`<text x="260" y="186" font-size="7.8" font-weight="800" fill="var(--good)" text-anchor="middle">УЧАСТОК КУПОРОСОВ — ПРЕДЛОЖЕНИЕ БИ</text>`;
+  g+=ko(138,177,206,12)+`<text x="240" y="186" font-size="7.8" font-weight="800" fill="var(--good)" text-anchor="middle">УЧАСТОК КУПОРОСОВ — ПРЕДЛОЖЕНИЕ БИ</text>`;
   g+=ko(234,214,52,20)+`<text x="260" y="222" font-size="7.2" fill="var(--good)" text-anchor="middle">24 × 12–18 м</text>`
     +`<text x="260" y="231" font-size="7.2" fill="var(--good)" text-anchor="middle">(2–3 шага)</text>`;
   g+=`<rect x="${px(48)}" y="${pz(45)}" width="${24*PS}" height="${18*PS}" fill="none" stroke="var(--good)" stroke-width="1.7" stroke-dasharray="6 4"/>`;
@@ -2382,7 +2409,7 @@ function svgLay4(){
   /* весы приёмки: демаркация + платформа */
   g+=`<rect x="${px(3.6)}" y="${py(9.9)}" width="${(3.8*S).toFixed(1)}" height="${(4.2*S).toFixed(1)}" fill="none" stroke="#a34e9e" stroke-width=".9" stroke-dasharray="4 3"/>`;
   g+=`<rect x="${px(4)}" y="${py(10.3)}" width="${(3*S).toFixed(1)}" height="${(3.4*S).toFixed(1)}" fill="none" stroke="#a34e9e" stroke-width="1.5"/>`;
-  g+=tt(px(5.5),192,'весы',7.5,'#a34e9e','middle',1)+tt(px(5.5),201,'3 т',7.5,'#a34e9e','middle');
+  g+=tt(px(5.5),192,'весы',6.3,'#a34e9e','middle',1)+tt(px(5.5),200,'3 т',6.3,'#a34e9e','middle');
   /* разбраковка */
   g+=`<rect x="${px(2)}" y="${py(16)}" width="${(6*S).toFixed(1)}" height="${(5*S).toFixed(1)}" fill="none" stroke="var(--crit)" stroke-width="1.4"/>`;
   g+=tt(px(5),231,'разбра-',7.5,'var(--crit)','middle',1)+tt(px(5),240.5,'ковка',7.5,'var(--crit)','middle',1);
@@ -2393,7 +2420,7 @@ function svgLay4(){
   g+=`<path d="M${px(5)} 180 L${px(5)} 171" stroke="var(--s1)" stroke-width="1.1" stroke-dasharray="4 3" fill="none" marker-end="url(#mk-lay4)"/>`;
   /* увязка/маркировка */
   g+=`<rect x="${px(10.5)}" y="${py(9.8)}" width="${(5*S).toFixed(1)}" height="${(4.4*S).toFixed(1)}" fill="none" stroke="var(--s1)" stroke-width="1.6"/>`;
-  g+=tt(px(13),190,'увязка',7.5,'var(--s1)','middle',1)+tt(px(13),199,'маркир.',7.5,'var(--s1)','middle',1);
+  g+=tt(px(13),190,'увязка',6.3,'var(--s1)','middle',1)+tt(px(13),198,'маркир.',6.3,'var(--s1)','middle',1);
   /* зарядная/операторская (размещение — предложение БИ) */
   g+=`<rect x="${px(10)}" y="${py(2)}" width="${(5.5*S).toFixed(1)}" height="${(5.5*S).toFixed(1)}" fill="none" stroke="var(--warn)" stroke-width="1.2" stroke-dasharray="5 4"/>`;
   g+=`<line x1="${px(12.75)}" y1="${py(2)}" x2="${px(12.75)}" y2="117" stroke="var(--mut)" stroke-width=".7"/>`;
@@ -2486,10 +2513,10 @@ function svgLay4(){
   g+=bx(96,364,152,62,'КОНВЕЙЕР ПРИЁМКИ','от КСМ (Лот №3), через|передаточные ворота|3,5 пак./ч, пик до 7','main');
   g+=bx(282,364,156,62,'ВЕСЫ ПРИЁМКИ','платформенные конвейерные|НПВ 3 т · класс «высокий»|допуск 2500 ± 50 кг','meas');
   g+=bx(472,364,156,62,'УВЯЗКА · МАРКИРОВКА','контроль/дотяжка увязки|(3 ленты) · этикетирование|партийная маркировка','main');
-  g+=bx(662,364,136,62,'ВЫДАЧА НА ШТАБЕЛЁР','по размеченным линиям|в стопы до 2 ярусов|→ адресное хранение','main');
+  g+=bx(648,364,164,62,'ВЫДАЧА НА ШТАБЕЛЁР','по размеченным линиям|в стопы до 2 ярусов|→ адресное хранение','main');
   g+=`<path d="M248 395 L282 395" stroke="var(--s1)" stroke-width="1.7" fill="none" marker-end="url(#mk-lay4)"/>`;
   g+=`<path d="M438 395 L472 395" stroke="var(--s1)" stroke-width="1.7" fill="none" marker-end="url(#mk-lay4)"/>`;
-  g+=`<path d="M628 395 L662 395" stroke="var(--s1)" stroke-width="1.7" fill="none" marker-end="url(#mk-lay4)"/>`;
+  g+=`<path d="M628 395 L648 395" stroke="var(--s1)" stroke-width="1.7" fill="none" marker-end="url(#mk-lay4)"/>`;
   g+=bx(262,452,120,52,'РАЗБРАКОВКА','вне допуска массы|переукладка по АСУ','crit');
   g+=bx(398,452,130,52,'СВЕРЛОВКА ПРОБ','часть катодов|по заданию АСУ','main');
   g+=`<path d="M330 426 L330 452" stroke="var(--crit)" stroke-width="1.3" stroke-dasharray="4 3" fill="none" marker-end="url(#mk-lay4)"/>`;
@@ -2597,12 +2624,26 @@ function rBI(){
       <b style="flex:0 0 46px;text-align:right;color:${c}">${r.now} %</b>
       <div class="mut" style="flex:1 1 100%;margin-left:2px">закрывает: ${esc(r.gap)}</div>
     </div>`;}).join('')}`:''}
+  ${AUDIT?`<h2>Аудит цифр — журнал подтверждённых находок</h2>
+  <div class="box info"><b>Как проверяем.</b> ${esc(AUDIT.note)}</div>
+  <div class="k">
+    <div class="tile"><b>${AUDIT.stats.zones}</b><span>зон проверено</span></div>
+    <div class="tile"><b class="mid">${AUDIT.stats.raw}</b><span>сырых находок</span></div>
+    <div class="tile"><b class="hi">${AUDIT.stats.confirmed}</b><span>подтверждено скептиками</span></div>
+    <div class="tile"><b>${AUDIT.stats.in_verify?'идёт':'завершена'}</b><span>верификация остальных</span></div>
+  </div>
+  <div class="tblwrap"><table><thead><tr><th style="width:190px">Зона</th><th style="width:90px">Вес</th><th>Суть</th><th>Что делаем</th><th style="width:110px">Статус</th></tr></thead><tbody>
+  ${AUDIT.items.map(a=>`<tr><td><b>${esc(a.zone)}</b></td>
+    <td><span class="${a.sev==='high'?'hi':(a.sev==='med'?'mid':'lo')}">${a.sev==='high'?'серьёзная':(a.sev==='med'?'существенная':'мелкая')}</span></td>
+    <td>${esc(a.what)}</td><td class="mut">${esc(a.fix)}</td>
+    <td><span class="${a.status==='done'?'tag lot3':'tag lot2'}">${a.status==='done'?'исправлено':'в очереди правок'}</span></td></tr>`).join('')}
+  </tbody></table></div>`:''}
   ${rGantt()}
   ${BIDOCS?`<h2>Документы БИ — формирование и согласование с Заказчиком</h2>
   <div class="box info">${esc(BIDOCS.note)}</div>
   ${BIDOCS.lots.map(L=>`<div class="card">
     <h3>${lotTag(L.lot)} ${esc(L.name)}
-      <span class="tag lot3">${L.docs.filter(d=>d.status==='draft').length} черновиков</span>
+      <span class="tag lot3">${(n=>`${n} ${plural(n,'черновик','черновика','черновиков')}`)(L.docs.filter(d=>d.status==='draft').length)}</span>
       <span class="tag">${L.docs.length} документов</span></h3>
     <div class="tblwrap"><table><thead><tr><th>Документ</th><th style="width:60px">Этап</th>
       <th style="width:150px">Статус</th><th style="width:60px">Файл</th><th>Примечание</th></tr></thead><tbody>
@@ -2618,7 +2659,7 @@ function rBI(){
   <div class="box info"><b>Как это работает.</b> Каждая ревизия — полный срез всех сгенерированных документов на момент вехи, с динамикой по каждому файлу против прошлой ревизии. Старые ревизии не перезаписываются: любую версию любого документа можно открыть и сравнить. Точечная история правок — в git-журнале репозитория; здесь — крупные срезы для согласования командой и Заказчиком.</div>
   ${[...REVS.revisions].reverse().map(r=>{
     const ST={new:['новый','tag lot2'],changed:['изменён','tag lot1'],same:['без изменений','tag']};
-    return `<div class="card"><h3>Р${r.id} · ${esc(r.date)} · ${esc(r.label)}
+    return `<div class="card"><h3>Р${r.id} · ${esc(r.date)} · ${esc(String(r.label||'').replace(/^Р\d+\s*[—–-]\s*/,''))}
       <span class="tag lot3">${r.files.length} файлов</span>
       ${r.counts.new?`<span class="tag lot2">${r.counts.new} новых</span>`:''}
       ${r.counts.changed?`<span class="tag lot1">${r.counts.changed} изменённых</span>`:''}
@@ -2634,9 +2675,9 @@ function rBI(){
     </div>`;}).join('')}`:''}
   ${ECO?`<h2>Экология / ООС — предварительно, из посчитанных балансов</h2>
   <div class="box info">${esc(ECO.note)}</div>
-  <div class="grid2">${ECO.sections.map(s=>`<div class="card"><h3>${esc(s.title)}</h3>
-    ${(s.items||[]).length?`<div class="tblwrap"><table><tbody>${s.items.map(i=>`<tr><td>${esc(i.label)}</td><td><b>${md(String(i.value))}</b></td><td class="mut">${esc(i.src||'')}</td></tr>`).join('')}</tbody></table></div>`:''}
-    ${s.note?`<p class="mut">${esc(s.note)}</p>`:''}</div>`).join('')}</div>
+  ${ECO.sections.map(s=>`<div class="card"><h3>${esc(s.title)}</h3>
+    ${(s.items||[]).length?`<div class="tblwrap"><table><tbody>${s.items.map(i=>`<tr><td>${esc(i.label)}</td><td><b>${md(String(i.value))}</b>${i.src?`<div class="mut">${esc(i.src)}</div>`:''}</td></tr>`).join('')}</tbody></table></div>`:''}
+    ${s.note?`<p class="mut">${esc(s.note)}</p>`:''}</div>`).join('')}
 `:''}
   <h2>Графические заготовки — с чего инженеру начать чертежи</h2>
   <div class="box info"><b>Что это.</b> Первые эскизы графической части, построенные из данных базы (ИД, расчётная модель, черновики ПЗ). Это стартовые подложки для CAD, а не выпущенные чертежи: инженер проверяет, переносит в CAD и дорабатывает. SVG скачивается кнопкой и открывается в любом векторном редакторе (Inkscape, CorelDRAW, nanoCAD через импорт).</div>
@@ -2848,7 +2889,7 @@ function qPaint(){
   const rows = qRows();
   el.innerHTML = rows.slice(0,300).map(x=>`<div class="card qcard">
     <h3><span class="${SEV[x.sev][1]}">${esc(x.id)}</span> ${esc(x.title)}
-      ${lotTag(x.lot)}<span class="tag">${esc(x.kind)}</span><span class="tag">${SEV[x.sev][0]}</span></h3>
+      ${lotTag(x.lot)}${x.kind&&x.kind!==SEV[x.sev][0]?`<span class="tag">${esc(x.kind)}</span>`:''}<span class="tag">${SEV[x.sev][0]}</span></h3>
     ${x.a?`<div class="vs"><div><b>Документ говорит:</b><div class="quote">${esc(x.a)}</div></div>
       <div><b>А здесь говорит иначе:</b><div class="quote">${esc(x.b)}</div></div></div>`:''}
     ${x.why?`<p class="mut"><b>Почему это важно:</b> ${esc(x.why)}</p>`:''}
@@ -3122,6 +3163,7 @@ function dPaint(){
   </div>`).join('') || '<div class="box mut">Под фильтр ничего не попало</div>';
   const done = DISC.items.filter(x=>ansOf(x.id).trim()).length;
   document.getElementById('dcount').textContent = `${rows.length} из ${DISC.items.length} · решено ${done}`;
+  const dt = document.getElementById('dtdone'); if(dt) dt.textContent = done;
 }
 function dLetter(){
   const pick = DISC.items.filter(x=>stOf(x.id)!=='closed' && !ansOf(x.id).trim()
@@ -3179,7 +3221,7 @@ function rDisc(){
     <div class="tile"><b>${bySev.minor||0}</b><span>формальных</span></div>
     <div class="tile"><b style="color:var(--good)">${DISC.items.filter(x=>x.v41&&x.v41.s==='off').length}</b><span>снято редакцией v4.1</span></div>
     <div class="tile"><b class="mid">${DISC.items.filter(x=>x.v41&&x.v41.s==='new').length}</b><span>новых в v4.1</span></div>
-    <div class="tile"><b>${DISC.items.filter(x=>ansOf(x.id).trim()).length}</b><span>решено с Заказчиком</span></div>
+    <div class="tile"><b id="dtdone">${DISC.items.filter(x=>ansOf(x.id).trim()).length}</b><span>решено с Заказчиком</span></div>
     <div class="tile"><b>${DISC.items.length}</b><span>всего в реестре</span></div>
   </div>
   <div class="filters">
@@ -3639,7 +3681,7 @@ const XP = {
     if(BX&&Array.isArray(BX.companies)&&BX.companies.length) s.push(objSheet('Bitrix — компании',BX.companies));
     return s; },
   capex: ()=>{ if(!CAPEX) return null;
-    const s=[objSheet('Оборудование',CAPEX.equipment), objSheet('Прочие затраты',CAPEX.nonequip), objSheet('Бенчмарк',CAPEX.benchmark)];
+    const s=[objSheet('Оборудование',CAPEX.equipment), objSheet('Прочие затраты',CAPEX.nonequip), objSheet('Бенчмарк',CAPEX.benchmark&&CAPEX.benchmark.rows)];
     if(CAPEX.params) s.push({name:'Параметры модели',rows:[['Параметр','Значение'],...Object.entries(CAPEX.params).map(([k,v])=>[k,String(xFlat(v))])]});
     if(CAPEX.notes) s.push({name:'Примечания',rows:(Array.isArray(CAPEX.notes)?CAPEX.notes:[CAPEX.notes]).map(x=>[String(xFlat(x))])});
     return s; },
@@ -3741,6 +3783,7 @@ function show(id){
     if(id==='capex') bindCapex();
     if(id==='bi') bindBI();
     if(id==='sup') bindSup();
+    if(id==='market') bindMkt();
     if(id==='questions') bindQ();
     if(id==='disc') bindDisc();
     if(id==='deliv') bindDeliv();

@@ -11,6 +11,7 @@
 """
 import hashlib
 import json
+import re
 import shutil
 import sys
 from datetime import date
@@ -30,6 +31,9 @@ def _files():
 
 
 def cut(label: str, note: str = "") -> None:
+    # номер ревизии сайт печатает сам («Р{id} · дата · label») — префикс «Р{N} — » в метке
+    # даёт дубль «Р1 · … · Р1 — …», поэтому срезаем его из переданной метки
+    label = re.sub(r"^Р\d+\s*[—–-]\s*", "", label.strip())
     man = {"revisions": []}
     if MANIFEST.exists():
         man = json.loads(MANIFEST.read_text(encoding="utf-8"))

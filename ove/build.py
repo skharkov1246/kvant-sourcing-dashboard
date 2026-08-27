@@ -59,6 +59,7 @@ OPTIONAL = {
     "__READY_JSON__": "readiness.json",
     "__REVS_JSON__": "revisions.json",
     "__ECO_JSON__": "eco_prelim.json",
+    "__AUDIT_JSON__": "audit_log.json",
 }
 
 
@@ -121,6 +122,9 @@ def build() -> None:
     build_rfq.build()
     import build_bim_plan
     build_bim_plan.build()
+    # единые метаданные всех выпускаемых DOCX/PDF (автор — ООО «КВАНТ»)
+    import doc_meta
+    doc_meta.build()
 
     bx = json.loads((DATA / "bitrix_ove.json").read_text(encoding="utf-8"))
     eq = json.loads((DATA / "equipment.json").read_text(encoding="utf-8"))
