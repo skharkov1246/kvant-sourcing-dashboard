@@ -54,6 +54,7 @@ nav .subrow .xbtn{border-style:dashed;opacity:.85}
   body{background:#fff;color:#111}
   nav,#foot,.filters,.qgrid,button,textarea,select,input{display:none !important}
   .tblwrap{overflow:visible;border:none}
+  svg.gsvg{width:100% !important;height:auto !important}
   .card,.box,.tile,tr{break-inside:avoid}
   a{color:inherit;text-decoration:none}
   @page{size:A4;margin:12mm}
@@ -176,6 +177,7 @@ const CALC = __CALC_JSON__;
 const HEDGE = __HEDGE_JSON__;
 const BIDOCS = __BIDOCS_JSON__;
 const APPLY = __APPLY_JSON__;
+const GANTT = __GANTT_JSON__;
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const nf = (n,d=0) => (n===''||n===null||n===undefined||isNaN(n)) ? '—' : Number(n).toLocaleString('ru-RU',{minimumFractionDigits:d,maximumFractionDigits:d});
@@ -889,6 +891,205 @@ function rApply(){
   <div class="mut">Обновлено ${esc(APPLY.updated||'')}. Черновики пересобираются при каждой сборке сайта; итоговые файлы перед подачей — через владельца.</div>`;
 }
 
+/* ============ Гант выполнения БИ (SVG из GANTT) и графические заготовки ============ */
+function rGantt(){
+  if(!GANTT || !GANTT.tasks || !GANTT.tasks.length) return '';
+  const D=s=>new Date(s+'T12:00:00'), MS=86400e3;
+  const fmt=d=>String(d.getDate()).padStart(2,'0')+'.'+String(d.getMonth()+1).padStart(2,'0');
+  const ds=GANTT.tasks.map(t=>D(t.start)), de=GANTT.tasks.map(t=>D(t.end||t.start));
+  const min=new Date(Math.min(...ds)-4*MS), max=new Date(Math.max(...de)+11*MS);
+  const days=(max-min)/MS, LW=340, CW=812, RH=23, HH=36;
+  const rows=[];
+  GANTT.lanes.forEach(l=>{ rows.push({lane:l});
+    GANTT.tasks.filter(t=>t.lane===l.id).forEach(t=>rows.push({t,l})); });
+  const H=HH+rows.length*RH+30, W=LW+CW+12;
+  const X=d=>LW+(d-min)/MS/days*CW;
+  let g='';
+  /* месячные полосы и подписи, недельные линии */
+  const MN=['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек'];
+  let m=new Date(min.getFullYear(),min.getMonth(),1,12);
+  for(let i=0;m<max;i++){
+    const m2=new Date(m.getFullYear(),m.getMonth()+1,1,12);
+    const x1=Math.max(X(m),LW), x2=Math.min(X(m2),LW+CW);
+    if(x2>x1){
+      if(i%2) g+=`<rect x="${x1.toFixed(1)}" y="${HH}" width="${(x2-x1).toFixed(1)}" height="${H-HH-26}" fill="rgba(127,127,127,.06)"/>`;
+      g+=`<line x1="${x1.toFixed(1)}" y1="${HH-14}" x2="${x1.toFixed(1)}" y2="${H-26}" stroke="var(--border)" stroke-width="1"/>`;
+      if(x2-x1>34) g+=`<text x="${(x1+4).toFixed(1)}" y="${HH-4}" font-size="11" font-weight="700" fill="var(--ink2)">${MN[m.getMonth()]} ${String(m.getFullYear()).slice(2)}</text>`;
+    }
+    m=m2;
+  }
+  for(let d=new Date(min); d<max; d=new Date(+d+MS))
+    if(d.getDay()===1){ const x=X(d).toFixed(1);
+      g+=`<line x1="${x}" y1="${HH}" x2="${x}" y2="${H-26}" stroke="var(--border)" stroke-width=".5" opacity=".45"/>`; }
+  /* строки */
+  let y=HH, ri=0;
+  for(const r of rows){
+    if(r.lane){
+      g+=`<line x1="4" y1="${y+RH-4}" x2="${W-6}" y2="${y+RH-4}" stroke="${r.lane.color}" stroke-width="1" opacity=".55"/>`
+        +`<text x="6" y="${y+15}" font-size="11.5" font-weight="800" fill="${r.lane.color}">${esc(r.lane.name).toUpperCase()}</text>`;
+      y+=RH; ri=0; continue;
+    }
+    if(ri%2) g+=`<rect x="4" y="${y}" width="${W-10}" height="${RH}" fill="rgba(127,127,127,.05)"/>`;
+    const t=r.t, s=D(t.start), e=D(t.end||t.start);
+    const nm=t.name.length>56?t.name.slice(0,55)+'…':t.name;
+    g+=`<text x="14" y="${y+15}" font-size="11" fill="var(--ink)">${esc(nm)}</text>`;
+    if(t.milestone){
+      const x=X(s), cy=y+RH/2;
+      g+=`<path d="M${x} ${cy-7} L${x+7} ${cy} L${x} ${cy+7} L${x-7} ${cy} Z" fill="${r.l.color}" stroke="var(--ink)" stroke-width="1.2"/>`
+        +`<text x="${x+11}" y="${y+15}" font-size="10" font-weight="700" fill="var(--ink2)">${fmt(s)}</text>`;
+    }else{
+      const x1=X(s), x2=X(new Date(+e+MS)), bw=Math.max(x2-x1,3);
+      g+=`<rect x="${x1.toFixed(1)}" y="${y+5}" width="${bw.toFixed(1)}" height="${RH-10}" rx="4" fill="${r.l.color}" opacity=".9"${t.crit?' stroke="var(--crit)" stroke-width="1.8"':''}/>`;
+      const lbl=fmt(s)+'–'+fmt(e);
+      g+= (x2+62<LW+CW) ? `<text x="${(x2+5).toFixed(1)}" y="${y+15}" font-size="9.5" fill="var(--mut)">${lbl}</text>`
+                        : `<text x="${(x1-5).toFixed(1)}" y="${y+15}" font-size="9.5" fill="var(--mut)" text-anchor="end">${lbl}</text>`;
+    }
+    y+=RH; ri++;
+  }
+  /* линии T0, Новый год, сегодня */
+  const mark=(d,color,lbl,dash)=>{ if(d<min||d>max) return '';
+    const x=X(d).toFixed(1);
+    return `<line x1="${x}" y1="${HH-14}" x2="${x}" y2="${H-26}" stroke="${color}" stroke-width="1.4"${dash?' stroke-dasharray="5 4"':''}/>`
+      +`<text x="${x}" y="${H-14}" font-size="10" font-weight="700" fill="${color}" text-anchor="middle">${lbl}</text>`; };
+  g+=mark(D(GANTT.t0),'var(--ink2)','T0 — старт работ',0);
+  g+=mark(new Date(2026,11,31,12),'var(--crit)','НГ',1);
+  const now=new Date(); if(now>min&&now<max) g+=mark(now,'var(--warn)','сегодня',1);
+  return `
+  <h2>График выполнения БИ (план до Нового года)</h2>
+  <div class="box info"><b>Гант.</b> ${esc(GANTT.note)}</div>
+  <div class="tblwrap" style="padding:8px 4px"><svg id="gantt-svg" class="gsvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" style="width:${W}px;max-width:none;display:block;font-family:system-ui,sans-serif">
+    <rect x="0" y="0" width="${W}" height="${H}" fill="var(--surface)"/>${g}</svg></div>
+  <div class="filters"><button class="btn" data-dl="gantt-svg" data-fn="ove75-gantt-bi.svg">⬇ SVG</button>
+    <span class="mut">Красная рамка — критический путь; ромб — веха; вертикали — T0 (старт), «сегодня», Новый год. Правка сроков — ove/data/gantt.json.</span></div>`;
+}
+
+/* --- эскиз 1: PFD Лота №1 (цех обжига) — по ИД табл. 22–23 и черновику ПЗ --- */
+function svgPfd1(){
+  const bx=(x,y,w,h,t1,t2,cls)=>{
+    const c={main:'var(--s1)',hot:'#e07f2e',dust:'#a34e9e',out:'var(--good)',aux:'var(--mut)'}[cls||'main'];
+    let s=`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="7" fill="none" stroke="${c}" stroke-width="1.6"/>`
+      +`<text x="${x+w/2}" y="${y+(t2?18:h/2+4)}" font-size="11.5" font-weight="700" fill="var(--ink)" text-anchor="middle">${t1}</text>`;
+    if(t2) t2.split('|').forEach((ln,i)=>{ s+=`<text x="${x+w/2}" y="${y+32+i*12}" font-size="9.5" fill="var(--ink2)" text-anchor="middle">${ln}</text>`; });
+    return s; };
+  const ar=(x1,y1,x2,y2,lbl,cls,mid)=>{
+    const c={gas:'#e07f2e',sol:'var(--s1)',dust:'#a34e9e',air:'var(--mut)'}[cls||'sol'];
+    let s=`<path d="M${x1} ${y1} ${mid?`L${mid[0]} ${mid[1]} L${mid[2]||mid[0]} ${y2}`:''} L${x2} ${y2}" fill="none" stroke="${c}" stroke-width="1.7" marker-end="url(#mkA)"/>`;
+    if(lbl) s+=`<text x="${(x1+x2)/2}" y="${(y1===y2?y1:(y1+y2)/2)-5}" font-size="9.3" fill="${c}" text-anchor="middle">${lbl}</text>`;
+    return s; };
+  let g='';
+  /* верхний ряд — газовый тракт */
+  g+=bx(315,60,150,66,'ПЕЧЬ КС','обжиг в кипящем слое|шихта 15,45 т/ч (макс)|автогенно: 36,7 ГДж/ч','hot');
+  g+=bx(520,60,128,66,'КОТЁЛ-УТИЛИЗАТОР','газ 882,8 → 400 °C|пар 1,9 МПа / 375 °C|~4,1 т/ч','hot');
+  g+=bx(690,60,96,66,'ЦИКЛОНЫ','пыль|8 165 т/год','dust');
+  g+=bx(826,60,110,66,'ЭЛЕКТРОФИЛЬТР','пыль 2 916 т/год|очистка до СКЦ','dust');
+  g+=bx(976,72,86,44,'ДЫМОСОС','','hot');
+  g+=bx(1090,48,84,90,'В СКЦ','13 262 нм³/ч|387 °C, Ø1100|сера в газ|21,3 тыс. т/год','out');
+  g+=ar(465,93,520,93,'газ 882,8 °C','gas'); g+=ar(648,93,690,93,'400 °C','gas');
+  g+=ar(786,93,826,93,'','gas'); g+=ar(936,93,976,93,'387 °C','gas'); g+=ar(1062,93,1090,93,'','gas');
+  /* подготовка кека — левый столбец вниз */
+  g+=bx(20,40,150,50,'ФИЛЬТРАЦИЯ КЕКА','вакуум-фильтры 2×32 м²|фильтрат → возврат в ОРФ');
+  g+=bx(20,130,150,44,'КОНВЕЙЕРЫ КЕКА','сборный + наклонный');
+  g+=bx(20,214,150,50,'РАСХОДНЫЕ БУНКЕРЫ','2 × 60 м³|+ приёмные бункеры');
+  g+=ar(95,90,95,130,'','sol',null); g+=ar(95,174,95,214,'','sol',null);
+  g+=`<path d="M170 239 L240 239 L240 110 L315 110" fill="none" stroke="var(--s1)" stroke-width="1.7" marker-end="url(#mkA)"/>`
+    +`<text x="243" y="170" font-size="9.3" fill="var(--s1)">шихта</text>`;
+  /* дутьё */
+  g+=bx(230,300,158,44,'ВОЗДУХОДУВКА ДУТЬЯ','шумоизолированный бокс|короткий напорный тракт','aux');
+  g+=`<path d="M340 300 L340 126" fill="none" stroke="var(--mut)" stroke-width="1.7" marker-end="url(#mkA)"/>`
+    +`<text x="345" y="220" font-size="9.3" fill="var(--mut)">дутьё в возд. коробку</text>`;
+  /* огарок вниз от печи */
+  g+=bx(460,210,150,50,'ХОЛОДИЛЬНИКИ ОГАРКА','донная выгрузка печи|огарок 19,5 % расхода','hot');
+  g+=bx(660,210,150,50,'КОНВЕЙЕРЫ ОГАРКА','тракт огарка и пыли');
+  g+=bx(880,196,214,78,'НА ВЫЩЕЛАЧИВАНИЕ','огарок 81,9 тыс. т/год (77,0 %)|+ пыли 20,2 тыс. т/год (19,0 %)|сера: в огарке 0,2 %, в пыли 2,2 %|граница проектирования Лота №1','out');
+  g+=`<path d="M395 126 L395 235 L460 235" fill="none" stroke="#e07f2e" stroke-width="1.7" marker-end="url(#mkA)"/>`
+    +`<text x="400" y="180" font-size="9.3" fill="#e07f2e">огарок</text>`;
+  g+=ar(610,235,660,235,'','sol'); g+=ar(810,235,880,235,'','sol');
+  /* пыли КУ/циклонов/ЭФ вниз в тракт */
+  g+=`<path d="M584 126 L584 168 L720 168 L720 210" fill="none" stroke="#a34e9e" stroke-width="1.5" marker-end="url(#mkA)"/>`
+    +`<path d="M738 126 L738 210" fill="none" stroke="#a34e9e" stroke-width="1.5" marker-end="url(#mkA)"/>`
+    +`<path d="M881 126 L881 168 L760 168 L760 210" fill="none" stroke="#a34e9e" stroke-width="1.5" marker-end="url(#mkA)"/>`
+    +`<text x="598" y="160" font-size="9.3" fill="#a34e9e">пыль КУ 9 081 т/год</text>`
+    +`<text x="775" y="200" font-size="9.3" fill="#a34e9e">пыли циклонов и ЭФ</text>`;
+  /* аспирация */
+  g+=bx(460,300,330,44,'АСПИРАЦИЯ УЗЛОВ ПЕРЕСЫПКИ','рукавные фильтры; уловленная пыль — в тракт огарка (в СКЦ 14 т/год)','aux');
+  return `<svg id="pfd1-svg" class="gsvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1190 400" style="width:1190px;max-width:none;display:block;font-family:system-ui,sans-serif">
+    <defs><marker id="mkA" markerWidth="9" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0 0 L9 4 L0 8 Z" fill="context-stroke"/></marker></defs>
+    <rect x="0" y="0" width="1190" height="400" fill="var(--surface)"/>
+    <rect x="6" y="6" width="1178" height="388" fill="none" stroke="var(--border)"/>
+    <text x="20" y="382" font-size="10" fill="var(--mut)">ЭСКИЗ — не для строительства · PFD Лот №1 «Цех обжига» · потоки и параметры — ИД табл. 22–23 (проверены расчётной моделью) · КВАНТ, черновик БИ</text>
+    <text x="1174" y="30" font-size="12" font-weight="800" fill="var(--ink2)" text-anchor="end">PFD · ЛОТ №1 — ЦЕХ ОБЖИГА</text>${g}</svg>`;
+}
+
+/* --- эскиз 2: план корпуса ЭЭ, сценарий Б (новый корпус 190×36) — по черновику ПЗ Лота №3 --- */
+function svgEwPlan(){
+  const S=4.6, ox=80, oy=84;                       // 1 м = 4,6 px
+  const px=m=>ox+m*S, py=m=>oy+m*S;
+  let g='';
+  /* контур и средний ряд колонн */
+  g+=`<rect x="${px(0)}" y="${py(0)}" width="${190*S}" height="${36*S}" fill="none" stroke="var(--ink)" stroke-width="2"/>`;
+  for(const [row,ym] of [['А',0],['Б',18],['В',36]]){
+    for(let x=0;x<=190;x+=6) if(x<=186) g+=`<rect x="${px(x)-2.2}" y="${py(ym)-2.2}" width="4.4" height="4.4" fill="var(--ink2)"/>`;
+    g+=`<text x="${px(-4)}" y="${py(ym)+4}" font-size="11" font-weight="700" fill="var(--ink2)" text-anchor="middle">${row}</text>`;
+  }
+  g+=`<line x1="${px(0)}" y1="${py(18)}" x2="${px(190)}" y2="${py(18)}" stroke="var(--ink2)" stroke-width=".8" stroke-dasharray="7 5"/>`;
+  /* зоны по длине */
+  const zone=(a,b,t1,t2,color)=>{
+    g+=`<line x1="${px(a)}" y1="${py(0)}" x2="${px(a)}" y2="${py(36)}" stroke="var(--mut)" stroke-width=".8" stroke-dasharray="3 4"/>`;
+    g+=`<text x="${px((a+b)/2)}" y="${py(-6.4)}" font-size="10.5" font-weight="700" fill="${color||'var(--ink2)'}" text-anchor="middle">${t1}</text>`;
+    if(t2) g+=`<text x="${px((a+b)/2)}" y="${py(-3.4)}" font-size="9" fill="var(--mut)" text-anchor="middle">${t2}</text>`; };
+  zone(0,30,'КСМ — катодосдирочные машины','торцевая зона 30 м','var(--s1)');
+  zone(30,100,'СЕРИЯ 1 — 90 ванн','2 ряда × 45 ванн, ряд ≈70 м','#0ca30c');
+  zone(100,170,'СЕРИЯ 2 — 90 ванн','2 ряда × 45 ванн','#0ca30c');
+  zone(170,190,'ремонтно-','шламовая зона');
+  g+=`<line x1="${px(190)}" y1="${py(0)}" x2="${px(190)}" y2="${py(36)}" stroke="var(--mut)" stroke-width=".8"/>`;
+  /* ванны: ряд в каждом пролёте, длинной осью поперёк пролёта; шаг 1,55 м на зону 70 м */
+  const vats=(x0,ymid)=>{ for(let i=0;i<45;i++){ const x=x0+2.6+i*1.492;
+      g+=`<rect x="${px(x)}" y="${py(ymid-4.32)}" width="${1.315*S}" height="${8.645*S}" fill="rgba(42,120,214,.5)" stroke="var(--s1)" stroke-width=".5"/>`; } };
+  for(const x0 of [30,100]) for(const ym of [9,27]) vats(x0,ym);
+  g+=`<text x="${px(65)}" y="${py(2.6)}" font-size="9" font-weight="700" fill="var(--ink)" text-anchor="middle">ряд 45 ванн · габарит ванны 8,645 × 1,315 м · шаг 1,40–1,55 м · длинной осью поперёк пролёта</text>`;
+  /* краны */
+  g+=`<text x="${px(65)}" y="${py(16.4)}" font-size="9" fill="var(--crit)" text-anchor="middle">мостовой кран пролёта А–Б (обслуживание ванн, траверса матриц)</text>`
+    +`<text x="${px(135)}" y="${py(21.6)}" font-size="9" fill="var(--crit)" text-anchor="middle">мостовой кран пролёта Б–В</text>`;
+  /* пристройки */
+  g+=`<rect x="${px(88)}" y="${py(36)+6}" width="${26*S}" height="${13*S}" fill="none" stroke="#a34e9e" stroke-width="1.4" stroke-dasharray="6 4"/>`
+    +`<circle cx="${px(95)}" cy="${py(36)+6+6.5*S}" r="${4.2*S}" fill="none" stroke="#a34e9e" stroke-width="1.2"/>`
+    +`<circle cx="${px(106)}" cy="${py(36)+6+6.5*S}" r="${4.2*S}" fill="none" stroke="#a34e9e" stroke-width="1.2"/>`
+    +`<text x="${px(101)}" y="${py(36)+6+13*S+13}" font-size="9.5" fill="#a34e9e" text-anchor="middle">баковое хозяйство: циркбаки 2 × 300 м³ (отметка ниже ванн — самотёк), узлы реагентов</text>`;
+  g+=`<rect x="${px(30)}" y="${py(0)-8-9*S}" width="${140*S}" height="${9*S}" fill="none" stroke="var(--warn)" stroke-width="1.2" stroke-dasharray="6 4" transform="translate(0,-26)"/>`;
+  g+=`<text x="${px(100)}" y="${py(0)-14-9*S-26+5.2*S}" font-size="9.5" fill="var(--warn)" text-anchor="middle">зона выпрямительных агрегатов и КТП (интерфейс: ток серии ≤ 47 кА, U ≤ 225 В; поставка — вне лота)</text>`;
+  /* размерные линии */
+  const dim=(x1,y1,x2,y2,t,vert)=>{
+    g+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="var(--ink2)" stroke-width=".9" marker-start="url(#mkB)" marker-end="url(#mkB)"/>`
+      +(vert?`<text x="${x1-7}" y="${(y1+y2)/2}" font-size="10" font-weight="700" fill="var(--ink2)" text-anchor="middle" transform="rotate(-90 ${x1-7} ${(y1+y2)/2})">${t}</text>`
+            :`<text x="${(x1+x2)/2}" y="${y1-5}" font-size="10" font-weight="700" fill="var(--ink2)" text-anchor="middle">${t}</text>`); };
+  dim(px(0),py(36)+92,px(190),py(36)+92,'190 000 (сетка колонн 6/12 м по ТЗ п.3.5)');
+  dim(px(-13),py(0),px(-13),py(18),'18 000',1); dim(px(-13),py(18),px(-13),py(36),'18 000',1);
+  dim(px(196)+10,py(0),px(196)+10,py(36),'36 000',1);
+  return `<svg id="ew-svg" class="gsvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1190 460" style="width:1190px;max-width:none;display:block;font-family:system-ui,sans-serif">
+    <defs><marker id="mkB" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto"><path d="M2 8 L8 2" stroke="context-stroke" stroke-width="1.6"/></marker></defs>
+    <rect x="0" y="0" width="1190" height="460" fill="var(--surface)"/>
+    <rect x="6" y="6" width="1178" height="448" fill="none" stroke="var(--border)"/>
+    <text x="20" y="444" font-size="10" fill="var(--mut)">ЭСКИЗ — не для строительства · Лот №3, сценарий Б (базовый): новый корпус ЭЭ 190 × 36 м, 2 пролёта по 18 м · проверка размещения — черновик ПЗ Лота №3 · КВАНТ, черновик БИ</text>
+    <text x="1174" y="30" font-size="12" font-weight="800" fill="var(--ink2)" text-anchor="end">ПЛАН · ЛОТ №3 — КОРПУС ЭЛЕКТРОЭКСТРАКЦИИ</text>
+    <g transform="translate(0,40)">${g}</g></svg>`;
+}
+/* манифест графических заготовок вкладки «Базовый проект»: добавление листа = функция + строка здесь */
+const SKETCHES = [
+ {f:svgPfd1, id:'pfd1-svg', dl:'ove75-lot1-pfd-eskiz.svg', lot:1, title:'PFD · Лот №1 — цех обжига',
+  cap:'Газовый тракт — оранжевым, пылевые потоки — фиолетовым, огарок/кек — синим, границы проектирования — зелёным. Числа — из ИД табл. 22–23.'},
+ {f:svgEwPlan, id:'ew-svg', dl:'ove75-lot3-plan-ew-eskiz.svg', lot:3, title:'План · Лот №3 — корпус электроэкстракции (сценарий Б)',
+  cap:'Раскладка 180 ванн по проверке размещения из черновика ПЗ; пунктир — предложения БИ (пристройки), подлежат подтверждению генпланом.'},
+];
+function dlSvg(id,fn){
+  const el=document.getElementById(id); if(!el) return;
+  const cs=getComputedStyle(document.body);
+  const s='<?xml version="1.0" encoding="UTF-8"?>\n'+
+    el.outerHTML.replace(/var\((--[a-z0-9-]+)\)/gi,(m,v)=>cs.getPropertyValue(v).trim()||'#444');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([s],{type:'image/svg+xml'}));
+  a.download=fn; a.click();
+}
+
 function rBI(){
   if(!BI.length) return `<div class="box warn"><b>Раздел собирается.</b> Здесь будет черновик Базового инжиниринга по каждому лоту: описание техпроцесса по операциям, материальные и тепловые балансы, PFD и P&amp;ID с контурами регулирования и блокировками, компоновочные решения с нагрузками на конструкции и фундаменты, спецификации оборудования и КИПиА, схема КТС АСУ — с привязкой каждого раздела к действующим ГОСТ, СП, ПУЭ и ФНП.</div>`;
   const nSec = BI.reduce((a,d)=>a+d.sections.length,0);
@@ -902,6 +1103,7 @@ function rBI(){
     <div class="tile"><b>${nGost}</b><span>нормативов привязано</span></div>
     <div class="tile"><b>${nOpen}</b><span>открытых вопросов</span></div>
   </div>
+  ${rGantt()}
   ${BIDOCS?`<h2>Документы БИ — формирование и согласование с Заказчиком</h2>
   <div class="box info">${esc(BIDOCS.note)}</div>
   ${BIDOCS.lots.map(L=>`<div class="card">
@@ -918,6 +1120,12 @@ function rBI(){
         <td>${d.file?`<a class="btn" href="${esc(d.file)}" download>⬇</a>`:'—'}</td>
         <td class="mut">${esc(d.note||'')}</td></tr>`;}).join('')}
     </tbody></table></div></div>`).join('')}`:''}
+  <h2>Графические заготовки — с чего инженеру начать чертежи</h2>
+  <div class="box info"><b>Что это.</b> Первые эскизы графической части, построенные из данных базы (ИД, расчётная модель, черновики ПЗ). Это стартовые подложки для CAD, а не выпущенные чертежи: инженер проверяет, переносит в CAD и дорабатывает. SVG скачивается кнопкой и открывается в любом векторном редакторе (Inkscape, CorelDRAW, nanoCAD через импорт).</div>
+  ${SKETCHES.map(s=>`<div class="card"><h3>${esc(s.title)} ${s.lot?lotTag(s.lot):'<span class="tag">все лоты</span>'} <span class="tag">эскиз v0.1</span></h3>
+    <div class="tblwrap" style="padding:6px 4px">${s.f()}</div>
+    <div class="filters"><button class="btn" data-dl="${s.id}" data-fn="${s.dl}">⬇ SVG</button>
+      <span class="mut">${esc(s.cap)}</span></div></div>`).join('')}
   <h2>Черновик по разделам</h2>
   <div class="filters">${BI.map((d,i)=>`<button class="btn bilot${i===biLot?' on':''}" data-i="${i}">${lotTag(d.lot)} ${esc(d.name)}</button>`).join('')}</div>
   <div id="bibody"></div>`;
@@ -1978,6 +2186,7 @@ function bindEquip(){
   eqPaint();
 }
 function bindBI(){
+  document.querySelectorAll('#s-bi [data-dl]').forEach(b=>b.addEventListener('click', ()=>dlSvg(b.dataset.dl, b.dataset.fn)));
   if(!BI.length) return;
   document.querySelectorAll('.bilot').forEach(b=>b.addEventListener('click', ()=>{
     biLot = Number(b.dataset.i);
