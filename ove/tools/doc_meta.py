@@ -31,7 +31,25 @@ def docx(p: Path) -> None:
     src = zipfile.ZipFile(p)
     names = src.namelist()
     if "docProps/core.xml" in names:
+        core = src.read("docProps/core.xml").decode("utf-8", errors="ignore")
+        if ORG in core:
+            src.close()
+            return
+        # чужой автор (например, статический шаблон) — переписываем поля
+        tmp = p.with_suffix(".docx.tmp")
+        with zipfile.ZipFile(tmp, "w", zipfile.ZIP_DEFLATED) as out:
+            for n in names:
+                data = src.read(n)
+                if n == "docProps/core.xml":
+                    c = data.decode("utf-8", errors="ignore")
+                    c = re.sub(r"<dc:creator>[^<]*</dc:creator>", f"<dc:creator>{ORG}</dc:creator>", c)
+                    c = re.sub(r"<cp:lastModifiedBy>[^<]*</cp:lastModifiedBy>", f"<cp:lastModifiedBy>{ORG}</cp:lastModifiedBy>", c)
+                    if "<dc:creator>" not in c:
+                        c = c.replace("</cp:coreProperties>", f"<dc:creator>{ORG}</dc:creator></cp:coreProperties>")
+                    data = c.encode("utf-8")
+                out.writestr(n, data)
         src.close()
+        shutil.move(tmp, p)
         return
     tmp = p.with_suffix(".docx.tmp")
     with zipfile.ZipFile(tmp, "w", zipfile.ZIP_DEFLATED) as out:
