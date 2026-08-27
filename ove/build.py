@@ -59,6 +59,7 @@ OPTIONAL = {
     "__READY_JSON__": "readiness.json",
     "__REVS_JSON__": "revisions.json",
     "__ECO_JSON__": "eco_prelim.json",
+    "__AUDIT_JSON__": "audit_log.json",
 }
 
 

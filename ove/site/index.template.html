@@ -188,6 +188,7 @@ const GANTT = __GANTT_JSON__;
 const READY = __READY_JSON__;
 const REVS = __REVS_JSON__;
 const ECO = __ECO_JSON__;
+const AUDIT = __AUDIT_JSON__;
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const nf = (n,d=0) => (n===''||n===null||n===undefined||isNaN(n)) ? '—' : Number(n).toLocaleString('ru-RU',{minimumFractionDigits:d,maximumFractionDigits:d});
@@ -2623,6 +2624,20 @@ function rBI(){
       <b style="flex:0 0 46px;text-align:right;color:${c}">${r.now} %</b>
       <div class="mut" style="flex:1 1 100%;margin-left:2px">закрывает: ${esc(r.gap)}</div>
     </div>`;}).join('')}`:''}
+  ${AUDIT?`<h2>Аудит цифр — журнал подтверждённых находок</h2>
+  <div class="box info"><b>Как проверяем.</b> ${esc(AUDIT.note)}</div>
+  <div class="k">
+    <div class="tile"><b>${AUDIT.stats.zones}</b><span>зон проверено</span></div>
+    <div class="tile"><b class="mid">${AUDIT.stats.raw}</b><span>сырых находок</span></div>
+    <div class="tile"><b class="hi">${AUDIT.stats.confirmed}</b><span>подтверждено скептиками</span></div>
+    <div class="tile"><b>${AUDIT.stats.in_verify?'идёт':'завершена'}</b><span>верификация остальных</span></div>
+  </div>
+  <div class="tblwrap"><table><thead><tr><th style="width:190px">Зона</th><th style="width:90px">Вес</th><th>Суть</th><th>Что делаем</th><th style="width:110px">Статус</th></tr></thead><tbody>
+  ${AUDIT.items.map(a=>`<tr><td><b>${esc(a.zone)}</b></td>
+    <td><span class="${a.sev==='high'?'hi':(a.sev==='med'?'mid':'lo')}">${a.sev==='high'?'серьёзная':(a.sev==='med'?'существенная':'мелкая')}</span></td>
+    <td>${esc(a.what)}</td><td class="mut">${esc(a.fix)}</td>
+    <td><span class="${a.status==='done'?'tag lot3':'tag lot2'}">${a.status==='done'?'исправлено':'в очереди правок'}</span></td></tr>`).join('')}
+  </tbody></table></div>`:''}
   ${rGantt()}
   ${BIDOCS?`<h2>Документы БИ — формирование и согласование с Заказчиком</h2>
   <div class="box info">${esc(BIDOCS.note)}</div>
