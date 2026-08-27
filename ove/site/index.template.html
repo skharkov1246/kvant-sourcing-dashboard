@@ -180,6 +180,7 @@ const APPLY = __APPLY_JSON__;
 const GANTT = __GANTT_JSON__;
 const READY = __READY_JSON__;
 const REVS = __REVS_JSON__;
+const ECO = __ECO_JSON__;
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const nf = (n,d=0) => (n===''||n===null||n===undefined||isNaN(n)) ? '—' : Number(n).toLocaleString('ru-RU',{minimumFractionDigits:d,maximumFractionDigits:d});
@@ -2010,6 +2011,527 @@ function svgEl3(){
     ${g}</svg>`;
 }
 
+/* --- эскиз: P&ID выпарной установки нитки 1 (медный купорос), Лот №2 --- */
+function svgPid2(){
+  const C={main:'var(--s1)',hot:'#e07f2e',vac:'#a34e9e',out:'var(--good)',aux:'var(--mut)',warn:'var(--warn)',crit:'var(--crit)'};
+  const bx=(x,y,w,h,t1,t2,cls,dash)=>{
+    const c=C[cls||'main'];
+    let s=`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="7" fill="none" stroke="${c}" stroke-width="1.6"${dash?' stroke-dasharray="6 4"':''}/>`
+      +`<text x="${x+w/2}" y="${y+(t2?17:h/2+4)}" font-size="11.5" font-weight="700" fill="var(--ink)" text-anchor="middle">${t1}</text>`;
+    if(t2) t2.split('|').forEach((ln,i)=>{ s+=`<text x="${x+w/2}" y="${y+31+i*12}" font-size="9.5" fill="var(--ink2)" text-anchor="middle">${ln}</text>`; });
+    return s; };
+  const bub=(cx,cy,a,b)=>{
+    let s=`<circle cx="${cx}" cy="${cy}" r="15" fill="var(--surface)" stroke="var(--ink2)" stroke-width="1.3"/>`;
+    if(b) s+=`<text x="${cx}" y="${cy-1.5}" font-size="8" font-weight="700" fill="var(--ink)" text-anchor="middle">${a}</text>`
+      +`<text x="${cx}" y="${cy+9}" font-size="8" font-weight="700" fill="var(--ink)" text-anchor="middle">${b}</text>`;
+    else s+=`<text x="${cx}" y="${cy+3}" font-size="8" font-weight="700" fill="var(--ink)" text-anchor="middle">${a}</text>`;
+    return s; };
+  const pr=(d,cls,w)=>`<path d="${d}" fill="none" stroke="${C[cls||'main']}" stroke-width="${w||1.8}" marker-end="url(#mk-pid2)"/>`;
+  const ln=(d,cls,w)=>`<path d="${d}" fill="none" stroke="${C[cls||'main']}" stroke-width="${w||1.8}"/>`;
+  const sig=d=>`<path d="${d}" fill="none" stroke="var(--mut)" stroke-width=".9" stroke-dasharray="3 3"/>`;
+  const tap=d=>`<path d="${d}" fill="none" stroke="var(--ink2)" stroke-width=".9"/>`;
+  const vlvH=(x,y,cls,dash)=>`<path d="M${x-9} ${y-6} L${x} ${y} L${x-9} ${y+6} Z M${x+9} ${y-6} L${x} ${y} L${x+9} ${y+6} Z" fill="none" stroke="${C[cls||'main']}" stroke-width="1.3"${dash?' stroke-dasharray="3 2"':''}/>`
+    +`<path d="M${x} ${y} L${x} ${y-14} M${x-5} ${y-14} L${x+5} ${y-14}" fill="none" stroke="${C[cls||'main']}" stroke-width="1.1"${dash?' stroke-dasharray="3 2"':''}/>`;
+  const vlvV=(x,y,cls)=>`<path d="M${x-6} ${y-9} L${x} ${y} L${x+6} ${y-9} Z M${x-6} ${y+9} L${x} ${y} L${x+6} ${y+9} Z" fill="none" stroke="${C[cls||'main']}" stroke-width="1.3"/>`
+    +`<path d="M${x} ${y} L${x-14} ${y} M${x-14} ${y-5} L${x-14} ${y+5}" fill="none" stroke="${C[cls||'main']}" stroke-width="1.1"/>`;
+  const T=(x,y,t,o)=>{o=o||{};return `<text x="${x}" y="${y}" font-size="${o.s||8.5}" fill="${o.f||'var(--ink2)'}"${o.w?` font-weight="${o.w}"`:''}${o.a?` text-anchor="${o.a}"`:''}${o.r?` transform="rotate(-90 ${x} ${y})"`:''}>${t}</text>`;};
+  let g='';
+  /* ---------- соковый пар I ступени в конденсатор ---------- */
+  g+=pr('M370 78 L370 38 L905 38 L905 82','vac');
+  g+=T(480,32,'соковый пар I ст. · 2,2 т/ч (расчёт 2,08)',{f:C.vac,a:'middle',s:9.3});
+  /* ---------- питание ---------- */
+  g+=bx(18,88,154,54,'БАК ПИТАНИЯ НИТКИ 1','поз. 4.1.22|5,0–5,3 м³/ч (6 340 кг/ч) · 70 °C','main');
+  g+=pr('M172 115 L276 115','main');
+  g+=vlvH(225,115,'main');
+  g+=tap('M188 128 L188 115')+bub(188,143,'FIC','01');
+  g+=tap('M268 95 L280 95')+bub(253,95,'LIC','01');
+  g+=sig('M243 106 L228 100');
+  /* ---------- испаритель I ступени + контур циркуляции ---------- */
+  g+=bx(280,78,185,92,'ИСПАРИТЕЛЬ I СТУПЕНИ','40 °C · 0,06–0,08 атм|соковый пар 2,2 т/ч (расчёт 2,08)|самоиспарение 70→40 °C: 261 кг/ч','main');
+  g+=tap('M268 158 L280 158')+bub(253,158,'TIC','01');
+  g+=sig('M253 173 L253 188 L118 188 L113 212');
+  g+=bx(132,200,164,74,'ПОДОГРЕВАТЕЛЬ F = 63 м²','Q = 1,22 МВт · ΔT прохода 1,7 К|K треб ≈ 160 Вт/(м²·К), запас ×5–7|трубки 904L · без кипения','hot');
+  g+=ln('M350 170 L350 285 L312 285','main');
+  g+=`<circle cx="300" cy="285" r="12" fill="var(--surface)" stroke="var(--ink2)" stroke-width="1.4"/><path d="M306 278 L306 292 L294 285 Z" fill="var(--ink2)"/>`;
+  g+=pr('M288 285 L215 285 L215 276','main');
+  g+=pr('M215 200 L215 132 L276 132','main');
+  g+=T(300,309,'циркнасос I ст. · 633 м³/ч',{a:'middle'})+T(300,320,'кратность циркуляции 125',{a:'middle',f:'var(--mut)'});
+  g+=tap('M350 225 L372 225')+bub(387,225,'DIC','01')+T(387,247,'байпас',{a:'middle',s:8,f:'var(--mut)'});
+  /* греющий пар и конденсат */
+  g+=pr('M55 225 L96 225','hot')+ln('M110 225 L132 225','hot');
+  g+=vlvH(108,225,'hot');
+  g+=tap('M75 211 L75 225')+bub(75,196,'FIQ');
+  g+=T(58,240,'греющий пар',{f:C.hot})+T(58,251,'0,6 МПа · 2,1 т/ч',{f:C.hot})+T(58,262,'T нас ≈ 159 °C',{f:C.hot});
+  g+=pr('M132 268 L95 268','hot',1.3)+T(93,280,'конденсат',{f:C.hot,a:'end'});
+  /* ---------- перетек раствора в II ступень ---------- */
+  g+=pr('M465 110 L491 110','main');
+  g+=vlvH(478,110,'main',1);
+  
+  g+=bub(480,140,'LIC','02')+sig('M480 125 L478 118');
+  /* ---------- испаритель II ступени + контур ---------- */
+  g+=bx(495,78,185,92,'ИСПАРИТЕЛЬ II СТУПЕНИ','20 °C · 0,013–0,02 атм|соковый пар 0,29 т/ч|выгрузка — солевая колонна','main');
+  g+=ln('M525 170 L525 278 L548 278','main');
+  g+=`<circle cx="560" cy="278" r="12" fill="var(--surface)" stroke="var(--ink2)" stroke-width="1.4"/><path d="M554 271 L554 285 L566 278 Z" fill="var(--ink2)"/>`;
+  g+=pr('M572 278 L595 278 L595 172','main');
+  g+=T(560,300,'циркнасос II ст.',{a:'middle'});
+  g+=tap('M525 228 L496 228')+bub(481,228,'DIC','02');
+  g+=sig('M481 243 L481 332 L627 332')+T(543,326,'управление выгрузкой',{s:8,f:'var(--mut)'});
+  g+=tap('M680 162 L692 162')+bub(707,166,'TI','02');
+  /* ---------- солевая колонна и репульпатор ---------- */
+  g+=ln('M631 170 L631 370','main',1.6)+ln('M640 170 L640 370','main',1.6);
+  const dm=(x,y1,y2)=>`<line x1="${x}" y1="${y1}" x2="${x}" y2="${y2}" stroke="var(--ink2)" stroke-width=".9" marker-start="url(#mkd-pid2)" marker-end="url(#mkd-pid2)"/>`;
+  g+=dm(660,170,370)+T(670,300,'столб пульпы H ≈ 7,0–7,9 м',{r:1,a:'middle'})+T(622,270,'солевая колонна',{r:1,a:'middle',f:C.main});
+  g+=bx(560,370,160,46,'РЕПУЛЬПАТОР ВЫГРУЗКИ','пульпа плотностью до 1,45 т/м³','main');
+  g+=pr('M720 393 L760 393','out')+T(764,396,'пульпа на центрифуги',{f:'var(--good)'});
+  /* ---------- эжектор II ступени ---------- */
+  g+=pr('M680 100 L768 100','vac');
+  g+=T(684,114,'соковый пар II ст.',{f:C.vac})+T(684,126,'0,29 т/ч',{f:C.vac})+T(684,138,'0,013–0,02 атм',{f:C.vac});
+  g+=`<rect x="770" y="88" width="32" height="24" fill="none" stroke="${C.vac}" stroke-width="1.4"/>`
+    +`<path d="M776 112 L796 112 L800 140 L772 140 Z" fill="none" stroke="${C.vac}" stroke-width="1.4"/>`;
+  g+=ln('M786 44 L786 53','hot')+vlvV(786,62,'hot')+pr('M786 71 L786 86','hot');
+  g+=T(794,50,'раб. пар 6 атм',{f:C.hot})+T(794,61,'0,75 т/ч',{f:C.hot});
+  g+=pr('M786 140 L786 156 L832 156','vac');
+  g+=T(800,169,'эжектор II ст.',{a:'middle',s:8});
+  g+=tap('M724 71 L724 100')+bub(724,56,'PIC','02');
+  g+=sig('M739 58 L768 62');
+  /* ---------- барометрический конденсатор ---------- */
+  g+=bx(836,84,160,92,'БАРОМЕТРИЧ. КОНДЕНСАТОР','смешивающий · 0,075 атм|пар 3,24 т/ч · Q = 2,17 МВт|вода 380 м³/ч · 22,5 → 27,4 °C|недогрев до 40,3 °C ≈ 13 К','vac');
+  g+=pr('M965 54 L965 82','main')+T(973,60,'кислая СОВ 380 м³/ч')+T(973,71,'подача 22,5 °C');
+  g+=tap('M933 77 L933 84')+bub(933,62,'PIC','01');
+  g+=sig('M948 58 L985 46 L1058 46 L1067 58');
+  /* ---------- барометрическая труба и гидрозатвор нитки 1 ---------- */
+  g+=ln('M920 176 L920 430','main',2.2);
+  g+=T(908,303,'барометрич. труба Dу 350–400 · V ≈ 1,0 м³',{r:1,a:'middle',f:C.main});
+  g+=dm(948,176,430)+T(958,303,'H ≈ 10,5 м (H мин = 9,56 м)',{r:1,a:'middle'});
+  g+=bx(843,430,154,48,'ГИДРОЗАТВОР НИТКИ 1','бак ≥ 1,5–2 м³ (≥1,5 V трубы)|LIC уровня · против срыва затвора','main');
+  g+=pr('M843 455 L790 455','main');
+  g+=T(786,449,'на градирню кислой СОВ · 27,4 °C',{a:'end'})+T(786,461,'участок итого: 568 м³/ч · ≈3,1–3,2 МВт',{a:'end',f:'var(--mut)'});
+  /* ---------- ПЭБ ---------- */
+  g+=pr('M996 100 L1062 100','vac');
+  g+=T(1000,113,'парогазовая',{f:C.vac})+T(1000,124,'смесь (ПГС)',{f:C.vac})+T(1000,135,'0,06–0,08 атм',{f:'var(--mut)',s:8});
+  g+=`<rect x="1064" y="88" width="32" height="24" fill="none" stroke="${C.vac}" stroke-width="1.4"/>`
+    +`<path d="M1070 112 L1090 112 L1094 140 L1066 140 Z" fill="none" stroke="${C.vac}" stroke-width="1.4"/>`;
+  g+=ln('M1080 44 L1080 53','hot')+vlvV(1080,62,'hot')+pr('M1080 71 L1080 86','hot');
+  g+=T(1090,56,'пар 6 атм · 0,27 т/ч',{f:C.hot});
+  g+=pr('M1080 140 L1080 156','vac');
+  g+=bx(1010,158,140,56,'КОНДЕНСАТОР ПЭБ','D 0,5 м · вода 32 м³/ч|Q ≈ 0,19 МВт · ΔT ≈ 5,0 К','vac');
+  g+=pr('M1130 214 L1130 236','vac');
+  g+=bx(1090,238,88,64,'ВВН1-6','водокольцевой|вакуум-насос|неконденс. газы','vac');
+  g+=pr('M1134 302 L1134 322','vac',1.3)+T(1134,334,'выхлоп',{a:'middle',f:C.vac});
+  g+=ln('M1045 214 L1045 446','main',1.8);
+  g+=T(1036,322,'труба ПЭБ Dу 100–125',{r:1,a:'middle',f:C.main});
+  g+=bx(1006,446,96,44,'ГИДРОЗАТВОР','ПЭБ · LIC уровня','main');
+  
+  /* ================= легенда ================= */
+  let L='';
+  const li=(x,y,cls,dash,txt,w)=>`<path d="M${x} ${y-3} L${x+28} ${y-3}" stroke="${C[cls]}" stroke-width="${w||1.8}"${dash?` stroke-dasharray="${dash}"`:''} fill="none"/>`
+    +`<text x="${x+34}" y="${y}" font-size="8.7" fill="var(--ink2)">${txt}</text>`;
+  L+=T(20,514,'ЛЕГЕНДА',{s:10,w:700});
+  L+=li(20,530,'main',0,'растворы, пульпа, вода кислой СОВ')
+    +li(20,544,'hot',0,'греющий / рабочий пар 0,6 МПа, конденсат')
+    +li(20,558,'vac',0,'соковый пар, вакуумные линии, ПГС')
+    +li(20,572,'aux','3 3','сигналы КИПиА (пунктир)')
+    +li(20,586,'out',0,'выходы к смежным системам');
+  L+=`<circle cx="34" cy="600" r="6" fill="none" stroke="var(--ink2)" stroke-width="1"/>`
+    +T(54,603,'кружок — контур КИПиА (тег)',{s:8.7});
+  L+=`<path d="M292 526 L300 530 L292 534 Z M308 526 L300 530 L308 534 Z" fill="none" stroke="var(--ink2)" stroke-width="1.1"/>`
+    +T(318,533,'клапан регулирующий',{s:8.7});
+  L+=`<path d="M292 546 L300 550 L292 554 Z M308 546 L300 550 L308 554 Z" fill="none" stroke="var(--ink2)" stroke-width="1.1" stroke-dasharray="3 2"/>`
+    +T(318,553,'пунктир — предложение БИ / уточняется при P&amp;ID',{s:8.7});
+  /* ================= контуры и уставки ================= */
+  let U=T(560,514,'ОСНОВНЫЕ КОНТУРЫ И УСТАВКИ (из данных БИ)',{s:10,w:700});
+  ['LIC-01/02 · уровни испарителей I/II ст. (радар, 904L/PTFE): питание — клапан линии бака 4.1.22; блокировки по предельным уровням',
+   'TIC-01 · T испарителя I ст. 40 °C — каскад на клапан греющего пара подогревателя · TI-02 · T II ступени 20 °C (контроль)',
+   'PIC-01 · вакуум конденсатора 0,075 атм — пар эжектора ПЭБ / клапан-разбиватель вакуума',
+   'PIC-02 · вакуум II ступени 0,013–0,02 атм — клапан рабочего пара эжектора II ст.',
+   'DIC-01/02 · плотность в контурах циркуляции (байпас) — выгрузка через солевые колонны; раствор 1,2–1,3, пульпа до 1,45 т/м³',
+   'FIC-01 · питание нитки 1: 5,0–5,3 м³/ч (эл.-магнитный, PFA) · FIQ · учёт пара · LIC гидрозатворов барометрических труб',
+   'насосы: защита от сухого хода, контроль протечек · эжектор II ст.: сжатие 3,8–5,8, u = 0,5, запас 1,3 · ПЭБ: 0,06–0,08 атм, ВВН1-6',
+   'уточняется при P&amp;ID: перечень блокировок; защита от срыва вакуума (разбиватель, обратные клапаны); тип плотномера (лицензия РБ)'
+  ].forEach((r,i)=>{ U+=`<text x="560" y="${528+i*11.5}" font-size="8.5" fill="var(--ink2)">${r}</text>`; });
+  return `<svg id="pid2-svg" class="gsvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1190 640" style="width:1190px;max-width:none;display:block;font-family:system-ui,sans-serif">
+    <defs><marker id="mk-pid2" markerWidth="9" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0 0 L9 4 L0 8 Z" fill="context-stroke"/></marker>
+    <marker id="mkd-pid2" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto"><path d="M2 8 L8 2" stroke="context-stroke" stroke-width="1.6"/></marker></defs>
+    <rect x="0" y="0" width="1190" height="640" fill="var(--surface)"/>
+    <rect x="6" y="6" width="1178" height="628" fill="none" stroke="var(--border)"/>
+    <text x="20" y="624" font-size="10" fill="var(--mut)">ЭСКИЗ — не для строительства · P&amp;ID выпарной установки нитки 1 (Лот №2, медный купорос) · источники: разделы БИ — тепловой расчёт, вакуумная система, P&amp;ID/КИПиА (ИД табл. 3.1/4.1) · КВАНТ, черновик БИ</text>
+    <text x="1174" y="28" font-size="12" font-weight="800" fill="var(--ink2)" text-anchor="end">P&amp;ID (ЭСКИЗ) · ЛОТ №2 — ВЫПАРНАЯ УСТАНОВКА НИТКИ 1 (МЕДНЫЙ КУПОРОС)</text>
+    ${g}${L}${U}</svg>`;
+}
+
+/* --- эскиз: компоновка участка купоросов в существующем здании ГМУ (Лот №2) + высотная проверка барометрических конденсаторов --- */
+function svgLay2(){
+  /* разрез: 1 м = 25 px, отм. 0,000 на y=500 */
+  const py=m=>500-25*m;
+  /* план: 1 м = 2,5 px */
+  const PX=110, PY=78, PS=2.5, px=m=>PX+PS*m, pz=m=>PY+PS*m;
+  const ko=(x,y,w,h)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="var(--surface)"/>`;
+  const vdim=(x,y1,y2,t,fs)=>`<line x1="${x}" y1="${y1}" x2="${x}" y2="${y2}" stroke="var(--ink2)" stroke-width=".9" marker-start="url(#mk-l2d)" marker-end="url(#mk-l2d)"/>`
+    +`<text x="${x-3.5}" y="${(y1+y2)/2}" font-size="${fs||8}" font-weight="700" fill="var(--ink2)" text-anchor="middle" transform="rotate(-90 ${x-3.5} ${(y1+y2)/2})">${t}</text>`;
+  const hdim=(x1,x2,y,t,dy)=>`<line x1="${x1}" y1="${y}" x2="${x2}" y2="${y}" stroke="var(--ink2)" stroke-width=".9" marker-start="url(#mk-l2d)" marker-end="url(#mk-l2d)"/>`
+    +(t?`<text x="${(x1+x2)/2}" y="${y+(dy||-4)}" font-size="8" font-weight="700" fill="var(--ink2)" text-anchor="middle">${t}</text>`:'');
+  const lev=(y,t)=>`<line x1="1096" y1="${y}" x2="1104" y2="${y}" stroke="var(--ink2)" stroke-width="1"/>`
+    +`<text x="1107" y="${y+3}" font-size="7.8" fill="var(--ink2)">${t}</text>`;
+  let g='';
+
+  /* ================= ПЛАН ================= */
+  g+=`<text x="36" y="56" font-size="10.5" font-weight="800" fill="var(--ink2)">ПЛАН ЗДАНИЯ ГМУ 96 × 108 М (ПРИЛ. №7: ФМ.01648-АР/АР1/КО)</text>`;
+  /* сетка: цифровые оси (шаг 6 м, горизонтальные линии), буквенные оси (пролёты 18+6+24+24+24) */
+  for(let k=0;k<=18;k++) g+=`<line x1="${px(0)}" y1="${pz(k*6)}" x2="${px(96)}" y2="${pz(k*6)}" stroke="var(--border)" stroke-width=".55"/>`;
+  const AX=[0,18,24,48,72,96];
+  for(const a of AX) g+=`<line x1="${px(a)}" y1="${pz(0)}" x2="${px(a)}" y2="${pz(108)}" stroke="var(--border)" stroke-width=".55"/>`;
+  for(const a of AX) for(let k=0;k<=18;k++) g+=`<rect x="${px(a)-1.3}" y="${pz(k*6)-1.3}" width="2.6" height="2.6" fill="var(--ink2)"/>`;
+  g+=`<rect x="${px(0)}" y="${pz(0)}" width="${96*PS}" height="${108*PS}" fill="none" stroke="var(--ink)" stroke-width="1.8"/>`;
+  /* блок участка в среднем 24-м пролёте (оси 48–72), 3 шага (18 м) */
+  g+=ko(216,177,132,12)+`<text x="260" y="186" font-size="7.8" font-weight="800" fill="var(--good)" text-anchor="middle">УЧАСТОК КУПОРОСОВ — ПРЕДЛОЖЕНИЕ БИ</text>`;
+  g+=ko(234,214,52,20)+`<text x="260" y="222" font-size="7.2" fill="var(--good)" text-anchor="middle">24 × 12–18 м</text>`
+    +`<text x="260" y="231" font-size="7.2" fill="var(--good)" text-anchor="middle">(2–3 шага)</text>`;
+  g+=`<rect x="${px(48)}" y="${pz(45)}" width="${24*PS}" height="${18*PS}" fill="none" stroke="var(--good)" stroke-width="1.7" stroke-dasharray="6 4"/>`;
+  /* стояки конденсаторов у колонн блока */
+  g+=`<rect x="${px(48)+2}" y="${pz(46.5)}" width="5" height="5" fill="none" stroke="var(--s1)" stroke-width="1.1" stroke-dasharray="2 2"/>`
+    +`<rect x="${px(72)-9}" y="${pz(48)}" width="5" height="5" fill="none" stroke="var(--s1)" stroke-width="1.1" stroke-dasharray="2 2"/>`;
+  g+=ko(190,238,140,10)+`<text x="260" y="246" font-size="7" fill="var(--s1)" text-anchor="middle">стояки конденсаторов у колонн (приямки)</text>`;
+  /* линия разреза 1—1 */
+  g+=`<line x1="106" y1="${pz(54)}" x2="354" y2="${pz(54)}" stroke="var(--ink)" stroke-width="1.1" stroke-dasharray="10 4"/>`
+    +`<circle cx="100" cy="${pz(54)}" r="6" fill="var(--surface)" stroke="var(--ink)" stroke-width="1"/><text x="100" y="${pz(54)+2.8}" font-size="7.5" font-weight="800" fill="var(--ink)" text-anchor="middle">1</text>`
+    +`<circle cx="360" cy="${pz(54)}" r="6" fill="var(--surface)" stroke="var(--ink)" stroke-width="1"/><text x="360" y="${pz(54)+2.8}" font-size="7.5" font-weight="800" fill="var(--ink)" text-anchor="middle">1</text>`;
+  /* размерные линии плана */
+  g+=hdim(px(0),px(18),364,'18 000')+hdim(px(18),px(24),364,'')+hdim(px(24),px(48),364,'24 000')
+    +hdim(px(48),px(72),364,'24 000')+hdim(px(72),px(96),364,'24 000');
+  g+=`<line x1="${px(21)}" y1="364" x2="${px(21)}" y2="374" stroke="var(--ink2)" stroke-width=".7"/>`
+    +`<text x="${px(21)}" y="384" font-size="7.5" font-weight="700" fill="var(--ink2)" text-anchor="middle">6 000</text>`;
+  g+=hdim(px(0),px(96),394,'96 000 (пролёты по буквенным осям)',9.5);
+  g+=vdim(380,pz(0),pz(108),'108 000 (шаг колонн 6 000; сетка 6/12 м — ТЗ п. 4.5)');
+  /* примечания */
+  const notes=[
+    'Сущ. здание: свайное основание с ростверками; пластовый дренаж (низ −1,65…−2,25);',
+    'покрытие — плиты 3 × 12 м, h = 455 мм; верх +13,400…+15,950, парапеты до +16,500;',
+    'частичные этажерки/перекрытия +5,000/+6,000; краны 5 т (Lк 22,5) и 7,5 т (Lк 16,5).',
+    'Монтаж: аппараты 904L заводской готовности — через сущ. проёмы/ворота; испарители',
+    'нитки 1 (~8–15 т) тяжелее г/п кранов 5/7,5 т — мобильный кран через проём до',
+    'монтажа кровли зоны либо укрупнительная сборка из транспортабельных частей.'
+  ];
+  notes.forEach((t,i)=>{ g+=`<text x="36" y="${418+i*10.5}" font-size="8.2" fill="var(--ink2)">${t}</text>`; });
+  /* вывод высотной проверки */
+  g+=`<rect x="30" y="478" width="430" height="118" rx="6" fill="none" stroke="var(--ink2)" stroke-width="1"/>`
+    +`<text x="40" y="492" font-size="9" font-weight="800" fill="var(--ink)">ВЫСОТНАЯ ПРОВЕРКА БАРОМЕТРИЧ. КОНДЕНСАТОРОВ — ВЫВОД (расчёт БИ)</text>`;
+  const verd=[
+    ['потребно: H = труба 10,5 + корпус 2,0…2,5 = 12,5…13,0 м от уровня воды гидрозатвора','var(--ink2)'],
+    ['(труба: 10,33 × (1 − 0,075) = 9,56 м + запас ~0,9 м; корпус D 2,0 с каплеотбойником)','var(--mut)'],
+    ['низ ферм: высокий пролёт ≈ +12,4…+12,9; при покрытии +13,4…+14,15 ≈ +10,9…+11,0','var(--ink2)'],
+    ['вариант 0 (гидрозатвор на 0,000): верх +13,2…+13,7 — НЕ ПРОХОДИТ, дефицит 0,3–1,3 м','var(--crit)'],
+    ['вариант А (реком.): приямок 2,0–2,5 м → верх +11,0…+11,5, запас ≥ 0,9–1,9 м','var(--good)'],
+    ['вариант Б (резерв): низкоуровневые конденсаторы + насосы 904L — если запретят приямки','var(--ink2)'],
+    ['альтернатива по II ступеням: заглубить репульпаторы — совместить с приямками','var(--ink2)'],
+    ['подтвердить обмерным обследованием (низ ферм, ростверки, зоны) — 1-й этап БИ;','var(--ink2)'],
+    ['в новом корпусе (базовый сценарий) низ ферм назначается ≥ 13,5 м — без приямков','var(--ink2)']
+  ];
+  verd.forEach((v,i)=>{ g+=`<text x="40" y="${504+i*10.6}" font-size="8.2" fill="${v[1]}">${v[0]}</text>`; });
+
+  /* ================= РАЗРЕЗ 1—1 ================= */
+  g+=`<text x="1174" y="56" font-size="10.5" font-weight="800" fill="var(--ink2)" text-anchor="end">РАЗРЕЗ 1—1 · ВЫСОКИЙ 24-М ПРОЛЁТ (ПРИВЯЗКА — ПО ОБСЛЕДОВАНИЮ)</text>`;
+  /* колонны, парапет, покрытие */
+  g+=`<rect x="500" y="${py(16.5)}" width="12" height="${py(0)-py(16.5)}" fill="none" stroke="var(--ink)" stroke-width="1.4"/>`
+    +`<rect x="1088" y="${py(16.5)}" width="12" height="${py(0)-py(16.5)}" fill="none" stroke="var(--ink)" stroke-width="1.4"/>`;
+  g+=`<text x="518" y="${py(16.5)+9}" font-size="7.5" fill="var(--mut)">парапеты до +16,500</text>`;
+  g+=`<line x1="500" y1="${py(15.95)}" x2="1100" y2="${py(15.95)}" stroke="var(--ink)" stroke-width="1.5"/>`
+    +`<line x1="512" y1="${py(15.35)}" x2="1088" y2="${py(15.35)}" stroke="var(--ink2)" stroke-width=".9" stroke-dasharray="6 4"/>`;
+  for(let x=524;x<1084;x+=28) g+=`<line x1="${x}" y1="${py(15.35)}" x2="${x+12}" y2="${py(15.95)}" stroke="var(--border)" stroke-width=".7"/>`;
+  g+=ko(662,py(15.85),262,11)+`<text x="793" y="${py(15.35)-3}" font-size="8" fill="var(--ink2)" text-anchor="middle">верх покрытия +15,35…+15,95 · плиты 3 × 12 м, h = 455 мм</text>`;
+  /* фермы (схематично) + пояс низа ферм */
+  for(let x=690;x<1070;x+=54) g+=`<line x1="${x}" y1="${py(12.65)}" x2="${x+27}" y2="${py(15.2)}" stroke="var(--border)" stroke-width=".7"/><line x1="${x+27}" y1="${py(15.2)}" x2="${x+54}" y2="${py(12.65)}" stroke="var(--border)" stroke-width=".7"/>`;
+  g+=`<line x1="512" y1="${py(12.9)}" x2="1088" y2="${py(12.9)}" stroke="var(--ink2)" stroke-width="1" stroke-dasharray="7 4"/>`
+    +`<line x1="512" y1="${py(12.4)}" x2="1088" y2="${py(12.4)}" stroke="var(--ink2)" stroke-width="1" stroke-dasharray="7 4"/>`;
+  g+=ko(628,py(12.9)-11,344,10)
+    +`<text x="800" y="${py(12.9)-3}" font-size="8" font-weight="700" fill="var(--ink2)" text-anchor="middle">низ несущих ферм — оценочно +12,4…+12,9 <tspan fill="var(--crit)">(подтвердить обмером — 1-й этап БИ)</tspan></text>`;
+  /* краны: консоли, рельсы, габарит */
+  g+=`<rect x="512" y="${py(10.4)}" width="14" height="10" fill="none" stroke="var(--ink2)" stroke-width="1.1"/><rect x="515" y="${py(10.4)-6}" width="6" height="6" fill="var(--ink2)"/>`
+    +`<rect x="1074" y="${py(10.4)}" width="14" height="10" fill="none" stroke="var(--ink2)" stroke-width="1.1"/><rect x="1079" y="${py(10.4)-6}" width="6" height="6" fill="var(--ink2)"/>`;
+  g+=`<line x1="512" y1="${py(12)}" x2="1088" y2="${py(12)}" stroke="var(--mut)" stroke-width=".9" stroke-dasharray="4 4"/>`;
+  g+=`<text x="1068" y="209.5" font-size="7.5" fill="var(--mut)" text-anchor="end">габарит крана ≈ +12 — стояки у колонн, вне зоны прохода (ФНП по ПС)</text>`
+    +`<text x="1068" y="259" font-size="7.5" fill="var(--ink2)" text-anchor="end">верх кранового рельса +10,000/+10,500</text>`;
+  /* пол, ростверки, дренаж */
+  g+=`<line x1="500" y1="500" x2="587" y2="500" stroke="var(--ink)" stroke-width="2"/><line x1="662" y1="500" x2="1100" y2="500" stroke="var(--ink)" stroke-width="2"/>`;
+  for(let x=514;x<583;x+=14) g+=`<line x1="${x}" y1="500" x2="${x-6}" y2="507" stroke="var(--ink2)" stroke-width=".7"/>`;
+  for(let x=672;x<1088;x+=14) g+=`<line x1="${x}" y1="500" x2="${x-6}" y2="507" stroke="var(--ink2)" stroke-width=".7"/>`;
+  g+=`<rect x="494" y="500" width="24" height="46" fill="none" stroke="var(--ink2)" stroke-width="1"/><rect x="1082" y="500" width="24" height="46" fill="none" stroke="var(--ink2)" stroke-width="1"/>`;
+  g+=`<line x1="512" y1="${py(-2.32)}" x2="580" y2="${py(-2.32)}" stroke="var(--border)" stroke-width=".9" stroke-dasharray="3 3"/>`
+    +`<line x1="670" y1="${py(-2.32)}" x2="1088" y2="${py(-2.32)}" stroke="var(--border)" stroke-width=".9" stroke-dasharray="3 3"/>`;
+  g+=`<text x="836" y="${py(-1.9)}" font-size="7.8" fill="var(--mut)" text-anchor="middle">свайные ростверки (низ −1,65…−2,25) · пластовый дренаж</text>`;
+  /* ВАРИАНТ 0 — призрак (не проходит) */
+  g+=`<rect x="535" y="${py(1)}" width="36" height="${py(0)-py(1)}" fill="none" stroke="var(--crit)" stroke-width="1.1" stroke-dasharray="4 3"/>`
+    +`<line x1="537" y1="${py(0.7)}" x2="569" y2="${py(0.7)}" stroke="var(--crit)" stroke-width=".9"/>`
+    +`<path d="M549 ${py(0.7)-6} L556 ${py(0.7)-6} L552.5 ${py(0.7)-1} Z" fill="var(--crit)"/>`
+    +`<text x="574" y="${py(0.7)+3}" font-size="6.8" fill="var(--crit)">вода ≈ +0,7</text>`;
+  g+=`<line x1="550" y1="${py(0.7)}" x2="550" y2="${py(11.2)}" stroke="var(--crit)" stroke-width="1.1" stroke-dasharray="4 3"/><line x1="555" y1="${py(0.7)}" x2="555" y2="${py(11.2)}" stroke="var(--crit)" stroke-width="1.1" stroke-dasharray="4 3"/>`;
+  g+=`<rect x="527" y="${py(13.45)}" width="50" height="${py(11.2)-py(13.45)}" rx="4" fill="none" stroke="var(--crit)" stroke-width="1.2" stroke-dasharray="4 3"/>`;
+  g+=`<path d="M537 ${py(12.9)-4} L565 ${py(12.4)+4} M565 ${py(12.9)-4} L537 ${py(12.4)+4}" stroke="var(--crit)" stroke-width="1.6"/>`;
+  g+=ko(512,120,166,44)
+    +`<text x="516" y="129" font-size="7.8" font-weight="700" fill="var(--crit)">ВАРИАНТ 0 — гидрозатвор на 0,000:</text>`
+    +`<text x="516" y="139" font-size="7.8" fill="var(--crit)">верх конденсатора +13,2…+13,7 —</text>`
+    +`<text x="516" y="149" font-size="7.8" fill="var(--crit)">выше низа ферм +12,4…+12,9:</text>`
+    +`<text x="516" y="159" font-size="7.8" font-weight="700" fill="var(--crit)">НЕ ПРОХОДИТ (дефицит 0,3–1,3 м)</text>`;
+  /* ВАРИАНТ А — приямок + стояк */
+  g+=`<path d="M587 500 L587 ${py(-2.3)} L662 ${py(-2.3)} L662 500" fill="none" stroke="var(--s1)" stroke-width="1.3" stroke-dasharray="6 4"/>`;
+  g+=vdim(578,500,py(-2.3),'2,0–2,5',7.2);
+  g+=`<rect x="602" y="${py(-0.9)}" width="46" height="${py(-2.2)-py(-0.9)}" fill="none" stroke="var(--s1)" stroke-width="1.2"/>`
+    +`<line x1="604" y1="${py(-1.75)}" x2="646" y2="${py(-1.75)}" stroke="var(--s1)" stroke-width="1"/>`
+    +`<path d="M620 ${py(-1.75)-6} L627 ${py(-1.75)-6} L623.5 ${py(-1.75)-1} Z" fill="var(--s1)"/>`
+    +`<text x="625" y="${py(-2.1)}" font-size="6.5" fill="var(--s1)" text-anchor="middle">−1,5…−2,0</text>`;
+  g+=`<line x1="622" y1="${py(-1.75)}" x2="622" y2="${py(8.75)}" stroke="var(--s1)" stroke-width="1.4"/><line x1="628" y1="${py(-1.75)}" x2="628" y2="${py(8.75)}" stroke="var(--s1)" stroke-width="1.4"/>`;
+  g+=`<rect x="600" y="${py(11)}" width="50" height="${py(8.75)-py(11)}" rx="5" fill="none" stroke="var(--s1)" stroke-width="1.6"/>`
+    +`<rect x="618" y="218" width="14" height="7" fill="none" stroke="var(--s1)" stroke-width="1.2"/>`
+    +`<text x="625" y="${py(9.9)+3}" font-size="7" fill="var(--s1)" text-anchor="middle">D 2,0</text>`;
+  g+=`<text x="584" y="207" font-size="7.4" font-weight="700" fill="var(--good)">ВАРИАНТ А (РЕКОМЕНДУЕМЫЙ):</text>`
+    +`<text x="584" y="216.5" font-size="7.4" fill="var(--good)">верх +11,0…+11,5 · запас до ферм 0,9–1,9 м</text>`;
+  g+=vdim(672,py(-1.75),py(8.75),'барометрическая труба 10,5 м')
+    +vdim(672,py(8.75),py(11),'корпус 2,0–2,5',7.2)
+    +vdim(692,py(-1.75),py(11),'H = 12,5–13,0 м от уровня воды');
+  g+=`<text x="560" y="${py(-2.3)+15}" font-size="7.8" fill="var(--s1)">приямок гидрозатвора 2,0–2,5 м (уровень воды −1,5…−2,0) — предложение БИ; кислотостойкий (СОВ до 0,5 г/л H₂SO₄);</text>`
+    +`<text x="560" y="${py(-2.3)+26}" font-size="7.8" fill="var(--s1)">между свайными ростверками — подтвердить обследованием и расчётом (СП 43.13330, СП 45.13330)</text>`;
+  /* испаритель нитки 1 */
+  g+=`<rect x="775" y="${py(11)}" width="50" height="${py(0.5)-py(11)}" rx="9" fill="none" stroke="var(--s1)" stroke-width="1.4" stroke-dasharray="6 4"/>`
+    +`<text x="800" y="356" font-size="8.5" font-weight="700" fill="var(--ink)" text-anchor="middle" transform="rotate(-90 800 356)">ИСПАРИТЕЛЬ НИТКИ 1</text>`;
+  const ev=['D 2,0 · V 34,5 м³','корпус 9–12 м','низ ~0…+1','верх ~+10…+12','(по изгот., ОЛ)'];
+  ev.forEach((t,i)=>{ g+=`<text x="734" y="${322+i*10.5}" font-size="7.4" fill="var(--ink2)" text-anchor="middle">${t}</text>`; });
+  /* этажерка + испаритель II ступени + солевая колонна */
+  g+=`<line x1="835" y1="${py(8.5)}" x2="1005" y2="${py(8.5)}" stroke="var(--ink2)" stroke-width="2" stroke-dasharray="7 4"/>`
+    +`<line x1="835" y1="${py(8.35)}" x2="1005" y2="${py(8.35)}" stroke="var(--ink2)" stroke-width=".8" stroke-dasharray="7 4"/>`
+    +`<line x1="840" y1="${py(8.35)}" x2="840" y2="500" stroke="var(--ink2)" stroke-width="1.6" stroke-dasharray="7 4"/>`
+    +`<line x1="1000" y1="${py(8.35)}" x2="1000" y2="500" stroke="var(--ink2)" stroke-width="1.6" stroke-dasharray="7 4"/>`;
+  g+=`<path d="M856 ${py(9.6)} L904 ${py(9.6)} L904 ${py(11.4)} L856 ${py(11.4)} Z" fill="none" stroke="var(--s1)" stroke-width="1.3" stroke-dasharray="5 3"/>`
+    +`<path d="M856 ${py(9.6)} L880 ${py(8.5)} L904 ${py(9.6)}" fill="none" stroke="var(--s1)" stroke-width="1.3" stroke-dasharray="5 3"/>`
+    +`<text x="910" y="231" font-size="7.8" font-weight="700" fill="var(--ink)">ИСПАРИТЕЛИ II СТУПЕНЕЙ</text>`
+    +`<text x="910" y="242" font-size="7.4" fill="var(--ink2)">низ конуса +8…+9 — на этажерке</text>`;
+  g+=`<line x1="877" y1="${py(8.5)}" x2="877" y2="${py(1.6)}" stroke="var(--s1)" stroke-width="1.2"/><line x1="883" y1="${py(8.5)}" x2="883" y2="${py(1.6)}" stroke="var(--s1)" stroke-width="1.2"/>`
+    +`<text x="869" y="380" font-size="7.2" fill="var(--s1)" text-anchor="middle" transform="rotate(-90 869 380)">солевая колонна</text>`;
+  g+=vdim(915,py(8.5),py(1.4),'столб пульпы 7,0–7,9 м',7.6);
+  g+=ko(838,304,166,10)+`<text x="920" y="312" font-size="7.5" fill="var(--ink2)" text-anchor="middle">ЭТАЖЕРКА (СП 16.13330) — предложение БИ</text>`;
+  /* репульпатор + центрифуги + фасовка */
+  g+=`<rect x="856" y="${py(1.6)}" width="50" height="${500-py(1.6)}" fill="none" stroke="var(--s1)" stroke-width="1.2" stroke-dasharray="5 3"/>`
+    +`<line x1="858" y1="${py(1.4)}" x2="904" y2="${py(1.4)}" stroke="var(--s1)" stroke-width=".8"/>`
+    +`<text x="881" y="483" font-size="6.6" fill="var(--ink2)" text-anchor="middle">репульпаторы</text>`
+    +`<text x="881" y="492" font-size="6.6" fill="var(--ink2)" text-anchor="middle">(0,000)</text>`;
+  g+=`<rect x="925" y="${py(1.1)}" width="55" height="${py(0.35)-py(1.1)}" fill="none" stroke="var(--s1)" stroke-width="1.2" stroke-dasharray="5 3"/>`
+    +`<rect x="918" y="${py(0.35)}" width="69" height="${500-py(0.35)}" fill="none" stroke="var(--ink2)" stroke-width="1" stroke-dasharray="3 3"/>`
+    +`<text x="958" y="459.5" font-size="7.2" fill="var(--ink2)" text-anchor="middle">центрифуги — инд.</text>`
+    +`<text x="958" y="468.5" font-size="7.2" fill="var(--ink2)" text-anchor="middle">виброфундаменты</text>`;
+  g+=`<line x1="1015" y1="497" x2="1080" y2="497" stroke="var(--mut)" stroke-width="1.2" stroke-dasharray="5 3"/>`
+    +`<line x1="1015" y1="497" x2="1015" y2="490" stroke="var(--mut)" stroke-width="1.2"/><line x1="1080" y1="497" x2="1080" y2="490" stroke="var(--mut)" stroke-width="1.2"/>`
+    +`<text x="1048" y="452" font-size="7.2" fill="var(--mut)" text-anchor="middle">фасовка биг-бегов,</text>`
+    +`<text x="1048" y="461" font-size="7.2" fill="var(--mut)" text-anchor="middle">склад — на 0,000,</text>`
+    +`<text x="1048" y="470" font-size="7.2" fill="var(--mut)" text-anchor="middle">проезд погрузчика</text>`;
+  /* существующие перекрытия +5/+6 */
+  g+=`<line x1="1040" y1="${py(5)}" x2="1088" y2="${py(5)}" stroke="var(--ink2)" stroke-width="2.4"/>`
+    +`<line x1="1040" y1="${py(6)}" x2="1088" y2="${py(6)}" stroke="var(--ink2)" stroke-width="2.4"/>`
+    +`<text x="1046" y="${py(5.65)}" font-size="7" fill="var(--mut)" text-anchor="middle">сущ. перекрытия</text>`
+    +`<text x="1046" y="${py(5.3)}" font-size="7" fill="var(--mut)" text-anchor="middle">(частично)</text>`;
+  /* отметки справа */
+  g+=lev(py(15.65),'+15,35…+15,95')+lev(py(12.65),'+12,4…+12,9')+lev(py(10.25),'+10,0/+10,5')
+    +lev(py(6),'+6,000')+lev(py(5),'+5,000')+lev(py(0),'0,000')+lev(py(-1.95),'−1,65…−2,25');
+  /* легенда */
+  g+=`<text x="470" y="604" font-size="7.8" fill="var(--mut)">— — — пунктир: предложения/допущения БИ (уточняются обследованием ГМУ и опросными листами) · сплошное: существующее здание и расчётные габариты БИ</text>`;
+
+  return `<svg id="lay2-svg" class="gsvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1190 640" style="width:1190px;max-width:none;display:block;font-family:system-ui,sans-serif">
+    <defs><marker id="mk-l2d" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto"><path d="M2 8 L8 2" stroke="context-stroke" stroke-width="1.6"/></marker></defs>
+    <rect x="0" y="0" width="1190" height="640" fill="var(--surface)"/>
+    <rect x="6" y="6" width="1178" height="628" fill="none" stroke="var(--border)"/>
+    <text x="20" y="626" font-size="10" fill="var(--mut)">ЭСКИЗ — не для строительства · Компоновка Лота №2 (купоросы) в сущ. ГМУ + высотная проверка барометрич. конденсаторов · источники: Прил. №7 ФМ.01648-АР/АР1/КО, ТЗ п. 4.5, расчёт БИ · КВАНТ, черновик БИ</text>
+    <text x="1174" y="30" font-size="12" font-weight="800" fill="var(--ink2)" text-anchor="end">КОМПОНОВКА · ЛОТ №2 — УЧАСТОК КУПОРОСОВ В ЗДАНИИ ГМУ</text>
+    ${g}</svg>`;
+}
+
+/* --- эскиз: план склада готовой продукции (Лот №4) — компоновка пролёта 24 м --- */
+function svgLay4(){
+  const S=6.15, ox=96, oy=120;                       // 1 м = 6,15 px
+  const px=m=>+(ox+m*S).toFixed(1), py=m=>+(oy+m*S).toFixed(1);
+  const C={main:'var(--s1)',meas:'#a34e9e',out:'var(--good)',aux:'var(--mut)',warn:'var(--warn)',crit:'var(--crit)'};
+  const tt=(x,y,t,s,c,a,w)=>`<text x="${x}" y="${y}" font-size="${s||8}" fill="${c||'var(--ink2)'}"${a?` text-anchor="${a}"`:''}${w?' font-weight="700"':''}>${t}</text>`;
+  const bx=(x,y,w,h,t1,t2,cls,dash)=>{
+    const c=C[cls||'main'];
+    let s=`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="7" fill="none" stroke="${c}" stroke-width="1.6"${dash?' stroke-dasharray="6 4"':''}/>`
+      +`<text x="${x+w/2}" y="${y+(t2?16:h/2+4)}" font-size="10.5" font-weight="700" fill="var(--ink)" text-anchor="middle">${t1}</text>`;
+    if(t2) t2.split('|').forEach((ln,i)=>{ s+=`<text x="${x+w/2}" y="${y+29+i*11.5}" font-size="9" fill="var(--ink2)" text-anchor="middle">${ln}</text>`; });
+    return s; };
+  let g='';
+  /* ===== ключевая строка ТТХ (слева сверху) ===== */
+  g+=tt(20,32,'75 000 т/год · приёмка 209,5 т/сут = 84 пакета/сут (по 2,5 т) · пик 7 пак./ч · буфер 1200 пакетов = 3000 т ≈ 14,3 сут · площадь СГП ≈2500–3000 м²',8.5,'var(--ink2)');
+  /* ===== заголовки зон над планом ===== */
+  g+=tt(px(8),92,'ПРИЁМКА · УПАКОВКА',9.5,'var(--ink2)','middle',1);
+  g+=tt(px(8),106,'≈200–250 м² · ≈100–150 м²',8,'var(--mut)','middle');
+  g+=tt(px(60),92,'ЗОНА АДРЕСНОГО ХРАНЕНИЯ — БУФЕР 1200 ПАКЕТОВ (3000 т ≈ 14,3 сут)',10.5,'var(--s1)','middle',1);
+  g+=tt(px(60),106,'длина ≈70–90 м · 600 позиций 1,1×1,1 м × 2 яруса · пятно 726 м² · зона ≈1600 м²',8,'var(--mut)','middle');
+  g+=tt(px(129.5),92,'ФРОНТЫ ОТГРУЗКИ — Ж/Д И АВТО',10.5,'var(--good)','middle',1);
+  g+=tt(px(129.5),106,'ж/д 4–6 вагонов (60–90 м): полувагоны — краном (вариант), крытые — штабелёрами · авто — 2 поста',8,'var(--mut)','middle');
+  /* ===== сетка адресных линий (до стен, чтобы стены были сверху) ===== */
+  for(const ys of [3.7,6.75,9.8,15.85,18.75,21.65]){
+    const y0=py(ys), h=+(2.2*S).toFixed(1);
+    g+=`<rect x="${px(22.5)}" y="${y0}" width="${(69.3*S).toFixed(1)}" height="${h}" fill="rgba(42,120,214,.20)" stroke="var(--s1)" stroke-width=".6"/>`;
+    g+=`<line x1="${px(22.5)}" y1="${py(ys+1.1)}" x2="${px(91.8)}" y2="${py(ys+1.1)}" stroke="var(--s1)" stroke-width=".35" opacity=".7"/>`;
+    let d='M'+px(23.6)+' '+y0+' v'+h;
+    for(let k=1;k<62;k++) d+=' m6.77 -'+h+' v'+h;
+    g+=`<path d="${d}" stroke="var(--s1)" stroke-width=".3" opacity=".55" fill="none"/>`;
+  }
+  /* ===== разделители зон (пунктир) ===== */
+  for(const xm of [10,16,21.5,93.5,99.5])
+    g+=`<line x1="${px(xm)}" y1="${py(0)}" x2="${px(xm)}" y2="${py(24)}" stroke="var(--mut)" stroke-width=".8" stroke-dasharray="3 4"/>`;
+  /* ===== конвейер приёмки ===== */
+  g+=`<rect x="${px(0)}" y="${py(10.8)}" width="${(16*S).toFixed(1)}" height="${(2.4*S).toFixed(1)}" fill="rgba(42,120,214,.15)" stroke="var(--s1)" stroke-width="1.1"/>`;
+  g+=`<path d="M99 ${py(12)} L114 ${py(12)}" stroke="var(--s1)" stroke-width="1.4" fill="none" marker-end="url(#mk-lay4)"/>`;
+  g+=`<path d="M144 ${py(12)} L157 ${py(12)}" stroke="var(--s1)" stroke-width="1.4" fill="none" marker-end="url(#mk-lay4)"/>`;
+  /* весы приёмки: демаркация + платформа */
+  g+=`<rect x="${px(3.6)}" y="${py(9.9)}" width="${(3.8*S).toFixed(1)}" height="${(4.2*S).toFixed(1)}" fill="none" stroke="#a34e9e" stroke-width=".9" stroke-dasharray="4 3"/>`;
+  g+=`<rect x="${px(4)}" y="${py(10.3)}" width="${(3*S).toFixed(1)}" height="${(3.4*S).toFixed(1)}" fill="none" stroke="#a34e9e" stroke-width="1.5"/>`;
+  g+=tt(px(5.5),192,'весы',7.5,'#a34e9e','middle',1)+tt(px(5.5),201,'3 т',7.5,'#a34e9e','middle');
+  /* разбраковка */
+  g+=`<rect x="${px(2)}" y="${py(16)}" width="${(6*S).toFixed(1)}" height="${(5*S).toFixed(1)}" fill="none" stroke="var(--crit)" stroke-width="1.4"/>`;
+  g+=tt(px(5),231,'разбра-',7.5,'var(--crit)','middle',1)+tt(px(5),240.5,'ковка',7.5,'var(--crit)','middle',1);
+  g+=`<path d="M${px(5.5)} 207 L${px(5.5)} 216" stroke="var(--crit)" stroke-width="1.2" stroke-dasharray="4 3" fill="none" marker-end="url(#mk-lay4)"/>`;
+  /* сверловка проб */
+  g+=`<rect x="${px(2)}" y="${py(3)}" width="${(6*S).toFixed(1)}" height="${(5*S).toFixed(1)}" fill="none" stroke="var(--s1)" stroke-width="1.1"/>`;
+  g+=tt(px(5),150.5,'сверлов.',7.5,'var(--s1)','middle',1)+tt(px(5),160,'проб',7.5,'var(--s1)','middle');
+  g+=`<path d="M${px(5)} 180 L${px(5)} 171" stroke="var(--s1)" stroke-width="1.1" stroke-dasharray="4 3" fill="none" marker-end="url(#mk-lay4)"/>`;
+  /* увязка/маркировка */
+  g+=`<rect x="${px(10.5)}" y="${py(9.8)}" width="${(5*S).toFixed(1)}" height="${(4.4*S).toFixed(1)}" fill="none" stroke="var(--s1)" stroke-width="1.6"/>`;
+  g+=tt(px(13),190,'увязка',7.5,'var(--s1)','middle',1)+tt(px(13),199,'маркир.',7.5,'var(--s1)','middle',1);
+  /* зарядная/операторская (размещение — предложение БИ) */
+  g+=`<rect x="${px(10)}" y="${py(2)}" width="${(5.5*S).toFixed(1)}" height="${(5.5*S).toFixed(1)}" fill="none" stroke="var(--warn)" stroke-width="1.2" stroke-dasharray="5 4"/>`;
+  g+=`<line x1="${px(12.75)}" y1="${py(2)}" x2="${px(12.75)}" y2="117" stroke="var(--mut)" stroke-width=".7"/>`;
+  g+=tt(105,114,'зарядная · операторская (уточняется)',7.5,'var(--mut)');
+  /* ===== магистральный проезд ===== */
+  g+=`<text transform="rotate(-90 200 236)" x="200" y="236" font-size="8" fill="var(--ink2)" text-anchor="middle">магистральный</text>`;
+  g+=`<text transform="rotate(-90 210 236)" x="210" y="236" font-size="8" fill="var(--ink2)" text-anchor="middle">проезд 4,5–6 м</text>`;
+  /* ===== подписи проездов ===== */
+  g+=tt(px(57.5),133.5,'проезд штабелёров 3,5–4,0 м · фронтальный штабелёр г/п 3,2–5 т (пакет 1×1 м)',8,'var(--ink2)','middle');
+  g+=tt(460,208.5,'проезд штабелёров 3,5–4,0 м',8,'var(--ink2)','middle');
+  /* штабелёр (символ) в среднем проезде */
+  g+=`<rect x="264" y="200" width="16" height="12" fill="none" stroke="var(--ink2)" stroke-width="1"/>`
+    +`<line x1="280" y1="198" x2="280" y2="214" stroke="var(--ink2)" stroke-width="1.2"/>`
+    +`<path d="M281 204 h9 M281 210 h9" stroke="var(--ink2)" stroke-width="1" fill="none"/>`;
+  /* ===== комплектация партии (зона у фронтов) ===== */
+  g+=`<text transform="rotate(-90 686 178)" x="686" y="178" font-size="7.5" fill="var(--ink2)" text-anchor="middle">комплектация</text>`;
+  g+=`<text transform="rotate(-90 697 178)" x="697" y="178" font-size="7.5" fill="var(--ink2)" text-anchor="middle">партии</text>`;
+  /* ===== ж/д фронт ===== */
+  g+=`<line x1="712" y1="136" x2="712" y2="152" stroke="var(--ink2)" stroke-width="1.5"/>`;   // упор
+  g+=`<line x1="712" y1="${py(3.2)}" x2="1141" y2="${py(3.2)}" stroke="var(--ink2)" stroke-width="1.1"/>`;
+  g+=`<line x1="712" y1="${py(4.72)}" x2="1141" y2="${py(4.72)}" stroke="var(--ink2)" stroke-width="1.1"/>`;
+  for(const [xm,wm] of [[102,13.5],[117,13.5],[132,13.5],[146,12]])
+    g+=`<rect x="${px(xm)}" y="${py(2.36)}" width="${(wm*S).toFixed(1)}" height="${(3.2*S).toFixed(1)}" fill="none" stroke="var(--ink2)" stroke-width="1"/>`;
+  /* вагонные весы */
+  g+=`<rect x="${px(145)}" y="${py(1.2)}" width="${(13.5*S).toFixed(1)}" height="${(6.4*S).toFixed(1)}" fill="none" stroke="#a34e9e" stroke-width="1" stroke-dasharray="4 3"/>`;
+  g+=tt(1070,175.5,'вагонные весы',7.8,'#a34e9e','end',1);
+  g+=tt(1070,183.5,'отдельный фундамент (Прил. №5)',7.5,'var(--mut)','end');
+  /* подписи фронта */
+  g+=tt(745,167.4,'полувагон: 27 пакетов = 67,5 т',8,'var(--ink2)');
+  g+=tt(745,177.2,'отгрузка 84 пак./сут ≈ 3 полувагона/сут',8,'var(--ink2)');
+  g+=tt(745,195,'мостовой кран с траверсой — вариант полувагонов (уточняется)',8,'var(--crit)');
+  g+=`<line x1="735" y1="128" x2="735" y2="260" stroke="var(--crit)" stroke-width="1.2" stroke-dasharray="6 4"/>`;
+  /* ===== стены, колонны ===== */
+  g+=`<rect x="${px(0)}" y="${py(0)}" width="${(159.5*S).toFixed(1)}" height="${(24*S).toFixed(1)}" fill="none" stroke="var(--ink)" stroke-width="2"/>`;
+  for(let x=0;x<=156;x+=6){
+    g+=`<rect x="${px(x)-2.1}" y="${py(0)-2.1}" width="4.2" height="4.2" fill="var(--ink2)"/>`;
+    g+=`<rect x="${px(x)-2.1}" y="${py(24)-2.1}" width="4.2" height="4.2" fill="var(--ink2)"/>`;
+  }
+  /* ===== ворота (границы по ТЗ — зелёный пунктир) ===== */
+  g+=`<line x1="${px(0)}" y1="${py(9.9)}" x2="${px(0)}" y2="${py(14.1)}" stroke="var(--good)" stroke-width="3" stroke-dasharray="7 5"/>`;
+  g+=`<line x1="${px(159.5)}" y1="${py(1.7)}" x2="${px(159.5)}" y2="${py(6.8)}" stroke="var(--good)" stroke-width="3" stroke-dasharray="7 5"/>`;
+  g+=`<line x1="${px(103)}" y1="${py(24)}" x2="${px(107)}" y2="${py(24)}" stroke="var(--good)" stroke-width="3" stroke-dasharray="7 5"/>`;
+  g+=`<line x1="${px(109)}" y1="${py(24)}" x2="${px(113)}" y2="${py(24)}" stroke="var(--good)" stroke-width="3" stroke-dasharray="7 5"/>`;
+  /* передаточные ворота: стрелка от КСМ и подпись */
+  g+=`<path d="M34 ${py(12)} L90 ${py(12)}" stroke="var(--s1)" stroke-width="1.7" fill="none" marker-end="url(#mk-lay4)"/>`;
+  g+=tt(20,178,'от КСМ',7.8,'var(--s1)')+tt(20,188,'(Лот №3)',7.8,'var(--s1)');
+  g+=tt(20,216,'передаточные',7.8,'var(--good)')+tt(20,226,'ворота —',7.8,'var(--good)')+tt(20,236,'граница ТЗ',7.8,'var(--good)');
+  /* ж/д ворота: подписи справа */
+  g+=tt(1082,126,'ворота ж/д (граница ТЗ)',7.8,'var(--good)');
+  g+=tt(1082,162,'проём — проверка',7.5,'var(--mut)')+tt(1082,172,'по ГОСТ 9238-2013',7.5,'var(--mut)');
+  g+=tt(1082,182,'выход на существующие',7.5,'var(--mut)')+tt(1082,192,'ж/д пути',7.5,'var(--mut)');
+  /* ===== потоки штабелёров (синие стрелки) ===== */
+  g+=`<path d="M${px(16)} ${py(12)} L211.3 ${py(12)}" stroke="var(--s1)" stroke-width="1.6" fill="none"/>`;
+  g+=`<path d="M211.3 ${py(12)} L211.3 ${py(1.75)} L237.5 ${py(1.75)}" stroke="var(--s1)" stroke-width="1.6" fill="none" marker-end="url(#mk-lay4)"/>`;
+  g+=`<path d="M211.3 ${py(12)} L211.3 ${py(13.95)} L237.5 ${py(13.95)}" stroke="var(--s1)" stroke-width="1.6" fill="none" marker-end="url(#mk-lay4)"/>`;
+  g+=`<path d="M655.7 ${py(13.95)} L725 ${py(13.95)} L725 157" stroke="var(--s1)" stroke-width="1.6" fill="none" marker-end="url(#mk-lay4)"/>`;
+  g+=`<path d="M700 ${py(13.95)} L741.7 ${py(13.95)} L741.7 263" stroke="var(--s1)" stroke-width="1.6" fill="none" marker-end="url(#mk-lay4)"/>`;
+  g+=tt(660,214,'штабелёрами',7.5,'var(--s1)');
+  /* ===== автофронт снаружи (внизу) ===== */
+  for(const tx0 of [732.6,770]){
+    g+=`<rect x="${tx0}" y="272" width="18.4" height="49" fill="none" stroke="var(--mut)" stroke-width="1" stroke-dasharray="5 3"/>`;
+    g+=`<line x1="${tx0}" y1="310" x2="${tx0+18.4}" y2="310" stroke="var(--mut)" stroke-width=".8"/>`;
+  }
+  g+=tt(780,332,'ворота автоотгрузки — граница ТЗ · 2 поста',7.8,'var(--good)','middle');
+  g+=tt(697,343,'проёмы ворот ≥3,5 м · мачта штабелёра до 3 м',7.5,'var(--mut)','middle');
+  g+=`<rect x="837" y="276" width="92.3" height="24" fill="none" stroke="#a34e9e" stroke-width="1" stroke-dasharray="4 3"/>`;
+  g+=tt(883,285.5,'автомобильные весы',7.5,'#a34e9e','middle',1)+tt(883,295,'(подъезд, вне здания)',7,'#a34e9e','middle');
+  g+=tt(940,284,'весы на подъезде — пандусы,',7.5,'var(--mut)')+tt(940,295,'отбойники, демаркация (Прил. №5)',7.5,'var(--mut)');
+  /* ===== подписи под планом (колонки) ===== */
+  g+=tt(96,284,'весы приёмки: платформенные',7.5)+tt(96,295,'конвейерные, НПВ 3 т, класс «высокий»,',7.5)
+    +tt(96,306,'допуск 2500 ± 50 кг; вне допуска —',7.5)+tt(96,317,'разбраковка · сверловка проб по АСУ',7.5);
+  g+=tt(292,284,'увязка: контроль 3 лент, дотяжка;',7.5)+tt(292,295,'маркировка: этикетки партии',7.5)
+    +tt(292,306,'зоны: приёмка ≈200–250 м²,',7.5)+tt(292,317,'упаковка ≈100–150 м²',7.5);
+  g+=tt(565,284,'адресные линии: стопы 1,0×1,0 м, зазоры 100 мм,',7.5,'var(--ink2)','middle')
+    +tt(565,295,'продольные линии по 2 пакета в глубину · разметка машиночитаемая',7.5,'var(--ink2)','middle')
+    +tt(565,306,'движение однонаправленное: приёмка → хранение → отгрузка',7.5,'var(--ink2)','middle')
+    +tt(565,317,'резерв адресов готовых партий — у фронтов',7.5,'var(--ink2)','middle');
+  /* ===== размерные линии ===== */
+  const dim=(x1,y1,x2,y2)=>`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="var(--ink2)" stroke-width=".9" marker-start="url(#mkd-lay4)" marker-end="url(#mkd-lay4)"/>`;
+  g+=dim(86,py(0),86,py(24));
+  g+=`<text transform="rotate(-90 76 155)" x="76" y="155" font-size="7.5" font-weight="700" fill="var(--ink2)" text-anchor="middle">24 000 — пролёт</text>`;
+  g+=`<text transform="rotate(-90 76 231)" x="76" y="231" font-size="7.5" font-weight="700" fill="var(--ink2)" text-anchor="middle">(крановый 22 000)</text>`;
+  g+=`<line x1="222" y1="${py(3.5)}" x2="222" y2="${py(12.2)}" stroke="var(--mut)" stroke-width=".7"/>`;
+  g+=`<line x1="222" y1="${py(15.7)}" x2="222" y2="${py(24)}" stroke="var(--mut)" stroke-width=".7"/>`;
+  for(const ym of [3.5,12.2,15.7,24]) g+=`<line x1="216" y1="${py(ym)}" x2="229" y2="${py(ym)}" stroke="var(--mut)" stroke-width=".7"/>`;
+  g+=`<text transform="rotate(-90 218 ${py(7.85)})" x="218" y="${py(7.85)}" font-size="6.8" fill="var(--mut)" text-anchor="middle">~9 м</text>`;
+  g+=`<text transform="rotate(-90 218 ${py(19.85)})" x="218" y="${py(19.85)}" font-size="6.8" fill="var(--mut)" text-anchor="middle">~9 м</text>`;
+  /* ===== инсет: узел приёмки (схема процесса) ===== */
+  g+=tt(96,352,'УЗЕЛ ПРИЁМКИ И УПАКОВКИ — СХЕМА ПРОЦЕССА (операции 1–5 техпроцесса)',9.5,'var(--ink2)','',1);
+  g+=bx(96,364,152,62,'КОНВЕЙЕР ПРИЁМКИ','от КСМ (Лот №3), через|передаточные ворота|3,5 пак./ч, пик до 7','main');
+  g+=bx(282,364,156,62,'ВЕСЫ ПРИЁМКИ','платформенные конвейерные|НПВ 3 т · класс «высокий»|допуск 2500 ± 50 кг','meas');
+  g+=bx(472,364,156,62,'УВЯЗКА · МАРКИРОВКА','контроль/дотяжка увязки|(3 ленты) · этикетирование|партийная маркировка','main');
+  g+=bx(662,364,136,62,'ВЫДАЧА НА ШТАБЕЛЁР','по размеченным линиям|в стопы до 2 ярусов|→ адресное хранение','main');
+  g+=`<path d="M248 395 L282 395" stroke="var(--s1)" stroke-width="1.7" fill="none" marker-end="url(#mk-lay4)"/>`;
+  g+=`<path d="M438 395 L472 395" stroke="var(--s1)" stroke-width="1.7" fill="none" marker-end="url(#mk-lay4)"/>`;
+  g+=`<path d="M628 395 L662 395" stroke="var(--s1)" stroke-width="1.7" fill="none" marker-end="url(#mk-lay4)"/>`;
+  g+=bx(262,452,120,52,'РАЗБРАКОВКА','вне допуска массы|переукладка по АСУ','crit');
+  g+=bx(398,452,130,52,'СВЕРЛОВКА ПРОБ','часть катодов|по заданию АСУ','main');
+  g+=`<path d="M330 426 L330 452" stroke="var(--crit)" stroke-width="1.3" stroke-dasharray="4 3" fill="none" marker-end="url(#mk-lay4)"/>`;
+  g+=tt(336,442,'вне допуска',7.5,'var(--crit)');
+  g+=`<path d="M430 426 L430 452" stroke="var(--s1)" stroke-width="1.3" stroke-dasharray="4 3" fill="none" marker-end="url(#mk-lay4)"/>`;
+  g+=tt(436,442,'по заданию АСУ',7.5,'var(--s1)');
+  g+=tt(96,530,'Поток: 75 000 т/год = 209,5 т/сут (358 сут) · буфер покрывает: партия-маршрут 1350 т (20 полувагонов × 27 пакетов) в наборе +',7.8,'var(--mut)');
+  g+=tt(96,542,'готовая партия в ожидании подачи + страховой запас 2–3 сут + технологический запас (химанализ) 1–2 сут · минимум 1500 т (7 сут)',7.8,'var(--mut)');
+  /* ===== инсет: ярусность и нагрузки ===== */
+  g+=tt(810,352,'ЯРУСНОСТЬ И НАГРУЗКИ НА ПОЛ',9.5,'var(--ink2)','',1);
+  g+=`<line x1="812" y1="500" x2="905" y2="500" stroke="var(--ink2)" stroke-width="1.3"/>`;
+  g+=`<rect x="826" y="478" width="64" height="22" fill="rgba(42,120,214,.22)" stroke="var(--s1)" stroke-width="1.3"/>`;
+  g+=`<rect x="826" y="456" width="64" height="22" fill="rgba(42,120,214,.22)" stroke="var(--s1)" stroke-width="1.3"/>`;
+  g+=`<rect x="826" y="434" width="64" height="22" fill="none" stroke="var(--s1)" stroke-width="1" stroke-dasharray="5 4"/>`;
+  g+=tt(858,492.5,'пакет 2,5 т',7,'var(--ink2)','middle')+tt(858,470.5,'1,0 × 1,0 м',7,'var(--ink2)','middle')+tt(858,448.5,'3-й ярус?',7,'var(--mut)','middle');
+  g+=dim(818,456,818,500);
+  g+=`<text transform="rotate(-90 812 478)" x="812" y="478" font-size="6.8" fill="var(--ink2)" text-anchor="middle">≈0,9–1,1 м</text>`;
+  g+=tt(858,512,'стопа 2 яруса (базово)',7.5,'var(--mut)','middle');
+  g+=tt(915,368,'хранение в стопах: 2 яруса — базово;',8.2);
+  g+=tt(915,381,'3-й ярус — по обследованию пола (уточняется)',8.2);
+  g+=tt(915,394,'пакет 2,5 т на пятне 1,0×1,0 м',8.2);
+  g+=tt(915,407,'нагрузка от стоп (СП 20.13330): 24,5 кПа/ярус',8.2);
+  g+=tt(915,420,'2 яруса — 49,1 кПа (расчётная 58,9)',8.2);
+  g+=tt(915,433,'3 яруса — 73,6 кПа (расчётная 88,3)',8.2);
+  g+=tt(915,446,'колесо штабелёра 3,5–4,5 тс (масса 8–11 т)',8.2);
+  g+=tt(915,459,'плита пола по СП 29.13330, топпинг, безуклонная',8.2);
+  g+=tt(915,472,'ровность: просвет ≤4 мм под 2-м рейкой',8.2);
+  g+=tt(915,485,'весовые зоны — отдельные фундаменты (Прил. №5)',8.2);
+  /* ===== примечания ===== */
+  g+=tt(96,566,'Базис размещения — ТЗ v4.1 п. 1.3 (новый склад ГП, задание на новый корпус); показана компоновка в пролёте 24 м с шагом колонн 6 м по разд. «Компоновочные решения» (резервный сценарий А — ЦЭМ); зонирование нового корпуса аналогично.',7.8,'var(--mut)');
+  g+=tt(96,578,'Цвета: синий — поток продукции и адресные линии · фиолетовый — весовые зоны · зелёный пунктир — границы проектирования по ТЗ (ворота) · красный — разбраковка, кран (вариант) · жёлтый — зарядная · пунктиром — предложения БИ (уточняется).',7.8,'var(--mut)');
+  return `<svg id="lay4-svg" class="gsvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1190 640" style="width:1190px;max-width:none;display:block;font-family:system-ui,sans-serif">
+    <defs><marker id="mk-lay4" markerWidth="9" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0 0 L9 4 L0 8 Z" fill="context-stroke"/></marker>
+    <marker id="mkd-lay4" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto"><path d="M2 8 L8 2" stroke="context-stroke" stroke-width="1.6"/></marker></defs>
+    <rect x="0" y="0" width="1190" height="640" fill="var(--surface)"/>
+    <rect x="6" y="6" width="1178" height="628" fill="none" stroke="var(--border)"/>
+    <text x="20" y="622" font-size="10" fill="var(--mut)">ЭСКИЗ — не для строительства · Лот №4: план склада готовой продукции (пролёт 24 м, сценарий А) · источники: bi_lot4.json («Компоновка», «Ёмкость», «Полы», техпроцесс) · КВАНТ, черновик БИ</text>
+    <text x="1174" y="30" font-size="12" font-weight="800" fill="var(--ink2)" text-anchor="end">ПЛАН · ЛОТ №4 — СКЛАД ГОТОВОЙ ПРОДУКЦИИ</text>
+    <text x="1174" y="44" font-size="8.5" fill="var(--mut)" text-anchor="end">эскиз компоновки · приёмка → адресное хранение → фронты отгрузки</text>
+    ${g}</svg>`;
+}
+
 /* манифест графических заготовок вкладки «Базовый проект»: добавление листа = функция + строка здесь */
 const SKETCHES = [
  {f:svgPfd1, id:'pfd1-svg', dl:'ove75-lot1-pfd-eskiz.svg', lot:1, title:'PFD · Лот №1 — цех обжига',
@@ -2026,6 +2548,12 @@ const SKETCHES = [
   cap:'Контуры ИД: TIC-301 слой 930 °C, FIC-302/303 дутьё и кислород, LICA-401 трёхимпульсный, PDIC-307 выгрузка огарка; ПАЗ красным пунктиром; топка ГМ-4,5 — вспомогательный вариант.'},
  {f:svgEl3, id:'el3-svg', dl:'ove75-lot3-odnolineynaya-eskiz.svg', lot:3, title:'Однолинейная схема · Лот №3 — электроснабжение отделения ЭЭ',
   cap:'Граница поставки зелёным: выше — ГПП/РУ/выпрямители пунктиром (вне лота, интерфейс Modbus TCP), ниже — серии 90 ванн, ошиновка, изолирующие стыки, мониторинг U.'},
+ {f:svgPid2, id:'pid2-svg', dl:'ove75-lot2-pid-vyparka-eskiz.svg', lot:2, title:'P&ID · Лот №2 — выпарная установка нитки 1',
+  cap:'Подогреватель, испарители I/II ст., эжекторы и ПЭБ, барометрический конденсатор с трубой H≈10,5 м; контуры LIC/TIC/PIC/DIC с уставками из данных; пунктир — уточняется при P&ID.'},
+ {f:svgLay2, id:'lay2-svg', dl:'ove75-lot2-komponovka-gmu-eskiz.svg', lot:2, title:'Компоновка · Лот №2 — участок купоросов в здании ГМУ (сценарий А)',
+  cap:'План ГМУ 96×108 м и разрез по 24-м пролёту: высотная проверка барометрических труб — вариант без приямка не проходит (красным), вариант А с приямком 2,0–2,5 м даёт запас 0,9–1,9 м.'},
+ {f:svgLay4, id:'lay4-svg', dl:'ove75-lot4-plan-sklada-eskiz.svg', lot:4, title:'План · Лот №4 — склад готовой продукции',
+  cap:'Адресное хранение 600 позиций × 2 яруса (буфер 1200 пакетов ≈ 14,3 сут), проезды штабелёров, весы приёмки, ж/д фронт 60–90 м и автофронт; нагрузки на полы из расчёта.'},
  {f:svgVys1, id:'vys1-svg', dl:'ove75-lot1-vysotka-eskiz.svg', lot:1, title:'Высотная схема · Лот №1 — главный корпус цеха обжига',
   cap:'Разрез-развёртка по цепочке аппаратов: бункеры, печь КС (подина ~+4,5), котёл-утилизатор, газоочистка, дымососы, наружная этажерка силосов; отметки и краны — предварительные.'},
  {f:svgPfd2, id:'pfd2-svg', dl:'ove75-lot2-pfd-eskiz.svg', lot:2, title:'PFD · Лот №2 — участок медного и медно-никелевого купороса',
@@ -2104,6 +2632,12 @@ function rBI(){
     </tbody></table></div>
     ${(r.removed||[]).length?`<div class="mut">Удалены против прошлой ревизии: ${r.removed.map(esc).join(' · ')}</div>`:''}
     </div>`;}).join('')}`:''}
+  ${ECO?`<h2>Экология / ООС — предварительно, из посчитанных балансов</h2>
+  <div class="box info">${esc(ECO.note)}</div>
+  <div class="grid2">${ECO.sections.map(s=>`<div class="card"><h3>${esc(s.title)}</h3>
+    ${(s.items||[]).length?`<div class="tblwrap"><table><tbody>${s.items.map(i=>`<tr><td>${esc(i.label)}</td><td><b>${md(String(i.value))}</b></td><td class="mut">${esc(i.src||'')}</td></tr>`).join('')}</tbody></table></div>`:''}
+    ${s.note?`<p class="mut">${esc(s.note)}</p>`:''}</div>`).join('')}</div>
+`:''}
   <h2>Графические заготовки — с чего инженеру начать чертежи</h2>
   <div class="box info"><b>Что это.</b> Первые эскизы графической части, построенные из данных базы (ИД, расчётная модель, черновики ПЗ). Это стартовые подложки для CAD, а не выпущенные чертежи: инженер проверяет, переносит в CAD и дорабатывает. SVG скачивается кнопкой и открывается в любом векторном редакторе (Inkscape, CorelDRAW, nanoCAD через импорт).</div>
   ${SKETCHES.map(s=>`<div class="card"><h3>${esc(s.title)} ${s.lot?lotTag(s.lot):'<span class="tag">все лоты</span>'} <span class="tag">эскиз v0.1</span></h3>
