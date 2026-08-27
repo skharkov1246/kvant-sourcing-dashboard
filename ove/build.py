@@ -56,6 +56,7 @@ OPTIONAL = {
     "__BIDOCS_JSON__": "bi_docs.json",
     "__APPLY_JSON__": "podacha.json",
     "__GANTT_JSON__": "gantt.json",
+    "__READY_JSON__": "readiness.json",
 }
 
 

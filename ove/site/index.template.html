@@ -178,6 +178,7 @@ const HEDGE = __HEDGE_JSON__;
 const BIDOCS = __BIDOCS_JSON__;
 const APPLY = __APPLY_JSON__;
 const GANTT = __GANTT_JSON__;
+const READY = __READY_JSON__;
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const nf = (n,d=0) => (n===''||n===null||n===undefined||isNaN(n)) ? '—' : Number(n).toLocaleString('ru-RU',{minimumFractionDigits:d,maximumFractionDigits:d});
@@ -1819,6 +1820,19 @@ function rBI(){
     <div class="tile"><b>${nGost}</b><span>нормативов привязано</span></div>
     <div class="tile"><b>${nOpen}</b><span>открытых вопросов</span></div>
   </div>
+  ${READY?`<h2>Готовность разделов БИ — цель ${READY.target} %</h2>
+  <div class="box warn">${esc(READY.note)}</div>
+  ${READY.rows.map(r=>{
+    const c = r.now>=READY.target?'var(--good)':(r.now>=50?'var(--warn)':'var(--crit)');
+    return `<div style="display:flex;gap:10px;align-items:center;margin:7px 0;flex-wrap:wrap">
+      <div style="flex:0 0 min(340px,90vw);font-size:12.5px"><b>${esc(r.name)}</b>${r.ext?' <span class="tag">внешний вход</span>':''}</div>
+      <div style="flex:1 1 220px;min-width:160px;height:14px;background:var(--chip);border-radius:7px;position:relative;overflow:hidden">
+        <div style="width:${r.now}%;height:100%;background:${c};border-radius:7px"></div>
+        <div style="position:absolute;left:${READY.target}%;top:-2px;bottom:-2px;width:2px;background:var(--ink2)"></div>
+      </div>
+      <b style="flex:0 0 46px;text-align:right;color:${c}">${r.now} %</b>
+      <div class="mut" style="flex:1 1 100%;margin-left:2px">закрывает: ${esc(r.gap)}</div>
+    </div>`;}).join('')}`:''}
   ${rGantt()}
   ${BIDOCS?`<h2>Документы БИ — формирование и согласование с Заказчиком</h2>
   <div class="box info">${esc(BIDOCS.note)}</div>
