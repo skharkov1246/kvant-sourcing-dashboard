@@ -174,6 +174,8 @@ const DISC = __DISC_JSON__;
 const DELIV = __DELIV_JSON__;
 const CALC = __CALC_JSON__;
 const HEDGE = __HEDGE_JSON__;
+const BIDOCS = __BIDOCS_JSON__;
+const APPLY = __APPLY_JSON__;
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const nf = (n,d=0) => (n===''||n===null||n===undefined||isNaN(n)) ? '—' : Number(n).toLocaleString('ru-RU',{minimumFractionDigits:d,maximumFractionDigits:d});
@@ -859,6 +861,34 @@ function biPaint(){
     ${(s.open&&s.open.length)?`<div class="box amber"><b>Определяется на стадии БИ:</b><ul>${s.open.map(o=>`<li>${esc(o)}</li>`).join('')}</ul></div>`:''}
   </div>`).join('')}</div>`;
 }
+/* ============ Подача на конкурс: пакет документов со статусами ============ */
+const AP_ST = {ready:['готов (черновик)','tag lot3'], form:['заполнить','tag lot2'],
+               team:['за командой','tag lot1'], wait:['ждём документацию','tag']};
+function rApply(){
+  if(!APPLY) return '<div class="box warn">Раздел собирается.</div>';
+  const by = {}; APPLY.docs.forEach(d=>{by[d.status]=(by[d.status]||0)+1});
+  return `
+  <div class="box warn"><b>Пакет подачи на конкурсную процедуру.</b> ${esc(APPLY.note)}</div>
+  <div class="k">
+    <div class="tile"><b style="color:var(--good)">${by.ready||0}</b><span>файлы готовы</span></div>
+    <div class="tile"><b class="mid">${by.form||0}</b><span>заполнить</span></div>
+    <div class="tile"><b class="hi">${by.team||0}</b><span>за командой</span></div>
+    <div class="tile"><b>${by.wait||0}</b><span>ждём документацию</span></div>
+    <div class="tile"><b>${APPLY.docs.length}</b><span>позиций пакета</span></div>
+  </div>
+  <div class="tblwrap"><table><thead><tr><th style="width:34px">№</th><th>Документ</th><th style="width:130px">Статус</th>
+    <th style="width:70px">Файл</th><th style="width:180px">Кто закрывает</th><th>Примечание</th></tr></thead><tbody>
+  ${APPLY.docs.map(d=>`<tr>
+    <td class="mut">${esc(d.id)}</td><td><b>${esc(d.name)}</b></td>
+    <td><span class="${(AP_ST[d.status]||['?','tag'])[1]}">${(AP_ST[d.status]||[d.status])[0]}</span></td>
+    <td>${d.file?`<a class="btn" href="${esc(d.file)}" download>⬇</a>`:'—'}</td>
+    <td>${esc(d.who||'—')}</td><td class="mut">${esc(d.note||'')}</td></tr>`).join('')}
+  </tbody></table></div>
+  <h2>Что нужно, чтобы пакет закрылся</h2>
+  ${(APPLY.next||[]).map(n=>`<div class="box">${esc(n)}</div>`).join('')}
+  <div class="mut">Обновлено ${esc(APPLY.updated||'')}. Черновики пересобираются при каждой сборке сайта; итоговые файлы перед подачей — через владельца.</div>`;
+}
+
 function rBI(){
   if(!BI.length) return `<div class="box warn"><b>Раздел собирается.</b> Здесь будет черновик Базового инжиниринга по каждому лоту: описание техпроцесса по операциям, материальные и тепловые балансы, PFD и P&amp;ID с контурами регулирования и блокировками, компоновочные решения с нагрузками на конструкции и фундаменты, спецификации оборудования и КИПиА, схема КТС АСУ — с привязкой каждого раздела к действующим ГОСТ, СП, ПУЭ и ФНП.</div>`;
   const nSec = BI.reduce((a,d)=>a+d.sections.length,0);
@@ -872,6 +902,23 @@ function rBI(){
     <div class="tile"><b>${nGost}</b><span>нормативов привязано</span></div>
     <div class="tile"><b>${nOpen}</b><span>открытых вопросов</span></div>
   </div>
+  ${BIDOCS?`<h2>Документы БИ — формирование и согласование с Заказчиком</h2>
+  <div class="box info">${esc(BIDOCS.note)}</div>
+  ${BIDOCS.lots.map(L=>`<div class="card">
+    <h3>${lotTag(L.lot)} ${esc(L.name)}
+      <span class="tag lot3">${L.docs.filter(d=>d.status==='draft').length} черновиков</span>
+      <span class="tag">${L.docs.length} документов</span></h3>
+    <div class="tblwrap"><table><thead><tr><th>Документ</th><th style="width:60px">Этап</th>
+      <th style="width:150px">Статус</th><th style="width:60px">Файл</th><th>Примечание</th></tr></thead><tbody>
+    ${L.docs.map(d=>{
+      const st={draft:['черновик готов','tag lot3'],base:['контент в базе','tag lot2'],
+                task:['нужен инженер','tag lot1'],wait:['после старта','tag'],team:['за командой','tag lot1']}[d.status]||[d.status,'tag'];
+      return `<tr><td>${esc(d.name)}</td><td class="mut">Этап ${d.stage}</td>
+        <td><span class="${st[1]}">${st[0]}</span></td>
+        <td>${d.file?`<a class="btn" href="${esc(d.file)}" download>⬇</a>`:'—'}</td>
+        <td class="mut">${esc(d.note||'')}</td></tr>`;}).join('')}
+    </tbody></table></div></div>`).join('')}`:''}
+  <h2>Черновик по разделам</h2>
   <div class="filters">${BI.map((d,i)=>`<button class="btn bilot${i===biLot?' on':''}" data-i="${i}">${lotTag(d.lot)} ${esc(d.name)}</button>`).join('')}</div>
   <div id="bibody"></div>`;
 }
@@ -1902,7 +1949,7 @@ const GROUPS = [
   ['project','Проект', [['overview','Обзор'],['stages','Этапы'],['blocks','Блоки и лоты'],['capex','Стройка · CAPEX']]],
   ['eng','Инжиниринг', [['bi','Базовый проект'],['rasch','Расчёты'],['equip','Оборудование'],['auto','Автоматизация'],['soft','ПО: сами или подряд']]],
   ['client','Заказчику', [['disc','Расхождения ТЗ'],['questions','Вопросы'],['deliv','Состав БИ']]],
-  ['bid','Торги', [['tender','Процедура'],['competitor','Конкурент'],['hedge','Закладки Дельты'],['alt','Альтернатива'],['partner','Партнёр']]],
+  ['bid','Торги', [['apply','Подача на конкурс'],['tender','Процедура'],['competitor','Конкурент'],['hedge','Закладки Дельты'],['alt','Альтернатива'],['partner','Партнёр']]],
   ['buy','Закупки', [['sup','Поставщики'],['market','Маркетинг'],['china','Китай'],['world','Мировой опыт']]],
 ];
 const TABS = GROUPS.flatMap(g=>g[2]);
@@ -1910,7 +1957,7 @@ const GOF = {}; GROUPS.forEach(g=>g[2].forEach(([id])=>GOF[id]=g[0]));
 const R = {overview:rOverview, stages:rStages, blocks:rBlocks, bi:rBI, deliv:rDeliv, rasch:rRasch, equip:rEquip,
            disc:rDisc, questions:rQ, sup:rSup, market:rMarket, soft:rSoft, alt:rAlt, auto:rAuto,
            world:rWorld, china:rChina, partner:rPartner, competitor:rComp, hedge:rHedge,
-           tender:rTender, capex:rCapex};
+           tender:rTender, capex:rCapex, apply:rApply};
 const nav = document.getElementById('nav'), main = document.getElementById('main');
 nav.innerHTML =
   `<div class="grow">${GROUPS.map(([gid,gt])=>`<button data-g="${gid}">${esc(gt)}</button>`).join('')}</div>` +

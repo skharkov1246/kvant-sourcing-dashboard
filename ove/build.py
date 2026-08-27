@@ -53,6 +53,8 @@ OPTIONAL = {
     "__DELIV_JSON__": "deliverables.json",
     "__CALC_JSON__": "calc.json",
     "__HEDGE_JSON__": "hedge.json",
+    "__BIDOCS_JSON__": "bi_docs.json",
+    "__APPLY_JSON__": "podacha.json",
 }
 
 
@@ -103,6 +105,11 @@ def build() -> None:
     # расчётная записка (независимый пересчёт КВАНТ) — из calc.json
     import build_calcnote
     build_calcnote.build()
+    # черновики ПЗ по лотам (из bi_lot*.json) и пакет подачи на конкурс
+    import build_bi_docs
+    build_bi_docs.build()
+    import build_apply_docs
+    build_apply_docs.build()
 
     bx = json.loads((DATA / "bitrix_ove.json").read_text(encoding="utf-8"))
     eq = json.loads((DATA / "equipment.json").read_text(encoding="utf-8"))
