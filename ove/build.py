@@ -55,6 +55,10 @@ OPTIONAL = {
     "__HEDGE_JSON__": "hedge.json",
     "__BIDOCS_JSON__": "bi_docs.json",
     "__APPLY_JSON__": "podacha.json",
+    "__GANTT_JSON__": "gantt.json",
+    "__READY_JSON__": "readiness.json",
+    "__REVS_JSON__": "revisions.json",
+    "__ECO_JSON__": "eco_prelim.json",
 }
 
 
@@ -110,6 +114,13 @@ def build() -> None:
     build_bi_docs.build()
     import build_apply_docs
     build_apply_docs.build()
+    # спецификации и опросные листы, пакет запросов ТКП, план реализации ЦИМ
+    import build_specs
+    build_specs.build()
+    import build_rfq
+    build_rfq.build()
+    import build_bim_plan
+    build_bim_plan.build()
 
     bx = json.loads((DATA / "bitrix_ove.json").read_text(encoding="utf-8"))
     eq = json.loads((DATA / "equipment.json").read_text(encoding="utf-8"))
