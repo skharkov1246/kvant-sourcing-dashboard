@@ -41,6 +41,9 @@ def main() -> None:
     reg = json.loads(REG.read_text(encoding="utf-8"))
     seen = {fp(i) for i in reg["items"]}
     seen_titles = {norm(i["title"])[:80] for i in reg["items"]}
+    # пара цитат без заголовка: один и тот же факт из разных прочёсов приходит
+    # с разными заголовками (так возник дубль C-19/C-87, слит 27.08.2026)
+    seen_pairs = {fp(i)[1:] for i in reg["items"]}
     next_n = 1 + max(int(m.group(1)) for i in reg["items"]
                      if (m := re.match(r"C-(\d+)$", i["id"])))
 
@@ -58,11 +61,12 @@ def main() -> None:
                 skipped += 1
                 continue
             f = fp(it)
-            if f in seen or norm(it.get("title"))[:80] in seen_titles:
+            if f in seen or norm(it.get("title"))[:80] in seen_titles or f[1:] in seen_pairs:
                 skipped += 1
                 continue
             seen.add(f)
             seen_titles.add(norm(it.get("title"))[:80])
+            seen_pairs.add(f[1:])
             added.append({
                 "id": f"C-{next_n:02d}",
                 "cat": it.get("cat") if it.get("cat") in VALID_CAT else "other",
