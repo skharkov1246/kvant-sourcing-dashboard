@@ -57,6 +57,7 @@ OPTIONAL = {
     "__APPLY_JSON__": "podacha.json",
     "__GANTT_JSON__": "gantt.json",
     "__READY_JSON__": "readiness.json",
+    "__REVS_JSON__": "revisions.json",
 }
 
 

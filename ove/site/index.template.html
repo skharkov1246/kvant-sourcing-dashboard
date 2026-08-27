@@ -179,6 +179,7 @@ const BIDOCS = __BIDOCS_JSON__;
 const APPLY = __APPLY_JSON__;
 const GANTT = __GANTT_JSON__;
 const READY = __READY_JSON__;
+const REVS = __REVS_JSON__;
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const nf = (n,d=0) => (n===''||n===null||n===undefined||isNaN(n)) ? '—' : Number(n).toLocaleString('ru-RU',{minimumFractionDigits:d,maximumFractionDigits:d});
@@ -1850,6 +1851,24 @@ function rBI(){
         <td>${d.file?`<a class="btn" href="${esc(d.file)}" download>⬇</a>`:'—'}</td>
         <td class="mut">${esc(d.note||'')}</td></tr>`;}).join('')}
     </tbody></table></div></div>`).join('')}`:''}
+  ${REVS&&REVS.revisions.length?`<h2>Архив ревизий документов — для согласования</h2>
+  <div class="box info"><b>Как это работает.</b> Каждая ревизия — полный срез всех сгенерированных документов на момент вехи, с динамикой по каждому файлу против прошлой ревизии. Старые ревизии не перезаписываются: любую версию любого документа можно открыть и сравнить. Точечная история правок — в git-журнале репозитория; здесь — крупные срезы для согласования командой и Заказчиком.</div>
+  ${[...REVS.revisions].reverse().map(r=>{
+    const ST={new:['новый','tag lot2'],changed:['изменён','tag lot1'],same:['без изменений','tag']};
+    return `<div class="card"><h3>Р${r.id} · ${esc(r.date)} · ${esc(r.label)}
+      <span class="tag lot3">${r.files.length} файлов</span>
+      ${r.counts.new?`<span class="tag lot2">${r.counts.new} новых</span>`:''}
+      ${r.counts.changed?`<span class="tag lot1">${r.counts.changed} изменённых</span>`:''}
+      ${r.counts.removed?`<span class="tag">${r.counts.removed} удалённых</span>`:''}</h3>
+    ${r.note?`<p class="mut">${esc(r.note)}</p>`:''}
+    <div class="tblwrap"><table><thead><tr><th>Документ</th><th style="width:70px">Размер</th>
+      <th style="width:120px">Статус</th><th style="width:60px">Файл</th></tr></thead><tbody>
+    ${r.files.map(f=>`<tr><td>${esc(f.path)}</td><td class="mut">${Math.max(1,Math.round(f.size/1024))} КБ</td>
+      <td><span class="${(ST[f.status]||['?','tag'])[1]}">${(ST[f.status]||[f.status])[0]}</span></td>
+      <td><a class="btn" href="docs/rev/r${r.id}/${esc(f.path)}" download>⬇</a></td></tr>`).join('')}
+    </tbody></table></div>
+    ${(r.removed||[]).length?`<div class="mut">Удалены против прошлой ревизии: ${r.removed.map(esc).join(' · ')}</div>`:''}
+    </div>`;}).join('')}`:''}
   <h2>Графические заготовки — с чего инженеру начать чертежи</h2>
   <div class="box info"><b>Что это.</b> Первые эскизы графической части, построенные из данных базы (ИД, расчётная модель, черновики ПЗ). Это стартовые подложки для CAD, а не выпущенные чертежи: инженер проверяет, переносит в CAD и дорабатывает. SVG скачивается кнопкой и открывается в любом векторном редакторе (Inkscape, CorelDRAW, nanoCAD через импорт).</div>
   ${SKETCHES.map(s=>`<div class="card"><h3>${esc(s.title)} ${s.lot?lotTag(s.lot):'<span class="tag">все лоты</span>'} <span class="tag">эскиз v0.1</span></h3>
