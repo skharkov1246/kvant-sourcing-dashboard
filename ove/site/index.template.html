@@ -973,6 +973,34 @@ function rRevsBlock(){ return `
 }
 
 /* ============ Гант выполнения БИ (SVG из GANTT) и графические заготовки ============ */
+/* CPM forward pass в браузере: сценарий «генплан +N недель» */
+function cpmDates(shiftW){
+  const D=s=>new Date(s+'T12:00:00');
+  const addWd=(d,n)=>{ let x=new Date(d); let left=Math.abs(n);
+    while(left>0){ x=new Date(+x+86400e3); const w=x.getDay(); if(w!==0&&w!==6) left--; } return x; };
+  const by={}; GANTT.tasks.forEach(x=>by[x.id]=x);
+  const memo={};
+  function ef(id){
+    if(memo[id]) return memo[id];
+    const x=by[id]; if(!x) return null;
+    let es=D(x.start);
+    (x.after||[]).forEach(a=>{ const p=ef(a); if(p&&p.end>=es) es=addWd(p.end,1); });
+    let dur=x.dur_wd||0;
+    if(x.id==='genplan'&&shiftW) dur+=shiftW*5;
+    const end=x.milestone?es:addWd(es,Math.max(dur-1,0));
+    return memo[id]={start:es,end:end};
+  }
+  GANTT.tasks.forEach(x=>ef(x.id));
+  return memo;
+}
+let GSHIFT=0;
+function factOf(id){
+  if(!BIDOCS||!id) return null;
+  let tot=0,done=0;
+  BIDOCS.lots.forEach(L=>L.docs.forEach(d=>{ if(d.gantt===id){ tot++;
+    if(d.status==='draft'||d.status==='ready') done++; }}));
+  return tot?{tot,done}:null;
+}
 function rGantt(){
   if(!GANTT || !GANTT.tasks || !GANTT.tasks.length) return '';
   const D=s=>new Date(s+'T12:00:00'), MS=86400e3;
@@ -1022,11 +1050,30 @@ function rGantt(){
     }else{
       const x1=X(s), x2=X(new Date(+e+MS)), bw=Math.max(x2-x1,3);
       g+=`<rect x="${x1.toFixed(1)}" y="${y+5}" width="${bw.toFixed(1)}" height="${RH-10}" rx="4" fill="${r.l.color}" opacity=".9"${t.crit?' stroke="var(--crit)" stroke-width="1.8"':''}/>`;
+      const ft=factOf(t.id);
+      if(ft){ const fw=(bw*ft.done/ft.tot);
+        g+=`<rect x="${x1.toFixed(1)}" y="${y+RH-9}" width="${bw.toFixed(1)}" height="3" rx="1.5" fill="rgba(0,0,0,.22)"/>`
+          +`<rect x="${x1.toFixed(1)}" y="${y+RH-9}" width="${Math.max(fw,ft.done?2:0).toFixed(1)}" height="3" rx="1.5" fill="var(--ink)"/>`; }
       const lbl=fmt(s)+'–'+fmt(e);
       gt+= (x2+62<LW+CW) ? `<text x="${(x2+5).toFixed(1)}" y="${y+15}" font-size="9.5" fill="var(--mut)">${lbl}</text>`
                          : `<text x="${(x1-5).toFixed(1)}" y="${y+15}" font-size="9.5" fill="var(--mut)" text-anchor="end">${lbl}</text>`;
     }
     y+=RH; ri++;
+  }
+  if(GSHIFT>0){
+    const sc=cpmDates(GSHIFT);
+    let yy=HH;
+    for(const r of rows){
+      if(r.lane){ yy+=RH; continue; }
+      const tk=r.t;
+      if(tk.milestone&&sc[tk.id]){
+        const nd=sc[tk.id].end, od=D(tk.start);
+        if(+nd!==+od){ const x=X(nd), cy=yy+RH/2;
+          gt+=`<path d="M${x} ${cy-7} L${x+7} ${cy} L${x} ${cy+7} L${x-7} ${cy} Z" fill="none" stroke="var(--crit)" stroke-width="1.6" stroke-dasharray="4 3"/>`
+            +`<text x="${x+11}" y="${yy+15}" font-size="10" font-weight="700" fill="var(--crit)">${fmt(nd)}</text>`; }
+      }
+      yy+=RH;
+    }
   }
   /* линии T0, Новый год, сегодня: сами линии — в g (ДО текстов дат), подписи — в gt */
   const mark=(d,color,lbl,dash)=>{ if(d<min||d>max) return;
@@ -1039,8 +1086,12 @@ function rGantt(){
   g+=gt;
   return `
   <h2>График выполнения БИ (план до Нового года)</h2>
-  <div class="box info"><b>Гант.</b> ${esc(GANTT.note)}</div>
-  <div class="tblwrap" style="padding:8px 4px"><svg id="gantt-svg" class="gsvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" style="width:${W}px;max-width:none;display:block;font-family:system-ui,sans-serif">
+  <div class="box info"><b>Гант.</b> ${esc(GANTT.note)} Тёмная полоска внизу бара — факт: доля закрытых позиций реестра.</div>
+  <div class="filters"><label style="font-size:12.5px">Сценарий: генплан задержится на
+    <input id="gshift" type="range" min="0" max="8" step="1" value="${GSHIFT}" style="vertical-align:middle;width:160px">
+    <b id="gshiftv">${GSHIFT}</b> нед.</label>
+    <span class="mut" id="gshiftsum"></span></div>
+  <div class="tblwrap" style="padding:8px 4px" id="gantwrap"><svg id="gantt-svg" class="gsvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" style="width:${W}px;max-width:none;display:block;font-family:system-ui,sans-serif">
     <rect x="0" y="0" width="${W}" height="${H}" fill="var(--surface)"/>${g}</svg></div>
   <div class="filters"><button class="btn" data-dl="gantt-svg" data-fn="ove75-gantt-bi.svg">⬇ SVG</button>
     <span class="mut">Красная рамка — критический путь; ромб — веха; вертикали — T0 (старт), «сегодня», Новый год. Правка сроков — ove/data/gantt.json.</span></div>`;
@@ -3876,7 +3927,27 @@ function bindEquip(){
   k.addEventListener('click', ()=>{eqFilter.key=!eqFilter.key; k.classList.toggle('on',eqFilter.key); eqPaint();});
   eqPaint();
 }
+function gshiftSummary(){
+  const el=document.getElementById('gshiftsum'); if(!el) return;
+  if(!GSHIFT){ el.textContent='двигай ползунок — критический путь пересчитается'; return; }
+  const sc=cpmDates(GSHIFT), D=s=>new Date(s+'T12:00:00');
+  const f=d=>String(d.getDate()).padStart(2,'0')+'.'+String(d.getMonth()+1).padStart(2,'0');
+  const dd=(id)=>{ const tk=GANTT.tasks.find(x=>x.id===id); const nd=sc[id]&&sc[id].end;
+    if(!tk||!nd) return '?'; const k=Math.round((nd-D(tk.start))/86400e3);
+    return f(nd)+(k>0?` (+${k} дн)`:' (без сдвига)'); };
+  el.textContent=`Этап 1 → ${dd('m1')} · Итог → ${dd('m2')}`;
+}
+function bindGshift(){
+  const s=document.getElementById('gshift'); if(!s) return;
+  s.addEventListener('input', ()=>{
+    GSHIFT=Number(s.value);
+    const sec=document.getElementById('s-bi');
+    if(sec){ sec.innerHTML=rBI(); bindBI(); }
+  });
+  gshiftSummary();
+}
 function bindBI(){
+  bindGshift();
   document.querySelectorAll('#s-bi [data-dl]').forEach(b=>b.addEventListener('click', ()=>dlSvg(b.dataset.dl, b.dataset.fn)));
   if(!BI.length) return;
   document.querySelectorAll('.bilot').forEach(b=>b.addEventListener('click', ()=>{
