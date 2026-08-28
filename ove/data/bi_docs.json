@@ -24,7 +24,8 @@
        "path": "docs/bi/ove75-lot1-pz-draft.docx",
        "tag": "ПЗ"
       }
-     ]
+     ],
+     "gantt": "pz"
     },
     {
      "name": "Расчётные приложения (балансы, электрика печи, гидродинамика слоя, точка росы)",
@@ -37,7 +38,8 @@
        "path": "docs/ove75-raschet.docx",
        "tag": "расчёт"
       }
-     ]
+     ],
+     "gantt": "calcrev"
     },
     {
      "name": "PFD с границами проектирования",
@@ -49,7 +51,8 @@
        "path": "docs/sketches/ove75-lot1-pfd-eskiz.svg",
        "tag": "PFD"
       }
-     ]
+     ],
+     "gantt": "pfd"
     },
     {
      "name": "Компоновочные решения (планы, разрезы)",
@@ -61,7 +64,8 @@
        "path": "docs/sketches/ove75-lot1-vysotka-eskiz.svg",
        "tag": "высотка"
       }
-     ]
+     ],
+     "gantt": "layout"
     },
     {
      "name": "Спецификация оборудования + опросные листы + исходные требования на длинноцикловое",
@@ -101,7 +105,8 @@
        "path": "docs/specs/ove75-ol-vakuum-filtr.docx",
        "tag": "ОЛ ВФ"
       }
-     ]
+     ],
+     "gantt": "spec1"
     },
     {
      "name": "Предварительные P&ID по участкам",
@@ -113,25 +118,29 @@
        "path": "docs/sketches/ove75-lot1-pid-pech-ku-eskiz.svg",
        "tag": "P&ID"
       }
-     ]
+     ],
+     "gantt": "pid"
     },
     {
      "name": "Планы предварительных нагрузок; фундаменты с динамикой (с запасом)",
      "stage": 2,
      "status": "task",
-     "note": "массы и динамика — из модели; планы — строитель"
+     "note": "массы и динамика — из модели; планы — строитель",
+     "gantt": "loads"
     },
     {
      "name": "Однолинейные схемы + предварительный перечень электрооборудования",
      "stage": 2,
      "status": "task",
-     "note": "нагрузки посчитаны (EL-TOTAL); схемы — электрик"
+     "note": "нагрузки посчитаны (EL-TOTAL); схемы — электрик",
+     "gantt": "elec"
     },
     {
      "name": "Line list ±20-30 % + спецификация критичных/длинноцикловых КИПиА",
      "stage": 2,
      "status": "wait",
-     "note": "после предварительных P&ID"
+     "note": "после предварительных P&ID",
+     "gantt": "spec1"
     },
     {
      "name": "Схема КТС АСУ; тепловыделения и вредности (по аналогам)",
@@ -143,7 +152,8 @@
        "path": "docs/sketches/ove75-asu-kts-eskiz.svg",
        "tag": "КТС"
       }
-     ]
+     ],
+     "gantt": "asu"
     },
     {
      "name": "Бюджетные ТКП по основному + бюджетная оценка поставки",
@@ -155,7 +165,8 @@
        "path": "docs/rfq/ove75-rfq-index.docx",
        "tag": "ТКП"
       }
-     ]
+     ],
+     "gantt": "tkp2"
     }
    ]
   },
@@ -174,7 +185,8 @@
        "path": "docs/bi/ove75-lot2-pz-draft.docx",
        "tag": "ПЗ"
       }
-     ]
+     ],
+     "gantt": "pz"
     },
     {
      "name": "PFD; компоновка в существующем/новом корпусе",
@@ -190,7 +202,8 @@
        "path": "docs/sketches/ove75-lot2-komponovka-gmu-eskiz.svg",
        "tag": "план"
       }
-     ]
+     ],
+     "gantt": "pfd"
     },
     {
      "name": "Спецификация оборудования + опросные листы",
@@ -210,7 +223,8 @@
        "path": "docs/specs/ove75-ol-tsentrifuga.docx",
        "tag": "ОЛ центр"
       }
-     ]
+     ],
+     "gantt": "spec1"
     },
     {
      "name": "Предварительные P&ID; нагрузки; электрочасть",
@@ -222,7 +236,8 @@
        "path": "docs/sketches/ove75-lot2-pid-vyparka-eskiz.svg",
        "tag": "P&ID"
       }
-     ]
+     ],
+     "gantt": "pid"
     },
     {
      "name": "Стоимостной блок (бюджетные ТКП, оценка)",
@@ -234,7 +249,8 @@
        "path": "docs/rfq/ove75-rfq-index.docx",
        "tag": "ТКП"
       }
-     ]
+     ],
+     "gantt": "tkp2"
     }
    ]
   },
@@ -253,7 +269,8 @@
        "path": "docs/bi/ove75-lot3-pz-draft.docx",
        "tag": "ПЗ"
       }
-     ]
+     ],
+     "gantt": "pz"
     },
     {
      "name": "Расчёт серии (ток, напряжение, выпрямление) + гарантийная рамка",
@@ -266,7 +283,8 @@
        "path": "docs/ove75-raschet.docx",
        "tag": "расчёт"
       }
-     ]
+     ],
+     "gantt": "calcrev"
     },
     {
      "name": "PFD; компоновочные решения нового корпуса",
@@ -282,7 +300,8 @@
        "path": "docs/sketches/ove75-lot3-razrez-eskiz.svg",
        "tag": "разрез"
       }
-     ]
+     ],
+     "gantt": "pfd"
     },
     {
      "name": "Спецификация: ванны, аноды, матрицы, КСМ, краны + опросные листы",
@@ -298,7 +317,8 @@
        "path": "docs/specs/ove75-ol-kran-mostovoy.docx",
        "tag": "ОЛ кран"
       }
-     ]
+     ],
+     "gantt": "spec1"
     },
     {
      "name": "Предварительные P&ID; нагрузки (динамика кранов); электрочасть",
@@ -314,7 +334,8 @@
        "path": "docs/sketches/ove75-lot3-odnolineynaya-eskiz.svg",
        "tag": "ЭЛ"
       }
-     ]
+     ],
+     "gantt": "pid"
     },
     {
      "name": "АСУ с прикладным ПО (схема КТС, карта сигналов)",
@@ -326,7 +347,8 @@
        "path": "docs/sketches/ove75-asu-kts-eskiz.svg",
        "tag": "КТС"
       }
-     ]
+     ],
+     "gantt": "asu"
     },
     {
      "name": "Стоимостной блок",
@@ -338,7 +360,8 @@
        "path": "docs/rfq/ove75-rfq-index.docx",
        "tag": "ТКП"
       }
-     ]
+     ],
+     "gantt": "tkp2"
     }
    ]
   },
@@ -361,7 +384,8 @@
        "path": "docs/ove75-raschet.docx",
        "tag": "расчёт"
       }
-     ]
+     ],
+     "gantt": "pz"
     },
     {
      "name": "PFD; компоновка склада; спецификация + опросные листы",
@@ -385,7 +409,8 @@
        "path": "docs/specs/ove75-ol-kran-mostovoy.docx",
        "tag": "ОЛ кран"
       }
-     ]
+     ],
+     "gantt": "pfd"
     },
     {
      "name": "Нагрузки; электрочасть; стоимостной блок",
@@ -397,7 +422,8 @@
        "path": "docs/rfq/ove75-rfq-index.docx",
        "tag": "ТКП"
       }
-     ]
+     ],
+     "gantt": "loads"
     }
    ]
   },
@@ -409,7 +435,8 @@
      "name": "ЦИМ стадии БИ (модели ТХ + ЭОМ/СС/АК по Прил.1 LOD/LOI)",
      "stage": 2,
      "status": "wait",
-     "note": "отдельный этап; ПО согласуется (Model Studio CS/NanoCAD); нужен моделлер"
+     "note": "отдельный этап; ПО согласуется (Model Studio CS/NanoCAD); нужен моделлер",
+     "gantt": "cim1"
     },
     {
      "name": "Реестр вопросов и решений Заказчика (сопровождение)",
@@ -435,7 +462,8 @@
        "path": "docs/specs/ove75-perechen-oborudovaniya.docx",
        "tag": "перечень"
       }
-     ]
+     ],
+     "gantt": "spec1"
     },
     {
      "name": "Опросные листы — 12 ключевых классов оборудования",
@@ -492,7 +520,8 @@
        "path": "docs/specs/ove75-ol-shtabeler.docx",
        "tag": "штабелёр"
       }
-     ]
+     ],
+     "gantt": "spec1"
     },
     {
      "name": "Пакет запросов бюджетных ТКП (27 позиций, RU+EN)",
@@ -505,7 +534,8 @@
        "path": "docs/rfq/ove75-rfq-index.docx",
        "tag": "ТКП"
       }
-     ]
+     ],
+     "gantt": "tkp2"
     },
     {
      "name": "План реализации ЦИМ (BEP, черновик v0.1)",
@@ -518,7 +548,8 @@
        "path": "docs/ove75-bim-plan-draft.docx",
        "tag": "BEP"
       }
-     ]
+     ],
+     "gantt": "cimsoft"
     }
    ]
   }
