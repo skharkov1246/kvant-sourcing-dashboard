@@ -125,6 +125,9 @@ def build() -> None:
     # единые метаданные всех выпускаемых DOCX/PDF (автор — ООО «КВАНТ»)
     import doc_meta
     doc_meta.build()
+    # ZIP-пакеты документов по лотам и пакет подачи (после метаданных)
+    import build_paket
+    build_paket.build()
 
     bx = json.loads((DATA / "bitrix_ove.json").read_text(encoding="utf-8"))
     eq = json.loads((DATA / "equipment.json").read_text(encoding="utf-8"))
