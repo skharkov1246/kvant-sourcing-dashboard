@@ -920,6 +920,58 @@ function rApply(){
   <div class="mut">Обновлено ${esc(APPLY.updated||'')}. Черновики пересобираются при каждой сборке сайта; итоговые файлы перед подачей — через владельца.</div>`;
 }
 
+function rReadyBlock(){ return `
+  ${READY?`<h2>Готовность разделов БИ — цель ${READY.target} %</h2>
+  <div class="box warn">${esc(READY.note)}</div>
+  ${READY.rows.map(r=>{
+    const c = r.now>=READY.target?'var(--good)':(r.now>=50?'var(--warn)':'var(--crit)');
+    return `<div style="display:flex;gap:10px;align-items:center;margin:7px 0;flex-wrap:wrap">
+      <div style="flex:0 0 min(340px,90vw);font-size:12.5px"><b>${esc(r.name)}</b>${r.ext?' <span class="tag">внешний вход</span>':''}</div>
+      <div style="flex:1 1 220px;min-width:160px;height:14px;background:var(--chip);border-radius:7px;position:relative;overflow:hidden">
+        <div style="width:${r.now}%;height:100%;background:${c};border-radius:7px"></div>
+        <div style="position:absolute;left:${READY.target}%;top:-2px;bottom:-2px;width:2px;background:var(--ink2)"></div>
+      </div>
+      <b style="flex:0 0 46px;text-align:right;color:${c}">${r.now} %</b>
+      <div class="mut" style="flex:1 1 100%;margin-left:2px">закрывает: ${esc(r.gap)}</div>
+    </div>`;}).join('')}`:''}`;
+}
+function rAuditBlock(){ return `
+  ${AUDIT?`<h2>Аудит цифр — журнал подтверждённых находок</h2>
+  <div class="box info"><b>Как проверяем.</b> ${esc(AUDIT.note)}</div>
+  <div class="k">
+    <div class="tile"><b>${AUDIT.stats.zones}</b><span>зон проверено</span></div>
+    <div class="tile"><b class="mid">${AUDIT.stats.raw}</b><span>сырых находок</span></div>
+    <div class="tile"><b class="hi">${AUDIT.stats.confirmed}</b><span>подтверждено скептиками</span></div>
+    <div class="tile"><b>${AUDIT.stats.in_verify?'идёт':'завершена'}</b><span>верификация остальных</span></div>
+  </div>
+  <div class="tblwrap"><table><thead><tr><th style="width:190px">Зона</th><th style="width:90px">Вес</th><th>Суть</th><th>Что делаем</th><th style="width:110px">Статус</th></tr></thead><tbody>
+  ${AUDIT.items.map(a=>`<tr><td><b>${esc(a.zone)}</b></td>
+    <td><span class="${a.sev==='high'?'hi':(a.sev==='med'?'mid':'lo')}">${a.sev==='high'?'серьёзная':(a.sev==='med'?'существенная':'мелкая')}</span></td>
+    <td>${esc(a.what)}</td><td class="mut">${esc(a.fix)}</td>
+    <td><span class="${a.status==='done'?'tag lot3':'tag lot2'}">${a.status==='done'?'исправлено':'в очереди правок'}</span></td></tr>`).join('')}
+  </tbody></table></div>`:''}`;
+}
+function rRevsBlock(){ return `
+  ${REVS&&REVS.revisions.length?`<h2>Архив ревизий документов — для согласования</h2>
+  <div class="box info"><b>Как это работает.</b> Каждая ревизия — полный срез всех сгенерированных документов на момент вехи, с динамикой по каждому файлу против прошлой ревизии. Старые ревизии не перезаписываются: любую версию любого документа можно открыть и сравнить. Точечная история правок — в git-журнале репозитория; здесь — крупные срезы для согласования командой и Заказчиком.</div>
+  ${[...REVS.revisions].reverse().map(r=>{
+    const ST={new:['новый','tag lot2'],changed:['изменён','tag lot1'],same:['без изменений','tag']};
+    return `<div class="card"><h3>Р${r.id} · ${esc(r.date)} · ${esc(String(r.label||'').replace(/^Р\d+\s*[—–-]\s*/,''))}
+      <span class="tag lot3">${r.files.length} файлов</span>
+      ${r.counts.new?`<span class="tag lot2">${r.counts.new} новых</span>`:''}
+      ${r.counts.changed?`<span class="tag lot1">${r.counts.changed} изменённых</span>`:''}
+      ${r.counts.removed?`<span class="tag">${r.counts.removed} удалённых</span>`:''}</h3>
+    ${r.note?`<p class="mut">${esc(r.note)}</p>`:''}
+    <div class="tblwrap"><table><thead><tr><th>Документ</th><th style="width:70px">Размер</th>
+      <th style="width:120px">Статус</th><th style="width:60px">Файл</th></tr></thead><tbody>
+    ${r.files.map(f=>`<tr><td>${esc(f.path)}</td><td class="mut">${Math.max(1,Math.round(f.size/1024))} КБ</td>
+      <td><span class="${(ST[f.status]||['?','tag'])[1]}">${(ST[f.status]||[f.status])[0]}</span></td>
+      <td><a class="btn" href="docs/rev/r${r.id}/${esc(f.path)}" download>⬇</a></td></tr>`).join('')}
+    </tbody></table></div>
+    ${(r.removed||[]).length?`<div class="mut">Удалены против прошлой ревизии: ${r.removed.map(esc).join(' · ')}</div>`:''}
+    </div>`;}).join('')}`:''}`;
+}
+
 /* ============ Гант выполнения БИ (SVG из GANTT) и графические заготовки ============ */
 function rGantt(){
   if(!GANTT || !GANTT.tasks || !GANTT.tasks.length) return '';
@@ -2613,33 +2665,6 @@ function rBI(){
     <div class="tile"><b>${nGost}</b><span>нормативов привязано</span></div>
     <div class="tile"><b>${nOpen}</b><span>открытых вопросов</span></div>
   </div>
-  ${READY?`<h2>Готовность разделов БИ — цель ${READY.target} %</h2>
-  <div class="box warn">${esc(READY.note)}</div>
-  ${READY.rows.map(r=>{
-    const c = r.now>=READY.target?'var(--good)':(r.now>=50?'var(--warn)':'var(--crit)');
-    return `<div style="display:flex;gap:10px;align-items:center;margin:7px 0;flex-wrap:wrap">
-      <div style="flex:0 0 min(340px,90vw);font-size:12.5px"><b>${esc(r.name)}</b>${r.ext?' <span class="tag">внешний вход</span>':''}</div>
-      <div style="flex:1 1 220px;min-width:160px;height:14px;background:var(--chip);border-radius:7px;position:relative;overflow:hidden">
-        <div style="width:${r.now}%;height:100%;background:${c};border-radius:7px"></div>
-        <div style="position:absolute;left:${READY.target}%;top:-2px;bottom:-2px;width:2px;background:var(--ink2)"></div>
-      </div>
-      <b style="flex:0 0 46px;text-align:right;color:${c}">${r.now} %</b>
-      <div class="mut" style="flex:1 1 100%;margin-left:2px">закрывает: ${esc(r.gap)}</div>
-    </div>`;}).join('')}`:''}
-  ${AUDIT?`<h2>Аудит цифр — журнал подтверждённых находок</h2>
-  <div class="box info"><b>Как проверяем.</b> ${esc(AUDIT.note)}</div>
-  <div class="k">
-    <div class="tile"><b>${AUDIT.stats.zones}</b><span>зон проверено</span></div>
-    <div class="tile"><b class="mid">${AUDIT.stats.raw}</b><span>сырых находок</span></div>
-    <div class="tile"><b class="hi">${AUDIT.stats.confirmed}</b><span>подтверждено скептиками</span></div>
-    <div class="tile"><b>${AUDIT.stats.in_verify?'идёт':'завершена'}</b><span>верификация остальных</span></div>
-  </div>
-  <div class="tblwrap"><table><thead><tr><th style="width:190px">Зона</th><th style="width:90px">Вес</th><th>Суть</th><th>Что делаем</th><th style="width:110px">Статус</th></tr></thead><tbody>
-  ${AUDIT.items.map(a=>`<tr><td><b>${esc(a.zone)}</b></td>
-    <td><span class="${a.sev==='high'?'hi':(a.sev==='med'?'mid':'lo')}">${a.sev==='high'?'серьёзная':(a.sev==='med'?'существенная':'мелкая')}</span></td>
-    <td>${esc(a.what)}</td><td class="mut">${esc(a.fix)}</td>
-    <td><span class="${a.status==='done'?'tag lot3':'tag lot2'}">${a.status==='done'?'исправлено':'в очереди правок'}</span></td></tr>`).join('')}
-  </tbody></table></div>`:''}
   ${rGantt()}
   ${BIDOCS?`<h2>Документы БИ — формирование и согласование с Заказчиком</h2>
   <div class="box info">${esc(BIDOCS.note)}</div>
@@ -2659,24 +2684,6 @@ function rBI(){
         <td>${fl.length?fl.map(f=>`<a class="btn" style="margin:1px 2px 1px 0;padding:3px 8px" href="${esc(f.path)}" download title="${esc(f.path.split('/').pop())}">⬇ ${esc(f.tag||'')}</a>`).join(''):'—'}</td>
         <td class="mut">${esc(d.note||'')}</td></tr>`;}).join('')}
     </tbody></table></div></div>`).join('')}`:''}
-  ${REVS&&REVS.revisions.length?`<h2>Архив ревизий документов — для согласования</h2>
-  <div class="box info"><b>Как это работает.</b> Каждая ревизия — полный срез всех сгенерированных документов на момент вехи, с динамикой по каждому файлу против прошлой ревизии. Старые ревизии не перезаписываются: любую версию любого документа можно открыть и сравнить. Точечная история правок — в git-журнале репозитория; здесь — крупные срезы для согласования командой и Заказчиком.</div>
-  ${[...REVS.revisions].reverse().map(r=>{
-    const ST={new:['новый','tag lot2'],changed:['изменён','tag lot1'],same:['без изменений','tag']};
-    return `<div class="card"><h3>Р${r.id} · ${esc(r.date)} · ${esc(String(r.label||'').replace(/^Р\d+\s*[—–-]\s*/,''))}
-      <span class="tag lot3">${r.files.length} файлов</span>
-      ${r.counts.new?`<span class="tag lot2">${r.counts.new} новых</span>`:''}
-      ${r.counts.changed?`<span class="tag lot1">${r.counts.changed} изменённых</span>`:''}
-      ${r.counts.removed?`<span class="tag">${r.counts.removed} удалённых</span>`:''}</h3>
-    ${r.note?`<p class="mut">${esc(r.note)}</p>`:''}
-    <div class="tblwrap"><table><thead><tr><th>Документ</th><th style="width:70px">Размер</th>
-      <th style="width:120px">Статус</th><th style="width:60px">Файл</th></tr></thead><tbody>
-    ${r.files.map(f=>`<tr><td>${esc(f.path)}</td><td class="mut">${Math.max(1,Math.round(f.size/1024))} КБ</td>
-      <td><span class="${(ST[f.status]||['?','tag'])[1]}">${(ST[f.status]||[f.status])[0]}</span></td>
-      <td><a class="btn" href="docs/rev/r${r.id}/${esc(f.path)}" download>⬇</a></td></tr>`).join('')}
-    </tbody></table></div>
-    ${(r.removed||[]).length?`<div class="mut">Удалены против прошлой ревизии: ${r.removed.map(esc).join(' · ')}</div>`:''}
-    </div>`;}).join('')}`:''}
   ${ECO?`<h2>Экология / ООС — предварительно, из посчитанных балансов</h2>
   <div class="box info">${esc(ECO.note)}</div>
   ${ECO.sections.map(s=>`<div class="card"><h3>${esc(s.title)}</h3>
@@ -3717,19 +3724,139 @@ function exportXlsx(){
   a.click();
 }
 
+
+/* ================= Штаб / Задачи / Документы (рабочие экраны, см. ove/docs/ux.md) ================= */
+function rHQ(){
+  const ms=(GANTT&&GANTT.tasks||[]).filter(x=>x.milestone);
+  const lastRev=(REVS&&REVS.revisions.length)?REVS.revisions[REVS.revisions.length-1]:null;
+  const dec=[];
+  (APPLY&&APPLY.next||[]).forEach(x=>dec.push({t:x,tab:'apply',tag:'подача'}));
+  (READY&&READY.rows||[]).filter(r=>r.ext).forEach(r=>dec.push({t:r.name+' — '+r.gap,tab:'bi',tag:'внешний вход'}));
+  const nTask=(BIDOCS?BIDOCS.lots.reduce((a,L)=>a+L.docs.filter(d=>d.status==='task'||d.status==='base').length,0):0)
+            +(APPLY?APPLY.docs.filter(d=>d.status==='form'||d.status==='team').length:0);
+  return `
+  <div class="box info"><b>Дашборд.</b> Решения — здесь; работа — в <a href="#tasks"><b>Задачах</b></a> (${nTask}); файлы — в <a href="#files"><b>Документах</b></a>.</div>
+  <div class="grid2">
+    <div class="card"><h3>Требуют решения владельца <span class="tag lot1">${dec.length}</span></h3>
+      <ol>${dec.map(d=>`<li>${esc(d.t)} <a class="btn" style="padding:2px 8px" href="#${d.tab}">открыть</a></li>`).join('')}</ol></div>
+    <div class="card"><h3>Вехи графика</h3>
+      ${ms.map(x=>`<div style="display:flex;gap:8px;align-items:baseline;margin:6px 0"><b style="min-width:64px">${esc(x.start.slice(5).split('-').reverse().join('.'))}</b><span>${esc(x.name)}</span></div>`).join('')}
+      <div class="mut">T0 = ${esc(GANTT?GANTT.t0:'')} (план). Полный Гант — вкладка «Базовый проект».</div>
+      ${lastRev?`<h3 style="margin-top:12px">Последний срез документов</h3>
+      <div>Р${lastRev.id} · ${esc(lastRev.date)} · ${esc(lastRev.label)}: <b>${lastRev.files.length}</b> файлов
+        (${lastRev.counts.new} новых, ${lastRev.counts.changed} изменённых) <a class="btn" style="padding:2px 8px" href="#files">к документам</a></div>`:''}
+    </div>
+  </div>
+  ${rReadyBlock()}
+  <details style="margin:10px 0"><summary style="cursor:pointer;font-weight:700">Журнал аудита цифр — ${AUDIT?AUDIT.stats.confirmed:0} находок, все исправлены (развернуть)</summary>${rAuditBlock()}</details>`;
+}
+
+/* --- Задачи: единая очередь --- */
+const ROLE_OF = n =>
+  /P&ID|КИПиА|line ?list/i.test(n)?'КИПиА' : /однолин|электрооборуд|электрочасть|электрик/i.test(n)?'электрик'
+  : /нагруз|фундамент|полы|динамик/i.test(n)?'строитель' : /КТС|АСУ|сигнал/i.test(n)?'АСУ'
+  : /ЦИМ|модел|BIM/i.test(n)?'САПР' : /ТКП|стоимост|поставщ|бюджетн/i.test(n)?'снабжение'
+  : /PFD|компонов|высотн|разрез|план склада/i.test(n)?'ТХ' : 'инженер';
+let TQ={role:'',lot:''};
+function tasksList(){
+  const out=[];
+  (BIDOCS?BIDOCS.lots:[]).forEach(L=>L.docs.forEach(d=>{
+    const files=(d.files&&d.files.length)?d.files:(d.file?[{path:d.file,tag:'файл'}]:[]);
+    if(d.status==='task') out.push({role:ROLE_OF(d.name),lot:L.lot,name:d.name,
+      todo:d.note||'взять подложку-эскиз и перенести в CAD',files,
+      done:'готовый файл — в чат проекта; куратор внесёт в базу, строка реестра получит файл и статус',src:'Реестр БИ · этап '+d.stage});
+    if(d.status==='base') out.push({role:'куратор базы',lot:L.lot,name:'Собрать файл: '+d.name,
+      todo:d.note||'контент готов в базе — собрать документ и приложить к строке',files,
+      done:'файл появился в строке реестра',src:'Реестр БИ · этап '+d.stage});
+  }));
+  (APPLY?APPLY.docs:[]).forEach(d=>{
+    if(d.status==='form'||d.status==='team') out.push({role:d.status==='form'?'владелец':'команда',lot:0,
+      name:d.name,todo:(d.note||'')+(d.who?' · закрывает: '+d.who:''),
+      files:(d.file?[{path:d.file,tag:'форма'}]:[]),done:'заполненный файл — куратору',src:'Подача · '+d.id});
+  });
+  (GANTT?GANTT.tasks:[]).filter(x=>x.crit&&!x.milestone).forEach(x=>out.push({role:ROLE_OF(x.name),lot:9,
+    name:'Критический путь: '+x.name,todo:'плановый старт '+x.start+' — входы подготовить заранее',
+    files:[],done:'по Ганту',src:'Гант'}));
+  return out;
+}
+function tasksPaint(){
+  const el=document.getElementById('taskbody'); if(!el) return;
+  const all=tasksList();
+  const rows=all.filter(x=>(!TQ.role||x.role===TQ.role)&&(TQ.lot===''||String(x.lot)===TQ.lot));
+  el.innerHTML=rows.map(x=>`<div class="card">
+    <h3><span class="tag">${esc(x.role)}</span> ${x.lot===9?'<span class="tag">план</span>':lotTag(x.lot)} ${esc(x.name)}</h3>
+    <p><b>Что сделать:</b> ${esc(x.todo)}</p>
+    ${x.files.length?`<div class="filters">${x.files.map(f=>`<a class="btn" href="${esc(f.path)}" download>⬇ ${esc(f.tag||'файл')}</a>`).join('')}</div>`:''}
+    <p class="mut"><b>Готово, когда:</b> ${esc(x.done)} · <i>${esc(x.src)}</i></p></div>`).join('')||'<div class="box mut">Под фильтр задач нет</div>';
+  const c=document.getElementById('taskcount'); if(c) c.textContent=rows.length+' из '+all.length;
+}
+function rTasks(){
+  const roles=[...new Set(tasksList().map(x=>x.role))];
+  return `
+  <div class="box info"><b>Очередь задач.</b> Всё, что можно закрывать уже сейчас, из всех реестров одним списком. Фильтруй по своей роли, скачивай входы кнопками, результат — в чат проекта: куратор вносит в базу, задача уходит из очереди, файл появляется в реестре и в следующем срезе.</div>
+  <div class="filters">
+    <select id="tqrole"><option value="">все роли</option>${roles.map(r=>`<option>${esc(r)}</option>`).join('')}</select>
+    <select id="tqlot"><option value="">все лоты</option><option value="1">Лот 1</option><option value="2">Лот 2</option><option value="3">Лот 3</option><option value="4">Лот 4</option><option value="0">общее/подача</option><option value="9">план</option></select>
+    <span class="count" id="taskcount"></span></div>
+  <div id="taskbody"></div>`;
+}
+function bindTasks(){
+  const r=document.getElementById('tqrole'), l=document.getElementById('tqlot');
+  if(r) r.addEventListener('change',()=>{TQ.role=r.value;tasksPaint();});
+  if(l) l.addEventListener('change',()=>{TQ.lot=l.value;tasksPaint();});
+  tasksPaint();
+}
+
+/* --- Документы: дерево папок + история версий у каждого файла --- */
+const DIRNAMES={bi:'Пояснительные записки',apply:'Пакет подачи',rfq:'Запросы ТКП',specs:'Спецификации и опросные листы',sketches:'Эскизы-подложки (SVG)',partner:'Партнёрская линия',paket:'ZIP-пакеты',_root:'Общие документы'};
+function fileMeta(){
+  const m={};
+  (BIDOCS?BIDOCS.lots:[]).forEach(L=>L.docs.forEach(d=>{
+    ((d.files&&d.files.length)?d.files:(d.file?[{path:d.file,tag:''}]:[])).forEach(f=>{
+      if(!m[f.path]) m[f.path]={st:d.status,who:'Лот '+(L.lot||'0'),tag:f.tag||''};});}));
+  (APPLY?APPLY.docs:[]).forEach(d=>{ if(d.file&&!m[d.file]) m[d.file]={st:d.status,who:'Подача '+d.id,tag:''};});
+  return m;
+}
+function rFiles(){
+  const meta=fileMeta(), seen={}, byDir={};
+  const push=p=>{ if(!p||seen[p]) return; seen[p]=1;
+    const rel=p.replace(/^docs\//,''); const dir=rel.includes('/')?rel.split('/')[0]:'_root';
+    (byDir[dir]=byDir[dir]||[]).push(p); };
+  if(REVS&&REVS.revisions.length) REVS.revisions[REVS.revisions.length-1].files.forEach(f=>push('docs/'+f.path));
+  Object.keys(meta).forEach(push);
+  SKETCHES.forEach(s=>push('docs/sketches/'+s.dl));
+  const ST={draft:['черновик','tag lot3'],ready:['готов','tag lot3'],base:['контент в базе','tag lot2'],form:['заполнить','tag lot2'],task:['нужен инженер','tag lot1'],team:['за командой','tag lot1'],wait:['после старта','tag']};
+  const hist=p=>{ const rel=p.replace(/^docs\//,'');
+    return (REVS?REVS.revisions:[]).map(r=>{const f=r.files.find(x=>x.path===rel);
+      return f?{id:r.id,date:r.date,st:f.status,href:'docs/rev/r'+r.id+'/'+rel}:null;}).filter(Boolean); };
+  const order=['bi','sketches','specs','rfq','apply','partner','paket','_root'];
+  return `
+  <div class="box info"><b>Документы проекта.</b> Дерево по папкам; у каждого файла — статус, скачивание и «история»: его личные версии из срезов Р0–Р${REVS&&REVS.revisions.length?REVS.revisions.length-1:0}. ZIP-пакеты — отдельной папкой. Полные таблицы срезов — в архиве внизу (для сверки «что изменилось между версиями целиком»).</div>
+  ${order.filter(d=>byDir[d]).map(dir=>`<div class="card"><h3>${esc(DIRNAMES[dir]||dir)} <span class="tag">${byDir[dir].length}</span>
+      ${dir!=='paket'&&dir!=='_root'&&byDir['paket']?'':''}</h3>
+    <div class="tblwrap"><table><thead><tr><th>Файл</th><th style="width:130px">Статус</th><th style="width:150px">Где используется</th><th style="width:70px">Скачать</th><th style="width:230px">История версий</th></tr></thead><tbody>
+    ${byDir[dir].sort().map(p=>{ const mm=meta[p]||{}; const st=ST[mm.st]; const h=hist(p);
+      return `<tr><td>${esc(p.split('/').pop())}</td>
+        <td>${st?`<span class="${st[1]}">${st[0]}</span>`:'<span class="mut">—</span>'}</td>
+        <td class="mut">${esc(mm.who||'—')}</td>
+        <td><a class="btn" href="${esc(p)}" download>⬇</a></td>
+        <td>${h.length?`<details><summary style="cursor:pointer">${h.length} верс.</summary>${h.map(v=>`<div style="margin:2px 0">Р${v.id} · ${esc(v.date)} · <span class="mut">${v.st==='same'?'без изм.':(v.st==='new'?'новый':'изменён')}</span> <a class="btn" style="padding:1px 7px" href="${esc(v.href)}" download>⬇</a></div>`).join('')}</details>`:'<span class="mut">вне срезов</span>'}</td></tr>`;}).join('')}
+    </tbody></table></div></div>`).join('')}
+  <details style="margin:12px 0"><summary style="cursor:pointer;font-weight:700">Архив срезов целиком (Р0–Р${REVS&&REVS.revisions.length?REVS.revisions.length-1:0}) — полные таблицы</summary>${rRevsBlock()}</details>`;
+}
+
 const GROUPS = [
-  ['project','Проект', [['overview','Обзор'],['stages','Этапы'],['blocks','Блоки и лоты'],['capex','Стройка · CAPEX']]],
-  ['eng','Инжиниринг', [['bi','Базовый проект'],['rasch','Расчёты'],['equip','Оборудование'],['auto','Автоматизация'],['soft','ПО: сами или подряд']]],
-  ['client','Заказчику', [['disc','Расхождения ТЗ'],['questions','Вопросы'],['deliv','Состав БИ']]],
-  ['bid','Торги', [['apply','Подача на конкурс'],['tender','Процедура'],['competitor','Конкурент'],['hedge','Закладки Дельты'],['alt','Альтернатива'],['partner','Партнёр']]],
-  ['buy','Закупки', [['sup','Поставщики'],['market','Маркетинг'],['china','Китай'],['world','Мировой опыт']]],
+  ['hq','Дашборд', [['hq','Дашборд'],['tasks','Задачи'],['files','Документы']]],
+  ['bp','Базовый проект', [['bi','Проект БИ'],['rasch','Расчёты'],['disc','Расхождения ТЗ'],['questions','Вопросы Заказчику'],['deliv','Состав БИ']]],
+  ['bid','Подача', [['apply','Пакет подачи'],['tender','Процедура']]],
+  ['more','Архив', [['overview','Обзор'],['stages','Этапы'],['blocks','Блоки'],['capex','CAPEX'],['equip','Оборудование'],['auto','Автоматизация'],['soft','ПО'],['competitor','Конкурент'],['hedge','Закладки Дельты'],['alt','Альтернатива'],['partner','Партнёр'],['sup','Поставщики'],['market','Маркетинг'],['china','Китай'],['world','Мир']]],
 ];
 const TABS = GROUPS.flatMap(g=>g[2]);
 const GOF = {}; GROUPS.forEach(g=>g[2].forEach(([id])=>GOF[id]=g[0]));
 const R = {overview:rOverview, stages:rStages, blocks:rBlocks, bi:rBI, deliv:rDeliv, rasch:rRasch, equip:rEquip,
            disc:rDisc, questions:rQ, sup:rSup, market:rMarket, soft:rSoft, alt:rAlt, auto:rAuto,
            world:rWorld, china:rChina, partner:rPartner, competitor:rComp, hedge:rHedge,
-           tender:rTender, capex:rCapex, apply:rApply};
+           tender:rTender, capex:rCapex, apply:rApply, hq:rHQ, tasks:rTasks, files:rFiles};
 const nav = document.getElementById('nav'), main = document.getElementById('main');
 nav.innerHTML =
   `<div class="grow">${GROUPS.map(([gid,gt])=>`<button data-g="${gid}">${esc(gt)}</button>`).join('')}</div>` +
@@ -3786,6 +3913,7 @@ function show(id){
     if(id==='equip') bindEquip();
     if(id==='capex') bindCapex();
     if(id==='bi') bindBI();
+    if(id==='tasks') bindTasks();
     if(id==='sup') bindSup();
     if(id==='market') bindMkt();
     if(id==='questions') bindQ();
@@ -3810,7 +3938,7 @@ window.addEventListener('hashchange', ()=>{
   const id = location.hash.slice(1);
   if(TABS.some(([tid])=>tid===id) && !document.getElementById(`s-${id}`).classList.contains('on')) show(id);
 });
-show(TABS.some(([id])=>id===location.hash.slice(1)) ? location.hash.slice(1) : 'overview');
+show(TABS.some(([id])=>id===location.hash.slice(1)) ? location.hash.slice(1) : 'hq');
 </script>
 </body>
 </html>
