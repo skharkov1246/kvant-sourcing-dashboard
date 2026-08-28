@@ -18,38 +18,102 @@
      "stage": 1,
      "status": "draft",
      "file": "docs/bi/ove75-lot1-pz-draft.docx",
-     "note": "v0.1 из базы; балансы — из расчётной модели"
+     "note": "v0.1 из базы; балансы — из расчётной модели",
+     "files": [
+      {
+       "path": "docs/bi/ove75-lot1-pz-draft.docx",
+       "tag": "ПЗ"
+      }
+     ]
     },
     {
      "name": "Расчётные приложения (балансы, электрика печи, гидродинамика слоя, точка росы)",
      "stage": 1,
      "status": "draft",
      "file": "docs/ove75-raschet.docx",
-     "note": "независимая записка, 21 блок — на рецензию инженеру"
+     "note": "независимая записка, 21 блок — на рецензию инженеру",
+     "files": [
+      {
+       "path": "docs/ove75-raschet.docx",
+       "tag": "расчёт"
+      }
+     ]
     },
     {
      "name": "PFD с границами проектирования",
      "stage": 1,
      "status": "task",
-     "note": "схема и границы описаны в базе; отрисовка — CAD по заданию"
+     "note": "схема и границы описаны в базе; отрисовка — CAD по заданию",
+     "files": [
+      {
+       "path": "docs/sketches/ove75-lot1-pfd-eskiz.svg",
+       "tag": "PFD"
+      }
+     ]
     },
     {
      "name": "Компоновочные решения (планы, разрезы)",
      "stage": 1,
      "status": "task",
-     "note": "задание для CAD готово (zadanie_cad); после генплана — посадка"
+     "note": "задание для CAD готово (zadanie_cad); после генплана — посадка",
+     "files": [
+      {
+       "path": "docs/sketches/ove75-lot1-vysotka-eskiz.svg",
+       "tag": "высотка"
+      }
+     ]
     },
     {
      "name": "Спецификация оборудования + опросные листы + исходные требования на длинноцикловое",
      "stage": 1,
      "status": "base",
-     "note": "перечень из 70 позиций на вкладке «Оборудование»; опросные листы — по шаблонам заводов"
+     "note": "перечень из 70 позиций на вкладке «Оборудование»; опросные листы — по шаблонам заводов",
+     "files": [
+      {
+       "path": "docs/specs/ove75-perechen-oborudovaniya.docx",
+       "tag": "перечень"
+      },
+      {
+       "path": "docs/specs/ove75-ol-pech-ks.docx",
+       "tag": "ОЛ печь"
+      },
+      {
+       "path": "docs/specs/ove75-ol-kotel-utilizator.docx",
+       "tag": "ОЛ КУ"
+      },
+      {
+       "path": "docs/specs/ove75-ol-tsiklony.docx",
+       "tag": "ОЛ цикл."
+      },
+      {
+       "path": "docs/specs/ove75-ol-elektrofiltr.docx",
+       "tag": "ОЛ ЭФ"
+      },
+      {
+       "path": "docs/specs/ove75-ol-dymosos.docx",
+       "tag": "ОЛ дым."
+      },
+      {
+       "path": "docs/specs/ove75-ol-vozduhoduvka.docx",
+       "tag": "ОЛ возд."
+      },
+      {
+       "path": "docs/specs/ove75-ol-vakuum-filtr.docx",
+       "tag": "ОЛ ВФ"
+      }
+     ]
     },
     {
      "name": "Предварительные P&ID по участкам",
      "stage": 2,
      "status": "task",
-     "note": "контуры КИПиА описаны в базе; отрисовка — инженер"
+     "note": "контуры КИПиА описаны в базе; отрисовка — инженер",
+     "files": [
+      {
+       "path": "docs/sketches/ove75-lot1-pid-pech-ku-eskiz.svg",
+       "tag": "P&ID"
+      }
+     ]
     },
     {
      "name": "Планы предварительных нагрузок; фундаменты с динамикой (с запасом)",
@@ -73,13 +137,25 @@
      "name": "Схема КТС АСУ; тепловыделения и вредности (по аналогам)",
      "stage": 2,
      "status": "base",
-     "note": "I/O ~2000 посчитано; данные по аналогам в базе"
+     "note": "I/O ~2000 посчитано; данные по аналогам в базе",
+     "files": [
+      {
+       "path": "docs/sketches/ove75-asu-kts-eskiz.svg",
+       "tag": "КТС"
+      }
+     ]
     },
     {
      "name": "Бюджетные ТКП по основному + бюджетная оценка поставки",
      "stage": 2,
      "status": "wait",
-     "note": "план сорсинга готов (114 поставщиков) — запуск в день старта"
+     "note": "план сорсинга готов (114 поставщиков) — запуск в день старта",
+     "files": [
+      {
+       "path": "docs/rfq/ove75-rfq-index.docx",
+       "tag": "ТКП"
+      }
+     ]
     }
    ]
   },
@@ -92,31 +168,73 @@
      "stage": 1,
      "status": "draft",
      "file": "docs/bi/ove75-lot2-pz-draft.docx",
-     "note": "v0.1; границы — от фланца выпарного I ступени, сборник маточника 1 учтён"
+     "note": "v0.1; границы — от фланца выпарного I ступени, сборник маточника 1 учтён",
+     "files": [
+      {
+       "path": "docs/bi/ove75-lot2-pz-draft.docx",
+       "tag": "ПЗ"
+      }
+     ]
     },
     {
      "name": "PFD; компоновка в существующем/новом корпусе",
      "stage": 1,
      "status": "task",
-     "note": "высотная проверка барометрических труб — в базе"
+     "note": "высотная проверка барометрических труб — в базе",
+     "files": [
+      {
+       "path": "docs/sketches/ove75-lot2-pfd-eskiz.svg",
+       "tag": "PFD"
+      },
+      {
+       "path": "docs/sketches/ove75-lot2-komponovka-gmu-eskiz.svg",
+       "tag": "план"
+      }
+     ]
     },
     {
      "name": "Спецификация оборудования + опросные листы",
      "stage": 1,
      "status": "base",
-     "note": "испарители, центрифуги, вакуум — параметры в базе"
+     "note": "испарители, центрифуги, вакуум — параметры в базе",
+     "files": [
+      {
+       "path": "docs/specs/ove75-perechen-oborudovaniya.docx",
+       "tag": "перечень"
+      },
+      {
+       "path": "docs/specs/ove75-ol-vyparnoy-apparat.docx",
+       "tag": "ОЛ вып."
+      },
+      {
+       "path": "docs/specs/ove75-ol-tsentrifuga.docx",
+       "tag": "ОЛ центр"
+      }
+     ]
     },
     {
      "name": "Предварительные P&ID; нагрузки; электрочасть",
      "stage": 2,
      "status": "task",
-     "note": "по заданиям из базы"
+     "note": "по заданиям из базы",
+     "files": [
+      {
+       "path": "docs/sketches/ove75-lot2-pid-vyparka-eskiz.svg",
+       "tag": "P&ID"
+      }
+     ]
     },
     {
      "name": "Стоимостной блок (бюджетные ТКП, оценка)",
      "stage": 2,
      "status": "wait",
-     "note": "кандидаты по классам evaporator/centrifuge готовы"
+     "note": "кандидаты по классам evaporator/centrifuge готовы",
+     "files": [
+      {
+       "path": "docs/rfq/ove75-rfq-index.docx",
+       "tag": "ТКП"
+      }
+     ]
     }
    ]
   },
@@ -129,44 +247,98 @@
      "stage": 1,
      "status": "draft",
      "file": "docs/bi/ove75-lot3-pz-draft.docx",
-     "note": "v0.1; сценарий Б (новый корпус 36×190) — базовый"
+     "note": "v0.1; сценарий Б (новый корпус 36×190) — базовый",
+     "files": [
+      {
+       "path": "docs/bi/ove75-lot3-pz-draft.docx",
+       "tag": "ПЗ"
+      }
+     ]
     },
     {
      "name": "Расчёт серии (ток, напряжение, выпрямление) + гарантийная рамка",
      "stage": 1,
      "status": "draft",
      "file": "docs/ove75-raschet.docx",
-     "note": "блоки L3/NB-EW в записке"
+     "note": "блоки L3/NB-EW в записке",
+     "files": [
+      {
+       "path": "docs/ove75-raschet.docx",
+       "tag": "расчёт"
+      }
+     ]
     },
     {
      "name": "PFD; компоновочные решения нового корпуса",
      "stage": 1,
      "status": "task",
-     "note": "посадка — после генплана (Q-10)"
+     "note": "посадка — после генплана (Q-10)",
+     "files": [
+      {
+       "path": "docs/sketches/ove75-lot3-plan-ew-eskiz.svg",
+       "tag": "план"
+      },
+      {
+       "path": "docs/sketches/ove75-lot3-razrez-eskiz.svg",
+       "tag": "разрез"
+      }
+     ]
     },
     {
      "name": "Спецификация: ванны, аноды, матрицы, КСМ, краны + опросные листы",
      "stage": 1,
      "status": "base",
-     "note": "требования Прил.В — после переиздания под 75 тыс. т (C-39)"
+     "note": "требования Прил.В — после переиздания под 75 тыс. т (C-39)",
+     "files": [
+      {
+       "path": "docs/specs/ove75-ol-vanna-elektroliznaya.docx",
+       "tag": "ОЛ ванна"
+      },
+      {
+       "path": "docs/specs/ove75-ol-kran-mostovoy.docx",
+       "tag": "ОЛ кран"
+      }
+     ]
     },
     {
      "name": "Предварительные P&ID; нагрузки (динамика кранов); электрочасть",
      "stage": 2,
      "status": "task",
-     "note": ""
+     "note": "",
+     "files": [
+      {
+       "path": "docs/sketches/ove75-lot3-pid-cirk-eskiz.svg",
+       "tag": "P&ID"
+      },
+      {
+       "path": "docs/sketches/ove75-lot3-odnolineynaya-eskiz.svg",
+       "tag": "ЭЛ"
+      }
+     ]
     },
     {
      "name": "АСУ с прикладным ПО (схема КТС, карта сигналов)",
      "stage": 2,
      "status": "base",
-     "note": "перечень контуров и блокировок — в базе"
+     "note": "перечень контуров и блокировок — в базе",
+     "files": [
+      {
+       "path": "docs/sketches/ove75-asu-kts-eskiz.svg",
+       "tag": "КТС"
+      }
+     ]
     },
     {
      "name": "Стоимостной блок",
      "stage": 2,
      "status": "wait",
-     "note": "кандидаты cell/anode/cathode/stripper/crane/rectifier готовы"
+     "note": "кандидаты cell/anode/cathode/stripper/crane/rectifier готовы",
+     "files": [
+      {
+       "path": "docs/rfq/ove75-rfq-index.docx",
+       "tag": "ТКП"
+      }
+     ]
     }
    ]
   },
@@ -179,19 +351,53 @@
      "stage": 1,
      "status": "draft",
      "file": "docs/bi/ove75-lot4-pz-draft.docx",
-     "note": "v0.1; буфер 3000 т = 14,3 суток отгрузки"
+     "note": "v0.1; буфер 3000 т = 14,3 суток отгрузки",
+     "files": [
+      {
+       "path": "docs/bi/ove75-lot4-pz-draft.docx",
+       "tag": "ПЗ"
+      },
+      {
+       "path": "docs/ove75-raschet.docx",
+       "tag": "расчёт"
+      }
+     ]
     },
     {
      "name": "PFD; компоновка склада; спецификация + опросные листы",
      "stage": 1,
      "status": "base",
-     "note": ""
+     "note": "",
+     "files": [
+      {
+       "path": "docs/sketches/ove75-lot4-flow-eskiz.svg",
+       "tag": "PFD"
+      },
+      {
+       "path": "docs/sketches/ove75-lot4-plan-sklada-eskiz.svg",
+       "tag": "план"
+      },
+      {
+       "path": "docs/specs/ove75-ol-shtabeler.docx",
+       "tag": "ОЛ штаб"
+      },
+      {
+       "path": "docs/specs/ove75-ol-kran-mostovoy.docx",
+       "tag": "ОЛ кран"
+      }
+     ]
     },
     {
      "name": "Нагрузки; электрочасть; стоимостной блок",
      "stage": 2,
      "status": "wait",
-     "note": ""
+     "note": "",
+     "files": [
+      {
+       "path": "docs/rfq/ove75-rfq-index.docx",
+       "tag": "ТКП"
+      }
+     ]
     }
    ]
   },
@@ -210,35 +416,109 @@
      "stage": 1,
      "status": "draft",
      "file": "docs/ove75-reestr.docx",
-     "note": "живёт на сайте, Word пересобирается автоматически"
+     "note": "живёт на сайте, Word пересобирается автоматически",
+     "files": [
+      {
+       "path": "docs/ove75-reestr.docx",
+       "tag": "реестр"
+      }
+     ]
     },
     {
      "name": "Перечень основного оборудования по лотам (70 позиций)",
      "stage": 1,
      "status": "draft",
      "file": "docs/specs/ove75-perechen-oborudovaniya.docx",
-     "note": "генерится из базы при каждой сборке"
+     "note": "генерится из базы при каждой сборке",
+     "files": [
+      {
+       "path": "docs/specs/ove75-perechen-oborudovaniya.docx",
+       "tag": "перечень"
+      }
+     ]
     },
     {
      "name": "Опросные листы — 12 ключевых классов оборудования",
      "stage": 1,
      "status": "draft",
      "file": "docs/specs/ove75-ol-pech-ks.docx",
-     "note": "остальные 11 файлов — в docs/specs/; параметры из базы, пробелы — «уточняется по ТКП»"
+     "note": "остальные 11 файлов — в docs/specs/; параметры из базы, пробелы — «уточняется по ТКП»",
+     "files": [
+      {
+       "path": "docs/specs/ove75-ol-pech-ks.docx",
+       "tag": "печь КС"
+      },
+      {
+       "path": "docs/specs/ove75-ol-kotel-utilizator.docx",
+       "tag": "КУ"
+      },
+      {
+       "path": "docs/specs/ove75-ol-tsiklony.docx",
+       "tag": "циклон"
+      },
+      {
+       "path": "docs/specs/ove75-ol-elektrofiltr.docx",
+       "tag": "ЭФ"
+      },
+      {
+       "path": "docs/specs/ove75-ol-dymosos.docx",
+       "tag": "дымосос"
+      },
+      {
+       "path": "docs/specs/ove75-ol-vozduhoduvka.docx",
+       "tag": "возд-ка"
+      },
+      {
+       "path": "docs/specs/ove75-ol-vakuum-filtr.docx",
+       "tag": "вак.ф-р"
+      },
+      {
+       "path": "docs/specs/ove75-ol-vyparnoy-apparat.docx",
+       "tag": "выпарка"
+      },
+      {
+       "path": "docs/specs/ove75-ol-tsentrifuga.docx",
+       "tag": "ц/фуга"
+      },
+      {
+       "path": "docs/specs/ove75-ol-vanna-elektroliznaya.docx",
+       "tag": "ванна"
+      },
+      {
+       "path": "docs/specs/ove75-ol-kran-mostovoy.docx",
+       "tag": "кран"
+      },
+      {
+       "path": "docs/specs/ove75-ol-shtabeler.docx",
+       "tag": "штабелёр"
+      }
+     ]
     },
     {
      "name": "Пакет запросов бюджетных ТКП (27 позиций, RU+EN)",
      "stage": 1,
      "status": "draft",
      "file": "docs/rfq/ove75-rfq-index.docx",
-     "note": "полный пакет — docs/rfq/; адресаты и рассылка — в день старта"
+     "note": "полный пакет — docs/rfq/; адресаты и рассылка — в день старта",
+     "files": [
+      {
+       "path": "docs/rfq/ove75-rfq-index.docx",
+       "tag": "ТКП"
+      }
+     ]
     },
     {
      "name": "План реализации ЦИМ (BEP, черновик v0.1)",
      "stage": 1,
      "status": "draft",
      "file": "docs/ove75-bim-plan-draft.docx",
-     "note": "перечень моделей, LOD/LOI по Прил.1, IFC раз в 4 недели"
+     "note": "перечень моделей, LOD/LOI по Прил.1, IFC раз в 4 недели",
+     "files": [
+      {
+       "path": "docs/ove75-bim-plan-draft.docx",
+       "tag": "BEP"
+      }
+     ]
     }
    ]
   }
