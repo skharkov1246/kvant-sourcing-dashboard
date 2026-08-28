@@ -3860,8 +3860,8 @@ function bindTasks(){
 }
 
 /* --- Документы: дерево папок + история версий у каждого файла --- */
-const DIRNAMES={bi:'Пояснительные записки',apply:'Пакет подачи',rfq:'Запросы ТКП',specs:'Спецификации и опросные листы',sketches:'Эскизы-подложки (SVG)',dxf:'Чертежи DXF (для nanoCAD)',cim:'ЦИМ — библиотека IFC',partner:'Партнёрская линия',paket:'ZIP-пакеты',_root:'Общие документы'};
-const DIRHINT={dxf:'Те же 14 листов, что в эскизах, но в DXF R2010: открываются в nanoCAD / AutoCAD / Model Studio CS. Слои GAS / LIQUID / DUST / ELECTRIC / INTERLOCK / OUTLINE / TEXT_RU, 1 единица = 1 мм — подложка для рабочей отрисовки, не перечерчивать с нуля.',cim:'IFC-файлы стадии БИ: библиотека типов оборудования (70 типов, 14 классов, атрибуты Pset_KVANT_LOI) и наборы по лотам. Открываются в Model Studio CS, nanoCAD BIM, BIMVision (бесплатный просмотрщик).'};
+const DIRNAMES={bi:'Пояснительные записки',apply:'Пакет подачи',rfq:'Запросы ТКП',specs:'Спецификации и опросные листы',sketches:'Эскизы-подложки (SVG)',dxf:'Чертежи DXF (для nanoCAD)',cim:'ЦИМ — библиотека IFC',idei:'Реестр идей эффективности',partner:'Партнёрская линия',paket:'ZIP-пакеты',_root:'Общие документы'};
+const DIRHINT={dxf:'Те же 14 листов, что в эскизах, но в DXF R2010: открываются в nanoCAD / AutoCAD / Model Studio CS. Слои GAS / LIQUID / DUST / ELECTRIC / INTERLOCK / OUTLINE / TEXT_RU, 1 единица = 1 мм — подложка для рабочей отрисовки, не перечерчивать с нуля.',cim:'IFC-файлы стадии БИ: библиотека типов оборудования (70 типов, 14 классов, атрибуты Pset_KVANT_LOI) и наборы по лотам. Открываются в Model Studio CS, nanoCAD BIM, BIMVision (бесплатный просмотрщик).',idei:'65 предложений по эффективности производства в трёх корзинах: 44 — в базовый состав БИ, 18 — опции Заказчику, 3 — эксплуатация. Ред. 1.0 — компактная (20 стр., абзац на идею); ред. 2.0 — рабочая (67 стр.): к каждой идее добавлены исполнители РФ/КНР и техническая реализация по шагам. Оценки эффектов — Class 5, до инженерной проверки.'};
 function fileMeta(){
   const m={};
   (BIDOCS?BIDOCS.lots:[]).forEach(L=>L.docs.forEach(d=>{
@@ -3881,11 +3881,12 @@ function rFiles(){
   SKETCHES.forEach(s=>push('docs/dxf/'+s.dl.replace(/\.svg$/,'.dxf')));
   push('docs/sketches/ove75-gantt-bi.svg'); push('docs/dxf/ove75-gantt-bi.dxf');
   ['lib','lot0','lot1','lot2','lot3','lot4'].forEach(x=>push('docs/cim/ove75-equip-'+x+'.ifc'));
+  ['ove75-reestr-effektivnost-zavod.pdf','ove75-reestr-effektivnost-zavod-red2.pdf'].forEach(f=>push('docs/idei/'+f));
   const ST={draft:['черновик','tag lot3'],ready:['готов','tag lot3'],base:['контент в базе','tag lot2'],form:['заполнить','tag lot2'],task:['нужен инженер','tag lot1'],team:['за командой','tag lot1'],wait:['после старта','tag']};
   const hist=p=>{ const rel=p.replace(/^docs\//,'');
     return (REVS?REVS.revisions:[]).map(r=>{const f=r.files.find(x=>x.path===rel);
       return f?{id:r.id,date:r.date,st:f.status,href:'docs/rev/r'+r.id+'/'+rel}:null;}).filter(Boolean); };
-  const order=['bi','sketches','dxf','cim','specs','rfq','apply','partner','paket','_root'];
+  const order=['bi','sketches','dxf','cim','specs','idei','rfq','apply','partner','paket','_root'];
   return `
   <div class="box info"><b>Документы проекта.</b> Дерево по папкам; у каждого файла — статус, скачивание и «история»: его личные версии из срезов Р0–Р${REVS&&REVS.revisions.length?REVS.revisions.length-1:0}. ZIP-пакеты — отдельной папкой. Полные таблицы срезов — в архиве внизу (для сверки «что изменилось между версиями целиком»).</div>
   ${order.filter(d=>byDir[d]).map(dir=>`<div class="card"><h3>${esc(DIRNAMES[dir]||dir)} <span class="tag">${byDir[dir].length}</span>
