@@ -2742,10 +2742,11 @@ function rBI(){
     ${s.note?`<p class="mut">${esc(s.note)}</p>`:''}</div>`).join('')}
 `:''}
   <h2>Графические заготовки — с чего инженеру начать чертежи</h2>
-  <div class="box info"><b>Что это.</b> Первые эскизы графической части, построенные из данных базы (ИД, расчётная модель, черновики ПЗ). Это стартовые подложки для CAD, а не выпущенные чертежи: инженер проверяет, переносит в CAD и дорабатывает. SVG скачивается кнопкой и открывается в любом векторном редакторе (Inkscape, CorelDRAW, nanoCAD через импорт).</div>
+  <div class="box info"><b>Что это.</b> Первые эскизы графической части, построенные из данных базы (ИД, расчётная модель, черновики ПЗ). Это стартовые подложки для CAD, а не выпущенные чертежи: инженер проверяет, переносит в CAD и дорабатывает. SVG скачивается кнопкой и открывается в любом векторном редакторе; DXF — тот же лист в формате nanoCAD / AutoCAD (слои по средам, 1 единица = 1 мм), чтобы не перечерчивать с нуля. Все DXF и IFC-библиотека оборудования собраны и на вкладке «Документы» — папки «Чертежи DXF» и «ЦИМ».</div>
   ${SKETCHES.map(s=>`<div class="card"><h3>${esc(s.title)} ${s.lot?lotTag(s.lot):'<span class="tag">все лоты</span>'} <span class="tag">эскиз v0.1</span></h3>
     <div class="tblwrap" style="padding:6px 4px">${s.f()}</div>
     <div class="filters"><button class="btn" data-dl="${s.id}" data-fn="${s.dl}">⬇ SVG</button>
+      <a class="btn" href="docs/dxf/${s.dl.replace(/\.svg$/,'.dxf')}" download>⬇ DXF</a>
       <span class="mut">${esc(s.cap)}</span></div></div>`).join('')}
   <h2>Черновик по разделам</h2>
   <div class="filters">${BI.map((d,i)=>`<button class="btn bilot${i===biLot?' on':''}" data-i="${i}">${lotTag(d.lot)} ${esc(d.name)}</button>`).join('')}</div>
@@ -3859,7 +3860,8 @@ function bindTasks(){
 }
 
 /* --- Документы: дерево папок + история версий у каждого файла --- */
-const DIRNAMES={bi:'Пояснительные записки',apply:'Пакет подачи',rfq:'Запросы ТКП',specs:'Спецификации и опросные листы',sketches:'Эскизы-подложки (SVG)',partner:'Партнёрская линия',paket:'ZIP-пакеты',_root:'Общие документы'};
+const DIRNAMES={bi:'Пояснительные записки',apply:'Пакет подачи',rfq:'Запросы ТКП',specs:'Спецификации и опросные листы',sketches:'Эскизы-подложки (SVG)',dxf:'Чертежи DXF (для nanoCAD)',cim:'ЦИМ — библиотека IFC',partner:'Партнёрская линия',paket:'ZIP-пакеты',_root:'Общие документы'};
+const DIRHINT={dxf:'Те же 14 листов, что в эскизах, но в DXF R2010: открываются в nanoCAD / AutoCAD / Model Studio CS. Слои GAS / LIQUID / DUST / ELECTRIC / INTERLOCK / OUTLINE / TEXT_RU, 1 единица = 1 мм — подложка для рабочей отрисовки, не перечерчивать с нуля.',cim:'IFC-файлы стадии БИ: библиотека типов оборудования (70 типов, 14 классов, атрибуты Pset_KVANT_LOI) и наборы по лотам. Открываются в Model Studio CS, nanoCAD BIM, BIMVision (бесплатный просмотрщик).'};
 function fileMeta(){
   const m={};
   (BIDOCS?BIDOCS.lots:[]).forEach(L=>L.docs.forEach(d=>{
@@ -3876,15 +3878,18 @@ function rFiles(){
   if(REVS&&REVS.revisions.length) REVS.revisions[REVS.revisions.length-1].files.forEach(f=>push('docs/'+f.path));
   Object.keys(meta).forEach(push);
   SKETCHES.forEach(s=>push('docs/sketches/'+s.dl));
+  SKETCHES.forEach(s=>push('docs/dxf/'+s.dl.replace(/\.svg$/,'.dxf')));
+  push('docs/sketches/ove75-gantt-bi.svg'); push('docs/dxf/ove75-gantt-bi.dxf');
+  ['lib','lot0','lot1','lot2','lot3','lot4'].forEach(x=>push('docs/cim/ove75-equip-'+x+'.ifc'));
   const ST={draft:['черновик','tag lot3'],ready:['готов','tag lot3'],base:['контент в базе','tag lot2'],form:['заполнить','tag lot2'],task:['нужен инженер','tag lot1'],team:['за командой','tag lot1'],wait:['после старта','tag']};
   const hist=p=>{ const rel=p.replace(/^docs\//,'');
     return (REVS?REVS.revisions:[]).map(r=>{const f=r.files.find(x=>x.path===rel);
       return f?{id:r.id,date:r.date,st:f.status,href:'docs/rev/r'+r.id+'/'+rel}:null;}).filter(Boolean); };
-  const order=['bi','sketches','specs','rfq','apply','partner','paket','_root'];
+  const order=['bi','sketches','dxf','cim','specs','rfq','apply','partner','paket','_root'];
   return `
   <div class="box info"><b>Документы проекта.</b> Дерево по папкам; у каждого файла — статус, скачивание и «история»: его личные версии из срезов Р0–Р${REVS&&REVS.revisions.length?REVS.revisions.length-1:0}. ZIP-пакеты — отдельной папкой. Полные таблицы срезов — в архиве внизу (для сверки «что изменилось между версиями целиком»).</div>
   ${order.filter(d=>byDir[d]).map(dir=>`<div class="card"><h3>${esc(DIRNAMES[dir]||dir)} <span class="tag">${byDir[dir].length}</span>
-      ${dir!=='paket'&&dir!=='_root'&&byDir['paket']?'':''}</h3>
+      </h3>${DIRHINT[dir]?`<p class="mut" style="margin:4px 0 8px">${esc(DIRHINT[dir])}</p>`:''}
     <div class="tblwrap"><table><thead><tr><th>Файл</th><th style="width:130px">Статус</th><th style="width:150px">Где используется</th><th style="width:70px">Скачать</th><th style="width:230px">История версий</th></tr></thead><tbody>
     ${byDir[dir].sort().map(p=>{ const mm=meta[p]||{}; const st=ST[mm.st]; const h=hist(p);
       return `<tr><td>${esc(p.split('/').pop())}</td>
