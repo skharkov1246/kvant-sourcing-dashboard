@@ -898,6 +898,8 @@ function rApply(){
   const by = {}; APPLY.docs.forEach(d=>{by[d.status]=(by[d.status]||0)+1});
   return `
   <div class="box warn"><b>Пакет подачи на конкурсную процедуру.</b> ${esc(APPLY.note)}</div>
+  <div class="filters"><a class="btn" href="docs/paket/ove75-podacha-paket.zip" download>⬇ весь пакет подачи одним архивом (ZIP)</a>
+    <span class="mut">внутри — только позиции со статусами «готов» и «заполнить»; служебные строки удалить перед подачей</span></div>
   <div class="k">
     <div class="tile"><b style="color:var(--good)">${by.ready||0}</b><span>файлы готовы</span></div>
     <div class="tile"><b class="mid">${by.form||0}</b><span>заполнить</span></div>
@@ -2644,15 +2646,17 @@ function rBI(){
   ${BIDOCS.lots.map(L=>`<div class="card">
     <h3>${lotTag(L.lot)} ${esc(L.name)}
       <span class="tag lot3">${(n=>`${n} ${plural(n,'черновик','черновика','черновиков')}`)(L.docs.filter(d=>d.status==='draft').length)}</span>
-      <span class="tag">${L.docs.length} документов</span></h3>
+      <span class="tag">${L.docs.length} документов</span>
+      <a class="btn" style="margin-left:6px" href="docs/paket/${L.lot?`ove75-lot${L.lot}-paket.zip`:'ove75-obshchee-paket.zip'}" download>⬇ пакет лота (ZIP)</a></h3>
     <div class="tblwrap"><table><thead><tr><th>Документ</th><th style="width:60px">Этап</th>
-      <th style="width:150px">Статус</th><th style="width:60px">Файл</th><th>Примечание</th></tr></thead><tbody>
+      <th style="width:150px">Статус</th><th style="width:190px">Файлы</th><th>Примечание</th></tr></thead><tbody>
     ${L.docs.map(d=>{
       const st={draft:['черновик готов','tag lot3'],base:['контент в базе','tag lot2'],
                 task:['нужен инженер','tag lot1'],wait:['после старта','tag'],team:['за командой','tag lot1']}[d.status]||[d.status,'tag'];
+      const fl=(d.files&&d.files.length)?d.files:(d.file?[{path:d.file,tag:'файл'}]:[]);
       return `<tr><td>${esc(d.name)}</td><td class="mut">Этап ${d.stage}</td>
         <td><span class="${st[1]}">${st[0]}</span></td>
-        <td>${d.file?`<a class="btn" href="${esc(d.file)}" download>⬇</a>`:'—'}</td>
+        <td>${fl.length?fl.map(f=>`<a class="btn" style="margin:1px 2px 1px 0;padding:3px 8px" href="${esc(f.path)}" download title="${esc(f.path.split('/').pop())}">⬇ ${esc(f.tag||'')}</a>`).join(''):'—'}</td>
         <td class="mut">${esc(d.note||'')}</td></tr>`;}).join('')}
     </tbody></table></div></div>`).join('')}`:''}
   ${REVS&&REVS.revisions.length?`<h2>Архив ревизий документов — для согласования</h2>
