@@ -1,8 +1,41 @@
 {
- "updated": "2026-08-24",
+ "updated": "2026-08-31",
  "source": "Bitrix24: сделки по ключевым словам ГТУ + СП-166 «Запросы поставщикам»",
  "live": true,
  "deals": [
+  {
+   "id": "22946",
+   "title": "2140380/1 Комп. прокладок, Комп. фитинг-адап. SGT",
+   "models": [
+    "Siemens (модель уточнить)"
+   ],
+   "stage": "C2:4",
+   "created": "2026-08-27",
+   "rfqs": [
+    {
+     "id": "42746",
+     "title": "RFQ ",
+     "created": "2026-08-28",
+     "supplier": "Interchim",
+     "stage": "Request Sent",
+     "sourcer": "Maria Sukhovarova",
+     "models": [
+      "Siemens (модель уточнить)"
+     ]
+    },
+    {
+     "id": "42752",
+     "title": "RFQ",
+     "created": "2026-08-28",
+     "supplier": "Scientific Glass Technology Singapore Pte Ltd",
+     "stage": "Request Sent",
+     "sourcer": "Maria Sukhovarova",
+     "models": [
+      "Siemens (модель уточнить)"
+     ]
+    }
+   ]
+  },
   {
    "id": "22866",
    "title": "5565875 Запрос ТКП (Выполнение комплекса работ по проведению инспекций ГТУ типа V64.3A ЭБ ст.№ 2, генератора WY8Z-066 ЭБ ст.№ 2, редуктора ТХ80/1С и восстановительному ремонту капитальных запасных частей газовой турбины)",
@@ -19,7 +52,7 @@
    "models": [
     "Titan 130"
    ],
-   "stage": "C4:PREPARATION",
+   "stage": "C4:EXECUTING",
    "created": "2026-08-13",
    "rfqs": [
     {
@@ -95,7 +128,7 @@
    "models": [
     "Taurus 60"
    ],
-   "stage": "C2:EXECUTING",
+   "stage": "C2:14",
    "created": "2026-08-03",
    "rfqs": [
     {
@@ -1405,7 +1438,7 @@
      "id": "31130",
      "title": "Amikon",
      "created": "2026-04-15",
-     "supplier": "Amikon",
+     "supplier": "Amikon Limited",
      "stage": "Price at Work",
      "sourcer": "Sergey Shipulev",
      "models": [
@@ -2618,7 +2651,7 @@
    "models": [
     "Taurus 60"
    ],
-   "stage": "C10:UC_PLDUI9",
+   "stage": "C10:9",
    "created": "2025-11-25",
    "rfqs": [
     {
@@ -2662,7 +2695,7 @@
    "models": [
     "Taurus 70"
    ],
-   "stage": "C10:UC_PLDUI9",
+   "stage": "C10:9",
    "created": "2025-11-25",
    "rfqs": [
     {
@@ -2706,7 +2739,7 @@
    "models": [
     "Taurus 70"
    ],
-   "stage": "C10:UC_PLDUI9",
+   "stage": "C10:9",
    "created": "2025-11-25",
    "rfqs": [
     {
@@ -8692,6 +8725,14 @@
    "model": "Siemens (модель уточнить)",
    "suppliers": [
     {
+     "name": "Interchim",
+     "n": 1
+    },
+    {
+     "name": "Scientific Glass Technology Singapore Pte Ltd",
+     "n": 1
+    },
+    {
      "name": "AoteWell Automation",
      "n": 1
     },
@@ -9179,7 +9220,7 @@
      "n": 1
     },
     {
-     "name": "Amikon",
+     "name": "Amikon Limited",
      "n": 1
     },
     {
