@@ -1,24 +1,25 @@
-"""CI-зонд v21: результативность сорсера Егора Семитко в сравнении со всей когортой.
+"""CI-зонд v22: аудит процесса «Запросы поставщикам» (СП-166, cat 24).
 
-Меряем одной линейкой всех, кто заводил RFQ в СП-166, и смотрим, где он в ряду:
-  • объём: сколько RFQ завёл, за какой срок, темп в неделю;
-  • входящие КП: сколько запросов дошло до «КП получено/выбран» и конверсия от закрытых;
-  • приведённые поставщики: компании, к которым ОН первым в компании отправил RFQ;
-  • ЭФФЕКТИВНЫЕ поставщики: из приведённых — те, у кого потом реально появились
-    заказы в СП-172 (то есть его находка превратилась в закупку), и на какую сумму.
-Плюс контекст: стаж (первый RFQ), доля свежих запросов, медиана и квартили когорты.
+Меряем то, что нужно для разговора об UX и конверсии в КП:
+  1) точные названия стадий и воронка (всего / 2026)
+  2) карточка запроса: сколько полей вообще и сколько реально заполняют
+  3) время: создан → отправлен → ответ; сколько висит в текущей стадии
+  4) ответная конверсия: новый поставщик против повторного
+  5) есть ли вообще куда писать — email/телефон у компаний-получателей
+  6) связь со сделкой, товарные позиции, число поставщиков на один запрос
 """
 from __future__ import annotations
 
+import datetime as dt
 import os
 import statistics as st
 from collections import Counter, defaultdict
 
 import requests
 
-TARGET = ("семитко", "semitko")
-SEL_STAGES = {"DT166_24:SUCCESS", "DT166_24:1"}          # «КП получено / выбран»
-CLOSED_SUF = {"SUCCESS", "1", "2", "3", "FAIL", "4", "5"}
+ET = 166
+CAT = 24
+Y = "2026-01-01"
 
 
 def bx(method: str, params: dict | None = None) -> dict:
@@ -45,146 +46,144 @@ def bx_all(method: str, params: dict) -> list:
         start = j["next"]
 
 
-def suf(sid): return str(sid or "").split(":")[-1]
-def is_closed(sid): return suf(sid) in CLOSED_SUF
-def is_sel(sid): return str(sid) in SEL_STAGES or suf(sid) in ("SUCCESS", "1")
-def d10(s): return str(s or "")[:10]
+def dtp(s):
+    if not s:
+        return None
+    try:
+        return dt.datetime.fromisoformat(str(s).replace("Z", "+00:00"))
+    except Exception:
+        return None
 
 
 def main() -> int:
-    users = {str(u["ID"]): f"{u.get('NAME') or ''} {u.get('LAST_NAME') or ''}".strip()
-             for u in bx_all("user.get", {})}
-    target_ids = [uid for uid, nm in users.items() if any(t in nm.lower() for t in TARGET)]
-    print("=== 1. Кого ищем ===")
-    for uid in target_ids:
-        print(f"  user #{uid}: «{users[uid]}»")
-    if not target_ids:
-        print("  ! пользователь с фамилией Семитко не найден в портале")
+    print("=== 1. СТАДИИ ВОРОНКИ ЗАПРОСОВ ===")
+    stg = bx("crm.status.list", {"filter": {"ENTITY_ID": f"DYNAMIC_{ET}_STAGE_{CAT}"}}).get("result") or []
+    names = {}
+    for s in sorted(stg, key=lambda x: int(x.get("SORT") or 0)):
+        names[s.get("STATUS_ID")] = s.get("NAME")
+        print(f"  {s.get('SORT'):>4} {s.get('STATUS_ID'):24s} «{s.get('NAME')}»")
 
-    print("\n=== 2. Выгрузка RFQ (СП-166) ===")
-    rfqs = bx_all("crm.item.list", {"entityTypeId": 166,
-        "select": ["id", "title", "companyId", "parentId2", "stageId",
-                   "createdTime", "movedTime", "assignedById", "createdBy"]})
-    print(f"  всего записей СП-166: {len(rfqs)}")
-    if rfqs:
-        print(f"  диапазон дат: {min(d10(r.get('createdTime')) for r in rfqs)} → "
-              f"{max(d10(r.get('createdTime')) for r in rfqs)}")
+    print("\n=== 2. КАРТОЧКА ЗАПРОСА: сколько полей просит система ===")
+    f = (bx("crm.item.fields", {"entityTypeId": ET}).get("result") or {}).get("fields", {})
+    uf = {k: v for k, v in f.items() if k.startswith("ufCrm")}
+    req = [k for k, v in f.items() if v.get("isRequired")]
+    print(f"  всего полей: {len(f)} · пользовательских: {len(uf)} · обязательных: {len(req)}")
+    print(f"  обязательные: {req}")
 
-    # --- кто первым отправил RFQ в компанию-поставщика = «привёл поставщика»
-    first_by_sup = {}
-    for r in sorted(rfqs, key=lambda r: str(r.get("createdTime") or "")):
+    print("\n=== 3. ЗАПРОСЫ ===")
+    sel = ["id", "title", "stageId", "createdTime", "updatedTime", "movedTime",
+           "companyId", "contactId", "assignedById", "parentId2", "opportunity", "currencyId"]
+    allr = bx_all("crm.item.list", {"entityTypeId": ET, "select": sel, "filter": {"categoryId": CAT}})
+    y26 = [r for r in allr if str(r.get("createdTime") or "").startswith("2026")]
+    print(f"  всего запросов: {len(allr)} · в 2026: {len(y26)}")
+
+    def funnel(rows, label):
+        c = Counter(r.get("stageId") for r in rows)
+        n = len(rows) or 1
+        print(f"\n  --- воронка: {label} ({len(rows)}) ---")
+        for sid, _ in sorted(c.items(), key=lambda kv: -kv[1]):
+            print(f"    {names.get(sid, sid)[:44]:46s} {c[sid]:>6}  {c[sid]/n*100:5.1f}%")
+    funnel(allr, "за всё время")
+    funnel(y26, "2026")
+
+    print("\n=== 4. ЗАПОЛНЯЕМОСТЬ КАРТОЧКИ (выборка 400 запросов 2026) ===")
+    sample = y26[-400:] if len(y26) > 400 else y26
+    ids = [r["id"] for r in sample]
+    full = []
+    for i in range(0, len(ids), 50):
+        chunk = bx_all("crm.item.list", {"entityTypeId": ET,
+            "filter": {"categoryId": CAT, "@id": ids[i:i + 50]}})
+        full += chunk
+    print(f"  разобрано карточек: {len(full)}")
+    fillc = Counter()
+    for it in full:
+        for k, v in it.items():
+            if v not in (None, "", 0, "0", [], {}, "0.00"):
+                fillc[k] += 1
+    n = len(full) or 1
+    print("  --- пользовательские поля: как часто заполнены ---")
+    rows = [(k, fillc.get(k, 0), (uf.get(k) or {}).get("title") or "") for k in uf]
+    for k, c, t in sorted(rows, key=lambda x: -x[1]):
+        if c:
+            print(f"    {c/n*100:5.1f}%  {c:>4}/{n}  {k:26s} «{str(t)[:44]}»")
+    dead = [k for k, c, t in rows if not c]
+    print(f"  ПУСТЫЕ ВСЕГДА ({len(dead)} полей): {dead[:24]}")
+
+    print("\n=== 5. ВРЕМЯ ===")
+    now = dt.datetime.now(dt.timezone.utc)
+    open_st = [s for s in names if s not in ("SUCCESS", "FAIL")]
+    ages = defaultdict(list)
+    for r in y26:
+        mv, cr = dtp(r.get("movedTime")), dtp(r.get("createdTime"))
+        if mv:
+            ages[r.get("stageId")].append((now - mv).total_seconds() / 86400)
+    print("  сколько дней запросы уже сидят в своей текущей стадии (медиана / макс):")
+    for sid, v in sorted(ages.items(), key=lambda kv: -len(kv[1])):
+        if v:
+            print(f"    {names.get(sid, sid)[:40]:42s} n={len(v):>5}  мед {st.median(v):6.1f} дн  макс {max(v):6.0f} дн")
+    closed = [r for r in y26 if r.get("stageId") in ("SUCCESS", "FAIL")]
+    lags = [( (dtp(r.get("updatedTime")) - dtp(r.get("createdTime"))).total_seconds()/86400 )
+            for r in closed if dtp(r.get("updatedTime")) and dtp(r.get("createdTime"))]
+    if lags:
+        lags.sort()
+        print(f"  цикл запроса до закрытия (2026, n={len(lags)}): "
+              f"мед {st.median(lags):.1f} дн · p25 {lags[len(lags)//4]:.1f} · p75 {lags[3*len(lags)//4]:.1f}")
+
+    print("\n=== 6. ОТВЕТИЛИ ЛИ: новый поставщик против повторного ===")
+    first_seen = {}
+    for r in sorted(allr, key=lambda r: str(r.get("createdTime"))):
         cid = str(r.get("companyId") or "")
-        if cid and cid not in first_by_sup:
-            first_by_sup[cid] = (str(r.get("assignedById") or ""), d10(r.get("createdTime")))
-
-    print("\n=== 3. Заказы СП-172: у каких поставщиков реально закупались ===")
-    orders = bx_all("crm.item.list", {"entityTypeId": 172,
-        "select": ["id", "companyId", "opportunity", "currencyId", "stageId", "createdTime"]})
-    cur = bx("crm.currency.list", {}).get("result") or []
-    rate = {c.get("CURRENCY"): float(c.get("AMOUNT") or 1) / float(c.get("AMOUNT_CNT") or 1) for c in cur}
-    ord_by_sup = defaultdict(lambda: [0, 0.0])
-    for o in orders:
-        cid = str(o.get("companyId") or "")
+        if cid and cid not in first_seen:
+            first_seen[cid] = r["id"]
+    ANSW = {"SUCCESS", "1", "2"}   # уточняется по названиям стадий ниже
+    def answered(r): return r.get("stageId") in ("SUCCESS",) or str(r.get("stageId")).endswith(":1")
+    n_new = a_new = n_rep = a_rep = 0
+    for r in y26:
+        cid = str(r.get("companyId") or "")
         if not cid:
             continue
-        ord_by_sup[cid][0] += 1
-        ord_by_sup[cid][1] += float(o.get("opportunity") or 0) * rate.get(o.get("currencyId"), 1.0)
-    print(f"  заказов всего: {len(orders)} · поставщиков с заказами: {len(ord_by_sup)}")
+        isnew = first_seen.get(cid) == r["id"]
+        ok = r.get("stageId") == "SUCCESS"
+        if isnew:
+            n_new += 1; a_new += ok
+        else:
+            n_rep += 1; a_rep += ok
+    print(f"  первый запрос этой компании : {n_new:>6} · дошли до «КП получено» {a_new:>5} = {a_new/max(n_new,1)*100:4.1f}%")
+    print(f"  повторный запрос            : {n_rep:>6} · дошли до «КП получено» {a_rep:>5} = {a_rep/max(n_rep,1)*100:4.1f}%")
+    per = Counter(str(r.get("companyId")) for r in allr if r.get("companyId"))
+    dist = Counter(min(v, 6) for v in per.values())
+    print(f"  поставщиков всего в запросах: {len(per)} · запросов на поставщика: "
+          + " · ".join(f"{k if k<6 else '6+'}:{v}" for k, v in sorted(dist.items())))
 
-    # --- метрики по каждому сорсеру
-    by_user = defaultdict(list)
-    for r in rfqs:
-        by_user[str(r.get("assignedById") or "")].append(r)
+    print("\n=== 7. ЕСТЬ ЛИ КУДА ПИСАТЬ: контакты компаний-получателей ===")
+    cids = sorted({str(r.get("companyId")) for r in y26 if r.get("companyId")})
+    have_mail = have_phone = seen = 0
+    for i in range(0, len(cids), 100):
+        for c in bx_all("crm.company.list", {"filter": {"ID": cids[i:i + 100]},
+                                             "select": ["ID", "HAS_EMAIL", "HAS_PHONE"]}):
+            seen += 1
+            have_mail += c.get("HAS_EMAIL") == "Y"
+            have_phone += c.get("HAS_PHONE") == "Y"
+    print(f"  компаний в запросах 2026: {seen}")
+    print(f"    с email:   {have_mail:>5} ({have_mail/max(seen,1)*100:.0f}%)")
+    print(f"    с телефоном:{have_phone:>5} ({have_phone/max(seen,1)*100:.0f}%)")
 
-    rows = []
-    for uid, items in by_user.items():
-        if len(items) < 5:                      # случайные заводители — не когорта
-            continue
-        dates = sorted(d10(r.get("createdTime")) for r in items if r.get("createdTime"))
-        closed = [r for r in items if is_closed(r.get("stageId"))]
-        sel = [r for r in items if is_sel(r.get("stageId"))]
-        y26 = [r for r in items if d10(r.get("createdTime")) >= "2026-01-01"]
-        sel26 = [r for r in y26 if is_sel(r.get("stageId"))]
-        brought = [cid for cid, (owner, _) in first_by_sup.items() if owner == uid]
-        eff = [cid for cid in brought if cid in ord_by_sup]
-        eff_money = sum(ord_by_sup[cid][1] for cid in eff)
-        eff_orders = sum(ord_by_sup[cid][0] for cid in eff)
-        months = max(1, (len(set(d[:7] for d in dates)) or 1))
-        rows.append({
-            "uid": uid, "name": users.get(uid, f"#{uid}"),
-            "n": len(items), "n26": len(y26),
-            "first": dates[0] if dates else "—", "last": dates[-1] if dates else "—",
-            "months": months,
-            "closed": len(closed), "sel": len(sel), "sel26": len(sel26),
-            "conv": round(len(sel) / len(closed) * 100) if closed else 0,
-            "sup": len({str(r.get("companyId")) for r in items if r.get("companyId")}),
-            "brought": len(brought), "eff": len(eff),
-            "effRate": round(len(eff) / len(brought) * 100) if brought else 0,
-            "effMoney": eff_money, "effOrders": eff_orders,
-        })
+    print("\n=== 8. СВЯЗНОСТЬ ===")
+    withdeal = sum(1 for r in y26 if r.get("parentId2"))
+    withcont = sum(1 for r in y26 if r.get("contactId"))
+    withsum = sum(1 for r in y26 if float(r.get("opportunity") or 0) > 0)
+    print(f"  привязан к сделке: {withdeal}/{len(y26)} ({withdeal/max(len(y26),1)*100:.0f}%)")
+    print(f"  указано контактное лицо: {withcont}/{len(y26)} ({withcont/max(len(y26),1)*100:.0f}%)")
+    print(f"  заполнена сумма: {withsum}/{len(y26)} ({withsum/max(len(y26),1)*100:.0f}%)")
+    perdeal = Counter(str(r.get("parentId2")) for r in y26 if r.get("parentId2"))
+    if perdeal:
+        vals = sorted(perdeal.values())
+        print(f"  поставщиков опрашивают на одну сделку: мед {st.median(vals):.0f} · "
+              f"p75 {vals[3*len(vals)//4]} · макс {max(vals)} · сделок с запросами {len(perdeal)}")
+        d1 = sum(1 for v in perdeal.values() if v == 1)
+        print(f"  сделок, где опросили только ОДНОГО поставщика: {d1} ({d1/len(perdeal)*100:.0f}%)")
 
-    def rank(key, uid, rev=True):
-        order = sorted(rows, key=lambda r: r[key], reverse=rev)
-        return next((i + 1 for i, r in enumerate(order) if r["uid"] == uid), None)
-
-    print(f"\n=== 4. КОГОРТА СОРСЕРОВ ({len(rows)} чел., ≥5 RFQ) ===")
-    hdr = (f"  {'сорсер':26s} {'RFQ':>5} {'2026':>5} {'закр':>5} {'КП':>4} {'конв':>5} "
-           f"{'пост':>5} {'привёл':>7} {'эфф':>4} {'%эф':>4} {'Σ€ через них':>13} {'первый RFQ':>11}")
-    print(hdr)
-    for r in sorted(rows, key=lambda r: -r["n"]):
-        mark = "  ←" if r["uid"] in target_ids else ""
-        print(f"  {r['name'][:26]:26s} {r['n']:>5} {r['n26']:>5} {r['closed']:>5} {r['sel']:>4} "
-              f"{r['conv']:>4}% {r['sup']:>5} {r['brought']:>7} {r['eff']:>4} {r['effRate']:>3}% "
-              f"{r['effMoney']:>13,.0f} {r['first']:>11}{mark}")
-
-    if rows:
-        print("\n  --- медианы когорты ---")
-        for k, lbl in [("n", "RFQ всего"), ("n26", "RFQ в 2026"), ("sel", "КП получено"),
-                       ("conv", "конверсия, %"), ("brought", "привёл поставщиков"),
-                       ("eff", "эффективных"), ("effRate", "доля эффективных, %")]:
-            vals = sorted(r[k] for r in rows)
-            print(f"    {lbl:24s} медиана {st.median(vals):>8.1f} · "
-                  f"нижний квартиль {vals[len(vals)//4]:>6} · верхний {vals[3*len(vals)//4]:>6}")
-
-    for uid in target_ids:
-        me = next((r for r in rows if r["uid"] == uid), None)
-        print(f"\n=== 5. РАЗБОР: {users[uid]} ===")
-        if not me:
-            n = len(by_user.get(uid, []))
-            print(f"  в когорте нет: всего {n} RFQ (порог 5). Похоже, RFQ он практически не заводит.")
-            continue
-        print(f"  RFQ всего: {me['n']} (место {rank('n', uid)} из {len(rows)}) · "
-              f"в 2026: {me['n26']} (место {rank('n26', uid)})")
-        print(f"  период работы: {me['first']} → {me['last']} · активных месяцев: {me['months']} · "
-              f"темп ≈ {me['n']/me['months']:.1f} RFQ/мес")
-        print(f"  входящие КП («КП получено/выбран»): {me['sel']} всего, {me['sel26']} в 2026 "
-              f"(место {rank('sel', uid)})")
-        print(f"  конверсия закрытых в КП: {me['conv']}% (место {rank('conv', uid)}) · "
-              f"закрыто {me['closed']} из {me['n']}")
-        print(f"  уникальных поставщиков в запросах: {me['sup']}")
-        print(f"  ПРИВЁЛ поставщиков (первым отправил им RFQ): {me['brought']} (место {rank('brought', uid)})")
-        print(f"  из них ЭФФЕКТИВНЫХ (появились заказы): {me['eff']} ({me['effRate']}%) · "
-              f"место {rank('eff', uid)} · заказов через них {me['effOrders']} на ≈{me['effMoney']:,.0f} €")
-
-        mine = by_user[uid]
-        print("  распределение по стадиям:")
-        for s, n in Counter(str(r.get("stageId")) for r in mine).most_common():
-            print(f"    {s:28s} {n:>4}")
-        print("  по месяцам:")
-        mon = Counter(d10(r.get("createdTime"))[:7] for r in mine)
-        print("    " + " · ".join(f"{m}:{n}" for m, n in sorted(mon.items())))
-        eff_ids = [cid for cid in first_by_sup if first_by_sup[cid][0] == uid and cid in ord_by_sup]
-        if eff_ids:
-            cn = {}
-            for c in bx_all("crm.company.list", {"filter": {"ID": sorted(eff_ids)[:50]},
-                                                 "select": ["ID", "TITLE"]}):
-                cn[str(c["ID"])] = c.get("TITLE") or ""
-            print("  его эффективные поставщики (заказы / сумма):")
-            for cid in sorted(eff_ids, key=lambda c: -ord_by_sup[c][1])[:20]:
-                n, e = ord_by_sup[cid]
-                print(f"    {cn.get(cid, '#'+cid)[:46]:48s} {n:>3} зак. · {e:>12,.0f} €")
-
-    print("\n✓ зонд v21 завершён")
+    print("\n✓ зонд v22 завершён")
     return 0
 
 
