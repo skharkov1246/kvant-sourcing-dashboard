@@ -1,7 +1,7 @@
 {
  "updated": "2026-09-01",
  "source": "добор контактов агентами с официальных сайтов поставщиков; только открытые страницы, без обхода защиты",
- "note": "Слой обогащения: применяется поверх реестра при сборке. Если контакт найден здесь, он замещает пустое поле карточки. Ключ — тот же, что в supplier_master. Ключи сверены с реестром.",
+ "note": "Слой обогащения: применяется поверх реестра при сборке. Если контакт найден здесь, он замещает пустое поле карточки. Ключ — тот же, что в supplier_master. Ключи сверены с реестром. Часть контактов собрана напрямую, без агентов.",
  "contacts": {
   "guangzhouanswktechnolo": {
    "name": "Guangzhou Answk Technology Co., Ltd (ANSWK)",
@@ -32,6 +32,36 @@
    "site": "sh-baorong.com",
    "note": "С 1992 г. ЗИП гидромолотов и землеройной техники: пики, втулки, пальцы, болты, ремкомплекты уплотнений, диафрагмы. OEM/ODM. No.857 Jixian Road, Luodian Town, Baoshan, Shanghai 201908. Витрина made-in-china контакты скрывает — взято с собственного сайта, открывается только по http.",
    "source": "http://www.sh-baorong.com/En/Contact.asp"
+  },
+  "fmribt": {
+   "name": "FMRIBT (Fujian Mineral Rock Industrial Boring Tools)",
+   "city": "Фуцзянь",
+   "email": "exportsales@fmribt.com",
+   "phone": "+86 18965558758",
+   "whatsapp": "+86 18965558758 (WhatsApp)",
+   "site": "fmribt.com",
+   "note": "ЗИП и инструмент для бурения: коронки, штанги, детали гидроперфораторов, ЗИП буровых установок, алюминиевые податчики. Заявлены Epiroc, Sandvik, Montabert.",
+   "source": "https://mineralrockspare.com/pages/contact"
+  },
+  "chinaeverlastingparts": {
+   "name": "China Everlasting Parts Co., Ltd.",
+   "city": "Сямэнь, Тунъань",
+   "email": "Sales@enginegensetparts.com",
+   "phone": "+86 13328990097",
+   "whatsapp": "+86 13328990097 (WhatsApp и WeChat)",
+   "site": "enginegensetparts.com",
+   "note": "Фильтрация и детали двигателей: воздушные, масляные, топливные, гидравлические фильтры, ЗИП генераторных установок Caterpillar, Perkins, Cummins, детали компрессоров Atlas Copco. ISO 9001 и IATF 16949, склад свыше 20 000 кв.м. Yuzhou Daxue Chen, Xike Town, Tong An District, Xiamen.",
+   "source": "https://www.enginegensetparts.com/"
+  },
+  "guangzhoujiaruiseals": {
+   "name": "Guangzhou Jiarui Seals Co., Ltd. (JR SEAL)",
+   "city": "Гуанчжоу, Тяньхэ",
+   "email": "jr@jrsealing.com",
+   "phone": "+86 20 3238 1126",
+   "whatsapp": "",
+   "site": "jrsealkit.com",
+   "note": "Уплотнения для гидравлики и спецтехники: ремкомплекты гидроцилиндров, гидромолотов, насосов, клапанов и гидромоторов, кольца, пыльники, манжеты. Своё производство свыше 8000 кв.м, более 10 000 наименований, ISO 9001:2015. ВНИМАНИЕ: почта в домене jrsealing.com, а не jrsealkit.com.",
+   "source": "https://www.jrsealkit.com/"
   }
  }
 }
