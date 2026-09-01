@@ -122,6 +122,9 @@ def build() -> None:
     build_rfq.build()
     import build_bim_plan
     build_bim_plan.build()
+    # сводная ведомость закладных решений для цифровизации (из zakladki.json)
+    import build_zakladki
+    build_zakladki.build()
     # единые метаданные всех выпускаемых DOCX/PDF (автор — ООО «КВАНТ»)
     import doc_meta
     doc_meta.build()

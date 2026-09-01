@@ -68,6 +68,13 @@ KEYWORDS: dict[str, list[str]] = {
 SELECT = ["id", "title", "stageId", "createdTime", "parentId2", "companyId",
           "assignedById", "ufCrm18Supplier", "opportunity"]
 
+# Сделка ОВЭ-75 в CRM (создана владельцем, подтверждена 28.08.2026):
+# «Запрос техпроцесса и оборудования под него от ПГК». Запросы ТКП-кампании
+# привязываются к ней полем «ID сделки» (ufCrm18_1723386389) — тянем их
+# отдельным блоком для плитки на Дашборде.
+OVE_DEAL_ID = 20472
+DEAL_FIELD = "ufCrm18_1723386389"
+
 
 def load_candidates() -> list[str]:
     """Имена компаний мирового/китайского пула из suppliers.json."""
@@ -152,6 +159,23 @@ def main() -> int:
          for v in per_company.values()),
         key=lambda x: -x["n"])
 
+    # 1а. Запросы, привязанные к сделке ОВЭ-75 (поле «ID сделки») — ТКП-кампания
+    deal_rows = client.list_items(SPA_ENTITY_TYPE_ID,
+                                  filter={DEAL_FIELD: OVE_DEAL_ID}, select=SELECT)
+    dcomp = {str(r.get("companyId")) for r in deal_rows if r.get("companyId")}
+    dnames = client.companies_by_ids(dcomp) if dcomp else {}
+    names.update(dnames)
+    deal_stages: dict[str, int] = defaultdict(int)
+    for r in deal_rows:
+        deal_stages[stage(r.get("stageId"))] += 1
+    deal = {
+        "id": OVE_DEAL_ID,
+        "n": len(deal_rows),
+        "stages": dict(sorted(deal_stages.items(), key=lambda kv: -kv[1])),
+        "rows": sorted((pack(r) for r in deal_rows), key=lambda x: x["created"], reverse=True),
+    }
+    print(f"запросов в сделке {OVE_DEAL_ID}: {len(deal_rows)}")
+
     # 2. Компании мирового/китайского пула: заведены ли и слали ли запросы
     pool = []
     for cand in load_candidates():
@@ -177,6 +201,7 @@ def main() -> int:
         "classes": classes,
         "companies": companies,
         "pool": pool,
+        "deal": deal,
     }, ensure_ascii=False, indent=1), encoding="utf-8")
     print(f"OK → {OUT}")
     return 0
