@@ -47,15 +47,15 @@ nav .subrow button{padding:4px 11px;font:600 12.5px system-ui;border-radius:14px
 nav .subrow button.on{background:var(--chip);border-color:var(--s1);color:var(--s1)}
 nav button{border:1px solid var(--border);background:var(--surface);color:var(--ink2);padding:6px 13px;border-radius:18px;font:600 13px system-ui;cursor:pointer}
 nav button.on{background:var(--s1);border-color:var(--s1);color:#fff}
-main{padding:16px 22px 40px;max-width:1280px}
-section{display:none} section.on{display:block}
+main{padding:16px 22px 40px;max-width:1280px;min-width:0}
+section{display:none;min-width:0} section.on{display:block}
 h2{font-size:16px;margin:22px 0 8px}
 h3{font-size:14px;margin:16px 0 6px}
-p{margin:8px 0;max-width:96ch}
+p{margin:8px 0;max-width:96ch;overflow-wrap:anywhere}
 .lead{font-size:13.5px;color:var(--ink2);max-width:100ch;margin:6px 0 2px}
 .mut{color:var(--mut);font-size:12px}
-.k{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
-.tile{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 16px;min-width:150px;flex:1 1 150px;border-top:3px solid var(--axis)}
+.k{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0;min-width:0}
+.tile{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 16px;min-width:min(150px,100%);flex:1 1 150px;border-top:3px solid var(--axis)}
 .tile b{display:block;font-size:20px;line-height:1.2;font-variant-numeric:tabular-nums}
 .tile span{color:var(--ink2);font-size:12px}
 .tile.ok{border-top-color:var(--good)} .tile.ok b{color:var(--good)}
@@ -68,11 +68,11 @@ p{margin:8px 0;max-width:96ch}
 .box.amber{border-left-color:var(--warn)}
 .box.plain{border-left-color:var(--axis)}
 .box b:first-child{display:inline}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin:8px 0;min-width:0}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin:8px 0;min-width:0;max-width:100%}
 .card h3{margin-top:0}
 .card p,.card li,.box{overflow-wrap:anywhere}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
-.grid2{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(300px,100%),1fr));gap:10px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(380px,100%),1fr));gap:10px}
 .tblwrap{overflow-x:auto;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin:8px 0;max-width:100%}
 table{border-collapse:collapse;width:100%;font-size:12.5px}
 th{background:var(--chip);text-align:left;font-size:11.5px;color:var(--ink2);white-space:nowrap}
@@ -95,7 +95,7 @@ tr.warn td{background:rgba(250,178,25,.10)} tr.tot td{font-weight:700;background
 .btn.on{background:var(--s1);border-color:var(--s1);color:#fff}
 ul,ol{margin:6px 0;padding-left:20px;max-width:100ch} li{margin:3px 0}
 .flow{display:flex;gap:6px;flex-wrap:wrap;align-items:stretch;margin:10px 0}
-.step{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:8px 11px;flex:1 1 200px;min-width:0;border-top:3px solid var(--axis)}
+.step{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:8px 11px;flex:1 1 min(200px,100%);min-width:0;border-top:3px solid var(--axis)}
 .step.on{border-top-color:var(--s1)} .step.no{border-top-color:var(--crit);opacity:.75}
 .step b{font-size:12.5px;display:block;margin-bottom:3px}
 .step .mut{font-size:11px}
