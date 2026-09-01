@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Свечи зажигания ГПУ — закупки и адресаты на оригинал</title>
+<style>
+:root{
+  color-scheme:light;
+  --page:#f9f9f7; --surface:#fcfcfb; --ink:#0b0b0b; --ink2:#52514e; --mut:#898781;
+  --border:rgba(11,11,11,.10); --s1:#2a78d6; --good:#0ca30c; --warn:#fab219; --crit:#d03b3b;
+  --chip:#eef2f7; --acc:#8a4b00;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:14px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 16px 80px}
+header{border-bottom:2px solid var(--acc);padding:20px 0 12px;margin-bottom:14px}
+h1{font-size:22px;margin:0 0 4px;letter-spacing:-.01em}
+h2{font-size:16px;margin:28px 0 6px}
+h3{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink2);margin:16px 0 8px}
+.mut{color:var(--mut)} .small{font-size:12.5px}
+a{color:var(--s1);text-underline-offset:3px}
+a:focus-visible,button:focus-visible{outline:2px solid var(--s1);outline-offset:2px}
+.box{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--acc);border-radius:8px;padding:12px 16px;margin:12px 0}
+.box.crit{border-left-color:var(--crit)} .box.good{border-left-color:var(--good)} .box.info{border-left-color:var(--s1)}
+.k{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:10px;margin:12px 0}
+.tile{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:11px 13px}
+.tile b{font-size:20px;font-variant-numeric:tabular-nums;display:block}
+.tile span{font-size:12px;color:var(--ink2)}
+.btn{cursor:pointer;font-size:12.5px;border:1px solid var(--border);border-radius:7px;padding:5px 10px;background:var(--surface);color:var(--ink);text-decoration:none;display:inline-block}
+.btn:hover{border-color:var(--s1)}
+.nav{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 4px}
+.tblwrap{overflow-x:auto;margin:8px 0}
+table{border-collapse:collapse;width:100%;font-size:12.5px}
+th,td{padding:6px 9px;text-align:left;border-bottom:1px solid var(--border);vertical-align:top}
+th{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);white-space:nowrap;position:sticky;top:0;background:var(--page)}
+tr.soon td{background:#fff7e6}
+.pn{font-family:ui-monospace,Menlo,monospace;background:var(--chip);border-radius:5px;padding:1px 6px;font-size:12px;white-space:nowrap}
+.pri{display:inline-block;font-weight:800;border-radius:5px;padding:1px 7px;font-size:12px;color:#fff}
+.pri1{background:#0a7d0a} .pri2{background:#b8770f} .pri3{background:#7a7873}
+.tag{display:inline-block;font-size:10.5px;border-radius:4px;padding:1px 6px;margin:1px 3px 1px 0;background:var(--chip);color:var(--ink2);white-space:nowrap}
+.bx{display:inline-block;font-size:10.5px;border-radius:4px;padding:1px 6px;font-weight:700;white-space:nowrap}
+.bx-never{background:#e6f2df;color:#2c5e14} .bx-won{background:#d9f2d9;color:#0a5c0a}
+.bx-price{background:#fdeecd;color:#7a5200} .bx-active{background:#dbe9fb;color:#124a86}
+.bx-sent{background:#e8e6e1;color:#4a4842} .bx-unread{background:#ffe0b3;color:#8a4b00}
+.bx-no_reply{background:#f6dcdc;color:#8c1f1f} .bx-refused{background:#f0d5f0;color:#6b1f6b}
+.bar{display:flex;height:22px;border-radius:6px;overflow:hidden;border:1px solid var(--border);margin:6px 0}
+.bar i{display:block;height:100%}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--ink2);margin-bottom:10px}
+.legend b{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px}
+.filters{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.f{cursor:pointer;font-size:12px;border:1px solid var(--border);border-radius:6px;padding:3px 9px;background:var(--surface);color:var(--ink2)}
+.f.on{background:var(--acc);border-color:var(--acc);color:#fff;font-weight:700}
+ol.play{padding-left:18px} ol.play li{margin:9px 0}
+@media(max-width:780px){th{position:static}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+ <h1>🕯 Свечи зажигания ГПУ — ближайшие закупки и адресаты на оригинал</h1>
+ <div class="mut small">Кому рассылать запросы на <b>оригинальные</b> свечи по каждому парку двигателей, чтобы получать сопоставимые КП. Данные Bitrix живые (<span id="upd"></span>). <a href="./">← библиотека ГТУ</a> · <a href="./cummins">свечи и фильтры QSK60G</a></div>
+</header>
+
+<div class="k" id="tiles"></div>
+
+<div class="box crit" id="problem"></div>
+
+<div class="nav">
+ <a class="btn" href="#deals">Ближайшие закупки</a>
+ <a class="btn" href="#demand">Спрос по паркам</a>
+ <a class="btn" href="#cross">Карта кроссов</a>
+ <a class="btn" href="#addr">Таблица адресатов</a>
+ <a class="btn" href="#eff">Эффективность</a>
+ <a class="btn" href="#play">Как запрашивать</a>
+</div>
+
+<h2 id="deals">Ближайшие закупки, где есть свечи и зажигание</h2>
+<div class="mut small">Открытые сделки Bitrix по паркам ГПУ, отсортированы по дате закрытия. Подсвечены те, где свечи — прямая часть предмета закупки.</div>
+<div class="tblwrap"><table id="t-deals"></table></div>
+
+<h2 id="demand">Спрос по паркам: что именно нужно</h2>
+<div class="mut small">Из спецификации заказчика (лист «Энергосети»): позиции зажигания и их количества — это то, подо что ищем оригинал.</div>
+<div class="tblwrap"><table id="t-demand"></table></div>
+
+<h2 id="cross">Карта кроссов: один и тот же товар под разными номерами</h2>
+<div class="mut small">Поставщик отвечает «нет» не потому, что товара нет, а потому что у него в карточке другой номер. Запрос сразу по всему ряду снимает эту потерю.</div>
+<div class="tblwrap"><table id="t-cross"></table></div>
+<div class="box" id="checks"></div>
+
+<h2 id="addr">Кому рассылать запросы на оригинал</h2>
+<div class="mut small">Фильтры складываются: парк двигателей × тип канала. «Хабы СНГ-периметра» — Турция, ОАЭ, Казахстан, Узбекистан.</div>
+<div class="filters" id="f-park"></div>
+<div class="filters" id="f-tier"></div>
+<div class="box small" id="streamnote" hidden></div>
+<div class="tblwrap"><table id="t-addr"></table></div>
+
+<h2 id="eff">Эффективность: что даёт адресная рассылка</h2>
+<div id="eff-body"></div>
+
+<h2 id="play">Как запрашивать, чтобы получать КП</h2>
+<ol class="play" id="play"></ol>
+
+<div class="box info small" id="method"></div>
+</div>
+
+<script>
+const D = __PLUGS_JSON__;
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const link = s => esc(s).replace(/(https?:\/\/\S+?)(?=[.,;)]?(\s|$))/g,'<a href="$1" target="_blank" rel="noopener">$1</a>');
+const num = n => (n==null||n==='')?'':Number(n).toLocaleString('ru-RU');
+const BX={never:['🆕 не запрашивали','bx-never'],won:['🏆 доходили до сделки','bx-won'],price:['💰 считает цену','bx-price'],
+ active:['💬 переписка','bx-active'],sent:['📨 без ответа','bx-sent'],unread:['📬 непрочитано','bx-unread'],
+ no_reply:['⏳ не ответили','bx-no_reply'],refused:['🚫 отказ','bx-refused']};
+const tbl=(head,rows)=>`<tr>${head.map(h=>`<th>${esc(h)}</th>`).join('')}</tr>`+rows;
+let parkF='all', tierF='all';
+
+function renderAddr(){
+ const sn=document.getElementById('streamnote');
+ const nt=parkF!=='all'?(D.park_notes||{})[parkF]:(tierF==='hub'?D.hub_note:'');
+ const pt=(D.parks.find(x=>x.key===parkF)||{}).title||'';
+ if(nt){ sn.hidden=false; sn.innerHTML=`<b>Что важно знать${pt?' — '+esc(pt):''}:</b> ${esc(nt)}`; } else { sn.hidden=true; }
+ const rows=D.addressees.filter(a=>(parkF==='all'||(a.parks||[]).includes(parkF))
+    && (tierF==='all'||(tierF==='hub'?a.hub:a.tier_key===tierF)))
+  .sort((a,b)=>(a.priority-b.priority)||a.name.localeCompare(b.name))
+  .map(a=>{const b=BX[a.bitrix_state||'never']||BX.never;return `<tr>
+   <td><span class="pri pri${a.priority}">${a.priority}</span></td>
+   <td><b>${esc(a.name)}</b><div class="mut small">${esc(a.country||'')}${a.city?', '+esc(a.city):''}</div>
+     ${a.site?`<div class="small"><a href="${esc(/^https?:/.test(a.site)?a.site:'https://'+a.site)}" target="_blank" rel="noopener">${esc(a.site.replace(/^https?:\/\//,'').slice(0,32))}</a></div>`:''}
+     ${a.email?`<div class="small"><a href="mailto:${esc(a.email)}">${esc(a.email)}</a></div>`:''}
+     ${a.phone?`<div class="small mut">${esc(a.phone)}</div>`:''}</td>
+   <td>${esc(a.tier_ru)}<div>${(a.families||[]).map(f=>`<span class="tag">${esc(f)}</span>`).join('')}</div>
+     ${(a.part_numbers&&a.part_numbers.length)?`<div class="small mut">${a.part_numbers.slice(0,6).map(p=>`<span class="pn">${esc(p)}</span>`).join(' ')}</div>`:''}</td>
+   <td>${esc(a.what_they_have)}${a.evidence_url?`<div class="small">${link(a.evidence_url)}</div>`:''}</td>
+   <td>${esc(a.route_to_ru||'')}<div class="small mut">${esc(a.ask_mode||'')}</div>
+     ${a.verdict?`<div class="small mut">проверка: ${a.verdict==='confirmed'?'✔ подтверждено на странице':'≈ правдоподобно, без прямого подтверждения'}</div>`:''}</td>
+   <td><span class="bx ${b[1]}">${b[0]}</span>${a.bitrix_note?`<div class="small mut">${esc(a.bitrix_note)}</div>`:''}
+     <div class="small">шанс ответа: <b>${esc(a.answer_odds||'—')}</b></div></td>
+  </tr>`}).join('');
+ document.getElementById('t-addr').innerHTML=tbl(['#','Компания','Кто это / парки','Что у них есть','Маршрут и заход','Bitrix'],rows);
+}
+function render(){
+ document.getElementById('upd').textContent='сверка '+D.updated;
+ document.getElementById('problem').innerHTML=D.problem;
+ document.getElementById('method').innerHTML=esc(D.method);
+ document.getElementById('tiles').innerHTML=D.tiles.map(t=>`<div class="tile"><b>${esc(t[0])}</b><span>${esc(t[1])}</span></div>`).join('');
+ document.getElementById('t-deals').innerHTML=tbl(['Закрытие','Сделка','Заказчик / воронка','Стадия','Сумма','Ответственный'],
+  D.deals.map(d=>`<tr class="${d.soon?'soon':''}"><td style="white-space:nowrap">${esc(d.close)}</td>
+   <td>${d.plugs?'🕯 ':''}#${esc(d.id)} ${esc(d.title)}</td><td>${esc(d.cat)}</td><td>${esc(d.stage)}</td>
+   <td style="white-space:nowrap;font-variant-numeric:tabular-nums">${d.sum?num(d.sum)+' '+esc(d.cur):'—'}</td>
+   <td class="mut">${esc(d.owner)}</td></tr>`).join(''));
+ document.getElementById('t-demand').innerHTML=tbl(['Парк','Позиция','Номер','Кол-во','Чей оригинал'],
+  D.demand.map(r=>`<tr><td>${esc(r.park)}</td><td>${esc(r.name)}</td><td><span class="pn">${esc(r.pn)}</span></td>
+   <td style="font-variant-numeric:tabular-nums">${num(r.qty)} шт</td><td class="mut">${esc(r.oem)}</td></tr>`).join(''));
+ const mk=(id,cur,items)=>document.getElementById(id).innerHTML=items.map(([k,t])=>
+   `<button class="f${k===cur?' on':''}" data-${id.slice(2)}="${esc(k)}">${esc(t)}</button>`).join('');
+ mk('f-park',parkF,[['all','все парки']].concat(D.parks.map(p=>[p.key,p.title])));
+ mk('f-tier',tierF,[['all','любой канал'],['hub','хабы СНГ-периметра']].concat(D.tiers.map(t=>[t.key,t.title])));
+ document.getElementById('t-cross').innerHTML=tbl(['Позиция спроса','Ряд взаимозаменяемых номеров','Чем подтверждено'],
+  D.crosses.map(c=>`<tr><td><b>${esc(c.pos)}</b></td><td>${esc(c.chain)}</td><td class="mut">${esc(c.note)}</td></tr>`).join(''));
+ document.getElementById('checks').innerHTML='<b>Три номера проверить ДО рассылки — иначе весь круг впустую:</b>'+
+  D.checks.map(c=>`<div style="margin-top:6px"><span class="pn">${esc(c.pn)}</span> — ${esc(c.what)} <b>${esc(c.do)}</b></div>`).join('');
+ renderAddr();
+ const f=D.funnel, tot=f.rows.reduce((a,r)=>a+r[1],0);
+ document.getElementById('eff-body').innerHTML=`
+  <div class="box">${D.effect.logic}</div>
+  <h3>Сейчас: во что превращаются запросы</h3>
+  <div class="legend">${f.rows.map(r=>`<span><b style="background:${r[2]}"></b>${esc(r[0])} — ${r[1]}</span>`).join('')}</div>
+  <div class="bar">${f.rows.map(r=>`<i style="width:${(r[1]/tot*100).toFixed(1)}%;background:${r[2]}" title="${esc(r[0])}: ${r[1]}"></i>`).join('')}</div>
+  <div class="tblwrap"><table>${tbl(['Рычаг','Что даёт','Почему так'],
+    D.effect.levers.map(l=>`<tr><td><b>${esc(l.lever)}</b></td><td>${esc(l.how_much)}</td><td class="mut">${esc(l.why)}</td></tr>`).join(''))}</table></div>`;
+ document.getElementById('play').innerHTML=D.playbook.map(p=>`<li><b>${esc(p.title)}</b><div>${esc(p.text)}</div></li>`).join('');
+}
+document.addEventListener('click',e=>{
+ const b=e.target.closest('.f'); if(!b) return;
+ if(b.dataset.park!==undefined) parkF=b.dataset.park; else if(b.dataset.tier!==undefined) tierF=b.dataset.tier;
+ document.querySelectorAll('#f-park .f').forEach(x=>x.classList.toggle('on',x.dataset.park===parkF));
+ document.querySelectorAll('#f-tier .f').forEach(x=>x.classList.toggle('on',x.dataset.tier===tierF));
+ renderAddr();
+});
+render();
+</script>
+</body>
+</html>
