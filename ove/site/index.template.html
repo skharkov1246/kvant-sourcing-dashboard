@@ -3786,8 +3786,13 @@ function rHQ(){
   (READY&&READY.rows||[]).filter(r=>r.ext).forEach(r=>dec.push({t:r.name+' — '+r.gap,tab:'bi',tag:'внешний вход'}));
   const nTask=(BIDOCS?BIDOCS.lots.reduce((a,L)=>a+L.docs.filter(d=>d.status==='task'||d.status==='base').length,0):0)
             +(APPLY?APPLY.docs.filter(d=>d.status==='form'||d.status==='team').length:0);
+  const deal=BX&&BX.deal;
   return `
   <div class="box info"><b>Дашборд.</b> Решения — здесь; работа — в <a href="#tasks"><b>Задачах</b></a> (${nTask}); файлы — в <a href="#files"><b>Документах</b></a>.</div>
+  ${deal?`<div class="card"><h3>ТКП-кампания · сделка Bitrix №${deal.id} <span class="tag lot3">${deal.n} запрос${deal.n%10===1&&deal.n%100!==11?'':(deal.n%10>=2&&deal.n%10<=4&&(deal.n%100<10||deal.n%100>=20)?'а':'ов')}</span></h3>
+    <div style="display:flex;gap:14px;flex-wrap:wrap;margin:6px 0">${Object.entries(deal.stages).map(([s,n])=>`<span><b>${n}</b> · ${esc(s)}</span>`).join('')}</div>
+    ${(deal.rows||[]).slice(0,6).map(r=>`<div class="mut" style="margin:2px 0">${esc(r.created)} · ${esc(r.company)} · ${esc(r.stage)}</div>`).join('')}
+    <div class="mut" style="margin-top:6px">Запросы поставщикам привязываются к сделке полем «ID сделки»; пакет из 27 подготовленных запросов (папка «Запросы ТКП») рассылается из Bitrix в день старта кампании. Срез Bitrix от ${esc(BX.updated)}.</div></div>`:''}
   <div class="grid2">
     <div class="card"><h3>Требуют решения владельца <span class="tag lot1">${dec.length}</span></h3>
       <ol>${dec.map(d=>`<li>${esc(d.t)} <a class="btn" style="padding:2px 8px" href="#${d.tab}">открыть</a></li>`).join('')}</ol></div>

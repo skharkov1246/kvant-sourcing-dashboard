@@ -410,6 +410,19 @@ CLASSES = [
     ]),
 ]
 
+# Закладные решения для последующей цифровизации: строки «Закладная (цифровизация)»
+# добавляются в конец существующих листов, КСМ получает собственный лист.
+# Формулировки живут в ol_zakladki.py (единый источник — ove/data/zakladki.json).
+import ol_zakladki  # noqa: E402
+for _slug, _rows in ol_zakladki.EXTRA.items():
+    for _c in CLASSES:
+        if _c["slug"] == _slug:
+            _c["rows"].extend(_rows)
+            break
+    else:
+        raise SystemExit(f"ol_zakladki: неизвестный слаг {_slug}")
+CLASSES.append(ol_zakladki.NEWCLASS)
+
 
 def general_rows(pj, lot_meta):
     site = pj.get("site", {})
