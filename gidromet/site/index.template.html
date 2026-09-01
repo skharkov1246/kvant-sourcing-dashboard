@@ -67,6 +67,20 @@ p{margin:8px 0;max-width:96ch;overflow-wrap:anywhere}
 .box.info{border-left-color:var(--s1)}
 .box.amber{border-left-color:var(--warn)}
 .box.plain{border-left-color:var(--axis)}
+.box.crit,.box.risk{border-left-color:var(--crit)}
+.box.good{border-left-color:var(--good)}
+/* вкладка «Развилки решений»: карточка развилки и два столбца вариантов */
+.razv{border-left:4px solid var(--s1);margin:14px 0 18px}
+.razv>h3{font-size:15px;margin-bottom:8px}
+.vr{border-top:3px solid var(--axis)}
+.vr.vrek{border-top-color:var(--good);border-color:var(--good)}
+.vr h3{font-size:13px;margin-bottom:2px}
+.vnum{font-size:17px;font-weight:700;font-variant-numeric:tabular-nums;margin:0 0 6px;overflow-wrap:anywhere}
+.vr.vrek .vnum{color:var(--good)}
+.vh{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--ink2);margin:6px 0 0}
+.razv ul.za,.razv ul.pr{margin:2px 0 0;padding-left:17px}
+.razv ul.za li::marker{color:var(--good)} .razv ul.pr li::marker{color:var(--crit)}
+
 .box b:first-child{display:inline}
 .card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin:8px 0;min-width:0;max-width:100%}
 .card h3{margin-top:0}
@@ -129,6 +143,7 @@ footer{padding:0 22px 24px;color:var(--mut);font-size:11.5px;max-width:1280px}
 <footer id="foot"></footer>
 <script>
 const D = {
+  razvilki: __RAZVILKI_JSON__,
   project: __PROJECT_JSON__,
   reframe: __REFRAME_JSON__,
   decision: __DECISION_JSON__,
@@ -254,6 +269,37 @@ function page(d, fallback){
     ${d.footnote?`<div class="mut" style="margin-top:18px">${md(d.footnote)}</div>`:''}`;
 }
 
+/* ═════════ вкладка «Развилки решений»: управленческая ведомость ═════════ */
+function variant(v){
+  /* цвет варианта означает рекомендацию, а не порядок: зелёным выделен тот,
+     который мы предлагаем принять. Там, где рекомендации нет (решение отложено
+     до измерения), оба варианта нейтральны — это отдельный содержательный ответ. */
+  return `<div class="card vr ${v.rek?'vrek':''}" style="margin:0">
+    <h3>${esc(v.imya)}${v.rek?' <span class="tag ok">рекомендуется</span>':''}</h3>
+    <div class="vnum">${esc(v.chislo)}</div>
+    ${(v.za||[]).length?`<div class="vh">За</div><ul class="za">${v.za.map(x=>`<li>${md(x)}</li>`).join('')}</ul>`:''}
+    ${(v.protiv||[]).length?`<div class="vh">Против</div><ul class="pr">${v.protiv.map(x=>`<li>${md(x)}</li>`).join('')}</ul>`:''}
+  </div>`;
+}
+function rRazvilki(){
+  const d=D.razvilki;
+  if(!d) return `<div class="box warn"><b>Раздел собирается.</b> ${esc(FB.razvilki||'')}</div>`;
+  const vil=(d.razvilki||[]).map(r=>`<div class="card razv">
+    <h3><span class="tag acc">${esc(r.nomer)}</span> ${esc(r.vopros)}</h3>
+    <div class="tblwrap"><table><tbody>
+      <tr><td style="width:24%">Что на кону</td><td><b>${esc(r.stavka)}</b></td></tr>
+      <tr><td>Кто и когда решает</td><td>${esc(r.kto)}${r.kogda?' · '+esc(r.kogda):''}</td></tr>
+    </tbody></table></div>
+    <div class="grid2">${(r.varianty||[]).map(variant).join('')}</div>
+    <div class="box crit"><b>Цена ошибки.</b> ${md(r.cena_oshibki)}</div>
+    <div class="box plain"><b>Чем закрывается.</b> ${md(r.chem)}</div>
+    <div class="box good"><b>Рекомендация.</b> ${md(r.rekomendaciya)}</div>
+  </div>`).join('');
+  return `${d.lead?`<div class="lead">${md(d.lead)}</div>`:''}${tiles(d.tiles)}${boxes(d.boxes)}
+    <h2>Развилки</h2>${vil}${sections(d.sections)}
+    ${d.footnote?`<div class="mut" style="margin-top:18px">${md(d.footnote)}</div>`:''}`;
+}
+
 /* ═════════ вкладка «Маршруты» с фильтром ═════════ */
 let mFilter='';
 function mPaint(){
@@ -345,7 +391,7 @@ function bindP(){
 
 /* ═════════ вкладки ═════════ */
 const GROUPS=[
-  ['itog','Итог',      [['overview','Главное'],['reframe','Постановка задачи'],['decision','Входим или нет']]],
+  ['itog','Итог',      [['overview','Главное'],['razvilki','Развилки решений'],['reframe','Постановка задачи'],['decision','Входим или нет']]],
   ['syrye','Сырьё',    [['syrye','Концентрат'],['proverka','Проверка данных'],['pirrotin','Второй продукт']]],
   ['tech','Технология',[['marshruty','Маршруты передела'],['balansy','Балансы'],['serebro','Серебро и сера']]],
   ['zavod','Завод',    [['shema','Схема и компоновка'],['oborud','Оборудование'],['postav','Поставщики']]],
@@ -372,11 +418,12 @@ const FB={
   programma:'Программа лабораторных и укрупнённых испытаний.',
   etapy:'Очерёдность строительства и ввода мощностей.',
   gonorar:'Конструкция агентского вознаграждения.',
+  razvilki:'Управленческая ведомость: шесть решений по проекту и цена каждого.',
   voprosy:'Вопросы к заказчику и к разработчику технологии.',
 };
 const R={};
 TABS.forEach(([id])=>{ R[id]=()=>page(D[id==='postav'?'postav':id], FB[id]); });
-R.marshruty=rMarshruty; R.postav=rPostav;
+R.marshruty=rMarshruty; R.postav=rPostav; R.razvilki=rRazvilki;
 
 const nav=document.getElementById('nav'), main=document.getElementById('main');
 nav.innerHTML=`<div class="grow">${GROUPS.map(([gid,gt])=>`<button data-g="${gid}">${esc(gt)}</button>`).join('')}</div><div class="subrow" id="subnav"></div>`;

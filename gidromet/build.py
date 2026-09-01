@@ -15,6 +15,7 @@ ROOT = Path(__file__).resolve().parent
 DATA, SITE, OUT = ROOT / "data", ROOT / "site", ROOT / "public"
 
 FILES = {
+    "__RAZVILKI_JSON__": "razvilki.json",
     "__PROJECT_JSON__": "project.json",
     "__REFRAME_JSON__": "reframe.json",
     "__DECISION_JSON__": "decision.json",
