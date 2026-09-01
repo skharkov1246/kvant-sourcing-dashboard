@@ -87,16 +87,59 @@ def main(run: str) -> None:
                 rez.append(r); n += 1
         if n:
             otkuda.append(f'{zh.parent.name}: {n}')
+    # Журнал потока пишется только после того, как поток завершит шаг. Агент,
+    # который уже отдал результат, но чей поток ещё не закрылся (или подвис),
+    # в журнал не попадает — его ответ лежит в собственном протоколе агента
+    # в вызове StructuredOutput. Читаем и оттуда, иначе готовый раздел теряется.
+    vidal = {json.dumps(d, ensure_ascii=False, sort_keys=True) for d in rez}
+    iz_agentov = 0
+    for pr in sorted(WF.glob('wf_*/agent-*.jsonl')):
+        for line in pr.read_text(encoding='utf-8', errors='replace').splitlines():
+            try:
+                z = json.loads(line)
+            except Exception:
+                continue
+            soderzh = (z.get('message') or {}).get('content')
+            if not isinstance(soderzh, list):
+                continue
+            for blok in soderzh:
+                if not (isinstance(blok, dict) and blok.get('type') == 'tool_use'
+                        and blok.get('name') == 'StructuredOutput'):
+                    continue
+                r = blok.get('input')
+                if not (isinstance(r, dict) and 'sections' in r and 'tiles' in r):
+                    continue
+                klyuch = json.dumps(r, ensure_ascii=False, sort_keys=True)
+                if klyuch in vidal:
+                    continue
+                vidal.add(klyuch); rez.append(r); iz_agentov += 1
+    if iz_agentov:
+        otkuda.append(f'протоколы агентов: {iz_agentov}')
     print('результатов найдено:', len(rez), '|', '; '.join(otkuda))
     if not rez:
         return
 
     teksty = [json.dumps(d, ensure_ascii=False) for d in rez]
+    zanyat_rez, zanyat_kluch, naznach = set(), set(), {}
+
+    # Два раздела опознаются не по словам, а по строению ответа: только у
+    # «Маршрутов передела» есть массив routes, только у «Поставщиков» — blocks.
+    # Признак строгий, поэтому такие результаты закрепляются ДО словарного
+    # разбора: иначе текст маршрутов уводит на себя «Экономику», у которой те же
+    # обороты (порог окупаемости, продажа концентрата, Карабашмедь).
+    for kluch, pole in (('marshruty', 'routes'), ('postav', 'blocks')):
+        kand = [i for i in range(len(rez))
+                if isinstance(rez[i].get(pole), list) and rez[i][pole]]
+        if not kand:
+            continue
+        i = max(kand, key=lambda i: (len(rez[i][pole]), len(teksty[i])))
+        naznach[kluch] = (i, ball(teksty[i], kluch))
+        zanyat_rez.add(i); zanyat_kluch.add(kluch)
+
     # матрица «результат × раздел», затем жадное назначение по убыванию уверенности
     pary = sorted(
         ((ball(teksty[i], k), i, k) for i in range(len(rez)) for k in PRIZNAKI),
         reverse=True)
-    zanyat_rez, zanyat_kluch, naznach = set(), set(), {}
     for b, i, k in pary:
         if b <= 0 or i in zanyat_rez or k in zanyat_kluch:
             continue
