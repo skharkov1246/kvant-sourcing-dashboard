@@ -98,8 +98,11 @@ def fetch(url, timeout=12, tries=3):
 
 
 def harvest(site):
-    base = site if site.startswith("http") else "https://" + site
-    base = base.rstrip("/")
+    """ВАЖНО: в реестре у части поставщиков записан URL страницы ТОВАРА, а не
+    корень сайта. Приписывать к нему /contact бессмысленно — берём корень домена."""
+    u = site if site.startswith("http") else "https://" + site
+    m = re.match(r"(https?://[^/]+)", u)
+    base = m.group(1) if m else u.rstrip("/")
     domain = re.sub(r"^https?://", "", base).split("/")[0]
     emails, phones, src = [], [], ""
     for suf in PAGES:
