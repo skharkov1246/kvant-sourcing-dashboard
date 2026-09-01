@@ -80,6 +80,14 @@ def main():
                 n = norm(raw)
                 if len(n) < 5 or not any(c.isdigit() for c in n):
                     continue
+                # «N 3115153600» — одиночная буква-приставка перед номером: это
+                # обрывок фразы, а не часть артикула. Отрезаем и сверяем заново.
+                m2 = re.match(r"^[A-ZА-Я]\s+(.+)$", raw)
+                if m2:
+                    raw = m2.group(1).strip()
+                    n = norm(raw)
+                    if n in seen_pos or len(n) < 5:
+                        continue
                 if JUNK.search(raw.strip()):
                     stat["отброшено как мусор"] += 1
                     continue

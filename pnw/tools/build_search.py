@@ -25,6 +25,8 @@ SECTION_URL = {
 def main():
     items = json.loads((DATA / "item_master.json").read_text(encoding="utf-8"))["items"]
     nums = json.loads((DATA / "numbers.json").read_text(encoding="utf-8"))["rows"]
+    sup_all = json.loads((DATA / "supplier_master.json").read_text(encoding="utf-8"))["suppliers"]
+    part_sup = json.loads((DATA / "part_suppliers.json").read_text(encoding="utf-8"))["parts"]
 
     kv2i = {it["kv"]: i for i, it in enumerate(items)}
     # компактная проекция: экономим вес страницы
@@ -33,6 +35,17 @@ def main():
           (it.get("machine") or "")[:40], it["section"],
           (it.get("equipment") or it.get("client") or "")[:40],
           ((it.get("material") or "") + " " + (it.get("note") or ""))[:110]] for it in items]
+    # поставщики: в страницу кладём только привязанных к деталям
+    used_keys = {k for b in part_sup.values() for ks in b.values() for k in ks}
+    skeys = sorted(used_keys)
+    sidx = {k: i for i, k in enumerate(skeys)}
+    SUP = [[sup_all[k]["name"], sup_all[k].get("country", "")[:22], sup_all[k].get("email", ""),
+            sup_all[k].get("phone", ""), sup_all[k].get("site", "")[:60],
+            (sup_all[k].get("what") or "")[:70]] for k in skeys]
+    PS = {}
+    for kv, b in part_sup.items():
+        PS[kv] = {g: [sidx[k] for k in ks if k in sidx] for g, ks in b.items()}
+
     KIND = {"свой": 0, "бренд": 1, "изготовитель": 2, "поставщик": 3, "аналог": 4, "заказчика": 5}
     N = []
     for r in nums:
@@ -70,6 +83,9 @@ th{background:#f2f4f7;font-weight:600}
 .sec a{color:#0b5fd0;text-decoration:none}
 .empty{padding:26px;text-align:center;color:#777}
 mark{background:#ffe066;padding:0 1px}
+.sub2{font-size:12px;font-weight:600;color:#444;margin:10px 0 2px}
+.grp{white-space:nowrap;font-weight:600;color:#0b3d91}
+a{color:#0b5fd0}
 """
     js = """
 const KINDS=['свой','бренд','изготовитель','поставщик','аналог','заказчика'];
@@ -114,13 +130,35 @@ function card(idx,hit,q){
   const url=SEC[it[6]]||'';
   const reason=hit?`<div class="stat">Найдено по номеру <b>${esc(hit[1])}</b> — ${KINDS[hit[2]]}${hit[3]?' ('+esc(hit[3])+')':''}</div>`:
     `<div class="stat">Найдено по наименованию</div>`;
+  const ps=PS[it[0]];
+  let sup='';
+  if(ps){
+    const GN={'П1':'П1 — Китай','П2':'П2 — РФ и СНГ','П3':'П3 — прочие'};
+    let tr='';
+    for(const g of ['П1','П2','П3']){
+      for(const si of (ps[g]||[])){
+        const s=SUP[si];
+        const c=[s[2]?`<a href="mailto:${s[2]}">${esc(s[2])}</a>`:'',s[3]?esc(s[3]):'']
+          .filter(Boolean).join(' · ')||'<span class="k4">контакт не найден</span>';
+        tr+=`<tr><td class="grp">${GN[g]}</td><td><b>${esc(s[0])}</b>`+
+            (s[5]?`<div class="k4" style="font-size:11.5px">${esc(s[5])}</div>`:'')+
+            `</td><td>${esc(s[1])}</td><td>${c}</td>`+
+            `<td>${s[4]?`<a href="${esc(s[4])}" target="_blank">сайт ↗</a>`:''}</td></tr>`;
+      }
+    }
+    if(tr) sup=`<div class="sub2">Поставщики</div><table>`+
+      `<tr><th style="width:13%">Группа</th><th style="width:33%">Компания</th>`+
+      `<th style="width:11%">Страна</th><th style="width:30%">Контакт</th><th style="width:8%"></th></tr>${tr}</table>`;
+  }
   return `<div class="card">
     <span class="sec">${url?`<a href="${url}" target="_blank">${esc(it[6])} ↗</a>`:esc(it[6])}</span>
     <div class="kv">${esc(it[0])}</div>
     <div class="nm">${esc(it[1])}</div>
     <div class="attrs">${attrs}</div>
     ${reason}
+    <div class="sub2">Номера</div>
     <table><tr><th style="width:32%">Номер</th><th style="width:22%">Тип</th><th>Чей</th></tr>${rows}</table>
+    ${sup}
   </div>`;
 }
 
@@ -158,13 +196,18 @@ run();
 <script>
 const I={json.dumps(I, ensure_ascii=False, separators=(',', ':'))};
 const N={json.dumps(N, ensure_ascii=False, separators=(',', ':'))};
+const SUP={json.dumps(SUP, ensure_ascii=False, separators=(',', ':'))};
+const PS={json.dumps(PS, ensure_ascii=False, separators=(',', ':'))};
 const SEC={json.dumps(SECTION_URL, ensure_ascii=False)};
 {js}
 </script></body></html>"""
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(html, encoding="utf-8")
-    print(f"{OUT}: {OUT.stat().st_size:,} байт | деталей {len(I)}, номеров {len(N)}".replace(",", " "))
+    withc = sum(1 for s in SUP if s[2] or s[3])
+    print(f"{OUT}: {OUT.stat().st_size:,} байт".replace(",", " "))
+    print(f"  деталей {len(I)}, номеров {len(N)}, поставщиков {len(SUP)} (с контактом {withc}), "
+          f"деталей с поставщиками {len(PS)}")
 
 
 if __name__ == "__main__":
