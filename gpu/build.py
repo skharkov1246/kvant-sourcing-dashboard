@@ -13,8 +13,12 @@ __PLAYBOOK_JSON__, __BUILT_AT__.
 Перед этим (по желанию, если менялась заявка):  python3 gpu/tools/build_demand.py
 """
 import json
+import sys
 from datetime import date
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent / "tools"))
+from lexicon import walk as normalize_lexicon  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent
 DATA = ROOT / "data"
@@ -45,11 +49,20 @@ FILES = {
     "__TARGETS_JSON__": "targets.json",
     "__CONSUMABLES_JSON__": "consumables.json",
     "__MACHINES_JSON__": "machines.json",
+    "__RFQPACK_JSON__": "rfq_pack.json",
+    "__GLOSSARY_JSON__": "glossary.json",
+    "__ACLASS_JSON__": "analog_classes.json",
 }
 
 
 def load(name: str):
-    return json.loads((DATA / name).read_text(encoding="utf-8"))
+    """Читает файл данных и приводит язык к терминологии словаря.
+
+    Нормализация выполняется здесь, а не только в самих файлах: demand.json
+    пересобирается build_demand.py из исходных материалов gt/, bitrix_gpu.json —
+    живой выгрузкой в CI, и просторечия из первоисточников иначе попадают на сайт.
+    """
+    return normalize_lexicon(json.loads((DATA / name).read_text(encoding="utf-8")))
 
 
 def score_suppliers(sup: dict) -> dict:

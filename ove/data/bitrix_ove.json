@@ -1,8 +1,8 @@
 {
  "live": true,
- "updated": "2026-08-13",
+ "updated": "2026-09-01",
  "source": "Bitrix24, смарт-процесс 166 «Запросы поставщикам» + crm.company.list",
- "n_rfq": 70,
+ "n_rfq": 71,
  "classes": {
   "roaster": [
    {
@@ -90,6 +90,11 @@
    }
   ],
   "conveyor": [
+   {
+    "company": "ООО «Шахтинский Завод Конвейерных Систем»",
+    "stage": "Request Sent",
+    "created": "2026-09-01"
+   },
    {
     "company": "HEFEI TECLION MACHINERY INDUSTRY CO. LTD.",
     "stage": "Price at Work",
@@ -248,7 +253,7 @@
    },
    {
     "company": "Beijing Precision Wave Instrument Co., Ltd",
-    "stage": "Unread Messages",
+    "stage": "In Correspondance",
     "created": "2026-07-30"
    },
    {
@@ -490,6 +495,14 @@
    "last": "2025-10-11",
    "classes": [
     "crane"
+   ]
+  },
+  {
+   "name": "ООО «Шахтинский Завод Конвейерных Систем»",
+   "n": 1,
+   "last": "2026-09-01",
+   "classes": [
+    "conveyor"
    ]
   },
   {
@@ -871,7 +884,19 @@
  ],
  "pool": [
   {
-   "query": "Fujian Longking",
+   "query": "Chongqing General Industry",
+   "name": "Chongqing General Industry (Group) Co., Ltd",
+   "n": 4,
+   "last": "2026-08-25"
+  },
+  {
+   "query": "EBICO",
+   "name": "EBICO",
+   "n": 4,
+   "last": "2026-05-13"
+  },
+  {
+   "query": "Fujian Longking Co., Ltd.",
    "name": "FUJIAN LONGKING CO., LTD.",
    "n": 1,
    "last": "2026-05-21"
@@ -883,10 +908,58 @@
    "last": "2026-06-19"
   },
   {
-   "query": "Jingjin Equipment",
+   "query": "Henan Mine Crane Co., Ltd.",
+   "name": "Henan Mine Crane Co., Ltd.",
+   "n": 1,
+   "last": "2026-08-11"
+  },
+  {
+   "query": "Henan Pingyuan Mining Machinery",
+   "name": "Henan Pingyuan Mining Machinery Co., Ltd.",
+   "n": 5,
+   "last": "2026-06-23"
+  },
+  {
+   "query": "Henan Zhengzhou Mining Machinery",
+   "name": "Henan Zhengzhou Mining Machinery Co., Ltd",
+   "n": 1,
+   "last": "2026-05-20"
+  },
+  {
+   "query": "Isgec Heavy Engineering Ltd.",
+   "name": "ISGEC Heavy Engineering Ltd.",
+   "n": 1,
+   "last": "2026-04-16"
+  },
+  {
+   "query": "Jiangsu Hanpu Mechanical Technology Co., Ltd.",
+   "name": "Jiangsu Hanpu Mechanical Technology Co., Ltd.",
+   "n": 1,
+   "last": "2026-04-06"
+  },
+  {
+   "query": "Jingjin Equipment Inc.",
    "name": "Jingjin Equipment Inc.",
    "n": 1,
    "last": "2026-07-29"
+  },
+  {
+   "query": "Lanpec Technologies Limited",
+   "name": "Lanpec Technologies Limited",
+   "n": 1,
+   "last": "2026-06-26"
+  },
+  {
+   "query": "Shenyang Blower Works Group / SBW",
+   "name": "Shenyang Blower Works Group / SBW INTL",
+   "n": 1,
+   "last": "2026-05-19"
+  },
+  {
+   "query": "Siping Juyuan Hanyang Plate Heat Exchanger",
+   "name": "Siping Juyuan Hanyang Plate Heat Exchanger Co., Ltd.",
+   "n": 1,
+   "last": "2026-02-04"
   },
   {
    "query": "Thermax",
@@ -907,10 +980,46 @@
    "last": "2026-06-15"
   },
   {
-   "query": "Yantai Jinpeng",
+   "query": "Thermax Limited",
+   "name": "Thermax Limited",
+   "n": 1,
+   "last": "2026-05-29"
+  },
+  {
+   "query": "Thermax Limited",
+   "name": "Thermax Limited — Energy Division",
+   "n": 1,
+   "last": "2026-06-15"
+  },
+  {
+   "query": "Weihai Chemical Machinery Co., Ltd.",
+   "name": "Weihai Chemical Machinery Co., Ltd.",
+   "n": 1,
+   "last": "2026-07-08"
+  },
+  {
+   "query": "Weihai Haiwang Hydrocyclone Co., Ltd.",
+   "name": "Weihai Haiwang Hydrocyclone Co., Ltd.",
+   "n": 1,
+   "last": "2024-11-22"
+  },
+  {
+   "query": "Xinxiang SIMO Blower Co., Ltd.",
+   "name": "Xinxiang SIMO Blower Co., Ltd.",
+   "n": 1,
+   "last": "2026-08-25"
+  },
+  {
+   "query": "Yantai Jinpeng Mining Machinery Co., Ltd.",
    "name": "Yantai Jinpeng Mining Machinery Co., Ltd.",
    "n": 1,
    "last": "2024-11-22"
+  },
+  {
+   "query": "АО «ЭМИС»",
+   "name": "ЗАО «ЭМИС»",
+   "n": 0,
+   "last": ""
   },
   {
    "query": "ЗАО «Росма»",
@@ -931,5 +1040,10 @@
    "last": "2026-08-09"
   }
  ],
- "note": "Сайт временно открыт без пароля — наружу идут только компания, стадия и дата. Имена сорсеров и номера запросов остаются в Bitrix."
+ "deal": {
+  "id": 23008,
+  "n": 0,
+  "stages": {},
+  "rows": []
+ }
 }

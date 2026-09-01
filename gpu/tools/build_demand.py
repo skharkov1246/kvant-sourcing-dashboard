@@ -14,9 +14,13 @@
 """
 import json
 import re
+import sys
 from collections import Counter
 from datetime import date
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from lexicon import walk as normalize_lexicon  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 REPO = ROOT.parent
@@ -157,8 +161,11 @@ def main():
         "rows": rows,
     }
     dst = ROOT / "data/demand.json"
+    # язык исходных материалов приводим к терминологии словаря на записи,
+    # иначе просторечия из gt/ возвращаются в файл при каждом прогоне
+    out = normalize_lexicon(out)
     dst.write_text(json.dumps(out, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
-    print(f"OK → {dst}: {len(rows)} позиций, {len(priced)} с ценой, {len(checked)} с живой проверкой; "
+    print(f"OK → {dst}: {len(rows)} позиций, {len(priced)} с ценой, {len(checked)} с проверкой предложения продавца; "
           f"лот ${total_lo:,} … ${total_hi:,}".replace(",", " "))
 
 

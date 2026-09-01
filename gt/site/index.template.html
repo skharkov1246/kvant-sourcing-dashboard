@@ -168,6 +168,7 @@ const BADGEOVR = __BADGEOVR_JSON__; /* вердикты скептика по п
 const DOSSIERS = __DOSSIERS_JSON__;
 const METHOD = __METHOD_JSON__;
 const BXHIST = __BXHIST_JSON__;
+const PNDB = __PNDB_JSON__; /* База PN: консолидированная номенклатура с атрибуцией субпоставщиков (1965 позиций) */
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const FAM_NAME = {SGT:'Siemens SGT', Solar:'Solar', Heavy:'Тяжёлые ГТУ'};
@@ -196,7 +197,7 @@ document.addEventListener('click', e=>{
 
 const TABS = [
  ['picker','Подбор поставщика'],['overview','Обзор'],['machines','Машины'],['parts','Номенклатура ЗИП'],['pn','Шифровки PN'],
- ['suppliers','Поставщики'],['bitrix','Наши запросы'],['customs','Таможня РФ'],['db','Базы данных']
+ ['pndb','База PN'],['suppliers','Поставщики'],['bitrix','Наши запросы'],['customs','Таможня РФ'],['db','Базы данных']
 ];
 
 /* ---------- Подбор поставщика: модель × сегмент → кто предлагает ---------- */
@@ -380,6 +381,64 @@ function mergeByDomain(map){
   }
  }
 }
+
+// Вторая склейка — по базовому имени (до скобки), для дублей на РАЗНЫХ доменах или без сайта.
+// Родовые слова исключены, чтобы не слить разные компании («Solar Turbines» ≠ «Solar Manufacturing»,
+// «Allied Power Group» ≠ «Allied International»): база берётся до первой скобки/запятой целиком.
+const NAMEBASE_GENERIC = new Set(['gasturbine','turbine','turbines','solar','power','energy','allied','resources','controls','services','shanghaielectric','general','industrial']);
+function nameBase(n){
+ let b = n.split('(')[0].split(',')[0].toLowerCase().trim();
+ b = b.replace(/\b(gmbh|co kg|co ltd|ltd|llc|inc|s r l|srl|s p a|spa|sa|sas|bv|ab|as|plc|corp|gruppe|group)\b/g,'');
+ return b.replace(/[^a-z0-9а-яё]/g,'');
+}
+function mergeByNameBase(map){
+ const byBase = new Map();
+ for(const [k,r] of map){
+  const b = nameBase(r.name);
+  if(b.length < 6 || NAMEBASE_GENERIC.has(b)) continue;
+  if(!byBase.has(b)) byBase.set(b, []);
+  byBase.get(b).push([k,r]);
+ }
+ for(const [,group] of byBase){
+  if(group.length < 2) continue;
+  group.sort((a,b)=> (b[1].src.size - a[1].src.size) || (a[1].name.length - b[1].name.length));
+  const [, keep] = group[0];
+  const plain = n => n.replace(/\s*\([^()]*\)/g,'').trim();
+  // головное имя — самое короткое «чистое» (без скобок), обычно это и есть база
+  const pick = group.map(g=>g[1].name).slice().sort((a,b)=> plain(a).length - plain(b).length)[0];
+  if(pick && pick!==keep.name){ keep.altNames = keep.altNames||[]; keep.altNames.push(keep.name); keep.name = pick; }
+  for(const [k,r] of group.slice(1)){
+   ['segs','models','src','subOf'].forEach(f=>{ if(r[f]&&keep[f]) r[f].forEach(x=>keep[f].add(x)); });
+   ['sgtAll','solarAll','heavyAll'].forEach(f=>{ if(r[f]) keep[f]=true; });
+   for(const [m,n] of Object.entries(r.bitrix||{})) keep.bitrix[m] = (keep.bitrix[m]||0) + n;
+   ['role','email','phone','what','evid','conf','prior','tier','tierRaw','site'].forEach(f=>{ if(!keep[f] && r[f]) keep[f]=r[f]; });
+   if(!keep.clSeg && r.clSeg) keep.clSeg = r.clSeg;
+   keep.altNames = keep.altNames || [];
+   if(!keep.altNames.includes(r.name)) keep.altNames.push(r.name);
+   if(r.altNames) r.altNames.forEach(n=>{ if(!keep.altNames.includes(n)) keep.altNames.push(n); });
+   map.delete(k);
+  }
+ }
+}
+
+// Экспортёры из таможни РФ (HS 8411): считаем по всем записям, ключ — нормализованное имя
+const CUST_EXPORTERS = (()=>{
+ const m = {};
+ for(const rec of (CUSTOMS.records||[])){
+  const name = rec.ex; if(!name) continue;
+  const k = nrm(name); if(k.length<5) continue;
+  if(!m[k]) m[k] = { n:0, ex:name };
+  m[k].n++;
+ }
+ return m;
+})();
+// подобрать экспортёра под компанию: точное или подстрочное совпадение нормализованных имён
+function custMatch(key){
+ if(CUST_EXPORTERS[key]) return CUST_EXPORTERS[key];
+ for(const k in CUST_EXPORTERS){ if((key.includes(k)||k.includes(key)) && Math.min(key.length,k.length)>=6) return CUST_EXPORTERS[k]; }
+ return null;
+}
+
 let UNI = null;
 function buildUnified(){
  const map = new Map();
@@ -521,6 +580,7 @@ function buildUnified(){
   else if(isRU(r)) map.delete(k);   // российские — конкуренты, в подбор не идут (см. gt/tools/drop_ru.py)
  }
  mergeByDomain(map);
+ mergeByNameBase(map);
  const dmap = {};
  for(const [n,v] of Object.entries((DOSSIERS.dossiers)||{})) dmap[nrm(n)] = v;
  const hmap = {};
@@ -550,6 +610,16 @@ function buildUnified(){
   r.typ = classify(r);
   r.dossier = dmap[r.key] || null;
   r.bxHist = hmap[r.key] || null;
+  if(r.bxHist){
+   const REPLIED=/Price at Work|Selected|Correspondance|Not Selected|Отказ в КП|Не подошло по технике/;
+   const NOREPLY=/Ответ не получен|Unread Messages/;
+   let rep=0,no=0;
+   for(const h of r.bxHist){ const st=h.stage||''; if(REPLIED.test(st)) rep++; else if(NOREPLY.test(st)) no++; }
+   r.bxReplied=rep; r.bxNoReply=no;
+   r.bxRate = (rep+no)>0 ? Math.round(100*rep/(rep+no)) : null;
+  }
+  const cm = custMatch(r.key);
+  if(cm) r.customs = cm;   // доказано отгрузкой: таможня РФ HS 8411
   if(r.dossier){
    if((!r.email || /см\. сайт|не найдено|—|^$/.test(r.email)) && r.dossier.contact_email) r.email = r.dossier.contact_email;
    if((!r.phone || /см\. сайт|не найдено|—|^$/.test(r.phone)) && r.dossier.contact_phone) r.phone = r.dossier.contact_phone;
@@ -600,6 +670,7 @@ const scoreBand = s => s>=75?['досье полное','sc-hi']:s>=50?['про�
 const SORTS = {
  score:['по рангу и фактам', (a,b)=> (a.prank-b.prank) || (b.score-a.score) || (b.bxTotal-a.bxTotal) || a.name.localeCompare(b.name)],
  rel:  ['сначала предлагавшие нам', (a,b)=> (b.bxTotal-a.bxTotal) || (b.score-a.score) || a.name.localeCompare(b.name)],
+ resp: ['сначала реально отвечающие', (a,b)=> ((b.bxReplied||0)-(a.bxReplied||0)) || ((b.bxRate??-1)-(a.bxRate??-1)) || (b.bxTotal-a.bxTotal) || a.name.localeCompare(b.name)],
  name: ['по алфавиту', (a,b)=> a.name.localeCompare(b.name,'ru')],
  country: ['по стране', (a,b)=> a.country.localeCompare(b.country,'ru') || a.name.localeCompare(b.name)],
 };
@@ -643,6 +714,10 @@ function pkCard(r){
  const src = [...r.src].map(s=>s==='bitrix'
    ? `<span class="pill bx">Bitrix · ${r.bxTotal} запрос${r.bxTotal>4?'ов':(r.bxTotal>1?'а':'')}</span>`
    : `<span class="pill">${esc(s)}</span>`).join('');
+ // отклик по CRM: реально отвечают N из (ответили+молчание)
+ const respP = (r.bxReplied!=null && (r.bxReplied+r.bxNoReply)>0)
+   ? `<span class="pill" style="background:${r.bxRate>=60?'#d9f2d9':r.bxRate>=30?'#fdeecd':'#f6dcdc'};color:${r.bxRate>=60?'#0a5c0a':r.bxRate>=30?'#7a5200':'#8c1f1f'}" title="По нашей истории в Bitrix: ответили по существу (цена/КП/переписка/мотивированный отказ) ${r.bxReplied}, промолчали/не прочли ${r.bxNoReply}">отвечают ${r.bxReplied}/${r.bxReplied+r.bxNoReply} · ${r.bxRate}%</span>`
+   : '';
  const [bandLabel, bandCls] = scoreBand(r.score);
  const PRANK = {1:['П1 · поставки доказаны','наша сделка в Bitrix или BOL/таможенная запись'],2:['П2 · назван клиент-OEM','кейс-стади, референс или пресс-релиз с именем клиента'],3:['П3 · профильный каталог','каталог с моделями/деталями ГТУ, но без имён клиентов'],4:['П4 · не доказано','только самозаявление на сайте']};
  const prankP = `<span class="pill pr pr${r.prank}" title="${esc(PRANK[r.prank][1])}">${PRANK[r.prank][0]}</span>`;
@@ -659,12 +734,17 @@ function pkCard(r){
    <h4>${esc(r.name)}</h4>
    <div class="mut" style="margin:2px 0 6px">${esc(r.country)}${r.role?' · '+esc(r.role):''}</div>
    ${r.altNames&&r.altNames.length?`<div class="mut small" style="margin:-4px 0 6px" title="Один сайт = одна компания: карточки этих названий объединены">в базе также как: ${esc(r.altNames.slice(0,4).join(' · '))}${r.altNames.length>4?` и ещё ${r.altNames.length-4}`:''}</div>`:''}
-   <div><span class="pill typ">${r.typ==='sub' ? 'субпоставщик: '+([...r.subOf].join(', ')||'OEM') : TYPE_NAME[r.typ]}</span>${scoreP}${src}</div>
+   <div><span class="pill typ">${r.typ==='sub' ? 'субпоставщик: '+([...r.subOf].join(', ')||'OEM') : TYPE_NAME[r.typ]}</span>${scoreP}${respP}${src}</div>
   </div>
   <div>
    <div style="margin-bottom:4px">${[...r.segs].map(id=>`<span class="tag">${esc(SEG_SHORT(id))}</span>`).join('')||'<span class="mut">сегмент не определён</span>'}</div>
    <div style="margin-bottom:6px">${models}${wide}${gen}${r.badgecheck?bcTag(r.badgecheck):''}</div>
    ${dossierBits.length?`<div style="font-size:12px;margin-bottom:4px">${dossierBits.map(b=>`<span class="dfact">${esc(b)}</span>`).join('')}</div>`:''}
+   ${(()=>{ const ev=[];
+     if(r.customs) ev.push(`<span class="dfact" style="background:#e6f0ff;color:#1d4ed8" title="Таможня РФ HS 8411: экспортёр «${esc(r.customs.ex)}», ${r.customs.n} записей">📦 возил в РФ ×${r.customs.n}</span>`);
+     if(r.badgecheck&&r.badgecheck.quote) ev.push(`<span class="dfact" style="background:#d9f2d9;color:#0a5c0a" title="${esc(r.badgecheck.quote)}">👁 скептик видел на сайте</span>`);
+     if(r.bxReplied>0) ev.push(`<span class="dfact" style="background:#fdeecd;color:#7a5200" title="Отвечали по существу ${r.bxReplied} из ${r.bxReplied+r.bxNoReply} наших запросов">💬 отвечали нам ×${r.bxReplied}</span>`);
+     return ev.length?`<div style="font-size:12px;margin-bottom:4px">${ev.join('')}</div>`:''; })()}
    ${r.what?`<div class="mut" style="font-size:12.5px">${esc(r.what.length>170?r.what.slice(0,170)+'…':r.what)}</div>`:''}
    ${r.evid?`<div class="mut" style="font-size:11.5px;margin-top:3px">Проверка: ${esc(r.evid.length>150?r.evid.slice(0,150)+'…':r.evid)}</div>`:''}
    ${d.hook?`<div style="font-size:12px;margin-top:4px;border-left:3px solid var(--good);padding-left:8px">✍ Зацепка для письма: ${esc(d.hook)}</div>`:''}
@@ -768,6 +848,10 @@ function pkImportEdits(inp){
    const e = JSON.parse(t);
    Object.assign(EDITS.st, e.st||{}); Object.assign(EDITS.note, e.note||{}); Object.assign(EDITS.hide, e.hide||{}); Object.assign(EDITS.ex, e.ex||{});
    Object.assign(EDITS.why, e.why||{}); Object.assign(EDITS.exwhy, e.exwhy||{});
+   if(e.pn){ EDITS.pn = EDITS.pn||{st:{},note:{},hide:{},over:{},add:[]};
+    Object.assign(EDITS.pn.st, e.pn.st||{}); Object.assign(EDITS.pn.note, e.pn.note||{});
+    Object.assign(EDITS.pn.hide, e.pn.hide||{}); Object.assign(EDITS.pn.over, e.pn.over||{});
+    for(const a of (e.pn.add||[])) if(!EDITS.pn.add.some(x=>x.pn===a.pn)) EDITS.pn.add.push(a); }
    for(const a of (e.add||[])) if(!EDITS.add.some(x=>nrm(x.name)===nrm(a.name))) EDITS.add.push(a);
    saveEdits(); UNI=null; buildUnified(); pkFilters();
   }catch(err){ alert('Не удалось прочитать файл правок: '+err.message); }
@@ -1039,6 +1123,165 @@ function pnFilters(){
  document.getElementById('pn-count').textContent=`${rows.length} из ${PNCAT.rows.length}`;
 }
 
+/* ---------- База PN: заказные парт-номера и субпоставщики (CRUD) ---------- */
+EDITS.pn = EDITS.pn || {st:{}, note:{}, hide:{}, over:{}, add:[]};
+const PNDB_CYR = {'А':'A','В':'B','С':'C','Е':'E','К':'K','М':'M','Н':'H','О':'O','Р':'P','Т':'T','Х':'X'};
+const pnNorm = s => String(s||'').toUpperCase().split('').map(c=>PNDB_CYR[c]||c).join('').replace(/[\s ]/g,'');
+const pnAll = () => PNDB.rows.concat(EDITS.pn.add);
+const pnGet = pn => pnAll().find(r=>r.pn===pn);
+const pnOv = r => { const o = EDITS.pn.over[r.pn]; return o ? Object.assign({}, r, o) : r; };
+const pnEvL = r => { const e=(r.ev||'').trim(); return e.startsWith('П1')?'П1':e.startsWith('П2')?'П2':e.startsWith('П3')?'П3':e.startsWith('П4')?'П4':''; };
+const PN_EV_STYLE = {'П1':'background:#e8f6ee;color:#1a7f4b','П2':'background:#e6f0ff;color:#1d4ed8','П3':'background:#fdf3e0;color:#b07503','П4':'background:#fbe9e7;color:#c0392b'};
+const pnEvBadge = r => { const l=pnEvL(r); return l?`<span style="border-radius:10px;padding:2px 8px;font-size:11.5px;font-weight:600;${PN_EV_STYLE[l]}">${l}</span>`:'<span class="mut">—</span>'; };
+const PN_STS = ['в работе','RFQ отправлен','есть КП','отказ'];
+const PN_ST_STYLE = {'в работе':'#b07503','RFQ отправлен':'#1d4ed8','есть КП':'#1a7f4b','отказ':'#c0392b'};
+const pnStBadge = pn => { const s=EDITS.pn.st[pn]; return s?`<span style="font-size:11.5px;font-weight:600;color:${PN_ST_STYLE[s]}">${s}</span>`:''; };
+
+function rPndb(){
+ const all = pnAll();
+ const attr = all.filter(r=>r.mk).length;
+ const p12 = all.filter(r=>['П1','П2'].includes(pnEvL(r))).length;
+ const oems = [...new Set(all.map(r=>r.oem).filter(Boolean))].sort();
+ const segs = [...new Set(all.map(r=>r.seg).filter(Boolean))].sort();
+ return `<div class="box info">Единая база заказных парт-номеров ГТУ: <b>${all.length}</b> PN · атрибутировано субпоставщикам: <b>${attr}</b> · уровень П1–П2: <b>${p12}</b>. ${esc(PNDB.source)} Поиск нечувствителен к кириллице/латинице в PN. Атрибуция, статусы, заметки и свои PN сохраняются в этом браузере; «⬇ правки» (вкладка «Подбор поставщика») выгружает их вместе с правками библиотеки.</div>
+ <div class="filters">
+  <div class="f-field" style="flex:1;min-width:220px"><label>Поиск</label>
+   <input id="pndb-q" placeholder="PN, описание, производитель…" oninput="pndbFilters(true)"></div>
+  <div class="f-field"><label>OEM</label>
+   <select id="pndb-oem" onchange="pndbFilters(true)"><option value="">любой</option>${oems.map(o=>`<option>${esc(o)}</option>`).join('')}</select></div>
+  <div class="f-field"><label>Сегмент</label>
+   <select id="pndb-seg" onchange="pndbFilters(true)"><option value="">любой</option>${segs.map(o=>`<option>${esc(o)}</option>`).join('')}</select></div>
+  <div class="f-field"><label>Доказанность</label>
+   <select id="pndb-ev" onchange="pndbFilters(true)"><option value="">любая</option><option>П1</option><option>П2</option><option>П3</option><option>П4</option><option value="none">не атрибутировано</option></select></div>
+  <label class="mut" style="font-size:12.5px"><input type="checkbox" id="pndb-attr" onchange="pndbFilters(true)"> только с субпоставщиком</label>
+  <label class="mut" style="font-size:12.5px"><input type="checkbox" id="pndb-hid" onchange="pndbFilters(true)"> показывать скрытые</label>
+  <button class="btn" onclick="pndbAddForm()">+ PN</button>
+  <button class="btn" onclick="pndbCSV()">⬇ CSV</button>
+  <span class="count" id="pndb-count"></span>
+ </div>
+ <div id="pndb-addform" style="display:none" class="card">
+  <b>Новый PN</b><div class="form-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;margin-top:8px">
+  <input id="pa-pn" placeholder="PN *"><input id="pa-desc" placeholder="Описание">
+  <input id="pa-oem" placeholder="OEM (Solar Turbines…)"><input id="pa-mach" placeholder="Машина (Taurus 60…)">
+  <input id="pa-seg" placeholder="Сегмент"><input id="pa-mk" placeholder="Реальный производитель">
+  <input id="pa-mpn" placeholder="PN производителя"></div>
+  <div style="margin-top:8px"><button class="btn primary" onclick="pndbAdd()">Добавить</button>
+  <button class="btn" onclick="document.getElementById('pndb-addform').style.display='none'">Отмена</button></div>
+ </div>
+ <div class="tblwrap"><table class="sortable">
+  <tr><th>PN</th><th>Описание</th><th>OEM</th><th>Машины</th><th>Сегмент</th><th>Субпоставщик</th><th>Док-во</th><th>Статус</th></tr>
+  <tbody id="pndb-body"></tbody>
+ </table></div>`;
+}
+let PNDB_SHOWN = 300;
+function pndbRows(){
+ const q = pnNorm(document.getElementById('pndb-q').value);
+ const o = document.getElementById('pndb-oem').value, s = document.getElementById('pndb-seg').value,
+       e = document.getElementById('pndb-ev').value, a = document.getElementById('pndb-attr').checked,
+       h = document.getElementById('pndb-hid').checked;
+ return pnAll().map(pnOv).filter(r=>{
+  if(!h && EDITS.pn.hide[r.pn]) return false;
+  if(o && r.oem!==o) return false;
+  if(s && r.seg!==s) return false;
+  if(a && !r.mk) return false;
+  if(e==='none' && r.mk) return false;
+  if(e && e!=='none' && pnEvL(r)!==e) return false;
+  if(q){ const hay = pnNorm(r.pn)+' '+pnNorm(r.desc)+' '+pnNorm(r.mk)+' '+pnNorm(r.mpn)+' '+pnNorm(r.mach);
+         if(!hay.includes(q)) return false; }
+  return true;
+ });
+}
+function pndbFilters(reset){
+ if(reset) PNDB_SHOWN = 300;
+ const rows = pndbRows();
+ document.getElementById('pndb-count').textContent = `${rows.length} из ${pnAll().length}`;
+ let h = rows.slice(0, PNDB_SHOWN).map(r=>{
+  const hid = EDITS.pn.hide[r.pn] ? ' style="opacity:.35"' : '';
+  return `<tr${hid} onclick="pndbToggle('${esc(r.pn)}',this)" style="cursor:pointer">
+   <td style="white-space:nowrap"><b>${esc(r.pn)}</b></td>
+   <td style="min-width:200px">${esc(r.desc)||'<span class="mut">—</span>'}</td>
+   <td class="mut" style="white-space:nowrap">${esc(r.oem)}</td>
+   <td class="mut" style="font-size:12px">${esc(r.mach)}</td>
+   <td class="mut" style="font-size:12px">${esc(r.seg)}</td>
+   <td style="font-size:12.5px">${esc(r.mk)}${r.mpn?`<br><span class="mut" style="font-size:11.5px">${esc(r.mpn)}</span>`:''}</td>
+   <td>${pnEvBadge(r)}</td><td>${pnStBadge(r.pn)}</td></tr>`;
+ }).join('');
+ if(rows.length > PNDB_SHOWN)
+  h += `<tr><td colspan="8" style="text-align:center"><button class="btn" onclick="PNDB_SHOWN+=500;pndbFilters()">Показать ещё (${rows.length-PNDB_SHOWN})</button></td></tr>`;
+ if(!rows.length) h = `<tr><td colspan="8" class="mut">Не найдено.</td></tr>`;
+ document.getElementById('pndb-body').innerHTML = h;
+}
+function pndbToggle(pn, tr){
+ const next = tr.nextElementSibling;
+ if(next && next.classList.contains('pndb-det')){ next.remove(); return; }
+ document.querySelectorAll('.pndb-det').forEach(x=>x.remove());
+ const r = pnOv(pnGet(pn)); if(!r) return;
+ const fam = pnAll().filter(x=>x.b===r.b && x.pn!==pn).slice(0,10);
+ const notes = EDITS.pn.note[pn]||[];
+ const isAdded = EDITS.pn.add.some(x=>x.pn===pn);
+ const det = document.createElement('tr');
+ det.className = 'pndb-det';
+ det.innerHTML = `<td colspan="8" style="background:var(--bg,#f8f9fb)">
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:4px 16px;font-size:12.5px;margin:6px 0">
+   <div><span class="mut">Шифровка:</span> ${esc(r.pat)||'—'}</div>
+   <div><span class="mut">Семейство (база):</span> <b>${esc(r.b)}</b></div>
+   <div><span class="mut">Спрос, шт:</span> ${r.qty||0}</div>
+   <div><span class="mut">Заказчики:</span> ${esc(r.cli)||'—'}</div>
+   <div style="grid-column:1/-1"><span class="mut">Источник:</span> ${esc(r.sn)||'—'}${r.su?` · <a href="${esc(r.su)}" target="_blank" rel="noopener">ссылка</a>`:''} · <span class="mut">${esc(r.org)||''}</span></div>
+  </div>
+  ${fam.length?`<div style="font-size:12px;margin:4px 0"><span class="mut">Семейство:</span> ${fam.map(x=>`<a href="javascript:void(0)" onclick="pndbJump('${esc(x.pn)}')">${esc(x.pn)}</a>`).join(' · ')}</div>`:''}
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;margin:8px 0">
+   <div><label class="mut" style="font-size:11.5px">Реальный производитель</label><input id="pe-mk" value="${esc(r.mk)}" style="width:100%"></div>
+   <div><label class="mut" style="font-size:11.5px">PN производителя</label><input id="pe-mpn" value="${esc(r.mpn)}" style="width:100%"></div>
+   <div><label class="mut" style="font-size:11.5px">Доказанность</label><select id="pe-ev" style="width:100%"><option value="">—</option>
+    ${['П1 — NSN/CAGE/таможня','П2 — прямой листинг','П3 — OE-статус/профиль','П4 — эвристика'].map(o=>`<option ${r.ev===o?'selected':''}>${o}</option>`).join('')}</select></div>
+   <div><label class="mut" style="font-size:11.5px">Статус проработки</label><select onchange="pndbStatus('${esc(pn)}',this.value)" style="width:100%"><option value="">без статуса</option>
+    ${PN_STS.map(s=>`<option ${EDITS.pn.st[pn]===s?'selected':''}>${s}</option>`).join('')}</select></div>
+  </div>
+  <div style="margin:6px 0">
+   <button class="btn primary" onclick="pndbSave('${esc(pn)}')">Сохранить атрибуцию</button>
+   <button class="btn" onclick="pndbHide('${esc(pn)}')">${EDITS.pn.hide[pn]?'Показать':'Скрыть'}</button>
+   ${isAdded?`<button class="btn" style="color:#c0392b" onclick="pndbDel('${esc(pn)}')">Удалить запись</button>`:''}
+  </div>
+  <div style="font-size:12.5px">${notes.map(n=>`<div class="card" style="margin:4px 0;padding:6px 10px">${esc(n.t)}<div class="mut" style="font-size:11px">${esc(n.d)}</div></div>`).join('')}
+   <input id="pe-note" placeholder="Заметка…" style="width:70%"> <button class="btn" onclick="pndbNote('${esc(pn)}')">+ заметка</button></div>
+ </td>`;
+ tr.after(det);
+}
+function pndbJump(pn){ document.getElementById('pndb-q').value=pn; pndbFilters(true); }
+function pndbSave(pn){
+ EDITS.pn.over[pn] = Object.assign(EDITS.pn.over[pn]||{}, {
+  mk: document.getElementById('pe-mk').value.trim(),
+  mpn: document.getElementById('pe-mpn').value.trim(),
+  ev: document.getElementById('pe-ev').value });
+ saveEdits(); pndbFilters();
+}
+function pndbStatus(pn, v){ if(v) EDITS.pn.st[pn]=v; else delete EDITS.pn.st[pn]; saveEdits(); pndbFilters(); }
+function pndbNote(pn){
+ const t = document.getElementById('pe-note').value.trim(); if(!t) return;
+ (EDITS.pn.note[pn]=EDITS.pn.note[pn]||[]).unshift({t, d:new Date().toLocaleString('ru')});
+ saveEdits(); pndbFilters();
+}
+function pndbHide(pn){ EDITS.pn.hide[pn]=!EDITS.pn.hide[pn]; if(!EDITS.pn.hide[pn]) delete EDITS.pn.hide[pn]; saveEdits(); pndbFilters(); }
+function pndbDel(pn){ EDITS.pn.add = EDITS.pn.add.filter(x=>x.pn!==pn); saveEdits(); show('pndb'); rendered.pndb=0; show('pndb'); }
+function pndbAddForm(){ const f=document.getElementById('pndb-addform'); f.style.display = f.style.display==='none'?'':'none'; }
+function pndbAdd(){
+ const pn = pnNorm(document.getElementById('pa-pn').value); if(!pn) return alert('Укажите PN');
+ if(pnGet(pn)) return alert('Такой PN уже есть в базе');
+ const g = id=>document.getElementById(id).value.trim();
+ EDITS.pn.add.push({pn, b:pn.split(/[-/]/)[0], pat:'', oem:g('pa-oem'), mach:g('pa-mach'), seg:g('pa-seg'),
+  desc:g('pa-desc'), qty:0, src:0, cli:'', mk:g('pa-mk'), mpn:g('pa-mpn'), ev:'', sn:'вручную', su:'', org:'добавлено вручную'});
+ saveEdits(); rendered.pndb=0; show('pndb');
+}
+function pndbCSV(){
+ const rows = pndbRows();
+ const esc2 = s => '"'+String(s??'').replace(/"/g,'""')+'"';
+ const head = 'PN;Семейство;Шифровка;OEM;Машины;Сегмент;Описание;Спрос;Субпоставщик;PN производителя;Доказанность;Статус;Источник;URL';
+ const lines = rows.map(r=>[r.pn,r.b,r.pat,r.oem,r.mach,r.seg,r.desc,r.qty,r.mk,r.mpn,r.ev,EDITS.pn.st[r.pn]||'',r.sn,r.su].map(esc2).join(';'));
+ const blob = new Blob(["﻿"+head+'\r\n'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'});
+ const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='kvant_pndb.csv'; a.click();
+}
+
 /* ---------- Поставщики ---------- */
 function supplierRow(s){
  return `<tr>
@@ -1277,7 +1520,7 @@ function rDB(){
 }
 
 /* ---------- Каркас ---------- */
-const R = {picker:rPicker, overview:rOverview, machines:rMachines, parts:rParts, pn:rPN, suppliers:rSuppliers, bitrix:rBitrix, customs:rCustoms, db:rDB};
+const R = {picker:rPicker, overview:rOverview, machines:rMachines, parts:rParts, pn:rPN, pndb:rPndb, suppliers:rSuppliers, bitrix:rBitrix, customs:rCustoms, db:rDB};
 const nav = document.getElementById('nav'), main = document.getElementById('main');
 nav.innerHTML = TABS.map(([id,t])=>`<button data-t="${id}">${t}</button>`).join('');
 main.innerHTML = TABS.map(([id])=>`<section id="s-${id}"></section>`).join('');
@@ -1287,7 +1530,7 @@ function show(id){
   document.querySelector(`[data-t="${tid}"]`).classList.toggle('on', tid===id);
   document.getElementById(`s-${tid}`).classList.toggle('on', tid===id);
  }
- if(!rendered[id]){ document.getElementById(`s-${id}`).innerHTML = R[id](); rendered[id]=1; if(id==='suppliers'){ applyFilters(); clFilters(); } if(id==='picker') pkFilters(); if(id==='bitrix') bxFilters(); if(id==='pn') pnFilters(); }
+ if(!rendered[id]){ document.getElementById(`s-${id}`).innerHTML = R[id](); rendered[id]=1; if(id==='suppliers'){ applyFilters(); clFilters(); } if(id==='picker') pkFilters(); if(id==='bitrix') bxFilters(); if(id==='pn') pnFilters(); if(id==='pndb') pndbFilters(); }
  location.hash = id;
 }
 nav.addEventListener('click', e=>{ const b=e.target.closest('button'); if(b) show(b.dataset.t); });

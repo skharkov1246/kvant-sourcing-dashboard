@@ -93,6 +93,8 @@ CANDIDATES = [
     "IPD", "Interstate", "McBee", "PAI Industries", "Costex", "Atmus", "Fleetguard",
     "Donaldson", "Mann", "Elring", "Denso", "Champion", "Woodward", "IMPCO", "Heinzmann",
     "Сервис Юнит", "ЭнергоТехСервис", "ROLT", "Цезарь-Нева", "Детройт", "Reman",
+    "Energy Assistance", "Энерджи Ассистанс", "GeneratorSparkPlug", "Walsh",
+    "Gilkes", "Holset", "Accelleron", "KBB", "Bleistahl",
 ]
 
 SELECT = ["id", "title", "stageId", "createdTime", "parentId2", "companyId",
@@ -206,6 +208,21 @@ def main() -> int:
                            "sourcer": users.get(str(r.get("assignedById")), "")} for r in items[:5]],
             })
 
+    # свод по поставщикам: сколько запросов, когда последний, какие стадии
+    by_supplier: dict[str, dict] = {}
+    for r in rfqs.values():
+        names_ = list(filter(None, (
+            [comp_names.get(str(r.get("companyId") or ""), "")] +
+            [comp_names.get(cid, cid) for cid in crm_refs(r.get("ufCrm18Supplier"))])))
+        for nm in names_ or []:
+            a = by_supplier.setdefault(nm, {"name": nm, "n": 0, "last": "", "stages": {}})
+            a["n"] += 1
+            dt = (r.get("createdTime") or "")[:10]
+            if dt > a["last"]:
+                a["last"] = dt
+            st = stages.get(str(r.get("stageId")), str(r.get("stageId")))
+            a["stages"][st] = a["stages"].get(st, 0) + 1
+
     offers: dict[str, dict[str, int]] = {}
     for d in out_deals:
         for r in d["rfqs"]:
@@ -221,6 +238,7 @@ def main() -> int:
         "live": True,
         "deals": out_deals,
         "pool": sorted(pool, key=lambda x: -x["rfqs"]),
+        "by_supplier": sorted(by_supplier.values(), key=lambda x: -x["n"]),
         "offers": [{"model": m, "suppliers": [{"name": n, "n": c} for n, c in
                                               sorted(sup.items(), key=lambda kv: -kv[1])]}
                    for m, sup in sorted(offers.items())],

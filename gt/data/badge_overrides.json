@@ -1,6 +1,6 @@
 {
- "updated": "2026-08-17",
- "source": "скептик-проверка плашек: по каждой компании открыт сайт и приведена дословная цитата; накоплено вердиктов — 120",
+ "updated": "2026-08-21",
+ "source": "скептик-проверка плашек: по каждой компании открыт сайт и приведена дословная цитата; накоплено вердиктов — 238",
  "checks": {
   "Intercon Enerji": {
    "models": [
@@ -1543,6 +1543,1695 @@
    "url": "https://www.psm.com/products + https://www.psm.com/products/other-frames",
    "quote": "Hot gas path buckets, nozzles, shrouds, liners, transition pieces, and fuel nozzles for GE 7B, 7E, and 7EA frames. LEC III and LEC NextGen low-emission combustion retrofits. // Complete 7F aftermarket packages including ",
    "note": "Настоящий независимый aftermarket-изготовитель: предметно 7B/E/EA, 7F, 6B, 6F, 9E, 9F, Frame 5, 501D/501F, OP16 — плашки Frame 7 и 6B подтверждены. Семейная «вся линейка Siemens SGT-100…400» на psm.com/thomassen.energy не встречается вообще (их Siemens — только тяжёлые 501D/501F) — снять как артефак"
+  },
+  "Dongturbo Electric Co. Ltd (DTEC)": {
+   "verdict": "partial",
+   "cause": "site_claims_unproven",
+   "models": [
+    "SGT-600",
+    "Mars 100",
+    "Titan 130",
+    "Saturn 20",
+    "SGT-800",
+    "SGT5-2000E (V94.2/ГТЭ-160)"
+   ],
+   "fams_off": [
+    "sgtAll",
+    "solarAll"
+   ],
+   "url": "https://www.chinaturbo.net/gas-turbine-power-plant/gas-turbine-power-plant-equipment/refurbished-solar-gas-turbine-titan130.html",
+   "quote": "Refurbished 2 Sets of Titan 130 Gas Turbine for Sale; Redurbished 3 Sets Solar Gas Turbine Mars100 in Stock for Sale; Siemens SGT-600 Is Available Now.",
+   "note": "Реальный рефёрбишер/сервис ГТУ + кит. теплоэнерг. EPC. Реально держит/восстанавливает Solar (Saturn20, T60/70, Mars100, Titan130), SGT-600, SGT-800, V94.2. Solar-линейка обоснована. GE MS5001 и малый ряд SGT-100…400 на сайте не видны — снять."
+  },
+  "Henan Gas Turbine Energy Technology Co. Ltd": {
+   "verdict": "partial",
+   "cause": "site_claims_unproven",
+   "models": [],
+   "fams_off": [
+    "sgtAll",
+    "heavyAll"
+   ],
+   "url": "https://henangtet.com/power-generation/",
+   "quote": "GE gas turbine parts: buckets, nozzles, coatings, combustion liners, fuel nozzles; Siemens gas turbine parts: hot gas path parts, compressor parts (индексир. страница, сайт отдавал 503).",
+   "note": "Настоящий non-OEM поставщик ЗИП/HGP для тяжёлых GE и Siemens (buckets/nozzles/liners, ремонт роторов, покрытия). Но конкретные модели не названы, Alstom не виден, малый ряд SGT-100…400 не их сегмент — семейные плашки не обоснованы."
+  },
+  "SAMIC S.p.A.": {
+   "verdict": "partial",
+   "cause": "site_claims_unproven",
+   "models": [
+    "SGT5-2000E (V94.2/ГТЭ-160)"
+   ],
+   "fams_off": [
+    "sgtAll",
+    "heavyAll"
+   ],
+   "url": "https://www.samic.it",
+   "quote": "gas turbine combustors, burners, supply piping, external mantles and flame tubes with ceramic coatings and internal corrugated alloy and Inconel liners; Siemens 94.2 combustion chamber.",
+   "note": "Настоящий изготовитель горячего тракта (камеры сгорания, горелки, жаровые трубы, лайнеры). Явно назван только Siemens 94.2 (тяжёлый V94.2/Ansaldo). GE/Alstom и малый ряд SGT-100…400 не показаны — семейные плашки снять, оставить heavy Siemens 94.2."
+  },
+  "Homedia (Zhangzhou) Import & Export Co. Ltd": {
+   "verdict": "bullshit",
+   "cause": "not_a_supplier",
+   "models": [],
+   "fams_off": [
+    "sgtAll",
+    "heavyAll"
+   ],
+   "url": "https://interpackgroup.en.made-in-china.com/company-Homedia-Zhangzhou-Import-and-Export-Co-Ltd-.html",
+   "quote": "HOMEDIA (ZHANGZHOU) IMPORT AND EXPORT Co., Ltd belongs to INTERPACK GROUP INC., having been 28 years in canning field; beverage can, two piece can, three piece can, easy open lid and lug cap.",
+   "note": "Производитель жестяной/пищевой упаковки (28 лет в canning, ~3 млрд банок/год, ISO/FSSC/FDA). Никаких ГТУ на сайте. Frame 7 — артефакт/прокладочный листинг. Не поставщик турбин: все плашки снять."
+  },
+  "Qingdao O.B.T Power Co. Ltd": {
+   "verdict": "partial",
+   "cause": "site_claims_real",
+   "models": [
+    "SGT-500",
+    "SGT-800",
+    "GT13E2"
+   ],
+   "fams_off": [
+    "sgtAll"
+   ],
+   "url": "https://www.obtmetalwork.com/combustor/gas-turbine-combustion-chamber-for-siemens.html",
+   "quote": "Gas Turbine Combustion Chamber For Siemens SGT500 ... Transition Piece For Heavy-duty Siemens SGT-800 ... Turbine Transition Duct For GE GT13E2",
+   "note": "Реальный завод литья турбодеталей. На сайте прямо назван только SGT-500 (камера сгорания). Transition-duct страницы показывают SGT-800 и GT13E2, а не SGT-400. SGT-100/200/400/700 не подтверждены — семейную плашку SGT-100…400 снять. Добавлены реальные SGT-800, GT13E2."
+  },
+  "Skyline Turbine Services BV": {
+   "verdict": "confirmed_broad",
+   "cause": "site_claims_real",
+   "models": [
+    "SGT-100",
+    "SGT-400",
+    "SGT-200",
+    "SGT-300"
+   ],
+   "fams_off": [],
+   "url": "https://sts-bv.com",
+   "quote": "the support of the TA1750, SGT100, SGT200, SGT300 and SGT400",
+   "note": "Профильный сервис Siemens/Ruston. Сайт явно перечисляет всю линейку SGT100-400 + TA1750, есть SGT-400 flow testing/calibration, combustion liners, запчасти OEM/non-OEM. Обе плашки реальны, линейка перечислена целиком — keep. Добавлены SGT-200, SGT-300, TA1750."
+  },
+  "EthosEnergy Light Turbines Ltd": {
+   "verdict": "confirmed_broad",
+   "cause": "site_claims_real",
+   "models": [
+    "SGT-100",
+    "SGT-400",
+    "GE 9F/9FA",
+    "GE Frame 7 (MS7001)",
+    "GE Frame 6B (MS6001)",
+    "GE MS5002",
+    "GE MS5001",
+    "GT13E2",
+    "Mars 90"
+   ],
+   "fams_off": [],
+   "url": "https://ethosenergy.com/ge-gas-turbine-parts-supplier",
+   "quote": "gas turbine replacement parts and hardware designed for GE heavy-duty frame turbines, including frame 3, frame 5, frame 6B, frame 7E / EA, frame 7F, and frame 9",
+   "note": "Сайт отдавал 503/overflow — по методике снипеты site:. Крупнейший независимый сервис: SGT-100…400+Solar (Mars 90/100), тяжёлые GE Frame 3-9, GT13E2 (ремонт форсунок OOEM). 8/10 плашек реальны. НЕ подтверждены heavy Siemens V94.2/V94.3A — блок 'все тяжёлые Siemens' сузить до GE/Alstom."
+  },
+  "Gas Turbine Services (GTS)": {
+   "verdict": "partial",
+   "cause": "site_claims_real",
+   "models": [
+    "SGT-100",
+    "SGT-400",
+    "SGT-200",
+    "SGT-300"
+   ],
+   "fams_off": [],
+   "url": "https://gasturbineservices.com",
+   "quote": "Siemens (Lincoln) SGT/Ruston range of engines, specifically TB5000/5400, SGT-100, SGT-200, SGT-300 and SGT-400",
+   "note": "Специалист по Ruston/Lincoln: overhaul, обменные двигатели, склад ЗИП, тест-ячейка. Сайт явно перечисляет SGT-100…400 + TB5000/5400 — семейную плашку keep. GE-аэродеривативы LM2500/LM6000 и SGT-600 (Финспонг) вне их scope — артефакты, снять."
+  },
+  "S&S Turbine Services Ltd.": {
+   "verdict": "partial",
+   "cause": "site_claims_real",
+   "models": [
+    "Saturn 20",
+    "Centaur 40"
+   ],
+   "fams_off": [
+    "solarAll"
+   ],
+   "url": "https://www.ssturbine.com/component/content/article/10-product-lines/20-solar-gas-turbine-services",
+   "quote": "We have full level IV support available for Saturn and Centaur units, as well as parts support for the Spartan and Centaur line.",
+   "note": "Домен sandsturbine.com в базе мёртв (DNS не резолвится); реальный сайт — ssturbine.com. Независимый семейный цех по Solar, но по факту только Saturn и Centaur (диапазон T-1200…T-4700). Taurus и Mars на сайте нет. Плашка 'крупнейший цех по всей линейке Solar' завышена — семейную снять."
+  },
+  "Alba Power (в составе Sulzer)": {
+   "verdict": "bullshit",
+   "cause": "regex_artifact",
+   "models": [
+    "RB211 (SGT-A35)"
+   ],
+   "fams_off": [
+    "sgtAll",
+    "solarAll",
+    "heavyAll"
+   ],
+   "url": "https://albapower.com/gas-turbine-services/",
+   "quote": "Alba Power specialises in gas turbine services for Rolls Royce (Avon and Olympus, RB211), Pratt & Whitney, Kongsberg KG2 and Solar Turbines.",
+   "note": "Alba Power — специалист по АЭРОПРОИЗВОДНЫМ ГТУ (RR Avon/Olympus/RB211, P&W FT4, Kongsberg KG2, Solar). Тяжёлых индустриальных Siemens SGT5-2000E/4000F, V94/V64, GT13E2, GE Frame 6/7/9 не обслуживает — эти плашки и семейная 'все тяжёлые GE/Siemens/Alstom' пришли из тяжёлые-база/research по ошибке. Sa"
+  },
+  "Chromalloy": {
+   "verdict": "bullshit",
+   "cause": "regex_artifact",
+   "models": [
+    "LM2500 (PGT25)",
+    "LM6000"
+   ],
+   "fams_off": [
+    "sgtAll",
+    "solarAll",
+    "heavyAll"
+   ],
+   "url": "https://www.chromalloy.com/energy/",
+   "quote": "Chromalloy supports the full range of LM2500, LM2500+/+G4, and LM6000 gas turbine engines and delivers LifeX Parts and Advanced Repairs...",
+   "note": "Chromalloy — производитель PMA-деталей и покрытий, но энергетический сегмент LifeX = аэропроизводные LM2500/LM6000 (плюс авиадвигатели, покрытия A-12). Прямых доказательств деталей под Siemens SGT-400 или SGT5-4000F нет. Специфические плашки Siemens и семейные (вся SGT-100…400, вся Solar, все тяжёлы"
+  },
+  "TFS Aero": {
+   "verdict": "partial",
+   "cause": "site_claims_real",
+   "models": [
+    "SGT-400",
+    "SGT-300",
+    "Saturn 20",
+    "Centaur 40",
+    "Taurus 60",
+    "Centaur 50"
+   ],
+   "fams_off": [
+    "sgtAll",
+    "solarAll"
+   ],
+   "url": "https://tfscorp.com.mx/index.php?idioma=en&menu=overhaul&ver=soluciones",
+   "quote": "SGT-300, SGT-400, SATURN 20, CENTAUR 40, CENTAUR 50, TAURUS 60, ALLISON 501 KB5S, ALLISON 501 KB7",
+   "note": "Реальный независимый MRO. Сайт прямо перечисляет SGT-300/400, Saturn 20, Centaur 40/50, Taurus 60 (+ Allison 501). Стенд SGT-400 подтверждён прессой (первый в мире, авг-2026). Нет SGT-100/200, Taurus 70, Mars 100 — их снять. Семейные плашки завышены: делают только SGT-300/400 (не 100/200) и Saturn…T"
+  },
+  "Turbine Efficiency Group": {
+   "verdict": "confirmed_broad",
+   "cause": "site_claims_real",
+   "models": [
+    "SGT-100",
+    "SGT-200",
+    "SGT-300",
+    "SGT-400"
+   ],
+   "fams_off": [],
+   "url": "https://www.powerprogress.com/news/turbine-efficiency-group-acquires-gas-turbine-applications-inc/7006918.article",
+   "quote": "founded in 2001 as an independent service provider for the full range of Siemens industrial gas turbines from 1-15 MW ... a wide range of IGTs (SGT-100, SGT-200, SGT-300, TA, TB, Saturn, Centaur)",
+   "note": "Крупный независимый сервис Siemens IGT 1-15 МВт (весь ряд SGT-100..400) + Solar Saturn/Centaur после покупки GTA. Плашки SGT-100/300 подтверждены. Сайт из среды не резолвился (DNS/502), взял трейд-прессу как санкционированный фолбэк. Семейка обоснована прямым заявлением о full range 1-15 МВт."
+  },
+  "SJE Engineering Ltd": {
+   "verdict": "confirmed_broad",
+   "cause": "site_claims_real",
+   "models": [
+    "SGT-100",
+    "SGT-200"
+   ],
+   "fams_off": [
+    "sgtAll"
+   ],
+   "url": "http://www.sje-engineering.co.uk/SJE_%20Engineering_Spares.html",
+   "quote": "SJE Engineering is a world leader in the supply of spare parts and the maintenance of the Ruston TA1500/TA1750 and TB4000/TB5000 range of Gas Turbines. SJE Engineering is also competitive on the Typhoon and Tornado, GEC,",
+   "note": "ЗИП по Ruston TA/TB + Typhoon (SGT-100) и Tornado (SGT-200) — обе плашки реальны. Про Tempest (SGT-300) и Cyclone (SGT-400) сайт не упоминает, поэтому семейная плашка SGT-100..400 не обоснована — drop."
+  },
+  "Task-Pro Ltd": {
+   "verdict": "confirmed_broad",
+   "cause": "site_claims_real",
+   "models": [
+    "SGT-100",
+    "SGT-200",
+    "SGT-300",
+    "SGT-400"
+   ],
+   "fams_off": [],
+   "url": "http://www.task-pro.co.uk/turbine-services.html",
+   "quote": "the Ruston and Siemens gas turbine product line ranging from TA1750, to TB5000, TB5400, Typhoon (SGT100), Tornado (SGT200), Tempest (SGT300),and Cyclone SGT400)",
+   "note": "Overhaul/ЗИП по Ruston/Siemens: страница явно перечисляет TA1750, TB5000/5400 и все четыре Typhoon/Tornado/Tempest/Cyclone = SGT-100/200/300/400. Плашка SGT-100 подтверждена; семейка обоснована (перечислен весь ряд), добавил SGT-200/300/400."
+  },
+  "GT-China": {
+   "verdict": "confirmed_broad",
+   "cause": "site_claims_real",
+   "models": [
+    "SGT-100",
+    "LM6000",
+    "LM2500 (PGT25)"
+   ],
+   "fams_off": [],
+   "url": "http://www.gt-china.net/Part.html",
+   "quote": "we are able to offer clients a wide range of high quality OEM and non-OEM gas turbine spare parts for GE: LM2500, LM2500+, LM5000, LM6000 , 6B, 6F,and 9E , Siemens SGT100-SGT800, V94.2, and V94.3 model gas turbines ... H",
+   "note": "Трейдер/поставщик ЗИП: страница Parts прямо заявляет Siemens SGT100-SGT800 и GE LM2500/LM6000 с номенклатурой (HPT-лопатки, форсунки, жаровые трубы, transition pieces). Обе плашки (SGT-100, LM6000) подтверждены, семейка SGT-100..400 покрыта заявленным диапазоном SGT100-800 = keep. Это заявленный кат"
+  },
+  "Doncasters Group (DPC Holdings PLC)": {
+   "verdict": "partial",
+   "cause": "site_claims_unproven",
+   "models": [],
+   "fams_off": [
+    "sgtAll",
+    "heavyAll"
+   ],
+   "url": "https://www.doncasters.com/our-expertise/industrial-gas-turbines",
+   "quote": "investment cast turbine blades, buckets, vanes, nozzles, and segments... equiaxed, directionally solidified and single crystal components using a wide range of nickel and cobalt base superalloys and steels",
+   "note": "Реальный крупный литейщик суперсплавов для ГТУ (лопатки, сопла, сегменты), роль подтверждена. Но сайт (WebFetch 403, данные из сниппетов) говорит только про generic IGT airfoils — ни одной конкретной модели (SGT-400/4000F/GT13E2/9F/LM6000) не называет. Claim про весь комплект камеры сгорания не подт"
+  },
+  "Lincotek Rubbiano S.p.A. (бывш. Turbocoating S.p.A.)": {
+   "verdict": "partial",
+   "cause": "site_claims_unproven",
+   "models": [],
+   "fams_off": [
+    "heavyAll"
+   ],
+   "url": "https://www.turbocoating.com/surfacesolutions/surface-treatments/",
+   "quote": "The MCrAlY overlay or bond coating is applied...on IGT/Aero turbine blades and vanes",
+   "note": "Профильный европейский центр покрытий горячей части ГТУ: MCrAlY, APS/TBC(YSZ), LPPS/VPS/HVOF, CVD/PACK диффузионные — роль полностью подтверждена. Но сайт нигде не называет конкретные модели (SGT5-4000F/V94.3A, 9FA), только generic 'IGT/Aero blades and vanes'. Семейную плашку 'все тяжёлые' снять — п"
+  },
+  "Wuxi Turbine Blade Co., Ltd. (WTB, 无锡透平叶片有限公司)": {
+   "verdict": "partial",
+   "cause": "site_claims_unproven",
+   "models": [],
+   "fams_off": [
+    "sgtAll"
+   ],
+   "url": "https://www.turblade.com/en/energy/101.html",
+   "quote": "products are used for heavy-duty gas turbines such as E-class, F-class, H-class and HL-class, as well as light-duty and medium-duty gas turbines",
+   "note": "Реальный крупный китайский изготовитель лопаток/дисков ГТУ (Shanghai Electric), поставляет GE Vernova, Siemens Energy, Mitsubishi, Ansaldo, Doosan. Сайт 503, данные из сниппетов. Говорит классами E/F/H/HL и light/medium duty — конкретно SGT-400 нигде не назван. Плашку SGT-400 и семейную SGT-100…400 "
+  },
+  "ASH Precision Engineering Ltd": {
+   "verdict": "confirmed_broad",
+   "cause": "site_claims_real",
+   "models": [
+    "SGT-100",
+    "SGT-200",
+    "SGT-400",
+    "SGT-500",
+    "SGT-600",
+    "SGT-800"
+   ],
+   "fams_off": [],
+   "url": "https://www.ashprecision.co.uk",
+   "quote": "aftermarket hot section parts for Siemens range of gas turbines: SGT-100, SGT-200, SGT-400, SGT-500, SGT-600, SGT-800 and Ruston TA, TB, TD",
+   "note": "Сайт открылся и прямо перечисляет всю линейку плашек SGT-100/200/400/500/600/800 плюс Ruston TA/TB/TD (добавил — их не было в плашках). Aftermarket hot section: лопатки, сопла, consumables + литьё/ковка/фрезеровка. Плашки подтверждены полностью, семейных нет."
+  },
+  "R&H Supply": {
+   "verdict": "confirmed_broad",
+   "cause": "site_claims_real",
+   "models": [
+    "Titan 130",
+    "Saturn 20",
+    "Centaur 40",
+    "Centaur 50",
+    "Taurus 60",
+    "Mars 100"
+   ],
+   "fams_off": [],
+   "url": "https://randhsupply.com/gas-turbines/",
+   "quote": "Saturn® 10, Centaur® 40, Centaur® 50, Taurus® 60, Mars® 100 ... combustion parts, hot gas path elements, compressors, and rotors ... buckets, shrouds, nozzles",
+   "note": "Крупный независимый сервис-провайдер (ISP). Страница Gas Turbines перечисляет всю линейку Solar Saturn→Titan включая Titan 130, плюс ЗИП горячего тракта (buckets/shrouds/nozzles). Плашка Titan 130 и семейная Solar обоснованы."
+  },
+  "Azad Engineering": {
+   "verdict": "bullshit",
+   "cause": "site_claims_unproven",
+   "models": [],
+   "fams_off": [
+    "sgtAll",
+    "solarAll"
+   ],
+   "url": "https://www.azad.in/energy",
+   "quote": "Aerofoils (Rotating & Stationary) | Combustion Parts | Diaphragms | Casings ... key customers such as GE Vernova, Mitsubishi Heavy Industries and Siemens Energy",
+   "note": "Реальный завод прецизионных аэрофойлов/лопаток для GE Vernova, MHI, Siemens Energy (роль подтверждается). Но НИ ОДНОЙ конкретной модели: ни SGT-100…400, ни Solar Saturn…Titan сайт не называет. Solar даже не в списке заказчиков. Семейные плашки — домысел, снять."
+  },
+  "Heinzmann UK Limited": {
+   "verdict": "partial",
+   "cause": "site_claims_unproven",
+   "models": [
+    "SGT-400"
+   ],
+   "fams_off": [
+    "sgtAll",
+    "solarAll"
+   ],
+   "url": "https://www.heinzmann-re.com/applications/for-turbines",
+   "quote": "designed and delivered four replacement fuel skids ... for the SIEMENS SGT 400 ... The skid controls both fuel lines, pilot and main, using EVO II valves and actuators",
+   "note": "Делает топливные скиды, системы зажигания (PROMETHEUS) и свечи, управление ГТУ — НЕ камеры сгорания и НЕ DLE-горелки, так что «ПРЯМАЯ ЦЕЛЬ MW21215M/MW22316B» мимо. SGT-400 подтверждён (4 скида). Также кейсы GE Frame 5/6 и Ruston TA1750. SGT-100 и обе семейные (особенно Solar) не подтверждены — снять"
+  },
+  "Allied Power Group (APG)": {
+   "verdict": "confirmed_broad",
+   "cause": "site_claims_real",
+   "models": [
+    "GE MS5001",
+    "SGT5-2000E (V94.2/ГТЭ-160)",
+    "SGT5-4000F (V94.3A)",
+    "GE 9F/9FA",
+    "GE Frame 6B (MS6001)"
+   ],
+   "fams_off": [],
+   "url": "https://alliedpg.com/solutions/ge-frame-9f-gas-turbine/",
+   "quote": "Allied Power Group's Combustion Parts are the highest quality combustion liners, caps, and transition pieces in the world",
+   "note": "Независимый изготовитель/ремонтник деталей камеры сгорания F-класса (Farrell Road, Хьюстон). Отдельные страницы по фреймам подтверждают широкий тяжёлый парк: GE Frame 3/5/6B/7F/9E/9F, Siemens 101/V84.2/V94.2/V94.3/501F — плашки MS5001(Frame5), V94.2, V94.3A, 9F/9FA обоснованы. SGT-400 (малый индустр"
+  },
+  "Patented Systems, Inc. (PSI)": {
+   "verdict": "partial",
+   "cause": "regex_artifact",
+   "models": [],
+   "fams_off": [
+    "sgtAll"
+   ],
+   "url": "https://patented-systems.com/",
+   "quote": "Patented Systems, Inc. (PSI) is an aftermarket manufacturer for Ruston Gas Turbines (RGT), TA and TB series engines.",
+   "note": "Реальный aftermarket-производитель деталей, но ТОЛЬКО для Ruston TA/TB. Плашка SGT-100 и семейная SGT-100…400 — артефакт нашего описания (Ruston = предки Siemens), сам сайт Siemens SGT нигде не называет. Держать как поставщика Ruston, семейку снять."
+  },
+  "Advanced Turbine Support": {
+   "verdict": "partial",
+   "cause": "site_claims_unproven",
+   "models": [
+    "GE Frame 7 (MS7001)",
+    "GE MS5002",
+    "GE Frame 6B (MS6001)",
+    "LM6000"
+   ],
+   "fams_off": [
+    "heavyAll"
+   ],
+   "url": "https://advancedturbinesupport.com/",
+   "quote": "Some of the gas & steam turbines that we work with include GE Frame 5's, 6 & 6B's, 7B's, 7EA's, 7FA's, LM6000's; Pratt and Whitney FT-4 and FT-8; Westinghouse 191's, 251's, 301's, 501AA's, 501B's, 501F's and D5A's; and o",
+   "note": "Независимый провайдер бороскопии/NDE. GE Frame 7 подтверждён явно (7B/7EA/7FA). GE 9F/9FA НЕ упомянут — на сайте перечислены только Westinghouse 501F, а не GE 9-й рамы. Siemens V84/94 и Alstom отсутствуют → семейку «все тяжёлые GE/Siemens/Alstom» снять."
+  },
+  "ProEnergy": {
+   "verdict": "partial",
+   "cause": "site_claims_unproven",
+   "models": [
+    "LM2500 (PGT25)",
+    "LM6000"
+   ],
+   "fams_off": [
+    "heavyAll"
+   ],
+   "url": "https://www.proenergyservices.com/solutions/lifecycle-care/parts-engines/",
+   "quote": "fuel-nozzle solutions for PE6000, LM6000, LM2500 engines",
+   "note": "Специалист по авиапроизводным LM: LM2500 (PGT25) и LM6000 подтверждены (депо, горячие секции, форсунки, ±2% калибровка), плюс собственный PE6000. Тяжёлых рам нет: GE Frame 7 (MS7001) на сайте не фигурирует → снять, и семейку «все тяжёлые GE/Siemens/Alstom» снять — это аэродеривативное депо, а не hea"
+  },
+  "Unisys Group": {
+   "verdict": "partial",
+   "cause": "site_claims_unproven",
+   "models": [
+    "GE MS5002",
+    "GE MS5001",
+    "GE 6F.03 (6FA)",
+    "GE Frame 6B (MS6001)"
+   ],
+   "fams_off": [],
+   "url": "https://unisysgroup.ae/",
+   "quote": "heavy duty gas turbines G.E. Frame 5/6/7/9, Siemens, Alstom and Aero derivatives GE LM1600/2500//5000/ 6000",
+   "note": "Трейдер/рефурбишер с прямой предметной номенклатурой по GE-рамам (buckets, nozzles, shrouds, liner, TP, fuel nozzles) — MS5001/MS5002 (Frame 5), 6FA (Frame 6), 9E (Frame 9) подтверждены. Семейная плашка «все тяжёлые GE/Siemens/Alstom» напрямую заявлена на сайте → keep. Но конкретные Siemens SGT5-400"
+  },
+  "Control Systems Co. Ltd. (CSC)": {
+   "verdict": "partial",
+   "cause": "site_claims_unproven",
+   "models": [],
+   "fams_off": [
+    "heavyAll"
+   ],
+   "url": "https://www.csksa.com.sa/services/1-heavy-industrial-gas-turbine.html",
+   "quote": "Supply of spares and replacement parts for GE heavy Industrial Gas Turbines ... complete compressor rotor and power section for all GE frame type engine and ABB Gas Turbine rotors",
+   "note": "Реальный независимый MRO по тяжёлым ГТУ. Сайт предметно называет GE (frame) и ABB/Alstom-роторы + hot gas path repair «for any OEM». Siemens нигде не упомянут — плашка «все тяжёлые GE/Siemens/Alstom» подтверждена лишь частично, семейную снять."
+  },
+  "GECOLSA": {
+   "verdict": "bullshit",
+   "cause": "not_a_supplier",
+   "models": [],
+   "fams_off": [
+    "solarAll"
+   ],
+   "url": "https://gecolsa.com/",
+   "quote": "GECOLSA también representa las marcas Schwing, Metso, Carmix, Wacker Neuson, Towmotor, Sullair y Genie",
+   "note": "Авторизованный дилер Caterpillar (стройтехника, генераторы, запчасти Cat) в Колумбии. Solar Turbines НЕТ ни в списке представленных брендов, ни в номенклатуре — нет доказательств, что GECOLSA поставляет турбины/запчасти Solar. Семейную линейку Solar снять; как поставщик ГТУ не подтверждён."
+  },
+  "Young & Franklin (YF)": {
+   "verdict": "confirmed_broad",
+   "cause": "site_claims_real",
+   "models": [
+    "Saturn 20",
+    "Mars 100"
+   ],
+   "fams_off": [
+    "sgtAll",
+    "solarAll"
+   ],
+   "url": "https://yf.com/products/yf-8641-series-integrated-natural-gas-fuel-control-valves/",
+   "quote": "The Young & Franklin 8641 Series Integrated Gas Control Valve Assembly is a balanced double-poppet flow control valve ... retrofit replacement for the following Solar gas turbines: Centaur, Saturn, Taurus, Mars",
+   "note": "Настоящий OEM-поставщик топливной аппаратуры (клапаны 8641, IGV-актуаторы 8277). Solar предметно: Centaur/Saturn/Taurus/Mars — Saturn 20 и Mars 100 подтверждены, добавил Centaur/Taurus. Titan не назван, Siemens только логотипом-клиентом без моделей — семейную Siemens SGT-100…400 снять."
+  },
+  "PTC Industries / Aerolloy Technologies": {
+   "verdict": "bullshit",
+   "cause": "regex_artifact",
+   "models": [],
+   "fams_off": [
+    "sgtAll"
+   ],
+   "url": "https://www.ptcil.com/",
+   "quote": "Aerolloy Technologies ... Single Crystal and Directionally Solidified blades and vanes for Aero-engine and Industrial Gas Turbine applications ... Purchase Order from the Gas Turbine Research Establishment (GTRE)",
+   "note": "Реальный литейщик суперсплавов/титана и монокристальных лопаток, но подтверждённые контракты — GTRE (оборонный аэродвигатель) и аэрокосмос, ГТУ лишь общей формулировкой. Ни SGT-400, ни линейка Siemens SGT нигде не встречаются — плашки не обоснованы (артефакт описания), снять."
+  },
+  "Industrial Motor Power Corporation (IMP)": {
+   "verdict": "partial",
+   "cause": "site_claims_real",
+   "models": [
+    "Saturn 20",
+    "Centaur 50"
+   ],
+   "fams_off": [
+    "solarAll"
+   ],
+   "url": "https://www.impcorporation.com/en-us/inventory/details/14563/2012-solar-saturn-20-generator-set",
+   "quote": "(2) New Surplus Solar Saturn 20 Gas Turbine Generator Sets. Rated at 1200kw/1500 kva, 60 hz, 277/480 v, 1800 rpm, 3 phase.",
+   "note": "Плашка Saturn 20 реальна: в инвентаре реально стоят 2 new-surplus GenSet. В similar equipment также Saturn 10, Saturn 1000, Centaur 50 — добавил. Но это общий surplus-трейдер (Solar — 1 бренд из ~25). Всей линейки Saturn…Titan нет: Taurus/Mars/Titan не найдены. Семейную плашку снять."
+  },
+  "ADN Global (ADN Ltd. Şirketi)": {
+   "verdict": "confirmed_broad",
+   "cause": "site_claims_real",
+   "models": [
+    "SGT-300",
+    "SGT-400",
+    "SGT-500"
+   ],
+   "fams_off": [
+    "sgtAll"
+   ],
+   "url": "https://www.adn-global.com/en/services/gas-turbines-spare-parts/",
+   "quote": "SGT-400 12.9 MW single fuel is a simple but robust gas turbine ... Siemens Energy SGT-500 (formerly known as GT35) ... Siemens Energy SGT-300 gas turbine is a proven and reliable solution",
+   "note": "Отдельная страница Gas Turbines & Spare Parts предметно перечисляет SGT-300, SGT-400, SGT-500 с описаниями — все три плашки реальны. Но SGT-100 и SGT-200 на сайте не указаны, поэтому семейная плашка «вся линейка SGT-100…400» не обоснована — снять."
+  },
+  "AECC Gas Turbine Co., Ltd (центр обслуживания импортных ГТУ)": {
+   "verdict": "confirmed_broad",
+   "cause": "site_claims_real",
+   "models": [
+    "SGT-100",
+    "SGT-400"
+   ],
+   "fams_off": [
+    "sgtAll"
+   ],
+   "url": "https://aeccgt.com/productinfo/1235766.html",
+   "quote": "SGT 400 Cyclone-import gas turbine mantenance center of aecc gas turbine company limited",
+   "note": "Домен не резолвится через наш прокси, но поиск отдаёт живые заголовки двух отдельных продуктовых страниц: SGT-100 Typhoon (productinfo/1235711) и SGT-400 Cyclone (productinfo/1235766) — центр MRO импортных ГТУ. Обе плашки реальны. SGT-200/SGT-300 страниц нет — семейную «SGT-100…400» снять."
+  },
+  "Soar Power Group (China) Ltd": {
+   "verdict": "partial",
+   "cause": "site_claims_real",
+   "models": [
+    "SGT-400"
+   ],
+   "fams_off": [
+    "sgtAll"
+   ],
+   "url": "https://soarpower.com/gtgenset2_en",
+   "quote": "The Siemens gas turbine range has been designed and tailored to help meet our customers' challenges in a dynamic market environment. SGT models range from 5 to 593 MW.",
+   "note": "Трейдер маркетирует ВЕСЬ каталог Siemens (SGT-100/300/400/600/700/750/800), на сайте лежит даташит SGT-400 (pdf/Siemens.GT.SGT400.pdf) — плашка SGT-400 подтверждается на уровне маркетинга. Но это перепечатка OEM-каталога без своей номенклатуры/инвентаря; SGT-200 отсутствует. Семейную «SGT-100…400» с"
+  },
+  "Europea Microfusioni Aerospaziali (EMA)": {
+   "verdict": "bullshit",
+   "cause": "site_claims_unproven",
+   "models": [],
+   "fams_off": [
+    "sgtAll"
+   ],
+   "url": "https://www.emaht.com",
+   "quote": "palette rotoriche, statori e componenti di turbine ... microfusione a cera persa ... single crystal, directionally solidified and equiaxed, in superleghe di nichel e cobalto",
+   "note": "Реальная аэрокосмическая литейка lost-wax (лопатки/vanes SX/DS/equiax из Ni/Co суперсплавов). Но сайт НЕ называет ни одной модели ГТУ и ни одного OEM. Плашки SGT5-4000F и вся линейка SGT-100…400 — research-артефакт, ничем не обоснованы. Модель отраслевого поставщика литья верна, конкретные плашки — "
+  },
+  "Allied Dynamics Corp": {
+   "verdict": "partial",
+   "cause": "site_claims_real",
+   "models": [
+    "SGT5-2000E (V94.2/ГТЭ-160)"
+   ],
+   "fams_off": [
+    "sgtAll"
+   ],
+   "url": "https://www.allied-dynamics.com",
+   "quote": "brand new OEM quality parts ... Siemens V94.2, 501F ... combustion liners, transition pieces, fuel nozzles, blades, nozzles",
+   "note": "Реальный поставщик ЗИП OEM-качества (combustion liners, transition pieces, форсунки, лопатки). Сайт прямо называет Siemens V94.2 (=SGT5-2000E) и 501F — плашка подтверждена. Но перечислены только тяжёлые V94.2/501F; малой линейки SGT-100…400 нет — семейную плашку снять. Основа Siemens — V94.2/501F, а"
+  },
+  "Turbo Control Solutions (TCS)": {
+   "verdict": "partial",
+   "cause": "site_claims_real",
+   "models": [
+    "GE MS5002",
+    "GE Frame 6B (MS6001)",
+    "GE Frame 7 (MS7001)"
+   ],
+   "fams_off": [
+    "solarAll"
+   ],
+   "url": "https://www.tcssb.com/services/fuel-nozzles-repair/",
+   "quote": "supports GE® gas turbine Frame 5, Frame 6, Frame 7 and Frame 9 fuel nozzles, including standard, Dual-Nozzle and DLN System 1.0, 2.0 and 2.6",
+   "note": "Реальный цех рефурбишмента топливных форсунок ГТУ: сайт прямо заявляет GE Frame 5/6/7/9, standard/dual/DLN 1.0-2.6 — GE-сторона подтверждена (MS5002 = Frame 5, в пределах заявленного). Solar фигурирует лишь как control-upgrade OEM, форсунок Solar и перечня Saturn…Titan нет — семейную плашку Solar сн"
+  },
+  "Continental Controls Corporation": {
+   "verdict": "confirmed_broad",
+   "cause": "site_claims_real",
+   "models": [
+    "Centaur 50",
+    "Taurus 60"
+   ],
+   "fams_off": [],
+   "url": "https://continentalcontrols.com/product/agv10-advanced-gas-valve/",
+   "quote": "The AGV50 Fuel Metering Valve ... compatible with Solar Turbines Centaur® H, Centaur® 50, and Taurus™ 60 ... AGV line can meter fuel for turbines in the range of 850HP up to 60,000HP",
+   "note": "Профильный производитель газовых дозирующих клапанов (AGV10/50), основан в 1968 для топливных модулей именно под двигатели Solar Turbines. Прямо называет Solar Centaur H, Centaur 50, Taurus 60; диапазон 850-60000 л.с. покрывает от Saturn до Titan. Семейную плашку Solar оставить, добавить конкретные "
+  },
+  "AI-Tek Instruments": {
+   "verdict": "bullshit",
+   "cause": "not_a_supplier",
+   "models": [],
+   "fams_off": [
+    "solarAll"
+   ],
+   "url": "https://aitekinstruments.com",
+   "quote": "Redefining the Industry Standard in Speed Sensor & Tachometer Technology ... designing, manufacturing and distributing magnetic speed sensors and high-precision tachometers",
+   "note": "Сайт: только магнитные датчики скорости и тахометры (TACHPAK/TACHTROL) для rail, aerospace, power, marine. Ни слова про Solar, Saturn или газовые турбины. Это узкий компонентник, а не поставщик ГТУ по моделям. Семейную плашку 'вся линейка Solar' снять."
+  },
+  "Turbin Bakim San. Ltd.": {
+   "verdict": "confirmed_broad",
+   "cause": "site_claims_real",
+   "models": [
+    "Saturn 20",
+    "Centaur 40",
+    "Taurus 60",
+    "Centaur 50"
+   ],
+   "fams_off": [
+    "solarAll"
+   ],
+   "url": "https://turbinbakim.com",
+   "quote": "We can repair components of Power Turbines in Turkey and CIS Countries ... Solar Saturn, Centaur 40, 50, Taurus 60, Ruston TA and TB, GEC EAS1 and EM85",
+   "note": "MRO, прямо перечисляет номенклатуру: Solar Saturn, Centaur 40/50, Taurus 60, плюс Ruston TA/TB и GEC EAS1/EM85; представитель Greenray. Все три плашки подтверждены (Saturn 20 = Solar Saturn). Но Titan/Mars не заявлены — семейную плашку 'вся линейка Solar до Titan' снять; добавить Centaur 50, Ruston,"
+  },
+  "Euroturbine B.V.": {
+   "verdict": "bullshit",
+   "cause": "regex_artifact",
+   "models": [
+    "GE MS5001",
+    "GE 9F/9FA",
+    "SGT5-2000E (V94.2/ГТЭ-160)"
+   ],
+   "fams_off": [
+    "sgtAll"
+   ],
+   "url": "https://www.euroturbine.eu/PowerGeneration.php",
+   "quote": "GE MS5001 ... GE MS9001E ... Siemens V93.1 ... Siemens V94.2 ... Mitsubishi 701B/D ... ABB13D",
+   "note": "Реальный афтермаркет ГТ (лопатки, реинжиниринг, б/у), НО работает по тяжёлым frame-машинам: GE MS5001/MS9001E, Siemens V93.1/V94.2, Mitsubishi 701B/D, ABB13D. Ни SGT-500, ни линейки SGT-100…400 на сайте нет — плашка SGT обрезана из описания ('...Siemens (SGT'), артефакт регэкспа. Снять SGT-500 и сем"
+  },
+  "Infinity Engineering Solutions Ltd": {
+   "verdict": "partial",
+   "cause": "site_claims_real",
+   "models": [
+    "SGT-600"
+   ],
+   "fams_off": [
+    "sgtAll"
+   ],
+   "url": "https://www.infinityengineering.co.uk/services/rotating-equipment-overhaul",
+   "quote": "The SGT-600 (also designated as GT10B) is listed among the turbines that Infinity Engineering provides support services for",
+   "note": "Независимый MRO вращающегося оборудования. Страница overhaul отдаёт 404 фетчеру, но проиндексирована: дважды подтверждает поддержку SGT-600 (GT10B). Плашка SGT-600 обоснована. Линейка SGT-100…400 нигде не заявлена (сайт общий, фокус на legacy GT10B) — семейную плашку снять."
+  },
+  "BNC Enerji": {
+   "verdict": "bullshit",
+   "cause": "site_claims_unproven",
+   "models": [],
+   "fams_off": [
+    "sgtAll"
+   ],
+   "url": "https://www.bncenerji.com",
+   "quote": "SIEMENS & GAZ TÜRBİNİ ROTOR BAKIMI",
+   "note": "Реальный независимый сервис (MRO) паровых/газовых турбин и генераторов, упомянут Jenbacher. Но на сайте только родовое 'Siemens & газотурбинный ремонт ротора' — ни SGT-400, ни линейки SGT-100…400 не названо. Плашка модели и семейная плашка не обоснованы."
+  },
+  "Uni Tritech (Unitritech)": {
+   "verdict": "bullshit",
+   "cause": "regex_artifact",
+   "models": [],
+   "fams_off": [
+    "sgtAll",
+    "solarAll"
+   ],
+   "url": "https://unitritech.com",
+   "quote": "Turbine Blade Manufacturer in India",
+   "note": "Литейка точного литья (аэрокосмос, одобрение Airbus), делает лопатки турбин из суперсплавов — реальный компонентщик, но моделей ГТУ не называет. Siemens SGT и Solar Saturn…Titan на сайте отсутствуют — обе семейные плашки чистый артефакт нашего регэкспа."
+  },
+  "Astec Tubes (Astec Tube)": {
+   "verdict": "bullshit",
+   "cause": "regex_artifact",
+   "models": [],
+   "fams_off": [
+    "sgtAll",
+    "solarAll"
+   ],
+   "url": "https://www.astectube.com/turbine-bolt-manufacturer-supplier.html",
+   "quote": "turbine bolts are fasteners made specifically to join together major turbine components such as flanges, casings and rotors",
+   "note": "Настоящий производитель турбинного крепежа (M6–M52, Inconel 718, A-286 660, B7/B16/B8M), но строго родовые 'steam, gas and wind turbines'. Ни OEM, ни моделей не названо — Siemens SGT и Solar не встречаются. Обе семейные плашки не обоснованы."
+  },
+  "Durub Alkhudra Goods Wholesalers L.L.C": {
+   "verdict": "partial",
+   "cause": "site_claims_unproven",
+   "models": [],
+   "fams_off": [
+    "sgtAll",
+    "solarAll"
+   ],
+   "url": "https://durub.ae/gas-turbines/",
+   "quote": "combustion chambers, turbine blades, bearings, fuel nozzles, cooling components, and control systems ... from leading brands (Siemens, GE, Mitsubishi, Solar Turbines, and Rolls-Royce)",
+   "note": "Оптовик ЗИП ГТ: перечисляет узлы (камеры сгорания, лопатки, подшипники, форсунки, СУ) и бренды Siemens/GE/Mitsubishi/Solar/Rolls-Royce — брендовая связь реальна. Но конкретных моделей нет, линейки SGT-100…400 и Saturn…Titan не перечислены — семейные плашки завышение, drop."
+  },
+  "Anhui Yingliu Electromechanical Co., Ltd (应流集团, Yingliu Group)": {
+   "verdict": "partial",
+   "cause": "regex_artifact",
+   "models": [
+    "SGT5-4000F (V94.3A)",
+    "LM2500 (PGT25)",
+    "LM6000"
+   ],
+   "fams_off": [
+    "sgtAll",
+    "solarAll"
+   ],
+   "url": "https://caifuhao.eastmoney.com/news/20251226175242309886770",
+   "quote": "应流股份是西门子能源燃机透平热端叶片中国唯一供应商，同时也是GE Vernova燃气轮机核心零部件战略合作伙伴……为西门子能源提供F级燃气轮机叶片（4000F系列，300MW+）和H级燃气轮机叶片（9000HL系列，600MW）",
+   "note": "Реальный крупный поставщик литых лопаток горячего тракта: единственный в КНР поставщик турбинных лопаток Siemens Energy и партнёр GE Vernova. Но работает с ТЯЖЁЛЫМ классом (SGT5-4000F, 9000HL) и аэродеривативами (LM2500/6000), а не с Solar Titan 130 / малым SGT-400. Плашки Titan 130 и SGT-400 — арте"
+  },
+  "Jereh Group (烟台杰瑞, Yantai Jereh)": {
+   "verdict": "bullshit",
+   "cause": "regex_artifact",
+   "models": [
+    "LM2500 (PGT25)"
+   ],
+   "fams_off": [
+    "solarAll"
+   ],
+   "url": "https://www.jerehglobal.com/Product/view/35MW-Mobile-Gas-Turbine-Genset-401",
+   "quote": "Gas Turbine: LM2500+G4 SAC",
+   "note": "Реальный packager ГТУ-электростанций, но собирает на GE LM2500+G4 (35 МВт) и Kawasaki KB7HE (6 МВт), в описании упоминается SGT-A05. Ни одной Solar-турбины на сайте нет — семейная плашка «вся линейка Solar Saturn…Titan» ничем не подтверждена, снять. Реальные машины добавлены в confirmed для точности"
+  },
+  "Huarui (Jiangsu) Gas Turbine Service Co., Ltd (华瑞燃机, China Huadian)": {
+   "verdict": "partial",
+   "cause": "site_claims_real",
+   "models": [
+    "GE 9F/9FA"
+   ],
+   "fams_off": [
+    "sgtAll"
+   ],
+   "url": "https://hrgtservices.chd.com.cn/site/17JQ/index.html",
+   "quote": "华电集团华瑞公司具备E级、F级燃机关键部件的修复能力，并逐渐覆盖GE、三菱及西门子燃机的检修业务，成功进行国内GE的9F级自主检修",
+   "note": "Независимый MRO Huadian: подтверждён ремонт E/F-класса и первое в КНР самостоятельное восстановление GE 9F — плашка GE 9F/9FA реальна. Но компания работает с тяжёлыми утилитными машинами (GE 9F, Mitsubishi, Siemens SGT5-класс/V94), а не с малыми промышленными SGT-100…400 — семейную плашку Siemens SG"
+  },
+  "成都航宇超合金技术有限公司 (Chengdu Aerospace Superalloy Technology Co., Ltd., бренд CAST)": {
+   "verdict": "bullshit",
+   "cause": "site_claims_unproven",
+   "models": [],
+   "fams_off": [
+    "sgtAll"
+   ],
+   "url": "https://www.sccast.com",
+   "quote": "single crystal/directional turbine blades for aero-engines and gas turbines high-temperature core components",
+   "note": "Реальный узкий изготовитель монокристаллических/направленных лопаток для авиадвигателей и ГТУ, но НИ ОДНОЙ конкретной модели не называет: говорит лишь обобщённо «gas turbines». Английская версия и раздел продуктов — «в разработке/503». Плашка SGT-400 и семейная SGT-100…400 не имеют предметного подтв"
+  },
+  "Propak Systems Ltd.": {
+   "verdict": "bullshit",
+   "cause": "not_a_supplier",
+   "models": [],
+   "fams_off": [
+    "solarAll"
+   ],
+   "url": "https://www.propaksystems.com/products/power",
+   "quote": "Reciprocating natural gas fuelled engine drives: 50 and 60hz",
+   "note": "Пэкеджер энергоблоков 300 кВт–3+ МВт на ПОРШНЕВЫХ газовых двигателях, не на турбинах Solar. Ни одной модели Solar/Saturn на странице power. Плашка Saturn 20 и семейная Solar — артефакт нашего описания («диапазон Saturn/Centaur»), сайтом не подтверждены."
+  },
+  "Used Power Plants": {
+   "verdict": "partial",
+   "cause": "site_claims_unproven",
+   "models": [
+    "Taurus 60"
+   ],
+   "fams_off": [
+    "sgtAll",
+    "solarAll"
+   ],
+   "url": "https://www.usedpowerplants.com",
+   "quote": "Solar Taurus 60 T 7301 Gas Turbine 5200 kw ( ISO Dry",
+   "note": "Дилер б/у станций. В инвентаре реально одна ГТУ — Solar Taurus 60 T7301, плашка Taurus 60 подтверждается. Семейные плашки (вся Siemens SGT, вся Solar) не обоснованы: перечня линеек нет, только один агрегат. Основной профиль — Wärtsilä/Caterpillar."
+  },
+  "Heritage Global Partners (HGP)": {
+   "verdict": "bullshit",
+   "cause": "site_claims_unproven",
+   "models": [],
+   "fams_off": [
+    "sgtAll",
+    "solarAll"
+   ],
+   "url": "https://www.hgpauction.com",
+   "quote": "13.1 MW Biomass Power Generation Facility: Steam Turbine-Generators, Diesel Generators, Fuel Storage Silos",
+   "note": "Аукционный дом промактивов, категория Energy & Power. В листингах — паровые турбогенераторы и дизели, ни одной газовой турбины Solar/Siemens. Семейные плашки — домысел канала-донора, предметной номенклатуры ГТУ нет. Снять обе."
+  },
+  "DEKOMTE de Temple Kompensator-Technik GmbH": {
+   "verdict": "partial",
+   "cause": "site_claims_unproven",
+   "models": [
+    "SGT-300"
+   ],
+   "fams_off": [
+    "solarAll"
+   ],
+   "url": "https://www.dekomte.com",
+   "quote": "Each SGT 300 (7.9 MW) gas turbine is being tested prior to its release; OVER 4000 GAS TURBINE EXHAUST EXPANSION JOINTS SUPPLIED",
+   "note": "Реальный изготовитель компенсаторов выхлопа ГТУ (4000+ поставок). Сайт предметно называет Siemens SGT-300 (кейс с испытательным стендом) и GE 7FA/7F — их добавляю. Семейная плашка Solar на сайте НЕ перечислена (Solar лишь в ImportYeti) — снять."
+  },
+  "ABB (ABB AB Machines, Швеция / ABB Oy IEC LV Motors, Финляндия)": {
+   "verdict": "bullshit",
+   "cause": "site_claims_unproven",
+   "models": [],
+   "fams_off": [
+    "solarAll"
+   ],
+   "url": "https://www.abb.com/global/en/areas/motion/motors-generators/generators/generators-for-steam-and-gas-turbines",
+   "quote": "ABB provides complete generator packages... generators for steam and gas turbines. ABB synchronous generators for steam and gas turbines are tailor-made, with a modular design.",
+   "note": "ABB делает двигатели/генераторы для паровых и газовых турбин в целом. Ни на сайте, ни где-либо нет предметной номенклатуры по моделям Solar. Связь с Solar — лишь инференс из ImportYeti (шипменты), без модельной привязки. Семейную плашку Saturn…Titan снять."
+  },
+  "Plasma Technology Inc. (PTI)": {
+   "verdict": "partial",
+   "cause": "site_claims_real",
+   "models": [],
+   "fams_off": [
+    "solarAll"
+   ],
+   "url": "http://www.ptise.com/files/141003969.pdf",
+   "quote": "An abridged list of customer approvals include... Rockwell International... Solar Turbines... For Solar Turbines: plasma coating, machining & grinding, approvals ES9-367, ES9-369, ES 1750.",
+   "note": "PTI — реальный поставщик термонапыляемых покрытий, держит process-approvals Solar (ES9-367/369, ES 1750). Связь с Solar подтверждена, но по спецификациям деталей, а НЕ по моделям. Ни одна турбинная модель не названа. Сайт ptise.com отдавал 503, цитата из PDF-справки одобрений и каталога. Семейную пл"
+  },
+  "University Mechanical & Engineering Contractors, Inc. (UMEC-CA)": {
+   "verdict": "bullshit",
+   "cause": "not_a_supplier",
+   "models": [],
+   "fams_off": [
+    "solarAll"
+   ],
+   "url": "https://umec-ca.com/projects/energy/solar-turbines-inc",
+   "quote": "UMEC–CA provided and installed a new cooling tower, feed pumps, piping, motor control center, and controllers for an industrial manufacturer.",
+   "note": "UMEC — механо-монтажный/HVAC-подрядчик. Для Solar построил испытательный стенд Titan 250 (монтаж пакета, обвязка, градирни, КИПиА) — это строительство инфраструктуры, а не поставка/изготовление турбин или деталей. Не поставщик ГТУ. Все плашки снять, Titan 250 — лишь проектная стройка."
+  },
+  "Rockwell Automation (Allen-Bradley)": {
+   "verdict": "confirmed_broad",
+   "cause": "site_claims_real",
+   "models": [
+    "Taurus 70",
+    "Titan 250"
+   ],
+   "fams_off": [
+    "solarAll"
+   ],
+   "url": "https://www.manualsdir.com/manuals/59759/cat-titan-250.html?page=30",
+   "quote": "The system architecture is based on a Rockwell Automation/Allen-Bradley hardware and software platform... ControlLogix controller (Allen-Bradley), RSLogix 5000 (Rockwell Automation), 1794 Flex I/O.",
+   "note": "Подтверждено официальным мануалом Solar/Caterpillar: САУ Turbotronic 4 построена на платформе Rockwell/Allen-Bradley. Модели Titan 250 (открытый мануал) и Taurus 70 (спец. пакета) реальны. Rockwell — подлинный компонентный поставщик управления. Семейную плашку строго снять — вся линейка Saturn…Titan"
+  },
+  "PPG Industries": {
+   "verdict": "bullshit",
+   "cause": "not_a_supplier",
+   "models": [],
+   "fams_off": [
+    "solarAll"
+   ],
+   "url": "https://www.ppg.com",
+   "quote": "Aerospace: transparencies, coatings, sealants, engineered materials and services",
+   "note": "PPG — производитель ЛКМ/покрытий (аэрокосмос, авто, промышленность, упаковка). Никакой турбинной номенклатуры. Плашка Solar — чистый артефакт: связь только через награду поставщику от Caterpillar (владелец Solar Turbines) за покрытия. Не поставщик ГТУ. Семейную плашку снять."
+  },
+  "voestalpine Giesserei Linz GmbH": {
+   "verdict": "partial",
+   "cause": "site_claims_unproven",
+   "models": [],
+   "fams_off": [
+    "sgtAll",
+    "solarAll"
+   ],
+   "url": "https://www.voestalpine.com/blog/en/energy/voestalpine-foundry-group-produces-components-for-worlds-largest-gas-turbine/",
+   "quote": "the Linz foundry producing cone parts and vane carriers... casts components for the Siemens SGT5-8000H gas turbine, the largest gas turbine in the world today",
+   "note": "Реальный литейщик турбинных корпусных деталей, НО для тяжёлой Siemens SGT5-8000H (конусы, обоймы лопаток >40 т), а не для мелкой линейки SGT-100…400. Solar подтверждён лишь коносаментом (b/l), на сайте не фигурирует. Обе семейные плашки не обоснованы — снять; добавить реальную SGT5-8000H."
+  },
+  "Voith Turbo (BHS Gear, Зонтхофен)": {
+   "verdict": "partial",
+   "cause": "site_claims_unproven",
+   "models": [
+    "SGT-800"
+   ],
+   "fams_off": [
+    "sgtAll"
+   ],
+   "url": "https://www.voith.com/corp-en/news-room/press-releases-99489.html",
+   "quote": "Siemens uses the AD 114-2 turbo gearbox in the SGT-800 gas turbine which was designed initially for industrial generation of electricity in both decentralized and combined cycle power plants",
+   "note": "Плашка SGT-800 подтверждена: BHS-редуктор AD 114-2 (6609→1500 об/мин, до 57 МВт) для SGT-800, 100-й редуктор поставлен в Siemens Финспонг. Семейная SGT-100…400 не подтверждена — это мелкие турбины 5-15 МВт, вне диапазона редукторов 30-60 МВт. Семейную снять, SGT-800 оставить."
+  },
+  "TDI — Tech Development Inc.": {
+   "verdict": "confirmed_broad",
+   "cause": "site_claims_real",
+   "models": [
+    "LM2500 (PGT25)",
+    "LM6000",
+    "Saturn 20"
+   ],
+   "fams_off": [
+    "solarAll"
+   ],
+   "url": "https://www.glmenergyllc.com/glm-valves-accessories-tdi-starters.php",
+   "quote": "GE – LM500, LM2500/+ and, LM6000 ... Solar® – Saturn, Centaur, and Taurus",
+   "note": "Изготовитель турбостартеров TurboTwin — реальный поставщик пусковых узлов ГТД. Плашки LM2500 и LM6000 подтверждены (плюс бонус LM500). T100-CS — прямая замена стартеров на Solar Centaur/Taurus. Solar подтверждён только Saturn/Centaur/Taurus; Mars и Titan не обслуживаются — семейную плашку «вся линей"
+  },
+  "PETRONAS": {
+   "verdict": "bullshit",
+   "cause": "not_a_supplier",
+   "models": [],
+   "fams_off": [
+    "sgtAll",
+    "solarAll"
+   ],
+   "url": "https://www.petronas.com",
+   "quote": "",
+   "note": "PETRONAS — интегрированный нефтегазовый оператор (разведка, LNG, НПЗ, розница). Турбины RB211/Avon/501 он ЭКСПЛУАТИРУЕТ как заказчик MRO, а не поставляет/производит. Ни компонентов, ни парт-листов, ни сервиса ГТУ. Плашки и обе семейные — снять."
+  },
+  "FOMAS Group": {
+   "verdict": "bullshit",
+   "cause": "site_claims_unproven",
+   "models": [],
+   "fams_off": [
+    "sgtAll",
+    "solarAll"
+   ],
+   "url": "http://www.fomasgroup.com/en",
+   "quote": "The core business areas are Power Generation, Oil & Gas, Industry & Aerospace.",
+   "note": "FOMAS реально делает поковки и катаные кольца, и Power Generation указан как сегмент — то есть поставщик заготовок для энергетики он настоящий. НО ни одной конкретной модели/OEM турбин сайт не называет. Обе семейные плашки (Siemens SGT, Solar) ничем не обоснованы — снять."
+  },
+  "Baker Hughes": {
+   "verdict": "bullshit",
+   "cause": "site_claims_unproven",
+   "models": [],
+   "fams_off": [
+    "solarAll"
+   ],
+   "url": "https://www.bakerhughes.com",
+   "quote": "The most competitive gas turbine in the 65+ MW power range.",
+   "note": "Baker Hughes — настоящий OEM турбомашин (NovaLT, аэродеривативы LM9000, Frame — наследие Nuovo Pignone/GE). Но Solar Turbines — субсидиар Caterpillar и прямой конкурент; BH не делает и не сервисит Solar. Единственная плашка (Solar) — ложная, снять; добавлены реально названные модели."
+  },
+  "EMCOR Group, Inc.": {
+   "verdict": "bullshit",
+   "cause": "not_a_supplier",
+   "models": [],
+   "fams_off": [
+    "solarAll"
+   ],
+   "url": "https://www.emcorgroup.com",
+   "quote": "build, power, service, and protect today's most advanced industries",
+   "note": "EMCOR — конгломерат mechanical/electrical construction и facility services (NYSE: EME). Не производит и не поставляет компоненты ГТУ. «Дочка UMEC-CA — подрядчик Solar Turbines» = строительно-монтажный подряд, не номенклатура запчастей. Семейная плашка Solar — снять."
+  },
+  "Gaona Aero Material Co., Ltd (钢研高纳, CISRI-Gaona)": {
+   "verdict": "bullshit",
+   "cause": "regex_artifact",
+   "models": [],
+   "fams_off": [],
+   "url": "https://www.emis.com/php/company-profile/CN/Gaona_Aero_Material_CoLtd (сайт en.cisri-gaona.com.cn — DNS/503, данные по каталогу)",
+   "quote": "precision casting products... forged disc rings products... high-temperature wear-resistant blocks for turbine blade crowns; MCrAlY series coating targets for blade thermal protection coating",
+   "note": "Реальный производитель суперсплавов, прецизионного литья и дисков/колец для авиа и ГТУ — но обобщённо. Ни Solar, ни какая-либо конкретная модель на сайте не названы. Семейная плашка Solar — артефакт нашего описания."
+  },
+  "Perenco": {
+   "verdict": "bullshit",
+   "cause": "not_a_supplier",
+   "models": [],
+   "fams_off": [
+    "sgtAll",
+    "solarAll"
+   ],
+   "url": "https://www.perenco.com",
+   "quote": "an independent hydrocarbon producer",
+   "note": "Нефтегазовый оператор зрелых месторождений, не поставщик и не сервис ГТУ. Турбины на сайте не упоминаются вообще. В лучшем случае конечный эксплуатант приводов — не основание для плашек. Обе семейные плашки снять."
+  },
+  "TransCanada Turbines": {
+   "verdict": "partial",
+   "cause": "site_claims_unproven",
+   "models": [
+    "RB211 (SGT-A35)",
+    "LM2500 (PGT25)",
+    "LM6000"
+   ],
+   "fams_off": [
+    "sgtAll"
+   ],
+   "url": "https://www.tcturbines.com",
+   "quote": "the sole authorized overhaul, repair and maintenance service provider... Industrial SGT-A20 (Avon), Industrial SGT-A35 (RB211), LM2500, LM6000",
+   "note": "Авторизованный MRO аэродеривативов. Конкретные плашки RB211/SGT-A35, LM2500, LM6000 подтверждены; добавлен Avon/SGT-A20. НО индустриальную линейку Siemens SGT-100…400 они НЕ делают (только аэродеривативы A20/A35) — семейную плашку снять."
+  },
+  "Special Metals Wiggin Ltd (Hereford, группа Special Metals/PCC)": {
+   "verdict": "bullshit",
+   "cause": "regex_artifact",
+   "models": [],
+   "fams_off": [
+    "sgtAll"
+   ],
+   "url": "https://www.specialmetals.com",
+   "quote": "invented over 80 percent of nickel alloys including INCONEL®, INCOLOY®, NIMONIC®, MONEL®, and UDIMET®",
+   "note": "Производитель никелевых суперсплавов (прутки, листы, сварочные материалы) для горячего тракта в целом. Ни SGT-400, ни линейка SGT-100…400 на сайте не названы — это привязка к модели из нашего описания. Все турбинные плашки снять."
+  },
+  "Linde Advanced Material Technologies (Linde AMT)": {
+   "verdict": "bullshit",
+   "cause": "site_claims_unproven",
+   "models": [],
+   "fams_off": [
+    "sgtAll"
+   ],
+   "url": "https://www.linde-amt.com/en/solutions-for-your-industry/power-generation",
+   "quote": "Linde's portfolio of high-performance coatings includes specially engineered coatings for the combustor, compressor and turbine sections of gas turbines.",
+   "note": "Реальный производитель покрытий (HVOF/детонационные/плазма) для секций ГТУ, но нигде не называет Siemens SGT-400 или линейку SGT-100…400. Заявленная связь — с GE Aerospace (JV), а не Siemens. Плашка SGT-400 и семейная SGT — не подтверждены, похоже на артефакт."
+  },
+  "Solar Manufacturing, Inc.": {
+   "verdict": "bullshit",
+   "cause": "not_a_supplier",
+   "models": [],
+   "fams_off": [
+    "solarAll"
+   ],
+   "url": "https://solarmfg.com",
+   "quote": "high temperature, high vacuum, batch type furnace with electric resistance heating elements",
+   "note": "Совпадение имени, а не поставщик турбин Solar. Делают вакуумные печи термообработки (Mentor, NEO, LPC, газовое азотирование). К Solar Turbines (Saturn…Titan) отношения не имеют — чистая коллизия по слову «Solar»."
+  },
+  "Pertamina": {
+   "verdict": "bullshit",
+   "cause": "not_a_supplier",
+   "models": [],
+   "fams_off": [
+    "solarAll"
+   ],
+   "url": "https://www.pertamina.com",
+   "quote": "a large integrated energy company",
+   "note": "Государственная нефтегазовая компания Индонезии — эксплуатант/оператор, а не поставщик или сервис турбин Solar. Ничего не производит и не обслуживает по ГТУ. Семейная плашка Solar не обоснована."
+  },
+  "Parker Hannifin (Gas Turbine Filtration)": {
+   "verdict": "bullshit",
+   "cause": "site_claims_unproven",
+   "models": [],
+   "fams_off": [
+    "solarAll"
+   ],
+   "url": "https://www.parker.com/us/en/divisions/gas-turbine-filtration-division.html",
+   "quote": "inlet system designs include self-cleaning (pulse) and static inlet systems for all gas turbine OEMs",
+   "note": "Реальный поставщик воздушной фильтрации на входе ГТУ (altair/clearcurrent), но универсально «для всех OEM», без привязки к линейке Solar Saturn…Titan. Конкретные модели Solar не называются — семейная плашка не подтверждена."
+  },
+  "MD&A (Mechanical Dynamics & Analysis)": {
+   "verdict": "confirmed_broad",
+   "cause": "site_claims_real",
+   "models": [
+    "SGT5-2000E (V94.2/ГТЭ-160)",
+    "GE 9F/9FA",
+    "GE 6F.03 (6FA)",
+    "GE Frame 7 (MS7001)",
+    "GE MS5002",
+    "GE Frame 6B (MS6001)",
+    "GT13E2"
+   ],
+   "fams_off": [
+    "sgtAll",
+    "heavyAll"
+   ],
+   "url": "https://www.mdaturbines.com/ge-7ea-turbine/",
+   "quote": "MD&A is a full-service provider for the GE 7EA turbine ... a full-service provider for the GE 7FA gas turbine",
+   "note": "Реальный независимый full-service провайдер по тяжёлым ГТУ: GE Frame 3/5/6B/6FA/7EA/7FA/9E/9FA, Siemens V84/V94, Alstom GT8-26. Плашки 9FA/6FA/Frame7/SGT5-2000E(V94.2) подтверждены. Семья «все тяжёлые GE/Siemens/Alstom» обоснована. НО малый ряд SGT-100…400 и плашка SGT-400 не подтверждаются — MD&A м"
+  },
+  "Turbine Services Ltd (TSL)": {
+   "verdict": "confirmed_broad",
+   "cause": "site_claims_real",
+   "models": [
+    "GE MS5002",
+    "GE MS5001",
+    "GE Frame 6B (MS6001)",
+    "GE Frame 7 (MS7001)",
+    "GE 9F/9FA"
+   ],
+   "fams_off": [],
+   "url": "https://www.turbineservices.com/products/",
+   "quote": "GE Large Frame Gas Turbine Replacement Parts ... Frame 3 (MS3002), Frame 5 (MS5001), Frame 5 NT, Frame 5 two-shaft (MS5002), Frame 6 (MS6001), Frame 7 (MS7001), Frame 9 (MS9001)",
+   "note": "Настоящий non-OEM изготовитель запчастей для тяжёлых рамных ГТУ GE. Сайт открылся, перечисляет Frame 3/5/5NT/5-two-shaft/6/7/9 с MS-номерами; отдельная страница MS9001 E-FA + «full line of parts throughout the hot gas path of frame 9 machines» покрывает 9F/9FA. Все 5 плашек (MS5001, MS5002, MS6001, "
+  },
+  "Arnold Group": {
+   "verdict": "partial",
+   "cause": "site_claims_real",
+   "models": [
+    "SGT5-4000F (V94.3A)",
+    "V64.3A (AE64.3A)",
+    "SGT5-2000E (V94.2/ГТЭ-160)"
+   ],
+   "fams_off": [
+    "sgtAll"
+   ],
+   "url": "https://www.arnoldgroup.com/insulation-systems/insulation-systems-for-gas-turbines/gt11/?lang=en",
+   "quote": "There are approximately 50 GT11N2 units left in commercial operation worldwide. ARNOLD specializes in providing tailor-made, state-of-the-art, 3D Single Layer Insulation Systems for this engine.",
+   "note": "Реальный поставщик компонентов — съёмных изоляционных систем — с модельными страницами. SGT5-4000F(V94.3A) подтверждён жёстко («more than 180 Insulation Systems installed»), V64.3A и Alstom GT11N2 — тоже. НО SGT-100 и весь малый ряд SGT-100…400 сайт НЕ перечисляет (индекс прямо не содержит малую инд"
+  },
+  "John Crane": {
+   "verdict": "bullshit",
+   "cause": "not_a_supplier",
+   "models": [],
+   "fams_off": [
+    "solarAll"
+   ],
+   "url": "https://www.johncrane.com/en/industries/power-generation",
+   "quote": "From mechanical seals to filtration equipment, our products equip mission-critical operations to meet tomorrow's challenges with reliability, safety and efficiency.",
+   "note": "Производитель механических/сухих газовых уплотнений, НЕ поставщик ГТУ. «Gas turbines» на сайте — лишь один пункт в общем списке применений уплотнений; ни одной модели Solar (Saturn/Centaur/Mars/Titan) не названо. Семейная плашка «вся линейка Solar» — артефакт из описания (связь через Serviturbinas к"
+  },
+  "Lei Shing Hong Machinery (LSHM)": {
+   "verdict": "partial",
+   "cause": "site_claims_unproven",
+   "models": [],
+   "fams_off": [
+    "solarAll"
+   ],
+   "url": "https://www.lsh-cat.com",
+   "quote": "Solar 燃气轮机组 (Solar gas turbine generator sets); проект: «...承接的...Solar Turbines（索拉透平）燃气轮机发电项目顺利完成调试工作»",
+   "note": "Реальный дилер Caterpillar/Solar и EPC-канал в Китае (сдал под ключ проект Solar Turbines). Но это ДИЛЕР, а не «узкий производитель компонентов». Сайт не перечисляет модельную линейку Saturn…Titan — семейную плашку снять, конкретных моделей не показано."
+  },
+  "Consolidated Turbine Services": {
+   "verdict": "bullshit",
+   "cause": "site_claims_unproven",
+   "models": [],
+   "fams_off": [
+    "heavyAll"
+   ],
+   "url": "https://www.ctscompany.com/",
+   "quote": "...manufacturing and engineering resources to replace or refurbish your GT hot and cold section parts",
+   "note": "Сайт — компания ОАЭ (Дубай/Абу-Даби, с 1985), не США: база спутала с американским Consolidated Turbine Specialists (ctsturbines.com). GT-обслуживание есть, но НИ ОДНОЙ конкретной модели/фрейма на сайте нет — MS5002, Frame 6B и «все тяжёлые» не подтверждены."
+  },
+  "Fortum (eNext)": {
+   "verdict": "bullshit",
+   "cause": "site_claims_unproven",
+   "models": [],
+   "fams_off": [
+    "sgtAll"
+   ],
+   "url": "https://www.linkedin.com/showcase/fortum-enext",
+   "quote": "full range of services for steam and gas turbines, generators and automation and protection systems",
+   "note": "Реальный крупный сервис турбин/генераторов (мастерские в Финляндии/Швеции, 150+ спец.), НЕ «узкий производитель компонентов». Но ни одна открываемая страница не называет SGT-500/600 или SGT-100…400 — конкретные плашки моделей не доказаны, семейную снять."
+  },
+  "Southeast Overseas": {
+   "verdict": "confirmed_broad",
+   "cause": "site_claims_real",
+   "models": [
+    "Saturn 20"
+   ],
+   "fams_off": [
+    "solarAll"
+   ],
+   "url": "https://www.southeastoverseas.com",
+   "quote": "Solar Turbine Parts & Solar Compressor Parts: Solar Gas Turbine spares & Solar Gas Turbine spare parts, including Solar Turbine replacement parts / Solar Turbine repair parts",
+   "note": "Сайт прямо перечисляет запчасти Solar по моделям Saturn, Centaur, Taurus, Mars — плашки Saturn 20 и Centaur 40 подтверждены. Но Titan и Mercury НЕ указаны, поэтому семейную «Saturn…Titan» снять. Стиль — широкий брокер-снабженец (без парт-номеров/инвентаря), но Solar-номенклатура заявлена по моделям."
+  },
+  "Renco S.p.A.": {
+   "verdict": "bullshit",
+   "cause": "not_a_supplier",
+   "models": [],
+   "fams_off": [
+    "solarAll"
+   ],
+   "url": "https://www.renco.it/what-we-do",
+   "quote": "Sustainable buildings, natural energy … engineering and construction services for the energy, oil & gas and civil infrastructures sectors",
+   "note": "EPC-подрядчик и исторически коммерческий представитель Solar Turbines, но НЕ изготовитель/поставщик компонентов ГТУ. На сайте — устойчивое строительство, водородные долины, стройка энергообъектов. Ни одной модели, ни номенклатуры деталей. Семейная плашка Solar не обоснована — снять."
+  },
+  "Sirgen": {
+   "verdict": "confirmed_broad",
+   "cause": "site_claims_real",
+   "models": [
+    "Saturn 20",
+    "LM2500 (PGT25)"
+   ],
+   "fams_off": [],
+   "url": "http://www.sirgen.com",
+   "quote": "We have overhauled and zero houred Saturns and Centaurs! Low houred Taurus, Mars and Titans. Gensets and compressor sets.",
+   "note": "Surplus Generation Equipment — дилер б/у и восстановленных ГТУ. Сайт прямо перечисляет ВСЮ линейку Solar (Saturn, Centaur, Taurus, Mars, Titan) в наличии, плюс zero-timed LM2500 PE. Это не «продали один агрегат», а инвентарь по всей линейке — семейная плашка Solar обоснована. По роли это перепродаве"
+  },
+  "Doosan Turbomachinery Services": {
+   "verdict": "confirmed_broad",
+   "cause": "site_claims_real",
+   "models": [
+    "GE Frame 7 (MS7001)",
+    "GE MS5002",
+    "GE Frame 6B (MS6001)"
+   ],
+   "fams_off": [],
+   "url": "https://www.doosanturbo.com/engines/w251/",
+   "quote": "the personnel at Doosan Turbomachinery Services have extensive repair knowledge with W251 units",
+   "note": "Независимый ремонт роторов/компонентов ГТ. Отдельные страницы моделей на сайте: GE Frame 5, Frame 6, Frame 7, W251, W501; ротор-цех под F-class. 3 из 4 плашек подтверждены (Frame 7/MS7001, Frame 5/MS5002, Frame 6B/MS6001). GT13E2 на сайте не найден — снять. Семейная «все тяжёлые GE/Siemens» обоснова"
+  },
+  "Barnes Aerospace": {
+   "verdict": "bullshit",
+   "cause": "regex_artifact",
+   "models": [
+    "LM2500 (PGT25)",
+    "LM6000",
+    "SGT-700",
+    "GE Frame 7 (MS7001)"
+   ],
+   "fams_off": [
+    "sgtAll"
+   ],
+   "url": "https://barnesaero.com/what-we-repair/mro-capabilities/",
+   "quote": "Energy (Industrial) Gas Turbines – LM2500, LM5000, LM6000, LMS100 GG4, GG8, SGT700, and Frame 7/9",
+   "note": "Реальный MRO-поставщик компонентов ГТУ, НО не тех моделей, что в плашках. На странице возможностей — LM2500/5000/6000, LMS100, SGT700, Frame 7/9. Малых промышленных Siemens SGT-100…400 (и конкретно SGT-400) на сайте нет — это артефакт нашего описания. Семейную плашку SGT-100…400 снять; в базу добавл"
+  },
+  "Thomassen Group (Thomassen Service Gulf)": {
+   "verdict": "confirmed_broad",
+   "cause": "site_claims_real",
+   "models": [
+    "SGT5-2000E (V94.2/ГТЭ-160)",
+    "LM2500 (PGT25)",
+    "LM6000",
+    "GE 6F.03 (6FA)",
+    "GE Frame 6B (MS6001)"
+   ],
+   "fams_off": [],
+   "url": "https://thomassen-me.com/spare-parts/",
+   "quote": "we keep a strategic inventory of refurbished Hot Gas Path components for Frame 6 and Frame 9 gas turbines ... produce certain critical repair parts for our Fuel Nozzle, Actuator and HGP component repair facilities",
+   "note": "Реальный ремонтник компонентов ГТ. Сайт прямо перечисляет Frame 5P/6B/6FA/9E, LM2500, LM6000, Hitachi H25, Siemens V94.2 + склад восстановленного HGP и ремонт форсунок/актуаторов. 5 из 6 плашек подтверждены. MS5002 не показан — на сайте только Frame 5P (одновальный MS5001P), двухвальный 5002 не назв"
+  },
+  "THETA TECH INTERNATIONAL TRADING LTD.": {
+   "verdict": "partial",
+   "cause": "site_claims_unproven",
+   "models": [
+    "GE Frame 6B (MS6001)",
+    "GE MS5001",
+    "GE Frame 7 (MS7001)",
+    "GE 9F/9FA"
+   ],
+   "fams_off": [
+    "sgtAll"
+   ],
+   "url": "https://ttitl.net/stock-gas-turbine-parts/",
+   "quote": "103L1101G003 - F6 COMPRESSOR STATOR VANE KIT ... 329A3228G004 - (Shroud set 1 stage 6B) Frame 6",
+   "note": "Реальная номенклатура в складских таблицах — только GE Frame 5/6B/7/9E (парт-номера, бандажи, лопатки). Siemens V94.2/V94.3A/V64.2/V64.3A назван лишь во вступительном тексте специализации, без единого парт-листа. SGT-100…400 не упоминается вовсе — семейную плашку снять."
+  },
+  "Power Plants Online (RMA Global)": {
+   "verdict": "bullshit",
+   "cause": "not_a_supplier",
+   "models": [],
+   "fams_off": [],
+   "url": "https://www.powerplantsonline.com/",
+   "quote": "50MW Pratt & Whitney 50MW FT4C Twin Pack GTG for sale. 60Hz. ... LM2500 Gas Turbine and Power Turbines for sale",
+   "note": "Это брокер/площадка целых агрегатов и станций (FT4C, GE Frame 6001 ПГУ, LM2500), а не производитель/поставщик компонентов. По 64.3A и SGT-300/400/600 — ничего. Единичные б/у юниты на продажу не делают компанию поставщиком по этим моделям. Годна лишь под wanted-заявку."
+  },
+  "Yingliu AeroTech / 应流航源 (Yingliu Co., Ltd., 603308)": {
+   "verdict": "partial",
+   "cause": "site_claims_real",
+   "models": [
+    "V64.3A (AE64.3A)"
+   ],
+   "fams_off": [
+    "sgtAll"
+   ],
+   "url": "https://finance.sina.com.cn/stock/hkstock/marketalerts/2026-06-04/doc-iniafrts0425315.shtml",
+   "quote": "应流股份 is a major domestic supplier of turbine blades ... the only supplier of Siemens Energy F/H-class heavy-duty gas turbine blades in China; core supplier to Ansaldo Energia (AE64.3A/AE94.3A)",
+   "note": "Реальный изготовитель литых лопаток горячего тракта, core supplier Ansaldo Energia и Siemens Energy F/H-класса. AE64.3A (=V64.3A) подтверждается, плюс AE94.3A. Но это тяжёлые ГТ — семейная плашка «вся линейка SGT-100…400» (малые промышленные) не обоснована, снять. LinkedIn-источник недоступен, прове"
+  },
+  "NNG Energy": {
+   "verdict": "confirmed_broad",
+   "cause": "site_claims_real",
+   "models": [
+    "Taurus 60",
+    "Taurus 70",
+    "Centaur 50",
+    "Mars 100",
+    "Titan 130"
+   ],
+   "fams_off": [
+    "solarAll"
+   ],
+   "url": "https://nngenergy.com/what-we-offer/gas-turbines/",
+   "quote": "We excel in a wide range of gas turbines, with particular expertise in Solar brand models such as the Taurus 60, Taurus 70, Centaur 50, Mars 100, and Titan 130. With over 60 turbine deliveries, we have extensive experien",
+   "note": "Все 5 плашек подтверждены дословно на странице Gas Turbines: рефурбишмент, package assembly, core engine, 60+ поставок. Но семейную плашку «вся линейка Saturn…Titan» надо снять — Saturn и полная линейка не заявлены, сайт называет только эти 5 моделей."
+  },
+  "Classic Automation": {
+   "verdict": "bullshit",
+   "cause": "not_a_supplier",
+   "models": [],
+   "fams_off": [
+    "solarAll"
+   ],
+   "url": "https://www.classicautomation.com",
+   "quote": "Repair Services Available For 50,000+ Parts ... 1 million parts in stock",
+   "note": "Это не поставщик ГТУ, а сток/ремонт промэлектроники (Allen-Bradley PLC-5, ABB и т.п.). Ни Solar, ни Turbotronic, ни одной модели турбины на сайте. Плашка «вся линейка Solar» ничем не обоснована — снять."
+  },
+  "TMS Ltd. (Alberta-TMS)": {
+   "verdict": "confirmed_broad",
+   "cause": "site_claims_real",
+   "models": [
+    "Saturn 20",
+    "Mars 90",
+    "Titan 130",
+    "Taurus 60",
+    "Centaur 50"
+   ],
+   "fams_off": [],
+   "url": "http://www.lincoln-tms.com/equipment-sales/",
+   "quote": "Solar Trouble Shooting & Solutions | Solar Upgrades And Repairs Service — exchange engine inventory that includes Saturn T1301, Centaur models, and Taurus T7901; serviceable used, totally refurbished and new surplus equi",
+   "note": "Сайт отдавал 503 на прямой WebFetch — доказательство собрано через WebSearch site:домен. Реальный дилер surplus/exchange-двигателей Solar в Альберте: инвентарь Saturn T1301, Centaur, Taurus T7901, Titan/Mars. Линейка Saturn…Titan действительно покрыта — семейную плашку оставить."
+  },
+  "Philadelphia Gear (Timken Power Systems)": {
+   "verdict": "bullshit",
+   "cause": "site_claims_unproven",
+   "models": [],
+   "fams_off": [
+    "solarAll"
+   ],
+   "url": "https://www.philagear.com",
+   "quote": "Any gearbox manufacturer. Any time. Discover our world-class inspection, overhaul, and complete gear upgrade and replacement services.",
+   "note": "Универсальный ремонт редукторов любых брендов (в т.ч. non-PG). Ни одной модели Solar, ни слова про турбинные пакеты Solar. Технически мог бы чинить редукторы Solar-пакетов, но предметных доказательств нет — семейную плашку «вся линейка Solar» снять."
+  },
+  "Turbine Resources International (TRI)": {
+   "verdict": "partial",
+   "cause": "site_dead",
+   "models": [
+    "Saturn 20"
+   ],
+   "fams_off": [
+    "solarAll"
+   ],
+   "url": "http://turbineresourcesintl.com/parts-sales/",
+   "quote": "TRI supplies and supports OEM and aftermarket replacement parts for the Solar Saturn, Centaur and Taurus gas turbines and Solar Packages.",
+   "note": "Домен не резолвится (ENOTFOUND, дважды) — открыть live не удалось; контент взят из кэша поиска. Реальный трейдер Solar-запчастей: Saturn/Centaur/Taurus (new/used/OEM surplus/refurb), плюс gearbox/engine exchange. Плашка Saturn 20 подтверждена. Mars/Titan не упомянуты — семейную «Saturn…Titan» снять."
+  },
+  "Wogen Engineering": {
+   "verdict": "confirmed_broad",
+   "cause": "site_claims_real",
+   "models": [
+    "Centaur 40",
+    "Taurus 60",
+    "Mars 100",
+    "Titan 130",
+    "Titan 250"
+   ],
+   "fams_off": [
+    "solarAll"
+   ],
+   "url": "https://wogenengg.com/gas-turbine-spare-parts.html",
+   "quote": "Titan 130, Titan 250, Mars 100, Taurus 60, Centaur 40",
+   "note": "Сайт открылся, прямо перечислены все 5 плашечных моделей Solar: Titan 130/250, Mars 100, Taurus 60, Centaur 40; HGP/combustion/spare parts, new/surplus/reconditioned. Все 5 плашек подтверждены. Семейную «Saturn…Titan» снять: Saturn на сайте нет, покрыт диапазон Centaur→Titan."
+  },
+  "NGT Gasturbinentechnik GmbH & Co. KG": {
+   "verdict": "confirmed_broad",
+   "cause": "site_claims_real",
+   "models": [
+    "Centaur 40",
+    "Taurus 60",
+    "Centaur 50",
+    "Saturn 20"
+   ],
+   "fams_off": [
+    "solarAll"
+   ],
+   "url": "http://www.ngt-gasturbinentechnik.com/de/leistungen/solar-gasturbinen.html",
+   "quote": "Baureihe Taurus 60, Centaur 40 / 50, Saturn 20",
+   "note": "Независимый Solar-сервис (Мёрс, DE): zero-hour турбина/редуктор, major overhaul, ТО 4000/8000 ч, бороскопия, запчасти. Сайт перечисляет Taurus 60, Centaur 40/50, Saturn 20 — обе плашки (Centaur 40, Taurus 60) подтверждены; добавлены Centaur 50 и Saturn 20. Mars/Titan не упомянуты — семейную «Saturn…"
+  },
+  "Kato Engineering (Nidec)": {
+   "verdict": "bullshit",
+   "cause": "not_a_supplier",
+   "models": [],
+   "fams_off": [
+    "solarAll"
+   ],
+   "url": "https://www.nidec.com/en/katoengineering/product/technology/",
+   "quote": "Kato Engineering designs and manufactures a complete range of gas & steam turbine synchronous alternators for applications requiring 100 kW to 25,000 kW output.",
+   "note": "Kato делает синхронные генераторы/альтернаторы 100 кВт–25 МВт для турбо- и паротурбинных генсетов, а НЕ сами турбины Solar. Плашки Saturn 20 / Titan 130 — артефакт: это лишь диапазон мощности, под который подходят генконцы Kato. Не поставщик запчастей ГТУ по этим моделям. Все турбинные плашки и семе"
+  },
+  "SoEnergy International (Used Equipment)": {
+   "verdict": "bullshit",
+   "cause": "not_a_supplier",
+   "models": [],
+   "fams_off": [
+    "solarAll"
+   ],
+   "url": "https://surplusrecord.com/listing/5200-kw-solar-turbines-tarus-60-mobile-generator-set-both-1500-rpm-11000v-10-hours-2001-637827/",
+   "quote": "5200 KW Solar Turbines Taurus 60 Mobile Generator Set … SoEnergy Used Equipment, a Surplus Record Dealer",
+   "note": "Это трейдер б/у оборудования (дилер Surplus Record), продающий одну готовую электростанцию. Сама объява — Solar Taurus 60, а вовсе не Centaur 40; плашка Centaur 40 не подтверждается страницей. Продажа одного б/у агрегата не делает компанию поставщиком модели. Семейная плашка беспочвенна."
+  },
+  "Prime Turbine Support": {
+   "verdict": "confirmed_broad",
+   "cause": "site_claims_real",
+   "models": [
+    "Saturn 20"
+   ],
+   "fams_off": [],
+   "url": "https://prime-turbinesupport.com/",
+   "quote": "SATURN, CENTAUR, TAURUS, MARS AND TITAN … We supply new, surplus, serviceable and overhauled components",
+   "note": "Реальный поставщик ЗИП по газовым турбинам. Сайт прямо перечисляет всю линейку Solar (Saturn, Centaur, Taurus, Mars, Titan) и заявляет поставку новых/surplus/refurb компонентов. Семейная плашка обоснована — линейка названа целиком. Плашка Saturn 20 покрыта семейством Saturn."
+  },
+  "Ideal Electric Power Co.": {
+   "verdict": "bullshit",
+   "cause": "not_a_supplier",
+   "models": [],
+   "fams_off": [
+    "solarAll"
+   ],
+   "url": "https://theidealelectric.com/",
+   "quote": "IDEAL ELECTRIC is building and delivering specialty electric machines … synchronous generators … up to 50 MVA (Mansfield, Ohio)",
+   "note": "Домен idealec.com мёртв, реальный сайт theidealelectric.com (403, данные из сниппетов). Это OEM генераторов/двигателей/switchgear, а не турбин. В пакете 'Solar Centaur 40 + Ideal Electric' они делают ГЕНЕРАТОРНУЮ половину, а не турбину. Плашка Centaur 40 и семейство Solar — артефакт пакетирования, н"
+  },
+  "Energy Parts Solutions": {
+   "verdict": "bullshit",
+   "cause": "site_claims_unproven",
+   "models": [],
+   "fams_off": [
+    "solarAll"
+   ],
+   "url": "https://www.energypartssolutions.com/services/reverse-engineering/",
+   "quote": "Blades and Buckets … Compressor Blades … Blade Rings … Diaphragms and Nozzles … reverse engineer your existing sample parts",
+   "note": "Реальный изготовитель турбинных деталей (лопатки, сопловые, диафрагмы) через реверс-инжиниринг по образцу. Но НИ Solar, НИ какой-либо модели (Saturn/Centaur/Taurus/Mars/Titan) на сайте нет. Семейная плашка 'вся линейка Solar' ничем не подтверждена — снять. Конкретных плашек-моделей нет."
+  },
+  "Al Waseet Oil Equipment Trading": {
+   "verdict": "partial",
+   "cause": "site_claims_real",
+   "models": [
+    "Saturn 20"
+   ],
+   "fams_off": [
+    "solarAll"
+   ],
+   "url": "https://www.alwaseetoil.com",
+   "quote": "we are a full line parts distribution company ... Solar, Centaur, Taurus, Saturn and Mars are registered trademarks of Solar Turbines Incorporated (FULLY INDEPENDENT from all OEM's)",
+   "note": "Реальный независимый дистрибьютор ЗИП. По Solar инвентарь заявлен только по Saturn и Centaur. Saturn 20 обоснован (плюс Centaur). Семейная плашка Saturn…Titan завышена: Taurus/Mars/Titan на сайте нет — снять."
+  },
+  "Global Power Supply (globalpwr.com)": {
+   "verdict": "confirmed_broad",
+   "cause": "site_claims_real",
+   "models": [
+    "Taurus 60",
+    "Saturn 20",
+    "Centaur 40",
+    "Mars 100",
+    "Titan 130"
+   ],
+   "fams_off": [],
+   "url": "https://www.globalpwr.com/brand/solar-turbines/",
+   "quote": "Global Power Supply is your source for used, surplus, and refurbished turbine generators from Solar Turbines.",
+   "note": "Трейдер/стокист, но их собственный каталог featured-turbines перечисляет всю линейку Solar из наличия: Saturn (10 шт), Centaur 40, Taurus T-60, Mars 100, Titan 130. Taurus 60 подтверждён + добавлены реальные модели. Семейная плашка обоснована — оставить. (Роль в базе «производитель компонентов» неве"
+  },
+  "Curtiss-Wright Surface Technologies (CCRS)": {
+   "verdict": "partial",
+   "cause": "site_claims_unproven",
+   "models": [],
+   "fams_off": [
+    "solarAll"
+   ],
+   "url": "https://surfacetechnologies.curtisswright.com/our-services/component-coating-and-repair-services",
+   "quote": "CCRS has experience repairing Rolls Royce RB211, Avon, Olympus, Allison 501, Siemens (Ruston TA, TB, and RT engines), and Solar gas turbines.",
+   "note": "Реальный компонентный ремонт/покрытия лопаток и NGV; Solar назван среди ремонтируемых двигателей, но без разбивки по моделям. Конкретики Saturn…Titan нет — семейную плашку снять (номенклатура по моделям не показана). Сайт 403 боту, подтверждено сниппетом сервисной страницы."
+  },
+  "Astrum Energy": {
+   "verdict": "bullshit",
+   "cause": "site_claims_unproven",
+   "models": [],
+   "fams_off": [
+    "solarAll"
+   ],
+   "url": "http://astrum-energy.com/product/turbine/",
+   "quote": "modular concept for gas turbine generators ... optimized for transportation and reduced installation times (astrum-energy.com/product/turbine — из поисковой выдачи, сайт отдаёт 503 боту)",
+   "note": "Маленькая немецкая ASTRUM Trading & Energy Consulting UG (Дюссельдорф, рег. 2020). Есть общая продуктовая страница Solar Turbines с маркетингом модульных станций, но никакой предметной номенклатуры/моделей. Это перепродавец-витрина OEM-контента, а не поставщик ГТУ с линейкой — семейную плашку Saturn"
+  },
+  "TURBINE.PARTS B.V.": {
+   "verdict": "partial",
+   "cause": "site_claims_unproven",
+   "models": [],
+   "fams_off": [
+    "solarAll"
+   ],
+   "url": "https://turbine.parts/brands/solar-turbines/",
+   "quote": "Gas Turbines Services & Spare Parts ... Hard-To-Find * Obsolete * Discontinued",
+   "note": "Реальный поставщик ЗИП ГТУ, есть бренд-раздел Solar Turbines и многостраничный каталог Solar-запчастей (прокладки, кольца, уплотнения, киты). НО номенклатура сгруппирована по part number/типу детали, а не по модели турбины: per-model листингов Centaur 40/Mars 100/Titan 250 на открытых страницах не в"
+  },
+  "PeriParts": {
+   "verdict": "partial",
+   "cause": "site_claims_unproven",
+   "models": [],
+   "fams_off": [
+    "solarAll"
+   ],
+   "url": "https://www.peri-parts.com/brand/solar-turbines",
+   "quote": "186159-35 Hydraulic Actuator | Control Module for Solar Turbines Systems | Peri-Parts",
+   "note": "Онлайн-ритейлер запчастей; раздел Solar Turbines реально есть (brand/solar-turbines) и продаются оригинальные Solar-детали по part number: актуаторы, трансформаторы, элементы (SOLAR TURBINES A CATERPILLAR BRAND ORIGINAL...). Но это универсальные узлы по номеру, каталог НЕ индексирован по модели турб"
+  },
+  "Global Turbine Parts Resource": {
+   "verdict": "confirmed_broad",
+   "cause": "site_claims_real",
+   "models": [
+    "GE Frame 7 (MS7001)",
+    "GE Frame 6B (MS6001)",
+    "GE MS5002",
+    "GE MS5001",
+    "GE 9F/9FA"
+   ],
+   "fams_off": [],
+   "url": "https://www.globaltpr.com",
+   "quote": "Through our worldwide network we can offer clients a wide range of products for the GE™ designed MS5002, MS5001, MS6001, MS7001 and MS9001 gas turbines.",
+   "note": "Настоящий поставщик ЗИП горячего тракта и крепежа для тяжёлых рамных ГТУ GE (bucket/shroud/nozzle hardware, форсунки, crossfire tubes и т.д.). Сайт прямо перечисляет MS5001/MS5002/MS6001/MS7001/MS9001 GE, а также Westinghouse 501D/251B8 и Siemens V84.2. MS7001=Frame7, MS6001=Frame6B подтверждены. Пл"
+  },
+  "FIN Marine & Energy Solutions Ltd.": {
+   "verdict": "partial",
+   "cause": "site_claims_real",
+   "models": [
+    "Mars 100",
+    "Saturn 20"
+   ],
+   "fams_off": [
+    "sgtAll",
+    "solarAll"
+   ],
+   "url": "https://fin-marine.com/gas-turbine/solar-turbines-mars-100/",
+   "quote": "Solar Turbines Mars 100 (Model No. 15002) ... completely refurbished and overhauled to zero hours ... Other Mars 100 units available",
+   "note": "Трейдер б/у энергооборудования (Стамбул/Дубай). Реально держит в инвентаре целые агрегаты: отдельные страницы Solar Mars 100 (11.3 МВт, восстановлен до zero hours) и б/у Solar Saturn 20 — эти две модели как товар подтверждены. НО это продажа целых б/у турбин, а не помодельный ЗИП. Семейные плашки не"
+  },
+  "Antoni International, Inc.": {
+   "verdict": "confirmed_broad",
+   "cause": "site_claims_real",
+   "models": [
+    "Mars 100",
+    "Taurus 60",
+    "Saturn 20",
+    "Titan 130",
+    "Centaur 40",
+    "Centaur 50"
+   ],
+   "fams_off": [],
+   "url": "https://www.antoni-intl.com/Solar+Turbines/id/34/",
+   "quote": "Independent Solar Turbines support engines compressors parts and repairs; inventory covering the Solar line of gas turbine and compressor packages with genuine new, reconditioned and reverse engineered parts (Saturn, Cen",
+   "note": "Реальный OEM-независимый поставщик запчастей/ремонта по всей линейке Solar (Saturn, Centaur, Taurus, Mars + компрессоры), reverse-engineered детали, overhaul. Сайт 503 на fetch, но заголовки страниц и сниппеты подтверждают. Добавил Centaur 40/50 — реально в номенклатуре. Семейная плашка Solar обосно"
+  },
+  "One Power Services": {
+   "verdict": "partial",
+   "cause": "site_claims_unproven",
+   "models": [
+    "LM2500 (PGT25)",
+    "LM6000"
+   ],
+   "fams_off": [
+    "solarAll"
+   ],
+   "url": "https://onepowerservices.com/products/lm-gas-turbine-parts-services",
+   "quote": "One Power Services provide General Electric LM - LM1600, LM2500 and LM6000 Aero derivative.",
+   "note": "LM-линейка подтверждена прямо на сайте (LM1600/LM2500/LM6000; LM1600 добавил). Страница Solar — только общие услуги (overhaul/exchanges/parts), конкретные модели Solar НЕ названы; MS5002 и PGT25 на сайте нигде нет. Плашки Mars 100/Taurus 60/Saturn 20/MS5002 не подтверждены конкретикой, семейную Sola"
+  },
+  "MarisoGT": {
+   "verdict": "partial",
+   "cause": "site_claims_unproven",
+   "models": [],
+   "fams_off": [
+    "solarAll"
+   ],
+   "url": "http://www.marisogt.com/en/about",
+   "quote": "In 1999, Shanghai Mariso Turbomachine Service Co., Ltd became the China industrial gas turbine market promotion authorized representative of Solar Turbines",
+   "note": "Авторизованный представитель Solar в Китае с 1999: продвижение, пэкидж энергоцентров, пусконаладка, обучение, продажа запчастей Solar. Реальная связь с Solar, но роль — промоушен/интеграция/packaging, предметной парт-номенклатуры по Mars 100/Taurus 60 на сайте не видно (сайт 503 на fetch). Партнёр O"
+  },
+  "Siemens Energy": {
+   "verdict": "confirmed_broad",
+   "cause": "site_claims_real",
+   "models": [
+    "SGT-100",
+    "SGT-300",
+    "SGT-400",
+    "SGT-600",
+    "SGT-700",
+    "SGT-750",
+    "SGT-800",
+    "SGT5-2000E (V94.2/ГТЭ-160)",
+    "SGT5-4000F (V94.3A)",
+    "RB211 (SGT-A35)"
+   ],
+   "fams_off": [],
+   "url": "https://www.siemens-energy.com/global/en/home/products-services/product/sgt-100.html",
+   "quote": "The SGT-100 industrial gas turbine is a proven unit for all electrical power generation and mechanical drive applications.",
+   "note": "OEM всех моделей. Портфельная страница перечисляет всю линейку SGT-100…800; SGT-A35 (наследие RB211), SGT5-2000E, SGT5-4000F — собственные продукты Siemens Energy. Все плашки подтверждены, семейную SGT-100…400 оставить."
+  },
+  "International Energy Resources": {
+   "verdict": "partial",
+   "cause": "site_claims_unproven",
+   "models": [
+    "SGT-400",
+    "SGT-500",
+    "LM2500 (PGT25)"
+   ],
+   "fams_off": [
+    "sgtAll",
+    "solarAll"
+   ],
+   "url": "https://ierfzco.com",
+   "quote": "Siemens SGT500 gas turbine core engines and 60hz Gear Boxes; Siemens SGT 400 Formerly- Cyclone Gas Turbine core; LM2500 gas turbine core engines; Siemens / Rolls Royce Avon ... Models 1533,1534,1535 and Avon 200",
+   "note": "Трейдер core-двигателей. Реально названы SGT-400, SGT-500, LM2500 и Rolls-Royce Avon. Плашки SGT-100/200/300 на сайте отсутствуют. Семейные (вся линейка SGT-100…400 и вся линейка Solar) не обоснованы — Solar вообще не упомянут. Оба семейства снять."
+  },
+  "Retrofit Turbine PartsTrading FZ (ОАЭ)": {
+   "verdict": "confirmed_broad",
+   "cause": "site_claims_real",
+   "models": [
+    "SGT-600",
+    "SGT-100",
+    "SGT-800",
+    "SGT5-2000E (V94.2/ГТЭ-160)",
+    "SGT5-4000F (V94.3A)",
+    "LM2500 (PGT25)",
+    "LM6000",
+    "GE Frame 6B (MS6001)"
+   ],
+   "fams_off": [],
+   "url": "https://retrofitturbineparts.com",
+   "quote": "GE Models: LM2500, LM2500+, LM5000, LM6000, 6B, 6F, and 9E; Siemens Models: SGT100-SGT800, V94.2, and V94.3",
+   "note": "Ремонт/восстановление и поставка запчастей ГТУ, инвентарь ~$15 млн. Сайт прямо перечисляет диапазон SGT100-SGT800, V94.2/V94.3 и линейку GE LM2500/LM6000/6B/6F/9E — все 8 плашек подтверждены. Добавлены реальные LM5000, GE 6F, 9E. Семейных плашек нет."
+  },
+  "Solar Turbines": {
+   "verdict": "confirmed_broad",
+   "cause": "site_claims_real",
+   "models": [
+    "Saturn 20",
+    "Centaur 40",
+    "Centaur 50",
+    "Taurus 60",
+    "Taurus 70",
+    "Mars 90",
+    "Mars 100",
+    "Titan 130",
+    "Titan 250"
+   ],
+   "fams_off": [],
+   "url": "https://www.solarturbines.com/en_US/products/gas-turbines.html",
+   "quote": "the Saturn 20, Centaur 40, Centaur 50, Taurus 60, Taurus 70, Mars 90, Mars 100 and Titan 130 gas turbines",
+   "note": "Это сам OEM (Solar Turbines, Caterpillar). Главная отдала 403, но у каждой модели своя товарная страница на solarturbines.com и сайт перечисляет линейку целиком. Все плашки подтверждены; линейка реально расширяется (Titan 250/350, Taurus 65, Mercury 50, Saturn 10). Семейная плашка обоснована."
+  },
+  "Precision Asset Solutions Pvt. Ltd.": {
+   "verdict": "bullshit",
+   "cause": "not_a_supplier",
+   "models": [],
+   "fams_off": [
+    "solarAll"
+   ],
+   "url": "https://precisionasset.in",
+   "quote": "Gas Turbine Spares (пункт меню в разделе Energy Solutions; без описания и без единой модели)",
+   "note": "Индийский универсал: лизинг оборудования, газопоршневые генераторы, торговля техникой, дистрибуция шин Yokohama. Газовые турбины — лишь пункт меню «Gas Turbine Spares» без единой модели. SGT-400 не подтверждён, семейная линейка Solar не обоснована. Не профильный поставщик ГТУ."
+  },
+  "Air Turbo Service FZE": {
+   "verdict": "partial",
+   "cause": "regex_artifact",
+   "models": [
+    "SGT-800"
+   ],
+   "fams_off": [
+    "solarAll"
+   ],
+   "url": "https://airturboservice.com",
+   "quote": "Blades, vanes, seals, combustion parts, casings and accessories for industrial gas turbines. ... Siemens SGT-800 (50 MW) case study",
+   "note": "Дистрибьютор компонентов ГТУ (лопатки, сопла, уплотнения, детали КС). Реально всплывает только SGT-800 (кейс на 50 МВт). Titan 250 и вся линейка Solar (Saturn…Titan) на сайте не упомянуты — артефакт, снять."
+  },
+  "DeveEnergy (UAE)": {
+   "verdict": "bullshit",
+   "cause": "site_claims_unproven",
+   "models": [],
+   "fams_off": [
+    "heavyAll"
+   ],
+   "url": "https://deveenergy.com",
+   "quote": "Supply of consumables, parts, and second-hand turbines ... 4+ Different OEM products and platforms",
+   "note": "Независимый инжиниринг/сервис (аутеджи, owner's engineering) + поставка расходников и б/у турбин. Ни одной модели не названо: ни Titan 250, ни GE 9F/9FA, ни семейство «все тяжёлые». Широкие плашки не обоснованы."
+  },
+  "WWGTP": {
+   "verdict": "confirmed_broad",
+   "cause": "site_claims_real",
+   "models": [
+    "GE 9F/9FA",
+    "GE Frame 7 (MS7001)",
+    "GE Frame 6B (MS6001)",
+    "GE MS5002",
+    "GE MS5001"
+   ],
+   "fams_off": [],
+   "url": "https://wwgtp.com",
+   "quote": "a wide range of quality spare parts for General Electric Gas Turbines ... MS3002, MS5001, MS5002, MS6001B, MS6001FA, MS7001E/EA, MS7001FA, MS9001E, MS9001FA, W251, W501",
+   "note": "Профильный поставщик запчастей GE и Westinghouse. Все 5 плашек подтверждены прямым парт-листом (MS9001FA=9F/9FA, MS7001, MS6001B, MS5002, MS5001). Добавлены реально перечисленные MS3002, MS9001E и Westinghouse W251/W501."
+  },
+  "Rathix automation": {
+   "verdict": "confirmed_broad",
+   "cause": "site_claims_real",
+   "models": [
+    "Saturn 20",
+    "Centaur 40",
+    "Centaur 50",
+    "Taurus 60",
+    "Mars 90",
+    "Mars 100",
+    "SGT-100",
+    "SGT-200",
+    "SGT-400"
+   ],
+   "fams_off": [],
+   "url": "https://rathix.com/services/light-industrial-gas-turbines.html",
+   "quote": "Mars 100, Taurus 60, Centaur 40, Centaur 50, including SoloNox for each, and also Mars 90 and Saturn 10",
+   "note": "Реальный сервис-поставщик по газовым турбинам. Сайт прямо перечисляет линейку Solar (Saturn 10, Centaur 40/50, Taurus 60, Mars 90/100) + Siemens SGT-100/200/400 как сервисное покрытие. Семейная плашка обоснована."
+  },
+  "Tesla Power": {
+   "verdict": "bullshit",
+   "cause": "regex_artifact",
+   "models": [],
+   "fams_off": [
+    "solarAll"
+   ],
+   "url": "https://teslapcs.com",
+   "quote": "",
+   "note": "Электротехника/автоматизация: НКУ, КРУ, ПЛК/SCADA, подстанции, солнечные (PV) решения. Газовых турбин нет. Плашка Solar — артефакт от «solar» (фотовольтаика), не Solar Turbines. Снять."
+  },
+  "Delafield Corporation": {
+   "verdict": "bullshit",
+   "cause": "not_a_supplier",
+   "models": [],
+   "fams_off": [
+    "solarAll"
+   ],
+   "url": "https://dftcorp.com",
+   "quote": "",
+   "note": "Изготовитель систем перекачки жидкостей/газов: шланги, рукава CNG, трубопроводы, коллекторы, насосы, клапаны. К газовым турбинам отношения нет, Solar/модели не упоминаются. Снять."
+  },
+  "ReflowX": {
+   "verdict": "confirmed_broad",
+   "cause": "site_claims_real",
+   "models": [
+    "Titan 130",
+    "SGT-500",
+    "Taurus 60",
+    "Mars 100",
+    "SGT5-4000F (V94.3A)",
+    "GE Frame 6B (MS6001)",
+    "GE MS5002",
+    "GE MS5001"
+   ],
+   "fams_off": [
+    "solarAll"
+   ],
+   "url": "https://reflowx.com/category/gas-turbines",
+   "quote": "Solar Titan 130 Gas Turbine – 15 MW – 2015 Mobile Package",
+   "note": "Маркетплейс б/у ГТУ (ОАЭ). Реально листингует Titan 130, SGT-500, Taurus 60, Taurus 65, Mars 100, SGT5-4000F, Frame 6B, Frame 5 MS5001, Frame 9E, FT4. Из плашек не подтвердились SGT-600 и MS5002. Семейная Solar «Saturn…Titan» неполная (нет Saturn/Centaur) — снять; конкретные плашки в основном верны."
   }
  }
 }

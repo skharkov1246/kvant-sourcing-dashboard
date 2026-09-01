@@ -65,14 +65,15 @@ def build() -> Path:
     body.append(bd.p([bd.run("ОВЭ-75 · Расчётная записка (независимый пересчёт КВАНТ)", bold=True, size=32)],
                      style="Heading1"))
     body.append(bd.p([bd.run(f"АО «Кольская ГМК», комплекс «обжиг–выщелачивание–электроэкстракция» 75 000 т/год. "
-                             f"Сборка {date.today().isoformat()}. К ТЗ на БИ v3.6 и ИД ч.1/ч.2.", size=20)]))
+                             f"Сборка {date.today().isoformat()}. К ТЗ на БИ v4.1 от 25.08.2026 "
+                             f"(историческая база сверок — ИД ч.1/ч.2).", size=20)]))
     body.append(bd.p([bd.run(calc["note"], italic=True, size=19)]))
     body.append(bd.p([bd.run(f"Итого: блоков {s['blocks']}, сверок {s['checks']} "
                              f"(сходится {s['ok']}, в допуске {s['warn']}, вопросов {s['question']}), "
-                             f"находок для Гипроникеля {s['flags']}.", bold=True, size=21)]))
+                             f"вопросов к разработчику ИД (Гипроникель) — {s['flags']}.", bold=True, size=21)]))
     body.append(bd.p([]))
 
-    body.append(bd.p([bd.run("1. Находки — вопросы к ИД", bold=True, size=28)], style="Heading1"))
+    body.append(bd.p([bd.run("1. Вопросы к исходным данным", bold=True, size=28)], style="Heading1"))
     for i, f in enumerate(calc["flags"], 1):
         body.append(bd.p([bd.run(f"{i}. [{SEV_RU[f['sev']]}] {f['t']}", bold=True, size=21)]))
         body.append(bd.p([bd.run(f["d"], size=20)]))
@@ -83,15 +84,16 @@ def build() -> Path:
                                  bold=True, size=28)], style="Heading1"))
         body.append(bd.p([bd.run("Правило: гарантируем границу с запасом к расчёту; условия — на сырьё и данные "
                                  "изготовителей; расчётные значения — справочные.", italic=True, size=19)]))
-        gw = [2600, 2900, 2900, 1238]
-        ghead = ["Параметр", "Расчёт / ИД", "Гарантия (рекомендация)", "Базис"]
+        # Колонка «Базис» (внутренние обоснования запасов) в предъявляемую версию
+        # не выводится — обоснования остаются в calc.json для внутренней работы.
+        gw = [3000, 3300, 3338]
+        ghead = ["Параметр", "Расчёт / ИД", "Гарантия (рекомендация)"]
         grows = [[bd.cell([bd.p([bd.run(h, bold=True, size=19)])], w, shade="EFEFEF")
                   for h, w in zip(ghead, gw)]]
         for g in calc["guarantees"]:
             vals = [bd.p([bd.run(g["param"], bold=True, size=19)]),
                     bd.p([bd.run(g["calc"], size=19)]),
-                    bd.p([bd.run(g["guar"], bold=True, size=19, color="8B0000")]),
-                    bd.p([bd.run(g["basis"], size=18)])]
+                    bd.p([bd.run(g["guar"], bold=True, size=19, color="8B0000")])]
             grows.append([bd.cell([v], w) for v, w in zip(vals, gw)])
         body.append(bd.table(grows, gw))
         body.append(bd.p([]))

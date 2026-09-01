@@ -31,6 +31,16 @@ gt/
                         наследие Линкольн-Ruston и Финспонг-STAL, РФ/СНГ/Иран
   data/bitrix_supplier_sites.json  верифицированные сайты Bitrix-компаний (165)
                         + список not_found (39, убраны из подбора)
+  data/plugs_world.json  СТРАНИЦА /gt/plugs (не ГТУ): свечи зажигания ГПУ —
+                        ближайшие закупки Bitrix со свечами, спрос по паркам
+                        (7 547 шт), карта кроссов (Denso GI3-3 ↔ Champion RB77CC ↔
+                        Waukesha 60999Z ↔ CAT 194-8518; MWM 12420480 ↔ BERU/Bosch/
+                        Stitt; Jenbacher 1214569 = Denso P518 = ERS 18.021-01),
+                        64 адресата с приоритетом, маршрутом и статусом в Bitrix,
+                        воронка эффективности и ценовые якоря. Фильтры: парк × канал.
+                        Данные: зонды scripts/bitrix_probe.py v19/v20 + разведка
+                        мировых каналов (7 стволов, состязательная проверка).
+                        Сборка: python3 gt/tools/build_plugs.py
   data/cummins_qsk60.json  ОТДЕЛЬНАЯ СТРАНИЦА /gt/cummins (не ГТУ): свечи зажигания
                         и масляные фильтры Cummins QSK60G — 2 позиции заказчика,
                         карта номеров (ERS/Hatraco 18.049-01 ↔ Cummins 4380132/
