@@ -10,6 +10,8 @@
 """
 import json
 import shutil
+import subprocess
+import sys
 from datetime import date
 from pathlib import Path
 
@@ -160,6 +162,24 @@ def build():
         for f in orders.iterdir():
             if f.suffix.lower() in (".pdf", ".csv", ".md", ".html"):
                 shutil.copy2(f, OUT / "orders" / alias.get(f.name, f.name))
+
+    # ГТУ-библиотека (gt/) → публикуется на этом же проекте Pages по пути /gt/
+    try:
+        subprocess.run([sys.executable, str(ROOT.parent / "gt" / "build.py")], check=True)
+        (OUT / "gt").mkdir(exist_ok=True)
+        for page in (ROOT.parent / "gt" / "public").glob("*.html"):
+            shutil.copy2(page, OUT / "gt" / page.name)
+            print(f"gt: {page.name} → zip/public/gt/{page.name}")
+        # PN-wizard: отдельный сайт базы PN по пути /gt/wizard/ (подпапка с data.js/guide.html)
+        wiz = ROOT.parent / "gt" / "public" / "wizard"
+        if wiz.is_dir():
+            dst = OUT / "gt" / "wizard"
+            if dst.exists():
+                shutil.rmtree(dst)
+            shutil.copytree(wiz, dst)
+            print(f"gt: wizard/ → zip/public/gt/wizard/ ({len(list(dst.iterdir()))} файлов)")
+    except Exception as e:  # ГТУ-сайт не должен ронять деплой базы ЗИП
+        print(f"gt: пропущен ({e})")
 
     size = (OUT / "index.html").stat().st_size
     print(f"zip/public/index.html: {size:,} байт | позиций {n_pos}, "

@@ -16,6 +16,8 @@
 from __future__ import annotations
 
 import datetime as dt
+import json
+import pathlib
 import re
 from collections import defaultdict
 
@@ -30,6 +32,10 @@ ECON_MARGIN = "UF_CRM_1704981084196"    # «Margin»
 ECON_PAID = "UF_CRM_1713874110281"      # «Оплачено»
 ECON_REST = "UF_CRM_1713874579940"      # «Остаток к оплате»
 ECON_LINK = "UF_CRM_1740133235324"      # ссылка (clck.ru) на файл «Экономика проекта» в Я.Диске
+BUDGET_LINK = "UF_CRM_1577100780"       # «Transaction budget + product conditions» — бюджет
+                                        # сделки в Google Sheets: единственное место, где
+                                        # может лежать ПОЛНАЯ себестоимость (логистика,
+                                        # таможня, НДС). Заполнен у ~90% открытых сделок.
 
 # плановые даты заказа СП-172 (см. зонд v9: поле дедлайна подтверждено на 72/72 строк
 # выгрузки «Контроль дедлайнов» — коллеги контролируют именно его)
@@ -42,6 +48,46 @@ OSS_DEAL = "UF_CRM_1715604558"          # «Сопровождение сдел�
 
 CAP_RATE = 0.20          # стоимость денег, годовых: по чему считаем упущенную доходность
                          # от поздней отгрузки (решение владельца)
+
+# снимок «Бюджетов сделок» из папки Google Drive (см. scripts/budget_snapshot.py):
+# лист «Бюджет» каждой книги содержит ПОЛНУЮ плановую экономику — закуп, логистику,
+# таможню, НДС, премии — и ссылку на сделку Битрикса. Суммы в книгах — в РУБЛЯХ.
+_BUDGET_SNAP = pathlib.Path(__file__).resolve().parent / "data" / "budget_snapshot.json"
+
+
+def _load_budget_plans() -> tuple[dict[int, dict], dict[str, dict], str]:
+    """Снимок → (по №, по deal_id, дата снимка).
+
+    Привязка К СДЕЛКЕ — в первую очередь по НОМЕРУ в названии книги («899. …»):
+    ссылка на Битрикс в шапке бывает скопирована из чужой книги (зафиксировано:
+    книга «729.» ссылается на сделку книги «899.»), поэтому по deal_id матчим
+    только книги вовсе без номера. Дубли на один номер (например, «909.» и
+    «Об 909.») схлопываются: побеждает книга с заполненной выручкой, при
+    равенстве — изменённая позже."""
+    try:
+        snap = json.loads(_BUDGET_SNAP.read_text())
+    except (OSError, ValueError):
+        return {}, {}, ""
+
+    def _better(new: dict, old: dict | None) -> bool:
+        if old is None:
+            return True
+        nk = (1 if (new.get("revenue") or 0) else 0, str(new.get("modified") or ""))
+        ok_ = (1 if (old.get("revenue") or 0) else 0, str(old.get("modified") or ""))
+        return nk > ok_
+
+    by_seq: dict[int, dict] = {}
+    by_id: dict[str, dict] = {}
+    for b in snap.get("budgets", []):
+        seq = _regno(b.get("deal_name"), b.get("drive_title"))
+        if seq:
+            if _better(b, by_seq.get(seq)):
+                by_seq[seq] = b
+        elif b.get("deal_id"):
+            did = str(b["deal_id"])
+            if _better(b, by_id.get(did)):
+                by_id[did] = b
+    return by_seq, by_id, str(snap.get("generatedAt") or "")
 
 SLOW_MIN_DAYS = 7        # порог замедленности не бывает ниже недели
 SLOW_MULT = 2.0          # … и не ниже 2× медианы по стадии
@@ -158,7 +204,11 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
     # 3. вселенная: сделки ВОРОНКИ РЕАЛИЗАЦИИ (кат.0) + родители заказов вне её
     DSEL = ["ID", "TITLE", "OPPORTUNITY", "CURRENCY_ID", "COMPANY_ID", "STAGE_ID",
             "STAGE_SEMANTIC_ID", "CATEGORY_ID", "DATE_CREATE", "ASSIGNED_BY_ID", OSS_DEAL,
-            BUY_ECON_RUB, BUY_ECON_VAL, ECON_MARGIN, ECON_PAID, ECON_REST, ECON_LINK]
+            BUY_ECON_RUB, BUY_ECON_VAL, ECON_MARGIN, ECON_PAID, ECON_REST, ECON_LINK,
+            BUDGET_LINK]
+    plan_by_seq, plan_by_id, plan_asof = _load_budget_plans()
+    rub = rate.get("RUB", 0.0)                 # ₽ → € по курсу Битрикса (суммы бюджетов в ₽)
+
     cat0 = client.list_deals_fast(filter={"CATEGORY_ID": 0}, select=DSEL)
     deals: dict[str, dict] = {str(d["ID"]): d for d in cat0}
     extra_ids = [d for d in by_deal if d and d not in deals]
@@ -233,6 +283,51 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
         # красный флаг: экономики проекта нет ни ссылкой на файл, ни money-полями
         econ_link = str(d.get(ECON_LINK) or "").strip()
         no_econ = not econ_link and buy_econ <= 0
+
+        # --- плановая экономика из бюджета сделки (снимок Google Drive, суммы в ₽) ---
+        plan = (plan_by_seq.get(seq) if seq else None) or plan_by_id.get(did)
+        plan_md = plan_pct = plan_profit = plan_ppct = plan_rev = None
+        plan_susp = False
+        plan_psrc = None
+        plan_break = None
+        if plan and rub:
+            _rev = plan.get("revenue_net") or plan.get("revenue")
+            _md = plan.get("margin_income_net") if plan.get("margin_income_net") is not None else plan.get("margin_income")
+            # «Прибыль по сделке» заполнена лишь у 118 книг, «Операционная прибыль» — у 234.
+            # Берём каскадом: обе уже ПОСЛЕ прямых переменных и прочих прямых расходов.
+            def _nz(v):
+                return v if isinstance(v, (int, float)) and v else None
+            _pf = _nz(plan.get("deal_profit_net")) or _nz(plan.get("deal_profit"))
+            plan_psrc = "deal" if _pf is not None else None
+            if _pf is None:
+                _pf = _nz(plan.get("op_profit_net")) or _nz(plan.get("op_profit"))
+                plan_psrc = "op" if _pf is not None else None
+            plan_rev = _rev * rub if _rev else None
+            plan_md = _md * rub if _md is not None else None
+            plan_profit = _pf * rub if _pf is not None else None
+            plan_pct = (round(plan.get("margin_pct") * 100, 1) if plan.get("margin_pct") is not None
+                        else (round(_md / _rev * 100, 1) if (_md is not None and _rev) else None))
+            plan_ppct = round(plan.get("profit_pct") * 100, 1) if plan.get("profit_pct") is not None else None
+            # бюджет не бьётся с суммой сделки в разы — вероятно, книга-заготовка или не та сделка
+            plan_susp = bool(sale > 1000 and plan_rev and not 0.25 <= plan_rev / sale <= 4.0)
+            def _e(*names):
+                for n in names:
+                    v = plan.get(n)
+                    if isinstance(v, (int, float)) and v:
+                        return round(v * rub)
+                return None
+            plan_break = {
+                "rev": _e("revenue_net", "revenue"),
+                "buy": _e("purchase_net", "purchase"),
+                "logi": _e("intl_logistics_net", "intl_logistics"),
+                "direct": _e("direct_costs_net", "direct_costs"),
+                "md": _e("margin_income_net", "margin_income"),
+                "other": _e("other_costs_net", "other_costs"),
+                "op": _e("op_profit_net", "op_profit"),
+                "deal": _e("deal_profit_net", "deal_profit"),
+                "normMd": plan.get("margin_norm"), "normPf": plan.get("profit_norm"),
+                "status": plan.get("status") or "", "executor": plan.get("executor") or "",
+            }
 
         # --- тайминг стадий сделки в кат.0
         tl = dhist.get(did, [])
@@ -358,9 +453,20 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
             "buyEur": round(buy), "buyLbl": _money(buy) if buy_src != "none" else "—",
             "buySrc": buy_src, "buyOrdersEur": round(buy_orders), "buyEconEur": round(buy_econ),
             "discrep": discrep, "econLink": bool(econ_link), "noEcon": no_econ,
+            "hasBudget": str(d.get(BUDGET_LINK) or "").startswith("http"),
             "marginEur": round(margin) if margin is not None else None,
             "marginLbl": _money(margin) if margin is not None else "—",
             "marginPct": round(margin / sale * 100) if (margin is not None and sale) else None,
+            # план из бюджета сделки: МД — после логистики, таможни и НДС; прибыль — итог
+            "planMdEur": round(plan_md) if plan_md is not None else None,
+            "planMdLbl": _money(plan_md) if plan_md is not None else "—",
+            "planMdPct": plan_pct,
+            "planProfitEur": round(plan_profit) if plan_profit is not None else None,
+            "planProfitLbl": _money(plan_profit) if plan_profit is not None else "—",
+            "planProfitPct": plan_ppct,
+            "planRevEur": round(plan_rev) if plan_rev is not None else None,
+            "planSusp": plan_susp, "planPSrc": plan_psrc, "planBreak": plan_break,
+            "planMod": str((plan or {}).get("modified") or ""),
             "econPaid": _money(_parse_econ_money(d.get(ECON_PAID), rate)) if d.get(ECON_PAID) else "",
             "econRest": _money(_parse_econ_money(d.get(ECON_REST), rate)) if d.get(ECON_REST) else "",
             "norders": len(ords), "suppliers": ", ".join(suppliers)[:70],
@@ -392,6 +498,22 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
             "hasSale": bool(d.get("OPPORTUNITY")),
         })
     rows.sort(key=lambda r: -r["seq"])
+
+    # --- аномально высокая валовая маржа = скорее всего заведены не все заказы поставщикам.
+    # Порог берём от самих данных: полторы медианы по сделкам, где закупка собрана из заказов,
+    # но не ниже 65% — ниже этого высокая маржа ещё правдоподобна.
+    _gross = [r["marginPct"] for r in rows
+              if r["buySrc"] == "orders" and r["marginPct"] is not None and r["saleEur"] > 1000]
+    med_gross = _median(_gross)
+    gross_thr = max(65.0, round((med_gross or 0) * 1.5, 1))
+    for r in rows:
+        r["grossSusp"] = bool(
+            not r["closed"] and r["buySrc"] == "orders" and r["norders"] > 0
+            and r["marginPct"] is not None and r["saleEur"] > 1000
+            and r["marginPct"] > gross_thr)
+        r["grossWhy"] = (f"валовая {r['marginPct']}% при типичной {round(med_gross or 0)}% — "
+                         f"похоже, заведены не все заказы поставщикам "
+                         f"(сейчас {r['norders']})") if r["grossSusp"] else ""
 
     live_rows = [r for r in rows if not r["closed"]]
     slow_rows = [r for r in live_rows if r["slow"]]
@@ -478,6 +600,18 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
     n_nobuy = sum(1 for r in rows if r["buySrc"] == "none")
     orphan_buy = sum(eur(o.get("opportunity"), o.get("currencyId")) for o in orphan)
     n_contracts = sum(1 for r in rows if r["norders"] > 0)
+    n_budget = sum(1 for r in rows if r["hasBudget"])
+    n_budget_live = sum(1 for r in live_rows if r["hasBudget"])
+
+    # --- плановая экономика по бюджетам: суммы по ОТКРЫТЫМ сделкам с внятным бюджетом ---
+    plan_live_rows = [r for r in live_rows if r["planMdEur"] is not None and not r["planSusp"]]
+    plan_md_live = sum(r["planMdEur"] for r in plan_live_rows)
+    plan_sale_live = sum(r["saleEur"] for r in plan_live_rows)
+    plan_profit_live = sum(r["planProfitEur"] for r in plan_live_rows if r["planProfitEur"] is not None)
+    n_plan = sum(1 for r in rows if r["planMdEur"] is not None)
+    n_plan_live = sum(1 for r in live_rows if r["planMdEur"] is not None)
+    n_plan_susp = sum(1 for r in live_rows if r["planMdEur"] is not None and r["planSusp"])
+    n_plan_neg = sum(1 for r in plan_live_rows if r["planMdEur"] < 0)
 
     # --- дедлайны клиенту: сводка по живым заказам (то же поле, что в «Контроле дедлайнов») ---
     late_rows = [r for r in live_rows if r["late"]]
@@ -575,8 +709,13 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
         ("Σ продажи", _money(sale_sum), "сумма сделок (выручка), €", "ok"),
         ("Σ закупки", _money(buy_sum),
          f"заказы {len(rows)-n_econ-n_nobuy} · из экономики {n_econ} · нет данных {n_nobuy}", "amber"),
-        ("Σ маржа", _money(margin_sum), "продажа − закупка (где есть данные), €", "ok" if margin_sum >= 0 else "warn"),
+        ("Σ валовая маржа", _money(margin_sum),
+         "продажа − закупка · БЕЗ логистики, таможни и НДС", "ok" if margin_sum >= 0 else "warn"),
         ("Ср. маржа", f"{round(margin_sum/sale_m*100) if sale_m else 0}%", "по сумме, валовая", ""),
+        ("📋 План МД по бюджетам", _money(plan_md_live),
+         f"{round(plan_md_live/plan_sale_live*100) if plan_sale_live else 0}% · "
+         f"{len(plan_live_rows)} из {len(live_rows)} открытых · ПОСЛЕ логистики, таможни и НДС",
+         "ok" if plan_md_live >= 0 else "warn"),
         ("В работе", f"{len(live_rows)}", "открытых сделок в воронке", ""),
         ("⚠ Замедлено", str(len(slow_rows)),
          f"{round(len(slow_rows)/len(live_rows)*100) if live_rows else 0}% открытых", "warn" if slow_rows else "ok"),
@@ -642,7 +781,16 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None) -> dict:
             "medCycle": round(med_cycle) if med_cycle else None,
             "medLag": round(med_lag, 1) if med_lag is not None else None,
             "loss": _money(loss_total), "burnDay": _money(burn_day),
+            "budget": n_budget, "budgetLive": n_budget_live,
+            "grossThr": gross_thr, "grossMed": round(med_gross or 0),
+            "grossSusp": sum(1 for r in live_rows if r["grossSusp"]),
             "slow": len(slow_rows), "lateDeals": len(late_rows),
+            # план по бюджетам сделок (снимок Google Drive)
+            "planMd": _money(plan_md_live), "planMdNum": round(plan_md_live),
+            "planMdPct": round(plan_md_live / plan_sale_live * 100) if plan_sale_live else 0,
+            "planProfit": _money(plan_profit_live), "planProfitNum": round(plan_profit_live),
+            "planN": len(plan_live_rows), "planLive": n_plan_live, "planTotal": n_plan,
+            "planSusp": n_plan_susp, "planNeg": n_plan_neg, "planAsOf": plan_asof,
         },
         "kpis": [{"lbl": l, "val": v, "meta": m, "clz": c} for l, v, m, c in kpis],
         "deadlines": deadlines,

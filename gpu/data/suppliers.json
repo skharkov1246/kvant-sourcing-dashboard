@@ -1,0 +1,1123 @@
+{
+ "updated": "2026-08-13",
+ "source": "Наш пул поставщиков по ГПУ: 12 компаний перенесены из gt/data/rfq_suppliers.json (профили собраны в августе 2026 при работе над лотом «Энергосети»), остальные добавлены разведкой 13.08.2026 по первоисточникам — сайтам компаний, кросс-каталогам и карточкам товаров.",
+ "rating_model": {
+  "note": "Рейтинг считается в gpu/build.py по пяти осям, каждая 0–5. Итог = взвешенная сумма, нормированная в 0–100. Веса подобраны под нашу задачу: важнее всего, чтобы поставщик реально мог отгрузить в РФ и чтобы его связь с позицией была доказана.",
+  "axes": [
+   {
+    "key": "reach",
+    "name": "Проходимость в РФ",
+    "w": 3,
+    "how": "5 — отгружает в РФ напрямую без вопросов; 4 — через Казахстан/ОАЭ/Турцию рутинно; 3 — только через посредника с нейтральным получателем; 2 — жёсткий комплаенс, шанс низкий; 1 — практически закрыт."
+   },
+   {
+    "key": "proof",
+    "name": "Доказанность",
+    "w": 3,
+    "how": "5 — есть публичный кросс-каталог или наша живая проверка цены/наличия; 4 — подробный профиль с сайта; 3 — карточка товара по нашей позиции; 2 — упоминание в выдаче; 1 — только имя."
+   },
+   {
+    "key": "depth",
+    "name": "Глубина по ГПУ",
+    "w": 2,
+    "how": "5 — специализация именно на газопоршневых; 3 — ГПУ в числе прочего; 1 — смежная тема."
+   },
+   {
+    "key": "stock",
+    "name": "Сток и сроки",
+    "w": 2,
+    "how": "5 — подтверждённое наличие и срок; 3 — заявленный склад; 1 — работа под заказ."
+   },
+   {
+    "key": "speed",
+    "name": "Отзывчивость",
+    "w": 1,
+    "how": "5 — интернет-магазин/форма/WhatsApp, ответ в тот же день; 3 — email, 1–3 дня; 1 — только телефон/форма без обратной связи."
+   }
+  ]
+ },
+ "companies": [
+  {
+   "name": "MOTORTECH GmbH",
+   "country": "Германия, Целле",
+   "region": "ЕС",
+   "type": "производитель",
+   "site": "https://www.motortech.de",
+   "email": "",
+   "oem": [
+    "Caterpillar",
+    "Jenbacher",
+    "MWM",
+    "Waukesha",
+    "Cummins"
+   ],
+   "sys": [
+    "ignition",
+    "gas",
+    "control",
+    "filtration"
+   ],
+   "reach": 2,
+   "proof": 5,
+   "depth": 5,
+   "stock": 4,
+   "speed": 4,
+   "what": "Системы зажигания и управления газовыми двигателями: контроллеры MIC3+/MIC4, катушки, провода PolyMot™, удлинители, пикапы, детонационный контроль DetCon20, дроссели, кислородные датчики, комплекты перевода маслофильтра. Публикует прямые кросс-каталоги на OEM-номера.",
+   "proof_note": "Application Guides CAT G3400 и G3500 с сотнями пар «CAT PN ↔ MOTORTECH PN ↔ ALTRONIC PN» — разобраны и внесены в наш раздел «Аналоги».",
+   "channel": "ЕС-юрисдикция: прямой RFQ из РФ отклонят. Рабочий путь — их дистрибьюторы в Турции и Китае (у MOTORTECH есть дочерняя компания в Китае) либо посредник вне РФ.",
+   "aliases": [
+    "motortech",
+    "мотортех"
+   ]
+  },
+  {
+   "name": "Altronic LLC",
+   "country": "США, Джирард (Огайо)",
+   "region": "США",
+   "type": "производитель",
+   "site": "https://www.altronic-llc.com",
+   "email": "",
+   "oem": [
+    "Caterpillar",
+    "Waukesha",
+    "Cummins"
+   ],
+   "sys": [
+    "ignition",
+    "control"
+   ],
+   "reach": 1,
+   "proof": 5,
+   "depth": 5,
+   "stock": 3,
+   "speed": 3,
+   "what": "Исторический OEM систем зажигания промышленных газовых двигателей: катушки 591xxx, провода 593027-XX, пикапы 791050-x, магниты 2606xx, контроллеры CPU95/DISN. Часть «оригинальных» номеров CAT — перемаркированный Altronic.",
+   "proof_note": "Номера Altronic напрямую указаны как эквиваленты CAT в кросс-каталогах MOTORTECH. Собственник: HOERBIGER с 2009 г., с 2025 г. — Arcline Investment Management.",
+   "channel": "США: прямой экспорт в РФ закрыт. Только через Ближний Восток/Азию, и это дорого.",
+   "aliases": [
+    "altronic",
+    "альтроник"
+   ]
+  },
+  {
+   "name": "Hatraco B.V. (+ ERS)",
+   "country": "Нидерланды",
+   "region": "ЕС",
+   "type": "дистрибьютор",
+   "site": "https://www.hatraco.com",
+   "email": "",
+   "oem": [
+    "Cummins",
+    "Jenbacher",
+    "Waukesha"
+   ],
+   "sys": [
+    "ignition"
+   ],
+   "reach": 2,
+   "proof": 5,
+   "depth": 5,
+   "stock": 4,
+   "speed": 4,
+   "what": "Европейский дистрибьютор Altronic, Stitt и Champion по системам зажигания стационарных газовых двигателей. Совместно с ERS выпускает премиальную свечу 18.049-01 (FT00196) под Cummins QSK60-1,54 МВт: drop-in замена 4380132/4390446/5544762, заявленный ресурс +50 %.",
+   "proof_note": "Карточка товара на сайте Hatraco по нашей позиции; дублируется у R M Walsh (UK).",
+   "channel": "ЕС. Через посредника.",
+   "aliases": [
+    "hatraco"
+   ]
+  },
+  {
+   "name": "PowerUP GmbH",
+   "country": "Австрия, Штанс (Тироль)",
+   "region": "ЕС",
+   "type": "независимый сток",
+   "site": "https://www.powerup.at",
+   "email": "office@powerup.at",
+   "oem": [
+    "Jenbacher",
+    "MWM"
+   ],
+   "sys": [
+    "ignition",
+    "cpg",
+    "head",
+    "filtration",
+    "seals"
+   ],
+   "reach": 2,
+   "proof": 5,
+   "depth": 5,
+   "stock": 5,
+   "speed": 5,
+   "what": "Мультибрендовый aftermarket для INNIO Jenbacher (типы 2/3/4/6) и MWM: свечи (альтернатива P600/P611), blow-by фильтры, фильтр-патроны, сервис-киты, поршни с покрытием, ГБЦ, актуаторы. Онлайн-магазин, склад 100 000 позиций / 500 м³.",
+   "proof_note": "Наша живая проверка: категория Jenbacher — 663 позиции с ценами (актуатор 3 421 EUR, шатун 3 630 EUR). Отдельные PN из нашего списка на витрине отсутствуют — уточнять адресно.",
+   "channel": "ЕС, санкционный комплаенс. Через ОАЭ/Турцию/СНГ с нейтральным конечным получателем.",
+   "aliases": [
+    "powerup",
+    "power up"
+   ]
+  },
+  {
+   "name": "ONERGYS / PERI-parts",
+   "country": "Германия",
+   "region": "ЕС",
+   "type": "независимый сток",
+   "site": "https://www.onergys.de",
+   "email": "",
+   "oem": [
+    "Jenbacher",
+    "MWM",
+    "Caterpillar"
+   ],
+   "sys": [
+    "ignition",
+    "gas",
+    "seals",
+    "filtration"
+   ],
+   "reach": 2,
+   "proof": 5,
+   "depth": 5,
+   "stock": 4,
+   "speed": 3,
+   "what": "Интернет-магазин ЗИП для когенерации. Держит и оригинал, и собственные альтернативы под маркой ONE (ONE222082 вместо клапана форкамеры Jenbacher 433894, ONE2010 вместо 389588). Каталог по свечам, катушкам, газовому тракту.",
+   "proof_note": "Карточки товаров по нашим позициям 433894 и 389588. ⚠ Наша проверка: сайт отдаёт 403 на автоматические запросы, цены только после логина (продажа юрлицам).",
+   "channel": "ЕС. Через посредника; регистрация юрлица вне РФ обязательна.",
+   "aliases": [
+    "onergys",
+    "peri-parts",
+    "peri parts",
+    "periparts"
+   ]
+  },
+  {
+   "name": "Emission Partner GmbH",
+   "country": "Германия",
+   "region": "ЕС",
+   "type": "дистрибьютор",
+   "site": "https://shop.emission-partner.de",
+   "email": "",
+   "oem": [
+    "Jenbacher",
+    "MWM"
+   ],
+   "sys": [
+    "ignition",
+    "exhaust"
+   ],
+   "reach": 2,
+   "proof": 4,
+   "depth": 5,
+   "stock": 3,
+   "speed": 4,
+   "what": "Магазин ЗИП для газовых двигателей и систем снижения выбросов; продаёт катушки MOTORTECH под Jenbacher серии 3.",
+   "proof_note": "Карточка «Ignition coil Motortech for Jenbacher Baureihe 3».",
+   "channel": "ЕС. Через посредника.",
+   "aliases": [
+    "emission partner"
+   ]
+  },
+  {
+   "name": "RS Motor Power Solutions",
+   "country": "Испания, Порриньо",
+   "region": "ЕС",
+   "type": "независимый сток",
+   "site": "https://rsmotorps.com",
+   "email": "rsmotor@rsmotor.es",
+   "oem": [
+    "Jenbacher",
+    "MWM",
+    "Caterpillar",
+    "Guascor"
+   ],
+   "sys": [
+    "ignition",
+    "head",
+    "cpg"
+   ],
+   "reach": 2,
+   "proof": 4,
+   "depth": 5,
+   "stock": 3,
+   "speed": 4,
+   "what": "ЗИП и сервис для газопоршневых: свечи Denso/BeRu/Champion и собственные разработки, ЗИП для Jenbacher типов 2–6, MWM/Deutz, CAT CG132/CG170, Guascor; система мониторинга ресурса свечей SparkView. Публикует методику межсервисных интервалов и оверхолов.",
+   "proof_note": "Страницы по J420/J624 и статья об интервалах ТО (расходники 1000–2000 ч, промежуточные ТО каждые 10 000 ч, оверхолы на 30 и 60 тыс. ч).",
+   "channel": "ЕС. Хорошо отвечают на технические RFQ из Азии/Латама; из РФ — через посредника.",
+   "aliases": [
+    "rs motor",
+    "rsmotor"
+   ]
+  },
+  {
+   "name": "IMAGE Spareparts Ltd",
+   "country": "Великобритания, Уиган",
+   "region": "ЕС/UK",
+   "type": "независимый сток",
+   "site": "https://www.image-spareparts.com",
+   "email": "enquiries@image-spareparts.com",
+   "oem": [
+    "Jenbacher",
+    "Waukesha",
+    "Caterpillar",
+    "Deutz"
+   ],
+   "sys": [
+    "ignition",
+    "head"
+   ],
+   "reach": 1,
+   "proof": 4,
+   "depth": 4,
+   "stock": 3,
+   "speed": 3,
+   "what": "Независимый поставщик ЗИП для газовых и дизельных двигателей: свечи Jenbacher (серии 2/3/4/6), ГБЦ, запчасти Ruston, Waukesha, Deutz, CAT, Mirrlees. ISO 9001.",
+   "proof_note": "Профиль с сайта.",
+   "channel": "UK — самый жёсткий комплаенс. Только через посредника с нейтральной страной назначения.",
+   "aliases": [
+    "image spareparts"
+   ]
+  },
+  {
+   "name": "MurCal Ltd",
+   "country": "Великобритания",
+   "region": "ЕС/UK",
+   "type": "дистрибьютор",
+   "site": "https://www.murcal.com",
+   "email": "",
+   "oem": [
+    "Caterpillar",
+    "Jenbacher",
+    "Guascor"
+   ],
+   "sys": [
+    "ignition"
+   ],
+   "reach": 1,
+   "proof": 5,
+   "depth": 4,
+   "stock": 4,
+   "speed": 4,
+   "what": "Дистрибьютор промышленных свечей Denso (GI3-3, GI3-5, GE3-5) с опубликованной применяемостью по двигателям, включая GE Jenbacher J612/J616/J620, и кросс-номерами. Также кросс Denso 97-8200 / 674-1000 на колпачок Cummins 4351035.",
+   "proof_note": "Карточки товара Denso с применяемостью и кросс-рядами — использованы в нашем разделе «Аналоги».",
+   "channel": "UK. Как справочник по кроссам — бесценен; как поставщик — через посредника.",
+   "aliases": [
+    "murcal"
+   ]
+  },
+  {
+   "name": "İggnita (Iggnita Endüstriyel)",
+   "country": "Турция, Стамбул (офисы: Роттердам, Ташкент)",
+   "region": "Турция",
+   "type": "трейдер",
+   "site": "https://iggnita.com",
+   "email": "info@iggnita.com",
+   "oem": [
+    "Jenbacher",
+    "MWM",
+    "Cummins",
+    "Caterpillar",
+    "Waukesha",
+    "Guascor",
+    "Perkins"
+   ],
+   "sys": [
+    "ignition",
+    "gas",
+    "filtration"
+   ],
+   "reach": 5,
+   "proof": 5,
+   "depth": 5,
+   "stock": 4,
+   "speed": 5,
+   "what": "Трейдер оригинальных и альтернативных индустриальных свечей и ЗИП для газопоршневых. Форма Get a Quote по каждой позиции. Держит клапан форкамеры Jenbacher 334976 (оригинал) и катушку 1200399.",
+   "proof_note": "Карточки товаров ровно по нашим позициям 334976 и 1200399.",
+   "channel": "★ Один из лучших каналов: офис в Ташкенте = активная работа с СНГ, Турция санкции не применяет, русскоязычный запрос поймут.",
+   "aliases": [
+    "iggnita",
+    "İggnita",
+    "игнита"
+   ]
+  },
+  {
+   "name": "BMF Enerji San. ve Tic. Ltd.",
+   "country": "Турция, Стамбул",
+   "region": "Турция",
+   "type": "независимый сток",
+   "site": "https://bmfenerji.com",
+   "email": "info@bmfenerji.com",
+   "oem": [
+    "Jenbacher",
+    "MWM"
+   ],
+   "sys": [
+    "ignition",
+    "cpg",
+    "head",
+    "filtration"
+   ],
+   "reach": 5,
+   "proof": 4,
+   "depth": 5,
+   "stock": 4,
+   "speed": 3,
+   "what": "ЗИП для Jenbacher и MWM в трёх вариантах: оригинал / OEM / альтернатива — свечи, масляные/воздушные/газовые фильтры, гильзы, клапаны, поршни, кольца, вкладыши. 30+ клиентов, 100+ обслуживаемых газовых моторов.",
+   "proof_note": "Профиль с сайта.",
+   "channel": "Турция, ограничений по РФ нет, привыкли возить альтернативу. Минус — небольшая компания, английский ограничен.",
+   "aliases": [
+    "bmf"
+   ]
+  },
+  {
+   "name": "Borusan Cat Kazakhstan",
+   "country": "Казахстан",
+   "region": "СНГ",
+   "type": "дилер OEM",
+   "site": "https://www.borusancat.kz",
+   "email": "",
+   "oem": [
+    "Caterpillar"
+   ],
+   "sys": [
+    "ignition",
+    "cpg",
+    "head",
+    "filtration",
+    "control"
+   ],
+   "reach": 4,
+   "proof": 4,
+   "depth": 3,
+   "stock": 4,
+   "speed": 3,
+   "what": "Официальный дилер Caterpillar в Казахстане, в т.ч. по газовым двигателям для компримирования газа (страница по G3516). Даёт доступ к оригинальному каталогу CAT и заводским срокам.",
+   "proof_note": "Страница G3516 в разделе Power Systems на сайте дилера.",
+   "channel": "★ Самый «белый» путь к оригиналу CAT: официальный дилер в ЕАЭС. Комплаенс дилера проверит конечного получателя — работать через казахстанское юрлицо.",
+   "aliases": [
+    "borusan"
+   ]
+  },
+  {
+   "name": "InstruBiz",
+   "country": "ОАЭ, Дубай (офисы: Нью-Йорк, Дублин, Карачи)",
+   "region": "ОАЭ",
+   "type": "независимый сток",
+   "site": "https://instrubiz.com",
+   "email": "inquiry@instrubiz.com",
+   "oem": [
+    "Cummins"
+   ],
+   "sys": [
+    "filtration"
+   ],
+   "reach": 4,
+   "proof": 4,
+   "depth": 3,
+   "stock": 4,
+   "speed": 5,
+   "what": "Неавторизованный сток-поставщик Fleetguard (воздух, топливо, масло, гидравлика, ОЖ + охлаждающие жидкости) и запчастей Cummins. Сами заявляют: «не официальный дилер Fleetguard/Cummins Filtration».",
+   "proof_note": "Профиль с сайта; явно заявлен экспорт в Казахстан и страны СНГ.",
+   "channel": "Два WhatsApp на сайте, обычно отвечают в тот же день. Прямо в РФ вряд ли оформят — через Казахстан/экспедитора.",
+   "aliases": [
+    "instrubiz"
+   ]
+  },
+  {
+   "name": "Radiant Filters Trading Co LLC",
+   "country": "ОАЭ (Дубай, Шарджа, Абу-Даби)",
+   "region": "ОАЭ",
+   "type": "независимый сток",
+   "site": "https://radiantfiltersuae.com",
+   "email": "",
+   "oem": [
+    "Cummins",
+    "Caterpillar",
+    "Perkins"
+   ],
+   "sys": [
+    "filtration"
+   ],
+   "reach": 3,
+   "proof": 3,
+   "depth": 2,
+   "stock": 4,
+   "speed": 3,
+   "what": "Складской сток фильтров: Fleetguard, Sakura, Mann, CAT, Hydac, Perkins + масла и АКБ.",
+   "proof_note": "Профиль с сайта; email не опубликован, только форма и телефон.",
+   "channel": "Локальный дубайский трейдер — скорее «экспедитор выкупил в Дубае и отправил сам», чем полноценный экспортный контрагент.",
+   "aliases": [
+    "radiant"
+   ]
+  },
+  {
+   "name": "TECHIE Power Parts",
+   "country": "Китай",
+   "region": "Китай",
+   "type": "реверс-производитель",
+   "site": "https://www.techiepowerparts.com",
+   "email": "info@techiepowerparts.com",
+   "oem": [
+    "Cummins",
+    "Jenbacher",
+    "MWM",
+    "Caterpillar",
+    "Waukesha"
+   ],
+   "sys": [
+    "ignition",
+    "head",
+    "air"
+   ],
+   "reach": 5,
+   "proof": 5,
+   "depth": 5,
+   "stock": 4,
+   "speed": 4,
+   "what": "Производитель систем зажигания для стационарных газовых двигателей с ОПУБЛИКОВАННЫМИ таблицами применяемости: Cummins (TISS9826/9825/9828/9838, TICS9145/9914), Jenbacher (TISS9611, TISS98P3, TISS98P7, кабель TIWS9457), клапаны Type 6 (TVIS9001/TVES9101), интеркулеры. Заявляет покрытие >95 % мировых моделей газовых двигателей.",
+   "proof_note": "★ Страницы применяемости по Cummins и Jenbacher разобраны — конкретные пары «OEM PN → TECHIE PN» внесены в раздел «Аналоги».",
+   "channel": "Китай санкции не применяет, отгрузка в РФ де-факто возможна напрямую. Качество проверять пробной партией.",
+   "aliases": [
+    "techie"
+   ]
+  },
+  {
+   "name": "Wuhan Weyeah Power Machinery Co., Ltd.",
+   "country": "Китай, Ухань",
+   "region": "Китай",
+   "type": "трейдер",
+   "site": "https://www.weyeahmotor.com",
+   "email": "info@weyeahengine.com",
+   "oem": [
+    "Jenbacher",
+    "MWM",
+    "Caterpillar",
+    "Deutz",
+    "MAN",
+    "Wärtsilä"
+   ],
+   "sys": [
+    "ignition",
+    "gas",
+    "air",
+    "cpg",
+    "filtration",
+    "sensors"
+   ],
+   "reach": 5,
+   "proof": 5,
+   "depth": 5,
+   "stock": 4,
+   "speed": 4,
+   "what": "Сток и трейдинг ЗИП для Jenbacher (серии 3/4/6): фильтры, свечи, интеркулеры, поршни, турбокомпрессоры (в т.ч. раздел ABB), клапаны форкамеры (321631/433894), преобразователи давления (285263/285285), катушки (1200399 для J320).",
+   "proof_note": "★ Карточки товаров ровно по нашим позициям 334976/433894, 285263, 285285, 1200399.",
+   "channel": "★ У сайта есть русская версия — целенаправленно работают со СНГ/РФ. Ответ обычно за 24–48 ч.",
+   "aliases": [
+    "weyeah",
+    "вейеа"
+   ]
+  },
+  {
+   "name": "Zuhon Technology",
+   "country": "Китай, Шэньчжэнь",
+   "region": "Китай",
+   "type": "трейдер",
+   "site": "https://zuhonpower.com",
+   "email": "info@zuhonpower.com",
+   "oem": [
+    "Jenbacher",
+    "MWM"
+   ],
+   "sys": [
+    "head",
+    "cpg",
+    "seals",
+    "air",
+    "filtration",
+    "ignition"
+   ],
+   "reach": 5,
+   "proof": 3,
+   "depth": 4,
+   "stock": 3,
+   "speed": 4,
+   "what": "OEM и альтернативный ЗИП для Jenbacher: ГБЦ, поршни, гильзы, прокладки, клапаны, подшипники, турбины, фильтры, свечи; услуги ремонта и оверхола. Корзина запроса котировки на сайте.",
+   "proof_note": "⚠ Наша проверка 13.08.2026: сайт закрыт антибот-защитой, автоматически профиль не читается. Данные — из выдачи и прошлого профиля.",
+   "channel": "Мультиязычный сайт, включая русский. Классический шэньчжэньский трейдер без опубликованных сертификаций — качество «alternative» проверять отдельно.",
+   "aliases": [
+    "zuhon"
+   ]
+  },
+  {
+   "name": "Jinhua Sizhouda (SparkPlugsFactory)",
+   "country": "Китай, Чжэцзян",
+   "region": "Китай",
+   "type": "реверс-производитель",
+   "site": "https://www.sparkplugsfactory.com",
+   "email": "tiffany@sparkplugsfactory.com",
+   "oem": [
+    "Cummins",
+    "Jenbacher",
+    "Caterpillar",
+    "Waukesha"
+   ],
+   "sys": [
+    "ignition"
+   ],
+   "reach": 5,
+   "proof": 4,
+   "depth": 4,
+   "stock": 3,
+   "speed": 3,
+   "what": "Реверс-производитель индустриальных свечей для газовых генераторов (заявленный ресурс 5000+ ч): кроссы на Jenbacher 1214569/436782, Cummins 4924504/5373898/2866879/4090121, CAT, Waukesha, аналоги Denso/Bosch/Champion.",
+   "proof_note": "Профиль и заявленные кроссы с сайта.",
+   "channel": "Завод с экспортным менеджером и WhatsApp. Минус — небольшой, ответ 2–3 дня, MOQ вероятно от коробки.",
+   "aliases": [
+    "sparkplugsfactory",
+    "sizhouda"
+   ]
+  },
+  {
+   "name": "EB Machinery (cummins-spareparts.com)",
+   "country": "Китай, Шэньчжэнь",
+   "region": "Китай",
+   "type": "трейдер",
+   "site": "https://www.cummins-spareparts.com",
+   "email": "info@eb-machinery.com",
+   "oem": [
+    "Cummins"
+   ],
+   "sys": [
+    "cpg",
+    "head",
+    "air",
+    "cooling"
+   ],
+   "reach": 5,
+   "proof": 4,
+   "depth": 3,
+   "stock": 4,
+   "speed": 5,
+   "what": "Трейдер оригинальных запчастей Cummins (DCEC/CCEC): NTA855, KTA19, KTA38, KTA50, QSB/QSK — базовые платформы газовых G-серий (GTA855, KTA38G); ГБЦ, гильзы, поршни, турбины, помпы, форсунки, ремкомплекты.",
+   "proof_note": "Профиль с сайта, работают с 2010 г.",
+   "channel": "В РФ возят напрямую или через Казахстан. ⚠ Специфику газовых позиций (свечи, катушки, датчики G-серии) запрашивать отдельно — на сайте акцент на дизелях.",
+   "aliases": [
+    "eb machinery",
+    "eb-machinery"
+   ]
+  },
+  {
+   "name": "North India Diesel Spares (NIDS Group)",
+   "country": "Индия, Пуна",
+   "region": "Индия",
+   "type": "реверс-производитель",
+   "site": "https://nids-group.com",
+   "email": "support@nids-group.com",
+   "oem": [
+    "Cummins"
+   ],
+   "sys": [
+    "air",
+    "cooling",
+    "cpg"
+   ],
+   "reach": 4,
+   "proof": 4,
+   "depth": 2,
+   "stock": 3,
+   "speed": 3,
+   "what": "Производитель и экспортёр aftermarket-запчастей Cummins с 1980 г.: турбины, водяные/масляные/топливные насосы, форсунки, узлы в сборе.",
+   "proof_note": "Профиль с сайта.",
+   "channel": "Индия к санкциям не присоединилась. Сильны в механике; электрику G-серий запрашивать точечно.",
+   "aliases": [
+    "nids",
+    "north india diesel"
+   ]
+  },
+  {
+   "name": "Modern Group (The Modern Shop)",
+   "country": "США",
+   "region": "США",
+   "type": "дилер OEM",
+   "site": "https://shop.moderngroup.com",
+   "email": "",
+   "oem": [
+    "Cummins"
+   ],
+   "sys": [
+    "air",
+    "filtration"
+   ],
+   "reach": 1,
+   "proof": 5,
+   "depth": 2,
+   "stock": 5,
+   "speed": 4,
+   "what": "Онлайн-магазин оригинальных запчастей Cummins с ценами и наличием.",
+   "proof_note": "★ Наши живые проверки: турбина 4025166 (HX82 Dry) — $16 493,84, в наличии, отгрузка 3 раб. дня; фильтр 4011553 — $1 836,20, в наличии. Это наш эталон «сколько стоит оригинал».",
+   "channel": "США — как поставщик почти закрыт. Использовать как ЦЕНОВОЙ РЕПЕР для торга с трейдерами.",
+   "aliases": [
+    "modern group"
+   ]
+  },
+  {
+   "name": "IPD (Industrial Parts Depot)",
+   "country": "США",
+   "region": "США",
+   "type": "производитель",
+   "site": "https://www.ipdparts.com",
+   "email": "",
+   "oem": [
+    "Caterpillar",
+    "Cummins"
+   ],
+   "sys": [
+    "cpg",
+    "crank",
+    "head",
+    "seals"
+   ],
+   "reach": 2,
+   "proof": 4,
+   "depth": 3,
+   "stock": 4,
+   "speed": 3,
+   "what": "Aftermarket-производитель с 1955 г.: поршни с галерейным охлаждением для дизельных и ГАЗОВЫХ применений, гильзы с индукционной закалкой, вкладыши из медных сплавов, клапанная группа, комплекты прокладок. Отдельная линейка по Caterpillar 3500.",
+   "proof_note": "⚠ Страница литературы по 3500 отдаёт 403 на автозапрос; профиль — из выдачи и общедоступного описания.",
+   "channel": "США. Реально доступны через дистрибьюторов в ОАЭ/Турции/Латаме.",
+   "aliases": [
+    "ipd",
+    "industrial parts depot"
+   ]
+  },
+  {
+   "name": "Interstate-McBee",
+   "country": "США, Кливленд",
+   "region": "США",
+   "type": "производитель",
+   "site": "https://www.interstate-mcbee.com",
+   "email": "",
+   "oem": [
+    "Caterpillar",
+    "Cummins",
+    "Detroit"
+   ],
+   "sys": [
+    "seals",
+    "cpg",
+    "head"
+   ],
+   "reach": 2,
+   "proof": 3,
+   "depth": 2,
+   "stock": 4,
+   "speed": 3,
+   "what": "Прокладки, уплотнения, прецизионная механообработка для CAT/Cummins/Detroit.",
+   "proof_note": "Общерыночный профиль, карточек по нашим PN не проверяли.",
+   "channel": "США, через дистрибьюторов.",
+   "aliases": [
+    "interstate",
+    "mcbee"
+   ]
+  },
+  {
+   "name": "PAI Industries",
+   "country": "США",
+   "region": "США",
+   "type": "производитель",
+   "site": "https://www.paiindustries.com",
+   "email": "",
+   "oem": [
+    "Cummins",
+    "Caterpillar",
+    "Mack"
+   ],
+   "sys": [
+    "sensors",
+    "cpg",
+    "seals"
+   ],
+   "reach": 2,
+   "proof": 5,
+   "depth": 2,
+   "stock": 4,
+   "speed": 3,
+   "what": "Экономичные комплекты для капремонта и отдельные компоненты.",
+   "proof_note": "★ Подтверждённый кросс по нашей позиции: PAI 050675 = датчик температуры Cummins 3408345.",
+   "channel": "США, через дистрибьюторов.",
+   "aliases": [
+    "pai"
+   ]
+  },
+  {
+   "name": "Costex Tractor Parts (CTP)",
+   "country": "США, Майами",
+   "region": "США",
+   "type": "производитель",
+   "site": "https://www.costex.com",
+   "email": "",
+   "oem": [
+    "Caterpillar"
+   ],
+   "sys": [
+    "cpg",
+    "seals"
+   ],
+   "reach": 3,
+   "proof": 3,
+   "depth": 2,
+   "stock": 4,
+   "speed": 3,
+   "what": "Комплекты «поршень + гильза» и прочий aftermarket для Caterpillar и Komatsu.",
+   "proof_note": "Профиль с сайта.",
+   "channel": "Майами — традиционный хаб для Латама и MENA; через реэкспорт доступны.",
+   "aliases": [
+    "costex",
+    "ctp"
+   ]
+  },
+  {
+   "name": "Atmus Filtration Technologies (Fleetguard)",
+   "country": "США, Нашвилл",
+   "region": "США",
+   "type": "производитель",
+   "site": "https://www.atmus.com",
+   "email": "",
+   "oem": [
+    "Cummins"
+   ],
+   "sys": [
+    "filtration"
+   ],
+   "reach": 1,
+   "proof": 5,
+   "depth": 3,
+   "stock": 5,
+   "speed": 3,
+   "what": "Изготовитель всех фильтров Fleetguard (LF/AF/WF/FF). С 2023 г. — самостоятельная публичная компания (IPO NYSE 26.05.2023; полное отделение от Cummins 18.03.2024).",
+   "proof_note": "Корпоративное сообщение о завершении отделения.",
+   "channel": "Как поставщик закрыт, но знание «Fleetguard = Atmus» открывает поиск по независимым дистрибьюторам Atmus в ОАЭ/Турции/Азии.",
+   "aliases": [
+    "atmus",
+    "fleetguard",
+    "флитгард"
+   ]
+  },
+  {
+   "name": "ООО «Сервис Юнит»",
+   "country": "Россия",
+   "region": "РФ",
+   "type": "сервис",
+   "site": "https://servunit.ru",
+   "email": "",
+   "oem": [
+    "Jenbacher"
+   ],
+   "sys": [
+    "ignition",
+    "cpg",
+    "head",
+    "filtration"
+   ],
+   "reach": 5,
+   "proof": 4,
+   "depth": 5,
+   "stock": 4,
+   "speed": 4,
+   "what": "Полный цикл обслуживания ГПУ Jenbacher с поставкой оригинальных запчастей, восстановление оригинальных деталей, капремонт установок. Заявляют ГПУ в наличии на складе и поставку ЗИП со склада или под заказ.",
+   "proof_note": "Разделы сайта по ЗИП, обслуживанию и восстановлению Jenbacher.",
+   "channel": "РФ. Полезны и как поставщик, и как источник экспертизы по интервалам ТО. ⚠ Конкурент по ряду заявок — учитывать при работе с общими заказчиками.",
+   "aliases": [
+    "сервис юнит",
+    "servunit"
+   ]
+  },
+  {
+   "name": "ООО «ЭнергоТехСервис»",
+   "country": "Россия, Тюмень",
+   "region": "РФ",
+   "type": "дистрибьютор",
+   "site": "https://www.tmenergo.ru",
+   "email": "",
+   "oem": [
+    "Jenbacher"
+   ],
+   "sys": [
+    "ignition",
+    "cpg",
+    "head",
+    "filtration",
+    "control"
+   ],
+   "reach": 5,
+   "proof": 4,
+   "depth": 5,
+   "stock": 4,
+   "speed": 3,
+   "what": "Позиционируются как официальный дистрибьютор Jenbacher в РФ; персонал с сертификацией INNIO. Работают и с оригиналом, и с «проверенными аналогами» — что для нас важный сигнал: даже официальный канал признал аналоги.",
+   "proof_note": "Страница «Газопоршневые электростанции Jenbacher» на сайте компании.",
+   "channel": "РФ. Самый вероятный держатель реального склада по Jenbacher в стране.",
+   "aliases": [
+    "энерготехсервис",
+    "tmenergo"
+   ]
+  },
+  {
+   "name": "ROLT energy service",
+   "country": "Россия",
+   "region": "РФ",
+   "type": "сервис",
+   "site": "https://roltservice.ru",
+   "email": "",
+   "oem": [
+    "Jenbacher"
+   ],
+   "sys": [
+    "ignition",
+    "head",
+    "filtration"
+   ],
+   "reach": 5,
+   "proof": 4,
+   "depth": 4,
+   "stock": 3,
+   "speed": 3,
+   "what": "Все виды ТО генераторных установок Jenbacher, текущий и аварийный ремонт на площадке, поставка ЗИП и инструмента на всю линейку.",
+   "proof_note": "Страница сервиса и ремонта Jenbacher.",
+   "channel": "РФ.",
+   "aliases": [
+    "rolt",
+    "ролт"
+   ]
+  },
+  {
+   "name": "ООО «ТД Цезарь-Нева»",
+   "country": "Россия, Санкт-Петербург",
+   "region": "РФ",
+   "type": "трейдер",
+   "site": "https://caesar-neva.ru",
+   "email": "",
+   "oem": [
+    "Cummins"
+   ],
+   "sys": [
+    "ignition",
+    "filtration",
+    "sensors",
+    "cpg"
+   ],
+   "reach": 5,
+   "proof": 3,
+   "depth": 3,
+   "stock": 3,
+   "speed": 3,
+   "what": "Продажа запчастей Cummins QSV91G, заявляют оригинал с гарантией Cummins.",
+   "proof_note": "Раздел «Запчасти Cummins QSV91G» на сайте. ⚠ Заявление о «гарантии Cummins» в условиях 2026 г. требует проверки — спрашивать происхождение партии.",
+   "channel": "РФ. Полезны как ценовой ориентир по внутреннему рынку — но помнить правило: российский склад сам берёт товар из того же мирового пула с наценкой.",
+   "aliases": [
+    "цезарь-нева",
+    "цезарь нева"
+   ]
+  },
+  {
+   "name": "«Детройт-СТ»",
+   "country": "Россия",
+   "region": "РФ",
+   "type": "трейдер",
+   "site": "https://detroit-st.ru",
+   "email": "",
+   "oem": [
+    "Cummins"
+   ],
+   "sys": [
+    "filtration",
+    "cpg",
+    "sensors"
+   ],
+   "reach": 5,
+   "proof": 3,
+   "depth": 2,
+   "stock": 3,
+   "speed": 3,
+   "what": "Магазин запчастей Cummins, в т.ч. по QSV91G (есть даже каталог запчастей 4021362). Доставка по РФ и Казахстану.",
+   "proof_note": "Карточка «QSV91G PARTS CATALOGUE 4021362».",
+   "channel": "РФ/КЗ. Отдельная ценность: у них есть номер каталога запчастей QSV91G — сам каталог стоит купить, он снимет половину вопросов по применяемости.",
+   "aliases": [
+    "детройт"
+   ]
+  },
+  {
+   "name": "HARTEX",
+   "country": "Казахстан",
+   "region": "СНГ",
+   "type": "трейдер",
+   "site": "https://hartex.kz",
+   "email": "",
+   "oem": [
+    "Caterpillar"
+   ],
+   "sys": [
+    "cpg",
+    "head",
+    "filtration",
+    "ignition"
+   ],
+   "reach": 5,
+   "proof": 3,
+   "depth": 2,
+   "stock": 3,
+   "speed": 3,
+   "what": "Каталог запчастей Caterpillar G3516 с доставкой по Казахстану, России и Киргизии.",
+   "proof_note": "Раздел каталога по G3516.",
+   "channel": "★ ЕАЭС: доставка внутри союза без таможенных барьеров.",
+   "aliases": [
+    "hartex",
+    "хартекс"
+   ]
+  },
+  {
+   "name": "Reman-Service",
+   "country": "Россия",
+   "region": "РФ",
+   "type": "трейдер",
+   "site": "https://reman-service.ru",
+   "email": "",
+   "oem": [
+    "Caterpillar"
+   ],
+   "sys": [
+    "cpg",
+    "head",
+    "filtration"
+   ],
+   "reach": 5,
+   "proof": 3,
+   "depth": 2,
+   "stock": 3,
+   "speed": 3,
+   "what": "Запчасти Caterpillar со склада, доставка по РФ и Казахстану.",
+   "proof_note": "Профиль магазина.",
+   "channel": "РФ.",
+   "aliases": [
+    "reman"
+   ]
+  },
+  {
+   "name": "Ghaddar Machinery",
+   "country": "Ливан",
+   "region": "MENA",
+   "type": "трейдер",
+   "site": "https://www.ghaddarmachinery.com",
+   "email": "",
+   "oem": [
+    "Cummins",
+    "Caterpillar"
+   ],
+   "sys": [
+    "filtration",
+    "cpg",
+    "ignition"
+   ],
+   "reach": 4,
+   "proof": 2,
+   "depth": 2,
+   "stock": 3,
+   "speed": 3,
+   "what": "Региональный поставщик генераторного оборудования и ЗИП по Ближнему Востоку.",
+   "proof_note": "⚠ Только упоминание в прошлых списках кандидатов, профиль по нашим позициям не проверен.",
+   "channel": "MENA — санкции не применяет.",
+   "aliases": [
+    "ghaddar"
+   ]
+  },
+  {
+   "name": "Clarke Energy",
+   "country": "Великобритания (сеть по миру)",
+   "region": "ЕС/UK",
+   "type": "дилер OEM",
+   "site": "https://www.clarke-energy.com",
+   "email": "",
+   "oem": [
+    "Jenbacher"
+   ],
+   "sys": [
+    "ignition",
+    "cpg",
+    "head",
+    "filtration",
+    "control"
+   ],
+   "reach": 1,
+   "proof": 4,
+   "depth": 5,
+   "stock": 4,
+   "speed": 3,
+   "what": "Крупнейший международный дистрибьютор INNIO Jenbacher: продажа, сервис, ЗИП, апгрейды и капремонты.",
+   "proof_note": "Разделы по ЗИП и оверхолам Type 6.",
+   "channel": "Как поставщик для РФ закрыт. Ценность — техническая: их публикации по интервалам и составу капремонта используем как справочник.",
+   "aliases": [
+    "clarke"
+   ]
+  },
+  {
+   "name": "Energy Assistance (энерджиассистанс)",
+   "country": "Россия, Москва",
+   "region": "РФ",
+   "type": "трейдер",
+   "site": "https://www.energyassistance.ru",
+   "email": "info@energyassistance.ru",
+   "oem": [
+    "Caterpillar",
+    "Cummins",
+    "Jenbacher",
+    "MWM",
+    "Waukesha",
+    "Guascor",
+    "Perkins"
+   ],
+   "sys": [
+    "ignition"
+   ],
+   "reach": 5,
+   "proof": 5,
+   "depth": 4,
+   "stock": 3,
+   "speed": 4,
+   "what": "Московский магазин ЗИП зажигания для ГПУ: свечи Bosch/BERU/Denso, катушки, кабели — под CAT, Cummins QSV/QSK, MWM, Jenbacher, Waukesha, Guascor, Perkins 4000.",
+   "proof_note": "★ Живая проверка 14.08.2026: карточка Bosch 7305 (MR3DII360) с ЦЕНОЙ 6 900 ₽, применяемость прямо на странице — CAT G3520, Cummins QSV/QSK, Guascor FG/FGLD, Perkins 4000, Waukesha. Телефон 8-800, работают 24/7.",
+   "channel": "РФ, рублёвая цена на полке — готовый ориентир внутреннего рынка по свечам. Плюс редкий случай: РФ-игрок, который специализируется именно на зажигании ГПУ.",
+   "aliases": [
+    "energy assistance",
+    "энерджи ассистанс",
+    "energyassistance"
+   ]
+  },
+  {
+   "name": "GeneratorSparkPlug (CN)",
+   "country": "Китай",
+   "region": "Китай",
+   "type": "реверс-производитель",
+   "site": "https://www.generatorsparkplug.com",
+   "email": "",
+   "oem": [
+    "MWM",
+    "Jenbacher",
+    "Caterpillar",
+    "Cummins"
+   ],
+   "sys": [
+    "ignition"
+   ],
+   "reach": 5,
+   "proof": 4,
+   "depth": 4,
+   "stock": 3,
+   "speed": 3,
+   "what": "Китайский производитель/трейдер промышленных свечей и катушек для ГПУ; открытые карточки с кроссами по MWM и Jenbacher.",
+   "proof_note": "Карточки по нашим темам: свеча 12453572 для MWM TCG 2020 V12/V16/V20 и CG170 (кросс 12452828, альтернатива S-R6A12); катушка MOTORTECH 06.50.100 под Jenbacher 1200399/1209987.",
+   "channel": "Китай, прямая отгрузка. Уровень REV — только через пробную партию.",
+   "aliases": [
+    "generatorsparkplug"
+   ]
+  }
+ ]
+}

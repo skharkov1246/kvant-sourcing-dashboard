@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Покрытие запросами — критичный ЗИП ЛУКОЙЛ</title>
+<style>
+:root{
+  color-scheme:light;
+  --page:#f9f9f7; --surface:#fcfcfb; --ink:#0b0b0b; --ink2:#52514e; --mut:#898781;
+  --border:rgba(11,11,11,.10); --s1:#2a78d6; --good:#0ca30c; --warn:#fab219; --crit:#d03b3b;
+  --chip:#eef2f7;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:14px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1200px;margin:0 auto;padding:0 16px 80px}
+header{border-bottom:2px solid var(--ink);padding:20px 0 12px;margin-bottom:14px}
+h1{font-size:22px;margin:0 0 4px;letter-spacing:-.01em}
+.mut{color:var(--mut)} .small{font-size:12.5px}
+a{color:var(--s1);text-underline-offset:3px}
+.box{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--s1);border-radius:8px;padding:12px 16px;margin:12px 0}
+h2{font-size:15px;margin:26px 0 10px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink2)}
+.filters{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin:10px 0}
+.f-field{display:flex;flex-direction:column;gap:3px;min-width:0;max-width:100%}
+.f-field select,.f-field input{max-width:100%}
+.f-field label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--mut)}
+select,input[type=search]{padding:6px 9px;border:1px solid var(--border);border-radius:7px;background:var(--surface);font-size:13.5px;color:var(--ink)}
+.count{font-size:12.5px;color:var(--ink2);margin-left:auto;align-self:center}
+.btn{cursor:pointer;font-size:12.5px;border:1px solid var(--border);border-radius:7px;padding:5px 10px;background:var(--surface);color:var(--ink)}
+.btn:hover{border-color:var(--s1)}
+/* пачка */
+.batch{background:var(--surface);border:1px solid var(--border);border-radius:10px;margin:12px 0;overflow:hidden}
+.b-head{display:flex;gap:12px;align-items:center;padding:11px 16px;cursor:pointer;flex-wrap:wrap}
+.b-head:hover{background:var(--chip)}
+.b-title{font-weight:700;font-size:14.5px}
+.tag{display:inline-block;background:var(--chip);border-radius:5px;padding:1px 7px;font-size:12px;margin-right:5px}
+.prog{flex:0 0 160px;height:8px;background:var(--chip);border-radius:4px;overflow:hidden;margin-left:auto}
+.prog span{display:block;height:100%;background:var(--good)}
+.prog-t{font-size:11.5px;color:var(--ink2);white-space:nowrap}
+.b-body{display:none;border-top:1px solid var(--border);padding:12px 16px}
+.batch.open .b-body{display:block}
+.tblwrap{overflow-x:auto;margin:8px 0}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{padding:5px 10px;text-align:left;border-bottom:1px solid var(--border);vertical-align:top}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);white-space:nowrap}
+td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+/* поставщик в пачке */
+.srow{display:grid;grid-template-columns:minmax(190px,1.2fr) 70px minmax(200px,2fr) minmax(230px,1.1fr);gap:8px 14px;padding:9px 0;border-bottom:1px dashed var(--border);align-items:start}
+.srow:last-child{border-bottom:none}
+.sname{font-weight:650}
+.pbadge{font-weight:800;font-variant-numeric:tabular-nums;border-radius:6px;padding:2px 7px;text-align:center;font-size:13px}
+.p-hi{background:#d9f2d9;color:#0a5c0a} .p-md{background:#fdeecd;color:#7a5200} .p-lo{background:#f0f0ee;color:#6c6a64}
+.why{font-size:12px;color:var(--ink2)}
+.hook{font-size:12px;border-left:3px solid var(--good);padding-left:7px;margin-top:3px;color:var(--ink2)}
+.contact{font-size:12.5px}
+.contact a{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:230px}
+.stbar{display:flex;gap:4px;margin-top:5px;flex-wrap:wrap}
+.st{cursor:pointer;font-size:11.5px;border:1px solid var(--border);border-radius:6px;padding:2px 7px;background:none;color:var(--ink2)}
+.st.on-sent{background:#dbe9fb;border-color:var(--s1);color:#124a86;font-weight:700}
+.st.on-rep{background:#fdeecd;border-color:var(--warn);color:#7a5200;font-weight:700}
+.st.on-kp{background:#d9f2d9;border-color:var(--good);color:#0a5c0a;font-weight:700}
+.st.on-no{background:#f6dcdc;border-color:var(--crit);color:#8c1f1f;font-weight:700}
+.snote{font-size:12px;color:var(--ink2);margin-top:3px;font-style:italic}
+.meth ol{margin:6px 0;padding-left:22px} .meth li{margin:4px 0}
+/* цены и проверка */
+.pr{white-space:nowrap;font-variant-numeric:tabular-nums}
+.trust{font-size:10.5px;border-radius:4px;padding:1px 5px;margin-left:4px;white-space:nowrap}
+.t-ok{background:#d9f2d9;color:#0a5c0a;font-weight:700}
+.t-fix{background:#dbe9fb;color:#124a86}
+.t-raw{background:#fdeecd;color:#7a5200}
+.t-exp{background:#f0f0ee;color:#6c6a64}
+.t-bad{background:#f6dcdc;color:#8c1f1f}
+.stock-yes{background:#d9f2d9;color:#0a5c0a;font-weight:700;border-radius:4px;padding:1px 6px;font-size:11px}
+.role{font-size:10.5px;border-radius:4px;padding:1px 6px;margin-left:5px;font-weight:600;white-space:nowrap}
+.r-spec{background:#d9f2d9;color:#0a5c0a}
+.r-trade{background:#e6e2f7;color:#4a3a86}
+.r-serv{background:#eef2f7;color:#3d566e}
+.ask{font-size:10.5px;border-radius:4px;padding:1px 6px;margin-left:5px;white-space:nowrap;cursor:help}
+.a-pn{background:#dbe9fb;color:#124a86}
+.a-nom{background:#fdeecd;color:#7a5200;font-weight:600}
+.b-kind{font-size:11px;border-radius:5px;padding:1px 7px;margin-left:6px;font-weight:600}
+.k-spec{background:#d9f2d9;color:#0a5c0a}
+.k-trade{background:#e6e2f7;color:#4a3a86}
+.warn-fb{background:#fdeecd;color:#7a5200;font-size:11.5px;border-radius:5px;padding:3px 8px;display:inline-block;margin-bottom:6px}
+/* верхние вкладки */
+nav.top{display:flex;gap:6px;margin:14px 0 4px;flex-wrap:wrap}
+nav.top button{cursor:pointer;border:1px solid var(--border);background:var(--surface);border-radius:8px;padding:7px 14px;font-size:13.5px;color:var(--ink2)}
+nav.top button.on{background:var(--ink);color:#fff;border-color:var(--ink);font-weight:700}
+.pane{display:none} .pane.on{display:block}
+.k{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:12px 0}
+.tile{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:11px 13px}
+.tile b{font-size:21px;font-variant-numeric:tabular-nums;display:block}
+.tile span{font-size:12px;color:var(--ink2)}
+@media(max-width:800px){.srow{grid-template-columns:1fr}.prog{flex-basis:90px}}
+@media(max-width:520px){.b-title{font-size:13.5px}.role,.b-kind{margin-left:0;display:inline-block;margin-top:2px}.sname{word-break:break-word}}
+button:focus-visible,select:focus-visible,input:focus-visible,.b-head:focus-visible{outline:2px solid var(--s1);outline-offset:2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+ <h1>Покрытие запросами: критичный импортный ЗИП</h1>
+ <div class="mut small" id="hd-meta"></div>
+</header>
+
+<div class="k" id="tiles"></div>
+
+<nav class="top">
+ <button id="tab-plan" class="on" onclick="showPane('plan')">План рассылки</button>
+ <button id="tab-stock" onclick="showPane('stock')">Склад — что реально лежит</button>
+</nav>
+
+<div class="pane on" id="pane-plan">
+
+<div class="box meth">
+ <b>Методика — как работаем с этим списком.</b>
+ <ol>
+  <li><b>Пачка = направление × номенклатура.</b> Одно письмо — одна пачка (PN, наименование, кол-во таблицей). Не смешивать SGT-400 c Taurus — разные заводы и разные люди на той стороне.</li>
+  <li><b>Адресаты подобраны по сегменту, а не «вообще по турбинам».</b> В предметную пачку попадает только тот, у кого ЭТА номенклатура подтверждена в профиле: прокладки — уплотнительщикам, подшипники — подшипниковым, фильтры — фильтровым. Бейдж «делает: …» на карточке показывает его реальную специализацию.</li>
+  <li><b>Трейдеры и общесервисные — отдельная пачка на направление</b> (фиолетовый бейдж). Им уходит весь список направления одним файлом: они сами отсекут, что могут закрыть. Дублировать им предметные пачки не нужно — это сжигает канал.</li>
+  <li><b>Волны отправки.</b> Волна 1 (день 1): компании, уже отвечавшие нам в Bitrix (вероятность 50–80%). Волна 2 (день 2–3): П1–П2 с профильной моделью. Волна 3 (неделя 2): каталожные П3, трейдеры и стоки — добивка того, что не закрылось. Одной компании — не больше 2 пачек в неделю.</li>
+  <li><b>Чертежей у нас нет — работаем только по кодам.</b> Отсюда два разных письма, бейдж на карточке говорит какое:
+   <br>· <b>«запрос по PN»</b> (трейдеры, стоки, реверс-производители со своими кроссами, официальные каналы) — шлём таблицу каталожных номеров и ждём цену, срок, наличие.
+   <br>· <b>«только по номенклатуре»</b> (профильный субпоставщик, который льёт и точит по чертежам своего заказчика) — чужой каталожный номер ему ничего не скажет. Таблицу PN такому не шлём и <b>чертежи не обещаем</b>: спрашиваем, делает ли он такую деталь для этой машины, на каких условиях берётся, готов ли работать по образцу или через своего OEM-заказчика.</li>
+  <li><b>Письмо.</b> Первый абзац — «зацепка» с карточки (конкретный факт о компании), затем таблица позиций или вопрос по номенклатуре, срок ответа 5 рабочих дней. Прямой email из карточки; если только форма — форма + дубль на info@.</li>
+  <li><b>Вероятность на бейдже</b> — оценка содержательного ответа, собрана из фактов: история Bitrix &gt; П-ранг &gt; совпадение категории &gt; наличие прямого контакта. Наведи на бейдж — увидишь слагаемые.</li>
+  <li><b>Отметки.</b> На каждой строке поставщика: 📨 отправлено → 💬 ответил → 📄 КП → ❌ отказ. Отметки живут в этом браузере; «⬇ выгрузка» собирает их в файл для общей сводки, «⬆ импорт» подтягивает чужие.</li>
+ </ol>
+</div>
+
+<div class="filters">
+ <div class="f-field"><label>Направление</label><select id="f-dir" onchange="render()"><option value="">все</option></select></div>
+ <div class="f-field"><label>Категория</label><select id="f-cat" onchange="render()"><option value="">все</option></select></div>
+ <div class="f-field"><label>Статус пачки</label><select id="f-st" onchange="render()">
+  <option value="">любой</option><option value="virgin">не начата</option><option value="progress">в работе</option><option value="done">есть КП</option></select></div>
+ <div class="f-field" style="flex:1;min-width:200px"><label>Поиск (PN, деталь, поставщик)</label><input type="search" id="f-q" oninput="render()" placeholder="MW21215M, прокладка, EthosEnergy…"></div>
+ <span class="count" id="cnt"></span>
+</div>
+<div class="filters">
+ <button class="btn" onclick="expandAll(true)">развернуть все</button>
+ <button class="btn" onclick="expandAll(false)">свернуть</button>
+ <button class="btn" onclick="exportMarks()">⬇ выгрузка отметок</button>
+ <label class="btn" style="cursor:pointer">⬆ импорт<input type="file" accept=".json" style="display:none" onchange="importMarks(this)"></label>
+ <button class="btn" onclick="exportCSV()">⬇ CSV план</button>
+ <a class="btn" href="./" style="text-decoration:none">← библиотека поставщиков</a>
+</div>
+
+<div id="list"></div>
+</div><!-- /pane-plan -->
+
+<div class="pane" id="pane-stock">
+ <div class="box meth">
+  <b>Складские позиции — отдельный список.</b> Сюда попадают только те позиции, где проверяющий агент <b>открыл страницу продавца и увидел</b>: этот PN, цену и отметку о наличии. Всё остальное (экспертные вилки, непроверенные ссылки) живёт в плане рассылки и в файле оценки, но здесь не показывается — чтобы этот список можно было брать в работу без перепроверки.
+  <div class="small mut" style="margin-top:6px">Сортировка по потенциальной сумме позиции (цена × количество из заявки) — сверху то, что сильнее двигает бюджет лота.</div>
+ </div>
+ <div class="filters">
+  <div class="f-field"><label>Направление</label><select id="s-dir" onchange="renderStock()"><option value="">все</option></select></div>
+  <div class="f-field" style="flex:1;min-width:200px"><label>Поиск</label><input type="search" id="s-q" oninput="renderStock()" placeholder="PN, деталь, продавец…"></div>
+  <span class="count" id="s-cnt"></span>
+ </div>
+ <div class="filters"><button class="btn" onclick="exportStock()">⬇ CSV склада</button></div>
+ <div id="stock-list"></div>
+</div><!-- /pane-stock -->
+
+</div>
+
+<script>
+const BATCHES = __BATCHES_JSON__;
+const STOCK = __STOCK_JSON__;
+const META = __META_JSON__;
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+/* отметки: ключ = bIdx|поставщик */
+let M;
+try{ M = JSON.parse(localStorage.getItem('gt_rfq_v1')) || {}; }catch(e){ M = {}; }
+M.st = M.st||{}; M.note = M.note||{};
+const save = () => { try{ localStorage.setItem('gt_rfq_v1', JSON.stringify(M)); }catch(e){} };
+const bkey = (bi,s) => bi+'|'+s;
+
+const ST = [['sent','📨 отправлено'],['rep','💬 ответил'],['kp','📄 КП'],['no','❌ отказ']];
+
+document.getElementById('hd-meta').textContent = `${META.source} · обновлено ${META.updated} · позиций: ${META.total}`;
+const dirs=[...new Set(BATCHES.map(b=>b.dir))], cats=[...new Set(BATCHES.map(b=>b.cat))];
+document.getElementById('f-dir').innerHTML += dirs.map(d=>`<option>${esc(d)}</option>`).join('');
+document.getElementById('f-cat').innerHTML += cats.map(c=>`<option>${esc(c)}</option>`).join('');
+document.getElementById('s-dir').innerHTML += [...new Set(STOCK.map(s=>s.dir))].map(d=>`<option>${esc(d)}</option>`).join('');
+
+const TRUST_CLS = {'проверено':'t-ok','цена уточнена при проверке':'t-fix','не проверено':'t-raw','экспертная вилка':'t-exp','источник не подтвердился':'t-bad'};
+const money = v => v==null?'':'$'+Number(v).toLocaleString('ru',{maximumFractionDigits:2});
+function priceCell(p){
+ if(!p) return '<span class="mut">—</span>';
+ const range = p.usd_lo===p.usd_hi ? money(p.usd_lo) : `${money(p.usd_lo)}–${money(p.usd_hi)}`;
+ const cls = TRUST_CLS[p.trust]||'t-exp';
+ const stock = p.in_stock==='yes' ? ' <span class="stock-yes">склад</span>' : '';
+ const link = p.seller_url ? ` <a href="${esc(p.seller_url)}" target="_blank" rel="noopener" title="${esc(p.seller||'источник цены')}">→</a>` : '';
+ return `${range}<span class="trust ${cls}" title="${esc((p.basis||'')+(p.check_note?' · проверка: '+p.check_note:''))}">${esc(p.trust)}</span>${stock}${link}`;
+}
+function showPane(id){
+ for(const p of ['plan','stock']){
+  document.getElementById('pane-'+p).classList.toggle('on', p===id);
+  document.getElementById('tab-'+p).classList.toggle('on', p===id);
+ }
+ if(id==='stock') renderStock();
+}
+function renderStock(){
+ const fd=document.getElementById('s-dir').value, q=document.getElementById('s-q').value.trim().toLowerCase();
+ const rows = STOCK.filter(s=>{
+  if(fd && s.dir!==fd) return false;
+  if(q && !(s.name+' '+s.pn+' '+s.seller+' '+s.model).toLowerCase().includes(q)) return false;
+  return true;
+ });
+ const sum = rows.reduce((a,s)=>a+(s.hi||0)*(s.qty||0),0);
+ document.getElementById('s-cnt').textContent = `позиций: ${rows.length}${sum?` · потенциал ${money(sum)}`:''}`;
+ document.getElementById('stock-list').innerHTML = rows.length ? `<div class="tblwrap"><table>
+  <tr><th>Позиция</th><th>PN</th><th>Нужно</th><th>Цена за ед.</th><th>Сумма</th><th>Продавец</th><th>Наличие / срок</th><th>Что видно на странице</th></tr>
+  ${rows.map(s=>`<tr>
+   <td>${esc(s.name)}<div class="mut small">${esc(s.man)} ${esc(s.model)}</div></td>
+   <td>${esc(s.pn)}</td>
+   <td class="num">${esc(s.qty)} ${esc(s.unit)}</td>
+   <td class="num pr">${s.lo===s.hi?money(s.lo):money(s.lo)+'–'+money(s.hi)}</td>
+   <td class="num pr">${money((s.hi||0)*(s.qty||0))}</td>
+   <td>${s.url?`<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.seller||'источник')}</a>`:esc(s.seller)}</td>
+   <td><span class="stock-yes">в наличии</span>${s.stock_qty?` ${esc(s.stock_qty)}`:''}${s.lead?`<div class="mut small">${esc(s.lead)}</div>`:''}</td>
+   <td class="mut small">${esc(s.note)}</td></tr>`).join('')}
+  </table></div>`
+  : `<div class="box">Пока пусто. Складские позиции появляются здесь только после того, как проверяющий агент открыл страницу продавца и подтвердил PN, цену и наличие — непроверенные цены сюда не попадают.</div>`;
+}
+function exportStock(){
+ const lines=['позиция;PN;нужно;ЕИ;цена_от;цена_до;сумма_до;продавец;ссылка;наличие;срок;примечание'];
+ STOCK.forEach(s=>lines.push([s.name,s.pn,s.qty,s.unit,s.lo,s.hi,(s.hi||0)*(s.qty||0),s.seller,s.url,s.stock_qty||'да',s.lead,s.note]
+  .map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(';')));
+ const blob=new Blob(["﻿"+lines.join('\r\n')],{type:'text/csv;charset=utf-8'});
+ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='sklad_pozicii.csv'; a.click();
+}
+function bStatus(b, bi){
+ const sts = b.sups.map(s=>M.st[bkey(bi,s.name)]||'');
+ if(sts.some(s=>s==='kp')) return 'done';
+ if(sts.some(s=>s)) return 'progress';
+ return 'virgin';
+}
+function pcls(p){ return p>=45?'p-hi':p>=22?'p-md':'p-lo'; }
+
+function card(b, bi){
+ const open = openSet.has(bi) ? ' open' : '';
+ const sent = b.sups.filter(s=>M.st[bkey(bi,s.name)]).length;
+ const kp = b.sups.filter(s=>M.st[bkey(bi,s.name)]==='kp').length;
+ const items = b.items.map(i=>`<tr><td>${esc(i.name)}</td><td>${esc(i.pn)}</td><td class="num">${esc(i.qty)} ${esc(i.unit)}</td><td class="pr">${priceCell(i.pr)}</td><td class="mut">${esc(i.model)}</td></tr>`).join('');
+ const sups = b.sups.length ? b.sups.map(s=>{
+  const k = bkey(bi,s.name), st = M.st[k]||'', note = M.note[k]||'';
+  const contacts = [
+   s.site?`<a href="${esc(/^https?:/.test(s.site)?s.site:'https://'+s.site)}" target="_blank" rel="noopener">🌐 ${esc(s.site.replace(/^https?:\/\//,''))}</a>`:'',
+   s.email?`<a href="mailto:${esc(s.email)}">✉ ${esc(s.email)}</a>`:'',
+   s.phone?`<span>☎ ${esc(s.phone)}</span>`:'',
+   s.person?`<span class="mut">${esc(s.person)}</span>`:'',
+  ].filter(Boolean).join('');
+  const ROLE = {specialist:['профильный изготовитель','r-spec'],trader:['трейдер / сток','r-trade'],service:['общий сервис','r-serv']};
+  const rl = ROLE[s.role]||ROLE.service;
+  const ask = s.ask==='pn'
+    ? '<span class="ask a-pn" title="Работает по каталожным номерам: трейдер, сток, реверс-производитель со своими кроссами или официальный канал. Шлём таблицу PN и ждём цену и срок.">запрос по PN</span>'
+    : '<span class="ask a-nom" title="Делает по чертежам своего заказчика — чужой каталожный номер ему ничего не скажет, а чертежей у нас нет. Спрашиваем по номенклатуре: делаете ли такую деталь для этой машины, на каких условиях беретесь, нужен ли образец.">только по номенклатуре — PN не поймёт</span>';
+  const ovb = s.ov==='send' ? '<span class="ask" style="background:#d9f2d9;color:#0a5c0a" title="компания и профиль проверены агентом: живая, занимается именно этим">✓ проверен</span>'
+    : s.ov==='doubt' ? '<span class="ask a-nom" title="проверка нашла натяжку — читай пояснение в тултипе вероятности">⚠ с оговоркой</span>' : '';
+  return `<div class="srow" data-k="${esc(k)}">
+   <div><div class="sname">${esc(s.name)} <span class="role ${rl[1]}">${rl[0]}</span>${ask}${ovb}</div>
+    <div class="mut small">${esc(s.country||'')}${s.bx?` · Bitrix ×${s.bx}`:''} · П${s.prank}${s.cats&&s.cats.length?' · делает: '+esc(s.cats.join(', ')):''}</div>
+    ${s.hook?`<div class="hook">✍ ${esc(s.hook)}</div>`:''}</div>
+   <div><span class="pbadge ${pcls(s.p)}" title="${esc(s.why)}">${s.p}%</span></div>
+   <div class="contact">${contacts||'<span class="mut">контакт через сайт</span>'}
+    ${note?`<div class="snote">${esc(note)}</div>`:''}</div>
+   <div><div class="stbar">${ST.map(([v,n])=>`<button class="st${st===v?' on-'+v:''}" data-st="${v}">${n}</button>`).join('')}
+    <button class="st" data-st="note">✏</button></div></div>
+  </div>`;
+ }).join('') : '<div class="mut">Поставщики не подобраны — направление ждёт раскрутки базы (см. волну по недостающим).</div>';
+ return `<div class="batch${open}" data-bi="${bi}">
+  <div class="b-head" tabindex="0">
+   <div><div class="b-title">${esc(b.dir)} — ${esc(b.cat)}<span class="b-kind ${b.kind==='trade'?'k-trade':'k-spec'}">${b.kind==='trade'?'трейдеры':'профильные'}</span></div>
+   <div class="small mut">${b.n} позиций · ${b.qty_total?b.qty_total.toLocaleString('ru')+' шт суммарно · ':''}адресатов: ${b.sups.length}</div></div>
+   <div class="prog" title="отправлено ${sent} из ${b.sups.length}"><span style="width:${b.sups.length?Math.round(100*sent/b.sups.length):0}%"></span></div>
+   <div class="prog-t">${kp?`📄 КП: ${kp} · `:''}${sent}/${b.sups.length}</div>
+  </div>
+  <div class="b-body">
+   <details><summary style="cursor:pointer" class="small">Позиции пачки (${b.n}) — что вставить в письмо</summary>
+    <div class="tblwrap"><table><tr><th>Наименование</th><th>PN</th><th>Кол-во</th><th>Оценка за ед.</th><th>Оборудование</th></tr>${items}</table></div>
+   </details>
+   <h2 style="margin-top:12px">Кому отправлять (по убыванию вероятности ответа)</h2>
+   ${b.fallback?'<div class="warn-fb">⚠ Профильного изготовителя именно по этой номенклатуре в базе нет — показаны специалисты направления. Перед отправкой уточнить, делают ли они эту позицию, либо закрывать через трейдерскую пачку.</div>':''}
+   ${b.kind==='trade'?'<div class="warn-fb" style="background:#e6e2f7;color:#4a3a86">Трейдеры и общесервисные: им уходит ВЕСЬ список направления одним файлом — они сами скажут, что могут закрыть. Предметные пачки этим адресатам не дублировать.</div>':''}
+   ${sups}
+  </div>
+ </div>`;
+}
+
+let openSet = new Set();
+function render(){
+ const fd=document.getElementById('f-dir').value, fc=document.getElementById('f-cat').value,
+       fs=document.getElementById('f-st').value, q=document.getElementById('f-q').value.trim().toLowerCase();
+ let shown=0, totalPos=0;
+ const html = BATCHES.map((b,bi)=>{
+  if(fd && b.dir!==fd) return '';
+  if(fc && b.cat!==fc) return '';
+  if(fs && bStatus(b,bi)!==fs) return '';
+  if(q){
+   const hay = (b.dir+' '+b.cat+' '+b.items.map(i=>i.name+' '+i.pn).join(' ')+' '+b.sups.map(s=>s.name).join(' ')).toLowerCase();
+   if(!hay.includes(q)) return '';
+  }
+  shown++; totalPos+=b.n;
+  return card(b,bi);
+ }).join('');
+ document.getElementById('list').innerHTML = html || '<div class="box">Ничего не найдено — сними фильтры.</div>';
+ document.getElementById('cnt').textContent = `пачек: ${shown} · позиций: ${totalPos}`;
+ tiles();
+}
+function tiles(){
+ const el=document.getElementById('tiles');
+ const nb=BATCHES.length;
+ const started=BATCHES.filter((b,bi)=>bStatus(b,bi)!=='virgin').length;
+ const done=BATCHES.filter((b,bi)=>bStatus(b,bi)==='done').length;
+ const sent=Object.values(M.st).filter(v=>v).length;
+ const kp=Object.values(M.st).filter(v=>v==='kp').length;
+ el.innerHTML=[[META.total,'позиций в заявке'],[nb,'пачек к отправке'],
+  [(META.priced||0),'позиций с оценкой цены'],[(META.verified||0),'цен подтверждено проверкой'],
+  [(META.stock||0),'позиций найдено на складах'],[sent,'отправок отмечено'],[kp,'получено КП (отметки)']]
+  .map(([b,s])=>`<div class="tile"><b>${b}</b><span>${s}</span></div>`).join('');
+}
+function expandAll(v){
+ openSet = v ? new Set(BATCHES.map((_,i)=>i)) : new Set();
+ render();
+}
+document.addEventListener('click', e=>{
+ const head = e.target.closest('.b-head');
+ if(head){
+  const bi=+head.parentElement.dataset.bi;
+  openSet.has(bi)?openSet.delete(bi):openSet.add(bi);
+  render(); return;
+ }
+ const st = e.target.closest('.st');
+ if(st){
+  const row=st.closest('.srow'), k=row.dataset.k;
+  if(st.dataset.st==='note'){
+   const v=prompt('Заметка по этому поставщику в этой пачке:', M.note[k]||'');
+   if(v!==null){ v.trim()?M.note[k]=v.trim():delete M.note[k]; save(); render(); }
+   return;
+  }
+  M.st[k]===st.dataset.st ? delete M.st[k] : M.st[k]=st.dataset.st;
+  save(); render();
+ }
+});
+document.addEventListener('keydown', e=>{
+ if(e.key==='Enter' && e.target.classList.contains('b-head')) e.target.click();
+});
+function exportMarks(){
+ const blob=new Blob([JSON.stringify(M,null,1)],{type:'application/json'});
+ const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+ a.download='rfq_marks_'+new Date().toISOString().slice(0,10)+'.json'; a.click();
+}
+function importMarks(inp){
+ const f=inp.files&&inp.files[0]; if(!f) return;
+ f.text().then(t=>{ try{
+  const e=JSON.parse(t); Object.assign(M.st,e.st||{}); Object.assign(M.note,e.note||{});
+  save(); render();
+ }catch(err){ alert('Не прочитал файл: '+err.message); } });
+}
+function exportCSV(){
+ const lines=['пачка;категория;поставщик;вероятность;email;телефон;статус;заметка'];
+ BATCHES.forEach((b,bi)=>b.sups.forEach(s=>{
+  const k=bkey(bi,s.name);
+  lines.push([b.dir,b.cat,s.name,s.p+'%',s.email,s.phone,(ST.find(x=>x[0]===M.st[k])||['',''])[1],M.note[k]||'']
+   .map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(';'));
+ }));
+ const blob=new Blob(["﻿"+lines.join('\r\n')],{type:'text/csv;charset=utf-8'});
+ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='rfq_plan.csv'; a.click();
+}
+render();
+/* глубокие ссылки из меню лота: #stock, #trade, #dir=<направление> */
+(function(){
+ const h=decodeURIComponent(location.hash.slice(1));
+ if(h==='stock'){ showPane('stock'); }
+ else if(h==='trade'){ const el=document.getElementById('f-cat'); 
+  for(const o of el.options) if(o.value.startsWith('трейдеры')) { el.value=o.value; break; }
+  render(); }
+ else if(h.startsWith('dir=')){ const v=h.slice(4); const el=document.getElementById('f-dir');
+  for(const o of el.options) if(o.value===v){ el.value=v; break; }
+  render(); }
+})();
+</script>
+</body>
+</html>

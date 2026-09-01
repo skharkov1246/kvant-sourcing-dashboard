@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Лот ЛУКОЙЛ — критичный импортный ЗИП · меню</title>
+<style>
+:root{
+  color-scheme:light;
+  --page:#f9f9f7; --surface:#fcfcfb; --ink:#0b0b0b; --ink2:#52514e; --mut:#898781;
+  --border:rgba(11,11,11,.10); --s1:#2a78d6; --good:#0ca30c; --hot:#b8431a; --chip:#eef2f7;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:980px;margin:0 auto;padding:0 16px 70px}
+header{border-bottom:2px solid var(--ink);padding:22px 0 14px;margin-bottom:16px}
+h1{font-size:23px;margin:0 0 4px;letter-spacing:-.01em}
+.mut{color:var(--mut)} .small{font-size:12.5px}
+a{color:var(--s1);text-underline-offset:3px}
+a:focus-visible{outline:2px solid var(--s1);outline-offset:3px;border-radius:4px}
+.k{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:14px 0 22px}
+.tile{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px}
+.tile b{font-size:22px;font-variant-numeric:tabular-nums;display:block}
+.tile span{font-size:12px;color:var(--ink2)}
+/* большие пункты меню */
+.menu{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.mcard{display:block;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;text-decoration:none;color:var(--ink);transition:border-color .12s}
+.mcard:hover{border-color:var(--s1)}
+.mcard .mi{font-size:26px;display:block;margin-bottom:6px}
+.mcard b{font-size:16.5px;display:block;margin-bottom:4px}
+.mcard .md{font-size:13px;color:var(--ink2);line-height:1.45}
+.mcard .mn{margin-top:8px;font-size:12.5px;color:var(--s1);font-weight:600}
+.mcard.hotc{border-left:4px solid var(--hot)}
+.mcard.stockc{border-left:4px solid var(--good)}
+h2{font-size:12.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink2);margin:28px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.dirrow{display:flex;justify-content:space-between;gap:12px;padding:9px 12px;border:1px solid var(--border);border-radius:9px;margin:6px 0;text-decoration:none;color:var(--ink);background:var(--surface);flex-wrap:wrap}
+.dirrow:hover{border-color:var(--s1)}
+.dirrow span:first-child{font-weight:600}
+footer{margin-top:34px;padding-top:12px;border-top:1px solid var(--border);font-size:12.5px;color:var(--mut)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+ <h1>Лот ЛУКОЙЛ · критичный импортный ЗИП</h1>
+ <div class="mut small">Рабочее меню лота для сорсеров · обновлено __UPDATED__ · <a href="./">библиотека поставщиков ГТУ</a></div>
+</header>
+
+<div class="k">
+ <div class="tile"><b>__TOTAL__</b><span>позиций в заявке</span></div>
+ <div class="tile"><b>__PRICED__</b><span>с оценкой цены</span></div>
+ <div class="tile"><b>__VERIFIED__</b><span>цен подтверждено проверкой</span></div>
+ <div class="tile"><b>__BATCHES__</b><span>пачек к отправке</span></div>
+ <div class="tile"><b>__SUPS__</b><span>адресатов подобрано</span></div>
+ <div class="tile"><b>__STOCK_N__</b><span>позиций найдено на складах</span></div>
+</div>
+
+<div class="menu">
+ <a class="mcard hotc" href="./hot">
+  <span class="mi">🔥</span><b>Горячая часть: камеры и горелки</b>
+  <div class="md">__HOT_N__ позиций (__HOT_QTY__ шт): камеры MW21215M, горелки DUAL DLE, жаровая KG2, завихрители Victory. Шорт-листы «кому писать первым», карта кодов (какая ревизия на какую машину ложится), риски и готовые формулировки запроса. Только Европа или склад.</div>
+  <div class="mn">Открыть разбор →</div>
+ </a>
+ <a class="mcard" href="./rfq">
+  <span class="mi">📦</span><b>Мелочь и весь остальной ЗИП — план рассылки</b>
+  <div class="md">__BATCHES__ пачек «направление × номенклатура»: прокладки — уплотнительщикам, подшипники — подшипниковым, электрика — специалистам по obsolete. Вероятность ответа с объяснением, режим запроса (PN / по номенклатуре), отметки хода рассылки.</div>
+  <div class="mn">Открыть план →</div>
+ </a>
+ <a class="mcard stockc" href="./rfq#stock">
+  <span class="mi">🏬</span><b>Склады — что реально лежит</b>
+  <div class="md">__STOCK_N__ позиций мелочи на подтверждённых складах (потенциал __STOCK_SUM__) + __HOT_STOCK__ складских находок по горячей части (DLE-горелки в Дубае, pilot burners в NL, ядро-донор). Каждый лот открыт и проверен агентом — непроверенное сюда не попадает.</div>
+  <div class="mn">Открыть склады →</div>
+ </a>
+ <a class="mcard" href="./f4000" style="border-left:4px solid #7a4bd1">
+  <span class="mi">⚙️</span><b>SGT5-4000F (V94.3A) — цепочка поставок</b>
+  <div class="md">Отдельная раскрутка тяжёлой машины: кто из независимых реально работал на 94.3A и делает компоненты, кто «светит» производством лопаток, камеры, поковок, САУ. Ansaldo как второй OEM. Фактура с источниками.</div>
+  <div class="mn">Открыть разбор 4000F →</div>
+ </a>
+ <a class="mcard" href="./lm6000" style="border-left:4px solid #0f766e">
+  <span class="mi">✈️</span><b>GE LM6000 — цепочка поставок и склады</b>
+  <div class="md">Аэродериватив от ядра CF6-80C2: независимые с опытом (ProEnergy, VBR, MTU, Chromalloy PMA), авторизованные депо GE, 37 складских лотов. Критично: поколения PA…PH и тип камеры SAC/DLE — горячая часть между ними не взаимозаменяема.</div>
+  <div class="mn">Открыть разбор LM6000 →</div>
+ </a>
+ <a class="mcard" href="./v643a" style="border-left:4px solid #b45309">
+  <span class="mi">🏭</span><b>V64.3A / AE64.3A / SGT-1000F</b>
+  <div class="md">Наши 5 сделок по ТТЭЦ-1 Фортум. Ansaldo — фактический владелец платформы и возила части в РФ в 2023; GFM возила ремкомплекты. Три ловушки: 64.3A и 94.3A выглядят одинаково, но детали вдвое меньше.</div>
+  <div class="mn">Открыть разбор 64.3A →</div>
+ </a>
+ <a class="mcard" href="./solar" style="border-left:4px solid #c2410c">
+  <span class="mi">☀️</span><b>Solar Turbines: Saturn → Titan</b>
+  <div class="md">Крупнейший спрос базы (~70 сделок). Рынок живёт на каталожных номерах — ровно наш случай, чертежи не нужны. Ловушки: последняя цифра T-номера = валовая схема, SoLoNOx ≠ стандартная камера, Titan 130 не апрейт Mars. Отдельно отмечено, где независимого рынка нет (Taurus 70, Titan).</div>
+  <div class="mn">Открыть разбор Solar →</div>
+ </a>
+ <a class="mcard" href="./ms6001b" style="border-left:4px solid #1d4ed8">
+  <span class="mi">🔩</span><b>GE Frame 6B (MS6001B)</b>
+  <div class="md">Самый ликвидный aftermarket среди GE-фреймов: >1200 машин, HGP-детали кросс-применимы между рейтингами 6541B–6581B. 40 компаний по слоям, ключевые факты перепроверены скептиком с цитатами. Ловушки: 6B ≠ 6F.03, DLN1 против стандартной камеры.</div>
+  <div class="mn">Открыть разбор 6B →</div>
+ </a>
+ <a class="mcard" href="./rfq#trade">
+  <span class="mi">🤝</span><b>Трейдеры и общий сервис</b>
+  <div class="md">13 пачек «весь список направления одним письмом» для трейдеров, стоков и общесервисных — они сами скажут, что закроют. В предметные пачки не дублируются, чтобы не жечь канал.</div>
+  <div class="mn">Открыть трейдерские пачки →</div>
+ </a>
+</div>
+
+<h2>Блоки лота по направлениям — сразу с фильтром</h2>
+__DIR_ROWS__
+
+<footer>
+ Все страницы обновляются одной сборкой; отметки сорсеров хранятся в браузере и переносятся выгрузкой/импортом. Оценка каждой позиции и файл поставщиков по направлениям — в XLSX-выгрузках у владельца.
+</footer>
+</div>
+</body>
+</html>

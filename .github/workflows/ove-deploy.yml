@@ -1,0 +1,64 @@
+name: OVE-75 deploy
+
+# Сборка сайта проекта ОВЭ-75 (ove/) и деплой на Cloudflare Pages (проект kvant-ove).
+# Отдельный домен, отдельный проект Pages — дашборд сорсеров и база ЗИП не затрагиваются.
+# Перед сборкой пытаемся обновить выгрузку поставщиков из Bitrix24; если секрета нет
+# или Bitrix недоступен — используется сид ove/data/bitrix_ove.json, сборка не падает.
+on:
+  push:
+    branches: [main]
+    paths: ["ove/**", ".github/workflows/ove-deploy.yml"]
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ove-deploy
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Зависимости
+        run: pip install --quiet requests pydantic python-dotenv
+
+      - name: Выгрузка поставщиков из Bitrix24 (не роняет сборку)
+        env:
+          BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
+        continue-on-error: true
+        run: python ove/tools/bitrix_ove.py
+
+      - name: Сборка index.html из шаблона и данных
+        run: |
+          set -euo pipefail
+          python ove/build.py
+          test -f ove/public/index.html
+
+      - name: Деплой на Cloudflare Pages (kvant-ove)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          # создать проект, если его ещё нет (иначе тихо пропустить)
+          npx --yes wrangler@latest pages project create kvant-ove \
+            --production-branch=main 2>/dev/null || true
+          # ASCII commit-message: иначе wrangler цепляет кириллицу git-коммита → CF отвергает (8000111).
+          ok=0
+          for i in 1 2 3; do
+            if npx --yes wrangler@latest pages deploy ove/public \
+                 --project-name=kvant-ove --branch=main \
+                 --commit-dirty=true --commit-message="ove auto deploy"; then
+              ok=1; break
+            fi
+            echo "⚠ деплой упал (попытка $i/3) — повтор через 20с…"; sleep 20
+          done
+          [ "$ok" = 1 ] || { echo "::error::деплой не удался после 3 попыток"; exit 1; }

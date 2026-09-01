@@ -1,0 +1,1426 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ГПУ-библиотека — Cummins · Caterpillar · Jenbacher</title>
+<style>
+:root{
+  color-scheme:light;
+  --page:#f9f9f7; --surface:#fcfcfb; --ink:#0b0b0b; --ink2:#52514e; --mut:#898781;
+  --grid:#e1e0d9; --axis:#c3c2b7; --border:rgba(11,11,11,.10);
+  --s1:#2a78d6; --s1-soft:#cde2fb; --good:#0ca30c; --warn:#fab219; --crit:#d03b3b; --serious:#ec835a;
+  --chip:#eef2f7;
+}
+@media (prefers-color-scheme: dark){
+  :root:where(:not([data-theme="light"])){
+    color-scheme:dark;
+    --page:#0d0d0d; --surface:#1a1a19; --ink:#fff; --ink2:#c3c2b7; --mut:#898781;
+    --grid:#2c2c2a; --axis:#383835; --border:rgba(255,255,255,.10);
+    --s1:#3987e5; --s1-soft:#184f95; --chip:#262624;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --page:#0d0d0d; --surface:#1a1a19; --ink:#fff; --ink2:#c3c2b7; --mut:#898781;
+  --grid:#2c2c2a; --axis:#383835; --border:rgba(255,255,255,.10);
+  --s1:#3987e5; --s1-soft:#184f95; --chip:#262624;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:14px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;overflow-wrap:break-word}
+/* рвать посимвольно можно только длинные технические строки — номера и ссылки */
+.mono,a,code{overflow-wrap:anywhere}
+a{color:var(--s1);text-decoration:none} a:hover{text-decoration:underline}
+header{padding:18px 22px 0}
+h1{font-size:21px;margin:0 0 2px}
+.sub{color:var(--ink2);font-size:12.5px}
+nav{position:sticky;top:0;z-index:5;background:var(--page);display:flex;gap:4px;flex-wrap:wrap;padding:10px 22px;border-bottom:1px solid var(--grid)}
+nav button{border:1px solid var(--border);background:var(--surface);color:var(--ink2);padding:6px 13px;border-radius:18px;font:600 13px system-ui;cursor:pointer}
+nav button.on{background:var(--s1);border-color:var(--s1);color:#fff}
+main{padding:16px 22px 40px;max-width:1280px}
+section{display:none} section.on{display:block}
+h2{font-size:16px;margin:20px 0 8px}
+h3{font-size:14px;margin:16px 0 6px}
+h4{margin:0 0 4px;font-size:13.5px}
+p{margin:8px 0}
+.mut{color:var(--mut);font-size:12px}
+.k{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+.tile{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 16px;min-width:132px;flex:1 1 132px}
+.tile b{display:block;font-size:21px;font-variant-numeric:tabular-nums}
+.tile span{color:var(--ink2);font-size:12px}
+.box{background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--good);border-radius:8px;padding:10px 14px;margin:10px 0;font-size:13px}
+.box.warn{border-left-color:var(--crit)}
+.box.info{border-left-color:var(--s1)}
+.box.hot{border-left-color:var(--warn)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin:8px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
+.tblwrap{overflow:auto;max-height:75vh;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin:8px 0}
+table{border-collapse:collapse;width:100%;font-size:12.5px}
+th{background:var(--chip);text-align:left;font-size:11.5px;color:var(--ink2);white-space:nowrap;position:sticky;top:0;z-index:2}
+th,td{padding:6px 9px;border-bottom:1px solid var(--grid);vertical-align:top}
+tr:last-child td{border-bottom:0}
+td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+table.sortable th{cursor:pointer;user-select:none}
+table.sortable th::after{content:" ↕";opacity:.35}
+table.sortable th.asc::after{content:" ↑";color:var(--s1);opacity:1}
+table.sortable th.desc::after{content:" ↓";color:var(--s1);opacity:1}
+.tag{display:inline-block;background:var(--chip);border-radius:9px;padding:1px 8px;font-size:11px;color:var(--ink2);margin:1px 2px 1px 0;white-space:nowrap;max-width:100%;vertical-align:top}
+/* длинные технические строки (номера OEM, имена каналов) переносим — иначе на 390px чип уезжает за экран */
+.tag.wrap{white-space:normal}
+.pill{display:inline-block;border:1px solid var(--border);border-radius:10px;padding:1px 9px;font-size:11px;color:var(--ink2);margin:1px 3px 1px 0;white-space:nowrap}
+.pill.a{border-color:var(--good);color:var(--good);font-weight:700}
+.pill.b{border-color:var(--s1);color:var(--s1)}
+.pill.c{border-color:var(--serious);color:var(--serious)}
+.pill.d{border-color:var(--crit);color:var(--crit)}
+.pill.hi{border-color:var(--good);color:var(--good);font-weight:700}
+.pill.md{border-color:var(--s1);color:var(--s1)}
+.pill.lo{border-color:var(--mut);color:var(--mut)}
+.filters{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin:10px 0}
+.f-field{display:flex;flex-direction:column;gap:3px}
+.f-field label{font-size:10.5px;color:var(--mut);text-transform:uppercase;letter-spacing:.05em}
+.filters input,.filters select{background:var(--surface);color:var(--ink);border:1px solid var(--border);border-radius:8px;padding:6px 10px;font:13px system-ui;max-width:100%}
+.filters input{min-width:200px}
+.count{color:var(--ink2);font-size:12px;margin-left:auto;align-self:center}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+.chip{border:1px solid var(--border);border-radius:16px;padding:4px 12px;font-size:12.5px;cursor:pointer;background:var(--surface);color:var(--ink2);user-select:none}
+.chip:hover{border-color:var(--s1);color:var(--ink)}
+.chip.on{background:var(--s1);border-color:var(--s1);color:#fff}
+.acc{border:1px solid var(--border);border-radius:10px;background:var(--surface);margin:8px 0;overflow:hidden}
+.acc-row{display:grid;grid-template-columns:minmax(160px,2fr) 3fr auto;gap:12px;align-items:center;padding:9px 14px;cursor:pointer;border-top:1px solid var(--grid)}
+.acc-item:first-child .acc-row{border-top:0}
+.acc-row:hover{background:var(--chip)}
+.acc-n{font-variant-numeric:tabular-nums;color:var(--ink2);font-size:12.5px;white-space:nowrap}
+.chev{color:var(--mut);transition:transform .15s;display:inline-block}
+.acc-item.open .chev{transform:rotate(90deg)}
+.acc-body{display:none;padding:2px 14px 12px;border-top:1px dashed var(--grid)}
+.acc-item.open .acc-body{display:block}
+.sup{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 16px;margin:10px 0;display:grid;grid-template-columns:minmax(190px,1fr) 1.7fr minmax(190px,.9fr);gap:8px 18px}
+.sup:hover{border-color:var(--s1)}
+.note{background:var(--chip);border-radius:8px;padding:6px 9px;font-size:12px;color:var(--ink2)}
+.score{display:flex;align-items:baseline;gap:6px}
+.score b{font-size:22px;font-variant-numeric:tabular-nums}
+.bars{display:flex;flex-direction:column;gap:3px;margin-top:6px}
+.barrow{display:grid;grid-template-columns:96px 1fr 18px;gap:6px;align-items:center;font-size:11px;color:var(--ink2)}
+.bartrack{height:6px;border-radius:3px;background:var(--grid);overflow:hidden}
+.barfill{height:100%;background:var(--s1);border-radius:3px}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px}
+pre{background:var(--chip);border:1px solid var(--border);border-radius:8px;padding:10px 12px;overflow-x:auto;font-size:12px;white-space:pre-wrap}
+ul,ol{margin:6px 0;padding-left:20px} li{margin:3px 0}
+.btn{border:1px solid var(--border);background:var(--surface);color:var(--ink2);padding:6px 12px;border-radius:8px;font:600 12px system-ui;cursor:pointer}
+.btn:hover{border-color:var(--s1);color:var(--ink)}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+footer{padding:0 22px 24px;color:var(--mut);font-size:11.5px}
+@media(max-width:900px){
+  main,header,nav,footer{padding-left:14px;padding-right:14px}
+  .sup{grid-template-columns:1fr}
+  .acc-row{grid-template-columns:1fr auto}
+  .split{grid-template-columns:1fr}
+  .count{margin-left:0}
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>ГПУ-библиотека — газопоршневые: Cummins · Caterpillar · Jenbacher</h1>
+  <div class="sub">Кому идти за каким ЗИП, кто реально делает узлы, какие аналоги считаются нормальными и через какие страны это ходит. Сборка <b id="built"></b>.</div>
+</header>
+<nav id="nav"></nav>
+<main>
+
+<section id="t-over" class="on">
+  <div class="k" id="ov-tiles"></div>
+  <div class="box hot" id="ov-hot"></div>
+  <div class="box info">
+    <b>Правило шильдика — главное, что стоит унести с этого сайта.</b>
+    <div id="ov-rule" style="margin-top:6px"></div>
+  </div>
+  <h2>Как пользоваться</h2>
+  <div class="grid" id="ov-how"></div>
+  <h2>Что внутри и откуда взято</h2>
+  <div class="card" id="ov-src"></div>
+</section>
+
+<section id="t-find">
+  <h2>Поиск по номеру</h2>
+  <p class="mut">Один номер — всё, что о нём знает библиотека: наш лот, аналоги, каталоги MOTORTECH, ведомости, машины, поставщики, живые проверки. Пробелы, дефисы и точки в номере игнорируются.</p>
+  <div class="filters"><div class="f-field" style="flex:1"><label>номер детали или название</label>
+    <input id="fx-q" placeholder="4380132 · 06.50.151 · 334976 · LF9050 · 12453572 · P611…" style="width:100%;font-size:16px;padding:10px 12px"></div></div>
+  <div id="fx-out"></div>
+</section>
+
+<section id="t-strategy">
+  <h2 id="st-title"></h2>
+  <div class="box info" id="st-thesis"></div>
+  <h3>Четыре актива, которые накапливаются</h3>
+  <div class="grid" id="st-assets"></div>
+  <h3>Годовая потребность по владельцам парка</h3>
+  <p class="mut" id="tg-src"></p>
+  <div class="k" id="tg-tiles"></div>
+  <div class="box warn" id="tg-caveat"></div>
+  <p class="mut">Клик по строке — объекты группы и раскладка годовой потребности по позициям.</p>
+  <div class="tblwrap"><table class="sortable" id="tg-tbl"><thead><tr>
+    <th data-k="group">Группа владельцев</th><th data-k="mw" class="num">МВт</th>
+    <th data-k="objects_n" class="num">Объектов</th><th data-k="usd_year" class="num">$ ЗИП в год</th>
+    <th data-k="plugs" class="num">Свечей в год</th><th data-k="warm">Отношения</th>
+  </tr></thead><tbody id="tg-body"></tbody></table></div>
+  <div id="tg-detail"></div>
+
+  <h3>Метрики</h3>
+  <div class="tblwrap"><table><thead><tr><th>Что меряем</th><th class="num">Сейчас</th><th class="num">Цель за квартал</th><th>Зачем</th></tr></thead><tbody id="st-metrics"></tbody></table></div>
+  <h3 id="st-plan-t"></h3>
+  <div id="st-plan"></div>
+  <h3 id="st-funnel-t"></h3>
+  <p id="st-funnel-x"></p>
+  <div class="tblwrap"><table><thead><tr><th>Стадия</th><th>Критерий перехода</th><th>Артефакт</th><th class="num">Сейчас</th></tr></thead><tbody id="st-funnel"></tbody></table></div>
+  <div class="box warn" id="st-funnel-rule"></div>
+  <h3 id="st-trial-t"></h3>
+  <div class="card"><ol id="st-trial"></ol><div class="note" id="st-trial-why"></div></div>
+  <h3>Принципы</h3>
+  <div class="card"><ul id="st-principles"></ul></div>
+</section>
+
+<section id="t-market">
+  <h2>Рынок и ёмкость</h2>
+  <p id="mk-intro"></p>
+  <div class="box warn" id="mk-persp"></div>
+  <div class="card"><h4>Как считаем</h4><div id="mk-method"></div></div>
+  <div class="tblwrap"><table><thead><tr><th>Периметр</th><th class="num">МВт</th><th class="num">$ в год</th><th>Комментарий</th></tr></thead><tbody id="mk-size"></tbody></table></div>
+  <h3>Сегменты</h3>
+  <div id="mk-seg"></div>
+  <h3>Почему у нас есть шанс</h3>
+  <div class="card"><ul id="mk-win"></ul></div>
+  <h3>Риски</h3>
+  <div id="mk-risks"></div>
+  <h3>Конкуренты</h3>
+  <p id="cp-intro"></p>
+  <div id="cp-land"></div>
+  <div class="box info" id="cp-pos"></div>
+  <div class="card"><h4>Что делает нас экспертом</h4><ul id="cp-exp"></ul></div>
+</section>
+
+<section id="t-fleet">
+  <h2>Парк ГПУ в России</h2>
+  <p id="fl-intro"></p>
+  <div class="box warn" id="fl-status"></div>
+  <div class="box info" id="fl-insight"></div>
+  <h3>Опорные цифры источников</h3>
+  <div id="fl-anchors"></div>
+  <div class="k" id="fl-tiles"></div>
+  <h3>Реестр объектов</h3>
+  <div class="filters">
+    <div class="f-field"><label>поиск</label><input id="fl-q" placeholder="владелец, объект…"></div>
+    <div class="f-field"><label>сегмент</label><select id="fl-seg"></select></div>
+    <span class="count" id="fl-count"></span>
+  </div>
+  <div class="tblwrap"><table class="sortable" id="fl-tbl"><thead><tr>
+    <th data-k="name">Объект</th><th data-k="owner">Владелец</th><th data-k="mw" class="num">МВт</th>
+    <th data-k="seg">Сегмент</th><th data-k="status">Статус</th></tr></thead><tbody id="fl-body"></tbody></table></div>
+  <h3>Как достроить реестр</h3>
+  <div class="card"><ol id="fl-how"></ol></div>
+</section>
+
+<section id="t-consum">
+  <h2>Модель потребления: из моточасов в деньги</h2>
+  <p class="mut" id="cn-src"></p>
+  <div class="box info" id="cn-method"></div>
+  <div class="k" id="cn-tiles"></div>
+  <h3>Допущения — их и надо оспаривать</h3>
+  <div class="tblwrap"><table><thead><tr><th>Параметр</th><th>Значение</th><th>Пояснение</th></tr></thead><tbody id="cn-assum"></tbody></table></div>
+  <h3>Годовое потребление по машинам</h3>
+  <p class="mut">Клик по строке — раскладка по позициям.</p>
+  <div class="tblwrap"><table class="sortable" id="cn-tbl"><thead><tr>
+    <th data-k="model">Машина</th><th data-k="oem">OEM</th><th data-k="cyl" class="num">Цил.</th>
+    <th data-k="kwe" class="num">кВт эл.</th><th data-k="gas_name">Газ</th>
+    <th data-k="usd_year" class="num">$ ЗИП в год</th><th data-k="usd_per_kw_year" class="num">$/кВт</th>
+    <th data-k="usd_per_mwh" class="num">$/МВт·ч</th></tr></thead><tbody id="cn-body"></tbody></table></div>
+  <div id="cn-detail"></div>
+  <h3>Складская стратегия</h3>
+  <p id="sk-intro"></p>
+  <div class="box info" id="sk-pareto"></div>
+  <div class="tblwrap"><table><thead><tr><th>Позиция</th><th class="num">шт/год</th><th class="num">$/год</th><th class="num">доля</th></tr></thead><tbody id="sk-top"></tbody></table></div>
+  <div class="card"><h4>Правила</h4><ul id="sk-rules"></ul></div>
+  <div id="sk-tiers"></div>
+  <div class="box" id="sk-first"></div>
+</section>
+
+<section id="t-cons">
+  <h2>Расходники по брендам — кому можно доверять</h2>
+  <p id="cb-intro"></p>
+  <h3 id="cb-trust-t"></h3>
+  <div class="grid" id="cb-tiers"></div>
+  <div class="box warn" id="cb-rule"></div>
+
+  <h3>Выбор бренда двигателя</h3>
+  <div class="chips" id="cb-pick"></div>
+  <div id="cb-oem"></div>
+
+  <h3 id="cb-uni-t"></h3>
+  <p class="mut" id="cb-uni-note"></p>
+  <div class="tblwrap"><table><thead><tr><th>Класс детали</th><th>Кто это делает в мире</th></tr></thead><tbody id="cb-uni"></tbody></table></div>
+
+  <h3 id="cb-mx-t"></h3>
+  <div class="tblwrap"><table><thead><tr>
+    <th>Класс</th><th>Первый выбор</th><th>Второй</th><th>Бюджетный</th><th>Риск</th>
+  </tr></thead><tbody id="cb-mx"></tbody></table></div>
+</section>
+
+<section id="t-mach">
+  <h2>Разбор машин по узлам</h2>
+  <p id="mc-intro"></p>
+  <div class="box info" id="mc-verify"></div>
+  <div class="chips" id="mc-pick"></div>
+  <div id="mc-body"></div>
+  <div class="card"><h4>Как этим пользоваться</h4><ol id="mc-how"></ol></div>
+</section>
+
+<section id="t-models">
+  <h2>Машины</h2>
+  <p class="mut" id="md-src"></p>
+  <div class="box warn" id="md-rule"></div>
+  <div id="md-oems"></div>
+  <h2>Смежные линейки</h2>
+  <div class="tblwrap"><table><thead><tr><th>Марка</th><th>Линейка</th><th>Почему нам важна</th></tr></thead><tbody id="md-adj"></tbody></table></div>
+</section>
+
+<section id="t-parts">
+  <h2>Номенклатура ЗИП по системам</h2>
+  <p class="mut" id="pt-src"></p>
+  <h3>Интервалы обслуживания — что и когда закупать</h3>
+  <div class="box info" id="pt-int-note"></div>
+  <div class="tblwrap"><table><thead><tr><th>Моточасы</th><th>Что делают / что закупается</th></tr></thead><tbody id="pt-int"></tbody></table></div>
+  <h3>Системы</h3>
+  <div class="acc" id="pt-sys"></div>
+
+  <h3>Ведомости ЗИП по машинам — с количеством на двигатель</h3>
+  <p id="pl-intro"></p>
+  <div class="card"><h4>Как этим пользоваться</h4><ol id="pl-how"></ol></div>
+  <div id="pl-lists"></div>
+</section>
+
+<section id="t-demand">
+  <h2>Наш спрос: реальный лот</h2>
+  <p class="mut" id="dm-src"></p>
+  <div class="k" id="dm-tiles"></div>
+  <div class="box warn" id="dm-caveat"></div>
+
+  <h3>Сходимость заявки — что спросить у заказчика до рассылки RFQ</h3>
+  <p id="lr-intro"></p>
+  <div class="box info" id="lr-why"></div>
+  <div id="lr-find"></div>
+  <p class="mut" id="lr-method"></p>
+
+  <h3>Позиции лота</h3>
+  <div class="chips" id="dm-sys"></div>
+  <div class="filters">
+    <div class="f-field"><label>поиск</label><input id="dm-q" placeholder="номер, наименование…"></div>
+    <div class="f-field"><label>бренд</label><select id="dm-man"></select></div>
+    <div class="f-field"><label>показывать</label><select id="dm-only">
+      <option value="">все позиции</option>
+      <option value="cross">только где есть кросс/аналог</option>
+      <option value="check">только с живой проверкой продавца</option>
+      <option value="weak">только слабо проверенные (conf C)</option>
+      <option value="big">только дороже $10 000 по лоту</option>
+    </select></div>
+    <span class="count" id="dm-count"></span>
+  </div>
+  <div class="tblwrap"><table class="sortable" id="dm-tbl">
+    <thead><tr>
+      <th data-k="pn">Номер</th><th data-k="name">Наименование</th><th data-k="man">Бренд</th>
+      <th data-k="sys">Система</th><th data-k="qty" class="num">Кол-во</th>
+      <th data-k="usd_lo" class="num">$ за шт</th><th data-k="lot_hi" class="num">$ по лоту</th>
+      <th data-k="gap" class="num">разрыв</th><th data-k="conf">увер.</th>
+    </tr></thead><tbody id="dm-body"></tbody>
+  </table></div>
+  <div id="dm-detail"></div>
+</section>
+
+<section id="t-analogs">
+  <h2>Аналоги и кросс-номера</h2>
+  <p class="mut" id="an-src"></p>
+  <h3 id="an-rules-t"></h3>
+  <div class="grid" id="an-levels"></div>
+  <div class="split">
+    <div class="card"><h4>Чеклист проверки аналога</h4><ol id="an-check"></ol></div>
+    <div class="card"><h4>Красные флаги</h4><ul id="an-red"></ul></div>
+  </div>
+  <h3>Каталог применяемости MOTORTECH — машинный разбор</h3>
+  <div class="box info" id="mt-note"></div>
+  <div class="k" id="mt-tiles"></div>
+  <div class="filters">
+    <div class="f-field"><label>номер OEM или MOTORTECH</label><input id="mt-q" placeholder="418-4861, 06.50.151, 4W-6747…"></div>
+    <div class="f-field"><label>каталог</label><select id="mt-guide"></select></div>
+    <div class="f-field"><label>тип детали</label><select id="mt-part"></select></div>
+    <span class="count" id="mt-count"></span>
+  </div>
+  <div class="tblwrap"><table><thead><tr>
+    <th>Деталь</th><th>Двигатели</th><th>MOTORTECH P/N</th><th>Заменяет (OEM и ALTRONIC)</th><th>Каталог</th>
+  </tr></thead><tbody id="mt-body"></tbody></table></div>
+
+  <h3>Семейства кросс-номеров</h3>
+  <div class="filters">
+    <div class="f-field"><label>поиск по номеру или тексту</label><input id="an-q" placeholder="4380132, 334976, MOTORTECH…"></div>
+    <div class="f-field"><label>OEM</label><select id="an-oem"></select></div>
+    <span class="count" id="an-count"></span>
+  </div>
+  <div class="acc" id="an-fam"></div>
+</section>
+
+<section id="t-subs">
+  <h2>Субпоставщики: кто реально делает узлы</h2>
+  <p class="mut" id="sb-src"></p>
+  <div class="box info" id="sb-rule"></div>
+  <div class="chips" id="sb-legend"></div>
+  <div class="acc" id="sb-sys"></div>
+</section>
+
+<section id="t-sup">
+  <h2>Поставщики и рейтинг</h2>
+  <p class="mut" id="sp-src"></p>
+  <div class="card"><h4>Как считается рейтинг</h4><div id="sp-model"></div></div>
+  <div class="filters">
+    <div class="f-field"><label>поиск</label><input id="sp-q" placeholder="имя, страна, что возит…"></div>
+    <div class="f-field"><label>регион</label><select id="sp-reg"></select></div>
+    <div class="f-field"><label>OEM</label><select id="sp-oem"></select></div>
+    <div class="f-field"><label>тип</label><select id="sp-typ"></select></div>
+    <div class="f-field"><label>сортировка</label><select id="sp-sort">
+      <option value="score">по рейтингу</option>
+      <option value="reach">по проходимости в РФ</option>
+      <option value="proof">по доказанности</option>
+      <option value="name">по алфавиту</option>
+    </select></div>
+    <span class="count" id="sp-count"></span>
+  </div>
+  <div id="sp-list"></div>
+</section>
+
+<section id="t-chan">
+  <h2>Каналы поставки</h2>
+  <div class="box warn" id="ch-principle"></div>
+  <p id="ch-intro" class="mut"></p>
+  <div id="ch-routes"></div>
+  <h3>Что делать на практике</h3>
+  <div class="card"><ol id="ch-play"></ol></div>
+</section>
+
+<section id="t-pn">
+  <h2>Шифровки номеров</h2>
+  <p id="pn-intro"></p>
+  <div id="pn-brands"></div>
+  <h3>Правила запроса по номерам</h3>
+  <div class="card"><ul id="pn-rules"></ul></div>
+</section>
+
+<section id="t-bx">
+  <h2>Наши запросы в Bitrix</h2>
+  <p class="mut" id="bx-src"></p>
+  <div class="box warn" id="bx-caveat"></div>
+  <div id="bx-deals"></div>
+  <h3>Смежное</h3>
+  <div id="bx-adj"></div>
+  <div class="card" id="bx-hist"></div>
+  <h3 id="bx-sup-t" style="display:none">К кому уже ходили: запросы СП-166 по поставщикам</h3>
+  <div class="tblwrap" id="bx-sup-w" style="display:none"><table><thead><tr><th>Поставщик</th><th class="num">Запросов</th><th>Последний</th><th>Стадии</th></tr></thead><tbody id="bx-sup"></tbody></table></div>
+  <h3 id="bx-pool-t" style="display:none">Мировой пул в нашей базе</h3>
+  <div class="tblwrap" id="bx-pool-w" style="display:none"><table><thead><tr><th>Компания</th><th class="num">Запросов</th><th>Последний</th></tr></thead><tbody id="bx-pool"></tbody></table></div>
+</section>
+
+<section id="t-cust">
+  <h2>Таможня РФ</h2>
+  <div class="box warn" id="cu-status"></div>
+  <div class="card" id="cu-what"></div>
+  <h3>Какие коды поднимать</h3>
+  <div class="tblwrap"><table><thead><tr><th>Код ТН ВЭД</th><th>Что это</th><th>Зачем нам</th></tr></thead><tbody id="cu-hs"></tbody></table></div>
+  <h3>Как выгрузить — пошагово</h3>
+  <div class="card" id="cu-how"></div>
+  <h3>Что искать в результате</h3>
+  <div class="card"><ul id="cu-look"></ul></div>
+</section>
+
+<section id="t-play">
+  <h2>Плейбук: как вести заявку по ГПУ</h2>
+
+  <h3>RFQ-пакет: пробные запросы — осталось отправить</h3>
+  <p id="rp-intro"></p>
+  <div class="card"><h4>Правила захода</h4><ol id="rp-rules"></ol></div>
+  <div class="k" id="rp-tiles"></div>
+  <div class="tblwrap"><table><thead><tr><th>Позиция</th><th>Номера</th><th>Количество</th></tr></thead><tbody id="rp-pos"></tbody></table></div>
+  <p class="mut">Клик по адресату — готовое письмо с его позициями и персональной строкой.</p>
+  <div class="chips" id="rp-pick"></div>
+  <div id="rp-letter"></div>
+  <div class="box info" id="rp-track"></div>
+  <p id="pb-intro"></p>
+  <div id="pb-flow"></div>
+  <h3>Что спросить у заказчика</h3>
+  <div class="card"><ul id="pb-quest"></ul></div>
+  <h3>Красные флаги поставщика</h3>
+  <div class="card"><ul id="pb-red"></ul></div>
+  <h3>Шаблоны</h3>
+  <div id="pb-tpl"></div>
+</section>
+
+</main>
+<footer>
+  КВАНТ · внутренний справочник сорсинга по газопоршневым установкам. Данные — из наших рабочих файлов и открытых источников;
+  где источник не проверен, это написано прямо. Сборка <span id="built2"></span>.
+</footer>
+
+<script>
+const MODELS   = __MODELS_JSON__;
+const PARTS    = __PARTS_JSON__;
+const DEMAND   = __DEMAND_JSON__;
+const ANALOGS  = __ANALOGS_JSON__;
+const SUBSUP   = __SUBSUP_JSON__;
+const SUPPLIERS= __SUPPLIERS_JSON__;
+const CHANNELS = __CHANNELS_JSON__;
+const PN       = __PN_JSON__;
+const BITRIX   = __BITRIX_JSON__;
+const CUSTOMS  = __CUSTOMS_JSON__;
+const PLAYBOOK = __PLAYBOOK_JSON__;
+const MTCROSS  = __MTCROSS_JSON__;
+const PARTLISTS= __PARTLISTS_JSON__;
+const LOTREVIEW= __LOTREVIEW_JSON__;
+const FLEET    = __FLEET_JSON__;
+const CONSUM   = __CONSUMPTION_JSON__;
+const MARKET   = __MARKET_JSON__;
+const COMPET   = __COMPETITORS_JSON__;
+const STOCK    = __STOCK_JSON__;
+const STRATEGY = __STRATEGY_JSON__;
+const TARGETS  = __TARGETS_JSON__;
+const CONSUM_B = __CONSUMABLES_JSON__;
+const MACHINES = __MACHINES_JSON__;
+const RFQPACK  = __RFQPACK_JSON__;
+const BUILT_AT = "__BUILT_AT__";
+
+const $ = s => document.querySelector(s);
+const el = (t, c, h) => { const n = document.createElement(t); if (c) n.className = c; if (h != null) n.innerHTML = h; return n; };
+const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const num = n => (n == null || n === "") ? "—" : Number(n).toLocaleString("ru-RU");
+const usd = n => (n == null || n === "") ? "—" : "$" + Number(n).toLocaleString("ru-RU");
+$("#built").textContent = BUILT_AT; $("#built2").textContent = BUILT_AT;
+
+/* ── вкладки ───────────────────────────────────────────────────────────── */
+const TABS = [
+  ["t-over", "Обзор"], ["t-find", "Поиск"], ["t-strategy", "Стратегия"], ["t-market", "Рынок"],
+  ["t-fleet", "Парк"], ["t-consum", "Потребление"],
+  ["t-cons", "Расходники"], ["t-mach", "Разбор машин"], ["t-models", "Машины"], ["t-parts", "Номенклатура"],
+  ["t-demand", "Наш спрос"], ["t-analogs", "Аналоги"], ["t-subs", "Субпоставщики"],
+  ["t-sup", "Поставщики"], ["t-chan", "Каналы"], ["t-pn", "Шифровки PN"],
+  ["t-bx", "Наши запросы"], ["t-cust", "Таможня"], ["t-play", "Плейбук"],
+];
+TABS.forEach(([id, name], i) => {
+  const b = el("button", i === 0 ? "on" : "", esc(name));
+  b.onclick = () => {
+    document.querySelectorAll("nav button").forEach(x => x.classList.remove("on"));
+    document.querySelectorAll("section").forEach(x => x.classList.remove("on"));
+    b.classList.add("on"); $("#" + id).classList.add("on");
+    try { location.hash = id; } catch (e) {}
+    window.scrollTo(0, 0);
+  };
+  $("#nav").append(b);
+});
+if (location.hash) {
+  const i = TABS.findIndex(t => "#" + t[0] === location.hash);
+  if (i >= 0) document.querySelectorAll("nav button")[i].click();
+}
+
+/* ── общие мелочи ──────────────────────────────────────────────────────── */
+function acc(host, items) {
+  host.innerHTML = "";
+  items.forEach(it => {
+    const item = el("div", "acc-item");
+    const row = el("div", "acc-row",
+      `<div><span class="chev">▸</span> <b>${esc(it.title)}</b></div>
+       <div class="mut">${it.sub || ""}</div>
+       <div class="acc-n">${it.n || ""}</div>`);
+    row.onclick = () => item.classList.toggle("open");
+    const body = el("div", "acc-body"); body.innerHTML = it.body;
+    item.append(row, body); host.append(item);
+  });
+}
+function sortable(tbl, rows, render, initial) {
+  let key = initial, dir = -1;
+  const ths = tbl.querySelectorAll("th[data-k]");
+  const paint = () => {
+    ths.forEach(t => { t.classList.remove("asc", "desc"); if (t.dataset.k === key) t.classList.add(dir > 0 ? "asc" : "desc"); });
+    const r = rows().slice().sort((a, b) => {
+      const x = a[key], y = b[key];
+      const xn = (x === null || x === undefined || x === "") ? -Infinity : x;
+      const yn = (y === null || y === undefined || y === "") ? -Infinity : y;
+      if (typeof xn === "number" && typeof yn === "number") return (xn - yn) * dir;
+      return String(xn).localeCompare(String(yn), "ru") * dir;
+    });
+    render(r);
+  };
+  ths.forEach(t => t.onclick = () => { if (key === t.dataset.k) dir = -dir; else { key = t.dataset.k; dir = -1; } paint(); });
+  return paint;
+}
+function fillSelect(sel, values, allLabel) {
+  sel.innerHTML = `<option value="">${allLabel}</option>` +
+    values.map(v => `<option value="${esc(v)}">${esc(v)}</option>`).join("");
+}
+
+/* ── Обзор ─────────────────────────────────────────────────────────────── */
+(function () {
+  const S = DEMAND.stats, fams = ANALOGS.families.length;
+  const crosses = ANALOGS.families.reduce((s, f) => s + f.analogs.length, 0);
+  // все номера, которые вообще есть на сайте — по ним работает поиск
+  const allPn = new Set();
+  ANALOGS.families.forEach(f => { f.oem_pns.forEach(p => allPn.add(p)); f.analogs.forEach(a => allPn.add(a.pn)); });
+  (MTCROSS.records || []).forEach(r => { r.motortech.forEach(p => allPn.add(p)); r.cross.forEach(c => c.pns.forEach(p => allPn.add(p))); });
+  (PARTLISTS.lists || []).forEach(L => L.groups.forEach(g => g.rows.forEach(r => allPn.add(r.pn))));
+  DEMAND.rows.forEach(r => allPn.add(String(r.pn)));
+  const tiles = [
+    [allPn.size, "номеров деталей в базе"],
+    [S.positions, "позиций в нашем лоте"],
+    [usd(S.lot_usd_lo).replace("$", "$ "), "лот по нижней границе"],
+    [usd(S.lot_usd_hi).replace("$", "$ "), "лот по верхней границе"],
+    [S.checked, "живых проверок продавцов"],
+    [fams + " / " + crosses, "семейств аналогов / кроссов"],
+    [(MTCROSS.stats || {}).oem_pns || 0, "кроссов из каталогов MOTORTECH"],
+    [SUPPLIERS.companies.length, "поставщиков в пуле"],
+    [MODELS.oems.reduce((s, o) => s + o.models.length, 0), "моделей машин"],
+  ];
+  $("#ov-tiles").innerHTML = tiles.map(([b, s]) => `<div class="tile"><b>${esc(b)}</b><span>${esc(s)}</span></div>`).join("");
+
+  const hot = (BITRIX.deals || []).find(d => (d.note || "").includes("★"));
+  $("#ov-hot").innerHTML = hot
+    ? `<b>Горячее прямо сейчас.</b> Сделка #${esc(hot.id)} от ${esc(hot.created)}: «${esc(hot.title)}». ${esc(hot.note.replace("★ ", ""))}`
+    : `<b>Зачем этот сайт.</b> Три OEM из трёх — из недружественных юрисдикций, официальные каналы закрыты, а машины работают и требуют ЗИП каждые 1000–2000 моточасов.`;
+
+  $("#ov-rule").innerHTML = `${esc(SUBSUP.key_rule.text)}
+    <ol style="margin-top:6px">${SUBSUP.key_rule.steps.map(s => `<li>${esc(s)}</li>`).join("")}</ol>`;
+
+  const how = [
+    ["Пришла заявка по ГПУ", "Начните с вкладки <b>Плейбук</b> — там порядок действий и готовые формулировки запросов."],
+    ["Непонятный номер", "<b>Шифровки PN</b>: чей это номер, есть ли цепочка замен, не жестянка ли это на 4 свечи."],
+    ["Нужен аналог", "<b>Аналоги</b>: семейства кросс-номеров с уровнем доверия A–D и правилами проверки."],
+    ["Кому слать запрос", "<b>Поставщики</b> — рейтинг с фильтрами по региону, OEM и типу. <b>Каналы</b> — через какую страну это ходит."],
+    ["Дорогой узел, ищем обход", "<b>Субпоставщики</b>: кто реально изготовил турбину, генератор, катушку, теплообменник."],
+    ["Считаем деньги лота", "<b>Наш спрос</b>: 94 реальные позиции с вилками цен, разрывом OEM/аналог и живыми проверками продавцов."],
+  ];
+  $("#ov-how").innerHTML = how.map(([t, d]) => `<div class="card"><h4>${esc(t)}</h4><div class="mut">${d}</div></div>`).join("");
+
+  $("#ov-src").innerHTML = `
+    <p><b>Наши данные.</b> ${esc(DEMAND.source)}</p>
+    <p><b>Аналоги.</b> ${esc(ANALOGS.source)}</p>
+    <p><b>Субпоставщики.</b> ${esc(SUBSUP.source)}</p>
+    <p><b>Поставщики.</b> ${esc(SUPPLIERS.source)}</p>
+    <p><b>Bitrix.</b> ${esc(BITRIX.source)}</p>
+    <p class="mut">Где источник не проверен или проверка не удалась — это написано прямо в карточке (значок ⚠). Ничего не додумано.</p>`;
+})();
+
+/* ── Глобальный поиск по номеру ────────────────────────────────────────── */
+(function () {
+  const norm = s => String(s || "").toUpperCase().replace(/[\s.\-–—_/]/g, "");
+  // индекс: [нормализованный ключ, группа, заголовок, html-детали, вкладка]
+  const IDX = [];
+  const add = (key, grp, title, html, tab) => { const k = norm(key); if (k.length >= 3) IDX.push([k, grp, title, html, tab]); };
+
+  DEMAND.rows.forEach(r => add(r.pn, "Наш лот", `${r.pn} — ${r.name}`,
+    `${esc(r.man)} · ${num(r.qty)} ${esc(r.unit)} · ${r.usd_lo != null ? usd(r.usd_lo) + "–" + num(r.usd_hi) + " за шт" : "цена не оценена"}${r.checks.length ? " · есть живые проверки продавцов" : ""}`, "t-demand"));
+  ANALOGS.families.forEach(f => {
+    f.oem_pns.forEach(p => add(p, "Аналоги", f.title, `OEM-номер в семействе. Аналоги: ${f.analogs.map(a => esc(a.brand) + " " + esc(a.pn)).join("; ")}`, "t-analogs"));
+    f.analogs.forEach(a => add(a.pn, "Аналоги", `${a.brand} ${a.pn}`, `Аналог в семействе «${esc(f.title)}» (уровень ${esc(a.level)}). Заменяет: ${f.oem_pns.map(esc).join(", ")}`, "t-analogs"));
+  });
+  (MTCROSS.records || []).forEach(r => {
+    const all = r.cross.map(c => `${esc(c.brand)}: ${c.pns.map(esc).join(", ")}`).join(" · ");
+    r.motortech.forEach(p => add(p, "Каталог MOTORTECH", `MOTORTECH ${p}`, `${esc(r.part || "позиция")} (${esc(r.guide)}${r.engines ? ", " + esc(r.engines) : ""}). Эквиваленты: ${all}`, "t-analogs"));
+    r.cross.forEach(c => c.pns.forEach(p => add(p, "Каталог MOTORTECH", `${c.brand} ${p}`, `${esc(r.part || "позиция")} (${esc(r.guide)}). MOTORTECH: ${r.motortech.map(esc).join(", ") || "—"}. Все эквиваленты: ${all}`, "t-analogs")));
+  });
+  (PARTLISTS.lists || []).forEach(L => L.groups.forEach(g => g.rows.forEach(r =>
+    add(r.pn, "Ведомости", `${r.pn} — ${r.desc}`, `${esc(L.engine)}, ${esc(g.name)}: ${esc(r.qty)} на двигатель${r.comment ? " · " + esc(r.comment) : ""}`, "t-parts"))));
+  MACHINES.machines.forEach(m => m.units.forEach(u => u.pns.forEach(p => {
+    const pn = String(p).split(" ")[0].split("(")[0];
+    add(pn, "Разбор машин", `${m.oem} ${m.model} — ${u.unit}`, `${esc(p)}. Кто делает: ${u.makers.map(k => esc(k.b)).join("; ")}`, "t-mach");
+  })));
+  SUPPLIERS.companies.forEach(c => add(c.name, "Поставщики", c.name, `${esc(c.country)} · рейтинг ${c.score} · ${esc((c.what || "").slice(0, 140))}…`, "t-sup"));
+
+  const grpOrder = ["Наш лот", "Аналоги", "Каталог MOTORTECH", "Ведомости", "Разбор машин", "Поставщики"];
+  function paint() {
+    const q = norm($("#fx-q").value);
+    const out = $("#fx-out");
+    if (q.length < 3) { out.innerHTML = `<p class="mut">Введите минимум 3 символа. В индексе ${num(IDX.length)} записей.</p>`; return; }
+    const hits = IDX.filter(x => x[0].includes(q));
+    if (!hits.length) { out.innerHTML = `<div class="box warn"><b>Ничего не найдено.</b> Это тоже информация: номера нет в базе — разберите его и добавьте (правило: каждая заявка оставляет след).</div>`; return; }
+    const seen = new Set(), groups = {};
+    hits.forEach(x => { const k = x[1] + "|" + x[2] + "|" + x[3]; if (seen.has(k)) return; seen.add(k); (groups[x[1]] = groups[x[1]] || []).push(x); });
+    out.innerHTML = grpOrder.filter(g => groups[g]).map(g => `<div class="card"><h4>${esc(g)} <span class="mut">· ${groups[g].length}</span></h4>` +
+      groups[g].slice(0, 25).map(x => `<div style="padding:6px 0;border-top:1px solid var(--grid)">
+        <b>${esc(x[2])}</b> <button class="btn" style="float:right;padding:2px 8px" onclick="document.querySelector('nav button:nth-child(${TABS.findIndex(t => t[0] === x[4]) + 1})').click()">открыть →</button>
+        <div class="mut" style="margin-top:2px">${x[3]}</div></div>`).join("") +
+      (groups[g].length > 25 ? `<div class="mut">…и ещё ${groups[g].length - 25}</div>` : "") + `</div>`).join("");
+  }
+  $("#fx-q").oninput = paint; paint();
+})();
+
+/* ── Стратегия ─────────────────────────────────────────────────────────── */
+(function () {
+  const T = STRATEGY;
+  $("#st-title").textContent = T.thesis.title;
+  $("#st-thesis").innerHTML = esc(T.thesis.text);
+  $("#st-assets").innerHTML = T.thesis.four_assets.map(a => `<div class="card">
+    <h4>${esc(a.name)}</h4>
+    <div><span class="pill">сейчас</span> ${esc(a.now)}</div>
+    <div style="margin-top:3px"><span class="pill a">цель</span> ${esc(a.goal)}</div>
+    <div class="note" style="margin-top:6px">${esc(a.how)}</div></div>`).join("");
+  // ── адресный расчёт по владельцам ──
+  const TG = TARGETS, TT = TG.totals;
+  $("#tg-src").textContent = TG.source;
+  $("#tg-caveat").innerHTML = "<b>Как читать.</b> " + esc(TG.caveat);
+  $("#tg-tiles").innerHTML = [
+    [TT.groups, "групп владельцев"], [num(TT.mw) + " МВт", "парк в расчёте"],
+    ["$" + (TT.usd_year / 1e6).toFixed(1) + " млн", "ЗИП в год по этим группам"],
+    ["$" + (TT.warm_usd_year / 1e6).toFixed(1) + " млн", "там, где отношения уже есть"],
+    [TT.warm_share + " %", "доля «тёплого» рынка"],
+  ].map(([b, s]) => `<div class="tile"><b>${esc(b)}</b><span>${esc(s)}</span></div>`).join("");
+
+  const tgRows = () => TG.targets.map(t => ({ ...t, plugs: t.qty_year.plug,
+    warm: t.our_customer.startsWith("★") ? "действующий" : t.our_customer ? "профиль совпал" : "—" }));
+  function tgRender(list) {
+    $("#tg-body").innerHTML = list.map(t => `<tr data-g="${esc(t.group)}" style="cursor:pointer">
+      <td><b>${esc(t.group)}</b>${t.mw_building ? `<div class="mut">+${t.mw_building} МВт строится</div>` : ""}</td>
+      <td class="num">${t.mw}</td><td class="num">${t.objects_n}</td>
+      <td class="num"><b>${usd(t.usd_year)}</b></td><td class="num">${num(t.plugs)}</td>
+      <td>${t.our_customer.startsWith("★") ? '<span class="pill a">действующий</span>'
+        : t.our_customer ? '<span class="pill b">профиль совпал</span>' : '<span class="pill lo">холодный</span>'}</td>
+    </tr>`).join("");
+    $("#tg-body").querySelectorAll("tr").forEach(tr => tr.onclick = () => {
+      const t = TG.targets.find(x => x.group === tr.dataset.g);
+      const q = t.qty_year, nm = TG.item_names;
+      $("#tg-detail").innerHTML = `<div class="card">
+        <h4>${esc(t.group)} — ${t.mw} МВт, ${t.objects_n} объектов</h4>
+        ${t.our_customer ? `<div class="note">${esc(t.our_customer)}</div>` : ""}
+        <p class="mut">Газ в расчёте: ${t.gas === "associated" ? "попутный (расход ×1,5)" : "природный"} ·
+          удельный расход $${t.usd_per_kw}/кВт·год · итого <b>${usd(t.usd_year)}</b> в год</p>
+        <div class="tblwrap"><table><thead><tr><th>Позиция</th><th class="num">шт в год</th></tr></thead>
+        <tbody>${Object.entries(q).map(([k, v]) => `<tr><td>${esc(nm[k] || k)}</td>
+          <td class="num"><b>${num(v)}</b></td></tr>`).join("")}</tbody></table></div>
+        <h4 style="margin-top:12px">Объекты</h4>
+        <div class="tblwrap"><table><thead><tr><th>Объект</th><th>Юрлицо</th><th class="num">МВт</th><th>Статус</th></tr></thead>
+        <tbody>${t.objects.map(o => `<tr><td>${esc(o.name)}</td><td class="mut">${esc(o.owner)}</td>
+          <td class="num">${o.mw}</td><td class="mut">${esc(o.status)}</td></tr>`).join("")}</tbody></table></div>
+      </div>`;
+      $("#tg-detail").scrollIntoView({ behavior: "smooth", block: "nearest" });
+    });
+  }
+  sortable($("#tg-tbl"), tgRows, tgRender, "priority")();
+
+  $("#st-metrics").innerHTML = T.metrics.map(m => `<tr><td><b>${esc(m.name)}</b></td>
+    <td class="num">${num(m.now)}</td><td class="num"><b>${num(m.q1)}</b></td>
+    <td class="mut">${esc(m.why)}</td></tr>`).join("");
+  $("#st-plan-t").textContent = T.plan_90.title;
+  $("#st-plan").innerHTML = T.plan_90.blocks.map(b => `<div class="card">
+    <h4>${esc(b.period)}</h4><ol>${b.items.map(i => `<li>${esc(i)}</li>`).join("")}</ol></div>`).join("");
+  $("#st-funnel-t").textContent = T.supplier_funnel.title;
+  $("#st-funnel-x").textContent = T.supplier_funnel.text;
+  $("#st-funnel").innerHTML = T.supplier_funnel.stages.map(s => `<tr>
+    <td><b>${s.stage}. ${esc(s.name)}</b></td><td>${esc(s.criteria)}</td>
+    <td class="mut">${esc(s.artifact)}</td>
+    <td class="num"><span class="pill ${s.now ? "a" : "lo"}">${s.now}</span></td></tr>`).join("");
+  $("#st-funnel-rule").innerHTML = "<b>Правило.</b> " + esc(T.supplier_funnel.rule);
+  $("#st-trial-t").textContent = T.trial_protocol.title;
+  $("#st-trial").innerHTML = T.trial_protocol.steps.map(s => `<li>${esc(s)}</li>`).join("");
+  $("#st-trial-why").innerHTML = "<b>Зачем.</b> " + esc(T.trial_protocol.why);
+  $("#st-principles").innerHTML = T.principles.map(p => `<li>${esc(p)}</li>`).join("");
+})();
+
+/* ── Рынок и конкуренты ────────────────────────────────────────────────── */
+(function () {
+  $("#mk-intro").textContent = MARKET.intro;
+  $("#mk-persp").innerHTML = `<b>${esc(MARKET.perspective.title)}.</b> ${esc(MARKET.perspective.text)}`;
+  $("#mk-method").innerHTML = `<p class="mono">${esc(MARKET.method.formula)}</p>
+    <p><b>Парк.</b> ${esc(MARKET.method.fleet)}</p>
+    <p><b>Удельный расход.</b> ${esc(MARKET.method.rate)}</p>
+    <p class="note">${esc(MARKET.method.honesty)}</p>`;
+  const mln = v => "$" + (v / 1e6).toFixed(1) + " млн";
+  $("#mk-size").innerHTML = MARKET.sizing.map(s => `<tr>
+    <td><b>${esc(s.scope)}</b></td>
+    <td class="num">${num(s.mw_lo)} – ${num(s.mw_hi)}</td>
+    <td class="num"><b>${mln(s.usd_lo)} – ${mln(s.usd_hi)}</b></td>
+    <td class="mut">${esc(s.note)}</td></tr>`).join("");
+  $("#mk-seg").innerHTML = MARKET.segments.map(s => `<div class="card">
+    <h4>${esc(s.name)} <span class="pill">${esc(s.share)}</span></h4>
+    <p>${esc(s.why)}</p>
+    <p class="mut"><b>Кто:</b> ${esc(s.who)}</p>
+    <div class="note"><b>Наш доступ:</b> ${esc(s.our_access)}</div></div>`).join("");
+  $("#mk-win").innerHTML = MARKET.why_we_can_win.map(w => `<li>${esc(w)}</li>`).join("");
+  $("#mk-risks").innerHTML = MARKET.risks.map(r => `<div class="card">
+    <h4>${esc(r.risk)}</h4><div class="note">${esc(r.mitigation)}</div></div>`).join("");
+
+  $("#cp-intro").textContent = COMPET.intro;
+  $("#cp-land").innerHTML = COMPET.landscape.map(l => `<div class="card">
+    <h4>${esc(l.type)}</h4>
+    <div style="margin:4px 0">${l.who.map(w => `<span class="tag">${esc(w)}</span>`).join("")}</div>
+    <p><b>Сильны:</b> ${esc(l.strength)}</p>
+    <p><b>Слабы:</b> ${esc(l.weakness)}</p>
+    <div class="note"><b>Наш ход:</b> ${esc(l.our_move)}</div></div>`).join("");
+  $("#cp-pos").innerHTML = `<b>${esc(COMPET.positioning.title)}.</b> ${esc(COMPET.positioning.text)}
+    <ul style="margin-top:6px">${COMPET.positioning.proof_points.map(p => `<li>${esc(p)}</li>`).join("")}</ul>`;
+  $("#cp-exp").innerHTML = COMPET.what_makes_us_expert.map(p => `<li>${esc(p)}</li>`).join("");
+})();
+
+/* ── Парк ──────────────────────────────────────────────────────────────── */
+(function () {
+  $("#fl-intro").textContent = FLEET.intro;
+  $("#fl-status").innerHTML = "<b>Статус сбора.</b> " + esc(FLEET.status) + `<div class="mut" style="margin-top:4px">${esc(FLEET.source)}</div>`;
+  $("#fl-insight").innerHTML = `<b>${esc(FLEET.insight.title)}.</b> ${esc(FLEET.insight.text)}
+    <div class="note" style="margin-top:6px"><b>Доказательство:</b> ${esc(FLEET.insight.proof)}</div>
+    <div class="note" style="margin-top:4px"><b>Что делать:</b> ${esc(FLEET.insight.action)}</div>`;
+  $("#fl-anchors").innerHTML = FLEET.anchors.map(a => `<div class="card">
+    <p>${esc(a.claim)}</p>
+    <div class="note"><b>Что это нам даёт:</b> ${esc(a.why)}</div>
+    ${a.url ? `<div class="mut" style="margin-top:4px"><a href="${esc(a.url)}" target="_blank" rel="noopener">${esc(a.url)}</a></div>` : ""}</div>`).join("");
+  const E = FLEET.estimate;
+  $("#fl-tiles").innerHTML = [
+    [E.collected_objects, "объектов собрано"], [num(Math.round(E.collected_mw)) + " МВт", "суммарно"],
+    [E.avg_mw + " МВт", "средний объект"], [E.catalogue_total, "объектов в каталоге"],
+    [num(E.range_mw[0]) + "–" + num(E.range_mw[1]) + " МВт", "оценка парка РФ"],
+  ].map(([b, s]) => `<div class="tile"><b>${esc(b)}</b><span>${esc(s)}</span></div>`).join("");
+  fillSelect($("#fl-seg"), [...new Set(FLEET.objects.map(o => o.seg))].sort(), "все сегменты");
+  const rows = () => FLEET.objects.filter(o => {
+    const seg = $("#fl-seg").value; if (seg && o.seg !== seg) return false;
+    const q = $("#fl-q").value.trim().toLowerCase();
+    return !q || (o.name + " " + o.owner).toLowerCase().includes(q);
+  });
+  function render(list) {
+    $("#fl-count").textContent = `${list.length} из ${FLEET.objects.length} · ${Math.round(list.reduce((s, o) => s + o.mw, 0))} МВт`;
+    $("#fl-body").innerHTML = list.map(o => `<tr${o.flag ? ' style="background:color-mix(in srgb,var(--warn) 12%,transparent)"' : ""}>
+      <td><b>${esc(o.name)}</b>${o.flag ? `<div class="mut">${esc(o.flag)}</div>` : ""}</td>
+      <td>${esc(o.owner)}</td><td class="num">${o.mw}</td>
+      <td><span class="tag">${esc(o.seg)}</span></td><td class="mut">${esc(o.status)}</td></tr>`).join("");
+  }
+  const paint = sortable($("#fl-tbl"), rows, render, "mw");
+  $("#fl-q").oninput = paint; $("#fl-seg").onchange = paint; paint();
+  $("#fl-how").innerHTML = FLEET.how_to_complete.map(h => `<li>${esc(h)}</li>`).join("");
+})();
+
+/* ── Потребление и склад ───────────────────────────────────────────────── */
+(function () {
+  $("#cn-src").textContent = CONSUM.source;
+  $("#cn-method").innerHTML = "<b>Метод.</b> " + esc(CONSUM.assumptions.method) +
+    "<br><b>Цены.</b> " + esc(CONSUM.assumptions.prices);
+  $("#cn-tiles").innerHTML = [
+    [CONSUM.hours_per_year + " ч", "наработка в год (база)"],
+    ["$" + CONSUM.avg_usd_per_kw_year, "средний расход ЗИП на кВт в год"],
+    [CONSUM.engines.length, "просчитанных машин"],
+  ].map(([b, s]) => `<div class="tile"><b>${esc(b)}</b><span>${esc(s)}</span></div>`).join("");
+  const A = CONSUM.assumptions;
+  $("#cn-assum").innerHTML =
+    `<tr><td><b>Наработка</b></td><td class="num">${A.hours_per_year.base} ч/год</td><td>${esc(A.hours_per_year.note)}</td></tr>` +
+    Object.values(A.gas_severity).map(g =>
+      `<tr><td><b>${esc(g.name)}</b></td><td class="num">×${g.k}</td><td>${esc(g.note)}</td></tr>`).join("");
+
+  const rows = () => CONSUM.engines;
+  function render(list) {
+    $("#cn-body").innerHTML = list.map(e => `<tr data-m="${esc(e.model)}" style="cursor:pointer">
+      <td><b>${esc(e.model)}</b></td><td>${esc(e.oem)}</td><td class="num">${e.cyl}</td>
+      <td class="num">${num(e.kwe)}</td><td class="mut">${esc(e.gas_name)}</td>
+      <td class="num"><b>${usd(e.usd_year)}</b></td><td class="num">${e.usd_per_kw_year}</td>
+      <td class="num">${e.usd_per_mwh}</td></tr>`).join("");
+    $("#cn-body").querySelectorAll("tr").forEach(tr => tr.onclick = () => {
+      const e = CONSUM.engines.find(x => x.model === tr.dataset.m);
+      $("#cn-detail").innerHTML = `<div class="card"><h4>${esc(e.model)} — что съедает за год</h4>
+        <div class="mut">${e.cyl} цилиндров · ${num(e.kwe)} кВт эл. · ${esc(e.gas_name)} · ${CONSUM.hours_per_year} ч/год</div>
+        <div class="tblwrap"><table><thead><tr><th>Позиция</th><th class="num">шт/год</th>
+        <th class="num">интервал, ч</th><th class="num">$/шт</th><th class="num">$/год</th></tr></thead>
+        <tbody>${e.items.map(i => `<tr><td>${esc(i.name)}${i.note ? `<div class="mut">${esc(i.note)}</div>` : ""}</td>
+          <td class="num">${i.qty_year}</td><td class="num">${num(i.interval)}</td>
+          <td class="num">${usd(i.usd_unit)}</td><td class="num"><b>${usd(i.usd_year)}</b></td></tr>`).join("")}</tbody>
+        </table></div></div>`;
+      $("#cn-detail").scrollIntoView({ behavior: "smooth", block: "nearest" });
+    });
+  }
+  sortable($("#cn-tbl"), rows, render, "usd_year")();
+
+  $("#sk-intro").textContent = STOCK.intro;
+  $("#sk-pareto").innerHTML = `<b>${esc(STOCK.pareto.title)}.</b> ${esc(STOCK.pareto.text)}
+    <div class="mut" style="margin-top:4px">Опорный парк — ${STOCK.reference.fleet_mw} МВт, ${usd(STOCK.reference.usd_year)} в год. ${esc(STOCK.reference.note)}</div>`;
+  $("#sk-top").innerHTML = STOCK.pareto.top.map(t => `<tr><td><b>${esc(t.name)}</b></td>
+    <td class="num">${num(t.qty)}</td><td class="num">${usd(t.usd)}</td>
+    <td class="num"><b>${t.share} %</b></td></tr>`).join("");
+  $("#sk-rules").innerHTML = STOCK.rules.map(r => `<li>${esc(r)}</li>`).join("");
+  $("#sk-tiers").innerHTML = STOCK.tiers.map(t => `<div class="card">
+    <h4>${esc(t.tier)}</h4><p class="mut">${esc(t.why)}</p>
+    <div class="tblwrap"><table><thead><tr><th>Позиция</th><th class="num">шт/год</th><th>Почему</th></tr></thead>
+    <tbody>${t.items.map(i => `<tr><td><b>${esc(i.name)}</b></td><td class="num">${num(i.qty_year)}</td>
+      <td>${esc(i.why)}</td></tr>`).join("")}</tbody></table></div></div>`).join("");
+  $("#sk-first").innerHTML = `<b>${esc(STOCK.first_stock.title)}.</b> ${esc(STOCK.first_stock.text)}
+    <div class="note" style="margin-top:6px">${esc(STOCK.first_stock.candidates)}</div>`;
+})();
+
+/* ── Расходники по брендам ─────────────────────────────────────────────── */
+(function () {
+  const C = CONSUM_B;
+  $("#cb-intro").textContent = C.intro;
+  $("#cb-trust-t").textContent = C.trust.title;
+  const TIER = { OE: "a", "OE-ALT": "b", SPEC: "b", REV: "c", NO: "d" };
+  $("#cb-tiers").innerHTML = C.trust.tiers.map(t => `<div class="card">
+    <h4><span class="pill ${TIER[t.code] || "b"}">${esc(t.code)}</span> ${esc(t.name)}</h4>
+    <p>${esc(t.what)}</p>
+    <div class="note"><b>Риск:</b> ${esc(t.risk)} · <b>Когда брать:</b> ${esc(t.when)}</div></div>`).join("");
+  $("#cb-rule").innerHTML = "<b>Правило.</b> " + esc(C.trust.rule);
+
+  $("#cb-uni-t").textContent = C.universal.title;
+  $("#cb-uni-note").textContent = C.universal.note;
+  $("#cb-uni").innerHTML = C.universal.by_class.map(b => `<tr>
+    <td><b>${esc(b.class)}</b></td>
+    <td>${b.makers.map(m => `<span class="tag wrap">${esc(m)}</span>`).join("")}</td></tr>`).join("");
+
+  $("#cb-mx-t").textContent = C.buy_matrix.title;
+  $("#cb-mx").innerHTML = C.buy_matrix.rows.map(r => `<tr>
+    <td><b>${esc(r.class)}</b></td><td>${esc(r.first)}</td><td class="mut">${esc(r.second)}</td>
+    <td class="mut">${esc(r.budget)}</td>
+    <td>${r.risk.startsWith("★") ? `<span class="pill d">${esc(r.risk)}</span>` : esc(r.risk)}</td></tr>`).join("");
+
+  // переключатель бренда
+  let cur = C.oems[0].key;
+  const host = $("#cb-pick");
+  function renderOem() {
+    const o = C.oems.find(x => x.key === cur);
+    $("#cb-oem").innerHTML = `<div class="card">
+      <h4>${esc(o.name)}</h4>
+      <p>${esc(o.ecosystem)}</p>
+      <div class="box info"><b>Масло — допуск ${esc(o.oil_spec.spec)}.</b> ${esc(o.oil_spec.note)}</div>
+    </div>` + o.classes.map(c => `<div class="card">
+      <h4>${esc(c.class)} <span class="mut">· ${esc(c.en)}</span></h4>
+      <p class="note"><b>Номера OEM:</b> ${c.oem_pns.map(p => `<span class="tag mono wrap">${esc(p)}</span>`).join("")}</p>
+      <p class="mut">${esc(c.volume)}</p>
+      <div class="tblwrap"><table><thead><tr><th>Бренд</th><th>Что брать</th><th>Ур.</th><th>Почему ему можно доверять</th></tr></thead>
+      <tbody>${c.respected.map(r => `<tr>
+        <td><b>${esc(r.brand)}</b></td><td class="mono">${esc(r.pn)}</td>
+        <td><span class="pill ${TIER[r.level] || "b"}">${esc(r.level)}</span></td>
+        <td>${esc(r.why)}${r.url ? ` <a href="${esc(r.url)}" target="_blank" rel="noopener">↗</a>` : ""}</td>
+      </tr>`).join("")}</tbody></table></div>
+      <p><b>Где брать:</b> ${c.where.map(w => `<span class="tag wrap">${esc(w)}</span>`).join("")}</p>
+      <div class="box"><b>Что проверить:</b><ul>${c.check.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>
+      <div class="box warn"><b>Чего не делать:</b><ul>${c.avoid.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>
+    </div>`).join("");
+  }
+  host.innerHTML = "";
+  C.oems.forEach(o => {
+    const ch = el("div", "chip" + (o.key === cur ? " on" : ""), esc(o.name));
+    ch.onclick = () => { cur = o.key; host.querySelectorAll(".chip").forEach(x => x.classList.remove("on")); ch.classList.add("on"); renderOem(); };
+    host.append(ch);
+  });
+  renderOem();
+})();
+
+/* ── Разбор машин по узлам ─────────────────────────────────────────────── */
+(function () {
+  const M = MACHINES, LV = { OE: "a", "OE-ALT": "b", SPEC: "b", REV: "c" };
+  $("#mc-intro").textContent = M.intro;
+  $("#mc-verify").innerHTML = "<b>Контроль данных.</b> " + esc(M.verify_note);
+  $("#mc-how").innerHTML = M.how_to_use.map(x => `<li>${esc(x)}</li>`).join("");
+  let cur = M.machines[0].key;
+  const host = $("#mc-pick");
+  function render() {
+    const m = M.machines.find(x => x.key === cur), P = m.passport;
+    $("#mc-body").innerHTML = `<div class="card">
+      <h4>${esc(m.oem)} ${esc(m.model)}</h4>
+      <p>${esc(m.why)}</p>
+      <div class="tblwrap"><table><thead><tr><th>Параметр</th><th>Значение</th></tr></thead><tbody>
+        <tr><td>Цилиндры</td><td><b>${esc(P.cyl)}</b></td></tr>
+        <tr><td>Диаметр × ход</td><td><b>Ø${P.bore_mm} × ${P.stroke_mm} мм</b></td></tr>
+        <tr><td>Объём на цилиндр</td><td>${P.disp_cyl_l} л</td></tr>
+        <tr><td>Рабочий объём</td><td><b>${P.disp_l} л</b></td></tr>
+        <tr><td>Обороты</td><td>${esc(P.rpm)} об/мин</td></tr>
+        <tr><td>Мощность эл.</td><td>${esc(P.kwe)} кВт</td></tr>
+        <tr><td>КПД эл.</td><td>${esc(P.eff)}</td></tr>
+        <tr><td>Сгорание</td><td>${esc(P.combustion)}</td></tr>
+        <tr><td>Наддув</td><td>${esc(P.charge)}</td></tr>
+      </tbody></table></div>
+    </div>` + m.units.map(u => `<div class="card">
+      <h4>${esc(u.unit)}</h4>
+      <p class="mut">${esc(u.what)}</p>
+      <p class="note"><b>Номера:</b> ${u.pns.map(p => `<span class="tag mono wrap">${esc(p)}</span>`).join("")}</p>
+      <div class="tblwrap"><table><thead><tr><th>Кто делает / у кого брать</th><th>Ур.</th><th>Что именно</th></tr></thead>
+      <tbody>${u.makers.map(k => `<tr><td><b>${esc(k.b)}</b></td>
+        <td><span class="pill ${LV[k.lvl] || "b"}">${esc(k.lvl)}</span></td>
+        <td>${esc(k.n)}</td></tr>`).join("")}</tbody></table></div>
+      ${u.check ? `<div class="box warn"><b>Что проверить:</b> ${esc(u.check)}</div>` : ""}
+    </div>`).join("");
+  }
+  M.machines.forEach(m => {
+    const ch = el("div", "chip" + (m.key === cur ? " on" : ""), esc(m.oem.split(" ")[0] + " " + m.model.split(" ")[0]));
+    ch.onclick = () => { cur = m.key; host.querySelectorAll(".chip").forEach(x => x.classList.remove("on")); ch.classList.add("on"); render(); };
+    host.append(ch);
+  });
+  render();
+})();
+
+/* ── Машины ────────────────────────────────────────────────────────────── */
+(function () {
+  $("#md-src").textContent = MODELS.source;
+  $("#md-rule").innerHTML = "<b>Важно.</b> " + esc(MODELS.rule);
+  const host = $("#md-oems");
+  MODELS.oems.forEach(o => {
+    const c = el("div", "card");
+    c.innerHTML = `<h3 style="margin-top:0">${esc(o.name)} — ${esc(o.full)}</h3>
+      <div class="mut" style="margin-bottom:6px">${esc(o.status)}</div>
+      <p>${esc(o.note)}</p>
+      <p class="note"><b>Номера:</b> ${esc(o.parts_logic)}</p>
+      <div class="tblwrap"><table><thead><tr>
+        <th>Модель</th><th>Цил.</th><th class="num">Объём, л</th><th class="num">кВт эл.</th>
+        <th>об/мин</th><th>КПД</th><th>Применение</th><th>Примечание</th></tr></thead>
+        <tbody>${o.models.map(m => `<tr>
+          <td><b>${esc(m.model)}</b></td><td>${esc(m.cyl)}</td><td class="num">${esc(m.disp_l)}</td>
+          <td class="num">${esc(m.kwe)}</td><td>${esc(m.rpm)}</td><td>${esc(m.eff)}</td>
+          <td>${esc(m.app)}</td><td class="mut">${esc(m.note || "")}</td></tr>`).join("")}</tbody>
+      </table></div>`;
+    host.append(c);
+  });
+  $("#md-adj").innerHTML = MODELS.adjacent.map(a =>
+    `<tr><td><b>${esc(a.name)}</b></td><td>${esc(a.line)}</td><td>${esc(a.why)}</td></tr>`).join("");
+})();
+
+/* ── Номенклатура ──────────────────────────────────────────────────────── */
+(function () {
+  $("#pt-src").textContent = PARTS.source;
+  $("#pt-int-note").innerHTML = esc(PARTS.intervals_note);
+  $("#pt-int").innerHTML = PARTS.intervals.map(i =>
+    `<tr><td><b>${esc(i.h)}</b></td><td>${esc(i.what)}</td></tr>`).join("");
+  $("#pl-intro").textContent = PARTLISTS.intro;
+  $("#pl-how").innerHTML = PARTLISTS.how_to_use.map(s => `<li>${esc(s)}</li>`).join("");
+  $("#pl-lists").innerHTML = PARTLISTS.lists.map(L => `<div class="card">
+    <h4>${esc(L.engine)}</h4>
+    <div class="mut">${esc(L.source)} ${L.url ? `— <a href="${esc(L.url)}" target="_blank" rel="noopener">источник</a>` : ""}</div>
+    <div class="box warn" style="margin:8px 0">${esc(L.note)}</div>
+    ${L.groups.map(g => `<h4 style="margin-top:12px">${esc(g.name)} <span class="mut">· ${esc(g.en)}</span></h4>
+      <div class="tblwrap"><table><thead><tr><th>Позиция</th><th>Номер</th><th class="num">На двигатель</th><th>Примечание</th></tr></thead>
+      <tbody>${g.rows.map(r => `<tr><td>${esc(r.desc)}</td><td class="mono"><b>${esc(r.pn)}</b></td>
+        <td class="num">${esc(r.qty)}</td><td class="mut">${esc(r.comment || "")}</td></tr>`).join("")}</tbody></table></div>`).join("")}
+  </div>`).join("");
+
+  acc($("#pt-sys"), PARTS.systems.map(s => ({
+    title: s.name,
+    sub: `<span class="pill">${esc(s.crit)}</span>`,
+    n: s.items.length + " поз.",
+    body: `<p class="note"><b>Для RFQ на английском:</b> ${esc(s.en)}</p>
+      <div class="tblwrap"><table><thead><tr><th>Позиция</th><th>English</th><th>Что помнить</th></tr></thead>
+      <tbody>${s.items.map(i => `<tr><td><b>${esc(i.ru)}</b></td><td class="mono">${esc(i.en)}</td>
+        <td class="mut">${esc(i.note || "")}</td></tr>`).join("")}</tbody></table></div>`,
+  })));
+})();
+
+/* ── Наш спрос ─────────────────────────────────────────────────────────── */
+(function () {
+  const S = DEMAND.stats;
+  $("#dm-src").textContent = DEMAND.source;
+  $("#dm-caveat").innerHTML = "<b>Как читать эти цифры.</b> " + esc(DEMAND.caveat);
+  $("#dm-tiles").innerHTML = [
+    [S.positions, "позиций"], [num(S.total_qty), "штук всего"],
+    [usd(S.lot_usd_lo), "по нижней границе"], [usd(S.lot_usd_hi), "по верхней границе"],
+    [S.priced, "с оценкой цены"], [S.checked, "с живой проверкой"],
+  ].map(([b, s]) => `<div class="tile"><b>${esc(b)}</b><span>${esc(s)}</span></div>`).join("");
+
+  // ── сходимость заявки ──
+  $("#lr-intro").textContent = LOTREVIEW.intro;
+  $("#lr-why").innerHTML = "<b>Зачем это делать.</b> " + esc(LOTREVIEW.why);
+  $("#lr-method").textContent = LOTREVIEW.method;
+  const LVL = { ok: ["a", "сходится"], info: ["b", "к сведению"], warn: ["c", "уточнить"], crit: ["d", "критично"] };
+  $("#lr-find").innerHTML = LOTREVIEW.findings.map(f => {
+    const [cls, label] = LVL[f.level] || ["b", f.level];
+    return `<div class="card" style="border-left:4px solid var(--${f.level === "crit" ? "crit" : f.level === "warn" ? "serious" : f.level === "ok" ? "good" : "s1"})">
+      <h4><span class="pill ${cls}">${esc(label)}</span> ${esc(f.title)}</h4>
+      <p>${esc(f.detail)}</p>
+      <div class="note"><b>Что делать:</b> ${esc(f.action)}</div>
+    </div>`;
+  }).join("");
+
+  let sysFilter = "";
+  const sysHost = $("#dm-sys");
+  const mkChip = (label, val) => {
+    const c = el("div", "chip" + (val === sysFilter ? " on" : ""), label);
+    c.onclick = () => { sysFilter = (sysFilter === val ? "" : val); sysHost.querySelectorAll(".chip").forEach(x => x.classList.remove("on")); if (sysFilter) c.classList.add("on"); paint(); };
+    return c;
+  };
+  sysHost.append(mkChip("все системы", ""));
+  S.by_system.forEach(s => sysHost.append(mkChip(`${DEMAND.systems[s.sys] || s.sys} · ${s.n}`, s.sys)));
+
+  fillSelect($("#dm-man"), S.by_man.map(m => m.man), "все бренды");
+
+  const rows = () => DEMAND.rows.filter(r => {
+    if (sysFilter && r.sys !== sysFilter) return false;
+    const man = $("#dm-man").value; if (man && r.man !== man) return false;
+    const only = $("#dm-only").value;
+    if (only === "cross" && !r.cross) return false;
+    if (only === "check" && !r.checks.length) return false;
+    if (only === "weak" && r.conf !== "C") return false;
+    if (only === "big" && !(r.lot_hi >= 10000)) return false;
+    const q = $("#dm-q").value.trim().toLowerCase();
+    if (q && !((r.pn + " " + r.name + " " + (r.note || "")).toLowerCase().includes(q))) return false;
+    return true;
+  });
+
+  function render(list) {
+    $("#dm-count").textContent = `${list.length} из ${DEMAND.rows.length}`;
+    $("#dm-body").innerHTML = list.map((r, i) => `<tr data-i="${DEMAND.rows.indexOf(r)}" style="cursor:pointer">
+      <td><b class="mono">${esc(r.pn)}</b></td>
+      <td>${esc(r.name)}${r.checks.length ? ' <span class="pill a">проверено</span>' : ""}${r.cross ? ' <span class="pill b">есть кросс</span>' : ""}</td>
+      <td>${esc(r.man)}</td>
+      <td class="mut">${esc(DEMAND.systems[r.sys] || r.sys)}</td>
+      <td class="num">${num(r.qty)}</td>
+      <td class="num">${r.usd_lo == null ? "—" : usd(r.usd_lo) + "–" + num(r.usd_hi)}</td>
+      <td class="num">${r.lot_hi == null ? "—" : usd(r.lot_lo) + "–" + num(r.lot_hi)}</td>
+      <td class="num">${r.gap ? r.gap.toFixed(1) + "×" : "—"}</td>
+      <td>${r.conf ? `<span class="pill ${r.conf === "A" ? "a" : r.conf === "B" ? "b" : "c"}">${esc(r.conf)}</span>` : "—"}</td>
+    </tr>`).join("");
+    $("#dm-body").querySelectorAll("tr").forEach(tr => tr.onclick = () => detail(DEMAND.rows[+tr.dataset.i]));
+  }
+  // ── маршрутизация: кому слать запрос по конкретной позиции ──
+  const OEM_OF = { "Cummins": "Cummins", "Jenbacher/INNIO": "Jenbacher", "Caterpillar": "Caterpillar" };
+  function routeFor(r) {
+    const oem = OEM_OF[r.man] || r.man;
+    const cands = SUPPLIERS.companies.filter(c => (c.oem || []).includes(oem));
+    const exact = cands.filter(c => (c.sys || []).includes(r.sys));
+    const pool = (exact.length >= 3 ? exact : cands).slice().sort((a, b) => b.score - a.score);
+    // класс позиции определяет, чем торгуем: критичным дорогим — оригинал, мелочью — Азия
+    const big = (r.lot_hi || 0) >= 50000, critical = ["gas", "air", "head", "crank", "cpg"].includes(r.sys);
+    const strategy = critical && big
+      ? "Класс A — критично и дорого. Оригинал или аналог уровня A (изготовитель компонента). Пробную партию не пропускать, но и китайский реверс первым заходом не брать."
+      : (r.sys === "seals" || r.sys === "hardware" || r.sys === "hoses")
+        ? "Класс C — мелочь. Быстрее и дешевле изготовить/подобрать по размеру и материалу, чем искать по номеру OEM. Собрать все такие позиции в один лот."
+        : "Класс B — расходник с ресурсом. Аналог уровня A/B от изготовителя компонента (Denso, Champion, MANN, Donaldson, MOTORTECH) — те же заводы без наценки OEM.";
+    return { top: pool.slice(0, 4), strategy, n: pool.length };
+  }
+
+  function detail(r) {
+    const rt = routeFor(r);
+    const d = $("#dm-detail");
+    d.innerHTML = `<div class="card"><h4>${esc(r.pn)} — ${esc(r.name)}</h4>
+      <div class="mut">${esc(r.man)} · ${esc(DEMAND.systems[r.sys] || r.sys)} · ${num(r.qty)} ${esc(r.unit)}</div>
+      ${r.note ? `<p>${esc(r.note)}</p>` : ""}
+      ${r.basis ? `<p class="note"><b>Основание вилки:</b> ${esc(r.basis)}${r.url ? ` — <a href="${esc(r.url)}" target="_blank" rel="noopener">источник</a>` : ""}</p>` : ""}
+      <div class="box info"><b>Кому слать запрос.</b> ${esc(rt.strategy)}
+        <div style="margin-top:6px">${rt.top.map(c => `<span class="pill ${c.score >= 80 ? "hi" : c.score >= 60 ? "md" : "lo"}">${c.score}</span>
+          <b>${esc(c.name)}</b> <span class="mut">— ${esc(c.region)}${c.email ? ", " + esc(c.email) : c.site ? ", " + esc(c.site.replace(/^https?:\/\//, "")) : ""}</span><br>`).join("")}
+        </div>
+        <div class="mut" style="margin-top:4px">Всего в пуле по ${esc(r.man)}: ${rt.n}. Слать минимум в три канала параллельно — разброс цен по нашим позициям 2–14×.</div>
+      </div>
+      ${r.checks.length ? `<h4 style="margin-top:10px">Живые проверки продавцов</h4>` + r.checks.map(c => `
+        <div class="note" style="margin:4px 0">
+          <b>${esc(c.seller || "—")}</b> <span class="pill ${c.verdict === "confirmed" ? "a" : c.verdict === "price_differs" ? "c" : "d"}">${esc(c.verdict)}</span>
+          ${c.lo ? " · " + usd(c.lo) : ""} ${c.stock ? " · сток: " + esc(c.stock) : ""} ${c.lead ? " · " + esc(c.lead) : ""}
+          ${c.url ? ` · <a href="${esc(c.url)}" target="_blank" rel="noopener">ссылка</a>` : ""}
+          ${c.note ? `<div style="margin-top:4px">${esc(c.note)}</div>` : ""}
+        </div>`).join("") : `<p class="mut">Живых проверок по этой позиции нет — стоит сделать.</p>`}
+      </div>`;
+    d.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+  const paint = sortable($("#dm-tbl"), rows, render, "lot_hi");
+  ["#dm-q", "#dm-man", "#dm-only"].forEach(s => $(s).oninput = paint);
+  $("#dm-man").onchange = paint; $("#dm-only").onchange = paint;
+  paint();
+})();
+
+/* ── Аналоги ───────────────────────────────────────────────────────────── */
+(function () {
+  $("#an-src").textContent = ANALOGS.source;
+  $("#an-rules-t").textContent = ANALOGS.rules.title;
+  $("#an-levels").innerHTML = ANALOGS.rules.levels.map(l =>
+    `<div class="card"><h4><span class="pill ${l.code.toLowerCase()}">${esc(l.code)}</span> ${esc(l.name)}</h4>
+     <div>${esc(l.what)}</div><div class="note" style="margin-top:6px"><b>Как относимся:</b> ${esc(l.trust)}</div></div>`).join("");
+  $("#an-check").innerHTML = ANALOGS.rules.checklist.map(c => `<li>${esc(c)}</li>`).join("");
+  $("#an-red").innerHTML = ANALOGS.rules.red_flags.map(c => `<li>${esc(c)}</li>`).join("");
+
+  // ── машинный разбор каталогов MOTORTECH ──
+  const MT = MTCROSS.records || [];
+  $("#mt-note").innerHTML = `<b>Кросс уровня A — от самого изготовителя компонента.</b> ${esc(MTCROSS.source)}
+    Каталоги: ${(MTCROSS.guides || []).map(g => `<a href="${esc(g.url)}" target="_blank" rel="noopener">${esc(g.name)}</a>`).join(" · ")}.
+    Пересобрать: <span class="mono">python3 gpu/tools/parse_motortech.py</span>`;
+  const S = MTCROSS.stats || {};
+  $("#mt-tiles").innerHTML = [
+    [S.records, "записей каталога"], [S.oem_pns, "номеров OEM"],
+    ...Object.entries(S.by_brand || {}).map(([b, n]) => [n, "номеров " + b]),
+  ].map(([b, s]) => `<div class="tile"><b>${esc(b)}</b><span>${esc(s)}</span></div>`).join("");
+  fillSelect($("#mt-guide"), [...new Set(MT.map(r => r.guide))], "все каталоги");
+  fillSelect($("#mt-part"), [...new Set(MT.map(r => r.part).filter(Boolean))].sort(), "любая деталь");
+  function mtPaint() {
+    const q = $("#mt-q").value.trim().toLowerCase();
+    const g = $("#mt-guide").value, pt = $("#mt-part").value;
+    const list = MT.filter(r => {
+      if (g && r.guide !== g) return false;
+      if (pt && r.part !== pt) return false;
+      if (!q) return true;
+      return (r.motortech.join(" ") + " " + r.cross.map(c => c.brand + " " + c.pns.join(" ")).join(" ") + " " + r.part + " " + r.engines).toLowerCase().includes(q);
+    });
+    $("#mt-count").textContent = `${list.length} из ${MT.length}`;
+    $("#mt-body").innerHTML = list.map(r => `<tr>
+      <td>${esc(r.part || "—")}</td>
+      <td class="mut">${esc(r.engines || "—")}</td>
+      <td class="mono"><b>${r.motortech.map(esc).join("<br>") || "—"}</b></td>
+      <td>${r.cross.map(c => `<div><span class="tag">${esc(c.brand)}</span> <span class="mono">${c.pns.map(esc).join(", ")}</span></div>`).join("")}</td>
+      <td class="mut"><a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.guide)}</a></td>
+    </tr>`).join("");
+  }
+  $("#mt-q").oninput = mtPaint; $("#mt-guide").onchange = mtPaint; $("#mt-part").onchange = mtPaint; mtPaint();
+
+  const oems = [...new Set(ANALOGS.families.map(f => f.oem))];
+  fillSelect($("#an-oem"), oems, "все OEM");
+  function paint() {
+    const q = $("#an-q").value.trim().toLowerCase(), oem = $("#an-oem").value;
+    const list = ANALOGS.families.filter(f => {
+      if (oem && f.oem !== oem) return false;
+      if (!q) return true;
+      return JSON.stringify(f).toLowerCase().includes(q);
+    });
+    $("#an-count").textContent = `${list.length} из ${ANALOGS.families.length}`;
+    acc($("#an-fam"), list.map(f => ({
+      title: f.title,
+      sub: `<span class="pill">${esc(f.oem)}</span> ${f.our_qty ? `<span class="pill b">в нашем лоте ${num(f.our_qty)} шт</span>` : ""}`,
+      n: f.analogs.length + " аналог.",
+      body: `<p><b>Применяемость:</b> ${esc(f.fits)}</p>
+        <p><b>OEM-номера:</b> ${f.oem_pns.map(p => `<span class="tag mono">${esc(p)}</span>`).join("")}</p>
+        <div class="tblwrap"><table><thead><tr><th>Бренд</th><th>Номер аналога</th><th>Ур.</th><th>Комментарий</th></tr></thead>
+        <tbody>${f.analogs.map(a => `<tr><td><b>${esc(a.brand)}</b></td><td class="mono">${esc(a.pn)}</td>
+          <td><span class="pill ${String(a.level).toLowerCase().replace(/[^a-d]/g, "").charAt(0) || "b"}">${esc(a.level)}</span></td>
+          <td>${esc(a.note || "")}${a.url ? ` <a href="${esc(a.url)}" target="_blank" rel="noopener">↗</a>` : ""}</td></tr>`).join("")}</tbody></table></div>
+        <div class="box warn"><b>Риск:</b> ${esc(f.risk)}</div>
+        <div class="box"><b>Как проверять:</b> ${esc(f.check)}</div>
+        ${f.note_atmus ? `<p class="note">${esc(f.note_atmus)}</p>` : ""}
+        ${f.source_url ? `<p class="mut">Источник кросс-таблицы: <a href="${esc(f.source_url)}" target="_blank" rel="noopener">${esc(f.source_url)}</a></p>` : ""}`,
+    })));
+  }
+  $("#an-q").oninput = paint; $("#an-oem").onchange = paint; paint();
+})();
+
+/* ── Субпоставщики ─────────────────────────────────────────────────────── */
+(function () {
+  $("#sb-src").textContent = SUBSUP.source;
+  $("#sb-rule").innerHTML = `<b>${esc(SUBSUP.key_rule.title)}.</b> ${esc(SUBSUP.key_rule.text)}`;
+  $("#sb-legend").innerHTML = Object.entries(SUBSUP.confidence_legend).map(([k, v]) =>
+    `<div class="chip" style="cursor:default"><b>${esc(k)}</b> — ${esc(v)}</div>`).join("");
+  acc($("#sb-sys"), SUBSUP.systems.map(s => ({
+    title: s.name,
+    sub: s.why ? esc(s.why) : "",
+    n: s.makers.length + " комп.",
+    body: s.makers.map(m => `<div class="card">
+      <h4>${esc(m.name)} <span class="pill ${m.conf === "confirmed" ? "a" : m.conf === "market" ? "b" : "c"}">${esc(m.conf)}</span></h4>
+      <div class="mut">${esc(m.country)}</div>
+      <p>${esc(m.role)}</p>
+      ${m.note ? `<div class="note">${esc(m.note)}</div>` : ""}
+      ${m.url ? `<div style="margin-top:4px"><a href="${esc(m.url)}" target="_blank" rel="noopener">${esc(m.url)}</a></div>` : ""}
+    </div>`).join(""),
+  })));
+})();
+
+/* ── Поставщики ────────────────────────────────────────────────────────── */
+(function () {
+  $("#sp-src").textContent = SUPPLIERS.source;
+  const M = SUPPLIERS.rating_model;
+  $("#sp-model").innerHTML = `<p class="mut">${esc(M.note)}</p>
+    <div class="tblwrap"><table><thead><tr><th>Ось</th><th class="num">Вес</th><th>Как оценивается</th></tr></thead>
+    <tbody>${M.axes.map(a => `<tr><td><b>${esc(a.name)}</b></td><td class="num">${a.w}</td><td>${esc(a.how)}</td></tr>`).join("")}</tbody></table></div>`;
+
+  // статистика Bitrix по поставщику: матчинг by_supplier/pool по алиасам
+  const bxNorm = s => String(s || "").toLowerCase();
+  function bxStat(c) {
+    const src = (BITRIX.by_supplier || []).concat((BITRIX.pool || []).map(p => ({ name: p.name, n: p.rfqs, last: p.last })));
+    if (!src.length) return null;   // сид без живой выгрузки — бейджи не показываем
+    const als = (c.aliases || []).map(bxNorm);
+    let best = null;
+    src.forEach(s => { const nm = bxNorm(s.name);
+      if (als.some(a => nm.includes(a))) { if (!best || (s.n || 0) > best.n) best = { n: s.n || 0, last: s.last || "" }; } });
+    return best || { n: 0, last: "" };
+  }
+  const regions = [...new Set(SUPPLIERS.companies.map(c => c.region))];
+  const oems = [...new Set(SUPPLIERS.companies.flatMap(c => c.oem || []))].sort();
+  const types = [...new Set(SUPPLIERS.companies.map(c => c.type))];
+  fillSelect($("#sp-reg"), regions, "все регионы");
+  fillSelect($("#sp-oem"), oems, "все OEM");
+  fillSelect($("#sp-typ"), types, "все типы");
+
+  function paint() {
+    const q = $("#sp-q").value.trim().toLowerCase();
+    const reg = $("#sp-reg").value, oem = $("#sp-oem").value, typ = $("#sp-typ").value, sort = $("#sp-sort").value;
+    let list = SUPPLIERS.companies.filter(c => {
+      if (reg && c.region !== reg) return false;
+      if (typ && c.type !== typ) return false;
+      if (oem && !(c.oem || []).includes(oem)) return false;
+      if (q && !JSON.stringify(c).toLowerCase().includes(q)) return false;
+      return true;
+    });
+    list = list.slice().sort((a, b) => sort === "name" ? a.name.localeCompare(b.name, "ru") : (b[sort] || 0) - (a[sort] || 0));
+    $("#sp-count").textContent = `${list.length} из ${SUPPLIERS.companies.length}`;
+    $("#sp-list").innerHTML = list.map(c => {
+      const cls = c.score >= 80 ? "hi" : c.score >= 60 ? "md" : "lo";
+      const bar = (label, v) => `<div class="barrow"><span>${esc(label)}</span>
+        <span class="bartrack"><span class="barfill" style="width:${(v / 5) * 100}%"></span></span><span>${v}</span></div>`;
+      const bx = bxStat(c);
+      return `<div class="sup">
+        <div>
+          <h4>${esc(c.name)}</h4>
+          <div class="mut">${esc(c.country)}</div>
+          <div style="margin-top:6px">
+            <span class="pill ${cls}">${c.score}</span>
+            <span class="pill">${esc(c.type)}</span>
+            <span class="pill">${esc(c.region)}</span>
+            ${bx ? `<span class="pill ${bx.n ? "a" : "lo"}" title="по живой выгрузке Bitrix">Bitrix: ${bx.n ? bx.n + " запр., посл. " + esc(bx.last) : "не ходили"}</span>` : ""}
+          </div>
+          <div style="margin-top:5px">${(c.oem || []).map(o => `<span class="tag">${esc(o)}</span>`).join("")}</div>
+        </div>
+        <div>
+          <div>${esc(c.what)}</div>
+          ${c.proof_note ? `<div class="note" style="margin-top:6px"><b>Чем подтверждено:</b> ${esc(c.proof_note)}</div>` : ""}
+          <div class="note" style="margin-top:6px"><b>Канал:</b> ${esc(c.channel)}</div>
+        </div>
+        <div>
+          <div class="score"><b>${c.score}</b><span class="mut">/100</span></div>
+          <div class="bars">
+            ${bar("проходимость", c.reach)}${bar("доказанность", c.proof)}${bar("глубина ГПУ", c.depth)}
+            ${bar("сток", c.stock)}${bar("отзывчивость", c.speed)}
+          </div>
+          <div style="margin-top:8px;font-size:12.5px">
+            ${c.site ? `<a href="${esc(c.site)}" target="_blank" rel="noopener">${esc(c.site.replace(/^https?:\/\//, ""))}</a><br>` : ""}
+            ${c.email ? `<a href="mailto:${esc(c.email)}">${esc(c.email)}</a>` : ""}
+          </div>
+        </div>
+      </div>`;
+    }).join("");
+  }
+  ["#sp-q"].forEach(s => $(s).oninput = paint);
+  ["#sp-reg", "#sp-oem", "#sp-typ", "#sp-sort"].forEach(s => $(s).onchange = paint);
+  paint();
+})();
+
+/* ── Каналы ────────────────────────────────────────────────────────────── */
+(function () {
+  $("#ch-principle").innerHTML = "<b>Правило первоисточника.</b> " + esc(CHANNELS.principle);
+  $("#ch-intro").textContent = CHANNELS.intro;
+  $("#ch-routes").innerHTML = CHANNELS.routes.map(r => {
+    const cls = r.score >= 4 ? "hi" : r.score >= 3 ? "md" : "lo";
+    return `<div class="card">
+      <h4>${esc(r.name)} <span class="pill ${cls}">${"★".repeat(r.score)}${"·".repeat(5 - r.score)}</span></h4>
+      <p>${esc(r.why)}</p>
+      <p><b>Кто там:</b> ${r.players.map(p => `<span class="tag">${esc(p)}</span>`).join("")}</p>
+      <p><b>Что идёт:</b> ${esc(r.goods)}</p>
+      <div class="box warn" style="margin:6px 0"><b>Риски:</b> ${esc(r.risks)}</div>
+      <div class="box" style="margin:6px 0"><b>Как работать:</b> ${esc(r.how)}</div>
+    </div>`;
+  }).join("");
+  $("#ch-play").innerHTML = CHANNELS.playbook.map(p => `<li>${esc(p)}</li>`).join("");
+})();
+
+/* ── Шифровки PN ───────────────────────────────────────────────────────── */
+(function () {
+  $("#pn-intro").textContent = PN.intro;
+  $("#pn-brands").innerHTML = PN.brands.map(b => `<div class="card">
+    <h4>${esc(b.brand)}</h4>
+    <p class="note"><b>Формат:</b> ${esc(b.format)}</p>
+    ${b.rules ? `<ul>${b.rules.map(r => `<li>${esc(r)}</li>`).join("")}</ul>` : ""}
+    ${b.traps ? `<div class="box warn"><b>Ловушки:</b><ul>${b.traps.map(t => `<li>${esc(t)}</li>`).join("")}</ul></div>` : ""}
+  </div>`).join("");
+  $("#pn-rules").innerHTML = PN.rfq_number_rules.map(r => `<li>${esc(r)}</li>`).join("");
+})();
+
+/* ── Наши запросы ──────────────────────────────────────────────────────── */
+(function () {
+  $("#bx-src").textContent = BITRIX.source;
+  $("#bx-caveat").innerHTML = (BITRIX.live ? "<b>Живая выгрузка.</b> " : "<b>Сид, не живая выгрузка.</b> ") + esc(BITRIX.caveat || "");
+  $("#bx-deals").innerHTML = (BITRIX.deals || []).map(d => `<div class="card">
+    <h4>#${esc(d.id)} — ${esc(d.title)}</h4>
+    <div class="mut">${esc(d.created)} ${d.stage ? "· " + esc(d.stage) : ""} ${d.sourcer ? "· " + esc(d.sourcer) : ""}</div>
+    <div style="margin:5px 0">${(d.models || []).map(m => `<span class="tag">${esc(m)}</span>`).join("")}</div>
+    ${d.note ? `<div class="note">${esc(d.note)}</div>` : ""}
+    ${(d.rfqs || []).length ? `<div class="tblwrap"><table><thead><tr><th>Запрос</th><th>Поставщик</th><th>Стадия</th><th>Сорсер</th><th>Дата</th></tr></thead>
+      <tbody>${d.rfqs.map(r => `<tr><td>${esc(r.title)}</td><td>${esc(r.supplier)}</td><td>${esc(r.stage)}</td>
+        <td>${esc(r.sourcer)}</td><td>${esc(r.created)}</td></tr>`).join("")}</tbody></table></div>` : ""}
+  </div>`).join("");
+  $("#bx-adj").innerHTML = (BITRIX.adjacent || []).map(a => `<div class="card">
+    <h4>${esc(a.title)}</h4>
+    <div class="mut">${esc(a.customer || "")} ${a.status ? "· " + esc(a.status) : ""}</div>
+    ${a.revenue_rub ? `<p>выручка ${num(Math.round(a.revenue_rub))} ₽ · закупка ${num(Math.round(a.purchase_rub))} ₽ ·
+      маржа ${(a.margin_pct * 100).toFixed(1)} % при норме ${(a.margin_norm * 100).toFixed(0)} %</p>` : ""}
+    ${a.note ? `<div class="note">${esc(a.note)}</div>` : ""}
+  </div>`).join("");
+  $("#bx-hist").innerHTML = esc(BITRIX.history_note || "");
+  if ((BITRIX.by_supplier || []).length) {
+    $("#bx-sup-t").style.display = ""; $("#bx-sup-w").style.display = "";
+    $("#bx-sup").innerHTML = BITRIX.by_supplier.map(s => `<tr><td><b>${esc(s.name)}</b></td>
+      <td class="num">${s.n}</td><td>${esc(s.last || "—")}</td>
+      <td class="mut">${Object.entries(s.stages || {}).map(([k, v]) => esc(k) + " ×" + v).join(", ")}</td></tr>`).join("");
+  }
+  if ((BITRIX.pool || []).length) {
+    $("#bx-pool-t").style.display = ""; $("#bx-pool-w").style.display = "";
+    $("#bx-pool").innerHTML = BITRIX.pool.map(p =>
+      `<tr><td>${esc(p.name)}</td><td class="num">${p.rfqs}</td><td>${esc(p.last || "—")}</td></tr>`).join("");
+  }
+})();
+
+/* ── Таможня ───────────────────────────────────────────────────────────── */
+(function () {
+  $("#cu-status").innerHTML = `<b>${esc(CUSTOMS.status)}</b><p style="margin:6px 0 0">${esc(CUSTOMS.why_it_matters)}</p>`;
+  $("#cu-what").innerHTML = `<h4>Что мы проверили</h4><p>${esc(CUSTOMS.what_we_checked)}</p>`;
+  $("#cu-hs").innerHTML = CUSTOMS.hs_codes.map(h =>
+    `<tr><td><b class="mono">${esc(h.code)}</b></td><td>${esc(h.what)}</td><td>${esc(h.use)}</td></tr>`).join("");
+  $("#cu-how").innerHTML = `<p class="note">${esc(CUSTOMS.how_to_pull.note)}</p>
+    <ol>${CUSTOMS.how_to_pull.steps.map(s => `<li class="mono">${esc(s)}</li>`).join("")}</ol>
+    <div class="box warn">${esc(CUSTOMS.how_to_pull.cost)}</div>`;
+  $("#cu-look").innerHTML = CUSTOMS.what_to_look_for.map(s => `<li>${esc(s)}</li>`).join("");
+})();
+
+/* ── RFQ-пакет ─────────────────────────────────────────────────────────── */
+(function () {
+  const P = RFQPACK;
+  $("#rp-intro").textContent = P.intro;
+  $("#rp-rules").innerHTML = P.rules.map(r => `<li>${esc(r)}</li>`).join("");
+  $("#rp-tiles").innerHTML = [[P.positions.length, "позиции"], [P.recipients.length, "адресатов"],
+    [P.recipients.filter(r => r.to).length, "с прямым email"]]
+    .map(([b, s]) => `<div class="tile"><b>${esc(b)}</b><span>${esc(s)}</span></div>`).join("");
+  $("#rp-pos").innerHTML = P.positions.map(p => `<tr><td><b>${esc(p.short)}</b><div class="mut">${esc(p.title)}</div></td>
+    <td class="mono">${esc(p.pns)}</td><td>${esc(p.qty)}</td></tr>`).join("");
+  const host = $("#rp-pick");
+  let cur = 0;
+  function letter(i) {
+    const r = P.recipients[i];
+    const tpl = r.lang === "ru" ? P.template_ru : P.template_en;
+    const pos = r.pos.map(k => P.positions.find(p => p.key === k));
+    const block = pos.map((p, n) => `${n + 1}) ${p.title}\n   P/N: ${p.pns}\n   Qty: ${p.qty}`).join("\n");
+    const asks = [...new Set(pos.flatMap(p => p.asks))].map((a, n) => `${n + 1}. ${a}`).join("\n");
+    const txt = tpl.replace("{SHORT}", pos.map(p => p.short).join(" + "))
+      .replace("{NAME}", r.name).replace("{PERSONAL}", r.personal)
+      .replace("Position: {TITLE}\nPart numbers: {PNS}\nQuantity: {QTY}", block)
+      .replace("Позиция: {TITLE}\nНомера: {PNS}\nКоличество: {QTY}", block)
+      .replace("{ASKS}", asks);
+    $("#rp-letter").innerHTML = `<div class="card"><h4>${esc(r.name)}
+      ${r.to ? `— <a href="mailto:${esc(r.to)}">${esc(r.to)}</a>` : r.form ? `— <a href="${esc(r.form)}" target="_blank" rel="noopener">через форму на сайте ↗</a>` : ""}</h4>
+      <div class="mut">Позиции: ${pos.map(p => esc(p.short)).join(" · ")} · язык: ${r.lang.toUpperCase()}</div>
+      <pre id="rp-txt">${esc(txt)}</pre>
+      <button class="btn" id="rp-copy">скопировать письмо</button>
+      <span class="mut" style="margin-left:8px">Подпись {SIGNATURE} сорсер вставляет свою.</span></div>`;
+    $("#rp-copy").onclick = () => { if (navigator.clipboard) navigator.clipboard.writeText($("#rp-txt").textContent)
+      .then(() => { $("#rp-copy").textContent = "скопировано ✓"; setTimeout(() => $("#rp-copy").textContent = "скопировать письмо", 1500); }); };
+  }
+  P.recipients.forEach((r, i) => {
+    const ch = el("div", "chip" + (i === 0 ? " on" : ""), esc(r.name));
+    ch.onclick = () => { cur = i; host.querySelectorAll(".chip").forEach(x => x.classList.remove("on")); ch.classList.add("on"); letter(i); };
+    host.append(ch);
+  });
+  letter(0);
+  $("#rp-track").innerHTML = "<b>Учёт.</b> " + esc(P.tracking_note);
+})();
+
+/* ── Плейбук ───────────────────────────────────────────────────────────── */
+(function () {
+  $("#pb-intro").textContent = PLAYBOOK.intro;
+  $("#pb-flow").innerHTML = PLAYBOOK.flow.map(f => `<div class="card">
+    <h4>${f.step}. ${esc(f.title)}</h4>
+    <p><b>Что нужно:</b> ${esc(f.what)}</p>
+    <p class="mut"><b>Зачем:</b> ${esc(f.why)}</p>
+    ${f.ask ? `<div class="note"><b>Как спросить:</b> ${esc(f.ask)}</div>` : ""}
+  </div>`).join("");
+  $("#pb-quest").innerHTML = PLAYBOOK.questions_to_customer.map(q => `<li>${esc(q)}</li>`).join("");
+  $("#pb-red").innerHTML = PLAYBOOK.red_flags_supplier.map(q => `<li>${esc(q)}</li>`).join("");
+  $("#pb-tpl").innerHTML = PLAYBOOK.templates.map((t, i) => `<div class="card">
+    <h4>${esc(t.name)}</h4>
+    <pre id="tpl-${i}">${esc(t.text)}</pre>
+    <button class="btn" data-tpl="${i}">скопировать</button>
+  </div>`).join("");
+  $("#pb-tpl").querySelectorAll("button[data-tpl]").forEach(b => b.onclick = () => {
+    const txt = PLAYBOOK.templates[+b.dataset.tpl].text;
+    if (navigator.clipboard) navigator.clipboard.writeText(txt).then(() => { b.textContent = "скопировано ✓"; setTimeout(() => b.textContent = "скопировать", 1500); });
+  });
+})();
+</script>
+</body>
+</html>
