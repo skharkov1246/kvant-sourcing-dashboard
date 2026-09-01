@@ -66,15 +66,27 @@ def ball(t, key):
 
 
 def main(run: str) -> None:
-    zhurnal = WF / run / 'journal.jsonl'
-    if not zhurnal.exists():
-        sys.exit(f'нет журнала {zhurnal}')
-    rez = []
-    for line in zhurnal.read_text(encoding='utf-8').splitlines():
-        z = json.loads(line)
-        if z.get('type') == 'result' and isinstance(z.get('result'), dict):
-            rez.append(z['result'])
-    print(f'результатов в журнале: {len(rez)}')
+    """Читает результаты из ВСЕХ журналов потоков: разделы собираются несколькими
+    потоками одновременно, чтобы обойти потолок одновременных агентов на поток."""
+    zhurnaly = sorted(WF.glob('wf_*/journal.jsonl'))
+    if not zhurnaly:
+        sys.exit(f'нет журналов в {WF}')
+    rez, otkuda = [], []
+    for zh in zhurnaly:
+        n = 0
+        for line in zh.read_text(encoding='utf-8').splitlines():
+            try:
+                z = json.loads(line)
+            except Exception:
+                continue
+            r = z.get('result')
+            # разделы сайта опознаются по обязательным полям схемы
+            if z.get('type') == 'result' and isinstance(r, dict) \
+                    and 'sections' in r and 'tiles' in r:
+                rez.append(r); n += 1
+        if n:
+            otkuda.append(f'{zh.parent.name}: {n}')
+    print('результатов найдено:', len(rez), '|', '; '.join(otkuda))
     if not rez:
         return
 
