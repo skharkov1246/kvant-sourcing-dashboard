@@ -348,34 +348,61 @@ footer{padding:0 22px 24px;color:var(--mut);font-size:11.5px}
 </section>
 
 <section id="t-analogs">
-  <h2>Аналоги и перекрёстные ссылки</h2>
+  <h2>Аналоги и замены</h2>
   <p class="mut" id="an-src"></p>
+  <p id="an-lead"></p>
+  <div class="chips" id="an-angle"></div>
+
+  <!-- угол 1: по классу детали -->
+  <div id="an-a-class">
+    <div class="k" id="ac-tiles"></div>
+    <div class="box info" id="ac-how"></div>
+    <div class="filters">
+      <div class="f-field" style="flex:1"><label>определить класс по наименованию позиции из заявки</label>
+        <input id="ac-q" placeholder="свеча зажигания 4380132 · набор прокладок ГБЦ · шланг масляной системы…" style="width:100%"></div>
+      <span class="count" id="ac-q-out"></span>
+    </div>
+    <div class="chips" id="ac-pick"></div>
+    <div id="ac-card"></div>
+  </div>
+
+  <!-- угол 2: по номеру -->
+  <div id="an-a-pn" style="display:none">
+    <h3>Каталоги применяемости MOTORTECH</h3>
+    <div class="box info" id="mt-note"></div>
+    <div class="k" id="mt-tiles"></div>
+    <div class="filters">
+      <div class="f-field"><label>номер OEM или MOTORTECH</label><input id="mt-q" placeholder="418-4861, 06.50.151, 4W-6747…"></div>
+      <div class="f-field"><label>каталог</label><select id="mt-guide"></select></div>
+      <div class="f-field"><label>вид детали</label><select id="mt-part"></select></div>
+      <span class="count" id="mt-count"></span>
+    </div>
+    <div class="tblwrap"><table><thead><tr>
+      <th>Деталь</th><th>Применяемость</th><th>MOTORTECH P/N</th><th>Заменяет (OEM и ALTRONIC)</th><th>Каталог</th>
+    </tr></thead><tbody id="mt-body"></tbody></table></div>
+
+    <h3>Семейства перекрёстных ссылок</h3>
+    <div class="filters">
+      <div class="f-field"><label>поиск по номеру или тексту</label><input id="an-q" placeholder="4380132, 334976, MOTORTECH…"></div>
+      <div class="f-field"><label>OEM</label><select id="an-oem"></select></div>
+      <span class="count" id="an-count"></span>
+    </div>
+    <div class="acc" id="an-fam"></div>
+  </div>
+
+  <!-- угол 3: по машине -->
+  <div id="an-a-mach" style="display:none">
+    <p class="mut" id="am-intro"></p>
+    <div class="chips" id="am-pick"></div>
+    <div id="am-body"></div>
+  </div>
+
   <h3 id="an-rules-t"></h3>
   <div class="grid" id="an-levels"></div>
   <div class="split">
     <div class="card"><h4>Порядок проверки аналога</h4><ol id="an-check"></ol></div>
     <div class="card"><h4>Признаки недостоверного предложения</h4><ul id="an-red"></ul></div>
   </div>
-  <h3>Каталоги применяемости MOTORTECH</h3>
-  <div class="box info" id="mt-note"></div>
-  <div class="k" id="mt-tiles"></div>
-  <div class="filters">
-    <div class="f-field"><label>номер OEM или MOTORTECH</label><input id="mt-q" placeholder="418-4861, 06.50.151, 4W-6747…"></div>
-    <div class="f-field"><label>каталог</label><select id="mt-guide"></select></div>
-    <div class="f-field"><label>вид детали</label><select id="mt-part"></select></div>
-    <span class="count" id="mt-count"></span>
-  </div>
-  <div class="tblwrap"><table><thead><tr>
-    <th>Деталь</th><th>Применяемость</th><th>MOTORTECH P/N</th><th>Заменяет (OEM и ALTRONIC)</th><th>Каталог</th>
-  </tr></thead><tbody id="mt-body"></tbody></table></div>
-
-  <h3>Семейства перекрёстных ссылок</h3>
-  <div class="filters">
-    <div class="f-field"><label>поиск по номеру или тексту</label><input id="an-q" placeholder="4380132, 334976, MOTORTECH…"></div>
-    <div class="f-field"><label>OEM</label><select id="an-oem"></select></div>
-    <span class="count" id="an-count"></span>
-  </div>
-  <div class="acc" id="an-fam"></div>
 </section>
 
 <section id="t-subs">
@@ -516,6 +543,7 @@ const CONSUM_B = __CONSUMABLES_JSON__;
 const MACHINES = __MACHINES_JSON__;
 const RFQPACK  = __RFQPACK_JSON__;
 const GLOSSARY = __GLOSSARY_JSON__;
+const ACLASS   = __ACLASS_JSON__;
 const BUILT_AT = "__BUILT_AT__";
 
 const $ = s => document.querySelector(s);
@@ -1237,6 +1265,203 @@ function fillSelect(sel, values, allLabel) {
     })));
   }
   $("#an-q").oninput = paint; $("#an-oem").onchange = paint; paint();
+})();
+
+/* ── Аналоги: подбор по классу детали и по машине ──────────────────────── */
+(function () {
+  $("#an-lead").textContent = ACLASS.intro;
+
+  /* правила отнесения позиции к классу: по наименованию, с оговорёнными исключениями */
+  const RULES = ACLASS.classes.map(c => ({
+    c,
+    re:  c.match.re  ? new RegExp(c.match.re,  "i") : null,
+    not: c.match.not ? new RegExp(c.match.not, "i") : null,
+    mt:  c.match.mt  ? new RegExp(c.match.mt,  "i") : null,
+    sys: new Set(c.match.sys || []),
+  }));
+  const hitName = (r, text) => !!r.re && r.re.test(text) && !(r.not && r.not.test(text));
+  const classOf = text => (RULES.find(r => hitName(r, text)) || {}).c || null;
+
+  /* заранее раскладываем данные по классам — счётчики нужны на плитках и чипах */
+  const byClass = {};
+  ACLASS.classes.forEach(c => byClass[c.key] = { rows: [], fams: [], mt: [], sup: [], units: [] });
+  DEMAND.rows.forEach(r => { const c = classOf(r.name + " " + r.pn); if (c) byClass[c.key].rows.push(r); });
+  ANALOGS.families.forEach(f => { const c = classOf(f.title + " " + (f.fits || "")); if (c) byClass[c.key].fams.push(f); });
+  (MTCROSS.records || []).forEach(r => {
+    const m = RULES.find(x => x.mt && x.mt.test(r.part || ""));
+    if (m) byClass[m.c.key].mt.push(r);
+  });
+  SUPPLIERS.companies.forEach(x => RULES.forEach(r => {
+    if ((x.sys || []).some(y => r.sys.has(y))) byClass[r.c.key].sup.push(x);
+  }));
+  (MACHINES.machines || []).forEach(m => (m.units || []).forEach(u => {
+    const c = classOf(u.unit + " " + (u.what || ""));
+    if (c) byClass[c.key].units.push({ machine: m.model, oem: m.oem, unit: u });
+  }));
+
+  const VERD = {}; ACLASS.verdicts.forEach(v => VERD[v.code] = v);
+  const VPILL = { free: "a", check: "c", oe: "d" };
+  const pill = code => `<span class="pill ${VPILL[code]}">${esc(VERD[code].name)}</span>`;
+
+  /* ── переключатель углов входа ── */
+  const ANGLES = [["an-a-class", "По классу детали"], ["an-a-pn", "По номеру"], ["an-a-mach", "По машине"]];
+  const angleHost = $("#an-angle");
+  ANGLES.forEach(([id, name], i) => {
+    const b = el("div", "chip" + (i === 0 ? " on" : ""), esc(name));
+    b.onclick = () => {
+      angleHost.querySelectorAll(".chip").forEach(x => x.classList.remove("on"));
+      b.classList.add("on");
+      ANGLES.forEach(([x]) => $("#" + x).style.display = x === id ? "" : "none");
+    };
+    angleHost.append(b);
+  });
+  /* переход к углу «по номеру» с заполненным условием отбора */
+  function toPn(q, part) {
+    angleHost.querySelectorAll(".chip").forEach((x, i) => x.classList.toggle("on", i === 1));
+    ANGLES.forEach(([x], i) => $("#" + x).style.display = i === 1 ? "" : "none");
+    if (part != null) { $("#mt-part").value = part; $("#mt-part").dispatchEvent(new Event("change")); }
+    if (q != null) { $("#an-q").value = q; $("#an-q").dispatchEvent(new Event("input")); }
+    window.scrollTo(0, 0);
+  }
+  window.anToPn = toPn;
+
+  /* ── плитки и порядок работы ── */
+  const cnt = code => ACLASS.classes.filter(c => c.verdict === code).length;
+  const rowsClassified = ACLASS.classes.reduce((a, c) => a + byClass[c.key].rows.length, 0);
+  $("#ac-tiles").innerHTML = [
+    [ACLASS.classes.length, "классов деталей"],
+    [cnt("free"), "аналог допускается"],
+    [cnt("check"), "допускается после проверки"],
+    [cnt("oe"), "только оригинал"],
+    [rowsClassified + " из " + DEMAND.rows.length, "позиций заявки разнесено по классам"],
+  ].map(([b, t]) => `<div class="tile"><b>${esc(b)}</b><span>${esc(t)}</span></div>`).join("");
+  $("#ac-how").innerHTML = `<b>Порядок подбора.</b> ${esc(ACLASS.how)}`;
+
+  /* ── карточка класса ── */
+  function card(c) {
+    const d = byClass[c.key];
+    const rows = d.rows.slice().sort((a, b) => (b.lot_hi || 0) - (a.lot_hi || 0));
+    const sup = d.sup.slice().sort((a, b) => b.score - a.score).slice(0, 6);
+    return `<div class="card">
+      <h4 style="font-size:15px">${esc(c.title)} <span class="mut" style="font-weight:400">${esc(c.en)}</span></h4>
+      <p>${pill(c.verdict)} ${esc(c.verdict_why)}</p>
+
+      <div class="split">
+        <div class="card"><h4>Контрольные признаки — что обязано совпасть</h4>
+          ${c.criteria.map(x => `<p style="margin:6px 0"><b>${esc(x.p)}.</b> ${esc(x.d)}</p>`).join("")}</div>
+        <div class="card"><h4>Запросить у поставщика</h4>
+          <ol>${c.ask.map(x => `<li>${esc(x)}</li>`).join("")}</ol>
+          <div class="note">Ответ по всем пунктам — основание для решения без обращения к внешним специалистам. Отсутствие ответа хотя бы по одному пункту — основание отказаться от аналога.</div></div>
+      </div>
+
+      <h4 style="margin-top:12px">Кто изготавливает</h4>
+      <div class="tblwrap"><table><thead><tr><th>Уровень</th><th>Изготовители</th></tr></thead><tbody>
+        ${c.makers.map(m => `<tr><td><span class="pill ${m.tier === "OE" ? "a" : m.tier === "OE-ALT" ? "b" : "c"}">${esc(m.tier)}</span></td><td>${esc(m.list)}</td></tr>`).join("")}
+      </tbody></table></div>
+
+      <div class="box warn"><b>Типичные ошибки по классу.</b>
+        <ul style="margin:4px 0 0">${c.pitfalls.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>
+
+      <h4>Куда направлять запрос</h4>
+      <div class="tblwrap"><table><thead><tr><th>Первый выбор</th><th>Второй выбор</th><th>Экономичный вариант</th><th>Риск</th></tr></thead>
+        <tbody><tr><td>${esc(c.buy.first)}</td><td>${esc(c.buy.second)}</td><td>${esc(c.buy.budget)}</td><td>${esc(c.buy.risk)}</td></tr></tbody></table></div>
+      ${sup.length ? `<p class="mut" style="margin-top:6px">Поставщики из реестра по этой системе:</p>
+        <div>${sup.map(x => `<span class="tag wrap"><b>${esc(x.name)}</b> · ${esc(x.country)} · ${x.score}</span>`).join("")}</div>` : ""}
+
+      <h4 style="margin-top:12px">Позиции текущей заявки этого класса — ${rows.length}</h4>
+      ${rows.length ? `<div class="tblwrap"><table><thead><tr>
+        <th>Номер</th><th>Наименование</th><th class="num">Кол-во</th><th class="num">$ по заявке</th><th>Замена известна</th></tr></thead>
+        <tbody>${rows.slice(0, 12).map(r => `<tr>
+          <td class="mono">${esc(r.pn)}</td><td>${esc(r.name)}</td>
+          <td class="num">${num(r.qty)}</td><td class="num">${usd(r.lot_hi)}</td>
+          <td>${r.cross ? `<span class="pill a">есть</span> <span class="mut">${esc(String(r.cross).slice(0, 60))}</span>` : `<span class="pill lo">не найдена</span>`}</td>
+        </tr>`).join("")}</tbody></table></div>
+        ${rows.length > 12 ? `<p class="mut">Показаны 12 позиций из ${rows.length} по убыванию стоимости.</p>` : ""}` :
+        `<p class="mut">В текущей заявке позиций этого класса нет.</p>`}
+
+      <h4 style="margin-top:12px">Готовые соответствия</h4>
+      <p>Семейств перекрёстных ссылок: <b>${d.fams.length}</b>${d.fams.length ? " — " + d.fams.map(f => esc(f.title)).join("; ") : ""}.
+         Записей каталогов MOTORTECH: <b>${d.mt.length}</b>.</p>
+      <p>${d.fams.length ? `<button class="btn" onclick="anToPn('${esc(c.match.re ? c.match.re.split("|")[0] : c.title.split(" ")[0].toLowerCase())}', null)">Открыть семейства по номеру →</button> ` : ""}
+         ${d.mt.length ? `<button class="btn" onclick="anToPn(null, '${esc(d.mt[0].part)}')">Открыть каталог MOTORTECH →</button>` : ""}</p>
+    </div>`;
+  }
+
+  const pickHost = $("#ac-pick");
+  ACLASS.classes.forEach((c, i) => {
+    const d = byClass[c.key];
+    const b = el("div", "chip" + (i === 0 ? " on" : ""),
+      `${esc(c.title.split(":")[0])}${d.rows.length ? ` <span class="mut">${d.rows.length}</span>` : ""}`);
+    b.onclick = () => {
+      pickHost.querySelectorAll(".chip").forEach(x => x.classList.remove("on"));
+      b.classList.add("on");
+      $("#ac-card").innerHTML = card(c);
+    };
+    pickHost.append(b);
+  });
+  const select = c => {
+    const i = ACLASS.classes.indexOf(c);
+    pickHost.querySelectorAll(".chip").forEach((x, j) => x.classList.toggle("on", j === i));
+    $("#ac-card").innerHTML = card(c);
+  };
+  $("#ac-card").innerHTML = card(ACLASS.classes[0]);
+
+  /* определение класса по наименованию: вставляется строка из заявки заказчика */
+  $("#ac-q").oninput = e => {
+    const v = e.target.value.trim();
+    if (!v) { $("#ac-q-out").textContent = ""; return; }
+    const c = classOf(v);
+    if (c) { $("#ac-q-out").innerHTML = `класс определён: <b>${esc(c.title.split(":")[0])}</b>`; select(c); }
+    else $("#ac-q-out").innerHTML = `класс не определён — отнести позицию вручную и дополнить правила в <span class="mono">data/analog_classes.json</span>`;
+  };
+
+  /* позиции заявки, не отнесённые ни к одному классу, не скрываем */
+  const unmatched = DEMAND.rows.filter(r => !classOf(r.name + " " + r.pn));
+  if (unmatched.length) {
+    const b = el("div", "chip", `Не отнесены к классам <span class="mut">${unmatched.length}</span>`);
+    b.onclick = () => {
+      pickHost.querySelectorAll(".chip").forEach(x => x.classList.remove("on"));
+      b.classList.add("on");
+      $("#ac-card").innerHTML = `<div class="card"><h4>Позиции, не отнесённые к классам — ${unmatched.length}</h4>
+        <p>Класс определяется по наименованию. Перечисленные позиции под действующие правила не подпадают: наименование
+           нетипично либо содержит ошибку перевода. Порядок действий — уточнить наименование у заказчика и дополнить
+           правила отнесения в <span class="mono">data/analog_classes.json</span>.</p>
+        <div class="tblwrap"><table><thead><tr><th>Номер</th><th>Наименование</th><th>Система</th><th class="num">Кол-во</th></tr></thead>
+        <tbody>${unmatched.map(r => `<tr><td class="mono">${esc(r.pn)}</td><td>${esc(r.name)}</td><td class="mut">${esc(r.sys || "")}</td><td class="num">${num(r.qty)}</td></tr>`).join("")}</tbody></table></div></div>`;
+    };
+    pickHost.append(b);
+  }
+
+  /* ── угол «по машине»: узлы выбранной машины с допуском по классу ── */
+  $("#am-intro").textContent = "Машина выбирается по заводской табличке. Для каждого узла показаны каталожные номера, класс детали, допуск аналога и изготовители, признанные для этого узла.";
+  const machHost = $("#am-pick");
+  function machBody(m) {
+    return `<div class="card"><h4>${esc(m.oem)} ${esc(m.model)}</h4>
+      <div class="tblwrap"><table><thead><tr>
+        <th>Узел</th><th>Каталожные номера</th><th>Класс детали</th><th>Допуск аналога</th><th>Изготовители узла</th>
+      </tr></thead><tbody>${(m.units || []).map(u => {
+        const c = classOf(u.unit + " " + (u.what || ""));
+        return `<tr>
+          <td><b>${esc(u.unit)}</b><div class="mut">${esc(u.what || "")}</div></td>
+          <td class="mono">${(u.pns || []).map(x => `<span class="tag wrap mono">${esc(x)}</span>`).join(" ")}</td>
+          <td>${c ? esc(c.title.split(":")[0]) : "<span class=\"mut\">не отнесён</span>"}</td>
+          <td>${c ? pill(c.verdict) : "—"}</td>
+          <td>${(u.makers || []).map(k => `<span class="tag wrap">${esc(k.b)}${k.lvl ? ` · ${esc(k.lvl)}` : ""}</span>`).join(" ")}</td>
+        </tr>`;
+      }).join("")}</tbody></table></div>
+      ${m.units && m.units.some(u => u.check) ? `<div class="box warn"><b>Проверить при заказе.</b>
+        <ul style="margin:4px 0 0">${m.units.filter(u => u.check).map(u => `<li>${esc(u.check)}</li>`).join("")}</ul></div>` : ""}</div>`;
+  }
+  (MACHINES.machines || []).forEach((m, i) => {
+    const b = el("div", "chip" + (i === 0 ? " on" : ""), esc(m.model));
+    b.onclick = () => {
+      machHost.querySelectorAll(".chip").forEach(x => x.classList.remove("on"));
+      b.classList.add("on");
+      $("#am-body").innerHTML = machBody(m);
+    };
+    machHost.append(b);
+  });
+  if ((MACHINES.machines || []).length) $("#am-body").innerHTML = machBody(MACHINES.machines[0]);
 })();
 
 /* ── Изготовители узлов ─────────────────────────────────────────────────────── */

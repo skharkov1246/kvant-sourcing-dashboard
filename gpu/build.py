@@ -51,6 +51,7 @@ FILES = {
     "__MACHINES_JSON__": "machines.json",
     "__RFQPACK_JSON__": "rfq_pack.json",
     "__GLOSSARY_JSON__": "glossary.json",
+    "__ACLASS_JSON__": "analog_classes.json",
 }
 
 
