@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Гидрометаллургия медно-золотого концентрата — месторождение в Карелии</title>
+<style>
+:root{
+  color-scheme:light;
+  --page:#f9f9f7; --surface:#fcfcfb; --ink:#0b0b0b; --ink2:#52514e; --mut:#898781;
+  --grid:#e1e0d9; --axis:#c3c2b7; --border:rgba(11,11,11,.10);
+  --s1:#2a78d6; --s1-soft:#cde2fb; --good:#0ca30c; --warn:#fab219; --crit:#d03b3b; --serious:#ec835a;
+  --chip:#eef2f7;
+  --l1:#e2653c; --l2:#3f7fd0; --l3:#159c72; --l4:#8b5cd6;
+  --pos:#2a78d6; --neg:#d03b3b;
+}
+@media (prefers-color-scheme: dark){
+  :root:where(:not([data-theme="light"])){
+    color-scheme:dark;
+    --page:#0d0d0d; --surface:#1a1a19; --ink:#fff; --ink2:#c3c2b7; --mut:#898781;
+    --grid:#2c2c2a; --axis:#383835; --border:rgba(255,255,255,.10);
+    --s1:#3987e5; --s1-soft:#184f95; --chip:#262624;
+    --l1:#f0805c; --l2:#5d99e2; --l3:#2fb98d; --l4:#a47ce6;
+    --pos:#3987e5; --neg:#e66767;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --page:#0d0d0d; --surface:#1a1a19; --ink:#fff; --ink2:#c3c2b7; --mut:#898781;
+  --grid:#2c2c2a; --axis:#383835; --border:rgba(255,255,255,.10);
+  --s1:#3987e5; --s1-soft:#184f95; --chip:#262624;
+  --l1:#f0805c; --l2:#5d99e2; --l3:#2fb98d; --l4:#a47ce6;
+  --pos:#3987e5; --neg:#e66767;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:14px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;overflow-x:hidden}
+a{color:var(--s1);text-decoration:none} a:hover{text-decoration:underline}
+header{padding:18px 22px 0}
+h1{font-size:21px;margin:0 0 2px}
+.sub{color:var(--ink2);font-size:12.5px;max-width:110ch}
+nav{position:sticky;top:0;z-index:5;background:var(--page);padding:8px 22px 6px;border-bottom:1px solid var(--grid)}
+nav .grow,nav .subrow{display:flex;gap:4px;flex-wrap:wrap}
+nav .grow button{font:700 13.5px system-ui}
+nav .subrow{margin-top:6px;padding-top:6px;border-top:1px dashed var(--grid)}
+nav .subrow button{padding:4px 11px;font:600 12.5px system-ui;border-radius:14px}
+nav .subrow button.on{background:var(--chip);border-color:var(--s1);color:var(--s1)}
+nav button{border:1px solid var(--border);background:var(--surface);color:var(--ink2);padding:6px 13px;border-radius:18px;font:600 13px system-ui;cursor:pointer}
+nav button.on{background:var(--s1);border-color:var(--s1);color:#fff}
+main{padding:16px 22px 40px;max-width:1280px}
+section{display:none} section.on{display:block}
+h2{font-size:16px;margin:22px 0 8px}
+h3{font-size:14px;margin:16px 0 6px}
+p{margin:8px 0;max-width:96ch}
+.lead{font-size:13.5px;color:var(--ink2);max-width:100ch;margin:6px 0 2px}
+.mut{color:var(--mut);font-size:12px}
+.k{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+.tile{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 16px;min-width:150px;flex:1 1 150px;border-top:3px solid var(--axis)}
+.tile b{display:block;font-size:20px;line-height:1.2;font-variant-numeric:tabular-nums}
+.tile span{color:var(--ink2);font-size:12px}
+.tile.ok{border-top-color:var(--good)} .tile.ok b{color:var(--good)}
+.tile.warn{border-top-color:var(--warn)} .tile.warn b{color:var(--warn)}
+.tile.risk{border-top-color:var(--crit)} .tile.risk b{color:var(--crit)}
+.tile.acc{border-top-color:var(--s1)} .tile.acc b{color:var(--s1)}
+.box{background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--good);border-radius:8px;padding:10px 14px;margin:10px 0;font-size:13px;max-width:104ch}
+.box.warn{border-left-color:var(--crit)}
+.box.info{border-left-color:var(--s1)}
+.box.amber{border-left-color:var(--warn)}
+.box.plain{border-left-color:var(--axis)}
+.box b:first-child{display:inline}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin:8px 0;min-width:0}
+.card h3{margin-top:0}
+.card p,.card li,.box{overflow-wrap:anywhere}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:10px}
+.tblwrap{overflow-x:auto;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin:8px 0;max-width:100%}
+table{border-collapse:collapse;width:100%;font-size:12.5px}
+th{background:var(--chip);text-align:left;font-size:11.5px;color:var(--ink2);white-space:nowrap}
+th,td{padding:6px 9px;border-bottom:1px solid var(--grid);vertical-align:top}
+tr:last-child td{border-bottom:0}
+td b{font-weight:700}
+caption{caption-side:top;text-align:left;font-size:11.5px;color:var(--mut);padding:8px 10px 2px;line-height:1.45}
+.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+tr.ok td{background:rgba(12,163,12,.07)} tr.risk td{background:rgba(208,59,59,.07)}
+tr.warn td{background:rgba(250,178,25,.10)} tr.tot td{font-weight:700;background:var(--chip)}
+.tag{display:inline-block;background:var(--chip);border-radius:9px;padding:1px 8px;font-size:11px;color:var(--ink2);margin:1px 2px 1px 0;white-space:nowrap}
+.tag.ok{background:var(--good);color:#fff} .tag.risk{background:var(--crit);color:#fff}
+.tag.warn{background:var(--warn);color:#111} .tag.acc{background:var(--s1);color:#fff}
+.hi{color:var(--crit);font-weight:700}.mid{color:var(--warn);font-weight:700}.lo{color:var(--ink2)}
+.filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0}
+.filters input,.filters select{background:var(--surface);color:var(--ink);border:1px solid var(--border);border-radius:8px;padding:6px 10px;font:13px system-ui;max-width:100%}
+.filters input[type=text]{min-width:min(260px,100%)}
+.count{color:var(--ink2);font-size:12px;margin-left:auto}
+.btn{border:1px solid var(--border);background:var(--surface);color:var(--ink2);padding:6px 12px;border-radius:8px;font:600 12px system-ui;cursor:pointer}
+.btn.on{background:var(--s1);border-color:var(--s1);color:#fff}
+ul,ol{margin:6px 0;padding-left:20px;max-width:100ch} li{margin:3px 0}
+.flow{display:flex;gap:6px;flex-wrap:wrap;align-items:stretch;margin:10px 0}
+.step{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:8px 11px;flex:1 1 200px;min-width:0;border-top:3px solid var(--axis)}
+.step.on{border-top-color:var(--s1)} .step.no{border-top-color:var(--crit);opacity:.75}
+.step b{font-size:12.5px;display:block;margin-bottom:3px}
+.step .mut{font-size:11px}
+.tl{border-left:2px solid var(--grid);margin-left:9px;padding-left:16px}
+.tl .ev{position:relative;margin:0 0 14px}
+.tl .ev::before{content:'';position:absolute;left:-22px;top:4px;width:10px;height:10px;border-radius:50%;background:var(--axis);border:2px solid var(--page)}
+.tl .ev.now::before{background:var(--s1)}
+.tl .ev h3{margin:0 0 2px}
+figure{margin:12px 0;max-width:100%}
+.figbox{overflow-x:auto;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 10px}
+figure svg{max-width:100%;height:auto;display:block}
+figcaption{font-size:11.5px;color:var(--mut);margin-top:8px;line-height:1.5;max-width:100ch}
+.legend{display:flex;flex-wrap:wrap;gap:14px;margin:0 0 8px;font-size:11.5px;color:var(--ink2);padding:0 4px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.doc{max-width:92ch}
+.quote{border-left:3px solid var(--warn);padding:4px 0 4px 12px;margin:2px 0 8px;font-style:italic;color:var(--ink2);overflow-wrap:anywhere}
+footer{padding:0 22px 24px;color:var(--mut);font-size:11.5px;max-width:1280px}
+@media (max-width:700px){
+  main,header,nav,footer{padding-left:12px;padding-right:12px}
+  h1{font-size:18px} .tile b{font-size:18px}
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>Гидрометаллургическая переработка медно-золотого концентрата</h1>
+  <div class="sub">Месторождение меди, золота и серебра в Республике Карелия · независимое инженерное заключение ООО «Квант» · разбор предложения НИЦ «Гидрометаллургия» № 26-273, китайского технического проекта и отчёта ЦНИГРИ по пробе Л-1 · котировки на 01.09.2026 · сборка __BUILT_AT__</div>
+</header>
+<nav id="nav"></nav>
+<main id="main"></main>
+<footer id="foot"></footer>
+<script>
+const D = {
+  project: __PROJECT_JSON__,
+  reframe: __REFRAME_JSON__,
+  decision: __DECISION_JSON__,
+  syrye: __SYRYE_JSON__,
+  proverka: __PROVERKA_JSON__,
+  pirrotin: __PIRROTIN_JSON__,
+  marshruty: __MARSHRUTY_JSON__,
+  balansy: __BALANSY_JSON__,
+  serebro: __SEREBRO_JSON__,
+  shema: __SHEMA_JSON__,
+  oborud: __OBORUD_JSON__,
+  postav: __POSTAV_JSON__,
+  capex: __CAPEX_JSON__,
+  economy: __ECONOMY_JSON__,
+  scenarii: __SCENARII_JSON__,
+  nic: __NIC_JSON__,
+  programma: __PROGRAMMA_JSON__,
+  etapy: __ETAPY_JSON__,
+  gonorar: __GONORAR_JSON__,
+  voprosy: __VOPROSY_JSON__,
+};
+
+D.overview = D.project;   // вкладка «Главное» читает project.json
+
+/* ═════════ утилиты ═════════ */
+const esc = s => String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const md = s => esc(s).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/«(.+?)»/g,'«$1»');
+const para = s => !s ? '' : '<p>' + md(s).split(/\n{2,}/).join('</p><p>').replace(/\n/g,'<br>') + '</p>';
+const nf = (x,d=0) => (typeof x==='number' ? x.toLocaleString('ru-RU',{minimumFractionDigits:d,maximumFractionDigits:d}) : esc(x));
+
+/* ═════════ графика ═════════ */
+function chBar(c){
+  const rows=(c.series||[]).filter(s=>s&&typeof s.value==='number');
+  if(!rows.length) return '';
+  const W=880, padL=Math.min(340, Math.max(150, 7.2*Math.max(...rows.map(r=>String(r.label).length)))), padR=96;
+  const bh=24, gap=9, H=rows.length*(bh+gap)+26;
+  const mx=Math.max(...rows.map(r=>Math.abs(r.value))) || 1;
+  const zero = rows.some(r=>r.value<0) ? padL + (W-padL-padR)*mx/(2*mx) : padL;
+  const span = rows.some(r=>r.value<0) ? (W-padL-padR)/2 : (W-padL-padR);
+  const bars=rows.map((r,i)=>{
+    const y=18+i*(bh+gap), w=Math.abs(r.value)/mx*span;
+    const x=r.value<0? zero-w : zero;
+    const col = r.tone==='neg'?'var(--neg)':(r.tone==='pos'?'var(--pos)':(r.tone==='warn'?'var(--warn)':(r.tone==='good'?'var(--good)':'var(--s1)')));
+    return `<rect x="${x.toFixed(1)}" y="${y}" width="${Math.max(1,w).toFixed(1)}" height="${bh}" rx="3" fill="${col}" opacity="${r.dim?0.45:0.9}"/>`
+      + `<text x="${(padL-9)}" y="${y+bh/2+4}" text-anchor="end" font-size="11.5" fill="var(--ink2)">${esc(r.label)}</text>`
+      + `<text x="${(r.value<0? x-6 : x+w+6).toFixed(1)}" y="${y+bh/2+4}" text-anchor="${r.value<0?'end':'start'}" font-size="11.5" font-weight="600" fill="var(--ink)" style="font-variant-numeric:tabular-nums">${esc(r.txt!=null?r.txt:nf(r.value,c.dec||0))}</text>`;
+  }).join('');
+  const zl = rows.some(r=>r.value<0) ? `<line x1="${zero}" y1="10" x2="${zero}" y2="${H-6}" stroke="var(--axis)" stroke-width="1.2"/>` : '';
+  return `<figure><div class="figbox"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(c.title||'диаграмма')}">${zl}${bars}</svg></div>${c.title||c.note?`<figcaption>${c.title?`<b>${esc(c.title)}</b>${c.unit?' · '+esc(c.unit):''}. `:''}${esc(c.note||'')}</figcaption>`:''}</figure>`;
+}
+function chStack(c){
+  const rows=(c.series||[]).filter(Boolean);
+  if(!rows.length) return '';
+  const W=880, H=Math.max(120, rows.length*34+30), padL=Math.min(300, Math.max(130, 7.2*Math.max(...rows.map(r=>String(r.label).length)))), padR=70;
+  const keys=c.keys||[];
+  const cols=['var(--s1)','var(--warn)','var(--good)','var(--crit)','var(--l4)','var(--axis)'];
+  const mx=Math.max(...rows.map(r=>(r.parts||[]).reduce((a,b)=>a+b,0)))||1;
+  const body=rows.map((r,i)=>{
+    const y=14+i*34; let x=padL; 
+    const seg=(r.parts||[]).map((v,j)=>{
+      const w=v/mx*(W-padL-padR); const rc=`<rect x="${x.toFixed(1)}" y="${y}" width="${Math.max(0,w).toFixed(1)}" height="22" fill="${cols[j%cols.length]}" opacity=".88"/>`;
+      x+=w; return rc;
+    }).join('');
+    const tot=(r.parts||[]).reduce((a,b)=>a+b,0);
+    return seg + `<text x="${padL-9}" y="${y+15}" text-anchor="end" font-size="11.5" fill="var(--ink2)">${esc(r.label)}</text>`
+      + `<text x="${(x+6).toFixed(1)}" y="${y+15}" font-size="11.5" font-weight="600" fill="var(--ink)" style="font-variant-numeric:tabular-nums">${esc(r.txt!=null?r.txt:nf(tot,c.dec||0))}</text>`;
+  }).join('');
+  const leg=keys.length?`<div class="legend">${keys.map((k,j)=>`<span><i style="background:${cols[j%cols.length]}"></i>${esc(k)}</span>`).join('')}</div>`:'';
+  return `<figure>${leg}<div class="figbox"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(c.title||'диаграмма')}">${body}</svg></div>${c.title||c.note?`<figcaption>${c.title?`<b>${esc(c.title)}</b>${c.unit?' · '+esc(c.unit):''}. `:''}${esc(c.note||'')}</figcaption>`:''}</figure>`;
+}
+function chLine(c){
+  const pts=(c.points||[]).filter(p=>p&&typeof p.y==='number');
+  if(pts.length<2) return '';
+  const W=880,H=300,padL=64,padR=24,padT=18,padB=40;
+  const xs=pts.map(p=>p.x), ys=pts.map(p=>p.y);
+  const x0=Math.min(...xs), x1=Math.max(...xs);
+  let y0=Math.min(0,Math.min(...ys)), y1=Math.max(...ys); if(y1===y0) y1=y0+1;
+  const X=v=>padL+(v-x0)/((x1-x0)||1)*(W-padL-padR);
+  const Y=v=>H-padB-(v-y0)/((y1-y0)||1)*(H-padT-padB);
+  const d=pts.map((p,i)=>`${i?'L':'M'}${X(p.x).toFixed(1)},${Y(p.y).toFixed(1)}`).join('');
+  const grid=[0,.25,.5,.75,1].map(t=>{const v=y0+(y1-y0)*t;return `<line x1="${padL}" y1="${Y(v).toFixed(1)}" x2="${W-padR}" y2="${Y(v).toFixed(1)}" stroke="var(--grid)"/><text x="${padL-8}" y="${(Y(v)+4).toFixed(1)}" text-anchor="end" font-size="10.5" fill="var(--mut)">${nf(v,c.dec||0)}</text>`;}).join('');
+  const zero = (y0<0&&y1>0)?`<line x1="${padL}" y1="${Y(0).toFixed(1)}" x2="${W-padR}" y2="${Y(0).toFixed(1)}" stroke="var(--axis)" stroke-width="1.4"/>`:'';
+  const dots=pts.map(p=>`<circle cx="${X(p.x).toFixed(1)}" cy="${Y(p.y).toFixed(1)}" r="3.2" fill="var(--s1)"/>`).join('');
+  const lbl=pts.map((p,i)=> (i%Math.ceil(pts.length/8)===0||i===pts.length-1) ? `<text x="${X(p.x).toFixed(1)}" y="${H-padB+16}" text-anchor="middle" font-size="10.5" fill="var(--mut)">${esc(p.lx!=null?p.lx:p.x)}</text>`:'').join('');
+  return `<figure><div class="figbox"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(c.title||'график')}">${grid}${zero}<path d="${d}" fill="none" stroke="var(--s1)" stroke-width="2.2"/>${dots}${lbl}</svg></div>${c.title||c.note?`<figcaption>${c.title?`<b>${esc(c.title)}</b>${c.unit?' · '+esc(c.unit):''}. `:''}${esc(c.note||'')}</figcaption>`:''}</figure>`;
+}
+function chart(c){
+  if(!c) return '';
+  if(c.kind==='stack') return chStack(c);
+  if(c.kind==='line') return chLine(c);
+  return chBar(c);
+}
+
+/* ═════════ универсальные блоки ═════════ */
+function tiles(a){ return !a||!a.length?'':`<div class="k">${a.map(t=>`<div class="tile ${esc(t.tone||'')}"><b>${esc(t.v)}</b><span>${esc(t.c)}</span></div>`).join('')}</div>`; }
+function boxes(a){ return !a||!a.length?'':a.map(b=>`<div class="box ${esc(b.kind||'plain')}">${b.title?`<b>${esc(b.title)}.</b> `:''}${md(b.text||'').replace(/\n{2,}/g,'<br><br>')}</div>`).join(''); }
+function tbl(t){
+  if(!t||!t.rows||!t.rows.length) return '';
+  const num=t.num||[];
+  return `<div class="tblwrap"><table>${t.caption?`<caption>${esc(t.caption)}</caption>`:''}
+    <thead><tr>${(t.cols||[]).map((c,i)=>`<th class="${num[i]?'num':''}">${esc(c)}</th>`).join('')}</tr></thead>
+    <tbody>${t.rows.map((r,ri)=>`<tr class="${esc((t.rowtone||[])[ri]||'')}">${r.map((c,i)=>`<td class="${num[i]?'num':''}">${md(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+}
+function steps(a){ return !a||!a.length?'':`<div class="flow">${a.map(s=>`<div class="step ${esc(s.tone||'')}"><b>${esc(s.t)}</b><div class="mut">${esc(s.d||'')}</div></div>`).join('')}</div>`; }
+function timeline(a){ return !a||!a.length?'':`<div class="tl">${a.map(e=>`<div class="ev ${e.now?'now':''}"><h3>${esc(e.when)} — ${esc(e.what)}</h3><div class="mut">${esc(e.note||'')}</div></div>`).join('')}</div>`; }
+function sections(a){
+  return !a||!a.length?'':a.map(s=>`
+    ${s.h?`<h2>${esc(s.h)}</h2>`:''}
+    ${para(s.text)}
+    ${boxes(s.boxes)}
+    ${s.list&&s.list.length?`<ul>${s.list.map(x=>`<li>${md(x)}</li>`).join('')}</ul>`:''}
+    ${tbl(s.table)}
+    ${chart(s.chart)}
+    ${steps(s.steps)}
+    ${timeline(s.timeline)}
+    ${s.cards&&s.cards.length?`<div class="grid2">${s.cards.map(c=>`<div class="card"><h3>${esc(c.h)}</h3>${para(c.text)}${c.list&&c.list.length?`<ul>${c.list.map(x=>`<li>${md(x)}</li>`).join('')}</ul>`:''}</div>`).join('')}</div>`:''}
+  `).join('');
+}
+function page(d, fallback){
+  if(!d) return `<div class="box warn"><b>Раздел собирается.</b> ${esc(fallback||'')}</div>`;
+  return `${d.lead?`<div class="lead">${md(d.lead)}</div>`:''}
+    ${tiles(d.tiles)}${boxes(d.boxes)}${sections(d.sections)}
+    ${d.footnote?`<div class="mut" style="margin-top:18px">${md(d.footnote)}</div>`:''}`;
+}
+
+/* ═════════ вкладка «Маршруты» с фильтром ═════════ */
+let mFilter='';
+function mPaint(){
+  const el=document.getElementById('mbody'); if(!el) return;
+  const rows=(D.marshruty.routes||[]).filter(r=>!mFilter||(mFilter==='razd'?r.razdelyaet:(mFilter==='top'?r.ocenka>=6:true)));
+  el.innerHTML = rows.map(r=>`<div class="card">
+    <h3>${esc(r.nazv)} <span class="tag ${r.razdelyaet?'ok':'risk'}">${r.razdelyaet?'разделяет медь':'медь не разделяет'}</span>
+      <span class="tag ${r.ocenka>=6?'acc':(r.ocenka>=4?'warn':'risk')}">оценка ${nf(r.ocenka,0)} из 10</span></h3>
+    ${para(r.sut)}
+    <div class="tblwrap"><table><thead><tr><th>Показатель</th><th class="num">Значение</th></tr></thead><tbody>
+      <tr><td>Извлечение меди</td><td class="num">${esc(r.cu)}</td></tr>
+      <tr><td>Извлечение золота</td><td class="num">${esc(r.au)}</td></tr>
+      <tr><td>Извлечение серебра</td><td class="num">${esc(r.ag)}</td></tr>
+      <tr><td>Капитал в полной границе объекта</td><td class="num">${esc(r.kapital)}</td></tr>
+      <tr><td>Эксплуатационные затраты</td><td class="num">${esc(r.opex)}</td></tr>
+    </tbody></table></div>
+    <div class="grid2">
+      ${(r.plyusy||[]).length?`<div class="card" style="margin:0"><h3>Достоинства</h3><ul>${r.plyusy.map(x=>`<li>${md(x)}</li>`).join('')}</ul></div>`:''}
+      ${(r.minusy||[]).length?`<div class="card" style="margin:0"><h3>Недостатки</h3><ul>${r.minusy.map(x=>`<li>${md(x)}</li>`).join('')}</ul></div>`:''}
+    </div>
+    ${(r.referencii||[]).length?`<div class="tblwrap"><table><caption>Промышленные референции</caption><thead><tr><th>Объект</th><th>Что подтверждает</th></tr></thead>
+      <tbody>${r.referencii.map(x=>`<tr><td><b>${esc(x.obekt)}</b></td><td>${esc(x.chto)}</td></tr>`).join('')}</tbody></table></div>`:''}
+  </div>`).join('') || '<div class="box plain">Под фильтр ничего не попало.</div>';
+  const c=document.getElementById('mcount'); if(c) c.textContent=`${rows.length} из ${(D.marshruty.routes||[]).length}`;
+}
+function rMarshruty(){
+  const d=D.marshruty;
+  if(!d) return `<div class="box warn"><b>Раздел собирается.</b> Сравнение маршрутов передела концентрата.</div>`;
+  return page({lead:d.lead,tiles:d.tiles,boxes:d.boxes,sections:d.sections}) +
+    `<h2>Досье по маршрутам</h2>
+     <div class="filters">
+       <button class="btn mf on" data-f="">Все</button>
+       <button class="btn mf" data-f="razd">Только те, что разделяют медь</button>
+       <button class="btn mf" data-f="top">Только с оценкой 6 и выше</button>
+       <span class="count" id="mcount"></span>
+     </div><div id="mbody"></div>` +
+    (d.footnote?`<div class="mut" style="margin-top:18px">${md(d.footnote)}</div>`:'');
+}
+function bindM(){
+  document.querySelectorAll('.mf').forEach(b=>b.addEventListener('click',()=>{
+    mFilter=b.dataset.f;
+    document.querySelectorAll('.mf').forEach(x=>x.classList.toggle('on',x===b));
+    mPaint();
+  }));
+  mPaint();
+}
+
+/* ═════════ вкладка «Поставщики» с фильтром ═════════ */
+let pQ='', pOnly='';
+function pPaint(){
+  const el=document.getElementById('pbody'); if(!el) return;
+  const all=D.postav.blocks||[];
+  const q=pQ.trim().toLowerCase();
+  const rows=all.filter(b=>{
+    if(pOnly==='crit' && !b.critical) return false;
+    if(!q) return true;
+    return [b.blok,b.sostav,b.rf,b.cn,b.zamechanie].join(' ').toLowerCase().includes(q);
+  });
+  el.innerHTML = `<div class="tblwrap"><table><thead><tr>
+      <th>Блок</th><th>Состав и расчётная мощность</th><th>Россия и ЕАЭС</th><th>Китай</th><th>Доступность</th><th>Замечание</th></tr></thead>
+    <tbody>${rows.map(b=>`<tr class="${b.critical?'risk':''}">
+      <td><b>${esc(b.blok)}</b></td><td>${esc(b.sostav)}</td><td>${esc(b.rf)}</td><td>${esc(b.cn)}</td>
+      <td><span class="tag ${b.dostupnost==='высокая'?'ok':(b.dostupnost==='средняя'?'warn':'risk')}">${esc(b.dostupnost)}</span></td>
+      <td>${esc(b.zamechanie||'')}</td></tr>`).join('')}</tbody></table></div>`;
+  const c=document.getElementById('pcount'); if(c) c.textContent=`${rows.length} из ${all.length}`;
+}
+function rPostav(){
+  const d=D.postav;
+  if(!d) return `<div class="box warn"><b>Раздел собирается.</b> Поставщики по укрупнённым блокам оборудования.</div>`;
+  return page({lead:d.lead,tiles:d.tiles,boxes:d.boxes}) +
+    `<div class="filters">
+       <input type="text" id="pq" placeholder="поиск по блокам, поставщикам и замечаниям">
+       <button class="btn pf on" data-o="">Все блоки</button>
+       <button class="btn pf" data-o="crit">Только критичные по доступности</button>
+       <span class="count" id="pcount"></span>
+     </div><div id="pbody"></div>` +
+    sections(d.sections) + (d.footnote?`<div class="mut" style="margin-top:18px">${md(d.footnote)}</div>`:'');
+}
+function bindP(){
+  const q=document.getElementById('pq');
+  if(q) q.addEventListener('input',()=>{pQ=q.value;pPaint();});
+  document.querySelectorAll('.pf').forEach(b=>b.addEventListener('click',()=>{
+    pOnly=b.dataset.o;
+    document.querySelectorAll('.pf').forEach(x=>x.classList.toggle('on',x===b));
+    pPaint();
+  }));
+  pPaint();
+}
+
+/* ═════════ вкладки ═════════ */
+const GROUPS=[
+  ['itog','Итог',      [['overview','Главное'],['reframe','Постановка задачи'],['decision','Входим или нет']]],
+  ['syrye','Сырьё',    [['syrye','Концентрат'],['proverka','Проверка данных'],['pirrotin','Второй продукт']]],
+  ['tech','Технология',[['marshruty','Маршруты передела'],['balansy','Балансы'],['serebro','Серебро и сера']]],
+  ['zavod','Завод',    [['shema','Схема и компоновка'],['oborud','Оборудование'],['postav','Поставщики']]],
+  ['dengi','Деньги',   [['capex','Капитал'],['economy','Экономика'],['scenarii','Сценарии по золоту']]],
+  ['rabota','Работа',  [['nic','Предложение НИЦ'],['programma','Программа испытаний'],['etapy','Этапность'],['gonorar','Вознаграждение'],['voprosy','Вопросы']]],
+];
+const TABS=GROUPS.flatMap(g=>g[2]);
+const GOF={}; GROUPS.forEach(g=>g[2].forEach(([id])=>GOF[id]=g[0]));
+const FB={
+  overview:'Сводка выводов и ключевые величины.',
+  reframe:'Проверка исходной постановки задачи.',
+  decision:'Аргументированный ответ, входим ли мы в проект.',
+  syrye:'Состав концентрата и что из него следует для технологии.',
+  proverka:'Проверка сходимости переданных исходных данных.',
+  pirrotin:'Пирротиново-пиритный передел — второй товарный продукт схемы.',
+  balansy:'Балансы серы, кислорода, тепла и реагентов.',
+  serebro:'Поведение серебра и связка формы серы с извлечением золота.',
+  shema:'Технологическая схема завода и компоновка мощностей.',
+  oborud:'Расчёт мощностей оборудования от производительности.',
+  capex:'Сведение оценок капитала к единой границе объёма.',
+  economy:'Экономика: собственный передел против продажи концентрата.',
+  scenarii:'Чувствительность проекта к цене золота.',
+  nic:'Разбор технико-коммерческого предложения № 26-273.',
+  programma:'Программа лабораторных и укрупнённых испытаний.',
+  etapy:'Очерёдность строительства и ввода мощностей.',
+  gonorar:'Конструкция агентского вознаграждения.',
+  voprosy:'Вопросы к заказчику и к разработчику технологии.',
+};
+const R={};
+TABS.forEach(([id])=>{ R[id]=()=>page(D[id==='postav'?'postav':id], FB[id]); });
+R.marshruty=rMarshruty; R.postav=rPostav;
+
+const nav=document.getElementById('nav'), main=document.getElementById('main');
+nav.innerHTML=`<div class="grow">${GROUPS.map(([gid,gt])=>`<button data-g="${gid}">${esc(gt)}</button>`).join('')}</div><div class="subrow" id="subnav"></div>`;
+main.innerHTML=TABS.map(([id])=>`<section id="s-${id}"></section>`).join('');
+document.getElementById('foot').innerHTML =
+  'Независимый инженерный расчёт ООО «Квант» по документам: отчёт ЦНИГРИ по технологической пробе Л-1 (2008), паспорт месторождения, технический проект китайского поставщика на обогатительную фабрику 2,3 млн т/год и медеплавильный завод 85 000 т/год концентрата, технико-коммерческое предложение НИЦ «Гидрометаллургия» № 26-273 от 27.07.2026. ' +
+  'Все числовые величины получены расчётом по воспроизводимым моделям (каталог factory/model репозитория) либо взяты из перечисленных документов и мировой практики с указанием источника. Оценка капитала — порядок величины, не смета. Сборка: __BUILT_AT__';
+
+const LASTTAB={}, rendered={};
+function show(id){
+  const gid=GOF[id]||GROUPS[0][0];
+  LASTTAB[gid]=id;
+  document.querySelectorAll('nav .grow button').forEach(b=>b.classList.toggle('on',b.dataset.g===gid));
+  const tabs=GROUPS.find(g=>g[0]===gid)[2];
+  document.getElementById('subnav').innerHTML=tabs.map(([tid,t])=>`<button data-t="${tid}"${tid===id?' class="on"':''}>${esc(t)}</button>`).join('');
+  for(const [tid] of TABS) document.getElementById('s-'+tid).classList.toggle('on',tid===id);
+  if(!rendered[id]){
+    document.getElementById('s-'+id).innerHTML=R[id]();
+    rendered[id]=1;
+    if(id==='marshruty'&&D.marshruty) bindM();
+    if(id==='postav'&&D.postav) bindP();
+  }
+  location.hash=id;
+  window.scrollTo(0,0);
+}
+nav.addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  if(b.dataset.t) show(b.dataset.t);
+  else if(b.dataset.g){ const g=GROUPS.find(x=>x[0]===b.dataset.g); show(LASTTAB[b.dataset.g]||g[2][0][0]); }
+});
+window.addEventListener('hashchange',()=>{
+  const id=location.hash.slice(1);
+  if(TABS.some(([tid])=>tid===id) && !document.getElementById('s-'+id).classList.contains('on')) show(id);
+});
+show(TABS.some(([id])=>id===location.hash.slice(1))?location.hash.slice(1):'overview');
+</script>
+</body>
+</html>
