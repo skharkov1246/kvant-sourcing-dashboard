@@ -69,6 +69,7 @@ ol.play{padding-left:18px} ol.play li{margin:9px 0}
 <div class="nav">
  <a class="btn" href="#deals">Ближайшие закупки</a>
  <a class="btn" href="#demand">Спрос по паркам</a>
+ <a class="btn" href="#cross">Карта кроссов</a>
  <a class="btn" href="#addr">Таблица адресатов</a>
  <a class="btn" href="#eff">Эффективность</a>
  <a class="btn" href="#play">Как запрашивать</a>
@@ -82,8 +83,16 @@ ol.play{padding-left:18px} ol.play li{margin:9px 0}
 <div class="mut small">Из спецификации заказчика (лист «Энергосети»): позиции зажигания и их количества — это то, подо что ищем оригинал.</div>
 <div class="tblwrap"><table id="t-demand"></table></div>
 
+<h2 id="cross">Карта кроссов: один и тот же товар под разными номерами</h2>
+<div class="mut small">Поставщик отвечает «нет» не потому, что товара нет, а потому что у него в карточке другой номер. Запрос сразу по всему ряду снимает эту потерю.</div>
+<div class="tblwrap"><table id="t-cross"></table></div>
+<div class="box" id="checks"></div>
+
 <h2 id="addr">Кому рассылать запросы на оригинал</h2>
-<div class="filters" id="f-stream"></div>
+<div class="mut small">Фильтры складываются: парк двигателей × тип канала. «Хабы СНГ-периметра» — Турция, ОАЭ, Казахстан, Узбекистан.</div>
+<div class="filters" id="f-park"></div>
+<div class="filters" id="f-tier"></div>
+<div class="box small" id="streamnote" hidden></div>
 <div class="tblwrap"><table id="t-addr"></table></div>
 
 <h2 id="eff">Эффективность: что даёт адресная рассылка</h2>
@@ -104,10 +113,15 @@ const BX={never:['🆕 не запрашивали','bx-never'],won:['🏆 до�
  active:['💬 переписка','bx-active'],sent:['📨 без ответа','bx-sent'],unread:['📬 непрочитано','bx-unread'],
  no_reply:['⏳ не ответили','bx-no_reply'],refused:['🚫 отказ','bx-refused']};
 const tbl=(head,rows)=>`<tr>${head.map(h=>`<th>${esc(h)}</th>`).join('')}</tr>`+rows;
-let streamFilter='all';
+let parkF='all', tierF='all';
 
 function renderAddr(){
- const rows=D.addressees.filter(a=>streamFilter==='all'||a.stream===streamFilter)
+ const sn=document.getElementById('streamnote');
+ const nt=parkF!=='all'?(D.park_notes||{})[parkF]:(tierF==='hub'?D.hub_note:'');
+ const pt=(D.parks.find(x=>x.key===parkF)||{}).title||'';
+ if(nt){ sn.hidden=false; sn.innerHTML=`<b>Что важно знать${pt?' — '+esc(pt):''}:</b> ${esc(nt)}`; } else { sn.hidden=true; }
+ const rows=D.addressees.filter(a=>(parkF==='all'||(a.parks||[]).includes(parkF))
+    && (tierF==='all'||(tierF==='hub'?a.hub:a.tier_key===tierF)))
   .sort((a,b)=>(a.priority-b.priority)||a.name.localeCompare(b.name))
   .map(a=>{const b=BX[a.bitrix_state||'never']||BX.never;return `<tr>
    <td><span class="pri pri${a.priority}">${a.priority}</span></td>
@@ -118,7 +132,8 @@ function renderAddr(){
    <td>${esc(a.tier_ru)}<div>${(a.families||[]).map(f=>`<span class="tag">${esc(f)}</span>`).join('')}</div>
      ${(a.part_numbers&&a.part_numbers.length)?`<div class="small mut">${a.part_numbers.slice(0,6).map(p=>`<span class="pn">${esc(p)}</span>`).join(' ')}</div>`:''}</td>
    <td>${esc(a.what_they_have)}${a.evidence_url?`<div class="small">${link(a.evidence_url)}</div>`:''}</td>
-   <td>${esc(a.route_to_ru||'')}<div class="small mut">${esc(a.ask_mode||'')}</div></td>
+   <td>${esc(a.route_to_ru||'')}<div class="small mut">${esc(a.ask_mode||'')}</div>
+     ${a.verdict?`<div class="small mut">проверка: ${a.verdict==='confirmed'?'✔ подтверждено на странице':'≈ правдоподобно, без прямого подтверждения'}</div>`:''}</td>
    <td><span class="bx ${b[1]}">${b[0]}</span>${a.bitrix_note?`<div class="small mut">${esc(a.bitrix_note)}</div>`:''}
      <div class="small">шанс ответа: <b>${esc(a.answer_odds||'—')}</b></div></td>
   </tr>`}).join('');
@@ -137,8 +152,14 @@ function render(){
  document.getElementById('t-demand').innerHTML=tbl(['Парк','Позиция','Номер','Кол-во','Чей оригинал'],
   D.demand.map(r=>`<tr><td>${esc(r.park)}</td><td>${esc(r.name)}</td><td><span class="pn">${esc(r.pn)}</span></td>
    <td style="font-variant-numeric:tabular-nums">${num(r.qty)} шт</td><td class="mut">${esc(r.oem)}</td></tr>`).join(''));
- const streams=[['all','все стволы']].concat(D.streams.map(s=>[s.key,s.title]));
- document.getElementById('f-stream').innerHTML=streams.map(([k,t])=>`<button class="f${k===streamFilter?' on':''}" data-s="${esc(k)}">${esc(t)}</button>`).join('');
+ const mk=(id,cur,items)=>document.getElementById(id).innerHTML=items.map(([k,t])=>
+   `<button class="f${k===cur?' on':''}" data-${id.slice(2)}="${esc(k)}">${esc(t)}</button>`).join('');
+ mk('f-park',parkF,[['all','все парки']].concat(D.parks.map(p=>[p.key,p.title])));
+ mk('f-tier',tierF,[['all','любой канал'],['hub','хабы СНГ-периметра']].concat(D.tiers.map(t=>[t.key,t.title])));
+ document.getElementById('t-cross').innerHTML=tbl(['Позиция спроса','Ряд взаимозаменяемых номеров','Чем подтверждено'],
+  D.crosses.map(c=>`<tr><td><b>${esc(c.pos)}</b></td><td>${esc(c.chain)}</td><td class="mut">${esc(c.note)}</td></tr>`).join(''));
+ document.getElementById('checks').innerHTML='<b>Три номера проверить ДО рассылки — иначе весь круг впустую:</b>'+
+  D.checks.map(c=>`<div style="margin-top:6px"><span class="pn">${esc(c.pn)}</span> — ${esc(c.what)} <b>${esc(c.do)}</b></div>`).join('');
  renderAddr();
  const f=D.funnel, tot=f.rows.reduce((a,r)=>a+r[1],0);
  document.getElementById('eff-body').innerHTML=`
@@ -152,8 +173,9 @@ function render(){
 }
 document.addEventListener('click',e=>{
  const b=e.target.closest('.f'); if(!b) return;
- streamFilter=b.dataset.s;
- document.querySelectorAll('.f').forEach(x=>x.classList.toggle('on',x.dataset.s===streamFilter));
+ if(b.dataset.park!==undefined) parkF=b.dataset.park; else if(b.dataset.tier!==undefined) tierF=b.dataset.tier;
+ document.querySelectorAll('#f-park .f').forEach(x=>x.classList.toggle('on',x.dataset.park===parkF));
+ document.querySelectorAll('#f-tier .f').forEach(x=>x.classList.toggle('on',x.dataset.tier===tierF));
  renderAddr();
 });
 render();
