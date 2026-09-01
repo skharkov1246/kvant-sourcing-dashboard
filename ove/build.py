@@ -60,6 +60,7 @@ OPTIONAL = {
     "__REVS_JSON__": "revisions.json",
     "__ECO_JSON__": "eco_prelim.json",
     "__AUDIT_JSON__": "audit_log.json",
+    "__RFQFILES_JSON__": "rfq_files.json",
 }
 
 

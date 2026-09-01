@@ -187,6 +187,7 @@ const APPLY = __APPLY_JSON__;
 const GANTT = __GANTT_JSON__;
 const READY = __READY_JSON__;
 const REVS = __REVS_JSON__;
+const RFQFILES = __RFQFILES_JSON__;
 const ECO = __ECO_JSON__;
 const AUDIT = __AUDIT_JSON__;
 
@@ -3866,7 +3867,7 @@ function bindTasks(){
 
 /* --- Документы: дерево папок + история версий у каждого файла --- */
 const DIRNAMES={bi:'Пояснительные записки',apply:'Пакет подачи',rfq:'Запросы ТКП',specs:'Спецификации и опросные листы',sketches:'Эскизы-подложки (SVG)',dxf:'Чертежи DXF (для nanoCAD)',cim:'ЦИМ — библиотека IFC',idei:'Реестр идей эффективности',partner:'Партнёрская линия',paket:'ZIP-пакеты',_root:'Общие документы'};
-const DIRHINT={dxf:'Те же 14 листов, что в эскизах, но в DXF R2010: открываются в nanoCAD / AutoCAD / Model Studio CS. Слои GAS / LIQUID / DUST / ELECTRIC / INTERLOCK / OUTLINE / TEXT_RU, 1 единица = 1 мм — подложка для рабочей отрисовки, не перечерчивать с нуля.',cim:'IFC-файлы стадии БИ: библиотека типов оборудования (70 типов, 14 классов, атрибуты Pset_KVANT_LOI) и наборы по лотам. Открываются в Model Studio CS, nanoCAD BIM, BIMVision (бесплатный просмотрщик).',idei:'65 предложений по эффективности производства в трёх корзинах: 44 — в базовый состав БИ, 18 — опции Заказчику, 3 — эксплуатация. Ред. 1.0 — компактная (20 стр., абзац на идею); ред. 2.0 — рабочая (67 стр.): к каждой идее добавлены исполнители РФ/КНР и техническая реализация по шагам. Оценки эффектов — Class 5, до инженерной проверки.'};
+const DIRHINT={rfq:'Технические задания на оборудование для запроса ТКП. У каждой позиции две версии PDF: «-ru» — русская (рабочая, с полями под ручное оформление письма), «-en» — версия для зарубежных изготовителей: часть 1 английская, часть 2 китайская, шапка письма снята, контакт для ответа проставлен. Именно «-en» уходит вложением в запросах из Bitrix. Исходные DOCX остаются для правок: русские собирает build_rfq.py, английские лежат в ove/rfq_en/ (чистка — rfq_en_clean.py, PDF — build_rfq_pdf.py).',dxf:'Те же 14 листов, что в эскизах, но в DXF R2010: открываются в nanoCAD / AutoCAD / Model Studio CS. Слои GAS / LIQUID / DUST / ELECTRIC / INTERLOCK / OUTLINE / TEXT_RU, 1 единица = 1 мм — подложка для рабочей отрисовки, не перечерчивать с нуля.',cim:'IFC-файлы стадии БИ: библиотека типов оборудования (70 типов, 14 классов, атрибуты Pset_KVANT_LOI) и наборы по лотам. Открываются в Model Studio CS, nanoCAD BIM, BIMVision (бесплатный просмотрщик).',idei:'65 предложений по эффективности производства в трёх корзинах: 44 — в базовый состав БИ, 18 — опции Заказчику, 3 — эксплуатация. Ред. 1.0 — компактная (20 стр., абзац на идею); ред. 2.0 — рабочая (67 стр.): к каждой идее добавлены исполнители РФ/КНР и техническая реализация по шагам. Оценки эффектов — Class 5, до инженерной проверки.'};
 function fileMeta(){
   const m={};
   (BIDOCS?BIDOCS.lots:[]).forEach(L=>L.docs.forEach(d=>{
@@ -3887,6 +3888,7 @@ function rFiles(){
   push('docs/sketches/ove75-gantt-bi.svg'); push('docs/dxf/ove75-gantt-bi.dxf');
   ['lib','lot0','lot1','lot2','lot3','lot4'].forEach(x=>push('docs/cim/ove75-equip-'+x+'.ifc'));
   ['ove75-reestr-effektivnost-zavod.pdf','ove75-reestr-effektivnost-zavod-red2.pdf'].forEach(f=>push('docs/idei/'+f));
+  (RFQFILES||[]).forEach(f=>push('docs/'+f));
   const ST={draft:['черновик','tag lot3'],ready:['готов','tag lot3'],base:['контент в базе','tag lot2'],form:['заполнить','tag lot2'],task:['нужен инженер','tag lot1'],team:['за командой','tag lot1'],wait:['после старта','tag']};
   const hist=p=>{ const rel=p.replace(/^docs\//,'');
     return (REVS?REVS.revisions:[]).map(r=>{const f=r.files.find(x=>x.path===rel);
