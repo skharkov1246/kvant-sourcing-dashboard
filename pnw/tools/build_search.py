@@ -41,7 +41,7 @@ def main():
     sidx = {k: i for i, k in enumerate(skeys)}
     SUP = [[sup_all[k]["name"], sup_all[k].get("country", "")[:22], sup_all[k].get("email", ""),
             sup_all[k].get("phone", ""), sup_all[k].get("site", "")[:60],
-            (sup_all[k].get("what") or "")[:70]] for k in skeys]
+            (sup_all[k].get("what") or "")[:110], sup_all[k].get("whatsapp", "")] for k in skeys]
     PS = {}
     for kv, b in part_sup.items():
         PS[kv] = {g: [sidx[k] for k in ks if k in sidx] for g, ks in b.items()}
@@ -133,13 +133,14 @@ function card(idx,hit,q){
   const ps=PS[it[0]];
   let sup='';
   if(ps){
-    const GN={'П1':'П1 — Китай','П2':'П2 — РФ и СНГ','П3':'П3 — прочие'};
+    const GN={'П1':'П1 — Китай','П3':'П3 — прочие зарубежные'};
     let tr='';
-    for(const g of ['П1','П2','П3']){
+    for(const g of ['П1','П3']){
       for(const si of (ps[g]||[])){
         const s=SUP[si];
-        const c=[s[2]?`<a href="mailto:${s[2]}">${esc(s[2])}</a>`:'',s[3]?esc(s[3]):'']
-          .filter(Boolean).join(' · ')||'<span class="k4">контакт не найден</span>';
+        const c=[s[2]?`<a href="mailto:${s[2]}">${esc(s[2])}</a>`:'',s[3]?esc(s[3]):'',
+                 s[6]?'WA/WeChat '+esc(s[6]):'']
+          .filter(Boolean).join('<br>')||'<span class="k4">контакт не найден</span>';
         tr+=`<tr><td class="grp">${GN[g]}</td><td><b>${esc(s[0])}</b>`+
             (s[5]?`<div class="k4" style="font-size:11.5px">${esc(s[5])}</div>`:'')+
             `</td><td>${esc(s[1])}</td><td>${c}</td>`+

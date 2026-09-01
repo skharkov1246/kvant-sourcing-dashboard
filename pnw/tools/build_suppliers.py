@@ -156,6 +156,28 @@ def main():
         if k and r.get("position_id"):
             link[r["position_id"]].add(k)
 
+    # ── слой обогащения: контакты, добранные с сайтов ───────────────────
+    found = (load("pnw/data/contacts_found.json") or {}).get("contacts", {})
+    enriched = 0
+    for k, c in found.items():
+        r = S.get(k)
+        if not r:                       # ключ мог прийти усечённым — ищем по префиксу
+            m = next((x for x in S if x.startswith(k)), None)
+            r = S.get(m) if m else None
+        if not r:
+            continue
+        for f in ("email", "phone", "city", "site"):
+            if c.get(f) and not r.get(f):
+                r[f] = c[f]
+                enriched += 1
+        if c.get("whatsapp"):
+            r["whatsapp"] = c["whatsapp"]
+        if c.get("note"):
+            r["what"] = c["note"][:200]
+        if c.get("source"):
+            r["contact_src"] = c["source"]
+    print(f"контактов добрано с сайтов: {len(found)} поставщиков, заполнено полей: {enriched}")
+
     # ── привязка П1/П2/П3 к деталям справочника ─────────────────────────
     master = json.loads((OUT / "item_master.json").read_text(encoding="utf-8"))["items"]
     parts = {}
@@ -163,12 +185,18 @@ def main():
         sid = it.get("src_id")
         if it["section"] != "ЗИП ГШО" or sid not in link:
             continue
-        buckets = {"П1": [], "П2": [], "П3": []}
+        # Российские поставщики в привязку не включаются по решению владельца
+        # (01.09.2026): интересны только зарубежные каналы. В реестре они
+        # остаются — они нужны отдельно, по теме подшипников и материалов.
+        buckets = {"П1": [], "П3": []}
         for k in link[sid]:
             s = S.get(k)
             if not s:
                 continue
-            buckets[geo(s["country"], s["name"], s.get("site", ""))].append(k)
+            g = geo(s["country"], s["name"], s.get("site", ""))
+            if g == "П2":
+                continue
+            buckets[g].append(k)
         # внутри группы вперёд тех, у кого есть контакт
         for b in buckets:
             buckets[b].sort(key=lambda k: (not (S[k]["email"] or S[k]["phone"]), S[k]["name"]))
@@ -181,7 +209,8 @@ def main():
         ensure_ascii=False), encoding="utf-8")
     (OUT / "part_suppliers.json").write_text(json.dumps(
         {"updated": "2026-09-01",
-         "note": "П1 — Китай, П2 — РФ и СНГ, П3 — прочие страны (правило рабочей таблицы)",
+         "note": "П1 — Китай, П3 — прочие зарубежные. Российские поставщики в привязку "
+                 "не включены по решению владельца от 01.09.2026 (в реестре остаются).",
          "parts": parts}, ensure_ascii=False), encoding="utf-8")
 
     withmail = sum(1 for v in sup.values() if v["email"])

@@ -1,0 +1,37 @@
+{
+ "updated": "2026-09-01",
+ "source": "добор контактов агентами с официальных сайтов поставщиков; только открытые страницы, без обхода защиты",
+ "note": "Слой обогащения: применяется поверх реестра при сборке. Если контакт найден здесь, он замещает пустое поле карточки. Ключ — тот же, что в supplier_master. Ключи сверены с реестром.",
+ "contacts": {
+  "guangzhouanswktechnolo": {
+   "name": "Guangzhou Answk Technology Co., Ltd (ANSWK)",
+   "city": "Гуанчжоу, Байюнь",
+   "email": "sales@answk.com",
+   "phone": "+86 20 3629 3651",
+   "whatsapp": "+86 15328879667 (он же WeChat)",
+   "site": "answk.com",
+   "note": "Запчасти для перфораторов и бурового оборудования, компрессоры, фильтры. Room A220, 2F, YH Building, Helongyi Road, Baiyun District, Guangzhou 510440. Приём 9:00-18:00 пекинского, пн-пт.",
+   "source": "https://www.answk.com/contact/"
+  },
+  "jinanlingongminingrock": {
+   "name": "Jinan Lingong Mining & Rock Technology Co., Ltd (LGMRT)",
+   "city": "Цзинань, Шаньдун",
+   "email": "sales@lgmrt.com.cn",
+   "phone": "+86 531 6897 2881",
+   "whatsapp": "",
+   "site": "en.lgmrt.com",
+   "note": "ВНИМАНИЕ: совместное предприятие Sandvik Group и Lingong Group (с мая 2016). Конфликт интересов с OEM, чей ЗИП замещаем — как у Sanshan с Atlas Copco. Домен из базы www.lgmrt.com по HTTPS не открывается, рабочий адрес http://en.lgmrt.com. Почта в зоне .com.cn, не .com.",
+   "source": "http://en.lgmrt.com/about/contact_us.htm"
+  },
+  "shanghaibaorongsteelpi": {
+   "name": "Shanghai Baorong Steel Pipe Metal Products Factory",
+   "city": "Шанхай, Баошань",
+   "email": "sales@sh-baorong.com",
+   "phone": "+86 21 5601 5630",
+   "whatsapp": "+86 13814269293 (Pavel Zhong, экспорт)",
+   "site": "sh-baorong.com",
+   "note": "С 1992 г. ЗИП гидромолотов и землеройной техники: пики, втулки, пальцы, болты, ремкомплекты уплотнений, диафрагмы. OEM/ODM. No.857 Jixian Road, Luodian Town, Baoshan, Shanghai 201908. Витрина made-in-china контакты скрывает — взято с собственного сайта, открывается только по http.",
+   "source": "http://www.sh-baorong.com/En/Contact.asp"
+  }
+ }
+}
