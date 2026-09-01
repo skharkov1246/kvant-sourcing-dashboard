@@ -1,0 +1,82 @@
+name: Gidromet site deploy
+
+# Сборка и деплой сайта инженерного заключения по гидрометаллургической переработке
+# медно-золотого концентрата карельского месторождения (gidromet/) на Cloudflare Pages
+# (проект kvant-gidromet). Отдельный проект Pages — дашборд сорсеров, сайт ОВЭ-75,
+# база ЗИП, ГПУ-библиотека и сайт базового проекта ГОКа не затрагиваются.
+#
+# ВНИМАНИЕ: у этого сайта НЕТ гейта доступа. В gidromet/public намеренно нет _worker.js,
+# поэтому Cloudflare Pages отдаёт статику всем без пароля. Так распорядился владелец
+# 01.09.2026 («сайт по ссылке, открываемой извне»). Если понадобится закрыть —
+# скопировать ove/public/_worker.js в gidromet/public/ и добавить в этот workflow
+# шаг записи секрета BASIC_AUTH_PASS (см. gpu-deploy.yml).
+#
+# Страница собирается из gidromet/site/index.template.html и gidromet/data/*.json
+# скриптом gidromet/build.py и получается самодостаточной: весь CSS и JS встроены,
+# внешних ресурсов нет.
+on:
+  push:
+    branches: [main]
+    paths: ["gidromet/**", ".github/workflows/gidromet-deploy.yml"]
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gidromet-deploy
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Сборка index.html из шаблона и данных
+        run: python3 gidromet/build.py
+
+      - name: Проверка страницы
+        run: |
+          set -euo pipefail
+          test -f gidromet/public/index.html
+          # гейта быть не должно: наличие _worker.js молча закрыло бы сайт
+          if [ -f gidromet/public/_worker.js ]; then
+            echo "::error::в gidromet/public появился _worker.js — сайт задуман открытым, проверьте намеренно ли это"
+            exit 1
+          fi
+          # страница обязана быть самодостаточной: внешние ресурсы в Pages не подтянутся
+          if grep -Eq '(src|href)="https?://' gidromet/public/index.html; then
+            echo "::error::в странице есть ссылки на внешние ресурсы — встройте их"
+            exit 1
+          fi
+          # незаменённые плейсхолдеры означают рассинхрон шаблона и build.py
+          if grep -q '__[A-Z_]*_JSON__' gidromet/public/index.html; then
+            echo "::error::в собранной странице остались плейсхолдеры"
+            exit 1
+          fi
+
+      - name: Деплой на Cloudflare Pages (kvant-gidromet)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          # создать проект, если его ещё нет (иначе тихо пропустить)
+          npx --yes wrangler@latest pages project create kvant-gidromet \
+            --production-branch=main 2>/dev/null || true
+          # ASCII commit-message: иначе wrangler цепляет кириллицу git-коммита → CF отвергает (8000111).
+          ok=0
+          for i in 1 2 3; do
+            if npx --yes wrangler@latest pages deploy gidromet/public \
+                 --project-name=kvant-gidromet --branch=main \
+                 --commit-dirty=true --commit-message="gidromet site deploy"; then
+              ok=1; break
+            fi
+            echo "деплой упал (попытка $i/3) — повтор через 20 с"; sleep 20
+          done
+          [ "$ok" = 1 ] || { echo "::error::деплой не удался после 3 попыток"; exit 1; }
