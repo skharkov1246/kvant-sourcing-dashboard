@@ -1,0 +1,6856 @@
+{
+ "updated": "2026-09-01",
+ "source": "разбор zip/data/positions.json, поле aliases",
+ "note": "kind: oem — номер оригинального производителя; analog — вторичный рынок; unknown — принадлежность не определена. number_norm — ключ поиска (только буквы и цифры), схлопывает разные написания одного номера.",
+ "rows": [
+  {
+   "position_id": 566,
+   "catalog_no": "1R-1807",
+   "number": "1R-1807",
+   "number_norm": "1R1807",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 566,
+   "catalog_no": "1R-1807",
+   "number": "P551807",
+   "number_norm": "P551807",
+   "brand": "Donaldson",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 566,
+   "catalog_no": "1R-1807",
+   "number": "LF3973",
+   "number_norm": "LF3973",
+   "brand": "Fleetguard",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 566,
+   "catalog_no": "1R-1807",
+   "number": "B7225",
+   "number_norm": "B7225",
+   "brand": "Baldwin",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 566,
+   "catalog_no": "1R-1807",
+   "number": "B7700",
+   "number_norm": "B7700",
+   "brand": "Baldwin",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 566,
+   "catalog_no": "1R-1807",
+   "number": "LFP3236",
+   "number_norm": "LFP3236",
+   "brand": "Luber-finer",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 566,
+   "catalog_no": "1R-1807",
+   "number": "PH9376",
+   "number_norm": "PH9376",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 567,
+   "catalog_no": "1R-0774",
+   "number": "P164229",
+   "number_norm": "P164229",
+   "brand": "Donaldson",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 567,
+   "catalog_no": "1R-0774",
+   "number": "P164241",
+   "number_norm": "P164241",
+   "brand": "Donaldson",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 567,
+   "catalog_no": "1R-0774",
+   "number": "P555461",
+   "number_norm": "P555461",
+   "brand": "Donaldson",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 567,
+   "catalog_no": "1R-0774",
+   "number": "HF6202",
+   "number_norm": "HF6202",
+   "brand": "Fleetguard",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 567,
+   "catalog_no": "1R-0774",
+   "number": "C1723A",
+   "number_norm": "C1723A",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 567,
+   "catalog_no": "1R-0774",
+   "number": "51194",
+   "number_norm": "51194",
+   "brand": "Wix",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 567,
+   "catalog_no": "1R-0774",
+   "number": "LH5461",
+   "number_norm": "LH5461",
+   "brand": "Luber-finer",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 572,
+   "catalog_no": "436-7077",
+   "number": "SK 48956",
+   "number_norm": "SK48956",
+   "brand": "SF-Filter",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 573,
+   "catalog_no": "500-0480",
+   "number": "SN 40856",
+   "number_norm": "SN40856",
+   "brand": "Hifi",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 574,
+   "catalog_no": "7T-7358",
+   "number": "P606087",
+   "number_norm": "P606087",
+   "brand": "Donaldson",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 574,
+   "catalog_no": "7T-7358",
+   "number": "AF25657",
+   "number_norm": "AF25657",
+   "brand": "Fleetguard",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 574,
+   "catalog_no": "7T-7358",
+   "number": "PA3803",
+   "number_norm": "PA3803",
+   "brand": "Baldwin",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 574,
+   "catalog_no": "7T-7358",
+   "number": "SC90019",
+   "number_norm": "SC90019",
+   "brand": "Hifi",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 574,
+   "catalog_no": "7T-7358",
+   "number": "AF2373",
+   "number_norm": "AF2373",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 574,
+   "catalog_no": "7T-7358",
+   "number": "LAF7358",
+   "number_norm": "LAF7358",
+   "brand": "Luber-finer",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 574,
+   "catalog_no": "7T-7358",
+   "number": "CA5501",
+   "number_norm": "CA5501",
+   "brand": "Sakura",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 575,
+   "catalog_no": "348-1861",
+   "number": "P575655",
+   "number_norm": "P575655",
+   "brand": "Donaldson",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 575,
+   "catalog_no": "348-1861",
+   "number": "PT9536-MPG",
+   "number_norm": "PT9536MPG",
+   "brand": "Baldwin",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 575,
+   "catalog_no": "348-1861",
+   "number": "EH-55060",
+   "number_norm": "EH55060",
+   "brand": "Sakura",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 575,
+   "catalog_no": "348-1861",
+   "number": "SH66280",
+   "number_norm": "SH66280",
+   "brand": "Hifi",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 575,
+   "catalog_no": "348-1861",
+   "number": "HY90785",
+   "number_norm": "HY90785",
+   "brand": "SF-Filter",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 575,
+   "catalog_no": "348-1861",
+   "number": "WHE105518",
+   "number_norm": "WHE105518",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 576,
+   "catalog_no": "328-3655",
+   "number": "1R-1809",
+   "number_norm": "1R1809",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 576,
+   "catalog_no": "328-3655",
+   "number": "PT9429-MPG",
+   "number_norm": "PT9429MPG",
+   "brand": "Baldwin",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 576,
+   "catalog_no": "328-3655",
+   "number": "P573354",
+   "number_norm": "P573354",
+   "brand": "Donaldson",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 576,
+   "catalog_no": "328-3655",
+   "number": "HF35515",
+   "number_norm": "HF35515",
+   "brand": "Fleetguard",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 576,
+   "catalog_no": "328-3655",
+   "number": "57809",
+   "number_norm": "57809",
+   "brand": "Wix",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 576,
+   "catalog_no": "328-3655",
+   "number": "WL10009",
+   "number_norm": "WL10009",
+   "brand": "Wix",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 576,
+   "catalog_no": "328-3655",
+   "number": "SF10009",
+   "number_norm": "SF10009",
+   "brand": "Wix",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 576,
+   "catalog_no": "328-3655",
+   "number": "400009",
+   "number_norm": "400009",
+   "brand": "Napa",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 576,
+   "catalog_no": "328-3655",
+   "number": "SH63967",
+   "number_norm": "SH63967",
+   "brand": "Hifi",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 577,
+   "catalog_no": "337-5270",
+   "number": "P580903",
+   "number_norm": "P580903",
+   "brand": "Donaldson",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 577,
+   "catalog_no": "337-5270",
+   "number": "HF29122",
+   "number_norm": "HF29122",
+   "brand": "Fleetguard",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 577,
+   "catalog_no": "337-5270",
+   "number": "SH66289",
+   "number_norm": "SH66289",
+   "brand": "Hifi",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 577,
+   "catalog_no": "337-5270",
+   "number": "HY90749",
+   "number_norm": "HY90749",
+   "brand": "SF-Filter",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 578,
+   "catalog_no": "299-8229",
+   "number": "FF261",
+   "number_norm": "FF261",
+   "brand": "Fleetguard",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 578,
+   "catalog_no": "299-8229",
+   "number": "P502504",
+   "number_norm": "P502504",
+   "brand": "Donaldson",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 578,
+   "catalog_no": "299-8229",
+   "number": "BF7990",
+   "number_norm": "BF7990",
+   "brand": "Baldwin",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 578,
+   "catalog_no": "299-8229",
+   "number": "2656F843",
+   "number_norm": "2656F843",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 578,
+   "catalog_no": "299-8229",
+   "number": "33076",
+   "number_norm": "33076",
+   "brand": "Wix",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 578,
+   "catalog_no": "299-8229",
+   "number": "SN30036",
+   "number_norm": "SN30036",
+   "brand": "Hifi",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 578,
+   "catalog_no": "299-8229",
+   "number": "FF1248",
+   "number_norm": "FF1248",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 578,
+   "catalog_no": "299-8229",
+   "number": "LFF5088",
+   "number_norm": "LFF5088",
+   "brand": "Luber-finer",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 580,
+   "catalog_no": "308-7298",
+   "number": "P553880",
+   "number_norm": "P553880",
+   "brand": "Donaldson",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 580,
+   "catalog_no": "308-7298",
+   "number": "FS20052",
+   "number_norm": "FS20052",
+   "brand": "Fleetguard",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 580,
+   "catalog_no": "308-7298",
+   "number": "BF1289-SP",
+   "number_norm": "BF1289SP",
+   "brand": "Baldwin",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 580,
+   "catalog_no": "308-7298",
+   "number": "CAT 2715076",
+   "number_norm": "CAT2715076",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 580,
+   "catalog_no": "308-7298",
+   "number": "271-5076",
+   "number_norm": "2715076",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 580,
+   "catalog_no": "308-7298",
+   "number": "FF1252-SP",
+   "number_norm": "FF1252SP",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 580,
+   "catalog_no": "308-7298",
+   "number": "SK3176",
+   "number_norm": "SK3176",
+   "brand": "SF-Filter",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 580,
+   "catalog_no": "308-7298",
+   "number": "2656F853",
+   "number_norm": "2656F853",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 581,
+   "catalog_no": "462-1171",
+   "number": "P550920",
+   "number_norm": "P550920",
+   "brand": "Donaldson",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 581,
+   "catalog_no": "462-1171",
+   "number": "LF17475",
+   "number_norm": "LF17475",
+   "brand": "Fleetguard",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 581,
+   "catalog_no": "462-1171",
+   "number": "B7378",
+   "number_norm": "B7378",
+   "brand": "Baldwin",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 581,
+   "catalog_no": "462-1171",
+   "number": "2654A111",
+   "number_norm": "2654A111",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 581,
+   "catalog_no": "462-1171",
+   "number": "CAT 269-8325",
+   "number_norm": "CAT2698325",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 581,
+   "catalog_no": "462-1171",
+   "number": "CAT 4627133",
+   "number_norm": "CAT4627133",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 581,
+   "catalog_no": "462-1171",
+   "number": "10000-66719",
+   "number_norm": "1000066719",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 582,
+   "catalog_no": "180-7487",
+   "number": "P606762",
+   "number_norm": "P606762",
+   "brand": "Donaldson",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 582,
+   "catalog_no": "180-7487",
+   "number": "AF25780",
+   "number_norm": "AF25780",
+   "brand": "Fleetguard",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 582,
+   "catalog_no": "180-7487",
+   "number": "PA5300",
+   "number_norm": "PA5300",
+   "brand": "Baldwin",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 582,
+   "catalog_no": "180-7487",
+   "number": "AF2451",
+   "number_norm": "AF2451",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 582,
+   "catalog_no": "180-7487",
+   "number": "SC90062",
+   "number_norm": "SC90062",
+   "brand": "Hifi",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 582,
+   "catalog_no": "180-7487",
+   "number": "LAF5300",
+   "number_norm": "LAF5300",
+   "brand": "Luber-finer",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 582,
+   "catalog_no": "180-7487",
+   "number": "CU42002",
+   "number_norm": "CU42002",
+   "brand": "Mann",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 582,
+   "catalog_no": "180-7487",
+   "number": "XC315",
+   "number_norm": "XC315",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 582,
+   "catalog_no": "180-7487",
+   "number": "83266",
+   "number_norm": "83266",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 584,
+   "catalog_no": "2901 0523 00",
+   "number": "1613 9014 00",
+   "number_norm": "1613901400",
+   "brand": "Atlas Copco",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 588,
+   "catalog_no": "3222 1881 32",
+   "number": "1619624800",
+   "number_norm": "1619624800",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 593,
+   "catalog_no": "5112 3300 41",
+   "number": "SC90248",
+   "number_norm": "SC90248",
+   "brand": "Hifi",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 593,
+   "catalog_no": "5112 3300 41",
+   "number": "SKL49072",
+   "number_norm": "SKL49072",
+   "brand": "SF-Filter",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 593,
+   "catalog_no": "5112 3300 41",
+   "number": "FLP2714",
+   "number_norm": "FLP2714",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 593,
+   "catalog_no": "5112 3300 41",
+   "number": "ECF2717",
+   "number_norm": "ECF2717",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 605,
+   "catalog_no": "8231046410",
+   "number": "2387374",
+   "number_norm": "2387374",
+   "brand": "Atlas Copco",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 605,
+   "catalog_no": "8231046410",
+   "number": "8231044410",
+   "number_norm": "8231044410",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 605,
+   "catalog_no": "8231046410",
+   "number": "8231045410",
+   "number_norm": "8231045410",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 605,
+   "catalog_no": "8231046410",
+   "number": "0454-10",
+   "number_norm": "045410",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 605,
+   "catalog_no": "8231046410",
+   "number": "0464-10",
+   "number_norm": "046410",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 611,
+   "catalog_no": "4238524",
+   "number": "P550900",
+   "number_norm": "P550900",
+   "brand": "Donaldson",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 611,
+   "catalog_no": "4238524",
+   "number": "FS19820",
+   "number_norm": "FS19820",
+   "brand": "Fleetguard",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 611,
+   "catalog_no": "4238524",
+   "number": "FS19843",
+   "number_norm": "FS19843",
+   "brand": "Fleetguard",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 611,
+   "catalog_no": "4238524",
+   "number": "FS19968",
+   "number_norm": "FS19968",
+   "brand": "Fleetguard",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 611,
+   "catalog_no": "4238524",
+   "number": "FS20007",
+   "number_norm": "FS20007",
+   "brand": "Fleetguard",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 611,
+   "catalog_no": "4238524",
+   "number": "FS20051",
+   "number_norm": "FS20051",
+   "brand": "Fleetguard",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 613,
+   "catalog_no": "2310167",
+   "number": "1232367",
+   "number_norm": "1232367",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 613,
+   "catalog_no": "2310167",
+   "number": "P827653",
+   "number_norm": "P827653",
+   "brand": "Donaldson",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 613,
+   "catalog_no": "2310167",
+   "number": "RS3542",
+   "number_norm": "RS3542",
+   "brand": "Baldwin",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 613,
+   "catalog_no": "2310167",
+   "number": "AF25555",
+   "number_norm": "AF25555",
+   "brand": "Fleetguard",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 613,
+   "catalog_no": "2310167",
+   "number": "AF25526",
+   "number_norm": "AF25526",
+   "brand": "Fleetguard",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 613,
+   "catalog_no": "2310167",
+   "number": "C142021",
+   "number_norm": "C142021",
+   "brand": "Mann",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 613,
+   "catalog_no": "2310167",
+   "number": "AF2285",
+   "number_norm": "AF2285",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 613,
+   "catalog_no": "2310167",
+   "number": "LAF7653",
+   "number_norm": "LAF7653",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 613,
+   "catalog_no": "2310167",
+   "number": "CAT 15153904",
+   "number_norm": "CAT15153904",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 613,
+   "catalog_no": "2310167",
+   "number": "CAT 15950115",
+   "number_norm": "CAT15950115",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 613,
+   "catalog_no": "2310167",
+   "number": "CAT 22909882",
+   "number_norm": "CAT22909882",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 613,
+   "catalog_no": "2310167",
+   "number": "CA9269",
+   "number_norm": "CA9269",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 615,
+   "catalog_no": "1R1808",
+   "number": "1R-1808",
+   "number_norm": "1R1808",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 615,
+   "catalog_no": "1R1808",
+   "number": "LF691A",
+   "number_norm": "LF691A",
+   "brand": "Fleetguard",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 615,
+   "catalog_no": "1R1808",
+   "number": "LF9691A",
+   "number_norm": "LF9691A",
+   "brand": "Fleetguard",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 615,
+   "catalog_no": "1R1808",
+   "number": "P551808",
+   "number_norm": "P551808",
+   "brand": "Donaldson",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 615,
+   "catalog_no": "1R1808",
+   "number": "P559629",
+   "number_norm": "P559629",
+   "brand": "Donaldson",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 615,
+   "catalog_no": "1R1808",
+   "number": "B7299",
+   "number_norm": "B7299",
+   "brand": "Baldwin",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 616,
+   "catalog_no": "1R0762",
+   "number": "FF5624",
+   "number_norm": "FF5624",
+   "brand": "Fleetguard",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 616,
+   "catalog_no": "1R0762",
+   "number": "P550625",
+   "number_norm": "P550625",
+   "brand": "Donaldson",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 616,
+   "catalog_no": "1R0762",
+   "number": "BF7753",
+   "number_norm": "BF7753",
+   "brand": "Baldwin",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 616,
+   "catalog_no": "1R0762",
+   "number": "H264WK",
+   "number_norm": "H264WK",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 616,
+   "catalog_no": "1R0762",
+   "number": "FP9265",
+   "number_norm": "FP9265",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 616,
+   "catalog_no": "1R0762",
+   "number": "P9265",
+   "number_norm": "P9265",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 616,
+   "catalog_no": "1R0762",
+   "number": "LFF5804",
+   "number_norm": "LFF5804",
+   "brand": "Luberfiner",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 616,
+   "catalog_no": "1R0762",
+   "number": "33640",
+   "number_norm": "33640",
+   "brand": "Wix",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 616,
+   "catalog_no": "1R0762",
+   "number": "4587258",
+   "number_norm": "4587258",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 617,
+   "catalog_no": "1R0722",
+   "number": "HF6202",
+   "number_norm": "HF6202",
+   "brand": "Fleetguard",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 617,
+   "catalog_no": "1R0722",
+   "number": "PT8473",
+   "number_norm": "PT8473",
+   "brand": "Baldwin",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 617,
+   "catalog_no": "1R0722",
+   "number": "LFH5461",
+   "number_norm": "LFH5461",
+   "brand": "Luberfiner",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 617,
+   "catalog_no": "1R0722",
+   "number": "LH5461",
+   "number_norm": "LH5461",
+   "brand": "Luberfiner",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 617,
+   "catalog_no": "1R0722",
+   "number": "P164378",
+   "number_norm": "P164378",
+   "brand": "Donaldson",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 618,
+   "catalog_no": "1R-0719",
+   "number": "1R-0719",
+   "number_norm": "1R0719",
+   "brand": "Caterpillar",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 618,
+   "catalog_no": "1R-0719",
+   "number": "HF6097",
+   "number_norm": "HF6097",
+   "brand": "Caterpillar",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 618,
+   "catalog_no": "1R-0719",
+   "number": "LF5055",
+   "number_norm": "LF5055",
+   "brand": "Caterpillar",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 618,
+   "catalog_no": "1R-0719",
+   "number": "LF555",
+   "number_norm": "LF555",
+   "brand": "Caterpillar",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 618,
+   "catalog_no": "1R-0719",
+   "number": "PT189",
+   "number_norm": "PT189",
+   "brand": "Baldwin",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 619,
+   "catalog_no": "1G8878",
+   "number": "1G-8878",
+   "number_norm": "1G8878",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 619,
+   "catalog_no": "1G8878",
+   "number": "HF6553",
+   "number_norm": "HF6553",
+   "brand": "Fleetguard",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 619,
+   "catalog_no": "1G8878",
+   "number": "BT8851-MPG",
+   "number_norm": "BT8851MPG",
+   "brand": "Baldwin",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 619,
+   "catalog_no": "1G8878",
+   "number": "P164378",
+   "number_norm": "P164378",
+   "brand": "Donaldson",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 619,
+   "catalog_no": "1G8878",
+   "number": "WH980",
+   "number_norm": "WH980",
+   "brand": "Mann",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 619,
+   "catalog_no": "1G8878",
+   "number": "WIX 51494",
+   "number_norm": "WIX51494",
+   "brand": "Wix",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 619,
+   "catalog_no": "1G8878",
+   "number": "CAT 102-2828",
+   "number_norm": "CAT1022828",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 619,
+   "catalog_no": "1G8878",
+   "number": "LFH4990",
+   "number_norm": "LFH4990",
+   "brand": "Luber-finer",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 621,
+   "catalog_no": "6060008044",
+   "number": "5580 0078 57",
+   "number_norm": "5580007857",
+   "brand": "Atlas Copco",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 623,
+   "catalog_no": "3222999091",
+   "number": "LF3970",
+   "number_norm": "LF3970",
+   "brand": "Fleetguard",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 623,
+   "catalog_no": "3222999091",
+   "number": "WIX 57182",
+   "number_norm": "WIX57182",
+   "brand": "Wix",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 623,
+   "catalog_no": "3222999091",
+   "number": "P550428",
+   "number_norm": "P550428",
+   "brand": "Donaldson",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 623,
+   "catalog_no": "3222999091",
+   "number": "P551019",
+   "number_norm": "P551019",
+   "brand": "Donaldson",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 623,
+   "catalog_no": "3222999091",
+   "number": "H320W",
+   "number_norm": "H320W",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 624,
+   "catalog_no": "3222999092",
+   "number": "P550881",
+   "number_norm": "P550881",
+   "brand": "Donaldson",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 629,
+   "catalog_no": "6060 0042 14",
+   "number": "SO10020",
+   "number_norm": "SO10020",
+   "brand": "Hifi",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 629,
+   "catalog_no": "6060 0042 14",
+   "number": "P550949",
+   "number_norm": "P550949",
+   "brand": "Donaldson",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 629,
+   "catalog_no": "6060 0042 14",
+   "number": "P559000",
+   "number_norm": "P559000",
+   "brand": "Donaldson",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 629,
+   "catalog_no": "6060 0042 14",
+   "number": "LF9080",
+   "number_norm": "LF9080",
+   "brand": "Fleetguard",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 629,
+   "catalog_no": "6060 0042 14",
+   "number": "LF9001",
+   "number_norm": "LF9001",
+   "brand": "Fleetguard",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 629,
+   "catalog_no": "6060 0042 14",
+   "number": "BD7154",
+   "number_norm": "BD7154",
+   "brand": "Baldwin",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 629,
+   "catalog_no": "6060 0042 14",
+   "number": "BD7509",
+   "number_norm": "BD7509",
+   "brand": "Baldwin",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 629,
+   "catalog_no": "6060 0042 14",
+   "number": "WP12120",
+   "number_norm": "WP12120",
+   "brand": "Mann",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 629,
+   "catalog_no": "6060 0042 14",
+   "number": "57746",
+   "number_norm": "57746",
+   "brand": "Wix",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 629,
+   "catalog_no": "6060 0042 14",
+   "number": "CAT 3961255",
+   "number_norm": "CAT3961255",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 629,
+   "catalog_no": "6060 0042 14",
+   "number": "2882674",
+   "number_norm": "2882674",
+   "brand": "Cummins",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 631,
+   "catalog_no": "BG00233226",
+   "number": "BG00233226",
+   "number_norm": "BG00233226",
+   "brand": "Sandvik Tamrock",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 633,
+   "catalog_no": "69042849",
+   "number": "LF3914",
+   "number_norm": "LF3914",
+   "brand": "Sandvik",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 633,
+   "catalog_no": "69042849",
+   "number": "P550761",
+   "number_norm": "P550761",
+   "brand": "Donaldson",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 633,
+   "catalog_no": "69042849",
+   "number": "MTU 0005459530",
+   "number_norm": "MTU0005459530",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 633,
+   "catalog_no": "69042849",
+   "number": "A0001801709",
+   "number_norm": "A0001801709",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 633,
+   "catalog_no": "69042849",
+   "number": "02931095",
+   "number_norm": "02931095",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 633,
+   "catalog_no": "69042849",
+   "number": "512600108",
+   "number_norm": "512600108",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 634,
+   "catalog_no": "61507642",
+   "number": "P550632",
+   "number_norm": "P550632",
+   "brand": "Donaldson",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 634,
+   "catalog_no": "61507642",
+   "number": "PF7735",
+   "number_norm": "PF7735",
+   "brand": "Baldwin",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 634,
+   "catalog_no": "61507642",
+   "number": "FF5380",
+   "number_norm": "FF5380",
+   "brand": "Fleetguard",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 634,
+   "catalog_no": "61507642",
+   "number": "A0000901551",
+   "number_norm": "A0000901551",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 634,
+   "catalog_no": "61507642",
+   "number": "0000901551",
+   "number_norm": "0000901551",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 634,
+   "catalog_no": "61507642",
+   "number": "0007983180",
+   "number_norm": "0007983180",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 634,
+   "catalog_no": "61507642",
+   "number": "07983180",
+   "number_norm": "07983180",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 634,
+   "catalog_no": "61507642",
+   "number": "798318",
+   "number_norm": "798318",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 634,
+   "catalog_no": "61507642",
+   "number": "571558408",
+   "number_norm": "571558408",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 634,
+   "catalog_no": "61507642",
+   "number": "608774",
+   "number_norm": "608774",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 634,
+   "catalog_no": "61507642",
+   "number": "DC221899",
+   "number_norm": "DC221899",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 635,
+   "catalog_no": "61507641",
+   "number": "61507642",
+   "number_norm": "61507642",
+   "brand": "Sandvik",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 639,
+   "catalog_no": "55027766",
+   "number": "CA79240",
+   "number_norm": "CA79240",
+   "brand": "SF-Filter",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 639,
+   "catalog_no": "55027766",
+   "number": "SC90230",
+   "number_norm": "SC90230",
+   "brand": "SF-Filter",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 639,
+   "catalog_no": "55027766",
+   "number": "SKL46618",
+   "number_norm": "SKL46618",
+   "brand": "SF-Filter",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 639,
+   "catalog_no": "55027766",
+   "number": "313609301",
+   "number_norm": "313609301",
+   "brand": "SF-Filter",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 639,
+   "catalog_no": "55027766",
+   "number": "SFC27766",
+   "number_norm": "SFC27766",
+   "brand": "SF-Filter",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 639,
+   "catalog_no": "55027766",
+   "number": "PF17525",
+   "number_norm": "PF17525",
+   "brand": "SF-Filter",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 640,
+   "catalog_no": "55027767",
+   "number": "55027766",
+   "number_norm": "55027766",
+   "brand": "Sandvik",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 640,
+   "catalog_no": "55027767",
+   "number": "SC90242",
+   "number_norm": "SC90242",
+   "brand": "Hifi",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 640,
+   "catalog_no": "55027767",
+   "number": "WCA104496",
+   "number_norm": "WCA104496",
+   "brand": "Hifi",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 640,
+   "catalog_no": "55027767",
+   "number": "P1289AH",
+   "number_norm": "P1289AH",
+   "brand": "Hifi",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 642,
+   "catalog_no": "56009813",
+   "number": "SO10024",
+   "number_norm": "SO10024",
+   "brand": "Hifi",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 642,
+   "catalog_no": "56009813",
+   "number": "W11102",
+   "number_norm": "W11102",
+   "brand": "Mann",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 642,
+   "catalog_no": "56009813",
+   "number": "51791",
+   "number_norm": "51791",
+   "brand": "Wix",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 642,
+   "catalog_no": "56009813",
+   "number": "51791E",
+   "number_norm": "51791E",
+   "brand": "Wix",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 642,
+   "catalog_no": "56009813",
+   "number": "OP584",
+   "number_norm": "OP584",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 643,
+   "catalog_no": "56045594",
+   "number": "56036990",
+   "number_norm": "56036990",
+   "brand": "Sandvik",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 643,
+   "catalog_no": "56045594",
+   "number": "SN70201",
+   "number_norm": "SN70201",
+   "brand": "Volvo",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 643,
+   "catalog_no": "56045594",
+   "number": "SK3320",
+   "number_norm": "SK3320",
+   "brand": "Volvo",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 643,
+   "catalog_no": "56045594",
+   "number": "SK33204",
+   "number_norm": "SK33204",
+   "brand": "Volvo",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 643,
+   "catalog_no": "56045594",
+   "number": "SK33205",
+   "number_norm": "SK33205",
+   "brand": "Volvo",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 643,
+   "catalog_no": "56045594",
+   "number": "S4120NR",
+   "number_norm": "S4120NR",
+   "brand": "Volvo",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 643,
+   "catalog_no": "56045594",
+   "number": "FT5658",
+   "number_norm": "FT5658",
+   "brand": "Volvo",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 643,
+   "catalog_no": "56045594",
+   "number": "WIX 33721",
+   "number_norm": "WIX33721",
+   "brand": "Volvo",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 643,
+   "catalog_no": "56045594",
+   "number": "20976005",
+   "number_norm": "20976005",
+   "brand": "Volvo",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 643,
+   "catalog_no": "56045594",
+   "number": "20430751",
+   "number_norm": "20430751",
+   "brand": "Volvo",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 643,
+   "catalog_no": "56045594",
+   "number": "21764958",
+   "number_norm": "21764958",
+   "brand": "Volvo",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 644,
+   "catalog_no": "BG00729292",
+   "number": "P766811",
+   "number_norm": "P766811",
+   "brand": "Donaldson",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 644,
+   "catalog_no": "BG00729292",
+   "number": "SH66358",
+   "number_norm": "SH66358",
+   "brand": "Hifi",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 644,
+   "catalog_no": "BG00729292",
+   "number": "GHF29292",
+   "number_norm": "GHF29292",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 644,
+   "catalog_no": "BG00729292",
+   "number": "4221160",
+   "number_norm": "4221160",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 645,
+   "catalog_no": "55199068",
+   "number": "SA12689",
+   "number_norm": "SA12689",
+   "brand": "Donaldson",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 646,
+   "catalog_no": "BG00208795",
+   "number": "944432Q",
+   "number_norm": "944432Q",
+   "brand": "Parker",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 646,
+   "catalog_no": "BG00208795",
+   "number": "SH51410",
+   "number_norm": "SH51410",
+   "brand": "Hifi",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 646,
+   "catalog_no": "BG00208795",
+   "number": "HY19281",
+   "number_norm": "HY19281",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 646,
+   "catalog_no": "BG00208795",
+   "number": "56031370",
+   "number_norm": "56031370",
+   "brand": "Sandvik",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 646,
+   "catalog_no": "BG00208795",
+   "number": "W053861703",
+   "number_norm": "W053861703",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 647,
+   "catalog_no": "56044761",
+   "number": "SN920430",
+   "number_norm": "SN920430",
+   "brand": "Hifi",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 647,
+   "catalog_no": "56044761",
+   "number": "P552044",
+   "number_norm": "P552044",
+   "brand": "Donaldson",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 647,
+   "catalog_no": "56044761",
+   "number": "FS1294",
+   "number_norm": "FS1294",
+   "brand": "Fleetguard",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 647,
+   "catalog_no": "56044761",
+   "number": "FS20403",
+   "number_norm": "FS20403",
+   "brand": "Fleetguard",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 647,
+   "catalog_no": "56044761",
+   "number": "PF58930",
+   "number_norm": "PF58930",
+   "brand": "Baldwin",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 647,
+   "catalog_no": "56044761",
+   "number": "PF788930",
+   "number_norm": "PF788930",
+   "brand": "Baldwin",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 647,
+   "catalog_no": "56044761",
+   "number": "2040N30",
+   "number_norm": "2040N30",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 647,
+   "catalog_no": "56044761",
+   "number": "81125030077",
+   "number_norm": "81125030077",
+   "brand": "Mann",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 647,
+   "catalog_no": "56044761",
+   "number": "38250270",
+   "number_norm": "38250270",
+   "brand": "Volvo",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 652,
+   "catalog_no": "6060008046",
+   "number": "6060 0080 42",
+   "number_norm": "6060008042",
+   "brand": "Donaldson",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 652,
+   "catalog_no": "6060008046",
+   "number": "P551311",
+   "number_norm": "P551311",
+   "brand": "Donaldson",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 652,
+   "catalog_no": "6060008046",
+   "number": "BF7587",
+   "number_norm": "BF7587",
+   "brand": "Donaldson",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 654,
+   "catalog_no": "CA1700061",
+   "number": "133-5673",
+   "number_norm": "1335673",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 654,
+   "catalog_no": "CA1700061",
+   "number": "513-4490",
+   "number_norm": "5134490",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 654,
+   "catalog_no": "CA1700061",
+   "number": "129-0373",
+   "number_norm": "1290373",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 655,
+   "catalog_no": "CA1R0749",
+   "number": "1R-0749",
+   "number_norm": "1R0749",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 655,
+   "catalog_no": "CA1R0749",
+   "number": "P551311",
+   "number_norm": "P551311",
+   "brand": "Donaldson",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 655,
+   "catalog_no": "CA1R0749",
+   "number": "FF5319",
+   "number_norm": "FF5319",
+   "brand": "Fleetguard",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 655,
+   "catalog_no": "CA1R0749",
+   "number": "FF5308",
+   "number_norm": "FF5308",
+   "brand": "Fleetguard",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 655,
+   "catalog_no": "CA1R0749",
+   "number": "FF5473",
+   "number_norm": "FF5473",
+   "brand": "Fleetguard",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 655,
+   "catalog_no": "CA1R0749",
+   "number": "BF7587",
+   "number_norm": "BF7587",
+   "brand": "Baldwin",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 655,
+   "catalog_no": "CA1R0749",
+   "number": "P8335",
+   "number_norm": "P8335",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 655,
+   "catalog_no": "CA1R0749",
+   "number": "WIX 33674",
+   "number_norm": "WIX33674",
+   "brand": "Wix",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 656,
+   "catalog_no": "CA1R0716",
+   "number": "1R-0716",
+   "number_norm": "1R0716",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 656,
+   "catalog_no": "CA1R0716",
+   "number": "P554005",
+   "number_norm": "P554005",
+   "brand": "Donaldson",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 656,
+   "catalog_no": "CA1R0716",
+   "number": "LF691A",
+   "number_norm": "LF691A",
+   "brand": "Fleetguard",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 656,
+   "catalog_no": "CA1R0716",
+   "number": "B7299",
+   "number_norm": "B7299",
+   "brand": "Baldwin",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 656,
+   "catalog_no": "CA1R0716",
+   "number": "2P-4005",
+   "number_norm": "2P4005",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 657,
+   "catalog_no": "100116355",
+   "number": "16355",
+   "number_norm": "16355",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 661,
+   "catalog_no": "ХП-2009.32",
+   "number": "ХП-2009.32",
+   "number_norm": "ХП200932",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 662,
+   "catalog_no": "4N-2745",
+   "number": "A-4N2745",
+   "number_norm": "A4N2745",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 662,
+   "catalog_no": "4N-2745",
+   "number": "P-4N2745",
+   "number_norm": "P4N2745",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 665,
+   "catalog_no": "56052657",
+   "number": "SA17088",
+   "number_norm": "SA17088",
+   "brand": "Hifi",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 665,
+   "catalog_no": "56052657",
+   "number": "LAF2342",
+   "number_norm": "LAF2342",
+   "brand": "Luber-finer",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 665,
+   "catalog_no": "56052657",
+   "number": "56052665",
+   "number_norm": "56052665",
+   "brand": "Normet",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 666,
+   "catalog_no": "56052665",
+   "number": "SA17089",
+   "number_norm": "SA17089",
+   "brand": "Hifi",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 666,
+   "catalog_no": "56052665",
+   "number": "LAF2343",
+   "number_norm": "LAF2343",
+   "brand": "Luber-finer",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 666,
+   "catalog_no": "56052665",
+   "number": "56052657",
+   "number_norm": "56052657",
+   "brand": "Normet",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 672,
+   "catalog_no": "BR2567902",
+   "number": "P782104",
+   "number_norm": "P782104",
+   "brand": "Donaldson",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 672,
+   "catalog_no": "BR2567902",
+   "number": "AF26397",
+   "number_norm": "AF26397",
+   "brand": "Fleetguard",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 672,
+   "catalog_no": "BR2567902",
+   "number": "RS3994",
+   "number_norm": "RS3994",
+   "brand": "Baldwin",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 672,
+   "catalog_no": "BR2567902",
+   "number": "SA17193",
+   "number_norm": "SA17193",
+   "brand": "Hifi",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 672,
+   "catalog_no": "BR2567902",
+   "number": "LAF4601",
+   "number_norm": "LAF4601",
+   "brand": "Luber-finer",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 672,
+   "catalog_no": "BR2567902",
+   "number": "AF2462",
+   "number_norm": "AF2462",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 672,
+   "catalog_no": "BR2567902",
+   "number": "E2000L",
+   "number_norm": "E2000L",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 672,
+   "catalog_no": "BR2567902",
+   "number": "UFI 2751000",
+   "number_norm": "UFI2751000",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 672,
+   "catalog_no": "BR2567902",
+   "number": "BS01224",
+   "number_norm": "BS01224",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 672,
+   "catalog_no": "BR2567902",
+   "number": "83783",
+   "number_norm": "83783",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 672,
+   "catalog_no": "BR2567902",
+   "number": "16138004",
+   "number_norm": "16138004",
+   "brand": "Atlas Copco",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 672,
+   "catalog_no": "BR2567902",
+   "number": "29149310",
+   "number_norm": "29149310",
+   "brand": "Atlas Copco",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 672,
+   "catalog_no": "BR2567902",
+   "number": "5821149",
+   "number_norm": "5821149",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 672,
+   "catalog_no": "BR2567902",
+   "number": "1181003",
+   "number_norm": "1181003",
+   "brand": "Deutz",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 672,
+   "catalog_no": "BR2567902",
+   "number": "3902783-M1",
+   "number_norm": "3902783M1",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 673,
+   "catalog_no": "BR2567903",
+   "number": "RS3995",
+   "number_norm": "RS3995",
+   "brand": "Baldwin",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 673,
+   "catalog_no": "BR2567903",
+   "number": "P782107",
+   "number_norm": "P782107",
+   "brand": "Donaldson",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 673,
+   "catalog_no": "BR2567903",
+   "number": "AF26398",
+   "number_norm": "AF26398",
+   "brand": "Fleetguard",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 674,
+   "catalog_no": "245-6375",
+   "number": "P782105",
+   "number_norm": "P782105",
+   "brand": "Donaldson",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 674,
+   "catalog_no": "245-6375",
+   "number": "AF26399",
+   "number_norm": "AF26399",
+   "brand": "Fleetguard",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 674,
+   "catalog_no": "245-6375",
+   "number": "RS3996",
+   "number_norm": "RS3996",
+   "brand": "Baldwin",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 674,
+   "catalog_no": "245-6375",
+   "number": "SA17206",
+   "number_norm": "SA17206",
+   "brand": "Hifi",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 674,
+   "catalog_no": "245-6375",
+   "number": "LAF6098",
+   "number_norm": "LAF6098",
+   "brand": "Luber-finer",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 674,
+   "catalog_no": "245-6375",
+   "number": "AF2457",
+   "number_norm": "AF2457",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 674,
+   "catalog_no": "245-6375",
+   "number": "UFI 27A0600",
+   "number_norm": "UFI27A0600",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 674,
+   "catalog_no": "245-6375",
+   "number": "F026400237",
+   "number_norm": "F026400237",
+   "brand": "Bosch",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 674,
+   "catalog_no": "245-6375",
+   "number": "S0237",
+   "number_norm": "S0237",
+   "brand": "Bosch",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 674,
+   "catalog_no": "245-6375",
+   "number": "83711",
+   "number_norm": "83711",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 674,
+   "catalog_no": "245-6375",
+   "number": "CAT 24424482",
+   "number_norm": "CAT24424482",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 674,
+   "catalog_no": "245-6375",
+   "number": "C25710",
+   "number_norm": "C25710",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 674,
+   "catalog_no": "245-6375",
+   "number": "2914-5023-00",
+   "number_norm": "2914502300",
+   "brand": "Atlas Copco",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 674,
+   "catalog_no": "245-6375",
+   "number": "3902806-M1",
+   "number_norm": "3902806M1",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 674,
+   "catalog_no": "245-6375",
+   "number": "245-6376",
+   "number_norm": "2456376",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 675,
+   "catalog_no": "245-6376",
+   "number": "P782108",
+   "number_norm": "P782108",
+   "brand": "Donaldson",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 675,
+   "catalog_no": "245-6376",
+   "number": "AF26400",
+   "number_norm": "AF26400",
+   "brand": "Fleetguard",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 675,
+   "catalog_no": "245-6376",
+   "number": "RS3997",
+   "number_norm": "RS3997",
+   "brand": "Baldwin",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 675,
+   "catalog_no": "245-6376",
+   "number": "SA17207",
+   "number_norm": "SA17207",
+   "brand": "Hifi",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 675,
+   "catalog_no": "245-6376",
+   "number": "LAF6099",
+   "number_norm": "LAF6099",
+   "brand": "Luber-finer",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 675,
+   "catalog_no": "245-6376",
+   "number": "AF2458",
+   "number_norm": "AF2458",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 675,
+   "catalog_no": "245-6376",
+   "number": "E630LS",
+   "number_norm": "E630LS",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 675,
+   "catalog_no": "245-6376",
+   "number": "UFI 27A0800",
+   "number_norm": "UFI27A0800",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 675,
+   "catalog_no": "245-6376",
+   "number": "FA3441",
+   "number_norm": "FA3441",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 675,
+   "catalog_no": "245-6376",
+   "number": "83710",
+   "number_norm": "83710",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 675,
+   "catalog_no": "245-6376",
+   "number": "CAT 32925285",
+   "number_norm": "CAT32925285",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 675,
+   "catalog_no": "245-6376",
+   "number": "245-6375",
+   "number_norm": "2456375",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 681,
+   "catalog_no": "6I2510",
+   "number": "6I-2510",
+   "number_norm": "6I2510",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 681,
+   "catalog_no": "6I2510",
+   "number": "P532510",
+   "number_norm": "P532510",
+   "brand": "Donaldson",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 681,
+   "catalog_no": "6I2510",
+   "number": "AF25138M",
+   "number_norm": "AF25138M",
+   "brand": "Fleetguard",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 681,
+   "catalog_no": "6I2510",
+   "number": "RS3515",
+   "number_norm": "RS3515",
+   "brand": "Baldwin",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 681,
+   "catalog_no": "6I2510",
+   "number": "CF22160",
+   "number_norm": "CF22160",
+   "brand": "Mann",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 681,
+   "catalog_no": "6I2510",
+   "number": "SA16024",
+   "number_norm": "SA16024",
+   "brand": "Hifi",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 681,
+   "catalog_no": "6I2510",
+   "number": "AF2211",
+   "number_norm": "AF2211",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 681,
+   "catalog_no": "6I2510",
+   "number": "WIX 46589",
+   "number_norm": "WIX46589",
+   "brand": "Wix",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 681,
+   "catalog_no": "6I2510",
+   "number": "LAF4510",
+   "number_norm": "LAF4510",
+   "brand": "Luber-finer",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 681,
+   "catalog_no": "6I2510",
+   "number": "A5563",
+   "number_norm": "A5563",
+   "brand": "Sakura",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 681,
+   "catalog_no": "6I2510",
+   "number": "FA3256",
+   "number_norm": "FA3256",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 682,
+   "catalog_no": "1327167",
+   "number": "P532509",
+   "number_norm": "P532509",
+   "brand": "Donaldson",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 682,
+   "catalog_no": "1327167",
+   "number": "AF25137M",
+   "number_norm": "AF25137M",
+   "brand": "Fleetguard",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 682,
+   "catalog_no": "1327167",
+   "number": "CAT 6I-2509",
+   "number_norm": "CAT6I2509",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 682,
+   "catalog_no": "1327167",
+   "number": "RS3514",
+   "number_norm": "RS3514",
+   "brand": "Baldwin",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 682,
+   "catalog_no": "1327167",
+   "number": "C32160",
+   "number_norm": "C32160",
+   "brand": "Mann",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 682,
+   "catalog_no": "1327167",
+   "number": "SA16983",
+   "number_norm": "SA16983",
+   "brand": "Hifi",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 682,
+   "catalog_no": "1327167",
+   "number": "AF2210",
+   "number_norm": "AF2210",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 682,
+   "catalog_no": "1327167",
+   "number": "LAF4509",
+   "number_norm": "LAF4509",
+   "brand": "Luber-finer",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 682,
+   "catalog_no": "1327167",
+   "number": "88742",
+   "number_norm": "88742",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 682,
+   "catalog_no": "1327167",
+   "number": "6I-2509",
+   "number_norm": "6I2509",
+   "brand": "Sakura",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 683,
+   "catalog_no": "3222 1881 42",
+   "number": "3222 1881 41",
+   "number_norm": "3222188141",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 683,
+   "catalog_no": "3222 1881 42",
+   "number": "48076592",
+   "number_norm": "48076592",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 683,
+   "catalog_no": "3222 1881 42",
+   "number": "19500340",
+   "number_norm": "19500340",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 683,
+   "catalog_no": "3222 1881 42",
+   "number": "100048354",
+   "number_norm": "100048354",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 683,
+   "catalog_no": "3222 1881 42",
+   "number": "MM0311575",
+   "number_norm": "MM0311575",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 683,
+   "catalog_no": "3222 1881 42",
+   "number": "11212778",
+   "number_norm": "11212778",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 683,
+   "catalog_no": "3222 1881 42",
+   "number": "11Q728020",
+   "number_norm": "11Q728020",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 684,
+   "catalog_no": "3222 1881 52",
+   "number": "3222 1881",
+   "number_norm": "32221881",
+   "brand": "Atlas Copco",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 688,
+   "catalog_no": "BG00443705",
+   "number": "BG00443705",
+   "number_norm": "BG00443705",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 688,
+   "catalog_no": "BG00443705",
+   "number": "TH540",
+   "number_norm": "TH540",
+   "brand": "Sandvik",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 688,
+   "catalog_no": "BG00443705",
+   "number": "TH550",
+   "number_norm": "TH550",
+   "brand": "Sandvik",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 689,
+   "catalog_no": "BG00987382",
+   "number": "BG00987382",
+   "number_norm": "BG00987382",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 690,
+   "catalog_no": "BG00657182",
+   "number": "BG00657182",
+   "number_norm": "BG00657182",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 690,
+   "catalog_no": "BG00657182",
+   "number": "TH320",
+   "number_norm": "TH320",
+   "brand": "Sandvik",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 691,
+   "catalog_no": "BG00838933",
+   "number": "BG00838933",
+   "number_norm": "BG00838933",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 691,
+   "catalog_no": "BG00838933",
+   "number": "TH320",
+   "number_norm": "TH320",
+   "brand": "Sandvik",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 693,
+   "catalog_no": "69032289",
+   "number": "OFS 97-22-0609",
+   "number_norm": "OFS97220609",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 697,
+   "catalog_no": "6060085486",
+   "number": "6060012478",
+   "number_norm": "6060012478",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 4,
+   "catalog_no": "3115917094",
+   "number": "3115917091",
+   "number_norm": "3115917091",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 4,
+   "catalog_no": "3115917094",
+   "number": "3115917092",
+   "number_norm": "3115917092",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 5,
+   "catalog_no": "3115153600",
+   "number": "N 3115153600",
+   "number_norm": "N3115153600",
+   "brand": "Atlas Copco",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 6,
+   "catalog_no": "3115336500",
+   "number": "N 3115336500",
+   "number_norm": "N3115336500",
+   "brand": "Atlas Copco",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 7,
+   "catalog_no": "3115376800",
+   "number": "N 3115376800",
+   "number_norm": "N3115376800",
+   "brand": "Atlas Copco",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 9,
+   "catalog_no": "3115901218",
+   "number": "N 3115901218",
+   "number_norm": "N3115901218",
+   "brand": "Atlas Copco",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 9,
+   "catalog_no": "3115901218",
+   "number": "3115 90",
+   "number_norm": "311590",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 11,
+   "catalog_no": "3115523400",
+   "number": "N 3115523400",
+   "number_norm": "N3115523400",
+   "brand": "Atlas Copco",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 12,
+   "catalog_no": "3115306000",
+   "number": "N 3115306000",
+   "number_norm": "N3115306000",
+   "brand": "Atlas Copco",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 12,
+   "catalog_no": "3115306000",
+   "number": "3115 30",
+   "number_norm": "311530",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 13,
+   "catalog_no": "3115233300",
+   "number": "N 3115233300",
+   "number_norm": "N3115233300",
+   "brand": "Atlas Copco",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 16,
+   "catalog_no": "3115305600",
+   "number": "N 3115305600",
+   "number_norm": "N3115305600",
+   "brand": "Atlas Copco",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 16,
+   "catalog_no": "3115305600",
+   "number": "3115 30",
+   "number_norm": "311530",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 20,
+   "catalog_no": "3115357400",
+   "number": "COP 4050",
+   "number_norm": "COP4050",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 20,
+   "catalog_no": "3115357400",
+   "number": "3115 3550 00",
+   "number_norm": "3115355000",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 20,
+   "catalog_no": "3115357400",
+   "number": "3115 3744 00",
+   "number_norm": "3115374400",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 20,
+   "catalog_no": "3115357400",
+   "number": "3115 3063 00",
+   "number_norm": "3115306300",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 23,
+   "catalog_no": "3115601036",
+   "number": "COP 4050",
+   "number_norm": "COP4050",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 23,
+   "catalog_no": "3115601036",
+   "number": "9120 0993",
+   "number_norm": "91200993",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 27,
+   "catalog_no": "3115505002",
+   "number": "COP 2238",
+   "number_norm": "COP2238",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 27,
+   "catalog_no": "3115505002",
+   "number": "2238HD",
+   "number_norm": "2238HD",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 27,
+   "catalog_no": "3115505002",
+   "number": "3115 1881 00",
+   "number_norm": "3115188100",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 27,
+   "catalog_no": "3115505002",
+   "number": "3115 1880 00",
+   "number_norm": "3115188000",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 36,
+   "catalog_no": "31153593 00",
+   "number": "3115192602",
+   "number_norm": "3115192602",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 41,
+   "catalog_no": "3115574580",
+   "number": "COP 3060",
+   "number_norm": "COP3060",
+   "brand": "Epiroc",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 42,
+   "catalog_no": "3115936200",
+   "number": "COP 3060ME",
+   "number_norm": "COP3060ME",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 42,
+   "catalog_no": "3115936200",
+   "number": "3115936201",
+   "number_norm": "3115936201",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 42,
+   "catalog_no": "3115936200",
+   "number": "3115936210",
+   "number_norm": "3115936210",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 44,
+   "catalog_no": "3115936204",
+   "number": "3115 9362 00",
+   "number_norm": "3115936200",
+   "brand": "Epiroc",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 44,
+   "catalog_no": "3115936204",
+   "number": "COP 3060ME",
+   "number_norm": "COP3060ME",
+   "brand": "Epiroc",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 55,
+   "catalog_no": "3115901183",
+   "number": "3115 6001 78",
+   "number_norm": "3115600178",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 57,
+   "catalog_no": "3115600784",
+   "number": "9853 6952 20",
+   "number_norm": "9853695220",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 58,
+   "catalog_no": "3115169091",
+   "number": "3115169092",
+   "number_norm": "3115169092",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 58,
+   "catalog_no": "3115169091",
+   "number": "COP 1028",
+   "number_norm": "COP1028",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 58,
+   "catalog_no": "3115169091",
+   "number": "3115901183",
+   "number_norm": "3115901183",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 58,
+   "catalog_no": "3115169091",
+   "number": "3115901184",
+   "number_norm": "3115901184",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 64,
+   "catalog_no": "3115535601",
+   "number": "3115 5356 00",
+   "number_norm": "3115535600",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 700,
+   "catalog_no": "23077N",
+   "number": "23077N",
+   "number_norm": "23077N",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 700,
+   "catalog_no": "23077N",
+   "number": "12001709",
+   "number_norm": "12001709",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 701,
+   "catalog_no": "23392N",
+   "number": "35-52-5",
+   "number_norm": "35525",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 701,
+   "catalog_no": "23392N",
+   "number": "NAK 23392N",
+   "number_norm": "NAK23392N",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 702,
+   "catalog_no": "22439N",
+   "number": "SCN5W22 35",
+   "number_norm": "SCN5W2235",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 702,
+   "catalog_no": "22439N",
+   "number": "035.048.05SCNW",
+   "number_norm": "03504805SCNW",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 75,
+   "catalog_no": "3115182201",
+   "number": "3115182200",
+   "number_norm": "3115182200",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 75,
+   "catalog_no": "3115182201",
+   "number": "3115265000",
+   "number_norm": "3115265000",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 75,
+   "catalog_no": "3115182201",
+   "number": "3115158200",
+   "number_norm": "3115158200",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 75,
+   "catalog_no": "3115182201",
+   "number": "3115026200",
+   "number_norm": "3115026200",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 75,
+   "catalog_no": "3115182201",
+   "number": "3115531400",
+   "number_norm": "3115531400",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 75,
+   "catalog_no": "3115182201",
+   "number": "3115295000",
+   "number_norm": "3115295000",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 75,
+   "catalog_no": "3115182201",
+   "number": "3115504200",
+   "number_norm": "3115504200",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 75,
+   "catalog_no": "3115182201",
+   "number": "3115212000",
+   "number_norm": "3115212000",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 75,
+   "catalog_no": "3115182201",
+   "number": "3115212600",
+   "number_norm": "3115212600",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 75,
+   "catalog_no": "3115182201",
+   "number": "3115212900",
+   "number_norm": "3115212900",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 75,
+   "catalog_no": "3115182201",
+   "number": "3115167100",
+   "number_norm": "3115167100",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 92,
+   "catalog_no": "04224846",
+   "number": "04204796",
+   "number_norm": "04204796",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 92,
+   "catalog_no": "04224846",
+   "number": "02931782",
+   "number_norm": "02931782",
+   "brand": "Deutz",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 93,
+   "catalog_no": "04290986",
+   "number": "0445120066",
+   "number_norm": "0445120066",
+   "brand": "Bosch",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 93,
+   "catalog_no": "04290986",
+   "number": "04299311",
+   "number_norm": "04299311",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 93,
+   "catalog_no": "04290986",
+   "number": "04289311",
+   "number_norm": "04289311",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 93,
+   "catalog_no": "04290986",
+   "number": "4290986",
+   "number_norm": "4290986",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 93,
+   "catalog_no": "04290986",
+   "number": "20798114",
+   "number_norm": "20798114",
+   "brand": "Volvo",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 93,
+   "catalog_no": "04290986",
+   "number": "VOE20798114",
+   "number_norm": "VOE20798114",
+   "brand": "Volvo",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 93,
+   "catalog_no": "04290986",
+   "number": "0986435548",
+   "number_norm": "0986435548",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 93,
+   "catalog_no": "04290986",
+   "number": "7420798114",
+   "number_norm": "7420798114",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 93,
+   "catalog_no": "04290986",
+   "number": "3803977",
+   "number_norm": "3803977",
+   "brand": "Volvo",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 94,
+   "catalog_no": "04290987",
+   "number": "4290987",
+   "number_norm": "4290987",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 94,
+   "catalog_no": "04290987",
+   "number": "0445120067",
+   "number_norm": "0445120067",
+   "brand": "Bosch",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 94,
+   "catalog_no": "04290987",
+   "number": "445 120 067",
+   "number_norm": "445120067",
+   "brand": "Bosch",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 94,
+   "catalog_no": "04290987",
+   "number": "20798683",
+   "number_norm": "20798683",
+   "brand": "Volvo",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 94,
+   "catalog_no": "04290987",
+   "number": "VOE20798683",
+   "number_norm": "VOE20798683",
+   "brand": "Volvo",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 94,
+   "catalog_no": "04290987",
+   "number": "7420798683",
+   "number_norm": "7420798683",
+   "brand": "Volvo",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 94,
+   "catalog_no": "04290987",
+   "number": "0986435549",
+   "number_norm": "0986435549",
+   "brand": "Bosch",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 94,
+   "catalog_no": "04290987",
+   "number": "04290986",
+   "number_norm": "04290986",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 94,
+   "catalog_no": "04290987",
+   "number": "03050480",
+   "number_norm": "03050480",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 104,
+   "catalog_no": "3177308500",
+   "number": "3177 3072 00",
+   "number_norm": "3177307200",
+   "brand": "Atlas Copco",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 104,
+   "catalog_no": "3177308500",
+   "number": "662001033",
+   "number_norm": "662001033",
+   "brand": "Epiroc",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 104,
+   "catalog_no": "3177308500",
+   "number": "662001023",
+   "number_norm": "662001023",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 104,
+   "catalog_no": "3177308500",
+   "number": "F11-006",
+   "number_norm": "F11006",
+   "brand": "Parker",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 104,
+   "catalog_no": "3177308500",
+   "number": "F11-010",
+   "number_norm": "F11010",
+   "brand": "Parker",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 104,
+   "catalog_no": "3177308500",
+   "number": "F11-012",
+   "number_norm": "F11012",
+   "brand": "Parker",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 104,
+   "catalog_no": "3177308500",
+   "number": "F11-014",
+   "number_norm": "F11014",
+   "brand": "Parker",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 104,
+   "catalog_no": "3177308500",
+   "number": "F11-019",
+   "number_norm": "F11019",
+   "brand": "Parker",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 105,
+   "catalog_no": "9106071336",
+   "number": "9106 0713 06",
+   "number_norm": "9106071306",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 106,
+   "catalog_no": "9106219204",
+   "number": "9106 2192",
+   "number_norm": "91062192",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 106,
+   "catalog_no": "9106219204",
+   "number": "9106 2192 03",
+   "number_norm": "9106219203",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 106,
+   "catalog_no": "9106219204",
+   "number": "RE-15-1-G02",
+   "number_norm": "RE151G02",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 106,
+   "catalog_no": "9106219204",
+   "number": "9106 2192 16",
+   "number_norm": "9106219216",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 106,
+   "catalog_no": "9106219204",
+   "number": "120 300 269",
+   "number_norm": "120300269",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 107,
+   "catalog_no": "9106219217",
+   "number": "9106 2192",
+   "number_norm": "91062192",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 107,
+   "catalog_no": "9106219217",
+   "number": "9106219216",
+   "number_norm": "9106219216",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 107,
+   "catalog_no": "9106219217",
+   "number": "9106219203",
+   "number_norm": "9106219203",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 107,
+   "catalog_no": "9106219217",
+   "number": "9106219220",
+   "number_norm": "9106219220",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 107,
+   "catalog_no": "9106219217",
+   "number": "9106219221",
+   "number_norm": "9106219221",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 109,
+   "catalog_no": "3217925650",
+   "number": "A10VO",
+   "number_norm": "A10VO",
+   "brand": "Bosch Rexroth",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 111,
+   "catalog_no": "9106975591",
+   "number": "9106 2192",
+   "number_norm": "91062192",
+   "brand": "Epiroc",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 123,
+   "catalog_no": "04295289",
+   "number": "BF4M2012",
+   "number_norm": "BF4M2012",
+   "brand": "Normet",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 123,
+   "catalog_no": "04295289",
+   "number": "TCD2012",
+   "number_norm": "TCD2012",
+   "brand": "Normet",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 123,
+   "catalog_no": "04295289",
+   "number": "04258199",
+   "number_norm": "04258199",
+   "brand": "Normet",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 123,
+   "catalog_no": "04295289",
+   "number": "04255272",
+   "number_norm": "04255272",
+   "brand": "Normet",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 123,
+   "catalog_no": "04295289",
+   "number": "04258205",
+   "number_norm": "04258205",
+   "brand": "Normet",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 123,
+   "catalog_no": "04295289",
+   "number": "04254537",
+   "number_norm": "04254537",
+   "brand": "Normet",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 123,
+   "catalog_no": "04295289",
+   "number": "04293692",
+   "number_norm": "04293692",
+   "brand": "Normet",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 123,
+   "catalog_no": "04295289",
+   "number": "318281",
+   "number_norm": "318281",
+   "brand": "Normet",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 123,
+   "catalog_no": "04295289",
+   "number": "311384",
+   "number_norm": "311384",
+   "brand": "Normet",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 124,
+   "catalog_no": "04298278",
+   "number": "TCD2013",
+   "number_norm": "TCD2013",
+   "brand": "Deutz",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 124,
+   "catalog_no": "04298278",
+   "number": "04253832",
+   "number_norm": "04253832",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 124,
+   "catalog_no": "04298278",
+   "number": "04259315",
+   "number_norm": "04259315",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 706,
+   "catalog_no": "100013460",
+   "number": "100050764",
+   "number_norm": "100050764",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 706,
+   "catalog_no": "100013460",
+   "number": "100013556",
+   "number_norm": "100013556",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 706,
+   "catalog_no": "100013460",
+   "number": "100050752",
+   "number_norm": "100050752",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 706,
+   "catalog_no": "100013460",
+   "number": "100013617",
+   "number_norm": "100013617",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 707,
+   "catalog_no": "100013629",
+   "number": "LF 050",
+   "number_norm": "LF050",
+   "brand": "Normet",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 707,
+   "catalog_no": "100013629",
+   "number": "100007150",
+   "number_norm": "100007150",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 707,
+   "catalog_no": "100013629",
+   "number": "56060270",
+   "number_norm": "56060270",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 707,
+   "catalog_no": "100013629",
+   "number": "LF050DC",
+   "number_norm": "LF050DC",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 127,
+   "catalog_no": "9106077588",
+   "number": "9106077580",
+   "number_norm": "9106077580",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 127,
+   "catalog_no": "9106077588",
+   "number": "9106077582",
+   "number_norm": "9106077582",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 128,
+   "catalog_no": "04282358",
+   "number": "02113757",
+   "number_norm": "02113757",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 128,
+   "catalog_no": "04282358",
+   "number": "02113803",
+   "number_norm": "02113803",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 128,
+   "catalog_no": "04282358",
+   "number": "02113816",
+   "number_norm": "02113816",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 128,
+   "catalog_no": "04282358",
+   "number": "04503576",
+   "number_norm": "04503576",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 128,
+   "catalog_no": "04282358",
+   "number": "04288617",
+   "number_norm": "04288617",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 128,
+   "catalog_no": "04282358",
+   "number": "20917999",
+   "number_norm": "20917999",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 128,
+   "catalog_no": "04282358",
+   "number": "02111299",
+   "number_norm": "02111299",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 131,
+   "catalog_no": "3176450566",
+   "number": "3176 4505 68",
+   "number_norm": "3176450568",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 134,
+   "catalog_no": "3128008216",
+   "number": "END 3128 3013 89",
+   "number_norm": "END3128301389",
+   "brand": "Atlas Copco",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 140,
+   "catalog_no": "3E-6451",
+   "number": "3E6451",
+   "number_norm": "3E6451",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 141,
+   "catalog_no": "459-2593",
+   "number": "174-4312",
+   "number_norm": "1744312",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 143,
+   "catalog_no": "56015324",
+   "number": "15324",
+   "number_norm": "15324",
+   "brand": "Sandvik",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 144,
+   "catalog_no": "194-6725",
+   "number": "194-6722",
+   "number_norm": "1946722",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 144,
+   "catalog_no": "194-6725",
+   "number": "194-6724",
+   "number_norm": "1946724",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 144,
+   "catalog_no": "194-6725",
+   "number": "194-6726",
+   "number_norm": "1946726",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 150,
+   "catalog_no": "1638530",
+   "number": "03-0220B",
+   "number_norm": "030220B",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 152,
+   "catalog_no": "55158399",
+   "number": "LH410",
+   "number_norm": "LH410",
+   "brand": "Sandvik Tamrock",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 153,
+   "catalog_no": "5580016648",
+   "number": "5580 0166 49",
+   "number_norm": "5580016649",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 154,
+   "catalog_no": "5580016649",
+   "number": "5580 0166 48",
+   "number_norm": "5580016648",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 155,
+   "catalog_no": "56002679",
+   "number": "55158399",
+   "number_norm": "55158399",
+   "brand": "Sandvik Tamrock",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 155,
+   "catalog_no": "56002679",
+   "number": "TH-540",
+   "number_norm": "TH540",
+   "brand": "Sandvik Tamrock",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 157,
+   "catalog_no": "256-6453",
+   "number": "CAT 234-5012",
+   "number_norm": "CAT2345012",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 157,
+   "catalog_no": "256-6453",
+   "number": "2345012",
+   "number_norm": "2345012",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 157,
+   "catalog_no": "256-6453",
+   "number": "350571",
+   "number_norm": "350571",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 157,
+   "catalog_no": "256-6453",
+   "number": "256-6454",
+   "number_norm": "2566454",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 159,
+   "catalog_no": "56014458",
+   "number": "TH540",
+   "number_norm": "TH540",
+   "brand": "Volvo",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 160,
+   "catalog_no": "2644297",
+   "number": "1309811",
+   "number_norm": "1309811",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 173,
+   "catalog_no": "3176001087",
+   "number": "3176 0010 94",
+   "number_norm": "3176001094",
+   "brand": "Atlas Copco",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 180,
+   "catalog_no": "56017692",
+   "number": "56015478",
+   "number_norm": "56015478",
+   "brand": "Sandvik",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 181,
+   "catalog_no": "4696523",
+   "number": "04696523",
+   "number_norm": "04696523",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 194,
+   "catalog_no": "212-0510",
+   "number": "CA2120510",
+   "number_norm": "CA2120510",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 198,
+   "catalog_no": "69041377",
+   "number": "55041212",
+   "number_norm": "55041212",
+   "brand": "Sandvik",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 199,
+   "catalog_no": "6E3524",
+   "number": "9J5764",
+   "number_norm": "9J5764",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 199,
+   "catalog_no": "6E3524",
+   "number": "9T5199",
+   "number_norm": "9T5199",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 199,
+   "catalog_no": "6E3524",
+   "number": "6E3524-A",
+   "number_norm": "6E3524A",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 201,
+   "catalog_no": "69041386",
+   "number": "BG00227281",
+   "number_norm": "BG00227281",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 202,
+   "catalog_no": "21631484",
+   "number": "20491753",
+   "number_norm": "20491753",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 202,
+   "catalog_no": "21631484",
+   "number": "21155561",
+   "number_norm": "21155561",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 202,
+   "catalog_no": "21631484",
+   "number": "21145261",
+   "number_norm": "21145261",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 202,
+   "catalog_no": "21631484",
+   "number": "15187600",
+   "number_norm": "15187600",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 202,
+   "catalog_no": "21631484",
+   "number": "APV1115",
+   "number_norm": "APV1115",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 202,
+   "catalog_no": "21631484",
+   "number": "89456",
+   "number_norm": "89456",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 202,
+   "catalog_no": "21631484",
+   "number": "VKM910020",
+   "number_norm": "VKM910020",
+   "brand": "SKF",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 205,
+   "catalog_no": "BG00425997",
+   "number": "BG00425997",
+   "number_norm": "BG00425997",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 206,
+   "catalog_no": "114-5333",
+   "number": "2601038",
+   "number_norm": "2601038",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 206,
+   "catalog_no": "114-5333",
+   "number": "MEI 1538",
+   "number_norm": "MEI1538",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 206,
+   "catalog_no": "114-5333",
+   "number": "11-3028",
+   "number_norm": "113028",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 206,
+   "catalog_no": "114-5333",
+   "number": "220-1052",
+   "number_norm": "2201052",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 206,
+   "catalog_no": "114-5333",
+   "number": "29-30740",
+   "number_norm": "2930740",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 206,
+   "catalog_no": "114-5333",
+   "number": "14-5458",
+   "number_norm": "145458",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 206,
+   "catalog_no": "114-5333",
+   "number": "MC-1318K",
+   "number_norm": "MC1318K",
+   "brand": "INA",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 207,
+   "catalog_no": "139-2118",
+   "number": "8906K5419",
+   "number_norm": "8906K5419",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 209,
+   "catalog_no": "3T-1730",
+   "number": "3T1730",
+   "number_norm": "3T1730",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 214,
+   "catalog_no": "352-0206",
+   "number": "10R-2129",
+   "number_norm": "10R2129",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 217,
+   "catalog_no": "434-1525",
+   "number": "CAT 434-1525",
+   "number_norm": "CAT4341525",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 218,
+   "catalog_no": "204-4311",
+   "number": "CAT 204-4311",
+   "number_norm": "CAT2044311",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 227,
+   "catalog_no": "248-5513",
+   "number": "4W4794",
+   "number_norm": "4W4794",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 227,
+   "catalog_no": "248-5513",
+   "number": "1743504",
+   "number_norm": "1743504",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 227,
+   "catalog_no": "248-5513",
+   "number": "247-7133",
+   "number_norm": "2477133",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 229,
+   "catalog_no": "BG00407855",
+   "number": "BG00407855",
+   "number_norm": "BG00407855",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 230,
+   "catalog_no": "3B8489",
+   "number": "3B8489",
+   "number_norm": "3B8489",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 231,
+   "catalog_no": "9N-1941",
+   "number": "9N-1941",
+   "number_norm": "9N1941",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 231,
+   "catalog_no": "9N-1941",
+   "number": "457-9164",
+   "number_norm": "4579164",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 231,
+   "catalog_no": "9N-1941",
+   "number": "149.40",
+   "number_norm": "14940",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 711,
+   "catalog_no": "6033GB3010",
+   "number": "6033GB3010",
+   "number_norm": "6033GB3010",
+   "brand": "Bosch",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 711,
+   "catalog_no": "6033GB3010",
+   "number": "0120501151",
+   "number_norm": "0120501151",
+   "brand": "Bosch",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 711,
+   "catalog_no": "6033GB3010",
+   "number": "0120469119",
+   "number_norm": "0120469119",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 711,
+   "catalog_no": "6033GB3010",
+   "number": "0120468143",
+   "number_norm": "0120468143",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 711,
+   "catalog_no": "6033GB3010",
+   "number": "0120468145",
+   "number_norm": "0120468145",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 711,
+   "catalog_no": "6033GB3010",
+   "number": "6033GB3023",
+   "number_norm": "6033GB3023",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 711,
+   "catalog_no": "6033GB3010",
+   "number": "6033GB3083",
+   "number_norm": "6033GB3083",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 711,
+   "catalog_no": "6033GB3010",
+   "number": "0986043890",
+   "number_norm": "0986043890",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 711,
+   "catalog_no": "6033GB3010",
+   "number": "0101548902",
+   "number_norm": "0101548902",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 711,
+   "catalog_no": "6033GB3010",
+   "number": "0101549202",
+   "number_norm": "0101549202",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 250,
+   "catalog_no": "4209751",
+   "number": "4209752",
+   "number_norm": "4209752",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 250,
+   "catalog_no": "4209751",
+   "number": "4209784",
+   "number_norm": "4209784",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 250,
+   "catalog_no": "4209751",
+   "number": "4212047",
+   "number_norm": "4212047",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 250,
+   "catalog_no": "4209751",
+   "number": "15.7TE32418-17",
+   "number_norm": "157TE3241817",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 257,
+   "catalog_no": "2746718",
+   "number": "274-6721",
+   "number_norm": "2746721",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 258,
+   "catalog_no": "8002370",
+   "number": "08002370",
+   "number_norm": "08002370",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 265,
+   "catalog_no": "1285346",
+   "number": "222-5079",
+   "number_norm": "2225079",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 269,
+   "catalog_no": "134-2252",
+   "number": "CAT 134-2252",
+   "number_norm": "CAT1342252",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 272,
+   "catalog_no": "3E7692",
+   "number": "3E7692",
+   "number_norm": "3E7692",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 272,
+   "catalog_no": "3E7692",
+   "number": "CA3E7692",
+   "number_norm": "CA3E7692",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 274,
+   "catalog_no": "459-2599",
+   "number": "459-2593",
+   "number_norm": "4592593",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 274,
+   "catalog_no": "459-2599",
+   "number": "459-2594",
+   "number_norm": "4592594",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 277,
+   "catalog_no": "2213411",
+   "number": "CA2213411",
+   "number_norm": "CA2213411",
+   "brand": "Caterpillar",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 278,
+   "catalog_no": "3618400",
+   "number": "CA3618400",
+   "number_norm": "CA3618400",
+   "brand": "Caterpillar",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 282,
+   "catalog_no": "00736521",
+   "number": "BG00736521",
+   "number_norm": "BG00736521",
+   "brand": "Sandvik",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 282,
+   "catalog_no": "00736521",
+   "number": "BG00359486",
+   "number_norm": "BG00359486",
+   "brand": "Sandvik",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 282,
+   "catalog_no": "00736521",
+   "number": "55037834",
+   "number_norm": "55037834",
+   "brand": "Sandvik",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 284,
+   "catalog_no": "6060012715",
+   "number": "60600012715",
+   "number_norm": "60600012715",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 286,
+   "catalog_no": "3176000290",
+   "number": "200300208",
+   "number_norm": "200300208",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 287,
+   "catalog_no": "5580009012",
+   "number": "55800009012",
+   "number_norm": "55800009012",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 290,
+   "catalog_no": "239-9957",
+   "number": "CA2399957",
+   "number_norm": "CA2399957",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 290,
+   "catalog_no": "239-9957",
+   "number": "430-9449",
+   "number_norm": "4309449",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 290,
+   "catalog_no": "239-9957",
+   "number": "4903489",
+   "number_norm": "4903489",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 291,
+   "catalog_no": "56018703",
+   "number": "55018882",
+   "number_norm": "55018882",
+   "brand": "Sandvik",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 294,
+   "catalog_no": "4913721",
+   "number": "0811994-001",
+   "number_norm": "0811994001",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 294,
+   "catalog_no": "4913721",
+   "number": "CAT 160-3518",
+   "number_norm": "CAT1603518",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 299,
+   "catalog_no": "56045189",
+   "number": "56016274",
+   "number_norm": "56016274",
+   "brand": "Sandvik",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 300,
+   "catalog_no": "56042596",
+   "number": "56016274",
+   "number_norm": "56016274",
+   "brand": "Sandvik",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 301,
+   "catalog_no": "BG00208794",
+   "number": "BG00208794",
+   "number_norm": "BG00208794",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 301,
+   "catalog_no": "BG00208794",
+   "number": "VD5LZ.1",
+   "number_norm": "VD5LZ1",
+   "brand": "Hydac",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 313,
+   "catalog_no": "BG00271733",
+   "number": "BG00271733",
+   "number_norm": "BG00271733",
+   "brand": "Sandvik",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 313,
+   "catalog_no": "BG00271733",
+   "number": "TH540",
+   "number_norm": "TH540",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 313,
+   "catalog_no": "BG00271733",
+   "number": "55042065",
+   "number_norm": "55042065",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 313,
+   "catalog_no": "BG00271733",
+   "number": "56037183",
+   "number_norm": "56037183",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 314,
+   "catalog_no": "56041887",
+   "number": "TH540",
+   "number_norm": "TH540",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 320,
+   "catalog_no": "BG00343149",
+   "number": "BG00343149",
+   "number_norm": "BG00343149",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 321,
+   "catalog_no": "1U0423",
+   "number": "1U0423",
+   "number_norm": "1U0423",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 321,
+   "catalog_no": "1U0423",
+   "number": "CAT 1U0423",
+   "number_norm": "CAT1U0423",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 322,
+   "catalog_no": "56024135",
+   "number": "24135",
+   "number_norm": "24135",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 323,
+   "catalog_no": "56024134",
+   "number": "24134",
+   "number_norm": "24134",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 323,
+   "catalog_no": "56024134",
+   "number": "R900938760",
+   "number_norm": "R900938760",
+   "brand": "Rexroth",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 324,
+   "catalog_no": "04698577",
+   "number": "TH540",
+   "number_norm": "TH540",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 324,
+   "catalog_no": "04698577",
+   "number": "55042065",
+   "number_norm": "55042065",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 324,
+   "catalog_no": "04698577",
+   "number": "56037183",
+   "number_norm": "56037183",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 325,
+   "catalog_no": "56203193",
+   "number": "TH540",
+   "number_norm": "TH540",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 326,
+   "catalog_no": "56013070",
+   "number": "TH540",
+   "number_norm": "TH540",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 328,
+   "catalog_no": "00225228",
+   "number": "BG00225228",
+   "number_norm": "BG00225228",
+   "brand": "Sandvik",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 328,
+   "catalog_no": "00225228",
+   "number": "55047602",
+   "number_norm": "55047602",
+   "brand": "Sandvik",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 328,
+   "catalog_no": "00225228",
+   "number": "55047603",
+   "number_norm": "55047603",
+   "brand": "Sandvik",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 330,
+   "catalog_no": "270-1535",
+   "number": "CA2701535",
+   "number_norm": "CA2701535",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 331,
+   "catalog_no": "6060 0041 42",
+   "number": "6060001357",
+   "number_norm": "6060001357",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 331,
+   "catalog_no": "6060 0041 42",
+   "number": "6060012046",
+   "number_norm": "6060012046",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 331,
+   "catalog_no": "6060 0041 42",
+   "number": "6060001380",
+   "number_norm": "6060001380",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 333,
+   "catalog_no": "3E-1906",
+   "number": "3E1906",
+   "number_norm": "3E1906",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 333,
+   "catalog_no": "3E-1906",
+   "number": "SD7H15",
+   "number_norm": "SD7H15",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 333,
+   "catalog_no": "3E-1906",
+   "number": "CAT 101-1759",
+   "number_norm": "CAT1011759",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 333,
+   "catalog_no": "3E-1906",
+   "number": "CAT 134-3997",
+   "number_norm": "CAT1343997",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 333,
+   "catalog_no": "3E-1906",
+   "number": "CAT 240-9718",
+   "number_norm": "CAT2409718",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 333,
+   "catalog_no": "3E-1906",
+   "number": "CAT 8T8816",
+   "number_norm": "CAT8T8816",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 334,
+   "catalog_no": "3535983",
+   "number": "CA3535983",
+   "number_norm": "CA3535983",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 336,
+   "catalog_no": "56210698",
+   "number": "10698",
+   "number_norm": "10698",
+   "brand": "Sandvik",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 337,
+   "catalog_no": "56043868",
+   "number": "55172641",
+   "number_norm": "55172641",
+   "brand": "Sandvik",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 337,
+   "catalog_no": "56043868",
+   "number": "55158399",
+   "number_norm": "55158399",
+   "brand": "Sandvik",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 338,
+   "catalog_no": "BG01048662",
+   "number": "BG01048662",
+   "number_norm": "BG01048662",
+   "brand": "Sandvik",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 343,
+   "catalog_no": "BG01026539",
+   "number": "BG01026539",
+   "number_norm": "BG01026539",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 343,
+   "catalog_no": "BG01026539",
+   "number": "TH540",
+   "number_norm": "TH540",
+   "brand": "Sandvik",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 343,
+   "catalog_no": "BG01026539",
+   "number": "77794282",
+   "number_norm": "77794282",
+   "brand": "Sandvik",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 343,
+   "catalog_no": "BG01026539",
+   "number": "55042065",
+   "number_norm": "55042065",
+   "brand": "Sandvik",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 343,
+   "catalog_no": "BG01026539",
+   "number": "56037183",
+   "number_norm": "56037183",
+   "brand": "Sandvik",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 344,
+   "catalog_no": "8E-1217",
+   "number": "8E-1217",
+   "number_norm": "8E1217",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 345,
+   "catalog_no": "211-3336",
+   "number": "6P-7358",
+   "number_norm": "6P7358",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 345,
+   "catalog_no": "211-3336",
+   "number": "R1700G",
+   "number_norm": "R1700G",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 351,
+   "catalog_no": "56003565",
+   "number": "TH540",
+   "number_norm": "TH540",
+   "brand": "Sandvik",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 351,
+   "catalog_no": "56003565",
+   "number": "77794282",
+   "number_norm": "77794282",
+   "brand": "Sandvik",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 351,
+   "catalog_no": "56003565",
+   "number": "55042065",
+   "number_norm": "55042065",
+   "brand": "Sandvik",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 351,
+   "catalog_no": "56003565",
+   "number": "56037183",
+   "number_norm": "56037183",
+   "brand": "Sandvik",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 362,
+   "catalog_no": "6P7358",
+   "number": "6P-7358",
+   "number_norm": "6P7358",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 362,
+   "catalog_no": "6P7358",
+   "number": "0R7798",
+   "number_norm": "0R7798",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 362,
+   "catalog_no": "6P7358",
+   "number": "3089913",
+   "number_norm": "3089913",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 362,
+   "catalog_no": "6P7358",
+   "number": "6P7361",
+   "number_norm": "6P7361",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 368,
+   "catalog_no": "6Y-2065",
+   "number": "377-5844",
+   "number_norm": "3775844",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 368,
+   "catalog_no": "6Y-2065",
+   "number": "CA6Y2065",
+   "number_norm": "CA6Y2065",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 369,
+   "catalog_no": "7N-7988",
+   "number": "7N-7988",
+   "number_norm": "7N7988",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 371,
+   "catalog_no": "56049802",
+   "number": "LH514",
+   "number_norm": "LH514",
+   "brand": "Sandvik",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 375,
+   "catalog_no": "0574 0074 10",
+   "number": "РВД 0574",
+   "number_norm": "РВД0574",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 385,
+   "catalog_no": "5580 0215 60",
+   "number": "5580108671",
+   "number_norm": "5580108671",
+   "brand": "Epiroc",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 388,
+   "catalog_no": "5580 0109 13",
+   "number": "QSB6.7",
+   "number_norm": "QSB67",
+   "brand": "Cummins",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 388,
+   "catalog_no": "5580 0109 13",
+   "number": "5267911",
+   "number_norm": "5267911",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 388,
+   "catalog_no": "5580 0109 13",
+   "number": "4996707",
+   "number_norm": "4996707",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 388,
+   "catalog_no": "5580 0109 13",
+   "number": "4280007100",
+   "number_norm": "4280007100",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 388,
+   "catalog_no": "5580 0109 13",
+   "number": "428000-2860",
+   "number_norm": "4280002860",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 388,
+   "catalog_no": "5580 0109 13",
+   "number": "42800-2880",
+   "number_norm": "428002880",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 388,
+   "catalog_no": "5580 0109 13",
+   "number": "3971603",
+   "number_norm": "3971603",
+   "brand": "Cummins",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 389,
+   "catalog_no": "23288365",
+   "number": "21103722",
+   "number_norm": "21103722",
+   "brand": "Volvo",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 389,
+   "catalog_no": "23288365",
+   "number": "3801289",
+   "number_norm": "3801289",
+   "brand": "Volvo",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 389,
+   "catalog_no": "23288365",
+   "number": "3803838",
+   "number_norm": "3803838",
+   "brand": "Volvo",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 389,
+   "catalog_no": "23288365",
+   "number": "3801273",
+   "number_norm": "3801273",
+   "brand": "Volvo",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 389,
+   "catalog_no": "23288365",
+   "number": "M105R3540SE",
+   "number_norm": "M105R3540SE",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 389,
+   "catalog_no": "23288365",
+   "number": "11139212",
+   "number_norm": "11139212",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 389,
+   "catalog_no": "23288365",
+   "number": "AZG4886",
+   "number_norm": "AZG4886",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 389,
+   "catalog_no": "23288365",
+   "number": "IS9510",
+   "number_norm": "IS9510",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 390,
+   "catalog_no": "338-3454",
+   "number": "CA3383454",
+   "number_norm": "CA3383454",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 390,
+   "catalog_no": "338-3454",
+   "number": "0R-4272",
+   "number_norm": "0R4272",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 390,
+   "catalog_no": "338-3454",
+   "number": "10R-9815",
+   "number_norm": "10R9815",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 390,
+   "catalog_no": "338-3454",
+   "number": "10R-9816",
+   "number_norm": "10R9816",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 390,
+   "catalog_no": "338-3454",
+   "number": "20R-3250",
+   "number_norm": "20R3250",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 390,
+   "catalog_no": "338-3454",
+   "number": "237-1962",
+   "number_norm": "2371962",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 392,
+   "catalog_no": "56046885",
+   "number": "BF6M1013",
+   "number_norm": "BF6M1013",
+   "brand": "Deutz",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 392,
+   "catalog_no": "56046885",
+   "number": "01183712",
+   "number_norm": "01183712",
+   "brand": "Deutz",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 392,
+   "catalog_no": "56046885",
+   "number": "01180928",
+   "number_norm": "01180928",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 392,
+   "catalog_no": "56046885",
+   "number": "01183286",
+   "number_norm": "01183286",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 392,
+   "catalog_no": "56046885",
+   "number": "0001231005",
+   "number_norm": "0001231005",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 392,
+   "catalog_no": "56046885",
+   "number": "01180999",
+   "number_norm": "01180999",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 394,
+   "catalog_no": "56049469",
+   "number": "21581717",
+   "number_norm": "21581717",
+   "brand": "Volvo",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 394,
+   "catalog_no": "56049469",
+   "number": "22929437",
+   "number_norm": "22929437",
+   "brand": "Volvo",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 394,
+   "catalog_no": "56049469",
+   "number": "22719937",
+   "number_norm": "22719937",
+   "brand": "Volvo",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 395,
+   "catalog_no": "56043861",
+   "number": "TH-540",
+   "number_norm": "TH540",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 396,
+   "catalog_no": "56016491",
+   "number": "TH-540",
+   "number_norm": "TH540",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 397,
+   "catalog_no": "5580 0137 86",
+   "number": "4973373",
+   "number_norm": "4973373",
+   "brand": "Cummins",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 397,
+   "catalog_no": "5580 0137 86",
+   "number": "3974823",
+   "number_norm": "3974823",
+   "brand": "Cummins",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 400,
+   "catalog_no": "541-3404",
+   "number": "CAT 541-3404",
+   "number_norm": "CAT5413404",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 403,
+   "catalog_no": "188-7497",
+   "number": "CAT 188-7497",
+   "number_norm": "CAT1887497",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 408,
+   "catalog_no": "5580 0129 15",
+   "number": "04253824",
+   "number_norm": "04253824",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 408,
+   "catalog_no": "5580 0129 15",
+   "number": "04253824KZ",
+   "number_norm": "04253824KZ",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 408,
+   "catalog_no": "5580 0129 15",
+   "number": "314001",
+   "number_norm": "314001",
+   "brand": "Deutz",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 408,
+   "catalog_no": "5580 0129 15",
+   "number": "313935",
+   "number_norm": "313935",
+   "brand": "Deutz",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 408,
+   "catalog_no": "5580 0129 15",
+   "number": "BF6M1013",
+   "number_norm": "BF6M1013",
+   "brand": "Deutz",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 408,
+   "catalog_no": "5580 0129 15",
+   "number": "ST710",
+   "number_norm": "ST710",
+   "brand": "Deutz",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 409,
+   "catalog_no": "5580 0137 73",
+   "number": "4089988",
+   "number_norm": "4089988",
+   "brand": "Cummins",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 409,
+   "catalog_no": "5580 0137 73",
+   "number": "4040344",
+   "number_norm": "4040344",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 409,
+   "catalog_no": "5580 0137 73",
+   "number": "4040345",
+   "number_norm": "4040345",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 409,
+   "catalog_no": "5580 0137 73",
+   "number": "4036915",
+   "number_norm": "4036915",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 409,
+   "catalog_no": "5580 0137 73",
+   "number": "4089988DR",
+   "number_norm": "4089988DR",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 409,
+   "catalog_no": "5580 0137 73",
+   "number": "HX55W",
+   "number_norm": "HX55W",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 409,
+   "catalog_no": "5580 0137 73",
+   "number": "4089854",
+   "number_norm": "4089854",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 410,
+   "catalog_no": "56209526",
+   "number": "VOE20500295",
+   "number_norm": "VOE20500295",
+   "brand": "Volvo",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 410,
+   "catalog_no": "56209526",
+   "number": "VOE20485365",
+   "number_norm": "VOE20485365",
+   "brand": "Volvo",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 413,
+   "catalog_no": "430-9448",
+   "number": "265-9033",
+   "number_norm": "2659033",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 413,
+   "catalog_no": "430-9448",
+   "number": "129-6628",
+   "number_norm": "1296628",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 415,
+   "catalog_no": "430-9449",
+   "number": "CA4309449",
+   "number_norm": "CA4309449",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 415,
+   "catalog_no": "430-9449",
+   "number": "239-9957",
+   "number_norm": "2399957",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 417,
+   "catalog_no": "56045592",
+   "number": "TH-540",
+   "number_norm": "TH540",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 419,
+   "catalog_no": "BG00390830",
+   "number": "BG00390830",
+   "number_norm": "BG00390830",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 420,
+   "catalog_no": "56209544",
+   "number": "09544",
+   "number_norm": "09544",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 424,
+   "catalog_no": "00101232",
+   "number": "AF00101232",
+   "number_norm": "AF00101232",
+   "brand": "Sandvik",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 426,
+   "catalog_no": "6544971",
+   "number": "AF06544971",
+   "number_norm": "AF06544971",
+   "brand": "Sandvik Tamrock",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 426,
+   "catalog_no": "6544971",
+   "number": "06544971",
+   "number_norm": "06544971",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 427,
+   "catalog_no": "01900008",
+   "number": "AF01900008",
+   "number_norm": "AF01900008",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 716,
+   "catalog_no": "54592092",
+   "number": "52231446",
+   "number_norm": "52231446",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 717,
+   "catalog_no": "100100582",
+   "number": "2000S",
+   "number_norm": "2000S",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 717,
+   "catalog_no": "100100582",
+   "number": "MF504",
+   "number_norm": "MF504",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 720,
+   "catalog_no": "54593066",
+   "number": "2000S",
+   "number_norm": "2000S",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 720,
+   "catalog_no": "54593066",
+   "number": "LF404",
+   "number_norm": "LF404",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 721,
+   "catalog_no": "GE 15 C",
+   "number": "GE15-DO",
+   "number_norm": "GE15DO",
+   "brand": "INA",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 721,
+   "catalog_no": "GE 15 C",
+   "number": "GE15C",
+   "number_norm": "GE15C",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 722,
+   "catalog_no": "100012817",
+   "number": "100013583",
+   "number_norm": "100013583",
+   "brand": "Normet",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 722,
+   "catalog_no": "100012817",
+   "number": "54562525",
+   "number_norm": "54562525",
+   "brand": "Normet",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 725,
+   "catalog_no": "6315-2Z",
+   "number": "6315-2Z",
+   "number_norm": "63152Z",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 725,
+   "catalog_no": "6315-2Z",
+   "number": "6315ZZ",
+   "number_norm": "6315ZZ",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 725,
+   "catalog_no": "6315-2Z",
+   "number": "6315-2Z-C3",
+   "number_norm": "63152ZC3",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 725,
+   "catalog_no": "6315-2Z",
+   "number": "FAG 6315-2Z",
+   "number_norm": "FAG63152Z",
+   "brand": "FAG",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 725,
+   "catalog_no": "6315-2Z",
+   "number": "NSK 6315ZZ",
+   "number_norm": "NSK6315ZZ",
+   "brand": "FAG",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 725,
+   "catalog_no": "6315-2Z",
+   "number": "NTN 6315ZZ",
+   "number_norm": "NTN6315ZZ",
+   "brand": "FAG",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 725,
+   "catalog_no": "6315-2Z",
+   "number": "ZWZ 6315ZZ",
+   "number_norm": "ZWZ6315ZZ",
+   "brand": "FAG",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 726,
+   "catalog_no": "6213-2Z/C3",
+   "number": "6213-2Z",
+   "number_norm": "62132Z",
+   "brand": "FAG",
+   "kind": "analog",
+   "source": "aliases"
+  },
+  {
+   "position_id": 726,
+   "catalog_no": "6213-2Z/C3",
+   "number": "6213ZZ",
+   "number_norm": "6213ZZ",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 726,
+   "catalog_no": "6213-2Z/C3",
+   "number": "62132ZC3",
+   "number_norm": "62132ZC3",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 729,
+   "catalog_no": "64803749",
+   "number": "88809749",
+   "number_norm": "88809749",
+   "brand": "Sandvik",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 445,
+   "catalog_no": "AF21080032",
+   "number": "AF21080032",
+   "number_norm": "AF21080032",
+   "brand": "Sandvik",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 459,
+   "catalog_no": "3128 3119 88",
+   "number": "COP 1638",
+   "number_norm": "COP1638",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 459,
+   "catalog_no": "3128 3119 88",
+   "number": "3115 9170",
+   "number_norm": "31159170",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 459,
+   "catalog_no": "3128 3119 88",
+   "number": "3115 9170 92",
+   "number_norm": "3115917092",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 459,
+   "catalog_no": "3128 3119 88",
+   "number": "COP1838",
+   "number_norm": "COP1838",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 459,
+   "catalog_no": "3128 3119 88",
+   "number": "3115 9170 96",
+   "number_norm": "3115917096",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 459,
+   "catalog_no": "3128 3119 88",
+   "number": "COP2238",
+   "number_norm": "COP2238",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 459,
+   "catalog_no": "3128 3119 88",
+   "number": "3115 9243 98",
+   "number_norm": "3115924398",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 459,
+   "catalog_no": "3128 3119 88",
+   "number": "COP1838MUX",
+   "number_norm": "COP1838MUX",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 461,
+   "catalog_no": "3128 2598 46",
+   "number": "COP 1638",
+   "number_norm": "COP1638",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 461,
+   "catalog_no": "3128 2598 46",
+   "number": "3128 2598 45",
+   "number_norm": "3128259845",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 462,
+   "catalog_no": "9120 0993 09",
+   "number": "COP 4050",
+   "number_norm": "COP4050",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 462,
+   "catalog_no": "9120 0993 09",
+   "number": "4050MEX",
+   "number_norm": "4050MEX",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 462,
+   "catalog_no": "9120 0993 09",
+   "number": "9120 0993 05",
+   "number_norm": "9120099305",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 463,
+   "catalog_no": "9120 0993 05",
+   "number": "9120 0993 09",
+   "number_norm": "9120099309",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 467,
+   "catalog_no": "6060 0024 59",
+   "number": "COP 1638",
+   "number_norm": "COP1638",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 734,
+   "catalog_no": "MK-SANDVIK-LH410",
+   "number": "LH410",
+   "number_norm": "LH410",
+   "brand": "Sandvik",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 468,
+   "catalog_no": "56019416",
+   "number": "UB-10-90",
+   "number_norm": "UB1090",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 738,
+   "catalog_no": "100037070",
+   "number": "LF050",
+   "number_norm": "LF050",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 738,
+   "catalog_no": "100037070",
+   "number": "100038573",
+   "number_norm": "100038573",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 738,
+   "catalog_no": "100037070",
+   "number": "100132146",
+   "number_norm": "100132146",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 479,
+   "catalog_no": "9120 0896 67",
+   "number": "COP 1838",
+   "number_norm": "COP1838",
+   "brand": "Epiroc",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 479,
+   "catalog_no": "9120 0896 67",
+   "number": "1838HD",
+   "number_norm": "1838HD",
+   "brand": "Epiroc",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 483,
+   "catalog_no": "3115 3473 90",
+   "number": "3115 3473 93",
+   "number_norm": "3115347393",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 497,
+   "catalog_no": "9120 0990 07",
+   "number": "9120 0990 09",
+   "number_norm": "9120099009",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 507,
+   "catalog_no": "9120 0993 13",
+   "number": "9120 0993 10",
+   "number_norm": "9120099310",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 507,
+   "catalog_no": "9120 0993 13",
+   "number": "9120 0993 12",
+   "number_norm": "9120099312",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 507,
+   "catalog_no": "9120 0993 13",
+   "number": "8231 1206 79",
+   "number_norm": "8231120679",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 514,
+   "catalog_no": "3176 6565 00",
+   "number": "3176 5535 00",
+   "number_norm": "3176553500",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 514,
+   "catalog_no": "3176 6565 00",
+   "number": "3176 6344 00",
+   "number_norm": "3176634400",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 520,
+   "catalog_no": "21351717",
+   "number": "3183368",
+   "number_norm": "3183368",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 520,
+   "catalog_no": "21351717",
+   "number": "21274700",
+   "number_norm": "21274700",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 520,
+   "catalog_no": "21351717",
+   "number": "85113732",
+   "number_norm": "85113732",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 520,
+   "catalog_no": "21351717",
+   "number": "21515329",
+   "number_norm": "21515329",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 520,
+   "catalog_no": "21351717",
+   "number": "46313",
+   "number_norm": "46313",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 520,
+   "catalog_no": "21351717",
+   "number": "852.700",
+   "number_norm": "852700",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 520,
+   "catalog_no": "21351717",
+   "number": "87388",
+   "number_norm": "87388",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 520,
+   "catalog_no": "21351717",
+   "number": "2.91280",
+   "number_norm": "291280",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 520,
+   "catalog_no": "21351717",
+   "number": "03.13.046",
+   "number_norm": "0313046",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 522,
+   "catalog_no": "220X250L16N",
+   "number": "220X250L16N",
+   "number_norm": "220X250L16N",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 522,
+   "catalog_no": "220X250L16N",
+   "number": "KE220X250L16N",
+   "number_norm": "KE220X250L16N",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 745,
+   "catalog_no": "MK-CAT-1528",
+   "number": "7K-9220",
+   "number_norm": "7K9220",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 745,
+   "catalog_no": "MK-CAT-1528",
+   "number": "8C9160",
+   "number_norm": "8C9160",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 745,
+   "catalog_no": "MK-CAT-1528",
+   "number": "R1600G",
+   "number_norm": "R1600G",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 745,
+   "catalog_no": "MK-CAT-1528",
+   "number": "R1700G",
+   "number_norm": "R1700G",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 745,
+   "catalog_no": "MK-CAT-1528",
+   "number": "270-1528",
+   "number_norm": "2701528",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 749,
+   "catalog_no": "МК02123297",
+   "number": "МК02123297",
+   "number_norm": "МК02123297",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 749,
+   "catalog_no": "МК02123297",
+   "number": "TH540",
+   "number_norm": "TH540",
+   "brand": "Sandvik",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 752,
+   "catalog_no": "MK-SANDVIK-BIG",
+   "number": "TH540",
+   "number_norm": "TH540",
+   "brand": "Sandvik",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 530,
+   "catalog_no": "6060 0021 41",
+   "number": "60600021141",
+   "number_norm": "60600021141",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 539,
+   "catalog_no": "56019376",
+   "number": "TH540",
+   "number_norm": "TH540",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 539,
+   "catalog_no": "56019376",
+   "number": "56019415",
+   "number_norm": "56019415",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 539,
+   "catalog_no": "56019376",
+   "number": "56019378",
+   "number_norm": "56019378",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 539,
+   "catalog_no": "56019376",
+   "number": "55019712",
+   "number_norm": "55019712",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 539,
+   "catalog_no": "56019376",
+   "number": "BG00560924",
+   "number_norm": "BG00560924",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 539,
+   "catalog_no": "56019376",
+   "number": "BG00507817",
+   "number_norm": "BG00507817",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 540,
+   "catalog_no": "1636223",
+   "number": "CAT 1636223",
+   "number_norm": "CAT1636223",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 540,
+   "catalog_no": "1636223",
+   "number": "289-2937",
+   "number_norm": "2892937",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 540,
+   "catalog_no": "1636223",
+   "number": "2K-4096",
+   "number_norm": "2K4096",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 540,
+   "catalog_no": "1636223",
+   "number": "4J-3420",
+   "number_norm": "4J3420",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 540,
+   "catalog_no": "1636223",
+   "number": "5F-5020",
+   "number_norm": "5F5020",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 540,
+   "catalog_no": "1636223",
+   "number": "8T-8394",
+   "number_norm": "8T8394",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 540,
+   "catalog_no": "1636223",
+   "number": "225-3281",
+   "number_norm": "2253281",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 540,
+   "catalog_no": "1636223",
+   "number": "289-2948",
+   "number_norm": "2892948",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 548,
+   "catalog_no": "6060 0120 08",
+   "number": "6060 0000 64",
+   "number_norm": "6060000064",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 549,
+   "catalog_no": "69039016",
+   "number": "TH540",
+   "number_norm": "TH540",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 754,
+   "catalog_no": "276948",
+   "number": "OE 276644",
+   "number_norm": "OE276644",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 754,
+   "catalog_no": "276948",
+   "number": "7400276948",
+   "number_norm": "7400276948",
+   "brand": "",
+   "kind": "unknown",
+   "source": "aliases"
+  },
+  {
+   "position_id": 754,
+   "catalog_no": "276948",
+   "number": "276845",
+   "number_norm": "276845",
+   "brand": "Volvo",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 754,
+   "catalog_no": "276948",
+   "number": "276935",
+   "number_norm": "276935",
+   "brand": "Volvo",
+   "kind": "oem",
+   "source": "aliases"
+  },
+  {
+   "position_id": 754,
+   "catalog_no": "276948",
+   "number": "TH540",
+   "number_norm": "TH540",
+   "brand": "Volvo",
+   "kind": "oem",
+   "source": "aliases"
+  }
+ ]
+}
