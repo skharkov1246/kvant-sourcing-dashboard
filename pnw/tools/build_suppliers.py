@@ -156,6 +156,40 @@ def main():
         if k and r.get("position_id"):
             link[r["position_id"]].add(k)
 
+    # ── склейка по домену сайта ─────────────────────────────────────────
+    # Одна компания попадает в реестр под разными написаниями имени
+    # («Jinan Duobo Intelligent Technology» и «Doobotec» — одно юрлицо).
+    # Имя такое не склеит, а корень домена — склеит однозначно.
+    def root(site):
+        m = re.match(r"(?:https?://)?(?:www\.)?([^/]+)", str(site or ""))
+        return m.group(1).lower() if m else ""
+
+    by_dom = {}
+    merge_map = {}                      # старый ключ → ключ-владелец
+    for k, v in list(S.items()):
+        d = root(v.get("site"))
+        if not d or d.count(".") > 3:
+            continue
+        if d in by_dom:
+            owner = by_dom[d]
+            o = S[owner]
+            for f in ("email", "phone", "city", "country", "what"):
+                if not o.get(f) and v.get(f):
+                    o[f] = v[f]
+            for sc in v.get("sources", []):
+                if sc not in o["sources"]:
+                    o["sources"].append(sc)
+            if len(v["name"]) > len(o["name"]):
+                o["name"] = v["name"]
+            merge_map[k] = owner
+            del S[k]
+        else:
+            by_dom[d] = k
+    if merge_map:
+        for pid, keys in link.items():
+            link[pid] = {merge_map.get(k, k) for k in keys}
+    print(f"склеено по домену: {len(merge_map)} карточек")
+
     # ── слой обогащения: контакты, добранные с сайтов ───────────────────
     found = (load("pnw/data/contacts_found.json") or {}).get("contacts", {})
     enriched = 0
