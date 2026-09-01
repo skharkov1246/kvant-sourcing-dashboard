@@ -63,7 +63,7 @@ def main():
             ('645', 'первая очередь до пересчёта под Карелию',
              r'(исходн\w+ капитал|до пересч|без карельск|staged\.py|вместо|очеред)'),
         ]:
-            for m in re.finditer(chislo.replace(' ', r'\s?'), t):
+            for m in re.finditer(chislo.replace(' ', r'\s?') + r'\s*(млн|&nbsp;млн)', t):
                 okno = t[max(0, m.start()-320):m.end()+320]
                 if not re.search(kvalifikator, okno, re.I):
                     zamechaniya.append(
