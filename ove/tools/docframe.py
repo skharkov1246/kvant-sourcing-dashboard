@@ -141,12 +141,20 @@ def table(rows, widths, *, borders=True, indent=0) -> str:
 
 # ----------------------------------------------------- титул и ревизии
 
-def cover_xml(row) -> str:
-    """Титульный лист: организация, заказчик, объект, документ, обозначение, ревизия."""
+def cover_xml(row, landscape=False) -> str:
+    """Титульный лист: организация, заказчик, объект, документ, обозначение, ревизия.
+
+    На альбомном листе высота меньше — вертикальные отбивки сжимаются, иначе
+    подписной блок уезжает на второй лист и ломает порядок «титул — ревизии».
+    """
     lot = row.get("lot") or 0
-    W = 9636
+    W = 14570 if landscape else 9636
+    k = 0.35 if landscape else 1.0
+
+    def sp(v):
+        return int(v * k)
     top = [
-        para([run(ORG, bold=True, size=28)], align="center", before=240, after=40),
+        para([run(ORG, bold=True, size=28)], align="center", before=sp(240), after=40),
         para([run("инжиниринг · поставка · сопровождение проектов", size=18, color="555555")],
              align="center", after=60),
         para([run("", size=8)], after=0),
@@ -157,19 +165,19 @@ def cover_xml(row) -> str:
                         '<w:tcBorders><w:top w:val="nil"/><w:left w:val="nil"/>'
                         '<w:bottom w:val="single" w:sz="12" w:space="0" w:color="000000"/><w:right w:val="nil"/></w:tcBorders>')
     mid = [
-        para([run("", size=8)], after=600),
+        para([run("", size=8)], after=sp(600)),
         para([run("Заказчик: ", size=20, color="555555"), run(CUSTOMER, size=20)], align="center", after=80),
         para([run(OBJECT, size=20)], align="center", after=80),
-        para([run(f"Шифр объекта {CODE}", size=20)], align="center", after=400),
+        para([run(f"Шифр объекта {CODE}", size=20)], align="center", after=sp(400)),
         para([run(STAGE.upper(), bold=True, size=22, caps=False)], align="center", after=80),
-        para([run(lot_title(lot), size=22)], align="center", after=520),
+        para([run(lot_title(lot), size=22)], align="center", after=sp(520)),
         para([run(row["title"], bold=True, size=36)], align="center", after=160),
     ]
     if row.get("subtitle"):
         mid.append(para([run(row["subtitle"], size=22, color="333333")], align="center", after=160))
     mid += [
         para([run("Обозначение документа", size=18, color="555555")], align="center", after=20),
-        para([run(row["code"], bold=True, size=28)], align="center", after=400),
+        para([run(row["code"], bold=True, size=28)], align="center", after=sp(400)),
     ]
     # штамп статуса
     stamp = table([[cell([
@@ -180,7 +188,7 @@ def cover_xml(row) -> str:
                   "для закупки, изготовления и строительства.", size=17)], align="center", after=40),
     ], W)]], [W])
     # подписи
-    sig_w = [3300, 3336, 3000]
+    sig_w = [int(W * 0.34), int(W * 0.35), W - int(W * 0.34) - int(W * 0.35)]
     sig_rows = [[cell([para([run(h, bold=True, size=17)], after=0)], w, shade="EFEFEF")
                  for h, w in zip(("Должность", "Подпись, дата", "Фамилия"), sig_w)]]
     for role in ("Генеральный директор", "Главный инженер проекта", "Разработал"):
@@ -189,16 +197,16 @@ def cover_xml(row) -> str:
                          cell([para([run("", size=18)], after=0)], sig_w[2])])
     sig = table(sig_rows, sig_w)
     bottom = [
-        para([run("", size=8)], after=400),
+        para([run("", size=8)], after=sp(400)),
         para([run(f"Ревизия {REV} · {today()}", size=20)], align="center", after=60),
         para([run(f"{CITY}, {date.today().year}", size=20)], align="center", after=0, brk=True),
     ]
-    return "".join(top) + rule + "".join(mid) + stamp + "".join([para([run("", size=8)], after=300)]) + sig + "".join(bottom)
+    return "".join(top) + rule + "".join(mid) + stamp + para([run("", size=8)], after=sp(300)) + sig + "".join(bottom)
 
 
-def revisions_xml(row) -> str:
+def revisions_xml(row, landscape=False) -> str:
     """Лист регистрации ревизий + состав документа (если задан)."""
-    W = [1000, 1500, 4436, 1350, 1350]
+    W = [1400, 2000, 6970, 2100, 2100] if landscape else [1000, 1500, 4436, 1350, 1350]
     head = [cell([para([run(h, bold=True, size=17)], after=0)], w, shade="EFEFEF")
             for h, w in zip(("Ревизия", "Дата", "Содержание изменений", "Разработал", "Проверил"), W)]
     r0 = [cell([para([run(REV, size=18)], align="center", after=0)], W[0]),
@@ -330,7 +338,7 @@ def frame_docx(src: Path, row: dict, dst: Path) -> Path:
         body = body[cut:]
     body = scrub_xml(body)
     new_doc = (f'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document {W_NS}><w:body>'
-               + cover_xml(row) + revisions_xml(row) + body + sect_xml(landscape) + "</w:body></w:document>")
+               + cover_xml(row, landscape) + revisions_xml(row, landscape) + body + sect_xml(landscape) + "</w:body></w:document>")
     if "w:r=" not in doc[:600] and 'xmlns:r=' not in doc[:600]:
         pass  # пространство имён r объявлено в новом корне
     rels = z.read("word/_rels/document.xml.rels").decode("utf-8") if "word/_rels/document.xml.rels" in names else \
@@ -437,9 +445,9 @@ html,body{margin:0;padding:0}
 body{font-family:Arial,'Liberation Sans',sans-serif;color:#000}
 .sheet{position:relative;width:420mm;height:297mm;page-break-after:always;overflow:hidden;background:#fff}
 .frame{position:absolute;left:20mm;top:5mm;width:395mm;height:287mm;border:0.7mm solid #000;box-sizing:border-box}
-.draw{position:absolute;left:22mm;top:7mm;width:391mm;height:224mm;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.draw{position:absolute;left:22mm;top:7mm;width:391mm;height:224mm;overflow:hidden;display:flex;align-items:center;justify-content:center;z-index:1}
 .draw svg{max-width:100%;max-height:100%;width:auto;height:auto}
-.stamp{position:absolute;right:8mm;top:8mm;border:0.5mm solid #b3261e;color:#b3261e;padding:1.6mm 3mm;font-size:3.4mm;font-weight:700;letter-spacing:.06em;background:#fff}
+.stamp{position:absolute;left:24mm;bottom:9mm;white-space:nowrap;z-index:3;border:0.5mm solid #b3261e;color:#b3261e;padding:1.6mm 3mm;font-size:3.4mm;font-weight:700;letter-spacing:.06em;background:#fff}
 .tb{position:absolute;right:5mm;bottom:5mm;width:185mm;border-collapse:collapse;font-size:2.6mm;background:#fff}
 .tb td{border:0.35mm solid #000;padding:0.6mm 1mm;height:5mm;vertical-align:middle}
 .tb td.b{font-weight:700}

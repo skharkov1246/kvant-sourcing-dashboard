@@ -85,15 +85,16 @@ def check(row: dict, rel: dict) -> dict:
     for t in BIN_TRACES:
         if t in raw:
             out["errors"].append(f"след инструмента в файле: {t.decode()}")
-    # титул
-    p1 = text(pdf, 1, 1)
+    # титул (текст PDF переносится по строкам — сверяем по нормализованному)
+    norm = lambda s: re.sub(r"\s+", " ", s)
+    p1 = norm(text(pdf, 1, 1))
     kind = row.get("kind", "text")
     if kind in ("text", "album"):
         for need, what in ((ORG, "организация"), (CUSTOMER, "заказчик"), (code, "обозначение"),
                            ("НЕ ДЛЯ СТРОИТЕЛЬСТВА", "штамп «не для строительства»"), ("Ревизия 0", "ревизия 0")):
             if need not in p1:
                 out["errors"].append(f"титул: нет — {what}")
-        p2 = text(pdf, 2, 2)
+        p2 = norm(text(pdf, 2, 2))
         if "Лист регистрации ревизий" not in p2:
             out["errors"].append("лист 2: нет листа регистрации ревизий")
         p3 = text(pdf, 3, 3)
@@ -104,7 +105,7 @@ def check(row: dict, rel: dict) -> dict:
         if pages > 80:
             out["warnings"].append(f"объём {pages} стр. — проверить разумность")
         # колонтитулы: обозначение должно встречаться на большинстве страниц
-        mid = text(pdf, min(4, pages), min(6, pages))
+        mid = norm(text(pdf, min(4, pages), min(6, pages)))
         if code not in mid:
             out["errors"].append("колонтитул: обозначение не найдено на страницах содержания")
         if "Лист " not in mid:
