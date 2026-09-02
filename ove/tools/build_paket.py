@@ -53,6 +53,10 @@ def make_zip(name: str, rel_paths: list[str]) -> tuple[Path, int, int] | None:
     seen: set[str] = set()
     items: list[tuple[Path, str]] = []
     for rel in rel_paths:
+        # элемент — путь либо пара (путь, имя внутри архива)
+        arc = None
+        if isinstance(rel, (tuple, list)):
+            rel, arc = rel
         if not rel or rel in seen:
             continue
         seen.add(rel)
@@ -60,7 +64,7 @@ def make_zip(name: str, rel_paths: list[str]) -> tuple[Path, int, int] | None:
         if not src.is_file():
             print(f"  ! {name}: пропуск, нет файла {rel}")
             continue
-        items.append((src, arcname(rel)))
+        items.append((src, arc or arcname(rel)))
     if not items:
         print(f"  ! {name}: ни одного существующего файла — архив не создан")
         return None
@@ -82,20 +86,35 @@ def build() -> None:
     made: list[tuple[Path, int, int]] = []
 
     lots = {lot.get("lot"): lot for lot in bi.get("lots", [])}
+
+    def lot_items(lot: dict) -> list:
+        """Выпуск лота: PDF под читаемыми именами «NN обозначение — название.pdf»
+        в корне архива, исходники (Word, SVG, DXF, IFC) — в папке src/."""
+        out = []
+        for i, doc in enumerate(lot.get("docs", []), 1):
+            code = doc.get("code") or ""
+            for f in doc_files(doc):
+                if code and f.lower().endswith(".pdf"):
+                    title = str(doc.get("name", "")).replace("/", "-").replace(":", " —")[:70]
+                    out.append((f, f"{i:02d} {code} — {title}.pdf"))
+                else:
+                    out.append(f)
+            for s in doc.get("src", []) or []:
+                out.append((s, "src/" + arcname(s)))
+        return out
+
     for n in (1, 2, 3, 4):
         lot = lots.get(n)
         if not lot:
             print(f"  ! лот {n}: не найден в bi_docs.json")
             continue
-        rels = [f for doc in lot.get("docs", []) for f in doc_files(doc)]
-        res = make_zip(f"ove75-lot{n}-paket.zip", rels)
+        res = make_zip(f"ove75-lot{n}-paket.zip", lot_items(lot))
         if res:
             made.append(res)
 
     lot0 = lots.get(0)
     if lot0:
-        rels = [f for doc in lot0.get("docs", []) for f in doc_files(doc)]
-        res = make_zip("ove75-obshchee-paket.zip", rels)
+        res = make_zip("ove75-obshchee-paket.zip", lot_items(lot0))
         if res:
             made.append(res)
     else:

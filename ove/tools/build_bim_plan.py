@@ -13,6 +13,7 @@
 (в ove/build.py намеренно не подключён — отдельный документ вне цикла CI).
 """
 import json
+import re
 import zipfile
 from datetime import date
 from pathlib import Path
@@ -27,13 +28,31 @@ ACCENT = "8A6200"   # цвет плашки черновика — как в о�
 MUTED = "666666"
 
 
+DB_NAME = {
+    "deliverables": "реестр состава выдачи Базового инжиниринга",
+    "discrepancies": "реестр расхождений конкурсной документации",
+    "gantt": "план-график Базового инжиниринга",
+    "lots": "реестр лотов и объектов комплекса",
+    "equipment": "перечень оборудования комплекса",
+    "bim_plan": "база решений по информационному моделированию",
+}
+
+
+def clean_src(text: str) -> str:
+    """Убрать из текста источника имена файлов базы решений (документ читает Заказчик)."""
+    def rep(m):
+        return DB_NAME.get(m.group(1), "база решений проекта")
+    t = re.sub(r"(?:ove/data/)?(\w+)\.json", rep, str(text or ""))
+    return re.sub(r"\s{2,}", " ", t).strip()
+
+
 def para(text, *, size="20", color=None, bold=False):
-    return bd.p([bd.run(text, size=size, color=color, bold=bold)])
+    return bd.p([bd.run(clean_src(text), size=size, color=color, bold=bold)])
 
 
 def src_line(text):
     return bd.p([bd.run("Источник: ", bold=True, size="18", color=MUTED),
-                 bd.run(text, size="18", color=MUTED)])
+                 bd.run(clean_src(text), size="18", color=MUTED)])
 
 
 def head_cells(labels, widths):
@@ -42,7 +61,7 @@ def head_cells(labels, widths):
 
 
 def body_cell(text, width, *, size="19", color=None):
-    return bd.cell([bd.p([bd.run(text, size=size, color=color)])], width)
+    return bd.cell([bd.p([bd.run(clean_src(text), size=size, color=color)])], width)
 
 
 def draft_plaque():
@@ -62,7 +81,7 @@ def sec_goal_scope(d):
     g = d.get("goal") or {}
     if g.get("t"):
         xml.append(bd.p([bd.run("Цель разработки ЦИМ. ", bold=True, size="20"),
-                         bd.run(g["t"], size="20")]))
+                         bd.run(clean_src(g["t"]), size="20")]))
         if g.get("src"):
             xml.append(src_line(g["src"]))
     xml.append(para("Рамки стадии БИ:", bold=True))
@@ -97,7 +116,7 @@ def sec_cde_cycle(d):
     cde = d.get("cde") or {}
     if cde.get("name"):
         xml.append(bd.p([bd.run(cde["name"] + ". ", bold=True, size="20"),
-                         bd.run(cde.get("role", ""), size="20")]))
+                         bd.run(clean_src(cde.get("role", "")), size="20")]))
     if cde.get("src"):
         xml.append(src_line(cde["src"]))
 
@@ -125,7 +144,7 @@ def sec_cde_cycle(d):
 
     if cde.get("naming"):
         xml.append(bd.p([bd.run("Наименование файлов. ", bold=True, size="20"),
-                         bd.run(cde["naming"], size="20")]))
+                         bd.run(clean_src(cde["naming"]), size="20")]))
         if cde.get("naming_src"):
             xml.append(src_line(cde["naming_src"]))
 
@@ -150,7 +169,7 @@ def sec_cde_cycle(d):
     for k, label in (("interim", "Промежуточные выгрузки"), ("interim_status", "Статус выгрузок"),
                      ("meetings", "Совещания"), ("final", "Итоговая передача")):
         if cyc.get(k):
-            xml.append(bd.p([bd.run(label + ": ", bold=True, size="20"), bd.run(cyc[k], size="20")]))
+            xml.append(bd.p([bd.run(label + ": ", bold=True, size="20"), bd.run(clean_src(cyc[k]), size="20")]))
     plan = cyc.get("plan") or []
     if plan:
         xml.append(para("Плановые сроки (целевой контур КВАНТ):", bold=True))
@@ -195,10 +214,18 @@ def sec_roles(d):
 
 
 def sec_open(d):
-    xml = [bd.p("6. Открытые вопросы к согласованию", style="Heading1")]
+    xml = [bd.p("7. Открытые позиции", style="Heading1"),
+           para("Перечисленные ниже позиции требуют решения Заказчика. До его получения "
+                "соответствующая часть состава и организации информационного моделирования "
+                "определяется на стадии БИ; принятые решения вносятся в очередную ревизию "
+                "настоящего документа.", size="20"),
+           para("Кроме того, на стадии БИ определяется: перечень объектов проектирования и "
+                "шифр проекта в системе наименования файлов; состав библиотечных компонентов "
+                "оборудования по фактическим данным изготовителей; регламент доступа "
+                "Исполнителя к среде общих данных Заказчика.", size="20")]
     for i, o in enumerate(d.get("open") or [], 1):
         xml.append(bd.p([bd.run(f"В-{i:02d}. ", bold=True, size="20"),
-                         bd.run(o.get("q", ""), size="20")]))
+                         bd.run(clean_src(o.get("q", "")), size="20")]))
         if o.get("src"):
             xml.append(src_line(o["src"]))
     return xml
@@ -215,7 +242,10 @@ def build() -> Path:
         draft_plaque(),
         bd.p([bd.run("АО «Кольская ГМК» · комплекс «обжиг – выщелачивание – электроэкстракция» "
                      "производительностью 75 000 т катодной меди в год · шифр ОВЭ-75", size="20")]),
-        bd.p([bd.run(f"Сформировано {today} (данные от {d.get('updated', '')}). {d.get('note', '')}",
+        bd.p([bd.run(f"{clean_src(d.get('note', ''))}", size="18", color=MUTED)]),
+        # Абзац даты — последний абзац шапки: каркас выпуска (docframe, drop_head) снимает
+        # всё до него, дальше идёт первый содержательный заголовок.
+        bd.p([bd.run(f"Сформировано {today} (данные от {d.get('updated', '')}).",
                      size="18", color=MUTED)]),
     ]
     body += sec_goal_scope(d)
@@ -223,13 +253,15 @@ def build() -> Path:
     body += sec_cde_cycle(d)
     body += sec_checks(d)
     body += sec_roles(d)
-    body += sec_open(d)
 
     srcs = d.get("sources") or []
     if srcs:
-        body.append(bd.p("Использованные источники", style="Heading1"))
-        for s in srcs:
-            body.append(bd.p([bd.run("— ", bold=True, size="19"), bd.run(s, size="19", color="444444")]))
+        body.append(bd.p("6. Использованные источники", style="Heading1"))
+        for one in srcs:
+            body.append(bd.p([bd.run("— ", bold=True, size="19"),
+                              bd.run(clean_src(one), size="19", color="444444")]))
+
+    body += sec_open(d)
 
     sect = ('<w:sectPr><w:pgSz w:w="11906" w:h="16838"/>'
             '<w:pgMar w:top="1134" w:right="1134" w:bottom="1134" w:left="1134"'
