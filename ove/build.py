@@ -126,11 +126,11 @@ def build() -> None:
     # сводная ведомость закладных решений для цифровизации (из zakladki.json)
     import build_zakladki
     build_zakladki.build()
-    # выпуск Базового инжиниринга Р0: одна строка ТЗ — один документ с титулом и штампом
-    # (docframe читает bi_register.json, генераторы содержания — tools/bidocs/);
-    # затем реестр выпуска → bi_docs.json для вкладки и ZIP-пакетов
-    import docframe
-    docframe.build()
+    # Реестр выпуска БИ Р0 → bi_docs.json для вкладки и ZIP-пакетов.
+    # Сами документы выпуска (PDF с титулом, штампом и колонтитулами) собираются
+    # ЛОКАЛЬНО командой python3 ove/tools/docframe.py и лежат в репозитории:
+    # сборке нужны LibreOffice и Chromium, в CI их нет, а полный проход занимает
+    # десятки минут — здесь только пересборка реестра по готовым файлам.
     import build_release
     build_release.build()
     # единые метаданные всех выпускаемых DOCX/PDF (автор — ООО «КВАНТ»)

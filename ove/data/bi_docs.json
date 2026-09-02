@@ -1,176 +1,364 @@
 {
- "updated": "2026-08-27",
- "note": "Реестр документов Базового инжиниринга по утверждённому перечню ТЗ v4.1 (с этапностью 3+3 мес). Статусы: draft — черновик сформирован и лежит файлом; base — контент готов в базе сайта, файл собирается; task — готово задание, нужен инженер/CAD; wait — после старта работ (нужны ИД/ТКП); team — за командой. Черновики ПЗ пересобираются при каждой сборке сайта из данных вкладки «Базовый проект».",
+ "updated": "2026-09-02",
+ "note": "Выпуск Базового инжиниринга, Ревизия 0 — черновики для согласования состава и решений с Заказчиком. Каждая строка состава ТЗ — отдельный документ с обозначением, титульным листом и штампом «Эскизная проработка — не для строительства». Архив лота содержит PDF всех документов лота и папку src с исходниками (Word, SVG, DXF, IFC).",
  "statuses": {
-  "draft": "черновик-файл готов",
-  "base": "контент в базе",
-  "task": "задание готово, нужен инженер",
-  "wait": "после старта работ",
-  "team": "за командой"
+  "draft": "Ревизия 0 — для согласования",
+  "task": "в работе"
  },
+ "rev": "0",
  "lots": [
   {
    "lot": 1,
    "name": "Цех обжига",
    "docs": [
     {
-     "name": "Пояснительная записка (общие сведения, сырьё, техпроцесс, балансы, ресурсы, оборудование, сети)",
+     "code": "ОВЭ75-БИ-Л1-ПЗ",
+     "name": "Пояснительная записка",
+     "tz": "D-01…D-11",
      "stage": 1,
+     "kind": "text",
+     "rev": "0",
      "status": "draft",
-     "file": "docs/bi/ove75-lot1-pz-draft.docx",
-     "note": "v0.1 из базы; балансы — из расчётной модели",
      "files": [
       {
-       "path": "docs/bi/ove75-lot1-pz-draft.docx",
-       "tag": "ПЗ"
+       "path": "docs/bi/ove75-l1-pz-r0.pdf",
+       "tag": "PDF"
       }
      ],
-     "gantt": "pz"
+     "src": [
+      "docs/bi/ove75-l1-pz-r0.docx",
+      "docs/bi/ove75-lot1-pz-draft.docx"
+     ],
+     "gantt": "pz",
+     "note": ""
     },
     {
-     "name": "Расчётные приложения (балансы, электрика печи, гидродинамика слоя, точка росы)",
+     "code": "ОВЭ75-БИ-Л1-РР",
+     "name": "Расчётные приложения к пояснительной записке",
+     "tz": "D-04, D-05, D-07",
      "stage": 1,
+     "kind": "text",
+     "rev": "0",
      "status": "draft",
-     "file": "docs/ove75-raschet.docx",
-     "note": "независимая записка, 21 блок — на рецензию инженеру",
      "files": [
       {
-       "path": "docs/ove75-raschet.docx",
-       "tag": "расчёт"
+       "path": "docs/bi/ove75-l1-rr-r0.pdf",
+       "tag": "PDF"
       }
      ],
-     "gantt": "calcrev"
+     "src": [
+      "docs/bi/ove75-l1-rr-r0.docx",
+      "docs/ove75-raschet-l1.docx"
+     ],
+     "gantt": "calcrev",
+     "note": ""
     },
     {
-     "name": "PFD с границами проектирования",
+     "code": "ОВЭ75-БИ-Л1-PFD",
+     "name": "Принципиальная технологическая схема (PFD)",
+     "tz": "D-12",
      "stage": 1,
-     "status": "task",
-     "note": "схема и границы описаны в базе; отрисовка — CAD по заданию",
+     "kind": "sheet",
+     "rev": "0",
+     "status": "draft",
      "files": [
       {
-       "path": "docs/sketches/ove75-lot1-pfd-eskiz.svg",
-       "tag": "PFD"
+       "path": "docs/bi/ove75-l1-pfd-r0.pdf",
+       "tag": "PDF"
       }
      ],
-     "gantt": "pfd"
+     "src": [
+      "docs/sketches/ove75-lot1-pfd-eskiz.svg"
+     ],
+     "gantt": "pfd",
+     "note": ""
     },
     {
+     "code": "ОВЭ75-БИ-Л1-КР",
      "name": "Компоновочные решения (планы, разрезы)",
+     "tz": "D-14",
      "stage": 1,
-     "status": "task",
-     "note": "задание для CAD готово (zadanie_cad); после генплана — посадка",
+     "kind": "sheet",
+     "rev": "0",
+     "status": "draft",
      "files": [
       {
-       "path": "docs/sketches/ove75-lot1-vysotka-eskiz.svg",
-       "tag": "высотка"
+       "path": "docs/bi/ove75-l1-kr-r0.pdf",
+       "tag": "PDF"
       }
      ],
-     "gantt": "layout"
+     "src": [
+      "docs/sketches/ove75-lot1-vysotka-eskiz.svg"
+     ],
+     "gantt": "layout",
+     "note": ""
     },
     {
-     "name": "Спецификация оборудования + опросные листы + исходные требования на длинноцикловое",
+     "code": "ОВЭ75-БИ-Л1-СО",
+     "name": "Спецификация оборудования с техническими характеристиками",
+     "tz": "D-18",
      "stage": 1,
-     "status": "base",
-     "note": "перечень из 70 позиций на вкладке «Оборудование»; опросные листы — по шаблонам заводов",
+     "kind": "text",
+     "rev": "0",
+     "status": "draft",
      "files": [
       {
-       "path": "docs/specs/ove75-perechen-oborudovaniya.docx",
-       "tag": "перечень"
-      },
-      {
-       "path": "docs/specs/ove75-ol-pech-ks.docx",
-       "tag": "ОЛ печь"
-      },
-      {
-       "path": "docs/specs/ove75-ol-kotel-utilizator.docx",
-       "tag": "ОЛ КУ"
-      },
-      {
-       "path": "docs/specs/ove75-ol-tsiklony.docx",
-       "tag": "ОЛ цикл."
-      },
-      {
-       "path": "docs/specs/ove75-ol-elektrofiltr.docx",
-       "tag": "ОЛ ЭФ"
-      },
-      {
-       "path": "docs/specs/ove75-ol-dymosos.docx",
-       "tag": "ОЛ дым."
-      },
-      {
-       "path": "docs/specs/ove75-ol-vozduhoduvka.docx",
-       "tag": "ОЛ возд."
-      },
-      {
-       "path": "docs/specs/ove75-ol-vakuum-filtr.docx",
-       "tag": "ОЛ ВФ"
-      },
-      {
-       "path": "docs/specs/ove75-zakladki-vedomost.docx",
-       "tag": "ведомость закладных"
+       "path": "docs/bi/ove75-l1-so-r0.pdf",
+       "tag": "PDF"
       }
      ],
-     "gantt": "spec1"
+     "src": [
+      "docs/bi/ove75-l1-so-r0.docx"
+     ],
+     "gantt": "spec1",
+     "note": ""
     },
     {
-     "name": "Предварительные P&ID по участкам",
-     "stage": 2,
-     "status": "task",
-     "note": "контуры КИПиА описаны в базе; отрисовка — инженер",
+     "code": "ОВЭ75-БИ-Л1-НО",
+     "name": "Спецификация нетипового оборудования с техническими требованиями",
+     "tz": "D-19",
+     "stage": 1,
+     "kind": "text",
+     "rev": "0",
+     "status": "draft",
      "files": [
       {
-       "path": "docs/sketches/ove75-lot1-pid-pech-ku-eskiz.svg",
-       "tag": "P&ID"
+       "path": "docs/bi/ove75-l1-no-r0.pdf",
+       "tag": "PDF"
       }
      ],
-     "gantt": "pid"
+     "src": [
+      "docs/bi/ove75-l1-no-r0.docx"
+     ],
+     "gantt": "spec1",
+     "note": ""
     },
     {
-     "name": "Планы предварительных нагрузок; фундаменты с динамикой (с запасом)",
-     "stage": 2,
-     "status": "task",
-     "note": "массы и динамика — из модели; планы — строитель",
-     "gantt": "loads"
-    },
-    {
-     "name": "Однолинейные схемы + предварительный перечень электрооборудования",
-     "stage": 2,
-     "status": "task",
-     "note": "нагрузки посчитаны (EL-TOTAL); схемы — электрик",
-     "gantt": "elec"
-    },
-    {
-     "name": "Line list ±20-30 % + спецификация критичных/длинноцикловых КИПиА",
-     "stage": 2,
-     "status": "wait",
-     "note": "после предварительных P&ID",
-     "gantt": "spec1"
-    },
-    {
-     "name": "Схема КТС АСУ; тепловыделения и вредности (по аналогам)",
-     "stage": 2,
-     "status": "base",
-     "note": "I/O ~2000 посчитано; данные по аналогам в базе",
+     "code": "ОВЭ75-БИ-Л1-ЭЧ",
+     "name": "Эскизные чертежи нетипового оборудования",
+     "tz": "D-20",
+     "stage": 1,
+     "kind": "sheet",
+     "rev": "0",
+     "status": "draft",
      "files": [
       {
-       "path": "docs/sketches/ove75-asu-kts-eskiz.svg",
-       "tag": "КТС"
+       "path": "docs/bi/ove75-l1-ech-r0.pdf",
+       "tag": "PDF"
       }
      ],
-     "gantt": "asu"
+     "src": [
+      "docs/sketches/ove75-lot1-pech-ks-eskiz.svg"
+     ],
+     "gantt": "spec1",
+     "note": ""
     },
     {
-     "name": "Бюджетные ТКП по основному + бюджетная оценка поставки",
-     "stage": 2,
-     "status": "wait",
-     "note": "план сорсинга готов (114 поставщиков) — запуск в день старта",
+     "code": "ОВЭ75-БИ-Л1-ОЛ",
+     "name": "Опросные листы основного оборудования (альбом)",
+     "tz": "D-21",
+     "stage": 1,
+     "kind": "album",
+     "rev": "0",
+     "status": "draft",
      "files": [
       {
-       "path": "docs/rfq/ove75-rfq-index.docx",
-       "tag": "ТКП"
+       "path": "docs/bi/ove75-l1-ol-r0.pdf",
+       "tag": "PDF"
       }
      ],
-     "gantt": "tkp2"
+     "src": [
+      "docs/bi/ove75-l1-ol-r0.docx",
+      "docs/specs/ove75-ol-pech-ks.docx",
+      "docs/specs/ove75-ol-kotel-utilizator.docx",
+      "docs/specs/ove75-ol-tsiklony.docx",
+      "docs/specs/ove75-ol-elektrofiltr.docx",
+      "docs/specs/ove75-ol-dymosos.docx",
+      "docs/specs/ove75-ol-vozduhoduvka.docx",
+      "docs/specs/ove75-ol-vakuum-filtr.docx"
+     ],
+     "gantt": "spec1",
+     "note": ""
+    },
+    {
+     "code": "ОВЭ75-БИ-Л1-ДЦ",
+     "name": "Исходные требования на длинноцикловое оборудование",
+     "tz": "D-22",
+     "stage": 1,
+     "kind": "text",
+     "rev": "0",
+     "status": "draft",
+     "files": [
+      {
+       "path": "docs/bi/ove75-l1-dc-r0.pdf",
+       "tag": "PDF"
+      }
+     ],
+     "src": [
+      "docs/bi/ove75-l1-dc-r0.docx"
+     ],
+     "gantt": "spec1",
+     "note": ""
+    },
+    {
+     "code": "ОВЭ75-БИ-Л1-PID",
+     "name": "Предварительные схемы трубопроводов и КИПиА (P&ID)",
+     "tz": "D-13",
+     "stage": 2,
+     "kind": "sheet",
+     "rev": "0",
+     "status": "draft",
+     "files": [
+      {
+       "path": "docs/bi/ove75-l1-pid-r0.pdf",
+       "tag": "PDF"
+      }
+     ],
+     "src": [
+      "docs/sketches/ove75-lot1-pid-pech-ku-eskiz.svg"
+     ],
+     "gantt": "pid",
+     "note": ""
+    },
+    {
+     "code": "ОВЭ75-БИ-Л1-НГ",
+     "name": "Планы строительных конструкций и фундаментов с предварительными нагрузками",
+     "tz": "D-15, D-16",
+     "stage": 2,
+     "kind": "text",
+     "rev": "0",
+     "status": "draft",
+     "files": [
+      {
+       "path": "docs/bi/ove75-l1-ng-r0.pdf",
+       "tag": "PDF"
+      }
+     ],
+     "src": [
+      "docs/bi/ove75-l1-ng-r0.docx"
+     ],
+     "gantt": "loads",
+     "note": ""
+    },
+    {
+     "code": "ОВЭ75-БИ-Л1-МТ",
+     "name": "Требования к монтажу (включая вес самых тяжёлых частей)",
+     "tz": "D-17",
+     "stage": 2,
+     "kind": "text",
+     "rev": "0",
+     "status": "draft",
+     "files": [
+      {
+       "path": "docs/bi/ove75-l1-mt-r0.pdf",
+       "tag": "PDF"
+      }
+     ],
+     "src": [
+      "docs/bi/ove75-l1-mt-r0.docx"
+     ],
+     "gantt": "mount",
+     "note": ""
+    },
+    {
+     "code": "ОВЭ75-БИ-Л1-ЭС",
+     "name": "Электроснабжение и электрооборудование: однолинейные схемы, предварительный перечень",
+     "tz": "D-23, D-33, E-02…E-17",
+     "stage": 2,
+     "kind": "text",
+     "rev": "0",
+     "status": "draft",
+     "files": [
+      {
+       "path": "docs/bi/ove75-l1-es-r0.pdf",
+       "tag": "PDF"
+      }
+     ],
+     "src": [
+      "docs/bi/ove75-l1-es-r0.docx"
+     ],
+     "gantt": "elec",
+     "note": ""
+    },
+    {
+     "code": "ОВЭ75-БИ-Л1-LL",
+     "name": "Перечень трубопроводов, арматуры и приборов КИПиА (line list)",
+     "tz": "D-24, D-25",
+     "stage": 2,
+     "kind": "text",
+     "rev": "0",
+     "status": "draft",
+     "files": [
+      {
+       "path": "docs/bi/ove75-l1-ll-r0.pdf",
+       "tag": "PDF"
+      }
+     ],
+     "src": [
+      "docs/bi/ove75-l1-ll-r0.docx"
+     ],
+     "gantt": "lines",
+     "note": ""
+    },
+    {
+     "code": "ОВЭ75-БИ-Л1-АСУ",
+     "name": "Схема комплекса технических средств АСУ",
+     "tz": "D-26",
+     "stage": 2,
+     "kind": "sheet",
+     "rev": "0",
+     "status": "draft",
+     "files": [
+      {
+       "path": "docs/bi/ove75-l1-asu-r0.pdf",
+       "tag": "PDF"
+      }
+     ],
+     "src": [
+      "docs/sketches/ove75-asu-kts-eskiz.svg"
+     ],
+     "gantt": "asu",
+     "note": ""
+    },
+    {
+     "code": "ОВЭ75-БИ-Л1-ТВ",
+     "name": "Тепловыделения и выделения вредностей от оборудования (данные для смежных разделов)",
+     "tz": "D-27, D-28",
+     "stage": 2,
+     "kind": "text",
+     "rev": "0",
+     "status": "draft",
+     "files": [
+      {
+       "path": "docs/bi/ove75-l1-tv-r0.pdf",
+       "tag": "PDF"
+      }
+     ],
+     "src": [
+      "docs/bi/ove75-l1-tv-r0.docx"
+     ],
+     "gantt": "emiss",
+     "note": ""
+    },
+    {
+     "code": "ОВЭ75-БИ-Л1-СТ",
+     "name": "Стоимостной блок: порядок сбора ТКП и бюджетной оценки поставки",
+     "tz": "D-29, D-30",
+     "stage": 2,
+     "kind": "text",
+     "rev": "0",
+     "status": "draft",
+     "files": [
+      {
+       "path": "docs/bi/ove75-l1-st-r0.pdf",
+       "tag": "PDF"
+      }
+     ],
+     "src": [
+      "docs/bi/ove75-l1-st-r0.docx"
+     ],
+     "gantt": "cost2",
+     "note": ""
     }
    ]
   },
@@ -179,82 +367,287 @@
    "name": "Участок купороса",
    "docs": [
     {
-     "name": "Пояснительная записка (границы v4.1, выпарка, вакуумное хозяйство, материалы 904L)",
+     "code": "ОВЭ75-БИ-Л2-ПЗ",
+     "name": "Пояснительная записка",
+     "tz": "D-01…D-11",
      "stage": 1,
+     "kind": "text",
+     "rev": "0",
      "status": "draft",
-     "file": "docs/bi/ove75-lot2-pz-draft.docx",
-     "note": "v0.1; границы — от фланца выпарного I ступени, сборник маточника 1 учтён",
      "files": [
       {
-       "path": "docs/bi/ove75-lot2-pz-draft.docx",
-       "tag": "ПЗ"
+       "path": "docs/bi/ove75-l2-pz-r0.pdf",
+       "tag": "PDF"
       }
      ],
-     "gantt": "pz"
+     "src": [
+      "docs/bi/ove75-l2-pz-r0.docx",
+      "docs/bi/ove75-lot2-pz-draft.docx"
+     ],
+     "gantt": "pz",
+     "note": ""
     },
     {
-     "name": "PFD; компоновка в существующем/новом корпусе",
+     "code": "ОВЭ75-БИ-Л2-PFD",
+     "name": "Принципиальная технологическая схема (PFD)",
+     "tz": "D-12",
      "stage": 1,
-     "status": "task",
-     "note": "высотная проверка барометрических труб — в базе",
+     "kind": "sheet",
+     "rev": "0",
+     "status": "draft",
      "files": [
       {
-       "path": "docs/sketches/ove75-lot2-pfd-eskiz.svg",
-       "tag": "PFD"
-      },
-      {
-       "path": "docs/sketches/ove75-lot2-komponovka-gmu-eskiz.svg",
-       "tag": "план"
+       "path": "docs/bi/ove75-l2-pfd-r0.pdf",
+       "tag": "PDF"
       }
      ],
-     "gantt": "pfd"
+     "src": [
+      "docs/sketches/ove75-lot2-pfd-eskiz.svg"
+     ],
+     "gantt": "pfd",
+     "note": ""
     },
     {
-     "name": "Спецификация оборудования + опросные листы",
+     "code": "ОВЭ75-БИ-Л2-КР",
+     "name": "Компоновочные решения (планы, разрезы)",
+     "tz": "D-14",
      "stage": 1,
-     "status": "base",
-     "note": "испарители, центрифуги, вакуум — параметры в базе",
+     "kind": "sheet",
+     "rev": "0",
+     "status": "draft",
      "files": [
       {
-       "path": "docs/specs/ove75-perechen-oborudovaniya.docx",
-       "tag": "перечень"
-      },
-      {
-       "path": "docs/specs/ove75-ol-vyparnoy-apparat.docx",
-       "tag": "ОЛ вып."
-      },
-      {
-       "path": "docs/specs/ove75-ol-tsentrifuga.docx",
-       "tag": "ОЛ центр"
+       "path": "docs/bi/ove75-l2-kr-r0.pdf",
+       "tag": "PDF"
       }
      ],
-     "gantt": "spec1"
+     "src": [
+      "docs/sketches/ove75-lot2-komponovka-gmu-eskiz.svg"
+     ],
+     "gantt": "layout",
+     "note": ""
     },
     {
-     "name": "Предварительные P&ID; нагрузки; электрочасть",
-     "stage": 2,
-     "status": "task",
-     "note": "по заданиям из базы",
+     "code": "ОВЭ75-БИ-Л2-СО",
+     "name": "Спецификация оборудования с техническими характеристиками",
+     "tz": "D-18",
+     "stage": 1,
+     "kind": "text",
+     "rev": "0",
+     "status": "draft",
      "files": [
       {
-       "path": "docs/sketches/ove75-lot2-pid-vyparka-eskiz.svg",
-       "tag": "P&ID"
+       "path": "docs/bi/ove75-l2-so-r0.pdf",
+       "tag": "PDF"
       }
      ],
-     "gantt": "pid"
+     "src": [
+      "docs/bi/ove75-l2-so-r0.docx"
+     ],
+     "gantt": "spec1",
+     "note": ""
     },
     {
-     "name": "Стоимостной блок (бюджетные ТКП, оценка)",
-     "stage": 2,
-     "status": "wait",
-     "note": "кандидаты по классам evaporator/centrifuge готовы",
+     "code": "ОВЭ75-БИ-Л2-ОЛ",
+     "name": "Опросные листы основного оборудования (альбом)",
+     "tz": "D-21",
+     "stage": 1,
+     "kind": "album",
+     "rev": "0",
+     "status": "draft",
      "files": [
       {
-       "path": "docs/rfq/ove75-rfq-index.docx",
-       "tag": "ТКП"
+       "path": "docs/bi/ove75-l2-ol-r0.pdf",
+       "tag": "PDF"
       }
      ],
-     "gantt": "tkp2"
+     "src": [
+      "docs/bi/ove75-l2-ol-r0.docx",
+      "docs/specs/ove75-ol-vyparnoy-apparat.docx",
+      "docs/specs/ove75-ol-tsentrifuga.docx"
+     ],
+     "gantt": "spec1",
+     "note": ""
+    },
+    {
+     "code": "ОВЭ75-БИ-Л2-ДЦ",
+     "name": "Исходные требования на длинноцикловое оборудование",
+     "tz": "D-22",
+     "stage": 1,
+     "kind": "text",
+     "rev": "0",
+     "status": "draft",
+     "files": [
+      {
+       "path": "docs/bi/ove75-l2-dc-r0.pdf",
+       "tag": "PDF"
+      }
+     ],
+     "src": [
+      "docs/bi/ove75-l2-dc-r0.docx"
+     ],
+     "gantt": "spec1",
+     "note": ""
+    },
+    {
+     "code": "ОВЭ75-БИ-Л2-PID",
+     "name": "Предварительные схемы трубопроводов и КИПиА (P&ID)",
+     "tz": "D-13",
+     "stage": 2,
+     "kind": "sheet",
+     "rev": "0",
+     "status": "draft",
+     "files": [
+      {
+       "path": "docs/bi/ove75-l2-pid-r0.pdf",
+       "tag": "PDF"
+      }
+     ],
+     "src": [
+      "docs/sketches/ove75-lot2-pid-vyparka-eskiz.svg"
+     ],
+     "gantt": "pid",
+     "note": ""
+    },
+    {
+     "code": "ОВЭ75-БИ-Л2-НГ",
+     "name": "Планы строительных конструкций и фундаментов с предварительными нагрузками",
+     "tz": "D-15, D-16",
+     "stage": 2,
+     "kind": "text",
+     "rev": "0",
+     "status": "draft",
+     "files": [
+      {
+       "path": "docs/bi/ove75-l2-ng-r0.pdf",
+       "tag": "PDF"
+      }
+     ],
+     "src": [
+      "docs/bi/ove75-l2-ng-r0.docx"
+     ],
+     "gantt": "loads",
+     "note": ""
+    },
+    {
+     "code": "ОВЭ75-БИ-Л2-МТ",
+     "name": "Требования к монтажу (включая вес самых тяжёлых частей)",
+     "tz": "D-17",
+     "stage": 2,
+     "kind": "text",
+     "rev": "0",
+     "status": "draft",
+     "files": [
+      {
+       "path": "docs/bi/ove75-l2-mt-r0.pdf",
+       "tag": "PDF"
+      }
+     ],
+     "src": [
+      "docs/bi/ove75-l2-mt-r0.docx"
+     ],
+     "gantt": "mount",
+     "note": ""
+    },
+    {
+     "code": "ОВЭ75-БИ-Л2-ЭС",
+     "name": "Электроснабжение и электрооборудование: однолинейные схемы, предварительный перечень",
+     "tz": "D-33, E-02…E-17",
+     "stage": 2,
+     "kind": "text",
+     "rev": "0",
+     "status": "draft",
+     "files": [
+      {
+       "path": "docs/bi/ove75-l2-es-r0.pdf",
+       "tag": "PDF"
+      }
+     ],
+     "src": [
+      "docs/bi/ove75-l2-es-r0.docx"
+     ],
+     "gantt": "elec",
+     "note": ""
+    },
+    {
+     "code": "ОВЭ75-БИ-Л2-LL",
+     "name": "Перечень трубопроводов, арматуры и приборов КИПиА (line list)",
+     "tz": "D-24, D-25",
+     "stage": 2,
+     "kind": "text",
+     "rev": "0",
+     "status": "draft",
+     "files": [
+      {
+       "path": "docs/bi/ove75-l2-ll-r0.pdf",
+       "tag": "PDF"
+      }
+     ],
+     "src": [
+      "docs/bi/ove75-l2-ll-r0.docx"
+     ],
+     "gantt": "lines",
+     "note": ""
+    },
+    {
+     "code": "ОВЭ75-БИ-Л2-АСУ",
+     "name": "Схема комплекса технических средств АСУ",
+     "tz": "D-26",
+     "stage": 2,
+     "kind": "sheet",
+     "rev": "0",
+     "status": "draft",
+     "files": [
+      {
+       "path": "docs/bi/ove75-l2-asu-r0.pdf",
+       "tag": "PDF"
+      }
+     ],
+     "src": [
+      "docs/sketches/ove75-asu-kts-eskiz.svg"
+     ],
+     "gantt": "asu",
+     "note": ""
+    },
+    {
+     "code": "ОВЭ75-БИ-Л2-ТВ",
+     "name": "Тепловыделения и выделения вредностей от оборудования (данные для смежных разделов)",
+     "tz": "D-27, D-28",
+     "stage": 2,
+     "kind": "text",
+     "rev": "0",
+     "status": "draft",
+     "files": [
+      {
+       "path": "docs/bi/ove75-l2-tv-r0.pdf",
+       "tag": "PDF"
+      }
+     ],
+     "src": [
+      "docs/bi/ove75-l2-tv-r0.docx"
+     ],
+     "gantt": "emiss",
+     "note": ""
+    },
+    {
+     "code": "ОВЭ75-БИ-Л2-СТ",
+     "name": "Стоимостной блок: порядок сбора ТКП и бюджетной оценки поставки",
+     "tz": "D-29, D-30",
+     "stage": 2,
+     "kind": "text",
+     "rev": "0",
+     "status": "draft",
+     "files": [
+      {
+       "path": "docs/bi/ove75-l2-st-r0.pdf",
+       "tag": "PDF"
+      }
+     ],
+     "src": [
+      "docs/bi/ove75-l2-st-r0.docx"
+     ],
+     "gantt": "cost2",
+     "note": ""
     }
    ]
   },
@@ -263,109 +656,325 @@
    "name": "Отделение электроэкстракции",
    "docs": [
     {
-     "name": "Пояснительная записка (электрохимия серии, баланс циркуляции, компоновка нового корпуса)",
+     "code": "ОВЭ75-БИ-Л3-ПЗ",
+     "name": "Пояснительная записка",
+     "tz": "D-01…D-11",
      "stage": 1,
+     "kind": "text",
+     "rev": "0",
      "status": "draft",
-     "file": "docs/bi/ove75-lot3-pz-draft.docx",
-     "note": "v0.1; сценарий Б (новый корпус 36×190) — базовый",
      "files": [
       {
-       "path": "docs/bi/ove75-lot3-pz-draft.docx",
-       "tag": "ПЗ"
+       "path": "docs/bi/ove75-l3-pz-r0.pdf",
+       "tag": "PDF"
       }
      ],
-     "gantt": "pz"
+     "src": [
+      "docs/bi/ove75-l3-pz-r0.docx",
+      "docs/bi/ove75-lot3-pz-draft.docx"
+     ],
+     "gantt": "pz",
+     "note": ""
     },
     {
-     "name": "Расчёт серии (ток, напряжение, выпрямление) + гарантийная рамка",
+     "code": "ОВЭ75-БИ-Л3-РР",
+     "name": "Расчётные приложения к пояснительной записке",
+     "tz": "D-04",
      "stage": 1,
+     "kind": "text",
+     "rev": "0",
      "status": "draft",
-     "file": "docs/ove75-raschet.docx",
-     "note": "блоки L3/NB-EW в записке",
      "files": [
       {
-       "path": "docs/ove75-raschet.docx",
-       "tag": "расчёт"
+       "path": "docs/bi/ove75-l3-rr-r0.pdf",
+       "tag": "PDF"
       }
      ],
-     "gantt": "calcrev"
+     "src": [
+      "docs/bi/ove75-l3-rr-r0.docx",
+      "docs/ove75-raschet-l3.docx"
+     ],
+     "gantt": "calcrev",
+     "note": ""
     },
     {
-     "name": "PFD; компоновочные решения нового корпуса",
+     "code": "ОВЭ75-БИ-Л3-PFD",
+     "name": "Принципиальная технологическая схема (PFD)",
+     "tz": "D-12",
      "stage": 1,
+     "kind": "sheet",
+     "rev": "0",
      "status": "task",
-     "note": "посадка — после генплана (Q-10)",
-     "files": [
-      {
-       "path": "docs/sketches/ove75-lot3-plan-ew-eskiz.svg",
-       "tag": "план"
-      },
-      {
-       "path": "docs/sketches/ove75-lot3-razrez-eskiz.svg",
-       "tag": "разрез"
-      }
+     "files": [],
+     "src": [
+      "docs/sketches/ove75-lot3-pfd-eskiz.svg"
      ],
-     "gantt": "pfd"
+     "gantt": "pfd",
+     "note": "в работе — документ собирается"
     },
     {
-     "name": "Спецификация: ванны, аноды, матрицы, КСМ, краны + опросные листы",
+     "code": "ОВЭ75-БИ-Л3-КР",
+     "name": "Компоновочные решения (планы, разрезы)",
+     "tz": "D-14",
      "stage": 1,
-     "status": "base",
-     "note": "требования Прил.В — после переиздания под 75 тыс. т (C-39)",
+     "kind": "sheet",
+     "rev": "0",
+     "status": "draft",
      "files": [
       {
-       "path": "docs/specs/ove75-ol-vanna-elektroliznaya.docx",
-       "tag": "ОЛ ванна"
-      },
-      {
-       "path": "docs/specs/ove75-ol-kran-mostovoy.docx",
-       "tag": "ОЛ кран"
+       "path": "docs/bi/ove75-l3-kr-r0.pdf",
+       "tag": "PDF"
       }
      ],
-     "gantt": "spec1"
+     "src": [
+      "docs/sketches/ove75-lot3-plan-ew-eskiz.svg",
+      "docs/sketches/ove75-lot3-razrez-eskiz.svg"
+     ],
+     "gantt": "layout",
+     "note": ""
     },
     {
-     "name": "Предварительные P&ID; нагрузки (динамика кранов); электрочасть",
-     "stage": 2,
-     "status": "task",
-     "note": "",
+     "code": "ОВЭ75-БИ-Л3-СО",
+     "name": "Спецификация оборудования с техническими характеристиками",
+     "tz": "D-18",
+     "stage": 1,
+     "kind": "text",
+     "rev": "0",
+     "status": "draft",
      "files": [
       {
-       "path": "docs/sketches/ove75-lot3-pid-cirk-eskiz.svg",
-       "tag": "P&ID"
-      },
-      {
-       "path": "docs/sketches/ove75-lot3-odnolineynaya-eskiz.svg",
-       "tag": "ЭЛ"
+       "path": "docs/bi/ove75-l3-so-r0.pdf",
+       "tag": "PDF"
       }
      ],
-     "gantt": "pid"
+     "src": [
+      "docs/bi/ove75-l3-so-r0.docx"
+     ],
+     "gantt": "spec1",
+     "note": ""
     },
     {
-     "name": "АСУ с прикладным ПО (схема КТС, карта сигналов)",
-     "stage": 2,
-     "status": "base",
-     "note": "перечень контуров и блокировок — в базе",
+     "code": "ОВЭ75-БИ-Л3-ОЛ",
+     "name": "Опросные листы основного оборудования (альбом)",
+     "tz": "D-21",
+     "stage": 1,
+     "kind": "album",
+     "rev": "0",
+     "status": "draft",
      "files": [
       {
-       "path": "docs/sketches/ove75-asu-kts-eskiz.svg",
-       "tag": "КТС"
+       "path": "docs/bi/ove75-l3-ol-r0.pdf",
+       "tag": "PDF"
       }
      ],
-     "gantt": "asu"
+     "src": [
+      "docs/bi/ove75-l3-ol-r0.docx",
+      "docs/specs/ove75-ol-vanna-elektroliznaya.docx",
+      "docs/specs/ove75-ol-kran-mostovoy.docx",
+      "docs/specs/ove75-ol-ksm.docx"
+     ],
+     "gantt": "spec1",
+     "note": ""
     },
     {
-     "name": "Стоимостной блок",
-     "stage": 2,
-     "status": "wait",
-     "note": "кандидаты cell/anode/cathode/stripper/crane/rectifier готовы",
+     "code": "ОВЭ75-БИ-Л3-ДЦ",
+     "name": "Исходные требования на длинноцикловое оборудование",
+     "tz": "D-22",
+     "stage": 1,
+     "kind": "text",
+     "rev": "0",
+     "status": "draft",
      "files": [
       {
-       "path": "docs/rfq/ove75-rfq-index.docx",
-       "tag": "ТКП"
+       "path": "docs/bi/ove75-l3-dc-r0.pdf",
+       "tag": "PDF"
       }
      ],
-     "gantt": "tkp2"
+     "src": [
+      "docs/bi/ove75-l3-dc-r0.docx"
+     ],
+     "gantt": "spec1",
+     "note": ""
+    },
+    {
+     "code": "ОВЭ75-БИ-Л3-PID",
+     "name": "Предварительные схемы трубопроводов и КИПиА (P&ID)",
+     "tz": "D-13",
+     "stage": 2,
+     "kind": "sheet",
+     "rev": "0",
+     "status": "draft",
+     "files": [
+      {
+       "path": "docs/bi/ove75-l3-pid-r0.pdf",
+       "tag": "PDF"
+      }
+     ],
+     "src": [
+      "docs/sketches/ove75-lot3-pid-cirk-eskiz.svg"
+     ],
+     "gantt": "pid",
+     "note": ""
+    },
+    {
+     "code": "ОВЭ75-БИ-Л3-НГ",
+     "name": "Планы строительных конструкций и фундаментов с предварительными нагрузками",
+     "tz": "D-15, D-16",
+     "stage": 2,
+     "kind": "text",
+     "rev": "0",
+     "status": "draft",
+     "files": [
+      {
+       "path": "docs/bi/ove75-l3-ng-r0.pdf",
+       "tag": "PDF"
+      }
+     ],
+     "src": [
+      "docs/bi/ove75-l3-ng-r0.docx"
+     ],
+     "gantt": "loads",
+     "note": ""
+    },
+    {
+     "code": "ОВЭ75-БИ-Л3-МТ",
+     "name": "Требования к монтажу (включая вес самых тяжёлых частей)",
+     "tz": "D-17",
+     "stage": 2,
+     "kind": "text",
+     "rev": "0",
+     "status": "draft",
+     "files": [
+      {
+       "path": "docs/bi/ove75-l3-mt-r0.pdf",
+       "tag": "PDF"
+      }
+     ],
+     "src": [
+      "docs/bi/ove75-l3-mt-r0.docx"
+     ],
+     "gantt": "mount",
+     "note": ""
+    },
+    {
+     "code": "ОВЭ75-БИ-Л3-ЭС",
+     "name": "Электроснабжение и электрооборудование: однолинейные схемы, предварительный перечень",
+     "tz": "D-33, E-02…E-17",
+     "stage": 2,
+     "kind": "text",
+     "rev": "0",
+     "status": "draft",
+     "files": [
+      {
+       "path": "docs/bi/ove75-l3-es-r0.pdf",
+       "tag": "PDF"
+      }
+     ],
+     "src": [
+      "docs/bi/ove75-l3-es-r0.docx"
+     ],
+     "gantt": "elec",
+     "note": ""
+    },
+    {
+     "code": "ОВЭ75-БИ-Л3-ЭС-С",
+     "name": "Однолинейная схема электроснабжения (эскиз)",
+     "tz": "E-10",
+     "stage": 2,
+     "kind": "sheet",
+     "rev": "0",
+     "status": "draft",
+     "files": [
+      {
+       "path": "docs/bi/ove75-l3-es-s-r0.pdf",
+       "tag": "PDF"
+      }
+     ],
+     "src": [
+      "docs/sketches/ove75-lot3-odnolineynaya-eskiz.svg"
+     ],
+     "gantt": "elec",
+     "note": ""
+    },
+    {
+     "code": "ОВЭ75-БИ-Л3-LL",
+     "name": "Перечень трубопроводов, арматуры и приборов КИПиА (line list)",
+     "tz": "D-24, D-25",
+     "stage": 2,
+     "kind": "text",
+     "rev": "0",
+     "status": "draft",
+     "files": [
+      {
+       "path": "docs/bi/ove75-l3-ll-r0.pdf",
+       "tag": "PDF"
+      }
+     ],
+     "src": [
+      "docs/bi/ove75-l3-ll-r0.docx"
+     ],
+     "gantt": "lines",
+     "note": ""
+    },
+    {
+     "code": "ОВЭ75-БИ-Л3-АСУ",
+     "name": "Схема комплекса технических средств АСУ",
+     "tz": "D-26",
+     "stage": 2,
+     "kind": "sheet",
+     "rev": "0",
+     "status": "draft",
+     "files": [
+      {
+       "path": "docs/bi/ove75-l3-asu-r0.pdf",
+       "tag": "PDF"
+      }
+     ],
+     "src": [
+      "docs/sketches/ove75-asu-kts-eskiz.svg"
+     ],
+     "gantt": "asu",
+     "note": ""
+    },
+    {
+     "code": "ОВЭ75-БИ-Л3-ТВ",
+     "name": "Тепловыделения и выделения вредностей от оборудования (данные для смежных разделов)",
+     "tz": "D-27, D-28",
+     "stage": 2,
+     "kind": "text",
+     "rev": "0",
+     "status": "draft",
+     "files": [
+      {
+       "path": "docs/bi/ove75-l3-tv-r0.pdf",
+       "tag": "PDF"
+      }
+     ],
+     "src": [
+      "docs/bi/ove75-l3-tv-r0.docx"
+     ],
+     "gantt": "emiss",
+     "note": ""
+    },
+    {
+     "code": "ОВЭ75-БИ-Л3-СТ",
+     "name": "Стоимостной блок: порядок сбора ТКП и бюджетной оценки поставки",
+     "tz": "D-29, D-30",
+     "stage": 2,
+     "kind": "text",
+     "rev": "0",
+     "status": "draft",
+     "files": [
+      {
+       "path": "docs/bi/ove75-l3-st-r0.pdf",
+       "tag": "PDF"
+      }
+     ],
+     "src": [
+      "docs/bi/ove75-l3-st-r0.docx"
+     ],
+     "gantt": "cost2",
+     "note": ""
     }
    ]
   },
@@ -374,60 +983,207 @@
    "name": "Склад готовой продукции",
    "docs": [
     {
-     "name": "Пояснительная записка (потоки склада, буфер, упаковка/маркировка/учёт)",
+     "code": "ОВЭ75-БИ-Л4-ПЗ",
+     "name": "Пояснительная записка",
+     "tz": "D-01…D-11",
      "stage": 1,
+     "kind": "text",
+     "rev": "0",
      "status": "draft",
-     "file": "docs/bi/ove75-lot4-pz-draft.docx",
-     "note": "v0.1; буфер 3000 т = 14,3 суток отгрузки",
      "files": [
       {
-       "path": "docs/bi/ove75-lot4-pz-draft.docx",
-       "tag": "ПЗ"
-      },
-      {
-       "path": "docs/ove75-raschet.docx",
-       "tag": "расчёт"
+       "path": "docs/bi/ove75-l4-pz-r0.pdf",
+       "tag": "PDF"
       }
      ],
-     "gantt": "pz"
+     "src": [
+      "docs/bi/ove75-l4-pz-r0.docx",
+      "docs/bi/ove75-lot4-pz-draft.docx"
+     ],
+     "gantt": "pz",
+     "note": ""
     },
     {
-     "name": "PFD; компоновка склада; спецификация + опросные листы",
+     "code": "ОВЭ75-БИ-Л4-PFD",
+     "name": "Принципиальная технологическая схема (PFD)",
+     "tz": "D-12",
      "stage": 1,
-     "status": "base",
-     "note": "",
+     "kind": "sheet",
+     "rev": "0",
+     "status": "draft",
      "files": [
       {
-       "path": "docs/sketches/ove75-lot4-flow-eskiz.svg",
-       "tag": "PFD"
-      },
-      {
-       "path": "docs/sketches/ove75-lot4-plan-sklada-eskiz.svg",
-       "tag": "план"
-      },
-      {
-       "path": "docs/specs/ove75-ol-shtabeler.docx",
-       "tag": "ОЛ штаб"
-      },
-      {
-       "path": "docs/specs/ove75-ol-kran-mostovoy.docx",
-       "tag": "ОЛ кран"
+       "path": "docs/bi/ove75-l4-pfd-r0.pdf",
+       "tag": "PDF"
       }
      ],
-     "gantt": "pfd"
+     "src": [
+      "docs/sketches/ove75-lot4-flow-eskiz.svg"
+     ],
+     "gantt": "pfd",
+     "note": ""
     },
     {
-     "name": "Нагрузки; электрочасть; стоимостной блок",
-     "stage": 2,
-     "status": "wait",
-     "note": "",
+     "code": "ОВЭ75-БИ-Л4-КР",
+     "name": "Компоновочные решения (планы, разрезы)",
+     "tz": "D-14",
+     "stage": 1,
+     "kind": "sheet",
+     "rev": "0",
+     "status": "draft",
      "files": [
       {
-       "path": "docs/rfq/ove75-rfq-index.docx",
-       "tag": "ТКП"
+       "path": "docs/bi/ove75-l4-kr-r0.pdf",
+       "tag": "PDF"
       }
      ],
-     "gantt": "loads"
+     "src": [
+      "docs/sketches/ove75-lot4-plan-sklada-eskiz.svg"
+     ],
+     "gantt": "layout",
+     "note": ""
+    },
+    {
+     "code": "ОВЭ75-БИ-Л4-СО",
+     "name": "Спецификация оборудования с техническими характеристиками",
+     "tz": "D-18",
+     "stage": 1,
+     "kind": "text",
+     "rev": "0",
+     "status": "draft",
+     "files": [
+      {
+       "path": "docs/bi/ove75-l4-so-r0.pdf",
+       "tag": "PDF"
+      }
+     ],
+     "src": [
+      "docs/bi/ove75-l4-so-r0.docx"
+     ],
+     "gantt": "spec1",
+     "note": ""
+    },
+    {
+     "code": "ОВЭ75-БИ-Л4-ОЛ",
+     "name": "Опросные листы основного оборудования (альбом)",
+     "tz": "D-21",
+     "stage": 1,
+     "kind": "album",
+     "rev": "0",
+     "status": "draft",
+     "files": [
+      {
+       "path": "docs/bi/ove75-l4-ol-r0.pdf",
+       "tag": "PDF"
+      }
+     ],
+     "src": [
+      "docs/bi/ove75-l4-ol-r0.docx",
+      "docs/specs/ove75-ol-shtabeler.docx",
+      "docs/specs/ove75-ol-kran-mostovoy.docx"
+     ],
+     "gantt": "spec1",
+     "note": ""
+    },
+    {
+     "code": "ОВЭ75-БИ-Л4-НГ",
+     "name": "Планы строительных конструкций и фундаментов с предварительными нагрузками",
+     "tz": "D-15, D-16",
+     "stage": 2,
+     "kind": "text",
+     "rev": "0",
+     "status": "draft",
+     "files": [
+      {
+       "path": "docs/bi/ove75-l4-ng-r0.pdf",
+       "tag": "PDF"
+      }
+     ],
+     "src": [
+      "docs/bi/ove75-l4-ng-r0.docx"
+     ],
+     "gantt": "loads",
+     "note": ""
+    },
+    {
+     "code": "ОВЭ75-БИ-Л4-МТ",
+     "name": "Требования к монтажу (включая вес самых тяжёлых частей)",
+     "tz": "D-17",
+     "stage": 2,
+     "kind": "text",
+     "rev": "0",
+     "status": "draft",
+     "files": [
+      {
+       "path": "docs/bi/ove75-l4-mt-r0.pdf",
+       "tag": "PDF"
+      }
+     ],
+     "src": [
+      "docs/bi/ove75-l4-mt-r0.docx"
+     ],
+     "gantt": "mount",
+     "note": ""
+    },
+    {
+     "code": "ОВЭ75-БИ-Л4-ЭС",
+     "name": "Электроснабжение и электрооборудование: однолинейные схемы, предварительный перечень",
+     "tz": "D-33, E-02…E-17",
+     "stage": 2,
+     "kind": "text",
+     "rev": "0",
+     "status": "draft",
+     "files": [
+      {
+       "path": "docs/bi/ove75-l4-es-r0.pdf",
+       "tag": "PDF"
+      }
+     ],
+     "src": [
+      "docs/bi/ove75-l4-es-r0.docx"
+     ],
+     "gantt": "elec",
+     "note": ""
+    },
+    {
+     "code": "ОВЭ75-БИ-Л4-АСУ",
+     "name": "Схема комплекса технических средств АСУ",
+     "tz": "D-26",
+     "stage": 2,
+     "kind": "sheet",
+     "rev": "0",
+     "status": "draft",
+     "files": [
+      {
+       "path": "docs/bi/ove75-l4-asu-r0.pdf",
+       "tag": "PDF"
+      }
+     ],
+     "src": [
+      "docs/sketches/ove75-asu-kts-eskiz.svg"
+     ],
+     "gantt": "asu",
+     "note": ""
+    },
+    {
+     "code": "ОВЭ75-БИ-Л4-СТ",
+     "name": "Стоимостной блок: порядок сбора ТКП и бюджетной оценки поставки",
+     "tz": "D-29, D-30",
+     "stage": 2,
+     "kind": "text",
+     "rev": "0",
+     "status": "draft",
+     "files": [
+      {
+       "path": "docs/bi/ove75-l4-st-r0.pdf",
+       "tag": "PDF"
+      }
+     ],
+     "src": [
+      "docs/bi/ove75-l4-st-r0.docx"
+     ],
+     "gantt": "cost2",
+     "note": ""
     }
    ]
   },
@@ -436,124 +1192,175 @@
    "name": "Общее по комплексу",
    "docs": [
     {
-     "name": "ЦИМ стадии БИ (модели ТХ + ЭОМ/СС/АК по Прил.1 LOD/LOI)",
+     "code": "ОВЭ75-БИ-ОБ-ВД",
+     "name": "Ведомость документов Базового инжиниринга",
+     "tz": "D-32",
+     "stage": 1,
+     "kind": "text",
+     "rev": "0",
+     "status": "draft",
+     "files": [
+      {
+       "path": "docs/bi/ove75-ob-vd-r0.pdf",
+       "tag": "PDF"
+      }
+     ],
+     "src": [
+      "docs/bi/ove75-ob-vd-r0.docx"
+     ],
+     "gantt": "asm1",
+     "note": ""
+    },
+    {
+     "code": "ОВЭ75-БИ-ОБ-ПО",
+     "name": "Перечень основного и вспомогательного оборудования по лотам",
+     "tz": "D-08",
+     "stage": 1,
+     "kind": "text",
+     "rev": "0",
+     "status": "draft",
+     "files": [
+      {
+       "path": "docs/bi/ove75-ob-po-r0.pdf",
+       "tag": "PDF"
+      }
+     ],
+     "src": [
+      "docs/bi/ove75-ob-po-r0.docx",
+      "docs/specs/ove75-perechen-oborudovaniya.docx"
+     ],
+     "gantt": "spec1",
+     "note": ""
+    },
+    {
+     "code": "ОВЭ75-БИ-ОБ-ЦИМ",
+     "name": "Цифровая информационная модель стадии БИ: описание и состав",
+     "tz": "D-31, M-09, M-12",
      "stage": 2,
-     "status": "wait",
-     "note": "отдельный этап; ПО согласуется (Model Studio CS/NanoCAD); нужен моделлер",
-     "gantt": "cim1"
-    },
-    {
-     "name": "Реестр вопросов и решений Заказчика (сопровождение)",
-     "stage": 1,
+     "kind": "text",
+     "rev": "0",
      "status": "draft",
-     "file": "docs/ove75-reestr.docx",
-     "note": "живёт на сайте, Word пересобирается автоматически",
      "files": [
       {
-       "path": "docs/ove75-reestr.docx",
-       "tag": "реестр"
-      }
-     ]
-    },
-    {
-     "name": "Перечень основного оборудования по лотам (70 позиций)",
-     "stage": 1,
-     "status": "draft",
-     "file": "docs/specs/ove75-perechen-oborudovaniya.docx",
-     "note": "генерится из базы при каждой сборке",
-     "files": [
-      {
-       "path": "docs/specs/ove75-perechen-oborudovaniya.docx",
-       "tag": "перечень"
+       "path": "docs/bi/ove75-ob-cim-r0.pdf",
+       "tag": "PDF"
       }
      ],
-     "gantt": "spec1"
+     "src": [
+      "docs/bi/ove75-ob-cim-r0.docx",
+      "docs/cim/ove75-equip-lib.ifc",
+      "docs/cim/ove75-equip-lot0.ifc",
+      "docs/cim/ove75-equip-lot1.ifc",
+      "docs/cim/ove75-equip-lot2.ifc",
+      "docs/cim/ove75-equip-lot3.ifc",
+      "docs/cim/ove75-equip-lot4.ifc"
+     ],
+     "gantt": "cim2",
+     "note": ""
     },
     {
-     "name": "Опросные листы — 12 ключевых классов оборудования",
+     "code": "ОВЭ75-БИ-ОБ-ПИМ",
+     "name": "План информационного моделирования (ПИМ)",
+     "tz": "M-03",
      "stage": 1,
+     "kind": "text",
+     "rev": "0",
      "status": "draft",
-     "file": "docs/specs/ove75-ol-pech-ks.docx",
-     "note": "остальные 11 файлов — в docs/specs/; параметры из базы, пробелы — «уточняется по ТКП»",
      "files": [
       {
-       "path": "docs/specs/ove75-ol-pech-ks.docx",
-       "tag": "печь КС"
-      },
-      {
-       "path": "docs/specs/ove75-ol-kotel-utilizator.docx",
-       "tag": "КУ"
-      },
-      {
-       "path": "docs/specs/ove75-ol-tsiklony.docx",
-       "tag": "циклон"
-      },
-      {
-       "path": "docs/specs/ove75-ol-elektrofiltr.docx",
-       "tag": "ЭФ"
-      },
-      {
-       "path": "docs/specs/ove75-ol-dymosos.docx",
-       "tag": "дымосос"
-      },
-      {
-       "path": "docs/specs/ove75-ol-vozduhoduvka.docx",
-       "tag": "возд-ка"
-      },
-      {
-       "path": "docs/specs/ove75-ol-vakuum-filtr.docx",
-       "tag": "вак.ф-р"
-      },
-      {
-       "path": "docs/specs/ove75-ol-vyparnoy-apparat.docx",
-       "tag": "выпарка"
-      },
-      {
-       "path": "docs/specs/ove75-ol-tsentrifuga.docx",
-       "tag": "ц/фуга"
-      },
-      {
-       "path": "docs/specs/ove75-ol-vanna-elektroliznaya.docx",
-       "tag": "ванна"
-      },
-      {
-       "path": "docs/specs/ove75-ol-kran-mostovoy.docx",
-       "tag": "кран"
-      },
-      {
-       "path": "docs/specs/ove75-ol-shtabeler.docx",
-       "tag": "штабелёр"
+       "path": "docs/bi/ove75-ob-pim-r0.pdf",
+       "tag": "PDF"
       }
      ],
-     "gantt": "spec1"
+     "src": [
+      "docs/bi/ove75-ob-pim-r0.docx",
+      "docs/ove75-bim-plan-draft.docx"
+     ],
+     "gantt": "cimsoft",
+     "note": ""
     },
     {
-     "name": "Пакет запросов бюджетных ТКП (27 позиций, RU+EN)",
+     "code": "ОВЭ75-БИ-ОБ-РВ",
+     "name": "Реестр вопросов Заказчику и принятых решений",
+     "tz": "сопровождение БИ",
      "stage": 1,
+     "kind": "text",
+     "rev": "0",
      "status": "draft",
-     "file": "docs/rfq/ove75-rfq-index.docx",
-     "note": "полный пакет — docs/rfq/; адресаты и рассылка — в день старта",
      "files": [
       {
-       "path": "docs/rfq/ove75-rfq-index.docx",
-       "tag": "ТКП"
+       "path": "docs/bi/ove75-ob-rv-r0.pdf",
+       "tag": "PDF"
       }
      ],
-     "gantt": "tkp2"
+     "src": [
+      "docs/bi/ove75-ob-rv-r0.docx",
+      "docs/ove75-reestr.docx"
+     ],
+     "gantt": null,
+     "note": ""
     },
     {
-     "name": "План реализации ЦИМ (BEP, черновик v0.1)",
+     "code": "ОВЭ75-БИ-ОБ-ЗР",
+     "name": "Ведомость закладных решений для последующей цифровизации",
+     "tz": "Прил. 4, Прил. 5",
      "stage": 1,
+     "kind": "text",
+     "rev": "0",
      "status": "draft",
-     "file": "docs/ove75-bim-plan-draft.docx",
-     "note": "перечень моделей, LOD/LOI по Прил.1, IFC раз в 4 недели",
      "files": [
       {
-       "path": "docs/ove75-bim-plan-draft.docx",
-       "tag": "BEP"
+       "path": "docs/bi/ove75-ob-zr-r0.pdf",
+       "tag": "PDF"
       }
      ],
-     "gantt": "cimsoft"
+     "src": [
+      "docs/bi/ove75-ob-zr-r0.docx",
+      "docs/specs/ove75-zakladki-vedomost.docx"
+     ],
+     "gantt": "spec1",
+     "note": ""
+    },
+    {
+     "code": "ОВЭ75-БИ-ОБ-ТКП",
+     "name": "Реестр запросов бюджетных технико-коммерческих предложений",
+     "tz": "D-29",
+     "stage": 2,
+     "kind": "text",
+     "rev": "0",
+     "status": "draft",
+     "files": [
+      {
+       "path": "docs/bi/ove75-ob-tkp-r0.pdf",
+       "tag": "PDF"
+      }
+     ],
+     "src": [
+      "docs/bi/ove75-ob-tkp-r0.docx",
+      "docs/rfq/ove75-rfq-index.docx"
+     ],
+     "gantt": "tkp1",
+     "note": ""
+    },
+    {
+     "code": "ОВЭ75-БИ-ОБ-АСУ",
+     "name": "Схема комплекса технических средств АСУ (по комплексу)",
+     "tz": "D-26",
+     "stage": 2,
+     "kind": "sheet",
+     "rev": "0",
+     "status": "draft",
+     "files": [
+      {
+       "path": "docs/bi/ove75-ob-asu-r0.pdf",
+       "tag": "PDF"
+      }
+     ],
+     "src": [
+      "docs/sketches/ove75-asu-kts-eskiz.svg"
+     ],
+     "gantt": "asu",
+     "note": ""
     }
    ]
   }
