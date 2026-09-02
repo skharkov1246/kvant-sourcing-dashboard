@@ -35,7 +35,8 @@ p{margin:0 0 2mm}
 .nah .t{font-weight:700;font-size:9.8pt}
 .nah .l{font-size:7pt;text-transform:uppercase;letter-spacing:.4pt;color:#6c757c;margin:1.1mm 0 .2mm}
 .nah .f{font-style:italic;background:#f2f4f5;padding:1mm 2.2mm;margin-top:1mm;border-left:1.6pt solid #7d868d;font-size:8pt}
-.poz{break-inside:avoid;border:.5pt solid #c6ccd1;padding:2mm 3mm;margin:0 0 2mm}
+.poz{border:.5pt solid #c6ccd1;padding:2mm 3mm;margin:0 0 2mm}
+.poz h3{break-after:avoid}
 .poz.glav{border-color:#1d6b3d;border-width:.9pt;background:#f4f8f5}
 table{border-collapse:collapse;width:100%;font-size:7.9pt;margin:.8mm 0 1.6mm}
 th,td{border:.4pt solid #b9bfc4;padding:1.2mm 2mm;text-align:left;vertical-align:top}
@@ -144,7 +145,7 @@ def sobrat() -> str:
 
     return ('<!doctype html>\n<html lang="ru"><head><meta charset="utf-8">'
             f'<title>{e(d["zagolovok"])}</title><style>{STIL}</style></head><body>\n'
-            + shapka + slovar + rech + nahodki + stavka + vozr + chisla + ne_gov + esli + shagi + podval
+            + shapka + rech + slovar + nahodki + stavka + vozr + chisla + ne_gov + esli + shagi + podval
             + '\n</body></html>\n')
 
 
