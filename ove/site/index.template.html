@@ -2725,16 +2725,18 @@ function rBI(){
       <span class="tag lot3">${(n=>`${n} ${plural(n,'черновик','черновика','черновиков')}`)(L.docs.filter(d=>d.status==='draft').length)}</span>
       <span class="tag">${L.docs.length} документов</span>
       <a class="btn" style="margin-left:6px" href="docs/paket/${L.lot?`ove75-lot${L.lot}-paket.zip`:'ove75-obshchee-paket.zip'}" download>⬇ пакет лота (ZIP)</a></h3>
-    <div class="tblwrap"><table><thead><tr><th>Документ</th><th style="width:60px">Этап</th>
-      <th style="width:150px">Статус</th><th style="width:190px">Файлы</th><th>Примечание</th></tr></thead><tbody>
+    <div class="tblwrap"><table><thead><tr><th style="width:170px">Обозначение</th><th>Документ</th><th style="width:150px">Пункт ТЗ</th><th style="width:56px">Этап</th>
+      <th style="width:140px">Статус</th><th style="width:120px">Скачать</th></tr></thead><tbody>
     ${L.docs.map(d=>{
-      const st={draft:['черновик готов','tag lot3'],base:['контент в базе','tag lot2'],
-                task:['нужен инженер','tag lot1'],wait:['после старта','tag'],team:['за командой','tag lot1']}[d.status]||[d.status,'tag'];
+      const st={draft:['Ревизия '+(d.rev||'0')+' — на согласование','tag lot3'],base:['контент в базе','tag lot2'],
+                task:['в работе','tag lot1'],wait:['после старта','tag'],team:['за командой','tag lot1']}[d.status]||[d.status,'tag'];
       const fl=(d.files&&d.files.length)?d.files:(d.file?[{path:d.file,tag:'файл'}]:[]);
-      return `<tr><td>${esc(d.name)}</td><td class="mut">Этап ${d.stage}</td>
+      const pdf=fl.find(f=>/\.pdf$/i.test(f.path))||fl[0];
+      const docx=(d.src||[]).find(s=>/\.docx$/i.test(s));
+      return `<tr><td class="mono" style="white-space:nowrap">${esc(d.code||'')}</td><td>${esc(d.name)}${d.note?`<div class="mut">${esc(d.note)}</div>`:''}</td>
+        <td class="mut">${esc(d.tz||'')}</td><td class="mut">Этап ${d.stage}</td>
         <td><span class="${st[1]}">${st[0]}</span></td>
-        <td>${fl.length?fl.map(f=>`<a class="btn" style="margin:1px 2px 1px 0;padding:3px 8px" href="${esc(f.path)}" download title="${esc(f.path.split('/').pop())}">⬇ ${esc(f.tag||'')}</a>`).join(''):'—'}</td>
-        <td class="mut">${esc(d.note||'')}</td></tr>`;}).join('')}
+        <td style="white-space:nowrap">${pdf?`<a class="btn" href="${esc(pdf.path)}" download title="${esc(pdf.path.split('/').pop())}">⬇ PDF</a>`:'—'}${docx?` <a class="btn" style="padding:3px 7px" href="${esc(docx)}" download title="исходник Word">W</a>`:''}</td></tr>`;}).join('')}
     </tbody></table></div></div>`).join('')}`:''}
   ${ECO?`<h2>Экология / ООС — предварительно, из посчитанных балансов</h2>
   <div class="box info">${esc(ECO.note)}</div>
@@ -3866,7 +3868,7 @@ function bindTasks(){
 }
 
 /* --- Документы: дерево папок + история версий у каждого файла --- */
-const DIRNAMES={bi:'Пояснительные записки',apply:'Пакет подачи',rfq:'Запросы ТКП',specs:'Спецификации и опросные листы',sketches:'Эскизы-подложки (SVG)',dxf:'Чертежи DXF (для nanoCAD)',cim:'ЦИМ — библиотека IFC',idei:'Реестр идей эффективности',partner:'Партнёрская линия',paket:'ZIP-пакеты',_root:'Общие документы'};
+const DIRNAMES={bi:'Выпуск БИ — Ревизия 0 (титул, штамп, колонтитулы)',apply:'Пакет подачи',rfq:'Запросы ТКП',specs:'Спецификации и опросные листы',sketches:'Эскизы-подложки (SVG)',dxf:'Чертежи DXF (для nanoCAD)',cim:'ЦИМ — библиотека IFC',idei:'Реестр идей эффективности',partner:'Партнёрская линия',paket:'ZIP-пакеты',_root:'Общие документы'};
 const DIRHINT={rfq:'Технические задания на оборудование для запроса ТКП. У каждой позиции две версии PDF: «-ru» — русская (рабочая, с полями под ручное оформление письма), «-en» — версия для зарубежных изготовителей: часть 1 английская, часть 2 китайская, шапка письма снята, контакт для ответа проставлен. Именно «-en» уходит вложением в запросах из Bitrix. Исходные DOCX остаются для правок: русские собирает build_rfq.py, английские лежат в ove/rfq_en/ (чистка — rfq_en_clean.py, PDF — build_rfq_pdf.py).',dxf:'Те же 14 листов, что в эскизах, но в DXF R2010: открываются в nanoCAD / AutoCAD / Model Studio CS. Слои GAS / LIQUID / DUST / ELECTRIC / INTERLOCK / OUTLINE / TEXT_RU, 1 единица = 1 мм — подложка для рабочей отрисовки, не перечерчивать с нуля.',cim:'IFC-файлы стадии БИ: библиотека типов оборудования (70 типов, 14 классов, атрибуты Pset_KVANT_LOI) и наборы по лотам. Открываются в Model Studio CS, nanoCAD BIM, BIMVision (бесплатный просмотрщик).',idei:'65 предложений по эффективности производства в трёх корзинах: 44 — в базовый состав БИ, 18 — опции Заказчику, 3 — эксплуатация. Ред. 1.0 — компактная (20 стр., абзац на идею); ред. 2.0 — рабочая (67 стр.): к каждой идее добавлены исполнители РФ/КНР и техническая реализация по шагам. Оценки эффектов — Class 5, до инженерной проверки.'};
 function fileMeta(){
   const m={};

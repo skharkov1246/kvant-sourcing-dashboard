@@ -39,7 +39,7 @@ def build() -> Path:
             "code": r["code"], "name": r["title"], "tz": r.get("tz", ""), "stage": r.get("stage", 1),
             "kind": r.get("kind", "text"), "rev": rel.get("rev", "0"),
             "status": "draft" if files else "task",
-            "files": files, "src": src,
+            "files": files, "src": src, "gantt": r.get("gantt"),
             "note": r.get("note", "") if files else "в работе — документ собирается",
         })
     out = {"updated": date.today().isoformat(), "note": NOTE,

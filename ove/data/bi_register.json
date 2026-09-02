@@ -15,7 +15,8 @@
    "status": "exists",
    "sources": [
     "docs/bi/ove75-lot1-pz-draft.docx"
-   ]
+   ],
+   "gantt": "pz"
   },
   {
    "code": "ОВЭ75-БИ-Л2-ПЗ",
@@ -30,7 +31,8 @@
    "status": "exists",
    "sources": [
     "docs/bi/ove75-lot2-pz-draft.docx"
-   ]
+   ],
+   "gantt": "pz"
   },
   {
    "code": "ОВЭ75-БИ-Л3-ПЗ",
@@ -45,7 +47,8 @@
    "status": "exists",
    "sources": [
     "docs/bi/ove75-lot3-pz-draft.docx"
-   ]
+   ],
+   "gantt": "pz"
   },
   {
    "code": "ОВЭ75-БИ-Л4-ПЗ",
@@ -60,7 +63,8 @@
    "status": "exists",
    "sources": [
     "docs/bi/ove75-lot4-pz-draft.docx"
-   ]
+   ],
+   "gantt": "pz"
   },
   {
    "code": "ОВЭ75-БИ-Л1-РР",
@@ -75,7 +79,8 @@
    "status": "exists",
    "sources": [
     "docs/ove75-raschet.docx"
-   ]
+   ],
+   "gantt": "calcrev"
   },
   {
    "code": "ОВЭ75-БИ-Л3-РР",
@@ -90,7 +95,8 @@
    "status": "exists",
    "sources": [
     "docs/ove75-raschet.docx"
-   ]
+   ],
+   "gantt": "calcrev"
   },
   {
    "code": "ОВЭ75-БИ-Л1-PFD",
@@ -107,7 +113,8 @@
      "title": "Принципиальная технологическая схема"
     }
    ],
-   "status": "exists"
+   "status": "exists",
+   "gantt": "pfd"
   },
   {
    "code": "ОВЭ75-БИ-Л2-PFD",
@@ -124,7 +131,8 @@
      "title": "Принципиальная технологическая схема"
     }
    ],
-   "status": "exists"
+   "status": "exists",
+   "gantt": "pfd"
   },
   {
    "code": "ОВЭ75-БИ-Л3-PFD",
@@ -141,7 +149,8 @@
      "title": "Принципиальная технологическая схема"
     }
    ],
-   "status": "exists"
+   "status": "exists",
+   "gantt": "pfd"
   },
   {
    "code": "ОВЭ75-БИ-Л4-PFD",
@@ -158,7 +167,8 @@
      "title": "Принципиальная технологическая схема"
     }
    ],
-   "status": "exists"
+   "status": "exists",
+   "gantt": "pfd"
   },
   {
    "code": "ОВЭ75-БИ-Л1-КР",
@@ -175,7 +185,8 @@
      "title": "Высотная схема размещения оборудования"
     }
    ],
-   "status": "exists"
+   "status": "exists",
+   "gantt": "layout"
   },
   {
    "code": "ОВЭ75-БИ-Л2-КР",
@@ -192,7 +203,8 @@
      "title": "План размещения оборудования в здании ГМУ"
     }
    ],
-   "status": "exists"
+   "status": "exists",
+   "gantt": "layout"
   },
   {
    "code": "ОВЭ75-БИ-Л3-КР",
@@ -213,7 +225,8 @@
      "title": "Разрез по корпусу"
     }
    ],
-   "status": "exists"
+   "status": "exists",
+   "gantt": "layout"
   },
   {
    "code": "ОВЭ75-БИ-Л4-КР",
@@ -230,7 +243,8 @@
      "title": "План склада готовой продукции"
     }
    ],
-   "status": "exists"
+   "status": "exists",
+   "gantt": "layout"
   },
   {
    "code": "ОВЭ75-БИ-Л1-СО",
@@ -241,7 +255,8 @@
    "tz": "D-18",
    "module": "spec_lot",
    "status": "new",
-   "sources": []
+   "sources": [],
+   "gantt": "spec1"
   },
   {
    "code": "ОВЭ75-БИ-Л2-СО",
@@ -252,7 +267,8 @@
    "tz": "D-18",
    "module": "spec_lot",
    "status": "new",
-   "sources": []
+   "sources": [],
+   "gantt": "spec1"
   },
   {
    "code": "ОВЭ75-БИ-Л3-СО",
@@ -263,7 +279,8 @@
    "tz": "D-18",
    "module": "spec_lot",
    "status": "new",
-   "sources": []
+   "sources": [],
+   "gantt": "spec1"
   },
   {
    "code": "ОВЭ75-БИ-Л4-СО",
@@ -274,7 +291,8 @@
    "tz": "D-18",
    "module": "spec_lot",
    "status": "new",
-   "sources": []
+   "sources": [],
+   "gantt": "spec1"
   },
   {
    "code": "ОВЭ75-БИ-Л1-НО",
@@ -284,7 +302,8 @@
    "title": "Спецификация нетипового оборудования с техническими требованиями",
    "tz": "D-19",
    "module": "netip_lot1",
-   "status": "new"
+   "status": "new",
+   "gantt": "spec1"
   },
   {
    "code": "ОВЭ75-БИ-Л1-ЭЧ",
@@ -299,7 +318,8 @@
      "title": "Печь кипящего слоя — эскиз общего вида"
     }
    ],
-   "status": "new"
+   "status": "new",
+   "gantt": "spec1"
   },
   {
    "code": "ОВЭ75-БИ-Л1-ОЛ",
@@ -327,7 +347,8 @@
     "docs/specs/ove75-ol-dymosos.docx",
     "docs/specs/ove75-ol-vozduhoduvka.docx",
     "docs/specs/ove75-ol-vakuum-filtr.docx"
-   ]
+   ],
+   "gantt": "spec1"
   },
   {
    "code": "ОВЭ75-БИ-Л2-ОЛ",
@@ -345,7 +366,8 @@
    "sources": [
     "docs/specs/ove75-ol-vyparnoy-apparat.docx",
     "docs/specs/ove75-ol-tsentrifuga.docx"
-   ]
+   ],
+   "gantt": "spec1"
   },
   {
    "code": "ОВЭ75-БИ-Л3-ОЛ",
@@ -365,7 +387,8 @@
     "docs/specs/ove75-ol-vanna-elektroliznaya.docx",
     "docs/specs/ove75-ol-kran-mostovoy.docx",
     "docs/specs/ove75-ol-ksm.docx"
-   ]
+   ],
+   "gantt": "spec1"
   },
   {
    "code": "ОВЭ75-БИ-Л4-ОЛ",
@@ -383,7 +406,8 @@
    "sources": [
     "docs/specs/ove75-ol-shtabeler.docx",
     "docs/specs/ove75-ol-kran-mostovoy.docx"
-   ]
+   ],
+   "gantt": "spec1"
   },
   {
    "code": "ОВЭ75-БИ-Л1-ДЦ",
@@ -393,7 +417,8 @@
    "title": "Исходные требования на длинноцикловое оборудование",
    "tz": "D-22",
    "module": "longlead",
-   "status": "new"
+   "status": "new",
+   "gantt": "spec1"
   },
   {
    "code": "ОВЭ75-БИ-Л2-ДЦ",
@@ -403,7 +428,8 @@
    "title": "Исходные требования на длинноцикловое оборудование",
    "tz": "D-22",
    "module": "longlead",
-   "status": "new"
+   "status": "new",
+   "gantt": "spec1"
   },
   {
    "code": "ОВЭ75-БИ-Л3-ДЦ",
@@ -413,7 +439,8 @@
    "title": "Исходные требования на длинноцикловое оборудование",
    "tz": "D-22",
    "module": "longlead",
-   "status": "new"
+   "status": "new",
+   "gantt": "spec1"
   },
   {
    "code": "ОВЭ75-БИ-Л1-PID",
@@ -430,7 +457,8 @@
      "title": "Предварительная схема P&ID"
     }
    ],
-   "status": "exists"
+   "status": "exists",
+   "gantt": "pid"
   },
   {
    "code": "ОВЭ75-БИ-Л2-PID",
@@ -447,7 +475,8 @@
      "title": "Предварительная схема P&ID"
     }
    ],
-   "status": "exists"
+   "status": "exists",
+   "gantt": "pid"
   },
   {
    "code": "ОВЭ75-БИ-Л3-PID",
@@ -464,7 +493,8 @@
      "title": "Предварительная схема P&ID"
     }
    ],
-   "status": "exists"
+   "status": "exists",
+   "gantt": "pid"
   },
   {
    "code": "ОВЭ75-БИ-Л1-НГ",
@@ -475,7 +505,8 @@
    "tz": "D-15, D-16",
    "subtitle": "Ведомость предварительных нагрузок, включая динамические",
    "module": "loads_lot",
-   "status": "new"
+   "status": "new",
+   "gantt": "loads"
   },
   {
    "code": "ОВЭ75-БИ-Л1-МТ",
@@ -485,7 +516,8 @@
    "title": "Требования к монтажу (включая вес самых тяжёлых частей)",
    "tz": "D-17",
    "module": "montazh_lot",
-   "status": "new"
+   "status": "new",
+   "gantt": "mount"
   },
   {
    "code": "ОВЭ75-БИ-Л1-ЭС",
@@ -495,7 +527,8 @@
    "title": "Электроснабжение и электрооборудование: однолинейные схемы, предварительный перечень",
    "tz": "D-23, D-33, E-02…E-17",
    "module": "electro_lot",
-   "status": "new"
+   "status": "new",
+   "gantt": "elec"
   },
   {
    "code": "ОВЭ75-БИ-Л2-НГ",
@@ -506,7 +539,8 @@
    "tz": "D-15, D-16",
    "subtitle": "Ведомость предварительных нагрузок, включая динамические",
    "module": "loads_lot",
-   "status": "new"
+   "status": "new",
+   "gantt": "loads"
   },
   {
    "code": "ОВЭ75-БИ-Л2-МТ",
@@ -516,7 +550,8 @@
    "title": "Требования к монтажу (включая вес самых тяжёлых частей)",
    "tz": "D-17",
    "module": "montazh_lot",
-   "status": "new"
+   "status": "new",
+   "gantt": "mount"
   },
   {
    "code": "ОВЭ75-БИ-Л2-ЭС",
@@ -526,7 +561,8 @@
    "title": "Электроснабжение и электрооборудование: однолинейные схемы, предварительный перечень",
    "tz": "D-23, D-33, E-02…E-17",
    "module": "electro_lot",
-   "status": "new"
+   "status": "new",
+   "gantt": "elec"
   },
   {
    "code": "ОВЭ75-БИ-Л3-НГ",
@@ -537,7 +573,8 @@
    "tz": "D-15, D-16",
    "subtitle": "Ведомость предварительных нагрузок, включая динамические",
    "module": "loads_lot",
-   "status": "new"
+   "status": "new",
+   "gantt": "loads"
   },
   {
    "code": "ОВЭ75-БИ-Л3-МТ",
@@ -547,7 +584,8 @@
    "title": "Требования к монтажу (включая вес самых тяжёлых частей)",
    "tz": "D-17",
    "module": "montazh_lot",
-   "status": "new"
+   "status": "new",
+   "gantt": "mount"
   },
   {
    "code": "ОВЭ75-БИ-Л3-ЭС",
@@ -557,7 +595,8 @@
    "title": "Электроснабжение и электрооборудование: однолинейные схемы, предварительный перечень",
    "tz": "D-23, D-33, E-02…E-17",
    "module": "electro_lot",
-   "status": "new"
+   "status": "new",
+   "gantt": "elec"
   },
   {
    "code": "ОВЭ75-БИ-Л4-НГ",
@@ -568,7 +607,8 @@
    "tz": "D-15, D-16",
    "subtitle": "Ведомость предварительных нагрузок, включая динамические",
    "module": "loads_lot",
-   "status": "new"
+   "status": "new",
+   "gantt": "loads"
   },
   {
    "code": "ОВЭ75-БИ-Л4-МТ",
@@ -578,7 +618,8 @@
    "title": "Требования к монтажу (включая вес самых тяжёлых частей)",
    "tz": "D-17",
    "module": "montazh_lot",
-   "status": "new"
+   "status": "new",
+   "gantt": "mount"
   },
   {
    "code": "ОВЭ75-БИ-Л4-ЭС",
@@ -588,7 +629,8 @@
    "title": "Электроснабжение и электрооборудование: однолинейные схемы, предварительный перечень",
    "tz": "D-23, D-33, E-02…E-17",
    "module": "electro_lot",
-   "status": "new"
+   "status": "new",
+   "gantt": "elec"
   },
   {
    "code": "ОВЭ75-БИ-Л3-ЭС-С",
@@ -605,7 +647,8 @@
      "title": "Однолинейная схема электроснабжения"
     }
    ],
-   "status": "exists"
+   "status": "exists",
+   "gantt": "elec"
   },
   {
    "code": "ОВЭ75-БИ-Л1-LL",
@@ -615,7 +658,8 @@
    "title": "Перечень трубопроводов, арматуры и приборов КИПиА (line list)",
    "tz": "D-24, D-25",
    "module": "linelist_lot",
-   "status": "new"
+   "status": "new",
+   "gantt": "lines"
   },
   {
    "code": "ОВЭ75-БИ-Л2-LL",
@@ -625,7 +669,8 @@
    "title": "Перечень трубопроводов, арматуры и приборов КИПиА (line list)",
    "tz": "D-24, D-25",
    "module": "linelist_lot",
-   "status": "new"
+   "status": "new",
+   "gantt": "lines"
   },
   {
    "code": "ОВЭ75-БИ-Л3-LL",
@@ -635,7 +680,8 @@
    "title": "Перечень трубопроводов, арматуры и приборов КИПиА (line list)",
    "tz": "D-24, D-25",
    "module": "linelist_lot",
-   "status": "new"
+   "status": "new",
+   "gantt": "lines"
   },
   {
    "code": "ОВЭ75-БИ-Л1-АСУ",
@@ -652,7 +698,8 @@
      "title": "Схема комплекса технических средств АСУ"
     }
    ],
-   "status": "exists"
+   "status": "exists",
+   "gantt": "asu"
   },
   {
    "code": "ОВЭ75-БИ-Л2-АСУ",
@@ -669,7 +716,8 @@
      "title": "Схема комплекса технических средств АСУ"
     }
    ],
-   "status": "exists"
+   "status": "exists",
+   "gantt": "asu"
   },
   {
    "code": "ОВЭ75-БИ-Л3-АСУ",
@@ -686,7 +734,8 @@
      "title": "Схема комплекса технических средств АСУ"
     }
    ],
-   "status": "exists"
+   "status": "exists",
+   "gantt": "asu"
   },
   {
    "code": "ОВЭ75-БИ-Л4-АСУ",
@@ -703,7 +752,8 @@
      "title": "Схема комплекса технических средств АСУ"
     }
    ],
-   "status": "exists"
+   "status": "exists",
+   "gantt": "asu"
   },
   {
    "code": "ОВЭ75-БИ-Л1-ТВ",
@@ -713,7 +763,8 @@
    "title": "Тепловыделения и выделения вредностей от оборудования (данные для смежных разделов)",
    "tz": "D-27, D-28",
    "module": "heat_lot",
-   "status": "new"
+   "status": "new",
+   "gantt": "emiss"
   },
   {
    "code": "ОВЭ75-БИ-Л2-ТВ",
@@ -723,7 +774,8 @@
    "title": "Тепловыделения и выделения вредностей от оборудования (данные для смежных разделов)",
    "tz": "D-27, D-28",
    "module": "heat_lot",
-   "status": "new"
+   "status": "new",
+   "gantt": "emiss"
   },
   {
    "code": "ОВЭ75-БИ-Л3-ТВ",
@@ -733,7 +785,8 @@
    "title": "Тепловыделения и выделения вредностей от оборудования (данные для смежных разделов)",
    "tz": "D-27, D-28",
    "module": "heat_lot",
-   "status": "new"
+   "status": "new",
+   "gantt": "emiss"
   },
   {
    "code": "ОВЭ75-БИ-Л1-СТ",
@@ -743,7 +796,8 @@
    "title": "Стоимостной блок: порядок сбора ТКП и бюджетной оценки поставки",
    "tz": "D-29, D-30",
    "module": "cost_lot",
-   "status": "new"
+   "status": "new",
+   "gantt": "cost2"
   },
   {
    "code": "ОВЭ75-БИ-Л2-СТ",
@@ -753,7 +807,8 @@
    "title": "Стоимостной блок: порядок сбора ТКП и бюджетной оценки поставки",
    "tz": "D-29, D-30",
    "module": "cost_lot",
-   "status": "new"
+   "status": "new",
+   "gantt": "cost2"
   },
   {
    "code": "ОВЭ75-БИ-Л3-СТ",
@@ -763,7 +818,8 @@
    "title": "Стоимостной блок: порядок сбора ТКП и бюджетной оценки поставки",
    "tz": "D-29, D-30",
    "module": "cost_lot",
-   "status": "new"
+   "status": "new",
+   "gantt": "cost2"
   },
   {
    "code": "ОВЭ75-БИ-Л4-СТ",
@@ -773,7 +829,8 @@
    "title": "Стоимостной блок: порядок сбора ТКП и бюджетной оценки поставки",
    "tz": "D-29, D-30",
    "module": "cost_lot",
-   "status": "new"
+   "status": "new",
+   "gantt": "cost2"
   },
   {
    "code": "ОВЭ75-БИ-ОБ-ВД",
@@ -783,7 +840,8 @@
    "title": "Ведомость документов Базового инжиниринга",
    "tz": "D-32 (состав и этапность выдачи)",
    "module": "vedomost",
-   "status": "new"
+   "status": "new",
+   "gantt": "asm1"
   },
   {
    "code": "ОВЭ75-БИ-ОБ-ПО",
@@ -797,7 +855,8 @@
    "status": "exists",
    "sources": [
     "docs/specs/ove75-perechen-oborudovaniya.docx"
-   ]
+   ],
+   "gantt": "spec1"
   },
   {
    "code": "ОВЭ75-БИ-ОБ-ЦИМ",
@@ -815,7 +874,8 @@
     "docs/cim/ove75-equip-lot2.ifc",
     "docs/cim/ove75-equip-lot3.ifc",
     "docs/cim/ove75-equip-lot4.ifc"
-   ]
+   ],
+   "gantt": "cim2"
   },
   {
    "code": "ОВЭ75-БИ-ОБ-ПИМ",
@@ -829,7 +889,8 @@
    "status": "exists",
    "sources": [
     "docs/ove75-bim-plan-draft.docx"
-   ]
+   ],
+   "gantt": "cimsoft"
   },
   {
    "code": "ОВЭ75-БИ-ОБ-РВ",
@@ -857,7 +918,8 @@
    "status": "exists",
    "sources": [
     "docs/specs/ove75-zakladki-vedomost.docx"
-   ]
+   ],
+   "gantt": "spec1"
   },
   {
    "code": "ОВЭ75-БИ-ОБ-ТКП",
@@ -871,7 +933,8 @@
    "status": "exists",
    "sources": [
     "docs/rfq/ove75-rfq-index.docx"
-   ]
+   ],
+   "gantt": "tkp1"
   },
   {
    "code": "ОВЭ75-БИ-ОБ-АСУ",
@@ -888,7 +951,8 @@
      "title": "Схема комплекса технических средств АСУ"
     }
    ],
-   "status": "exists"
+   "status": "exists",
+   "gantt": "asu"
   }
  ]
 }
