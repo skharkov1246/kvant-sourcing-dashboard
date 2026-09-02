@@ -11,11 +11,83 @@
    ]
   },
   {
+   "code": "ОВЭ75-БИ-Л2-ПЗ",
+   "pdf": "docs/bi/ove75-l2-pz-r0.pdf",
+   "docx": "docs/bi/ove75-l2-pz-r0.docx",
+   "src": [
+    "docs/bi/ove75-lot2-pz-draft.docx"
+   ]
+  },
+  {
+   "code": "ОВЭ75-БИ-Л3-ПЗ",
+   "pdf": "docs/bi/ove75-l3-pz-r0.pdf",
+   "docx": "docs/bi/ove75-l3-pz-r0.docx",
+   "src": [
+    "docs/bi/ove75-lot3-pz-draft.docx"
+   ]
+  },
+  {
+   "code": "ОВЭ75-БИ-Л4-ПЗ",
+   "pdf": "docs/bi/ove75-l4-pz-r0.pdf",
+   "docx": "docs/bi/ove75-l4-pz-r0.docx",
+   "src": [
+    "docs/bi/ove75-lot4-pz-draft.docx"
+   ]
+  },
+  {
+   "code": "ОВЭ75-БИ-Л1-РР",
+   "pdf": "docs/bi/ove75-l1-rr-r0.pdf",
+   "docx": "docs/bi/ove75-l1-rr-r0.docx",
+   "src": [
+    "docs/ove75-raschet-l1.docx"
+   ]
+  },
+  {
+   "code": "ОВЭ75-БИ-Л3-РР",
+   "pdf": "docs/bi/ove75-l3-rr-r0.pdf",
+   "docx": "docs/bi/ove75-l3-rr-r0.docx",
+   "src": [
+    "docs/ove75-raschet-l3.docx"
+   ]
+  },
+  {
    "code": "ОВЭ75-БИ-Л1-PFD",
    "pdf": "docs/bi/ove75-l1-pfd-r0.pdf",
    "docx": null,
    "src": [
     "docs/sketches/ove75-lot1-pfd-eskiz.svg"
+   ]
+  },
+  {
+   "code": "ОВЭ75-БИ-Л2-PFD",
+   "pdf": "docs/bi/ove75-l2-pfd-r0.pdf",
+   "docx": null,
+   "src": [
+    "docs/sketches/ove75-lot2-pfd-eskiz.svg"
+   ]
+  },
+  {
+   "code": "ОВЭ75-БИ-Л4-PFD",
+   "pdf": "docs/bi/ove75-l4-pfd-r0.pdf",
+   "docx": null,
+   "src": [
+    "docs/sketches/ove75-lot4-flow-eskiz.svg"
+   ]
+  },
+  {
+   "code": "ОВЭ75-БИ-Л1-КР",
+   "pdf": "docs/bi/ove75-l1-kr-r0.pdf",
+   "docx": null,
+   "src": [
+    "docs/sketches/ove75-lot1-vysotka-eskiz.svg"
+   ]
+  },
+  {
+   "code": "ОВЭ75-БИ-Л2-КР",
+   "pdf": "docs/bi/ove75-l2-kr-r0.pdf",
+   "docx": null,
+   "src": [
+    "docs/sketches/ove75-lot2-komponovka-gmu-eskiz.svg"
    ]
   },
   {
@@ -25,6 +97,14 @@
    "src": [
     "docs/sketches/ove75-lot3-plan-ew-eskiz.svg",
     "docs/sketches/ove75-lot3-razrez-eskiz.svg"
+   ]
+  },
+  {
+   "code": "ОВЭ75-БИ-Л4-КР",
+   "pdf": "docs/bi/ove75-l4-kr-r0.pdf",
+   "docx": null,
+   "src": [
+    "docs/sketches/ove75-lot4-plan-sklada-eskiz.svg"
    ]
   },
   {
@@ -61,7 +141,9 @@
    "code": "ОВЭ75-БИ-Л1-ЭЧ",
    "pdf": "docs/bi/ove75-l1-ech-r0.pdf",
    "docx": null,
-   "src": []
+   "src": [
+    "docs/sketches/ove75-lot1-pech-ks-eskiz.svg"
+   ]
   },
   {
    "code": "ОВЭ75-БИ-Л1-ОЛ",
@@ -104,7 +186,293 @@
     "docs/specs/ove75-ol-shtabeler.docx",
     "docs/specs/ove75-ol-kran-mostovoy.docx"
    ]
+  },
+  {
+   "code": "ОВЭ75-БИ-Л1-ДЦ",
+   "pdf": "docs/bi/ove75-l1-dc-r0.pdf",
+   "docx": "docs/bi/ove75-l1-dc-r0.docx",
+   "src": []
+  },
+  {
+   "code": "ОВЭ75-БИ-Л2-ДЦ",
+   "pdf": "docs/bi/ove75-l2-dc-r0.pdf",
+   "docx": "docs/bi/ove75-l2-dc-r0.docx",
+   "src": []
+  },
+  {
+   "code": "ОВЭ75-БИ-Л3-ДЦ",
+   "pdf": "docs/bi/ove75-l3-dc-r0.pdf",
+   "docx": "docs/bi/ove75-l3-dc-r0.docx",
+   "src": []
+  },
+  {
+   "code": "ОВЭ75-БИ-Л1-PID",
+   "pdf": "docs/bi/ove75-l1-pid-r0.pdf",
+   "docx": null,
+   "src": [
+    "docs/sketches/ove75-lot1-pid-pech-ku-eskiz.svg"
+   ]
+  },
+  {
+   "code": "ОВЭ75-БИ-Л2-PID",
+   "pdf": "docs/bi/ove75-l2-pid-r0.pdf",
+   "docx": null,
+   "src": [
+    "docs/sketches/ove75-lot2-pid-vyparka-eskiz.svg"
+   ]
+  },
+  {
+   "code": "ОВЭ75-БИ-Л3-PID",
+   "pdf": "docs/bi/ove75-l3-pid-r0.pdf",
+   "docx": null,
+   "src": [
+    "docs/sketches/ove75-lot3-pid-cirk-eskiz.svg"
+   ]
+  },
+  {
+   "code": "ОВЭ75-БИ-Л1-НГ",
+   "pdf": "docs/bi/ove75-l1-ng-r0.pdf",
+   "docx": "docs/bi/ove75-l1-ng-r0.docx",
+   "src": []
+  },
+  {
+   "code": "ОВЭ75-БИ-Л1-МТ",
+   "pdf": "docs/bi/ove75-l1-mt-r0.pdf",
+   "docx": "docs/bi/ove75-l1-mt-r0.docx",
+   "src": []
+  },
+  {
+   "code": "ОВЭ75-БИ-Л1-ЭС",
+   "pdf": "docs/bi/ove75-l1-es-r0.pdf",
+   "docx": "docs/bi/ove75-l1-es-r0.docx",
+   "src": []
+  },
+  {
+   "code": "ОВЭ75-БИ-Л2-НГ",
+   "pdf": "docs/bi/ove75-l2-ng-r0.pdf",
+   "docx": "docs/bi/ove75-l2-ng-r0.docx",
+   "src": []
+  },
+  {
+   "code": "ОВЭ75-БИ-Л2-МТ",
+   "pdf": "docs/bi/ove75-l2-mt-r0.pdf",
+   "docx": "docs/bi/ove75-l2-mt-r0.docx",
+   "src": []
+  },
+  {
+   "code": "ОВЭ75-БИ-Л2-ЭС",
+   "pdf": "docs/bi/ove75-l2-es-r0.pdf",
+   "docx": "docs/bi/ove75-l2-es-r0.docx",
+   "src": []
+  },
+  {
+   "code": "ОВЭ75-БИ-Л3-НГ",
+   "pdf": "docs/bi/ove75-l3-ng-r0.pdf",
+   "docx": "docs/bi/ove75-l3-ng-r0.docx",
+   "src": []
+  },
+  {
+   "code": "ОВЭ75-БИ-Л3-МТ",
+   "pdf": "docs/bi/ove75-l3-mt-r0.pdf",
+   "docx": "docs/bi/ove75-l3-mt-r0.docx",
+   "src": []
+  },
+  {
+   "code": "ОВЭ75-БИ-Л3-ЭС",
+   "pdf": "docs/bi/ove75-l3-es-r0.pdf",
+   "docx": "docs/bi/ove75-l3-es-r0.docx",
+   "src": []
+  },
+  {
+   "code": "ОВЭ75-БИ-Л4-НГ",
+   "pdf": "docs/bi/ove75-l4-ng-r0.pdf",
+   "docx": "docs/bi/ove75-l4-ng-r0.docx",
+   "src": []
+  },
+  {
+   "code": "ОВЭ75-БИ-Л4-МТ",
+   "pdf": "docs/bi/ove75-l4-mt-r0.pdf",
+   "docx": "docs/bi/ove75-l4-mt-r0.docx",
+   "src": []
+  },
+  {
+   "code": "ОВЭ75-БИ-Л4-ЭС",
+   "pdf": "docs/bi/ove75-l4-es-r0.pdf",
+   "docx": "docs/bi/ove75-l4-es-r0.docx",
+   "src": []
+  },
+  {
+   "code": "ОВЭ75-БИ-Л3-ЭС-С",
+   "pdf": "docs/bi/ove75-l3-es-s-r0.pdf",
+   "docx": null,
+   "src": [
+    "docs/sketches/ove75-lot3-odnolineynaya-eskiz.svg"
+   ]
+  },
+  {
+   "code": "ОВЭ75-БИ-Л1-LL",
+   "pdf": "docs/bi/ove75-l1-ll-r0.pdf",
+   "docx": "docs/bi/ove75-l1-ll-r0.docx",
+   "src": []
+  },
+  {
+   "code": "ОВЭ75-БИ-Л2-LL",
+   "pdf": "docs/bi/ove75-l2-ll-r0.pdf",
+   "docx": "docs/bi/ove75-l2-ll-r0.docx",
+   "src": []
+  },
+  {
+   "code": "ОВЭ75-БИ-Л3-LL",
+   "pdf": "docs/bi/ove75-l3-ll-r0.pdf",
+   "docx": "docs/bi/ove75-l3-ll-r0.docx",
+   "src": []
+  },
+  {
+   "code": "ОВЭ75-БИ-Л1-АСУ",
+   "pdf": "docs/bi/ove75-l1-asu-r0.pdf",
+   "docx": null,
+   "src": [
+    "docs/sketches/ove75-asu-kts-eskiz.svg"
+   ]
+  },
+  {
+   "code": "ОВЭ75-БИ-Л2-АСУ",
+   "pdf": "docs/bi/ove75-l2-asu-r0.pdf",
+   "docx": null,
+   "src": [
+    "docs/sketches/ove75-asu-kts-eskiz.svg"
+   ]
+  },
+  {
+   "code": "ОВЭ75-БИ-Л3-АСУ",
+   "pdf": "docs/bi/ove75-l3-asu-r0.pdf",
+   "docx": null,
+   "src": [
+    "docs/sketches/ove75-asu-kts-eskiz.svg"
+   ]
+  },
+  {
+   "code": "ОВЭ75-БИ-Л4-АСУ",
+   "pdf": "docs/bi/ove75-l4-asu-r0.pdf",
+   "docx": null,
+   "src": [
+    "docs/sketches/ove75-asu-kts-eskiz.svg"
+   ]
+  },
+  {
+   "code": "ОВЭ75-БИ-Л1-ТВ",
+   "pdf": "docs/bi/ove75-l1-tv-r0.pdf",
+   "docx": "docs/bi/ove75-l1-tv-r0.docx",
+   "src": []
+  },
+  {
+   "code": "ОВЭ75-БИ-Л2-ТВ",
+   "pdf": "docs/bi/ove75-l2-tv-r0.pdf",
+   "docx": "docs/bi/ove75-l2-tv-r0.docx",
+   "src": []
+  },
+  {
+   "code": "ОВЭ75-БИ-Л3-ТВ",
+   "pdf": "docs/bi/ove75-l3-tv-r0.pdf",
+   "docx": "docs/bi/ove75-l3-tv-r0.docx",
+   "src": []
+  },
+  {
+   "code": "ОВЭ75-БИ-Л1-СТ",
+   "pdf": "docs/bi/ove75-l1-st-r0.pdf",
+   "docx": "docs/bi/ove75-l1-st-r0.docx",
+   "src": []
+  },
+  {
+   "code": "ОВЭ75-БИ-Л2-СТ",
+   "pdf": "docs/bi/ove75-l2-st-r0.pdf",
+   "docx": "docs/bi/ove75-l2-st-r0.docx",
+   "src": []
+  },
+  {
+   "code": "ОВЭ75-БИ-Л3-СТ",
+   "pdf": "docs/bi/ove75-l3-st-r0.pdf",
+   "docx": "docs/bi/ove75-l3-st-r0.docx",
+   "src": []
+  },
+  {
+   "code": "ОВЭ75-БИ-Л4-СТ",
+   "pdf": "docs/bi/ove75-l4-st-r0.pdf",
+   "docx": "docs/bi/ove75-l4-st-r0.docx",
+   "src": []
+  },
+  {
+   "code": "ОВЭ75-БИ-ОБ-ВД",
+   "pdf": "docs/bi/ove75-ob-vd-r0.pdf",
+   "docx": "docs/bi/ove75-ob-vd-r0.docx",
+   "src": []
+  },
+  {
+   "code": "ОВЭ75-БИ-ОБ-ПО",
+   "pdf": "docs/bi/ove75-ob-po-r0.pdf",
+   "docx": "docs/bi/ove75-ob-po-r0.docx",
+   "src": [
+    "docs/specs/ove75-perechen-oborudovaniya.docx"
+   ]
+  },
+  {
+   "code": "ОВЭ75-БИ-ОБ-ЦИМ",
+   "pdf": "docs/bi/ove75-ob-cim-r0.pdf",
+   "docx": "docs/bi/ove75-ob-cim-r0.docx",
+   "src": [
+    "docs/cim/ove75-equip-lib.ifc",
+    "docs/cim/ove75-equip-lot0.ifc",
+    "docs/cim/ove75-equip-lot1.ifc",
+    "docs/cim/ove75-equip-lot2.ifc",
+    "docs/cim/ove75-equip-lot3.ifc",
+    "docs/cim/ove75-equip-lot4.ifc"
+   ]
+  },
+  {
+   "code": "ОВЭ75-БИ-ОБ-ПИМ",
+   "pdf": "docs/bi/ove75-ob-pim-r0.pdf",
+   "docx": "docs/bi/ove75-ob-pim-r0.docx",
+   "src": [
+    "docs/ove75-bim-plan-draft.docx"
+   ]
+  },
+  {
+   "code": "ОВЭ75-БИ-ОБ-РВ",
+   "pdf": "docs/bi/ove75-ob-rv-r0.pdf",
+   "docx": "docs/bi/ove75-ob-rv-r0.docx",
+   "src": [
+    "docs/ove75-reestr.docx"
+   ]
+  },
+  {
+   "code": "ОВЭ75-БИ-ОБ-ЗР",
+   "pdf": "docs/bi/ove75-ob-zr-r0.pdf",
+   "docx": "docs/bi/ove75-ob-zr-r0.docx",
+   "src": [
+    "docs/specs/ove75-zakladki-vedomost.docx"
+   ]
+  },
+  {
+   "code": "ОВЭ75-БИ-ОБ-ТКП",
+   "pdf": "docs/bi/ove75-ob-tkp-r0.pdf",
+   "docx": "docs/bi/ove75-ob-tkp-r0.docx",
+   "src": [
+    "docs/rfq/ove75-rfq-index.docx"
+   ]
+  },
+  {
+   "code": "ОВЭ75-БИ-ОБ-АСУ",
+   "pdf": "docs/bi/ove75-ob-asu-r0.pdf",
+   "docx": null,
+   "src": [
+    "docs/sketches/ove75-asu-kts-eskiz.svg"
+   ]
   }
  ],
- "failed": []
+ "failed": [
+  [
+   "ОВЭ75-БИ-Л3-PFD",
+   "[Errno 2] No such file or directory: '/home/user/kvant-sourcing-dashboard/ove/public/docs/sketches/ove75-lot3-pfd-eskiz.svg'"
+  ]
+ ]
 }

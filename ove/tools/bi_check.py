@@ -138,7 +138,15 @@ def check(row: dict, rel: dict) -> dict:
 
 
 def main(argv: list) -> int:
-    codes = [a for a in argv if not a.startswith("--")]
+    codes, skip = [], False
+    for a in argv:
+        if skip:
+            skip = False
+            continue
+        if a == "--json":
+            skip = True
+        elif not a.startswith("--"):
+            codes.append(a)
     reg = json.loads((DATA / "bi_register.json").read_text(encoding="utf-8"))["rows"]
     rel_p = DATA / "bi_release.json"
     rel = {d["code"]: d for d in json.loads(rel_p.read_text(encoding="utf-8")).get("docs", [])} if rel_p.exists() else {}
