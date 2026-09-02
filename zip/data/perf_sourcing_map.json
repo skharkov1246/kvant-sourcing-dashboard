@@ -45,6 +45,7 @@
     }
    ],
    "price_best_cn_usd": null,
+   "price_ref_oem_cn_usd": null,
    "price_wms_usd": null,
    "material": {
     "oem": "Цементуемые никель-хром-молибденовые стали. Sandvik — фирменная Sanbar 64 (воздушно-закаливаемая высоконикелевая сталь с высокой усталостной прочностью и хорошей отзывчивостью на цементацию). OEM/аналоги — стали типа 23CrNiMo / ZK22CrNi3Mo (22CrNi3Mo), 20CrNiMo, эквивалент европейской 18CrNiMo7-6.",
@@ -54,6 +55,8 @@
    },
    "suppliers": [
     {
+     "capital": "cn",
+     "excluded": "",
      "name": "Shandong KAT Drilling",
      "country": "Китай, Шаньдун, Ляочэн",
      "email": "",
@@ -66,6 +69,8 @@
      "crm_direction": "Shank adapters COP 1036-2238"
     },
     {
+     "capital": "cn",
+     "excluded": "",
      "name": "Litian / Litech",
      "country": "Китай, Ляонин, Хулудао",
      "email": "litian@litechtools.com",
@@ -78,6 +83,8 @@
      "crm_direction": "Хвостовики COP1028-4050"
     },
     {
+     "capital": "cn",
+     "excluded": "",
      "name": "Pulanka Rock Tools",
      "country": "Китай, Чжэцзян, Тайчжоу",
      "email": "elma@cnpulk.com",
@@ -90,6 +97,8 @@
      "crm_direction": "Хвостовики + drifter ЗИП"
     },
     {
+     "capital": "cn",
+     "excluded": "",
      "name": "Xiamen Bestlink",
      "country": "Китай, Фуцзянь, Сямэнь",
      "email": "",
@@ -102,6 +111,8 @@
      "crm_direction": "Хвостовики shank COP1838/4050"
     },
     {
+     "capital": "cn",
+     "excluded": "",
      "name": "GMD Equipment",
      "country": "Китай, Фуцзянь, Сямэнь",
      "email": "info@gmd-eqpt.com",
@@ -114,6 +125,8 @@
      "crm_direction": "Хвостовики shank COP1838"
     },
     {
+     "capital": "cn",
+     "excluded": "",
      "name": "Prodrill (Xiamen)",
      "country": "Китай, Фуцзянь, Сямэнь",
      "email": "sales@prodrill.com.cn",
@@ -126,6 +139,8 @@
      "crm_direction": "Хвостовики shank COP1838 + буры"
     },
     {
+     "capital": "cn",
+     "excluded": "",
      "name": "LianHuaShan Rock Tools",
      "country": "Китай, Ляонин, Хулудао",
      "email": "info@lhsrocktools.com",
@@ -137,7 +152,8 @@
      "crm_stage": "Отказ (по хвостовикам/втулкам)",
      "crm_direction": "Хвостовики, shank adapters, guide bushings"
     }
-   ]
+   ],
+   "excluded": []
   },
   {
    "class": "букса",
@@ -444,7 +460,8 @@
      "quotes": []
     }
    ],
-   "price_best_cn_usd": 21.9,
+   "price_best_cn_usd": 71.0,
+   "price_ref_oem_cn_usd": 17.7,
    "price_wms_usd": 309.7,
    "material": {
     "oem": null,
@@ -454,59 +471,65 @@
    },
    "suppliers": [
     {
-     "flag": "С августа 2016 — полностью дочернее предприятие Atlas Copco (по их странице /company/). Для тестовой закупки плюс: оригинальное качество по китайской цене. Для замещения OEM — риск: канал контролирует сам OEM и может его закрыть",
-     "name": "Sanshan Rock Tools (Atlas Copco/Epiroc rock drilling consumables)",
-     "country": "Китай",
-     "email": "epiroc@sanshanrocktools.com",
-     "phone": "+86-635-8330862",
-     "whatsapp": "",
-     "site": "https://www.sanshanrocktools.com/",
-     "positions": 4,
-     "quotes": 3,
-     "crm_stage": "К/П",
-     "crm_direction": "Внутренности COP: piston, liner, driver"
-    },
-    {
-     "flag": "С августа 2016 — полностью дочернее предприятие Atlas Copco (по их странице /company/). Для тестовой закупки плюс: оригинальное качество по китайской цене. Для замещения OEM — риск: канал контролирует сам OEM и может его закрыть",
-     "name": "Shandong Rock Drilling Tools Co., Ltd. (Sanshan / sanshanrocktools.com",
-     "country": "Китай",
+     "capital": "cn",
+     "excluded": "",
+     "name": "Shandong KAT Drilling",
+     "country": "Китай, Шаньдун, Ляочэн",
      "email": "",
-     "phone": "",
-     "whatsapp": "",
-     "site": "http://www.china-rocktools.com/",
-     "positions": 1,
+     "phone": "+86 635 8585985",
+     "whatsapp": "WA/WeChat 86 13969583325",
+     "site": "",
+     "positions": 0,
      "quotes": 3,
      "crm_stage": "К/П",
-     "crm_direction": "Внутренности COP: piston, liner, driver"
+     "crm_direction": "Shank adapters COP 1036-2238"
     },
     {
-     "flag": "С августа 2016 — полностью дочернее предприятие Atlas Copco (по их странице /company/). Для тестовой закупки плюс: оригинальное качество по китайской цене. Для замещения OEM — риск: канал контролирует сам OEM и может его закрыть",
-     "name": "Zuanshan Mining Machinery Co., Ltd / Shandong Rock Drilling Tools Co.,",
-     "country": "Китай",
-     "email": "sales@zuanshancompressor.com",
-     "phone": "+86-635-8330862",
-     "whatsapp": "",
-     "site": "https://www.chinadthtools.com/products/rock-drill-spare-parts/hydraulic-drifter-spare-part",
-     "positions": 3,
-     "quotes": 0,
+     "capital": "cn",
+     "excluded": "",
+     "name": "Xiamen Yonglianfeng",
+     "country": "Китай, Фуцзянь, Сямэнь",
+     "email": "bin@ylfpart.com",
+     "phone": "+86 18874204200",
+     "whatsapp": "WA/WeChat 86 18874204200",
+     "site": "",
+     "positions": 0,
+     "quotes": 3,
      "crm_stage": "К/П",
-     "crm_direction": "Внутренности COP: piston, liner, driver"
+     "crm_direction": "Металл COP1838/1840"
+    },
+    {
+     "capital": "cn",
+     "excluded": "",
+     "name": "Jinhua Fuxuan Machinery",
+     "country": "Китай, Чжэцзян, Цзиньхуа",
+     "email": "tiffany@fuxuan-machine.com",
+     "phone": "+86 15268086116",
+     "whatsapp": "WA/WeChat 86 15268086116",
+     "site": "",
+     "positions": 0,
+     "quotes": 3,
+     "crm_stage": "К/П",
+     "crm_direction": "Металл / bushing rock drill"
+    },
+    {
+     "capital": "cn",
+     "excluded": "",
+     "name": "Mindrill Systems",
+     "country": "Индия",
+     "email": "salessupport@mindrill.com",
+     "phone": "+91 98305 94274",
+     "whatsapp": "",
+     "site": "",
+     "positions": 0,
+     "quotes": 1,
+     "crm_stage": "К/П",
+     "crm_direction": "Дрифтеры-аналоги 1838/2238/MD20"
     },
     {
      "flag": "",
-     "name": "Nanjing Hovoo Machinery Technology Co., Ltd. (Hovoo; hovooseal.com)",
-     "country": "Китай, Цзянсу, Нанкин",
-     "email": "sales@hovooseal.com",
-     "phone": "+86 18012806665",
-     "whatsapp": "",
-     "site": "hovooseal.com",
-     "positions": 2,
-     "quotes": 0,
-     "crm_stage": "К/П",
-     "crm_direction": "COP seal kits 2238/3060/4050"
-    },
-    {
-     "flag": "",
+     "capital": "cn",
+     "excluded": "",
      "name": "Litian Heavy Industry Machinery Co., Ltd. (力天重工 / Litech)",
      "country": "Китай, Ляонин, Хулудао",
      "email": "litian@litechtools.com",
@@ -519,31 +542,9 @@
      "crm_direction": "Хвостовики COP1028-4050"
     },
     {
-     "name": "Jinhua Fuxuan Machinery",
-     "country": "Китай, Чжэцзян, Цзиньхуа",
-     "email": "tiffany@fuxuan-machine.com",
-     "phone": "+86 15268086116",
-     "whatsapp": "WA/WeChat 86 15268086116",
-     "site": "",
-     "positions": 0,
-     "quotes": 0,
-     "crm_stage": "К/П",
-     "crm_direction": "Металл / bushing rock drill"
-    },
-    {
-     "name": "Xiamen Yonglianfeng",
-     "country": "Китай, Фуцзянь, Сямэнь",
-     "email": "bin@ylfpart.com",
-     "phone": "+86 18874204200",
-     "whatsapp": "WA/WeChat 86 18874204200",
-     "site": "",
-     "positions": 0,
-     "quotes": 0,
-     "crm_stage": "К/П",
-     "crm_direction": "Металл COP1838/1840"
-    },
-    {
      "flag": "",
+     "capital": "cn",
+     "excluded": "",
      "name": "Jiangxi Siton Machinery Manufacturing Co., Ltd. (SITON; globalsiton.co",
      "country": "China",
      "email": "",
@@ -554,6 +555,73 @@
      "quotes": 0,
      "crm_stage": "Ответил — взял в работу",
      "crm_direction": "Внутренности COP: piston/guide/bushing/driver"
+    },
+    {
+     "flag": "",
+     "capital": "cn",
+     "excluded": "",
+     "name": "Fujian Juntai Construction Machinery Co., Ltd. — juntaimachinery.com",
+     "country": "Китай",
+     "email": "juntai@wan-tai.com.cn",
+     "phone": "+86 182 5953 5636",
+     "whatsapp": "",
+     "site": "https://www.juntaimachinery.com/",
+     "positions": 17,
+     "quotes": 0,
+     "crm_stage": "",
+     "crm_direction": ""
+    },
+    {
+     "flag": "",
+     "capital": "cn",
+     "excluded": "",
+     "name": "FMRIBT (Fujian/Foshan Mineral Rock Industrial Boring Tools) — mineralr",
+     "country": "China",
+     "email": "exportsales@fmribt.com",
+     "phone": "+86 18965558758",
+     "whatsapp": "+86 18965558758 (WhatsApp)",
+     "site": "https://mineralrockspare.com/collections/underground-drill-rig-spare-parts",
+     "positions": 15,
+     "quotes": 0,
+     "crm_stage": "",
+     "crm_direction": ""
+    }
+   ],
+   "excluded": [
+    {
+     "name": "Sanshan Rock Tools (Atlas Copco/Epiroc rock drilling consumables)",
+     "capital": "oem",
+     "reason": "Капитал OEM: по странице компании — с августа 2016 дочернее предприятие Atlas Copco (в ODM-реестре базы отмечено как бывшее СП с Atlas Copco/Epiroc 2013–2020). Для размещения не опция; котировки — только ценовой ориентир",
+     "quotes": 3,
+     "crm_stage": "К/П"
+    },
+    {
+     "name": "Zuanshan Mining Machinery Co., Ltd / Shandong Rock Drilling Tools Co.,",
+     "capital": "oem",
+     "reason": "Капитал OEM: по странице компании — с августа 2016 дочернее предприятие Atlas Copco (в ODM-реестре базы отмечено как бывшее СП с Atlas Copco/Epiroc 2013–2020). Для размещения не опция; котировки — только ценовой ориентир",
+     "quotes": 3,
+     "crm_stage": "К/П"
+    },
+    {
+     "name": "Shandong Rock Drilling Tools Co., Ltd. (Sanshan / sanshanrocktools.com",
+     "capital": "oem",
+     "reason": "Капитал OEM: по странице компании — с августа 2016 дочернее предприятие Atlas Copco (в ODM-реестре базы отмечено как бывшее СП с Atlas Copco/Epiroc 2013–2020). Для размещения не опция; котировки — только ценовой ориентир",
+     "quotes": 3,
+     "crm_stage": "К/П"
+    },
+    {
+     "name": "Answk (Guangzhou, air-compressor & Atlas Copco/Epiroc genuine-spares d",
+     "capital": "dealer",
+     "reason": "Дилер оригинальных запчастей Atlas Copco/Epiroc (по ODM-реестру: distributor of genuine, not ODM) — канал OEM, для размещения не опция",
+     "quotes": 0,
+     "crm_stage": "Написали — ждём"
+    },
+    {
+     "name": "WMS / Atmaca",
+     "capital": "reseller",
+     "reason": "Реселлер уровня OEM (Турция) — цены в 8 раз выше китайских заводов; только ценовой ориентир",
+     "quotes": 15,
+     "crm_stage": "К/П"
     }
    ]
   },
@@ -833,7 +901,8 @@
      ]
     }
    ],
-   "price_best_cn_usd": 15.0,
+   "price_best_cn_usd": 70.7,
+   "price_ref_oem_cn_usd": 15.0,
    "price_wms_usd": 452.7,
    "material": {
     "oem": "Легированные Cr-Ni-Mo стали цементуемого/улучшаемого класса: 18CrNiMo7-6, 23CrNi3Mo/22CrNi3Mo, улучшаемые 42CrMo4 (аналог 4140/38ХМ); ряд производителей применяют инструментальные стали типа 7Cr5Mo2V. Тело — из чистой (переплавной) стали.",
@@ -843,45 +912,50 @@
    },
    "suppliers": [
     {
-     "flag": "С августа 2016 — полностью дочернее предприятие Atlas Copco (по их странице /company/). Для тестовой закупки плюс: оригинальное качество по китайской цене. Для замещения OEM — риск: канал контролирует сам OEM и может его закрыть",
-     "name": "Sanshan Rock Tools (Atlas Copco/Epiroc rock drilling consumables)",
-     "country": "Китай",
-     "email": "epiroc@sanshanrocktools.com",
-     "phone": "+86-635-8330862",
-     "whatsapp": "",
-     "site": "https://www.sanshanrocktools.com/",
-     "positions": 5,
-     "quotes": 7,
+     "capital": "cn",
+     "excluded": "",
+     "name": "Shandong KAT Drilling",
+     "country": "Китай, Шаньдун, Ляочэн",
+     "email": "",
+     "phone": "+86 635 8585985",
+     "whatsapp": "WA/WeChat 86 13969583325",
+     "site": "",
+     "positions": 0,
+     "quotes": 4,
      "crm_stage": "К/П",
-     "crm_direction": "Внутренности COP: piston, liner, driver"
+     "crm_direction": "Shank adapters COP 1036-2238"
     },
     {
-     "flag": "",
-     "name": "Nanjing Hovoo Machinery Technology Co., Ltd. (Hovoo; hovooseal.com)",
-     "country": "Китай, Цзянсу, Нанкин",
-     "email": "sales@hovooseal.com",
-     "phone": "+86 18012806665",
-     "whatsapp": "",
-     "site": "hovooseal.com",
-     "positions": 2,
-     "quotes": 0,
+     "capital": "cn",
+     "excluded": "",
+     "name": "Xiamen Yonglianfeng",
+     "country": "Китай, Фуцзянь, Сямэнь",
+     "email": "bin@ylfpart.com",
+     "phone": "+86 18874204200",
+     "whatsapp": "WA/WeChat 86 18874204200",
+     "site": "",
+     "positions": 0,
+     "quotes": 6,
      "crm_stage": "К/П",
-     "crm_direction": "COP seal kits 2238/3060/4050"
+     "crm_direction": "Металл COP1838/1840"
     },
     {
-     "flag": "С августа 2016 — полностью дочернее предприятие Atlas Copco (по их странице /company/). Для тестовой закупки плюс: оригинальное качество по китайской цене. Для замещения OEM — риск: канал контролирует сам OEM и может его закрыть",
-     "name": "Zuanshan Mining Machinery Co., Ltd / Shandong Rock Drilling Tools Co.,",
-     "country": "Китай",
-     "email": "sales@zuanshancompressor.com",
-     "phone": "+86-635-8330862",
-     "whatsapp": "",
-     "site": "https://www.chinadthtools.com/products/rock-drill-spare-parts/hydraulic-drifter-spare-part",
-     "positions": 1,
-     "quotes": 0,
+     "capital": "cn",
+     "excluded": "",
+     "name": "Jinhua Fuxuan Machinery",
+     "country": "Китай, Чжэцзян, Цзиньхуа",
+     "email": "tiffany@fuxuan-machine.com",
+     "phone": "+86 15268086116",
+     "whatsapp": "WA/WeChat 86 15268086116",
+     "site": "",
+     "positions": 0,
+     "quotes": 2,
      "crm_stage": "К/П",
-     "crm_direction": "Внутренности COP: piston, liner, driver"
+     "crm_direction": "Металл / bushing rock drill"
     },
     {
+     "capital": "cn",
+     "excluded": "",
      "name": "Jiangxi Woserld / Siton",
      "country": "Китай (Woserld Цзянси / Siton)",
      "email": "sales@woserld.com",
@@ -895,6 +969,8 @@
     },
     {
      "flag": "",
+     "capital": "cn",
+     "excluded": "",
      "name": "Fujian Juntai Construction Machinery Co., Ltd. — juntaimachinery.com",
      "country": "Китай",
      "email": "juntai@wan-tai.com.cn",
@@ -908,19 +984,8 @@
     },
     {
      "flag": "",
-     "name": "Answk (Guangzhou, air-compressor & Atlas Copco/Epiroc genuine-spares d",
-     "country": "Китай, Гуандун, Гуанчжоу",
-     "email": "sales@answk.com",
-     "phone": "WA +86 153288796767",
-     "whatsapp": "",
-     "site": "answk.com",
-     "positions": 11,
-     "quotes": 0,
-     "crm_stage": "Написали — ждём",
-     "crm_direction": "COP overhaul kits"
-    },
-    {
-     "flag": "",
+     "capital": "cn",
+     "excluded": "",
      "name": "FMRIBT (Fujian/Foshan Mineral Rock Industrial Boring Tools) — mineralr",
      "country": "China",
      "email": "exportsales@fmribt.com",
@@ -934,6 +999,8 @@
     },
     {
      "flag": "",
+     "capital": "cn",
+     "excluded": "",
      "name": "Xi'an Huizhong Mechanical Equipment Co., Ltd. (rockdrilling-tools.com)",
      "country": "Китай",
      "email": "shet35008@gmail.com",
@@ -944,6 +1011,51 @@
      "quotes": 0,
      "crm_stage": "Написали — ждём (прозвон)",
      "crm_direction": "Хвостовики shank COP1838"
+    },
+    {
+     "flag": "",
+     "capital": "cn",
+     "excluded": "",
+     "name": "Nanjing Hovoo Machinery Technology Co., Ltd. (Hovoo; hovooseal.com)",
+     "country": "Китай, Цзянсу, Нанкин",
+     "email": "sales@hovooseal.com",
+     "phone": "+86 18012806665",
+     "whatsapp": "",
+     "site": "hovooseal.com",
+     "positions": 2,
+     "quotes": 0,
+     "crm_stage": "К/П",
+     "crm_direction": "COP seal kits 2238/3060/4050"
+    }
+   ],
+   "excluded": [
+    {
+     "name": "Sanshan Rock Tools (Atlas Copco/Epiroc rock drilling consumables)",
+     "capital": "oem",
+     "reason": "Капитал OEM: по странице компании — с августа 2016 дочернее предприятие Atlas Copco (в ODM-реестре базы отмечено как бывшее СП с Atlas Copco/Epiroc 2013–2020). Для размещения не опция; котировки — только ценовой ориентир",
+     "quotes": 7,
+     "crm_stage": "К/П"
+    },
+    {
+     "name": "Zuanshan Mining Machinery Co., Ltd / Shandong Rock Drilling Tools Co.,",
+     "capital": "oem",
+     "reason": "Капитал OEM: по странице компании — с августа 2016 дочернее предприятие Atlas Copco (в ODM-реестре базы отмечено как бывшее СП с Atlas Copco/Epiroc 2013–2020). Для размещения не опция; котировки — только ценовой ориентир",
+     "quotes": 7,
+     "crm_stage": "К/П"
+    },
+    {
+     "name": "Answk (Guangzhou, air-compressor & Atlas Copco/Epiroc genuine-spares d",
+     "capital": "dealer",
+     "reason": "Дилер оригинальных запчастей Atlas Copco/Epiroc (по ODM-реестру: distributor of genuine, not ODM) — канал OEM, для размещения не опция",
+     "quotes": 0,
+     "crm_stage": "Написали — ждём"
+    },
+    {
+     "name": "WMS / Atmaca",
+     "capital": "reseller",
+     "reason": "Реселлер уровня OEM (Турция) — цены в 8 раз выше китайских заводов; только ценовой ориентир",
+     "quotes": 12,
+     "crm_stage": "К/П"
     }
    ]
   },
@@ -1020,7 +1132,8 @@
      ]
     }
    ],
-   "price_best_cn_usd": 164.7,
+   "price_best_cn_usd": 278.0,
+   "price_ref_oem_cn_usd": 41.3,
    "price_wms_usd": 330.6,
    "material": {
     "oem": "Цементуемые никель-хром-молибденовые стали. Sandvik — фирменная Sanbar 64 (воздушно-закаливаемая высоконикелевая сталь с высокой усталостной прочностью и хорошей отзывчивостью на цементацию). OEM/аналоги — стали типа 23CrNiMo / ZK22CrNi3Mo (22CrNi3Mo), 20CrNiMo, эквивалент европейской 18CrNiMo7-6.",
@@ -1030,19 +1143,50 @@
    },
    "suppliers": [
     {
-     "flag": "С августа 2016 — полностью дочернее предприятие Atlas Copco (по их странице /company/). Для тестовой закупки плюс: оригинальное качество по китайской цене. Для замещения OEM — риск: канал контролирует сам OEM и может его закрыть",
-     "name": "Sanshan Rock Tools (Atlas Copco/Epiroc rock drilling consumables)",
-     "country": "Китай",
-     "email": "epiroc@sanshanrocktools.com",
-     "phone": "+86-635-8330862",
+     "capital": "cn",
+     "excluded": "",
+     "name": "Mindrill Systems",
+     "country": "Индия",
+     "email": "salessupport@mindrill.com",
+     "phone": "+91 98305 94274",
      "whatsapp": "",
-     "site": "https://www.sanshanrocktools.com/",
-     "positions": 2,
+     "site": "",
+     "positions": 0,
      "quotes": 1,
      "crm_stage": "К/П",
-     "crm_direction": "Внутренности COP: piston, liner, driver"
+     "crm_direction": "Дрифтеры-аналоги 1838/2238/MD20"
     },
     {
+     "capital": "cn",
+     "excluded": "",
+     "name": "Xiamen Yonglianfeng",
+     "country": "Китай, Фуцзянь, Сямэнь",
+     "email": "bin@ylfpart.com",
+     "phone": "+86 18874204200",
+     "whatsapp": "WA/WeChat 86 18874204200",
+     "site": "",
+     "positions": 0,
+     "quotes": 2,
+     "crm_stage": "К/П",
+     "crm_direction": "Металл COP1838/1840"
+    },
+    {
+     "capital": "cn",
+     "excluded": "",
+     "name": "Jinhua Fuxuan Machinery",
+     "country": "Китай, Чжэцзян, Цзиньхуа",
+     "email": "tiffany@fuxuan-machine.com",
+     "phone": "+86 15268086116",
+     "whatsapp": "WA/WeChat 86 15268086116",
+     "site": "",
+     "positions": 0,
+     "quotes": 2,
+     "crm_stage": "К/П",
+     "crm_direction": "Металл / bushing rock drill"
+    },
+    {
+     "capital": "cn",
+     "excluded": "",
      "name": "Jiangxi Woserld / Siton",
      "country": "Китай (Woserld Цзянси / Siton)",
      "email": "sales@woserld.com",
@@ -1056,6 +1200,8 @@
     },
     {
      "flag": "",
+     "capital": "cn",
+     "excluded": "",
      "name": "Fujian Juntai Construction Machinery Co., Ltd. — juntaimachinery.com",
      "country": "Китай",
      "email": "juntai@wan-tai.com.cn",
@@ -1066,32 +1212,29 @@
      "quotes": 0,
      "crm_stage": "",
      "crm_direction": ""
+    }
+   ],
+   "excluded": [
+    {
+     "name": "Sanshan Rock Tools (Atlas Copco/Epiroc rock drilling consumables)",
+     "capital": "oem",
+     "reason": "Капитал OEM: по странице компании — с августа 2016 дочернее предприятие Atlas Copco (в ODM-реестре базы отмечено как бывшее СП с Atlas Copco/Epiroc 2013–2020). Для размещения не опция; котировки — только ценовой ориентир",
+     "quotes": 1,
+     "crm_stage": "К/П"
     },
     {
-     "flag": "",
      "name": "Answk (Guangzhou, air-compressor & Atlas Copco/Epiroc genuine-spares d",
-     "country": "Китай, Гуандун, Гуанчжоу",
-     "email": "sales@answk.com",
-     "phone": "WA +86 153288796767",
-     "whatsapp": "",
-     "site": "answk.com",
-     "positions": 2,
+     "capital": "dealer",
+     "reason": "Дилер оригинальных запчастей Atlas Copco/Epiroc (по ODM-реестру: distributor of genuine, not ODM) — канал OEM, для размещения не опция",
      "quotes": 0,
-     "crm_stage": "Написали — ждём",
-     "crm_direction": "COP overhaul kits"
+     "crm_stage": "Написали — ждём"
     },
     {
-     "flag": "",
      "name": "WMS / Atmaca",
-     "country": "Турция, Анкара",
-     "email": "export@drill-parts.com",
-     "phone": "+90 537 725 36 26",
-     "whatsapp": "",
-     "site": "drill-parts.com",
-     "positions": 2,
+     "capital": "reseller",
+     "reason": "Реселлер уровня OEM (Турция) — цены в 8 раз выше китайских заводов; только ценовой ориентир",
      "quotes": 2,
-     "crm_stage": "К/П",
-     "crm_direction": "Комплектные COP + металл-ЗИП"
+     "crm_stage": "К/П"
     }
    ]
   },
@@ -1184,7 +1327,8 @@
      ]
     }
    ],
-   "price_best_cn_usd": 2.1,
+   "price_best_cn_usd": 18.0,
+   "price_ref_oem_cn_usd": 2.1,
    "price_wms_usd": 26.4,
    "material": {
     "oem": "Гидрированный бутадиен-нитрильный каучук HNBR (стандартный средне-нитрильный грейд, аналог ARLANXEO Therban / Zeon Zetpol). У части моделей Epiroc COP и Sandvik HL/RD OEM также предлагает вариант из полиуретана TPU/PU. Рабочий диапазон HNBR-мембраны −35...+150 °C, до ~3000 циклов/мин",
@@ -1194,20 +1338,51 @@
    },
    "suppliers": [
     {
-     "flag": "С августа 2016 — полностью дочернее предприятие Atlas Copco (по их странице /company/). Для тестовой закупки плюс: оригинальное качество по китайской цене. Для замещения OEM — риск: канал контролирует сам OEM и может его закрыть",
-     "name": "Sanshan Rock Tools (Atlas Copco/Epiroc rock drilling consumables)",
-     "country": "Китай",
-     "email": "epiroc@sanshanrocktools.com",
-     "phone": "+86-635-8330862",
-     "whatsapp": "",
-     "site": "https://www.sanshanrocktools.com/",
-     "positions": 2,
+     "capital": "cn",
+     "excluded": "",
+     "name": "Xiamen Yonglianfeng",
+     "country": "Китай, Фуцзянь, Сямэнь",
+     "email": "bin@ylfpart.com",
+     "phone": "+86 18874204200",
+     "whatsapp": "WA/WeChat 86 18874204200",
+     "site": "",
+     "positions": 0,
      "quotes": 3,
      "crm_stage": "К/П",
-     "crm_direction": "Внутренности COP: piston, liner, driver"
+     "crm_direction": "Металл COP1838/1840"
+    },
+    {
+     "capital": "cn",
+     "excluded": "",
+     "name": "Jinhua Fuxuan Machinery",
+     "country": "Китай, Чжэцзян, Цзиньхуа",
+     "email": "tiffany@fuxuan-machine.com",
+     "phone": "+86 15268086116",
+     "whatsapp": "WA/WeChat 86 15268086116",
+     "site": "",
+     "positions": 0,
+     "quotes": 3,
+     "crm_stage": "К/П",
+     "crm_direction": "Металл / bushing rock drill"
+    },
+    {
+     "capital": "cn",
+     "excluded": "",
+     "name": "Mindrill Systems",
+     "country": "Индия",
+     "email": "salessupport@mindrill.com",
+     "phone": "+91 98305 94274",
+     "whatsapp": "",
+     "site": "",
+     "positions": 0,
+     "quotes": 1,
+     "crm_stage": "К/П",
+     "crm_direction": "Дрифтеры-аналоги 1838/2238/MD20"
     },
     {
      "flag": "",
+     "capital": "cn",
+     "excluded": "",
      "name": "Nanjing Hovoo Machinery Technology Co., Ltd. (Hovoo; hovooseal.com)",
      "country": "Китай, Цзянсу, Нанкин",
      "email": "sales@hovooseal.com",
@@ -1220,6 +1395,8 @@
      "crm_direction": "COP seal kits 2238/3060/4050"
     },
     {
+     "capital": "cn",
+     "excluded": "",
      "name": "Qingdao Hendac Prime",
      "country": "Китай, Шаньдун, Циндао",
      "email": "lucy@allianceseals.com",
@@ -1232,6 +1409,8 @@
      "crm_direction": "РТИ (авто): oil/PU seals"
     },
     {
+     "capital": "cn",
+     "excluded": "",
      "name": "Guangdong DEF Seals",
      "country": "Китай, Гуандун, Дунгуань",
      "email": "defseals@defseals.com",
@@ -1244,6 +1423,8 @@
      "crm_direction": "РТИ / hydraulic seals"
     },
     {
+     "capital": "cn",
+     "excluded": "",
      "name": "Xi'an Meiwa",
      "country": "Китай, Шэньси, Сиань",
      "email": "",
@@ -1256,32 +1437,8 @@
      "crm_direction": "COP seal kits"
     },
     {
-     "flag": "",
-     "name": "Answk (Guangzhou, air-compressor & Atlas Copco/Epiroc genuine-spares d",
-     "country": "Китай, Гуандун, Гуанчжоу",
-     "email": "sales@answk.com",
-     "phone": "WA +86 153288796767",
-     "whatsapp": "",
-     "site": "answk.com",
-     "positions": 1,
-     "quotes": 0,
-     "crm_stage": "Написали — ждём",
-     "crm_direction": "COP overhaul kits"
-    },
-    {
-     "flag": "",
-     "name": "Xi'an Huizhong Mechanical Equipment Co., Ltd. (rockdrilling-tools.com)",
-     "country": "Китай",
-     "email": "shet35008@gmail.com",
-     "phone": "+86 17391861661",
-     "whatsapp": "",
-     "site": "https://www.rockdrilling-tools.com/",
-     "positions": 1,
-     "quotes": 0,
-     "crm_stage": "Написали — ждём (прозвон)",
-     "crm_direction": "Хвостовики shank COP1838"
-    },
-    {
+     "capital": "cn",
+     "excluded": "",
      "name": "Biaotuo / BPSEAL",
      "country": "Китай, Хэбэй, Синтай",
      "email": "oilseal@bpseal.com",
@@ -1292,6 +1449,29 @@
      "quotes": 0,
      "crm_stage": "Написали — ждём (прозвон)",
      "crm_direction": "РТИ: PU/PTFE seals, O-rings"
+    }
+   ],
+   "excluded": [
+    {
+     "name": "Sanshan Rock Tools (Atlas Copco/Epiroc rock drilling consumables)",
+     "capital": "oem",
+     "reason": "Капитал OEM: по странице компании — с августа 2016 дочернее предприятие Atlas Copco (в ODM-реестре базы отмечено как бывшее СП с Atlas Copco/Epiroc 2013–2020). Для размещения не опция; котировки — только ценовой ориентир",
+     "quotes": 3,
+     "crm_stage": "К/П"
+    },
+    {
+     "name": "Answk (Guangzhou, air-compressor & Atlas Copco/Epiroc genuine-spares d",
+     "capital": "dealer",
+     "reason": "Дилер оригинальных запчастей Atlas Copco/Epiroc (по ODM-реестру: distributor of genuine, not ODM) — канал OEM, для размещения не опция",
+     "quotes": 0,
+     "crm_stage": "Написали — ждём"
+    },
+    {
+     "name": "WMS / Atmaca",
+     "capital": "reseller",
+     "reason": "Реселлер уровня OEM (Турция) — цены в 8 раз выше китайских заводов; только ценовой ориентир",
+     "quotes": 3,
+     "crm_stage": "К/П"
     }
    ]
   },
@@ -1898,7 +2078,8 @@
      "quotes": []
     }
    ],
-   "price_best_cn_usd": 7.5,
+   "price_best_cn_usd": 33.0,
+   "price_ref_oem_cn_usd": 12.3,
    "price_wms_usd": 152.1,
    "material": {
     "oem": "OEM-стандарт (Epiroc/Atlas Copco COP-серия, Sandvik, Tamrock): NBR (нитрил-бутадиеновый каучук) как базовый эластомер аккумуляторных мембран/диафрагм (напр. Atlas Copco 3115182200) и статических уплотнений; литой полиэфирный полиуретан (PU, MDI-based) для динамических манжет/U-колец и цельнолитых мембран; комбинированные пакеты PU+PTFE для штоковых/поршневых уплотнений высокого давления.",
@@ -1908,20 +2089,51 @@
    },
    "suppliers": [
     {
-     "flag": "С августа 2016 — полностью дочернее предприятие Atlas Copco (по их странице /company/). Для тестовой закупки плюс: оригинальное качество по китайской цене. Для замещения OEM — риск: канал контролирует сам OEM и может его закрыть",
-     "name": "Sanshan Rock Tools (Atlas Copco/Epiroc rock drilling consumables)",
-     "country": "Китай",
-     "email": "epiroc@sanshanrocktools.com",
-     "phone": "+86-635-8330862",
-     "whatsapp": "",
-     "site": "https://www.sanshanrocktools.com/",
-     "positions": 10,
+     "capital": "cn",
+     "excluded": "",
+     "name": "Xiamen Yonglianfeng",
+     "country": "Китай, Фуцзянь, Сямэнь",
+     "email": "bin@ylfpart.com",
+     "phone": "+86 18874204200",
+     "whatsapp": "WA/WeChat 86 18874204200",
+     "site": "",
+     "positions": 0,
      "quotes": 6,
      "crm_stage": "К/П",
-     "crm_direction": "Внутренности COP: piston, liner, driver"
+     "crm_direction": "Металл COP1838/1840"
+    },
+    {
+     "capital": "cn",
+     "excluded": "",
+     "name": "Jinhua Fuxuan Machinery",
+     "country": "Китай, Чжэцзян, Цзиньхуа",
+     "email": "tiffany@fuxuan-machine.com",
+     "phone": "+86 15268086116",
+     "whatsapp": "WA/WeChat 86 15268086116",
+     "site": "",
+     "positions": 0,
+     "quotes": 3,
+     "crm_stage": "К/П",
+     "crm_direction": "Металл / bushing rock drill"
+    },
+    {
+     "capital": "cn",
+     "excluded": "",
+     "name": "Mindrill Systems",
+     "country": "Индия",
+     "email": "salessupport@mindrill.com",
+     "phone": "+91 98305 94274",
+     "whatsapp": "",
+     "site": "",
+     "positions": 0,
+     "quotes": 1,
+     "crm_stage": "К/П",
+     "crm_direction": "Дрифтеры-аналоги 1838/2238/MD20"
     },
     {
      "flag": "",
+     "capital": "cn",
+     "excluded": "",
      "name": "Nanjing Hovoo Machinery Technology Co., Ltd. (Hovoo; hovooseal.com)",
      "country": "Китай, Цзянсу, Нанкин",
      "email": "sales@hovooseal.com",
@@ -1934,19 +2146,8 @@
      "crm_direction": "COP seal kits 2238/3060/4050"
     },
     {
-     "flag": "",
-     "name": "Litian Heavy Industry Machinery Co., Ltd. (力天重工 / Litech)",
-     "country": "Китай, Ляонин, Хулудао",
-     "email": "litian@litechtools.com",
-     "phone": "+86 18080948772",
-     "whatsapp": "",
-     "site": "litechtools.com",
-     "positions": 3,
-     "quotes": 0,
-     "crm_stage": "Ответил — взял в работу",
-     "crm_direction": "Хвостовики COP1028-4050"
-    },
-    {
+     "capital": "cn",
+     "excluded": "",
      "name": "Qingdao Hendac Prime",
      "country": "Китай, Шаньдун, Циндао",
      "email": "lucy@allianceseals.com",
@@ -1959,6 +2160,8 @@
      "crm_direction": "РТИ (авто): oil/PU seals"
     },
     {
+     "capital": "cn",
+     "excluded": "",
      "name": "Guangdong DEF Seals",
      "country": "Китай, Гуандун, Дунгуань",
      "email": "defseals@defseals.com",
@@ -1971,6 +2174,8 @@
      "crm_direction": "РТИ / hydraulic seals"
     },
     {
+     "capital": "cn",
+     "excluded": "",
      "name": "Xi'an Meiwa",
      "country": "Китай, Шэньси, Сиань",
      "email": "",
@@ -1984,19 +2189,8 @@
     },
     {
      "flag": "",
-     "name": "Guangzhou Toparts Mechanical Equipment Co., Ltd. (Toparts; сайты topar",
-     "country": "CN",
-     "email": "paul@toparts.net",
-     "phone": "0086-20-32233290",
-     "whatsapp": "",
-     "site": "https://www.toparts.cc/collections/rock-drills-seal-kit",
-     "positions": 37,
-     "quotes": 0,
-     "crm_stage": "Написали — ждём (прозвон)",
-     "crm_direction": "Хвостовики shank COP1838"
-    },
-    {
-     "flag": "",
+     "capital": "cn",
+     "excluded": "",
      "name": "FMRIBT (Fujian/Foshan Mineral Rock Industrial Boring Tools) — mineralr",
      "country": "China",
      "email": "exportsales@fmribt.com",
@@ -2007,6 +2201,29 @@
      "quotes": 0,
      "crm_stage": "",
      "crm_direction": ""
+    }
+   ],
+   "excluded": [
+    {
+     "name": "Sanshan Rock Tools (Atlas Copco/Epiroc rock drilling consumables)",
+     "capital": "oem",
+     "reason": "Капитал OEM: по странице компании — с августа 2016 дочернее предприятие Atlas Copco (в ODM-реестре базы отмечено как бывшее СП с Atlas Copco/Epiroc 2013–2020). Для размещения не опция; котировки — только ценовой ориентир",
+     "quotes": 6,
+     "crm_stage": "К/П"
+    },
+    {
+     "name": "Answk (Guangzhou, air-compressor & Atlas Copco/Epiroc genuine-spares d",
+     "capital": "dealer",
+     "reason": "Дилер оригинальных запчастей Atlas Copco/Epiroc (по ODM-реестру: distributor of genuine, not ODM) — канал OEM, для размещения не опция",
+     "quotes": 0,
+     "crm_stage": "Написали — ждём"
+    },
+    {
+     "name": "WMS / Atmaca",
+     "capital": "reseller",
+     "reason": "Реселлер уровня OEM (Турция) — цены в 8 раз выше китайских заводов; только ценовой ориентир",
+     "quotes": 12,
+     "crm_stage": "К/П"
     }
    ]
   },
@@ -2285,7 +2502,8 @@
      "quotes": []
     }
    ],
-   "price_best_cn_usd": 0.3,
+   "price_best_cn_usd": 3.0,
+   "price_ref_oem_cn_usd": 0.3,
    "price_wms_usd": 3.5,
    "material": {
     "oem": "OEM-стандарт (Epiroc/Atlas Copco COP-серия, Sandvik, Tamrock): NBR (нитрил-бутадиеновый каучук) как базовый эластомер аккумуляторных мембран/диафрагм (напр. Atlas Copco 3115182200) и статических уплотнений; литой полиэфирный полиуретан (PU, MDI-based) для динамических манжет/U-колец и цельнолитых мембран; комбинированные пакеты PU+PTFE для штоковых/поршневых уплотнений высокого давления.",
@@ -2295,20 +2513,51 @@
    },
    "suppliers": [
     {
-     "flag": "С августа 2016 — полностью дочернее предприятие Atlas Copco (по их странице /company/). Для тестовой закупки плюс: оригинальное качество по китайской цене. Для замещения OEM — риск: канал контролирует сам OEM и может его закрыть",
-     "name": "Sanshan Rock Tools (Atlas Copco/Epiroc rock drilling consumables)",
-     "country": "Китай",
-     "email": "epiroc@sanshanrocktools.com",
-     "phone": "+86-635-8330862",
-     "whatsapp": "",
-     "site": "https://www.sanshanrocktools.com/",
-     "positions": 3,
-     "quotes": 6,
+     "capital": "cn",
+     "excluded": "",
+     "name": "Xiamen Yonglianfeng",
+     "country": "Китай, Фуцзянь, Сямэнь",
+     "email": "bin@ylfpart.com",
+     "phone": "+86 18874204200",
+     "whatsapp": "WA/WeChat 86 18874204200",
+     "site": "",
+     "positions": 0,
+     "quotes": 5,
      "crm_stage": "К/П",
-     "crm_direction": "Внутренности COP: piston, liner, driver"
+     "crm_direction": "Металл COP1838/1840"
+    },
+    {
+     "capital": "cn",
+     "excluded": "",
+     "name": "Jinhua Fuxuan Machinery",
+     "country": "Китай, Чжэцзян, Цзиньхуа",
+     "email": "tiffany@fuxuan-machine.com",
+     "phone": "+86 15268086116",
+     "whatsapp": "WA/WeChat 86 15268086116",
+     "site": "",
+     "positions": 0,
+     "quotes": 5,
+     "crm_stage": "К/П",
+     "crm_direction": "Металл / bushing rock drill"
+    },
+    {
+     "capital": "cn",
+     "excluded": "",
+     "name": "Mindrill Systems",
+     "country": "Индия",
+     "email": "salessupport@mindrill.com",
+     "phone": "+91 98305 94274",
+     "whatsapp": "",
+     "site": "",
+     "positions": 0,
+     "quotes": 3,
+     "crm_stage": "К/П",
+     "crm_direction": "Дрифтеры-аналоги 1838/2238/MD20"
     },
     {
      "flag": "",
+     "capital": "cn",
+     "excluded": "",
      "name": "Nanjing Hovoo Machinery Technology Co., Ltd. (Hovoo; hovooseal.com)",
      "country": "Китай, Цзянсу, Нанкин",
      "email": "sales@hovooseal.com",
@@ -2321,19 +2570,8 @@
      "crm_direction": "COP seal kits 2238/3060/4050"
     },
     {
-     "flag": "",
-     "name": "Litian Heavy Industry Machinery Co., Ltd. (力天重工 / Litech)",
-     "country": "Китай, Ляонин, Хулудао",
-     "email": "litian@litechtools.com",
-     "phone": "+86 18080948772",
-     "whatsapp": "",
-     "site": "litechtools.com",
-     "positions": 1,
-     "quotes": 0,
-     "crm_stage": "Ответил — взял в работу",
-     "crm_direction": "Хвостовики COP1028-4050"
-    },
-    {
+     "capital": "cn",
+     "excluded": "",
      "name": "Qingdao Hendac Prime",
      "country": "Китай, Шаньдун, Циндао",
      "email": "lucy@allianceseals.com",
@@ -2346,6 +2584,8 @@
      "crm_direction": "РТИ (авто): oil/PU seals"
     },
     {
+     "capital": "cn",
+     "excluded": "",
      "name": "Guangdong DEF Seals",
      "country": "Китай, Гуандун, Дунгуань",
      "email": "defseals@defseals.com",
@@ -2358,6 +2598,8 @@
      "crm_direction": "РТИ / hydraulic seals"
     },
     {
+     "capital": "cn",
+     "excluded": "",
      "name": "Xi'an Meiwa",
      "country": "Китай, Шэньси, Сиань",
      "email": "",
@@ -2371,29 +2613,41 @@
     },
     {
      "flag": "",
-     "name": "Guangzhou Toparts Mechanical Equipment Co., Ltd. (Toparts; сайты topar",
-     "country": "CN",
-     "email": "paul@toparts.net",
-     "phone": "0086-20-32233290",
+     "capital": "cn",
+     "excluded": "",
+     "name": "Fujian Juntai Construction Machinery Co., Ltd. — juntaimachinery.com",
+     "country": "Китай",
+     "email": "juntai@wan-tai.com.cn",
+     "phone": "+86 182 5953 5636",
      "whatsapp": "",
-     "site": "https://www.toparts.cc/collections/rock-drills-seal-kit",
-     "positions": 10,
+     "site": "https://www.juntaimachinery.com/",
+     "positions": 5,
      "quotes": 0,
-     "crm_stage": "Написали — ждём (прозвон)",
-     "crm_direction": "Хвостовики shank COP1838"
+     "crm_stage": "",
+     "crm_direction": ""
+    }
+   ],
+   "excluded": [
+    {
+     "name": "Sanshan Rock Tools (Atlas Copco/Epiroc rock drilling consumables)",
+     "capital": "oem",
+     "reason": "Капитал OEM: по странице компании — с августа 2016 дочернее предприятие Atlas Copco (в ODM-реестре базы отмечено как бывшее СП с Atlas Copco/Epiroc 2013–2020). Для размещения не опция; котировки — только ценовой ориентир",
+     "quotes": 6,
+     "crm_stage": "К/П"
     },
     {
-     "flag": "",
      "name": "Answk (Guangzhou, air-compressor & Atlas Copco/Epiroc genuine-spares d",
-     "country": "Китай, Гуандун, Гуанчжоу",
-     "email": "sales@answk.com",
-     "phone": "WA +86 153288796767",
-     "whatsapp": "",
-     "site": "answk.com",
-     "positions": 6,
+     "capital": "dealer",
+     "reason": "Дилер оригинальных запчастей Atlas Copco/Epiroc (по ODM-реестру: distributor of genuine, not ODM) — канал OEM, для размещения не опция",
      "quotes": 0,
-     "crm_stage": "Написали — ждём",
-     "crm_direction": "COP overhaul kits"
+     "crm_stage": "Написали — ждём"
+    },
+    {
+     "name": "WMS / Atmaca",
+     "capital": "reseller",
+     "reason": "Реселлер уровня OEM (Турция) — цены в 8 раз выше китайских заводов; только ценовой ориентир",
+     "quotes": 11,
+     "crm_stage": "К/П"
     }
    ]
   },
@@ -2476,24 +2730,56 @@
      "quotes": []
     }
    ],
-   "price_best_cn_usd": 0.8,
+   "price_best_cn_usd": 8.0,
+   "price_ref_oem_cn_usd": 0.8,
    "price_wms_usd": 13.6,
    "material": null,
    "suppliers": [
     {
-     "flag": "С августа 2016 — полностью дочернее предприятие Atlas Copco (по их странице /company/). Для тестовой закупки плюс: оригинальное качество по китайской цене. Для замещения OEM — риск: канал контролирует сам OEM и может его закрыть",
-     "name": "Sanshan Rock Tools (Atlas Copco/Epiroc rock drilling consumables)",
-     "country": "Китай",
-     "email": "epiroc@sanshanrocktools.com",
-     "phone": "+86-635-8330862",
+     "capital": "cn",
+     "excluded": "",
+     "name": "Mindrill Systems",
+     "country": "Индия",
+     "email": "salessupport@mindrill.com",
+     "phone": "+91 98305 94274",
      "whatsapp": "",
-     "site": "https://www.sanshanrocktools.com/",
-     "positions": 2,
+     "site": "",
+     "positions": 0,
      "quotes": 1,
      "crm_stage": "К/П",
-     "crm_direction": "Внутренности COP: piston, liner, driver"
+     "crm_direction": "Дрифтеры-аналоги 1838/2238/MD20"
     },
     {
+     "capital": "cn",
+     "excluded": "",
+     "name": "Xiamen Yonglianfeng",
+     "country": "Китай, Фуцзянь, Сямэнь",
+     "email": "bin@ylfpart.com",
+     "phone": "+86 18874204200",
+     "whatsapp": "WA/WeChat 86 18874204200",
+     "site": "",
+     "positions": 0,
+     "quotes": 1,
+     "crm_stage": "К/П",
+     "crm_direction": "Металл COP1838/1840"
+    },
+    {
+     "capital": "cn",
+     "excluded": "",
+     "name": "Jinhua Fuxuan Machinery",
+     "country": "Китай, Чжэцзян, Цзиньхуа",
+     "email": "tiffany@fuxuan-machine.com",
+     "phone": "+86 15268086116",
+     "whatsapp": "WA/WeChat 86 15268086116",
+     "site": "",
+     "positions": 0,
+     "quotes": 1,
+     "crm_stage": "К/П",
+     "crm_direction": "Металл / bushing rock drill"
+    },
+    {
+     "capital": "cn",
+     "excluded": "",
      "name": "Ningbo Chaori Hydraulic",
      "country": "Китай, Чжэцзян, Нинбо (Фэнхуа)",
      "email": "Export@nbchaori.cn",
@@ -2506,6 +2792,8 @@
      "crm_direction": "GAP-клапан (charging valve)"
     },
     {
+     "capital": "cn",
+     "excluded": "",
      "name": "Difon Machinery",
      "country": "Китай",
      "email": "info@difon.cn",
@@ -2519,6 +2807,8 @@
     },
     {
      "flag": "",
+     "capital": "cn",
+     "excluded": "",
      "name": "FMRIBT (Fujian/Foshan Mineral Rock Industrial Boring Tools) — mineralr",
      "country": "China",
      "email": "exportsales@fmribt.com",
@@ -2532,6 +2822,8 @@
     },
     {
      "flag": "",
+     "capital": "cn",
+     "excluded": "",
      "name": "Hambition Mining (Qingdao Hambition Drivetrain Components & Parts Co.,",
      "country": "China",
      "email": "info@hambition.com",
@@ -2545,19 +2837,8 @@
     },
     {
      "flag": "",
-     "name": "Answk (Guangzhou, air-compressor & Atlas Copco/Epiroc genuine-spares d",
-     "country": "Китай, Гуандун, Гуанчжоу",
-     "email": "sales@answk.com",
-     "phone": "WA +86 153288796767",
-     "whatsapp": "",
-     "site": "answk.com",
-     "positions": 2,
-     "quotes": 0,
-     "crm_stage": "Написали — ждём",
-     "crm_direction": "COP overhaul kits"
-    },
-    {
-     "flag": "",
+     "capital": "cn",
+     "excluded": "",
      "name": "Xi'an Huizhong Mechanical Equipment Co., Ltd. (rockdrilling-tools.com)",
      "country": "Китай",
      "email": "shet35008@gmail.com",
@@ -2568,18 +2849,36 @@
      "quotes": 0,
      "crm_stage": "Написали — ждём (прозвон)",
      "crm_direction": "Хвостовики shank COP1838"
+    }
+   ],
+   "excluded": [
+    {
+     "name": "Sanshan Rock Tools (Atlas Copco/Epiroc rock drilling consumables)",
+     "capital": "oem",
+     "reason": "Капитал OEM: по странице компании — с августа 2016 дочернее предприятие Atlas Copco (в ODM-реестре базы отмечено как бывшее СП с Atlas Copco/Epiroc 2013–2020). Для размещения не опция; котировки — только ценовой ориентир",
+     "quotes": 1,
+     "crm_stage": "К/П"
     },
     {
-     "name": "Xingtai Huimen Seals",
-     "country": "Китай, Хэбэй, Синтай",
-     "email": "fyyf1988@163.com",
-     "phone": "86 319 7656928",
-     "whatsapp": "WA/WeChat 86 15832965899",
-     "site": "",
-     "positions": 0,
+     "name": "Answk (Guangzhou, air-compressor & Atlas Copco/Epiroc genuine-spares d",
+     "capital": "dealer",
+     "reason": "Дилер оригинальных запчастей Atlas Copco/Epiroc (по ODM-реестру: distributor of genuine, not ODM) — канал OEM, для размещения не опция",
      "quotes": 0,
-     "crm_stage": "Написали — ждём (прозвон)",
-     "crm_direction": "РТИ: oil seals, O-rings, valve seals"
+     "crm_stage": "Написали — ждём"
+    },
+    {
+     "name": "Chengdu Pudding Mechatronic Co. (CPMC, via aircompressorstrade China d",
+     "capital": "dealer",
+     "reason": "Дилер оригинальных запчастей Atlas Copco/Epiroc (по ODM-реестру: distributor of genuine, not ODM) — канал OEM, для размещения не опция",
+     "quotes": 0,
+     "crm_stage": ""
+    },
+    {
+     "name": "WMS / Atmaca",
+     "capital": "reseller",
+     "reason": "Реселлер уровня OEM (Турция) — цены в 8 раз выше китайских заводов; только ценовой ориентир",
+     "quotes": 1,
+     "crm_stage": "К/П"
     }
    ]
   },
@@ -2724,51 +3023,57 @@
      "quotes": []
     }
    ],
-   "price_best_cn_usd": 29.3,
+   "price_best_cn_usd": 29.7,
+   "price_ref_oem_cn_usd": 0.4,
    "price_wms_usd": 88.2,
    "material": null,
    "suppliers": [
     {
-     "flag": "С августа 2016 — полностью дочернее предприятие Atlas Copco (по их странице /company/). Для тестовой закупки плюс: оригинальное качество по китайской цене. Для замещения OEM — риск: канал контролирует сам OEM и может его закрыть",
-     "name": "Sanshan Rock Tools (Atlas Copco/Epiroc rock drilling consumables)",
-     "country": "Китай",
-     "email": "epiroc@sanshanrocktools.com",
-     "phone": "+86-635-8330862",
+     "capital": "cn",
+     "excluded": "",
+     "name": "Jinhua Fuxuan Machinery",
+     "country": "Китай, Чжэцзян, Цзиньхуа",
+     "email": "tiffany@fuxuan-machine.com",
+     "phone": "+86 15268086116",
+     "whatsapp": "WA/WeChat 86 15268086116",
+     "site": "",
+     "positions": 0,
+     "quotes": 2,
+     "crm_stage": "К/П",
+     "crm_direction": "Металл / bushing rock drill"
+    },
+    {
+     "capital": "cn",
+     "excluded": "",
+     "name": "Mindrill Systems",
+     "country": "Индия",
+     "email": "salessupport@mindrill.com",
+     "phone": "+91 98305 94274",
      "whatsapp": "",
-     "site": "https://www.sanshanrocktools.com/",
-     "positions": 6,
+     "site": "",
+     "positions": 0,
      "quotes": 1,
      "crm_stage": "К/П",
-     "crm_direction": "Внутренности COP: piston, liner, driver"
+     "crm_direction": "Дрифтеры-аналоги 1838/2238/MD20"
+    },
+    {
+     "capital": "cn",
+     "excluded": "",
+     "name": "Xiamen Yonglianfeng",
+     "country": "Китай, Фуцзянь, Сямэнь",
+     "email": "bin@ylfpart.com",
+     "phone": "+86 18874204200",
+     "whatsapp": "WA/WeChat 86 18874204200",
+     "site": "",
+     "positions": 0,
+     "quotes": 1,
+     "crm_stage": "К/П",
+     "crm_direction": "Металл COP1838/1840"
     },
     {
      "flag": "",
-     "name": "Nanjing Hovoo Machinery Technology Co., Ltd. (Hovoo; hovooseal.com)",
-     "country": "Китай, Цзянсу, Нанкин",
-     "email": "sales@hovooseal.com",
-     "phone": "+86 18012806665",
-     "whatsapp": "",
-     "site": "hovooseal.com",
-     "positions": 3,
-     "quotes": 0,
-     "crm_stage": "К/П",
-     "crm_direction": "COP seal kits 2238/3060/4050"
-    },
-    {
-     "flag": "С августа 2016 — полностью дочернее предприятие Atlas Copco (по их странице /company/). Для тестовой закупки плюс: оригинальное качество по китайской цене. Для замещения OEM — риск: канал контролирует сам OEM и может его закрыть",
-     "name": "Zuanshan Mining Machinery Co., Ltd / Shandong Rock Drilling Tools Co.,",
-     "country": "Китай",
-     "email": "sales@zuanshancompressor.com",
-     "phone": "+86-635-8330862",
-     "whatsapp": "",
-     "site": "https://www.chinadthtools.com/products/rock-drill-spare-parts/hydraulic-drifter-spare-part",
-     "positions": 1,
-     "quotes": 0,
-     "crm_stage": "К/П",
-     "crm_direction": "Внутренности COP: piston, liner, driver"
-    },
-    {
-     "flag": "",
+     "capital": "cn",
+     "excluded": "",
      "name": "Jiangxi Siton Machinery Manufacturing Co., Ltd. (SITON; globalsiton.co",
      "country": "China",
      "email": "",
@@ -2782,6 +3087,8 @@
     },
     {
      "flag": "",
+     "capital": "cn",
+     "excluded": "",
      "name": "Fujian Juntai Construction Machinery Co., Ltd. — juntaimachinery.com",
      "country": "Китай",
      "email": "juntai@wan-tai.com.cn",
@@ -2795,19 +3102,8 @@
     },
     {
      "flag": "",
-     "name": "Answk (Guangzhou, air-compressor & Atlas Copco/Epiroc genuine-spares d",
-     "country": "Китай, Гуандун, Гуанчжоу",
-     "email": "sales@answk.com",
-     "phone": "WA +86 153288796767",
-     "whatsapp": "",
-     "site": "answk.com",
-     "positions": 4,
-     "quotes": 0,
-     "crm_stage": "Написали — ждём",
-     "crm_direction": "COP overhaul kits"
-    },
-    {
-     "flag": "",
+     "capital": "cn",
+     "excluded": "",
      "name": "FMRIBT (Fujian/Foshan Mineral Rock Industrial Boring Tools) — mineralr",
      "country": "China",
      "email": "exportsales@fmribt.com",
@@ -2821,6 +3117,8 @@
     },
     {
      "flag": "",
+     "capital": "cn",
+     "excluded": "",
      "name": "Xi'an Huizhong Mechanical Equipment Co., Ltd. (rockdrilling-tools.com)",
      "country": "Китай",
      "email": "shet35008@gmail.com",
@@ -2831,6 +3129,51 @@
      "quotes": 0,
      "crm_stage": "Написали — ждём (прозвон)",
      "crm_direction": "Хвостовики shank COP1838"
+    },
+    {
+     "flag": "",
+     "capital": "cn",
+     "excluded": "",
+     "name": "Nanjing Hovoo Machinery Technology Co., Ltd. (Hovoo; hovooseal.com)",
+     "country": "Китай, Цзянсу, Нанкин",
+     "email": "sales@hovooseal.com",
+     "phone": "+86 18012806665",
+     "whatsapp": "",
+     "site": "hovooseal.com",
+     "positions": 3,
+     "quotes": 0,
+     "crm_stage": "К/П",
+     "crm_direction": "COP seal kits 2238/3060/4050"
+    }
+   ],
+   "excluded": [
+    {
+     "name": "Sanshan Rock Tools (Atlas Copco/Epiroc rock drilling consumables)",
+     "capital": "oem",
+     "reason": "Капитал OEM: по странице компании — с августа 2016 дочернее предприятие Atlas Copco (в ODM-реестре базы отмечено как бывшее СП с Atlas Copco/Epiroc 2013–2020). Для размещения не опция; котировки — только ценовой ориентир",
+     "quotes": 1,
+     "crm_stage": "К/П"
+    },
+    {
+     "name": "Zuanshan Mining Machinery Co., Ltd / Shandong Rock Drilling Tools Co.,",
+     "capital": "oem",
+     "reason": "Капитал OEM: по странице компании — с августа 2016 дочернее предприятие Atlas Copco (в ODM-реестре базы отмечено как бывшее СП с Atlas Copco/Epiroc 2013–2020). Для размещения не опция; котировки — только ценовой ориентир",
+     "quotes": 1,
+     "crm_stage": "К/П"
+    },
+    {
+     "name": "Answk (Guangzhou, air-compressor & Atlas Copco/Epiroc genuine-spares d",
+     "capital": "dealer",
+     "reason": "Дилер оригинальных запчастей Atlas Copco/Epiroc (по ODM-реестру: distributor of genuine, not ODM) — канал OEM, для размещения не опция",
+     "quotes": 0,
+     "crm_stage": "Написали — ждём"
+    },
+    {
+     "name": "WMS / Atmaca",
+     "capital": "reseller",
+     "reason": "Реселлер уровня OEM (Турция) — цены в 8 раз выше китайских заводов; только ценовой ориентир",
+     "quotes": 7,
+     "crm_stage": "К/П"
     }
    ]
   },
@@ -2908,24 +3251,14 @@
     }
    ],
    "price_best_cn_usd": null,
+   "price_ref_oem_cn_usd": null,
    "price_wms_usd": 821.6,
    "material": null,
    "suppliers": [
     {
-     "flag": "С августа 2016 — полностью дочернее предприятие Atlas Copco (по их странице /company/). Для тестовой закупки плюс: оригинальное качество по китайской цене. Для замещения OEM — риск: канал контролирует сам OEM и может его закрыть",
-     "name": "Sanshan Rock Tools (Atlas Copco/Epiroc rock drilling consumables)",
-     "country": "Китай",
-     "email": "epiroc@sanshanrocktools.com",
-     "phone": "+86-635-8330862",
-     "whatsapp": "",
-     "site": "https://www.sanshanrocktools.com/",
-     "positions": 1,
-     "quotes": 0,
-     "crm_stage": "К/П",
-     "crm_direction": "Внутренности COP: piston, liner, driver"
-    },
-    {
      "flag": "",
+     "capital": "cn",
+     "excluded": "",
      "name": "XCG Parts (heavy machinery alternator/motor factory)",
      "country": "China",
      "email": "robin@xcgparts.com",
@@ -2938,6 +3271,8 @@
      "crm_direction": "GAP-мотор (orbital + radial-piston)"
     },
     {
+     "capital": "cn",
+     "excluded": "",
      "name": "Shijiazhuang Hanjiu",
      "country": "Китай, Хэбэй, Шицзячжуан",
      "email": "Alyssa@sjzhjsm.com",
@@ -2950,6 +3285,8 @@
      "crm_direction": "GAP-мотор (orbital, Char-Lynn equiv)"
     },
     {
+     "capital": "cn",
+     "excluded": "",
      "name": "Jining Jinjia Hydraulic",
      "country": "Китай, Шаньдун, Цзинин",
      "email": "alice@jinjiahyd.com",
@@ -2963,6 +3300,8 @@
     },
     {
      "flag": "",
+     "capital": "cn",
+     "excluded": "",
      "name": "Hambition Mining (Qingdao Hambition Drivetrain Components & Parts Co.,",
      "country": "China",
      "email": "info@hambition.com",
@@ -2976,19 +3315,8 @@
     },
     {
      "flag": "",
-     "name": "Answk (Guangzhou, air-compressor & Atlas Copco/Epiroc genuine-spares d",
-     "country": "Китай, Гуандун, Гуанчжоу",
-     "email": "sales@answk.com",
-     "phone": "WA +86 153288796767",
-     "whatsapp": "",
-     "site": "answk.com",
-     "positions": 2,
-     "quotes": 0,
-     "crm_stage": "Написали — ждём",
-     "crm_direction": "COP overhaul kits"
-    },
-    {
-     "flag": "",
+     "capital": "cn",
+     "excluded": "",
      "name": "FMRIBT (Fujian/Foshan Mineral Rock Industrial Boring Tools) — mineralr",
      "country": "China",
      "email": "exportsales@fmribt.com",
@@ -3001,6 +3329,8 @@
      "crm_direction": ""
     },
     {
+     "capital": "cn",
+     "excluded": "",
      "name": "Jining Liyuan Hydraulic",
      "country": "Китай, Шаньдун, Цзинин",
      "email": "lyexport@jnlyyy.com",
@@ -3011,6 +3341,50 @@
      "quotes": 0,
      "crm_stage": "Написали — ждём",
      "crm_direction": "GAP-мотор (orbital+axial)"
+    },
+    {
+     "capital": "cn",
+     "excluded": "",
+     "name": "Ningbo Helm Tower Noda",
+     "country": "Китай, Чжэцзян, Нинбо",
+     "email": "sales@hydraulics-china.com",
+     "phone": "+86 13567431300",
+     "whatsapp": "WA/WeChat 86 13567431300",
+     "site": "",
+     "positions": 0,
+     "quotes": 0,
+     "crm_stage": "Написали — ждём",
+     "crm_direction": "GAP-мотор (radial-piston)"
+    }
+   ],
+   "excluded": [
+    {
+     "name": "Sanshan Rock Tools (Atlas Copco/Epiroc rock drilling consumables)",
+     "capital": "oem",
+     "reason": "Капитал OEM: по странице компании — с августа 2016 дочернее предприятие Atlas Copco (в ODM-реестре базы отмечено как бывшее СП с Atlas Copco/Epiroc 2013–2020). Для размещения не опция; котировки — только ценовой ориентир",
+     "quotes": 0,
+     "crm_stage": "К/П"
+    },
+    {
+     "name": "Answk (Guangzhou, air-compressor & Atlas Copco/Epiroc genuine-spares d",
+     "capital": "dealer",
+     "reason": "Дилер оригинальных запчастей Atlas Copco/Epiroc (по ODM-реестру: distributor of genuine, not ODM) — канал OEM, для размещения не опция",
+     "quotes": 0,
+     "crm_stage": "Написали — ждём"
+    },
+    {
+     "name": "Chengdu Pudding Mechatronic Co. (CPMC, via aircompressorstrade China d",
+     "capital": "dealer",
+     "reason": "Дилер оригинальных запчастей Atlas Copco/Epiroc (по ODM-реестру: distributor of genuine, not ODM) — канал OEM, для размещения не опция",
+     "quotes": 0,
+     "crm_stage": ""
+    },
+    {
+     "name": "WMS / Atmaca",
+     "capital": "reseller",
+     "reason": "Реселлер уровня OEM (Турция) — цены в 8 раз выше китайских заводов; только ценовой ориентир",
+     "quotes": 1,
+     "crm_stage": "К/П"
     }
    ]
   },
@@ -3305,11 +3679,14 @@
     }
    ],
    "price_best_cn_usd": null,
+   "price_ref_oem_cn_usd": null,
    "price_wms_usd": null,
    "material": null,
    "suppliers": [
     {
      "flag": "",
+     "capital": "cn",
+     "excluded": "",
      "name": "Hovor Diesel (Shijiazhuang Hovor Diesel Engine Co., Ltd.)",
      "country": "China",
      "email": "",
@@ -3323,6 +3700,8 @@
     },
     {
      "flag": "",
+     "capital": "cn",
+     "excluded": "",
      "name": "Nanjing Wotian Technology Co., Ltd. (WT Sensor)",
      "country": "China",
      "email": "",
@@ -3336,6 +3715,8 @@
     },
     {
      "flag": "",
+     "capital": "cn",
+     "excluded": "",
      "name": "Hambition Mining (Qingdao Hambition Drivetrain Components & Parts Co.,",
      "country": "China",
      "email": "info@hambition.com",
@@ -3349,19 +3730,8 @@
     },
     {
      "flag": "",
-     "name": "Answk (Guangzhou, air-compressor & Atlas Copco/Epiroc genuine-spares d",
-     "country": "Китай, Гуандун, Гуанчжоу",
-     "email": "sales@answk.com",
-     "phone": "WA +86 153288796767",
-     "whatsapp": "",
-     "site": "answk.com",
-     "positions": 13,
-     "quotes": 0,
-     "crm_stage": "Написали — ждём",
-     "crm_direction": "COP overhaul kits"
-    },
-    {
-     "flag": "",
+     "capital": "cn",
+     "excluded": "",
      "name": "Guangzhou Toparts Mechanical Equipment Co., Ltd. (Toparts; сайты topar",
      "country": "CN",
      "email": "paul@toparts.net",
@@ -3375,6 +3745,8 @@
     },
     {
      "flag": "",
+     "capital": "cn",
+     "excluded": "",
      "name": "Henan Ceda Dinglue Mechanical Equipment Co., Ltd.",
      "country": "China",
      "email": "",
@@ -3385,6 +3757,15 @@
      "quotes": 0,
      "crm_stage": "Написали — ждём (прозвон)",
      "crm_direction": "Хвостовики shank COP1838"
+    }
+   ],
+   "excluded": [
+    {
+     "name": "Answk (Guangzhou, air-compressor & Atlas Copco/Epiroc genuine-spares d",
+     "capital": "dealer",
+     "reason": "Дилер оригинальных запчастей Atlas Copco/Epiroc (по ODM-реестру: distributor of genuine, not ODM) — канал OEM, для размещения не опция",
+     "quotes": 0,
+     "crm_stage": "Написали — ждём"
     }
    ]
   },
@@ -3468,24 +3849,14 @@
     }
    ],
    "price_best_cn_usd": null,
+   "price_ref_oem_cn_usd": null,
    "price_wms_usd": 1543.0,
    "material": null,
    "suppliers": [
     {
-     "flag": "С августа 2016 — полностью дочернее предприятие Atlas Copco (по их странице /company/). Для тестовой закупки плюс: оригинальное качество по китайской цене. Для замещения OEM — риск: канал контролирует сам OEM и может его закрыть",
-     "name": "Sanshan Rock Tools (Atlas Copco/Epiroc rock drilling consumables)",
-     "country": "Китай",
-     "email": "epiroc@sanshanrocktools.com",
-     "phone": "+86-635-8330862",
-     "whatsapp": "",
-     "site": "https://www.sanshanrocktools.com/",
-     "positions": 2,
-     "quotes": 0,
-     "crm_stage": "К/П",
-     "crm_direction": "Внутренности COP: piston, liner, driver"
-    },
-    {
      "flag": "",
+     "capital": "cn",
+     "excluded": "",
      "name": "Litian Heavy Industry Machinery Co., Ltd. (力天重工 / Litech)",
      "country": "Китай, Ляонин, Хулудао",
      "email": "litian@litechtools.com",
@@ -3498,6 +3869,8 @@
      "crm_direction": "Хвостовики COP1028-4050"
     },
     {
+     "capital": "cn",
+     "excluded": "",
      "name": "Mindrill Systems",
      "country": "Индия",
      "email": "salessupport@mindrill.com",
@@ -3510,6 +3883,8 @@
      "crm_direction": "Дрифтеры-аналоги 1838/2238/MD20"
     },
     {
+     "capital": "cn",
+     "excluded": "",
      "name": "Pulanka Rock Tools",
      "country": "Китай, Чжэцзян, Тайчжоу",
      "email": "elma@cnpulk.com",
@@ -3523,19 +3898,8 @@
     },
     {
      "flag": "",
-     "name": "Answk (Guangzhou, air-compressor & Atlas Copco/Epiroc genuine-spares d",
-     "country": "Китай, Гуандун, Гуанчжоу",
-     "email": "sales@answk.com",
-     "phone": "WA +86 153288796767",
-     "whatsapp": "",
-     "site": "answk.com",
-     "positions": 3,
-     "quotes": 0,
-     "crm_stage": "Написали — ждём",
-     "crm_direction": "COP overhaul kits"
-    },
-    {
-     "flag": "",
+     "capital": "cn",
+     "excluded": "",
      "name": "Fujian Juntai Construction Machinery Co., Ltd. — juntaimachinery.com",
      "country": "Китай",
      "email": "juntai@wan-tai.com.cn",
@@ -3549,6 +3913,8 @@
     },
     {
      "flag": "",
+     "capital": "cn",
+     "excluded": "",
      "name": "FMRIBT (Fujian/Foshan Mineral Rock Industrial Boring Tools) — mineralr",
      "country": "China",
      "email": "exportsales@fmribt.com",
@@ -3562,6 +3928,8 @@
     },
     {
      "flag": "",
+     "capital": "cn",
+     "excluded": "",
      "name": "Hambition Mining (Qingdao Hambition Drivetrain Components & Parts Co.,",
      "country": "China",
      "email": "info@hambition.com",
@@ -3572,6 +3940,44 @@
      "quotes": 0,
      "crm_stage": "",
      "crm_direction": ""
+    },
+    {
+     "flag": "",
+     "capital": "cn",
+     "excluded": "",
+     "name": "Hubei Superdrill Equipment Co., Ltd.",
+     "country": "China",
+     "email": "",
+     "phone": "",
+     "whatsapp": "",
+     "site": "https://www.hbsuperdrill.com/product/3115519000-cup-Seal-Atlas-Copco-Epiroc-Sullair-Genuin",
+     "positions": 1,
+     "quotes": 0,
+     "crm_stage": "Написали — ждём (прозвон)",
+     "crm_direction": "Хвостовики shank COP1838"
+    }
+   ],
+   "excluded": [
+    {
+     "name": "Sanshan Rock Tools (Atlas Copco/Epiroc rock drilling consumables)",
+     "capital": "oem",
+     "reason": "Капитал OEM: по странице компании — с августа 2016 дочернее предприятие Atlas Copco (в ODM-реестре базы отмечено как бывшее СП с Atlas Copco/Epiroc 2013–2020). Для размещения не опция; котировки — только ценовой ориентир",
+     "quotes": 0,
+     "crm_stage": "К/П"
+    },
+    {
+     "name": "Answk (Guangzhou, air-compressor & Atlas Copco/Epiroc genuine-spares d",
+     "capital": "dealer",
+     "reason": "Дилер оригинальных запчастей Atlas Copco/Epiroc (по ODM-реестру: distributor of genuine, not ODM) — канал OEM, для размещения не опция",
+     "quotes": 0,
+     "crm_stage": "Написали — ждём"
+    },
+    {
+     "name": "WMS / Atmaca",
+     "capital": "reseller",
+     "reason": "Реселлер уровня OEM (Турция) — цены в 8 раз выше китайских заводов; только ценовой ориентир",
+     "quotes": 2,
+     "crm_stage": "К/П"
     }
    ]
   }

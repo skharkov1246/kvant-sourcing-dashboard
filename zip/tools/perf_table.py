@@ -17,6 +17,9 @@ D, OUT = ROOT / "data", ROOT / "orders"
 e = lambda s: html.escape(str(s or ""))
 
 
+CAP = {'oem': 'капитал OEM', 'dealer': 'дилер оригинала', 'reseller': 'реселлер OEM', 'cn': 'иностр. капитал в базе не отмечен'}
+
+
 def short(name):
     """Короткое имя поставщика для сводной таблицы: до первой скобки или « — »."""
     for sep in (" (", " — "):
@@ -55,19 +58,19 @@ def main():
     H.append(f"""<h1>Гидроперфораторы Sandvik / Epiroc: куда идти и что запрашивать для тестирования</h1>
 <div class="mut">Таблица для сорсеров по классам деталей · {date.today().strftime('%d.%m.%Y')} · {tot} позиций базы ЗИП в {len(classes)} классах.
 Ничего нового не искалось: переработаны база ЗИП, статусы Битрикса, заводские КП, CRM прозвона, реестр поставщиков и материаловедческая стратегия.
-Цены — USD за штуку, EXW, медиана по позициям класса: «CN» — лучший китайский завод, «WMS» — реселлер уровня OEM (ориентир, в тестовую закупку не идёт).</div>""")
+Критерий отбора: компании с капиталом OEM (Atlas Copco/Epiroc, Sandvik — США/ЕС/Швеция) и дилеры оригинала для размещения не опция; они вынесены в строку «Исключены» и служат только ценовым ориентиром.
+Цены — USD за штуку, EXW, медиана по позициям класса: «CN» — лучший независимый китайский завод, «OEM-Китай» — котировки Sanshan (дочернее Atlas Copco, справочно), «WMS» — реселлер уровня OEM (Турция).</div>""")
 
     # сводная
     H.append('<h2>Сводка по классам</h2><table><tr><th>Класс детали</th><th class="num">Позиций</th><th class="num">С КП</th><th class="num">Продавали</th>'
-             '<th>Машины</th><th class="num">CN, $</th><th class="num">WMS, $</th><th>Куда идти первым</th><th>Приоритет теста</th></tr>')
+             '<th>Машины</th><th class="num">CN, $</th><th class="num">OEM-Китай, $</th><th class="num">WMS, $</th><th>Куда идти первым</th><th>Приоритет теста</th></tr>')
     for c in classes:
         t = tr.get(c["class"], {})
         first = e(short(c["suppliers"][0]["name"])) if c["suppliers"] else "—"
-        if c["suppliers"] and c["suppliers"][0].get("flag"):
-            first += ' <span class="flag">(дочернее Atlas Copco)</span>'  # подробно — в примечании у класса
         H.append(f'<tr><td><b>{e(c["title"])}</b></td><td class="num">{c["positions"]}</td><td class="num">{c["with_quote"]}</td>'
                  f'<td class="num">{c["sold"]}</td><td>{e(", ".join(c["machines"][:5]))}</td>'
                  f'<td class="num">{c["price_best_cn_usd"] if c["price_best_cn_usd"] is not None else "—"}</td>'
+                 f'<td class="num mut">{c.get("price_ref_oem_cn_usd") if c.get("price_ref_oem_cn_usd") is not None else "—"}</td>'
                  f'<td class="num">{c["price_wms_usd"] if c["price_wms_usd"] is not None else "—"}</td>'
                  f'<td>{first}</td><td>{e(t.get("priority",""))}</td></tr>')
     H.append('</table>')
@@ -79,12 +82,17 @@ def main():
             H.append(f'<div class="box">{e(t["summary"])}</div>')
         # куда идти
         H.append('<table><tr><th style="width:24%">Куда идти</th><th style="width:9%">Страна</th><th style="width:25%">Контакт</th>'
-                 '<th class="num" style="width:6%">КП</th><th style="width:14%">Статус в CRM</th><th>Примечание</th></tr>')
+                 '<th class="num" style="width:6%">КП</th><th style="width:14%">Статус в CRM</th><th style="width:12%">Капитал / канал</th><th>Направление в CRM</th></tr>')
         for s in c["suppliers"][:6]:
             ct = "<br>".join(x for x in (e(s.get("email")), e(s.get("phone")), e(s.get("whatsapp"))) if x) or '<span class="mut">контакт не найден</span>'
             H.append(f'<tr><td><b>{e(s["name"][:60])}</b></td><td>{e(str(s.get("country"))[:18])}</td><td>{ct}</td>'
                      f'<td class="num">{s.get("quotes") or ""}</td><td>{e(s.get("crm_stage"))}</td>'
-                     f'<td class="flag">{e(s.get("flag"))}</td></tr>')
+                     f'<td>{e(CAP.get(s.get("capital"), ""))}</td><td class="mut">{e(s.get("crm_direction"))}</td></tr>')
+        if c.get("excluded"):
+            ex = "; ".join(f'{e(short(x["name"]))} ({e(CAP.get(x["capital"], ""))}' + (f', КП {x["quotes"]}' if x.get("quotes") else "") + ")"
+                           for x in c["excluded"])
+            H.append(f'<tr><td colspan="7" class="flag"><b>Исключены из размещения:</b> {ex}. '
+                     f'Причина: капитал OEM или канал OEM — не опция; котировки использовать только как ценовой ориентир.</td></tr>')
         H.append('</table>')
         # что запрашивать
         if t.get("request"):
@@ -107,14 +115,18 @@ def main():
 
     with open(OUT / "perf_sourcing.csv", "w", encoding="utf-8-sig", newline="") as f:
         w = csv.writer(f, delimiter=";")
-        w.writerow(["Класс", "Позиций", "С КП", "Продавали", "Машины", "CN $", "WMS $", "Ранг", "Поставщик", "Страна", "Email", "Телефон", "WhatsApp/WeChat", "КП по классу", "Статус CRM", "Пометка", "Приоритет теста"])
+        w.writerow(["Класс", "Позиций", "С КП", "Продавали", "Машины", "CN $", "OEM-Китай $", "WMS $", "Ранг", "Поставщик", "Страна", "Email", "Телефон", "WhatsApp/WeChat", "КП по классу", "Статус CRM", "Направление CRM", "Капитал / канал", "Приоритет теста"])
         for c in classes:
             t = tr.get(c["class"], {})
+            base = [c["title"], c["positions"], c["with_quote"], c["sold"], ", ".join(c["machines"][:5]),
+                    c["price_best_cn_usd"] or "", c.get("price_ref_oem_cn_usd") or "", c["price_wms_usd"] or ""]
             for i, s in enumerate(c["suppliers"][:6], 1):
-                w.writerow([c["title"], c["positions"], c["with_quote"], c["sold"], ", ".join(c["machines"][:5]),
-                            c["price_best_cn_usd"] or "", c["price_wms_usd"] or "", i, s["name"], s.get("country", ""),
-                            s.get("email", ""), s.get("phone", ""), s.get("whatsapp", ""), s.get("quotes") or "",
-                            s.get("crm_stage", ""), s.get("flag", ""), t.get("priority", "")])
+                w.writerow(base + [i, s["name"], s.get("country", ""),
+                                   s.get("email", ""), s.get("phone", ""), s.get("whatsapp", ""), s.get("quotes") or "",
+                                   s.get("crm_stage", ""), s.get("crm_direction", ""), CAP.get(s.get("capital"), ""), t.get("priority", "")])
+            for x in c.get("excluded", []):
+                w.writerow(base + ["исключён", x["name"], "", "", "", "", x.get("quotes") or "", x.get("crm_stage", ""), "",
+                                   "НЕ ОПЦИЯ: " + CAP.get(x["capital"], "") + " — " + x["reason"], ""])
     print(f"HTML + CSV готовы: {len(classes)} классов, рекомендаций по тесту: {len(tr)}")
 
 

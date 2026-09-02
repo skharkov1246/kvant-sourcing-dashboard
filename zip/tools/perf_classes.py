@@ -62,6 +62,58 @@ def machine_of(model):
     return sorted({re.sub(r"\s+", " ", x.upper()) for x in m})
 
 
+# Капитал и канал поставщика — по данным нашей базы (ODM-реестр, вердикты по сайтам).
+# Компании с капиталом OEM (США/ЕС/Швеция) и дилеры оригинала для размещения не опция:
+# исключаются из ранжирования, остаются только как ценовой ориентир.
+CAPITAL = [
+    (r"sanshan|zuanshan|shandong rock drilling", "oem",
+     "Капитал OEM: по странице компании — с августа 2016 дочернее предприятие Atlas Copco "
+     "(в ODM-реестре базы отмечено как бывшее СП с Atlas Copco/Epiroc 2013–2020). "
+     "Для размещения не опция; котировки — только ценовой ориентир"),
+    (r"lingong|lgmrt", "oem", "СП Sandvik Group и Lingong — капитал OEM, для размещения не опция"),
+    (r"answk|machfans|aircompressorstrade", "dealer",
+     "Дилер оригинальных запчастей Atlas Copco/Epiroc (по ODM-реестру: distributor of genuine, not ODM) — "
+     "канал OEM, для размещения не опция"),
+    (r"\bwms\b|atmaca", "reseller",
+     "Реселлер уровня OEM (Турция) — цены в 8 раз выше китайских заводов; только ценовой ориентир"),
+]
+
+
+# Экспортёры из price_records → имя поставщика в реестре/CRM
+QUOTER_RX = {"KAT": r"\bKAT\b", "YLF": r"yonglianfeng|\bYLF\b", "Fuxuan": r"fuxuan",
+             "Mindrill": r"mindrill", "Sanshan": r"sanshan|zuanshan|shandong rock drilling",
+             "WMS": r"\bwms\b|atmaca"}
+
+
+def quoter_match(exp, name):
+    rx = QUOTER_RX.get(exp)
+    return bool(re.search(rx, name, re.I)) if rx else exp.lower()[:5] in name.lower()
+
+
+METAL = {"хвостовик", "букса", "поршень", "драйвер", "крепёж", "прочее"}
+SEAL = {"уплотнение", "комплект", "диафрагма"}
+
+
+def off_profile(key, direction):
+    """1, если направление поставщика в CRM явно из другой группы классов."""
+    d = direction or ""
+    if key in METAL and re.search(r"seal|рти|уплотн|фильтр|filter|мотор|motor|сенсор|sensor", d, re.I) \
+            and not re.search(r"металл|piston|bushing|shank|хвостов|внутренност|drifter|дрифтер", d, re.I):
+        return 1
+    if key in SEAL and re.search(r"shank|хвостов|мотор|motor|фильтр|filter|сенсор|sensor", d, re.I) \
+            and not re.search(r"seal|рти|уплотн|kit|внутренност", d, re.I):
+        return 1
+    return 0
+
+
+def capital_of(name):
+    """→ (код, причина-исключения или '', исключён?)."""
+    for rx, code, why in CAPITAL:
+        if re.search(rx, name, re.I):
+            return code, why, True
+    return "cn", "", False
+
+
 def main():
     P = load(D / "positions.json")
     perf = [p for p in P if str(p.get("category", "")).startswith(("01", "02"))]
@@ -135,7 +187,7 @@ def main():
             if tk and tk in seen_tok:
                 continue
             stage, direction = crm_stage(s["name"])
-            nq = sum(v for e, v in quoted_by.items() if e.lower()[:5] in s["name"].lower())
+            nq = sum(v for e, v in quoted_by.items() if quoter_match(e, s["name"]))
             # ранг: WMS — реселлер по ценам уровня OEM (медиана x8 к лучшему китайцу),
             # в тестовую закупку не идёт, остаётся ориентиром цены и последним резервом.
             # Дальше: есть КП > ответил в CRM > есть контакт > просто привязка.
@@ -146,7 +198,7 @@ def main():
                 continue
             if tk:
                 seen_tok.add(tk)
-            rank = (1 if is_wms else 0, 0 if nq else 1,
+            rank = (1 if is_wms else 0, 0 if nq else 1, off_profile(key, direction),
                     0 if ("Ответил" in stage or "К/П" in stage) else 1,
                     0 if (s.get("email") or s.get("phone")) else 1, -n)
             flag = ""
@@ -156,14 +208,43 @@ def main():
                         "Для замещения OEM — риск: канал контролирует сам OEM и может его закрыть")
             elif re.search(r"lingong|lgmrt", s["name"], re.I):
                 flag = "СП Sandvik Group и Lingong — конфликт интересов с OEM"
+            cap, why, excl = capital_of(s["name"])
             sup_rows.append({
-                "flag": flag,
+                "flag": flag, "capital": cap, "excluded": why,
                 "name": s["name"], "country": s.get("country", ""), "email": s.get("email", ""),
                 "phone": s.get("phone", ""),
                 "whatsapp": s.get("whatsapp", "") if re.search(r"\d{7,}", str(s.get("whatsapp", ""))) else "",
                 "site": s.get("site", ""), "positions": n, "quotes": nq,
                 "crm_stage": stage, "crm_direction": direction, "_rank": rank,
             })
+        def row_from_crm(c, nq=0):
+            nm = c.get("name") or ""
+            ct = str(c.get("contacts") or "")
+            em = re.search(r"[\w.\-+]+@[\w\-]+\.[\w.\-]+", ct)
+            ph = re.search(r"\+?\d[\d\s\-()]{7,}\d", ct)
+            wa = re.search(r"(?:WA|WhatsApp|WeChat)[^\n\d]{0,12}(\+?\d[\d\s\-]{7,}\d)", ct, re.I)
+            stage = c.get("stage") or ""
+            cap, why, excl = capital_of(nm)
+            return {
+                "capital": cap, "excluded": why,
+                "name": nm, "country": c.get("geo", ""), "email": em.group(0) if em else "",
+                "phone": ph.group(0).strip() if ph else "", "whatsapp": ("WA/WeChat " + wa.group(1).strip()) if wa else "",
+                "site": "", "positions": 0, "quotes": nq, "crm_stage": stage,
+                "crm_direction": c.get("direction") or "",
+                "_rank": (0, 0 if nq else 1, off_profile(key, c.get("direction") or ""),
+                          0 if ("Ответил" in stage or "К/П" in stage) else 1,
+                          0 if (em or ph) else 1, 0),
+            }
+
+        # Заводы, давшие КП по позициям класса, но не привязанные к ним в реестре
+        # (KAT, YLF, Fuxuan, Mindrill) — берём из CRM прозвона с контактами
+        for exp, v in quoted_by.items():
+            if any(quoter_match(exp, r["name"]) for r in sup_rows):
+                continue
+            c = next((c for c in crm.values() if quoter_match(exp, c.get("name") or "")), None)
+            if c:
+                sup_rows.append(row_from_crm(c, v))
+
         # CRM прозвона: поставщики привязаны к НАПРАВЛЕНИЮ, не к позиции — подмешиваем по классу
         DIR_RX = {"хвостовик": r"хвостовик|shank", "букса": r"bushing|втулк|guide|металл(?!.*мотор)",
                   "поршень": r"(?<![-\w])piston|внутренност", "драйвер": r"driver|внутренност",
@@ -171,7 +252,7 @@ def main():
                   "диафрагма": r"рти|seal|диафрагм", "клапан": r"клапан|valve",
                   "гидромотор": r"мотор|motor", "прочее": r"комплектн|drifter|дрифтер"}
         rx = DIR_RX.get(key)
-        have = {t for r in sup_rows for t in tokens(r["name"])}
+        have = {t for r in sup_rows for t in tokens(r["name"])} | {t for r in sup_rows for t in tokens(r["name"])}
         if rx:
             for c in crm.values():
                 if not re.search(rx, c.get("direction") or "", re.I):
@@ -179,19 +260,7 @@ def main():
                 nm = c.get("name") or ""
                 if set(tokens(nm)) & have:
                     continue
-                ct = str(c.get("contacts") or "")
-                em = re.search(r"[\w.\-+]+@[\w\-]+\.[\w.\-]+", ct)
-                ph = re.search(r"\+?\d[\d\s\-()]{7,}\d", ct)
-                wa = re.search(r"(?:WA|WhatsApp|WeChat)[^\n\d]{0,12}(\+?\d[\d\s\-]{7,}\d)", ct, re.I)
-                stage = c.get("stage") or ""
-                sup_rows.append({
-                    "name": nm, "country": c.get("geo", ""), "email": em.group(0) if em else "",
-                    "phone": ph.group(0).strip() if ph else "", "whatsapp": ("WA/WeChat " + wa.group(1).strip()) if wa else "",
-                    "site": "", "positions": 0, "quotes": 0, "crm_stage": stage,
-                    "crm_direction": c.get("direction") or "",
-                    "_rank": (0, 1, 0 if ("Ответил" in stage or "К/П" in stage) else 1,
-                              0 if (em or ph) else 1, 0),
-                })
+                sup_rows.append(row_from_crm(c))
         # отказ по направлению — выводим, но в конец
         for r in sup_rows:
             if "Отказ" in (r.get("crm_stage") or ""):
@@ -199,14 +268,20 @@ def main():
         sup_rows.sort(key=lambda r: r["_rank"])
         for r in sup_rows:
             r.pop("_rank")
+        allowed = [r for r in sup_rows if not r["excluded"]]
+        excluded = [r for r in sup_rows if r["excluded"]]
 
-        # ценовой ориентир: лучший китайский КП vs WMS по позициям класса
-        best, wms = [], []
+        # ценовой ориентир по позициям класса: лучший независимый китайский КП,
+        # отдельно — Sanshan (капитал OEM, справочно) и WMS (реселлер)
+        best, ref_oem, wms = [], [], []
         for p in ps:
             q = dict(quotes.get(p["id"], []))
-            cn = [v for e, v in q.items() if e != "WMS" and v > 0]
+            cn = [v for e, v in q.items() if not capital_of(e)[2] and v > 0]
+            oemcn = [v for e, v in q.items() if capital_of(e)[0] == "oem" and v > 0]
             if cn:
                 best.append(min(cn))
+            if oemcn:
+                ref_oem.append(min(oemcn))
             if q.get("WMS"):
                 wms.append(q["WMS"])
         node = next((m for m in nodes if m["part_class"].startswith(NODE_OF.get(key, "\x00"))), None)
@@ -224,10 +299,13 @@ def main():
                           **({"izmer": p.get("_izmer") or "—", "rkd": p.get("_rkd") or "—"} if "_kv30" in p else {})}
                          for p in ps[:60]],
             "price_best_cn_usd": round(st.median(best), 1) if best else None,
+            "price_ref_oem_cn_usd": round(st.median(ref_oem), 1) if ref_oem else None,
             "price_wms_usd": round(st.median(wms), 1) if wms else None,
             "material": {"oem": node.get("oem_material"), "alt": node.get("alt_material"),
                          "alt_treatment": node.get("alt_treatment"), "gain": node.get("expected_gain")} if node else None,
-            "suppliers": sup_rows[:8],
+            "suppliers": allowed[:8],
+            "excluded": [{"name": r["name"], "capital": r["capital"], "reason": r["excluded"], "quotes": r["quotes"],
+                          "crm_stage": r["crm_stage"]} for r in excluded],
         })
 
     (D / "perf_sourcing_map.json").write_text(json.dumps(
@@ -240,10 +318,12 @@ def main():
             "with_quote": c["with_quote"], "sold": c["sold"], "machines": c["machines"],
             "examples": [{k: v for k, v in e.items() if k in ("kv", "pn", "name", "model", "bitrix", "quotes", "izmer", "rkd")}
                          for e in c["examples"][:6]],
-            "price_best_cn_usd": c["price_best_cn_usd"], "price_wms_usd": c["price_wms_usd"],
+            "price_best_cn_usd": c["price_best_cn_usd"], "price_ref_oem_cn_usd": c["price_ref_oem_cn_usd"],
+            "price_wms_usd": c["price_wms_usd"],
             "material": c["material"],
-            "suppliers": [{k: v for k, v in r.items() if k in ("name", "country", "email", "phone", "whatsapp", "quotes", "crm_stage", "crm_direction", "flag")}
+            "suppliers": [{k: v for k, v in r.items() if k in ("name", "country", "email", "phone", "whatsapp", "quotes", "crm_stage", "crm_direction")}
                           for r in c["suppliers"][:5]],
+            "excluded": c["excluded"],
         })
     (D / "perf_class_packets.json").write_text(json.dumps(packets, ensure_ascii=False), encoding="utf-8")
     print(f"позиций перфораторов: {len(perf)} → классов: {len(out)}; пакетов для агентов: {len(packets)} "
@@ -251,7 +331,8 @@ def main():
     for c in out:
         top = c["suppliers"][0]["name"][:28] if c["suppliers"] else "—"
         print(f"  {c['positions']:3} поз. | КП {c['with_quote']:2} | прод {c['sold']:2} | "
-              f"CN ${str(c['price_best_cn_usd']):>6} vs WMS ${str(c['price_wms_usd']):>6} | {c['title'][:40]:42} | {top}")
+              f"CN ${str(c['price_best_cn_usd']):>6} / OEM-CN ${str(c['price_ref_oem_cn_usd']):>6} / WMS ${str(c['price_wms_usd']):>6} | "
+              f"{c['title'][:34]:36} | {top} | искл. {len(c['excluded'])}")
 
 
 if __name__ == "__main__":
