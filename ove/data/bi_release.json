@@ -67,6 +67,14 @@
    ]
   },
   {
+   "code": "ОВЭ75-БИ-Л3-PFD",
+   "pdf": "docs/bi/ove75-l3-pfd-r0.pdf",
+   "docx": null,
+   "src": [
+    "docs/sketches/ove75-lot3-pfd-eskiz.svg"
+   ]
+  },
+  {
    "code": "ОВЭ75-БИ-Л4-PFD",
    "pdf": "docs/bi/ove75-l4-pfd-r0.pdf",
    "docx": null,
@@ -469,10 +477,5 @@
    ]
   }
  ],
- "failed": [
-  [
-   "ОВЭ75-БИ-Л3-PFD",
-   "[Errno 2] No such file or directory: '/home/user/kvant-sourcing-dashboard/ove/public/docs/sketches/ove75-lot3-pfd-eskiz.svg'"
-  ]
- ]
+ "failed": []
 }

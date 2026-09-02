@@ -704,13 +704,18 @@
      "stage": 1,
      "kind": "sheet",
      "rev": "0",
-     "status": "task",
-     "files": [],
+     "status": "draft",
+     "files": [
+      {
+       "path": "docs/bi/ove75-l3-pfd-r0.pdf",
+       "tag": "PDF"
+      }
+     ],
      "src": [
       "docs/sketches/ove75-lot3-pfd-eskiz.svg"
      ],
      "gantt": "pfd",
-     "note": "в работе — документ собирается"
+     "note": ""
     },
     {
      "code": "ОВЭ75-БИ-Л3-КР",
