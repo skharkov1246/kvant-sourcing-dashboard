@@ -55,7 +55,7 @@ ul.neg li::marker{color:#a32617;content:"✕  "}
 .foot{margin-top:4mm;padding-top:1.5mm;border-top:.4pt solid #b9bfc4;font-size:7.8pt;color:#4a5157}
 .pb{break-before:page}
 .nah2{display:grid;grid-template-columns:1fr 1fr;gap:3mm}
-.slovar{display:grid;grid-template-columns:repeat(5,1fr);gap:1.6mm;margin:.8mm 0 1.6mm}
+.slovar{display:grid;grid-template-columns:repeat(4,1fr);gap:1.6mm;margin:.8mm 0 1.6mm}
 .sw{border:.5pt solid #b9bfc4;border-top:2pt solid #2a4a6b;padding:1.4mm 2mm;font-size:8pt;line-height:1.3}
 .sw b{display:block;font-size:8.8pt;margin-bottom:.7mm}
 ol.zakr{margin:1.2mm 0 1mm;padding-left:5mm} ol.zakr li{margin:.7mm 0}
