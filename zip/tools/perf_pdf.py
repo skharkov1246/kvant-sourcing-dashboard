@@ -21,7 +21,9 @@ async def main():
         await pg.goto(SRC.as_uri())
         await pg.wait_for_load_state("networkidle")
         ov = await pg.evaluate("document.documentElement.scrollWidth > document.documentElement.clientWidth")
-        await pg.screenshot(path=str(ROOT / "orders" / ".perf_preview.png"), full_page=False)
+        import os
+        prev = Path(os.environ.get("PERF_PREVIEW", ROOT.parent / ".perf_preview.png"))  # вне zip/orders
+        await pg.screenshot(path=str(prev), full_page=False)
         await pg.pdf(path=str(DST), format="A4", landscape=True, print_background=True,
                      margin={"top": "10mm", "bottom": "10mm", "left": "10mm", "right": "10mm"})
         await b.close()
