@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Заголовок отчёта</title>
+<style>
+  /* Каркас A4-отчёта для печати headless-хромом. Проверен на 5-страничном отчёте. */
+  @page { size: A4; margin: 14mm 12mm; }
+  * { box-sizing: border-box; }
+  body { font-family: "DejaVu Sans", Arial, sans-serif; font-size: 9.1pt; line-height: 1.34; color: #16191d; margin: 0; }
+  h1 { font-size: 16pt; margin: 0 0 2mm; letter-spacing: -0.2px; }
+  h2 { font-size: 11pt; margin: 7mm 0 2mm; padding: 1.6mm 2.5mm; background: #16324f; color: #fff; border-radius: 2px; }
+  h3 { font-size: 9.6pt; margin: 4mm 0 1.5mm; color: #16324f; }
+  p { margin: 0 0 1.8mm; }
+  .sub { color: #55606b; font-size: 8.4pt; margin-bottom: 4mm; border-bottom: 1.4px solid #16324f; padding-bottom: 2.5mm; }
+  table { width: 100%; border-collapse: collapse; margin: 1.5mm 0 3mm; font-size: 8.3pt; }
+  th { background: #e8edf3; text-align: left; font-weight: 700; padding: 1.4mm 2mm; border: 0.6px solid #b9c4d0; color: #16324f; }
+  td { padding: 1.3mm 2mm; border: 0.6px solid #ccd4dd; vertical-align: top; }
+  tr:nth-child(even) td { background: #f7f9fb; }
+  td.num { white-space: nowrap; }
+  /* Таблица «характеристика — значение» в два столбца пар. Ширины задавать ТОЛЬКО здесь,
+     инлайновый style в первой строке перебьёт CSS и растянет колонки. */
+  table.spec td:nth-child(1), table.spec td:nth-child(3) { width: 19%; background: #f0f3f7; font-weight: 600; }
+  table.spec td:nth-child(2), table.spec td:nth-child(4) { width: 31%; }
+  table.spec tr:nth-child(even) td:nth-child(2), table.spec tr:nth-child(even) td:nth-child(4) { background: #fff; }
+  table.spec td { padding: 1.1mm 2mm; }
+  .key { background: #fff6e5; border-left: 3px solid #d98600; padding: 2.5mm 3mm; margin: 2mm 0 3mm; }
+  .key b { color: #8a5600; }
+  ul { margin: 0 0 2mm; padding-left: 5mm; }
+  li { margin-bottom: 0.9mm; }
+  .tag { display: inline-block; font-size: 7.4pt; font-weight: 700; padding: 0.3mm 1.6mm; border-radius: 2px; color: #fff; }
+  .t-red { background: #b3261e; } .t-amb { background: #b06f00; } .t-grn { background: #1e6b3a; } .t-gry { background: #55606b; }
+  /* Двухколоночный список: column-count балансирует, flex — нет. */
+  .cols { column-count: 2; column-gap: 6mm; }
+  .cols ul { margin: 0; }
+  .cols li { break-inside: avoid; }
+  .foot { margin-top: 5mm; padding-top: 2mm; border-top: 0.6px solid #ccd4dd; font-size: 7.6pt; color: #6b7680; }
+  .nb { page-break-inside: avoid; }
+  .pb { page-break-before: always; }   /* ставить точечно, иначе полупустые страницы */
+  small { font-size: 7.8pt; color: #55606b; }
+</style>
+</head>
+<body>
+
+<h1>Заголовок отчёта</h1>
+<div class="sub">Подзаголовок: объём исходных данных, метод, дата.</div>
+
+<div class="key"><b>Главное.</b> Один абзац с выводом и цифрами — то, ради чего отчёт открывают.</div>
+
+<h2>1. Раздел</h2>
+<table>
+<tr><th style="width:25%">Колонка</th><th>Колонка</th></tr>
+<tr><td>Значение</td><td>Значение</td></tr>
+</table>
+
+<h2>2. Характеристики</h2>
+<table class="spec nb">
+<tr><td>Параметр</td><td>Значение</td><td>Параметр</td><td>Значение</td></tr>
+</table>
+
+<div class="foot">Источник данных, метод, оговорки.</div>
+
+</body>
+</html>
