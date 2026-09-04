@@ -99,7 +99,10 @@ def check_content(blobs: dict, errors: list[str], allow_empty: bool) -> None:
 
 def _chrome_run(chrome: str, path: Path, extra: list[str], timeout: int, headless: str = "--headless=new"):
     """Один прогон Chromium. Возвращает (dom, log); dom пуст, если браузер ничего не отдал."""
-    with tempfile.TemporaryDirectory() as td:
+    # ignore_cleanup_errors: Chrome оставляет фоновые процессы, которые ещё пишут
+    # в профиль после выхода основного, и удаление каталога падало гонкой
+    # (OSError: Directory not empty: .../Default) — уже при пройденных проверках.
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as td:
         cmd = [chrome, headless, "--no-sandbox", "--disable-gpu",
                "--disable-dev-shm-usage",          # на CI /dev/shm мал, без этого рендерер виснет
                "--no-first-run", "--no-default-browser-check",
