@@ -179,8 +179,11 @@ def main() -> int:
             print(f"✗ нет {OUT.relative_to(ROOT)} — выполните: python scripts/build_catalog.py", file=sys.stderr)
             return 1
         old = json.loads(OUT.read_text(encoding="utf-8"))
-        # сравниваем состав и форму, а не метаданные git (они меняются от коммита к коммиту)
-        strip = lambda c: [{k: v for k, v in d.items() if k not in ("last_change", "last_author", "last_commit")}
+        # Сравниваем состав и форму, а не метаданные git. updated_by тоже выводится
+        # из истории: в мелком клоне последний коммит по файлу другой, чем в полном,
+        # поэтому включение этого поля делало проверку зависящей от глубины клона.
+        GIT_FIELDS = ("last_change", "last_author", "last_commit", "updated_by")
+        strip = lambda c: [{k: v for k, v in d.items() if k not in GIT_FIELDS}
                            for d in c["datasets"]]
         if strip(old) != strip(fresh):
             print("✗ каталог данных устарел — выполните: python scripts/build_catalog.py", file=sys.stderr)
