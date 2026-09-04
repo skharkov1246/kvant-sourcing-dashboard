@@ -97,10 +97,10 @@ def check_content(blobs: dict, errors: list[str], allow_empty: bool) -> None:
         errors.append("нет недельной разбивки (weekly) — метрики неполные")
 
 
-def _chrome_run(chrome: str, path: Path, extra: list[str], timeout: int):
-    """Один прогон Chromium. Возвращает (dom, log) либо None при зависании."""
+def _chrome_run(chrome: str, path: Path, extra: list[str], timeout: int, headless: str = "--headless=new"):
+    """Один прогон Chromium. Возвращает (dom, log); dom пуст, если браузер ничего не отдал."""
     with tempfile.TemporaryDirectory() as td:
-        cmd = [chrome, "--headless=new", "--no-sandbox", "--disable-gpu",
+        cmd = [chrome, headless, "--no-sandbox", "--disable-gpu",
                "--disable-dev-shm-usage",          # на CI /dev/shm мал, без этого рендерер виснет
                "--no-first-run", "--no-default-browser-check",
                "--disable-extensions", "--disable-background-networking",
@@ -112,8 +112,8 @@ def _chrome_run(chrome: str, path: Path, extra: list[str], timeout: int):
                "--dump-dom", path.resolve().as_uri()]
         try:
             r = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
-        except subprocess.TimeoutExpired:
-            return None
+        except subprocess.TimeoutExpired as e:
+            return "", (e.stderr or b"").decode("utf-8", "replace") if isinstance(e.stderr, bytes) else (e.stderr or "")
     return r.stdout, r.stderr
 
 
@@ -122,15 +122,24 @@ def check_browser(path: Path, errors: list[str], warns: list[str]) -> None:
     if not chrome:
         warns.append("Chromium не найден — проверка рендера пропущена")
         return
-    out = _chrome_run(chrome, path, [], 75)
-    if out is None:                                # вторая попытка в один процесс
-        out = _chrome_run(chrome, path, ["--single-process"], 60)
-    if out is None:
-        # Зависший браузер — не доказательство поломки дашборда. Структурные
-        # проверки выше уже отработали, поэтому не блокируем, но говорим явно.
-        warns.append("Chromium не ответил за отведённое время — проверка рендера не выполнена")
+    # три попытки: обычный headless, один процесс, старый headless.
+    # На раннерах GitHub встречаются сборки Chrome, где --dump-dom не отдаёт
+    # ничего в первых двух режимах.
+    attempts = [([], 75, "--headless=new"),
+                (["--single-process"], 60, "--headless=new"),
+                ([], 60, "--headless=old")]
+    dom, log = "", ""
+    for extra, timeout, mode in attempts:
+        dom, log = _chrome_run(chrome, path, extra, timeout, mode)
+        if dom.strip():
+            break
+    if not dom.strip():
+        # Пустой ответ браузера — отсутствие данных, а не доказательство поломки.
+        # Структурные проверки выше отработали и остаются в силе, поэтому
+        # предупреждаем, но не блокируем деплой исправного дашборда.
+        tail = " | ".join(log.strip().splitlines()[-2:])[:200]
+        warns.append(f"Chromium не отдал DOM — проверка рендера не выполнена ({tail or 'без вывода'})")
         return
-    dom, log = out
     bad = [ln for ln in log.splitlines()
            if re.search(r"\bERROR:CONSOLE\b|Uncaught|SyntaxError|is not defined|is not a function", ln)]
     if bad:
