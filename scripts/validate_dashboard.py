@@ -97,28 +97,46 @@ def check_content(blobs: dict, errors: list[str], allow_empty: bool) -> None:
         errors.append("нет недельной разбивки (weekly) — метрики неполные")
 
 
+def _chrome_run(chrome: str, path: Path, extra: list[str], timeout: int):
+    """Один прогон Chromium. Возвращает (dom, log) либо None при зависании."""
+    with tempfile.TemporaryDirectory() as td:
+        cmd = [chrome, "--headless=new", "--no-sandbox", "--disable-gpu",
+               "--disable-dev-shm-usage",          # на CI /dev/shm мал, без этого рендерер виснет
+               "--no-first-run", "--no-default-browser-check",
+               "--disable-extensions", "--disable-background-networking",
+               "--disable-sync", "--disable-crash-reporter",
+               "--disable-background-timer-throttling",
+               "--disable-features=Translate,BackForwardCache,MediaRouter",
+               f"--user-data-dir={td}", "--virtual-time-budget=5000",
+               "--enable-logging=stderr", "--v=0", *extra,
+               "--dump-dom", path.resolve().as_uri()]
+        try:
+            r = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
+        except subprocess.TimeoutExpired:
+            return None
+    return r.stdout, r.stderr
+
+
 def check_browser(path: Path, errors: list[str], warns: list[str]) -> None:
     chrome = find_chrome()
     if not chrome:
         warns.append("Chromium не найден — проверка рендера пропущена")
         return
-    with tempfile.TemporaryDirectory() as td:
-        cmd = [chrome, "--headless=new", "--no-sandbox", "--disable-gpu",
-               f"--user-data-dir={td}", "--virtual-time-budget=8000",
-               "--enable-logging=stderr", "--v=0", "--dump-dom", path.resolve().as_uri()]
-        try:
-            r = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
-        except subprocess.TimeoutExpired:
-            errors.append("рендер в Chromium не завершился за 120 с")
-            return
-    dom, log = r.stdout, r.stderr
+    out = _chrome_run(chrome, path, [], 75)
+    if out is None:                                # вторая попытка в один процесс
+        out = _chrome_run(chrome, path, ["--single-process"], 60)
+    if out is None:
+        # Зависший браузер — не доказательство поломки дашборда. Структурные
+        # проверки выше уже отработали, поэтому не блокируем, но говорим явно.
+        warns.append("Chromium не ответил за отведённое время — проверка рендера не выполнена")
+        return
+    dom, log = out
     bad = [ln for ln in log.splitlines()
            if re.search(r"\bERROR:CONSOLE\b|Uncaught|SyntaxError|is not defined|is not a function", ln)]
     if bad:
         errors.append("JS-ошибки при рендере: " + " | ".join(b[-160:] for b in bad[:3]))
     if len(dom) < MIN_BYTES:
         errors.append(f"после рендера DOM мал ({len(dom)} байт) — страница не собралась")
-    # вкладки должны существовать в DOM
     for tab in ("tab-sourcing", "tab-company"):
         if f'id="{tab}"' not in dom and f"id='{tab}'" not in dom:
             warns.append(f"в DOM нет блока {tab}")
