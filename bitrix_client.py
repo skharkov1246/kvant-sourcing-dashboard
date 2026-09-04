@@ -7,6 +7,9 @@
 """
 from __future__ import annotations
 
+import os
+import random
+import sys
 import threading
 import time
 from typing import Any, Iterable
@@ -18,11 +21,28 @@ class BitrixError(RuntimeError):
     pass
 
 
+#: Коды ошибок Bitrix, которые лечатся повтором (транзиентные).
+#: INTERNAL_SERVER_ERROR добавлен по разбору падения сборки 19.08.2026
+#: (crm.activity.list уронил весь 12-минутный прогон деплоя).
+RETRYABLE_BITRIX_ERRORS = frozenset({
+    "QUERY_LIMIT_EXCEEDED",     # превышен лимит запросов в секунду
+    "OPERATION_TIME_LIMIT",     # портал не успел выполнить операцию
+    "INTERNAL_SERVER_ERROR",    # внутренняя ошибка портала
+    "ERROR_CORE",               # ядро Bitrix отдало ошибку
+    "OVERLOAD_LIMIT",           # портал перегружен
+})
+
+
 class BitrixClient:
-    def __init__(self, webhook_url: str, *, timeout: int = 30, min_interval: float = 0.34):
+    def __init__(self, webhook_url: str, *, timeout: int = 30, min_interval: float = 0.34,
+                 retries: int | None = None, backoff_base: float = 0.5, backoff_max: float = 32.0):
         self.base = webhook_url.rstrip("/") + "/"
         self.timeout = timeout
         self.min_interval = min_interval  # ~3 запроса/сек, под лимит Bitrix
+        self.retries = int(os.getenv("BITRIX_RETRIES") or retries or 6)
+        self.backoff_base = backoff_base
+        self.backoff_max = backoff_max
+        self.retry_count = 0              # счётчик повторов за прогон (для сводки сборки)
         self._session = requests.Session()
         self._lock = threading.Lock()
         self._last_call = 0.0
@@ -34,7 +54,14 @@ class BitrixClient:
         self._departments: list[dict] | None = None
 
     # ----------------------------------------------------------------- low level
-    def call(self, method: str, params: dict | None = None, *, retries: int = 4) -> Any:
+    def call_envelope(self, method: str, params: dict | None = None, *, retries: int | None = None) -> dict:
+        """Полный ответ Bitrix ({result, next, total}) с ретраями транзиентных сбоев.
+
+        Повторяем: сетевые ошибки, HTTP 429 и >=500, не-JSON ответ (портал отдаёт HTML
+        при 500/502/504) и коды из RETRYABLE_BITRIX_ERRORS. Пауза — экспоненциальная
+        с джиттером (0.5 → 32 с), суммарный бюджет ожидания ~60 с.
+        """
+        retries = self.retries if retries is None else retries
         url = self.base + method + ".json"
         payload = params or {}
         last_err: Exception | None = None
@@ -42,27 +69,42 @@ class BitrixClient:
             self._throttle()
             try:
                 r = self._session.post(url, json=payload, timeout=self.timeout)
-            except requests.RequestException as e:  # сеть
+            except requests.RequestException as e:                      # сеть/таймаут
                 last_err = e
-                time.sleep(0.5 * (attempt + 1))
+                self._backoff(attempt, method, f"сеть: {e.__class__.__name__}")
                 continue
-            if r.status_code == 503 or r.status_code == 429:
-                time.sleep(0.7 * (attempt + 1))
+            if r.status_code == 429 or r.status_code >= 500:
+                last_err = BitrixError(f"{method}: HTTP {r.status_code}")
+                self._backoff(attempt, method, f"HTTP {r.status_code}")
                 continue
             try:
                 data = r.json()
-            except ValueError:
-                raise BitrixError(f"{method}: не JSON-ответ (HTTP {r.status_code}): {r.text[:200]}")
+            except ValueError:                                          # HTML вместо JSON
+                last_err = BitrixError(f"{method}: не JSON-ответ (HTTP {r.status_code}): {r.text[:200]}")
+                self._backoff(attempt, method, f"не JSON (HTTP {r.status_code})")
+                continue
             if isinstance(data, dict) and data.get("error"):
-                err = data.get("error")
+                err = str(data.get("error"))
                 desc = data.get("error_description", "")
-                if err in ("QUERY_LIMIT_EXCEEDED", "OPERATION_TIME_LIMIT"):
-                    time.sleep(0.7 * (attempt + 1))
+                if err in RETRYABLE_BITRIX_ERRORS:
                     last_err = BitrixError(f"{method}: {err} {desc}")
+                    self._backoff(attempt, method, err)
                     continue
-                raise BitrixError(f"{method}: {err} {desc}")
-            return data.get("result") if isinstance(data, dict) else data
+                raise BitrixError(f"{method}: {err} {desc}")            # неустранимая ошибка
+            return data if isinstance(data, dict) else {"result": data}
         raise BitrixError(f"{method}: не удалось выполнить за {retries} попыток ({last_err})")
+
+    def call(self, method: str, params: dict | None = None, *, retries: int | None = None) -> Any:
+        data = self.call_envelope(method, params, retries=retries)
+        return data.get("result")
+
+    def _backoff(self, attempt: int, method: str, reason: str) -> None:
+        """Экспоненциальная пауза с джиттером; каждый повтор виден в логах CI."""
+        delay = min(self.backoff_base * (2 ** attempt), self.backoff_max)
+        delay *= 0.75 + random.random() * 0.5                            # джиттер ±25 %
+        self.retry_count += 1
+        print(f"  ↻ повтор {method}: {reason} — пауза {delay:.1f} с", file=sys.stderr, flush=True)
+        time.sleep(delay)
 
     def _throttle(self) -> None:
         with self._lock:
@@ -160,16 +202,9 @@ class BitrixClient:
         start = 0
         while True:
             params["start"] = start
-            self._throttle()
-            try:
-                data = self._session.post(self.base + "crm.stagehistory.list.json",
-                                          json=params, timeout=self.timeout).json()
-            except requests.RequestException:
-                break
-            if isinstance(data, dict) and data.get("error"):
-                if data.get("error") in ("QUERY_LIMIT_EXCEEDED", "OPERATION_TIME_LIMIT"):
-                    time.sleep(0.7); continue
-                raise BitrixError(f"crm.stagehistory.list: {data['error']} {data.get('error_description','')}")
+            # через call_envelope: ретраи транзиентных сбоев + сохранение поля next.
+            # Раньше сетевая ошибка делала break и молча возвращала частичный результат.
+            data = self.call_envelope("crm.stagehistory.list", params)
             res = (data or {}).get("result") or {}
             items = res.get("items") if isinstance(res, dict) else res
             items = items or []

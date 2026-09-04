@@ -13,6 +13,11 @@
 - **Цепочка «запрос → сделка»:** доводимость до ТКП по сорсерам, исход связанных сделок, какие воронки кормит сорсинг.
 - **Покрытие сделок сорсингом:** доля сделок с ≥1 запросом, глубина обзвона (поставщиков/сделку), покрытие по воронкам.
 
+## Быстрый старт для агента
+
+`.agent/README.md` — что где лежит и как проверять; `.agent/manifest.json` — то же
+машинно; `data/catalog.json` — каталог всех наборов данных.
+
 ## Установка
 ```bash
 cd sourcing-analyzer
@@ -54,6 +59,19 @@ SOURCING_MODEL=claude-opus-4-8
   семантике в `stages.py` (`_TKP_POS` / `_TKP_NEG` / `WON`). При желании сузить до WON — правится там же.
 - **Покрытие** — сделки периода (все воронки) с ≥1 связанным RFQ; глубина = RFQ на покрытую сделку.
 
+## Проверки
+
+```bash
+python -m pytest -q                          # тесты ядра
+ruff check .                                 # ошибки кода
+python scripts/build_catalog.py --check      # каталог данных актуален
+python scripts/validate_dashboard.py public/index.html   # собранный дашборд годен к деплою
+```
+
+Те же проверки выполняет `.github/workflows/gate.yml` на каждый PR, а валидация
+собранного HTML стоит барьером перед деплоем: сломанный или пустой дашборд
+на сайт не уезжает.
+
 ## Архитектура
 ```
 config.py          конфиг и доменные константы (отдел 172, пол периода)
@@ -64,7 +82,10 @@ metrics.py         движок метрик (чистые функции) → d
 insights.py        гибрид: правила + Claude Opus 4.8 (adaptive thinking, кэш system)
 templates/dashboard_core.html   шаблон (данные через window.__DATA__/__INSIGHTS__)
 dashboard.py       подстановка metrics+insights → HTML
-main.py            CLI-оркестратор
+main.py            CLI-оркестратор + проверка достаточности данных
+tests/             фикстура синтетических данных Bitrix и тесты ядра
+scripts/validate_dashboard.py   проверка собранного HTML перед деплоем
+scripts/build_catalog.py        каталог данных → data/catalog.json
 ```
 
 ## Этап 2 (не входит в v1)

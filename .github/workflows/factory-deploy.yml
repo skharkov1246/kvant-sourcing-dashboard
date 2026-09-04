@@ -28,6 +28,7 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v5
 
@@ -46,6 +47,13 @@ jobs:
             exit 1
           fi
 
+      - name: Фиксация версии wrangler на прогон
+        run: |
+          set -euo pipefail
+          v="$(npm view wrangler version)"
+          echo "WRANGLER_VERSION=$v" >> "$GITHUB_ENV"
+          echo "wrangler зафиксирован на $v (одна версия на все шаги прогона)"
+
       - name: Деплой на Cloudflare Pages (kvant-gok)
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -53,12 +61,12 @@ jobs:
         run: |
           set -euo pipefail
           # создать проект, если его ещё нет (иначе тихо пропустить)
-          npx --yes wrangler@latest pages project create kvant-gok \
+          npx --yes wrangler@${WRANGLER_VERSION} pages project create kvant-gok \
             --production-branch=main 2>/dev/null || true
           # ASCII commit-message: иначе wrangler цепляет кириллицу git-коммита → CF отвергает (8000111).
           ok=0
           for i in 1 2 3; do
-            if npx --yes wrangler@latest pages deploy factory/public \
+            if npx --yes wrangler@${WRANGLER_VERSION} pages deploy factory/public \
                  --project-name=kvant-gok --branch=main \
                  --commit-dirty=true --commit-message="gok project deploy"; then
               ok=1; break

@@ -21,3 +21,15 @@ scheduler/.wrangler/
 # база ЗИП: public/ — артефакт сборки (собирается build.py/CI), в репозиторий не кладём
 zip/public/
 zip/customs/recon/
+
+# кэш wrangler содержит account_id и e-mail владельца — в публичном репозитории не нужен
+.wrangler/
+*/.wrangler/
+
+# промежуточные дампы зонда Bitrix (scripts/bitrix_probe.py) — артефакты, не исходники
+scripts/_coll_*.json
+
+# каталоги проверок
+smoke/
+.pytest_cache/
+.ruff_cache/

@@ -13,6 +13,7 @@ from __future__ import annotations
 import argparse
 import datetime as dt
 import json
+import os
 import sys
 import webbrowser
 from collections import Counter, defaultdict
@@ -193,6 +194,47 @@ def _send_stats(client: BitrixClient, rfqs: list[dict], sourcer_rows: list[dict]
     return {"rows": rows, "totals": tot, "byCard": {c: v for c, v in by_card.items()}}
 
 
+class DataGateError(RuntimeError):
+    """Выгрузка не прошла проверку достаточности — собирать дашборд нельзя."""
+
+
+def _sanity_gates(p, rfqs, period_deals, dept_a_ids, sourcers_a, *, skip: bool = False) -> None:
+    """Проверка, что данные из Bitrix пришли, а не «пустой, но валидный» ответ.
+
+    Разбор падений: при частичной выгрузке пайплайн собирал корректный HTML с нулями
+    во всех KPI и деплоил его в прод. Здесь прогон останавливается ДО генерации, поэтому
+    на сайте остаётся предыдущая рабочая версия.
+
+    Пороги масштабируются длиной периода и переопределяются переменными окружения
+    SOURCING_MIN_RFQ / SOURCING_MIN_DEALS / SOURCING_MIN_SOURCERS; отключение — --allow-empty.
+    """
+    if skip:
+        print("  ⚠ проверки достаточности отключены (--allow-empty или --max-deals)")
+        return
+    scale = min(1.0, max(p.days, 1) / 30.0)          # для коротких периодов пороги ниже
+    min_rfq = max(1, int(int(os.getenv("SOURCING_MIN_RFQ") or 20) * scale))
+    min_deals = max(1, int(int(os.getenv("SOURCING_MIN_DEALS") or 20) * scale))
+    min_sourcers = max(1, int(int(os.getenv("SOURCING_MIN_SOURCERS") or 3) * scale))
+
+    problems = []
+    if not dept_a_ids:
+        problems.append(f"отдел {config.DEPT_SOURCING_ID} не вернул ни одного сотрудника")
+    if len(rfqs) < min_rfq:
+        problems.append(f"RFQ {len(rfqs)} < порога {min_rfq}")
+    if len(period_deals) < min_deals:
+        problems.append(f"сделок периода {len(period_deals)} < порога {min_deals}")
+    if len(sourcers_a) < min_sourcers:
+        problems.append(f"сорсеров с активностью {len(sourcers_a)} < порога {min_sourcers}")
+    if problems:
+        raise DataGateError(
+            "данные Bitrix не прошли проверку достаточности:\n    - " + "\n    - ".join(problems)
+            + "\n  Дашборд НЕ собран, прежняя версия на сайте не тронута."
+            + "\n  Если период действительно пустой — запустите с --allow-empty."
+        )
+    print(f"  ✓ проверка данных пройдена: RFQ {len(rfqs)}, сделок {len(period_deals)}, "
+          f"сорсеров {len(sourcers_a)}, отдел {len(dept_a_ids)} чел.")
+
+
 def run(args) -> int:
     settings = config.Settings.load()
     as_of = dt.date.fromisoformat(args.as_of) if args.as_of else None
@@ -241,6 +283,9 @@ def run(args) -> int:
         p, rfqs, deal_index, period_deals, dept_a_ids,
         names, since, deal_stage_names, category_names,
     )
+
+    _sanity_gates(p, rfqs, period_deals, dept_a_ids, m.get("sourcersA") or [],
+                  skip=bool(args.allow_empty or args.max_deals))
 
     print("• Отправлено vs создано (письма)…")
     m["send"] = _send_stats(client, rfqs, m["sourcersA"], dept_a_ids, p.start_iso, p.end_iso)
@@ -478,11 +523,18 @@ def main() -> int:
     ap.add_argument("--open", action="store_true", help="открыть дашборд в браузере")
     ap.add_argument("--max-deals", type=int, default=None, help="ограничить число RFQ (для теста)")
     ap.add_argument("--as-of", help="переопределить «сегодня» (YYYY-MM-DD), для воспроизводимости")
+    ap.add_argument("--allow-empty", action="store_true",
+                    help="не останавливаться, если данных из Bitrix мало (период действительно пустой)")
     args = ap.parse_args()
     try:
         return run(args)
     except SystemExit:
         raise
+    except DataGateError as e:
+        # код 2 = «данные не прошли проверку»: отличается от краха кода (1),
+        # чтобы CI мог показать понятную причину и не деплоить.
+        print(f"✗ {e}", file=sys.stderr)
+        return 2
     except Exception as e:
         print(f"✗ Ошибка: {type(e).__name__}: {e}", file=sys.stderr)
         return 1

@@ -49,10 +49,7 @@ export default {
       open.headers.set("Referrer-Policy", "no-referrer");
       return open;
     }
-
-    const got = request.headers.get("Authorization") || "";
-    const want = "Basic " + btoa(`${user}:${pass}`);
-    if (!timingSafeEqual(got, want)) {
+    if (!basicOk(request, user, pass)) {
       return new Response(page(
         "ОВЭ-75 · КВАНТ",
         "<p>Материалы проекта «обжиг – выщелачивание – электроэкстракция» для АО «Кольская ГМК».</p>" +
@@ -98,8 +95,7 @@ async function handleAnswers(request, env) {
   const pass = env.BASIC_AUTH_PASS;
   // без пароля сайта отправка выключена: иначе кто угодно коммитил бы в репозиторий
   if (!pass) return json({ ok: false, error: "submit_disabled_no_password" }, 503);
-  const got = request.headers.get("Authorization") || "";
-  if (!timingSafeEqual(got, "Basic " + btoa(`${user}:${pass}`))) {
+  if (!basicOk(request, user, pass)) {
     return json({ ok: false, error: "auth" }, 401,
       { "WWW-Authenticate": 'Basic realm="OVE-75 KVANT", charset="UTF-8"' });
   }
@@ -227,4 +223,31 @@ function timingSafeEqual(a, b) {
   let diff = 0;
   for (let i = 0; i < ea.length; i++) diff |= ea[i] ^ eb[i];
   return diff === 0;
+}
+
+// Разбор заголовка Basic без btoa: пароль может содержать любые символы UTF-8.
+// btoa на строке с кириллицей бросает исключение, и сайт отвечает 500 на каждый
+// запрос — то есть падает целиком. Здесь декодируем присланные байты и сравниваем
+// уже строки, поэтому пароль может быть любым.
+function parseBasic(header) {
+  if (!header || !header.startsWith("Basic ")) return null;
+  let raw;
+  try { raw = atob(header.slice(6)); } catch { return null; }
+  const text = new TextDecoder().decode(Uint8Array.from(raw, (c) => c.charCodeAt(0)));
+  const i = text.indexOf(":");
+  return i < 0 ? null : { user: text.slice(0, i), pass: text.slice(i + 1) };
+}
+
+// сравнение без ранних выходов (не зависит от позиции первого несовпадения)
+function safeEqual(a, b) {
+  const enc = new TextEncoder();
+  const x = enc.encode(String(a)), y = enc.encode(String(b));
+  let diff = x.length ^ y.length;
+  for (let i = 0; i < Math.max(x.length, y.length); i++) diff |= (x[i] || 0) ^ (y[i] || 0);
+  return diff === 0;
+}
+
+function basicOk(request, user, pass) {
+  const creds = parseBasic(request.headers.get("Authorization"));
+  return !!creds && safeEqual(creds.user, user) && safeEqual(creds.pass, pass);
 }

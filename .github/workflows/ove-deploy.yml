@@ -20,6 +20,7 @@ concurrency:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v5
 
@@ -42,19 +43,37 @@ jobs:
           python ove/build.py
           test -f ove/public/index.html
 
+      - name: Фиксация версии wrangler на прогон
+        run: |
+          set -euo pipefail
+          v="$(npm view wrangler version)"
+          echo "WRANGLER_VERSION=$v" >> "$GITHUB_ENV"
+          echo "wrangler зафиксирован на $v (одна версия на все шаги прогона)"
+
       - name: Деплой на Cloudflare Pages (kvant-ove)
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          BASIC_AUTH_PASS: ${{ secrets.BASIC_AUTH_PASS }}
         run: |
           set -euo pipefail
           # создать проект, если его ещё нет (иначе тихо пропустить)
-          npx --yes wrangler@latest pages project create kvant-ove \
+          npx --yes wrangler@${WRANGLER_VERSION} pages project create kvant-ove \
             --production-branch=main 2>/dev/null || true
+          # Гейт ove/public/_worker.js лежит в репозитории, но пароль ему до сих пор
+          # не задавался — воркер пропускал всех, и материалы проекта (включая
+          # тендерный пакет) были открыты. Секрет пуст → остаётся как было.
+          if [ -n "${BASIC_AUTH_PASS:-}" ]; then
+            printf '%s' "$BASIC_AUTH_PASS" \
+              | npx --yes wrangler@${WRANGLER_VERSION} pages secret put BASIC_AUTH_PASS --project-name=kvant-ove \
+              || echo "не удалось задать секрет в CI — задайте BASIC_AUTH_PASS в Cloudflare Pages → Settings"
+          else
+            echo "GitHub-секрет BASIC_AUTH_PASS пуст — сайт ОВЭ-75 остаётся открытым"
+          fi
           # ASCII commit-message: иначе wrangler цепляет кириллицу git-коммита → CF отвергает (8000111).
           ok=0
           for i in 1 2 3; do
-            if npx --yes wrangler@latest pages deploy ove/public \
+            if npx --yes wrangler@${WRANGLER_VERSION} pages deploy ove/public \
                  --project-name=kvant-ove --branch=main \
                  --commit-dirty=true --commit-message="ove auto deploy"; then
               ok=1; break
