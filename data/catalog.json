@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 159,
-    "total_bytes": 69478834,
+    "total_bytes": 69467821,
     "by_sensitivity": {
       "конфиденциально": 43,
       "внутреннее": 84,
@@ -1035,7 +1035,7 @@
     {
       "path": "data/chat_snapshot.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 507041,
+      "bytes": 496028,
       "note": "Суточный снимок реакции коммерсантов в чатах сделок. Пишет бот scan.yml (chat_scan.py) раз в сутки. Руками не редактировать: правка в PR откатит свежие данные при мерже. Содержит поимённые метрики 15 сотрудников и LLM-оценки.",
       "format": "json",
       "shape": "объект",
@@ -1048,9 +1048,9 @@
         "key": "assessment",
         "records": 15
       },
-      "last_change": "2026-09-03",
+      "last_change": "2026-09-04",
       "last_author": "github-actions[bot]",
-      "last_commit": "0c18c73",
+      "last_commit": "9c473b2",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "конфиденциально",

@@ -179,12 +179,23 @@ def main() -> int:
             print(f"✗ нет {OUT.relative_to(ROOT)} — выполните: python scripts/build_catalog.py", file=sys.stderr)
             return 1
         old = json.loads(OUT.read_text(encoding="utf-8"))
-        # Сравниваем состав и форму, а не метаданные git. updated_by тоже выводится
-        # из истории: в мелком клоне последний коммит по файлу другой, чем в полном,
-        # поэтому включение этого поля делало проверку зависящей от глубины клона.
-        GIT_FIELDS = ("last_change", "last_author", "last_commit", "updated_by")
-        strip = lambda c: [{k: v for k, v in d.items() if k not in GIT_FIELDS}
-                           for d in c["datasets"]]
+        # Проверяем СОСТАВ и ФОРМУ каталога: не появился ли набор данных мимо
+        # каталога и не исчез ли описанный. Всё, что меняется само по себе,
+        # из сравнения исключаем, иначе проверка краснеет на ровном месте:
+        #   * поля из git — в мелком клоне последний коммит по файлу другой,
+        #     чем в полном (сюда же выведенный из автора updated_by);
+        #   * объём и число записей — боты обновляют снимки данных ежедневно,
+        #     и на merge-коммите PR цифры уже другие, чем в ветке.
+        VOLATILE = ("last_change", "last_author", "last_commit", "updated_by", "bytes", "records")
+
+        def shape(d):
+            out = {k: v for k, v in d.items() if k not in VOLATILE}
+            mc = out.get("main_collection")
+            if isinstance(mc, dict):
+                out["main_collection"] = {k: v for k, v in mc.items() if k != "records"}
+            return out
+
+        strip = lambda c: [shape(d) for d in c["datasets"]]
         if strip(old) != strip(fresh):
             print("✗ каталог данных устарел — выполните: python scripts/build_catalog.py", file=sys.stderr)
             return 1
