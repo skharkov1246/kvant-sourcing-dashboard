@@ -1,0 +1,114 @@
+name: Gate — проверки перед мержем
+
+# Быстрый (2–4 мин) барьер на пути в main. Ничего не деплоит и не коммитит.
+# Ловит то, что раньше попадало в прод и обнаруживалось на живом сайте:
+#   • сломанный Python (синтаксис, неопределённые имена);
+#   • сломанный рендер дашборда и незаменённые плейсхолдеры;
+#   • откат бот-файлов (data/chat_snapshot.json) при мерже из долгоживущей ветки;
+#   • секреты и вебхуки, случайно попавшие в коммит.
+# Чтобы гейт стал обязательным: Settings → Rules → Rulesets → main → Require status checks → gate.
+on:
+  pull_request:
+  push:
+    branches-ignore: [main]      # main проверяется своим деплой-workflow
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gate:
+    name: gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0          # нужен для сравнения с base-веткой
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Установка зависимостей
+        run: pip install --quiet -r requirements.txt ruff pytest
+
+      - name: Ruff — ошибки кода
+        run: ruff check .
+
+      - name: Компиляция всех модулей
+        run: |
+          set -euo pipefail
+          find . -name '*.py' -not -path './.venv/*' -not -path './reports/*' -print0 \
+            | xargs -0 -n50 python -m py_compile
+          echo "✓ все модули компилируются"
+
+      - name: Тесты ядра
+        run: python -m pytest -q
+
+      - name: Smoke-рендер дашборда на синтетических данных
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import sys, types
+          sys.modules.setdefault("dotenv", types.SimpleNamespace(load_dotenv=lambda *a, **k: None))
+          sys.path.insert(0, ".")
+          import dashboard
+          from tests import fixture
+          m = fixture.build_metrics()
+          dashboard.write(m, {"source": "rules", "items": []}, "smoke/index.html")
+          print("собрано smoke/index.html")
+          PY
+          python scripts/validate_dashboard.py smoke/index.html
+
+      - name: Каталог данных актуален
+        run: python scripts/build_catalog.py --check
+
+      - name: Бот-файлы не должны меняться в PR
+        if: github.event_name == 'pull_request'
+        run: |
+          set -euo pipefail
+          base="origin/${{ github.base_ref }}"
+          changed="$(git diff --name-only "$base"...HEAD || true)"
+          bad="$(echo "$changed" | grep -E '^(data/chat_snapshot\.json|data/budget_snapshot\.json|gt/data/bitrix_gt\.json)$' || true)"
+          if [ -n "$bad" ]; then
+            echo "::error::в PR изменены файлы, которыми управляют боты:"
+            echo "$bad"
+            echo "Верните их к состоянию базовой ветки: git checkout $base -- $bad"
+            echo "Иначе мерж откатит свежий снимок и дашборд соберётся на устаревших данных."
+            exit 1
+          fi
+          echo "✓ бот-файлы не тронуты"
+
+      - name: Поиск секретов в изменённых файлах
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            files="$(git diff --name-only origin/${{ github.base_ref }}...HEAD --diff-filter=ACM || true)"
+          else
+            files="$(git diff --name-only HEAD~1...HEAD --diff-filter=ACM 2>/dev/null || git ls-files)"
+          fi
+          [ -z "$files" ] && { echo "нет изменённых файлов"; exit 0; }
+          # шаблоны: вебхук Bitrix с токеном, ключи Anthropic/AWS/GitHub, приватные ключи
+          pattern='bitrix24\.ru/rest/[0-9]+/[A-Za-z0-9]{10,}|sk-ant-[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{30,}|AKIA[0-9A-Z]{16}|BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY'
+          hits=""
+          for f in $files; do
+            [ -f "$f" ] || continue
+            case "$f" in *.png|*.jpg|*.pdf|*.zip|*.docx|*.xlsx|*.woff2|*.npz) continue;; esac
+            if grep -nEI "$pattern" "$f" >/dev/null 2>&1; then hits="$hits $f"; fi
+          done
+          if [ -n "$hits" ]; then
+            echo "::error::возможные секреты в файлах:$hits"
+            echo "Уберите значение из кода, положите его в GitHub Secrets и отзовите скомпрометированный ключ."
+            exit 1
+          fi
+          echo "✓ секретов не найдено"
+
+      - name: Сводка
+        if: always()
+        run: echo "Гейт завершён со статусом ${{ job.status }}"

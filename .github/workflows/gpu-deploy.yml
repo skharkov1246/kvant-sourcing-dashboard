@@ -23,6 +23,7 @@ concurrency:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v5
 
@@ -49,6 +50,13 @@ jobs:
           test -f gpu/public/index.html
           test -f gpu/public/_worker.js
 
+      - name: Фиксация версии wrangler на прогон
+        run: |
+          set -euo pipefail
+          v="$(npm view wrangler version)"
+          echo "WRANGLER_VERSION=$v" >> "$GITHUB_ENV"
+          echo "wrangler зафиксирован на $v (одна версия на все шаги прогона)"
+
       - name: Деплой на Cloudflare Pages (kvant-gpu)
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -57,13 +65,13 @@ jobs:
         run: |
           set -euo pipefail
           # создать проект, если его ещё нет (иначе тихо пропустить)
-          npx --yes wrangler@latest pages project create kvant-gpu \
+          npx --yes wrangler@${WRANGLER_VERSION} pages project create kvant-gpu \
             --production-branch=main 2>/dev/null || true
           # пароль гейта берём из GitHub-секрета и кладём в секрет Pages
           # (в репозитории пароля нет). Если пуст — деплой не падает, но гейт вернёт 503.
           if [ -n "${BASIC_AUTH_PASS:-}" ]; then
             printf '%s' "$BASIC_AUTH_PASS" \
-              | npx --yes wrangler@latest pages secret put BASIC_AUTH_PASS --project-name=kvant-gpu \
+              | npx --yes wrangler@${WRANGLER_VERSION} pages secret put BASIC_AUTH_PASS --project-name=kvant-gpu \
               || echo "⚠ не удалось задать секрет в CI — задайте BASIC_AUTH_PASS в Cloudflare Pages → Settings"
           else
             echo "⚠ GitHub-секрет BASIC_AUTH_PASS пуст — гейт закрыт (503), пока не зададите пароль"
@@ -72,7 +80,7 @@ jobs:
           # Автоповтор: Cloudflare изредка отдаёт транзиентную ошибку публикации Function.
           ok=0
           for i in 1 2 3; do
-            if npx --yes wrangler@latest pages deploy gpu/public \
+            if npx --yes wrangler@${WRANGLER_VERSION} pages deploy gpu/public \
                  --project-name=kvant-gpu --branch=main \
                  --commit-dirty=true --commit-message="gpu auto deploy"; then
               ok=1; break

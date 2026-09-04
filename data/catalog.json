@@ -1,0 +1,6531 @@
+{
+  "schema": "kvant.data-catalog/1",
+  "repo": "skharkov1246/kvant-sourcing-dashboard",
+  "generated_by": "scripts/build_catalog.py",
+  "how_to_refresh": "python scripts/build_catalog.py",
+  "summary": {
+    "datasets": 159,
+    "total_bytes": 69478834,
+    "by_sensitivity": {
+      "конфиденциально": 43,
+      "внутреннее": 84,
+      "публикуемо": 32
+    },
+    "by_subproject": {
+      "ГПУ-библиотека": 26,
+      "ГТУ-библиотека": 30,
+      "ОВЭ-75": 45,
+      "база ЗИП": 14,
+      "база ЗИП · таможня": 18,
+      "гидрометаллургия": 22,
+      "дашборд сорсеров": 3,
+      "каталог PN (веб)": 1
+    }
+  },
+  "datasets": [
+    {
+      "path": "zip/customs/out/customs_8207_2023-01-01_2023-12-31.json",
+      "subproject": "база ЗИП · таможня",
+      "bytes": 9062198,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "country",
+        "fields",
+        "hs",
+        "matched",
+        "meta",
+        "method",
+        "period",
+        "strong",
+        "total_records",
+        "weak"
+      ],
+      "main_collection": {
+        "key": "matched",
+        "records": 11340,
+        "record_keys": [
+          "brand",
+          "cur",
+          "custval",
+          "date",
+          "desc",
+          "dispatch",
+          "exporter",
+          "gross_kg",
+          "hs10",
+          "importer",
+          "incoterms",
+          "inn",
+          "net_kg",
+          "origin",
+          "place",
+          "pn",
+          "statval",
+          "tag",
+          "usd_kg",
+          "val"
+        ]
+      },
+      "last_change": "2026-07-07",
+      "last_author": "skharkov1246",
+      "last_commit": "4a1bb8c",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "ИНН контрагентов",
+          "выручка и маржа сделок",
+          "участники внешнеэкономических сделок"
+        ]
+      },
+      "referenced_by": []
+    },
+    {
+      "path": "zip/customs/out/customs_8207_2024-01-01_2024-12-31.json",
+      "subproject": "база ЗИП · таможня",
+      "bytes": 6381136,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "country",
+        "fields",
+        "hs",
+        "matched",
+        "meta",
+        "method",
+        "period",
+        "strong",
+        "total_records",
+        "weak"
+      ],
+      "main_collection": {
+        "key": "matched",
+        "records": 7957,
+        "record_keys": [
+          "brand",
+          "cur",
+          "custval",
+          "date",
+          "desc",
+          "dispatch",
+          "exporter",
+          "gross_kg",
+          "hs10",
+          "importer",
+          "incoterms",
+          "inn",
+          "net_kg",
+          "origin",
+          "place",
+          "pn",
+          "statval",
+          "tag",
+          "usd_kg",
+          "val"
+        ]
+      },
+      "last_change": "2026-07-07",
+      "last_author": "skharkov1246",
+      "last_commit": "4a1bb8c",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "ИНН контрагентов",
+          "выручка и маржа сделок",
+          "участники внешнеэкономических сделок"
+        ]
+      },
+      "referenced_by": []
+    },
+    {
+      "path": "pnw/public/data.js",
+      "subproject": "каталог PN (веб)",
+      "bytes": 6146458,
+      "note": "Копия базы PN для веб-каталога. Байт-в-байт дубль gt/public/wizard/data.js (по 6,1 МБ каждый).",
+      "format": "js",
+      "last_change": "2026-08-23",
+      "last_author": "Kimi Agent",
+      "last_commit": "a1f6db9",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/public/wizard/index.html",
+        "zip/build.py"
+      ]
+    },
+    {
+      "path": "gt/data/pn_db.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 6142433,
+      "note": "База номенклатуры (part numbers) ГТУ. Дублируется в gt/public/wizard/data.js и pnw/public/data.js — при правке обновлять все три или собирать из одного источника.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "rows",
+        "source",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 12442,
+        "record_keys": [
+          "b",
+          "cli",
+          "cu",
+          "desc",
+          "dq",
+          "ev",
+          "gold",
+          "mach",
+          "mk",
+          "mpn",
+          "oem",
+          "org",
+          "pat",
+          "pn",
+          "qt",
+          "qty",
+          "seg",
+          "sn",
+          "src",
+          "su",
+          "vf"
+        ]
+      },
+      "last_change": "2026-08-27",
+      "last_author": "skharkov1246",
+      "last_commit": "5aa78f3",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/build.py"
+      ]
+    },
+    {
+      "path": "zip/data/customs_declarations.json",
+      "subproject": "база ЗИП",
+      "bytes": 6004898,
+      "note": "Таможенные декларации (агрегат). Источник — платная подписка glbs.io.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "cols",
+        "rows",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 23280
+      },
+      "last_change": "2026-07-10",
+      "last_author": "skharkov1246",
+      "last_commit": "debbad5",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "zip/build.py",
+        "zip/tools/aggregate_customs.py"
+      ]
+    },
+    {
+      "path": "zip/customs/out/customs_8431.json",
+      "subproject": "база ЗИП · таможня",
+      "bytes": 5055250,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "country",
+        "fields",
+        "hs",
+        "matched",
+        "meta",
+        "method",
+        "period",
+        "strong",
+        "total_records",
+        "weak"
+      ],
+      "main_collection": {
+        "key": "matched",
+        "records": 5977,
+        "record_keys": [
+          "brand",
+          "cur",
+          "custval",
+          "date",
+          "desc",
+          "dispatch",
+          "exporter",
+          "gross_kg",
+          "hs10",
+          "importer",
+          "incoterms",
+          "inn",
+          "net_kg",
+          "origin",
+          "place",
+          "pn",
+          "statval",
+          "tag",
+          "usd_kg",
+          "val"
+        ]
+      },
+      "last_change": "2026-07-07",
+      "last_author": "skharkov1246",
+      "last_commit": "4a1bb8c",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "ИНН контрагентов",
+          "выручка и маржа сделок",
+          "участники внешнеэкономических сделок"
+        ]
+      },
+      "referenced_by": []
+    },
+    {
+      "path": "zip/data/odm_suppliers.json",
+      "subproject": "база ЗИП",
+      "bytes": 3292954,
+      "note": "",
+      "format": "json",
+      "shape": "список",
+      "records": 4309,
+      "record_keys": [
+        "catalog_price",
+        "catalog_price_raw",
+        "catalog_url",
+        "comment",
+        "confidence",
+        "country",
+        "created_at",
+        "created_by",
+        "id",
+        "makes",
+        "name",
+        "position_id",
+        "price_currency",
+        "quality",
+        "region",
+        "source_url",
+        "status",
+        "terms",
+        "updated_at"
+      ],
+      "last_change": "2026-07-02",
+      "last_author": "Claude",
+      "last_commit": "1a0bf54",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "zip/build.py"
+      ]
+    },
+    {
+      "path": "zip/customs/out/customs_8412.json",
+      "subproject": "база ЗИП · таможня",
+      "bytes": 2873827,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "country",
+        "fields",
+        "hs",
+        "matched",
+        "meta",
+        "method",
+        "period",
+        "strong",
+        "total_records",
+        "weak"
+      ],
+      "main_collection": {
+        "key": "matched",
+        "records": 3592,
+        "record_keys": [
+          "brand",
+          "cur",
+          "custval",
+          "date",
+          "desc",
+          "dispatch",
+          "exporter",
+          "gross_kg",
+          "hs10",
+          "importer",
+          "incoterms",
+          "inn",
+          "net_kg",
+          "origin",
+          "place",
+          "pn",
+          "statval",
+          "tag",
+          "usd_kg",
+          "val"
+        ]
+      },
+      "last_change": "2026-07-07",
+      "last_author": "skharkov1246",
+      "last_commit": "4a1bb8c",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "ИНН контрагентов",
+          "выручка и маржа сделок",
+          "участники внешнеэкономических сделок"
+        ]
+      },
+      "referenced_by": []
+    },
+    {
+      "path": "zip/customs/out/customs_8467_2023-01-01_2023-12-31.json",
+      "subproject": "база ЗИП · таможня",
+      "bytes": 2365387,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "country",
+        "fields",
+        "hs",
+        "matched",
+        "meta",
+        "method",
+        "period",
+        "strong",
+        "total_records",
+        "weak"
+      ],
+      "main_collection": {
+        "key": "matched",
+        "records": 2952,
+        "record_keys": [
+          "brand",
+          "cur",
+          "custval",
+          "date",
+          "desc",
+          "dispatch",
+          "exporter",
+          "gross_kg",
+          "hs10",
+          "importer",
+          "incoterms",
+          "inn",
+          "net_kg",
+          "origin",
+          "place",
+          "pn",
+          "statval",
+          "tag",
+          "usd_kg",
+          "val"
+        ]
+      },
+      "last_change": "2026-07-07",
+      "last_author": "skharkov1246",
+      "last_commit": "4a1bb8c",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "ИНН контрагентов",
+          "выручка и маржа сделок",
+          "участники внешнеэкономических сделок"
+        ]
+      },
+      "referenced_by": []
+    },
+    {
+      "path": "zip/customs/out/customs_8207_2025-01-01_2026-03-31.json",
+      "subproject": "база ЗИП · таможня",
+      "bytes": 2338217,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "country",
+        "fields",
+        "hs",
+        "matched",
+        "meta",
+        "method",
+        "period",
+        "strong",
+        "total_records",
+        "weak"
+      ],
+      "main_collection": {
+        "key": "matched",
+        "records": 3303,
+        "record_keys": [
+          "brand",
+          "cur",
+          "custval",
+          "date",
+          "desc",
+          "dispatch",
+          "exporter",
+          "gross_kg",
+          "hs10",
+          "importer",
+          "incoterms",
+          "inn",
+          "net_kg",
+          "origin",
+          "place",
+          "pn",
+          "statval",
+          "tag",
+          "usd_kg",
+          "val"
+        ]
+      },
+      "last_change": "2026-07-07",
+      "last_author": "skharkov1246",
+      "last_commit": "4a1bb8c",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "ИНН контрагентов",
+          "выручка и маржа сделок",
+          "участники внешнеэкономических сделок"
+        ]
+      },
+      "referenced_by": []
+    },
+    {
+      "path": "gt/data/dossiers.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 1619895,
+      "note": "Досье поставщиков ГТУ: 1359 записей, 731 e-mail, 992 телефона. Персональные и контактные данные.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "dossiers",
+        "source",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "dossiers",
+        "records": 1359
+      },
+      "last_change": "2026-08-18",
+      "last_author": "skharkov1246",
+      "last_commit": "5e72d14",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "телефоны"
+        ]
+      },
+      "referenced_by": [
+        "gt/build.py",
+        "gt/tools/build_rfq.py",
+        "gt/tools/drop_ru.py"
+      ]
+    },
+    {
+      "path": "zip/customs/out/customs_8467_2024-01-01_2024-12-31.json",
+      "subproject": "база ЗИП · таможня",
+      "bytes": 1542689,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "country",
+        "fields",
+        "hs",
+        "matched",
+        "meta",
+        "method",
+        "period",
+        "strong",
+        "total_records",
+        "weak"
+      ],
+      "main_collection": {
+        "key": "matched",
+        "records": 1879,
+        "record_keys": [
+          "brand",
+          "cur",
+          "custval",
+          "date",
+          "desc",
+          "dispatch",
+          "exporter",
+          "gross_kg",
+          "hs10",
+          "importer",
+          "incoterms",
+          "inn",
+          "net_kg",
+          "origin",
+          "place",
+          "pn",
+          "statval",
+          "tag",
+          "usd_kg",
+          "val"
+        ]
+      },
+      "last_change": "2026-07-07",
+      "last_author": "skharkov1246",
+      "last_commit": "4a1bb8c",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "ИНН контрагентов",
+          "выручка и маржа сделок",
+          "участники внешнеэкономических сделок"
+        ]
+      },
+      "referenced_by": []
+    },
+    {
+      "path": "zip/customs/out/customs_8466_2023-01-01_2023-12-31.json",
+      "subproject": "база ЗИП · таможня",
+      "bytes": 1362874,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "country",
+        "fields",
+        "hs",
+        "matched",
+        "meta",
+        "method",
+        "period",
+        "strong",
+        "total_records",
+        "weak"
+      ],
+      "main_collection": {
+        "key": "matched",
+        "records": 1710,
+        "record_keys": [
+          "brand",
+          "cur",
+          "custval",
+          "date",
+          "decl",
+          "desc",
+          "dispatch",
+          "exporter",
+          "gross_kg",
+          "hs10",
+          "importer",
+          "incoterms",
+          "inn",
+          "net_kg",
+          "origin",
+          "place",
+          "pn",
+          "qty",
+          "statval",
+          "tag",
+          "usd_kg",
+          "val"
+        ]
+      },
+      "last_change": "2026-07-07",
+      "last_author": "skharkov1246",
+      "last_commit": "4a1bb8c",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "ИНН контрагентов",
+          "выручка и маржа сделок",
+          "участники внешнеэкономических сделок"
+        ]
+      },
+      "referenced_by": []
+    },
+    {
+      "path": "zip/data/positions.json",
+      "subproject": "база ЗИП",
+      "bytes": 1064958,
+      "note": "",
+      "format": "json",
+      "shape": "список",
+      "records": 752,
+      "record_keys": [
+        "aliases",
+        "applications",
+        "bitrix_price_history",
+        "bitrix_sold",
+        "bitrix_status",
+        "catalog_no",
+        "catalog_norm",
+        "category",
+        "created_at",
+        "hs_code",
+        "id",
+        "material_type",
+        "model",
+        "name",
+        "note",
+        "oem",
+        "opendb_signal",
+        "plan_currency",
+        "plan_price",
+        "pp",
+        "price_cur",
+        "price_eur_competitor",
+        "price_max",
+        "price_min",
+        "price_src",
+        "qty_quarter",
+        "target_equipment",
+        "updated_at"
+      ],
+      "last_change": "2026-07-02",
+      "last_author": "Claude",
+      "last_commit": "1a0bf54",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "zip/build.py",
+        "zip/customs/glbs_pull.mjs",
+        "zip/tools/aggregate_customs.py",
+        "zip/tools/aggregate_prices.py",
+        "zip/tools/import_sheet.py",
+        "zip/tools/pilot_order.py",
+        "zip/tools/pilot_pdf.py"
+      ]
+    },
+    {
+      "path": "gt/data/research_suppliers.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 856261,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "rows",
+        "source",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 1297,
+        "record_keys": [
+          "angle",
+          "country",
+          "email",
+          "link",
+          "name",
+          "risk",
+          "site",
+          "tier",
+          "what"
+        ]
+      },
+      "last_change": "2026-08-18",
+      "last_author": "skharkov1246",
+      "last_commit": "a51e700",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "адреса электронной почты"
+        ]
+      },
+      "referenced_by": [
+        "gt/build.py",
+        "gt/tools/build_rfq.py",
+        "gt/tools/drop_ru.py"
+      ]
+    },
+    {
+      "path": "gt/data/rfq_prices.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 846622,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "checks",
+        "prices",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "prices",
+        "records": 857,
+        "record_keys": [
+          "basis",
+          "conf",
+          "cross",
+          "gap",
+          "note",
+          "pn",
+          "url",
+          "usd_hi",
+          "usd_lo"
+        ]
+      },
+      "last_change": "2026-08-08",
+      "last_author": "Claude",
+      "last_commit": "f1149d1",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gpu/tools/build_demand.py",
+        "gt/tools/build_lot_xlsx.py",
+        "gt/tools/build_rfq.py"
+      ]
+    },
+    {
+      "path": "zip/customs/out/customs_8466_2024-01-01_2024-12-31.json",
+      "subproject": "база ЗИП · таможня",
+      "bytes": 751563,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "country",
+        "fields",
+        "hs",
+        "matched",
+        "meta",
+        "method",
+        "period",
+        "strong",
+        "total_records",
+        "weak"
+      ],
+      "main_collection": {
+        "key": "matched",
+        "records": 937,
+        "record_keys": [
+          "brand",
+          "cur",
+          "custval",
+          "date",
+          "decl",
+          "desc",
+          "dispatch",
+          "exporter",
+          "gross_kg",
+          "hs10",
+          "importer",
+          "incoterms",
+          "inn",
+          "net_kg",
+          "origin",
+          "place",
+          "pn",
+          "qty",
+          "statval",
+          "tag",
+          "usd_kg",
+          "val"
+        ]
+      },
+      "last_change": "2026-07-07",
+      "last_author": "skharkov1246",
+      "last_commit": "4a1bb8c",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "ИНН контрагентов",
+          "выручка и маржа сделок",
+          "участники внешнеэкономических сделок"
+        ]
+      },
+      "referenced_by": []
+    },
+    {
+      "path": "gt/data/rfq_demand.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 558136,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "rows",
+        "source",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 2089,
+        "record_keys": [
+          "cat",
+          "man",
+          "model",
+          "name",
+          "pn",
+          "qty",
+          "sheet",
+          "unit"
+        ]
+      },
+      "last_change": "2026-08-08",
+      "last_author": "Claude",
+      "last_commit": "b8858b4",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gpu/tools/build_demand.py",
+        "gt/public/hot.html",
+        "gt/public/plugs.html",
+        "gt/tools/build_lot_xlsx.py",
+        "gt/tools/build_rfq.py"
+      ]
+    },
+    {
+      "path": "zip/customs/out/customs_8467_2025-01-01_2026-03-31.json",
+      "subproject": "база ЗИП · таможня",
+      "bytes": 552848,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "country",
+        "fields",
+        "hs",
+        "matched",
+        "meta",
+        "method",
+        "period",
+        "strong",
+        "total_records",
+        "weak"
+      ],
+      "main_collection": {
+        "key": "matched",
+        "records": 858,
+        "record_keys": [
+          "brand",
+          "cur",
+          "custval",
+          "date",
+          "desc",
+          "dispatch",
+          "exporter",
+          "gross_kg",
+          "hs10",
+          "importer",
+          "incoterms",
+          "inn",
+          "net_kg",
+          "origin",
+          "place",
+          "pn",
+          "statval",
+          "tag",
+          "usd_kg",
+          "val"
+        ]
+      },
+      "last_change": "2026-07-07",
+      "last_author": "skharkov1246",
+      "last_commit": "4a1bb8c",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "ИНН контрагентов",
+          "выручка и маржа сделок",
+          "участники внешнеэкономических сделок"
+        ]
+      },
+      "referenced_by": []
+    },
+    {
+      "path": "zip/customs/out/customs_848120_2023-01-01_2023-12-31.json",
+      "subproject": "база ЗИП · таможня",
+      "bytes": 550878,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "country",
+        "fields",
+        "hs",
+        "matched",
+        "meta",
+        "method",
+        "period",
+        "strong",
+        "total_records",
+        "weak"
+      ],
+      "main_collection": {
+        "key": "matched",
+        "records": 657,
+        "record_keys": [
+          "brand",
+          "cur",
+          "custval",
+          "date",
+          "decl",
+          "desc",
+          "dispatch",
+          "exporter",
+          "gross_kg",
+          "hs10",
+          "importer",
+          "incoterms",
+          "inn",
+          "net_kg",
+          "origin",
+          "place",
+          "pn",
+          "qty",
+          "statval",
+          "tag",
+          "usd_kg",
+          "val"
+        ]
+      },
+      "last_change": "2026-07-07",
+      "last_author": "skharkov1246",
+      "last_commit": "4a1bb8c",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "ИНН контрагентов",
+          "выручка и маржа сделок",
+          "участники внешнеэкономических сделок"
+        ]
+      },
+      "referenced_by": []
+    },
+    {
+      "path": "data/chat_snapshot.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 507041,
+      "note": "Суточный снимок реакции коммерсантов в чатах сделок. Пишет бот scan.yml (chat_scan.py) раз в сутки. Руками не редактировать: правка в PR откатит свежие данные при мерже. Содержит поимённые метрики 15 сотрудников и LLM-оценки.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "assessment",
+        "days",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "assessment",
+        "records": 15
+      },
+      "last_change": "2026-09-03",
+      "last_author": "github-actions[bot]",
+      "last_commit": "0c18c73",
+      "updated_by": "бот (workflow)",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "оценки и данные сотрудников"
+        ]
+      },
+      "referenced_by": [
+        ".github/workflows/scan.yml",
+        "chat_scan.py",
+        "gpu/tools/bitrix_gpu.py",
+        "reps.py",
+        "scripts/budget_snapshot.py"
+      ]
+    },
+    {
+      "path": "zip/customs/out/customs_841199_2023-01-01_2026-03-31.json",
+      "subproject": "база ЗИП · таможня",
+      "bytes": 375225,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "country",
+        "fields",
+        "hs",
+        "matched",
+        "meta",
+        "method",
+        "period",
+        "strong",
+        "total_records",
+        "weak"
+      ],
+      "main_collection": {
+        "key": "matched",
+        "records": 444,
+        "record_keys": [
+          "brand",
+          "cur",
+          "custval",
+          "date",
+          "decl",
+          "desc",
+          "dispatch",
+          "exporter",
+          "gross_kg",
+          "hs10",
+          "importer",
+          "incoterms",
+          "inn",
+          "net_kg",
+          "origin",
+          "place",
+          "qty",
+          "statval",
+          "tag",
+          "usd_kg",
+          "val"
+        ]
+      },
+      "last_change": "2026-08-05",
+      "last_author": "skharkov1246",
+      "last_commit": "7db483d",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "выручка и маржа сделок",
+          "участники внешнеэкономических сделок"
+        ]
+      },
+      "referenced_by": []
+    },
+    {
+      "path": "ove/data/questions.json",
+      "subproject": "ОВЭ-75",
+      "bytes": 369764,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "counts",
+        "items",
+        "note",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "items",
+        "records": 403,
+        "record_keys": [
+          "a",
+          "ask",
+          "b",
+          "id",
+          "kind",
+          "lot",
+          "sev",
+          "title",
+          "why"
+        ]
+      },
+      "last_change": "2026-08-28",
+      "last_author": "skharkov1246",
+      "last_commit": "b9efc83",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "ove/build.py",
+        "ove/tools/build_questions.py"
+      ]
+    },
+    {
+      "path": "zip/data/price_records.json",
+      "subproject": "база ЗИП",
+      "bytes": 306460,
+      "note": "",
+      "format": "json",
+      "shape": "список",
+      "records": 618,
+      "record_keys": [
+        "confidence",
+        "country",
+        "created_by",
+        "currency",
+        "exporter",
+        "hs_code",
+        "note",
+        "position_id",
+        "source",
+        "unit_price",
+        "url",
+        "year"
+      ],
+      "last_change": "2026-07-10",
+      "last_author": "skharkov1246",
+      "last_commit": "debbad5",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "участники внешнеэкономических сделок"
+        ]
+      },
+      "referenced_by": [
+        "zip/build.py",
+        "zip/tools/aggregate_customs.py",
+        "zip/tools/aggregate_prices.py",
+        "zip/tools/import_sheet.py",
+        "zip/tools/pilot_order.py",
+        "zip/tools/pilot_pdf.py"
+      ]
+    },
+    {
+      "path": "zip/customs/out/customs_848120_2024-01-01_2024-12-31.json",
+      "subproject": "база ЗИП · таможня",
+      "bytes": 262883,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "country",
+        "fields",
+        "hs",
+        "matched",
+        "meta",
+        "method",
+        "period",
+        "strong",
+        "total_records",
+        "weak"
+      ],
+      "main_collection": {
+        "key": "matched",
+        "records": 302,
+        "record_keys": [
+          "brand",
+          "cur",
+          "custval",
+          "date",
+          "decl",
+          "desc",
+          "dispatch",
+          "exporter",
+          "gross_kg",
+          "hs10",
+          "importer",
+          "incoterms",
+          "inn",
+          "net_kg",
+          "origin",
+          "place",
+          "pn",
+          "qty",
+          "statval",
+          "tag",
+          "usd_kg",
+          "val"
+        ]
+      },
+      "last_change": "2026-07-07",
+      "last_author": "skharkov1246",
+      "last_commit": "4a1bb8c",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "ИНН контрагентов",
+          "выручка и маржа сделок",
+          "участники внешнеэкономических сделок"
+        ]
+      },
+      "referenced_by": []
+    },
+    {
+      "path": "ove/data/bi_lot1.json",
+      "subproject": "ОВЭ-75",
+      "bytes": 260259,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "lot",
+        "name",
+        "sections"
+      ],
+      "main_collection": {
+        "key": "sections",
+        "records": 28,
+        "record_keys": [
+          "body",
+          "gost",
+          "id",
+          "items",
+          "kind",
+          "open",
+          "title"
+        ]
+      },
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "97d8e0c",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "ove/build.py",
+        "ove/site/index.template.html"
+      ]
+    },
+    {
+      "path": "data/budget_snapshot.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 244926,
+      "note": "Бюджеты сделок из Google Drive: заказчик, исполнитель, выручка, закупка, маржа (352 записи, Σ выручки ≈3,9 млрд ₽). Источник — scripts/budget_snapshot.py. Коммерческая тайна: в публичном репозитории быть не должно.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "budgets",
+        "errors",
+        "folder",
+        "generatedAt",
+        "nErrors",
+        "nFiles",
+        "nParsed"
+      ],
+      "main_collection": {
+        "key": "budgets",
+        "records": 352,
+        "record_keys": [
+          "customer",
+          "deal_name",
+          "deal_url",
+          "direct_costs",
+          "direct_costs_net",
+          "drive_id",
+          "drive_title",
+          "executor",
+          "margin_income",
+          "margin_income_net",
+          "margin_norm",
+          "margin_pct",
+          "modified",
+          "op_margin_pct",
+          "op_profit",
+          "op_profit_net",
+          "other_costs",
+          "other_costs_net",
+          "profit_norm",
+          "purchase",
+          "purchase_net",
+          "revenue",
+          "revenue_net",
+          "status"
+        ]
+      },
+      "last_change": "2026-08-06",
+      "last_author": "Claude",
+      "last_commit": "e2eb8a1",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "выручка и маржа сделок",
+          "оценки и данные сотрудников"
+        ]
+      },
+      "referenced_by": [
+        "contracts.py",
+        "gpu/tools/build_targets.py",
+        "scripts/budget_snapshot.py",
+        "templates/dashboard_core.html"
+      ]
+    },
+    {
+      "path": "gt/data/bitrix_gt.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 227883,
+      "note": "Метки «был ли запрос в компанию» из СП-166. Пишет бот gt-bitrix.yml дважды в неделю. Руками не редактировать.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "deals",
+        "live",
+        "offers",
+        "source",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "deals",
+        "records": 216,
+        "record_keys": [
+          "created",
+          "id",
+          "models",
+          "rfqs",
+          "stage",
+          "title"
+        ]
+      },
+      "last_change": "2026-09-03",
+      "last_author": "github-actions[bot]",
+      "last_commit": "b63eab3",
+      "updated_by": "бот (workflow)",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        ".github/workflows/gt-bitrix.yml",
+        "gt/build.py",
+        "gt/tools/bitrix_gt.py",
+        "gt/tools/drop_ru.py"
+      ]
+    },
+    {
+      "path": "ove/data/bi_lot3.json",
+      "subproject": "ОВЭ-75",
+      "bytes": 216664,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "lot",
+        "name",
+        "sections"
+      ],
+      "main_collection": {
+        "key": "sections",
+        "records": 24,
+        "record_keys": [
+          "body",
+          "gost",
+          "id",
+          "items",
+          "kind",
+          "open",
+          "title"
+        ]
+      },
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "97d8e0c",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "ove/build.py",
+        "ove/site/index.template.html"
+      ]
+    },
+    {
+      "path": "gt/data/badge_overrides.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 208188,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "checks",
+        "source",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "checks",
+        "records": 238
+      },
+      "last_change": "2026-08-21",
+      "last_author": "skharkov1246",
+      "last_commit": "c80990f",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/build.py",
+        "gt/tools/apply_badge_checks.py"
+      ]
+    },
+    {
+      "path": "gt/data/plugs_world.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 207204,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "addressees",
+        "anchors",
+        "checks",
+        "crosses",
+        "deals",
+        "demand",
+        "effect",
+        "funnel",
+        "hub_note",
+        "method",
+        "park_notes",
+        "parks",
+        "playbook",
+        "problem",
+        "streams",
+        "tiers",
+        "tiles",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "addressees",
+        "records": 64,
+        "record_keys": [
+          "answer_odds",
+          "ask_mode",
+          "bitrix_note",
+          "bitrix_state",
+          "country",
+          "families",
+          "hub",
+          "name",
+          "parks",
+          "part_numbers",
+          "priority",
+          "route_to_ru",
+          "stream",
+          "tier",
+          "tier_key",
+          "tier_ru",
+          "what_they_have"
+        ]
+      },
+      "last_change": "2026-09-01",
+      "last_author": "Claude",
+      "last_commit": "91b954d",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "адреса электронной почты",
+          "телефоны"
+        ]
+      },
+      "referenced_by": [
+        "gt/tools/build_plugs.py"
+      ]
+    },
+    {
+      "path": "zip/data/material_suppliers.json",
+      "subproject": "база ЗИП",
+      "bytes": 195837,
+      "note": "",
+      "format": "json",
+      "shape": "список",
+      "records": 130,
+      "record_keys": [
+        "capability",
+        "category",
+        "confidence",
+        "contact",
+        "country",
+        "moq",
+        "name",
+        "products",
+        "relevance",
+        "url"
+      ],
+      "last_change": "2026-07-07",
+      "last_author": "skharkov1246",
+      "last_commit": "4a1bb8c",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "zip/build.py"
+      ]
+    },
+    {
+      "path": "gt/data/hot_parts.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 190966,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "positions",
+        "stock",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "positions",
+        "records": 7,
+        "record_keys": [
+          "advice",
+          "candidates",
+          "facts",
+          "key",
+          "man",
+          "model",
+          "name",
+          "pn",
+          "pn_map",
+          "qty",
+          "risks",
+          "unit"
+        ]
+      },
+      "last_change": "2026-08-18",
+      "last_author": "skharkov1246",
+      "last_commit": "e724a48",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "адреса электронной почты"
+        ]
+      },
+      "referenced_by": [
+        "gt/public/hot.html",
+        "gt/tools/build_hot.py",
+        "gt/tools/build_lot.py",
+        "gt/tools/drop_ru.py"
+      ]
+    },
+    {
+      "path": "gidromet/data/marshruty.json",
+      "subproject": "гидрометаллургия",
+      "bytes": 187050,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "boxes",
+        "footnote",
+        "lead",
+        "routes",
+        "sections",
+        "tiles"
+      ],
+      "main_collection": {
+        "key": "routes",
+        "records": 8,
+        "record_keys": [
+          "ag",
+          "au",
+          "cu",
+          "kapital",
+          "minusy",
+          "nazv",
+          "ocenka",
+          "opex",
+          "plyusy",
+          "razdelyaet",
+          "referencii",
+          "sut"
+        ]
+      },
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "9ebf5b2",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gidromet/build.py"
+      ]
+    },
+    {
+      "path": "ove/data/bi_lot2.json",
+      "subproject": "ОВЭ-75",
+      "bytes": 178391,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "lot",
+        "name",
+        "sections"
+      ],
+      "main_collection": {
+        "key": "sections",
+        "records": 25,
+        "record_keys": [
+          "body",
+          "gost",
+          "id",
+          "items",
+          "kind",
+          "open",
+          "title"
+        ]
+      },
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "97d8e0c",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "ove/build.py",
+        "ove/site/index.template.html"
+      ]
+    },
+    {
+      "path": "ove/data/discrepancies.json",
+      "subproject": "ОВЭ-75",
+      "bytes": 173950,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "cats",
+        "items",
+        "note",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "items",
+        "records": 100,
+        "record_keys": [
+          "a",
+          "ask",
+          "b",
+          "cat",
+          "essence",
+          "id",
+          "lot",
+          "sev",
+          "src",
+          "title"
+        ]
+      },
+      "last_change": "2026-08-28",
+      "last_author": "skharkov1246",
+      "last_commit": "b9efc83",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "ove/build.py",
+        "ove/tools/build_disc.py",
+        "ove/tools/build_docx.py",
+        "ove/tools/build_questions.py"
+      ]
+    },
+    {
+      "path": "gt/data/v643a.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 173259,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "companies",
+        "facts",
+        "model",
+        "stock",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "facts",
+        "records": 89,
+        "record_keys": [
+          "claim",
+          "source"
+        ]
+      },
+      "last_change": "2026-08-21",
+      "last_author": "skharkov1246",
+      "last_commit": "c745e02",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "адреса электронной почты",
+          "участники внешнеэкономических сделок"
+        ]
+      },
+      "referenced_by": [
+        "gt/tools/build_v643a.py",
+        "gt/tools/drop_ru.py"
+      ]
+    },
+    {
+      "path": "gt/data/solar.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 168915,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "companies",
+        "facts",
+        "model",
+        "stock",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "facts",
+        "records": 110,
+        "record_keys": [
+          "claim",
+          "cross_check",
+          "source"
+        ]
+      },
+      "last_change": "2026-08-21",
+      "last_author": "skharkov1246",
+      "last_commit": "c745e02",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "адреса электронной почты",
+          "участники внешнеэкономических сделок"
+        ]
+      },
+      "referenced_by": [
+        "gt/tools/build_solar.py",
+        "gt/tools/drop_ru.py"
+      ]
+    },
+    {
+      "path": "ove/data/bi_lot4.json",
+      "subproject": "ОВЭ-75",
+      "bytes": 168033,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "lot",
+        "name",
+        "sections"
+      ],
+      "main_collection": {
+        "key": "sections",
+        "records": 26,
+        "record_keys": [
+          "body",
+          "gost",
+          "id",
+          "items",
+          "kind",
+          "open",
+          "title"
+        ]
+      },
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "97d8e0c",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "ove/build.py",
+        "ove/site/index.template.html"
+      ]
+    },
+    {
+      "path": "gt/data/lm6000.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 162366,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "companies",
+        "facts",
+        "model",
+        "stock",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "facts",
+        "records": 90,
+        "record_keys": [
+          "claim",
+          "source"
+        ]
+      },
+      "last_change": "2026-08-21",
+      "last_author": "skharkov1246",
+      "last_commit": "c745e02",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "адреса электронной почты",
+          "участники внешнеэкономических сделок"
+        ]
+      },
+      "referenced_by": [
+        "gt/tools/build_lm6000.py",
+        "gt/tools/drop_ru.py"
+      ]
+    },
+    {
+      "path": "ove/data/deliverables.json",
+      "subproject": "ОВЭ-75",
+      "bytes": 152249,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "basis",
+        "items",
+        "note",
+        "stages",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "items",
+        "records": 104,
+        "record_keys": [
+          "effect",
+          "group",
+          "id",
+          "intl",
+          "lots",
+          "name",
+          "note",
+          "propose",
+          "refs",
+          "req",
+          "stage",
+          "verdict"
+        ]
+      },
+      "last_change": "2026-08-28",
+      "last_author": "skharkov1246",
+      "last_commit": "b9efc83",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "ove/build.py",
+        "ove/tools/ifc_check.py"
+      ]
+    },
+    {
+      "path": "zip/customs/out/customs_841181_2023-01-01_2026-03-31.json",
+      "subproject": "база ЗИП · таможня",
+      "bytes": 147860,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "country",
+        "fields",
+        "hs",
+        "matched",
+        "meta",
+        "method",
+        "period",
+        "strong",
+        "total_records",
+        "weak"
+      ],
+      "main_collection": {
+        "key": "matched",
+        "records": 163,
+        "record_keys": [
+          "brand",
+          "cur",
+          "custval",
+          "date",
+          "decl",
+          "desc",
+          "dispatch",
+          "exporter",
+          "gross_kg",
+          "hs10",
+          "importer",
+          "incoterms",
+          "inn",
+          "net_kg",
+          "origin",
+          "place",
+          "qty",
+          "statval",
+          "tag",
+          "usd_kg",
+          "val"
+        ]
+      },
+      "last_change": "2026-08-05",
+      "last_author": "skharkov1246",
+      "last_commit": "7db483d",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "выручка и маржа сделок",
+          "участники внешнеэкономических сделок"
+        ]
+      },
+      "referenced_by": []
+    },
+    {
+      "path": "gt/data/bitrix_history.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 141710,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "history",
+        "source",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "history",
+        "records": 231,
+        "record_keys": [
+          "items",
+          "name"
+        ]
+      },
+      "last_change": "2026-08-06",
+      "last_author": "Claude",
+      "last_commit": "9367019",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/build.py",
+        "gt/tools/build_rfq.py",
+        "gt/tools/drop_ru.py"
+      ]
+    },
+    {
+      "path": "ove/data/suppliers.json",
+      "subproject": "ОВЭ-75",
+      "bytes": 139653,
+      "note": "Поставщики проекта ОВЭ-75 с контактами и статусами по лотам.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "legend",
+        "market_notes",
+        "note",
+        "positions",
+        "profiles",
+        "sourcing_rules"
+      ],
+      "main_collection": {
+        "key": "profiles",
+        "records": 114,
+        "record_keys": [
+          "checked",
+          "classes",
+          "contact",
+          "country",
+          "key",
+          "name",
+          "profile",
+          "refs",
+          "site",
+          "src",
+          "zh"
+        ]
+      },
+      "last_change": "2026-08-28",
+      "last_author": "skharkov1246",
+      "last_commit": "b9efc83",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gpu/build.py",
+        "gt/build.py",
+        "gt/tools/build_rfq.py",
+        "gt/tools/drop_ru.py",
+        "ove/build.py",
+        "ove/tools/bitrix_ove.py",
+        "ove/tools/build_rfq.py",
+        "ove/tools/check_tkp.py",
+        "zip/build.py"
+      ]
+    },
+    {
+      "path": "zip/data/competitor_prices.json",
+      "subproject": "база ЗИП",
+      "bytes": 132965,
+      "note": "",
+      "format": "json",
+      "shape": "список",
+      "records": 509,
+      "record_keys": [
+        "catalog_no",
+        "ens",
+        "model",
+        "name",
+        "price_rub",
+        "source",
+        "unit"
+      ],
+      "last_change": "2026-07-05",
+      "last_author": "Claude",
+      "last_commit": "24a0816",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "zip/build.py",
+        "zip/tools/parse_demand.py"
+      ]
+    },
+    {
+      "path": "gpu/data/demand.json",
+      "subproject": "ГПУ-библиотека",
+      "bytes": 127476,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "caveat",
+        "rows",
+        "source",
+        "stats",
+        "systems",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 94,
+        "record_keys": [
+          "basis",
+          "cat",
+          "checks",
+          "conf",
+          "cross",
+          "gap",
+          "lot_hi",
+          "lot_lo",
+          "man",
+          "name",
+          "note",
+          "pn",
+          "qty",
+          "sys",
+          "unit",
+          "url",
+          "usd_hi",
+          "usd_lo"
+        ]
+      },
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "a9fad8a",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gpu/build.py",
+        "gpu/tools/build_demand.py",
+        "gt/public/hot.html",
+        "gt/public/plugs.html",
+        "gt/tools/build_lot_xlsx.py",
+        "gt/tools/build_rfq.py",
+        "zip/build.py",
+        "zip/tools/parse_demand.py"
+      ]
+    },
+    {
+      "path": "gt/data/sgt4000f.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 127021,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "companies",
+        "facts",
+        "model",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "companies",
+        "records": 80,
+        "record_keys": [
+          "ask",
+          "comp",
+          "comps",
+          "country",
+          "email",
+          "evidence",
+          "name",
+          "rank",
+          "relation",
+          "site",
+          "tier",
+          "what"
+        ]
+      },
+      "last_change": "2026-08-21",
+      "last_author": "skharkov1246",
+      "last_commit": "c745e02",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "адреса электронной почты",
+          "участники внешнеэкономических сделок"
+        ]
+      },
+      "referenced_by": [
+        "gt/tools/build_f4000.py",
+        "gt/tools/drop_ru.py"
+      ]
+    },
+    {
+      "path": "gt/data/site_profiles.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 112817,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "profiles",
+        "source",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "profiles",
+        "records": 162
+      },
+      "last_change": "2026-08-18",
+      "last_author": "skharkov1246",
+      "last_commit": "29bc2dc",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/build.py",
+        "gt/tools/drop_ru.py"
+      ]
+    },
+    {
+      "path": "gt/data/sgt400_checklist.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 111620,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "rows",
+        "segments",
+        "source",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 128,
+        "record_keys": [
+          "conf",
+          "country",
+          "email",
+          "name",
+          "phone",
+          "prior",
+          "proof",
+          "seg",
+          "seg_name",
+          "site",
+          "what"
+        ]
+      },
+      "last_change": "2026-08-18",
+      "last_author": "skharkov1246",
+      "last_commit": "5e72d14",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "адреса электронной почты",
+          "телефоны"
+        ]
+      },
+      "referenced_by": [
+        "gt/build.py",
+        "gt/tools/build_rfq.py",
+        "gt/tools/drop_ru.py"
+      ]
+    },
+    {
+      "path": "zip/data/material_process.json",
+      "subproject": "база ЗИП",
+      "bytes": 108254,
+      "note": "",
+      "format": "json",
+      "shape": "список",
+      "records": 7,
+      "record_keys": [
+        "defects",
+        "heat_treat",
+        "node_index",
+        "sources",
+        "summary",
+        "test_protocol"
+      ],
+      "last_change": "2026-07-07",
+      "last_author": "skharkov1246",
+      "last_commit": "4a1bb8c",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "zip/build.py"
+      ]
+    },
+    {
+      "path": "gt/data/ms6001b.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 106907,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "companies",
+        "facts",
+        "model",
+        "stock",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "facts",
+        "records": 95,
+        "record_keys": [
+          "claim",
+          "cross",
+          "source"
+        ]
+      },
+      "last_change": "2026-08-21",
+      "last_author": "skharkov1246",
+      "last_commit": "c745e02",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "адреса электронной почты",
+          "участники внешнеэкономических сделок"
+        ]
+      },
+      "referenced_by": [
+        "gt/tools/build_ms6001b.py",
+        "gt/tools/drop_ru.py"
+      ]
+    },
+    {
+      "path": "ove/data/market.json",
+      "subproject": "ОВЭ-75",
+      "bytes": 105198,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "makeorbuy",
+        "margin",
+        "market",
+        "materials",
+        "partner_method",
+        "summary",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "makeorbuy",
+        "records": 29,
+        "record_keys": [
+          "buy",
+          "cls",
+          "lot",
+          "make_ru",
+          "make_self",
+          "name",
+          "verdict",
+          "why"
+        ]
+      },
+      "last_change": "2026-08-27",
+      "last_author": "skharkov1246",
+      "last_commit": "84ec8e4",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "выручка и маржа сделок"
+        ]
+      },
+      "referenced_by": [
+        "gpu/build.py",
+        "ove/build.py",
+        "zip/build.py",
+        "zip/tools/aggregate_customs.py"
+      ]
+    },
+    {
+      "path": "gt/data/rfq_overrides.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 100333,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "overrides",
+        "source",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "overrides",
+        "records": 160
+      },
+      "last_change": "2026-08-09",
+      "last_author": "Claude",
+      "last_commit": "20aced1",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/build_rfq.py"
+      ]
+    },
+    {
+      "path": "gt/data/rfq_suppliers.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 99515,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "note",
+        "rows",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 87,
+        "record_keys": [
+          "country",
+          "email",
+          "name",
+          "relation",
+          "resp_note",
+          "site",
+          "what"
+        ]
+      },
+      "last_change": "2026-08-08",
+      "last_author": "Claude",
+      "last_commit": "694ee62",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "адреса электронной почты"
+        ]
+      },
+      "referenced_by": [
+        "gt/tools/build_rfq.py",
+        "gt/tools/drop_ru.py"
+      ]
+    },
+    {
+      "path": "zip/customs/out/customs_8466_2025-01-01_2026-03-31.json",
+      "subproject": "база ЗИП · таможня",
+      "bytes": 91930,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "country",
+        "fields",
+        "hs",
+        "matched",
+        "meta",
+        "method",
+        "period",
+        "strong",
+        "total_records",
+        "weak"
+      ],
+      "main_collection": {
+        "key": "matched",
+        "records": 120,
+        "record_keys": [
+          "brand",
+          "cur",
+          "custval",
+          "date",
+          "decl",
+          "desc",
+          "dispatch",
+          "exporter",
+          "gross_kg",
+          "hs10",
+          "importer",
+          "incoterms",
+          "inn",
+          "net_kg",
+          "origin",
+          "place",
+          "qty",
+          "statval",
+          "tag",
+          "usd_kg",
+          "val"
+        ]
+      },
+      "last_change": "2026-07-07",
+      "last_author": "skharkov1246",
+      "last_commit": "4a1bb8c",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "ИНН контрагентов",
+          "выручка и маржа сделок",
+          "участники внешнеэкономических сделок"
+        ]
+      },
+      "referenced_by": []
+    },
+    {
+      "path": "ove/data/alternative.json",
+      "subproject": "ОВЭ-75",
+      "bytes": 89065,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "legal",
+        "matrix",
+        "risks",
+        "summary",
+        "updated",
+        "wording"
+      ],
+      "main_collection": {
+        "key": "legal",
+        "records": 27,
+        "record_keys": [
+          "favors",
+          "quote",
+          "reading",
+          "where"
+        ]
+      },
+      "last_change": "2026-08-13",
+      "last_author": "skharkov1246",
+      "last_commit": "19e30c4",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "ove/build.py"
+      ]
+    },
+    {
+      "path": "zip/data/bom.json",
+      "subproject": "база ЗИП",
+      "bytes": 81322,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "machines",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "machines",
+        "records": 1,
+        "record_keys": [
+          "file",
+          "kits",
+          "name",
+          "parts",
+          "stats"
+        ]
+      },
+      "last_change": "2026-07-09",
+      "last_author": "skharkov1246",
+      "last_commit": "83a1167",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "zip/build.py",
+        "zip/tools/import_bom.py",
+        "zip/tools/pilot_order.py"
+      ]
+    },
+    {
+      "path": "gpu/data/motortech_cross.json",
+      "subproject": "ГПУ-библиотека",
+      "bytes": 79705,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "guides",
+        "records",
+        "source",
+        "stats",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "records",
+        "records": 161,
+        "record_keys": [
+          "cross",
+          "engines",
+          "guide",
+          "kind",
+          "motortech",
+          "oem",
+          "part",
+          "url"
+        ]
+      },
+      "last_change": "2026-08-22",
+      "last_author": "Claude",
+      "last_commit": "f8adae9",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gpu/build.py",
+        "gpu/tools/parse_motortech.py"
+      ]
+    },
+    {
+      "path": "gidromet/data/postav.json",
+      "subproject": "гидрометаллургия",
+      "bytes": 73868,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "blocks",
+        "boxes",
+        "footnote",
+        "lead",
+        "sections",
+        "tiles"
+      ],
+      "main_collection": {
+        "key": "blocks",
+        "records": 18,
+        "record_keys": [
+          "blok",
+          "cn",
+          "critical",
+          "dostupnost",
+          "rf",
+          "sostav",
+          "zamechanie"
+        ]
+      },
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "9ebf5b2",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gidromet/build.py"
+      ]
+    },
+    {
+      "path": "gidromet/data/voprosy.json",
+      "subproject": "гидрометаллургия",
+      "bytes": 66562,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "footnote",
+        "lead",
+        "sections",
+        "tiles"
+      ],
+      "main_collection": {
+        "key": "sections",
+        "records": 7,
+        "record_keys": [
+          "boxes",
+          "h",
+          "table",
+          "text"
+        ]
+      },
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "9ebf5b2",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gidromet/build.py"
+      ]
+    },
+    {
+      "path": "ove/data/zakladki.json",
+      "subproject": "ОВЭ-75",
+      "bytes": 66324,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "items",
+        "note",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "items",
+        "records": 46,
+        "record_keys": [
+          "adresat",
+          "id",
+          "istochnik",
+          "lot",
+          "name",
+          "obosnovanie",
+          "status",
+          "trebovanie",
+          "uzel"
+        ]
+      },
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "97d8e0c",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "ove/build.py",
+        "ove/tools/build_specs.py",
+        "ove/tools/build_zakladki.py",
+        "ove/tools/ol_zakladki.py"
+      ]
+    },
+    {
+      "path": "ove/data/calc.json",
+      "subproject": "ОВЭ-75",
+      "bytes": 66082,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "blocks",
+        "flags",
+        "guarantees",
+        "mc",
+        "note",
+        "summary",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "blocks",
+        "records": 21,
+        "record_keys": [
+          "checks",
+          "concl",
+          "id",
+          "inputs",
+          "lot",
+          "steps",
+          "title"
+        ]
+      },
+      "last_change": "2026-08-28",
+      "last_author": "skharkov1246",
+      "last_commit": "b9efc83",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "ove/build.py",
+        "ove/site/index.template.html",
+        "ove/tools/build_calcnote.py",
+        "ove/tools/build_checklist.py",
+        "ove/tools/calc_ove.py"
+      ]
+    },
+    {
+      "path": "ove/data/software.json",
+      "subproject": "ОВЭ-75",
+      "bytes": 65702,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "components",
+        "constraint",
+        "rates",
+        "strategy",
+        "summary",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "components",
+        "records": 8,
+        "record_keys": [
+          "boxed",
+          "lot",
+          "n",
+          "name",
+          "outsource",
+          "self",
+          "verdict",
+          "what",
+          "why"
+        ]
+      },
+      "last_change": "2026-08-13",
+      "last_author": "skharkov1246",
+      "last_commit": "eec0a61",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "ove/build.py"
+      ]
+    },
+    {
+      "path": "gpu/data/analog_classes.json",
+      "subproject": "ГПУ-библиотека",
+      "bytes": 64931,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "classes",
+        "how",
+        "intro",
+        "updated",
+        "verdicts"
+      ],
+      "main_collection": {
+        "key": "classes",
+        "records": 17,
+        "record_keys": [
+          "ask",
+          "buy",
+          "criteria",
+          "en",
+          "key",
+          "makers",
+          "match",
+          "pitfalls",
+          "title",
+          "verdict",
+          "verdict_why"
+        ]
+      },
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "b15ad17",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gpu/build.py",
+        "gpu/site/index.template.html"
+      ]
+    },
+    {
+      "path": "gidromet/data/syrye.json",
+      "subproject": "гидрометаллургия",
+      "bytes": 63193,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "footnote",
+        "lead",
+        "sections",
+        "tiles"
+      ],
+      "main_collection": {
+        "key": "sections",
+        "records": 9,
+        "record_keys": [
+          "boxes",
+          "h",
+          "table",
+          "text"
+        ]
+      },
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "9ebf5b2",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gidromet/build.py"
+      ]
+    },
+    {
+      "path": "gidromet/data/shema.json",
+      "subproject": "гидрометаллургия",
+      "bytes": 62674,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "footnote",
+        "lead",
+        "sections",
+        "tiles"
+      ],
+      "main_collection": {
+        "key": "tiles",
+        "records": 6,
+        "record_keys": [
+          "c",
+          "tone",
+          "v"
+        ]
+      },
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "9ebf5b2",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gidromet/build.py"
+      ]
+    },
+    {
+      "path": "zip/customs/out/customs_848120_2025-01-01_2026-03-31.json",
+      "subproject": "база ЗИП · таможня",
+      "bytes": 61233,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "country",
+        "fields",
+        "hs",
+        "matched",
+        "meta",
+        "method",
+        "period",
+        "strong",
+        "total_records",
+        "weak"
+      ],
+      "main_collection": {
+        "key": "matched",
+        "records": 77,
+        "record_keys": [
+          "brand",
+          "cur",
+          "custval",
+          "date",
+          "decl",
+          "desc",
+          "dispatch",
+          "exporter",
+          "gross_kg",
+          "hs10",
+          "importer",
+          "incoterms",
+          "inn",
+          "net_kg",
+          "origin",
+          "place",
+          "pn",
+          "qty",
+          "statval",
+          "tag",
+          "usd_kg",
+          "val"
+        ]
+      },
+      "last_change": "2026-07-07",
+      "last_author": "skharkov1246",
+      "last_commit": "4a1bb8c",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "ИНН контрагентов",
+          "выручка и маржа сделок",
+          "участники внешнеэкономических сделок"
+        ]
+      },
+      "referenced_by": []
+    },
+    {
+      "path": "gidromet/data/serebro.json",
+      "subproject": "гидрометаллургия",
+      "bytes": 59946,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "footnote",
+        "lead",
+        "sections",
+        "tiles"
+      ],
+      "main_collection": {
+        "key": "sections",
+        "records": 9,
+        "record_keys": [
+          "boxes",
+          "h",
+          "table",
+          "text"
+        ]
+      },
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "9ebf5b2",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gidromet/build.py"
+      ]
+    },
+    {
+      "path": "gidromet/data/capex.json",
+      "subproject": "гидрометаллургия",
+      "bytes": 59587,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "boxes",
+        "footnote",
+        "lead",
+        "sections",
+        "tiles"
+      ],
+      "main_collection": {
+        "key": "sections",
+        "records": 9,
+        "record_keys": [
+          "h",
+          "table",
+          "text"
+        ]
+      },
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "9ebf5b2",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gidromet/build.py",
+        "ove/build.py"
+      ]
+    },
+    {
+      "path": "gidromet/data/economy.json",
+      "subproject": "гидрометаллургия",
+      "bytes": 59069,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "boxes",
+        "footnote",
+        "lead",
+        "sections",
+        "tiles"
+      ],
+      "main_collection": {
+        "key": "sections",
+        "records": 10,
+        "record_keys": [
+          "h",
+          "table",
+          "text"
+        ]
+      },
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "9ebf5b2",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gidromet/build.py"
+      ]
+    },
+    {
+      "path": "gt/data/bitrix_supplier_sites.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 58488,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "confirmed",
+        "not_found",
+        "source",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "confirmed",
+        "records": 161
+      },
+      "last_change": "2026-08-18",
+      "last_author": "skharkov1246",
+      "last_commit": "29bc2dc",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "адреса электронной почты"
+        ]
+      },
+      "referenced_by": [
+        "gt/build.py",
+        "gt/tools/build_rfq.py",
+        "gt/tools/drop_ru.py"
+      ]
+    },
+    {
+      "path": "gidromet/data/programma.json",
+      "subproject": "гидрометаллургия",
+      "bytes": 58118,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "boxes",
+        "footnote",
+        "lead",
+        "sections",
+        "tiles"
+      ],
+      "main_collection": {
+        "key": "sections",
+        "records": 8,
+        "record_keys": [
+          "boxes",
+          "h",
+          "table",
+          "text"
+        ]
+      },
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "9ebf5b2",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gidromet/build.py"
+      ]
+    },
+    {
+      "path": "gidromet/data/oborud.json",
+      "subproject": "гидрометаллургия",
+      "bytes": 57613,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "footnote",
+        "lead",
+        "sections",
+        "tiles"
+      ],
+      "main_collection": {
+        "key": "sections",
+        "records": 8,
+        "record_keys": [
+          "boxes",
+          "h",
+          "table",
+          "text"
+        ]
+      },
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "9ebf5b2",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gidromet/build.py"
+      ]
+    },
+    {
+      "path": "gpu/data/consumables.json",
+      "subproject": "ГПУ-библиотека",
+      "bytes": 57290,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "buy_matrix",
+        "intro",
+        "oems",
+        "trust",
+        "universal",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "trust",
+        "records": 3
+      },
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "e94cc48",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gpu/build.py"
+      ]
+    },
+    {
+      "path": "gpu/data/machines.json",
+      "subproject": "ГПУ-библиотека",
+      "bytes": 56132,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "how_to_use",
+        "intro",
+        "machines",
+        "updated",
+        "verify_note"
+      ],
+      "main_collection": {
+        "key": "machines",
+        "records": 14,
+        "record_keys": [
+          "key",
+          "model",
+          "oem",
+          "passport",
+          "units",
+          "why"
+        ]
+      },
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "e94cc48",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gpu/build.py"
+      ]
+    },
+    {
+      "path": "ove/data/disc_b.json",
+      "subproject": "ОВЭ-75",
+      "bytes": 55851,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "items",
+        "note",
+        "scope",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "items",
+        "records": 36,
+        "record_keys": [
+          "a",
+          "ask",
+          "b",
+          "cat",
+          "essence",
+          "lot",
+          "sev",
+          "title"
+        ]
+      },
+      "last_change": "2026-08-13",
+      "last_author": "skharkov1246",
+      "last_commit": "d6f5114",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "ove/tools/build_disc.py"
+      ]
+    },
+    {
+      "path": "gt/data/cummins_qsk60.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 54713,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "bitrix",
+        "plan",
+        "positions",
+        "rule",
+        "source",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "bitrix",
+        "records": 7
+      },
+      "last_change": "2026-09-01",
+      "last_author": "Claude",
+      "last_commit": "dc2d3f1",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "адреса электронной почты",
+          "телефоны"
+        ]
+      },
+      "referenced_by": [
+        "gt/tools/build_cummins.py"
+      ]
+    },
+    {
+      "path": "gpu/data/consumption.json",
+      "subproject": "ГПУ-библиотека",
+      "bytes": 54245,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "assumptions",
+        "avg_usd_per_kw_year",
+        "engines",
+        "hours_per_year",
+        "source",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "engines",
+        "records": 10,
+        "record_keys": [
+          "cyl",
+          "gas",
+          "gas_name",
+          "items",
+          "kwe",
+          "model",
+          "oem",
+          "usd_per_kw_year",
+          "usd_per_mwh",
+          "usd_year"
+        ]
+      },
+      "last_change": "2026-08-13",
+      "last_author": "Claude",
+      "last_commit": "13a6b73",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gpu/build.py",
+        "gpu/tools/build_consumption.py",
+        "gpu/tools/build_targets.py"
+      ]
+    },
+    {
+      "path": "gidromet/data/etapy.json",
+      "subproject": "гидрометаллургия",
+      "bytes": 53302,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "footnote",
+        "lead",
+        "sections",
+        "tiles"
+      ],
+      "main_collection": {
+        "key": "sections",
+        "records": 8,
+        "record_keys": [
+          "boxes",
+          "h",
+          "table",
+          "text"
+        ]
+      },
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "9ebf5b2",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gidromet/build.py"
+      ]
+    },
+    {
+      "path": "gidromet/data/balansy.json",
+      "subproject": "гидрометаллургия",
+      "bytes": 53191,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "boxes",
+        "footnote",
+        "lead",
+        "sections",
+        "tiles"
+      ],
+      "main_collection": {
+        "key": "sections",
+        "records": 8,
+        "record_keys": [
+          "boxes",
+          "h",
+          "table",
+          "text"
+        ]
+      },
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "9ebf5b2",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gidromet/build.py"
+      ]
+    },
+    {
+      "path": "gidromet/data/gd.json",
+      "subproject": "гидрометаллургия",
+      "bytes": 53180,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "chisla",
+        "dve_minuty",
+        "esli_sprosyat",
+        "nahodki",
+        "ne_govorit",
+        "podval",
+        "podzagolovok",
+        "poryadok",
+        "slovar",
+        "stavka",
+        "sut",
+        "vozrazheniya",
+        "zagolovok"
+      ],
+      "main_collection": {
+        "key": "nahodki",
+        "records": 3
+      },
+      "last_change": "2026-09-02",
+      "last_author": "skharkov1246",
+      "last_commit": "b0c4b18",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gidromet/tools/spravka_gd.py"
+      ]
+    },
+    {
+      "path": "ove/data/reframe.json",
+      "subproject": "ОВЭ-75",
+      "bytes": 51773,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "facts",
+        "matrix_changes",
+        "newframe",
+        "summary",
+        "updated",
+        "verdict",
+        "wording"
+      ],
+      "main_collection": {
+        "key": "facts",
+        "records": 8,
+        "record_keys": [
+          "checked",
+          "claim",
+          "detail",
+          "kind",
+          "src",
+          "status"
+        ]
+      },
+      "last_change": "2026-08-27",
+      "last_author": "skharkov1246",
+      "last_commit": "84ec8e4",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gidromet/build.py",
+        "ove/build.py"
+      ]
+    },
+    {
+      "path": "ove/data/tianxin.json",
+      "subproject": "ОВЭ-75",
+      "bytes": 51045,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "coverage",
+        "letter",
+        "name",
+        "profile",
+        "refs",
+        "request_docs",
+        "risks",
+        "role",
+        "summary",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "profile",
+        "records": 16,
+        "record_keys": [
+          "checked",
+          "fact",
+          "kind",
+          "src"
+        ]
+      },
+      "last_change": "2026-08-13",
+      "last_author": "skharkov1246",
+      "last_commit": "19e30c4",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "ove/build.py"
+      ]
+    },
+    {
+      "path": "gidromet/data/pirrotin.json",
+      "subproject": "гидрометаллургия",
+      "bytes": 50636,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "footnote",
+        "lead",
+        "sections",
+        "tiles"
+      ],
+      "main_collection": {
+        "key": "sections",
+        "records": 8,
+        "record_keys": [
+          "boxes",
+          "h",
+          "table",
+          "text"
+        ]
+      },
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "9ebf5b2",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gidromet/build.py"
+      ]
+    },
+    {
+      "path": "gt/data/pn_catalog.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 49641,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "format_notes",
+        "rows",
+        "source",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 187,
+        "record_keys": [
+          "desc",
+          "model",
+          "pn",
+          "source",
+          "system"
+        ]
+      },
+      "last_change": "2026-08-06",
+      "last_author": "Claude",
+      "last_commit": "9ec3b40",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/build.py"
+      ]
+    },
+    {
+      "path": "gidromet/data/nic.json",
+      "subproject": "гидрометаллургия",
+      "bytes": 49265,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "boxes",
+        "footnote",
+        "lead",
+        "sections",
+        "tiles"
+      ],
+      "main_collection": {
+        "key": "sections",
+        "records": 9,
+        "record_keys": [
+          "boxes",
+          "h",
+          "table",
+          "text"
+        ]
+      },
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "9ebf5b2",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gidromet/build.py"
+      ]
+    },
+    {
+      "path": "gidromet/data/project.json",
+      "subproject": "гидрометаллургия",
+      "bytes": 48385,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "boxes",
+        "footnote",
+        "lead",
+        "sections",
+        "tiles"
+      ],
+      "main_collection": {
+        "key": "sections",
+        "records": 7,
+        "record_keys": [
+          "h",
+          "table",
+          "text"
+        ]
+      },
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "9ebf5b2",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gidromet/build.py",
+        "gidromet/site/index.template.html",
+        "ove/build.py",
+        "ove/tools/build_specs.py",
+        "ove/tools/build_zakladki.py"
+      ]
+    },
+    {
+      "path": "ove/data/hedge.json",
+      "subproject": "ОВЭ-75",
+      "bytes": 47959,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "items",
+        "note",
+        "tone",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "items",
+        "records": 20,
+        "record_keys": [
+          "alt",
+          "ask",
+          "basis",
+          "id",
+          "kind",
+          "lots",
+          "note",
+          "quote",
+          "title",
+          "tz"
+        ]
+      },
+      "last_change": "2026-08-28",
+      "last_author": "skharkov1246",
+      "last_commit": "b9efc83",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "ove/build.py"
+      ]
+    },
+    {
+      "path": "gidromet/data/proverka.json",
+      "subproject": "гидрометаллургия",
+      "bytes": 47526,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "boxes",
+        "footnote",
+        "lead",
+        "sections",
+        "tiles"
+      ],
+      "main_collection": {
+        "key": "sections",
+        "records": 8,
+        "record_keys": [
+          "h",
+          "table",
+          "text"
+        ]
+      },
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "9ebf5b2",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gidromet/build.py"
+      ]
+    },
+    {
+      "path": "zip/data/customs_market.json",
+      "subproject": "база ЗИП",
+      "bytes": 46205,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "by_hs4",
+        "hs",
+        "note",
+        "oem_direct",
+        "perforator",
+        "source",
+        "strong_linked",
+        "updated",
+        "watched"
+      ],
+      "main_collection": {
+        "key": "oem_direct",
+        "records": 120,
+        "record_keys": [
+          "desc",
+          "exporter",
+          "importer",
+          "origin",
+          "usd_kg",
+          "year"
+        ]
+      },
+      "last_change": "2026-07-09",
+      "last_author": "skharkov1246",
+      "last_commit": "6bf8795",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "участники внешнеэкономических сделок"
+        ]
+      },
+      "referenced_by": [
+        "zip/build.py",
+        "zip/tools/aggregate_customs.py"
+      ]
+    },
+    {
+      "path": "gpu/data/analogs.json",
+      "subproject": "ГПУ-библиотека",
+      "bytes": 46047,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "families",
+        "rules",
+        "source",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "families",
+        "records": 19,
+        "record_keys": [
+          "analogs",
+          "check",
+          "fits",
+          "id",
+          "oem",
+          "oem_pns",
+          "our_qty",
+          "risk",
+          "sys",
+          "title"
+        ]
+      },
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "e94cc48",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gpu/build.py"
+      ]
+    },
+    {
+      "path": "gidromet/data/scenarii.json",
+      "subproject": "гидрометаллургия",
+      "bytes": 45327,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "boxes",
+        "footnote",
+        "lead",
+        "sections",
+        "tiles"
+      ],
+      "main_collection": {
+        "key": "sections",
+        "records": 8,
+        "record_keys": [
+          "boxes",
+          "h",
+          "table",
+          "text"
+        ]
+      },
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "9ebf5b2",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gidromet/build.py"
+      ]
+    },
+    {
+      "path": "ove/data/equipment.json",
+      "subproject": "ОВЭ-75",
+      "bytes": 44892,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "items",
+        "normalization",
+        "source",
+        "status_legend"
+      ],
+      "main_collection": {
+        "key": "items",
+        "records": 70,
+        "record_keys": [
+          "area",
+          "dims",
+          "lot",
+          "material",
+          "model",
+          "name",
+          "param",
+          "power",
+          "purpose",
+          "qty",
+          "status"
+        ]
+      },
+      "last_change": "2026-08-13",
+      "last_author": "skharkov1246",
+      "last_commit": "ad744ff",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "ove/build.py",
+        "ove/tools/build_rfq.py",
+        "ove/tools/build_specs.py",
+        "ove/tools/calc_ove.py",
+        "ove/tools/check_tkp.py",
+        "ove/tools/equip2ifc.py"
+      ]
+    },
+    {
+      "path": "gpu/data/suppliers.json",
+      "subproject": "ГПУ-библиотека",
+      "bytes": 43463,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "companies",
+        "rating_model",
+        "source",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "companies",
+        "records": 37,
+        "record_keys": [
+          "aliases",
+          "channel",
+          "country",
+          "depth",
+          "email",
+          "name",
+          "oem",
+          "proof",
+          "proof_note",
+          "reach",
+          "region",
+          "site",
+          "speed",
+          "stock",
+          "sys",
+          "type",
+          "what"
+        ]
+      },
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "e94cc48",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "адреса электронной почты"
+        ]
+      },
+      "referenced_by": [
+        "gpu/build.py",
+        "gt/build.py",
+        "gt/tools/build_rfq.py",
+        "gt/tools/drop_ru.py",
+        "ove/build.py",
+        "ove/tools/bitrix_ove.py",
+        "ove/tools/build_rfq.py",
+        "ove/tools/check_tkp.py",
+        "zip/build.py"
+      ]
+    },
+    {
+      "path": "ove/data/partner.json",
+      "subproject": "ОВЭ-75",
+      "bytes": 42682,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "already_contacted",
+        "candidates",
+        "decision",
+        "docs_to_request",
+        "owner_decision",
+        "risks",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "already_contacted",
+        "records": 14,
+        "record_keys": [
+          "classes",
+          "company",
+          "note"
+        ]
+      },
+      "last_change": "2026-08-13",
+      "last_author": "skharkov1246",
+      "last_commit": "19e30c4",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "ove/build.py"
+      ]
+    },
+    {
+      "path": "gidromet/data/gonorar.json",
+      "subproject": "гидрометаллургия",
+      "bytes": 41939,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "boxes",
+        "footnote",
+        "lead",
+        "sections",
+        "tiles"
+      ],
+      "main_collection": {
+        "key": "sections",
+        "records": 7,
+        "record_keys": [
+          "boxes",
+          "h",
+          "table",
+          "text"
+        ]
+      },
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "9ebf5b2",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gidromet/build.py"
+      ]
+    },
+    {
+      "path": "zip/customs/out/customs_841182_2023-01-01_2026-03-31.json",
+      "subproject": "база ЗИП · таможня",
+      "bytes": 41550,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "country",
+        "fields",
+        "hs",
+        "matched",
+        "meta",
+        "method",
+        "period",
+        "strong",
+        "total_records",
+        "weak"
+      ],
+      "main_collection": {
+        "key": "fields",
+        "records": 53
+      },
+      "last_change": "2026-08-05",
+      "last_author": "skharkov1246",
+      "last_commit": "7db483d",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "выручка и маржа сделок",
+          "участники внешнеэкономических сделок"
+        ]
+      },
+      "referenced_by": []
+    },
+    {
+      "path": "ove/data/competitor.json",
+      "subproject": "ОВЭ-75",
+      "bytes": 41495,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "corrections",
+        "hatch",
+        "implications",
+        "in_tender",
+        "our_moves",
+        "profile",
+        "publish",
+        "publish_note",
+        "strength",
+        "subject",
+        "summary",
+        "updated",
+        "weakness"
+      ],
+      "main_collection": {
+        "key": "profile",
+        "records": 13,
+        "record_keys": [
+          "checked",
+          "fact",
+          "kind",
+          "src"
+        ]
+      },
+      "last_change": "2026-08-13",
+      "last_author": "skharkov1246",
+      "last_commit": "19e30c4",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "ove/build.py"
+      ]
+    },
+    {
+      "path": "gidromet/data/reframe.json",
+      "subproject": "гидрометаллургия",
+      "bytes": 41469,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "boxes",
+        "footnote",
+        "lead",
+        "sections",
+        "tiles"
+      ],
+      "main_collection": {
+        "key": "sections",
+        "records": 8,
+        "record_keys": [
+          "h",
+          "table",
+          "text"
+        ]
+      },
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "9ebf5b2",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gidromet/build.py",
+        "ove/build.py"
+      ]
+    },
+    {
+      "path": "gidromet/data/decision.json",
+      "subproject": "гидрометаллургия",
+      "bytes": 40502,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "footnote",
+        "lead",
+        "sections",
+        "tiles"
+      ],
+      "main_collection": {
+        "key": "sections",
+        "records": 7,
+        "record_keys": [
+          "boxes",
+          "h",
+          "table",
+          "text"
+        ]
+      },
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "9ebf5b2",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gidromet/build.py"
+      ]
+    },
+    {
+      "path": "ove/data/disc_a.json",
+      "subproject": "ОВЭ-75",
+      "bytes": 38724,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "items",
+        "scope",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "items",
+        "records": 27,
+        "record_keys": [
+          "a",
+          "ask",
+          "b",
+          "cat",
+          "essence",
+          "lot",
+          "sev",
+          "title"
+        ]
+      },
+      "last_change": "2026-08-13",
+      "last_author": "skharkov1246",
+      "last_commit": "d6f5114",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "ove/tools/build_disc.py"
+      ]
+    },
+    {
+      "path": "zip/data/material_strategy.json",
+      "subproject": "база ЗИП",
+      "bytes": 38294,
+      "note": "",
+      "format": "json",
+      "shape": "список",
+      "records": 7,
+      "record_keys": [
+        "alt_material",
+        "alt_treatment",
+        "expected_gain",
+        "oem_material",
+        "oem_treatment",
+        "part_class",
+        "rationale",
+        "sources"
+      ],
+      "last_change": "2026-07-05",
+      "last_author": "Claude",
+      "last_commit": "61663d1",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "zip/build.py"
+      ]
+    },
+    {
+      "path": "ove/data/disc_c.json",
+      "subproject": "ОВЭ-75",
+      "bytes": 35757,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "items",
+        "scope",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "items",
+        "records": 20,
+        "record_keys": [
+          "a",
+          "ask",
+          "b",
+          "cat",
+          "essence",
+          "id",
+          "lot",
+          "sev",
+          "title"
+        ]
+      },
+      "last_change": "2026-08-13",
+      "last_author": "skharkov1246",
+      "last_commit": "d6f5114",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "ove/tools/build_disc.py"
+      ]
+    },
+    {
+      "path": "ove/data/bi_register.json",
+      "subproject": "ОВЭ-75",
+      "bytes": 33887,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "note",
+        "rev",
+        "rows"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 65,
+        "record_keys": [
+          "code",
+          "contents_from",
+          "drop_head",
+          "gantt",
+          "kind",
+          "lot",
+          "source",
+          "sources",
+          "stage",
+          "status",
+          "title",
+          "tz"
+        ]
+      },
+      "last_change": "2026-09-03",
+      "last_author": "skharkov1246",
+      "last_commit": "9d0b92c",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "ove/tools/bi_check.py",
+        "ove/tools/build_release.py",
+        "ove/tools/docframe.py"
+      ]
+    },
+    {
+      "path": "ove/data/bi_docs.json",
+      "subproject": "ОВЭ-75",
+      "bytes": 33566,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "lots",
+        "note",
+        "rev",
+        "statuses",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "lots",
+        "records": 5,
+        "record_keys": [
+          "docs",
+          "lot",
+          "name"
+        ]
+      },
+      "last_change": "2026-09-03",
+      "last_author": "skharkov1246",
+      "last_commit": "9d0b92c",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "ove/build.py",
+        "ove/tools/build_paket.py",
+        "ove/tools/build_release.py"
+      ]
+    },
+    {
+      "path": "ove/data/automation.json",
+      "subproject": "ОВЭ-75",
+      "bytes": 32384,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "approved",
+        "docs",
+        "metrology",
+        "ml_requirement",
+        "network",
+        "power",
+        "protection",
+        "source",
+        "systems"
+      ],
+      "main_collection": {
+        "key": "protection",
+        "records": 11
+      },
+      "last_change": "2026-08-13",
+      "last_author": "skharkov1246",
+      "last_commit": "d677c21",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "ove/build.py",
+        "ove/site/index.template.html"
+      ]
+    },
+    {
+      "path": "gt/data/suppliers.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 32218,
+      "note": "",
+      "format": "json",
+      "shape": "список",
+      "records": 38,
+      "record_keys": [
+        "cats",
+        "city",
+        "country",
+        "email",
+        "families",
+        "models",
+        "name",
+        "note",
+        "phone",
+        "profile",
+        "role",
+        "ru_buyers",
+        "shipments",
+        "site",
+        "tier",
+        "verified",
+        "years"
+      ],
+      "last_change": "2026-08-06",
+      "last_author": "Claude",
+      "last_commit": "d6897e3",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "адреса электронной почты",
+          "телефоны"
+        ]
+      },
+      "referenced_by": [
+        "gpu/build.py",
+        "gt/build.py",
+        "gt/tools/build_rfq.py",
+        "gt/tools/drop_ru.py",
+        "ove/build.py",
+        "ove/tools/bitrix_ove.py",
+        "ove/tools/build_rfq.py",
+        "ove/tools/check_tkp.py",
+        "zip/build.py"
+      ]
+    },
+    {
+      "path": "ove/data/tender.json",
+      "subproject": "ОВЭ-75",
+      "bytes": 31688,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "actions",
+        "basis",
+        "checklist",
+        "lots_summary",
+        "platform",
+        "questions_to_customer",
+        "risks",
+        "strategy",
+        "title"
+      ],
+      "main_collection": {
+        "key": "actions",
+        "records": 11,
+        "record_keys": [
+          "done",
+          "owner",
+          "what",
+          "when"
+        ]
+      },
+      "last_change": "2026-08-27",
+      "last_author": "skharkov1246",
+      "last_commit": "84ec8e4",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "ove/build.py",
+        "ove/tools/build_docx.py",
+        "ove/tools/build_questions.py"
+      ]
+    },
+    {
+      "path": "gt/data/removed_ru.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 31270,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "items",
+        "reason",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "items",
+        "records": 189,
+        "record_keys": [
+          "country",
+          "file",
+          "name",
+          "site"
+        ]
+      },
+      "last_change": "2026-08-18",
+      "last_author": "skharkov1246",
+      "last_commit": "a51e700",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/drop_ru.py"
+      ]
+    },
+    {
+      "path": "zip/data/supplier_crm.json",
+      "subproject": "база ЗИП",
+      "bytes": 30784,
+      "note": "CRM поставщиков базы ЗИП: стадии переговоров, комментарии, контакты.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "calls",
+        "suppliers",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "suppliers",
+        "records": 30,
+        "record_keys": [
+          "comments",
+          "contacts",
+          "direction",
+          "geo",
+          "kind",
+          "last_comm",
+          "name",
+          "stage",
+          "waiting"
+        ]
+      },
+      "last_change": "2026-07-09",
+      "last_author": "skharkov1246",
+      "last_commit": "8cdaf8d",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "телефоны"
+        ]
+      },
+      "referenced_by": [
+        "zip/build.py",
+        "zip/tools/import_sheet.py"
+      ]
+    },
+    {
+      "path": "gidromet/data/razvilki.json",
+      "subproject": "гидрометаллургия",
+      "bytes": 29953,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "boxes",
+        "footnote",
+        "lead",
+        "razvilki",
+        "sections",
+        "tiles"
+      ],
+      "main_collection": {
+        "key": "tiles",
+        "records": 6,
+        "record_keys": [
+          "c",
+          "v"
+        ]
+      },
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "d7311e6",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gidromet/build.py",
+        "gidromet/tools/vedomost.py"
+      ]
+    },
+    {
+      "path": "ove/data/bim_plan.json",
+      "subproject": "ОВЭ-75",
+      "bytes": 29882,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "cde",
+        "checks",
+        "checks_note",
+        "cycle",
+        "goal",
+        "models",
+        "models_note",
+        "note",
+        "open",
+        "roles",
+        "scope",
+        "sources",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "cde",
+        "records": 13
+      },
+      "last_change": "2026-08-27",
+      "last_author": "skharkov1246",
+      "last_commit": "5aa78f3",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "ove/tools/build_bim_plan.py",
+        "ove/tools/ifc_check.py"
+      ]
+    },
+    {
+      "path": "ove/data/eco_prelim.json",
+      "subproject": "ОВЭ-75",
+      "bytes": 28621,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "note",
+        "sections",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "sections",
+        "records": 4,
+        "record_keys": [
+          "items",
+          "note",
+          "title"
+        ]
+      },
+      "last_change": "2026-08-28",
+      "last_author": "skharkov1246",
+      "last_commit": "b9efc83",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "ove/build.py"
+      ]
+    },
+    {
+      "path": "gpu/data/glossary.json",
+      "subproject": "ГПУ-библиотека",
+      "bytes": 28517,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "groups",
+        "intro",
+        "rule",
+        "source",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "groups",
+        "records": 5,
+        "record_keys": [
+          "intro",
+          "key",
+          "terms",
+          "title"
+        ]
+      },
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "e94cc48",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gpu/build.py",
+        "gpu/tools/lexicon.py"
+      ]
+    },
+    {
+      "path": "ove/data/lots.json",
+      "subproject": "ОВЭ-75",
+      "bytes": 28072,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "appendices",
+        "common_gr",
+        "common_pz",
+        "cost_req",
+        "lots",
+        "objects",
+        "other_terms"
+      ],
+      "main_collection": {
+        "key": "common_gr",
+        "records": 13
+      },
+      "last_change": "2026-08-13",
+      "last_author": "skharkov1246",
+      "last_commit": "d677c21",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "ove/build.py",
+        "ove/tools/build_specs.py"
+      ]
+    },
+    {
+      "path": "ove/data/capex.json",
+      "subproject": "ОВЭ-75",
+      "bytes": 27779,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "benchmark",
+        "disclaimer",
+        "equipment",
+        "nonequip",
+        "notes",
+        "params"
+      ],
+      "main_collection": {
+        "key": "equipment",
+        "records": 42,
+        "record_keys": [
+          "base",
+          "basis",
+          "conf",
+          "high",
+          "lot",
+          "low",
+          "name",
+          "qty"
+        ]
+      },
+      "last_change": "2026-08-28",
+      "last_author": "skharkov1246",
+      "last_commit": "b9efc83",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gidromet/build.py",
+        "ove/build.py"
+      ]
+    },
+    {
+      "path": "zip/data/demand.json",
+      "subproject": "база ЗИП",
+      "bytes": 27663,
+      "note": "",
+      "format": "json",
+      "shape": "список",
+      "records": 64,
+      "record_keys": [
+        "currency",
+        "customer",
+        "delivery",
+        "enn",
+        "fact_rub",
+        "import_value",
+        "name",
+        "oem",
+        "plan_cost_rub",
+        "plant",
+        "price_rub",
+        "qty",
+        "supplier",
+        "year"
+      ],
+      "last_change": "2026-07-05",
+      "last_author": "Claude",
+      "last_commit": "24a0816",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gpu/build.py",
+        "gpu/tools/build_demand.py",
+        "gt/public/hot.html",
+        "gt/public/plugs.html",
+        "gt/tools/build_lot_xlsx.py",
+        "gt/tools/build_rfq.py",
+        "zip/build.py",
+        "zip/tools/parse_demand.py"
+      ]
+    },
+    {
+      "path": "ove/data/revisions.json",
+      "subproject": "ОВЭ-75",
+      "bytes": 27399,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "revisions"
+      ],
+      "main_collection": {
+        "key": "revisions",
+        "records": 4,
+        "record_keys": [
+          "counts",
+          "date",
+          "files",
+          "id",
+          "label",
+          "note",
+          "removed"
+        ]
+      },
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "97d8e0c",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "ove/build.py",
+        "ove/tools/revisions.py"
+      ]
+    },
+    {
+      "path": "gpu/data/subsuppliers.json",
+      "subproject": "ГПУ-библиотека",
+      "bytes": 25012,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "confidence_legend",
+        "key_rule",
+        "source",
+        "systems",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "systems",
+        "records": 12,
+        "record_keys": [
+          "makers",
+          "name",
+          "sys",
+          "why"
+        ]
+      },
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "e94cc48",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gpu/build.py",
+        "gt/build.py",
+        "gt/tools/build_rfq.py",
+        "gt/tools/drop_ru.py"
+      ]
+    },
+    {
+      "path": "ove/data/audit_log.json",
+      "subproject": "ОВЭ-75",
+      "bytes": 21236,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "items",
+        "note",
+        "stats",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "items",
+        "records": 31,
+        "record_keys": [
+          "fix",
+          "sev",
+          "status",
+          "what",
+          "zone"
+        ]
+      },
+      "last_change": "2026-08-28",
+      "last_author": "skharkov1246",
+      "last_commit": "b9efc83",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "ove/build.py"
+      ]
+    },
+    {
+      "path": "ove/data/bitrix_ove.json",
+      "subproject": "ОВЭ-75",
+      "bytes": 20614,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "classes",
+        "companies",
+        "deal",
+        "live",
+        "n_rfq",
+        "pool",
+        "source",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "companies",
+        "records": 62,
+        "record_keys": [
+          "classes",
+          "last",
+          "n",
+          "name"
+        ]
+      },
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "3e32e6d",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        ".github/workflows/ove-deploy.yml",
+        "ove/build.py",
+        "ove/tools/bitrix_ove.py"
+      ]
+    },
+    {
+      "path": "gpu/data/models.json",
+      "subproject": "ГПУ-библиотека",
+      "bytes": 20045,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "adjacent",
+        "oems",
+        "rule",
+        "source",
+        "spec_note",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "adjacent",
+        "records": 9,
+        "record_keys": [
+          "line",
+          "name",
+          "why"
+        ]
+      },
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "e94cc48",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gpu/build.py",
+        "gt/build.py"
+      ]
+    },
+    {
+      "path": "gpu/data/fleet.json",
+      "subproject": "ГПУ-библиотека",
+      "bytes": 19970,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "anchors",
+        "estimate",
+        "how_to_complete",
+        "insight",
+        "intro",
+        "objects",
+        "source",
+        "status",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "objects",
+        "records": 49,
+        "record_keys": [
+          "mw",
+          "name",
+          "note",
+          "owner",
+          "seg",
+          "status"
+        ]
+      },
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "e94cc48",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "gpu/build.py",
+        "gpu/tools/build_targets.py"
+      ]
+    },
+    {
+      "path": "gpu/data/targets.json",
+      "subproject": "ГПУ-библиотека",
+      "bytes": 19306,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "caveat",
+        "item_names",
+        "per_kw",
+        "source",
+        "targets",
+        "totals",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "item_names",
+        "records": 18
+      },
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "e94cc48",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "gpu/build.py",
+        "gpu/tools/build_targets.py"
+      ]
+    },
+    {
+      "path": "gpu/data/parts.json",
+      "subproject": "ГПУ-библиотека",
+      "bytes": 16417,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "intervals",
+        "intervals_note",
+        "source",
+        "systems",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "systems",
+        "records": 14,
+        "record_keys": [
+          "crit",
+          "en",
+          "items",
+          "key",
+          "name"
+        ]
+      },
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "e94cc48",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "gpu/build.py",
+        "gt/build.py",
+        "gt/public/hot.html",
+        "gt/tools/build_hot.py",
+        "gt/tools/build_lot.py",
+        "gt/tools/drop_ru.py"
+      ]
+    },
+    {
+      "path": "gt/data/heavy_suppliers.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 16318,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "rows",
+        "source",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 24,
+        "record_keys": [
+          "city",
+          "conf",
+          "country",
+          "email",
+          "name",
+          "phone",
+          "role",
+          "site",
+          "what"
+        ]
+      },
+      "last_change": "2026-08-18",
+      "last_author": "skharkov1246",
+      "last_commit": "29bc2dc",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "адреса электронной почты",
+          "телефоны"
+        ]
+      },
+      "referenced_by": [
+        "gt/build.py",
+        "gt/tools/build_rfq.py",
+        "gt/tools/drop_ru.py"
+      ]
+    },
+    {
+      "path": "ove/data/world.json",
+      "subproject": "ОВЭ-75",
+      "bytes": 16177,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "analogues",
+        "honesty",
+        "lessons",
+        "tech_position",
+        "vendor_classes"
+      ],
+      "main_collection": {
+        "key": "vendor_classes",
+        "records": 11,
+        "record_keys": [
+          "class",
+          "note",
+          "world"
+        ]
+      },
+      "last_change": "2026-08-13",
+      "last_author": "skharkov1246",
+      "last_commit": "d677c21",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/build_plugs.py",
+        "ove/build.py"
+      ]
+    },
+    {
+      "path": "zip/data/sheet_meta.json",
+      "subproject": "база ЗИП",
+      "bytes": 15351,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "10",
+        "11",
+        "12",
+        "13",
+        "14",
+        "15",
+        "16",
+        "17",
+        "18",
+        "19",
+        "20",
+        "21",
+        "22",
+        "23",
+        "24",
+        "25",
+        "26",
+        "27",
+        "28",
+        "29",
+        "3",
+        "30",
+        "31",
+        "32",
+        "33",
+        "34",
+        "35",
+        "36",
+        "37",
+        "38",
+        "39",
+        "4",
+        "40",
+        "41",
+        "42",
+        "43",
+        "44",
+        "45",
+        "46",
+        "47"
+      ],
+      "main_collection": {
+        "key": "3",
+        "records": 6
+      },
+      "last_change": "2026-07-09",
+      "last_author": "skharkov1246",
+      "last_commit": "e572127",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "zip/build.py",
+        "zip/tools/import_sheet.py"
+      ]
+    },
+    {
+      "path": "ove/data/china.json",
+      "subproject": "ОВЭ-75",
+      "bytes": 15154,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "epc",
+        "equipment",
+        "gaps",
+        "honesty",
+        "playbook",
+        "why"
+      ],
+      "main_collection": {
+        "key": "gaps",
+        "records": 5,
+        "record_keys": [
+          "action",
+          "class",
+          "status"
+        ]
+      },
+      "last_change": "2026-08-27",
+      "last_author": "skharkov1246",
+      "last_commit": "84ec8e4",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "ove/build.py"
+      ]
+    },
+    {
+      "path": "gpu/data/strategy.json",
+      "subproject": "ГПУ-библиотека",
+      "bytes": 14056,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "metrics",
+        "plan_90",
+        "principles",
+        "supplier_funnel",
+        "thesis",
+        "trial_protocol",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "metrics",
+        "records": 7,
+        "record_keys": [
+          "name",
+          "now",
+          "q1",
+          "why"
+        ]
+      },
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "e94cc48",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "gpu/build.py",
+        "zip/build.py"
+      ]
+    },
+    {
+      "path": "ove/data/stages.json",
+      "subproject": "ОВЭ-75",
+      "bytes": 12725,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "bi_workflow",
+        "note",
+        "stages"
+      ],
+      "main_collection": {
+        "key": "bi_workflow",
+        "records": 10,
+        "record_keys": [
+          "step",
+          "what"
+        ]
+      },
+      "last_change": "2026-08-28",
+      "last_author": "skharkov1246",
+      "last_commit": "b9efc83",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "ove/build.py"
+      ]
+    },
+    {
+      "path": "ove/data/project.json",
+      "subproject": "ОВЭ-75",
+      "bytes": 12655,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "background",
+        "byproducts",
+        "code",
+        "contract_id",
+        "customer",
+        "executor",
+        "feed",
+        "genproject",
+        "group",
+        "history_refs",
+        "id_author",
+        "intermediate",
+        "location",
+        "losses",
+        "product",
+        "regimes",
+        "short",
+        "site",
+        "title",
+        "tz_version"
+      ],
+      "main_collection": {
+        "key": "site",
+        "records": 12
+      },
+      "last_change": "2026-08-28",
+      "last_author": "skharkov1246",
+      "last_commit": "b9efc83",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "оценки и данные сотрудников"
+        ]
+      },
+      "referenced_by": [
+        "gidromet/build.py",
+        "gidromet/site/index.template.html",
+        "ove/build.py",
+        "ove/tools/build_specs.py",
+        "ove/tools/build_zakladki.py"
+      ]
+    },
+    {
+      "path": "gpu/data/channels.json",
+      "subproject": "ГПУ-библиотека",
+      "bytes": 12627,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "intro",
+        "playbook",
+        "principle",
+        "routes",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "routes",
+        "records": 8,
+        "record_keys": [
+          "goods",
+          "how",
+          "key",
+          "name",
+          "players",
+          "risks",
+          "score",
+          "why"
+        ]
+      },
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "e94cc48",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "gpu/build.py"
+      ]
+    },
+    {
+      "path": "ove/data/flowsheet.json",
+      "subproject": "ОВЭ-75",
+      "bytes": 12389,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "chain",
+        "source",
+        "streams"
+      ],
+      "main_collection": {
+        "key": "streams",
+        "records": 17,
+        "record_keys": [
+          "from",
+          "qty",
+          "to",
+          "what"
+        ]
+      },
+      "last_change": "2026-08-13",
+      "last_author": "skharkov1246",
+      "last_commit": "d677c21",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "ove/build.py"
+      ]
+    },
+    {
+      "path": "gt/data/models.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 11790,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "families",
+        "note"
+      ],
+      "main_collection": {
+        "key": "families",
+        "records": 4,
+        "record_keys": [
+          "history",
+          "id",
+          "models",
+          "title"
+        ]
+      },
+      "last_change": "2026-08-06",
+      "last_author": "Claude",
+      "last_commit": "d6897e3",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "gpu/build.py",
+        "gt/build.py"
+      ]
+    },
+    {
+      "path": "gpu/data/playbook.json",
+      "subproject": "ГПУ-библиотека",
+      "bytes": 11381,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "flow",
+        "intro",
+        "questions_to_customer",
+        "red_flags_supplier",
+        "templates",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "questions_to_customer",
+        "records": 8
+      },
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "e94cc48",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "gpu/build.py"
+      ]
+    },
+    {
+      "path": "ove/data/bi_release.json",
+      "subproject": "ОВЭ-75",
+      "bytes": 11128,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "date",
+        "docs",
+        "failed",
+        "rev"
+      ],
+      "main_collection": {
+        "key": "docs",
+        "records": 65,
+        "record_keys": [
+          "code",
+          "docx",
+          "pdf",
+          "src"
+        ]
+      },
+      "last_change": "2026-09-03",
+      "last_author": "skharkov1246",
+      "last_commit": "9d0b92c",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "ove/tools/bi_check.py",
+        "ove/tools/bidocs/vedomost.py",
+        "ove/tools/build_release.py",
+        "ove/tools/docframe.py"
+      ]
+    },
+    {
+      "path": "gpu/data/market.json",
+      "subproject": "ГПУ-библиотека",
+      "bytes": 10800,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "intro",
+        "method",
+        "perspective",
+        "risks",
+        "segments",
+        "sizing",
+        "updated",
+        "why_we_can_win"
+      ],
+      "main_collection": {
+        "key": "segments",
+        "records": 5,
+        "record_keys": [
+          "name",
+          "our_access",
+          "share",
+          "who",
+          "why"
+        ]
+      },
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "e94cc48",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "gpu/build.py",
+        "ove/build.py",
+        "zip/build.py",
+        "zip/tools/aggregate_customs.py"
+      ]
+    },
+    {
+      "path": "gpu/data/lot_review.json",
+      "subproject": "ГПУ-библиотека",
+      "bytes": 10216,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "findings",
+        "intro",
+        "method",
+        "updated",
+        "why"
+      ],
+      "main_collection": {
+        "key": "findings",
+        "records": 11,
+        "record_keys": [
+          "action",
+          "detail",
+          "level",
+          "title"
+        ]
+      },
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "e94cc48",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "gpu/build.py"
+      ]
+    },
+    {
+      "path": "ove/data/podacha.json",
+      "subproject": "ОВЭ-75",
+      "bytes": 10185,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "docs",
+        "next",
+        "note",
+        "statuses",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "docs",
+        "records": 14,
+        "record_keys": [
+          "file",
+          "id",
+          "name",
+          "note",
+          "status",
+          "who"
+        ]
+      },
+      "last_change": "2026-08-27",
+      "last_author": "skharkov1246",
+      "last_commit": "84ec8e4",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "ove/build.py",
+        "ove/tools/build_paket.py"
+      ]
+    },
+    {
+      "path": "gpu/data/pn_guide.json",
+      "subproject": "ГПУ-библиотека",
+      "bytes": 9752,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "brands",
+        "intro",
+        "rfq_number_rules",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "brands",
+        "records": 8,
+        "record_keys": [
+          "brand",
+          "format",
+          "rules",
+          "traps"
+        ]
+      },
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "e94cc48",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "gpu/build.py",
+        "gt/build.py"
+      ]
+    },
+    {
+      "path": "gpu/data/partlists.json",
+      "subproject": "ГПУ-библиотека",
+      "bytes": 9421,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "how_to_use",
+        "intro",
+        "lists",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "how_to_use",
+        "records": 4
+      },
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "e94cc48",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "gpu/build.py"
+      ]
+    },
+    {
+      "path": "gt/data/parts.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 9230,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "note",
+        "systems"
+      ],
+      "main_collection": {
+        "key": "systems",
+        "records": 8,
+        "record_keys": [
+          "aftermarket",
+          "components",
+          "crit",
+          "id",
+          "title"
+        ]
+      },
+      "last_change": "2026-08-06",
+      "last_author": "skharkov1246",
+      "last_commit": "e1c38b0",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "gpu/build.py",
+        "gt/build.py",
+        "gt/public/hot.html",
+        "gt/tools/build_hot.py",
+        "gt/tools/build_lot.py",
+        "gt/tools/drop_ru.py"
+      ]
+    },
+    {
+      "path": "ove/data/resources.json",
+      "subproject": "ОВЭ-75",
+      "bytes": 9090,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "base_note",
+        "blast",
+        "roast_detail",
+        "source",
+        "total"
+      ],
+      "main_collection": {
+        "key": "total",
+        "records": 23,
+        "record_keys": [
+          "group",
+          "n",
+          "name",
+          "per_t",
+          "unit",
+          "year"
+        ]
+      },
+      "last_change": "2026-08-13",
+      "last_author": "skharkov1246",
+      "last_commit": "d677c21",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "ove/build.py"
+      ]
+    },
+    {
+      "path": "gpu/data/stock.json",
+      "subproject": "ГПУ-библиотека",
+      "bytes": 8308,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "first_stock",
+        "intro",
+        "pareto",
+        "reference",
+        "rules",
+        "tiers",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "rules",
+        "records": 4
+      },
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "e94cc48",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "gpu/build.py"
+      ]
+    },
+    {
+      "path": "gpu/data/rfq_pack.json",
+      "subproject": "ГПУ-библиотека",
+      "bytes": 8058,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "intro",
+        "positions",
+        "recipients",
+        "rules",
+        "template_en",
+        "template_ru",
+        "tracking_note",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "recipients",
+        "records": 11,
+        "record_keys": [
+          "lang",
+          "name",
+          "personal",
+          "pos",
+          "to"
+        ]
+      },
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "e94cc48",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "gpu/build.py"
+      ]
+    },
+    {
+      "path": "gpu/data/competitors.json",
+      "subproject": "ГПУ-библиотека",
+      "bytes": 7621,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "intro",
+        "landscape",
+        "positioning",
+        "updated",
+        "what_makes_us_expert"
+      ],
+      "main_collection": {
+        "key": "what_makes_us_expert",
+        "records": 4
+      },
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "e94cc48",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "gpu/build.py"
+      ]
+    },
+    {
+      "path": "gpu/data/customs.json",
+      "subproject": "ГПУ-библиотека",
+      "bytes": 7474,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "how_to_pull",
+        "hs_codes",
+        "status",
+        "updated",
+        "what_to_look_for",
+        "what_we_checked",
+        "why_it_matters"
+      ],
+      "main_collection": {
+        "key": "hs_codes",
+        "records": 10,
+        "record_keys": [
+          "code",
+          "use",
+          "what"
+        ]
+      },
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "e94cc48",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "gpu/build.py"
+      ]
+    },
+    {
+      "path": "ove/data/gantt.json",
+      "subproject": "ОВЭ-75",
+      "bytes": 7116,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "lanes",
+        "note",
+        "t0",
+        "tasks",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "tasks",
+        "records": 26,
+        "record_keys": [
+          "after",
+          "dur_wd",
+          "end",
+          "id",
+          "lane",
+          "name",
+          "start"
+        ]
+      },
+      "last_change": "2026-08-28",
+      "last_author": "skharkov1246",
+      "last_commit": "6823fb7",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "ove/build.py",
+        "ove/site/index.template.html",
+        "ove/tools/cpm.py"
+      ]
+    },
+    {
+      "path": "gt/data/pn_guide.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 5965,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "intro",
+        "sections"
+      ],
+      "main_collection": {
+        "key": "sections",
+        "records": 3,
+        "record_keys": [
+          "id",
+          "rules",
+          "title"
+        ]
+      },
+      "last_change": "2026-08-06",
+      "last_author": "skharkov1246",
+      "last_commit": "e1c38b0",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "gpu/build.py",
+        "gt/build.py"
+      ]
+    },
+    {
+      "path": "gpu/data/bitrix_gpu.json",
+      "subproject": "ГПУ-библиотека",
+      "bytes": 4642,
+      "note": "Выгрузка запросов по ГПУ из Bitrix. Обновляется в gpu-deploy.yml; при недоступности портала используется закоммиченный сид.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "adjacent",
+        "by_supplier",
+        "caveat",
+        "deals",
+        "history_note",
+        "live",
+        "offers",
+        "pool",
+        "source",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "deals",
+        "records": 4,
+        "record_keys": [
+          "created",
+          "id",
+          "models",
+          "note",
+          "rfqs",
+          "sourcer",
+          "stage",
+          "title"
+        ]
+      },
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "e94cc48",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "выручка и маржа сделок"
+        ]
+      },
+      "referenced_by": [
+        ".github/workflows/gpu-deploy.yml",
+        "gpu/build.py",
+        "gpu/tools/bitrix_gpu.py"
+      ]
+    },
+    {
+      "path": "gt/data/tfs_subsuppliers.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 4298,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "rows",
+        "source",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 10,
+        "record_keys": [
+          "conf",
+          "country",
+          "email",
+          "module",
+          "name",
+          "site",
+          "what"
+        ]
+      },
+      "last_change": "2026-08-06",
+      "last_author": "Claude",
+      "last_commit": "d6897e3",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "адреса электронной почты"
+        ]
+      },
+      "referenced_by": [
+        "gt/build.py",
+        "gt/tools/build_rfq.py",
+        "gt/tools/drop_ru.py"
+      ]
+    },
+    {
+      "path": "gt/data/methodology.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 4194,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "bands",
+        "factors",
+        "intro",
+        "note",
+        "prank",
+        "title",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "factors",
+        "records": 5,
+        "record_keys": [
+          "key",
+          "max",
+          "name",
+          "rule"
+        ]
+      },
+      "last_change": "2026-08-07",
+      "last_author": "Claude",
+      "last_commit": "7fd8b91",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/build.py"
+      ]
+    },
+    {
+      "path": "zip/data/mining_log.json",
+      "subproject": "база ЗИП",
+      "bytes": 4191,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "positions_no_open_price",
+        "positions_with_prices",
+        "total_records",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "positions_no_open_price",
+        "records": 530
+      },
+      "last_change": "2026-07-04",
+      "last_author": "Claude",
+      "last_commit": "c4ac8cd",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "zip/tools/aggregate_prices.py"
+      ]
+    },
+    {
+      "path": "ove/data/questions_answers.json",
+      "subproject": "ОВЭ-75",
+      "bytes": 3935,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "ans",
+        "eng",
+        "meta",
+        "note",
+        "st",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "eng",
+        "records": 4
+      },
+      "last_change": "2026-09-01",
+      "last_author": "КВАНТ · проверка связи",
+      "last_commit": "66c5527",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "оценки и данные сотрудников"
+        ]
+      },
+      "referenced_by": [
+        "ove/build.py",
+        "ove/public/_worker.js",
+        "ove/site/index.template.html",
+        "ove/tools/build_disc.py",
+        "ove/tools/build_docx.py",
+        "ove/tools/build_questions.py"
+      ]
+    },
+    {
+      "path": "ove/data/readiness.json",
+      "subproject": "ОВЭ-75",
+      "bytes": 2967,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "note",
+        "rows",
+        "target",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 8,
+        "record_keys": [
+          "ext",
+          "gap",
+          "id",
+          "name",
+          "now"
+        ]
+      },
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "97d8e0c",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "ove/build.py"
+      ]
+    },
+    {
+      "path": "data/catalog_notes.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 2915,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "data/budget_snapshot.json",
+        "data/chat_snapshot.json",
+        "gidromet/data/",
+        "gpu/data/bitrix_gpu.json",
+        "gt/data/bitrix_gt.json",
+        "gt/data/dossiers.json",
+        "gt/data/pn_db.json",
+        "ove/data/suppliers.json",
+        "pnw/public/data.js",
+        "zip/customs/out/",
+        "zip/data/customs_declarations.json",
+        "zip/data/supplier_crm.json"
+      ],
+      "last_change": null,
+      "last_author": null,
+      "last_commit": null,
+      "updated_by": "неизвестно",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": []
+    },
+    {
+      "path": "zip/customs/out/_summary.json",
+      "subproject": "база ЗИП · таможня",
+      "bytes": 2297,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "country",
+        "hs",
+        "method",
+        "period",
+        "results"
+      ],
+      "main_collection": {
+        "key": "hs",
+        "records": 3
+      },
+      "last_change": "2026-08-05",
+      "last_author": "skharkov1246",
+      "last_commit": "7db483d",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "zip/customs/glbs_pull.mjs"
+      ]
+    },
+    {
+      "path": "ove/data/rfq_files.json",
+      "subproject": "ОВЭ-75",
+      "bytes": 1909,
+      "note": "",
+      "format": "json",
+      "shape": "список",
+      "records": 54,
+      "record_keys": [],
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "6fde732",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "ove/build.py",
+        "ove/tools/build_rfq_pdf.py"
+      ]
+    }
+  ]
+}

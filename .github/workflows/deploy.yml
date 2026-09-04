@@ -36,6 +36,7 @@ concurrency:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 35          # прогон занимает ~12 мин; всё, что дольше, — зависание
     steps:
       - uses: actions/checkout@v5
 
@@ -61,6 +62,19 @@ jobs:
           cp "$latest" public/index.html
           echo "index.html ← $latest ($(wc -c < public/index.html) байт)"
 
+      # Барьер перед деплоем: незаменённые плейсхолдеры, пустые KPI, JS-ошибки рендера.
+      # Если проверка не прошла — деплой не выполняется и на сайте остаётся
+      # предыдущая рабочая версия (это лучше, чем выкатить пустой дашборд).
+      - name: Проверка собранного дашборда
+        run: python scripts/validate_dashboard.py public/index.html
+
+      - name: Фиксация версии wrangler на прогон
+        run: |
+          set -euo pipefail
+          v="$(npm view wrangler version)"
+          echo "WRANGLER_VERSION=$v" >> "$GITHUB_ENV"
+          echo "wrangler зафиксирован на $v (одна версия на все шаги прогона)"
+
       - name: Деплой на Cloudflare Pages
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -69,19 +83,43 @@ jobs:
         run: |
           set -euo pipefail
           # создать проект, если его ещё нет (иначе тихо пропустить)
-          npx --yes wrangler@latest pages project create kvant-sourcing-f122 \
+          npx --yes wrangler@${WRANGLER_VERSION} pages project create kvant-sourcing-f122 \
             --production-branch=main 2>/dev/null || true
           # пароль гейта берём из GitHub-секрета и кладём в секрет Pages
           # (в репозитории пароля нет). Если пуст — деплой не падает, но гейт вернёт 503.
           if [ -n "${BASIC_AUTH_PASS:-}" ]; then
             printf '%s' "$BASIC_AUTH_PASS" \
-              | npx --yes wrangler@latest pages secret put BASIC_AUTH_PASS --project-name=kvant-sourcing-f122 \
+              | npx --yes wrangler@${WRANGLER_VERSION} pages secret put BASIC_AUTH_PASS --project-name=kvant-sourcing-f122 \
               || echo "⚠ не удалось задать секрет в CI — задайте BASIC_AUTH_PASS в Cloudflare Pages → Settings"
           else
             echo "⚠ GitHub-секрет BASIC_AUTH_PASS пуст — гейт будет закрыт (503), пока не зададите пароль"
           fi
           # --commit-message ASCII: иначе wrangler цепляет кириллическое сообщение
           # git-коммита и Cloudflare отвергает деплой (code 8000111).
-          npx --yes wrangler@latest pages deploy public \
-            --project-name=kvant-sourcing-f122 --branch=main \
-            --commit-dirty=true --commit-message="auto deploy"
+          # автоповтор: Cloudflare изредка отдаёт транзиентную ошибку публикации
+          ok=0
+          for i in 1 2 3; do
+            if npx --yes wrangler@${WRANGLER_VERSION} pages deploy public \
+                 --project-name=kvant-sourcing-f122 --branch=main \
+                 --commit-dirty=true --commit-message="auto deploy"; then
+              ok=1; break
+            fi
+            echo "деплой упал (попытка $i/3) — повтор через 20 с"; sleep 20
+          done
+          [ "$ok" = 1 ] || { echo "::error::деплой не удался после 3 попыток"; exit 1; }
+
+      - name: Причина падения (в сводку прогона)
+        if: failure()
+        run: |
+          {
+            echo "## Пересборка дашборда не удалась"
+            echo ""
+            echo "Сайт не тронут — на нём осталась предыдущая рабочая версия."
+            echo ""
+            echo "Что смотреть по шагу, на котором остановился прогон:"
+            echo "- **Генерация** — код 2 значит «данные Bitrix не прошли проверку достаточности»"
+            echo "  (неполная выгрузка). Код 1 — ошибка в коде или недоступный портал."
+            echo "- **Проверка собранного дашборда** — рассинхрон шаблона и dashboard.py"
+            echo "  либо JS-ошибка рендера."
+            echo "- **Деплой** — Cloudflare отверг публикацию (3 попытки исчерпаны)."
+          } >> "$GITHUB_STEP_SUMMARY"

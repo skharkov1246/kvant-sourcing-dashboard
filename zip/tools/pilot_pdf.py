@@ -5,7 +5,6 @@
 PDF печатается chromium-скриптом print_pdf.mjs.
 """
 import json
-import re
 import html
 from pathlib import Path
 from datetime import date

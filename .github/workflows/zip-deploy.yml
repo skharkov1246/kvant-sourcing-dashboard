@@ -19,6 +19,7 @@ concurrency:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v5
 
@@ -33,6 +34,13 @@ jobs:
           test -f zip/public/index.html
           test -f zip/public/vendor/supabase.js
 
+      - name: Фиксация версии wrangler на прогон
+        run: |
+          set -euo pipefail
+          v="$(npm view wrangler version)"
+          echo "WRANGLER_VERSION=$v" >> "$GITHUB_ENV"
+          echo "wrangler зафиксирован на $v (одна версия на все шаги прогона)"
+
       - name: Деплой на Cloudflare Pages (kvant-zip)
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -40,14 +48,14 @@ jobs:
         run: |
           set -euo pipefail
           # создать проект, если его ещё нет (иначе тихо пропустить)
-          npx --yes wrangler@latest pages project create kvant-zip \
+          npx --yes wrangler@${WRANGLER_VERSION} pages project create kvant-zip \
             --production-branch=main 2>/dev/null || true
           # ASCII commit-message: иначе wrangler цепляет кириллицу git-коммита → CF отвергает (8000111).
           # Автоповтор: Cloudflare изредка отдаёт транзиентную «Failed to publish your Function.
           # Unknown internal error» — повторяем до 3 раз.
           ok=0
           for i in 1 2 3; do
-            if npx --yes wrangler@latest pages deploy zip/public \
+            if npx --yes wrangler@${WRANGLER_VERSION} pages deploy zip/public \
                  --project-name=kvant-zip --branch=main \
                  --commit-dirty=true --commit-message="zip auto deploy"; then
               ok=1; break
