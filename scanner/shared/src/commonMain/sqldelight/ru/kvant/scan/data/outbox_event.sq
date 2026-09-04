@@ -1,0 +1,52 @@
+-- Исходящая очередь событий (§04.1, ADR-0002).
+-- Зеркало контракта OutboxStore: правило выбора партии («голова сессии держит
+-- хвост») живёт в коде и одинаково для этой таблицы и InMemoryOutboxStore —
+-- эталонная семантика закреплена тестами OutboxStoreTest.
+
+CREATE TABLE outbox_event (
+  client_event_id TEXT NOT NULL PRIMARY KEY,
+  session_id      TEXT NOT NULL,
+  seq             INTEGER NOT NULL,
+  type            TEXT NOT NULL,
+  device_ts       INTEGER NOT NULL,
+  payload         TEXT NOT NULL,             -- JSON события
+  trace_id        TEXT,
+  state           TEXT NOT NULL DEFAULT 'PENDING',  -- PENDING | IN_FLIGHT | DEAD_LETTER
+  attempts        INTEGER NOT NULL DEFAULT 0,
+  next_attempt_at INTEGER NOT NULL DEFAULT 0,       -- epoch ms
+  last_error_code TEXT,
+  last_error_message TEXT,
+  UNIQUE (session_id, seq)
+);
+
+CREATE INDEX outbox_by_session ON outbox_event (session_id, seq);
+
+enqueue:
+-- Повтор того же client_event_id — идемпотентный no-op (I-2 на устройстве).
+INSERT OR IGNORE INTO outbox_event (
+  client_event_id, session_id, seq, type, device_ts, payload, trace_id
+) VALUES (?, ?, ?, ?, ?, ?, ?);
+
+allOrdered:
+-- Кандидаты для партии: весь порядок по сессиям, решение принимает код.
+SELECT * FROM outbox_event ORDER BY session_id, seq;
+
+markInFlight:
+UPDATE outbox_event SET state = 'IN_FLIGHT' WHERE client_event_id IN ?;
+
+remove:
+DELETE FROM outbox_event WHERE client_event_id IN ?;
+
+reschedule:
+UPDATE outbox_event SET state = 'PENDING', attempts = ?, next_attempt_at = ?,
+  last_error_code = ?, last_error_message = ?
+WHERE client_event_id = ?;
+
+moveToDeadLetter:
+-- Мёртвые письма не удаляются: они — материал для поддержки (§04.4).
+UPDATE outbox_event SET state = 'DEAD_LETTER',
+  last_error_code = ?, last_error_message = ?
+WHERE client_event_id = ?;
+
+depth:
+SELECT COUNT(*) FROM outbox_event WHERE state != 'DEAD_LETTER';

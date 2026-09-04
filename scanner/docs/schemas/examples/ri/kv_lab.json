@@ -1,0 +1,193 @@
+{
+  "schema_version": 1,
+  "code": "kv_lab",
+  "version": 1,
+  "status": "active",
+  "scope": "global",
+  "title": "Камеральный протокол лаборатории материалов",
+  "description": "Каталог docs/14, kv_lab: определение материала по лестнице Р-09 — от неразрушающего XRF вверх по стоимости. Зашитые в шаги предохранители: XRF не определяет углерод (класс стали по C — только OES); сервис в H2S тянет проверку по NACE MR0175; разрушающие испытания видимы только при загруженном согласии заказчика (Р-07 п.4).",
+  "applies_to": {
+    "categories": [
+      "ri_lab"
+    ]
+  },
+  "settings": {
+    "estimated_duration_s": 600
+  },
+  "steps": [
+    {
+      "id": "lab_sample",
+      "kind": "form",
+      "title": "Образец и допуски",
+      "form": {
+        "fields": [
+          {
+            "key": "sample_ref",
+            "type": "text",
+            "label": "Код KV-D / номер образца",
+            "required": true
+          },
+          {
+            "key": "consent_destructive",
+            "type": "bool",
+            "label": "Согласие заказчика на разрушающий контроль загружено (Р-07 п.4)",
+            "required": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "lab_xrf",
+      "kind": "form",
+      "title": "XRF-анализ",
+      "instruction": "Первая ступень лестницы Р-09. ВНИМАНИЕ: XRF не определяет углерод — марку углеродистой/легированной стали по C подтверждает только OES (следующий шаг).",
+      "form": {
+        "fields": [
+          {
+            "key": "cr_pct",
+            "type": "number",
+            "label": "Cr, %",
+            "required": true,
+            "min": 0
+          },
+          {
+            "key": "ni_pct",
+            "type": "number",
+            "label": "Ni, %",
+            "required": true,
+            "min": 0
+          },
+          {
+            "key": "mo_pct",
+            "type": "number",
+            "label": "Mo, %",
+            "required": true,
+            "min": 0
+          },
+          {
+            "key": "probable_grade",
+            "type": "enum",
+            "label": "Вероятная марка (по XRF)",
+            "required": true,
+            "source": "materials_directory"
+          },
+          {
+            "key": "carbon_needed",
+            "type": "bool",
+            "label": "Для марки нужен углерод (→ OES)",
+            "required": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "lab_oes",
+      "kind": "form",
+      "title": "OES (оптико-эмиссионный)",
+      "instruction": "Вторая ступень: углерод и точная марка. Выполняется, если XRF недостаточно; оставляет пятно обжига — согласуйте место с конструктором.",
+      "required": false,
+      "form": {
+        "fields": [
+          {
+            "key": "c_pct",
+            "type": "number",
+            "label": "C, %",
+            "required": true,
+            "min": 0
+          },
+          {
+            "key": "mn_pct",
+            "type": "number",
+            "label": "Mn, %",
+            "required": true,
+            "min": 0
+          },
+          {
+            "key": "grade",
+            "type": "enum",
+            "label": "Марка (подтверждённая)",
+            "required": true,
+            "source": "materials_directory"
+          }
+        ]
+      }
+    },
+    {
+      "id": "lab_h2s",
+      "kind": "form",
+      "title": "Сероводородный сервис",
+      "instruction": "Если рабочая среда содержит H2S — материал проверяется на соответствие NACE MR0175/ISO 15156: твёрдость и марка в допустимых пределах для кислого сервиса.",
+      "form": {
+        "fields": [
+          {
+            "key": "h2s_service",
+            "type": "bool",
+            "label": "Среда содержит H2S",
+            "required": true
+          },
+          {
+            "key": "nace_check",
+            "type": "enum",
+            "label": "Проверка NACE MR0175",
+            "required": true,
+            "options": [
+              "соответствует",
+              "НЕ соответствует — материал менять",
+              "не требуется (H2S нет)",
+              "не проверялось"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "lab_destructive",
+      "kind": "form",
+      "title": "Разрушающие испытания",
+      "instruction": "Видимо только при загруженном согласии заказчика (Р-07 п.4). Верх лестницы Р-09 — когда неразрушающих ступеней не хватило.",
+      "required": false,
+      "visible_if": {
+        "step": "lab_sample",
+        "field": "consent_destructive",
+        "eq": true
+      },
+      "form": {
+        "fields": [
+          {
+            "key": "test_kind",
+            "type": "enum",
+            "label": "Испытание",
+            "required": true,
+            "options": [
+              "твёрдость по сечению",
+              "металлография",
+              "растяжение",
+              "ударная вязкость"
+            ]
+          },
+          {
+            "key": "result",
+            "type": "multiline",
+            "label": "Результат",
+            "required": true
+          }
+        ]
+      }
+    }
+  ],
+  "acceptance": {
+    "auto_accept_if": {
+      "all": [
+        {
+          "step": "lab_sample"
+        },
+        {
+          "step": "lab_xrf"
+        },
+        {
+          "step": "lab_h2s"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,344 @@
+{
+  "schema_version": 1,
+  "code": "kv_cat_h",
+  "version": 1,
+  "status": "active",
+  "scope": "global",
+  "title": "Категория H: сварные узлы и металлоконструкции",
+  "description": "Р-05 п.5 H, каталог docs/14: габарит узла — единственное уместное применение примитива measure (AR-обмер bounding box); состав — по элементам профиля, карта швов со ссылками на кадры. Шага твёрдости НЕТ ВОВСЕ: «—» в матрице регламента означает отсутствие шага, а не required:false.",
+  "applies_to": {
+    "categories": [
+      "ri_cat_h"
+    ]
+  },
+  "settings": {
+    "estimated_duration_s": 2400
+  },
+  "steps": [
+    {
+      "id": "h_safety",
+      "kind": "form",
+      "title": "Среда и безопасность",
+      "instruction": "Р-10 п.1: рабочая среда, СИЗ. Острые кромки и заусенцы после реза — перчатки обязательны; узлы свыше 20 кг — кантовка с помощником.",
+      "form": {
+        "fields": [
+          {
+            "key": "medium",
+            "type": "enum",
+            "label": "Рабочая среда",
+            "required": true,
+            "source": "media_directory"
+          },
+          {
+            "key": "ppe_ack",
+            "type": "bool",
+            "label": "СИЗ надеты",
+            "required": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "h_condition",
+      "kind": "form",
+      "title": "Состояние узла",
+      "form": {
+        "fields": [
+          {
+            "key": "condition",
+            "type": "enum",
+            "label": "Состояние",
+            "required": true,
+            "options": [
+              "пригоден к обмеру",
+              "деформации/коррозия, обмер возможен",
+              "разрушен — обмер невозможен"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "h_overview",
+      "kind": "photo",
+      "title": "Общий вид со всех сторон",
+      "repeat": {
+        "min": 4,
+        "max": 10
+      },
+      "quality": {
+        "max_blur": 0.35,
+        "min_lux": 60,
+        "require_subject_fill_pct": [
+          20,
+          90
+        ],
+        "on_violation": "warn"
+      }
+    },
+    {
+      "id": "h_mark",
+      "kind": "photo",
+      "title": "Маркировка/бирки (если есть)",
+      "required": false,
+      "repeat": {
+        "min": 1,
+        "max": 4
+      },
+      "quality": {
+        "max_blur": 0.25,
+        "min_lux": 80,
+        "on_violation": "warn"
+      }
+    },
+    {
+      "id": "h_bbox",
+      "kind": "measure",
+      "title": "Габарит узла (AR-обмер)",
+      "instruction": "Единственное место, где AR-габарит уместен: точность класса C для металлоконструкции достаточна. Обведите узел камерой по кругу.",
+      "measure": {
+        "target": "bounding_box",
+        "min_accuracy_class": "C",
+        "marker": {
+          "type": "aruco_4x4_50",
+          "size_mm": 100
+        },
+        "capture_depth": true,
+        "on_violation": "warn"
+      }
+    },
+    {
+      "id": "h_members",
+      "kind": "form",
+      "title": "Элементы профиля (по одному на строку)",
+      "instruction": "Каждый элемент: тип проката, типоразмер по маркировке или обмеру, длина. Типоразмер сортамента сверяется по справочнику при синхронизации.",
+      "repeat": {
+        "min": 1,
+        "max": 40
+      },
+      "form": {
+        "fields": [
+          {
+            "key": "member_no",
+            "type": "number",
+            "label": "№ элемента (по эскизу)",
+            "required": true,
+            "min": 1
+          },
+          {
+            "key": "profile_kind",
+            "type": "enum",
+            "label": "Тип проката",
+            "required": true,
+            "options": [
+              "лист",
+              "труба круглая",
+              "труба профильная",
+              "уголок",
+              "швеллер",
+              "двутавр",
+              "круг/пруток",
+              "полоса",
+              "прочее"
+            ]
+          },
+          {
+            "key": "size_spec",
+            "type": "text",
+            "label": "Типоразмер (например 63×63×5)",
+            "required": true
+          },
+          {
+            "key": "length_mm",
+            "type": "number",
+            "label": "Длина",
+            "unit": "mm",
+            "required": true,
+            "min": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "h_welds",
+      "kind": "form",
+      "title": "Карта швов (по одному на строку)",
+      "instruction": "Каждый шов: между какими элементами, тип, катет, протяжённость. В поле «кадры» перечислите номера фото следующего шага, где шов виден.",
+      "repeat": {
+        "min": 1,
+        "max": 40
+      },
+      "form": {
+        "fields": [
+          {
+            "key": "weld_no",
+            "type": "number",
+            "label": "№ шва (по эскизу)",
+            "required": true,
+            "min": 1
+          },
+          {
+            "key": "between",
+            "type": "text",
+            "label": "Элементы (например 1–3)",
+            "required": true
+          },
+          {
+            "key": "weld_kind",
+            "type": "enum",
+            "label": "Тип шва",
+            "required": true,
+            "options": [
+              "угловой",
+              "стыковой",
+              "тавровый",
+              "нахлёсточный",
+              "точечный/прихватки",
+              "прочее"
+            ]
+          },
+          {
+            "key": "leg_mm",
+            "type": "number",
+            "label": "Катет",
+            "unit": "mm",
+            "required": true,
+            "min": 0.5
+          },
+          {
+            "key": "length_note",
+            "type": "text",
+            "label": "Протяжённость (сплошной/прерывистый, шаг)",
+            "required": true
+          },
+          {
+            "key": "photo_refs",
+            "type": "text",
+            "label": "Кадры со швом (№№ фото)",
+            "required": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "h_weld_photos",
+      "kind": "photo",
+      "title": "Швы крупно",
+      "instruction": "Каждый шов из карты — минимум один кадр крупно с масштабом (линейка или шаблон катета).",
+      "repeat": {
+        "min": 2,
+        "max": 20
+      },
+      "quality": {
+        "max_blur": 0.3,
+        "min_lux": 80,
+        "on_violation": "warn"
+      }
+    },
+    {
+      "id": "h_holes",
+      "kind": "form",
+      "title": "Отверстия и крепёж (если есть)",
+      "required": false,
+      "repeat": {
+        "min": 1,
+        "max": 20
+      },
+      "form": {
+        "fields": [
+          {
+            "key": "hole_no",
+            "type": "number",
+            "label": "№ группы отверстий",
+            "required": true,
+            "min": 1
+          },
+          {
+            "key": "d_mm",
+            "type": "number",
+            "label": "Диаметр",
+            "unit": "mm",
+            "required": true,
+            "min": 1
+          },
+          {
+            "key": "pattern",
+            "type": "text",
+            "label": "Расположение (шаг, межосевые)",
+            "required": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "h_sketch",
+      "kind": "photo",
+      "title": "Эскиз с нумерацией элементов и швов",
+      "instruction": "Р-08 п.3.1: эскиз связывает элементы, швы и отверстия. Без него карта швов не читается.",
+      "repeat": {
+        "min": 1,
+        "max": 4
+      },
+      "quality": {
+        "max_blur": 0.3,
+        "min_lux": 80,
+        "on_violation": "block"
+      }
+    },
+    {
+      "id": "h_material",
+      "kind": "form",
+      "title": "Материал и покрытие",
+      "form": {
+        "fields": [
+          {
+            "key": "material",
+            "type": "enum",
+            "label": "Материал",
+            "required": true,
+            "source": "materials_directory"
+          },
+          {
+            "key": "coating",
+            "type": "enum",
+            "label": "Покрытие/окраска",
+            "required": true,
+            "source": "materials_directory"
+          },
+          {
+            "key": "defects",
+            "type": "multiline",
+            "label": "Дефекты: трещины швов, коррозия, деформации (можно голосом)",
+            "required": false
+          }
+        ]
+      }
+    }
+  ],
+  "acceptance": {
+    "auto_accept_if": {
+      "all": [
+        {
+          "step": "h_bbox"
+        },
+        {
+          "step": "h_members"
+        },
+        {
+          "step": "h_welds"
+        },
+        {
+          "step": "h_sketch"
+        },
+        {
+          "quality_score_at_least": 0.75
+        }
+      ]
+    },
+    "reject_if": {
+      "step": "h_condition",
+      "field": "condition",
+      "eq": "разрушен — обмер невозможен"
+    }
+  }
+}

@@ -1,0 +1,161 @@
+{
+  "schema_version": 1,
+  "code": "pallet_general",
+  "version": 7,
+  "status": "active",
+  "scope": "global",
+  "title": "Приёмка паллеты — общий сценарий",
+  "description": "Базовый сценарий для приёмки паллетированного товара без специальных требований заказчика. Ожидаемое время прохождения — около 3 минут.",
+  "applies_to": {
+    "categories": ["pallet", "bulk_carton"]
+  },
+  "settings": {
+    "require_geo": false,
+    "min_battery_pct": 10,
+    "estimated_duration_s": 180,
+    "allow_pause": true,
+    "allow_handoff": true
+  },
+  "steps": [
+    {
+      "id": "overview",
+      "kind": "photo",
+      "required": true,
+      "title": "Общий вид паллеты",
+      "instruction": "Отойдите на 2–3 метра. Паллета должна попасть в кадр целиком, включая нижний поддон.",
+      "hint_overlay": "frame_4_3",
+      "quality": {
+        "min_resolution_mp": 8,
+        "max_blur": 0.35,
+        "min_lux": 60,
+        "require_subject_fill_pct": [30, 90],
+        "on_violation": "warn"
+      }
+    },
+    {
+      "id": "sides",
+      "kind": "photo",
+      "required": true,
+      "title": "Боковые стороны",
+      "instruction": "Обойдите паллету и снимите каждую из четырёх сторон.",
+      "hint_overlay": "frame_4_3",
+      "repeat": { "min": 2, "max": 4 },
+      "quality": {
+        "max_blur": 0.4,
+        "reject_duplicates": true,
+        "on_violation": "warn"
+      }
+    },
+    {
+      "id": "dims",
+      "kind": "measure",
+      "required": true,
+      "title": "Габариты",
+      "instruction": "Положите калибровочную карточку на верхнюю грань паллеты и медленно обведите объект камерой.",
+      "measure": {
+        "target": "bounding_box",
+        "min_accuracy_class": "C",
+        "marker": { "type": "aruco_4x4_50", "size_mm": 100 },
+        "capture_depth": true,
+        "on_violation": "block"
+      }
+    },
+    {
+      "id": "orbit",
+      "kind": "video",
+      "required": false,
+      "title": "Облёт для 3D-реконструкции",
+      "instruction": "Медленно обойдите паллету по кругу, удерживая её в центре кадра.",
+      "video": { "duration_s": 20, "require_motion": true, "max_bitrate_kbps": 6000 }
+    },
+    {
+      "id": "label",
+      "kind": "code",
+      "required": true,
+      "title": "Код маркировки",
+      "instruction": "Наведите камеру на этикетку. Избегайте бликов — при необходимости прикройте ладонью.",
+      "code": {
+        "symbologies": ["data_matrix", "gs1_128", "code_128", "ean_13", "itf_14"],
+        "parse": "gs1",
+        "allow_manual": true,
+        "quality": { "glare_ratio": 0.15, "on_violation": "block" }
+      }
+    },
+    {
+      "id": "label_photo",
+      "kind": "photo",
+      "required": true,
+      "title": "Фото этикетки целиком",
+      "instruction": "Снимите этикетку так, чтобы читались все надписи — это доказательство для трассировки.",
+      "hint_overlay": "frame_16_9",
+      "quality": { "max_blur": 0.25, "glare_ratio": 0.2, "on_violation": "warn" }
+    },
+    {
+      "id": "supplier",
+      "kind": "form",
+      "required": true,
+      "title": "Происхождение",
+      "instruction": "Укажите поставщика по документам. Если поставщик неизвестен — оставьте поле пустым, не выдумывайте.",
+      "form": {
+        "fields": [
+          { "key": "supplier_name", "type": "text", "label": "Поставщик", "required": true, "suggest": "supplier_directory" },
+          { "key": "supplier_inn", "type": "text", "label": "ИНН", "pattern": "^\\d{10}(\\d{2})?$" },
+          { "key": "origin_country", "type": "enum", "label": "Страна происхождения", "source": "iso3166_alpha2" },
+          { "key": "batch", "type": "text", "label": "Партия / лот" },
+          { "key": "has_damage", "type": "bool", "label": "Есть видимые повреждения", "default": false }
+        ]
+      }
+    },
+    {
+      "id": "weight",
+      "kind": "weight",
+      "required": false,
+      "title": "Вес брутто",
+      "instruction": "Если паллета взвешена — введите вес. Он используется для перекрёстной проверки габаритов.",
+      "weight": { "unit": "kg", "source": "any", "min": 0.1, "max": 2000 }
+    },
+    {
+      "id": "damage",
+      "kind": "photo",
+      "required": true,
+      "title": "Фото повреждений",
+      "instruction": "Снимите каждое повреждение крупным планом.",
+      "repeat": { "min": 1, "max": 6 },
+      "visible_if": { "step": "supplier", "field": "has_damage", "eq": true },
+      "quality": { "max_blur": 0.3, "on_violation": "warn" }
+    },
+    {
+      "id": "damage_note",
+      "kind": "note",
+      "required": false,
+      "title": "Описание повреждений",
+      "visible_if": { "step": "supplier", "field": "has_damage", "eq": true }
+    },
+    {
+      "id": "done",
+      "kind": "confirm",
+      "required": true,
+      "title": "Подтверждение",
+      "confirm": {
+        "text": "Подтверждаю, что снятые данные соответствуют фактическому состоянию товара.",
+        "require_signature": false
+      }
+    }
+  ],
+  "acceptance": {
+    "auto_accept_if": {
+      "all": [
+        { "step": "dims", "accuracy_class_at_least": "B" },
+        { "quality_score_at_least": 0.8 },
+        { "step": "label", "field": "parsed.gtin", "exists": true },
+        { "not": { "step": "supplier", "field": "has_damage", "eq": true } }
+      ]
+    },
+    "reject_if": {
+      "any": [
+        { "step": "dims", "field": "accuracy_class", "eq": "D" },
+        { "step": "label", "field": "source", "eq": "manual" }
+      ]
+    }
+  }
+}

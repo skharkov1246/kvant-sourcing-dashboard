@@ -1,0 +1,419 @@
+{
+  "schema_version": 1,
+  "code": "kv_cat_c",
+  "version": 1,
+  "status": "active",
+  "scope": "global",
+  "title": "Категория C: тела вращения",
+  "description": "Р-05 п.5 C, каталог docs/14: посадочные поверхности сеткой 3 сечения × 2 направления НА КАЖДУЮ ступень (вал с 4 ступенями = 24 строки — отсюда честная оценка в час), резьбы по ≥5 неповреждённым виткам с проверкой кратности обоим рядам, Ra, твёрдость, биение. Номиналы и допуски ЗДЕСЬ НЕ назначаются — это работа конструктора (kv_desk): оператор фиксирует фактические замеры, сервер считает статистику поверхности и восстанавливает номинал предположением.",
+  "applies_to": {
+    "categories": [
+      "ri_cat_c"
+    ]
+  },
+  "settings": {
+    "estimated_duration_s": 3600
+  },
+  "steps": [
+    {
+      "id": "c_safety",
+      "kind": "form",
+      "title": "Среда и безопасность",
+      "instruction": "Р-10 п.1: рабочая среда, СИЗ. Тяжёлые валы кантовать только с помощником.",
+      "form": {
+        "fields": [
+          {
+            "key": "medium",
+            "type": "enum",
+            "label": "Рабочая среда",
+            "required": true,
+            "source": "media_directory"
+          },
+          {
+            "key": "ppe_ack",
+            "type": "bool",
+            "label": "СИЗ надеты",
+            "required": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "c_condition",
+      "kind": "form",
+      "title": "Состояние образца",
+      "instruction": "Р-08 п.3: у разрушенной детали номинал по обломкам не восстанавливается — такой образец идёт к конструктору, не в обмер.",
+      "form": {
+        "fields": [
+          {
+            "key": "condition",
+            "type": "enum",
+            "label": "Состояние",
+            "required": true,
+            "options": [
+              "пригодна к обмеру",
+              "износ значительный, обмер возможен",
+              "разрушена — обмер невозможен"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "c_overview",
+      "kind": "photo",
+      "title": "Общий вид с линейкой",
+      "repeat": {
+        "min": 2,
+        "max": 6
+      },
+      "quality": {
+        "max_blur": 0.35,
+        "min_lux": 60,
+        "require_subject_fill_pct": [
+          25,
+          90
+        ],
+        "on_violation": "warn"
+      }
+    },
+    {
+      "id": "c_mark",
+      "kind": "photo",
+      "title": "Маркировка/клейма (если есть)",
+      "required": false,
+      "repeat": {
+        "min": 1,
+        "max": 4
+      },
+      "quality": {
+        "max_blur": 0.25,
+        "min_lux": 80,
+        "on_violation": "warn"
+      }
+    },
+    {
+      "id": "c_layout",
+      "kind": "form",
+      "title": "Схема ступеней",
+      "instruction": "Число ступеней и общая длина. Дальше сетка замеров заполняется НА КАЖДУЮ ступень — эскиз со ступенями снимите крупно в следующем шаге.",
+      "form": {
+        "fields": [
+          {
+            "key": "n_steps",
+            "type": "number",
+            "label": "Ступеней",
+            "required": true,
+            "min": 1
+          },
+          {
+            "key": "total_length_mm",
+            "type": "number",
+            "label": "Общая длина",
+            "unit": "mm",
+            "required": true,
+            "min": 1
+          },
+          {
+            "key": "has_bore",
+            "type": "bool",
+            "label": "Есть центральное отверстие",
+            "required": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "c_sketch",
+      "kind": "photo",
+      "title": "Эскиз от руки с нумерацией ступеней",
+      "instruction": "Р-08 п.3.1: эскиз с пронумерованными ступенями — ключ к сетке замеров. Без него 24 числа сетки не привязать к геометрии.",
+      "repeat": {
+        "min": 1,
+        "max": 3
+      },
+      "quality": {
+        "max_blur": 0.3,
+        "min_lux": 80,
+        "on_violation": "block"
+      }
+    },
+    {
+      "id": "c_grid",
+      "kind": "form",
+      "title": "Сетка замеров: 3 сечения × 2 направления",
+      "instruction": "Р-10 п.4.1: на КАЖДУЮ посадочную ступень — три сечения по длине (края и середина), в каждом два взаимно перпендикулярных замера. Заполняется по одной строке на замер; статистику (овальность, конусность, базу) считает сервер. Изношенные пояски отметьте в примечании.",
+      "repeat": {
+        "min": 6,
+        "max": 60
+      },
+      "form": {
+        "fields": [
+          {
+            "key": "step_no",
+            "type": "number",
+            "label": "№ ступени (по эскизу)",
+            "required": true,
+            "min": 1
+          },
+          {
+            "key": "surface",
+            "type": "enum",
+            "label": "Поверхность",
+            "required": true,
+            "options": [
+              "вал",
+              "отверстие"
+            ]
+          },
+          {
+            "key": "section",
+            "type": "enum",
+            "label": "Сечение",
+            "required": true,
+            "options": [
+              "край 1",
+              "середина",
+              "край 2"
+            ]
+          },
+          {
+            "key": "direction",
+            "type": "enum",
+            "label": "Направление",
+            "required": true,
+            "options": [
+              "0°",
+              "90°"
+            ]
+          },
+          {
+            "key": "value_mm",
+            "type": "number",
+            "label": "Замер",
+            "unit": "mm",
+            "required": true,
+            "min": 0.1
+          },
+          {
+            "key": "instrument",
+            "type": "enum",
+            "label": "СИ (номер поверки)",
+            "required": true,
+            "source": "si_directory"
+          },
+          {
+            "key": "note",
+            "type": "text",
+            "label": "Примечание",
+            "required": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "c_thread",
+      "kind": "form",
+      "title": "Резьбы (при наличии)",
+      "instruction": "Р-10 п.4.4: шаг определяется на длине НЕ МЕНЕЕ 5 неповреждённых витков; сервер проверит кратность и метрическому, и дюймовому ряду — не округляйте в метрику сами (Р-08 п.3.3.3).",
+      "required": false,
+      "repeat": {
+        "min": 1,
+        "max": 8
+      },
+      "form": {
+        "fields": [
+          {
+            "key": "location",
+            "type": "text",
+            "label": "Где (№ ступени / торец)",
+            "required": true
+          },
+          {
+            "key": "span_mm",
+            "type": "number",
+            "label": "Длина по виткам",
+            "unit": "mm",
+            "required": true,
+            "min": 1
+          },
+          {
+            "key": "turns",
+            "type": "number",
+            "label": "Витков в замере (≥5)",
+            "required": true,
+            "min": 5
+          },
+          {
+            "key": "major_d_mm",
+            "type": "number",
+            "label": "Наружный диаметр",
+            "unit": "mm",
+            "required": true,
+            "min": 0.5
+          }
+        ]
+      }
+    },
+    {
+      "id": "c_ra",
+      "kind": "form",
+      "title": "Шероховатость посадочных",
+      "form": {
+        "fields": [
+          {
+            "key": "ra_um",
+            "type": "number",
+            "label": "Ra",
+            "unit": "мкм",
+            "required": true,
+            "min": 0.01
+          },
+          {
+            "key": "ra_method",
+            "type": "enum",
+            "label": "Метод",
+            "required": true,
+            "options": [
+              "профилометр",
+              "образцы сравнения",
+              "оценка визуально"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "c_hardness",
+      "kind": "form",
+      "title": "Твёрдость",
+      "instruction": "Р-08 п.4: замер на неответственной поверхности; при ТВЧ/цементации указать зону.",
+      "form": {
+        "fields": [
+          {
+            "key": "hardness_value",
+            "type": "number",
+            "label": "Значение",
+            "required": true,
+            "min": 1
+          },
+          {
+            "key": "hardness_scale",
+            "type": "enum",
+            "label": "Шкала",
+            "required": true,
+            "options": [
+              "HB",
+              "HRC",
+              "HV"
+            ]
+          },
+          {
+            "key": "instrument",
+            "type": "enum",
+            "label": "СИ (номер поверки)",
+            "required": true,
+            "source": "si_directory"
+          }
+        ]
+      }
+    },
+    {
+      "id": "c_runout",
+      "kind": "form",
+      "title": "Биение (в центрах или на призмах)",
+      "required": false,
+      "form": {
+        "fields": [
+          {
+            "key": "runout_mm",
+            "type": "number",
+            "label": "Радиальное биение",
+            "unit": "mm",
+            "required": true,
+            "min": 0
+          },
+          {
+            "key": "base",
+            "type": "enum",
+            "label": "База",
+            "required": true,
+            "options": [
+              "центра",
+              "призмы",
+              "патрон"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "c_material",
+      "kind": "form",
+      "title": "Материал и термообработка",
+      "form": {
+        "fields": [
+          {
+            "key": "material",
+            "type": "enum",
+            "label": "Материал",
+            "required": true,
+            "source": "materials_directory"
+          },
+          {
+            "key": "coating",
+            "type": "enum",
+            "label": "Покрытие",
+            "required": true,
+            "source": "materials_directory"
+          },
+          {
+            "key": "heat_treatment",
+            "type": "enum",
+            "label": "Термообработка (по признакам)",
+            "required": true,
+            "options": [
+              "нет признаков",
+              "ТВЧ/поверхностная",
+              "объёмная",
+              "цементация",
+              "не определена"
+            ]
+          },
+          {
+            "key": "defects",
+            "type": "multiline",
+            "label": "Дефекты и износ (можно голосом)",
+            "required": false
+          }
+        ]
+      }
+    }
+  ],
+  "acceptance": {
+    "auto_accept_if": {
+      "all": [
+        {
+          "step": "c_sketch"
+        },
+        {
+          "step": "c_grid"
+        },
+        {
+          "step": "c_hardness"
+        },
+        {
+          "step": "c_material"
+        },
+        {
+          "quality_score_at_least": 0.75
+        }
+      ]
+    },
+    "reject_if": {
+      "step": "c_condition",
+      "field": "condition",
+      "eq": "разрушена — обмер невозможен"
+    }
+  }
+}

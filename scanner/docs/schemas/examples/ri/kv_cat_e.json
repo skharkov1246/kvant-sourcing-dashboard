@@ -1,0 +1,325 @@
+{
+  "schema_version": 1,
+  "code": "kv_cat_e",
+  "version": 1,
+  "status": "active",
+  "scope": "global",
+  "title": "Категория E: сложные поверхности",
+  "description": "Р-05 п.5 E, каталог docs/14: крыльчатки, лопатки, кулачки — геометрия снимается сканом С ОБЕИХ СТОРОН, но посадочные места по-прежнему только вручную («железное правило» Р-05: скан не заменяет обмер посадочных). Покрытия и класс балансировки ISO 21940 — обязательные поля: без них РКД крыльчатки неполна.",
+  "applies_to": {
+    "categories": [
+      "ri_cat_e"
+    ]
+  },
+  "settings": {
+    "estimated_duration_s": 2700
+  },
+  "steps": [
+    {
+      "id": "e_safety",
+      "kind": "form",
+      "title": "Среда и безопасность",
+      "instruction": "Р-10 п.1: рабочая среда, СИЗ. Кромки лопаток бывают острыми — перчатки обязательны.",
+      "form": {
+        "fields": [
+          {
+            "key": "medium",
+            "type": "enum",
+            "label": "Рабочая среда",
+            "required": true,
+            "source": "media_directory"
+          },
+          {
+            "key": "ppe_ack",
+            "type": "bool",
+            "label": "СИЗ надеты",
+            "required": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "e_condition",
+      "kind": "form",
+      "title": "Состояние образца",
+      "instruction": "Эрозия и кавитация лопаток — норма для б/у; фиксируйте. Обломанные лопатки — к конструктору: скан обломка не восстанавливает профиль.",
+      "form": {
+        "fields": [
+          {
+            "key": "condition",
+            "type": "enum",
+            "label": "Состояние",
+            "required": true,
+            "options": [
+              "пригодна к обмеру",
+              "эрозия/кавитация, обмер возможен",
+              "разрушена — обмер невозможен"
+            ]
+          },
+          {
+            "key": "condition_note",
+            "type": "multiline",
+            "label": "Зоны износа (можно голосом)",
+            "required": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "e_overview",
+      "kind": "photo",
+      "title": "Общий вид со всех сторон",
+      "repeat": {
+        "min": 4,
+        "max": 8
+      },
+      "quality": {
+        "max_blur": 0.35,
+        "min_lux": 60,
+        "require_subject_fill_pct": [
+          25,
+          90
+        ],
+        "on_violation": "warn"
+      }
+    },
+    {
+      "id": "e_mark",
+      "kind": "photo",
+      "title": "Маркировка/клейма (если есть)",
+      "required": false,
+      "repeat": {
+        "min": 1,
+        "max": 4
+      },
+      "quality": {
+        "max_blur": 0.25,
+        "min_lux": 80,
+        "on_violation": "warn"
+      }
+    },
+    {
+      "id": "e_seats",
+      "kind": "form",
+      "title": "Посадочные места — только вручную",
+      "instruction": "«Железное правило» Р-05: посадка на вал, шпонпаз, торцы — поверенным СИ, сеткой. Скан для посадочных не используется.",
+      "repeat": {
+        "min": 6,
+        "max": 36
+      },
+      "form": {
+        "fields": [
+          {
+            "key": "step_no",
+            "type": "number",
+            "label": "№ места (по эскизу)",
+            "required": true,
+            "min": 1
+          },
+          {
+            "key": "surface",
+            "type": "enum",
+            "label": "Поверхность",
+            "required": true,
+            "options": [
+              "отверстие",
+              "вал"
+            ]
+          },
+          {
+            "key": "section",
+            "type": "enum",
+            "label": "Сечение",
+            "required": true,
+            "options": [
+              "край 1",
+              "середина",
+              "край 2"
+            ]
+          },
+          {
+            "key": "direction",
+            "type": "enum",
+            "label": "Направление",
+            "required": true,
+            "options": [
+              "0°",
+              "90°"
+            ]
+          },
+          {
+            "key": "value_mm",
+            "type": "number",
+            "label": "Замер",
+            "unit": "mm",
+            "required": true,
+            "min": 0.1
+          },
+          {
+            "key": "instrument",
+            "type": "enum",
+            "label": "СИ (номер поверки)",
+            "required": true,
+            "source": "si_directory"
+          }
+        ]
+      }
+    },
+    {
+      "id": "e_sketch",
+      "kind": "photo",
+      "title": "Эскиз с нумерацией посадочных",
+      "repeat": {
+        "min": 1,
+        "max": 3
+      },
+      "quality": {
+        "max_blur": 0.3,
+        "min_lux": 80,
+        "on_violation": "block"
+      }
+    },
+    {
+      "id": "e_manual_done",
+      "kind": "form",
+      "title": "Ручной обмер посадочных закрыт",
+      "instruction": "Подтверждая, вы отвечаете, что посадочные сняты вручную. Только после этого открывается скан профиля.",
+      "form": {
+        "fields": [
+          {
+            "key": "all_dims_recorded",
+            "type": "bool",
+            "label": "Посадочные сняты и записаны",
+            "required": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "e_scan_front",
+      "kind": "photo",
+      "title": "Скан профиля: сторона A (превью)",
+      "visible_if": {
+        "step": "e_manual_done",
+        "field": "all_dims_recorded",
+        "eq": true
+      },
+      "repeat": {
+        "min": 2,
+        "max": 6
+      },
+      "quality": {
+        "max_blur": 0.4,
+        "on_violation": "warn"
+      }
+    },
+    {
+      "id": "e_scan_back",
+      "kind": "photo",
+      "title": "Скан профиля: сторона B (превью)",
+      "instruction": "Каталог E: профиль снимается С ОБЕИХ СТОРОН — одна сторона не восстанавливает межлопаточные каналы.",
+      "visible_if": {
+        "step": "e_manual_done",
+        "field": "all_dims_recorded",
+        "eq": true
+      },
+      "repeat": {
+        "min": 2,
+        "max": 6
+      },
+      "quality": {
+        "max_blur": 0.4,
+        "on_violation": "warn"
+      }
+    },
+    {
+      "id": "e_balance",
+      "kind": "form",
+      "title": "Балансировка и покрытие",
+      "instruction": "Класс балансировки — по ISO 21940 (метка на детали, паспорт агрегата или «не определён»). Для рабочих колёс это не справка, а требование к производству.",
+      "form": {
+        "fields": [
+          {
+            "key": "balance_class",
+            "type": "enum",
+            "label": "Класс балансировки ISO 21940",
+            "required": true,
+            "options": [
+              "G0.4",
+              "G1",
+              "G2.5",
+              "G6.3",
+              "G16",
+              "G40",
+              "не определён"
+            ]
+          },
+          {
+            "key": "rotor_mass_kg",
+            "type": "number",
+            "label": "Масса, кг",
+            "required": true,
+            "min": 0.01
+          },
+          {
+            "key": "coating",
+            "type": "enum",
+            "label": "Покрытие",
+            "required": true,
+            "source": "materials_directory"
+          }
+        ]
+      }
+    },
+    {
+      "id": "e_material",
+      "kind": "form",
+      "title": "Материал",
+      "form": {
+        "fields": [
+          {
+            "key": "material",
+            "type": "enum",
+            "label": "Материал",
+            "required": true,
+            "source": "materials_directory"
+          },
+          {
+            "key": "defects",
+            "type": "multiline",
+            "label": "Дефекты: эрозия, кавитация, наплавки (можно голосом)",
+            "required": false
+          }
+        ]
+      }
+    }
+  ],
+  "acceptance": {
+    "auto_accept_if": {
+      "all": [
+        {
+          "step": "e_seats"
+        },
+        {
+          "step": "e_sketch"
+        },
+        {
+          "step": "e_manual_done",
+          "field": "all_dims_recorded",
+          "eq": true
+        },
+        {
+          "step": "e_balance"
+        },
+        {
+          "quality_score_at_least": 0.75
+        }
+      ]
+    },
+    "reject_if": {
+      "step": "e_condition",
+      "field": "condition",
+      "eq": "разрушена — обмер невозможен"
+    }
+  }
+}

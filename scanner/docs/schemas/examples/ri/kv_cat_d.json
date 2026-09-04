@@ -1,0 +1,412 @@
+{
+  "schema_version": 1,
+  "code": "kv_cat_d",
+  "version": 1,
+  "status": "active",
+  "scope": "global",
+  "title": "Категория D: корпусные детали",
+  "description": "Р-05 п.5 D, каталог docs/14. «Железное правило» Р-05: 3D-скан — КОНТРОЛЬ ПОЛНОТЫ, а не замена ручного обмера; шаги скана физически недоступны (visible_if), пока оператор не подтвердил закрытие ручного обмера. Посадочные и межосевые — только вручную поверенным СИ; толщины стенок — УЗ-толщиномером.",
+  "applies_to": {
+    "categories": [
+      "ri_cat_d"
+    ]
+  },
+  "settings": {
+    "estimated_duration_s": 3900
+  },
+  "steps": [
+    {
+      "id": "d_safety",
+      "kind": "form",
+      "title": "Среда и безопасность",
+      "instruction": "Р-10 п.1: рабочая среда, СИЗ. Корпуса свыше 20 кг — кантовка только с помощником или тельфером.",
+      "form": {
+        "fields": [
+          {
+            "key": "medium",
+            "type": "enum",
+            "label": "Рабочая среда",
+            "required": true,
+            "source": "media_directory"
+          },
+          {
+            "key": "ppe_ack",
+            "type": "bool",
+            "label": "СИЗ надеты",
+            "required": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "d_condition",
+      "kind": "form",
+      "title": "Состояние образца",
+      "form": {
+        "fields": [
+          {
+            "key": "condition",
+            "type": "enum",
+            "label": "Состояние",
+            "required": true,
+            "options": [
+              "пригодна к обмеру",
+              "износ/трещины, обмер возможен",
+              "разрушена — обмер невозможен"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "d_overview",
+      "kind": "photo",
+      "title": "Общий вид со всех сторон",
+      "repeat": {
+        "min": 4,
+        "max": 8
+      },
+      "quality": {
+        "max_blur": 0.35,
+        "min_lux": 60,
+        "require_subject_fill_pct": [
+          25,
+          90
+        ],
+        "on_violation": "warn"
+      }
+    },
+    {
+      "id": "d_mark",
+      "kind": "photo",
+      "title": "Маркировка/номер отливки (если есть)",
+      "required": false,
+      "repeat": {
+        "min": 1,
+        "max": 4
+      },
+      "quality": {
+        "max_blur": 0.25,
+        "min_lux": 80,
+        "on_violation": "warn"
+      }
+    },
+    {
+      "id": "d_base_dims",
+      "kind": "form",
+      "title": "Габариты",
+      "form": {
+        "fields": [
+          {
+            "key": "length_mm",
+            "type": "number",
+            "label": "Длина",
+            "unit": "mm",
+            "required": true,
+            "min": 1
+          },
+          {
+            "key": "width_mm",
+            "type": "number",
+            "label": "Ширина",
+            "unit": "mm",
+            "required": true,
+            "min": 1
+          },
+          {
+            "key": "height_mm",
+            "type": "number",
+            "label": "Высота",
+            "unit": "mm",
+            "required": true,
+            "min": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "d_seats",
+      "kind": "form",
+      "title": "Посадочные места (по одному на строку)",
+      "instruction": "Р-10 п.4.2: каждое посадочное отверстие — сеткой, у кромки раструб, база в глубине. Статистику считает сервер.",
+      "repeat": {
+        "min": 1,
+        "max": 40
+      },
+      "form": {
+        "fields": [
+          {
+            "key": "step_no",
+            "type": "number",
+            "label": "№ места (по эскизу)",
+            "required": true,
+            "min": 1
+          },
+          {
+            "key": "surface",
+            "type": "enum",
+            "label": "Поверхность",
+            "required": true,
+            "options": [
+              "отверстие",
+              "вал"
+            ]
+          },
+          {
+            "key": "section",
+            "type": "enum",
+            "label": "Сечение",
+            "required": true,
+            "options": [
+              "край 1",
+              "середина",
+              "край 2"
+            ]
+          },
+          {
+            "key": "direction",
+            "type": "enum",
+            "label": "Направление",
+            "required": true,
+            "options": [
+              "0°",
+              "90°"
+            ]
+          },
+          {
+            "key": "value_mm",
+            "type": "number",
+            "label": "Замер",
+            "unit": "mm",
+            "required": true,
+            "min": 0.1
+          },
+          {
+            "key": "instrument",
+            "type": "enum",
+            "label": "СИ (номер поверки)",
+            "required": true,
+            "source": "si_directory"
+          }
+        ]
+      }
+    },
+    {
+      "id": "d_axes",
+      "kind": "form",
+      "title": "Межосевые расстояния",
+      "repeat": {
+        "min": 1,
+        "max": 20
+      },
+      "form": {
+        "fields": [
+          {
+            "key": "from_seat",
+            "type": "number",
+            "label": "От места №",
+            "required": true,
+            "min": 1
+          },
+          {
+            "key": "to_seat",
+            "type": "number",
+            "label": "До места №",
+            "required": true,
+            "min": 1
+          },
+          {
+            "key": "distance_mm",
+            "type": "number",
+            "label": "Межосевое",
+            "unit": "mm",
+            "required": true,
+            "min": 0.1
+          },
+          {
+            "key": "instrument",
+            "type": "enum",
+            "label": "СИ (номер поверки)",
+            "required": true,
+            "source": "si_directory"
+          }
+        ]
+      }
+    },
+    {
+      "id": "d_wall_us",
+      "kind": "form",
+      "title": "Толщины стенок (УЗ-толщиномер)",
+      "instruction": "Каталог D: литьё имеет разброс — минимум 3 точки на характерную стенку, зачистить краску в точке контакта.",
+      "repeat": {
+        "min": 3,
+        "max": 24
+      },
+      "form": {
+        "fields": [
+          {
+            "key": "location",
+            "type": "text",
+            "label": "Место (по эскизу)",
+            "required": true
+          },
+          {
+            "key": "thickness_mm",
+            "type": "number",
+            "label": "Толщина",
+            "unit": "mm",
+            "required": true,
+            "min": 0.5
+          },
+          {
+            "key": "instrument",
+            "type": "enum",
+            "label": "УЗ-толщиномер (№ поверки)",
+            "required": true,
+            "source": "si_directory"
+          }
+        ]
+      }
+    },
+    {
+      "id": "d_sketch",
+      "kind": "photo",
+      "title": "Эскиз с нумерацией мест и размерами",
+      "instruction": "Р-08 п.3.1: эскиз связывает сетку замеров, межосевые и толщины с геометрией. Без читаемого эскиза данные не интерпретируемы.",
+      "repeat": {
+        "min": 1,
+        "max": 4
+      },
+      "quality": {
+        "max_blur": 0.3,
+        "min_lux": 80,
+        "on_violation": "block"
+      }
+    },
+    {
+      "id": "d_manual_done",
+      "kind": "form",
+      "title": "Ручной обмер закрыт",
+      "instruction": "«Железное правило» Р-05: скан — контроль полноты, а не замена обмера. Подтверждая, вы отвечаете, что все посадочные, межосевые и толщины сняты вручную поверенным СИ.",
+      "form": {
+        "fields": [
+          {
+            "key": "all_dims_recorded",
+            "type": "bool",
+            "label": "Все ручные замеры сняты и записаны",
+            "required": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "d_scan_preview",
+      "kind": "photo",
+      "title": "3D-скан: превью с экрана сканера",
+      "instruction": "Доступно только после закрытия ручного обмера. Превью со всех сторон: цель — увидеть пропущенные бобышки, приливы, отверстия.",
+      "visible_if": {
+        "step": "d_manual_done",
+        "field": "all_dims_recorded",
+        "eq": true
+      },
+      "repeat": {
+        "min": 2,
+        "max": 8
+      },
+      "quality": {
+        "max_blur": 0.4,
+        "on_violation": "warn"
+      }
+    },
+    {
+      "id": "d_scan_accept",
+      "kind": "form",
+      "title": "Контроль полноты по скану",
+      "visible_if": {
+        "all": [
+          {
+            "step": "d_manual_done",
+            "field": "all_dims_recorded",
+            "eq": true
+          },
+          {
+            "step": "d_scan_preview"
+          }
+        ]
+      },
+      "form": {
+        "fields": [
+          {
+            "key": "coverage_ok",
+            "type": "bool",
+            "label": "Скан покрывает все поверхности",
+            "required": true
+          },
+          {
+            "key": "missing_features",
+            "type": "multiline",
+            "label": "Что не попало в ручной обмер (по скану)",
+            "required": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "d_material",
+      "kind": "form",
+      "title": "Материал и покрытие",
+      "form": {
+        "fields": [
+          {
+            "key": "material",
+            "type": "enum",
+            "label": "Материал",
+            "required": true,
+            "source": "materials_directory"
+          },
+          {
+            "key": "coating",
+            "type": "enum",
+            "label": "Покрытие/окраска",
+            "required": true,
+            "source": "materials_directory"
+          },
+          {
+            "key": "defects",
+            "type": "multiline",
+            "label": "Дефекты: трещины, ремонтные сварки (можно голосом)",
+            "required": false
+          }
+        ]
+      }
+    }
+  ],
+  "acceptance": {
+    "auto_accept_if": {
+      "all": [
+        {
+          "step": "d_base_dims"
+        },
+        {
+          "step": "d_seats"
+        },
+        {
+          "step": "d_sketch"
+        },
+        {
+          "step": "d_manual_done",
+          "field": "all_dims_recorded",
+          "eq": true
+        },
+        {
+          "quality_score_at_least": 0.75
+        }
+      ]
+    },
+    "reject_if": {
+      "step": "d_condition",
+      "field": "condition",
+      "eq": "разрушена — обмер невозможен"
+    }
+  }
+}

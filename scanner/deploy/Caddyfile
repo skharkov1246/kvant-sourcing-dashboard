@@ -1,0 +1,44 @@
+# TLS и единственная дверь наружу. Домен подставляется переменной среды
+# KVANT_DOMAIN (см. .env.example): для быстрого старта годится
+# <ip-сервера>.nip.io — Let's Encrypt такие имена подписывает, отдельный
+# домен покупать не обязательно.
+{$KVANT_DOMAIN} {
+	encode gzip
+
+	# Защитные заголовки: браузерная поверхность (/review) не должна
+	# встраиваться в чужие фреймы и угадывать типы содержимого.
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "no-referrer"
+		-Server
+	}
+
+	# Дашборд контролёра и API ревью — пока dev-инструмент без OIDC (§07.2),
+	# поэтому закрыты HTTP-аутентификацией отдельно от API устройств.
+	# После аутентификации прокси сам утверждает субъект: заголовки
+	# перезаписываются, чтобы клиент не мог назначить себе роль снаружи.
+	@review path /review* /v1/review*
+	basic_auth @review {
+		{$KVANT_REVIEW_USER} {$KVANT_REVIEW_PASSWORD_HASH}
+	}
+	request_header @review X-Tenant-Id "t-internal"
+	request_header @review X-User-Id "reviewer"
+	request_header @review X-Roles "reviewer"
+
+	# Кадры и видео идут чанками по мегабайту; лимит держим с запасом,
+	# но не бесконечным — иначе один клиент забьёт диск буфера.
+	request_body {
+		max_size 64MB
+	}
+
+	reverse_proxy api:8000
+
+	log {
+		output file /data/access.log {
+			roll_size 50MB
+			roll_keep 5
+		}
+	}
+}

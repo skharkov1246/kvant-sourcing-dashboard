@@ -1,0 +1,409 @@
+{
+  "schema_version": 1,
+  "code": "kv_cat_f",
+  "version": 1,
+  "status": "active",
+  "scope": "global",
+  "title": "Категория F: зубчатые детали",
+  "description": "Р-05 п.5 F, каталог docs/14: оператор снимает счётные и мерные величины — z, da, ширину венца, длину общей нормали W по n_w зубьям; модуль и смещение СЧИТАЕТ СЕРВЕР и показывает у детали — грубая ошибка промера (перепутан обхват, съеден зуб) ловится на месте. Посадка на вал — сеткой, как у тел вращения.",
+  "applies_to": {
+    "categories": [
+      "ri_cat_f"
+    ]
+  },
+  "settings": {
+    "estimated_duration_s": 2400
+  },
+  "steps": [
+    {
+      "id": "f_safety",
+      "kind": "form",
+      "title": "Среда и безопасность",
+      "form": {
+        "fields": [
+          {
+            "key": "medium",
+            "type": "enum",
+            "label": "Рабочая среда",
+            "required": true,
+            "source": "media_directory"
+          },
+          {
+            "key": "ppe_ack",
+            "type": "bool",
+            "label": "СИЗ надеты",
+            "required": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "f_condition",
+      "kind": "form",
+      "title": "Состояние венца",
+      "instruction": "Питтинг и износ рабочих профилей — фиксируйте; выкрошенные зубья пересчитайте и отметьте номера. Полностью разрушенный венец не обмеряется.",
+      "form": {
+        "fields": [
+          {
+            "key": "condition",
+            "type": "enum",
+            "label": "Состояние",
+            "required": true,
+            "options": [
+              "пригодна к обмеру",
+              "износ/питтинг, обмер возможен",
+              "разрушена — обмер невозможен"
+            ]
+          },
+          {
+            "key": "broken_teeth",
+            "type": "text",
+            "label": "Номера выкрошенных зубьев (если есть)",
+            "required": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "f_overview",
+      "kind": "photo",
+      "title": "Общий вид с обеих сторон",
+      "repeat": {
+        "min": 2,
+        "max": 6
+      },
+      "quality": {
+        "max_blur": 0.35,
+        "min_lux": 60,
+        "require_subject_fill_pct": [
+          25,
+          90
+        ],
+        "on_violation": "warn"
+      }
+    },
+    {
+      "id": "f_teeth_macro",
+      "kind": "photo",
+      "title": "Зубья крупно (профиль и торец)",
+      "instruction": "Профиль зуба сбоку и торец венца: по этим кадрам конструктор проверит угол и косозубость.",
+      "repeat": {
+        "min": 2,
+        "max": 6
+      },
+      "quality": {
+        "max_blur": 0.25,
+        "min_lux": 80,
+        "on_violation": "warn"
+      }
+    },
+    {
+      "id": "f_type",
+      "kind": "form",
+      "title": "Тип передачи",
+      "form": {
+        "fields": [
+          {
+            "key": "gear_kind",
+            "type": "enum",
+            "label": "Тип",
+            "required": true,
+            "options": [
+              "цилиндрическая прямозубая",
+              "цилиндрическая косозубая",
+              "коническая",
+              "червячное колесо",
+              "шлицевой венец",
+              "прочее"
+            ]
+          },
+          {
+            "key": "helix_visible",
+            "type": "bool",
+            "label": "Наклон зубьев виден на глаз",
+            "required": true
+          },
+          {
+            "key": "aw_mm",
+            "type": "number",
+            "label": "Межосевое aw (если есть корпус/пара)",
+            "unit": "mm",
+            "required": false,
+            "min": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "f_geometry",
+      "kind": "form",
+      "title": "Венец: z, da, ширина (по одному на строку)",
+      "instruction": "z считать ДВАЖДЫ мелом от метки. da — по вершинам через центр; у б/у венца вершины изношены, сервер это учтёт при подборе модуля.",
+      "repeat": {
+        "min": 1,
+        "max": 4
+      },
+      "form": {
+        "fields": [
+          {
+            "key": "venets_no",
+            "type": "number",
+            "label": "№ венца",
+            "required": true,
+            "min": 1
+          },
+          {
+            "key": "z",
+            "type": "number",
+            "label": "Число зубьев z",
+            "required": true,
+            "min": 5
+          },
+          {
+            "key": "da_mm",
+            "type": "number",
+            "label": "Диаметр вершин da",
+            "unit": "mm",
+            "required": true,
+            "min": 1
+          },
+          {
+            "key": "b_mm",
+            "type": "number",
+            "label": "Ширина венца",
+            "unit": "mm",
+            "required": true,
+            "min": 0.5
+          },
+          {
+            "key": "instrument",
+            "type": "enum",
+            "label": "СИ (номер поверки)",
+            "required": true,
+            "source": "si_directory"
+          }
+        ]
+      }
+    },
+    {
+      "id": "f_normal",
+      "kind": "form",
+      "title": "Длина общей нормали",
+      "instruction": "Нормалемером или штангенциркулем с тарелками: W по n_w зубьям, номер венца тот же, что в предыдущем шаге. Смещение посчитает сервер.",
+      "repeat": {
+        "min": 1,
+        "max": 4
+      },
+      "form": {
+        "fields": [
+          {
+            "key": "venets_no",
+            "type": "number",
+            "label": "№ венца",
+            "required": true,
+            "min": 1
+          },
+          {
+            "key": "n_w",
+            "type": "number",
+            "label": "Зубьев в обхвате n_w",
+            "required": true,
+            "min": 2
+          },
+          {
+            "key": "w_mm",
+            "type": "number",
+            "label": "W",
+            "unit": "mm",
+            "required": true,
+            "min": 1
+          },
+          {
+            "key": "instrument",
+            "type": "enum",
+            "label": "СИ (номер поверки)",
+            "required": true,
+            "source": "si_directory"
+          }
+        ]
+      }
+    },
+    {
+      "id": "f_bore",
+      "kind": "form",
+      "title": "Посадка на вал: сетка 3×2",
+      "instruction": "Р-10 п.4.1-4.2: посадочное отверстие и шпонпаз — сеткой, статистику считает сервер.",
+      "repeat": {
+        "min": 6,
+        "max": 12
+      },
+      "form": {
+        "fields": [
+          {
+            "key": "step_no",
+            "type": "number",
+            "label": "№ места (по эскизу)",
+            "required": true,
+            "min": 1
+          },
+          {
+            "key": "surface",
+            "type": "enum",
+            "label": "Поверхность",
+            "required": true,
+            "options": [
+              "отверстие",
+              "вал"
+            ]
+          },
+          {
+            "key": "section",
+            "type": "enum",
+            "label": "Сечение",
+            "required": true,
+            "options": [
+              "край 1",
+              "середина",
+              "край 2"
+            ]
+          },
+          {
+            "key": "direction",
+            "type": "enum",
+            "label": "Направление",
+            "required": true,
+            "options": [
+              "0°",
+              "90°"
+            ]
+          },
+          {
+            "key": "value_mm",
+            "type": "number",
+            "label": "Замер",
+            "unit": "mm",
+            "required": true,
+            "min": 0.1
+          },
+          {
+            "key": "instrument",
+            "type": "enum",
+            "label": "СИ (номер поверки)",
+            "required": true,
+            "source": "si_directory"
+          }
+        ]
+      }
+    },
+    {
+      "id": "f_sketch",
+      "kind": "photo",
+      "title": "Эскиз с нумерацией венцов и мест",
+      "repeat": {
+        "min": 1,
+        "max": 3
+      },
+      "quality": {
+        "max_blur": 0.3,
+        "min_lux": 80,
+        "on_violation": "block"
+      }
+    },
+    {
+      "id": "f_hardness",
+      "kind": "form",
+      "title": "Твёрдость зуба",
+      "instruction": "Р-08 п.4: на торце зуба или нерабочей поверхности; цементованный слой — отметить.",
+      "form": {
+        "fields": [
+          {
+            "key": "hardness_value",
+            "type": "number",
+            "label": "Значение",
+            "required": true,
+            "min": 1
+          },
+          {
+            "key": "hardness_scale",
+            "type": "enum",
+            "label": "Шкала",
+            "required": true,
+            "options": [
+              "HB",
+              "HRC",
+              "HV"
+            ]
+          },
+          {
+            "key": "instrument",
+            "type": "enum",
+            "label": "СИ (номер поверки)",
+            "required": true,
+            "source": "si_directory"
+          }
+        ]
+      }
+    },
+    {
+      "id": "f_material",
+      "kind": "form",
+      "title": "Материал и термообработка",
+      "form": {
+        "fields": [
+          {
+            "key": "material",
+            "type": "enum",
+            "label": "Материал",
+            "required": true,
+            "source": "materials_directory"
+          },
+          {
+            "key": "heat_treatment",
+            "type": "enum",
+            "label": "Термообработка (по признакам)",
+            "required": true,
+            "options": [
+              "нет признаков",
+              "ТВЧ/поверхностная",
+              "объёмная",
+              "цементация",
+              "не определена"
+            ]
+          },
+          {
+            "key": "defects",
+            "type": "multiline",
+            "label": "Дефекты: питтинг, задиры (можно голосом)",
+            "required": false
+          }
+        ]
+      }
+    }
+  ],
+  "acceptance": {
+    "auto_accept_if": {
+      "all": [
+        {
+          "step": "f_geometry"
+        },
+        {
+          "step": "f_normal"
+        },
+        {
+          "step": "f_bore"
+        },
+        {
+          "step": "f_sketch"
+        },
+        {
+          "quality_score_at_least": 0.75
+        }
+      ]
+    },
+    "reject_if": {
+      "step": "f_condition",
+      "field": "condition",
+      "eq": "разрушена — обмер невозможен"
+    }
+  }
+}
