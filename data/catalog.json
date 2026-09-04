@@ -1059,6 +1059,7 @@
         ]
       },
       "referenced_by": [
+        ".github/workflows/gate.yml",
         ".github/workflows/scan.yml",
         "chat_scan.py",
         "gpu/tools/bitrix_gpu.py",
@@ -6465,15 +6466,17 @@
         "zip/data/customs_declarations.json",
         "zip/data/supplier_crm.json"
       ],
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-04",
+      "last_author": "Claude",
+      "last_commit": "4b0cf2b",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
         "markers": []
       },
-      "referenced_by": []
+      "referenced_by": [
+        "scripts/build_catalog.py"
+      ]
     },
     {
       "path": "zip/customs/out/_summary.json",

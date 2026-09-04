@@ -173,6 +173,15 @@ def build():
     except Exception as e:  # ГТУ-сайт не должен ронять деплой базы ЗИП
         print(f"gt: пропущен ({e})")
 
+    # Гейт доступа. Сайт отдаёт CRM поставщиков и контакты (gt/ — 860+ адресов),
+    # поэтому воркер кладётся всегда. Он самовыключающийся: если секрет
+    # BASIC_AUTH_PASS в Cloudflare Pages не задан, гейт пропускает всех и сайт
+    # работает как раньше — уронить публикацию он не может. Логин — «kvant».
+    gate_src = ROOT / "site" / "_worker.js.example"
+    if gate_src.exists():
+        shutil.copy2(gate_src, OUT / "_worker.js")
+        print("гейт: zip/public/_worker.js установлен (активируется секретом BASIC_AUTH_PASS)")
+
     size = (OUT / "index.html").stat().st_size
     print(f"zip/public/index.html: {size:,} байт | позиций {n_pos}, "
           f"с ODM {n_with_odm}, ODM-записей {n_odm}, цен {len(prices)}")
