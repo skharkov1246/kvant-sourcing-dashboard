@@ -79,9 +79,10 @@ python3 .claude/skills/pdf-analysis/scripts/diff_docs.py a.txt b.txt --changes  
 bash .claude/skills/pdf-analysis/scripts/html2pdf.sh report.html "Отчёт.pdf"
 ```
 
-Хром лежит в `/opt/pw-browsers/chromium-1194/chrome-linux/chrome`, кириллицу
-закрывает DejaVu Sans. Каркас вёрстки — `templates/report_a4.html` в этом же навыке:
-A4, поля 14/12 мм, шрифт 9 pt, тёмно-синие заголовки, таблицы с зеброй.
+Хром лежит в `/opt/pw-browsers/chromium-1194/chrome-linux/chrome`. Каркас вёрстки —
+`templates/report_a4.html` в этом же навыке: A4, Times New Roman (Liberation Serif),
+чёрный текст на белом, тонкие линии таблиц, без выделений — стиль ведомости по правилу
+владельца (см. навык `tkp-vedomost`).
 
 Обязательная проверка перед отправкой: открой готовый PDF через `Read` с `pages`
 и посмотри на вёрстку. Типовые дефекты:
