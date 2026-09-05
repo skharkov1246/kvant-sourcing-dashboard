@@ -1,34 +1,39 @@
-"""CI-зонд v22: аудит процесса «Запросы поставщикам» (СП-166, cat 24).
+"""Зонд v23: динамика с апреля — отправленные запросы и полученные КП, в среднем на человека.
 
-Меряем то, что нужно для разговора об UX и конверсии в КП:
-  1) точные названия стадий и воронка (всего / 2026)
-  2) карточка запроса: сколько полей вообще и сколько реально заполняют
-  3) время: создан → отправлен → ответ; сколько висит в текущей стадии
-  4) ответная конверсия: новый поставщик против повторного
-  5) есть ли вообще куда писать — email/телефон у компаний-получателей
-  6) связь со сделкой, товарные позиции, число поставщиков на один запрос
+Считаем ПОТОК СОБЫТИЙ по истории стадий СП-166 (не текущие стадии):
+  отправлено   = первый вход запроса в стадию «Request Sent» в этом месяце
+  получено КП  = первый вход в любую стадию, означающую наличие цены
+  ответ получен = шире: любая реакция поставщика, включая отказ котировать
+Делим на число сотрудников, у которых в этом месяце была хотя бы одна отправка.
+Приводим среднее и медиану — среднее искажают несколько человек с большим объёмом.
 """
 from __future__ import annotations
 
-import datetime as dt
 import os
 import statistics as st
 from collections import Counter, defaultdict
 
 import requests
 
-ET = 166
-CAT = 24
-Y = "2026-01-01"
+ET, CAT = 166, 24
+SINCE = "2026-03-01"
+
+SENT = "DT166_24:PREPARATION"
+QUOTE = {"DT166_24:UC_H49RUE", "DT166_24:SUCCESS", "DT166_24:1",
+         "DT166_24:4", "DT166_24:5", "DT166_24:FAIL"}
+RESP = QUOTE | {"DT166_24:UC_61BSRU", "DT166_24:UC_GFJ5A8", "DT166_24:2"}
 
 
 def bx(method: str, params: dict | None = None) -> dict:
     base = os.environ["BITRIX_WEBHOOK_URL"].rstrip("/")
-    for _ in range(3):
+    for _ in range(4):
         try:
             r = requests.post(f"{base}/{method}.json", json=params or {}, timeout=90)
             r.raise_for_status()
-            return r.json()
+            j = r.json()
+            if isinstance(j, dict) and j.get("error") in ("QUERY_LIMIT_EXCEEDED", "OPERATION_TIME_LIMIT"):
+                continue
+            return j
         except Exception:
             continue
     return {}
@@ -46,144 +51,112 @@ def bx_all(method: str, params: dict) -> list:
         start = j["next"]
 
 
-def dtp(s):
-    if not s:
-        return None
-    try:
-        return dt.datetime.fromisoformat(str(s).replace("Z", "+00:00"))
-    except Exception:
-        return None
-
-
 def main() -> int:
-    print("=== 1. СТАДИИ ВОРОНКИ ЗАПРОСОВ ===")
-    stg = bx("crm.status.list", {"filter": {"ENTITY_ID": f"DYNAMIC_{ET}_STAGE_{CAT}"}}).get("result") or []
-    names = {}
-    for s in sorted(stg, key=lambda x: int(x.get("SORT") or 0)):
-        names[s.get("STATUS_ID")] = s.get("NAME")
-        print(f"  {s.get('SORT'):>4} {s.get('STATUS_ID'):24s} «{s.get('NAME')}»")
+    print("=== 1. Кто есть кто ===")
+    deps = {str(d["ID"]): str(d.get("NAME") or "") for d in bx_all("department.get", {})}
+    uname, udep = {}, {}
+    for u in bx_all("user.get", {}):
+        uid = str(u["ID"])
+        uname[uid] = f"{u.get('NAME') or ''} {u.get('LAST_NAME') or ''}".strip() or uid
+        dd = u.get("UF_DEPARTMENT") or []
+        udep[uid] = deps.get(str(dd[0]), "—") if dd else "—"
+    print(f"  сотрудников: {len(uname)} · подразделений: {len(deps)}")
 
-    print("\n=== 2. КАРТОЧКА ЗАПРОСА: сколько полей просит система ===")
-    f = (bx("crm.item.fields", {"entityTypeId": ET}).get("result") or {}).get("fields", {})
-    uf = {k: v for k, v in f.items() if k.startswith("ufCrm")}
-    req = [k for k, v in f.items() if v.get("isRequired")]
-    print(f"  всего полей: {len(f)} · пользовательских: {len(uf)} · обязательных: {len(req)}")
-    print(f"  обязательные: {req}")
+    print("\n=== 2. Запросы: кто ответственный ===")
+    items = bx_all("crm.item.list", {"entityTypeId": ET, "filter": {"categoryId": CAT},
+                                     "select": ["id", "assignedById", "createdTime"]})
+    owner = {str(i["id"]): str(i.get("assignedById") or "") for i in items}
+    born = {str(i["id"]): str(i.get("createdTime") or "")[:7] for i in items}
+    print(f"  запросов всего: {len(items)}")
 
-    print("\n=== 3. ЗАПРОСЫ ===")
-    sel = ["id", "title", "stageId", "createdTime", "updatedTime", "movedTime",
-           "companyId", "contactId", "assignedById", "parentId2", "opportunity", "currencyId"]
-    allr = bx_all("crm.item.list", {"entityTypeId": ET, "select": sel, "filter": {"categoryId": CAT}})
-    y26 = [r for r in allr if str(r.get("createdTime") or "").startswith("2026")]
-    print(f"  всего запросов: {len(allr)} · в 2026: {len(y26)}")
+    print(f"\n=== 3. История стадий с {SINCE} ===")
+    params = {"entityTypeId": ET, "filter": {"CATEGORY_ID": CAT, ">=CREATED_TIME": SINCE},
+              "select": ["OWNER_ID", "CREATED_TIME", "STAGE_ID"], "order": {"CREATED_TIME": "ASC"}}
+    hist = bx_all("crm.stagehistory.list", params)
+    print(f"  записей истории: {len(hist)}")
+    print(f"  встреченные стадии: {dict(Counter(h.get('STAGE_ID') for h in hist).most_common(14))}")
 
-    def funnel(rows, label):
-        c = Counter(r.get("stageId") for r in rows)
-        n = len(rows) or 1
-        print(f"\n  --- воронка: {label} ({len(rows)}) ---")
-        for sid, _ in sorted(c.items(), key=lambda kv: -kv[1]):
-            print(f"    {names.get(sid, sid)[:44]:46s} {c[sid]:>6}  {c[sid]/n*100:5.1f}%")
-    funnel(allr, "за всё время")
-    funnel(y26, "2026")
+    # первый вход каждого запроса в каждую стадию
+    first: dict[tuple[str, str], str] = {}
+    for h in hist:
+        k = (str(h.get("OWNER_ID")), str(h.get("STAGE_ID")))
+        t = str(h.get("CREATED_TIME") or "")
+        if k not in first or t < first[k]:
+            first[k] = t
 
-    print("\n=== 4. ЗАПОЛНЯЕМОСТЬ КАРТОЧКИ (выборка 400 запросов 2026) ===")
-    sample = y26[-400:] if len(y26) > 400 else y26
-    ids = [r["id"] for r in sample]
-    full = []
-    for i in range(0, len(ids), 50):
-        chunk = bx_all("crm.item.list", {"entityTypeId": ET,
-            "filter": {"categoryId": CAT, "@id": ids[i:i + 50]}})
-        full += chunk
-    print(f"  разобрано карточек: {len(full)}")
-    fillc = Counter()
-    for it in full:
-        for k, v in it.items():
-            if v not in (None, "", 0, "0", [], {}, "0.00"):
-                fillc[k] += 1
-    n = len(full) or 1
-    print("  --- пользовательские поля: как часто заполнены ---")
-    rows = [(k, fillc.get(k, 0), (uf.get(k) or {}).get("title") or "") for k in uf]
-    for k, c, t in sorted(rows, key=lambda x: -x[1]):
-        if c:
-            print(f"    {c/n*100:5.1f}%  {c:>4}/{n}  {k:26s} «{str(t)[:44]}»")
-    dead = [k for k, c, t in rows if not c]
-    print(f"  ПУСТЫЕ ВСЕГДА ({len(dead)} полей): {dead[:24]}")
-
-    print("\n=== 5. ВРЕМЯ ===")
-    now = dt.datetime.now(dt.timezone.utc)
-    open_st = [s for s in names if s not in ("SUCCESS", "FAIL")]
-    ages = defaultdict(list)
-    for r in y26:
-        mv, cr = dtp(r.get("movedTime")), dtp(r.get("createdTime"))
-        if mv:
-            ages[r.get("stageId")].append((now - mv).total_seconds() / 86400)
-    print("  сколько дней запросы уже сидят в своей текущей стадии (медиана / макс):")
-    for sid, v in sorted(ages.items(), key=lambda kv: -len(kv[1])):
-        if v:
-            print(f"    {names.get(sid, sid)[:40]:42s} n={len(v):>5}  мед {st.median(v):6.1f} дн  макс {max(v):6.0f} дн")
-    closed = [r for r in y26 if r.get("stageId") in ("SUCCESS", "FAIL")]
-    lags = [( (dtp(r.get("updatedTime")) - dtp(r.get("createdTime"))).total_seconds()/86400 )
-            for r in closed if dtp(r.get("updatedTime")) and dtp(r.get("createdTime"))]
-    if lags:
-        lags.sort()
-        print(f"  цикл запроса до закрытия (2026, n={len(lags)}): "
-              f"мед {st.median(lags):.1f} дн · p25 {lags[len(lags)//4]:.1f} · p75 {lags[3*len(lags)//4]:.1f}")
-
-    print("\n=== 6. ОТВЕТИЛИ ЛИ: новый поставщик против повторного ===")
-    first_seen = {}
-    for r in sorted(allr, key=lambda r: str(r.get("createdTime"))):
-        cid = str(r.get("companyId") or "")
-        if cid and cid not in first_seen:
-            first_seen[cid] = r["id"]
-    ANSW = {"SUCCESS", "1", "2"}   # уточняется по названиям стадий ниже
-    def answered(r): return r.get("stageId") in ("SUCCESS",) or str(r.get("stageId")).endswith(":1")
-    n_new = a_new = n_rep = a_rep = 0
-    for r in y26:
-        cid = str(r.get("companyId") or "")
-        if not cid:
+    sent_ev = defaultdict(lambda: defaultdict(int))    # месяц → сотрудник → шт
+    quote_ev = defaultdict(lambda: defaultdict(int))
+    resp_ev = defaultdict(lambda: defaultdict(int))
+    seen_q, seen_r = set(), set()
+    for (oid, sid), t in sorted(first.items(), key=lambda kv: kv[1]):
+        m, who = t[:7], owner.get(oid, "")
+        if not who or not m:
             continue
-        isnew = first_seen.get(cid) == r["id"]
-        ok = r.get("stageId") == "SUCCESS"
-        if isnew:
-            n_new += 1; a_new += ok
-        else:
-            n_rep += 1; a_rep += ok
-    print(f"  первый запрос этой компании : {n_new:>6} · дошли до «КП получено» {a_new:>5} = {a_new/max(n_new,1)*100:4.1f}%")
-    print(f"  повторный запрос            : {n_rep:>6} · дошли до «КП получено» {a_rep:>5} = {a_rep/max(n_rep,1)*100:4.1f}%")
-    per = Counter(str(r.get("companyId")) for r in allr if r.get("companyId"))
-    dist = Counter(min(v, 6) for v in per.values())
-    print(f"  поставщиков всего в запросах: {len(per)} · запросов на поставщика: "
-          + " · ".join(f"{k if k<6 else '6+'}:{v}" for k, v in sorted(dist.items())))
+        if sid == SENT:
+            sent_ev[m][who] += 1
+        if sid in QUOTE and oid not in seen_q:
+            seen_q.add(oid); quote_ev[m][who] += 1
+        if sid in RESP and oid not in seen_r:
+            seen_r.add(oid); resp_ev[m][who] += 1
 
-    print("\n=== 7. ЕСТЬ ЛИ КУДА ПИСАТЬ: контакты компаний-получателей ===")
-    cids = sorted({str(r.get("companyId")) for r in y26 if r.get("companyId")})
-    have_mail = have_phone = seen = 0
-    for i in range(0, len(cids), 100):
-        for c in bx_all("crm.company.list", {"filter": {"ID": cids[i:i + 100]},
-                                             "select": ["ID", "HAS_EMAIL", "HAS_PHONE"]}):
-            seen += 1
-            have_mail += c.get("HAS_EMAIL") == "Y"
-            have_phone += c.get("HAS_PHONE") == "Y"
-    print(f"  компаний в запросах 2026: {seen}")
-    print(f"    с email:   {have_mail:>5} ({have_mail/max(seen,1)*100:.0f}%)")
-    print(f"    с телефоном:{have_phone:>5} ({have_phone/max(seen,1)*100:.0f}%)")
+    months = [m for m in sorted(set(sent_ev) | set(quote_ev)) if m >= "2026-04"]
 
-    print("\n=== 8. СВЯЗНОСТЬ ===")
-    withdeal = sum(1 for r in y26 if r.get("parentId2"))
-    withcont = sum(1 for r in y26 if r.get("contactId"))
-    withsum = sum(1 for r in y26 if float(r.get("opportunity") or 0) > 0)
-    print(f"  привязан к сделке: {withdeal}/{len(y26)} ({withdeal/max(len(y26),1)*100:.0f}%)")
-    print(f"  указано контактное лицо: {withcont}/{len(y26)} ({withcont/max(len(y26),1)*100:.0f}%)")
-    print(f"  заполнена сумма: {withsum}/{len(y26)} ({withsum/max(len(y26),1)*100:.0f}%)")
-    perdeal = Counter(str(r.get("parentId2")) for r in y26 if r.get("parentId2"))
-    if perdeal:
-        vals = sorted(perdeal.values())
-        print(f"  поставщиков опрашивают на одну сделку: мед {st.median(vals):.0f} · "
-              f"p75 {vals[3*len(vals)//4]} · макс {max(vals)} · сделок с запросами {len(perdeal)}")
-        d1 = sum(1 for v in perdeal.values() if v == 1)
-        print(f"  сделок, где опросили только ОДНОГО поставщика: {d1} ({d1/len(perdeal)*100:.0f}%)")
+    print("\n=== 4. ДИНАМИКА ПО МЕСЯЦАМ: все, кто шлёт запросы ===")
+    print(f"  {'месяц':8s} {'чел':>4} {'отправл':>8} {'на чел':>7} {'медиана':>8} "
+          f"{'КП':>6} {'КП/чел':>7} {'КП мед':>7} {'КП/отпр':>8} {'ответ':>7} {'отв%':>6}")
+    for m in months:
+        people = sorted(set(sent_ev[m]))
+        n = len(people) or 1
+        s_v = [sent_ev[m][p] for p in people]
+        q_v = [quote_ev[m].get(p, 0) for p in people]
+        S, Q, R = sum(s_v), sum(quote_ev[m].values()), sum(resp_ev[m].values())
+        print(f"  {m:8s} {len(people):>4} {S:>8} {S/n:>7.1f} {st.median(s_v):>8.0f} "
+              f"{Q:>6} {Q/n:>7.1f} {st.median(q_v):>7.0f} {Q/max(S,1)*100:>7.0f}% "
+              f"{R:>7} {R/max(S,1)*100:>5.0f}%")
 
-    print("\n✓ зонд v22 завершён")
+    print("\n=== 5. ТО ЖЕ, ПО ПОДРАЗДЕЛЕНИЯМ (топ-6 по объёму) ===")
+    dvol = Counter()
+    for m in months:
+        for p, v in sent_ev[m].items():
+            dvol[udep.get(p, "—")] += v
+    for dep, _ in dvol.most_common(6):
+        print(f"\n  --- {dep} ---")
+        print(f"  {'месяц':8s} {'чел':>4} {'отправл':>8} {'на чел':>7} {'КП':>6} {'КП/чел':>7} {'КП/отпр':>8}")
+        for m in months:
+            people = [p for p in sent_ev[m] if udep.get(p, "—") == dep]
+            if not people:
+                continue
+            n = len(people)
+            S = sum(sent_ev[m][p] for p in people)
+            Q = sum(quote_ev[m].get(p, 0) for p in people)
+            print(f"  {m:8s} {n:>4} {S:>8} {S/n:>7.1f} {Q:>6} {Q/n:>7.1f} {Q/max(S,1)*100:>7.0f}%")
+
+    print("\n=== 6. КОГОРТЫ: из запросов, СОЗДАННЫХ в месяце, сколько дошло до КП ===")
+    print("  (последние месяцы занижены: цикл ответа не завершён)")
+    coh = defaultdict(lambda: [0, 0])
+    for oid, m in born.items():
+        if m < "2026-04":
+            continue
+        coh[m][0] += 1
+        if oid in seen_q:
+            coh[m][1] += 1
+    for m in sorted(coh):
+        n, q = coh[m]
+        print(f"  {m}: создано {n:>5} · дошли до КП {q:>5} = {q/max(n,1)*100:4.1f}%")
+
+    print("\n=== 7. КТО ФОРМИРУЕТ ОБЪЁМ: топ-12 по отправкам за период ===")
+    tot_s, tot_q = Counter(), Counter()
+    for m in months:
+        for p, v in sent_ev[m].items():
+            tot_s[p] += v
+        for p, v in quote_ev[m].items():
+            tot_q[p] += v
+    print(f"  {'сотрудник':28s} {'подразделение':30s} {'отпр':>6} {'КП':>5} {'КП/отпр':>8}")
+    for p, v in tot_s.most_common(12):
+        q = tot_q.get(p, 0)
+        print(f"  {uname.get(p, p)[:28]:28s} {udep.get(p, '—')[:30]:30s} {v:>6} {q:>5} {q/max(v,1)*100:>7.0f}%")
+
+    print("\n✓ зонд v23 завершён")
     return 0
 
 
