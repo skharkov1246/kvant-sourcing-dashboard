@@ -1,11 +1,10 @@
-"""Зонд v23: динамика с апреля — отправленные запросы и полученные КП, в среднем на человека.
+"""Зонд v24: чем на самом деле измеряется нагрузка сорсера.
 
-Считаем ПОТОК СОБЫТИЙ по истории стадий СП-166 (не текущие стадии):
-  отправлено   = первый вход запроса в стадию «Request Sent» в этом месяце
-  получено КП  = первый вход в любую стадию, означающую наличие цены
-  ответ получен = шире: любая реакция поставщика, включая отказ котировать
-Делим на число сотрудников, у которых в этом месяце была хотя бы одна отправка.
-Приводим среднее и медиану — среднее искажают несколько человек с большим объёмом.
+Отделяем машинную работу от ручной:
+  кто создаёт карточки (человек или служебная учётная запись),
+  пачками ли они создаются (group_id и всплески по времени),
+  сколько сделок и товарных строк приходится на сотрудника,
+  какие шаги остаются ручными — это и есть незакрытая автоматизация.
 """
 from __future__ import annotations
 
@@ -16,12 +15,11 @@ from collections import Counter, defaultdict
 import requests
 
 ET, CAT = 166, 24
-SINCE = "2026-03-01"
-
-SENT = "DT166_24:PREPARATION"
-QUOTE = {"DT166_24:UC_H49RUE", "DT166_24:SUCCESS", "DT166_24:1",
-         "DT166_24:4", "DT166_24:5", "DT166_24:FAIL"}
-RESP = QUOTE | {"DT166_24:UC_61BSRU", "DT166_24:UC_GFJ5A8", "DT166_24:2"}
+SINCE = "2026-04-01"
+F_GROUP = "ufCrm18_1750155997248"     # group_id
+F_AI = "ufCrm18_1703712609095"        # AI model
+F_TEXT = "ufCrm18_1706636290339"      # Deal_text
+F_RESP = "ufCrm18_1709056431446"      # Response received
 
 
 def bx(method: str, params: dict | None = None) -> dict:
@@ -52,7 +50,6 @@ def bx_all(method: str, params: dict) -> list:
 
 
 def main() -> int:
-    print("=== 1. Кто есть кто ===")
     deps = {str(d["ID"]): str(d.get("NAME") or "") for d in bx_all("department.get", {})}
     uname, udep = {}, {}
     for u in bx_all("user.get", {}):
@@ -60,103 +57,127 @@ def main() -> int:
         uname[uid] = f"{u.get('NAME') or ''} {u.get('LAST_NAME') or ''}".strip() or uid
         dd = u.get("UF_DEPARTMENT") or []
         udep[uid] = deps.get(str(dd[0]), "—") if dd else "—"
-    print(f"  сотрудников: {len(uname)} · подразделений: {len(deps)}")
 
-    print("\n=== 2. Запросы: кто ответственный ===")
-    items = bx_all("crm.item.list", {"entityTypeId": ET, "filter": {"categoryId": CAT},
-                                     "select": ["id", "assignedById", "createdTime"]})
-    owner = {str(i["id"]): str(i.get("assignedById") or "") for i in items}
-    born = {str(i["id"]): str(i.get("createdTime") or "")[:7] for i in items}
-    print(f"  запросов всего: {len(items)}")
+    print(f"=== 1. Запросы с {SINCE} ===")
+    rows = bx_all("crm.item.list", {"entityTypeId": ET,
+        "filter": {"categoryId": CAT, ">=createdTime": SINCE},
+        "select": ["id", "createdTime", "createdBy", "assignedById", "parentId2",
+                   F_GROUP, F_AI]})
+    print(f"  карточек: {len(rows)}")
 
-    print(f"\n=== 3. История стадий с {SINCE} ===")
-    params = {"entityTypeId": ET, "filter": {"CATEGORY_ID": CAT, ">=CREATED_TIME": SINCE},
-              "select": ["OWNER_ID", "CREATED_TIME", "STAGE_ID"], "order": {"CREATED_TIME": "ASC"}}
-    hist = bx_all("crm.stagehistory.list", params)
-    print(f"  записей истории: {len(hist)}")
-    print(f"  встреченные стадии: {dict(Counter(h.get('STAGE_ID') for h in hist).most_common(14))}")
+    print("\n=== 2. КТО СОЗДАЁТ КАРТОЧКИ ===")
+    cb = Counter(str(r.get("createdBy") or "—") for r in rows)
+    for uid, n in cb.most_common(12):
+        print(f"  {uname.get(uid, uid)[:34]:36s} {udep.get(uid,'—')[:26]:28s} {n:>6}  {n/len(rows)*100:5.1f}%")
+    mism = sum(1 for r in rows if str(r.get("createdBy")) != str(r.get("assignedById")))
+    print(f"  создатель ≠ ответственный: {mism} из {len(rows)} ({mism/max(len(rows),1)*100:.0f}%)")
 
-    # первый вход каждого запроса в каждую стадию
-    first: dict[tuple[str, str], str] = {}
-    for h in hist:
-        k = (str(h.get("OWNER_ID")), str(h.get("STAGE_ID")))
-        t = str(h.get("CREATED_TIME") or "")
-        if k not in first or t < first[k]:
-            first[k] = t
+    print("\n=== 3. ПАЧКИ: сколько карточек порождает одно действие ===")
+    grp = defaultdict(int)
+    nogrp = 0
+    for r in rows:
+        g = r.get(F_GROUP)
+        if g in (None, "", 0):
+            nogrp += 1
+        else:
+            grp[str(g)] += 1
+    if grp:
+        sizes = sorted(grp.values())
+        print(f"  групп (group_id): {len(grp)} · карточек в группах: {sum(sizes)} · без группы: {nogrp}")
+        print(f"  карточек в группе: медиана {st.median(sizes):.0f} · среднее {sum(sizes)/len(sizes):.1f} · макс {max(sizes)}")
+        dist = Counter(min(v, 10) for v in sizes)
+        print("  распределение: " + " · ".join(f"{k if k<10 else '10+'}:{v}" for k, v in sorted(dist.items())))
+    # всплески: карточки одного создателя в одну минуту
+    burst = defaultdict(int)
+    for r in rows:
+        burst[(str(r.get("createdBy")), str(r.get("createdTime"))[:16])] += 1
+    bs = sorted(burst.values())
+    big = sum(v for v in bs if v >= 5)
+    print(f"  создано в одну минуту одним автором: медиана {st.median(bs):.0f} · макс {max(bs)}")
+    print(f"  доля карточек, созданных пачками по 5+ за минуту: {big}/{len(rows)} = {big/max(len(rows),1)*100:.0f}%")
 
-    sent_ev = defaultdict(lambda: defaultdict(int))    # месяц → сотрудник → шт
-    quote_ev = defaultdict(lambda: defaultdict(int))
-    resp_ev = defaultdict(lambda: defaultdict(int))
-    seen_q, seen_r = set(), set()
-    for (oid, sid), t in sorted(first.items(), key=lambda kv: kv[1]):
-        m, who = t[:7], owner.get(oid, "")
-        if not who or not m:
+    print("\n=== 4. ПРИЗНАКИ УЧАСТИЯ ИИ ===")
+    ai = Counter(str(r.get(F_AI) or "—")[:40] for r in rows)
+    for v, n in ai.most_common(8):
+        print(f"  «{v}»: {n} ({n/len(rows)*100:.0f}%)")
+
+    print("\n=== 5. НАГРУЗКА В СДЕЛКАХ: сколько сделок на сотрудника в месяц ===")
+    dm = defaultdict(lambda: defaultdict(set))     # месяц → сотрудник → сделки
+    cm = defaultdict(lambda: defaultdict(int))     # месяц → сотрудник → карточки
+    gm = defaultdict(lambda: defaultdict(set))     # месяц → сотрудник → группы
+    for r in rows:
+        m = str(r.get("createdTime") or "")[:7]
+        p = str(r.get("assignedById") or "")
+        if not m or not p:
             continue
-        if sid == SENT:
-            sent_ev[m][who] += 1
-        if sid in QUOTE and oid not in seen_q:
-            seen_q.add(oid); quote_ev[m][who] += 1
-        if sid in RESP and oid not in seen_r:
-            seen_r.add(oid); resp_ev[m][who] += 1
+        cm[m][p] += 1
+        if r.get("parentId2"):
+            dm[m][p].add(str(r["parentId2"]))
+        if r.get(F_GROUP):
+            gm[m][p].add(str(r[F_GROUP]))
+    print(f"  {'месяц':8s} {'чел':>4} {'сделок':>7} {'сд/чел':>7} {'сд.мед':>7} {'групп':>7} {'гр/чел':>7} {'карт/чел':>9} {'карт/сделку':>12}")
+    for m in sorted(cm):
+        ppl = sorted(cm[m])
+        n = len(ppl)
+        dv = [len(dm[m].get(p, ())) for p in ppl]
+        gv = [len(gm[m].get(p, ())) for p in ppl]
+        cv = [cm[m][p] for p in ppl]
+        D, G, C = sum(dv), sum(gv), sum(cv)
+        print(f"  {m:8s} {n:>4} {D:>7} {D/n:>7.1f} {st.median(dv):>7.0f} {G:>7} {G/n:>7.1f} {C/n:>9.1f} {C/max(D,1):>12.1f}")
 
-    months = [m for m in sorted(set(sent_ev) | set(quote_ev)) if m >= "2026-04"]
-
-    print("\n=== 4. ДИНАМИКА ПО МЕСЯЦАМ: все, кто шлёт запросы ===")
-    print(f"  {'месяц':8s} {'чел':>4} {'отправл':>8} {'на чел':>7} {'медиана':>8} "
-          f"{'КП':>6} {'КП/чел':>7} {'КП мед':>7} {'КП/отпр':>8} {'ответ':>7} {'отв%':>6}")
-    for m in months:
-        people = sorted(set(sent_ev[m]))
-        n = len(people) or 1
-        s_v = [sent_ev[m][p] for p in people]
-        q_v = [quote_ev[m].get(p, 0) for p in people]
-        S, Q, R = sum(s_v), sum(quote_ev[m].values()), sum(resp_ev[m].values())
-        print(f"  {m:8s} {len(people):>4} {S:>8} {S/n:>7.1f} {st.median(s_v):>8.0f} "
-              f"{Q:>6} {Q/n:>7.1f} {st.median(q_v):>7.0f} {Q/max(S,1)*100:>7.0f}% "
-              f"{R:>7} {R/max(S,1)*100:>5.0f}%")
-
-    print("\n=== 5. ТО ЖЕ, ПО ПОДРАЗДЕЛЕНИЯМ (топ-6 по объёму) ===")
-    dvol = Counter()
-    for m in months:
-        for p, v in sent_ev[m].items():
-            dvol[udep.get(p, "—")] += v
-    for dep, _ in dvol.most_common(6):
-        print(f"\n  --- {dep} ---")
-        print(f"  {'месяц':8s} {'чел':>4} {'отправл':>8} {'на чел':>7} {'КП':>6} {'КП/чел':>7} {'КП/отпр':>8}")
-        for m in months:
-            people = [p for p in sent_ev[m] if udep.get(p, "—") == dep]
-            if not people:
-                continue
-            n = len(people)
-            S = sum(sent_ev[m][p] for p in people)
-            Q = sum(quote_ev[m].get(p, 0) for p in people)
-            print(f"  {m:8s} {n:>4} {S:>8} {S/n:>7.1f} {Q:>6} {Q/n:>7.1f} {Q/max(S,1)*100:>7.0f}%")
-
-    print("\n=== 6. КОГОРТЫ: из запросов, СОЗДАННЫХ в месяце, сколько дошло до КП ===")
-    print("  (последние месяцы занижены: цикл ответа не завершён)")
-    coh = defaultdict(lambda: [0, 0])
-    for oid, m in born.items():
-        if m < "2026-04":
+    print("\n  --- то же по Отделу поиска поставщиков ---")
+    print(f"  {'месяц':8s} {'чел':>4} {'сделок':>7} {'сд/чел':>7} {'групп':>7} {'гр/чел':>7} {'карт/чел':>9}")
+    for m in sorted(cm):
+        ppl = [p for p in cm[m] if udep.get(p, "") == "Отдел поиска поставщиков"]
+        if not ppl:
             continue
-        coh[m][0] += 1
-        if oid in seen_q:
-            coh[m][1] += 1
-    for m in sorted(coh):
-        n, q = coh[m]
-        print(f"  {m}: создано {n:>5} · дошли до КП {q:>5} = {q/max(n,1)*100:4.1f}%")
+        n = len(ppl)
+        D = len(set().union(*[dm[m].get(p, set()) for p in ppl])) if ppl else 0
+        G = sum(len(gm[m].get(p, ())) for p in ppl)
+        C = sum(cm[m][p] for p in ppl)
+        print(f"  {m:8s} {n:>4} {D:>7} {D/n:>7.1f} {G:>7} {G/n:>7.1f} {C/n:>9.1f}")
 
-    print("\n=== 7. КТО ФОРМИРУЕТ ОБЪЁМ: топ-12 по отправкам за период ===")
-    tot_s, tot_q = Counter(), Counter()
-    for m in months:
-        for p, v in sent_ev[m].items():
-            tot_s[p] += v
-        for p, v in quote_ev[m].items():
-            tot_q[p] += v
-    print(f"  {'сотрудник':28s} {'подразделение':30s} {'отпр':>6} {'КП':>5} {'КП/отпр':>8}")
-    for p, v in tot_s.most_common(12):
-        q = tot_q.get(p, 0)
-        print(f"  {uname.get(p, p)[:28]:28s} {udep.get(p, '—')[:30]:30s} {v:>6} {q:>5} {q/max(v,1)*100:>7.0f}%")
+    print("\n=== 6. ТОВАРНЫЕ СТРОКИ: сколько позиций в сделке (выборка 200) ===")
+    dids = sorted({str(r["parentId2"]) for r in rows if r.get("parentId2")})
+    print(f"  сделок с запросами с апреля: {len(dids)}")
+    sample = dids[-200:]
+    cnt, zero = [], 0
+    for d in sample:
+        j = bx("crm.item.productrow.list", {"filter": {"=ownerType": "D", "=ownerId": int(d)}})
+        pr = ((j or {}).get("result") or {}).get("productRows")
+        if pr is None:
+            continue
+        cnt.append(len(pr))
+        if not pr:
+            zero += 1
+    if cnt:
+        cs = sorted(cnt)
+        print(f"  разобрано сделок: {len(cs)} · без позиций: {zero} ({zero/len(cs)*100:.0f}%)")
+        print(f"  позиций в сделке: медиана {st.median(cs):.0f} · среднее {sum(cs)/len(cs):.1f} · "
+              f"p75 {cs[3*len(cs)//4]} · макс {max(cs)}")
+    else:
+        print("  товарные строки через API недоступны")
 
-    print("\n✓ зонд v23 завершён")
+    print("\n=== 7. ЧТО ОСТАЁТСЯ РУЧНЫМ: длина технического текста запроса (выборка 200) ===")
+    ids = [r["id"] for r in rows[-200:]]
+    lens, resp = [], 0
+    got = 0
+    for i in range(0, len(ids), 50):
+        for it in bx_all("crm.item.list", {"entityTypeId": ET,
+                "filter": {"categoryId": CAT, "@id": ids[i:i+50]},
+                "select": ["id", F_TEXT, F_RESP]}):
+            got += 1
+            t = it.get(F_TEXT)
+            if t:
+                lens.append(len(str(t)))
+            if it.get(F_RESP) not in (None, "", 0, "0"):
+                resp += 1
+    if lens:
+        ls = sorted(lens)
+        print(f"  карточек: {got} · с текстом: {len(ls)} · длина: медиана {st.median(ls):.0f} симв. · макс {max(ls)}")
+    print(f"  отметка «ответ получен» проставлена: {resp} из {got}")
+
+    print("\n✓ зонд v24 завершён")
     return 0
 
 
