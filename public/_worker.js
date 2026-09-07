@@ -1,49 +1,49 @@
-// Гейт доступа к дашборду: HTTP Basic Auth перед отдачей статики + САМООБНОВЛЕНИЕ.
-// Cloudflare Pages в advanced-режиме (наличие _worker.js) гоняет ВСЕ запросы
-// через этот fetch; сами файлы отдаём через env.ASSETS уже после проверки.
+// Портал КВАНТ и дашборд сорсинга: вход только через Cloudflare Access + САМООБНОВЛЕНИЕ.
+// Cloudflare Pages в advanced-режиме (наличие _worker.js) гоняет ВСЕ запросы через этот
+// fetch; файлы отдаём через env.ASSETS уже после проверки подписи входа.
 //
-// Пароль в КОДЕ НЕ хранится — берётся из переменной окружения проекта
-// BASIC_AUTH_PASS (секрет Cloudflare Pages). Логин — BASIC_AUTH_USER (по умолчанию "kvant").
+// Маршруты:  /            — портал: плитки всех сайтов компании (генерируется здесь)
+//            /dashboard   — дашборд сорсинга (index.html из сборки) с плашкой портала
+//            /gen         — метка свежести для поллинга со страницы
+//            /fonts/*     — иммутабельная статика
+// Паролей нет: периметр — приложение Access с одной политикой допуска по почте
+// (распоряжение владельца от 07.09.2026: единый вход, единый портал).
 //
 // САМООБНОВЛЕНИЕ: если при заходе данные старше 2 ч, воркер сам триггерит пересборку
 // (GitHub repository_dispatch {"event_type":"rebuild"}), а страница опрашивает сервер
-// и перезагрузится, когда придёт свежий деплой. Так датчик почти всегда зелёный.
-// Нужен один секрет проекта: GH_DISPATCH_TOKEN — fine-grained PAT этого репозитория
-// с правом Contents: Read and write (или classic с scope `repo`). Без него воркер просто
-// отдаёт статику как раньше (самообновление выключено, ломаться нечему).
+// и перезагрузится, когда придёт свежий деплой. Нужен секрет проекта GH_DISPATCH_TOKEN —
+// fine-grained PAT этого репозитория с правом Contents: Read and write. Без него
+// самообновление выключено, ломаться нечему.
 const GH_REPO = "skharkov1246/kvant-sourcing-dashboard";
 const FRESH_MS = 2 * 3600 * 1000;          // порог свежести — 2 часа
 const DEBOUNCE_MS = 15 * 60;               // не триггерить пересборку чаще раза в 15 мин (сек, для Cache-Control)
+const PORTAL_SITES = [
+  { href: "/dashboard", name: "Дашборд сорсинга", note: "нагрузка, конверсия, реализация, поставщики — по данным Bitrix24, обновление каждые 2 часа" },
+  { href: "https://kvant-zip.pages.dev/", name: "База ЗИП", note: "позиции, ODM-аналоги и цены; внутри — справочник ГТУ и документы заказов" },
+  { href: "https://kvant-zip.pages.dev/gt/", name: "Справочник ГТУ", note: "газотурбинное оборудование: поставщики, цепочки, досье" },
+  { href: "https://kvant-gpu.pages.dev/", name: "Библиотека ГПУ", note: "газопоршневые установки: Cummins, Caterpillar, INNIO — сорсинг и цены" },
+  { href: "https://kvant-ove.pages.dev/", name: "ОВЭ-75", note: "проект «обжиг – выщелачивание – электроэкстракция» для Кольской ГМК" },
+  { href: "https://kvant-gidromet.pages.dev/", name: "Гидрометаллургия", note: "заключение по переработке медно-золотого концентрата" },
+  { href: "https://kvant-gok.pages.dev/", name: "ГОК", note: "базовый проект золото-медного ГОКа" },
+];
 
 export default {
   async fetch(request, env, ctx) {
-    const user = env.BASIC_AUTH_USER || "kvant";
-    const pass = env.BASIC_AUTH_PASS;
-
-    // секрет не задан → доступ закрыт (fail-closed), с подсказкой по настройке
-    if (!pass && !env.BASIC_AUTH_USERS) {
-      return new Response(
-        "Доступ не настроен: задайте секрет BASIC_AUTH_PASS в проекте Cloudflare Pages.",
-        { status: 503, headers: { "Cache-Control": "no-store" } },
-      );
-    }
-    if (!(await userOk(request, env, SITE))) {
-      return new Response("Требуется авторизация", {
-        status: 401,
-        headers: {
-          "WWW-Authenticate": 'Basic realm="KVANT Sourcing Dashboard", charset="UTF-8"',
-          "Cache-Control": "no-store",
-        },
-      });
-    }
+    const who = await accessOk(request, env);
+    if (!who) return denyPage("Портал КВАНТ");
 
     const url = new URL(request.url);
 
-    // /gen — лёгкая проверка свежести для поллинга со страницы: вместо скачивания
-    // всего index.html клиент получает пару десятков байт JSON с меткой генерации.
+    // портал — корень
+    if (url.pathname === "/" || url.pathname === "/portal" || url.pathname === "/portal/") {
+      if (env.VISITS && request.headers.get("X-Poll") !== "1") ctx.waitUntil(logVisit(request, env));
+      return portalPage(who, env);
+    }
+
+    // /gen — лёгкая проверка свежести для поллинга со страницы дашборда.
     // Заодно триггерит пересборку, если данные устарели (как заход на страницу).
     if (url.pathname === "/gen") {
-      const idx = await env.ASSETS.fetch(new Request(url.origin + "/", { headers: request.headers }));
+      const idx = await env.ASSETS.fetch(new Request(url.origin + "/index.html", { headers: request.headers }));
       const text = await idx.text();
       const m = text.match(/gen=new Date\("([^"]+)"\)/);
       const genMs = m ? Date.parse(m[1]) : NaN;
@@ -62,38 +62,79 @@ export default {
       return new Response(font.body, { status: font.status, statusText: font.statusText, headers: fh });
     }
 
-    // авторизованы → отдаём статический файл, но ЗАПРЕЩАЕМ кэширование:
-    // иначе браузер/edge отдают старый index.html и после деплоя «сайт не обновляется».
-    const resp = await env.ASSETS.fetch(request);
+    // дашборд: /dashboard (и прямой /index.html) → index.html из сборки
+    const isDash = url.pathname === "/dashboard" || url.pathname === "/dashboard/" || url.pathname === "/index.html";
+    const resp = await env.ASSETS.fetch(isDash ? new Request(url.origin + "/index.html", { headers: request.headers }) : request);
     const headers = new Headers(resp.headers);
+    // ЗАПРЕЩАЕМ кэширование: иначе браузер/edge отдают старый index.html и «сайт не обновляется»
     headers.set("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
     headers.set("Pragma", "no-cache");
     headers.set("Expires", "0");
+    headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
 
     const ctype = resp.headers.get("content-type") || "";
     if (ctype.includes("text/html")) {
       // лог визита для ежедневного отчёта (уникальные IP). Поллинг свежести (X-Poll) не считаем.
       if (env.VISITS && request.headers.get("X-Poll") !== "1") ctx.waitUntil(logVisit(request, env));
       try {
-        // читаем БАЙТЫ один раз; их же и отдаём (без двойного чтения/перекодировки).
-        // Content-Encoding/Length чистим — тело уже декодировано рантаймом, edge сожмёт заново.
         const buf = await resp.arrayBuffer();
-        const text = new TextDecoder().decode(buf);
+        let text = new TextDecoder().decode(buf);
         const m = text.match(/gen=new Date\("([^"]+)"\)/);
         const genMs = m ? Date.parse(m[1]) : NaN;
         const stale = isNaN(genMs) || (Date.now() - genMs) > FRESH_MS;
         if (stale && env.GH_DISPATCH_TOKEN) ctx.waitUntil(triggerRebuild(env));
+        // плашка портала над вкладками
+        text = text.replace('<div class="tabs">', portalBar(who, env) + '<div class="tabs">');
         headers.delete("Content-Encoding");
         headers.delete("Content-Length");
-        return new Response(buf, { status: resp.status, statusText: resp.statusText, headers });
+        return new Response(text, { status: resp.status, statusText: resp.statusText, headers });
       } catch (e) {
-        // что-то пошло не так с чтением — отдаём страницу как есть, ничего не ломаем
         return new Response(resp.body, { status: resp.status, statusText: resp.statusText, headers });
       }
     }
     return new Response(resp.body, { status: resp.status, statusText: resp.statusText, headers });
   },
 };
+
+// Портал: одна страница с плитками всех сайтов компании. Шрифты — свои (/fonts), внешних ресурсов нет.
+function portalPage(who, env) {
+  const team = String((env && env.CF_ACCESS_TEAM) || CF_TEAM_DEFAULT).replace(/^https?:\/\//, "").replace(/\/+$/, "");
+  const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const tiles = PORTAL_SITES.map((s) =>
+    `<a class="tile" href="${esc(s.href)}"><div class="n">${esc(s.name)}</div><div class="d">${esc(s.note)}</div></a>`).join("");
+  const html = `<!doctype html><html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="dark">
+<title>Портал КВАНТ</title>
+<style>
+@font-face{font-family:'IBM Plex Sans';font-style:normal;font-weight:400 600;font-display:swap;src:url(/fonts/ibm-plex-sans-var-cyr.woff2) format('woff2');unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:'IBM Plex Sans';font-style:normal;font-weight:400 600;font-display:swap;src:url(/fonts/ibm-plex-sans-var-lat.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+2000-206F,U+20AC,U+2122,U+2212}
+:root{--bg:#0e1116;--card:#151a22;--ln:#232a35;--ink:#e7ecf3;--dim:#8b97a8;--a:#5aa9ff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 'IBM Plex Sans',-apple-system,'Segoe UI',Roboto,sans-serif}
+.wrap{max-width:1040px;margin:0 auto;padding:36px 20px 60px}
+.top{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:22px}
+.eyebrow{color:var(--a);font-size:12px;letter-spacing:.1em;text-transform:uppercase}
+h1{font-size:26px;margin:4px 0 0}.who{margin-left:auto;color:var(--dim);font-size:13px}.who a{color:var(--a);text-decoration:none;margin-left:10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.tile{display:block;background:var(--card);border:1px solid var(--ln);border-radius:12px;padding:18px 20px;color:inherit;text-decoration:none;transition:border-color .15s}
+.tile:hover,.tile:focus-visible{border-color:var(--a);outline:none}.tile .n{font-weight:600;font-size:17px;margin-bottom:6px}.tile .d{color:var(--dim);font-size:13px}
+.note{color:var(--dim);font-size:12.5px;margin-top:22px;max-width:70ch}
+</style></head><body><div class="wrap">
+<div class="top"><div><div class="eyebrow">КВАНТ · единый вход</div><h1>Портал</h1></div>
+<div class="who">${esc(who.email)}<a href="https://${esc(team)}/cdn-cgi/access/logout">выйти</a></div></div>
+<div class="grid">${tiles}</div>
+<div class="note">Вход по корпоративной почте через Cloudflare, сессия действует месяц. Доступ к сайтам выдаёт владелец.</div>
+</div></body></html>`;
+  return new Response(html, { status: 200, headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store",
+    "X-Robots-Tag": "noindex, nofollow, noarchive", "Referrer-Policy": "no-referrer" } });
+}
+// плашка над дашбордом: ссылка на портал, почта вошедшего, выход
+function portalBar(who, env) {
+  const team = String((env && env.CF_ACCESS_TEAM) || CF_TEAM_DEFAULT).replace(/^https?:\/\//, "").replace(/\/+$/, "");
+  const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  return `<div style="display:flex;gap:14px;align-items:center;justify-content:space-between;font:12px/1.4 'IBM Plex Sans',sans-serif;color:#8b97a8;padding:8px 14px 0">` +
+    `<a href="/" style="color:#5aa9ff;text-decoration:none">← Портал КВАНТ</a>` +
+    `<span>${esc(who.email)} · <a href="https://${esc(team)}/cdn-cgi/access/logout" style="color:#5aa9ff;text-decoration:none">выйти</a></span></div>`;
+}
 
 // Триггер пересборки через GitHub repository_dispatch, с дебаунсом через Cache API
 // (не чаще раза в 15 мин на edge — чтобы пачка заходов в окно сборки не наплодила прогонов).
@@ -128,68 +169,97 @@ async function logVisit(request, env) {
   } catch (e) { /* аналитика — best-effort */ }
 }
 
-// сравнение за постоянное время, чтобы не подсказывать пароль по таймингу
-function timingSafeEqual(a, b) {
-  if (a.length !== b.length) return false;
-  let diff = 0;
-  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
-  return diff === 0;
+
+// служебная страница отказа: без внешних ресурсов, светлая и тёмная тема
+function denyPage(title) {
+  const html = `<!doctype html><html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1"><title>${title}</title>
+<style>:root{color-scheme:light;--page:#f9f9f7;--surface:#fcfcfb;--ink:#0b0b0b;--ink2:#52514e;--b:rgba(11,11,11,.10);--s1:#2a78d6}
+@media(prefers-color-scheme:dark){:root{color-scheme:dark;--page:#0d0d0d;--surface:#1a1a19;--ink:#fff;--ink2:#c3c2b7;--b:rgba(255,255,255,.10);--s1:#3987e5}}
+body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;
+background:var(--page);color:var(--ink);font:15px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
+.c{background:var(--surface);border:1px solid var(--b);border-left:4px solid var(--s1);border-radius:12px;
+padding:22px 26px;max-width:560px}h1{font-size:19px;margin:0 0 10px}p{margin:9px 0;color:var(--ink2)}
+a{color:var(--s1)}</style></head><body><div class="c"><h1>${title}</h1>
+<p>Вход выполняется через портал КВАНТ по корпоративной почте.</p>
+<p><a href="https://kvant-sourcing-f122.pages.dev/">Перейти к порталу</a></p></div></body></html>`;
+  return new Response(html, {
+    status: 403,
+    headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store",
+               "X-Robots-Tag": "noindex, nofollow, noarchive" },
+  });
 }
 
-// Разбор заголовка Basic без btoa: пароль может содержать любые символы UTF-8.
-// btoa на строке с кириллицей бросает исключение, и сайт отвечает 500 на каждый
-// запрос — то есть падает целиком. Здесь декодируем присланные байты и сравниваем
-// уже строки, поэтому пароль может быть любым.
-function parseBasic(header) {
-  if (!header || !header.startsWith("Basic ")) return null;
-  let raw;
-  try { raw = atob(header.slice(6)); } catch { return null; }
-  const text = new TextDecoder().decode(Uint8Array.from(raw, (c) => c.charCodeAt(0)));
-  const i = text.indexOf(":");
-  return i < 0 ? null : { user: text.slice(0, i), pass: text.slice(i + 1) };
-}
-
-// сравнение без ранних выходов (не зависит от позиции первого несовпадения)
-function safeEqual(a, b) {
-  const enc = new TextEncoder();
-  const x = enc.encode(String(a)), y = enc.encode(String(b));
-  let diff = x.length ^ y.length;
-  for (let i = 0; i < Math.max(x.length, y.length); i++) diff |= (x[i] || 0) ^ (y[i] || 0);
-  return diff === 0;
-}
-
-// ---- ИМЕННОЙ ВХОД ПО КОРПОРАТИВНОЙ ПОЧТЕ (копия access/users.js, сверяется тестом) ----
-// Секрет BASIC_AUTH_USERS: по строке «email sha256(email:пароль) сайты»; общий пароль — резервный вход.
 const SITE = "sourcing";
-// BEGIN userOk
-async function userOk(request, env, site) {
-  const c = parseBasic(request.headers.get("Authorization"));
-  if (!c) return false;
-  const login = c.user.trim().toLowerCase();
-  const table = env.BASIC_AUTH_USERS || "";
-  if (table) {
-    for (const raw of table.split(/\r?\n/)) {
-      const line = raw.trim();
-      if (!line || line.startsWith("#")) continue;
-      const [email, hash, ...rest] = line.split(/\s+/);
-      const sites = rest.join("") || "*";
-      if (!email || !hash || email.toLowerCase() !== login) continue;
-      const got = await sha256Hex(`${login}:${c.pass}`);
-      if (!safeEqual(got, hash.toLowerCase())) return false;
-      return sites === "*" || sites.split(",").map((s) => s.trim()).includes(site);
-    }
+// BEGIN accessOk
+// Проверка входа через Cloudflare Access: подпись JWT (RS256) по открытым ключам команды,
+// срок, издатель и, если задан CF_ACCESS_AUD, аудитория приложения. Возвращает {email, sub, exp}
+// или null. Нужна на служебных адресах предпросмотра (<hash>.<проект>.pages.dev), куда
+// периметр Access не распространяется: без действительного входа воркер ничего не отдаёт.
+const CF_TEAM_DEFAULT = "small-bread-df2f.cloudflareaccess.com";
+async function accessOk(request, env) {
+  const team = String((env && env.CF_ACCESS_TEAM) || CF_TEAM_DEFAULT).replace(/^https?:\/\//, "").replace(/\/+$/, "");
+  const jwt = request.headers.get("Cf-Access-Jwt-Assertion") || readCookie(request, "CF_Authorization");
+  if (!jwt) return null;
+  const parts = jwt.split(".");
+  if (parts.length !== 3) return null;
+  let header, payload;
+  try {
+    header = JSON.parse(b64uText(parts[0]));
+    payload = JSON.parse(b64uText(parts[1]));
+  } catch { return null; }
+  if (!header || header.alg !== "RS256" || !header.kid) return null;
+  const now = Math.floor(Date.now() / 1000);
+  if (typeof payload.exp !== "number" || payload.exp < now - 60) return null;
+  if (payload.iss !== `https://${team}`) return null;
+  const want = String((env && env.CF_ACCESS_AUD) || "").split(",").map((s) => s.trim()).filter(Boolean);
+  if (want.length) {
+    const aud = Array.isArray(payload.aud) ? payload.aud : [payload.aud];
+    if (!aud.some((a) => want.includes(a))) return null;
   }
-  const user = env.BASIC_AUTH_USER || "kvant";
-  const pass = env.BASIC_AUTH_PASS;
-  return !!pass && safeEqual(c.user, user) && safeEqual(c.pass, pass);
+  const keys = await accessCerts(team, env);
+  const jwk = keys.find((k) => k && k.kid === header.kid);
+  if (!jwk) return null;
+  try {
+    const key = await crypto.subtle.importKey("jwk", jwk, { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" }, false, ["verify"]);
+    const ok = await crypto.subtle.verify("RSASSA-PKCS1-v1_5", key, b64uBytes(parts[2]),
+      new TextEncoder().encode(parts[0] + "." + parts[1]));
+    if (!ok) return null;
+  } catch { return null; }
+  const email = String(payload.email || "").trim().toLowerCase();
+  return email ? { email, sub: String(payload.sub || ""), exp: payload.exp } : null;
 }
-async function sha256Hex(s) {
-  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
-  return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
+// открытые ключи команды; кэш на edge на час. env.__certs — подстановка для тестов.
+async function accessCerts(team, env) {
+  if (env && env.__certs) return Array.isArray(env.__certs.keys) ? env.__certs.keys : [];
+  const url = `https://${team}/cdn-cgi/access/certs`;
+  let resp = null;
+  try { if (typeof caches !== "undefined") resp = await caches.default.match(url); } catch { resp = null; }
+  if (!resp) {
+    resp = await fetch(url);
+    if (!resp || !resp.ok) return [];
+    try {
+      const copy = resp.clone();
+      const h = new Headers(copy.headers);
+      h.set("Cache-Control", "max-age=3600");
+      if (typeof caches !== "undefined") await caches.default.put(url, new Response(await copy.arrayBuffer(), { headers: h }));
+    } catch { /* кэш — необязателен */ }
+  }
+  try { const j = await resp.json(); return Array.isArray(j.keys) ? j.keys : []; } catch { return []; }
 }
-// END userOk
-
-function basicOk(request, user, pass) {
-  const creds = parseBasic(request.headers.get("Authorization"));
-  return !!creds && safeEqual(creds.user, user) && safeEqual(creds.pass, pass);
+function readCookie(request, name) {
+  const raw = request.headers.get("Cookie") || "";
+  for (const part of raw.split(";")) {
+    const i = part.indexOf("=");
+    if (i < 0) continue;
+    if (part.slice(0, i).trim() === name) return part.slice(i + 1).trim();
+  }
+  return null;
 }
+function b64uBytes(s) {
+  const b = String(s).replace(/-/g, "+").replace(/_/g, "/");
+  const bin = atob(b + "=".repeat((4 - (b.length % 4)) % 4));
+  return Uint8Array.from(bin, (c) => c.charCodeAt(0));
+}
+function b64uText(s) { return new TextDecoder().decode(b64uBytes(s)); }
+// END accessOk

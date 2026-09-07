@@ -5,7 +5,8 @@
 ## Что это за проект
 **Sourcing Analyzer (КВАНТ × Bitrix24)** — внутренний дашборд анализа работы сорсеров.
 По живым данным Bitrix24 (смарт-процесс «Запросы поставщикам», entityTypeId 166) считает
-метрики, генерирует HTML-дашборд и деплоит его на Cloudflare Pages за Basic Auth.
+метрики, генерирует HTML-дашборд и деплоит его на Cloudflare Pages. Вход — через Cloudflare Access (портал КВАНТ на `/`,
+дашборд на `/dashboard`; проверка подписи входа — `access/cfaccess.js`, паролей на сайтах нет).
 
 - Точка входа: `main.py` → тянет данные из Bitrix → модули метрик → рендер HTML.
 - Модули расчёта: `metrics.py`, `company.py`, `advisor.py`, `reps.py`, `kam.py`,
