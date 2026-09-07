@@ -250,6 +250,46 @@ test("права из ADMIN_EMAILS работают и без хранилища
   assert.match(await save.text(), /привяжите KV/);
 });
 
+test("журнал пишет, кто что открыл и что выгрузил", async () => {
+  const env = makeEnv();
+  await seed(env, {});
+  await call(env, "/dashboard", "ivan@kvantpro.com");
+  // другой сайт сообщает о себе через /api/rights
+  await call(env, "/api/rights?site=zip&at=/orders/zakaz.pdf", "ivan@kvantpro.com");
+
+  const html = await (await call(env, "/admin/log", "boss@kvantpro.com")).text();
+  assert.ok(html.includes("ivan@kvantpro.com"), "человека нет в журнале");
+  assert.ok(html.includes("/orders/zakaz.pdf"), "выгрузки нет в журнале");
+  assert.ok(html.includes("выгрузка"), "выгрузка не распознана");
+});
+
+test("отказ в доступе попадает в журнал", async () => {
+  const env = makeEnv();
+  await seed(env, { "e@kvantpro.com": { role: "guest", sites: [], tabs: [], note: "", seen: 1 } });
+  assert.equal((await call(env, "/dashboard", "e@kvantpro.com")).status, 403);
+  const html = await (await call(env, "/admin/log", "boss@kvantpro.com")).text();
+  assert.ok(html.includes("отказ"), "отказ не записан");
+  assert.ok(html.includes("e@kvantpro.com"));
+});
+
+test("журнал закрыт для всех, кроме владельца, и сам это фиксирует", async () => {
+  const env = makeEnv();
+  await seed(env, { "s@kvantpro.com": { role: "sourcing", sites: [], tabs: [], note: "", seen: 1 } });
+  const r = await call(env, "/admin/log", "s@kvantpro.com");
+  assert.equal(r.status, 403);
+  const body = await r.text();
+  assert.ok(!body.includes("Журнал действий"), "содержимое журнала не должно утечь");
+  const html = await (await call(env, "/admin/log", "boss@kvantpro.com")).text();
+  assert.ok(html.includes("s@kvantpro.com") && html.includes("отказ"), "попытка входа в журнал не зафиксирована");
+});
+
+test("без хранилища журнал говорит об этом прямо", async () => {
+  const env = makeEnv({ ACL: undefined, VISITS: undefined });
+  const html = await (await call(env, "/admin/log", "boss@kvantpro.com")).text();
+  assert.match(html, /Журнал не ведётся/);
+  assert.match(html, /KV namespace/);
+});
+
 test("страницы доступов не кэшируются и не индексируются", async () => {
   const env = makeEnv();
   for (const p of ["/", "/admin", "/dashboard"]) {
