@@ -208,3 +208,64 @@ def test_неполные_данные_не_гасят_страницу(tmp_path
     html = out.read_text(encoding="utf-8")
     assert "window.__RENDER_OK__=1" in html          # базовый слой на месте
     assert "if(M[_k]==null) M[_k]=_d" in html        # нормализация данных на месте
+
+
+# ------------------------------------------------------------------ поисковый индекс
+def _index():
+    import json
+    p = ROOT / "data" / "index.json"
+    assert p.exists(), "нет data/index.json — соберите: python scripts/build_index.py"
+    return json.loads(p.read_text(encoding="utf-8"))
+
+
+def test_индекс_не_содержит_персональных_и_ценовых_полей():
+    """Индекс лежит рядом с данными и не должен становиться отдельной выгрузкой."""
+    idx = _index()
+    banned = {"email", "phone", "inn", "price", "val", "custval", "margin", "revenue"}
+    assert banned <= set(idx["excluded_fields"]), "список исключений сузился"
+    # ни одно проиндексированное поле не должно быть из запрещённых
+    assert not (set(idx["indexed_fields"]) & banned)
+
+
+def test_в_индексе_нет_значений_похожих_на_адреса_и_телефоны():
+    """Парт-номера бывают из 10–12 цифр, поэтому «похоже на телефон» проверяем
+    только вне групп pn и hs и только при телефонном оформлении номера."""
+    import re
+    idx = _index()
+    mail = re.compile(r"[^@\s]+@[^@\s]+\.[a-z]{2,}")
+    phone = re.compile(r"^(\+|8|7)[\d\s()-]{10,}$")
+    bad = []
+    for group, values in idx["index"].items():
+        for key in values:
+            if mail.search(key):
+                bad.append(f"{group}: адрес {key}")
+            elif group not in ("pn", "hs") and phone.match(key):
+                bad.append(f"{group}: телефон {key}")
+            if len(bad) > 5:
+                break
+    assert not bad, f"в индекс попали контакты: {bad[:5]}"
+
+
+def test_каждая_ссылка_индекса_ведёт_в_существующий_набор():
+    idx = _index()
+    n = len(idx["files"])
+    for group, values in idx["index"].items():
+        for key, postings in list(values.items())[:200]:
+            for fi, ri in postings:
+                assert 0 <= fi < n, f"{group}:{key} ссылается на набор {fi}, а их {n}"
+                assert ri >= 0
+
+
+def test_поиск_по_индексу_находит_известный_парт_номер():
+    """4380132 — свеча зажигания Cummins, встречается в базе PN и в ценах."""
+    idx = _index()
+    postings = idx["index"]["pn"].get("4380132")
+    assert postings, "известный парт-номер пропал из индекса"
+    paths = {idx["files"][fi]["path"] for fi, _ in postings}
+    assert "gt/data/pn_db.json" in paths
+
+
+def test_индекс_ссылается_только_на_источники_а_не_на_сборочные_копии():
+    idx = _index()
+    copies = [f["path"] for f in idx["files"] if "/public/" in f["path"]]
+    assert not copies, f"в индексе сборочные копии: {copies[:3]}"
