@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="ru"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>База ЗИП — снабжение / прайс / ODM</title>
+<title>ГШО — горно-шахтное оборудование: снабжение, прайс, ODM</title>
 <style>
 :root{--bg:#f4f6f9;--pan:#ffffff;--ln:#dde3ea;--tx:#1b2330;--mut:#5d6b7a;--acc:#1f6feb;--ok:#1a7f37;--w:#9a6700;--bad:#cf222e}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:13px/1.45 -apple-system,Segoe UI,Roboto,Arial}
@@ -77,10 +77,10 @@ table.pt .eur{color:#0b5;font-variant-numeric:tabular-nums}
 #bomdetail:empty{display:none}
 #bomdetail{background:#fffbea;border:1px solid #f0dfa8;border-radius:8px;padding:10px 12px;margin:8px 0;font-size:12px}
 </style></head><body>
-<div id="banner"><b>Рабочая база ЗИП</b> · __N_POS__ позиций · __N_WITH_ODM__ с ODM · __N_ODM__ ODM-записей (high __N_HI__/med __N_ME__/low __N_LO__) · обновлено __UPDATED__. Правки сохраняются для всей команды. Логина нет — ссылку шли коллегам.</div>
+<div id="banner"><b>ГШО · рабочая база</b> · __N_POS__ позиций · __N_WITH_ODM__ с ODM · __N_ODM__ ODM-записей (high __N_HI__/med __N_ME__/low __N_LO__) · обновлено __UPDATED__. Правки сохраняются для всей команды. Вход — по корпоративной почте через портал КВАНТ.</div>
 <header>
   <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
-    <div><b>База ЗИП · локализация производства</b> <span class="pill" id="cnt">…</span> <span class="pill" id="mode">…</span></div>
+    <div><b>ГШО · локализация производства</b> <span class="pill" id="cnt">…</span> <span class="pill" id="mode">…</span></div>
     <div class="tabs"><button class="on" data-t="grid">Позиции</button><button data-t="sup">Поставщики</button><button data-t="wh">Склад</button><button data-t="dem">Спрос</button><button data-t="cust">Таможня</button><button data-t="bom">Разработка</button><button data-t="mat">Материалы</button><button data-t="stats">Обзор</button><button data-t="log">Журнал</button><button id="expPos" class="exp">⬇ позиции</button><button id="expOdm" class="exp">⬇ ODM</button><button id="expPrices" class="exp">⬇ цены</button><button id="expSamples" class="exp">⬇ образцы</button><button id="expSup" class="exp">⬇ поставщики</button><a href="./orders/pilot-order-1.pdf" target="_blank" class="exp" style="text-decoration:none;background:#1a7f37;color:#fff;border-color:#1a7f37" title="Пилотный заказ №1 — PDF для закупок">📄 Заказ №1 (PDF)</a></div>
   </div>
   <div class="bar" id="ctrls">

@@ -38,13 +38,13 @@ test("роль сорсинга ограничивает вкладки, точ�
   acl.users["s@kvantpro.com"] = { role: "sourcing", sites: [], tabs: [], note: "", seen: 1 };
   const base = rightsFor(acl, "s@kvantpro.com", {});
   assert.deepEqual(base.tabs, ["sourcing", "contracts", "suppliers"]);
-  assert.deepEqual(base.sites, ["dashboard", "zip", "gpu"]);
+  assert.deepEqual(base.sites, ["dashboard", "zip", "gt", "gpu"]);
 
   acl.users["s@kvantpro.com"].tabs = ["kam"];
   acl.users["s@kvantpro.com"].sites = ["gok"];
   const wide = rightsFor(acl, "s@kvantpro.com", {});
   assert.deepEqual(wide.tabs, ["sourcing", "kam", "contracts", "suppliers"]);   // порядок — как в TAB_IDS
-  assert.deepEqual(wide.sites, ["dashboard", "zip", "gpu", "gok"]);
+  assert.deepEqual(wide.sites, ["dashboard", "zip", "gt", "gpu", "gok"]);
 });
 
 test("ADMIN_EMAILS даёт полные права даже при пустой роли — страховка от потери хранилища", () => {
@@ -188,4 +188,32 @@ test("копия блока прав в гейте портала совпада
   assert.ok(want, "в access/acl.js нет маркеров");
   const gate = fs.readFileSync(path.join(ROOT, "public/_worker.js"), "utf8");
   assert.equal(block(gate), want, "public/_worker.js: блок aclCore разошёлся с access/acl.js");
+});
+
+test("разделение «Базы ЗИП» на ГШО и ГТУ не отнимает уже выданный доступ", () => {
+  // документ версии 1: плитка была одна, идентификатор zip
+  const a = normalizeAcl({
+    version: 1, defaultRole: "employee",
+    roles: { engineer: { name: "Инженер", sites: ["zip", "gpu"], tabs: [] },
+             guest: { name: "Гость", sites: [], tabs: [] } },
+    users: { "e@kvantpro.com": { role: "engineer", sites: ["zip"], tabs: [] },
+             "g@kvantpro.com": { role: "guest", sites: ["gpu"], tabs: [] } },
+  });
+  assert.equal(a.version, 2);
+  assert.deepEqual(a.roles.engineer.sites, ["zip", "gt", "gpu"], "роль с ЗИП должна получить ГТУ");
+  assert.deepEqual(a.roles.guest.sites, [], "пустой роли ничего не добавляем");
+  assert.deepEqual(a.users["e@kvantpro.com"].sites, ["zip", "gt"]);
+  assert.deepEqual(a.users["g@kvantpro.com"].sites, ["gpu"], "без ЗИП добавки нет");
+
+  // документ уже второй версии: владелец мог снять ГТУ сознательно — не возвращаем
+  const b = normalizeAcl({
+    version: 2, defaultRole: "employee",
+    roles: { engineer: { name: "Инженер", sites: ["zip"], tabs: [] } }, users: {},
+  });
+  assert.deepEqual(b.roles.engineer.sites, ["zip"]);
+});
+
+test("порядок сайтов в правах всегда как в справочнике", () => {
+  const a = normalizeAcl({ version: 2, roles: { r: { name: "Р", sites: ["gok", "dashboard", "gt"], tabs: [] } }, users: {} });
+  assert.deepEqual(a.roles.r.sites, ["dashboard", "gt", "gok"]);
 });

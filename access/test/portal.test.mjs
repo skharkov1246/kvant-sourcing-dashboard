@@ -74,7 +74,8 @@ test("портал показывает только выданные челов
   const env = makeEnv();
   await seed(env, { "s@kvantpro.com": { role: "sourcing", sites: [], tabs: [], note: "", seen: 1 } });
   const html = await (await call(env, "/", "s@kvantpro.com")).text();
-  assert.ok(html.includes("Дашборд сорсинга") && html.includes("Библиотека ГПУ"));
+  assert.ok(html.includes("Дашборд сорсинга") && html.includes("ГПУ — газопоршневые установки"));
+  assert.ok(html.includes("ГШО — горно-шахтное оборудование") && html.includes("ГТУ — газотурбинные установки"));
   assert.ok(!html.includes("Гидрометаллургия"), "показан невыданный сайт");
   assert.ok(!html.includes('href="/admin"'), "рядовому сотруднику видна ссылка на админку");
 
@@ -115,7 +116,7 @@ test("/api/rights отвечает правами вошедшего — для 
   const env = makeEnv();
   await seed(env, { "s@kvantpro.com": { role: "sourcing", sites: [], tabs: [], note: "", seen: 1 } });
   const d = await (await call(env, "/api/rights", "s@kvantpro.com")).json();
-  assert.deepEqual(d.sites, ["dashboard", "zip", "gpu"]);
+  assert.deepEqual(d.sites, ["dashboard", "zip", "gt", "gpu"]);
   assert.equal(d.admin, false);
   assert.equal(d.email, "s@kvantpro.com");
 });

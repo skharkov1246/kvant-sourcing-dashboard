@@ -16,16 +16,22 @@
 
 // BEGIN aclCore
 const ACL_KEY = "acl:v1";
+// Версия документа прав. 2 — «База ЗИП» разделена на две плитки: ГШО и ГТУ-библиотека.
+// Разделение не должно молча отнимать доступ, поэтому при подъёме версии тем, у кого
+// был ЗИП, добавляется ГТУ (справочник и раньше лежал внутри того же сайта).
+const ACL_VERSION = 2;
 
 // Сайты компании. gt (справочник ГТУ) живёт по пути внутри проекта ЗИП,
 // поэтому отдельным ресурсом не является — управляется вместе с zip.
 const SITES = [
   { id: "dashboard", name: "Дашборд сорсинга", href: "/dashboard",
     note: "нагрузка, конверсия, реализация, поставщики — по данным Bitrix24" },
-  { id: "zip", name: "База ЗИП и справочник ГТУ", href: "https://kvant-zip.pages.dev/",
-    note: "позиции, ODM-аналоги, цены, таможня; внутри — справочник ГТУ и документы заказов" },
-  { id: "gpu", name: "Библиотека ГПУ", href: "https://kvant-gpu.pages.dev/",
-    note: "газопоршневые установки: Cummins, Caterpillar, INNIO — поставщики и цены" },
+  { id: "zip", name: "ГШО — горно-шахтное оборудование", href: "https://kvant-zip.pages.dev/",
+    note: "перфораторы, буровая и горнопроходческая техника: позиции, ODM-аналоги, цены, таможня, заказы" },
+  { id: "gt", name: "ГТУ — газотурбинные установки", href: "https://kvant-zip.pages.dev/gt/",
+    note: "Siemens SGT-100…400 и SGT5-4000F, GE LM6000 и Frame 6B: субпоставщики, MRO, склады" },
+  { id: "gpu", name: "ГПУ — газопоршневые установки", href: "https://kvant-gpu.pages.dev/",
+    note: "Cummins, Caterpillar, INNIO: поставщики, цены, разрывы OEM/аналог" },
   { id: "ove", name: "ОВЭ-75", href: "https://kvant-ove.pages.dev/",
     note: "обжиг, выщелачивание, электроэкстракция — проект для Кольской ГМК" },
   { id: "gidromet", name: "Гидрометаллургия", href: "https://kvant-gidromet.pages.dev/",
@@ -55,18 +61,18 @@ const TAB_IDS = TABS.map((t) => t.id);
 // Роли по умолчанию. Владелец правит их в админке; здесь — состояние при первом запуске.
 function defaultAcl() {
   return {
-    version: 1,
+    version: ACL_VERSION,
     defaultRole: "employee",
     roles: {
       owner: { name: "Владелец", admin: true, sites: SITE_IDS.slice(), tabs: TAB_IDS.slice() },
       head: { name: "Руководитель", admin: false, sites: SITE_IDS.slice(), tabs: TAB_IDS.slice() },
       employee: { name: "Сотрудник", admin: false, sites: SITE_IDS.slice(), tabs: TAB_IDS.slice() },
       sourcing: { name: "Сорсинг", admin: false,
-        sites: ["dashboard", "zip", "gpu"], tabs: ["sourcing", "contracts", "suppliers"] },
+        sites: ["dashboard", "zip", "gt", "gpu"], tabs: ["sourcing", "contracts", "suppliers"] },
       kam: { name: "КАМ", admin: false,
-        sites: ["dashboard", "zip"], tabs: ["company", "kam", "reps", "cohorts"] },
+        sites: ["dashboard", "zip", "gt"], tabs: ["company", "kam", "reps", "cohorts"] },
       engineer: { name: "Инженер", admin: false,
-        sites: ["zip", "gpu", "ove", "gidromet", "gok"], tabs: [] },
+        sites: ["zip", "gt", "gpu", "ove", "gidromet", "gok"], tabs: [] },
       guest: { name: "Гость", admin: false, sites: [], tabs: [] },
     },
     users: {},
@@ -79,13 +85,19 @@ function normEmail(s) { return String(s || "").trim().toLowerCase(); }
 function normalizeAcl(raw) {
   const d = defaultAcl();
   if (!raw || typeof raw !== "object") return d;
+  const old = Number(raw.version || 1) < 2;
+  const sites = (list) => {
+    const ok = (Array.isArray(list) ? list : []).filter((x) => SITE_IDS.includes(x));
+    if (old && ok.includes("zip") && !ok.includes("gt")) ok.push("gt");
+    return SITE_IDS.filter((x) => ok.includes(x));
+  };
   const roles = { ...d.roles };
   for (const [id, r] of Object.entries(raw.roles || {})) {
     if (!r || typeof r !== "object") continue;
     roles[id] = {
       name: String(r.name || id),
       admin: !!r.admin,
-      sites: (Array.isArray(r.sites) ? r.sites : []).filter((x) => SITE_IDS.includes(x)),
+      sites: sites(r.sites),
       tabs: (Array.isArray(r.tabs) ? r.tabs : []).filter((x) => TAB_IDS.includes(x)),
     };
   }
@@ -95,7 +107,7 @@ function normalizeAcl(raw) {
     if (!u || typeof u !== "object") continue;
     users[normEmail(em)] = {
       role: roles[u.role] ? u.role : defaultRole,
-      sites: (Array.isArray(u.sites) ? u.sites : []).filter((x) => SITE_IDS.includes(x)),
+      sites: sites(u.sites),
       tabs: (Array.isArray(u.tabs) ? u.tabs : []).filter((x) => TAB_IDS.includes(x)),
       note: String(u.note || "").slice(0, 200),
       first: String(u.first || ""),
@@ -103,7 +115,7 @@ function normalizeAcl(raw) {
       seen: Number(u.seen || 0),
     };
   }
-  return { version: 1, defaultRole, roles, users };
+  return { version: ACL_VERSION, defaultRole, roles, users };
 }
 
 async function aclStore(env) { return (env && (env.ACL || env.VISITS)) || null; }
