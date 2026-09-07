@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 159,
-    "total_bytes": 69467821,
+    "total_bytes": 69458141,
     "by_sensitivity": {
       "конфиденциально": 43,
       "внутреннее": 84,
@@ -208,7 +208,8 @@
         "markers": []
       },
       "referenced_by": [
-        "gt/build.py"
+        "gt/build.py",
+        "tests/test_core.py"
       ]
     },
     {
@@ -1035,7 +1036,7 @@
     {
       "path": "data/chat_snapshot.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 496028,
+      "bytes": 485951,
       "note": "Суточный снимок реакции коммерсантов в чатах сделок. Пишет бот scan.yml (chat_scan.py) раз в сутки. Руками не редактировать: правка в PR откатит свежие данные при мерже. Содержит поимённые метрики 15 сотрудников и LLM-оценки.",
       "format": "json",
       "shape": "объект",
@@ -1048,9 +1049,9 @@
         "key": "assessment",
         "records": 15
       },
-      "last_change": "2026-09-04",
+      "last_change": "2026-09-05",
       "last_author": "github-actions[bot]",
-      "last_commit": "9c473b2",
+      "last_commit": "69b9d8b",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "конфиденциально",
@@ -6410,6 +6411,40 @@
       ]
     },
     {
+      "path": "data/catalog_notes.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 3312,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "data/budget_snapshot.json",
+        "data/chat_snapshot.json",
+        "data/index.json",
+        "gidromet/data/",
+        "gpu/data/bitrix_gpu.json",
+        "gt/data/bitrix_gt.json",
+        "gt/data/dossiers.json",
+        "gt/data/pn_db.json",
+        "ove/data/suppliers.json",
+        "pnw/public/data.js",
+        "zip/customs/out/",
+        "zip/data/customs_declarations.json",
+        "zip/data/supplier_crm.json"
+      ],
+      "last_change": "2026-09-04",
+      "last_author": "skharkov1246",
+      "last_commit": "ee02e71",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "scripts/build_catalog.py"
+      ]
+    },
+    {
       "path": "ove/data/readiness.json",
       "subproject": "ОВЭ-75",
       "bytes": 2967,
@@ -6443,39 +6478,6 @@
       },
       "referenced_by": [
         "ove/build.py"
-      ]
-    },
-    {
-      "path": "data/catalog_notes.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 2915,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "data/budget_snapshot.json",
-        "data/chat_snapshot.json",
-        "gidromet/data/",
-        "gpu/data/bitrix_gpu.json",
-        "gt/data/bitrix_gt.json",
-        "gt/data/dossiers.json",
-        "gt/data/pn_db.json",
-        "ove/data/suppliers.json",
-        "pnw/public/data.js",
-        "zip/customs/out/",
-        "zip/data/customs_declarations.json",
-        "zip/data/supplier_crm.json"
-      ],
-      "last_change": "2026-09-04",
-      "last_author": "Claude",
-      "last_commit": "4b0cf2b",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "публикуемо",
-        "markers": []
-      },
-      "referenced_by": [
-        "scripts/build_catalog.py"
       ]
     },
     {

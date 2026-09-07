@@ -132,7 +132,9 @@ def build() -> dict:
             if size < MIN_BYTES:
                 continue
             rel = str(path.relative_to(ROOT))
-            if rel == str(OUT.relative_to(ROOT)):
+            # сам каталог и поисковый индекс — производные файлы, а не наборы данных;
+            # включив их, мы получили бы взаимную гонку: индекс строится по каталогу
+            if rel in (str(OUT.relative_to(ROOT)), "data/index.json"):
                 continue
             entry = {
                 "path": rel,
