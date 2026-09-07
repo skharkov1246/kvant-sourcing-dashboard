@@ -87,8 +87,14 @@ test("копии блока в пяти гейтах совпадают с ка�
     assert.equal(block(src), want, `${g}: блок siteRights разошёлся с access/siterights.js`);
     const site = (src.match(/const SITE = "([a-z]+)";/) || [])[1];
     assert.ok(site, `${g}: нет константы SITE`);
-    assert.match(src, new RegExp(`siteAllowed\\(request, env, SITE\\)`), `${g}: право на сайт не проверяется`);
+    assert.match(src, /siteAllowed\(request, env, /, `${g}: право на сайт не проверяется`);
   }
+});
+
+test("гейт ГШО спрашивает право на ГТУ для раздела /gt/", () => {
+  const src = fs.readFileSync(path.join(ROOT, "zip/site/_worker.js"), "utf8");
+  assert.match(src, /path === "\/gt" \|\| path\.startsWith\("\/gt\/"\)/, "раздел ГТУ не отделён");
+  assert.match(src, /siteAllowed\(request, env, gt \? "gt" : SITE\)/, "право на ГТУ не проверяется отдельно");
 });
 
 test("идентификаторы сайтов в гейтах есть в справочнике прав", async () => {

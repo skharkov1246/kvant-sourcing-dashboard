@@ -1,7 +1,11 @@
-// Гейт сайта «База ЗИП»: вход только через Cloudflare Access (портал КВАНТ).
-// Cloudflare Pages в advanced-режиме (наличие _worker.js) гоняет ВСЕ запросы через этот
-// fetch; файлы отдаём через env.ASSETS уже после проверки подписи входа.
-// Внутри база ЗИП, справочник ГТУ (/gt/), документы заказов (/orders/). Файл копируется сборщиком zip/build.py в zip/public/.
+// Гейт сайта «ГШО — горно-шахтное оборудование»: вход только через Cloudflare Access
+// (портал КВАНТ). Cloudflare Pages в advanced-режиме (наличие _worker.js) гоняет ВСЕ
+// запросы через этот fetch; файлы отдаём через env.ASSETS уже после проверки подписи входа.
+// Внутри база ГШО (перфораторы, буровая техника, ЗИП), библиотека ГТУ (/gt/) и документы
+// заказов (/orders/). Файл копируется сборщиком zip/build.py в zip/public/.
+// На портале это ДВЕ плитки с разными правами, поэтому /gt/ спрашивает право «gt»,
+// а всё остальное — право «zip» (идентификатор оставлен прежним, чтобы переименование
+// не отняло доступ у тех, кому он уже выдан).
 // ВНИМАНИЕ: доступ к Supabase идёт по anon-ключу из index.html — сужайте RLS-политики (migrations.sql).
 // Паролей нет: периметр — приложение Access с одной политикой допуска по почте
 // (распоряжение владельца от 07.09.2026: единый вход, единый портал).
@@ -9,8 +13,13 @@
 export default {
   async fetch(request, env) {
     const who = await accessOk(request, env);
-    if (!who) return denyPage("База ЗИП · КВАНТ");
-    if (!(await siteAllowed(request, env, SITE))) return denyPage("База ЗИП · КВАНТ");
+    if (!who) return denyPage("ГШО · КВАНТ");
+
+    const path = new URL(request.url).pathname;
+    const gt = path === "/gt" || path.startsWith("/gt/");   // без слэша Pages сам перебросит
+    if (!(await siteAllowed(request, env, gt ? "gt" : SITE))) {
+      return denyPage(gt ? "Библиотека ГТУ · КВАНТ" : "ГШО · КВАНТ");
+    }
 
     const resp = await env.ASSETS.fetch(request);
     const out = new Response(resp.body, resp);
