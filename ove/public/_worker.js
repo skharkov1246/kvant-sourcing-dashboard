@@ -102,7 +102,15 @@ function ghHeaders(env) {
 async function ghGetFile(env) {
   const r = await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${GH_PATH}?ref=${GH_BRANCH}`,
     { headers: ghHeaders(env) });
-  if (r.status === 404) return { sha: undefined, data: { updated: "", note: "", ans: {}, eng: {}, st: {}, meta: {} } };
+  if (r.status === 404) {
+    // GitHub отдаёт 404 и когда файла нет, и когда у токена нет доступа к
+    // репозиторию. Разница критическая: пустой документ отсюда уходит в
+    // ghPutFile без sha, то есть файл создаётся заново — и все накопленные
+    // ответы заказчика затираются. Различаем запросом самого репозитория.
+    const probe = await fetch(`https://api.github.com/repos/${GH_REPO}`, { headers: ghHeaders(env) });
+    if (!probe.ok) throw new Error("github_no_access_" + probe.status);
+    return { sha: undefined, data: { updated: "", note: "", ans: {}, eng: {}, st: {}, meta: {} } };
+  }
   if (!r.ok) throw new Error("github_get_" + r.status);
   const j = await r.json();
   return { sha: j.sha, data: JSON.parse(b64decodeUtf8(j.content)) };
@@ -231,3 +239,6 @@ function b64uBytes(s) {
 }
 function b64uText(s) { return new TextDecoder().decode(b64uBytes(s)); }
 // END accessOk
+
+// экспорт для тестов (на исполнение воркера не влияет)
+export { ghGetFile };
