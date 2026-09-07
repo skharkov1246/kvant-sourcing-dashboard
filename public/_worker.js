@@ -26,22 +26,30 @@ const ACL_KEY = "acl:v1";
 // был ЗИП, добавляется ГТУ (справочник и раньше лежал внутри того же сайта).
 const ACL_VERSION = 2;
 
-// Сайты компании. gt (справочник ГТУ) живёт по пути внутри проекта ЗИП,
-// поэтому отдельным ресурсом не является — управляется вместе с zip.
+// Разделы портала. Спецпроекты ведёт один департамент, поэтому стоят под общей плашкой
+// (распоряжение владельца от 07.09.2026).
+const GROUPS = [
+  { id: "work", name: "Работа с данными", note: "ежедневные инструменты" },
+  { id: "lib", name: "Библиотеки оборудования", note: "ГПУ, ГТУ, ГШО — поставщики, цены, аналоги" },
+  { id: "proj", name: "Спецпроекты", note: "проработки под заказчика; ведёт один департамент" },
+];
+
+// Сайты компании. gt (библиотека ГТУ) живёт по пути внутри проекта ЗИП,
+// поэтому отдельным проектом Pages не является — но правом управляется отдельно.
 const SITES = [
-  { id: "dashboard", name: "Дашборд сорсинга", href: "/dashboard",
+  { id: "dashboard", group: "work", name: "Дашборд сорсинга", href: "/dashboard",
     note: "нагрузка, конверсия, реализация, поставщики — по данным Bitrix24" },
-  { id: "zip", name: "ГШО — горно-шахтное оборудование", href: "https://kvant-zip.pages.dev/",
+  { id: "zip", group: "lib", name: "ГШО — горно-шахтное оборудование", href: "https://kvant-zip.pages.dev/",
     note: "перфораторы, буровая и горнопроходческая техника: позиции, ODM-аналоги, цены, таможня, заказы" },
-  { id: "gt", name: "ГТУ — газотурбинные установки", href: "https://kvant-zip.pages.dev/gt/",
+  { id: "gt", group: "lib", name: "ГТУ — газотурбинные установки", href: "https://kvant-zip.pages.dev/gt/",
     note: "Siemens SGT-100…400 и SGT5-4000F, GE LM6000 и Frame 6B: субпоставщики, MRO, склады" },
-  { id: "gpu", name: "ГПУ — газопоршневые установки", href: "https://kvant-gpu.pages.dev/",
+  { id: "gpu", group: "lib", name: "ГПУ — газопоршневые установки", href: "https://kvant-gpu.pages.dev/",
     note: "Cummins, Caterpillar, INNIO: поставщики, цены, разрывы OEM/аналог" },
-  { id: "ove", name: "ОВЭ-75", href: "https://kvant-ove.pages.dev/",
+  { id: "ove", group: "proj", name: "ОВЭ-75", href: "https://kvant-ove.pages.dev/",
     note: "обжиг, выщелачивание, электроэкстракция — проект для Кольской ГМК" },
-  { id: "gidromet", name: "Гидрометаллургия", href: "https://kvant-gidromet.pages.dev/",
+  { id: "gidromet", group: "proj", name: "Гидрометаллургия", href: "https://kvant-gidromet.pages.dev/",
     note: "заключение по переработке медно-золотого концентрата" },
-  { id: "gok", name: "Базовый проект ГОКа", href: "https://kvant-gok.pages.dev/",
+  { id: "gok", group: "proj", name: "Базовый проект ГОКа", href: "https://kvant-gok.pages.dev/",
     note: "золото-медный горно-обогатительный комбинат" },
 ];
 
@@ -123,10 +131,10 @@ function normalizeAcl(raw) {
   return { version: ACL_VERSION, defaultRole, roles, users };
 }
 
-async function aclStore(env) { return (env && (env.ACL || env.VISITS)) || null; }
+function aclStore(env) { return (env && (env.ACL || env.VISITS)) || null; }
 
 async function loadAcl(env) {
-  const kv = await aclStore(env);
+  const kv = aclStore(env);
   if (!kv) return defaultAcl();
   try {
     const raw = await kv.get(ACL_KEY, { type: "json" });
@@ -135,7 +143,7 @@ async function loadAcl(env) {
 }
 
 async function saveAcl(env, acl) {
-  const kv = await aclStore(env);
+  const kv = aclStore(env);
   if (!kv) return false;
   await kv.put(ACL_KEY, JSON.stringify(normalizeAcl(acl)));
   return true;
@@ -167,17 +175,50 @@ function rightsFor(acl, email, env) {
   };
 }
 
-// Отметка о входе: человек появляется в списке админки сам, заводить вручную не нужно.
-async function touchUser(env, acl, email) {
+// УЧЁТ ВХОДОВ. Держится отдельными ключами seen:<почта>, а не внутри документа прав,
+// по двум причинам: запись входа не должна затирать правку, сделанную в это же время
+// в панели, и не должна переписывать весь документ на каждый заход.
+//
+// Отметка ставится на любой странице, которую отдаёт портал, и на /api/rights —
+// то есть и когда человек заходит сразу на дашборд или на другой сайт по закладке.
+// Чтобы не писать в хранилище на каждый запрос, повторная отметка в пределах
+// SEEN_QUIET пропускается.
+const SEEN_PREFIX = "seen:";
+const SEEN_QUIET = 10 * 60 * 1000;
+
+async function touchUser(env, email) {
   const em = normEmail(email);
   if (!em) return;
-  const now = new Date().toISOString();
-  const u = acl.users[em] || { role: acl.defaultRole, sites: [], tabs: [], note: "", first: now, seen: 0 };
-  u.last = now;
-  u.seen = (u.seen || 0) + 1;
-  if (!u.first) u.first = now;
-  acl.users[em] = u;
-  try { await saveAcl(env, acl); } catch { /* учёт входов не должен ломать отдачу страницы */ }
+  const kv = aclStore(env);
+  if (!kv) return;
+  try {
+    const key = SEEN_PREFIX + em;
+    const prev = (await kv.get(key, { type: "json" })) || {};
+    const now = Date.now();
+    if (prev.last && now - Date.parse(prev.last) < SEEN_QUIET) return;
+    const iso = new Date(now).toISOString();
+    await kv.put(key, JSON.stringify({ first: prev.first || iso, last: iso, seen: Number(prev.seen || 0) + 1 }));
+  } catch { /* учёт входов не должен ломать отдачу страницы */ }
+}
+
+// Кто и когда заходил. Возвращает null, если хранилище не привязано, — панель обязана
+// отличать «никто не заходил» от «учёт вообще не ведётся».
+async function loadSeen(env) {
+  const kv = aclStore(env);
+  if (!kv) return null;
+  const out = {};
+  try {
+    let cursor;
+    do {
+      const page = await kv.list({ prefix: SEEN_PREFIX, cursor });
+      for (const k of page.keys || []) {
+        const v = await kv.get(k.name, { type: "json" });
+        if (v) out[k.name.slice(SEEN_PREFIX.length)] = v;
+      }
+      cursor = page.list_complete ? null : page.cursor;
+    } while (cursor);
+  } catch { return null; }
+  return out;
 }
 
 // Вырезание вкладок дашборда: убираем кнопку, панель и — главное — массив данных.
@@ -230,6 +271,13 @@ export default {
     const acl = await loadAcl(env);
     const rights = rightsFor(acl, who.email, env);
 
+    // Отметка о входе. Ставится и на /api/rights, поэтому в списке оказываются и те,
+    // кто зашёл сразу на дашборд или на другой сайт по закладке, минуя портал.
+    // Служебные запросы (шрифты, опрос свежести) не считаем.
+    if (!url.pathname.startsWith("/fonts/") && url.pathname !== "/gen") {
+      ctx.waitUntil(touchUser(env, who.email));
+    }
+
     // /api/rights — права для гейтов остальных сайтов: они шлют сюда JWT вошедшего,
     // мы его проверяем тем же помощником и отвечаем набором прав. Общих секретов не нужно.
     if (url.pathname === "/api/rights") {
@@ -240,7 +288,7 @@ export default {
     // админка — только владельцу
     if (url.pathname === "/admin" || url.pathname === "/admin/") {
       if (!rights.admin) return denyPage("Доступы · КВАНТ");
-      return adminPage(acl, who, env);
+      return adminPage(acl, who, env, await loadSeen(env));
     }
     if (url.pathname === "/admin/api") {
       if (!rights.admin) return new Response(JSON.stringify({ ok: false, error: "forbidden" }),
@@ -250,7 +298,6 @@ export default {
 
     // портал — корень
     if (url.pathname === "/" || url.pathname === "/portal" || url.pathname === "/portal/") {
-      ctx.waitUntil(touchUser(env, acl, who.email));
       if (env.VISITS && request.headers.get("X-Poll") !== "1") ctx.waitUntil(logVisit(request, env));
       return portalPage(who, rights, env);
     }
@@ -314,10 +361,24 @@ export default {
 const ESC = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) =>
   ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
-function adminPage(acl, me, env) {
+// seen === null означает, что хранилище не привязано: пустой список тогда не факт,
+// а неизвестность, и панель обязана сказать об этом прямо.
+function adminPage(acl, me, env, seen) {
   const team = String((env && env.CF_ACCESS_TEAM) || CF_TEAM_DEFAULT).replace(/^https?:\/\//, "").replace(/\/+$/, "");
   const roleIds = Object.keys(acl.roles);
-  const users = Object.entries(acl.users).sort((a, b) => String(b[1].last || "").localeCompare(String(a[1].last || "")));
+  const noStore = seen === null;
+  const facts = seen || {};
+
+  // список = все, кому назначены права, плюс все, кто хоть раз заходил
+  const blank = () => ({ role: acl.defaultRole, sites: [], tabs: [], note: "" });
+  const merged = {};
+  for (const [em, u] of Object.entries(acl.users)) merged[em] = { ...blank(), ...u };
+  for (const [em, f] of Object.entries(facts)) merged[em] = { ...(merged[em] || blank()), ...f };
+  const users = Object.entries(merged).sort((a, b) => {
+    const d = String(b[1].last || "").localeCompare(String(a[1].last || ""));
+    return d || a[0].localeCompare(b[0]);
+  });
+  const wasIn = users.filter(([, u]) => u.last).length;
   const opt = (sel) => roleIds.map((r) =>
     `<option value="${ESC(r)}"${r === sel ? " selected" : ""}>${ESC(acl.roles[r].name)}</option>`).join("");
   const fmt = (iso) => {
@@ -336,7 +397,7 @@ function adminPage(acl, me, env) {
       <td class="ct"><span class="pill${r.sites.length ? " on" : ""}">${r.sites.length} из ${SITE_IDS.length}</span></td>
       <td class="ct"><span class="pill${r.tabs.length ? " on" : ""}">${r.tabs.length} из ${TAB_IDS.length}</span></td>
       <td class="dim">${extra ? `+${extra} лично` : "—"}</td>
-      <td class="dim">${ESC(fmt(u.last))}</td>
+      <td class="dim">${u.last ? ESC(fmt(u.last)) : '<span style="color:#8b97a8">ни разу</span>'}</td>
       <td class="ct"><button class="lnk" data-open="${ESC(em)}">настроить</button></td>
     </tr>`;
   }).join("");
@@ -346,10 +407,17 @@ function adminPage(acl, me, env) {
     const r = acl.roles[id];
     const chk = (arr, list, kind) => list.map((x) =>
       `<label class="chk"><input type="checkbox" data-role="${ESC(id)}" data-kind="${kind}" value="${ESC(x.id)}"${arr.includes(x.id) ? " checked" : ""}><span>${ESC(x.name)}</span></label>`).join("");
+    // сайты — теми же разделами, что на портале: спецпроекты выдаются одним блоком
+    const siteChk = (arr) => GROUPS.map((g) => {
+      const own = SITES.filter((x) => x.group === g.id);
+      if (!own.length) return "";
+      return `<div class="sub">${ESC(g.name)} <button class="lnk all" data-role="${ESC(id)}" data-group="${ESC(g.id)}">все</button></div>` +
+             `<div class="chks">${chk(arr, own, "site")}</div>`;
+    }).join("");
     return `<div class="card role" data-role="${ESC(id)}">
       <div class="rh"><b>${ESC(r.name)}</b>${r.admin ? '<span class="pill adm">админ</span>' : ""}
         <span class="dim">${users.filter(([, u]) => u.role === id).length} чел.</span></div>
-      <div class="grp"><div class="gt">Сайты</div><div class="chks">${chk(r.sites, SITES, "site")}</div></div>
+      <div class="grp"><div class="gt">Сайты</div>${siteChk(r.sites)}</div>
       <div class="grp"><div class="gt">Вкладки дашборда</div><div class="chks">${chk(r.tabs, TABS, "tab")}</div></div>
     </div>`;
   }).join("");
@@ -379,8 +447,13 @@ select:focus,input:focus{outline:2px solid var(--a);outline-offset:1px}
 .chks{display:grid;grid-template-columns:1fr 1fr;gap:3px 10px}
 .chk{display:flex;align-items:center;gap:7px;font-size:12.5px;cursor:pointer;padding:2px 0}
 .chk input{accent-color:var(--a);width:15px;height:15px;flex:none}
+.sub{display:flex;align-items:baseline;gap:8px;font-size:11.5px;color:#6b7787;margin:8px 0 3px}
+.sub .all{font-size:11.5px}
 .bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
 .bar input{flex:1;min-width:220px}
+.card.warn{border-color:#5a4415;background:#221a0d;color:#f0d9a8}
+.card.warn code{background:#2c2210;padding:1px 5px;border-radius:4px}
+.card.ok-note{color:var(--dim);font-size:13px}
 .st{margin-left:auto;font-size:12.5px;color:var(--dim)}.st.ok{color:var(--ok)}.st.err{color:#ff6b6b}
 dialog{background:var(--card);color:var(--ink);border:1px solid var(--ln);border-radius:12px;padding:0;max-width:620px;width:92vw}
 dialog::backdrop{background:rgba(0,0,0,.6)}.dlg{padding:20px 22px}
@@ -392,6 +465,14 @@ button.gh{background:#232a35;color:var(--ink)}
   const body = `<div class="wrap">
 <div class="top"><div><div class="eyebrow">КВАНТ · портал</div><h1>Доступы</h1></div>
 <div class="who">${ESC(me.email)}<a href="/">портал</a><a href="https://${ESC(team)}/cdn-cgi/access/logout">выйти</a></div></div>
+
+${noStore ? `<div class="card warn"><b>Учёт входов не ведётся.</b> К проекту Cloudflare Pages
+  <code>kvant-sourcing-f122</code> не привязано хранилище KV, поэтому ни входы, ни правки прав
+  не сохраняются. Привязка делается в Cloudflare: <i>Workers &amp; Pages → kvant-sourcing-f122 →
+  Settings → Bindings → Add → KV namespace</i>, имя переменной <code>ACL</code>.</div>`
+  : `<div class="card ok-note">Заходили: <b>${wasIn}</b> из ${users.length} в списке.
+  Отметка ставится на любой странице портала и при обращении сайтов за правами, поэтому
+  учитываются и те, кто заходит сразу на дашборд или другой сайт по закладке.</div>`}
 
 <div class="card">
   <div class="bar">
@@ -457,6 +538,15 @@ document.querySelectorAll('.role input[type=checkbox]').forEach(cb => cb.addEven
   const val = k => [...card.querySelectorAll('input[data-kind='+k+']:checked')].map(x=>x.value);
   post('role_rights', {role, sites: val('site'), tabs: val('tab')});
 }));
+// «все» в разделе сайтов
+document.querySelectorAll('.role .all').forEach(b => b.addEventListener('click', () => {
+  const card = b.closest('.role');
+  const box = b.closest('.sub').nextElementSibling.querySelectorAll('input[type=checkbox]');
+  const on = ![...box].every(x => x.checked);
+  box.forEach(x => { x.checked = on; });
+  const val = k => [...card.querySelectorAll('input[data-kind='+k+']:checked')].map(x=>x.value);
+  post('role_rights', {role: card.dataset.role, sites: val('site'), tabs: val('tab')});
+}));
 // поиск
 document.getElementById('q').addEventListener('input', e => {
   const q = e.target.value.trim().toLowerCase();
@@ -517,6 +607,10 @@ async function adminApi(request, env, acl) {
   try { b = await request.json(); } catch { return json({ ok: false, error: "bad_json" }, 400); }
   const pick = (arr, all) => (Array.isArray(arr) ? arr : []).filter((x) => all.includes(x));
 
+  // Права хранятся отдельно от фактов входа, поэтому у вошедшего человека строки прав
+  // может ещё не быть. Правка из панели её создаёт — иначе назначить роль было бы нельзя.
+  const row = (em) => (acl.users[em] ||= { role: acl.defaultRole, sites: [], tabs: [], note: "" });
+
   if (b.op === "user_add") {
     const em = normEmail(b.email);
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)) return json({ ok: false, error: "плохая почта" }, 400);
@@ -529,15 +623,16 @@ async function adminApi(request, env, acl) {
     delete acl.users[em];
   } else if (b.op === "user_role") {
     const em = normEmail(b.email);
-    if (!acl.users[em]) return json({ ok: false, error: "no_user" }, 404);
+    if (!em) return json({ ok: false, error: "no_user" }, 404);
     if (!acl.roles[b.role]) return json({ ok: false, error: "no_role" }, 400);
-    acl.users[em].role = b.role;
+    row(em).role = b.role;
   } else if (b.op === "user_extra") {
     const em = normEmail(b.email);
-    if (!acl.users[em]) return json({ ok: false, error: "no_user" }, 404);
-    acl.users[em].sites = pick(b.sites, SITE_IDS);
-    acl.users[em].tabs = pick(b.tabs, TAB_IDS);
-    acl.users[em].note = String(b.note || "").slice(0, 200);
+    if (!em) return json({ ok: false, error: "no_user" }, 404);
+    const u = row(em);
+    u.sites = pick(b.sites, SITE_IDS);
+    u.tabs = pick(b.tabs, TAB_IDS);
+    u.note = String(b.note || "").slice(0, 200);
   } else if (b.op === "role_rights") {
     if (!acl.roles[b.role]) return json({ ok: false, error: "no_role" }, 400);
     acl.roles[b.role].sites = pick(b.sites, SITE_IDS);
@@ -559,8 +654,14 @@ function portalPage(who, rights, env) {
   const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) =>
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const mine = SITES.filter((s) => rights.sites.includes(s.id));
-  const tiles = mine.map((s) =>
-    `<a class="tile" href="${esc(s.href)}"><div class="n">${esc(s.name)}</div><div class="d">${esc(s.note)}</div></a>`).join("");
+  // разделы: плашка показывается, только если в ней человеку что-то доступно
+  const sections = GROUPS.map((g) => {
+    const own = mine.filter((s) => s.group === g.id);
+    if (!own.length) return "";
+    const tiles = own.map((s) =>
+      `<a class="tile" href="${esc(s.href)}"><div class="n">${esc(s.name)}</div><div class="d">${esc(s.note)}</div></a>`).join("");
+    return `<section><h2>${esc(g.name)}<span>${esc(g.note)}</span></h2><div class="grid">${tiles}</div></section>`;
+  }).join("");
   const empty = `<div class="card">Доступ к разделам пока не выдан. Обратитесь к владельцу — он назначает права на странице «Доступы».</div>`;
   const html = `<!doctype html><html lang="ru"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="dark">
@@ -575,6 +676,10 @@ function portalPage(who, rights, env) {
 .eyebrow{color:var(--a);font-size:12px;letter-spacing:.1em;text-transform:uppercase}
 h1{font-size:26px;margin:4px 0 0}.who{margin-left:auto;color:var(--dim);font-size:13px}.who a{color:var(--a);text-decoration:none;margin-left:10px}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+section{margin-bottom:26px}
+section h2{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;font-size:12px;font-weight:600;
+letter-spacing:.09em;text-transform:uppercase;color:var(--dim);margin:0 0 10px;padding-bottom:7px;border-bottom:1px solid var(--ln)}
+section h2 span{font-size:12px;font-weight:400;letter-spacing:0;text-transform:none;color:#6b7787}
 .tile{display:block;background:var(--card);border:1px solid var(--ln);border-radius:12px;padding:18px 20px;color:inherit;text-decoration:none;transition:border-color .15s}
 .tile:hover,.tile:focus-visible{border-color:var(--a);outline:none}.tile .n{font-weight:600;font-size:17px;margin-bottom:6px}.tile .d{color:var(--dim);font-size:13px}
 .card{background:var(--card);border:1px solid var(--ln);border-radius:12px;padding:18px 20px;color:var(--dim)}
@@ -582,7 +687,7 @@ h1{font-size:26px;margin:4px 0 0}.who{margin-left:auto;color:var(--dim);font-siz
 </style></head><body><div class="wrap">
 <div class="top"><div><div class="eyebrow">КВАНТ · единый вход</div><h1>Портал</h1></div>
 <div class="who">${esc(who.email)}${rights.admin ? '<a href="/admin">доступы</a>' : ""}<a href="https://${esc(team)}/cdn-cgi/access/logout">выйти</a></div></div>
-${mine.length ? `<div class="grid">${tiles}</div>` : empty}
+${mine.length ? sections : empty}
 <div class="note">Вход по корпоративной почте, сессия действует месяц. Права на разделы назначает владелец.</div>
 </div></body></html>`;
   return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store",
