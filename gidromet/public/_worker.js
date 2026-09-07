@@ -1,19 +1,17 @@
-// Гейт доступа к ГПУ-библиотеке: HTTP Basic Auth перед отдачей статики.
+// Гейт доступа к сайту «Гидрометаллургия»: HTTP Basic Auth перед отдачей статики.
 // Cloudflare Pages в advanced-режиме (наличие _worker.js) гоняет ВСЕ запросы
 // через этот fetch; файлы отдаём через env.ASSETS уже после проверки.
 //
 // Пароль в КОДЕ НЕ хранится — берётся из переменной окружения проекта
-// BASIC_AUTH_PASS (секрет Cloudflare Pages проекта kvant-gpu).
-// Логин — BASIC_AUTH_USER (по умолчанию "kvant").
+// BASIC_AUTH_PASS (секрет Cloudflare Pages проекта kvant-gidromet), общий для всех
+// сайтов компании: его записывает процесс выкладки из секрета GitHub.
+// Логин — BASIC_AUTH_USER (по умолчанию "kvant"); именной вход — BASIC_AUTH_USERS.
 //
 // Поведение без секрета — FAIL-CLOSED: сайт отдаёт 503 и никого не пускает.
-// Это осознанно и отличается от временного открытого окна на сайте ОВЭ-75:
-// здесь внутри стоимость нашего реального лота с вилками закупки, разрывы
-// цен OEM/аналог, рейтинг поставщиков с оценкой санкционной проходимости
-// и номера сделок Bitrix. Пустой пароль тут опаснее, чем недоступный сайт.
-//
-// Чтобы открыть сайт команде: Cloudflare Pages → kvant-gpu → Settings →
-// Environment variables → добавить секрет BASIC_AUTH_PASS. Пересборка не нужна.
+// Сайт закрыт по распоряжению владельца от 07.09.2026 («закрываем тем же паролем,
+// тем же методом»): внутри расчётные модели и данные заказчика.
+// Следующий шаг по тому же распоряжению — периметр Cloudflare Access (вход по
+// корпоративной почте); после его включения этот воркер снимается.
 
 export default {
   async fetch(request, env) {
@@ -22,9 +20,9 @@ export default {
 
     if (!pass && !env.BASIC_AUTH_USERS) {
       return new Response(page(
-        "ГПУ-библиотека · КВАНТ",
+        "Гидрометаллургия · КВАНТ",
         "<p>Доступ закрыт: не задан пароль сайта.</p>" +
-        "<p>Владельцу: Cloudflare Pages → проект <code>kvant-gpu</code> → Settings → " +
+        "<p>Владельцу: Cloudflare Pages → проект <code>kvant-gidromet</code> → Settings → " +
         "Environment variables → секрет <code>BASIC_AUTH_PASS</code>. " +
         "После этого гейт включится сам, пересборка не нужна.</p>"),
         {
@@ -38,8 +36,8 @@ export default {
     }
     if (!(await userOk(request, env, SITE))) {
       return new Response(page(
-        "ГПУ-библиотека · КВАНТ",
-        "<p>Справочник сорсинга по газопоршневым установкам (Cummins, Caterpillar, INNIO Jenbacher).</p>" +
+        "Гидрометаллургия · КВАНТ",
+        "<p>Инженерное заключение по гидрометаллургической переработке медно-золотого концентрата.</p>" +
         "<p>Введите логин и пароль в окне браузера. Если окно не появилось — обновите страницу. " +
         "Логин и пароль выдаёт владелец.</p>"),
         {
@@ -47,7 +45,7 @@ export default {
           headers: {
             // realm только ASCII: значения HTTP-заголовков — ByteString (Latin-1),
             // кириллица здесь роняет ответ и окно ввода пароля не появляется
-            "WWW-Authenticate": 'Basic realm="GPU KVANT", charset="UTF-8"',
+            "WWW-Authenticate": 'Basic realm="GIDROMET KVANT", charset="UTF-8"',
             "Content-Type": "text/html; charset=utf-8",
             "Cache-Control": "no-store",
           },
@@ -119,7 +117,7 @@ function safeEqual(a, b) {
 
 // ---- ИМЕННОЙ ВХОД ПО КОРПОРАТИВНОЙ ПОЧТЕ (копия access/users.js, сверяется тестом) ----
 // Секрет BASIC_AUTH_USERS: по строке «email sha256(email:пароль) сайты»; общий пароль — резервный вход.
-const SITE = "gpu";
+const SITE = "gidromet";
 // BEGIN userOk
 async function userOk(request, env, site) {
   const c = parseBasic(request.headers.get("Authorization"));
