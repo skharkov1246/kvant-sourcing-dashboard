@@ -8,7 +8,10 @@ import { fileURLToPath } from "node:url";
 import { userOk, sha256Hex } from "../users.js";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
-const GATES = ["public/_worker.js", "gpu/public/_worker.js", "ove/public/_worker.js", "zip/site/_worker.js.example"];
+const GATES = ["public/_worker.js", "gpu/public/_worker.js", "ove/public/_worker.js", "zip/site/_worker.js.example",
+  "gidromet/public/_worker.js",
+  "factory/public/_worker.js",
+];
 
 const req = (login, pass) => new Request("https://x/", {
   headers: login == null ? {} : { Authorization: "Basic " + Buffer.from(`${login}:${pass}`, "utf8").toString("base64") },
@@ -62,6 +65,6 @@ test("копии помощника в гейтах совпадают с кан
   for (const g of GATES) {
     const got = block(fs.readFileSync(path.join(ROOT, g), "utf8"));
     assert.equal(got, want, `${g}: блок userOk разошёлся с access/users.js`);
-    assert.match(fs.readFileSync(path.join(ROOT, g), "utf8"), /const SITE = "(sourcing|gpu|ove|zip)";/, `${g}: нет константы SITE`);
+    assert.match(fs.readFileSync(path.join(ROOT, g), "utf8"), /const SITE = "(sourcing|gpu|ove|zip|gidromet|gok)";/, `${g}: нет константы SITE`);
   }
 });

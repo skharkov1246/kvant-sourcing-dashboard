@@ -1,6 +1,7 @@
 // ИМЕННОЙ ВХОД ПО КОРПОРАТИВНОЙ ПОЧТЕ — канонический экземпляр помощника.
 // Ровно этот же блок (между маркерами BEGIN/END) вшит в каждый гейт:
 //   public/_worker.js · gpu/public/_worker.js · ove/public/_worker.js · zip/site/_worker.js.example
+//   gidromet/public/_worker.js · factory/public/_worker.js
 // Тест: node --test access/test/users.test.mjs. Сверка копий: node access/test/users.test.mjs --sync
 //
 // Секрет BASIC_AUTH_USERS — текст, по строке на сотрудника:
