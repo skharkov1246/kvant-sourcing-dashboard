@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 159,
-    "total_bytes": 69458141,
+    "total_bytes": 69450612,
     "by_sensitivity": {
       "конфиденциально": 43,
       "внутреннее": 84,
@@ -1036,7 +1036,7 @@
     {
       "path": "data/chat_snapshot.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 485951,
+      "bytes": 478272,
       "note": "Суточный снимок реакции коммерсантов в чатах сделок. Пишет бот scan.yml (chat_scan.py) раз в сутки. Руками не редактировать: правка в PR откатит свежие данные при мерже. Содержит поимённые метрики 15 сотрудников и LLM-оценки.",
       "format": "json",
       "shape": "объект",
@@ -1049,9 +1049,9 @@
         "key": "assessment",
         "records": 15
       },
-      "last_change": "2026-09-05",
+      "last_change": "2026-09-06",
       "last_author": "github-actions[bot]",
-      "last_commit": "69b9d8b",
+      "last_commit": "fdd95fc",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "конфиденциально",
@@ -1375,7 +1375,7 @@
     {
       "path": "gt/data/bitrix_gt.json",
       "subproject": "ГТУ-библиотека",
-      "bytes": 227883,
+      "bytes": 228033,
       "note": "Метки «был ли запрос в компанию» из СП-166. Пишет бот gt-bitrix.yml дважды в неделю. Руками не редактировать.",
       "format": "json",
       "shape": "объект",
@@ -1398,9 +1398,9 @@
           "title"
         ]
       },
-      "last_change": "2026-09-03",
+      "last_change": "2026-09-07",
       "last_author": "github-actions[bot]",
-      "last_commit": "b63eab3",
+      "last_commit": "a6fbb02",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "внутреннее",
@@ -1410,7 +1410,8 @@
         ".github/workflows/gt-bitrix.yml",
         "gt/build.py",
         "gt/tools/bitrix_gt.py",
-        "gt/tools/drop_ru.py"
+        "gt/tools/drop_ru.py",
+        "scripts/build_index.py"
       ]
     },
     {
@@ -6432,9 +6433,9 @@
         "zip/data/customs_declarations.json",
         "zip/data/supplier_crm.json"
       ],
-      "last_change": "2026-09-04",
-      "last_author": "skharkov1246",
-      "last_commit": "ee02e71",
+      "last_change": "2026-09-07",
+      "last_author": "Claude",
+      "last_commit": "6e02dc0",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",

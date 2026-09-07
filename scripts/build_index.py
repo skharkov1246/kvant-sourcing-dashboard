@@ -25,7 +25,27 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 CATALOG = ROOT / "data" / "catalog.json"
+MANIFEST = ROOT / ".agent" / "manifest.json"
 OUT = ROOT / "data" / "index.json"
+
+
+def bot_files() -> set[str]:
+    """Наборы, которые переписывают боты по расписанию.
+
+    Их содержимое меняется независимо от пул-реквестов, поэтому индекс,
+    построенный по ним, устаревал бы сам собой: PR проверяется на слиянии с
+    актуальным main, где бот уже успел записать новые данные, и гейт краснел бы
+    по причине, к самому PR отношения не имеющей.
+
+    Цена исключения измерена: gt/data/bitrix_gt.json давал 592 вхождения, но
+    лишь 36 ключей из 32 619 (0,1 %) встречались только в нём.
+    Список берём из .agent/manifest.json, чтобы он был один на репозиторий.
+    """
+    try:
+        m = json.loads(MANIFEST.read_text(encoding="utf-8"))
+    except Exception:
+        return set()
+    return {b["path"] for b in m.get("bot_files", []) if b.get("path", "").endswith(".json")}
 
 # Поля, попадающие в индекс: имя поля → группа поиска.
 FIELD_GROUPS: dict[str, str] = {
@@ -112,11 +132,14 @@ def records_of(path: Path, entry: dict) -> tuple[str | None, list]:
 
 def build() -> dict:
     catalog = json.loads(CATALOG.read_text(encoding="utf-8"))
+    skip = bot_files()
     files: list[dict] = []
     index: dict[str, dict[str, list]] = {}
 
     for entry in catalog["datasets"]:
         if entry["path"].endswith(".js") or entry.get("format") != "json":
+            continue
+        if entry["path"] in skip:                    # см. bot_files(): волатильные наборы
             continue
         path = ROOT / entry["path"]
         if not path.exists():
@@ -160,6 +183,8 @@ def build() -> dict:
         "how_to_use": "python scripts/lookup.py <значение>",
         "indexed_fields": FIELD_GROUPS,
         "excluded_fields": EXCLUDED_FIELDS,
+        "excluded_datasets": sorted(bot_files()),
+        "excluded_datasets_reason": "наборы, переписываемые ботами по расписанию: индекс по ним устаревал бы сам собой",
         "excluded_reason": "персональные данные, контакты и суммы в индекс не попадают — иначе индекс сам станет выгрузкой",
         "summary": {
             "files": len(files),
