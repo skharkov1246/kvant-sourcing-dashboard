@@ -86,4 +86,4 @@ function b64uBytes(s) {
 function b64uText(s) { return new TextDecoder().decode(b64uBytes(s)); }
 // END accessOk
 
-export { accessOk, accessCerts };
+export { accessOk, accessCerts, readCookie };

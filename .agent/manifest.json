@@ -141,6 +141,8 @@
       "ruff",
       "компиляция всех модулей",
       "pytest",
+      "тесты доступов (node --test access/test/)",
+      "синтаксис гейтов Cloudflare",
       "smoke-рендер + валидация HTML",
       "бот-файлы не изменены",
       "поиск секретов"
@@ -150,7 +152,8 @@
   "do_not_touch_without_owner": [
     ".github/workflows/ — расписания и деплой",
     "scheduler/ — Cloudflare Cron Worker",
-    "public/_worker.js — гейт доступа Basic Auth",
+    "public/_worker.js — портал, гейт входа Cloudflare Access и панель доступов",
+    "access/acl.js, access/cfaccess.js, access/siterights.js — канонические блоки прав и входа; копии в гейтах сверяются тестами",
     "секреты и .env",
     "data/chat_snapshot.json — им управляет бот"
   ],

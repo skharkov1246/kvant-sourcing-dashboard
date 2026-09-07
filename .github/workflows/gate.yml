@@ -51,6 +51,22 @@ jobs:
       - name: Тесты ядра
         run: python -m pytest -q
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Тесты доступов (вход, права, резка вкладок)
+        run: node --test access/test/cfaccess.test.mjs access/test/acl.test.mjs access/test/siterights.test.mjs
+
+      - name: Синтаксис гейтов Cloudflare
+        run: |
+          set -euo pipefail
+          for f in public/_worker.js gpu/public/_worker.js ove/public/_worker.js \
+                   zip/site/_worker.js gidromet/public/_worker.js factory/public/_worker.js; do
+            node --check "$f"
+          done
+          echo "✓ все гейты синтаксически целы"
+
       - name: Smoke-рендер дашборда на синтетических данных
         run: |
           set -euo pipefail
