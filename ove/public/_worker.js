@@ -1,79 +1,25 @@
-// Гейт доступа к сайту ОВЭ-75: HTTP Basic Auth перед отдачей статики.
-// Cloudflare Pages в advanced-режиме (наличие _worker.js) гоняет ВСЕ запросы
-// через этот fetch; файлы отдаём через env.ASSETS уже после проверки.
+// Гейт сайта ОВЭ-75: вход только через Cloudflare Access (портал КВАНТ).
+// Cloudflare Pages в advanced-режиме (наличие _worker.js) гоняет ВСЕ запросы через этот
+// fetch; файлы отдаём через env.ASSETS уже после проверки подписи входа.
+// Внутри тендерные данные КГМК/Гипроникеля, пул поставщиков и досье на конкурента.
+// Паролей нет: периметр — приложение Access с одной политикой допуска по почте
+// (распоряжение владельца от 07.09.2026: единый вход, единый портал).
 //
-// Пароль в КОДЕ НЕ хранится — берётся из переменной окружения проекта
-// BASIC_AUTH_PASS (секрет Cloudflare Pages проекта kvant-ove).
-// Логин — BASIC_AUTH_USER (по умолчанию "kvant").
-//
-// Поведение без секрета — fail-closed: сайт отдаёт 503 и никого не пускает.
-// Это осознанно: внутри тендерные данные КГМК/Гипроникеля, наш пул поставщиков
-// со статусами запросов и досье на конкурента. Пустой пароль здесь опаснее,
-// чем недоступный сайт.
-//
-// Самообновления и счётчика визитов тут намеренно нет — это статический
-// разбор тендерного пакета, а не живой дашборд.
-
-// ── Приём ответов с вкладки «Вопросы Заказчику» ──────────────────────────────
-// POST /api/answers коммитит ответы Заказчика и комментарии инженеров в
-// ove/data/questions_answers.json ветки main через GitHub Contents API.
-// Каждая отправка = настоящий git-коммит с именем инженера в авторе; пуш в
-// main триггерит ove-deploy, и через ~3 минуты ответы запечены в страницу для
-// всей команды. Нужен секрет проекта GH_ANSWERS_TOKEN — fine-grained PAT этого
-// репозитория с правом Contents: Read and write. Путь файла зашит в код:
-// токен шире, но воркер физически не умеет писать никуда, кроме этого файла.
-// Отправка требует Basic Auth: пока пароль сайта не задан (временное открытое
-// окно), эндпоинт отвечает 503 — анонимные коммиты в репозиторий недопустимы.
+// POST /api/answers — приём ответов с вкладки «Вопросы Заказчику»: коммит в
+// ove/data/questions_answers.json ветки main через GitHub Contents API (секрет проекта
+// GH_ANSWERS_TOKEN — fine-grained PAT с правом Contents: Read and write). Только для вошедших.
 
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     if (url.pathname === "/api/answers") return handleAnswers(request, env);
 
-    const user = env.BASIC_AUTH_USER || "kvant";
-    const pass = env.BASIC_AUTH_PASS;
-
-    // ⚠ ВРЕМЕННЫЙ РЕЖИМ, распоряжение владельца 13.08.2026: «выкладывай пока всё
-    // без пароля, запаролю утром завтра». Пока секрет BASIC_AUTH_PASS не задан —
-    // сайт открыт. Как только владелец добавит секрет в Cloudflare, гейт включается
-    // сам: ни правок в коде, ни пересборки не нужно.
-    //
-    // Это fail-OPEN, и как постоянное решение он опасен: если секрет когда-нибудь
-    // удалят, сайт молча откроется. После того как владелец подтвердит, что пароль
-    // задан и вход работает, вернуть здесь fail-closed (отдавать 503 без секрета).
-    if (!pass) {
-      const resp = await env.ASSETS.fetch(request);
-      const open = new Response(resp.body, resp);
-      open.headers.set("Cache-Control", "no-store");
-      open.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
-      open.headers.set("Referrer-Policy", "no-referrer");
-      return open;
-    }
-
-    const got = request.headers.get("Authorization") || "";
-    const want = "Basic " + btoa(`${user}:${pass}`);
-    if (!timingSafeEqual(got, want)) {
-      return new Response(page(
-        "ОВЭ-75 · КВАНТ",
-        "<p>Материалы проекта «обжиг – выщелачивание – электроэкстракция» для АО «Кольская ГМК».</p>" +
-        "<p>Введите логин и пароль в окне браузера. Если окно не появилось — обновите страницу. " +
-        "Логин и пароль выдаёт владелец.</p>"),
-        {
-          status: 401,
-          headers: {
-            // realm только ASCII: значения HTTP-заголовков — ByteString (Latin-1),
-            // кириллица здесь роняет ответ и окно ввода пароля не появляется
-            "WWW-Authenticate": 'Basic realm="OVE-75 KVANT", charset="UTF-8"',
-            "Content-Type": "text/html; charset=utf-8",
-            "Cache-Control": "no-store",
-          },
-        });
-    }
+    const who = await accessOk(request, env);
+    if (!who) return denyPage("ОВЭ-75 · КВАНТ");
+    if (!(await siteAllowed(request, env, SITE))) return denyPage("ОВЭ-75 · КВАНТ");
 
     const resp = await env.ASSETS.fetch(request);
     const out = new Response(resp.body, resp);
-    // страницу не кэшируем: данные обновляются пересборкой, а закэшированная
-    // копия у прокси пережила бы смену пароля
     out.headers.set("Cache-Control", "no-store");
     out.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
     out.headers.set("Referrer-Policy", "no-referrer");
@@ -94,15 +40,8 @@ async function handleAnswers(request, env) {
   });
   if (request.method !== "POST") return json({ ok: false, error: "post_only" }, 405);
 
-  const user = env.BASIC_AUTH_USER || "kvant";
-  const pass = env.BASIC_AUTH_PASS;
-  // без пароля сайта отправка выключена: иначе кто угодно коммитил бы в репозиторий
-  if (!pass) return json({ ok: false, error: "submit_disabled_no_password" }, 503);
-  const got = request.headers.get("Authorization") || "";
-  if (!timingSafeEqual(got, "Basic " + btoa(`${user}:${pass}`))) {
-    return json({ ok: false, error: "auth" }, 401,
-      { "WWW-Authenticate": 'Basic realm="OVE-75 KVANT", charset="UTF-8"' });
-  }
+  // отправка только вошедшим через Cloudflare Access: анонимные коммиты недопустимы
+  if (!(await accessOk(request, env))) return json({ ok: false, error: "auth" }, 403);
   if (!env.GH_ANSWERS_TOKEN) return json({ ok: false, error: "no_token" }, 503);
 
   let body;
@@ -164,7 +103,15 @@ function ghHeaders(env) {
 async function ghGetFile(env) {
   const r = await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${GH_PATH}?ref=${GH_BRANCH}`,
     { headers: ghHeaders(env) });
-  if (r.status === 404) return { sha: undefined, data: { updated: "", note: "", ans: {}, eng: {}, st: {}, meta: {} } };
+  if (r.status === 404) {
+    // GitHub отдаёт 404 и когда файла нет, и когда у токена нет доступа к
+    // репозиторию. Разница критическая: пустой документ отсюда уходит в
+    // ghPutFile без sha, то есть файл создаётся заново — и все накопленные
+    // ответы заказчика затираются. Различаем запросом самого репозитория.
+    const probe = await fetch(`https://api.github.com/repos/${GH_REPO}`, { headers: ghHeaders(env) });
+    if (!probe.ok) throw new Error("github_no_access_" + probe.status);
+    return { sha: undefined, data: { updated: "", note: "", ans: {}, eng: {}, st: {}, meta: {} } };
+  }
   if (!r.ok) throw new Error("github_get_" + r.status);
   const j = await r.json();
   return { sha: j.sha, data: JSON.parse(b64decodeUtf8(j.content)) };
@@ -199,32 +146,126 @@ function b64decodeUtf8(b64) {
   return new TextDecoder().decode(bytes);
 }
 
-// служебная страница в стиле сайта: светлая и тёмная тема, без внешних ресурсов
-function page(title, body) {
-  return `<!doctype html><html lang="ru"><head><meta charset="utf-8">
+
+// служебная страница отказа: без внешних ресурсов, светлая и тёмная тема
+function denyPage(title) {
+  const html = `<!doctype html><html lang="ru"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1"><title>${title}</title>
 <style>:root{color-scheme:light;--page:#f9f9f7;--surface:#fcfcfb;--ink:#0b0b0b;--ink2:#52514e;--b:rgba(11,11,11,.10);--s1:#2a78d6}
 @media(prefers-color-scheme:dark){:root{color-scheme:dark;--page:#0d0d0d;--surface:#1a1a19;--ink:#fff;--ink2:#c3c2b7;--b:rgba(255,255,255,.10);--s1:#3987e5}}
 body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;
 background:var(--page);color:var(--ink);font:15px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
 .c{background:var(--surface);border:1px solid var(--b);border-left:4px solid var(--s1);border-radius:12px;
-padding:22px 26px;max-width:620px}h1{font-size:19px;margin:0 0 10px}p{margin:9px 0;color:var(--ink2)}
-code{background:var(--page);border:1px solid var(--b);border-radius:5px;padding:1px 5px;font-size:13px;
-overflow-wrap:anywhere}b{color:var(--ink)}</style></head>
-<body><div class="c"><h1>${title}</h1>${body}</div></body></html>`;
+padding:22px 26px;max-width:560px}h1{font-size:19px;margin:0 0 10px}p{margin:9px 0;color:var(--ink2)}
+a{color:var(--s1)}</style></head><body><div class="c"><h1>${title}</h1>
+<p>Вход выполняется через портал КВАНТ по корпоративной почте.</p>
+<p><a href="https://kvant-sourcing-f122.pages.dev/">Перейти к порталу</a></p></div></body></html>`;
+  return new Response(html, {
+    status: 403,
+    headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store",
+               "X-Robots-Tag": "noindex, nofollow, noarchive" },
+  });
 }
 
-// сравнение за постоянное время — чтобы по времени ответа нельзя было подбирать пароль
-function timingSafeEqual(a, b) {
-  const ea = new TextEncoder().encode(a);
-  const eb = new TextEncoder().encode(b);
-  if (ea.length !== eb.length) {
-    // всё равно проходим цикл, чтобы длина не утекала через тайминг
-    let d = 1;
-    for (let i = 0; i < Math.max(ea.length, eb.length); i++) d |= (ea[i] ?? 0) ^ (eb[i] ?? 1);
-    return false;
-  }
-  let diff = 0;
-  for (let i = 0; i < ea.length; i++) diff |= ea[i] ^ eb[i];
-  return diff === 0;
+const SITE = "ove";
+// BEGIN siteRights
+const RIGHTS_URL = "https://kvant-sourcing-f122.pages.dev/api/rights";
+const RIGHTS_TTL = 60 * 1000;              // память изолята: не дёргать портал на каждый файл
+const rightsCache = new Map();
+
+async function siteAllowed(request, env, site) {
+  if (env && env.SITE_RIGHTS === "off") return true;
+  const jwt = request.headers.get("Cf-Access-Jwt-Assertion") || readCookie(request, "CF_Authorization");
+  if (!jwt) return true;                   // сюда приходят только вошедшие; подпись проверена выше
+  const now = Date.now();
+  const hit = rightsCache.get(jwt);
+  if (hit && now - hit.t < RIGHTS_TTL) return hit.sites === null || hit.sites.includes(site);
+  let sites = null;                        // null — «портал не ответил», пускаем
+  try {
+    const r = await fetch(RIGHTS_URL, { headers: { "Cf-Access-Jwt-Assertion": jwt } });
+    if (r.ok) {
+      const d = await r.json();
+      if (d && Array.isArray(d.sites)) sites = d.sites;
+    }
+  } catch { /* сеть между проектами не должна запирать сайт */ }
+  if (rightsCache.size > 500) rightsCache.clear();
+  rightsCache.set(jwt, { t: now, sites });
+  return sites === null || sites.includes(site);
 }
+// END siteRights
+
+// BEGIN accessOk
+// Проверка входа через Cloudflare Access: подпись JWT (RS256) по открытым ключам команды,
+// срок, издатель и, если задан CF_ACCESS_AUD, аудитория приложения. Возвращает {email, sub, exp}
+// или null. Нужна на служебных адресах предпросмотра (<hash>.<проект>.pages.dev), куда
+// периметр Access не распространяется: без действительного входа воркер ничего не отдаёт.
+const CF_TEAM_DEFAULT = "small-bread-df2f.cloudflareaccess.com";
+async function accessOk(request, env) {
+  const team = String((env && env.CF_ACCESS_TEAM) || CF_TEAM_DEFAULT).replace(/^https?:\/\//, "").replace(/\/+$/, "");
+  const jwt = request.headers.get("Cf-Access-Jwt-Assertion") || readCookie(request, "CF_Authorization");
+  if (!jwt) return null;
+  const parts = jwt.split(".");
+  if (parts.length !== 3) return null;
+  let header, payload;
+  try {
+    header = JSON.parse(b64uText(parts[0]));
+    payload = JSON.parse(b64uText(parts[1]));
+  } catch { return null; }
+  if (!header || header.alg !== "RS256" || !header.kid) return null;
+  const now = Math.floor(Date.now() / 1000);
+  if (typeof payload.exp !== "number" || payload.exp < now - 60) return null;
+  if (payload.iss !== `https://${team}`) return null;
+  const want = String((env && env.CF_ACCESS_AUD) || "").split(",").map((s) => s.trim()).filter(Boolean);
+  if (want.length) {
+    const aud = Array.isArray(payload.aud) ? payload.aud : [payload.aud];
+    if (!aud.some((a) => want.includes(a))) return null;
+  }
+  const keys = await accessCerts(team, env);
+  const jwk = keys.find((k) => k && k.kid === header.kid);
+  if (!jwk) return null;
+  try {
+    const key = await crypto.subtle.importKey("jwk", jwk, { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" }, false, ["verify"]);
+    const ok = await crypto.subtle.verify("RSASSA-PKCS1-v1_5", key, b64uBytes(parts[2]),
+      new TextEncoder().encode(parts[0] + "." + parts[1]));
+    if (!ok) return null;
+  } catch { return null; }
+  const email = String(payload.email || "").trim().toLowerCase();
+  return email ? { email, sub: String(payload.sub || ""), exp: payload.exp } : null;
+}
+// открытые ключи команды; кэш на edge на час. env.__certs — подстановка для тестов.
+async function accessCerts(team, env) {
+  if (env && env.__certs) return Array.isArray(env.__certs.keys) ? env.__certs.keys : [];
+  const url = `https://${team}/cdn-cgi/access/certs`;
+  let resp = null;
+  try { if (typeof caches !== "undefined") resp = await caches.default.match(url); } catch { resp = null; }
+  if (!resp) {
+    resp = await fetch(url);
+    if (!resp || !resp.ok) return [];
+    try {
+      const copy = resp.clone();
+      const h = new Headers(copy.headers);
+      h.set("Cache-Control", "max-age=3600");
+      if (typeof caches !== "undefined") await caches.default.put(url, new Response(await copy.arrayBuffer(), { headers: h }));
+    } catch { /* кэш — необязателен */ }
+  }
+  try { const j = await resp.json(); return Array.isArray(j.keys) ? j.keys : []; } catch { return []; }
+}
+function readCookie(request, name) {
+  const raw = request.headers.get("Cookie") || "";
+  for (const part of raw.split(";")) {
+    const i = part.indexOf("=");
+    if (i < 0) continue;
+    if (part.slice(0, i).trim() === name) return part.slice(i + 1).trim();
+  }
+  return null;
+}
+function b64uBytes(s) {
+  const b = String(s).replace(/-/g, "+").replace(/_/g, "/");
+  const bin = atob(b + "=".repeat((4 - (b.length % 4)) % 4));
+  return Uint8Array.from(bin, (c) => c.charCodeAt(0));
+}
+function b64uText(s) { return new TextDecoder().decode(b64uBytes(s)); }
+// END accessOk
+
+// экспорт для тестов (на исполнение воркера не влияет)
+export { ghGetFile };
