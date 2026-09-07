@@ -8,7 +8,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import worker from "../../public/_worker.js";
-import { PAYLOADS, defaultAcl, loadAcl } from "../acl.js";
+import { PAYLOADS, defaultAcl, loadAcl, loadSeen } from "../acl.js";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const TEAM = "test-team.cloudflareaccess.com";
@@ -35,8 +35,15 @@ async function jwtFor(email) {
 // ── подпорки Cloudflare: KV на карте, ASSETS на боевом шаблоне ───────────────
 function kv() {
   const box = new Map();
-  return { box, get: async (k, o) => { const v = box.get(k); return v == null ? null : (o && o.type === "json" ? JSON.parse(v) : v); },
-           put: async (k, v) => { box.set(k, v); }, list: async () => ({ keys: [] }) };
+  return {
+    box,
+    get: async (k, o) => { const v = box.get(k); return v == null ? null : (o && o.type === "json" ? JSON.parse(v) : v); },
+    put: async (k, v) => { box.set(k, v); },
+    list: async ({ prefix = "" } = {}) => ({
+      keys: [...box.keys()].filter((k) => k.startsWith(prefix)).map((name) => ({ name })),
+      list_complete: true,
+    }),
+  };
 }
 function dashboardHtml() {
   let html = fs.readFileSync(path.join(ROOT, "templates/dashboard_core.html"), "utf8");
@@ -77,6 +84,8 @@ test("портал показывает только выданные челов
   assert.ok(html.includes("Дашборд сорсинга") && html.includes("ГПУ — газопоршневые установки"));
   assert.ok(html.includes("ГШО — горно-шахтное оборудование") && html.includes("ГТУ — газотурбинные установки"));
   assert.ok(!html.includes("Гидрометаллургия"), "показан невыданный сайт");
+  assert.ok(html.includes("Библиотеки оборудования"), "нет плашки раздела");
+  assert.ok(!html.includes("Спецпроекты"), "пустая плашка не должна показываться");
   assert.ok(!html.includes('href="/admin"'), "рядовому сотруднику видна ссылка на админку");
 
   const none = makeEnv();
@@ -84,12 +93,43 @@ test("портал показывает только выданные челов
   assert.match(await (await call(none, "/", "g@kvantpro.com")).text(), /Доступ к разделам пока не выдан/);
 });
 
-test("первый вход заводит человека в списке доступов", async () => {
+test("вход учитывается на любой странице, а не только на корне портала", async () => {
+  // именно этим был сломан учёт: кто заходил по закладке сразу на дашборд, в список не попадал
+  for (const p of ["/", "/dashboard", "/api/rights"]) {
+    const env = makeEnv();
+    await call(env, p, "new@kvantpro.com");
+    assert.ok((await loadSeen(env))["new@kvantpro.com"], `вход через ${p} не учтён`);
+  }
+  // служебные запросы не считаем
   const env = makeEnv();
-  await call(env, "/", "new@kvantpro.com");
-  const acl = await loadAcl(env);
-  assert.ok(acl.users["new@kvantpro.com"], "человек не появился в списке");
-  assert.equal(acl.users["new@kvantpro.com"].role, "employee");
+  await call(env, "/fonts/x.woff2", "new@kvantpro.com");
+  assert.deepEqual(await loadSeen(env), {}, "запрос шрифта не должен считаться входом");
+});
+
+test("вошедший виден в панели, даже если прав ему ещё не назначали", async () => {
+  const env = makeEnv();
+  await seed(env, {});
+  await call(env, "/dashboard", "nov@kvantpro.com");
+  const html = await (await call(env, "/admin", "boss@kvantpro.com")).text();
+  assert.ok(html.includes("nov@kvantpro.com"), "вошедшего нет в списке панели");
+  assert.ok(!html.includes("Учёт входов не ведётся"), "ложная тревога при работающем хранилище");
+});
+
+test("без хранилища панель говорит об этом прямо, а не показывает пустой список", async () => {
+  const env = makeEnv({ ACL: undefined, VISITS: undefined });
+  const html = await (await call(env, "/admin", "boss@kvantpro.com")).text();
+  assert.match(html, /Учёт входов не ведётся/);
+  assert.match(html, /KV namespace/, "не сказано, что именно сделать");
+});
+
+test("роль назначается вошедшему, у которого строки прав ещё нет", async () => {
+  const env = makeEnv();
+  await seed(env, {});
+  await call(env, "/", "nov@kvantpro.com");
+  const r = await call(env, "/admin/api", "boss@kvantpro.com",
+    { method: "POST", body: JSON.stringify({ op: "user_role", email: "nov@kvantpro.com", role: "kam" }) });
+  assert.equal((await r.json()).ok, true);
+  assert.equal((await loadAcl(env)).users["nov@kvantpro.com"].role, "kam");
 });
 
 test("дашборд режется по правам: чужих данных в исходном коде нет", async () => {
@@ -163,7 +203,7 @@ test("владелец меняет роль, точечные права и р�
   await post({ op: "default_role", role: "guest" });
   assert.equal((await loadAcl(env)).defaultRole, "guest");
 
-  for (const [body, code] of [[{ op: "user_role", email: "нет@kvantpro.com", role: "kam" }, 404],
+  for (const [body, code] of [[{ op: "user_role", email: "", role: "kam" }, 404],
                               [{ op: "user_role", email: "s@kvantpro.com", role: "выдумка" }, 400],
                               [{ op: "выдумка" }, 400]]) {
     assert.equal((await post(body)).status, code, JSON.stringify(body));
@@ -185,6 +225,19 @@ test("владелец заводит человека заранее и сни�
   assert.equal((await (await post({ op: "user_drop", email: "nov@kvantpro.com" })).json()).ok, true);
   assert.equal((await loadAcl(env)).users["nov@kvantpro.com"], undefined);
   assert.equal((await post({ op: "user_drop", email: "nov@kvantpro.com" })).status, 404);
+});
+
+test("спецпроекты стоят под одной плашкой", async () => {
+  const env = makeEnv();
+  await seed(env, { "e@kvantpro.com": { role: "engineer", sites: [], tabs: [], note: "", seen: 1 } });
+  const html = await (await call(env, "/", "e@kvantpro.com")).text();
+  const sec = html.indexOf("Спецпроекты");
+  assert.ok(sec > 0, "нет плашки «Спецпроекты»");
+  const tail = html.slice(sec);
+  for (const n of ["ОВЭ-75", "Гидрометаллургия", "Базовый проект ГОКа"]) {
+    assert.ok(tail.includes(n), `${n} не попал в спецпроекты`);
+  }
+  assert.ok(html.indexOf("Библиотеки оборудования") < sec, "библиотеки должны идти выше спецпроектов");
 });
 
 test("права из ADMIN_EMAILS работают и без хранилища", async () => {

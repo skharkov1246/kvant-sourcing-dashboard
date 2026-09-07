@@ -8,7 +8,7 @@ import { fileURLToPath } from "node:url";
 
 import {
   SITE_IDS, TAB_IDS, PAYLOADS, ACL_KEY,
-  defaultAcl, normalizeAcl, rightsFor, loadAcl, saveAcl, touchUser, cutDashboard,
+  defaultAcl, normalizeAcl, rightsFor, loadAcl, saveAcl, touchUser, loadSeen, cutDashboard,
 } from "../acl.js";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
@@ -16,8 +16,15 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..")
 // Хранилище-подпорка вместо Cloudflare KV.
 function kv() {
   const box = new Map();
-  return { box, get: async (k, o) => { const v = box.get(k); return v == null ? null : (o && o.type === "json" ? JSON.parse(v) : v); },
-           put: async (k, v) => { box.set(k, v); } };
+  return {
+    box,
+    get: async (k, o) => { const v = box.get(k); return v == null ? null : (o && o.type === "json" ? JSON.parse(v) : v); },
+    put: async (k, v) => { box.set(k, v); },
+    list: async ({ prefix = "" } = {}) => ({
+      keys: [...box.keys()].filter((k) => k.startsWith(prefix)).map((name) => ({ name })),
+      list_complete: true,
+    }),
+  };
 }
 
 test("роль по умолчанию даёт сотруднику всё, гость не получает ничего", () => {
@@ -110,18 +117,41 @@ test("хранилище берётся из VISITS, если отдельная
   assert.ok(store.box.has(ACL_KEY));
 });
 
-test("вход отмечается: человек появляется в списке сам", async () => {
+test("вход отмечается отдельным ключом, а не правкой документа прав", async () => {
   const env = { ACL: kv() };
-  const acl = defaultAcl();
-  await touchUser(env, acl, "New@KvantPro.com");
-  const u = (await loadAcl(env)).users["new@kvantpro.com"];
-  assert.ok(u, "новый человек заведён при первом входе");
-  assert.equal(u.role, "employee");
+  await touchUser(env, "New@KvantPro.com");
+  const seen = await loadSeen(env);
+  const u = seen["new@kvantpro.com"];
+  assert.ok(u, "вошедший не попал в учёт");
   assert.equal(u.seen, 1);
-  await touchUser(env, acl, "new@kvantpro.com");
-  assert.equal((await loadAcl(env)).users["new@kvantpro.com"].seen, 2);
-  await touchUser(env, acl, "");   // пустая почта ничего не заводит
-  assert.equal(Object.keys((await loadAcl(env)).users).length, 1);
+  assert.ok(u.first && u.last);
+  assert.deepEqual((await loadAcl(env)).users, {}, "документ прав учётом входов не трогается");
+
+  await touchUser(env, "");                       // пустая почта ничего не заводит
+  assert.equal(Object.keys(await loadSeen(env)).length, 1);
+});
+
+test("повторный вход в течение десяти минут не переписывает хранилище", async () => {
+  const store = kv();
+  const env = { ACL: store };
+  await touchUser(env, "a@kvantpro.com");
+  const first = store.box.get("seen:a@kvantpro.com");
+  await touchUser(env, "a@kvantpro.com");
+  assert.equal(store.box.get("seen:a@kvantpro.com"), first, "запись на каждый запрос — лишняя нагрузка");
+
+  // спустя тишину счётчик растёт, дата первого входа сохраняется
+  const old = JSON.parse(first);
+  store.box.set("seen:a@kvantpro.com", JSON.stringify({ ...old, last: new Date(Date.now() - 20 * 60 * 1000).toISOString() }));
+  await touchUser(env, "a@kvantpro.com");
+  const now = JSON.parse(store.box.get("seen:a@kvantpro.com"));
+  assert.equal(now.seen, 2);
+  assert.equal(now.first, old.first);
+});
+
+test("без хранилища учёт отвечает «неизвестно», а не «никто не заходил»", async () => {
+  await touchUser({}, "a@kvantpro.com");          // не должно бросать
+  assert.equal(await loadSeen({}), null, "пустой список и отсутствие хранилища нельзя путать");
+  assert.deepEqual(await loadSeen({ ACL: kv() }), {}, "с хранилищем пустой список — это факт");
 });
 
 // ── резка дашборда ───────────────────────────────────────────────────────────

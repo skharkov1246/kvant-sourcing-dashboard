@@ -21,22 +21,30 @@ const ACL_KEY = "acl:v1";
 // был ЗИП, добавляется ГТУ (справочник и раньше лежал внутри того же сайта).
 const ACL_VERSION = 2;
 
-// Сайты компании. gt (справочник ГТУ) живёт по пути внутри проекта ЗИП,
-// поэтому отдельным ресурсом не является — управляется вместе с zip.
+// Разделы портала. Спецпроекты ведёт один департамент, поэтому стоят под общей плашкой
+// (распоряжение владельца от 07.09.2026).
+const GROUPS = [
+  { id: "work", name: "Работа с данными", note: "ежедневные инструменты" },
+  { id: "lib", name: "Библиотеки оборудования", note: "ГПУ, ГТУ, ГШО — поставщики, цены, аналоги" },
+  { id: "proj", name: "Спецпроекты", note: "проработки под заказчика; ведёт один департамент" },
+];
+
+// Сайты компании. gt (библиотека ГТУ) живёт по пути внутри проекта ЗИП,
+// поэтому отдельным проектом Pages не является — но правом управляется отдельно.
 const SITES = [
-  { id: "dashboard", name: "Дашборд сорсинга", href: "/dashboard",
+  { id: "dashboard", group: "work", name: "Дашборд сорсинга", href: "/dashboard",
     note: "нагрузка, конверсия, реализация, поставщики — по данным Bitrix24" },
-  { id: "zip", name: "ГШО — горно-шахтное оборудование", href: "https://kvant-zip.pages.dev/",
+  { id: "zip", group: "lib", name: "ГШО — горно-шахтное оборудование", href: "https://kvant-zip.pages.dev/",
     note: "перфораторы, буровая и горнопроходческая техника: позиции, ODM-аналоги, цены, таможня, заказы" },
-  { id: "gt", name: "ГТУ — газотурбинные установки", href: "https://kvant-zip.pages.dev/gt/",
+  { id: "gt", group: "lib", name: "ГТУ — газотурбинные установки", href: "https://kvant-zip.pages.dev/gt/",
     note: "Siemens SGT-100…400 и SGT5-4000F, GE LM6000 и Frame 6B: субпоставщики, MRO, склады" },
-  { id: "gpu", name: "ГПУ — газопоршневые установки", href: "https://kvant-gpu.pages.dev/",
+  { id: "gpu", group: "lib", name: "ГПУ — газопоршневые установки", href: "https://kvant-gpu.pages.dev/",
     note: "Cummins, Caterpillar, INNIO: поставщики, цены, разрывы OEM/аналог" },
-  { id: "ove", name: "ОВЭ-75", href: "https://kvant-ove.pages.dev/",
+  { id: "ove", group: "proj", name: "ОВЭ-75", href: "https://kvant-ove.pages.dev/",
     note: "обжиг, выщелачивание, электроэкстракция — проект для Кольской ГМК" },
-  { id: "gidromet", name: "Гидрометаллургия", href: "https://kvant-gidromet.pages.dev/",
+  { id: "gidromet", group: "proj", name: "Гидрометаллургия", href: "https://kvant-gidromet.pages.dev/",
     note: "заключение по переработке медно-золотого концентрата" },
-  { id: "gok", name: "Базовый проект ГОКа", href: "https://kvant-gok.pages.dev/",
+  { id: "gok", group: "proj", name: "Базовый проект ГОКа", href: "https://kvant-gok.pages.dev/",
     note: "золото-медный горно-обогатительный комбинат" },
 ];
 
@@ -118,10 +126,10 @@ function normalizeAcl(raw) {
   return { version: ACL_VERSION, defaultRole, roles, users };
 }
 
-async function aclStore(env) { return (env && (env.ACL || env.VISITS)) || null; }
+function aclStore(env) { return (env && (env.ACL || env.VISITS)) || null; }
 
 async function loadAcl(env) {
-  const kv = await aclStore(env);
+  const kv = aclStore(env);
   if (!kv) return defaultAcl();
   try {
     const raw = await kv.get(ACL_KEY, { type: "json" });
@@ -130,7 +138,7 @@ async function loadAcl(env) {
 }
 
 async function saveAcl(env, acl) {
-  const kv = await aclStore(env);
+  const kv = aclStore(env);
   if (!kv) return false;
   await kv.put(ACL_KEY, JSON.stringify(normalizeAcl(acl)));
   return true;
@@ -162,17 +170,50 @@ function rightsFor(acl, email, env) {
   };
 }
 
-// Отметка о входе: человек появляется в списке админки сам, заводить вручную не нужно.
-async function touchUser(env, acl, email) {
+// УЧЁТ ВХОДОВ. Держится отдельными ключами seen:<почта>, а не внутри документа прав,
+// по двум причинам: запись входа не должна затирать правку, сделанную в это же время
+// в панели, и не должна переписывать весь документ на каждый заход.
+//
+// Отметка ставится на любой странице, которую отдаёт портал, и на /api/rights —
+// то есть и когда человек заходит сразу на дашборд или на другой сайт по закладке.
+// Чтобы не писать в хранилище на каждый запрос, повторная отметка в пределах
+// SEEN_QUIET пропускается.
+const SEEN_PREFIX = "seen:";
+const SEEN_QUIET = 10 * 60 * 1000;
+
+async function touchUser(env, email) {
   const em = normEmail(email);
   if (!em) return;
-  const now = new Date().toISOString();
-  const u = acl.users[em] || { role: acl.defaultRole, sites: [], tabs: [], note: "", first: now, seen: 0 };
-  u.last = now;
-  u.seen = (u.seen || 0) + 1;
-  if (!u.first) u.first = now;
-  acl.users[em] = u;
-  try { await saveAcl(env, acl); } catch { /* учёт входов не должен ломать отдачу страницы */ }
+  const kv = aclStore(env);
+  if (!kv) return;
+  try {
+    const key = SEEN_PREFIX + em;
+    const prev = (await kv.get(key, { type: "json" })) || {};
+    const now = Date.now();
+    if (prev.last && now - Date.parse(prev.last) < SEEN_QUIET) return;
+    const iso = new Date(now).toISOString();
+    await kv.put(key, JSON.stringify({ first: prev.first || iso, last: iso, seen: Number(prev.seen || 0) + 1 }));
+  } catch { /* учёт входов не должен ломать отдачу страницы */ }
+}
+
+// Кто и когда заходил. Возвращает null, если хранилище не привязано, — панель обязана
+// отличать «никто не заходил» от «учёт вообще не ведётся».
+async function loadSeen(env) {
+  const kv = aclStore(env);
+  if (!kv) return null;
+  const out = {};
+  try {
+    let cursor;
+    do {
+      const page = await kv.list({ prefix: SEEN_PREFIX, cursor });
+      for (const k of page.keys || []) {
+        const v = await kv.get(k.name, { type: "json" });
+        if (v) out[k.name.slice(SEEN_PREFIX.length)] = v;
+      }
+      cursor = page.list_complete ? null : page.cursor;
+    } while (cursor);
+  } catch { return null; }
+  return out;
 }
 
 // Вырезание вкладок дашборда: убираем кнопку, панель и — главное — массив данных.
@@ -217,6 +258,7 @@ function cutDashboard(html, allowedTabs) {
 // END aclCore
 
 export {
-  SITES, TABS, SITE_IDS, TAB_IDS, PAYLOADS, ACL_KEY,
-  defaultAcl, normalizeAcl, normEmail, loadAcl, saveAcl, rightsFor, touchUser, cutDashboard,
+  SITES, GROUPS, TABS, SITE_IDS, TAB_IDS, PAYLOADS, ACL_KEY, ACL_VERSION,
+  defaultAcl, normalizeAcl, normEmail, aclStore, loadAcl, saveAcl, rightsFor,
+  touchUser, loadSeen, cutDashboard,
 };
