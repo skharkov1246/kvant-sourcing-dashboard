@@ -181,19 +181,22 @@ function rightsFor(acl, email, env) {
 const SEEN_PREFIX = "seen:";
 const SEEN_QUIET = 10 * 60 * 1000;
 
+// Возвращает true, если это первый вход человека вообще: журнал отмечает такое
+// отдельным признаком, чтобы владелец узнавал о новых людях сразу.
 async function touchUser(env, email) {
   const em = normEmail(email);
-  if (!em) return;
+  if (!em) return false;
   const kv = aclStore(env);
-  if (!kv) return;
+  if (!kv) return false;
   try {
     const key = SEEN_PREFIX + em;
     const prev = (await kv.get(key, { type: "json" })) || {};
     const now = Date.now();
-    if (prev.last && now - Date.parse(prev.last) < SEEN_QUIET) return;
+    if (prev.last && now - Date.parse(prev.last) < SEEN_QUIET) return false;
     const iso = new Date(now).toISOString();
     await kv.put(key, JSON.stringify({ first: prev.first || iso, last: iso, seen: Number(prev.seen || 0) + 1 }));
-  } catch { /* учёт входов не должен ломать отдачу страницы */ }
+    return !prev.first;
+  } catch { return false; }
 }
 
 // Кто и когда заходил. Возвращает null, если хранилище не привязано, — панель обязана

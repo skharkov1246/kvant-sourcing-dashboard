@@ -186,19 +186,22 @@ function rightsFor(acl, email, env) {
 const SEEN_PREFIX = "seen:";
 const SEEN_QUIET = 10 * 60 * 1000;
 
+// Возвращает true, если это первый вход человека вообще: журнал отмечает такое
+// отдельным признаком, чтобы владелец узнавал о новых людях сразу.
 async function touchUser(env, email) {
   const em = normEmail(email);
-  if (!em) return;
+  if (!em) return false;
   const kv = aclStore(env);
-  if (!kv) return;
+  if (!kv) return false;
   try {
     const key = SEEN_PREFIX + em;
     const prev = (await kv.get(key, { type: "json" })) || {};
     const now = Date.now();
-    if (prev.last && now - Date.parse(prev.last) < SEEN_QUIET) return;
+    if (prev.last && now - Date.parse(prev.last) < SEEN_QUIET) return false;
     const iso = new Date(now).toISOString();
     await kv.put(key, JSON.stringify({ first: prev.first || iso, last: iso, seen: Number(prev.seen || 0) + 1 }));
-  } catch { /* учёт входов не должен ломать отдачу страницы */ }
+    return !prev.first;
+  } catch { return false; }
 }
 
 // Кто и когда заходил. Возвращает null, если хранилище не привязано, — панель обязана
@@ -262,6 +265,182 @@ function cutDashboard(html, allowedTabs) {
 }
 // END aclCore
 
+// BEGIN auditCore
+const LOG_PREFIX = "log:";
+const LOG_TTL = 180 * 24 * 3600;          // полгода
+const CNT_TTL = 2 * 3600;                 // счётчики для распознавания всплесков
+const ALERT_PREFIX = "alrt:";
+const ALERT_TTL = 90 * 24 * 3600;
+const MUTE_TTL = 3600;                    // повтор одного признака по человеку — раз в час
+
+// Выгрузка — это файл, который человек уносит с собой. Картинки и шрифты сюда не входят:
+// они часть страницы, а не данные.
+const DOWNLOAD_RE = /\.(csv|tsv|xlsx?|pdf|jsonl?|zip|docx?|pptx?|txt|sql)$/i;
+const ASSET_RE = /\.(css|js|mjs|map|woff2?|ttf|png|jpe?g|gif|svg|webp|ico|avif)$/i;
+
+function classify(path) {
+  if (path === "/gen" || path.startsWith("/fonts/")) return "skip";
+  if (DOWNLOAD_RE.test(path)) return "download";
+  if (ASSET_RE.test(path)) return "skip";
+  if (path.startsWith("/admin/api")) return "admin";
+  if (path.startsWith("/api/")) return "skip";     // служебный обмен между сайтами
+  return "page";
+}
+
+const domainOf = (em) => String(em || "").split("@")[1] || "";
+const corpDomains = (env) => String((env && env.CORP_DOMAINS) || "kvantpro.com")
+  .split(/[,\s]+/).map((d) => d.trim().toLowerCase()).filter(Boolean);
+
+// Устройство — грубо, одним словом: подробная строка браузера в журнале не нужна.
+function deviceOf(ua) {
+  const s = String(ua || "");
+  if (!s) return "—";
+  if (/bot|crawler|spider|curl|wget|python|node-fetch/i.test(s)) return "робот";
+  if (/iPhone|iPad|Android|Mobile/i.test(s)) return "телефон";
+  if (/Macintosh|Mac OS/i.test(s)) return "Mac";
+  if (/Windows/i.test(s)) return "Windows";
+  if (/Linux/i.test(s)) return "Linux";
+  return "прочее";
+}
+
+// Признаки, при которых владельцу уходит письмо.
+const SIGNALS = [
+  { id: "outside", name: "вход с почты вне корпоративного домена" },
+  { id: "first", name: "первый вход нового человека" },
+  { id: "bulk", name: "массовая выгрузка файлов" },
+  { id: "denied", name: "повторные попытки войти туда, где нет доступа" },
+  { id: "robot", name: "обращения не из браузера" },
+];
+
+const pad = (n) => String(n).padStart(2, "0");
+// Час по Москве — журнал и пороги считаем в том часовом поясе, в котором работает компания.
+function mskHourKey(ms) {
+  const d = new Date(ms + 3 * 3600 * 1000);
+  return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}T${pad(d.getUTCHours())}`;
+}
+
+async function bump(kv, key, ttl) {
+  const n = Number((await kv.get(key)) || 0) + 1;
+  await kv.put(key, String(n), { expirationTtl: ttl });
+  return n;
+}
+
+// Запись одного действия. Ничего не бросает: журнал не должен ломать отдачу страницы.
+async function auditRecord(env, { request, email, site, path, kind, denied }) {
+  const kv = aclStore(env);
+  if (!kv) return null;
+  const k = kind || classify(path);
+  if (k === "skip" && !denied) return null;
+  try {
+    const em = normEmail(email);
+    const now = Date.now();
+    const h = request && request.headers;
+    const rec = {
+      t: new Date(now).toISOString(),
+      em, dom: domainOf(em), site, path: String(path).slice(0, 200),
+      kind: denied ? "denied" : k,
+      geo: (h && h.get("CF-IPCountry")) || "—",
+      dev: deviceOf(h && h.get("User-Agent")),
+      ua: String((h && h.get("User-Agent")) || "").slice(0, 120),
+    };
+    await kv.put(`${LOG_PREFIX}${rec.t}:${Math.random().toString(36).slice(2, 6)}`,
+                 JSON.stringify(rec), { expirationTtl: LOG_TTL });
+
+    const hour = mskHourKey(now);
+    const counts = {};
+    if (rec.kind === "download") counts.dl = await bump(kv, `cnt:${em}:${hour}:dl`, CNT_TTL);
+    if (rec.kind === "denied") counts.dn = await bump(kv, `cnt:${em}:${hour}:dn`, CNT_TTL);
+    if (rec.dev === "робот") counts.rb = await bump(kv, `cnt:${em}:${hour}:rb`, CNT_TTL);
+    return { rec, counts };
+  } catch { return null; }
+}
+
+// Какие признаки сработали на этой записи.
+function signalsFor(env, rec, counts, opts = {}) {
+  const out = [];
+  const lim = (name, def) => Number((env && env[name]) || def);
+  if (rec.dom && !corpDomains(env).includes(rec.dom)) {
+    out.push({ id: "outside", text: `вход с почты вне корпоративного домена: ${rec.em}` });
+  }
+  if (opts.firstEver) {
+    out.push({ id: "first", text: `первый вход нового человека: ${rec.em}` });
+  }
+  if ((counts.dl || 0) >= lim("ALERT_DOWNLOADS", 30)) {
+    out.push({ id: "bulk", text: `${rec.em} выгрузил ${counts.dl} файлов за час (порог ${lim("ALERT_DOWNLOADS", 30)})` });
+  }
+  if ((counts.dn || 0) >= lim("ALERT_DENIED", 5)) {
+    out.push({ id: "denied", text: `${rec.em}: ${counts.dn} попыток открыть закрытое за час` });
+  }
+  if ((counts.rb || 0) >= lim("ALERT_ROBOT", 20)) {
+    out.push({ id: "robot", text: `${rec.em}: ${counts.rb} обращений не из браузера за час` });
+  }
+  return out;
+}
+
+// Складывает сработавший признак и отправляет письмо. Возвращает список отправленного.
+async function raiseAlerts(env, rec, signals) {
+  const kv = aclStore(env);
+  if (!kv || !signals.length) return [];
+  const sent = [];
+  for (const s of signals) {
+    try {
+      const mute = `mute:${s.id}:${rec.em}`;
+      if (await kv.get(mute)) continue;                     // уже писали в этот час
+      await kv.put(mute, "1", { expirationTtl: MUTE_TTL });
+      const item = { t: rec.t, id: s.id, text: s.text, em: rec.em, site: rec.site, path: rec.path, geo: rec.geo };
+      await kv.put(`${ALERT_PREFIX}${rec.t}:${s.id}`, JSON.stringify(item), { expirationTtl: ALERT_TTL });
+      item.mail = await alertMail(env, item);
+      sent.push(item);
+    } catch { /* оповещение не должно ломать отдачу страницы */ }
+  }
+  return sent;
+}
+
+// Письмо владельцу. Провайдер задаётся переменными; без ключа признак всё равно
+// сохраняется и виден в панели — «не настроена почта» не должно означать «не заметили».
+async function alertMail(env, item) {
+  const to = String((env && env.ALERT_TO) || (env && env.ADMIN_EMAILS) || "").split(/[,\s]+/)[0];
+  if (!to || !env.RESEND_API_KEY) return "почта не настроена — признак записан в панель";
+  const subject = `КВАНТ · доступы: ${item.text.slice(0, 120)}`;
+  const body = [
+    item.text, "",
+    `время: ${item.t}`, `сайт: ${item.site || "—"}`, `адрес: ${item.path || "—"}`,
+    `страна: ${item.geo}`, "", "Журнал: https://kvant-sourcing-f122.pages.dev/admin/log",
+  ].join("\n");
+  try {
+    const r = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ from: env.MAIL_FROM || "alerts@kvantpro.com", to: [to], subject, text: body }),
+    });
+    return r.ok ? `отправлено на ${to}` : `не отправлено: resend ${r.status}`;
+  } catch (e) { return `не отправлено: ${String((e && e.message) || e)}`; }
+}
+
+// Чтение журнала для панели: свежие записи первыми. null — хранилище не привязано.
+async function readLog(env, { prefix = LOG_PREFIX, limit = 300 } = {}) {
+  const kv = aclStore(env);
+  if (!kv) return null;
+  const out = [];
+  try {
+    let cursor;
+    do {
+      const page = await kv.list({ prefix, cursor, limit: 1000 });
+      for (const k of page.keys || []) out.push(k.name);
+      cursor = page.list_complete ? null : page.cursor;
+    } while (cursor && out.length < 5000);
+    out.sort().reverse();
+    const take = out.slice(0, limit);
+    const recs = [];
+    for (const name of take) {
+      const v = await kv.get(name, { type: "json" });
+      if (v) recs.push(v);
+    }
+    return recs;
+  } catch { return null; }
+}
+// END auditCore
+
 export default {
   async fetch(request, env, ctx) {
     const who = await accessOk(request, env);
@@ -274,25 +453,46 @@ export default {
     // Отметка о входе. Ставится и на /api/rights, поэтому в списке оказываются и те,
     // кто зашёл сразу на дашборд или на другой сайт по закладке, минуя портал.
     // Служебные запросы (шрифты, опрос свежести) не считаем.
+    let firstEver = false;
     if (!url.pathname.startsWith("/fonts/") && url.pathname !== "/gen") {
-      ctx.waitUntil(touchUser(env, who.email));
+      firstEver = await touchUser(env, who.email);
+      ctx.waitUntil(audit(env, request, who, "portal", url.pathname, { firstEver }));
     }
 
     // /api/rights — права для гейтов остальных сайтов: они шлют сюда JWT вошедшего,
     // мы его проверяем тем же помощником и отвечаем набором прав. Общих секретов не нужно.
     if (url.pathname === "/api/rights") {
+      // гейт сайта присылает, какой адрес человек открыл: журналу нужны все сайты,
+      // а не только портал. Отсутствие параметров ничего не ломает.
+      const site = url.searchParams.get("site") || "";
+      const at = url.searchParams.get("at") || "";
+      if (site && at) {
+        const denied = !rights.sites.includes(site);
+        ctx.waitUntil(audit(env, request, who, site, at, { denied, firstEver }));
+      }
       return new Response(JSON.stringify({ email: rights.email, sites: rights.sites, tabs: rights.tabs, admin: rights.admin }),
         { headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" } });
     }
 
     // админка — только владельцу
     if (url.pathname === "/admin" || url.pathname === "/admin/") {
-      if (!rights.admin) return denyPage("Доступы · КВАНТ");
+      if (!rights.admin) {
+        ctx.waitUntil(audit(env, request, who, "admin", url.pathname, { denied: true }));
+        return denyPage("Доступы · КВАНТ");
+      }
       return adminPage(acl, who, env, await loadSeen(env));
+    }
+    if (url.pathname === "/admin/log" || url.pathname === "/admin/log/") {
+      if (!rights.admin) {
+        ctx.waitUntil(audit(env, request, who, "admin", url.pathname, { denied: true }));
+        return denyPage("Журнал · КВАНТ");
+      }
+      return logPage(env, who, url);
     }
     if (url.pathname === "/admin/api") {
       if (!rights.admin) return new Response(JSON.stringify({ ok: false, error: "forbidden" }),
         { status: 403, headers: { "Content-Type": "application/json" } });
+      ctx.waitUntil(audit(env, request, who, "admin", url.pathname, { kind: "admin" }));
       return adminApi(request, env, acl);
     }
 
@@ -324,7 +524,10 @@ export default {
 
     // дашборд
     const isDash = url.pathname === "/dashboard" || url.pathname === "/dashboard/" || url.pathname === "/index.html";
-    if (isDash && !rights.sites.includes("dashboard")) return denyPage("Дашборд сорсинга · КВАНТ");
+    if (isDash && !rights.sites.includes("dashboard")) {
+      ctx.waitUntil(audit(env, request, who, "dashboard", url.pathname, { denied: true }));
+      return denyPage("Дашборд сорсинга · КВАНТ");
+    }
 
     const resp = await env.ASSETS.fetch(isDash ? new Request(url.origin + "/index.html", { headers: request.headers }) : request);
     const headers = new Headers(resp.headers);
@@ -356,6 +559,15 @@ export default {
   },
 };
 
+
+// Запись действия в журнал + разбор признаков. Вызывается через ctx.waitUntil,
+// поэтому отдачу страницы не задерживает и её ошибками не ломает.
+async function audit(env, request, who, site, path, opts = {}) {
+  const done = await auditRecord(env, { request, email: who.email, site, path, kind: opts.kind, denied: opts.denied });
+  if (!done) return;
+  const signals = signalsFor(env, done.rec, done.counts, { firstEver: opts.firstEver });
+  if (signals.length) await raiseAlerts(env, done.rec, signals);
+}
 
 // ── АДМИНКА: управление доступами ────────────────────────────────────────────
 const ESC = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) =>
@@ -464,7 +676,7 @@ button.gh{background:#232a35;color:var(--ink)}
 
   const body = `<div class="wrap">
 <div class="top"><div><div class="eyebrow">КВАНТ · портал</div><h1>Доступы</h1></div>
-<div class="who">${ESC(me.email)}<a href="/">портал</a><a href="https://${ESC(team)}/cdn-cgi/access/logout">выйти</a></div></div>
+<div class="who">${ESC(me.email)}<a href="/admin/log">журнал</a><a href="/">портал</a><a href="https://${ESC(team)}/cdn-cgi/access/logout">выйти</a></div></div>
 
 ${noStore ? `<div class="card warn"><b>Учёт входов не ведётся.</b> К проекту Cloudflare Pages
   <code>kvant-sourcing-f122</code> не привязано хранилище KV, поэтому ни входы, ни правки прав
@@ -647,6 +859,110 @@ async function adminApi(request, env, acl) {
   return json(saved ? { ok: true } : { ok: false, error: "нет хранилища: привяжите KV к проекту" }, saved ? 200 : 503);
 }
 
+
+// ЖУРНАЛ ДЕЙСТВИЙ. Только владельцу. Сведения о сотрудниках: в репозиторий не выгружаются
+// и наружу не отдаются — читаются из KV и показываются здесь.
+async function logPage(env, me, url) {
+  const [recs, alerts] = await Promise.all([
+    readLog(env, { limit: 400 }),
+    readLog(env, { prefix: ALERT_PREFIX, limit: 60 }),
+  ]);
+  const noStore = recs === null;
+  const rows = recs || [];
+  const alr = alerts || [];
+
+  const fmt = (iso) => {
+    const d = new Date(iso);
+    if (isNaN(d)) return "—";
+    return d.toLocaleString("ru-RU", { timeZone: "Europe/Moscow", day: "2-digit", month: "short",
+                                       hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  };
+  const KIND = { page: "просмотр", download: "выгрузка", admin: "правка прав", denied: "отказ" };
+  const kindPill = (k) => `<span class="pill k-${ESC(k)}">${ESC(KIND[k] || k)}</span>`;
+  const siteName = (id) => (SITES.find((x) => x.id === id) || {}).name || id || "портал";
+
+  const body = rows.map((r) => `<tr data-search="${ESC([r.em, r.site, r.path, KIND[r.kind] || r.kind, r.geo, r.dev].join(" "))}">
+    <td class="dim nw">${ESC(fmt(r.t))}</td>
+    <td><b>${ESC(r.em)}</b><div class="dim">${ESC(r.dom)}</div></td>
+    <td>${ESC(siteName(r.site))}<div class="dim mono">${ESC(r.path)}</div></td>
+    <td class="ct">${kindPill(r.kind)}</td>
+    <td class="dim nw">${ESC(r.geo)} · ${ESC(r.dev)}</td>
+  </tr>`).join("");
+
+  const alertRows = alr.map((a) => `<div class="al"><span class="dim nw">${ESC(fmt(a.t))}</span>
+    <span>${ESC(a.text)}</span></div>`).join("");
+
+  const dl = rows.filter((r) => r.kind === "download").length;
+  const den = rows.filter((r) => r.kind === "denied").length;
+  const people = new Set(rows.map((r) => r.em)).size;
+
+  const style = `
+:root{--bg:#0e1116;--card:#151a22;--ln:#232a35;--ink:#e7ecf3;--dim:#8b97a8;--a:#5aa9ff;--wr:#ffb020}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 'IBM Plex Sans',-apple-system,'Segoe UI',Roboto,sans-serif}
+.wrap{max-width:1180px;margin:0 auto;padding:26px 20px 70px}
+.top{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:18px}
+.eyebrow{color:var(--a);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase}
+h1{font-size:24px;margin:3px 0 0}h2{font-size:12px;margin:24px 0 10px;color:var(--dim);font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.who{margin-left:auto;color:var(--dim);font-size:12.5px}.who a{color:var(--a);text-decoration:none;margin-left:10px}
+.card{background:var(--card);border:1px solid var(--ln);border-radius:11px;padding:15px 17px;margin-bottom:10px}
+.card.warn{border-color:#5a4415;background:#221a0d;color:#f0d9a8}
+.card.warn code{background:#2c2210;padding:1px 5px;border-radius:4px}
+.sum{display:flex;gap:26px;flex-wrap:wrap}.sum div b{display:block;font-size:20px}.sum div span{color:var(--dim);font-size:12px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;color:var(--dim);font-size:11px;letter-spacing:.05em;text-transform:uppercase;padding:8px 10px;border-bottom:1px solid var(--ln);white-space:nowrap}
+td{padding:8px 10px;border-bottom:1px solid var(--ln);vertical-align:top}
+td.ct,th.ct{text-align:center}.dim{color:var(--dim);font-size:12px}.nw{white-space:nowrap}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;word-break:break-all}
+.pill{display:inline-block;border-radius:999px;padding:2px 9px;font-size:11.5px;background:#1b2430;border:1px solid var(--ln);color:var(--dim)}
+.pill.k-download{background:#123049;border-color:#1d4e79;color:#cfe6ff}
+.pill.k-denied{background:#3a1418;border-color:#7d2731;color:#ffb3ba}
+.pill.k-admin{background:#2c2210;border-color:#5a4415;color:var(--wr)}
+.al{display:flex;gap:12px;padding:7px 0;border-bottom:1px solid var(--ln);font-size:13px}
+.al:last-child{border-bottom:0}
+input[type=text]{background:#0f141b;border:1px solid var(--ln);color:var(--ink);border-radius:7px;padding:7px 10px;font:inherit;width:100%}
+input:focus{outline:2px solid var(--a);outline-offset:1px}
+.note{color:var(--dim);font-size:12.5px;margin-top:18px;max-width:80ch}`;
+
+  const html = `<!doctype html><html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="dark">
+<title>Журнал действий · КВАНТ</title><style>${style}</style></head><body><div class="wrap">
+<div class="top"><div><div class="eyebrow">КВАНТ · доступы</div><h1>Журнал действий</h1></div>
+<div class="who">${ESC(me.email)}<a href="/admin">доступы</a><a href="/">портал</a></div></div>
+
+${noStore ? `<div class="card warn"><b>Журнал не ведётся.</b> К проекту Pages не привязано хранилище KV
+  (<i>Workers &amp; Pages → kvant-sourcing-f122 → Settings → Bindings → Add → KV namespace</i>,
+  имя переменной <code>ACL</code>).</div>` : ""}
+
+${alr.length ? `<h2>Признаки, о которых сообщено</h2><div class="card">${alertRows}</div>` : ""}
+
+<div class="card sum">
+  <div><b>${rows.length}</b><span>записей показано</span></div>
+  <div><b>${people}</b><span>человек</span></div>
+  <div><b>${dl}</b><span>выгрузок</span></div>
+  <div><b>${den}</b><span>отказов</span></div>
+</div>
+
+<div class="card"><input type="text" id="q" placeholder="Поиск: почта, сайт, адрес, страна, устройство…"></div>
+<div class="card" style="padding:0 4px">
+<table><thead><tr><th>Время (МСК)</th><th>Кто</th><th>Что открыл</th><th class="ct">Действие</th><th>Откуда</th></tr></thead>
+<tbody id="tb">${body || '<tr><td colspan="5" class="dim" style="padding:16px">Записей пока нет.</td></tr>'}</tbody></table>
+</div>
+
+<div class="note">Записи хранятся полгода в Cloudflare KV и никуда не выгружаются — репозиторий
+публичный, сведения о сотрудниках в него не попадают. Просмотр доступен только владельцу.
+Сотрудников о ведении журнала следует уведомить.</div>
+</div>
+<script>
+document.getElementById('q').addEventListener('input', e => {
+  const q = e.target.value.trim().toLowerCase();
+  document.querySelectorAll('#tb tr[data-search]').forEach(tr => {
+    tr.style.display = !q || tr.dataset.search.toLowerCase().includes(q) ? '' : 'none';
+  });
+});
+</script></body></html>`;
+  return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store",
+    "X-Robots-Tag": "noindex, nofollow, noarchive", "Referrer-Policy": "no-referrer" } });
+}
 
 // Портал: плитки доступных человеку сайтов.
 function portalPage(who, rights, env) {

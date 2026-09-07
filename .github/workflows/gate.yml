@@ -56,7 +56,7 @@ jobs:
           node-version: "22"
 
       - name: Тесты доступов (вход, права, резка вкладок)
-        run: node --test access/test/cfaccess.test.mjs access/test/acl.test.mjs access/test/siterights.test.mjs
+        run: node --test access/test/*.test.mjs
 
       - name: Синтаксис гейтов Cloudflare
         run: |

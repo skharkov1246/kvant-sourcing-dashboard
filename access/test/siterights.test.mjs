@@ -14,6 +14,7 @@ const GATES = ["gpu/public/_worker.js", "ove/public/_worker.js", "zip/site/_work
 
 const req = (jwt) => new Request("https://kvant-gpu.pages.dev/", jwt ? { headers: { "Cf-Access-Jwt-Assertion": jwt } } : {});
 const reqCookie = (jwt) => new Request("https://kvant-gpu.pages.dev/", { headers: { Cookie: `CF_Authorization=${jwt}` } });
+const pageReq = (jwt, path) => new Request("https://kvant-gpu.pages.dev" + path, { headers: { "Cf-Access-Jwt-Assertion": jwt } });
 
 // Подменяем сеть: запоминаем, что и куда ушло.
 let calls, reply;
@@ -31,7 +32,7 @@ test("сайт из списка прав открывается, отсутст
   assert.equal(await siteAllowed(req("jwt-a"), {}, "gpu"), true);
   rightsCache.clear();
   assert.equal(await siteAllowed(req("jwt-a"), {}, "gok"), false);
-  assert.equal(calls[0].url, RIGHTS_URL);
+  assert.ok(calls[0].url.startsWith(RIGHTS_URL), calls[0].url);
   assert.equal(calls[0].init.headers["Cf-Access-Jwt-Assertion"], "jwt-a", "подпись входа пересылается порталу");
 });
 
@@ -66,16 +67,35 @@ test("выключатель SITE_RIGHTS=off пропускает всех", asy
   assert.equal(calls.length, 0);
 });
 
-test("ответ помнится минуту: портал не дёргается на каждый файл", async () => {
+test("права берутся из памяти изолята, но каждое открытие уходит в журнал", async () => {
   rightsCache.clear(); stub();
   reply = () => new Response(JSON.stringify({ sites: ["gpu"] }), { headers: { "Content-Type": "application/json" } });
-  await siteAllowed(req("jwt-m"), {}, "gpu");
-  await siteAllowed(req("jwt-m"), {}, "gpu");
-  assert.equal(calls.length, 1, "второй запрос взят из памяти изолята");
-  assert.equal(await siteAllowed(req("jwt-m"), {}, "gok"), false, "из памяти отвечаем и по другому сайту");
-  assert.equal(calls.length, 1);
-  await siteAllowed(req("jwt-other"), {}, "gpu");
-  assert.equal(calls.length, 2, "для другого человека права спрашиваются заново");
+  await siteAllowed(pageReq("jwt-m", "/a.html"), {}, "gpu");
+  await siteAllowed(pageReq("jwt-m", "/b.html"), {}, "gpu");
+  assert.equal(calls.length, 2, "второе открытие должно попасть в журнал");
+  assert.equal(new URL(calls[1].url).searchParams.get("at"), "/b.html", "порталу не сказано, что открыли");
+  assert.equal(new URL(calls[1].url).searchParams.get("site"), "gpu");
+});
+
+test("разметка, картинки и шрифты в журнал не идут", async () => {
+  rightsCache.clear(); stub();
+  reply = () => new Response(JSON.stringify({ sites: ["gpu"] }), { headers: { "Content-Type": "application/json" } });
+  await siteAllowed(pageReq("jwt-s", "/index.html"), {}, "gpu");     // первый запрос — за правами
+  calls.length = 0;
+  for (const p of ["/app.css", "/app.js", "/logo.svg", "/f.woff2", "/x.png"]) {
+    await siteAllowed(pageReq("jwt-s", p), {}, "gpu");
+  }
+  assert.equal(calls.length, 0, "статика не действие человека, журналу она не нужна");
+  await siteAllowed(pageReq("jwt-s", "/orders/zakaz.pdf"), {}, "gpu");
+  assert.equal(calls.length, 1, "выгрузка файла должна попасть в журнал");
+});
+
+test("первый запрос за правами сразу несёт и запись для журнала", async () => {
+  rightsCache.clear(); stub();
+  reply = () => new Response(JSON.stringify({ sites: ["gpu"] }), { headers: { "Content-Type": "application/json" } });
+  await siteAllowed(pageReq("jwt-f", "/lot.html"), {}, "gpu");
+  assert.equal(calls.length, 1, "лишнего запроса быть не должно");
+  assert.equal(new URL(calls[0].url).searchParams.get("at"), "/lot.html");
 });
 
 test("копии блока в пяти гейтах совпадают с каноническим access/siterights.js", () => {
