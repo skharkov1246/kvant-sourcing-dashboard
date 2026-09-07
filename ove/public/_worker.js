@@ -41,7 +41,7 @@ export default {
     // Это fail-OPEN, и как постоянное решение он опасен: если секрет когда-нибудь
     // удалят, сайт молча откроется. После того как владелец подтвердит, что пароль
     // задан и вход работает, вернуть здесь fail-closed (отдавать 503 без секрета).
-    if (!pass) {
+    if (!pass && !env.BASIC_AUTH_USERS) {
       const resp = await env.ASSETS.fetch(request);
       const open = new Response(resp.body, resp);
       open.headers.set("Cache-Control", "no-store");
@@ -49,7 +49,7 @@ export default {
       open.headers.set("Referrer-Policy", "no-referrer");
       return open;
     }
-    if (!basicOk(request, user, pass)) {
+    if (!(await userOk(request, env, SITE))) {
       return new Response(page(
         "ОВЭ-75 · КВАНТ",
         "<p>Материалы проекта «обжиг – выщелачивание – электроэкстракция» для АО «Кольская ГМК».</p>" +
@@ -94,8 +94,8 @@ async function handleAnswers(request, env) {
   const user = env.BASIC_AUTH_USER || "kvant";
   const pass = env.BASIC_AUTH_PASS;
   // без пароля сайта отправка выключена: иначе кто угодно коммитил бы в репозиторий
-  if (!pass) return json({ ok: false, error: "submit_disabled_no_password" }, 503);
-  if (!basicOk(request, user, pass)) {
+  if (!pass && !env.BASIC_AUTH_USERS) return json({ ok: false, error: "submit_disabled_no_password" }, 503);
+  if (!(await userOk(request, env, SITE))) {
     return json({ ok: false, error: "auth" }, 401,
       { "WWW-Authenticate": 'Basic realm="OVE-75 KVANT", charset="UTF-8"' });
   }
@@ -246,6 +246,37 @@ function safeEqual(a, b) {
   for (let i = 0; i < Math.max(x.length, y.length); i++) diff |= (x[i] || 0) ^ (y[i] || 0);
   return diff === 0;
 }
+
+// ---- ИМЕННОЙ ВХОД ПО КОРПОРАТИВНОЙ ПОЧТЕ (копия access/users.js, сверяется тестом) ----
+// Секрет BASIC_AUTH_USERS: по строке «email sha256(email:пароль) сайты»; общий пароль — резервный вход.
+const SITE = "ove";
+// BEGIN userOk
+async function userOk(request, env, site) {
+  const c = parseBasic(request.headers.get("Authorization"));
+  if (!c) return false;
+  const login = c.user.trim().toLowerCase();
+  const table = env.BASIC_AUTH_USERS || "";
+  if (table) {
+    for (const raw of table.split(/\r?\n/)) {
+      const line = raw.trim();
+      if (!line || line.startsWith("#")) continue;
+      const [email, hash, ...rest] = line.split(/\s+/);
+      const sites = rest.join("") || "*";
+      if (!email || !hash || email.toLowerCase() !== login) continue;
+      const got = await sha256Hex(`${login}:${c.pass}`);
+      if (!safeEqual(got, hash.toLowerCase())) return false;
+      return sites === "*" || sites.split(",").map((s) => s.trim()).includes(site);
+    }
+  }
+  const user = env.BASIC_AUTH_USER || "kvant";
+  const pass = env.BASIC_AUTH_PASS;
+  return !!pass && safeEqual(c.user, user) && safeEqual(c.pass, pass);
+}
+async function sha256Hex(s) {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
+  return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+// END userOk
 
 function basicOk(request, user, pass) {
   const creds = parseBasic(request.headers.get("Authorization"));
