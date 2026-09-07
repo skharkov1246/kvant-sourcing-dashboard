@@ -1,14 +1,15 @@
-// Гейт сайта «Гидрометаллургия»: вход только через Cloudflare Access (портал КВАНТ).
+// Гейт сайта «База ЗИП»: вход только через Cloudflare Access (портал КВАНТ).
 // Cloudflare Pages в advanced-режиме (наличие _worker.js) гоняет ВСЕ запросы через этот
 // fetch; файлы отдаём через env.ASSETS уже после проверки подписи входа.
-// Внутри расчётные модели и данные заказчика.
+// Внутри база ЗИП, справочник ГТУ (/gt/), документы заказов (/orders/). Файл копируется сборщиком zip/build.py в zip/public/.
+// ВНИМАНИЕ: доступ к Supabase идёт по anon-ключу из index.html — сужайте RLS-политики (migrations.sql).
 // Паролей нет: периметр — приложение Access с одной политикой допуска по почте
 // (распоряжение владельца от 07.09.2026: единый вход, единый портал).
 
 export default {
   async fetch(request, env) {
     const who = await accessOk(request, env);
-    if (!who) return denyPage("Гидрометаллургия · КВАНТ");
+    if (!who) return denyPage("База ЗИП · КВАНТ");
 
     const resp = await env.ASSETS.fetch(request);
     const out = new Response(resp.body, resp);
@@ -40,7 +41,7 @@ a{color:var(--s1)}</style></head><body><div class="c"><h1>${title}</h1>
   });
 }
 
-const SITE = "gidromet";
+const SITE = "zip";
 // BEGIN accessOk
 // Проверка входа через Cloudflare Access: подпись JWT (RS256) по открытым ключам команды,
 // срок, издатель и, если задан CF_ACCESS_AUD, аудитория приложения. Возвращает {email, sub, exp}

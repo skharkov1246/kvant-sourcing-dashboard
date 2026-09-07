@@ -177,10 +177,10 @@ def build():
     # поэтому воркер кладётся всегда. Он самовыключающийся: если секрет
     # BASIC_AUTH_PASS в Cloudflare Pages не задан, гейт пропускает всех и сайт
     # работает как раньше — уронить публикацию он не может. Логин — «kvant».
-    gate_src = ROOT / "site" / "_worker.js.example"
+    gate_src = ROOT / "site" / "_worker.js"
     if gate_src.exists():
         shutil.copy2(gate_src, OUT / "_worker.js")
-        print("гейт: zip/public/_worker.js установлен (активируется секретом BASIC_AUTH_PASS)")
+        print("гейт: zip/public/_worker.js установлен (вход через Cloudflare Access)")
 
     size = (OUT / "index.html").stat().st_size
     print(f"zip/public/index.html: {size:,} байт | позиций {n_pos}, "

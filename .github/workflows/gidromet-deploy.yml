@@ -5,9 +5,8 @@ name: Gidromet site deploy
 # (проект kvant-gidromet). Отдельный проект Pages — дашборд сорсеров, сайт ОВЭ-75,
 # база ЗИП, ГПУ-библиотека и сайт базового проекта ГОКа не затрагиваются.
 #
-# Гейт доступа: gidromet/public/_worker.js (Basic Auth, единый пароль компании из секрета
-# GitHub BASIC_AUTH_PASS + именной вход BASIC_AUTH_USERS). Сайт закрыт по распоряжению
-# владельца 07.09.2026; следующий шаг — периметр Cloudflare Access.
+# Гейт доступа: gidromet/public/_worker.js — вход через Cloudflare Access (портал КВАНТ),
+# паролей нет. Закрыт по распоряжению владельца 07.09.2026.
 #
 # Страница собирается из gidromet/site/index.template.html и gidromet/data/*.json
 # скриптом gidromet/build.py и получается самодостаточной: весь CSS и JS встроены,
@@ -67,27 +66,11 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          BASIC_AUTH_PASS: ${{ secrets.BASIC_AUTH_PASS }}
-          BASIC_AUTH_USERS: ${{ secrets.BASIC_AUTH_USERS }}
         run: |
           set -euo pipefail
           # создать проект, если его ещё нет (иначе тихо пропустить)
           npx --yes wrangler@${WRANGLER_VERSION} pages project create kvant-gidromet \
             --production-branch=main 2>/dev/null || true
-          # единый пароль компании из секрета GitHub → секрет проекта Pages (fail-closed без него)
-          if [ -n "${BASIC_AUTH_PASS:-}" ]; then
-            printf '%s' "$BASIC_AUTH_PASS" \
-              | npx --yes wrangler@${WRANGLER_VERSION} pages secret put BASIC_AUTH_PASS --project-name=kvant-gidromet \
-              || echo "::warning::не удалось задать секрет BASIC_AUTH_PASS в CI"
-          else
-            echo "::warning::GitHub-секрет BASIC_AUTH_PASS пуст — сайт отдаст 503, пока пароль не задан"
-          fi
-          # именной вход: таблица «email хэш сайты» из секрета BASIC_AUTH_USERS (пусто — только общий пароль)
-          if [ -n "${BASIC_AUTH_USERS:-}" ]; then
-            printf '%s' "$BASIC_AUTH_USERS" \
-              | npx --yes wrangler@${WRANGLER_VERSION} pages secret put BASIC_AUTH_USERS --project-name=kvant-gidromet \
-              || echo "::warning::не удалось задать секрет BASIC_AUTH_USERS в CI"
-          fi
           # ASCII commit-message: иначе wrangler цепляет кириллицу git-коммита → CF отвергает (8000111).
           ok=0
           for i in 1 2 3; do
