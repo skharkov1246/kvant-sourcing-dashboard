@@ -15,7 +15,6 @@ import csv
 import html
 import json
 import re
-import subprocess
 from datetime import date
 from pathlib import Path
 
