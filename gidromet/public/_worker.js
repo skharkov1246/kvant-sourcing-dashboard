@@ -9,6 +9,7 @@ export default {
   async fetch(request, env) {
     const who = await accessOk(request, env);
     if (!who) return denyPage("Гидрометаллургия · КВАНТ");
+    if (!(await siteAllowed(request, env, SITE))) return denyPage("Гидрометаллургия · КВАНТ");
 
     const resp = await env.ASSETS.fetch(request);
     const out = new Response(resp.body, resp);
@@ -41,6 +42,32 @@ a{color:var(--s1)}</style></head><body><div class="c"><h1>${title}</h1>
 }
 
 const SITE = "gidromet";
+// BEGIN siteRights
+const RIGHTS_URL = "https://kvant-sourcing-f122.pages.dev/api/rights";
+const RIGHTS_TTL = 60 * 1000;              // память изолята: не дёргать портал на каждый файл
+const rightsCache = new Map();
+
+async function siteAllowed(request, env, site) {
+  if (env && env.SITE_RIGHTS === "off") return true;
+  const jwt = request.headers.get("Cf-Access-Jwt-Assertion") || readCookie(request, "CF_Authorization");
+  if (!jwt) return true;                   // сюда приходят только вошедшие; подпись проверена выше
+  const now = Date.now();
+  const hit = rightsCache.get(jwt);
+  if (hit && now - hit.t < RIGHTS_TTL) return hit.sites === null || hit.sites.includes(site);
+  let sites = null;                        // null — «портал не ответил», пускаем
+  try {
+    const r = await fetch(RIGHTS_URL, { headers: { "Cf-Access-Jwt-Assertion": jwt } });
+    if (r.ok) {
+      const d = await r.json();
+      if (d && Array.isArray(d.sites)) sites = d.sites;
+    }
+  } catch { /* сеть между проектами не должна запирать сайт */ }
+  if (rightsCache.size > 500) rightsCache.clear();
+  rightsCache.set(jwt, { t: now, sites });
+  return sites === null || sites.includes(site);
+}
+// END siteRights
+
 // BEGIN accessOk
 // Проверка входа через Cloudflare Access: подпись JWT (RS256) по открытым ключам команды,
 // срок, издатель и, если задан CF_ACCESS_AUD, аудитория приложения. Возвращает {email, sub, exp}
