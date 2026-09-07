@@ -24,3 +24,13 @@ zip/customs/recon/
 
 # локальное состояние тестового контура доступов
 access/.contour/
+# кэш wrangler содержит account_id и e-mail владельца — в публичном репозитории не нужен
+*/.wrangler/
+
+# промежуточные дампы зонда Bitrix (scripts/bitrix_probe.py) — артефакты, не исходники
+scripts/_coll_*.json
+
+# каталоги проверок
+smoke/
+.pytest_cache/
+.ruff_cache/

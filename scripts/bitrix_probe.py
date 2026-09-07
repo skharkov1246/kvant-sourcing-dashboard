@@ -1,183 +1,133 @@
-"""Зонд v24: чем на самом деле измеряется нагрузка сорсера.
+"""CI-зонд v18: ЗИП Cummins QSK60G — что уже запрашивал сорсинг.
 
-Отделяем машинную работу от ручной:
-  кто создаёт карточки (человек или служебная учётная запись),
-  пачками ли они создаются (group_id и всплески по времени),
-  сколько сделок и товарных строк приходится на сотрудника,
-  какие шаги остаются ручными — это и есть незакрытая автоматизация.
+Отвечает на два вопроса перед новым заходом по позициям
+«Свеча зажигания 18.049-01 (Cummins 4380132/4390446/5544762)» и
+«Фильтр масляный 9050 (Fleetguard LF9050 / Cummins 4920071)»:
+
+1. Были ли у нас сделки/запросы СП-166 по Cummins / QSK / QSV / газопоршневым —
+   и чем закончились (стадия, сорсер, дата).
+2. Заводили ли мы уже компании-кандидаты мирового пула (Hatraco, PeriParts,
+   Techie, Ghaddar, TVH, Diesel Parts Direct …) и слали ли им запросы.
+
+Печатает компактную сводку в лог Actions (секреты не выводятся).
+Запуск: gh workflow run probe.yml --ref <ветка>  |  Actions → Bitrix probe.
 """
 from __future__ import annotations
 
-import os
-import statistics as st
-from collections import Counter, defaultdict
+import json
+import sys
+from collections import defaultdict
+from pathlib import Path
 
-import requests
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
 
-ET, CAT = 166, 24
-SINCE = "2026-04-01"
-F_GROUP = "ufCrm18_1750155997248"     # group_id
-F_AI = "ufCrm18_1703712609095"        # AI model
-F_TEXT = "ufCrm18_1706636290339"      # Deal_text
-F_RESP = "ufCrm18_1709056431446"      # Response received
+from bitrix_client import BitrixClient  # noqa: E402
+from config import SPA_ENTITY_TYPE_ID, Settings  # noqa: E402
 
+# 1. ключевые слова по технике и позициям
+KEYWORDS = ["Cummins", "Камминз", "Камминс", "QSK", "QSV", "газопоршн",
+            "ГПЭС", "ГПУ", "свеча зажигания", "свечи зажигания",
+            "LF9050", "4380132", "4390446", "5544762", "4924504", "5373898",
+            "18.049", "4920071"]
 
-def bx(method: str, params: dict | None = None) -> dict:
-    base = os.environ["BITRIX_WEBHOOK_URL"].rstrip("/")
-    for _ in range(4):
-        try:
-            r = requests.post(f"{base}/{method}.json", json=params or {}, timeout=90)
-            r.raise_for_status()
-            j = r.json()
-            if isinstance(j, dict) and j.get("error") in ("QUERY_LIMIT_EXCEEDED", "OPERATION_TIME_LIMIT"):
-                continue
-            return j
-        except Exception:
-            continue
-    return {}
+# 2. мировой пул кандидатов по этим позициям (имена как их знает рынок)
+CANDIDATES = [
+    "Hatraco", "PeriParts", "Peri-Parts", "Techie", "Stitt", "Altronic",
+    "Champion", "Federal-Mogul", "Federal Mogul", "BERU", "Denso", "NGK",
+    "Motortech", "ERS", "RM Walsh", "Walsh",
+    "Diesel Parts Direct", "Area Diesel", "Source One", "FinditParts",
+    "Reliable Industries", "Everything Truck", "AGA Parts", "Supply Spare",
+    "FridayParts", "Friday Parts", "Makano", "Yemparts", "Buymachineryparts",
+    "Ghaddar", "Al Khalij", "Alkhalij", "TVH", "Dynatrade", "Radiant",
+    "Fleetguard", "Donaldson", "Baldwin", "WIX", "Sakura", "Hifi", "MANN",
+    "Cummins", "Filters King", "Hanton", "Sparkplugs", "Sinotruk",
+    "Dongfeng", "Chongqing", "Aksa", "Teksan", "Karatay",
+]
 
-
-def bx_all(method: str, params: dict) -> list:
-    out, start = [], 0
-    while True:
-        j = bx(method, {**params, "start": start})
-        res = j.get("result")
-        items = res.get("items") if isinstance(res, dict) and "items" in res else res
-        out += items or []
-        if "next" not in j:
-            return out
-        start = j["next"]
+SELECT = ["id", "title", "stageId", "createdTime", "parentId2", "companyId",
+          "assignedById", "ufCrm18Supplier", "ufCrm18SupplContact", "opportunity"]
 
 
 def main() -> int:
-    deps = {str(d["ID"]): str(d.get("NAME") or "") for d in bx_all("department.get", {})}
-    uname, udep = {}, {}
-    for u in bx_all("user.get", {}):
-        uid = str(u["ID"])
-        uname[uid] = f"{u.get('NAME') or ''} {u.get('LAST_NAME') or ''}".strip() or uid
-        dd = u.get("UF_DEPARTMENT") or []
-        udep[uid] = deps.get(str(dd[0]), "—") if dd else "—"
+    client = BitrixClient(Settings.load().bitrix_webhook_url)
+    users = client.users()
+    stages = client.spa_stages(SPA_ENTITY_TYPE_ID, 24)
 
-    print(f"=== 1. Запросы с {SINCE} ===")
-    rows = bx_all("crm.item.list", {"entityTypeId": ET,
-        "filter": {"categoryId": CAT, ">=createdTime": SINCE},
-        "select": ["id", "createdTime", "createdBy", "assignedById", "parentId2",
-                   F_GROUP, F_AI]})
-    print(f"  карточек: {len(rows)}")
+    def who(uid):
+        return users.get(str(uid), f"#{uid}")
 
-    print("\n=== 2. КТО СОЗДАЁТ КАРТОЧКИ ===")
-    cb = Counter(str(r.get("createdBy") or "—") for r in rows)
-    for uid, n in cb.most_common(12):
-        print(f"  {uname.get(uid, uid)[:34]:36s} {udep.get(uid,'—')[:26]:28s} {n:>6}  {n/len(rows)*100:5.1f}%")
-    mism = sum(1 for r in rows if str(r.get("createdBy")) != str(r.get("assignedById")))
-    print(f"  создатель ≠ ответственный: {mism} из {len(rows)} ({mism/max(len(rows),1)*100:.0f}%)")
+    def stage(sid):
+        return stages.get(str(sid), str(sid))
 
-    print("\n=== 3. ПАЧКИ: сколько карточек порождает одно действие ===")
-    grp = defaultdict(int)
-    nogrp = 0
-    for r in rows:
-        g = r.get(F_GROUP)
-        if g in (None, "", 0):
-            nogrp += 1
-        else:
-            grp[str(g)] += 1
-    if grp:
-        sizes = sorted(grp.values())
-        print(f"  групп (group_id): {len(grp)} · карточек в группах: {sum(sizes)} · без группы: {nogrp}")
-        print(f"  карточек в группе: медиана {st.median(sizes):.0f} · среднее {sum(sizes)/len(sizes):.1f} · макс {max(sizes)}")
-        dist = Counter(min(v, 10) for v in sizes)
-        print("  распределение: " + " · ".join(f"{k if k<10 else '10+'}:{v}" for k, v in sorted(dist.items())))
-    # всплески: карточки одного создателя в одну минуту
-    burst = defaultdict(int)
-    for r in rows:
-        burst[(str(r.get("createdBy")), str(r.get("createdTime"))[:16])] += 1
-    bs = sorted(burst.values())
-    big = sum(v for v in bs if v >= 5)
-    print(f"  создано в одну минуту одним автором: медиана {st.median(bs):.0f} · макс {max(bs)}")
-    print(f"  доля карточек, созданных пачками по 5+ за минуту: {big}/{len(rows)} = {big/max(len(rows),1)*100:.0f}%")
+    print("=== 1. Сделки по ключевым словам (Cummins / QSK / газопоршневые / свечи) ===")
+    deals: dict[str, dict] = {}
+    for kw in KEYWORDS:
+        for d in client.list_paged("crm.deal.list", {
+            "filter": {"%TITLE": kw},
+            "select": ["ID", "TITLE", "STAGE_ID", "DATE_CREATE", "ASSIGNED_BY_ID", "OPPORTUNITY"],
+        }):
+            deals[str(d["ID"])] = d
+    print(f"  найдено сделок: {len(deals)}")
+    for d in sorted(deals.values(), key=lambda x: str(x.get("DATE_CREATE")), reverse=True)[:40]:
+        print(f"  #{d['ID']} {str(d.get('DATE_CREATE'))[:10]} {str(d.get('TITLE'))[:95]!r} "
+              f"стадия={d.get('STAGE_ID')} отв={who(d.get('ASSIGNED_BY_ID'))}")
 
-    print("\n=== 4. ПРИЗНАКИ УЧАСТИЯ ИИ ===")
-    ai = Counter(str(r.get(F_AI) or "—")[:40] for r in rows)
-    for v, n in ai.most_common(8):
-        print(f"  «{v}»: {n} ({n/len(rows)*100:.0f}%)")
-
-    print("\n=== 5. НАГРУЗКА В СДЕЛКАХ: сколько сделок на сотрудника в месяц ===")
-    dm = defaultdict(lambda: defaultdict(set))     # месяц → сотрудник → сделки
-    cm = defaultdict(lambda: defaultdict(int))     # месяц → сотрудник → карточки
-    gm = defaultdict(lambda: defaultdict(set))     # месяц → сотрудник → группы
-    for r in rows:
-        m = str(r.get("createdTime") or "")[:7]
-        p = str(r.get("assignedById") or "")
-        if not m or not p:
-            continue
-        cm[m][p] += 1
-        if r.get("parentId2"):
-            dm[m][p].add(str(r["parentId2"]))
-        if r.get(F_GROUP):
-            gm[m][p].add(str(r[F_GROUP]))
-    print(f"  {'месяц':8s} {'чел':>4} {'сделок':>7} {'сд/чел':>7} {'сд.мед':>7} {'групп':>7} {'гр/чел':>7} {'карт/чел':>9} {'карт/сделку':>12}")
-    for m in sorted(cm):
-        ppl = sorted(cm[m])
-        n = len(ppl)
-        dv = [len(dm[m].get(p, ())) for p in ppl]
-        gv = [len(gm[m].get(p, ())) for p in ppl]
-        cv = [cm[m][p] for p in ppl]
-        D, G, C = sum(dv), sum(gv), sum(cv)
-        print(f"  {m:8s} {n:>4} {D:>7} {D/n:>7.1f} {st.median(dv):>7.0f} {G:>7} {G/n:>7.1f} {C/n:>9.1f} {C/max(D,1):>12.1f}")
-
-    print("\n  --- то же по Отделу поиска поставщиков ---")
-    print(f"  {'месяц':8s} {'чел':>4} {'сделок':>7} {'сд/чел':>7} {'групп':>7} {'гр/чел':>7} {'карт/чел':>9}")
-    for m in sorted(cm):
-        ppl = [p for p in cm[m] if udep.get(p, "") == "Отдел поиска поставщиков"]
-        if not ppl:
-            continue
-        n = len(ppl)
-        D = len(set().union(*[dm[m].get(p, set()) for p in ppl])) if ppl else 0
-        G = sum(len(gm[m].get(p, ())) for p in ppl)
-        C = sum(cm[m][p] for p in ppl)
-        print(f"  {m:8s} {n:>4} {D:>7} {D/n:>7.1f} {G:>7} {G/n:>7.1f} {C/n:>9.1f}")
-
-    print("\n=== 6. ТОВАРНЫЕ СТРОКИ: сколько позиций в сделке (выборка 200) ===")
-    dids = sorted({str(r["parentId2"]) for r in rows if r.get("parentId2")})
-    print(f"  сделок с запросами с апреля: {len(dids)}")
-    sample = dids[-200:]
-    cnt, zero = [], 0
-    for d in sample:
-        j = bx("crm.item.productrow.list", {"filter": {"=ownerType": "D", "=ownerId": int(d)}})
-        pr = ((j or {}).get("result") or {}).get("productRows")
-        if pr is None:
-            continue
-        cnt.append(len(pr))
-        if not pr:
-            zero += 1
-    if cnt:
-        cs = sorted(cnt)
-        print(f"  разобрано сделок: {len(cs)} · без позиций: {zero} ({zero/len(cs)*100:.0f}%)")
-        print(f"  позиций в сделке: медиана {st.median(cs):.0f} · среднее {sum(cs)/len(cs):.1f} · "
-              f"p75 {cs[3*len(cs)//4]} · макс {max(cs)}")
-    else:
-        print("  товарные строки через API недоступны")
-
-    print("\n=== 7. ЧТО ОСТАЁТСЯ РУЧНЫМ: длина технического текста запроса (выборка 200) ===")
-    ids = [r["id"] for r in rows[-200:]]
-    lens, resp = [], 0
-    got = 0
+    print("\n=== 2. Запросы СП-166 по тем же словам (в названии) + привязанные к сделкам ===")
+    rfqs: dict[str, dict] = {}
+    for kw in KEYWORDS:
+        for r in client.list_items(SPA_ENTITY_TYPE_ID, filter={"%title": kw}, select=SELECT):
+            rfqs[str(r["id"])] = r
+    ids = list(deals)
     for i in range(0, len(ids), 50):
-        for it in bx_all("crm.item.list", {"entityTypeId": ET,
-                "filter": {"categoryId": CAT, "@id": ids[i:i+50]},
-                "select": ["id", F_TEXT, F_RESP]}):
-            got += 1
-            t = it.get(F_TEXT)
-            if t:
-                lens.append(len(str(t)))
-            if it.get(F_RESP) not in (None, "", 0, "0"):
-                resp += 1
-    if lens:
-        ls = sorted(lens)
-        print(f"  карточек: {got} · с текстом: {len(ls)} · длина: медиана {st.median(ls):.0f} симв. · макс {max(ls)}")
-    print(f"  отметка «ответ получен» проставлена: {resp} из {got}")
+        for r in client.list_items(SPA_ENTITY_TYPE_ID, filter={"parentId2": ids[i:i + 50]}, select=SELECT):
+            rfqs[str(r["id"])] = r
+    print(f"  найдено запросов: {len(rfqs)}")
 
-    print("\n✓ зонд v24 завершён")
+    comp_ids = {str(r.get("companyId")) for r in rfqs.values() if r.get("companyId")}
+    names = client.companies_by_ids(comp_ids) if comp_ids else {}
+    by_comp: dict[str, list] = defaultdict(list)
+    for r in sorted(rfqs.values(), key=lambda x: str(x.get("createdTime")), reverse=True):
+        cname = names.get(str(r.get("companyId"))) or (r.get("ufCrm18Supplier") or "—")
+        by_comp[str(cname)].append(r)
+        print(f"  #{r['id']} {str(r.get('createdTime'))[:10]} {str(r.get('title'))[:80]!r} "
+              f"→ {str(cname)[:45]} | {stage(r.get('stageId'))} | {who(r.get('assignedById'))}")
+
+    print("\n=== 3. Кому из этих поставщиков уже слали (свод) ===")
+    for cname, items in sorted(by_comp.items(), key=lambda kv: -len(kv[1])):
+        last = str(items[0].get("createdTime"))[:10]
+        print(f"  {len(items):>3} запр. | посл. {last} | {cname[:70]}")
+
+    print("\n=== 4. Компании мирового пула: есть ли в базе и слали ли запросы ===")
+    found_any = False
+    for cand in CANDIDATES:
+        comps = client.list_paged("crm.company.list", {
+            "filter": {"%TITLE": cand}, "select": ["ID", "TITLE", "WEB", "EMAIL"]})
+        if not comps:
+            continue
+        found_any = True
+        for c in comps[:5]:
+            cid = str(c["ID"])
+            items = client.list_items(SPA_ENTITY_TYPE_ID, filter={"companyId": cid}, select=SELECT)
+            items.sort(key=lambda x: str(x.get("createdTime")), reverse=True)
+            head = (f"  [{cand}] #{cid} {str(c.get('TITLE'))[:60]!r} — запросов СП-166: {len(items)}")
+            print(head)
+            for r in items[:5]:
+                print(f"        {str(r.get('createdTime'))[:10]} {str(r.get('title'))[:70]!r} "
+                      f"| {stage(r.get('stageId'))} | {who(r.get('assignedById'))}")
+    if not found_any:
+        print("  ни одна компания мирового пула в базе не заведена")
+
+    print("\n=== 5. Машиночитаемый срез (для сайта) ===")
+    dump = {
+        "deals": [{"id": d["ID"], "title": d.get("TITLE"), "stage": d.get("STAGE_ID"),
+                   "created": str(d.get("DATE_CREATE"))[:10]} for d in deals.values()],
+        "rfqs": [{"id": r["id"], "title": r.get("title"),
+                  "company": names.get(str(r.get("companyId"))) or r.get("ufCrm18Supplier"),
+                  "stage": stage(r.get("stageId")), "created": str(r.get("createdTime"))[:10],
+                  "sourcer": who(r.get("assignedById"))} for r in rfqs.values()],
+    }
+    print(json.dumps(dump, ensure_ascii=False)[:60000])
     return 0
 
 

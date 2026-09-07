@@ -1,0 +1,52 @@
+name: GT bitrix refresh
+
+# Дважды в неделю обновляет метки «был ли запрос в компанию из нашего Bitrix»
+# на ГТУ-библиотеке (gt/): тянет свежие СП-166 «Запросы поставщикам» → bitrix_gt.json,
+# пересобирает страницы gt/public/ и коммитит. Пуш в main сам триггерит zip-deploy
+# (paths gt/**) → сайт обновится. Задача владельца от 17.08.2026.
+# Лёгкий: один прогон ~2-3 мин + деплой; 2 раза в неделю — не жжёт лимит Actions.
+on:
+  schedule:
+    - cron: "17 3 * * 1,4"    # пн и чт 03:17 UTC (06:17 МСК); GitHub-крон может опаздывать — для 2х/нед некритично
+  workflow_dispatch: {}
+
+permissions:
+  contents: write             # коммитим обновлённый снапшот и пересобранные страницы
+
+concurrency:
+  group: gt-bitrix-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Установка зависимостей
+        run: pip install -r requirements.txt
+      - name: Свежие запросы из Bitrix → gt/data/bitrix_gt.json
+        env:
+          BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
+        run: python gt/tools/bitrix_gt.py
+      - name: Пересборка страниц gt/
+        run: |
+          set -euo pipefail
+          python gt/build.py
+          python gt/tools/build_rfq.py
+          python gt/tools/build_lot.py
+      - name: Коммит, если есть изменения
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add gt/data/bitrix_gt.json gt/public/
+          if git diff --cached --quiet; then
+            echo "запросы Bitrix без изменений — деплой не нужен"
+          else
+            git commit -m "chore: обновление Bitrix-меток ГТУ-библиотеки ($(date -u +%F))"
+            git push
+          fi

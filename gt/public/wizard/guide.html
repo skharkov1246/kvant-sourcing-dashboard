@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Справочник парт-номеров ГТУ — КВАНТ</title>
+<style>
+:root{--bg:#0e1116;--panel:#161b23;--panel2:#1c232e;--line:#2a3341;--txt:#e6ebf2;--mut:#8b98a9;--acc:#4a9eff;--ok:#3fb97c;}
+body{background:var(--bg);color:var(--txt);font:15px/1.6 "Segoe UI",system-ui,sans-serif;margin:0}
+.topbar{position:sticky;top:0;background:var(--panel);border-bottom:1px solid var(--line);padding:12px 24px;display:flex;gap:14px;align-items:center;z-index:5}
+.topbar b{font-size:16px}
+.topbar a{color:var(--acc);text-decoration:none;font-size:13px}
+.topbar .mut{color:var(--mut);font-size:13px}
+.wrap{max-width:1000px;margin:0 auto;padding:24px}
+h1{font-size:26px;line-height:1.3}
+h2{border-bottom:1px solid var(--line);padding-bottom:6px;margin-top:36px;color:var(--acc)}
+h3{color:var(--acc);margin-top:26px}
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13.5px;background:var(--panel)}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--panel2)}
+code{background:var(--panel2);border-radius:4px;padding:1px 6px;font-family:Consolas,monospace;font-size:13px}
+a{color:var(--acc)}
+blockquote{border-left:3px solid var(--acc);margin:12px 0;padding:8px 14px;background:var(--panel);color:var(--mut)}
+input#q{width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:12px 16px;font-size:15px;margin:14px 0}
+tr.hide{display:none}
+</style>
+</head>
+<body>
+<div class="topbar"><b>КВАНТ · Справочник PN ГТУ</b><span class="mut">расшифровка всех OEM · где покупать</span><span style="margin-left:auto"></span><a href="index.html">→ База PN (поиск)</a></div>
+<div class="wrap">
+<input id="q" placeholder="Быстрый фильтр по справочнику (напр. MW21215, Solar, O-ring…)" oninput="filt()">
+<h1
+id="единая-база-знаний-расшифровка-парт-номеров-всех-oem-газовых-турбин">ЕДИНАЯ
+БАЗА ЗНАНИЙ: расшифровка парт-номеров всех OEM газовых турбин</h1>
+<p><strong>v1.0 · 21.08.2026 · КВАНТ · Справочник сорсера</strong>
+Назначение: по любому парт-номеру любой западной ГТУ определить — что
+это за деталь, кто её реально производит и через какие каналы её достать
+без OEM. Работает в паре с мастер-Excel (1785 PN) и ГТУ-библиотекой
+поставщиков (1212 компаний).</p>
+<hr />
+<h2 id="универсальная-методика-атрибуции-применима-ко-всем-oem">0.
+Универсальная методика атрибуции (применима ко всем OEM)</h2>
+<p>Пять каналов, от сильного к слабому:</p>
+<ol type="1">
+<li><strong>NSN/FLIS + CAGE</strong> (wbparts.com, aerobasegroup.com,
+nsn.today). Пробиваем PN → получаем CAGE производителей. Ключевые CAGE:
+66195 = Solar, 81873 = Woodward HRT, 02697 = Parker, 58828/07482 = GE,
+99167/55820 = Hamilton Sundstrand.</li>
+<li><strong>FAA PMA-базы</strong> (partslogistics.com и аналоги) —
+недооценённый канал для аэродеривационных машин (LM2500/6000, RB211,
+FT4/FT8, Avon): для каждого одобренного аналога публикуется
+<strong>какой OEM PN он заменяет и на каких моделях</strong>. Это
+легальный, документированный обход OEM.</li>
+<li><strong>Парт-листы независимых поставщиков</strong>
+(turbineblade.net, gas-turbine-parts.com, gasturbineproduct.com,
+gcmindustrial.com, johnsonturbine.com) — раскрывают тысячи OEM PN с
+описаниями; у Siemens вдобавок дают пары PN ↔︎ ESP.</li>
+<li><strong>Таможенные базы</strong> (Volza, TradeData.Pro,
+ImportGenius) — кто физически грузил конкретный PN, страна,
+получатель.</li>
+<li><strong>Официальные цепочки замен</strong> — shop.solarturbines.com
+«Replaces», GE ER-система, service bulletins у RR (SB79-C947 и
+т.п.).</li>
+</ol>
+<p>Правило: vendor-код в описании (Rosemount 1151, Woodward 8200-1253,
+Arkwin 98391-1211425-003) — всегда выносим в поле <code>maker_pn</code>,
+это готовая атрибуция уровня П2.</p>
+<hr />
+<h2
+id="solar-turbines-saturn-20-centaur-4050-taurus-606570-mars-90100-titan-130250">1.
+SOLAR TURBINES (Saturn 20, Centaur 40/50, Taurus 60/65/70, Mars 90/100,
+Titan 130/250)</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Паттерн</th>
+<th>Что это</th>
+<th>Пример</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>NNNNNNN-D(D)</code></td>
+<td>Основной формат: 7-зн. чертёж + dash-вариант</td>
+<td>1089034-3</td>
+</tr>
+<tr class="even">
+<td><code>NNNNNN-D(D)</code></td>
+<td>Старые 6-зн. чертежи (двигатель)</td>
+<td>186212-100</td>
+</tr>
+<tr class="odd">
+<td><code>9NNNNNC1</code></td>
+<td>Коммерческая позиция (прокладки, O-rings, фильтры) — массово есть в
+NSN</td>
+<td>903315C1</td>
+</tr>
+<tr class="even">
+<td><code>FTNNNNN</code></td>
+<td>Field Tooling, оснастка</td>
+<td>FT20026-100</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Подтверждённые субпоставщики:</strong> Woodward HRT (приводы
+948001C1), Meggitt (топливные клапаны 1019431-xxxx = VL4000S), Bently
+Nevada (датчики 1023031-x, 1406779-5, вибромодули 1034549-40/-42),
+Parker (O-rings 9xxxxxC1), Champion Aerospace (OE зажигания: 903316C1,
+кабели 1051293), Hamilton Sundstrand (160656-100). Aftermarket горячего
+тракта: BDB, Peri-Parts.</p>
+<h3
+id="a.-solar-расходка-расшифровка-по-открытому-каталогу-shop.solarturbines.com">1a.
+Solar — расходка: расшифровка по открытому каталогу
+(shop.solarturbines.com)</h3>
+<p>Главное: у Solar нет «секретного кода» на расходку — <strong>стандарт
+напечатан прямо в названии позиции</strong> их публичного каталога:
+«903270C1 — O-ring, SAE 916, Viton». Правила чтения:</p>
+<ul>
+<li><strong><code>SAE nnn</code> в описании = dash-номер SAE
+AS568.</strong> Серия задаёт сечение: 0xx — тонкие, 1xx, 2xx — толще.
+Заказывается у Parker O-Ring или любого производителя по номеру AS568 +
+материал. В базе 25 позиций уже переведены в заказную спецификацию;</li>
+<li><strong>Болт «B7» = ASTM A193 Grade B7</strong>; «Grade 5» = SAE
+J429 Gr.5 (карта материалов стандартных деталей — Том IV, публ. 59421,
+757 позиций в базе);</li>
+<li><strong>BLUE-GARD = Garlock</strong> (листовой материал — прокладка
+режется из стандартного листа по габариту);</li>
+<li><strong>«4079» и похожие = номер компаунда DuPont Kalrez</strong>
+(перфторэластомер), а НЕ размер.</li>
+</ul>
+<p><strong>Ловушки (дорого ошибиться):</strong> 1. <strong>900-я серия
+(SAE 9xx)</strong> — это НЕ обычные O-rings, а уплотнения резьбовых
+штуцеров (boss seals): «толсто-короткая» геометрия, по ID совпадает с
+обычным кольцом, но замена обычным потечёт; 2. <strong>Переводческие
+ошибки в заявках</strong>: 124907-25 названа «прокладка уплотнительная»,
+а это grommet кабельного ввода; 17+ исполнений под одним описанием
+различаются только числом/диаметром отверстий — заказывать ТОЛЬКО по
+образцу; 3. <strong>Срезные болты (shear bolts)</strong> — канавка среза
+это расчётная ослабленная величина под заданный момент. Обычный болт
+ставить категорически нельзя; 4. Честный предел: ~1/3 расходных позиций
+к стандарту не сводится (нет схемы отверстий/марки материала) — такие
+только с образца или через «Вопрос Кими».</p>
+<h2 id="siemens-industrial-turbines-линкольнфинспонг">2. SIEMENS —
+Industrial Turbines (Линкольн/Финспонг)</h2>
+<h3 id="sgt-100200-ruston-tb-наследие-sgt-300-sgt-400">SGT-100/200
+(Ruston TB-наследие), SGT-300, SGT-400</h3>
+<p><code>64/NNNNNNNN/N</code> материальный номер · <code>SP0NNNNN</code>
+суб-деталь · <code>ESP0NNNNNN</code> парный складской код ·
+<code>MW/RW/RM/RT</code> + 5 цифр — чертёжные серии Линкольна (MW =
+горячий тракт: MW21215M камера сгорания; RW = компрессор: RW14012C; RM =
+механика: RM13029) · <code>CT/ST</code> + цифры — коммерческие/покупные
+позиции (CT886/13 = Loctite 572, CT95230/01 = Rockwell 1756-L55M24) ·
+9-значные и <code>NNNNNN/NNN</code> — крепёж (151210025, 012633/000).
+<strong>Субпоставщики:</strong> Rockwell/Allen-Bradley (САУ),
+Pepperl+Fuchs (барьеры 64/09001062/xx), Norgren (пневматика), Albany
+(насосы), Dresser Rand (редукторы), Henkel (CT886).</p>
+<h3 id="sgt-500600700750800-финспонг">SGT-500/600/700/750/800
+(Финспонг)</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Паттерн</th>
+<th>Что это</th>
+<th>Пример</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>NNNNNNN-L</code></td>
+<td>7-зн. чертёж + буква ревизии</td>
+<td>2405043-A, 2511628, 2461017-A</td>
+</tr>
+<tr class="even">
+<td><code>NNNNNNNN-N</code></td>
+<td>8-значные (прокладки, уплотнения)</td>
+<td>51085529-1</td>
+</tr>
+<tr class="odd">
+<td><code>T3NNN-NNN</code></td>
+<td>Стандартный крепёж (шайбы, стопоры)</td>
+<td>T3904-178</td>
+</tr>
+<tr class="even">
+<td><code>1CSANNNN-N</code> / <code>SCA NNNNN-N</code></td>
+<td>Стандартные гайки/комплекты трубок</td>
+<td>1CSA7596-1, 1SCA20286-1</td>
+</tr>
+<tr class="odd">
+<td><code>A2NNNNNN-NNN</code></td>
+<td>Покупные стандартные позиции (O-rings, герметики, изолента)</td>
+<td>A2842152-591</td>
+</tr>
+<tr class="even">
+<td><code>E1BNNNNNNNNN</code></td>
+<td>Экраны/теплозащита (наследие тяжёлой линейки)</td>
+<td>E1B100006241</td>
+</tr>
+</tbody>
+</table>
+<p>Карта горячего тракта раскрыта парт-листами: камера 2409539-K
+(SGT-600), 2415650-C (SGT-700), 2424101-B (SGT-800); горелки 2461017-A
+(SGT-700), 2428811-A (SGT-800); лопатки 2511628 / 2460801-A /
+2423974-B.</p>
+<h3
+id="sgt5sgt6-тяжёлые-kwu-мюльхайм-sgt5-2000e-v94.2гтэ-160-sgt5-4000f-v94.3a">SGT5/SGT6
+— тяжёлые (KWU, Мюльхайм): SGT5-2000E (V94.2/ГТЭ-160), SGT5-4000F
+(V94.3A)</h3>
+<p>Наследие KWU: материальные коды вида <code>E1A…/E1B…</code>, узловые
+обозначения и SAP-номера; электрика и реле — классические
+Siemens-каталожные (3AX, 3RH, 6ES7 SIMATIC). САУ — SPPA-T3000. Источник
+по лопаткам/соплам: INTECH, EthosEnergy, ZURN (V94.2/V94.3A в их
+линейке).</p>
+<h2 id="general-electric">3. GENERAL ELECTRIC</h2>
+<h3 id="frame-тяжёлые-ms50015002-6b-7ea-6f7f-9e9fa9fb-ha">Frame —
+тяжёлые (MS5001/5002, 6B, 7EA, 6F/7F, 9E/9FA/9FB, HA)</h3>
+<p><strong>Классическая система GE:
+<code>[серия 3-4 знака][буква группы][4 цифры][P + 3 цифры piece]</code></strong></p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Паттерн</th>
+<th>Что это</th>
+<th>Пример</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>NNNABNNNNPNNN</code></td>
+<td>Основной чертёж: серия + группа + порядковый + номер детали в
+группе</td>
+<td>328A7187P003 (фильтр 6FA), 302A7009P009 (топливный насос 6B),
+312A6077P005 (сервоклапан)</td>
+</tr>
+<tr class="even">
+<td><code>…GNN</code> вместо P</td>
+<td>Сборка (Group) вместо детали (Piece)</td>
+<td>91204241G01</td>
+</tr>
+<tr class="odd">
+<td><code>N + цифры + AP/P + …</code></td>
+<td>Стандартный крепёж GE</td>
+<td>N733AP44080, N536P706</td>
+</tr>
+<tr class="even">
+<td><code>H + цифры</code></td>
+<td>Покупное изделие</td>
+<td>H1978A006</td>
+</tr>
+<tr class="odd">
+<td><code>DS200…</code> / <code>DS3800…</code></td>
+<td>Платы Mark V / Mark IV</td>
+<td>DS200TCCAG1BAA</td>
+</tr>
+<tr class="even">
+<td><code>IS200…/IS215…</code></td>
+<td>Платы Mark VI / VIe</td>
+<td>IS200TBAIH1C</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Субпоставщики (подтверждено списками):</strong> сервоклапаны
+— Moog; зажигание — Chentronics/Unison (кросс-таблица по моделям GE
+7EA/9F в каталоге Chentronics); фильтры — Pall/Donaldson; КИП —
+Rosemount. Independent-каналы: EthosEnergy, AP+M, Power Systems Mfg
+(PSM), AGT Thermal Spray.</p>
+<h3 id="lm-аэродеривационные-lm2500pgt25-lm5000-lm6000-lms100">LM —
+аэродеривационные (LM2500/PGT25, LM5000, LM6000, LMS100)</h3>
+<p><strong>Система авиационная (Cincinnati/Lynn):
+<code>[4 цифры]M[2 цифры]P/G[2 цифры]</code> + серии J/K/L + пакетные
+форматы</strong></p>
+<p>Полная карта по нашей базе (1761 позиция LM6000 + 3673 LM2500):</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Паттерн</th>
+<th>Доля</th>
+<th>Что это</th>
+<th>Пример</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>NNNNMNNP/GNN</code></td>
+<td>189</td>
+<td>Основной авиа-формат детали</td>
+<td>9173M87P02, 1539M96P01</td>
+</tr>
+<tr class="even">
+<td><code>L NNNNN(P/G)NN</code></td>
+<td>249</td>
+<td><strong>LM6000-специфичная серия</strong> (узлы пакета и горячего
+тракта)</td>
+<td>L47552G13 (HPT nozzle), L43418P03 (VSV actuator = Arkwin)</td>
+</tr>
+<tr class="odd">
+<td><code>K NNN(P/G)NN</code></td>
+<td>99</td>
+<td>Детали LM (лопатки HPC, ванes)</td>
+<td>K024G02 (HPC stg.1)</td>
+</tr>
+<tr class="even">
+<td><code>J NNN(P/B)</code></td>
+<td>139</td>
+<td>Стандартный крепёж/шайбы</td>
+<td>J221P904</td>
+</tr>
+<tr class="odd">
+<td><code>NNNLNNNGNN</code></td>
+<td>киты</td>
+<td>Комплекты лопаток</td>
+<td>682L929G08</td>
+</tr>
+<tr class="even">
+<td><code>NNNABNNNNPNNNN</code></td>
+<td>118</td>
+<td><strong>Frame-формат с 4-зн. piece</strong> — пакетные детали</td>
+<td>393A1532P0001, 398A2327P0001</td>
+</tr>
+<tr class="odd">
+<td><code>MS9xxx-xx</code></td>
+<td>64</td>
+<td>Military Standard — покупается у любого аэро-дистрибьютора</td>
+<td>MS9556-12</td>
+</tr>
+<tr class="even">
+<td><code>IC697xxx / IC200xxx</code></td>
+<td>21+21</td>
+<td><strong>GE Fanuc → Emerson</strong>: Series 90-70 / VersaMax (САУ
+пакета)</td>
+<td>IC697CMM742, IC200ALG240</td>
+</tr>
+<tr class="odd">
+<td><code>1746/1747-…</code></td>
+<td>5</td>
+<td>Allen-Bradley SLC 500 (САУ)</td>
+<td>1747-L541</td>
+</tr>
+<tr class="even">
+<td><code>1756-…</code> / <code>64/52…</code></td>
+<td>—</td>
+<td>ControlLogix</td>
+<td>1756-ENBT</td>
+</tr>
+<tr class="odd">
+<td><code>3500/NN</code></td>
+<td>16</td>
+<td>Bently Nevada 3500 (виброконтроль)</td>
+<td>3500/15, 3500/92</td>
+</tr>
+<tr class="even">
+<td><code>1x0PxxCxx</code></td>
+<td>2+</td>
+<td>CCS (датчики давления)</td>
+<td>132P41C6B</td>
+</tr>
+<tr class="odd">
+<td><code>IS20xx</code></td>
+<td>25</td>
+<td>GE Mark VI (управление)</td>
+<td>IS2020RKPSG3A</td>
+</tr>
+<tr class="even">
+<td><code>8xxx-xxxx</code></td>
+<td>11</td>
+<td><strong>Woodward</strong> (управление топливом)</td>
+<td>8923-1395 (контроллер LM6000), 8915 (метеринг-клапан),
+8200/176R</td>
+</tr>
+<tr class="odd">
+<td><code>9-9999-9999-99</code></td>
+<td>22</td>
+<td>Формат вендора (длинный)</td>
+<td>5-2271-1611-51</td>
+</tr>
+<tr class="even">
+<td><code>S9xxxxxxxx</code></td>
+<td>25</td>
+<td>S-префикс, вендор</td>
+<td>S963100901</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Подтверждённые субпоставщики LM6000 (с заказными номерами в
+базе):</strong> Woodward (8923-1395, 8915-1010/1310, 8200/176R), Arkwin
+Industries (VSV/VIGV актуаторы L43418P03), Formsprag/Aerofit (клатч
+6601-01-019-C), Rosemount (трансмиттеры 1151/3051), Bently Nevada
+(3500-серия), Rockwell (SLC500/ControlLogix), CCS, Metrix (5485C).</p>
+<p><strong>Где покупать LM (стоки уже в базе):</strong> makikmachinery
+(1783 поз. LM6000 с статусами NEW/AR/OH), turbinepartsspecialist (3673
+поз. LM2500), turbineblade (197 поз. LM6000), EthosEnergy (форсунки
+LMS100), VBR Turbine Partners, AP+M, Johnson Turbine. <strong>FAA
+PMA-канал применим</strong> (авианаследие CF6): partslogistics.com —
+одобренные аналоги с привязкой к OEM PN.</p>
+<p><strong>Подтверждённые субпоставщики LM6000:</strong> Woodward
+(8200-1253 RTN gateway, 8200/176R gas valve driver, 8915 gas metering
+valve), Rosemount (1151GP… transmitters), Arkwin Industries (VSV/VIGV
+actuator, vendor 98391-1211425-003), Dataforth (модули 5441-695,
+1784-655), Aerofit/Formsprag (clutch 6601-01-019-C). <strong>FAA
+PMA-канал</strong> для LM полностью применим (авианаследие CF6).</p>
+<h2
+id="rolls-royce-industrial-avon-15333435-rb211-24-trent-60-olympus-spey-501">4.
+ROLLS-ROYCE (Industrial Avon 1533/34/35, RB211-24, Trent 60, Olympus,
+Spey, 501)</h2>
+<p><strong>Система:
+<code>[2 буквы][5 цифр][буква ревизии]</code></strong> — префикс
+кодирует серию/узел: <code>AG</code> — лопатки/узлы (AG56587, AG56002A
+стартер-фэринг), <code>BR</code> — сегменты/кольца (BR9044),
+<code>BA</code> — крепёж/шайбы (BA34641 tab washer), <code>LJ/LK</code>
+— трубопроводы RB211 (LJ35347, LK74367), <code>FW</code> — топливные
+трубки, <code>AE</code> — трубки с ревизией -1/-2 (AE709623-1). Service
+Bulletin в тексте PN-описаний (SB79-C947) — маркер внедрения.
+<strong>Каналы:</strong> FAA PMA-базы (датчики 0154KA/LF с привязкой к
+моделям Trent), Score Energy (собственное производство Avon-лопаток),
+Rolaar, Manor Engineering; Ruston TB5000 = линейка SGT-100 (Siemens) —
+кросс-наследие.</p>
+<h2
+id="a.-ge-frame-6b-ms5001-углублённая-расшифровка-по-290-позициям-нашей-базы">4a.
+GE FRAME 6B / MS5001 — углублённая расшифровка (по 290 позициям нашей
+базы)</h2>
+<p><strong>Система:</strong>
+<code>[серия 3-4 знака][буква группы][4 цифры][P/G + номер]</code>.</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Формат</th>
+<th>Что это</th>
+<th>Пример</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>NNNABNNNNPNNN</code></td>
+<td>Основной чертёж: серия + группа + порядковый + <strong>P +
+piece</strong> (деталь)</td>
+<td>302A4594P026 (спиральная прокладка)</td>
+</tr>
+<tr class="even">
+<td><code>NNNNNNNNPNNN</code></td>
+<td>8-значная серия (эра Frame 5/6, 1970-е+) — тот же принцип</td>
+<td>91600478P161, 91419375P006</td>
+</tr>
+<tr class="odd">
+<td><code>NNNYNNNPNNN</code></td>
+<td>Y-серия — электрика/КИП</td>
+<td>113Y687P001</td>
+</tr>
+<tr class="even">
+<td><code>…GNN</code></td>
+<td><strong>Group</strong> — сборка/узел (не деталь)</td>
+<td>91204241G01 (система смазки), 91160375G01 (клатч)</td>
+</tr>
+<tr class="odd">
+<td><code>HNNNNANNN</code></td>
+<td>Покупное изделие (bought-out)</td>
+<td>H1978A006</td>
+</tr>
+<tr class="even">
+<td><code>N…AP/P…</code></td>
+<td>Стандартный крепёж GE</td>
+<td>N733AP44080</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Эмпирические кластеры серий (по нашей базе — что реально за
+серией стоит):</strong> <code>185A</code> — O-rings (каталожная серия
+уплотнений) · <code>302A</code> — спиральные прокладки ·
+<code>328A</code> — термопары/датчики/фильтры · <code>312A</code> —
+сервоклапаны (Moog-профиль) · <code>205B</code> — трубки ·
+<code>279A</code> — компенсаторы · <code>114A</code> — сальники Garlock
+· <code>261A</code> — flame-детекторы ·
+<code>272A</code>/<code>351A</code> — термометры/термопары ·
+<code>91600478</code> — серия с piece-вариантами P150–P162 (лопаточные
+по ступеням).</p>
+<p><strong>Правила работы:</strong> piece-номер (P026) обязателен — без
+него деталь не идентифицирована; G-номер заказывается как узел целиком;
+<code>List-701/717/922</code> в описаниях — внутренние парт-листы GE
+(система/узел). MS5001 = та же система (более ранняя эра, много H- и
+8-значных серий). Подтверждённые каналы 6B: EthosEnergy, PSM, AP+M;
+сервоклапаны — Moog; сальники — Garlock.</p>
+<h2 id="pratt-whitney-gg3gg4ft4-gg8ft8-ft4000-swiftpac">5. PRATT &amp;
+WHITNEY (GG3/GG4/FT4, GG8/FT8, FT4000 SWIFTPAC)</h2>
+<p><strong>Система: 6-7-значные чертежи</strong> (1043647 bearing,
+1083042 fuel nozzle, 1088010 combustion chamber) + суффикс ревизии
+<code>-01</code>. Стандартная арматура: <code>ST</code> + 4 цифры +
+<code>-NN</code> (ST1141-41 gasket, ST1353-11 stud), военные стандарты
+MS/AN/AS (MS9061-08, MS29513-013, AS3214-02 lockwire) — покупаются
+напрямую у любого аэро-дистрибьютора без P&amp;W. Коммерческие рукава:
+<code>IPC/IPD</code> коды (IPD21306-24-2). <strong>Каналы:</strong>
+Johnson Turbine, Global Turbine Support (1691 позиция FT4/GG4 в открытом
+стоке), GCM Industrial (FT8 hot section), FAA PMA.</p>
+<h2 id="alstom-abb-gt13e2-gt13e2-1-mxl-gt11n2-gt8c2">6. ALSTOM / ABB
+(GT13E2, GT13E2-1 MXL, GT11N2, GT8C2)</h2>
+<p>Тройное наследие BBC→ABB→Alstom→(GE): один PN может существовать в
+нескольких чертёжных системах эпох — ZURN Power прямо указывает, что
+«один номер несёт несколько чертежей» и резолвит историю. Электрика —
+коды ABB (<code>1SBL281001R8832</code> контакторы) и AEG
+(<code>910-304-426-000</code>). Горячий тракт: SEV-горелки, лопатки 1–3
+ст., сварной барабанный ротор — независимые: ZURN Power, EthosEnergy,
+PSM. Зажигание — Chentronics 09000002 (кросс по модели Alstom 13E2).</p>
+<h2 id="ansaldo-energia-ae64.3a-ae94.2-ae94.3a-gt36">7. ANSALDO ENERGIA
+(AE64.3A, AE94.2, AE94.3A, GT36)</h2>
+<p>AE64.3A = лицензионная линейка V64.3A (Siemens-наследие) — применяйте
+правила Siemens тяжёлой серии (§2.3); AE94.2/94.3A =
+V94.2/V94.3A-наследие аналогично. GT36 — собственная новая платформа
+(зажигание Chentronics 09000057). Независимый канал: ZURN, EthosEnergy,
+INTECH.</p>
+<h2
+id="mitsubishi-mhi-m501dafgjjac-m701f4j-и-westinghouse-251-501bdfg">8.
+MITSUBISHI / MHI (M501DA/F/G/J/JAC, M701F4/J) и WESTINGHOUSE (251,
+501B/D/F/G)</h2>
+<p>M501/M701 = наследие Westinghouse 501: нумерация унаследована от
+W-чертежей, горячий тракт совместим по линейке. Зажигание — Chentronics
+(501F: 09000069, 501G: 09000807; 251/501B: 09000044). Независимые:
+MD&amp;A, PSM, EthosEnergy, AGT. Для M701F4 лопатки/сопла — INTECH (в их
+линейке). Японская специфика: много JIS-стандарта в крепеже —
+заказывается напрямую в Японии/Китае.</p>
+<h2 id="прочие-линейки-краткая-шпаргалка">9. Прочие линейки (краткая
+шпаргалка)</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>OEM / линейка</th>
+<th>Что знать</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Kawasaki (M1A/M7A/M1T)</strong></td>
+<td>Японская система, JIS-крепёж; парк в РФ мал — работаем через MRO
+Японии/Сингапура</td>
+</tr>
+<tr class="even">
+<td><strong>MAN / THM (THM1304)</strong></td>
+<td>Наследие MAN Turbomaschinen; каналы — European Gas
+Turbines/ETHOS</td>
+</tr>
+<tr class="odd">
+<td><strong>Baker Hughes NovaLT5/12/16</strong></td>
+<td>Новая платформа (ex-GE Nuovo Pignone), запчасти в основном через
+BH</td>
+</tr>
+<tr class="even">
+<td><strong>Vericor TF/ASE</strong></td>
+<td>Морская линейка, зажигание Chentronics 09000400</td>
+</tr>
+<tr class="odd">
+<td><strong>Zorya-Mashproekt UGT</strong></td>
+<td>Не западный, но в списке gasturbineworld — отдельная
+номенклатура</td>
+</tr>
+</tbody>
+</table>
+<h2
+id="универсальные-субпоставщики-работают-на-всех-oem-стучаться-в-первую-очередь">10.
+Универсальные субпоставщики (работают на ВСЕХ OEM — стучаться в первую
+очередь)</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Сегмент</th>
+<th>Кто реально делает</th>
+<th>Чей PN маскируют</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Управление топливом, регуляторы</td>
+<td><strong>Woodward</strong> (8200/9905 серии)</td>
+<td>Solar, GE LM, Siemens</td>
+</tr>
+<tr class="even">
+<td>Клапаны/актуаторы топлива</td>
+<td><strong>Meggitt</strong>, Arkwin, Young &amp; Franklin</td>
+<td>Solar 1019431, LM L43418</td>
+</tr>
+<tr class="odd">
+<td>Виброконтроль</td>
+<td><strong>Bently Nevada</strong></td>
+<td>Solar 1023031/1034549/1406779, все пакеты</td>
+</tr>
+<tr class="even">
+<td>КИП: давление/температура</td>
+<td><strong>Emerson Rosemount</strong> (1151/3051)</td>
+<td>LM6000, все пакеты</td>
+</tr>
+<tr class="odd">
+<td>Зажигание</td>
+<td><strong>Champion, Unison, Chentronics</strong></td>
+<td>Solar 903316C1/1051293; Chentronics покрывает
+GE/RR/P&amp;W/Alstom/Siemens/Westinghouse одним каталогом</td>
+</tr>
+<tr class="even">
+<td>Уплотнения/O-rings</td>
+<td><strong>Parker Hannifin</strong></td>
+<td>Solar 9xxxxxC1, GE 185A</td>
+</tr>
+<tr class="odd">
+<td>Фильтры</td>
+<td><strong>Pall, Donaldson, Parker, PECOFacet, Fleetguard</strong></td>
+<td>все OEM</td>
+</tr>
+<tr class="even">
+<td>Подшипники пром.</td>
+<td><strong>RENK, SKF, Timken, Miba</strong></td>
+<td>Siemens, GE, DR</td>
+</tr>
+<tr class="odd">
+<td>САУ пакетов</td>
+<td><strong>Rockwell (ControlLogix), Siemens SIMATIC, ABB</strong></td>
+<td>SGT-400 (CT95230), пакеты всех OEM</td>
+</tr>
+<tr class="even">
+<td>Барьеры искрозащиты</td>
+<td><strong>Pepperl+Fuchs, MTL</strong></td>
+<td>SGT-400 64/09001062</td>
+</tr>
+<tr class="odd">
+<td>Химия (герметики, смазки)</td>
+<td><strong>Henkel Loctite, Dow Molykote</strong></td>
+<td>Siemens CT886/ST886</td>
+</tr>
+<tr class="even">
+<td>Горячий тракт (независимое литьё)</td>
+<td><strong>PSM, EthosEnergy, AGT, BDB, ZURN, INTECH, Doncasters, Howmet
+(OEM-подряд)</strong></td>
+<td>GE Frame, Siemens V94, Alstom, MHI</td>
+</tr>
+</tbody>
+</table>
+<h2 id="агрегаторы-и-базы-рабочие-закладки-сорсера">11. Агрегаторы и
+базы (рабочие закладки сорсера)</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Ресурс</th>
+<th>Что даёт</th>
+<th>URL</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>WBParts / AerobaseGroup</td>
+<td>NSN ↔︎ PN ↔︎ CAGE ↔︎ производитель</td>
+<td>https://www.wbparts.com</td>
+</tr>
+<tr class="even">
+<td>PartsLogistics (FAA PMA)</td>
+<td>Одобренные аналоги с привязкой к OEM PN и моделям</td>
+<td>https://www.partslogistics.com</td>
+</tr>
+<tr class="odd">
+<td>Solar Parts Store</td>
+<td>Официальные замены Solar («Replaces»)</td>
+<td>https://shop.solarturbines.com</td>
+</tr>
+<tr class="even">
+<td>TurbineBlade</td>
+<td>Открытые парт-листы SGT-400/600/800, LM6000, Avon</td>
+<td>https://turbineblade.net</td>
+</tr>
+<tr class="odd">
+<td>Gas-Turbine-Parts (Hangzhou)</td>
+<td>Парт-листы SGT-400/700 с ESP-кодами, LM6000 с vendor-PN</td>
+<td>http://www.gas-turbine-parts.com</td>
+</tr>
+<tr class="even">
+<td>Gasturbineproduct</td>
+<td>Карта горячего тракта SGT-400</td>
+<td>https://gasturbineproduct.com</td>
+</tr>
+<tr class="odd">
+<td>Supply.Parts</td>
+<td>Чужие RFQ с manufacturer part no</td>
+<td>https://supply.parts</td>
+</tr>
+<tr class="even">
+<td>Volza / TradeData.Pro</td>
+<td>Таможня: кто грузил PN</td>
+<td>https://www.volza.com</td>
+</tr>
+<tr class="odd">
+<td>Chentronics (каталог PDF)</td>
+<td>Кросс-таблица зажигания по ВСЕМ моделям ГТУ</td>
+<td>https://www.chentronics.com</td>
+</tr>
+<tr class="even">
+<td>EthosEnergy</td>
+<td>Независимый горячий тракт GE Frame / Siemens / Alstom</td>
+<td>https://ethosenergy.com</td>
+</tr>
+<tr class="odd">
+<td>Score Energy</td>
+<td>Собственное производство деталей RR Avon</td>
+<td>https://www.score-group.com</td>
+</tr>
+<tr class="even">
+<td>Rolaar</td>
+<td>Avon / RB211: изготовление по заказу</td>
+<td>https://www.rolaar.co.uk</td>
+</tr>
+<tr class="odd">
+<td>Johnson Turbine</td>
+<td>Сток GG3/GG4/FT4/FT8</td>
+<td>https://www.johnsonturbine.com</td>
+</tr>
+<tr class="even">
+<td>GCM Industrial</td>
+<td>FT8 hot section</td>
+<td>https://gcmindustrial.com</td>
+</tr>
+<tr class="odd">
+<td>ZURN Power</td>
+<td>GT13E2 + Ansaldo-наследие</td>
+<td>https://www.zurnpower.com</td>
+</tr>
+<tr class="even">
+<td>Gas Turbine World</td>
+<td>Покрытие 90+ моделей</td>
+<td>https://gasturbineworld.com/spare-parts/</td>
+</tr>
+<tr class="odd">
+<td>INTECH GmbH</td>
+<td>Лопатки/сопла V94, LM, 6FA, 6B, M701F4</td>
+<td>https://intech-gmbh.ru</td>
+</tr>
+<tr class="even">
+<td>DrillingBase</td>
+<td>Парт-листы GE Frame 6B</td>
+<td>https://drillingbase.com</td>
+</tr>
+<tr class="odd">
+<td>PLC DCS Pro</td>
+<td>Кросс Solar ↔︎ Bently Nevada</td>
+<td>https://www.plcdcspro.com</td>
+</tr>
+<tr class="even">
+<td>Champion Aerospace</td>
+<td>OE-лист систем зажигания (Solar и др.)</td>
+<td>https://www.championaerospace.com</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="эталонные-сделки-ценовой-слой-v1-из-свода-юнипро">12. Эталонные
+сделки (ценовой слой v1 — из свода Юнипро)</h2>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Дата</th>
+<th>Тема</th>
+<th>Сумма</th>
+<th>Примечание</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>25.08.2025</td>
+<td>Капитальные части ГТУ 6FA</td>
+<td>$4 485 249,60 без НДС</td>
+<td>эталон капчастей 6FA</td>
+</tr>
+<tr class="even">
+<td>16.02.2026</td>
+<td>ТКП для ГТУ MS5001</td>
+<td>503 427 € без НДС</td>
+<td>первый заход MS5001</td>
+</tr>
+<tr class="odd">
+<td>06.05.2026</td>
+<td>ТКП для ГТУ MS5001 (Ванкор)</td>
+<td>$7 739 772,11 с НДС</td>
+<td>полный пакет MS5001</td>
+</tr>
+<tr class="even">
+<td>28.07.2026</td>
+<td>ЗИП ГТУ (крепёж для лопаток)</td>
+<td>29 402 006,10 ₽ с НДС</td>
+<td>эталон крепежа 9FA</td>
+</tr>
+</tbody>
+</table>
+<p>Использование: любое КП по этим моделям сверять с эталоном;
+отклонение &gt;30% — флаг для переговоров.</p>
+<p><em>Методическая основа: мастер-Excel «База парт-номеров ГТУ — Solar
+и Siemens (мастер v1)» (1785 PN, 286 атрибутировано) + 6 волн
+веб-ресёрча 21.08.2026. Все мэтчинги П1–П2 — с URL-источниками в
+мастер-Excel, листы «Атрибуция П1–П2» и «Источники».</em></p>
+</div>
+<script>
+function filt(){
+ const q=document.getElementById('q').value.toLowerCase();
+ document.querySelectorAll('.wrap table tr').forEach(tr=>{
+  tr.style.display = (!q||tr.textContent.toLowerCase().includes(q))?'':'none';
+ });
+ document.querySelectorAll('.wrap h2,.wrap h3,.wrap p,.wrap li').forEach(el=>{
+  el.style.display = (!q||el.textContent.toLowerCase().includes(q))?'':'none';
+ });
+}
+</script>
+</body>
+</html>

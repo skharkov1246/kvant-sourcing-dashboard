@@ -1,0 +1,2290 @@
+{
+"updated": "2026-08-17",
+"model": "Solar Turbines (Saturn / Centaur / Taurus / Mars / Titan)",
+"facts": [
+{
+"claim": "Генеалогия и годы: Saturn — 1960 (Saturn 20 ≈1,2 МВт); Centaur 40 — 1968 (≈3,5 МВт / 4700 л.с.); Centaur 50 — ≈4,6 МВт; Taurus 60 — 1989 (≈5,7 МВт); Taurus 70 — 1995 (≈8,2 МВт / 11 150 л.с.); Mars — с 1977; Mars 100 — ≈11,4 МВт; Titan 130 — 1997 (≈16,5 МВт); Titan 250 — 2008 (≈23,1 МВт)",
+"source": "https://en.wikipedia.org/wiki/Solar_Turbines (проверено WebFetch)",
+"cross_check": "https://heriss.com/ps/solar/ (Taurus 60 ≈5,7 МВт, Taurus 70 ≈7,5 МВт) и https://www.solarturbines.com/en_US/about-us/history.html"
+},
+{
+"claim": "Парк Solar Turbines — более 16 000 установленных машин и >3 млрд наработанных часов (по состоянию на 2020-е)",
+"source": "https://www.turbomachinerymag.com/view/vendor-spotlight-solar-turbines",
+"cross_check": "https://en.wikipedia.org/wiki/Solar_Turbines — «более 15 000 систем, свыше 2 млрд часов» (более ранняя цифра, динамика сходится)"
+},
+{
+"claim": "Saturn — самая массовая индустриальная ГТУ в мире: ~4800 единиц в 80+ странах",
+"source": "https://en.wikipedia.org/wiki/Solar_Turbines (проверено WebFetch)"
+},
+{
+"claim": "Система T-обозначений Centaur: T4000 → T4500 → T4700 — последовательные апрейты одной машины (Centaur 40→50 линия); независимые шопы предлагают обмен T4001/T4501/T4701 и T4002/T4502/T4702",
+"source": "https://www.gtaturbines.com/gta-about-us.php (проверено, перечислены T4001/T4501/T4701 CED и T4002/T4502/T4702 HED)",
+"cross_check": "https://www.power-technology.com/contractors/turbine-cooling/immi-turbines/ (T4000, T4500, T4700, single/split shaft) и https://www.ssturbine.com/component/content/article/10-product-lines/20-solar-gas-turbine-services («T-1200 through T-4700»)"
+},
+{
+"claim": "Последняя цифра T-номера кодирует валовую схему: ...1 = одновальная (генераторная, «3-wheel»), ...2 = двухвальная split-shaft (механический привод). Пример Saturn: split-shaft T1102/T1202/T1302 против одновальных T1201/T1301 — ЛОВУШКА при подборе: одинаковый рейтинг, разные машины",
+"source": "https://www.gtaturbines.com/gta-about-us.php (проверено WebFetch: 'Saturn Split Shaft T1102/T1202/T1302' vs 'Saturn 3 Wheel T1201/T1301')"
+},
+{
+"claim": "Taurus 60 генераторный одновальный = T7301: 5200 кВт ISO, 1500 об/мин (50 Гц) или 1800 (60 Гц); семейство рейтингов 7300/7301/7302",
+"source": "https://www.usedpowerplants.com/listings/7663542-solar-taurus-60-t7301-gas-turbine (проверено WebFetch: T7301, 5200 kW, 1500 RPM)",
+"cross_check": "https://www.directindustry.com/prod/solar-turbines/product-22650-1363701.html и листинг Antoni 'TAURUS 60 T7301 Gas' https://www.antoni-intl.com/Equipment+for+Sale/id/42/prod_id/16257/"
+},
+{
+"claim": "Mars второго поколения = Mars T-14000 (1992): 10,5 МВт / 14 100 л.с., КПД 33,5% — основа линии Mars 90/100; Mars 90 и Mars 100 — два рейтинга одного газогенератора Mars, большая часть ЗИП пересекается",
+"source": "ASME GT1992 paper 'Evolution and Introduction of the Mars T-14000 Gas Turbine' — https://asmedigitalcollection.asme.org/GT/proceedings/GT1992/78965/V004T11A010/242972"
+},
+{
+"claim": "Titan 130 (1997, 18 300 л.с.) — аэродинамический скейл компрессора Taurus 70 (14 ступеней) с использованием существующих компонентов Mars: генеалогически это «увеличенный Taurus 70 на технологии Mars», а НЕ прямой апрейт Mars — ЗИП с Mars пересекается лишь частично (компрессорная группа), горячая часть своя",
+"source": "ASME GT1998 'Evolution of the Solar Turbines Titan 130 Industrial Gas Turbine' — https://asmedigitalcollection.asme.org/GT/proceedings/GT1998/78644/V003T07A012/246911",
+"cross_check": "https://www.solarturbines.com/en_US/about-us/history.html (Titan 130 introduced 1997)"
+},
+{
+"claim": "Centaur 40/50 и Taurus 60 имеют общую пакетную базу: единый engine skid и общие редукторы 1800/1500 об/мин — по пакетному ЗИП (редуктор, вспомсистемы) соседние модели частично взаимозаменяемы, по горячей части — нет (Taurus 60 — апрейт с другой горячей частью)",
+"source": "https://ethosenergy.com/services/light-industrial-gas-turbines/solar-light-turbines (проверено: 'Centaur 40 / 50 and Taurus 60 reduction gearboxes (1800/1500 RPM)')",
+"cross_check": "https://www.directindustry.com/prod/solar-turbines/product-22650-1363701.html (общий engine skid Centaur 40/50/Taurus 60)"
+},
+{
+"claim": "SoLoNOx (DLE) внедрён в 1992, ретрофитнуто >2000 машин; парк каждой модели расщеплён на conventional и SoLoNOx версии — камера сгорания, форсунки и топливная арматура НЕ взаимозаменяемы, при запросе ЗИП обязательно фиксировать тип камеры",
+"source": "https://en.wikipedia.org/wiki/Solar_Turbines (SoLoNOx 1992, >2000 ретрофитов)",
+"cross_check": "https://heriss.com/ps/solar/ ('Centaur 4500 and 50 (with or without SoloNox)') и датащит Taurus 70 'Combustion System: SoLoNOx (DLE) / Conventional' — https://saintwah.en.made-in-china.com/product/qOZfkNtdGFpD/China-Solar-Turbines-Taurus-70-T70-Gas-Turbine-Used-Turbine.html"
+},
+{
+"claim": "Формат каталожных номеров Solar: 5-7-значные числовые с дэш-суффиксом версии/модификации (117850-105; 178502-1; 143925-1; 30065-0), встречаются буквенные вставки (702009C1, 1125X130, 8007917R91) — по одному PN без суффикса деталь не идентифицируется однозначно",
+"source": "https://heriss.com/ps/solar/ (проверено WebFetch: 'Accessory drive Gearbox Part Number 117850-105')",
+"cross_check": "Каталог PeriParts: https://www.peri-parts.com/178502-1-solar-turbines-a-caterpillar-brand-original-retainer-o-ring-65d.html и https://www.peri-parts.com/143925-1-solar-turbines-a-caterpillar-brand-original-assembly-pump-and-motor-lubeoil-509.html"
+},
+{
+"claim": "Независимый рынок капремонта покрывает в основном Saturn–Centaur–Taurus 60–Mars: крупнейший независимый (EthosEnergy, Хьюстон) официально ремонтирует Saturn 10, Centaur 40/50, Taurus 60, Mars 90/100 (все поколения SoLoNOx + Low BTU) и компрессоры C16/C28/C30, но НЕ Taurus 70 и НЕ Titan — по Taurus 70/Titan 130/250 независимая альтернатива почти только на уровне компонентов (Score Energy: Centaur, Taurus, Mars, Titan — топливные системы, компонентный ремонт, склад запчастей $30 млн)",
+"source": "https://ethosenergy.com/services/light-industrial-gas-turbines/solar-light-turbines (проверено, список моделей)",
+"cross_check": "Брошюра Score Energy (проверено, извлечён текст PDF): https://cdn.scoreltd.com/pdf/brochure/Score%20Energy%20brochure%20English%20Rev%201.pdf"
+},
+{
+"claim": "IMMI Turbines (Conroe, TX) — полностью независимый от OEM провайдер: капремонты и обмен двигателей Solar Saturn 10/20, Centaur 40/50, Taurus 60/70, нагрузочные испытания до 5 МВт; склад включает new/refurbished/used и reverse-engineered детали для снятых с поддержки позиций",
+"source": "https://immiturbines.com/about-us/ (проверено WebFetch)",
+"cross_check": "https://www.power-technology.com/contractors/turbine-cooling/immi-turbines/ (проверено WebFetch: перечислены buckets/blades/nozzles 1-3 ступеней, жаровые трубы, transition pieces, форсунки, роторы)"
+},
+{
+"claim": "R&H Supply открыто заявляет «full in-house capacity to manufacture gas turbine parts for both OEM and select non-OEM fleets» и ведёт линейку Solar: Saturn 10, Centaur 40/50, Taurus 50/60/70 (+S), Mars 90/100 (+S) — редкий случай независимого изготовителя с явной Solar-номенклатурой",
+"source": "https://randhsupply.com/gas-turbines/ (проверено WebFetch)",
+"cross_check": "Поисковая выдача Google по randhsupply.com подтверждает список моделей Saturn 20, Centaur 40&40S, 50&50S, Taurus 50/60/70, Mars 90/100"
+},
+{
+"claim": "EthosEnergy (Хьюстон) — крупнейший западный независимый по лёгким Solar: обслуживание/капремонт/обмен Mars 100, Mars 90, Taurus 60, Centaur 50, Centaur 40, Saturn 10; исторически Wood Group GTS первым из независимых запустил aftermarket-сервис Solar Mars",
+"source": "https://ethosenergy.com/services/light-industrial-gas-turbines/solar-light-turbines (прямой fetch блокируется 503/307, содержание подтверждено многократно в сниппетах поиска)",
+"cross_check": "https://www.prnewswire.com/news-releases/wood-group-gts-launches-maintenance-services-for-solar-mars-and-siemens-tornado-and-typhoon-gas-turbines-221264741.html"
+},
+{
+"claim": "S&S Turbine Services (Fort St. John, BC, Канада) — семейный независимый цех: полный Level IV капремонт Saturn и Centaur (T-1200…T-4700), собственный склад ремонтных компонентов, балансировка роторов; экономия до 60% против OEM",
+"source": "https://www.ssturbine.com/component/content/article/10-product-lines/20-solar-gas-turbine-services (проверено WebFetch)",
+"cross_check": "https://www.dnb.com/business-directory/company-profiles.s__s_turbine_services_ltd.561d348637eea14b57dae13592ccde73.html; есть ближневосточное подразделение ssturbineme.com"
+},
+{
+"claim": "Gas Turbine Applications / GTA (Calera, OK) — независимый ремонт/испытания Solar Saturn 10/20 и Centaur 40/50 (вкл. SoLoNOx), склад сервисных запчастей с отгрузкой 24/7 по миру; обменные ГГ и силовые турбины Saturn/Centaur",
+"source": "https://www.gtaturbines.com/ и https://www.gtaturbines.com/gta-turbine-services.php (проверено WebFetch)",
+"cross_check": "https://www.turbineefficiencygroup.com/service/gas-turbine-applications (Turbine Efficiency Group называет GTA независимым провайдером по Saturn и Centaur)"
+},
+{
+"claim": "Alba Power (Netherley, Aberdeenshire, UK + La Porte, TX; с 2019 в составе Sulzer) — специализируется на сервисе газовых турбин, включая Solar Turbines: field service, инспекции, ремонт и капремонт, обмен/лизинг пакетов, поставка zero-houred машин",
+"source": "https://albapower.com/gas-turbine-services/ (проверено WebFetch)",
+"cross_check": "https://energy-oil-gas.com/news/alba-power-2 (поглощение Sulzer, профиль сервисов); https://www.energyvoice.com/oilandgas/north-sea/157804/turbine-firm-alba-powers-way-canadian-market/"
+},
+{
+"claim": "Score Energy (Score Group) выполняет component overhaul по спецификациям OEM для оборудования Solar и держит склад новых и восстановленных деталей >$30 млн, включая топливные форсунки",
+"source": "https://cdn.scoreltd.com/pdf/brochure/Score%20Energy%20brochure%20English%20Rev%201.pdf (официальная брошюра Score Energy, найдена поиском)"
+},
+{
+"claim": "GLM Energy Systems (Kenai, Аляска) — независимый сервис Solar Saturn T1200 и Centaur T4500: изготовление/закупка компонентов, обменные двигатели, переоблопачивание, ремонт сопловых аппаратов и покрытия, восстановление шеек валов",
+"source": "https://www.glmenergyllc.com/glm-turbine-solar.php (проверено WebFetch, email contacts@glmenergyllc.com)"
+},
+{
+"claim": "Energy Parts Solutions (Schaumburg, IL) — механообработка и изготовление лопаток, сопловых, диафрагм с услугой reverse engineering «по изношенной детали-образцу без чертежей» (CMM + CAD/CAM); прямой Solar-референс на сайте отсутствует — подходит как изготовитель по образцу",
+"source": "https://www.energypartssolutions.com/services/reverse-engineering/ (проверено WebFetch)"
+},
+{
+"claim": "Кандидаты НЕ подтвердились публичными доказательствами по Solar: PBS Velká Bíteš (литьё лопаток для GE IGT, связей с Solar не найдено), Doncasters (литейщик OEM-цепочек, публичный мегаконтракт — с Siemens Energy на >$1 млрд, Solar не упоминается), Chromalloy (PMA/IGT-детали, открытой Solar-номенклатуры нет), Meccanica Pi.Erre (делает обрезные прессы/оснастку для литья, а не детали турбин — кандидат ошибочный), «Turbine Standard» (компания не находится)",
+"source": "https://www.doncasters.com/news/contract-worth-over-1-billion-usd-signed-with-siemens-energy; https://en.wikipedia.org/wiki/PBS_Velk%C3%A1_B%C3%ADte%C5%A1; https://www.chromalloy.com/energy/; https://meccanica-pierre.it/en/home_page/",
+"cross_check": "Целевые поисковые запросы по каждой паре «компания + Solar» релевантных страниц не дали"
+},
+{
+"claim": "Страница «Solar Turbine Parts» на tdsparts.com — SEO-приманка: реальный владелец Weifang Heris Petroleum Equipment (Китай) торгует буровым оборудованием, к деталям турбин Solar отношения не имеет — в базу не брать",
+"source": "https://www.tdsparts.com/solar-turbine-parts/ (проверено WebFetch: контент только про top drive/буровое)"
+},
+{
+"claim": "HPI LLC (Хьюстон) — не изготовитель ЗИП горячего тракта, а интегратор САУ: ретрофиты систем управления турбомашин всех основных OEM, включая Solar (пример — Centaur 50); полезен для канала «контроллеры/АСУ», не для лопаток",
+"source": "https://www.linkedin.com/company/hpi-llc + http://www.mec-houston.com/assets/HPI/HPI-Overview-Presentation.pdf (сайт hpi-llc.com отдаёт 403, подтверждено сниппетами)"
+},
+{
+"claim": "Southeast Overseas (Sarasota, FL) — трейдер: OEM/aftermarket/refurbished/new surplus ЗИП Solar по линейкам Saturn, Centaur, Mercury, Taurus, Mars с открытым каталогом каталожных номеров (30621…179889K401B) — удобен для отработки запросов по P/N",
+"source": "https://www.southeastoverseas.com/solar1.html (проверено WebFetch, email roy.pandel@titanoiltools.com)",
+"cross_check": "https://southeastoverseas.com/solar4.html (страницы 2-4 каталога)"
+},
+{
+"claim": "Turbine Resources International — OEM и aftermarket replacement parts для Solar Saturn, Centaur 40/50, Taurus 60, обменные редукторы и двигатели; сайт периодически недоступен (DNS), данные из кэша поиска",
+"source": "http://turbineresourcesintl.com/parts-sales/ + http://turbineresourcesintl.com/our-services/ (fetch не прошёл — ENOTFOUND; подтверждено сниппетами поиска)"
+},
+{
+"claim": "Antoni International — OEM-независимая поставка ЗИП Solar Saturn/Centaur/Taurus/Mars + раздел Equipment for Sale с турбинами/компрессорами (в CRM КВАНТ уже 4 запроса); сайт в момент проверки отдавал 503",
+"source": "http://www.antoni-intl.com/ (сниппеты поиска; прямой fetch 503)"
+},
+{
+"claim": "Sirgen предлагает полностью восстановленные zero-houred Solar Saturn и Centaur с годовой гарантией, а также машины Taurus, Mars и Titan с малой наработкой, 50 или 60 Гц",
+"source": "http://www.sirgen.com/solargasturbines.html (сайт за JS-проверкой, содержание подтверждено сниппетами поиска)"
+},
+{
+"claim": "Стандартный межремонтный ресурс (TBO) серийных двигателей Solar — 30 000 часов: «this goal was increased to be consistent with Solar's standard 30,000 hour time before overhaul for production engines» (DOE-отчёт по Mercury 50). Практика ТО — циклы по ~10 000 ч, на 30 000 ч полная разборка/оверхол.",
+"source": "https://digital.library.unt.edu/ark:/67531/metadc1014343/ (проверено WebFetch, цитата подтверждена)",
+"cross_check": "https://www.aer.gov.au/system/files/APA%20VTS%20-%20Access%20Arrangement%202023-27%20-%20Business%20Case%20235%20-%20Turbine%20Overhaul%20-%20December%202021.pdf (бизнес-кейс APA VTS: рекомендация OEM — major overhaul на 30 000 ч; PDF скачать не удалось — блокировка, факт по поисковой выдаче)"
+},
+{
+"claim": "Exchange-программа Solar: OEM отгружает >800 обменных двигателей в год из собственного пула, ~80% заказчиков выбирают exchange вместо оверхола своего двигателя, т.к. агрегат возвращается в работу «in as little as two days»; в каждый оверхол вносятся текущие конструктивные улучшения OEM. Это ключевое давление на не-OEM ремонтников: они отвечают собственными пулами обменных двигателей (EthosEnergy, IMMI, ITS) и ценой на 25–50% ниже OEM.",
+"source": "https://www.solarturbines.com/en_US/services/gas-turbine-overhaul.html (сайт Solar блокирует прямой fetch (Akamai 403); цифры зафиксированы из сниппета страницы в поисковой выдаче)",
+"cross_check": "https://immiturbines.com/about-us/ (проверено WebFetch: IMMI гарантирует цены «25% to 50% lower than most prices quoted by the OEM», exchange-юниты «subject to availability»)"
+},
+{
+"claim": "SoLoNOx (DLE) внедрён в 1992 г.; выпущено >3500 турбин с SoLoNOx, >312 млн часов наработки (брошюра 2019 г.). Доступен на Centaur, Taurus, Mars и Titan (машины от 3,5 МВт); на Saturn 20 SoLoNOx не предлагается — там только стандартная камера.",
+"source": "https://s7d2.scene7.com/is/content/Caterpillar/CM20150630-30875-02578 (брошюра DSSOLONOX/0419, PDF извлечён и прочитан)",
+"cross_check": "http://s7d2.scene7.com/is/content/Caterpillar/C10547639 (датащит DSSOLONOX/107 2007 г.: «including the Centaur, Taurus, Mars and Titan gas turbine families», прочитан из PDF)"
+},
+{
+"claim": "Отличие ЗИП DLE (SoLoNOx) от стандартной камеры: SoLoNOx — lean-premix; форсунка состоит из премиксного основного контура (swirler) + пилотной горелки (diffusion/partially-premixed pilot); стабильность на частичных нагрузках обеспечивается пилотным топливом и управлением воздухом (bleed), рабочее окно эмиссий 50–100% нагрузки (1-вальные) / 40–100% (2-вальные). Стандартная камера — диффузионное горение, впрыск воды/пара для NOx не нужен только у DLE. Взаимно НЕ взаимозаменяемые узлы: форсунки, жаровая труба (liner), элементы управления воздухом (bleed shield/valve).",
+"source": "https://www.osti.gov/servlets/purl/1051563 (DOE/PCI отчёт по Taurus 70: «catalytic pilot burner replacing a diffusion flame or partially-premixed pilot in an otherwise DLN combustor»; PDF прочитан)",
+"cross_check": "https://s7d2.scene7.com/is/content/Caterpillar/CM20150630-30875-02578 (DLE 101: премикс до первичной зоны, без воды/пара; окна нагрузок 50–100%/40–100%) + https://www.solarturbines.com/en_US/services/equipment-optimization/system-upgrades/safety-and-sustainability/solonox-upgrades.html (сниппет: «advancements in combustor liner, fuel injector, and bleed shield design, primary zone temperature control»)"
+},
+{
+"claim": "Карта горячего тракта Taurus 60 (оф. спецификация пакета TPS60CSMD/309): кольцевая (annular) камера сгорания, 12 топливных форсунок, факельное (torch) зажигание; 12-ступенчатый осевой компрессор, 2-ступенчатая турбина газогенератора + 2-ступенчатая силовая турбина.",
+"source": "https://d3pcsg2wjq9izr.cloudfront.net/files/28661/download/361630/Taurus60GasTurbinesBrochure.pdf (PDF извлечён, таблица 2 процитирована)"
+},
+{
+"claim": "Mars 100: 14 топливных форсунок SoLoNOx радиально вокруг камеры; снятие одной форсунки занимает у FSR в среднем 2–3 часа; регламент обслуживания форсунок/бороскопии — каждые 5000 часов или ежегодно.",
+"source": "https://www.sandiego.edu/ugresearch/documents/34_ava-boughey.pdf (проект Shiley Marcos School of Engineering с менторами Solar Turbines; PDF прочитан, цитаты подтверждены)"
+},
+{
+"claim": "Жаровые трубы Solar — backside-cooled (охлаждение с тыльной стороны, без плёночных отверстий в зоне горения) с усиленным ТБП-покрытием (40 mil advanced TBC); эта конструкция — производственный стандарт для Centaur 50, Taurus 60/65/70, Mars 100, Titan 130, Titan 250, Mercury 50. Ресурс лайнера рассчитан под 30 000-часовой TBO.",
+"source": "https://digital.library.unt.edu/ark:/67531/metadc1014343/ (DOE-отчёт «Advanced Materials for Mercury 50»; проверено WebFetch)"
+},
+{
+"claim": "Примеры каталожных номеров Solar (горячий тракт/топливо): 127982-100 FUEL INJECTOR ASSY; 127983-100 INJECTOR, DUAL FUEL (номенклатура Saturn/Centaur у стокиста Southeast Overseas). Из запросов эксплуатантов Taurus 60: 1065717-100 SENSOR MASS FLOW METER (газовый расходомер), 1086652-5 COOLER (PCD air cooler kit), 186648-1200/-300 VALVE BALL, 190537-103 VALVE ACTUATOR ASSY (liquid fuel module), 1621079-4 VALVE CAGE, 1783171-4 THERMO CONTROL VALVE, 1859015-1 OIL VALVE CARTRIDGE (маслосистема). Формат PN Solar — числовой 6-7-значный код с суффиксом исполнения через дефис.",
+"source": "https://www.southeastoverseas.com/solar1.html (проверено WebFetch, PN процитированы)",
+"cross_check": "https://www.industrialmarinepower.com/wanted-solar-turbine-taurus-60-gas-turbine-spare-parts-17298/ и https://www.industrialmarinepower.com/gas-turbine-solar--turbines%C2%A0model%C2%A0taurus%C2%A060-spare-parts-25531/ (оба проверены WebFetch)"
+},
+{
+"claim": "EthosEnergy позиционируется как «world's leading independent provider of Solar gas turbine and compressor overhaul services»; оверхол Solar до 15 МВт в Хьюстоне (центр компетенции) и Абердине: Saturn 10, Centaur 40/50, Taurus 60, Mars 90/100, включая все поколения SoLoNOx и Low-BTU, плюс редукторы Centaur 40/50 и Taurus 60 и газовые компрессоры Solar C16/C160, C28, C30; держит пул обменных двигателей (emergency exchanges).",
+"source": "https://ethosenergy.com/services/light-industrial-gas-turbines/solar-light-turbines (получено curl, текст извлечён и процитирован)",
+"cross_check": "https://ethosenergy.com/services/light-industrial-gas-turbines/overhaul-and-repair (получено curl: тот же перечень моделей, Aberdeen + Houston)"
+},
+{
+"claim": "Kian TurboTec (kianturbotec.com) регулярно всплывает в выдаче по ЗИП Solar Centaur/Taurus/Mars — компания иранская, из выборки исключена полностью по правилу задачи.",
+"source": "https://kianturbotec.com/solar-centaur/ (не обрабатывался, исключение по стране)"
+},
+{
+"claim": "Titan 130/250 в не-OEM контуре почти не покрыт: из проверенных независимых только Score Energy (топливные системы/аксессуары) и трейдеры (ITS, Prime Turbine Support) декларируют Titan; полный не-OEM оверхол Titan никто из проверенных не заявляет — по Titan рынок фактически замкнут на OEM exchange.",
+"source": "https://cdn.scoreltd.com/pdf/brochure/Score%20Energy%20brochure%20English%20Rev%201.pdf (PDF прочитан: Solar Centaur/Mars/Taurus/Titan в перечне поддержки топливных систем)",
+"cross_check": "https://www.its-parts.com/services/parts-supply/ (проверено WebFetch: запчасти Saturn–Titan)"
+},
+{
+"claim": "Существует зрелый независимый (non-OEM) MRO-рынок Solar Turbines: EthosEnergy (Хьюстон, Техас) позиционирует себя как «world's leading independent provider of Solar gas turbine and compressor overhaul services» с полным охватом Saturn 10, Centaur 40/50, Taurus 60 (вкл. 7800/7900), Mars 90/100, включая все поколения SoLoNOx и Low-BTU; есть full-load test cell и exchange-двигатели",
+"source": "https://ethosenergy.com/services/light-industrial-gas-turbines/solar-light-turbines",
+"cross_check": "https://www.prnewswire.com/news-releases/wood-group-gts-launches-maintenance-services-for-solar-mars-and-siemens-tornado-and-typhoon-gas-turbines-221264741.html (Wood Group GTS, предшественник EthosEnergy, в 2013 стал первым независимым провайдером сервиса Solar Mars, расширив испытательный стенд в Хьюстоне; парк Mars ~1000 машин)"
+},
+{
+"claim": "Taurus 60 — самый ликвидный сегмент б/у рынка малых ГТУ Solar: одновременно активны минимум 5 лотов в США (SoEnergy Houston, Phoenix Equipment 2 шт., Integrated Energy Networks мобильный, Wabash Power, плюс 4 Taurus у Energy & Industrial Solutions)",
+"source": "https://surplusrecord.com/electrical-power/gas-turbine-generators/solar/",
+"cross_check": "https://www.phxequip.com/equipment/28634/solar-taurus-60-gas-turbine-generator"
+},
+{
+"claim": "Ценовой бенчмарк целого агрегата: мобильный генсет Solar Taurus 60 5200 кВт, 2001 г.в., всего 10 моточасов, 11 кВ/1500 rpm — $3 100 000 (SoEnergy, Хьюстон, активный лот)",
+"source": "https://surplusrecord.com/listing/5200-kw-solar-turbines-tarus-60-mobile-generator-set-both-1500-rpm-11000v-10-hours-2001-637827/"
+},
+{
+"claim": "Полный Level IV overhaul Saturn и Centaur вне OEM доступен в Канаде: S&S Turbine Services (Fort St. John, BC) держит склад компонентов Saturn/Centaur, делает капремонты T-1200…T-4700 и заявляет экономию до 60% против цен OEM-цехов",
+"source": "https://www.ssturbine.com/component/content/article/10-product-lines/20-solar-gas-turbine-services",
+"cross_check": "https://www.ssturbine.com/ («truly independent and economical alternative to OEM», Fort St. John, BC)"
+},
+{
+"claim": "Ремонт рабочих лопаток Solar Taurus 60 (1-я ступень) освоен независимым ремонтником компонентов Liburdi Turbine Services (Канада): входной контроль, разрушающая металлургия, FPI, CT-скан, восстановление по технологии Full Solution Rejuvenation / LPM",
+"source": "https://liburditurbineservices.com/news/hot-section-inspection-of-gas-turbine-blades",
+"cross_check": "https://www.liburditurbineservices.com/ (Solar в списке поддерживаемых платформ)"
+},
+{
+"claim": "Компонентная база по топливной арматуре: Young & Franklin (Ливерпуль, штат Нью-Йорк, с 1918 г.) — изготовитель клапанов; серия YF 8641 — интегрированный газовый топливный клапан, ретрофит-замена гидропривода Y&F, solar loader и butterfly valve на турбинах Solar от Saturn 20 до Mars 100",
+"source": "https://www.power-technology.com/contractors/valves/young2/",
+"cross_check": "https://yf.com/about/ (производитель прецизионной топливной арматуры для энергетики, Liverpool NY, основан в 1918)"
+},
+{
+"claim": "Petrotech (США) выполняет ретрофиты систем управления пакетов Solar: подтверждены product bulletins 08004 (Solar Mars gas turbine generator drive control package) и 94085 (Solar Centaur gas turbine compressor drive control package)",
+"source": "https://petrotechinc.com/wp-content/uploads/2024/07/solar-mars-gen.pdf",
+"cross_check": "https://petrotechinc.com/literature-library-files/gas-steam-turbines/solar-centaur-compressor.pdf"
+},
+{
+"claim": "Обменные двигатели «0 часов после капремонта, tested» по Solar доступны со склада в Альберте (Канада): TMS Ltd. — Taurus T7301S, Centaur T4702S/T4701S/T4502/T4501, Saturn T1602/T1302/T1301/T1202/T1201; плюс new-surplus пакеты Titan 130S 15 МВт и Taurus T7901S 5,67 МВт (50 и 60 Гц)",
+"source": "http://www.lincoln-tms.com/equipment-sales/"
+},
+{
+"claim": "Ценовой ориентир по запчастям: IMMI Turbines (Конро, Техас) гарантирует цены на 25–50% ниже OEM, держит собственный склад по Centaur/Taurus (new/refurbished/used/surplus/reverse-engineered) и делает overhaul/exchange",
+"source": "https://immiturbines.com/about-us/",
+"cross_check": "https://www.power-technology.com/contractors/turbine-cooling/immi-turbines/"
+},
+{
+"claim": "Работа только по каталожным номерам Solar (без чертежей) — стандартная практика независимого рынка: Southeast Overseas публикует открытый каталог тысяч Solar P/N (30621…179889K401B) для Saturn/Centaur/Mercury/Taurus/Mars, а ITS Parts (Румыния) продаёт genuine OEM surplus по PN, декларируя полную независимость от OEM",
+"source": "https://www.southeastoverseas.com/solar1.html",
+"cross_check": "https://www.its-parts.com/services/parts-supply/"
+},
+{
+"claim": "В выдаче по сервису Solar активно продвигается Kian TurboTec (офис в Dubai Silicon Oasis) — компания иранского происхождения; исключена из базы по правилу «Иран — полностью исключить»",
+"source": "результаты поиска kianturbotec.com (Solar Taurus/Centaur/Mars overhaul); в базу не включена"
+},
+{
+"claim": "EthosEnergy (Хьюстон, Техас — «Center of Excellence» по лёгким турбинам) выполняет полный не-OEM overhaul и обмен (exchange) Solar: Saturn 10, Centaur 40, Centaur 50, Taurus 60, Mars 90, Mars 100 — включая все поколения SoLoNOx и Low BTU, плюс редукторы Centaur 40/50 и Taurus 60 (1500/1800 об/мин) и компрессоры Solar C16/C160, C28, C30. Titan в перечне overhaul-моделей отсутствует.",
+"source": "https://ethosenergy.com/services/light-industrial-gas-turbines/solar-light-turbines (текст страницы получен напрямую: «Our comprehensive overhaul capabilities encompass... Saturn 10, Centaur 40, Centaur 50, Taurus 60, Mars 90, Mars 100 including all generations of SoLoNOx...»)",
+"cross_check": "https://ethosenergy.com/our-locations/houston-light-turbines — Хьюстонская площадка: full-load testing Mars/Taurus/Centaur/Saturn, SoLoNOx emissions testing, rotor balancing"
+},
+{
+"claim": "В скоуп овер-хола EthosEnergy входит балансировка ротора и NDE-инспекция: «complete teardown, NDE inspection, dimensional verification, rotor balancing, component repair or replacement» — подтверждено страницей продажи перебранных Centaur 40.",
+"source": "https://ethosenergy.com/parts-and-equipment/solar-centaur-40-gas-turbine (текст страницы получен напрямую)",
+"cross_check": "https://ethosenergy.com/services/light-industrial-gas-turbines/overhaul-and-repair"
+},
+{
+"claim": "Score Energy (уже в базе КВАНТ): по брошюре поддерживает Solar Centaur, Mars, Taurus, Titan в части топливных систем, аксессуаров и вспомогательных агрегатов (форсунки, клапаны, регуляторы, насосы, стартеры, датчики/жгуты) + компонентный ремонт «по широкой линейке RR/GE/Siemens/Solar»; DLE/DLN «Centre of Excellence»; тест-селл GLEN до 60 МВт; единственный вне Сев. Америки «full service» провайдер Woodward по механическим изделиям. Полевые центры: Aberdeenshire (UK), Sanford NC (US), Dubai (UAE), Maracaibo, Kuala Lumpur; склад запчастей >$30 млн.",
+"source": "https://cdn.scoreltd.com/pdf/brochure/Score%20Energy%20brochure%20English%20Rev%201.pdf (стр. 5-6: таблица Solar: Centaur, Mars, Taurus, Titan; стр. 11-14)",
+"cross_check": "https://www.score-group.com (бренд-сайт группы, указан в брошюре)"
+},
+{
+"claim": "Компания с названием «Quality Turbine Service» как специализированный Solar-шоп поиском НЕ подтверждается — по всем запросам выпадают EthosEnergy, IMMI, GLM, S&S и др. Вероятно, искажённое название.",
+"source": "Поиск \"Quality Turbine Service\" Solar turbine overhaul Centaur (17.08.2026) — точного совпадения нет"
+},
+{
+"claim": "Alba Power (куплена Sulzer в 2019) — специалист по Rolls-Royce Avon/Olympus/RB211 и Pratt & Whitney аэродеривативам, НЕ по Solar. Как канал по Solar не годится; MTU Maintenance в Solar-выдаче также не фигурирует (профиль — GE LM).",
+"source": "https://www.sulzer.com/en/shared/news/190701-project-aero («field service, inspection, repair and overhaul for Rolls Royce (Avon, Olympus, RB211), Pratt & Whitney...»)",
+"cross_check": "https://albapower.com/"
+},
+{
+"claim": "Kian TurboTec — иранский провайдер капремонта Solar Centaur/Solar Turbines — ИСКЛЮЧЁН из выборки по правилу «Иран исключить полностью» (регулярно всплывает в выдаче по запросам Solar Centaur overhaul).",
+"source": "https://kianturbotec.com/solar-centaur/"
+},
+{
+"claim": "ПРЕДУПРЕЖДЕНИЕ: rathix.com («Rathix Automation, Houston») дословно копирует текст страницы EthosEnergy про Solar (вплоть до «world's leading independent provider...», список Mars 100/Taurus 60/Centaur 40/50/Mars 90/Saturn 10). Признаки сайта-клона/посредника — в базу не вносить без ручной проверки.",
+"source": "https://rathix.com/services/light-industrial-gas-turbines/solar-light-turbines.html (сравнение с https://ethosenergy.com/services/light-industrial-gas-turbines/solar-light-turbines)"
+},
+{
+"claim": "Turbine Efficiency Group (Линкольн, UK; сервис Saturn/Centaur + Siemens SGT) в декабре 2018 купила американскую Gas Turbine Applications Inc (Калера, Оклахома). На 17.08.2026 домен turbine-efficiency.co.uk не резолвится (ENOTFOUND) — статус группы требует проверки перед контактом; GTA как самостоятельный шоп — рабочая зацепка.",
+"source": "https://www.powermag.com/press-releases/gas-turbine-applications-inc/ («GTA... independent service provider specialising in the Saturn and Centaur... acquired by Turbine Efficiency Group, December 2018»)",
+"cross_check": "DNS-проверка turbine-efficiency.co.uk 17.08.2026: getaddrinfo ENOTFOUND"
+},
+{
+"claim": "IMMI Turbines (Конро, Техас, с 1999): овер-холы и обмены Solar Saturn (T3000), Centaur T4000/T4500/T4700, Taurus 60/70 + Ruston; обменные газогенераторы (в т.ч. Centaur single & split shaft), собственный тест-стенд под нагрузкой до 5 МВт, склад запчастей, цены «на 25-50% ниже OEM-квот».",
+"source": "https://immiturbines.com/about-us/ (модели Saturn 10/20, Centaur 40/50, Taurus 60/70; load test 5 MW; sales@immiturbines.com)",
+"cross_check": "https://www.power-technology.com/contractors/turbine-cooling/immi-turbines/ (Saturn, T3000, Centaur, T4000, T4500, T4700, Taurus, T60, T70; Conroe TX; exchange engines)"
+},
+{
+"claim": "S&S Turbine Services (Форт-Сент-Джон, Британская Колумбия, Канада): не-OEM овер-хол Solar Saturn и Centaur «от T-1200 до T-4700», level IV поддержка, полевой сервис, склад компонентов Saturn/Centaur, услуги динамической балансировки роторов, собственный тест-селл.",
+"source": "https://www.ssturbine.com/component/content/article/10-product-lines/20-solar-gas-turbine-services (текст получен напрямую: «contact us for your T-1200, to T-4700 overhaul requirements», «Dynamic Rotor Balancing Services»)",
+"cross_check": "https://www.cossd.com/biz/5450/s-s-turbine-services (Fort St John, BC)"
+},
+{
+"claim": "TS&S (Turbine Services & Solutions, группа Sanad/Mubadala, аэропорт Абу-Даби) запустила независимую (первую собственную, вне OEM-сети) линию R&O газогенераторов Solar Centaur — hot end и cold end drive версии, с тест-стендом и доступными zero-time обменными юнитами.",
+"source": "https://www.sanad.ae/archive/turbine-services-solutions-launch-uae-centaur-gas-turbine-overhaul-facility/ («independent repair and overhaul (R&O) facility for Centaur... zero-time exchange units available»)"
+},
+{
+"claim": "Liburdi Turbine Services (Дандас, Онтарио + Дэвидсон, Сев. Каролина) ведёт компонентный ремонт горячей части по Solar: в списке двигателей — Saturn, Centaur 40/50, T60 (Taurus 60), Mars, Mercury; фирменные технологии LPM (порошковая наплавка), автоматизированная сварка, CT-инспекция лопаток 1-й ступени Taurus 60 с оценкой остаточного ресурса.",
+"source": "https://www.liburditurbineservices.com/turbine-engines-we-repair/all-gas-turbine-engines/all-engines (Solar: Centaur 40/50, MARS, Mercury, Saturn, T60)",
+"cross_check": "https://www.liburditurbineservices.com/news/gas-turbine-repair-articles (кейс hot section inspection лопаток Solar T60 st.1: visual/metallurgical/dimensional/CT)"
+},
+{
+"claim": "NGT Gasturbinentechnik GmbH & Co. KG (Мёрс, Германия) — независимый немецкий сервис Solar: zero-hour турбины, major overhaul, обслуживание и инспекции Centaur 40/50 и Taurus 60; выступает VAR-партнёром Valmet по замене САУ Solar-агрегатов.",
+"source": "https://www.valmet.com/insights/articles/automation/success-in-the-german-solar-gas-turbine-market/ («NGT offers full service, such as zero-hour turbines, major overhaul... for the Centaur 40 and 50, as well as Taurus 60»)",
+"cross_check": "http://www.ngt-gasturbinentechnik.com/ (линейка услуг «Solar Gasturbinen», Zechenstr. 68, 47443 Moers; info@ngt-gasturbinentechnik.com)"
+},
+{
+"claim": "GLM Energy Systems (Кенай, Аляска): не-OEM поддержка Solar Saturn T1200 и Centaur T4500 — полевой сервис, переоблопачивание компрессора и турбины, ремонт сопловых аппаратов с покрытиями, обменные юниты, изготовление/закупка компонентов, полные скиды под ключ.",
+"source": "https://www.glmenergyllc.com/glm-turbine-solar.php (Saturn T1200, Centaur T4500; re-blading; nozzle repair and coatings; exchanges; 420 N. Willow St., Kenai, AK; contacts@glmenergyllc.com)"
+},
+{
+"claim": "Wood Group GTS (предшественник EthosEnergy по лёгким турбинам) ещё в 2013 публично запускал независимое ТО Solar Mars — линия не-OEM поддержки Solar в Хьюстоне имеет более чем десятилетнюю историю.",
+"source": "https://www.prnewswire.com/news-releases/wood-group-gts-launches-maintenance-services-for-solar-mars-and-siemens-tornado-and-typhoon-gas-turbines-221264741.html"
+},
+{
+"claim": "EthosEnergy (Хьюстон, США) — крупнейший независимый провайдер капремонта Solar: обслуживает Saturn 10, Centaur 40, Centaur 50, Taurus 60, Mars 90 и Mars 100, делает overhaul + exchange-двигатели на своей площадке в Хьюстоне, есть онлайн-поиск по базе Solar-запчастей",
+"source": "https://ethosenergy.com/services/light-industrial-gas-turbines/solar-light-turbines (проверено WebFetch/curl 17.08.2026, текст FAQ страницы)"
+},
+{
+"claim": "IMMI Turbines (Conroe, Техас) держит склад Solar-ЗИП: exchange топливные регуляторы (газ/жидкое топливо), black boxes, сервоприводы, термопары, компрессорные лопатки, горячий тракт, уплотнения, роторы и целые скиды; модели Saturn 10/20 (T3000), Centaur 40/50 (T4000/T4500/T4700), Taurus 60/70; котировки за 24-48 ч, цены заявлены на 25-50% ниже OEM",
+"source": "https://immiturbines.com/about-us/ (WebFetch)",
+"cross_check": "https://www.power-technology.com/contractors/turbine-cooling/immi-turbines/ (WebFetch)"
+},
+{
+"claim": "Heriss Corporation (Канада) — дистрибьютор Solar-ЗИП с инвентарём 4000+ позиций: Saturn 10/20 (включая новые и zero-hour двигатели), Centaur 4500/50 (± SoloNox), Taurus 60/65/70; публикует Solar Parts List и лист доступного инвентаря; также ЗИП компрессоров Solar C-160…C-306 и редукторов Philadelphia",
+"source": "https://heriss.com/ps/solar/ (curl, полный текст страницы)",
+"cross_check": "https://www.energy-xprt.com/companies/heriss-corporation-94783 (профиль в каталоге, найден поиском)"
+},
+{
+"claim": "Southeast Overseas, Inc. (Sarasota, Флорида) публикует открытый 4-страничный лист каталожных номеров Solar (диапазон PN 30621 — 179889K401B: клапаны, реле, датчики, насосы, GOVERNOR ASSY 1016093K100B и т.д.) для Saturn, Centaur, Mercury, Taurus, Mars; работают по схеме сорсинга под запрос",
+"source": "https://www.southeastoverseas.com/solar1.html (curl, извлечён текст PN-листа; контакт roy.pandel@titanoiltools.com)"
+},
+{
+"claim": "Gas Turbine Applications / GTA (Calera, Оклахома) специализируется на overhaul/repair/testing именно Solar-турбин и ведёт открытую базу-lookup Solar PN; часть позиций поставляется как refurbished или аналог не-OEM изготовителей",
+"source": "https://www.gtaturbines.com/gta-turbine-parts-lookup.php (WebFetch)"
+},
+{
+"claim": "NNG Energy (Стамбул + цех в Ялова, Турция) декларирует экспертизу именно по Solar: Taurus 60, Taurus 70, Centaur 50, Mars 100 и Titan 130 — рефурбишмент, поставка, package assembly, core engine services, 60+ поставленных турбин. Единственный найденный турецкий игрок с прямым покрытием Titan 130 (наш топ-спрос)",
+"source": "https://nngenergy.com/what-we-offer/gas-turbines/ (WebFetch)"
+},
+{
+"claim": "TFS = Turbine Field Solutions (порт Веракрус, Мексика; 200+ специалистов, офисы в т.ч. в Дубае) держит оснастку под Solar Taurus 60 и центробежные компрессоры Solar; дивизион TFS Aero — прецизионная CNC-механообработка, металлургическая диагностика и MRO компонентов",
+"source": "https://mexicobusiness.news/aerospace/news/tfs-deploys-worlds-first-siemens-sgt-400-turbine-test-bench (WebFetch)"
+},
+{
+"claim": "ITS / Industrial Turbine Services (Балш, Румыния) — глобальный поставщик OEM-surplus и 'engineered' (аналоговых) запчастей на Solar Saturn, Centaur, Taurus, Mars и Titan (+GE, Ruston/Siemens)",
+"source": "https://www.its-parts.com/services/parts-supply/ (WebFetch)"
+},
+{
+"claim": "Al Waseet Oil Equipment Trading (Абу-Даби, ОАЭ, ISO 9001) — 30+ лет поддержки Solar Saturn и Centaur (также P&W, GE, Ruston); держит инвентарь ЗИП пакетов и аксессуаров (TDI стартеры, ASCO, AAF/Donaldson фильтры, SKF и пр.)",
+"source": "https://www.alwaseetoil.com/ (curl, текст сайта; sales@alwaseetoil.com)"
+},
+{
+"claim": "TURBINE.PARTS B.V. (Нидерланды, +31 43 — р-н Маастрихта) — трейдер hard-to-find/obsolete/discontinued позиций для газотурбинных пакетов; публикует linecard из десятков изготовителей компонентов, из которых собраны пакеты Solar (AMOT, Ametek, Auxitrol, Bently Nevada, CCS, Det-Tronics, Fenwal, JASC, Kavlico, Meggitt/Vibro-Meter, Metrix, Moog, PECC и др.) — канал добора обвязки по PN",
+"source": "https://turbine.parts/ (curl, полный linecard)",
+"cross_check": "http://turbine.parts/stock/ (WebFetch)"
+},
+{
+"claim": "VG Engineering (Gourdon, Шотландия) ведёт exchange-программу по всем пяти семействам Solar — Saturn, Centaur, Taurus, Mars, Titan: рефурбишмент до zero-hour, сорсинг компонентов, поддержка контрольных систем",
+"source": "https://vg-eng.com/gas-turbine-services/ (WebFetch)"
+},
+{
+"claim": "S&S Turbine Services (Fort St. John, BC, Канада) — независимый MRO с полным level IV support по Saturn и Centaur и селективным складом компонентов для их обслуживания и капремонта",
+"source": "https://www.ssturbine.com/component/content/article/10-product-lines/20-solar-gas-turbine-services (curl)"
+},
+{
+"claim": "Shenzhen Blaze Turbine (Шэньчжэнь, КНР) — изготовитель-реверс-инжинирер компонентов контрольных систем (PN 50377-1, 919086C1 и др.), но прямо требует чертежи или образец для reverse engineering — несовместимо с нашим кейсом 'только каталожные номера' и с правилом владельца о китайском реверсе",
+"source": "https://turbineblade.net/solar-turbine-spare-parts/ (WebFetch; peter@turbineblade.net)"
+},
+{
+"claim": "Hangzhou Gas Turbine Parts Co. (HGTP, Ханчжоу) заявляет поставку ЗИП Solar Mars, Mercury, Taurus, Titan (рабочие колёса, лопатки, сопловые аппараты, камеры сгорания, датчики, насосы, стартеры, клапаны); сайт gas-turbine-parts.com из нашего региона отдаёт 503 (гео/анти-бот) — контент подтверждён только сниппетами индекса",
+"source": "https://gas-turbine-parts.com/?a=index&aid=265&c=View&m=home и https://gas-turbine-parts.com/?a=index&aid=60&c=View&m=home (WebFetch → 503; описание из поискового индекса 17.08.2026)"
+},
+{
+"claim": "По 'Wuxi Weishi' и 'CSTC Shandong' публичных следов работы с Solar не найдено (профильных сайтов/страниц нет в выдаче) — оценивать этих контрагентов можно только по нашей Bitrix-истории; не путать Wuxi Weishi с Wuxi Turbine Blade Co. (WTB, Shanghai Electric — кузнечный изготовитель лопаток под GE/Siemens, без упоминаний Solar)",
+"source": "WebSearch 17.08.2026: запросы \"Wuxi Weishi turbine parts\", \"CSTC Shandong Solar turbine parts\" — релевантных корпоративных страниц не найдено; WTB: https://www.turblade.com/en/index.html"
+},
+{
+"claim": "Сайты Antoni International (antoni-intl.com) и peri-parts.com на момент проверки закрыты анти-ботом (503/Cloudflare); их Solar-номенклатура (Antoni: Saturn/Centaur/Taurus/Mars, OEM-independent, equipment for sale; PeriParts: онлайн-каталог Solar с прайс-листами) подтверждается только сниппетами поискового индекса",
+"source": "WebFetch 17.08.2026: https://www.antoni-intl.com/ → 503; https://www.peri-parts.com/top-selling-brands/gas-and-oil-industry/solar-turbines → 403; сниппеты Google-индекса тех же URL"
+},
+{
+"claim": "Sirgen = Surplus Generation Equipment, LLC (США, брокер): предлагает полностью капиталенные zero-hour Solar Saturn и Centaur с годовой гарантией, малоресурсные Taurus, Mars и Titan (50/60 Гц) и запчасти Solar",
+"source": "http://www.sirgen.com/solargasturbines.html (curl, текст страницы)"
+},
+{
+"claim": "One Power Services (Сингапур, WhatsApp +65-8444-1440) позиционирует направление 'Solar Turbine Parts and Services' (плюс GE LM): парts, ремонты аксессуаров/компонентов/электрики, overhaul-exchange, test cell — конкретные модели Solar на сайте не раскрыты",
+"source": "https://onepowerservices.com/products/solar-turbine-parts-and-services (WebFetch)",
+"cross_check": "https://onepowerservices.com/about-us (WebFetch)"
+},
+{
+"claim": "IER — International Energy Resources (Jebel Ali FZ, Дубай) — MRO/поставщик по лёгким индустриальным и аэропроизводным ГТ, в списке поддерживаемых OEM прямо указан 'Solar Cat'; запчасти, core engines, модули; 30+ лет опыта",
+"source": "https://ierfzco.com/energy/ (WebFetch; sales@ierfzco.com)"
+},
+{
+"claim": "Precision Asset Solutions (Дели/Гургаон + Мумбаи, Индия) — трейдер-снабженец по ГТ-запчастям, в списке брендов Solar Turbines (также Siemens, GE, RR, Mitsubishi, Ansaldo); закупает genuine OEM и совместимые позиции через дистрибьюторские сети",
+"source": "https://precisionasset.in/gas-turbine-spares/ (WebFetch; info@precisionasset.in)"
+},
+{
+"claim": "Гипотеза «КТК/CPC — Solar Taurus/Mars на НПС» НЕ подтверждается: по Интерфаксу на НПС Тенгиз—Новороссийск стоят ГТУ Siemens, и с июня 2025 КТК начал программу отказа от ГТУ в пользу внешнего электроснабжения (электроприводы Транснефти) именно из-за зависимости от импортных запчастей; замещение трёх ГТ-станций снижает проектную мощность с 81,5 до 65,5 млн т/год",
+"source": "https://interfax.com/newsroom/top-stories/105693/",
+"cross_check": "https://crudeaccountability.org/the-caspian-pipeline-consortium-russian-and-western-accountability-in-the-oil-and-gas-sector-during-wartime/"
+},
+{
+"claim": "Caterpillar в 2022 приостановил операции в РФ и завершает выход продажей российских «дочек» ~за 2,6 млрд руб.; сделка охватывает Caterpillar Eurasia LLC, Caterpillar Distribution International LLC, ООО «Солар Тербинс СНГ» (Solar Turbines CIS LLC) и Electro-Motive; по отраслевым данным Solar Turbines CIS какое-то время продолжала сервис — т.е. OEM-канал ЗИП в РФ закрыт, ниша занята параллельным импортом",
+"source": "https://www.eureporter.co/business/2025/12/22/caterpillars-lingering-russia-exposure-could-raise-questions-about-potential-ofac-sanctions-violations-undisclosed-losses-and-legal-challenges/",
+"cross_check": "https://leave-russia.org/caterpillar"
+},
+{
+"claim": "Пакетированием и aftermarket для региона EAME (вкл. бывш. СНГ) занимается Solar Turbines Europe S.A., Avenue Jean Mermoz 5, Gosselies (Бельгия) — закупает двигатели Solar, пакетирует и продаёт как интегрированные системы; сервисные юрлица EAME: Solar Turbines Switzerland Sagl (Riazzino) и Solar Turbines EAME s.r.o. (Прага)",
+"source": "https://us.kompass.com/c/solar-turbines-switzerland-sagl/ch042220/",
+"cross_check": "http://s7d2.scene7.com/is/content/Caterpillar/C10547637"
+},
+{
+"claim": "EthosEnergy (мастерская Хьюстон, США) выполняет независимый overhaul и обменный фонд (exchange engines) по лёгким индустриальным ГТУ Solar: Saturn 10, Centaur 40, Centaur 50, Taurus 60, Mars 90, Mars 100",
+"source": "https://ethosenergy.com/services/light-industrial-gas-turbines/solar-light-turbines",
+"cross_check": "https://www.google.com/search?q=EthosEnergy+Solar+light+turbines+Mars+100+Taurus+60+Centaur+overhaul+Houston"
+},
+{
+"claim": "Score Energy Ltd (Абердиншир, Шотландия) — независимый специалист по топливным системам/аксессуарам ГТУ, в т.ч. Solar Centaur, Mars, Taurus, Titan (форсунки, клапаны, регуляторы, насосы, IGV/VSV актуаторы, стартеры); единственный вне Северной Америки одобренный «full service» провайдер по механическим продуктам Woodward для индустриальных турбин",
+"source": "https://cdn.scoreltd.com/pdf/brochure/Score%20Energy%20brochure%20English%20Rev%201.pdf",
+"cross_check": "https://www.score-group.com/"
+},
+{
+"claim": "S&S Turbine Services Ltd (Fort St. John, BC, Канада) — независимый MRO с поддержкой Level IV по Solar Saturn и Centaur (капремонты T-1200…T-4700), собственным складом ЗИП Saturn/Centaur и полевым сервисом",
+"source": "https://www.ssturbine.com/component/content/article/10-product-lines/20-solar-gas-turbine-services",
+"cross_check": "https://ca.linkedin.com/company/s%26s-turbine-services-ltd."
+},
+{
+"claim": "Petrotech Inc. (Новый Орлеан, США) серийно предлагает ретрофит-пакеты управления для Solar Centaur (компрессорный привод — бюллетень 94085, генераторный привод — 00005): замена штатных мех/гидро/пневмо регуляторов на PLC (Allen-Bradley/GE/Siemens/Modicon), включая апгрейд топливных клапанов, IGV и bleed-клапанов",
+"source": "https://petrotechinc.com/wp-content/uploads/2024/07/solar-centaur-compressor-1.pdf",
+"cross_check": "https://petrotechinc.com/wp-content/uploads/2024/07/solar-centaur-generator.pdf"
+},
+{
+"claim": "Precision Engine Controls Corporation (PECC, Сан-Диего; с 2014/15 в составе Meggitt) — изготовитель полностью электрических газовых дозирующих клапанов (VG1.5 — >8000 шт. в эксплуатации, серии XVG/RGV), bleed-клапанов AVB и актуаторов ACT2000 для индустриальных ГТУ 1–100 МВт лёгкого/среднего класса — стандартный источник клапанов для машин класса Solar (на самой странице Meggitt бренд Solar прямо не назван)",
+"source": "https://www.meggittvalves.com/precision-engine-controls-corporation/",
+"cross_check": "https://news.thomasnet.com/companystory/precision-engine-controls-retires-pioneering-vg1-5-fuel-metering-valve-544729"
+},
+{
+"claim": "Kato Engineering (Nidec, Манкейто, США) производит синхронные генераторы для газотурбинных ГПА/генсетов 100 кВт–25 МВт (диапазон точно накрывает Saturn—Titan 130); тысячи машин Kato работают на FPSO и платформах — классический пакетируемый генератор для турбинных агрегатов",
+"source": "https://www.power-technology.com/contractors/energy-and-utilities/kato/",
+"cross_check": "https://www.nidec.com/en/katoengineering/product/technology/"
+},
+{
+"claim": "Генераторы Ideal Electric (Мансфилд, Огайо) встречаются в б/у генсетах Solar Centaur 40 на вторичном рынке (агрегаты продаются как «Centaur 40 Solar Turbine / Ideal Electric equipment») — Ideal Electric Power Co. жива и выпускает/ремонтирует генераторы 0,4–25 МВт; прямых свежих пруфов пакетирования новых Solar с Ideal нет",
+"source": "https://www.machinio.com/manufacturer/centaur-40-solar-turbine",
+"cross_check": "https://www.machinio.com/manufacturer/solar-centaur"
+},
+{
+"claim": "Kian TurboTec (kianturbotec.com) активно продвигает major overhaul Solar Taurus/Centaur/Mars и поставку ЗИП, но не раскрывает юрисдикцию и адрес (только e-mail); косвенные признаки иранского происхождения (имя, разработчик сайта) — по правилу «Иран исключить» в базу не включён, контакт не рекомендуется",
+"source": "https://kianturbotec.com/contact/",
+"cross_check": "https://kianturbotec.com/solar-turbines/"
+},
+{
+"claim": "Вторичный рынок США ликвиден по генсетам Solar: на Surplus Record/Phoenix Equipment/Cat Used одновременно доступны Centaur 40 (2×3,0 МВт, капремонт 2020, не эксплуатировались), Taurus 60 (2×5,2 МВт, 2001 г., генератор после ремонта) и мобильный Taurus 60 за $1,3 млн — источник доноров и агрегатных узлов под каталожные номера Solar",
+"source": "https://surplusrecord.com/electrical-power/gas-turbine-generators/solar/",
+"cross_check": "https://www.phxequip.com/equipment/28634/solar-taurus-60-gas-turbine-generator"
+},
+{
+"claim": "IMMI Turbines (Техас, США) — независимый интегратор/сервис Solar: реконденшн и turnkey-установка компрессорных и генераторных агрегатов Saturn и Centaur, поставка 2× генсетов Taurus 60 (Belle Chasse, LA), выполнял «multiple Saturn and Centaur overhauls» в Дубае — опыт вне США подтверждён",
+"source": "https://immiturbines.com/projects/",
+"cross_check": "https://www.power-technology.com/contractors/turbine-cooling/immi-turbines/"
+},
+{
+"claim": "САУ Solar — Turbotronic (версии до Turbotronic 5, актуальная OEM-платформа — Turbotronic 6); Solar предлагает ретрофит старых релейных систем на PLC-базу. TT5 позиционируется как модернизация с контролем доступа/кибербезопасностью.",
+"source": "https://www.solarturbines.com/en_US/services/equipment-optimization/system-upgrades.html",
+"cross_check": "https://s7d2.scene7.com/is/content/Caterpillar/CM20170531-57000-44523 (брошюра Caterpillar 'TURBOTRONIC 5')"
+},
+{
+"claim": "Petrotech (New Orleans, США) выпускает non-OEM пакеты управления для Solar Centaur: бюллетени 94085 (compressor drive, пакет 9500-SC-COMP), 00005 (generator drive), 00013 (pump drive). Пакет заменяет старые мех./гидравл./пневмо регуляторы топлива Centaur; аппаратно-независим — PLC Allen-Bradley, GE, Siemens/TI, Modicon; опции: замена топливного и ускорительного клапанов, приводов ВНА и антипомпажных клапанов, виброзащиты. Контакт info@petrotechinc.com.",
+"source": "https://petrotechinc.com/wp-content/uploads/2024/07/solar-centaur-compressor-1.pdf (PDF прочитан полностью)",
+"cross_check": "https://petrotechinc.com/wp-content/uploads/2024/07/solar-centaur-generator.pdf"
+},
+{
+"claim": "Young & Franklin 8641 Series (интегрированный газовый клапан) в паре с цифровым контроллером YF 1100D300 — прямой ретрофит гидравлического актуатора, butterfly- и loader-клапанов на Solar Centaur, Saturn, Taurus и Mars; управляется любым современным контроллером по замкнутому контуру (известная Cv-кривая).",
+"source": "https://www.power-technology.com/products/electrically-actuated-gas-control-valves/ (верифицировано WebFetch)",
+"cross_check": "https://yf.com/products/yf-8641-series-integrated-natural-gas-fuel-control-valves/"
+},
+{
+"claim": "Пневмостартеры TDI TurboTwin T100-CS — прямая замена сдвоенных пластинчатых/турбинных стартеров Ingersoll-Rand и Hilliard на двигателях Solar Centaur и Taurus (крепится на корпус привода агрегатов, 35 фунтов, +25% мощности); линейка T100-MS/T100-V/T100-B для газотурбинных двигателей.",
+"source": "https://www.tdi-airstarter.com/air-starters/t100-cs",
+"cross_check": "https://www.rowlandcompany.com/wp-content/uploads/2018/07/T100-MS-Air-Starter-IOM.pdf (IOM 'T100-MS TURBOTWIN Gas Turbine Engine Air Starter')"
+},
+{
+"claim": "Генераторы на пакетах Solar — Kato Engineering (Nidec): Taurus 70 комплектуется Kato 8000 kVA / 6400 kW 13.8 кВ, Centaur 50 — Kato 4.25 MW brushless synchronous, модель A255800000. Т.е. по генераторной части Solar-пакетов работать можно напрямую с Kato.",
+"source": "https://www.phxequip.com/equipment/28974/solar-taurus-70-gas-turbine-generator (верифицировано WebFetch)",
+"cross_check": "https://www.phxequip.com/equipment/8978/solar-centaur-50-gas-turbine-generator (верифицировано WebFetch)"
+},
+{
+"claim": "Редуктор генераторного привода Solar Mars — эпициклический Allen Gears ASG 32; Allen Gears (ныне Baker Hughes, вместе с Lufkin) имеет центр компетенции по эпициклическим редукторам, делает апгрейды и полевой сервис чужих редукторов.",
+"source": "https://www.scribd.com/document/678104445/a356a (Allen Gearbox Manual for Solar Turbines, ASG 32)",
+"cross_check": "https://www.bakerhughes.com/lufkin-gears-allen-gears-gearboxes-gear-couplings"
+},
+{
+"claim": "EthosEnergy выполняет overhaul/exchange лёгких индустриальных ГТУ Solar: Mars 100, Mars 90, Taurus 60, Centaur 50, Centaur 40, Saturn 10 — цех в Хьюстоне, Техас. (Страница дважды отдавала 503 при WebFetch; данные из поисковой выдачи по этому URL — при контакте перепроверить.)",
+"source": "https://ethosenergy.com/services/light-industrial-gas-turbines/solar-light-turbines"
+},
+{
+"claim": "Turbotronic ранних версий построен на Allen-Bradley (PLC-5 и далее ControlLogix); PLC-5 снят Rockwell с производства — obsolete-платы держат независимые стокисты (Classic Automation: тестированные PLC-5 с 2-летней гарантией + ремонт).",
+"source": "https://www.classicautomation.com/parts/allen-bradley/allen-bradley-plc-5 (верифицировано WebFetch)",
+"cross_check": "https://www.plantservices.com/energy/power-generation/article/11336669/what-works-turbine-retrofit-adds-remote-monitoring-plant-services (ретрофиты турбин на Allen-Bradley ControlLogix/FLEX I/O)"
+},
+{
+"claim": "Precision Engine Controls Corp. (PECC, Сан-Диего, ныне в составе Meggitt) — производитель полностью электрических топливных дозирующих клапанов VG-серии для индустриальных ГТУ (>8000 клапанов в эксплуатации, 34 года выпуска VG1.5); новое поколение — eXVG. Штатно применялись на малых индустриальных ГТУ класса Solar.",
+"source": "https://turbinevalves.com/precision/",
+"cross_check": "https://www.meggittvalves.com/precision-engine-controls-corporation/"
+},
+{
+"claim": "Сменные фильтры КВОУ под корпуса любых брендов (Donaldson, Braden, AAF, Camfil Farr) выпускает Nederman Pneumafil — т.е. картриджи для Solar-пакетов можно брать не у изготовителя корпуса. Camfil (CamGT, TurboPulse/CamPulse, Hi-Flo, CamClose) и Donaldson (в т.ч. 'small turbines', retrofit-программа) — основные изготовители фильтров/КВОУ.",
+"source": "https://www.nedermanmikropul.com/en/Products/Gas-Turbine-Inlet-Filters",
+"cross_check": "https://www.camfil.com/en/industries/energy-and-power-systems/gas-turbines-and-air-compressors + https://www.donaldson.com/en-us/gas-turbine/ (оба верифицированы WebFetch)"
+},
+{
+"claim": "Kian TurboTec (kianturbotec.com, 'Solar Mars gas turbine upgrades') — иранская компания: ИСКЛЮЧЕНА из выдачи согласно правилу (Иран полностью исключить).",
+"source": "https://kianturbotec.com/solar-mars-gas-turbine-upgrades/"
+},
+{
+"claim": "Маслоохладители/АВО смазки для турбопакетов: бренды Chart Industries (Hudson Products, Air-X-Changers, Smithco, Hammco, Cooler Service) покрывают lube oil/turbine coolers и обслуживают АВО любых производителей (цех Beasley, TX) — рабочий канал под замену теплообменников Solar-пакетов.",
+"source": "https://www.chartindustries.com/Products/Air-Cooled-Heat-Exchangers",
+"cross_check": "https://www.chartindustries.com/Businesses-Brands/Hudson"
+}
+],
+"companies": [
+{
+"name": "EthosEnergy (Light Turbines, Houston)",
+"site": "https://ethosenergy.com/services/light-industrial-gas-turbines/solar-light-turbines",
+"what": "Крупнейший независимый (не-OEM) центр полного овер-хола и обмена Solar: Saturn 10, Centaur 40/50, Taurus 60, Mars 90/100 (все поколения SoLoNOx и Low BTU), редукторы Centaur/Taurus, компрессоры Solar C16/C160, C28, C30. Full-load тест (в т.ч. эмиссии SoLoNOx), балансировка роторов, обменные двигатели со склада (Centaur 40 — немедленный exchange). Titan не покрывают.",
+"relation": "независимый MRO + обменный фонд (не OEM)",
+"rank": 1,
+"country": "США (Хьюстон, Техас)",
+"models": [
+"Saturn 20",
+"Centaur 40",
+"Centaur 50",
+"Taurus 60",
+"Mars 90",
+"Mars 100",
+"Saturn 10",
+"Centaur 40/50",
+"Mars 90/100"
+],
+"evidence": "https://ethosenergy.com/services/light-industrial-gas-turbines/solar-light-turbines",
+"ask": "nomen",
+"evidence2": "https://ethosenergy.com/services/light-industrial-gas-turbines/overhaul-and-repair",
+"check": "confirmed",
+"check_seen": "<title>Solar Turbine Overhaul, Repair & Maintenance | EthosEnergy</title>; на странице: \"Saturn 10 Gas Turbine Services\", \"Centaur 40 & 50 Gas Tur[bine]\", \"Taurus 60 Gas Turbine Services\", \"Mars 90 & 100 Gas Turbine Services\", \"Mars 90, Mars 100\"",
+"tier": "indep_proven",
+"comps": [
+"камера: жаровые, форсунки, SoLoNOx",
+"ротор, подшипники, редукторы",
+"двигатели и агрегаты целиком"
+],
+"comp": "камера: жаровые, форсунки, SoLoNOx"
+},
+{
+"name": "IMMI Turbines",
+"site": "https://immiturbines.com",
+"what": "Уже предлагали нам ЗИП (13 запросов в Bitrix). Склад OEM surplus/new/used по Saturn (T1000-серия), Centaur T4000/T4500/T4700 (одно- и двухвальные), Taurus 60/70: топливные регуляторы, датчики, лопатки/направляющие, диски, клапаны, форсунки, горячая часть (роторы, ЖТ, переходники); PLC-ретрофиты СУ; заявляют цены на 25-50% ниже OEM; ВНИМАНИЕ: часть номенклатуры — reverse engineered (фиксировать происхождение при заказе)",
+"relation": "независимый MRO + сток ЗИП (не OEM); уже в CRM КВАНТ (13 запросов)",
+"rank": 1,
+"country": "США (Conroe, TX)",
+"email": "sales@immiturbines.com",
+"models": [
+"Saturn 20",
+"Centaur 40/50",
+"Taurus 60/70",
+"Saturn 10",
+"Centaur 40",
+"Centaur 50",
+"Taurus 60",
+"Taurus 70",
+"Saturn 10/20"
+],
+"evidence": "https://immiturbines.com/about-us/",
+"evidence2": "https://www.power-technology.com/contractors/turbine-cooling/immi-turbines/",
+"ask": "pn",
+"tier": "indep_proven",
+"comps": [
+"камера: жаровые, форсунки, SoLoNOx",
+"лопатки и сопловые (blades/nozzles)",
+"ротор, подшипники, редукторы",
+"САУ, КИП, топливная арматура",
+"двигатели и агрегаты целиком"
+],
+"comp": "камера: жаровые, форсунки, SoLoNOx"
+},
+{
+"name": "NNG Energy",
+"site": "https://nngenergy.com",
+"what": "Турецкий независимый сервис/поставщик Solar: рефурбишмент и поставка турбин, package assembly, core engine services, 24/7 поддержка. Заявленная экспертиза: Taurus 60, Taurus 70, Centaur 50, Mars 100, Titan 130 — единственный найденный игрок в Турции с покрытием Titan 130 (наш топ-спрос: 12 сделок). 60+ поставленных турбин, цех в Ялова",
+"relation": "независимый сервис/поставщик, НОВЫЙ (нет в CRM)",
+"rank": 1,
+"country": "Турция (Стамбул + Ялова)",
+"email": "info@nngenergy.com",
+"evidence": "https://nngenergy.com/what-we-offer/gas-turbines/",
+"models": [
+"Taurus 60",
+"Taurus 70",
+"Centaur 50",
+"Mars 100",
+"Titan 130"
+],
+"ask": "pn",
+"check": "confirmed",
+"check_seen": "\"We excel in a wide range of gas turbines, with particular expertise in Solar brand models such as the Taurus 60, Taurus 70, Centaur 50, Mars 100, and Titan 130\"; услуги: \"refurbishment, new turbine supply, package assembly, core engine services, and maintenance\"",
+"tier": "indep_proven",
+"comps": [
+"покрытия и восстановление",
+"двигатели и агрегаты целиком"
+],
+"comp": "покрытия и восстановление"
+},
+{
+"name": "S&S Turbine Services Ltd",
+"site": "https://www.ssturbine.com",
+"what": "Независимый Level IV капремонт Saturn и Centaur (T-1200…T-4700, T-1302 мехпривод, T-4001 генераторные), склад ремонтных компонентов Saturn/Centaur, балансировка, оценка остаточного ресурса; экономия до 60% vs OEM; есть офис на Ближнем Востоке (ssturbineme.com)",
+"relation": "независимый MRO с доказанным Solar-опытом (не OEM)",
+"rank": 1,
+"models": [
+"Saturn 10/20 (T-1200/T-1500)",
+"Centaur 40",
+"Centaur 50 (T-4700)",
+"Saturn 20",
+"Centaur 40/50",
+"Centaur 50",
+"Saturn 10/20 (T-1200/T-1302)",
+"Centaur 40/50 (T-4000…T-4700)",
+"Saturn 10/20"
+],
+"evidence": "https://www.ssturbine.com/component/content/article/10-product-lines/20-solar-gas-turbine-services",
+"evidence2": "https://ca.linkedin.com/company/s%26s-turbine-services-ltd.",
+"ask": "pn",
+"country": "Канада (Fort St. John, BC)",
+"email": "",
+"check": "confirmed",
+"check_seen": "\"Solar Gas Turbine Services\" (заголовок); \"Our inventory of Saturn and Centaur maintenance and overhaul components is of the very best quality\"; \"We have full level IV support available for Saturn and Centaur units\"; \"Please contact us for your T-1200, to T-4700 overhaul requirements\"",
+"tier": "indep_proven",
+"comps": [
+"ротор, подшипники, редукторы",
+"КВОУ, фильтры, навесное"
+],
+"comp": "ротор, подшипники, редукторы"
+},
+{
+"name": "Petrotech, Inc.",
+"site": "https://petrotechinc.com",
+"what": "Изготовитель ретрофитных систем управления для Solar: серийные продукт-бюллетени на Centaur compressor drive (94085), Centaur generator drive (00005), Centaur pump drive (00013) — PLC-пакеты управления с интерфейсами на штатные NGP/NPT/T5-датчики и топливные клапаны. Закрывает угол «контроллеры/электрика», где OEM-детали сняты с производства",
+"relation": "независимый интегратор САУ (ретрофит без OEM)",
+"rank": 1,
+"country": "США (New Orleans, LA)",
+"email": "info@petrotechinc.com",
+"models": [
+"Centaur 40/50",
+"Mars 90/100",
+"Centaur 40",
+"Centaur 50",
+"Taurus 60",
+"Mars 90",
+"Mars 100"
+],
+"evidence": "https://petrotechinc.com/wp-content/uploads/2024/07/solar-centaur-compressor-1.pdf",
+"evidence2": "https://petrotechinc.com/wp-content/uploads/2024/07/solar-centaur-generator.pdf",
+"ask": "nomen",
+"check": "confirmed",
+"check_seen": "PDF 1: \"PRODUCT BULLETIN: 94085 — SOLAR CENTAUR® GAS TURBINE COMPRESSOR DRIVE APPLICATION CONTROL PACKAGE... replaces older mechanical/hydraulic/electronic/pneumatic Centaur® fuel [system]\". PDF 2: \"PRODUCT BULLETIN 00005 — SOLAR CENTAUR® GAS TURBINE GENERATOR DRIVE APPLICATION CONTROL PACKAGE\"",
+"tier": "indep_proven_maker",
+"comps": [
+"САУ, КИП, топливная арматура"
+],
+"comp": "САУ, КИП, топливная арматура"
+},
+{
+"name": "Young & Franklin Inc.",
+"site": "https://yf.com",
+"what": "Изготовитель топливной арматуры: YF 8641 Series — интегрированный газовый топливный клапан (ретрофит гидропривода Y&F + solar loader + butterfly valve) для турбин Solar от Saturn 20 до Mars 100; электромеханические актуаторы, контроллер YF 1100; SIL 2, ATEX/CSA/UL",
+"relation": "изготовитель компонентов (поставщик Solar) + ретрофит",
+"rank": 1,
+"country": "США (Liverpool, NY)",
+"models": [
+"Saturn 20",
+"Centaur 40/50",
+"Taurus 60/70",
+"Mars 90/100"
+],
+"evidence": "https://www.power-technology.com/products/electrically-actuated-gas-control-valves/",
+"evidence2": "https://yf.com/products/yf-8641-series-integrated-natural-gas-fuel-control-valves/",
+"ask": "pn",
+"check": "confirmed",
+"check_seen": "На power-technology: \"YF 8641 Series Integrated Natural Gas Fuel Control Valve Assembly... Designed to be a retrofit replacement for the Y&F hydraulic actuator, solar loader, and butterfly valve for the fuel control system on solar gas turbines (Saturn 20 to Mars 100)\"",
+"tier": "indep_proven_maker",
+"comps": [
+"САУ, КИП, топливная арматура"
+],
+"comp": "САУ, КИП, топливная арматура"
+},
+{
+"name": "TDI (Tech Development Inc.) — TurboTwin",
+"site": "https://www.tdistarters.com",
+"what": "Пневмостартеры TurboTwin: T100-CS — прямая замена стартеров Ingersoll-Rand и Hilliard на Solar Centaur/Taurus (болт-он на корпус привода агрегатов); T100-MS/V/B для других ГТУ; страница /Solar.php посвящена двигателям Solar.",
+"relation": "изготовитель компонентов (замена штатных стартеров)",
+"rank": 1,
+"country": "США (Dayton, OH)",
+"models": [
+"Centaur 40/50",
+"Taurus 60/70"
+],
+"evidence": "https://www.rowlandcompany.com/wp-content/uploads/2018/07/T100-MS-Air-Starter-IOM.pdf",
+"evidence2": "https://www.tdi-airstarter.com/air-starters/t100-cs",
+"ask": "pn",
+"check": "confirmed",
+"check_seen": "IOM-мануал TDI TURBOTWIN Model T100-MS: «These are suitable for use on a variety of Solar Turbine Engine applications including the Centaur & Taurus»; таблицы кросс-референсов с колонкой «Solar Part Number», напр. «SOLAR P/N: 1078362-100», модель T115-60034-MSL-1-90",
+"tier": "indep_proven_maker",
+"comps": [
+"КВОУ, фильтры, навесное",
+"двигатели и агрегаты целиком"
+],
+"comp": "КВОУ, фильтры, навесное"
+},
+{
+"name": "Score Energy Ltd (Score Group)",
+"site": "https://www.score-group.com",
+"what": "По брошюре: топливные системы и аксессуары Solar Centaur, Mars, Taurus, TITAN (форсунки, клапаны, регуляторы, насосы, стартеры, датчики/жгуты — ремонт, обмен, rotable exchange units); компонентный ремонт Solar-оборудования; DLE/DLN центр (профиль под SoLoNOx-подобные системы); Woodward full-service вне Сев. Америки; центры Peterhead(UK)/Sanford NC/Dubai/KL.",
+"relation": "независимый MRO + компонентный ремонт (топливные системы) + склад",
+"rank": 2,
+"country": "Великобритания (Peterhead, Шотландия)",
+"models": [
+"Centaur 40",
+"Centaur 50",
+"Taurus 60",
+"Taurus 70",
+"Mars 90",
+"Mars 100",
+"Titan 130",
+"Centaur 40/50",
+"Taurus 60/70",
+"Mars 90/100",
+"Taurus 60/70 (бренд Solar заявлен в брошюре без пообъектной детализации)"
+],
+"evidence": "https://cdn.scoreltd.com/pdf/brochure/Score%20Energy%20brochure%20English%20Rev%201.pdf (текст PDF извлечён и проверен)",
+"ask": "nomen",
+"evidence2": "https://etn.global/gas-turbine-products/centaur-40/",
+"check": "confirmed",
+"check_seen": "Из PDF: раздел «Solar» со списком моделей: \"• Centaur • Mars • Taurus • Titan\"; \"engine types manufactured by General Electric, Siemens, Rolls-Royce and Solar. A high quality and unparalleled turn around service utilising OEM parts and procedures\"; \"component inspection, repair and overhaul service over a wide range of Rolls-Royce, GE, Siemens and Solar equipment\"",
+"tier": "indep_proven",
+"comps": [
+"камера: жаровые, форсунки, SoLoNOx",
+"САУ, КИП, топливная арматура",
+"КВОУ, фильтры, навесное",
+"двигатели и агрегаты целиком"
+],
+"comp": "камера: жаровые, форсунки, SoLoNOx"
+},
+{
+"name": "R&H Supply",
+"site": "https://randhsupply.com/gas-turbines/",
+"what": "Заявляет собственное производство деталей ГТУ («full in-house capacity to manufacture gas turbine parts… for OEM and select non-OEM fleets») + ремонт компонентов горячего тракта и камер сгорания; открытая линейка Solar: Saturn, Centaur 40/50, Taurus 50/60/70, Mars 90/100",
+"relation": "независимый изготовитель/ремонтник компонентов (проверить объём собственного производства по Solar)",
+"rank": 2,
+"country": "США",
+"models": [
+"Saturn 20",
+"Centaur 40/50",
+"Taurus 60/70",
+"Mars 90/100"
+],
+"evidence": "https://randhsupply.com/gas-turbines/",
+"evidence2": "поисковая выдача Google с полным списком моделей randhsupply.com (второй независимый источник не найден — сайт единственный)",
+"ask": "pn",
+"check": "confirmed",
+"check_seen": "\"Saturn® 10, Centaur® 40, Centaur® 50, Taurus® 60, Mars® 100\"; полный список: \"SATURN 20, CENTAUR 40 & 40S... TAURUS 70 & 70S, MARS 90 & 90S, MARS 100 & 100S... SATURN T1200, SATURN T1300, Titan 130\"; \"full in-house capacity to manufacture gas turbine parts for both OEM and select non-OEM fleets\"",
+"tier": "indep_proven_maker",
+"comps": [
+"камера: жаровые, форсунки, SoLoNOx"
+],
+"comp": "камера: жаровые, форсунки, SoLoNOx"
+},
+{
+"name": "Liburdi Turbine Services",
+"site": "https://www.liburditurbineservices.com/",
+"what": "Компонентный ремонт горячей части Solar: лопатки, сопловые аппараты, камеры сгорания для Saturn, Centaur 40/50, Taurus 60 (T60), Mars, Mercury. Технологии LPM-наплавки, автоматизированная/электронно-лучевая сварка, CT-инспекция лопаток Taurus 60 st.1 с оценкой ремонтопригодности. Идеально под задачу «ремонт горячей части» по каталожным номерам.",
+"relation": "независимый ремонтник компонентов (blades/vanes/nozzles/combustors), Dundas, Онтарио, Канада + США",
+"rank": 2,
+"country": "Канада",
+"models": [
+"Taurus 60",
+"Saturn 20",
+"Centaur 40",
+"Centaur 50",
+"Mars 90/100",
+"Centaur/Taurus/Mars — компонентный ремонт, модели уточнять",
+"Mars 90",
+"Mars 100"
+],
+"evidence": "https://liburditurbineservices.com/news/hot-section-inspection-of-gas-turbine-blades",
+"evidence2": "https://www.liburditurbineservices.com/",
+"ask": "sample",
+"tier": "indep_proven_maker",
+"comps": [
+"камера: жаровые, форсунки, SoLoNOx",
+"лопатки и сопловые (blades/nozzles)",
+"покрытия и восстановление"
+],
+"comp": "камера: жаровые, форсунки, SoLoNOx"
+},
+{
+"name": "Gas Turbine Applications Corp. (GTA)",
+"site": "https://www.gtaturbines.com",
+"what": "Уже в ядре базы. С 1984 г. >300 капремонтов Saturn и >150 Centaur; полный overhaul/exchange Saturn 10/20, Centaur 40/50 вкл. SoLoNOx; обменные двигатели по T-номерам: Centaur T4001/T4501/T4701 и T4002/T4502/T4702, Saturn T1102/T1202/T1302 (split) и T1201/T1301; тест-фасилити 9600 кв.футов; входит в Turbine Efficiency Group",
+"relation": "независимый MRO + parts",
+"rank": 2,
+"country": "США (Calera, OK)",
+"email": "parts@gtaturbines.com",
+"models": [
+"Saturn 20",
+"Centaur 40/50",
+"Centaur 40",
+"Centaur 50",
+"Saturn 10/20",
+"Taurus 60"
+],
+"evidence": "https://www.gtaturbines.com/gta-turbine-parts-lookup.php",
+"ask": "pn",
+"evidence2": "https://turbine-efficiency.co.uk/service/gas-turbine-applications/",
+"check": "confirmed",
+"check_seen": "«We specialize in the overhaul, repair and testing of Solar® brand turbines and the part numbers»; каталог из тысяч каталожных номеров Solar, напр. 1065472-101 «Sensor, T5 TC, Saturn», 136053-1 «Arm, Guide Vane, Centaur»",
+"tier": "indep_proven",
+"comps": [
+"камера: жаровые, форсунки, SoLoNOx",
+"двигатели и агрегаты целиком"
+],
+"comp": "камера: жаровые, форсунки, SoLoNOx"
+},
+{
+"name": "Turbo Control Solutions (TCS Sdn Bhd)",
+"site": "https://www.tcssb.com",
+"what": "Ретрофиты САУ 'many OEM gas turbines' — в списке брендов прямо назван Solar (наряду с GE Frame/LM, Siemens SGT, RR, Westinghouse, P&W). Конкретные модели Solar на сайте не указаны — уточнять референсы. Внимание: офис в Ливии (комплаенс-фактор).",
+"relation": "независимый интегратор САУ",
+"rank": 2,
+"country": "Малайзия (офисы: Индонезия, Швейцария, Канада, Ливия)",
+"evidence": "https://www.tcssb.com/our-solution/retrofits-upgrades/",
+"ask": "nomen",
+"check": "confirmed",
+"check_seen": "«TCS specializes in the Control upgrade of many OEM gas turbines, GE heavy duty (Frame 5, 6, 7, & 9) and industrial gas turbine (LM2500, LM5000, LM6000), Siemens SGT-series, Rolls Royce turbines, Solar turbines, Westinghouse, P&W and many others»",
+"tier": "indep_service",
+"comps": [
+"САУ, КИП, топливная арматура"
+],
+"comp": "САУ, КИП, топливная арматура"
+},
+{
+"name": "Classic Automation",
+"site": "https://www.classicautomation.com",
+"what": "Obsolete-электроника платформы Turbotronic 1–4: склад снятых с производства Allen-Bradley PLC-5 (тестированные, гарантия 2 года) + ремонт модулей. Канал поддержки старых Turbotronic без OEM.",
+"relation": "стокист/ремонт obsolete-электроники (трейдер)",
+"rank": 2,
+"country": "США (Rochester, NY)",
+"models": [
+"Saturn 20",
+"Centaur 40/50",
+"Taurus 60/70",
+"Mars 90/100"
+],
+"evidence": "https://www.classicautomation.com/parts/allen-bradley/allen-bradley-plc-5",
+"ask": "pn",
+"tier": "trader",
+"comps": [
+"САУ, КИП, топливная арматура"
+],
+"comp": "САУ, КИП, топливная арматура"
+},
+{
+"name": "Meggitt / Precision Engine Controls (PECC)",
+"site": "https://www.meggittvalves.com/precision-engine-controls-corporation/",
+"what": "Изготовитель газовых дозирующих клапанов (VG1.5 — >8000 в парке, XVG/eXVG, RGV), bleed-клапанов AVB, линейных актуаторов ACT2000 для индустриальных ГТУ 1–100 МВт — типовая топливная арматура машин класса Solar; внимание: на странице Meggitt Solar прямо не назван — модельную привязку подтверждать по P/N",
+"relation": "изготовитель компонентов",
+"rank": 2,
+"country": "США (San Diego, CA)",
+"models": [
+"Centaur 40/50",
+"Taurus 60/70"
+],
+"evidence": "https://turbinevalves.com/precision/",
+"evidence2": "https://www.meggittvalves.com/precision-engine-controls-corporation/",
+"ask": "nomen",
+"tier": "indep_proven_maker",
+"comps": [
+"САУ, КИП, топливная арматура"
+],
+"comp": "САУ, КИП, топливная арматура"
+},
+{
+"name": "Nederman Pneumafil",
+"site": "https://www.nedermanmikropul.com/en/Products/Gas-Turbine-Inlet-Filters",
+"what": "Сменные фильтроэлементы под корпуса КВОУ ЛЮБЫХ брендов (Donaldson, Braden, AAF, Camfil Farr) — независимая альтернатива для картриджей Solar-пакетов по каталожному номеру корпуса.",
+"relation": "независимый изготовитель сменных фильтров",
+"rank": 2,
+"country": "США (Charlotte, NC)",
+"models": [
+"Centaur 40/50",
+"Taurus 60/70",
+"Mars 90/100"
+],
+"evidence": "https://www.nedermanmikropul.com/en/Products/Gas-Turbine-Inlet-Filters",
+"ask": "pn",
+"check": "confirmed",
+"check_seen": "Замена под чужие корпуса дословно: 'replacement filtration products for all brands of pulse style or static style inlet housings, including Donaldson, Braden, AAF (American Air Filter), and CamFil Farr'. И прямое упоминание Solar: '...installed filtration systems on turbines of every make, including GE, Siemens, Mitsubishi, Alstom, Pratt & Whitney, Rolls Royce, Solar, and ABB'.",
+"tier": "indep_proven_maker",
+"comps": [
+"КВОУ, фильтры, навесное"
+],
+"comp": "КВОУ, фильтры, навесное"
+},
+{
+"name": "ITS Parts (Industrial Turbine Services s.r.l.)",
+"site": "https://www.its-parts.com",
+"what": "ЗИП по всей линейке Saturn/Centaur/Taurus/Mars/Titan: горячий тракт (диски, лопатки, сопловые, бандажи), камера сгорания (liners, фор­сунки), топливная система, компрессор; плюс exchange/overhaul/repair по машинам Solar, Ruston, Siemens; «genuine OEM surplus + engineered turbine parts»",
+"relation": "трейдер/стокист (OEM surplus + aftermarket)",
+"rank": 2,
+"country": "Румыния (Bals, Olt)",
+"models": [
+"Saturn 20",
+"Centaur 40/50",
+"Taurus 60/70",
+"Mars 90/100",
+"Titan 130/250",
+"Titan 130",
+"Centaur 40",
+"Centaur 50",
+"Taurus 60",
+"Taurus 70",
+"Mars 90",
+"Mars 100"
+],
+"evidence": "https://www.its-parts.com/services/parts-supply/",
+"ask": "pn",
+"evidence2": "https://www.its-parts.com/services/exchange-overhaul-repair/",
+"email": "sales@its-parts.com",
+"tier": "trader",
+"comps": [
+"камера: жаровые, форсунки, SoLoNOx",
+"лопатки и сопловые (blades/nozzles)",
+"покрытия и восстановление",
+"САУ, КИП, топливная арматура",
+"двигатели и агрегаты целиком"
+],
+"comp": "камера: жаровые, форсунки, SoLoNOx"
+},
+{
+"name": "TMS Ltd. (Alberta-TMS)",
+"site": "http://www.lincoln-tms.com/equipment-sales/",
+"what": "Склад агрегатов и обменных двигателей Solar в Альберте: Titan 130S 15 МВт new surplus, Mars 90 9,5 МВт, 2×Taurus T7901S 5,67 МВт 60 Гц new surplus + 2×50 Гц, Centaur T5901S/T4701S/T4501, Saturn T1301; exchange-двигатели «0 часов, tested»: Taurus T7301S, Centaur T4702S/T4701S/T4502/T4501, Saturn T1602/T1302/T1301/T1202/T1201; компрессорные пакеты Centaur T5502/T4702S/T4502",
+"relation": "независимый пэкеджер/дилер б/у и new-surplus оборудования с гарантией; Альберта, Канада",
+"rank": 3,
+"country": "Канада",
+"models": [
+"Saturn 20",
+"Centaur 40/50",
+"Taurus 60",
+"Mars 90/100",
+"Titan 130"
+],
+"evidence": "http://www.lincoln-tms.com/equipment-sales/",
+"ask": "nomen",
+"tier": "trader",
+"comps": [
+"двигатели и агрегаты целиком"
+],
+"comp": "двигатели и агрегаты целиком"
+},
+{
+"name": "Heriss Corporation",
+"site": "https://heriss.com",
+"what": "Уже предлагали нам (4 запроса). Трейдер-стокист: >4000 позиций ЗИП Solar на складе; Saturn 10/20, Centaur 4500 и 50 (с SoLoNOx и без), Taurus 65/70, Mars — как запчасти, так и целые новые/zero-hour/б.у. двигатели и комплектные компрессорные/насосные/генераторные пакеты; пример стока: редуктор привода агрегатов PN 117850-105; плюс редукторы Philadelphia",
+"relation": "трейдер/дистрибьютор со стоком, уже в CRM (4 запроса)",
+"rank": 3,
+"country": "Канада",
+"email": "sales@heriss.com",
+"evidence": "https://heriss.com/ps/solar/",
+"evidence2": "https://www.energy-xprt.com/companies/heriss-corporation-94783",
+"models": [
+"Saturn 10",
+"Saturn 20",
+"Centaur 40/50",
+"Taurus 60",
+"Taurus 65",
+"Taurus 70",
+"Centaur 40",
+"Centaur 50",
+"Mars 90",
+"Mars 100"
+],
+"ask": "pn",
+"tier": "trader",
+"comps": [
+"камера: жаровые, форсунки, SoLoNOx",
+"ротор, подшипники, редукторы",
+"КВОУ, фильтры, навесное",
+"двигатели и агрегаты целиком"
+],
+"comp": "камера: жаровые, форсунки, SoLoNOx"
+},
+{
+"name": "Philadelphia Gear (Timken Power Systems)",
+"site": "https://www.philagear.com",
+"what": "Ремонт/rebuild редукторов любых брендов, включая планетарные/эпициклические — альтернативный канал ремонта редукторов Solar-пакетов (repair-of-non-PG программа).",
+"relation": "независимый сервис редукторов",
+"rank": 3,
+"country": "США",
+"models": [
+"Centaur 40/50",
+"Taurus 60/70",
+"Mars 90/100"
+],
+"evidence": "https://www.philagear.com/gearbox-solutions/gearbox-repair/repair-of-non-pg/",
+"ask": "pn",
+"tier": "indep_proven",
+"comps": [
+"покрытия и восстановление",
+"ротор, подшипники, редукторы"
+],
+"comp": "покрытия и восстановление"
+},
+{
+"name": "Chart Industries (Hudson / Air-X-Changers)",
+"site": "https://www.chartindustries.com/Products/Air-Cooled-Heat-Exchangers",
+"what": "АВО и lube-oil/turbine coolers; сервис и aftermarket по теплообменникам любых производителей (цех Beasley, TX) — канал замены/ремонта маслоохладителей Solar-пакетов.",
+"relation": "изготовитель компонентов + сервис",
+"rank": 3,
+"country": "США (Техас)",
+"models": [
+"Taurus 60/70",
+"Mars 90/100"
+],
+"evidence": "https://www.chartindustries.com/Products/Air-Cooled-Heat-Exchangers",
+"evidence2": "https://www.chartindustries.com/Businesses-Brands/Hudson",
+"ask": "nomen",
+"tier": "maker",
+"comps": [
+"КВОУ, фильтры, навесное",
+"двигатели и агрегаты целиком"
+],
+"comp": "КВОУ, фильтры, навесное"
+},
+{
+"name": "Antoni International",
+"site": "http://www.antoni-intl.com",
+"what": "Уже предлагали нам (4 запроса). Независимый трейдер ЗИП Solar Saturn/Centaur/Taurus/Mars и компрессоров, большой онлайн-каталог деталей (~1000+ позиций) и оборудование в наличии, в т.ч. Taurus 60 T7301. ВНИМАНИЕ: сайт за анти-ботом — evidence подтверждено через поисковую выдачу и страницы каталога",
+"relation": "трейдер (независимый поставщик запчастей)",
+"rank": 3,
+"country": "США",
+"models": [
+"Saturn 20",
+"Centaur 40/50",
+"Taurus 60/70",
+"Mars 90/100",
+"Saturn 10/20",
+"Taurus 60",
+"Centaur 40",
+"Centaur 50",
+"Taurus 70",
+"Mars 90",
+"Mars 100"
+],
+"evidence": "http://www.antoni-intl.com/",
+"ask": "pn",
+"evidence2": "https://www.antoni-intl.com/Equipment+for+Sale/id/42/prod_id/16068 (Centaur T4702 пакет)",
+"tier": "trader",
+"comps": [
+"прочее"
+],
+"comp": "прочее"
+},
+{
+"name": "Southeast Overseas",
+"site": "https://www.southeastoverseas.com/solar1.html",
+"what": "Стокист ЗИП Saturn, Centaur, Mercury, Taurus, Mars: OEM-оригинал, aftermarket, refurb, surplus; публикует открытые PN-листы (>100 позиций, в т.ч. 127982-100 FUEL INJECTOR ASSY, 127983-100 INJECTOR DUAL FUEL) — удобно для проценки по каталожным номерам без чертежей",
+"relation": "трейдер",
+"rank": 3,
+"country": "США",
+"models": [
+"Saturn 20",
+"Centaur 40/50",
+"Taurus 60/70",
+"Mars 90/100",
+"Taurus 60",
+"Saturn 10/20"
+],
+"evidence": "https://www.southeastoverseas.com/solar1.html",
+"ask": "pn",
+"email": "roy.pandel@titanoiltools.com",
+"evidence2": "https://southeastoverseas.com/solar3.html",
+"tier": "trader",
+"comps": [
+"камера: жаровые, форсунки, SoLoNOx"
+],
+"comp": "камера: жаровые, форсунки, SoLoNOx"
+},
+{
+"name": "Sirgen",
+"site": "http://www.sirgen.com/solargasturbines.html",
+"what": "Продажа полностью перебранных «zero-hour» Solar Saturn и Centaur с годовой гарантией; малоресурсные Taurus, Mars и Titan в наличии. Источник обменных ядер/машин. Сайт за анти-бот защитой — данные из поисковой выдачи, требует ручной проверки.",
+"relation": "трейдер/восстановитель двигателей",
+"rank": 3,
+"country": "США",
+"models": [
+"Saturn 20",
+"Centaur 40/50",
+"Taurus 60/70",
+"Mars 90/100",
+"Titan 130/250",
+"Taurus 60",
+"Titan 130",
+"Centaur 40",
+"Centaur 50",
+"Mars 90",
+"Mars 100",
+"Saturn 10/20"
+],
+"evidence": "http://www.sirgen.com/solargasturbines.html",
+"ask": "pn",
+"tier": "trader",
+"comps": [
+"двигатели и агрегаты целиком"
+],
+"comp": "двигатели и агрегаты целиком"
+},
+{
+"name": "Shenzhen Blaze Turbine Co., Ltd",
+"site": "https://turbineblade.net/solar-turbine-spare-parts/",
+"what": "НОВЫЙ, но НЕ КАНАЛ: изготовитель-реверс-инжинирер компонентов контрольных систем (листает PN 50377-1, 919086C1 и др., 15+ лет), однако прямо требует чертежи или образец — у нас только каталожные номера, плюс правило владельца против китайского реверса. Фиксируем как справочный контакт по компонентке",
+"relation": "изготовитель aftermarket (реверс-инжиниринг)",
+"rank": 3,
+"country": "Китай (Shenzhen)",
+"email": "peter@turbineblade.net",
+"models": [
+"Centaur 40/50",
+"Taurus 60/70"
+],
+"evidence": "https://turbineblade.net/solar-turbine-spare-parts/",
+"ask": "sample",
+"tier": "maker",
+"comps": [
+"прочее"
+],
+"comp": "прочее"
+},
+{
+"name": "GTC Control Solutions (ex-Gas Turbine Controls)",
+"site": "https://callgtc.com",
+"what": "Крупнейший независимый склад плат/запчастей САУ и виброаппаратуры (Bently Nevada 3500 — стоит на Solar-пакетах; Woodward, Triconex и др.). По Turbotronic (Allen-Bradley) профильного стока не подтверждено — использовать точечно под Bently/Woodward позиции.",
+"relation": "трейдер (obsolete-электроника САУ)",
+"rank": 3,
+"country": "США (NY)",
+"models": [
+"Centaur 40/50",
+"Taurus 60/70",
+"Mars 90/100"
+],
+"evidence": "https://www.power-technology.com/contractors/gas-turbine-suppliers/gtc-control-solutions/",
+"ask": "pn",
+"tier": "trader",
+"comps": [
+"САУ, КИП, топливная арматура"
+],
+"comp": "САУ, КИП, топливная арматура"
+},
+{
+"name": "Phoenix Equipment Corporation",
+"site": "https://www.phxequip.com",
+"what": "Трейдер б/у энергооборудования: проходили целые Solar-пакеты — Taurus 70 GTG (unused, 2011, Kato 8000 kVA; продан) и Centaur 50 GTG (1994, Kato 4.25 MW; продан). Держать в рассылке под появление новых Solar-лотов.",
+"relation": "трейдер комплектных агрегатов",
+"rank": 3,
+"country": "США (Red Bank, NJ)",
+"email": "sales@phxequip.com",
+"models": [
+"Centaur 40/50",
+"Taurus 60/70",
+"Taurus 60"
+],
+"evidence": "https://www.phxequip.com/equipment/28974/solar-taurus-70-gas-turbine-generator",
+"evidence2": "https://www.phxequip.com/equipment/8978/solar-centaur-50-gas-turbine-generator",
+"ask": "nomen",
+"tier": "trader",
+"comps": [
+"КВОУ, фильтры, навесное",
+"двигатели и агрегаты целиком"
+],
+"comp": "КВОУ, фильтры, навесное"
+},
+{
+"name": "GLM Energy Systems LLC",
+"site": "https://www.glmenergyllc.com/glm-turbine-solar.php",
+"what": "Полный спектр по ВСЕМ моделям Solar Centaur и Saturn: полевой сервис, обмен оборудования, переоблопачивание компрессора и турбины, восстановление шеек, ремонт и покрытие сопловых аппаратов; ключевое — «components manufactured and/or procured», т.е. сами изготавливают компоненты (угол изготовителей); работают с T1200/T4500",
+"relation": "независимый сервисный цех, Kenai, Аляска, США",
+"rank": 4,
+"country": "США",
+"models": [
+"Saturn 20",
+"Centaur 40/50",
+"Centaur 40",
+"Centaur 50",
+"Saturn 10/20"
+],
+"evidence": "https://www.glmenergyllc.com/glm-turbine-solar.php",
+"email": "contacts@glmenergyllc.com",
+"ask": "nomen",
+"tier": "maker",
+"comps": [
+"лопатки и сопловые (blades/nozzles)",
+"покрытия и восстановление"
+],
+"comp": "лопатки и сопловые (blades/nozzles)"
+},
+{
+"name": "CTG Power Systems International",
+"site": "https://www.ctgpowersystems.com",
+"what": "НОВЫЙ. Брокер энергооборудования (Тампа, Флорида) с разделом инвентаря Solar Turbine: генсеты, запчасти, двигатели; конкретика по моделям/ценам только по запросу",
+"relation": "трейдер",
+"rank": 4,
+"country": "США (Tampa, FL)",
+"models": [
+"Centaur 40/50",
+"Taurus 60/70"
+],
+"evidence": "https://www.ctgpowersystems.com/inventory/.b/solar-turbine",
+"ask": "pn",
+"tier": "trader",
+"comps": [
+"двигатели и агрегаты целиком"
+],
+"comp": "двигатели и агрегаты целиком"
+},
+{
+"name": "Turbine Resources International (TRI)",
+"site": "http://turbineresourcesintl.com/parts-sales/",
+"what": "New/used/OEM surplus/aftermarket/refurbished запчасти на Solar Saturn, Centaur, Taurus и Solar-пакеты (по поисковому индексу). Домен при проверке не резолвился (ENOTFOUND) — статус компании проверить перед контактом.",
+"relation": "трейдер",
+"rank": 4,
+"country": "США",
+"models": [
+"Saturn 20",
+"Centaur 40/50",
+"Taurus 60/70",
+"Taurus 60"
+],
+"evidence": "http://turbineresourcesintl.com/parts-sales/",
+"ask": "pn",
+"evidence2": "http://turbineresourcesintl.com/our-services/",
+"tier": "trader",
+"comps": [
+"прочее"
+],
+"comp": "прочее"
+},
+{
+"name": "Wogen Engineering",
+"site": "https://wogenengg.com/gas-turbine-spare-parts.html",
+"what": "Hot Gas Path (HGP) и inspection kits, компоненты камеры сгорания для Solar: Titan 130, Titan 250, Mars 100, Taurus 60, Centaur 40; new/surplus/refurbished/used",
+"relation": "трейдер/стокист (industrial trading division), Аджман, ОАЭ",
+"rank": 5,
+"country": "ОАЭ",
+"models": [
+"Centaur 40/50",
+"Taurus 60",
+"Mars 90/100",
+"Titan 130/250"
+],
+"evidence": "https://wogenengg.com/gas-turbine-spare-parts.html",
+"email": "Info@wogenengg.com",
+"ask": "pn",
+"tier": "trader",
+"comps": [
+"камера: жаровые, форсунки, SoLoNOx"
+],
+"comp": "камера: жаровые, форсунки, SoLoNOx"
+},
+{
+"name": "Alba Power (Sulzer)",
+"site": "https://albapower.com/gas-turbine-services/",
+"what": "Независимый сервис ГТУ: field service, inspection, repair & overhaul, балансировка, tooling; Solar Turbines заявлен как одна из специализаций наряду с RR Avon/Olympus/RB211, P&W, Kongsberg KG2 (конкретные модели Solar на сайте не расписаны — уточнять)",
+"relation": "независимый MRO в составе Sulzer (не OEM)",
+"rank": 6,
+"country": "Великобритания (Aberdeenshire) + США (La Porte, TX) + Канада",
+"models": [
+"Centaur 40/50",
+"Taurus 60/70 (заявлен бренд Solar без детализации моделей)"
+],
+"evidence": "https://albapower.com/gas-turbine-services/",
+"evidence2": "https://energy-oil-gas.com/news/alba-power-2",
+"ask": "nomen",
+"tier": "indep_service",
+"comps": [
+"покрытия и восстановление",
+"ротор, подшипники, редукторы"
+],
+"comp": "покрытия и восстановление"
+},
+{
+"name": "NGT Gasturbinentechnik GmbH & Co. KG",
+"site": "http://www.ngt-gasturbinentechnik.com/",
+"what": "Единственный найденный независимый Solar-шоп в Германии: zero-hour турбины, major overhaul, ТО и инспекции Centaur 40/50 и Taurus 60; модернизация САУ Solar-агрегатов как VAR Valmet. Удобный ЕС-канал.",
+"relation": "независимый сервис, Мёрс (Moers), Германия",
+"rank": 6,
+"country": "Германия",
+"email": "info@ngt-gasturbinentechnik.com",
+"models": [
+"Centaur 40",
+"Centaur 50",
+"Taurus 60"
+],
+"evidence": "https://www.valmet.com/insights/articles/automation/success-in-the-german-solar-gas-turbine-market/",
+"evidence2": "http://www.ngt-gasturbinentechnik.com/",
+"ask": "nomen",
+"tier": "indep_service",
+"comps": [
+"САУ, КИП, топливная арматура",
+"двигатели и агрегаты целиком"
+],
+"comp": "САУ, КИП, топливная арматура"
+},
+{
+"name": "TFS — Turbine Field Solutions",
+"site": "https://tfsmx.com",
+"what": "Уже в CRM (3 запроса), ядро базы знает его субпоставщиков. Полноцикловый турбомашинный провайдер (200+ специалистов): оснастка под Solar Taurus 60 и центробежные компрессоры Solar; дивизион TFS Aero — прецизионная CNC-механообработка и MRO компонентов; присутствие в Дубае",
+"relation": "независимый MRO + изготовитель компонентов, уже в CRM (3 запроса)",
+"rank": 6,
+"country": "Мексика (Веракрус), офис в Дубае",
+"evidence": "https://mexicobusiness.news/aerospace/news/tfs-deploys-worlds-first-siemens-sgt-400-turbine-test-bench",
+"models": [
+"Taurus 60"
+],
+"ask": "pn",
+"tier": "maker",
+"comps": [
+"прочее"
+],
+"comp": "прочее"
+},
+{
+"name": "Kato Engineering (Nidec)",
+"site": "https://www.nidec.com/en/katoengineering/",
+"what": "Производитель синхронных генераторов 100 кВт–25 МВт для газотурбинных генсетов (диапазон Saturn—Titan 130); тысячи машин на FPSO/платформах; генераторные концы Kato массово встречаются в б/у турбинных генсетах — пакетировщик генераторов, прямую привязку к конкретному Solar-пакету подтверждать по шильдику",
+"relation": "изготовитель компонентов (генераторы)",
+"rank": 7,
+"country": "США (North Mankato, MN)",
+"models": [
+"Centaur 40/50",
+"Taurus 60/70",
+"Mars 90/100"
+],
+"evidence": "https://www.phxequip.com/equipment/28974/solar-taurus-70-gas-turbine-generator",
+"evidence2": "https://www.phxequip.com/equipment/8978/solar-centaur-50-gas-turbine-generator",
+"ask": "pn",
+"check": "doubt",
+"check_seen": "power-technology.com: «Kato's alternators for steam and gas turbine applications combine high-power density, efficiency and high performance», диапазон «200kW to 25MW» (в white paper — «100kW to 25,000kW»). nidec.com: «Nidec - Kato Engineering generators for gas & steam turbines… up to 25 MW». Ни Solar Turbines, ни Saturn/Titan 130 не упомянуты ни на одной из страниц",
+"tier": "maker",
+"comps": [
+"КВОУ, фильтры, навесное",
+"двигатели и агрегаты целиком"
+],
+"comp": "КВОУ, фильтры, навесное"
+},
+{
+"name": "SoEnergy International (Used Equipment)",
+"site": "https://surplusrecord.com/listing/5200-kw-solar-turbines-tarus-60-mobile-generator-set-both-1500-rpm-11000v-10-hours-2001-637827/",
+"what": "ТРЕЙДЕР (дилер Surplus Record): электростанция 2× Solar Centaur 40 по 3,0 МВт 13,8 кВ — капремонт 2020, смонтированы и не эксплуатировались (<800 ч на генконцах), со switchgear и панелями. Контакт: Victor Flores +1 904-333-6624",
+"relation": "трейдер (Silver-дилер Surplus Record с 2022), Хьюстон, Техас, США",
+"rank": 7,
+"country": "США",
+"models": [
+"Taurus 60",
+"Centaur 40"
+],
+"evidence": "https://surplusrecord.com/listing/5200-kw-solar-turbines-tarus-60-mobile-generator-set-both-1500-rpm-11000v-10-hours-2001-637827/",
+"ask": "nomen",
+"evidence2": "https://surplusrecord.com/electrical-power/gas-turbine-generators/solar/",
+"tier": "trader",
+"comps": [
+"прочее"
+],
+"comp": "прочее"
+},
+{
+"name": "TS&S — Turbine Services & Solutions (Sanad Group)",
+"site": "https://www.sanad.ae/",
+"what": "Независимая (внe OEM-сети) линия R&O газогенераторов Solar Centaur (hot end и cold end drive) на базе аэропорта Абу-Даби: тест-стенд, zero-time обменные юниты. Ключевой канал по Ближнему Востоку.",
+"relation": "независимая программа R&O в составе Sanad (Mubadala), Абу-Даби",
+"rank": 7,
+"country": "ОАЭ",
+"models": [
+"Centaur 40",
+"Centaur 50"
+],
+"evidence": "https://www.sanad.ae/archive/turbine-services-solutions-launch-uae-centaur-gas-turbine-overhaul-facility/",
+"ask": "nomen",
+"tier": "indep_service",
+"comps": [
+"КВОУ, фильтры, навесное",
+"двигатели и агрегаты целиком"
+],
+"comp": "КВОУ, фильтры, навесное"
+},
+{
+"name": "TURBINE.PARTS B.V.",
+"site": "https://turbine.parts",
+"what": "Уже в CRM (10 запросов). Трейдер hard-to-find/obsolete/discontinued для газотурбинных пакетов; сильная сторона — обвязка пакетов Solar по PN: linecard из десятков компонентных OEM (AMOT, Ametek, Auxitrol, Bently Nevada, CCS, Det-Tronics, Fenwal, JASC, Kavlico, Meggitt/Vibro-Meter, Metrix, Moog, PECC и др.)",
+"relation": "ТРЕЙДЕР, уже в CRM (10 запросов)",
+"rank": 7,
+"country": "Нидерланды",
+"email": "hello@turbine.parts",
+"evidence": "https://turbine.parts/",
+"evidence2": "http://turbine.parts/stock/",
+"models": [],
+"ask": "pn",
+"tier": "trader",
+"comps": [
+"прочее"
+],
+"comp": "прочее"
+},
+{
+"name": "Woodward Inc.",
+"site": "https://www.woodward.com",
+"what": "Топливные дозирующие клапаны для индустриальных ГТУ: GS6/GS16 (с бортовым драйвером, аэро/индустриальные), GS40/GS50, SonicFlo. Прямой Solar-референс на сайте не показан — при ретрофите САУ (Petrotech и др.) GS-серия ставится как end element; уточнять применимость по модели.",
+"relation": "изготовитель компонентов",
+"rank": 8,
+"country": "США (Fort Collins, CO)",
+"models": [
+"Centaur 40/50",
+"Taurus 60/70"
+],
+"evidence": "https://www.woodward.com/products/industrial/gs6-gas-fuel-metering-valve/",
+"ask": "nomen",
+"check": "doubt",
+"check_seen": "Страница «GS6 Gas Fuel Metering Valve» существует; о применении сказано лишь «used in aeroderivative gas turbines». Ни Solar Turbines, ни Saturn/Centaur/Taurus/Mars/Titan на странице нет",
+"tier": "maker",
+"comps": [
+"САУ, КИП, топливная арматура"
+],
+"comp": "САУ, КИП, топливная арматура"
+},
+{
+"name": "Allen Gears (Baker Hughes, с Lufkin)",
+"site": "https://www.bakerhughes.com/lufkin-gears-allen-gears-gearboxes-gear-couplings",
+"what": "Изготовитель эпициклических редукторов Solar-пакетов (ASG 32 на генприводе Solar Mars); центр компетенции по эпициклике: апгрейды, запчасти, полевой сервис и overhaul редукторов, в т.ч. чужих.",
+"relation": "изготовитель компонентов + сервис",
+"rank": 8,
+"country": "Великобритания (Pershore) / США",
+"models": [
+"Mars 90/100"
+],
+"evidence": "https://www.bakerhughes.com/lufkin-gears-allen-gears-gearboxes-gear-couplings",
+"evidence2": "https://www.scribd.com/document/678104445/a356a",
+"ask": "pn",
+"check": "doubt",
+"check_seen": "На живой странице Baker Hughes: 'High-performance gearbox solutions... epicyclic gearboxes, gear couplings, marine gearboxes'; сервис для 'their own products and over 30 other manufacturers' gearboxes'. Ни Solar Turbines, ни Solar Mars, ни ASG 32 на странице НЕТ.",
+"tier": "maker",
+"comps": [
+"ротор, подшипники, редукторы"
+],
+"comp": "ротор, подшипники, редукторы"
+},
+{
+"name": "Camfil Power Systems",
+"site": "https://www.camfil.com/en/industries/energy-and-power-systems/gas-turbines-and-air-compressors",
+"what": "Фильтры и системы КВОУ: CamGT (E)PA-финишные, картриджи TurboPulse/CamPulse GTC, префильтры Hi-Flo/CamClose; ретрофиты КВОУ под климат (offshore/пустыня/арктика). Под Solar-пакеты — подбор по размеру картриджа.",
+"relation": "изготовитель фильтров/КВОУ",
+"rank": 8,
+"country": "Швеция/Канада (Power Systems — Laval)",
+"models": [
+"Centaur 40/50",
+"Taurus 60/70",
+"Mars 90/100",
+"Titan 130/250"
+],
+"evidence": "https://www.camfil.com/en/industries/energy-and-power-systems/gas-turbines-and-air-compressors",
+"ask": "nomen",
+"check": "doubt",
+"check_seen": "'CamGT EPA filters boost gas turbine performance', 'TurboPulse takes a modern approach to filter design', 'CamPulse GTC... Cartridge air intake filters improve gas turbine performance', Hi-Flo префильтры, 'The CamClose panel air filter is engineered for gas turbine air intake systems'. Упоминаний Solar Turbines или моделей Saturn/Centaur/Taurus/Mars/Titan на странице НЕТ.",
+"tier": "maker",
+"comps": [
+"КВОУ, фильтры, навесное"
+],
+"comp": "КВОУ, фильтры, навесное"
+},
+{
+"name": "Donaldson (Gas Turbine Systems)",
+"site": "https://www.donaldson.com/en-us/gas-turbine/",
+"what": "КВОУ и сменные фильтры для 'large turbines, small turbines, microturbines'; официальная retrofit-программа воздухозаборных систем; частый штатный поставщик КВОУ Solar-пакетов.",
+"relation": "изготовитель фильтров/КВОУ",
+"rank": 8,
+"country": "США (Minneapolis, MN)",
+"models": [
+"Centaur 40/50",
+"Taurus 60/70",
+"Mars 90/100"
+],
+"evidence": "https://www.donaldson.com/en-us/gas-turbine/",
+"evidence2": "https://www.wajax.com/product/gas-turbine-inlet-air-filters/",
+"ask": "nomen",
+"check": "doubt",
+"check_seen": "'Donaldson designs and manufactures air inlet systems and filtration components for large turbines, small turbines, microturbines, and industrial compressors'; 'From initial system design to upgrades and retrofits'. Solar Turbines и модели Saturn/Centaur/Taurus/Mars/Titan НЕ упомянуты.",
+"tier": "maker",
+"comps": [
+"КВОУ, фильтры, навесное"
+],
+"comp": "КВОУ, фильтры, навесное"
+},
+{
+"name": "Prime Turbine Support",
+"site": "https://prime-turbinesupport.com/",
+"what": "ЗИП по всем линейкам Solar (Saturn, Centaur, Taurus, Mars, Titan), фокус — платформа Taurus: hot section, форсунки, подшипники, уплотнения; новые/refurb/serviceable used; ответ на RFQ за 24 ч",
+"relation": "ТРЕЙДЕР/сорсинг-партнёр (не изготовитель), Fort Lauderdale, FL, США",
+"rank": 8,
+"country": "США",
+"email": "sales@prime-turbinesupport.com",
+"models": [
+"Saturn 20",
+"Centaur 40/50",
+"Taurus 60/70",
+"Mars 90/100",
+"Titan 130"
+],
+"evidence": "https://prime-turbinesupport.com/",
+"ask": "pn",
+"tier": "trader",
+"comps": [
+"камера: жаровые, форсунки, SoLoNOx",
+"ротор, подшипники, редукторы"
+],
+"comp": "камера: жаровые, форсунки, SoLoNOx"
+},
+{
+"name": "Ideal Electric Power Co.",
+"site": "https://www.idealec.com",
+"what": "Производитель/ремонт генераторов 0,4–25 МВт (Мансфилд, Огайо); б/у генсеты Solar Centaur 40 на рынке идут в связке «Solar Centaur 40 + Ideal Electric» — исторический пакетируемый генератор для Solar; свежих пруфов новых пакетов нет, запрашивать по номенклатуре генератора",
+"relation": "изготовитель генераторов (историч. пакетирование с Solar)",
+"rank": 8,
+"models": [
+"Centaur 40 (б/у пакеты)"
+],
+"evidence": "https://www.machinio.com/manufacturer/centaur-40-solar-turbine",
+"evidence2": "https://www.machinio.com/manufacturer/solar-centaur",
+"ask": "nomen",
+"country": "США (Mansfield, OH)",
+"email": "",
+"tier": "maker",
+"comps": [
+"КВОУ, фильтры, навесное",
+"двигатели и агрегаты целиком"
+],
+"comp": "КВОУ, фильтры, навесное"
+},
+{
+"name": "Energy Parts Solutions",
+"site": "https://www.energypartssolutions.com/services/reverse-engineering/",
+"what": "Изготовитель: прецизионная механообработка и производство лопаток, сопловых, диафрагм; reverse engineering по изношенной детали-образцу (CMM, CAD/CAM, 50+ лет опыта) — вариант для позиций, где OEM недоступен; прямых Solar-референсов на сайте нет",
+"relation": "независимый изготовитель по образцу (Solar-опыт не доказан — проверять запросом)",
+"rank": 9,
+"country": "США (Schaumburg, IL)",
+"models": [
+"уточнять (публичных Solar-референсов нет)"
+],
+"evidence": "https://www.energypartssolutions.com/services/reverse-engineering/",
+"ask": "sample",
+"tier": "maker",
+"comps": [
+"лопатки и сопловые (blades/nozzles)",
+"двигатели и агрегаты целиком"
+],
+"comp": "лопатки и сопловые (blades/nozzles)"
+},
+{
+"name": "Gas Turbine Applications Inc (GTA)",
+"site": "https://www.powermag.com/press-releases/gas-turbine-applications-inc/",
+"what": "Независимый шоп (с 1984): овер-хол, ремонт и тестирование Solar Saturn и Centaur. В 2018 куплен Turbine Efficiency Group (UK); домен TEG сейчас мёртв — перед контактом проверить текущий статус GTA/TEG.",
+"relation": "независимый шоп, Калера, Оклахома; ВНИМАНИЕ: статус материнской TEG неясен",
+"rank": 9,
+"country": "США",
+"models": [
+"Saturn 20",
+"Centaur 40",
+"Centaur 50"
+],
+"evidence": "https://www.powermag.com/press-releases/gas-turbine-applications-inc/",
+"ask": "nomen",
+"tier": "indep_service",
+"comps": [
+"прочее"
+],
+"comp": "прочее"
+},
+{
+"name": "VG Engineering",
+"site": "https://vg-eng.com",
+"what": "Полевой сервис и сопровождение замен двигателей/редукторов (engine & RGB exchange, пуско-наладка) по всей линейке Solar: Saturn, Centaur, Taurus, Mars, Titan; системы управления и КИП. НЕ овер-хол шоп — сервисно-инжиниринговая компания (частично агентская модель по овер-холу — «support customers with OEM overhaul»).",
+"relation": "независимый сервис/exchange, уже в CRM (3 запроса)",
+"rank": 9,
+"country": "Великобритания (Gourdon, Шотландия)",
+"evidence": "https://vg-eng.com/gas-turbine-services/",
+"models": [
+"Saturn 20",
+"Centaur 40/50",
+"Taurus 60/70",
+"Mars 90/100",
+"Titan 130/250",
+"Titan 130",
+"Centaur 40",
+"Centaur 50",
+"Taurus 60",
+"Taurus 70",
+"Mars 90",
+"Mars 100"
+],
+"ask": "pn",
+"evidence2": "https://vg-eng.com/gas-turbines",
+"email": "sales@vg-eng.com",
+"tier": "indep_service",
+"comps": [
+"ротор, подшипники, редукторы",
+"двигатели и агрегаты целиком"
+],
+"comp": "ротор, подшипники, редукторы"
+},
+{
+"name": "Fin Marine & Energy Solutions",
+"site": "https://fin-marine.com",
+"what": "ТРЕЙДЕР (Стамбул/Дубай): в наличии 2× Solar Mars 100 генсета 11,3 МВт SoLoNOx, «zero hours after overhaul» (2011 г.в.), генераторы в комплекте; торгует турбинными агрегатами для marine/energy — удобный нейтральный канал для СНГ",
+"relation": "трейдер б/у агрегатов",
+"rank": 9,
+"models": [
+"Mars 100"
+],
+"evidence": "https://fin-marine.com/gas-turbine/mars-100-gas-turbine-generator-set/",
+"ask": "nomen",
+"country": "Турция/ОАЭ",
+"email": "",
+"tier": "trader",
+"comps": [
+"камера: жаровые, форсунки, SoLoNOx",
+"КВОУ, фильтры, навесное",
+"двигатели и агрегаты целиком"
+],
+"comp": "камера: жаровые, форсунки, SoLoNOx"
+},
+{
+"name": "Genersol",
+"site": "https://www.genersol.com/en/products-and-services/Gas-turbine-p389601644",
+"what": "Региональный сервис/поставка по Solar Taurus и Centaur: первичные и вторичные форсунки, жаровые (flame tube), переходники, лопатки, сопловые, бандажи; бороскопия, замена горячих частей, ремонт силовой турбины в цехе",
+"relation": "региональный сервис-провайдер/дистрибьютор ЗИП (Латинская Америка), Монтевидео, Уругвай",
+"rank": 11,
+"country": "Уругвай",
+"email": "genersol@genersol.com",
+"models": [
+"Centaur 40/50",
+"Taurus 60"
+],
+"evidence": "https://www.genersol.com/en/products-and-services/Gas-turbine-p389601644",
+"ask": "pn",
+"tier": "trader",
+"comps": [
+"камера: жаровые, форсунки, SoLoNOx",
+"лопатки и сопловые (blades/nozzles)"
+],
+"comp": "камера: жаровые, форсунки, SoLoNOx"
+},
+{
+"name": "Al Waseet Oil Equipment Trading",
+"site": "https://www.alwaseetoil.com",
+"what": "НОВЫЙ. Абу-Даби, ISO 9001, 30+ лет поддержки Solar Saturn и Centaur; инвентарь ЗИП пакетов и аксессуаров (стартеры TDI/POW-R-QUIK, клапаны ASCO/Velan, фильтры AAF/Donaldson/Camfil, SKF, метизы/уплотнения) — хороший канал по обвязке пакетов через ОАЭ",
+"relation": "ТРЕЙДЕР/дистрибьютор, НОВЫЙ",
+"rank": 11,
+"country": "ОАЭ (Абу-Даби)",
+"email": "sales@alwaseetoil.com",
+"evidence": "https://www.alwaseetoil.com/",
+"models": [
+"Saturn 10/20",
+"Centaur 40/50"
+],
+"ask": "pn",
+"tier": "trader",
+"comps": [
+"ротор, подшипники, редукторы",
+"САУ, КИП, топливная арматура",
+"КВОУ, фильтры, навесное"
+],
+"comp": "ротор, подшипники, редукторы"
+},
+{
+"name": "IER — International Energy Resources FZCO",
+"site": "https://ierfzco.com",
+"what": "НОВЫЙ. Дубай, Jebel Ali FZ: MRO и поставка запчастей/core engines/модулей для лёгких индустриальных и аэропроизводных ГТ; 'Solar Cat' прямо в списке поддерживаемых OEM; 30+ лет опыта. Конкретные модели Solar на сайте не раскрыты — запросить",
+"relation": "ТРЕЙДЕР/MRO, НОВЫЙ",
+"rank": 12,
+"country": "ОАЭ (Дубай, JAFZA)",
+"email": "sales@ierfzco.com",
+"evidence": "https://ierfzco.com/energy/",
+"models": [],
+"ask": "nomen",
+"tier": "trader",
+"comps": [
+"двигатели и агрегаты целиком"
+],
+"comp": "двигатели и агрегаты целиком"
+},
+{
+"name": "Global Power Supply (globalpwr.com)",
+"site": "https://www.globalpwr.com",
+"what": "ТРЕЙДЕР/стокист энергоблоков: маркетирует скид-пакеты Solar Taurus 60 (размещает полные спецификации Solar TPS60GS), торгует турбинными и дизельными генсетами из наличия",
+"relation": "трейдер/стокист",
+"rank": 12,
+"models": [
+"Taurus 60"
+],
+"evidence": "https://www.globalpwr.com/wp-content/uploads/cut-sheets/gps-taurus60-skid-mount.pdf",
+"ask": "nomen",
+"country": "США",
+"email": "",
+"tier": "trader",
+"comps": [
+"двигатели и агрегаты целиком"
+],
+"comp": "двигатели и агрегаты целиком"
+},
+{
+"name": "PeriParts",
+"site": "https://www.peri-parts.com",
+"what": "Уже предлагали нам (8 запросов). Онлайн-трейдер «genuine/OEM/replacement» деталей Solar по каталожным номерам — публичный каталог с PN (178502-1, 143925-1, 30065-0, 5475C-006, 702009C1 и т.д.), полезен для валидации формата PN и быстрых RFQ; трейдер без собственного производства. Сайт за анти-ботом (403) — подтверждено индексированными карточками PN",
+"relation": "трейдер (онлайн-каталог)",
+"rank": 13,
+"models": [
+"Saturn 20",
+"Centaur 40",
+"Centaur 50",
+"Taurus 60",
+"Mars 90",
+"Mars 100"
+],
+"evidence": "https://www.peri-parts.com/brand/solar-turbines (403 анти-бот; подтверждено выдачей)",
+"evidence2": "https://www.peri-parts.com/178502-1-solar-turbines-a-caterpillar-brand-original-retainer-o-ring-65d.html",
+"ask": "pn",
+"tier": "trader",
+"comps": [
+"прочее"
+],
+"comp": "прочее"
+},
+{
+"name": "One Power Services",
+"site": "https://onepowerservices.com",
+"what": "Уже предлагали нам (4 запроса). Сингапурская компания (активна в СНГ, офис Ташкент по выдаче): капремонты, обмены, запчасти и ремонт по индустриальным ГТУ Solar — силовые турбины, редукторы, ретрофиты СУ, обвязка; плюс химия для промывки, фильтрация, масла. Конкретные модели на сайте не названы — уточнять номенклатуру при RFQ",
+"relation": "независимый сервис/трейдер, уже в CRM (4 запроса)",
+"rank": 13,
+"country": "Сингапур",
+"evidence": "https://onepowerservices.com/products/solar-turbine-parts-and-services",
+"evidence2": "https://onepowerservices.com/about-us",
+"models": [],
+"ask": "nomen",
+"tier": "trader",
+"comps": [
+"ротор, подшипники, редукторы",
+"КВОУ, фильтры, навесное"
+],
+"comp": "ротор, подшипники, редукторы"
+},
+{
+"name": "Curtiss-Wright Surface Technologies (CCRS)",
+"site": "https://surfacetechnologies.curtisswright.com/",
+"what": "Компонентный ремонт и покрытия (диффузионные, thermal spray) лопаток и сопловых аппаратов газовых турбин; в описании сервиса заявлен опыт ремонта Solar. Страница отдаёт 403 боту — подтверждено только поисковым сниппетом, нужна ручная верификация моделей.",
+"relation": "независимый компонентный/покрытийный подрядчик; слабое доказательство — проверить вручную",
+"rank": 14,
+"country": "Великобритания/США",
+"models": [],
+"evidence": "https://surfacetechnologies.curtisswright.com/our-services/component-coating-and-repair-services",
+"ask": "pn",
+"tier": "indep_service",
+"comps": [
+"лопатки и сопловые (blades/nozzles)",
+"покрытия и восстановление"
+],
+"comp": "лопатки и сопловые (blades/nozzles)"
+},
+{
+"name": "Precision Asset Solutions (PASPL)",
+"site": "https://precisionasset.in",
+"what": "НОВЫЙ. Индийский трейдер-снабженец ГТ-запчастей: Solar Turbines в списке брендов (также Siemens/GE/RR/Mitsubishi/Ansaldo); закупает genuine OEM и совместимые позиции через дистрибьюторские сети; офисы Дели/Гургаон/Мумбаи и др. Модели не детализированы — работать по нашим PN",
+"relation": "ТРЕЙДЕР, НОВЫЙ",
+"rank": 14,
+"country": "Индия (Дели/Мумбаи)",
+"email": "info@precisionasset.in",
+"evidence": "https://precisionasset.in/gas-turbine-spares/",
+"models": [],
+"ask": "pn",
+"tier": "trader",
+"comps": [
+"прочее"
+],
+"comp": "прочее"
+},
+{
+"name": "Used Power Plants FZE",
+"site": "https://www.usedpowerplants.com",
+"what": "Стокист комплектных агрегатов в ОАЭ: в наличии Taurus 60 T7301 (2008 г.в., полный рефабрикейт 2024, 0 часов, 5200 кВт, 50 Гц, редуктор Solar + генератор Leroy Somer, бороскоп-отчёт). Канал под целые пакеты и доноры ЗИП",
+"relation": "трейдер/стокист комплектных агрегатов",
+"rank": 15,
+"country": "ОАЭ (Рас-эль-Хайма)",
+"models": [
+"Taurus 60"
+],
+"evidence": "https://www.usedpowerplants.com/listings/7663542-solar-taurus-60-t7301-gas-turbine",
+"email": "info@usedpowerplants.com",
+"ask": "nomen",
+"tier": "trader",
+"comps": [
+"ротор, подшипники, редукторы",
+"КВОУ, фильтры, навесное",
+"двигатели и агрегаты целиком"
+],
+"comp": "ротор, подшипники, редукторы"
+},
+{
+"name": "HPI LLC",
+"site": "https://www.hpi-llc.com",
+"what": "Интегратор САУ турбомашин: ретрофиты систем управления на всех основных OEM, включая Solar (пример — Centaur 50 с подключением к InSight); канал под контроллеры/АСУ, не под горячий тракт",
+"relation": "независимый интегратор систем управления (не изготовитель ЗИП)",
+"rank": 15,
+"country": "США (Houston, TX)",
+"models": [
+"Centaur 40/50 (пример ретрофита Centaur 50)"
+],
+"evidence": "http://www.mec-houston.com/assets/HPI/HPI-Overview-Presentation.pdf (hpi-llc.com отдаёт 403; подтверждено сниппетами и LinkedIn)",
+"evidence2": "https://www.linkedin.com/company/hpi-llc",
+"ask": "nomen",
+"tier": "maker",
+"comps": [
+"САУ, КИП, топливная арматура"
+],
+"comp": "САУ, КИП, топливная арматура"
+},
+{
+"name": "Dongturbo Electric Co Ltd (DTEC)",
+"site": "https://www.dongturbo.com",
+"what": "Уже предлагали нам (7 запросов). КИТАЙ — фиксируем с пометкой: как КАНАЛ реверс-ЗИП не предлагать (правило владельца); реальный опыт по Solar подтверждён: продают б/у пакеты Taurus 70 (генсет 2004 г., 10 тыс. часов, $2,95 млн с рефабрикейтом), Taurus 60, Saturn 20 и системы обвязки (маслосистема, топливный газ, воздухозабор). Допустимое применение — целые машины/доноры, не реверс-детали",
+"relation": "китайский трейдер б/у пакетов + изготовитель (ПОМЕТКА: не канал для реверс-ЗИП)",
+"rank": 17,
+"country": "Китай (Чэнду/Дэян)",
+"models": [
+"Saturn 20",
+"Taurus 60",
+"Taurus 70"
+],
+"evidence": "https://www.chinaturbo.net/gas-turbine-power-plant/gas-turbine-power-plant-equipment/used-solar-gas-turbine-t70.html",
+"evidence2": "https://www.dongturbo.com/used-solar-gas-turbine-taurus-70 (анти-бот; подтверждено выдачей)",
+"ask": "nomen",
+"tier": "trader",
+"comps": [
+"САУ, КИП, топливная арматура",
+"двигатели и агрегаты целиком"
+],
+"comp": "САУ, КИП, топливная арматура",
+"customs": {
+"n": 20,
+"years": [
+"2023",
+"2024",
+"2025"
+],
+"exporter": "DONGTURBO ELECTRIC COMPANY LTD.."
+}
+},
+{
+"name": "Hangzhou HGTP Gas Turbine Parts Co Ltd",
+"site": "https://gas-turbine-parts.com",
+"what": "Уже в CRM (3 запроса). Китайский изготовитель/поставщик ЗИП Solar: рабочие колёса, лопатки, сопловые аппараты, камеры сгорания, датчики, насосы, стартеры, клапаны для Mars, Mercury, Taurus, Titan. ПОМЕТКА: китайский изготовитель — фиксируем опыт, но как канал реверса НЕ предлагать (правило владельца); сайт из нашего региона отдаёт 503, контент по индексу",
+"relation": "китайский изготовитель реверс-ЗИП (ПОМЕТКА: не канал)",
+"rank": 18,
+"country": "Китай (Ханчжоу)",
+"models": [
+"Centaur 40",
+"Centaur 50",
+"Taurus 70",
+"Mars 90/100",
+"Taurus 60/70",
+"Titan 130"
+],
+"evidence": "https://gas-turbine-parts.com/?a=index&aid=453&c=View&m=home (анти-бот 503; подтверждено выдачей)",
+"evidence2": "https://www.industrialmarinepower.com/company/hangzhou-hgtp-gas-turbine-parts-coltd/",
+"ask": "pn",
+"tier": "maker",
+"comps": [
+"камера: жаровые, форсунки, SoLoNOx",
+"лопатки и сопловые (blades/nozzles)",
+"САУ, КИП, топливная арматура",
+"КВОУ, фильтры, навесное"
+],
+"comp": "камера: жаровые, форсунки, SoLoNOx"
+},
+{
+"name": "Astrum Energy",
+"site": "http://astrum-energy.com",
+"what": "ТРЕЙДЕР (Дюссельдорф, ФРГ; всплывает в казахстанских выдачах): продуктовая страница Solar Turbines (генераторные модули MGP, lifecycle-сервис), торгует турбинами/генсетами — потенциальный нейтральный канал ЕС→ЦА",
+"relation": "трейдер",
+"rank": 19,
+"models": [],
+"evidence": "http://astrum-energy.com/product/turbine/",
+"ask": "nomen",
+"country": "Германия (Дюссельдорф)",
+"email": "info@astrum-energy.com",
+"tier": "trader",
+"comps": [
+"КВОУ, фильтры, навесное",
+"двигатели и агрегаты целиком"
+],
+"comp": "КВОУ, фильтры, навесное"
+}
+],
+"stock": [
+{
+"what": "Solar Taurus 60 T7301 генсет 5200 кВт, 50 Гц, 2008 г.в., рефабрикейт 2024, 0 часов, редуктор Solar + генератор Leroy Somer, бороскоп-отчёт (сток №00072)",
+"seller": "Used Power Plants FZE",
+"url": "https://www.usedpowerplants.com/listings/7663542-solar-taurus-60-t7301-gas-turbine",
+"condition": "zero-hour после полного рефабрикейта",
+"price": "по запросу",
+"country": "ОАЭ"
+},
+{
+"what": "Solar Taurus 70 (T70) генераторный пакет: ГТУ + генератор + редуктор + шумозащитный кожух + масло/топливо/воздухосистемы; 2004 г.в., ввод 2005, наработка 10 000 ч, последняя работа 2012; цена включает рефабрикейт (правка, пескоструй, покраска)",
+"seller": "Dongturbo Electric (DTEC)",
+"url": "https://www.chinaturbo.net/gas-turbine-power-plant/gas-turbine-power-plant-equipment/used-solar-gas-turbine-t70.html",
+"condition": "б/у, 10 000 часов",
+"price": "USD 2 950 000",
+"country": "Китай",
+"note": "у DTEC также заявлены б/у Taurus 60 и Saturn 20; китайский канал — только целые машины/доноры"
+},
+{
+"what": "Solar Taurus 70 генсет (8180 кВт ISO, SoLoNOx/conventional варианты), б/у",
+"seller": "Saintwah Inc (площадка Made-in-China)",
+"url": "https://saintwah.en.made-in-china.com/product/qOZfkNtdGFpD/China-Solar-Turbines-Taurus-70-T70-Gas-Turbine-Used-Turbine.html",
+"condition": "б/у, гарантия 1 год / 2000 ч",
+"price": "USD 1 260 000 – 1 450 000",
+"country": "Китай",
+"note": "трейдер-площадка, происхождение машины проверять отдельно"
+},
+{
+"what": "Zero-hour восстановленные Saturn и Centaur (гарантия 1 год); малочасовые Taurus, Mars, Titan, 50/60 Гц; кастомная сборка генсетов и компрессорных сетов; ЗИП Solar",
+"seller": "Surplus Generation Equipment LLC (sirgen)",
+"url": "http://www.sirgen.com/solargasturbines.html",
+"condition": "zero-hour / low-hour surplus",
+"price": "по запросу",
+"country": "США"
+},
+{
+"what": "Редуктор привода агрегатов Solar (Accessory drive Gearbox) PN 117850-105 — на складе, немедленная отгрузка; всего >4000 позиций ЗИП Solar + двигатели и комплектные пакеты Saturn/Centaur/Taurus/Mars",
+"seller": "Heriss Corporation",
+"url": "https://heriss.com/ps/solar/",
+"condition": "склад, new/zero-hour/б.у.",
+"price": "по запросу",
+"country": "Канада"
+},
+{
+"what": "Taurus 60 T7301 Gas — комплектная единица в продаже (плюс онлайн-каталог ЗИП Solar)",
+"seller": "Antoni International",
+"url": "https://www.antoni-intl.com/Equipment+for+Sale/id/42/prod_id/16257/",
+"condition": "по запросу",
+"price": "по запросу",
+"note": "сайт за анти-ботом, листинг подтверждён через поисковую выдачу"
+},
+{
+"what": "Solar Taurus 60 T7301 ГТЭС 5200 кВт, 2001 г.в., эксплуатация до 2007, генератор после ремонта, 2 единицы, borescope-отчёты по запросу",
+"seller": "Phoenix Equipment Corporation (Red Bank, NJ, США)",
+"url": "https://www.phxequip.com/plant/99/5200-kw-solar-taurus-60-gas-turbine-generator",
+"condition": "used/rebuilt generator",
+"price": "по запросу",
+"country": "США",
+"note": "Проверено WebFetch 17.08.2026; email sales@phxequip.com, сток №12107. Кандидат в доноры ЗИП Taurus 60 (11 сделок КВАНТ)"
+},
+{
+"what": "Solar Taurus 60 ГТЭС 5300 кВт на природном газе, доступна немедленно",
+"seller": "Phoenix Equipment Corporation",
+"url": "https://www.phxequip.com/plant/2282/5300-kw-solar-taurus-60-gas-turbine-generator",
+"condition": "used",
+"price": "по запросу",
+"country": "США",
+"note": "Из поисковой выдачи, страница той же площадки"
+},
+{
+"what": "Solar Taurus 60 Package, 50 Гц, ~30 000 часов, выведен из эксплуатации в 2014, хранение в контролируемых условиях",
+"seller": "EthosEnergy",
+"url": "https://ethosenergy.com/parts-and-equipment/solar-taurus-60-package-used-50-hz",
+"condition": "used, storage",
+"price": "по запросу",
+"country": "США/UK",
+"note": "Страница отдаёт redirect при fetch, данные из сниппетов; 50 Гц — подходит под рынки СНГ/ЕС"
+},
+{
+"what": "Мобильная ГТЭС Solar Taurus 60 5.2 МВт, 13.8 кВ, 33 540 часов с новья, на трейлере с САУ",
+"seller": "Surplus Record (агрегатор, листинг дилера)",
+"url": "https://surplusrecord.com/electrical-power/gas-turbine-generators/solar/",
+"condition": "used",
+"price": "по запросу",
+"country": "США",
+"note": "Категория Surplus Record по Solar — живой пул листингов Saturn/Centaur/Taurus"
+},
+{
+"what": "Taurus 60 генсет 2012 г., unused, 5500 кВт, 11 кВ, 50 Гц",
+"seller": "Machinio (агрегатор)",
+"url": "https://www.machinio.com/cat/solar-taurus-60-turbines",
+"condition": "unused",
+"price": "по запросу",
+"note": "Агрегатор — выйти на конечного продавца"
+},
+{
+"what": "Лот ЗИП Mars 100: 331 позиция (уплотнения, регуляторы, подшипники, клапаны, электронные модули), new surplus",
+"seller": "Salvex (аукцион)",
+"url": "https://www.salvex.com/listings/listing_detail.cfm/aucid/183026815/",
+"condition": "new surplus",
+"price": "запрашивали $1 028 000 (wholesale $1.5 млн)",
+"note": "ВНИМАНИЕ: листинг помечен «no longer available» — лот ушёл. Полезен как ценовой бенчмарк на пакет ЗИП Mars 100 (31 запрос в базе КВАНТ); мониторить Salvex на повторы"
+},
+{
+"what": "2x Solar Centaur 40 (3000 кВт каждая, 13 800 В, 60 Гц) — комплектная электростанция: КРУ Square D 15 кВ, САУ, ВЗУ/выхлоп; оверхол 2020 г., установлены, но не эксплуатировались (генераторы <800 ч, один 0 ч)",
+"seller": "Integrated Energy Networks LLC (через Surplus Record), контакт Victor Flores +1-904-333-6624",
+"url": "https://surplusrecord.com/listing/6-mw-13800v-60-hz-solar-centaur-40-two-unit-power-plant-1039510/",
+"condition": "overhauled 2020, не эксплуатировалась",
+"country": "США (Dade City, FL)",
+"price": "по запросу",
+"note": "проверено WebFetch; демонтаж с площадки за счёт покупателя"
+},
+{
+"what": "Solar Centaur 50 ГТЭС 4000 кВт (GSI-CH-ID, 1986 г., топливо керосин, 4160 В), ~3000 часов и ~1400 пусков; полный комплект вспомсистем (маслоохладители, КРУ, ВЗУ, выхлопные стеки)",
+"seller": "Phoenix Equipment Corp, Red Bank, NJ, +1-732-442-6990 (сток #13305)",
+"url": "https://www.phxequip.com/equipment/29735/4000-kw-solar-centaur-50-gas-turbine-generator",
+"condition": "б/у, малая наработка (3000 ч)",
+"country": "США",
+"price": "по запросу",
+"note": "проверено WebFetch; s/n пакета HG86O17, s/n двигателя 0022H53 — источник донорских узлов горячего тракта Centaur 50"
+},
+{
+"what": "Каталог б/у Solar (Centaur 40/50, Taurus 60, Saturn) — генераторные установки и пакеты, сводная витрина продавцов",
+"seller": "Surplus Record (маркетплейс)",
+"url": "https://surplusrecord.com/electrical-power/gas-turbine-generators/solar/",
+"condition": "разное (used/surplus)",
+"country": "США",
+"note": "точка мониторинга донорских двигателей под разборку на ЗИП"
+},
+{
+"what": "Мобильный генсет Solar Taurus 60, 5200 кВт, 2001 г.в., 10 моточасов, 11 кВ / 1500 rpm (50 Гц)",
+"seller": "SoEnergy Used Equipment (Хьюстон)",
+"url": "https://surplusrecord.com/listing/5200-kw-solar-turbines-tarus-60-mobile-generator-set-both-1500-rpm-11000v-10-hours-2001-637827/",
+"price": "$3 100 000",
+"condition": "практически новый (10 часов наработки), mobile trailer",
+"country": "США",
+"note": "Лот активен; контакт Jairo Gonzalez 305-431-7296; проверен WebFetch"
+},
+{
+"what": "2 (два) генсета Solar Taurus 60 T7301, 5200 кВт, 3/60/4160В, 2001 г.в., конфигурация landfill gas (конвертируется на природный газ)",
+"seller": "Phoenix Equipment Corp. (Нью-Джерси), сток #12107",
+"url": "https://www.phxequip.com/equipment/28634/solar-taurus-60-gas-turbine-generator",
+"price": "по запросу",
+"condition": "б/у: эксплуатация 2001–2007, далее хранение под программой Solar care; генератор rebuilt; бороскопия по запросу; полная обвязка (switchgear, фильтры Donaldson, выхлоп, маслосистема)",
+"country": "США",
+"note": "Активный лот, Qty 2; дубль-листинг на LabX (DIS-39092-12107) подтверждает; проверен curl"
+},
+{
+"what": "Мобильный генсет Solar Taurus 60 (TG01827), 5200 кВт, 13,8 кВ, 33 540 часов, трейлер + СУ plug-and-play",
+"seller": "Integrated Energy Networks LLC (Dade City, FL)",
+"url": "https://surplusrecord.com/listing/solar-taurus-60-mobile-turbine-generator-1034570/",
+"price": "по запросу",
+"condition": "б/у, 33 540 ч с нового",
+"country": "США",
+"note": "Активен; у того же продавца также 2×Centaur 40 3000 кВт (2014) и 3×Saturn 10; проверен WebFetch"
+},
+{
+"what": "Склад агрегатов и обменных двигателей Solar: Titan 130S 15 МВт (new surplus), Mars 90 9,5 МВт, 2×Taurus T7901S 5,67 МВт 60 Гц (new surplus) + 2×50 Гц, Centaur T5901S/T4701S/T4501, Saturn T1301; exchange-двигатели «0 часов после капремонта, tested»: Taurus T7301S, Centaur T4702S/T4701S/T4502/T4501, Saturn T1602/T1302/T1301/T1202/T1201",
+"seller": "TMS Ltd. (Alberta-TMS), Альберта, Канада",
+"url": "http://www.lincoln-tms.com/equipment-sales/",
+"price": "по запросу",
+"condition": "смесь: new surplus / refurbished / б/у, со стандартной гарантией",
+"country": "Канада",
+"note": "Ключевой канал по ядрам/обменным двигателям (engine core exchange) из нефтянки Альберты; проверен curl"
+},
+{
+"what": "Активная категория Solar на Surplus Record: Taurus 60-7301 5200 кВт (Wabash Power, Wheeling IL); Taurus 70 6500 кВт, 2016 г., 28 000 ч (NSV Energy, Canton GA); 4×Taurus low-hours (Energy & Industrial Solutions, FL); Saturn 10 T1201 800 кВт 2013 г. (Industrial Motor Power, CA)",
+"seller": "разные дилеры через Surplus Record",
+"url": "https://surplusrecord.com/electrical-power/gas-turbine-generators/solar/",
+"price": "по запросу",
+"condition": "б/у / low-hours",
+"country": "США",
+"note": "Категорийная страница проверена WebFetch; лот Taurus 70 2016 г. — редкий на вторичке"
+},
+{
+"what": "«Zero-hour» полностью перебранные Saturn и Centaur с годовой гарантией; low-hour Taurus, Mars, Titan (50/60 Гц); кастомная сборка генсетов и компрессорных пакетов; запчасти",
+"seller": "Surplus Generation Equipment LLC (SirGen)",
+"url": "http://www.sirgen.com/solargasturbines.html",
+"price": "по запросу",
+"condition": "переборка «0 часов» с гарантией 1 год / low-hour б/у",
+"country": "США",
+"note": "Брокер; проверен curl"
+},
+{
+"what": "Складские запчасти Solar: горячая часть, HGPI-компоненты, new/refurbished/used/surplus/reverse-engineered; собственный inventory по Centaur и Taurus",
+"seller": "IMMI Turbines (Конро, Техас)",
+"url": "https://immiturbines.com/about-us/",
+"price": "заявлено на 25–50% ниже OEM",
+"condition": "new / refurbished / used / surplus / reverse-engineered",
+"country": "США",
+"note": "RFQ по каталожным номерам, ответ 24–48 ч; email sales@immiturbines.com; проверен WebFetch"
+},
+{
+"what": "Hot Gas Path (HGP) и inspection kits, компоненты камеры сгорания для Titan 130/250, Mars 100, Taurus 60, Centaur 40",
+"seller": "Wogen Engineering (Аджман, ОАЭ)",
+"url": "https://wogenengg.com/gas-turbine-spare-parts.html",
+"price": "по запросу",
+"condition": "new / surplus / refurbished / used",
+"country": "ОАЭ",
+"note": "Трейдер; хаб для поставок в регион MENA; email Info@wogenengg.com; проверен WebFetch"
+},
+{
+"what": "Перебранные (zero-hour) Solar Centaur C-40 4701/4702 — склад для немедленного обмена (exchange); полный teardown, NDE, балансировка ротора, тестирование в Хьюстоне; поддержка перевозки и монтажа",
+"seller": "EthosEnergy (Хьюстон, Техас)",
+"url": "https://ethosenergy.com/parts-and-equipment/solar-centaur-40-gas-turbine",
+"condition": "полностью перебран, протестирован (zero-hour)",
+"price": "по запросу",
+"country": "США",
+"note": "Текст страницы проверен напрямую (curl): «inventory of overhauled Solar Centaur 40 gas turbines available for immediate exchange»"
+},
+{
+"what": "Zero-hour Solar Saturn и Centaur (гарантия 1 год); малоресурсные Taurus, Mars, Titan",
+"seller": "Sirgen (трейдер)",
+"url": "http://www.sirgen.com/solargasturbines.html",
+"condition": "zero-hour / low-hour",
+"price": "по запросу",
+"country": "США",
+"note": "Сайт за анти-бот защитой; данные из поисковой выдачи — проверить вручную"
+},
+{
+"what": "Б/у агрегаты и запчасти Solar (Saturn/Centaur/Taurus/Mars) — раздел Equipment for Sale",
+"seller": "Antoni International (трейдер)",
+"url": "https://www.antoni-intl.com/Equipment+for+Sale/id/42/gr_id/1/offset/2/",
+"condition": "б/у, разное",
+"price": "по запросу",
+"country": "США",
+"note": "Сайт на устаревшем TLS, напрямую не открылся — верифицировано поисковыми сниппетами"
+},
+{
+"what": "Solar Centaur 4701, 3.5 МВт, газовый генераторный агрегат — листинг #1021991",
+"seller": "EquipNet (маркетплейс)",
+"url": "https://www.equipnet.com/solar-turbines-centaur-4701-35-mw-natural-ga-listid-1021991/",
+"condition": "б/у",
+"price": "по запросу",
+"country": "США",
+"note": "Страница отдаёт 403 боту — наличие листинга видно из поисковой выдачи, проверить вручную"
+},
+{
+"what": "Б/у Solar Centaur (агрегаты/генсеты, разные годы) — сводные объявления",
+"seller": "Machinio (агрегатор, продавцы разные)",
+"url": "https://www.machinio.com/manufacturer/solar-centaur",
+"condition": "б/у, разное",
+"price": "разные",
+"country": "разные",
+"note": "Агрегатор — использовать для мониторинга появления Centaur/Taurus на вторичке"
+},
+{
+"what": "Solar accessory drive gearbox PN 117850-105 — в наличии, immediate delivery; плюс общий сток 4000+ позиций Solar-ЗИП (Saturn 10/20, Centaur 4500/50, Taurus 60/65/70) и zero-hour/новые двигатели",
+"seller": "Heriss Corporation (Канада)",
+"url": "https://heriss.com/ps/solar/",
+"condition": "новое/surplus (по позиции уточнять)",
+"country": "Канада",
+"note": "На сайте опубликованы Solar Parts List и лист доступного инвентаря; контакт sales@heriss.com"
+},
+{
+"what": "Zero-hour капиталенные Solar Saturn и Centaur (генсеты/компрессорные) с гарантией 1 год; малоресурсные Taurus, Mars, Titan 50/60 Гц; запчасти Solar",
+"seller": "Surplus Generation Equipment, LLC (sirgen.com)",
+"url": "http://www.sirgen.com/solargasturbines.html",
+"condition": "overhauled zero-hour / low-hour surplus",
+"country": "США",
+"note": "Брокер; кастомная сборка под требования (genset/compressor set)"
+},
+{
+"what": "Складской сток Solar-ЗИП: exchange топливные регуляторы (газ/жидкое), black boxes, сервоприводы, термопары, компрессорные лопатки и лопатки НА, горячий тракт, вращающиеся/статичные уплотнения, роторы, комплектные скиды — Saturn 10/20, Centaur 40/50, Taurus 60/70",
+"seller": "IMMI Turbines (Conroe, TX)",
+"url": "https://www.power-technology.com/contractors/turbine-cooling/immi-turbines/",
+"condition": "new / refurbished / used / surplus",
+"country": "США",
+"note": "Котировки 24-48 ч, заявленные цены на 25-50% ниже OEM; sales@immiturbines.com"
+},
+{
+"what": "Exchange-двигатели и капремонт Solar Saturn 10, Centaur 40/50, Taurus 60, Mars 90/100 + поиск запчастей по базе (Parts Quick Search: Centaur, Mars, Taurus)",
+"seller": "EthosEnergy Light Turbines (Хьюстон)",
+"url": "https://ethosenergy.com/services/light-industrial-gas-turbines/solar-light-turbines",
+"condition": "overhauled/exchange",
+"country": "США",
+"note": "Крупнейший независимый по Solar; юрисдикция США — через посредника"
+},
+{
+"what": "Инвентарь Solar Turbine: генсеты, двигатели, запчасти (модели/цены по запросу)",
+"seller": "CTG Power Systems International (Тампа)",
+"url": "https://www.ctgpowersystems.com/inventory/.b/solar-turbine",
+"condition": "used/surplus",
+"country": "США",
+"note": "Брокер; запрашивать актуальный сток-лист"
+},
+{
+"what": "Сток hard-to-find/obsolete компонентов обвязки газотурбинных пакетов (датчики, клапаны, контроллеры десятков OEM из linecard — AMOT, Meggitt/Vibro-Meter, Bently Nevada, ASCO, Moog и др.)",
+"seller": "TURBINE.PARTS B.V. (Нидерланды)",
+"url": "http://turbine.parts/stock/",
+"condition": "new surplus / OEM certified / non-OEM",
+"country": "Нидерланды",
+"note": "Уже в CRM (10 запросов); хорош для добора пакетной обвязки Solar по PN; hello@turbine.parts"
+},
+{
+"what": "2× Solar Mars 100 генсет 11,3 МВт, 60 Гц, SoLoNOx, 2011 г.в.",
+"seller": "Fin Marine & Energy Solutions (Стамбул/Дубай), контакт Alp Altan +90 543 899 2106",
+"url": "https://fin-marine.com/gas-turbine/mars-100-gas-turbine-generator-set/",
+"condition": "Used — zero hours after overhaul",
+"price": "по запросу",
+"country": "Турция/ОАЭ",
+"note": "генератор в комплекте; удобный нейтральный канал"
+},
+{
+"what": "2× Solar Taurus 60 T7301 генсет 5,2 МВт, 4160В, 60 Гц",
+"seller": "Phoenix Equipment Corporation, Red Bank NJ, +1 732-442-6990",
+"url": "https://www.phxequip.com/equipment/28634/solar-taurus-60-gas-turbine-generator",
+"condition": "2001 г., эксплуатация до 2007, хранение under Solar care, генератор rebuilt; конфигурация landfill gas (конвертируется на ПГ)",
+"price": "по запросу",
+"country": "США",
+"note": "бороскоп-отчёты по запросу; полная обвязка (Donaldson фильтры, switchgear)"
+},
+{
+"what": "Электростанция 2× Solar Centaur 40 по 3,0 МВт, 13,8 кВ, 60 Гц",
+"seller": "Integrated Energy Networks LLC (дилер Surplus Record), Victor Flores +1 904-333-6624",
+"url": "https://surplusrecord.com/listing/6-mw-13800v-60-hz-solar-centaur-40-two-unit-power-plant-1039510/",
+"condition": "капремонт 2020, смонтированы и не эксплуатировались; генконцы <800 ч (один 0,0 ч)",
+"price": "по запросу",
+"country": "США (Dade City, FL)",
+"note": "со switchgear, панелями, редукторами после капремонта"
+},
+{
+"what": "Мобильный генсет Solar Taurus 60 (2001 г.)",
+"seller": "Cat Used (официальная площадка Caterpillar б/у)",
+"url": "https://catused.cat.com/en/construction/mobile-generator-sets/other-solar-turbines-taurus-60/e7249d91-03a7-4166-b242-4971e15f1def.html",
+"condition": "2001 г.в., 33 540 ч (по данным поисковой выдачи, страница не верифицирована фетчем)",
+"price": "1 300 000 USD",
+"country": "США",
+"note": "13,8 кВ, 60/50 Гц, trailer chassis, Plug&Play"
+},
+{
+"what": "Генераторные концы и генераторы Kato (б/у, разные мощности)",
+"seller": "Power Zone Equipment",
+"url": "https://inventory.powerzone.com/search/generator-ends/kato",
+"condition": "б/у, склад",
+"price": "по позициям",
+"country": "США",
+"note": "источник генераторов Kato под замену в турбинных генсетах"
+},
+{
+"what": "Solar Taurus 70 Gas Turbine Generator 6400 kW, UNUSED, 2011 г., генератор Kato 8000 kVA 13.8 кВ, в комплекте котёл Cleaver Brooks 60 klb/h + экономайзер",
+"seller": "Phoenix Equipment Corporation (Red Bank, NJ, США)",
+"url": "https://www.phxequip.com/equipment/28974/solar-taurus-70-gas-turbine-generator",
+"condition": "unused / surplus",
+"price": "не указана",
+"country": "США",
+"note": "Помечен SOLD — использовать как профиль продавца, запросить аналогичные лоты (sales@phxequip.com). Верифицировано WebFetch."
+},
+{
+"what": "Solar Centaur 50 Gas Turbine Generator 4250 kW, dual fuel, 1994 г., генератор Kato 4.25 MW A255800000, редуктор 1800 rpm",
+"seller": "Phoenix Equipment Corporation",
+"url": "https://www.phxequip.com/equipment/8978/solar-centaur-50-gas-turbine-generator",
+"condition": "used",
+"price": "не указана",
+"country": "США",
+"note": "Помечен SOLD. Верифицировано WebFetch."
+},
+{
+"what": "Zero-hour восстановленные Solar Saturn и Centaur (гарантия 1 год); малочасовые Taurus, Mars, Titan; запчасти Solar",
+"seller": "Sirgen",
+"url": "http://www.sirgen.com/solargasturbines.html",
+"condition": "overhauled zero-hour / low-hour",
+"country": "США",
+"note": "Сайт за анти-бот экраном — WebFetch не прошёл, данные из поискового индекса; перепроверить при контакте."
+},
+{
+"what": "Лоты запчастей Solar Turbines (сток-листинги, ~747 позиций по категории)",
+"seller": "Salvex (аукционная площадка промышленных остатков)",
+"url": "https://www.salvex.com/listings/listing_detail.cfm/aucid/182999003/",
+"condition": "surplus/salvage",
+"country": "США",
+"note": "Не верифицировано WebFetch (из поисковой выдачи); площадка-агрегатор, продавцов проверять по каждому лоту."
+},
+{
+"what": "Инвентарь 'gas turbine spare parts & engines', категория Solar Turbine",
+"seller": "CTG Power Systems International (Tampa, FL)",
+"url": "https://www.ctgpowersystems.com/inventory/.b/solar-turbine",
+"condition": "used/surplus",
+"country": "США",
+"note": "Верифицировано WebFetch; конкретные единицы не раскрыты — запрашивать список напрямую (+1-813-535-7771)."
+}
+]
+}

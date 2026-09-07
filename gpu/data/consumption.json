@@ -1,0 +1,1963 @@
+{
+ "updated": "2026-08-13",
+ "source": "Расчёт gpu/tools/build_consumption.py по типовым интервалам ТО и нашим ценовым вилкам.",
+ "assumptions": {
+  "hours_per_year": {
+   "base": 8000,
+   "note": "Базовый режим ГПЭС: круглогодичная работа с плановыми остановами (≈91 % готовности). Для пиковых и резервных машин ставить 2000–4000 ч, для теплиц с сезонной досветкой — 5000–6000 ч."
+  },
+  "gas_severity": {
+   "natural": {
+    "k": 1.0,
+    "name": "Природный газ",
+    "note": "Базовый случай, интервалы паспортные."
+   },
+   "associated": {
+    "k": 1.5,
+    "name": "Попутный нефтяной газ",
+    "note": "Тяжёлые фракции, нестабильный состав: свечи и масло меняются в 1,5 раза чаще. Это самый массовый случай в РФ."
+   },
+   "biogas": {
+    "k": 2.0,
+    "name": "Биогаз / свалочный / шахтный",
+    "note": "Сера, силоксаны, хлор — интервалы сокращаются вдвое, а иногда сильнее. Масло уходит в отдельный регламент по числу зол."
+   }
+  },
+  "method": "Интервалы взяты типовые для природного газа (свечи 2000 ч, масло и фильтры 1000–2000 ч, промежуточное ТО 10 000 ч, верхний ремонт 20–30 тыс. ч, капремонт 60 тыс. ч) и делятся на коэффициент тяжести газа. Точные интервалы — только из сервисной документации конкретной машины; модель нужна для планирования закупки и разговора с владельцем, а не как регламент.",
+  "prices": "Цены за штуку — середина наших вилок из вкладки «Наш спрос» (открытая розница). Реальная закупочная будет ниже; модель показывает ПОРЯДОК денег, а не смету."
+ },
+ "hours_per_year": 8000,
+ "avg_usd_per_kw_year": 49.0,
+ "engines": [
+  {
+   "model": "Jenbacher J320 (Type 3)",
+   "oem": "Jenbacher",
+   "cyl": 20,
+   "kwe": 1064,
+   "gas": "associated",
+   "gas_name": "Попутный нефтяной газ",
+   "usd_year": 92185,
+   "usd_per_kw_year": 86.6,
+   "usd_per_mwh": 10.83,
+   "items": [
+    {
+     "key": "head",
+     "name": "Головка блока цилиндров (замена или восстановление)",
+     "sys": "head",
+     "qty_year": 8.0,
+     "usd_unit": 3500,
+     "usd_year": 28000,
+     "interval": 30000,
+     "note": "Верхний ремонт. Самая тяжёлая строка бюджета владельца."
+    },
+    {
+     "key": "plug",
+     "name": "Свеча зажигания",
+     "sys": "ignition",
+     "qty_year": 120.0,
+     "usd_unit": 210,
+     "usd_year": 25200,
+     "interval": 2000,
+     "note": "Главный расходник. Цена — середина вилки по 4380132 и 5373898."
+    },
+    {
+     "key": "prechamber_valve",
+     "name": "Клапан газовый форкамеры",
+     "sys": "gas",
+     "qty_year": 24.0,
+     "usd_unit": 375,
+     "usd_year": 9000,
+     "interval": 10000,
+     "note": "Только на форкамерных двигателях (Jenbacher Type 4/6, часть Cummins и CAT)."
+    },
+    {
+     "key": "gas_filter",
+     "name": "Фильтр газовый",
+     "sys": "gas",
+     "qty_year": 6.0,
+     "usd_unit": 700,
+     "usd_year": 4200,
+     "interval": 4000,
+     "note": ""
+    },
+    {
+     "key": "coil",
+     "name": "Катушка зажигания",
+     "sys": "ignition",
+     "qty_year": 16.0,
+     "usd_unit": 260,
+     "usd_year": 4160,
+     "interval": 15000,
+     "note": "Дорогая позиция с длинным ресурсом — идеальный кандидат на аналог MOTORTECH."
+    },
+    {
+     "key": "piston",
+     "name": "Поршень",
+     "sys": "cpg",
+     "qty_year": 2.7,
+     "usd_unit": 1200,
+     "usd_year": 3200,
+     "interval": 60000,
+     "note": ""
+    },
+    {
+     "key": "oil_filter",
+     "name": "Фильтр масляный",
+     "sys": "filtration",
+     "qty_year": 32.0,
+     "usd_unit": 95,
+     "usd_year": 3040,
+     "interval": 1500,
+     "note": ""
+    },
+    {
+     "key": "valve",
+     "name": "Клапаны впуск/выпуск (комплект на цилиндр)",
+     "sys": "head",
+     "qty_year": 8.0,
+     "usd_unit": 320,
+     "usd_year": 2560,
+     "interval": 30000,
+     "note": ""
+    },
+    {
+     "key": "liner",
+     "name": "Гильза цилиндра",
+     "sys": "cpg",
+     "qty_year": 2.7,
+     "usd_unit": 850,
+     "usd_year": 2267,
+     "interval": 60000,
+     "note": ""
+    },
+    {
+     "key": "rings",
+     "name": "Комплект поршневых колец",
+     "sys": "cpg",
+     "qty_year": 5.3,
+     "usd_unit": 380,
+     "usd_year": 2027,
+     "interval": 30000,
+     "note": ""
+    },
+    {
+     "key": "blowby",
+     "name": "Фильтр вентиляции картера (blow-by)",
+     "sys": "filtration",
+     "qty_year": 6.0,
+     "usd_unit": 300,
+     "usd_year": 1800,
+     "interval": 4000,
+     "note": ""
+    },
+    {
+     "key": "turbo",
+     "name": "Турбокомпрессор (ремонт картриджа)",
+     "sys": "air",
+     "qty_year": 0.3,
+     "usd_unit": 6000,
+     "usd_year": 1600,
+     "interval": 30000,
+     "note": "Ремонт, а не новая турбина: новая — от $16 тыс."
+    },
+    {
+     "key": "air_filter",
+     "name": "Фильтр воздушный",
+     "sys": "filtration",
+     "qty_year": 6.0,
+     "usd_unit": 260,
+     "usd_year": 1560,
+     "interval": 4000,
+     "note": ""
+    },
+    {
+     "key": "boot",
+     "name": "Колпачок / удлинитель свечи",
+     "sys": "ignition",
+     "qty_year": 30.0,
+     "usd_unit": 50,
+     "usd_year": 1500,
+     "interval": 8000,
+     "note": "Ресурс выше свечи, но ниже катушки."
+    },
+    {
+     "key": "rod_bearing",
+     "name": "Вкладыш шатунный (комплект на цилиндр)",
+     "sys": "crank",
+     "qty_year": 5.3,
+     "usd_unit": 150,
+     "usd_year": 800,
+     "interval": 30000,
+     "note": ""
+    },
+    {
+     "key": "plug_seal",
+     "name": "Комплект уплотнений колодца свечи (о-кольца, шайба)",
+     "sys": "seals",
+     "qty_year": 60.0,
+     "usd_unit": 12,
+     "usd_year": 720,
+     "interval": 4000,
+     "note": "Меняется обычно через одну замену свечи."
+    },
+    {
+     "key": "coolant_filter",
+     "name": "Фильтр охлаждающей жидкости",
+     "sys": "filtration",
+     "qty_year": 12.0,
+     "usd_unit": 28,
+     "usd_year": 336,
+     "interval": 2000,
+     "note": ""
+    },
+    {
+     "key": "main_bearing",
+     "name": "Вкладыш коренной",
+     "sys": "crank",
+     "qty_year": 1.2,
+     "usd_unit": 180,
+     "usd_year": 216,
+     "interval": 60000,
+     "note": "Число коренных зависит от компоновки; 9 — как у V16 CAT G3516."
+    }
+   ]
+  },
+  {
+   "model": "Caterpillar G3520",
+   "oem": "Caterpillar",
+   "cyl": 20,
+   "kwe": 2000,
+   "gas": "associated",
+   "gas_name": "Попутный нефтяной газ",
+   "usd_year": 92185,
+   "usd_per_kw_year": 46.1,
+   "usd_per_mwh": 5.76,
+   "items": [
+    {
+     "key": "head",
+     "name": "Головка блока цилиндров (замена или восстановление)",
+     "sys": "head",
+     "qty_year": 8.0,
+     "usd_unit": 3500,
+     "usd_year": 28000,
+     "interval": 30000,
+     "note": "Верхний ремонт. Самая тяжёлая строка бюджета владельца."
+    },
+    {
+     "key": "plug",
+     "name": "Свеча зажигания",
+     "sys": "ignition",
+     "qty_year": 120.0,
+     "usd_unit": 210,
+     "usd_year": 25200,
+     "interval": 2000,
+     "note": "Главный расходник. Цена — середина вилки по 4380132 и 5373898."
+    },
+    {
+     "key": "prechamber_valve",
+     "name": "Клапан газовый форкамеры",
+     "sys": "gas",
+     "qty_year": 24.0,
+     "usd_unit": 375,
+     "usd_year": 9000,
+     "interval": 10000,
+     "note": "Только на форкамерных двигателях (Jenbacher Type 4/6, часть Cummins и CAT)."
+    },
+    {
+     "key": "gas_filter",
+     "name": "Фильтр газовый",
+     "sys": "gas",
+     "qty_year": 6.0,
+     "usd_unit": 700,
+     "usd_year": 4200,
+     "interval": 4000,
+     "note": ""
+    },
+    {
+     "key": "coil",
+     "name": "Катушка зажигания",
+     "sys": "ignition",
+     "qty_year": 16.0,
+     "usd_unit": 260,
+     "usd_year": 4160,
+     "interval": 15000,
+     "note": "Дорогая позиция с длинным ресурсом — идеальный кандидат на аналог MOTORTECH."
+    },
+    {
+     "key": "piston",
+     "name": "Поршень",
+     "sys": "cpg",
+     "qty_year": 2.7,
+     "usd_unit": 1200,
+     "usd_year": 3200,
+     "interval": 60000,
+     "note": ""
+    },
+    {
+     "key": "oil_filter",
+     "name": "Фильтр масляный",
+     "sys": "filtration",
+     "qty_year": 32.0,
+     "usd_unit": 95,
+     "usd_year": 3040,
+     "interval": 1500,
+     "note": ""
+    },
+    {
+     "key": "valve",
+     "name": "Клапаны впуск/выпуск (комплект на цилиндр)",
+     "sys": "head",
+     "qty_year": 8.0,
+     "usd_unit": 320,
+     "usd_year": 2560,
+     "interval": 30000,
+     "note": ""
+    },
+    {
+     "key": "liner",
+     "name": "Гильза цилиндра",
+     "sys": "cpg",
+     "qty_year": 2.7,
+     "usd_unit": 850,
+     "usd_year": 2267,
+     "interval": 60000,
+     "note": ""
+    },
+    {
+     "key": "rings",
+     "name": "Комплект поршневых колец",
+     "sys": "cpg",
+     "qty_year": 5.3,
+     "usd_unit": 380,
+     "usd_year": 2027,
+     "interval": 30000,
+     "note": ""
+    },
+    {
+     "key": "blowby",
+     "name": "Фильтр вентиляции картера (blow-by)",
+     "sys": "filtration",
+     "qty_year": 6.0,
+     "usd_unit": 300,
+     "usd_year": 1800,
+     "interval": 4000,
+     "note": ""
+    },
+    {
+     "key": "turbo",
+     "name": "Турбокомпрессор (ремонт картриджа)",
+     "sys": "air",
+     "qty_year": 0.3,
+     "usd_unit": 6000,
+     "usd_year": 1600,
+     "interval": 30000,
+     "note": "Ремонт, а не новая турбина: новая — от $16 тыс."
+    },
+    {
+     "key": "air_filter",
+     "name": "Фильтр воздушный",
+     "sys": "filtration",
+     "qty_year": 6.0,
+     "usd_unit": 260,
+     "usd_year": 1560,
+     "interval": 4000,
+     "note": ""
+    },
+    {
+     "key": "boot",
+     "name": "Колпачок / удлинитель свечи",
+     "sys": "ignition",
+     "qty_year": 30.0,
+     "usd_unit": 50,
+     "usd_year": 1500,
+     "interval": 8000,
+     "note": "Ресурс выше свечи, но ниже катушки."
+    },
+    {
+     "key": "rod_bearing",
+     "name": "Вкладыш шатунный (комплект на цилиндр)",
+     "sys": "crank",
+     "qty_year": 5.3,
+     "usd_unit": 150,
+     "usd_year": 800,
+     "interval": 30000,
+     "note": ""
+    },
+    {
+     "key": "plug_seal",
+     "name": "Комплект уплотнений колодца свечи (о-кольца, шайба)",
+     "sys": "seals",
+     "qty_year": 60.0,
+     "usd_unit": 12,
+     "usd_year": 720,
+     "interval": 4000,
+     "note": "Меняется обычно через одну замену свечи."
+    },
+    {
+     "key": "coolant_filter",
+     "name": "Фильтр охлаждающей жидкости",
+     "sys": "filtration",
+     "qty_year": 12.0,
+     "usd_unit": 28,
+     "usd_year": 336,
+     "interval": 2000,
+     "note": ""
+    },
+    {
+     "key": "main_bearing",
+     "name": "Вкладыш коренной",
+     "sys": "crank",
+     "qty_year": 1.2,
+     "usd_unit": 180,
+     "usd_year": 216,
+     "interval": 60000,
+     "note": "Число коренных зависит от компоновки; 9 — как у V16 CAT G3516."
+    }
+   ]
+  },
+  {
+   "model": "Cummins QSV91G",
+   "oem": "Cummins",
+   "cyl": 18,
+   "kwe": 1540,
+   "gas": "associated",
+   "gas_name": "Попутный нефтяной газ",
+   "usd_year": 84242,
+   "usd_per_kw_year": 54.7,
+   "usd_per_mwh": 6.84,
+   "items": [
+    {
+     "key": "head",
+     "name": "Головка блока цилиндров (замена или восстановление)",
+     "sys": "head",
+     "qty_year": 7.2,
+     "usd_unit": 3500,
+     "usd_year": 25200,
+     "interval": 30000,
+     "note": "Верхний ремонт. Самая тяжёлая строка бюджета владельца."
+    },
+    {
+     "key": "plug",
+     "name": "Свеча зажигания",
+     "sys": "ignition",
+     "qty_year": 108.0,
+     "usd_unit": 210,
+     "usd_year": 22680,
+     "interval": 2000,
+     "note": "Главный расходник. Цена — середина вилки по 4380132 и 5373898."
+    },
+    {
+     "key": "prechamber_valve",
+     "name": "Клапан газовый форкамеры",
+     "sys": "gas",
+     "qty_year": 21.6,
+     "usd_unit": 375,
+     "usd_year": 8100,
+     "interval": 10000,
+     "note": "Только на форкамерных двигателях (Jenbacher Type 4/6, часть Cummins и CAT)."
+    },
+    {
+     "key": "gas_filter",
+     "name": "Фильтр газовый",
+     "sys": "gas",
+     "qty_year": 6.0,
+     "usd_unit": 700,
+     "usd_year": 4200,
+     "interval": 4000,
+     "note": ""
+    },
+    {
+     "key": "coil",
+     "name": "Катушка зажигания",
+     "sys": "ignition",
+     "qty_year": 14.4,
+     "usd_unit": 260,
+     "usd_year": 3744,
+     "interval": 15000,
+     "note": "Дорогая позиция с длинным ресурсом — идеальный кандидат на аналог MOTORTECH."
+    },
+    {
+     "key": "oil_filter",
+     "name": "Фильтр масляный",
+     "sys": "filtration",
+     "qty_year": 32.0,
+     "usd_unit": 95,
+     "usd_year": 3040,
+     "interval": 1500,
+     "note": ""
+    },
+    {
+     "key": "piston",
+     "name": "Поршень",
+     "sys": "cpg",
+     "qty_year": 2.4,
+     "usd_unit": 1200,
+     "usd_year": 2880,
+     "interval": 60000,
+     "note": ""
+    },
+    {
+     "key": "valve",
+     "name": "Клапаны впуск/выпуск (комплект на цилиндр)",
+     "sys": "head",
+     "qty_year": 7.2,
+     "usd_unit": 320,
+     "usd_year": 2304,
+     "interval": 30000,
+     "note": ""
+    },
+    {
+     "key": "liner",
+     "name": "Гильза цилиндра",
+     "sys": "cpg",
+     "qty_year": 2.4,
+     "usd_unit": 850,
+     "usd_year": 2040,
+     "interval": 60000,
+     "note": ""
+    },
+    {
+     "key": "rings",
+     "name": "Комплект поршневых колец",
+     "sys": "cpg",
+     "qty_year": 4.8,
+     "usd_unit": 380,
+     "usd_year": 1824,
+     "interval": 30000,
+     "note": ""
+    },
+    {
+     "key": "blowby",
+     "name": "Фильтр вентиляции картера (blow-by)",
+     "sys": "filtration",
+     "qty_year": 6.0,
+     "usd_unit": 300,
+     "usd_year": 1800,
+     "interval": 4000,
+     "note": ""
+    },
+    {
+     "key": "turbo",
+     "name": "Турбокомпрессор (ремонт картриджа)",
+     "sys": "air",
+     "qty_year": 0.3,
+     "usd_unit": 6000,
+     "usd_year": 1600,
+     "interval": 30000,
+     "note": "Ремонт, а не новая турбина: новая — от $16 тыс."
+    },
+    {
+     "key": "air_filter",
+     "name": "Фильтр воздушный",
+     "sys": "filtration",
+     "qty_year": 6.0,
+     "usd_unit": 260,
+     "usd_year": 1560,
+     "interval": 4000,
+     "note": ""
+    },
+    {
+     "key": "boot",
+     "name": "Колпачок / удлинитель свечи",
+     "sys": "ignition",
+     "qty_year": 27.0,
+     "usd_unit": 50,
+     "usd_year": 1350,
+     "interval": 8000,
+     "note": "Ресурс выше свечи, но ниже катушки."
+    },
+    {
+     "key": "rod_bearing",
+     "name": "Вкладыш шатунный (комплект на цилиндр)",
+     "sys": "crank",
+     "qty_year": 4.8,
+     "usd_unit": 150,
+     "usd_year": 720,
+     "interval": 30000,
+     "note": ""
+    },
+    {
+     "key": "plug_seal",
+     "name": "Комплект уплотнений колодца свечи (о-кольца, шайба)",
+     "sys": "seals",
+     "qty_year": 54.0,
+     "usd_unit": 12,
+     "usd_year": 648,
+     "interval": 4000,
+     "note": "Меняется обычно через одну замену свечи."
+    },
+    {
+     "key": "coolant_filter",
+     "name": "Фильтр охлаждающей жидкости",
+     "sys": "filtration",
+     "qty_year": 12.0,
+     "usd_unit": 28,
+     "usd_year": 336,
+     "interval": 2000,
+     "note": ""
+    },
+    {
+     "key": "main_bearing",
+     "name": "Вкладыш коренной",
+     "sys": "crank",
+     "qty_year": 1.2,
+     "usd_unit": 180,
+     "usd_year": 216,
+     "interval": 60000,
+     "note": "Число коренных зависит от компоновки; 9 — как у V16 CAT G3516."
+    }
+   ]
+  },
+  {
+   "model": "Caterpillar G3516",
+   "oem": "Caterpillar",
+   "cyl": 16,
+   "kwe": 1030,
+   "gas": "associated",
+   "gas_name": "Попутный нефтяной газ",
+   "usd_year": 76299,
+   "usd_per_kw_year": 74.1,
+   "usd_per_mwh": 9.26,
+   "items": [
+    {
+     "key": "head",
+     "name": "Головка блока цилиндров (замена или восстановление)",
+     "sys": "head",
+     "qty_year": 6.4,
+     "usd_unit": 3500,
+     "usd_year": 22400,
+     "interval": 30000,
+     "note": "Верхний ремонт. Самая тяжёлая строка бюджета владельца."
+    },
+    {
+     "key": "plug",
+     "name": "Свеча зажигания",
+     "sys": "ignition",
+     "qty_year": 96.0,
+     "usd_unit": 210,
+     "usd_year": 20160,
+     "interval": 2000,
+     "note": "Главный расходник. Цена — середина вилки по 4380132 и 5373898."
+    },
+    {
+     "key": "prechamber_valve",
+     "name": "Клапан газовый форкамеры",
+     "sys": "gas",
+     "qty_year": 19.2,
+     "usd_unit": 375,
+     "usd_year": 7200,
+     "interval": 10000,
+     "note": "Только на форкамерных двигателях (Jenbacher Type 4/6, часть Cummins и CAT)."
+    },
+    {
+     "key": "gas_filter",
+     "name": "Фильтр газовый",
+     "sys": "gas",
+     "qty_year": 6.0,
+     "usd_unit": 700,
+     "usd_year": 4200,
+     "interval": 4000,
+     "note": ""
+    },
+    {
+     "key": "coil",
+     "name": "Катушка зажигания",
+     "sys": "ignition",
+     "qty_year": 12.8,
+     "usd_unit": 260,
+     "usd_year": 3328,
+     "interval": 15000,
+     "note": "Дорогая позиция с длинным ресурсом — идеальный кандидат на аналог MOTORTECH."
+    },
+    {
+     "key": "oil_filter",
+     "name": "Фильтр масляный",
+     "sys": "filtration",
+     "qty_year": 32.0,
+     "usd_unit": 95,
+     "usd_year": 3040,
+     "interval": 1500,
+     "note": ""
+    },
+    {
+     "key": "piston",
+     "name": "Поршень",
+     "sys": "cpg",
+     "qty_year": 2.1,
+     "usd_unit": 1200,
+     "usd_year": 2560,
+     "interval": 60000,
+     "note": ""
+    },
+    {
+     "key": "valve",
+     "name": "Клапаны впуск/выпуск (комплект на цилиндр)",
+     "sys": "head",
+     "qty_year": 6.4,
+     "usd_unit": 320,
+     "usd_year": 2048,
+     "interval": 30000,
+     "note": ""
+    },
+    {
+     "key": "liner",
+     "name": "Гильза цилиндра",
+     "sys": "cpg",
+     "qty_year": 2.1,
+     "usd_unit": 850,
+     "usd_year": 1813,
+     "interval": 60000,
+     "note": ""
+    },
+    {
+     "key": "blowby",
+     "name": "Фильтр вентиляции картера (blow-by)",
+     "sys": "filtration",
+     "qty_year": 6.0,
+     "usd_unit": 300,
+     "usd_year": 1800,
+     "interval": 4000,
+     "note": ""
+    },
+    {
+     "key": "rings",
+     "name": "Комплект поршневых колец",
+     "sys": "cpg",
+     "qty_year": 4.3,
+     "usd_unit": 380,
+     "usd_year": 1621,
+     "interval": 30000,
+     "note": ""
+    },
+    {
+     "key": "turbo",
+     "name": "Турбокомпрессор (ремонт картриджа)",
+     "sys": "air",
+     "qty_year": 0.3,
+     "usd_unit": 6000,
+     "usd_year": 1600,
+     "interval": 30000,
+     "note": "Ремонт, а не новая турбина: новая — от $16 тыс."
+    },
+    {
+     "key": "air_filter",
+     "name": "Фильтр воздушный",
+     "sys": "filtration",
+     "qty_year": 6.0,
+     "usd_unit": 260,
+     "usd_year": 1560,
+     "interval": 4000,
+     "note": ""
+    },
+    {
+     "key": "boot",
+     "name": "Колпачок / удлинитель свечи",
+     "sys": "ignition",
+     "qty_year": 24.0,
+     "usd_unit": 50,
+     "usd_year": 1200,
+     "interval": 8000,
+     "note": "Ресурс выше свечи, но ниже катушки."
+    },
+    {
+     "key": "rod_bearing",
+     "name": "Вкладыш шатунный (комплект на цилиндр)",
+     "sys": "crank",
+     "qty_year": 4.3,
+     "usd_unit": 150,
+     "usd_year": 640,
+     "interval": 30000,
+     "note": ""
+    },
+    {
+     "key": "plug_seal",
+     "name": "Комплект уплотнений колодца свечи (о-кольца, шайба)",
+     "sys": "seals",
+     "qty_year": 48.0,
+     "usd_unit": 12,
+     "usd_year": 576,
+     "interval": 4000,
+     "note": "Меняется обычно через одну замену свечи."
+    },
+    {
+     "key": "coolant_filter",
+     "name": "Фильтр охлаждающей жидкости",
+     "sys": "filtration",
+     "qty_year": 12.0,
+     "usd_unit": 28,
+     "usd_year": 336,
+     "interval": 2000,
+     "note": ""
+    },
+    {
+     "key": "main_bearing",
+     "name": "Вкладыш коренной",
+     "sys": "crank",
+     "qty_year": 1.2,
+     "usd_unit": 180,
+     "usd_year": 216,
+     "interval": 60000,
+     "note": "Число коренных зависит от компоновки; 9 — как у V16 CAT G3516."
+    }
+   ]
+  },
+  {
+   "model": "Cummins QSK60G",
+   "oem": "Cummins",
+   "cyl": 16,
+   "kwe": 1540,
+   "gas": "associated",
+   "gas_name": "Попутный нефтяной газ",
+   "usd_year": 76299,
+   "usd_per_kw_year": 49.5,
+   "usd_per_mwh": 6.19,
+   "items": [
+    {
+     "key": "head",
+     "name": "Головка блока цилиндров (замена или восстановление)",
+     "sys": "head",
+     "qty_year": 6.4,
+     "usd_unit": 3500,
+     "usd_year": 22400,
+     "interval": 30000,
+     "note": "Верхний ремонт. Самая тяжёлая строка бюджета владельца."
+    },
+    {
+     "key": "plug",
+     "name": "Свеча зажигания",
+     "sys": "ignition",
+     "qty_year": 96.0,
+     "usd_unit": 210,
+     "usd_year": 20160,
+     "interval": 2000,
+     "note": "Главный расходник. Цена — середина вилки по 4380132 и 5373898."
+    },
+    {
+     "key": "prechamber_valve",
+     "name": "Клапан газовый форкамеры",
+     "sys": "gas",
+     "qty_year": 19.2,
+     "usd_unit": 375,
+     "usd_year": 7200,
+     "interval": 10000,
+     "note": "Только на форкамерных двигателях (Jenbacher Type 4/6, часть Cummins и CAT)."
+    },
+    {
+     "key": "gas_filter",
+     "name": "Фильтр газовый",
+     "sys": "gas",
+     "qty_year": 6.0,
+     "usd_unit": 700,
+     "usd_year": 4200,
+     "interval": 4000,
+     "note": ""
+    },
+    {
+     "key": "coil",
+     "name": "Катушка зажигания",
+     "sys": "ignition",
+     "qty_year": 12.8,
+     "usd_unit": 260,
+     "usd_year": 3328,
+     "interval": 15000,
+     "note": "Дорогая позиция с длинным ресурсом — идеальный кандидат на аналог MOTORTECH."
+    },
+    {
+     "key": "oil_filter",
+     "name": "Фильтр масляный",
+     "sys": "filtration",
+     "qty_year": 32.0,
+     "usd_unit": 95,
+     "usd_year": 3040,
+     "interval": 1500,
+     "note": ""
+    },
+    {
+     "key": "piston",
+     "name": "Поршень",
+     "sys": "cpg",
+     "qty_year": 2.1,
+     "usd_unit": 1200,
+     "usd_year": 2560,
+     "interval": 60000,
+     "note": ""
+    },
+    {
+     "key": "valve",
+     "name": "Клапаны впуск/выпуск (комплект на цилиндр)",
+     "sys": "head",
+     "qty_year": 6.4,
+     "usd_unit": 320,
+     "usd_year": 2048,
+     "interval": 30000,
+     "note": ""
+    },
+    {
+     "key": "liner",
+     "name": "Гильза цилиндра",
+     "sys": "cpg",
+     "qty_year": 2.1,
+     "usd_unit": 850,
+     "usd_year": 1813,
+     "interval": 60000,
+     "note": ""
+    },
+    {
+     "key": "blowby",
+     "name": "Фильтр вентиляции картера (blow-by)",
+     "sys": "filtration",
+     "qty_year": 6.0,
+     "usd_unit": 300,
+     "usd_year": 1800,
+     "interval": 4000,
+     "note": ""
+    },
+    {
+     "key": "rings",
+     "name": "Комплект поршневых колец",
+     "sys": "cpg",
+     "qty_year": 4.3,
+     "usd_unit": 380,
+     "usd_year": 1621,
+     "interval": 30000,
+     "note": ""
+    },
+    {
+     "key": "turbo",
+     "name": "Турбокомпрессор (ремонт картриджа)",
+     "sys": "air",
+     "qty_year": 0.3,
+     "usd_unit": 6000,
+     "usd_year": 1600,
+     "interval": 30000,
+     "note": "Ремонт, а не новая турбина: новая — от $16 тыс."
+    },
+    {
+     "key": "air_filter",
+     "name": "Фильтр воздушный",
+     "sys": "filtration",
+     "qty_year": 6.0,
+     "usd_unit": 260,
+     "usd_year": 1560,
+     "interval": 4000,
+     "note": ""
+    },
+    {
+     "key": "boot",
+     "name": "Колпачок / удлинитель свечи",
+     "sys": "ignition",
+     "qty_year": 24.0,
+     "usd_unit": 50,
+     "usd_year": 1200,
+     "interval": 8000,
+     "note": "Ресурс выше свечи, но ниже катушки."
+    },
+    {
+     "key": "rod_bearing",
+     "name": "Вкладыш шатунный (комплект на цилиндр)",
+     "sys": "crank",
+     "qty_year": 4.3,
+     "usd_unit": 150,
+     "usd_year": 640,
+     "interval": 30000,
+     "note": ""
+    },
+    {
+     "key": "plug_seal",
+     "name": "Комплект уплотнений колодца свечи (о-кольца, шайба)",
+     "sys": "seals",
+     "qty_year": 48.0,
+     "usd_unit": 12,
+     "usd_year": 576,
+     "interval": 4000,
+     "note": "Меняется обычно через одну замену свечи."
+    },
+    {
+     "key": "coolant_filter",
+     "name": "Фильтр охлаждающей жидкости",
+     "sys": "filtration",
+     "qty_year": 12.0,
+     "usd_unit": 28,
+     "usd_year": 336,
+     "interval": 2000,
+     "note": ""
+    },
+    {
+     "key": "main_bearing",
+     "name": "Вкладыш коренной",
+     "sys": "crank",
+     "qty_year": 1.2,
+     "usd_unit": 180,
+     "usd_year": 216,
+     "interval": 60000,
+     "note": "Число коренных зависит от компоновки; 9 — как у V16 CAT G3516."
+    }
+   ]
+  },
+  {
+   "model": "Jenbacher J420 (Type 4)",
+   "oem": "Jenbacher",
+   "cyl": 20,
+   "kwe": 1413,
+   "gas": "natural",
+   "gas_name": "Природный газ",
+   "usd_year": 64827,
+   "usd_per_kw_year": 45.9,
+   "usd_per_mwh": 5.73,
+   "items": [
+    {
+     "key": "head",
+     "name": "Головка блока цилиндров (замена или восстановление)",
+     "sys": "head",
+     "qty_year": 5.3,
+     "usd_unit": 3500,
+     "usd_year": 18667,
+     "interval": 30000,
+     "note": "Верхний ремонт. Самая тяжёлая строка бюджета владельца."
+    },
+    {
+     "key": "plug",
+     "name": "Свеча зажигания",
+     "sys": "ignition",
+     "qty_year": 80.0,
+     "usd_unit": 210,
+     "usd_year": 16800,
+     "interval": 2000,
+     "note": "Главный расходник. Цена — середина вилки по 4380132 и 5373898."
+    },
+    {
+     "key": "prechamber_valve",
+     "name": "Клапан газовый форкамеры",
+     "sys": "gas",
+     "qty_year": 16.0,
+     "usd_unit": 375,
+     "usd_year": 6000,
+     "interval": 10000,
+     "note": "Только на форкамерных двигателях (Jenbacher Type 4/6, часть Cummins и CAT)."
+    },
+    {
+     "key": "piston",
+     "name": "Поршень",
+     "sys": "cpg",
+     "qty_year": 2.7,
+     "usd_unit": 1200,
+     "usd_year": 3200,
+     "interval": 60000,
+     "note": ""
+    },
+    {
+     "key": "gas_filter",
+     "name": "Фильтр газовый",
+     "sys": "gas",
+     "qty_year": 4.0,
+     "usd_unit": 700,
+     "usd_year": 2800,
+     "interval": 4000,
+     "note": ""
+    },
+    {
+     "key": "coil",
+     "name": "Катушка зажигания",
+     "sys": "ignition",
+     "qty_year": 10.7,
+     "usd_unit": 260,
+     "usd_year": 2773,
+     "interval": 15000,
+     "note": "Дорогая позиция с длинным ресурсом — идеальный кандидат на аналог MOTORTECH."
+    },
+    {
+     "key": "liner",
+     "name": "Гильза цилиндра",
+     "sys": "cpg",
+     "qty_year": 2.7,
+     "usd_unit": 850,
+     "usd_year": 2267,
+     "interval": 60000,
+     "note": ""
+    },
+    {
+     "key": "oil_filter",
+     "name": "Фильтр масляный",
+     "sys": "filtration",
+     "qty_year": 21.3,
+     "usd_unit": 95,
+     "usd_year": 2027,
+     "interval": 1500,
+     "note": ""
+    },
+    {
+     "key": "rings",
+     "name": "Комплект поршневых колец",
+     "sys": "cpg",
+     "qty_year": 5.3,
+     "usd_unit": 380,
+     "usd_year": 2027,
+     "interval": 30000,
+     "note": ""
+    },
+    {
+     "key": "valve",
+     "name": "Клапаны впуск/выпуск (комплект на цилиндр)",
+     "sys": "head",
+     "qty_year": 5.3,
+     "usd_unit": 320,
+     "usd_year": 1707,
+     "interval": 30000,
+     "note": ""
+    },
+    {
+     "key": "turbo",
+     "name": "Турбокомпрессор (ремонт картриджа)",
+     "sys": "air",
+     "qty_year": 0.3,
+     "usd_unit": 6000,
+     "usd_year": 1600,
+     "interval": 30000,
+     "note": "Ремонт, а не новая турбина: новая — от $16 тыс."
+    },
+    {
+     "key": "blowby",
+     "name": "Фильтр вентиляции картера (blow-by)",
+     "sys": "filtration",
+     "qty_year": 4.0,
+     "usd_unit": 300,
+     "usd_year": 1200,
+     "interval": 4000,
+     "note": ""
+    },
+    {
+     "key": "air_filter",
+     "name": "Фильтр воздушный",
+     "sys": "filtration",
+     "qty_year": 4.0,
+     "usd_unit": 260,
+     "usd_year": 1040,
+     "interval": 4000,
+     "note": ""
+    },
+    {
+     "key": "boot",
+     "name": "Колпачок / удлинитель свечи",
+     "sys": "ignition",
+     "qty_year": 20.0,
+     "usd_unit": 50,
+     "usd_year": 1000,
+     "interval": 8000,
+     "note": "Ресурс выше свечи, но ниже катушки."
+    },
+    {
+     "key": "rod_bearing",
+     "name": "Вкладыш шатунный (комплект на цилиндр)",
+     "sys": "crank",
+     "qty_year": 5.3,
+     "usd_unit": 150,
+     "usd_year": 800,
+     "interval": 30000,
+     "note": ""
+    },
+    {
+     "key": "plug_seal",
+     "name": "Комплект уплотнений колодца свечи (о-кольца, шайба)",
+     "sys": "seals",
+     "qty_year": 40.0,
+     "usd_unit": 12,
+     "usd_year": 480,
+     "interval": 4000,
+     "note": "Меняется обычно через одну замену свечи."
+    },
+    {
+     "key": "coolant_filter",
+     "name": "Фильтр охлаждающей жидкости",
+     "sys": "filtration",
+     "qty_year": 8.0,
+     "usd_unit": 28,
+     "usd_year": 224,
+     "interval": 2000,
+     "note": ""
+    },
+    {
+     "key": "main_bearing",
+     "name": "Вкладыш коренной",
+     "sys": "crank",
+     "qty_year": 1.2,
+     "usd_unit": 180,
+     "usd_year": 216,
+     "interval": 60000,
+     "note": "Число коренных зависит от компоновки; 9 — как у V16 CAT G3516."
+    }
+   ]
+  },
+  {
+   "model": "Jenbacher J620 (Type 6)",
+   "oem": "Jenbacher",
+   "cyl": 20,
+   "kwe": 3043,
+   "gas": "natural",
+   "gas_name": "Природный газ",
+   "usd_year": 64827,
+   "usd_per_kw_year": 21.3,
+   "usd_per_mwh": 2.66,
+   "items": [
+    {
+     "key": "head",
+     "name": "Головка блока цилиндров (замена или восстановление)",
+     "sys": "head",
+     "qty_year": 5.3,
+     "usd_unit": 3500,
+     "usd_year": 18667,
+     "interval": 30000,
+     "note": "Верхний ремонт. Самая тяжёлая строка бюджета владельца."
+    },
+    {
+     "key": "plug",
+     "name": "Свеча зажигания",
+     "sys": "ignition",
+     "qty_year": 80.0,
+     "usd_unit": 210,
+     "usd_year": 16800,
+     "interval": 2000,
+     "note": "Главный расходник. Цена — середина вилки по 4380132 и 5373898."
+    },
+    {
+     "key": "prechamber_valve",
+     "name": "Клапан газовый форкамеры",
+     "sys": "gas",
+     "qty_year": 16.0,
+     "usd_unit": 375,
+     "usd_year": 6000,
+     "interval": 10000,
+     "note": "Только на форкамерных двигателях (Jenbacher Type 4/6, часть Cummins и CAT)."
+    },
+    {
+     "key": "piston",
+     "name": "Поршень",
+     "sys": "cpg",
+     "qty_year": 2.7,
+     "usd_unit": 1200,
+     "usd_year": 3200,
+     "interval": 60000,
+     "note": ""
+    },
+    {
+     "key": "gas_filter",
+     "name": "Фильтр газовый",
+     "sys": "gas",
+     "qty_year": 4.0,
+     "usd_unit": 700,
+     "usd_year": 2800,
+     "interval": 4000,
+     "note": ""
+    },
+    {
+     "key": "coil",
+     "name": "Катушка зажигания",
+     "sys": "ignition",
+     "qty_year": 10.7,
+     "usd_unit": 260,
+     "usd_year": 2773,
+     "interval": 15000,
+     "note": "Дорогая позиция с длинным ресурсом — идеальный кандидат на аналог MOTORTECH."
+    },
+    {
+     "key": "liner",
+     "name": "Гильза цилиндра",
+     "sys": "cpg",
+     "qty_year": 2.7,
+     "usd_unit": 850,
+     "usd_year": 2267,
+     "interval": 60000,
+     "note": ""
+    },
+    {
+     "key": "oil_filter",
+     "name": "Фильтр масляный",
+     "sys": "filtration",
+     "qty_year": 21.3,
+     "usd_unit": 95,
+     "usd_year": 2027,
+     "interval": 1500,
+     "note": ""
+    },
+    {
+     "key": "rings",
+     "name": "Комплект поршневых колец",
+     "sys": "cpg",
+     "qty_year": 5.3,
+     "usd_unit": 380,
+     "usd_year": 2027,
+     "interval": 30000,
+     "note": ""
+    },
+    {
+     "key": "valve",
+     "name": "Клапаны впуск/выпуск (комплект на цилиндр)",
+     "sys": "head",
+     "qty_year": 5.3,
+     "usd_unit": 320,
+     "usd_year": 1707,
+     "interval": 30000,
+     "note": ""
+    },
+    {
+     "key": "turbo",
+     "name": "Турбокомпрессор (ремонт картриджа)",
+     "sys": "air",
+     "qty_year": 0.3,
+     "usd_unit": 6000,
+     "usd_year": 1600,
+     "interval": 30000,
+     "note": "Ремонт, а не новая турбина: новая — от $16 тыс."
+    },
+    {
+     "key": "blowby",
+     "name": "Фильтр вентиляции картера (blow-by)",
+     "sys": "filtration",
+     "qty_year": 4.0,
+     "usd_unit": 300,
+     "usd_year": 1200,
+     "interval": 4000,
+     "note": ""
+    },
+    {
+     "key": "air_filter",
+     "name": "Фильтр воздушный",
+     "sys": "filtration",
+     "qty_year": 4.0,
+     "usd_unit": 260,
+     "usd_year": 1040,
+     "interval": 4000,
+     "note": ""
+    },
+    {
+     "key": "boot",
+     "name": "Колпачок / удлинитель свечи",
+     "sys": "ignition",
+     "qty_year": 20.0,
+     "usd_unit": 50,
+     "usd_year": 1000,
+     "interval": 8000,
+     "note": "Ресурс выше свечи, но ниже катушки."
+    },
+    {
+     "key": "rod_bearing",
+     "name": "Вкладыш шатунный (комплект на цилиндр)",
+     "sys": "crank",
+     "qty_year": 5.3,
+     "usd_unit": 150,
+     "usd_year": 800,
+     "interval": 30000,
+     "note": ""
+    },
+    {
+     "key": "plug_seal",
+     "name": "Комплект уплотнений колодца свечи (о-кольца, шайба)",
+     "sys": "seals",
+     "qty_year": 40.0,
+     "usd_unit": 12,
+     "usd_year": 480,
+     "interval": 4000,
+     "note": "Меняется обычно через одну замену свечи."
+    },
+    {
+     "key": "coolant_filter",
+     "name": "Фильтр охлаждающей жидкости",
+     "sys": "filtration",
+     "qty_year": 8.0,
+     "usd_unit": 28,
+     "usd_year": 224,
+     "interval": 2000,
+     "note": ""
+    },
+    {
+     "key": "main_bearing",
+     "name": "Вкладыш коренной",
+     "sys": "crank",
+     "qty_year": 1.2,
+     "usd_unit": 180,
+     "usd_year": 216,
+     "interval": 60000,
+     "note": "Число коренных зависит от компоновки; 9 — как у V16 CAT G3516."
+    }
+   ]
+  },
+  {
+   "model": "Waukesha VHP L7042",
+   "oem": "Waukesha",
+   "cyl": 12,
+   "kwe": 1100,
+   "gas": "associated",
+   "gas_name": "Попутный нефтяной газ",
+   "usd_year": 60412,
+   "usd_per_kw_year": 54.9,
+   "usd_per_mwh": 6.87,
+   "items": [
+    {
+     "key": "head",
+     "name": "Головка блока цилиндров (замена или восстановление)",
+     "sys": "head",
+     "qty_year": 4.8,
+     "usd_unit": 3500,
+     "usd_year": 16800,
+     "interval": 30000,
+     "note": "Верхний ремонт. Самая тяжёлая строка бюджета владельца."
+    },
+    {
+     "key": "plug",
+     "name": "Свеча зажигания",
+     "sys": "ignition",
+     "qty_year": 72.0,
+     "usd_unit": 210,
+     "usd_year": 15120,
+     "interval": 2000,
+     "note": "Главный расходник. Цена — середина вилки по 4380132 и 5373898."
+    },
+    {
+     "key": "prechamber_valve",
+     "name": "Клапан газовый форкамеры",
+     "sys": "gas",
+     "qty_year": 14.4,
+     "usd_unit": 375,
+     "usd_year": 5400,
+     "interval": 10000,
+     "note": "Только на форкамерных двигателях (Jenbacher Type 4/6, часть Cummins и CAT)."
+    },
+    {
+     "key": "gas_filter",
+     "name": "Фильтр газовый",
+     "sys": "gas",
+     "qty_year": 6.0,
+     "usd_unit": 700,
+     "usd_year": 4200,
+     "interval": 4000,
+     "note": ""
+    },
+    {
+     "key": "oil_filter",
+     "name": "Фильтр масляный",
+     "sys": "filtration",
+     "qty_year": 32.0,
+     "usd_unit": 95,
+     "usd_year": 3040,
+     "interval": 1500,
+     "note": ""
+    },
+    {
+     "key": "coil",
+     "name": "Катушка зажигания",
+     "sys": "ignition",
+     "qty_year": 9.6,
+     "usd_unit": 260,
+     "usd_year": 2496,
+     "interval": 15000,
+     "note": "Дорогая позиция с длинным ресурсом — идеальный кандидат на аналог MOTORTECH."
+    },
+    {
+     "key": "piston",
+     "name": "Поршень",
+     "sys": "cpg",
+     "qty_year": 1.6,
+     "usd_unit": 1200,
+     "usd_year": 1920,
+     "interval": 60000,
+     "note": ""
+    },
+    {
+     "key": "blowby",
+     "name": "Фильтр вентиляции картера (blow-by)",
+     "sys": "filtration",
+     "qty_year": 6.0,
+     "usd_unit": 300,
+     "usd_year": 1800,
+     "interval": 4000,
+     "note": ""
+    },
+    {
+     "key": "turbo",
+     "name": "Турбокомпрессор (ремонт картриджа)",
+     "sys": "air",
+     "qty_year": 0.3,
+     "usd_unit": 6000,
+     "usd_year": 1600,
+     "interval": 30000,
+     "note": "Ремонт, а не новая турбина: новая — от $16 тыс."
+    },
+    {
+     "key": "air_filter",
+     "name": "Фильтр воздушный",
+     "sys": "filtration",
+     "qty_year": 6.0,
+     "usd_unit": 260,
+     "usd_year": 1560,
+     "interval": 4000,
+     "note": ""
+    },
+    {
+     "key": "valve",
+     "name": "Клапаны впуск/выпуск (комплект на цилиндр)",
+     "sys": "head",
+     "qty_year": 4.8,
+     "usd_unit": 320,
+     "usd_year": 1536,
+     "interval": 30000,
+     "note": ""
+    },
+    {
+     "key": "liner",
+     "name": "Гильза цилиндра",
+     "sys": "cpg",
+     "qty_year": 1.6,
+     "usd_unit": 850,
+     "usd_year": 1360,
+     "interval": 60000,
+     "note": ""
+    },
+    {
+     "key": "rings",
+     "name": "Комплект поршневых колец",
+     "sys": "cpg",
+     "qty_year": 3.2,
+     "usd_unit": 380,
+     "usd_year": 1216,
+     "interval": 30000,
+     "note": ""
+    },
+    {
+     "key": "boot",
+     "name": "Колпачок / удлинитель свечи",
+     "sys": "ignition",
+     "qty_year": 18.0,
+     "usd_unit": 50,
+     "usd_year": 900,
+     "interval": 8000,
+     "note": "Ресурс выше свечи, но ниже катушки."
+    },
+    {
+     "key": "rod_bearing",
+     "name": "Вкладыш шатунный (комплект на цилиндр)",
+     "sys": "crank",
+     "qty_year": 3.2,
+     "usd_unit": 150,
+     "usd_year": 480,
+     "interval": 30000,
+     "note": ""
+    },
+    {
+     "key": "plug_seal",
+     "name": "Комплект уплотнений колодца свечи (о-кольца, шайба)",
+     "sys": "seals",
+     "qty_year": 36.0,
+     "usd_unit": 12,
+     "usd_year": 432,
+     "interval": 4000,
+     "note": "Меняется обычно через одну замену свечи."
+    },
+    {
+     "key": "coolant_filter",
+     "name": "Фильтр охлаждающей жидкости",
+     "sys": "filtration",
+     "qty_year": 12.0,
+     "usd_unit": 28,
+     "usd_year": 336,
+     "interval": 2000,
+     "note": ""
+    },
+    {
+     "key": "main_bearing",
+     "name": "Вкладыш коренной",
+     "sys": "crank",
+     "qty_year": 1.2,
+     "usd_unit": 180,
+     "usd_year": 216,
+     "interval": 60000,
+     "note": "Число коренных зависит от компоновки; 9 — как у V16 CAT G3516."
+    }
+   ]
+  },
+  {
+   "model": "Jenbacher J616 (Type 6)",
+   "oem": "Jenbacher",
+   "cyl": 16,
+   "kwe": 2433,
+   "gas": "natural",
+   "gas_name": "Природный газ",
+   "usd_year": 53683,
+   "usd_per_kw_year": 22.1,
+   "usd_per_mwh": 2.76,
+   "items": [
+    {
+     "key": "head",
+     "name": "Головка блока цилиндров (замена или восстановление)",
+     "sys": "head",
+     "qty_year": 4.3,
+     "usd_unit": 3500,
+     "usd_year": 14933,
+     "interval": 30000,
+     "note": "Верхний ремонт. Самая тяжёлая строка бюджета владельца."
+    },
+    {
+     "key": "plug",
+     "name": "Свеча зажигания",
+     "sys": "ignition",
+     "qty_year": 64.0,
+     "usd_unit": 210,
+     "usd_year": 13440,
+     "interval": 2000,
+     "note": "Главный расходник. Цена — середина вилки по 4380132 и 5373898."
+    },
+    {
+     "key": "prechamber_valve",
+     "name": "Клапан газовый форкамеры",
+     "sys": "gas",
+     "qty_year": 12.8,
+     "usd_unit": 375,
+     "usd_year": 4800,
+     "interval": 10000,
+     "note": "Только на форкамерных двигателях (Jenbacher Type 4/6, часть Cummins и CAT)."
+    },
+    {
+     "key": "gas_filter",
+     "name": "Фильтр газовый",
+     "sys": "gas",
+     "qty_year": 4.0,
+     "usd_unit": 700,
+     "usd_year": 2800,
+     "interval": 4000,
+     "note": ""
+    },
+    {
+     "key": "piston",
+     "name": "Поршень",
+     "sys": "cpg",
+     "qty_year": 2.1,
+     "usd_unit": 1200,
+     "usd_year": 2560,
+     "interval": 60000,
+     "note": ""
+    },
+    {
+     "key": "coil",
+     "name": "Катушка зажигания",
+     "sys": "ignition",
+     "qty_year": 8.5,
+     "usd_unit": 260,
+     "usd_year": 2219,
+     "interval": 15000,
+     "note": "Дорогая позиция с длинным ресурсом — идеальный кандидат на аналог MOTORTECH."
+    },
+    {
+     "key": "oil_filter",
+     "name": "Фильтр масляный",
+     "sys": "filtration",
+     "qty_year": 21.3,
+     "usd_unit": 95,
+     "usd_year": 2027,
+     "interval": 1500,
+     "note": ""
+    },
+    {
+     "key": "liner",
+     "name": "Гильза цилиндра",
+     "sys": "cpg",
+     "qty_year": 2.1,
+     "usd_unit": 850,
+     "usd_year": 1813,
+     "interval": 60000,
+     "note": ""
+    },
+    {
+     "key": "rings",
+     "name": "Комплект поршневых колец",
+     "sys": "cpg",
+     "qty_year": 4.3,
+     "usd_unit": 380,
+     "usd_year": 1621,
+     "interval": 30000,
+     "note": ""
+    },
+    {
+     "key": "turbo",
+     "name": "Турбокомпрессор (ремонт картриджа)",
+     "sys": "air",
+     "qty_year": 0.3,
+     "usd_unit": 6000,
+     "usd_year": 1600,
+     "interval": 30000,
+     "note": "Ремонт, а не новая турбина: новая — от $16 тыс."
+    },
+    {
+     "key": "valve",
+     "name": "Клапаны впуск/выпуск (комплект на цилиндр)",
+     "sys": "head",
+     "qty_year": 4.3,
+     "usd_unit": 320,
+     "usd_year": 1365,
+     "interval": 30000,
+     "note": ""
+    },
+    {
+     "key": "blowby",
+     "name": "Фильтр вентиляции картера (blow-by)",
+     "sys": "filtration",
+     "qty_year": 4.0,
+     "usd_unit": 300,
+     "usd_year": 1200,
+     "interval": 4000,
+     "note": ""
+    },
+    {
+     "key": "air_filter",
+     "name": "Фильтр воздушный",
+     "sys": "filtration",
+     "qty_year": 4.0,
+     "usd_unit": 260,
+     "usd_year": 1040,
+     "interval": 4000,
+     "note": ""
+    },
+    {
+     "key": "boot",
+     "name": "Колпачок / удлинитель свечи",
+     "sys": "ignition",
+     "qty_year": 16.0,
+     "usd_unit": 50,
+     "usd_year": 800,
+     "interval": 8000,
+     "note": "Ресурс выше свечи, но ниже катушки."
+    },
+    {
+     "key": "rod_bearing",
+     "name": "Вкладыш шатунный (комплект на цилиндр)",
+     "sys": "crank",
+     "qty_year": 4.3,
+     "usd_unit": 150,
+     "usd_year": 640,
+     "interval": 30000,
+     "note": ""
+    },
+    {
+     "key": "plug_seal",
+     "name": "Комплект уплотнений колодца свечи (о-кольца, шайба)",
+     "sys": "seals",
+     "qty_year": 32.0,
+     "usd_unit": 12,
+     "usd_year": 384,
+     "interval": 4000,
+     "note": "Меняется обычно через одну замену свечи."
+    },
+    {
+     "key": "coolant_filter",
+     "name": "Фильтр охлаждающей жидкости",
+     "sys": "filtration",
+     "qty_year": 8.0,
+     "usd_unit": 28,
+     "usd_year": 224,
+     "interval": 2000,
+     "note": ""
+    },
+    {
+     "key": "main_bearing",
+     "name": "Вкладыш коренной",
+     "sys": "crank",
+     "qty_year": 1.2,
+     "usd_unit": 180,
+     "usd_year": 216,
+     "interval": 60000,
+     "note": "Число коренных зависит от компоновки; 9 — как у V16 CAT G3516."
+    }
+   ]
+  },
+  {
+   "model": "MWM TCG 2020 (CAT CG170)",
+   "oem": "MWM/CAT",
+   "cyl": 16,
+   "kwe": 1560,
+   "gas": "natural",
+   "gas_name": "Природный газ",
+   "usd_year": 53683,
+   "usd_per_kw_year": 34.4,
+   "usd_per_mwh": 4.3,
+   "items": [
+    {
+     "key": "head",
+     "name": "Головка блока цилиндров (замена или восстановление)",
+     "sys": "head",
+     "qty_year": 4.3,
+     "usd_unit": 3500,
+     "usd_year": 14933,
+     "interval": 30000,
+     "note": "Верхний ремонт. Самая тяжёлая строка бюджета владельца."
+    },
+    {
+     "key": "plug",
+     "name": "Свеча зажигания",
+     "sys": "ignition",
+     "qty_year": 64.0,
+     "usd_unit": 210,
+     "usd_year": 13440,
+     "interval": 2000,
+     "note": "Главный расходник. Цена — середина вилки по 4380132 и 5373898."
+    },
+    {
+     "key": "prechamber_valve",
+     "name": "Клапан газовый форкамеры",
+     "sys": "gas",
+     "qty_year": 12.8,
+     "usd_unit": 375,
+     "usd_year": 4800,
+     "interval": 10000,
+     "note": "Только на форкамерных двигателях (Jenbacher Type 4/6, часть Cummins и CAT)."
+    },
+    {
+     "key": "gas_filter",
+     "name": "Фильтр газовый",
+     "sys": "gas",
+     "qty_year": 4.0,
+     "usd_unit": 700,
+     "usd_year": 2800,
+     "interval": 4000,
+     "note": ""
+    },
+    {
+     "key": "piston",
+     "name": "Поршень",
+     "sys": "cpg",
+     "qty_year": 2.1,
+     "usd_unit": 1200,
+     "usd_year": 2560,
+     "interval": 60000,
+     "note": ""
+    },
+    {
+     "key": "coil",
+     "name": "Катушка зажигания",
+     "sys": "ignition",
+     "qty_year": 8.5,
+     "usd_unit": 260,
+     "usd_year": 2219,
+     "interval": 15000,
+     "note": "Дорогая позиция с длинным ресурсом — идеальный кандидат на аналог MOTORTECH."
+    },
+    {
+     "key": "oil_filter",
+     "name": "Фильтр масляный",
+     "sys": "filtration",
+     "qty_year": 21.3,
+     "usd_unit": 95,
+     "usd_year": 2027,
+     "interval": 1500,
+     "note": ""
+    },
+    {
+     "key": "liner",
+     "name": "Гильза цилиндра",
+     "sys": "cpg",
+     "qty_year": 2.1,
+     "usd_unit": 850,
+     "usd_year": 1813,
+     "interval": 60000,
+     "note": ""
+    },
+    {
+     "key": "rings",
+     "name": "Комплект поршневых колец",
+     "sys": "cpg",
+     "qty_year": 4.3,
+     "usd_unit": 380,
+     "usd_year": 1621,
+     "interval": 30000,
+     "note": ""
+    },
+    {
+     "key": "turbo",
+     "name": "Турбокомпрессор (ремонт картриджа)",
+     "sys": "air",
+     "qty_year": 0.3,
+     "usd_unit": 6000,
+     "usd_year": 1600,
+     "interval": 30000,
+     "note": "Ремонт, а не новая турбина: новая — от $16 тыс."
+    },
+    {
+     "key": "valve",
+     "name": "Клапаны впуск/выпуск (комплект на цилиндр)",
+     "sys": "head",
+     "qty_year": 4.3,
+     "usd_unit": 320,
+     "usd_year": 1365,
+     "interval": 30000,
+     "note": ""
+    },
+    {
+     "key": "blowby",
+     "name": "Фильтр вентиляции картера (blow-by)",
+     "sys": "filtration",
+     "qty_year": 4.0,
+     "usd_unit": 300,
+     "usd_year": 1200,
+     "interval": 4000,
+     "note": ""
+    },
+    {
+     "key": "air_filter",
+     "name": "Фильтр воздушный",
+     "sys": "filtration",
+     "qty_year": 4.0,
+     "usd_unit": 260,
+     "usd_year": 1040,
+     "interval": 4000,
+     "note": ""
+    },
+    {
+     "key": "boot",
+     "name": "Колпачок / удлинитель свечи",
+     "sys": "ignition",
+     "qty_year": 16.0,
+     "usd_unit": 50,
+     "usd_year": 800,
+     "interval": 8000,
+     "note": "Ресурс выше свечи, но ниже катушки."
+    },
+    {
+     "key": "rod_bearing",
+     "name": "Вкладыш шатунный (комплект на цилиндр)",
+     "sys": "crank",
+     "qty_year": 4.3,
+     "usd_unit": 150,
+     "usd_year": 640,
+     "interval": 30000,
+     "note": ""
+    },
+    {
+     "key": "plug_seal",
+     "name": "Комплект уплотнений колодца свечи (о-кольца, шайба)",
+     "sys": "seals",
+     "qty_year": 32.0,
+     "usd_unit": 12,
+     "usd_year": 384,
+     "interval": 4000,
+     "note": "Меняется обычно через одну замену свечи."
+    },
+    {
+     "key": "coolant_filter",
+     "name": "Фильтр охлаждающей жидкости",
+     "sys": "filtration",
+     "qty_year": 8.0,
+     "usd_unit": 28,
+     "usd_year": 224,
+     "interval": 2000,
+     "note": ""
+    },
+    {
+     "key": "main_bearing",
+     "name": "Вкладыш коренной",
+     "sys": "crank",
+     "qty_year": 1.2,
+     "usd_unit": 180,
+     "usd_year": 216,
+     "interval": 60000,
+     "note": "Число коренных зависит от компоновки; 9 — как у V16 CAT G3516."
+    }
+   ]
+  }
+ ]
+}

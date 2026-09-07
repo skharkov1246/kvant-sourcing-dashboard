@@ -1,0 +1,65 @@
+{
+  "schema": "agent.repo-manifest/1",
+  "repo": "skharkov1246/kvant-sourcing-dashboard",
+  "visibility": "public",
+  "purpose": "Монорепозиторий внутренних инструментов КВАНТ: дашборд анализа работы сорсеров по данным Bitrix24 плюс шесть статических сайтов проектов, каждый со своей сборкой и своим проектом Cloudflare Pages.",
+  "peers": [
+    {
+      "repo": "skharkov1246/ocm-research-diary",
+      "relation": "второй репозиторий владельца: открытый дневник квантово-химических расчётов MatterForge",
+      "manifest": ".agent/manifest.json",
+      "catalog": "data/catalog.json"
+    }
+  ],
+  "start_here": ["CLAUDE.md", ".agent/README.md", "data/catalog.json", "README.md"],
+  "commands": {
+    "tests": "python -m pytest -q",
+    "lint": "ruff check .",
+    "smoke_render": "python -c \"import sys,types;sys.modules.setdefault('dotenv',types.SimpleNamespace(load_dotenv=lambda *a,**k:None));sys.path.insert(0,'.');import dashboard;from tests import fixture;dashboard.write(fixture.build_metrics(),{'source':'rules','items':[]},'smoke/index.html')\" && python scripts/validate_dashboard.py smoke/index.html",
+    "validate_html": "python scripts/validate_dashboard.py <путь к html>",
+    "refresh_catalog": "python scripts/build_catalog.py",
+    "check_catalog": "python scripts/build_catalog.py --check",
+    "dry_run_metrics": "python main.py --dry-run   # нужен BITRIX_WEBHOOK_URL в .env"
+  },
+  "subprojects": [
+    {"id": "dashboard", "path": ".", "build": "main.py", "template": "templates/dashboard_core.html", "deploy": ".github/workflows/deploy.yml", "cloudflare_project": "kvant-sourcing-f122", "gated": true, "data": "data/"},
+    {"id": "ove", "path": "ove", "build": "ove/build.py", "deploy": ".github/workflows/ove-deploy.yml", "cloudflare_project": "kvant-ove", "gated": true, "data": "ove/data/"},
+    {"id": "gt", "path": "gt", "build": "gt/build.py", "deploy": ".github/workflows/zip-deploy.yml", "cloudflare_project": "kvant-zip", "gated": false, "data": "gt/data/", "note": "сайт ГТУ собирается внутрь zip/public/gt — отдельного workflow у него нет"},
+    {"id": "zip", "path": "zip", "build": "zip/build.py", "deploy": ".github/workflows/zip-deploy.yml", "cloudflare_project": "kvant-zip", "gated": false, "data": "zip/data/"},
+    {"id": "gpu", "path": "gpu", "build": "gpu/build.py", "deploy": ".github/workflows/gpu-deploy.yml", "cloudflare_project": "kvant-gpu", "gated": true, "data": "gpu/data/"},
+    {"id": "gidromet", "path": "gidromet", "build": "gidromet/build.py", "deploy": ".github/workflows/gidromet-deploy.yml", "cloudflare_project": "kvant-gidromet", "gated": false, "data": "gidromet/data/"},
+    {"id": "factory", "path": "factory", "build": "нет (страница самодостаточна)", "deploy": ".github/workflows/factory-deploy.yml", "cloudflare_project": "kvant-gok", "gated": false, "data": "factory/model/"}
+  ],
+  "data": {
+    "catalog": "data/catalog.json",
+    "notes": "data/catalog_notes.json",
+    "refresh": "python scripts/build_catalog.py",
+    "rule": "новый набор данных → добавить пояснение в data/catalog_notes.json и пересобрать каталог"
+  },
+  "bot_files": [
+    {"path": "data/chat_snapshot.json", "written_by": ".github/workflows/scan.yml", "cadence": "раз в сутки"},
+    {"path": "gt/data/bitrix_gt.json", "written_by": ".github/workflows/gt-bitrix.yml", "cadence": "пн и чт"},
+    {"path": "gt/public/", "written_by": ".github/workflows/gt-bitrix.yml", "cadence": "пн и чт"}
+  ],
+  "schedules": [
+    {"what": "пересборка дашборда", "primary": "repository_dispatch rebuild от Cloudflare Cron Worker (scheduler/)", "backup": "cron 7 */6 в deploy.yml", "cadence": "раз в 6 часов"},
+    {"what": "снимок чатов сделок", "primary": "repository_dispatch scan", "backup": "cron 0 21 в scan.yml", "cadence": "раз в сутки"}
+  ],
+  "guardrails": {
+    "gate_workflow": ".github/workflows/gate.yml",
+    "checks": ["ruff", "компиляция всех модулей", "pytest", "smoke-рендер + валидация HTML", "бот-файлы не изменены", "поиск секретов"],
+    "pre_deploy_validation": "scripts/validate_dashboard.py — деплой не выполняется, если дашборд пустой или сломан"
+  },
+  "do_not_touch_without_owner": [
+    ".github/workflows/ — расписания и деплой",
+    "scheduler/ — Cloudflare Cron Worker",
+    "public/_worker.js — гейт доступа Basic Auth",
+    "секреты и .env",
+    "data/chat_snapshot.json — им управляет бот"
+  ],
+  "known_risks": [
+    "Репозиторий публичный, а в нём коммерческие и персональные данные: 43 набора помечены в каталоге как конфиденциальные. Решение о выносе или закрытии репозитория — за владельцем.",
+    "Публичный ключ Supabase и политики RLS «всё разрешено anon» дают доступ к базе ЗИП в обход гейта. Подготовлена миграция zip/supabase/migrations_rls.sql.",
+    "История git содержит удалённые секреты и данные: очистка требует git filter-repo и отзыва учётных данных."
+  ]
+}

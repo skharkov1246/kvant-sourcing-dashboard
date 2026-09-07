@@ -130,10 +130,11 @@ document.getElementById('f-tier').innerHTML += Object.entries(TIERS).filter(([k]
 
 function coRow(c){
  const k=c.name, st=M.st[k]||'', note=M.note[k]||'';
+ const custb = c.customs ? `<span class="badge" style="background:#e6f0ff;color:#1d4ed8;border:1px solid #1d4ed8" title="Доказано отгрузкой: таможня РФ HS 8411, экспортёр «${esc(c.customs.exporter)}», ${c.customs.n} записей (${(c.customs.years||[]).join(', ')})">📦 возил в РФ ×${c.customs.n}</span>` : '';
  const a=ASK[c.ask]||ASK.nomen;
  const comps=(c.comps&&c.comps.length?c.comps:[c.comp]).map(x=>`<span class="badge b-comp">${esc(x)}</span>`).join('');
  return `<div class="co" data-k="${esc(k)}">
-  <div><div class="cn">${esc(c.name)} <span class="badge ${a[1]}">${a[0]}</span></div>
+  <div><div class="cn">${esc(c.name)} <span class="badge ${a[1]}">${a[0]}</span>${custb}</div>
    <div class="mut small">${esc(c.country||'')} · ${esc(c.relation||'')}</div>
    <div style="margin-top:4px">${comps}</div>
    ${c.email?`<div class="small"><a href="mailto:${esc(c.email)}">✉ ${esc(c.email)}</a></div>`:''}

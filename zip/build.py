@@ -162,8 +162,25 @@ def build():
         for page in (ROOT.parent / "gt" / "public").glob("*.html"):
             shutil.copy2(page, OUT / "gt" / page.name)
             print(f"gt: {page.name} → zip/public/gt/{page.name}")
+        # PN-wizard: отдельный сайт базы PN по пути /gt/wizard/ (подпапка с data.js/guide.html)
+        wiz = ROOT.parent / "gt" / "public" / "wizard"
+        if wiz.is_dir():
+            dst = OUT / "gt" / "wizard"
+            if dst.exists():
+                shutil.rmtree(dst)
+            shutil.copytree(wiz, dst)
+            print(f"gt: wizard/ → zip/public/gt/wizard/ ({len(list(dst.iterdir()))} файлов)")
     except Exception as e:  # ГТУ-сайт не должен ронять деплой базы ЗИП
         print(f"gt: пропущен ({e})")
+
+    # Гейт доступа. Сайт отдаёт CRM поставщиков и контакты (gt/ — 860+ адресов),
+    # поэтому воркер кладётся всегда. Он самовыключающийся: если секрет
+    # BASIC_AUTH_PASS в Cloudflare Pages не задан, гейт пропускает всех и сайт
+    # работает как раньше — уронить публикацию он не может. Логин — «kvant».
+    gate_src = ROOT / "site" / "_worker.js.example"
+    if gate_src.exists():
+        shutil.copy2(gate_src, OUT / "_worker.js")
+        print("гейт: zip/public/_worker.js установлен (активируется секретом BASIC_AUTH_PASS)")
 
     size = (OUT / "index.html").stat().st_size
     print(f"zip/public/index.html: {size:,} байт | позиций {n_pos}, "
