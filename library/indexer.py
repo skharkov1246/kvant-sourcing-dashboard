@@ -390,6 +390,19 @@ def handle(ref: dict) -> tuple[dict, list[dict]]:
     return rec, items
 
 
+NULLS = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f]")
+
+
+def pg(s) -> str:
+    """Строка, пригодная для PostgreSQL.
+
+    В тексте, извлечённом из PDF и старых .xls, попадаются нулевые байты и другие
+    управляющие символы. PostgreSQL их в text не принимает — psycopg2 падает с
+    «A string literal cannot contain NUL (0x00) characters», и вместе с одной
+    строкой теряется весь пакет разобранных файлов."""
+    return NULLS.sub(" ", str(s or ""))
+
+
 def ensure_segments(cur) -> None:
     """Справочник сегментов в базе должен существовать ДО записи номенклатуры.
 
@@ -442,10 +455,26 @@ def main() -> int:
         conn = connect()
         with conn.cursor() as cur:
             if buf_items:
-                psycopg2.extras.execute_values(cur, """
-                    insert into lib_demand
-                      (segment_id, deal_id, item_name, oem, part_number, qty, unit, source, source_file)
-                    values %s""", buf_items, page_size=500)
+                try:
+                    psycopg2.extras.execute_values(cur, """
+                        insert into lib_demand
+                          (segment_id, deal_id, item_name, oem, part_number, qty, unit, source, source_file)
+                        values %s""", buf_items, page_size=500)
+                except (psycopg2.Error, ValueError) as e:
+                    # одна испорченная строка не должна стоить всего пакета: двадцать минут
+                    # разбора уже потрачены, поэтому досылаем построчно и пропускаем битые
+                    conn.rollback()
+                    bad = 0
+                    for row in buf_items:
+                        try:
+                            cur.execute("""insert into lib_demand
+                                (segment_id, deal_id, item_name, oem, part_number, qty, unit, source, source_file)
+                                values (%s,%s,%s,%s,%s,%s,%s,%s,%s)""", row)
+                        except (psycopg2.Error, ValueError):
+                            conn.rollback()
+                            bad += 1
+                    print(f"  ⚠ пакет номенклатуры не прошёл ({type(e).__name__}); "
+                          f"построчно записано {len(buf_items) - bad}, пропущено {bad}", flush=True)
             if buf_files:
                 psycopg2.extras.execute_values(cur, """
                     insert into lib_files
@@ -469,12 +498,12 @@ def main() -> int:
                 segs[rec["segment_id"]] += rec["rows_found"]
             total_items += rec["rows_found"]
             buf_files.append((rec["file_id"], rec["deal_id"], rec["origin"], rec["field"], rec["kind"],
-                              rec["size_bytes"], rec["status"], rec["reason"], rec["chars"],
+                              rec["size_bytes"], rec["status"], pg(rec["reason"]), rec["chars"],
                               rec["rows_found"], rec["segment_id"], rec["sha256"]))
             for it in items:
-                buf_items.append((it["segment_id"], it["deal_id"], it["item_name"][:500],
-                                  (it.get("oem") or "")[:200], (it.get("part_number") or "")[:120],
-                                  it.get("qty"), (it.get("unit") or "")[:40],
+                buf_items.append((it["segment_id"], it["deal_id"], pg(it["item_name"])[:500],
+                                  pg(it.get("oem"))[:200], pg(it.get("part_number"))[:120],
+                                  it.get("qty"), pg(it.get("unit"))[:40],
                                   "спецификация сделки", it["source_file"]))
             if len(buf_files) >= 200 or len(buf_items) >= 4000:
                 flush()
