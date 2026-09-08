@@ -1,4 +1,4 @@
-"""Зонд v27: сегментация сделок за календарный год по типам оборудования.
+"""Зонд v28: сегментация сделок за календарный год по типам оборудования.
 
 Задача владельца: выделить десять направлений, по которым имеет смысл глубокое
 исследование (как сделано по ГПУ, ГТУ и ГШО), и понять, какие из них изучены хуже
@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import os
 import re
-from collections import Counter, defaultdict
+from collections import Counter
 from datetime import datetime, timedelta, timezone
 
 import requests
@@ -83,6 +83,10 @@ SEGMENTS: dict[str, list[str]] = {
         "труба", "трубы", "лист стальн", "швеллер", "двутавр", "металлопрокат", "отвод",
         "тройник", "металлоконструкц", "арматура а500",
     ],
+    "Водоподготовка и фильтрация": [
+        "мембран", "ультрафильтрац", "обратн осмос", "осмос", "фильтрующ", "фильтроэлемент",
+        "водоподготовк", "картридж", "деминерализ", "умягчител", "фильтр тонк",
+    ],
     "Сварка и инструмент": [
         "сварочн", "электрод", "проволок сварочн", "резак", "инструмент", "абразив",
         "круг отрезн", "сверло", "фреза",
@@ -119,6 +123,31 @@ def bx_all(method: str, params: dict, cap: int = 100000) -> list:
         start = j["next"]
 
 
+def bx_batch(cmds: dict) -> dict:
+    """Пакетный вызов: до 50 команд за запрос. Возвращает result_result."""
+    base = os.environ["BITRIX_WEBHOOK_URL"].rstrip("/")
+    for _ in range(4):
+        try:
+            r = requests.post(f"{base}/batch.json", json={"halt": 0, "cmd": cmds}, timeout=120)
+            r.raise_for_status()
+            return (r.json().get("result") or {}).get("result") or {}
+        except Exception:
+            continue
+    return {}
+
+
+def deal_rows(ids: list[str]) -> dict[str, list[str]]:
+    """Названия позиций по сделкам. crm.item.productrow.list по ownerType не отдаёт
+    строки старых сделок, поэтому берём штатным crm.deal.productrows.get пакетами."""
+    out: dict[str, list[str]] = {}
+    for i in range(0, len(ids), 50):
+        chunk = ids[i:i + 50]
+        cmds = {d: f"crm.deal.productrows.get?id={d}" for d in chunk}
+        for did, rows in (bx_batch(cmds) or {}).items():
+            out[str(did)] = [str((r or {}).get("PRODUCT_NAME") or "") for r in (rows or [])]
+    return out
+
+
 def classify(text: str) -> str | None:
     t = text.lower().replace("ё", "е")
     best, score = None, 0
@@ -131,7 +160,7 @@ def classify(text: str) -> str | None:
 
 def main() -> int:
     since = (datetime.now(timezone.utc) - timedelta(days=365)).strftime("%Y-%m-%dT00:00:00+03:00")
-    print(f"=== Зонд v27: сделки, созданные с {since[:10]} ===\n")
+    print(f"=== Зонд v28: сделки, созданные с {since[:10]} ===\n")
 
     deals = bx_all("crm.deal.list", {
         "filter": {">=DATE_CREATE": since},
@@ -144,12 +173,23 @@ def main() -> int:
         print("данных нет — проверьте права вебхука")
         return 0
 
+    # стадии и направления: без этого не понять, что считать выигрышем —
+    # выигранная сделка уходит в отдельное направление «Реализация»
+    st, cat = Counter(), Counter()
+    for d in deals:
+        st[str(d.get("STAGE_ID") or "")] += 1
+        cat[str(d.get("CATEGORY_ID") or "")] += 1
+    print("направления (CATEGORY_ID → сделок):", dict(cat.most_common()))
+    print("стадии (STAGE_ID → сделок):")
+    for k, n in st.most_common(40):
+        print(f"    {k:28s} {n:>6d}")
+    print()
+
     # позиции сделок: название номенклатуры сильно точнее заголовка сделки
-    rows = bx_all("crm.item.productrow.list", {"filter": {"=ownerType": "D"}}, cap=200000)
-    by_deal: dict[str, list[str]] = defaultdict(list)
-    for r in rows:
-        by_deal[str(r.get("ownerId"))].append(str(r.get("productName") or ""))
-    print(f"строк номенклатуры получено: {len(rows)} · сделок с позициями: {len(by_deal)}\n")
+    by_deal = deal_rows([str(d.get("ID")) for d in deals])
+    n_rows = sum(len(v) for v in by_deal.values())
+    with_rows = sum(1 for v in by_deal.values() if v)
+    print(f"строк номенклатуры получено: {n_rows} · сделок с позициями: {with_rows} из {len(deals)}\n")
 
     seg_deals: Counter = Counter()
     seg_sum: Counter = Counter()
@@ -170,10 +210,12 @@ def main() -> int:
         seg_deals[seg] += 1
         seg_sum[seg] += amount
         seg_rows[seg] += len(by_deal.get(did, []))
-        if "WON" in stage:
+        # Стадии в портале переименованы, поэтому опираемся только на однозначные
+        # признаки; всё прочее считаем незакрытым, а не выигранным.
+        if "WON" in stage or stage.endswith(":SUCCESS"):
             seg_won[seg] += 1
             seg_won_sum[seg] += amount
-        elif "LOSE" in stage or "APOLOGY" in stage:
+        elif "LOSE" in stage or "APOLOGY" in stage or stage.endswith(":FAIL"):
             seg_lost[seg] += 1
         if seg == "— не распознано":
             unknown_titles.append(text)
@@ -224,7 +266,7 @@ def main() -> int:
     for i in range(0, len(shown), 3):
         print("   " + "".join(f"{w:24s}{n:>4d}   " for w, n in shown[i:i + 3]))
 
-    print("\n✓ зонд v27 завершён")
+    print("\n✓ зонд v28 завершён")
     return 0
 
 
