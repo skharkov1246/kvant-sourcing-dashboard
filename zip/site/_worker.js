@@ -6,7 +6,11 @@
 // На портале это ДВЕ плитки с разными правами, поэтому /gt/ спрашивает право «gt»,
 // а всё остальное — право «zip» (идентификатор оставлен прежним, чтобы переименование
 // не отняло доступ у тех, кому он уже выдан).
-// ВНИМАНИЕ: доступ к Supabase идёт по anon-ключу из index.html — сужайте RLS-политики (migrations.sql).
+// База ЗИП: страница больше НЕ носит ключ Supabase. Запросы идут на /db/* этого же
+// сайта, и ключ подставляет воркер — уже после проверки подписи Access и права «zip».
+// Пока в Cloudflare не задан секрет SUPABASE_SERVICE_KEY, используется прежний
+// публикуемый ключ (см. SUPA_FALLBACK_KEY): сайт работает как раньше, но ключ из
+// браузера уже исчез. Полное закрытие — секрет + zip/supabase/migrations_rls.sql.
 // Паролей нет: периметр — приложение Access с одной политикой допуска по почте
 // (распоряжение владельца от 07.09.2026: единый вход, единый портал).
 
@@ -21,6 +25,8 @@ export default {
       return denyPage(gt ? "Библиотека ГТУ · КВАНТ" : "ГШО · КВАНТ");
     }
 
+    if (path === "/db" || path.startsWith("/db/")) return proxyDb(request, env);
+
     const resp = await env.ASSETS.fetch(request);
     const out = new Response(resp.body, resp);
     // страницу не кэшируем: данные обновляются пересборкой
@@ -30,6 +36,45 @@ export default {
     return out;
   },
 };
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Прокси к Supabase. Вызывается ТОЛЬКО после accessOk() и siteAllowed(): без
+// подписи входа сюда не попасть. Браузер шлёт заглушку вместо ключа — воркер её
+// перезаписывает, поэтому настоящий ключ живёт только на стороне Cloudflare.
+const SUPA_ORIGIN = "https://vpjliavuuxjcvtxbthlp.supabase.co";
+// Прежний публикуемый ключ. Это не новая утечка: он и так лежал в отдаваемой
+// странице и остаётся в истории git. Здесь он — страховка на время перехода,
+// чтобы выкладка прокси ничего не сломала до того, как владелец заведёт секрет.
+// После задания SUPABASE_SERVICE_KEY и сужения RLS этот ключ станет бесполезен.
+const SUPA_FALLBACK_KEY = "sb_publishable_z74BF5VzezeQfTc9fni-ZA_HMyTKRTJ";
+
+async function proxyDb(request, env) {
+  const url = new URL(request.url);
+  const target = SUPA_ORIGIN + url.pathname.slice("/db".length) + url.search;
+  const key = (env && env.SUPABASE_SERVICE_KEY) || SUPA_FALLBACK_KEY;
+
+  const headers = new Headers(request.headers);
+  headers.set("apikey", key);
+  headers.set("Authorization", "Bearer " + key);
+  // куки Access и служебные заголовки Cloudflare базе не нужны и наружу не уходят
+  headers.delete("cookie");
+  headers.delete("cf-access-jwt-assertion");
+  headers.delete("cf-connecting-ip");
+  headers.delete("x-forwarded-for");
+
+  const method = request.method;
+  const init = { method, headers, redirect: "manual" };
+  if (method !== "GET" && method !== "HEAD") init.body = request.body;
+
+  const upstream = await fetch(target, init);
+  const out = new Response(upstream.body, upstream);
+  out.headers.set("Cache-Control", "no-store");
+  out.headers.delete("set-cookie");
+  return out;
+}
+
+// экспорт для тестов (на исполнение воркера не влияет)
+export { proxyDb, SUPA_ORIGIN };
 
 // служебная страница отказа: без внешних ресурсов, светлая и тёмная тема
 function denyPage(title) {
@@ -57,9 +102,10 @@ const RIGHTS_URL = "https://kvant-sourcing-f122.pages.dev/api/rights";
 const RIGHTS_TTL = 60 * 1000;              // память изолята: не дёргать портал на каждый файл
 const rightsCache = new Map();
 
-// Что стоит журнала: страницы и выгружаемые файлы. Разметка, картинки и шрифты —
-// часть страницы, а не действие человека, и в журнал не идут.
-const AUDIT_SKIP = /\.(css|js|mjs|map|woff2?|ttf|png|jpe?g|gif|svg|webp|ico|avif)$/i;
+// Что стоит журнала: страницы и выгружаемые файлы. Разметка, картинки, шрифты и
+// обращения страницы к данным (/db/…) — часть страницы, а не действие человека,
+// и в журнал не идут.
+const AUDIT_SKIP = /^\/db\/|\.(css|js|mjs|map|woff2?|ttf|png|jpe?g|gif|svg|webp|ico|avif)$/i;
 
 async function siteAllowed(request, env, site) {
   if (env && env.SITE_RIGHTS === "off") return true;

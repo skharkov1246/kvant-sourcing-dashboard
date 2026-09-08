@@ -108,7 +108,11 @@ table.pt .eur{color:#0b5;font-variant-numeric:tabular-nums}
 <div id="toast"></div>
 <script src="./vendor/supabase.js"></script>
 <script>
-const SUPA_URL="https://vpjliavuuxjcvtxbthlp.supabase.co", SUPA_KEY="sb_publishable_z74BF5VzezeQfTc9fni-ZA_HMyTKRTJ";
+// База ходит через собственный воркер сайта: /db/* → Supabase. Ключ подставляет
+// воркер (zip/site/_worker.js) уже ПОСЛЕ проверки входа Cloudflare Access, поэтому
+// в странице его больше нет и браузер посетителя его не получает.
+// SUPA_KEY — заглушка: supabase-js требует непустую строку, воркер её перезаписывает.
+const SUPA_URL=location.origin+"/db", SUPA_KEY="via-worker";
 const SEED=[/*__SEED__*/];
 const DEMAND=[/*__DEMAND__*/];
 const COMPET=[/*__COMPET__*/];
