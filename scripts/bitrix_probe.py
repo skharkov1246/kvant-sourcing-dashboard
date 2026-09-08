@@ -1,27 +1,33 @@
-"""Зонд v32: остались ли пути к файлам, кроме закрытых.
+"""Зонд v33: последние пути к файлам и оценка достижимой доли.
 
-v31 показал: ссылки из полей сделки ведут на страницу входа даже с ключом вебхука,
-а disk.file.get и disk.attachedObject.get по идентификатору из поля ссылки не дают.
-Файлы полей лежат в файловом хранилище портала, а не в Диске.
+Установлено: у вебхука все 69 прав, Диск отвечает, но файлы полей сделок — это
+файлы портала (тип «file»), а не объекты Диска, и их ссылки ведут на страницы,
+требующие сессии пользователя.
 
-Проверяются оставшиеся возможности, прежде чем просить владельца менять настройки:
-  1. crm.deal.get вместо crm.deal.list — иногда отдаёт объект файла иначе;
-  2. права вебхука: какие скоупы вообще выданы;
-  3. Диск: какие хранилища видны, есть ли среди них хранилище CRM;
-  4. вложения таймлайна (письма и задачи) — там идентификаторы другого рода,
-     и именно они могли дать «9 из 40» в ранней разведке.
+Однако ранняя разведка v29 получила 9 файлов из 40 через disk.file.get — значит
+часть вложений всё же лежит в Диске. Прежде чем объявлять путь закрытым, нужно:
 
-ПЕЧАТАЮТСЯ ТОЛЬКО ИМЕНА КЛЮЧЕЙ, КОДЫ ОТВЕТОВ И НАЗВАНИЯ ХРАНИЛИЩ.
+  1. измерить, какая доля файлов достижима через disk.file.get на большой выборке;
+  2. проверить служебный адрес выдачи вложений /bitrix/tools/disk/uf.php с ключом
+     вебхука — он предназначен именно для отдачи привязанных файлов;
+  3. перечислить типы всех хранилищ Диска: если есть хранилище CRM, файлы сделок
+     достижимы обходом папок, а не по идентификатору из поля.
+
+ПЕЧАТАЮТСЯ ТОЛЬКО ТИПЫ, КОДЫ ОТВЕТОВ И ДОЛИ.
 """
 from __future__ import annotations
 
 import os
+import re
 from collections import Counter
 from datetime import datetime, timedelta, timezone
 
 import requests
 
 BASE = os.environ["BITRIX_WEBHOOK_URL"].rstrip("/")
+m = re.match(r"(https://[^/]+)/rest/(\d+)/([^/]+)", BASE)
+PORTAL, USER_ID, TOKEN = (m.group(1), m.group(2), m.group(3)) if m else ("", "", "")
+SAMPLE = 200
 
 
 def bx(method: str, params: dict) -> dict:
@@ -61,101 +67,72 @@ def probe(u: str) -> str:
             return "ФАЙЛ office"
         if b.lstrip()[:1] == b"<":
             return "страница входа (html)"
-        return f"иное ({len(b)} б)"
+        return f"ФАЙЛ иное ({len(b)} б)"
     except Exception as e:
         return f"ошибка {type(e).__name__}"
 
 
 def main() -> int:
-    print("=== Зонд v32: оставшиеся пути к файлам ===\n")
+    print("=== Зонд v33: достижимая доля вложений ===\n")
 
-    # 1. Права вебхука
-    sc = sorted((bx("scope", {}).get("result") or []))
-    print(f"ПРАВА ВЕБХУКА ({len(sc)}): {', '.join(sc) if sc else 'не отдаются'}")
-    for need in ("crm", "disk", "task", "mailservice", "im"):
-        print(f"    {need:12s} {'есть' if need in sc else 'НЕТ'}")
-    print()
-
-    # 2. Диск: какие хранилища видны
     st = bx("disk.storage.getlist", {}).get("result") or []
-    print(f"ХРАНИЛИЩА ДИСКА: {len(st)}")
-    for s in st[:15]:
-        print(f"    id={s.get('ID')} тип={s.get('ENTITY_TYPE')} имя={str(s.get('NAME'))[:40]}")
-    print()
+    types = Counter(str(s.get("ENTITY_TYPE")) for s in st)
+    print(f"ТИПЫ ХРАНИЛИЩ ДИСКА ({len(st)}): {dict(types.most_common())}")
+    crm_st = [s for s in st if "crm" in str(s.get("ENTITY_TYPE", "")).lower()]
+    print(f"  хранилищ CRM: {len(crm_st)}\n")
 
     since = (datetime.now(timezone.utc) - timedelta(days=365)).strftime("%Y-%m-%dT00:00:00+03:00")
     uf = bx("crm.deal.userfield.list", {"order": {"FIELD_NAME": "ASC"}}).get("result") or []
     ff = [str(u["FIELD_NAME"]) for u in uf if u.get("USER_TYPE_ID") == "file"]
     deals = bx_all("crm.deal.list", {"filter": {">=DATE_CREATE": since},
                                      "select": ["ID"], "order": {"ID": "DESC"}})
-    ids = [str(d["ID"]) for d in deals[:200]]
+    ids = [str(d["ID"]) for d in deals]
 
-    # 3. crm.deal.get против crm.deal.list — форма объекта файла
-    print("ФОРМА ОБЪЕКТА ФАЙЛА: crm.deal.get против crm.deal.list")
-    shown = 0
-    for did in ids:
-        g = bx("crm.deal.get", {"id": did}).get("result") or {}
-        for f in ff:
-            v = g.get(f)
-            if not v:
-                continue
-            for fo in (v if isinstance(v, list) else [v]):
-                if isinstance(fo, dict) and shown < 3:
-                    print(f"    ключи из crm.deal.get: {sorted(fo.keys())}")
-                    for k in fo:
-                        if "url" in k.lower():
-                            u = str(fo[k])
-                            if u.startswith("http"):
-                                print(f"      {k}: {probe(u)}")
-                    shown += 1
-        if shown >= 3:
-            break
-    if not shown:
-        print("    файловых значений не встретилось в первых сделках")
-    print()
-
-    # 4. Вложения таймлайна: письма и задачи
-    print("ВЛОЖЕНИЯ ТАЙМЛАЙНА")
-    res: Counter = Counter()
-    keys: Counter = Counter()
-    tried = 0
-    for did in ids[:120]:
-        acts = bx("crm.activity.list", {"filter": {"OWNER_TYPE_ID": 2, "OWNER_ID": did},
-                                        "select": ["ID", "PROVIDER_ID", "FILES"]}).get("result") or []
-        for a in acts:
-            fl = a.get("FILES")
-            if not fl:
-                continue
-            items = fl.values() if isinstance(fl, dict) else fl
-            for fo in items:
-                if not isinstance(fo, dict):
+    refs: list[dict] = []
+    for i in range(0, len(ids), 50):
+        j = bx("crm.deal.list", {"filter": {"ID": ids[i:i + 50]}, "select": ["ID"] + ff})
+        for x in j.get("result") or []:
+            for f in ff:
+                v = x.get(f)
+                if not v:
                     continue
-                keys.update(fo.keys())
-                if tried >= 20:
-                    continue
-                tried += 1
-                got = False
-                for k in fo:
-                    if "url" in k.lower() or "link" in k.lower():
-                        u = str(fo[k])
-                        if u.startswith("http"):
-                            res[f"{k}: {probe(u)}"] += 1
-                            got = True
-                fid = fo.get("id") or fo.get("ID") or fo.get("fileId")
-                if fid:
-                    d = bx("disk.attachedObject.get", {"id": fid}).get("result") or {}
-                    u = d.get("DOWNLOAD_URL")
-                    res[f"attachedObject: {probe(u) if u else 'ссылки нет'}"] += 1
-                    got = True
-                if not got:
-                    res["ссылок в объекте нет"] += 1
-        if tried >= 20:
+                for fo in (v if isinstance(v, list) else [v]):
+                    if isinstance(fo, dict) and fo.get("id"):
+                        refs.append(fo)
+        if len(refs) >= SAMPLE * 3:
             break
-    print(f"    ключи объекта вложения: {dict(keys.most_common())}")
-    for k, n in res.most_common():
-        print(f"    {k:52s} {n}")
+    step = max(1, len(refs) // SAMPLE)
+    sample = refs[::step][:SAMPLE]
+    print(f"выборка вложений: {len(sample)} из {len(refs)} собранных\n")
 
-    print("\n✓ зонд v32 завершён")
+    # 1. Какая доля достижима через Диск
+    disk_ok = 0
+    disk_res: Counter = Counter()
+    for fo in sample:
+        d = bx("disk.file.get", {"id": fo["id"]})
+        u = (d.get("result") or {}).get("DOWNLOAD_URL")
+        if u:
+            r = probe(u)
+            disk_res[r] += 1
+            if r.startswith("ФАЙЛ"):
+                disk_ok += 1
+        else:
+            disk_res["объекта Диска нет"] += 1
+    print("=== ПУТЬ 1: disk.file.get по идентификатору поля ===")
+    print(f"  годных: {disk_ok} из {len(sample)} ({disk_ok / max(len(sample), 1) * 100:.1f}%)")
+    print(f"  {dict(disk_res.most_common(5))}\n")
+
+    # 2. Служебный адрес выдачи привязанных файлов
+    print("=== ПУТЬ 2: /bitrix/tools/disk/uf.php с ключом вебхука ===")
+    uf_res: Counter = Counter()
+    for fo in sample[:30]:
+        fid = fo["id"]
+        for tmpl in (f"{PORTAL}/bitrix/tools/disk/uf.php?attachedId={fid}&auth={TOKEN}&action=download",
+                     f"{PORTAL}/bitrix/tools/disk/uf.php?attachedId={fid}&action=download"):
+            uf_res[probe(tmpl)] += 1
+    print(f"  {dict(uf_res.most_common(5))}\n")
+
+    print("✓ зонд v33 завершён")
     return 0
 
 
