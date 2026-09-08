@@ -88,7 +88,7 @@ CREATE TABLE IF NOT EXISTS positions (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   deal_id INTEGER, fid TEXT, seg TEXT,
   raw TEXT, part_number TEXT, manufacturer TEXT, name TEXT,
-  qty REAL, unit TEXT, price REAL, currency TEXT, source TEXT
+  qty REAL, unit TEXT, price REAL, price_total REAL, currency TEXT, source TEXT
 );
 CREATE INDEX IF NOT EXISTS ix_pos_pn   ON positions(part_number);
 CREATE INDEX IF NOT EXISTS ix_pos_deal ON positions(deal_id);

@@ -148,20 +148,31 @@ def parse_cells(cells: list[str]) -> dict | None:
         pn, pn_idx = tok, i
         break
 
-    price = None
-    cand = [(i, v) for i, v in nums
-            if v and v >= 100 and v != qty and i != pn_idx and v < 1e9]
-    if cand:
-        # цена с копейками надёжнее круглого числа: круглым чаще оказывается код
-        dec = [v for i, v in cand if abs(v - round(v)) > 1e-9]
-        price = max(dec) if dec else max(v for _i, v in cand)
+    # цена за единицу и сумма строки различаются по связи с количеством:
+    # если одно число, умноженное на количество, даёт другое — это цена и сумма.
+    # Без такого разделения сравнение «цена поставщика против нашей» бессмысленно:
+    # в паре оказываются цена за штуку у одного и сумма позиции у другого.
+    price = price_total = None
+    cand = [v for i, v in nums if v and v >= 1 and v != qty and i != pn_idx and v < 1e9]
+    if qty and qty > 0:
+        for u in cand:
+            for t in cand:
+                if t > u and abs(u * qty - t) <= max(1.0, 0.02 * t):
+                    price, price_total = u, t
+                    break
+            if price is not None:
+                break
+    if price is None and cand:
+        big = [v for v in cand if v >= 100]
+        dec = [v for v in big if abs(v - round(v)) > 1e-9]
+        price = max(dec) if dec else (max(big) if big else None)
     words = [c for c in cells if len(c) >= 6 and sum(ch.isalpha() for ch in c) >= 4]
     name = max(words, key=len) if words else None
     if not name or (not pn and qty is None):
         return None
     m = CUR.search(joined)
     return {"name": name[:300], "part_number": (pn or None), "manufacturer": None,
-            "qty": qty, "unit": unit, "price": price,
+            "qty": qty, "unit": unit, "price": price, "price_total": price_total,
             "currency": (m.group(1).upper() if m else None), "raw": joined[:500]}
 
 
@@ -214,8 +225,8 @@ def from_text(text: str) -> list[dict]:
             cur = cm.group(1).upper() if cm else None
         out.append({"name": name, "part_number": pn, "manufacturer": None,
                     "qty": _num(q.group(1)) if q else None, "unit": (q.group(2) if q else None),
-                    "price": _num(p.group(1)) if p else None, "currency": cur,
-                    "raw": line[:500]})
+                    "price": _num(p.group(1)) if p else None, "price_total": None,
+                    "currency": cur, "raw": line[:500]})
         if len(out) >= MAX_ROWS_PER_FILE:
             break
     return out
@@ -252,20 +263,23 @@ def run(db_path: str, limit: int | None = None) -> dict:
                 continue
             for r in rows:
                 buf.append((int(d), fid, None, r["raw"], r["part_number"], r["manufacturer"],
-                            r["name"], r["qty"], r["unit"], r["price"], r["currency"], f"file:{ext}"))
+                            r["name"], r["qty"], r["unit"], r["price"], r.get("price_total"),
+                            r["currency"], f"file:{ext}"))
                 stats["positions"] += 1
                 if r["price"]:
                     stats["with_price"] += 1
         if len(buf) > 20000:
             con.executemany("""INSERT INTO positions
-                (deal_id, fid, seg, raw, part_number, manufacturer, name, qty, unit, price, currency, source)
-                VALUES (?,?,?,?,?,?,?,?,?,?,?,?)""", buf)
+                (deal_id, fid, seg, raw, part_number, manufacturer, name, qty, unit, price,
+                 price_total, currency, source)
+                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)""", buf)
             con.commit()
             buf = []
     if buf:
         con.executemany("""INSERT INTO positions
-            (deal_id, fid, seg, raw, part_number, manufacturer, name, qty, unit, price, currency, source)
-            VALUES (?,?,?,?,?,?,?,?,?,?,?,?)""", buf)
+            (deal_id, fid, seg, raw, part_number, manufacturer, name, qty, unit, price,
+             price_total, currency, source)
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)""", buf)
     con.commit()
     con.execute("UPDATE positions SET seg=(SELECT seg FROM deals WHERE deals.id=positions.deal_id)")
     con.commit()
