@@ -1,32 +1,27 @@
-"""Зонд v31: каким способом вообще скачиваются вложения сделок.
+"""Зонд v32: остались ли пути к файлам, кроме закрытых.
 
-Пробный прогон индексатора: 50 файлов из 50 — «не скачался». Значит дело не в
-хранилище и не в пуле соединений, а в способе получения. Разведка v29 давала
-9 из 40 через disk.file.get — то есть какой-то путь работает, но не для всех.
+v31 показал: ссылки из полей сделки ведут на страницу входа даже с ключом вебхука,
+а disk.file.get и disk.attachedObject.get по идентификатору из поля ссылки не дают.
+Файлы полей лежат в файловом хранилище портала, а не в Диске.
 
-Зонд не гадает, а перебирает пути на одной выборке и печатает, что ответил каждый:
-  • ссылки, лежащие в самом объекте файла (какие там вообще есть ключи);
-  • те же ссылки с добавленным ключом вебхука;
-  • disk.file.get по идентификатору;
-  • disk.attachedObject.get — для файлов, привязанных как объекты Диска.
+Проверяются оставшиеся возможности, прежде чем просить владельца менять настройки:
+  1. crm.deal.get вместо crm.deal.list — иногда отдаёт объект файла иначе;
+  2. права вебхука: какие скоупы вообще выданы;
+  3. Диск: какие хранилища видны, есть ли среди них хранилище CRM;
+  4. вложения таймлайна (письма и задачи) — там идентификаторы другого рода,
+     и именно они могли дать «9 из 40» в ранней разведке.
 
-ПЕЧАТАЮТСЯ ТОЛЬКО ИМЕНА КЛЮЧЕЙ И КОДЫ ОТВЕТОВ. Ни ссылок, ни имён файлов, ни
-содержимого: репозиторий публичный, журналы сборок открыты.
+ПЕЧАТАЮТСЯ ТОЛЬКО ИМЕНА КЛЮЧЕЙ, КОДЫ ОТВЕТОВ И НАЗВАНИЯ ХРАНИЛИЩ.
 """
 from __future__ import annotations
 
 import os
-import re
 from collections import Counter
 from datetime import datetime, timedelta, timezone
 
 import requests
 
 BASE = os.environ["BITRIX_WEBHOOK_URL"].rstrip("/")
-# из вебхука вида https://<портал>/rest/<id>/<токен>/ достаём части для ручных ссылок
-m = re.match(r"(https://[^/]+)/rest/(\d+)/([^/]+)", BASE)
-PORTAL, USER_ID, TOKEN = (m.group(1), m.group(2), m.group(3)) if m else ("", "", "")
-N = 25
 
 
 def bx(method: str, params: dict) -> dict:
@@ -52,22 +47,19 @@ def bx_all(method: str, params: dict) -> list:
         start = j["next"]
 
 
-def probe_url(u: str) -> str:
+def probe(u: str) -> str:
     try:
-        r = requests.get(u, timeout=45, allow_redirects=True)
+        r = requests.get(u, timeout=45)
         if r.status_code != 200:
             return f"http {r.status_code}"
         b = r.content
-        if len(b) < 200:
-            return f"пусто ({len(b)} б)"
-        head = b[:4]
-        if head[:2] == b"PK":
+        if b[:2] == b"PK":
             return "ФАЙЛ xlsx/docx"
-        if head == b"%PDF":
+        if b[:4] == b"%PDF":
             return "ФАЙЛ pdf"
         if b[:8] == b"\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1":
             return "ФАЙЛ office"
-        if b.lstrip()[:1] in (b"<",):
+        if b.lstrip()[:1] == b"<":
             return "страница входа (html)"
         return f"иное ({len(b)} б)"
     except Exception as e:
@@ -75,75 +67,95 @@ def probe_url(u: str) -> str:
 
 
 def main() -> int:
-    since = (datetime.now(timezone.utc) - timedelta(days=365)).strftime("%Y-%m-%dT00:00:00+03:00")
-    print(f"=== Зонд v31: способы скачивания вложений (выборка {N}) ===")
-    print(f"портал разобран из вебхука: {'да' if PORTAL else 'НЕТ — ручные ссылки не построить'}\n")
+    print("=== Зонд v32: оставшиеся пути к файлам ===\n")
 
+    # 1. Права вебхука
+    sc = sorted((bx("scope", {}).get("result") or []))
+    print(f"ПРАВА ВЕБХУКА ({len(sc)}): {', '.join(sc) if sc else 'не отдаются'}")
+    for need in ("crm", "disk", "task", "mailservice", "im"):
+        print(f"    {need:12s} {'есть' if need in sc else 'НЕТ'}")
+    print()
+
+    # 2. Диск: какие хранилища видны
+    st = bx("disk.storage.getlist", {}).get("result") or []
+    print(f"ХРАНИЛИЩА ДИСКА: {len(st)}")
+    for s in st[:15]:
+        print(f"    id={s.get('ID')} тип={s.get('ENTITY_TYPE')} имя={str(s.get('NAME'))[:40]}")
+    print()
+
+    since = (datetime.now(timezone.utc) - timedelta(days=365)).strftime("%Y-%m-%dT00:00:00+03:00")
     uf = bx("crm.deal.userfield.list", {"order": {"FIELD_NAME": "ASC"}}).get("result") or []
     ff = [str(u["FIELD_NAME"]) for u in uf if u.get("USER_TYPE_ID") == "file"]
     deals = bx_all("crm.deal.list", {"filter": {">=DATE_CREATE": since},
                                      "select": ["ID"], "order": {"ID": "DESC"}})
-    ids = [str(d["ID"]) for d in deals[:400]]
+    ids = [str(d["ID"]) for d in deals[:200]]
 
-    refs: list[tuple[str, str, dict]] = []
-    keyset: Counter = Counter()
-    for i in range(0, len(ids), 50):
-        j = bx("crm.deal.list", {"filter": {"ID": ids[i:i + 50]}, "select": ["ID"] + ff})
-        for x in j.get("result") or []:
-            for f in ff:
-                v = x.get(f)
-                if not v:
-                    continue
-                for fo in (v if isinstance(v, list) else [v]):
-                    if isinstance(fo, dict):
-                        keyset.update(fo.keys())
-                        refs.append((str(x["ID"]), f, fo))
-        if len(refs) >= N * 4:
+    # 3. crm.deal.get против crm.deal.list — форма объекта файла
+    print("ФОРМА ОБЪЕКТА ФАЙЛА: crm.deal.get против crm.deal.list")
+    shown = 0
+    for did in ids:
+        g = bx("crm.deal.get", {"id": did}).get("result") or {}
+        for f in ff:
+            v = g.get(f)
+            if not v:
+                continue
+            for fo in (v if isinstance(v, list) else [v]):
+                if isinstance(fo, dict) and shown < 3:
+                    print(f"    ключи из crm.deal.get: {sorted(fo.keys())}")
+                    for k in fo:
+                        if "url" in k.lower():
+                            u = str(fo[k])
+                            if u.startswith("http"):
+                                print(f"      {k}: {probe(u)}")
+                    shown += 1
+        if shown >= 3:
             break
+    if not shown:
+        print("    файловых значений не встретилось в первых сделках")
+    print()
 
-    print(f"объектов файлов собрано: {len(refs)}")
-    print(f"КЛЮЧИ объекта файла: {dict(keyset.most_common())}\n")
-    if not refs:
-        print("вложений не найдено")
-        return 0
-
-    url_keys = [k for k in keyset if "url" in k.lower() or "link" in k.lower() or "download" in k.lower()]
-    print(f"ключи, похожие на ссылку: {url_keys}\n")
-
-    res: dict[str, Counter] = {}
-
-    def note(way: str, outcome: str) -> None:
-        res.setdefault(way, Counter())[outcome] += 1
-
-    for _did, _f, fo in refs[:N]:
-        fid = fo.get("id") or fo.get("ID")
-        for k in url_keys:
-            u = fo.get(k)
-            if not u:
-                note(f"ключ {k}", "нет значения")
+    # 4. Вложения таймлайна: письма и задачи
+    print("ВЛОЖЕНИЯ ТАЙМЛАЙНА")
+    res: Counter = Counter()
+    keys: Counter = Counter()
+    tried = 0
+    for did in ids[:120]:
+        acts = bx("crm.activity.list", {"filter": {"OWNER_TYPE_ID": 2, "OWNER_ID": did},
+                                        "select": ["ID", "PROVIDER_ID", "FILES"]}).get("result") or []
+        for a in acts:
+            fl = a.get("FILES")
+            if not fl:
                 continue
-            u = str(u)
-            full = u if u.startswith("http") else (PORTAL + u if PORTAL else "")
-            if not full:
-                note(f"ключ {k}", "относительная ссылка, портал неизвестен")
-                continue
-            note(f"ключ {k}", probe_url(full))
-            sep = "&" if "?" in full else "?"
-            note(f"ключ {k} + auth", probe_url(f"{full}{sep}auth={TOKEN}"))
-        if fid:
-            d = bx("disk.file.get", {"id": fid})
-            u = (d.get("result") or {}).get("DOWNLOAD_URL")
-            note("disk.file.get", probe_url(u) if u else f"нет DOWNLOAD_URL ({str(d.get('error') or '')[:40]})")
-            a = bx("disk.attachedObject.get", {"id": fid})
-            u2 = (a.get("result") or {}).get("DOWNLOAD_URL")
-            note("disk.attachedObject.get", probe_url(u2) if u2 else f"нет ссылки ({str(a.get('error') or '')[:40]})")
+            items = fl.values() if isinstance(fl, dict) else fl
+            for fo in items:
+                if not isinstance(fo, dict):
+                    continue
+                keys.update(fo.keys())
+                if tried >= 20:
+                    continue
+                tried += 1
+                got = False
+                for k in fo:
+                    if "url" in k.lower() or "link" in k.lower():
+                        u = str(fo[k])
+                        if u.startswith("http"):
+                            res[f"{k}: {probe(u)}"] += 1
+                            got = True
+                fid = fo.get("id") or fo.get("ID") or fo.get("fileId")
+                if fid:
+                    d = bx("disk.attachedObject.get", {"id": fid}).get("result") or {}
+                    u = d.get("DOWNLOAD_URL")
+                    res[f"attachedObject: {probe(u) if u else 'ссылки нет'}"] += 1
+                    got = True
+                if not got:
+                    res["ссылок в объекте нет"] += 1
+        if tried >= 20:
+            break
+    print(f"    ключи объекта вложения: {dict(keys.most_common())}")
+    for k, n in res.most_common():
+        print(f"    {k:52s} {n}")
 
-    print("=== ЧТО ОТВЕТИЛ КАЖДЫЙ СПОСОБ ===")
-    for way, c in res.items():
-        good = sum(n for o, n in c.items() if o.startswith("ФАЙЛ"))
-        print(f"{way:34s} годных {good:>3d} из {sum(c.values()):>3d} · {dict(c.most_common(4))}")
-
-    print("\n✓ зонд v31 завершён")
+    print("\n✓ зонд v32 завершён")
     return 0
 
 
