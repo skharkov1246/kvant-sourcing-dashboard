@@ -1,25 +1,66 @@
-"""Зонд v29: где лежит номенклатура — разведка вложений сделок.
+"""Зонд v30: победа — это переезд в «Реализацию»; номенклатура — из файлов сделок.
 
-Владелец: номенклатура не в строках Битрикса, а в файлах, привязанных к сделкам.
-Прежде чем разбирать их все, нужно понять устройство: какие файловые поля есть,
-сколько сделок с файлами, какие форматы, и — главное — хватает ли вебхуку прав,
-чтобы файлы скачать (скоуп «Диск»). Без этого дальнейшая работа бессмысленна.
+Владелец уточнил устройство портала: выигранная сделка не закрывается стадией, а
+ПЕРЕЕЗЖАЕТ в направление «Реализация» той же карточкой, с сохранением истории.
+Значит признак победы — текущее направление сделки, а не семантика стадии. Прежний
+расчёт («выиграно 9 из 2926») был артефактом: переехавшие карточки просто не видны
+в исходной воронке, а закрытые в ней — действительно проигранные.
 
-ПЕЧАТАЮТСЯ ТОЛЬКО АГРЕГАТЫ. Имена файлов, названия сделок и содержимое не выводятся:
-репозиторий публичный. Из разобранных файлов показывается лишь распределение по
-сегментам оборудования и число распознанных строк.
+Он же указал, что номенклатура лежит в файлах, привязанных к сделкам, а не в строках
+товаров: v28 это подтвердил — штатный метод вернул ноль строк на всех 2926 сделках.
+Здесь файлы скачиваются и разбираются, формат определяется по содержимому (сигнатуре),
+а не по имени: в v29 имя файла оказалось в другом поле объекта и все 22 168 файлов
+определились как «без расширения».
+
+ПЕЧАТАЮТСЯ ТОЛЬКО АГРЕГАТЫ. Имена файлов, названия сделок, содержимое спецификаций
+и наименования контрагентов не выводятся: репозиторий публичный.
 """
 from __future__ import annotations
 
 import io
 import os
+import re
+import zipfile
 from collections import Counter
 from datetime import datetime, timedelta, timezone
 
 import requests
 
 BASE = os.environ["BITRIX_WEBHOOK_URL"].rstrip("/")
-SAMPLE_FILES = 40          # сколько файлов пробуем скачать в разведке
+SAMPLE = int(os.environ.get("PROBE_SAMPLE", "400"))     # сколько файлов разбираем
+
+SEGMENTS: dict[str, list[str]] = {
+    "ГПУ — газопоршневые": ["газопоршн", "cummins", "камминз", "jenbacher", "waukesha", "mwm",
+                            "innio", "qsk", "kta", "g3512", "g3516"],
+    "ГТУ — газотурбинные": ["газотурб", "турбин", "sgt", "lm6000", "lm2500", "taurus", "centaur",
+                            "solar turbines", "kawasaki", "гпа"],
+    "ГШО — горно-шахтное": ["перфоратор", "буров", "epiroc", "atlas copco", "sandvik", "tamrock",
+                            "normet", "пдм", "коронк", "штанг", "крепь", "проходческ"],
+    "Насосное оборудование": ["насос", "flowserve", "sulzer", "ksb", "grundfos", "цнс", "шламов",
+                              "warman", "weir", "рабочее колесо", "торцевое уплотнен"],
+    "Компрессоры": ["компрессор", "винтов", "ingersoll", "kaeser", "воздуходув", "ресивер",
+                    "осушитель воздух"],
+    "Дробление и обогащение": ["дробилк", "мельниц", "грохот", "флотац", "гидроциклон", "metso",
+                               "outotec", "футеровк", "сгустител", "классификатор", "конусн"],
+    "Трубопроводная арматура": ["задвижк", "затвор", "клапан", "кран шаров", "вентиль", "арматур",
+                                "фланец", "фланц"],
+    "Электротехника и приводы": ["трансформатор", "кру", "ктп", "частотн", "чрп", "электродвигател",
+                                 "schneider", "ячейк", "распредустройств", "кабель"],
+    "КИПиА и автоматизация": ["датчик", "расходомер", "манометр", "термопар", "emerson", "endress",
+                              "yokogawa", "уровнемер", "контроллер", "преобразователь давлен"],
+    "Подъёмно-транспортное": ["конвейер", "транспортёр", "транспортер", "лебёдк", "лебедк",
+                              "кран мостов", "редуктор", "тельфер", "роликоопор", "лента конвейер"],
+    "Теплообмен и котельное": ["теплообменник", "alfa laval", "котёл", "котел", "градирн",
+                               "экономайзер", "калорифер"],
+    "Карьерная спецтехника": ["самосвал", "экскаватор", "белаз", "komatsu", "бульдозер",
+                              "погрузчик фронтальн", "автогрейдер"],
+    "Подшипники и уплотнения": ["подшипник", "skf", "timken", "манжет", "сальник", "john crane"],
+    "Водоподготовка и фильтрация": ["мембран", "ультрафильтрац", "осмос", "фильтрующ", "фильтроэлемент",
+                                    "водоподготовк", "картридж", "умягчител"],
+    "Металлопрокат и трубы": ["швеллер", "двутавр", "металлопрокат", "лист стальн", "отвод",
+                              "тройник", "труба"],
+    "Сварка и инструмент": ["сварочн", "электрод", "проволок", "абразив", "круг отрезн", "сверло", "фреза"],
+}
 
 
 def bx(method: str, params: dict) -> dict:
@@ -33,7 +74,7 @@ def bx(method: str, params: dict) -> dict:
     return {}
 
 
-def bx_all(method: str, params: dict, cap: int = 100000) -> list:
+def bx_all(method: str, params: dict, cap: int = 200000) -> list:
     out, start = [], 0
     while True:
         j = bx(method, {**params, "start": start})
@@ -45,183 +86,168 @@ def bx_all(method: str, params: dict, cap: int = 100000) -> list:
         start = j["next"]
 
 
-def bx_batch(cmds: dict) -> dict:
-    for _ in range(4):
+def classify(text: str) -> str | None:
+    t = text.lower().replace("ё", "е")
+    best, score = None, 0
+    for name, words in SEGMENTS.items():
+        n = sum(t.count(w.replace("ё", "е")) for w in words)
+        if n > score:
+            best, score = name, n
+    return best
+
+
+def sniff(b: bytes) -> str:
+    if b[:2] == b"PK":
+        return "zip-документ"          # xlsx/docx/pptx
+    if b[:4] == b"%PDF":
+        return "pdf"
+    if b[:8] == b"\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1":
+        return "старый office (xls/doc)"
+    if b[:4] in (b"\x89PNG", b"\xff\xd8\xff\xe0", b"\xff\xd8\xff\xe1"):
+        return "изображение"
+    return "прочее"
+
+
+def text_from(b: bytes) -> str:
+    """Текст из xlsx/docx. Для xlsx хватает общей таблицы строк — она содержит
+    все текстовые ячейки книги и читается без разбора самих листов."""
+    if b[:2] != b"PK":
+        return ""
+    try:
+        z = zipfile.ZipFile(io.BytesIO(b))
+        names = set(z.namelist())
+        if "xl/sharedStrings.xml" in names:
+            raw = z.read("xl/sharedStrings.xml").decode("utf-8", "ignore")
+            return " ".join(re.findall(r"<t[^>]*>([^<]{1,300})</t>", raw))
+        if "word/document.xml" in names:
+            raw = z.read("word/document.xml").decode("utf-8", "ignore")
+            return " ".join(re.findall(r"<w:t[^>]*>([^<]{1,300})</w:t>", raw))
+    except Exception:
+        return ""
+    return ""
+
+
+def download(fo: dict) -> bytes | None:
+    """Файлы лежат по-разному: часть в Диске, часть отдаётся прямой ссылкой из
+    самого объекта поля. Пробуем оба пути — в v29 один только Диск дал 9 из 40."""
+    for key in ("urlMachine", "downloadUrl", "url", "URL_MACHINE", "DOWNLOAD_URL"):
+        u = fo.get(key)
+        if u:
+            try:
+                r = requests.get(str(u), timeout=60)
+                if r.status_code == 200 and len(r.content) > 200:
+                    return r.content
+            except Exception:
+                pass
+    fid = fo.get("id") or fo.get("ID")
+    if fid:
         try:
-            r = requests.post(f"{BASE}/batch.json", json={"halt": 0, "cmd": cmds}, timeout=120)
-            r.raise_for_status()
-            j = r.json()
-            return {"res": (j.get("result") or {}).get("result") or {},
-                    "err": (j.get("result") or {}).get("result_error") or {}}
+            u = (bx("disk.file.get", {"id": fid}).get("result") or {}).get("DOWNLOAD_URL")
+            if u:
+                r = requests.get(u, timeout=60)
+                if r.status_code == 200 and len(r.content) > 200:
+                    return r.content
         except Exception:
-            continue
-    return {"res": {}, "err": {}}
+            pass
+    return None
 
 
 def main() -> int:
     since = (datetime.now(timezone.utc) - timedelta(days=365)).strftime("%Y-%m-%dT00:00:00+03:00")
-    print(f"=== Зонд v29: вложения сделок с {since[:10]} ===\n")
+    print(f"=== Зонд v30: сделки с {since[:10]} ===\n")
 
-    # 1. Какие вообще права у вебхука
-    sc = bx("scope", {})
-    scopes = sorted(sc.get("result") or [])
-    print(f"права вебхука ({len(scopes)}): {', '.join(scopes)}")
-    print(f"  скоуп «disk»: {'ЕСТЬ' if 'disk' in scopes else 'НЕТ — файлы скачать не выйдет'}")
-    print(f"  скоуп «crm» : {'есть' if 'crm' in scopes else 'НЕТ'}\n")
+    cats = {str(c["ID"]): str(c.get("NAME") or "") for c in
+            (bx("crm.dealcategory.list", {"select": ["ID", "NAME"]}).get("result") or [])}
+    cats.setdefault("0", "Общее (воронка по умолчанию)")
+    print("=== НАПРАВЛЕНИЯ ===")
+    for cid, nm in sorted(cats.items(), key=lambda x: int(x[0])):
+        print(f"  {cid:>4s}  {nm}")
 
-    # 2. Файловые пользовательские поля сделок
+    real_ids = [cid for cid, nm in cats.items() if "реализац" in nm.lower()]
+    print(f"\nнаправление «Реализация»: {real_ids or 'НЕ НАЙДЕНО — победу определить нельзя'}\n")
+
     uf = bx("crm.deal.userfield.list", {"order": {"FIELD_NAME": "ASC"}}).get("result") or []
-    types = Counter(str(u.get("USER_TYPE_ID")) for u in uf)
-    file_fields = [str(u["FIELD_NAME"]) for u in uf if u.get("USER_TYPE_ID") == "file"]
-    print(f"пользовательских полей сделки: {len(uf)} · из них файловых: {len(file_fields)}")
-    print(f"  типы полей: {dict(types.most_common(12))}")
-    print(f"  файловые поля: {file_fields}\n")
+    ffields = [str(u["FIELD_NAME"]) for u in uf if u.get("USER_TYPE_ID") == "file"]
 
-    # 3. Справочник стадий: без него выигрыш не определить — стадии в портале свои
-    # (C2, C4, C8, C10, C30 с кодами UC_*), а SEMANTICS отвечает, чем стадия является:
-    # S — успех, F — провал, P — в работе.
-    sem: dict[str, str] = {}
-    ent = bx("crm.status.entity.items", {"entityId": "DEAL_STAGE"}).get("result") or []
-    cats = bx("crm.dealcategory.list", {"select": ["ID", "NAME"]}).get("result") or []
-    entities = ["DEAL_STAGE"] + [f"DEAL_STAGE_{c['ID']}" for c in cats]
-    for e in entities:
-        for it in bx("crm.status.list", {"filter": {"ENTITY_ID": e}}).get("result") or []:
-            sem[str(it.get("STATUS_ID"))] = str(it.get("SEMANTICS") or "P")
-    print(f"направлений сделок: {len(cats)} · стадий в справочнике: {len(sem)}")
-    print(f"  из них успешных: {sum(1 for v in sem.values() if v == 'S')} · "
-          f"провальных: {sum(1 for v in sem.values() if v == 'F')} · "
-          f"в работе: {sum(1 for v in sem.values() if v not in ('S', 'F'))}")
-    print(f"  (пример разбора первых элементов справочника получен: {len(ent)} записей)\n")
+    deals = bx_all("crm.deal.list", {
+        "filter": {">=DATE_CREATE": since},
+        "select": ["ID", "TITLE", "CATEGORY_ID", "STAGE_ID", "OPPORTUNITY"],
+        "order": {"ID": "ASC"}})
+    print(f"сделок за период: {len(deals)}\n")
 
-    # 4. Сделки за период
-    deals = bx_all("crm.deal.list", {"filter": {">=DATE_CREATE": since},
-                                     "select": ["ID", "STAGE_ID", "OPPORTUNITY", "CATEGORY_ID"],
-                                     "order": {"ID": "ASC"}})
-    ids = [str(d["ID"]) for d in deals]
-    print(f"сделок за период: {len(ids)}\n")
-
-    won = lost = work = unknown = 0
-    won_sum = lost_sum = 0.0
+    by_cat: Counter = Counter()
+    sum_cat: Counter = Counter()
     for d in deals:
-        st = str(d.get("STAGE_ID") or "")
-        amount = float(d.get("OPPORTUNITY") or 0)
-        s_ = sem.get(st)
-        if s_ == "S":
-            won += 1
-            won_sum += amount
-        elif s_ == "F":
-            lost += 1
-            lost_sum += amount
-        elif s_ is None:
-            unknown += 1
-        else:
-            work += 1
-    closed = won + lost
-    print("=== ИСХОДЫ ПО СПРАВОЧНИКУ СТАДИЙ ===")
-    print(f"  выиграно: {won:>5d} на {won_sum / 1e6:>10.1f} млн")
-    print(f"  проиграно:{lost:>5d} на {lost_sum / 1e6:>10.1f} млн")
-    print(f"  в работе: {work:>5d} · стадия не найдена в справочнике: {unknown}")
-    if closed:
-        print(f"  доля выигранных среди закрытых: {won / closed * 100:.1f}% "
-              f"· по деньгам: {won_sum / max(won_sum + lost_sum, 1) * 100:.1f}%\n")
+        c = str(d.get("CATEGORY_ID") or "0")
+        by_cat[c] += 1
+        sum_cat[c] += float(d.get("OPPORTUNITY") or 0)
+    print("=== СДЕЛКИ ПО НАПРАВЛЕНИЯМ ===")
+    print(f"{'напр.':>5s} {'название':40s} {'сделок':>7s} {'сумма, млн':>11s}")
+    for c, n in by_cat.most_common():
+        print(f"{c:>5s} {cats.get(c, '?')[:40]:40s} {n:>7d} {sum_cat[c] / 1e6:>11.1f}")
 
-    # 5. Сколько сделок с файлами в UF-полях и какие форматы
-    per_field = Counter()
-    fmt = Counter()
-    with_files = 0
-    file_refs: list[dict] = []
-    if file_fields:
-        for i in range(0, len(ids), 50):
-            chunk = ids[i:i + 50]
-            j = bx("crm.deal.list", {"filter": {"ID": chunk},
-                                     "select": ["ID"] + file_fields})
-            for x in j.get("result") or []:
-                got = False
-                for f in file_fields:
-                    v = x.get(f)
-                    if not v:
-                        continue
-                    files = v if isinstance(v, list) else [v]
-                    for fo in files:
-                        if not isinstance(fo, dict) or "id" not in fo:
-                            continue
-                        got = True
-                        per_field[f] += 1
-                        name = str(fo.get("fileName") or "")
-                        ext = name.rsplit(".", 1)[-1].lower() if "." in name else "без расширения"
-                        fmt[ext] += 1
-                        file_refs.append({"deal": str(x["ID"]), "id": fo["id"], "ext": ext})
-                if got:
-                    with_files += 1
-    print(f"сделок с файлами в UF-полях: {with_files} из {len(ids)} "
-          f"({with_files / max(len(ids), 1) * 100:.1f}%) · файлов всего: {len(file_refs)}")
-    if per_field:
-        print("  по полям:", dict(per_field.most_common()))
-    if fmt:
-        print("  форматы:", dict(fmt.most_common(15)))
-    print()
+    won = sum(by_cat[c] for c in real_ids)
+    won_sum = sum(sum_cat[c] for c in real_ids)
+    print(f"\nпобеды (сейчас в «Реализации»): {won} сделок на {won_sum / 1e6:.1f} млн")
+    print(f"доля побед от всех заведённых за год: {won / max(len(deals), 1) * 100:.1f}%\n")
 
-    # 6. Вложения в делах/письмах таймлайна — сюда обычно попадают спецификации из писем
-    act_files = Counter()
-    act_total = 0
-    probe_ids = ids[-300:]
-    for i in range(0, len(probe_ids), 50):
-        chunk = probe_ids[i:i + 50]
-        cmds = {d: (f"crm.activity.list?filter[OWNER_TYPE_ID]=2&filter[OWNER_ID]={d}"
-                    f"&select[]=ID&select[]=TYPE_ID&select[]=PROVIDER_ID&select[]=FILES") for d in chunk}
-        out = bx_batch(cmds)
-        for _did, acts in (out["res"] or {}).items():
-            for a in acts or []:
-                act_total += 1
-                fl = a.get("FILES")
-                if fl:
-                    n = len(fl) if isinstance(fl, (list, dict)) else 1
-                    act_files[str(a.get("PROVIDER_ID") or a.get("TYPE_ID"))] += n
-    print(f"дел и писем в таймлайне (выборка {len(probe_ids)} свежих сделок): {act_total}")
-    print(f"  из них с вложениями, по источнику: {dict(act_files.most_common(10))}")
-    print(f"  вложений всего в выборке: {sum(act_files.values())}\n")
+    # ── номенклатура из файлов ────────────────────────────────────────────────
+    print(f"=== ФАЙЛЫ: разбираем выборку из {SAMPLE} ===")
+    ids = [str(d["ID"]) for d in deals]
+    cat_of = {str(d["ID"]): str(d.get("CATEGORY_ID") or "0") for d in deals}
+    amt_of = {str(d["ID"]): float(d.get("OPPORTUNITY") or 0) for d in deals}
 
-    # 7. Пробуем скачать и разобрать выборку файлов
-    print(f"=== пробное скачивание {min(SAMPLE_FILES, len(file_refs))} файлов ===")
-    ok = fail = parsed = 0
-    rows_total = 0
-    why: Counter = Counter()
-    for ref in file_refs[:SAMPLE_FILES]:
-        content = None
-        try:
-            df = bx("disk.file.get", {"id": ref["id"]})
-            url = (df.get("result") or {}).get("DOWNLOAD_URL")
-            if not url:
-                why[str(df.get("error") or "нет DOWNLOAD_URL")] += 1
-            else:
-                rr = requests.get(url, timeout=60)
-                if rr.status_code == 200 and len(rr.content) > 100:
-                    content = rr.content
-                else:
-                    why[f"http {rr.status_code}"] += 1
-        except Exception as e:
-            why[type(e).__name__] += 1
-        if content is None:
+    refs: list[tuple[str, dict]] = []
+    keyset: Counter = Counter()
+    for i in range(0, len(ids), 50):
+        j = bx("crm.deal.list", {"filter": {"ID": ids[i:i + 50]}, "select": ["ID"] + ffields})
+        for x in j.get("result") or []:
+            for f in ffields:
+                v = x.get(f)
+                if not v:
+                    continue
+                for fo in (v if isinstance(v, list) else [v]):
+                    if isinstance(fo, dict):
+                        keyset.update(fo.keys())
+                        refs.append((str(x["ID"]), fo))
+        if len(refs) > SAMPLE * 8:
+            break
+    print(f"файловых объектов собрано: {len(refs)}")
+    print(f"поля объекта файла: {dict(keyset.most_common())}\n")
+
+    kinds: Counter = Counter()
+    seg_files: Counter = Counter()
+    seg_deals: dict[str, set] = {}
+    ok = fail = 0
+    step = max(1, len(refs) // SAMPLE)
+    for did, fo in refs[::step][:SAMPLE]:
+        b = download(fo)
+        if not b:
             fail += 1
             continue
         ok += 1
-        if ref["ext"] in ("xlsx", "xlsm"):
-            try:
-                import openpyxl
-                wb = openpyxl.load_workbook(io.BytesIO(content), read_only=True, data_only=True)
-                n = 0
-                for ws in wb.worksheets:
-                    for _ in ws.iter_rows(values_only=True):
-                        n += 1
-                rows_total += n
-                parsed += 1
-            except Exception as e:
-                why[f"xlsx: {type(e).__name__}"] += 1
-    print(f"скачано: {ok} · не удалось: {fail} · разобрано таблиц: {parsed} · строк в них: {rows_total}")
-    if why:
-        print("  причины отказов:", dict(why.most_common(8)))
+        k = sniff(b)
+        kinds[k] += 1
+        t = text_from(b)
+        if len(t) < 40:
+            continue
+        seg = classify(t)
+        if seg:
+            seg_files[seg] += 1
+            seg_deals.setdefault(seg, set()).add(did)
 
-    print("\n✓ зонд v29 завершён")
+    print(f"скачано: {ok} · не удалось: {fail}")
+    print(f"по содержимому: {dict(kinds.most_common())}\n")
+
+    print("=== ЧТО В ФАЙЛАХ: сегменты по разобранным документам ===")
+    print(f"{'сегмент':32s} {'файлов':>7s} {'сделок':>7s} {'из них в реализации':>21s} {'сумма, млн':>11s}")
+    for seg, n in seg_files.most_common():
+        ds = seg_deals.get(seg, set())
+        w = sum(1 for d in ds if cat_of.get(d) in real_ids)
+        s = sum(amt_of.get(d, 0) for d in ds)
+        print(f"{seg:32s} {n:>7d} {len(ds):>7d} {w:>21d} {s / 1e6:>11.1f}")
+
+    print("\n✓ зонд v30 завершён")
     return 0
 
 
