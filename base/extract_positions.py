@@ -48,7 +48,33 @@ STOP = {"итого", "всего", "total", "ндс", "vat", "sum", "сумма
 BOILER = re.compile(r"(?i)(дней от даты|срок действия|условия оплат|грузополучател|реквизит|"
                     r"в соответствии с|приложение №|подпис|печат|гарантийн\w+ срок|"
                     r"валюта контракта|инкотермс|incoterms|выбираем|заполняем|переносим)")
+# адреса и реквизиты сторон: в текстовом режиме их индексы и КПП выглядят как артикулы
+ADDR = re.compile(r"(?i)(инн|кпп|огрн|р/с|к/с|бик|юридическ\w+ адрес|почтовый адрес|"
+                  r"г\.\s?[А-Я]|ул\.|пер\.|область|респ\b|район|снип|сп \d|гост|тр тс|"
+                  r"покупатель|поставщик:|заказчик:|банк)")
 MAX_ROWS_PER_FILE = 4000
+
+# Поля карточки, где лежит номенклатура. Остальные — шаблон «экономики проекта»,
+# вложения бота и файлы тендерной площадки: позиций там нет, а мусора много.
+GOOD_FIELDS = (
+    "Техническая спецификация", "Offer from supplier(s)",
+    "Offer from supplier (Техническое поле.Заполняется автоматически)",
+    "Offer from us", "Customer request for automatic processing",
+    "Technical data from customer", "Processed file for supplier", "Result file",
+    "(старое) Result of automatic request processing",
+)
+
+# Реквизиты и ссылки на нормативы, которые выглядят как артикулы. Без этого верх
+# списка «самых частых артикулов» занимают ИНН КВАНТа, расчётный счёт и ГОСТы.
+JUNK_PN = re.compile(
+    r"^(?:\d{20}"                      # расчётный и корреспондентский счёт
+    r"|\d{10}|\d{12,13}"               # ИНН и ОГРН
+    r"|\d{4,5}-\d{2,4}"                # ГОСТ 33259-2015
+    r"|\d{3}/\d{4}"                    # ТР ТС 010/2011
+    r"|\d{1,2}\.\d{1,2}\.?"            # пункт договора 12.3.
+    r"|[78]\d{10}"                     # телефон
+    r"|20\d\d|19\d\d"                  # год
+    r")$")
 
 
 def _num(s: str) -> float | None:
@@ -117,6 +143,8 @@ def parse_cells(cells: list[str]) -> dict | None:
             continue
         if tok.replace(".", "").isdigit() and not (5 <= len(tok.replace(".", "")) <= 14):
             continue
+        if JUNK_PN.match(tok):                      # реквизиты и номера нормативов — не артикулы
+            continue
         pn, pn_idx = tok, i
         break
 
@@ -157,17 +185,22 @@ def from_text(text: str) -> list[dict]:
         line = line.strip()
         if len(line) < 12 or len(line) > 400 or BOILER.search(line):
             continue
+        if ADDR.search(line):
+            continue
         q = QTY_TXT.search(line)
         p = PRICE_TXT.search(line)
         pn = None
         for m in PN_TXT.finditer(line):
             tok = m.group(1)
-            if DATEISH.match(tok) or tok.lower() in STOP:
+            if DATEISH.match(tok) or tok.lower() in STOP or JUNK_PN.match(tok):
                 continue
             if sum(ch.isdigit() for ch in tok) >= 3:
                 pn = tok
                 break
-        if not pn and not (q and p):
+        # в тексте PDF строка считается позицией только при количестве с единицей
+        # или явной цене: одного похожего на артикул токена мало — так в таблицу
+        # попадали почтовые индексы, КПП и номера нормативов
+        if not (q or p):
             continue
         name = re.sub(r"\s{2,}", " ", line)
         if pn:
@@ -193,9 +226,11 @@ def run(db_path: str, limit: int | None = None) -> dict:
     con.execute("PRAGMA busy_timeout=300000")
     con.execute("DELETE FROM positions")
     # один файл на каждый sha1: 46 % вложений — копии
-    files = con.execute("""SELECT MIN(f.fid), f.sha1, f.ext, group_concat(DISTINCT f.deal_id)
-                           FROM files f WHERE f.status='parsed' AND f.sha1!=''
-                           GROUP BY f.sha1""").fetchall()
+    marks = ",".join("?" * len(GOOD_FIELDS))
+    files = con.execute(f"""SELECT MIN(f.fid), f.sha1, f.ext, group_concat(DISTINCT f.deal_id)
+                            FROM files f
+                            WHERE f.status='parsed' AND f.sha1!='' AND f.field_name IN ({marks})
+                            GROUP BY f.sha1""", GOOD_FIELDS).fetchall()
     stats = Counter()
     buf: list[tuple] = []
     for fid, _sha, ext, deal_ids in files:
