@@ -39,6 +39,29 @@ COLS = {
     "price": ["цена", "стоимость", "price", "сумма", "amount", "cost", "тариф"],
 }
 CUR = re.compile(r"\b(RUB|EUR|USD|CNY|руб|евро|₽|€|\$|¥)\b", re.I)
+# Валюта строки распознаётся редко: в таблице её пишут один раз в шапке или в
+# названии колонки. Без валюты цены несравнимы — отношение «наша к поставщику»
+# оказывается курсом, а не наценкой. Поэтому валюта определяется по документу.
+CUR_MAP = {"RUB": "RUB", "РУБ": "RUB", "₽": "RUB", "RUR": "RUB", "РУБЛ": "RUB",
+           "EUR": "EUR", "ЕВРО": "EUR", "€": "EUR",
+           "USD": "USD", "$": "USD", "ДОЛЛАР": "USD",
+           "CNY": "CNY", "¥": "CNY", "ЮАН": "CNY", "RMB": "CNY"}
+CUR_DOC = re.compile(r"(RUB|RUR|РУБЛ\w*|РУБ\.?|₽|EUR|ЕВРО|€|USD|ДОЛЛАР\w*|\$|CNY|RMB|ЮАН\w*|¥)", re.I)
+
+
+def doc_currency(text: str) -> str | None:
+    """Валюта документа — самая частая из встреченных в первых страницах текста."""
+    hits: Counter = Counter()
+    for m in CUR_DOC.finditer(text[:40_000]):
+        tok = m.group(1).upper()
+        for k, v in CUR_MAP.items():
+            if tok.startswith(k):
+                hits[v] += 1
+                break
+    if not hits:
+        return None
+    top, n = hits.most_common(1)[0]
+    return top if n >= 2 else None
 NUM = re.compile(r"^-?\d[\d  ]*([.,]\d+)?$")
 PN_TXT = re.compile(r"(?<![\w/-])((?=[A-Za-z0-9._/-]*\d)[A-Z0-9][A-Za-z0-9._/-]{4,26})(?![\w-])")
 QTY_TXT = re.compile(r"(\d{1,6}(?:[.,]\d{1,3})?)\s*(шт|шт\.|компл|к-т|pcs|pc|ea|set|м|кг|л|уп)\b", re.I)
@@ -257,6 +280,11 @@ def run(db_path: str, limit: int | None = None) -> dict:
             rows = from_text(text)
         if not rows:
             continue
+        doc_cur = doc_currency(text)
+        if doc_cur:
+            for r in rows:
+                if not r.get("currency"):
+                    r["currency"] = doc_cur
         stats["files_with_rows"] += 1
         for d in str(deal_ids or "").split(",")[:5]:      # копия может лежать в нескольких сделках
             if not d.strip().isdigit():

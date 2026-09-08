@@ -34,6 +34,8 @@ SPACES = re.compile(r"\s+")
 STOPW = {"поз", "позиция", "шт", "штук", "компл", "ндс", "итого", "всего", "ед", "изм",
          "наименование", "артикул", "цена", "сумма", "кол", "во", "количество", "for",
          "the", "and", "или", "для", "тип", "type"}
+CUR_NORM = {"РУБ": "RUB", "РУБЛЬ": "RUB", "РУБЛИ": "RUB", "ЕВРО": "EUR", "ЮАНЬ": "CNY",
+            "ДОЛЛАР": "USD", "RUR": "RUB", "RMB": "CNY"}
 MIN_TOKENS = 2
 MIN_SIM = 0.6
 
@@ -41,7 +43,7 @@ DDL = """
 CREATE TABLE IF NOT EXISTS price_pairs (
   deal_id INTEGER, key TEXT, kind TEXT,          -- kind: 'pn' или 'name'
   name_sup TEXT, name_our TEXT,
-  price_sup REAL, price_our REAL, qty REAL, ratio REAL
+  price_sup REAL, price_our REAL, qty REAL, ratio REAL, currency TEXT
 );
 CREATE INDEX IF NOT EXISTS ix_pp_deal ON price_pairs(deal_id);
 """
@@ -68,13 +70,14 @@ def run(db_path: str) -> dict:
     con.executescript(DDL)
     con.execute("DELETE FROM price_pairs")
 
-    rows = con.execute("""SELECT p.deal_id, f.field_name, p.part_number, p.name, p.price, p.qty
+    rows = con.execute("""SELECT p.deal_id, f.field_name, p.part_number, p.name, p.price, p.qty,
+                                 p.currency
                           FROM positions p JOIN files f ON f.fid = p.fid
                           WHERE p.price IS NOT NULL AND p.price > 0""").fetchall()
     sup: dict[int, list] = defaultdict(list)
     our: dict[int, list] = defaultdict(list)
-    for did, field, pn, name, price, qty in rows:
-        rec = (pn, name, price, qty, set(norm(name)))
+    for did, field, pn, name, price, qty, cur in rows:
+        rec = (pn, name, price, qty, set(norm(name)), CUR_NORM.get(str(cur or "").upper(), cur))
         if str(field).startswith("Offer from supplier"):
             sup[did].append(rec)
         elif field == "Offer from us":
@@ -83,10 +86,13 @@ def run(db_path: str) -> dict:
     out, stats = [], defaultdict(int)
     for did in set(sup) & set(our):
         used_our: set[int] = set()
-        for pn_s, nm_s, pr_s, qty_s, tok_s in sup[did]:
+        for pn_s, nm_s, pr_s, qty_s, tok_s, cur_s in sup[did]:
             best, best_sim, best_kind, best_i = None, 0.0, None, -1
-            for i, (pn_o, nm_o, pr_o, _q, tok_o) in enumerate(our[did]):
+            for i, (pn_o, nm_o, pr_o, _q, tok_o, cur_o) in enumerate(our[did]):
                 if i in used_our:
+                    continue
+                # разные валюты — отношение цен даст курс, а не наценку
+                if cur_s and cur_o and cur_s != cur_o:
                     continue
                 if pn_s and pn_o and pn_s == pn_o:
                     best, best_sim, best_kind, best_i = (nm_o, pr_o), 1.0, "pn", i
@@ -99,8 +105,11 @@ def run(db_path: str) -> dict:
                 used_our.add(best_i)
                 stats[best_kind] += 1
                 out.append((did, pn_s or nm_s[:60], best_kind, nm_s[:200], best[0][:200],
-                            pr_s, best[1], qty_s, round(best[1] / pr_s, 3) if pr_s else None))
-    con.executemany("INSERT INTO price_pairs VALUES (?,?,?,?,?,?,?,?,?)", out)
+                            pr_s, best[1], qty_s, round(best[1] / pr_s, 3) if pr_s else None,
+                            cur_s or ""))
+    con.execute("DROP TABLE IF EXISTS price_pairs")
+    con.executescript(DDL)
+    con.executemany("INSERT INTO price_pairs VALUES (?,?,?,?,?,?,?,?,?,?)", out)
     con.commit()
     stats["pairs"] = len(out)
     stats["deals"] = len({r[0] for r in out})
