@@ -294,6 +294,29 @@ class BitrixClient:
             m[s["STATUS_ID"]] = s.get("NAME") or s["STATUS_ID"]
         return m
 
+    def deal_stage_meta(self) -> dict[str, dict]:
+        """Все стадии всех воронок сделок: {STAGE_ID: {name, sem, sort, cat}}.
+
+        `sem` — семантика стадии: 'F' проигрыш, 'S' успех, 'P' в работе. Прежние
+        методы её выбрасывали, а для разбора проигрышей она и есть главное: имена
+        F-стадий («Не прошли по цене», «Пост-щик не ответил») — единственная
+        причина проигрыша, которую портал хранит машинно, отдельного поля нет.
+        `sort` даёт порядок стадии в воронке, то есть глубину отвала без истории.
+        """
+        m: dict[str, dict] = {}
+        for s in self.list_paged("crm.status.list", {"order": {"SORT": "ASC"}}):
+            ent = str(s.get("ENTITY_ID") or "")
+            if not ent.startswith("DEAL_STAGE"):
+                continue
+            cat = ent.split("_")[-1] if ent != "DEAL_STAGE" else "0"
+            m[s["STATUS_ID"]] = {
+                "name": s.get("NAME") or s["STATUS_ID"],
+                "sem": str(s.get("SEMANTICS") or "P").upper(),
+                "sort": int(s.get("SORT") or 0),
+                "cat": cat,
+            }
+        return m
+
     # ----------------------------------------------------------------- smart-process items
     def list_items(
         self,

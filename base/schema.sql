@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS deals (
   closedate     TEXT,
   closed        TEXT,
   age_days      INTEGER,
-  sum_rub       REAL,
+  sum_eur       REAL,      -- сумма в БАЗОВОЙ валюте портала (евро, BASE=Y у EUR)
   sum_orig      REAL,
   currency      TEXT,
   company_id    TEXT,
