@@ -1,9 +1,16 @@
 name: ZIP base — apply DB migrations
 
 # Применяет zip/supabase/migrations.sql к Supabase (Postgres) базы ЗИП.
-# Запуск вручную (workflow_dispatch). Нужен секрет SUPABASE_DB_URL —
-# connection string из Supabase → Project Settings → Database → Connection string
-# (URI, роль postgres). Идемпотентно — можно гонять повторно.
+# Запуск вручную (workflow_dispatch). Нужен секрет SUPABASE_DB_URL.
+#
+# ВАЖНО, КАКУЮ ИМЕННО СТРОКУ БРАТЬ. В Supabase кнопка «Connect» вверху страницы
+# проекта показывает три варианта. Здесь годится ТОЛЬКО «Session pooler»:
+#   • Direct connection (db.<ref>.supabase.co:5432) — по умолчанию IPv6, а раннеры
+#     GitHub ходят по IPv4, соединения не будет;
+#   • Transaction pooler (порт 6543) — без поддержки подготовленных запросов;
+#   • Session pooler (aws-<регион>.pooler.supabase.com:5432) — всегда IPv4, подходит.
+# Пользователь в такой строке имеет вид postgres.<ref>, пароль подставляется вместо
+# [YOUR-PASSWORD]. Идемпотентно — можно гонять повторно.
 on:
   workflow_dispatch: {}
 
