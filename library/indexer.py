@@ -390,11 +390,28 @@ def handle(ref: dict) -> tuple[dict, list[dict]]:
     return rec, items
 
 
+def ensure_segments(cur) -> None:
+    """Справочник сегментов в базе должен существовать ДО записи номенклатуры.
+
+    lib_demand.segment_id ссылается на lib_segments(id); при пустом справочнике
+    вся запись падает с ForeignKeyViolation, а разобранные файлы теряются —
+    именно так оборвались все двенадцать частей прогона 08.09.2026.
+    Источник истины — словарь SEGMENTS в этом файле, поэтому справочник
+    наполняем из него, а не поддерживаем вручную в двух местах."""
+    psycopg2.extras.execute_values(
+        cur,
+        "insert into lib_segments (id, name) values %s on conflict (id) do nothing",
+        [(sid, name) for sid, (name, _words) in SEGMENTS.items()],
+    )
+
+
 def main() -> int:
     if SHARDS > 1:
         print(f"часть {SHARD + 1} из {SHARDS}", flush=True)
     conn = connect()
     with conn.cursor() as cur:
+        ensure_segments(cur)
+        conn.commit()
         cur.execute("select file_id from lib_files")
         done = {r[0] for r in cur.fetchall()}
     conn.close()
