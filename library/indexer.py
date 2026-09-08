@@ -266,27 +266,46 @@ def items_from_rows(rows: list[list[str]]) -> list[dict]:
 
 
 def collect_refs(days: int) -> list[dict]:
+    """Ссылки на все вложения сделок за период.
+
+    Берём их через crm.item.list (entityTypeId=2), а НЕ через crm.deal.list.
+    Разница решающая: crm.deal.list отдаёт у файловых полей только ссылки на
+    страницы портала (`crm.deal.show/show_file.php`, `crm_show_file.php`), а те
+    требуют сессии пользователя и вебхуку возвращают страницу входа с кодом 200 —
+    отсюда прежние «не скачался» на всей выборке. Универсальный item-метод отдаёт
+    у тех же полей `urlMachine`: REST-ссылку с одноразовым токеном, по которой
+    файл приходит как есть. Проверено на портале 08.09.2026: 22 181 вложение
+    у 2 928 сделок года, скачивание отдаёт PDF, XLSX и DOCX.
+    """
     since = (datetime.now(timezone.utc) - timedelta(days=days)).strftime("%Y-%m-%dT00:00:00+03:00")
-    uf = bx("crm.deal.userfield.list", {"order": {"FIELD_NAME": "ASC"}}).get("result") or []
-    ffields = [str(u["FIELD_NAME"]) for u in uf if u.get("USER_TYPE_ID") == "file"]
+    fields = ((bx("crm.item.fields", {"entityTypeId": 2}).get("result") or {}).get("fields") or {})
+    ffields = [k for k, v in fields.items() if v.get("type") == "file"]
     deals = bx_all("crm.deal.list", {"filter": {">=DATE_CREATE": since},
                                      "select": ["ID"], "order": {"ID": "ASC"}})
-    ids = [str(d["ID"]) for d in deals]
+    ids = [int(d["ID"]) for d in deals]
     print(f"сделок за {days} дн.: {len(ids)} · файловых полей: {len(ffields)}", flush=True)
 
     refs: list[dict] = []
     for i in range(0, len(ids), 50):
-        j = bx("crm.deal.list", {"filter": {"ID": ids[i:i + 50]}, "select": ["ID"] + ffields})
-        for x in j.get("result") or []:
+        j = bx("crm.item.list", {"entityTypeId": 2, "filter": {"@id": ids[i:i + 50]},
+                                 "select": ["id"] + ffields, "start": 0})
+        for x in (j.get("result") or {}).get("items") or []:
             for f in ffields:
                 v = x.get(f)
                 if not v:
                     continue
                 for fo in (v if isinstance(v, list) else [v]):
-                    if isinstance(fo, dict) and (fo.get("id") or fo.get("ID")):
-                        refs.append({"deal": str(x["ID"]), "field": f, "origin": "поле сделки", "fo": fo})
+                    if isinstance(fo, dict) and fo.get("urlMachine"):
+                        refs.append({"deal": str(x["id"]), "field": f, "origin": "поле сделки", "fo": fo})
     print(f"вложений в полях сделок: {len(refs)}", flush=True)
     return refs
+
+
+def is_login_page(b: bytes) -> bool:
+    """Портал отдаёт страницу входа с кодом 200 — по коду ответа её не отличить.
+    Отличаем по содержимому, иначе HTML формы логина уходит в разбор как файл."""
+    head = b.lstrip()[:512].lower()
+    return head.startswith(b"<!doctype htm") or head.startswith(b"<html")
 
 
 def download(fo: dict) -> bytes | None:
@@ -295,7 +314,7 @@ def download(fo: dict) -> bytes | None:
         if u:
             try:
                 r = requests.get(str(u), timeout=90)
-                if r.status_code == 200 and len(r.content) > 200:
+                if r.status_code == 200 and len(r.content) > 200 and not is_login_page(r.content):
                     return r.content
             except Exception:
                 pass
