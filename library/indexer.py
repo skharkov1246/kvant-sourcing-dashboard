@@ -21,8 +21,10 @@ from __future__ import annotations
 import hashlib
 import io
 import os
+import random
 import re
 import sys
+import time
 import zipfile
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
@@ -85,6 +87,25 @@ COLS = {
 }
 PN_RE = re.compile(r"\b(?=[A-Z0-9]*[0-9])[A-Z0-9][A-Z0-9\-./]{4,24}\b")
 NOISE_ROW = re.compile(r"^(итого|всего|подпись|примечан|№|n\s*п/п|приложение)", re.I)
+
+
+# Session pooler Supabase допускает лишь 15 одновременных клиентов (EMAXCONNSESSION).
+# Поэтому соединение не удерживается на весь прогон: открываем на время записи и сразу
+# закрываем, а при отказе ждём и пробуем снова — потерять двадцать минут разбора из-за
+# занятого пула недопустимо.
+def connect(attempts: int = 12):
+    last = None
+    for i in range(attempts):
+        try:
+            c = psycopg2.connect(DB, connect_timeout=20)
+            c.autocommit = False
+            return c
+        except psycopg2.OperationalError as e:
+            last = e
+            if "EMAXCONNSESSION" not in str(e) and "too many" not in str(e).lower():
+                raise
+            time.sleep(min(30, 2 ** min(i, 4)) + random.random() * 3)
+    raise last
 
 
 def bx(method: str, params: dict) -> dict:
@@ -353,11 +374,11 @@ def handle(ref: dict) -> tuple[dict, list[dict]]:
 def main() -> int:
     if SHARDS > 1:
         print(f"часть {SHARD + 1} из {SHARDS}", flush=True)
-    conn = psycopg2.connect(DB)
-    conn.autocommit = False
+    conn = connect()
     with conn.cursor() as cur:
         cur.execute("select file_id from lib_files")
         done = {r[0] for r in cur.fetchall()}
+    conn.close()
     print(f"уже разобрано ранее: {len(done)}", flush=True)
 
     refs = collect_refs(DAYS)
@@ -382,6 +403,7 @@ def main() -> int:
         nonlocal buf_files, buf_items
         if not buf_files and not buf_items:
             return
+        conn = connect()
         with conn.cursor() as cur:
             if buf_items:
                 psycopg2.extras.execute_values(cur, """
@@ -399,6 +421,7 @@ def main() -> int:
                       rows_found = excluded.rows_found, segment_id = excluded.segment_id,
                       processed_at = now()""", buf_files, page_size=500)
         conn.commit()
+        conn.close()
         buf_files, buf_items = [], []
 
     with ThreadPoolExecutor(max_workers=WORKERS) as pool:
@@ -422,7 +445,6 @@ def main() -> int:
             if n % 200 == 0:
                 print(f"  обработано {n} из {len(mine)} · позиций {total_items}", flush=True)
     flush()
-    conn.close()
 
     print("\n=== ИТОГ ЧАСТИ ===")
     print(f"файлов: {sum(stat.values())} · позиций номенклатуры: {total_items}")
