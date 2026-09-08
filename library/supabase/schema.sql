@@ -155,3 +155,29 @@ alter table lib_suppliers enable row level security;
 alter table lib_prices    enable row level security;
 alter table lib_knowledge enable row level security;
 alter table lib_losses    enable row level security;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- 9. Реестр разобранных файлов. Нужен для возобновляемости: обход 22 тысяч
+--    вложений идёт частями и в несколько заходов, повторно скачивать уже
+--    разобранное незачем. Здесь же видно, какая доля файлов нечитаема и почему
+--    (например, сканы без текстового слоя — им понадобится распознавание).
+create table if not exists lib_files (
+  file_id      text primary key,             -- идентификатор вложения в Битриксе
+  deal_id      text,
+  origin       text,                         -- 'поле сделки' | 'задача' | 'письмо'
+  field        text,                         -- имя UF-поля, если из поля
+  kind         text,                         -- определён по сигнатуре содержимого
+  size_bytes   bigint,
+  status       text not null,                -- 'разобран' | 'пусто' | 'не скачался' | 'формат не читаем'
+  reason       text,
+  chars        int,                          -- сколько текста извлечено
+  rows_found   int,                          -- сколько позиций номенклатуры получено
+  segment_id   text,
+  sha256       text,                         -- чтобы не разбирать один и тот же файл дважды
+  processed_at timestamptz default now()
+);
+create index if not exists lib_files_deal   on lib_files (deal_id);
+create index if not exists lib_files_status on lib_files (status);
+create index if not exists lib_files_sha    on lib_files (sha256);
+
+alter table lib_files enable row level security;

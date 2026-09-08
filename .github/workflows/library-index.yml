@@ -1,0 +1,71 @@
+name: Библиотека — разбор вложений Битрикса
+
+# Сплошной разбор файлов, привязанных к сделкам: номенклатура из спецификаций
+# ложится в Supabase (lib_demand), состояние каждого файла — в lib_files.
+# Возобновляемо: повторный запуск пропускает уже разобранное.
+#
+# Только ручной запуск. Работа делится на 20 частей, идущих параллельно;
+# каждая часть берёт свою долю файлов по остатку от деления хеша.
+#
+# В репозиторий и в артефакты сборки НИЧЕГО не пишется: репозиторий публичный,
+# а артефакты открытого репозитория может скачать кто угодно. Данные идут прямо
+# в базу, в журнал прогона — только агрегаты.
+on:
+  workflow_dispatch:
+    inputs:
+      days:
+        description: "За сколько последних дней брать сделки"
+        default: "365"
+      limit:
+        description: "Ограничение файлов на часть (0 — без ограничения)"
+        default: "0"
+      workers:
+        description: "Потоков скачивания в каждой части"
+        default: "12"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: library-index
+  cancel-in-progress: false
+
+jobs:
+  index:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    strategy:
+      fail-fast: false
+      max-parallel: 20
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Установка зависимостей
+        run: pip install --quiet requests openpyxl xlrd pypdf psycopg2-binary
+
+      - name: Проверка секретов
+        env:
+          B: ${{ secrets.BITRIX_WEBHOOK_URL }}
+          S: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set -euo pipefail
+          [ -n "${B:-}" ] || { echo "::error::нет секрета BITRIX_WEBHOOK_URL"; exit 1; }
+          [ -n "${S:-}" ] || { echo "::error::нет секрета SUPABASE_DB_URL — Settings → Secrets → Actions"; exit 1; }
+          echo "секреты на месте"
+
+      - name: Разбор части ${{ matrix.shard }}
+        env:
+          BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          SHARDS: "20"
+          SHARD: ${{ matrix.shard }}
+          WORKERS: ${{ inputs.workers }}
+          DAYS: ${{ inputs.days }}
+          LIMIT: ${{ inputs.limit }}
+        run: python library/indexer.py
