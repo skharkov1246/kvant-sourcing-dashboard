@@ -290,6 +290,48 @@ test("без хранилища журнал говорит об этом пря
   assert.match(html, /KV namespace/);
 });
 
+test("канал оповещений настраивается из панели, без похода в Cloudflare", async () => {
+  const env = makeEnv();
+  await seed(env, {});
+  const real = globalThis.fetch;
+  const calls = [];
+  globalThis.fetch = async (u, i) => {
+    calls.push(String(u));
+    if (String(u).includes("getUpdates")) {
+      return new Response(JSON.stringify({ ok: true, result: [{ message: { chat: { id: 900 } } }] }), { status: 200 });
+    }
+    return new Response(JSON.stringify({ ok: true, result: {} }), { status: 200 });
+  };
+  try {
+    const r = await call(env, "/admin/api", "boss@kvantpro.com",
+      { method: "POST", body: JSON.stringify({ op: "notify_tg", token: "123:AAA" }) });
+    const j = await r.json();
+    assert.equal(j.ok, true);
+    assert.match(j.note, /отправлено в Telegram/, "пробное сообщение не ушло");
+    assert.ok(calls.some((u) => u.includes("sendMessage")), "проверка канала должна слать пробное сообщение");
+    // ключ сохранён, переписка найдена — панель это показывает
+    const html = await (await call(env, "/admin", "boss@kvantpro.com")).text();
+    assert.ok(html.includes("Канал настроен"), "панель не показывает состояние канала");
+    assert.ok(!html.includes("123:AAA"), "ключ бота не должен попадать на страницу");
+  } finally { globalThis.fetch = real; }
+});
+
+test("пустой ключ канала отклоняется, а не сохраняется молча", async () => {
+  const env = makeEnv();
+  await seed(env, {});
+  const r = await call(env, "/admin/api", "boss@kvantpro.com",
+    { method: "POST", body: JSON.stringify({ op: "notify_tg", token: "  " }) });
+  assert.equal(r.status, 400);
+});
+
+test("настройка канала закрыта для не-владельца", async () => {
+  const env = makeEnv();
+  await seed(env, { "s@kvantpro.com": { role: "sourcing", sites: [], tabs: [], note: "", seen: 1 } });
+  const r = await call(env, "/admin/api", "s@kvantpro.com",
+    { method: "POST", body: JSON.stringify({ op: "notify_tg", token: "123:AAA" }) });
+  assert.equal(r.status, 403);
+});
+
 test("страницы доступов не кэшируются и не индексируются", async () => {
   const env = makeEnv();
   for (const p of ["/", "/admin", "/dashboard"]) {

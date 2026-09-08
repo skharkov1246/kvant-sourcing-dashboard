@@ -389,32 +389,105 @@ async function raiseAlerts(env, rec, signals) {
       await kv.put(mute, "1", { expirationTtl: MUTE_TTL });
       const item = { t: rec.t, id: s.id, text: s.text, em: rec.em, site: rec.site, path: rec.path, geo: rec.geo };
       await kv.put(`${ALERT_PREFIX}${rec.t}:${s.id}`, JSON.stringify(item), { expirationTtl: ALERT_TTL });
-      item.mail = await alertMail(env, item);
+      item.sent = await sendAlert(env, alertText(item));
       sent.push(item);
     } catch { /* оповещение не должно ломать отдачу страницы */ }
   }
   return sent;
 }
 
-// Письмо владельцу. Провайдер задаётся переменными; без ключа признак всё равно
-// сохраняется и виден в панели — «не настроена почта» не должно означать «не заметили».
-async function alertMail(env, item) {
+// ОПОВЕЩЕНИЕ ВЛАДЕЛЬЦА. Канал выбирается тем, что настроено; признак сохраняется
+// в любом случае — «канал не настроен» не должно означать «не заметили».
+//
+// Основной канал — Telegram: он не требует ни домена, ни DNS, ни учётной записи
+// на стороннем сервисе. Владелец создаёт бота у @BotFather, пишет ему /start и
+// вставляет ключ бота в панель; адрес переписки определяется сам (getUpdates) и
+// запоминается. Почта оставлена запасным каналом на случай, если домен всё же
+// подтвердят: тогда достаточно задать переменные, код уже готов.
+const NOTIFY_KEY = "notify:v1";
+
+async function loadNotify(env) {
+  const kv = aclStore(env);
+  if (!kv) return {};
+  try { return (await kv.get(NOTIFY_KEY, { type: "json" })) || {}; } catch { return {}; }
+}
+async function saveNotify(env, cfg) {
+  const kv = aclStore(env);
+  if (!kv) return false;
+  await kv.put(NOTIFY_KEY, JSON.stringify(cfg || {}));
+  return true;
+}
+
+// Ключ бота: сначала из панели (хранилище), иначе из переменной окружения.
+function tgToken(env, cfg) {
+  return String((cfg && cfg.tgToken) || (env && env.TG_TOKEN) || "").trim();
+}
+
+// Адрес переписки. Telegram отдаёт его только после того, как человек написал боту,
+// и держит такие сообщения сутки — поэтому найденное значение запоминаем навсегда.
+async function tgResolveChat(token) {
+  try {
+    const r = await fetch(`https://api.telegram.org/bot${encodeURIComponent(token)}/getUpdates`);
+    if (!r.ok) return null;
+    const d = await r.json();
+    const ups = (d && d.result) || [];
+    for (let i = ups.length - 1; i >= 0; i--) {
+      const m = ups[i].message || ups[i].edited_message || ups[i].channel_post;
+      const id = m && m.chat && m.chat.id;
+      if (id) return String(id);
+    }
+    return null;
+  } catch { return null; }
+}
+
+async function tgSend(token, chat, text) {
+  const r = await fetch(`https://api.telegram.org/bot${encodeURIComponent(token)}/sendMessage`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ chat_id: chat, text, disable_web_page_preview: true }),
+  });
+  if (r.ok) return { ok: true };
+  let why = `telegram ${r.status}`;
+  try { const d = await r.json(); if (d && d.description) why += `: ${d.description}`; } catch { /* тело может быть пустым */ }
+  return { ok: false, why };
+}
+
+// Отправка одного оповещения по настроенному каналу. Возвращает строку для журнала.
+async function sendAlert(env, text, opts = {}) {
+  const cfg = opts.cfg || (await loadNotify(env));
+  const token = tgToken(env, cfg);
+  if (token) {
+    let chat = cfg.tgChat || (env && env.TG_CHAT) || null;
+    if (!chat) {
+      chat = await tgResolveChat(token);
+      if (chat && !opts.noSave) { cfg.tgChat = chat; await saveNotify(env, cfg); }
+    }
+    if (!chat) return "Telegram: напишите боту /start — переписка ещё не начата";
+    const r = await tgSend(token, chat, text);
+    if (r.ok) return "отправлено в Telegram";
+    return `не отправлено, ${r.why}`;
+  }
   const to = String((env && env.ALERT_TO) || (env && env.ADMIN_EMAILS) || "").split(/[,\s]+/)[0];
-  if (!to || !env.RESEND_API_KEY) return "почта не настроена — признак записан в панель";
-  const subject = `КВАНТ · доступы: ${item.text.slice(0, 120)}`;
-  const body = [
+  if (to && env && env.RESEND_API_KEY) {
+    try {
+      const r = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ from: env.MAIL_FROM || "alerts@kvantpro.com", to: [to],
+                               subject: `КВАНТ · доступы: ${text.split("\n")[0].slice(0, 120)}`, text }),
+      });
+      return r.ok ? `отправлено на ${to}` : `не отправлено: resend ${r.status}`;
+    } catch (e) { return `не отправлено: ${String((e && e.message) || e)}`; }
+  }
+  return "канал не настроен — признак записан в журнал";
+}
+
+function alertText(item) {
+  return [
     item.text, "",
     `время: ${item.t}`, `сайт: ${item.site || "—"}`, `адрес: ${item.path || "—"}`,
     `страна: ${item.geo}`, "", "Журнал: https://kvant-sourcing-f122.pages.dev/admin/log",
   ].join("\n");
-  try {
-    const r = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ from: env.MAIL_FROM || "alerts@kvantpro.com", to: [to], subject, text: body }),
-    });
-    return r.ok ? `отправлено на ${to}` : `не отправлено: resend ${r.status}`;
-  } catch (e) { return `не отправлено: ${String((e && e.message) || e)}`; }
 }
 
 // Чтение журнала для панели: свежие записи первыми. null — хранилище не привязано.
@@ -480,7 +553,7 @@ export default {
         ctx.waitUntil(audit(env, request, who, "admin", url.pathname, { denied: true }));
         return denyPage("Доступы · КВАНТ");
       }
-      return adminPage(acl, who, env, await loadSeen(env));
+      return adminPage(acl, who, env, await loadSeen(env), await loadNotify(env));
     }
     if (url.pathname === "/admin/log" || url.pathname === "/admin/log/") {
       if (!rights.admin) {
@@ -575,7 +648,7 @@ const ESC = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) =>
 
 // seen === null означает, что хранилище не привязано: пустой список тогда не факт,
 // а неизвестность, и панель обязана сказать об этом прямо.
-function adminPage(acl, me, env, seen) {
+function adminPage(acl, me, env, seen, notify) {
   const team = String((env && env.CF_ACCESS_TEAM) || CF_TEAM_DEFAULT).replace(/^https?:\/\//, "").replace(/\/+$/, "");
   const roleIds = Object.keys(acl.roles);
   const noStore = seen === null;
@@ -703,6 +776,24 @@ ${noStore ? `<div class="card warn"><b>Учёт входов не ведётся
   </table>
 </div>
 
+<h2>Оповещения</h2>
+<div class="card">
+  <div class="dim" style="max-width:78ch;margin-bottom:12px">Признаки записываются в журнал всегда. Чтобы они ещё и приходили вам сразу, нужен канал.
+  Проще всего Telegram — ни домена, ни DNS, ни учётной записи на стороннем сервисе:
+  <b>1)</b> напишите <b>@BotFather</b> команду <code>/newbot</code> и получите ключ;
+  <b>2)</b> откройте своего бота и нажмите «Запустить» (<code>/start</code>);
+  <b>3)</b> вставьте ключ сюда и нажмите «Сохранить и проверить» — придёт пробное сообщение.</div>
+  <div class="bar">
+    <input type="password" id="tg" placeholder="${notify && notify.tgToken ? "ключ сохранён — вставьте новый, чтобы заменить" : "ключ бота вида 123456789:AA..."}" autocomplete="off">
+    <button class="go" id="tgsave">Сохранить и проверить</button>
+  </div>
+  <div class="dim" id="tgst">${notify && notify.tgToken
+    ? (notify.tgChat ? `Канал настроен, переписка найдена. Последняя проверка: ${ESC(notify.tgNote || "—")}`
+                     : "Ключ сохранён, но переписки нет — откройте бота и нажмите «Запустить», затем проверьте снова.")
+    : (env && env.RESEND_API_KEY ? "Настроена почта. Telegram можно добавить как более быстрый канал."
+                                 : "Канал не настроен: признаки видны только в журнале.")}</div>
+</div>
+
 <h2>Роли</h2>
 <div class="dim" style="margin-bottom:10px;max-width:78ch">Роль — это набор прав. Меняете галочку в роли — меняется у всех, у кого эта роль. Правки сохраняются сразу.<br>
 Две пары вкладок читают общий массив данных: <b>Реализация ↔ Поставщики</b> и <b>Пульс компании ↔ Когорты</b>. Выдача одной из пары в интерфейсе вторую не открывает, но её цифры остаются в исходном коде страницы. Разделить пары можно только правкой сборки дашборда.</div>
@@ -750,6 +841,13 @@ document.querySelectorAll('.role input[type=checkbox]').forEach(cb => cb.addEven
   const val = k => [...card.querySelectorAll('input[data-kind='+k+']:checked')].map(x=>x.value);
   post('role_rights', {role, sites: val('site'), tabs: val('tab')});
 }));
+// ключ телеграм-бота
+document.getElementById('tgsave').addEventListener('click', async () => {
+  const el = document.getElementById('tg');
+  const j = await post('notify_tg', {token: el.value.trim()});
+  el.value = '';
+  document.getElementById('tgst').textContent = j.note || 'проверено';
+});
 // «все» в разделе сайтов
 document.querySelectorAll('.role .all').forEach(b => b.addEventListener('click', () => {
   const card = b.closest('.role');
@@ -822,6 +920,19 @@ async function adminApi(request, env, acl) {
   // Права хранятся отдельно от фактов входа, поэтому у вошедшего человека строки прав
   // может ещё не быть. Правка из панели её создаёт — иначе назначить роль было бы нельзя.
   const row = (em) => (acl.users[em] ||= { role: acl.defaultRole, sites: [], tabs: [], note: "" });
+
+  if (b.op === "notify_tg") {
+    const cfg = await loadNotify(env);
+    const token = String(b.token || "").trim();
+    if (token) { cfg.tgToken = token; delete cfg.tgChat; }      // новый бот — новая переписка
+    if (!tgToken(env, cfg)) return json({ ok: false, error: "ключ не задан" }, 400);
+    const note = await sendAlert(env, "КВАНТ · доступы: проверка канала оповещений. Если вы видите это сообщение, признаки будут приходить сюда.",
+                                 { cfg, noSave: true });
+    cfg.tgNote = `${new Date().toISOString().slice(0, 16).replace("T", " ")} — ${note}`;
+    if (!cfg.tgChat) { const c = await tgResolveChat(tgToken(env, cfg)); if (c) cfg.tgChat = c; }
+    const saved = await saveNotify(env, cfg);
+    return json(saved ? { ok: true, note: cfg.tgNote } : { ok: false, error: "нет хранилища" }, saved ? 200 : 503);
+  }
 
   if (b.op === "user_add") {
     const em = normEmail(b.email);

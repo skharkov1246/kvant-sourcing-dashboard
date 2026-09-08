@@ -7,7 +7,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { auditRecord, signalsFor, raiseAlerts, readLog, classify, deviceOf, domainOf,
-         SIGNALS, LOG_PREFIX, ALERT_PREFIX, mskHourKey } from "../audit.js";
+         SIGNALS, LOG_PREFIX, ALERT_PREFIX, NOTIFY_KEY, mskHourKey,
+         loadNotify, saveNotify, sendAlert, alertText, tgResolveChat } from "../audit.js";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 
@@ -114,29 +115,115 @@ test("признак сохраняется, и по одному человек
   const sig = [{ id: "outside", text: "вход с почты вне корпоративного домена: kto@gmail.com" }];
   const first = await raiseAlerts(env, rec, sig);
   assert.equal(first.length, 1);
-  assert.match(first[0].mail, /почта не настроена/, "без ключа признак всё равно должен сохраниться");
+  assert.match(first[0].sent, /канал не настроен/, "без канала признак всё равно должен сохраниться");
   assert.equal([...env.ACL.box.keys()].filter((k) => k.startsWith(ALERT_PREFIX)).length, 1);
 
   const again = await raiseAlerts(env, { ...rec, t: new Date().toISOString() }, sig);
   assert.equal(again.length, 0, "повтор в тот же час не должен слать письмо");
 });
 
-test("письмо уходит, когда провайдер настроен", async () => {
-  const real = globalThis.fetch;
+// ── каналы оповещения ────────────────────────────────────────────────────────
+// Подменяем сеть, чтобы видеть, куда и что ушло.
+function net(handler) {
   const calls = [];
-  globalThis.fetch = async (u, i) => { calls.push({ u: String(u), i }); return new Response("{}", { status: 200 }); };
+  const real = globalThis.fetch;
+  globalThis.fetch = async (u, i) => { calls.push({ u: String(u), i }); return handler(String(u), i); };
+  return { calls, restore: () => { globalThis.fetch = real; } };
+}
+const tgOk = () => new Response(JSON.stringify({ ok: true, result: {} }), { status: 200 });
+const tgUpdates = (id) => new Response(JSON.stringify({ ok: true, result: [{ message: { chat: { id } } }] }), { status: 200 });
+
+test("Telegram: переписка определяется сама и запоминается", async () => {
+  const env = { ACL: kv() };
+  await saveNotify(env, { tgToken: "111:AAA" });
+  const n = net((u) => (u.includes("getUpdates") ? tgUpdates(-4242) : tgOk()));
   try {
-    const env = { ACL: kv(), RESEND_API_KEY: "key", ALERT_TO: "boss@kvantpro.com", MAIL_FROM: "alerts@kvantpro.com" };
-    const rec = { t: new Date().toISOString(), em: "a@kvantpro.com", dom: "kvantpro.com", site: "zip", path: "/x.csv", geo: "RU" };
-    const out = await raiseAlerts(env, rec, [{ id: "bulk", text: "a@kvantpro.com выгрузил 40 файлов за час" }]);
-    assert.match(out[0].mail, /отправлено на boss@kvantpro.com/);
-    assert.equal(calls.length, 1);
-    assert.match(calls[0].u, /api\.resend\.com/);
-    const body = JSON.parse(calls[0].i.body);
+    const note = await sendAlert(env, "проверка");
+    assert.equal(note, "отправлено в Telegram");
+    assert.match(n.calls[0].u, /getUpdates/, "адрес переписки должен определяться сам");
+    assert.match(n.calls[1].u, /sendMessage/);
+    assert.equal(JSON.parse(n.calls[1].i.body).chat_id, "-4242");
+    assert.equal((await loadNotify(env)).tgChat, "-4242", "переписка не запомнена");
+
+    // второй раз getUpdates уже не нужен — Telegram держит такие сообщения лишь сутки
+    n.calls.length = 0;
+    await sendAlert(env, "ещё раз");
+    assert.equal(n.calls.length, 1);
+    assert.match(n.calls[0].u, /sendMessage/);
+  } finally { n.restore(); }
+});
+
+test("Telegram: без /start честно говорим, что делать", async () => {
+  const env = { ACL: kv() };
+  await saveNotify(env, { tgToken: "111:AAA" });
+  const n = net(() => new Response(JSON.stringify({ ok: true, result: [] }), { status: 200 }));
+  try {
+    assert.match(await sendAlert(env, "проверка"), /напишите боту \/start/);
+  } finally { n.restore(); }
+});
+
+test("Telegram: причина отказа доносится словами, а не молчанием", async () => {
+  const env = { ACL: kv() };
+  await saveNotify(env, { tgToken: "111:AAA", tgChat: "5" });
+  const n = net(() => new Response(JSON.stringify({ ok: false, description: "chat not found" }), { status: 400 }));
+  try {
+    assert.match(await sendAlert(env, "проверка"), /telegram 400: chat not found/);
+  } finally { n.restore(); }
+});
+
+test("ключ бота берётся и из переменной окружения", async () => {
+  const env = { ACL: kv(), TG_TOKEN: "222:BBB", TG_CHAT: "77" };
+  const n = net(() => tgOk());
+  try {
+    assert.equal(await sendAlert(env, "проверка"), "отправлено в Telegram");
+    assert.match(n.calls[0].u, /bot222%3ABBB\/sendMessage/);
+    assert.equal(JSON.parse(n.calls[0].i.body).chat_id, "77");
+  } finally { n.restore(); }
+});
+
+test("почта остаётся запасным каналом, если Telegram не настроен", async () => {
+  const env = { ACL: kv(), RESEND_API_KEY: "key", ALERT_TO: "boss@kvantpro.com", MAIL_FROM: "alerts@kvantpro.com" };
+  const n = net(() => new Response("{}", { status: 200 }));
+  try {
+    assert.equal(await sendAlert(env, "a@kvantpro.com выгрузил 40 файлов за час"), "отправлено на boss@kvantpro.com");
+    assert.match(n.calls[0].u, /api\.resend\.com/);
+    const body = JSON.parse(n.calls[0].i.body);
     assert.deepEqual(body.to, ["boss@kvantpro.com"]);
     assert.match(body.subject, /выгрузил 40 файлов/);
-    assert.match(body.text, /admin\/log/, "в письме должна быть ссылка на журнал");
-  } finally { globalThis.fetch = real; }
+  } finally { n.restore(); }
+});
+
+test("без каналов признак всё равно сохраняется — «не настроено» не значит «не заметили»", async () => {
+  const env = { ACL: kv() };
+  const rec = { t: new Date().toISOString(), em: "kto@gmail.com", dom: "gmail.com", site: "gpu", path: "/", geo: "NL" };
+  const out = await raiseAlerts(env, rec, [{ id: "outside", text: "вход с чужой почты" }]);
+  assert.match(out[0].sent, /канал не настроен/);
+  assert.equal([...env.ACL.box.keys()].filter((k) => k.startsWith(ALERT_PREFIX)).length, 1);
+});
+
+test("в тексте оповещения есть суть, время, адрес и ссылка на журнал", () => {
+  const t = alertText({ text: "выгрузка 40 файлов", t: "2026-09-08T09:00:00.000Z", site: "zip", path: "/x.csv", geo: "RU" });
+  assert.match(t, /выгрузка 40 файлов/);
+  assert.match(t, /2026-09-08/);
+  assert.match(t, /\/x\.csv/);
+  assert.match(t, /admin\/log/);
+});
+
+test("настройки канала лежат отдельным ключом и без хранилища не притворяются сохранёнными", async () => {
+  const env = { ACL: kv() };
+  assert.equal(await saveNotify(env, { tgToken: "x" }), true);
+  assert.ok(env.ACL.box.has(NOTIFY_KEY));
+  assert.equal(await saveNotify({}, { tgToken: "x" }), false);
+  assert.deepEqual(await loadNotify({}), {});
+});
+
+test("определение переписки не падает на невнятном ответе", async () => {
+  for (const r of [() => new Response("не json", { status: 200 }),
+                   () => new Response("{}", { status: 500 }),
+                   () => { throw new Error("сеть"); }]) {
+    const n = net(r);
+    try { assert.equal(await tgResolveChat("1:A"), null); } finally { n.restore(); }
+  }
 });
 
 test("журнал читается свежими записями вперёд", async () => {

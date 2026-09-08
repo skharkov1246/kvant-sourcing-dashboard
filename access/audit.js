@@ -140,32 +140,105 @@ async function raiseAlerts(env, rec, signals) {
       await kv.put(mute, "1", { expirationTtl: MUTE_TTL });
       const item = { t: rec.t, id: s.id, text: s.text, em: rec.em, site: rec.site, path: rec.path, geo: rec.geo };
       await kv.put(`${ALERT_PREFIX}${rec.t}:${s.id}`, JSON.stringify(item), { expirationTtl: ALERT_TTL });
-      item.mail = await alertMail(env, item);
+      item.sent = await sendAlert(env, alertText(item));
       sent.push(item);
     } catch { /* оповещение не должно ломать отдачу страницы */ }
   }
   return sent;
 }
 
-// Письмо владельцу. Провайдер задаётся переменными; без ключа признак всё равно
-// сохраняется и виден в панели — «не настроена почта» не должно означать «не заметили».
-async function alertMail(env, item) {
+// ОПОВЕЩЕНИЕ ВЛАДЕЛЬЦА. Канал выбирается тем, что настроено; признак сохраняется
+// в любом случае — «канал не настроен» не должно означать «не заметили».
+//
+// Основной канал — Telegram: он не требует ни домена, ни DNS, ни учётной записи
+// на стороннем сервисе. Владелец создаёт бота у @BotFather, пишет ему /start и
+// вставляет ключ бота в панель; адрес переписки определяется сам (getUpdates) и
+// запоминается. Почта оставлена запасным каналом на случай, если домен всё же
+// подтвердят: тогда достаточно задать переменные, код уже готов.
+const NOTIFY_KEY = "notify:v1";
+
+async function loadNotify(env) {
+  const kv = aclStore(env);
+  if (!kv) return {};
+  try { return (await kv.get(NOTIFY_KEY, { type: "json" })) || {}; } catch { return {}; }
+}
+async function saveNotify(env, cfg) {
+  const kv = aclStore(env);
+  if (!kv) return false;
+  await kv.put(NOTIFY_KEY, JSON.stringify(cfg || {}));
+  return true;
+}
+
+// Ключ бота: сначала из панели (хранилище), иначе из переменной окружения.
+function tgToken(env, cfg) {
+  return String((cfg && cfg.tgToken) || (env && env.TG_TOKEN) || "").trim();
+}
+
+// Адрес переписки. Telegram отдаёт его только после того, как человек написал боту,
+// и держит такие сообщения сутки — поэтому найденное значение запоминаем навсегда.
+async function tgResolveChat(token) {
+  try {
+    const r = await fetch(`https://api.telegram.org/bot${encodeURIComponent(token)}/getUpdates`);
+    if (!r.ok) return null;
+    const d = await r.json();
+    const ups = (d && d.result) || [];
+    for (let i = ups.length - 1; i >= 0; i--) {
+      const m = ups[i].message || ups[i].edited_message || ups[i].channel_post;
+      const id = m && m.chat && m.chat.id;
+      if (id) return String(id);
+    }
+    return null;
+  } catch { return null; }
+}
+
+async function tgSend(token, chat, text) {
+  const r = await fetch(`https://api.telegram.org/bot${encodeURIComponent(token)}/sendMessage`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ chat_id: chat, text, disable_web_page_preview: true }),
+  });
+  if (r.ok) return { ok: true };
+  let why = `telegram ${r.status}`;
+  try { const d = await r.json(); if (d && d.description) why += `: ${d.description}`; } catch { /* тело может быть пустым */ }
+  return { ok: false, why };
+}
+
+// Отправка одного оповещения по настроенному каналу. Возвращает строку для журнала.
+async function sendAlert(env, text, opts = {}) {
+  const cfg = opts.cfg || (await loadNotify(env));
+  const token = tgToken(env, cfg);
+  if (token) {
+    let chat = cfg.tgChat || (env && env.TG_CHAT) || null;
+    if (!chat) {
+      chat = await tgResolveChat(token);
+      if (chat && !opts.noSave) { cfg.tgChat = chat; await saveNotify(env, cfg); }
+    }
+    if (!chat) return "Telegram: напишите боту /start — переписка ещё не начата";
+    const r = await tgSend(token, chat, text);
+    if (r.ok) return "отправлено в Telegram";
+    return `не отправлено, ${r.why}`;
+  }
   const to = String((env && env.ALERT_TO) || (env && env.ADMIN_EMAILS) || "").split(/[,\s]+/)[0];
-  if (!to || !env.RESEND_API_KEY) return "почта не настроена — признак записан в панель";
-  const subject = `КВАНТ · доступы: ${item.text.slice(0, 120)}`;
-  const body = [
+  if (to && env && env.RESEND_API_KEY) {
+    try {
+      const r = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ from: env.MAIL_FROM || "alerts@kvantpro.com", to: [to],
+                               subject: `КВАНТ · доступы: ${text.split("\n")[0].slice(0, 120)}`, text }),
+      });
+      return r.ok ? `отправлено на ${to}` : `не отправлено: resend ${r.status}`;
+    } catch (e) { return `не отправлено: ${String((e && e.message) || e)}`; }
+  }
+  return "канал не настроен — признак записан в журнал";
+}
+
+function alertText(item) {
+  return [
     item.text, "",
     `время: ${item.t}`, `сайт: ${item.site || "—"}`, `адрес: ${item.path || "—"}`,
     `страна: ${item.geo}`, "", "Журнал: https://kvant-sourcing-f122.pages.dev/admin/log",
   ].join("\n");
-  try {
-    const r = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ from: env.MAIL_FROM || "alerts@kvantpro.com", to: [to], subject, text: body }),
-    });
-    return r.ok ? `отправлено на ${to}` : `не отправлено: resend ${r.status}`;
-  } catch (e) { return `не отправлено: ${String((e && e.message) || e)}`; }
 }
 
 // Чтение журнала для панели: свежие записи первыми. null — хранилище не привязано.
@@ -194,5 +267,6 @@ async function readLog(env, { prefix = LOG_PREFIX, limit = 300 } = {}) {
 
 export {
   auditRecord, signalsFor, raiseAlerts, readLog, classify, deviceOf, domainOf,
-  SIGNALS, LOG_PREFIX, ALERT_PREFIX, mskHourKey,
+  SIGNALS, LOG_PREFIX, ALERT_PREFIX, NOTIFY_KEY, mskHourKey,
+  loadNotify, saveNotify, sendAlert, alertText, tgResolveChat,
 };
