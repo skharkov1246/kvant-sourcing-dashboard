@@ -29,7 +29,9 @@ def _date(s) -> dt.date | None:
 
 
 def connect(db_path: str | Path) -> sqlite3.Connection:
-    con = sqlite3.connect(str(db_path))
+    con = sqlite3.connect(str(db_path), timeout=300)
+    # качалка вложений пишет в ту же базу параллельно: ждём её транзакцию, а не падаем
+    con.execute("PRAGMA busy_timeout=300000")
     con.executescript(SCHEMA.read_text(encoding="utf-8"))
     return con
 
