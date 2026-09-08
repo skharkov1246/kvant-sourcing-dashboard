@@ -18,9 +18,10 @@ const RIGHTS_URL = "https://kvant-sourcing-f122.pages.dev/api/rights";
 const RIGHTS_TTL = 60 * 1000;              // память изолята: не дёргать портал на каждый файл
 const rightsCache = new Map();
 
-// Что стоит журнала: страницы и выгружаемые файлы. Разметка, картинки и шрифты —
-// часть страницы, а не действие человека, и в журнал не идут.
-const AUDIT_SKIP = /\.(css|js|mjs|map|woff2?|ttf|png|jpe?g|gif|svg|webp|ico|avif)$/i;
+// Что стоит журнала: страницы и выгружаемые файлы. Разметка, картинки, шрифты и
+// обращения страницы к данным (/db/…) — часть страницы, а не действие человека,
+// и в журнал не идут.
+const AUDIT_SKIP = /^\/db\/|\.(css|js|mjs|map|woff2?|ttf|png|jpe?g|gif|svg|webp|ico|avif)$/i;
 
 async function siteAllowed(request, env, site) {
   if (env && env.SITE_RIGHTS === "off") return true;
@@ -64,4 +65,4 @@ function tell(jwt, site, path) {
 }
 // END siteRights
 
-export { siteAllowed, RIGHTS_URL, rightsCache };
+export { siteAllowed, RIGHTS_URL, rightsCache, AUDIT_SKIP };
