@@ -38,4 +38,7 @@ jobs:
             exit 1
           fi
           psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -f zip/supabase/migrations.sql
+          echo "— схема базы ЗИП применена"
+          psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -f library/supabase/schema.sql
+          echo "— схема библиотеки рынков применена"
           echo "✓ миграции применены"
