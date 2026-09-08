@@ -88,19 +88,35 @@ COMPILED = {k: (title, [re.compile(p, re.I) for p in pats]) for k, (title, pats)
 MAX_TEXT = 300_000     # больше на одну сделку не разбираем: дальше идут повторы цитат
 
 
-def texts_for(con: sqlite3.Connection, acon: sqlite3.Connection | None, deal_id: int) -> str:
-    parts = []
+def texts_for(con: sqlite3.Connection, acon: sqlite3.Connection | None,
+              ccon: sqlite3.Connection | None, deal_id: int) -> str:
+    """Тексты сделки: вложения, почта и ЧАТ, с РАЗДЕЛЬНЫМ бюджетом на каждый источник.
+
+    Общий лимит съедали вложения (одна спецификация бывает на сотни тысяч знаков),
+    и переписка до разметки просто не доходила — сюжеты из писем терялись целиком.
+    Чат карточки — главный источник: писем на 2 928 сделок всего 2 485, а сообщений
+    в чатах 76 494, и обсуждение идёт именно там."""
+    half = MAX_TEXT // 3
+    files_txt: list[str] = []
     for (t,) in con.execute(
             "SELECT t.text FROM file_text t JOIN files f ON f.fid=t.fid WHERE f.deal_id=?", (deal_id,)):
-        parts.append(t or "")
-        if sum(len(x) for x in parts) > MAX_TEXT:
+        files_txt.append(t or "")
+        if sum(len(x) for x in files_txt) > half:
             break
+    acts_txt: list[str] = []
     src = acon or con
     for subj, body in src.execute("SELECT subject, body FROM activities WHERE deal_id=?", (deal_id,)):
-        parts.append(f"{subj or ''}\n{body or ''}")
-        if sum(len(x) for x in parts) > MAX_TEXT:
+        acts_txt.append(f"{subj or ''}\n{body or ''}")
+        if sum(len(x) for x in acts_txt) > half:
             break
-    return "\n".join(parts)[:MAX_TEXT]
+    chat_txt: list[str] = []
+    if ccon is not None:
+        for (t,) in ccon.execute("SELECT text FROM messages WHERE deal_id=? ORDER BY at", (deal_id,)):
+            chat_txt.append(t or "")
+            if sum(len(x) for x in chat_txt) > half:
+                break
+    return ("\n".join(files_txt)[:half] + "\n" + "\n".join(acts_txt)[:half]
+            + "\n" + "\n".join(chat_txt)[:half]).strip()
 
 
 def mark(text: str) -> dict[str, int]:
@@ -115,13 +131,17 @@ def mark(text: str) -> dict[str, int]:
     return hits
 
 
-def run(db: str, acts_db: str | None, only_lost: bool = False) -> dict:
+def run(db: str, acts_db: str | None, chats_db: str | None = None, only_lost: bool = False) -> dict:
     con = sqlite3.connect(db, timeout=300)
     con.execute("PRAGMA busy_timeout=300000")
     acon = None
     if acts_db and Path(acts_db).exists():
         acon = sqlite3.connect(acts_db, timeout=300)
         acon.execute("PRAGMA busy_timeout=300000")
+    ccon = None
+    if chats_db and Path(chats_db).exists():
+        ccon = sqlite3.connect(chats_db, timeout=300)
+        ccon.execute("PRAGMA busy_timeout=300000")
 
     con.execute("""CREATE TABLE IF NOT EXISTS loss_marks (
         deal_id INTEGER, narrative TEXT, hits INTEGER, main INTEGER, chars INTEGER)""")
@@ -136,7 +156,7 @@ def run(db: str, acts_db: str | None, only_lost: bool = False) -> dict:
     by_narr_won = defaultdict(lambda: [0, 0])
     rows = []
     for did, won, sem, _cat, _stage, _sm in deals:
-        text = texts_for(con, acon, did)
+        text = texts_for(con, acon, ccon, did)
         stats["всего сделок"] += 1
         if not text:
             stats["без текстов"] += 1
@@ -157,6 +177,8 @@ def run(db: str, acts_db: str | None, only_lost: bool = False) -> dict:
     con.close()
     if acon:
         acon.close()
+    if ccon:
+        ccon.close()
     return {"stats": dict(stats), "by_narrative": dict(by_narr),
             "won_lost": {k: {"won": v[0], "lost": v[1]} for k, v in by_narr_won.items()}}
 
@@ -166,9 +188,10 @@ def main() -> int:
     here = Path(__file__).resolve().parent
     ap.add_argument("--db", default=str(here / "kvant.db"))
     ap.add_argument("--acts", default=str(here / "kvant_acts.db"))
+    ap.add_argument("--chats", default=str(here / "kvant_chats.db"))
     ap.add_argument("--only-lost", action="store_true")
     a = ap.parse_args()
-    res = run(a.db, a.acts, a.only_lost)
+    res = run(a.db, a.acts, a.chats, a.only_lost)
     print("покрытие:", res["stats"])
     print("\nсюжеты (сколько сделок):")
     for k, n in sorted(res["by_narrative"].items(), key=lambda x: -x[1]):

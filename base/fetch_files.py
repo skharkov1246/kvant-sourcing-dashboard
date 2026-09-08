@@ -160,7 +160,10 @@ def worker(q: "queue.Queue", out: "queue.Queue", stop: threading.Event, session:
 
 def run(att_path: str, db_path: str, workers: int = 8, limit: int | None = None) -> None:
     att = json.loads(Path(att_path).read_text(encoding="utf-8"))
-    con = sqlite3.connect(db_path)
+    con = sqlite3.connect(db_path, timeout=300)
+    # аналитика читает и пишет ту же базу параллельно: без ожидания качалка
+    # обрывалась на «database is locked» и теряла часы разбора
+    con.execute("PRAGMA busy_timeout=300000")
     con.executescript((Path(__file__).resolve().parent / "schema.sql").read_text(encoding="utf-8"))
     done = {r[0] for r in con.execute("SELECT fid FROM files WHERE status IN ('parsed','empty')")}
     todo = [a for a in att if a["fid"] not in done]
