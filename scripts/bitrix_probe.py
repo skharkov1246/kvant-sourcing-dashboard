@@ -1,120 +1,42 @@
-"""Зонд v28: сегментация сделок за календарный год по типам оборудования.
+"""Зонд v29: где лежит номенклатура — разведка вложений сделок.
 
-Задача владельца: выделить десять направлений, по которым имеет смысл глубокое
-исследование (как сделано по ГПУ, ГТУ и ГШО), и понять, какие из них изучены хуже
-всего при сопоставимом объёме спроса.
+Владелец: номенклатура не в строках Битрикса, а в файлах, привязанных к сделкам.
+Прежде чем разбирать их все, нужно понять устройство: какие файловые поля есть,
+сколько сделок с файлами, какие форматы, и — главное — хватает ли вебхуку прав,
+чтобы файлы скачать (скоуп «Диск»). Без этого дальнейшая работа бессмысленна.
 
-ЧТО ПЕЧАТАЕТСЯ: только агрегаты по сегментам — число сделок, сумма, доля выигранных
-и проигранных, средний чек, число запросов поставщикам. Названия сделок, клиентов,
-контрагентов и позиций НЕ выводятся: репозиторий публичный, журналы сборок открыты.
-По нераспознанному остатку печатаются только строчные русские слова длиной от пяти
-букв с частотой от пяти — названия компаний и брендов почти всегда пишутся с большой
-буквы или латиницей и такой фильтр не проходят.
+ПЕЧАТАЮТСЯ ТОЛЬКО АГРЕГАТЫ. Имена файлов, названия сделок и содержимое не выводятся:
+репозиторий публичный. Из разобранных файлов показывается лишь распределение по
+сегментам оборудования и число распознанных строк.
 """
 from __future__ import annotations
 
+import io
 import os
-import re
 from collections import Counter
 from datetime import datetime, timedelta, timezone
 
 import requests
 
-# ── сегменты. Ключ — короткое имя, значение — слова-приметы (в нижнем регистре).
-# Порядок важен: сделка относится к сегменту с наибольшим числом совпадений,
-# при равенстве — к тому, что выше.
-SEGMENTS: dict[str, list[str]] = {
-    "ГПУ — газопоршневые": [
-        "газопоршн", "гпу", "cummins", "камминз", "jenbacher", "енбахер", "waukesha",
-        "mwm", "innio", "g3512", "gta", "qsk", "kta", "поршневая электростанция", "пгу",
-    ],
-    "ГТУ — газотурбинные": [
-        "газотурб", "гту", "турбина", "sgt", "lm6000", "lm2500", "frame", "solar turbines",
-        "taurus", "centaur", "mars 100", "siemens sgt", "kawasaki", "ггпа", "гпа",
-    ],
-    "ГШО — горно-шахтное": [
-        "перфоратор", "буров", "гшо", "epiroc", "эпирок", "atlas copco", "sandvik", "сандвик",
-        "tamrock", "normet", "нормет", "пдм", "погрузочно-доставочн", "коронка", "штанга буров",
-        "самоходн вагон", "крепь", "комбайн проход",
-    ],
-    "Насосное оборудование": [
-        "насос", "flowserve", "флоусерв", "sulzer", "зульцер", "ksb", "grundfos", "грундфос",
-        "цнс", "шламов", "warman", "уорман", "weir", "гнб", "консольн", "секционн", "пескового",
-    ],
-    "Компрессоры": [
-        "компрессор", "винтов", "ingersoll", "kaeser", "кэзер", "atlas copco ga", "воздуходув",
-        "осушитель воздуха", "ресивер",
-    ],
-    "Дробление и обогащение": [
-        "дробилк", "мельниц", "грохот", "флотац", "гидроциклон", "metso", "метсо", "outotec",
-        "оутотек", "сгущ", "конусн", "щеков", "футеровк", "сепаратор магн", "классификатор",
-        "обогатит",
-    ],
-    "Трубопроводная арматура": [
-        "задвижк", "затвор дисков", "клапан", "кран шаров", "вентиль", "арматур",
-        "регулирующ клапан", "обратн клапан", "предохранит клапан", "фланц",
-    ],
-    "Электротехника и приводы": [
-        "трансформатор", "кру", "ктп", "частотн", "чрп", "преобразователь частот",
-        "электродвигател", "abb", "schneider", "шнейдер", "ячейк", "щит", "распредустройств",
-        "генератор синхрон", "кабель",
-    ],
-    "КИПиА и автоматизация": [
-        "датчик", "расходомер", "манометр", "термопар", "emerson", "endress", "yokogawa",
-        "асу тп", "контроллер", "уровнемер", "кипиа", "кип и а", "преобразователь давлен",
-    ],
-    "Подъёмно-транспортное": [
-        "конвейер", "транспортёр", "транспортер", "лебёдк", "лебедк", "кран мостов",
-        "редуктор", "тельфер", "лента конвейерн", "барабан привод", "роликоопор",
-    ],
-    "Теплообмен и котельное": [
-        "теплообменник", "alfa laval", "альфа лаваль", "котёл", "котел ", "градирн",
-        "экономайзер", "калорифер", "теплообменн",
-    ],
-    "Карьерная спецтехника": [
-        "самосвал", "экскаватор", "белаз", "komatsu", "коматсу", "погрузчик фронтальн",
-        "бульдозер", "автогрейдер", "caterpillar 7", "буровой станок",
-    ],
-    "Подшипники и уплотнения": [
-        "подшипник", "skf", "timken", "тимкен", "уплотнени", "john crane", "манжет",
-        "сальник", "торцевое уплотнен", "ртэ", "рти",
-    ],
-    "Металлопрокат и трубы": [
-        "труба", "трубы", "лист стальн", "швеллер", "двутавр", "металлопрокат", "отвод",
-        "тройник", "металлоконструкц", "арматура а500",
-    ],
-    "Водоподготовка и фильтрация": [
-        "мембран", "ультрафильтрац", "обратн осмос", "осмос", "фильтрующ", "фильтроэлемент",
-        "водоподготовк", "картридж", "деминерализ", "умягчител", "фильтр тонк",
-    ],
-    "Сварка и инструмент": [
-        "сварочн", "электрод", "проволок сварочн", "резак", "инструмент", "абразив",
-        "круг отрезн", "сверло", "фреза",
-    ],
-}
+BASE = os.environ["BITRIX_WEBHOOK_URL"].rstrip("/")
+SAMPLE_FILES = 40          # сколько файлов пробуем скачать в разведке
 
-STOP = re.compile(r"[^а-яё]")
-NOISE = {
-    "поставка", "поставки", "запрос", "запросы", "коммерческое", "предложение", "оборудование",
-    "оборудования", "заказчик", "заказчика", "договор", "спецификация", "тендер", "закупка",
-    "закупки", "материалы", "запчасти", "запасные", "части", "комплект", "комплекта", "новая",
-    "новый", "проект", "работы", "услуги", "прочее", "разное", "позиция", "позиции",
-}
+
+def bx(method: str, params: dict) -> dict:
+    for _ in range(4):
+        try:
+            r = requests.post(f"{BASE}/{method}.json", json=params, timeout=90)
+            r.raise_for_status()
+            return r.json()
+        except Exception:
+            continue
+    return {}
 
 
 def bx_all(method: str, params: dict, cap: int = 100000) -> list:
-    base = os.environ["BITRIX_WEBHOOK_URL"].rstrip("/")
     out, start = [], 0
     while True:
-        j = {}
-        for _ in range(4):
-            try:
-                r = requests.post(f"{base}/{method}.json", json={**params, "start": start}, timeout=90)
-                r.raise_for_status()
-                j = r.json()
-                break
-            except Exception:
-                continue
+        j = bx(method, {**params, "start": start})
         res = j.get("result")
         items = res.get("items") if isinstance(res, dict) and "items" in res else res
         out += items or []
@@ -124,149 +46,182 @@ def bx_all(method: str, params: dict, cap: int = 100000) -> list:
 
 
 def bx_batch(cmds: dict) -> dict:
-    """Пакетный вызов: до 50 команд за запрос. Возвращает result_result."""
-    base = os.environ["BITRIX_WEBHOOK_URL"].rstrip("/")
     for _ in range(4):
         try:
-            r = requests.post(f"{base}/batch.json", json={"halt": 0, "cmd": cmds}, timeout=120)
+            r = requests.post(f"{BASE}/batch.json", json={"halt": 0, "cmd": cmds}, timeout=120)
             r.raise_for_status()
-            return (r.json().get("result") or {}).get("result") or {}
+            j = r.json()
+            return {"res": (j.get("result") or {}).get("result") or {},
+                    "err": (j.get("result") or {}).get("result_error") or {}}
         except Exception:
             continue
-    return {}
-
-
-def deal_rows(ids: list[str]) -> dict[str, list[str]]:
-    """Названия позиций по сделкам. crm.item.productrow.list по ownerType не отдаёт
-    строки старых сделок, поэтому берём штатным crm.deal.productrows.get пакетами."""
-    out: dict[str, list[str]] = {}
-    for i in range(0, len(ids), 50):
-        chunk = ids[i:i + 50]
-        cmds = {d: f"crm.deal.productrows.get?id={d}" for d in chunk}
-        for did, rows in (bx_batch(cmds) or {}).items():
-            out[str(did)] = [str((r or {}).get("PRODUCT_NAME") or "") for r in (rows or [])]
-    return out
-
-
-def classify(text: str) -> str | None:
-    t = text.lower().replace("ё", "е")
-    best, score = None, 0
-    for name, words in SEGMENTS.items():
-        n = sum(1 for w in words if w.replace("ё", "е") in t)
-        if n > score:
-            best, score = name, n
-    return best
+    return {"res": {}, "err": {}}
 
 
 def main() -> int:
     since = (datetime.now(timezone.utc) - timedelta(days=365)).strftime("%Y-%m-%dT00:00:00+03:00")
-    print(f"=== Зонд v28: сделки, созданные с {since[:10]} ===\n")
+    print(f"=== Зонд v29: вложения сделок с {since[:10]} ===\n")
 
-    deals = bx_all("crm.deal.list", {
-        "filter": {">=DATE_CREATE": since},
-        "select": ["ID", "TITLE", "CATEGORY_ID", "STAGE_ID", "OPPORTUNITY", "CURRENCY_ID",
-                   "DATE_CREATE", "CLOSED", "ASSIGNED_BY_ID"],
-        "order": {"ID": "ASC"},
-    })
-    print(f"сделок за период: {len(deals)}\n")
-    if not deals:
-        print("данных нет — проверьте права вебхука")
-        return 0
+    # 1. Какие вообще права у вебхука
+    sc = bx("scope", {})
+    scopes = sorted(sc.get("result") or [])
+    print(f"права вебхука ({len(scopes)}): {', '.join(scopes)}")
+    print(f"  скоуп «disk»: {'ЕСТЬ' if 'disk' in scopes else 'НЕТ — файлы скачать не выйдет'}")
+    print(f"  скоуп «crm» : {'есть' if 'crm' in scopes else 'НЕТ'}\n")
 
-    # стадии и направления: без этого не понять, что считать выигрышем —
-    # выигранная сделка уходит в отдельное направление «Реализация»
-    st, cat = Counter(), Counter()
+    # 2. Файловые пользовательские поля сделок
+    uf = bx("crm.deal.userfield.list", {"order": {"FIELD_NAME": "ASC"}}).get("result") or []
+    types = Counter(str(u.get("USER_TYPE_ID")) for u in uf)
+    file_fields = [str(u["FIELD_NAME"]) for u in uf if u.get("USER_TYPE_ID") == "file"]
+    print(f"пользовательских полей сделки: {len(uf)} · из них файловых: {len(file_fields)}")
+    print(f"  типы полей: {dict(types.most_common(12))}")
+    print(f"  файловые поля: {file_fields}\n")
+
+    # 3. Справочник стадий: без него выигрыш не определить — стадии в портале свои
+    # (C2, C4, C8, C10, C30 с кодами UC_*), а SEMANTICS отвечает, чем стадия является:
+    # S — успех, F — провал, P — в работе.
+    sem: dict[str, str] = {}
+    ent = bx("crm.status.entity.items", {"entityId": "DEAL_STAGE"}).get("result") or []
+    cats = bx("crm.dealcategory.list", {"select": ["ID", "NAME"]}).get("result") or []
+    entities = ["DEAL_STAGE"] + [f"DEAL_STAGE_{c['ID']}" for c in cats]
+    for e in entities:
+        for it in bx("crm.status.list", {"filter": {"ENTITY_ID": e}}).get("result") or []:
+            sem[str(it.get("STATUS_ID"))] = str(it.get("SEMANTICS") or "P")
+    print(f"направлений сделок: {len(cats)} · стадий в справочнике: {len(sem)}")
+    print(f"  из них успешных: {sum(1 for v in sem.values() if v == 'S')} · "
+          f"провальных: {sum(1 for v in sem.values() if v == 'F')} · "
+          f"в работе: {sum(1 for v in sem.values() if v not in ('S', 'F'))}")
+    print(f"  (пример разбора первых элементов справочника получен: {len(ent)} записей)\n")
+
+    # 4. Сделки за период
+    deals = bx_all("crm.deal.list", {"filter": {">=DATE_CREATE": since},
+                                     "select": ["ID", "STAGE_ID", "OPPORTUNITY", "CATEGORY_ID"],
+                                     "order": {"ID": "ASC"}})
+    ids = [str(d["ID"]) for d in deals]
+    print(f"сделок за период: {len(ids)}\n")
+
+    won = lost = work = unknown = 0
+    won_sum = lost_sum = 0.0
     for d in deals:
-        st[str(d.get("STAGE_ID") or "")] += 1
-        cat[str(d.get("CATEGORY_ID") or "")] += 1
-    print("направления (CATEGORY_ID → сделок):", dict(cat.most_common()))
-    print("стадии (STAGE_ID → сделок):")
-    for k, n in st.most_common(40):
-        print(f"    {k:28s} {n:>6d}")
+        st = str(d.get("STAGE_ID") or "")
+        amount = float(d.get("OPPORTUNITY") or 0)
+        s_ = sem.get(st)
+        if s_ == "S":
+            won += 1
+            won_sum += amount
+        elif s_ == "F":
+            lost += 1
+            lost_sum += amount
+        elif s_ is None:
+            unknown += 1
+        else:
+            work += 1
+    closed = won + lost
+    print("=== ИСХОДЫ ПО СПРАВОЧНИКУ СТАДИЙ ===")
+    print(f"  выиграно: {won:>5d} на {won_sum / 1e6:>10.1f} млн")
+    print(f"  проиграно:{lost:>5d} на {lost_sum / 1e6:>10.1f} млн")
+    print(f"  в работе: {work:>5d} · стадия не найдена в справочнике: {unknown}")
+    if closed:
+        print(f"  доля выигранных среди закрытых: {won / closed * 100:.1f}% "
+              f"· по деньгам: {won_sum / max(won_sum + lost_sum, 1) * 100:.1f}%\n")
+
+    # 5. Сколько сделок с файлами в UF-полях и какие форматы
+    per_field = Counter()
+    fmt = Counter()
+    with_files = 0
+    file_refs: list[dict] = []
+    if file_fields:
+        for i in range(0, len(ids), 50):
+            chunk = ids[i:i + 50]
+            j = bx("crm.deal.list", {"filter": {"ID": chunk},
+                                     "select": ["ID"] + file_fields})
+            for x in j.get("result") or []:
+                got = False
+                for f in file_fields:
+                    v = x.get(f)
+                    if not v:
+                        continue
+                    files = v if isinstance(v, list) else [v]
+                    for fo in files:
+                        if not isinstance(fo, dict) or "id" not in fo:
+                            continue
+                        got = True
+                        per_field[f] += 1
+                        name = str(fo.get("fileName") or "")
+                        ext = name.rsplit(".", 1)[-1].lower() if "." in name else "без расширения"
+                        fmt[ext] += 1
+                        file_refs.append({"deal": str(x["ID"]), "id": fo["id"], "ext": ext})
+                if got:
+                    with_files += 1
+    print(f"сделок с файлами в UF-полях: {with_files} из {len(ids)} "
+          f"({with_files / max(len(ids), 1) * 100:.1f}%) · файлов всего: {len(file_refs)}")
+    if per_field:
+        print("  по полям:", dict(per_field.most_common()))
+    if fmt:
+        print("  форматы:", dict(fmt.most_common(15)))
     print()
 
-    # позиции сделок: название номенклатуры сильно точнее заголовка сделки
-    by_deal = deal_rows([str(d.get("ID")) for d in deals])
-    n_rows = sum(len(v) for v in by_deal.values())
-    with_rows = sum(1 for v in by_deal.values() if v)
-    print(f"строк номенклатуры получено: {n_rows} · сделок с позициями: {with_rows} из {len(deals)}\n")
+    # 6. Вложения в делах/письмах таймлайна — сюда обычно попадают спецификации из писем
+    act_files = Counter()
+    act_total = 0
+    probe_ids = ids[-300:]
+    for i in range(0, len(probe_ids), 50):
+        chunk = probe_ids[i:i + 50]
+        cmds = {d: (f"crm.activity.list?filter[OWNER_TYPE_ID]=2&filter[OWNER_ID]={d}"
+                    f"&select[]=ID&select[]=TYPE_ID&select[]=PROVIDER_ID&select[]=FILES") for d in chunk}
+        out = bx_batch(cmds)
+        for _did, acts in (out["res"] or {}).items():
+            for a in acts or []:
+                act_total += 1
+                fl = a.get("FILES")
+                if fl:
+                    n = len(fl) if isinstance(fl, (list, dict)) else 1
+                    act_files[str(a.get("PROVIDER_ID") or a.get("TYPE_ID"))] += n
+    print(f"дел и писем в таймлайне (выборка {len(probe_ids)} свежих сделок): {act_total}")
+    print(f"  из них с вложениями, по источнику: {dict(act_files.most_common(10))}")
+    print(f"  вложений всего в выборке: {sum(act_files.values())}\n")
 
-    seg_deals: Counter = Counter()
-    seg_sum: Counter = Counter()
-    seg_won: Counter = Counter()
-    seg_lost: Counter = Counter()
-    seg_won_sum: Counter = Counter()
-    seg_rows: Counter = Counter()
-    unknown_titles: list[str] = []
-    total_sum = 0.0
+    # 7. Пробуем скачать и разобрать выборку файлов
+    print(f"=== пробное скачивание {min(SAMPLE_FILES, len(file_refs))} файлов ===")
+    ok = fail = parsed = 0
+    rows_total = 0
+    why: Counter = Counter()
+    for ref in file_refs[:SAMPLE_FILES]:
+        content = None
+        try:
+            df = bx("disk.file.get", {"id": ref["id"]})
+            url = (df.get("result") or {}).get("DOWNLOAD_URL")
+            if not url:
+                why[str(df.get("error") or "нет DOWNLOAD_URL")] += 1
+            else:
+                rr = requests.get(url, timeout=60)
+                if rr.status_code == 200 and len(rr.content) > 100:
+                    content = rr.content
+                else:
+                    why[f"http {rr.status_code}"] += 1
+        except Exception as e:
+            why[type(e).__name__] += 1
+        if content is None:
+            fail += 1
+            continue
+        ok += 1
+        if ref["ext"] in ("xlsx", "xlsm"):
+            try:
+                import openpyxl
+                wb = openpyxl.load_workbook(io.BytesIO(content), read_only=True, data_only=True)
+                n = 0
+                for ws in wb.worksheets:
+                    for _ in ws.iter_rows(values_only=True):
+                        n += 1
+                rows_total += n
+                parsed += 1
+            except Exception as e:
+                why[f"xlsx: {type(e).__name__}"] += 1
+    print(f"скачано: {ok} · не удалось: {fail} · разобрано таблиц: {parsed} · строк в них: {rows_total}")
+    if why:
+        print("  причины отказов:", dict(why.most_common(8)))
 
-    for d in deals:
-        did = str(d.get("ID"))
-        text = " ".join([str(d.get("TITLE") or "")] + by_deal.get(did, []))
-        seg = classify(text) or "— не распознано"
-        stage = str(d.get("STAGE_ID") or "")
-        amount = float(d.get("OPPORTUNITY") or 0)
-        total_sum += amount
-        seg_deals[seg] += 1
-        seg_sum[seg] += amount
-        seg_rows[seg] += len(by_deal.get(did, []))
-        # Стадии в портале переименованы, поэтому опираемся только на однозначные
-        # признаки; всё прочее считаем незакрытым, а не выигранным.
-        if "WON" in stage or stage.endswith(":SUCCESS"):
-            seg_won[seg] += 1
-            seg_won_sum[seg] += amount
-        elif "LOSE" in stage or "APOLOGY" in stage or stage.endswith(":FAIL"):
-            seg_lost[seg] += 1
-        if seg == "— не распознано":
-            unknown_titles.append(text)
-
-    print("=== СЕГМЕНТЫ (по сумме сделок) ===")
-    print(f"{'сегмент':32s} {'сделок':>7s} {'сумма, млн':>11s} {'выигр':>6s} {'проигр':>7s} "
-          f"{'winrate':>8s} {'ср.чек, тыс':>12s} {'позиций':>8s}")
-    for seg, _ in seg_sum.most_common():
-        n = seg_deals[seg]
-        w, l = seg_won[seg], seg_lost[seg]
-        closed = w + l
-        wr = f"{w / closed * 100:5.1f}%" if closed else "     —"
-        avg = seg_sum[seg] / n / 1000 if n else 0
-        print(f"{seg:32s} {n:>7d} {seg_sum[seg] / 1e6:>11.1f} {w:>6d} {l:>7d} "
-              f"{wr:>8s} {avg:>12.0f} {seg_rows[seg]:>8d}")
-    print(f"{'ИТОГО':32s} {len(deals):>7d} {total_sum / 1e6:>11.1f}")
-
-    print("\n=== ПРОИГРАННЫЕ ДЕНЬГИ (сумма закрытых минус выигранных) ===")
-    for seg, _ in seg_sum.most_common():
-        miss = seg_sum[seg] - seg_won_sum[seg]
-        if seg_deals[seg] >= 3:
-            print(f"{seg:32s} упущено {miss / 1e6:>9.1f} млн · выиграно {seg_won_sum[seg] / 1e6:>8.1f} млн")
-
-    # запросы поставщикам (СП-166) — объём проработки по тем же сегментам
-    try:
-        rfq = bx_all("crm.item.list", {"entityTypeId": 166, "filter": {">=createdTime": since[:10]},
-                                       "select": ["id", "title", "createdTime"]}, cap=60000)
-        rseg: Counter = Counter()
-        for it in rfq:
-            rseg[classify(str(it.get("title") or "")) or "— не распознано"] += 1
-        print(f"\n=== ЗАПРОСЫ ПОСТАВЩИКАМ (СП-166), карточек за период: {len(rfq)} ===")
-        for seg, n in rseg.most_common():
-            d = seg_deals.get(seg, 0)
-            ratio = f"{n / d:5.1f}" if d else "    —"
-            print(f"{seg:32s} запросов {n:>6d} · сделок {d:>5d} · запросов на сделку {ratio}")
-    except Exception as e:
-        print(f"\nСП-166 недоступен: {e}")
-
-    print(f"\n=== НЕРАСПОЗНАННЫЙ ОСТАТОК: {len(unknown_titles)} сделок ===")
-    print("частые строчные русские слова (>=5 букв, >=5 вхождений) — подсказка для новых сегментов:")
-    tok: Counter = Counter()
-    for t in unknown_titles:
-        for w in t.split():
-            w2 = STOP.sub("", w.lower())
-            if len(w2) >= 5 and w2 not in NOISE and w == w.lower():
-                tok[w2] += 1
-    shown = [(w, n) for w, n in tok.most_common(200) if n >= 5][:60]
-    for i in range(0, len(shown), 3):
-        print("   " + "".join(f"{w:24s}{n:>4d}   " for w, n in shown[i:i + 3]))
-
-    print("\n✓ зонд v28 завершён")
+    print("\n✓ зонд v29 завершён")
     return 0
 
 
