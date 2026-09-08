@@ -1,19 +1,16 @@
-"""Зонд v33: последние пути к файлам и оценка достижимой доли.
+"""Зонд v34: подстановка ключа в ссылку выдачи файла.
 
-Установлено: у вебхука все 69 прав, Диск отвечает, но файлы полей сделок — это
-файлы портала (тип «file»), а не объекты Диска, и их ссылки ведут на страницы,
-требующие сессии пользователя.
+Проверка v31 могла быть ошибочной. Ссылка downloadUrl у Битрикса, как правило, уже
+содержит параметр auth= с пустым значением. Я дописывал второй auth= в конец —
+портал читает первый, пустой, и отдаёт страницу входа. То есть «страница входа
+25 из 25» могла означать не «путь закрыт», а «ключ подставлен не туда».
 
-Однако ранняя разведка v29 получила 9 файлов из 40 через disk.file.get — значит
-часть вложений всё же лежит в Диске. Прежде чем объявлять путь закрытым, нужно:
+Здесь ключ подставляется четырьмя способами, и печатается, чем ответил каждый:
+  как есть · дописан в конец · подставлен в существующий пустой auth= ·
+  собран заново из идентификатора файла.
 
-  1. измерить, какая доля файлов достижима через disk.file.get на большой выборке;
-  2. проверить служебный адрес выдачи вложений /bitrix/tools/disk/uf.php с ключом
-     вебхука — он предназначен именно для отдачи привязанных файлов;
-  3. перечислить типы всех хранилищ Диска: если есть хранилище CRM, файлы сделок
-     достижимы обходом папок, а не по идентификатору из поля.
-
-ПЕЧАТАЮТСЯ ТОЛЬКО ТИПЫ, КОДЫ ОТВЕТОВ И ДОЛИ.
+ПЕЧАТАЮТСЯ ТОЛЬКО ПРИЗНАКИ ССЫЛКИ (есть ли в ней auth=, относительная ли она),
+КОДЫ ОТВЕТОВ И ДОЛИ. Сами ссылки, имена файлов и содержимое не выводятся.
 """
 from __future__ import annotations
 
@@ -21,13 +18,14 @@ import os
 import re
 from collections import Counter
 from datetime import datetime, timedelta, timezone
+from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
 import requests
 
 BASE = os.environ["BITRIX_WEBHOOK_URL"].rstrip("/")
 m = re.match(r"(https://[^/]+)/rest/(\d+)/([^/]+)", BASE)
 PORTAL, USER_ID, TOKEN = (m.group(1), m.group(2), m.group(3)) if m else ("", "", "")
-SAMPLE = 200
+N = 20
 
 
 def bx(method: str, params: dict) -> dict:
@@ -54,6 +52,8 @@ def bx_all(method: str, params: dict) -> list:
 
 
 def probe(u: str) -> str:
+    if not u:
+        return "ссылки нет"
     try:
         r = requests.get(u, timeout=45)
         if r.status_code != 200:
@@ -65,28 +65,30 @@ def probe(u: str) -> str:
             return "ФАЙЛ pdf"
         if b[:8] == b"\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1":
             return "ФАЙЛ office"
-        if b.lstrip()[:1] == b"<":
+        s = b.lstrip()[:1]
+        if s == b"<":
             return "страница входа (html)"
         return f"ФАЙЛ иное ({len(b)} б)"
     except Exception as e:
         return f"ошибка {type(e).__name__}"
 
 
+def with_auth(u: str) -> str:
+    """Подставляет ключ в существующий параметр auth=, а не дописывает второй."""
+    p = urlparse(u)
+    q = parse_qs(p.query, keep_blank_values=True)
+    q["auth"] = [TOKEN]
+    return urlunparse(p._replace(query=urlencode(q, doseq=True)))
+
+
 def main() -> int:
-    print("=== Зонд v33: достижимая доля вложений ===\n")
-
-    st = bx("disk.storage.getlist", {}).get("result") or []
-    types = Counter(str(s.get("ENTITY_TYPE")) for s in st)
-    print(f"ТИПЫ ХРАНИЛИЩ ДИСКА ({len(st)}): {dict(types.most_common())}")
-    crm_st = [s for s in st if "crm" in str(s.get("ENTITY_TYPE", "")).lower()]
-    print(f"  хранилищ CRM: {len(crm_st)}\n")
-
+    print("=== Зонд v34: как правильно подставить ключ в ссылку файла ===\n")
     since = (datetime.now(timezone.utc) - timedelta(days=365)).strftime("%Y-%m-%dT00:00:00+03:00")
     uf = bx("crm.deal.userfield.list", {"order": {"FIELD_NAME": "ASC"}}).get("result") or []
     ff = [str(u["FIELD_NAME"]) for u in uf if u.get("USER_TYPE_ID") == "file"]
     deals = bx_all("crm.deal.list", {"filter": {">=DATE_CREATE": since},
                                      "select": ["ID"], "order": {"ID": "DESC"}})
-    ids = [str(d["ID"]) for d in deals]
+    ids = [str(d["ID"]) for d in deals[:200]]
 
     refs: list[dict] = []
     for i in range(0, len(ids), 50):
@@ -97,42 +99,55 @@ def main() -> int:
                 if not v:
                     continue
                 for fo in (v if isinstance(v, list) else [v]):
-                    if isinstance(fo, dict) and fo.get("id"):
+                    if isinstance(fo, dict) and fo.get("downloadUrl"):
                         refs.append(fo)
-        if len(refs) >= SAMPLE * 3:
+        if len(refs) >= N:
             break
-    step = max(1, len(refs) // SAMPLE)
-    sample = refs[::step][:SAMPLE]
-    print(f"выборка вложений: {len(sample)} из {len(refs)} собранных\n")
+    refs = refs[:N]
+    print(f"вложений в выборке: {len(refs)}")
+    if not refs:
+        print("вложений не найдено")
+        return 0
 
-    # 1. Какая доля достижима через Диск
-    disk_ok = 0
-    disk_res: Counter = Counter()
-    for fo in sample:
-        d = bx("disk.file.get", {"id": fo["id"]})
-        u = (d.get("result") or {}).get("DOWNLOAD_URL")
-        if u:
-            r = probe(u)
-            disk_res[r] += 1
-            if r.startswith("ФАЙЛ"):
-                disk_ok += 1
-        else:
-            disk_res["объекта Диска нет"] += 1
-    print("=== ПУТЬ 1: disk.file.get по идентификатору поля ===")
-    print(f"  годных: {disk_ok} из {len(sample)} ({disk_ok / max(len(sample), 1) * 100:.1f}%)")
-    print(f"  {dict(disk_res.most_common(5))}\n")
+    # признаки ссылки — без самой ссылки
+    sample_u = str(refs[0]["downloadUrl"])
+    pr = urlparse(sample_u)
+    q = parse_qs(pr.query, keep_blank_values=True)
+    print(f"ссылка относительная: {'да' if not sample_u.startswith('http') else 'нет'}")
+    print(f"путь ссылки: {pr.path}")
+    print(f"имена параметров: {sorted(q.keys())}")
+    print(f"параметр auth присутствует: {'да' if 'auth' in q else 'нет'}"
+          f" · пустой: {'да' if q.get('auth') == [''] else 'нет'}\n")
 
-    # 2. Служебный адрес выдачи привязанных файлов
-    print("=== ПУТЬ 2: /bitrix/tools/disk/uf.php с ключом вебхука ===")
-    uf_res: Counter = Counter()
-    for fo in sample[:30]:
-        fid = fo["id"]
-        for tmpl in (f"{PORTAL}/bitrix/tools/disk/uf.php?attachedId={fid}&auth={TOKEN}&action=download",
-                     f"{PORTAL}/bitrix/tools/disk/uf.php?attachedId={fid}&action=download"):
-            uf_res[probe(tmpl)] += 1
-    print(f"  {dict(uf_res.most_common(5))}\n")
+    res: dict[str, Counter] = {}
 
-    print("✓ зонд v33 завершён")
+    def note(way: str, out: str) -> None:
+        res.setdefault(way, Counter())[out] += 1
+
+    for fo in refs:
+        for key in ("downloadUrl", "showUrl"):
+            u = str(fo.get(key) or "")
+            if not u:
+                continue
+            full = u if u.startswith("http") else PORTAL + u
+            note(f"{key}: как есть", probe(full))
+            sep = "&" if "?" in full else "?"
+            note(f"{key}: ключ дописан в конец", probe(f"{full}{sep}auth={TOKEN}"))
+            note(f"{key}: ключ подставлен в auth=", probe(with_auth(full)))
+        fid = fo.get("id")
+        if fid:
+            note("собрана заново: /rest/.../download",
+                 probe(f"{BASE}/download.json?fileId={fid}"))
+            note("собрана заново: uf.php с ключом",
+                 probe(with_auth(f"{PORTAL}/bitrix/tools/disk/uf.php?attachedId={fid}&action=download&auth=")))
+
+    print("=== ЧТО ОТВЕТИЛ КАЖДЫЙ СПОСОБ ===")
+    for way, c in res.items():
+        good = sum(n for o, n in c.items() if o.startswith("ФАЙЛ"))
+        mark = "  ✔ РАБОТАЕТ" if good else ""
+        print(f"{way:44s} годных {good:>3d} из {sum(c.values()):>3d} · {dict(c.most_common(3))}{mark}")
+
+    print("\n✓ зонд v34 завершён")
     return 0
 
 
