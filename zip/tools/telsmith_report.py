@@ -48,7 +48,7 @@ def main():
     d = load("telsmith_3858.json")
     sup = load("telsmith_suppliers.json", {"suppliers": [], "crossrefs": [], "notes": []})
     pr = load("telsmith_prices.json", {"estimates": [], "basis": [], "fx_rub_usd": None})
-    est = {i["pn"]: i for x in pr.get("estimates", []) for i in x.get("items", [])}
+    est = {i["pn"]: i for x in pr.get("estimates", []) for i in x.get("items", []) if i.get("pn")}
     fx = pr.get("fx_rub_usd")
     rec = load("telsmith_recon.json", {"items": [], "summary": ""})
     recon = {i["pn"]: i for i in rec.get("items", [])}
@@ -92,8 +92,9 @@ def main():
     if est and fx:
         rows, d_sum, a_sum = [], 0, 0
         for n in need:
-            it = est.get(n.get("oem"))
-            if not it or not isinstance(n["sum_rub"], (int, float)) or not n["qty"]:
+            it = est.get(n.get("oem")) if n.get("oem") else None
+            if not it or not isinstance(n["sum_rub"], (int, float)) or not n["qty"] \
+                    or not isinstance(n["price_rub"], (int, float)):
                 continue
             a_unit = it["delivered_usd"] * fx
             d_sum += n["sum_rub"]
@@ -147,7 +148,7 @@ def main():
                  '<th class="num">Расхождение</th><th class="num">В работу, $/шт</th>'
                  '<th class="num">Дилер, \u20bd/шт</th><th class="num">Кратность</th>'
                  '<th style="width:30%">Куда копать</th></tr>')
-        by_pn = {n.get("oem"): n for n in need if n.get("oem")}
+        by_pn = {n["oem"]: n for n in need if n.get("oem")}
         for i in sorted(recon.values(), key=lambda x: (x.get("converges", False), x.get("pn", ""))):
             n = by_pn.get(i["pn"], {})
             dp = n.get("price_rub")

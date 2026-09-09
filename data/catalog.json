@@ -4,18 +4,18 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 168,
-    "total_bytes": 71198114,
+    "datasets": 170,
+    "total_bytes": 71750289,
     "by_sensitivity": {
-      "конфиденциально": 51,
-      "внутреннее": 85,
+      "конфиденциально": 52,
+      "внутреннее": 86,
       "публикуемо": 32
     },
     "by_subproject": {
       "ГПУ-библиотека": 26,
       "ГТУ-библиотека": 30,
       "ОВЭ-75": 45,
-      "база ЗИП": 23,
+      "база ЗИП": 25,
       "база ЗИП · таможня": 18,
       "гидрометаллургия": 22,
       "дашборд сорсеров": 3,
@@ -1231,6 +1231,41 @@
       ]
     },
     {
+      "path": "zip/data/telsmith_prices.json",
+      "subproject": "база ЗИП",
+      "bytes": 362458,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "basis",
+        "estimates",
+        "fx_rub_usd",
+        "generated",
+        "method"
+      ],
+      "main_collection": {
+        "key": "estimates",
+        "records": 9,
+        "record_keys": [
+          "cls",
+          "items",
+          "method"
+        ]
+      },
+      "last_change": null,
+      "last_author": null,
+      "last_commit": null,
+      "updated_by": "неизвестно",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "zip/tools/telsmith_report.py"
+      ]
+    },
+    {
       "path": "zip/data/bearing_sites_cn.json",
       "subproject": "база ЗИП",
       "bytes": 323230,
@@ -1354,10 +1389,10 @@
           "top_down_usd"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-09",
+      "last_author": "Claude",
+      "last_commit": "72968c5",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -1816,6 +1851,45 @@
         "gt/tools/build_hot.py",
         "gt/tools/build_lot.py",
         "gt/tools/drop_ru.py"
+      ]
+    },
+    {
+      "path": "zip/data/telsmith_suppliers.json",
+      "subproject": "база ЗИП",
+      "bytes": 189717,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "crossrefs",
+        "generated",
+        "notes",
+        "suppliers"
+      ],
+      "main_collection": {
+        "key": "crossrefs",
+        "records": 22,
+        "record_keys": [
+          "confidence",
+          "evidence_url",
+          "real_maker",
+          "real_pn",
+          "telsmith_pn"
+        ]
+      },
+      "last_change": null,
+      "last_author": null,
+      "last_commit": null,
+      "updated_by": "неизвестно",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "адреса электронной почты",
+          "телефоны"
+        ]
+      },
+      "referenced_by": [
+        "zip/tools/telsmith_report.py"
       ]
     },
     {
