@@ -11,13 +11,13 @@
 («поз.», «шт», «ндс»), числа сохраняются — в наименованиях запчастей размер и
 типоразмер несут смысл. Сравнение — по доле общих значимых токенов.
 
-ЧТО ЭТИМ МОЖНО И НЕЛЬЗЯ МЕРИТЬ. Пары — это готовый обучающий материал: одна и
-та же позиция в оферте поставщика и в нашем ТКП, с обеими ценами. А вот НАЦЕНКУ
-по ним считать пока нельзя: валюта строки распознана лишь у 8 % позиций с ценой,
-и отношение цен сплошь и рядом оказывается курсом, а не маржой (в рублёвых
-сделках медиана выходит ×10,6 — это евро против рубля, а не наценка). Чтобы
-считать маржу, сначала нужна валюта документа: её берут из шапки оферты, а не
-из строки таблицы.
+ВАЛЮТА. Отношение цен в разных валютах — это курс, а не наценка, поэтому пара
+считается только когда обе цены приведены к одной валюте. Совпала валюта —
+берём отношение как есть; разошлась (поставщик в долларах или юанях, мы в евро
+или рублях — так в 200 сделках из 269) — обе цены переводятся в евро по курсу
+ЦБ на дату создания сделки, модуль base/fx.py. Если валюта не распозналась
+вовсе, стороны считаются одновалютными, как раньше, и такая пара помечена
+пустой валютой — на ней наценку мерить нельзя.
 
     python base/match_prices.py --db base/kvant.db
 """
@@ -28,6 +28,8 @@ import re
 import sqlite3
 from collections import defaultdict
 from pathlib import Path
+
+import fx
 
 PUNCT = re.compile(r"[^\w\s./-]+", re.U)
 SPACES = re.compile(r"\s+")
@@ -43,7 +45,9 @@ DDL = """
 CREATE TABLE IF NOT EXISTS price_pairs (
   deal_id INTEGER, key TEXT, kind TEXT,          -- kind: 'pn' или 'name'
   name_sup TEXT, name_our TEXT,
-  price_sup REAL, price_our REAL, qty REAL, ratio REAL, currency TEXT
+  price_sup REAL, price_our REAL, qty REAL, ratio REAL, currency TEXT,
+  cur_sup TEXT, cur_our TEXT,                    -- как было в документе
+  price_sup_eur REAL, price_our_eur REAL         -- приведённые, если валюты разошлись
 );
 CREATE INDEX IF NOT EXISTS ix_pp_deal ON price_pairs(deal_id);
 """
@@ -69,6 +73,8 @@ def run(db_path: str) -> dict:
     con.execute("PRAGMA busy_timeout=300000")
     con.executescript(DDL)
     con.execute("DELETE FROM price_pairs")
+    fx.ensure(con)
+    day = {int(d): fx.day_of(c) for d, c in con.execute("SELECT id, date_create FROM deals")}
 
     rows = con.execute("""SELECT p.deal_id, f.field_name, p.part_number, p.name, p.price, p.qty,
                                  p.currency
@@ -91,25 +97,36 @@ def run(db_path: str) -> dict:
             for i, (pn_o, nm_o, pr_o, _q, tok_o, cur_o) in enumerate(our[did]):
                 if i in used_our:
                     continue
-                # разные валюты — отношение цен даст курс, а не наценку
-                if cur_s and cur_o and cur_s != cur_o:
-                    continue
+                # разные валюты допустимы: ниже обе цены приводятся к евро
                 if pn_s and pn_o and pn_s == pn_o:
-                    best, best_sim, best_kind, best_i = (nm_o, pr_o), 1.0, "pn", i
+                    best, best_sim, best_kind, best_i = (nm_o, pr_o, cur_o), 1.0, "pn", i
                     break
                 if len(tok_s) >= MIN_TOKENS and len(tok_o) >= MIN_TOKENS:
                     s = sim(tok_s, tok_o)
                     if s > best_sim:
-                        best, best_sim, best_kind, best_i = (nm_o, pr_o), s, "name", i
+                        best, best_sim, best_kind, best_i = (nm_o, pr_o, cur_o), s, "name", i
             if best and (best_kind == "pn" or best_sim >= MIN_SIM):
+                nm_o, pr_o, cur_o = best
+                eur_s = eur_o = None
+                if cur_s and cur_o and cur_s != cur_o:
+                    d = day.get(did) or fx.day_of(None)
+                    eur_s, eur_o = fx.to_eur(con, pr_s, cur_s, d), fx.to_eur(con, pr_o, cur_o, d)
+                    if eur_s is None or eur_o is None or not eur_s:
+                        stats["без курса"] += 1        # курса на дату нет — пара несопоставима
+                        continue
+                    ratio, cur = round(eur_o / eur_s, 3), "EUR"
+                    stats["приведено к евро"] += 1
+                else:
+                    ratio = round(pr_o / pr_s, 3) if pr_s else None
+                    cur = cur_s or cur_o or ""
                 used_our.add(best_i)
                 stats[best_kind] += 1
-                out.append((did, pn_s or nm_s[:60], best_kind, nm_s[:200], best[0][:200],
-                            pr_s, best[1], qty_s, round(best[1] / pr_s, 3) if pr_s else None,
-                            cur_s or ""))
+                out.append((did, pn_s or nm_s[:60], best_kind, nm_s[:200], nm_o[:200],
+                            pr_s, pr_o, qty_s, ratio, cur,
+                            cur_s or "", cur_o or "", eur_s, eur_o))
     con.execute("DROP TABLE IF EXISTS price_pairs")
     con.executescript(DDL)
-    con.executemany("INSERT INTO price_pairs VALUES (?,?,?,?,?,?,?,?,?,?)", out)
+    con.executemany("INSERT INTO price_pairs VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)", out)
     con.commit()
     stats["pairs"] = len(out)
     stats["deals"] = len({r[0] for r in out})
