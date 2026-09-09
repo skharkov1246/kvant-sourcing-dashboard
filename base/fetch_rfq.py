@@ -93,7 +93,7 @@ def stage_names(sess: requests.Session, base: str) -> dict[str, str]:
 
 def company_names(con: sqlite3.Connection, sess: requests.Session, base: str,
                   ids: list[int]) -> dict[int, str]:
-    known = {r[0]: r[1] for r in con.execute("SELECT id, name FROM companies")}
+    known = {r[0]: r[1] for r in con.execute("SELECT id, title FROM companies")}
     need = sorted({i for i in ids if i and i not in known})
     for i in range(0, len(need), 50):
         part = need[i:i + 50]
@@ -130,6 +130,9 @@ def run(db_path: str, out_path: str) -> dict:
             print(f"  {len(items)} запросов · {len(items)/max(time.time()-t0,1):.0f}/с", flush=True)
         time.sleep(0.25)
     print(f"выгружено запросов: {len(items)}", flush=True)
+    raw = Path(out_path).with_suffix(".raw.json")
+    raw.write_text(json.dumps(items, ensure_ascii=False), encoding="utf-8")
+    print(f"сырые карточки сохранены → {raw}", flush=True)
 
     comp = company_names(con, sess, base, [int(x.get("ufCrm18Supplier") or 0) for x in items])
     atts: list[dict] = []
