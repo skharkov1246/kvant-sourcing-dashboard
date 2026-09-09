@@ -161,7 +161,10 @@ def build():
                  "КТО-УЖЕ-ПОСТАВЛЯЕТ.html": "who-supplies.html",
                  "ПЕРФОРАТОРЫ-СОРСИНГ.pdf": "drifters-sourcing.pdf",
                  "ПЕРФОРАТОРЫ-СОРСИНГ.html": "drifters-sourcing.html",
-                 "perf_sourcing.csv": "drifters-sourcing.csv"}
+                 "perf_sourcing.csv": "drifters-sourcing.csv",
+                 "ТЕЛСМИТ-СОРСИНГ.pdf": "telsmith-sourcing.pdf",
+                 "ТЕЛСМИТ-СОРСИНГ.html": "telsmith-sourcing.html",
+                 "telsmith_need.csv": "telsmith-need.csv"}
         for f in orders.iterdir():
             if f.suffix.lower() in (".pdf", ".csv", ".md", ".html"):
                 shutil.copy2(f, OUT / "orders" / alias.get(f.name, f.name))
