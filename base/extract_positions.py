@@ -24,6 +24,7 @@ from __future__ import annotations
 import argparse
 import re
 import sqlite3
+import unicodedata
 from collections import Counter
 from pathlib import Path
 
@@ -47,6 +48,68 @@ CUR_MAP = {"RUB": "RUB", "РУБ": "RUB", "₽": "RUB", "RUR": "RUB", "РУБЛ"
            "USD": "USD", "$": "USD", "ДОЛЛАР": "USD",
            "CNY": "CNY", "¥": "CNY", "ЮАН": "CNY", "RMB": "CNY"}
 CUR_DOC = re.compile(r"(RUB|RUR|РУБЛ\w*|РУБ\.?|₽|EUR|ЕВРО|€|USD|ДОЛЛАР\w*|\$|CNY|RMB|ЮАН\w*|¥)", re.I)
+
+
+def norm_cur(tok: str | None) -> str | None:
+    """Код валюты из того, как её написали в строке: «евро», «€», «руб» → EUR, RUB.
+
+    Без этого в базе соседствуют EUR и ЕВРО, RUB и РУБ — сравнение цен по валюте
+    молча пропускает часть позиций."""
+    if not tok:
+        return None
+    tok = tok.upper()
+    for k, v in CUR_MAP.items():
+        if tok.startswith(k):
+            return v
+    return None
+
+
+# Производитель в спецификации пишется отдельной ячейкой или внутри наименования,
+# но заголовка «производитель» в тексте уже нет: пустые ячейки xlsx выброшены.
+# Поэтому опознаём по словарю брендов, собранному из самих сделок (поле «Brands»
+# заполнено у 1 701 карточки) — так в базу попадает только то, с чем мы реально
+# работаем, а не случайное латинское слово из строки.
+BRANDS: dict[str, str] = {}
+BRAND_RE: re.Pattern | None = None
+BRAND_STOP = {"новый", "прочее", "другое", "разные", "нет", "оригинал", "аналог", "россия"}
+
+
+def _fold(s: str) -> str:
+    """Ту же марку в спецификациях пишут без диакритики: Wärtsilä → Wartsila,
+    Dräger → Drager. Без свёртки такие строки остаются без производителя."""
+    return "".join(c for c in unicodedata.normalize("NFKD", s) if not unicodedata.combining(c))
+
+
+def load_brands(con: sqlite3.Connection) -> None:
+    global BRANDS, BRAND_RE
+    canon: dict[str, str] = {}
+    for (b,) in con.execute("SELECT DISTINCT brand FROM deals WHERE brand IS NOT NULL AND brand<>''"):
+        for part in re.split(r"[,;/]| и ", b):
+            name = part.strip(" .«»\"'()")
+            if len(name) < 3 or name.lower() in BRAND_STOP:
+                continue
+            if not re.search(r"[A-Za-zа-яА-Я]{3}", name):
+                continue
+            canon[name] = name
+            folded = _fold(name)
+            if folded != name:
+                canon[folded] = name
+    BRANDS = canon
+    if canon:
+        BRAND_RE = re.compile(r"(?<![A-Za-zа-яА-Я0-9])(" +
+                              "|".join(re.escape(b) for b in sorted(canon, key=len, reverse=True)) +
+                              r")(?![A-Za-zа-яА-Я0-9])", re.I)
+
+
+def find_brand(text: str) -> str | None:
+    """Каноническое написание марки, как она заведена в сделках."""
+    if not BRAND_RE:
+        return None
+    m = BRAND_RE.search(text)
+    if not m:
+        return None
+    hit = m.group(1)
+    return BRANDS.get(hit) or next((v for k, v in BRANDS.items() if k.lower() == hit.lower()), hit)
 
 
 def doc_currency(text: str) -> str | None:
@@ -194,9 +257,9 @@ def parse_cells(cells: list[str]) -> dict | None:
     if not name or (not pn and qty is None):
         return None
     m = CUR.search(joined)
-    return {"name": name[:300], "part_number": (pn or None), "manufacturer": None,
+    return {"name": name[:300], "part_number": (pn or None), "manufacturer": find_brand(joined),
             "qty": qty, "unit": unit, "price": price, "price_total": price_total,
-            "currency": (m.group(1).upper() if m else None), "raw": joined[:500]}
+            "currency": norm_cur(m.group(1) if m else None), "raw": joined[:500]}
 
 
 def from_table(text: str) -> list[dict]:
@@ -245,8 +308,8 @@ def from_text(text: str) -> list[dict]:
         cur = None
         if p:
             cm = CUR.search(p.group(2))
-            cur = cm.group(1).upper() if cm else None
-        out.append({"name": name, "part_number": pn, "manufacturer": None,
+            cur = norm_cur(cm.group(1) if cm else None)
+        out.append({"name": name, "part_number": pn, "manufacturer": find_brand(line),
                     "qty": _num(q.group(1)) if q else None, "unit": (q.group(2) if q else None),
                     "price": _num(p.group(1)) if p else None, "price_total": None,
                     "currency": cur, "raw": line[:500]})
@@ -259,6 +322,8 @@ def run(db_path: str, limit: int | None = None) -> dict:
     con = sqlite3.connect(db_path, timeout=300)
     con.execute("PRAGMA busy_timeout=300000")
     con.execute("DELETE FROM positions")
+    load_brands(con)
+    print(f"брендов в словаре: {len(BRANDS)}", flush=True)
     # один файл на каждый sha1: 46 % вложений — копии
     marks = ",".join("?" * len(GOOD_FIELDS))
     files = con.execute(f"""SELECT MIN(f.fid), f.sha1, f.ext, group_concat(DISTINCT f.deal_id)
