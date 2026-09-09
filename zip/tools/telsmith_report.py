@@ -50,6 +50,8 @@ def main():
     pr = load("telsmith_prices.json", {"estimates": [], "basis": [], "fx_rub_usd": None})
     est = {i["pn"]: i for x in pr.get("estimates", []) for i in x.get("items", [])}
     fx = pr.get("fx_rub_usd")
+    rec = load("telsmith_recon.json", {"items": [], "summary": ""})
+    recon = {i["pn"]: i for i in rec.get("items", [])}
     m, st = d["machine"], d["stats"]
     classes = {c["key"]: c for c in d["classes"]}
     need = d["need"]
@@ -128,7 +130,40 @@ def main():
                 H.append('<div class="box"><b>Как считалось:</b><ul>'
                          + "".join("<li>" + m + "</li>" for m in methods) + "</ul></div>")
 
-    # 3. Внутренние коды — главный резерв по цене
+    # 3. Сходимость двух оценок
+    if recon:
+        conv = [i for i in recon.values() if i.get("converges")]
+        H.append("<h2>3. Сходимость встречных оценок: где считать надёжным, где копать</h2>")
+        H.append('<div class="box">Цена считалась двумя независимыми путями. Снизу вверх — от материала и переделов: '
+                 "масса, марка стали, литьё или ковка, механическая и термическая обработка, контроль, прибыль завода. "
+                 "Сверху вниз — от рынка: опубликованные цены аутмаркета на такую же или ближайшую деталь. "
+                 "Совпадение двух путей в пределах двух раз означает, что цифру можно брать в переговоры. "
+                 "Расхождение больше — сигнал, что мы чего-то не знаем о самой позиции: массы, комплектности, типоразмера. "
+                 "Сошлось по " + str(len(conv)) + " позициям из " + str(len(recon)) + ".</div>")
+        if rec.get("summary"):
+            H.append('<div class="box">' + e(rec["summary"]) + "</div>")
+        H.append('<table><tr><th>Номер</th><th style="width:22%">Наименование</th>'
+                 '<th class="num">Снизу вверх, $/шт</th><th class="num">Сверху вниз, $/шт</th>'
+                 '<th class="num">Расхождение</th><th class="num">В работу, $/шт</th>'
+                 '<th class="num">Дилер, \u20bd/шт</th><th class="num">Кратность</th>'
+                 '<th style="width:30%">Куда копать</th></tr>')
+        by_pn = {n.get("oem"): n for n in need if n.get("oem")}
+        for i in sorted(recon.values(), key=lambda x: (x.get("converges", False), x.get("pn", ""))):
+            n = by_pn.get(i["pn"], {})
+            dp = n.get("price_rub")
+            mult = (dp / (i["take_usd"] * fx)) if (fx and i.get("take_usd") and isinstance(dp, (int, float))) else None
+            cls_ = "" if i.get("converges") else ' class="flag"'
+            H.append("<tr><td><b>" + e(i["pn"]) + "</b></td><td>" + e(i.get("name", ""))[:42] + "</td>"
+                     + '<td class="num">' + (f'{i["bottom_up_usd"]:,.0f}'.replace(",", " ") if i.get("bottom_up_usd") else "—") + "</td>"
+                     + '<td class="num">' + (f'{i["top_down_usd"]:,.0f}'.replace(",", " ") if i.get("top_down_usd") else "—") + "</td>"
+                     + "<td" + cls_ + ">" + e(i.get("spread", ""))[:26] + "</td>"
+                     + '<td class="num"><b>' + (f'{i["take_usd"]:,.0f}'.replace(",", " ") if i.get("take_usd") else "—") + "</b></td>"
+                     + '<td class="num">' + rub(dp) + "</td>"
+                     + '<td class="num">' + (f"{mult:.0f}\u00d7" if mult else "—") + "</td>"
+                     + "<td>" + e(i.get("dig", ""))[:190] + "</td></tr>")
+        H.append("</table>")
+
+    # 4. Внутренние коды — главный резерв по цене
     inner = [n for n in need if n["pn_kind"] == "внутренний код покупного"]
     inner_sum = sum(n["sum_rub"] for n in inner if isinstance(n["sum_rub"], (int, float)))
     H.append(f'''<div class="box warn"><b>Главный резерв: {len(inner)} позиций на {inner_sum/1e6:.1f} млн ₽
@@ -152,7 +187,7 @@ def main():
         H.append('</table>')
 
     # 3. Поставщики
-    H.append('<h2>4. Куда идти: изготовители аутмаркета</h2>')
+    H.append('<h2>5. Куда идти: изготовители аутмаркета</h2>')
     if not sup.get("suppliers"):
         H.append('<div class="box">Проверка поставщиков не выполнена — раздел пуст.</div>')
     else:
@@ -176,7 +211,7 @@ def main():
 
     # 4. Что запрашивать
     if sup.get("requests"):
-        H.append('<h2>5. Что запрашивать и как принимать</h2>')
+        H.append('<h2>6. Что запрашивать и как принимать</h2>')
         for blk in sup["requests"]:
             H.append(f'<h3>{e(blk["title"])}</h3><div class="box"><b>Запрос:</b><ul>'
                      + "".join(f"<li>{e(x)}</li>" for x in blk.get("request", [])) + '</ul>')
@@ -185,7 +220,7 @@ def main():
             H.append('</div>')
 
     # 5. Позиции первой волны
-    H.append('<h2>6. Позиции для первого запроса</h2>')
+    H.append('<h2>7. Позиции для первого запроса</h2>')
     first = sorted([n for n in need if isinstance(n["sum_rub"], (int, float))],
                    key=lambda x: -x["sum_rub"])[:24]
     H.append('<table><tr><th>Element ID</th><th>Номер Telsmith</th><th style="width:34%">Наименование</th>'
@@ -199,7 +234,7 @@ def main():
     H.append('</table>')
 
     if sup.get("notes"):
-        H.append('<h2>7. Замечания по рынку</h2><div class="box"><ul>'
+        H.append('<h2>8. Замечания по рынку</h2><div class="box"><ul>'
                  + "".join(f"<li>{e(x)}</li>" for x in sup["notes"]) + '</ul></div>')
 
     H.append('<div class="mut" style="margin-top:8px">Источники: прейскурант дилера и каталог запасных частей '
@@ -209,7 +244,7 @@ def main():
     OUT.mkdir(exist_ok=True)
     (OUT / "ТЕЛСМИТ-СОРСИНГ.html").write_text("\n".join(H), encoding="utf-8")
     print(f"HTML готов: {st['need_positions']} позиций, поставщиков {len(sup.get('suppliers', []))}, "
-          f"расшифровок кодов {len(sup.get('crossrefs', []))}, оценок цен {len(est)}")
+          f"расшифровок кодов {len(sup.get('crossrefs', []))}, оценок цен {len(est)}, сверок {len(recon)}")
 
 
 if __name__ == "__main__":
