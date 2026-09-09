@@ -68,6 +68,15 @@ def main():
         H.append('<div class="box warn"><b>Как искать эту машину.</b> ' + e(m["series_note"]) + ". "
                  + e(m.get("search_key", "")) + " " + e(m.get("status", "")) + "</div>")
 
+    if st.get("vibro_positions"):
+        H.append('<div class="box warn"><b>Потребность относится к двум разным машинам.</b> '
+                 + str(st["vibro_positions"]) + " позиций на "
+                 + f'{st["vibro_sum_rub"]/1e6:.1f}'.replace(".", ",")
+                 + " млн \u20bd принадлежат не дробилке, а вибровозбудителю питателя: это группы номеров "
+                 + "277-6xx и 18-xxxx. Подтверждено каталогом дистрибьютора Telsmith, где B1-18-1179 описана "
+                 + "как DRIVE GEAR 280H VIBRATING UNIT. Эти позиции закупаются у поставщиков вибрационного "
+                 + "оборудования, а не у изготовителей ЗИП дробилок, и в запросах их нужно разделять.</div>")
+
     # 1. Экономика потребности
     H.append('<h2>1. Из чего складывается потребность</h2>')
     H.append('<table><tr><th style="width:42%">Класс деталей</th><th class="num">Позиций</th>'
@@ -270,7 +279,8 @@ def main():
         H.append(f'<tr><td>{e(n["eid"])}</td><td><b>{e(n["oem"])}</b></td><td>{e(n["name"])[:60]}</td>'
                  f'<td>{e(n["node"])[:26]}</td><td class="num">{e(n["qty"])}</td>'
                  f'<td class="num">{rub(n["price_rub"])}</td>'
-                 f'<td class="num">{mln(n["sum_rub"])}</td><td>{e(n["pn_kind"])}</td></tr>')
+                 f'<td class="num">{mln(n["sum_rub"])}</td><td>{e(n["pn_kind"])}</td>'
+                 f'<td>{"питатель" if n.get("unit","").startswith("вибро") else "дробилка"}</td></tr>')
     H.append('</table>')
 
     if sup.get("notes"):

@@ -4,18 +4,18 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 172,
-    "total_bytes": 72330414,
+    "datasets": 173,
+    "total_bytes": 72929072,
     "by_sensitivity": {
       "конфиденциально": 53,
-      "внутреннее": 87,
+      "внутреннее": 88,
       "публикуемо": 32
     },
     "by_subproject": {
       "ГПУ-библиотека": 26,
       "ГТУ-библиотека": 30,
       "ОВЭ-75": 45,
-      "база ЗИП": 27,
+      "база ЗИП": 28,
       "база ЗИП · таможня": 18,
       "гидрометаллургия": 22,
       "дашборд сорсеров": 3,
@@ -880,6 +880,42 @@
       "referenced_by": []
     },
     {
+      "path": "zip/data/telsmith_crossrefs.json",
+      "subproject": "база ЗИП",
+      "bytes": 599926,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "angle_findings",
+        "crossrefs",
+        "verdicts"
+      ],
+      "main_collection": {
+        "key": "verdicts",
+        "records": 42,
+        "record_keys": [
+          "contacts_ok",
+          "covers_classes",
+          "name",
+          "real_production",
+          "recommend",
+          "risks",
+          "telsmith_experience",
+          "verdict"
+        ]
+      },
+      "last_change": null,
+      "last_author": null,
+      "last_commit": null,
+      "updated_by": "неизвестно",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
+    },
+    {
       "path": "gt/data/rfq_demand.json",
       "subproject": "ГТУ-библиотека",
       "bytes": 558136,
@@ -1268,7 +1304,7 @@
     {
       "path": "zip/data/telsmith_suppliers.json",
       "subproject": "база ЗИП",
-      "bytes": 358035,
+      "bytes": 346377,
       "note": "",
       "format": "json",
       "shape": "объект",
@@ -1282,7 +1318,7 @@
       ],
       "main_collection": {
         "key": "suppliers",
-        "records": 31,
+        "records": 59,
         "record_keys": [
           "city",
           "covers_classes",
@@ -1300,7 +1336,7 @@
       },
       "last_change": "2026-09-09",
       "last_author": "Claude",
-      "last_commit": "bbfd50a",
+      "last_commit": "0dfb3d6",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
@@ -1569,10 +1605,10 @@
           "scope"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-09",
+      "last_author": "Claude",
+      "last_commit": "0dfb3d6",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
         "markers": [
@@ -2019,6 +2055,48 @@
       ]
     },
     {
+      "path": "zip/data/telsmith_3858.json",
+      "subproject": "база ЗИП",
+      "bytes": 177150,
+      "note": "Реестр исследований ГШО по щековой дробилке Telsmith 3858 (38x58) рудника Таймырский: потребность 197 позиций на 198,6 млн ₽ с ценами действующего канала поставки и состав изделия — 414 строк каталога запасных частей в 20 узлах. Разбор — zip/tools/telsmith_parse.py из двух документов заказчика (дополнение к прейскуранту дилера и каталог запчастей); сами документы в репозиторий не кладутся. КОММЕРЧЕСКИ ЧУВСТВИТЕЛЬНО: содержит отпускные цены стороннего поставщика по договору с заказчиком.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "catalog",
+        "classes",
+        "machine",
+        "need",
+        "stats"
+      ],
+      "main_collection": {
+        "key": "catalog",
+        "records": 414,
+        "record_keys": [
+          "eid",
+          "name",
+          "node",
+          "oem",
+          "page",
+          "poz",
+          "qty"
+        ]
+      },
+      "last_change": "2026-09-09",
+      "last_author": "Claude",
+      "last_commit": "135f5e4",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "договорные цены контрагентов"
+        ]
+      },
+      "referenced_by": [
+        "zip/tools/telsmith_parse.py",
+        "zip/tools/telsmith_report.py"
+      ]
+    },
+    {
       "path": "ove/data/discrepancies.json",
       "subproject": "ОВЭ-75",
       "bytes": 173950,
@@ -2175,48 +2253,6 @@
       "referenced_by": [
         "ove/build.py",
         "ove/site/index.template.html"
-      ]
-    },
-    {
-      "path": "zip/data/telsmith_3858.json",
-      "subproject": "база ЗИП",
-      "bytes": 166760,
-      "note": "Реестр исследований ГШО по щековой дробилке Telsmith 3858 (38x58) рудника Таймырский: потребность 197 позиций на 198,6 млн ₽ с ценами действующего канала поставки и состав изделия — 414 строк каталога запасных частей в 20 узлах. Разбор — zip/tools/telsmith_parse.py из двух документов заказчика (дополнение к прейскуранту дилера и каталог запчастей); сами документы в репозиторий не кладутся. КОММЕРЧЕСКИ ЧУВСТВИТЕЛЬНО: содержит отпускные цены стороннего поставщика по договору с заказчиком.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "catalog",
-        "classes",
-        "machine",
-        "need",
-        "stats"
-      ],
-      "main_collection": {
-        "key": "catalog",
-        "records": 414,
-        "record_keys": [
-          "eid",
-          "name",
-          "node",
-          "oem",
-          "page",
-          "poz",
-          "qty"
-        ]
-      },
-      "last_change": "2026-09-09",
-      "last_author": "Claude",
-      "last_commit": "135f5e4",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "конфиденциально",
-        "markers": [
-          "договорные цены контрагентов"
-        ]
-      },
-      "referenced_by": [
-        "zip/tools/telsmith_parse.py",
-        "zip/tools/telsmith_report.py"
       ]
     },
     {

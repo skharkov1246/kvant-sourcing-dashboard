@@ -39,6 +39,11 @@ CLASSES = [
     ("прочее", "Прочее", r"."),
 ]
 
+# Принадлежность узлу. По каталогу дистрибьютора Telsmith группы 277-6xx и 18-xxxx описаны как
+# вибровозбудитель питателя (например, B1-18-1179 — «DRIVE GEAR 280H VIBRATING UNIT»), то есть эти
+# позиции относятся не к дробилке, а к смежной машине комплекса и закупаются у других поставщиков.
+RX_VIBRO = re.compile(r"-277-6\d\d|-18-1\d{3}")
+
 # Номер Telsmith двух видов: конструкционный (узел-деталь) и внутренний код покупного изделия.
 RX_STRUCT = re.compile(r"\b([A-Z]{1,3}\d?-\d{2,3}-\d{3,4}[A-Z]?)\b")
 RX_INNER = re.compile(r"\b(\d{2}[A-Z]\d{2})\b")
@@ -110,6 +115,7 @@ def main():
         n["node"] = p["node"] if p else ""
         n["in_catalog"] = bool(p)
         n["class"] = cls_of(n["name"])
+        n["unit"] = "вибровозбудитель питателя" if RX_VIBRO.search(n["oem"] or "") else "щековая дробилка 3858"
 
     groups = defaultdict(lambda: {"positions": 0, "sum_rub": 0})
     for n in need:
@@ -137,13 +143,19 @@ def main():
         "stats": {"need_positions": len(need),
                   "need_sum_rub": round(sum(n["sum_rub"] for n in need if isinstance(n["sum_rub"], (int, float))), 2),
                   "catalog_rows": len(parts), "catalog_nodes": len({p["node"] for p in parts if p["node"]}),
-                  "matched": sum(1 for n in need if n["in_catalog"])},
+                  "matched": sum(1 for n in need if n["in_catalog"]),
+                  "vibro_positions": sum(1 for n in need if n["unit"] != "щековая дробилка 3858"),
+                  "vibro_sum_rub": round(sum(n["sum_rub"] for n in need
+                                             if n["unit"] != "щековая дробилка 3858"
+                                             and isinstance(n["sum_rub"], (int, float))), 2)},
     }
     OUT.write_text(json.dumps(doc, ensure_ascii=False, indent=1), encoding="utf-8")
     s = doc["stats"]
     print(f"zip/data/telsmith_3858.json: потребность {s['need_positions']} поз. на "
           f"{s['need_sum_rub']:,.0f} ₽".replace(",", " ") +
           f" | каталог {s['catalog_rows']} строк в {s['catalog_nodes']} узлах | сопоставлено {s['matched']}")
+    print(f"  из них узел вибровозбудителя питателя (не дробилка): {s['vibro_positions']} поз. на "
+          f"{s['vibro_sum_rub']/1e6:.1f} млн ₽")
     for c in sorted(doc["classes"], key=lambda x: -x["sum_rub"]):
         print(f"  {c['positions']:3} поз. | {c['sum_rub']/1e6:7.1f} млн ₽ | {c['title']}")
 
