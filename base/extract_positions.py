@@ -169,10 +169,44 @@ JUNK_PN = re.compile(
     r"|\d{10}|\d{12,13}"               # ИНН и ОГРН
     r"|\d{4,5}-\d{2,4}"                # ГОСТ 33259-2015
     r"|\d{3}/\d{4}"                    # ТР ТС 010/2011
-    r"|\d{1,2}\.\d{1,2}\.?"            # пункт договора 12.3.
     r"|[78]\d{10}"                     # телефон
     r"|20\d\d|19\d\d"                  # год
     r")$")
+# Технический параметр по форме неотличим от артикула, и именно параметры лезут
+# в верх любого частотного отчёта: «0x0x0» стоял в 385 сделках, «230/400» в 34,
+# «7.2.9.» в 20. Настоящие коды запчастей сидят в хвосте, поэтому параметры надо
+# отсеивать по форме, иначе картина спроса переворачивается.
+PARAM_PN = [
+    re.compile(r"^\d+(?:\.\d+)+\.?$"),                   # пункт инструкции, версия
+    re.compile(r"^\d+(?:[.,]\d+)?\s*-\s*\d+(?:[.,]\d+)?$"),   # диапазон 0-1.6
+    re.compile(r"^\d+[xх*]\d+(?:[xх*]\d+)?$", re.I),      # габарит 100x200x30
+    re.compile(r"^IP\d{2}$", re.I),                        # степень защиты
+    re.compile(r"^\d+[A-Za-zА-Яа-я]{1,4}$"),               # 60days, 12mm
+    re.compile(r"^\d{2,4}/\d{2,4}$"),                      # напряжение 230/400
+    re.compile(r"^(?:DN|PN|ДУ|РУ)\s*\d+$", re.I),          # условный проход и давление
+    re.compile(r"^0+$"),
+]
+
+
+# Строки бланков: «Форма по ОКУД 0335001» неотличима от семизначного каталожного
+# номера, но встречается в двадцати сделках подряд — это шапка типовой формы М-15.
+FORM_LINE = re.compile(r"\b(ОКУД|ОКПО|ОКТМО|ОКАТО|Форма\s+по)\b", re.I)
+
+
+def junk_pn(tok: str) -> bool:
+    """Похоже ли на реквизит или технический параметр, а не на артикул."""
+    if JUNK_PN.match(tok):
+        return True
+    if any(p.match(tok) for p in PARAM_PN):
+        return True
+    if tok.isdigit():
+        # у кодов запчастей длина 6-12 знаков: «12000» — это количество или
+        # мощность, а круглое число никогда не бывает каталожным номером
+        if not (6 <= len(tok) <= 12):
+            return True
+        if re.fullmatch(r"\d+?0{3,}", tok):
+            return True
+    return False
 
 
 def _num(s: str) -> float | None:
@@ -231,6 +265,7 @@ def parse_cells(cells: list[str]) -> dict | None:
     # артикул: короткий токен без пробелов, с цифрами; запоминаем его ячейку,
     # иначе то же число уходит и в цену — каталожный номер превращается в рубли
     pn, pn_idx = None, -1
+    form_line = bool(FORM_LINE.search(joined))
     for i, c in enumerate(cells):
         tok = c.strip()
         if not (4 <= len(tok) <= 32) or DATEISH.match(tok) or tok.lower() in STOP:
@@ -241,7 +276,7 @@ def parse_cells(cells: list[str]) -> dict | None:
             continue
         if tok.replace(".", "").isdigit() and not (5 <= len(tok.replace(".", "")) <= 14):
             continue
-        if JUNK_PN.match(tok):                      # реквизиты и номера нормативов — не артикулы
+        if junk_pn(tok) or form_line:                # реквизиты, нормативы и параметры — не артикулы
             continue
         pn, pn_idx = tok, i
         break
@@ -299,9 +334,11 @@ def from_text(text: str) -> list[dict]:
         q = QTY_TXT.search(line)
         p = PRICE_TXT.search(line)
         pn = None
+        if FORM_LINE.search(line):
+            continue
         for m in PN_TXT.finditer(line):
             tok = m.group(1)
-            if DATEISH.match(tok) or tok.lower() in STOP or JUNK_PN.match(tok):
+            if DATEISH.match(tok) or tok.lower() in STOP or junk_pn(tok):
                 continue
             if sum(ch.isdigit() for ch in tok) >= 3:
                 pn = tok
