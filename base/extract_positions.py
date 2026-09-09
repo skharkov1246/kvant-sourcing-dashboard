@@ -71,7 +71,11 @@ def norm_cur(tok: str | None) -> str | None:
 # работаем, а не случайное латинское слово из строки.
 BRANDS: dict[str, str] = {}
 BRAND_RE: re.Pattern | None = None
-BRAND_STOP = {"новый", "прочее", "другое", "разные", "нет", "оригинал", "аналог", "россия"}
+# Марки, совпадающие с обычным словом спецификации. «Seal» дал 3 806 ложных
+# срабатываний на строках вида «LABYRINTH SEAL 200-R», «Total» — на итоговых
+# строках таблиц («Total EXW Price», «Итого»).
+BRAND_STOP = {"новый", "прочее", "другое", "разные", "нет", "оригинал", "аналог",
+              "россия", "seal", "total"}
 
 
 def _fold(s: str) -> str:
@@ -82,7 +86,7 @@ def _fold(s: str) -> str:
 
 def load_brands(con: sqlite3.Connection) -> None:
     global BRANDS, BRAND_RE
-    canon: dict[str, str] = {}
+    canon_by_key: dict[str, str] = {}
     for (b,) in con.execute("SELECT DISTINCT brand FROM deals WHERE brand IS NOT NULL AND brand<>''"):
         for part in re.split(r"[,;/]| и ", b):
             name = part.strip(" .«»\"'()")
@@ -90,10 +94,18 @@ def load_brands(con: sqlite3.Connection) -> None:
                 continue
             if not re.search(r"[A-Za-zа-яА-Я]{3}", name):
                 continue
-            canon[name] = name
-            folded = _fold(name)
-            if folded != name:
-                canon[folded] = name
+            # одна марка заведена в сделках и как «WILO», и как «Wilo»: в базу
+            # позиций должно попасть одно написание, иначе марка двоится
+            key = name.lower()
+            best = canon_by_key.get(key)
+            if best is None or (best.isupper() and not name.isupper()):
+                canon_by_key[key] = name
+    canon: dict[str, str] = {}
+    for name in canon_by_key.values():
+        canon[name] = name
+        folded = _fold(name)
+        if folded != name:
+            canon[folded] = name
     BRANDS = canon
     if canon:
         BRAND_RE = re.compile(r"(?<![A-Za-zа-яА-Я0-9])(" +
