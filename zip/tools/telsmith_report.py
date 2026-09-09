@@ -52,6 +52,7 @@ def main():
     fx = pr.get("fx_rub_usd")
     rec = load("telsmith_recon.json", {"items": [], "summary": ""})
     recon = {i["pn"]: i for i in rec.get("items", [])}
+    br = load("telsmith_brands.json", {"synth": {}, "brands": []})
     m, st = d["machine"], d["stats"]
     classes = {c["key"]: c for c in d["classes"]}
     need = d["need"]
@@ -62,6 +63,10 @@ def main():
 Потребность — {st['need_positions']} позиций на {st['need_sum_rub']/1e6:.1f} млн ₽ по действующему каналу ({m['channel']}).
 Состав изделия — {st['catalog_rows']} строк каталога в {st['catalog_nodes']} узлах, сопоставлено с потребностью {st['matched']} позиций.
 Цены — рубли без НДС, склад Норильск.</div>""")
+
+    if m.get("series_note"):
+        H.append('<div class="box warn"><b>Как искать эту машину.</b> ' + e(m["series_note"]) + ". "
+                 + e(m.get("search_key", "")) + " " + e(m.get("status", "")) + "</div>")
 
     # 1. Экономика потребности
     H.append('<h2>1. Из чего складывается потребность</h2>')
@@ -188,7 +193,20 @@ def main():
         H.append('</table>')
 
     # 3. Поставщики
-    H.append('<h2>5. Куда идти: изготовители аутмаркета</h2>')
+    # Каналы снабжения по итогам разбора марок
+    sy = br.get("synth") or {}
+    if sy.get("channels"):
+        H.append("<h2>5. Другие имена машины и каналы снабжения</h2>")
+        if sy.get("verdict"):
+            H.append('<div class="box">' + e(sy["verdict"]) + "</div>")
+        H.append('<table><tr><th style="width:22%">Канал</th><th style="width:34%">Что делать</th>'
+                 '<th style="width:22%">Что даёт</th><th>Риск</th></tr>')
+        for c in sy["channels"]:
+            H.append("<tr><td><b>" + e(c["channel"])[:150] + "</b></td><td>" + e(c["what_to_do"])[:420] + "</td>"
+                     + "<td>" + e(c["value"])[:240] + "</td><td>" + e(c["risk"])[:240] + "</td></tr>")
+        H.append("</table>")
+
+    H.append('<h2>6. Куда идти: изготовители аутмаркета</h2>')
     if not sup.get("suppliers"):
         H.append('<div class="box">Проверка поставщиков не выполнена — раздел пуст.</div>')
     else:
@@ -212,7 +230,7 @@ def main():
 
     # 4. Что запрашивать
     if sup.get("requests"):
-        H.append('<h2>6. Что запрашивать и как принимать</h2>')
+        H.append('<h2>7. Что запрашивать и как принимать</h2>')
         for blk in sup["requests"]:
             H.append(f'<h3>{e(blk["title"])}</h3><div class="box"><b>Запрос:</b><ul>'
                      + "".join(f"<li>{e(x)}</li>" for x in blk.get("request", [])) + '</ul>')
@@ -221,7 +239,7 @@ def main():
             H.append('</div>')
 
     # 5. Позиции первой волны
-    H.append('<h2>7. Позиции для первого запроса</h2>')
+    H.append('<h2>8. Позиции для первого запроса</h2>')
     first = sorted([n for n in need if isinstance(n["sum_rub"], (int, float))],
                    key=lambda x: -x["sum_rub"])[:24]
     H.append('<table><tr><th>Element ID</th><th>Номер Telsmith</th><th style="width:34%">Наименование</th>'
@@ -235,7 +253,7 @@ def main():
     H.append('</table>')
 
     if sup.get("notes"):
-        H.append('<h2>8. Замечания по рынку</h2><div class="box"><ul>'
+        H.append('<h2>9. Замечания по рынку</h2><div class="box"><ul>'
                  + "".join(f"<li>{e(x)}</li>" for x in sup["notes"]) + '</ul></div>')
 
     H.append('<div class="mut" style="margin-top:8px">Источники: прейскурант дилера и каталог запасных частей '

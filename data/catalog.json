@@ -4,18 +4,18 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 170,
-    "total_bytes": 71750289,
+    "datasets": 171,
+    "total_bytes": 71904822,
     "by_sensitivity": {
       "конфиденциально": 52,
-      "внутреннее": 86,
+      "внутреннее": 87,
       "публикуемо": 32
     },
     "by_subproject": {
       "ГПУ-библиотека": 26,
       "ГТУ-библиотека": 30,
       "ОВЭ-75": 45,
-      "база ЗИП": 25,
+      "база ЗИП": 26,
       "база ЗИП · таможня": 18,
       "гидрометаллургия": 22,
       "дашборд сорсеров": 3,
@@ -1253,10 +1253,10 @@
           "method"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-09",
+      "last_author": "Claude",
+      "last_commit": "bbfd50a",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -1877,10 +1877,10 @@
           "telsmith_pn"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-09",
+      "last_author": "Claude",
+      "last_commit": "bbfd50a",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
         "markers": [
@@ -2137,7 +2137,7 @@
     {
       "path": "zip/data/telsmith_3858.json",
       "subproject": "база ЗИП",
-      "bytes": 165688,
+      "bytes": 166760,
       "note": "Реестр исследований ГШО по щековой дробилке Telsmith 3858 (38x58) рудника Таймырский: потребность 197 позиций на 198,6 млн ₽ с ценами действующего канала поставки и состав изделия — 414 строк каталога запасных частей в 20 узлах. Разбор — zip/tools/telsmith_parse.py из двух документов заказчика (дополнение к прейскуранту дилера и каталог запчастей); сами документы в репозиторий не кладутся. КОММЕРЧЕСКИ ЧУВСТВИТЕЛЬНО: содержит отпускные цены стороннего поставщика по договору с заказчиком.",
       "format": "json",
       "shape": "объект",
@@ -2212,6 +2212,38 @@
       "referenced_by": [
         "gt/tools/build_lm6000.py",
         "gt/tools/drop_ru.py"
+      ]
+    },
+    {
+      "path": "zip/data/telsmith_brands.json",
+      "subproject": "база ЗИП",
+      "bytes": 153461,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "brands",
+        "synth"
+      ],
+      "main_collection": {
+        "key": "brands",
+        "records": 4,
+        "record_keys": [
+          "identities",
+          "notes",
+          "scope"
+        ]
+      },
+      "last_change": null,
+      "last_author": null,
+      "last_commit": null,
+      "updated_by": "неизвестно",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "zip/tools/telsmith_report.py"
       ]
     },
     {
