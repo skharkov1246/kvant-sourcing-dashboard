@@ -101,6 +101,43 @@ def text_docx(b: bytes) -> tuple[str, int]:
     return "\n".join(out), len(d.paragraphs)
 
 
+def text_xls(b: bytes) -> tuple[str, int]:
+    """Старый .xls (OLE2). Таких в корпусе больше тысячи — раньше все шли в «пусто»."""
+    import xlrd
+    wb = xlrd.open_workbook(file_contents=b)
+    out, n = [], 0
+    for ws in wb.sheets():
+        n += 1
+        out.append(f"### лист: {ws.name}")
+        for i in range(ws.nrows):
+            cells = [str(c.value).strip() for c in ws.row(i) if str(c.value).strip()]
+            if cells:
+                out.append(" | ".join(cells))
+            if sum(len(x) for x in out) > MAX_CHARS:
+                break
+        if sum(len(x) for x in out) > MAX_CHARS:
+            break
+    return "\n".join(out), n
+
+
+def text_doc(b: bytes) -> str:
+    """Старый .doc — через antiword/catdoc: чистого разбора OLE-Word в Python нет."""
+    import shutil
+    import subprocess
+    import tempfile
+    tool = shutil.which("antiword") or shutil.which("catdoc")
+    if not tool:
+        return ""
+    with tempfile.NamedTemporaryFile(suffix=".doc", delete=True) as f:
+        f.write(b)
+        f.flush()
+        try:
+            r = subprocess.run([tool, f.name], capture_output=True, timeout=60)
+            return r.stdout.decode("utf-8", "ignore")
+        except Exception:
+            return ""
+
+
 def extract(b: bytes, name: str) -> tuple[str, int, str]:
     """(текст, число страниц/листов, вид). Пустой текст — не ошибка: бывают сканы."""
     kind = sniff(b)
@@ -118,6 +155,15 @@ def extract(b: bytes, name: str) -> tuple[str, int, str]:
                 t, n = text_docx(b)
                 return _clean(t), n, "docx"
             return "", 0, "zip"
+        if kind == "ole":
+            try:
+                t, n = text_xls(b)
+                if t.strip():
+                    return _clean(t), n, "xls"
+            except Exception:
+                pass
+            t = text_doc(b)
+            return (_clean(t), 0, "doc") if t.strip() else ("", 0, "ole")
         if kind == "html":
             return _clean(re.sub(r"(?is)<(script|style)[^>]*>.*?</\1>|<[^>]+>", " ", b.decode("utf-8", "ignore"))), 0, "html"
         if kind == "other" and ext in ("txt", "csv", "xml", "json", "eml"):
