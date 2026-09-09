@@ -207,6 +207,7 @@ def main():
         H.append("</table>")
 
     H.append('<h2>6. Куда идти: изготовители аутмаркета</h2>')
+
     if not sup.get("suppliers"):
         H.append('<div class="box">Проверка поставщиков не выполнена — раздел пуст.</div>')
     else:
@@ -228,9 +229,29 @@ def main():
                 H.append(f'<div class="box warn"><b>{e(s["name"])[:60]} — на что смотреть:</b><ul>'
                          + "".join(f"<li>{e(r)}</li>" for r in s["risks"][:5]) + '</ul></div>')
 
+    # Работа без чертежей
+    if sup.get("plan"):
+        pl = sup["plan"]
+        H.append("<h2>7. Работа без чертежей: что делать по каждому классу</h2>")
+        if pl.get("summary"):
+            H.append('<div class="box">' + e(pl["summary"]) + "</div>")
+        for c in pl.get("classes", []):
+            bad = "нет" in (c.get("feasible") or "").lower()[:4]
+            H.append('<div class="box' + (" warn" if bad else "") + '"><b>' + e(c["cls"])[:110]
+                     + " — " + e(c["feasible"])[:120] + "</b><br>" + e(c["route"])[:900])
+            if c.get("critical_dims"):
+                H.append("<br><b>Критичные размеры:</b><ul>"
+                         + "".join("<li>" + e(x)[:260] + "</li>" for x in c["critical_dims"][:5]) + "</ul>")
+            if c.get("forgiving_dims"):
+                H.append("<b>Допускают отклонение:</b> " + e("; ".join(c["forgiving_dims"]))[:400])
+            if c.get("ask_supplier"):
+                H.append("<br><b>Спросить у поставщика:</b><ul>"
+                         + "".join("<li>" + e(x)[:260] + "</li>" for x in c["ask_supplier"][:5]) + "</ul>")
+            H.append("<br><b>Риск:</b> " + e(c.get("risk", ""))[:400] + "</div>")
+
     # 4. Что запрашивать
     if sup.get("requests"):
-        H.append('<h2>7. Что запрашивать и как принимать</h2>')
+        H.append('<h2>8. Что запрашивать и как принимать</h2>')
         for blk in sup["requests"]:
             H.append(f'<h3>{e(blk["title"])}</h3><div class="box"><b>Запрос:</b><ul>'
                      + "".join(f"<li>{e(x)}</li>" for x in blk.get("request", [])) + '</ul>')
@@ -239,7 +260,7 @@ def main():
             H.append('</div>')
 
     # 5. Позиции первой волны
-    H.append('<h2>8. Позиции для первого запроса</h2>')
+    H.append('<h2>9. Позиции для первого запроса</h2>')
     first = sorted([n for n in need if isinstance(n["sum_rub"], (int, float))],
                    key=lambda x: -x["sum_rub"])[:24]
     H.append('<table><tr><th>Element ID</th><th>Номер Telsmith</th><th style="width:34%">Наименование</th>'
@@ -253,7 +274,7 @@ def main():
     H.append('</table>')
 
     if sup.get("notes"):
-        H.append('<h2>9. Замечания по рынку</h2><div class="box"><ul>'
+        H.append('<h2>10. Замечания по рынку</h2><div class="box"><ul>'
                  + "".join(f"<li>{e(x)}</li>" for x in sup["notes"]) + '</ul></div>')
 
     H.append('<div class="mut" style="margin-top:8px">Источники: прейскурант дилера и каталог запасных частей '

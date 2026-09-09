@@ -4,10 +4,10 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 171,
-    "total_bytes": 71904822,
+    "datasets": 172,
+    "total_bytes": 72330414,
     "by_sensitivity": {
-      "конфиденциально": 52,
+      "конфиденциально": 53,
       "внутреннее": 87,
       "публикуемо": 32
     },
@@ -15,7 +15,7 @@
       "ГПУ-библиотека": 26,
       "ГТУ-библиотека": 30,
       "ОВЭ-75": 45,
-      "база ЗИП": 26,
+      "база ЗИП": 27,
       "база ЗИП · таможня": 18,
       "гидрометаллургия": 22,
       "дашборд сорсеров": 3,
@@ -1266,6 +1266,54 @@
       ]
     },
     {
+      "path": "zip/data/telsmith_suppliers.json",
+      "subproject": "база ЗИП",
+      "bytes": 358035,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "crossrefs",
+        "generated",
+        "geom",
+        "notes",
+        "plan",
+        "suppliers"
+      ],
+      "main_collection": {
+        "key": "suppliers",
+        "records": 31,
+        "record_keys": [
+          "city",
+          "covers_classes",
+          "email",
+          "evidence",
+          "kind",
+          "name",
+          "phone",
+          "production",
+          "recommend",
+          "risks",
+          "site",
+          "whatsapp"
+        ]
+      },
+      "last_change": "2026-09-09",
+      "last_author": "Claude",
+      "last_commit": "bbfd50a",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "адреса электронной почты",
+          "телефоны"
+        ]
+      },
+      "referenced_by": [
+        "zip/tools/telsmith_report.py"
+      ]
+    },
+    {
       "path": "zip/data/bearing_sites_cn.json",
       "subproject": "база ЗИП",
       "bytes": 323230,
@@ -1499,6 +1547,40 @@
         "ove/build.py",
         "ove/site/index.template.html"
       ]
+    },
+    {
+      "path": "zip/data/telsmith_nodrawings.json",
+      "subproject": "база ЗИП",
+      "bytes": 257274,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "geom",
+        "made",
+        "plan"
+      ],
+      "main_collection": {
+        "key": "made",
+        "records": 3,
+        "record_keys": [
+          "companies",
+          "notes",
+          "scope"
+        ]
+      },
+      "last_change": null,
+      "last_author": null,
+      "last_commit": null,
+      "updated_by": "неизвестно",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "адреса электронной почты",
+          "телефоны"
+        ]
+      },
+      "referenced_by": []
     },
     {
       "path": "data/budget_snapshot.json",
@@ -1854,45 +1936,6 @@
       ]
     },
     {
-      "path": "zip/data/telsmith_suppliers.json",
-      "subproject": "база ЗИП",
-      "bytes": 189717,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "crossrefs",
-        "generated",
-        "notes",
-        "suppliers"
-      ],
-      "main_collection": {
-        "key": "crossrefs",
-        "records": 22,
-        "record_keys": [
-          "confidence",
-          "evidence_url",
-          "real_maker",
-          "real_pn",
-          "telsmith_pn"
-        ]
-      },
-      "last_change": "2026-09-09",
-      "last_author": "Claude",
-      "last_commit": "bbfd50a",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "конфиденциально",
-        "markers": [
-          "адреса электронной почты",
-          "телефоны"
-        ]
-      },
-      "referenced_by": [
-        "zip/tools/telsmith_report.py"
-      ]
-    },
-    {
       "path": "gidromet/data/marshruty.json",
       "subproject": "гидрометаллургия",
       "bytes": 187050,
@@ -2163,7 +2206,7 @@
       },
       "last_change": "2026-09-09",
       "last_author": "Claude",
-      "last_commit": "f038365",
+      "last_commit": "135f5e4",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
@@ -2234,10 +2277,10 @@
           "scope"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-09",
+      "last_author": "Claude",
+      "last_commit": "135f5e4",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
