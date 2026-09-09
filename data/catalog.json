@@ -4,18 +4,18 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 167,
-    "total_bytes": 70924175,
+    "datasets": 168,
+    "total_bytes": 71198114,
     "by_sensitivity": {
       "конфиденциально": 51,
-      "внутреннее": 84,
+      "внутреннее": 85,
       "публикуемо": 32
     },
     "by_subproject": {
       "ГПУ-библиотека": 26,
       "ГТУ-библиотека": 30,
       "ОВЭ-75": 45,
-      "база ЗИП": 22,
+      "база ЗИП": 23,
       "база ЗИП · таможня": 18,
       "гидрометаллургия": 22,
       "дашборд сорсеров": 3,
@@ -1327,6 +1327,46 @@
       ]
     },
     {
+      "path": "zip/data/telsmith_recon.json",
+      "subproject": "база ЗИП",
+      "bytes": 273939,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "generated",
+        "items",
+        "legs",
+        "method",
+        "summary"
+      ],
+      "main_collection": {
+        "key": "items",
+        "records": 38,
+        "record_keys": [
+          "bottom_up_usd",
+          "converges",
+          "dig",
+          "name",
+          "pn",
+          "spread",
+          "take_usd",
+          "top_down_usd"
+        ]
+      },
+      "last_change": null,
+      "last_author": null,
+      "last_commit": null,
+      "updated_by": "неизвестно",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "zip/tools/telsmith_report.py"
+      ]
+    },
+    {
       "path": "zip/customs/out/customs_848120_2024-01-01_2024-12-31.json",
       "subproject": "база ЗИП · таможня",
       "bytes": 262883,
@@ -2047,17 +2087,20 @@
           "qty"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-09",
+      "last_author": "Claude",
+      "last_commit": "f038365",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
         "markers": [
           "договорные цены контрагентов"
         ]
       },
-      "referenced_by": []
+      "referenced_by": [
+        "zip/tools/telsmith_parse.py",
+        "zip/tools/telsmith_report.py"
+      ]
     },
     {
       "path": "gt/data/lm6000.json",
@@ -6609,9 +6652,9 @@
         "zip/data/supplier_crm.json",
         "zip/data/telsmith_3858.json"
       ],
-      "last_change": "2026-09-07",
+      "last_change": "2026-09-09",
       "last_author": "Claude",
-      "last_commit": "7716da9",
+      "last_commit": "f038365",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
