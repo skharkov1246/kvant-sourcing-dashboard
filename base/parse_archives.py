@@ -38,6 +38,12 @@ from fetch_files import CHUNK, extract, filename_from
 
 warnings.filterwarnings("ignore")          # pypdf шумит на каждый нестандартный шрифт
 
+def safe(s: str) -> str:
+    """Строка, которую примет SQLite: имена внутри архивов и текст из битых
+    кодировок содержат одиночные суррогаты, и на них падает вся запись."""
+    return (s or "").encode("utf-8", "ignore").decode("utf-8", "ignore")
+
+
 MEMBER_EXT = {"xlsx", "xls", "docx", "doc", "pdf", "csv", "txt", "xlsm", "rtf"}
 MAX_MEMBERS = 60          # больше в одном архиве — это фотоотчёт, а не спецификация
 MAX_MEMBER_BYTES = 80_000_000
@@ -213,9 +219,11 @@ def run(db_path: str, limit: int | None = None, workers: int = 6) -> dict:
         if not parsed:
             empty += 1
             continue
+        name = safe(name)
         got_text = 0
         for idx, (mname, text, pages, ext) in enumerate(parsed):
             mlen = sizes[idx] if idx < len(sizes) else 0
+            mname, text = safe(mname), safe(text)
             sub = f"{fid}#{idx}"
             con.execute("INSERT OR REPLACE INTO files VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                         (sub, int(deal), field, fname, f"{name} :: {mname}"[:250], ext, mlen,
@@ -230,7 +238,12 @@ def run(db_path: str, limit: int | None = None, workers: int = 6) -> dict:
                             (f"{mname}\n{text[:CHUNK * 3]}", sub, int(deal)))
         if got_text:
             ok += 1
-        con.commit()
+        try:
+            con.commit()
+        except Exception as e:                 # один битый документ не должен рушить прогон
+            err += 1
+            con.rollback()
+            print(f"  ! запись не прошла ({type(e).__name__}), архив пропущен", flush=True)
         if n % 20 == 0:
             sp = n / max(time.time() - t0, 1)
             print(f"  {n}/{len(rows)} · с текстом {ok} · пусто {empty} · ошибок {err} · "

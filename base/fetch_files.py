@@ -36,7 +36,10 @@ _NL = re.compile(r"\n{3,}")
 
 
 def _clean(s: str) -> str:
-    s = _WS.sub(" ", s or "")
+    # Разбор битых кодировок оставляет одиночные суррогаты (\udcXX): такой текст
+    # SQLite сохранить не может и роняет весь прогон. Выбрасываем их сразу.
+    s = (s or "").encode("utf-8", "ignore").decode("utf-8", "ignore")
+    s = _WS.sub(" ", s)
     return _NL.sub("\n\n", s).strip()
 
 
