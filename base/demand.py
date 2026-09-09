@@ -35,6 +35,46 @@ STOPW = {"поз", "позиция", "шт", "штук", "компл", "ндс",
          "the", "and", "for", "with", "или", "тип", "type", "pcs", "ea", "set"}
 MIN_TOKENS = 2
 TOP = 60
+MIN_DECIDED = 5         # меньше решённых сделок — конверсия по позиции ничего не значит
+
+# Сегмент определяется по самой позиции, а не по сделке: в одной карточке
+# «Запчасти для ПДМ» соседствуют насос, гидроцилиндр и подшипник, и сегмент
+# сделки не говорит, на чём именно мы выиграли или проиграли.
+SEGMENTS = {
+    "Насосы": ["насос", "pump", "рабочее колесо", "impeller", "торцевое уплотнение",
+               "flowserve", "grundfos", "wilo", "sulzer", "ksb", "цнс", "шламов"],
+    "Компрессоры и пневматика": ["компрессор", "compressor", "воздуходув", "ресивер",
+                                 "пневмо", "осушител", "atlas copco", "kaeser", "boge"],
+    "Горно-шахтное": ["перфоратор", "буров", "коронк", "штанга бурил", "пдм", "погрузочно-доставочн",
+                      "epiroc", "sandvik", "tamrock", "normet", "boomer", "simba", "проходческ"],
+    "Двигатели и генераторы": ["двигател", "engine", "генератор", "generator", "дизел",
+                               "cummins", "caterpillar", "мотор", "гду", "гдг"],
+    "Турбины": ["турбин", "turbine", "гту", "solar turbines", "nuovo pignone", "камера сгорания"],
+    "Дробление и обогащение": ["дробилк", "мельниц", "грохот", "флотац", "гидроциклон",
+                               "футеровк", "metso", "outotec", "конвейер", "питател"],
+    "Трубопроводная арматура": ["задвижк", "затвор", "клапан", "кран шаров", "вентиль",
+                                "арматур", "фланц", "valve", "фитинг"],
+    "Электротехника и КИП": ["трансформатор", "кру", "ктп", "частотн", "датчик", "sensor",
+                             "преобразовател", "контроллер", "реле", "кабел", "siemens",
+                             "rosemount", "автоматическ выключател"],
+    "Подшипники и трансмиссия": ["подшипник", "bearing", "редуктор", "муфта", "цепь приводная",
+                                 "ремень", "шкив", "вал", "skf", "timken", "flender"],
+    "Гидравлика": ["гидроцилиндр", "гидромотор", "гидронасос", "гидрораспределител", "рукав высокого",
+                   "hydraulic", "гидравлическ"],
+    "Фильтрация и уплотнения": ["фильтр", "filter", "фильтроэлемент", "уплотнен", "манжет",
+                                "прокладк", "сальник", "seal kit", "ремкомплект"],
+}
+SEG_RE = [(name, re.compile("|".join(re.escape(w) for w in words), re.I))
+          for name, words in SEGMENTS.items()]
+
+
+def segment_of(text: str) -> str | None:
+    """Сегмент оборудования по наименованию и марке."""
+    s = text or ""
+    for name, rx in SEG_RE:
+        if rx.search(s):
+            return name
+    return None
 
 # В спецификации соседствуют строки трёх сортов: сама номенклатура, атрибуты
 # позиции («Базовая единица измерения: ШТ», «Overall Package Size:») и пункты
@@ -98,8 +138,14 @@ def norm_name(s: str) -> str:
 
 
 def load(con: sqlite3.Connection) -> list[tuple]:
+    # Исход сделки: победа — карточка переехала в «Реализацию» (won), проигрыш —
+    # закрыта без победы, остальное ещё в работе и в конверсию не идёт: иначе
+    # свежая номенклатура выглядит провальной просто потому, что не доиграна.
     return con.execute("""SELECT p.deal_id, p.part_number, p.name, p.manufacturer, p.price,
-                                 p.currency, f.field_name, d.company, d.won, d.seg
+                                 p.currency, f.field_name, d.company, d.won, d.seg,
+                                 CASE WHEN d.won THEN 'win'
+                                      WHEN d.closed='Y' THEN 'loss'
+                                      ELSE 'work' END
                           FROM positions p
                           LEFT JOIN files f ON f.fid = p.fid
                           LEFT JOIN deals d ON d.id = p.deal_id""").fetchall()
@@ -116,11 +162,13 @@ def run(db_path: str, out_path: str) -> dict:
     maker_of: dict[str, Counter] = defaultdict(Counter)
     buyers_of: dict[str, set[str]] = defaultdict(set)
     wins_of: dict[str, set[int]] = defaultdict(set)
+    losses_of: dict[str, set[int]] = defaultdict(set)
+    seg_of: dict[str, Counter] = defaultdict(Counter)
     priced_of: Counter = Counter()
     kind_of: dict[str, str] = {}
     skipped: Counter = Counter()
 
-    for deal, pn, name, maker, price, _cur, field, company, won, _seg in rows:
+    for deal, pn, name, maker, price, _cur, field, company, won, seg, outcome in rows:
         if pn and junk_pn(pn):
             pn = None                        # параметр, а не каталожный номер
         key = ("pn:" + pn) if pn else ("nm:" + norm_name(name))
@@ -139,17 +187,27 @@ def run(db_path: str, out_path: str) -> dict:
             maker_of[key][maker] += 1
         if company:
             buyers_of[key].add(company)
-        if won:
+        if outcome == "win":
             wins_of[key].add(int(deal or 0))
+        elif outcome == "loss":
+            losses_of[key].add(int(deal or 0))
+        item_seg = segment_of(f"{name or ''} {maker or ''}")
+        if item_seg:
+            seg_of[key][item_seg] += 1
         if price is not None:
             priced_of[key] += 1
 
     def entry(key: str) -> dict:
         makers = maker_of[key].most_common(1)
+        segs = seg_of[key].most_common(1)
+        win, loss = len(wins_of[key]), len(losses_of[key])
+        decided = win + loss
         return {"key": key, "kind": kind_of[key], "code": key[3:] if key.startswith("pn:") else None,
                 "label": label_of[key], "deals": len(deals_of[key]), "lines": lines_of[key],
-                "buyers": len(buyers_of[key]), "wins": len(wins_of[key]),
-                "priced": priced_of[key], "maker": makers[0][0] if makers else None}
+                "buyers": len(buyers_of[key]), "wins": win, "losses": loss,
+                "decided": decided, "rate": round(100 * win / decided, 1) if decided else None,
+                "priced": priced_of[key], "maker": makers[0][0] if makers else None,
+                "seg": segs[0][0] if segs else None}
 
     ranked = sorted(deals_of, key=lambda k: (-len(deals_of[k]), -lines_of[k]))
     by_freq = Counter(len(v) for v in deals_of.values())
@@ -168,7 +226,44 @@ def run(db_path: str, out_path: str) -> dict:
     for _d, _pn, _n, _m, _p, _c, field, *_ in rows:
         field_lines[field or "—"] += 1
 
+    decided_items = [entry(k) for k in deals_of if len(wins_of[k]) + len(losses_of[k]) >= MIN_DECIDED]
+    winners = sorted((e for e in decided_items if e["rate"]), key=lambda e: (-e["rate"], -e["decided"]))
+    losers = sorted((e for e in decided_items if e["rate"] == 0.0),
+                    key=lambda e: (-e["decided"], -e["lines"]))
+
+    # исход по производителю и по сегменту оборудования
+    def outcome_by(bucket: dict[str, set[str]]) -> list[dict]:
+        res = []
+        for name, keys in bucket.items():
+            win = set().union(*(wins_of[k] for k in keys)) if keys else set()
+            loss = set().union(*(losses_of[k] for k in keys)) if keys else set()
+            decided = len(win) + len(loss)
+            if decided < MIN_DECIDED:
+                continue
+            res.append({"name": name, "items": len(keys), "wins": len(win), "losses": len(loss),
+                        "decided": decided, "rate": round(100 * len(win) / decided, 1)})
+        return sorted(res, key=lambda r: -r["decided"])
+
+    by_maker: dict[str, set[str]] = defaultdict(set)
+    for key, cnt in maker_of.items():
+        for m in cnt:
+            by_maker[m].add(key)
+    by_seg: dict[str, set[str]] = defaultdict(set)
+    for key, cnt in seg_of.items():
+        for s in cnt:
+            by_seg[s].add(key)
+
+    all_win = len({d for s in wins_of.values() for d in s})
+    all_loss = len({d for s in losses_of.values() for d in s})
+
     out = {
+        "base_rate": round(100 * all_win / (all_win + all_loss), 1) if (all_win + all_loss) else None,
+        "deals_with_items": {"wins": all_win, "losses": all_loss},
+        "items_decided": len(decided_items),
+        "best_items": winners[:TOP],
+        "zero_win_items": losers[:TOP],
+        "outcome_by_maker": outcome_by(by_maker)[:40],
+        "outcome_by_segment": outcome_by(by_seg)[:20],
         "positions_rows": len(rows),
         "skipped_rows": dict(skipped),
         "unique_items": len(deals_of),
@@ -197,11 +292,30 @@ def main() -> int:
           f"{sum(st['skipped_rows'].values())}, разных позиций {st['unique_items']}, "
           f"из них с каталожным номером {st['with_code']}, "
           f"встречались ровно в одной сделке {st['one_deal_only']}")
+    print(f"базовая конверсия по сделкам с номенклатурой: {st['base_rate']} % "
+          f"({st['deals_with_items']['wins']} побед против "
+          f"{st['deals_with_items']['losses']} проигрышей)")
+
     print("\nчаще всего запрашивают:")
     for e in st["top_items"][:12]:
         code = f" · {e['code']}" if e["code"] else ""
         maker = f" · {e['maker']}" if e["maker"] else ""
-        print(f"  {e['deals']:3} сделок · {e['buyers']:2} заказчиков{code}{maker} · {e['label'][:52]}")
+        res = f" · {e['wins']}/{e['decided']}" if e["decided"] else " · нет решённых"
+        print(f"  {e['deals']:3} сделок{res}{code}{maker} · {e['label'][:44]}")
+
+    print(f"\nвыигрываем чаще всего (от {st['items_decided']} позиций с решёнными сделками):")
+    for e in st["best_items"][:10]:
+        print(f"  {e['rate']:5.1f} % · {e['wins']}/{e['decided']} · "
+              f"{(e['code'] or e['maker'] or '—')[:16]:16} {e['label'][:44]}")
+
+    print("\nни одной победы при пяти и более решённых сделках:")
+    for e in st["zero_win_items"][:10]:
+        print(f"  0 из {e['decided']:3} · {(e['code'] or e['maker'] or '—')[:16]:16} {e['label'][:48]}")
+
+    print("\nисход по производителю:")
+    for m in st["outcome_by_maker"][:12]:
+        print(f"  {m['rate']:5.1f} % · {m['wins']:4}/{m['decided']:4} решённых · "
+              f"{m['items']:5} позиций · {m['name'][:28]}")
     return 0
 
 
