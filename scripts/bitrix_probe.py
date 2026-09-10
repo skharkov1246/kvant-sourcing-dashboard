@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Зонд v38: сплошная выгрузка и разбор файлов по запросам поставщикам (СП-166).
+"""Зонд v39: сплошная выгрузка и разбор файлов по запросам поставщикам (СП-166).
 
 ЗАЧЕМ. Сорсинг утверждает, что по сделке на 2,5 млрд прокотированы все позиции и на
 всё есть живое КП. По стадиям воронки это не подтверждается. Но стадия — отметка
@@ -14,13 +14,12 @@
  4. Качает каждый файл. Способ выбран по замеру v35: годится только urlMachine —
     url отдаёт страницу входа, disk.file.get на этих объектах ошибается.
  5. Разбирает xlsx / xls / docx / pdf: артикул, наименование, количество, цена, срок.
- 6. Считает покрытие строк заказчика. Спецификация заказчика подшита к каждому
-    запросу, поэтому пустая её копия из ответов исключается — но заполненная ценами
-    считается КП, потому что поставщики часто отвечают именно так. Отдельно даётся
-    оценка без допущений: артикулы с ценой по всем вложениям без разбора происхождения.
+ 6. Считает покрытие строк заказчика и показывает, ЧЕЙ документ его даёт: в тех же
+    вложениях лежат наше исходящее ТКП и бюджет заказчика, и по одним числам их от
+    ответа поставщика не отличить.
 
-КУДА РЕЗУЛЬТАТ. Репозиторий публичный, поэтому коммерческое содержимое в журнал не
-печатается: только агрегаты. Построчный разбор выгружается по флагу PROBE_SEAL=1 —
+КУДА РЕЗУЛЬТАТ. Репозиторий публичный, поэтому цены в журнал не печатаются: только
+агрегаты и метаданные запросов. Построчный разбор выгружается по флагу PROBE_SEAL=1 —
 сжатым и зашифрованным на открытый ключ scripts/probe_pubkey.pem.
 """
 from __future__ import annotations
@@ -228,7 +227,7 @@ def items_from_rows(rows: list[list[str]]) -> list[dict]:
 def items_from_text(text: str) -> list[dict]:
     """Из PDF и docx таблица приходит строками. Цену берём как последнее денежное
     число строки — в КП цена почти всегда в конце, после наименования и количества."""
-    money = re.compile(r"(?<![\w.-])\d{1,3}(?:[  ]?\d{3})*(?:[.,]\d{1,2})?(?![\w-])")
+    money = re.compile(r"(?<![\w.-])\d{1,3}(?:[  ]?\d{3})*(?:[.,]\d{1,2})?(?![\w-])")
     out: list[dict] = []
     for ln in text.splitlines():
         ln = ln.strip()
@@ -264,22 +263,19 @@ def main() -> None:
         sys.exit(1)
     subprocess.run([sys.executable, "-m", "pip", "install", "-q", "pypdf", "xlrd==1.2.0"],
                    check=False)
-    # pypdf сыплет предупреждениями о шрифтах на каждый PDF — они забивают журнал.
     for nm in ("pypdf", "pypdf._cmap", "pypdf.generic", "pypdf._reader"):
         logging.getLogger(nm).setLevel(logging.ERROR)
 
     bx = BitrixClient(wh)
     sess = requests.Session()
 
-    print("=== Зонд v38: файлы по запросам поставщикам — выгрузка и разбор ===")
+    print("=== Зонд v39: файлы по запросам поставщикам — выгрузка, разбор, атрибуция ===")
     print(f"период с {PERIOD_FROM}\n", flush=True)
 
-    # --- поля СП-166
     fl = bx.call("crm.item.fields", {"entityTypeId": SPA}) or {}
     fields = fl.get("fields") or {}
     ffields = [n for n, m in fields.items() if str(m.get("type")) == "file"]
 
-    # --- все запросы периода
     sel = ["id", "title", "stageId", "parentId2", "createdTime", "assignedById"] + ffields
     items = bx.list_items(SPA, filter={">=createdTime": PERIOD_FROM}, select=sel)
     stages = bx.spa_stages(SPA, 24)
@@ -306,13 +302,11 @@ def main() -> None:
 
     ours_ids = [k for k, v in recs.items() if v["ours"]]
     kp_ids = [k for k in ours_ids if recs[k]["kp"]]
-    our_deal_ids = [k for k in ours_ids if recs[k]["deal"] in OUR_DEALS]
-    print(f"по нашей номенклатуре / сделкам: {len(ours_ids)} · из них с КП: {len(kp_ids)} · "
-          f"на наших восьми сделках: {len(our_deal_ids)}", flush=True)
-    n_field = sum(len(recs[k]["files"]) for k in ours_ids)
-    print(f"файлов в полях записей (по нашим): {n_field}", flush=True)
+    print(f"по нашей номенклатуре / сделкам: {len(ours_ids)} · из них с КП: {len(kp_ids)}",
+          flush=True)
+    print(f"файлов в полях записей (по нашим): "
+          f"{sum(len(recs[k]['files']) for k in ours_ids)}", flush=True)
 
-    # --- дела и письма таймлайна
     def pull_acts(f: dict) -> list[dict]:
         out: list[dict] = []
         last = 0
@@ -348,28 +342,21 @@ def main() -> None:
 
     order = kp_ids + [k for k in ours_ids if k not in set(kp_ids)]
     acts = activities(SPA, order)
-    prov: Counter = Counter()
     n_act = 0
     for a in acts:
         fs = a.get("FILES") or []
         if isinstance(fs, dict):
             fs = list(fs.values())
         oid = str(a.get("OWNER_ID"))
-        with_f = 0
         for fo in fs:
             if isinstance(fo, dict) and fo.get("urlMachine") and oid in recs:
                 recs[oid]["files"].append({"src": f"таймлайн запроса/{a.get('PROVIDER_ID')}",
                                            "fo": fo})
                 n_act += 1
-                with_f += 1
-        prov[str(a.get("PROVIDER_ID"))] += 1
-    print(f"дел/писем в таймлайне запросов: {len(acts)} · файлов из них: {n_act}")
-    print(f"  по типам дел: {dict(prov.most_common(8))}", flush=True)
+    print(f"дел/писем в таймлайне запросов: {len(acts)} · файлов из них: {n_act}", flush=True)
 
-    # --- письма таймлайна наших сделок (КП часто приходят на сделку, не на запрос)
     deal_files: list[dict] = []
     dacts = activities(2, sorted(OUR_DEALS))
-    dprov: Counter = Counter()
     for a in dacts:
         fs = a.get("FILES") or []
         if isinstance(fs, dict):
@@ -378,11 +365,9 @@ def main() -> None:
             if isinstance(fo, dict) and fo.get("urlMachine"):
                 deal_files.append({"deal": str(a.get("OWNER_ID")), "prov": str(a.get("PROVIDER_ID")),
                                    "subj": str(a.get("SUBJECT") or "")[:120], "fo": fo})
-        dprov[str(a.get("PROVIDER_ID"))] += 1
-    print(f"дел/писем в таймлайне наших сделок: {len(dacts)} · файлов из них: {len(deal_files)}")
-    print(f"  по типам дел: {dict(dprov.most_common(8))}", flush=True)
+    print(f"дел/писем в таймлайне наших сделок: {len(dacts)} · файлов из них: {len(deal_files)}",
+          flush=True)
 
-    # --- очередь на скачивание
     queue: list[dict] = []
     for k in ours_ids:
         for f in recs[k]["files"]:
@@ -403,7 +388,6 @@ def main() -> None:
     print(f"\nуникальных файлов в очереди: {len(queue)} (из них по запросам с КП: "
           f"{sum(1 for q in queue if q['kp'])})\n", flush=True)
 
-    # --- скачивание и разбор
     stat: Counter = Counter()
     parsed: list[dict] = []
     done = [0]
@@ -461,12 +445,7 @@ def main() -> None:
     print(f"\nскачано файлов: {len(parsed)} · из них документы: {len(real)} · "
           f"разобрано с позициями: {len(withit)}")
     print(f"позиций извлечено всего: {sum(len(p['items']) for p in withit)}")
-    byk = Counter("с КП" if p["kp"] else ("сделка" if p["kp"] is None else "без КП") for p in real)
-    print(f"документы по источнику запроса: {dict(byk)}")
-    srcs = Counter(p["src"] for p in real)
-    print(f"документы по месту хранения: {dict(srcs)}")
 
-    # --- покрытие строк заказчика
     def pnset(doc: dict) -> set[str]:
         return {p for p in (norm_pn(i.get("pn")) for i in doc.get("items") or []) if len(p) >= 5}
 
@@ -477,11 +456,11 @@ def main() -> None:
             d["_npriced"] = sum(1 for i in (d.get("items") or []) if i.get("price"))
         tot_i = sum(d["_ni"] for d in real)
         tot_p = sum(d["_npriced"] for d in real)
-        docs_with_price = sum(1 for d in real if d["_npriced"])
-        print(f"\n--- ПРОВЕРКА РАЗБОРА ЦЕН ---")
+        print("\n--- ПРОВЕРКА РАЗБОРА ЦЕН ---")
         print(f"  позиций с распознанной ценой : {tot_p} из {tot_i}"
               f" ({100 * tot_p / max(1, tot_i):.1f}%)")
-        print(f"  документов, где цена нашлась : {docs_with_price} из {len(real)}")
+        print(f"  документов, где цена нашлась : {sum(1 for d in real if d['_npriced'])}"
+              f" из {len(real)}")
 
         cand = sorted([d for d in real if d["req"] is None or str(d["deal"]) in OUR_DEALS],
                       key=lambda d: -len(d["_pns"]))
@@ -496,20 +475,12 @@ def main() -> None:
                 continue
             used.add(sig)
             uniq_cand.append(d)
-        print("\n--- КАНДИДАТЫ В СПЕЦИФИКАЦИЮ ЗАКАЗЧИКА (копии свёрнуты) ---")
-        for d in uniq_cand[:8]:
-            print(f"  {len(d['_pns']):>5} арт. · сделка {d['deal']:>6} · {d['kind']:9} · "
-                  f"{d['size']:>8} б · с ценой строк: {d['_npriced']:>5} · "
-                  f"подшит к запросам: {sigs[(d['size'], len(d['_pns']))]}")
 
         rfq: set[str] = uniq_cand[0]["_pns"] if uniq_cand else set()
 
         def overlap(d: dict) -> float:
             return len(d["_pns"] & rfq) / len(d["_pns"]) if d["_pns"] else 0.0
 
-        # Поставщик часто отвечает, проставляя цены в нашу же спецификацию: такой
-        # документ — КП, а не копия. Пустой копией считаем только то, что совпадает с
-        # эталоном И цен практически не содержит.
         for d in real:
             d["_copy"] = overlap(d) > 0.6 and d["_npriced"] < max(1, 0.05 * d["_ni"])
         copies = [d for d in real if d["_copy"]]
@@ -524,8 +495,6 @@ def main() -> None:
                 p = norm_pn(i.get("pn"))
                 if len(p) >= 5 and i.get("price"):
                     quoted_priced.add(p)
-
-        # Оценка без допущений: цена у артикула есть хоть в каком вложении.
         priced_any: set[str] = set()
         for d in real:
             for i in d.get("items") or []:
@@ -540,20 +509,29 @@ def main() -> None:
         print(f"  пустых копий нашей спецификации        : {len(copies)}")
         print(f"  наша спецификация, заполненная ценами  : {len(filled)}")
         print(f"  ответов поставщиков (запросы с КП)     : {len(supplier_docs)}")
-        print(f"  артикулов в ответах поставщиков        : {len(quoted)}")
         print(f"  из эталона встречается в ответах       : {len(rfq & quoted)}"
               f"  = {100 * len(rfq & quoted) / n:.1f}%")
         print(f"  из эталона имеет цену в ответах        : {len(rfq & quoted_priced)}"
               f"  = {100 * len(rfq & quoted_priced) / n:.1f}%")
         print(f"  из эталона имеет цену В ЛЮБОМ вложении : {len(rfq & priced_any)}"
-              f"  = {100 * len(rfq & priced_any) / n:.1f}%   (верхняя оценка, без допущений)")
+              f"  = {100 * len(rfq & priced_any) / n:.1f}%")
+
+        # Главное: чей это документ. Наше исходящее ТКП и бюджет заказчика дают такое же
+        # пересечение с эталоном, как ответ поставщика, — по числам их не отличить.
+        print("\n--- ЧЕЙ ДОКУМЕНТ: ТОП-18 ПО ВКЛАДУ В ПОКРЫТИЕ ---")
+        for d in sorted(real, key=lambda x: -len(x["_pns"] & rfq))[:18]:
+            r = recs.get(str(d["req"])) if d["req"] else None
+            title = (r or {}).get("title") or f"(вложение сделки: {d.get('subj', '')})"
+            stage = (r or {}).get("stage", "—")
+            print(f"  {len(d['_pns'] & rfq):>4} из эталона · цен {d['_npriced']:>4} · "
+                  f"{d['kind']:9} {d['size']:>9} б · сд.{d['deal']:>6} · "
+                  f"{'КОПИЯ ' if d['_copy'] else 'ответ '} · {stage[:16]:16} · {title[:58]}")
     except Exception as e:
         print(f"\nсопоставление не выполнено: {type(e).__name__}: {e}")
 
-    # --- построчный разбор наружу: только по флагу PROBE_SEAL=1
     if not os.getenv("PROBE_SEAL"):
         print("\n(построчный разбор не выгружался: PROBE_SEAL не задан)")
-        print("\n✓ зонд v38 завершён")
+        print("\n✓ зонд v39 завершён")
         return
 
     for d in real:
@@ -582,7 +560,7 @@ def main() -> None:
     for i in range(0, len(b64), 4000):
         print(b64[i:i + 4000])
     print("-----KVANT END-----")
-    print("\n✓ зонд v38 завершён")
+    print("\n✓ зонд v39 завершён")
 
 
 if __name__ == "__main__":
