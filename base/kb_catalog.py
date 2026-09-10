@@ -72,6 +72,17 @@ def med(vals: list[float]) -> float | None:
     return round(statistics.median(vals), 2) if vals else None
 
 
+def quartiles(vals: list[float]) -> tuple[float | None, float | None]:
+    """Четверти цены. Крайним значениям по артикулу верить нельзя: у 24 %
+    артикулов с четырьмя и более ценами максимум выше медианы в десять раз, у
+    14 % — в сто. Это не рынок, а разбор: в колонку цены попала сумма по
+    позиции, количество или код. Четверти показывают, почём берут обычно."""
+    if len(vals) < 4:
+        return (min(vals), max(vals)) if vals else (None, None)
+    q = statistics.quantiles(sorted(vals), n=4)
+    return round(q[0], 2), round(q[2], 2)
+
+
 def run(db_path: str) -> dict:
     con = sqlite3.connect(db_path, timeout=300)
     con.execute("PRAGMA busy_timeout=300000")
@@ -92,7 +103,9 @@ def run(db_path: str) -> dict:
         last_seen  TEXT,
         cur        TEXT,              -- валюта, в которой чаще всего дана цена
         price_min  REAL,
+        price_p25  REAL,        -- нижняя четверть: обычная цена, без выбросов
         price_med  REAL,
+        price_p75  REAL,        -- верхняя четверть
         price_max  REAL,
         price_n    INTEGER,           -- по скольким ценам посчитано
         sup_med    REAL,              -- медиана цены поставщика
@@ -195,12 +208,13 @@ def run(db_path: str) -> dict:
             a["seg"].most_common(1)[0][0] if a["seg"] else None,
             a["n"], len(a["docs"]), len(a["deals"]), len(a["won"]), len(a["lost"]),
             min(a["dates"]) if a["dates"] else None, max(a["dates"]) if a["dates"] else None,
-            cur, pr[0] if pr else None, med(pr), pr[-1] if pr else None, len(pr),
+            cur, pr[0] if pr else None, quartiles(pr)[0], med(pr), quartiles(pr)[1],
+            pr[-1] if pr else None, len(pr),
             sup, our, round(statistics.median(ratios[k]), 2) if ratios.get(k) else None,
             round(a["qty"], 2),
             ", ".join(s for s, _ in a["suppliers"].most_common(5)),
             ", ".join(c for c, _ in a["customers"].most_common(5))))
-    con.executemany(f"INSERT OR REPLACE INTO catalog_items VALUES ({','.join('?'*23)})", rows)
+    con.executemany(f"INSERT OR REPLACE INTO catalog_items VALUES ({','.join('?'*25)})", rows)
     con.execute("CREATE INDEX IF NOT EXISTS ix_cat_brand ON catalog_items(brand)")
     con.execute("CREATE INDEX IF NOT EXISTS ix_cat_pn ON catalog_items(pn)")
     con.commit()

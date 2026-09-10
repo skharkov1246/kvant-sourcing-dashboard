@@ -90,9 +90,12 @@ def show(c: dict) -> None:
     print(f"  сегмент: {seg}    просили в {it['deals']} сделках "
           f"(выиграно {it['won']}, проиграно {it['lost']})    последний раз {it['last_seen'] or '—'}")
     if it["price_med"]:
-        line = (f"  цена: медиана {it['price_med']:,.0f} {it['cur']}"
-                f"  край {it['price_min']:,.0f}–{it['price_max']:,.0f}  по {it['price_n']} ценам")
-        print(line.replace(",", " "))
+        # показываем четверти, а не край: максимум по артикулу почти всегда
+        # выброс разбора — сумма по позиции или количество, попавшее в цену
+        band = (f"  обычно {it['price_p25']:,.0f}–{it['price_p75']:,.0f}"
+                if it["price_p25"] and it["price_p75"] else "")
+        print((f"  цена: медиана {it['price_med']:,.0f} {it['cur']}{band}"
+               f"  по {it['price_n']} ценам").replace(",", " "))
     if it["sup_med"] and it["our_med"]:
         print(f"  поставщик {it['sup_med']:,.0f} → мы {it['our_med']:,.0f} {it['cur']}"
               .replace(",", " ") + (f"   наценка ×{it['markup']}" if it["markup"] else ""))
