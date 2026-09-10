@@ -28,17 +28,25 @@ TOP = 8000          # столько строк вшивается в стран
 
 def build(db_path: str, top: int) -> str:
     con = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True, timeout=300)
+    # к строке справочника подтягивается самый дешёвый поставщик: это первое,
+    # что спрашивают, открыв артикул
     rows = con.execute("""
-        SELECT pn, brand, name, seg, mentions, deals, won, lost, cur,
-               price_min, price_med, price_max, sup_med, our_med, markup,
-               suppliers, customers, last_seen
-        FROM catalog_items ORDER BY mentions DESC LIMIT ?""", (top,)).fetchall()
+        WITH best AS (
+          SELECT pn_key, supplier, price_med, cur,
+                 row_number() OVER (PARTITION BY pn_key ORDER BY price_med) rn
+          FROM supplier_prices WHERE price_med > 0)
+        SELECT c.pn, c.brand, c.name, c.seg, c.mentions, c.deals, c.won, c.lost, c.cur,
+               c.price_min, c.price_med, c.price_max, c.sup_med, c.our_med, c.markup,
+               b.supplier, c.customers, c.last_seen, b.price_med, b.cur
+        FROM catalog_items c
+        LEFT JOIN best b ON b.pn_key = c.pn_key AND b.rn = 1
+        ORDER BY c.deals DESC, c.mentions DESC LIMIT ?""", (top,)).fetchall()
     total = con.execute("SELECT count(*) FROM catalog_items").fetchone()[0]
     priced = con.execute("SELECT count(*) FROM catalog_items WHERE price_med IS NOT NULL").fetchone()[0]
     con.close()
 
     data = [[r[0], r[1] or "", (r[2] or "")[:70], r[3] or "", r[4], r[5], r[6], r[7],
-             r[8] or "", r[10], r[12], r[13], r[14], (r[15] or "")[:60], (r[16] or "")[:60], r[17] or ""]
+             r[8] or "", r[10], r[12], r[13], r[14], (r[15] or "")[:44], r[18], r[19] or ""]
             for r in rows]
     css = CSS.read_text(encoding="utf-8")
     payload = json.dumps(data, ensure_ascii=False, separators=(",", ":"))
@@ -69,11 +77,13 @@ tr.w td.res{{color:var(--good)}} tr.l td.res{{color:var(--critical)}}
 <div class="tablewrap"><table>
 <thead><tr><th>артикул</th><th>марка</th><th>наименование</th><th class="r">просили</th>
 <th class="r">сделок</th><th class="r">исход</th><th>вал.</th><th class="r">медиана</th>
-<th class="r">поставщик</th><th class="r">мы</th><th class="r">наценка</th><th>кто предлагал</th></tr></thead>
+<th class="r">поставщик</th><th class="r">мы</th><th class="r">наценка</th>
+<th>дешевле всех</th><th class="r">его цена</th></tr></thead>
 <tbody id="t"></tbody></table></div>
 <p class="note">Медиана — по всем ценам этого артикула в документах; «поставщик» и «мы» —
 медианы по офертам поставщиков и нашим предложениям. Наценка считается только там, где
-есть обе цены в одной валюте. Показаны {len(data)} самых частых артикулов из {total}.</p>
+есть обе цены в одной валюте. «Дешевле всех» — поставщик с наименьшей медианной ценой
+по его офертам. Показаны {len(data)} артикулов с наибольшим числом сделок из {total}.</p>
 </section>
 <footer>Собрано base/kb_catalog.py из base/kvant.db. Полная выгрузка — base/export_kb.py.</footer>
 </div>
@@ -87,7 +97,8 @@ function draw(list){{
     return `<tr class="${{cls}}"><td class="pn">${{r[0]}}</td><td>${{r[1]}}</td><td>${{r[2]}}</td>`+
       `<td class="r">${{r[4]}}</td><td class="r">${{r[5]}}</td><td class="r res">${{r[6]}}/${{r[7]}}</td>`+
       `<td>${{r[8]}}</td><td class="r">${{fmt(r[9])}}</td><td class="r">${{fmt(r[10])}}</td>`+
-      `<td class="r">${{fmt(r[11])}}</td><td class="r">${{r[12]?r[12]+'×':''}}</td><td>${{r[13]}}</td></tr>`;
+      `<td class="r">${{fmt(r[11])}}</td><td class="r">${{r[12]?r[12]+'×':''}}</td>`+
+      `<td>${{r[13]}}</td><td class="r">${{fmt(r[14])}} ${{r[15]}}</td></tr>`;
   }}).join('');
   cnt.textContent=`найдено ${{list.length}}` + (list.length>300?', показаны первые 300':'');
 }}

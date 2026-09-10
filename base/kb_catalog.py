@@ -18,6 +18,10 @@
 колонку цены попала сумма по позиции или курс валюты, и одно такое значение
 перекашивает среднее в разы.
 
+Рядом строится supplier_prices — строка на пару «артикул + поставщик»: у кого
+этот артикул вообще брали и почём. Справочник отвечает «сколько стоит», эта
+таблица — «у кого дешевле», а расчёт предложения начинается со второго вопроса.
+
     python base/kb_catalog.py --db base/kvant.db
 """
 from __future__ import annotations
@@ -191,6 +195,51 @@ def run(db_path: str) -> dict:
     con.execute("CREATE INDEX IF NOT EXISTS ix_cat_pn ON catalog_items(pn)")
     con.commit()
 
+    # ── кто и почём предлагал: строка на пару «артикул + поставщик»
+    # Без этой таблицы справочник отвечает «сколько стоит», но не отвечает
+    # «у кого дешевле» — а расчёт предложения начинается со второго вопроса.
+    con.executescript("""
+      DROP TABLE IF EXISTS supplier_prices;
+      CREATE TABLE supplier_prices (
+        pn_key   TEXT, pn TEXT, brand TEXT, supplier TEXT, cur TEXT,
+        price_med REAL, price_min REAL, price_n INTEGER,
+        first_seen TEXT, last_seen TEXT, deals INTEGER, won INTEGER
+      );
+    """)
+    sp: dict[tuple, dict] = defaultdict(lambda: {"p": [], "d": set(), "w": set(), "dates": []})
+    rows_sp = con.execute("""
+        SELECT p.part_number, p.manufacturer, c.supplier, p.price, p.currency, p.deal_id, p.name
+        FROM positions p JOIN file_cards c ON c.fid = p.fid
+        WHERE p.part_number IS NOT NULL AND p.price IS NOT NULL
+          AND c.side='поставщик' AND c.supplier IS NOT NULL AND c.supplier<>''""")
+    for pn, brand, supplier, price, cur, did, name in rows_sp:
+        k = key_of(pn)
+        # те же отсевы, что и в справочнике: без них в таблицу цен попадают
+        # сроки поставки («2-3weeks») и строки бланка закупки
+        if not k or BAD_PN.match(pn.strip()) or (name and FORM_ROW.search(name)):
+            continue
+        if not cur or not (0 < price < 1e9):
+            continue
+        e = sp[(k, supplier, cur)]
+        e["p"].append(price)
+        e.setdefault("pn", pn.strip())
+        e.setdefault("brand", brand)
+        if did:
+            e["d"].add(did)
+            if deal.get(did, (None, None, None, None))[1] == 1:
+                e["w"].add(did)
+            dc = deal.get(did, (None, None, None, None))[2]
+            if dc:
+                e["dates"].append(dc)
+    con.executemany(f"INSERT INTO supplier_prices VALUES ({','.join('?'*12)})", [
+        (k, e.get("pn"), e.get("brand"), supplier, cur, med(e["p"]), min(e["p"]), len(e["p"]),
+         min(e["dates"]) if e["dates"] else None, max(e["dates"]) if e["dates"] else None,
+         len(e["d"]), len(e["w"]))
+        for (k, supplier, cur), e in sp.items()])
+    con.execute("CREATE INDEX IF NOT EXISTS ix_sp_pn ON supplier_prices(pn_key)")
+    con.execute("CREATE INDEX IF NOT EXISTS ix_sp_sup ON supplier_prices(supplier)")
+    con.commit()
+
     q = lambda s: con.execute(s).fetchone()[0]      # noqa: E731
     out = {
         "items": len(rows),
@@ -198,12 +247,17 @@ def run(db_path: str) -> dict:
         "with_brand": q("SELECT count(*) FROM catalog_items WHERE brand IS NOT NULL"),
         "repeat": q("SELECT count(*) FROM catalog_items WHERE deals>1"),
         "with_markup": q("SELECT count(*) FROM catalog_items WHERE markup IS NOT NULL"),
+        "sup_prices": q("SELECT count(*) FROM supplier_prices"),
+        "sup_multi": q("""SELECT count(*) FROM (SELECT pn_key FROM supplier_prices
+                          GROUP BY pn_key HAVING count(DISTINCT supplier)>1)"""),
     }
     print(f"артикулов в справочнике: {out['items']}", flush=True)
     print(f"  с ценой:            {out['with_price']}", flush=True)
     print(f"  с маркой:           {out['with_brand']}", flush=True)
     print(f"  просили не раз:     {out['repeat']}", flush=True)
     print(f"  с наценкой:         {out['with_markup']}", flush=True)
+    print(f"цен поставщиков:      {out['sup_prices']} "
+          f"(артикулов с двумя и более поставщиками: {out['sup_multi']})", flush=True)
     con.close()
     return out
 

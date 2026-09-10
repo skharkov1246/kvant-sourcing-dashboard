@@ -213,6 +213,36 @@ def build(db_path: str) -> str:
     worst = "; ".join(fmt_br(r) for r in ranked[:4])
     best = "; ".join(fmt_br(r) for r in ranked[-4:][::-1])
 
+    # ── у кого дешевле: артикулы, где цену дали несколько поставщиков
+    # Разброс выше двадцатикратного — это не разница в цене, а разъехавшийся
+    # разбор: в одной оферте цена за штуку, в другой сумма по позиции. Такие
+    # пары в счёт не идут, иначе медиана разброса уходит в тысячи.
+    multi = q("""
+        WITH s AS (SELECT pn_key, max(pn) pn, max(brand) br, cur,
+                          count(DISTINCT supplier) n, min(price_med) lo, max(price_med) hi,
+                          sum(deals) dl
+                   FROM supplier_prices WHERE price_med > 0
+                   GROUP BY pn_key, cur HAVING n > 1)
+        SELECT pn, br, cur, n, lo, hi, round(hi/lo, 1), dl
+        FROM s WHERE lo > 10 AND hi/lo <= 20 ORDER BY dl DESC, n DESC LIMIT 15""")
+    multi_t = table(["артикул", "марка", "вал.", "поставщиков", "дешевле всех", "дороже всех",
+                     "разброс", "сделок"],
+                    [[f'<span class="code">{h(pn)}</span>', h(br or ""), h(cu), num(n),
+                      num(lo), num(hi), f"×{sp:g}", num(dl)]
+                     for pn, br, cu, n, lo, hi, sp, dl in multi], {3, 4, 5, 6, 7})
+    sp_rows = one("SELECT count(*) FROM supplier_prices")
+    sp_pn = one("SELECT count(DISTINCT pn_key) FROM supplier_prices")
+    sp_multi = one("""SELECT count(*) FROM (SELECT pn_key FROM supplier_prices
+                      GROUP BY pn_key HAVING count(DISTINCT supplier)>1)""")
+    spreads = [r[0] for r in q("""SELECT hi/lo FROM
+                       (SELECT min(price_med) lo, max(price_med) hi FROM supplier_prices
+                        WHERE price_med>10 GROUP BY pn_key, cur
+                        HAVING count(DISTINCT supplier)>1)
+                       WHERE hi/lo <= 20 ORDER BY hi/lo""")]
+    # медиана, а не среднее: пара сорвавшихся строк тянет среднее в разы
+    sp_spread = f"{spreads[len(spreads)//2]:.1f}" if spreads else "—"
+    sp_cmp = len(spreads)
+
     offers = one("SELECT count(*) FROM file_cards WHERE kind='оферта'")
     off_priced = one("SELECT count(*) FROM file_cards WHERE kind='оферта' AND priced>0")
     tender = one("SELECT count(*) FROM file_cards WHERE kind='тендер'")
@@ -230,6 +260,11 @@ def build(db_path: str) -> str:
          "Закономерность одна и та же: где чаще находится оферта поставщика, там и побед "
          "больше. По маркам из первого списка либо нужен канал к оригиналу, либо такие "
          "запросы честнее отдавать в отказ сразу, не тратя расчёт."),
+        (f"Разброс цен поставщиков ×{sp_spread} — это и есть маржа, которую сейчас не выбирают",
+         f"У {num(sp_cmp)} артикулов есть сравнимые цены от двух и более поставщиков, и между "
+         f"самым дешёвым и самым дорогим медианно ×{sp_spread}. Пока расчёт делается по первой "
+         "пришедшей оферте, эта разница остаётся у поставщика. Таблица supplier_prices "
+         "отвечает на вопрос «у кого этот артикул дешевле» за один запрос."),
         ("Цены поставщиков лежат в " + num(offers) + " офертах, разобрано " + pct(off_priced, offers or 1),
          f"Из {num(offers)} документов-оферт цену удалось снять с {num(off_priced)}. "
          "Остальные — сканы и картинки в письмах: их читает OCR, но таблицу он не восстанавливает. "
@@ -327,6 +362,18 @@ def build(db_path: str) -> str:
 <p>Двадцать марок, вокруг которых больше всего сделок. Доля побед считается от сделок
 с известным исходом.</p>
 {br_t}
+</section>
+
+<section><h2>У кого дешевле</h2>
+<p class="lead">Из оферт собрано {num(sp_rows)} цен поставщиков на {num(sp_pn)} артикулов.
+У {num(sp_multi)} артикулов цену дали два поставщика и больше; из них {num(sp_cmp)} сравнимы —
+цены отличаются не больше чем в двадцать раз. Медианный разброс между самым дешёвым
+и самым дорогим — <strong>×{sp_spread}</strong>.</p>
+{multi_t}
+<p class="note">Цена — медиана по офертам этого поставщика на этот артикул, в валюте оферты.
+Разброс считается внутри одной валюты, чтобы это была разница в цене, а не в курсе. Пары,
+где цены расходятся больше чем в двадцать раз, отброшены: это не разница в цене, а разбор,
+где у одного поставщика взята цена за штуку, а у другого сумма по позиции.</p>
 </section>
 
 <section><h2>Что решает исход</h2>

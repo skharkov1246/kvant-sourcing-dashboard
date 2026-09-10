@@ -9,6 +9,7 @@
 Выгружаются семь наборов:
   files      — карточка на документ (что за файл, чей, о чём)   file_cards.py
   catalog    — справочник оборудования: артикул, цены, поставщики kb_catalog.py
+  supplier_prices — цены поставщиков по артикулам: у кого дешевле kb_catalog.py
   positions  — номенклатура из документов с ценами и марками     extract_positions.py
   deals      — сделки с исходом, суммой и сегментом
   rfq        — запросы поставщикам (смарт-процесс 166)
@@ -50,6 +51,8 @@ EXPORTS: list[tuple[str, str, str]] = [
      "Карточка документа: род, сторона, язык, даты, ИНН, номенклатура. Ключ — sha1 содержимого"),
     ("catalog", """SELECT * FROM catalog_items""",
      "Справочник оборудования: артикул → марка, цены, поставщики, исходы сделок"),
+    ("supplier_prices", """SELECT * FROM supplier_prices""",
+     "Цены поставщиков по артикулам: у кого брали и почём"),
     ("positions", """
         SELECT p.id, p.deal_id, p.fid, p.seg, p.part_number, p.manufacturer, p.name,
                p.qty, p.unit, p.price, p.currency, p.price_total, p.source,
@@ -128,6 +131,11 @@ def run(db_path: str, out_dir: str) -> dict:
         copy.append(f"\\copy {tbl} FROM PROGRAM 'zcat kb_{name}.csv.gz' CSV HEADER")
         print(f"  {tbl:16} {n:>9} строк", flush=True)
 
+    ddl += ["", "-- ключи: у карточки документа это содержимое, у справочника — артикул"]
+    if "files" in stat:
+        ddl.append("ALTER TABLE kb_files ADD PRIMARY KEY (sha1);")
+    if "catalog" in stat:
+        ddl.append("ALTER TABLE kb_catalog ADD PRIMARY KEY (pn_key);")
     ddl += ["", "-- индексы под обычные вопросы к базе"]
     ddl += [
         "CREATE INDEX IF NOT EXISTS ix_files_kind ON kb_files(kind);",

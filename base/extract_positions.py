@@ -14,7 +14,8 @@
     самый большой ресурс корпуса: 4 979 разобранных PDF на 31 тыс. страниц,
     из которых прежняя версия не доставала ни одной позиции.
 
-Дубли: 46 % вложений — копии одного файла, поэтому обрабатывается один файл
+Дубли: 32 % разобранных вложений — копии одного файла (27 940 из 87 485),
+поэтому обрабатывается один файл
 на каждый sha1, а позиции привязываются ко всем сделкам, где эта копия лежит.
 
     python base/extract_positions.py --db base/kvant.db
@@ -430,7 +431,7 @@ def run(db_path: str, limit: int | None = None) -> dict:
     con.execute("DELETE FROM positions")
     load_brands(con)
     print(f"брендов в словаре: {len(BRANDS)}", flush=True)
-    # один файл на каждый sha1: 46 % вложений — копии
+    # один файл на каждый sha1: копией является каждый третий
     marks = ",".join("?" * len(GOOD_FIELDS))
     files = con.execute(f"""SELECT MIN(f.fid), f.sha1, f.ext, group_concat(DISTINCT f.deal_id)
                             FROM files f
