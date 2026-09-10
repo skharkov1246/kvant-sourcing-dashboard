@@ -1,181 +1,227 @@
-"""CI-зонд: все запросы СП-166 по нашей номенклатуре за период — где реально есть КП.
+#!/usr/bin/env python3
+"""Зонд v35: где лежат файлы КП по запросам поставщикам (СП-166) и как их достать.
 
-Вопрос владельца (10.09.2026): сорсинг говорит, что по теме прокотировано всё.
-Первый зонд смотрел только сделки со словом «Энергосети» и нашёл 197 запросов,
-из них с КП 30. Но запросы по этой же номенклатуре могли идти вне этих сделок —
-отдельными сделками, общими RFQ по брендам, без привязки к родителю.
+Владелец: «выгружай все файлы в рамках запросов поставщиков — проверь всё, что мы
+получали». Прежде чем качать тысячи вложений, нужно точно знать ДВА факта:
 
-Этот зонд снимает ограничение по сделке: тянет ВСЕ записи СП-166 за период
-и размечает их по брендам из двух наших листов (ЛУКОЙЛ-Энергосети 1561 строка
-и ЛУКОЙЛ-НВН 528 строк). Отвечает: сколько запросов по теме, в каких стадиях,
-по каким сделкам, кому слали и сколько КП реально получено.
+  1) где у запроса СП-166 живут файлы — в полях записи, в комментариях таймлайна
+     или во вложениях писем (activity);
+  2) какой способ скачивания реально отдаёт файл, а не страницу входа.
 
-Стадии Selected / Not Selected / Price at Work = КП от поставщика получено.
-Отказ в КП / Ответ не получен / Не подошло по технике = нет.
+Зонд v34 показал, что ссылки show_file.php отдают страницу входа при любой подстановке
+ключа, а «рабочий» способ uf.php вернул 83 байта на всех двадцати файлах — то есть
+заглушку, а не файл. Поэтому здесь проверяются все пути разом на небольшой выборке,
+и по каждому печатается, что именно пришло: размер и сигнатура содержимого.
 
-Печатает сводку в лог Actions. Секреты не выводит.
-Запуск: Actions → Bitrix probe → Run workflow (ветка с этой версией скрипта).
+Ничего не скачивается массово и ничего коммерческого в лог не идёт: только имена полей,
+типы файлов, размеры и признак «файл/не файл». Репозиторий публичный.
 """
 from __future__ import annotations
 
 import os
 import sys
-from collections import Counter, defaultdict
+from collections import Counter
 from pathlib import Path
+
+import requests
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from bitrix_client import BitrixClient  # noqa: E402
-from config import SPA_ENTITY_TYPE_ID, Settings  # noqa: E402
 
-PERIOD_FROM = os.getenv("PROBE_FROM", "2026-01-01")
-
-# бренды из листов Энергосети и НВН — по ним размечаем «наша тема»
-TOPICS = {
-    "Solar/Taurus": ["solar", "солар", "taurus", "тауру", "centaur", "titan 130", "mars 100"],
-    "Siemens SGT": ["siemens", "сименс", "sgt", "simatic", "siprotec", "profibus"],
-    "Cummins/ГПЭС": ["cummins", "камминз", "камминс", "qsk", "qsv", "kta", "газопоршн", "гпэс", "гпу"],
-    "Jenbacher/INNIO": ["jenbacher", "енбахер", "innio", "мwm", "mwm"],
-    "Bently Nevada": ["bently", "бентли", "proximit", "3500"],
-    "Fleetguard/фильтры": ["fleetguard", "флитгард", "af25", "lf9", "wf20", "фильтр"],
-    "ABB": ["abb", "асс800", "acs800", "acs880"],
-    "Буровое НВН": ["drillmec", "дриллмек", "nov ", "national oilwell", "tesco", "shaffer",
-                    "bentec", "превентор", "bop", "верхний привод", "top drive", "вибросито"],
-    "SLB/Cameron": ["schlumberger", "cameron", "камерон", "swaco", "vetco", "fmc"],
-    "КИП/автоматика": ["pepperl", "det-tronics", "det tronics", "allen bradley", "wago",
-                       "weidmuller", "harting", "balluff", "баллуф", "scancon", "semikron",
-                       "woodward", "comat", "releco", "auma", "asco", "danfoss", "wandfluh"],
-    "Насосы": ["bornemann", "marflex", "ingersoll", "pedrollo", "pompetravaini", "grundfos"],
-    "ЛУКОЙЛ (прямо)": ["лукойл", "lukoil", "нвн", "нижневолж", "энергосет", "л-эс", "л-нвн"],
-}
+SPA = 166
 GOT_QUOTE = {"Selected", "Not Selected", "Price at Work"}
-NO_QUOTE = {"Отказ в КП", "Ответ не получен (в срок)", "Не подошло по технике"}
+# сделки двух наших RFQ — Энергосети и НВН
+OUR_DEALS = {"22566", "22564", "22568", "22016", "21926", "22292", "22282", "18016"}
 
 
-def crm_refs(v) -> list[str]:
-    if not v:
-        return []
-    vals = v if isinstance(v, list) else [v]
-    return [(str(x).split("_", 1)[1] if str(x).startswith("CO_") else str(x)) for x in vals]
+def sniff(b: bytes) -> str:
+    if not b:
+        return "пусто"
+    if b[:2] == b"PK":
+        return "zip/xlsx/docx"
+    if b[:4] == b"%PDF":
+        return "pdf"
+    if b[:8] == b"\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1":
+        return "старый office"
+    if b[:3] == b"\xff\xd8\xff" or b[:4] == b"\x89PNG":
+        return "изображение"
+    if b[:4] == b"Rar!" or b[:2] == b"\x1f\x8b" or b[:2] == b"7z":
+        return "архив"
+    head = b[:400].lower()
+    if b"<html" in head or b"<!doctype" in head:
+        return "HTML (скорее всего страница входа)"
+    return "прочее"
 
 
-def topics_of(text: str) -> list[str]:
-    t = (text or "").lower()
-    return [name for name, kws in TOPICS.items() if any(k in t for k in kws)]
+def try_get(url: str, sess: requests.Session) -> tuple[str, int]:
+    try:
+        r = sess.get(url, timeout=60, allow_redirects=True)
+    except Exception as e:
+        return (f"ошибка сети: {type(e).__name__}", 0)
+    if r.status_code != 200:
+        return (f"http {r.status_code}", 0)
+    return (sniff(r.content), len(r.content))
 
 
-def main() -> int:
-    client = BitrixClient(Settings.load().bitrix_webhook_url)
-    print(f"период с {PERIOD_FROM}\n")
+def main() -> None:
+    wh = (os.getenv("BITRIX_WEBHOOK_URL") or "").strip()
+    if not wh:
+        print("нет BITRIX_WEBHOOK_URL", file=sys.stderr)
+        sys.exit(1)
+    bx = BitrixClient(wh)
+    sess = requests.Session()
+    base = wh.rstrip("/")
 
-    select = ["id", "title", "stageId", "createdTime", "parentId2", "companyId",
-              "assignedById", "ufCrm18Supplier", "opportunity"]
-    items = client.list_items(SPA_ENTITY_TYPE_ID,
-                              filter={">=createdTime": PERIOD_FROM}, select=select)
-    print(f"=== ВСЕГО ЗАПИСЕЙ СП-166 С {PERIOD_FROM}: {len(items)} ===")
+    print("=== Зонд v35: где файлы запросов поставщикам и чем их взять ===\n")
 
-    stages: dict[str, str] = {}
-    for cat in (24, 0):
-        try:
-            stages.update(client.spa_stages(SPA_ENTITY_TYPE_ID, cat))
-        except Exception:
-            pass
+    # ---------------------------------------------------------------- права вебхука
+    try:
+        sc = bx.call("scope", {})
+        print(f"скоупы вебхука ({len(sc)}): {', '.join(sorted(sc))}\n")
+    except Exception as e:
+        print(f"scope недоступен: {e}\n")
 
-    # разметка по темам
-    tagged = []
-    for r in items:
-        tp = topics_of(r.get("title") or "")
-        if tp:
-            tagged.append((r, tp))
-    print(f"из них по НАШЕЙ номенклатуре: {len(tagged)}\n")
+    # ---------------------------------------------------------------- поля СП-166
+    file_fields: list[str] = []
+    try:
+        fl = bx.call("crm.item.fields", {"entityTypeId": SPA}) or {}
+        fields = fl.get("fields") or {}
+        for name, meta in fields.items():
+            if str(meta.get("type")) == "file":
+                file_fields.append(name)
+        print(f"полей у СП-166: {len(fields)} · из них файловых: {len(file_fields)}")
+        print(f"  файловые поля: {file_fields}\n")
+    except Exception as e:
+        print(f"crm.item.fields не отдал поля: {e}\n")
 
-    def stage_of(r):
-        return stages.get(str(r.get("stageId")), str(r.get("stageId")))
+    # ---------------------------------------------------------------- выборка запросов с КП
+    sel = ["id", "title", "stageId", "parentId2", "createdTime"] + file_fields
+    items = bx.call("crm.item.list", {
+        "entityTypeId": SPA, "order": {"id": "DESC"},
+        "filter": {">=createdTime": "2026-07-01"},
+        "select": sel, "start": -1}) or {}
+    items = items.get("items", []) if isinstance(items, dict) else []
+    stages = bx.spa_stages(SPA, 24)
+    quoted = [i for i in items if stages.get(str(i.get("stageId")), str(i.get("stageId"))) in GOT_QUOTE]
+    ours = [i for i in quoted if str(i.get("parentId2") or "") in OUR_DEALS]
+    print(f"записей СП-166 с 01.07 в первой странице выборки: {len(items)} · с КП: {len(quoted)} · по нашим сделкам: {len(ours)}")
 
-    # общий разрез по стадиям
-    by_stage = Counter(stage_of(r) for r, _ in tagged)
-    got = sum(n for s, n in by_stage.items() if s in GOT_QUOTE)
-    ref = sum(n for s, n in by_stage.items() if s in NO_QUOTE)
-    other = sum(by_stage.values()) - got - ref
-    print("--- СТАДИИ (по нашей номенклатуре) ---")
-    for s, n in by_stage.most_common():
-        mark = "КП ЕСТЬ " if s in GOT_QUOTE else ("нет КП  " if s in NO_QUOTE else "в работе")
-        print(f"  {n:>5} | {mark} | {s}")
-    tot = sum(by_stage.values()) or 1
-    print(f"\n  КП получено      : {got:>5} ({100 * got / tot:.0f}%)")
-    print(f"  отказ / молчание : {ref:>5} ({100 * ref / tot:.0f}%)")
-    print(f"  в работе, без КП : {other:>5} ({100 * other / tot:.0f}%)")
+    sample = (ours + [i for i in quoted if i not in ours])[:12]
+    print(f"в выборку зонда взято: {len(sample)} запросов\n")
 
-    # по темам
-    print("\n--- ПО ТЕМАМ: запросов / из них с КП ---")
-    t_all = Counter()
-    t_got = Counter()
-    for r, tps in tagged:
-        g = stage_of(r) in GOT_QUOTE
-        for t in tps:
-            t_all[t] += 1
-            if g:
-                t_got[t] += 1
-    for t, n in t_all.most_common():
-        print(f"  {n:>5} / {t_got[t]:>4} КП  ({100 * t_got[t] / n:>3.0f}%)  {t}")
+    # ---------------------------------------------------------------- где лежат файлы
+    found: list[dict] = []          # найденные файловые объекты
+    src_count: Counter = Counter()
 
-    # по месяцам
-    print("\n--- ПО МЕСЯЦАМ: запросов / из них с КП ---")
-    m_all = Counter()
-    m_got = Counter()
-    for r, _ in tagged:
-        m = (r.get("createdTime") or "")[:7]
-        m_all[m] += 1
-        if stage_of(r) in GOT_QUOTE:
-            m_got[m] += 1
-    for m in sorted(m_all):
-        print(f"  {m}: {m_all[m]:>5} / {m_got[m]:>4} КП")
+    for it in sample:
+        iid = it["id"]
+        # 1) файловые поля самой записи
+        full = bx.call("crm.item.get", {"entityTypeId": SPA, "id": iid}) or {}
+        item = (full.get("item") or {}) if isinstance(full, dict) else {}
+        for fname, val in item.items():
+            if not val or fname in ("id", "title"):
+                continue
+            vals = val if isinstance(val, list) else [val]
+            for fo in vals:
+                if isinstance(fo, dict) and (fo.get("id") or fo.get("ID")):
+                    src_count["поле записи"] += 1
+                    found.append({"src": f"поле {fname}", "item": iid, "fo": fo})
 
-    # по сделкам
-    parents = Counter(str(r.get("parentId2") or "—") for r, _ in tagged)
-    p_got = Counter()
-    for r, _ in tagged:
-        if stage_of(r) in GOT_QUOTE:
-            p_got[str(r.get("parentId2") or "—")] += 1
-    top_ids = [d for d, _ in parents.most_common(30) if d not in ("—", "0")]
-    dmap = client.deals_by_ids(top_ids, select=["ID", "TITLE", "STAGE_ID", "OPPORTUNITY", "CURRENCY_ID"]) if top_ids else {}
-    print("\n--- ТОП-30 СДЕЛОК ПО ЧИСЛУ ЗАПРОСОВ ПО НАШЕЙ ТЕМЕ ---")
-    for did, n in parents.most_common(30):
-        d = dmap.get(str(did), {})
-        opp = float(d.get("OPPORTUNITY") or 0)
-        print(f"  {did:>8}: запросов {n:>4}, с КП {p_got[did]:>4} | {opp:>14,.0f} {d.get('CURRENCY_ID') or ''} | "
-              f"{(d.get('TITLE') or ('без привязки' if did == '—' else '?'))[:62]}")
+        # 2) комментарии таймлайна — пробуем разные написания типа сущности
+        for ent in (SPA, f"DYNAMIC_{SPA}", "dynamic_166"):
+            try:
+                cs = bx.call("crm.timeline.comment.list", {
+                    "filter": {"ENTITY_ID": iid, "ENTITY_TYPE": ent}, "select": ["ID", "COMMENT", "FILES"]}) or []
+                for c in (cs if isinstance(cs, list) else []):
+                    for fo in (c.get("FILES") or []):
+                        src_count[f"комментарий ({ent})"] += 1
+                        found.append({"src": f"комментарий {ent}", "item": iid, "fo": fo})
+                if cs:
+                    break
+            except Exception:
+                continue
 
-    # поставщики, от кого есть КП
-    comp_ids = set()
-    for r, _ in tagged:
-        if r.get("companyId"):
-            comp_ids.add(str(r["companyId"]))
-        comp_ids.update(crm_refs(r.get("ufCrm18Supplier")))
-    names = client.companies_by_ids(list(comp_ids)) if comp_ids else {}
-    sup_got = Counter()
-    for r, _ in tagged:
-        if stage_of(r) not in GOT_QUOTE:
-            continue
-        s = ", ".join(dict.fromkeys(filter(None, (
-            [names.get(str(r.get("companyId") or ""), "")]
-            + [names.get(c, c) for c in crm_refs(r.get("ufCrm18Supplier"))])))) or "—"
-        sup_got[s] += 1
-    print(f"\n--- ПОСТАВЩИКИ, ОТ КОГО ЕСТЬ КП: {len(sup_got)} компаний ---")
-    for s, n in sup_got.most_common(40):
-        print(f"  {n:>3}  {s[:92]}")
+        # 3) дела/письма таймлайна
+        for otid in (SPA, 2):
+            owner = iid if otid == SPA else it.get("parentId2")
+            if not owner:
+                continue
+            try:
+                acts = bx.call("crm.activity.list", {
+                    "filter": {"OWNER_TYPE_ID": otid, "OWNER_ID": owner},
+                    "select": ["ID", "PROVIDER_ID", "TYPE_ID", "SUBJECT", "FILES"],
+                    "start": -1}) or []
+                for a in (acts if isinstance(acts, list) else [])[:40]:
+                    fs = a.get("FILES") or []
+                    if isinstance(fs, dict):
+                        fs = list(fs.values())
+                    for fo in fs:
+                        if isinstance(fo, dict):
+                            src_count[f"activity owner={otid} ({a.get('PROVIDER_ID')})"] += 1
+                            found.append({"src": f"activity{otid}", "item": iid, "fo": fo})
+            except Exception as e:
+                src_count[f"activity owner={otid}: ОШИБКА {type(e).__name__}"] += 1
 
-    print(f"\n--- ВСЕ ЗАПРОСЫ С КП ПО НАШЕЙ ТЕМЕ: {got} ---")
-    for r, tps in sorted(((r, t) for r, t in tagged if stage_of(r) in GOT_QUOTE),
-                         key=lambda x: x[0].get("createdTime") or ""):
-        s = ", ".join(dict.fromkeys(filter(None, (
-            [names.get(str(r.get("companyId") or ""), "")]
-            + [names.get(c, c) for c in crm_refs(r.get("ufCrm18Supplier"))])))) or "—"
-        print(f"  #{r['id']:>7} | {(r.get('createdTime') or '')[:10]} | сделка {str(r.get('parentId2') or '—'):>7} | "
-              f"{stage_of(r):<14} | {s[:34]:<34} | {','.join(tps)[:26]:<26} | {(r.get('title') or '')[:52]}")
-    return 0
+    print("--- ГДЕ НАШЛИСЬ ФАЙЛОВЫЕ ОБЪЕКТЫ ---")
+    if not src_count:
+        print("  ни одного файлового объекта не найдено ни в полях, ни в таймлайне")
+    for k, v in src_count.most_common():
+        print(f"  {v:>4}  {k}")
+    print(f"\nвсего объектов для проверки скачивания: {len(found)}\n")
+
+    if found:
+        keys = Counter()
+        for f in found[:5]:
+            keys.update(f["fo"].keys())
+        print(f"ключи файлового объекта (по первым 5): {sorted(keys)}\n")
+
+    # ---------------------------------------------------------------- чем скачать
+    strategies: dict[str, Counter] = {}
+    sizes: dict[str, list[int]] = {}
+
+    def note(name: str, res: tuple[str, int]) -> None:
+        strategies.setdefault(name, Counter())[res[0]] += 1
+        sizes.setdefault(name, []).append(res[1])
+
+    for f in found[:25]:
+        fo = f["fo"]
+        fid = fo.get("id") or fo.get("ID") or fo.get("fileId")
+        for key in ("urlMachine", "downloadUrl", "url", "URL_MACHINE", "DOWNLOAD_URL", "viewUrl"):
+            u = fo.get(key)
+            if u:
+                u = str(u)
+                if u.startswith("/"):
+                    host = base.split("/rest/")[0]
+                    u = host + u
+                note(f"объект.{key}", try_get(u, sess))
+        if fid:
+            try:
+                df = bx.call("disk.file.get", {"id": fid}) or {}
+                dl = df.get("DOWNLOAD_URL") if isinstance(df, dict) else None
+                note("disk.file.get → DOWNLOAD_URL", try_get(str(dl), sess) if dl else ("метод не дал ссылки", 0))
+            except Exception as e:
+                note("disk.file.get → DOWNLOAD_URL", (f"ошибка REST: {type(e).__name__}", 0))
+            try:
+                ext = bx.call("disk.file.getExternalLink", {"id": fid})
+                note("disk.file.getExternalLink", try_get(str(ext), sess) if ext else ("метод не дал ссылки", 0))
+            except Exception as e:
+                note("disk.file.getExternalLink", (f"ошибка REST: {type(e).__name__}", 0))
+            note("rest/download?token", try_get(f"{base}/download.json?id={fid}", sess))
+
+    print("--- ЧТО ОТВЕТИЛ КАЖДЫЙ СПОСОБ СКАЧИВАНИЯ ---")
+    if not strategies:
+        print("  нечего было качать")
+    for name, c in strategies.items():
+        good = sum(n for k, n in c.items() if k in ("zip/xlsx/docx", "pdf", "старый office", "изображение", "архив"))
+        sz = [s for s in sizes[name] if s]
+        med = sorted(sz)[len(sz) // 2] if sz else 0
+        mark = "  ✔ ГОДИТСЯ" if good else ""
+        print(f"  {name:34} файлов {good:>3} из {sum(c.values()):>3} · медиана {med:>8} б · {dict(c)}{mark}")
+
+    print("\n✓ зонд v35 завершён")
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    main()
