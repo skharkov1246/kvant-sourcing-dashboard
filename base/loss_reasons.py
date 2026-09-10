@@ -10,6 +10,13 @@
 Правила намеренно консервативные: признак срабатывает только на явных
 формулировках, поэтому доля «не размечено» честно показывает предел метода.
 
+ЧИТАТЬ ПО ЛИФТУ, А НЕ ПО СЧЁТЧИКУ. Когда разметка идёт по всему корпусу —
+вложения, письма и чаты, — сюжет находится почти в каждой сделке: «проиграли
+по цене» срабатывает у 95 % проигранных и у 92 % выигранных. Такой сюжет не
+объясняет ничего. Разделяет исход отношение долей (лифт): «поставщик не
+ответил» встречается у проигранных втрое чаще, чем у выигранных, — вот это
+причина. Поэтому сводка печатает доли и лифт, а не только число сделок.
+
     python base/loss_reasons.py --db base/kvant.db --acts base/kvant_acts.db
 """
 from __future__ import annotations
@@ -150,6 +157,10 @@ def run(db: str, acts_db: str | None, chats_db: str | None = None, only_lost: bo
 
     where = "WHERE won=0 AND semantic='F'" if only_lost else ""
     deals = con.execute(f"SELECT id, won, semantic, origin_cat, stage, sum_eur FROM deals {where}").fetchall()
+    # знаменатели для лифта: сколько всего выиграно и сколько проиграно
+    won_tot = con.execute("SELECT count(*) FROM deals WHERE won=1").fetchone()[0]
+    lost_tot = con.execute("""SELECT count(*) FROM deals
+                              WHERE closed='Y' AND (won IS NULL OR won=0)""").fetchone()[0]
 
     stats = Counter()
     by_narr = Counter()
@@ -180,7 +191,8 @@ def run(db: str, acts_db: str | None, chats_db: str | None = None, only_lost: bo
     if ccon:
         ccon.close()
     return {"stats": dict(stats), "by_narrative": dict(by_narr),
-            "won_lost": {k: {"won": v[0], "lost": v[1]} for k, v in by_narr_won.items()}}
+            "won_lost": {k: {"won": v[0], "lost": v[1]} for k, v in by_narr_won.items()},
+            "totals": {"won": won_tot, "lost": lost_tot}}
 
 
 def main() -> int:
@@ -193,10 +205,20 @@ def main() -> int:
     a = ap.parse_args()
     res = run(a.db, a.acts, a.chats, a.only_lost)
     print("покрытие:", res["stats"])
-    print("\nсюжеты (сколько сделок):")
-    for k, n in sorted(res["by_narrative"].items(), key=lambda x: -x[1]):
+    # Сырые счётчики обманывают: сюжет «проиграли по цене» находится в 95 %
+    # проигранных сделок — и в 92 % выигранных. Разделяет исход не частота, а
+    # лифт: во сколько раз чаще сюжет встречается у проигранных, чем у
+    # выигранных. Всё, что около единицы, — общий фон переписки, а не причина.
+    wt, lt = res["totals"]["won"], res["totals"]["lost"]
+    print(f"\nсюжеты (выиграно {wt}, проиграно {lt}):")
+    print(f"  {'сюжет':<42} {'у выигр.':>9} {'у проигр.':>10} {'лифт':>7}")
+    rank = []
+    for k, _n in res["by_narrative"].items():
         wl = res["won_lost"][k]
-        print(f"  {NARRATIVES[k][0]:<42} {n:>5}  (выиграно {wl['won']}, проиграно {wl['lost']})")
+        pw, pl = wl["won"] / max(wt, 1), wl["lost"] / max(lt, 1)
+        rank.append((pl / pw if pw else 99.0, k, pw, pl))
+    for lift, k, pw, pl in sorted(rank, reverse=True):
+        print(f"  {NARRATIVES[k][0]:<42} {100*pw:8.0f}% {100*pl:9.0f}% {lift:7.2f}")
     return 0
 
 

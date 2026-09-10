@@ -243,12 +243,110 @@ def build(db_path: str) -> str:
     sp_spread = f"{spreads[len(spreads)//2]:.1f}" if spreads else "—"
     sp_cmp = len(spreads)
 
+    # ── сегменты оборудования: где деньги и где проигрываем
+    seg_rows = q("""
+        WITH s AS (SELECT deal_id did, max(side='поставщик') sup
+                   FROM file_cards WHERE deal_id IS NOT NULL GROUP BY deal_id)
+        SELECT coalesce(g.name, d.seg), count(*),
+               sum(d.won=1),
+               sum(CASE WHEN d.closed='Y' AND d.won IS NOT 1 THEN 1 ELSE 0 END),
+               sum(coalesce(s.sup,0)),
+               round(sum(coalesce(d.sum_eur,0))/1e6, 1)
+        FROM deals d LEFT JOIN segments g ON g.code = d.seg
+        LEFT JOIN s ON s.did = d.id
+        GROUP BY 1 ORDER BY 2 DESC""")
+    seg_t = table(["сегмент оборудования", "сделок", "выиграно", "проиграно", "доля побед",
+                   "с офертой поставщика", "сумма, млн €"],
+                  [[f"<b>{h(str(nm)[:52])}</b>", num(n), num(w or 0), num(ls or 0),
+                    pct(w or 0, (w or 0) + (ls or 0)), pct(sup or 0, n), num(sm)]
+                   for nm, n, w, ls, sup, sm in seg_rows], {1, 2, 3, 4, 5, 6})
+    seg_named = one("SELECT count(*) FROM deals WHERE seg IS NOT NULL AND seg<>'other'")
+    seg_tot = one("SELECT count(*) FROM deals")
+
+    # ── поставщики: кто отвечает, кто молчит, кто чем возит
+    sup_req = one("SELECT sum(requests) FROM supplier_stats")
+    sup_ans = one("SELECT sum(answered) FROM supplier_stats")
+    sup_sil = one("SELECT sum(silent) FROM supplier_stats")
+    sup_n = one("SELECT count(*) FROM supplier_stats")
+    freq = q("""SELECT CASE WHEN requests=1 THEN 'написали один раз'
+                            WHEN requests<=3 THEN '2–3 раза' WHEN requests<=10 THEN '4–10'
+                            WHEN requests<=30 THEN '11–30' ELSE '31 и больше' END g,
+                       min(requests), count(*), sum(requests), sum(answered), sum(silent), sum(selected)
+                FROM supplier_stats GROUP BY 1 ORDER BY 2""")
+    freq_t = table(["сколько раз писали поставщику", "поставщиков", "запросов",
+                    "прислал файл", "полное молчание", "выбран"],
+                   [[f"<b>{h(g)}</b>", num(sup), num(req), pct(ans, req), pct(sil, req), num(sel)]
+                    for g, _m, sup, req, ans, sil, sel in freq], {1, 2, 3, 4, 5})
+    pool = q("""SELECT supplier, requests, answered, silent, selected, won_deals, priced, brands
+                FROM supplier_stats WHERE requests>=15
+                ORDER BY selected DESC, answered DESC LIMIT 15""")
+    pool_t = table(["поставщик", "запросов", "прислал файл", "молчал", "выбран",
+                    "побед", "цен разобрано", "марки"],
+                   [[f"<b>{h(str(s)[:38])}</b>", num(n), num(a), num(si), num(sel), num(w),
+                     num(pr), h((br or "")[:38])]
+                    for s, n, a, si, sel, w, pr, br in pool], {1, 2, 3, 4, 5, 6})
+    bs = q("""SELECT brand, supplier, positions, priced, deals, won
+              FROM brand_suppliers WHERE priced>0 ORDER BY deals DESC, priced DESC LIMIT 15""")
+    bs_t = table(["марка", "поставщик", "позиций", "с ценой", "сделок", "побед"],
+                 [[f"<b>{h(b)}</b>", h(str(s)[:38]), num(n), num(pr), num(dl), num(w)]
+                  for b, s, n, pr, dl, w in bs], {2, 3, 4, 5})
+    pool_n = one("SELECT count(*) FROM supplier_stats WHERE requests>=10 AND answer_rate>=0.6")
+
+    # ── почему проигрываем: сюжеты из переписки и вложений, по лифту
+    won_tot = one("SELECT count(*) FROM deals WHERE won=1")
+    lost_tot = one("SELECT count(*) FROM deals WHERE closed='Y' AND (won IS NULL OR won=0)")
+    narr = q("""
+        SELECT l.narrative,
+               sum(CASE WHEN d.won=1 THEN 1 ELSE 0 END),
+               sum(CASE WHEN d.closed='Y' AND (d.won IS NULL OR d.won=0) THEN 1 ELSE 0 END),
+               sum(CASE WHEN l.main=1 AND d.closed='Y' AND (d.won IS NULL OR d.won=0) THEN 1 ELSE 0 END)
+        FROM loss_marks l JOIN deals d ON d.id = l.deal_id GROUP BY 1""")
+    NAMES = {
+        "no_answer": "Поставщик не ответил", "competitor": "Проиграли конкуренту",
+        "customer_cancel": "Заказчик отменил или перенёс", "tech": "Не прошли по технике",
+        "no_supplier": "Не нашли изготовителя / нет канала",
+        "sanctions": "Санкции и отказ поставлять в РФ", "price": "Разговор о цене",
+        "no_techinfo": "Заказчик не дал техническую информацию",
+        "lead_time": "Не прошли по срокам", "docs": "Документы, сертификация, допуски",
+        "payment_terms": "Условия оплаты и финансы", "logistics": "Логистика и таможня",
+    }
+    nrows = []
+    for code, w, ls, ml in narr:
+        pw, pl = (w or 0) / max(won_tot, 1), (ls or 0) / max(lost_tot, 1)
+        nrows.append((pl / pw if pw else 99.0, code, pw, pl, ml or 0))
+    nrows.sort(reverse=True)
+    narr_t = table(["сюжет", "у выигранных", "у проигранных", "лифт", "главный сюжет у скольких проигранных"],
+                   [[f"<b>{h(NAMES.get(code, code))}</b>", pct(round(pw*won_tot), won_tot),
+                     pct(round(pl*lost_tot), lost_tot), f"{lift:.2f}", num(ml)]
+                    for lift, code, pw, pl, ml in nrows], {1, 2, 3, 4})
+    marked = one("SELECT count(DISTINCT deal_id) FROM loss_marks")
+    top_lift = nrows[0] if nrows else None
+
     offers = one("SELECT count(*) FROM file_cards WHERE kind='оферта'")
     off_priced = one("SELECT count(*) FROM file_cards WHERE kind='оферта' AND priced>0")
     tender = one("SELECT count(*) FROM file_cards WHERE kind='тендер'")
     old = one("SELECT count(*) FROM file_cards WHERE date_max<'2024-01-01'")
 
     acts = [
+        ("КИПиА, арматура и ГПУ: оферты есть, а побед 4–10 %",
+         "В КИПиА оферта поставщика найдена в 47 % сделок, в арматуре — в 44 %, но выигрывается "
+         "только 9 % и 10 %. Для сравнения, в ГШО оферта есть в 59 % сделок и побед 21 %. "
+         "Значит в этих сегментах барьер не в поиске поставщика, а дальше: оригинал вместо "
+         "аналога, сертификация, допуск завода-изготовителя. Прежде чем вкладываться в сорсинг "
+         "по ним, стоит проверить на десятке проигранных сделок, что именно требовал заказчик."),
+        ("Холодные адреса отвечают в 17 % случаев, постоянный пул — в 52 %",
+         f"Из {num(sup_n)} поставщиков {num(one('SELECT count(*) FROM supplier_stats WHERE requests=1'))} "
+         "получили ровно один запрос, и ответил из них каждый шестой. Сорок три поставщика, "
+         "которым пишут чаще тридцати раз, дают половину всех ответов и большую часть выборов. "
+         f"Маршрут запроса должен начинаться с этого пула ({num(pool_n)} адресов, отвечающих чаще "
+         "60 % раз) и только потом уходить в холодный поиск — тогда оферта появляется там, "
+         "где сейчас молчание."),
+        ("«Проиграли по цене» — не причина: этот сюжет есть в 92 % выигранных сделок",
+         "Разметка по всему тексту показывает, что разговор о цене идёт везде, и по нему "
+         "нельзя отличить проигрыш от победы (лифт 1,03). Единственный сюжет с сильным "
+         "перекосом в проигрыши — «поставщик не ответил», лифт 3,1: у проигранных он "
+         "встречается втрое чаще. Разбирать надо не цену, а молчание поставщиков: "
+         "срок ответа, второй канал связи, запасной поставщик на тот же артикул."),
         ("Половина сделок идёт без оферты поставщика — и выигрывается 1 из 100",
          f"Оферта поставщика есть только в {sup_share} сделок. Без неё доля побед {wr(no_sup)}, "
          f"с ней — {wr(has_sup)}. Запрос хотя бы четырём поставщикам поднимает долю побед "
@@ -387,6 +485,42 @@ def build(db_path: str) -> str:
 {rfq_t}
 <p>Чем больше поставщиков опрошено, тем выше доля побед — от одного запроса
 до семи и больше разрыв почти вдвое. Это уже управляемое действие, а не следствие.</p>
+</section>
+
+<section><h2>Сегменты оборудования</h2>
+<p class="lead">Сегмент сделки проставлен по названию карточки и по тому, что в ней
+запрашивали: {num(seg_named)} сделок из {num(seg_tot)} узнаны, остальные — «прочее».
+Столбец «с офертой поставщика» показывает, где сорсинг вообще доходит до цены.</p>
+{seg_t}
+<p class="note">Сумма — по полю сделки, в евро по курсу на дату; у сделок в работе она
+плановая. Доля побед считается от сделок с известным исходом.</p>
+</section>
+
+<section><h2>Поставщики: кто отвечает</h2>
+<p class="lead">{num(sup_req)} запросов ушло к {num(sup_n)} поставщикам. Файл в ответ пришёл
+в {pct(sup_ans, sup_req)} случаев, полное молчание — ни файла, ни движения по стадии —
+в {pct(sup_sil, sup_req)}.</p>
+{freq_t}
+<p>Доля ответа растёт вместе с числом обращений: холодный адрес, которому написали
+однажды, отвечает в 17 % случаев, поставщик из постоянного пула — в 52 %. Постоянных,
+кто отвечает чаще чем в 60 % запросов, — {num(pool_n)}.</p>
+<h3>Рабочий пул</h3>
+{pool_t}
+<h3>Кому писать по марке</h3>
+<p>Пары «марка + поставщик», где поставщик реально присылал цены. Это то, с чего
+начинается расчёт: не поиск по каталогу, а адрес, по которому уже приходил ответ.</p>
+{bs_t}
+</section>
+
+<section><h2>Почему проигрываем</h2>
+<p class="lead">Сюжеты размечены правилами по всему тексту сделки — вложения, письма, чат.
+Сюжет находится у {num(marked)} сделок из {num(one("SELECT count(*) FROM deals"))}, но частота
+сама по себе ничего не объясняет: «разговор о цене» есть у 95 % проигранных и у 92 %
+выигранных. Разделяет исход лифт — во сколько раз чаще сюжет встречается у проигранных.</p>
+{narr_t}
+<p class="note">Лифт около единицы — общий фон переписки, а не причина. Лифт меньше единицы
+означает обратное: сюжет чаще у выигранных. «Логистика и таможня» с лифтом 0,07 — признак
+того, что сделка дошла до отгрузки, а не причина исхода.</p>
 </section>
 
 <section><h2>Что делать</h2>{acts_html}</section>

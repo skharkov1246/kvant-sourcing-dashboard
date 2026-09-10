@@ -169,6 +169,50 @@ CREATE TABLE kb_price_pairs (
   price_our_eur  double precision
 );
 COMMENT ON TABLE kb_price_pairs IS 'Пары «цена поставщика ↔ наша цена» по одной позиции: наценка';
+DROP TABLE IF EXISTS kb_suppliers;
+CREATE TABLE kb_suppliers (
+  supplier       text,
+  requests       integer,
+  answered       integer,
+  moved_on       integer,
+  silent         integer,
+  talking        integer,
+  refused        integer,
+  selected       integer,
+  chosen         integer,
+  answer_rate    double precision,
+  select_rate    double precision,
+  deals          integer,
+  won_deals      integer,
+  days_med       double precision,
+  positions      integer,
+  priced         integer,
+  brands         text,
+  first_seen     text,
+  last_seen      text
+);
+COMMENT ON TABLE kb_suppliers IS 'Поставщики: сколько запросов, сколько ответов, сколько выборов, по каким маркам';
+DROP TABLE IF EXISTS kb_brand_suppliers;
+CREATE TABLE kb_brand_suppliers (
+  brand          text,
+  supplier       text,
+  positions      integer,
+  priced         integer,
+  deals          integer,
+  won            integer,
+  cur            text,
+  price_med      double precision,
+  last_seen      text
+);
+COMMENT ON TABLE kb_brand_suppliers IS 'Пары «марка + поставщик»: кто реально присылал цены по этой марке';
+DROP TABLE IF EXISTS kb_loss_marks;
+CREATE TABLE kb_loss_marks (
+  deal_id        integer,
+  narrative      text,
+  hits           integer,
+  main           integer
+);
+COMMENT ON TABLE kb_loss_marks IS 'Сюжеты сделки из переписки и вложений: что мешало, размечено правилами';
 DROP TABLE IF EXISTS kb_brands;
 CREATE TABLE kb_brands (
   id             integer,
@@ -198,6 +242,7 @@ CREATE INDEX IF NOT EXISTS ix_pos_pn ON kb_positions(part_number);
 CREATE INDEX IF NOT EXISTS ix_pos_oem ON kb_positions(manufacturer);
 CREATE INDEX IF NOT EXISTS ix_pos_deal ON kb_positions(deal_id);
 CREATE INDEX IF NOT EXISTS ix_rfq_sup ON kb_rfq(supplier);
+CREATE INDEX IF NOT EXISTS ix_bs_brand ON kb_brand_suppliers(brand);
 
 -- загрузка (запускать из каталога с выгрузкой):
 -- \copy kb_files FROM PROGRAM 'zcat kb_files.csv.gz' CSV HEADER
@@ -207,5 +252,8 @@ CREATE INDEX IF NOT EXISTS ix_rfq_sup ON kb_rfq(supplier);
 -- \copy kb_deals FROM PROGRAM 'zcat kb_deals.csv.gz' CSV HEADER
 -- \copy kb_rfq FROM PROGRAM 'zcat kb_rfq.csv.gz' CSV HEADER
 -- \copy kb_price_pairs FROM PROGRAM 'zcat kb_price_pairs.csv.gz' CSV HEADER
+-- \copy kb_suppliers FROM PROGRAM 'zcat kb_suppliers.csv.gz' CSV HEADER
+-- \copy kb_brand_suppliers FROM PROGRAM 'zcat kb_brand_suppliers.csv.gz' CSV HEADER
+-- \copy kb_loss_marks FROM PROGRAM 'zcat kb_loss_marks.csv.gz' CSV HEADER
 -- \copy kb_brands FROM PROGRAM 'zcat kb_brands.csv.gz' CSV HEADER
 -- \copy kb_companies FROM PROGRAM 'zcat kb_companies.csv.gz' CSV HEADER
