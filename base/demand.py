@@ -82,6 +82,11 @@ def segment_of(text: str) -> str | None:
 # Разбор строк берёт все три, и в частотном отчёте наверх лезут именно требования:
 # один и тот же пункт типового техзадания повторяется в десятках сделок.
 CLAUSE_START = re.compile(r"^\s*\d+(\.\d+)*[.)]\s")                 # «6.1. », «4) »
+# Пункт перечня требуемых документов: «B07 Certificate of Compliance»,
+# «N04 Spare Parts & Interchangeability Record» — буква с номером в начале строки
+DOC_CODE = re.compile(r"^\s*[A-Z]\d{2}\s+\S")
+# Бланк под заполнение: «"____" ____________ 20___ г.»
+BLANK_FORM = re.compile(r"_{3,}")
 NORMATIVE = re.compile(
     r"(не\s+менее|не\s+более|не\s+допускается|предусмотреть|должен|должна|должно|должны"
     r"|обеспечить|требуется|при\s+необходимости|в\s+соответствии|согласно"
@@ -121,7 +126,7 @@ def looks_like_item(name: str, has_code: bool) -> bool:
         return bool(has_code)
     if (CLAUSE_START.search(s) or NORMATIVE.search(s) or ATTRIBUTE.search(s)
             or LEGAL.search(s) or PARAM_ROW.search(s) or ANSWER.match(s)
-            or DOCREQ.search(s)):
+            or DOCREQ.search(s) or DOC_CODE.match(s) or BLANK_FORM.search(s)):
         return False
     if s.endswith(":"):                      # подпись атрибута, значение в соседней ячейке
         return False
