@@ -10,6 +10,8 @@
   files      — карточка на документ (что за файл, чей, о чём)   file_cards.py
   catalog    — справочник оборудования: артикул, цены, поставщики kb_catalog.py
   supplier_prices — цены поставщиков по артикулам: у кого дешевле kb_catalog.py
+  suppliers  — кто отвечает, кто молчит, кто чем возит            suppliers.py
+  brand_suppliers — пары «марка + поставщик» с ценами             suppliers.py
   positions  — номенклатура из документов с ценами и марками     extract_positions.py
   deals      — сделки с исходом, суммой и сегментом
   loss_marks — сюжеты сделки: что мешало, по тексту               loss_reasons.py
@@ -38,13 +40,16 @@ NUM = {"bytes", "pages", "chars", "copies", "deals", "deal_id", "rfq_id", "won",
        "sum_eur", "sum_orig", "age_days", "amount", "supplier_id", "company_id",
        "contact_id", "assigned_id", "chosen", "files", "hits", "main",
        "price_sup", "price_our", "ratio", "price_sup_eur", "price_our_eur",
+       "answer_rate", "select_rate", "days_med",
        "delivery_days", "prepay_pct", "defer_days", "warranty_mo", "penalty_pct", "nmck",
        "mentions", "docs", "lost", "price_min", "price_med", "price_max", "price_n",
        "sup_med", "our_med", "markup", "qty_total"}
 INT = {"bytes", "pages", "chars", "copies", "deals", "deal_id", "rfq_id", "won",
        "positions", "priced", "blank", "id", "age_days", "supplier_id", "company_id",
        "contact_id", "assigned_id", "chosen", "files", "hits", "main",
-       "mentions", "docs", "lost", "price_n", "hits", "main"}
+       "mentions", "docs", "lost", "price_n", "hits", "main",
+       "requests", "answered", "moved_on", "silent", "talking", "refused", "selected",
+       "chosen", "won_deals"}
 
 EXPORTS: list[tuple[str, str, str]] = [
     # (имя набора, SQL, комментарий к таблице)
@@ -76,6 +81,10 @@ EXPORTS: list[tuple[str, str, str]] = [
      "Запросы поставщикам (смарт-процесс 166): кому, на что, чем кончилось"),
     ("price_pairs", """SELECT * FROM price_pairs""",
      "Пары «цена поставщика ↔ наша цена» по одной позиции: наценка"),
+    ("suppliers", """SELECT * FROM supplier_stats""",
+     "Поставщики: сколько запросов, сколько ответов, сколько выборов, по каким маркам"),
+    ("brand_suppliers", """SELECT * FROM brand_suppliers""",
+     "Пары «марка + поставщик»: кто реально присылал цены по этой марке"),
     ("loss_marks", """SELECT deal_id, narrative, hits, main FROM loss_marks""",
      "Сюжеты сделки из переписки и вложений: что мешало, размечено правилами"),
     ("brands", """SELECT id, title, company_id, created FROM brands""",
@@ -149,6 +158,7 @@ def run(db_path: str, out_dir: str) -> dict:
         "CREATE INDEX IF NOT EXISTS ix_pos_oem ON kb_positions(manufacturer);",
         "CREATE INDEX IF NOT EXISTS ix_pos_deal ON kb_positions(deal_id);",
         "CREATE INDEX IF NOT EXISTS ix_rfq_sup ON kb_rfq(supplier);",
+        "CREATE INDEX IF NOT EXISTS ix_bs_brand ON kb_brand_suppliers(brand);",
         "", "-- загрузка (запускать из каталога с выгрузкой):",
     ] + [f"-- {c}" for c in copy]
     (out / "schema.sql").write_text("\n".join(ddl) + "\n", encoding="utf-8")
