@@ -6390,7 +6390,7 @@
       ],
       "last_change": "2026-09-10",
       "last_author": "Claude",
-      "last_commit": "0ab65df",
+      "last_commit": "f944bea",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
@@ -6500,16 +6500,17 @@
           "suppliers"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-10",
+      "last_author": "Claude",
+      "last_commit": "f944bea",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
         "markers": []
       },
       "referenced_by": [
-        "gpu/build.py"
+        "gpu/build.py",
+        "gpu/tools/coverage.py"
       ]
     },
     {
