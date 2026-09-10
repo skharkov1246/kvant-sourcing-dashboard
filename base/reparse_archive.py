@@ -36,6 +36,12 @@ from reparse import ocr_image, ocr_pdf
 warnings.filterwarnings("ignore")
 
 MIN_OCR_CHARS = 40
+# Один и тот же документ лежит в архиве по нескольку раз: тендерный пакет
+# раскладывают по папкам «Позиция 1»…«Позиция 8», и в каждой полный комплект.
+# Распознавать копии заново — впустую часы OCR, поэтому текст берётся из кеша
+# по хешу содержимого, а хеш считается ДО распознавания.
+_CACHE: dict[str, tuple] = {}
+_CACHE_LOCK = threading.Lock()
 SCAN_EXT = (".pdf",)
 IMAGE_EXT = (".jpg", ".jpeg", ".png", ".tif", ".tiff")
 
@@ -107,16 +113,23 @@ def run(db_path: str, limit: int | None, workers: int, kind: str) -> dict:
                     if idx >= len(inner):
                         continue
                     blob = inner[idx][1]
-                    if kind == "scan":
-                        text, pages = ocr_pdf(blob)
-                        ext = "ocr-pdf"
+                    sha = hashlib.sha1(blob).hexdigest()
+                    with _CACHE_LOCK:
+                        hit = _CACHE.get(sha)
+                    if hit is not None:
+                        text, pages, ext = hit
                     else:
-                        text, pages = ocr_image(blob), 0
-                        ext = "ocr-image"
-                    text = (text or "").strip()
+                        if kind == "scan":
+                            text, pages = ocr_pdf(blob)
+                            ext = "ocr-pdf"
+                        else:
+                            text, pages = ocr_image(blob), 0
+                            ext = "ocr-image"
+                        text = (text or "").strip()
+                        with _CACHE_LOCK:
+                            _CACHE[sha] = (text, pages, ext)
                     if len(text) >= MIN_OCR_CHARS:
-                        done.append((fid, text, pages, ext, len(blob),
-                                     hashlib.sha1(blob).hexdigest()))
+                        done.append((fid, text, pages, ext, len(blob), sha))
                 outq.put((arch_fid, done, None))
             except Exception as e:
                 outq.put((arch_fid, [], type(e).__name__))
