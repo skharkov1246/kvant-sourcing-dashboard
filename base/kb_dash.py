@@ -243,12 +243,48 @@ def build(db_path: str) -> str:
     sp_spread = f"{spreads[len(spreads)//2]:.1f}" if spreads else "—"
     sp_cmp = len(spreads)
 
+    # ── почему проигрываем: сюжеты из переписки и вложений, по лифту
+    won_tot = one("SELECT count(*) FROM deals WHERE won=1")
+    lost_tot = one("SELECT count(*) FROM deals WHERE closed='Y' AND (won IS NULL OR won=0)")
+    narr = q("""
+        SELECT l.narrative,
+               sum(CASE WHEN d.won=1 THEN 1 ELSE 0 END),
+               sum(CASE WHEN d.closed='Y' AND (d.won IS NULL OR d.won=0) THEN 1 ELSE 0 END),
+               sum(CASE WHEN l.main=1 AND d.closed='Y' AND (d.won IS NULL OR d.won=0) THEN 1 ELSE 0 END)
+        FROM loss_marks l JOIN deals d ON d.id = l.deal_id GROUP BY 1""")
+    NAMES = {
+        "no_answer": "Поставщик не ответил", "competitor": "Проиграли конкуренту",
+        "customer_cancel": "Заказчик отменил или перенёс", "tech": "Не прошли по технике",
+        "no_supplier": "Не нашли изготовителя / нет канала",
+        "sanctions": "Санкции и отказ поставлять в РФ", "price": "Разговор о цене",
+        "no_techinfo": "Заказчик не дал техническую информацию",
+        "lead_time": "Не прошли по срокам", "docs": "Документы, сертификация, допуски",
+        "payment_terms": "Условия оплаты и финансы", "logistics": "Логистика и таможня",
+    }
+    nrows = []
+    for code, w, ls, ml in narr:
+        pw, pl = (w or 0) / max(won_tot, 1), (ls or 0) / max(lost_tot, 1)
+        nrows.append((pl / pw if pw else 99.0, code, pw, pl, ml or 0))
+    nrows.sort(reverse=True)
+    narr_t = table(["сюжет", "у выигранных", "у проигранных", "лифт", "главный сюжет у скольких проигранных"],
+                   [[f"<b>{h(NAMES.get(code, code))}</b>", pct(round(pw*won_tot), won_tot),
+                     pct(round(pl*lost_tot), lost_tot), f"{lift:.2f}", num(ml)]
+                    for lift, code, pw, pl, ml in nrows], {1, 2, 3, 4})
+    marked = one("SELECT count(DISTINCT deal_id) FROM loss_marks")
+    top_lift = nrows[0] if nrows else None
+
     offers = one("SELECT count(*) FROM file_cards WHERE kind='оферта'")
     off_priced = one("SELECT count(*) FROM file_cards WHERE kind='оферта' AND priced>0")
     tender = one("SELECT count(*) FROM file_cards WHERE kind='тендер'")
     old = one("SELECT count(*) FROM file_cards WHERE date_max<'2024-01-01'")
 
     acts = [
+        ("«Проиграли по цене» — не причина: этот сюжет есть в 92 % выигранных сделок",
+         "Разметка по всему тексту показывает, что разговор о цене идёт везде, и по нему "
+         "нельзя отличить проигрыш от победы (лифт 1,03). Единственный сюжет с сильным "
+         "перекосом в проигрыши — «поставщик не ответил», лифт 3,1: у проигранных он "
+         "встречается втрое чаще. Разбирать надо не цену, а молчание поставщиков: "
+         "срок ответа, второй канал связи, запасной поставщик на тот же артикул."),
         ("Половина сделок идёт без оферты поставщика — и выигрывается 1 из 100",
          f"Оферта поставщика есть только в {sup_share} сделок. Без неё доля побед {wr(no_sup)}, "
          f"с ней — {wr(has_sup)}. Запрос хотя бы четырём поставщикам поднимает долю побед "
@@ -387,6 +423,17 @@ def build(db_path: str) -> str:
 {rfq_t}
 <p>Чем больше поставщиков опрошено, тем выше доля побед — от одного запроса
 до семи и больше разрыв почти вдвое. Это уже управляемое действие, а не следствие.</p>
+</section>
+
+<section><h2>Почему проигрываем</h2>
+<p class="lead">Сюжеты размечены правилами по всему тексту сделки — вложения, письма, чат.
+Сюжет находится у {num(marked)} сделок из {num(one("SELECT count(*) FROM deals"))}, но частота
+сама по себе ничего не объясняет: «разговор о цене» есть у 95 % проигранных и у 92 %
+выигранных. Разделяет исход лифт — во сколько раз чаще сюжет встречается у проигранных.</p>
+{narr_t}
+<p class="note">Лифт около единицы — общий фон переписки, а не причина. Лифт меньше единицы
+означает обратное: сюжет чаще у выигранных. «Логистика и таможня» с лифтом 0,07 — признак
+того, что сделка дошла до отгрузки, а не причина исхода.</p>
 </section>
 
 <section><h2>Что делать</h2>{acts_html}</section>

@@ -12,6 +12,7 @@
   supplier_prices — цены поставщиков по артикулам: у кого дешевле kb_catalog.py
   positions  — номенклатура из документов с ценами и марками     extract_positions.py
   deals      — сделки с исходом, суммой и сегментом
+  loss_marks — сюжеты сделки: что мешало, по тексту               loss_reasons.py
   rfq        — запросы поставщикам (смарт-процесс 166)
   price_pairs— пары «цена поставщика ↔ наша цена» по одной позиции
   brands     — справочник марок из портала
@@ -43,7 +44,7 @@ NUM = {"bytes", "pages", "chars", "copies", "deals", "deal_id", "rfq_id", "won",
 INT = {"bytes", "pages", "chars", "copies", "deals", "deal_id", "rfq_id", "won",
        "positions", "priced", "blank", "id", "age_days", "supplier_id", "company_id",
        "contact_id", "assigned_id", "chosen", "files", "hits", "main",
-       "mentions", "docs", "lost", "price_n"}
+       "mentions", "docs", "lost", "price_n", "hits", "main"}
 
 EXPORTS: list[tuple[str, str, str]] = [
     # (имя набора, SQL, комментарий к таблице)
@@ -75,6 +76,8 @@ EXPORTS: list[tuple[str, str, str]] = [
      "Запросы поставщикам (смарт-процесс 166): кому, на что, чем кончилось"),
     ("price_pairs", """SELECT * FROM price_pairs""",
      "Пары «цена поставщика ↔ наша цена» по одной позиции: наценка"),
+    ("loss_marks", """SELECT deal_id, narrative, hits, main FROM loss_marks""",
+     "Сюжеты сделки из переписки и вложений: что мешало, размечено правилами"),
     ("brands", """SELECT id, title, company_id, created FROM brands""",
      "Справочник марок из портала (смарт-процесс 176)"),
     ("companies", """SELECT id, title, industry FROM companies""",

@@ -169,6 +169,14 @@ CREATE TABLE kb_price_pairs (
   price_our_eur  double precision
 );
 COMMENT ON TABLE kb_price_pairs IS 'Пары «цена поставщика ↔ наша цена» по одной позиции: наценка';
+DROP TABLE IF EXISTS kb_loss_marks;
+CREATE TABLE kb_loss_marks (
+  deal_id        integer,
+  narrative      text,
+  hits           integer,
+  main           integer
+);
+COMMENT ON TABLE kb_loss_marks IS 'Сюжеты сделки из переписки и вложений: что мешало, размечено правилами';
 DROP TABLE IF EXISTS kb_brands;
 CREATE TABLE kb_brands (
   id             integer,
@@ -207,5 +215,6 @@ CREATE INDEX IF NOT EXISTS ix_rfq_sup ON kb_rfq(supplier);
 -- \copy kb_deals FROM PROGRAM 'zcat kb_deals.csv.gz' CSV HEADER
 -- \copy kb_rfq FROM PROGRAM 'zcat kb_rfq.csv.gz' CSV HEADER
 -- \copy kb_price_pairs FROM PROGRAM 'zcat kb_price_pairs.csv.gz' CSV HEADER
+-- \copy kb_loss_marks FROM PROGRAM 'zcat kb_loss_marks.csv.gz' CSV HEADER
 -- \copy kb_brands FROM PROGRAM 'zcat kb_brands.csv.gz' CSV HEADER
 -- \copy kb_companies FROM PROGRAM 'zcat kb_companies.csv.gz' CSV HEADER
