@@ -34,3 +34,8 @@ scripts/_coll_*.json
 smoke/
 .pytest_cache/
 .ruff_cache/
+
+# база фундамента: коммерческие данные, в публичный репозиторий не кладём
+base/kvant.db
+base/kvant.db-*
+base/*.json

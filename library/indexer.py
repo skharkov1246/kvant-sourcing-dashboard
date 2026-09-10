@@ -283,27 +283,46 @@ def items_from_rows(rows: list[list[str]]) -> list[dict]:
 
 
 def collect_refs(days: int) -> list[dict]:
+    """Ссылки на все вложения сделок за период.
+
+    Берём их через crm.item.list (entityTypeId=2), а НЕ через crm.deal.list.
+    Разница решающая: crm.deal.list отдаёт у файловых полей только ссылки на
+    страницы портала (`crm.deal.show/show_file.php`, `crm_show_file.php`), а те
+    требуют сессии пользователя и вебхуку возвращают страницу входа с кодом 200 —
+    отсюда прежние «не скачался» на всей выборке. Универсальный item-метод отдаёт
+    у тех же полей `urlMachine`: REST-ссылку с одноразовым токеном, по которой
+    файл приходит как есть. Проверено на портале 08.09.2026: 22 181 вложение
+    у 2 928 сделок года, скачивание отдаёт PDF, XLSX и DOCX.
+    """
     since = (datetime.now(timezone.utc) - timedelta(days=days)).strftime("%Y-%m-%dT00:00:00+03:00")
-    uf = bx("crm.deal.userfield.list", {"order": {"FIELD_NAME": "ASC"}}).get("result") or []
-    ffields = [str(u["FIELD_NAME"]) for u in uf if u.get("USER_TYPE_ID") == "file"]
+    fields = ((bx("crm.item.fields", {"entityTypeId": 2}).get("result") or {}).get("fields") or {})
+    ffields = [k for k, v in fields.items() if v.get("type") == "file"]
     deals = bx_all("crm.deal.list", {"filter": {">=DATE_CREATE": since},
                                      "select": ["ID"], "order": {"ID": "ASC"}})
-    ids = [str(d["ID"]) for d in deals]
+    ids = [int(d["ID"]) for d in deals]
     print(f"сделок за {days} дн.: {len(ids)} · файловых полей: {len(ffields)}", flush=True)
 
     refs: list[dict] = []
     for i in range(0, len(ids), 50):
-        j = bx("crm.deal.list", {"filter": {"ID": ids[i:i + 50]}, "select": ["ID"] + ffields})
-        for x in j.get("result") or []:
+        j = bx("crm.item.list", {"entityTypeId": 2, "filter": {"@id": ids[i:i + 50]},
+                                 "select": ["id"] + ffields, "start": 0})
+        for x in (j.get("result") or {}).get("items") or []:
             for f in ffields:
                 v = x.get(f)
                 if not v:
                     continue
                 for fo in (v if isinstance(v, list) else [v]):
-                    if isinstance(fo, dict) and (fo.get("id") or fo.get("ID")):
-                        refs.append({"deal": str(x["ID"]), "field": f, "origin": "поле сделки", "fo": fo})
+                    if isinstance(fo, dict) and fo.get("urlMachine"):
+                        refs.append({"deal": str(x["id"]), "field": f, "origin": "поле сделки", "fo": fo})
     print(f"вложений в полях сделок: {len(refs)}", flush=True)
     return refs
+
+
+def is_login_page(b: bytes) -> bool:
+    """Портал отдаёт страницу входа с кодом 200 — по коду ответа её не отличить.
+    Отличаем по содержимому, иначе HTML формы логина уходит в разбор как файл."""
+    head = b.lstrip()[:512].lower()
+    return head.startswith(b"<!doctype htm") or head.startswith(b"<html")
 
 
 def download(fo: dict) -> bytes | None:
@@ -312,7 +331,7 @@ def download(fo: dict) -> bytes | None:
         if u:
             try:
                 r = requests.get(str(u), timeout=90)
-                if r.status_code == 200 and len(r.content) > 200:
+                if r.status_code == 200 and len(r.content) > 200 and not is_login_page(r.content):
                     return r.content
             except Exception:
                 pass
@@ -388,11 +407,41 @@ def handle(ref: dict) -> tuple[dict, list[dict]]:
     return rec, items
 
 
+NULLS = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f]")
+
+
+def pg(s) -> str:
+    """Строка, пригодная для PostgreSQL.
+
+    В тексте, извлечённом из PDF и старых .xls, попадаются нулевые байты и другие
+    управляющие символы. PostgreSQL их в text не принимает — psycopg2 падает с
+    «A string literal cannot contain NUL (0x00) characters», и вместе с одной
+    строкой теряется весь пакет разобранных файлов."""
+    return NULLS.sub(" ", str(s or ""))
+
+
+def ensure_segments(cur) -> None:
+    """Справочник сегментов в базе должен существовать ДО записи номенклатуры.
+
+    lib_demand.segment_id ссылается на lib_segments(id); при пустом справочнике
+    вся запись падает с ForeignKeyViolation, а разобранные файлы теряются —
+    именно так оборвались все двенадцать частей прогона 08.09.2026.
+    Источник истины — словарь SEGMENTS в этом файле, поэтому справочник
+    наполняем из него, а не поддерживаем вручную в двух местах."""
+    psycopg2.extras.execute_values(
+        cur,
+        "insert into lib_segments (id, name) values %s on conflict (id) do nothing",
+        [(sid, name) for sid, (name, _words) in SEGMENTS.items()],
+    )
+
+
 def main() -> int:
     if SHARDS > 1:
         print(f"часть {SHARD + 1} из {SHARDS}", flush=True)
     conn = connect()
     with conn.cursor() as cur:
+        ensure_segments(cur)
+        conn.commit()
         cur.execute("select file_id from lib_files")
         done = {r[0] for r in cur.fetchall()}
     conn.close()
@@ -423,10 +472,26 @@ def main() -> int:
         conn = connect()
         with conn.cursor() as cur:
             if buf_items:
-                psycopg2.extras.execute_values(cur, """
-                    insert into lib_demand
-                      (segment_id, deal_id, item_name, oem, part_number, qty, unit, source, source_file)
-                    values %s""", buf_items, page_size=500)
+                try:
+                    psycopg2.extras.execute_values(cur, """
+                        insert into lib_demand
+                          (segment_id, deal_id, item_name, oem, part_number, qty, unit, source, source_file)
+                        values %s""", buf_items, page_size=500)
+                except (psycopg2.Error, ValueError) as e:
+                    # одна испорченная строка не должна стоить всего пакета: двадцать минут
+                    # разбора уже потрачены, поэтому досылаем построчно и пропускаем битые
+                    conn.rollback()
+                    bad = 0
+                    for row in buf_items:
+                        try:
+                            cur.execute("""insert into lib_demand
+                                (segment_id, deal_id, item_name, oem, part_number, qty, unit, source, source_file)
+                                values (%s,%s,%s,%s,%s,%s,%s,%s,%s)""", row)
+                        except (psycopg2.Error, ValueError):
+                            conn.rollback()
+                            bad += 1
+                    print(f"  ⚠ пакет номенклатуры не прошёл ({type(e).__name__}); "
+                          f"построчно записано {len(buf_items) - bad}, пропущено {bad}", flush=True)
             if buf_files:
                 psycopg2.extras.execute_values(cur, """
                     insert into lib_files
@@ -450,12 +515,12 @@ def main() -> int:
                 segs[rec["segment_id"]] += rec["rows_found"]
             total_items += rec["rows_found"]
             buf_files.append((rec["file_id"], rec["deal_id"], rec["origin"], rec["field"], rec["kind"],
-                              rec["size_bytes"], rec["status"], rec["reason"], rec["chars"],
+                              rec["size_bytes"], rec["status"], pg(rec["reason"]), rec["chars"],
                               rec["rows_found"], rec["segment_id"], rec["sha256"]))
             for it in items:
-                buf_items.append((it["segment_id"], it["deal_id"], it["item_name"][:500],
-                                  (it.get("oem") or "")[:200], (it.get("part_number") or "")[:120],
-                                  it.get("qty"), (it.get("unit") or "")[:40],
+                buf_items.append((it["segment_id"], it["deal_id"], pg(it["item_name"])[:500],
+                                  pg(it.get("oem"))[:200], pg(it.get("part_number"))[:120],
+                                  it.get("qty"), pg(it.get("unit"))[:40],
                                   "спецификация сделки", it["source_file"]))
             if len(buf_files) >= 200 or len(buf_items) >= 4000:
                 flush()
