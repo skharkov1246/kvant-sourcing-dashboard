@@ -87,6 +87,10 @@ CLAUSE_START = re.compile(r"^\s*\d+(\.\d+)*[.)]\s")                 # «6.1. »,
 DOC_CODE = re.compile(r"^\s*[A-Z]\d{2}\s+\S")
 # Бланк под заполнение: «"____" ____________ 20___ г.»
 BLANK_FORM = re.compile(r"_{3,}")
+# Адрес склада или грузополучателя: в таблицах доставки он идёт строкой с кодом
+# площадки («9W03 · 453110, Респ. Башкортостан, г. Стерлитамак…») и по форме
+# неотличим от позиции с артикулом.
+ADDRESS = re.compile(r"^\s*\d{6}\s*,|\b(обл\.|Респ\.|край,|пр-кт|мкр\.)\s")
 NORMATIVE = re.compile(
     r"(не\s+менее|не\s+более|не\s+допускается|предусмотреть|должен|должна|должно|должны"
     r"|обеспечить|требуется|при\s+необходимости|в\s+соответствии|согласно"
@@ -116,7 +120,7 @@ ATTRIBUTE = re.compile(
     r"(единица\s+измерения|package\s+size|phase\s+connection|protection\s+designation"
     r"|declaration\s+of\s+compliance|at\s+the\s+manufacturer|срок\s+поставки|условия\s+оплаты"
     r"|страна\s+происхождения|грузополучатель|дата\s+заполнения|ОКУД|ОКПО"
-    r"|оплата\s+по\s+факту|предоплат|отсрочка\s+платежа|альт\.?\s*предложение)", re.I)
+    r"|оплата\s+по\s+факту|предоплат|отсрочка\s+платежа|альт\.?\s*предложение|тема\s+уведомления|тело\s+уведомления|шаблон\s+уведомл)", re.I)
 
 
 def looks_like_item(name: str, has_code: bool) -> bool:
@@ -126,7 +130,8 @@ def looks_like_item(name: str, has_code: bool) -> bool:
         return bool(has_code)
     if (CLAUSE_START.search(s) or NORMATIVE.search(s) or ATTRIBUTE.search(s)
             or LEGAL.search(s) or PARAM_ROW.search(s) or ANSWER.match(s)
-            or DOCREQ.search(s) or DOC_CODE.match(s) or BLANK_FORM.search(s)):
+            or DOCREQ.search(s) or DOC_CODE.match(s) or BLANK_FORM.search(s)
+            or ADDRESS.search(s)):
         return False
     if s.endswith(":"):                      # подпись атрибута, значение в соседней ячейке
         return False
