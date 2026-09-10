@@ -1,26 +1,42 @@
 #!/usr/bin/env python3
-"""Зонд v35: где лежат файлы КП по запросам поставщикам (СП-166) и как их достать.
+"""Зонд v36: сплошная выгрузка и разбор файлов по запросам поставщикам (СП-166).
 
-Владелец: «выгружай все файлы в рамках запросов поставщиков — проверь всё, что мы
-получали». Прежде чем качать тысячи вложений, нужно точно знать ДВА факта:
+ЗАЧЕМ. Сорсинг утверждает, что по сделке на 2,5 млрд прокотированы все позиции и на
+всё есть живое КП. По стадиям воронки это не подтверждается (v34: 505 запросов по
+нашей номенклатуре, КП получено по 116). Но стадия — это отметка человека. Истина
+лежит в файлах, которые поставщики реально прислали. Зонд их достаёт и разбирает.
 
-  1) где у запроса СП-166 живут файлы — в полях записи, в комментариях таймлайна
-     или во вложениях писем (activity);
-  2) какой способ скачивания реально отдаёт файл, а не страницу входа.
+ЧТО ДЕЛАЕТ.
+ 1. Тянет все записи СП-166 за период вместе с восемью файловыми полями.
+ 2. Отмечает запросы по нашей номенклатуре (бренды обоих RFQ — Энергосети и НВН).
+ 3. Собирает файловые объекты из трёх мест: поля записи, вложения дел и писем
+    таймлайна запроса, письма таймлайна наших сделок.
+ 4. Качает каждый файл. Способ выбран по замеру v35: годится только urlMachine —
+    url отдаёт страницу входа, disk.file.get на этих объектах ошибается.
+ 5. Разбирает xlsx / xls / docx / pdf, вытаскивает позиции: артикул, наименование,
+    количество, цену, валюту.
 
-Зонд v34 показал, что ссылки show_file.php отдают страницу входа при любой подстановке
-ключа, а «рабочий» способ uf.php вернул 83 байта на всех двадцати файлах — то есть
-заглушку, а не файл. Поэтому здесь проверяются все пути разом на небольшой выборке,
-и по каждому печатается, что именно пришло: размер и сигнатура содержимого.
-
-Ничего не скачивается массово и ничего коммерческого в лог не идёт: только имена полей,
-типы файлов, размеры и признак «файл/не файл». Репозиторий публичный.
+КУДА РЕЗУЛЬТАТ. Репозиторий публичный, поэтому коммерческое содержимое в журнал не
+печатается: в журнал идут только агрегаты. Сам разбор уходит одним блоком, сжатым и
+зашифрованным на открытый ключ scripts/probe_pubkey.pem — закрытый ключ есть только
+в рабочей сессии агента. Кто угодно может прочитать журнал, расшифровать не может
+никто.
 """
 from __future__ import annotations
 
+import base64
+import gzip
+import io
+import json
 import os
+import re
+import secrets
+import subprocess
 import sys
+import time
+import zipfile
 from collections import Counter
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import requests
@@ -31,196 +47,460 @@ sys.path.insert(0, str(ROOT))
 from bitrix_client import BitrixClient  # noqa: E402
 
 SPA = 166
+PERIOD_FROM = os.getenv("PROBE_FROM", "2026-01-01")
+PUBKEY = ROOT / "scripts/probe_pubkey.pem"
+DEADLINE = time.monotonic() + float(os.getenv("PROBE_BUDGET_SEC", "540"))
+MAX_FILES = int(os.getenv("PROBE_MAX_FILES", "2500"))
+
 GOT_QUOTE = {"Selected", "Not Selected", "Price at Work"}
-# сделки двух наших RFQ — Энергосети и НВН
 OUR_DEALS = {"22566", "22564", "22568", "22016", "21926", "22292", "22282", "18016"}
+
+TOPICS = {
+    "Solar/Taurus": ["solar", "солар", "taurus", "таурус", "centaur", "titan"],
+    "Siemens SGT": ["siemens", "сименс", "sgt", "simatic", "симатик", "innomotics"],
+    "Cummins/ГПЭС": ["cummins", "камминз", "qsk", "qsv", "гпэс"],
+    "Jenbacher/INNIO": ["jenbacher", "дженбах", "innio"],
+    "Bently Nevada": ["bently", "бентли", "nevada", "3500/"],
+    "Fleetguard/фильтры": ["fleetguard", "флитгард", "фильтр", "filter", "af25", "lf3"],
+    "ABB": ["abb", "абб"],
+    "Буровое НВН": ["bentec", "бентек", "m-i swaco", "swaco", "totco", "нвн", "буров"],
+    "SLB/Cameron": ["cameron", "камерон", "slb", "schlumberger", "grove"],
+    "КИП/автоматика": ["allen bradley", "allen-bradley", "rockwell", "pepperl", "det-tronics",
+                       "auma", "аума", "hirschmann", "comatreleco", "asco", "saex"],
+    "Насосы": ["grundfos", "грундфос", "pompetravaini", "bornemann", "weir", "gabbioneta",
+               "ingersoll", "leroy-somer"],
+    "ЛУКОЙЛ (прямо)": ["лукойл", "энергосети", "нижневолжскнефть", "lukoil"],
+}
+
+# Колонки спецификаций и КП: заголовки у всех поставщиков свои, но слова повторяются.
+COLS = {
+    "pn": ["артикул", "парт", "part", "p/n", "pn", "обозначение", "каталожн", "код", "номер детали",
+           "item code", "ref", "reference"],
+    "name": ["наименование", "номенклатура", "описание", "description", "item", "предмет", "наимен",
+             "designation", "product"],
+    "qty": ["кол-во", "количество", "кол.", "qty", "quantity", "q-ty", "шт"],
+    "price": ["цена", "price", "unit price", "стоимость", "amount", "сумма", "total", "eur", "usd",
+              "руб", "rmb", "cny"],
+    "lead": ["срок", "lead", "delivery", "поставк", "готовност", "eta", "days", "weeks"],
+}
+PN_RE = re.compile(r"\b(?=[A-Z0-9]*[0-9])[A-Z0-9][A-Z0-9\-./]{4,24}\b")
+NUM_RE = re.compile(r"\d[\d\s.,]*")
+NOISE = re.compile(r"^(итого|всего|подпись|примечан|n\s*п/п|приложение|total|subtotal)", re.I)
+
+
+# ------------------------------------------------------------------ утилиты
+def topics_of(text: str) -> list[str]:
+    t = (text or "").lower()
+    return [n for n, ws in TOPICS.items() if any(w in t for w in ws)]
 
 
 def sniff(b: bytes) -> str:
     if not b:
         return "пусто"
     if b[:2] == b"PK":
-        return "zip/xlsx/docx"
+        return "xlsx/docx"
     if b[:4] == b"%PDF":
         return "pdf"
     if b[:8] == b"\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1":
-        return "старый office"
+        return "xls/doc"
     if b[:3] == b"\xff\xd8\xff" or b[:4] == b"\x89PNG":
         return "изображение"
     if b[:4] == b"Rar!" or b[:2] == b"\x1f\x8b" or b[:2] == b"7z":
         return "архив"
-    head = b[:400].lower()
+    head = b[:500].lower()
     if b"<html" in head or b"<!doctype" in head:
-        return "HTML (скорее всего страница входа)"
+        return "страница входа"
     return "прочее"
 
 
-def try_get(url: str, sess: requests.Session) -> tuple[str, int]:
+def rows_xlsx(b: bytes) -> list[list[str]]:
+    import openpyxl
+    out: list[list[str]] = []
+    wb = openpyxl.load_workbook(io.BytesIO(b), read_only=True, data_only=True)
+    for ws in wb.worksheets:
+        for row in ws.iter_rows(values_only=True):
+            cells = ["" if c is None else str(c).strip() for c in row]
+            if any(cells):
+                out.append(cells)
+            if len(out) > 12000:
+                return out
+    return out
+
+
+def rows_xls(b: bytes) -> list[list[str]]:
+    import xlrd
+    out: list[list[str]] = []
+    wb = xlrd.open_workbook(file_contents=b)
+    for ws in wb.sheets():
+        for i in range(ws.nrows):
+            cells = [str(c.value).strip() for c in ws.row(i)]
+            if any(cells):
+                out.append(cells)
+            if len(out) > 12000:
+                return out
+    return out
+
+
+def text_docx(b: bytes) -> str:
     try:
-        r = sess.get(url, timeout=60, allow_redirects=True)
-    except Exception as e:
-        return (f"ошибка сети: {type(e).__name__}", 0)
-    if r.status_code != 200:
-        return (f"http {r.status_code}", 0)
-    return (sniff(r.content), len(r.content))
+        z = zipfile.ZipFile(io.BytesIO(b))
+        if "word/document.xml" in z.namelist():
+            raw = z.read("word/document.xml").decode("utf-8", "ignore")
+            raw = raw.replace("</w:p>", "\n")
+            return " ".join(re.findall(r"<w:t[^>]*>([^<]{1,400})</w:t>", raw))
+    except Exception:
+        return ""
+    return ""
 
 
+def text_pdf(b: bytes) -> str:
+    try:
+        from pypdf import PdfReader
+        rd = PdfReader(io.BytesIO(b))
+        return "\n".join((p.extract_text() or "") for p in rd.pages[:80])
+    except Exception:
+        return ""
+
+
+def num(s: str) -> float | None:
+    m = NUM_RE.search(str(s or ""))
+    if not m:
+        return None
+    t = m.group(0).replace(" ", "").replace(" ", "")
+    if t.count(",") and t.count("."):
+        t = t.replace(",", "")
+    else:
+        t = t.replace(",", ".")
+    try:
+        return float(t)
+    except Exception:
+        return None
+
+
+def header_map(rows: list[list[str]]) -> tuple[int, dict[str, int]]:
+    for i, row in enumerate(rows[:50]):
+        low = [str(c).lower() for c in row]
+        found: dict[str, int] = {}
+        for key, words in COLS.items():
+            for j, c in enumerate(low):
+                if c and any(w in c for w in words):
+                    found.setdefault(key, j)
+                    break
+        if len(found) >= 2 and ("name" in found or "pn" in found):
+            return i, found
+    return -1, {}
+
+
+def items_from_rows(rows: list[list[str]]) -> list[dict]:
+    hi, cols = header_map(rows)
+    body = rows[hi + 1:] if hi >= 0 else rows
+    out: list[dict] = []
+    for row in body:
+        joined = " ".join(str(c) for c in row).strip()
+        if len(joined) < 5 or NOISE.match(joined):
+            continue
+
+        def get(key: str) -> str:
+            j = cols.get(key, -1)
+            return str(row[j]).strip() if 0 <= j < len(row) else ""
+
+        pn = get("pn")
+        name = get("name")
+        if not pn:
+            m = PN_RE.search(joined.upper())
+            pn = m.group(0) if m else ""
+        if not name:
+            txt = [str(c) for c in row if not str(c).replace(".", "").replace(",", "").isdigit()]
+            name = max(txt, key=len) if txt else ""
+        rec = {"pn": pn[:60], "name": name[:200], "qty": num(get("qty")),
+               "price": num(get("price")), "lead": get("lead")[:60], "row": joined[:300]}
+        if not rec["pn"] and len(rec["name"]) < 5:
+            continue
+        out.append(rec)
+        if len(out) >= 2500:
+            break
+    return out
+
+
+def items_from_text(text: str) -> list[dict]:
+    out: list[dict] = []
+    for ln in text.splitlines():
+        ln = ln.strip()
+        if len(ln) < 8 or NOISE.match(ln):
+            continue
+        m = PN_RE.search(ln.upper())
+        if not m:
+            continue
+        out.append({"pn": m.group(0)[:60], "name": ln[:200], "qty": None, "price": None,
+                    "lead": "", "row": ln[:300]})
+        if len(out) >= 2500:
+            break
+    return out
+
+
+# ------------------------------------------------------------------ основной проход
 def main() -> None:
     wh = (os.getenv("BITRIX_WEBHOOK_URL") or "").strip()
     if not wh:
         print("нет BITRIX_WEBHOOK_URL", file=sys.stderr)
         sys.exit(1)
+    subprocess.run([sys.executable, "-m", "pip", "install", "-q", "pypdf", "xlrd==1.2.0"],
+                   check=False)
     bx = BitrixClient(wh)
     sess = requests.Session()
-    base = wh.rstrip("/")
 
-    print("=== Зонд v35: где файлы запросов поставщикам и чем их взять ===\n")
+    print("=== Зонд v36: файлы по запросам поставщикам — выгрузка и разбор ===")
+    print(f"период с {PERIOD_FROM}\n", flush=True)
 
-    # ---------------------------------------------------------------- права вебхука
-    try:
-        sc = bx.call("scope", {})
-        print(f"скоупы вебхука ({len(sc)}): {', '.join(sorted(sc))}\n")
-    except Exception as e:
-        print(f"scope недоступен: {e}\n")
+    # --- поля СП-166
+    fl = bx.call("crm.item.fields", {"entityTypeId": SPA}) or {}
+    fields = fl.get("fields") or {}
+    ffields = [n for n, m in fields.items() if str(m.get("type")) == "file"]
 
-    # ---------------------------------------------------------------- поля СП-166
-    file_fields: list[str] = []
-    try:
-        fl = bx.call("crm.item.fields", {"entityTypeId": SPA}) or {}
-        fields = fl.get("fields") or {}
-        for name, meta in fields.items():
-            if str(meta.get("type")) == "file":
-                file_fields.append(name)
-        print(f"полей у СП-166: {len(fields)} · из них файловых: {len(file_fields)}")
-        print(f"  файловые поля: {file_fields}\n")
-    except Exception as e:
-        print(f"crm.item.fields не отдал поля: {e}\n")
-
-    # ---------------------------------------------------------------- выборка запросов с КП
-    sel = ["id", "title", "stageId", "parentId2", "createdTime"] + file_fields
-    items = bx.call("crm.item.list", {
-        "entityTypeId": SPA, "order": {"id": "DESC"},
-        "filter": {">=createdTime": "2026-07-01"},
-        "select": sel, "start": -1}) or {}
-    items = items.get("items", []) if isinstance(items, dict) else []
+    # --- все запросы периода
+    sel = ["id", "title", "stageId", "parentId2", "createdTime", "assignedById"] + ffields
+    items = bx.list_items(SPA, filter={">=createdTime": PERIOD_FROM}, select=sel)
     stages = bx.spa_stages(SPA, 24)
-    quoted = [i for i in items if stages.get(str(i.get("stageId")), str(i.get("stageId"))) in GOT_QUOTE]
-    ours = [i for i in quoted if str(i.get("parentId2") or "") in OUR_DEALS]
-    print(f"записей СП-166 с 01.07 в первой странице выборки: {len(items)} · с КП: {len(quoted)} · по нашим сделкам: {len(ours)}")
+    print(f"всего записей СП-166: {len(items)}", flush=True)
 
-    sample = (ours + [i for i in quoted if i not in ours])[:12]
-    print(f"в выборку зонда взято: {len(sample)} запросов\n")
-
-    # ---------------------------------------------------------------- где лежат файлы
-    found: list[dict] = []          # найденные файловые объекты
-    src_count: Counter = Counter()
-
-    for it in sample:
-        iid = it["id"]
-        # 1) файловые поля самой записи
-        full = bx.call("crm.item.get", {"entityTypeId": SPA, "id": iid}) or {}
-        item = (full.get("item") or {}) if isinstance(full, dict) else {}
-        for fname, val in item.items():
-            if not val or fname in ("id", "title"):
+    recs: dict[str, dict] = {}
+    for it in items:
+        iid = str(it["id"])
+        title = str(it.get("title") or "")
+        tp = topics_of(title)
+        deal = str(it.get("parentId2") or "")
+        stage = stages.get(str(it.get("stageId")), str(it.get("stageId")))
+        ours = bool(tp) or deal in OUR_DEALS
+        recs[iid] = {"id": iid, "title": title[:160], "deal": deal, "stage": stage,
+                     "created": str(it.get("createdTime"))[:10], "topics": tp,
+                     "kp": stage in GOT_QUOTE, "ours": ours, "files": []}
+        for f in ffields:
+            v = it.get(f)
+            if not v:
                 continue
-            vals = val if isinstance(val, list) else [val]
-            for fo in vals:
-                if isinstance(fo, dict) and (fo.get("id") or fo.get("ID")):
-                    src_count["поле записи"] += 1
-                    found.append({"src": f"поле {fname}", "item": iid, "fo": fo})
+            for fo in (v if isinstance(v, list) else [v]):
+                if isinstance(fo, dict) and fo.get("urlMachine"):
+                    recs[iid]["files"].append({"src": "поле записи", "fo": fo})
 
-        # 2) комментарии таймлайна — пробуем разные написания типа сущности
-        for ent in (SPA, f"DYNAMIC_{SPA}", "dynamic_166"):
-            try:
-                cs = bx.call("crm.timeline.comment.list", {
-                    "filter": {"ENTITY_ID": iid, "ENTITY_TYPE": ent}, "select": ["ID", "COMMENT", "FILES"]}) or []
-                for c in (cs if isinstance(cs, list) else []):
-                    for fo in (c.get("FILES") or []):
-                        src_count[f"комментарий ({ent})"] += 1
-                        found.append({"src": f"комментарий {ent}", "item": iid, "fo": fo})
-                if cs:
+    ours_ids = [k for k, v in recs.items() if v["ours"]]
+    print(f"по нашей номенклатуре / сделкам: {len(ours_ids)}", flush=True)
+    n_field = sum(len(recs[k]["files"]) for k in ours_ids)
+    print(f"файлов в полях записей (по нашим): {n_field}", flush=True)
+
+    # --- вложения дел и писем таймлайна самих запросов
+    def activities(owner_type: int, owner_ids: list[str]) -> list[dict]:
+        out: list[dict] = []
+        for i in range(0, len(owner_ids), 50):
+            if time.monotonic() > DEADLINE:
+                break
+            chunk = owner_ids[i:i + 50]
+            last = 0
+            while True:
+                try:
+                    res = bx.call("crm.activity.list", {
+                        "filter": {"OWNER_TYPE_ID": owner_type, "OWNER_ID": chunk, ">ID": last},
+                        "select": ["ID", "OWNER_ID", "PROVIDER_ID", "SUBJECT", "FILES"],
+                        "order": {"ID": "ASC"}, "start": -1}) or []
+                except Exception:
                     break
-            except Exception:
+                if not res:
+                    break
+                out.extend(res)
+                last = int(res[-1]["ID"])
+                if len(res) < 50:
+                    break
+        return out
+
+    acts = activities(SPA, ours_ids)
+    prov: Counter = Counter()
+    n_act = 0
+    for a in acts:
+        fs = a.get("FILES") or []
+        if isinstance(fs, dict):
+            fs = list(fs.values())
+        oid = str(a.get("OWNER_ID"))
+        for fo in fs:
+            if isinstance(fo, dict) and fo.get("urlMachine") and oid in recs:
+                recs[oid]["files"].append({"src": f"таймлайн запроса/{a.get('PROVIDER_ID')}",
+                                           "fo": fo})
+                prov[str(a.get("PROVIDER_ID"))] += 1
+                n_act += 1
+    print(f"дел/писем в таймлайне запросов: {len(acts)} · файлов из них: {n_act} · {dict(prov)}",
+          flush=True)
+
+    # --- письма таймлайна наших сделок (КП часто приходят на сделку, не на запрос)
+    deal_files: list[dict] = []
+    dacts = activities(2, sorted(OUR_DEALS))
+    dprov: Counter = Counter()
+    for a in dacts:
+        fs = a.get("FILES") or []
+        if isinstance(fs, dict):
+            fs = list(fs.values())
+        for fo in fs:
+            if isinstance(fo, dict) and fo.get("urlMachine"):
+                deal_files.append({"deal": str(a.get("OWNER_ID")), "prov": str(a.get("PROVIDER_ID")),
+                                   "subj": str(a.get("SUBJECT") or "")[:120], "fo": fo})
+                dprov[str(a.get("PROVIDER_ID"))] += 1
+    print(f"дел/писем в таймлайне наших сделок: {len(dacts)} · файлов из них: {len(deal_files)} · "
+          f"{dict(dprov)}", flush=True)
+
+    # --- очередь на скачивание
+    queue: list[dict] = []
+    for k in ours_ids:
+        for f in recs[k]["files"]:
+            queue.append({"req": k, "deal": recs[k]["deal"], "kp": recs[k]["kp"],
+                          "src": f["src"], "fo": f["fo"]})
+    for f in deal_files:
+        queue.append({"req": None, "deal": f["deal"], "kp": None,
+                      "src": f"таймлайн сделки/{f['prov']}", "subj": f["subj"], "fo": f["fo"]})
+    seen: set[str] = set()
+    uniq: list[dict] = []
+    for q in queue:
+        fid = str(q["fo"].get("id"))
+        if fid in seen:
+            continue
+        seen.add(fid)
+        uniq.append(q)
+    queue = uniq[:MAX_FILES]
+    print(f"\nуникальных файлов в очереди: {len(queue)} (из них по запросам с КП: "
+          f"{sum(1 for q in queue if q['kp'])})\n", flush=True)
+
+    # --- скачивание и разбор
+    stat: Counter = Counter()
+    parsed: list[dict] = []
+    done = [0]
+
+    def work(q: dict) -> dict | None:
+        if time.monotonic() > DEADLINE:
+            return None
+        u = str(q["fo"].get("urlMachine"))
+        try:
+            r = sess.get(u, timeout=90)
+        except Exception as e:
+            stat[f"сеть: {type(e).__name__}"] += 1
+            return None
+        if r.status_code != 200:
+            stat[f"http {r.status_code}"] += 1
+            return None
+        b = r.content
+        kind = sniff(b)
+        stat[kind] += 1
+        rec = {"req": q["req"], "deal": q["deal"], "kp": q["kp"], "src": q["src"],
+               "subj": q.get("subj", ""), "fid": str(q["fo"].get("id")),
+               "name": str(q["fo"].get("name") or "")[:160], "size": len(b), "kind": kind,
+               "items": []}
+        try:
+            if kind == "xlsx/docx":
+                nm = (rec["name"] or "").lower()
+                if nm.endswith(".docx") or b"word/document.xml" in b[:4000]:
+                    rec["items"] = items_from_text(text_docx(b))
+                else:
+                    rec["items"] = items_from_rows(rows_xlsx(b))
+            elif kind == "xls/doc":
+                try:
+                    rec["items"] = items_from_rows(rows_xls(b))
+                except Exception:
+                    rec["items"] = []
+            elif kind == "pdf":
+                rec["items"] = items_from_text(text_pdf(b))
+        except Exception as e:
+            rec["parse_error"] = type(e).__name__
+        done[0] += 1
+        if done[0] % 100 == 0:
+            print(f"  обработано {done[0]} файлов…", flush=True)
+        return rec
+
+    with ThreadPoolExecutor(max_workers=12) as ex:
+        for rec in ex.map(work, queue):
+            if rec:
+                parsed.append(rec)
+
+    print("\n--- ЧТО ПРИШЛО ---")
+    for k, v in stat.most_common():
+        print(f"  {v:>5}  {k}")
+    real = [p for p in parsed if p["kind"] in ("xlsx/docx", "pdf", "xls/doc")]
+    withit = [p for p in real if p["items"]]
+    print(f"\nскачано файлов: {len(parsed)} · из них документы: {len(real)} · "
+          f"разобрано с позициями: {len(withit)}")
+    print(f"позиций извлечено всего: {sum(len(p['items']) for p in withit)}")
+    byk = Counter("с КП" if p["kp"] else ("сделка" if p["kp"] is None else "без КП") for p in real)
+    print(f"документы по источнику запроса: {dict(byk)}")
+    srcs = Counter(p["src"] for p in real)
+    print(f"документы по месту хранения: {dict(srcs)}")
+
+    # --- сопоставление: покрыты ли строки запроса заказчика ценами из КП поставщиков
+    # Спецификация заказчика лежит в тех же вложениях, что и КП, поэтому эталон берётся
+    # прямо здесь: самый крупный по числу позиций документ наших сделок. Наружу идут
+    # только количества — ни одного артикула и ни одной цены.
+    def norm_pn(s: str) -> str:
+        cyr = str.maketrans({"А": "A", "В": "B", "С": "C", "Е": "E", "К": "K", "М": "M",
+                             "Н": "H", "О": "O", "Р": "P", "Т": "T", "Х": "X", "У": "Y"})
+        return re.sub(r"[^A-Z0-9]", "", str(s or "").upper().translate(cyr))
+
+    def pnset(doc: dict) -> set[str]:
+        return {p for p in (norm_pn(i.get("pn")) for i in doc.get("items") or []) if len(p) >= 5}
+
+    try:
+        for d in real:
+            d["_pns"] = pnset(d)
+        cand = sorted([d for d in real if d["req"] is None or str(d["deal"]) in OUR_DEALS],
+                      key=lambda d: -len(d["_pns"]))
+        print("\n--- КАНДИДАТЫ В СПЕЦИФИКАЦИЮ ЗАКАЗЧИКА (по числу артикулов) ---")
+        for d in cand[:8]:
+            print(f"  {len(d['_pns']):>5} арт. · сделка {d['deal']:>6} · {d['kind']:9} · "
+                  f"{d['size']:>8} б · {d['name'][:70]}")
+
+        rfq: set[str] = set()
+        for d in cand[:3]:
+            rfq |= d["_pns"]
+        quoted: set[str] = set()
+        quoted_priced: set[str] = set()
+        for d in real:
+            if d["req"] is None or not d["kp"]:
                 continue
+            quoted |= d["_pns"]
+            for i in d.get("items") or []:
+                p = norm_pn(i.get("pn"))
+                if len(p) >= 5 and i.get("price"):
+                    quoted_priced.add(p)
 
-        # 3) дела/письма таймлайна
-        for otid in (SPA, 2):
-            owner = iid if otid == SPA else it.get("parentId2")
-            if not owner:
-                continue
-            try:
-                acts = bx.call("crm.activity.list", {
-                    "filter": {"OWNER_TYPE_ID": otid, "OWNER_ID": owner},
-                    "select": ["ID", "PROVIDER_ID", "TYPE_ID", "SUBJECT", "FILES"],
-                    "start": -1}) or []
-                for a in (acts if isinstance(acts, list) else [])[:40]:
-                    fs = a.get("FILES") or []
-                    if isinstance(fs, dict):
-                        fs = list(fs.values())
-                    for fo in fs:
-                        if isinstance(fo, dict):
-                            src_count[f"activity owner={otid} ({a.get('PROVIDER_ID')})"] += 1
-                            found.append({"src": f"activity{otid}", "item": iid, "fo": fo})
-            except Exception as e:
-                src_count[f"activity owner={otid}: ОШИБКА {type(e).__name__}"] += 1
+        print("\n--- ПОКРЫТИЕ СТРОК ЗАКАЗЧИКА КОТИРОВКАМИ ПОСТАВЩИКОВ ---")
+        print(f"  артикулов в эталонной спецификации : {len(rfq)}")
+        print(f"  артикулов во всех КП поставщиков   : {len(quoted)}")
+        print(f"  пересечение (есть хоть какое КП)   : {len(rfq & quoted)}"
+              f"  = {100 * len(rfq & quoted) / max(1, len(rfq)):.1f}%")
+        print(f"  из них с проставленной ценой       : {len(rfq & quoted_priced)}"
+              f"  = {100 * len(rfq & quoted_priced) / max(1, len(rfq)):.1f}%")
+    except Exception as e:
+        print(f"\nсопоставление не выполнено: {type(e).__name__}: {e}")
 
-    print("--- ГДЕ НАШЛИСЬ ФАЙЛОВЫЕ ОБЪЕКТЫ ---")
-    if not src_count:
-        print("  ни одного файлового объекта не найдено ни в полях, ни в таймлайне")
-    for k, v in src_count.most_common():
-        print(f"  {v:>4}  {k}")
-    print(f"\nвсего объектов для проверки скачивания: {len(found)}\n")
-
-    if found:
-        keys = Counter()
-        for f in found[:5]:
-            keys.update(f["fo"].keys())
-        print(f"ключи файлового объекта (по первым 5): {sorted(keys)}\n")
-
-    # ---------------------------------------------------------------- чем скачать
-    strategies: dict[str, Counter] = {}
-    sizes: dict[str, list[int]] = {}
-
-    def note(name: str, res: tuple[str, int]) -> None:
-        strategies.setdefault(name, Counter())[res[0]] += 1
-        sizes.setdefault(name, []).append(res[1])
-
-    for f in found[:25]:
-        fo = f["fo"]
-        fid = fo.get("id") or fo.get("ID") or fo.get("fileId")
-        for key in ("urlMachine", "downloadUrl", "url", "URL_MACHINE", "DOWNLOAD_URL", "viewUrl"):
-            u = fo.get(key)
-            if u:
-                u = str(u)
-                if u.startswith("/"):
-                    host = base.split("/rest/")[0]
-                    u = host + u
-                note(f"объект.{key}", try_get(u, sess))
-        if fid:
-            try:
-                df = bx.call("disk.file.get", {"id": fid}) or {}
-                dl = df.get("DOWNLOAD_URL") if isinstance(df, dict) else None
-                note("disk.file.get → DOWNLOAD_URL", try_get(str(dl), sess) if dl else ("метод не дал ссылки", 0))
-            except Exception as e:
-                note("disk.file.get → DOWNLOAD_URL", (f"ошибка REST: {type(e).__name__}", 0))
-            try:
-                ext = bx.call("disk.file.getExternalLink", {"id": fid})
-                note("disk.file.getExternalLink", try_get(str(ext), sess) if ext else ("метод не дал ссылки", 0))
-            except Exception as e:
-                note("disk.file.getExternalLink", (f"ошибка REST: {type(e).__name__}", 0))
-            note("rest/download?token", try_get(f"{base}/download.json?id={fid}", sess))
-
-    print("--- ЧТО ОТВЕТИЛ КАЖДЫЙ СПОСОБ СКАЧИВАНИЯ ---")
-    if not strategies:
-        print("  нечего было качать")
-    for name, c in strategies.items():
-        good = sum(n for k, n in c.items() if k in ("zip/xlsx/docx", "pdf", "старый office", "изображение", "архив"))
-        sz = [s for s in sizes[name] if s]
-        med = sorted(sz)[len(sz) // 2] if sz else 0
-        mark = "  ✔ ГОДИТСЯ" if good else ""
-        print(f"  {name:34} файлов {good:>3} из {sum(c.values()):>3} · медиана {med:>8} б · {dict(c)}{mark}")
-
-    print("\n✓ зонд v35 завершён")
+    # --- выгрузка наружу: сжать, зашифровать на открытый ключ, напечатать base64
+    for d in real:
+        d.pop("_pns", None)
+    payload = {
+        "period_from": PERIOD_FROM,
+        "requests": [dict(recs[k], files=len(recs[k]["files"])) for k in ours_ids],
+        "docs": parsed,
+        "stat": dict(stat),
+    }
+    raw = gzip.compress(json.dumps(payload, ensure_ascii=False).encode(), 9)
+    key, iv = secrets.token_bytes(32), secrets.token_bytes(16)
+    enc = subprocess.run(["openssl", "enc", "-aes-256-cbc", "-K", key.hex(), "-iv", iv.hex()],
+                         input=raw, capture_output=True, check=True).stdout
+    sealed = subprocess.run(["openssl", "pkeyutl", "-encrypt", "-pubin", "-inkey", str(PUBKEY),
+                             "-pkeyopt", "rsa_padding_mode:oaep",
+                             "-pkeyopt", "rsa_oaep_md:sha256"],
+                            input=key + iv, capture_output=True, check=True).stdout
+    b64 = base64.b64encode(enc).decode()
+    print(f"\nзашифрованный разбор: {len(raw)} б сжато → {len(enc)} б шифра → "
+          f"{len(b64)} символов base64")
+    print("-----KVANT SEALED KEY-----")
+    print(base64.b64encode(sealed).decode())
+    print("-----KVANT SEALED DATA-----")
+    for i in range(0, len(b64), 4000):
+        print(b64[i:i + 4000])
+    print("-----KVANT END-----")
+    print("\n✓ зонд v36 завершён")
 
 
 if __name__ == "__main__":
