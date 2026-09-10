@@ -243,6 +243,26 @@ def build(db_path: str) -> str:
     sp_spread = f"{spreads[len(spreads)//2]:.1f}" if spreads else "—"
     sp_cmp = len(spreads)
 
+    # ── сегменты оборудования: где деньги и где проигрываем
+    seg_rows = q("""
+        WITH s AS (SELECT deal_id did, max(side='поставщик') sup
+                   FROM file_cards WHERE deal_id IS NOT NULL GROUP BY deal_id)
+        SELECT coalesce(g.name, d.seg), count(*),
+               sum(d.won=1),
+               sum(CASE WHEN d.closed='Y' AND d.won IS NOT 1 THEN 1 ELSE 0 END),
+               sum(coalesce(s.sup,0)),
+               round(sum(coalesce(d.sum_eur,0))/1e6, 1)
+        FROM deals d LEFT JOIN segments g ON g.code = d.seg
+        LEFT JOIN s ON s.did = d.id
+        GROUP BY 1 ORDER BY 2 DESC""")
+    seg_t = table(["сегмент оборудования", "сделок", "выиграно", "проиграно", "доля побед",
+                   "с офертой поставщика", "сумма, млн €"],
+                  [[f"<b>{h(str(nm)[:52])}</b>", num(n), num(w or 0), num(ls or 0),
+                    pct(w or 0, (w or 0) + (ls or 0)), pct(sup or 0, n), num(sm)]
+                   for nm, n, w, ls, sup, sm in seg_rows], {1, 2, 3, 4, 5, 6})
+    seg_named = one("SELECT count(*) FROM deals WHERE seg IS NOT NULL AND seg<>'other'")
+    seg_tot = one("SELECT count(*) FROM deals")
+
     # ── поставщики: кто отвечает, кто молчит, кто чем возит
     sup_req = one("SELECT sum(requests) FROM supplier_stats")
     sup_ans = one("SELECT sum(answered) FROM supplier_stats")
@@ -308,7 +328,13 @@ def build(db_path: str) -> str:
     old = one("SELECT count(*) FROM file_cards WHERE date_max<'2024-01-01'")
 
     acts = [
-        (f"Холодные адреса отвечают в 17 % случаев, постоянный пул — в 52 %",
+        ("КИПиА, арматура и ГПУ: оферты есть, а побед 4–10 %",
+         "В КИПиА оферта поставщика найдена в 47 % сделок, в арматуре — в 44 %, но выигрывается "
+         "только 9 % и 10 %. Для сравнения, в ГШО оферта есть в 59 % сделок и побед 21 %. "
+         "Значит в этих сегментах барьер не в поиске поставщика, а дальше: оригинал вместо "
+         "аналога, сертификация, допуск завода-изготовителя. Прежде чем вкладываться в сорсинг "
+         "по ним, стоит проверить на десятке проигранных сделок, что именно требовал заказчик."),
+        ("Холодные адреса отвечают в 17 % случаев, постоянный пул — в 52 %",
          f"Из {num(sup_n)} поставщиков {num(one('SELECT count(*) FROM supplier_stats WHERE requests=1'))} "
          "получили ровно один запрос, и ответил из них каждый шестой. Сорок три поставщика, "
          "которым пишут чаще тридцати раз, дают половину всех ответов и большую часть выборов. "
@@ -459,6 +485,15 @@ def build(db_path: str) -> str:
 {rfq_t}
 <p>Чем больше поставщиков опрошено, тем выше доля побед — от одного запроса
 до семи и больше разрыв почти вдвое. Это уже управляемое действие, а не следствие.</p>
+</section>
+
+<section><h2>Сегменты оборудования</h2>
+<p class="lead">Сегмент сделки проставлен по названию карточки и по тому, что в ней
+запрашивали: {num(seg_named)} сделок из {num(seg_tot)} узнаны, остальные — «прочее».
+Столбец «с офертой поставщика» показывает, где сорсинг вообще доходит до цены.</p>
+{seg_t}
+<p class="note">Сумма — по полю сделки, в евро по курсу на дату; у сделок в работе она
+плановая. Доля побед считается от сделок с известным исходом.</p>
 </section>
 
 <section><h2>Поставщики: кто отвечает</h2>
