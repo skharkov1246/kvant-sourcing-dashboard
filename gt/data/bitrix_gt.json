@@ -1,15 +1,35 @@
 {
- "updated": "2026-09-07",
+ "updated": "2026-09-10",
  "source": "Bitrix24: сделки по ключевым словам ГТУ + СП-166 «Запросы поставщикам»",
  "live": true,
  "deals": [
+  {
+   "id": "23146",
+   "title": "048-7436-26 T-111 Выполнение работ по техническому обслуживанию при наработке 4000 и 8000 часов, а также услуг по удаленной поддержке при эксплуатации газотурбинных агрегатов Solar Mars 100 ООО \"ЛУКОЙЛ-Пермнефтеоргсинтез\" в 2027 - 2029 годах",
+   "models": [
+    "Mars 100"
+   ],
+   "stage": "C2:NEW",
+   "created": "2026-09-09",
+   "rfqs": []
+  },
+  {
+   "id": "23142",
+   "title": "DR.xlsx (ЭР-сервис ЗИП на ГТУ DRESSER RAND KG2-3E)",
+   "models": [
+    "ГТУ (модель уточнить)"
+   ],
+   "stage": "C4:NEW",
+   "created": "2026-09-08",
+   "rfqs": []
+  },
   {
    "id": "22946",
    "title": "2140380/1 Комп. прокладок, Комп. фитинг-адап. SGT",
    "models": [
     "Siemens (модель уточнить)"
    ],
-   "stage": "C2:PREPARATION",
+   "stage": "C2:EXECUTING",
    "created": "2026-08-27",
    "rfqs": [
     {
@@ -70,7 +90,7 @@
      "id": "41592",
      "title": "WTT Паша tg",
      "created": "2026-08-18",
-     "supplier": "Wuxi Weishi Turbine Technology Co., Ltd.",
+     "supplier": "Wuxi Weishi Turbine Technology Co., Ltd. (Wuxi Heyi Power System Co., Ltd.)",
      "stage": "In Correspondance",
      "sourcer": "Ekaterina Kornilova",
      "models": [
@@ -311,7 +331,7 @@
      "id": "38808",
      "title": "WTT Паша tg",
      "created": "2026-07-16",
-     "supplier": "Wuxi Weishi Turbine Technology Co., Ltd.",
+     "supplier": "Wuxi Weishi Turbine Technology Co., Ltd. (Wuxi Heyi Power System Co., Ltd.)",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
      "models": [
@@ -2217,7 +2237,7 @@
      "id": "37410",
      "title": "WTT tg",
      "created": "2026-07-01",
-     "supplier": "Wuxi Weishi Turbine Technology Co., Ltd.",
+     "supplier": "Wuxi Weishi Turbine Technology Co., Ltd. (Wuxi Heyi Power System Co., Ltd.)",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
      "models": [
@@ -2338,7 +2358,7 @@
      "id": "38848",
      "title": "Паша tg",
      "created": "2026-07-17",
-     "supplier": "Wuxi Weishi Turbine Technology Co., Ltd.",
+     "supplier": "Wuxi Weishi Turbine Technology Co., Ltd. (Wuxi Heyi Power System Co., Ltd.)",
      "stage": "Price at Work",
      "sourcer": "Ekaterina Kornilova",
      "models": [
@@ -2534,7 +2554,7 @@
     {
      "id": "25422",
      "title": "Фильтры Siemens в EU Automation (UAE)",
-     "created": "2025-12-15",
+     "created": "2025-12-16",
      "supplier": "EU Automation (UAE)",
      "stage": "Ответ не получен (в срок)",
      "sourcer": "Daria Lysenko",
@@ -2624,7 +2644,7 @@
     {
      "id": "26030",
      "title": "Направляющие аппараты для MS5001PA в POWERGEN SOLUTIONS FZE LLC",
-     "created": "2026-01-08",
+     "created": "2026-01-09",
      "supplier": "POWERGEN SOLUTIONS FZE LLC",
      "stage": "Selected",
      "sourcer": "Daria Lysenko",
@@ -2876,7 +2896,7 @@
     {
      "id": "24010",
      "title": "Pepple+Fuchs в Kempston Controls LLC",
-     "created": "2025-11-18",
+     "created": "2025-11-19",
      "supplier": "Kempston Controls LLC",
      "stage": "In Correspondance",
      "sourcer": "Daria Lysenko",
@@ -2887,7 +2907,7 @@
     {
      "id": "24012",
      "title": "Pepple+Fuchs в Gahangan",
-     "created": "2025-11-18",
+     "created": "2025-11-19",
      "supplier": "Gahangan",
      "stage": "Unread Messages",
      "sourcer": "Daria Lysenko",
@@ -3425,7 +3445,7 @@
      "id": "37408",
      "title": "WTT tg",
      "created": "2026-07-01",
-     "supplier": "Wuxi Weishi Turbine Technology Co., Ltd.",
+     "supplier": "Wuxi Weishi Turbine Technology Co., Ltd. (Wuxi Heyi Power System Co., Ltd.)",
      "stage": "Отказ в КП",
      "sourcer": "Ekaterina Kornilova",
      "models": [
@@ -3653,7 +3673,7 @@
      "id": "37406",
      "title": "WTT tg",
      "created": "2026-07-01",
-     "supplier": "Wuxi Weishi Turbine Technology Co., Ltd.",
+     "supplier": "Wuxi Weishi Turbine Technology Co., Ltd. (Wuxi Heyi Power System Co., Ltd.)",
      "stage": "Price at Work",
      "sourcer": "Ekaterina Kornilova",
      "models": [
@@ -4014,7 +4034,7 @@
      "id": "38854",
      "title": "8 позиций до октября wtt Паша tg",
      "created": "2026-07-17",
-     "supplier": "Wuxi Weishi Turbine Technology Co., Ltd.",
+     "supplier": "Wuxi Weishi Turbine Technology Co., Ltd. (Wuxi Heyi Power System Co., Ltd.)",
      "stage": "Ответ не получен (в срок)",
      "sourcer": "Ekaterina Kornilova",
      "models": [
@@ -5648,7 +5668,7 @@
     {
      "id": "10108",
      "title": "Requests #10108",
-     "created": "2024-12-17",
+     "created": "2024-12-18",
      "supplier": "RTP power",
      "stage": "Selected",
      "sourcer": "Ruslan Sitdikov",
@@ -8220,7 +8240,7 @@
      "n": 2
     },
     {
-     "name": "Wuxi Weishi Turbine Technology Co., Ltd.",
+     "name": "Wuxi Weishi Turbine Technology Co., Ltd. (Wuxi Heyi Power System Co., Ltd.)",
      "n": 2
     },
     {
@@ -8406,7 +8426,7 @@
      "n": 1
     },
     {
-     "name": "Wuxi Weishi Turbine Technology Co., Ltd.",
+     "name": "Wuxi Weishi Turbine Technology Co., Ltd. (Wuxi Heyi Power System Co., Ltd.)",
      "n": 1
     },
     {
@@ -8886,7 +8906,7 @@
      "n": 1
     },
     {
-     "name": "Wuxi Weishi Turbine Technology Co., Ltd.",
+     "name": "Wuxi Weishi Turbine Technology Co., Ltd. (Wuxi Heyi Power System Co., Ltd.)",
      "n": 1
     },
     {
@@ -8968,7 +8988,7 @@
      "n": 1
     },
     {
-     "name": "Wuxi Weishi Turbine Technology Co., Ltd.",
+     "name": "Wuxi Weishi Turbine Technology Co., Ltd. (Wuxi Heyi Power System Co., Ltd.)",
      "n": 1
     },
     {
@@ -9001,7 +9021,7 @@
      "n": 3
     },
     {
-     "name": "Wuxi Weishi Turbine Technology Co., Ltd.",
+     "name": "Wuxi Weishi Turbine Technology Co., Ltd. (Wuxi Heyi Power System Co., Ltd.)",
      "n": 2
     },
     {
