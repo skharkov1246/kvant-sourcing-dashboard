@@ -197,11 +197,17 @@ MAX_ROWS_PER_FILE = 4000
 # Поля карточки, где лежит номенклатура. Остальные — шаблон «экономики проекта»,
 # вложения бота и файлы тендерной площадки: позиций там нет, а мусора много.
 GOOD_FIELDS = (
+    # поля карточки сделки
     "Техническая спецификация", "Offer from supplier(s)",
     "Offer from supplier (Техническое поле.Заполняется автоматически)",
     "Offer from us", "Customer request for automatic processing",
     "Technical data from customer", "Processed file for supplier", "Result file",
     "(старое) Result of automatic request processing",
+    # поля карточки запроса поставщику (смарт-процесс 166). Называются иначе, и
+    # без них не разбиралось 4 854 оферты на 32,4 млн знаков — ровно та сторона,
+    # где лежит цена поставщика на конкретный артикул.
+    "Offer from supplier", "КП поставщика", "Offer, old", "Processed offer",
+    "Processed offer with descriptions / archive", "Request file",
 )
 
 # Реквизиты и ссылки на нормативы, которые выглядят как артикулы. Без этого верх
