@@ -98,6 +98,55 @@ const PANES = [
     + D.parts_notes.map(t=>`<div class="box">${t}</div>`).join('')
     + (D.prices.length ? '<h2>Цены и сроки</h2>' + T(['Позиция','Цена / срок','Основание','Источник'],
         D.prices.map(x=>[esc(x.item), `<span class="cn">${esc(x.val)}</span>`, x.basis||'', `<span class="src">${esc(x.src||'')}</span>`])) : '')],
+ ['Партномера и шифровки', () => D.pn_intro.map(t=>`<div class="box crit">${t}</div>`).join('')
+    + '<h2>Форматы номеров по школам</h2>' + T(['Формат','Машины','Что это и как читается','Реальные образцы'],
+      D.pn_formats.map(x=>[`<span class="cn">${esc(x.f)}</span>`, esc(x.m), x.w, `<span class="src">${x.ex}</span>`]))
+    + '<h2>Позиционные коды — язык, на котором машину понимает поставщик</h2>' + T(['Код','Немецкий оригинал','Что это','Диапазон'],
+      D.pos_codes.map(x=>[`<span class="cn">${esc(x.c)}</span>`, esc(x.de), esc(x.ru), x.r]))
+    + `<div class="box warn">${D.pos_note}</div>`
+    + '<h2>Глоссарий RU / EN / DE / IT — для попадания в терминологию поставщика</h2>' + T(['Русский','English','Deutsch','Italiano'],
+      D.glossary.map(x=>[`<span class="cn">${esc(x.ru)}</span>`, esc(x.en), esc(x.de), esc(x.it)]))
+    + D.pn_gaps.map(t=>`<div class="box">${t}</div>`).join('')],
+ ['Керамика и горелки', () => D.cer_spec.map(t=>`<div class="box crit">${t}</div>`).join('')
+    + '<h2>Патентная карта: что можно копировать, а что нет</h2>' + T(['Патент','Дата','Что защищает','Статус'],
+      D.cer_patents.map(x=>[`<span class="cn">${esc(x.n)}</span>`, esc(x.d), x.w, x.s]))
+    + '<h2>Температуры</h2>' + T(['Зона','Температура','Источник'],
+      D.cer_temp.map(x=>[esc(x.z), `<span class="cn">${esc(x.t)}</span>`, `<span class="src">${esc(x.s)}</span>`]))
+    + '<h2>Количества</h2>' + D.cer_count.map(t=>`<div class="box">${t}</div>`).join('')
+    + '<h2>Научные работы — где лежит физика</h2>' + T(['Работа','Авторы','Что даёт'],
+      D.cer_papers.map(x=>[`<span class="cn">${esc(x.n)}</span>`, esc(x.a), x.w]))
+    + '<h2>Кто делает и заявляет</h2>' + T(['Компания','Страна','Что заявляет','Контакт','Оговорка'],
+      D.cer_makers.map(x=>[`<span class="cn">${esc(x.n)}</span>`, esc(x.c), x.w, esc(x.k), x.x]))],
+ ['Ведомости из тендеров', () => '<h2>Подтверждённые количества и номера</h2>' + T(['Машина','Позиция','Количество','Основание'],
+      D.bom_qty.map(x=>[`<span class="cn">${esc(x.m)}</span>`, esc(x.i), `<span class="cn">${x.q}</span>`, x.p]))
+    + `<div class="box warn">${D.bom_fmt}</div>`
+    + '<h2>Состав комплекта и логика лотов</h2>' + D.bom_kit.map(t=>`<div class="box">${t}</div>`).join('')
+    + '<h2>Требования заказчиков — что придётся закрыть</h2>' + T(['Что','Требование'],
+      D.bom_req.map(x=>[`<span class="cn">${esc(x.t)}</span>`, x.r]))],
+ ['Апгрейды и ремонт', () => '<h2>Матрица апгрейдов</h2>' + T(['Пакет','Модель','Применимость','Когда ставится','Прирост ГТУ','Прирост ПГУ','XL-режим','Интервал','Что входит'],
+      D.upg_matrix.map(x=>[`<span class="cn">${esc(x.p)}</span>`, x.m, esc(x.ap), x.wh, `<span class="cn">${esc(x.gt)}</span>`, esc(x.cc), esc(x.xl), esc(x.iv), x.c]))
+    + D.upg_notes.map(t=>`<div class="box">${t}</div>`).join('')
+    + '<h2>Свежие внедрения</h2>' + T(['Год','Объект','Что сделано'],
+      D.upg_refs.map(x=>[esc(x.y), `<span class="cn">${esc(x.o)}</span>`, x.w]))
+    + '<h2>Ремонтные технологии: 5 стадий</h2>' + T(['Стадия','Операции'],
+      D.repair_stages.map(x=>[`<span class="cn">${esc(x.s)}</span>`, x.w]))
+    + D.repair_notes.map(t=>`<div class="box">${t}</div>`).join('')
+    + '<h2>Типы инспекций и длительность</h2>' + T(['Тип','Длительность','Объём'],
+      D.insp_types.map(x=>[`<span class="cn">${esc(x.t)}</span>`, `<span class="cn">${x.d}</span>`, x.w]))
+    + '<h2>Ремонтные центры</h2>' + T(['Центр','Адрес','Что делает'],
+      D.repair_centres.map(x=>[`<span class="cn">${esc(x.n)}</span>`, esc(x.a), x.w]))],
+ ['Литьё и поковки', () => '<h2>Кто реально льёт крупные лопатки (перо от 300 мм)</h2>' + T(['#','Компания','Габарит','Что умеет','Доступ'],
+      D.cast_rank.map(x=>[esc(x.r), `<span class="cn">${esc(x.n)}</span>`, x.g, x.w, esc(x.a)]))
+    + D.cast_notes.map(t=>`<div class="box">${t}</div>`).join('')
+    + '<h2>Поковка-заготовка диска ротора</h2>' + T(['Компания','Страна','Возможности','Контакт'],
+      D.forge_disc.map(x=>[`<span class="cn">${esc(x.n)}</span>`, esc(x.c), x.w, esc(x.k)]))
+    + '<h2>Хиртовый венец — где обрывается открытый рынок</h2>' + D.hirth.map(t=>`<div class="box warn">${t}</div>`).join('')],
+ ['КВОУ и фильтры', () => D.kvou_geom.map(t=>`<div class="box crit">${t}</div>`).join('')
+    + '<h2>Реальные размеры</h2>' + T(['Обозначение','Верхний Ø','Нижний Ø','Высота','Площадь и параметры'],
+      D.kvou_sizes.map(x=>[`<span class="cn">${esc(x.pn)}</span>`, esc(x.up), esc(x.lo), esc(x.h), esc(x.s)]))
+    + '<h2>Экономика замены — чем обосновывать заказчику</h2>' + D.kvou_econ.map(t=>`<div class="box">${t}</div>`).join('')
+    + '<h2>Кто изготавливает</h2>' + T(['Компания','Страна','Что делает','Контакт','Доступ'],
+      D.kvou_makers.map(x=>[`<span class="cn">${esc(x.n)}</span>`, esc(x.c), x.w, esc(x.k), esc(x.a)]))],
  ['Парк РФ и наш след', () => T(['Станция','Владелец','Модель','Блоков','Ввод','Что известно'],
     D.fleet_ru.map(x=>[`<span class="cn">${esc(x.plant)}</span>`, esc(x.owner||''), esc(x.model||''), esc(x.units||''), esc(x.year||''), x.note||'']))
     + D.fleet_notes.map(t=>`<div class="box">${t}</div>`).join('')
@@ -135,10 +184,7 @@ const PANES = [
  ['АСУ ТП и арматура', () => D.controls.map(g=>`<h2>${esc(g.g)}</h2>` + T(['Позиция','Кто','Что это','Где у нас','Доступность'],
       g.rows.map(x=>[`<span class="cn">${esc(x.n)}</span>`, esc(x.who), x.what, x.ru, esc(x.av)]))).join('')
     + D.controls_notes.map(t=>`<div class="box">${t}</div>`).join('')],
- ['Санкции и каналы', () => D.sanctions.intro.map(t=>`<div class="box crit">${t}</div>`).join('')
-    + T(['Канал','Как работает','Что реально получим','Риск','Первый шаг'],
-      D.channels.map(x=>[`<span class="cn">${esc(x.name)}</span>`, x.how, x.what, esc(x.risk||''), x.step||'']))],
- ['Право и экспортконтроль', () => T(['Юрисдикция','Инструмент','Охват 8411','Дата введения','Что это значит'],
+ ['Право и ограничения', () => T(['Юрисдикция','Инструмент','Охват 8411','Дата введения','Что это значит'],
       D.legal_map.map(x=>[`<span class="cn">${esc(x.j)}</span>`, esc(x.a), x.s, x.w, x.x]))
     + D.legal_notes.map(t=>`<div class="box crit">${t}</div>`).join('')],
  ['Логистика и таможня', () => '<h2>Коды ТН ВЭД и ставки</h2>' + T(['Код','Наименование','Пошлина','НДС','Примечание'],
