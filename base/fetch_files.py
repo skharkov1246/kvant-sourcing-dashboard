@@ -145,6 +145,73 @@ def text_doc(b: bytes) -> str:
             return ""
 
 
+_WT = re.compile(r"<w:t[^>]*>(.*?)</w:t>", re.S)
+_WP = re.compile(r"</w:p>")
+_TAG = re.compile(r"<[^>]+>")
+
+
+def text_ooxml_raw(b: bytes, kind: str) -> str:
+    """Текст из docx и xlsx напрямую из XML, минуя python-docx и openpyxl.
+
+    Нужен там, где библиотеки отказывают, а файл целый:
+      * openpyxl падает с «TypeError: expected datetime» на книге с битой датой;
+      * python-docx отдаёт пустоту, если текст лежит в надписи или колонтитуле,
+        а не в абзацах — таких документов в корпусе сотни.
+    """
+    import html as _html
+    try:
+        z = zipfile.ZipFile(io.BytesIO(b))
+    except Exception:
+        return ""
+    out: list[str] = []
+    if kind == "docx":
+        parts = [n for n in z.namelist()
+                 if n.startswith("word/") and n.endswith(".xml")
+                 and ("document" in n or "header" in n or "footer" in n or "footnotes" in n)]
+        for part in parts:
+            try:
+                xml = z.read(part).decode("utf-8", "ignore")
+            except Exception:
+                continue
+            for para in _WP.split(xml):
+                line = " ".join(_html.unescape(m) for m in _WT.findall(para))
+                line = _TAG.sub("", line).strip()
+                if line:
+                    out.append(line)
+    else:
+        shared: list[str] = []
+        try:
+            xml = z.read("xl/sharedStrings.xml").decode("utf-8", "ignore")
+            shared = [_TAG.sub("", _html.unescape(m)).strip()
+                      for m in re.findall(r"<si>(.*?)</si>", xml, re.S)]
+        except Exception:
+            pass
+        for part in sorted(n for n in z.namelist() if re.match(r"xl/worksheets/sheet\d+\.xml$", n)):
+            try:
+                xml = z.read(part).decode("utf-8", "ignore")
+            except Exception:
+                continue
+            out.append(f"### лист: {part.rsplit('/', 1)[1]}")
+            for row in re.findall(r"<row[^>]*>(.*?)</row>", xml, re.S):
+                cells = []
+                # тип ячейки ищем в её атрибутах целиком: порядок атрибутов в
+                # xlsx не фиксирован, и попытка выцепить t="s" одним шаблоном
+                # промахивается — вместо строк в текст попадают их номера
+                for attrs, body in re.findall(r"<c([^>]*)>(.*?)</c>", row, re.S):
+                    val = _TAG.sub("", _html.unescape(body)).strip()
+                    if 't="s"' in attrs and val.isdigit() and int(val) < len(shared):
+                        val = shared[int(val)]
+                    elif 't="s"' in attrs:
+                        val = ""
+                    if val:
+                        cells.append(val)
+                if cells:
+                    out.append(" | ".join(cells))
+            if sum(len(x) for x in out) > MAX_CHARS:
+                break
+    return "\n".join(out)
+
+
 def text_via_office(b: bytes, suffix: str) -> str:
     """Последний рубеж для старых книг и документов: конвертация LibreOffice.
 
@@ -243,10 +310,20 @@ def extract(b: bytes, name: str) -> tuple[str, int, str]:
         if kind == "zipish":
             names = zipfile.ZipFile(io.BytesIO(b)).namelist()
             if any(x.startswith("xl/") for x in names):
-                t, n = text_xlsx(b)
+                try:
+                    t, n = text_xlsx(b)
+                except Exception:
+                    t, n = "", 0
+                if not t.strip():                       # openpyxl отказал — читаем XML сами
+                    t, n = text_ooxml_raw(b, "xlsx"), 0
                 return _clean(t), n, "xlsx"
             if any(x.startswith("word/") for x in names):
-                t, n = text_docx(b)
+                try:
+                    t, n = text_docx(b)
+                except Exception:
+                    t, n = "", 0
+                if not t.strip():                       # текст в надписи или колонтитуле
+                    t, n = text_ooxml_raw(b, "docx"), 0
                 return _clean(t), n, "docx"
             return "", 0, "zip"
         if kind == "ole":

@@ -34,6 +34,9 @@ from parse_archives import fresh_links, webhook
 warnings.filterwarnings("ignore")
 
 WHERE = {
+    # Коммерческое предложение, вставленное картинкой в Word: текста в документе
+    # нет вовсе, вся суть — в изображении. Таких среди пустых .docx около 79 %.
+    "ooxml": "status='empty' AND (lower(filename) LIKE '%.docx' OR lower(filename) LIKE '%.xlsx')",
     "ole": "status='empty' AND (lower(filename) LIKE '%.doc' OR lower(filename) LIKE '%.xls')",
     "scan": "status='empty' AND lower(filename) LIKE '%.pdf'",
     "image": "status='empty' AND (lower(filename) LIKE '%.jpg' OR lower(filename) LIKE '%.jpeg'"
@@ -80,9 +83,50 @@ def ocr_pdf(blob: bytes) -> tuple[str, int]:
     return "\n".join(out), len(pages)
 
 
+def ocr_ooxml_media(blob: bytes) -> tuple[str, int]:
+    """Распознавание картинок, вложенных в docx или xlsx.
+
+    Один и тот же снимок вставляют в документ по нескольку раз (шапка, подпись),
+    поэтому одинаковые изображения распознаются один раз — по хешу содержимого."""
+    import hashlib
+    import io as _io
+    import zipfile as _zip
+    try:
+        z = _zip.ZipFile(_io.BytesIO(blob))
+    except Exception:
+        return "", 0
+    media = [n for n in z.namelist()
+             if ("/media/" in n and n.rsplit(".", 1)[-1].lower()
+                 in ("png", "jpg", "jpeg", "tif", "tiff", "bmp", "gif"))]
+    seen: dict[str, str] = {}
+    out = []
+    for name in media[:12]:
+        try:
+            img = z.read(name)
+        except Exception:
+            continue
+        key = hashlib.sha1(img).hexdigest()
+        if key in seen:
+            continue
+        try:
+            txt = ocr_image(img).strip()
+        except Exception:
+            txt = ""
+        seen[key] = txt
+        if txt:
+            out.append(txt)
+    return "\n\n".join(out), len(media)
+
+
 def parse_one(kind: str, blob: bytes, name: str) -> tuple[str, int, str]:
     if kind == "ole":
         return extract(blob, name)
+    if kind == "ooxml":
+        text, pages = extract(blob, name)[0], 0
+        if len(text.strip()) >= MIN_OCR_CHARS:          # заработал новый разбор XML
+            return text.strip(), 0, "docx" if name.lower().endswith(".docx") else "xlsx"
+        text, pages = ocr_ooxml_media(blob)
+        return (text.strip(), pages, "ocr-ooxml") if len(text.strip()) >= MIN_OCR_CHARS else ("", pages, "empty")
     if kind == "image":
         t = ocr_image(blob)
         return (t.strip(), 0, "ocr-image") if len(t.strip()) >= MIN_OCR_CHARS else ("", 0, "image")
