@@ -43,8 +43,16 @@ DAYS = int(os.environ.get("DAYS", "365"))
 LIMIT = int(os.environ.get("LIMIT", "0"))          # 0 — без ограничения
 
 SEGMENTS: dict[str, tuple[str, list[str]]] = {
-    "gpu": ("ГПУ — газопоршневые", ["газопоршн", "cummins", "камминз", "jenbacher", "waukesha",
-                                    "mwm", "innio", "qsk", "g3512", "g3516"]),
+    "gpu": ("ГПУ — газопоршневые", ["газопоршн", "когенерац", "мини-тэц", "мини тэц", "гпа-", "гпэс",
+                                    "cummins", "камминз", "qsv", "qsk", "kta38", "kta50", "gta855",
+                                    "g3512", "g3516", "g3520", "g3606",
+                                    "g3608", "g3612", "g3616", "cg170", "cg132",
+                                    "jenbacher", "дженбахер", "innio", "j208", "j312", "j320",
+                                    "j412", "j420", "j612", "j616", "j620", "j624",
+                                    "waukesha", "воукеша", "vhp", "l7042", "f3521", "apg1000",
+                                    "mwm", "tcg 2020", "tcg2020", "tcg 3016", "deutz", "деутц",
+                                    "guascor", "гуаскор", "jichai", "yuchai", "ючай", "weichai",
+                                    "hsk78", "mtu onsite", "свеча зажигания газ"]),
     "gtu": ("ГТУ — газотурбинные", ["газотурб", "турбин", "sgt", "lm6000", "lm2500", "taurus",
                                     "centaur", "solar turbines", "гпа"]),
     "gsho": ("ГШО — горно-шахтное", ["перфоратор", "буров", "epiroc", "atlas copco", "sandvik",

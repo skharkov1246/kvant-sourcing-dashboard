@@ -161,6 +161,34 @@ footer{padding:0 22px 24px;color:var(--mut);font-size:11.5px}
   <div id="fx-out"></div>
 </section>
 
+<section id="t-cover">
+  <h2>Заполняемость базы</h2>
+  <p id="cv-intro"></p>
+  <div class="box info" id="cv-method"></div>
+  <div class="k" id="cv-tiles"></div>
+  <h3>Показатели</h3>
+  <div class="tblwrap"><table><thead><tr>
+    <th>Что считаем</th><th class="num">Есть</th><th class="num">Всего</th><th class="num">%</th>
+    <th>Состояние</th><th>Где дыра и что делать</th>
+  </tr></thead><tbody id="cv-metrics"></tbody></table></div>
+  <h3>Системы двигателя: сколько слоёв закрыто</h3>
+  <p class="mut">Слои: потребность в натуре, семейства аналогов, изготовители узлов, допущенные поставщики.
+  Система считается закрытой, когда собраны все четыре — иначе запрос упирается в отсутствующий слой.</p>
+  <div class="tblwrap"><table class="sortable" id="cv-systab"><thead><tr>
+    <th data-k="name">Система</th><th data-k="demand" class="num">Потребность</th>
+    <th data-k="analogs" class="num">Аналоги</th><th data-k="subsuppliers" class="num">Изготовители</th>
+    <th data-k="suppliers" class="num">Поставщики</th><th data-k="layers" class="num">Слоёв</th>
+    <th data-k="status">Состояние</th>
+  </tr></thead><tbody id="cv-systems"></tbody></table></div>
+  <h3>Машины: разобран ли состав</h3>
+  <p class="mut">Список применяемости — это разобранный каталог изготовителя: по нему видно, какая деталь
+  к какой машине подходит. Там, где его нет, номенклатура собирается по отдельным позициям.</p>
+  <div class="tblwrap"><table><thead><tr>
+    <th>Изготовитель</th><th>Машина</th><th class="num">Узлов разобрано</th>
+    <th class="num">Паспорт</th><th>Список применяемости</th>
+  </tr></thead><tbody id="cv-machines"></tbody></table></div>
+</section>
+
 <section id="t-strategy">
   <h2 id="st-title"></h2>
   <div class="box info" id="st-thesis"></div>
@@ -537,6 +565,7 @@ const CONSUM   = __CONSUMPTION_JSON__;
 const MARKET   = __MARKET_JSON__;
 const COMPET   = __COMPETITORS_JSON__;
 const STOCK    = __STOCK_JSON__;
+const COVERAGE = __COVERAGE_JSON__;
 const STRATEGY = __STRATEGY_JSON__;
 const TARGETS  = __TARGETS_JSON__;
 const CONSUM_B = __CONSUMABLES_JSON__;
@@ -556,7 +585,8 @@ $("#built").textContent = BUILT_AT; $("#built2").textContent = BUILT_AT;
 /* ── навигация: пять корневых разделов, в каждом — до четырёх подразделов ─ */
 const NAV = [
   ["Обзор", [
-    ["t-over", "Общие сведения"], ["t-play", "Порядок ведения заявки"], ["t-strategy", "Развитие направления"]]],
+    ["t-over", "Общие сведения"], ["t-cover", "Заполняемость базы"],
+    ["t-play", "Порядок ведения заявки"], ["t-strategy", "Развитие направления"]]],
   ["Подбор", [
     ["t-find", "Поиск по номеру"], ["t-analogs", "Аналоги и замены"],
     ["t-pn", "Строение обозначений"], ["t-gloss", "Словарь терминов"]]],
@@ -1745,6 +1775,32 @@ function fillSelect(sel, values, allLabel) {
     <pre id="tpl-${i}">${esc(t.text)}</pre>
     <button class="btn" data-tpl="${i}">скопировать</button>
   </div>`).join("");
+  /* ── заполняемость базы ─────────────────────────────────────────────── */
+  const cvCls = st => st === "закрыто" ? "ok" : (st === "частично" ? "warn" : "bad");
+  $("#cv-intro").textContent = COVERAGE.intro;
+  $("#cv-method").textContent = COVERAGE.method;
+  const C = COVERAGE.context;
+  $("#cv-tiles").innerHTML = [
+    [C.machines, "машин в базе"], [C.systems, "систем двигателя"],
+    [C.suppliers, "поставщиков"], [C.demand_rows, "позиций текущей заявки"],
+    [C.analog_classes, "классов аналогов"], [C.cross_records, "записей кросс-каталогов"],
+    [C.cross_oem_pns, "номеров изготовителей в кроссах"],
+    [C.fleet_objects + " / " + C.fleet_catalogue_total, "объектов парка собрано из каталога"],
+  ].map(([v, t]) => `<div class="tile"><b>${esc(v)}</b><span>${esc(t)}</span></div>`).join("");
+  $("#cv-metrics").innerHTML = COVERAGE.metrics.map(m => `<tr>
+    <td><b>${esc(m.title)}</b></td><td class="num">${num(m.done)}</td><td class="num">${num(m.total)}</td>
+    <td class="num"><b>${m.pct} %</b></td><td><span class="pill ${cvCls(m.status)}">${esc(m.status)}</span></td>
+    <td class="mut">${esc(m.gap)}<div class="note">${esc(m.next)}</div></td></tr>`).join("");
+  $("#cv-systems").innerHTML = COVERAGE.systems.map(s => `<tr>
+    <td>${esc(s.name)}</td><td class="num">${num(s.demand)}</td><td class="num">${num(s.analogs)}</td>
+    <td class="num">${num(s.subsuppliers)}</td><td class="num">${num(s.suppliers)}</td>
+    <td class="num"><b>${s.layers}/4</b></td>
+    <td><span class="pill ${cvCls(s.status)}">${esc(s.status)}</span></td></tr>`).join("");
+  $("#cv-machines").innerHTML = COVERAGE.machines.map(m => `<tr>
+    <td>${esc(m.oem)}</td><td><b>${esc(m.model)}</b></td><td class="num">${num(m.units)}</td>
+    <td class="num">${m.passport ? "есть" : "—"}</td>
+    <td><span class="pill ${m.partlist ? "ok" : "bad"}">${m.partlist ? "разобран" : "нет"}</span></td></tr>`).join("");
+
   $("#pb-tpl").querySelectorAll("button[data-tpl]").forEach(b => b.onclick = () => {
     const txt = PLAYBOOK.templates[+b.dataset.tpl].text;
     if (navigator.clipboard) navigator.clipboard.writeText(txt).then(() => { b.textContent = "скопировано ✓"; setTimeout(() => b.textContent = "скопировать", 1500); });

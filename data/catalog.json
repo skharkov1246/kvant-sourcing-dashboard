@@ -4,15 +4,15 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 174,
-    "total_bytes": 73366009,
+    "datasets": 175,
+    "total_bytes": 73377981,
     "by_sensitivity": {
       "конфиденциально": 54,
       "внутреннее": 88,
-      "публикуемо": 32
+      "публикуемо": 33
     },
     "by_subproject": {
-      "ГПУ-библиотека": 26,
+      "ГПУ-библиотека": 27,
       "ГТУ-библиотека": 31,
       "ОВЭ-75": 45,
       "база ЗИП": 28,
@@ -913,7 +913,9 @@
         "level": "внутреннее",
         "markers": []
       },
-      "referenced_by": []
+      "referenced_by": [
+        "zip/tools/build_telsmith_page.py"
+      ]
     },
     {
       "path": "gt/data/rfq_demand.json",
@@ -1371,6 +1373,7 @@
         "markers": []
       },
       "referenced_by": [
+        "zip/tools/build_telsmith_page.py",
         "zip/tools/telsmith_report.py"
       ]
     },
@@ -1419,6 +1422,7 @@
         ]
       },
       "referenced_by": [
+        "zip/tools/build_telsmith_page.py",
         "zip/tools/telsmith_report.py"
       ]
     },
@@ -1555,6 +1559,7 @@
         "markers": []
       },
       "referenced_by": [
+        "zip/tools/build_telsmith_page.py",
         "zip/tools/telsmith_report.py"
       ]
     },
@@ -1689,7 +1694,9 @@
           "телефоны"
         ]
       },
-      "referenced_by": []
+      "referenced_by": [
+        "zip/tools/build_telsmith_page.py"
+      ]
     },
     {
       "path": "data/budget_snapshot.json",
@@ -1831,7 +1838,9 @@
         "level": "внутреннее",
         "markers": []
       },
-      "referenced_by": []
+      "referenced_by": [
+        "zip/tools/build_audit_page.py"
+      ]
     },
     {
       "path": "ove/data/bi_lot3.json",
@@ -2166,6 +2175,7 @@
         ]
       },
       "referenced_by": [
+        "zip/tools/build_telsmith_page.py",
         "zip/tools/telsmith_parse.py",
         "zip/tools/telsmith_report.py"
       ]
@@ -2397,6 +2407,7 @@
         "markers": []
       },
       "referenced_by": [
+        "zip/tools/build_telsmith_page.py",
         "zip/tools/telsmith_report.py"
       ]
     },
@@ -6346,6 +6357,50 @@
       ]
     },
     {
+      "path": "data/catalog_notes.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 11656,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "data/budget_snapshot.json",
+        "data/chat_snapshot.json",
+        "data/index.json",
+        "gidromet/data/",
+        "gpu/data/bitrix_gpu.json",
+        "gpu/data/coverage.json",
+        "gt/data/ansaldo.json",
+        "gt/data/bitrix_gt.json",
+        "gt/data/dossiers.json",
+        "gt/data/pn_db.json",
+        "ove/data/suppliers.json",
+        "pnw/public/data.js",
+        "pnw/public/search.html",
+        "zip/customs/out/",
+        "zip/data/customs_declarations.json",
+        "zip/data/kp1763_audit.json",
+        "zip/data/perf_class_packets.json",
+        "zip/data/perf_sourcing_map.json",
+        "zip/data/perf_test_requests.json",
+        "zip/data/supplier_crm.json",
+        "zip/data/telsmith_3858.json",
+        "zip/data/telsmith_crossrefs.json",
+        "zip/data/telsmith_nodrawings.json"
+      ],
+      "last_change": "2026-09-10",
+      "last_author": "Claude",
+      "last_commit": "0ab65df",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "scripts/build_catalog.py"
+      ]
+    },
+    {
       "path": "gpu/data/playbook.json",
       "subproject": "ГПУ-библиотека",
       "bytes": 11381,
@@ -6415,6 +6470,49 @@
       ]
     },
     {
+      "path": "gpu/data/coverage.json",
+      "subproject": "ГПУ-библиотека",
+      "bytes": 11105,
+      "note": "Заполняемость базы ГПУ: сколько машин с разобранным списком применяемости, поставщиков с рабочим адресом, позиций заявки с ценой, проверкой и кроссом, и сколько систем двигателя закрыто всеми четырьмя слоями (потребность, аналоги, изготовители узлов, поставщики). Производный файл — считается gpu/tools/coverage.py по фактическим данным gpu/data и пересчитывается при каждой сборке сайта; руками не заполнять. Публикуется на kvant-gpu, раздел «Обзор → Заполняемость базы».",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "context",
+        "intro",
+        "machines",
+        "method",
+        "metrics",
+        "systems",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "systems",
+        "records": 19,
+        "record_keys": [
+          "analogs",
+          "demand",
+          "key",
+          "layers",
+          "name",
+          "pct",
+          "status",
+          "subsuppliers",
+          "suppliers"
+        ]
+      },
+      "last_change": null,
+      "last_author": null,
+      "last_commit": null,
+      "updated_by": "неизвестно",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "gpu/build.py"
+      ]
+    },
+    {
       "path": "gpu/data/market.json",
       "subproject": "ГПУ-библиотека",
       "bytes": 10800,
@@ -6455,49 +6553,6 @@
         "ove/build.py",
         "zip/build.py",
         "zip/tools/aggregate_customs.py"
-      ]
-    },
-    {
-      "path": "data/catalog_notes.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 10789,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "data/budget_snapshot.json",
-        "data/chat_snapshot.json",
-        "data/index.json",
-        "gidromet/data/",
-        "gpu/data/bitrix_gpu.json",
-        "gt/data/ansaldo.json",
-        "gt/data/bitrix_gt.json",
-        "gt/data/dossiers.json",
-        "gt/data/pn_db.json",
-        "ove/data/suppliers.json",
-        "pnw/public/data.js",
-        "pnw/public/search.html",
-        "zip/customs/out/",
-        "zip/data/customs_declarations.json",
-        "zip/data/kp1763_audit.json",
-        "zip/data/perf_class_packets.json",
-        "zip/data/perf_sourcing_map.json",
-        "zip/data/perf_test_requests.json",
-        "zip/data/supplier_crm.json",
-        "zip/data/telsmith_3858.json",
-        "zip/data/telsmith_crossrefs.json",
-        "zip/data/telsmith_nodrawings.json"
-      ],
-      "last_change": "2026-09-10",
-      "last_author": "skharkov1246",
-      "last_commit": "4a7a9db",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "публикуемо",
-        "markers": []
-      },
-      "referenced_by": [
-        "scripts/build_catalog.py"
       ]
     },
     {
