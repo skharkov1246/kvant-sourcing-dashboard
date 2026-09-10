@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Сборка gt/public/ansaldo.html — досье Ansaldo Energia (модели, субпоставщики, каналы)."""
+"""Сборка gt/public/ansaldo.html — база знаний по Ansaldo Energia и семейству V-машин."""
 import json
 from pathlib import Path
 
@@ -13,7 +13,8 @@ def main():
     subs = {
         "__ANSALDO_JSON__": json.dumps(d, ensure_ascii=False),
         "__N_CO__": str(n_co),
-        "__N_MODELS__": str(len(d["models"])),
+        "__N_MODELS__": str(sum(len(o["models"]) for o in d["nav_oem"])),
+        "__N_TYPES__": str(len(d["nav_types"])),
         "__N_SRC__": str(len(d["sources"])),
         "__UPDATED__": d["updated"],
     }

@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 174,
-    "total_bytes": 73334671,
+    "total_bytes": 73363312,
     "by_sensitivity": {
       "конфиденциально": 54,
       "внутреннее": 88,
@@ -1167,6 +1167,79 @@
       ]
     },
     {
+      "path": "gt/data/ansaldo.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 399548,
+      "note": "База знаний по Ansaldo Energia и всему семейству V-машин (страница /gt/ansaldo, 21 вкладка; печатный отчёт gt/docs/ANSALDO-разведка-2026-09.pdf, 23 раздела, 68 страниц). Модельный ряд; наследие Alstom (GT26/GT36/GT13E2, раздел активов между Ansaldo и GE по делу ЕК M.7278, апгрейды MXL2/MXL3, Alstom Owners Group); горячий тракт с EN-терминами, количествами и ценовыми якорями из тендеров TED; партномера и шифровки по четырём инженерным школам с позиционными кодами TLa/TLe/VLa/VLe и глоссарием RU/EN/DE/IT; керамика камеры сгорания (состав, режим обжига, патентная карта, температуры) и горелки; ведомости из тендеров с реальными номерами и количествами; апгрейды и ремонтные технологии (5 стадий, типы инспекций, ремцентры); литьё и поковки, включая хиртовый венец; КВОУ и фильтроэлементы с геометрией и экономикой замены; парк в РФ и СНГ; субпоставщики с доказательствами связи; дилерская сеть и лицензиаты; независимый аутмаркет; российские сервисные и литейные мощности; генераторы (типоряд, комплектация, ремонтники, объём инспекции без выемки ротора); АСУ ТП, КИП и топливная арматура; нормативные ограничения по позиции 8411 (ЕС, США, Великобритания, Швейцария, РФ); логистика и таможня; правила RFQ. 34 параллельные разведки 09.2026. Публичные данные плюс агрегаты из нашей таможни HS 8411 и Bitrix СП-166 — персональных и ценовых данных заказчиков не содержит.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "action_notes",
+        "actions",
+        "aftermarket",
+        "alstom_fleet_ru",
+        "alstom_gt",
+        "alstom_market",
+        "alstom_upg",
+        "aog",
+        "bom_fmt",
+        "bom_kit",
+        "bom_qty",
+        "bom_req",
+        "cast_notes",
+        "cast_rank",
+        "cer_count",
+        "cer_makers",
+        "cer_papers",
+        "cer_patents",
+        "cer_spec",
+        "cer_temp",
+        "company",
+        "controls",
+        "controls_notes",
+        "customs_codes",
+        "customs_risk",
+        "fleet_notes",
+        "fleet_ru",
+        "forge_disc",
+        "ge_split",
+        "gen_code",
+        "gen_deal",
+        "gen_inspect",
+        "gen_pairs",
+        "gen_parts",
+        "gen_repair",
+        "gen_sites",
+        "gen_types",
+        "glossary",
+        "gt13e2_parts",
+        "hirth"
+      ],
+      "main_collection": {
+        "key": "sources",
+        "records": 73,
+        "record_keys": [
+          "url",
+          "what"
+        ]
+      },
+      "last_change": "2026-09-10",
+      "last_author": "skharkov1246",
+      "last_commit": "4a7a9db",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "адреса электронной почты",
+          "ИНН контрагентов"
+        ]
+      },
+      "referenced_by": [
+        "gt/tools/ansaldo_report.py",
+        "gt/tools/build_ansaldo.py"
+      ]
+    },
+    {
       "path": "zip/customs/out/customs_841199_2023-01-01_2026-03-31.json",
       "subproject": "база ЗИП · таможня",
       "bytes": 375225,
@@ -1224,79 +1297,6 @@
         ]
       },
       "referenced_by": []
-    },
-    {
-      "path": "gt/data/ansaldo.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 370907,
-      "note": "База знаний по Ansaldo Energia и всему семейству V-машин (страница /gt/ansaldo, 21 вкладка; печатный отчёт gt/docs/ANSALDO-разведка-2026-09.pdf, 23 раздела, 68 страниц). Модельный ряд; наследие Alstom (GT26/GT36/GT13E2, раздел активов между Ansaldo и GE по делу ЕК M.7278, апгрейды MXL2/MXL3, Alstom Owners Group); горячий тракт с EN-терминами, количествами и ценовыми якорями из тендеров TED; партномера и шифровки по четырём инженерным школам с позиционными кодами TLa/TLe/VLa/VLe и глоссарием RU/EN/DE/IT; керамика камеры сгорания (состав, режим обжига, патентная карта, температуры) и горелки; ведомости из тендеров с реальными номерами и количествами; апгрейды и ремонтные технологии (5 стадий, типы инспекций, ремцентры); литьё и поковки, включая хиртовый венец; КВОУ и фильтроэлементы с геометрией и экономикой замены; парк в РФ и СНГ; субпоставщики с доказательствами связи; дилерская сеть и лицензиаты; независимый аутмаркет; российские сервисные и литейные мощности; генераторы (типоряд, комплектация, ремонтники, объём инспекции без выемки ротора); АСУ ТП, КИП и топливная арматура; нормативные ограничения по позиции 8411 (ЕС, США, Великобритания, Швейцария, РФ); логистика и таможня; правила RFQ. 34 параллельные разведки 09.2026. Публичные данные плюс агрегаты из нашей таможни HS 8411 и Bitrix СП-166 — персональных и ценовых данных заказчиков не содержит.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "action_notes",
-        "actions",
-        "aftermarket",
-        "alstom_fleet_ru",
-        "alstom_gt",
-        "alstom_market",
-        "alstom_upg",
-        "aog",
-        "bom_fmt",
-        "bom_kit",
-        "bom_qty",
-        "bom_req",
-        "cast_notes",
-        "cast_rank",
-        "cer_count",
-        "cer_makers",
-        "cer_papers",
-        "cer_patents",
-        "cer_spec",
-        "cer_temp",
-        "company",
-        "controls",
-        "controls_notes",
-        "customs_codes",
-        "customs_risk",
-        "fleet_notes",
-        "fleet_ru",
-        "forge_disc",
-        "ge_split",
-        "gen_code",
-        "gen_deal",
-        "gen_inspect",
-        "gen_pairs",
-        "gen_parts",
-        "gen_repair",
-        "gen_sites",
-        "gen_types",
-        "glossary",
-        "gt13e2_parts",
-        "hirth"
-      ],
-      "main_collection": {
-        "key": "sources",
-        "records": 73,
-        "record_keys": [
-          "url",
-          "what"
-        ]
-      },
-      "last_change": "2026-09-10",
-      "last_author": "Claude",
-      "last_commit": "903a9a7",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "конфиденциально",
-        "markers": [
-          "адреса электронной почты",
-          "ИНН контрагентов"
-        ]
-      },
-      "referenced_by": [
-        "gt/tools/ansaldo_report.py",
-        "gt/tools/build_ansaldo.py"
-      ]
     },
     {
       "path": "ove/data/questions.json",
@@ -6734,8 +6734,8 @@
         "zip/data/telsmith_3858.json"
       ],
       "last_change": "2026-09-10",
-      "last_author": "Claude",
-      "last_commit": "903a9a7",
+      "last_author": "skharkov1246",
+      "last_commit": "4a7a9db",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
