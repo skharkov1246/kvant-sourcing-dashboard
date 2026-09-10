@@ -62,6 +62,12 @@ def key_of(pn: str) -> str | None:
     return k
 
 
+def pn_num(pn: str) -> float | None:
+    """Числовое значение артикула, если он состоит из одних цифр."""
+    s = (pn or "").strip()
+    return float(s) if s.isdigit() and len(s) <= 15 else None
+
+
 def med(vals: list[float]) -> float | None:
     return round(statistics.median(vals), 2) if vals else None
 
@@ -153,6 +159,10 @@ def run(db_path: str) -> dict:
         s = sup_of.get(fid)
         if s:
             a["suppliers"][s] += 1
+        # цена, равная самому артикулу, — это номер, уехавший в колонку цены:
+        # у Grundfos 96525458 «максимальная цена» выходила 96 525 458 EUR
+        if price and pn_num(pn) is not None and abs(price - pn_num(pn)) < 0.5:
+            price = None
         if price and 0 < price < 1e9 and cur:
             a["prices"][cur].append(price)
             who = side.get(fid)
@@ -219,6 +229,8 @@ def run(db_path: str) -> dict:
         if not k or BAD_PN.match(pn.strip()) or (name and FORM_ROW.search(name)):
             continue
         if not cur or not (0 < price < 1e9):
+            continue
+        if pn_num(pn) is not None and abs(price - pn_num(pn)) < 0.5:
             continue
         e = sp[(k, supplier, cur)]
         e["p"].append(price)

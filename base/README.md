@@ -65,6 +65,7 @@ operation time limit») — модули ждут и продолжают, а н
 python base/kb_dash.py  --db base/kvant.db --out kb_report.html   # отчёт по корпусу
 python base/kb_page.py  --db base/kvant.db --out public/kb.html   # справочник с поиском
 python base/demand.py   --db base/kvant.db                        # спрос и исходы
+python base/quote.py    NU2216                                   # карточка сорсинга по артикулу
 ```
 
 `public/*.html` в репозиторий не коммитится (см. `.gitignore`) — страницы
