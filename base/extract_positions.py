@@ -66,16 +66,24 @@ def norm_cur(tok: str | None) -> str | None:
 
 # Производитель в спецификации пишется отдельной ячейкой или внутри наименования,
 # но заголовка «производитель» в тексте уже нет: пустые ячейки xlsx выброшены.
-# Поэтому опознаём по словарю брендов, собранному из самих сделок (поле «Brands»
-# заполнено у 1 701 карточки) — так в базу попадает только то, с чем мы реально
-# работаем, а не случайное латинское слово из строки.
+# Поэтому опознаём по словарю марок. Источник — справочник портала, смарт-процесс
+# 176 «Brands» (2 449 записей): он не зависит от того, чем наполнены карточки.
+# Поле «Brands» у сделок оставлено запасным вариантом — после пересборки снимка
+# оно пустует, и словарь из него не собирается вовсе.
 BRANDS: dict[str, str] = {}
-BRAND_RE: re.Pattern | None = None
+BRAND_RE: re.Pattern | None = None          # марки от четырёх знаков, регистр не важен
+BRAND_SHORT_RE: re.Pattern | None = None    # ABB, SKF, MAN — только заглавными,
+                                            # иначе «MAN» ловит английское «man»
+SHORT_LEN = 3
 # Марки, совпадающие с обычным словом спецификации. «Seal» дал 3 806 ложных
 # срабатываний на строках вида «LABYRINTH SEAL 200-R», «Total» — на итоговых
 # строках таблиц («Total EXW Price», «Итого»).
 BRAND_STOP = {"новый", "прочее", "другое", "разные", "нет", "оригинал", "аналог",
-              "россия", "seal", "total"}
+              "россия", "seal", "total",
+              # в справочнике портала эти записи заведены наравне с марками, но
+              # маркой не являются: «ГОСТ» иначе цепляется к любой ссылке на стандарт
+              "гост", "ост", "бренд", "бренд отсутствует", "марка", "отсутствует",
+              "без бренда", "не определён", "не определен", "уточняется"}
 
 
 def _fold(s: str) -> str:
@@ -84,10 +92,22 @@ def _fold(s: str) -> str:
     return "".join(c for c in unicodedata.normalize("NFKD", s) if not unicodedata.combining(c))
 
 
+def brand_source(con: sqlite3.Connection) -> list[str]:
+    """Сырые названия марок: справочник портала, иначе поле «Brands» у сделок."""
+    try:
+        rows = [r[0] for r in con.execute("SELECT title FROM brands WHERE title IS NOT NULL AND title<>''")]
+        if rows:
+            return rows
+    except sqlite3.OperationalError:
+        pass                                  # справочник ещё не выгружен
+    return [r[0] for r in con.execute(
+        "SELECT DISTINCT brand FROM deals WHERE brand IS NOT NULL AND brand<>''")]
+
+
 def load_brands(con: sqlite3.Connection) -> None:
-    global BRANDS, BRAND_RE
+    global BRANDS, BRAND_RE, BRAND_SHORT_RE
     canon_by_key: dict[str, str] = {}
-    for (b,) in con.execute("SELECT DISTINCT brand FROM deals WHERE brand IS NOT NULL AND brand<>''"):
+    for b in brand_source(con):
         for part in re.split(r"[,;/]| и ", b):
             name = part.strip(" .«»\"'()")
             if len(name) < 3 or name.lower() in BRAND_STOP:
@@ -107,17 +127,23 @@ def load_brands(con: sqlite3.Connection) -> None:
         if folded != name:
             canon[folded] = name
     BRANDS = canon
-    if canon:
+    long_names = [b for b in canon if len(b) > SHORT_LEN]
+    short_names = [b for b in canon if len(b) <= SHORT_LEN]
+    if long_names:
         BRAND_RE = re.compile(r"(?<![A-Za-zа-яА-Я0-9])(" +
-                              "|".join(re.escape(b) for b in sorted(canon, key=len, reverse=True)) +
+                              "|".join(re.escape(b) for b in sorted(long_names, key=len, reverse=True)) +
                               r")(?![A-Za-zа-яА-Я0-9])", re.I)
+    if short_names:
+        BRAND_SHORT_RE = re.compile(r"(?<![A-Za-zа-яА-Я0-9])(" +
+                                    "|".join(re.escape(b.upper()) for b in sorted(short_names)) +
+                                    r")(?![A-Za-zа-яА-Я0-9])")
 
 
 def find_brand(text: str) -> str | None:
-    """Каноническое написание марки, как она заведена в сделках."""
-    if not BRAND_RE:
-        return None
-    m = BRAND_RE.search(text)
+    """Каноническое написание марки, как она заведена в справочнике портала."""
+    m = BRAND_RE.search(text) if BRAND_RE else None
+    if not m and BRAND_SHORT_RE:
+        m = BRAND_SHORT_RE.search(text)
     if not m:
         return None
     hit = m.group(1)
