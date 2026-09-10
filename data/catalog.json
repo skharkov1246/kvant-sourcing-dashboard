@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 174,
-    "total_bytes": 73118353,
+    "total_bytes": 73130373,
     "by_sensitivity": {
       "конфиденциально": 54,
       "внутреннее": 88,
@@ -1080,7 +1080,7 @@
     {
       "path": "data/chat_snapshot.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 498596,
+      "bytes": 509413,
       "note": "Суточный снимок реакции коммерсантов в чатах сделок. Пишет бот scan.yml (chat_scan.py) раз в сутки. Руками не редактировать: правка в PR откатит свежие данные при мерже. Содержит поимённые метрики 15 сотрудников и LLM-оценки.",
       "format": "json",
       "shape": "объект",
@@ -1685,7 +1685,7 @@
     {
       "path": "gt/data/bitrix_gt.json",
       "subproject": "ГТУ-библиотека",
-      "bytes": 228033,
+      "bytes": 229236,
       "note": "Метки «был ли запрос в компанию» из СП-166. Пишет бот gt-bitrix.yml дважды в неделю. Руками не редактировать.",
       "format": "json",
       "shape": "объект",
@@ -1698,7 +1698,7 @@
       ],
       "main_collection": {
         "key": "deals",
-        "records": 216,
+        "records": 218,
         "record_keys": [
           "created",
           "id",
@@ -1719,6 +1719,7 @@
       "referenced_by": [
         ".github/workflows/gt-bitrix.yml",
         "gt/build.py",
+        "gt/public/ansaldo.html",
         "gt/tools/bitrix_gt.py",
         "gt/tools/drop_ru.py",
         "scripts/build_index.py"
@@ -2174,6 +2175,7 @@
         ]
       },
       "referenced_by": [
+        "gt/public/ansaldo.html",
         "gt/tools/build_v643a.py",
         "gt/tools/drop_ru.py"
       ]
@@ -2258,10 +2260,10 @@
           "what"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-10",
+      "last_author": "Claude",
+      "last_commit": "d0e88cd",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
         "markers": [
@@ -2705,6 +2707,7 @@
         ]
       },
       "referenced_by": [
+        "gt/public/ansaldo.html",
         "gt/tools/build_f4000.py",
         "gt/tools/drop_ru.py"
       ]
@@ -6861,9 +6864,9 @@
         "zip/data/supplier_crm.json",
         "zip/data/telsmith_3858.json"
       ],
-      "last_change": "2026-09-09",
-      "last_author": "skharkov1246",
-      "last_commit": "2fe20e9",
+      "last_change": "2026-09-10",
+      "last_author": "Claude",
+      "last_commit": "d0e88cd",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
