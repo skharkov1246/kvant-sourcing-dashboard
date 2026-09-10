@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Зонд v40: сплошная выгрузка и разбор файлов по запросам поставщикам (СП-166).
+"""Зонд v41: сплошная выгрузка и разбор файлов по запросам поставщикам (СП-166).
 
 ЗАЧЕМ. Сорсинг утверждает, что по сделке на 2,5 млрд прокотированы все позиции и на
 всё есть живое КП. По стадиям воронки это не подтверждается. Но стадия — отметка
@@ -14,7 +14,8 @@
  4. Качает каждый файл. Способ выбран по замеру v35: годится только urlMachine —
     url отдаёт страницу входа, disk.file.get на этих объектах ошибается.
  5. Разбирает xlsx / xls / docx / pdf, а картинки — распознаванием: четверть вложений
-    оказалась сканами и фото КП, и без OCR они не читались вовсе.
+    оказалась сканами и фото КП, и без OCR они не читались вовсе. На каждую картинку
+    отведено двадцать секунд, иначе одно тяжёлое фото съедает весь прогон.
  6. Считает покрытие строк заказчика и показывает, ЧЕЙ документ его даёт: в тех же
     вложениях лежат наше исходящее ТКП и бюджет заказчика, и по одним числам их от
     ответа поставщика не отличить.
@@ -51,9 +52,12 @@ from bitrix_client import BitrixClient  # noqa: E402
 SPA = 166
 PERIOD_FROM = os.getenv("PROBE_FROM", "2026-01-01")
 PUBKEY = ROOT / "scripts/probe_pubkey.pem"
-DEADLINE = time.monotonic() + float(os.getenv("PROBE_BUDGET_SEC", "560"))
+DEADLINE = time.monotonic() + float(os.getenv("PROBE_BUDGET_SEC", "480"))
 ACT_DEADLINE = DEADLINE - 240          # на скачивание, разбор и OCR остаётся время
 MAX_FILES = int(os.getenv("PROBE_MAX_FILES", "2500"))
+OCR_TIMEOUT = int(os.getenv("PROBE_OCR_TIMEOUT", "20"))   # секунд на одну картинку
+OCR_MAX_BYTES = 12_000_000                                # тяжелее — пропускаем
+OCR_MAX_SIDE = 2200                                       # до чего увеличивать мелкие
 
 GOT_QUOTE = {"Selected", "Not Selected", "Price at Work"}
 OUR_DEALS = {"22566", "22564", "22568", "22016", "21926", "22292", "22282", "18016"}
@@ -164,21 +168,28 @@ def text_pdf(b: bytes) -> str:
         return ""
 
 
-def text_image(b: bytes) -> str:
-    """Сканы и фото КП: текстового слоя нет, нужен распознаватель. Мелкие картинки
-    tesseract читает плохо, поэтому перед распознаванием увеличиваем."""
+def text_image(b: bytes) -> tuple[str, str]:
+    """Сканы и фото КП: текстового слоя нет, нужен распознаватель. Возвращает
+    (текст, пометка). На одну картинку отведено OCR_TIMEOUT секунд: без этого одно
+    фото на несколько мегабайт съедает весь прогон — так и случилось в v40."""
+    if len(b) > OCR_MAX_BYTES:
+        return "", "пропущено: тяжелее лимита"
     try:
         import pytesseract
         from PIL import Image
         im = Image.open(io.BytesIO(b))
         if im.mode not in ("L", "RGB"):
             im = im.convert("RGB")
-        if max(im.size) < 1600:
-            k = 1600 / max(im.size)
+        side = max(im.size)
+        if side < 1600:
+            k = min(OCR_MAX_SIDE, 1600) / side
             im = im.resize((int(im.width * k), int(im.height * k)))
-        return pytesseract.image_to_string(im, lang="rus+eng")
-    except Exception:
-        return ""
+        elif side > OCR_MAX_SIDE:
+            k = OCR_MAX_SIDE / side
+            im = im.resize((int(im.width * k), int(im.height * k)))
+        return pytesseract.image_to_string(im, lang="rus+eng", timeout=OCR_TIMEOUT), "ок"
+    except Exception as e:
+        return "", f"сбой: {type(e).__name__}"
 
 
 def num(s: str) -> float | None:
@@ -279,10 +290,8 @@ def main() -> None:
         sys.exit(1)
     subprocess.run([sys.executable, "-m", "pip", "install", "-q", "pypdf", "xlrd==1.2.0",
                     "pytesseract", "Pillow"], check=False)
-    subprocess.run(["sudo", "apt-get", "update", "-qq"], check=False,
-                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     subprocess.run(["sudo", "apt-get", "install", "-y", "-qq", "tesseract-ocr",
-                    "tesseract-ocr-rus"], check=False,
+                    "tesseract-ocr-rus"], check=False, timeout=180,
                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     ocr_ok = subprocess.run(["tesseract", "--version"], check=False,
                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode == 0
@@ -292,9 +301,9 @@ def main() -> None:
     bx = BitrixClient(wh)
     sess = requests.Session()
 
-    print("=== Зонд v40: файлы по запросам поставщикам — выгрузка, разбор, сканы ===")
-    print(f"период с {PERIOD_FROM} · распознаватель: {'есть' if ocr_ok else 'НЕ УСТАНОВЛЕН'}\n",
-          flush=True)
+    print("=== Зонд v41: файлы по запросам поставщикам — выгрузка, разбор, сканы ===")
+    print(f"период с {PERIOD_FROM} · распознаватель: {'есть' if ocr_ok else 'НЕ УСТАНОВЛЕН'} · "
+          f"на картинку {OCR_TIMEOUT} с\n", flush=True)
 
     fl = bx.call("crm.item.fields", {"entityTypeId": SPA}) or {}
     fields = fl.get("fields") or {}
@@ -410,6 +419,7 @@ def main() -> None:
     print(f"\nуникальных файлов в очереди: {len(queue)}\n", flush=True)
 
     stat: Counter = Counter()
+    ocr_stat: Counter = Counter()
     parsed: list[dict] = []
     done = [0]
 
@@ -447,8 +457,9 @@ def main() -> None:
             elif kind == "pdf":
                 rec["items"] = items_from_text(text_pdf(b))
             elif kind == "изображение" and ocr_ok:
-                txt = text_image(b)
+                txt, mark = text_image(b)
                 rec["ocr_chars"] = len(txt)
+                ocr_stat[mark] += 1
                 rec["items"] = items_from_text(txt)
         except Exception as e:
             rec["parse_error"] = type(e).__name__
@@ -470,9 +481,10 @@ def main() -> None:
     scans_ok = [p for p in scans if p["items"]]
     print(f"\nдокументы: {len(real)} · с позициями: {len([p for p in real if p['items']])} · "
           f"позиций: {sum(len(p['items']) for p in real)}")
-    print(f"сканы: {len(scans)} · распознано с позициями: {len(scans_ok)} · "
-          f"позиций из сканов: {sum(len(p['items']) for p in scans_ok)} · "
-          f"символов распознано: {sum(p.get('ocr_chars', 0) for p in scans)}")
+    print(f"сканы: {len(scans)} · распознавание: {dict(ocr_stat)}")
+    print(f"сканы с позициями: {len(scans_ok)} · позиций из сканов: "
+          f"{sum(len(p['items']) for p in scans_ok)} · символов распознано: "
+          f"{sum(p.get('ocr_chars', 0) for p in scans)}")
 
     def pnset(doc: dict) -> set[str]:
         return {p for p in (norm_pn(i.get("pn")) for i in doc.get("items") or []) if len(p) >= 5}
@@ -518,8 +530,8 @@ def main() -> None:
               f"  = {100 * len(rfq & doc_q) / n:.1f}%")
         print(f"  имеет цену в документах                   : {len(rfq & doc_p)}"
               f"  = {100 * len(rfq & doc_p) / n:.1f}%")
-        print(f"  ДОБАВИЛИ СКАНЫ: встречается                : {len(rfq & scan_q - doc_q)}")
-        print(f"  ДОБАВИЛИ СКАНЫ: с ценой                   : {len(rfq & scan_p - doc_p)}")
+        print(f"  ДОБАВИЛИ СКАНЫ: встречается                : {len((rfq & scan_q) - doc_q)}")
+        print(f"  ДОБАВИЛИ СКАНЫ: с ценой                   : {len((rfq & scan_p) - doc_p)}")
         print(f"  ИТОГО с ценой (документы + сканы)          : {len(rfq & (doc_p | scan_p))}"
               f"  = {100 * len(rfq & (doc_p | scan_p)) / n:.1f}%")
 
@@ -532,19 +544,20 @@ def main() -> None:
                   f"{d['kind']:11} {d['size']:>9} б · сд.{d['deal']:>6} · "
                   f"{'КОПИЯ ' if d['_copy'] else 'ответ '} · {stage[:16]:16} · {title[:52]}")
 
-        print("\n--- САМЫЕ СОДЕРЖАТЕЛЬНЫЕ СКАНЫ ---")
-        for d in sorted(scans_ok, key=lambda x: -x["_ni"])[:10]:
-            r = recs.get(str(d["req"])) if d["req"] else None
-            title = (r or {}).get("title") or "(вложение сделки)"
-            print(f"  позиций {d['_ni']:>4} · с ценой {d['_npriced']:>4} · "
-                  f"символов {d.get('ocr_chars', 0):>6} · {d['size']:>8} б · "
-                  f"из эталона {len(d['_pns'] & rfq):>3} · {title[:52]}")
+        if scans_ok:
+            print("\n--- САМЫЕ СОДЕРЖАТЕЛЬНЫЕ СКАНЫ ---")
+            for d in sorted(scans_ok, key=lambda x: -x["_ni"])[:10]:
+                r = recs.get(str(d["req"])) if d["req"] else None
+                title = (r or {}).get("title") or "(вложение сделки)"
+                print(f"  позиций {d['_ni']:>4} · с ценой {d['_npriced']:>4} · "
+                      f"символов {d.get('ocr_chars', 0):>6} · {d['size']:>8} б · "
+                      f"из эталона {len(d['_pns'] & rfq):>3} · {title[:52]}")
     except Exception as e:
         print(f"\nсопоставление не выполнено: {type(e).__name__}: {e}")
 
     if not os.getenv("PROBE_SEAL"):
         print("\n(построчный разбор не выгружался: PROBE_SEAL не задан)")
-        print("\n✓ зонд v40 завершён")
+        print("\n✓ зонд v41 завершён")
         return
 
     for d in parsed:
@@ -572,7 +585,7 @@ def main() -> None:
     for i in range(0, len(b64), 4000):
         print(b64[i:i + 4000])
     print("-----KVANT END-----")
-    print("\n✓ зонд v40 завершён")
+    print("\n✓ зонд v41 завершён")
 
 
 if __name__ == "__main__":
