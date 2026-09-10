@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Ansaldo Energia — модели, субпоставщики, каналы</title>
+<title>Ansaldo Energia и семейство V-машин</title>
 <style>
 :root{
   color-scheme:light;
@@ -26,8 +26,9 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--s1);outline-offset:
 .tile b{font-size:21px;font-variant-numeric:tabular-nums;display:block}
 .tile span{font-size:12px;color:var(--ink2)}
 h2{font-size:13px;text-transform:uppercase;letter-spacing:.09em;color:var(--ink2);margin:26px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
-table{border-collapse:collapse;width:100%;margin:8px 0;font-size:13px}
-th,td{border-bottom:1px solid var(--border);padding:6px 8px;text-align:left;vertical-align:top}
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:8px 0;max-width:100%}
+table{border-collapse:collapse;width:100%;margin:0;font-size:13px}
+th,td{border-bottom:1px solid var(--border);padding:6px 8px;text-align:left;vertical-align:top;overflow-wrap:anywhere}
 th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);font-weight:600}
 tbody tr:hover{background:#fff}
 .filters{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin:10px 0}
@@ -40,6 +41,19 @@ select,input[type=search]{padding:6px 9px;border:1px solid var(--border);border-
 .cn{font-weight:650}
 .src{font-size:11px;color:var(--mut);word-break:break-all}
 .ls{margin:10px 0 14px;padding-left:22px}
+.navbar{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin:10px 0 6px}
+.navbar label{display:flex;flex-direction:column;gap:4px;font-size:11.5px;color:var(--mut);text-transform:uppercase;letter-spacing:.06em;flex:1 1 210px;min-width:0}
+.navbar select{font:14px/1.3 inherit;padding:7px 9px;border:1px solid var(--border);border-radius:7px;background:#fff;color:var(--ink);max-width:100%}
+.navbar button{font:13px inherit;padding:8px 13px;border:1px solid var(--border);border-radius:7px;background:#fff;color:var(--ink2);cursor:pointer}
+.navbar button:hover{border-color:var(--ans);color:var(--ans)}
+.jump{display:inline-block;font:12.5px inherit;padding:5px 11px;margin:3px 5px 3px 0;border:1px solid var(--ans);border-radius:14px;background:#fff;color:var(--ans);cursor:pointer}
+.jump:hover{background:var(--ans);color:#fff}
+.chip{display:inline-block;font-size:12px;padding:3px 9px;margin:3px 4px 3px 0;border-radius:12px;background:var(--chip,#eef2f7);color:var(--ink2)}
+.mcard2{background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--ans);border-radius:10px;padding:14px 16px;margin:12px 0}
+.mcard2 h3{margin:0 0 4px;font-size:17px}
+.mcard2 .al{color:var(--mut);font-size:13px;margin-bottom:8px}
+.mspec{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;margin:8px 0}
+.mspec div{font-size:12.5px}.mspec b{display:block;color:var(--mut);font-size:11px;text-transform:uppercase;letter-spacing:.05em}
 .ls li{margin:6px 0;line-height:1.55}
 .tabs{display:flex;gap:4px;flex-wrap:wrap;margin:14px 0 4px;border-bottom:1px solid var(--border)}
 .tab{cursor:pointer;border:1px solid var(--border);border-bottom:none;border-radius:7px 7px 0 0;padding:7px 13px;background:var(--page);font-size:13px;color:var(--ink2)}
@@ -51,8 +65,8 @@ select,input[type=search]{padding:6px 9px;border:1px solid var(--border);border-
 <body>
 <div class="wrap">
 <header>
- <h1>Ansaldo Energia — что за машины, кто их делает и где брать детали</h1>
- <div class="mut small">__N_CO__ компаний · __N_MODELS__ моделей · __N_SRC__ источников · данные на __UPDATED__ · <a href="./">библиотека ГТУ</a> · <a href="./v643a">разбор V64.3A</a> · <a href="./f4000">разбор SGT5-4000F</a></div>
+ <h1>Ansaldo Energia и семейство V-машин: что за машины, из чего состоят, кто делает детали</h1>
+ <div class="mut small">__N_CO__ компаний · __N_MODELS__ моделей у 6 производителей · __N_TYPES__ типов узлов · __N_SRC__ источников · данные на __UPDATED__ · <a href="./">библиотека ГТУ</a> · <a href="./v643a">разбор V64.3A</a> · <a href="./f4000">разбор SGT5-4000F</a></div>
 </header>
 
 <div class="k" id="kpi"></div>
@@ -70,9 +84,16 @@ const acc = a => a==='высокая' ? '<span class="badge b-hi">доступе
 document.getElementById('kpi').innerHTML = D.kpi.map(x=>`<div class="tile"><b>${esc(x.v)}</b><span>${esc(x.t)}</span></div>`).join('');
 document.getElementById('verdict').innerHTML = '<b>Вывод.</b> ' + D.verdict;
 
-const T = (cols, rows) => `<table><thead><tr>${cols.map(c=>`<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+const T = (cols, rows) => `<div class="tw"><table><thead><tr>${cols.map(c=>`<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
 
 const PANES = [
+ ['Навигатор', () => `<div class="navbar">
+   <label>Производитель (OEM)<select id="fOem"></select></label>
+   <label>Модель<select id="fMod"></select></label>
+   <label>Узел / тип оборудования<select id="fTyp"></select></label>
+   <button id="fReset">Сбросить</button>
+  </div><div id="navOut"></div>`
+  + D.nav_how.map(t=>`<div class="box">${t}</div>`).join('')],
  ['Действия', () => T(['№','Действие','Кому','Зачем','Срок','Риск'],
     D.actions.map(x=>[esc(x.n), `<span class="cn">${esc(x.what)}</span>`, esc(x.who), esc(x.why), esc(x.when), esc(x.risk||'')]))
     + D.action_notes.map(t=>`<div class="box warn">${t}</div>`).join('')],
@@ -207,15 +228,85 @@ const PANES = [
 
 document.getElementById('tabs').innerHTML = PANES.map((p,i)=>`<button class="tab${i?'':' on'}" data-i="${i}">${esc(p[0])}</button>`).join('');
 document.getElementById('panes').innerHTML = PANES.map((p,i)=>`<div class="pane${i?'':' on'}" id="p${i}">${i?'':p[1]()}</div>`).join('');
-document.getElementById('tabs').addEventListener('click', ev => {
-  const b = ev.target.closest('.tab'); if(!b) return;
-  const i = +b.dataset.i;
-  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on', t===b));
+function showPane(i){
+  document.querySelectorAll('.tab').forEach((t,j)=>t.classList.toggle('on', j===i));
   document.querySelectorAll('.pane').forEach((p,j)=>{
     if(j===i && !p.dataset.built && j) { p.innerHTML = PANES[j][1](); p.dataset.built='1'; }
     p.classList.toggle('on', j===i);
   });
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+document.getElementById('tabs').addEventListener('click', ev => {
+  const b = ev.target.closest('.tab'); if(!b) return;
+  showPane(+b.dataset.i);
 });
+const goTab = title => { const i = PANES.findIndex(p=>p[0]===title); if(i>=0) showPane(i); };
+
+/* --- навигатор: связанные выпадающие списки --- */
+const MODELS = D.nav_oem.flatMap(o => o.models.map(m => ({...m, oem:o.o, co:o.co, role:o.role})));
+const TYPES = D.nav_types;
+const typeOf = t => TYPES.find(x=>x.t===t) || {w:[]};
+const fill = (el, items, cur, all) => {
+  el.innerHTML = `<option value="">${all}</option>` + items.map(v=>`<option value="${esc(v)}"${v===cur?' selected':''}>${esc(v)}</option>`).join('');
+};
+const sel = {oem:'', mod:'', typ:''};
+function navRender(){
+  const eOem=document.getElementById('fOem'), eMod=document.getElementById('fMod'), eTyp=document.getElementById('fTyp');
+  if(!eOem) return;
+  let pool = MODELS;
+  if(sel.oem) pool = pool.filter(m=>m.oem===sel.oem);
+  if(sel.typ) pool = pool.filter(m=>m.ty.includes(sel.typ));
+  if(sel.mod && !pool.some(m=>m.m===sel.mod)) sel.mod='';
+  const oems = D.nav_oem.map(o=>o.o).filter(o => !sel.typ || MODELS.some(m=>m.oem===o && m.ty.includes(sel.typ)));
+  const typs = TYPES.map(t=>t.t).filter(t => pool.some(m=>m.ty.includes(t)));
+  fill(eOem, oems, sel.oem, '— все производители —');
+  fill(eMod, pool.map(m=>m.m), sel.mod, `— все модели (${pool.length}) —`);
+  fill(eTyp, typs, sel.typ, '— все узлы —');
+
+  const out = document.getElementById('navOut');
+  const jumps = list => [...new Set(list)].map(t=>`<button class="jump" data-t="${esc(t)}">${esc(t)} →</button>`).join('');
+  const one = MODELS.find(m=>m.m===sel.mod);
+  if(one){
+    const shown = sel.typ ? [sel.typ] : one.ty;
+    out.innerHTML = `<div class="mcard2">
+      <h3>${esc(one.m)}</h3>
+      <div class="al">${esc(one.oem)} · ${esc(one.co)}${one.al&&one.al!=='—'?' · также известна как '+esc(one.al):''}</div>
+      <div class="mspec">
+        <div><b>Класс</b>${esc(one.cl)}</div><div><b>Мощность и КПД</b>${esc(one.p)}</div>
+        <div><b>Камера сгорания</b>${esc(one.cmb)}</div><div><b>Проточная часть</b>${esc(one.st)}</div>
+      </div>
+      <div><b>Узлы на этой машине (${one.ty.length}):</b><br>${one.ty.map(t=>`<span class="chip">${esc(t)}</span>`).join('')}</div>
+      <div style="margin-top:10px"><b>Где читать${sel.typ?' по узлу «'+esc(sel.typ)+'»':''}:</b><br>${jumps(shown.flatMap(t=>typeOf(t).w))}</div>
+    </div>
+    <div class="box warn"><b>Ловушки этой машины.</b> ${one.tr}</div>
+    <h2>Узлы модели ${esc(one.m)}</h2>` + T(['Узел','Код / обозначение','EN-термин для RFQ','Где читать'],
+      shown.map(t=>{const x=typeOf(t); return [`<span class="cn">${esc(t)}</span>`, esc(x.c||''), esc(x.en||''), jumps(x.w)];}));
+  } else {
+    out.innerHTML = `<h2>Модели${sel.oem?' — '+esc(sel.oem):''}${sel.typ?', где есть узел «'+esc(sel.typ)+'»':''} (${pool.length})</h2>`
+      + T(['Производитель','Модель','Другие имена','Класс','Мощность','Узлов','Где читать'],
+        pool.map(m=>[esc(m.oem), `<span class="cn">${esc(m.m)}</span>`, esc(m.al), esc(m.cl), esc(m.p), String(m.ty.length),
+          jumps((sel.typ?[sel.typ]:m.ty).flatMap(t=>typeOf(t).w))]))
+      + '<h2>Узлы и типы оборудования</h2>' + T(['Узел','Код / обозначение','EN-термин для RFQ','На каких моделях','Где читать'],
+        TYPES.filter(x=>!sel.typ||x.t===sel.typ).map(x=>{
+          const ms = pool.filter(m=>m.ty.includes(x.t)).map(m=>m.m);
+          return [`<span class="cn">${esc(x.t)}</span>`, esc(x.c), esc(x.en),
+            ms.length?ms.map(v=>`<span class="chip">${esc(v)}</span>`).join(''):'<span class="mut">—</span>', jumps(x.w)];
+        }).filter(r=>r[3].indexOf('—')<0||sel.typ));
+  }
+}
+document.getElementById('panes').addEventListener('change', ev => {
+  if(ev.target.id==='fOem'){ sel.oem=ev.target.value; sel.mod=''; }
+  else if(ev.target.id==='fMod') sel.mod=ev.target.value;
+  else if(ev.target.id==='fTyp') sel.typ=ev.target.value;
+  else return;
+  navRender();
+});
+document.getElementById('panes').addEventListener('click', ev => {
+  const j = ev.target.closest('.jump');
+  if(j){ goTab(j.dataset.t); return; }
+  if(ev.target.id==='fReset'){ sel.oem=sel.mod=sel.typ=''; navRender(); }
+});
+navRender();
 </script>
 </body>
 </html>
