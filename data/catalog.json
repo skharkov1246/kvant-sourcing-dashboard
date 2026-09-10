@@ -4,18 +4,18 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 166,
-    "total_bytes": 70765033,
+    "datasets": 175,
+    "total_bytes": 73377981,
     "by_sensitivity": {
-      "конфиденциально": 48,
-      "внутреннее": 86,
-      "публикуемо": 32
+      "конфиденциально": 54,
+      "внутреннее": 88,
+      "публикуемо": 33
     },
     "by_subproject": {
-      "ГПУ-библиотека": 26,
-      "ГТУ-библиотека": 30,
+      "ГПУ-библиотека": 27,
+      "ГТУ-библиотека": 31,
       "ОВЭ-75": 45,
-      "база ЗИП": 21,
+      "база ЗИП": 28,
       "база ЗИП · таможня": 18,
       "гидрометаллургия": 22,
       "дашборд сорсеров": 3,
@@ -880,6 +880,44 @@
       "referenced_by": []
     },
     {
+      "path": "zip/data/telsmith_crossrefs.json",
+      "subproject": "база ЗИП",
+      "bytes": 599926,
+      "note": "Проверка заводов по щековой дробилке Telsmith 3858: 22 кросс-референса «номер Telsmith → настоящий изготовитель и его номер», 42 вердикта по компаниям (есть ли собственные переделы, подтверждается ли опыт по Telsmith, риски, в какую волну запроса ставить) и 8 углов разведки. Публикуется на странице /telsmith.html (вкладки «Кросс-референсы», «Заводы: вердикты», «Углы разведки»).",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "angle_findings",
+        "crossrefs",
+        "verdicts"
+      ],
+      "main_collection": {
+        "key": "verdicts",
+        "records": 42,
+        "record_keys": [
+          "contacts_ok",
+          "covers_classes",
+          "name",
+          "real_production",
+          "recommend",
+          "risks",
+          "telsmith_experience",
+          "verdict"
+        ]
+      },
+      "last_change": null,
+      "last_author": null,
+      "last_commit": null,
+      "updated_by": "неизвестно",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "zip/tools/build_telsmith_page.py"
+      ]
+    },
+    {
       "path": "gt/data/rfq_demand.json",
       "subproject": "ГТУ-библиотека",
       "bytes": 558136,
@@ -1044,7 +1082,7 @@
     {
       "path": "data/chat_snapshot.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 485708,
+      "bytes": 509413,
       "note": "Суточный снимок реакции коммерсантов в чатах сделок. Пишет бот scan.yml (chat_scan.py) раз в сутки. Руками не редактировать: правка в PR откатит свежие данные при мерже. Содержит поимённые метрики 15 сотрудников и LLM-оценки.",
       "format": "json",
       "shape": "объект",
@@ -1128,6 +1166,79 @@
       "referenced_by": [
         "pnw/tools/build_suppliers.py",
         "zip/tools/bearing_report.py"
+      ]
+    },
+    {
+      "path": "gt/data/ansaldo.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 399548,
+      "note": "База знаний по Ansaldo Energia и всему семейству V-машин (страница /gt/ansaldo, 21 вкладка; печатный отчёт gt/docs/ANSALDO-разведка-2026-09.pdf, 23 раздела, 68 страниц). Модельный ряд; наследие Alstom (GT26/GT36/GT13E2, раздел активов между Ansaldo и GE по делу ЕК M.7278, апгрейды MXL2/MXL3, Alstom Owners Group); горячий тракт с EN-терминами, количествами и ценовыми якорями из тендеров TED; партномера и шифровки по четырём инженерным школам с позиционными кодами TLa/TLe/VLa/VLe и глоссарием RU/EN/DE/IT; керамика камеры сгорания (состав, режим обжига, патентная карта, температуры) и горелки; ведомости из тендеров с реальными номерами и количествами; апгрейды и ремонтные технологии (5 стадий, типы инспекций, ремцентры); литьё и поковки, включая хиртовый венец; КВОУ и фильтроэлементы с геометрией и экономикой замены; парк в РФ и СНГ; субпоставщики с доказательствами связи; дилерская сеть и лицензиаты; независимый аутмаркет; российские сервисные и литейные мощности; генераторы (типоряд, комплектация, ремонтники, объём инспекции без выемки ротора); АСУ ТП, КИП и топливная арматура; нормативные ограничения по позиции 8411 (ЕС, США, Великобритания, Швейцария, РФ); логистика и таможня; правила RFQ. 34 параллельные разведки 09.2026. Публичные данные плюс агрегаты из нашей таможни HS 8411 и Bitrix СП-166 — персональных и ценовых данных заказчиков не содержит.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "action_notes",
+        "actions",
+        "aftermarket",
+        "alstom_fleet_ru",
+        "alstom_gt",
+        "alstom_market",
+        "alstom_upg",
+        "aog",
+        "bom_fmt",
+        "bom_kit",
+        "bom_qty",
+        "bom_req",
+        "cast_notes",
+        "cast_rank",
+        "cer_count",
+        "cer_makers",
+        "cer_papers",
+        "cer_patents",
+        "cer_spec",
+        "cer_temp",
+        "company",
+        "controls",
+        "controls_notes",
+        "customs_codes",
+        "customs_risk",
+        "fleet_notes",
+        "fleet_ru",
+        "forge_disc",
+        "ge_split",
+        "gen_code",
+        "gen_deal",
+        "gen_inspect",
+        "gen_pairs",
+        "gen_parts",
+        "gen_repair",
+        "gen_sites",
+        "gen_types",
+        "glossary",
+        "gt13e2_parts",
+        "hirth"
+      ],
+      "main_collection": {
+        "key": "sources",
+        "records": 73,
+        "record_keys": [
+          "url",
+          "what"
+        ]
+      },
+      "last_change": null,
+      "last_author": null,
+      "last_commit": null,
+      "updated_by": "неизвестно",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "адреса электронной почты",
+          "ИНН контрагентов"
+        ]
+      },
+      "referenced_by": [
+        "gt/tools/ansaldo_report.py",
+        "gt/tools/build_ansaldo.py"
       ]
     },
     {
@@ -1231,6 +1342,91 @@
       ]
     },
     {
+      "path": "zip/data/telsmith_prices.json",
+      "subproject": "база ЗИП",
+      "bytes": 362458,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "basis",
+        "estimates",
+        "fx_rub_usd",
+        "generated",
+        "method"
+      ],
+      "main_collection": {
+        "key": "estimates",
+        "records": 9,
+        "record_keys": [
+          "cls",
+          "items",
+          "method"
+        ]
+      },
+      "last_change": null,
+      "last_author": null,
+      "last_commit": null,
+      "updated_by": "неизвестно",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "zip/tools/build_telsmith_page.py",
+        "zip/tools/telsmith_report.py"
+      ]
+    },
+    {
+      "path": "zip/data/telsmith_suppliers.json",
+      "subproject": "база ЗИП",
+      "bytes": 346377,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "crossrefs",
+        "generated",
+        "geom",
+        "notes",
+        "plan",
+        "suppliers"
+      ],
+      "main_collection": {
+        "key": "suppliers",
+        "records": 59,
+        "record_keys": [
+          "city",
+          "covers_classes",
+          "email",
+          "evidence",
+          "kind",
+          "name",
+          "phone",
+          "production",
+          "recommend",
+          "risks",
+          "site",
+          "whatsapp"
+        ]
+      },
+      "last_change": null,
+      "last_author": null,
+      "last_commit": null,
+      "updated_by": "неизвестно",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "адреса электронной почты",
+          "телефоны"
+        ]
+      },
+      "referenced_by": [
+        "zip/tools/build_telsmith_page.py",
+        "zip/tools/telsmith_report.py"
+      ]
+    },
+    {
       "path": "zip/data/bearing_sites_cn.json",
       "subproject": "база ЗИП",
       "bytes": 323230,
@@ -1324,6 +1520,47 @@
         "zip/tools/pilot_order.py",
         "zip/tools/pilot_pdf.py",
         "zip/tools/who_supplies.py"
+      ]
+    },
+    {
+      "path": "zip/data/telsmith_recon.json",
+      "subproject": "база ЗИП",
+      "bytes": 273939,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "generated",
+        "items",
+        "legs",
+        "method",
+        "summary"
+      ],
+      "main_collection": {
+        "key": "items",
+        "records": 38,
+        "record_keys": [
+          "bottom_up_usd",
+          "converges",
+          "dig",
+          "name",
+          "pn",
+          "spread",
+          "take_usd",
+          "top_down_usd"
+        ]
+      },
+      "last_change": null,
+      "last_author": null,
+      "last_commit": null,
+      "updated_by": "неизвестно",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "zip/tools/build_telsmith_page.py",
+        "zip/tools/telsmith_report.py"
       ]
     },
     {
@@ -1426,6 +1663,42 @@
       ]
     },
     {
+      "path": "zip/data/telsmith_nodrawings.json",
+      "subproject": "база ЗИП",
+      "bytes": 257274,
+      "note": "Порядок работы по Telsmith 3858 без чертежей: 32 компании с доказательством изготовления в трёх разрезах (каталожные позиции с прямым указанием модели, другие модели, следы поставок), восстановление геометрии по 91 факту и план по шести классам деталей. Поля geom и plan дублируют telsmith_suppliers.json. Публикуется на /telsmith.html (вкладки «Кто уже изготавливал», «Без чертежей»).",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "geom",
+        "made",
+        "plan"
+      ],
+      "main_collection": {
+        "key": "made",
+        "records": 3,
+        "record_keys": [
+          "companies",
+          "notes",
+          "scope"
+        ]
+      },
+      "last_change": null,
+      "last_author": null,
+      "last_commit": null,
+      "updated_by": "неизвестно",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "адреса электронной почты",
+          "телефоны"
+        ]
+      },
+      "referenced_by": [
+        "zip/tools/build_telsmith_page.py"
+      ]
+    },
+    {
       "path": "data/budget_snapshot.json",
       "subproject": "дашборд сорсеров",
       "bytes": 244926,
@@ -1492,7 +1765,7 @@
     {
       "path": "gt/data/bitrix_gt.json",
       "subproject": "ГТУ-библиотека",
-      "bytes": 228033,
+      "bytes": 229236,
       "note": "Метки «был ли запрос в компанию» из СП-166. Пишет бот gt-bitrix.yml дважды в неделю. Руками не редактировать.",
       "format": "json",
       "shape": "объект",
@@ -1505,7 +1778,7 @@
       ],
       "main_collection": {
         "key": "deals",
-        "records": 216,
+        "records": 218,
         "record_keys": [
           "created",
           "id",
@@ -1526,6 +1799,7 @@
       "referenced_by": [
         ".github/workflows/gt-bitrix.yml",
         "gt/build.py",
+        "gt/public/ansaldo.html",
         "gt/tools/bitrix_gt.py",
         "gt/tools/drop_ru.py",
         "scripts/build_index.py"
@@ -1535,7 +1809,7 @@
       "path": "zip/data/kp1763_audit.json",
       "subproject": "база ЗИП",
       "bytes": 219849,
-      "note": "",
+      "note": "Аудит КП №1763 ООО «НПФ ТЕХНОЛОГИЯ» → ООО «КВАНТ» на 16,76 млн ₽ с НДС: 185 проверенных фактов по шести направлениям (кто поставщик, цены на бронзу в РФ, ставки механообработки, альтернативы РФ, аналоги марок и С72900, цены Китая). Источник — фан-аут агентов плюс официальная выписка ЕГРЮЛ. Спецификация, обратный счёт по массе и выводы живут в zip/tools/kp1763_audit.py. Публикуется на странице /audit-kp1763.html. Коммерчески чувствительно: цены стороннего поставщика.",
       "format": "json",
       "shape": "объект",
       "top_keys": [
@@ -1564,7 +1838,9 @@
         "level": "внутреннее",
         "markers": []
       },
-      "referenced_by": []
+      "referenced_by": [
+        "zip/tools/build_audit_page.py"
+      ]
     },
     {
       "path": "ove/data/bi_lot3.json",
@@ -1862,6 +2138,49 @@
       ]
     },
     {
+      "path": "zip/data/telsmith_3858.json",
+      "subproject": "база ЗИП",
+      "bytes": 177150,
+      "note": "Реестр исследований ГШО по щековой дробилке Telsmith 3858 (38x58) рудника Таймырский: потребность 197 позиций на 198,6 млн ₽ с ценами действующего канала поставки и состав изделия — 414 строк каталога запасных частей в 20 узлах. Разбор — zip/tools/telsmith_parse.py из двух документов заказчика (дополнение к прейскуранту дилера и каталог запчастей); сами документы в репозиторий не кладутся. КОММЕРЧЕСКИ ЧУВСТВИТЕЛЬНО: содержит отпускные цены стороннего поставщика по договору с заказчиком.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "catalog",
+        "classes",
+        "machine",
+        "need",
+        "stats"
+      ],
+      "main_collection": {
+        "key": "catalog",
+        "records": 414,
+        "record_keys": [
+          "eid",
+          "name",
+          "node",
+          "oem",
+          "page",
+          "poz",
+          "qty"
+        ]
+      },
+      "last_change": null,
+      "last_author": null,
+      "last_commit": null,
+      "updated_by": "неизвестно",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "договорные цены контрагентов"
+        ]
+      },
+      "referenced_by": [
+        "zip/tools/build_telsmith_page.py",
+        "zip/tools/telsmith_parse.py",
+        "zip/tools/telsmith_report.py"
+      ]
+    },
+    {
       "path": "ove/data/discrepancies.json",
       "subproject": "ОВЭ-75",
       "bytes": 173950,
@@ -1939,6 +2258,7 @@
         ]
       },
       "referenced_by": [
+        "gt/public/ansaldo.html",
         "gt/tools/build_v643a.py",
         "gt/tools/drop_ru.py"
       ]
@@ -2056,6 +2376,39 @@
       "referenced_by": [
         "gt/tools/build_lm6000.py",
         "gt/tools/drop_ru.py"
+      ]
+    },
+    {
+      "path": "zip/data/telsmith_brands.json",
+      "subproject": "база ЗИП",
+      "bytes": 153461,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "brands",
+        "synth"
+      ],
+      "main_collection": {
+        "key": "brands",
+        "records": 4,
+        "record_keys": [
+          "identities",
+          "notes",
+          "scope"
+        ]
+      },
+      "last_change": null,
+      "last_author": null,
+      "last_commit": null,
+      "updated_by": "неизвестно",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "zip/tools/build_telsmith_page.py",
+        "zip/tools/telsmith_report.py"
       ]
     },
     {
@@ -2271,8 +2624,10 @@
       "last_commit": "7e6f50f",
       "updated_by": "бот (workflow)",
       "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
+        "level": "конфиденциально",
+        "markers": [
+          "договорные цены контрагентов"
+        ]
       },
       "referenced_by": [
         "zip/build.py",
@@ -2381,6 +2736,7 @@
         ]
       },
       "referenced_by": [
+        "gt/public/ansaldo.html",
         "gt/tools/build_f4000.py",
         "gt/tools/drop_ru.py"
       ]
@@ -5226,8 +5582,10 @@
       "last_commit": "7e6f50f",
       "updated_by": "бот (workflow)",
       "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
+        "level": "конфиденциально",
+        "markers": [
+          "договорные цены контрагентов"
+        ]
       },
       "referenced_by": [
         "base/demand.py",
@@ -6001,6 +6359,50 @@
       ]
     },
     {
+      "path": "data/catalog_notes.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 11656,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "data/budget_snapshot.json",
+        "data/chat_snapshot.json",
+        "data/index.json",
+        "gidromet/data/",
+        "gpu/data/bitrix_gpu.json",
+        "gpu/data/coverage.json",
+        "gt/data/ansaldo.json",
+        "gt/data/bitrix_gt.json",
+        "gt/data/dossiers.json",
+        "gt/data/pn_db.json",
+        "ove/data/suppliers.json",
+        "pnw/public/data.js",
+        "pnw/public/search.html",
+        "zip/customs/out/",
+        "zip/data/customs_declarations.json",
+        "zip/data/kp1763_audit.json",
+        "zip/data/perf_class_packets.json",
+        "zip/data/perf_sourcing_map.json",
+        "zip/data/perf_test_requests.json",
+        "zip/data/supplier_crm.json",
+        "zip/data/telsmith_3858.json",
+        "zip/data/telsmith_crossrefs.json",
+        "zip/data/telsmith_nodrawings.json"
+      ],
+      "last_change": "2026-09-07",
+      "last_author": "Claude",
+      "last_commit": "7716da9",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "scripts/build_catalog.py"
+      ]
+    },
+    {
       "path": "gpu/data/playbook.json",
       "subproject": "ГПУ-библиотека",
       "bytes": 11381,
@@ -6067,6 +6469,50 @@
         "ove/tools/bidocs/vedomost.py",
         "ove/tools/build_release.py",
         "ove/tools/docframe.py"
+      ]
+    },
+    {
+      "path": "gpu/data/coverage.json",
+      "subproject": "ГПУ-библиотека",
+      "bytes": 11105,
+      "note": "Заполняемость базы ГПУ: сколько машин с разобранным списком применяемости, поставщиков с рабочим адресом, позиций заявки с ценой, проверкой и кроссом, и сколько систем двигателя закрыто всеми четырьмя слоями (потребность, аналоги, изготовители узлов, поставщики). Производный файл — считается gpu/tools/coverage.py по фактическим данным gpu/data и пересчитывается при каждой сборке сайта; руками не заполнять. Публикуется на kvant-gpu, раздел «Обзор → Заполняемость базы».",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "context",
+        "intro",
+        "machines",
+        "method",
+        "metrics",
+        "systems",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "systems",
+        "records": 19,
+        "record_keys": [
+          "analogs",
+          "demand",
+          "key",
+          "layers",
+          "name",
+          "pct",
+          "status",
+          "subsuppliers",
+          "suppliers"
+        ]
+      },
+      "last_change": null,
+      "last_author": null,
+      "last_commit": null,
+      "updated_by": "неизвестно",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "gpu/build.py",
+        "gpu/tools/coverage.py"
       ]
     },
     {
@@ -6540,43 +6986,6 @@
       "referenced_by": [
         "gpu/build.py",
         "gt/build.py"
-      ]
-    },
-    {
-      "path": "data/catalog_notes.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 4854,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "data/budget_snapshot.json",
-        "data/chat_snapshot.json",
-        "data/index.json",
-        "gidromet/data/",
-        "gpu/data/bitrix_gpu.json",
-        "gt/data/bitrix_gt.json",
-        "gt/data/dossiers.json",
-        "gt/data/pn_db.json",
-        "ove/data/suppliers.json",
-        "pnw/public/data.js",
-        "zip/customs/out/",
-        "zip/data/customs_declarations.json",
-        "zip/data/perf_class_packets.json",
-        "zip/data/perf_sourcing_map.json",
-        "zip/data/perf_test_requests.json",
-        "zip/data/supplier_crm.json"
-      ],
-      "last_change": "2026-09-07",
-      "last_author": "Claude",
-      "last_commit": "7716da9",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "публикуемо",
-        "markers": []
-      },
-      "referenced_by": [
-        "scripts/build_catalog.py"
       ]
     },
     {

@@ -142,6 +142,22 @@ def build():
     (OUT / "vendor").mkdir(exist_ok=True)
     shutil.copy2(SITE / "vendor" / "supabase.js", OUT / "vendor" / "supabase.js")
 
+    # страницы-разведки: собираются из тех же данных zip/data, но своим сборщиком.
+    # Каждая — самодостаточный HTML рядом с индексом; падение одной не роняет деплой.
+    for mod in ("build_telsmith_page", "build_audit_page"):
+        try:
+            subprocess.run([sys.executable, str(ROOT / "tools" / f"{mod}.py")], check=True)
+        except Exception as ex:
+            print(f"{mod}: пропущен ({ex})")
+
+    # единый поиск детали по номеру (pnw/public/search.html) — 3,4 МБ самодостаточного HTML.
+    # Кладём в оба периметра: корень сайта закрыт правом «zip», /gt/ — правом «gt», и держатель
+    # одного права не должен упираться в отказ на соседнем.
+    search = ROOT.parent / "pnw" / "public" / "search.html"
+    if search.exists():
+        shutil.copy2(search, OUT / "search.html")
+        print(f"поиск: pnw/public/search.html → zip/public/search.html ({search.stat().st_size:,} байт)")
+
     # документы заказов → на сайт (/orders/), с ASCII-именами для чистых URL
     orders = ROOT / "orders"
     if orders.exists():
@@ -161,7 +177,10 @@ def build():
                  "КТО-УЖЕ-ПОСТАВЛЯЕТ.html": "who-supplies.html",
                  "ПЕРФОРАТОРЫ-СОРСИНГ.pdf": "drifters-sourcing.pdf",
                  "ПЕРФОРАТОРЫ-СОРСИНГ.html": "drifters-sourcing.html",
-                 "perf_sourcing.csv": "drifters-sourcing.csv"}
+                 "perf_sourcing.csv": "drifters-sourcing.csv",
+                 "ТЕЛСМИТ-СОРСИНГ.pdf": "telsmith-sourcing.pdf",
+                 "ТЕЛСМИТ-СОРСИНГ.html": "telsmith-sourcing.html",
+                 "telsmith_need.csv": "telsmith-need.csv"}
         for f in orders.iterdir():
             if f.suffix.lower() in (".pdf", ".csv", ".md", ".html"):
                 shutil.copy2(f, OUT / "orders" / alias.get(f.name, f.name))
@@ -180,6 +199,8 @@ def build():
             if dst.exists():
                 shutil.rmtree(dst)
             shutil.copytree(wiz, dst)
+            if search.exists():
+                shutil.copy2(search, dst / "search.html")
             print(f"gt: wizard/ → zip/public/gt/wizard/ ({len(list(dst.iterdir()))} файлов)")
     except Exception as e:  # ГТУ-сайт не должен ронять деплой базы ЗИП
         print(f"gt: пропущен ({e})")

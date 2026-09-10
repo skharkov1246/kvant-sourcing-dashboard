@@ -1,0 +1,390 @@
+{
+  "updated": "2026-09-10",
+  "method": "Считается gpu/tools/coverage.py по фактическим файлам gpu/data при каждой сборке сайта. Числитель — записи, которые в файлах реально есть; ничего не досчитывается и не оценивается экспертно.",
+  "intro": "Что в базе ГПУ уже закрыто, а что ещё дыра. Показатель считается по данным, а не по ощущению: если цифра не растёт, значит разведка не добавила записей.",
+  "metrics": [
+    {
+      "key": "partlists",
+      "title": "Машины с разобранным списком применяемости",
+      "done": 1,
+      "total": 14,
+      "gap": "Партлист есть только там, где изготовитель aftermarket сам опубликовал каталог применяемости. По остальным машинам номенклатура собирается по позициям, а не по составу двигателя.",
+      "next": "Искать каталоги применяемости независимых изготовителей по машинам с наибольшим парком; в первую очередь — по тем, где парк есть, а списка нет.",
+      "pct": 7,
+      "status": "дыра"
+    },
+    {
+      "key": "supplier_contacts",
+      "title": "Поставщики с рабочим адресом",
+      "done": 13,
+      "total": 37,
+      "gap": "Сайт известен у всех, почта — у трети. Остальным запрос отправить некому: сорсер упирается в форму обратной связи.",
+      "next": "Прогнать реестр сборщиком контактов и добить недостающие адреса вручную по страницам контактов и импринтам.",
+      "pct": 35,
+      "status": "дыра"
+    },
+    {
+      "key": "demand_priced",
+      "title": "Позиции лота с ценовым ориентиром",
+      "done": 85,
+      "total": 94,
+      "gap": "Непрощупанные позиции — те, где ни каталог, ни розница цену не отдают.",
+      "next": "Закрывать запросом котировок, а не поиском: по этим позициям публичной цены нет.",
+      "pct": 90,
+      "status": "закрыто"
+    },
+    {
+      "key": "demand_checked",
+      "title": "Позиции лота с проверкой",
+      "done": 61,
+      "total": 94,
+      "gap": "Проверка — это встречное подтверждение цены или применяемости из второго источника.",
+      "next": "Довести проверку по денежным позициям: непроверенная цена в расчёт лота не идёт.",
+      "pct": 65,
+      "status": "частично"
+    },
+    {
+      "key": "demand_cross",
+      "title": "Позиции с кроссом на независимого изготовителя",
+      "done": 55,
+      "total": 94,
+      "gap": "Без кросса позиция остаётся в канале OEM — торговаться нечем.",
+      "next": "Расширять кросс-каталоги: они существуют не по всем системам.",
+      "pct": 59,
+      "status": "частично"
+    },
+    {
+      "key": "systems",
+      "title": "Системы, закрытые всеми четырьмя слоями",
+      "done": 6,
+      "total": 19,
+      "gap": "Слои: спрос в натуре, семейства аналогов, субпоставщики, допущенные поставщики. Система считается закрытой, когда есть все четыре.",
+      "next": "Идти по списку снизу вверх — первыми те, где закрыт один слой из четырёх.",
+      "pct": 32,
+      "status": "дыра"
+    }
+  ],
+  "systems": [
+    {
+      "key": "mech",
+      "name": "Механика и приводы",
+      "demand": 0,
+      "analogs": 0,
+      "subsuppliers": 0,
+      "suppliers": 0,
+      "layers": 0,
+      "pct": 0,
+      "status": "дыра"
+    },
+    {
+      "key": "gen",
+      "name": "Генератор и муфта",
+      "demand": 0,
+      "analogs": 0,
+      "subsuppliers": 3,
+      "suppliers": 0,
+      "layers": 1,
+      "pct": 25,
+      "status": "дыра"
+    },
+    {
+      "key": "coupling",
+      "name": "Муфты и виброразвязка",
+      "demand": 0,
+      "analogs": 0,
+      "subsuppliers": 1,
+      "suppliers": 0,
+      "layers": 1,
+      "pct": 25,
+      "status": "дыра"
+    },
+    {
+      "key": "oil",
+      "name": "Масла и химия",
+      "demand": 0,
+      "analogs": 0,
+      "subsuppliers": 1,
+      "suppliers": 0,
+      "layers": 1,
+      "pct": 25,
+      "status": "дыра"
+    },
+    {
+      "key": "hardware",
+      "name": "Крепёж",
+      "demand": 2,
+      "analogs": 0,
+      "subsuppliers": 0,
+      "suppliers": 0,
+      "layers": 1,
+      "pct": 25,
+      "status": "дыра"
+    },
+    {
+      "key": "hoses",
+      "name": "Шланги и трубопроводы",
+      "demand": 5,
+      "analogs": 0,
+      "subsuppliers": 0,
+      "suppliers": 0,
+      "layers": 1,
+      "pct": 25,
+      "status": "дыра"
+    },
+    {
+      "key": "other",
+      "name": "Прочее",
+      "demand": 6,
+      "analogs": 0,
+      "subsuppliers": 0,
+      "suppliers": 0,
+      "layers": 1,
+      "pct": 25,
+      "status": "дыра"
+    },
+    {
+      "key": "crank",
+      "name": "КШМ",
+      "demand": 0,
+      "analogs": 0,
+      "subsuppliers": 3,
+      "suppliers": 1,
+      "layers": 2,
+      "pct": 50,
+      "status": "частично"
+    },
+    {
+      "key": "exhaust",
+      "name": "Выхлоп и катализ",
+      "demand": 0,
+      "analogs": 0,
+      "subsuppliers": 2,
+      "suppliers": 1,
+      "layers": 2,
+      "pct": 50,
+      "status": "частично"
+    },
+    {
+      "key": "cooling",
+      "name": "Охлаждение",
+      "demand": 6,
+      "analogs": 0,
+      "subsuppliers": 0,
+      "suppliers": 2,
+      "layers": 2,
+      "pct": 50,
+      "status": "частично"
+    },
+    {
+      "key": "seals",
+      "name": "Уплотнения и прокладки",
+      "demand": 19,
+      "analogs": 0,
+      "subsuppliers": 0,
+      "suppliers": 7,
+      "layers": 2,
+      "pct": 50,
+      "status": "частично"
+    },
+    {
+      "key": "cpg",
+      "name": "ЦПГ: поршень, гильза, кольца",
+      "demand": 1,
+      "analogs": 0,
+      "subsuppliers": 6,
+      "suppliers": 20,
+      "layers": 3,
+      "pct": 75,
+      "status": "частично"
+    },
+    {
+      "key": "sensors",
+      "name": "Датчики и КИП",
+      "demand": 18,
+      "analogs": 1,
+      "subsuppliers": 0,
+      "suppliers": 4,
+      "layers": 3,
+      "pct": 75,
+      "status": "частично"
+    },
+    {
+      "key": "air",
+      "name": "Воздух и наддув",
+      "demand": 2,
+      "analogs": 1,
+      "subsuppliers": 7,
+      "suppliers": 6,
+      "layers": 4,
+      "pct": 100,
+      "status": "закрыто"
+    },
+    {
+      "key": "gas",
+      "name": "Газовый тракт и смесеобразование",
+      "demand": 3,
+      "analogs": 1,
+      "subsuppliers": 5,
+      "suppliers": 4,
+      "layers": 4,
+      "pct": 100,
+      "status": "закрыто"
+    },
+    {
+      "key": "head",
+      "name": "ГБЦ и клапаны",
+      "demand": 3,
+      "analogs": 1,
+      "subsuppliers": 5,
+      "suppliers": 16,
+      "layers": 4,
+      "pct": 100,
+      "status": "закрыто"
+    },
+    {
+      "key": "control",
+      "name": "САУ и электрика",
+      "demand": 3,
+      "analogs": 1,
+      "subsuppliers": 5,
+      "suppliers": 5,
+      "layers": 4,
+      "pct": 100,
+      "status": "закрыто"
+    },
+    {
+      "key": "filtration",
+      "name": "Фильтрация",
+      "demand": 10,
+      "analogs": 2,
+      "subsuppliers": 5,
+      "suppliers": 21,
+      "layers": 4,
+      "pct": 100,
+      "status": "закрыто"
+    },
+    {
+      "key": "ignition",
+      "name": "Зажигание",
+      "demand": 16,
+      "analogs": 12,
+      "subsuppliers": 8,
+      "suppliers": 25,
+      "layers": 4,
+      "pct": 100,
+      "status": "закрыто"
+    }
+  ],
+  "machines": [
+    {
+      "oem": "Cummins",
+      "model": "QSV91G",
+      "units": 6,
+      "passport": 10,
+      "partlist": false
+    },
+    {
+      "oem": "INNIO Jenbacher",
+      "model": "J620 (Type 6)",
+      "units": 5,
+      "passport": 10,
+      "partlist": false
+    },
+    {
+      "oem": "Cummins",
+      "model": "QSK60G",
+      "units": 3,
+      "passport": 10,
+      "partlist": false
+    },
+    {
+      "oem": "INNIO Jenbacher",
+      "model": "J320 (Type 3)",
+      "units": 3,
+      "passport": 10,
+      "partlist": false
+    },
+    {
+      "oem": "INNIO Jenbacher",
+      "model": "J420 (Type 4)",
+      "units": 3,
+      "passport": 10,
+      "partlist": false
+    },
+    {
+      "oem": "Caterpillar",
+      "model": "G3520 (серия G3500)",
+      "units": 2,
+      "passport": 10,
+      "partlist": false
+    },
+    {
+      "oem": "INNIO Jenbacher",
+      "model": "J208 (Type 2)",
+      "units": 2,
+      "passport": 10,
+      "partlist": false
+    },
+    {
+      "oem": "INNIO Jenbacher",
+      "model": "J612 / J616 / J624 (Type 6)",
+      "units": 2,
+      "passport": 10,
+      "partlist": false
+    },
+    {
+      "oem": "Caterpillar",
+      "model": "G3612 / G3616 (серия G3600)",
+      "units": 2,
+      "passport": 10,
+      "partlist": false
+    },
+    {
+      "oem": "MWM / Caterpillar",
+      "model": "TCG 2020 (CAT CG170)",
+      "units": 2,
+      "passport": 10,
+      "partlist": false
+    },
+    {
+      "oem": "Cummins",
+      "model": "KTA38G / KTA50G (+GTA855)",
+      "units": 2,
+      "passport": 10,
+      "partlist": false
+    },
+    {
+      "oem": "Waukesha (INNIO)",
+      "model": "VHP F3521 / L7042 (GSI/GL)",
+      "units": 2,
+      "passport": 10,
+      "partlist": false
+    },
+    {
+      "oem": "Cummins",
+      "model": "HSK78G",
+      "units": 1,
+      "passport": 10,
+      "partlist": false
+    },
+    {
+      "oem": "Caterpillar",
+      "model": "G3516 (серия G3500)",
+      "units": 5,
+      "passport": 10,
+      "partlist": true
+    }
+  ],
+  "context": {
+    "machines": 14,
+    "systems": 19,
+    "suppliers": 37,
+    "demand_rows": 94,
+    "analog_classes": 17,
+    "cross_records": 161,
+    "cross_oem_pns": 352,
+    "fleet_objects": 49,
+    "fleet_mw": 1188.0,
+    "fleet_catalogue_total": 206
+  }
+}

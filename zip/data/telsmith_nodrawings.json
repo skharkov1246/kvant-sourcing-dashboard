@@ -1,0 +1,1222 @@
+{
+ "made": [
+  {
+   "scope": "iron-giant",
+   "companies": [
+    {
+     "name": "Zhejiang Rock Machinery Co., Ltd. (сайты rock-machinery.com / cncrusher.net; в контактах базы фигурирует также Yiwu Wings Trading Co., Ltd.), г. Иу, пров. Чжэцзян",
+     "site": "https://www.cncrusher.net/english/parts-database/R47,telsmith-crusher",
+     "proof_level": "изготавливал 3858 подтверждено",
+     "proof": "В открытой базе запчастей Telsmith (стр. 15 каталога) четыре позиции с номерами деталей, у каждой в поле «Crusher Type» прямо указана модель: AA-273-1917M10 — Jaw plate — Crusher Type: Telsmith 38x58; AB-273-1917_SPL — Jaw plate — Telsmith 38x58; AA-273-1917M10M — Jaw plate — Telsmith 38x58; AB-273-1917_SPL-M — Jaw plate — Telsmith 38x58. Это тот же индекс 273-1917, что и в списке заказчика (FA-273-1917, EA-273-1917, EB-273-1917, DA-273-1917W). Дополнительно в той же базе: WG-273-918 — Jaw plate — Crusher Type: Telsmith 44X48 Iron Giant, с указанным весом брутто 3159,5 кг (то есть по серии Iron Giant у них есть не только номер, но и весовые данные, что говорит о наличии реальной геометрии, а не переписанного прайса). В шапке базы прямо заявлено: «CnCrusher.net is a China manufacturer of Telsmith crusher replacement parts. Cast and CNC-machined in our own facilities to OEM specifications». На странице продукта Telsmith указано «Our foundry in Zhejiang, China». Фотографий отливок с маркировкой на страницах нет — это ограничение доказательства.",
+     "models_made": "Telsmith 38x58 (четыре позиции футеровок 273-1917), Telsmith 44X48 Iron Giant (WG-273-918, RB-273-918, MB5-273-918_FIE, JB1-273-918), а также 32x44 (1055680-FIE, AB273-1718-HD, B1273-1718-HD), 25x36/2436, A273-1818, BA/BB-273-1417-R/L, DB-273-1417, EB-273-1417",
+     "has_tooling": "Косвенные признаки есть: собственная база данных с внутренними суффиксами исполнений (_SPL, _SPL-M, M10, M10M) и указанием весов брутто по отдельным позициям — так ведут учёт по фактически изготавливавшимся деталям, а не по чужому каталогу. Заявлено собственное литейное производство в Чжэцзяне и мехобработка ЧПУ. Наличие модели/оснастки именно на 273-1917 не подтверждено документально — требует прямого запроса.",
+     "email": "miles@rock-machinery.com; admin@rock-machinery.com",
+     "phone": "+86 133 3592 5193 (телефон/WhatsApp/WeChat)",
+     "urls": [
+      "https://www.cncrusher.net/english/parts-database/R47,telsmith-crusher/15",
+      "https://www.cncrusher.net/english/parts-database/R47,telsmith-crusher",
+      "https://www.rock-machinery.com/english/products/Telsmith-jaw-crusher-parts"
+     ]
+    },
+    {
+     "name": "Sunrise Machinery Co., Ltd. (офис — Пудун, Шанхай; завод — Хунъя, Мэйшань, пров. Сычуань)",
+     "site": "https://www.sunrisespares.com/telsmith-crusher-parts/",
+     "proof_level": "изготавливал 3858 подтверждено",
+     "proof": "В таблице каталога Telsmith на сайте есть строка с номером детали и явным указанием модели: 1149591 — «DIE,STA JAW» (неподвижная щёчная плита) — Telsmith 3858. Рядом в той же таблице позиции по Iron Giant: 1149434 — «DIE,SWG JAW» — Telsmith 5060IG и 1149580 — «DIE JAW» — Telsmith 5060IG. В перечне обслуживаемых типоразмеров отдельной строкой стоит 38X58. Также по щековым дробилкам Telsmith у них есть отдельные товарные страницы со старой (буквенной) нумерацией 273-й серии и фотографиями изделий: B1-273-968 (Movable Jaw Plate), B-273-681 (Swing Jaw Plate), XG-273-918 (Swing Jaw Plate). Фотографии отливки именно детали 3858 с литейной маркировкой не найдены.",
+     "models_made": "Telsmith 3858 (1149591), Telsmith 5060IG Iron Giant (1149434, 1149580), Telsmith 3648 (1149668, 1149674), Telsmith 3258 (1150922, 1150922.01, 1150929, 1151218, 1151223), а также щёки 273-й серии B1-273-968, B-273-681, XG-273-918; по конусам — большой массив 272-й серии",
+     "has_tooling": "Признак повторяемости: каталог построен по номерам ASTEC/Telsmith нового (7-значного) образца с расшифровкой типа детали и привязкой к модели, включая варианты исполнения одной позиции (1150922 и 1150922.01) — так фиксируют реально освоенные отливки. Собственный завод в Мэйшане (Сычуань). Подтверждения наличия модели/оснастки на 3858 в открытых источниках нет.",
+     "email": "js@sunrisespares.com",
+     "phone": "+86 185 1219 7002",
+     "urls": [
+      "https://www.sunrisespares.com/telsmith-crusher-parts/",
+      "https://www.sunrisespares.com/telsmith-movable-jaw-plate-b1-273-968-product/",
+      "https://www.sunrisespares.com/telsmith-swing-jaw-plate-b-273-681-product/",
+      "https://www.sunrisespares.com/telsmith-swing-jaw-plate-xg-273-918-product/"
+     ]
+    },
+    {
+     "name": "Mining Spare Parts / Wearplus, г. Цюйчжоу, пров. Чжэцзян (Liushan 1st Road, Hangbu Town, Kecheng)",
+     "site": "https://miningspareparts.com/",
+     "proof_level": "изготавливал другие модели Telsmith",
+     "proof": "Товарная страница «Telsmith 44*48 Jaw Plate For Jaw Crusher 273-918» — конкретный номер детали 273-918 плюс фотографии готовой щёчной плиты. 44x48 — это типоразмер серии Iron Giant, то есть по геометрии и массе класс, сопоставимый с 3858. В разделе номенклатуры щековых дробилок Telsmith у них перечислены три ряда: старый (10x21, 14x24, 24x5, 30x42, 42x48), гидравлический (2038, 2550, 3042, 3055, 3648, 3258, 3858, 4448, 5060) и Hydra & Iron Jaw (H2238, H2550, H3244, H3450, H4448, H5060, H3042, H3055, H3648, H3258, H3858, 4448IG, 5060IG). Модель 3858 и H3858 названы прямо, но без номера детали и без фотографии изделия под 3858 — поэтому подтверждено только по другим моделям.",
+     "models_made": "Подтверждено фотографией и номером — Telsmith 44x48 (273-918), Osborn/Telsmith 44x48. Заявлены (без номеров) 3858, H3858, 4448IG, 5060IG и весь ряд Hydra Jaw.",
+     "has_tooling": "Публикуют фотографии готовых плит 44x48 — по этому типоразмеру оснастка/модель, судя по всему, есть. По 3858 признаков готовой оснастки не найдено.",
+     "email": "не найдено",
+     "phone": "+86 159 5845 2539",
+     "urls": [
+      "https://miningspareparts.com/en/product/telsmith-4448-jaw-plate-for-jaw-crusher-273-918/",
+      "https://miningspareparts.com/en/product/telsmith_44x48_jaw_plate/"
+     ]
+    },
+    {
+     "name": "Jiangsu Hyton Mechanical Equipment Co., Ltd. (бренд Hyton), г. Наньтун, пров. Цзянсу",
+     "site": "https://hytongroup.en.made-in-china.com/",
+     "proof_level": "только каталожное упоминание",
+     "proof": "В спецификации товара «High Manganese Steel Mn18Cr2 Jaw Plate Suit Telsmith JCI KPI» модель 3858 названа отдельной строкой в перечне применимости: Tel2550, Tel3858, Tel4244, Tel5060, Tel5260 (плюс ряд H2238, H2550, H3244, H3450). Это уже не «обслуживаем марку Telsmith», а поимённый список типоразмеров, но номера деталей не приведены и фотографий отливки под 3858 нет. Заявлено: производство с 2005 г., более 300 работников, 30 000 т/год отливок, 5000 шт./год щёчных плит; контроль — капиллярный, магнитопорошковый, инфракрасный. Отдельно у них есть страницы с подлинной нумерацией Telsmith по конусам: Ht-Ba-272-2636 / B1-18-1167 (шестерня и трибка 44SBS), Ht-Ta-272-2438 (бронзовая втулка 44SBS) — то есть с системой обозначений Telsmith работают предметно.",
+     "models_made": "Заявлены Tel2550, Tel3858, Tel4244, Tel5060, Tel5260, H2238, H2550, H3244, H3450. Подтверждены номерами только конусные позиции Telsmith 44SBS (272-2636 / B1-18-1167, 272-2438).",
+     "has_tooling": "Прямых признаков оснастки на 3858 нет. Косвенно: серийное производство щёчных плит 5000 шт./год и работа с оригинальными индексами Telsmith по другой линейке. Обратите внимание — их номер шестерни B1-18-1167 лежит в той же серии «18-», что и ваша шестерня B1-18-1179; это повод запросить именно эту позицию.",
+     "email": "не найдено (связь через форму made-in-china)",
+     "phone": "не найдено",
+     "urls": [
+      "https://hytongroup.en.made-in-china.com/product/NCOfDhRVldUu/China-High-Manganese-Steel-Mn18cr2-Jaw-Plate-Suit-Telsmith-Jci-Kpi-Jaw-Crusher-Wear-Parts.html",
+      "https://hytoncasting.en.made-in-china.com/product/eEQYMNOJaBRA/China-OEM-Telsmith-44sbs-Cone-Crusher-Parts-Pinion-and-Gear-Ht-Ba-272-2636-B1-18-1167.html",
+      "https://hytoncasting.en.made-in-china.com/product/DYqRPTsogUVI/China-OEM-Telsmith-44sbs-Cone-Crusher-Parts-Inner-Bronze-Sleeve-Ht-Ta-272-2438.html"
+     ]
+    },
+    {
+     "name": "Wuyi Slon Machinery Co., Ltd., г. Уи, пров. Чжэцзян",
+     "site": "https://slonmachinery.en.made-in-china.com/",
+     "proof_level": "только каталожное упоминание",
+     "proof": "Товарная позиция названа прямо по типоразмеру: «Telsmith 25X36 38X58 Jaw Crusher Spare Parts Fixed / Swing / Moving Jaw Plate». В спецификации применимость: Telsmith 25X36, 22X40, 38X58, 1016, 1424, 2050. На карточке шесть фотографий щёчных плит с разных ракурсов, но это общие снимки продукции — привязать конкретную отливку к 38X58 по ним нельзя, литейной маркировки и номеров деталей не видно. Статус на площадке: Diamond Member с 2017 г., аудированный поставщик, ISO 9001:2015, заявленная мощность 20 000 т/год, экспортный опыт более 10 лет.",
+     "models_made": "Заявлены Telsmith 38X58, 25X36, 22X40, 1016, 1424, 2050; отдельными карточками — H2238 / 2550 / 3244 / 3450, распорные плиты Parker/Osborn/Telsmith, конусные футеровки Telsmith",
+     "has_tooling": "Собственное литейное производство (позиционируют себя как direct sales foundry), номенклатура повторяющаяся. Признаков сохранённой геометрии именно 38X58 (веса, чертёжные номера, фото с маркировкой) в открытом доступе нет.",
+     "email": "не найдено (связь через форму made-in-china)",
+     "phone": "не найдено",
+     "urls": [
+      "https://slonmachinery.en.made-in-china.com/product/MNZxprGWhYck/China-Telsmith-25X36-38X58-Jaw-Crusher-Spare-Parts-Fixed-Swing-Moving-Jaw-Plate.html",
+      "https://slonmachinery.en.made-in-china.com/productimage/MNZxprGWhYck-2f1j00CYGUveTdaioR/China-Telsmith-25X36-38X58-Jaw-Crusher-Spare-Parts-Fixed-Swing-Moving-Jaw-Plate.html",
+      "https://slonmachinery.en.made-in-china.com/product/qFefohKkLcWm/China-Telsmith-H2238-2550-3244-3450-Jaw-Crusher-Spare-Wear-Parts-on-Sell.html"
+     ]
+    },
+    {
+     "name": "Zore Mining Technology (泽锐科技), zoremining.com, КНР",
+     "site": "https://zoremining.com/",
+     "proof_level": "только каталожное упоминание",
+     "proof": "В разделе «Telsmith crusher» есть позиции AA-273-1917M10 и AA-273-1917M10M, обозначенные как Jaw plate. Номер — из той же группы 273-1917, что и футеровки заказчика, и по базе Rock Machinery он относится именно к Telsmith 38x58. Однако на странице Zore модель дробилки не указана, фотографий отливок нет (только заглушки), это скорее выгрузка номенклатуры, чем подтверждение производства.",
+     "models_made": "По номерам — группа 273-1917 (щёчные плиты 38x58). Модель в каталоге явно не проставлена.",
+     "has_tooling": "Признаков оснастки, складских остатков или фотографий готовой продукции не найдено.",
+     "email": "zoremining@163.com",
+     "phone": "+86 180 8090 9568",
+     "urls": [
+      "https://zoremining.com/product/detail/store/16869/Telsmith%20crusher"
+     ]
+    },
+    {
+     "name": "Quarry and Mining Spares (Zhejiang) Co., Ltd. (бренд Jinhua Steel Casting / Shanvim), г. Цзиньхуа, пров. Чжэцзян",
+     "site": "https://steelcasting.en.made-in-china.com/",
+     "proof_level": "изготавливал другие модели Telsmith",
+     "proof": "Товарная карточка «AB-273-1718 Fixed Jaw Plate» — конкретный номер детали в родной буквенной нумерации Telsmith 273-й серии, с несколькими фотографиями готовых отливок с разных ракурсов. Тот же номер AB273-1718-HD присутствует в базе Telsmith у Rock Machinery. Отдельно есть общая карточка щёчных плит Telsmith (Mn14/Mn14Cr2/Mn18Cr2/Mn22Cr2). Упоминаний 3858 / 38x58 и номеров 273-19xx у них не найдено.",
+     "models_made": "Подтверждено номером и фото — Telsmith 273-1718 (щёчная плита). Прочие модели Telsmith — без номеров.",
+     "has_tooling": "Работают в оригинальной нумерации Telsmith и публикуют фото готовых отливок по позиции 273-1718 — по ней оснастка, вероятно, есть. По 3858 — нет.",
+     "email": "не найдено (связь через форму made-in-china)",
+     "phone": "не найдено",
+     "urls": [
+      "https://steelcasting.en.made-in-china.com/product/PnBpvcOZPFkd/China-Ab-273-1718-3-Fixed-Jaw-Plate-Sevdala-90X75.html",
+      "https://steelcasting.en.made-in-china.com/product/TZOfkcJyCPGb/China-Telsmith-Movable-Jaw-Plate-Stationary-Jaw-Plate-and-Fixed-Jaw-Plate-Jaw-Die-for-Jaw-Crusher-Austenstic-Manganese-Steel-Mn14-M14Cr2-Mn18Cr2-Mn22Cr2-.html"
+     ]
+    },
+    {
+     "name": "Zhejiang Gravik Machinery and Equipment Co., Ltd. (бренд COHESION, crusher-stone.com), г. Ханчжоу, пров. Чжэцзян",
+     "site": "http://m.crusher-stone.com/",
+     "proof_level": "только каталожное упоминание",
+     "proof": "Страница с тем же заголовком, что и у Wuyi Slon: «Telsmith 25X36 38X58 Jaw Crusher Spare Parts Fixed / Swing / Moving Jaw Plate». Модель 38X58 названа только в заголовке; номеров деталей, весов и фотографий именно этой отливки нет — на странице общие снимки конусных и щековых деталей и упаковки. Заявлено более 15 лет в горном машиностроении и сертификация ISO. По совпадению заголовка с карточкой Slon видно, что это перепечатка типовой листинговой страницы, а не собственное подтверждение производства.",
+     "models_made": "Заявлены Telsmith 25X36 и 38X58 (без номеров). Подтверждённых позиций Telsmith с номерами не найдено.",
+     "has_tooling": "Нет доказательств.",
+     "email": "sales@gravik.cn",
+     "phone": "+86 135 8816 4675",
+     "urls": [
+      "http://m.crusher-stone.com/showroom/telsmith-25x36-38x58-jaw-crusher-spare-parts-fixed-swing-moving-jaw-plate.html"
+     ]
+    },
+    {
+     "name": "Henan Crushtechs Machinery Co., Ltd., пров. Хэнань",
+     "site": "https://crushtechs.en.made-in-china.com/",
+     "proof_level": "изготавливал другие модели Telsmith",
+     "proof": "Отдельные товарные карточки с указанием конкретных моделей Telsmith и фотографиями изделий: «Telsmith H3450 Fixed Jaw Die Movable Jaw Plate» и «Telsmith 1016 Jaw Crusher Parts Jaw Plate», а также конусные футеровки Telsmith. Номера деталей не приведены. Модель 3858 / 38x58 у них не встречается.",
+     "models_made": "Telsmith H3450, Telsmith 1016, конусные футеровки Telsmith. По 3858 — ничего.",
+     "has_tooling": "Есть повторяющаяся номенклатура по мелким и средним типоразмерам Telsmith. Признаков оснастки под 38x58 нет.",
+     "email": "не найдено (связь через форму made-in-china)",
+     "phone": "не найдено",
+     "urls": [
+      "https://crushtechs.en.made-in-china.com/product/qOoaQPIlAyYN/China-Telsmith-H3450-Fixed-Jaw-Die-Movable-Jaw-Plate.html",
+      "https://crushtechs.en.made-in-china.com/product/RwZATPQBhyrg/China-Overseas-Professional-Factory-Telsmith-1016-Jaw-Crusher-Parts-Jaw-Plate.html"
+     ]
+    },
+    {
+     "name": "GTEK MINING (gtekmining.com), КНР",
+     "site": "https://gtekmining.com/",
+     "proof_level": "изготавливал другие модели Telsmith",
+     "proof": "В интернет-магазине есть позиция «Swing Jaw Plate Suits Telsmith 3042 B1-273-881» — номер детали в оригинальной нумерации Telsmith плюс привязка к модели 3042. При этом на странице распорных плит GTEK прямо оговаривает условие работы: изготовление возможно, «если известен номер OEM или вы можете предоставить чертежи». Это ровно тот путь, который заказчик отвергает, — по 3858 у них ни номеров, ни модели не найдено.",
+     "models_made": "Telsmith 3042 (B1-273-881), конусные детали Telsmith. По 3858 / 38x58 — ничего.",
+     "has_tooling": "По 3042 позиция стоит в магазине как товар. По 3858 оснастки нет; заявленный ими способ — работа по чертежу заказчика, что для нашей задачи неприменимо.",
+     "email": "не найдено",
+     "phone": "не найдено",
+     "urls": [
+      "https://gtekmining.com/shop/product/swing-jaw-plate-b1-273-881/",
+      "https://gtekmining.com/products/jaw-crusher-parts/toggle-plate/"
+     ]
+    },
+    {
+     "name": "H&G Machinery (hgminingparts.com), Шанхай",
+     "site": "https://www.hgminingparts.com/",
+     "proof_level": "только каталожное упоминание",
+     "proof": "Страница «China TelSmith Jaw Plate factory and manufacturers» — общее предложение щёчных плит под марку Telsmith. При выгрузке страницы упоминаний 3858, 38x58, Iron Giant и номеров серии 273- не обнаружено. Доказательств изготовления конкретных деталей Telsmith нет.",
+     "models_made": "Не найдено ни одной конкретной модели Telsmith с номером детали.",
+     "has_tooling": "Нет доказательств.",
+     "email": "не найдено",
+     "phone": "+86 21 68407982; +86 21 68409065; +86 150 6794 7515",
+     "urls": [
+      "https://www.hgminingparts.com/jaw-crusher-plate-product/"
+     ]
+    }
+   ],
+   "notes": "ГЛАВНЫЙ РЕЗУЛЬТАТ. Из проверенных китайских компаний только две дают доказательство того уровня, который вы обозначили как приемлемый («позиция в каталоге с номером детали и указанием модели»):\n\n1) Zhejiang Rock Machinery (cncrusher.net) — четыре позиции футеровок с номерами AA-273-1917M10, AA-273-1917M10M, AB-273-1917_SPL, AB-273-1917_SPL-M, у каждой в карточке проставлено «Crusher Type: Telsmith 38x58». Это прямое попадание в вашу группу 273-1917 (FA-273-1917, EA-273-1917, EB-273-1917, DA-273-1917W). Плюс по серии Iron Giant у них есть позиция WG-273-918 (Telsmith 44X48 Iron Giant) с указанным весом брутто 3159,5 кг — наличие весовых данных косвенно говорит о сохранённой геометрии, а не о переписанном прайсе. Заявлено собственное литьё и мехобработка в Чжэцзяне.\n2) Sunrise Machinery — строка каталога 1149591 «DIE,STA JAW» с моделью Telsmith 3858 и две позиции по 5060IG (1149434, 1149580). Работают и в новой 7-значной нумерации ASTEC, и в старой буквенной 273-й (B1-273-968, B-273-681, XG-273-918 — с фотографиями изделий).\n\nЭто первые две компании, куда имеет смысл направлять запрос. Формулировка запроса должна быть проверочной: попросить назвать массу отливки и материал по AA-273-1917M10 / AB-273-1917_SPL, прислать фотографию имеющейся модели (оснастки) или фото ранее отгруженной детали с литейной маркировкой. Если компания реально делала деталь, масса и фото найдутся за день; если это перепечатанный каталог — ответа не будет.\n\nВАЖНОЕ УТОЧНЕНИЕ ПО МАШИНЕ. По фирменным материалам Telsmith/ASTEC серия Iron Giant — это типоразмеры 4448 и 5060, а 3858 относится к гидравлическому ряду (Hydra-Jaw / 2038, 2550, 3042, 3055, 3258, 3648, 3858, 4448, 5060). Это видно и в номенклатуре Mining Spare Parts, где 3858 и H3858 стоят отдельно от 4448IG и 5060IG. Практическое следствие: поиск по «Iron Giant» уводит на 4448/5060, а нужные детали ищутся по «Telsmith 3858» и «Telsmith 38x58». Рекомендую в переписке с поставщиками указывать обе формы и обязательно номера деталей.\n\nПОДТВЕРЖДЕНИЕ ВАШИХ НОМЕРОВ (независимая проверка). Каталог Mining Element (miningelement.com) по машине «Telsmith Jaw crusher 38x58» содержит ваши номера буквально: EA-273-1917, EB-273-1917, FA-273-1917, а также A-273-1917, A-273-1932, A-273-1932W, AC-273-1922 (регулировочная прокладка, срок поставки заявлен 27 недель). Это подтверждает, что группа 273-19xx действительно принадлежит Telsmith 38x58, и даёт вам сверочную базу. Оговорка: Mining Element — российская компания (Санкт-Петербург, ИНН 7810982090), а не китайский изготовитель, поэтому в список выше не включена; в вашу постановку «только аутмаркет, независимые китайские изготовители» она не попадает, но как источник сверки номеров и как запасной канал поставки её стоит держать в виду.\n\nЧЕГО НАЙТИ НЕ УДАЛОСЬ (пишу прямо, без домысливания):\n— Ни одной фотографии готовой отливки под 3858 с литейной маркировкой или читаемым номером детали ни у одной китайской компании.\n— Ни одного отзыва, кейса или упоминания заказчика по 3858.\n— Ни одной таможенной записи в открытом доступе (Panjiva, ImportGenius, Volza — за пейволлом, обходить не стал).\n— По невизуальным позициям (вал 1082397, корпус подшипника A-277-619, крышки BA-277-619 и BB-277-619, шестерня B1-18-1179, кожух маховика 1050402, ограждение шкива 1064057) не найдено ничего ни у одной китайской компании. Единственная зацепка: Jiangsu Hyton публикует шестерню Telsmith 44SBS с номером B1-18-1167 — та же серия «18-», что и ваша B1-18-1179. Это не доказательство, но конкретный повод адресно запросить именно их по шестерне.\n— Распорная плита B1-273-1723 / ZF-273-1922, седло CN-273-1923, зажим CP-273-1923: ни у одного китайского поставщика этих номеров нет. Ближайшее — AC-273-1922 у Mining Element (регулировочная прокладка, 38x58). Распорные плиты Telsmith китайцы предлагают только обезличенно, без номеров.\n— Официальный каталог запчастей Telsmith 3858 лежит на Scribd (документ 476121345), доступ там за регистрацией — не открывал по вашему условию. Если каталог будет получен легальным путём, он даст сверку «номер — деталь — узел» и резко упростит проверку поставщиков.\n\nЗАМЕЧАНИЕ ПО ВТОРОМУ ДОПУСТИМОМУ ПУТИ (подбор детали от другой машины). Судя по нумерации, футеровки 38x58 (273-1917) и 44x48 Iron Giant (273-918) — разные позиции, взаимозаменяемость исключена. А вот дублирование внутри группы 273-1917 (исполнения M10, M10M, _SPL, _SPL-M) означает, что под одну машину существует несколько профилей зуба — при запросе нужно указывать не только номер, но и требуемый профиль и материал (Mn18Cr2 / Mn22Cr2), иначе поставщик подберёт своё исполнение.\n\nОСТОРОЖНО С ЗЕРКАЛАМИ. Карточка «Telsmith 25X36 38X58 Jaw Crusher Spare Parts» встречается дословно на трёх разных сайтах (Wuyi Slon, wjcrusherparts.com, crusher-stone.com/COHESION). Это типовой листинг, размноженный по площадкам; наличие такой страницы само по себе ничего не доказывает. Учитывайте это при отборе."
+  },
+  {
+   "scope": "другие-модели",
+   "companies": [
+    {
+     "name": "Hyton Group Mechanical Equipment Co., Ltd. / Maanshan City Hyton Heavy Industry Technology Development Co., Ltd (Ма'аньшань, пров. Аньхой)",
+     "site": "https://www.hytoncrusherparts.com/ ; https://www.hytoncasting.com/ ; https://hytoncasting.goldsupplier.com/",
+     "proof_level": "изготавливал другие модели Telsmith (каталожно подтверждено); 3858 присутствует в собственной номенклатуре — единственный найденный китайский завод, называющий 3858 прямо",
+     "proof": "На странице номенклатуры высокомарганцовистых футеровок hytoncrusherparts.com дословно значится позиция «Wear Parts Fixed and Movable Jaw Plate Suit to Telsmith Tel3858 Jaw Crusher» — то есть неподвижная и подвижная плиты именно под 38x58. В том же перечне моделей щековых Telsmith: H2238, H2550, H3244, H3450, Tel2550, Tel3858, Tel4244, Tel5060, Tel5260. По конусным и роторным Telsmith отдельно указаны SBS52, HS5263, HS4230/HS5252, HS3036/HS3048, HS2421/HS2430. Профиль завода (goldsupplier): основан в 2004 г., собственное литейное производство >20 000 т/год износостойкого литья, итальянская линия литья по газифицируемым моделям FATA и линия V-процесса, ISO 9001. ВАЖНО: фотографии отливки с номером 273-1917 или иным номером 3858 не найдены — подтверждение остаётся каталожным, не фотографическим.",
+     "models_made": "Telsmith щековые: Tel2550, Tel3858, Tel4244, Tel5060, Tel5260, Hydra-Jaw H2238/H2550/H3244/H3450. Конусные: SBS52. Роторные: HS5263, HS4230/HS5252, HS3036/HS3048, HS2421/HS2430",
+     "has_tooling": "Косвенные признаки есть: собственная литейка с линией V-процесса и ЛГМ (обе технологии позволяют лить крупные плиты по модели без дорогой постоянной оснастки), заявленный объём 20 000-30 000 т/год, 3858 держится в постоянной номенклатуре, а не как разовая позиция. Наличие именно сохранённой модели/геометрии на 3858 требует прямого запроса — публично не подтверждено",
+     "email": "sales@hytoncasting.com; tom@hytoncasting.com",
+     "phone": "+86 (555) 8288330; +86 15391798008; +86 15955530811",
+     "urls": [
+      "https://www.hytoncrusherparts.com/High-Manganese-Casting-Liners-pl3957522.html",
+      "https://hytoncasting.goldsupplier.com/about.html",
+      "https://www.hytoncrusherparts.com/",
+      "https://hytongroup.en.made-in-china.com/product/NCOfDhRVldUu/China-High-Manganese-Steel-Mn18cr2-Jaw-Plate-Suit-Telsmith-Jci-Kpi-Jaw-Crusher-Wear-Parts.html"
+     ]
+    },
+    {
+     "name": "Shanghai Bogvik Wear Material Co., Ltd (Шанхай, Пудун; производство — сеть литейных партнёров)",
+     "site": "https://www.bogvik.com/ ; https://bogvik.cn/",
+     "proof_level": "изготавливал другие модели Telsmith подтверждено — в т.ч. серию Iron Giant 4448 (прямой аналог 3858 по конструкции)",
+     "proof": "Публикация в корпоративном разделе Bogvik Daily «Telsmith 4448 Jaws» (m.bogvik.com/news/bogvik_daily/Telsmith_4448_Jaws.html): по индексированному содержанию — «BOGVIK has produced the new design of Telsmith 4448 Jaws», т.е. компания изготовила щёчные плиты для Iron Giant 4448 и дорабатывала конструкцию под требования заказчика. Компания публикует нумерованные «pattern list» (перечни имеющихся модельных комплектов) — открытые выпуски 33-47 на SlideShare; в них фигурируют позиции Telsmith (футеровки, бронеплиты, било для HSI 5252/5242/4230/2430, а также подвижные/неподвижные щёки, щёчные плиты и щёчные вкладыши по типоразмерам Telsmith). Заявленный парк — свыше 10 000 моделей (patterns) под мировые дробилки. Работает с 2002 г., литьё от 5 до 10 000 кг: сталь легированная, марганцовистая, ЧШГ, высокохромистый чугун. ВНИМАНИЕ: прямая ссылка на статью с www отдаёт 404, доступна мобильная версия — при переписке требовать копию публикации и фото.",
+     "models_made": "Telsmith Iron Giant 4448 (щёчные плиты, новая конструкция — подтверждено публикацией). Плюс по pattern list — Telsmith HSI 5252, 5242, 4230, 2430 и позиции по щековым Telsmith разных типоразмеров",
+     "has_tooling": "Да, наиболее сильный признак среди всех найденных: компания ведёт и публикует реестры имеющихся модельных комплектов (pattern list), заявляет >10 000 моделей. Именно у такого поставщика имеет смысл спрашивать, сохранён ли модельный комплект по 273-1917/273-1903 или по 4448 (WG/XG-273-918) как база для пересчёта",
+     "email": "sales@bogvik.com",
+     "phone": "+86 158-5198-9372 (факс +86 158-6899-9133)",
+     "urls": [
+      "https://m.bogvik.com/news/bogvik_daily/Telsmith_4448_Jaws.html",
+      "https://www.bogvik.com/",
+      "https://www.slideshare.net/slideshow/bogvik-pattern-list-46-blo/231091365",
+      "https://www.slideshare.net/slideshow/bogvik-pattern-list-47-cer/231091373",
+      "https://m.bogvik.com/news/bogvik_daily/Quality_Custom_Casting_Crusher_Wear_Parts3083.html"
+     ]
+    },
+    {
+     "name": "Sunrise Machinery Co., Ltd (офис — Шанхай, Пудун; завод — Хунъя, Мэйшань, пров. Сычуань)",
+     "site": "https://www.sunrisespares.com/telsmith-crusher-parts/",
+     "proof_level": "изготавливал другие модели Telsmith — самый подробный из найденных китайских каталогов по номерам Telsmith, с массами и марками стали; 3858 присутствует отдельной строкой",
+     "proof": "Раздел «ASTEC Telsmith Crusher Parts» содержит развёрнутый перечень по типоразмерам с реальными заводскими номерами Telsmith: 3042 — B-273-881, B-273-888 (и высокотемпературные исполнения); 3244 — щёчные плиты верхние/нижние левые/правые, DB-273-1417, EB-273-1417; 3648 — D-273-968, B-273-968C и рифлёные варианты; 4448 (Iron Giant) — WG-273-918 (неподвижная), XG-273-918 (подвижная); 5060 (Iron Giant) — GD-273-2017, HD-273-2017; отдельной строкой типоразмер 38X58 с позицией «DIE, SWG JAW» номер 1149668. На карточках товара указаны конкретные массы и марки: B1-273-968 — 2640 кг, Mn18Cr2; XG-273-918 (Astec Telsmith 4448 44x48) — 3755 кг, Mn18Cr2. Модельный ряд Telsmith на сайте: 3042, 3244, 3648, 4448, 5060, 38X58, SBS 44/52, T900, конусы 36\" и 48\".",
+     "models_made": "Telsmith 3042, 3244, 3648, 4448, 5060, 38X58 (позиция 1149668), конусные SBS44/SBS52, T900",
+     "has_tooling": "Признаки складского обращения есть — позиции оформлены как готовые товарные карточки с массой, маркой стали и статусом «New Wear Part», а не как «изготовим под заказ». Прямых указаний на остатки, повторные отгрузки или фото цеха на карточках нет. Наличие модели именно по 38X58 (1149668) нужно подтверждать запросом",
+     "email": "js@sunrisespares.com (контактное лицо — Jacky S.)",
+     "phone": "+86 18512197002 (WhatsApp/WeChat)",
+     "urls": [
+      "https://www.sunrisespares.com/telsmith-crusher-parts/",
+      "https://www.sunrisespares.com/telsmith-movable-jaw-plate-b1-273-968-product/",
+      "https://www.sunrisespares.com/telsmith-swing-jaw-plate-xg-273-918-product/",
+      "https://www.sunrisespares.com/telsmith-swing-jaw-plate-b-273-681-product/"
+     ]
+    },
+    {
+     "name": "Mining Spare Parts (Люшань 1-я ул., пос. Ханбу, р-н Кэчэн, г. Цюйчжоу, пров. Чжэцзян)",
+     "site": "https://miningspareparts.com/",
+     "proof_level": "изготавливал другие модели Telsmith — серия Iron Giant 4448 с номерами и массами, с фотографиями плит",
+     "proof": "Две отдельные карточки. Первая — «Fixed Jaw Die and Swing Jaw Die Suit Osborn Telsmith 44x48 Jaw Crusher», прямо назван «Telsmith 44x48 IG Iron Giant», номера WG-273-918 (неподвижная щека) — 1644 кг и XG-273-918 (подвижная) — 1626 кг, материал Mn13Cr2, сертификация ISO/CE. Вторая — «Telsmith 44*48 Jaw Plate For Jaw Crusher», код 273-918, масса 3075 кг, материалы Mn13, Mn13Cr2, Mn18Cr2, Mn22Cr2. На страницах есть фотографии неподвижной и подвижной плит и схема технологического процесса литья. В описании заявлен «large inventory of original drawings» по основным брендам. РАСХОЖДЕНИЕ МАСС по одному и тому же номеру (1626 / 3075 / у Sunrise 3755 кг) — сигнал, что часть данных переписана из чужих каталогов; при переговорах требовать взвешенную отгрузочную спецификацию.",
+     "models_made": "Telsmith 4448 Iron Giant — WG-273-918, XG-273-918, 273-918. Кросс-таблица совместимости покрывает также Metso, Sandvik и др.",
+     "has_tooling": "Заявлен собственный архив исходных чертежей по ведущим брендам и показан техпроцесс литья; фотографии готовых плит присутствуют. Складских остатков и повторных отгрузок публично не показано",
+     "email": "не найдено (на сайте адрес скрыт маской, указан только телефон и имя руководителя)",
+     "phone": "+86-15958452539 (Mr. Wang, генеральный директор)",
+     "urls": [
+      "https://miningspareparts.com/en/product/telsmith_44x48_jaw_plate/",
+      "https://miningspareparts.com/en/product/telsmith-4448-jaw-plate-for-jaw-crusher-273-918/"
+     ]
+    },
+    {
+     "name": "WUYI SLON MACHINERY CO., LTD (уезд Уи, г. Цзиньхуа, пров. Чжэцзян)",
+     "site": "https://www.slonmachinery.com/ ; https://slonmachinery.en.made-in-china.com/",
+     "proof_level": "изготавливал другие модели Telsmith — серия Hydra-Jaw подтверждена товарными позициями; типоразмер 38X58 заявлен в заголовке позиции",
+     "proof": "Товарная позиция «Telsmith H2238/2550/3244/3450 Jaw Crusher Spare Wear Parts» — прямое покрытие серии Hydra-Jaw; отдельная позиция «Telsmith H3244 Hydra Jaw Crusher Liner, Stationary Jaw Die». Позиция «Telsmith 25X36 38X58 Jaw Crusher Spare Parts Fixed/Swing/Moving Jaw Plate» содержит 38X58 прямо в наименовании (перечень типоразмеров в карточке: 25X36, 22X40, 38X58, 1016, 1424, 2050). По конусным Telsmith указаны настоящие заводские номера чаш и брони серии SBS: B-272-426C, B-272-451C (52SBS/48SBS/36SBS). Собственный профиль: основана 25.03.2013, три литейные линии с печами 3 т, 5 т и 10 т, выпуск >15 000 т/год, максимальная масса одной отливки 10 т, ISO 9001, аудит SGS (QIP-ASR2431547), экспорт в 40+ стран, доля повторных заказов 80-100%. В карточке есть видео с демонстрацией 3D-сканирования на объекте («On-Site Scanning», «Precise Digital Duplicate») — то есть восстановление геометрии по образцу без чертежей.",
+     "models_made": "Telsmith Hydra-Jaw H2238, H2550, H3244, H3450 (футеровки, неподвижные щёки); щековые типоразмеры 25X36, 22X40, 38X58; распорные плиты Telsmith/Parker/Osborn; конусные SBS 36/48/52 — B-272-426C, B-272-451C",
+     "has_tooling": "Полноценная собственная литейка (3 линии, макс. отливка 10 т) — это перекрывает массы футеровок 3858. Заявлена доля повторных покупателей 80-100%. Отдельно ценно наличие 3D-сканирования: при отсутствии чертежей это единственный законный путь снять геометрию с демонтированного изношенного комплекта. Сохранённой модели именно по 273-1917 публично не подтверждено",
+     "email": "sales@slonmachinery.com",
+     "phone": "+86-579-87601039",
+     "urls": [
+      "https://slonmachinery.en.made-in-china.com/product/qFefohKkLcWm/China-Telsmith-H2238-2550-3244-3450-Jaw-Crusher-Spare-Wear-Parts-on-Sell.html",
+      "https://slonmachinery.en.made-in-china.com/product/MNZxprGWhYck/China-Telsmith-25X36-38X58-Jaw-Crusher-Spare-Parts-Fixed-Swing-Moving-Jaw-Plate.html",
+      "https://slonmachinery.en.made-in-china.com/product/XOMGuLCbyVhv/China-Telsmith-H3244-Hydra-Jaw-Crusher-Liner-Stationary-Jaw-Die.html",
+      "https://slonmachinery.en.made-in-china.com/product/yCOmSUTjLYcV/China-Manganese-Steel-Parker-Osborn-Telsmith-Jaw-Crusher-Spare-Parts-Toggle-Jaw-Plate.html",
+      "https://www.slonmachinery.com/about"
+     ]
+    },
+    {
+     "name": "ZHEJIANG ROCK MACHINERY CO., LTD (торговое лицо — YIWU WINGS TRADING CO., LTD), г. Иу, пров. Чжэцзян",
+     "site": "https://www.rock-machinery.com/ ; https://www.cncrusher.net/",
+     "proof_level": "изготавливал другие модели Telsmith — открытая база номеров Telsmith, серия Iron Giant 4448 в номенклатуре",
+     "proof": "Страница «Telsmith Jaw Crusher Parts» перечисляет типоразмеры 2540, 3648, 5060 и отдельно Iron Giant 4448 (с паспортными данными 349-936 т/ч, CSS 5-12 дюймов) и предлагает неподвижные/подвижные щёки, щёчные плиты, узлы распорной плиты. Материалы Mn18Cr2 и Mn21Cr2, футеровки из AR-стали. Заявлено: «Our foundry in Zhejiang, China casts, forges and CNC-machines replacement components» с полной приёмочной документацией. Собственная открытая база деталей на cncrusher.net содержит реальные номера Telsmith: A273-1818 и AA273-1818 (20X44), BA-273-1417-R/L и BB-273-1417-R/L (щёчные плиты 22X50 верхние/нижние), AB273-1718-HD и B1273-1718-HD (30X55), 1055680 (32x44), 2436A64-1_SPL (24X36). Регистрационный номер юрлица 91330782MACQ9CX477.",
+     "models_made": "Telsmith 2540, 3648, 5060, Iron Giant 4448; по базе номеров — 20X44, 22X50, 24X36, 30X55, 32x44",
+     "has_tooling": "Заявлено собственное литейно-кузнечно-механообрабатывающее производство в Чжэцзяне и приёмочная документация; ведётся систематизированная база номеров Telsmith, что говорит о регулярной, а не разовой работе по бренду. Складских остатков и фотоотчётов по конкретным отливкам не показано",
+     "email": "admin@rock-machinery.com; miles@rock-machinery.com",
+     "phone": "+86-133 3592 5193 (WhatsApp/WeChat)",
+     "urls": [
+      "https://www.rock-machinery.com/english/products/Telsmith-jaw-crusher-parts",
+      "https://www.cncrusher.net/english/parts-database/R47,telsmith-crusher/14",
+      "https://crusher.ltd/english/product/Telsmith-jaw-crusher-parts"
+     ]
+    },
+    {
+     "name": "GTEK MINING (No.156, North Zhenxi Road, Shengshan industrial town, г. Цыси, Нинбо, пров. Чжэцзян)",
+     "site": "https://gtekmining.com/",
+     "proof_level": "изготавливал другие модели Telsmith — позиция 3042 продаётся как готовый каталожный товар; заявлен собственный парк моделей (mold inventory) с покрытием Telsmith",
+     "proof": "В интернет-магазине GTEK есть отдельная товарная карточка «Swing Jaw Plate Suits Telsmith 3042 B1-273-881» — подвижная щека под Telsmith 3042 с настоящим заводским номером серии 273-. Компания заявляет: детали маркируются клеймом GTEK, изготавливаются по спецификациям OEM, гарантия 12 месяцев; и отдельно — «extensive mold inventory» (обширный парк моделей/оснастки), в перечне охваченных брендов прямо назван Telsmith наряду с Metso, Sandvik, Trio, Terex Cedarapids/Powerscreen/Finlay, Lippmann, McCloskey, Extec. Основана в 2005 г., экспорт в 50+ стран. ОГОВОРКА: сайт закрыт защитой Cloudflare (страница верификации), прямая выгрузка карточки не удалась — сведения получены из поисковой выдачи по этим же URL, при переписке требовать подтверждение позиции.",
+     "models_made": "Telsmith 3042 — B1-273-881 (подвижная щека). Отдельный раздел по конусным Telsmith. Распорные плиты — общий раздел без привязки к моделям Telsmith",
+     "has_tooling": "Прямо заявлен обширный парк моделей/пресс-форм с покрытием Telsmith — это ровно тот признак, который требуется заказчику. Позиция 3042 оформлена как складской товар в розничном магазине, а не как заказная. Подтверждение по 3858 отсутствует",
+     "email": "не найдено (в открытой выдаче адрес скрыт маской)",
+     "phone": "+86 159 5822 9409; +86 138 6784 5744",
+     "urls": [
+      "https://gtekmining.com/shop/product/swing-jaw-plate-b1-273-881/",
+      "https://gtekmining.com/products/jaw-crusher-parts/jaw-plates/",
+      "https://gtekmining.com/products/jaw-crusher-parts/toggle-plate/",
+      "https://gtekmining.com/about/"
+     ]
+    },
+    {
+     "name": "Quarry and Mining Spares (Zhejiang) Co., Ltd (пров. Чжэцзян; торговая марка steelcasting / JINHUA STEEL CASTING AND ENGINEERING PARTS)",
+     "site": "https://steelcasting.en.made-in-china.com/",
+     "proof_level": "изготавливал другие модели Telsmith — типоразмер 3648 с парой заводских номеров",
+     "proof": "Товарная позиция «Telsmith 3648 Jaw Crusher Parts Die Stationary Swing Jaw Plate» с указанием обоих номеров комплекта — D1-273-968 (неподвижная) и B1-273-968 (подвижная), то есть заводская нумерация Telsmith серии 273- воспроизведена корректно. Материалы Mn13Cr2, Mn18Cr2. Профиль поставщика: производственная мощность 5000 т/год, 1 инженер-конструктор, заявлены CE и ISO 9001:2000/2008, проверенная лицензия и аудит площадки Made-in-China. На карточке шесть фотографий щековых плит, но номера на самих отливках в кадре не читаются.",
+     "models_made": "Telsmith 3648 — D1-273-968, B1-273-968",
+     "has_tooling": "Мощность 5000 т/год и собственная позиция под 3648 с полной парой номеров. Признаков склада, повторных отгрузок или сохранённых моделей по другим типоразмерам Telsmith не найдено — по объёму это самый мелкий из отобранных претендентов",
+     "email": "не найдено (связь через форму Made-in-China)",
+     "phone": "не найдено",
+     "urls": [
+      "https://steelcasting.en.made-in-china.com/product/LvSQElzVsbra/China-Telsmith-3648-Jaw-Crusher-Parts-Die-Stationary-Swin-Jaw-Plate.html"
+     ]
+    },
+    {
+     "name": "Zhejiang Wujing Machine Manufacture Co., Ltd (WUJING MACHINE), пров. Чжэцзян",
+     "site": "https://www.wjcrusherparts.com/ ; https://www.wj-parts.com/",
+     "proof_level": "только каталожное упоминание — заявлено покрытие всей линейки щековых и конусных Telsmith, конкретные номера деталей не показаны",
+     "proof": "Раздел «Telsmith Crusher Parts» заявляет полный ассортимент запчастей под щековые и конусные дробилки Telsmith, материалы Mn13-Mn22 с хромом 2% и без, а также высокохромистый чугун; опыт разработки и поставки аналогов заявлен как более 20 лет. Компания дублирует у себя ту же позицию «Telsmith 25X36 38X58 Jaw Crusher Spare Parts Fixed/Swing/Moving Jaw Plate» и позицию по распорным плитам Parker/Osborn/Telsmith. ОГРАНИЧЕНИЕ: при прямом обращении страница отдала HTTP 503, содержимое получено из поисковой выдачи; конкретных номеров деталей Telsmith на сайте не обнаружено, а совпадение заголовков позиций с каталогом SLON указывает на возможное перепечатывание чужих карточек. Проверять первичность обязательно.",
+     "models_made": "Прямо названы только типоразмеры 25X36 и 38X58 в заголовке позиции; конкретные номера деталей Telsmith не найдены",
+     "has_tooling": "Не найдено. Ни складских остатков, ни фотографий собственных отливок Telsmith, ни упоминаний сохранённых моделей",
+     "email": "не найдено",
+     "phone": "не найдено",
+     "urls": [
+      "https://www.wjcrusherparts.com/crusher-parts/telsmith-crusher-parts.html",
+      "https://www.wjcrusherparts.com/showroom/telsmith-25x36-38x58-jaw-crusher-spare-parts-fixed-swing-moving-jaw-plate.html",
+      "https://zjwjjq.en.made-in-china.com/"
+     ]
+    },
+    {
+     "name": "Nicole Tree Technology Limited (торговая марка 泽锐科技 / zoremining), КНР",
+     "site": "https://zoremining.com/",
+     "proof_level": "только каталожное упоминание — но единственное попадание прямо в номерную группу 273-1917 машины 3858",
+     "proof": "В открытой базе деталей раздела «Telsmith crusher» присутствуют позиции AA-273-1917M10M и AA-273-1917M10 с описанием «Jaw plate». Номерная группа 273-1917 — это в точности группа футеровок заказчика (DA-273-1917W, DD-273-1917W, FA-273-1917, EA-273-1917, EB-273-1917), то есть речь идёт о щековых плитах именно 38x58. ОДНАКО: масса в карточке проставлена как 0.0000, фотографий реальной отливки нет (только заглушки), остатки не показаны. Это торговая база данных, а не доказательство изготовления. Ценность позиции — как контакт для запроса: если у них есть модель по 273-1917, это прямое попадание в задачу.",
+     "models_made": "Заявлены позиции группы 273-1917 (щековые плиты 38x58). Подтверждения фактического изготовления нет",
+     "has_tooling": "Не найдено. Ни фотографий, ни масс, ни остатков, ни сведений о собственном литейном производстве",
+     "email": "zoremining@163.com",
+     "phone": "+86 180 8090 9568",
+     "urls": [
+      "https://zoremining.com/product/detail/store/16869/Telsmith%20crusher"
+     ]
+    },
+    {
+     "name": "Xuzhou H&G Wear-resistant Material Co., Ltd (г. Сюйчжоу, пров. Цзянсу)",
+     "site": "https://www.hgminingparts.com/",
+     "proof_level": "только каталожное упоминание — Telsmith назван в общем перечне брендов, ни моделей, ни номеров",
+     "proof": "На странице «TelSmith Jaw Plate» бренд Telsmith присутствует только в общем списке охватываемых марок (Metso, Sandvik, Barmac, Svedala, Extec, Symons, Hazemag, Cedarapids, Telsmith, McCloskey, Trio, Powerscreen, Kleemann, Terex, Pegson, Kue Ken, Parker, Shanbao, SBM и др.). Материалы: Mn13Cr2, Mn18Cr2, Mn22Cr2 и марганцовистая сталь со спецлегированием и термообработкой. Ни одной модели Telsmith, ни одного номера детали, ни фотографий литейного производства на странице нет.",
+     "models_made": "Не найдено — ни одной конкретной модели Telsmith",
+     "has_tooling": "Не найдено",
+     "email": "nick@xzhuagang.com; info@xzhuagang.com",
+     "phone": "+86 13122362916",
+     "urls": [
+      "https://www.hgminingparts.com/jaw-crusher-plate-product/"
+     ]
+    }
+   ],
+   "notes": "ГЛАВНЫЙ ВЫВОД. Ни один китайский изготовитель не предъявил публично доказательства уровня «вот фотография нашей отливки с номером DA-273-1917W» или «вот отгрузка футеровок 3858 такому-то руднику». Максимум, что подтверждается открытыми источниками, — каталожное присутствие типоразмера и заводских номеров Telsmith серии 273-. Поэтому список выстроен по убыванию силы косвенного доказательства, а окончательную проверку придётся вести перепиской.\n\nРАНЖИРОВАНИЕ ПО ПРИГОДНОСТИ ПОД ЖЁСТКИЕ УСЛОВИЯ ЗАКАЗЧИКА (нет чертежей, машину не остановить):\n1) Shanghai Bogvik — единственный, кто ведёт и публикует реестры имеющихся модельных комплектов (pattern list, заявлено >10 000 моделей) и документально сообщил об изготовлении щёчных плит Telsmith Iron Giant 4448. Это ровно тот тип поставщика, у которого осмысленно спрашивать «сохранена ли у вас модель по 273-1917 или по 273-918».\n2) Hyton (Ма'аньшань) — единственный, у кого 3858 назван прямо: позиция «Fixed and Movable Jaw Plate Suit to Telsmith Tel3858 Jaw Crusher», плюс полный ряд Tel2550/Tel4244/Tel5060/Tel5260 и Hydra-Jaw. Собственная литейка 20-30 тыс. т/год с линиями ЛГМ (FATA) и V-процесса — обе технологии позволяют лить крупные плиты по разовой модели.\n3) Sunrise Machinery — самый подробный каталог номеров Telsmith с массами и марками стали, включая обе плиты Iron Giant 4448 (WG/XG-273-918), 5060 (GD/HD-273-2017) и отдельную строку 38X58 (номер 1149668).\n4) Mining Spare Parts (Цюйчжоу) и WUYI SLON — рабочие резервные варианты: у первого фотографии плит Iron Giant 4448 с номерами и заявленный архив чертежей, у второго — реальная литейка (3 линии, макс. отливка 10 т) и, что важно при отсутствии чертежей, собственное 3D-сканирование на объекте.\n\nО СООТВЕТСТВИИ МОДЕЛЕЙ. 3858 и 4448/5060 — одна серия Iron Giant, поэтому опыт по 4448 (WG-273-918 / XG-273-918) и 5060 (GD-273-2017 / HD-273-2017) ближе всего к задаче: та же конструктивная школа, та же система номеров 273-XXXX, та же схема клинового крепления футеровок. Hydra-Jaw (H2238/H2550/H3244/H3450) — другое поколение с гидравлической регулировкой, опыт по ним подтверждает работу с брендом, но геометрия щёчного узла отличается сильнее.\n\nКРАСНЫЕ ФЛАГИ, ОБНАРУЖЕННЫЕ ПРИ СВЕРКЕ:\n— Массы по одному и тому же номеру XG-273-918 расходятся катастрофически: 1626 кг (Mining Spare Parts), 3075 кг (тот же сайт, другая карточка, код 273-918) и 3755 кг (Sunrise). Это признак переписывания карточек друг у друга. Первый же проверочный вопрос любому кандидату — прислать взвешенную спецификацию и модельную массу отливки.\n— Заголовок позиции «Telsmith 25X36 38X58 Jaw Crusher Spare Parts Fixed/Swing/Moving Jaw Plate» дословно совпадает у SLON, Wujing Machine и ещё нескольких витрин (crusher-stone.com и др.) — карточка тиражируется, первичность требует проверки.\n— GTEK и rock-machinery частично закрыты защитой от ботов и отдавали 503/страницу верификации; сведения по ним взяты из поисковой выдачи по тем же URL, без обхода защиты. Их следует подтвердить перепиской.\n\nЧТО НЕ НАЙДЕНО ВООБЩЕ. По неизнашиваемым и механообработанным позициям заказчика — вал 1082397, корпус подшипника A-277-619, крышки BA-277-619 и BB-277-619, шестерня B1-18-1179, распорная плита B1-273-1723 и ZF-273-1922, седло CN-273-1923, зажим CP-273-1923, кожух маховика 1050402, ограждение шкива 1064057 — ни одного китайского изготовителя с подтверждённым опытом не найдено. Это другой класс поставщика (поковка вала, обработка корпусов, зубофрезеровка, сварные ограждения), и искать их надо отдельно. Единственное косвенное попадание в группу 1922/1923 — регулировочная прокладка AC-273-1922 «для Telsmith 38x58», но у компании Mining Element (Санкт-Петербург, ИНН 7810982090), которая не подпадает под условие «китайский изготовитель»; срок поставки заявлен 27 недель, то есть позиция заказная, а не складская. Приведено только как подтверждение, что номерная группа 273-19XX действительно относится к 38x58.\n\nРЕКОМЕНДУЕМЫЙ ПОРЯДОК ПРОВЕРКИ КАНДИДАТА (одинаковый для всех, три вопроса, ответ на которые нельзя подделать общими словами):\n1. Пришлите фотографию вашей отливки, где читается литой номер серии 273- (любой модели Telsmith), с указанием даты и заказа.\n2. Есть ли у вас сохранённый модельный комплект или 3D-геометрия по группе 273-1917 / 273-1903 / 273-918 / 273-2017? Если да — назовите массу отливки по модели и год последней заливки.\n3. Если модели по 3858 нет: возьмётесь ли восстановить геометрию по демонтированному изношенному комплекту (3D-сканирование с компенсацией износа) и какой срок на изготовление модели. Этот путь совместим с условием «машину не останавливать», поскольку сканируется снятый ранее комплект, а не установленная деталь.\nДополнительно у SLON прямо заявлена услуга сканирования на объекте, у Bogvik — реестр моделей, у Mining Spare Parts — архив чертежей; именно эти три заявления и надо заставить подтвердить документально в первую очередь."
+  },
+  {
+   "scope": "следы-поставок",
+   "companies": [
+    {
+     "name": "Zhejiang Rock Machinery Co., Ltd. (внешнеторговое лицо — Yiwu Wings Trading Co., Ltd.; зеркала сайта: cncrusher.net, rock-machinery.com, crusher.ltd)",
+     "site": "https://www.rock-machinery.com",
+     "proof_level": "изготавливал другие модели Telsmith",
+     "proof": "Единственная найденная китайская компания, в чьей номенклатуре присутствует базовый номер нашей дробилки. В её базе запчастей Telsmith (страница 14 раздела telsmith-crusher) выведены четыре позиции с явной привязкой к типу машины: «AA-273-1917M10 — Crusher Type: Telsmith 38x58 | Jaw plate», «AA-273-1917M10M — Telsmith 38x58 | Jaw plate», «AB-273-1917_SPL — Telsmith 38x58 | Jaw plate», «AB-273-1917_SPL-M — Telsmith 38x58 | Jaw plate». 38x58 — это и есть модель 3858. База обходилась постранично (25 страниц), из всей серии 273 в ней присутствуют также 273-1718, 273-1818, 273-1417, 273-881/888/968, 273-918, 273-2017 — то есть это структурированная номенклатура Telsmith, а не случайное упоминание. На странице Telsmith jaw crusher parts компания заявляет собственное литейное производство: «Our foundry in Zhejiang, China casts, forges and CNC-machines replacement components for mining and quarry equipment — supplied worldwide with full inspection documentation», и отдельно — «Jaw plates, cheek plates, and wedge lock components for Telsmith jaw crushers. Manufactured to original specifications. Includes Iron Giant 4448», с указанием марок Mn18Cr2 / Mn21Cr2. Iron Giant 4448 — соседний типоразмер той же серии, что и наша 3858. ВАЖНАЯ ОГОВОРКА: у позиций 273-1917 в базе не проставлены масса, фотография и признак наличия; у соседних позиций (например BA-273-1417 — 121,8 кг) масса указана. Это значит, что 273-1917 может быть перенесённой из каталога OEM строкой, а не позицией с существующей оснасткой. Прямого доказательства (фото отливки с номером, таможенной записи, отзыва покупателя) не найдено.",
+     "models_made": "Заявлены и присутствуют в базе с привязкой к модели: Telsmith 38x58 (=3858) — AA-273-1917M10, AA-273-1917M10M, AB-273-1917_SPL, AB-273-1917_SPL-M; Telsmith 20x44 (A273-1818, AA273-1818), 22x50 (BA/BB-273-1417 — щёки верхние/нижние, левые/правые), 24x36 (2436A64-1_SPL), 30x55 (AB273-1718-HD, B1273-1718-HD), 32x44 (1055680), Iron Giant 4448 (плиты, щёки, узел клинового зажима)",
+     "has_tooling": "Косвенные признаки: заявлено собственное литьё + ковка + механообработка в Чжэцзяне, описаны технологии литья по деревянным моделям для высокомарганцовистой стали и высокохромистого чугуна, центробежное литьё втулок. Наличие в базе левых/правых и верхних/нижних щёк с проставленными массами говорит о реальном модельном парке по ряду типоразмеров. По самой 273-1917 признаков готовой оснастки (масса, фото, склад) НЕТ — статус позиции требует прямого запроса.",
+     "email": "miles@rock-machinery.com",
+     "phone": "+86-133 3592 5193",
+     "urls": [
+      "https://www.cncrusher.net/english/parts-database/R47,telsmith-crusher/14",
+      "https://www.rock-machinery.com/english/products/Telsmith-jaw-crusher-parts",
+      "https://www.cncrusher.net/english/parts-database/telsmith-crusher/2",
+      "https://crusher.ltd/english/product/Telsmith-jaw-crusher-parts"
+     ]
+    },
+    {
+     "name": "Sunrise Machinery Co., Ltd (офис — Шанхай, завод — Хунъя, Мэйшань, пров. Сычуань)",
+     "site": "https://www.sunrisespares.com",
+     "proof_level": "изготавливал другие модели Telsmith",
+     "proof": "На сводной странице ASTEC Telsmith Crusher Parts выложена таблица позиций с номерами Astec/Telsmith нового (семизначного) поколения и привязкой к моделям. В ней прямо присутствует строка «1149591 | DIE, STA JAW | Telsmith 3858» — неподвижная щёковая плита именно нашей дробилки. Рядом в той же таблице — Iron Giant соседних типоразмеров: «DIE,STA JAW Telsmith 4448IG» (три позиции), «DIE,SWG JAW Telsmith 4448D», «DIE,STA JAW Telsmith 5060D», «DIE,STA JAW Telsmith 5060IG», «DIE,SWG JAW Telsmith 5060IG», «1149580 DIE JAW Telsmith 5060IG», а также 3648, 3258, 2436. В перечне обслуживаемых моделей в шапке страницы отдельной строкой стоит «38X58». По серии 273 у компании есть отдельные карточки товара с проставленной массой — например Telsmith B1-273-968 Movable Jaw Plate для 36x48 с брутто 2824,5 кг; наличие весовых данных отличает её от чисто рекламных страниц. Ведёт русскоязычный сайт ru.sunrisespares.com с разделом «Запчасти для дробилок ASTEC Telsmith» — то есть целенаправленно работает на рынок РФ/СНГ. ОГОВОРКА: по 3858 в таблице выведена только одна позиция (неподвижная плита 1149591), подвижной нет; фотографий отливок с номерами, таможенных записей и отзывов не найдено.",
+     "models_made": "Telsmith 3858 (1149591, неподвижная щёковая плита — каталожная строка), 4448IG, 4448D, 5060IG, 5060D, 3648 (B1-273-968, 1149668), 3258, 2436; конусы 36S, 36FC, 38S, 38SBS, 44SBS, 44FC, 48S, 48FC, T400, T900; щёковые плиты серии 273: B1-273-968, B-273-681, XG-273-918, WG-273-918",
+     "has_tooling": "Косвенные признаки: собственный завод в Мэйшане (Сычуань), заявлено «Sunrise has some stock of crusher parts for Telsmith Crusher» и более 20 лет производственного опыта. Карточки отдельных позиций Telsmith с конкретной массой брутто указывают на наличие рабочих данных по детали. Прямого подтверждения наличия модели/оснастки именно по 3858 нет.",
+     "email": "js@sunrisespares.com",
+     "phone": "+86 18512197002 (контактное лицо — Jacky S.)",
+     "urls": [
+      "https://www.sunrisespares.com/telsmith-crusher-parts/",
+      "http://ru.sunrisespares.com/telsmith-crusher-parts/",
+      "https://www.sunrisespares.com/telsmith-movable-jaw-plate-b1-273-968-product/",
+      "https://www.sunrisespares.com/telsmith-swing-jaw-plate-b-273-681-product/",
+      "https://www.sunrisespares.com/telsmith-swing-jaw-plate-xg-273-918-product/"
+     ]
+    },
+    {
+     "name": "GTEK MINING (Цыси, Нинбо, пров. Чжэцзян)",
+     "site": "https://gtekmining.com",
+     "proof_level": "изготавливал другие модели Telsmith",
+     "proof": "Единственный из найденных, кто прямо декларирует модельный парк (оснастку) под щёковые плиты и при этом называет нашу модель. На странице Jaw Plates: «GTEK has vast database and mold inventory for more than 350 types of jaw plates», «With a deep inventory of patterns and molds for the most widely used crushers, we're able to shorten lead times», «GTEK maintains an extensive mold inventory covering a wide range of leading jaw crusher brands, including Metso, Sandvik, Trio, Terex Cedarapids, Terex Powerscreen, Terex Finlay, Telsmith, H.R. Lippmann, McCloskey, Extec». В раскрывающемся перечне под брендом TELSMITH на этой же странице значатся: H2550, H3244, H3450, «3258 Hydraulic», «3858 Hydraulic», «Iron Giant Series», 3042/3055/3648. Заявление о наличии моделей подкреплено фактическим магазином с реальными номерами Telsmith: щёковые плиты Telsmith 3042 B1-273-881 и B1-273-888, конусные части Telsmith 36S/36FC/48S/489S — B-272-428C, D-272-452C, A-272-454C, B-272-430C, B-272-431C, B-272-453C, D-272-307C, E-272-308C, AA-272-452, B-272-345C. То есть номенклатура Telsmith у них товарная, а не декларативная. ОГОВОРКА: в самом магазине позиций 3858 / 273-1917 НЕТ — модель 3858 фигурирует только в списке охвата. Утверждение о наличии модели именно на 3858 не подтверждено.",
+     "models_made": "Подтверждено товарными позициями: Telsmith 3042 (щёковые плиты B1-273-881, B1-273-888), конусы Telsmith 36S, 36FC, 48S/489S (серия 272). Заявлено в охвате: H2550, H3244, H3450, 3258 Hydraulic, 3858 Hydraulic, Iron Giant Series, 3055, 3648",
+     "has_tooling": "Наиболее внятное из найденных заявление об оснастке: модельный парк более 350 типов щёковых плит, прямо перечислен Telsmith среди брендов, покрытых модельным парком. Литьё по стандартам OEM с термообработкой и последующей механообработкой посадочных поверхностей. Требует прямой проверки: есть ли модель конкретно на 273-1917 / 3858, либо только на перечисленные в магазине 3042 и конусные позиции.",
+     "email": "sales@gtekmining.com",
+     "phone": "+86 138 6784 5744; +86 159 5822 9409",
+     "urls": [
+      "https://gtekmining.com/products/jaw-crusher-parts/jaw-plates/",
+      "https://gtekmining.com/shop/product/swing-jaw-plate-b1-273-881/",
+      "https://gtekmining.com/shop/?s=telsmith"
+     ]
+    },
+    {
+     "name": "Ma'anshan Ona Intelligent Equipment Co., Ltd (Маань­шань, пров. Аньхой)",
+     "site": "https://www.onacasting.com",
+     "proof_level": "изготавливал другие модели Telsmith",
+     "proof": "Литейное предприятие (не трейдер) в Мааньшане — одном из основных центров износостойкого литья КНР. Признак реального производства под Telsmith: собственные каталожные номера, образованные от номеров OEM, — карточка «Manufacturer Mining Telsmith 36FC Cone Crusher Spare Parts Forging Lower Mantle and Bowl Liner Ona-B272-430 Ona-B272-453». Присвоение своего индекса поверх номера OEM (B272-430, B272-453) обычно означает, что деталь заведена в производство, а не переписана из каталога. Отдельные карточки на Telsmith SBS44/SBS52 (мантия и конус) и Telsmith 36s/38s/48s/52s. Ведёт аккаунт с фотоматериалами производства (Instagram @onacrusherparts). ОГОВОРКА: вся подтверждаемая номенклатура Telsmith у них КОНУСНАЯ (серия 272). Щёковых позиций Telsmith, тем более 3858 или серии 273-19xx, не найдено.",
+     "models_made": "Telsmith 36FC (Ona-B272-430, Ona-B272-453), Telsmith 36S, 38S, 48S, 52S, SBS44, SBS52 — конусные дробилки. Щёковые части Telsmith конкретными номерами не подтверждены.",
+     "has_tooling": "Собственная литейка, марганцовистые сплавы 13 % / 18 % / 22 %, номенклатура щёковых плит и щёк как класс продукции присутствует. Оснастка под 3858 не подтверждена и по профилю компании маловероятна — по Telsmith они специализируются на конусе.",
+     "email": "не найдено в открытом виде (форма обратной связи на onacasting.com и витрина на Made-in-China)",
+     "phone": "не найдено",
+     "urls": [
+      "https://www.onacasting.com/about-us",
+      "https://m.made-in-china.com/product/Manufacturer-Mining-Telsmith-36FC-Cone-Crusher-Spare-Parts-Forging-Lower-Mantle-and-Bowl-Liner-Ona-B272-430-Ona-B272-453-2086647272.html",
+      "https://b0834ae83c08afae.en.made-in-china.com/",
+      "https://www.instagram.com/onacrusherparts/"
+     ]
+    },
+    {
+     "name": "Wuyi Slon Machinery Co., Ltd (Уи, пров. Чжэцзян)",
+     "site": "https://slonmachinery.en.made-in-china.com",
+     "proof_level": "изготавливал другие модели Telsmith",
+     "proof": "Профиль на Made-in-China со статусом Diamond Member и отметкой «This supplier has been audited by SGS» — то есть площадка проводила выездной аудит производства, что отличает компанию от анонимных страниц. Товарные карточки под Telsmith: «Telsmith H2238/2550/3244/3450 Jaw Crusher Spare Wear Parts on Sell», «Manganese Steel Parker Osborn Telsmith Jaw Crusher Spare Parts Toggle Jaw Plate» (то есть распорные плиты — класс, к которому относятся наши B1-273-1723 и ZF-273-1922), «Mining Machinery Telsmith Mantle Concave Spare Cone Crusher Parts». Заявлен экспорт более чем в 40 стран, среди названных — Индонезия и Перу, то есть рынки из вашего списка. ОГОВОРКА: охват по щёковым Telsmith ограничен серией Hydra (H2238/2550/3244/3450). Ни 3858, ни 38x58, ни номеров серии 273-19xx на их страницах не обнаружено (проверено выгрузкой страниц).",
+     "models_made": "Telsmith H2238, H2550, H3244, H3450 (щёковые износные части, включая распорные плиты); конусные Telsmith (мантии, конусы). Модель 3858 не фигурирует.",
+     "has_tooling": "Признаки производства: SGS-аудит площадки, отгрузка на стальных паллетах контейнерами, собственная линия износостойкого литья. Оснастки под 3858 нет — по щёковым Telsmith покрыта только серия Hydra.",
+     "email": "не найдено в открытом виде (контакт через витрину Made-in-China)",
+     "phone": "не найдено",
+     "urls": [
+      "https://slonmachinery.en.made-in-china.com/product/qFefohKkLcWm/China-Telsmith-H2238-2550-3244-3450-Jaw-Crusher-Spare-Wear-Parts-on-Sell.html",
+      "https://slonmachinery.en.made-in-china.com/product/yCOmSUTjLYcV/China-Manganese-Steel-Parker-Osborn-Telsmith-Jaw-Crusher-Spare-Parts-Toggle-Jaw-Plate.html",
+      "https://slonmachinery.en.made-in-china.com/product/QjZxemucbUWC/China-Mining-Machinery-Telsmith-Mantle-Concave-Spare-Cone-Crusher-Parts.html"
+     ]
+    },
+    {
+     "name": "Henan Crushtechs Machinery Co., Ltd (пров. Хэнань)",
+     "site": "https://crushtechs.en.made-in-china.com",
+     "proof_level": "изготавливал другие модели Telsmith",
+     "proof": "Товарные карточки под конкретные модели Telsmith: «Telsmith H3450 Fixed Jaw Die Movable Jaw Plate», «Overseas Professional Factory Telsmith 1016 Jaw Crusher Parts Jaw Plate», «Crusher Combination Parts Telsmith Cone Crusher Parts Cone Wear Liner». Привязка к конкретной модели (H3450) — признак того, что деталь заведена, а не описана обобщённо. ОГОВОРКА: страницы выгружены и проверены — упоминаний 3858, 38x58 и серии 273-19xx нет. Фотографий отливок с читаемыми номерами, складских остатков и отзывов покупателей не найдено.",
+     "models_made": "Telsmith H3450 (неподвижная и подвижная щёковые плиты), Telsmith 1016; конусные износные части Telsmith. Модель 3858 не фигурирует.",
+     "has_tooling": "Заявлено собственное производство высокомарганцовистого стального литья по стандартам OEM. Признаков оснастки на 3858 нет.",
+     "email": "не найдено в открытом виде (контакт через витрину Made-in-China)",
+     "phone": "не найдено",
+     "urls": [
+      "https://crushtechs.en.made-in-china.com/product/qOoaQPIlAyYN/China-Telsmith-H3450-Fixed-Jaw-Die-Movable-Jaw-Plate.html",
+      "https://crushtechs.en.made-in-china.com/product/RwZATPQBhyrg/China-Overseas-Professional-Factory-Telsmith-1016-Jaw-Crusher-Parts-Jaw-Plate.html"
+     ]
+    },
+    {
+     "name": "Shanvim (Jinhua) — производитель щёковых плит, пров. Чжэцзян",
+     "site": "https://www.shanvim.com",
+     "proof_level": "только каталожное упоминание",
+     "proof": "Две страницы с брендом Telsmith в заголовке: «China Telsmith Jaw Plate Manufacturer – JAW CRUSHER PLATE-JAW LINER» и «China Wholesale Telsmith Jaw Plate Factory – JAW CRUSHER WEAR PLATE-SIDE PLATE». Формулировка на сайте — «manufactures, stocks and supplies genuine alternative jaw plates for a fully extensive range of OEM jaw crushers including Telsmith». Страницы выгружены и просканированы: НИ ОДНОГО номера детали Telsmith, ни одной модели дробилки Telsmith, ни массы, ни фотографии отливки с номером на них нет. Telsmith присутствует только как слово в перечне брендов — типовая SEO-страница.",
+     "models_made": "Ни одной модели Telsmith не названо",
+     "has_tooling": "Не найдено. Заявление о наличии складских запасов ничем не детализировано — нет ни номеров, ни масс, ни фотографий.",
+     "email": "не найдено",
+     "phone": "не найдено",
+     "urls": [
+      "https://www.shanvim.com/telsmith-jaw-plate-manufacturer-jaw-crusher-plate-jaw-liner-jinhua-product/",
+      "https://www.shanvim.com/china-wholesale-telsmith-jaw-plate-factory-jaw-crusher-wear-plate-side-plate-jinhua-product/"
+     ]
+    },
+    {
+     "name": "H&G Machinery (hgminingparts.com, связывается с литейным кластером Нинго, пров. Аньхой)",
+     "site": "https://www.hgminingparts.com",
+     "proof_level": "только каталожное упоминание",
+     "proof": "Страница «China TelSmith Jaw Plate factory and manufacturers | H&G» присутствует в выдаче по всем запросам о плитах Telsmith. Страница выгружена и просканирована на номера деталей: совпадений по 3858, 38x58, 273-19xx, 273-17xx, 1082397, 277-619 — ноль. Конкретных моделей Telsmith и номеров на странице не приведено. H&G — крупный производитель износостойкого литья (заявляется объём марганцовистого литья по ASTM A128 порядка 12 000 т/год), но применительно к Telsmith это остаётся необоснованным упоминанием бренда.",
+     "models_made": "Ни одной модели Telsmith не названо",
+     "has_tooling": "Общие производственные возможности по марганцовистому литью значительны, но привязки к Telsmith и тем более к 3858 нет",
+     "email": "не найдено",
+     "phone": "не найдено",
+     "urls": [
+      "https://www.hgminingparts.com/jaw-crusher-plate-product/"
+     ]
+    },
+    {
+     "name": "Nicole Tree Technology Limited / 泽锐科技 zoremining",
+     "site": "https://zoremining.com",
+     "proof_level": "нет доказательств",
+     "proof": "Формально это единственная кроме Zhejiang Rock Machinery площадка, где встречается наш базовый номер: карточка «AA-273-1917M10M — Telsmith crusher», рядом AA-273-1917M10. Но при проверке карточка пустая: масса указана как «0.0000», фотография детали отсутствует, наличие не показано, модель дробилки (38x58) не проставлена. Никаких признаков литейного производства на сайте нет — указана только доставка курьерскими службами DHL/FedEx/TNT/UPS/EMS, что характерно для мелкого посредника, а не для отправителя многотонных отливок. С высокой вероятностью это перенос чужой базы номеров. Как поставщика футеровок массой в тонны рассматривать нельзя.",
+     "models_made": "Номинально AA-273-1917M10, AA-273-1917M10M (щёковые плиты); фактических подтверждений изготовления нет",
+     "has_tooling": "Нет. Ни масс, ни фотографий, ни склада, ни упоминания литейного производства",
+     "email": "zoremining@163.com",
+     "phone": "+8618080909568",
+     "urls": [
+      "https://zoremining.com/product/detail/store/16869/Telsmith%20crusher"
+     ]
+    },
+    {
+     "name": "Sinco Machinery (scrusherparts.com)",
+     "site": "https://www.scrusherparts.com",
+     "proof_level": "нет доказательств",
+     "proof": "В выдаче присутствует раздел «Telsmith Crusher Parts» с заявлением «stocks a large number of Telsmith Crusher Parts». Проверить не удалось: сервер отдаёт код 202 с телом 216 байт (защитный экран), содержимое страницы недоступно без обхода защиты, а обход правилами запрещён. Ни одного номера детали, ни одной модели Telsmith подтвердить не получилось. До появления проверяемых данных статус — недоказано.",
+     "models_made": "не найдено",
+     "has_tooling": "не найдено",
+     "email": "не найдено",
+     "phone": "не найдено",
+     "urls": [
+      "https://www.scrusherparts.com/spare-parts-service/telsmith-crusher-parts/"
+     ]
+    }
+   ],
+   "notes": "ГЛАВНЫЙ ВЫВОД. Компании, про которую по открытым данным можно сказать «она уже делала футеровки для Telsmith 3858 и у неё есть оснастка», НЕ НАЙДЕНО. Ни по одному из ваших номеров (DA-273-1917W, DD-273-1917W, FA-273-1903W, FA-273-1917, EA-273-1917, EB-273-1917, B1-273-1723, ZF-273-1922, CN-273-1923, CP-273-1923, 1082397, A-277-619, BA-277-619, BB-277-619, B1-18-1179, 1050402, 1064057) не найдено ни одной китайской товарной позиции, ни одной фотографии отливки с читаемым номером, ни одной таможенной записи, ни одного отзыва покупателя. Проверялось поиском по точным номерам и постраничной выгрузкой каталогов с грепом по шаблонам 3858, 38x58, 273-19xx, 273-17xx, 1082397, 277-619, 18-1179, 1050402, 1064057.\n\nЧТО ВСЁ-ТАКИ НАЙДЕНО ПО САМОЙ 3858 — три независимых следа, и только три:\n1. Zhejiang Rock Machinery: четыре позиции AA-273-1917M10, AA-273-1917M10M, AB-273-1917_SPL, AB-273-1917_SPL-M с явной машинной привязкой «Crusher Type: Telsmith 38x58 | Jaw plate». Это прямое попадание в базовый номер 273-1917.\n2. Sunrise Machinery: строка «1149591 | DIE, STA JAW | Telsmith 3858» в таблице позиций — неподвижная щёковая плита именно 3858, в номенклатуре нового (семизначного) поколения Astec.\n3. GTEK Mining: «3858 Hydraulic» и «Iron Giant Series» в перечне охваченных моделей Telsmith на странице, где отдельно заявлен модельный парк (mold inventory) с прямым упоминанием Telsmith среди покрытых брендов.\nВсе три — каталожного уровня. Ни один не сопровождается массой детали, фотографией отливки, складским остатком или отгрузкой.\n\nИНЖЕНЕРНОЕ НАБЛЮДЕНИЕ, ВАЖНОЕ ДЛЯ ПЕРЕГОВОРОВ. У Telsmith на 3858 сосуществуют два поколения номеров: старое буквенно-цифровое 273-19xx и новое семизначное Astec (1149591, 1082397, 1050402, 1064057). Базовое число 273-1917 — это щёковая плита 38x58, а буквенный префикс (AA, AB, DA, DD, EA, EB, FA) обозначает исполнение и профиль зуба; суффикс W в ваших номерах, судя по построению ряда, обозначает отдельное исполнение. Это ГИПОТЕЗА на основе структуры каталогов, документального подтверждения расшифровки префиксов найти не удалось — проверяйте у поставщика. Практическое следствие: разговаривать с китайцами надо не только вашими номерами, но и парой «273-1917 / 38x58» и «1149591», иначе поиск по их базе даст ноль там, где позиция на самом деле есть. Заметьте: у Rock Machinery в базе есть только префиксы AA и AB, у вас — DA, DD, EA, EB, FA. Совпадение по базовому числу не означает совпадения по геометрии рабочей поверхности.\n\nТАМОЖЕННЫЕ ДАННЫЕ — НЕ НАЙДЕНО. Фрагментов таможенных баз с отгрузками запчастей Telsmith из КНР в открытом доступе обнаружить не удалось. Volza и ImportGenius индексируют такие записи только внутри платной подписки, публичные страницы дают лишь агрегаты по коду ТН ВЭД 8474 без указания брендов, номеров и контрагентов. Обходить пейволл не стал. Это единственный источник, который дал бы вам прямое доказательство «у него это реально покупают», и получить его можно только платным доступом к Volza/ImportGenius по коду 8474 с фильтром по слову Telsmith и стране назначения.\n\nРЫНКИ ИЗ ВАШЕГО СПИСКА — ЧТО УДАЛОСЬ И ЧТО НЕТ. По России и СНГ найден один прямой след именно 3858: петербургский импортёр «Дробтехимпорт» (drobspb.ru) в разделе запчастей Telsmith прямо называет «Щёковые, со сложным и простым качением щеки (например, Iron Giant 3858)» — то есть в РФ на эту машину износ уже возят. Второй российский канал — «Майнинг Элемент» (СПб, ИНН 7810982090, ОГРН 1237800084433, pro@miningelement.com, +7 800 777-73-69), раздел Telsmith с доставкой по РФ и Казахстану; в поисковой выдаче их страница ассоциируется с парой FA-273-1917 (подвижная) и FB-273-1917 (неподвижная) для 3858, но при прямой выгрузке страницы этих номеров подтвердить не удалось — считайте неподтверждённым. Оба — российские перепродавцы, не изготовители, и по вашим условиям в аутмаркет-список не входят; ценность их в другом — они знают, чьё литьё ставят на 3858 в РФ, и это самый короткий путь к фактическому изготовителю. Sunrise — единственный из китайцев, кто целенаправленно работает на РФ/СНГ (русскоязычный сайт ru.sunrisespares.com). По Казахстану найден только общий каталог quantparts.com без позиций Telsmith. По Монголии, Чили, Перу, ЮАР, Индонезии адресных следов поставок износа под Telsmith не найдено; косвенно — Wuyi Slon заявляет экспорт в том числе в Индонезию и Перу, но без привязки к Telsmith.\n\nКАК ОТЛИЧИТЬ РЕАЛЬНОГО ОТ СТРАНИЦЫ — ЧТО ПОКАЗАЛА ПРОВЕРКА. Рабочий признак оказался один: наличие в каталоге номера детали вместе с массой и привязкой к типоразмеру машины. У Rock Machinery по позициям 273-1417 проставлены массы (121,8 кг верхняя щека, 105 кг нижняя) и разделение на левую/правую — такие данные берутся с реальной детали. У Sunrise по B1-273-968 указано брутто 2824,5 кг. У Shanvim, H&G и Sinco нет ни одного номера — это чистые SEO-страницы под бренд. У zoremining номер есть, но масса «0.0000» и нет фото — перенос чужой базы. Обратите внимание на ловушку с именами: китайская Zhejiang Rock Machinery (rock-machinery.com, cncrusher.net, crusher.ltd) и американский дилер Rock Machinery (rockmachinery.com, Аллентон, Висконсин) — разные компании со схожими названиями, не перепутайте при переписке.\n\nЧТО ДЕЛАТЬ ДАЛЬШЕ, УЧИТЫВАЯ ЧТО ЧЕРТЕЖЕЙ НЕТ И МАШИНУ НЕ ОСТАНОВИТЬ. Ни один из найденных поставщиков сегодня не закрывает ваше условие доказанной оснастки на 3858. Практическая последовательность: (1) запросить у Zhejiang Rock Machinery, Sunrise и GTEK не коммерческое предложение, а доказательство — фотографию модели или отливки 273-1917 / 1149591 с читаемым номером на теле, массу отливки и дату последней плавки по этой позиции; отсутствие такого ответа за пару дней само по себе ответ. (2) Помнить, что найденные следы покрывают только щёковые плиты. Распорная плита с седлом и зажимом (B1-273-1723, ZF-273-1922, CN-273-1923, CP-273-1923), вал 1082397, корпус подшипника с крышками (A-277-619, BA-277-619, BB-277-619), шестерня B1-18-1179, кожух маховика 1050402 и ограждение шкива 1064057 не найдены ни у кого — по ним аутмаркет-канал не просматривается вовсе, и это отдельная задача. (3) Наиболее вероятный источник геометрии без остановки машины и без чертежей — не китайский изготовитель, а российский канал, который уже возил износ на Iron Giant 3858 (Дробтехимпорт), либо платная выгрузка таможенных записей по 8474 для выхода на фактического отправителя. (4) Кожух маховика 1050402 и ограждение шкива 1064057 — сварные ограждения, а не литьё; они снимаются и обмеряются без остановки дробления, в отличие от футеровок, и по ним требование «уже делал» можно не предъявлять."
+  }
+ ],
+ "geom": [
+  {
+   "topic": "размеры-машины",
+   "facts": [
+    {
+     "item": "Принадлежность к серии: 3858 НЕ относится к Iron Giant",
+     "value": "В таблице спецификаций Telsmith модель 38\"×58\" помечена «H = Hydraulic Relief»; пометка «I = Iron Giant Series» стоит только у 44\"×48\" и 50\"×60\"",
+     "source": "Telsmith, Mineral Processing Handbook, стр. 29 «Specifications — Telsmith 25\"×40\" thru 55\"×66\" Overhead Eccentric Jaw Crushers»",
+     "url": "https://web.archive.org/web/20121114202828/http://www.telsmith.com/files/Mineral-Processing-Handbook.pdf"
+    },
+    {
+     "item": "Подтверждение того же факта в фирменном обзоре продукции",
+     "value": "«IRON GIANT™ SERIES … available in two sizes: 4448 (1,118 × 1,219 мм), 5060 (1,270 × 1,524 мм)»; «MODEL 3858 (965 мм × 1 473 мм)» вынесена отдельным пунктом",
+     "source": "Telsmith Product Overview (Astec), 2015/2020",
+     "url": "https://crushingandscreening.com/uploads/2020/02/Telsmith-Product-Overview.pdf"
+    },
+    {
+     "item": "Зев (по обозначению модели и обзору продукции)",
+     "value": "38\" × 58\" = 965 × 1473 мм",
+     "source": "Telsmith Product Overview — «MODEL 3858 (965MM X 1,473MM)»",
+     "url": "https://crushingandscreening.com/uploads/2020/02/Telsmith-Product-Overview.pdf"
+    },
+    {
+     "item": "Зев со стандартными футеровками (по проспекту J3858) — РАСХОЖДЕНИЕ с обозначением модели",
+     "value": "Jaw Opening (standard dies) 38 in × 60 in = 965 × 1524 мм",
+     "source": "Telsmith, проспект «J3858 Telsmith Jaw Crusher», раздел General Specifications",
+     "url": "https://web.archive.org/web/20130717154020/http://www.telsmith.com/files/3858JawBrochure.pdf"
+    },
+    {
+     "item": "Ширина камеры дробления между щёками (cheek plate to cheek plate) — рабочая ширина футеровок",
+     "value": "60,0 in = 1524 мм",
+     "source": "Telsmith, проспект J3858, габаритная схема («Inside cheek plate»); та же цифра «60 CHEEK PLATE TO CHEEK PLATE» на схеме проспекта 2003 г.",
+     "url": "https://web.archive.org/web/20130717154020/http://www.telsmith.com/files/3858JawBrochure.pdf"
+    },
+    {
+     "item": "Ширина внутри главной рамы",
+     "value": "62,0 in = 1575 мм",
+     "source": "Telsmith, проспект J3858, габаритная схема («Inside main frame»)",
+     "url": "https://web.archive.org/web/20130717154020/http://www.telsmith.com/files/3858JawBrochure.pdf"
+    },
+    {
+     "item": "Масса машины, нетто",
+     "value": "108 000 lbs = 48 988 кг",
+     "source": "Telsmith, проспект J3858, General Specifications «Net Weight 108,000 lbs / 48,988 kg»; та же цифра в Mineral Processing Handbook, стр. 29",
+     "url": "https://web.archive.org/web/20130717154020/http://www.telsmith.com/files/3858JawBrochure.pdf"
+    },
+    {
+     "item": "Масса в экспортной упаковке",
+     "value": "109 500 lbs = 49 668 кг",
+     "source": "Telsmith, проспект J3858 «Export Packed 109,500 lbs / 49,668 kg»; Mineral Processing Handbook, стр. 29",
+     "url": "https://web.archive.org/web/20130717154020/http://www.telsmith.com/files/3858JawBrochure.pdf"
+    },
+    {
+     "item": "Объём экспортной упаковки",
+     "value": "1 600 ft³ ≈ 45,3 м³",
+     "source": "Telsmith, Mineral Processing Handbook, стр. 29, строка «Export packed ft.3 approx.»",
+     "url": "https://web.archive.org/web/20121114202828/http://www.telsmith.com/files/Mineral-Processing-Handbook.pdf"
+    },
+    {
+     "item": "Масса дробилки целиком по заводской таблице масс (вал в сборе, подвижная щека и её футеровка; без маховика и шкива)",
+     "value": "107 680 lbs = 48 843 кг (допуск завода ±10 %)",
+     "source": "Telsmith, «Jaw Crusher Weights» (Parts & Service), столбец 3858, строка «Entire Crusher»",
+     "url": "https://web.archive.org/web/20030325192542/http://www.telsmith.com/Parts%20&%20Service/weights/weights_jaws.htm"
+    },
+    {
+     "item": "Обороты дробилки",
+     "value": "260 об/мин",
+     "source": "Telsmith, проспект J3858 «Recommended Crusher RPM 260»; Mineral Processing Handbook, стр. 29, строка RPM",
+     "url": "https://web.archive.org/web/20130717154020/http://www.telsmith.com/files/3858JawBrochure.pdf"
+    },
+    {
+     "item": "Мощность привода",
+     "value": "250 л.с. = 186 кВт",
+     "source": "Telsmith, проспект J3858 «Recommended Motor 250 hp / 186 kw»; Mineral Processing Handbook, стр. 29 «HP required 250»",
+     "url": "https://web.archive.org/web/20130717154020/http://www.telsmith.com/files/3858JawBrochure.pdf"
+    },
+    {
+     "item": "Приводной шкив (маховик-шкив): диаметр × ширина обода",
+     "value": "66 in × 16 in = 1676 × 406 мм",
+     "source": "Telsmith, проспект J3858 «Pulley Size (dia × face)»; Mineral Processing Handbook, стр. 29 «Drive pulley dia. × face 66 × 16»",
+     "url": "https://web.archive.org/web/20130717154020/http://www.telsmith.com/files/3858JawBrochure.pdf"
+    },
+    {
+     "item": "Диапазон регулировки щели (CSS), по таблицам производительности",
+     "value": "4\"–9\" = 100–229 мм (шаги 4, 5, 6, 7, 8, 9\")",
+     "source": "Telsmith, проспект J3858, «Jaw Crusher Capacity — model J3858»; Mineral Processing Handbook, стр. 30",
+     "url": "https://web.archive.org/web/20130717154020/http://www.telsmith.com/files/3858JawBrochure.pdf"
+    },
+    {
+     "item": "Способ регулировки щели и защиты от недробимого",
+     "value": "Гидравлическая регулировка с набором прокладок (шимов), гидравлическая разгрузка от перегрузки и гидравлическая очистка камеры",
+     "source": "Telsmith, проспект J3858 «Adjustment: Hydraulic Adjust with Shims; Overload Protection: Hydraulic Relief»",
+     "url": "https://web.archive.org/web/20130717154020/http://www.telsmith.com/files/3858JawBrochure.pdf"
+    },
+    {
+     "item": "Производительность",
+     "value": "390–600 stph при CSS 4\" … 620–950 stph при CSS 9\" (355–864 мт/ч)",
+     "source": "Telsmith, проспект J3858, таблица «Jaw Crusher Capacity — model J3858»",
+     "url": "https://web.archive.org/web/20130717154020/http://www.telsmith.com/files/3858JawBrochure.pdf"
+    },
+    {
+     "item": "Футеровка подвижной щеки AA-273-1917 (swinging jaw die) — масса",
+     "value": "7 753 lbs = 3 517 кг (по таблице масс 7 760 lbs = 3 520 кг)",
+     "source": "Telsmith, «38X58D Jaw Crushers» — прайс-лист/перечень изнашиваемых деталей, колонка WGT.; и таблица «Jaw Crusher Weights», строка «Swing Jaw Die», столбец 3858",
+     "url": "https://web.archive.org/web/20030508232001/http://www.telsmith.com/Parts%20&%20Service/wear_parts/wear_jaw_38X58D.htm"
+    },
+    {
+     "item": "Футеровка неподвижной щеки AB-273-1917 (stationary jaw die) — масса",
+     "value": "6 530 lbs = 2 962 кг (по таблице масс 6 540 lbs = 2 967 кг)",
+     "source": "Telsmith, «38X58D Jaw Crushers»; таблица «Jaw Crusher Weights», строка «Stationary Jaw Die», столбец 3858",
+     "url": "https://web.archive.org/web/20030508232001/http://www.telsmith.com/Parts%20&%20Service/wear_parts/wear_jaw_38X58D.htm"
+    },
+    {
+     "item": "Клин футеровки подвижной щеки DA-273-1917W (swing jaw die wedge), 2 шт. на машину",
+     "value": "285 lbs = 129 кг каждый",
+     "source": "Telsmith, «38X58D Jaw Crushers», колонка QTY./WGT.",
+     "url": "https://web.archive.org/web/20030508232001/http://www.telsmith.com/Parts%20&%20Service/wear_parts/wear_jaw_38X58D.htm"
+    },
+    {
+     "item": "Прижимная плита футеровки подвижной щеки DD-273-1917W (swing jaw die plate), 1 шт.",
+     "value": "313 lbs = 142 кг",
+     "source": "Telsmith, «38X58D Jaw Crushers»",
+     "url": "https://web.archive.org/web/20030508232001/http://www.telsmith.com/Parts%20&%20Service/wear_parts/wear_jaw_38X58D.htm"
+    },
+    {
+     "item": "Верхняя прижимная плита неподвижной футеровки FA-273-1903W (clamp plate, top), 1 шт.",
+     "value": "544 lbs = 247 кг",
+     "source": "Telsmith, «38X58D Jaw Crushers»",
+     "url": "https://web.archive.org/web/20030508232001/http://www.telsmith.com/Parts%20&%20Service/wear_parts/wear_jaw_38X58D.htm"
+    },
+    {
+     "item": "Нижняя прижимная плита неподвижной футеровки FD-273-1903 (clamp plate, bottom), 1 шт.",
+     "value": "431 lbs = 195 кг",
+     "source": "Telsmith, «38X58D Jaw Crushers»",
+     "url": "https://web.archive.org/web/20030508232001/http://www.telsmith.com/Parts%20&%20Service/wear_parts/wear_jaw_38X58D.htm"
+    },
+    {
+     "item": "Верхняя боковая плита (щека) EA-273-1917, 2 шт.",
+     "value": "520 lbs = 236 кг каждая (в таблице масс — 519 lbs прав./519 lbs лев.)",
+     "source": "Telsmith, «38X58D Jaw Crushers»; таблица «Jaw Crusher Weights», строка «Cheek Plate (Upper)», столбец 3858",
+     "url": "https://web.archive.org/web/20030508232001/http://www.telsmith.com/Parts%20&%20Service/wear_parts/wear_jaw_38X58D.htm"
+    },
+    {
+     "item": "Нижняя боковая плита (щека) EB-273-1917, 2 шт.",
+     "value": "380 lbs = 172 кг каждая (в таблице масс — 381 lbs прав./381 lbs лев.)",
+     "source": "Telsmith, «38X58D Jaw Crushers»; таблица «Jaw Crusher Weights», строка «Cheek Plate (Lower)», столбец 3858",
+     "url": "https://web.archive.org/web/20030508232001/http://www.telsmith.com/Parts%20&%20Service/wear_parts/wear_jaw_38X58D.htm"
+    },
+    {
+     "item": "Распорная плита B1-273-1723 (toggle) — масса",
+     "value": "755 lbs = 342 кг по перечню деталей 38X58D; 700 lbs = 318 кг по общей таблице масс",
+     "source": "Telsmith, «38X58D Jaw Crushers», раздел ADJUSTING GROUP; таблица «Jaw Crusher Weights», строка «Toggle», столбец 3858",
+     "url": "https://web.archive.org/web/20030508232001/http://www.telsmith.com/Parts%20&%20Service/wear_parts/wear_jaw_38X58D.htm"
+    },
+    {
+     "item": "Седло распорной плиты со стороны балки E-273-1723 (toggle seat, beam)",
+     "value": "213 lbs = 97 кг",
+     "source": "Telsmith, «38X58D Jaw Crushers», раздел ADJUSTING GROUP",
+     "url": "https://web.archive.org/web/20030508232001/http://www.telsmith.com/Parts%20&%20Service/wear_parts/wear_jaw_38X58D.htm"
+    },
+    {
+     "item": "Седло распорной плиты со стороны подвижной щеки D-273-1723 (toggle seat, S.J.)",
+     "value": "200 lbs = 91 кг",
+     "source": "Telsmith, «38X58D Jaw Crushers», раздел ADJUSTING GROUP",
+     "url": "https://web.archive.org/web/20030508232001/http://www.telsmith.com/Parts%20&%20Service/wear_parts/wear_jaw_38X58D.htm"
+    },
+    {
+     "item": "Подвижная щека в сборе с эксцентриковым валом (SwgJaw & Shft Assy)",
+     "value": "35 820 lbs = 16 247 кг",
+     "source": "Telsmith, «Jaw Crusher Weights», строка «SwgJaw&ShftAssy», столбец 3858",
+     "url": "https://web.archive.org/web/20030325192542/http://www.telsmith.com/Parts%20&%20Service/weights/weights_jaws.htm"
+    },
+    {
+     "item": "Маховик-шкив (flywheel sheave)",
+     "value": "3 900 lbs = 1 769 кг",
+     "source": "Telsmith, «Jaw Crusher Weights», строка «Flywheel Sheave», столбец 3858",
+     "url": "https://web.archive.org/web/20030325192542/http://www.telsmith.com/Parts%20&%20Service/weights/weights_jaws.htm"
+    },
+    {
+     "item": "Маховик (flywheel pulley)",
+     "value": "3 340 lbs = 1 515 кг",
+     "source": "Telsmith, «Jaw Crusher Weights», строка «Flywheel Pulley», столбец 3858",
+     "url": "https://web.archive.org/web/20030325192542/http://www.telsmith.com/Parts%20&%20Service/weights/weights_jaws.htm"
+    },
+    {
+     "item": "Полный комплект износа (расчёт суммированием заводских масс: 2 футеровки + 4 щеки + 2 клина + 3 прижимные плиты)",
+     "value": "17 941 lbs = 8 137 кг (7753 + 6530 + 2×520 + 2×380 + 2×285 + 313 + 544 + 431)",
+     "source": "Расчёт по массам из перечня Telsmith «38X58D Jaw Crushers» (все слагаемые — заводские значения с этой страницы)",
+     "url": "https://web.archive.org/web/20030508232001/http://www.telsmith.com/Parts%20&%20Service/wear_parts/wear_jaw_38X58D.htm"
+    },
+    {
+     "item": "Материалы изнашиваемых деталей",
+     "value": "Футеровки — марганцовистая сталь Гадфильда (Hadfields Manganese); боковые щёки — AR400",
+     "source": "Telsmith, проспект J3858, General Specifications («Jaw Die Material», «Cheek Plate Material»)",
+     "url": "https://web.archive.org/web/20130717154020/http://www.telsmith.com/files/3858JawBrochure.pdf"
+    },
+    {
+     "item": "Крепление футеровок (важно для идентификации ревизии машины)",
+     "value": "Верхний прижим — clamp plate; нижний — клин (wedge); нижний прижим неподвижной футеровки — сменное болтовое седло (bolt-in replaceable toe). Болты сквозь футеровку отсутствуют («die clamping plate — eliminates bolts through jaw die»)",
+     "source": "Telsmith, проспект J3858, General Specifications и выноски; проспект 3858 ред. 08/2003",
+     "url": "https://web.archive.org/web/20060311175018/http://www.telsmith.com/Product%20Literature/images/3858%20brochure%2010-01-03.pdf"
+    },
+    {
+     "item": "Габаритные размеры машины (по схеме проспекта)",
+     "value": "162,0 in = 4115 мм; 142,5 in = 3620 мм; 126,0 in = 3200 мм; 120,0 in = 3048 мм; 99,0 in = 2515 мм; 82,0 in = 2083 мм; 33 in = 838 мм; 94 in = 2388 мм; 75 in = 1905 мм",
+     "source": "Telsmith, проспект J3858, «General Dimensions»; проспект 3858 ред. 08/2003, габаритная схема",
+     "url": "https://web.archive.org/web/20130717154020/http://www.telsmith.com/files/3858JawBrochure.pdf"
+    },
+    {
+     "item": "Минимальный монтажный зазор для выемки подвижной щеки",
+     "value": "13,5 in = 343 мм («MINIMUM CLEARANCE FOR SWING JAW»)",
+     "source": "Telsmith, проспект 3858 ред. 08/2003, габаритная схема; та же цифра 13.5\" (343 мм) в проспекте J3858",
+     "url": "https://web.archive.org/web/20060311175018/http://www.telsmith.com/Product%20Literature/images/3858%20brochure%2010-01-03.pdf"
+    },
+    {
+     "item": "Гидросистема (регулировка, разгрузка, очистка камеры)",
+     "value": "Бак 60 галлонов = 227 л; электродвигатель насоса 20 л.с. = 15 кВт; давление разгрузки 4600 ± 50 psi = 317 ± 3,4 бар",
+     "source": "Telsmith, проспект J3858 (Hydraulic System: Tank Capacity, Motor); Lubrication & Maintenance Schedule Model 3858, стр. 1",
+     "url": "https://web.archive.org/web/20120916214651/http://www.telsmith.com/files/schedules/3858JawCrusherLM.pdf"
+    },
+    {
+     "item": "Система смазки подшипников",
+     "value": "Циркуляционная масляная: бак 20 галлонов = 76 л, двигатель насоса 5 л.с. ≈ 3,7 кВт, делитель потока на каждый подшипник. Рабочее масло: не ниже 10 °C для пуска, не ниже 21 °C для дробления, не выше 60 °C",
+     "source": "Telsmith, проспект 3858 ред. 08/2003 (Oil lubrication system); Lubrication & Maintenance Schedule Model 3858, стр. 2",
+     "url": "https://web.archive.org/web/20120916214651/http://www.telsmith.com/files/schedules/3858JawCrusherLM.pdf"
+    },
+    {
+     "item": "Диаметр эксцентрикового вала и посадочные размеры под подшипники",
+     "value": "не найдено — в открытых заводских материалах (проспекты, хендбук, таблица масс, перечень изнашиваемых деталей) эти размеры не публикуются",
+     "source": "Проверены: проспекты J3858 и 3858 ред. 2003, Mineral Processing Handbook стр. 29–30, таблица «Jaw Crusher Weights», перечень «38X58D Jaw Crushers», график смазки 3858",
+     "url": "https://web.archive.org/web/20121114202828/http://www.telsmith.com/files/Mineral-Processing-Handbook.pdf"
+    },
+    {
+     "item": "Масса эксцентрикового вала, главной рамы и балки распорной плиты для 3858",
+     "value": "не найдено — в заводской таблице масс ячейки для 3858 в строках «Eccentric Shaft», «Main Frame», «Toggle Beam» пустые (для соседних моделей заполнены: 3648 — вал 3 570 lbs, рама 31 800 lbs, балка 4 550 lbs; 4448 — вал 4 380 lbs)",
+     "source": "Telsmith, «Jaw Crusher Weights», столбец 3858",
+     "url": "https://web.archive.org/web/20030325192542/http://www.telsmith.com/Parts%20&%20Service/weights/weights_jaws.htm"
+    },
+    {
+     "item": "Кросс-референс подшипников Messinger для 38×58",
+     "value": "не найдено — в опубликованном перечне Messinger по щековым дробилкам Telsmith есть 10x21, 10x30, 15x38, 20x36, 25x40, 30x42, 42x48, 50x60; позиции 38x58 нет",
+     "source": "Messinger Bearings, «Replacement Crusher Bearings», таблица «Telsmith Jaw Crushers»",
+     "url": "https://www.messingerbearings.com/rock-crushing"
+    },
+    {
+     "item": "Длина и сечение распорной плиты B1-273-1723",
+     "value": "не найдено — опубликована только масса (755 lbs / 342 кг); геометрия в открытых источниках отсутствует",
+     "source": "Telsmith, «38X58D Jaw Crushers», раздел ADJUSTING GROUP",
+     "url": "https://web.archive.org/web/20030508232001/http://www.telsmith.com/Parts%20&%20Service/wear_parts/wear_jaw_38X58D.htm"
+    },
+    {
+     "item": "Габариты футеровок (длина × ширина × толщина, шаг и профиль зуба)",
+     "value": "не найдено — прямых размеров нет ни в одном открытом заводском документе; косвенно ширина ограничена камерой 60 in = 1524 мм между щёками, высота — зевом 38 in = 965 мм",
+     "source": "Telsmith, проспект J3858 (габаритная схема, «Inside cheek plate 60.0\"»)",
+     "url": "https://web.archive.org/web/20130717154020/http://www.telsmith.com/files/3858JawBrochure.pdf"
+    },
+    {
+     "item": "Соседние модели для поиска взаимозаменяемости (данные для сопоставления)",
+     "value": "36\"×48\": 76 800 lbs, 200 л.с., 230 об/мин, шкив 66×16 in — шкив идентичен 3858. 44\"×48\" (Iron Giant): 125 900 lbs, 250 л.с., 225 об/мин, шкив 72×17 in. 50\"×60\" (Iron Giant): 190 000 lbs, 350 л.с., 225 об/мин, шкив 78×23 in",
+     "source": "Telsmith, Mineral Processing Handbook, стр. 29",
+     "url": "https://web.archive.org/web/20121114202828/http://www.telsmith.com/files/Mineral-Processing-Handbook.pdf"
+    },
+    {
+     "item": "Каталог запчастей Telsmith 3858 (существование подтверждено, содержимое за пейволлом)",
+     "value": "«Telsmith 3858 Jaw Crusher Parts Catalog» — документ размещён на Scribd (doc 476121345), доступ платный/по регистрации, содержимое не извлекалось",
+     "source": "Scribd, карточка документа «3858 Parts Catalogue»",
+     "url": "https://www.scribd.com/document/476121345/3858-Parts-Catalogue"
+    },
+    {
+     "item": "Подтверждение номенклатуры деталей 38×58 у независимого поставщика (массы не раскрыты)",
+     "value": "В каталоге по позиции «38x58 Telsmith» присутствуют FA-273-1917 (JAW PLATE, MOVABLE), FB-273-1917 (JAW PLATE, FIXED), EA-273-1917 (CHEEK PLATE, UPPER), EB-273-1917 (CHEEK PLATE, LOWER), AA/AB-273-1917, AC/AD/AE-273-1922 (ADJUSTMENT SHIM) — всего 441 позиция; поля «Weight, kg» — «On request»",
+     "source": "Mining Element, раздел «Spare parts for jaw crusher 38x58, Telsmith» (страница сохранена локально в ходе работы: /tmp/claude-0/-home-user-kvant-sourcing-dashboard/6b830c47-4619-5c5b-89c7-2553097dcc80/scratchpad/me3858.txt)",
+     "url": "https://www.scribd.com/document/476121345/3858-Parts-Catalogue"
+    }
+   ],
+   "method": "Задача сводится к одному: получить геометрию, не трогая работающую машину, и заставить поставщика доказать, что она у него уже есть. Практический порядок действий.\n\n1. Сначала — заводской каталог запчастей, а не чертежи. Каталог 3858 существует (Telsmith 3858 Jaw Crusher Parts Catalog) и почти наверняка есть в комплекте эксплуатационной документации, переданной руднику при поставке машины. Он не содержит рабочих чертежей, но содержит сборочные виды и точные номера с индексами ревизий. Этого достаточно, чтобы изготовитель, у которого позиция уже была, опознал её однозначно. Первый шаг — поднять комплект ЗИП-документации в архиве рудника, второй — запросить каталог у Astec/Telsmith как сервисный документ (это не закупка через дистрибьютора, а получение документа).\n\n2. Опрос поставщиков строить не как «сделаете ли», а как «покажите, что уже сделали». Обязательный пакет доказательств от каждого китайского изготовителя, по каждому номеру отдельно:\n   — фото/видео действующей модельной оснастки (модель, стержневой ящик, опока) с видимой маркировкой номера детали;\n   — скриншот позиции в их ERP/номенклатуре с историей отгрузок (даты, количества, без раскрытия покупателей);\n   — датированные цеховые фото отливки этого номера и фото маркировки на готовом изделии;\n   — протокол размерного контроля (dimensional inspection report) уже изготовленной детали этого номера.\n   Последний пункт — ключевой: это и есть геометрия, которую вам передадут бесплатно и добровольно, без единого вашего чертежа. Кто не может дать протокол обмера — тот детали не делал.\n\n3. Массы использовать как первичный фильтр подлинности геометрии. Заводские значения известны точно (подвижная футеровка 3 517 кг, неподвижная 2 962 кг, верхняя щека 236 кг, нижняя 172 кг, клин 129 кг, прижимные плиты 142/247/195 кг, распорная плита 342 кг). Требуйте от поставщика заявить массу отливки до отправки ТКП. Отклонение больше ±5 % от заводского значения при той же марке стали означает другую геометрию или другую ревизию — предложение отсеивается сразу, до всяких переговоров. Это самый дешёвый способ проверки и он не требует ни чертежей, ни остановки машины.\n\n4. Обмерять не установленную деталь, а склад. На первичной дробилке рудника почти всегда лежит резервный комплект футеровок, щёк, клиньев и распорная плита. Всё это — та же геометрия. Резервные детали сканируются ручным 3D-сканером или фотограмметрией за смену, машина при этом работает. Сюда же — детали, снятые ранее и лежащие в отвале/на площадке металлолома: изношенная рабочая поверхность бесполезна, но посадочные плоскости, клиновые пазы, отверстия и габарит по опорной стороне сохраняются и дают всю привязочную геометрию.\n\n5. Плановую перефутеровку превратить в сеанс обмера. Замена футеровок — уже запланированный простой, а не дополнительный. Заранее подготовить регламент: кто, чем и за сколько минут снимает геометрию каждой снятой детали (сканирование 20–30 мин на позицию), где ставятся реперы, какой протокол заполняется. Так за одну штатную перефутеровку закрывается вся номенклатура 273-1917/273-1903 без единой минуты сверхнормативного простоя.\n\n6. Посадочные размеры вала, корпуса подшипника A-277-619 и крышек BA/BB-277-619 снимать при плановой ревизии подшипникового узла — они в открытых источниках отсутствуют полностью (проверено: проспекты, Mineral Processing Handbook, заводская таблица масс, перечень изнашиваемых деталей 38X58D, график смазки; кросс-референса Messinger для 38×58 тоже нет). До ревизии единственный законный источник этих размеров — сам подшипник: снять маркировку с установленного подшипника через смотровой лючок или по журналу закупок ЗИП, и от его типоразмера получить диаметр шейки вала и диаметр расточки корпуса. Это делается на работающей машине.\n\n7. Использовать вторую такую же машину. Модель 3858 серийная, машины в обороте есть (в том числе на вторичном рынке). Обмер узлов на чужой остановленной или разукомплектованной 3858 — законный способ получить геометрию, пока своя работает. Тот же приём: покупка б/у узла (распорной плиты, седла, щеки) как эталона для обратного проектирования обходится дешевле, чем простой.\n\n8. Проверить ревизию машины до рассылки запросов. В открытых материалах зафиксировано расхождение: обозначение модели и обзор продукции дают зев 965 × 1473 мм, а проспект J3858 — «jaw opening (standard dies) 965 × 1524 мм» при ширине камеры между щёками 1524 мм. Конструкция крепления футеровок тоже менялась (прижимная плита плюс клин против болтов сквозь футеровку). Поэтому в запросе обязательно указывать не только номер детали, но и год выпуска и заводской номер машины и требовать от поставщика письменного подтверждения соответствия именно этой ревизии.\n\n9. Первый заказ у нового поставщика делать на дешёвой позиции. Нижняя щека EB-273-1917 (172 кг) или клин DA-273-1917W (129 кг) — низкий риск, быстрая примерка по месту. Только после подтверждённой посадки переходить к подвижной футеровке в 3,5 т. Такая ступенчатая квалификация заменяет отсутствующие чертежи фактической проверкой.",
+   "notes": "Главный результат по фактуре: полный заводской набор массогабаритных данных по 3858 найден не на текущих сайтах Astec/Telsmith, а в веб-архиве telsmith.com — там сохранились (а) страница изнашиваемых деталей «38X58D Jaw Crushers» с поштучными массами и количествами по всем интересующим номерам, (б) сводная таблица «Jaw Crusher Weights» по 13 моделям, (в) проспекты 3858 (ред. 08/2003) и J3858, (г) Mineral Processing Handbook со сводной таблицей спецификаций, (д) график смазки и обслуживания модели 3858. Все ссылки в фактах ведут на архивные копии и стабильны.\n\nВажное расхождение с постановкой задачи: машина 3858 НЕ относится к серии Iron Giant. По собственной классификации Telsmith в Mineral Processing Handbook (стр. 29) 38″×58″ помечена литерой H — «Hydraulic Relief», а литера I — «Iron Giant Series» — стоит только у 44″×48″ и 50″×60″. То же разделение в обзоре продукции Astec/Telsmith 2015/2020: Iron Giant — только 4448 и 5060, а 3858 вынесена отдельной моделью. Это не придирка к терминологии: в запросе поставщику формулировка «Iron Giant 3858» уводит подбор к другой конструкции камеры (у Iron Giant удлинённая камера и малые углы захвата) и к другой номенклатуре футеровок. В ТКП следует писать «Telsmith 3858 (38″×58″), D-style, с гидравлической разгрузкой», без упоминания Iron Giant.\n\nВторое расхождение — по зеву. Обозначение модели и обзор продукции дают 965 × 1473 мм, проспект J3858 в разделе General Specifications указывает зев со стандартными футеровками 38 in × 60 in = 965 × 1524 мм, а габаритная схема даёт 1524 мм между боковыми щёками и 1575 мм внутри главной рамы. Рабочая ширина футеровки, скорее всего, 1524 мм, но утверждать это без обмера нельзя — обе цифры приведены в фактах как есть, со ссылками.\n\nВнутренняя сходимость данных высокая: массы из перечня изнашиваемых деталей и из сводной таблицы масс совпадают в пределах 0,1–0,2 % (7 753 против 7 760 lbs; 6 530 против 6 540; 520 против 519; 380 против 381), масса машины из проспекта (108 000 lbs) сходится с хендбуком и с таблицей масс (107 680 lbs). Единственное заметное расхождение — распорная плита: 755 lbs в перечне деталей против 700 lbs в сводной таблице; при заявленном заводом допуске ±10 % это в пределах нормы, но при квалификации поставщика ориентироваться следует на 755 lbs (342 кг) как на значение из детального перечня по конкретному номеру B1-273-1723.\n\nЧего найти не удалось, несмотря на целенаправленный поиск: диаметр эксцентрикового вала и посадочные размеры под подшипники (вал 1082397, корпус A-277-619, крышки BA/BB-277-619) — этих величин нет ни в одном открытом заводском документе; масса эксцентрикового вала, главной рамы и балки распорной плиты именно для 3858 — в заводской таблице масс соответствующие ячейки пустые, хотя для соседних моделей заполнены; кросс-референс подшипников Messinger для 38×58 — в их перечне этой позиции нет; длина и сечение распорной плиты, шестерня B1-18-1179, кожух маховика 1050402, ограждение шкива 1064057 — ничего, кроме факта существования номеров у поставщиков. Габаритов футеровок (длина, ширина, толщина, профиль зуба) в открытом доступе нет вообще — только косвенное ограничение по ширине камеры.\n\nКаталог запчастей 3858 существует и размещён на Scribd (документ 476121345), но за регистрацией/оплатой; в соответствии с ограничением по пейволлам содержимое не извлекалось. То же с «Telsmith Jaw Crusher Specifications» (Britador Mandibulas Telsmith, doc 676413487). Файл Mineral Processing Handbook на сайте ausimm.com закрыт защитой Cloudflare — обходить её не стали, вместо этого взята архивная копия того же документа с сайта Telsmith, данные из неё и приведены.\n\nПрактический вывод для закупки: по всем позициям футеровок, щёк, клиньев, прижимных плит и распорной плиты у вас теперь есть заводские массы. Это достаточный инструмент отбора поставщиков без чертежей и без остановки машины — заявленная поставщиком масса отливки при известной марке стали однозначно выдаёт, работает ли он по подлинной оснастке или собирается делать деталь «по фотографии». По валу и подшипниковому узлу такого инструмента нет: там придётся идти либо через маркировку установленного подшипника, либо через плановую ревизию узла."
+  },
+  {
+   "topic": "снять-без-остановки",
+   "facts": [
+    {
+     "item": "Масса дробилки Telsmith J3858 (нетто / в экспортной упаковке)",
+     "value": "48 988 кг (108 000 lbs) / 49 668 кг (109 500 lbs)",
+     "source": "Заводской спецлист Telsmith «J3858 Telsmith Jaw Crusher», Mequon WI, an Astec Industries Company (PDF, дилер Madisa)",
+     "url": "https://www.madisa.com/wp-content/uploads/fichas/3858-Jaw-Crusher.pdf"
+    },
+    {
+     "item": "Зев J3858 со стандартными плитами — расхождение с формулировкой заказчика (38x58 = 965x1473 мм)",
+     "value": "38 in x 60 in = 965 мм x 1524 мм (стандартные плиты); ширина камеры 60 in (1524 мм) внутри щёк, 62,0 in (1575 мм) внутри главной рамы",
+     "source": "Заводской спецлист Telsmith J3858, раздел «general specifications» и «section view»",
+     "url": "https://www.madisa.com/wp-content/uploads/fichas/3858-Jaw-Crusher.pdf"
+    },
+    {
+     "item": "Материалы изнашиваемых деталей J3858",
+     "value": "Челюстные плиты — Hadfields Manganese (сталь Гадфильда, аналог 110Г13Л); щековые накладки (cheek plates) — AR400",
+     "source": "Заводской спецлист Telsmith J3858, «Jaw Die Material», «Cheek Plate Material»",
+     "url": "https://www.madisa.com/wp-content/uploads/fichas/3858-Jaw-Crusher.pdf"
+    },
+    {
+     "item": "Схема крепления плит J3858 — прямо соответствует номерам заказчика (клинья, зажим CP-273-1923, седло CN-273-1923)",
+     "value": "Верхний зажим плиты: Clamp Plate (стандарт) / Wedge (опция); нижний зажим: Bolt-in Replaceable Toe (болтовое сменное седло-носок); за неподвижной плитой — износная полоса, защищающая раму",
+     "source": "Заводской спецлист Telsmith J3858, «Jaw Die Clamp (upper)/(lower)», описание конструкции",
+     "url": "https://www.madisa.com/wp-content/uploads/fichas/3858-Jaw-Crusher.pdf"
+    },
+    {
+     "item": "Привод и шкив J3858 — базовая геометрия для кожуха маховика 1050402 и ограждения шкива 1064057",
+     "value": "Двигатель 186 кВт (250 hp), частота вращения дробилки 260 об/мин, шкив диаметр x ширина обода 1676 мм x 406 мм (66 in x 16 in)",
+     "source": "Заводской спецлист Telsmith J3858, «general specifications»",
+     "url": "https://www.madisa.com/wp-content/uploads/fichas/3858-Jaw-Crusher.pdf"
+    },
+    {
+     "item": "Габаритные привязки корпуса J3858, пригодные как контрольные размеры при обмере на месте",
+     "value": "3620 мм (142,5 in), 3200 мм (126,0 in), 3048 мм (120,0 in), 4115 мм (162,0 in), 2515 мм (99,0 in), 2083 мм (82,0 in), 343 мм (13,5 in), 267 мм (10,5 in); допуск округления — до 1/4 дюйма (6,35 мм)",
+     "source": "Заводской спецлист Telsmith J3858, габаритная схема, примечание «Dimensions are approximate, rounded to the nearest 1/4”»",
+     "url": "https://www.madisa.com/wp-content/uploads/fichas/3858-Jaw-Crusher.pdf"
+    },
+    {
+     "item": "Точность метрологического ручного 3D-сканера для крупных деталей (эталон качества скана)",
+     "value": "Точность 0,025 мм (22 голубых лазерных линии) и 0,020 мм (46 линий); объёмная точность 0,075 мм + 0,010 мм/м; аккредитация ISO 17025, соответствие VDI/VDE 2634 part 3",
+     "source": "Creaform, пресс-релиз «New Enhanced Specifications for the HandySCAN 3D|MAX Series»",
+     "url": "https://www.creaform3d.com/en/about-us/press-releases/new-enhanced-specifications-handyscan-3dmax-series"
+    },
+    {
+     "item": "Точность фотограмметрии по фотоснимкам с масштабными линейками",
+     "value": "Ошибки стабильно менее 0,1 см (1 мм); в специальных условиях достигается ±0,3 мм; обязательное условие — масштабная база (scale bar) как заданное расстояние между маркерами",
+     "source": "Agisoft Metashape, руководства «How to Add a Scale Bar» и «Reverse Engineering Objects with Metashape: From Scan to CAD»",
+     "url": "https://www.agisoftmetashape.com/how-to-add-a-scale-bar-in-agisoft-metashape-step-by-step-guide/"
+    },
+    {
+     "item": "Цена услуги 3D-сканирования и реверс-инжиниринга в России (прайс подрядчика, СПб/Москва, выезд по РФ)",
+     "value": "Точность 20 мкм: STL от 4 000 ₽, твердотельная STP-модель от 9 000 ₽; точность 200 мкм: STL от 2 800 ₽, STP от 6 000 ₽; габариты объектов от 5 мм до 5 м; оценка стоимости в течение ~2 часов",
+     "source": "InCAD, страница услуги «3D сканирование деталей на заказ»",
+     "url": "https://in-cad.ru/services/3d-scanning/"
+    },
+    {
+     "item": "Подрядчик с прямо заявленным выездом в Норильск и Красноярский край",
+     "value": "Сканеры ATOS 5 (структурированный свет), заявленные габариты объектов от 1 см до 1 м, отдельное направление лазерного сканирования крупных деталей; города обслуживания — Красноярск, Норильск, Ачинск, Канск; тел. +7 (800) 551-30-69",
+     "source": "PNM (pnm.su), «3D сканирование деталей, объектов, изделий в Красноярске»",
+     "url": "https://krasnoyarsk.pnm.su/reverse-engineering/vysokotochnoe-3d-skanirovanie/"
+    },
+    {
+     "item": "Мировые расценки на выездное метрологическое сканирование крупных объектов",
+     "value": "Дневная ставка 1 200–3 500 USD/день (метрологический класс + CAD-результат); крупные объекты (машины, техника) 2 000–10 000+ USD за проект; мелкие детали 150–500 USD",
+     "source": "Tangent, «3D Scanning Services Cost | Pricing Guide & Project Estimates»",
+     "url": "https://www.usetangent.com/how-much-does-a-3d-scan-cost/"
+    },
+    {
+     "item": "Собственный ресурс «Норникеля» по обратному проектированию",
+     "value": "Центр инновационных технологий: цикл 3D-сканирование → инженерный аудит → аддитивное производство; снижение затрат на комплектующие на 30–50%; в работе как импортные, так и российские 3D-сканеры и принтеры",
+     "source": "Норникель, «Реверс-инжиниринг и 3D-печать: как «Норникель» создаёт детали будущего»",
+     "url": "https://nornickel.digital/cifra_v_nornikele/revers-inzhiniring_i_3d-pechat_kak_nornikel_sozdajot_detali_budushhego"
+    },
+    {
+     "item": "Литейная усадка высокомарганцовистой стали — почему нельзя копировать образец «один в один»",
+     "value": "Усадка 2,6–3,0 % (в других источниках 2,5–2,7 %), то есть на 1500 мм длины плиты около 39–45 мм; требование к плоскостности стыковых поверхностей отливки — не более 3 мм",
+     "source": "MGS Casting, «High Manganese Crusher Jaw Plate Expendable Casting Process»",
+     "url": "https://mgscasting.com/high-manganese-crusher-jaw-plate-expendable-casting-process/"
+    },
+    {
+     "item": "Заявленные допуски и процесс китайского изготовителя по реверс-инжинирингу (Чэнду, Сычуань)",
+     "value": "Допуск по посадочным (installation) поверхностям ±1,5 мм; сканирование LiDAR/структурированным светом «с точностью до долей миллиметра»; принимают изношенные образцы для анализа профиля износа; материалы Mn13 / Mn18 / Mn21–22; контроль КИМ (CMM) и лазерным сканированием; ориентир срока OEM, который они замещают, — 12–24 недели",
+     "source": "GUBT Casting, «The Ultimate Guide to Custom Crusher Parts and Reverse Engineering»",
+     "url": "https://gubtcasting.com/the-ultimate-guide-to-custom-crusher-parts-and-reverse-engineering/"
+    },
+    {
+     "item": "Китайский изготовитель, декларирующий сканирование изношенной детали и сравнение с исходным профилем",
+     "value": "Портативные голубые лазерные сканеры, точность измерений до 0,025 мм; сравнение изношенной геометрии с исходным профилем для расчёта скорости износа; литейная мощность свыше 20 000 т/год",
+     "source": "Tycosen, «Crusher Wear Parts: Precision & Reverse Engineering»",
+     "url": "https://tycosen.com/mining-spare-parts-with-reverse-engineering/"
+    },
+    {
+     "item": "Китайский изготовитель с прямо опубликованной услугой «изготовление по образцу» и выездным сканированием",
+     "value": "WUYI SLON MACHINERY CO., LTD (пров. Чжэцзян, г. Уи): «Customization from Samples», «Customization from Designs», «On-Site Scanning», «Precise Digital Duplicate»; цена 1,40–1,80 USD/кг; MOQ 10 кг; срок изготовления 1 месяц; ISO 9001; в номенклатуре Telsmith H2238/2550/3244/3450",
+     "source": "WUYI SLON MACHINERY, карточка товара на Made-in-China",
+     "url": "https://slonmachinery.en.made-in-china.com/product/qFefohKkLcWm/China-Telsmith-H2238-2550-3244-3450-Jaw-Crusher-Spare-Wear-Parts-on-Sell.html"
+    },
+    {
+     "item": "Прямое подтверждение, что геометрия семейства 273-1917 уже есть у китайского поставщика",
+     "value": "Позиция каталога AA-273-1917M10M (а также AA-273-1917M10), наименование «Jaw plate», машина «Telsmith crusher», происхождение — Китай; вес в карточке не заполнен (0.0000)",
+     "source": "Zoremining (泽锐科技, Nicole Tree Technology Ltd), карточка Telsmith crusher",
+     "url": "https://zoremining.com/product/detail/store/16869/Telsmith%20crusher"
+    },
+    {
+     "item": "Китайский поставщик, у которого 3858 указан в номенклатуре по номеру детали",
+     "value": "Позиция «1149591 — DIE, STA JAW — Telsmith 3858» (неподвижная челюстная плита); в перечне моделей указан 38X58; в том же каталоге номера DB-273-1417, EB-273-1417, HD-273-2017, GD-273-2017, B1-273-968, WG-273-918, XG-273-918",
+     "source": "Sunrise Machinery Co., Ltd (офис Шанхай, завод Мэйшань, пров. Сычуань), «ASTEC Telsmith Crusher Parts»",
+     "url": "https://www.sunrisespares.com/telsmith-crusher-parts/"
+    },
+    {
+     "item": "Порядок массы челюстной плиты соседнего типоразмера (ориентир для грузоподъёмности при съёме, кантовании и сканировании)",
+     "value": "Telsmith 3648: подвижная плита B1-273-968 — 2 640 кг, Mn18Cr2",
+     "source": "Sunrise Machinery, карточка B1-273-968",
+     "url": "https://www.sunrisespares.com/telsmith-movable-jaw-plate-b1-273-968-product/"
+    },
+    {
+     "item": "Порядок массы плит Iron Giant соседнего типоразмера 44x48",
+     "value": "Неподвижная плита WG-273-918 — 3 242 кг; подвижная XG-273-918 — 3 800 кг; материал Mn18Cr2; завод — Лююшань 1-я ул., пос. Ханбу, р-н Кэчэн, г. Цюйчжоу, пров. Чжэцзян",
+     "source": "Miningspareparts.com, «Fixed Jaw Die and Swing Jaw Die Suit Telsmith 44x48 IG Iron Giant»",
+     "url": "https://miningspareparts.com/en/product/telsmith_44x48_jaw_plate/"
+    },
+    {
+     "item": "Риск смешения линеек: 3858 существует и в серии Hydra-Jaw",
+     "value": "HCMP (Шанхай) перечисляет модели Hydra-Jaw H2238 / H2550 / H3244 / H3450 / H3258 / H3858 и позиции: неподвижная плита, подвижная плита, эксцентриковый вал, рама, толкающая балка (toggle beam)",
+     "source": "HCMP Machinery Parts, раздел «Jaw Crusher Parts»",
+     "url": "https://www.hcmachineryparts.com/products/mining-aggregate-parts/jaw-crusher-parts/"
+    },
+    {
+     "item": "Публичный каталог деталей 3858 — существует, но за регистрационной стеной",
+     "value": "Документ «3858 Parts Catalogue» (Telsmith Jaw Crusher Model 3858) размещён на Scribd; доступ требует регистрации/подписки — обход не выполнялся, содержимое не проверялось",
+     "source": "Scribd, карточка документа «Telsmith 3858 Jaw Crusher Parts Catalog»",
+     "url": "https://www.scribd.com/document/476121345/3858-Parts-Catalogue"
+    },
+    {
+     "item": "Проверка поставщика Wujing (Чжэцзян) не выполнена",
+     "value": "HTTP 503 при обращении к странице Telsmith-номенклатуры 09.09.2026 — данные не подтверждены",
+     "source": "Zhejiang Wujing Machine Manufacture Co., Ltd, страница Telsmith Crusher Parts",
+     "url": "https://www.wjcrusherparts.com/crusher-parts/telsmith-crusher-parts.html"
+    }
+   ],
+   "method": "ЦЕЛЬ: получить геометрию без остановки машины и без чертежей, в приоритетном порядке — от самого дешёвого и надёжного к запасному.\n\nШАГ 0. Инвентаризация до всяких обмеров (0 руб., 1–2 дня, силами рудника).\n0.1. Снять с шильдика дробилки серийный номер и год, зафиксировать фото. Он определяет, какая это машина — Iron Giant 3858 или Hydra-Jaw H3858, и какой ширины камера (заводской спецлист J3858 даёт зев 965 x 1524 мм, тогда как в задании указано 965 x 1473 мм; расхождение 51 мм по ширине плиты недопустимо и должно быть закрыто до любого заказа).\n0.2. Проверить склад: есть ли новые/б-у плиты, клинья, распорная плита, седло, зажим, крышки подшипника, вал. Каждая новая деталь на складе — это готовый эталон геометрии, снимать который можно сколько угодно долго.\n0.3. Поднять всю бумагу, которая не является чертежом, но содержит размеры: паспорт, руководство по эксплуатации и смазке, ведомость ЗИП, старые заявки и инвойсы (в них номера и массы), акты предыдущих замен, фото прежних монтажей.\n0.4. Запросить у Центра инновационных технологий «Норникеля» (у компании есть собственный цикл 3D-сканирование → инженерный аудит → изготовление, заявленная экономия 30–50 %) включение позиции в программу обратного проектирования — это дешевле внешнего подряда и не требует вывоза детали за периметр.\n\nШАГ 1 (ОСНОВНОЙ). Сканирование изношенной детали в момент плановой замены.\nЭто единственный способ, который ничего не стоит по простою: деталь всё равно демонтируется.\n1.1. За 3–4 недели до плановой замены заключить договор со сканирующим подрядчиком с выездом (в Красноярском крае услугу с выездом в Норильск заявляет PNM, оборудование ATOS 5; ориентир по цене в РФ — от 4 000 ₽ за скан 20 мкм в STL и от 9 000 ₽ за твердотельную STP-модель; мировой ориентир выездной работы — 1 200–3 500 USD за смену). Подрядчик приезжает по вызову «деталь снята».\n1.2. Требования в ТЗ на сканирование: метрологический класс (объёмная точность порядка 0,075 мм + 0,010 мм/м, соответствие VDI/VDE 2634 ч.3), матирующий спрей, приклеиваемые маркеры, обязательная фотограмметрическая привязка для деталей длиной свыше 1,5 м (иначе накапливается линейная ошибка).\n1.3. Сканировать обязательно ПАРАМИ: изношенную деталь и сопрягаемый узел — плиту вместе с посадочным карманом рамы и питмана, клинья вместе с пазами, седло вместе с гнездом, крышки подшипника вместе с корпусом.\n1.4. Результат принимать в трёх видах: облако/сетка (STL), восстановленная твердотельная модель (STEP), и контрольный эскиз с 8–12 базовыми размерами, простановкой болтового рисунка и допусками. Только STL для литейщика недостаточно.\n1.5. Пока деталь снята — измерить твёрдость (переносной твердомер) и вырезать/снять стружку на спектральный анализ, чтобы задать материал в заказе, а не гадать между Mn13 / Mn18 / Mn22.\nЧто даёт: полную наружную геометрию, болтовой рисунок, клиновые пазы, посадочные плоскости. Точность 0,05–0,2 мм по неизношенным зонам.\nЧего НЕ даёт: исходный профиль зубьев рабочей поверхности (он съеден), исходную толщину, внутренние полости и рёбра (нужен эндоскоп или разрезание), твёрдость/термообработку, посадочные допуски вала и подшипниковых гнёзд.\n\nШАГ 2. Обмер запасной детали со склада — по приоритету выше шага 1, если склад не пуст.\nНовая деталь даёт ИСХОДНЫЙ профиль зубьев и исходную толщину — именно то, чего нельзя получить с изношенной. Порядок работ тот же, но без спешки и без привязки к окну ремонта; сканировать можно в тёплом помещении, что снимает температурную погрешность.\nПравило: перед установкой любой новой детали со склада она должна быть отсканирована. Это дисциплинарная мера, а не разовая работа: каждая уходящая в машину запчасть — последний шанс снять эталон.\n\nШАГ 3. Съём геометрии с сопрягаемых деталей (интерфейсы).\n3.1. Что можно мерить, не останавливая машину: наружные ограждения и кожухи (кожух маховика 1050402, ограждение шкива 1064057) — их геометрия снимается снаружи рулеткой, шаблонами и фотограмметрией, при соблюдении требований охраны труда по расстоянию до вращающихся частей. Диаметр шкива 1676 мм и ширина обода 406 мм известны из спецлиста и служат контрольной базой.\n3.2. Что мерить в ремонтное окно: посадочные карманы плит в раме и питмане, гнёзда клиньев, гнездо седла распорной плиты, болтовой рисунок (шаг, диаметр, глубина резьбы — калибрами-пробками), корпус подшипника A-277-619 и плоскости разъёма крышек BA-277-619 / BB-277-619.\n3.3. Отдельно по подшипниковому узлу и валу 1082397: геометрию посадок восстанавливают не сканированием, а от обозначения подшипника. Считать маркировку с самого подшипника или с упаковки складского запаса; по каталогу производителя подшипника далее однозначно определяются диаметр и ширина посадочного места, а посадки назначаются по ГОСТ 3325. Скан здесь даёт форму корпуса, а не размер посадки.\n3.4. По шестерне B1-18-1179 — снимать не «скан», а зубоизмерительные параметры: число зубьев, наружный диаметр, длина общей нормали или размер по роликам, угол профиля; по ним модуль и коррекция восстанавливаются расчётом.\nЧто даёт: интерфейсы, которые обязаны совпасть при монтаже.\nЧего НЕ даёт: рабочий профиль и сечения самой детали.\n\nШАГ 4. Литьё по изношенному образцу как по мастер-модели.\nРаботоспособно, но с двумя обязательными поправками, иначе — гарантированный брак:\n4.1. Компенсация усадки: у высокомарганцовистой стали усадка 2,6–3,0 %, то есть модель должна быть крупнее детали примерно на 40 мм на каждые 1500 мм длины. Копия «один в один» с готовой детали не встанет в карман.\n4.2. Компенсация износа: съеденный зуб восстанавливается только по неизношенным зонам — по краям плиты, по зонам под клиньями и по симметрии профиля. Требовать от изготовителя показать восстановленный профиль в CAD с указанием, откуда взята каждая базовая линия.\n4.3. Формальный запрет: не отправлять изношенную деталь в Китай как «мастер-модель» без цифровой модели на руках. Иначе геометрия остаётся у поставщика, а заказчик привязан к нему навсегда. Сканируем в России, отдаём модель, деталь оставляем.\nТочность процесса: заявляемый китайскими изготовителями допуск по посадочным поверхностям ±1,5 мм, требование к плоскостности стыков отливки — не более 3 мм.\n\nШАГ 5. Фотограмметрия — резервный и разведочный метод.\nДаёт 0,3–1,0 мм при съёмке с двумя-тремя калиброванными масштабными базами (карбоновые линейки), кодированными маркерами и 150–300 кадрами. Годится для: кожухов и ограждений, общей компоновки, предварительной оценки до приезда сканировщика, фиксации состояния детали «как снята». Не годится для: посадочных мест, болтовых отверстий, клиновых пазов, любых поверхностей с бликами и глубоких карманов. Стоимость — фактически стоимость смены работника с зеркальной камерой плюс лицензия обработки; отдельной услугой её нанимать нецелесообразно.\n\nШАГ 6. Оформление заказа у китайского изготовителя.\n6.1. Отбор ведём по одному признаку: поставщик уже делал эту деталь. Проверяемые кандидаты: Zoremining — в каталоге числятся AA-273-1917M10 / AA-273-1917M10M (то самое семейство 273-1917); Sunrise Machinery — в номенклатуре модель 38X58 и позиция 1149591 «DIE, STA JAW, Telsmith 3858», плюс родственные номера 273-1417 и 273-2017; Miningspareparts (Цюйчжоу) — плиты Iron Giant 44x48 (WG-273-918 — 3 242 кг, XG-273-918 — 3 800 кг).\n6.2. Первое письмо не содержит ни моделей, ни фото — только номера деталей и вопрос: «Изготавливали ли вы эту позицию ранее? Есть ли модель/оснастка? Пришлите фото отливки, лист контроля размеров и отгрузочные документы по прошлой поставке». Ответ с фотографией готовой отливки с этим номером и есть требуемое доказательство. Отсутствие ответа по существу — отказ от кандидата.\n6.3. Для позиций, которых у поставщика нет: работаем по образцу/облаку точек. Услуга публично заявлена у WUYI SLON («Customization from Samples», «On-Site Scanning», «Precise Digital Duplicate», 1,40–1,80 USD/кг, MOQ 10 кг, срок 1 месяц), у GUBT (Чэнду) и у Tycosen. Комплект передачи: STEP + STL, контрольный эскиз PDF с 8–12 размерами и допусками, фото детали с масштабной линейкой, результаты спектрального анализа и твёрдости, требование материала (Mn18Cr2 или Mn22Cr2 по согласованию).\n6.4. Условия договора, без которых не заказывать: оснастка (модель) изготавливается за счёт поставщика, но право на цифровую модель остаётся у заказчика; предпроизводственный отчёт FAI с картой замеров по КИМ до заливки серии; сертификат по химсоставу (спектрометр) и протокол термообработки на каждую плавку; фотофиксация отливки с шаблоном профиля; приёмка по контрольным размерам, в первую очередь по толщине в карманах и по клиновым пазам; штраф за отклонение по посадочным поверхностям свыше согласованного допуска; первая поставка — одна деталь под примерку, серия — только после установки.\n6.5. Порядок запуска: сначала заказываются простые позиции (кожух маховика 1050402, ограждение шкива 1064057, клинья, зажим, седло) — по ним риск минимален и проверяется дисциплина поставщика; плиты и распорная плита — вторым заказом; вал 1082397, корпус подшипника A-277-619 и шестерня B1-18-1179 — только после того, как поставщик подтверждён на предыдущих партиях.",
+   "notes": "Ранжирование способов по надёжности: (1) обмер новой запасной детали со склада — единственный источник исходного профиля и толщины; (2) сканирование изношенной при плановой замене, обязательно вместе с сопрягаемыми узлами; (3) съём интерфейсов с рамы/питмана; (4) литьё по образцу с двойной компенсацией (усадка + износ); (5) фотограмметрия — только как разведка и для наружных ограждений.\n\nЧего не даёт ни один из пяти способов и что нужно закрывать отдельно: твёрдость и режим термообработки (переносной твердомер по снятой детали), химсостав (спектральный анализ стружки), посадочные допуски вала и подшипниковых гнёзд (восстанавливаются от обозначения подшипника и ГОСТ 3325, а не от скана), параметры зубчатого зацепления шестерни B1-18-1179 (зубоизмерение, не сканирование), внутренние рёбра и полости литых корпусов (эндоскоп или разрезание выбракованной детали).\n\nКритические расхождения, требующие разрешения до заказа:\n1. Заводской спецлист J3858 даёт зев 38 in x 60 in (965 x 1524 мм), в задании указано 38x58 (965 x 1473 мм). Ширина плиты — размер, ошибка в котором обнуляет всю партию.\n2. Существуют две линейки с индексом 3858: Iron Giant / J3858 и Hydra-Jaw H3858 (последняя фигурирует в номенклатуре HCMP). Номера деталей семейства 273-19xx должны быть привязаны к конкретному серийному номеру машины.\n3. Sunrise указывает для 3858 номер 1149591 (DIE, STA JAW) — иная система нумерации, чем 273-1917 у заказчика. Возможны разные поколения машины; расхождение проверяется по серийному номеру.\n\nОтдельно по риску утраты геометрии: распорная плита B1-273-1723 / ZF-273-1922 — предохранительный элемент. Её нельзя копировать «как есть» без понимания расчётного усилия разрушения: точная копия геометрии при другом материале превращает предохранитель либо в неразрушаемую деталь (тогда ломается рама), либо в расходник, ломающийся под нагрузкой. По этой позиции требовать от поставщика подтверждение материала и, желательно, ссылку на прежние поставки, а не только совпадение размеров. Кроме того, у J3858 перегрузка снимается гидравлической системой сброса, а не изломом толкателя — конструктив узла надо сверить с фактической машиной.\n\nОрганизационное правило, которое стоит ввести немедленно и которое стоит дешевле любого сканирования: ни одна новая запчасть не уходит в машину без предварительного 3D-скана. Каждая установленная без обмера деталь — потерянный эталон, который потом придётся восстанавливать по изношенному остатку.\n\nЧто не проверено и заявлено как «не найдено»: массы конкретных деталей DA-273-1917W, DD-273-1917W, FA-273-1903W, FA-273-1917, EA-273-1917, EB-273-1917, B1-273-1723, ZF-273-1922, CN-273-1923, CP-273-1923, 1082397, A-277-619, BA-277-619, BB-277-619, B1-18-1179, 1050402, 1064057 — в открытых источниках не найдены; приведены только массы аналогичных плит соседних типоразмеров как порядковый ориентир. Каталог деталей 3858 доступен только за регистрационной стеной Scribd — обход не выполнялся. Страница Wujing (wjcrusherparts.com) вернула HTTP 503, поставщик не проверен. Прайсы на реверс-инжиниринг у китайских изготовителей публично не опубликованы — указанные 1,40–1,80 USD/кг относятся к серийным изнашиваемым отливкам из марганцовистой стали и не включают изготовление оснастки."
+  },
+  {
+   "topic": "взаимозаменяемость",
+   "facts": [
+    {
+     "item": "Telsmith 3858 — загрузочное отверстие (глубина камеры x ширина камеры)",
+     "value": "965 x 1473 мм (38 x 58 дюйма)",
+     "source": "Telsmith / Astec, Product Overview (официальный обзорный каталог), раздел Jaw Crushers: «MODEL 3858 (965MM X 1,473MM)»",
+     "url": "https://crushingandscreening.com/uploads/2020/02/Telsmith-Product-Overview.pdf"
+    },
+    {
+     "item": "Telsmith 3258 — загрузочное отверстие (единственная модель с той же шириной камеры, что и 3858)",
+     "value": "813 x 1473 мм; ширина камеры совпадает с 3858 (1473 мм), глубина меньше на 152 мм",
+     "source": "Telsmith / Astec, Product Overview: «MODEL 3258 (813MM X 1,473MM)»",
+     "url": "https://crushingandscreening.com/uploads/2020/02/Telsmith-Product-Overview.pdf"
+    },
+    {
+     "item": "Состав серии Iron Giant у Telsmith (уточнение к формулировке заказчика)",
+     "value": "Iron Giant = только 4448 (1118 x 1219 мм) и 5060 (1270 x 1524 мм). Модель 3858 в серию Iron Giant по каталогу не входит и описана отдельной позицией",
+     "source": "Telsmith / Astec, Product Overview: «IRON GIANT SERIES ... Available in two sizes: 4448 (1,118mm x 1,219mm), 5060 (1,270mm x 1,524mm)»",
+     "url": "https://crushingandscreening.com/uploads/2020/02/Telsmith-Product-Overview.pdf"
+    },
+    {
+     "item": "Metso Nordberg C125 — глубина x ширина камеры",
+     "value": "950 x 1250 мм",
+     "source": "Metso, Nordberg C Series jaw crusher wear parts Handbook (3795-10-18), таблица «Feed opening depth / Cavity width»",
+     "url": "https://www.metso.com/globalassets/saleshub/documents---episerver/handbook-wear-parts-c-series-3795-en-lowres.pdf"
+    },
+    {
+     "item": "Metso Nordberg C130 — глубина x ширина камеры",
+     "value": "1000 x 1300 мм",
+     "source": "Metso, Wear parts Handbook C Series, та же таблица; подтверждено брошюрой C Series (Nominal feed opening: width 1300 мм, depth 1000 мм)",
+     "url": "https://www.metso.com/globalassets/saleshub/documents---episerver/handbook-wear-parts-c-series-3795-en-lowres.pdf"
+    },
+    {
+     "item": "Metso C140 / C145 / C150 / C160 — ширина камеры (ближайшие к 1473 мм соседи по линейке)",
+     "value": "C140 1070 x 1400; C145 1100 x 1400; C150 1200 x 1400; C160 1200 x 1600 мм",
+     "source": "Metso, Wear parts Handbook C Series, таблица «Feed opening depth / Cavity width»",
+     "url": "https://www.metso.com/globalassets/saleshub/documents---episerver/handbook-wear-parts-c-series-3795-en-lowres.pdf"
+    },
+    {
+     "item": "Расхождение по ширине камеры Telsmith 3858 против Metso",
+     "value": "C125 −223 мм; C130 −173 мм; C140/C145/C150 −73 мм; C160 +127 мм. Ни одного совпадения",
+     "source": "Расчёт по данным Telsmith Product Overview и Metso Wear parts Handbook",
+     "url": "https://www.metso.com/globalassets/saleshub/documents---episerver/handbook-wear-parts-c-series-3795-en-lowres.pdf"
+    },
+    {
+     "item": "Sandvik CJ613 — загрузочное отверстие и масса распорной плиты",
+     "value": "1300 x 1130 мм; распорная плита 420 кг; подвижная щека в сборе 22 500 кг",
+     "source": "Sandvik, Technical specification JAW CRUSHER CJ SERIES CJ613 (таблицы PERFORMANCE и WEIGHTS)",
+     "url": "https://www.mining.sandvik/globalassets/products/stationary-crushers-and-screens/pdf/cj613-specification-sheet-english.pdf"
+    },
+    {
+     "item": "Sandvik CJ615 — загрузочное отверстие и масса распорной плиты",
+     "value": "1500 x 1070 мм; распорная плита 800 кг; подвижная щека в сборе 22 500 кг",
+     "source": "Sandvik, Technical specification JAW CRUSHER CJ SERIES CJ615 (таблицы PERFORMANCE и WEIGHTS)",
+     "url": "https://www.mining.sandvik/globalassets/products/stationary-crushers-and-screens/pdf/cj615-specification-sheet-english.pdf"
+    },
+    {
+     "item": "Расхождение Telsmith 3858 против Sandvik",
+     "value": "CJ615: ширина +27 мм (1500 против 1473), глубина +105 мм (1070 против 965). CJ613: ширина −173 мм, глубина +165 мм",
+     "source": "Расчёт по спецификациям Sandvik CJ613/CJ615 и каталогу Telsmith",
+     "url": "https://www.mining.sandvik/globalassets/products/stationary-crushers-and-screens/pdf/cj615-specification-sheet-english.pdf"
+    },
+    {
+     "item": "Terex Pegson XR400 — загрузочное отверстие",
+     "value": "1100 x 650 мм",
+     "source": "Terex Pegson, XR400 Specification, раздел JAW CRUSHER: «Feed opening: 1100 x 650 mm»",
+     "url": "https://www.abbaplanthire.co.uk/wp-content/uploads/2017/06/pegson-xr400-spec-sheet.pdf"
+    },
+    {
+     "item": "Kleemann MOBICAT MC 110 EVO2 — вход дробилки",
+     "value": "1118 x 711 мм (44 x 28 дюйма)",
+     "source": "Wirtgen Group / Kleemann, страница продукта MC 110 EVO2, технические характеристики (Crusher inlet width/depth)",
+     "url": "https://www.wirtgen-group.com/ocs/en-us/kleemann/mc-110-evo2-94932-p/"
+    },
+    {
+     "item": "Kleemann MOBICAT MC 120 (Zi) PRO — вход дробилки",
+     "value": "1219 x 813 мм (48 x 32 дюйма)",
+     "source": "Wirtgen Group / Kleemann, страница продукта MC 120 PRO, технические характеристики",
+     "url": "https://wirtgen-group.com/ocs/en-us/kleemann/mc-120-zi-pro-139-p"
+    },
+    {
+     "item": "Китайская PE-900x1200 — загрузочное отверстие",
+     "value": "900 x 1200 мм (зев 900, ширина камеры 1200), макс. кусок 750 мм, масса 52 т",
+     "source": "Baichy Machinery, описание PE900X1200",
+     "url": "https://www.baichy.com/Enterprise_news/Jaw_crusher_PE900X1200.html"
+    },
+    {
+     "item": "Китайская PE-1000x1200 — загрузочное отверстие",
+     "value": "1000 x 1200 мм, макс. кусок 850 мм, разгрузочная щель 195–265 мм, масса 51 т",
+     "source": "YiFan Machinery, спецификация PE1000x1200",
+     "url": "http://www.yifancrusher.com/PE1000-1200-Jaw-Crusher.html"
+    },
+    {
+     "item": "Ряд типоразмеров PE — ширины камер, доступные в стандарте",
+     "value": "1060, 1200, 1500 мм (PE-750x1060, PE-800x1060, PE-900x1200, PE-1000x1200, PE-1200x1500). Ширины 1473 мм в ряду PE нет",
+     "source": "MarsCrusher, сводная таблица серии PE (модель / загрузочное отверстие / макс. кусок / щель / производительность / мощность / масса)",
+     "url": "https://marscrusher.com/products/pe-jaw-crusher"
+    },
+    {
+     "item": "Архитектура крепления футеровок Metso C Series",
+     "value": "Фиксация клиньями: у части моделей клинья сверху футеровки, у C105/C3055 — за футеровкой; регулировка щели двумя клиньями без прокладок; за плитами ставятся защитные подкладные плиты (для C125 — не штатно)",
+     "source": "Metso, Nordberg C Series jaw crusher wear parts Handbook, разделы «When to change jaw dies» и «Complementary products»",
+     "url": "https://www.metso.com/globalassets/saleshub/documents---episerver/handbook-wear-parts-c-series-3795-en-lowres.pdf"
+    },
+    {
+     "item": "Архитектура крепления футеровок Telsmith (серия Iron Giant, ближайший конструктивный аналог 3858)",
+     "value": "Гидравлический клиновой замок регулировки, усиленные футеровки, сменные подкладные износные плиты за футеровкой, щёки из стали AR400",
+     "source": "Astec/Telsmith, описание Iron Giant Series Jaw Crushers (характеристики серии)",
+     "url": "https://manuquipinc.com/wp-content/uploads/2020/09/Iron-Giant-Series-Jaw-Crushers-1.pdf"
+    },
+    {
+     "item": "Длина распорной плиты Telsmith 3858 (B1-273-1723 / ZF-273-1922), межосевое расстояние седла CN-273-1923",
+     "value": "не найдено — в открытых источниках размерных данных нет; каталог запчастей 3858 доступен только на платном хостинге, обход не выполнялся",
+     "source": "Поиск по номерам B1-273-1723, ZF-273-1922, CN-273-1923 — публичных спецификаций с размерами не обнаружено",
+     "url": "https://www.mining.sandvik/globalassets/products/stationary-crushers-and-screens/pdf/cj615-specification-sheet-english.pdf"
+    },
+    {
+     "item": "Масса и габариты футеровок Telsmith 3858 (DA/DD-273-1917W, FA-273-1903W, FA/EA/EB-273-1917)",
+     "value": "не найдено в открытых источниках",
+     "source": "Поиск по номерам 273-1917 / 273-1903 у аутмаркет-поставщиков: позиция найдена только как каталожный номер без размеров и массы",
+     "url": "https://zoremining.com/product/detail/store/16869/Telsmith%20crusher"
+    },
+    {
+     "item": "Подтверждение, что номер 273-1917 живёт в аутмаркет-номенклатуре Китая",
+     "value": "Позиция AA-273-1917M10M «Jaw plate, Telsmith crusher» присутствует в каталоге китайского поставщика (масса в карточке не указана)",
+     "source": "Zore Mining (泽锐科技), карточка Telsmith crusher",
+     "url": "https://zoremining.com/product/detail/store/16869/Telsmith%20crusher"
+    },
+    {
+     "item": "Китайский изготовитель, прямо заявляющий модель 3858 в перечне освоенных",
+     "value": "Jiangsu Hyton Mechanical Equipment Co., Ltd. (Наньтун, Цзянсу): перечень моделей футеровок «H2238 H2550 H3244 H3450 Tel2550 Tel3858 Tel4244 Tel5060 Tel5260», материал Mn18Cr2, литьё, ISO 9001",
+     "source": "Jiangsu Hyton, карточка товара «High Manganese Steel Mn18Cr2 Jaw Plate Suit Telsmith» на Made-in-China",
+     "url": "https://hytongroup.en.made-in-china.com/product/NCOfDhRVldUu/China-High-Manganese-Steel-Mn18cr2-Jaw-Plate-Suit-Telsmith-Jci-Kpi-Jaw-Crusher-Wear-Parts.html"
+    },
+    {
+     "item": "Заявленная точность промышленного 3D-сканирования при обратном инжиниринге дробильной футеровки (заявление аутмаркет-литейщика, не независимая проверка)",
+     "value": "до 0,025 мм; сканирование снятых с эксплуатации деталей, контроль посадочных мест распорной плиты по цифровой модели",
+     "source": "Tycosen, «Crusher Wear Parts: Precision & Reverse Engineering»",
+     "url": "https://tycosen.com/mining-spare-parts-with-reverse-engineering/"
+    }
+   ],
+   "method": "Геометрия берётся не с работающей машины, а с металла, который уже лежит на складе и в отвале, и с самого поставщика. Пять шагов, ни один не требует остановки дробилки.\n\n1. Инвентаризация складского комплекта. У первичной дробилки рудника практически всегда лежит страховой запас футеровок, клиньев и распорной плиты. Новая деталь со склада — это эталон геометрии, полностью эквивалентный чертежу. Проверить наличие по номерам DA-273-1917W, DD-273-1917W, FA-273-1903W, FA-273-1917, EA-273-1917, EB-273-1917, B1-273-1723, ZF-273-1922, CN-273-1923, CP-273-1923 и по бирке/маркировке отливки.\n\n2. Отработанные детали в отвале. Изношены только зубья и рабочая поверхность. Тыльная опорная плоскость, клиновые пазы, монтажные и подъёмные отверстия, посадочные поверхности седла и распорной плиты износу не подвергаются — по ним восстанавливается вся присоединительная геометрия. Для распорной плиты и седла отработанная деталь даёт длину, радиусы и профиль торцов практически без потерь.\n\n3. Оцифровка. Ручной синелазерный 3D-сканер по складской и/или снятой детали, привязка к контрольным линейным промерам штангенрейсмасом и рулеткой (длина, ширина, толщина у торцов, шаг и глубина клинового паза, диаметры и координаты отверстий), плюс контрольное взвешивание отливки. Скан + 4–6 ручных размеров + масса дают закрытый комплект приёмочных признаков. Это работа на складской площадке, машина при этом крушит.\n\n4. Перенос бремени доказательства на изготовителя. Всем кандидатам ставится одно условие: не «сделаем по вашему чертежу», а «пришлите вашу сохранённую модель/чертёж на 3858 и фото оснастки с номером». Далее их размеры сверяются с эталоном по п.1–3. Кто не может прислать геометрию первым — отсеивается. По открытым данным заявку такого рода можно адресовать Jiangsu Hyton (Наньтун), у которого Tel3858 прямо указан в перечне освоенных моделей, и поставщикам, у которых номер 273-1917 уже стоит в номенклатуре (Zore Mining). Требовать: фото модели/кокиля с литейным номером, отгрузочные документы по этой позиции за прошлые периоды, паспортную массу отливки, марку стали (Mn18Cr2 / Mn22Cr2) и сертификат на химсостав и твёрдость.\n\n5. Плановая перефутеровка как окно съёмки. Футеровки меняются по регламенту; специально останавливать машину не нужно — достаточно включить в наряд на ближайшую замену получасовую операцию: фотограмметрия камеры (20–30 кадров с масштабной линейкой), промер межщёчного расстояния, замер зева по новым плитам, промер посадки распорной плиты. Это фиксирует то, чего нет ни на складе, ни в отвале, — геометрию корпуса.\n\nДополнительно: каталог запчастей на модель 3858 существует и содержит номенклатуру с видами в разборе. Запрос обезличенного parts book у сервисной службы не является закупкой у дистрибьютора и не нарушает условие «только аутмаркет» — он нужен только для корректной идентификации позиций перед рассылкой запросов.",
+   "notes": "Прямой ответ на главный вопрос: модели, чьи футеровки встанут на Telsmith 3858 без переделки, среди перечисленных нет. Ни одной.\n\nОснование — ширина дробильной камеры. У 3858 она 1473 мм. В рядах сравниваемых машин такой ширины не существует: Metso — 1250 (C125), 1300 (C130), 1400 (C140/C145/C150), 1600 (C160); Sandvik — 1300 (CJ613), 1500 (CJ615); китайские PE — 1060, 1200, 1500; мобильные Terex Pegson XR400 — 1100, Kleemann MC110 — 1118, MC120 — 1219. Ширина футеровки — размер, который нельзя компенсировать: плита уже камеры даёт незакрытые полосы литой станины по бокам и разбивает щёки, плита шире камеры физически не заходит между боковыми стенками.\n\nРазбор по позициям.\n— Metso C125 (950x1250) и C130 (1000x1300). Единственные, у кого совпадает порядок глубины камеры (расхождение с 965 мм всего 15 и 35 мм), и именно поэтому они провоцируют ошибочный вывод «почти то же самое». По ширине это −223 и −173 мм. Не подходит категорически, доработке не подлежит.\n— Metso C150/C145/C140 (ширина 1400). Ближе всех из Metso по ширине, но −73 мм; при этом глубина 1070–1200 мм против 965, то есть плита ещё и длиннее. Не подходит.\n— Metso C160 (1200x1600). Шире на 127 мм. Не подходит.\n— Sandvik CJ613 (1300x1130). Уже на 173 мм и глубже на 165 мм. Не подходит.\n— Sandvik CJ615 (1500x1070). Формально самое близкое совпадение по ширине во всей выборке: +27 мм. Но по глубине камеры +105 мм, то есть комплект плит другой длины и другого угла захвата; кроме того, ширина 1500 мм означает, что плита не войдёт между щёками 1473-мм камеры — доработка сводилась бы к строжке манганистой стали по боковым кромкам, что для аустенитной Mn18 нетехнологично и снимает наклёпанный слой. Не подходит.\n— Terex Pegson XR/Premiertrak и Kleemann MC110/MC120. Это мобильные машины другого класса: 1100x650, 1118x711, 1219x813. Разница по обоим размерам от 250 до 800 мм. Сравнение бессмысленно, рассматривать не нужно.\n— Китайские PE-900x1200 и PE-1000x1200. Ширина камеры 1200 мм при зеве 900 и 1000 мм. Уже на 273 мм. Не подходит. PE-1200x1500 совпадает по ширине с CJ615 (1500 мм, +27 мм к 3858), но зев 1200 мм — плита длиннее на четверть. Не подходит.\n\nВторой критерий, который закрывает вопрос даже там, где ширина случайно сошлась бы: футеровка определяется не зевом, а присоединительной геометрией — профилем тыльной опорной поверхности, конфигурацией клинового замка, положением монтажных и подъёмных отверстий. Архитектуры разные: у Metso C Series фиксация клиньями сверху плиты (у C105/C3055 — за плитой) и регулировка щели двумя клиньями без прокладок; у Telsmith — гидравлический клиновой замок и сменные подкладные износные плиты за футеровкой. Плиты этих двух школ не садятся друг к другу принципиально, независимо от размера зева.\n\nРаспорная плита. Межмарочный подбор исключён: это деталь, задающая кинематику и ход щеки. Наглядная иллюстрация масштаба разброса — у одного производителя в соседних типоразмерах масса распорной плиты отличается вдвое: Sandvik CJ613 — 420 кг, CJ615 — 800 кг. Размерных данных по B1-273-1723 / ZF-273-1922 и седлу CN-273-1923 в открытых источниках нет — не найдено; сравнивать не с чем и подбирать наугад нельзя.\n\nЕдинственное реальное совпадение найдено внутри самой линейки Telsmith: модель 3258 имеет ту же ширину камеры 1473 мм при зеве 813 мм. Это значит, что плиты 3258 совпадают с плитами 3858 по ширине, но отличаются по длине (глубина камеры меньше на 152 мм). Практический вывод из этого один и он важен для закупки: поставщик, у которого сохранена оснастка на 3258, с высокой вероятностью работает в той же размерной группе и той же схеме крепления, что и 3858 — его стоит спрашивать в первую очередь, но как кандидата на изготовление по своей модели 3858, а не как источник готовой взаимозаменяемой детали.\n\nИтог для заказчика: путь «подобрать деталь от другой машины» по данной выборке закрыт. Остаётся первый путь — поставщик, который уже делал именно 3858 и имеет модель/оснастку. По открытым данным такие есть: Jiangsu Hyton указывает Tel3858 в перечне освоенных моделей футеровок, номер 273-1917 присутствует в номенклатуре китайского поставщика Zore Mining. Заявления не проверены независимо — это заявления продавцов, и проверяются они по процедуре из раздела «метод»: фото оснастки с литейным номером, прошлые отгрузки, паспортная масса, сертификаты, и сверка их размеров с деталью со склада или из отвала.\n\nОграничения работы: платные хостинги каталогов не открывались, капчи и пейволлы не обходились; все выводы построены на официальных спецификациях производителей и открытых каталожных карточках. Габаритные и присоединительные размеры самих футеровок 3858 в открытом доступе отсутствуют — там, где их нет, прямо указано «не найдено», а не подставлено оценочное значение."
+  }
+ ],
+ "plan": {
+  "classes": [
+   {
+    "cls": "Футеровки и клинья щёк (DA-273-1917W, DD-273-1917W, FA-273-1903W, FA-273-1917, EA-273-1917, EB-273-1917)",
+    "feasible": "Да. Единственный класс, где есть прямые каталожные попадания в номерную группу 273-1917 именно по 38x58 и полный набор заводских масс, позволяющий проверить поставщика без единого чертежа.",
+    "route": "1) Поставщики с подтверждённой привязкой к машине: Zhejiang Rock Machinery / cncrusher.net — позиции AA-273-1917M10, AA-273-1917M10M, AB-273-1917_SPL, AB-273-1917_SPL-M, у каждой в карточке проставлено «Crusher Type: Telsmith 38x58» (https://www.cncrusher.net/english/parts-database/R47,telsmith-crusher/14); Sunrise Machinery — строка каталога «1149591 | DIE, STA JAW | Telsmith 3858» и отдельная строка типоразмера 38X58 (https://www.sunrisespares.com/telsmith-crusher-parts/). Каталожно 3858 называют также Hyton (Ма'аньшань, позиция «Fixed and Movable Jaw Plate Suit to Telsmith Tel3858») и GTEK («3858 Hydraulic» в перечне охвата при заявленном парке моделей >350 типов щёковых плит). Bogvik — единственный, кто публикует реестры имеющихся модельных комплектов (pattern list, >10 000 моделей) и сообщил об изготовлении плит Telsmith 4448. 2) Путь «подобрать от другой машины» по футеровкам закрыт: ширины камеры 1473 мм нет ни у Metso (1250 / 1300 / 1400 / 1600 мм), ни у Sandvik (1300 / 1500), ни в ряду PE (1060 / 1200 / 1500), ни у Kleemann MC110/MC120 (1118 / 1219) и Pegson XR400 (1100). Единственное совпадение по ширине — Telsmith 3258 (1473 x 813 мм): плита той же ширины, но короче на 152 мм; поставщик с оснасткой на 3258 — кандидат на изготовление в той же размерной группе и той же схеме крепления, но не источник готовой взаимозаменяемой детали. 3) Собственный эталон без остановки машины: складской резерв (новая деталь — единственный источник ИСХОДНОГО профиля зуба и толщины), изношенный комплект в отвале (тыл, клиновые пазы, отверстия, габарит сохраняются), сканирование в окно уже запланированной перефутеровки. 4) Осторожно с индексом: базовое число 273-1917 общее, а буквенный префикс — исполнение. У заказчика подвижная плита FA-273-1917, в архивном заводском перечне 38X58D массы даны на AA-273-1917 (swing) и AB-273-1917 (stationary), у Mining Element по 38x58 значатся FA-273-1917 (MOVABLE) и FB-273-1917 (FIXED), у китайцев — AA/AB с суффиксами M10, M10M, _SPL, _SPL-M. Совпадение базового числа не означает совпадения рабочей поверхности: массы использовать как порядковый фильтр, посадочную геометрию — по своему эталону.",
+    "critical_dims": [
+     "Ширина плиты по камере. Габаритная схема проспекта J3858: 60,0 in = 1524 мм между боковыми щёками, 62,0 in = 1575 мм внутри главной рамы; обозначение модели и Astec Product Overview дают 1473 мм. Расхождение 51 мм закрывается обмером ДО заказа — ошибка здесь обнуляет всю партию.",
+     "Клиновые пазы подвижной футеровки под DA-273-1917W: угол, глубина, шаг, положение по высоте. Крепление 3858 — нижний клин плюс верхняя прижимная плита, болтов сквозь футеровку нет («eliminates bolts through jaw die»).",
+     "Болтовой рисунок прижимных плит FA-273-1903W (верх, 247 кг) и FD-273-1903 (низ, 195 кг) и сменного болтового седла-носка (bolt-in replaceable toe): координаты, диаметр, глубина и шаг резьбы.",
+     "Тыльная опорная плоскость и её плоскостность: литейное требование по стыковым поверхностям марганцовистой отливки — не более 3 мм. Кривой тыл даёт точечный контакт и раскол плиты в первые смены.",
+     "Толщина в зоне карманов и высота посадочной части — определяют, сядет ли плита под клин и хватит ли хода прижима.",
+     "Масса отливки при заявленной марке стали как приёмочный признак: AA-273-1917 (подвижная) 3517 кг / 7753 lbs, AB-273-1917 (неподвижная) 2962 кг / 6530 lbs, EA-273-1917 236 кг (2 шт.), EB-273-1917 172 кг (2 шт.), DA-273-1917W 129 кг (2 шт.), DD-273-1917W 142 кг, FA-273-1903W 247 кг; комплект 8137 кг (архив telsmith.com, перечень «38X58D Jaw Crushers»). Отклонение свыше ±5 % — другая геометрия или другая ревизия."
+    ],
+    "forgiving_dims": [
+     "Профиль зуба (шаг, высота, форма гребня): под одну машину штатно существует несколько исполнений — в группе 273-1917 сосуществуют M10, M10M, _SPL, _SPL-M. Профиль выбирается под руду и требуемую гранулометрию, а не копируется буквально.",
+     "Марка марганцовистой стали в пределах ряда: завод указывает Hadfields Manganese, аутмаркет предлагает Mn13Cr2 / Mn18Cr2 / Mn22Cr2. Влияет на ресурс, а не на посадку — фиксируется в заказе отдельной строкой.",
+     "Литейные уклоны, радиусы, необработанные нерабочие поверхности, форма рёбер вне зон контакта.",
+     "Боковые щёки EA/EB-273-1917: по проспекту J3858 материал AR400, то есть прокат и резка, а не литьё — допуск свободнее, изготовитель может быть любой, включая местный РМЦ.",
+     "Проушины и отверстия строповки — допускается переработать под собственную оснастку монтажа."
+    ],
+    "ask_supplier": [
+     "Назовите массу отливки и марку стали по AA-273-1917 / AB-273-1917 (или по вашим индексам AA-273-1917M10, AB-273-1917_SPL). Свои цифры (3517 и 2962 кг) при этом не сообщать — это и есть проверка.",
+     "Пришлите фотографию вашей модельной оснастки или ранее отгруженной отливки, где читается литой номер серии 273-, с датой и номером заказа.",
+     "Год последней заливки по этой позиции и сколько комплектов отгружено — так отличается живая позиция от строки, перенесённой из чужого каталога.",
+     "Пришлите протокол размерного контроля (dimensional inspection report) ранее изготовленной детали этого номера. Это и есть геометрия, которую передадут добровольно и бесплатно; кто не может дать протокол — деталь не делал.",
+     "Какие исполнения профиля вы делаете под 273-1917 (M10 / M10M / _SPL / _SPL-M) и чем они отличаются по шагу и высоте зуба.",
+     "Под какое крепление ваша плита — под клин плюс прижимную плиту или под болты сквозь плиту? Для 3858 верный ответ первый; неверный ответ отсеивает поставщика сразу."
+    ],
+    "risk": "Главный риск — перепечатанный каталог вместо производства. Карточка «Telsmith 25X36 38X58 Jaw Crusher Spare Parts» дословно тиражирована минимум на трёх витринах (Wuyi Slon, wjcrusherparts.com, crusher-stone.com/COHESION), а массы по одному и тому же номеру XG-273-918 у разных продавцов расходятся втрое: 1626, 3075, 3242, 3755, 3800 кг. Ни одной фотографии отливки 3858 с читаемым литым номером не найдено ни у кого — максимум доказательства на сегодня каталожный. Снимается тремя независимыми фильтрами: заявленная масса против заводской ±5 %, фото оснастки или отливки с литым номером, протокол обмера ранее изготовленной детали. Плюс ступенчатая квалификация: первый заказ — клин DA-273-1917W (129 кг) или нижняя щека EB-273-1917 (172 кг) с примеркой по месту, и только после подтверждённой посадки — подвижная плита в 3,5 т."
+   },
+   {
+    "cls": "Распорная плита, седло и зажимы (B1-273-1723, ZF-273-1922, CN-273-1923, CP-273-1923)",
+    "feasible": "Да, но с оговорками: готовой геометрии нет ни у кого. Ни B1-273-1723, ни ZF-273-1922, ни CN-273-1923, ни CP-273-1923 не найдены ни у одного китайского изготовителя — распорные плиты Telsmith предлагаются обезличенно, без номеров (например, Wuyi Slon: «Parker Osborn Telsmith Toggle Jaw Plate»). Класс закрывается не поиском готовой позиции, а собственным эталоном плюс изготовлением под жёстким контролем материала и сечения.",
+    "route": "1) Заводские массы известны и служат первым приёмочным признаком: распорная плита B1-273-1723 — 342 кг (755 lbs) по детальному перечню «38X58D Jaw Crushers», раздел ADJUSTING GROUP, и 318 кг (700 lbs) по сводной таблице «Jaw Crusher Weights» (завод сам объявляет допуск ±10 %); седло со стороны балки E-273-1723 — 97 кг; седло со стороны подвижной щеки D-273-1723 — 91 кг. 2) Геометрия снимается с изношенной или складской детали: у распорной плиты и седла износ сосредоточен в зонах контакта, а длина, профиль и радиусы торцов восстанавливаются практически без потерь. Сканировать обязательно комплектом «плита + оба седла + гнёзда», иначе межосевое и радиусы не сойдутся. 3) Изготовитель выбирается не по каталогу, а по способности работать по образцу и цифровой модели: Wuyi Slon (три литейные линии, максимальная отливка 10 т, публично заявленные «Customization from Samples», «On-Site Scanning», «Precise Digital Duplicate»), Bogvik (реестр модельных комплектов), Mining Spare Parts (заявленный архив исходных чертежей — требовать подтверждения). 4) Жёсткий запрет: не отправлять изношенный оригинал в Китай как мастер-модель, не имея цифровой модели на руках — иначе геометрия остаётся у поставщика и заказчик привязан к нему навсегда. Сканируем в России, отдаём STEP + контрольный эскиз, деталь оставляем у себя.",
+    "critical_dims": [
+     "Длина между опорными поверхностями седел — прямо задаёт выходную щель и гранулометрию. Диапазон CSS у 3858 — 100–229 мм (4–9 in); регулировка по проспекту «Hydraulic Adjust with Shims», то есть небольшая ошибка по длине теоретически добирается набором прокладок (группа AC/AD/AE-273-1922), но диапазон набора конечен и должен быть проверен на фактической машине, а не предположен.",
+     "Сечение в опасном месте плюс материал и термообработка — задают усилие разрушения. Точная копия геометрии в другом материале превращает деталь либо в неразрушаемый упор (нагрузку принимают рама и вал), либо в расходник, ломающийся под штатной нагрузкой.",
+     "Профиль и радиус опорных торцов плиты и сопряжённый радиус гнезда седла CN-273-1923: контакт линейный/цилиндрический, ошибка радиуса даёт кромочный контакт и выкрашивание за считанные смены.",
+     "Присоединительные размеры зажима CP-273-1923: резьба, ход, усилие затяжки распорного узла и поджатие пружинного механизма.",
+     "Масса как контроль подлинности геометрии: 342 кг по B1-273-1723. Масштаб цены ошибки виден на чужом примере — у Sandvik в соседних типоразмерах масса распорной плиты отличается вдвое: CJ613 — 420 кг, CJ615 — 800 кг."
+    ],
+    "forgiving_dims": [
+     "Форма средней части — перемычки, рёбра, окна облегчения — вне силового контура и вне опасного сечения.",
+     "Литейные уклоны, необработанные поверхности, окраска, консервация.",
+     "Масса в пределах ±10 %: сам завод даёт по этой позиции две разные цифры (755 и 700 lbs) и объявляет допуск ±10 %.",
+     "Технология изготовления — литьё или сварно-фрезерованная конструкция — при подтверждённых сечении, материале, твёрдости и геометрии опорных торцов.",
+     "Отделка нерабочих кромок, наличие рым-болтов и монтажных приливов."
+    ],
+    "ask_supplier": [
+     "Делали ли вы распорную плиту или седло для Telsmith 3858, 3258 или 3648? Назовите номер детали и массу отливки.",
+     "Есть ли сохранённая модель или цифровая геометрия по узлу 273-1723 / 273-1922 / 273-1923? Если да — год последней заливки.",
+     "Какой материал и термообработку применяете для toggle plate и на какое усилие рассчитано опасное сечение — покажите расчёт или ссылку на прежние поставки.",
+     "Пришлите протокол обмера и сертификат на химсостав и твёрдость ранее изготовленной распорной плиты любой модели.",
+     "Возьмётесь ли изготовить по нашей цифровой модели (STEP + контрольный эскиз с допусками), без передачи вам оригинала детали, и за чей счёт оснастка при условии, что права на модель остаются у заказчика?"
+    ],
+    "risk": "Риск двусторонний: ошибка по длине уводит выходную щель и гранулометрию (частично, но не полностью компенсируется набором прокладок), ошибка по сечению или материалу — либо ломает раму и вал, либо превращает деталь в расходник. Отдельно и до всякого заказа: у 3858 защита от недробимого гидравлическая — сброс при 4600 ± 50 psi = 317 ± 3,4 бар («Overload Protection: Hydraulic Relief»), а не через излом распорки. Значит, конструктив узла надо сверить с фактической машиной и понять, является ли распорная плита предохранительным элементом или силовым; от этого зависит вся постановка требований к материалу. Снимается: обмер снятой детали комплектом с сёдлами и гнёздами, подтверждение материала и твёрдости сертификатом на плавку, приёмка по длине и сечению, первая поставка — одна деталь с примеркой и контрольным замером щели."
+   },
+   {
+    "cls": "Эксцентриковый вал, подшипники, корпуса и крышки (1082397, A-277-619, BA-277-619, BB-277-619)",
+    "feasible": "Нет — в постановке «без чертежей и без доступа к узлу» класс не закрывается. По валу 1082397, корпусу A-277-619 и крышкам BA/BB-277-619 в открытых источниках нет ничего: ни размеров, ни масс (в заводской таблице «Jaw Crusher Weights» ячейки «Eccentric Shaft», «Main Frame», «Toggle Beam» для 3858 пустые, тогда как для 3648 и 4448 заполнены), ни кросс-референса подшипников Messinger по 38x58 (в их перечне по щековым Telsmith есть 10x21, 10x30, 15x38, 20x36, 25x40, 30x42, 42x48, 50x60 — позиции 38x58 нет), ни одного китайского изготовителя с подтверждённым опытом по этим номерам. Закрывается только через плановую ревизию узла и через обозначение подшипника.",
+    "route": "1) Идти от подшипника, а не от скана. Снять обозначение установленного подшипника — через смотровой лючок, с упаковки складского ЗИП или из журнала закупок; каталог производителя подшипника однозначно даёт диаметр и ширину посадочного места, посадки назначаются по ГОСТ 3325. Это делается на работающей машине. 2) Плановая ревизия подшипникового узла — единственный легальный момент прямого обмера: расточка корпуса, соосность гнёзд, плоскость разъёма крышек, каналы смазки. Планировать заранее, с подрядчиком по сканированию на площадке. 3) Это другой класс поставщика: поковка, термообработка, шлифовка, расточка — не марганцовистая литейка. Ни один из найденных изготовителей футеровок сюда не годится, искать надо отдельно и по другим признакам (станочный парк, КИМ, протоколы UT/MPI). 4) Законный обходной путь получения эталона — б/у узел с другой 3858 (машина серийная, на вторичном рынке есть): покупка вала или корпуса как эталона дешевле любого простоя и одновременно даёт холодный резерв. 5) Планирование подъёма и такелажа: подвижная щека в сборе с валом — 16 247 кг (35 820 lbs), маховик-шкив 1769 кг, маховик 1515 кг, минимальный монтажный зазор для выемки подвижной щеки 343 мм (13,5 in).",
+    "critical_dims": [
+     "Диаметры и длины шеек вала под подшипники с посадочными допусками — восстанавливаются не сканированием, а от обозначения подшипника и назначаются по ГОСТ 3325. Скан даёт форму, но не посадку.",
+     "Эксцентриситет (ход) вала — задаёт ход подвижной щеки, производительность и нагрузку на раму; ошибка не компенсируется ничем.",
+     "Расточка корпуса A-277-619, соосность гнёзд, плоскость разъёма и посадка крышек BA-277-619 / BB-277-619, посадочные места уплотнений.",
+     "Каналы и точки подвода смазки: система циркуляционная — бак 76 л (20 gal), насос ≈3,7 кВт (5 hp), делитель потока на каждый подшипник; непроработанный или смещённый канал означает выплавленный подшипник.",
+     "Посадки маховика-шкива (1769 кг) и маховика (1515 кг), шпонка или конус, радиальное и торцевое биение — на 260 об/мин дисбаланс разрушает узел.",
+     "Материал поковки, твёрдость и отсутствие внутренних дефектов — обязательны UT и MPI по всей длине."
+    ],
+    "forgiving_dims": [
+     "Наружные необработанные поверхности вала и корпуса, литейные рёбра, форма приливов и бобышек.",
+     "Тип и производитель уплотнения при сохранении посадочного диаметра, ширины и температурного исполнения.",
+     "Крепёж, рым-болты и такелажные элементы крышек.",
+     "Масса, окраска, консервация, конструкция маслосборных карманов вне зоны каналов."
+    ],
+    "ask_supplier": [
+     "Изготавливали ли вы эксцентриковые валы щековых дробилок этого класса (подвижная щека в сборе с валом — 16,2 т)? Назовите модель машины, массу вала и диаметры шеек.",
+     "Станочный парк: максимальная длина и диаметр шлифования шеек, наличие КИМ и её поле контроля.",
+     "Пришлите FAI и сертификат на поковку (химсостав, механика, протоколы UT и MPI) по ранее изготовленному валу.",
+     "Работаете ли по обозначению подшипника — мы даём тип подшипника и посадку по ГОСТ 3325, вы даёте вал — или требуете чертёж? Ответ «пришлите чертёж» означает отказ.",
+     "По корпусу и крышкам: есть ли опыт расточки корпусов подшипников с контролем соосности, покажите протокол."
+    ],
+    "risk": "Здесь риск метрологический, а не геометрический: отклонение в сотые доли миллиметра по посадке разрушает подшипник и вал за смену, а замена узла — это остановка на недели и 16 т на подъёме при монтажном зазоре 343 мм. Снимается единственным способом: ничего не заказывать до плановой ревизии узла; размеры вести от обозначения подшипника, а не от скана; принимать только по FAI с картой замеров КИМ; первым заказом взять крышки BA/BB-277-619 как наименее ответственную позицию и на них проверить дисциплину поставщика; параллельно рассматривать покупку б/у узла с разукомплектованной 3858 как эталона и одновременно как холодного резерва."
+   },
+   {
+    "cls": "Шестерня привода B1-18-1179",
+    "feasible": "Да, с оговорками — но первым делом подтвердить принадлежность номера машине. У 3858 привод клиноремённый: двигатель 186 кВт (250 hp), маховик-шкив 1676 x 406 мм (66 x 16 in), 260 об/мин; зубчатой передачи в приводе дробилки заводской проспект J3858 не показывает. Номер B1-18-1179 лежит в серии «18-», в которой у Jiangsu Hyton числится пара шестерня/трибка B1-18-1167 для конусной Telsmith 44SBS. То есть это либо деталь смежного узла (например, привода насосной группы), либо позиция другой машины парка. Вопрос решается по заводскому каталогу 3858 и по фактическому осмотру узла — до рассылки запросов.",
+    "route": "После подтверждения принадлежности: геометрию зубчатого колеса восстанавливают не сканированием, а зубоизмерением с последующим расчётом. Снимаются число зубьев, наружный диаметр, длина общей нормали (или размер по роликам), угол профиля, ширина венца, угол наклона зуба и посадочные размеры — по ним однозначно определяются модуль, угол зацепления и коэффициент коррекции. Работа выполняется на снятой или складской детали, машину останавливать не требуется. Адресный кандидат найден ровно один и он конкретен: Jiangsu Hyton (Наньтун), публикующий позицию «Ht-Ba-272-2636 / B1-18-1167 — pinion and gear, Telsmith 44SBS» — его следует спрашивать именно по номеру B1-18-1179, поскольку это та же номерная серия. Обязательное условие заказа: шестерня и сопряжённая трибка меняются и принимаются парой.",
+    "critical_dims": [
+     "Модуль, число зубьев, угол зацепления и угол наклона зуба — задают само зацепление; ошибка означает, что пара физически не соберётся.",
+     "Межосевое расстояние по факту машины и боковой зазор; длина общей нормали или размер по роликам (фактическая толщина зуба) — задают зазор и пятно контакта.",
+     "Посадочный диаметр, шпоночный паз или конус, торцевое и радиальное биение относительно посадки.",
+     "Ширина венца, твёрдость поверхности и глубина упрочнённого слоя (цементация или ТВЧ) — определяют ресурс.",
+     "Степень точности изготовления по ГОСТ 1643 — оговаривается в заказе явной строкой, иначе поставщик сделает по своей внутренней норме."
+    ],
+    "forgiving_dims": [
+     "Конструкция ступицы и диска вне посадочных поверхностей: рёбра, облегчающие отверстия, форма перехода.",
+     "Марка стали — при подтверждённой твёрдости, прокаливаемости и результатах контроля.",
+     "Масса, окраска, способ балансировки и маркировки.",
+     "Форма и расположение технологических отверстий под съёмник."
+    ],
+    "ask_supplier": [
+     "Изготавливали ли вы B1-18-1167 (пара шестерня и трибка Telsmith 44SBS)? Есть ли в вашей номенклатуре B1-18-1179 и под какую машину она у вас проходит?",
+     "Какое зуборезное и зубошлифовальное оборудование, максимальные модуль и диаметр обработки?",
+     "Пришлите протокол зубоконтроля (профиль, направление зуба, шаг, биение) по ранее изготовленной паре.",
+     "Поставляете ли комплектом с сопряжённой деталью и даёте ли на пару общий протокол пятна контакта?",
+     "Материал, режим термообработки, твёрдость поверхности и сердцевины — с сертификатом на плавку."
+    ],
+    "risk": "Два риска. Первый — ошибка идентификации: заказать зубчатое колесо, которого в приводе этой машины нет, и потерять 3–6 месяцев и бюджет; снимается сверкой по заводскому каталогу 3858 и осмотром фактического узла до рассылки. Второй — установка новой шестерни к изношенной ответной: пара прирабатывается, одиночная замена даёт ускоренный износ, шум и повторный выход из строя; снимается заменой парой и обязательным протоколом зубоконтроля. Изготовление «по образцу» без зубоизмерения не заказывать ни при каких условиях: скан изношенного зуба не даёт ни модуля, ни исходной толщины."
+   },
+   {
+    "cls": "Сварные ограждения и кожухи (кожух маховика 1050402, ограждение шкива 1064057)",
+    "feasible": "Да, и это единственный класс, где требование «поставщик уже делал такую деталь» можно вообще не предъявлять. Это сварные листовые конструкции, а не литьё; геометрия снимается снаружи на работающей машине — рулеткой, шаблонами и фотограмметрией (типичная точность менее 1 мм при съёмке с масштабными базами, чего для ограждения избыточно достаточно), при соблюдении требований охраны труда по расстоянию до вращающихся частей.",
+    "route": "Контрольные базы известны из заводских документов и не требуют обмера: шкив 1676 x 406 мм (66 x 16 in), 260 об/мин, габаритная схема машины 4115 / 3620 / 3200 / 3048 / 2515 / 2083 мм с заводским округлением до 1/4 дюйма (6,35 мм). Порядок: обмер снаружи и фотофиксация → эскиз → фанерный или картонный шаблон присоединительного фланца → примерка по месту до окраски → изготовление. Изготовление местное: ремонтно-механический цех рудника или ближайший сварочный подрядчик. Возить эти позиции из Китая нецелесообразно — объём большой, цена низкая, срок и логистика те же, что у литья, а по открытым данным номеров 1050402 и 1064057 нет ни у одного китайского поставщика вообще.",
+    "critical_dims": [
+     "Присоединительный болтовой рисунок к раме и кронштейнам: координаты, диаметры и глубина отверстий — единственное, что обязано совпасть точно.",
+     "Внутренние зазоры до вращающихся частей: шкив диаметром 1676 мм и шириной обода 406 мм плюс ветви ремней; касание ограждения на 260 об/мин — авария.",
+     "Габарит по высоте и вылету: возможность снять ограждение без демонтажа шкива и сохранённый доступ к точкам смазки и смотровым лючкам.",
+     "Соблюдение требований по ограждению вращающихся частей: сплошность или допустимый размер ячейки, отсутствие проёмов, через которые возможен доступ к движущимся элементам."
+    ],
+    "forgiving_dims": [
+     "Толщина листа и марка стали — допускается поднять относительно оригинала.",
+     "Рёбра жёсткости, тип петель, замков и ручек; конструкцию можно сделать разъёмной для удобства обслуживания.",
+     "Масса, окраска, форма нерабочих поверхностей, схема раскроя.",
+     "Способ изготовления: сварка вместо гибки и наоборот."
+    ],
+    "ask_supplier": [
+     "Готовую геометрию здесь не ищем — главный вопрос местному подрядчику: работаете ли по эскизу и шаблону с примеркой по месту до окраски?",
+     "Толщина и марка листа, вид антикоррозионного покрытия, исполнение по низким температурам.",
+     "Срок изготовления и возможность подгонки на площадке при монтаже.",
+     "Если позиция всё же включается в китайский запрос: есть ли у вас в номенклатуре 1050402 и 1064057? По открытым данным их нет ни у кого, отрицательный ответ ожидаем и сам по себе нормален — он лишь подтверждает, что класс надо закрывать локально."
+    ],
+    "risk": "Риск не производственный, а организационный: эти позиции легко «прицепить» к общему китайскому заказу, где они займут деньги, объём и срок наравне с литьём и затянут поставку критичных деталей. Второй риск — ошибка в присоединительных отверстиях при обмере снаружи работающей машины. Оба снимаются одинаково: вывести класс из китайского пакета в местное изготовление и обязательно делать шаблон присоединительного фланца с примеркой по месту до окраски."
+   },
+   {
+    "cls": "Гидравлика и покупные изделия (станция регулировки и разгрузки, система смазки, подшипники, уплотнения, РВД)",
+    "feasible": "Да, полностью и вне аутмаркета. Этот класс по определению не требует чертежей: цилиндры, насосы, клапаны, РВД, уплотнения, подшипники и масла подбираются по маркировке на изделии и по параметрам системы, а не по геометрии детали. Здесь же лежит ключ к классу вала: обозначение подшипника закрывает посадочные размеры шеек и расточки корпуса.",
+    "route": "Параметры системы 3858 документированы заводом и достаточны для подбора. Гидравлика регулировки щели, разгрузки от недробимого и очистки камеры: бак 227 л (60 gal), электродвигатель насоса 15 кВт (20 hp), давление разгрузки 4600 ± 50 psi = 317 ± 3,4 бар, регулировка «Hydraulic Adjust with Shims», диапазон CSS 100–229 мм. Смазка: циркуляционная масляная, бак 76 л (20 gal), насос ≈3,7 кВт (5 hp), делитель потока на каждый подшипник, масло не ниже 10 °C для пуска и не ниже 21 °C для дробления, не выше 60 °C. Порядок работ: сфотографировать шильдики и маркировки всех покупных изделий на работающей машине (безопасно, остановки не требует), составить ведомость соответствий, подобрать по каталогам действующих производителей, включая российских, в северном исполнении для Таймыра, и заложить в ЗИП. Подшипники — только по маркировке с установленного изделия или из журнала закупок.",
+    "critical_dims": [
+     "Давление настройки разгрузки 317 ± 3,4 бар (4600 ± 50 psi) — это единственная защита рамы и эксцентрикового вала от недробимого; настройка «на глаз» после замены клапана дороже всего остального списка вместе взятого.",
+     "Ход, усилие и присоединительные размеры цилиндра регулировки щели (проушины, оси, резьбы портов) в увязке с диапазоном CSS 100–229 мм и толщиной набора прокладок.",
+     "Обозначение подшипника целиком, включая класс точности и группу радиального зазора (C3/C4) — по нему определяются посадки по ГОСТ 3325.",
+     "Размерный ряд уплотнений (внутренний и наружный диаметр, высота) и материал по рабочей температуре и типу масла.",
+     "Производительность и давление насоса смазки, настройка делителя потока, температурные пороги масла 10 / 21 / 60 °C — для Таймыра это означает обязательный подогрев бака и контроль пуска."
+    ],
+    "forgiving_dims": [
+     "Бренд и страна изготовителя насоса, клапана, цилиндра при совпадении параметров и присоединительных размеров.",
+     "Длина и трассировка РВД, тип фитинга при сохранении типоразмера, давления и температурного исполнения.",
+     "Исполнение бака, фильтров и теплообменника; марка масла в пределах требуемого класса вязкости и допуска.",
+     "Компоновка станции, цвет, тип и расположение манометров, схема пультов."
+    ],
+    "ask_supplier": [
+     "Подберёте ли по фотографии шильдика и параметрам системы (бак 227 л, привод 15 кВт, разгрузка 317 бар) без чертежа и дадите ли письменное подтверждение соответствия?",
+     "Есть ли исполнение для Крайнего Севера: РВД, уплотнения, масло, подогрев бака, пусковые характеристики при отрицательных температурах?",
+     "Даёте ли протокол стендового испытания предохранительного клапана с фиксацией настройки 317 ± 3,4 бар?",
+     "По подшипникам: подтвердите обозначение, класс точности и группу радиального зазора, дайте сертификат подлинности и происхождения.",
+     "Срок поставки и наличие на складе в РФ — этот класс обязан закрываться неделями, а не месяцами, и именно он держит машину на ходу между поставками литья."
+    ],
+    "risk": "Главный риск — потеря защиты машины: заменённый предохранительный клапан без стендовой настройки на 317 ± 3,4 бар оставляет раму и эксцентриковый вал без единственной защиты от недробимого, а последствия дороже всей остальной номенклатуры. Второй риск — контрафактные подшипники и уплотнения, третий — неморозостойкие РВД и масло, отказывающие при пуске на Таймыре. Снимается протоколом стендовой настройки клапана, закупкой подшипников через каналы с сертификатом подлинности и явным требованием северного исполнения в спецификации; при этом маркировку подшипника зафиксировать письменно и хранить — она же понадобится для восстановления посадок вала и корпуса."
+   }
+  ],
+  "summary": "Начинать нужно не с рассылки запросов, а с идентификации машины: снять с шильдика серийный номер и год, зафиксировать фактическую схему крепления футеровок (клин плюс прижимная плита либо болты сквозь плиту) и закрыть обмером расхождение по ширине камеры — обозначение модели и Astec Product Overview дают 1473 мм, а заводской проспект J3858 и его габаритная схема — 1524 мм между щёками при 1575 мм внутри рамы; ошибка в этом размере обнуляет любую партию, и попутно снимается терминологическая ловушка: 3858 по заводской классификации относится к гидравлическому ряду, а не к серии Iron Giant (Iron Giant — только 4448 и 5060), поэтому в переписке нужны формулировки «Telsmith 3858 / 38x58» и номера деталей. Параллельно провести инвентаризацию склада и отвала: каждая новая деталь на складе — это готовый эталон с исходным профилем зуба и толщиной, а изношенная сохраняет всю присоединительную геометрию — тыльную плоскость, клиновые пазы, отверстия и опорные поверхности седел. Ввести правило, которое дешевле любого сканирования: ни одна новая запчасть не уходит в машину без предварительного 3D-обмера — подрядчик с выездом в Норильск существует (PNM, сканеры ATOS 5), и у самого «Норникеля» работает собственный цикл обратного проектирования. Ближайшую плановую перефутеровку превратить в сеанс обмера: она уже запланирована и простоя не добавляет, а по регламенту 20–30 минут на позицию за одно окно закрывается вся группа 273-1917 и 273-1903 — сканировать обязательно парами «деталь плюс её посадочное место». Одновременно разослать одно проверочное письмо пяти-шести адресатам (Zhejiang Rock Machinery, Sunrise Machinery, GTEK, Bogvik, Hyton, Wuyi Slon) — не запрос цены, а запрос доказательства: масса отливки, фото модельной оснастки или отгруженной детали с читаемым литым номером, год последней заливки, протокол размерного контроля; отсутствие ответа по существу за два-три дня само по себе является ответом. Отбор вести по массе: заводские значения известны точно (3517 и 2962 кг по плитам, 236 и 172 кг по щёкам, 129 кг по клину, 342 кг по распорной плите), и отклонение свыше ±5 % при той же марке стали означает другую геометрию или другую ревизию — предложение отсеивается до всяких переговоров. Первый заказ строить ступенчато: клин DA-273-1917W (129 кг) и нижняя щека EB-273-1917 (172 кг) с примеркой по месту, затем футеровки и распорная плита, и только после подтверждённой посадки — вал, корпус подшипника и шестерня, причём вал и подшипниковый узел заказывать исключительно после плановой ревизии, ведя размеры от обозначения подшипника, а не от скана. Два класса вывести из китайского пакета немедленно, они не зависят от литейщиков: ограждения 1050402 и 1064057 отдать в местное изготовление по эскизу и шаблону с примеркой, а гидравлику, подшипники и уплотнения подобрать по маркировке и параметрам системы (227 л, 15 кВт, разгрузка 317 ± 3,4 бар) в северном исполнении. И последнее по порядку, но первое по последствиям: не ждать поломки — заказные позиции по этой машине идут до 27 недель, поэтому страховой комплект футеровок, клиньев и распорной плиты должен лежать на складе до того, как понадобится, а каждая уходящая в машину деталь предварительно оцифрована, чтобы отсутствие чертежей больше никогда не было ограничением."
+ }
+}

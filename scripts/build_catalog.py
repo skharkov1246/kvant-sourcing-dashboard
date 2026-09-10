@@ -50,6 +50,7 @@ SENSITIVE_MARKERS = [
      "выручка и маржа сделок"),
     (re.compile(r'"(executor|assessment|eng|prof)"\s*:', re.I), "оценки и данные сотрудников"),
     (re.compile(r'"(importer|exporter)"\s*:\s*"', re.I), "участники внешнеэкономических сделок"),
+    (re.compile(r'"(price_rub|sum_rub)"\s*:', re.I), "договорные цены контрагентов"),
 ]
 
 
