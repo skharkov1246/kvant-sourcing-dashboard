@@ -36,7 +36,7 @@ def build(db_path: str, top: int) -> str:
                  row_number() OVER (PARTITION BY pn_key ORDER BY price_med) rn
           FROM supplier_prices WHERE price_med > 0)
         SELECT c.pn, c.brand, c.name, c.seg, c.mentions, c.deals, c.won, c.lost, c.cur,
-               c.price_min, c.price_med, c.price_max, c.sup_med, c.our_med, c.markup,
+               c.price_p25, c.price_med, c.price_p75, c.sup_med, c.our_med, c.markup,
                b.supplier, c.customers, c.last_seen, b.price_med, b.cur
         FROM catalog_items c
         LEFT JOIN best b ON b.pn_key = c.pn_key AND b.rn = 1
