@@ -29,9 +29,9 @@ from pathlib import Path
 
 import requests
 
-from fetch_files import CHUNK
+from fetch_files import CHUNK, extract
 from parse_archives import fresh_links, members, webhook
-from reparse import ocr_image, ocr_pdf
+from reparse import ocr_image, ocr_ooxml_media, ocr_pdf
 
 warnings.filterwarnings("ignore")
 
@@ -44,6 +44,10 @@ _CACHE: dict[str, tuple] = {}
 _CACHE_LOCK = threading.Lock()
 SCAN_EXT = (".pdf",)
 IMAGE_EXT = (".jpg", ".jpeg", ".png", ".tif", ".tiff")
+# docx и xlsx внутри архивов разбирались старым кодом, до починки разбора XML и
+# распознавания вложенных картинок: их надо перечитать тем же путём, что и
+# самостоятельные вложения.
+OOXML_EXT = (".docx", ".xlsx")
 
 
 def member_index(fid: str) -> int:
@@ -60,7 +64,7 @@ def member_index(fid: str) -> int:
 def run(db_path: str, limit: int | None, workers: int, kind: str) -> dict:
     con = sqlite3.connect(db_path, timeout=300)
     con.execute("PRAGMA busy_timeout=300000")
-    exts = SCAN_EXT if kind == "scan" else IMAGE_EXT
+    exts = {"scan": SCAN_EXT, "image": IMAGE_EXT, "ooxml": OOXML_EXT}[kind]
     cond = " OR ".join("lower(filename) LIKE ?" for _ in exts)
     rows = con.execute(f"""SELECT fid, deal_id, filename FROM files
                            WHERE status='empty' AND fid LIKE '%#%' AND ({cond})""",
@@ -122,6 +126,11 @@ def run(db_path: str, limit: int | None, workers: int, kind: str) -> dict:
                         if kind == "scan":
                             text, pages = ocr_pdf(blob)
                             ext = "ocr-pdf"
+                        elif kind == "ooxml":
+                            text, pages, ext = extract(blob, _filename)
+                            if len(text.strip()) < MIN_OCR_CHARS:
+                                text, pages = ocr_ooxml_media(blob)
+                                ext = "ocr-ooxml"
                         else:
                             text, pages = ocr_image(blob), 0
                             ext = "ocr-image"
@@ -177,7 +186,7 @@ def run(db_path: str, limit: int | None, workers: int, kind: str) -> dict:
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--db", default=str(Path(__file__).resolve().parent / "kvant.db"))
-    ap.add_argument("--kind", default="scan", choices=("scan", "image"))
+    ap.add_argument("--kind", default="scan", choices=("scan", "image", "ooxml"))
     ap.add_argument("--limit", type=int, default=None)
     ap.add_argument("--workers", type=int, default=3)
     a = ap.parse_args()
