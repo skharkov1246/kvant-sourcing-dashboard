@@ -55,6 +55,10 @@ def sniff(b: bytes) -> str:
     head = b.lstrip()[:16].lower()
     if head.startswith(b"<!doctype htm") or head.startswith(b"<html"):
         return "html"
+    if head.startswith(b"<?xml"):
+        return "xml"
+    if head.startswith(b"{\\rtf"):
+        return "rtf"
     return "other"
 
 
@@ -141,6 +145,93 @@ def text_doc(b: bytes) -> str:
             return ""
 
 
+def text_via_office(b: bytes, suffix: str) -> str:
+    """Последний рубеж для старых книг и документов: конвертация LibreOffice.
+
+    xlrd читает только классический BIFF и на части настоящих .xls падает с
+    AssertionError. Такие файлы — примерно пятая часть остатка, и среди них
+    формы RFQ заказчиков, поэтому терять их нельзя."""
+    import shutil
+    import subprocess
+    import tempfile
+    soffice = shutil.which("soffice") or shutil.which("libreoffice")
+    if not soffice:
+        return ""
+    with tempfile.TemporaryDirectory() as td:
+        src = Path(td) / ("in" + suffix)
+        src.write_bytes(b)
+        want = "csv" if suffix in (".xls", ".xlsx") else "txt:Text"
+        try:
+            subprocess.run([soffice, "--headless", "--norestore", f"-env:UserInstallation=file://{td}/p",
+                            "--convert-to", want, "--outdir", td, str(src)],
+                           capture_output=True, timeout=180)
+        except Exception:
+            return ""
+        for out in Path(td).glob("in.*"):
+            if out.suffix.lower() in (".csv", ".txt"):
+                return out.read_text(encoding="utf-8", errors="ignore")
+    return ""
+
+
+_ASCII_RUN = re.compile(rb"[\x20-\x7e\r\n\t]{12,}")
+_UTF16_RUN = re.compile(rb"(?:[\x20-\x7e]\x00){12,}")
+
+
+def text_ole_strings(b: bytes) -> str:
+    """Текстовые строки прямо из OLE-контейнера — когда его не берёт никто.
+
+    Часть файлов с расширением .xls и .doc — контейнеры OLE вообще без потоков
+    Workbook и WordDocument: ни xlrd, ни LibreOffice их не открывают («source
+    file could not be loaded»). Внутри при этом лежит обычный текст технических
+    требований. Для полнотекстового поиска и разбора номенклатуры этого хватает,
+    поэтому выбираем читаемые последовательности напрямую."""
+    parts = [m.group(0).decode("cp1251", "ignore") for m in _ASCII_RUN.finditer(b)]
+    parts += [m.group(0).decode("utf-16le", "ignore") for m in _UTF16_RUN.finditer(b)]
+    text = "\n".join(s.strip() for s in parts if len(s.strip()) >= 12)
+    # мусорные последовательности вида BFRRRRGJNNEEB отсеиваем по доле гласных
+    keep = [ln for ln in text.split("\n")
+            if sum(ch.lower() in "aeiouаеёиоуыэюя" for ch in ln) >= max(2, len(ln) // 12)]
+    return "\n".join(keep)
+
+
+def text_spreadsheetml(b: bytes) -> tuple[str, int]:
+    """Книга Excel в формате XML Spreadsheet 2003.
+
+    Так выгружает 1С: файл называется .xls, а внутри XML. Сигнатуры OLE у него
+    нет, xlrd на нём падает, и до этого разбора такие книги целиком уходили в
+    «пусто» — а это спецификации заказчика."""
+    import xml.etree.ElementTree as ET
+    root = ET.fromstring(b.decode("utf-8", "ignore"))
+    ns = "{urn:schemas-microsoft-com:office:spreadsheet}"
+    out, sheets = [], 0
+    for ws in root.iter(f"{ns}Worksheet"):
+        sheets += 1
+        out.append(f"### лист: {ws.get(f'{ns}Name') or sheets}")
+        for row in ws.iter(f"{ns}Row"):
+            cells = []
+            for cell in row.iter(f"{ns}Cell"):
+                data = cell.find(f"{ns}Data")
+                val = "".join(data.itertext()).strip() if data is not None else ""
+                if val:
+                    cells.append(val)
+            if cells:
+                out.append(" | ".join(cells))
+            if sum(len(x) for x in out) > MAX_CHARS:
+                break
+    return "\n".join(out), sheets
+
+
+def text_rtf(b: bytes) -> str:
+    """Текст из RTF: часть .doc на деле сохранена в этом формате."""
+    s = b.decode("cp1251", "ignore")
+    s = re.sub(r"\\'([0-9a-fA-F]{2})", lambda m: bytes([int(m.group(1), 16)]).decode("cp1251", "ignore"), s)
+    s = re.sub(r"\\u(-?\d+)\s?\??", lambda m: chr(int(m.group(1)) % 65536), s)
+    s = re.sub(r"\{\\\*[^{}]*\}", " ", s)          # служебные группы целиком
+    s = re.sub(r"\\[a-zA-Z]+-?\d* ?", " ", s)       # управляющие слова
+    s = s.replace("{", " ").replace("}", " ")
+    return s
+
+
 def extract(b: bytes, name: str) -> tuple[str, int, str]:
     """(текст, число страниц/листов, вид). Пустой текст — не ошибка: бывают сканы."""
     kind = sniff(b)
@@ -166,7 +257,18 @@ def extract(b: bytes, name: str) -> tuple[str, int, str]:
             except Exception:
                 pass
             t = text_doc(b)
-            return (_clean(t), 0, "doc") if t.strip() else ("", 0, "ole")
+            if t.strip():
+                return _clean(t), 0, "doc"
+            t = text_via_office(b, ".xls" if ext in ("xls", "xlsm") else ".doc")
+            if t.strip():
+                return _clean(t), 0, "office"
+            t = text_ole_strings(b)
+            return (_clean(t), 0, "ole-strings") if len(t.strip()) > 200 else ("", 0, "ole")
+        if kind == "xml":
+            t, n = text_spreadsheetml(b)
+            return _clean(t), n, "xml-xls"
+        if kind == "rtf":
+            return _clean(text_rtf(b)), 0, "rtf"
         if kind == "html":
             return _clean(re.sub(r"(?is)<(script|style)[^>]*>.*?</\1>|<[^>]+>", " ", b.decode("utf-8", "ignore"))), 0, "html"
         if kind == "other" and ext in ("txt", "csv", "xml", "json", "eml"):
