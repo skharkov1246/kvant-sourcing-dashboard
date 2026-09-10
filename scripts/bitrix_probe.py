@@ -1,22 +1,24 @@
-"""CI-зонд: сделка ЛУКОЙЛ-ЭНЕРГОСЕТИ — какие КП реально получены от поставщиков.
+"""CI-зонд: все запросы СП-166 по нашей номенклатуре за период — где реально есть КП.
 
-Вопрос владельца (10.09.2026): сорсинг утверждает, что по сделке Энергосети
-прокотированы ВСЕ позиции и на всё есть живое КП. Снимок gt/data/bitrix_gt.json
-это подтвердить не может: он собирается по ключевым словам ГТУ и сделок
-«Энергосети» не содержит вовсе.
+Вопрос владельца (10.09.2026): сорсинг говорит, что по теме прокотировано всё.
+Первый зонд смотрел только сделки со словом «Энергосети» и нашёл 197 запросов,
+из них с КП 30. Но запросы по этой же номенклатуре могли идти вне этих сделок —
+отдельными сделками, общими RFQ по брендам, без привязки к родителю.
 
-Зонд отвечает на три вопроса, читая Bitrix напрямую:
-  1. Какие сделки по ЛУКОЙЛ-ЭНЕРГОСЕТИ есть и на какую сумму.
-  2. Сколько под ними запросов СП-166 «Запросы поставщикам», по каким поставщикам.
-  3. В каких стадиях эти запросы — то есть по скольким КП РЕАЛЬНО получено
-     (Selected / Not Selected / Price at Work) против отказов и молчания
-     (Отказ в КП / Ответ не получен / Request Sent).
+Этот зонд снимает ограничение по сделке: тянет ВСЕ записи СП-166 за период
+и размечает их по брендам из двух наших листов (ЛУКОЙЛ-Энергосети 1561 строка
+и ЛУКОЙЛ-НВН 528 строк). Отвечает: сколько запросов по теме, в каких стадиях,
+по каким сделкам, кому слали и сколько КП реально получено.
 
-Печатает компактную сводку в лог Actions. Секреты не выводит.
+Стадии Selected / Not Selected / Price at Work = КП от поставщика получено.
+Отказ в КП / Ответ не получен / Не подошло по технике = нет.
+
+Печатает сводку в лог Actions. Секреты не выводит.
 Запуск: Actions → Bitrix probe → Run workflow (ветка с этой версией скрипта).
 """
 from __future__ import annotations
 
+import os
 import sys
 from collections import Counter, defaultdict
 from pathlib import Path
@@ -27,8 +29,26 @@ sys.path.insert(0, str(ROOT))
 from bitrix_client import BitrixClient  # noqa: E402
 from config import SPA_ENTITY_TYPE_ID, Settings  # noqa: E402
 
-DEAL_KEYWORDS = ["ЭНЕРГОСЕТИ", "Энергосети", "энергосети", "ЛУКОЙЛ-ЭНЕРГО"]
-# стадии СП-166, означающие, что КП от поставщика получено
+PERIOD_FROM = os.getenv("PROBE_FROM", "2026-01-01")
+
+# бренды из листов Энергосети и НВН — по ним размечаем «наша тема»
+TOPICS = {
+    "Solar/Taurus": ["solar", "солар", "taurus", "тауру", "centaur", "titan 130", "mars 100"],
+    "Siemens SGT": ["siemens", "сименс", "sgt", "simatic", "siprotec", "profibus"],
+    "Cummins/ГПЭС": ["cummins", "камминз", "камминс", "qsk", "qsv", "kta", "газопоршн", "гпэс", "гпу"],
+    "Jenbacher/INNIO": ["jenbacher", "енбахер", "innio", "мwm", "mwm"],
+    "Bently Nevada": ["bently", "бентли", "proximit", "3500"],
+    "Fleetguard/фильтры": ["fleetguard", "флитгард", "af25", "lf9", "wf20", "фильтр"],
+    "ABB": ["abb", "асс800", "acs800", "acs880"],
+    "Буровое НВН": ["drillmec", "дриллмек", "nov ", "national oilwell", "tesco", "shaffer",
+                    "bentec", "превентор", "bop", "верхний привод", "top drive", "вибросито"],
+    "SLB/Cameron": ["schlumberger", "cameron", "камерон", "swaco", "vetco", "fmc"],
+    "КИП/автоматика": ["pepperl", "det-tronics", "det tronics", "allen bradley", "wago",
+                       "weidmuller", "harting", "balluff", "баллуф", "scancon", "semikron",
+                       "woodward", "comat", "releco", "auma", "asco", "danfoss", "wandfluh"],
+    "Насосы": ["bornemann", "marflex", "ingersoll", "pedrollo", "pompetravaini", "grundfos"],
+    "ЛУКОЙЛ (прямо)": ["лукойл", "lukoil", "нвн", "нижневолж", "энергосет", "л-эс", "л-нвн"],
+}
 GOT_QUOTE = {"Selected", "Not Selected", "Price at Work"}
 NO_QUOTE = {"Отказ в КП", "Ответ не получен (в срок)", "Не подошло по технике"}
 
@@ -37,131 +57,123 @@ def crm_refs(v) -> list[str]:
     if not v:
         return []
     vals = v if isinstance(v, list) else [v]
-    out = []
-    for x in vals:
-        s = str(x)
-        out.append(s.split("_", 1)[1] if s.startswith("CO_") else s)
-    return out
+    return [(str(x).split("_", 1)[1] if str(x).startswith("CO_") else str(x)) for x in vals]
+
+
+def topics_of(text: str) -> list[str]:
+    t = (text or "").lower()
+    return [name for name, kws in TOPICS.items() if any(k in t for k in kws)]
 
 
 def main() -> int:
     client = BitrixClient(Settings.load().bitrix_webhook_url)
+    print(f"период с {PERIOD_FROM}\n")
 
-    # 1. сделки Энергосети
-    deals: dict[str, dict] = {}
-    for kw in DEAL_KEYWORDS:
-        for d in client.list_paged(
-            "crm.deal.list",
-            {"filter": {"%TITLE": kw},
-             "select": ["ID", "TITLE", "STAGE_ID", "OPPORTUNITY", "CURRENCY_ID",
-                        "COMPANY_ID", "ASSIGNED_BY_ID", "DATE_CREATE"]},
-        ):
-            deals[str(d["ID"])] = d
-    print(f"=== СДЕЛКИ ЭНЕРГОСЕТИ: {len(deals)} ===")
-    for did, d in sorted(deals.items(), key=lambda kv: -int(kv[0])):
-        opp = d.get("OPPORTUNITY") or 0
-        print(f"  {did:>7} | {str(d.get('DATE_CREATE'))[:10]} | {d.get('STAGE_ID'):<24} | "
-              f"{float(opp):>16,.0f} {d.get('CURRENCY_ID') or ''} | {(d.get('TITLE') or '')[:80]}")
-    if not deals:
-        print("  сделок не найдено — проверить ключевые слова")
-        return 0
-
-    # 2. запросы СП-166 под этими сделками
     select = ["id", "title", "stageId", "createdTime", "parentId2", "companyId",
-              "assignedById", "ufCrm18Supplier", "ufCrm18SupplContact", "opportunity"]
-    rfqs: dict[str, dict] = {}
-    ids = list(deals)
-    for i in range(0, len(ids), 50):
-        for r in client.list_items(SPA_ENTITY_TYPE_ID, filter={"parentId2": ids[i:i + 50]}, select=select):
-            rfqs[str(r["id"])] = r
-    for kw in DEAL_KEYWORDS:
-        for r in client.list_items(SPA_ENTITY_TYPE_ID, filter={"%title": kw}, select=select):
-            rfqs[str(r["id"])] = r
-    print(f"\n=== ЗАПРОСОВ СП-166: {len(rfqs)} ===")
+              "assignedById", "ufCrm18Supplier", "opportunity"]
+    items = client.list_items(SPA_ENTITY_TYPE_ID,
+                              filter={">=createdTime": PERIOD_FROM}, select=select)
+    print(f"=== ВСЕГО ЗАПИСЕЙ СП-166 С {PERIOD_FROM}: {len(items)} ===")
 
-    # 3. справочники
     stages: dict[str, str] = {}
     for cat in (24, 0):
         try:
             stages.update(client.spa_stages(SPA_ENTITY_TYPE_ID, cat))
         except Exception:
             pass
+
+    # разметка по темам
+    tagged = []
+    for r in items:
+        tp = topics_of(r.get("title") or "")
+        if tp:
+            tagged.append((r, tp))
+    print(f"из них по НАШЕЙ номенклатуре: {len(tagged)}\n")
+
+    def stage_of(r):
+        return stages.get(str(r.get("stageId")), str(r.get("stageId")))
+
+    # общий разрез по стадиям
+    by_stage = Counter(stage_of(r) for r, _ in tagged)
+    got = sum(n for s, n in by_stage.items() if s in GOT_QUOTE)
+    ref = sum(n for s, n in by_stage.items() if s in NO_QUOTE)
+    other = sum(by_stage.values()) - got - ref
+    print("--- СТАДИИ (по нашей номенклатуре) ---")
+    for s, n in by_stage.most_common():
+        mark = "КП ЕСТЬ " if s in GOT_QUOTE else ("нет КП  " if s in NO_QUOTE else "в работе")
+        print(f"  {n:>5} | {mark} | {s}")
+    tot = sum(by_stage.values()) or 1
+    print(f"\n  КП получено      : {got:>5} ({100 * got / tot:.0f}%)")
+    print(f"  отказ / молчание : {ref:>5} ({100 * ref / tot:.0f}%)")
+    print(f"  в работе, без КП : {other:>5} ({100 * other / tot:.0f}%)")
+
+    # по темам
+    print("\n--- ПО ТЕМАМ: запросов / из них с КП ---")
+    t_all = Counter()
+    t_got = Counter()
+    for r, tps in tagged:
+        g = stage_of(r) in GOT_QUOTE
+        for t in tps:
+            t_all[t] += 1
+            if g:
+                t_got[t] += 1
+    for t, n in t_all.most_common():
+        print(f"  {n:>5} / {t_got[t]:>4} КП  ({100 * t_got[t] / n:>3.0f}%)  {t}")
+
+    # по месяцам
+    print("\n--- ПО МЕСЯЦАМ: запросов / из них с КП ---")
+    m_all = Counter()
+    m_got = Counter()
+    for r, _ in tagged:
+        m = (r.get("createdTime") or "")[:7]
+        m_all[m] += 1
+        if stage_of(r) in GOT_QUOTE:
+            m_got[m] += 1
+    for m in sorted(m_all):
+        print(f"  {m}: {m_all[m]:>5} / {m_got[m]:>4} КП")
+
+    # по сделкам
+    parents = Counter(str(r.get("parentId2") or "—") for r, _ in tagged)
+    p_got = Counter()
+    for r, _ in tagged:
+        if stage_of(r) in GOT_QUOTE:
+            p_got[str(r.get("parentId2") or "—")] += 1
+    top_ids = [d for d, _ in parents.most_common(30) if d not in ("—", "0")]
+    dmap = client.deals_by_ids(top_ids, select=["ID", "TITLE", "STAGE_ID", "OPPORTUNITY", "CURRENCY_ID"]) if top_ids else {}
+    print("\n--- ТОП-30 СДЕЛОК ПО ЧИСЛУ ЗАПРОСОВ ПО НАШЕЙ ТЕМЕ ---")
+    for did, n in parents.most_common(30):
+        d = dmap.get(str(did), {})
+        opp = float(d.get("OPPORTUNITY") or 0)
+        print(f"  {did:>8}: запросов {n:>4}, с КП {p_got[did]:>4} | {opp:>14,.0f} {d.get('CURRENCY_ID') or ''} | "
+              f"{(d.get('TITLE') or ('без привязки' if did == '—' else '?'))[:62]}")
+
+    # поставщики, от кого есть КП
     comp_ids = set()
-    for r in rfqs.values():
+    for r, _ in tagged:
         if r.get("companyId"):
             comp_ids.add(str(r["companyId"]))
         comp_ids.update(crm_refs(r.get("ufCrm18Supplier")))
-    comp_names: dict[str, str] = {}
-    if comp_ids:
-        for c in client.list_paged("crm.company.list",
-                                   {"filter": {"@ID": list(comp_ids)}, "select": ["ID", "TITLE"]}):
-            comp_names[str(c["ID"])] = c.get("TITLE") or str(c["ID"])
-
-    # 4. разбор по стадиям — главный ответ
-    by_stage = Counter()
-    by_deal = defaultdict(Counter)
-    suppliers = Counter()
-    with_price = 0
-    price_sum = 0.0
-    for r in rfqs.values():
-        st = stages.get(str(r.get("stageId")), str(r.get("stageId")))
-        by_stage[st] += 1
-        by_deal[str(r.get("parentId2") or "—")][st] += 1
-        sup = ", ".join(filter(None, (
-            [comp_names.get(str(r.get("companyId") or ""), "")]
-            + [comp_names.get(c, c) for c in crm_refs(r.get("ufCrm18Supplier"))]))) or "—"
-        suppliers[sup] += 1
-        opp = r.get("opportunity")
-        if opp:
-            with_price += 1
-            try:
-                price_sum += float(opp)
-            except (TypeError, ValueError):
-                pass
-
-    print("\n--- СТАДИИ ЗАПРОСОВ (ключ к вопросу «есть ли КП») ---")
-    got = ref = other = 0
-    for st, n in by_stage.most_common():
-        mark = "  КП ЕСТЬ " if st in GOT_QUOTE else ("  нет КП  " if st in NO_QUOTE else "  в работе")
-        print(f"  {n:>5} |{mark}| {st}")
-        if st in GOT_QUOTE:
-            got += n
-        elif st in NO_QUOTE:
-            ref += n
-        else:
-            other += n
-    tot = sum(by_stage.values()) or 1
-    print(f"\n  КП получено      : {got:>5}  ({100 * got / tot:.0f}%)")
-    print(f"  отказ / молчание : {ref:>5}  ({100 * ref / tot:.0f}%)")
-    print(f"  в работе, без КП : {other:>5}  ({100 * other / tot:.0f}%)")
-    print(f"\n  запросов с суммой в карточке: {with_price} из {tot}, итого {price_sum:,.0f}")
-
-    print("\n--- ПО СДЕЛКАМ ---")
-    for did, c in sorted(by_deal.items(), key=lambda kv: -sum(kv[1].values())):
-        g = sum(n for s, n in c.items() if s in GOT_QUOTE)
-        print(f"  сделка {did:>7}: запросов {sum(c.values()):>4}, из них с КП {g:>4} | "
-              f"{(deals.get(did, {}).get('TITLE') or '')[:60]}")
-
-    print("\n--- ТОП-25 ПОСТАВЩИКОВ, КОМУ СЛАЛИ ---")
-    for s, n in suppliers.most_common(25):
-        print(f"  {n:>4}  {s[:88]}")
-
-    print("\n--- ПРИМЕРЫ ЗАПРОСОВ С ПОЛУЧЕННЫМ КП (до 40) ---")
-    shown = 0
-    for r in sorted(rfqs.values(), key=lambda x: int(x["id"])):
-        st = stages.get(str(r.get("stageId")), str(r.get("stageId")))
-        if st not in GOT_QUOTE:
+    names = client.companies_by_ids(list(comp_ids)) if comp_ids else {}
+    sup_got = Counter()
+    for r, _ in tagged:
+        if stage_of(r) not in GOT_QUOTE:
             continue
-        sup = ", ".join(filter(None, (
-            [comp_names.get(str(r.get("companyId") or ""), "")]
-            + [comp_names.get(c, c) for c in crm_refs(r.get("ufCrm18Supplier"))]))) or "—"
-        opp = r.get("opportunity") or 0
-        print(f"  #{r['id']:>7} | {str(r.get('createdTime'))[:10]} | {st:<16} | "
-              f"{float(opp or 0):>14,.0f} | {sup[:32]:<32} | {(r.get('title') or '')[:60]}")
-        shown += 1
-        if shown >= 40:
-            break
-    print(f"\nвсего запросов с КП: {got}")
+        s = ", ".join(dict.fromkeys(filter(None, (
+            [names.get(str(r.get("companyId") or ""), "")]
+            + [names.get(c, c) for c in crm_refs(r.get("ufCrm18Supplier"))])))) or "—"
+        sup_got[s] += 1
+    print(f"\n--- ПОСТАВЩИКИ, ОТ КОГО ЕСТЬ КП: {len(sup_got)} компаний ---")
+    for s, n in sup_got.most_common(40):
+        print(f"  {n:>3}  {s[:92]}")
+
+    print(f"\n--- ВСЕ ЗАПРОСЫ С КП ПО НАШЕЙ ТЕМЕ: {got} ---")
+    for r, tps in sorted(((r, t) for r, t in tagged if stage_of(r) in GOT_QUOTE),
+                         key=lambda x: x[0].get("createdTime") or ""):
+        s = ", ".join(dict.fromkeys(filter(None, (
+            [names.get(str(r.get("companyId") or ""), "")]
+            + [names.get(c, c) for c in crm_refs(r.get("ufCrm18Supplier"))])))) or "—"
+        print(f"  #{r['id']:>7} | {(r.get('createdTime') or '')[:10]} | сделка {str(r.get('parentId2') or '—'):>7} | "
+              f"{stage_of(r):<14} | {s[:34]:<34} | {','.join(tps)[:26]:<26} | {(r.get('title') or '')[:52]}")
     return 0
 
 
