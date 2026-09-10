@@ -32,6 +32,14 @@ a{color:var(--s1);text-decoration:none} a:hover{text-decoration:underline}
 header{padding:18px 22px 0}
 h1{font-size:21px;margin:0 0 2px}
 .sub{color:var(--ink2);font-size:12.5px}
+.libnav{padding:14px 22px 0;max-width:1280px}
+.libnav-h{font-size:12.5px;color:var(--mut);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px}
+.libnav-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:8px}
+.lc{display:block;border:1px solid var(--border);background:var(--surface);border-radius:10px;padding:9px 11px;color:var(--ink);text-decoration:none}
+.lc:hover{border-color:var(--s1);text-decoration:none}
+.lc b{display:block;font-size:13px;margin-bottom:2px}
+.lc span{display:block;color:var(--ink2);font-size:11.5px;line-height:1.35}
+@media(max-width:700px){.libnav{padding-left:12px;padding-right:12px}}
 nav{position:sticky;top:0;z-index:5;background:var(--page);display:flex;gap:4px;flex-wrap:wrap;padding:10px 22px;border-bottom:1px solid var(--grid)}
 nav button{border:1px solid var(--border);background:var(--surface);color:var(--ink2);padding:6px 13px;border-radius:18px;font:600 13px system-ui;cursor:pointer}
 nav button.on{background:var(--s1);border-color:var(--s1);color:#fff}
@@ -147,6 +155,24 @@ footer{padding:0 22px 24px;color:var(--mut);font-size:11.5px}
   <div class="sub">Справочник для сорсеров КВАНТ: машины · номенклатура ЗИП · шифровки PN · библиотека производителей (OEM / независимые / реверс) · таможня РФ · мировые базы. Сборка: __BUILT_AT__</div>
   <div class="sub" style="margin-top:6px"><a href="./lot" style="font-weight:700">→ Лот ЛУКОЙЛ: рабочее меню</a> — горячая часть · план рассылки · склады · трейдеры · блоки по направлениям</div>
 </header>
+<div class="libnav">
+  <div class="libnav-h">Разделы библиотеки — по машинам и по темам</div>
+  <div class="libnav-g">
+    <a class="lc" href="./ansaldo"><b>Ansaldo Energia и семейство V-машин</b><span>21 вкладка: наследие Alstom, горячий тракт, партномера четырёх школ, керамика, апгрейды, парк РФ и СНГ, аутмаркет</span></a>
+    <a class="lc" href="./f4000"><b>SGT5-4000F (V94.3A)</b><span>субпоставщики и независимый рынок</span></a>
+    <a class="lc" href="./v643a"><b>V64.3A / AE64.3A / SGT-1000F</b><span>субпоставщики и склады</span></a>
+    <a class="lc" href="./ms6001b"><b>GE Frame 6B (MS6001B)</b><span>субпоставщики и склады</span></a>
+    <a class="lc" href="./lm6000"><b>GE LM6000</b><span>субпоставщики, MRO и склады</span></a>
+    <a class="lc" href="./solar"><b>Solar Turbines (Saturn → Titan)</b><span>субпоставщики и склады</span></a>
+    <a class="lc" href="./cummins"><b>Cummins QSK60G</b><span>свечи и фильтры: мировой пул поставщиков</span></a>
+    <a class="lc" href="./plugs"><b>Свечи зажигания ГПУ</b><span>закупки и адресаты на оригинал</span></a>
+    <a class="lc" href="./hot"><b>Камеры сгорания и горелки</b><span>глубокий разбор лота</span></a>
+    <a class="lc" href="./rfq"><b>Покрытие запросами</b><span>критичный ЗИП ЛУКОЙЛ: что запрошено, что нет</span></a>
+    <a class="lc" href="./wizard/"><b>Мастер партномеров</b><span>база PN: шифровки, разбор номера, справочник</span></a>
+    <a class="lc" href="./wizard/search.html"><b>Поиск детали по любому номеру</b><span>KV · бренд · изготовитель · аналог · номер поставщика — единый вход по всем разделам</span></a>
+    <a class="lc" href="https://kvant-zip.pages.dev/"><b>ГШО — горно-шахтное оборудование</b><span>соседний раздел: перфораторы, дробилки, ЗИП, таможня</span></a>
+  </div>
+</div>
 <nav id="nav"></nav>
 <main id="main"></main>
 <footer>Контакты SGT-блока верифицированы 05.08.2026 (таможня РФ HS 8411 + сайты компаний); Solar-блок — публичные данные, контакты брать с сайтов при первом RFQ. Полная таможенная база и ЗИП-платформа: kvant-zip.pages.dev</footer>
