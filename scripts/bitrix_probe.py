@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Зонд v36: сплошная выгрузка и разбор файлов по запросам поставщикам (СП-166).
+"""Зонд v37: сплошная выгрузка и разбор файлов по запросам поставщикам (СП-166).
 
 ЗАЧЕМ. Сорсинг утверждает, что по сделке на 2,5 млрд прокотированы все позиции и на
-всё есть живое КП. По стадиям воронки это не подтверждается (v34: 505 запросов по
-нашей номенклатуре, КП получено по 116). Но стадия — это отметка человека. Истина
-лежит в файлах, которые поставщики реально прислали. Зонд их достаёт и разбирает.
+всё есть живое КП. По стадиям воронки это не подтверждается (505 запросов по нашей
+номенклатуре, КП получено по 116). Но стадия — это отметка человека. Истина лежит в
+файлах, которые поставщики реально прислали. Зонд их достаёт и разбирает.
 
 ЧТО ДЕЛАЕТ.
  1. Тянет все записи СП-166 за период вместе с восемью файловыми полями.
@@ -14,13 +14,14 @@
  4. Качает каждый файл. Способ выбран по замеру v35: годится только urlMachine —
     url отдаёт страницу входа, disk.file.get на этих объектах ошибается.
  5. Разбирает xlsx / xls / docx / pdf, вытаскивает позиции: артикул, наименование,
-    количество, цену, валюту.
+    количество, цену, срок.
+ 6. Считает покрытие строк заказчика ответами поставщиков, отсекая копии нашей же
+    спецификации: она подшита к каждому запросу и иначе засчиталась бы как ответ.
 
 КУДА РЕЗУЛЬТАТ. Репозиторий публичный, поэтому коммерческое содержимое в журнал не
 печатается: в журнал идут только агрегаты. Построчный разбор выгружается отдельно и
 только по флагу PROBE_SEAL=1 — сжатым и зашифрованным на открытый ключ
-scripts/probe_pubkey.pem. Закрытый ключ есть только в рабочей сессии агента. Кто
-угодно может прочитать журнал, расшифровать не может никто.
+scripts/probe_pubkey.pem. Закрытый ключ есть только в рабочей сессии агента.
 """
 from __future__ import annotations
 
@@ -28,6 +29,7 @@ import base64
 import gzip
 import io
 import json
+import logging
 import os
 import re
 import secrets
@@ -49,7 +51,8 @@ from bitrix_client import BitrixClient  # noqa: E402
 SPA = 166
 PERIOD_FROM = os.getenv("PROBE_FROM", "2026-01-01")
 PUBKEY = ROOT / "scripts/probe_pubkey.pem"
-DEADLINE = time.monotonic() + float(os.getenv("PROBE_BUDGET_SEC", "540"))
+DEADLINE = time.monotonic() + float(os.getenv("PROBE_BUDGET_SEC", "560"))
+ACT_DEADLINE = DEADLINE - 180          # на скачивание и разбор всегда остаётся время
 MAX_FILES = int(os.getenv("PROBE_MAX_FILES", "2500"))
 
 GOT_QUOTE = {"Selected", "Not Selected", "Price at Work"}
@@ -238,6 +241,12 @@ def items_from_text(text: str) -> list[dict]:
     return out
 
 
+def norm_pn(s: str) -> str:
+    cyr = str.maketrans({"А": "A", "В": "B", "С": "C", "Е": "E", "К": "K", "М": "M",
+                         "Н": "H", "О": "O", "Р": "P", "Т": "T", "Х": "X", "У": "Y"})
+    return re.sub(r"[^A-Z0-9]", "", str(s or "").upper().translate(cyr))
+
+
 # ------------------------------------------------------------------ основной проход
 def main() -> None:
     wh = (os.getenv("BITRIX_WEBHOOK_URL") or "").strip()
@@ -246,10 +255,14 @@ def main() -> None:
         sys.exit(1)
     subprocess.run([sys.executable, "-m", "pip", "install", "-q", "pypdf", "xlrd==1.2.0"],
                    check=False)
+    # pypdf сыплет предупреждениями о шрифтах на каждый PDF — они забивают журнал.
+    for nm in ("pypdf", "pypdf._cmap", "pypdf.generic", "pypdf._reader"):
+        logging.getLogger(nm).setLevel(logging.ERROR)
+
     bx = BitrixClient(wh)
     sess = requests.Session()
 
-    print("=== Зонд v36: файлы по запросам поставщикам — выгрузка и разбор ===")
+    print("=== Зонд v37: файлы по запросам поставщикам — выгрузка и разбор ===")
     print(f"период с {PERIOD_FROM}\n", flush=True)
 
     # --- поля СП-166
@@ -283,35 +296,56 @@ def main() -> None:
                     recs[iid]["files"].append({"src": "поле записи", "fo": fo})
 
     ours_ids = [k for k, v in recs.items() if v["ours"]]
-    print(f"по нашей номенклатуре / сделкам: {len(ours_ids)}", flush=True)
+    kp_ids = [k for k in ours_ids if recs[k]["kp"]]
+    print(f"по нашей номенклатуре / сделкам: {len(ours_ids)} · из них с КП: {len(kp_ids)}",
+          flush=True)
     n_field = sum(len(recs[k]["files"]) for k in ours_ids)
     print(f"файлов в полях записей (по нашим): {n_field}", flush=True)
 
-    # --- вложения дел и писем таймлайна самих запросов
-    def activities(owner_type: int, owner_ids: list[str]) -> list[dict]:
+    # --- дела и письма таймлайна
+    def pull_acts(f: dict) -> list[dict]:
         out: list[dict] = []
-        for i in range(0, len(owner_ids), 50):
-            if time.monotonic() > DEADLINE:
-                break
-            chunk = owner_ids[i:i + 50]
-            last = 0
-            while True:
-                try:
-                    res = bx.call("crm.activity.list", {
-                        "filter": {"OWNER_TYPE_ID": owner_type, "OWNER_ID": chunk, ">ID": last},
-                        "select": ["ID", "OWNER_ID", "PROVIDER_ID", "SUBJECT", "FILES"],
-                        "order": {"ID": "ASC"}, "start": -1}) or []
-                except Exception:
-                    break
-                if not res:
-                    break
-                out.extend(res)
-                last = int(res[-1]["ID"])
-                if len(res) < 50:
-                    break
-        return out
+        last = 0
+        while True:
+            try:
+                res = bx.call("crm.activity.list", {
+                    "filter": dict(f, **{">ID": last}),
+                    "select": ["ID", "OWNER_ID", "PROVIDER_ID", "SUBJECT", "FILES"],
+                    "order": {"ID": "ASC"}, "start": -1}) or []
+            except Exception:
+                return out
+            if not res:
+                return out
+            out.extend(res)
+            last = int(res[-1]["ID"])
+            if len(res) < 50:
+                return out
 
-    acts = activities(SPA, ours_ids)
+    def activities(owner_type: int, owner_ids: list[str]) -> list[dict]:
+        """Битрикс не всегда принимает список OWNER_ID одним фильтром и молча отдаёт
+        пусто. Поэтому пакетный вызов — первым, а если он пуст, обходим поштучно."""
+        batch: list[dict] = []
+        for i in range(0, len(owner_ids), 50):
+            if time.monotonic() > ACT_DEADLINE:
+                break
+            batch += pull_acts({"OWNER_TYPE_ID": owner_type, "OWNER_ID": owner_ids[i:i + 50]})
+        if batch:
+            print(f"  таймлайн {owner_type}: пакетный фильтр дал {len(batch)}", flush=True)
+            return batch
+        one: list[dict] = []
+        cut = False
+        for oid in owner_ids:
+            if time.monotonic() > ACT_DEADLINE:
+                cut = True
+                break
+            one += pull_acts({"OWNER_TYPE_ID": owner_type, "OWNER_ID": oid})
+        print(f"  таймлайн {owner_type}: пакетный фильтр пуст, поштучно дал {len(one)}"
+              f"{' (обход прерван бюджетом)' if cut else ''}", flush=True)
+        return one
+
+    # приоритет — запросы с полученным КП: именно там должны лежать ответы поставщиков
+    order = kp_ids + [k for k in ours_ids if k not in set(kp_ids)]
+    acts = activities(SPA, order)
     prov: Counter = Counter()
     n_act = 0
     for a in acts:
@@ -428,15 +462,7 @@ def main() -> None:
     srcs = Counter(p["src"] for p in real)
     print(f"документы по месту хранения: {dict(srcs)}")
 
-    # --- сопоставление: покрыты ли строки запроса заказчика ценами из КП поставщиков
-    # Спецификация заказчика лежит в тех же вложениях, что и КП, поэтому эталон берётся
-    # прямо здесь: самый крупный по числу позиций документ наших сделок. Наружу идут
-    # только количества — ни одного артикула и ни одной цены.
-    def norm_pn(s: str) -> str:
-        cyr = str.maketrans({"А": "A", "В": "B", "С": "C", "Е": "E", "К": "K", "М": "M",
-                             "Н": "H", "О": "O", "Р": "P", "Т": "T", "Х": "X", "У": "Y"})
-        return re.sub(r"[^A-Z0-9]", "", str(s or "").upper().translate(cyr))
-
+    # --- покрытие строк заказчика ответами поставщиков
     def pnset(doc: dict) -> set[str]:
         return {p for p in (norm_pn(i.get("pn")) for i in doc.get("items") or []) if len(p) >= 5}
 
@@ -445,31 +471,49 @@ def main() -> None:
             d["_pns"] = pnset(d)
         cand = sorted([d for d in real if d["req"] is None or str(d["deal"]) in OUR_DEALS],
                       key=lambda d: -len(d["_pns"]))
-        print("\n--- КАНДИДАТЫ В СПЕЦИФИКАЦИЮ ЗАКАЗЧИКА (по числу артикулов) ---")
-        for d in cand[:8]:
+        sigs: dict[tuple, int] = {}
+        for d in cand:
+            sigs[(d["size"], len(d["_pns"]))] = sigs.get((d["size"], len(d["_pns"])), 0) + 1
+        uniq_cand: list[dict] = []
+        used: set[tuple] = set()
+        for d in cand:
+            sig = (d["size"], len(d["_pns"]))
+            if sig in used:
+                continue
+            used.add(sig)
+            uniq_cand.append(d)
+        print("\n--- КАНДИДАТЫ В СПЕЦИФИКАЦИЮ ЗАКАЗЧИКА (копии свёрнуты) ---")
+        for d in uniq_cand[:8]:
             print(f"  {len(d['_pns']):>5} арт. · сделка {d['deal']:>6} · {d['kind']:9} · "
-                  f"{d['size']:>8} б · {d['name'][:70]}")
+                  f"{d['size']:>8} б · подшит к запросам: {sigs[(d['size'], len(d['_pns']))]}")
 
-        rfq: set[str] = set()
-        for d in cand[:3]:
-            rfq |= d["_pns"]
+        rfq: set[str] = uniq_cand[0]["_pns"] if uniq_cand else set()
+
+        # Спецификация заказчика подшита к каждому запросу поставщику. Если её не
+        # отсечь, она засчитается как ответ поставщика и покрытие будет фиктивным.
+        def is_copy(d: dict) -> bool:
+            return bool(d["_pns"]) and len(d["_pns"] & rfq) / len(d["_pns"]) > 0.6
+
+        copies = [d for d in real if is_copy(d)]
+        supplier_docs = [d for d in real if d["req"] and d["kp"] and not is_copy(d)]
         quoted: set[str] = set()
         quoted_priced: set[str] = set()
-        for d in real:
-            if d["req"] is None or not d["kp"]:
-                continue
+        for d in supplier_docs:
             quoted |= d["_pns"]
             for i in d.get("items") or []:
                 p = norm_pn(i.get("pn"))
                 if len(p) >= 5 and i.get("price"):
                     quoted_priced.add(p)
 
-        print("\n--- ПОКРЫТИЕ СТРОК ЗАКАЗЧИКА КОТИРОВКАМИ ПОСТАВЩИКОВ ---")
-        print(f"  артикулов в эталонной спецификации : {len(rfq)}")
-        print(f"  артикулов во всех КП поставщиков   : {len(quoted)}")
-        print(f"  пересечение (есть хоть какое КП)   : {len(rfq & quoted)}"
+        print("\n--- ПОКРЫТИЕ СТРОК ЗАКАЗЧИКА ОТВЕТАМИ ПОСТАВЩИКОВ ---")
+        print(f"  артикулов в эталонной спецификации   : {len(rfq)}")
+        print(f"  документов всего                     : {len(real)}")
+        print(f"  из них копии нашей же спецификации   : {len(copies)}")
+        print(f"  собственно ответы поставщиков (с КП) : {len(supplier_docs)}")
+        print(f"  артикулов в ответах поставщиков      : {len(quoted)}")
+        print(f"  пересечение с эталоном               : {len(rfq & quoted)}"
               f"  = {100 * len(rfq & quoted) / max(1, len(rfq)):.1f}%")
-        print(f"  из них с проставленной ценой       : {len(rfq & quoted_priced)}"
+        print(f"  из них с проставленной ценой         : {len(rfq & quoted_priced)}"
               f"  = {100 * len(rfq & quoted_priced) / max(1, len(rfq)):.1f}%")
     except Exception as e:
         print(f"\nсопоставление не выполнено: {type(e).__name__}: {e}")
@@ -479,7 +523,7 @@ def main() -> None:
     # его может только держатель закрытого ключа. Включается PROBE_SEAL=1.
     if not os.getenv("PROBE_SEAL"):
         print("\n(построчный разбор не выгружался: PROBE_SEAL не задан)")
-        print("\n✓ зонд v36 завершён")
+        print("\n✓ зонд v37 завершён")
         return
 
     for d in real:
@@ -507,7 +551,7 @@ def main() -> None:
     for i in range(0, len(b64), 4000):
         print(b64[i:i + 4000])
     print("-----KVANT END-----")
-    print("\n✓ зонд v36 завершён")
+    print("\n✓ зонд v37 завершён")
 
 
 if __name__ == "__main__":
