@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 176,
-    "total_bytes": 74269245,
+    "total_bytes": 74287144,
     "by_sensitivity": {
       "конфиденциально": 54,
       "внутреннее": 89,
@@ -736,7 +736,7 @@
     {
       "path": "gt/data/ship_energoseti.json",
       "subproject": "ГТУ-библиотека",
-      "bytes": 876405,
+      "bytes": 894304,
       "note": "Проверка наличия у продавцов по непроверенному остатку ТКП ЛУКОЙЛ/«Энергосети»: 505 артикулов с нашей ценовой вилкой, по которым ранее не было проверки наличия. Список собран из gt/data/rfq_demand.json (лист «Энергосети») за вычетом проверенных в gt/data/rfq_prices.json:checks. По каждой строке — вердикт (склад / под заказ / артикул живой без склада / только OEM / не найден), продавец со ссылкой на карточку товара, страна, тип предложения (оригинал OEM / изготовитель узла / аналог), наличие, остаток, срок отгрузки, цена за единицу продажи, размер упаковки, покрытие заявленного объёма. Собрано агентами по витринам продавцов 11.09.2026; котировками не является. Отчёт — gt/tools/ship_report.py → gt/docs/НАЛИЧИЕ-ТКП-ЭНЕРГОСЕТИ.pdf.",
       "format": "json",
       "shape": "объект",
@@ -777,10 +777,10 @@
           "verdict"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-11",
+      "last_author": "Claude",
+      "last_commit": "57750db",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -6260,9 +6260,9 @@
         "zip/data/telsmith_crossrefs.json",
         "zip/data/telsmith_nodrawings.json"
       ],
-      "last_change": "2026-09-10",
-      "last_author": "skharkov1246",
-      "last_commit": "37dfb12",
+      "last_change": "2026-09-11",
+      "last_author": "Claude",
+      "last_commit": "57750db",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
