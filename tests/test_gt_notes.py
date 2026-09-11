@@ -160,3 +160,21 @@ def test_модуль_синтаксически_цел():
     assert t.count("(") == t.count(")"), "несбалансированные скобки в notes.js"
     assert "global.KVN" in t, "модуль ничего не экспортирует"
     json.dumps(t[:10])            # текст читается как обычная строка, без сюрпризов кодировки
+
+
+def test_миграция_правок_применяется_первой():
+    """Прогон №4 (11.09.2026): тяжёлая схема библиотеки упала на statement timeout,
+    и из-за set -e до gt_notes очередь не дошла — общей базы правок не появилось.
+    Мелкая схема правок должна применяться раньше тяжёлой и не зависеть от неё."""
+    wf = (ROOT / ".github" / "workflows" / "zip-db.yml").read_text(encoding="utf-8")
+    gt = wf.index("apply gt/supabase/migrations.sql")
+    lib = wf.index("apply library/supabase/schema.sql")
+    assert gt < lib, (
+        "gt/supabase/migrations.sql применяется после library/supabase/schema.sql: "
+        "падение тяжёлой схемы снова оставит правки инженеров без общей базы")
+    assert "rc=1" in wf, (
+        "неудача одного файла миграций отменяет остальные — нужен сбор кода возврата")
+    sql = (ROOT / "library" / "supabase" / "schema.sql").read_text(encoding="utf-8")
+    assert "statement_timeout" in sql, (
+        "в схеме библиотеки не снят лимит времени запроса: перестройка колонок fts "
+        "не укладывается в двухминутный дефолт Supabase")
