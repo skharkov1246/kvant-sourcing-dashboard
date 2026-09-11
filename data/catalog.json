@@ -569,15 +569,18 @@
           "verdict"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-11",
+      "last_author": "Claude",
+      "last_commit": "db80bdd",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
       },
-      "referenced_by": []
+      "referenced_by": [
+        "gt/tools/ship_map.py",
+        "gt/tools/ship_merge.py"
+      ]
     },
     {
       "path": "gt/data/dossiers.json",
@@ -843,6 +846,7 @@
         "markers": []
       },
       "referenced_by": [
+        "gt/tools/ship_merge.py",
         "gt/tools/ship_report.py"
       ]
     },
@@ -929,6 +933,7 @@
         "gpu/tools/build_demand.py",
         "gt/tools/build_lot_xlsx.py",
         "gt/tools/build_rfq.py",
+        "gt/tools/ship_merge.py",
         "gt/tools/ship_report.py"
       ]
     },
@@ -1071,6 +1076,7 @@
         "gt/public/plugs.html",
         "gt/tools/build_lot_xlsx.py",
         "gt/tools/build_rfq.py",
+        "gt/tools/ship_merge.py",
         "gt/tools/ship_report.py"
       ]
     },
@@ -2804,9 +2810,9 @@
         "gt/public/plugs.html",
         "gt/tools/build_lot_xlsx.py",
         "gt/tools/build_rfq.py",
+        "gt/tools/ship_merge.py",
         "gt/tools/ship_report.py",
-        "zip/build.py",
-        "zip/tools/parse_demand.py"
+        "zip/build.py"
       ]
     },
     {
@@ -5711,9 +5717,9 @@
         "gt/public/plugs.html",
         "gt/tools/build_lot_xlsx.py",
         "gt/tools/build_rfq.py",
+        "gt/tools/ship_merge.py",
         "gt/tools/ship_report.py",
-        "zip/build.py",
-        "zip/tools/parse_demand.py"
+        "zip/build.py"
       ]
     },
     {
@@ -6243,7 +6249,7 @@
       ],
       "last_change": "2026-09-11",
       "last_author": "Claude",
-      "last_commit": "57750db",
+      "last_commit": "db80bdd",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
