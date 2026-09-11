@@ -439,6 +439,11 @@ def test_display_family_dictionary_and_russian_search_remain_in_sync_without_sou
     html = (SCRIPTS.parent / "public" / "library.html").read_text()
     labels = json.loads(re.search(r"const COMPONENT_FAMILIES=(\{[^\n]+\});", html).group(1))
     assert labels == p.COMPONENT_FAMILIES
+    qualified = json.loads(re.search(r"const OEM_COMPONENT_FAMILIES=(\{[^\n]+\});", html).group(1))
+    assert qualified == p.OEM_COMPONENT_FAMILIES
+    for name in ("PENTAIR_ACCESSORY_FAMILIES", "PENTAIR_DESCRIPTION_LABELS", "VALVE_FLOW_LABELS"):
+        literal = re.search(r"const " + name + r"=([^\n]+);", html).group(1)
+        assert json.loads(literal) == getattr(p, name)
     for family, query in (("spherical_roller", "сферический роликовый подшипник"),
                           ("electric_motor", "электродвигатель")):
         component = row(3)
@@ -471,6 +476,79 @@ def test_every_relation_edge_is_accounted_for_including_exact_duplicate_observat
     assert metrics["edges"] == sum(metrics[key] for key in ("linked", "missing_target", "missing_evidence", "duplicate_edges"))
     assert len(index[row(3)["id"]]) == 1
     assert p.encode([[str(x) for x in r] for r in projection]) == before
+
+
+def test_explicit_tool_family_is_oem_qualified_never_inferred_from_order_code():
+    fields = {"oem": "Dormer Pramet", "family": "R200", "part_number": "SYNTHETIC-007_"}
+    assert p.known_component_family(fields) == "Твердосплавное центровочное сверло"
+    assert p.known_component_family({**fields, "family": "R7131"}) == "Твердосплавное ступенчатое сверло"
+    assert p.known_component_family({**fields, "family": "R6011"}) == "Твердосплавное сверло для засверливания"
+    assert p.known_component_family({**fields, "oem": "Different OEM"}) == ""
+    assert p.known_component_family({"oem": "Dormer Pramet", "part_number": "R200-SYNTHETIC"}) == ""
+    component = row(3)
+    component["sources"]["component_fields"] = fields
+    component["segment_id"] = "welding"
+    before = p.encode(component)
+    assert "центровочное сверло" in p.search_text(component)
+    assert p.component_type_label(p.summary(component)["sources"], "welding") == p.component_type_label(component["sources"], "welding")
+    assert p.encode(component) == before
+
+
+def test_accessory_flag_prevents_filter_housing_family_from_becoming_product_type():
+    source = {"component_fields": {"oem": "Pentair", "family": "PENTEK SLIM LINE FILTER HOUSINGS",
+                                    "part_number": "SYNTHETIC-007", "is_accessory": True}}
+    assert p.component_type_label(source, "water") == "Принадлежность системы фильтрации"
+    source["component_fields"]["is_accessory"] = None
+    assert p.component_type_label(source, "water") == ""
+
+
+def test_water_types_require_explicit_scope_flags_and_common_description():
+    source = {"component_fields": {"oem": "Pentair", "family": "PENTEK ST SERIES STAINLESS STEEL FILTER HOUSINGS", "is_accessory": True},
+              "typedfields": {"specification": {"catalogue_fields_as_printed": {"DESCRIPTION": "ST Gasket , BUNA-N"}}}}
+    assert p.component_type_label(source, "water") == "Прокладка ST · ST Gasket , BUNA-N"
+    assert p.component_type_label(source, "pumps") == ""
+    source["component_fields"]["family"] = "Unknown family"
+    assert p.component_type_label(source, "water") == ""
+    source["component_fields"].update(family="PENTEK SLIM LINE FILTER HOUSINGS", is_accessory=False)
+    assert p.component_type_label(source, "water") == "Корпус фильтра"
+    source["component_fields"].update(family="PENTEK QUICK-CHANGE FILTRATION SYSTEMS")
+    assert p.component_type_label(source, "water") == ""
+    source["typedfields"]["specification"]["catalogue_fields_as_printed"]["CARTRIDGE COLOR"] = "White"
+    assert p.component_type_label(source, "water") == "Сменный картридж фильтра"
+    source["component_fields"].update(family="Pentek water filtration")
+    source["typedfields"]["specification"]["catalogue_fields_as_printed"] = {"DESCRIPTION": "Thin Film Membrane"}
+    assert p.component_type_label(source, "water") == "Тонкоплёночная мембрана"
+    source["component_fields"].update(family="PENTEK SLIM LINE FILTER HOUSINGS", is_accessory=True)
+    source["typedfields"]["specification"]["catalogue_fields_as_printed"] = {}
+    source["original_record"] = {"catalogue_observations": [{"description": "Viton"}, {"description": "Silicone"}]}
+    assert p.component_type_label(source, "water") == "Принадлежность системы фильтрации"
+
+
+def test_equipment_types_do_not_copy_engineering_parameters_or_guess_missing_families():
+    cases = [({"oem": "Danfoss", "family": "XB51L-1 SB"}, "heat", "Паяный пластинчатый теплообменник"),
+             ({"oem": "Tsurumi", "family": "KTZ"}, "pumps", "Погружной дренажный насос"),
+             ({"oem": "Swagelok", "family": "40GX"}, "valves", "Шаровой кран"),
+             ({"oem": "Grundfos", "part_number": "SYNTHETIC"}, "pumps", "")]
+    for fields, segment, expected in cases:
+        source = {"component_fields": fields, "typedfields": {"specification": {"pressure": None, "orifice_mm": None}}}
+        before = p.encode(source)
+        assert p.component_type_label(source, segment) == expected
+        assert p.encode(source) == before
+    source = {"component_fields": {"oem": "Swagelok"}, "typedfields": {"specification": {"flow_pattern": "three_way_switching"}}}
+    assert p.component_type_label(source, "valves") == "Арматура: трёхходовая переключающая"
+    source["typedfields"]["specification"]["valve_type"] = "ball"
+    assert p.component_type_label(source, "valves") == "Шаровой кран"
+
+
+def test_russian_display_label_search_accepts_yo_and_e_without_rewriting_full_source():
+    component = row(3)
+    component["sources"]["component_fields"] = {"family": "hydraulic_gear_pump", "part_number": "SYNTHETIC"}
+    before = p.encode(component)
+    search = p.search_text(component)
+    assert "шестерённый гидравлический насос" in search
+    assert "шестеренный гидравлический насос" in search
+    assert search.count(component["body"].lower()) == 1
+    assert p.encode(component) == before
 
 
 if __name__ == "__main__":

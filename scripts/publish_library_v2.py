@@ -39,6 +39,7 @@ KINDS = ("knowledge", "supplier", "price", "component")
 # Exact source-family labels only. Parity with the reader is tested; this adds
 # search aliases without rewriting canonical titles, sources or full records.
 COMPONENT_FAMILIES = {
+    "Однорядный радиальный шариковый": "Однорядный радиальный шариковый подшипник",
     "Стальной профиль": "Стальной профиль", "Приводная цепь": "Приводная цепь",
     "Втулочная приводная цепь": "Втулочная приводная цепь", "Пластинчатая цепь": "Пластинчатая цепь",
     "single_row_ball": "Однорядный шариковый подшипник",
@@ -55,6 +56,211 @@ COMPONENT_FAMILIES = {
     "self_aligning_ball": "Самоустанавливающийся шариковый подшипник",
     "thrust_ball": "Упорный шариковый подшипник",
 }
+# These are explicit catalogue family fields, qualified by the stated OEM.
+# In particular, no prefix/substring of a part number is used as a family.
+OEM_COMPONENT_FAMILIES = {
+    "Dormer Pramet": {
+        "R023": "Короткое твердосплавное сверло",
+        "R003": "Твердосплавное сверло",
+        "RS403": "Твердосплавное сверло",
+        "RC403": "Твердосплавное сверло",
+        "RS405": "Твердосплавное сверло",
+        "RC405": "Твердосплавное сверло",
+        "RC408": "Твердосплавное сверло",
+        "RC305": "Твердосплавное микросверло",
+        "RC412": "Твердосплавное сверло для глубоких отверстий",
+        "RC416": "Твердосплавное сверло для глубоких отверстий",
+        "RC420": "Твердосплавное сверло для глубоких отверстий",
+        "RC4P": "Твердосплавное пилотное сверло",
+        "R122": "Твердосплавное сверло для засверливания",
+        "R123": "Твердосплавное сверло для засверливания",
+        "R125": "Твердосплавное сверло для засверливания",
+        "R6011": "Твердосплавное сверло для засверливания",
+        "R200": "Твердосплавное центровочное сверло",
+        "R7131": "Твердосплавное ступенчатое сверло"
+    },
+    "Pentair": {
+        "PENTEK 3G SLIM LINE FILTER HOUSINGS": "Корпус фильтра",
+        "PENTEK 3G STANDARD SERIES FILTER HOUSINGS": "Корпус фильтра",
+        "PENTEK ALL NATURAL FILTER HOUSINGS": "Корпус фильтра",
+        "PENTEK BIG BLUE HEAVY DUTY FILTER HOUSINGS": "Корпус фильтра",
+        "PENTEK BIG BLUE WITH DRAIN FILTER HOUSINGS": "Корпус фильтра",
+        "PENTEK BIG CLEAR HEAVY DUTY FILTER HOUSINGS": "Корпус фильтра",
+        "PENTEK BIG WHITE FILTER HOUSINGS": "Корпус фильтра",
+        "PENTEK BIG WHITE WITH BYPASS FILTER HOUSINGS": "Корпус фильтра",
+        "PENTEK CARBON BLOCK CARTRIDGES": "Картридж водоподготовки",
+        "PENTEK CARBON BLOCK MULTI-MEDIA CARTRIDGES": "Картридж водоподготовки",
+        "PENTEK CERAMIC CARTRIDGE": "Картридж водоподготовки",
+        "PENTEK CHLORAMINE REDUCTION CARBON CARTRIDGES": "Картридж водоподготовки",
+        "PENTEK COCONUT SHELL GRANULAR ACTIVATED CARBON CARTRIDGES": "Картридж водоподготовки",
+        "PENTEK COCONUT-BASED CARBON BLOCK CARTRIDGES": "Картридж водоподготовки",
+        "PENTEK COUNTER TOP SLIM LINE SERIES FILTER HOUSINGS": "Корпус фильтра",
+        "PENTEK DIAMOND FLOW CARTRIDGES": "Картридж водоподготовки",
+        "PENTEK DUAL PURPOSE POWDER-ACTIVATED CARBON CARTRIDGE": "Картридж водоподготовки",
+        "PENTEK DUAL PURPOSE POWDER-ACTIVATED CARBON CARTRIDGES": "Картридж водоподготовки",
+        "PENTEK ELPC ELECTROPLATING CARBON CARTRIDGES": "Картридж водоподготовки",
+        "PENTEK FLAT CAP SLIM LINE FILTER HOUSINGS": "Корпус фильтра",
+        "PENTEK GRADIENT DENSITY CARTRIDGES": "Картридж водоподготовки",
+        "PENTEK GRANULAR ACTIVATED CARBON CARTRIDGES": "Картридж водоподготовки",
+        "PENTEK HEXAMETAPHOSPHATE CRYSTAL CARTRIDGES": "Картридж водоподготовки",
+        "PENTEK HIGH TEMPERATURE FILTER HOUSINGS": "Корпус фильтра",
+        "PENTEK MICROGUARD SERIES CARTRIDGES": "Картридж водоподготовки",
+        "PENTEK MIXED BED DEIONIZATION CARTRIDGES": "Картридж водоподготовки",
+        "PENTEK MODIFIED EPSILON CARBON BLOCK CARTRIDGES": "Картридж водоподготовки",
+        "PENTEK MODIFIED MOLDED BLOCK CARTRIDGE": "Картридж водоподготовки",
+        "PENTEK MODIFIED MOLDED BLOCK CARTRIDGES": "Картридж водоподготовки",
+        "PENTEK MODIFIED MOLDED CARBON BLOCK CARTRIDGES": "Картридж водоподготовки",
+        "PENTEK MPST 1.5 STAINLESS STEEL FILTER HOUSINGS": "Корпус фильтра",
+        "PENTEK NON-CELLULOSE CARBON-IMPREGNATED PLEATED CARTRIDGES": "Картридж водоподготовки",
+        "PENTEK PBH BAG FILTER HOUSINGS": "Корпус фильтра",
+        "PENTEK PLEATED CELLULOSE CARTRIDGES": "Картридж водоподготовки",
+        "PENTEK PLEATED CELLULOSE POLYESTER CARTRIDGES": "Картридж водоподготовки",
+        "PENTEK PLEATED POLYESTER CARTRIDGES": "Картридж водоподготовки",
+        "PENTEK POLYDEPTH CARTRIDGES": "Картридж водоподготовки",
+        "PENTEK POLYPROPYLENE STRING WOUND CARTRIDGES": "Картридж водоподготовки",
+        "PENTEK POLYPROPYLENE STRING-WOUND CARTRIDGES": "Картридж водоподготовки",
+        "PENTEK POLYPROPYLENE WOUND CARTRIDGES": "Картридж водоподготовки",
+        "PENTEK RADIAL FLOW IRON REDUCTION CARTRIDGE": "Картридж водоподготовки",
+        "PENTEK SCBC-10 ANTIMICROBIAL CARBON BLOCK CARTRIDGE": "Картридж водоподготовки",
+        "PENTEK SLIM LINE FILTER HOUSINGS": "Корпус фильтра",
+        "PENTEK SPECIALTY GRANULAR ACTIVATED CARBON/PHOSPHATE CARTRIDGE": "Картридж водоподготовки",
+        "PENTEK SPUN-BONDED POLYPROPYLENE CARTRIDGES": "Картридж водоподготовки",
+        "PENTEK ST SERIES STAINLESS STEEL FILTER HOUSINGS": "Корпус фильтра",
+        "PENTEK ST-BC SERIES STAINLESS STEEL FILTER HOUSINGS": "Корпус фильтра",
+        "PENTEK STANDARD FILTER HOUSINGS": "Корпус фильтра",
+        "PENTEK STANDARD FLAT CAP FILTER HOUSINGS": "Корпус фильтра",
+        "PENTEK UDS/DBC SERIES CARTRIDGES": "Картридж водоподготовки",
+        "PENTEK VALVE-IN-HEAD SERIES FILTER HOUSINGS": "Корпус фильтра",
+        "PENTEK WATER SOFTENER CARTRIDGES": "Картридж водоподготовки",
+        "PENTEK FILTER BAGS": "Фильтрующий мешок",
+        "PENTAIR THIN LAYER COMPOSITE MEMBRANES": "Тонкоплёночная композитная мембрана",
+        "PENTEK ULTRAVIOLET SYSTEMS": "Ультрафиолетовая система",
+        "PENTEK REVERSE OSMOSIS DRINKING WATER SYSTEM": "Система обратного осмоса"
+    },
+    "Danfoss": {
+        "XB04-1": "Паяный пластинчатый теплообменник",
+        "XB04-2": "Паяный пластинчатый теплообменник",
+        "XB10-1": "Паяный пластинчатый теплообменник",
+        "XB10-2": "Паяный пластинчатый теплообменник",
+        "XB20-1": "Паяный пластинчатый теплообменник",
+        "XB20-2": "Паяный пластинчатый теплообменник",
+        "XB24-1": "Паяный пластинчатый теплообменник",
+        "XB30-1": "Паяный пластинчатый теплообменник",
+        "XB30-2": "Паяный пластинчатый теплообменник",
+        "XB51H-1": "Паяный пластинчатый теплообменник",
+        "XB51H-1 SB": "Паяный пластинчатый теплообменник",
+        "XB51H-2": "Паяный пластинчатый теплообменник",
+        "XB51L-1": "Паяный пластинчатый теплообменник",
+        "XB51L-1 SB": "Паяный пластинчатый теплообменник",
+        "XB51L-2": "Паяный пластинчатый теплообменник",
+        "XB70H-1": "Паяный пластинчатый теплообменник",
+        "XB70L-1": "Паяный пластинчатый теплообменник",
+        "XB70M-1": "Паяный пластинчатый теплообменник"
+    },
+    "Tsurumi": {
+        "KTZ": "Погружной дренажный насос"
+    },
+    "Swagelok": {
+        "40G": "Шаровой кран",
+        "40GX": "Шаровой кран"
+    }
+}
+
+PENTAIR_ACCESSORY_FAMILIES = [
+    "PENTEK 3G STANDARD SERIES FILTER HOUSINGS",
+    "PENTEK ALL NATURAL FILTER HOUSINGS",
+    "PENTEK BIG BLUE HEAVY DUTY FILTER HOUSINGS",
+    "PENTEK BIG BLUE WITH DRAIN FILTER HOUSINGS",
+    "PENTEK BIG CLEAR HEAVY DUTY FILTER HOUSINGS",
+    "PENTEK BIG WHITE FILTER HOUSINGS",
+    "PENTEK BIG WHITE WITH BYPASS FILTER HOUSINGS",
+    "PENTEK COUNTER TOP SLIM LINE SERIES FILTER HOUSINGS",
+    "PENTEK SLIM LINE FILTER HOUSINGS",
+    "PENTEK ST SERIES STAINLESS STEEL FILTER HOUSINGS",
+    "PENTEK ST-BC SERIES STAINLESS STEEL FILTER HOUSINGS",
+    "PENTEK STANDARD FILTER HOUSINGS",
+    "PENTEK VALVE-IN-HEAD SERIES FILTER HOUSINGS",
+    "Pentek water filtration"
+]
+
+PENTAIR_DESCRIPTION_LABELS = {
+    "Thin Film Membrane": "Тонкоплёночная мембрана",
+    "Cartridge Set": "Комплект картриджей",
+    "RO Replacement Cartridge Set": "Комплект сменных картриджей для обратного осмоса",
+    "Spanner Wrench": "Ключ для корпуса фильтра",
+    "Faucet": "Кран",
+    "Auto Shut-Off Valve": "Автоматический запорный клапан",
+    "ST Gasket , BUNA-N": "Прокладка ST",
+    "ST Gasket, Teflon": "Прокладка ST",
+    "ST Gasket, Viton": "Прокладка ST",
+    "ST Gasket, Silicone": "Прокладка ST",
+    "Gasket for STBC Series": "Прокладка STBC",
+    "Two-Housing Bracket": "Кронштейн для двух корпусов",
+    "Three-Housing Bracket": "Кронштейн для трёх корпусов",
+    "Housing Stand": "Подставка для корпуса",
+    "ST Centering Spring": "Центрирующая пружина ST"
+}
+
+VALVE_FLOW_LABELS = {
+    "two_way_straight": "Арматура: двухходовая прямоточная",
+    "two_way_straight_shutoff": "Арматура: двухходовая прямоточная запорная",
+    "three_way_switching": "Арматура: трёхходовая переключающая"
+}
+
+
+def known_component_family(fields):
+    if not isinstance(fields, dict) or not isinstance(fields.get("family"), str):
+        return ""
+    family, oem = fields["family"], fields.get("oem")
+    qualified = OEM_COMPONENT_FAMILIES.get(oem, {}) if isinstance(oem, str) else {}
+    return qualified.get(family) or COMPONENT_FAMILIES.get(family, "")
+
+
+def component_type_label(sources, segment_id=None):
+    if not isinstance(sources, dict):
+        return ""
+    fields = sources.get("component_fields")
+    if not isinstance(fields, dict):
+        return ""
+    typed = sources.get("typedfields", {})
+    spec = typed.get("specification", {}) if isinstance(typed, dict) else {}
+    spec = spec if isinstance(spec, dict) else {}
+    values = spec.get("catalogue_fields_as_printed", {})
+    values = values if isinstance(values, dict) else {}
+    description = values.get("DESCRIPTION")
+    description = description if isinstance(description, str) else ""
+    oem = fields.get("oem") if isinstance(fields.get("oem"), str) else ""
+    family = fields.get("family") if isinstance(fields.get("family"), str) else ""
+    if oem == "Pentair":
+        if segment_id != "water":
+            return ""
+        families = OEM_COMPONENT_FAMILIES.get("Pentair", {})
+        if fields.get("is_accessory") is True:
+            if family not in PENTAIR_ACCESSORY_FAMILIES:
+                return ""
+            # This field contains only a shared, non-conflicting table value.
+            # Never choose the first of the original per-observation versions.
+            label = PENTAIR_DESCRIPTION_LABELS.get(description, "Принадлежность системы фильтрации")
+            return label + (" · " + description if description else "")
+        if fields.get("is_accessory") is not False:
+            return ""
+        if family == "PENTEK QUICK-CHANGE FILTRATION SYSTEMS":
+            return "Сменный картридж фильтра" if isinstance(values.get("CARTRIDGE COLOR"), str) and values["CARTRIDGE COLOR"] else ""
+        if family == "Pentek water filtration":
+            return PENTAIR_DESCRIPTION_LABELS.get(description, "")
+        return families.get(family, "")
+    if oem == "Swagelok" and segment_id == "valves":
+        if spec.get("valve_type") == "ball":
+            return "Шаровой кран"
+        if family in OEM_COMPONENT_FAMILIES["Swagelok"]:
+            return OEM_COMPONENT_FAMILIES["Swagelok"][family]
+        flow = spec.get("flow_pattern")
+        return VALVE_FLOW_LABELS.get(flow, "") if isinstance(flow, str) else ""
+    scoped = {"Dormer Pramet": "welding", "Danfoss": "heat", "Tsurumi": "pumps", "Swagelok": "valves"}
+    if oem in scoped and family in OEM_COMPONENT_FAMILIES.get(oem, {}):
+        if segment_id != scoped[oem]:
+            return ""
+    return known_component_family(fields)
 ORDERED_SQL = f"""SELECT {v1.ARTICLE_COLUMNS} FROM public.lib_knowledge
 WHERE researched_by = %s AND sources->>'publication_approved' = 'true'
 ORDER BY sources->>'importer_id' COLLATE \"C\", id LIMIT 250001"""
@@ -215,9 +421,12 @@ def search_text(row):
     if kind(row) == "component":
         fields = row["sources"].get("component_fields", {})
         if isinstance(fields, dict):
-            label = COMPONENT_FAMILIES.get(fields.get("family")) if isinstance(fields.get("family"), str) else None
+            label = component_type_label(row["sources"], row["segment_id"])
             if label:
                 strings.append(label)
+                alias = label.replace("ё", "е").replace("Ё", "Е")
+                if alias != label:
+                    strings.append(alias)
     def walk(value):
         if isinstance(value, str):
             strings.append(value)
