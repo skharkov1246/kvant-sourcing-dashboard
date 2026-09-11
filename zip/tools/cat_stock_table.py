@@ -16,11 +16,12 @@ OUT = ROOT / "orders"
 e = lambda s: html.escape(str(s if s is not None else ""))
 
 CLS_COLOR = {"массовый": "#1a7f37", "узловой": "#b26a00", "тяжёлый": "#c62828"}
-FIT_NOTE = {
-    "профильно": "возил ровно нашу группу товара",
-    "канал": "возил землеройную оснастку — доказан маршрут, не номенклатура",
-    "смежно": "смежная номенклатура Cat",
+LANE_COLOR = {
+    "ЮАР · гидравлика": "#1a7f37", "ЮАР + CAT": "#0b3d91", "ЮАР · отгрузка": "#2a6f97",
+    "КНР · CAT": "#b26a00", "ЮАР · логистика": "#5a6672",
+    "ЮАР · происхождение": "#8a7300", "КНР · канал": "#5a6672",
 }
+GEO_COLOR = {"ЮАР": "#1a7f37", "КНР": "#b26a00"}
 
 CSS = """
 @page{size:A4 landscape;margin:10mm 8mm}
@@ -58,11 +59,13 @@ def main() -> int:
     H = [f'<!doctype html><html lang="ru"><head><meta charset="utf-8"><title>CAT: стоки и запросы</title>'
          f'<style>{CSS}</style></head><body>']
 
-    H.append(f'<h1>Срочная заявка CAT: {req["lines"]} позиций — где искать сток и кого запрашивать</h1>'
+    H.append(f'<h1>Срочная заявка CAT: {req["lines"]} позиций — склады Китая и ЮАР</h1>'
              f'<div class="mut">Лист для сорсеров · собран {e(d["updated"])} · назначение {e(req["destination"])} · '
              f'срок поставки по перечню {e(req["deadline"])} · отгрузка в течение недели, то есть до {e(req["ship_by"])}. '
-             f'Источники: перечень заказчика, наша таможенная выгрузка за {e(req["source"] and "2023-01…2026-03")} '
-             f'({d["customs_stats"]["cat_rows"]} строк Cat, из них {d["customs_stats"]["genuine_rows"]} — отправитель сам Caterpillar) '
+             f'<b>{e(req["geo_note"])}</b> '
+             f'Источники: перечень заказчика, наша таможенная выгрузка за '
+             f'{e(" … ".join(d["customs_stats"]["period"]))} '
+             f'({d["customs_stats"]["za_rows"]} строк из ЮАР и {d["customs_stats"]["cat_rows"]} строк genuine CAT) '
              f'и справочник ODM. Наличие по конкретным номерам здесь не подтверждено: остатки складов закрыты, '
              f'их даёт только запрос.</div>')
 
@@ -70,10 +73,11 @@ def main() -> int:
              f'<div><div class="v">{req["lines"]}</div><div class="l">строк / {req["units"]} шт</div></div>'
              f'<div><div class="v">{req["days_left"]}</div><div class="l">дней до срока 15.10, а не 7</div></div>'
              f'<div><div class="v">{sum(1 for p in d["positions"] if p["stock_class"] == "массовый")}</div>'
-             f'<div class="l">позиций закрываются стоком в РФ</div></div>'
+             f'<div class="l">позиций закрываются складским стоком</div></div>'
              f'<div><div class="v">{sum(1 for p in d["positions"] if p["stock_class"] == "тяжёлый")}</div>'
              f'<div class="l">позиции определяют бюджет и срок</div></div>'
-             f'<div><div class="v">{len(d["leads"])}</div><div class="l">импортёра Cat в базе таможни</div></div>'
+             f'<div><div class="v">{sum(1 for x in d["leads"] if x["za_ship_from"])}</div>'
+             f'<div class="l">компании реально отгружают из ЮАР</div></div>'
              f'</div>')
 
     H.append(f'<div class="box"><b>Машина.</b> {e(mach["verdict"])}. {e(mach["basis"])}<br>'
@@ -81,11 +85,13 @@ def main() -> int:
     H.append('<div class="box warn"><b>Что понять до рассылки</b><ol>'
              + "".join(f"<li>{e(f)}</li>" for f in d["findings"]) + "</ol></div>")
 
-    H.append('<h2>Куда идти: каналы и реальные сроки до Красноярска</h2>')
-    H.append('<table><tr><th style="width:20%">Канал</th><th style="width:8%">Тип</th><th style="width:7%">Срок, дн.</th>'
-             '<th style="width:27%">Почему он в списке</th><th style="width:22%">Что спрашивать</th><th>Риск</th></tr>')
+    H.append('<h2>Куда идти: каналы Китая и ЮАР с реальными сроками до Красноярска</h2>')
+    H.append('<table><tr><th style="width:5%">Страна</th><th style="width:19%">Канал</th><th style="width:8%">Тип</th>'
+             '<th style="width:8%">Срок, дн.</th><th style="width:25%">Почему он в списке</th>'
+             '<th style="width:20%">Что спрашивать</th><th>Риск</th></tr>')
     for c in d["channels"]:
-        H.append(f'<tr><td><b>{e(c["title"])}</b><br><span class="mut">{e(c["geo"])}</span></td>'
+        H.append(f'<tr><td>{tag(c["geo"], GEO_COLOR[c["geo"]])}</td>'
+                 f'<td><b>{e(c["title"])}</b><br><span class="mut">{e(c["place"])}</span></td>'
                  f'<td>{e(c["kind"])}</td><td class="num">{e(c["days"])}</td>'
                  f'<td>{e(c["why"])}</td><td>{e(c["ask"])}</td><td class="mut">{e(c["risk"])}</td></tr>')
     H.append('</table>')
@@ -114,25 +120,31 @@ def main() -> int:
                  f'<td class="pn mut">{e(", ".join(g["pns"]))}</td></tr>')
     H.append('</table>')
 
-    H.append('<h2>Кого запрашивать: кто реально растаможивал Cat от самого Caterpillar</h2>')
-    H.append('<div class="mut">Отбор по нашей таможенной выгрузке: отправителем груза выступал сам CATERPILLAR — '
-             'значит у компании есть рабочий канал к заводу, а не только перепродажа. Сортировка по свежести. '
+    H.append('<h2>Кого запрашивать: у кого канал из ЮАР и Китая уже работает</h2>')
+    H.append('<div class="mut">Отбор по нашей таможенной выгрузке: компании, которые реально ввозили в РФ товар '
+             'из ЮАР, и компании, которым отгружал сам CATERPILLAR. Считается страна отправления, а не происхождения. '
+             'Сверху — те, кто отгружает из ЮАР ровно наши '
+             'классы: гидроцилиндры и клапаны гидротрансмиссий. Порядок в таблице — порядок обзвона. '
              'Контактов в базе нет: ИНН нужен, чтобы найти компанию в ЕГРЮЛ и в Битриксе перед звонком.</div>')
-    H.append('<table><tr><th style="width:20%">Компания</th><th style="width:8%">ИНН</th><th class="num" style="width:5%">Постав.</th>'
-             '<th style="width:8%">Последняя</th><th style="width:7%">Роль</th><th style="width:9%">Профиль</th><th style="width:18%">Маршруты</th>'
+    H.append('<table><tr><th style="width:17%">Компания</th><th style="width:8%">ИНН</th>'
+             '<th style="width:11%">Чем полезен</th><th class="num" style="width:8%">Отгрузок из ЮАР / КНР</th>'
+             '<th style="width:7%">Последняя</th><th style="width:17%">Маршруты</th>'
              '<th>Что везли (из декларации)</th></tr>')
-    for lead in d["leads"]:
-        ev = "; ".join(f'{x["date"]}: {x["desc"][:90]}' for x in lead["evidence"][:2])
-        color = {"профильно": "#0b3d91", "канал": "#5a6672", "смежно": "#8a7300"}[lead["fit"]]
-        H.append(f'<tr><td><b>{e(lead["importer"])}</b></td><td class="pn">{e(lead["inn"])}</td>'
-                 f'<td class="num">{lead["shipments"]}</td><td>{e(lead["last"])}</td>'
-                 f'<td>{tag(lead["fit"], color)}<br><span class="mut">{e(FIT_NOTE[lead["fit"]])}</span></td>'
+    for lead in d["leads"][:14]:
+        ev = "; ".join(f'{x["date"]} {x["exporter"][:26]}: {x["desc"][:70]}' for x in lead["evidence"][:2])
+        H.append(f'<tr><td><b>{e(lead["importer"])}</b>'
+                 + (f'<br><span class="mut">{e(lead["role_note"])}</span>' if lead["role_note"] else "")
+                 + f'</td><td class="pn">{e(lead["inn"])}</td>'
+                 f'<td>{tag(lead["lane"], LANE_COLOR[lead["lane"]])}'
+                 f'<br><span class="mut">{e(lead["lane_note"])}</span></td>'
+                 f'<td class="num">{lead["za_ship_from"]} / {lead["cn_shipments"]}</td>'
+                 f'<td>{e(lead["last"])}</td>'
                  f'<td class="mut">{e("; ".join(lead["routes"][:2]))}</td>'
                  f'<td class="mut">{e(ev)}</td></tr>')
     H.append('</table>')
 
     am = d["aftermarket"]
-    H.append('<h2>Китайский афтермаркет из нашей базы ODM</h2>')
+    H.append('<h2>Китай: заводы афтермаркета из нашей базы ODM</h2>')
     if am["note"]:
         H.append(f'<div class="box warn">{e(am["note"])}</div>')
     if am["relevant"]:
@@ -153,18 +165,21 @@ def main() -> int:
     pns = ", ".join(p["pn_cat"].replace(" (?)", "") for p in d["positions"])
     H.append('<h2>Готовый текст запроса — вставить в почту Битрикса</h2>')
     H.append('<div class="letter">' + e(
-        "Тема: Запрос наличия на складе — запчасти Cat, 29 позиций, отгрузка в течение недели\n\n"
+        "Subject / Тема: Stock request — Caterpillar parts, 29 line items, shipment within one week\n\n"
         "Добрый день!\n\n"
-        "Просим подтвердить наличие на складе в РФ и условия отгрузки по перечню ниже.\n"
-        "Поставка — г. Красноярск, срок по проекту 15.10.2026, отгрузка требуется в течение недели.\n\n"
+        "Просим подтвердить наличие на вашем складе и условия отгрузки по перечню ниже.\n"
+        "Назначение — г. Красноярск, Россия. Срок поставки по проекту 15.10.2026, отгрузка требуется\n"
+        "в течение недели, доставка — авиа.\n\n"
         f"Парт-номера Caterpillar: {pns}.\n"
         "По позиции 294221 номер уточняется — просим подтвердить, читается ли он у вас как номер КПП.\n\n"
         "Просим в ответе:\n"
         "1. Разделить перечень на «в наличии на складе» и «под заказ» — по наличию нужен отдельный счёт.\n"
         "2. По каждой позиции: количество на складе, цена за штуку с НДС, срок отгрузки.\n"
-        "3. По позициям под заказ: срок поставки до Красноярска и базис.\n"
-        "4. Указать статус детали: оригинал Cat, Cat Reman, восстановленная, аналог.\n"
-        "5. Подтвердить готовность отгрузить в течение недели с даты оплаты.\n\n"
+        "3. По позициям под заказ: срок готовности и базис (EXW / FOB).\n"
+        "4. Указать статус детали: оригинал Cat, Cat Reman, восстановленная, б/у, аналог.\n"
+        "5. Вес брутто и габариты упаковки по каждой позиции — нужны для расчёта авиафрахта.\n"
+        "6. Подтвердить готовность отгрузить в течение недели с даты оплаты и возможность\n"
+        "   поставки в Российскую Федерацию.\n\n"
         "Количества по позициям вышлем сразу после подтверждения наличия.\n"
         "Ответ просим до конца рабочего дня завтра — заявка срочная.\n\n"
         "С уважением,\nотдел сорсинга") + '</div>')
