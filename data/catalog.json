@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 177,
-    "total_bytes": 76136491,
+    "total_bytes": 76653313,
     "by_sensitivity": {
       "конфиденциально": 54,
       "внутреннее": 90,
@@ -464,6 +464,67 @@
       "referenced_by": []
     },
     {
+      "path": "gt/data/ship_lukoil.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 2364249,
+      "note": "Сводная карта закупки по всей заявке ЛУКОЙЛ: 1642 уникальных артикула обоих листов («Энергосети» 1198, НВН 444) с результатом проверки наличия. Производный файл — собирается gt/tools/ship_merge.py из rfq_demand.json и трёх поколений проверок (rfq_prices.json:checks, ship_energoseti.json, ship_sweep.json); поздняя проверка перекрывает раннюю, непроверенные строки помечены not_checked. Руками не заполнять. Отчёт — gt/tools/ship_map.py → gt/docs/ЗАКУПКА-ЛУКОЙЛ.pdf: карта «у кого что брать», изготовители узлов под шильдой OEM, позиции под подбор по стандарту, расхождения цен.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "method",
+        "rows",
+        "source",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 1642,
+        "record_keys": [
+          "cat",
+          "checked_by",
+          "conf",
+          "covers_qty",
+          "currency",
+          "in_stock",
+          "kind",
+          "lead_time",
+          "man",
+          "model",
+          "name",
+          "note",
+          "pack_qty",
+          "pn",
+          "price",
+          "qty",
+          "real_maker",
+          "real_pn",
+          "seller",
+          "seller_country",
+          "seller_url",
+          "sellers",
+          "sheet",
+          "stock_qty",
+          "substitute",
+          "unit",
+          "usd_hi",
+          "usd_lo",
+          "verdict"
+        ]
+      },
+      "last_change": "2026-09-11",
+      "last_author": "Claude",
+      "last_commit": "db80bdd",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/ship_map.py",
+        "gt/tools/ship_merge.py"
+      ]
+    },
+    {
       "path": "zip/customs/out/customs_8207_2025-01-01_2026-03-31.json",
       "subproject": "база ЗИП · таможня",
       "bytes": 2338217,
@@ -523,66 +584,6 @@
       "referenced_by": []
     },
     {
-      "path": "gt/data/ship_lukoil.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 1847427,
-      "note": "Сводная карта закупки по всей заявке ЛУКОЙЛ: 1642 уникальных артикула обоих листов («Энергосети» 1198, НВН 444) с результатом проверки наличия. Производный файл — собирается gt/tools/ship_merge.py из rfq_demand.json и трёх поколений проверок (rfq_prices.json:checks, ship_energoseti.json, ship_sweep.json); поздняя проверка перекрывает раннюю, непроверенные строки помечены not_checked. Руками не заполнять. Отчёт — gt/tools/ship_map.py → gt/docs/ЗАКУПКА-ЛУКОЙЛ.pdf: карта «у кого что брать», изготовители узлов под шильдой OEM, позиции под подбор по стандарту, расхождения цен.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "method",
-        "rows",
-        "source",
-        "updated"
-      ],
-      "main_collection": {
-        "key": "rows",
-        "records": 1642,
-        "record_keys": [
-          "cat",
-          "checked_by",
-          "conf",
-          "covers_qty",
-          "currency",
-          "in_stock",
-          "kind",
-          "lead_time",
-          "man",
-          "model",
-          "name",
-          "note",
-          "pack_qty",
-          "pn",
-          "price",
-          "qty",
-          "real_maker",
-          "real_pn",
-          "seller",
-          "seller_country",
-          "seller_url",
-          "sheet",
-          "stock_qty",
-          "substitute",
-          "unit",
-          "usd_hi",
-          "usd_lo",
-          "verdict"
-        ]
-      },
-      "last_change": "2026-09-11",
-      "last_author": "Claude",
-      "last_commit": "db80bdd",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "gt/tools/ship_map.py",
-        "gt/tools/ship_merge.py"
-      ]
-    },
-    {
       "path": "gt/data/dossiers.json",
       "subproject": "ГТУ-библиотека",
       "bytes": 1619895,
@@ -611,7 +612,8 @@
       "referenced_by": [
         "gt/build.py",
         "gt/tools/build_rfq.py",
-        "gt/tools/drop_ru.py"
+        "gt/tools/drop_ru.py",
+        "gt/tools/ship_merge.py"
       ]
     },
     {
@@ -891,6 +893,7 @@
         "gt/build.py",
         "gt/tools/build_rfq.py",
         "gt/tools/drop_ru.py",
+        "gt/tools/ship_merge.py",
         "pnw/tools/build_suppliers.py"
       ]
     },
@@ -2715,12 +2718,12 @@
         "gt/build.py",
         "gt/tools/build_rfq.py",
         "gt/tools/drop_ru.py",
+        "gt/tools/ship_merge.py",
         "ove/build.py",
         "ove/tools/bitrix_ove.py",
         "ove/tools/build_rfq.py",
         "ove/tools/check_tkp.py",
-        "pnw/tools/build_search.py",
-        "pnw/tools/build_suppliers.py"
+        "pnw/tools/build_search.py"
       ]
     },
     {
@@ -3202,7 +3205,8 @@
       },
       "referenced_by": [
         "gt/tools/build_rfq.py",
-        "gt/tools/drop_ru.py"
+        "gt/tools/drop_ru.py",
+        "gt/tools/ship_merge.py"
       ]
     },
     {
@@ -4827,12 +4831,12 @@
         "gt/build.py",
         "gt/tools/build_rfq.py",
         "gt/tools/drop_ru.py",
+        "gt/tools/ship_merge.py",
         "ove/build.py",
         "ove/tools/bitrix_ove.py",
         "ove/tools/build_rfq.py",
         "ove/tools/check_tkp.py",
-        "pnw/tools/build_search.py",
-        "pnw/tools/build_suppliers.py"
+        "pnw/tools/build_search.py"
       ]
     },
     {
@@ -5326,12 +5330,12 @@
         "gt/build.py",
         "gt/tools/build_rfq.py",
         "gt/tools/drop_ru.py",
+        "gt/tools/ship_merge.py",
         "ove/build.py",
         "ove/tools/bitrix_ove.py",
         "ove/tools/build_rfq.py",
         "ove/tools/check_tkp.py",
-        "pnw/tools/build_search.py",
-        "pnw/tools/build_suppliers.py"
+        "pnw/tools/build_search.py"
       ]
     },
     {
@@ -5794,7 +5798,8 @@
         "gpu/build.py",
         "gt/build.py",
         "gt/tools/build_rfq.py",
-        "gt/tools/drop_ru.py"
+        "gt/tools/drop_ru.py",
+        "gt/tools/ship_merge.py"
       ]
     },
     {
@@ -6071,6 +6076,7 @@
         "gt/build.py",
         "gt/tools/build_rfq.py",
         "gt/tools/drop_ru.py",
+        "gt/tools/ship_merge.py",
         "pnw/tools/build_suppliers.py"
       ]
     },
@@ -7201,7 +7207,8 @@
       "referenced_by": [
         "gt/build.py",
         "gt/tools/build_rfq.py",
-        "gt/tools/drop_ru.py"
+        "gt/tools/drop_ru.py",
+        "gt/tools/ship_merge.py"
       ]
     },
     {

@@ -13,6 +13,7 @@
 from __future__ import annotations
 
 import json
+import re
 import sys
 from datetime import date
 from pathlib import Path
@@ -22,7 +23,76 @@ DEMAND = ROOT / "gt/data/rfq_demand.json"
 PRICES = ROOT / "gt/data/rfq_prices.json"
 SHIP = ROOT / "gt/data/ship_energoseti.json"
 SWEEP = ROOT / "gt/data/ship_sweep.json"
+SELLERS = ROOT / "gt/data/ship_sellers.json"
 DST = ROOT / "gt/data/ship_lukoil.json"
+
+# наши базы контактов: путь -> ключ коллекции (None = файл сам массив)
+CONTACT_BASES = [
+    ("gt/data/dossiers.json", "dossiers"),
+    ("gt/data/suppliers.json", None),
+    ("gt/data/rfq_suppliers.json", "rows"),
+    ("gt/data/research_suppliers.json", "rows"),
+    ("gt/data/heavy_suppliers.json", "rows"),
+    ("gt/data/tfs_subsuppliers.json", "rows"),
+]
+ORG_TAIL = re.compile(
+    r"[,.]?\s*(LLC|L\.L\.C|Ltd\.?|Inc\.?|GmbH|B\.?V\.?|S\.?r\.?l\.?|S\.?p\.?A\.?|S\.?A\.?S\.?|"
+    r"Co\.?|Corp\.?|AG|Limited|Company|Pvt\.?|ООО|АО|ЗАО)\b\.?", re.I)
+EMAIL = re.compile(r"[\w.+-]+@[\w-]+\.[\w.]{2,}")
+PHONE = re.compile(r"\+\d[\d\-\s()]{7,}\d")
+
+
+def key(name: str) -> str:
+    """Имя компании без орг-формы, регистра и пунктуации — для сопоставления."""
+    n = re.sub(r"\s+", " ", s(name))
+    n = ORG_TAIL.sub("", n)
+    return re.sub(r"[^0-9a-zа-я ]", "", n.lower()).strip()
+
+
+def contact_index() -> dict:
+    """Справочник контактов: нормализованное имя -> e-mail, телефон, сайт.
+
+    Приоритет у gt/data/ship_sellers.json — он собран прицельно под эту заявку.
+    Наши турбинные базы дают добор по тем продавцам, что в них уже были.
+    """
+    idx: dict[str, dict] = {}
+
+    def put(name, emails, phones, site, country="", covers="", note=""):
+        k = key(name)
+        if not k or len(k) < 3:
+            return
+        e = idx.setdefault(k, {"name": s(name), "emails": [], "phones": [],
+                               "site": "", "country": "", "covers": "", "note": ""})
+        for v in emails:
+            if v and v not in e["emails"]:
+                e["emails"].append(v)
+        for v in phones:
+            if v and v not in e["phones"]:
+                e["phones"].append(v)
+        e["site"] = e["site"] or s(site)
+        e["country"] = e["country"] or s(country)
+        e["covers"] = e["covers"] or s(covers)
+        e["note"] = e["note"] or s(note)
+
+    for rel, coll in CONTACT_BASES:
+        path = ROOT / rel
+        if not path.exists():
+            continue
+        doc = json.loads(path.read_text())
+        rows = doc if coll is None else doc.get(coll, [])
+        pairs = rows.items() if isinstance(rows, dict) else (
+            (r.get("name") or r.get("company") or "", r) for r in rows if isinstance(r, dict))
+        for name, rec in pairs:
+            blob = json.dumps(rec, ensure_ascii=False)
+            put(name, EMAIL.findall(blob), PHONE.findall(blob),
+                rec.get("site") or rec.get("url") or "", rec.get("country") or "",
+                rec.get("what") or "", "из нашей базы поставщиков")
+
+    if SELLERS.exists():  # прицельный справочник перекрывает общие базы
+        for r in json.loads(SELLERS.read_text()).get("rows", []):
+            put(r.get("seller"), r.get("emails") or [], r.get("phones") or [],
+                r.get("site"), r.get("country"), r.get("covers"), r.get("note"))
+    return idx
 
 VERDICTS = ("in_stock", "available_lead", "pn_found_no_stock", "oem_only",
             "pn_not_found", "not_checked")
@@ -57,8 +127,36 @@ def blank(pn: str) -> dict:
         "seller_country": "", "kind": "unknown", "in_stock": "unknown", "stock_qty": "",
         "lead_time": "", "price": None, "currency": "USD", "pack_qty": 1,
         "covers_qty": "unknown", "real_maker": "", "real_pn": "", "substitute": "",
-        "note": "", "checked_by": "",
+        "note": "", "checked_by": "", "sellers": [],
     }
+
+
+def sellers_list(raw: dict) -> list:
+    """Все адресаты по строке: основной продавец плюс альтернативы, без дублей.
+
+    Альтернативы агенты складывали в alt_sellers с разной формой ключей —
+    нормализуем к одной, чтобы отчёт печатал 3-4 адресата на позицию.
+    """
+    out, seen = [], set()
+
+    def push(name, url, country, price, lead, note=""):
+        name = s(name)
+        if not name or name.lower() in seen:
+            return
+        seen.add(name.lower())
+        out.append({"seller": name, "url": s(url), "country": s(country),
+                    "price": num(price), "lead_time": s(lead), "note": s(note)})
+
+    push(raw.get("seller"), raw.get("seller_url"), raw.get("seller_country"),
+         raw.get("price"), raw.get("lead_time"))
+    for a in raw.get("alt_sellers") or []:
+        if isinstance(a, dict):
+            push(a.get("seller") or a.get("name"), a.get("url") or a.get("seller_url"),
+                 a.get("country") or a.get("seller_country"), a.get("price"),
+                 a.get("lead_time") or a.get("lead"), a.get("note"))
+        elif isinstance(a, str):
+            push(a, "", "", None, "")
+    return out
 
 
 def norm(raw: dict, source: str) -> dict:
@@ -96,6 +194,7 @@ def norm(raw: dict, source: str) -> dict:
         r["pack_qty"] = 1
     if v in LEGACY_NOTE:
         r["note"] = (LEGACY_NOTE[v] + ". " + r["note"]).strip()
+    r["sellers"] = sellers_list(raw)
     r["checked_by"] = source
     return r
 
@@ -130,12 +229,12 @@ def main() -> int:
 
     # проверки от ранней к поздней — поздняя перекрывает
     checks: dict[str, dict] = {}
-    for path, key, src in (
+    for path, coll, src in (
         (PRICES, "checks", "проверка 08.2026"),
         (SHIP, "rows", "проверка 505 строк 09.2026"),
         (SWEEP, "rows", "сплошная проверка остатка 09.2026"),
     ):
-        rows = prices_doc["checks"] if path == PRICES else load_rows(path, key)
+        rows = prices_doc["checks"] if path == PRICES else load_rows(path, coll)
         for raw in rows:
             pn = s(raw.get("pn"))
             if pn in items:
@@ -151,6 +250,20 @@ def main() -> int:
         rec.update({k: v for k, v in (checks.get(pn) or blank(pn)).items() if k != "pn"})
         out.append(rec)
 
+    # контакты — на продавца, а не на позицию: один справочник на всю выкладку
+    contacts = contact_index()
+    for rec in out:
+        for sl in rec.get("sellers") or []:
+            c = contacts.get(key(sl["seller"]))
+            if c:
+                sl["emails"] = c["emails"][:3]
+                sl["phones"] = c["phones"][:2]
+                sl["site"] = sl["url"] or c["site"]
+                sl["country"] = sl["country"] or c["country"]
+            else:
+                sl["emails"], sl["phones"] = [], []
+                sl["site"] = sl["url"]
+
     out.sort(key=lambda r: (r["sheet"], r["cat"], r["pn"]))
     DST.write_text(json.dumps({
         "updated": date.today().isoformat(),
@@ -163,7 +276,11 @@ def main() -> int:
     }, ensure_ascii=False, indent=1))
 
     checked = sum(1 for r in out if r["verdict"] != "not_checked")
+    three = sum(1 for r in out if len(r.get("sellers") or []) >= 3)
+    withc = sum(1 for r in out if any(sl.get("emails") or sl.get("phones")
+                                      for sl in r.get("sellers") or []))
     print(f"позиций {len(out)}, проверено {checked}, без проверки {len(out) - checked}")
+    print(f"  с 3+ адресатами: {three}; хотя бы с одним контактом: {withc}")
     for sheet in sorted({r["sheet"] for r in out}):
         n = [r for r in out if r["sheet"] == sheet]
         st = sum(1 for r in n if r["verdict"] == "in_stock")

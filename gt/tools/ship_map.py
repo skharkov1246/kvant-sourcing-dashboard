@@ -113,6 +113,7 @@ table.t { width: 100%; border-collapse: collapse; table-layout: fixed; margin-bo
 .t th { background: #111; color: #fff; text-align: left; padding: 1.2mm 1.4mm; font-size: 7pt; }
 .t td { padding: 1.2mm 1.4mm; word-wrap: break-word; overflow-wrap: anywhere; vertical-align: top; }
 .t tr.d td { border-top: 0.3pt solid #bbb; padding-top: 1.6mm; }
+.t tr.a td { font-size: 6.9pt; padding-top: 0.6mm; padding-bottom: 0.2mm; line-height: 1.35; }
 .t tr.n td { color: #444; font-size: 6.9pt; padding-top: 0.4mm; padding-bottom: 1.6mm; line-height: 1.3; }
 .t tbody.p:nth-of-type(even) td { background: #f6f6f6; }
 .pn { font-family: "DejaVu Sans Mono", monospace; font-weight: bold; }
@@ -129,16 +130,41 @@ li { margin-bottom: 1.5mm; line-height: 1.35; }
 """
 
 
-def rows_table(rows: list[dict], cols: list) -> str:
+def addressees(r: dict, limit: int = 4) -> str:
+    """Строка адресатов: кому писать по этой позиции, с контактом, если он есть."""
+    out = []
+    for sl in (r.get("sellers") or [])[:limit]:
+        bits = [f'<b>{E(sl["seller"])}</b>']
+        if sl.get("country"):
+            bits.append(E(sl["country"]))
+        for em in (sl.get("emails") or [])[:2]:
+            bits.append(f'<span class="pn">{E(em)}</span>')
+        for ph in (sl.get("phones") or [])[:1]:
+            bits.append(E(ph))
+        if not (sl.get("emails") or sl.get("phones")):
+            bits.append(f'<span class="dim">{E(sl.get("site") or "контакт не собран")}</span>')
+        if sl.get("lead_time"):
+            bits.append(f'<span class="dim">{E(sl["lead_time"])}</span>')
+        out.append(" · ".join(bits))
+    return " ⁄ ".join(out)
+
+
+def rows_table(rows: list[dict], cols: list, with_addr: bool = False) -> str:
     if not rows:
         return '<p class="dim">Строк нет.</p>'
     th = "".join(f'<th style="width:{w}%">{E(t)}</th>' for t, w, _ in cols)
     bodies = []
     for r in rows:
         tds = "".join(f"<td>{fn(r)}</td>" for _, _, fn in cols)
+        extra = ""
+        if with_addr:
+            addr = addressees(r)
+            if addr:
+                extra = (f'<tr class="a"><td colspan="{len(cols)}">Кому писать: '
+                         f"{addr}</td></tr>")
         note = E(r.get("note"))
         nrow = f'<tr class="n"><td colspan="{len(cols)}">{note}</td></tr>' if note else ""
-        bodies.append(f'<tbody class="p"><tr class="d">{tds}</tr>{nrow}</tbody>')
+        bodies.append(f'<tbody class="p"><tr class="d">{tds}</tr>{extra}{nrow}</tbody>')
     return f'<table class="t"><thead><tr>{th}</tr></thead>{"".join(bodies)}</table>'
 
 
@@ -404,7 +430,7 @@ eBay, Zoro, Grainger, DO Supply, shop.solarturbines.com) закрыта от а�
                 first = False
             else:
                 head = f'<h2>«{E(sheet)}» · {E(VERDICT_RU[v])} — {len(vr)}</h2>'
-            parts.append(f'<div class="sec">{head}' + rows_table(vr, LINE_COLS) + "</div>")
+            parts.append(f'<div class="sec">{head}' + rows_table(vr, LINE_COLS, with_addr=True) + "</div>")
 
     return ("<!doctype html><html lang='ru'><head><meta charset='utf-8'>"
             "<title>Закупка ЛУКОЙЛ</title>"
