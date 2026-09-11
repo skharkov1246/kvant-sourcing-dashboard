@@ -49,5 +49,8 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           PYTHONDONTWRITEBYTECODE: "1"
+          # Read only the exact immutable blob from the last failed release.
+          LIBRARY_AUDIT_BLOB_SHA256: "88e797a19cdf780a3369c8fd2833111667117464fcbcce4f3e9e63de704a3a29"
+          LIBRARY_AUDIT_BLOB_BYTES: "442083"
           LIBRARY_PUBLISH_MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.mode || 'publish' }}
         run: python scripts/publish_library_v2.py

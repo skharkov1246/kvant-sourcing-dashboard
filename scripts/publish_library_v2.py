@@ -16,6 +16,7 @@ import json
 import re
 import os
 import sys
+import time
 from urllib import parse
 import uuid
 
@@ -462,6 +463,7 @@ def search_text(row):
 
 
 KV_KEY_KINDS = frozenset(("cas_blob", "current_v2", "revision_v2", "current_v1", "history_v1", "draft", "other"))
+MAX_WRITE_ELAPSED_MS = 300_000
 
 
 def key_kind(key):
@@ -487,7 +489,7 @@ def value_fingerprint(raw):
 
 class KVReadbackError(v1.PublishError):
     """No raw key, namespace or value crosses the diagnostics boundary."""
-    def __init__(self, kind, expected, observations):
+    def __init__(self, kind, expected, observations, write_context=None):
         super().__init__("KV_READBACK_NOT_CONFIRMED")
         v1.require(isinstance(kind, str) and kind in KV_KEY_KINDS, "INVALID_READBACK_KIND")
         def checked(value):
@@ -504,10 +506,47 @@ class KVReadbackError(v1.PublishError):
             v1.require(isinstance(value, dict) and set(value) == {"attempt", "presence", "bytes", "sha256"} and
                        type(value["attempt"]) is int and value["attempt"] == number, "INVALID_READBACK_PROOF")
             attempts.append({"attempt": number, **checked({k: v for k, v in value.items() if k != "attempt"})})
-        self.proof = {"key_kind": kind, "expected": checked(expected), "attempts": attempts}
+        context = {"outcome": "not_observed", "elapsed_ms": None} if write_context is None else write_context
+        v1.require(isinstance(context, dict) and set(context) == {"outcome", "elapsed_ms"}, "INVALID_WRITE_CONTEXT")
+        outcome, elapsed = context["outcome"], context["elapsed_ms"]
+        v1.require((outcome == "not_observed" and elapsed is None) or
+                   (outcome in ("acknowledged", "transport_uncertain") and type(elapsed) is int and
+                    0 <= elapsed <= MAX_WRITE_ELAPSED_MS), "INVALID_WRITE_CONTEXT")
+        self.proof = {"key_kind": kind, "expected": checked(expected), "attempts": attempts,
+                      "write_context": dict(context)}
 
 
 class Cloudflare(v1.Cloudflare):
+    def put(self, namespace, key, raw):
+        # A context belongs to one exact PUT and must not survive a different or
+        # rejected write attempt. Raw identifiers stay only in private memory.
+        self._last_write = None
+        path = self.value_path(namespace, key)
+        v1.require(isinstance(raw, bytes) and len(raw) <= v1.MAX_BYTES, "LIBRARY_TOO_LARGE")
+        expected = value_fingerprint(raw)
+        started = time.monotonic()
+        def record(outcome):
+            elapsed = min(MAX_WRITE_ELAPSED_MS, max(0, int((time.monotonic() - started) * 1000)))
+            self._last_write = {"namespace": namespace, "key": key, "expected": expected,
+                                "outcome": outcome, "elapsed_ms": elapsed}
+        try:
+            self.envelope("PUT", path, raw)
+        except v1.PublishError as failure:
+            if str(failure) != "CLOUDFLARE_WRITE_OUTCOME_UNCONFIRMED":
+                raise
+            record("transport_uncertain")
+            # Inherited transport timeout and single-PUT policy stay unchanged.
+            self.verify(namespace, key, raw)
+        else:
+            record("acknowledged")
+
+    def write_context(self, namespace, key, expected):
+        context = getattr(self, "_last_write", None)
+        if (isinstance(context, dict) and context.get("namespace") == namespace and
+                context.get("key") == key and context.get("expected") == expected):
+            return {"outcome": context["outcome"], "elapsed_ms": context["elapsed_ms"]}
+        return {"outcome": "not_observed", "elapsed_ms": None}
+
     def verify(self, namespace, key, expected):
         expected_proof = value_fingerprint(expected)
         observations = []
@@ -518,7 +557,8 @@ class Cloudflare(v1.Cloudflare):
             if observed == expected:
                 return
             observations.append({"attempt": attempt, **value_fingerprint(observed)})
-        raise KVReadbackError(key_kind(key), expected_proof, observations)
+        raise KVReadbackError(key_kind(key), expected_proof, observations,
+                              self.write_context(namespace, key, expected_proof))
 
     def preserve(self, namespace, key, raw):
         old = self.get(namespace, key)
@@ -603,6 +643,27 @@ def audit_current(cf):
     return {"ok": True, "version": 1 if legacy_raw is not None else None,
             "present": legacy_raw is not None, "articles": len(legacy["articles"]),
             "segments": len(legacy["segments"]), "scope": "pointer_and_manifest_only"}
+
+
+def blob_audit_spec(env):
+    sha, size = env.get("LIBRARY_AUDIT_BLOB_SHA256"), env.get("LIBRARY_AUDIT_BLOB_BYTES")
+    if sha is None and size is None:
+        return None
+    v1.require(isinstance(sha, str) and re.fullmatch(r"[0-9a-f]{64}", sha) is not None and
+               isinstance(size, str) and re.fullmatch(r"[1-9][0-9]{0,6}", size) is not None,
+               "INVALID_BLOB_AUDIT_ARGUMENTS")
+    size = int(size)
+    v1.require(size <= MAX_VALUE_BYTES, "INVALID_BLOB_AUDIT_ARGUMENTS")
+    return {"sha256": sha, "bytes": size}
+
+
+def audit_blob(cf, reference):
+    """One optional diagnostic GET; a missing blob does not invalidate current."""
+    namespace = cf.namespace()
+    raw = cf.get(namespace, PREFIX + reference["sha256"])
+    expected = {"presence": "value", "bytes": reference["bytes"], "sha256": reference["sha256"]}
+    observed = value_fingerprint(raw)
+    return {"expected": expected, "observed": observed, "match": observed == expected}
 
 
 def tree(store, leaves, category):
@@ -1031,12 +1092,17 @@ def main(environ=None):
     try:
         mode = env.get("LIBRARY_PUBLISH_MODE", "publish")
         v1.require(mode in ("publish", "audit"), "INVALID_PUBLISH_MODE")
+        reference = blob_audit_spec(env)
         cf = Cloudflare(env.get("CLOUDFLARE_ACCOUNT_ID"), env.get("CLOUDFLARE_API_TOKEN"))
         current = audit_current(cf)
         if mode == "audit":
             result = {"mode": "audit", **current}
+            if reference is not None:
+                result["blob_audit"] = audit_blob(cf, reference)
         else:
             print(json.dumps({"event": "prepublish_audit", "audit": current}, ensure_ascii=True), file=sys.stderr)
+            if reference is not None:
+                print(json.dumps({"event": "blob_audit", "audit": audit_blob(cf, reference)}, ensure_ascii=True), file=sys.stderr)
             result = run(Database(env.get("SUPABASE_DB_URL")), cf)
     except KVReadbackError as failure:
         result = {"ok": False, "error": "KV_READBACK_NOT_CONFIRMED", "readback": failure.proof}
