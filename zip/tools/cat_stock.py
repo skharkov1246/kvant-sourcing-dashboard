@@ -8,9 +8,10 @@
   1. держит перечень заявки (парт-номера, наименования, количества) — сам файл
      заказчика в репозиторий не кладётся;
   2. раскладывает позиции по узлам, ходовым классам и ТН ВЭД;
-  3. поднимает из нашей таможенной базы (zip/customs/out) компании с рабочим
-     каналом из КНР и ЮАР: кто импортёр, от кого, каким маршрутом — список
-     «кого запрашивать», подтверждённый фактами ввоза, а не памятью;
+  3. поднимает из нашей таможенной базы (zip/customs/out) ИНОСТРАННЫХ
+     отправителей из КНР и ЮАР — это и есть адресаты запроса. Российские
+     импортёры в лист не выводятся: по решению владельца запрашиваем только
+     за рубежом, отечественных игроков не рассматриваем;
   4. добавляет каналы (стоки) обеих стран с оценкой срока и афтермаркет из
      нашего справочника ODM.
 
@@ -167,26 +168,59 @@ ROUTE = {
                 "спросить ремкомплект уплотнений, если заказчик готов на восстановление"),
 }
 
-# Роль компании по ИНН — из декларации это не следует, проставляем вручную.
-ROLE = {
-    "5029242308": ("трейдер", "Канал ЮАР (гидроцилиндры Epiroc, EXW Pretoria) плюс единственный в базе ввоз "
-                              "genuine CAT по клапанам гидротрансмиссий и частям гидроустановок. Первый звонок."),
-    "2465084448": ("трейдер", "Зарегистрирована в Красноярске — там же, куда нужна поставка. Самый плотный канал "
-                              "ЮАР в нашей базе: 16 поставок, EXW Претория и FOB Дурбан. Возит ровно наши классы: "
-                              "гидроцилиндры погрузчика и клапаны гидротрансмиссий."),
-    "5404454954": ("брокер", "Таможенный брокер, Новосибирск. Своего стока не держит — полезен как "
-                             "исполнитель ввоза, когда товар найден."),
-    "8709009294": ("парк Cat", "Конечный потребитель с парком Cat, не поставщик."),
-    "5103070023": ("парк Cat", "Конечный потребитель с парком Cat, не поставщик."),
+# Что мы знаем о конкретном отправителе сверх декларации.
+EXPORTER_NOTE = {
+    "WECO (PTY) LTD": "Самый плотный южноафриканский отправитель в нашей базе: 10 поставок, "
+                      "EXW Ритвалеранд под Преторией. Возит гидравлику и части гидроперфораторов — "
+                      "то есть умеет и оформлять экспорт в РФ, и работать с нашими классами.",
+    "BOXAKA PROJECTS (PTY) LTD": "EXW Претория, части бурильных машин. Канал рабочий, номенклатура смежная — "
+                                 "спрашивать, берутся ли за поиск Cat по складам ЮАР.",
+    "CATERPILLAR (QINGZHOU) CO. LTD": "Завод Caterpillar в Циньчжоу. По нашей базе — самый плотный поток "
+                                      "Cat/SEM в РФ через Хэйхэ и Благовещенск.",
+    "CATERPILLAR INC.": "Прямые отгрузки самого Caterpillar: EXW Шанхай в 12.2024 и 01.2025 — "
+                        "самый свежий genuine-поток в базе.",
+    "HAINA (SHENZHEN) MECHANICAL EQUIPMENT CO. LTD": "Гидроцилиндры для самоходной техники, 67 поставок. "
+                                                     "Не Cat, но изготовитель цилиндров — кандидат на "
+                                                     "изготовление по чертежу и на ремкомплекты.",
+    "ZHEJIANG ZHIGAO MACHINERY CO. LTD": "Силовые гидроцилиндры, 64 поставки. Профиль по цилиндрам совпадает, "
+                                         "марка другая — запрашивать как изготовителя, а не как склад.",
 }
-ROLE_ORDER = {"дилер": 0, "трейдер": 1, "брокер": 2, "парк Cat": 3}
-LANE_ORDER = {"ЮАР · гидравлика": 0, "ЮАР + CAT": 1, "ЮАР · отгрузка": 2,
-              "КНР · CAT": 3, "ЮАР · логистика": 4, "ЮАР · происхождение": 5, "КНР · канал": 6}
 
-# Профильность под нашу номенклатуру: гидравлика, клапаны, электрика, трансмиссия, рама.
-_PROFILE = re.compile(r"ГИДРАВЛ|КЛАПАН|РУЛЕВ|ТРАНСМИСС|ЖГУТ|ПРОВОД|КАБЕЛ|РАДИАТОР|ЦИЛИНДР|"
-                      r"РАМ[ЫАУ]|НАВЕСН|ДВИГАТЕЛ|ПОРШН|АКТУАТОР|ПРИВОД")
-_GET = re.compile(r"КОРОНК|АДАПТЕР КРЕПЛЕНИЯ|ЗУБ|РЫХЛИТЕЛ|КОВШ|ФИКСАТОР|ПАЛЕЦ")
+# Компании вне нашей базы: взяты с рынка, в таможенной выгрузке их нет.
+# Помечаются отдельно, чтобы сорсер знал, что подтверждения поставки в РФ у нас нет.
+MARKET_SUPPLIERS = [
+    {"name": "Barloworld Equipment", "country": "ЮАР", "kind": "дилер Cat",
+     "place": "Isando и Boksburg, Йоханнесбург",
+     "what": "Дилер Caterpillar в Южной Африке с 1927 года. Распределительный хаб Isando на весь юг Африки; "
+             "в Boksburg — Reman-центр Cat по гидравлике, трансмиссиям и двигателям с поставкой узлов "
+             "по обмену и крупнейший Rebuild-центр в дилерской сети Cat.",
+     "ask": "наличие по 29 PN на складе; по цилиндрам и КПП — Cat Reman по обмену и без обмена; "
+            "первым вопросом, до цен, — готовность отгружать в РФ"},
+    {"name": "TOSOG", "country": "ЮАР", "kind": "трейдер",
+     "place": "Претория, Йоханнесбург",
+     "what": "Независимый склад Cat: genuine, OEM, афтермаркет и б/у одновременно, экспорт по Африке — "
+             "экспортная логистика поставлена.",
+     "ask": "что из 29 PN лежит на складе сегодня, статус каждой детали, цена EXW и вес брутто"},
+    {"name": "Nkokhi Group", "country": "ЮАР", "kind": "трейдер",
+     "place": "Претория, Йоханнесбург",
+     "what": "Тот же профиль: genuine, OEM, афтермаркет и б/у Cat для горной и строительной техники, "
+             "поставки по ЮАР и на экспорт.",
+     "ask": "наличие по PN, статус детали, цена EXW, вес брутто, срок отгрузки"},
+    {"name": "Machineryline South Africa", "country": "ЮАР", "kind": "площадка б/у",
+     "place": "Йоханнесбург",
+     "what": "Маркетплейс б/у запчастей и техники: через него выходят на разборы, у которых своего сайта нет.",
+     "ask": "фото детали и бирки с PN, наработка донора, гарантия, вес брутто"},
+]
+
+LANE_ORDER = {"Caterpillar": 0, "ЮАР · гидравлика": 1, "КНР · гидравлика": 2,
+              "ЮАР · смежное": 3, "КНР · смежное": 4, "ЮАР · инструмент": 5, "КНР · инструмент": 6}
+
+# Профильность под нашу номенклатуру: гидравлика и клапаны — классы тяжёлых позиций.
+_HYDRA = {"8412", "8481", "8544"}
+_TOOLING = {"8207", "8466", "8467"}
+# Гидроцилиндр в описании груза — единственный надёжный признак профильного отправителя:
+# у крупного поставщика бурового инструмента код 8412 всё равно где-нибудь мелькнёт.
+_CYL = re.compile(r"ГИДРОЦИЛИНДР|ЦИЛИНДР ГИДРАВЛ|ГИДРАВЛИЧЕСК\w* ЦИЛИНДР|ЦИЛИНДРЫ\)")
 
 
 def canon(value: str) -> str:
@@ -199,41 +233,29 @@ def clean(value: str) -> str:
     return re.sub(r"\s+", " ", s)
 
 
-_HYDRA = {"8412", "8481"}          # гидравлика и клапаны — классы наших тяжёлых позиций
-_TOOLING = {"8207", "8466", "8467"}  # буровой и слесарный инструмент — не наша номенклатура
+def norm_company(name: str) -> str:
+    """Одна компания в декларациях пишется по-разному: с точкой, без, с CO./LTD.
 
-
-def lane_of(hs4: set[str], ship_za: int, orig_za: int, cn: int, cat: int) -> tuple[str, str]:
-    """Чем лид полезен по этой заявке.
-
-    Отгрузка из ЮАР и происхождение из ЮАР — разные вещи, и путать их нельзя:
-    груз с маркировкой «сделано в ЮАР», уехавший к нам из Турции или Беларуси,
-    не доказывает, что у компании есть выход на южноафриканский склад.
-    Сильный признак — страна отправления, а не происхождения.
+    Без склейки WECO (PTY)LTD, WECO PTY LTD и WECO (PTY) LTD выглядят как три
+    разных отправителя, и десять поставок распадаются на 7 + 2 + 1.
     """
-    if ship_za and hs4 & _HYDRA:
-        return ("ЮАР · гидравлика", "отгружает из ЮАР ровно наши классы — гидроцилиндры и клапаны гидротрансмиссий")
-    if ship_za and cat:
-        return ("ЮАР + CAT", "отгрузка из ЮАР и опыт ввоза genuine CAT")
-    if ship_za and hs4 <= _TOOLING:
-        return ("ЮАР · логистика", "возит инструмент, не нашу номенклатуру: ценен отлаженным маршрутом из ЮАР")
-    if ship_za:
-        return ("ЮАР · отгрузка", "отгрузка из ЮАР подтверждена, номенклатура смежная")
-    if orig_za:
-        return ("ЮАР · происхождение", "товар южноафриканского происхождения, но уехал к нам из третьей страны — "
-                                       "выход на склад в ЮАР не доказан")
-    if cat and cn:
-        return ("КНР · CAT", "ввозил genuine CAT из Китая")
-    return ("КНР · канал", "маршрут из Китая рабочий")
+    n = re.sub(r"[^A-Z0-9А-Я]+", " ", clean(name).upper())
+    n = re.sub(r"\b(CO|LTD|LIMITED|INC|GMBH|AB|SA|LLC|PTY|КНР|CQL)\b", " ", n)
+    return re.sub(r"\s+", " ", n).strip()
 
 
-def fit_of(hs4: set[str], desc: str) -> str:
-    """Профильность лида под нашу заявку: по коду ТН ВЭД и описанию груза."""
-    if hs4 & {"8412", "8481", "8544", "8483", "8708"} or _PROFILE.search(desc.upper()):
-        return "профильно"
-    if _GET.search(desc.upper()):
-        return "канал"
-    return "смежно"
+def lane_of(hs4: set[str], geo: str, cat: bool, cyl: int) -> tuple[str, str]:
+    """Чем отправитель полезен по этой заявке."""
+    if cat:
+        return ("Caterpillar", "отгружал сам Caterpillar или его завод — прямой доступ к genuine")
+    if cyl:
+        return (f"{geo} · гидравлика",
+                "отгружает гидроцилиндры и клапаны: профиль совпадает с тяжёлой частью заявки, "
+                "марка другая — запрашивать и как склад, и как изготовителя по чертежу")
+    if hs4 and hs4 <= _TOOLING:
+        return (f"{geo} · инструмент",
+                "возит инструмент, не нашу номенклатуру: ценен только отлаженным экспортом в РФ")
+    return (f"{geo} · смежное", "маршрут рабочий, номенклатура смежная")
 
 
 def _desc_date(value: str) -> str:
@@ -241,87 +263,161 @@ def _desc_date(value: str) -> str:
     return "".join(chr(ord("9") - int(c)) if c.isdigit() else c for c in value or "")
 
 
-def customs_leads() -> tuple[list[dict], dict]:
-    """Компании с рабочим каналом из КНР или ЮАР — по фактам ввоза в нашей базе.
+def foreign_suppliers() -> tuple[list[dict], dict]:
+    """Иностранные отправители из КНР и ЮАР — адресаты запроса.
 
-    Берём две категории: кто возил genuine CAT (отправитель — сам CATERPILLAR)
-    и кто возил что угодно из ЮАР. Первое даёт доступ к номенклатуре,
-    второе — готовую логистику из нужной нам страны.
+    Российские импортёры намеренно не выводятся: по решению владельца запрос
+    идёт только за рубеж. Сам факт ввоза в РФ при этом остаётся доказательством
+    того, что отправитель умеет оформлять экспорт в нашу сторону, поэтому
+    считаем поставки, но контрагента не называем.
     """
     rows, files = [], sorted(CUSTOMS.glob("customs_*.json"))
-    stats_cat = stats_za = 0
     for path in files:
         if path.name == "_summary.json":
             continue
         payload = json.loads(path.read_text(encoding="utf-8"))
         for rec in payload.get("matched", []):
-            origin, dispatch = clean(rec.get("origin")).upper(), clean(rec.get("dispatch")).upper()
+            dispatch = clean(rec.get("dispatch")).upper()
             exporter = clean(rec.get("exporter"))
             is_cat = "CATERPILLAR" in exporter.upper()
-            is_za = "ZA" in (origin, dispatch)
-            ship_za, orig_za = dispatch == "ZA", origin == "ZA"
-            is_cn = "CN" in (origin, dispatch)
-            if not (is_za or (is_cat and is_cn) or is_cat):
+            if not exporter or exporter.upper() in ("ОТСУТСТВУЕТ", "НЕ ОБОЗНАЧЕН"):
                 continue
-            stats_cat += is_cat
-            stats_za += is_za
+            if dispatch not in ("ZA", "CN") and not is_cat:
+                continue
             rows.append({
-                "date": rec.get("date"), "importer": clean(rec.get("importer")), "inn": clean(rec.get("inn")),
-                "exporter": exporter, "origin": origin, "dispatch": dispatch,
+                "date": rec.get("date"), "exporter": exporter, "key": norm_company(exporter),
+                "dispatch": dispatch, "origin": clean(rec.get("origin")).upper(),
                 "incoterms": clean(rec.get("incoterms")), "place": clean(rec.get("place")),
-                "hs10": clean(rec.get("hs10")), "desc": clean(rec.get("desc"))[:180],
-                "cat": is_cat, "za": is_za, "cn": is_cn,
-                "ship_za": ship_za, "orig_za": orig_za, "src": path.name,
+                "hs10": clean(rec.get("hs10")), "desc": clean(rec.get("desc"))[:150],
+                "cat": is_cat, "cyl": bool(_CYL.search(clean(rec.get("desc")).upper())),
+                "src": path.name,
             })
 
-    leads: dict[tuple[str, str], dict] = {}
+    agg: dict[str, dict] = {}
     for r in rows:
-        lead = leads.setdefault((r["importer"], r["inn"]), {
-            "importer": r["importer"], "inn": r["inn"], "shipments": 0, "last": "",
-            "routes": Counter(), "hs": Counter(), "evidence": [],
-            "cat_shipments": 0, "za_shipments": 0, "cn_shipments": 0,
-            "za_ship_from": 0, "za_origin_only": 0,
-            "_hs4": set(), "_desc": [],
+        a = agg.setdefault(r["key"], {
+            "exporter": r["exporter"], "shipments": 0, "last": "", "cat": False,
+            "terms": Counter(), "hs": Counter(), "names": Counter(),
+            "za": 0, "cn": 0, "cyl": 0, "evidence": [], "_hs4": set(),
         })
-        lead["shipments"] += 1
-        lead["cat_shipments"] += r["cat"]
-        lead["za_shipments"] += r["za"]
-        lead["cn_shipments"] += r["cn"]
-        lead["za_ship_from"] += r["ship_za"]
-        lead["za_origin_only"] += r["orig_za"] and not r["ship_za"]
-        lead["last"] = max(lead["last"], r["date"] or "")
-        lead["routes"][f'{r["origin"]}→{r["dispatch"]}, {r["incoterms"]} {r["place"]}'] += 1
-        lead["hs"][r["hs10"][:4]] += 1
-        lead["_hs4"].add(r["hs10"][:4])
-        lead["_desc"].append(r["desc"])
-        if len(lead["evidence"]) < 3:
-            lead["evidence"].append({"date": r["date"], "exporter": r["exporter"],
-                                     "hs10": r["hs10"], "desc": r["desc"], "src": r["src"]})
+        a["shipments"] += 1
+        a["names"][r["exporter"]] += 1
+        a["last"] = max(a["last"], r["date"] or "")
+        a["cat"] = a["cat"] or r["cat"]
+        a["cyl"] += r["cyl"]
+        a["za"] += r["dispatch"] == "ZA"
+        a["cn"] += r["dispatch"] == "CN"
+        a["hs"][r["hs10"][:4]] += 1
+        a["_hs4"].add(r["hs10"][:4])
+        if r["place"]:
+            a["terms"][f'{r["incoterms"]} {r["place"]}'] += 1
+        if len(a["evidence"]) < 2 and r["desc"]:
+            a["evidence"].append({"date": r["date"], "hs10": r["hs10"], "desc": r["desc"]})
 
     out = []
-    for lead in leads.values():
-        lead["routes"] = [r for r, _ in lead["routes"].most_common()][:3]
-        lead["hs"] = [h for h, _ in lead["hs"].most_common()][:4]
-        hs4 = lead.pop("_hs4")
-        lead["fit"] = fit_of(hs4, " ".join(lead.pop("_desc")))
-        lead["role"], lead["role_note"] = ROLE.get(lead["inn"], ("трейдер", ""))
-        lead["geo"] = [g for g, n in (("ЮАР", lead["za_shipments"]), ("КНР", lead["cn_shipments"])) if n]
-        lead["lane"], lead["lane_note"] = lane_of(hs4, lead["za_ship_from"], lead["za_origin_only"],
-                                                  lead["cn_shipments"], lead["cat_shipments"])
-        out.append(lead)
-    # Порядок обзвона: сначала те, кто возит из ЮАР нашу номенклатуру, затем прочие каналы ЮАР,
-    # затем Китай; внутри группы — по свежести последней поставки.
-    out.sort(key=lambda x: (LANE_ORDER[x["lane"]], ROLE_ORDER[x["role"]],
-                            -x["shipments"], _desc_date(x["last"])))
+    for a in agg.values():
+        if not (a["za"] or a["cn"]):
+            continue
+        geo = "ЮАР" if a["za"] >= a["cn"] else "КНР"
+        hs4 = a.pop("_hs4")
+        a["exporter"] = a["names"].most_common(1)[0][0]      # самое частое написание имени
+        a["geo"] = geo
+        a["lane"], a["lane_note"] = lane_of(hs4, geo, a["cat"], a["cyl"])
+        a["terms"] = [t for t, _ in a["terms"].most_common()][:2]
+        a["hs"] = [h for h, _ in a["hs"].most_common()][:4]
+        a["note"] = EXPORTER_NOTE.get(a["exporter"].upper().rstrip("."), "")
+        a.pop("names")
+        out.append(a)
+
+    # ЮАР показываем целиком — отправителей оттуда мало и каждый на счету.
+    # По Китаю оставляем профильных: Caterpillar и гидравлику, остальное отсекаем.
+    za = [x for x in out if x["geo"] == "ЮАР"]
+    cn = [x for x in out if x["geo"] == "КНР" and (x["cat"] or x["cyl"] >= 3)]
+    picked = sorted(za, key=lambda x: (LANE_ORDER[x["lane"]], -x["shipments"]))[:10]
+    picked += sorted(cn, key=lambda x: (LANE_ORDER[x["lane"]], -x["shipments"]))[:10]
+    picked.sort(key=lambda x: (LANE_ORDER[x["lane"]], -x["shipments"], _desc_date(x["last"])))
 
     stats = {
         "files": len([f for f in files if f.name != "_summary.json"]),
-        "cat_rows": stats_cat, "za_rows": stats_za, "rows": len(rows),
+        "rows": len(rows), "exporters": len(out),
+        "za_exporters": len(za), "cn_exporters": sum(1 for x in out if x["geo"] == "КНР"),
         "period": ["2023-01-01", "2026-03-31"],
-        "note": "Агрегат нашей платной таможенной выгрузки: только факт ввоза и маршрут. "
-                "Стоимости, веса и номера деклараций не переносятся.",
+        "note": "Агрегат нашей платной таможенной выгрузки: только отправитель, маршрут и род груза. "
+                "Российские получатели, стоимости, веса и номера деклараций не переносятся.",
     }
-    return out[:20], stats
+    return picked, stats
+
+
+# Базисы, при которых товар передаётся на площадке продавца: только они называют
+# реальный адрес склада. CPT/DAP/CFR указывают точку доставки, а не откуда везли.
+_AT_SELLER = {"EXW", "FCA", "FOB"}
+# Российские пункты в поле «место»: при CPT/DAP это destination, складом не является.
+_RU_PLACE = re.compile(r"МОСКВА|С-ПЕТЕР|ВЛАДИВОСТОК|БЛАГОВЕЩЕНСК|ЗАБАЙКАЛЬСК|НОВОРОССИЙСК|"
+                       r"ШЕРЕМЕТ|SVO|КРАСНОАРМ|КАНИГУРГАН|МАНЬЧЖУРИЯ|МАНЧЖУРИЯ|ХЭЙХЭ")
+
+
+def shipping_points() -> list[dict]:
+    """Адреса, с которых товар реально уезжал: то немногое, что здесь подтверждено.
+
+    Наличие по нашим парт-номерам не подтверждает ничто — остатки складов закрыты.
+    А вот площадка отгрузки в декларации названа, и базис EXW/FCA означает, что
+    товар передали именно там. Это и есть ответ на вопрос «какой склад подтверждён»:
+    подтверждён адрес и факт отгрузки оттуда в РФ, а не наличие наших деталей.
+    """
+    agg: dict[tuple, dict] = {}
+    for path in sorted(CUSTOMS.glob("customs_*.json")):
+        if path.name == "_summary.json":
+            continue
+        for rec in json.loads(path.read_text(encoding="utf-8")).get("matched", []):
+            dispatch = clean(rec.get("dispatch")).upper()
+            exporter = clean(rec.get("exporter"))
+            incoterms = clean(rec.get("incoterms")).upper()
+            place = clean(rec.get("place")).upper()
+            is_cat = "CATERPILLAR" in exporter.upper()
+            # Строго страна отправления: заявку ограничили КНР и ЮАР, поэтому отгрузки
+            # Caterpillar из Стамбула, Сингапура и Таллина сюда не относятся.
+            if dispatch not in ("ZA", "CN"):
+                continue
+            if incoterms not in _AT_SELLER or not place or _RU_PLACE.search(place):
+                continue
+            key = (dispatch, place, incoterms, norm_company(exporter))
+            a = agg.setdefault(key, {
+                "geo": "ЮАР" if dispatch == "ZA" else "КНР", "place": place,
+                "incoterms": incoterms, "exporter": exporter, "shipments": 0,
+                "first": "9999", "last": "", "hs": set(), "cyl": 0, "cat": is_cat, "desc": "",
+            })
+            a["shipments"] += 1
+            a["first"] = min(a["first"], rec.get("date") or "")
+            a["last"] = max(a["last"], rec.get("date") or "")
+            a["hs"].add(clean(rec.get("hs10"))[:4])
+            a["cyl"] += bool(_CYL.search(clean(rec.get("desc")).upper()))
+            if not a["desc"]:
+                a["desc"] = clean(rec.get("desc"))[:120]
+
+    out = []
+    for a in agg.values():
+        a["hs"] = sorted(a["hs"])
+        # Профиль площадки: чем она нам интересна
+        if a["cat"]:
+            a["profile"] = "Caterpillar"
+        elif a["cyl"] or set(a["hs"]) & _HYDRA:
+            a["profile"] = "гидравлика"
+        elif set(a["hs"]) <= _TOOLING:
+            a["profile"] = "инструмент"
+        else:
+            a["profile"] = "смежное"
+        out.append(a)
+
+    rank = {"Caterpillar": 0, "гидравлика": 1, "смежное": 2, "инструмент": 3}
+    za = sorted((x for x in out if x["geo"] == "ЮАР"),
+                key=lambda x: (rank[x["profile"]], -x["shipments"]))
+    # По Китаю площадок тысячи: берём отдельно площадки самого Caterpillar
+    # и отдельно тех, у кого гидроцилиндр — постоянный груз, а не разовый.
+    cn_cat = sorted((x for x in out if x["geo"] == "КНР" and x["cat"]),
+                    key=lambda x: -x["shipments"])
+    cn_cyl = sorted((x for x in out if x["geo"] == "КНР" and not x["cat"] and x["cyl"] >= 10),
+                    key=lambda x: -x["cyl"])
+    return za[:12] + cn_cat[:4] + cn_cyl[:6]
 
 
 def odm_leads() -> dict:
@@ -375,18 +471,20 @@ def build() -> dict:
     for g in groups.values():
         g["classes"] = dict(g.pop("classes"))
 
-    leads, stats = customs_leads()
+    suppliers, stats = foreign_suppliers()
+    points = shipping_points()
     return {
         "updated": date.today().isoformat(),
-        "schema": "kvant.cat-stock/2",
+        "schema": "kvant.cat-stock/3",
         "built_by": "zip/tools/cat_stock.py",
         "request": {
             "asked": ASK_DATE, "destination": "г. Красноярск", "deadline": DEADLINE,
             "ship_by": SHIP_BY, "days_left": 34,
             "lines": len(positions), "units": sum(p["qty"] for p in positions),
             "geo": GEO,
-            "geo_note": "По решению владельца ищем только на складах КНР и ЮАР. "
-                        "Российские, казахстанские и турецкие каналы из раскладки исключены.",
+            "geo_note": "По решению владельца ищем только на складах КНР и ЮАР и запрашиваем только "
+                        "иностранных поставщиков. Российские игроки — импортёры, дилеры и трейдеры — "
+                        "в лист не выводятся.",
             "customer": "не раскрывается",
             "source": "перечень заказчика, xlsx, 29 строк; сам файл в репозиторий не кладётся",
         },
@@ -408,6 +506,18 @@ def build() -> dict:
             "гидравлику и трансмиссии и отдаёт узлы по обмену. Это ответ по 18 цилиндрам и КПП.",
             "Китай сильнее по массовой механике и электрике: крышки, кронштейны, трубки, фитинги, "
             "жгуты и кабели — там их держат на складе и отгружают сразу.",
+            "Подтверждённого склада по нашим 29 номерам нет ни одного: остатки закрыты, их даёт только "
+            "запрос. Подтверждены адреса площадок, с которых товар реально уезжал в РФ — при базисе "
+            "EXW и FCA товар передают именно там. Сильнейший адрес по нашей заявке — Ритвалеранд и "
+            "Претория (Гаутенг, ЮАР): оттуда отгружали и WECO, и Epiroc, и шли именно гидроцилиндры "
+            "и клапаны. У китайского потока Cat базисы CPT Благовещенск и FCA Хэйхэ — это доставка "
+            "до границы, адрес склада в декларации не раскрыт.",
+            "Запрос идёт напрямую за рубеж, без российского посредника. Значит заранее нужны: свой "
+            "экспедитор на плече Йоханнесбург/Китай — Красноярск, готовность платить по инвойсу "
+            "иностранного поставщика и свой декларант. Иначе найденный сток некому будет вывезти.",
+            "Из ЮАР в нашей базе реально отгружают единицы компаний, и сильнейшая из них — WECO (PTY) LTD "
+            "(EXW Ритвалеранд под Преторией, гидравлика). По Китаю выбор шире, но по нашим PN профильны "
+            "только завод Caterpillar в Циньчжоу и прямые отгрузки самого Caterpillar из Шанхая.",
             "Позиция 16 (КПП) записана шестизначным номером 294221 — это не формат Cat (7 знаков). "
             "Уточнить у заказчика до рассылки: по неверному номеру запрос уйдёт впустую.",
             "Жгуты кабины 380-0049 / 380-0050 — сборки под конкретное исполнение машины. Складского "
@@ -416,20 +526,26 @@ def build() -> dict:
         "positions": positions,
         "groups": sorted(groups.values(), key=lambda g: -g["qty"]),
         "channels": CHANNELS,
-        "leads": leads,
+        "suppliers": suppliers,
+        "shipping_points": points,
+        "market_suppliers": MARKET_SUPPLIERS,
         "aftermarket": odm_leads(),
         "customs_stats": stats,
         "playbook": [
             {"day": "День 1", "what": "Запросить у заказчика модель и серийные номера трёх машин, подтвердить "
-                                      "номер КПП и согласовать авиафрахт как единственный способ уложиться в срок."},
-            {"day": "День 1", "what": "Barloworld Equipment (Isando): наличие по 29 PN и — первым вопросом, "
-                                      "до цен — готовность отгрузить на РФ. От ответа зависит вся ветка ЮАР."},
-            {"day": "День 1–2", "what": "Веерный запрос по таблице «Кого запрашивать»: компании с подтверждённым "
-                                        "каналом ЮАР и КНР. Просить разбивку «в наличии / под заказ» и вес брутто."},
+                                      "номер КПП и согласовать авиафрахт — при поставке из КНР и ЮАР это "
+                                      "единственный способ уложиться в срок."},
+            {"day": "День 1", "what": "Barloworld Equipment (Isando, ЮАР): наличие по 29 PN и — первым вопросом, "
+                                      "до цен — готовность отгружать в РФ. От ответа зависит вся ветка ЮАР."},
+            {"day": "День 1–2", "what": "Веерный запрос по таблице отправителей: сначала ЮАР (их единицы), "
+                                        "затем профильный Китай. Письмо на английском, одно на всех."},
+            {"day": "День 2", "what": "Параллельно — свой экспедитор и декларант: плечо Йоханнесбург — Красноярск "
+                                      "и Китай — Красноярск, условия оплаты иностранного инвойса. Без этого "
+                                      "найденный сток вывезти нечем."},
             {"day": "День 2–3", "what": "Независимые склады и разборы ЮАР по тяжёлым позициям: цилиндры, КПП. "
                                         "Фото детали и бирки с PN обязательно."},
-            {"day": "День 3–4", "what": "Склады КНР (Гуанчжоу, Цзинань, Шанхай) по массовой механике и электрике. "
-                                        "Отдельно проверить genuine против реплики."},
+            {"day": "День 3–4", "what": "Склады и заводы КНР по массовой механике и электрике. Отдельно "
+                                        "проверить genuine против реплики: фото упаковки Cat и серийной наклейки."},
             {"day": "День 4–5", "what": "Свести закрытое стоком и открытое, посчитать два бюджета — авиа и море — "
                                         "и вынести заказчику решение по позициям, которые в срок не проходят."},
         ],
@@ -441,7 +557,10 @@ def main() -> int:
     OUT.write_text(json.dumps(doc, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     print(f"{OUT.relative_to(ROOT.parent)}: позиций {len(doc['positions'])}, "
           f"узлов {len(doc['groups'])}, каналов {len(doc['channels'])} "
-          f"(КНР/ЮАР), лидов {len(doc['leads'])}, "
+          f"(КНР/ЮАР), иностранных отправителей {len(doc['suppliers'])} "
+          f"(ЮАР {sum(1 for x in doc['suppliers'] if x['geo'] == 'ЮАР')}), "
+          f"площадок отгрузки {len(doc['shipping_points'])}, "
+          f"рыночных {len(doc['market_suppliers'])}, "
           f"афтермаркет {len(doc['aftermarket']['relevant'])}")
     return 0
 
