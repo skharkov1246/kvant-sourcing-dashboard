@@ -35,7 +35,13 @@ async function setup(options={}){
  const body=new Element('body'),allCreated=[],historyLog=[],requests=[];let loc=new URL('https://portal.example/library');
  const doc={body,getElementById:id=>map[id]||allCreated.find(e=>e.id===id),createElement:tag=>{const e=new Element(tag);allCreated.push(e);return e;},createElementNS:(_,tag)=>{const e=new Element(tag);allCreated.push(e);return e;},createTextNode:t=>Object.assign(new Element('#text'),{textContent:t})};
  const context={document:doc,window:{matchMedia:()=>({matches:mobile}),addEventListener(){}},get location(){return loc;},history:{replaceState:(_a,_b,path)=>{loc=new URL(path,loc);historyLog.push(path);}},URL,URLSearchParams,AbortController,setTimeout,clearTimeout,crypto:{randomUUID:crypto.randomUUID},console,
- fetch:async(url,options)=>{requests.push({url,options});if(failure&&url==='/api/library')return {status:503,ok:false,headers:new Headers({'Content-Type':'application/json'})};if(url.startsWith('/admin/library/drafts?'))return new Response(JSON.stringify({drafts:saved,cursor:null,list_complete:true}),{headers:{'Content-Type':'application/json'}});
+ fetch:async(url,options)=>{requests.push({url,options});
+ if(optionsForSetup.v2){const u=new URL(url,'https://portal.example'),json=(v,status=200)=>new Response(JSON.stringify(v),{status,headers:{'Content-Type':'application/json'}});const counts={knowledge:1000,component:1000,supplier:1000,price:1000};
+  if(u.pathname==='/api/library/v2')return optionsForSetup.manifestFailure?json({error:'library_unavailable'},503):json({version:2,revision:'r2',published_at:'2026-09-11',segments:[{id:'engine',name:'Пример оборудования',note:'Описание',article_count:4000,counts_by_kind:counts}],article_count:4000,admin});
+  if(u.pathname==='/api/library/v2/article'){const a=articles.find(a=>a.id===u.searchParams.get('id'));return json({revision:'r2',article:a});}
+  if(u.pathname==='/api/library/v2/articles'){if(optionsForSetup.slowKnowledge&&u.searchParams.get('kind')==='knowledge')await new Promise(r=>setTimeout(r,60));if(optionsForSetup.pageFailure)return json({error:'missing_shard'},503);const next=u.searchParams.get('cursor'),q=u.searchParams.get('q'),kind=u.searchParams.get('kind');const selected=articles.filter(a=>!kind||(a.sources.kind===kind));const items=(q?(next?[articles[0],articles[1]]:[]):next?selected.slice(1):selected.slice(0,1)).map(({body,...a})=>({...a,excerpt:'Краткая карточка без полного текста',...(optionsForSetup.truncatedSources?{sources:{kind:a.sources.kind},sources_truncated:true}:{})}));return json({revision:'r2',items,next_cursor:next?null:'p2',complete:!!next,scope_total:4000,scanned:25,matched_in_batch:items.length,total:q?null:4000});}
+ }
+ if(url==='/api/library/v2')return new Response(JSON.stringify({error:'library_v2_unavailable'}),{status:404,headers:{'Content-Type':'application/json'}});if(failure&&url==='/api/library')return {status:503,ok:false,headers:new Headers({'Content-Type':'application/json'})};if(url.startsWith('/admin/library/drafts?'))return new Response(JSON.stringify({drafts:saved,cursor:null,list_complete:true}),{headers:{'Content-Type':'application/json'}});
  if(url==='/admin/library/drafts'){posts++;const article=JSON.parse(options.body);saved.push({id:article.id,title:article.title,segment_id:article.segment_id,status:'pending',created_at:article.updated_at});if(optionsForSetup.uncertainFirst&&posts===1)throw new Error('Connection lost after server save');return new Response(JSON.stringify({ok:true,id:article.id,status:'pending',queued:true,sync_requested:optionsForSetup.syncRequested!==false}),{headers:{'Content-Type':'application/json'}});}return new Response(JSON.stringify(url==='/api/rights'?{sites:['gt'],admin:true}:{segments:[{id:'engine',name:'Пример оборудования',note:'Описание'},{id:'gtu',name:'ГТУ',note:'Газотурбинные установки'}],articles,published_at:'2026-09-11',admin}),{headers:{'Content-Type':'application/json'}});}};
  vm.runInNewContext(source,context);for(let i=0;i<5;i++)await new Promise(setImmediate);return {map,allCreated,requests,historyLog,body};
 }
@@ -72,4 +78,33 @@ test('failed sync is reported as saved pending, with exact-payload retry',async(
 test('API error differs from an empty library; editor is hidden from non-admins',async()=>{
  const f=await setup({failure:true});assert.equal(f.map.loadStatus.hidden,false);assert.match(f.map.loadStatus.textContent,/Не удалось загрузить/);assert.equal(f.map.equipmentLanding.hidden,true);assert.equal(f.map.editor.hidden,true);
  const h=await setup({admin:false});assert.equal(h.map.editor.hidden,true);assert.equal(h.map.admin.hidden,true);assert.equal(h.requests.some(r=>r.url.startsWith('/admin/')),false);
+});
+
+test('v2 loads metadata and one bounded page, then fetches full article on demand',async()=>{
+ const h=await setup({v2:true});assert.match(h.map.equipmentCards.textContent,/4000/);assert.equal(h.requests.some(r=>r.url==='/api/library'),false);assert.equal(h.requests.some(r=>r.url.includes('/articles?')),false);
+ await h.map.equipmentCards.children[0].fire('click');await button(h.map.kindTabs,'Компоненты').fire('click');assert.match(h.map.recordCatalog.textContent,/0007/);assert.match(h.map.pageStatus.textContent,/4000/);assert.equal(h.map.admin.hidden,true);assert.equal(h.map.editor.hidden,false);
+ await button(h.map.recordCatalog,'0007').fire('click');assert.ok(h.requests.some(r=>r.url.includes('/article?')&&r.url.includes('revision=r2')));assert.match(h.map.reader.textContent,/Описание детали/);assert.match(h.map.reader.textContent,/Найти все материалы по артикулу/);
+ await h.map.nextPage.fire('click');assert.match(h.map.pageStatus.textContent,/Страница 2/);assert.equal(h.map.nextPage.disabled,true);await h.map.previousPage.fire('click');assert.match(h.map.pageStatus.textContent,/Страница 1/);
+});
+test('v2 search does not call an incomplete empty page an empty search',async()=>{
+ const h=await setup({v2:true});h.map.search.value='подтверждён';await h.map.search.fire('input');await new Promise(r=>setTimeout(r,450));assert.match(h.map.pageStatus.textContent,/ещё не завершён/);assert.equal(h.map.nextPage.disabled,false);assert.doesNotMatch(h.map.emptyList.textContent,/Ничего не найдено/);
+ await h.map.nextPage.fire('click');assert.match(h.map.pageStatus.textContent,/Всего совпадений: 2/);assert.equal(h.map.articleList.children.length,2);assert.equal(h.map.nextPage.disabled,true);
+ await h.map.previousPage.fire('click');assert.match(h.map.pageStatus.textContent,/ещё не завершён/);await h.map.nextPage.fire('click');assert.match(h.map.pageStatus.textContent,/Всего совпадений: 2/);
+});
+test('v2 missing data fails visibly and never falls back to stale v1',async()=>{
+ const broken=await setup({v2:true,manifestFailure:true});assert.match(broken.map.loadStatus.textContent,/Не удалось загрузить/);assert.equal(broken.requests.some(r=>r.url==='/api/library'),false);
+ const h=await setup({v2:true,pageFailure:true});await h.map.equipmentCards.children[0].fire('click');await button(h.map.kindTabs,'Компоненты').fire('click');assert.match(h.map.pageStatus.textContent,/Данные страницы не получены/);assert.equal(h.map.retryPage.hidden,false);assert.equal(h.requests.some(r=>r.url==='/api/library'),false);
+});
+
+test('v2 ignores an older page response after equipment section changes',async()=>{
+ const h=await setup({v2:true,slowKnowledge:true});const first=h.map.equipmentCards.children[0].fire('click');await button(h.map.kindTabs,'Компоненты').fire('click');await first;assert.equal(h.map.recordCatalog.hidden,false);assert.match(h.map.recordCatalog.textContent,/0007/);assert.doesNotMatch(h.map.recordCatalog.textContent,/Пример проверки/);
+});
+
+test('v2 sources omitted from summaries remain reachable during an active search',async()=>{
+ const h=await setup({v2:true,truncatedSources:true});await h.map.equipmentCards.children[0].fire('click');await button(h.map.kindTabs,'Источники').fire('click');assert.match(h.map.sourceCatalog.textContent,/не поместились/);assert.doesNotMatch(h.map.sourceCatalog.textContent,/пока не приложены/);
+ h.map.search.value='подтверждён';await h.map.search.fire('input');await new Promise(r=>setTimeout(r,450));await h.map.nextPage.fire('click');await button(h.map.sourceCatalog,'Пример проверки').fire('click');assert.equal(h.map.sourceCatalog.hidden,true);assert.equal(h.map.workspace.hidden,false);assert.match(h.map.reader.textContent,/Уточнить исполнение/);assert.match(h.map.reader.textContent,/Документ/);
+});
+test('v2 empty or failed component search page is not reported as an empty database',async()=>{
+ const h=await setup({v2:true});await h.map.equipmentCards.children[0].fire('click');await button(h.map.kindTabs,'Компоненты').fire('click');h.map.search.value='искомый';await h.map.search.fire('input');await new Promise(r=>setTimeout(r,450));assert.match(h.map.recordCatalog.textContent,/Продолжите поиск/);assert.doesNotMatch(h.map.recordCatalog.textContent,/ничего не найдено/);
+ const broken=await setup({v2:true,pageFailure:true});await broken.map.equipmentCards.children[0].fire('click');await button(broken.map.kindTabs,'Компоненты').fire('click');assert.match(broken.map.recordCatalog.textContent,/Не удалось загрузить/);assert.doesNotMatch(broken.map.recordCatalog.textContent,/пока не опубликованы/);
 });

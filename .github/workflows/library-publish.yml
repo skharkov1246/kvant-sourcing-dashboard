@@ -10,6 +10,8 @@ on:
     branches: [main]
     paths:
       - scripts/publish_library.py
+      - scripts/publish_library_v2.py
+      - public/library_v2.js
       - .github/workflows/library-publish.yml
 
 permissions:
@@ -38,4 +40,4 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           PYTHONDONTWRITEBYTECODE: "1"
-        run: python scripts/publish_library.py
+        run: python scripts/publish_library_v2.py

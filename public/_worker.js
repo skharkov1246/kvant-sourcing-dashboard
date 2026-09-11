@@ -15,6 +15,8 @@
 //
 // САМООБНОВЛЕНИЕ: если данные старше 2 ч, воркер триггерит пересборку через
 // GitHub repository_dispatch (секрет GH_DISPATCH_TOKEN); без секрета просто выключено.
+import { libraryV2, libraryV2Segments } from "./library_v2.js";
+
 const GH_REPO = "skharkov1246/kvant-sourcing-dashboard";
 const FRESH_MS = 2 * 3600 * 1000;          // порог свежести — 2 часа
 const DEBOUNCE_MS = 15 * 60;               // не триггерить пересборку чаще раза в 15 мин
@@ -534,6 +536,7 @@ const LIBRARY_ID = /^[A-Za-z0-9][A-Za-z0-9:_-]{0,159}$/;
 function libraryRoute(path) {
   if (["/library", "/library/", "/library.html"].includes(path)) return "page";
   if (path === "/api/library") return "api";
+  if (["/api/library/v2", "/api/library/v2/articles", "/api/library/v2/article"].includes(path)) return "v2";
   if (path === "/admin/library") return "publish";
   if (path === "/admin/library/drafts") return "drafts";
   let decoded = path;
@@ -678,6 +681,9 @@ async function publishLibrary(request, env) {
   const kv = aclStore(env);
   if (!kv || typeof kv.put !== "function") return libraryJson({ error: "library_unavailable" }, 503);
   try {
+    // Once v2 exists, only the serialized database publisher may advance it.
+    // A v1-only edit would create a competing, unreachable current library.
+    if (await libraryV2Segments(env)) return libraryJson({ error: "library_v2_use_owner_drafts" }, 409);
     const incoming = libraryDocument(await libraryRequestBody(request));
     const { snapshot: previous, raw: previousRaw } = await readLibraryRecord(env);
     const merge = (before, after) => [...new Map([...before, ...after].map((item) => [item.id, item])).values()];
@@ -775,7 +781,7 @@ async function libraryDrafts(request, env) {
   try {
     const input = await libraryRequestBody(request);
     const article = libraryDraftArticle(libraryObject(input) && input.article ? input.article : input);
-    const snapshot = await readLibrary(env);
+    const snapshot = await libraryV2Segments(env) || await readLibrary(env);
     if (!snapshot.segments.some((segment) => segment.id === article.segment_id)) libraryInvalid();
     const key = LIBRARY_DRAFT_PREFIX + article.id;
     const existing = await kv.get(key);
@@ -830,6 +836,7 @@ export default {
         return libraryJson({ error: "forbidden" }, 403);
       }
       if (request.method !== "GET") return libraryJson({ error: "method_not_allowed" }, 405, { Allow: "GET" });
+      if (library === "v2") return libraryV2(request, env, rights.admin);
       if (library === "api") {
         try {
           const snapshot = await readLibrary(env);
