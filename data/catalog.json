@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 176,
-    "total_bytes": 73442924,
+    "total_bytes": 73461355,
     "by_sensitivity": {
       "конфиденциально": 55,
       "внутреннее": 88,
@@ -3300,6 +3300,63 @@
       ]
     },
     {
+      "path": "zip/data/cat_stock_2026-09.json",
+      "subproject": "база ЗИП",
+      "bytes": 68166,
+      "note": "Срочная заявка Caterpillar на 29 позиций (92 шт) с поставкой в Красноярск к 15.10.2026, поиск стока ограничен складами КНР и ЮАР (решение владельца 11.09.2026): разбор перечня по узлам и ходовым классам, шесть каналов поставки обеих стран с реальными сроками до Красноярска, 20 компаний из нашей таможенной выгрузки с рабочим каналом из ЮАР или от самого CATERPILLAR — считается страна отправления, а не происхождения, поэтому отгрузку из ЮАР подтверждают только три компании; профильный китайский афтермаркет из справочника ODM и план сорсера на пять дней. Строит zip/tools/cat_stock.py; лист для сорсеров — zip/orders/CAT-СТОКИ-СОРСИНГ.pdf (рендер zip/tools/cat_stock_table.py + cat_stock_pdf.py). Заказчик не называется, цен и контактов нет; из таможни перенесены только факт ввоза и маршрут — стоимости, веса и номера деклараций не переносятся. Наличие складов программно не проверялось: закрытых остатков в открытых источниках нет.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "aftermarket",
+        "built_by",
+        "channels",
+        "customs_stats",
+        "findings",
+        "groups",
+        "leads",
+        "machine",
+        "playbook",
+        "positions",
+        "request",
+        "schema",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "positions",
+        "records": 29,
+        "record_keys": [
+          "ask",
+          "group",
+          "hs_hint",
+          "name_en",
+          "name_ru",
+          "pn",
+          "pn_cat",
+          "pn_norm",
+          "pp",
+          "qty",
+          "route",
+          "stock_class",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-11",
+      "last_author": "Claude",
+      "last_commit": "cbf0b32",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "ИНН контрагентов",
+          "участники внешнеэкономических сделок"
+        ]
+      },
+      "referenced_by": [
+        "zip/tools/cat_stock.py",
+        "zip/tools/cat_stock_table.py"
+      ]
+    },
+    {
       "path": "gidromet/data/voprosy.json",
       "subproject": "гидрометаллургия",
       "bytes": 66562,
@@ -4297,63 +4354,6 @@
       },
       "referenced_by": [
         "gidromet/build.py"
-      ]
-    },
-    {
-      "path": "zip/data/cat_stock_2026-09.json",
-      "subproject": "база ЗИП",
-      "bytes": 50021,
-      "note": "Срочная заявка Caterpillar на 29 позиций (92 шт) с поставкой в Красноярск к 15.10.2026: разбор перечня по узлам и ходовым классам, шесть каналов поставки с реальными сроками до Красноярска, 16 импортёров Cat из нашей таможенной выгрузки (кто, ИНН, маршрут, что везли — отбор по признаку «отправитель сам CATERPILLAR»), профильный китайский афтермаркет из справочника ODM и план сорсера на пять дней. Строит zip/tools/cat_stock.py; лист для сорсеров — zip/orders/CAT-СТОКИ-СОРСИНГ.pdf (рендер zip/tools/cat_stock_table.py + cat_stock_pdf.py). Заказчик не называется, цен и контактов нет; из таможни перенесены только факт ввоза и маршрут — стоимости, веса и номера деклараций не переносятся. Наличие складов программно не проверялось: закрытых остатков в открытых источниках нет.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "aftermarket",
-        "built_by",
-        "channels",
-        "customs_stats",
-        "findings",
-        "groups",
-        "leads",
-        "machine",
-        "playbook",
-        "positions",
-        "request",
-        "schema",
-        "updated"
-      ],
-      "main_collection": {
-        "key": "positions",
-        "records": 29,
-        "record_keys": [
-          "ask",
-          "group",
-          "hs_hint",
-          "name_en",
-          "name_ru",
-          "pn",
-          "pn_cat",
-          "pn_norm",
-          "pp",
-          "qty",
-          "route",
-          "stock_class",
-          "unit"
-        ]
-      },
-      "last_change": "2026-09-11",
-      "last_author": "Claude",
-      "last_commit": "1c007a1",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "конфиденциально",
-        "markers": [
-          "ИНН контрагентов",
-          "участники внешнеэкономических сделок"
-        ]
-      },
-      "referenced_by": [
-        "zip/tools/cat_stock.py",
-        "zip/tools/cat_stock_table.py"
       ]
     },
     {
@@ -6228,7 +6228,7 @@
     {
       "path": "data/catalog_notes.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 12999,
+      "bytes": 13285,
       "note": "",
       "format": "json",
       "shape": "объект",
@@ -6260,7 +6260,7 @@
       ],
       "last_change": "2026-09-11",
       "last_author": "Claude",
-      "last_commit": "1c007a1",
+      "last_commit": "cbf0b32",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
