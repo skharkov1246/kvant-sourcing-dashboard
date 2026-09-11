@@ -679,6 +679,18 @@ def database_call(stage, operation, *args, **kwargs):
 
 
 class Database(v1.Database):
+    def connect(self, readonly=True):
+        connection = self.driver.connect(**self.parameters)
+        try:
+            connection.set_session(readonly=readonly, autocommit=False, isolation_level="REPEATABLE READ")
+        except Exception:
+            try:
+                connection.close()
+            except Exception:
+                pass
+            raise
+        return connection
+
     @contextmanager
     def _session(self):
         connection = database_call("connect", self.connect)

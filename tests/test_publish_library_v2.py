@@ -429,6 +429,27 @@ def test_cleanup_preserves_initial_database_failure_and_always_closes_connection
     assert events.count("close") >= 4
 
 
+def test_session_setup_error_keeps_primary_sqlstate_if_connection_close_also_fails():
+    events = []
+    class Connection:
+        def set_session(self, **kwargs):
+            events.append(kwargs)
+            raise SyntheticDriverFailure("PRIVATE setup DSN")
+        def close(self):
+            events.append("close")
+            raise RuntimeError("PRIVATE cleanup")
+    class Driver:
+        @staticmethod
+        def connect(**kwargs): return Connection()
+    db = object.__new__(p.Database)
+    db.driver, db.parameters = Driver, {}
+    with pytest.raises(p.DatabaseReadError) as caught:
+        db.read_segments()
+    assert caught.value.stage == "connect"
+    assert caught.value.sqlstate == "57014"
+    assert events == [{"readonly": True, "autocommit": False, "isolation_level": "REPEATABLE READ"}, "close"]
+
+
 def test_run_uses_segment_only_preflight_then_one_complete_relation_snapshot():
     class CountedDB(RelatedDB):
         def __init__(self):

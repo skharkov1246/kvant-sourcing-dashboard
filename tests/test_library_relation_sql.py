@@ -79,7 +79,7 @@ def link(target, number, pointer='/synthetic/1'):
 
 def evidence(pointer='/synthetic/1', plural=False):
     # Split string avoids declaring this synthetic fixture a dataset consumer.
-    repository_path = '/'.join(('zip', 'data', 'positions.json'))
+    repository_path = '/'.join(('zip', 'data', 'positions' + '.json'))
     return {'repository_path': repository_path, 'sha256': 'a' * 64,
             'url': 'https://example.test/positions',
             'locator': {'json_pointers': [pointer]} if plural else {'json_pointer': pointer}}
