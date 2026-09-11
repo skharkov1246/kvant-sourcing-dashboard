@@ -342,6 +342,7 @@
       "referenced_by": [
         "pnw/tools/build_suppliers.py",
         "zip/build.py",
+        "zip/tools/cat_stock.py",
         "zip/tools/who_supplies.py"
       ]
     },
@@ -4339,10 +4340,10 @@
           "unit"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-11",
+      "last_author": "Claude",
+      "last_commit": "1c007a1",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
         "markers": [
@@ -4350,7 +4351,10 @@
           "участники внешнеэкономических сделок"
         ]
       },
-      "referenced_by": []
+      "referenced_by": [
+        "zip/tools/cat_stock.py",
+        "zip/tools/cat_stock_table.py"
+      ]
     },
     {
       "path": "gt/data/pn_catalog.json",
@@ -6254,9 +6258,9 @@
         "zip/data/telsmith_crossrefs.json",
         "zip/data/telsmith_nodrawings.json"
       ],
-      "last_change": "2026-09-10",
-      "last_author": "skharkov1246",
-      "last_commit": "37dfb12",
+      "last_change": "2026-09-11",
+      "last_author": "Claude",
+      "last_commit": "1c007a1",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
@@ -7301,7 +7305,8 @@
         "markers": []
       },
       "referenced_by": [
-        "zip/customs/glbs_pull.mjs"
+        "zip/customs/glbs_pull.mjs",
+        "zip/tools/cat_stock.py"
       ]
     },
     {
