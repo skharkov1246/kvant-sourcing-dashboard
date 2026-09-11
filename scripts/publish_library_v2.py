@@ -268,7 +268,7 @@ ORDER BY sources->>'importer_id' COLLATE \"C\", id LIMIT 250001"""
 
 # Project identities and source coordinates only, never supplier/article bodies.
 # Both sides must be approved rows in the same repeatable-read transaction.
-RELATIONS_SQL = """WITH edges AS (
+RELATIONS_SQL = """WITH edges AS MATERIALIZED (
  SELECT s.id AS supplier_db_id, s.sources->>'importer_id' AS supplier_id,
  COALESCE(NULLIF(s.sources->'supplier_fields'->>'name',''),s.title) AS name,
  e.link, s.sources->'references' AS refs
@@ -279,9 +279,15 @@ RELATIONS_SQL = """WITH edges AS (
  AND s.sources->>'kind'='supplier'
  ORDER BY s.sources->>'importer_id' COLLATE "C",s.id,e.link->>'article_id',e.link->>'source_pointer'
  LIMIT %s
+), component_ids AS MATERIALIZED (
+ SELECT id, sources->>'importer_id' AS importer_id,
+ sources->'component_fields'->>'part_number' AS part_number
+ FROM public.lib_knowledge
+ WHERE researched_by=%s AND sources->>'publication_approved'='true'
+ AND sources->>'kind'='component'
 )
 SELECT e.supplier_db_id,e.supplier_id,e.name,e.link,t.id,
- t.sources->>'importer_id',t.sources->'component_fields'->>'part_number',
+ t.importer_id,t.part_number,
  (SELECT jsonb_agg(jsonb_build_object('sha256',r->>'sha256','url',r->>'url',
  'json_pointer',e.link->>'source_pointer','repository_path',r->>'repository_path')) FROM jsonb_array_elements(
  CASE WHEN jsonb_typeof(e.refs)='array' THEN e.refs ELSE '[]'::jsonb END) r
@@ -289,9 +295,7 @@ SELECT e.supplier_db_id,e.supplier_id,e.name,e.link,t.id,
  (r->'locator'->>'json_pointer'=e.link->>'source_pointer' OR
  CASE WHEN jsonb_typeof(r->'locator'->'json_pointers')='array'
  THEN r->'locator'->'json_pointers' ? (e.link->>'source_pointer') ELSE false END))
-FROM edges e LEFT JOIN public.lib_knowledge t ON t.sources->>'importer_id'=e.link->>'article_id'
- AND t.researched_by=%s AND t.sources->>'publication_approved'='true'
- AND t.sources->>'kind'='component'
+FROM edges e LEFT JOIN component_ids t ON t.importer_id=e.link->>'article_id'
 ORDER BY e.supplier_id COLLATE "C",e.supplier_db_id,e.link->>'article_id',e.link->>'source_pointer',t.id
 LIMIT %s"""
 
@@ -641,38 +645,119 @@ class Builder:
                 "directory": roots.get(("directory", "", "")), "search_version": "unicode-lower-substring-v1"}
 
 
+DATABASE_STAGES = frozenset(("connect", "segments_execute", "segments_fetch",
+    "relations_execute", "relations_fetch", "articles_execute", "articles_fetch", "close"))
+DATABASE_SQLSTATES = frozenset(("08000", "08001", "08003", "08004", "08006", "08007", "08P01",
+    "22023", "25006", "25P02", "28000", "28P01", "40001", "40P01", "42501", "42601",
+    "42703", "42804", "42883", "42P01", "53000", "53100", "53200", "53300", "53400",
+    "54000", "54001", "54011", "55000", "55P03", "57014", "57P01", "57P02", "57P03"))
+
+
+class DatabaseReadError(v1.PublishError):
+    """Allowlisted diagnostic metadata only; never an exception message or DSN."""
+    def __init__(self, stage, failure):
+        super().__init__("DATABASE_READ_FAILED")
+        self.stage = stage if isinstance(stage, str) and stage in DATABASE_STAGES else None
+        self.sqlstate = None
+        for attribute in ("sqlstate", "pgcode"):
+            try:
+                value = getattr(failure, attribute, None)
+            except Exception:
+                continue
+            if isinstance(value, str) and value in DATABASE_SQLSTATES:
+                self.sqlstate = value
+                break
+
+
+def database_call(stage, operation, *args, **kwargs):
+    try:
+        return operation(*args, **kwargs)
+    except v1.PublishError:
+        raise
+    except Exception as failure:
+        raise DatabaseReadError(stage, failure) from None
+
+
 class Database(v1.Database):
+    def connect(self, readonly=True):
+        connection = self.driver.connect(**self.parameters)
+        try:
+            connection.set_session(readonly=readonly, autocommit=False, isolation_level="REPEATABLE READ")
+        except Exception:
+            try:
+                connection.close()
+            except Exception:
+                pass
+            raise
+        return connection
+
+    @contextmanager
+    def _session(self):
+        connection = database_call("connect", self.connect)
+        try:
+            yield connection
+        finally:
+            active_error = sys.exc_info()[0] is not None
+            cleanup_error = None
+            for operation in (connection.rollback, connection.close):
+                try:
+                    database_call("close", operation)
+                except Exception as failure:
+                    if cleanup_error is None:
+                        cleanup_error = failure
+            if cleanup_error is not None and not active_error:
+                raise cleanup_error
+
+    @contextmanager
+    def _cursor(self, connection, stage, name=None):
+        cursor = database_call(stage, connection.cursor, name=name)
+        try:
+            yield cursor
+        finally:
+            active_error = sys.exc_info()[0] is not None
+            try:
+                database_call("close", cursor.close)
+            except Exception:
+                if not active_error:
+                    raise
+
+    def _segments(self, connection):
+        with self._cursor(connection, "segments_execute") as cursor:
+            database_call("segments_execute", cursor.execute, v1.SEGMENTS_SQL)
+            rows = database_call("segments_fetch", cursor.fetchmany, MAX_SEGMENTS + 1)
+            v1.require(len(rows) <= MAX_SEGMENTS, "SEGMENT_LIMIT")
+            return [{"id": v1.stable_id(r[0]), "name": v1.string(r[1], 300),
+                     "note": v1.string(r[2], 10000, True)} for r in rows]
+
+    def read_segments(self):
+        # Draft FK validation needs no relation projection or article cursor.
+        with self._session() as connection:
+            return self._segments(connection)
+
     @contextmanager
     def stream(self):
-        connection = None
-        try:
-            connection = self.connect()
-            with connection.cursor() as cursor:
-                cursor.execute(v1.SEGMENTS_SQL)
-                rows = cursor.fetchmany(MAX_SEGMENTS + 1)
-                v1.require(len(rows) <= MAX_SEGMENTS, "SEGMENT_LIMIT")
-                segments = [{"id": v1.stable_id(r[0]), "name": v1.string(r[1], 300),
-                             "note": v1.string(r[2], 10000, True)} for r in rows]
-            with connection.cursor(name="private_library_relations") as cursor:
+        with self._session() as connection:
+            segments = self._segments(connection)
+            with self._cursor(connection, "relations_execute", name="private_library_relations") as cursor:
                 cursor.itersize = 50
-                cursor.execute(RELATIONS_SQL, (v1.MANAGER, MAX_RELATION_EDGES + 1,
-                                              v1.MANAGER, MAX_RELATION_EDGES + 1))
+                database_call("relations_execute", cursor.execute, RELATIONS_SQL,
+                              (v1.MANAGER, MAX_RELATION_EDGES + 1, v1.MANAGER, MAX_RELATION_EDGES + 1))
                 def projection():
                     while True:
-                        rows = cursor.fetchmany(50)
+                        rows = database_call("relations_fetch", cursor.fetchmany, 50)
                         if not rows:
                             return
                         yield from rows
                 relations, relation_metrics = supplier_relations(projection())
-            # Server cursor bounds client memory; the repeatable-read transaction
-            # supplies one source snapshot for all fetches.
-            with connection.cursor(name="private_library_v2") as cursor:
+            # One readonly repeatable-read transaction supplies all source rows
+            # and the narrow relation projection. Consumer/KV errors propagate.
+            with self._cursor(connection, "articles_execute", name="private_library_v2") as cursor:
                 cursor.itersize = 50
-                cursor.execute(ORDERED_SQL, (v1.MANAGER,))
+                database_call("articles_execute", cursor.execute, ORDERED_SQL, (v1.MANAGER,))
                 def source():
                     seen = 0
                     while True:
-                        rows = cursor.fetchmany(50)
+                        rows = database_call("articles_fetch", cursor.fetchmany, 50)
                         if not rows:
                             return
                         for row in rows:
@@ -682,16 +767,6 @@ class Database(v1.Database):
                             v1.require(v1.managed(normalized), "UNAPPROVED_DATABASE_ROW")
                             yield normalized
                 yield segments, SourceRows(source(), relations, relation_metrics)
-        except v1.PublishError:
-            raise
-        except Exception:
-            raise v1.PublishError("DATABASE_READ_FAILED") from None
-        finally:
-            if connection is not None:
-                try:
-                    connection.rollback()
-                finally:
-                    connection.close()
 
 
 def old_rows(store, old_manifest, old_v1):
@@ -798,9 +873,9 @@ def run(db, cf, now=None):
     v1_raw = cf.get(namespace, v1.CURRENT_KEY)
     legacy = v1.snapshot(v1_raw)
     # Segment names and draft FK are read in a short readonly transaction.
-    with db.stream() as (segments, _):
-        metrics = {}
-        drafts = v1.pending_drafts(cf, namespace, segments, metrics)
+    segments = db.read_segments()
+    metrics = {}
+    drafts = v1.pending_drafts(cf, namespace, segments, metrics)
     preflight_drafts(store, drafts, old_manifest, legacy)
     for draft in drafts:
         v1.require(cf.get(namespace, draft["key"]) == draft["raw"], "DRAFT_CHANGED")
@@ -854,6 +929,9 @@ def main(environ=None):
     try:
         result = run(Database(env.get("SUPABASE_DB_URL")),
                      Cloudflare(env.get("CLOUDFLARE_ACCOUNT_ID"), env.get("CLOUDFLARE_API_TOKEN")))
+    except DatabaseReadError as failure:
+        result = {"ok": False, "error": "DATABASE_READ_FAILED",
+                  "stage": failure.stage, "sqlstate": failure.sqlstate}
     except v1.PublishError as failure:
         result = {"ok": False, "error": str(failure)}
     except KeyboardInterrupt:

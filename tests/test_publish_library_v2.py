@@ -62,6 +62,8 @@ class DB:
     def __init__(self, rows):
         self.rows = rows
         self.inserts, self.iterated = [], 0
+    def read_segments(self):
+        return copy.deepcopy(SEGMENTS)
     @contextmanager
     def stream(self):
         def source():
@@ -264,8 +266,8 @@ def test_safe_failure_output_never_raw_values(monkeypatch, capsys):
 
 def test_source_bundle_has_named_server_cursor_and_readonly_transaction():
     source = (SCRIPTS / "publish_library_v2.py").read_text()
-    assert 'cursor(name="private_library_v2")' in source
-    assert "fetchmany(50)" in source
+    assert 'name="private_library_v2"' in source
+    assert '"articles_fetch", cursor.fetchmany, 50' in source
     assert "LIMIT 250001" in p.ORDERED_SQL
     assert "COLLATE \"C\"" in p.ORDERED_SQL
 
@@ -279,6 +281,7 @@ def test_actual_database_session_uses_readonly_snapshot_and_50_row_fetches():
         def __init__(self, named): self.named, self.offset, self.calls = named, 0, []
         def __enter__(self): return self
         def __exit__(self, *args): pass
+        def close(self): pass
         def execute(self, sql, params=None): self.calls.append((sql, params))
         def fetchmany(self, size):
             if not self.named: return [(x["id"], x["name"], x["note"]) for x in SEGMENTS]
@@ -316,6 +319,153 @@ def test_actual_database_session_uses_readonly_snapshot_and_50_row_fetches():
     assert connection.cursors[2].itersize == 50
     assert connection.cursors[2].calls == [(p.ORDERED_SQL, (p.v1.MANAGER,))]
     assert connection.rollbacks == 1 and connection.closed
+
+
+class SyntheticDriverFailure(Exception):
+    pgcode = "57014"
+
+
+def diagnostic_database(failing_stage=None, failure=None, fail_cleanup=False):
+    """Driver-operation fixture; external consumer failures remain outside it."""
+    failure = failure or SyntheticDriverFailure("PRIVATE DSN=password BODY SQL text")
+    events = []
+    failed = False
+    def operation(stage):
+        nonlocal failed
+        events.append(stage)
+        if stage == failing_stage:
+            failed = True
+            raise failure
+        if stage == "close" and fail_cleanup and failed:
+            raise RuntimeError("PRIVATE cleanup credential")
+    class Cursor:
+        def __init__(self, name):
+            self.kind = {None: "segments", "private_library_relations": "relations",
+                         "private_library_v2": "articles"}[name]
+            self.offset = 0
+        def execute(self, sql, params=None):
+            operation(self.kind + "_execute")
+        def fetchmany(self, size):
+            operation(self.kind + "_fetch")
+            if self.offset:
+                return []
+            self.offset += 1
+            if self.kind == "segments":
+                return [(r["id"], r["name"], r["note"]) for r in SEGMENTS]
+            if self.kind == "relations":
+                return []
+            r = row(3)
+            return [tuple(r[k] for k in ("segment_id", "title", "topic", "body", "sources", "confidence", "updated_at"))]
+        def close(self):
+            operation("close")
+    class Connection:
+        def cursor(self, name=None): return Cursor(name)
+        def rollback(self): operation("close")
+        def close(self): operation("close")
+    def connect():
+        operation("connect")
+        return Connection()
+    db = object.__new__(p.Database)
+    db.connect = connect
+    return db, events
+
+
+@pytest.mark.parametrize("stage", sorted(p.DATABASE_STAGES))
+def test_driver_failure_has_only_allowlisted_stage_and_sqlstate(stage, monkeypatch, capsys):
+    db, events = diagnostic_database(stage)
+    with pytest.raises(p.DatabaseReadError) as caught:
+        with db.stream() as (_, rows):
+            list(rows)
+    failure = caught.value
+    assert str(failure) == "DATABASE_READ_FAILED"
+    assert failure.stage == stage and failure.sqlstate == "57014"
+    monkeypatch.setattr(p, "Database", lambda *args: db)
+    monkeypatch.setattr(p, "Cloudflare", lambda *args: object())
+    def fail(*args, **kwargs): raise failure
+    monkeypatch.setattr(p, "run", fail)
+    assert p.main({}) == 1
+    output = capsys.readouterr().out
+    assert json.loads(output) == {"ok": False, "error": "DATABASE_READ_FAILED", "stage": stage, "sqlstate": "57014"}
+    assert all(private not in output for private in ("PRIVATE", "password", "BODY", "SQL text"))
+    assert stage in events
+
+
+@pytest.mark.parametrize("code,expected", [("42601", "42601"), ("42501", "42501"), ("55P03", "55P03"),
+    ("08006", "08006"), ("PRIVATE body", None), ("ZZ999", None), (None, None)])
+def test_sqlstate_filter_does_not_accept_arbitrary_exception_fields(code, expected):
+    failure = RuntimeError("PRIVATE connection")
+    failure.sqlstate = code
+    diagnostic = p.DatabaseReadError("relations_execute", failure)
+    assert diagnostic.sqlstate == expected
+    assert p.DatabaseReadError("PRIVATE custom stage", failure).stage is None
+    assert p.DatabaseReadError([], failure).stage is None
+
+
+def test_segment_preflight_does_not_open_relation_or_article_cursors():
+    db, events = diagnostic_database()
+    assert db.read_segments() == SEGMENTS
+    assert [event for event in events if event != "close"] == ["connect", "segments_execute", "segments_fetch"]
+    assert events.count("close") == 3
+
+
+@pytest.mark.parametrize("consumer_failure", [p.v1.PublishError("KV_READBACK_NOT_CONFIRMED"),
+    RuntimeError("PRIVATE consumer body")])
+def test_stream_never_relabels_consumer_or_kv_failure_as_database_read(consumer_failure):
+    db, _ = diagnostic_database()
+    with pytest.raises(type(consumer_failure)) as caught:
+        with db.stream():
+            raise consumer_failure
+    assert caught.value is consumer_failure
+
+
+def test_cleanup_preserves_initial_database_failure_and_always_closes_connection():
+    original = SyntheticDriverFailure("PRIVATE query")
+    db, events = diagnostic_database("articles_fetch", original, fail_cleanup=True)
+    with pytest.raises(p.DatabaseReadError) as caught:
+        with db.stream() as (_, rows):
+            list(rows)
+    assert caught.value.stage == "articles_fetch"
+    assert caught.value.sqlstate == "57014"
+    assert events.count("close") >= 4
+
+
+def test_session_setup_error_keeps_primary_sqlstate_if_connection_close_also_fails():
+    events = []
+    class Connection:
+        def set_session(self, **kwargs):
+            events.append(kwargs)
+            raise SyntheticDriverFailure("PRIVATE setup DSN")
+        def close(self):
+            events.append("close")
+            raise RuntimeError("PRIVATE cleanup")
+    class Driver:
+        @staticmethod
+        def connect(**kwargs): return Connection()
+    db = object.__new__(p.Database)
+    db.driver, db.parameters = Driver, {}
+    with pytest.raises(p.DatabaseReadError) as caught:
+        db.read_segments()
+    assert caught.value.stage == "connect"
+    assert caught.value.sqlstate == "57014"
+    assert events == [{"readonly": True, "autocommit": False, "isolation_level": "REPEATABLE READ"}, "close"]
+
+
+def test_run_uses_segment_only_preflight_then_one_complete_relation_snapshot():
+    class CountedDB(RelatedDB):
+        def __init__(self):
+            super().__init__([row(1), row(3)], [relation_projection()])
+            self.segment_reads, self.full_streams = 0, 0
+        def read_segments(self):
+            self.segment_reads += 1
+            return super().read_segments()
+        @contextmanager
+        def stream(self):
+            self.full_streams += 1
+            with super().stream() as result:
+                yield result
+    db = CountedDB()
+    result = p.run(db, CF(), NOW)
+    assert result["ok"] and db.segment_reads == db.full_streams == 1
 
 
 def test_draft_unmanaged_collision_rejected_before_database_insert():
@@ -470,7 +620,9 @@ def test_relations_never_replace_a_source_owned_field_or_promote_brand_to_suppli
     assert p.encode(component) == before
     assert p.CURRENT not in cf.values
     assert "'component'" in p.RELATIONS_SQL and "'supplier'" in p.RELATIONS_SQL
-    assert "t.sources->>'importer_id'=e.link->>'article_id'" in p.RELATIONS_SQL
+    assert "LEFT JOIN component_ids t ON t.importer_id=e.link->>'article_id'" in p.RELATIONS_SQL
+    assert "component_ids AS MATERIALIZED" in p.RELATIONS_SQL
+    assert "sources->>'importer_id' AS importer_id" in p.RELATIONS_SQL
     assert "body" not in p.RELATIONS_SQL
     assert p.RELATIONS_SQL.count("publication_approved") == 2
 
