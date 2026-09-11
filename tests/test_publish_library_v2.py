@@ -3,6 +3,7 @@ from contextlib import contextmanager
 import copy
 import importlib.util
 import json
+import re
 from pathlib import Path
 import sys
 
@@ -281,6 +282,9 @@ def test_actual_database_session_uses_readonly_snapshot_and_50_row_fetches():
         def execute(self, sql, params=None): self.calls.append((sql, params))
         def fetchmany(self, size):
             if not self.named: return [(x["id"], x["name"], x["note"]) for x in SEGMENTS]
+            if self.named == "private_library_relations":
+                assert size == 50
+                return []
             assert size == 50
             result = records[self.offset:self.offset + size]; self.offset += len(result)
             return result
@@ -305,9 +309,12 @@ def test_actual_database_session_uses_readonly_snapshot_and_50_row_fetches():
         assert segments == SEGMENTS
         assert len(list(stream)) == 102
     assert connection.session == {"readonly": True, "autocommit": False, "isolation_level": "REPEATABLE READ"}
-    assert connection.cursors[1].named == "private_library_v2"
-    assert connection.cursors[1].itersize == 50
-    assert connection.cursors[1].calls == [(p.ORDERED_SQL, (p.v1.MANAGER,))]
+    assert connection.cursors[1].named == "private_library_relations"
+    assert connection.cursors[1].calls == [(p.RELATIONS_SQL, (p.v1.MANAGER, p.MAX_RELATION_EDGES + 1,
+                                                          p.v1.MANAGER, p.MAX_RELATION_EDGES + 1))]
+    assert connection.cursors[2].named == "private_library_v2"
+    assert connection.cursors[2].itersize == 50
+    assert connection.cursors[2].calls == [(p.ORDERED_SQL, (p.v1.MANAGER,))]
     assert connection.rollbacks == 1 and connection.closed
 
 
@@ -321,6 +328,149 @@ def test_draft_unmanaged_collision_rejected_before_database_insert():
         p.run(db, cf, NOW)
     assert db.inserts == []
     assert p.CURRENT not in cf.values
+
+
+def relation_projection(**changes):
+    values = {"supplier_uuid": "10000000-0000-0000-0000-000000000001", "supplier_id": row(1)["id"],
+              "name": "Synthetic candidate", "edge": {"article_id": row(3)["id"], "position_id": 7,
+              "part_number": "T-007", "source_pointer": "/6"},
+              "target_uuid": "20000000-0000-0000-0000-000000000001", "target_id": row(3)["id"],
+              "part_number": "T-007", "evidence": [{"sha256": "a" * 64, "url": "https://example.test/source",
+              "json_pointer": "/6", "repository_path": "zip/data/positions.json"}]}
+    values.update(changes)
+    return tuple(values.values())
+
+
+class RelatedDB(DB):
+    def __init__(self, rows, projection):
+        super().__init__(rows)
+        self.projection = projection
+    @contextmanager
+    def stream(self):
+        with super().stream() as (segments, incoming):
+            relations, metrics = p.supplier_relations(self.projection)
+            yield segments, p.SourceRows(incoming, relations, metrics)
+
+
+def test_exact_candidate_join_preserves_canonical_sources_and_old_snapshot_bytes():
+    supplier, component = row(1), row(3)
+    supplier["sources"]["candidate_position_links"] = [relation_projection()[3]]
+    component["sources"]["component_fields"] = {"part_number": "T-007"}
+    original = p.encode([supplier, component])
+    cf = CF([supplier, component])
+    old = cf.values[p.v1.CURRENT_KEY]
+    db = RelatedDB([supplier, component], [relation_projection()])
+    result = p.run(db, cf, NOW)
+    actual = materialized(cf)
+    assert p.encode(db.rows) == original
+    assert cf.values[p.v1.CURRENT_KEY] == cf.values["library:history:legacy-r1"] == old
+    assert actual[supplier["id"]] == supplier
+    projected = copy.deepcopy(actual[component["id"]])
+    relations = projected["sources"].pop("library_relations")
+    assert projected == component
+    assert relations["producer"] == "publisher-v2"
+    assert relations["candidate_suppliers"][0] == {"article_id": supplier["id"], "name": "Synthetic candidate",
+        "relation_type": "historical_supplier_candidate", "position_id": 7, "part_number": "T-007",
+        "json_pointer": "/6", "source_sha256": "a" * 64, "source_url": "https://example.test/source"}
+    assert result["supplier_relations"] == {"edges": 1, "linked": 1, "missing_target": 0, "missing_evidence": 0, "duplicate_edges": 0}
+    assert p.summary(actual[component["id"]])["sources"]["library_relations"] == relations
+    previous = dict(cf.values)
+    assert p.run(db, cf, NOW)["changed"] is False
+    assert all(cf.values[k] == value for k, value in previous.items())
+
+
+def test_missing_target_or_exact_evidence_never_creates_a_guessed_link():
+    index, metrics = p.supplier_relations([
+        relation_projection(target_uuid=None, target_id=None, part_number=None),
+        relation_projection(evidence=[{"sha256": "a" * 64, "json_pointer": "/wrong"}])])
+    assert index == {}
+    assert metrics == {"edges": 2, "linked": 0, "missing_target": 1, "missing_evidence": 1, "duplicate_edges": 0}
+    # Missing supplier/target in the actual emitted stream cannot be published,
+    # even if a buggy projection claims the target exists.
+    for records in ([row(1)], [row(3)]):
+        cf = CF()
+        with pytest.raises(p.v1.PublishError, match="RELATION_TARGET_NOT_PUBLISHED"):
+            p.run(RelatedDB(records, [relation_projection()]), cf, NOW)
+        assert p.CURRENT not in cf.values
+
+
+@pytest.mark.parametrize("changes,error", [
+    ({"supplier_uuid": "synthetic:000001"}, "INVALID_RELATION_DATABASE_ID"),
+    ({"target_id": "synthetic:other"}, "INVALID_RELATION_TARGET"),
+    ({"part_number": "T-008"}, "RELATION_PART_NUMBER_MISMATCH"),
+    ({"evidence": [{"sha256": "a" * 64, "url": "javascript:bad", "json_pointer": "/6", "repository_path": "zip/data/positions.json"}]}, "INVALID_RELATION_SOURCE_URL")])
+def test_unsafe_or_inconsistent_candidate_projection_fails(changes, error):
+    with pytest.raises(p.v1.PublishError, match=error):
+        p.supplier_relations([relation_projection(**changes)])
+
+
+@pytest.mark.parametrize("field", ["supplier_uuid", "target_uuid"])
+def test_relation_stable_id_collision_does_not_collapse_database_rows(field):
+    with pytest.raises(p.v1.PublishError, match="RELATION_ID_COLLISION"):
+        p.supplier_relations([relation_projection(), relation_projection(**{field: "30000000-0000-0000-0000-000000000001"})])
+
+
+@pytest.mark.parametrize("limit,error", [("MAX_RELATION_EDGES", "RELATION_EDGE_LIMIT"),
+    ("MAX_COMPONENT_RELATIONS", "COMPONENT_RELATION_LIMIT"), ("MAX_RELATION_BYTES", "RELATION_BYTE_LIMIT")])
+def test_relation_bounds_fail_without_truncation_or_pointer_update(monkeypatch, limit, error):
+    monkeypatch.setattr(p, limit, 0)
+    cf = CF()
+    with pytest.raises(p.v1.PublishError, match=error):
+        p.run(RelatedDB([row(1), row(3)], [relation_projection()]), cf, NOW)
+    assert p.CURRENT not in cf.values
+
+
+def test_relations_never_replace_a_source_owned_field_or_promote_brand_to_supplier():
+    component = row(3)
+    component["sources"]["library_relations"] = {"original": "keep"}
+    before = p.encode(component)
+    cf = CF()
+    with pytest.raises(p.v1.PublishError, match="DERIVED_RELATION_FIELD_CONFLICT"):
+        p.run(RelatedDB([row(1), component], [relation_projection()]), cf, NOW)
+    assert p.encode(component) == before
+    assert p.CURRENT not in cf.values
+    assert "'component'" in p.RELATIONS_SQL and "'supplier'" in p.RELATIONS_SQL
+    assert "t.sources->>'importer_id'=e.link->>'article_id'" in p.RELATIONS_SQL
+    assert "body" not in p.RELATIONS_SQL
+    assert p.RELATIONS_SQL.count("publication_approved") == 2
+
+
+def test_display_family_dictionary_and_russian_search_remain_in_sync_without_source_rewrite():
+    html = (SCRIPTS.parent / "public" / "library.html").read_text()
+    labels = json.loads(re.search(r"const COMPONENT_FAMILIES=(\{[^\n]+\});", html).group(1))
+    assert labels == p.COMPONENT_FAMILIES
+    for family, query in (("spherical_roller", "сферический роликовый подшипник"),
+                          ("electric_motor", "электродвигатель")):
+        component = row(3)
+        component["sources"]["component_fields"] = {"part_number": "T-007", "family": family}
+        before = p.encode(component)
+        cf = CF()
+        p.run(DB([component]), cf, NOW)
+        store, doc = manifest(cf)
+        root = doc["segments"][0]["indexes"]["component"]["search"]
+        indexed = list(p.entries(store, root, "search"))
+        assert query in indexed[0]["text"]
+        assert p.encode(materialized(cf)[component["id"]]) == before
+
+
+def test_relation_evidence_rejects_same_pointer_in_a_different_source_file():
+    evidence = [{"sha256": "a" * 64, "url": "https://example.test/source", "json_pointer": "/6",
+                 "repository_path": "zip/data/odm_suppliers.json"}]
+    index, metrics = p.supplier_relations([relation_projection(evidence=evidence)])
+    assert index == {} and metrics["missing_evidence"] == 1
+    assert "'json_pointers' ? (e.link->>'source_pointer')" in p.RELATIONS_SQL
+    assert "r->>'repository_path'='zip/data/positions.json'" in p.RELATIONS_SQL
+
+
+def test_every_relation_edge_is_accounted_for_including_exact_duplicate_observations():
+    projection = [relation_projection(), relation_projection(),
+                  relation_projection(target_uuid=None, target_id=None), relation_projection(evidence=[])]
+    before = p.encode([[str(x) for x in r] for r in projection])
+    index, metrics = p.supplier_relations(projection)
+    assert metrics == {"edges": 4, "linked": 1, "missing_target": 1, "missing_evidence": 1, "duplicate_edges": 1}
+    assert metrics["edges"] == sum(metrics[key] for key in ("linked", "missing_target", "missing_evidence", "duplicate_edges"))
+    assert len(index[row(3)["id"]]) == 1
+    assert p.encode([[str(x) for x in r] for r in projection]) == before
 
 
 if __name__ == "__main__":

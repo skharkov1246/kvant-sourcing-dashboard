@@ -21,7 +21,7 @@ class Element {
  querySelector(tag){return descendants(this).find(e=>e.tagName===tag.toUpperCase())||null;}focus(){}scrollIntoView(){}reportValidity(){return true;}reset(){}
 }
 function descendants(root){return [root,...root.children.flatMap(descendants)];}
-const articles=[
+const defaultArticles=[
  {id:'k',segment_id:'engine',title:'Пример проверки',topic:'Опыт',body:'## Вывод\n\nТекст **подтверждён** и `<img src=x onerror=bad()>`. [опасно](javascript:bad) [источник](https://example.org/source).\n\n| Артикул | Статус |\n|---|---|\n| 0007 | Проверить |',confidence:'partial',sources:{kind:'knowledge',references:[{title:'Документ',sha256:'a'.repeat(64),locator:{page:1}}],open_questions:['Уточнить исполнение']},updated_at:'2026-09-10'},
  {id:'c',segment_id:'engine',title:'Пример компонента',body:'Описание детали',sources:{kind:'component',component_fields:{part_number:'0007',family:'Кольца',quantity:12,unit:'комплект',priced:true}}},
  {id:'p1',segment_id:'engine',title:'Пример цены USD',body:'Историческая цена',sources:{kind:'price',price_fields:{part_number:'0007',amount:'10.00',currency:'USD',unit:'комплект',price_type:'Расценка из сделки',supplier:'Автор не подтверждён',price_date:'2026-07-01'}}},
@@ -29,6 +29,7 @@ const articles=[
  {id:'s',segment_id:'engine',title:'Пример поставщика',body:'Компания требует проверки',sources:{kind:'supplier',supplier_fields:{name:'Компания примера',role:'unknown'}}}
 ];
 async function setup(options={}){
+ const articles=options.articles||defaultArticles;
  const optionsForSetup=options;const {mobile=false,failure=false,admin=true}=options;let posts=0;const saved=[];
  const map={};for(const [id,def]of Object.entries(elementDefs)){const el=new Element(def.tag);Object.assign(el.attrs,def.attrs);el.id=id;el.hidden=Object.hasOwn(def.attrs,'hidden');el.disabled=Object.hasOwn(def.attrs,'disabled');map[id]=el;}
  map.recordForm.querySelectorAll=()=>Object.values(map).filter(e=>e.id?.startsWith('record')&&['INPUT','SELECT','TEXTAREA'].includes(e.tagName));
@@ -107,4 +108,37 @@ test('v2 sources omitted from summaries remain reachable during an active search
 test('v2 empty or failed component search page is not reported as an empty database',async()=>{
  const h=await setup({v2:true});await h.map.equipmentCards.children[0].fire('click');await button(h.map.kindTabs,'Компоненты').fire('click');h.map.search.value='искомый';await h.map.search.fire('input');await new Promise(r=>setTimeout(r,450));assert.match(h.map.recordCatalog.textContent,/Продолжите поиск/);assert.doesNotMatch(h.map.recordCatalog.textContent,/ничего не найдено/);
  const broken=await setup({v2:true,pageFailure:true});await broken.map.equipmentCards.children[0].fire('click');await button(broken.map.kindTabs,'Компоненты').fire('click');assert.match(broken.map.recordCatalog.textContent,/Не удалось загрузить/);assert.doesNotMatch(broken.map.recordCatalog.textContent,/пока не опубликованы/);
+});
+
+function componentFixture(fields,extra={}){return {id:'part:synthetic',segment_id:'engine',title:'Example OEM T-007',body:'Учебный каталог. Подтверждена запись источника.',confidence:'confirmed',sources:{kind:'component',component_fields:{part_number:'T-007',oem:'Example OEM',...fields}},...extra};}
+async function openComponent(h){await h.map.equipmentCards.children[0].fire('click');await button(h.map.kindTabs,'Компоненты').fire('click');await button(h.map.recordCatalog,'T-007').fire('click');}
+test('explicit component name and purpose appear consistently without inventing a supplier',async()=>{
+ const h=await setup({articles:[componentFixture({name:'Крышка корпуса',family:'Исходная группа',purpose:'Закрывает корпус учебного узла'})]});await openComponent(h);
+ assert.match(h.map.recordCatalog.textContent,/Крышка корпуса — Example OEM T-007/);assert.match(h.map.articleList.textContent,/Крышка корпуса — Example OEM T-007/);assert.equal(h.map.reader.children.find(e=>e.tagName==='HEADER').children.find(e=>e.id==='articleTitle').textContent,'Крышка корпуса — Example OEM T-007');
+ assert.match(h.map.reader.textContent,/Назначение в узле: Закрывает корпус учебного узла/);assert.match(h.map.reader.textContent,/Статус проработки закупки здесь не установлен/);assert.doesNotMatch(h.map.reader.textContent,/Поставщик по этой позиции: Example OEM|Готово к закупке/);
+});
+test('only an explicit known family supplies a Russian type, while an unknown family remains raw',async()=>{
+ const known=await setup({articles:[componentFixture({name:'Example OEM T-007',family:'spherical_roller'})]});await openComponent(known);assert.match(known.map.recordCatalog.textContent,/Сферический роликовый подшипник — Example OEM T-007/);assert.match(known.map.reader.textContent,/Сферический роликовый подшипник — Example OEM T-007/);assert.match(known.map.reader.textContent,/Назначение в узле: не установлено/);
+ const unknown=await setup({articles:[componentFixture({name:'T-007',family:'source_family_undecoded'})]});await openComponent(unknown);assert.match(unknown.map.reader.textContent,/source_family_undecoded/);assert.match(unknown.map.reader.textContent,/Описание позиции ещё не установлено/);assert.doesNotMatch(unknown.map.reader.textContent,/Сферический роликовый подшипник/);
+});
+test('a validated historical supplier relation opens the exact unloaded article and correct section',async()=>{
+ const supplier={id:'supplier:actual',segment_id:'engine',title:'Досье учебного кандидата',body:'Прежняя запись, текущая поставка не проверена.',confidence:'confirmed',sources:{kind:'supplier',supplier_fields:{name:'Учебная компания',role:'unknown'}}};
+ const part=componentFixture({name:'Крышка корпуса'});part.sources.library_relations={version:1,producer:'publisher-v2',candidate_suppliers:[{article_id:supplier.id,name:'Учебная компания',relation_type:'historical_supplier_candidate',position_id:7,json_pointer:'/6',source_url:'https://example.org/legacy'},{article_id:'https://invalid.example',name:'Не ссылка на карточку',relation_type:'historical_supplier_candidate'},{article_id:'supplier:guessed',name:'Неподтверждённая догадка',relation_type:'confirmed_supplier'}]};
+ const h=await setup({v2:true,articles:[part,supplier]});await openComponent(h);
+ assert.match(h.map.reader.textContent,/Исторический кандидат/);assert.match(h.map.reader.textContent,/Статус проработки закупки здесь не установлен/);assert.doesNotMatch(h.map.reader.textContent,/Не ссылка на карточку|Неподтверждённая догадка/);
+ const before=h.requests.filter(r=>r.url.includes('/article?')).length;await button(h.map.reader,'Учебная компания →').fire('click');assert.equal(h.requests.filter(r=>r.url.includes('/article?')).length,before+1);
+ assert.match(h.map.reader.textContent,/Досье учебного кандидата/);assert.equal(button(h.map.kindTabs,'Поставщики').attrs['aria-pressed'],'true');assert.match(h.historyLog.at(-1),/section=supplier/);assert.match(h.historyLog.at(-1),/article=supplier%3Aactual/);
+ assert.ok(h.requests.some(r=>r.url.includes('/article?')&&new URL(r.url,'https://example.org').searchParams.get('id')===supplier.id));assert.equal(h.requests.some(r=>r.url==='/api/library'),false);
+});
+test('explicit position type preserves model and full order code; a stated company is not certified',async()=>{
+ const part=componentFixture({part_number:'T-007_',name:'Example Model X',position_type:'Компрессорная головка / блок',family:'Source paragraph without a translated equipment type'});part.sources.supplier_fields={name:'Компания из исходного документа'};
+ const h=await setup({articles:[part]});await openComponent(h);assert.match(h.map.reader.textContent,/Компрессорная головка \/ блок — Example Model X · T-007_/);assert.match(h.map.reader.textContent,/Компания, указанная в записи: Компания из исходного документа/);assert.match(h.map.reader.textContent,/без подтверждения текущей поставки/);assert.doesNotMatch(h.map.reader.textContent,/Водяной насос|Винтовой компрессор/);
+});
+test('narrow family translations preserve pump-stage and chain distinctions',async()=>{
+ for(const [family,label]of [['hydraulic_gear_pump_stage','Секция шестерённого гидравлического насоса'],['double_row_ball','Двухрядный шариковый подшипник'],['Втулочная приводная цепь','Втулочная приводная цепь']]){
+  const h=await setup({articles:[componentFixture({name:'T-007',family})]});await openComponent(h);assert.match(h.map.reader.textContent,new RegExp(label+' — Example OEM T-007'));assert.doesNotMatch(h.map.reader.textContent,/Роликовая цепь|Гидравлический насос в сборе|Двухрядный радиальный/);
+ }
+});
+test('a displayed Russian component family is also searchable in legacy data',async()=>{
+ const h=await setup({articles:[componentFixture({name:'T-007',family:'spherical_roller'})]});h.map.search.value='подшипник';await h.map.search.fire('input');assert.match(h.map.resultCount.textContent,/1 материал найдено/);assert.match(h.map.articleList.textContent,/Сферический роликовый подшипник/);
 });
