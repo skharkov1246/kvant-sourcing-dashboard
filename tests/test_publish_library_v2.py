@@ -551,6 +551,11 @@ def test_russian_display_label_search_accepts_yo_and_e_without_rewriting_full_so
     assert p.encode(component) == before
 
 
+def test_filter_cartridge_label_does_not_invent_a_water_treatment_application():
+    source = {"component_fields": {"oem": "Pentair", "family": "PENTEK ELPC ELECTROPLATING CARBON CARTRIDGES", "is_accessory": False}}
+    assert p.component_type_label(source, "water") == "Фильтрующий картридж"
+
+
 if __name__ == "__main__":
     # Synthetic cross-runtime fixture over stdout only, consumed by Node tests.
     count = int(sys.argv[1]) if len(sys.argv) > 1 else 195
