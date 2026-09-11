@@ -42,10 +42,23 @@ EMAIL = re.compile(r"[\w.+-]+@[\w-]+\.[\w.]{2,}")
 PHONE = re.compile(r"\+\d[\d\-\s()]{7,}\d")
 
 
+def clean_name(name: str) -> str:
+    """Имя компании без приписок агента.
+
+    Агенты писали продавца свободной формой: «WTE PowerBolt s.r.o. (CZ) — серийно
+    делает крепёж под турбины», «Shenzhen Blaze Turbine Co., Ltd: https://...».
+    Без отсечения хвоста одна компания даёт четыре разные записи, и карта закупки
+    врёт по числу адресатов.
+    """
+    n = re.sub(r"\s+", " ", s(name))
+    n = re.split(r"\s[—–-]\s|:\s|,?\s*https?://|\s\(?(?:сайт|site)\b", n)[0]
+    n = re.sub(r"\s*\([^)]*\)", " ", n)       # (CZ), (Чехия), (Дубай) — не часть имени
+    return re.sub(r"\s+", " ", n).strip(" .,;·—–-")
+
+
 def key(name: str) -> str:
     """Имя компании без орг-формы, регистра и пунктуации — для сопоставления."""
-    n = re.sub(r"\s+", " ", s(name))
-    n = ORG_TAIL.sub("", n)
+    n = ORG_TAIL.sub("", clean_name(name))
     return re.sub(r"[^0-9a-zа-я ]", "", n.lower()).strip()
 
 
@@ -141,11 +154,15 @@ def sellers_list(raw: dict) -> list:
 
     def push(name, url, country, price, lead, note=""):
         name = s(name)
-        if not name or name.lower() in seen:
+        if not name:
             return
-        seen.add(name.lower())
-        out.append({"seller": name, "url": s(url), "country": s(country),
-                    "price": num(price), "lead_time": s(lead), "note": s(note)})
+        k = key(name) or name.lower()
+        if k in seen:
+            return
+        seen.add(k)
+        out.append({"seller": clean_name(name) or name, "seller_key": k, "url": s(url),
+                    "country": s(country), "price": num(price), "lead_time": s(lead),
+                    "note": s(note)})
 
     push(raw.get("seller"), raw.get("seller_url"), raw.get("seller_country"),
          raw.get("price"), raw.get("lead_time"))
@@ -254,7 +271,7 @@ def main() -> int:
     contacts = contact_index()
     for rec in out:
         for sl in rec.get("sellers") or []:
-            c = contacts.get(key(sl["seller"]))
+            c = contacts.get(sl["seller_key"])
             if c:
                 sl["emails"] = c["emails"][:3]
                 sl["phones"] = c["phones"][:2]
