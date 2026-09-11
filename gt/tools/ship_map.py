@@ -227,6 +227,47 @@ def supplier_map(rows: list[dict]) -> str:
     return f'<table class="t"><thead><tr>{head}</tr></thead>{"".join(cards)}</table>'
 
 
+def directory(rows: list[dict]) -> str:
+    """Справочник адресатов: одна строка на компанию, с контактами для рассылки."""
+    comp: dict[str, dict] = {}
+    for r in rows:
+        for sl in r.get("sellers") or []:
+            c = comp.setdefault(sl["seller_key"], {
+                "name": sl["seller"], "country": sl.get("country", ""), "site": sl.get("site", ""),
+                "emails": [], "phones": [], "lines": 0, "stock": 0, "cats": set(), "sheets": set()})
+            c["lines"] += 1
+            if r["verdict"] == "in_stock":
+                c["stock"] += 1
+            c["cats"].add(r["cat"])
+            c["sheets"].add(r["sheet"])
+            c["country"] = c["country"] or sl.get("country", "")
+            c["site"] = c["site"] or sl.get("site", "")
+            for e in sl.get("emails") or []:
+                if e not in c["emails"]:
+                    c["emails"].append(e)
+            for p in sl.get("phones") or []:
+                if p not in c["phones"]:
+                    c["phones"].append(p)
+    if not comp:
+        return '<p class="dim">Адресатов нет.</p>'
+
+    head = "".join(f'<th style="width:{w}%">{E(t)}</th>' for t, w in [
+        ("Компания", 19), ("Страна", 8), ("E-mail", 20), ("Телефон", 13),
+        ("Наших строк", 6), ("Со склада", 6), ("Лист", 9), ("Что берут", 19)])
+    bodies = []
+    for c in sorted(comp.values(), key=lambda x: (-x["lines"], x["name"].lower())):
+        em = "<br>".join(f'<span class="pn">{E(e)}</span>' for e in c["emails"][:3]) or \
+             f'<span class="dim">{E(c["site"]) or "не собран"}</span>'
+        ph = "<br>".join(E(p) for p in c["phones"][:2]) or "—"
+        bodies.append(
+            f'<tbody class="p"><tr class="d">'
+            f'<td><b>{E(c["name"])}</b></td><td>{E(c["country"]) or "—"}</td>'
+            f"<td>{em}</td><td>{ph}</td><td>{c['lines']}</td><td>{c['stock']}</td>"
+            f'<td>{E(", ".join(sorted(c["sheets"])))}</td>'
+            f'<td>{E(", ".join(sorted(c["cats"])[:4]))}</td></tr></tbody>')
+    return f'<table class="t"><thead><tr>{head}</tr></thead>{"".join(bodies)}</table>'
+
+
 def makers_table(rows: list[dict]) -> str:
     g = [r for r in rows if (r.get("real_maker") or "").strip()]
     g.sort(key=lambda r: (-line_value(r), r["pn"]))
@@ -301,6 +342,7 @@ def build_html(doc: dict) -> str:
     subs = [r for r in rows if (r.get("substitute") or "").strip()
             and not (r.get("real_maker") or "").strip()]
     sellers = {seller_key(r) for r in stock + lead if r.get("seller")}
+    addr_comp = {sl["seller_key"] for r in rows for sl in r.get("sellers") or []}
     stock_val = sum(line_value(r) for r in stock)
     gaps = gaps_table(rows)
     over = [g for g in gaps if g[1]]
@@ -377,11 +419,16 @@ eBay, Zoro, Grainger, DO Supply, shop.solarturbines.com) закрыта от а�
         'Сортировка по числу наших позиций: сверху те, у кого одним письмом закрывается больше '
         'всего строк. «Склад сейчас» — позиции с безусловным наличием; остальные условные '
         '(«отгрузим, если есть»).</p>' + supplier_map(rows) + "</div>",
-        f'<div class="sec"><h2>3. Изготовители узлов под шильдой OEM — {len(makers)}</h2>'
+        f'<div class="sec"><h2>3. Справочник адресатов: кому писать — {len(addr_comp)} компаний</h2>'
+        '<p class="lead">Контакты сняты со страниц самих компаний; адреса по шаблону не '
+        'конструировались — где не напечатан, там прочерк и адрес сайта. Сортировка по числу '
+        'наших строк: сверху те, у кого одним письмом закрывается больше всего заявки.</p>'
+        + directory(rows) + "</div>",
+        f'<div class="sec"><h2>4. Изготовители узлов под шильдой OEM — {len(makers)}</h2>'
         '<p class="lead">Правило первоисточника: на узле стоит имя реального изготовителя, а не '
         'OEM. Прямой каталог изготовителя дешевле в 2–10 раз. Это список адресатов для прямых '
         'запросов.</p>' + makers_table(rows) + "</div>",
-        f'<div class="sec"><h2>4. Закрывается стандартом или подбором — {len(subs)}</h2>'
+        f'<div class="sec"><h2>5. Закрывается стандартом или подбором — {len(subs)}</h2>'
         '<p class="lead">Класс C: искать оригинальный номер OEM по этим строкам не нужно. '
         'В колонке «чем закрывается» — конкретное обозначение; в примечании — что уточнить '
         'у заказчика, чтобы подобрать однозначно.</p>' + substitutes_table(rows) + "</div>",
@@ -407,12 +454,12 @@ eBay, Zoro, Grainger, DO Supply, shop.solarturbines.com) закрыта от а�
             rr["_shift"] = ru(abs((mid - u) * float(r.get("qty") or 0)))
             g_rows.append(rr)
         parts.append(
-            f'<div class="sec"><h2>5. Цена расходится с нашей вилкой в 2,5+ раза — {len(gaps)}</h2>'
+            f'<div class="sec"><h2>6. Цена расходится с нашей вилкой в 2,5+ раза — {len(gaps)}</h2>'
             '<p class="lead">«Сдвиг по строке» — на сколько меняется сумма строки, если взять цену '
             'продавца вместо нашей вилки. Проверять до отправки ТКП: завышение заказчик заметит '
             'раньше нас, занижение съест маржу.</p>' + rows_table(g_rows, cols) + "</div>")
 
-    n = 6
+    n = 7
     for sheet in sheets:
         srows = by_sheet[sheet]
         first = True

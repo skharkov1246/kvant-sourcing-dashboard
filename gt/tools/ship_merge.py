@@ -51,6 +51,8 @@ def clean_name(name: str) -> str:
     врёт по числу адресатов.
     """
     n = re.sub(r"\s+", " ", s(name))
+    if re.match(r"^https?://", n):  # агент вписал вместо имени голый адрес — берём домен
+        return re.sub(r"^https?://(www\.)?([^/]+).*", r"\2", n)
     n = re.split(r"\s[—–-]\s|:\s|,?\s*https?://|\s\(?(?:сайт|site)\b", n)[0]
     n = re.sub(r"\s*\([^)]*\)", " ", n)       # (CZ), (Чехия), (Дубай) — не часть имени
     return re.sub(r"\s+", " ", n).strip(" .,;·—–-")
@@ -105,6 +107,11 @@ def contact_index() -> dict:
         for r in json.loads(SELLERS.read_text()).get("rows", []):
             put(r.get("seller"), r.get("emails") or [], r.get("phones") or [],
                 r.get("site"), r.get("country"), r.get("covers"), r.get("note"))
+            # сшиваем и по исходному ключу: часть имён была голыми адресами сайтов,
+            # после нормализации они схлопнулись в домен и по имени уже не найдутся
+            raw = s(r.get("seller_key"))
+            if raw and raw not in idx:
+                idx[raw] = idx.get(key(r.get("seller")), {})
     return idx
 
 VERDICTS = ("in_stock", "available_lead", "pn_found_no_stock", "oem_only",

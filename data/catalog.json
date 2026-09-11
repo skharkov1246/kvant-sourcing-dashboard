@@ -4,16 +4,16 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 177,
-    "total_bytes": 76663096,
+    "datasets": 178,
+    "total_bytes": 77063506,
     "by_sensitivity": {
       "конфиденциально": 54,
-      "внутреннее": 90,
+      "внутреннее": 91,
       "публикуемо": 33
     },
     "by_subproject": {
       "ГПУ-библиотека": 27,
-      "ГТУ-библиотека": 33,
+      "ГТУ-библиотека": 34,
       "ОВЭ-75": 45,
       "база ЗИП": 28,
       "база ЗИП · таможня": 18,
@@ -407,7 +407,7 @@
     {
       "path": "gt/data/ship_lukoil.json",
       "subproject": "ГТУ-библиотека",
-      "bytes": 2374032,
+      "bytes": 2452293,
       "note": "Сводная карта закупки по всей заявке ЛУКОЙЛ: 1642 уникальных артикула обоих листов («Энергосети» 1198, НВН 444) с результатом проверки наличия. Производный файл — собирается gt/tools/ship_merge.py из rfq_demand.json и трёх поколений проверок (rfq_prices.json:checks, ship_energoseti.json, ship_sweep.json); поздняя проверка перекрывает раннюю, непроверенные строки помечены not_checked. Руками не заполнять. Отчёт — gt/tools/ship_map.py → gt/docs/ЗАКУПКА-ЛУКОЙЛ.pdf: карта «у кого что брать», изготовители узлов под шильдой OEM, позиции под подбор по стандарту, расхождения цен.",
       "format": "json",
       "shape": "объект",
@@ -454,7 +454,7 @@
       },
       "last_change": "2026-09-11",
       "last_author": "Claude",
-      "last_commit": "b0c4a1c",
+      "last_commit": "b381eaa",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -1600,6 +1600,50 @@
       "referenced_by": [
         "pnw/tools/build_suppliers.py",
         "zip/tools/bearing_report.py"
+      ]
+    },
+    {
+      "path": "gt/data/ship_sellers.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 321167,
+      "note": "Справочник адресатов по заявке ЛУКОЙЛ: 363 компании, найденные проверкой наличия, с контактами для рассылки запросов цен — e-mail отдела продаж, телефон, страница формы RFQ, сайт, страна и город, роль на рынке (OEM / дилер / независимый сток / трейдер / изготовитель / маркетплейс / сервис), чем полезны по нашей номенклатуре и справочная пометка проходимости прямого запроса из РФ. Контакты сняты со страниц самих компаний workflow lukoil-seller-contacts 09.2026; адреса по шаблону не конструировались. Контактные данные организаций — внутреннее.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "method",
+        "rows",
+        "source",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 363,
+        "record_keys": [
+          "city",
+          "country",
+          "covers",
+          "emails",
+          "found",
+          "note",
+          "phones",
+          "rfq_url",
+          "role",
+          "ru_access",
+          "seller",
+          "seller_key",
+          "site"
+        ]
+      },
+      "last_change": null,
+      "last_author": null,
+      "last_commit": null,
+      "updated_by": "неизвестно",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/ship_merge.py"
       ]
     },
     {
@@ -6117,6 +6161,54 @@
       ]
     },
     {
+      "path": "data/catalog_notes.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 15838,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "data/budget_snapshot.json",
+        "data/chat_snapshot.json",
+        "data/index.json",
+        "gidromet/data/",
+        "gpu/data/bitrix_gpu.json",
+        "gpu/data/coverage.json",
+        "gt/data/ansaldo.json",
+        "gt/data/bitrix_gt.json",
+        "gt/data/dossiers.json",
+        "gt/data/pn_db.json",
+        "gt/data/ship_energoseti.json",
+        "gt/data/ship_lukoil.json",
+        "gt/data/ship_sellers.json",
+        "gt/data/ship_sweep.json",
+        "ove/data/suppliers.json",
+        "pnw/public/data.js",
+        "pnw/public/search.html",
+        "zip/customs/out/",
+        "zip/data/customs_declarations.json",
+        "zip/data/kp1763_audit.json",
+        "zip/data/perf_class_packets.json",
+        "zip/data/perf_sourcing_map.json",
+        "zip/data/perf_test_requests.json",
+        "zip/data/supplier_crm.json",
+        "zip/data/telsmith_3858.json",
+        "zip/data/telsmith_crossrefs.json",
+        "zip/data/telsmith_nodrawings.json"
+      ],
+      "last_change": "2026-09-11",
+      "last_author": "Claude",
+      "last_commit": "db80bdd",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "scripts/build_catalog.py"
+      ]
+    },
+    {
       "path": "zip/data/sheet_meta.json",
       "subproject": "база ЗИП",
       "bytes": 15351,
@@ -6216,53 +6308,6 @@
       },
       "referenced_by": [
         "ove/build.py"
-      ]
-    },
-    {
-      "path": "data/catalog_notes.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 14856,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "data/budget_snapshot.json",
-        "data/chat_snapshot.json",
-        "data/index.json",
-        "gidromet/data/",
-        "gpu/data/bitrix_gpu.json",
-        "gpu/data/coverage.json",
-        "gt/data/ansaldo.json",
-        "gt/data/bitrix_gt.json",
-        "gt/data/dossiers.json",
-        "gt/data/pn_db.json",
-        "gt/data/ship_energoseti.json",
-        "gt/data/ship_lukoil.json",
-        "gt/data/ship_sweep.json",
-        "ove/data/suppliers.json",
-        "pnw/public/data.js",
-        "pnw/public/search.html",
-        "zip/customs/out/",
-        "zip/data/customs_declarations.json",
-        "zip/data/kp1763_audit.json",
-        "zip/data/perf_class_packets.json",
-        "zip/data/perf_sourcing_map.json",
-        "zip/data/perf_test_requests.json",
-        "zip/data/supplier_crm.json",
-        "zip/data/telsmith_3858.json",
-        "zip/data/telsmith_crossrefs.json",
-        "zip/data/telsmith_nodrawings.json"
-      ],
-      "last_change": "2026-09-11",
-      "last_author": "Claude",
-      "last_commit": "db80bdd",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "публикуемо",
-        "markers": []
-      },
-      "referenced_by": [
-        "scripts/build_catalog.py"
       ]
     },
     {
