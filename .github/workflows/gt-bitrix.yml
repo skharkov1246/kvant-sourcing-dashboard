@@ -38,12 +38,21 @@ jobs:
           python gt/build.py
           python gt/tools/build_rfq.py
           python gt/tools/build_lot.py
+      # Сам bitrix_gt.json из индекса исключён как волатильный (см. bot_files()
+      # в scripts/build_index.py), но бот переписывает и страницы gt/public,
+      # поэтому каталог с индексом пересобираем — чтобы производные файлы
+      # не разъезжались с данными.
+      - name: Пересборка каталога и поискового индекса
+        run: |
+          set -euo pipefail
+          python scripts/build_catalog.py
+          python scripts/build_index.py
       - name: Коммит, если есть изменения
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add gt/data/bitrix_gt.json gt/public/
+          git add gt/data/bitrix_gt.json gt/public/ data/catalog.json data/index.json
           if git diff --cached --quiet; then
             echo "запросы Bitrix без изменений — деплой не нужен"
           else

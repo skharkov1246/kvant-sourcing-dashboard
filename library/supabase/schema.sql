@@ -1,0 +1,183 @@
+-- БИБЛИОТЕКА РЫНКОВ — хранилище исследований по всем направлениям оборудования.
+--
+-- Почему здесь, а не в репозитории: извлечённая из спецификаций номенклатура,
+-- цены и поставщики — коммерческие данные заказчиков, а репозиторий публичный
+-- (решение владельца от 08.09.2026). Доступ идёт только через воркер сайта,
+-- сервисным ключом, после проверки входа Cloudflare Access и права на раздел.
+--
+-- Идемпотентно: можно прогонять повторно.
+-- Применение: Actions → «ZIP base — apply DB migrations» (секрет SUPABASE_DB_URL).
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- 1. Сегменты рынка. Строка = направление оборудования со своими цифрами спроса
+--    и оценкой нашей изученности. Заполняется зондом по Битриксу и обновляется.
+create table if not exists lib_segments (
+  id            text primary key,            -- 'pumps', 'valves', 'gtu' …
+  name          text not null,
+  note          text,
+  demand_deals  int,                         -- сделок за период наблюдения
+  demand_sum    numeric,                     -- сумма этих сделок
+  demand_rfq    int,                         -- запросов поставщикам
+  won_deals     int,                         -- доехало до «Реализации»
+  won_sum       numeric,
+  depth_score   int,                         -- наша изученность: упоминаний в базе
+  priority      int,                         -- место в очереди на исследование
+  period_from   date,
+  period_to     date,
+  updated_at    timestamptz default now()
+);
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- 2. Спрос в натуре: что именно спрашивают заказчики — из файлов, привязанных
+--    к сделкам. В Битриксе строк товаров нет, вся номенклатура в спецификациях.
+create table if not exists lib_demand (
+  id           bigint generated always as identity primary key,
+  segment_id   text references lib_segments(id) on delete set null,
+  deal_id      text,                         -- карточка Битрикса, откуда взято
+  item_name    text not null,
+  oem          text,                         -- изготовитель по спецификации
+  model        text,
+  part_number  text,
+  qty          numeric,
+  unit         text,
+  source       text default 'спецификация сделки',
+  source_file  text,                         -- идентификатор файла в Битриксе
+  created_at   timestamptz default now()
+);
+create index if not exists lib_demand_seg on lib_demand (segment_id);
+create index if not exists lib_demand_pn  on lib_demand (part_number);
+create index if not exists lib_demand_oem on lib_demand (oem);
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- 3. Поставщики: кто в мире делает это оборудование и его части.
+create table if not exists lib_suppliers (
+  id           bigint generated always as identity primary key,
+  segment_id   text references lib_segments(id) on delete set null,
+  name         text not null,
+  country      text,
+  kind         text,                         -- 'OEM' | 'ODM' | 'дистрибьютор' | 'сервис' | 'трейдер'
+  site         text,
+  oem_brands   text[],                       -- под какие марки делает
+  strengths    text,
+  lead_time    text,
+  moq          text,
+  certificates text,
+  sanctions    text,                         -- ограничения на поставку в РФ
+  confidence   text default 'med',           -- 'high' | 'med' | 'low'
+  source_url   text,
+  researched_by text,
+  created_at   timestamptz default now(),
+  unique (segment_id, name)
+);
+create index if not exists lib_suppliers_seg on lib_suppliers (segment_id);
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- 4. Ценообразование: из чего складывается цена и какова она у разных источников.
+create table if not exists lib_prices (
+  id           bigint generated always as identity primary key,
+  segment_id   text references lib_segments(id) on delete set null,
+  supplier_id  bigint references lib_suppliers(id) on delete set null,
+  item_name    text,
+  part_number  text,
+  price        numeric,
+  currency     text default 'EUR',
+  basis        text,                         -- EXW | FOB | CIF | DDP
+  qty          numeric,
+  qty_unit     text,
+  price_date   date,
+  source       text,                         -- 'прайс' | 'КП' | 'таможня' | 'маркетплейс' | 'оценка'
+  source_url   text,
+  confidence   text default 'med',
+  note         text,
+  created_at   timestamptz default now()
+);
+create index if not exists lib_prices_seg on lib_prices (segment_id);
+create index if not exists lib_prices_pn  on lib_prices (part_number);
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- 5. Знание об оборудовании: устройство, режимы работы, критерии подбора,
+--    типовые отказы, взаимозаменяемость. То, без чего нельзя грамотно
+--    разговаривать с заказчиком и отличить аналог от подделки.
+create table if not exists lib_knowledge (
+  id           bigint generated always as identity primary key,
+  segment_id   text references lib_segments(id) on delete set null,
+  topic        text not null,                -- 'устройство' | 'подбор' | 'отказы' | 'аналоги' | 'рынок'
+  title        text not null,
+  body         text not null,
+  sources      jsonb,                        -- список ссылок с датами обращения
+  confidence   text default 'med',
+  researched_by text,
+  created_at   timestamptz default now(),
+  updated_at   timestamptz default now()
+);
+create index if not exists lib_knowledge_seg on lib_knowledge (segment_id, topic);
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- 6. Разбор проигрышей: почему сделка не доехала до реализации. Главный источник
+--    для проверки гипотезы «глубина понимания цены влияет на конверсию».
+create table if not exists lib_losses (
+  id           bigint generated always as identity primary key,
+  segment_id   text references lib_segments(id) on delete set null,
+  deal_id      text,
+  reason       text,                         -- 'цена' | 'срок' | 'не нашли' | 'нет аналога' | 'молчание' | 'иное'
+  competitor   text,
+  our_price    numeric,
+  rival_price  numeric,
+  currency     text,
+  note         text,
+  created_at   timestamptz default now()
+);
+create index if not exists lib_losses_seg on lib_losses (segment_id, reason);
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- 7. Поиск. Русская морфология, одна колонка на таблицу — чтобы искать по всей
+--    библиотеке одним запросом, а не перебирать таблицы вручную.
+alter table lib_demand    add column if not exists fts tsvector
+  generated always as (to_tsvector('russian',
+    coalesce(item_name,'') || ' ' || coalesce(oem,'') || ' ' || coalesce(model,'') || ' ' || coalesce(part_number,''))) stored;
+alter table lib_suppliers add column if not exists fts tsvector
+  generated always as (to_tsvector('russian',
+    coalesce(name,'') || ' ' || coalesce(country,'') || ' ' || coalesce(strengths,''))) stored;
+alter table lib_knowledge add column if not exists fts tsvector
+  generated always as (to_tsvector('russian',
+    coalesce(title,'') || ' ' || coalesce(body,''))) stored;
+create index if not exists lib_demand_fts    on lib_demand    using gin (fts);
+create index if not exists lib_suppliers_fts on lib_suppliers using gin (fts);
+create index if not exists lib_knowledge_fts on lib_knowledge using gin (fts);
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- 8. Доступ. Включаем RLS и НЕ выдаём прав роли anon: библиотека читается только
+--    сервисным ключом через воркер, за входом Cloudflare Access. Это сознательно
+--    строже, чем у таблиц ЗИП, где anon исторически имеет полный доступ.
+alter table lib_segments  enable row level security;
+alter table lib_demand    enable row level security;
+alter table lib_suppliers enable row level security;
+alter table lib_prices    enable row level security;
+alter table lib_knowledge enable row level security;
+alter table lib_losses    enable row level security;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- 9. Реестр разобранных файлов. Нужен для возобновляемости: обход 22 тысяч
+--    вложений идёт частями и в несколько заходов, повторно скачивать уже
+--    разобранное незачем. Здесь же видно, какая доля файлов нечитаема и почему
+--    (например, сканы без текстового слоя — им понадобится распознавание).
+create table if not exists lib_files (
+  file_id      text primary key,             -- идентификатор вложения в Битриксе
+  deal_id      text,
+  origin       text,                         -- 'поле сделки' | 'задача' | 'письмо'
+  field        text,                         -- имя UF-поля, если из поля
+  kind         text,                         -- определён по сигнатуре содержимого
+  size_bytes   bigint,
+  status       text not null,                -- 'разобран' | 'пусто' | 'не скачался' | 'формат не читаем'
+  reason       text,
+  chars        int,                          -- сколько текста извлечено
+  rows_found   int,                          -- сколько позиций номенклатуры получено
+  segment_id   text,
+  sha256       text,                         -- чтобы не разбирать один и тот же файл дважды
+  processed_at timestamptz default now()
+);
+create index if not exists lib_files_deal   on lib_files (deal_id);
+create index if not exists lib_files_status on lib_files (status);
+create index if not exists lib_files_sha    on lib_files (sha256);
+
+alter table lib_files enable row level security;

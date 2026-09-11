@@ -60,6 +60,7 @@ OPTIONAL = {
     "__REVS_JSON__": "revisions.json",
     "__ECO_JSON__": "eco_prelim.json",
     "__AUDIT_JSON__": "audit_log.json",
+    "__RFQFILES_JSON__": "rfq_files.json",
 }
 
 
@@ -122,6 +123,16 @@ def build() -> None:
     build_rfq.build()
     import build_bim_plan
     build_bim_plan.build()
+    # сводная ведомость закладных решений для цифровизации (из zakladki.json)
+    import build_zakladki
+    build_zakladki.build()
+    # Реестр выпуска БИ Р0 → bi_docs.json для вкладки и ZIP-пакетов.
+    # Сами документы выпуска (PDF с титулом, штампом и колонтитулами) собираются
+    # ЛОКАЛЬНО командой python3 ove/tools/docframe.py и лежат в репозитории:
+    # сборке нужны LibreOffice и Chromium, в CI их нет, а полный проход занимает
+    # десятки минут — здесь только пересборка реестра по готовым файлам.
+    import build_release
+    build_release.build()
     # единые метаданные всех выпускаемых DOCX/PDF (автор — ООО «КВАНТ»)
     import doc_meta
     doc_meta.build()

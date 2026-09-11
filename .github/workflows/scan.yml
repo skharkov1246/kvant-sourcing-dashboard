@@ -19,7 +19,50 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # Резерв дублировал планировщик один в один: за 49 суток 50 прогонов по dispatch
+  # и ровно 50 по расписанию — каждый скан выполнялся дважды в сутки вместо одного.
+  # Тот же приём, что в deploy.yml: крон-прогон пропускается, если успешный скан
+  # был меньше FRESH_H часов назад. Планировщик умолкнет — резерв сработает.
+  guard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      actions: read
+    outputs:
+      run: ${{ steps.check.outputs.build }}
+    steps:
+      - name: Нужен ли скан
+        id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EVENT: ${{ github.event_name }}
+          REPO: ${{ github.repository }}
+          RUN_ID: ${{ github.run_id }}
+          FRESH_H: "20"
+        run: |
+          set -uo pipefail
+          go() { echo "build=true" >> "$GITHUB_OUTPUT"; echo "→ сканируем: $1"; exit 0; }
+          [ "$EVENT" = "schedule" ] || go "триггер $EVENT, не резервный крон"
+          body=$(curl -sS --max-time 30 \
+                   -H "Authorization: Bearer $GH_TOKEN" \
+                   -H "Accept: application/vnd.github+json" \
+                   "https://api.github.com/repos/$REPO/actions/workflows/scan.yml/runs?status=success&per_page=20") \
+            || go "API недоступен (fail-open)"
+          last=$(printf '%s' "$body" | jq -r --arg id "$RUN_ID" \
+                   '[.workflow_runs[]? | select((.id|tostring) != $id) | .updated_at] | max // empty') \
+            || go "не разобрал ответ API (fail-open)"
+          [ -n "$last" ] || go "успешных сканов в истории нет"
+          last_s=$(date -u -d "$last" +%s 2>/dev/null) || go "не разобрал дату (fail-open)"
+          [ -n "$last_s" ] || go "не разобрал дату (fail-open)"
+          age=$(( ( $(date -u +%s) - last_s ) / 60 ))
+          echo "последний успешный скан: $last (${age} мин назад), порог ${FRESH_H} ч"
+          [ "$age" -lt $(( FRESH_H * 60 )) ] || go "снимок старше порога"
+          echo "build=false" >> "$GITHUB_OUTPUT"
+          echo "→ пропуск: снимок собран ${age} мин назад, резерв не нужен"
+
   scan:
+    needs: guard
+    if: needs.guard.outputs.run == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5

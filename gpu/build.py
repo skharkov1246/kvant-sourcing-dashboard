@@ -13,8 +13,12 @@ __PLAYBOOK_JSON__, __BUILT_AT__.
 Перед этим (по желанию, если менялась заявка):  python3 gpu/tools/build_demand.py
 """
 import json
+import sys
 from datetime import date
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent / "tools"))
+from lexicon import walk as normalize_lexicon  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent
 DATA = ROOT / "data"
@@ -46,11 +50,20 @@ FILES = {
     "__CONSUMABLES_JSON__": "consumables.json",
     "__MACHINES_JSON__": "machines.json",
     "__RFQPACK_JSON__": "rfq_pack.json",
+    "__GLOSSARY_JSON__": "glossary.json",
+    "__ACLASS_JSON__": "analog_classes.json",
+    "__COVERAGE_JSON__": "coverage.json",
 }
 
 
 def load(name: str):
-    return json.loads((DATA / name).read_text(encoding="utf-8"))
+    """Читает файл данных и приводит язык к терминологии словаря.
+
+    Нормализация выполняется здесь, а не только в самих файлах: demand.json
+    пересобирается build_demand.py из исходных материалов gt/, bitrix_gpu.json —
+    живой выгрузкой в CI, и просторечия из первоисточников иначе попадают на сайт.
+    """
+    return normalize_lexicon(json.loads((DATA / name).read_text(encoding="utf-8")))
 
 
 def score_suppliers(sup: dict) -> dict:
@@ -69,7 +82,18 @@ def compact(obj) -> str:
     return json.dumps(obj, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
 
 
+def refresh_coverage() -> None:
+    """Заполняемость считается перед сборкой: показатель, отстающий от данных, врёт."""
+    import subprocess
+    try:
+        subprocess.run([sys.executable, str(ROOT / "tools" / "coverage.py")],
+                       check=True, capture_output=True)
+    except Exception as ex:  # счётчик не должен ронять сборку сайта
+        print(f"   заполняемость: пропущена ({ex})")
+
+
 def main() -> None:
+    refresh_coverage()
     tpl = (SITE / "index.template.html").read_text(encoding="utf-8")
 
     data = {ph: load(fn) for ph, fn in FILES.items()}

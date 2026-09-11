@@ -17,7 +17,7 @@
       "crit": "критично",
       "en": "ignition system: spark plug, ignition coil, spark plug extension / boot, primary lead, ignition controller, pickup, trigger magnet",
       "items": [
-        {"ru": "Свеча зажигания (предкамерная / J-Gap / 4-ground)", "en": "spark plug (prechamber / J-gap / 4-ground)", "note": "Главная расходная позиция ГПУ. Cummins — 7-значный PN; Jenbacher — жестянка на 4 шт; CAT — M18×1,5 (G3500) или M14×1,25 (G3400)."},
+        {"ru": "Свеча зажигания (предкамерная / J-Gap / 4-ground)", "en": "spark plug (prechamber / J-gap / 4-ground)", "note": "Главная расходная позиция ГПУ. Cummins — 7-значный PN; Jenbacher — банка из 4 шт.; CAT — M18×1,5 (G3500) или M14×1,25 (G3400)."},
         {"ru": "Колпачок / удлинитель свечи", "en": "spark plug boot / extension", "note": "Идёт в паре с катушкой. Ремкомплект (тефлон + уплотнение + подпружиненная клемма) дешевле нового удлинителя."},
         {"ru": "Катушка зажигания", "en": "ignition coil", "note": "Экранированное и неэкранированное исполнения не взаимозаменяемы."},
         {"ru": "Первичный провод", "en": "primary lead", "note": "Длина зашита в номер (дюймы). Составлять ведомость длин по цилиндрам."},
@@ -121,7 +121,7 @@
       "items": [
         {"ru": "Насос охлаждающей жидкости (ВТК / НТК)", "en": "coolant pump, HT / LT circuit", "note": "Cummins 4089332 (НТК, Gilkes) и 4376121 (ВТК) — в нашем списке помечены «возможен аналог»."},
         {"ru": "Подогреватель ОЖ (ТЭН)", "en": "coolant / engine heater", "note": "Cummins 3423495."},
-        {"ru": "Теплообменник, радиатор", "en": "heat exchanger, radiator", "note": "Читать шильдик изготовителя (Funke, Kelvion, API, AKG)."},
+        {"ru": "Теплообменник, радиатор", "en": "heat exchanger, radiator", "note": "Читать заводская табличка изготовителя (Funke, Kelvion, API, AKG)."},
         {"ru": "Термостат, шланги контура", "en": "thermostat, coolant hoses"}
       ]
     },

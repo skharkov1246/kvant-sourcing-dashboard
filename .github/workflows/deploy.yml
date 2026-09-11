@@ -1,7 +1,7 @@
 name: Daily dashboard refresh
 
 # Каждые 2 часа (и на push в main) тянет свежие данные из Bitrix, пересобирает дашборд
-# и заливает его на Cloudflare Pages (за Basic Auth из public/_worker.js).
+# и заливает его на Cloudflare Pages (вход через Cloudflare Access; гейт public/_worker.js).
 on:
   # GitHub schedule НЕнадёжен (приватные репо душатся — по факту срабатывает ~раз в сутки).
   # Поэтому НАДЁЖНЫЙ триггер — repository_dispatch от внешнего планировщика (см. АВТООБНОВЛЕНИЕ.md),
@@ -12,16 +12,40 @@ on:
     - cron: "7 */6 * * *"      # backup каждые 6 часов в :07 UTC (реже — экономия минут Actions; GitHub может пропускать)
   push:
     branches: [main]           # коммит в main → немедленная пересборка/деплой
-    paths-ignore: ["ove/**", "gpu/**", "factory/**"]
-                               # сайт ОВЭ-75 собирает свой workflow (ove-deploy.yml); его коммиты,
-                               # включая автокоммиты ответов с сайта, дашборд не трогают — не жжём ~8 мин
-                               # Actions на каждый. Согласовано владельцем 13.08.2026.
-                               # gpu/** — то же самое для ГПУ-библиотеки (gpu-deploy.yml), 13.08.2026:
-                               # правило добавлено по той же логике, но БЕЗ отдельного согласования —
-                               # если владелец против, достаточно убрать "gpu/**" из этого списка.
-                               # factory/** — сайт базового проекта ГОКа (factory-deploy.yml), 17.08.2026:
-                               # та же логика, чтобы правка одной статической страницы не запускала
-                               # ~8 мин пересборки дашборда.
+    # Список того, от чего дашборд и портал ДЕЙСТВИТЕЛЬНО зависят (allowlist).
+    # Раньше здесь был обратный список (paths-ignore) из четырёх сайтов, и любой
+    # коммит мимо него запускал ~12 мин пересборки. Замер по main за 30 суток:
+    # 123 коммита из 168 запускали пересборку, а нужна она была 11 — 91% прогонов
+    # пересобирали дашборд из-за правок, которые его не касаются (библиотека ГТУ,
+    # ГШО, PN-wizard, навыки, суточные снимки бота).
+    # Правило: сюда попадает только то, что читает main.py/dashboard.py при сборке
+    # или лежит в public/ и уезжает на Pages этим же workflow. У остальных сайтов
+    # свои workflow (ove-, gpu-, zip-, factory-, gidromet-deploy.yml).
+    paths:
+      - "main.py"
+      - "dashboard.py"
+      - "bitrix_client.py"
+      - "config.py"
+      - "metrics.py"
+      - "company.py"
+      - "advisor.py"
+      - "reps.py"
+      - "kam.py"
+      - "contracts.py"
+      - "insights.py"
+      - "stages.py"
+      - "period.py"
+      - "requirements.txt"
+      - "templates/**"          # вёрстка дашборда
+      - "public/**"             # то, что уезжает на Cloudflare Pages, включая гейт
+      - "access/**"             # общие модули гейта, копии которых лежат в public/_worker.js
+      - "scripts/validate_dashboard.py"
+      - ".github/workflows/deploy.yml"
+    # data/** намеренно НЕ в списке: суточный снимок чатов пишет бот (~30 коммитов
+    # в месяц), и каждый запускал полную пересборку. Снимок влияет на одну метрику —
+    # недельное среднее реакции коммерсантов; ближайшая плановая пересборка
+    # (планировщик каждые ~6 ч) его подхватит. Цена — задержка до 6 ч на этой метрике,
+    # выигрыш — ~360 мин Actions в месяц.
   workflow_dispatch: {}        # ручной запуск (вкладка Actions / gh workflow run)
 
 permissions:
@@ -32,8 +56,58 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build-and-deploy:
+  # Резервный крон дублировал внешний планировщик: за 11 суток (27.08–07.09.2026)
+  # workflow отработал 100 раз — 45 по dispatch и 39 по расписанию, то есть
+  # ~7,6 пересборок в сутки там, где хватает 4. Каждая — ~12 мин Actions.
+  # Этот job (≈10 с) спрашивает у API возраст последней УСПЕШНОЙ пересборки и
+  # пропускает крон-прогон, если она свежее FRESH_H часов. Роль резерва цела:
+  # умолкнет планировщик — возраст перевалит за порог и ближайший крон соберёт.
+  # Порог 4 ч < FRESH=7 ч на шкале свежести дашборда, поэтому даже худший случай
+  # (пропуск + 6 ч до следующего крона) не красит индикатор.
+  # Любой другой триггер (dispatch, push, ручной) проходит без проверки.
+  # Ошибка API = собираем (fail-open) — лучше лишняя пересборка, чем пропущенная.
+  guard:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      actions: read
+    outputs:
+      build: ${{ steps.check.outputs.build }}
+    steps:
+      - name: Нужна ли пересборка
+        id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EVENT: ${{ github.event_name }}
+          REPO: ${{ github.repository }}
+          RUN_ID: ${{ github.run_id }}
+          FRESH_H: "4"
+        run: |
+          set -uo pipefail
+          go() { echo "build=true" >> "$GITHUB_OUTPUT"; echo "→ собираем: $1"; exit 0; }
+          [ "$EVENT" = "schedule" ] || go "триггер $EVENT, не резервный крон"
+          body=$(curl -sS --max-time 30 \
+                   -H "Authorization: Bearer $GH_TOKEN" \
+                   -H "Accept: application/vnd.github+json" \
+                   "https://api.github.com/repos/$REPO/actions/workflows/deploy.yml/runs?status=success&per_page=20") \
+            || go "API недоступен (fail-open)"
+          last=$(printf '%s' "$body" | jq -r --arg id "$RUN_ID" \
+                   '[.workflow_runs[]? | select((.id|tostring) != $id) | .updated_at] | max // empty') \
+            || go "не разобрал ответ API (fail-open)"
+          [ -n "$last" ] || go "успешных пересборок в истории нет"
+          last_s=$(date -u -d "$last" +%s 2>/dev/null) || go "не разобрал дату (fail-open)"
+          [ -n "$last_s" ] || go "не разобрал дату (fail-open)"
+          age=$(( ( $(date -u +%s) - last_s ) / 60 ))
+          echo "последняя успешная пересборка: $last (${age} мин назад), порог ${FRESH_H} ч"
+          [ "$age" -lt $(( FRESH_H * 60 )) ] || go "дашборд старше порога"
+          echo "build=false" >> "$GITHUB_OUTPUT"
+          echo "→ пропуск: планировщик отработал ${age} мин назад, резерв не нужен"
+
+  build-and-deploy:
+    needs: guard
+    if: needs.guard.outputs.build == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 35          # прогон занимает ~12 мин; всё, что дольше, — зависание
     steps:
       - uses: actions/checkout@v5
 
@@ -59,27 +133,54 @@ jobs:
           cp "$latest" public/index.html
           echo "index.html ← $latest ($(wc -c < public/index.html) байт)"
 
+      # Барьер перед деплоем: незаменённые плейсхолдеры, пустые KPI, JS-ошибки рендера.
+      # Если проверка не прошла — деплой не выполняется и на сайте остаётся
+      # предыдущая рабочая версия (это лучше, чем выкатить пустой дашборд).
+      - name: Проверка собранного дашборда
+        run: python scripts/validate_dashboard.py public/index.html
+
+      - name: Фиксация версии wrangler на прогон
+        run: |
+          set -euo pipefail
+          v="$(npm view wrangler version)"
+          echo "WRANGLER_VERSION=$v" >> "$GITHUB_ENV"
+          echo "wrangler зафиксирован на $v (одна версия на все шаги прогона)"
+
       - name: Деплой на Cloudflare Pages
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          BASIC_AUTH_PASS: ${{ secrets.BASIC_AUTH_PASS }}
         run: |
           set -euo pipefail
           # создать проект, если его ещё нет (иначе тихо пропустить)
-          npx --yes wrangler@latest pages project create kvant-sourcing-f122 \
+          npx --yes wrangler@${WRANGLER_VERSION} pages project create kvant-sourcing-f122 \
             --production-branch=main 2>/dev/null || true
-          # пароль гейта берём из GitHub-секрета и кладём в секрет Pages
-          # (в репозитории пароля нет). Если пуст — деплой не падает, но гейт вернёт 503.
-          if [ -n "${BASIC_AUTH_PASS:-}" ]; then
-            printf '%s' "$BASIC_AUTH_PASS" \
-              | npx --yes wrangler@latest pages secret put BASIC_AUTH_PASS --project-name=kvant-sourcing-f122 \
-              || echo "⚠ не удалось задать секрет в CI — задайте BASIC_AUTH_PASS в Cloudflare Pages → Settings"
-          else
-            echo "⚠ GitHub-секрет BASIC_AUTH_PASS пуст — гейт будет закрыт (503), пока не зададите пароль"
-          fi
           # --commit-message ASCII: иначе wrangler цепляет кириллическое сообщение
           # git-коммита и Cloudflare отвергает деплой (code 8000111).
-          npx --yes wrangler@latest pages deploy public \
-            --project-name=kvant-sourcing-f122 --branch=main \
-            --commit-dirty=true --commit-message="auto deploy"
+          # автоповтор: Cloudflare изредка отдаёт транзиентную ошибку публикации
+          ok=0
+          for i in 1 2 3; do
+            if npx --yes wrangler@${WRANGLER_VERSION} pages deploy public \
+                 --project-name=kvant-sourcing-f122 --branch=main \
+                 --commit-dirty=true --commit-message="auto deploy"; then
+              ok=1; break
+            fi
+            echo "деплой упал (попытка $i/3) — повтор через 20 с"; sleep 20
+          done
+          [ "$ok" = 1 ] || { echo "::error::деплой не удался после 3 попыток"; exit 1; }
+
+      - name: Причина падения (в сводку прогона)
+        if: failure()
+        run: |
+          {
+            echo "## Пересборка дашборда не удалась"
+            echo ""
+            echo "Сайт не тронут — на нём осталась предыдущая рабочая версия."
+            echo ""
+            echo "Что смотреть по шагу, на котором остановился прогон:"
+            echo "- **Генерация** — код 2 значит «данные Bitrix не прошли проверку достаточности»"
+            echo "  (неполная выгрузка). Код 1 — ошибка в коде или недоступный портал."
+            echo "- **Проверка собранного дашборда** — рассинхрон шаблона и dashboard.py"
+            echo "  либо JS-ошибка рендера."
+            echo "- **Деплой** — Cloudflare отверг публикацию (3 попытки исчерпаны)."
+          } >> "$GITHUB_STEP_SUMMARY"

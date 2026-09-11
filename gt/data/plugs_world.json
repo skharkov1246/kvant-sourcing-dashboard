@@ -1,0 +1,2967 @@
+{
+ "updated": "2026-09-01",
+ "method": "Источники: живая выгрузка Bitrix24 (сделки + смарт-процесс 166 «Запросы поставщикам») зондами scripts/bitrix_probe.py v19 и v20 от 01.09.2026; спецификация спроса — gt/data/rfq_demand.json (лист «Энергосети»); мировые каналы — веб-ресерч с проверкой каждой ссылки. Оценки помечены словом «оценка» — их подтверждает первое же КП. Мировые каналы — рабочий поток из 15 агентов по семи стволам (01.09.2026): поиск + состязательная проверка каждой компании по её же странице; опровергнутые выброшены. Советы по сокрытию конечного получателя из результатов удалены сознательно — мы такие каналы помечаем закрытыми, а не обходим.",
+ "problem": "<b>Свечи — единственная группа, где у нас нулевая конверсия.</b> В Bitrix 14 запросов со свечами: 11 в стадии «Request Sent» без ответа, 2 «Unread Messages» (ответы пришли и лежат непрочитанными), 1 переписка. <b>Ни одного КП.</b> Для сравнения, по остальным позициям тех же сделок 18 % запросов доходит до «Selected» и ещё 13 % до «Price at Work». Значит, проблема не в рынке и не в дефиците — в адресах и канале связи.",
+ "tiles": [
+  [
+   14,
+   "закупок со свечами в работе"
+  ],
+  [
+   "917 млн ₽",
+   "две закупки ЗПЧ ГПУ на 401 позицию"
+  ],
+  [
+   "16 млн ₽",
+   "контракты по расходникам Waukesha"
+  ],
+  [
+   "7 547",
+   "штук зажигания в спецификации"
+  ],
+  [
+   64,
+   "адресатов в таблице"
+  ],
+  [
+   44,
+   "из них ещё не запрашивали"
+  ],
+  [
+   "0 из 14",
+   "свечных запросов дошло до КП"
+  ]
+ ],
+ "deals": [
+  {
+   "id": "7942",
+   "title": "ЗИП к газопоршневым агрегатам Jenbacher , ОАО НАФТАН",
+   "close": "2024-06-05",
+   "cat": "Запросы",
+   "stage": "Quotation Issued to Client | Working with Client on Quotation",
+   "sum": 965866.0,
+   "cur": "EUR",
+   "owner": "Sergey Geronok (Project Manager)",
+   "plugs": true,
+   "soon": false
+  },
+  {
+   "id": "9462",
+   "title": "Запасные части для газовых двигателей MWM",
+   "close": "2024-09-17",
+   "cat": "Запросы",
+   "stage": "Quotation Issued to Client | Working with Client on Quotation",
+   "sum": 0.0,
+   "cur": "EUR",
+   "owner": "Vsevolod Shchurenkov (Project Manager)",
+   "plugs": true,
+   "soon": false
+  },
+  {
+   "id": "10704",
+   "title": "467. Tesi РЭПх свеча 2",
+   "close": "2024-11-25",
+   "cat": "Общая",
+   "stage": "Оплата получена | Закрытие сделки",
+   "sum": 150564.6,
+   "cur": "EUR",
+   "owner": "Svetlana Kruchinina (Project Implementation Manager)",
+   "plugs": true,
+   "soon": false
+  },
+  {
+   "id": "12138",
+   "title": "до 22.01.2025 Коленчатый вал  JENBACHER --ООО «ЭнергоТехСервис»--Артикгаз",
+   "close": "2025-01-28",
+   "cat": "Запросы",
+   "stage": "Quotation Issued to Client | Working with Client on Quotation",
+   "sum": 675400.0,
+   "cur": "EUR",
+   "owner": "Sergey Geronok (Project Manager)",
+   "plugs": false,
+   "soon": false
+  },
+  {
+   "id": "12558",
+   "title": "Система зажигания_РГТ",
+   "close": "2025-02-13",
+   "cat": "Запросы",
+   "stage": "Supplier's Offer Received | Preparing Quotation from Us",
+   "sum": 136887.6,
+   "cur": "EUR",
+   "owner": "Sergey Galushko ( Supplier Sourcing Manager)",
+   "plugs": true,
+   "soon": false
+  },
+  {
+   "id": "15992",
+   "title": "НН-559 Аварийная закупка до 04.08.2025 ДВС Cummins",
+   "close": "2025-08-08",
+   "cat": "ПАО «ГМК «Норильский никель»",
+   "stage": "Quotation Issued to Client | Working with Client on Quotation",
+   "sum": 0.0,
+   "cur": "EUR",
+   "owner": "Marina Topolyanskaya ( Supplier Sourcing Manager)",
+   "plugs": false,
+   "soon": false
+  },
+  {
+   "id": "18122",
+   "title": "737. Sandvik, Atlas Cummins (НН-642)",
+   "close": "2025-12-04",
+   "cat": "Общая",
+   "stage": "Доставка клиенту произведена | Ожидание оплаты",
+   "sum": 193512.74,
+   "cur": "EUR",
+   "owner": "Svetlana Kruchinina (Project Implementation Manager)",
+   "plugs": false,
+   "soon": false
+  },
+  {
+   "id": "20424",
+   "title": "НН-793 Запрос Двигателей Cummins QSX15",
+   "close": "2026-05-14",
+   "cat": "ПАО «ГМК «Норильский никель»",
+   "stage": "Requested from Suppliers | Awaiting Response",
+   "sum": 0.0,
+   "cur": "EUR",
+   "owner": "Lada Lebedinskaya (Supplier Sourcing Manager)",
+   "plugs": false,
+   "soon": false
+  },
+  {
+   "id": "22016",
+   "title": "Л-ЭС (NA)/02/Cummins",
+   "close": "2026-07-16",
+   "cat": "ПАО «ЛУКОЙЛ»",
+   "stage": "В работе у менеджера/Запрос отправлен",
+   "sum": 0.0,
+   "cur": "EUR",
+   "owner": "Vsevolod Shchurenkov (Project Manager)",
+   "plugs": true,
+   "soon": false
+  },
+  {
+   "id": "22144",
+   "title": "Л-ЭС (NA)/02/Cummins запрос 2",
+   "close": "2026-07-21",
+   "cat": "ПАО «ЛУКОЙЛ»",
+   "stage": "В работе у менеджера/Запрос отправлен",
+   "sum": 0.0,
+   "cur": "EUR",
+   "owner": "Vsevolod Shchurenkov (Project Manager)",
+   "plugs": true,
+   "soon": false
+  },
+  {
+   "id": "22162",
+   "title": "COM15072600150 Поставка расходных материалов Waukesha на 2026 год для ООО \"ЛУКОЙЛ-Ухтанефтепереработка\"",
+   "close": "2026-07-22",
+   "cat": "Тендеры",
+   "stage": "Тендерное предложение выдано | Работаем с клиентом по тендеру",
+   "sum": 11152584.86,
+   "cur": "RUB",
+   "owner": "Daria Lysenko (Project Manager)",
+   "plugs": true,
+   "soon": false
+  },
+  {
+   "id": "19092",
+   "title": "РН60305525 ЗЧ для газопоршневого двигателя (401 позиция)",
+   "close": "2026-07-23",
+   "cat": "ПАО «ЛУКОЙЛ»",
+   "stage": "Бюджетирование / Мониторинг цен",
+   "sum": 10838548.32,
+   "cur": "EUR",
+   "owner": "Polina Zababurina",
+   "plugs": true,
+   "soon": false
+  },
+  {
+   "id": "21618",
+   "title": "909. СОМ18062600080 \tПоставка расходных материалов Waukesha для ООО \"ЛУКОЙЛ-Пермнефтеоргсинтез\" в 2026 году",
+   "close": "2026-07-28",
+   "cat": "Общая",
+   "stage": "Бюджет сделки согласован | Оплата поставщикам",
+   "sum": 4815241.18,
+   "cur": "RUB",
+   "owner": "Daria Lysenko (Project Manager)",
+   "plugs": true,
+   "soon": false
+  },
+  {
+   "id": "20788",
+   "title": "РН60503879 Поставка «ЗПЧ для газопоршневого двигателя» (401 позиция)",
+   "close": "2026-07-28",
+   "cat": "ПАО «ЛУКОЙЛ»",
+   "stage": "Бюджетирование / Мониторинг цен",
+   "sum": 906645303.36,
+   "cur": "RUB",
+   "owner": "Polina Zababurina",
+   "plugs": true,
+   "soon": false
+  },
+  {
+   "id": "22418",
+   "title": "RA-RZ-2026-002010 Запчасти к двигателям внутреннего сгорания Cummins - подано (аналог/оригинал 70/30)",
+   "close": "2026-08-04",
+   "cat": "Тендеры",
+   "stage": "Тендерное предложение выдано | Работаем с клиентом по тендеру",
+   "sum": 362787.74,
+   "cur": "EUR",
+   "owner": "Nikita Romanyuk (Project Manager)",
+   "plugs": true,
+   "soon": false
+  },
+  {
+   "id": "21782",
+   "title": "918. 3.2.101 Проведение работ по ТО-10000, ТО-2000, сервисному сопровождению и шефнадзору на агрегатах ГПЭС-32 для ТПП «Урайнефтегаз» в 2026 году",
+   "close": "2026-08-11",
+   "cat": "Общая",
+   "stage": "Бюджет сделки согласован | Оплата поставщикам",
+   "sum": 47079800.0,
+   "cur": "RUB",
+   "owner": "Sofia Chertova (Project Coordinator)",
+   "plugs": true,
+   "soon": false
+  },
+  {
+   "id": "22552",
+   "title": "Л-ЭС (бн)/02/ЗИП на ДЭС консерв. Сандиб Cummins, Scania",
+   "close": "2026-08-12",
+   "cat": "ПАО «ЛУКОЙЛ»",
+   "stage": "В работе у менеджера/Формирование запросов",
+   "sum": 0.0,
+   "cur": "EUR",
+   "owner": "Alexey Vasiliev (менеджер проектов)",
+   "plugs": true,
+   "soon": false
+  },
+  {
+   "id": "22974",
+   "title": "COM28082600029 Поставка расходных материалов Waukesha на 2027 год для ООО \"ЛУКОЙЛ-Пермнефтеоргсинтез\"",
+   "close": "2026-09-04",
+   "cat": "Тендеры",
+   "stage": "New tender",
+   "sum": 0.0,
+   "cur": "EUR",
+   "owner": "Daria Lysenko (Project Manager)",
+   "plugs": true,
+   "soon": true
+  }
+ ],
+ "demand": [
+  {
+   "park": "Cummins gas (QSV91G/QSK60G)",
+   "name": "Свеча зажигания 5373898",
+   "pn": "5373898",
+   "qty": 1490,
+   "oem": "Cummins"
+  },
+  {
+   "park": "Cummins/Jenbacher (свечи Denso)",
+   "name": "Свеча Denso GI3-3",
+   "pn": "GI3-3",
+   "qty": 869,
+   "oem": "Denso"
+  },
+  {
+   "park": "Cummins gas (QSV91G/QSK60G)",
+   "name": "Уплотнительная шайба свечи зажигания",
+   "pn": "4970773",
+   "qty": 869,
+   "oem": "Cummins"
+  },
+  {
+   "park": "Cummins gas (QSV91G/QSK60G)",
+   "name": "Свеча зажигания 4380132",
+   "pn": "4380132",
+   "qty": 773,
+   "oem": "Cummins"
+  },
+  {
+   "park": "Cummins gas (QSV91G/QSK60G)",
+   "name": "Колпачек свечи зажигания 4351035",
+   "pn": "4351035",
+   "qty": 773,
+   "oem": "Cummins"
+  },
+  {
+   "park": "INNIO Jenbacher JMS 6xx",
+   "name": "К-кт свечей зажигания DENSO 518 (4шт), артикул 404492-1214569",
+   "pn": "404492-1214569",
+   "qty": 587,
+   "oem": "Jenbacher/INNIO"
+  },
+  {
+   "park": "Cummins gas (QSV91G/QSK60G)",
+   "name": "О-образное уплотнительное кольцо (колодца свечи верхнее)",
+   "pn": "3336259",
+   "qty": 373,
+   "oem": "Cummins"
+  },
+  {
+   "park": "Cummins gas (QSV91G/QSK60G)",
+   "name": "О-образное уплотнительное кольцо (колодца свечи нижнее)",
+   "pn": "3087911",
+   "qty": 373,
+   "oem": "Cummins"
+  },
+  {
+   "park": "Cummins gas (QSV91G/QSK60G)",
+   "name": "О-образное уплотнительное кольцо (фланца колодца свечи ) 3422444",
+   "pn": "3422444",
+   "qty": 311,
+   "oem": "Cummins"
+  },
+  {
+   "park": "INNIO Jenbacher JMS 6xx",
+   "name": "Наконечник контактный запальной свечи, артикул 657541",
+   "pn": "657541",
+   "qty": 242,
+   "oem": "Jenbacher/INNIO"
+  },
+  {
+   "park": "MWM / Deutz TCG",
+   "name": "Уплотнительное кольцо свечи зажигания",
+   "pn": "12211061",
+   "qty": 221,
+   "oem": "DEUTZ"
+  },
+  {
+   "park": "MWM / Deutz TCG",
+   "name": "Свеча зажигания",
+   "pn": "12420480",
+   "qty": 221,
+   "oem": "DEUTZ"
+  },
+  {
+   "park": "Cummins gas (QSV91G/QSK60G)",
+   "name": "О-образное уплотнительное кольцо (колодца свечи верхнее)",
+   "pn": "120554",
+   "qty": 110,
+   "oem": "Cummins"
+  },
+  {
+   "park": "Cummins gas (QSV91G/QSK60G)",
+   "name": "О-образное уплотнительное кольцо (колодца свечи нижнее)",
+   "pn": "3651213",
+   "qty": 110,
+   "oem": "Cummins"
+  },
+  {
+   "park": "INNIO Jenbacher JMS 6xx",
+   "name": "Запальная свеча, артикул 1236100",
+   "pn": "1236100",
+   "qty": 66,
+   "oem": "Jenbacher/INNIO"
+  },
+  {
+   "park": "Cummins gas (QSV91G/QSK60G)",
+   "name": "Катушка зажигания",
+   "pn": "4327849",
+   "qty": 55,
+   "oem": "Cummins"
+  },
+  {
+   "park": "Cummins gas (QSV91G/QSK60G)",
+   "name": "Катушка зажигания",
+   "pn": "5634409",
+   "qty": 52,
+   "oem": "Cummins"
+  },
+  {
+   "park": "INNIO Jenbacher JMS 6xx",
+   "name": "Катушка зажигания, артикул 487181",
+   "pn": "487181",
+   "qty": 28,
+   "oem": "Jenbacher/INNIO"
+  },
+  {
+   "park": "ГТУ Solar/Siemens",
+   "name": "ЗАПАЛЬНАЯ СВЕЧА Солар Taurus 60S 903316C1",
+   "pn": "903316C1",
+   "qty": 6,
+   "oem": "Solar"
+  },
+  {
+   "park": "ГТУ Solar/Siemens",
+   "name": "ЗАПАЛЬНАЯ СВЕЧА Солар Taurus 70MD 903316C1",
+   "pn": "903316C1",
+   "qty": 6,
+   "oem": "Solar"
+  },
+  {
+   "park": "ГТУ Solar/Siemens",
+   "name": "ЗАПАЛЬНАЯ СВЕЧА Сименс SGT-400  903316C1",
+   "pn": "903316C1",
+   "qty": 6,
+   "oem": "Solar"
+  },
+  {
+   "park": "Cummins gas (QSV91G/QSK60G)",
+   "name": "МОДУЛЬ УПРАВЛЕНИЯ ЗАЖИГАНИЕМ",
+   "pn": "2866883",
+   "qty": 3,
+   "oem": "Cummins"
+  },
+  {
+   "park": "ГТУ Solar/Siemens",
+   "name": "ПРОКЛАДКА, 0,77 ВНУТР. ДИАМЕТР, МЕТАЛЛИЧЕСКАЯ, SPARK  СОЛАР Taurus 70 и Taurus 70MD (унифи",
+   "pn": "903315C1",
+   "qty": 3,
+   "oem": "Solar"
+  }
+ ],
+ "streams": [
+  {
+   "key": "cummins",
+   "title": "Cummins gas",
+   "note": "Подтверждено документально: 4380132 заменил 5544762 («SUPERSEDED FROM 5544762», dieselengines.parts), а 5373898 = 4924504 = 4302738 — взаимозаменяемая группа (кросс-лист WETZ). Это расширяет пул поставщиков по позиции с максимальным объёмом. Cummins ушёл из РФ, поэтому именно АВТОРИЗОВАННЫЙ дилер — худший канал по genuine с российским конечником; независимый трейдер отвечает охотнее. Ценовой коридор проверен: genuine США — $1019 за 4380132; РФ-перепродажа 5373898 — 26 600–41 094 ₽ при сроке 60–90 дней; китайский заводской аналог — кратно ниже. Красный флаг: карточки РФ-трейдеров одновременно пишут «оригинал» и «выпускаются в России для Cummins» — происхождение требовать документально."
+  },
+  {
+   "key": "jenbacher",
+   "title": "Jenbacher",
+   "note": "Завод в Йенбахе прямых продаж не ведёт: оригинал идёт только через закрытый реестр провайдеров INNIO (jenbacher.com/en/providers/). Реальных типов источника три: авторизованный провайдер в дружественной юрисдикции (ETS-Astana в РК, Topkapı в Турции, Orient Energy в DAFZA, Clarke Energy India), независимый складской трейдер по зажиганию (İggnita, BMF, PowerUP, Weyeah), завод премиум-аналога (ERS/Hatraco, Denso, MOTORTECH/Goetze, Federal Mogul). Ключ к обходу брендового фильтра: Jenbacher 1214569 = Denso P518 = Federal Mogul FV76WWCC/18GZ45 = Goetze G-6004 = ERS 18.021-01 (подтверждено дважды — флаером Hatraco и страницей RS Motor); Jenbacher P611 1236099/1236100 = ERS 18.043-01/FT00174. Наконечник 657541 имеет новый кросс 578732 (подтверждён в связанных товарах PowerUP)."
+  },
+  {
+   "key": "mwm_deutz",
+   "title": "MWM / Deutz",
+   "note": "12420480 подтверждена самим OEM как оригинальная форкамерная свеча MWM (страница Caterpillar Energy Solutions, применимость TCG 2016/2020/2032/3016/3020, TBG 441/632); 12211061 — оригинальное уплотнительное кольцо под 18-мм свечи MWM. Деньги в этом парке сидят в свечах, а не в кольцах: форкамерная свеча уровня оригинала стоит сотни долларов, кольцо — центы, поэтому торговаться надо по свечам, а кольца брать «до кучи» у китайцев. Легальные маршруты: MWM EECA (собственное подразделение Caterpillar Energy Solutions с поимёнными менеджерами по РК и УЗ), İltekno (официальный дистрибьютор MWM с мандатом Solutions Provider по Узбекистану с 2023 г.), İggnita (карточки 12420480 «Orijinal» и 12211061). Номер 12128936 в спросе перепроверить: в найденных источниках он проходит как установочный штифт TCG2020, а не как уплотнение свечи."
+  },
+  {
+   "key": "cat_waukesha",
+   "title": "CAT / Waukesha",
+   "note": "В rfq_demand.json номеров CAT и Waukesha нет, но парк обслуживается, и через Denso GI3-х эти машины пересекаются с закупаемой позицией GI3-3: карточка Denso GI3-1 у İggnita даёт кроссы CAT OES 194-8518/224-2700/243-4291/301-6663 и Waukesha OES 60999Z/69919D. Официальный канал Waukesha закрыт на сеть провайдеров INNIO — в ней для СНГ критична ES Compression Too (Алматы, функция Parts подтверждена). Дилеры CAT (Borusan, Al-Bahar) физически имеют оригинал и SIS, но продажа с российским конечником заблокирована политикой вендора. Номер «69804» из обихода не подтверждается ни одним каталогом — вероятно, опечатка от 69919D, сверять по паспорту двигателя."
+  },
+  {
+   "key": "makers",
+   "title": "производители свечей",
+   "note": "Главный вывод: ни один производитель промышленных свечей не продаёт конечному промышленному потребителю. Denso дословно: «We only sell to stockists who have an active account with us», плюс на русской странице висит уведомление, что DENSO не работает на территории России и Беларуси. Champion, BorgWarner/BERU, Stitt, Altronic — только «Where to buy» / «Find a distributor». Значит, запросы «в завод» по определению не могут вернуть КП: писать надо стокистам, и лучше сразу вне санкционного периметра. Взамен заводы дают бесплатно то, что дороже КП — карту замен: 12420480 = Champion RB75N/RB75PP/RB75WPC/RB75WPCC = BERU 18GZ5-77-2 = Bosch 7307/7308 = Denso GL3-1/GL3-3/GL3-5 = Stitt RL807LL = Altronic L1863B/DP/IP; GI3-3 = Champion RB77CC/RB77N/RB77WPCC, премиум FB77WPCC = BERU 18GZ 4-77/6-77 = Bosch 7302/7305/7306 = Waukesha 60999Z/69919D = Cummins 4098162/4010981/2866879 = CAT 194-8518/224-2700/243-4291/301-6663."
+  },
+  {
+   "key": "hubs",
+   "title": "хабы TR/ОАЭ/КЗ/УЗ",
+   "note": "Хабы распадаются на два класса, и смешивать их в одном письме нельзя. Независимые стокисты и трейдеры (İggnita, BMF Enerji, Aytuğlu, Lloyd & Fedders) комплаенсом не связаны и реально отгружают покупателю из СНГ. Асимметрия покрытия: Jenbacher и Waukesha в хабах закрыты отлично (по официальному провайдеру в каждой стране), MWM — через İltekno и İggnita, а Cummins gas (наш максимальный объём) закрыт хуже всего: эмиратские и казахстанские каналы Cummins преимущественно дизельные. ОАЭ работают через свободные зоны (DAFZA, JAFZA) — реэкспорт в Центральную Азию там рутинная операция."
+  },
+  {
+   "key": "china_india",
+   "title": "Китай / Индия",
+   "note": "Китай — реальное производство под наши парки, доступное без обходных схем: оплата CNY, отгрузка авто/ж-д через Забайкальск или Казахстан, санкционных ограничений нет. Настоящие производства: Weichai Torch (Чжучжоу, с 1961 г., индустриальная иридиевая и форкамерная линейки) и Jinhua Sizhouda/Лайчжоу (завод свечей, честно заявляет ресурс «5000 hours or more»). Techie — контрактное производство под своей маркой TISS/TICS с инженерными кросс-таблицами. Важно для торга: почти вся «индустриальная» свеча у китайских трейдеров — это артикулы Torch (R10P3, R10P7, R9B12-77, S-R6A1x), а у Takumi и Changsha Torch Auto Parts совпадает телефон +86-731-84830658 — это одна контора под двумя витринами, считать их двумя независимыми котировками нельзя. Индия по свечам ГПУ слаба: собственных производств нет (Autolite делает лампы, Federal-Mogul Goetze India — только автомобильный Champion), индийские фирмы торгуют дизельным Cummins. Единственный ценный индийский адрес — Mestek India (авторизованный дистрибьютор Champion Industrial и BG Service Co.), и то в первую очередь как источник кроссов."
+  }
+ ],
+ "addressees": [
+  {
+   "name": "CJ Aerospace",
+   "country": "—",
+   "stream": "makers",
+   "tier": "trader",
+   "tier_ru": "Поставщик, отвечавший по свечам Champion",
+   "families": [
+    "промышленное зажигание"
+   ],
+   "part_numbers": [
+    "Champion"
+   ],
+   "what_they_have": "В Bitrix с 15.07.2026 висит НЕПРОЧИТАННЫЙ ответ по свечам Champion.",
+   "route_to_ru": "уточнить",
+   "ask_mode": "открыть переписку",
+   "answer_odds": "high",
+   "priority": 1,
+   "bitrix_state": "unread",
+   "bitrix_note": "#38612 «Свеча зажигания Champion в CJ Aerospace» — «Unread Messages» с 15.07.2026.",
+   "parks": [
+    "other"
+   ],
+   "tier_key": "trade",
+   "hub": false
+  },
+  {
+   "name": "EMAC Group Limited (sinomac.com)",
+   "country": "Китай / Гонконг",
+   "stream": "cummins",
+   "tier": "authorized_distributor",
+   "tier_ru": "Дилер Cummins",
+   "families": [
+    "Cummins gas",
+    "Cummins дизель"
+   ],
+   "part_numbers": [
+    "QSK",
+    "QSV",
+    "KTA"
+   ],
+   "what_they_have": "Дилерский канал Cummins: 11 запросов, 2 «Selected» (QSK23-C, KTA-50), последний в стадии «Price at Work».",
+   "route_to_ru": "через КНР",
+   "ask_mode": "по PN, знают каталог Cummins",
+   "answer_odds": "high",
+   "priority": 1,
+   "bitrix_state": "won",
+   "bitrix_note": "11 запросов, 2 «Selected», посл. 02.07.2026 «Price at Work».",
+   "evidence_url": "https://www.sinomac.com",
+   "parks": [
+    "cummins"
+   ],
+   "tier_key": "trade",
+   "hub": false
+  },
+  {
+   "name": "ES Compression Too",
+   "country": "Казахстан",
+   "city": "Алматы, пр. Ермека Серкебаева 90, БЦ «Гагарин»",
+   "site": "https://www.es-compression.com",
+   "email": "info@es-compression.com; support@es-compression.com",
+   "phone": "+7 (771) 214-02-11; +7 (727) 310-10-36 (номер из каталога Waukesha, возможно устарел)",
+   "stream": "makers",
+   "tier_ru": "Авторизованный дистрибьютор",
+   "families": [
+    "Waukesha VHP/VGF"
+   ],
+   "part_numbers": [
+    "69919D",
+    "60999Z"
+   ],
+   "what_they_have": "Официальный провайдер INNIO Waukesha по Казахстану — в реестре waukeshaengine.com функции указаны дословно: «Engine Sales, Packaging - Commercial / Industrial Power Gen, Packaging - Compression, Packaging - Oilfield Power Gen, Parts, Service», то есть Parts подтверждён первоисточником. На своём сайте — «официальный дистрибьютор Ariel Corporation и INNIO Waukesha Gas Engines в Казахстане, Узбекистане и Туркменистане», сервис и оригинальные запчасти. Конкретные номера свечей на сайте не показаны — это вывод из статуса Parts.",
+   "evidence_url": "https://www.waukeshaengine.com/providers/es-compression/",
+   "route_to_ru": "ЕАЭС: таможенной границы с РФ нет, автодоставка Алматы→РФ 5–8 дней, расчёты в тенге/рублях. Единственный найденный авторизованный дистрибьютор Waukesha в СНГ.",
+   "ask_mode": "По-русски на info@ + звонок/WhatsApp на +7 771 214-02-11. Заходить строго по Waukesha (по CAT они не канал): свечи 69919D / 60999-серия, наконечники, катушки — с указанием модели и серийного номера установки. Сразу проговорить договор в тенге/рублях и автодоставку. Быть готовыми к вопросу о конечном пользователе — как провайдер INNIO они могут упереться в ограничения по реэкспорту.",
+   "answer_odds": "high",
+   "priority": 1,
+   "verdict": "confirmed",
+   "why_priority": "Оригинал Waukesha внутри ЕАЭС на русском языке — по этому парку короче маршрута не существует. Под текущий перечень номеров прямо не попадает, но закрывает парк заказчика и должен быть в списке до того, как Waukesha-позиции появятся в заявке.",
+   "bitrix_state": "never",
+   "bitrix_note": "В Bitrix не заведены — новый канал из разведки 01.09.2026.",
+   "parks": [
+    "waukesha"
+   ],
+   "tier_key": "auth",
+   "hub": true
+  },
+  {
+   "name": "MWM Eastern Europe & Central Asia (Caterpillar Energy Solutions)",
+   "country": "Австрия (подразделение по СНГ и Средней Азии)",
+   "city": "офис EECA; склад ЗИП — Лорш, Германия",
+   "site": "https://www.mwm.energy/en/",
+   "email": "info-eeca@mwmenergy.com",
+   "phone": "+43 5242 21300",
+   "stream": "makers",
+   "tier_ru": "Авторизованный дистрибьютор",
+   "families": [
+    "MWM TCG 2016",
+    "MWM TCG 2020",
+    "MWM TCG 2032",
+    "MWM TCG 3016",
+    "MWM TCG 3020"
+   ],
+   "part_numbers": [
+    "12420480",
+    "12211061"
+   ],
+   "what_they_have": "Не реселлер, а собственное подразделение Caterpillar Energy Solutions с закреплёнными территориальными менеджерами: Arman Mukanov (Казахстан, Киргизия, Таджикистан) и Ilir Iliri (Узбекистан, Туркменистан, Азербайджан). Оригинальные детали MWM со склада в Лорше («более двух миллионов деталей»), в перечне дословно «whether gaskets, filters, spark plugs, cylinder liners, pistons, bearings, or other components». Прямо предупреждают, что неоригинал аннулирует гарантию — это аргумент, если энергоцентр заказчика на гарантии.",
+   "evidence_url": "https://www.mwm.energy/en/technology/service-and-original-spare-parts/",
+   "route_to_ru": "Самый короткий официальный путь к оригиналу MWM для СНГ: заказ через территориального менеджера по Казахстану/Узбекистану, приёмка и платёж на юрлицо в РК или РУз. Прямая отгрузка в РФ исключена — это то же юрлицо Caterpillar с экспортным контролем группы.",
+   "ask_mode": "Адресно на конкретного менеджера, а не на общий ящик: по Узбекистану — Ilir Iliri, по Казахстану — Arman Mukanov, с копией на info-eeca@mwmenergy.com. Письмо от юрлица РК/РУз с серийным номером установки, перечнем PN (12420480 — 221, 12211061 — 221) и количеством. Легенда конечного использования в Средней Азии должна быть настоящей: при признаке реэкспорта в РФ включается комплаенс и запрос умирает.",
+   "answer_odds": "medium",
+   "priority": 1,
+   "verdict": "confirmed",
+   "why_priority": "Единственный подтверждённый легальный источник оригинальной форкамерной свечи MWM 12420480 с прямым мандатом на СНГ и поимёнными менеджерами. По этому парку альтернатива только аналог, поэтому обращение обязательно — даже если закончится переадресацией на İltekno.",
+   "bitrix_state": "never",
+   "bitrix_note": "В Bitrix не заведены — новый канал из разведки 01.09.2026.",
+   "parks": [
+    "mwm_deutz",
+    "cat"
+   ],
+   "tier_key": "auth",
+   "hub": false
+  },
+  {
+   "name": "Mepa Energy Systems (ТОО)",
+   "country": "Казахстан",
+   "city": "Алматы, ул. Братская 84Б, 050061",
+   "site": "https://mepa.kz/zapchasti",
+   "email": "sales.kz@mepaenerji.com",
+   "phone": "+7 701 844 64 44; +7 708 970 52 33",
+   "stream": "makers",
+   "tier_ru": "Авторизованный дистрибьютор",
+   "families": [
+    "Cummins (в т.ч. газовые генераторные установки и когенерация)"
+   ],
+   "part_numbers": [
+    "5373898",
+    "4380132",
+    "4351035",
+    "4970773"
+   ],
+   "what_they_have": "Уполномоченный дилер Cummins в Казахстане по продаже, обслуживанию и запчастям (казахстанское плечо турецкой группы Mepa Enerji). В шапке страницы дословно «УПОЛНОМОЧЕННЫЙ ДИЛЕР ПО ПРОДАЖЕ, ОБСЛУЖИВАНИЮ И ЗАПЧАСТЯМ», в подвале «Sales and Service Dealer of Cummins», в продуктовом меню есть «Газовые генераторы» и «Когенерация». Раздел ЗИП весь про Cummins Genuine. Конкретно свечи как позиция на сайте не заявлены — доступ следует из дилерского статуса.",
+   "evidence_url": "https://mepa.kz/zapchasti",
+   "route_to_ru": "Казахстанское юрлицо с турецкой материнской структурой — двойной маршрут (Турция→КЗ→РФ) внутри одной группы; поставка в РФ идёт внутри ЕАЭС, расчёты в тенге/рублях.",
+   "ask_mode": "По-русски на sales.kz@mepaenerji.com с дублем звонком. Строго по номерам: 5373898 (1490), 4380132 (773), колпачок 4351035 (773), шайба 4970773 (869). Первый отсеивающий вопрос — покрывает ли их дилерская франшиза линейку газовых QSV81G/QSV91G/QSK-G, потому что расходка зажигания идёт по каналу Power Generation. Второй ход, если казахстанское плечо не тянет, — через турецкую материнскую Mepa Enerji.",
+   "answer_odds": "high",
+   "priority": 1,
+   "verdict": "confirmed",
+   "why_priority": "Единственный подтверждённый официальный канал Cummins в ЕАЭС с русскоязычным сайтом и +7-номерами — под самый крупный объём спроса (1490 + 773 шт) это единственный вариант получить genuine. Ограничение честное: такой объём — заказ у Cummins, а не отгрузка со склада, поэтому запускать параллельно с китайским треком.",
+   "bitrix_state": "never",
+   "bitrix_note": "В Bitrix не заведены — новый канал из разведки 01.09.2026.",
+   "parks": [
+    "cummins"
+   ],
+   "tier_key": "auth",
+   "hub": true
+  },
+  {
+   "name": "Nordroy Power FZC",
+   "country": "ОАЭ",
+   "stream": "hubs",
+   "tier": "trader",
+   "tier_ru": "Энергетический трейдер ЗИП",
+   "families": [
+    "ГПУ",
+    "генераторы"
+   ],
+   "part_numbers": [],
+   "what_they_have": "10 запросов, 6 «Selected» — один из самых результативных адресатов базы, но последний контакт 09.02.2025.",
+   "route_to_ru": "через ОАЭ",
+   "ask_mode": "по PN, реанимировать канал",
+   "answer_odds": "medium",
+   "priority": 1,
+   "bitrix_state": "won",
+   "bitrix_note": "6 «Selected» из 10 запросов; полтора года не трогали — канал стоит разбудить именно свечами.",
+   "evidence_url": "",
+   "parks": [
+    "other"
+   ],
+   "tier_key": "trade",
+   "hub": true
+  },
+  {
+   "name": "R M Walsh Ltd",
+   "country": "Великобритания, Stoke-on-Trent",
+   "stream": "cummins",
+   "tier": "genuine_stockist",
+   "tier_ru": "Дилер ERS в Великобритании",
+   "families": [
+    "Cummins gas QSK60"
+   ],
+   "part_numbers": [
+    "18.049-01",
+    "FT00196",
+    "4380132",
+    "4390446",
+    "5544762"
+   ],
+   "what_they_have": "Продаёт ровно нашу свечу коробками по 4 шт, срок отгрузки 2–3 недели, номера OEM указаны в карточке.",
+   "route_to_ru": "UK — через хаб (ОАЭ/Турция) либо ЕС-агента",
+   "ask_mode": "по PN, есть онлайн-карточка и телефон",
+   "answer_odds": "medium",
+   "priority": 1,
+   "bitrix_state": "never",
+   "bitrix_note": "В Bitrix компании нет — ни одного запроса. Самый очевидный незакрытый ход по свече 18.049-01.",
+   "evidence_url": "https://www.rmwalshltd.co.uk/products/spark-plug-for-qsk60-1-54-mw",
+   "parks": [
+    "cummins"
+   ],
+   "tier_key": "trade",
+   "hub": false
+  },
+  {
+   "name": "TECHIE Power Parts",
+   "country": "Китай, Шэньчжэнь",
+   "stream": "china_india",
+   "tier_ru": "Производитель промышленных свечей",
+   "families": [
+    "Cummins gas",
+    "Waukesha",
+    "CAT",
+    "Jenbacher"
+   ],
+   "part_numbers": [
+    "TISS9826",
+    "TISS9838",
+    "RB77CC"
+   ],
+   "what_they_have": "Публичная кросс-таблица под газовые Cummins (QSV/QSK/HSK) и под Champion RB77CC; делает J-Gap и 4-ground свечи.",
+   "evidence_url": "https://www.techiepowerparts.com/application/cummins-gas-engine/",
+   "route_to_ru": "КНР — прямой маршрут",
+   "ask_mode": "по PN + фото старой свечи, спросить MOQ и ресурс",
+   "answer_odds": "high",
+   "priority": 1,
+   "bitrix_state": "never",
+   "bitrix_note": "В Bitrix не заведены — свечной завод, которого у нас нет.",
+   "email": "info@techiepowerparts.com",
+   "phone": "+86 130 1729 3329",
+   "site": "techiepowerparts.com",
+   "parks": [
+    "cummins",
+    "jenbacher",
+    "cat",
+    "waukesha"
+   ],
+   "tier_key": "makers",
+   "hub": false
+  },
+  {
+   "name": "TESI SPA",
+   "country": "Италия",
+   "stream": "makers",
+   "tier": "oem",
+   "tier_ru": "Производитель свечей и систем зажигания",
+   "families": [
+    "ГТУ/ГПУ",
+    "промышленное зажигание"
+   ],
+   "part_numbers": [
+    "свеча в сборе"
+   ],
+   "what_they_have": "Единственный производитель свечей в нашей базе, с которым уже была ОПЛАЧЕННАЯ сделка: «467. Tesi РЭПх свеча 2» на 150 564 EUR, плюс запрос «НЗЛ_Tesi_Свеча в сборе».",
+   "route_to_ru": "работали напрямую, поставка состоялась",
+   "ask_mode": "по чертежу/образцу и по типу двигателя, менеджер уже знаком",
+   "answer_odds": "high",
+   "priority": 1,
+   "bitrix_state": "won",
+   "bitrix_note": "4 запроса, 2 «Selected», последний 13.07.2026. Проверенный канал — а по свечам ГПУ его ни разу не спросили.",
+   "evidence_url": "",
+   "parks": [
+    "other"
+   ],
+   "tier_key": "makers",
+   "hub": false
+  },
+  {
+   "name": "UKP Parts India Pvt Ltd",
+   "country": "Индия",
+   "stream": "china_india",
+   "tier": "trader",
+   "tier_ru": "Индийский поставщик ЗИП",
+   "families": [
+    "Cummins",
+    "дизель/газ"
+   ],
+   "part_numbers": [],
+   "what_they_have": "3 запроса, все три в стадии «Price at Work» — считают цены прямо сейчас (последний 11.08.2026).",
+   "route_to_ru": "Индия — рабочий маршрут",
+   "ask_mode": "по PN списком",
+   "answer_odds": "high",
+   "priority": 1,
+   "bitrix_state": "price",
+   "bitrix_note": "3 запроса, 3× «Price at Work», посл. 11.08.2026. Живой канал — добавить свечи.",
+   "parks": [
+    "cummins"
+   ],
+   "tier_key": "trade",
+   "hub": false
+  },
+  {
+   "name": "Waukesha-Pearce Industries, LLC (WPI)",
+   "country": "США, Хьюстон",
+   "stream": "cat_waukesha",
+   "tier": "authorized_distributor",
+   "tier_ru": "Дистрибьютор Waukesha",
+   "families": [
+    "Waukesha VHP/VGF"
+   ],
+   "part_numbers": [
+    "69804",
+    "60999Z"
+   ],
+   "what_they_have": "Единственный профильный адресат по Waukesha в базе — и у него с 27.05.2026 висит НЕПРОЧИТАННЫЙ ответ, при том что у нас два контракта на расходники Waukesha на 16 млн ₽ и тендер на 2027 год.",
+   "route_to_ru": "США — только через посредника/хаб",
+   "ask_mode": "открыть существующую переписку, затем годовой лот",
+   "answer_odds": "medium",
+   "priority": 1,
+   "bitrix_state": "unread",
+   "bitrix_note": "#— от 27.05.2026, «Unread Messages» три месяца. Это самая дешёвая точка роста на странице.",
+   "evidence_url": "",
+   "parks": [
+    "waukesha"
+   ],
+   "tier_key": "trade",
+   "hub": false
+  },
+  {
+   "name": "Wuhan Weyeah Power Machinery Co., Ltd.",
+   "country": "Китай, Ухань",
+   "stream": "china_india",
+   "tier": "trader",
+   "tier_ru": "Поставщик ЗИП двигателей и генераторов",
+   "families": [
+    "Cummins gas",
+    "дизель"
+   ],
+   "part_numbers": [
+    "12211061",
+    "657541",
+    "657540",
+    "1236100",
+    "436782",
+    "1241162",
+    "12452828",
+    "12453572"
+   ],
+   "what_they_have": "Китайский поставщик ЗИП ГПУ с полноценной русскоязычной версией сайта — редкий признак реальной работы с СНГ. Подтверждены карточки наконечника свечи 657541 для Jenbacher Type 6 (публичная цена $202,80) и уплотнения MWM 12211061 ($0,34, применимость TBG 604BL6, TCG 2016V8C, TBG 604BV8, TBG 616V16), плюс обвязка Jenbacher по заводским номерам. КРИТИЧНАЯ ОГОВОРКА: на карточке свечи 12453572 в поле Model стоит «Weyeah», а в подвале дисклеймер о чужих торговых марках — по свечам это собственный афтермаркет, не оригинал. Плюс на русской карточке 1236100 указана неверная применимость (серии 2/3/4 вместо Type 6/9) — признак трейдера, а не эксперта.",
+   "route_to_ru": "прямые поставки из КНР, отработаны",
+   "ask_mode": "по PN списком, отвечает быстро",
+   "answer_odds": "high",
+   "priority": 1,
+   "bitrix_state": "won",
+   "bitrix_note": "11 запросов, 8 «Selected». Обязательный адресат по любой свечной позиции Cummins.",
+   "evidence_url": "https://www.weyeahmotor.com/MWM-12211061-spark-plug-gasket-for-MWM-gas-engine-pd44891804.html",
+   "city": "Ухань, Huangpi District, No. 6 Songgang Road",
+   "site": "https://www.weyeahmotor.com (рус. версия ru.weyeahmotor.com)",
+   "email": "info@weyeahengine.com",
+   "phone": "+86-18064047867",
+   "verdict": "confirmed",
+   "why_priority": "Самый низкий барьер входа во всём списке (русский язык, публичные цены, приём банковского перевода) и идеальный источник дешёвой расходки. По свечам — риск получить собственный бренд под видом оригинала, то есть ровно то, чего заказчик просил избежать.",
+   "parks": [
+    "cummins",
+    "jenbacher",
+    "mwm_deutz"
+   ],
+   "tier_key": "trade",
+   "hub": false
+  },
+  {
+   "name": "İggnita (Iggnita Enerji)",
+   "country": "Турция (+ Узбекистан, Нидерланды)",
+   "city": "İstanbul (Ümraniye), Aksaray, Ташкент, Роттердам",
+   "site": "https://iggnita.com",
+   "email": "info@iggnita.com",
+   "phone": "+90 216 232 28 28; отдел продаж +90 546 902 28 45; Роттердам +31 6 27533560",
+   "stream": "makers",
+   "tier_ru": "Складской сток оригинала",
+   "families": [
+    "INNIO Jenbacher Type 2/3/4/6/9",
+    "MWM/Deutz TCG 2016/2020/2032",
+    "Cummins gas (QSV81/QSV91, QSK19-60G)",
+    "Caterpillar G3500/G3600, CG170",
+    "Waukesha VHP/VGF/AT",
+    "Guascor FG/FGLD"
+   ],
+   "part_numbers": [
+    "Denso GI3-3",
+    "Denso GI3-1",
+    "Denso GI3-5",
+    "Denso GK3-5",
+    "1214569 (DENSO 518 set)",
+    "436782",
+    "1236100 (P611)",
+    "1205634"
+   ],
+   "what_they_have": "Профильный склад ЗИП систем зажигания ГПУ с категорией «Buji ve Ateşleme» на 444 позиции. Подтверждены дословно карточки ровно наших позиций: Denso GI3-3 (применимость Cummins Q19G/QSV81-V16/QSV91-V18, CAT G3500/G3600, Jenbacher J612/616/629, Waukesha, Guascor FG/FGLD), «DENSO 518 Spark Plug Set Jenbacher 1214569 ORIGINAL» с кроссом на 436782, «Spark plug MWM 12420480 Original» и его кросс BERU 18GZ5-77-2, уплотнение 12211061 (Buji Contası, Orijinal), катушка Jenbacher 487181, форкамерные MWM 12452176/12453572, MOTORTECH MPC1900, свеча CAT 346-5123 Original. Отпуск «Iggnita İstanbul Depo Teslim». Единственная компания, у которой в одном каталоге лежат Cummins, Jenbacher, MWM, Denso и CAT одновременно.",
+   "evidence_url": "https://iggnita.com/urun/denso-gi3-3-iridyum-buji-cat-guascor-waukesha-jenbacher-cummins/",
+   "route_to_ru": "Лучший маршрут из всех проверенных: турецкое юрлицо (не применяет санкции ЕС) + собственный офис в Ташкенте (Hamid Olimjon str., Center-1, 22/20) + Роттердам как закупочная точка в ЕС. Цепочка ЕС→Турция→Узбекистан→РФ построена внутри одной компании. Сайт имеет русскую версию (TR|EN|RU) — они осознанно работают со СНГ.",
+   "ask_mode": "Двухходовка. (1) Зарегистрироваться на сайте — цены открываются только после sign-up, это их модель, а не отговорка. (2) Письмо на info@iggnita.com (можно по-русски) с копией менеджеру, одной таблицей на весь спрос: Denso GI3-3 — 869; Cummins 5373898 — 1490; 4380132 — 773; колпачок 4351035 — 773; шайба 4970773 — 869; Jenbacher 1236100 — 66; наконечник 657541 — 242; катушка 487181 — 28; к-кт DENSO 518 / 1214569; DEUTZ 12420480 — 221; кольцо 12211061 — 221. Просить цену «İstanbul Depo Teslim» + срок + отгрузку через их ташкентский офис. По позициям, помеченным Orijinal, требовать заводскую упаковку и фото маркировки: параллельно они торгуют OEM и Alternatif.",
+   "answer_odds": "high",
+   "priority": 1,
+   "verdict": "confirmed",
+   "why_priority": "Единственный адрес, где спецификация совпала дословно по большинству номеров спроса, при этом компания не связана комплаенсом ни одного OEM, имеет русскую версию сайта и собственную точку приёмки в Ташкенте. Один адресат закрывает несколько парков сразу — экономит и время сорсера, и цикл согласования.",
+   "bitrix_state": "never",
+   "bitrix_note": "В Bitrix не заведены — новый канал из разведки 01.09.2026.",
+   "parks": [
+    "cummins",
+    "jenbacher",
+    "mwm_deutz",
+    "cat",
+    "waukesha",
+    "other"
+   ],
+   "tier_key": "stock",
+   "hub": true
+  },
+  {
+   "name": "ЭнергоТехСервис (ETS) / ETS-Astana ТОО",
+   "country": "Казахстан / Россия",
+   "city": "Астана (пр. Туран, зд. 50), Алматы (пр. Аль-Фараби 7), Тюмень — 8 офисов в РФ и РК",
+   "site": "https://www.tmenergo.kz",
+   "email": "info@tmenergo.kz",
+   "phone": "+7-499-709-71-17; 8-800-222-88-65; +7 778 130 88 33",
+   "stream": "makers",
+   "tier_ru": "Авторизованный дистрибьютор",
+   "families": [
+    "INNIO Jenbacher Type 2/3/4/6/9",
+    "INNIO Waukesha VHP/VGF/275GL+"
+   ],
+   "part_numbers": [
+    "1236100",
+    "1214569",
+    "657541",
+    "487181"
+   ],
+   "what_they_have": "Единственный найденный официальный канал INNIO, физически присутствующий и в РК, и в РФ. ETS-Astana ТОО значится в официальном реестре провайдеров INNIO: регион CIS/Kazakhstan, виды деятельности «Sales, Services» — то есть продажа ЗИП, а не только сервис по контракту. Ключевое: в карточке самого INNIO для этого партнёра указаны российский сайт tmenergo.ru и московский номер +7-499-709-71-17, то есть связку РФ↔РК публикует сам вендор. На своём сайте называют себя официальным сервис-провайдером INNIO Jenbacher, в услугах прямо «Поставка запчастей».",
+   "evidence_url": "https://www.jenbacher.com/en/providers/ets-astana-llc/",
+   "route_to_ru": "Самый короткий легальный путь к оригиналу Jenbacher/Waukesha: закупка на казахстанское юрлицо ETS-Astana ТОО как официального провайдера INNIO → ввоз в РФ внутри ЕАЭС без таможенной границы. Российский контур группы уже работает с этой номенклатурой.",
+   "ask_mode": "Письмо по-русски на info@tmenergo.kz от казахстанского или российского юрлица, тема — «ЗИП системы зажигания INNIO Jenbacher Type 6, запрос цены и срока». В теле — голый список: 1236100 (66), 657541 (242), 487181 (28), к-кт DENSO 518 / 1214569. Сослаться на их статус провайдера INNIO по РК и прямо спросить, оформляется ли поставка на ETS-Astana ТОО с отгрузкой в РФ внутри ЕАЭС и требуется ли привязка к обслуживаемому парку. Продублировать звонком на +7-499 — там русскоязычный менеджер.",
+   "answer_odds": "high",
+   "priority": 1,
+   "verdict": "confirmed",
+   "why_priority": "Оригинал INNIO плюс русскоязычный контур и московский телефон, опубликованный самим вендором — ни языкового, ни часового барьера. Риск не в получении ответа, а в комплаенсе INNIO: ответ будет почти наверняка, вопрос — какой. Именно поэтому писать первым и параллельно с турецким каналом.",
+   "bitrix_state": "never",
+   "bitrix_note": "В Bitrix не заведены — новый канал из разведки 01.09.2026.",
+   "parks": [
+    "jenbacher",
+    "waukesha"
+   ],
+   "tier_key": "auth",
+   "hub": true
+  },
+  {
+   "name": "Aytuğlu Dizel",
+   "country": "Турция, Стамбул",
+   "stream": "hubs",
+   "tier_ru": "Складской поставщик Cummins QSK60",
+   "families": [
+    "Cummins gas"
+   ],
+   "part_numbers": [
+    "QSK60"
+   ],
+   "what_they_have": "Складской торговец оригинальными запчастями Cummins с 50-летней историей: Cummins genuine, Fleetguard, Holset, официальное дилерство FP Diesel и PAI Industries, есть RU-версия сайта и онлайн-оплата. ЧЕСТНАЯ ОГОВОРКА: опубликованный перечень моделей — исключительно дизель (4BT, 6BT, KT-19/38/50, NTA-855, QSK-19/60/78, QST-30), газовых модификаций нет; в номенклатуре нет ни свечей, ни системы зажигания; заявленные ранее «21 000 артикулов» на страницах не подтверждаются.",
+   "evidence_url": "https://www.aytuglu.com/cummins-qsk-60-motor/",
+   "route_to_ru": "Турция — рабочий маршрут",
+   "ask_mode": "по PN, по-турецки/по-английски",
+   "answer_odds": "medium",
+   "priority": 2,
+   "bitrix_state": "never",
+   "bitrix_note": "Не заведены.",
+   "phone": "+90 216 410 80 52",
+   "site": "aytuglu.com",
+   "city": "İstanbul, Dik Sokak No:13, 34841 Maltepe",
+   "email": "spareparts@aytuglu.com",
+   "verdict": "plausible",
+   "why_priority": "Запасной турецкий канал по Cummins genuine: инфраструктура и мотивация есть, но газовая линейка в публичной номенклатуре отсутствует полностью, поэтому вероятный ответ — «этого PN у нас нет». Одно письмо, не больше.",
+   "parks": [
+    "cummins"
+   ],
+   "tier_key": "trade",
+   "hub": true
+  },
+  {
+   "name": "BMF Enerji San. ve Tic. Ltd. Şti.",
+   "country": "Турция",
+   "city": "İstanbul, Oruçreis Mah. Tekstilkent Cad. Koza Plaza, B Blok, Kat 18, No 183, Esenler",
+   "site": "https://bmfenerji.com",
+   "email": "info@bmfenerji.com",
+   "phone": "+90 212 438 18 99",
+   "stream": "makers",
+   "tier_ru": "Трейдер / поставщик ЗИП",
+   "families": [
+    "INNIO Jenbacher",
+    "MWM/Deutz TCG"
+   ],
+   "part_numbers": [
+    "462203",
+    "1214569",
+    "1236100",
+    "12420480",
+    "12211061"
+   ],
+   "what_they_have": "Независимый турецкий снабженец по газовым двигателям Jenbacher и MWM, дословно: «gaz motoru yedek parçalarını; Orijinal, OEM ve Alternatif olarak tedarik ediyoruz» — три категории поставки заявлены явно. Обслуживают более 100 газовых двигателей у 30+ клиентов. В галерее — реальные позиции с артикулами: «Jenbacher Buji Spark Plugs 462203» и «MWM Denso Buji Spark Plugs», рядом клапаны MWM 12454246/12420827 и узлы Jenbacher. Каталога, цен и склада на сайте нет — это поставщик под заказ, а не сток.",
+   "evidence_url": "https://bmfenerji.com/faaliyet-alanlari/gaz-motoru-yedek-parca-tedariki/",
+   "route_to_ru": "Независимый трейдер без дистрибьюторского контракта с INNIO и MWM — комплаенс-ограничений на покупателя из СНГ нет, мотивация продать высокая. Турция санкции ЕС не применяет.",
+   "ask_mode": "Каталога нет, поэтому заходить голым списком номеров, лучше по-турецки или очень простым английским: таблица PN + количество и по каждой позиции цена в трёх вариантах их же терминологией — Orijinal / OEM / Alternatif. Позиции: Jenbacher 1236100 (66), 657541 (242), 487181 (28), 1214569; MWM/DEUTZ 12420480 (221) и кольцо 12211061 (221) — по MWM у них явно заявлены Denso Buji. Категория «Alternatif» в их формулировке — риск получить ноунейм, требовать бренд поимённо.",
+   "answer_odds": "medium",
+   "priority": 2,
+   "verdict": "confirmed",
+   "why_priority": "Живой турецкий канал без вендорского комплаенса, охватывающий сразу Jenbacher и MWM — то есть два парка одним письмом. Минус: компания небольшая, без каталога и без EN/RU, ответ может потребовать напоминаний.",
+   "bitrix_state": "never",
+   "bitrix_note": "В Bitrix не заведены — новый канал из разведки 01.09.2026.",
+   "parks": [
+    "jenbacher",
+    "mwm_deutz"
+   ],
+   "tier_key": "trade",
+   "hub": true
+  },
+  {
+   "name": "Changsha Torch Auto Parts Co., Ltd (torchscitech)",
+   "country": "Китай",
+   "city": "Чанша, Building A3-306, Lugu Enterprise Square, No.27 Wenxuan Road",
+   "site": "https://www.torchscitech.com",
+   "email": "sales@torchgroup.cn",
+   "phone": "+86-731-84830658; WhatsApp +86 193 1161 7404",
+   "stream": "makers",
+   "tier_ru": "Трейдер / поставщик ЗИП",
+   "families": [
+    "INNIO Jenbacher",
+    "Cummins gas (QSK60)",
+    "MWM/Deutz TCG 2020/2032",
+    "Perkins/FG Wilson"
+   ],
+   "part_numbers": [
+    "R10P3",
+    "R10P7",
+    "R10P7N",
+    "R9B12-77",
+    "R9B12-77R",
+    "S-R6A13",
+    "S-R6A13L",
+    "S-R6A21"
+   ],
+   "what_they_have": "Экспортный дом индустриальной линейки Torch с публикацией новинок под конкретные парки, дословно: «R10P7N — Direct Replacement for Cummins QSK60 Engines», «R9B12-77R Industrial Spark Plug — Engineered for JENBACHER Generators», «S-R6A13 — Prechamber... OEM-equivalent quality» для MWM TCG 2032, «S-R6A13L — Premium replacement for DEUTZ and MWM engines».",
+   "evidence_url": "https://www.torchscitech.com/tagdetail/1907366037583257600.html",
+   "route_to_ru": "Китай→РФ авто/ж-д через Забайкальск или Казахстан, оплата CNY, работа по WhatsApp. Ограничений нет.",
+   "ask_mode": "WhatsApp + письмо на sales@torchgroup.cn. Запрашивать по ИХ артикулам: R9B12-77/R9B12-77R под Jenbacher 436782-1214569 и 1236100; R10P7N под Cummins QSK60; S-R6A13L под DEUTZ 12420480. Просить прайс-лист целиком по industrial-линейке, MOQ, срок, ресурс в часах и FOB. Учесть, что это перепродажа Torch: параллельно давить на завод, чтобы срезать наценку.",
+   "answer_odds": "high",
+   "priority": 2,
+   "verdict": "confirmed",
+   "why_priority": "Быстрый и отзывчивый канал к линейке Torch с готовыми кроссами под три наших парка сразу. Но это посредник и одно юрлицо с Takumi — как независимая котировка не засчитывается.",
+   "bitrix_state": "never",
+   "bitrix_note": "В Bitrix не заведены — новый канал из разведки 01.09.2026.",
+   "parks": [
+    "cummins",
+    "jenbacher",
+    "mwm_deutz"
+   ],
+   "tier_key": "trade",
+   "hub": false
+  },
+  {
+   "name": "Clarke Energy India Private Limited (Rehlko group)",
+   "country": "Индия",
+   "city": "Пуна, Office No. 701-704, 7th Floor, Cybercity Tower-15, Magarpatta City, Hadapsar, Maharashtra 411013",
+   "site": "https://www.clarke-energy.com",
+   "email": "india@clarke-energy.com",
+   "phone": "+91 20 30241777",
+   "stream": "makers",
+   "tier_ru": "Авторизованный дистрибьютор",
+   "families": [
+    "INNIO Jenbacher Type 2/3/4/6/9"
+   ],
+   "part_numbers": [
+    "1236100",
+    "657541",
+    "487181",
+    "1214569",
+    "P611"
+   ],
+   "what_they_have": "Крупнейший авторизованный дистрибьютор оригинального ЗИП Jenbacher: дословно «Clarke Energy is the authorised distributor of genuine Jenbacher spare parts in 27 countries and maintains the largest stock globally outside of Jenbach, Austria». Индийское юрлицо числится в реестре провайдеров INNIO с видами деятельности «Sales, Services» и — в отличие от глобального сайта — с опубликованными живыми контактами.",
+   "evidence_url": "https://www.jenbacher.com/en/providers/clarke-energy-india-private-limited/",
+   "route_to_ru": "Вход только через индийское юрлицо, не через британский головной офис (из UK гарантированный отказ). Индия экспортные ограничения ЕС не применяет, логистика Мумбаи/Пуна → РФ работает; запрос вести от индийского или казахстанского покупателя.",
+   "ask_mode": "Письмо на india@clarke-energy.com по-английски со списком PN (1236100, 657541, 487181, 1214569) и количествами, от индийского или казахстанского покупателя. Российского конечника на первом контакте не называть. Учитывать, что крупный дистрибьютор неохотно берётся за разовую мелкую партию свечей вне сервисного контракта — сразу давать весь объём и годовую перспективу.",
+   "answer_odds": "medium",
+   "priority": 2,
+   "verdict": "confirmed",
+   "why_priority": "Единственный из крупных авторизованных каналов Jenbacher, расположенный в стране с рабочей логистикой в РФ и опубликованной живой почтой. Комплаенс Rehlko/INNIO серьёзный, поэтому канал через посредника — приоритет 2.",
+   "bitrix_state": "never",
+   "bitrix_note": "В Bitrix не заведены — новый канал из разведки 01.09.2026.",
+   "parks": [
+    "jenbacher"
+   ],
+   "tier_key": "auth",
+   "hub": false
+  },
+  {
+   "name": "GPS Engine Spares",
+   "country": "Индия, Дели",
+   "stream": "china_india",
+   "tier_ru": "Поставщик Cummins genuine/OEM/aftermarket, 25 лет",
+   "families": [
+    "Cummins gas"
+   ],
+   "part_numbers": [
+    "4924504",
+    "5373898"
+   ],
+   "what_they_have": "Витрина с оригинальными свечами под QSK60 и QSV91, экспресс-отгрузка.",
+   "evidence_url": "https://www.ebay.com/str/gpsenginespares",
+   "route_to_ru": "Индия — рабочий маршрут",
+   "ask_mode": "по PN",
+   "answer_odds": "medium",
+   "priority": 2,
+   "bitrix_state": "never",
+   "bitrix_note": "Не заведены. Индийский трек у нас работает (UKP Parts India — 3× Price at Work).",
+   "parks": [
+    "cummins"
+   ],
+   "tier_key": "trade",
+   "hub": false
+  },
+  {
+   "name": "HONGKONG XIEYUAN TECH CO., LIMITED",
+   "country": "Гонконг",
+   "stream": "makers",
+   "tier": "trader",
+   "tier_ru": "Поставщик промышленных компонентов (в т.ч. брендовых свечей)",
+   "families": [
+    "промышленное зажигание"
+   ],
+   "part_numbers": [],
+   "what_they_have": "8 запросов, есть история «Selected» по дорогой позиции (384 EUR/шт).",
+   "route_to_ru": "Гонконг",
+   "ask_mode": "по PN бренда",
+   "answer_odds": "medium",
+   "priority": 2,
+   "bitrix_state": "refused",
+   "bitrix_note": "Последний 13.08.2026 — «Отказ в КП»; ранее доходило до «Selected».",
+   "parks": [
+    "other"
+   ],
+   "tier_key": "trade",
+   "hub": false
+  },
+  {
+   "name": "Hatraco B.V. (бренд ERS)",
+   "country": "Нидерланды",
+   "city": "Angerlo, De Koppeling 3, 6986 CS",
+   "site": "https://www.hatraco.com",
+   "email": "sales@hatraco.com",
+   "phone": "+31 316 280191",
+   "stream": "makers",
+   "tier_ru": "Завод заводского аналога",
+   "families": [
+    "INNIO Jenbacher Type 3/4/6",
+    "Cummins QSK60G",
+    "MWM/Deutz",
+    "Caterpillar",
+    "Waukesha",
+    "Guascor"
+   ],
+   "part_numbers": [
+    "18.043-01 / FT00174 (= Jenbacher P611 | 1236099 | 1236100)",
+    "18.021-01 / FT00169 (= P603 | 436782 | 1205632 | 1205634 | 1214569 = Denso 518 = FM FV76WWCC/18GZ45 = Goetze G-6004 = ECI/PowerUp 1105010)",
+    "18.020-01 / FT00193",
+    "18.049-01 / FT00196 (= Cummins 4380132, 4390446, 5544762)",
+    "Denso GI3-1/GI3-3/GI3-5, GL3-1/GL3-3/GL3-5"
+   ],
+   "what_they_have": "Тот самый «заводской премиум-аналог уровня ERS», который заказчик готов принимать: 40+ лет на рынке зажигания промышленных ДВС. Кросс-референсы подтверждены дословно (флаер распакован и прочитан): одна позиция 18.049-01 закрывает сразу три наших номера Cummins — 4380132, 4390446, 5544762, «Made in Austria», отгрузка максимум 3 недели после получения заказа, заявленный ресурс +50%. По Jenbacher — 18.043-01 под 1236099/1236100 и 18.021-01 под группу 1214569/Denso 518. Одновременно авторизованный европейский дистрибьютор Denso Iridium Saver, дистрибьютор Stitt по Европе и центральноевропейский дистрибьютор Altronic — четыре бренда через одну компанию. Иридий/иридий, M18x1.5, вылет 20,6 мм.",
+   "evidence_url": "https://www.hatraco.com/en/products/spark-plugs-igniters/spark-plugs/hatraco-18049-01",
+   "route_to_ru": "Прямая продажа из ЕС в РФ закрыта. Реальный путь — их дилерская сеть в третьих странах либо отгрузка на турецкое/узбекское/казахстанское юрлицо (у их партнёра İggnita есть офис в Роттердаме, то есть канал NL→TR физически существует).",
+   "ask_mode": "Даже без сделки обращение окупается: это готовая карта замен. Письмо на sales@hatraco.com по-английски, ТОЛЬКО с получателем в Турции/Узбекистане/Казахстане. Просить: (1) подтвердить кросс 18.049-01 → 4380132/5544762 и есть ли аналог под QSV81G/QSV91G и под prechamber 4970773/4351035; (2) назвать дилера, работающего с покупателями из Турции/Средней Азии; (3) их таблицу соответствий по Denso/Stitt/Altronic. Дальше по рынку искать не по «1236100», а по ERS 18.043-01/FT00174, а по 1214569 — ещё и по Denso 518, FM FV76WWCC, 18GZ45, Goetze G-6004.",
+   "answer_odds": "medium",
+   "priority": 2,
+   "verdict": "confirmed",
+   "why_priority": "Технический ключ ко всему проекту: отвязывает поиск от брендов Jenbacher и Cummins и открывает турецких и китайских поставщиков. Как поставщик из ЕС недоступен напрямую, поэтому ожидаемый результат — контакт дилера и карта кроссов, а не оффер.",
+   "bitrix_state": "never",
+   "bitrix_note": "В Bitrix не заведены — новый канал из разведки 01.09.2026.",
+   "parks": [
+    "cummins",
+    "jenbacher",
+    "mwm_deutz",
+    "cat",
+    "waukesha",
+    "other"
+   ],
+   "tier_key": "makers",
+   "hub": false
+  },
+  {
+   "name": "Hatraco BV",
+   "country": "Нидерланды, Angerlo",
+   "stream": "makers",
+   "tier": "authorized_distributor",
+   "tier_ru": "Европейский дистрибьютор Altronic/Stitt/Champion, владелец номера 18.049-01",
+   "families": [
+    "Cummins gas",
+    "промышленное зажигание"
+   ],
+   "part_numbers": [
+    "18.049-01",
+    "FT00196"
+   ],
+   "what_they_have": "Первоисточник по нашей свече QSK60 и вообще по свечам стационарных газовых двигателей.",
+   "route_to_ru": "ЕС — почтой не отвечает, нужен звонок или посредник (R M Walsh)",
+   "ask_mode": "звонок +31 316 280191, свечную программу в веб-шоп не выкладывают принципиально",
+   "answer_odds": "low",
+   "priority": 2,
+   "bitrix_state": "sent",
+   "bitrix_note": "Два захода: 14.07.2026 — «Ответ не получен в срок»; 19.08.2026 (#41720) — «Request Sent», тишина на 01.09.",
+   "evidence_url": "https://www.hatraco.com/en/products/spark-plugs-igniters/spark-plugs",
+   "parks": [
+    "cummins"
+   ],
+   "tier_key": "trade",
+   "hub": false
+  },
+  {
+   "name": "Heavy Duty Kits (HDKits)",
+   "country": "США",
+   "city": "Hialeah Gardens, Florida, 13202 NW 107th Ave, Ste #12, FL 33018",
+   "site": "https://www.heavydutykits.com",
+   "email": "ac@heavydutykits.com",
+   "phone": "+1 (888) 642-6460",
+   "stream": "makers",
+   "tier_ru": "Складской сток оригинала",
+   "families": [
+    "Cummins QSK60",
+    "Cummins QSV81/QSV91",
+    "Cummins K38/GTA38"
+   ],
+   "part_numbers": [
+    "5373898",
+    "5373898-OEM"
+   ],
+   "what_they_have": "Genuine Cummins: карточка «PLUG,SPARK | 5373898 | Cummins Genuine Parts», статус «In Stock» указан прямо (в отличие от условных формулировок конкурентов). Цена не показана, нужен запрос. Заявлений о международной доставке на сайте нет ни в разрешающем, ни в запрещающем виде — экспортный вопрос открыт и решается только письмом.",
+   "evidence_url": "https://www.heavydutykits.com/product/plugspark-5373898-cummins-genuine-parts/",
+   "route_to_ru": "Только через третью страну: грузополучатель в ОАЭ/Турции/Казахстане и экспедитор в Майами (Флорида — экспортный хаб, схема для них привычна). Прямой контракт РФ↔США нереален; при всплытии российского конечника сделка встанет на комплаенсе Cummins.",
+   "ask_mode": "Письмо на ac@heavydutykits.com СРАЗУ с грузополучателем в третьей стране и реквизитами тамошнего юрлица — не начинать переписку с российской привязки. Спрашивать цену за 1490 шт 5373898, реальный остаток и готовность отгрузить на экспедитора в Майами. Быть готовыми к запросу end-user certificate.",
+   "answer_odds": "medium",
+   "priority": 2,
+   "verdict": "confirmed",
+   "why_priority": "Единственное подтверждённое наличие genuine 5373898 в мире. Ответ вероятен, доведение до отгрузки — нет, поэтому запускать как страховочный трек и только через юрлицо в третьей стране.",
+   "bitrix_state": "never",
+   "bitrix_note": "В Bitrix не заведены — новый канал из разведки 01.09.2026.",
+   "parks": [
+    "cummins"
+   ],
+   "tier_key": "stock",
+   "hub": false
+  },
+  {
+   "name": "IGGNITA Engine Solutions",
+   "country": "Турция",
+   "stream": "hubs",
+   "tier": "trader",
+   "tier_ru": "Сервис газовых двигателей, ЗИП оригинал/OEM/аналог",
+   "families": [
+    "Jenbacher",
+    "MWM",
+    "CAT",
+    "Guascor"
+   ],
+   "part_numbers": [],
+   "what_they_have": "Турецкий сервисник с B2B-платформой по ЗИП когенерации; заведены две карточки.",
+   "route_to_ru": "Турция — рабочий маршрут",
+   "ask_mode": "через сайт-форму и на турецком; почтой не отвечали",
+   "answer_odds": "medium",
+   "priority": 2,
+   "bitrix_state": "no_reply",
+   "bitrix_note": "#37612 от 03.07.2026 — «Ответ не получен в срок»; вторая карточка «Iggnita Gas Engine Solutions» без запросов.",
+   "evidence_url": "https://iggnita.com/en/hakkimizda/",
+   "parks": [
+    "jenbacher",
+    "mwm_deutz",
+    "cat",
+    "other"
+   ],
+   "tier_key": "makers",
+   "hub": true
+  },
+  {
+   "name": "Jinhua Sizhouda Automobile Accessories Co., Ltd. (sparkplugsfactory.com)",
+   "country": "Китай",
+   "city": "производство — Laizhou Development Zone, Yantai, Shandong; торговый офис — Цзиньхуа, Чжэцзян",
+   "site": "https://www.sparkplugsfactory.com",
+   "email": "tiffany@sparkplugsfactory.com",
+   "phone": "+86-579-83120669; WhatsApp +86-13566795602",
+   "stream": "makers",
+   "tier_ru": "Завод заводского аналога",
+   "families": [
+    "Cummins gas (QSV91G, GTA38/K38/QSK38, QSK60)",
+    "INNIO Jenbacher",
+    "Waukesha",
+    "Caterpillar G-серия",
+    "MWM/Deutz TCG 2020, CAT CG170",
+    "Guascor"
+   ],
+   "part_numbers": [
+    "5373898",
+    "4302738",
+    "4924504",
+    "2866879",
+    "4090121",
+    "4098162",
+    "3607738",
+    "4380132"
+   ],
+   "what_they_have": "Завод свечей с отдельными карточками сразу под три ключевых номера спроса: «Cummins Spark Plug 5373898 4302738 for Gas Generator GTA38 K38 QSK38», «Prechamber Ignition Spark Plug 4380132 for Cummins» (референсы RB77CC, 60999Z) и карточка под 4955850; в общем списке — Jenbacher 436782 и 1214569, Waukesha 69919D/60999Z, CAT-серия и Denso GI3-1A/GI3-3A/GI3-5A. Позиционирование честное и дословное: «The best alternative to the original», ресурс «5000 hours or more». Оговорка: на карточке 4380132 модель двигателя не указана — привязку к QSK60 подтверждать запросом; юрлицо зарегистрировано в Цзиньхуа, а производственный адрес в Яньтае (расхождение ~1200 км) — уточнять, чей завод.",
+   "evidence_url": "https://www.sparkplugsfactory.com/product/products-7-56.html",
+   "route_to_ru": "Китай→РФ напрямую, отгрузка из Циндао/Нинбо морем или ж-д, оплата в юанях. Именной менеджер с WhatsApp.",
+   "ask_mode": "Email Tiffany + WhatsApp. Заходить как крупный годовой покупатель, а не как разовый: годовая потребность ~7 500 шт, ключевые строки 5373898 (1490), 4380132 (773), 1214569/DENSO 518, GI3-3 (869). Просить EXW/FOB Qingdao, MOQ, цену на 1000+ шт отдельной строкой, письменное подтверждение ресурса 5000 ч, нейтральную или собственную упаковку и образцы 3–5 шт на приёмку. Отдельно уточнить, под какой двигатель их 4380132 и есть ли форкамерные под MWM 12420480.",
+   "answer_odds": "high",
+   "priority": 2,
+   "verdict": "confirmed",
+   "why_priority": "Ближайший к заводу контакт по массовым позициям: единственный, у кого на сайте отдельные карточки сразу под 5373898, 4380132 и 4955850. Не оригинал, поэтому только второй трек — и считать надо стоимость моточаса, а не штуки: при OEM 8–12 тыс. ч против заявленных 5000 ч экономия может съесться удвоенной частотой замены.",
+   "bitrix_state": "never",
+   "bitrix_note": "В Bitrix не заведены — новый канал из разведки 01.09.2026.",
+   "parks": [
+    "cummins",
+    "jenbacher",
+    "mwm_deutz",
+    "cat",
+    "waukesha",
+    "other"
+   ],
+   "tier_key": "makers",
+   "hub": false
+  },
+  {
+   "name": "Jining Huida Construction Machinery Co., Ltd.",
+   "country": "Китай",
+   "stream": "china_india",
+   "tier": "trader",
+   "tier_ru": "Поставщик ЗИП спецтехники и двигателей",
+   "families": [
+    "Cummins",
+    "дизель"
+   ],
+   "part_numbers": [],
+   "what_they_have": "10 запросов: 5 «Selected», 4 «Price at Work».",
+   "route_to_ru": "КНР",
+   "ask_mode": "по PN",
+   "answer_odds": "high",
+   "priority": 2,
+   "bitrix_state": "won",
+   "bitrix_note": "10 запросов, 5 «Selected» — стабильно отвечает.",
+   "parks": [
+    "cummins"
+   ],
+   "tier_key": "trade",
+   "hub": false
+  },
+  {
+   "name": "Jones Engineering Co., Ltd",
+   "country": "—",
+   "stream": "hubs",
+   "tier": "trader",
+   "tier_ru": "Адресат последней рассылки по свечам",
+   "families": [
+    "Cummins gas"
+   ],
+   "part_numbers": [
+    "18.049-01"
+   ],
+   "what_they_have": "Запрос «Свечи Hatraco» ушёл 28.08.2026, ответа пока нет.",
+   "route_to_ru": "уточнить",
+   "ask_mode": "дожать по телефону",
+   "answer_odds": "medium",
+   "priority": 2,
+   "bitrix_state": "sent",
+   "bitrix_note": "#42702 от 28.08.2026, «Request Sent».",
+   "parks": [
+    "cummins"
+   ],
+   "tier_key": "trade",
+   "hub": false
+  },
+  {
+   "name": "KING KONG DRILLS LIMITED",
+   "country": "Китай / Гонконг",
+   "stream": "china_india",
+   "tier": "trader",
+   "tier_ru": "Экспортёр ЗИП",
+   "families": [
+    "Cummins",
+    "буровое"
+   ],
+   "part_numbers": [],
+   "what_they_have": "9 запросов, 4 «Selected».",
+   "route_to_ru": "КНР",
+   "ask_mode": "по PN",
+   "answer_odds": "high",
+   "priority": 2,
+   "bitrix_state": "won",
+   "bitrix_note": "9 запросов, 4 «Selected», посл. 29.07.2026.",
+   "parks": [
+    "cummins"
+   ],
+   "tier_key": "trade",
+   "hub": false
+  },
+  {
+   "name": "Makano",
+   "country": "Китай",
+   "stream": "china_india",
+   "tier_ru": "Производитель свечей для газовых генераторов",
+   "families": [
+    "Cummins gas",
+    "KTA38GC"
+   ],
+   "part_numbers": [
+    "2866879",
+    "4098162"
+   ],
+   "what_they_have": "Каталог свечей прямо по номерам Cummins для QSK60/QSV91/KTA38GC.",
+   "evidence_url": "https://www.makano.com.cn/product/products-6-78.html",
+   "route_to_ru": "КНР",
+   "ask_mode": "по PN, англ.",
+   "answer_odds": "medium",
+   "priority": 2,
+   "bitrix_state": "never",
+   "bitrix_note": "Не заведены.",
+   "email": "info@makano.com.cn",
+   "phone": "+86 155 8699 9980",
+   "site": "makano.com.cn",
+   "parks": [
+    "cummins"
+   ],
+   "tier_key": "makers",
+   "hub": false
+  },
+  {
+   "name": "Makano Corporation Limited",
+   "country": "Китай / Гонконг",
+   "city": "Шиянь (пров. Хубэй); рег. адрес — Mongkok, Kowloon, Hong Kong",
+   "site": "https://www.makano.com.cn",
+   "email": "info@makano.com.cn",
+   "phone": "+86 15586999980 (моб./WhatsApp, Eason Geng); офис +86 719 8318788",
+   "stream": "makers",
+   "tier_ru": "Трейдер / поставщик ЗИП",
+   "families": [
+    "Cummins gas (KTA38GC, QSK60G, QSV91G)",
+    "MWM/Deutz TBG 616 / TCG",
+    "Waukesha",
+    "Caterpillar G-серия",
+    "Guascor HGM/SFGM"
+   ],
+   "part_numbers": [
+    "12420480 (1242-0480)",
+    "5373898",
+    "2866879",
+    "4924504",
+    "3964408",
+    "69919D",
+    "7664375",
+    "194-8256"
+   ],
+   "what_they_have": "Трейдер ЗИП в Шияне — на базе китайского Cummins. Подтверждённое прямое попадание в спрос: карточка «Generator Spark Plug 1242-0480 for MWM», применимость «MWM: TBG 616 series», статус «Stock: Yes» — это ровно DEUTZ/MWM 12420480 (221 шт). Отдельные страницы под Cummins 5373898 (K38/QSV81/QSV91) и 2866879 (KTA38GC/QSK60/QSV91). Гонконгское юрлицо номинальное (адрес массовой регистрации), реальные операции в Шияне — для доступа к стоку это плюс, для договора и платежа требует внимания.",
+   "evidence_url": "https://www.makano.com.cn/product/MWN-Generator-Spark-Plug-1242-0480.html",
+   "route_to_ru": "Прямая отгрузка Китай→РФ, гонконгская юрисдикция удобна для платежей, есть русская версия сайта.",
+   "ask_mode": "Письмо на имя Eason Geng со всей корзиной сразу: Cummins 5373898 (1490), 4380132 (773), колпачок 4351035 (773), шайба 4970773 (869) + DEUTZ 12420480 (221) и кольцо 12211061 (221). Шиянь — база Cummins, поэтому именно у них требовать различать genuine Cummins и aftermarket и просить фото упаковки/маркировки по каждой позиции. «Stock: Yes» просить подтвердить реальным количеством на складе.",
+   "answer_odds": "high",
+   "priority": 2,
+   "verdict": "confirmed",
+   "why_priority": "Единственный источник с подтверждённой карточкой 12420480 и отметкой о наличии, плюс третья независимая котировка по Cummins для перекрёстной проверки Techie и Sizhouda. Происхождение товара непрозрачно — только с образцом и фото маркировки.",
+   "bitrix_state": "never",
+   "bitrix_note": "В Bitrix не заведены — новый канал из разведки 01.09.2026.",
+   "parks": [
+    "cummins",
+    "mwm_deutz",
+    "cat",
+    "waukesha",
+    "other"
+   ],
+   "tier_key": "trade",
+   "hub": false
+  },
+  {
+   "name": "Orient Energy Systems FZCO",
+   "country": "ОАЭ",
+   "city": "Дубай, 1W 215 – West Wing 1, PO Box 54652, Dubai Airport Free Zone",
+   "site": "https://orient-power.com/",
+   "email": "orientdubai@orient-power.com",
+   "phone": "+971 4 255 51 20; +971 4 295 69 22",
+   "stream": "makers",
+   "tier_ru": "Авторизованный дистрибьютор",
+   "families": [
+    "INNIO Jenbacher Type 2/3/4/6/9",
+    "Waukesha VHP/VGF"
+   ],
+   "part_numbers": [
+    "1236100",
+    "657541",
+    "487181",
+    "69919D",
+    "60999Z"
+   ],
+   "what_they_have": "Редкий случай, когда один контрагент авторизован INNIO по обеим маркам: в реестре jenbacher.com — «Sales, Services», в реестре waukeshaengine.com — «Engine Sales, Parts, Service», то есть по Waukesha функция Parts заявлена явно. Прописан в Dubai Airport Free Zone. ВАЖНО: наличие складской позиции по свечам ни на одной открытой странице не подтверждено — это вывод из статуса; эмиратский сайт филиала не работает, головной сайт группы (Карачи) о ЗИП не упоминает.",
+   "evidence_url": "https://www.waukeshaengine.com/providers/orient-energy-systems-fzco/",
+   "route_to_ru": "DAFZA — классическая схема реэкспорта: отгрузка на условиях EXW/FCA свободной зоны в адрес торговой компании в ОАЭ/Казахстане/Узбекистане, далее в РФ. Как авторизованный провайдер INNIO обязан проверять конечного пользователя.",
+   "ask_mode": "Начинать телефоном/WhatsApp на дубайский +971 4 255 51 20 и просить менеджера по parts — письмо в общий ящик группы уйдёт в Пакистан. Тема письма: «RFQ — Jenbacher & Waukesha ignition spare parts, DAFZA delivery», список 1236100, 657541, 487181, 69919D/60999Z, котировка на юрлицо в ОАЭ. Конечного получателя в РФ не называть.",
+   "answer_odds": "medium",
+   "priority": 2,
+   "verdict": "confirmed",
+   "why_priority": "Единственный подтверждённый двойной канал INNIO в фризоне, откуда реэкспорт в Среднюю Азию — рутина. Но склад по свечам не доказан, а рабочий вход только телефонный, поэтому не приоритет 1.",
+   "bitrix_state": "never",
+   "bitrix_note": "В Bitrix не заведены — новый канал из разведки 01.09.2026.",
+   "parks": [
+    "jenbacher",
+    "waukesha"
+   ],
+   "tier_key": "auth",
+   "hub": true
+  },
+  {
+   "name": "PowerUP GmbH",
+   "country": "Австрия",
+   "city": "Stans (Тироль), Sportplatzweg 2, 6135",
+   "site": "https://www.powerup.at",
+   "email": "office@powerup.at",
+   "phone": "+43 5242 64 666",
+   "stream": "makers",
+   "tier_ru": "Завод заводского аналога",
+   "families": [
+    "INNIO Jenbacher Type 2/3/4/6/9",
+    "MWM TCG 2016/2020/3016",
+    "MAN",
+    "Caterpillar",
+    "MTU"
+   ],
+   "part_numbers": [
+    "PUP 1112900 (кросс 657541)",
+    "578732",
+    "PUP 1113339 (свеча под MWM 2016/3016/2020)",
+    "PUP 1112877 (наконечник, реф. 12300136)",
+    "1109001",
+    "1114316",
+    "1236100"
+   ],
+   "what_they_have": "Независимый мультибрендовый поставщик с 662 позициями по Jenbacher, отдельной категорией «Spark plugs and ignition systems» и — редкость для этого рынка — ПУБЛИЧНЫМИ ценами и остатками. Проверено: наконечник по кроссу 657541 — это PowerUP No. 1112900, 256,56 € без НДС / 307,87 € с НДС; свеча PUP 1113339 под MWM — 1 540,00 € без налога, 102 шт. в наличии; наконечник 1112877 (реф. 12300136) — 93,50 €, 110 шт. Честно дисквалифицируют себя: «PowerUP is an independent, multi-brand supplier – not an authorized INNIO Jenbacher dealer». В связанных товарах фигурирует ref. 578732 — независимое подтверждение кросса 657541 → 578732.",
+   "evidence_url": "https://www.powerup.at/shop/category/spark-plugs-ignition-systems/",
+   "route_to_ru": "ЕС, прямая отгрузка в РФ закрыта. Реально — запрос строго от турецкого/узбекского/казахстанского юрлица с доставкой в эту же страну.",
+   "ask_mode": "Главная ценность — бенчмарк: перед разговором с турками и китайцами открыть карточки и зафиксировать потолок (наконечник по кроссу 657541 ≈ 256 € без НДС). Если китаец просит существенно больше — он перепродаёт, если в разы меньше — подделка. Для закупки: office@powerup.at на немецком или английском от нероссийского юрлица; обязательно уточнить фасовку 1113339 (штука или комплект 4 шт. — от этого бюджет меняется вчетверо) и применимость вместо оригинального 12420480.",
+   "answer_odds": "medium",
+   "priority": 2,
+   "verdict": "confirmed",
+   "why_priority": "Единственный источник публичных европейских цен и остатков по нужным кроссам — без него невозможно оценить, дорого или дёшево предлагают турки и китайцы. Плюс это готовый премиум-аналог под MWM с подтверждённым остатком 102 шт.",
+   "bitrix_state": "never",
+   "bitrix_note": "В Bitrix не заведены — новый канал из разведки 01.09.2026.",
+   "parks": [
+    "jenbacher",
+    "mwm_deutz",
+    "cat",
+    "other"
+   ],
+   "tier_key": "makers",
+   "hub": false
+  },
+  {
+   "name": "Qingdao Formine International Trading Co., Ltd.",
+   "country": "Китай, Циндао",
+   "stream": "china_india",
+   "tier": "trader",
+   "tier_ru": "Экспортёр ЗИП",
+   "families": [
+    "Cummins",
+    "дизель"
+   ],
+   "part_numbers": [],
+   "what_they_have": "9 запросов, 3 «Selected».",
+   "route_to_ru": "КНР",
+   "ask_mode": "по PN",
+   "answer_odds": "high",
+   "priority": 2,
+   "bitrix_state": "won",
+   "bitrix_note": "9 запросов, 3 «Selected», посл. 28.07.2026.",
+   "parks": [
+    "cummins"
+   ],
+   "tier_key": "trade",
+   "hub": false
+  },
+  {
+   "name": "RS Motor (RS Motor Power Solutions, S.L.)",
+   "country": "Испания",
+   "city": "Porriño (Pontevedra), Pol. Ind. PPI-5, parcelas 28-29, 36418",
+   "site": "https://rsmotorps.com",
+   "email": "rsmotor@rsmotor.es",
+   "phone": "+34 986 461 801",
+   "stream": "makers",
+   "tier_ru": "Складской сток оригинала",
+   "families": [
+    "INNIO Jenbacher Type 2/3/4/6",
+    "MWM/Deutz TCG",
+    "Guascor FG/FGLD/SFGLD/SFGM/HGM",
+    "Caterpillar CG132/CG170"
+   ],
+   "part_numbers": [
+    "1214569 = Denso P518",
+    "Denso GI3-1/GI3-3/GI3-5",
+    "Denso GL-1/GL-3/GL-5",
+    "MOTORTECH MPC",
+    "BERU (Federal Mogul) industrial",
+    "Champion industrial"
+   ],
+   "what_they_have": "Независимый склад по Guascor/Siemens, MWM, Deutz, CAT и Jenbacher, официальный дистрибьютор MOTORTECH по Испании и Португалии, торгует тремя заводскими брендами свечей — Denso, Beru (прямо от Federal Mogul) и Champion. Главная ценность — техническая расшифровка, подтверждённая дословно: «In Jenbacher type 6 gas engines, the spark plugs released with the Jenbacher part number 1214569 are spark plugs Denso P518» — это независимо совпало с флаером Hatraco, связку можно считать доказанной. Держит Denso GI3-3 — ровно нашу позицию на 869 шт по парку Guascor. На странице свечей прямо перечислены страны поставки, включая Turkey, Russia, Belarus (вероятно легаси-страница, юридически из ЕС в РФ закрыто).",
+   "evidence_url": "https://rsmotorps.com/en/denso-spark-plugs-for-industrial-gas-engines/",
+   "route_to_ru": "ЕС, прямая продажа в РФ закрыта экспортным комплаенсом и сорвётся на банковском платеже раньше, чем на комплаенсе. Реалистично — запрос от посредника в Турции/ОАЭ/Казахстане.",
+   "ask_mode": "Использовать прежде всего как техническую опору: раз 1214569 = Denso P518, комплект «DENSO 518 арт. 404492-1214569» можно искать напрямую по номенклатуре Denso у турок и китайцев, минуя бренд Jenbacher и его наценку; GI3-3 по Guascor ищется как позиция Denso, а не как ЗИП Guascor. Если писать — на rsmotor@rsmotor.es от юрлица вне РФ, спрашивать шире Guascor: сразу Jenbacher (1236100, 657541, 487181) и MWM (12420480, 12211061), требуя раздельно «original» и «OEM» с указанием производителя по каждой позиции.",
+   "answer_odds": "medium",
+   "priority": 2,
+   "verdict": "confirmed",
+   "why_priority": "Даёт кросс, который снимает брендовую наценку сразу по двум позициям спроса, и держит GI3-3. Как канал закупки ограничен ЕС-юрисдикцией, поэтому — второй эшелон, но письмо обязательно.",
+   "bitrix_state": "never",
+   "bitrix_note": "В Bitrix не заведены — новый канал из разведки 01.09.2026.",
+   "parks": [
+    "jenbacher",
+    "mwm_deutz",
+    "cat",
+    "other"
+   ],
+   "tier_key": "stock",
+   "hub": false
+  },
+  {
+   "name": "SGS Power",
+   "country": "Турция, Тузла",
+   "stream": "hubs",
+   "tier_ru": "Поставщик оригинальных ЗИП Cummins",
+   "families": [
+    "Cummins gas",
+    "Cummins дизель"
+   ],
+   "part_numbers": [],
+   "what_they_have": "Позиционируется как канал оригинальных запчастей Cummins с широкой складской сетью.",
+   "evidence_url": "https://www.sgspower.com.tr/cummins-genuine-spare-parts-supply-services/",
+   "route_to_ru": "Турция",
+   "ask_mode": "по PN",
+   "answer_odds": "medium",
+   "priority": 2,
+   "bitrix_state": "never",
+   "bitrix_note": "Не заведены.",
+   "site": "sgspower.com.tr",
+   "parks": [
+    "cummins"
+   ],
+   "tier_key": "trade",
+   "hub": true
+  },
+  {
+   "name": "TAKUMI JAPAN AUTO PARTS CO., LTD (generatorsparkplug.com)",
+   "country": "Китай (юр. адрес Гонконг)",
+   "city": "Чанша, пров. Хунань",
+   "site": "https://www.generatorsparkplug.com",
+   "email": "hy@takumijap.com",
+   "phone": "+86-731-84830658; WhatsApp/WeChat +8615367823075",
+   "stream": "makers",
+   "tier_ru": "Трейдер / поставщик ЗИП",
+   "families": [
+    "INNIO Jenbacher 616/620/624",
+    "MWM/Deutz TCG 2020",
+    "Cummins gas",
+    "Caterpillar"
+   ],
+   "part_numbers": [
+    "436782",
+    "1214569",
+    "R9B12-77",
+    "12453572",
+    "12452828",
+    "P3V3I"
+   ],
+   "what_they_have": "Витрина с ЕДИНСТВЕННЫМ публичным ценовым якорем по Jenbacher: «Gas Engine Spark Plug 436782 1214569 For Jenbacher 616 620 624 Engines», модель R9B12-77, MOQ 10 шт., USD 100/шт., срок 25 дней; техданные — M18x1.5, вылет 19 мм, калильное число 77, Double Iridium L-Gap. Отдельно держат форкамерные MWM 12453572/12452828. ВАЖНО: «японское» имя и гонконгский адрес — фасад (адрес массовой регистрации), а телефон совпадает с Changsha Torch Auto Parts: это одна чаншайская контора, перепродающая индустриальную линейку Torch.",
+   "evidence_url": "https://www.generatorsparkplug.com/sale-45794538-gas-engine-spark-plug-436782-1214569-for-jenbacher-616-620-624-engines.html",
+   "route_to_ru": "Китай→РФ напрямую, оплата CNY, есть русская версия витрины.",
+   "ask_mode": "Самый быстрый способ получить рыночную цену: WhatsApp +8615367823075 со ссылкой на конкретный лот и вопросом «цена на 66 шт и на 800+ шт, FOB, ресурс в часах». Взять образец (MOQ 10 = ~1000 USD) для проверки геометрии P3/1214569 до серии. Не вести с ними и с torchscitech две «независимые» переписки — это один продавец; давить объёмом в одной.",
+   "answer_odds": "high",
+   "priority": 2,
+   "verdict": "confirmed",
+   "why_priority": "Даёт то, чего нет больше нигде — публичную цену и MOQ по позиции Jenbacher, то есть точку отсчёта для всех остальных переговоров. Если на 800+ шт цена не падает с витринных 100 USD, значит перепродают с большой маржой.",
+   "bitrix_state": "never",
+   "bitrix_note": "В Bitrix не заведены — новый канал из разведки 01.09.2026.",
+   "parks": [
+    "cummins",
+    "jenbacher",
+    "mwm_deutz",
+    "cat"
+   ],
+   "tier_key": "trade",
+   "hub": false
+  },
+  {
+   "name": "Techie Inc. (Techie Power Parts)",
+   "country": "Китай",
+   "city": "Шэньчжэнь",
+   "site": "https://www.techiepowerparts.com",
+   "email": "info@techiepowerparts.com",
+   "phone": "+86-13017293329 (он же WhatsApp)",
+   "stream": "makers",
+   "tier_ru": "Завод заводского аналога",
+   "families": [
+    "Cummins QSV81G/QSV91G",
+    "Cummins QSK19/38/45/50/60G",
+    "Cummins HSK78G",
+    "INNIO Jenbacher Type 2/3/4/6/9",
+    "MWM/Deutz TCG 2016/2020/2032/3016",
+    "Caterpillar gas"
+   ],
+   "part_numbers": [
+    "5373898",
+    "4098162",
+    "4010981",
+    "2866879",
+    "5504704",
+    "4302738",
+    "3016663",
+    "5634407"
+   ],
+   "what_they_have": "Производитель систем зажигания для стационарных газовых двигателей: свечи (в т.ч. форкамерные), катушки, ВВ-провода, наконечники. На странице дословно: «Techie offers J-Gap / 4 Ground spark plugs compatible with Cummins - QSV / QSK / HSK gas engines», и все шесть проверенных номеров реально присутствуют, включая 5373898. Есть инженерные кросс-таблицы по Jenbacher (TISS9611 = P611 1236099, Denso 518-436782, Beru FV76WWCC), каких у обычного трейдера не бывает. Покрывают весь парк заказчика, а не одну марку. Оговорка: адрес указан просто «Shenzhen», регистрационных данных и сертификатов на сайте нет — статус производителя это самозаявление.",
+   "evidence_url": "https://www.techiepowerparts.com/application/cummins-gas-engine/",
+   "route_to_ru": "Прямая отгрузка Китай→РФ без ограничений, оплата в юанях, объёмы 1000+ шт штатные, авто/ж-д через Забайкальск–Маньчжурию или транзитом Казахстан.",
+   "ask_mode": "Email + дубль в WhatsApp на тот же номер. Давать сразу весь спрос по всем маркам, а не только Cummins, и заходить по ИХ артикулам, а не только по OEM: «TISS9826/9838 for Cummins 5373898 — 1490 pcs, 4380132 — 773 pcs; TISS9611 for Jenbacher 1236099/1236100 — 66 pcs», плюс 4351035, 4970773, GI3-3, 657541, 487181, 12420480, 12211061. Просить прайс с разбивкой по объёму, MOQ, срок, ресурс в моточасах письменно и обязательно образцы с протоколом испытаний до партии. Проверять, что производитель, а не перекуп: адрес завода и видеозвонок с цеха.",
+   "answer_odds": "high",
+   "priority": 2,
+   "verdict": "confirmed",
+   "why_priority": "Максимальное покрытие спроса одним адресатом и открытый маршрут в РФ, но это аналог, а не оригинал, и статус завода не верифицирован. Идеален как второй трек к оригиналу и как рычаг давления на цену турецких предложений.",
+   "bitrix_state": "never",
+   "bitrix_note": "В Bitrix не заведены — новый канал из разведки 01.09.2026.",
+   "parks": [
+    "cummins",
+    "jenbacher",
+    "mwm_deutz",
+    "cat"
+   ],
+   "tier_key": "makers",
+   "hub": false
+  },
+  {
+   "name": "Topkapı Endüstri Malları Ticaret A.Ş.",
+   "country": "Турция",
+   "city": "İstanbul, Topkapı Mah. Turgut Özal Millet Cad. No: 180-182, Fatih 34093",
+   "site": "https://www.topkapigroup.com.tr",
+   "email": "info@topkapigroup.com.tr",
+   "phone": "+90 212 534 04 10; +90 212 524 58 46",
+   "stream": "makers",
+   "tier_ru": "Авторизованный дистрибьютор",
+   "families": [
+    "INNIO Jenbacher Type 2/3/4/6/9"
+   ],
+   "part_numbers": [
+    "1236100",
+    "1214569",
+    "657541",
+    "487181"
+   ],
+   "what_they_have": "Официальный провайдер INNIO Jenbacher по Турции — в реестре jenbacher.com виды деятельности «Sales, Services», адрес и контакты совпадают с сайтом. На собственном сайте направление «Jenbacher Yedek Parça ve Servis» и дословно: сервисная команда обеспечивает ЗИП, ТО и ремонт как в гарантийный, так и в постгарантийный период. Артикулов, цен и склада на сайте нет — доступ к оригинальному ЗИП следует из статуса провайдера.",
+   "evidence_url": "https://www.jenbacher.com/en/providers/topkapi-endustri-mallari-ticaret-a-s/",
+   "route_to_ru": "Турция — рабочий транзит. Как официальный дистрибьютор INNIO осторожен с прямой отгрузкой в РФ; реалистично — поставка турецкому или казахстанскому посреднику, далее в РФ.",
+   "ask_mode": "В лоб про отгрузку в РФ не писать — это гарантированный отказ по комплаенсу. Запрос от турецкого или казахстанского юрлица на английском или турецком, тема — ЗИП системы зажигания Jenbacher Type 6, список PN и количества (1236100 — 66, 657541 — 242, 487181 — 28, 1214569), без указания конечного получателя.",
+   "answer_odds": "medium",
+   "priority": 2,
+   "verdict": "confirmed",
+   "why_priority": "Чистый заводской источник оригинала Jenbacher в удобной юрисдикции, но работает только через посредника — типичный случай приоритета 2. Держать как страховку к ETS-Astana, если казахстанский канал упрётся в привязку к обслуживаемому парку.",
+   "bitrix_state": "never",
+   "bitrix_note": "В Bitrix не заведены — новый канал из разведки 01.09.2026.",
+   "parks": [
+    "jenbacher"
+   ],
+   "tier_key": "auth",
+   "hub": true
+  },
+  {
+   "name": "VALTRONICS DWC LLC",
+   "country": "ОАЭ, Дубай",
+   "stream": "makers",
+   "tier": "authorized_distributor",
+   "tier_ru": "Дистрибьютор Altronic (системы зажигания) в регионе",
+   "families": [
+    "промышленное зажигание"
+   ],
+   "part_numbers": [
+    "Altronic FLASHGUARD"
+   ],
+   "what_they_have": "Ближневосточный канал к Altronic — свечи и катушки для стационарных газовых двигателей.",
+   "route_to_ru": "ОАЭ — рабочий маршрут",
+   "ask_mode": "по PN Altronic, звонком",
+   "answer_odds": "low",
+   "priority": 2,
+   "bitrix_state": "no_reply",
+   "bitrix_note": "3 запроса (последний 17.03.2026) — все «Ответ не получен в срок». По свечам не спрашивали ни разу.",
+   "parks": [
+    "other"
+   ],
+   "tier_key": "trade",
+   "hub": true
+  },
+  {
+   "name": "Weichai Torch Technology Co., Ltd. (TORCH)",
+   "country": "Китай",
+   "city": "Чжучжоу, пров. Хунань, No.68 Hongqi Road",
+   "site": "https://www.cntorch.com",
+   "email": "export@cntorch.com; info@torchautoparts.cn",
+   "phone": "+86 731 28450034; +86-731-85155584",
+   "stream": "makers",
+   "tier_ru": "Завод заводского аналога",
+   "families": [
+    "Cummins gas",
+    "INNIO Jenbacher",
+    "Caterpillar G/CG170",
+    "Waukesha",
+    "Guascor",
+    "MWM/Deutz TCG 2020"
+   ],
+   "part_numbers": [
+    "кросс Champion RB77WPCC / KB77WPCC / FB77WPCC",
+    "кросс MWM 12343055",
+    "R10P3",
+    "R10P7",
+    "R9B12-77",
+    "S-R6A12/13/15/16/19"
+   ],
+   "what_they_have": "Крупнейший и старейший (с 1961 г.) китайский завод свечей, с 2005 г. в составе Weichai. Подтверждены две страницы индустриальной витрины: «IRIDIUM INDUSTRIAL SPARK PLUGS» с применимостью Caterpillar, Cummins, Guascor, Jenbacher, Perkins, Superior, Wärtsilä, Waukesha и кроссом Champion RB/KB/FB77WPCC (это ровно класс, закрывающий Cummins 5373898/4098162), и «PRECHAMBER SPARK PLUGS» M18×18,7 с четырьмя боковыми электродами и платиной под MWM TCG2020 V12/V16/V20 и CAT CG170, кросс MWM 1234-3055. Оговорка: индустриальная витрина живёт на отдельном домене; на корпоративном cntorch.com этого раздела нет.",
+   "evidence_url": "http://www.torchsparkplug.com.co/en-US/IndustrialEngines/1235.html",
+   "route_to_ru": "Weichai массово присутствует в РФ, продукция Torch идёт в Россию потоком. Санкционных ограничений нет, оплата CNY. Реалистичный путь — экспортное подразделение либо их же экспортный дом в Чанше.",
+   "ask_mode": "Двойной заход: (1) export@cntorch.com — как промышленный конечник с годовой потребностью 7 500+ шт, просить выход на industrial/gas-engine department и прайс по индустриальной линейке; (2) info@torchautoparts.cn — витрина, где реально лежат индустриальные позиции. Опираться на их же формулировки: «IRIDIUM INDUSTRIAL, cross Champion RB/KB/FB77WPCC» под Cummins 5373898/4098162 и «PRECHAMBER, cross MWM 1234-3055» под DEUTZ 12420480. Отдельно спросить позицию под 12420480 и кольцо 12211061.",
+   "answer_odds": "medium",
+   "priority": 2,
+   "verdict": "confirmed",
+   "why_priority": "Смысл обращения — срезать наценку трейдеров, которые все продают именно этот завод. Минус: крупный OEM работает через дилеров и типично футболит прямые запросы, ответ может прийти переадресацией и через неделю.",
+   "bitrix_state": "never",
+   "bitrix_note": "В Bitrix не заведены — новый канал из разведки 01.09.2026.",
+   "parks": [
+    "cummins",
+    "jenbacher",
+    "mwm_deutz",
+    "cat",
+    "waukesha",
+    "other"
+   ],
+   "tier_key": "makers",
+   "hub": false
+  },
+  {
+   "name": "Wings Power Solutions",
+   "country": "—",
+   "stream": "hubs",
+   "tier": "trader",
+   "tier_ru": "Адресат последней рассылки по свечам",
+   "families": [
+    "Cummins gas"
+   ],
+   "part_numbers": [
+    "18.049-01"
+   ],
+   "what_they_have": "Запрос «Свечи Hatraco #42676» ушёл 28.08.2026.",
+   "route_to_ru": "уточнить",
+   "ask_mode": "дожать по телефону",
+   "answer_odds": "medium",
+   "priority": 2,
+   "bitrix_state": "sent",
+   "bitrix_note": "#42676 от 28.08.2026, «Request Sent».",
+   "parks": [
+    "cummins"
+   ],
+   "tier_key": "trade",
+   "hub": false
+  },
+  {
+   "name": "İltekno A.Ş.",
+   "country": "Турция",
+   "city": "İstanbul (Şişli); склады Dilovası и Gaziantep, 700 м²",
+   "site": "https://iltekno.com/en/spare-parts/",
+   "email": "info@iltekno.com",
+   "phone": "+90 212 910 11 00",
+   "stream": "makers",
+   "tier_ru": "Авторизованный дистрибьютор",
+   "families": [
+    "MWM/Deutz TCG 2016/2020/3016/3020"
+   ],
+   "part_numbers": [
+    "12420480",
+    "12211061"
+   ],
+   "what_they_have": "Официальный дистрибьютор MWM в Турции с 2002 г. Дословно на сайте: «ILTEKNO, the authorized distributor of MWM, while providing original spare parts supply and procurement services... through its 700 m2 warehouses in Dilovası and Gaziantep». Ключевое для маршрута: 26.07.2023 подписал с MWM (Mannheim) соглашение MWM Solutions Provider по УЗБЕКИСТАНУ — подтверждено пресс-релизом самого производителя; в подвале сайта Узбекистан прямо в списке стран присутствия. Артикулов и каталога на сайте нет — доступ к оригиналу следует из статуса.",
+   "evidence_url": "https://iltekno.com/en/spare-parts/",
+   "route_to_ru": "Официальный канал MWM с легальным мандатом на Узбекистан: отгрузка из Стамбула, оформление и приёмка на узбекское юрлицо, далее в РФ. Турция санкции ЕС не применяет.",
+   "ask_mode": "Письмо на info@iltekno.com по-английски, заходить со ссылкой на их узбекский мандат: тема — снабжение ЗИП для парка MWM в Узбекистане, список PN с количествами (12420480 — 221, 12211061 — 221, форкамерные 12452176/12453572), запрос наличия на складах Dilovası/Gaziantep, цены и срока. Российского конечника в первом письме не называть — комплаенс MWM закроет тему быстрее, чем у нейтрального трейдера.",
+   "answer_odds": "medium",
+   "priority": 2,
+   "verdict": "confirmed",
+   "why_priority": "Второй по надёжности источник оригинала MWM после EECA, с уже готовым узбекским контуром и складом в Турции. Минус — вендорский комплаенс, поэтому только через местное юрлицо, отсюда приоритет 2, а не 1.",
+   "bitrix_state": "never",
+   "bitrix_note": "В Bitrix не заведены — новый канал из разведки 01.09.2026.",
+   "parks": [
+    "mwm_deutz"
+   ],
+   "tier_key": "auth",
+   "hub": true
+  },
+  {
+   "name": "Caterpillar Energy Solutions GmbH (бренд MWM)",
+   "country": "Германия",
+   "city": "Mannheim, Carl-Benz-Strasse 1, 68167",
+   "site": "https://www.mwm.net",
+   "email": "info@mwm.net",
+   "phone": "+49 621 384-0",
+   "stream": "makers",
+   "tier_ru": "Производитель (завод)",
+   "families": [
+    "MWM TCG 2016/2020/2032/3016/3020",
+    "MWM TBG 441",
+    "MWM TBG 632"
+   ],
+   "part_numbers": [
+    "12420480",
+    "12285487",
+    "12344841",
+    "12453385",
+    "12453562",
+    "12453564",
+    "12453572",
+    "12453574"
+   ],
+   "what_they_have": "Первоисточник, подтверждающий, что 12420480 из спроса — это ОРИГИНАЛЬНАЯ форкамерная свеча MWM, а не абстрактный «Deutz»: номер стоит в одном ряду с одиннадцатью другими на официальной странице, применимость «TCG 2016, TCG 2020, TCG 2032, TCG 3016, TCG 3020, TBG 441, and TBG 632», логистика — более 2 млн деталей на складе в Лорше, отгрузка свечей в день заказа. Заказ описан как обращение через авторизованных сервис-партнёров.",
+   "evidence_url": "https://www.mwm.net/en/services/parts-logistics/original-spare-part-mwm-prechamber-spark-plug/",
+   "route_to_ru": "Напрямую не поставит. Только через MWM EECA (Казахстан/Узбекистан) либо через дистрибьютора İltekno (Турция/Узбекистан).",
+   "ask_mode": "Не запрашивать цену — коммерчески не ответят. Письмом на info@mwm.net запросить подтверждение актуальности PN 12420480 и 12211061 под конкретный тип двигателя заказчика и попросить назвать авторизованного партнёра по региону приёмки (Узбекистан/Казахстан). Ответ с именем партнёра и есть цель обращения. Заходить нейтрально, от лица юрлица РК/РУз.",
+   "answer_odds": "medium",
+   "priority": 3,
+   "verdict": "confirmed",
+   "why_priority": "Ценен как техническая верификация номера и как навигатор к партнёру — само письмо дёшево и может сэкономить недели поиска. Коммерческого результата от него не ждать.",
+   "bitrix_state": "never",
+   "bitrix_note": "В Bitrix не заведены — новый канал из разведки 01.09.2026.",
+   "parks": [
+    "mwm_deutz",
+    "cat"
+   ],
+   "tier_key": "makers",
+   "hub": false
+  },
+  {
+   "name": "Champion Industrial (Tenneco / Federal-Mogul)",
+   "country": "США / ЕС",
+   "city": "",
+   "site": "https://www.championautoparts.com/en-eu/products/non-automotive.html",
+   "email": "",
+   "phone": "",
+   "stream": "makers",
+   "tier_ru": "Производитель (завод)",
+   "families": [
+    "Caterpillar",
+    "INNIO Jenbacher",
+    "Guascor",
+    "Waukesha",
+    "MWM/Deutz TBG616/TBG620",
+    "Cummins gas"
+   ],
+   "part_numbers": [
+    "RB77WPCC",
+    "RB77CC",
+    "RB77N",
+    "RB75N",
+    "RB75PP",
+    "RB75WPCC",
+    "KB77WPCC",
+    "FB77WPCC (Premium)"
+   ],
+   "what_they_have": "Заводской бренд промышленных свечей: «Champion® Industrial Plugs are backed by global engineering and development of Federal-Mogul», технологии Precious metals, F.I.S.S resistor, Hot Lock, «4-series range... for commercial, stationary and gas engine applications». По кросс-таблицам İggnita RB75WPCC/RB75N закрывает MWM 12420480, а RB77WPCC/RB77CC — тот же тепловой диапазон, что Denso GI3-3. Артикулов, цен и контактов промышленного отдела на странице нет — только «Where to buy».",
+   "evidence_url": "https://www.championautoparts.com/en-eu/products/non-automotive.html",
+   "route_to_ru": "Только через дистрибьюторов. Доступные из СНГ: İggnita (Champion RB75WPCC под MWM в каталоге), RS Motor, а из США — SPLUGS с публичными ценами (RB77CC $27, FB77WPCC $75).",
+   "ask_mode": "Напрямую не писать — контактов промышленного направления нет. Использовать бренд как ЧЕТВЁРТЫЙ вариант на каждую позицию при запросе к турецким и китайским поставщикам: спрашивать не «12420480», а «12420480 или Champion RB75WPCC / BERU 18GZ5-77-2 / Bosch 7307 / Denso GL3-3» — это резко повышает шанс, что у поставщика что-то найдётся.",
+   "answer_odds": "low",
+   "priority": 3,
+   "verdict": "confirmed",
+   "why_priority": "Не адресат, а инструмент расширения запроса: наличие пятого-шестого заводского бренда на одну позицию — главный способ поднять долю отвечающих поставщиков без увеличения числа писем.",
+   "bitrix_state": "never",
+   "bitrix_note": "В Bitrix не заведены — новый канал из разведки 01.09.2026.",
+   "parks": [
+    "cummins",
+    "jenbacher",
+    "mwm_deutz",
+    "cat",
+    "waukesha",
+    "other"
+   ],
+   "tier_key": "makers",
+   "hub": false
+  },
+  {
+   "name": "Clarke Energy",
+   "country": "Великобритания (сеть по миру)",
+   "stream": "jenbacher",
+   "tier": "authorized_distributor",
+   "tier_ru": "Авторизованный дистрибьютор INNIO Jenbacher",
+   "families": [
+    "Jenbacher JMS 6xx"
+   ],
+   "part_numbers": [
+    "1236100",
+    "657541",
+    "487181"
+   ],
+   "what_they_have": "Крупнейший официальный дистрибьютор Jenbacher; в базе три карточки (UK, Tunis, головная).",
+   "route_to_ru": "напрямую в РФ не поставит — только через локальные офисы в дружественных юрисдикциях",
+   "ask_mode": "через локальный офис (Tunis/Middle East), по артикулам INNIO",
+   "answer_odds": "low",
+   "priority": 3,
+   "bitrix_state": "refused",
+   "bitrix_note": "4 запроса в феврале 2025, все «Not Selected». Полтора года не обращались.",
+   "evidence_url": "",
+   "parks": [
+    "jenbacher"
+   ],
+   "tier_key": "auth",
+   "hub": false
+  },
+  {
+   "name": "DENSO Europe B.V. / DENSO Corporation",
+   "country": "Япония / Нидерланды",
+   "city": "Weesp, Hogeweyselaan 165, 1382 JL",
+   "site": "https://www.denso-am.eu/products/life-energy/cogen-spark-plugs/",
+   "email": "",
+   "phone": "+31 (0)294 493 493",
+   "stream": "makers",
+   "tier_ru": "Производитель (завод)",
+   "families": [
+    "INNIO Jenbacher",
+    "Caterpillar G3500/G3600",
+    "Waukesha VHP/VGF/AT",
+    "Cummins gas (Q19G, QSV81, QSV91)",
+    "Guascor",
+    "Wärtsilä"
+   ],
+   "part_numbers": [
+    "GI3-1",
+    "GI3-3",
+    "GI3-5",
+    "GI3-8",
+    "Iridium Saver",
+    "Iridium Saver Performer",
+    "Iridium Saver DDI"
+   ],
+   "what_they_have": "Производитель самой нужной нам позиции — GI3-3 (869 шт) и физический изготовитель свечи, продаваемой под номером Jenbacher 1214569 (Denso P518). Два факта, определяющие тактику, подтверждены дословно: «We only sell to stockists who have an active account with us» и на русской странице — «В связи с политической и экономической неопределенностью, в настоящее время, компания DENSO не работает на территории России и Беларуси». При этом в страновом селекторе есть DENSO Türkiye, DENSO Kazakhstan, DENSO Uzbekistan, DENSO Azerbaijan.",
+   "evidence_url": "https://www.denso-am.eu/ru/svechi-zazhiganiia-co-generation",
+   "route_to_ru": "Прямой канал закрыт публичным заявлением самой компании. Практический маршрут — локальные стокисты Denso в Турции/Казахстане/Узбекистане либо покупка через İggnita / RS Motor / Hatraco.",
+   "ask_mode": "Как поставщику не писать вообще — канал закрыт их же уведомлением. Использовать как справочник: через селектор стран искать локальных стокистов (Türkiye, Kazakhstan, Uzbekistan) и слать запрос им. Второй способ применения — попросить у İggnita и Hatraco подтверждение, что их GI3-3 идёт по официальному стокистскому счёту Denso.",
+   "answer_odds": "low",
+   "priority": 3,
+   "verdict": "confirmed",
+   "why_priority": "Держать в карте как эталон подлинности и как источник списка легальных стокистов в дружественных юрисдикциях. Любой запрос из РФ вернётся отпиской «find your local stockist».",
+   "bitrix_state": "never",
+   "bitrix_note": "В Bitrix не заведены — новый канал из разведки 01.09.2026.",
+   "parks": [
+    "cummins",
+    "jenbacher",
+    "cat",
+    "waukesha",
+    "other"
+   ],
+   "tier_key": "makers",
+   "hub": false
+  },
+  {
+   "name": "Diesel Engines Parts (dieselengines.parts)",
+   "country": "США",
+   "city": "Davie, Florida, 10412 W State Road 84 #105, FL 33324",
+   "site": "https://www.dieselengines.parts",
+   "email": "",
+   "phone": "+1 (561) 880-4022",
+   "stream": "makers",
+   "tier_ru": "Складской сток оригинала",
+   "families": [
+    "Cummins QSK60G",
+    "Cummins industrial / gas"
+   ],
+   "part_numbers": [
+    "4380132",
+    "5544762"
+   ],
+   "what_they_have": "Genuine-сток Cummins с ключевой для нас карточкой: «CUMMINS 4380132 SPARK PLUG Original OEM part - SUPERSEDED FROM 5544762», «CUMMINS Genuine Part». Это официально подтверждает замену 5544762 → 4380132. Цена уточнена: было $1 115,74, стало $1 019,23. Наличие НЕ подтверждено — формулировка условная («Ships within next business day IF IN STOCK»), поле Current Stock пустое. Экспорт закрыт дословно: «Currently, we only ship within the continental United States and Puerto Rico».",
+   "evidence_url": "https://www.dieselengines.parts/shipping/",
+   "route_to_ru": "Прямого маршрута нет — отказ зашит в их же политику доставки. Только через американского форвардера с грузополучателем в ОАЭ/Турции, и запрос ведёт он, а не мы.",
+   "ask_mode": "Как поставщика не трогать. Ценность страницы уже извлечена: эталон цены genuine ($1019 за 4380132 — потолок для сравнения с китайским аналогом) и документальное подтверждение замены номера, которое надо занести в техническую карту и предъявлять всем поставщикам.",
+   "answer_odds": "low",
+   "priority": 3,
+   "verdict": "confirmed",
+   "why_priority": "Информационный источник, а не канал: даёт цену genuine и подтверждение супрессии номера. Писать не нужно — всё нужное уже на странице.",
+   "bitrix_state": "never",
+   "bitrix_note": "В Bitrix не заведены — новый канал из разведки 01.09.2026.",
+   "parks": [
+    "cummins"
+   ],
+   "tier_key": "stock",
+   "hub": false
+  },
+  {
+   "name": "Diesel Parts Direct",
+   "country": "США",
+   "stream": "cummins",
+   "tier_ru": "Genuine-стокист Cummins KTA/QSK/QSV",
+   "families": [
+    "Cummins gas"
+   ],
+   "part_numbers": [
+    "5544762",
+    "LF9050"
+   ],
+   "what_they_have": "Публикует цены на оригинал: 5544762 — $1 822,81. Ценовой референс для торга.",
+   "evidence_url": "https://www.dieselpartsdirect.com/5544762",
+   "route_to_ru": "США — через посредника",
+   "ask_mode": "как референс цены",
+   "answer_odds": "low",
+   "priority": 3,
+   "bitrix_state": "never",
+   "bitrix_note": "Не заведены; соседи по нише (Area Diesel, FinditParts) получили запрос 19.08 и молчат.",
+   "site": "dieselpartsdirect.com",
+   "parks": [
+    "cummins"
+   ],
+   "tier_key": "stock",
+   "hub": false
+  },
+  {
+   "name": "ER-System Mechatronic GmbH (бренд ERS)",
+   "country": "Австрия",
+   "city": "Golling an der Salzach, Holzerfeld 395, 5440",
+   "site": "https://www.er-system.at",
+   "email": "office@er-system.at",
+   "phone": "+43 (0) 6244 8554",
+   "stream": "makers",
+   "tier_ru": "Завод заводского аналога",
+   "families": [
+    "INNIO Jenbacher Type 3/4/6",
+    "MWM (форкамерные)",
+    "газовые двигатели 0,2–10 МВт"
+   ],
+   "part_numbers": [
+    "18.021-01 / FT00169",
+    "18.043-01 / FT00174",
+    "18.020-01 / FT00193"
+   ],
+   "what_they_have": "Австрийский завод — автор того самого премиум-аналога, который заказчик готов принимать вместо оригинала. Компания действующая (основана 2007, управляющие Elias Russegger и Josef Schnöll), свечу для газовых двигателей 0,2–10 МВт разработали в 2014 г. Реальные артикулы под Jenbacher Type 6 подтверждены на материале Hatraco: 18.021-01 (FT00169), 18.043-01 (FT00174), 18.020-01 (FT00193), с формулировками «No adjustments required», «Available for all type of gases», «Developed and tested by Hatraco® & ERS®». Заявления про ресурс 6000–8000 ч первоисточником не подтверждены — не переносить в КП заказчику.",
+   "evidence_url": "https://www.er-system.at/",
+   "route_to_ru": "Из ЕС напрямую закрыто. Основной путь — через Hatraco или через трейдеров, которые уже возят ERS (İggnita), с отгрузкой на Турцию/Узбекистан.",
+   "ask_mode": "Коммерцию у них не просить. Письмо на office@er-system.at по-немецки или английски строго техническое: какая свеча ERS соответствует Jenbacher J612/J616/J620/J624 и какой заявленный ресурс — это техподтверждение «премиум-аналога» для заказчика. Закупку вести через Hatraco по артикулам 18.021-01 / 18.043-01.",
+   "answer_odds": "medium",
+   "priority": 3,
+   "verdict": "confirmed",
+   "why_priority": "Нужен не как поставщик, а как источник письменного технического обоснования замены — именно этой бумаги обычно не хватает, чтобы заказчик согласился на аналог вместо оригинала.",
+   "bitrix_state": "never",
+   "bitrix_note": "В Bitrix не заведены — новый канал из разведки 01.09.2026.",
+   "parks": [
+    "jenbacher",
+    "mwm_deutz"
+   ],
+   "tier_key": "makers",
+   "hub": false
+  },
+  {
+   "name": "Federal-Mogul DEVA GmbH",
+   "country": "Германия",
+   "stream": "makers",
+   "tier": "oem",
+   "tier_ru": "Подразделение Federal-Mogul (бренд Champion)",
+   "families": [
+    "промышленное зажигание"
+   ],
+   "part_numbers": [
+    "RB77CC"
+   ],
+   "what_they_have": "Заведён 13.08.2026, запрос отправлен — канал к бренду Champion.",
+   "route_to_ru": "ЕС — через хаб",
+   "ask_mode": "по PN Champion",
+   "answer_odds": "low",
+   "priority": 3,
+   "bitrix_state": "sent",
+   "bitrix_note": "1 запрос от 13.08.2026, «Request Sent».",
+   "parks": [
+    "other"
+   ],
+   "tier_key": "trade",
+   "hub": false
+  },
+  {
+   "name": "INNIO Jenbacher GmbH & Co OG",
+   "country": "Австрия",
+   "city": "Jenbach (Тироль); завод свечей — Kapfenberg",
+   "site": "https://www.jenbacher.com",
+   "email": "",
+   "phone": "",
+   "stream": "makers",
+   "tier_ru": "Производитель (завод)",
+   "families": [
+    "INNIO Jenbacher Type 2/3/4",
+    "INNIO Jenbacher Type 6 (JMS 612/616/620/624)",
+    "INNIO Jenbacher Type 9"
+   ],
+   "part_numbers": [
+    "P611 (Type 6/9)",
+    "P518 (Type 6, высокое содержание инертных газов)",
+    "P3MAX",
+    "P3PRO",
+    "P7V3i",
+    "P7V5i"
+   ],
+   "what_they_have": "Производитель с собственным заводом свечей в Капфенберге: «At our specialized spark plug manufacturing facility in Kapfenberg, Austria...». Портфель подтверждён ровно в шести моделях. ВАЖНЫЕ ПОПРАВКИ: цифровых артикулов на странице НЕТ вообще — связки P611 = 1236100/1236099 и P518 = 1214569 подтверждаются не здесь, а независимо у Hatraco и RS Motor; модели P603 на актуальной странице тоже нет. Как поставщик бесполезен: ни телефона, ни почты, ни цен, только веб-форма.",
+   "evidence_url": "https://www.jenbacher.com/en/services/genuine-jenbacher-spare-parts/spark-plug/",
+   "route_to_ru": "Прямо — нет. Только через регионального провайдера из реестра jenbacher.com/en/providers/ (Турция, ОАЭ, Казахстан, Индия).",
+   "ask_mode": "Не как к поставщику, а как к эталону номенклатуры: сверять, какая свеча идёт на какой Type (P611 → Type 6/9 — это закрывает вопрос по 1236100; P518 → Type 6 на газе с инертными примесями — это 1214569). Заказ физически только через Customer Portal или провайдера из реестра — реестр и есть главная ценность этой страницы.",
+   "answer_odds": "low",
+   "priority": 3,
+   "verdict": "confirmed",
+   "why_priority": "Не адресат для запроса, а справочник: реестр провайдеров и подтверждение применимости моделей. Запрос из РФ уйдёт в регион-роутинг и вернётся переадресацией.",
+   "bitrix_state": "never",
+   "bitrix_note": "В Bitrix не заведены — новый канал из разведки 01.09.2026.",
+   "parks": [
+    "jenbacher"
+   ],
+   "tier_key": "makers",
+   "hub": false
+  },
+  {
+   "name": "Lloyd & Fedders Automotive Systems LLC",
+   "country": "ОАЭ",
+   "city": "Дубай + экспортный офис/шоурум в Шардже",
+   "site": "https://www.lloydfedders.com",
+   "email": "info@lloydfedders.com",
+   "phone": "+971 6 554 4896",
+   "stream": "makers",
+   "tier_ru": "Трейдер / поставщик ЗИП",
+   "families": [
+    "Cummins",
+    "Caterpillar",
+    "MWM/Deutz",
+    "Waukesha",
+    "INNIO Jenbacher",
+    "Wärtsilä"
+   ],
+   "part_numbers": [],
+   "what_they_have": "Независимый эмиратский экспортёр ЗИП энергетических двигателей. На сайте дословно: «we proudly serve customers across the Middle East, Africa, CIS countries, Asia», отдельным списком экспортных направлений — GCC, CIS, Central Asia; в строке парков «Power Plant Engines: Wärtsilä, Guascor, MWM, Waukesha, Jenbacher, MAN B&W». Рекламируют «cross-reference and superseded part number support». ОГОВОРКА: вся конкретная номенклатура на сайте дизельная (поршни, гильзы, ГБЦ, форсунки, турбины), свечей зажигания и систем зажигания нет вовсе — это широкопрофильный реэкспортёр, который будет перекупать.",
+   "evidence_url": "https://www.lloydfedders.com/",
+   "route_to_ru": "Самый прямой маршрутный признак среди эмиратцев: сами заявляют поставки в СНГ и Центральную Азию, отдельный экспортный офис в Шардже, авиа- и морская отправка. Вендорского комплаенса нет.",
+   "ask_mode": "Через info@lloydfedders.com или форму Inquiry, по-английски, сразу списком PN — они сами рекламируют работу с кроссами и заменёнными номерами. Прямо ссылаться на их фразу про CIS и просить подтвердить готовность отгрузить покупателю из СНГ, Incoterms и условия оплаты. Обязательно требовать подтверждение происхождения (Original/OEM/Aftermarket) — на свечах разница критична.",
+   "answer_odds": "medium",
+   "priority": 3,
+   "verdict": "plausible",
+   "why_priority": "Ответят быстро и без барьеров, но свечей ГПУ в профиле нет — реалистичный исход — предложение перекупа с неясным происхождением. Держать как эмиратский резерв и как возможного грузополучателя в схеме.",
+   "bitrix_state": "never",
+   "bitrix_note": "В Bitrix не заведены — новый канал из разведки 01.09.2026.",
+   "parks": [
+    "cummins",
+    "jenbacher",
+    "mwm_deutz",
+    "cat",
+    "waukesha",
+    "other"
+   ],
+   "tier_key": "trade",
+   "hub": true
+  },
+  {
+   "name": "MESTEK INDIA",
+   "country": "Индия",
+   "city": "Нью-Дели, 602A, Ansal Majestic Tower, Vikas Puri, PVR Complex, 110018",
+   "site": "http://mestekindia.com",
+   "email": "",
+   "phone": "+91-11-45531065",
+   "stream": "makers",
+   "tier_ru": "Авторизованный дистрибьютор",
+   "families": [
+    "Waukesha",
+    "Caterpillar",
+    "Guascor",
+    "MWM/Deutz",
+    "INNIO Jenbacher",
+    "Cummins (через Champion Industrial)"
+   ],
+   "part_numbers": [
+    "Champion RB77WPCC / KB77WPCC / FB77WPCC",
+    "Goetze G-6002",
+    "BG Service Co. — наконечники и удлинители свечей"
+   ],
+   "what_they_have": "Дословно: «We are Authorized distributor for Tenneco's Champion® Industrial Spark Plugs Serving the Oil and Gas Industry», плюс поставка genuine/OEM/aftermarket по Waukesha, Caterpillar, Guascor, MWM, Jenbacher, Scania, Woodward и авторизация по BG Service Co. (США) — ВВ-провода, удлинители и наконечники свечей, то есть класс нашего 657541. ОГОВОРКИ: статус дистрибьютора Champion — их собственное заявление, независимого подтверждения от Tenneco нет; страница /contact-us/ отдаёт 404, подтверждённого email на сайте нет.",
+   "evidence_url": "http://mestekindia.com/gas-engine/",
+   "route_to_ru": "Индия торгует с РФ штатно, но Champion и BG — американские бренды Tenneco, и реэкспорт в РФ дистрибьюторским договором почти наверняка запрещён. Реальный путь — посредник в ОАЭ/Турции либо оформление на юрлицо заказчика вне РФ.",
+   "ask_mode": "Звонок/WhatsApp на +91-11-45531065 либо форма на их карточке IndiaMART. Первый заход сделать ТЕХНИЧЕСКИМ: попросить кросс-лист Champion Industrial под Cummins 5373898/4098162 и под Jenbacher, а также линейку BG Service Co. на наконечники/удлинители (класс 657541). Не представляться российским покупателем: запрашивать как проект в СНГ/ОАЭ. Даже отказ по поставке даст эталонные кроссы и уровень цен премиум-сегмента.",
+   "answer_odds": "low",
+   "priority": 3,
+   "verdict": "confirmed",
+   "why_priority": "Ценность сейчас информационная, а не коммерческая: кросс-референсы Champion Industrial и подтверждение уровня цен на заводской премиум. Как только всплывёт российское назначение, дистрибьютор американского бренда откажет.",
+   "bitrix_state": "never",
+   "bitrix_note": "В Bitrix не заведены — новый канал из разведки 01.09.2026.",
+   "parks": [
+    "cummins",
+    "jenbacher",
+    "mwm_deutz",
+    "cat",
+    "waukesha",
+    "other"
+   ],
+   "tier_key": "auth",
+   "hub": false
+  },
+  {
+   "name": "MOTORTECH GmbH",
+   "country": "Германия",
+   "city": "Celle",
+   "site": "https://www.motortech.de",
+   "email": "",
+   "phone": "",
+   "stream": "makers",
+   "tier_ru": "Завод заводского аналога",
+   "families": [
+    "MWM/Deutz TCG",
+    "Caterpillar",
+    "INNIO Jenbacher",
+    "MAN",
+    "MTU 4000",
+    "Guascor"
+   ],
+   "part_numbers": [
+    "MPC1900 (форкамерная)",
+    "MPC-Plugs",
+    "SparkView",
+    "Spark Plug Cleaning Kit"
+   ],
+   "what_they_have": "Немецкий производитель систем зажигания для стационарных газовых двигателей с собственными форкамерными свечами MPC. Подтверждено по двум независимым источникам (собственный сайт закрыт защитой Incapsula): страница официального дистрибьютора RS Motor — «MOTORTECH GmbH has been developing and manufacturing ignition components... for more than 30 years», в номенклатуре прямо «Spark plugs (DENSO, CHAMPION, BERU) and accessories»; товарная карточка İggnita по MPC1900 — «Developed and manufactured in Germany», «Iridium/Platinum alloy on center and ground electrode», применимость MTU 4000, Guascor SFGM5600, CAT 346-5123. Контакты завода не подтверждены первоисточником — оставлены пустыми.",
+   "evidence_url": "https://iggnita.com/en/urun/buji-mpc1900-motortech-pre-chamber-spark-plug/",
+   "route_to_ru": "Прямо в Целле не писать. Продукция реально доступна через дистрибьюторов: İggnita (держит MPC1900 на стамбульском складе) и RS Motor (официальный дистрибьютор ES/PT).",
+   "ask_mode": "Заходить через дистрибьюторов, а не через завод. У İggnita запрашивать MPC-свечи по названию модели, у RS Motor — подбор MOTORTECH под парк заказчика. Если понадобится сам завод — запрос должен идти от турецкого юрлица с вопросом «кто ваш дистрибьютор в Турции и Центральной Азии».",
+   "answer_odds": "low",
+   "priority": 3,
+   "verdict": "confirmed",
+   "why_priority": "Третий бренд премиум-аналога после ERS и Denso, физически доступный через уже отобранных турецких партнёров — расширяет число заводских вариантов на позицию, но собственного канала для нас не даёт.",
+   "bitrix_state": "never",
+   "bitrix_note": "В Bitrix не заведены — новый канал из разведки 01.09.2026.",
+   "parks": [
+    "jenbacher",
+    "mwm_deutz",
+    "cat",
+    "other"
+   ],
+   "tier_key": "makers",
+   "hub": false
+  },
+  {
+   "name": "McGill Industries / SPLUGS",
+   "country": "США",
+   "city": "Johnstown, Colorado, 4691 Concord Ave, Ste 4, CO 80534",
+   "site": "https://splugs.com",
+   "email": "plugs@splugs.com; sales@mcgillindustries.com",
+   "phone": "+1 (970) 685-8695 (он же WhatsApp); +1 970-685-8694",
+   "stream": "makers",
+   "tier_ru": "Складской сток оригинала",
+   "families": [
+    "Caterpillar",
+    "Waukesha",
+    "Cummins gas",
+    "INNIO Jenbacher",
+    "Guascor"
+   ],
+   "part_numbers": [
+    "Denso GI3-3",
+    "Denso GI3-5",
+    "Denso GE3-1",
+    "Champion 237 RB77CC",
+    "Champion 1230 FB77WPCC",
+    "Champion 643 RB75N",
+    "Stitt (genuine)"
+   ],
+   "what_they_have": "Единственный найденный канал с ПУБЛИЧНЫМИ ценами и остатками ровно по нашей позиции: Denso GI3-3 — $69,00/шт при 191 шт в наличии; GI3-5 — $130,00 при 148 шт; Champion RB77CC — $27,00; Champion Premium FB77WPCC — $75,00. Значит 869 шт GI3-3 ≈ $60 тыс. по американской рознице — это готовый потолок для торга. Параллельно McGill заявляет genuine Stitt: «We provide only genuine Stitt parts, including spark plugs».",
+   "evidence_url": "https://splugs.com/product/denso-gi3-3/",
+   "route_to_ru": "Прямая отгрузка из США невозможна: вся логистика заточена под UPS Ground по континентальным США. Физическая поставка — только перевыставление на получателя в ОАЭ/Казахстане, с высоким риском отказа по экспортному комплаенсу США.",
+   "ask_mode": "В первую очередь НЕ как к поставщику: цены и остатки уже публичны, их можно снять без письма и использовать в переговорах с турками и китайцами. Если писать — WhatsApp +1-970-685-8695 или sales@mcgillindustries.com от лица покупателя в ОАЭ/Казахстане с вопросом про freight forwarder. Про РФ не упоминать вообще.",
+   "answer_odds": "low",
+   "priority": 3,
+   "verdict": "confirmed",
+   "why_priority": "Ценовой якорь по GI3-3 — второй по важности после кросс-карты Hatraco: без него невозможно понять, торгуют ли турки в рынке. Как канал поставки практически закрыт.",
+   "bitrix_state": "never",
+   "bitrix_note": "В Bitrix не заведены — новый канал из разведки 01.09.2026.",
+   "parks": [
+    "cummins",
+    "jenbacher",
+    "cat",
+    "waukesha",
+    "other"
+   ],
+   "tier_key": "stock",
+   "hub": false
+  },
+  {
+   "name": "ONERGYS GmbH",
+   "country": "Германия",
+   "stream": "jenbacher",
+   "tier": "trader",
+   "tier_ru": "Независимый поставщик ЗИП газовых двигателей",
+   "families": [
+    "Jenbacher",
+    "MWM"
+   ],
+   "part_numbers": [],
+   "what_they_have": "Специализируется на ЗИП ГПУ, в базе 3 запроса.",
+   "route_to_ru": "ЕС — через хаб",
+   "ask_mode": "по артикулам, англ.",
+   "answer_odds": "low",
+   "priority": 3,
+   "bitrix_state": "no_reply",
+   "bitrix_note": "3 запроса, последний 03.07.2026 — «Ответ не получен в срок».",
+   "parks": [
+    "jenbacher",
+    "mwm_deutz"
+   ],
+   "tier_key": "trade",
+   "hub": false
+  },
+  {
+   "name": "Radiant Filters Trading Co LLC",
+   "country": "ОАЭ, Шарджа",
+   "stream": "hubs",
+   "tier": "trader",
+   "tier_ru": "Фильтровальный трейдер ОАЭ",
+   "families": [
+    "фильтры",
+    "ЗИП"
+   ],
+   "part_numbers": [
+    "LF9050"
+   ],
+   "what_they_have": "20 запросов исторически, был «Selected». По свечам — профиль не тот, но фильтры закроет.",
+   "route_to_ru": "ОАЭ",
+   "ask_mode": "по PN фильтров",
+   "answer_odds": "medium",
+   "priority": 3,
+   "bitrix_state": "sent",
+   "bitrix_note": "#41726 от 19.08.2026 по нашим двум позициям — «Request Sent». По свечам это не профильный адрес.",
+   "parks": [
+    "other"
+   ],
+   "tier_key": "trade",
+   "hub": true
+  },
+  {
+   "name": "SPLUGS (Industrial Spark Plug Supplier)",
+   "country": "США",
+   "stream": "makers",
+   "tier_ru": "Специализированный поставщик промышленных свечей",
+   "families": [
+    "CAT",
+    "Champion",
+    "Bosch",
+    "Denso"
+   ],
+   "part_numbers": [],
+   "what_they_have": "Узкий профиль — промышленные свечи Caterpillar, Champion, Bosch, Denso; полезен для сверки кроссов.",
+   "evidence_url": "https://splugs.com/",
+   "route_to_ru": "США — через хаб",
+   "ask_mode": "по PN, англ.",
+   "answer_odds": "low",
+   "priority": 3,
+   "bitrix_state": "never",
+   "bitrix_note": "Не заведены.",
+   "site": "splugs.com",
+   "parks": [
+    "cat"
+   ],
+   "tier_key": "trade",
+   "hub": false
+  },
+  {
+   "name": "Shanghai Powergen Electromechanical Technology Co., Ltd.",
+   "country": "Китай",
+   "city": "Шанхай, No. 860, Xinyang Road, Lingang New Area, Shanghai Pilot Free Trade Zone",
+   "site": "https://www.made-in-china.com/showroom/a94aa325fc82980e/",
+   "email": "",
+   "phone": "",
+   "stream": "makers",
+   "tier_ru": "Трейдер / поставщик ЗИП",
+   "families": [
+    "INNIO Jenbacher Type 6 (JMS 612/616/620/624)"
+   ],
+   "part_numbers": [
+    "436782",
+    "1205632",
+    "1236099",
+    "1236100"
+   ],
+   "what_they_have": "Витрина на made-in-china с позицией «Jenbacher Series 6 Spark Plug» сразу под четыре номера, включая 1236100, MOQ 4 шт., порт Шанхай. Заявляют себя авторизованным дистрибьютором ERS по APAC — дословно «We are an authorized distributor of ERS in the Asia Pacific». ВАЖНО: это самозаявление на маркетплейсе; во флаере Hatraco (владельца бренда ERS), прочитанном целиком, Shanghai Powergen не упоминается. Контактов на странице нет вовсе, цена US$1.00 — заглушка платформы.",
+   "evidence_url": "https://www.made-in-china.com/showroom/a94aa325fc82980e/product-detailaOrGoKAMYifD/China-Jenbacher-Series-6-Spark-Plug.html",
+   "route_to_ru": "Китай, зона свободной торговли Линган — отгрузка в РФ без ограничений. Если статус дистрибьютора ERS подтвердится, это легальный канал заводского премиум-аналога с китайской стороны.",
+   "ask_mode": "Только через форму Send Inquiry на made-in-china — иного входа нет. В первом же письме, до всякой цены, требовать три вещи: (1) документальное подтверждение статуса дистрибьютора ERS — письмо или сертификат от Hatraco B.V., которое можно перепроверить на sales@hatraco.com; (2) артикул ERS, а не только номер Jenbacher (по нашей позиции это 18.043-01 / FT00174); (3) фото упаковки с маркировкой ERS. Нет ответа на пункт (1) — считать обычным китайским трейдером и требовать образец до партии.",
+   "answer_odds": "high",
+   "priority": 3,
+   "verdict": "plausible",
+   "why_priority": "Высокий шанс ПОЛУЧИТЬ ответ не равен шансу получить внятный: доказательная база — витрина маркетплейса без контактов, а заявленный маршрут «через китайского дилера ERS» документально не подтверждён ни с одной стороны. Проверять одним письмом с жёсткими требованиями.",
+   "bitrix_state": "never",
+   "bitrix_note": "В Bitrix не заведены — новый канал из разведки 01.09.2026.",
+   "parks": [
+    "jenbacher"
+   ],
+   "tier_key": "trade",
+   "hub": false
+  },
+  {
+   "name": "Shenzhen Zuhon Technology Co., Ltd (zuhonpower.com)",
+   "country": "Китай",
+   "city": "Шэньчжэнь, 1009, 5A Building, Huaqiang Idea Park, Guangming District, 518000",
+   "site": "https://zuhonpower.com",
+   "email": "",
+   "phone": "+86-755-86955520; +86-13310831043",
+   "stream": "makers",
+   "tier_ru": "Трейдер / поставщик ЗИП",
+   "families": [
+    "INNIO Jenbacher",
+    "MWM/Deutz TCG",
+    "Caterpillar gas"
+   ],
+   "part_numbers": [],
+   "what_they_have": "Независимый поставщик ЗИП ГПУ с каталогом, построенным по ЗАВОДСКИМ номерам Jenbacher (100001, 100009, 100012 и т.д.), где в номенклатуре явно указаны Spark Plugs, Ignition Cables, Ignition Wires, Pre-chamber Tips — то есть весь класс наших позиций, включая наконечники и катушки. Есть русская версия сайта и услуги ремонта/капремонта ГПУ на площадке заказчика. Честный дисклеймер: «is not an authorized dealer or representative of MWM, Jenbacher, or Caterpillar». Цен и артикулов свечей на витрине нет — глубина именно по свечам не доказана.",
+   "evidence_url": "https://zuhonpower.com/",
+   "route_to_ru": "Шэньчжэнь — простая логистика в РФ и оплата через HK/CNY, есть русская версия сайта.",
+   "ask_mode": "Через их Inquiry Cart / «Add to Quote» (сайт заточен под это) или WhatsApp на +86-13310831043. Сильная сторона — не свечи, а обвязка Jenbacher: наконечник 657541 (242), катушка 487181 (28), запальная свеча 1236100 (66), форкамерные наконечники. Заходить именно по заводским номерам INNIO — их каталог построен ровно так. Отдельно спросить про шеф-монтаж и капремонт на площадке.",
+   "answer_odds": "medium",
+   "priority": 3,
+   "verdict": "confirmed",
+   "why_priority": "Полезен по «нецентральным» позициям Jenbacher (наконечники, катушки), где остальные каналы пусты. По свечам, скорее всего, сам перекупает у Torch/Techie, поэтому цена будет не лучшей — резерв, а не основной канал.",
+   "bitrix_state": "never",
+   "bitrix_note": "В Bitrix не заведены — новый канал из разведки 01.09.2026.",
+   "parks": [
+    "jenbacher",
+    "mwm_deutz",
+    "cat"
+   ],
+   "tier_key": "trade",
+   "hub": false
+  },
+  {
+   "name": "Sonnenberg Power Solutions LLC (SPS)",
+   "country": "ОАЭ",
+   "city": "Дубай, A1-Building, Digital Park, Dubai Silicon Oasis",
+   "site": "https://www.spower.ae",
+   "email": "info@spower.ae",
+   "phone": "+971 42 353 433",
+   "stream": "makers",
+   "tier_ru": "Авторизованный дистрибьютор",
+   "families": [
+    "Guascor FG/FGLD/SFGLD/SFGM/HGM"
+   ],
+   "part_numbers": [],
+   "what_they_have": "Дистрибьютор Guascor Energy с территорией, подтверждённой на сайте производителя дословно: «UAE, Kuwait, Qatar, Bahrain, Uzbekistan, Kazakhstan, Azerbaijan, Turkmenistan, Kyrgyzstan, Tajikistan, and Irak (Kurdistan excluded)», роль — Industrial and Marine sales & service. Соглашение от 12.05.2025, компания активно растёт (Bergen Engines, выставочная программа).",
+   "evidence_url": "https://guascor-energy.com/contact/",
+   "route_to_ru": "Узбекистан и Казахстан прямо входят в их официальную зону — это снимает вопрос конечного получателя при поставке на юрлицо в этих странах. ОАЭ — юрисдикция, привычная к работе с СНГ.",
+   "ask_mode": "Письмо на info@spower.ae от юрлица ОАЭ, Узбекистана или Казахстана со ссылкой на их дистрибьюторское соглашение с Guascor Energy. Спрашивать свечи по парку Guascor (позиция Denso GI3-3 — 869 шт идёт именно на этот парк) и уточнять, работают ли они по номенклатуре Denso напрямую. Конечника в РФ не называть.",
+   "answer_odds": "high",
+   "priority": 3,
+   "verdict": "confirmed",
+   "why_priority": "Молодая растущая дистрибьюторская компания отвечает охотно, а Узбекистан и Казахстан у неё в мандате. Но в текущем перечне номеров позиций Guascor нет (кроме GI3-3, который проще взять у İggnita или RS Motor) — это задел, а не срочный адрес.",
+   "bitrix_state": "never",
+   "bitrix_note": "В Bitrix не заведены — новый канал из разведки 01.09.2026.",
+   "parks": [
+    "other"
+   ],
+   "tier_key": "auth",
+   "hub": true
+  },
+  {
+   "name": "ООО «DIESEL HYDRO SERVICE»",
+   "country": "Узбекистан",
+   "city": "Ташкент, Яккасарайский р-н, ул. Бобура 74, оф. 207, 100022",
+   "site": "",
+   "email": "",
+   "phone": "+998 78 150 85 90; +998 90 730 36 16 (Ахмаджанов Санжарбек, сервис-менеджер)",
+   "stream": "makers",
+   "tier_ru": "Авторизованный дистрибьютор",
+   "families": [
+    "Cummins"
+   ],
+   "part_numbers": [],
+   "what_they_have": "По справочной карточке — официальный дилер CUMMINS INC в Республике Узбекистан: гарантийное и постгарантийное обслуживание и поставка запчастей Cummins, фильтры Fleetguard, масла Valvoline. Реквизиты: ИНН 304921852, создана в 2017 г. ОГОВОРКИ: собственного сайта нет, дилерство на cummins.com не подтверждается, а профиль в карточке целиком дизельно-автомобильный — газовых двигателей, свечей и систем зажигания в номенклатуре нет.",
+   "evidence_url": "https://gigal.uz/objects/dir/tashkent/42-avto_tehnika_perevozki/diesel_hydro_service.html",
+   "route_to_ru": "Узбекский дилерский канал Cummins — короткий официальный путь в Центральной Азии, платежи и логистика из РФ проще, чем через Турцию и ОАЭ.",
+   "ask_mode": "Только звонок/WhatsApp по-русски на +998 90 730 36 16 — почты нет, письмо отправить некуда. Первый вопрос верификационный: подтверждают ли действующее дилерство Cummins, покрывает ли франшиза Power Generation и газовые QSV/QSK-G, есть ли доступ к 5373898 и 4380132 в дилерском каталоге. Если разговор уходит в горную технику и форсунки — закрывать позицию.",
+   "answer_odds": "medium",
+   "priority": 3,
+   "verdict": "plausible",
+   "why_priority": "Географически удобный узбекский дилерский контур Cummins, но подтверждение только из бизнес-справочника, профиль дизельный и канал чисто телефонный. Один проверочный звонок, дальше по результату.",
+   "bitrix_state": "never",
+   "bitrix_note": "В Bitrix не заведены — новый канал из разведки 01.09.2026.",
+   "parks": [
+    "cummins"
+   ],
+   "tier_key": "auth",
+   "hub": true
+  },
+  {
+   "name": "ООО «ТД Цезарь-Нева» (caesar-neva.ru)",
+   "country": "Россия",
+   "city": "Санкт-Петербург",
+   "site": "https://caesar-neva.ru",
+   "email": "sales@caesar-neva.ru",
+   "phone": "+7 (911) 013-54-59; Telegram t.me/caesar_neva",
+   "stream": "makers",
+   "tier_ru": "Трейдер / поставщик ЗИП",
+   "families": [
+    "Cummins QSV81G/QSV91G, QSK60G, QSK19 Gas",
+    "Caterpillar G3500 (G3512/G3516/G3520)"
+   ],
+   "part_numbers": [
+    "5373898",
+    "4924504",
+    "346-5123",
+    "284-8313",
+    "BERU 18 VGZ 1-77"
+   ],
+   "what_they_have": "РФ-поставщик с карточками под 5373898 и 4924504 (26 600 ₽ со скидкой с 30 000 ₽, упаковка по 10 шт) и под CAT 346-5123 (36 000–40 000 ₽/шт, гарантия 12 мес, кроссы 284-8313 и BERU 18 VGZ 1-77). ГЛАВНЫЙ КРАСНЫЙ ФЛАГ ВСЕЙ ВЫБОРКИ: в одной и той же карточке товар назван «(оригинал)» и одновременно сказано дословно «Данные свечи выпускаются в России для Cummins» — это внутренне противоречиво.",
+   "evidence_url": "https://caesar-neva.ru/product/5373898-%D1%81%D0%B2%D0%B5%D1%87%D0%B0-%D0%B7%D0%B0%D0%B6%D0%B8%D0%B3%D0%B0%D0%BD%D0%B8%D1%8F-%D0%B4%D0%BB%D1%8F-cummins-qsv91g/",
+   "route_to_ru": "Уже в РФ, рублёвый договор, отгрузка из СПб.",
+   "ask_mode": "Второй внутренний ценовой бенчмарк (26,6–30 тыс. ₽ против 41 тыс. ₽ у WETZ). Если прорабатывать как канал — спрашивать в лоб, кто производитель и есть ли документы о происхождении, требовать карточку предприятия с ИНН и фото упаковки со штрих-кодом Cummins. Этот же вопрос задавать ВСЕМ российским продавцам «оригинального» 5373898.",
+   "answer_odds": "high",
+   "priority": 3,
+   "verdict": "confirmed",
+   "why_priority": "Нижняя граница внутреннего рынка и одновременно живая иллюстрация того, почему слову «оригинал» в карточке верить нельзя. Как источник на тысячи штук не тянет — пойдёт искать по тем же турецким и китайским каналам с наценкой.",
+   "bitrix_state": "never",
+   "bitrix_note": "В Bitrix не заведены — новый канал из разведки 01.09.2026.",
+   "parks": [
+    "cummins",
+    "cat"
+   ],
+   "tier_key": "trade",
+   "hub": false
+  },
+  {
+   "name": "ООО «ТК ВЕТЦ» (WETZ Group)",
+   "country": "Россия",
+   "city": "Москва, ул. Воронцовские пруды, д. 3, 117630",
+   "site": "https://wetzparts.com",
+   "email": "info@wetzparts.com",
+   "phone": "+7 495 129 02 35; Telegram @WETZ_parts",
+   "stream": "makers",
+   "tier_ru": "Трейдер / поставщик ЗИП",
+   "families": [
+    "Cummins QSV91G"
+   ],
+   "part_numbers": [
+    "5373898",
+    "4924504",
+    "4302738",
+    "537389800",
+    "430273800",
+    "492450400"
+   ],
+   "what_they_have": "Российский трейдер с карточкой «Свеча зажигания CUMMINS 5373898 (4924504) OE для CUMMINS QSV91G» и полным списком взаимозаменяемых OE-номеров — это самый ценный кросс из всей выборки: подтверждает, что 5373898 и 4924504 взаимозаменяемы, значит два номера спроса закрываются одной позицией. Цена 41 094 ₽ без НДС, статус «под заказ», срок на склад в Москве 60–90 дней.",
+   "evidence_url": "https://wetzparts.com/ru/product/5373898/",
+   "route_to_ru": "Уже в РФ — маршрута нет, это конкурент-перепродавец, а не источник.",
+   "ask_mode": "Как поставщика не рассматривать. Использовать как ценовой и срочный бенчмарк внутреннего рынка: 41 094 ₽/шт и 60–90 дней — это то, что заказчик получит и без нас. Цель прямого сорсинга должна быть кратно ниже по цене и заметно короче по сроку, иначе смысла в проекте нет. Их кросс-лист 5373898 = 4924504 = 4302738 забрать в свою техническую карту.",
+   "answer_odds": "high",
+   "priority": 3,
+   "verdict": "confirmed",
+   "why_priority": "Обязательный бенчмарк: без него нечем доказать заказчику ценность прямого сорсинга. Как канал поставки бесполезен.",
+   "bitrix_state": "never",
+   "bitrix_note": "В Bitrix не заведены — новый канал из разведки 01.09.2026.",
+   "parks": [
+    "cummins"
+   ],
+   "tier_key": "trade",
+   "hub": false
+  }
+ ],
+ "funnel": {
+  "rows": [
+   [
+    "Request Sent",
+    84,
+    "#b9b6ae"
+   ],
+   [
+    "Selected",
+    44,
+    "#0a7d0a"
+   ],
+   [
+    "Price at Work",
+    32,
+    "#fab219"
+   ],
+   [
+    "Not Selected",
+    21,
+    "#c9c6bf"
+   ],
+   [
+    "Ответ не получен (в срок)",
+    21,
+    "#8c1f1f"
+   ],
+   [
+    "Unread Messages",
+    16,
+    "#ff9800"
+   ],
+   [
+    "Отказ в КП",
+    15,
+    "#d03b3b"
+   ],
+   [
+    "In Correspondance",
+    12,
+    "#2a78d6"
+   ],
+   [
+    "New Request",
+    2,
+    "#e0ddd6"
+   ],
+   [
+    "Не подошло по технике",
+    1,
+    "#7a7873"
+   ]
+  ]
+ },
+ "effect": {
+  "logic": "<b>Как считать эффект.</b> Сейчас по свечам 14 запросов дают 0 КП. По остальным позициям тех же сделок воронка такая: из 248 запросов 44 «Selected» (18 %) и 32 «Price at Work» (13 %) — то есть до цены доходит примерно каждый третий запрос. Если свечные запросы уходят по профильным адресам с той же конверсией, те же 14 запросов дают <b>около 4 сопоставимых КП вместо нуля</b>. Три из четырёх рычагов ниже не требуют ни рубля — только другой адрес и открытую переписку. <b>Что добавила разведка мирового рынка.</b> Эффективность сорсинга здесь упирается не в переговорный навык, а в арифметику доходимости писем. По этому парку ЗИП ни один производитель не продаёт конечному потребителю, поэтому доля запросов, физически способных вернуть КП, у веерной рассылки близка к нулю: письма уходят на заводы (Denso, Champion, BERU, Stitt, Altronic, INNIO, MWM), в дилерские сети, связанные комплаенсом вендора, и в американские магазины, которые отгружают только внутри США. Далее срабатывают три независимых фильтра: (1) профильный — держит ли контрагент вообще ЗИП зажигания ГПУ, а не дизельное железо; (2) юрисдикционный — может ли он законно отгрузить покупателю из СНГ; (3) комплаенс-фильтр вендора — не потеряет ли он авторизацию из-за нашей сделки. Адресный список бьёт веер именно тем, что все три фильтра уже применены до отправки: каждый адресат здесь открыт, прочитан, у него подтверждена либо конкретная карточ",
+  "levers": [
+   {
+    "lever": "Открыть то, что уже ответили",
+    "how_much": "2 готовых ответа, 0 ₽ затрат",
+    "why": "CJ Aerospace по свечам Champion (с 15.07.2026) и Waukesha-Pearce (с 27.05.2026) висят в статусе «Unread Messages». Ответы получены, но никто их не открыл."
+   },
+   {
+    "lever": "Сменить адресатов на профильных",
+    "how_much": "с 0 % до ~31 % «доходит до цены» (оценка по воронке остальных позиций)",
+    "why": "Из восьми адресатов рассылки 19–28.08 ни один не является дистрибьютором свечей: FinditParts и Area Diesel — американские витрины, Radiant Filters — фильтровальщик, остальные — трейдеры общего профиля. Профильный был один (Hatraco) — и он на почту не отвечает."
+   },
+   {
+    "lever": "Подключить своих чемпионов",
+    "how_much": "6 поставщиков с доказанной конверсией",
+    "why": "Wuhan Weyeah — 8 «Selected» из 11 запросов, Nordroy Power — 6 из 10, Jining Huida — 5, KING KONG DRILLS — 4, Qingdao Formine — 3, UKP Parts India — 3 «Price at Work» прямо сейчас. Свечи им не отправляли ни разу."
+   },
+   {
+    "lever": "Вернуться к TESI SPA",
+    "how_much": "производитель свечей с оплаченной сделкой на 150 564 EUR",
+    "why": "«467. Tesi РЭПх свеча 2» закрыта оплатой, ещё 2 «Selected» по другим запросам. Единственный свечной производитель в базе с подтверждённой поставкой — и по ГПУ его не спрашивали."
+   },
+   {
+    "lever": "Спрашивать годовым лотом, а не строкой",
+    "how_much": "скидка за объём по промышленным свечам обычно 15–25 % (оценка, проверяется КП)",
+    "why": "Расходники Waukesha закупаются ежегодно (2026 — 11,15 млн ₽, тендер на 2027 открыт с закрытием 04.09.2026), а в спецификации ГПУ 6 065 штук позиций зажигания Cummins. Запрос годовым объёмом — другой разговор о цене, чем запрос на 96 штук."
+   },
+   {
+    "lever": "Двойной трек «оригинал + заводской аналог»",
+    "how_much": "ресурс +50 % при цене ниже OEM (заявление ERS/Hatraco)",
+    "why": "По QSK60 премиум-аналог ERS 18.049-01 заменяет OEM 4380132/4390446/5544762 и заявлен как drop-in. Просить обе цены в одном письме — быстрее, чем два круга рассылки."
+   },
+   {
+    "lever": "Отсев непроходимых адресов до отправки",
+    "how_much": "доля писем, способных вернуть КП, растёт примерно с 10–20% при веерной рассылке до 60–70%",
+    "why": "Из семи стволов разведки видно, что большинство «поставщиков» в выдаче — это заводы без прямых продаж, дилеры под комплаенсом ушедших из РФ вендоров, американские магазины с запретом экспорта в собственной политике доставки и дизельные трейдеры без свечей в номенклатуре. В этом списке все они либо помечены как справочные, либо исключены. Сорсер тратит те же 20 писем, но каждое уходит туда, где физически есть и товар, и право его отгрузить."
+   },
+   {
+    "lever": "Расширение запроса по кросс-номерам",
+    "how_much": "число заводских вариантов на одну позицию растёт с 1 до 5–6, вероятность найти позицию у конкретного поставщика — кратно",
+    "why": "Поставщик отвечает «нет» не потому, что товара нет, а потому, что у него другой номер в карточке. Запрос «12420480 или Champion RB75WPCC, BERU 18GZ5-77-2, Bosch 7307/7308, Denso GL3-3, Stitt RL807LL» находит позицию там, где запрос по одному номеру MWM вернул бы отказ. Плюс кросс на Denso отвязывает закупку от бренда Jenbacher и снимает его наценку по двум позициям спроса сразу."
+   },
+   {
+    "lever": "Правильная точка входа в компанию",
+    "how_much": "экономит 3–10 дней на каждом крупном адресате и снимает часть отказов",
+    "why": "Разница между общим ящиком и профильным адресом здесь измерена: у Clarke Energy глобальный сайт вообще не публикует контактов, а карточка индийского юрлица в реестре INNIO даёт живые india@clarke-energy.com и +91 20 30241777; у Orient Energy общий info@ уходит в Карачи, а рабочий — дубайский; у MWM вместо Мангейма нужны поимённые менеджеры EECA по РК и УЗ. Письмо в правильную дверь либо отвечается, либо не отвечается вовсе — промежуточного состояния нет."
+   },
+   {
+    "lever": "Два трека вместо последовательного перебора",
+    "how_much": "срок до первого пригодного КП сокращается примерно вдвое",
+    "why": "Оригинал и заводской премиум-аналог запрашиваются одновременно у разных адресатов, а не по очереди. Пока ETS-Astana и Mepa проверяют привязку к парку, а MWM EECA гоняет комплаенс (это недели), китайский и турецкий треки уже дают цифры. Заказчик получает выбор «оригинал дороже и позже / заводской аналог дешевле и раньше» в одном пакете, а не двумя итерациями с перерывом в месяц."
+   },
+   {
+    "lever": "Ценовые якоря в переговорах",
+    "how_much": "торг ведётся в известном коридоре: потолок genuine $1019 за 4380132 и $69/шт за GI3-3, пол — китайский аналог, внутренний рынок РФ 26,6–41 тыс. ₽",
+    "why": "Публичные цены и остатки (PowerUP, SPLUGS, Takumi, dieselengines.parts) превращают переговоры из угадывания в проверку. Предложение выше потолка означает перепродажу, в разы ниже пола — подделку. Одновременно якорь 41 094 ₽ / 60–90 дней у московского перепродавца — это то, что заказчик может получить без нас, то есть встроенное доказательство ценности прямого сорсинга."
+   },
+   {
+    "lever": "Агрегация спроса на мультипарковых адресатах",
+    "how_much": "11 позиций спроса закрываются рассылкой в 20–25 писем вместо 45–55",
+    "why": "İggnita держит в одном каталоге Cummins, Jenbacher, MWM, Denso и CAT; Techie покрывает Cummins, Jenbacher, MWM, CAT, Waukesha; Jinhua Sizhouda и Makano — Cummins плюс Jenbacher плюс MWM. Отправка всего RFQ одним файлом такому адресату даёт ему коммерчески интересный объём (заметно повышая приоритет нашего запроса в его очереди) и одновременно сокращает число переписок, которые сорсеру надо вести и помнить."
+   },
+   {
+    "lever": "Проверка номеров и происхождения до заказа",
+    "how_much": "снимает риск закупки 200+ неподходящих или неоригинальных свечей и повторного цикла в 25–90 дней",
+    "why": "Три номера в спросе сомнительны (69804 не подтверждается нигде, 12128936 проходит как штифт, 1236100 против 1236099), а рынок засорён товаром, который называется «оригиналом» и при этом либо выпускается в РФ, либо носит собственный бренд продавца. Сверка по паспорту и требование фото упаковки, статуса Original/OEM/собственный бренд и ресурса в моточасах стоят один звонок и одно письмо, а ошибка стоит полного повторного цикла поставки."
+   }
+  ]
+ },
+ "playbook": [
+  {
+   "title": "Работаем в открытую",
+   "text": "Авторизованные каналы (INNIO, Cummins, MWM, Caterpillar) обязаны проверять конечного пользователя. Мы эту проверку не обходим и данные о покупателе не прячем: если политика вендора закрывает поставку — канал помечается закрытым, и позиция закрывается независимым стокистом или заводским аналогом, где ограничений нет. Так адресат не сгорает, а список остаётся честным."
+  },
+  {
+   "title": "Одно письмо — обе цены",
+   "text": "В каждом запросе просить сразу две строки: оригинал (Cummins/INNIO/MWM/Waukesha PN) и заводской аналог (ERS/Hatraco, Denso, Champion, TECHIE). Тогда сравнение цен получается за один круг, а не за два."
+  },
+  {
+   "title": "К каждому PN — фото и парк",
+   "text": "Свечи разных типов внешне похожи. Прикладывать фото маркировки снятой свечи и модель двигателя: это резко снижает долю ответов «пришлите чертёж» и ошибочных подборов."
+  },
+  {
+   "title": "Профильным — по PN, трейдерам — списком",
+   "text": "Производителю и авторизованному дистрибьютору писать адресно по номеру. Трейдеру давать весь свечной блок парка одним письмом — он сам скажет, что закроет."
+  },
+  {
+   "title": "Почта не сработала — меняем канал",
+   "text": "Hatraco: два письма (14.07 и 19.08) — тишина. По таким адресам следующий шаг не третье письмо, а телефон, форма на сайте или локальный дилер (для Hatraco — R M Walsh в Великобритании)."
+  },
+  {
+   "title": "Сначала непрочитанное, потом новая рассылка",
+   "text": "Перед любым новым заходом открыть «Unread Messages»: по свечам там два ответа, по всем паркам — 16."
+  },
+  {
+   "title": "Годовой объём — в теле письма",
+   "text": "Указывать годовую потребность (по спецификации: 6 065 шт зажигания Cummins, 923 шт Jenbacher, 869 шт Denso GI3-3, 442 шт Deutz) и предлагать рамочное соглашение с отгрузкой партиями."
+  },
+  {
+   "title": "Не пишите заводам — пишите стокистам",
+   "text": "Denso дословно: «We only sell to stockists who have an active account with us»; Champion, BorgWarner/BERU, Stitt и Altronic дают только кнопку «Where to buy»; INNIO и MWM продают через реестр провайдеров. Это значит, что любой запрос «в завод» по определению не может вернуть КП — он вернёт в лучшем случае имя дистрибьютора. Заводу писать имеет смысл ровно с одной целью: получить кросс-референс или контакт партнёра в дружественной юрисдикции. Все коммерческие письма — стокистам и трейдерам."
+  },
+  {
+   "title": "Ищите по кросс-номеру, а не по бренду — это главный рычаг",
+   "text": "Проверено и подтверждено минимум двумя независимыми источниками: Jenbacher 1214569 = Denso P518 = Federal Mogul FV76WWCC / 18GZ45 = Goetze G-6004 = ERS 18.021-01/FT00169; Jenbacher P611 1236099/1236100 = ERS 18.043-01/FT00174; Cummins 4380132 = 4390446 = 5544762 = ERS 18.049-01/FT00196; Cummins 5373898 = 4924504 = 4302738; MWM 12420480 = Champion RB75N/RB75WPCC = BERU 18GZ5-77-2 = Bosch 7307/7308 = Denso GL3-1/GL3-3/GL3-5 = Stitt RL807LL = Altronic L1863B/DP/IP; Denso GI3-3 = Champion RB77CC/RB77N/RB77WPCC = BERU 18GZ 4-77/6-77 = Bosch 7302/7305/7306 = Waukesha 60999Z/69919D = CAT 194-8518/224-2700/243-4291/301-6663; наконечник 657541 → новый номер 578732. В каждом письме давайте позицию пятью номерами сразу. Это и снимает брендовую наценку, и кратно повышает шанс, что у поставщика что-то найдётся."
+  },
+  {
+   "title": "Сверьте три сомнительных номера ДО рассылки",
+   "text": "Три позиции в спросе выглядят как ошибки и способны обнулить всю цепочку. (1) Jenbacher 1236100 против 1236099 — это соседние артикулы одного семейства P611, у части поставщиков карточка только на 1236099: спрашивать оба. (2) 12128936 в найденных источниках проходит как установочный штифт TCG2020, а не как уплотнение свечи — перед закупкой перепроверить по паспорту, не тащить вслепую в спецификацию. (3) Waukesha «69804» не подтверждается ни одним каталогом, ни одним продавцом и ни одной кросс-таблицей — вероятно, опечатка от 69919D. Один звонок в эксплуатацию дешевле, чем 200 неподходящих свечей."
+  },
+  {
+   "title": "Разделите спрос на два трека и ведите их параллельно",
+   "text": "Трек «оригинал» — ETS-Astana, Mepa, MWM EECA, İltekno, Topkapı, Orient, Clarke Energy India: медленно, дорого, с проверкой конечного пользователя, но снимает вопрос гарантии (MWM прямо пишет: «Use of unauthorized spare parts or services can void the warranty»). Трек «заводской премиум-аналог» — Hatraco/ERS, PowerUP, MOTORTECH, Denso и Champion через стокистов, из китайцев только те, у кого есть письменный ресурс и образцы. Никогда не смешивайте их в одном письме и не подавайте заказчику китайский аналог как оригинал: у Weyeah в поле Model прямо стоит «Weyeah», а Jinhua Sizhouda честно пишет «best alternative to the original»."
+  },
+  {
+   "title": "Держите на столе четыре ценовых якоря",
+   "text": "Без них торг превращается в угадайку. Genuine Cummins 4380132 — $1 019,23 (США). Denso GI3-3 — $69,00/шт при остатке 191 шт, GI3-5 — $130,00, Champion RB77CC — $27,00, FB77WPCC — $75,00 (розница США): значит 869 шт GI3-3 ≈ $60 тыс. по верхней границе. Наконечник по кроссу 657541 — 256,56 € без НДС (PowerUP, Австрия) против $202,80 у китайца: разница в четверть правдоподобна, разница в разы — подделка. Внутренний рынок РФ по 5373898 — 26 600–41 094 ₽ при сроке 60–90 дней; это то, что заказчик получит и без нас, и именно это число надо побить."
+  },
+  {
+   "title": "Там, где цена спрятана за логином, — регистрируйтесь, а не переписывайтесь",
+   "text": "У İggnita цены открываются только после B2B-регистрации («Please sign up for special prices») — это их бизнес-модель, а не отговорка, и переписка без регистрации даст один лишний раунд задержки. Аналогично: на каждой карточке у них есть кнопка Get a Quote — жать её по каждой нужной SKU быстрее, чем описывать позицию словами в письме. Ссылка на конкретную карточку поставщика в письме сокращает цикл ответа примерно вдвое."
+  },
+  {
+   "title": "В Китае и Турции мессенджер быстрее почты",
+   "text": "У Techie, Jinhua Sizhouda, Makano, Takumi, Changsha Torch, Weyeah и Zuhon мобильный номер = WhatsApp/WeChat, и ответ там приходит за часы, а не за дни. Правило: письмо со спецификацией на почту + короткое сообщение в мессенджер со ссылкой на письмо и на конкретную карточку товара. У турок то же самое работает через WhatsApp на стамбульский номер. У İggnita и Weyeah можно писать по-русски."
+  },
+  {
+   "title": "Не считайте одну и ту же контору двумя котировками",
+   "text": "У Takumi (generatorsparkplug.com) и Changsha Torch Auto Parts (torchscitech) совпадает телефон +86-731-84830658 — это одна чаншайская компания под двумя витринами, обе продают индустриальную линейку Torch. У McGill Industries и SPLUGS совпадает адрес — тоже одна контора. Сравнивать их предложения между собой бессмысленно: вместо этого идти к самому заводу Torch и требовать заводскую цену, а второй витрине сказать, что цена завода известна."
+  },
+  {
+   "title": "Проверяйте товар до партии, а не после",
+   "text": "Обязательный минимум по каждому неоригиналу: фото упаковки и партийной маркировки, письменное указание одного из трёх статусов (Original / OEM / собственный бренд), ресурс в моточасах письменно и образец на тест до серии. Ресурс — та самая цифра, которой заводской аналог отличается от ноунейма: Techie заявляет до 10 000 ч и гарантию 365 дней, Jinhua Sizhouda честно пишет 5000 ч, ERS/Hatraco — plus 50% к оригиналу. Считайте стоимость моточаса, а не штуки: свеча вдвое дешевле при вдвое меньшем ресурсе не экономит ничего, зато удваивает число остановов."
+  },
+  {
+   "title": "Слово «оригинал» в карточке ничего не значит — требуйте происхождение",
+   "text": "Живой пример: ТД Цезарь-Нева в одной карточке пишет «(оригинал)» и одновременно «Данные свечи выпускаются в России для Cummins». Wuhan Weyeah продаёт свечу с полем Model = «Weyeah» в разделе, озаглавленном «Original, OEM and Alternative». Единственная защита — документы: фото упаковки со штрих-кодом производителя, инвойс с указанием происхождения, для премиум-аналога — сертификат или письмо владельца бренда (по ERS его можно перепроверить прямо на sales@hatraco.com)."
+  },
+  {
+   "title": "Что делать с площадками, которые не открываются",
+   "text": "По правилу честности в список не вошли onergys.de/.com, peri-parts.com, MOPA Motor Parts и AP Service & Parts — все четыре отдают 403 через Cloudflare, но по заголовкам выдачи выглядят как точные хиты по нашим номерам (Jenbacher 1236100, 487181, 657541/657540; MWM 12420480 и 12211061 «original»; Cummins 5373898 и 4955850). Их нужно открыть руками из обычного браузера и, если содержимое подтвердится, добавить в рассылку — это, судя по признакам, самые точные попадания в спецификацию из всех найденных."
+  }
+ ],
+ "crosses": [
+  {
+   "pos": "Свеча Cummins 4380132 (773 шт)",
+   "chain": "4380132 ← заменила 5544762; в цепочке 4390446. Заводской премиум-аналог — ERS/Hatraco 18.049-01 (FT00196).",
+   "note": "Подтверждено карточкой Hatraco и каталогом R M Walsh; supersession — dieselengines.parts."
+  },
+  {
+   "pos": "Свеча Cummins 5373898 (1490 шт)",
+   "chain": "5373898 = 4924504 = 4302738 — взаимозаменяемая группа. Китайский аналог TECHIE TISS9826.",
+   "note": "Кросс-лист поставщика WETZ; расширяет пул по самой объёмной позиции."
+  },
+  {
+   "pos": "Свеча Denso GI3-3 (869 шт)",
+   "chain": "GI3-3 = Champion RB77CC / RB77N / RB77WPCC (премиум FB77WPCC) = BERU 18GZ 4-77 / 6-77 = Bosch 7302 / 7305 / 7306 = Waukesha 60999Z / 69919D = Cummins 4098162 / 4010981 / 2866879 = CAT 194-8518 / 224-2700 / 243-4291 / 301-6663.",
+   "note": "Ключевой кросс: одна позиция открывает Waukesha и CAT одновременно."
+  },
+  {
+   "pos": "Свеча MWM/Deutz 12420480 (221 шт)",
+   "chain": "12420480 = Champion RB75N / RB75PP / RB75WPC / RB75WPCC = BERU 18GZ5-77-2 = Bosch 7307 / 7308 = Denso GL3-1 / GL3-3 / GL3-5 = Stitt RL807LL = Altronic L1863B / DP / IP.",
+   "note": "Оригинальность 12420480 подтверждена страницей Caterpillar Energy Solutions (TCG 2016/2020/2032, TBG 441/632)."
+  },
+  {
+   "pos": "Комплект свечей Jenbacher 1214569 (587 шт)",
+   "chain": "1214569 = Denso P518 = Federal Mogul FV76WWCC / 18GZ45 = Goetze G-6004 = ERS 18.021-01 (FT00169).",
+   "note": "Подтверждено дважды — флаер Hatraco и страница RS Motor."
+  },
+  {
+   "pos": "Запальная свеча Jenbacher 1236100 (66 шт)",
+   "chain": "Заводской индекс P611 (пара 1236099/1236100) = ERS 18.043-01 (FT00174).",
+   "note": "У части поставщиков карточка только на 1236099 — спрашивать оба номера."
+  },
+  {
+   "pos": "Наконечник Jenbacher 657541 (242 шт)",
+   "chain": "657541 → новый кросс 578732.",
+   "note": "Подтверждён в связанных товарах PowerUP."
+  }
+ ],
+ "checks": [
+  {
+   "pn": "1236100 / 1236099",
+   "what": "Соседние артикулы одного семейства P611. У части поставщиков карточка только на 1236099.",
+   "do": "В запросе указывать оба номера."
+  },
+  {
+   "pn": "12128936",
+   "what": "В найденных каталогах проходит как установочный штифт TCG2020, а не как уплотнение свечи.",
+   "do": "Сверить по спецификации заказчика до рассылки."
+  },
+  {
+   "pn": "69804 (Waukesha)",
+   "what": "Ни в одном каталоге не подтверждается; похоже на опечатку от 69919D.",
+   "do": "Сверить по паспорту двигателя."
+  }
+ ],
+ "anchors": [
+  {
+   "item": "Cummins 4380132, genuine (США)",
+   "price": "$1 019,23",
+   "src": "розничная витрина genuine-стокиста"
+  },
+  {
+   "item": "Cummins 5544762, genuine (США)",
+   "price": "$1 822,81",
+   "src": "Diesel Parts Direct"
+  },
+  {
+   "item": "Denso GI3-3",
+   "price": "$69,00/шт (остаток 191 шт) → ≈$60 тыс. за 869 шт",
+   "src": "розница США"
+  },
+  {
+   "item": "Denso GI3-5",
+   "price": "$130,00",
+   "src": "розница США"
+  },
+  {
+   "item": "Champion RB77CC / FB77WPCC",
+   "price": "$27,00 / $75,00",
+   "src": "розница США"
+  },
+  {
+   "item": "Наконечник 657541 (кросс 578732)",
+   "price": "256,56 € без НДС",
+   "src": "европейский каталог"
+  },
+  {
+   "item": "Cummins 5373898, перепродажа в РФ",
+   "price": "26 600 – 41 094 ₽, срок 60–90 дней",
+   "src": "российские витрины — верхняя граница коридора"
+  }
+ ],
+ "parks": [
+  {
+   "key": "cummins",
+   "title": "Cummins gas"
+  },
+  {
+   "key": "jenbacher",
+   "title": "Jenbacher"
+  },
+  {
+   "key": "mwm_deutz",
+   "title": "MWM / Deutz"
+  },
+  {
+   "key": "cat",
+   "title": "Caterpillar"
+  },
+  {
+   "key": "waukesha",
+   "title": "Waukesha"
+  },
+  {
+   "key": "other",
+   "title": "прочее (Guascor, MAN, MTU, ГТУ)"
+  }
+ ],
+ "tiers": [
+  {
+   "key": "makers",
+   "title": "заводы и премиум-аналоги"
+  },
+  {
+   "key": "auth",
+   "title": "авторизованные дистрибьюторы"
+  },
+  {
+   "key": "stock",
+   "title": "складские стокисты"
+  },
+  {
+   "key": "trade",
+   "title": "трейдеры и поставщики ЗИП"
+  }
+ ],
+ "park_notes": {
+  "cummins": "Подтверждено документально: 4380132 заменил 5544762 («SUPERSEDED FROM 5544762», dieselengines.parts), а 5373898 = 4924504 = 4302738 — взаимозаменяемая группа (кросс-лист WETZ). Это расширяет пул поставщиков по позиции с максимальным объёмом. Cummins ушёл из РФ, поэтому именно АВТОРИЗОВАННЫЙ дилер — худший канал по genuine с российским конечником; независимый трейдер отвечает охотнее. Ценовой коридор проверен: genuine США — $1019 за 4380132; РФ-перепродажа 5373898 — 26 600–41 094 ₽ при сроке 60–90 дней; китайский заводской аналог — кратно ниже. Красный флаг: карточки РФ-трейдеров одновременно пишут «оригинал» и «выпускаются в России для Cummins» — происхождение требовать документально.",
+  "jenbacher": "Завод в Йенбахе прямых продаж не ведёт: оригинал идёт только через закрытый реестр провайдеров INNIO (jenbacher.com/en/providers/). Реальных типов источника три: авторизованный провайдер в дружественной юрисдикции (ETS-Astana в РК, Topkapı в Турции, Orient Energy в DAFZA, Clarke Energy India), независимый складской трейдер по зажиганию (İggnita, BMF, PowerUP, Weyeah), завод премиум-аналога (ERS/Hatraco, Denso, MOTORTECH/Goetze, Federal Mogul). Ключ к обходу брендового фильтра: Jenbacher 1214569 = Denso P518 = Federal Mogul FV76WWCC/18GZ45 = Goetze G-6004 = ERS 18.021-01 (подтверждено дважды — флаером Hatraco и страницей RS Motor); Jenbacher P611 1236099/1236100 = ERS 18.043-01/FT00174. Наконечник 657541 имеет новый кросс 578732 (подтверждён в связанных товарах PowerUP).",
+  "mwm_deutz": "12420480 подтверждена самим OEM как оригинальная форкамерная свеча MWM (страница Caterpillar Energy Solutions, применимость TCG 2016/2020/2032/3016/3020, TBG 441/632); 12211061 — оригинальное уплотнительное кольцо под 18-мм свечи MWM. Деньги в этом парке сидят в свечах, а не в кольцах: форкамерная свеча уровня оригинала стоит сотни долларов, кольцо — центы, поэтому торговаться надо по свечам, а кольца брать «до кучи» у китайцев. Легальные маршруты: MWM EECA (собственное подразделение Caterpillar Energy Solutions с поимёнными менеджерами по РК и УЗ), İltekno (официальный дистрибьютор MWM с мандатом Solutions Provider по Узбекистану с 2023 г.), İggnita (карточки 12420480 «Orijinal» и 12211061). Номер 12128936 в спросе перепроверить: в найденных источниках он проходит как установочный штифт TCG2020, а не как уплотнение свечи.",
+  "cat": "В rfq_demand.json номеров CAT и Waukesha нет, но парк обслуживается, и через Denso GI3-х эти машины пересекаются с закупаемой позицией GI3-3: карточка Denso GI3-1 у İggnita даёт кроссы CAT OES 194-8518/224-2700/243-4291/301-6663 и Waukesha OES 60999Z/69919D. Официальный канал Waukesha закрыт на сеть провайдеров INNIO — в ней для СНГ критична ES Compression Too (Алматы, функция Parts подтверждена). Дилеры CAT (Borusan, Al-Bahar) физически имеют оригинал и SIS, но продажа с российским конечником заблокирована политикой вендора. Номер «69804» из обихода не подтверждается ни одним каталогом — вероятно, опечатка от 69919D, сверять по паспорту двигателя.",
+  "waukesha": "В rfq_demand.json номеров CAT и Waukesha нет, но парк обслуживается, и через Denso GI3-х эти машины пересекаются с закупаемой позицией GI3-3: карточка Denso GI3-1 у İggnita даёт кроссы CAT OES 194-8518/224-2700/243-4291/301-6663 и Waukesha OES 60999Z/69919D. Официальный канал Waukesha закрыт на сеть провайдеров INNIO — в ней для СНГ критична ES Compression Too (Алматы, функция Parts подтверждена). Дилеры CAT (Borusan, Al-Bahar) физически имеют оригинал и SIS, но продажа с российским конечником заблокирована политикой вендора. Номер «69804» из обихода не подтверждается ни одним каталогом — вероятно, опечатка от 69919D, сверять по паспорту двигателя.",
+  "other": "Главный вывод: ни один производитель промышленных свечей не продаёт конечному промышленному потребителю. Denso дословно: «We only sell to stockists who have an active account with us», плюс на русской странице висит уведомление, что DENSO не работает на территории России и Беларуси. Champion, BorgWarner/BERU, Stitt, Altronic — только «Where to buy» / «Find a distributor». Значит, запросы «в завод» по определению не могут вернуть КП: писать надо стокистам, и лучше сразу вне санкционного периметра. Взамен заводы дают бесплатно то, что дороже КП — карту замен: 12420480 = Champion RB75N/RB75PP/RB75WPC/RB75WPCC = BERU 18GZ5-77-2 = Bosch 7307/7308 = Denso GL3-1/GL3-3/GL3-5 = Stitt RL807LL = Altronic L1863B/DP/IP; GI3-3 = Champion RB77CC/RB77N/RB77WPCC, премиум FB77WPCC = BERU 18GZ 4-77/6-77 = Bosch 7302/7305/7306 = Waukesha 60999Z/69919D = Cummins 4098162/4010981/2866879 = CAT 194-8518/224-2700/243-4291/301-6663."
+ },
+ "hub_note": "Хабы распадаются на два класса, и смешивать их в одном письме нельзя. Независимые стокисты и трейдеры (İggnita, BMF Enerji, Aytuğlu, Lloyd & Fedders) комплаенсом не связаны и реально отгружают покупателю из СНГ. Асимметрия покрытия: Jenbacher и Waukesha в хабах закрыты отлично (по официальному провайдеру в каждой стране), MWM — через İltekno и İggnita, а Cummins gas (наш максимальный объём) закрыт хуже всего: эмиратские и казахстанские каналы Cummins преимущественно дизельные. ОАЭ работают через свободные зоны (DAFZA, JAFZA) — реэкспорт в Центральную Азию там рутинная операция."
+}
