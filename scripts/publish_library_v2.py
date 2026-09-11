@@ -461,7 +461,65 @@ def search_text(row):
     return "\n".join(strings).lower()
 
 
+KV_KEY_KINDS = frozenset(("cas_blob", "current_v2", "revision_v2", "current_v1", "history_v1", "draft", "other"))
+
+
+def key_kind(key):
+    if not isinstance(key, str):
+        return "other"
+    if key == CURRENT:
+        return "current_v2"
+    if key == v1.CURRENT_KEY:
+        return "current_v1"
+    for prefix, kind in ((PREFIX, "cas_blob"), ("library:v2:revision:", "revision_v2"),
+                         ("library:history:", "history_v1"), (v1.DRAFT_PREFIX, "draft")):
+        if key.startswith(prefix):
+            return kind
+    return "other"
+
+
+def value_fingerprint(raw):
+    v1.require(raw is None or isinstance(raw, bytes), "INVALID_READBACK_VALUE")
+    return {"presence": "missing" if raw is None else "value",
+            "bytes": None if raw is None else len(raw),
+            "sha256": None if raw is None else digest(raw)}
+
+
+class KVReadbackError(v1.PublishError):
+    """No raw key, namespace or value crosses the diagnostics boundary."""
+    def __init__(self, kind, expected, observations):
+        super().__init__("KV_READBACK_NOT_CONFIRMED")
+        v1.require(isinstance(kind, str) and kind in KV_KEY_KINDS, "INVALID_READBACK_KIND")
+        def checked(value):
+            v1.require(isinstance(value, dict) and set(value) == {"presence", "bytes", "sha256"}, "INVALID_READBACK_PROOF")
+            missing = value["presence"] == "missing" and value["bytes"] is None and value["sha256"] is None
+            present = (value["presence"] == "value" and type(value["bytes"]) is int and
+                       0 <= value["bytes"] <= MAX_VALUE_BYTES and isinstance(value["sha256"], str) and
+                       re.fullmatch(r"[0-9a-f]{64}", value["sha256"]) is not None)
+            v1.require(missing or present, "INVALID_READBACK_PROOF")
+            return dict(value)
+        v1.require(isinstance(observations, list) and len(observations) == len(v1.READBACK_DELAYS), "INVALID_READBACK_PROOF")
+        attempts = []
+        for number, value in enumerate(observations, 1):
+            v1.require(isinstance(value, dict) and set(value) == {"attempt", "presence", "bytes", "sha256"} and
+                       type(value["attempt"]) is int and value["attempt"] == number, "INVALID_READBACK_PROOF")
+            attempts.append({"attempt": number, **checked({k: v for k, v in value.items() if k != "attempt"})})
+        self.proof = {"key_kind": kind, "expected": checked(expected), "attempts": attempts}
+
+
 class Cloudflare(v1.Cloudflare):
+    def verify(self, namespace, key, expected):
+        expected_proof = value_fingerprint(expected)
+        observations = []
+        for attempt, delay in enumerate(v1.READBACK_DELAYS, 1):
+            if delay:
+                self.sleep(delay)
+            observed = self.get(namespace, key)
+            if observed == expected:
+                return
+            observations.append({"attempt": attempt, **value_fingerprint(observed)})
+        raise KVReadbackError(key_kind(key), expected_proof, observations)
+
     def preserve(self, namespace, key, raw):
         old = self.get(namespace, key)
         v1.require(old is None or old == raw, "HISTORY_REVISION_CONFLICT")
@@ -501,6 +559,50 @@ class Store:
         v1.require(raw is not None and len(raw) == ref["bytes"] and digest(raw) == ref["sha256"],
                    "BLOB_INTEGRITY_FAILED")
         return v1.decode(raw)
+
+
+def audit_current(cf):
+    """Readonly audit of the stable pointer and its manifest, not every blob."""
+    namespace = cf.namespace()
+    raw = cf.get(namespace, CURRENT)
+    if raw is not None:
+        pointer = v1.decode(raw)
+        v1.require(isinstance(pointer, dict) and pointer.get("version") == 2, "INVALID_VERSION")
+        revision = v1.stable_id(pointer.get("revision"))
+        reference = pointer.get("manifest")
+        v1.require(isinstance(reference, dict) and type(reference.get("bytes")) is int and
+                   0 < reference["bytes"] <= MAX_VALUE_BYTES and isinstance(reference.get("sha256"), str) and
+                   re.fullmatch(r"[0-9a-f]{64}", reference["sha256"]) is not None, "INVALID_BLOB_REFERENCE")
+        manifest = Store(cf, namespace).get(reference)
+        v1.require(isinstance(manifest, dict) and manifest.get("version") == 2, "INVALID_VERSION")
+        v1.require(manifest.get("revision") == revision, "REVISION_MISMATCH")
+        count, segments = manifest.get("article_count"), manifest.get("segments")
+        v1.require(type(count) is int and 0 <= count <= MAX_ARTICLES, "INVALID_MANIFEST_COUNTS")
+        v1.require(isinstance(segments, list) and len(segments) <= MAX_SEGMENTS, "INVALID_MANIFEST_COUNTS")
+        total, identities = 0, set()
+        for segment in segments:
+            v1.require(isinstance(segment, dict), "INVALID_MANIFEST_COUNTS")
+            identity = v1.stable_id(segment.get("id"))
+            v1.require(identity not in identities, "DUPLICATE_SEGMENT_ID")
+            identities.add(identity)
+            amount, kinds = segment.get("article_count"), segment.get("counts_by_kind")
+            v1.require(type(amount) is int and 0 <= amount <= MAX_ARTICLES and isinstance(kinds, dict),
+                       "INVALID_MANIFEST_COUNTS")
+            v1.require(set(kinds) == set(KINDS) and
+                       all(type(n) is int and 0 <= n <= MAX_ARTICLES for n in kinds.values()) and
+                       sum(kinds.values()) == amount, "INVALID_MANIFEST_COUNTS")
+            total += amount
+        v1.require(total == count, "INVALID_MANIFEST_COUNTS")
+        v1.require(cf.get(namespace, CURRENT) == raw, "CURRENT_LIBRARY_CHANGED")
+        return {"ok": True, "version": 2, "present": True, "articles": count,
+                "segments": len(segments), "scope": "pointer_and_manifest_only"}
+    legacy_raw = cf.get(namespace, v1.CURRENT_KEY)
+    legacy = v1.snapshot(legacy_raw)
+    v1.require(cf.get(namespace, v1.CURRENT_KEY) == legacy_raw, "LEGACY_LIBRARY_CHANGED")
+    v1.require(cf.get(namespace, CURRENT) is None, "CURRENT_LIBRARY_CHANGED")
+    return {"ok": True, "version": 1 if legacy_raw is not None else None,
+            "present": legacy_raw is not None, "articles": len(legacy["articles"]),
+            "segments": len(legacy["segments"]), "scope": "pointer_and_manifest_only"}
 
 
 def tree(store, leaves, category):
@@ -927,8 +1029,17 @@ def run(db, cf, now=None):
 def main(environ=None):
     env = os.environ if environ is None else environ
     try:
-        result = run(Database(env.get("SUPABASE_DB_URL")),
-                     Cloudflare(env.get("CLOUDFLARE_ACCOUNT_ID"), env.get("CLOUDFLARE_API_TOKEN")))
+        mode = env.get("LIBRARY_PUBLISH_MODE", "publish")
+        v1.require(mode in ("publish", "audit"), "INVALID_PUBLISH_MODE")
+        cf = Cloudflare(env.get("CLOUDFLARE_ACCOUNT_ID"), env.get("CLOUDFLARE_API_TOKEN"))
+        current = audit_current(cf)
+        if mode == "audit":
+            result = {"mode": "audit", **current}
+        else:
+            print(json.dumps({"event": "prepublish_audit", "audit": current}, ensure_ascii=True), file=sys.stderr)
+            result = run(Database(env.get("SUPABASE_DB_URL")), cf)
+    except KVReadbackError as failure:
+        result = {"ok": False, "error": "KV_READBACK_NOT_CONFIRMED", "readback": failure.proof}
     except DatabaseReadError as failure:
         result = {"ok": False, "error": "DATABASE_READ_FAILED",
                   "stage": failure.stage, "sqlstate": failure.sqlstate}
