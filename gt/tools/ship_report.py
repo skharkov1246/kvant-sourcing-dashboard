@@ -79,17 +79,16 @@ def line_value(r: dict) -> float:
 
 
 COLS = [
-    ("Артикул", 10, lambda r: f'<span class="pn">{E(r["pn"])}</span>'),
-    ("Производитель", 7, lambda r: E(r["man"])),
-    ("Наименование", 17, lambda r: E(r["name"])),
-    ("Кол-во", 4, lambda r: f'{r.get("qty", 0)} {E(r.get("unit", ""))}'),
-    ("Продавец", 13, lambda r: seller_cell(r)),
-    ("Стр.", 4, lambda r: E(r.get("seller_country"))),
-    ("Нал.", 4, lambda r: STOCK_RU.get(r.get("in_stock"), "н/д")),
-    ("Срок отгрузки", 12, lambda r: E(r.get("lead_time")) or "—"),
-    ("Цена", 8, money),
+    ("Артикул", 11, lambda r: f'<span class="pn">{E(r["pn"])}</span>'),
+    ("Производитель", 8, lambda r: E(r["man"])),
+    ("Наименование", 21, lambda r: E(r["name"])),
+    ("Кол-во", 5, lambda r: f'{r.get("qty", 0)} {E(r.get("unit", ""))}'),
+    ("Продавец", 17, lambda r: seller_cell(r)),
+    ("Стр.", 5, lambda r: E(r.get("seller_country"))),
+    ("Нал.", 5, lambda r: STOCK_RU.get(r.get("in_stock"), "н/д")),
+    ("Срок отгрузки", 14, lambda r: E(r.get("lead_time")) or "—"),
+    ("Цена", 9, money),
     ("Объём", 5, lambda r: COVERS_RU.get(r.get("covers_qty"), "н/д")),
-    ("Примечание", 16, lambda r: E(r.get("note"))),
 ]
 
 
@@ -104,14 +103,14 @@ def table(rows: list[dict]) -> str:
     if not rows:
         return '<p class="dim">Строк нет.</p>'
     th = "".join(f'<th style="width:{w}%">{E(t)}</th>' for t, w, _ in COLS)
-    trs = []
+    # позиция = один <tbody>: строка данных и примечание не расходятся по страницам
+    bodies = []
     for r in rows:
         tds = "".join(f"<td>{fn(r)}</td>" for _, _, fn in COLS)
-        trs.append(f"<tr>{tds}</tr>")
-    return (
-        f'<table class="t"><thead><tr>{th}</tr></thead>'
-        f'<tbody>{"".join(trs)}</tbody></table>'
-    )
+        note = E(r.get("note"))
+        nrow = f'<tr class="n"><td colspan="{len(COLS)}">{note}</td></tr>' if note else ""
+        bodies.append(f'<tbody class="p"><tr class="d">{tds}</tr>{nrow}</tbody>')
+    return f'<table class="t"><thead><tr>{th}</tr></thead>{"".join(bodies)}</table>'
 
 
 CSS = """
@@ -127,11 +126,13 @@ p  { margin: 0 0 2mm; line-height: 1.35; }
 .dim { color: #666; }
 table.t { width: 100%; border-collapse: collapse; table-layout: fixed; margin-bottom: 3mm; }
 .t thead { display: table-header-group; }
-.t tr { page-break-inside: avoid; }
+.t tbody.p { page-break-inside: avoid; }
 .t th { background: #111; color: #fff; text-align: left; padding: 1.2mm 1.4mm; font-size: 7pt; }
-.t td { padding: 1.2mm 1.4mm; border-bottom: 0.3pt solid #ccc;
-        word-wrap: break-word; overflow-wrap: anywhere; vertical-align: top; }
-.t tbody tr:nth-child(even) td { background: #f5f5f5; }
+.t td { padding: 1.2mm 1.4mm; word-wrap: break-word; overflow-wrap: anywhere;
+        vertical-align: top; }
+.t tr.d td { border-top: 0.3pt solid #bbb; padding-top: 1.6mm; }
+.t tr.n td { color: #444; font-size: 6.9pt; padding-top: 0.4mm; padding-bottom: 1.6mm;
+             line-height: 1.3; }
 .pn { font-family: "DejaVu Sans Mono", monospace; font-weight: bold; }
 table.k { border-collapse: collapse; margin: 0 0 4mm; }
 .k td { padding: 1.4mm 4mm 1.4mm 0; border-bottom: 0.3pt solid #ddd; vertical-align: top; }
