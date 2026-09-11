@@ -28,6 +28,10 @@ on:
       workers:
         description: "Потоков скачивания в каждой части"
         default: "12"
+      retry_failed:
+        description: "Повторить файлы со статусом «не скачался» (сетевая осечка, а не свойство файла)"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -78,4 +82,5 @@ jobs:
           WORKERS: ${{ inputs.workers }}
           DAYS: ${{ inputs.days }}
           LIMIT: ${{ inputs.limit }}
+          RETRY_FAILED: ${{ inputs.retry_failed && '1' || '' }}
         run: python library/indexer.py
