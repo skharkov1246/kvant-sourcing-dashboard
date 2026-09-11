@@ -64,7 +64,7 @@ button,input{font:inherit}button,a,input,summary{-webkit-tap-highlight-color:tra
         <label class="form-field">Количество<input id="recordQuantity" inputmode="decimal" maxlength="32" placeholder="Если указано в запросе"></label>
         <label class="form-field">Единица компонента<input id="recordComponentUnit" maxlength="80" placeholder="Штука, комплект…"></label>
         <label class="form-field">Поставщик или компания<input id="recordSupplier" maxlength="200" placeholder="Полное название"></label>
-        <label class="form-field">Роль компании<select id="recordRole"><option value="unknown">Не установлена</option><option value="maker">OEM / изготовитель оригинала</option><option value="trader">Торговая компания</option><option value="analog">Изготовитель аналога</option><option value="service">Сервисная компания</option></select></label>
+        <label class="form-field">Роль компании<select id="recordRole"><option value="unknown">Не установлена</option><option value="maker">Изготовитель</option><option value="trader">Торговая компания</option><option value="analog">Изготовитель аналога</option><option value="service">Сервисная компания</option></select></label>
         <div id="priceFields" class="wide" hidden><div class="form-grid">
           <h3 class="form-divider">Условия цены</h3>
           <label class="form-field">Цена за единицу *<input id="recordAmount" type="text" inputmode="decimal" maxlength="32" placeholder="Например, 1250,00"></label>
@@ -103,7 +103,7 @@ button,input{font:inherit}button,a,input,summary{-webkit-tap-highlight-color:tra
   ];
   const state = {segments:[],articles:[],segment:'all',section:'overview',subtype:'all',selected:null,query:'',sites:[],pending:null,loading:false,sort:'part_number',sortDirection:1,draftId:null,draftPayload:null,savedDraftPayloads:new Map(),drafts:[],draftCursor:null,draftsLoading:false,draftsLoaded:false,dataReady:false};
   const KINDS=[{id:'overview',name:'Обзор'},{id:'component',name:'Компоненты'},{id:'supplier',name:'Поставщики'},{id:'price',name:'Цены'},{id:'knowledge',name:'Знания'},{id:'sources',name:'Источники'}];
-  const ROLES={maker:'OEM / изготовитель оригинала',trader:'Торговая компания',analog:'Изготовитель аналога',service:'Сервисная компания',unknown:'Роль не установлена'};
+  const ROLES={maker:'Изготовитель',trader:'Торговая компания',analog:'Изготовитель аналога',service:'Сервисная компания',unknown:'Роль не установлена'};
   const mobile = () => window.matchMedia('(max-width: 760px)').matches;
   const node = (tag, cls, value) => {const el=document.createElement(tag);if(cls)el.className=cls;if(value!=null)el.textContent=String(value);return el;};
   const text = (v) => typeof v==='string' ? v : (typeof v==='number' ? String(v) : '');
