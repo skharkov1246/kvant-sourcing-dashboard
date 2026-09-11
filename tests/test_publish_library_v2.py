@@ -331,10 +331,10 @@ def test_draft_unmanaged_collision_rejected_before_database_insert():
 
 
 def relation_projection(**changes):
-    values = {"supplier_uuid": "10000000-0000-0000-0000-000000000001", "supplier_id": row(1)["id"],
+    values = {"supplier_db_id": 1, "supplier_id": row(1)["id"],
               "name": "Synthetic candidate", "edge": {"article_id": row(3)["id"], "position_id": 7,
               "part_number": "T-007", "source_pointer": "/6"},
-              "target_uuid": "20000000-0000-0000-0000-000000000001", "target_id": row(3)["id"],
+              "target_db_id": 3, "target_id": row(3)["id"],
               "part_number": "T-007", "evidence": [{"sha256": "a" * 64, "url": "https://example.test/source",
               "json_pointer": "/6", "repository_path": "zip/data/positions.json"}]}
     values.update(changes)
@@ -352,14 +352,17 @@ class RelatedDB(DB):
             yield segments, p.SourceRows(incoming, relations, metrics)
 
 
-def test_exact_candidate_join_preserves_canonical_sources_and_old_snapshot_bytes():
+@pytest.mark.parametrize("database_ids", [(1, 3), ("1", "3"),
+    ("10000000-0000-0000-0000-000000000001", "20000000-0000-0000-0000-000000000001")])
+def test_exact_candidate_join_preserves_canonical_sources_and_old_snapshot_bytes(database_ids):
     supplier, component = row(1), row(3)
     supplier["sources"]["candidate_position_links"] = [relation_projection()[3]]
     component["sources"]["component_fields"] = {"part_number": "T-007"}
     original = p.encode([supplier, component])
     cf = CF([supplier, component])
     old = cf.values[p.v1.CURRENT_KEY]
-    db = RelatedDB([supplier, component], [relation_projection()])
+    db = RelatedDB([supplier, component], [relation_projection(
+        supplier_db_id=database_ids[0], target_db_id=database_ids[1])])
     result = p.run(db, cf, NOW)
     actual = materialized(cf)
     assert p.encode(db.rows) == original
@@ -381,7 +384,7 @@ def test_exact_candidate_join_preserves_canonical_sources_and_old_snapshot_bytes
 
 def test_missing_target_or_exact_evidence_never_creates_a_guessed_link():
     index, metrics = p.supplier_relations([
-        relation_projection(target_uuid=None, target_id=None, part_number=None),
+        relation_projection(target_db_id=None, target_id=None, part_number=None),
         relation_projection(evidence=[{"sha256": "a" * 64, "json_pointer": "/wrong"}])])
     assert index == {}
     assert metrics == {"edges": 2, "linked": 0, "missing_target": 1, "missing_evidence": 1, "duplicate_edges": 0}
@@ -395,7 +398,7 @@ def test_missing_target_or_exact_evidence_never_creates_a_guessed_link():
 
 
 @pytest.mark.parametrize("changes,error", [
-    ({"supplier_uuid": "synthetic:000001"}, "INVALID_RELATION_DATABASE_ID"),
+    ({"supplier_db_id": "synthetic:000001"}, "INVALID_RELATION_DATABASE_ID"),
     ({"target_id": "synthetic:other"}, "INVALID_RELATION_TARGET"),
     ({"part_number": "T-008"}, "RELATION_PART_NUMBER_MISMATCH"),
     ({"evidence": [{"sha256": "a" * 64, "url": "javascript:bad", "json_pointer": "/6", "repository_path": "zip/data/positions.json"}]}, "INVALID_RELATION_SOURCE_URL")])
@@ -404,10 +407,47 @@ def test_unsafe_or_inconsistent_candidate_projection_fails(changes, error):
         p.supplier_relations([relation_projection(**changes)])
 
 
-@pytest.mark.parametrize("field", ["supplier_uuid", "target_uuid"])
-def test_relation_stable_id_collision_does_not_collapse_database_rows(field):
+@pytest.mark.parametrize("field", ["supplier_db_id", "target_db_id"])
+@pytest.mark.parametrize("different_id", [4, "4", "30000000-0000-0000-0000-000000000001"])
+def test_relation_stable_id_collision_does_not_collapse_database_rows(field, different_id):
     with pytest.raises(p.v1.PublishError, match="RELATION_ID_COLLISION"):
-        p.supplier_relations([relation_projection(), relation_projection(**{field: "30000000-0000-0000-0000-000000000001"})])
+        p.supplier_relations([relation_projection(), relation_projection(**{field: different_id})])
+
+
+def test_internal_database_identity_canonicalization_is_typed_and_never_a_public_id():
+    assert p.database_identity(1) == p.database_identity("1") == ("bigint", 1)
+    assert p.database_identity(9223372036854775807) == p.database_identity("9223372036854775807")
+    value = p.uuid.UUID("abcdefab-cdef-abcd-efab-cdefabcdefab")
+    assert p.database_identity(value) == p.database_identity(str(value).upper()) == ("uuid", str(value))
+    assert p.database_identity(1) != p.database_identity("00000000-0000-0000-0000-000000000001")
+    with pytest.raises(p.v1.PublishError, match="RELATION_ID_COLLISION"):
+        p.supplier_relations([relation_projection(), relation_projection(
+            supplier_db_id="00000000-0000-0000-0000-000000000001")])
+    index, metrics = p.supplier_relations([relation_projection(),
+        relation_projection(supplier_db_id="1", target_db_id="3")])
+    assert metrics["linked"] == metrics["duplicate_edges"] == 1
+    assert set(index) == {row(3)["id"]}
+    assert index[row(3)["id"]][0]["article_id"] == row(1)["id"]
+    uuid_projection = relation_projection(supplier_db_id=value, target_db_id=str(value).replace("abcdefab-", "12345678-", 1))
+    canonical_projection = relation_projection(supplier_db_id=str(value).upper(), target_db_id=uuid_projection[4])
+    _, metrics = p.supplier_relations([uuid_projection, canonical_projection])
+    assert metrics["linked"] == metrics["duplicate_edges"] == 1
+
+
+@pytest.mark.parametrize("invalid", [None, True, False, 0, -1, 9223372036854775808,
+    1.0, [], {}, "", "0", "-1", "+1", "01", " 1", "1 ", "1.0", "١", "１",
+    "9223372036854775808", "00000000000000000000000000000001", "synthetic:000001"])
+def test_invalid_database_identity_fails_before_current_pointer_write(invalid):
+    with pytest.raises(p.v1.PublishError, match="INVALID_RELATION_DATABASE_ID"):
+        p.database_identity(invalid)
+    cf = CF()
+    with pytest.raises(p.v1.PublishError, match="INVALID_RELATION_DATABASE_ID"):
+        p.run(RelatedDB([row(1), row(3)], [relation_projection(supplier_db_id=invalid)]), cf, NOW)
+    assert p.CURRENT not in cf.values
+    if invalid is not None:
+        with pytest.raises(p.v1.PublishError, match="INVALID_RELATION_DATABASE_ID"):
+            p.run(RelatedDB([row(1), row(3)], [relation_projection(target_db_id=invalid)]), cf, NOW)
+        assert p.CURRENT not in cf.values
 
 
 @pytest.mark.parametrize("limit,error", [("MAX_RELATION_EDGES", "RELATION_EDGE_LIMIT"),
@@ -469,7 +509,7 @@ def test_relation_evidence_rejects_same_pointer_in_a_different_source_file():
 
 def test_every_relation_edge_is_accounted_for_including_exact_duplicate_observations():
     projection = [relation_projection(), relation_projection(),
-                  relation_projection(target_uuid=None, target_id=None), relation_projection(evidence=[])]
+                  relation_projection(target_db_id=None, target_id=None), relation_projection(evidence=[])]
     before = p.encode([[str(x) for x in r] for r in projection])
     index, metrics = p.supplier_relations(projection)
     assert metrics == {"edges": 4, "linked": 1, "missing_target": 1, "missing_evidence": 1, "duplicate_edges": 1}

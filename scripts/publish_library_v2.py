@@ -13,6 +13,7 @@ import copy
 from datetime import datetime, timezone
 import hashlib
 import json
+import re
 import os
 import sys
 from urllib import parse
@@ -295,6 +296,21 @@ ORDER BY e.supplier_id COLLATE "C",e.supplier_db_id,e.link->>'article_id',e.link
 LIMIT %s"""
 
 
+def database_identity(value):
+    """Canonical internal row identity, separate from the public importer ID."""
+    if type(value) is int:
+        v1.require(0 < value <= 9223372036854775807, "INVALID_RELATION_DATABASE_ID")
+        return ("bigint", value)
+    if isinstance(value, str) and re.fullmatch(r"[1-9][0-9]{0,18}", value):
+        return database_identity(int(value))
+    if isinstance(value, uuid.UUID):
+        return ("uuid", str(value))
+    if isinstance(value, str) and re.fullmatch(
+            r"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}", value):
+        return ("uuid", str(uuid.UUID(value)))
+    raise v1.PublishError("INVALID_RELATION_DATABASE_ID")
+
+
 def supplier_relations(projection):
     """Reverse explicit article-ID edges; SKU alone never creates a relation."""
     result, identities = defaultdict(list), {}
@@ -309,15 +325,13 @@ def supplier_relations(projection):
         supplier_id = v1.stable_id(supplier_id)
         v1.require(isinstance(edge, dict), "INVALID_RELATION_EDGE")
         requested_id = v1.stable_id(edge.get("article_id"))
-        # Stable public article identity and database UUID have different roles.
+        # Stable public article identity and internal database identity have different roles.
         # Duplicate stable IDs must fail even if they yield different positions.
+        v1.require(supplier_db_id is not None, "INVALID_RELATION_DATABASE_ID")
         for identity, database_id in ((supplier_id, supplier_db_id), (target_id, target_db_id)):
             if database_id is None:
                 continue
-            try:
-                database_id = str(uuid.UUID(str(database_id)))
-            except (ValueError, TypeError, AttributeError):
-                raise v1.PublishError("INVALID_RELATION_DATABASE_ID") from None
+            database_id = database_identity(database_id)
             v1.require(identity not in identities or identities[identity] == database_id,
                        "RELATION_ID_COLLISION")
             identities[identity] = database_id
