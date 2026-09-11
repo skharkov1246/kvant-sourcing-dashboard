@@ -3,7 +3,16 @@ name: Библиотека — публикация проверенных ма�
 # Private content travels from Supabase/owner drafts directly to the existing
 # private KV. Never place it in checkout files, logs, or Actions artifacts.
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "Проверить текущую публикацию или опубликовать материалы"
+        required: true
+        type: choice
+        default: audit
+        options:
+          - audit
+          - publish
   repository_dispatch:
     types: [library-update]
   push:
@@ -40,4 +49,5 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           PYTHONDONTWRITEBYTECODE: "1"
+          LIBRARY_PUBLISH_MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.mode || 'publish' }}
         run: python scripts/publish_library_v2.py

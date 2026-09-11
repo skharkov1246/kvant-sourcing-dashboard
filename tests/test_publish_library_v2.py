@@ -260,8 +260,225 @@ def test_only_fixed_v2_keys_and_namespace_allowed():
 def test_safe_failure_output_never_raw_values(monkeypatch, capsys):
     def failure(*a, **k): raise RuntimeError("synthetic-token PRIVATE body")
     monkeypatch.setattr(p, "Database", failure)
+    monkeypatch.setattr(p, "Cloudflare", lambda *args: CF())
     assert p.main({}) == 1
     assert json.loads(capsys.readouterr().out) == {"ok": False, "error": "PUBLISH_FAILED"}
+
+
+def readback_client(values):
+    cf = object.__new__(p.Cloudflare)
+    sequence = iter(values)
+    reads, sleeps, writes = [], [], []
+    def get(namespace, key):
+        reads.append((namespace, key))
+        return next(sequence)
+    cf.get = get
+    cf.sleep = sleeps.append
+    cf.put = lambda namespace, key, raw: writes.append((namespace, key, raw))
+    return cf, reads, sleeps, writes
+
+
+@pytest.mark.parametrize("key,kind", [(p.PREFIX + "a" * 64, "cas_blob"), (p.CURRENT, "current_v2"),
+    ("library:v2:revision:synthetic", "revision_v2"), (p.v1.CURRENT_KEY, "current_v1"),
+    ("library:history:synthetic", "history_v1"), (p.v1.DRAFT_PREFIX + "synthetic", "draft"),
+    ("PRIVATE-unrecognized-key", "other")])
+def test_readback_failure_has_only_fingerprints_and_keeps_exact_six_attempts(key, kind):
+    expected, wrong = b'PRIVATE expected body', b'PRIVATE wrong body'
+    values = [None, wrong, b'', wrong, None, wrong]
+    cf, reads, sleeps, writes = readback_client(values)
+    with pytest.raises(p.KVReadbackError) as caught:
+        cf.verify("PRIVATE-namespace", key, expected)
+    failure = caught.value
+    assert str(failure) == "KV_READBACK_NOT_CONFIRMED"
+    assert failure.proof == {"key_kind": kind, "expected": p.value_fingerprint(expected),
+        "attempts": [{"attempt": i + 1, **p.value_fingerprint(value)} for i, value in enumerate(values)]}
+    assert len(reads) == 6 and sleeps == [2, 5, 15, 30, 30] and sum(sleeps) == 82 and writes == []
+    serialized = json.dumps(failure.proof)
+    assert all(value not in serialized for value in ("PRIVATE", "namespace", key))
+
+
+def test_readback_success_requires_equal_bytes_not_equivalent_json():
+    expected = b'{"value":1}'
+    cf, reads, sleeps, writes = readback_client([b'{ "value": 1 }', expected])
+    cf.verify("synthetic", p.CURRENT, expected)
+    assert len(reads) == 2 and sleeps == [2] and writes == []
+
+
+def test_preserve_does_not_repeat_put_or_overwrite_after_failed_readback():
+    cf, reads, sleeps, writes = readback_client([None] * 7)
+    with pytest.raises(p.KVReadbackError):
+        cf.preserve("synthetic", p.PREFIX + "a" * 64, b'PRIVATE bytes')
+    assert len(reads) == 7 and len(writes) == 1 and sum(sleeps) == 82
+    cf, _, sleeps, writes = readback_client([b'other bytes'])
+    with pytest.raises(p.v1.PublishError, match="HISTORY_REVISION_CONFLICT"):
+        cf.preserve("synthetic", p.PREFIX + "a" * 64, b'PRIVATE bytes')
+    assert writes == sleeps == []
+
+
+def test_uncertain_put_uses_diagnostic_verify_without_another_put():
+    cf, reads, sleeps, _ = readback_client([None] * 6)
+    calls = []
+    cf.value_path = lambda namespace, key: "/synthetic"
+    def envelope(method, path, raw):
+        calls.append(method)
+        raise p.v1.PublishError("CLOUDFLARE_WRITE_OUTCOME_UNCONFIRMED")
+    cf.envelope = envelope
+    with pytest.raises(p.KVReadbackError):
+        p.v1.Cloudflare.put(cf, "synthetic", p.CURRENT, b'PRIVATE expected')
+    assert calls == ["PUT"] and len(reads) == 6 and sum(sleeps) == 82
+
+
+def test_readback_exception_proof_cannot_smuggle_unknown_fields_or_raw_values():
+    fingerprint = p.value_fingerprint(b'synthetic')
+    attempts = [{"attempt": i + 1, **fingerprint} for i in range(6)]
+    for expected in ({**fingerprint, "raw": "PRIVATE"}, {**fingerprint, "sha256": "PRIVATE"},
+                     {**fingerprint, "presence": "PRIVATE"}):
+        with pytest.raises(p.v1.PublishError, match="INVALID_READBACK_PROOF"):
+            p.KVReadbackError("cas_blob", expected, attempts)
+    with pytest.raises(p.v1.PublishError, match="INVALID_READBACK_KIND"):
+        p.KVReadbackError("PRIVATE", fingerprint, attempts)
+
+
+def published_audit_fixture():
+    cf = CF()
+    p.run(DB([row(1), row(3)]), cf, NOW)
+    cf.puts.clear()
+    cf.reads.clear()
+    return cf
+
+
+def test_audit_current_v2_reads_only_pointer_manifest_pointer_and_never_writes():
+    cf = published_audit_fixture()
+    before = dict(cf.values)
+    pointer = p.v1.decode(cf.values[p.CURRENT])
+    result = p.audit_current(cf)
+    assert result == {"ok": True, "version": 2, "present": True, "articles": 2,
+                      "segments": 2, "scope": "pointer_and_manifest_only"}
+    assert cf.reads == [p.CURRENT, p.PREFIX + pointer["manifest"]["sha256"], p.CURRENT]
+    assert cf.values == before and cf.puts == []
+
+
+def test_audit_v2_corruption_never_falls_back_to_valid_legacy():
+    cf = published_audit_fixture()
+    legacy = CF([row(7)])
+    cf.values[p.v1.CURRENT_KEY] = legacy.values[p.v1.CURRENT_KEY]
+    pointer = p.v1.decode(cf.values[p.CURRENT])
+    cf.values[p.PREFIX + pointer["manifest"]["sha256"]] = b'PRIVATE corrupted value'
+    with pytest.raises(p.v1.PublishError, match="BLOB_INTEGRITY_FAILED"):
+        p.audit_current(cf)
+    assert p.v1.CURRENT_KEY not in cf.reads and cf.puts == []
+
+
+@pytest.mark.parametrize("mutation,error", [
+    (lambda manifest: manifest.update(revision="synthetic-wrong-revision"), "REVISION_MISMATCH"),
+    (lambda manifest: manifest.update(article_count=True), "INVALID_MANIFEST_COUNTS"),
+    (lambda manifest: manifest.update(article_count=3), "INVALID_MANIFEST_COUNTS"),
+    (lambda manifest: manifest["segments"].append(copy.deepcopy(manifest["segments"][0])), "DUPLICATE_SEGMENT_ID")])
+def test_audit_rejects_validly_hashed_but_inconsistent_manifest(mutation, error):
+    cf = published_audit_fixture()
+    pointer = p.v1.decode(cf.values[p.CURRENT])
+    manifest = p.v1.decode(cf.values[p.PREFIX + pointer["manifest"]["sha256"]])
+    mutation(manifest)
+    raw = p.encode(manifest)
+    reference = {"sha256": p.digest(raw), "bytes": len(raw)}
+    cf.values[p.PREFIX + reference["sha256"]] = raw
+    cf.values[p.CURRENT] = p.encode({**pointer, "manifest": reference})
+    with pytest.raises(p.v1.PublishError, match=error):
+        p.audit_current(cf)
+    assert cf.puts == []
+
+
+def test_audit_rejects_changed_current_and_legacy_to_v2_race():
+    cf = published_audit_fixture()
+    original_get = cf.get
+    count = 0
+    def changed_get(namespace, key):
+        nonlocal count
+        if key == p.CURRENT:
+            count += 1
+            if count == 2: return b'changed'
+        return original_get(namespace, key)
+    cf.get = changed_get
+    with pytest.raises(p.v1.PublishError, match="CURRENT_LIBRARY_CHANGED"):
+        p.audit_current(cf)
+    cf = CF([row(3)])
+    original_get, count = cf.get, 0
+    def appeared_get(namespace, key):
+        nonlocal count
+        if key == p.CURRENT:
+            count += 1
+            if count == 2: return b'new-v2-pointer'
+        return original_get(namespace, key)
+    cf.get = appeared_get
+    with pytest.raises(p.v1.PublishError, match="CURRENT_LIBRARY_CHANGED"):
+        p.audit_current(cf)
+    assert cf.puts == []
+
+
+@pytest.mark.parametrize("legacy", [None, [row(3)]])
+def test_audit_legacy_or_empty_state_is_explicit_and_readonly(legacy):
+    cf = CF(legacy)
+    before = dict(cf.values)
+    result = p.audit_current(cf)
+    assert result["version"] == (1 if legacy is not None else None)
+    assert result["present"] is (legacy is not None)
+    assert result["articles"] == (1 if legacy else 0)
+    assert result["scope"] == "pointer_and_manifest_only"
+    assert cf.reads == [p.CURRENT, p.v1.CURRENT_KEY, p.v1.CURRENT_KEY, p.CURRENT]
+    assert cf.values == before and cf.puts == []
+
+
+def test_main_audit_mode_never_constructs_database_or_calls_run(monkeypatch, capsys):
+    cf = published_audit_fixture()
+    monkeypatch.setattr(p, "Cloudflare", lambda *args: cf)
+    def forbidden(*args, **kwargs): pytest.fail("Audit must not open DB or publish")
+    monkeypatch.setattr(p, "Database", forbidden)
+    monkeypatch.setattr(p, "run", forbidden)
+    assert p.main({"LIBRARY_PUBLISH_MODE": "audit"}) == 0
+    output = capsys.readouterr()
+    result = json.loads(output.out)
+    assert result["mode"] == "audit" and result["articles"] == 2 and result["scope"] == "pointer_and_manifest_only"
+    assert output.err == "" and cf.puts == []
+
+
+def test_main_default_has_one_stderr_audit_then_one_final_stdout_failure(monkeypatch, capsys):
+    cf = published_audit_fixture()
+    failing_cf, _, _, _ = readback_client([None] * 6)
+    with pytest.raises(p.KVReadbackError) as caught:
+        failing_cf.verify("PRIVATE-namespace", p.PREFIX + "a" * 64, b'PRIVATE expected card')
+    failure = caught.value
+    order = []
+    original_audit = p.audit_current
+    def audit(cf):
+        order.append("audit")
+        return original_audit(cf)
+    def database(*args):
+        order.append("database")
+        return object()
+    def publish(*args):
+        order.append("publish")
+        raise failure
+    monkeypatch.setattr(p, "Cloudflare", lambda *args: cf)
+    monkeypatch.setattr(p, "audit_current", audit)
+    monkeypatch.setattr(p, "Database", database)
+    monkeypatch.setattr(p, "run", publish)
+    assert p.main({}) == 1
+    output = capsys.readouterr()
+    assert len(output.err.splitlines()) == len(output.out.splitlines()) == 1
+    assert json.loads(output.err) == {"event": "prepublish_audit", "audit": original_audit(cf)}
+    assert json.loads(output.out) == {"ok": False, "error": "KV_READBACK_NOT_CONFIRMED", "readback": failure.proof}
+    assert "PRIVATE" not in output.err + output.out and order == ["audit", "database", "publish"]
+
+
+@pytest.mark.parametrize("mode", ["", "other", "AUDIT", "audit\nPRIVATE"])
+def test_unknown_mode_fails_before_any_external_client(mode, monkeypatch, capsys):
+    def forbidden(*args): pytest.fail("Unknown mode must not construct any client")
+    monkeypatch.setattr(p, "Cloudflare", forbidden)
+    monkeypatch.setattr(p, "Database", forbidden)
+    assert p.main({"LIBRARY_PUBLISH_MODE": mode}) == 1
+    output = capsys.readouterr()
+    assert json.loads(output.out) == {"ok": False, "error": "INVALID_PUBLISH_MODE"}
+    assert output.err == ""
 
 
 def test_source_bundle_has_named_server_cursor_and_readonly_transaction():
@@ -380,7 +597,7 @@ def test_driver_failure_has_only_allowlisted_stage_and_sqlstate(stage, monkeypat
     assert str(failure) == "DATABASE_READ_FAILED"
     assert failure.stage == stage and failure.sqlstate == "57014"
     monkeypatch.setattr(p, "Database", lambda *args: db)
-    monkeypatch.setattr(p, "Cloudflare", lambda *args: object())
+    monkeypatch.setattr(p, "Cloudflare", lambda *args: CF())
     def fail(*args, **kwargs): raise failure
     monkeypatch.setattr(p, "run", fail)
     assert p.main({}) == 1
