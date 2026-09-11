@@ -507,11 +507,20 @@ class KVReadbackError(v1.PublishError):
                        type(value["attempt"]) is int and value["attempt"] == number, "INVALID_READBACK_PROOF")
             attempts.append({"attempt": number, **checked({k: v for k, v in value.items() if k != "attempt"})})
         context = {"outcome": "not_observed", "elapsed_ms": None} if write_context is None else write_context
-        v1.require(isinstance(context, dict) and set(context) == {"outcome", "elapsed_ms"}, "INVALID_WRITE_CONTEXT")
+        v1.require(isinstance(context, dict), "INVALID_WRITE_CONTEXT")
+        fields = {"outcome", "elapsed_ms"}
+        if context.get("outcome") == "transport_uncertain":
+            fields.update(("reason", "http_status"))
+        v1.require(set(context) == fields, "INVALID_WRITE_CONTEXT")
         outcome, elapsed = context["outcome"], context["elapsed_ms"]
         v1.require((outcome == "not_observed" and elapsed is None) or
                    (outcome in ("acknowledged", "transport_uncertain") and type(elapsed) is int and
                     0 <= elapsed <= MAX_WRITE_ELAPSED_MS), "INVALID_WRITE_CONTEXT")
+        if outcome == "transport_uncertain":
+            reason, status = context["reason"], context["http_status"]
+            v1.require(reason is None or (isinstance(reason, str) and reason in v1.TRANSPORT_REASONS), "INVALID_WRITE_CONTEXT")
+            v1.require((reason == "http_error" and type(status) is int and status in v1.TRANSPORT_HTTP_STATUSES) or
+                       (reason != "http_error" and status is None), "INVALID_WRITE_CONTEXT")
         self.proof = {"key_kind": kind, "expected": checked(expected), "attempts": attempts,
                       "write_context": dict(context)}
 
@@ -525,16 +534,30 @@ class Cloudflare(v1.Cloudflare):
         v1.require(isinstance(raw, bytes) and len(raw) <= v1.MAX_BYTES, "LIBRARY_TOO_LARGE")
         expected = value_fingerprint(raw)
         started = time.monotonic()
-        def record(outcome):
+        def record(outcome, failure=None):
             elapsed = min(MAX_WRITE_ELAPSED_MS, max(0, int((time.monotonic() - started) * 1000)))
             self._last_write = {"namespace": namespace, "key": key, "expected": expected,
                                 "outcome": outcome, "elapsed_ms": elapsed}
+            if outcome == "transport_uncertain":
+                reason, status = None, None
+                try:
+                    candidate = getattr(failure, "transport_reason", None)
+                    code = getattr(failure, "transport_http_status", None)
+                    if isinstance(candidate, str) and candidate in v1.TRANSPORT_REASONS:
+                        if candidate == "http_error":
+                            if type(code) is int and code in v1.TRANSPORT_HTTP_STATUSES:
+                                reason, status = candidate, code
+                        else:
+                            reason = candidate
+                except Exception:
+                    pass
+                self._last_write.update(reason=reason, http_status=status)
         try:
             self.envelope("PUT", path, raw)
         except v1.PublishError as failure:
             if str(failure) != "CLOUDFLARE_WRITE_OUTCOME_UNCONFIRMED":
                 raise
-            record("transport_uncertain")
+            record("transport_uncertain", failure)
             # Inherited transport timeout and single-PUT policy stay unchanged.
             self.verify(namespace, key, raw)
         else:
@@ -544,7 +567,10 @@ class Cloudflare(v1.Cloudflare):
         context = getattr(self, "_last_write", None)
         if (isinstance(context, dict) and context.get("namespace") == namespace and
                 context.get("key") == key and context.get("expected") == expected):
-            return {"outcome": context["outcome"], "elapsed_ms": context["elapsed_ms"]}
+            result = {"outcome": context["outcome"], "elapsed_ms": context["elapsed_ms"]}
+            if context["outcome"] == "transport_uncertain":
+                result.update(reason=context["reason"], http_status=context["http_status"])
+            return result
         return {"outcome": "not_observed", "elapsed_ms": None}
 
     def verify(self, namespace, key, expected):
