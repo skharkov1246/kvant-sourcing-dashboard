@@ -341,6 +341,7 @@
       },
       "referenced_by": [
         "pnw/tools/build_suppliers.py",
+        "tests/test_publish_library_v2.py",
         "zip/build.py",
         "zip/tools/cat_stock.py",
         "zip/tools/who_supplies.py"
@@ -724,14 +725,14 @@
       "referenced_by": [
         "pnw/tools/build_master.py",
         "pnw/tools/parse_crossrefs.py",
+        "scripts/publish_library_v2.py",
+        "tests/test_publish_library_v2.py",
         "zip/build.py",
         "zip/customs/glbs_pull.mjs",
         "zip/tools/aggregate_customs.py",
         "zip/tools/aggregate_prices.py",
         "zip/tools/import_sheet.py",
-        "zip/tools/perf_classes.py",
-        "zip/tools/pilot_order.py",
-        "zip/tools/pilot_pdf.py"
+        "zip/tools/perf_classes.py"
       ]
     },
     {

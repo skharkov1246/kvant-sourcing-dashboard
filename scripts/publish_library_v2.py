@@ -13,6 +13,7 @@ import copy
 from datetime import datetime, timezone
 import hashlib
 import json
+import re
 import os
 import sys
 from urllib import parse
@@ -32,10 +33,361 @@ TREE_FANOUT = 64
 MAX_BUFFER_BYTES = 8 * 1024 * 1024
 MAX_ARTICLE_RESPONSE_BYTES = 2 * 1024 * 1024
 SUMMARY_SOURCES_BYTES = 16 * 1024
+MAX_RELATION_EDGES = 25_000
+MAX_COMPONENT_RELATIONS = 512
+MAX_RELATION_BYTES = 8 * 1024 * 1024
 KINDS = ("knowledge", "supplier", "price", "component")
+# Exact source-family labels only. Parity with the reader is tested; this adds
+# search aliases without rewriting canonical titles, sources or full records.
+COMPONENT_FAMILIES = {
+    "Однорядный радиальный шариковый": "Однорядный радиальный шариковый подшипник",
+    "Стальной профиль": "Стальной профиль", "Приводная цепь": "Приводная цепь",
+    "Втулочная приводная цепь": "Втулочная приводная цепь", "Пластинчатая цепь": "Пластинчатая цепь",
+    "single_row_ball": "Однорядный шариковый подшипник",
+    "double_row_ball": "Двухрядный шариковый подшипник",
+    "electric_motor": "Электродвигатель", "programmable_controller": "Программируемый контроллер",
+    "controller_io_module": "Модуль ввода-вывода контроллера", "motion_controller": "Контроллер управления движением",
+    "hydraulic_gear_pump": "Шестерённый гидравлический насос",
+    "hydraulic_gear_pump_stage": "Секция шестерённого гидравлического насоса",
+    "spherical_roller": "Сферический роликовый подшипник",
+    "cylindrical_roller": "Цилиндрический роликовый подшипник",
+    "tapered_roller": "Конический роликовый подшипник",
+    "deep_groove_ball": "Радиальный шариковый подшипник",
+    "angular_contact_ball": "Радиально-упорный шариковый подшипник",
+    "self_aligning_ball": "Самоустанавливающийся шариковый подшипник",
+    "thrust_ball": "Упорный шариковый подшипник",
+}
+# These are explicit catalogue family fields, qualified by the stated OEM.
+# In particular, no prefix/substring of a part number is used as a family.
+OEM_COMPONENT_FAMILIES = {
+    "Dormer Pramet": {
+        "R023": "Короткое твердосплавное сверло",
+        "R003": "Твердосплавное сверло",
+        "RS403": "Твердосплавное сверло",
+        "RC403": "Твердосплавное сверло",
+        "RS405": "Твердосплавное сверло",
+        "RC405": "Твердосплавное сверло",
+        "RC408": "Твердосплавное сверло",
+        "RC305": "Твердосплавное микросверло",
+        "RC412": "Твердосплавное сверло для глубоких отверстий",
+        "RC416": "Твердосплавное сверло для глубоких отверстий",
+        "RC420": "Твердосплавное сверло для глубоких отверстий",
+        "RC4P": "Твердосплавное пилотное сверло",
+        "R122": "Твердосплавное сверло для засверливания",
+        "R123": "Твердосплавное сверло для засверливания",
+        "R125": "Твердосплавное сверло для засверливания",
+        "R6011": "Твердосплавное сверло для засверливания",
+        "R200": "Твердосплавное центровочное сверло",
+        "R7131": "Твердосплавное ступенчатое сверло"
+    },
+    "Pentair": {
+        "PENTEK 3G SLIM LINE FILTER HOUSINGS": "Корпус фильтра",
+        "PENTEK 3G STANDARD SERIES FILTER HOUSINGS": "Корпус фильтра",
+        "PENTEK ALL NATURAL FILTER HOUSINGS": "Корпус фильтра",
+        "PENTEK BIG BLUE HEAVY DUTY FILTER HOUSINGS": "Корпус фильтра",
+        "PENTEK BIG BLUE WITH DRAIN FILTER HOUSINGS": "Корпус фильтра",
+        "PENTEK BIG CLEAR HEAVY DUTY FILTER HOUSINGS": "Корпус фильтра",
+        "PENTEK BIG WHITE FILTER HOUSINGS": "Корпус фильтра",
+        "PENTEK BIG WHITE WITH BYPASS FILTER HOUSINGS": "Корпус фильтра",
+        "PENTEK CARBON BLOCK CARTRIDGES": "Фильтрующий картридж",
+        "PENTEK CARBON BLOCK MULTI-MEDIA CARTRIDGES": "Фильтрующий картридж",
+        "PENTEK CERAMIC CARTRIDGE": "Фильтрующий картридж",
+        "PENTEK CHLORAMINE REDUCTION CARBON CARTRIDGES": "Фильтрующий картридж",
+        "PENTEK COCONUT SHELL GRANULAR ACTIVATED CARBON CARTRIDGES": "Фильтрующий картридж",
+        "PENTEK COCONUT-BASED CARBON BLOCK CARTRIDGES": "Фильтрующий картридж",
+        "PENTEK COUNTER TOP SLIM LINE SERIES FILTER HOUSINGS": "Корпус фильтра",
+        "PENTEK DIAMOND FLOW CARTRIDGES": "Фильтрующий картридж",
+        "PENTEK DUAL PURPOSE POWDER-ACTIVATED CARBON CARTRIDGE": "Фильтрующий картридж",
+        "PENTEK DUAL PURPOSE POWDER-ACTIVATED CARBON CARTRIDGES": "Фильтрующий картридж",
+        "PENTEK ELPC ELECTROPLATING CARBON CARTRIDGES": "Фильтрующий картридж",
+        "PENTEK FLAT CAP SLIM LINE FILTER HOUSINGS": "Корпус фильтра",
+        "PENTEK GRADIENT DENSITY CARTRIDGES": "Фильтрующий картридж",
+        "PENTEK GRANULAR ACTIVATED CARBON CARTRIDGES": "Фильтрующий картридж",
+        "PENTEK HEXAMETAPHOSPHATE CRYSTAL CARTRIDGES": "Фильтрующий картридж",
+        "PENTEK HIGH TEMPERATURE FILTER HOUSINGS": "Корпус фильтра",
+        "PENTEK MICROGUARD SERIES CARTRIDGES": "Фильтрующий картридж",
+        "PENTEK MIXED BED DEIONIZATION CARTRIDGES": "Фильтрующий картридж",
+        "PENTEK MODIFIED EPSILON CARBON BLOCK CARTRIDGES": "Фильтрующий картридж",
+        "PENTEK MODIFIED MOLDED BLOCK CARTRIDGE": "Фильтрующий картридж",
+        "PENTEK MODIFIED MOLDED BLOCK CARTRIDGES": "Фильтрующий картридж",
+        "PENTEK MODIFIED MOLDED CARBON BLOCK CARTRIDGES": "Фильтрующий картридж",
+        "PENTEK MPST 1.5 STAINLESS STEEL FILTER HOUSINGS": "Корпус фильтра",
+        "PENTEK NON-CELLULOSE CARBON-IMPREGNATED PLEATED CARTRIDGES": "Фильтрующий картридж",
+        "PENTEK PBH BAG FILTER HOUSINGS": "Корпус фильтра",
+        "PENTEK PLEATED CELLULOSE CARTRIDGES": "Фильтрующий картридж",
+        "PENTEK PLEATED CELLULOSE POLYESTER CARTRIDGES": "Фильтрующий картридж",
+        "PENTEK PLEATED POLYESTER CARTRIDGES": "Фильтрующий картридж",
+        "PENTEK POLYDEPTH CARTRIDGES": "Фильтрующий картридж",
+        "PENTEK POLYPROPYLENE STRING WOUND CARTRIDGES": "Фильтрующий картридж",
+        "PENTEK POLYPROPYLENE STRING-WOUND CARTRIDGES": "Фильтрующий картридж",
+        "PENTEK POLYPROPYLENE WOUND CARTRIDGES": "Фильтрующий картридж",
+        "PENTEK RADIAL FLOW IRON REDUCTION CARTRIDGE": "Фильтрующий картридж",
+        "PENTEK SCBC-10 ANTIMICROBIAL CARBON BLOCK CARTRIDGE": "Фильтрующий картридж",
+        "PENTEK SLIM LINE FILTER HOUSINGS": "Корпус фильтра",
+        "PENTEK SPECIALTY GRANULAR ACTIVATED CARBON/PHOSPHATE CARTRIDGE": "Фильтрующий картридж",
+        "PENTEK SPUN-BONDED POLYPROPYLENE CARTRIDGES": "Фильтрующий картридж",
+        "PENTEK ST SERIES STAINLESS STEEL FILTER HOUSINGS": "Корпус фильтра",
+        "PENTEK ST-BC SERIES STAINLESS STEEL FILTER HOUSINGS": "Корпус фильтра",
+        "PENTEK STANDARD FILTER HOUSINGS": "Корпус фильтра",
+        "PENTEK STANDARD FLAT CAP FILTER HOUSINGS": "Корпус фильтра",
+        "PENTEK UDS/DBC SERIES CARTRIDGES": "Фильтрующий картридж",
+        "PENTEK VALVE-IN-HEAD SERIES FILTER HOUSINGS": "Корпус фильтра",
+        "PENTEK WATER SOFTENER CARTRIDGES": "Фильтрующий картридж",
+        "PENTEK FILTER BAGS": "Фильтрующий мешок",
+        "PENTAIR THIN LAYER COMPOSITE MEMBRANES": "Тонкоплёночная композитная мембрана",
+        "PENTEK ULTRAVIOLET SYSTEMS": "Ультрафиолетовая система",
+        "PENTEK REVERSE OSMOSIS DRINKING WATER SYSTEM": "Система обратного осмоса"
+    },
+    "Danfoss": {
+        "XB04-1": "Паяный пластинчатый теплообменник",
+        "XB04-2": "Паяный пластинчатый теплообменник",
+        "XB10-1": "Паяный пластинчатый теплообменник",
+        "XB10-2": "Паяный пластинчатый теплообменник",
+        "XB20-1": "Паяный пластинчатый теплообменник",
+        "XB20-2": "Паяный пластинчатый теплообменник",
+        "XB24-1": "Паяный пластинчатый теплообменник",
+        "XB30-1": "Паяный пластинчатый теплообменник",
+        "XB30-2": "Паяный пластинчатый теплообменник",
+        "XB51H-1": "Паяный пластинчатый теплообменник",
+        "XB51H-1 SB": "Паяный пластинчатый теплообменник",
+        "XB51H-2": "Паяный пластинчатый теплообменник",
+        "XB51L-1": "Паяный пластинчатый теплообменник",
+        "XB51L-1 SB": "Паяный пластинчатый теплообменник",
+        "XB51L-2": "Паяный пластинчатый теплообменник",
+        "XB70H-1": "Паяный пластинчатый теплообменник",
+        "XB70L-1": "Паяный пластинчатый теплообменник",
+        "XB70M-1": "Паяный пластинчатый теплообменник"
+    },
+    "Tsurumi": {
+        "KTZ": "Погружной дренажный насос"
+    },
+    "Swagelok": {
+        "40G": "Шаровой кран",
+        "40GX": "Шаровой кран"
+    }
+}
+
+PENTAIR_ACCESSORY_FAMILIES = [
+    "PENTEK 3G STANDARD SERIES FILTER HOUSINGS",
+    "PENTEK ALL NATURAL FILTER HOUSINGS",
+    "PENTEK BIG BLUE HEAVY DUTY FILTER HOUSINGS",
+    "PENTEK BIG BLUE WITH DRAIN FILTER HOUSINGS",
+    "PENTEK BIG CLEAR HEAVY DUTY FILTER HOUSINGS",
+    "PENTEK BIG WHITE FILTER HOUSINGS",
+    "PENTEK BIG WHITE WITH BYPASS FILTER HOUSINGS",
+    "PENTEK COUNTER TOP SLIM LINE SERIES FILTER HOUSINGS",
+    "PENTEK SLIM LINE FILTER HOUSINGS",
+    "PENTEK ST SERIES STAINLESS STEEL FILTER HOUSINGS",
+    "PENTEK ST-BC SERIES STAINLESS STEEL FILTER HOUSINGS",
+    "PENTEK STANDARD FILTER HOUSINGS",
+    "PENTEK VALVE-IN-HEAD SERIES FILTER HOUSINGS",
+    "Pentek water filtration"
+]
+
+PENTAIR_DESCRIPTION_LABELS = {
+    "Thin Film Membrane": "Тонкоплёночная мембрана",
+    "Cartridge Set": "Комплект картриджей",
+    "RO Replacement Cartridge Set": "Комплект сменных картриджей для обратного осмоса",
+    "Spanner Wrench": "Ключ для корпуса фильтра",
+    "Faucet": "Кран",
+    "Auto Shut-Off Valve": "Автоматический запорный клапан",
+    "ST Gasket , BUNA-N": "Прокладка ST",
+    "ST Gasket, Teflon": "Прокладка ST",
+    "ST Gasket, Viton": "Прокладка ST",
+    "ST Gasket, Silicone": "Прокладка ST",
+    "Gasket for STBC Series": "Прокладка STBC",
+    "Two-Housing Bracket": "Кронштейн для двух корпусов",
+    "Three-Housing Bracket": "Кронштейн для трёх корпусов",
+    "Housing Stand": "Подставка для корпуса",
+    "ST Centering Spring": "Центрирующая пружина ST"
+}
+
+VALVE_FLOW_LABELS = {
+    "two_way_straight": "Арматура: двухходовая прямоточная",
+    "two_way_straight_shutoff": "Арматура: двухходовая прямоточная запорная",
+    "three_way_switching": "Арматура: трёхходовая переключающая"
+}
+
+
+def known_component_family(fields):
+    if not isinstance(fields, dict) or not isinstance(fields.get("family"), str):
+        return ""
+    family, oem = fields["family"], fields.get("oem")
+    qualified = OEM_COMPONENT_FAMILIES.get(oem, {}) if isinstance(oem, str) else {}
+    return qualified.get(family) or COMPONENT_FAMILIES.get(family, "")
+
+
+def component_type_label(sources, segment_id=None):
+    if not isinstance(sources, dict):
+        return ""
+    fields = sources.get("component_fields")
+    if not isinstance(fields, dict):
+        return ""
+    typed = sources.get("typedfields", {})
+    spec = typed.get("specification", {}) if isinstance(typed, dict) else {}
+    spec = spec if isinstance(spec, dict) else {}
+    values = spec.get("catalogue_fields_as_printed", {})
+    values = values if isinstance(values, dict) else {}
+    description = values.get("DESCRIPTION")
+    description = description if isinstance(description, str) else ""
+    oem = fields.get("oem") if isinstance(fields.get("oem"), str) else ""
+    family = fields.get("family") if isinstance(fields.get("family"), str) else ""
+    if oem == "Pentair":
+        if segment_id != "water":
+            return ""
+        families = OEM_COMPONENT_FAMILIES.get("Pentair", {})
+        if fields.get("is_accessory") is True:
+            if family not in PENTAIR_ACCESSORY_FAMILIES:
+                return ""
+            # This field contains only a shared, non-conflicting table value.
+            # Never choose the first of the original per-observation versions.
+            label = PENTAIR_DESCRIPTION_LABELS.get(description, "Принадлежность системы фильтрации")
+            return label + (" · " + description if description else "")
+        if fields.get("is_accessory") is not False:
+            return ""
+        if family == "PENTEK QUICK-CHANGE FILTRATION SYSTEMS":
+            return "Сменный картридж фильтра" if isinstance(values.get("CARTRIDGE COLOR"), str) and values["CARTRIDGE COLOR"] else ""
+        if family == "Pentek water filtration":
+            return PENTAIR_DESCRIPTION_LABELS.get(description, "")
+        return families.get(family, "")
+    if oem == "Swagelok" and segment_id == "valves":
+        if spec.get("valve_type") == "ball":
+            return "Шаровой кран"
+        if family in OEM_COMPONENT_FAMILIES["Swagelok"]:
+            return OEM_COMPONENT_FAMILIES["Swagelok"][family]
+        flow = spec.get("flow_pattern")
+        return VALVE_FLOW_LABELS.get(flow, "") if isinstance(flow, str) else ""
+    scoped = {"Dormer Pramet": "welding", "Danfoss": "heat", "Tsurumi": "pumps", "Swagelok": "valves"}
+    if oem in scoped and family in OEM_COMPONENT_FAMILIES.get(oem, {}):
+        if segment_id != scoped[oem]:
+            return ""
+    return known_component_family(fields)
 ORDERED_SQL = f"""SELECT {v1.ARTICLE_COLUMNS} FROM public.lib_knowledge
 WHERE researched_by = %s AND sources->>'publication_approved' = 'true'
 ORDER BY sources->>'importer_id' COLLATE \"C\", id LIMIT 250001"""
+
+# Project identities and source coordinates only, never supplier/article bodies.
+# Both sides must be approved rows in the same repeatable-read transaction.
+RELATIONS_SQL = """WITH edges AS (
+ SELECT s.id AS supplier_db_id, s.sources->>'importer_id' AS supplier_id,
+ COALESCE(NULLIF(s.sources->'supplier_fields'->>'name',''),s.title) AS name,
+ e.link, s.sources->'references' AS refs
+ FROM public.lib_knowledge s CROSS JOIN LATERAL jsonb_array_elements(
+ CASE WHEN jsonb_typeof(s.sources->'candidate_position_links')='array'
+ THEN s.sources->'candidate_position_links' ELSE '[]'::jsonb END) e(link)
+ WHERE s.researched_by=%s AND s.sources->>'publication_approved'='true'
+ AND s.sources->>'kind'='supplier'
+ ORDER BY s.sources->>'importer_id' COLLATE "C",s.id,e.link->>'article_id',e.link->>'source_pointer'
+ LIMIT %s
+)
+SELECT e.supplier_db_id,e.supplier_id,e.name,e.link,t.id,
+ t.sources->>'importer_id',t.sources->'component_fields'->>'part_number',
+ (SELECT jsonb_agg(jsonb_build_object('sha256',r->>'sha256','url',r->>'url',
+ 'json_pointer',e.link->>'source_pointer','repository_path',r->>'repository_path')) FROM jsonb_array_elements(
+ CASE WHEN jsonb_typeof(e.refs)='array' THEN e.refs ELSE '[]'::jsonb END) r
+ WHERE r->>'repository_path'='zip/data/positions.json' AND
+ (r->'locator'->>'json_pointer'=e.link->>'source_pointer' OR
+ CASE WHEN jsonb_typeof(r->'locator'->'json_pointers')='array'
+ THEN r->'locator'->'json_pointers' ? (e.link->>'source_pointer') ELSE false END))
+FROM edges e LEFT JOIN public.lib_knowledge t ON t.sources->>'importer_id'=e.link->>'article_id'
+ AND t.researched_by=%s AND t.sources->>'publication_approved'='true'
+ AND t.sources->>'kind'='component'
+ORDER BY e.supplier_id COLLATE "C",e.supplier_db_id,e.link->>'article_id',e.link->>'source_pointer',t.id
+LIMIT %s"""
+
+
+def database_identity(value):
+    """Canonical internal row identity, separate from the public importer ID."""
+    if type(value) is int:
+        v1.require(0 < value <= 9223372036854775807, "INVALID_RELATION_DATABASE_ID")
+        return ("bigint", value)
+    if isinstance(value, str) and re.fullmatch(r"[1-9][0-9]{0,18}", value):
+        return database_identity(int(value))
+    if isinstance(value, uuid.UUID):
+        return ("uuid", str(value))
+    if isinstance(value, str) and re.fullmatch(
+            r"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}", value):
+        return ("uuid", str(uuid.UUID(value)))
+    raise v1.PublishError("INVALID_RELATION_DATABASE_ID")
+
+
+def supplier_relations(projection):
+    """Reverse explicit article-ID edges; SKU alone never creates a relation."""
+    result, identities = defaultdict(list), {}
+    metrics = {"edges": 0, "linked": 0, "missing_target": 0, "missing_evidence": 0, "duplicate_edges": 0}
+    seen, byte_count, projection_bytes = set(), 0, 0
+    for supplier_db_id, supplier_id, name, edge, target_db_id, target_id, part_number, evidence in projection:
+        metrics["edges"] += 1
+        v1.require(metrics["edges"] <= MAX_RELATION_EDGES, "RELATION_EDGE_LIMIT")
+        projection_bytes += len(encode([str(supplier_db_id), supplier_id, name, edge,
+                                       str(target_db_id), target_id, part_number, evidence]))
+        v1.require(projection_bytes <= MAX_RELATION_BYTES, "RELATION_BYTE_LIMIT")
+        supplier_id = v1.stable_id(supplier_id)
+        v1.require(isinstance(edge, dict), "INVALID_RELATION_EDGE")
+        requested_id = v1.stable_id(edge.get("article_id"))
+        # Stable public article identity and internal database identity have different roles.
+        # Duplicate stable IDs must fail even if they yield different positions.
+        v1.require(supplier_db_id is not None, "INVALID_RELATION_DATABASE_ID")
+        for identity, database_id in ((supplier_id, supplier_db_id), (target_id, target_db_id)):
+            if database_id is None:
+                continue
+            database_id = database_identity(database_id)
+            v1.require(identity not in identities or identities[identity] == database_id,
+                       "RELATION_ID_COLLISION")
+            identities[identity] = database_id
+        if target_db_id is None:
+            metrics["missing_target"] += 1
+            continue
+        v1.require(target_id == requested_id and target_id != supplier_id, "INVALID_RELATION_TARGET")
+        pointer = v1.string(edge.get("source_pointer"), 2048)
+        v1.require(pointer.startswith("/") and not any(ord(c) < 32 for c in pointer), "INVALID_RELATION_POINTER")
+        number = v1.string(edge.get("part_number"), 300)
+        v1.require(number == part_number, "RELATION_PART_NUMBER_MISMATCH")
+        position_id = edge.get("position_id")
+        v1.require(type(position_id) is int and position_id > 0, "INVALID_RELATION_POSITION")
+        valid = []
+        for ref in evidence or []:
+            sha = ref.get("sha256") if isinstance(ref, dict) else None
+            if (isinstance(sha, str) and len(sha) == 64 and all(c in "0123456789abcdef" for c in sha)
+                    and ref.get("json_pointer") == pointer and ref.get("repository_path") == "zip/data/positions.json"):
+                valid.append(ref)
+        if not valid:
+            metrics["missing_evidence"] += 1
+            continue
+        v1.require(all(ref == valid[0] for ref in valid), "RELATION_EVIDENCE_COLLISION")
+        source_url = valid[0].get("url")
+        if source_url:
+            parsed = parse.urlsplit(v1.string(source_url, 4096))
+            v1.require(parsed.scheme in ("http", "https") and bool(parsed.hostname) and
+                       parsed.username is None and parsed.password is None and
+                       not any(ord(c) <= 32 or ord(c) == 127 for c in source_url), "INVALID_RELATION_SOURCE_URL")
+        relation = {"article_id": supplier_id, "name": v1.string(name, 300),
+                    "relation_type": "historical_supplier_candidate", "position_id": position_id,
+                    "part_number": number, "json_pointer": pointer, "source_sha256": valid[0]["sha256"],
+                    "source_url": source_url}
+        # Duplicate observations remain in their canonical supplier source; the
+        # derived navigation omits only byte-identical edges.
+        identity = (target_id, encode(relation))
+        if identity in seen:
+            metrics["duplicate_edges"] += 1
+            continue
+        seen.add(identity)
+        result[target_id].append(relation)
+        v1.require(len(result[target_id]) <= MAX_COMPONENT_RELATIONS, "COMPONENT_RELATION_LIMIT")
+        byte_count += len(identity[1]) + len(target_id.encode("utf-8"))
+        v1.require(byte_count <= MAX_RELATION_BYTES, "RELATION_BYTE_LIMIT")
+        metrics["linked"] += 1
+    for links in result.values():
+        links.sort(key=lambda r: (r["article_id"], r["position_id"], r["json_pointer"]))
+    return dict(result), metrics
+
+
+class SourceRows:
+    def __init__(self, rows, relations, metrics):
+        self.rows, self.relations, self.relation_metrics = rows, relations, metrics
+
+    def __iter__(self):
+        return iter(self.rows)
 
 
 def digest(raw):
@@ -56,7 +408,7 @@ def summary(row):
     result_sources = {"kind": kind(row)}
     truncated = False
     if isinstance(sources, dict):
-        for key in ("typedfields", "supplier_fields", "price_fields", "component_fields", "references",
+        for key in ("component_fields", "supplier_fields", "price_fields", "library_relations", "typedfields", "references",
                     "review_status", "open_questions", "source_date", "origin", "importer_id"):
             if key not in sources:
                 continue
@@ -80,6 +432,15 @@ def search_text(row):
     # Full strings, including body and all structured sources. The worker uses
     # the same Unicode lowercase operation; no field is silently truncated.
     strings = [row["title"], row["topic"], row["body"]]
+    if kind(row) == "component":
+        fields = row["sources"].get("component_fields", {})
+        if isinstance(fields, dict):
+            label = component_type_label(row["sources"], row["segment_id"])
+            if label:
+                strings.append(label)
+                alias = label.replace("ё", "е").replace("Ё", "Е")
+                if alias != label:
+                    strings.append(alias)
     def walk(value):
         if isinstance(value, str):
             strings.append(value)
@@ -180,7 +541,7 @@ def entries(store, ref, category, depth=0):
 
 
 class Builder:
-    def __init__(self, store, segments):
+    def __init__(self, store, segments, relations=None):
         self.store = store
         self.segments = {v1.stable_id(x["id"]): copy.deepcopy(x) for x in segments}
         v1.require(len(self.segments) == len(segments) <= MAX_SEGMENTS, "INVALID_SEGMENTS")
@@ -190,6 +551,9 @@ class Builder:
         self.confidence_counts = defaultdict(lambda: defaultdict(int))
         self.count, self.last_id = 0, None
         self.body_rows, self.body_bytes = [], 0
+        self.relations = relations or {}
+        self.relation_targets_seen, self.relation_suppliers_seen = set(), set()
+        self.relation_suppliers = {r["article_id"] for links in self.relations.values() for r in links}
 
     def flush_bodies(self):
         if not self.body_rows:
@@ -222,6 +586,19 @@ class Builder:
         # Validate but preserve every original field and timestamp spelling on
         # retained historical articles; validation is not a source rewrite.
         normalized = v1.article(row)
+        if row["id"] in self.relation_suppliers:
+            v1.require(kind(normalized) == "supplier" and v1.managed(row), "INVALID_RELATION_SUPPLIER")
+            self.relation_suppliers_seen.add(row["id"])
+        if row["id"] in self.relations:
+            v1.require(kind(normalized) == "component" and v1.managed(row), "INVALID_RELATION_COMPONENT")
+            v1.require("library_relations" not in row["sources"], "DERIVED_RELATION_FIELD_CONFLICT")
+            # A publication-only projection. No original nested dictionary or
+            # database source is mutated; draft readback happens before add().
+            row = {**row, "sources": {**row["sources"], "library_relations": {
+                "version": 1, "producer": "publisher-v2",
+                "candidate_suppliers": self.relations[row["id"]]}}}
+            normalized = v1.article(row)
+            self.relation_targets_seen.add(row["id"])
         v1.require(len(encode({"revision": "0" * 160, "article": row})) <= MAX_ARTICLE_RESPONSE_BYTES,
                    "ARTICLE_REQUIRES_PAGED_BODY")
         v1.require(row["segment_id"] in self.segments, "UNKNOWN_SEGMENT")
@@ -242,6 +619,8 @@ class Builder:
         self.confidence_counts[seg][normalized["confidence"]] += 1
 
     def finish(self, revision, published_at):
+        v1.require(self.relation_targets_seen == set(self.relations) and
+                   self.relation_suppliers_seen == self.relation_suppliers, "RELATION_TARGET_NOT_PUBLISHED")
         self.flush_bodies()
         for group in list(self.buffers):
             self.flush(group)
@@ -274,6 +653,17 @@ class Database(v1.Database):
                 v1.require(len(rows) <= MAX_SEGMENTS, "SEGMENT_LIMIT")
                 segments = [{"id": v1.stable_id(r[0]), "name": v1.string(r[1], 300),
                              "note": v1.string(r[2], 10000, True)} for r in rows]
+            with connection.cursor(name="private_library_relations") as cursor:
+                cursor.itersize = 50
+                cursor.execute(RELATIONS_SQL, (v1.MANAGER, MAX_RELATION_EDGES + 1,
+                                              v1.MANAGER, MAX_RELATION_EDGES + 1))
+                def projection():
+                    while True:
+                        rows = cursor.fetchmany(50)
+                        if not rows:
+                            return
+                        yield from rows
+                relations, relation_metrics = supplier_relations(projection())
             # Server cursor bounds client memory; the repeatable-read transaction
             # supplies one source snapshot for all fetches.
             with connection.cursor(name="private_library_v2") as cursor:
@@ -291,7 +681,7 @@ class Database(v1.Database):
                             normalized = v1.db_article(row)
                             v1.require(v1.managed(normalized), "UNAPPROVED_DATABASE_ROW")
                             yield normalized
-                yield segments, source()
+                yield segments, SourceRows(source(), relations, relation_metrics)
         except v1.PublishError:
             raise
         except Exception:
@@ -422,7 +812,8 @@ def run(db, cf, now=None):
         merged_segments = {x["id"]: {k: v for k, v in x.items() if k not in
                            ("indexes", "counts_by_kind", "counts_by_confidence", "article_count")} for x in old_segments}
         merged_segments.update({x["id"]: x for x in segments})
-        builder = Builder(store, list(merged_segments.values()))
+        builder = Builder(store, list(merged_segments.values()), getattr(incoming, "relations", {}))
+        relation_metrics = getattr(incoming, "relation_metrics", {})
         reconcile(store, builder, old_rows(store, old_manifest, legacy), incoming,
                   {d["article"]["id"]: d["article"] for d in drafts})
         manifest = builder.finish(revision, published_at)
@@ -453,6 +844,7 @@ def run(db, cf, now=None):
         cf.verify(namespace, draft["key"], encode(completed))
     return {"ok": True, "version": 2, "changed": not unchanged, "articles": manifest["article_count"],
             "segments": len(manifest["segments"]), "drafts_published": len(drafts),
+            "supplier_relations": relation_metrics,
             "draft_keys_deferred": metrics["draft_keys_deferred"],
             "next_manual_run_required": bool(metrics["draft_keys_deferred"])}
 
