@@ -14,6 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "data" / "cat_stock_2026-09.json"
 OUT = ROOT / "orders"
 e = lambda s: html.escape(str(s if s is not None else ""))
+money = lambda n: f"{int(n):,}".replace(",", " ")
 
 CLS_COLOR = {"массовый": "#1a7f37", "узловой": "#b26a00", "тяжёлый": "#c62828"}
 LANE_COLOR = {
@@ -21,6 +22,7 @@ LANE_COLOR = {
     "ЮАР · смежное": "#2a6f97", "КНР · смежное": "#2a6f97",
     "ЮАР · инструмент": "#5a6672", "КНР · инструмент": "#5a6672",
 }
+ALT_NAME = {"aftermarket_cn": "аналог КНР", "used_za": "б/у ЮАР"}
 PROFILE_COLOR = {"Caterpillar": "#0b3d91", "гидравлика": "#1a7f37",
                  "смежное": "#2a6f97", "инструмент": "#5a6672"}
 GEO_COLOR = {"ЮАР": "#1a7f37", "КНР": "#b26a00"}
@@ -102,15 +104,24 @@ def main() -> int:
     H.append('<h2>Позиции: узел, ходовой класс и маршрут сорсера</h2>')
     H.append('<table><tr><th class="num" style="width:3%">№</th><th style="width:8%">Парт-номер</th>'
              '<th style="width:20%">Наименование</th><th class="num" style="width:4%">Кол-во</th>'
-             '<th style="width:15%">Узел</th><th style="width:8%">Класс</th><th style="width:6%">ТН ВЭД</th>'
-             '<th style="width:16%">Куда идти по порядку</th><th>Что спросить</th></tr>')
+             '<th style="width:13%">Узел</th><th style="width:7%">Класс</th>'
+             '<th class="num" style="width:9%">EXW за шт., $</th>'
+             '<th class="num" style="width:7%">Строка, $</th>'
+             '<th class="num" style="width:8%">Альтернатива, $/шт.</th>'
+             '<th style="width:13%">Куда идти по порядку</th><th>Что спросить</th></tr>')
     for p in d["positions"]:
         route = " → ".join(ch[i]["short"] for i in p["route"])
         H.append(f'<tr><td class="num">{p["pp"]}</td><td class="pn"><b>{e(p["pn_cat"])}</b></td>'
                  f'<td>{e(p["name_ru"])}<br><span class="mut">{e(p["name_en"])}</span></td>'
                  f'<td class="num">{p["qty"]}</td><td>{e(p["group"])}</td>'
                  f'<td>{tag(p["stock_class"], CLS_COLOR[p["stock_class"]])}</td>'
-                 f'<td class="pn mut">{e(p["hs_hint"])}</td><td>{e(route)}</td>'
+                 f'<td class="num"><b>{money(p["price_exw_usd"]["base"])}</b>'
+                 f'<br><span class="mut">{money(p["price_exw_usd"]["low"])}–'
+                 f'{money(p["price_exw_usd"]["high"])}</span></td>'
+                 f'<td class="num">{money(p["line_exw_usd"]["base"])}</td>'
+                 f'<td class="num mut">' + ("<br>".join(
+                     f'{ALT_NAME[k]} {money(v["unit"])}' for k, v in p["alt_exw_usd"].items()) or "—")
+                 + f'</td><td>{e(route)}</td>'
                  f'<td class="mut">{e(p["ask"])}</td></tr>')
     H.append('</table>')
 
@@ -122,6 +133,40 @@ def main() -> int:
                  f'<td class="num">{g["qty"]}</td><td>{e(cls)}</td>'
                  f'<td class="pn mut">{e(", ".join(g["pns"]))}</td></tr>')
     H.append('</table>')
+
+    b = d["budget"]
+    gen = b["genuine"]["base"]
+    H.append('<h2>Бюджет закупки: четыре сценария, USD EXW</h2>')
+    H.append(f'<div class="box warn"><b>Это оценка по классу детали, а не котировка.</b> {e(b["note"])}<br>'
+             f'Базис — {e(b["basis"])}. Фрахт, страховку, пошлину и НДС считать сверх: '
+             f'при авиа из ЮАР и КНР это ещё заметная величина, и её даёт экспедитор, а не эта таблица.</div>')
+    H.append('<table><tr><th style="width:22%">Сценарий</th><th class="num" style="width:13%">Сумма, $</th>'
+             '<th class="num" style="width:10%">К оригиналу</th><th>Что берём</th></tr>')
+    rows = [
+        ("Всё оригинал Cat", gen, f'{money(b["genuine"]["low"])} … {money(b["genuine"]["high"])} — ширина оценки',
+         "29 позиций genuine со склада за рубежом. Верхняя планка бюджета."),
+        ("Массовка на аналог", b["mixed"], "",
+         "19 массовых позиций — китайский афтермаркет или б/у, тяжёлое и узловое оригинал. "
+         "Экономия символическая: массовая механика в бюджете почти ничего не весит."),
+        ("Тяжёлое с разбора", b["heavy_used"], "",
+         "Цилиндры и КПП — восстановленные с разбора ЮАР, остальное оригинал. "
+         "Настоящий рычаг: тут и лежит вся экономия."),
+        ("Максимально дёшево", b["cheap"], "",
+         "Везде, где альтернатива допустима, берём её. Распределитель, жгуты и проводка "
+         "остаются оригиналом в любом случае."),
+    ]
+    for title, total, note, what in rows:
+        pct = round(100 * total / gen)
+        save = "—" if pct >= 100 else f"−{100 - pct} %"
+        H.append(f'<tr><td><b>{e(title)}</b></td><td class="num"><b>{money(total)}</b>'
+                 + (f'<br><span class="mut">{e(note)}</span>' if note else "")
+                 + f'</td><td class="num">{e(save)}</td><td>{e(what)}</td></tr>')
+    H.append('</table>')
+    H.append(f'<div class="box"><b>Где сидят деньги.</b> {b["heavy_share_pct"]} % суммы — в четырёх тяжёлых '
+             f'позициях (18 гидроцилиндров и КПП), из них {b["transmission_share_pct"]} % — одна только КПП '
+             f'на две штуки. Поэтому торг по крышкам и фитингам бюджет не меняет, а решение заказчика '
+             f'«оригинал или восстановленное» по цилиндрам и КПП меняет его на '
+             f'{round(100 - 100 * b["heavy_used"] / gen)} %.</div>')
 
     H.append('<h2>Что здесь подтверждено: площадки, с которых товар реально уезжал</h2>')
     H.append('<div class="mut">Наличие по нашим 29 номерам не подтверждено нигде — остатки складов закрыты, '
@@ -234,10 +279,18 @@ def main() -> int:
     with csv_path.open("w", encoding="utf-8-sig", newline="") as f:
         w = csv.writer(f, delimiter=";")
         w.writerow(["№", "Парт-номер", "Наименование RU", "Наименование EN", "Кол-во", "Ед.",
-                    "Узел", "Ходовой класс", "ТН ВЭД (ориентир)", "Куда идти по порядку", "Что спросить"])
+                    "Узел", "Ходовой класс", "ТН ВЭД (ориентир)",
+                    "EXW оценка, $/шт.", "EXW min, $", "EXW max, $", "Строка EXW, $",
+                    "Аналог КНР, $/шт.", "Б/у ЮАР, $/шт.",
+                    "Куда идти по порядку", "Что спросить"])
         for p in d["positions"]:
+            alt = p["alt_exw_usd"]
             w.writerow([p["pp"], p["pn_cat"], p["name_ru"], p["name_en"], p["qty"], p["unit"],
                         p["group"], p["stock_class"], p["hs_hint"],
+                        p["price_exw_usd"]["base"], p["price_exw_usd"]["low"], p["price_exw_usd"]["high"],
+                        p["line_exw_usd"]["base"],
+                        alt.get("aftermarket_cn", {}).get("unit", ""),
+                        alt.get("used_za", {}).get("unit", ""),
                         " → ".join(ch[i]["short"] for i in p["route"]), p["ask"]])
 
     print(f"HTML: {html_path.name} {html_path.stat().st_size:,} байт · CSV: {csv_path.name}")
