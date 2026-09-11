@@ -156,7 +156,7 @@ test("/api/rights отвечает правами вошедшего — для 
   const env = makeEnv();
   await seed(env, { "s@kvantpro.com": { role: "sourcing", sites: [], tabs: [], note: "", seen: 1 } });
   const d = await (await call(env, "/api/rights", "s@kvantpro.com")).json();
-  assert.deepEqual(d.sites, ["dashboard", "zip", "gt", "gpu"]);
+  assert.deepEqual(d.sites, ["dashboard", "zip", "gt", "gpu", "knowledge"]);
   assert.equal(d.admin, false);
   assert.equal(d.email, "s@kvantpro.com");
 });

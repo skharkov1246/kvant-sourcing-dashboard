@@ -40,6 +40,8 @@ const SITES = [
     note: "Siemens SGT-100…400 и SGT5-4000F, GE LM6000 и Frame 6B: субпоставщики, MRO, склады" },
   { id: "gpu", group: "lib", name: "ГПУ — газопоршневые установки", href: "https://kvant-gpu.pages.dev/",
     note: "Cummins, Caterpillar, INNIO: поставщики, цены, разрывы OEM/аналог" },
+  { id: "knowledge", group: "lib", name: "Библиотека оборудования и знаний", href: "/library",
+    note: "узлы и детали, изготовители, трейдеры, аналоги, цены и проверенные источники" },
   { id: "ove", group: "proj", name: "ОВЭ-75", href: "https://kvant-ove.pages.dev/",
     note: "обжиг, выщелачивание, электроэкстракция — проект для Кольской ГМК" },
   { id: "gidromet", group: "proj", name: "Гидрометаллургия", href: "https://kvant-gidromet.pages.dev/",
@@ -76,11 +78,11 @@ function defaultAcl() {
       head: { name: "Руководитель", admin: false, sites: SITE_IDS.slice(), tabs: TAB_IDS.slice() },
       employee: { name: "Сотрудник", admin: false, sites: SITE_IDS.slice(), tabs: TAB_IDS.slice() },
       sourcing: { name: "Сорсинг", admin: false,
-        sites: ["dashboard", "zip", "gt", "gpu"], tabs: ["sourcing", "contracts", "suppliers"] },
+        sites: ["dashboard", "zip", "gt", "gpu", "knowledge"], tabs: ["sourcing", "contracts", "suppliers"] },
       kam: { name: "КАМ", admin: false,
-        sites: ["dashboard", "zip", "gt"], tabs: ["company", "kam", "reps", "cohorts"] },
+        sites: ["dashboard", "zip", "gt", "knowledge"], tabs: ["company", "kam", "reps", "cohorts"] },
       engineer: { name: "Инженер", admin: false,
-        sites: ["zip", "gt", "gpu", "ove", "gidromet", "gok"], tabs: [] },
+        sites: ["zip", "gt", "gpu", "knowledge", "ove", "gidromet", "gok"], tabs: [] },
       guest: { name: "Гость", admin: false, sites: [], tabs: [] },
     },
     users: {},
@@ -128,13 +130,21 @@ function normalizeAcl(raw) {
 
 function aclStore(env) { return (env && (env.ACL || env.VISITS)) || null; }
 
-async function loadAcl(env) {
+async function loadAcl(env, { strict = false } = {}) {
   const kv = aclStore(env);
-  if (!kv) return defaultAcl();
+  if (!kv) {
+    if (strict) throw new Error("acl_unavailable");
+    return defaultAcl();
+  }
   try {
     const raw = await kv.get(ACL_KEY, { type: "json" });
+    if (strict && raw !== null && (!raw || typeof raw !== "object" || Array.isArray(raw) ||
+        !raw.roles || typeof raw.roles !== "object" || Array.isArray(raw.roles))) throw new Error("acl_invalid");
     return normalizeAcl(raw);
-  } catch { return defaultAcl(); }
+  } catch (error) {
+    if (strict) throw error;
+    return defaultAcl();
+  }
 }
 
 async function saveAcl(env, acl) {

@@ -45,6 +45,8 @@ const SITES = [
     note: "Siemens SGT-100…400 и SGT5-4000F, GE LM6000 и Frame 6B: субпоставщики, MRO, склады" },
   { id: "gpu", group: "lib", name: "ГПУ — газопоршневые установки", href: "https://kvant-gpu.pages.dev/",
     note: "Cummins, Caterpillar, INNIO: поставщики, цены, разрывы OEM/аналог" },
+  { id: "knowledge", group: "lib", name: "Библиотека оборудования и знаний", href: "/library",
+    note: "узлы и детали, изготовители, трейдеры, аналоги, цены и проверенные источники" },
   { id: "ove", group: "proj", name: "ОВЭ-75", href: "https://kvant-ove.pages.dev/",
     note: "обжиг, выщелачивание, электроэкстракция — проект для Кольской ГМК" },
   { id: "gidromet", group: "proj", name: "Гидрометаллургия", href: "https://kvant-gidromet.pages.dev/",
@@ -81,11 +83,11 @@ function defaultAcl() {
       head: { name: "Руководитель", admin: false, sites: SITE_IDS.slice(), tabs: TAB_IDS.slice() },
       employee: { name: "Сотрудник", admin: false, sites: SITE_IDS.slice(), tabs: TAB_IDS.slice() },
       sourcing: { name: "Сорсинг", admin: false,
-        sites: ["dashboard", "zip", "gt", "gpu"], tabs: ["sourcing", "contracts", "suppliers"] },
+        sites: ["dashboard", "zip", "gt", "gpu", "knowledge"], tabs: ["sourcing", "contracts", "suppliers"] },
       kam: { name: "КАМ", admin: false,
-        sites: ["dashboard", "zip", "gt"], tabs: ["company", "kam", "reps", "cohorts"] },
+        sites: ["dashboard", "zip", "gt", "knowledge"], tabs: ["company", "kam", "reps", "cohorts"] },
       engineer: { name: "Инженер", admin: false,
-        sites: ["zip", "gt", "gpu", "ove", "gidromet", "gok"], tabs: [] },
+        sites: ["zip", "gt", "gpu", "knowledge", "ove", "gidromet", "gok"], tabs: [] },
       guest: { name: "Гость", admin: false, sites: [], tabs: [] },
     },
     users: {},
@@ -133,13 +135,21 @@ function normalizeAcl(raw) {
 
 function aclStore(env) { return (env && (env.ACL || env.VISITS)) || null; }
 
-async function loadAcl(env) {
+async function loadAcl(env, { strict = false } = {}) {
   const kv = aclStore(env);
-  if (!kv) return defaultAcl();
+  if (!kv) {
+    if (strict) throw new Error("acl_unavailable");
+    return defaultAcl();
+  }
   try {
     const raw = await kv.get(ACL_KEY, { type: "json" });
+    if (strict && raw !== null && (!raw || typeof raw !== "object" || Array.isArray(raw) ||
+        !raw.roles || typeof raw.roles !== "object" || Array.isArray(raw.roles))) throw new Error("acl_invalid");
     return normalizeAcl(raw);
-  } catch { return defaultAcl(); }
+  } catch (error) {
+    if (strict) throw error;
+    return defaultAcl();
+  }
 }
 
 async function saveAcl(env, acl) {
@@ -514,13 +524,291 @@ async function readLog(env, { prefix = LOG_PREFIX, limit = 300 } = {}) {
 }
 // END auditCore
 
+// Публикация библиотеки — закрытая копия проверенных материалов из Supabase.
+// Здесь нет ключей БД и нет содержимого CRM в репозитории. Импорт пишет только
+// library:*; документ прав и другие ключи общего KV не изменяются.
+const LIBRARY_KEY = "library:v1";
+const LIBRARY_MAX_BYTES = 4 * 1024 * 1024;
+const LIBRARY_ID = /^[A-Za-z0-9][A-Za-z0-9:_-]{0,159}$/;
+
+function libraryRoute(path) {
+  if (["/library", "/library/", "/library.html"].includes(path)) return "page";
+  if (path === "/api/library") return "api";
+  if (path === "/admin/library") return "publish";
+  if (path === "/admin/library/drafts") return "drafts";
+  let decoded = path;
+  for (let i = 0; i < 8 && decoded.includes("%"); i++) {
+    try {
+      const next = decodeURIComponent(decoded);
+      if (next === decoded) break;
+      decoded = next;
+    } catch { break; }
+  }
+  // Не даём ASSETS самостоятельно нормализовать альтернативное написание пути
+  // и обойти проверку права knowledge; неизвестные подмаршруты тоже закрыты.
+  decoded = decoded.replace(/\\/g, "/").replace(/\/{2,}/g, "/");
+  return /^\/(?:library(?:[/.;]|$)|api\/library(?:[/.;]|$)|admin\/library(?:[/.;]|$))/i.test(decoded) ? "invalid" : null;
+}
+
+function libraryHeaders(initial) {
+  const headers = new Headers(initial);
+  headers.set("Cache-Control", "private, no-store, max-age=0");
+  headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
+  headers.set("X-Content-Type-Options", "nosniff");
+  headers.set("Referrer-Policy", "same-origin");
+  headers.set("X-Frame-Options", "DENY");
+  headers.set("Vary", "Cookie, Cf-Access-Jwt-Assertion");
+  return headers;
+}
+
+function libraryJson(value, status = 200, extraHeaders) {
+  const headers = libraryHeaders(extraHeaders);
+  headers.set("Content-Type", "application/json; charset=utf-8");
+  return new Response(JSON.stringify(value), { status, headers });
+}
+
+class LibraryInputError extends Error {
+  constructor(status, code) { super(code); this.status = status; }
+}
+
+function libraryObject(value) { return value !== null && typeof value === "object" && !Array.isArray(value); }
+function libraryInvalid() { throw new LibraryInputError(400, "invalid_library"); }
+function libraryString(value, max, optional = false) {
+  if (optional && value == null) return "";
+  if (typeof value !== "string" || value.length > max || (!optional && !value.trim())) libraryInvalid();
+  return value;
+}
+function libraryId(value) {
+  if (typeof value !== "string" || !LIBRARY_ID.test(value)) libraryInvalid();
+  return value;
+}
+function libraryDate(value, optional = false) {
+  if (optional && value == null) return null;
+  if (typeof value !== "string" || value.length > 40 || !/^\d{4}-\d{2}-\d{2}T/.test(value) || !Number.isFinite(Date.parse(value))) libraryInvalid();
+  return value;
+}
+function librarySize(value) {
+  if (new TextEncoder().encode(JSON.stringify(value)).byteLength > LIBRARY_MAX_BYTES)
+    throw new LibraryInputError(413, "library_too_large");
+}
+
+function libraryDocument(value) {
+  if (!libraryObject(value) || !Array.isArray(value.segments) || !Array.isArray(value.articles) ||
+      value.segments.length > 100 || value.articles.length > 5000) libraryInvalid();
+  const segments = value.segments.map((s) => {
+    if (!libraryObject(s)) libraryInvalid();
+    return { id: libraryId(s.id), name: libraryString(s.name, 300), note: libraryString(s.note, 10000, true) };
+  });
+  const articles = value.articles.map((a) => {
+    if (!libraryObject(a)) libraryInvalid();
+    const sources = a.sources == null ? {} : a.sources;
+    if (!libraryObject(sources) && !Array.isArray(sources)) libraryInvalid();
+    return { id: libraryId(a.id), segment_id: libraryId(a.segment_id), title: libraryString(a.title, 300),
+      topic: libraryString(a.topic, 200, true), body: libraryString(a.body, 160000), sources,
+      confidence: a.confidence == null ? "med" : libraryString(a.confidence, 40),
+      updated_at: libraryDate(a.updated_at, true) };
+  });
+  if (new Set(segments.map((s) => s.id)).size !== segments.length ||
+      new Set(articles.map((a) => a.id)).size !== articles.length) libraryInvalid();
+  const result = { segments, articles };
+  librarySize(result);
+  return result;
+}
+
+function libraryReferences(document) {
+  const ids = new Set(document.segments.map((s) => s.id));
+  if (document.articles.some((a) => !ids.has(a.segment_id))) libraryInvalid();
+}
+
+async function readLibraryRecord(env) {
+  const kv = aclStore(env);
+  if (!kv) throw new Error("library_unavailable");
+  const raw = await kv.get(LIBRARY_KEY);
+  if (raw == null) return { snapshot: { version: 1, revision: null, published_at: null, segments: [], articles: [] }, raw: null };
+  if (typeof raw !== "string" || new TextEncoder().encode(raw).byteLength > LIBRARY_MAX_BYTES) throw new Error("library_invalid");
+  const value = JSON.parse(raw);
+  if (value.version !== 1) throw new Error("library_invalid");
+  const document = libraryDocument(value);
+  libraryReferences(document);
+  return { snapshot: { version: 1, revision: libraryId(value.revision), published_at: libraryDate(value.published_at), ...document }, raw };
+}
+async function readLibrary(env) { return (await readLibraryRecord(env)).snapshot; }
+
+async function libraryRequestBody(request) {
+  const length = Number(request.headers.get("Content-Length"));
+  if (Number.isFinite(length) && length > LIBRARY_MAX_BYTES) throw new LibraryInputError(413, "library_too_large");
+  if (!request.body) throw new LibraryInputError(400, "invalid_json");
+  const reader = request.body.getReader();
+  const chunks = [];
+  let bytes = 0;
+  try {
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      bytes += value.byteLength;
+      if (bytes > LIBRARY_MAX_BYTES) {
+        await reader.cancel();
+        throw new LibraryInputError(413, "library_too_large");
+      }
+      chunks.push(value);
+    }
+    const body = new Uint8Array(bytes);
+    let at = 0;
+    for (const chunk of chunks) { body.set(chunk, at); at += chunk.byteLength; }
+    return JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(body));
+  } catch (error) {
+    if (error instanceof LibraryInputError) throw error;
+    throw new LibraryInputError(400, "invalid_json");
+  } finally { reader.releaseLock(); }
+}
+
+async function preserveLibraryVersion(kv, snapshot, original) {
+  const key = "library:history:" + snapshot.revision;
+  const data = original == null ? JSON.stringify(snapshot) : original;
+  const existing = await kv.get(key);
+  if (existing != null && existing !== data) throw new Error("library_revision_conflict");
+  if (existing == null) await kv.put(key, data);
+}
+
+async function publishLibrary(request, env) {
+  if (request.method !== "POST") return libraryJson({ error: "method_not_allowed" }, 405, { Allow: "POST" });
+  if (request.headers.get("Origin") !== new URL(request.url).origin) return libraryJson({ error: "origin_required" }, 403);
+  if ((request.headers.get("Content-Type") || "").split(";", 1)[0].trim().toLowerCase() !== "application/json")
+    return libraryJson({ error: "json_required" }, 415);
+  const kv = aclStore(env);
+  if (!kv || typeof kv.put !== "function") return libraryJson({ error: "library_unavailable" }, 503);
+  try {
+    const incoming = libraryDocument(await libraryRequestBody(request));
+    const { snapshot: previous, raw: previousRaw } = await readLibraryRecord(env);
+    const merge = (before, after) => [...new Map([...before, ...after].map((item) => [item.id, item])).values()];
+    const document = libraryDocument({ segments: merge(previous.segments, incoming.segments), articles: merge(previous.articles, incoming.articles) });
+    libraryReferences(document);
+    if (JSON.stringify({ segments: previous.segments, articles: previous.articles }) === JSON.stringify(document))
+      return libraryJson({ ok: true, changed: false, revision: previous.revision, published_at: previous.published_at,
+        segments: previous.segments.length, articles: previous.articles.length });
+    const snapshot = { version: 1, revision: crypto.randomUUID(), published_at: new Date().toISOString(), ...document };
+    librarySize(snapshot);
+    // KV не поддерживает транзакции: обе версии сохраняем ДО смены указателя.
+    // Каноническая база — Supabase; публикации следует выполнять последовательно.
+    if (previous.revision) await preserveLibraryVersion(kv, previous, previousRaw);
+    await preserveLibraryVersion(kv, snapshot);
+    await kv.put(LIBRARY_KEY, JSON.stringify(snapshot));
+    return libraryJson({ ok: true, changed: true, revision: snapshot.revision, published_at: snapshot.published_at,
+      segments: snapshot.segments.length, articles: snapshot.articles.length });
+  } catch (error) {
+    return error instanceof LibraryInputError ? libraryJson({ error: error.message }, error.status) :
+      libraryJson({ error: "library_unavailable" }, 503);
+  }
+}
+
+const LIBRARY_DRAFT_PREFIX = "library:draft:";
+const LIBRARY_DRAFT_KINDS = ["knowledge", "supplier", "price", "component"];
+
+function libraryDraftArticle(value) {
+  const article = libraryDocument({ segments: [], articles: [value] }).articles[0];
+  if (!/^draft:[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(article.id) ||
+      !libraryObject(article.sources) || !LIBRARY_DRAFT_KINDS.includes(article.sources.kind) ||
+      (article.sources.typedfields != null && !libraryObject(article.sources.typedfields))) libraryInvalid();
+  return article;
+}
+
+function libraryDraftRecord(raw, key) {
+  if (typeof raw !== "string" || new TextEncoder().encode(raw).byteLength > LIBRARY_MAX_BYTES) throw new Error("draft_invalid");
+  const value = JSON.parse(raw);
+  if (!libraryObject(value) || value.version !== 1 || !["pending", "published", "error"].includes(value.status)) throw new Error("draft_invalid");
+  const article = libraryDraftArticle(value.article);
+  if (key !== LIBRARY_DRAFT_PREFIX + article.id) throw new Error("draft_key_invalid");
+  return { version: 1, status: value.status, created_at: libraryDate(value.created_at),
+    published_at: libraryDate(value.published_at, true),
+    error: typeof value.error === "string" && /^[a-z][a-z0-9_-]{0,79}$/.test(value.error) ? value.error : null, article };
+}
+
+async function requestLibrarySync(env) {
+  if (!env.GH_DISPATCH_TOKEN) return false;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 4000);
+  try {
+    const response = await fetch(`https://api.github.com/repos/${GH_REPO}/dispatches`, {
+      method: "POST", signal: controller.signal,
+      headers: { Authorization: `Bearer ${env.GH_DISPATCH_TOKEN}`, Accept: "application/vnd.github+json",
+        "User-Agent": "kvant-library-worker", "Content-Type": "application/json" },
+      // В публичный GitHub отправляется только сигнал, никогда текст или ссылки CRM.
+      body: JSON.stringify({ event_type: "library-update" }),
+    });
+    return response.ok;
+  } catch { return false; }
+  finally { clearTimeout(timeout); }
+}
+
+async function libraryDrafts(request, env) {
+  const kv = aclStore(env);
+  if (!kv) return libraryJson({ error: "library_unavailable" }, 503);
+  if (request.method === "GET") {
+    if (typeof kv.list !== "function") return libraryJson({ error: "library_unavailable" }, 503);
+    try {
+      const url = new URL(request.url);
+      const cursor = url.searchParams.get("cursor") || undefined;
+      if (cursor && cursor.length > 2048) return libraryJson({ error: "invalid_cursor" }, 400);
+      const asked = Number(url.searchParams.get("limit") || 20);
+      const limit = Number.isInteger(asked) && asked > 0 ? Math.min(asked, 50) : 20;
+      const page = await kv.list({ prefix: LIBRARY_DRAFT_PREFIX, limit, ...(cursor ? { cursor } : {}) });
+      if (!page || !Array.isArray(page.keys) || page.keys.length > limit) throw new Error("draft_list_invalid");
+      const drafts = [];
+      for (const key of page.keys) {
+        if (!key.name.startsWith(LIBRARY_DRAFT_PREFIX)) throw new Error("draft_key_invalid");
+        const raw = await kv.get(key.name);
+        if (raw == null) continue;
+        const record = libraryDraftRecord(raw, key.name);
+        drafts.push({ id: record.article.id, segment_id: record.article.segment_id, title: record.article.title,
+          kind: record.article.sources.kind, status: record.status, created_at: record.created_at,
+          published_at: record.published_at, error: record.error });
+      }
+      drafts.sort((a, b) => b.created_at.localeCompare(a.created_at));
+      return libraryJson({ drafts, cursor: page.list_complete ? null : (page.cursor || null), list_complete: !!page.list_complete });
+    } catch { return libraryJson({ error: "library_unavailable" }, 503); }
+  }
+  if (request.method !== "POST") return libraryJson({ error: "method_not_allowed" }, 405, { Allow: "GET, POST" });
+  if (request.headers.get("Origin") !== new URL(request.url).origin) return libraryJson({ error: "origin_required" }, 403);
+  if ((request.headers.get("Content-Type") || "").split(";", 1)[0].trim().toLowerCase() !== "application/json")
+    return libraryJson({ error: "json_required" }, 415);
+  if (typeof kv.put !== "function") return libraryJson({ error: "library_unavailable" }, 503);
+  try {
+    const input = await libraryRequestBody(request);
+    const article = libraryDraftArticle(libraryObject(input) && input.article ? input.article : input);
+    const snapshot = await readLibrary(env);
+    if (!snapshot.segments.some((segment) => segment.id === article.segment_id)) libraryInvalid();
+    const key = LIBRARY_DRAFT_PREFIX + article.id;
+    const existing = await kv.get(key);
+    let status = "pending";
+    if (existing != null) {
+      const previous = libraryDraftRecord(existing, key);
+      if (JSON.stringify(previous.article) !== JSON.stringify(article)) return libraryJson({ error: "draft_id_conflict" }, 409);
+      status = previous.status;
+    } else {
+      const record = { version: 1, status, created_at: new Date().toISOString(), article };
+      librarySize(record);
+      await kv.put(key, JSON.stringify(record));
+    }
+    const queued = status !== "published";
+    const sync_requested = queued ? await requestLibrarySync(env) : false;
+    return libraryJson({ ok: true, id: article.id, status, queued, sync_requested });
+  } catch (error) {
+    return error instanceof LibraryInputError ? libraryJson({ error: error.message }, error.status) :
+      libraryJson({ error: "library_unavailable" }, 503);
+  }
+}
+
 export default {
   async fetch(request, env, ctx) {
     const who = await accessOk(request, env);
     if (!who) return denyPage("Портал КВАНТ");
 
     const url = new URL(request.url);
-    const acl = await loadAcl(env);
+    const library = libraryRoute(url.pathname);
+    if (library === "invalid") return libraryJson({ error: "not_found" }, 404);
+    let acl;
+    try { acl = await loadAcl(env, { strict: !!library }); }
+    catch { return libraryJson({ error: "library_unavailable" }, 503); }
     const rights = rightsFor(acl, who.email, env);
 
     // Отметка о входе. Ставится и на /api/rights, поэтому в списке оказываются и те,
@@ -530,6 +818,32 @@ export default {
     if (!url.pathname.startsWith("/fonts/") && url.pathname !== "/gen") {
       firstEver = await touchUser(env, who.email);
       ctx.waitUntil(audit(env, request, who, "portal", url.pathname, { firstEver }));
+    }
+
+    if (library) {
+      if (library === "publish" || library === "drafts") {
+        if (!rights.admin) return libraryJson({ error: "forbidden" }, 403);
+        return library === "drafts" ? libraryDrafts(request, env) : publishLibrary(request, env);
+      }
+      if (!rights.admin && !rights.sites.includes("knowledge")) {
+        ctx.waitUntil(audit(env, request, who, "knowledge", url.pathname, { denied: true }));
+        return libraryJson({ error: "forbidden" }, 403);
+      }
+      if (request.method !== "GET") return libraryJson({ error: "method_not_allowed" }, 405, { Allow: "GET" });
+      if (library === "api") {
+        try {
+          const snapshot = await readLibrary(env);
+          return libraryJson({ ...snapshot, admin: rights.admin });
+        } catch { return libraryJson({ error: "library_unavailable" }, 503); }
+      }
+      try {
+        const asset = await env.ASSETS.fetch(new Request(url.origin + "/library.html", { headers: request.headers }));
+        if (!asset.ok) return libraryJson({ error: "library_page_unavailable" }, 503);
+        const headers = libraryHeaders(asset.headers);
+        headers.set("Content-Type", "text/html; charset=utf-8");
+        headers.set("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'");
+        return new Response(asset.body, { headers });
+      } catch { return libraryJson({ error: "library_page_unavailable" }, 503); }
     }
 
     // /api/rights — права для гейтов остальных сайтов: они шлют сюда JWT вошедшего,
@@ -1080,7 +1394,7 @@ function portalPage(who, rights, env) {
   const team = String((env && env.CF_ACCESS_TEAM) || CF_TEAM_DEFAULT).replace(/^https?:\/\//, "").replace(/\/+$/, "");
   const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) =>
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-  const mine = SITES.filter((s) => rights.sites.includes(s.id));
+  const mine = SITES.filter((s) => rights.sites.includes(s.id) || (s.id === "knowledge" && rights.admin));
   // разделы: плашка показывается, только если в ней человеку что-то доступно
   const sections = GROUPS.map((g) => {
     const own = mine.filter((s) => s.group === g.id);
