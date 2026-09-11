@@ -176,7 +176,7 @@ const rightsCache = new Map();
 // Что стоит журнала: страницы и выгружаемые файлы. Разметка, картинки, шрифты и
 // обращения страницы к данным (/db/…) — часть страницы, а не действие человека,
 // и в журнал не идут.
-const AUDIT_SKIP = /^\/db\/|\.(css|js|mjs|map|woff2?|ttf|png|jpe?g|gif|svg|webp|ico|avif)$/i;
+const AUDIT_SKIP = /^\/db\/|^\/api\/|\.(css|js|mjs|map|woff2?|ttf|png|jpe?g|gif|svg|webp|ico|avif)$/i;
 
 async function siteAllowed(request, env, site) {
   if (env && env.SITE_RIGHTS === "off") return true;

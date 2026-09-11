@@ -21,11 +21,25 @@ export default {
 
     const path = new URL(request.url).pathname;
     const gt = path === "/gt" || path.startsWith("/gt/");   // без слэша Pages сам перебросит
-    if (!(await siteAllowed(request, env, gt ? "gt" : SITE))) {
-      return denyPage(gt ? "Библиотека ГТУ · КВАНТ" : "ГШО · КВАНТ");
+    // Служебные адреса страниц (кто вошёл, доступ к базе) общие для обоих разделов:
+    // они лежат не под /gt/, и проверять их правом «zip» нельзя — инженер библиотеки
+    // ГТУ, у которого права «zip» нет, иначе не смог бы ни подписать заметку, ни
+    // сохранить её. Поэтому здесь достаточно ЛЮБОГО из двух прав.
+    const api = path === "/api/me" || path === "/db" || path.startsWith("/db/");
+    const allowed = api
+      ? (await siteAllowed(request, env, SITE)) || (await siteAllowed(request, env, "gt"))
+      : await siteAllowed(request, env, gt ? "gt" : SITE);
+    if (!allowed) return denyPage(gt ? "Библиотека ГТУ · КВАНТ" : "ГШО · КВАНТ");
+
+    // Кто вошёл — для подписи правок в библиотеке ГТУ. Отдаём только собственную
+    // почту спрашивающего: она и так уже у него, узнать чужую этим нельзя.
+    if (path === "/api/me") {
+      return new Response(JSON.stringify({ email: who.email }), {
+        headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" },
+      });
     }
 
-    if (path === "/db" || path.startsWith("/db/")) return proxyDb(request, env);
+    if (path === "/db" || path.startsWith("/db/")) return proxyDb(request, env, who);
 
     const resp = await env.ASSETS.fetch(request);
     const out = new Response(resp.body, resp);
@@ -48,10 +62,35 @@ const SUPA_ORIGIN = "https://vpjliavuuxjcvtxbthlp.supabase.co";
 // После задания SUPABASE_SERVICE_KEY и сужения RLS этот ключ станет бесполезен.
 const SUPA_FALLBACK_KEY = "sb_publishable_z74BF5VzezeQfTc9fni-ZA_HMyTKRTJ";
 
-async function proxyDb(request, env) {
+// Правки инженеров в библиотеке ГТУ: таблица gt_notes. Автора проставляет воркер по
+// подписи Cloudflare Access, а не страница: подпись, которую можно подделать из
+// браузера, не подпись. Удаление запрещено — снятая правка помечается removed и
+// остаётся в истории, иначе «пропало» повторится, только уже необратимо.
+const NOTES_PATH = "/rest/v1/gt_notes";
+
+async function stampAuthor(request, who) {
+  const body = await request.text();
+  if (!body) return body;
+  let data;
+  try { data = JSON.parse(body); } catch { return body; }   // не JSON — не наше дело
+  const stamp = (r) => {
+    if (!r || typeof r !== "object") return r;
+    r.author = who && who.email ? who.email : "";
+    r.at = new Date().toISOString();
+    return r;
+  };
+  return JSON.stringify(Array.isArray(data) ? data.map(stamp) : stamp(data));
+}
+
+async function proxyDb(request, env, who) {
   const url = new URL(request.url);
   const target = SUPA_ORIGIN + url.pathname.slice("/db".length) + url.search;
   const key = (env && env.SUPABASE_SERVICE_KEY) || SUPA_FALLBACK_KEY;
+  const notes = url.pathname.slice("/db".length).startsWith(NOTES_PATH);
+  if (notes && request.method === "DELETE") {
+    return new Response(JSON.stringify({ error: "правки не удаляются: снимайте флагом removed" }),
+      { status: 405, headers: { "Content-Type": "application/json; charset=utf-8" } });
+  }
 
   const headers = new Headers(request.headers);
   headers.set("apikey", key);
@@ -64,7 +103,10 @@ async function proxyDb(request, env) {
 
   const method = request.method;
   const init = { method, headers, redirect: "manual" };
-  if (method !== "GET" && method !== "HEAD") init.body = request.body;
+  if (method !== "GET" && method !== "HEAD") {
+    init.body = notes ? await stampAuthor(request, who) : request.body;
+    if (notes) headers.set("Content-Type", "application/json");
+  }
 
   const upstream = await fetch(target, init);
   const out = new Response(upstream.body, upstream);
@@ -74,7 +116,7 @@ async function proxyDb(request, env) {
 }
 
 // экспорт для тестов (на исполнение воркера не влияет)
-export { proxyDb, SUPA_ORIGIN };
+export { proxyDb, SUPA_ORIGIN, stampAuthor, NOTES_PATH };
 
 // служебная страница отказа: без внешних ресурсов, светлая и тёмная тема
 function denyPage(title) {
@@ -105,7 +147,7 @@ const rightsCache = new Map();
 // Что стоит журнала: страницы и выгружаемые файлы. Разметка, картинки, шрифты и
 // обращения страницы к данным (/db/…) — часть страницы, а не действие человека,
 // и в журнал не идут.
-const AUDIT_SKIP = /^\/db\/|\.(css|js|mjs|map|woff2?|ttf|png|jpe?g|gif|svg|webp|ico|avif)$/i;
+const AUDIT_SKIP = /^\/db\/|^\/api\/|\.(css|js|mjs|map|woff2?|ttf|png|jpe?g|gif|svg|webp|ico|avif)$/i;
 
 async function siteAllowed(request, env, site) {
   if (env && env.SITE_RIGHTS === "off") return true;
