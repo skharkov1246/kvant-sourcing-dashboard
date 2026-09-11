@@ -161,3 +161,19 @@ def test_пороги_наследования_консервативны():
     r = load_reclassify()
     assert 0.5 < r.MIN_SHARE_FILE <= r.MIN_SHARE_DEAL <= 1.0, (
         "порог наследования по сделке должен быть не ниже, чем по файлу, и оба выше половины")
+
+
+def test_разведка_не_печатает_наименования():
+    """Частотный список — это отдельные слова, а не строки номенклатуры.
+    Фильтр «только кириллица от шести букв и от MIN_FREQ повторов» не пропускает
+    ни марку, ни парт-номер, ни фамилию: они либо латиницей, либо единичны."""
+    diag = (ROOT / "library" / "diag_demand.py").read_text(encoding="utf-8")
+    assert "[а-яё]{%d,}" in diag, "частотный список собирается не по кириллическим словам"
+    assert "MIN_FREQ" in diag and "MIN_LEN" in diag, "нет порогов длины и частоты"
+    for line in diag.splitlines():
+        if "print(" in line:
+            for leak in ("item_name", "deal_id", "part_number", "oem)"):
+                assert leak not in line, f"в журнал уходит {leak}: {line.strip()[:70]}"
+    assert "select item_name from lib_demand" in diag, "наименования нужны только для частот"
+    wf = (ROOT / ".github" / "workflows" / "library-stats.yml").read_text(encoding="utf-8")
+    assert "diag" in wf and "diag_demand.py" in wf, "разведка не подключена к workflow"
