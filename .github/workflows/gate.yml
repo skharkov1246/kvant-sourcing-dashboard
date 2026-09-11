@@ -25,6 +25,22 @@ jobs:
     name: gate
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: library_sql_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: synthetic-library-ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d library_sql_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      LIBRARY_SQL_TEST_DSN: postgresql://postgres:synthetic-library-ci@127.0.0.1:5432/library_sql_test
     steps:
       - uses: actions/checkout@v5
         with:
@@ -36,7 +52,7 @@ jobs:
           cache: pip
 
       - name: Установка зависимостей
-        run: pip install --quiet -r requirements.txt ruff pytest
+        run: pip install --quiet -r requirements.txt ruff pytest psycopg2-binary==2.9.10
 
       - name: Ruff — ошибки кода
         run: ruff check .
