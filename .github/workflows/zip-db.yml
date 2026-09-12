@@ -65,6 +65,7 @@ jobs:
           }
           apply gt/supabase/migrations.sql  "правки инженеров ГТУ"
           apply zip/supabase/migrations.sql "схема базы ЗИП"
+          apply zip/supabase/seed_r1700.sql "досье машины R1700G (данные)"
           apply library/supabase/schema.sql "схема библиотеки рынков"
           apply library/supabase/schema_junk.sql "разметка текста документов"
           [ "$rc" = 0 ] && echo "✓ миграции применены" || echo "✗ часть миграций не применилась"
