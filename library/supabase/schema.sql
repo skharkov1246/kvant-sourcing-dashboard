@@ -466,6 +466,68 @@ alter table lib_prices add column if not exists exporter text;
 create index if not exists lib_prices_part on lib_prices (part_id);
 create index if not exists lib_prices_feed on lib_prices (feed);
 
+-- ВНИМАНИЕ: источник — платная подписка (glbs.io), условия которой, как правило,
+-- запрещают перепубликацию. Таблица и представление ниже живут только в закрытой
+-- базе; на страницы портала числа из деклараций не выносятся.
+--
+-- Реестр таможенных декларации: кто фактически вёз такую номенклатуру, из какой
+-- страны, под какой маркой, на каких условиях и по какой цене за килограмм. Это
+-- не мнение и не оценка, а совершённые сделки — единственный наш источник,
+-- который отвечает на вопрос «кто это уже возит», а не «кого мы нашли».
+--
+-- match хранит надёжность сопоставления словом источника, а не сводится к
+-- «да/нет»: strong — декларация нашлась по партномеру (таких 80 из 42 314),
+-- weak — только по коду ТН ВЭД и описанию. Между ними две разные дальнейшие
+-- работы, и связь «деталь → поставка» ставится только по strong.
+--
+-- Импортёр лежит здесь с ИНН, но в lib_suppliers не идёт: он покупатель, а не
+-- исполнитель, и смешать их значит сломать единственный вопрос, на который
+-- справочник исполнителей отвечает.
+create table if not exists lib_customs (
+  id           text primary key,           -- хеш содержимого строки: прогон идемпотентен
+  decl_date    text,
+  hs10         text,
+  hs4          text,                       -- товарная группа, по ней считается ориентир
+  part_number  text,                       -- только для strong
+  brand        text,
+  exporter     text,
+  importer     text,
+  importer_inn text,
+  origin       text,
+  dispatch     text,
+  incoterms    text,
+  currency     text,
+  net_kg       numeric,
+  usd_kg       numeric,
+  value_usd    numeric,
+  descr        text,
+  match        text,                       -- strong | weak
+  source       text,                       -- файл выгрузки: без него выборку не повторить
+  created_at   timestamptz default now()
+);
+create index if not exists lib_customs_hs4   on lib_customs (hs4);
+create index if not exists lib_customs_pn    on lib_customs (part_number);
+create index if not exists lib_customs_exp   on lib_customs (exporter);
+create index if not exists lib_customs_brand on lib_customs (brand);
+
+-- Ценовой ориентир по товарной группе, а НЕ цена детали: в одной группе лежат и
+-- коронка, и корпус, и расходник. Отвечает «двадцать долларов за килограмм для
+-- этой группы — дорого или дёшево», и только на это. Меньше двадцати строк в
+-- группе — медиана шум, поэтому такие группы отброшены прямо в представлении.
+create or replace view lib_customs_bench
+  with (security_invoker = true) as
+select hs4,
+       count(*)                                                as поставок,
+       round(percentile_cont(0.25) within group (order by usd_kg)::numeric, 2) as p25,
+       round(percentile_cont(0.50) within group (order by usd_kg)::numeric, 2) as медиана,
+       round(percentile_cont(0.75) within group (order by usd_kg)::numeric, 2) as p75,
+       min(decl_date)                                          as с_даты,
+       max(decl_date)                                          as по_дату
+  from lib_customs
+ where hs4 is not null and usd_kg is not null
+ group by hs4
+having count(*) >= 20;
+
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 5. Знание об оборудовании: устройство, режимы работы, критерии подбора,
 --    типовые отказы, взаимозаменяемость. То, без чего нельзя грамотно
@@ -552,6 +614,7 @@ alter table lib_pn_patterns    enable row level security;
 alter table lib_symptom_ops    enable row level security;
 alter table lib_symptom_defects enable row level security;
 alter table lib_defect_ops     enable row level security;
+alter table lib_customs        enable row level security;
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 9. Реестр разобранных файлов. Нужен для возобновляемости: обход 22 тысяч
