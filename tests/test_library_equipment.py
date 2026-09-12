@@ -157,3 +157,35 @@ def test_критичность_приводится_к_одной_шкале():
     assert eq.crit_of("A") == "A"                  # буква остаётся буквой
     assert eq.crit_of("по проекту") is None        # зависит от проекта
     assert eq.crit_of(None) is None
+
+
+# ─── изготовитель как исполнитель ────────────────────────────────────────────
+def test_пометка_незнания_в_карточку_изготовителя_не_идёт():
+    """В поле «изготовитель» незнание помечают словами, и такие «фирмы» в базе
+    компаний заводить нельзя: «Прочие» — не изготовитель 242 деталей."""
+    for s in ("Прочие", "прочий OEM", "не указан", "неизвестно", "—", ""):
+        assert not eq.oem_is_real(s), s
+
+
+def test_настоящее_имя_изготовителя_проходит():
+    for s in ("Telsmith", "Cryostar", "Sandvik Tamrock", "GE Vernova (General Electric)"):
+        assert eq.oem_is_real(s), s
+
+
+def test_описание_вместо_имени_в_карточку_не_идёт():
+    assert not eq.oem_is_real("серийный подшипник стороннего изготовителя SKF Timken FAG NSK")
+
+
+def test_псевдонимы_изготовителей_ведут_к_полному_имени_и_их_мало():
+    """Список короткий и ручной сознательно: склейка по началу имени связала бы
+    «Caterpillar» с «Caterpillar gear pump (made-in-china supplier)» — а это
+    другая фирма."""
+    assert eq.OEM_ALIAS["ge"] == eq.OEM_ALIAS["general electric"]
+    assert eq.OEM_ALIAS["siemens"].startswith("siemens energy")
+    assert len(eq.OEM_ALIAS) <= 8, "псевдонимов стало много — значит, начали угадывать"
+    for короткое, полное in eq.OEM_ALIAS.items():
+        # Полное имя обязано содержать короткое как слово (в любом месте: карточка
+        # GE называется «GE Vernova (General Electric)», и «general electric»
+        # стоит в ней не первым). Иначе это уже не псевдоним, а другая фирма.
+        assert полное != короткое, короткое
+        assert короткое in полное, f"{короткое} → {полное}: это не то же имя"

@@ -34,7 +34,8 @@ import sys
 from collections import Counter
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from load_suppliers import norm as norm_company  # noqa: E402  (после sys.path)
+import equipment as eq  # noqa: E402  (после sys.path)
+from load_suppliers import norm as norm_company  # noqa: E402
 from segments import classify, name_of  # noqa: E402
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
@@ -357,21 +358,54 @@ def main() -> int:
                                             confidence, source)
             values %s on conflict (part_id, supplier_id) do nothing""",
             готовые, page_size=500)
+        # Карточка изготовителя, если её ещё нет. 234 имени из поля «изготовитель»
+        # не имели карточки вовсе, а за ними 7 750 позиций: «Telsmith», «Cryostar»,
+        # «Sandvik Tamrock». Карточка заводится без контактов и с низкой
+        # уверенностью — она честно показывает, что про эту фирму мы знаем только
+        # имя, и попадает в список «без контакта» как работа сорсеру.
+        cur.execute("select name_key from lib_suppliers where name_key is not null")
+        ключи_компаний = {r[0].replace(" ", "") for r in cur.fetchall()}
+        cur.execute("select distinct oem from lib_parts where coalesce(btrim(oem),'') <> ''")
+        новые_изготовители = []
+        for (имя,) in cur.fetchall():
+            if not eq.oem_is_real(имя):
+                continue
+            ключ = norm_company(имя)
+            цель = eq.OEM_ALIAS.get(ключ, ключ)
+            if not ключ or цель.replace(" ", "") in ключи_компаний:
+                continue
+            новые_изготовители.append((имя[:300], ключ, "изготовитель (из каталога)",
+                                       "изготовитель из каталога", "low"))
+            ключи_компаний.add(ключ.replace(" ", ""))
+        if новые_изготовители:
+            psycopg2.extras.execute_values(cur, """
+                insert into lib_suppliers (name, name_key, kind, researched_by, confidence)
+                values %s on conflict do nothing""", новые_изготовители, page_size=500)
+            print(f"  карточек изготовителей заведено: {len(новые_изготовители)}")
+
         # Изготовитель позиции — тоже исполнитель, и это самая дешёвая связь из
         # существующих: у 72 % деталей изготовитель назван в самой записи. До
         # этого 11 716 деталей не имели ни одного исполнителя, хотя про них
         # известно, кто их делает. Ключ считается так же, как у компаний, иначе
         # «Siemens Energy» и «Siemens Energy,» окажутся разными фирмами.
-        cur.execute("""
+        # Псевдонимы идут списком значений: их три, и они должны быть видны в
+        # запросе, а не спрятаны в CASE.
+        psycopg2.extras.execute_values(cur, """
             insert into lib_part_suppliers (part_id, supplier_id, makes, confidence, source)
             select p.id, s.id, 'изготовитель позиции', 'high', 'изготовитель (OEM) по каталогу'
               from lib_parts p
+              left join (values %s) as a(короткое, полное)
+                on a.короткое = lower(regexp_replace(coalesce(p.oem, ''),
+                                                     '[^0-9a-zA-Zа-яА-Я ]', '', 'g'))
               join lib_suppliers s
                 on s.name_key is not null
-               and replace(s.name_key, ' ', '') =
-                   lower(regexp_replace(coalesce(p.oem, ''), '[^0-9a-zA-Zа-яА-Я]', '', 'g'))
+               and replace(s.name_key, ' ', '') = replace(
+                     coalesce(a.полное,
+                              lower(regexp_replace(coalesce(p.oem, ''),
+                                                   '[^0-9a-zA-Zа-яА-Я]', '', 'g'))), ' ', '')
              where coalesce(btrim(p.oem), '') <> ''
-            on conflict (part_id, supplier_id) do nothing""")
+            on conflict (part_id, supplier_id) do nothing""",
+            sorted(eq.OEM_ALIAS.items()), page_size=50)
         по_изготовителю = cur.rowcount
         if по_изготовителю:
             print(f"  связей «деталь → изготовитель» добавлено: {по_изготовителю}")
