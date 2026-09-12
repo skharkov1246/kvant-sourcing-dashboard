@@ -80,13 +80,29 @@ def marks_pn(s):
             out.append(t)
     return out
 
+# Слова, рядом с которыми число — это сумма или цена, а не артикул.
+MONEY = re.compile(r"(?<![а-яё])(рубл|руб\.|сумм|цена|цену|цены|стоимост|итого|ндс|тариф)", re.I)
+
+
 def part_number_of(s):
+    """Артикул из строки. Пусто — честный ответ: артикула в строке нет.
+
+    Три отсева, каждый оплачен разбором ошибки:
+      • мусор (_rubbish) — даты, номера пунктов, годы, разряды тысяч. Прежнее
+        выражение на line.upper() принимало за артикул 01.09.2026 и 223-ФЗ;
+      • типоразмер (45х65х10, 3х2,5) — это размер, а не артикул. Без отсева
+        «Манжета 45х65х10 ГОСТ 8752-79» получала артикулом свой размер;
+      • голое число при денежных словах в строке — это сумма. Четырёхзначные
+        числа принимаются, иначе теряются канонические номера подшипников
+        (6205, 22315): в строке «Подшипник SKF 22315 EK» артикул — именно они."""
+    money = bool(MONEY.search(s or ""))
     best = ""
     for m in TOKEN.finditer(s or ""):
         t = _clean(m.group(0))
-        if len(t) < 4 or _rubbish(t):
+        if len(t) < 4 or _rubbish(t) or SIZE.search(t):
             continue
-        ok = (HASD.search(t) and HASL.search(t)) or (t.isdigit() and 6 <= len(t) <= 14) \
+        ok = (HASD.search(t) and HASL.search(t)) \
+             or (t.isdigit() and 4 <= len(t) <= 14 and not money) \
              or (re.fullmatch(r"\d{2,6}([-/]\d{2,6}){1,3}", t) is not None)
         if ok and len(t) > len(best):
             best = t
