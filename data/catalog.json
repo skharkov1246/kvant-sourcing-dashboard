@@ -272,6 +272,7 @@
       },
       "referenced_by": [
         "gt/build.py",
+        "library/load_crossrefs.py",
         "library/load_equipment.py",
         "pnw/tools/build_master.py",
         "tests/test_core.py"
@@ -849,6 +850,7 @@
       },
       "referenced_by": [
         "gt/tools/ship_merge.py",
+        "library/load_crossrefs.py",
         "library/load_parts.py",
         "library/load_suppliers.py"
       ]
@@ -908,6 +910,7 @@
       "referenced_by": [
         "gt/tools/ship_merge.py",
         "gt/tools/ship_report.py",
+        "library/load_crossrefs.py",
         "library/load_parts.py",
         "library/load_suppliers.py"
       ]
@@ -1097,6 +1100,7 @@
         "markers": []
       },
       "referenced_by": [
+        "library/load_crossrefs.py",
         "zip/tools/build_telsmith_page.py"
       ]
     },
@@ -3521,6 +3525,7 @@
         "markers": []
       },
       "referenced_by": [
+        "library/load_crossrefs.py",
         "zip/build.py",
         "zip/tools/import_bom.py",
         "zip/tools/perf_classes.py",
