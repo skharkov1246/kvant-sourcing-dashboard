@@ -137,6 +137,42 @@ create table if not exists lib_part_models (
 );
 create index if not exists lib_part_models_model on lib_part_models (model_id);
 
+-- Взаимозаменяемость: чей это на самом деле номер и чем позицию можно закрыть.
+-- Каталожный номер сборщика почти никогда не номер изготовителя: Telsmith 14T47 —
+-- это серийный подшипник SKF/Timken, и без такой связи сорсер ищет несуществующую
+-- деталь у несуществующего изготовителя.
+create table if not exists lib_part_alt (
+  part_id    text not null references lib_parts(id) on delete cascade,
+  alt_pn     text not null,
+  kind       text not null,              -- номер изготовителя | замена | наш номер | аналог
+  alt_maker  text,
+  evidence   text,
+  confidence text default 'med',
+  source     text,
+  created_at timestamptz default now(),
+  primary key (part_id, alt_pn, kind)
+);
+create index if not exists lib_part_alt_pn on lib_part_alt (alt_pn);
+
+-- Ведомость: из чего собрана машина, с уровнем вложенности и количеством. Без
+-- неё «узел → запчасть» держится на словах описания, а не на конструкции.
+create table if not exists lib_bom (
+  id        text primary key,
+  machine   text not null,
+  model_id  text references lib_models(id) on delete set null,
+  scheme    text,
+  level     int,
+  part_id   text references lib_parts(id) on delete set null,
+  part_no   text not null,
+  own_no    text,                        -- наш внутренний номер, если заведён
+  qty       text,
+  name      text,
+  source    text,
+  created_at timestamptz default now()
+);
+create index if not exists lib_bom_machine on lib_bom (machine);
+create index if not exists lib_bom_part on lib_bom (part_id);
+
 -- Парк: какая машина где стоит и чья. Без этого справочник машин отвечает «что
 -- бывает», а не «что чинить у этого заказчика», а сорсинг живёт вторым вопросом.
 create table if not exists lib_fleet (
@@ -365,6 +401,8 @@ alter table lib_part_models    enable row level security;
 alter table lib_procedures     enable row level security;
 alter table lib_defects        enable row level security;
 alter table lib_fleet          enable row level security;
+alter table lib_part_alt       enable row level security;
+alter table lib_bom            enable row level security;
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 9. Реестр разобранных файлов. Нужен для возобновляемости: обход 22 тысяч

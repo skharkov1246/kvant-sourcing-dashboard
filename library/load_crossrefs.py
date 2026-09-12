@@ -1,0 +1,253 @@
+#!/usr/bin/env python3
+"""Взаимозаменяемость и ведомости: чей это номер на самом деле и из чего машина.
+
+ЗАЧЕМ. Каталожный номер сборщика почти никогда не номер изготовителя. Telsmith
+14T47 — это серийный сферический подшипник SKF/Timken с посадочным диаметром
+140 мм; пока связи нет, сорсер ищет несуществующую деталь у несуществующего
+изготовителя и получает отказ. То же с нашими внутренними номерами: KV30 0001 и
+Epiroc 7490 0290 74 — одна деталь, и не связать их значит дважды закупать.
+
+ЧТО ЧИТАЕТСЯ. Партномера потребности (поле «номер изготовителя»), сплошные
+проверки наличия (настоящий номер и предложенная замена), кросс-таблица Telsmith
+и ведомость COP 3060MUX.
+
+ПОЧЕМУ НОМЕР ПРОВЕРЯЕТСЯ, А НЕ БЕРЁТСЯ КАК ЕСТЬ. В поле «номер изготовителя»
+руками пишут и описание: «ШАЙБА АЛЮМИНИЕВАЯ - 1/4 BSP». Такое в таблицу
+взаимозаменяемости попасть не должно — иначе по ней начнут искать деталь с
+номером «шайба алюминиевая».
+
+БЕЗ APPLY=1 идёт вхолостую.
+
+    python library/load_crossrefs.py
+    SUPABASE_DB_URL=... APPLY=1 python library/load_crossrefs.py
+
+В журнал идут только агрегаты.
+"""
+from __future__ import annotations
+
+import json
+import os
+import re
+import sys
+from collections import Counter
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import equipment as eq  # noqa: E402  (после sys.path)
+from segments import classify  # noqa: E402
+
+ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
+APPLY = os.environ.get("APPLY", "") not in ("", "0", "false")
+NOT_KEY = re.compile(r"[^0-9a-zа-яё]+")
+КИРИЛЛИЦА = re.compile(r"[а-яё]")
+
+
+def part_key(pn: str) -> str:
+    return NOT_KEY.sub("", (pn or "").lower().replace("ё", "е"))[:80]
+
+
+def похоже_на_номер(s: str) -> bool:
+    """Номер это или всё-таки описание.
+
+    Четыре условия, каждое оплачено содержимым поля «номер изготовителя»:
+    цифра есть (номера без цифр не бывает), не длиннее сорока знаков, не больше
+    трёх слов и не больше двух кириллических букв — «ШАЙБА АЛЮМИНИЕВАЯ - 1/4 BSP»
+    отсекается именно последним."""
+    t = (s or "").strip()
+    if not (2 < len(t) <= 40) or not any(c.isdigit() for c in t):
+        return False
+    if len(t.split()) > 3:
+        return False
+    return len(КИРИЛЛИЦА.findall(t.lower())) <= 2
+
+
+_ТОКЕН = re.compile(r"[^\s,;/()\[\]]+")
+
+
+def номера_из(текст: str, сколько: int = 3) -> list[str]:
+    """Номера, спрятанные в предложении.
+
+    Поле «замена» у продавцов — не номер, а фраза: «Magelis HMISTO501 / HMIS
+    серия — официальная замена после EOL». Номер там есть, и выбросить всю
+    строку значит потерять 400 подсказок. Токен считается номером, если в нём
+    есть И цифра, И латинская буква: так отсекаются и слова, и голые числа
+    («1900/1950» — это диапазон моделей, а не партномер)."""
+    out = []
+    for t in _ТОКЕН.findall(текст or ""):
+        t = t.strip(".,:—-")
+        if not (4 <= len(t) <= 40):
+            continue
+        if not (any(c.isdigit() for c in t) and re.search(r"[A-Za-z]", t)):
+            continue
+        if КИРИЛЛИЦА.search(t.lower()):
+            continue
+        if t not in out:
+            out.append(t)
+        if len(out) >= сколько:
+            break
+    return out
+
+
+def load(path: str, key: str | None = None):
+    full = os.path.join(ROOT, path)
+    if not os.path.exists(full):
+        return []
+    d = json.load(open(full, encoding="utf-8"))
+    if isinstance(d, list):
+        return d
+    return d.get(key or "rows") or []
+
+
+def num(v, w=9):
+    return f"{v:,}".replace(",", " ").rjust(w)
+
+
+def build_alts() -> list[dict]:
+    alts: dict[tuple, dict] = {}
+
+    def add(pn, alt, kind, maker=None, evidence=None, source="", conf="med"):
+        key, alt = part_key(pn), (alt or "").strip()
+        if not key or not похоже_на_номер(alt) or part_key(alt) == key:
+            return
+        alts[(key, alt[:120], kind)] = {
+            "part_id": key, "alt_pn": alt[:120], "kind": kind,
+            "alt_maker": (maker or None) and str(maker)[:200],
+            "evidence": (evidence or None) and str(evidence)[:1000],
+            "confidence": conf, "source": source}
+
+    for r in load("gt/data/pn_db.json"):
+        add(r.get("pn"), r.get("mpn"), "номер изготовителя", r.get("mk"),
+            r.get("ev"), "партномера потребности")
+    for путь, откуда in (("gt/data/ship_sweep.json", "проверка наличия (ЛУКОЙЛ)"),
+                         ("gt/data/ship_energoseti.json", "проверка наличия (Энергосети)")):
+        for r in load(путь):
+            add(r.get("pn"), r.get("real_pn"), "номер изготовителя", r.get("real_maker"),
+                r.get("note"), откуда)
+            # Замена приходит фразой: достаём номера, а фразу оставляем
+            # доказательством — по ней потом видно, чья это была рекомендация.
+            for кандидат in номера_из(str(r.get("substitute") or "")):
+                add(r.get("pn"), кандидат, "замена", r.get("real_maker"),
+                    str(r.get("substitute"))[:600], откуда, conf="low")
+    for r in load("zip/data/telsmith_crossrefs.json", "crossrefs"):
+        add(r.get("telsmith_pn"), r.get("real_pn"), "номер изготовителя",
+            r.get("real_maker"), r.get("evidence_url"), "кросс-таблица Telsmith",
+            r.get("confidence") or "med")
+    return list(alts.values())
+
+
+def build_bom() -> tuple[list[dict], dict[str, dict], list[dict]]:
+    """Ведомость → строки состава, новые детали и машина."""
+    строки, детали, машины = [], {}, {}
+    for m in load("zip/data/bom.json", "machines"):
+        имя = str(m.get("name") or "").strip()
+        if not имя:
+            continue
+        ключ_машины = eq.norm_model(имя) if eq.looks_like_machine(имя) else None
+        if ключ_машины:
+            машины[ключ_машины] = {"id": ключ_машины, "name": имя[:200],
+                                   "source": "ведомость состава"}
+        for i, p in enumerate(m.get("parts") or []):
+            pn = str(p.get("epiroc_pn") or p.get("pn") or "").strip()
+            if not pn:
+                continue
+            key = part_key(pn)
+            строки.append({
+                "id": f"{ключ_машины or part_key(имя)}.{i}", "machine": имя[:200],
+                "model_id": ключ_машины, "scheme": str(p.get("scheme") or "")[:40] or None,
+                "level": p.get("level") if isinstance(p.get("level"), int) else None,
+                "part_id": key, "part_no": pn[:120],
+                "own_no": str(p.get("kv_pn") or "")[:120] or None,
+                "qty": str(p.get("qty") or "")[:40] or None,
+                "name": str(p.get("desc") or "")[:400] or None,
+                "source": "ведомость состава"})
+            имя_детали = str(p.get("desc") or pn)
+            детали.setdefault(key, {
+                "id": key, "catalog_no": pn[:120], "name": имя_детали[:400],
+                "oem": None, "model": имя[:600], "category": None,
+                "segment_id": classify(f"{имя_детали} {имя}"),
+                "unit_id": eq.unit_of(имя_детали), "source": "ведомость состава"})
+    return строки, детали, машины
+
+
+def main() -> int:
+    alts = build_alts()
+    строки, детали, машины = build_bom()
+
+    print("=== взаимозаменяемость ===")
+    print(f"  связей: {num(len(alts))}")
+    for k, n in Counter(a["kind"] for a in alts).most_common():
+        print(f"    {k:26}{num(n)}")
+    print(f"  с названным изготовителем: {sum(1 for a in alts if a['alt_maker'])}")
+    print(f"  различных деталей: {len({a['part_id'] for a in alts})}")
+
+    print("\n=== ведомости ===")
+    print(f"  машин: {len(машины)} · строк состава: {num(len(строки))} · "
+          f"деталей: {len(детали)}")
+    сузлом = sum(1 for d in детали.values() if d["unit_id"])
+    print(f"  с определённым узлом: {сузлом} · со своим номером: "
+          f"{sum(1 for s in строки if s['own_no'])}")
+
+    if not APPLY:
+        print("\nхолостой прогон — в базе ничего не изменилось. Для записи: APPLY=1")
+        return 0
+
+    url = os.environ.get("SUPABASE_DB_URL", "")
+    if not url:
+        print("нет переменной SUPABASE_DB_URL", file=sys.stderr)
+        return 2
+    import psycopg2
+    import psycopg2.extras
+
+    import indexer
+    conn = psycopg2.connect(url, connect_timeout=20, options="-c statement_timeout=900000")
+    conn.autocommit = False
+    with conn.cursor() as cur:
+        indexer.ensure_segments(cur)
+        if машины:
+            psycopg2.extras.execute_values(cur, """
+                insert into lib_models (id, name, source) values %s
+                on conflict (id) do nothing""",
+                [(m["id"], m["name"], m["source"]) for m in машины.values()])
+        psycopg2.extras.execute_values(cur, """
+            insert into lib_parts (id, catalog_no, name, model, segment_id, unit_id, source)
+            values %s
+            on conflict (id) do update set
+              model = coalesce(lib_parts.model, excluded.model),
+              unit_id = coalesce(lib_parts.unit_id, excluded.unit_id),
+              updated_at = now()""",
+            [(d["id"], d["catalog_no"], d["name"], d["model"], d["segment_id"],
+              d["unit_id"], d["source"]) for d in детали.values()], page_size=500)
+
+        # Связь ставится только на известную деталь: ключ ведёт в lib_parts, и
+        # висячая ссылка здесь означала бы «замена неизвестно чего».
+        cur.execute("select id from lib_parts")
+        известные = {r[0] for r in cur.fetchall()}
+        годные = [a for a in alts if a["part_id"] in известные]
+        psycopg2.extras.execute_values(cur, """
+            insert into lib_part_alt (part_id, alt_pn, kind, alt_maker, evidence,
+                                      confidence, source)
+            values %s on conflict (part_id, alt_pn, kind) do nothing""",
+            [(a["part_id"], a["alt_pn"], a["kind"], a["alt_maker"], a["evidence"],
+              a["confidence"], a["source"]) for a in годные], page_size=500)
+        psycopg2.extras.execute_values(cur, """
+            insert into lib_bom (id, machine, model_id, scheme, level, part_id, part_no,
+                                 own_no, qty, name, source)
+            values %s
+            on conflict (id) do update set
+              qty = excluded.qty, name = excluded.name, part_id = excluded.part_id""",
+            [(s["id"], s["machine"], s["model_id"], s["scheme"], s["level"],
+              s["part_id"] if s["part_id"] in известные else None, s["part_no"],
+              s["own_no"], s["qty"], s["name"], s["source"]) for s in строки],
+            page_size=500)
+        conn.commit()
+        print(f"\n  связей записано: {len(годные)} из {len(alts)} "
+              f"(остальные — на деталь, которой в каталоге нет)")
+        for t in ("lib_part_alt", "lib_bom", "lib_parts"):
+            cur.execute(f"select count(*) from {t}")
+            print(f"  {t:16}{num(cur.fetchone()[0])}")
+    conn.close()
+    print("\n✓ взаимозаменяемость и ведомости загружены")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
