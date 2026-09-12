@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 189,
-    "total_bytes": 91515542,
+    "total_bytes": 91516241,
     "by_sensitivity": {
       "конфиденциально": 57,
       "внутреннее": 99,
@@ -276,6 +276,7 @@
         "pnw/tools/build_master.py",
         "scripts/build_chain_coverage.py",
         "scripts/build_dict.py",
+        "scripts/build_node_map.py",
         "tests/test_core.py"
       ]
     },
@@ -6021,7 +6022,7 @@
     {
       "path": "data/catalog_notes.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 28733,
+      "bytes": 29432,
       "note": "",
       "format": "json",
       "shape": "объект",
@@ -6031,6 +6032,7 @@
         "data/chat_snapshot.json",
         "data/index.json",
         "dict/",
+        "dict/node_map.json",
         "gidromet/data/",
         "gpu/data/bitrix_gpu.json",
         "gpu/data/coverage.json",
@@ -6064,12 +6066,11 @@
         "zip/data/customs_declarations.json",
         "zip/data/kp1763_audit.json",
         "zip/data/machines.json",
-        "zip/data/perf_class_packets.json",
-        "zip/data/perf_sourcing_map.json"
+        "zip/data/perf_class_packets.json"
       ],
       "last_change": "2026-09-12",
       "last_author": "Claude",
-      "last_commit": "7a56c95",
+      "last_commit": "950d5bf",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -6537,7 +6538,7 @@
       },
       "last_change": "2026-09-12",
       "last_author": "Claude",
-      "last_commit": "7a56c95",
+      "last_commit": "950d5bf",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
@@ -6622,7 +6623,8 @@
         "gt/tools/build_lot.py",
         "gt/tools/drop_ru.py",
         "scripts/build_chain_coverage.py",
-        "scripts/build_dict.py"
+        "scripts/build_dict.py",
+        "scripts/build_node_map.py"
       ]
     },
     {
@@ -7420,7 +7422,8 @@
         "gt/tools/build_lot.py",
         "gt/tools/drop_ru.py",
         "scripts/build_chain_coverage.py",
-        "scripts/build_dict.py"
+        "scripts/build_dict.py",
+        "scripts/build_node_map.py"
       ]
     },
     {

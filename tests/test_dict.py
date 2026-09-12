@@ -225,3 +225,36 @@ def test_machine_classifier_catches_flagship_models():
     assert m.mach_kind("Solar (сток)")[0] == "bucket"
     assert m.mach_kind("Буровой насос 12T1600")[0] == "other_machine"
 
+
+def test_node_map_is_fresh_and_complete():
+    """Карта узлов пересобрана и не теряет метки молча.
+
+    Ключи таблицы соответствия приводятся тем же правилом, каким по ней ищут.
+    Без этого «Крепёж» в таблице и «крепеж» в запросе — разные строки, и 828
+    размеченных человеком строк уходили в «не определено», не подав признака."""
+    r = subprocess.run([sys.executable, str(ROOT / "scripts" / "build_node_map.py"), "--check"],
+                       capture_output=True, text=True)
+    assert r.returncode == 0, f"карта узлов устарела: {r.stdout}{r.stderr}"
+
+    d = json.loads((DICT / "node_map.json").read_text(encoding="utf-8"))
+    assert d["labels"]["unmapped"] == [], \
+        f"метки не сведены к узлам: {d['labels']['unmapped']}"
+    assert d["labels"]["distinct"] > 40, "меток стало подозрительно мало"
+
+
+def test_node_classifier_precision_floor():
+    """Точность классификатора измеряется на ручной разметке и не должна падать.
+
+    Классификатор предлагает разметку для строк без метки — по этому предложению
+    потом принимают решение. Заявленная, но не измеренная точность бесполезна,
+    поэтому порог закреплён здесь и проверяется на каждом PR."""
+    d = json.loads((DICT / "node_map.json").read_text(encoding="utf-8"))
+    c = d["classifier"]
+    assert c["judged"] >= 1000, "выборка для измерения точности слишком мала"
+    assert c["precision_pct"] >= 80, (
+        f"точность упала до {c['precision_pct']} %: проверьте правила, "
+        f"путаница — {c['top_confusions'][:3]}")
+    # Предложение не должно молча объявлять разобранным то, что не разобрано.
+    p = d["proposal"]
+    assert p["would_classify"] + p["would_leave_unresolved"] == p["rows_without_label"]
+
