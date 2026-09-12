@@ -194,3 +194,13 @@ create index if not exists lib_files_status on lib_files (status);
 create index if not exists lib_files_sha    on lib_files (sha256);
 
 alter table lib_files enable row level security;
+
+-- Распознавание сканов (library/ocr.py). Файлы без текстового слоя — 4 059
+-- изображений и 8 195 «пусто» на 12.09.2026 — это фотографии и сканы
+-- спецификаций: разбор не извлёк из них ни одной позиции. Отметка о
+-- распознавании нужна для возобновляемости: повторный прогон пропускает
+-- уже распознанное. Колонки nullable и без default — правка каталога.
+alter table lib_files add column if not exists ocr_at    timestamptz;
+alter table lib_files add column if not exists ocr_chars int;
+create index if not exists lib_files_ocr on lib_files (ocr_at) where ocr_at is null;
+
