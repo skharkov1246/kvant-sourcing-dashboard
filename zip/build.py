@@ -189,7 +189,10 @@ def build():
     try:
         subprocess.run([sys.executable, str(ROOT.parent / "gt" / "build.py")], check=True)
         (OUT / "gt").mkdir(exist_ok=True)
-        for page in (ROOT.parent / "gt" / "public").glob("*.html"):
+        # .js рядом с .html: страницы ГТУ подключают общий модуль правок notes.js,
+        # и без него заметки инженеров молча перестанут сохраняться в общую базу.
+        for page in sorted((ROOT.parent / "gt" / "public").glob("*.html")) + \
+                sorted((ROOT.parent / "gt" / "public").glob("*.js")):
             shutil.copy2(page, OUT / "gt" / page.name)
             print(f"gt: {page.name} → zip/public/gt/{page.name}")
         # PN-wizard: отдельный сайт базы PN по пути /gt/wizard/ (подпапка с data.js/guide.html)

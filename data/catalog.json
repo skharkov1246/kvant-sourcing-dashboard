@@ -4,10 +4,10 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 179,
-    "total_bytes": 82350730,
+    "datasets": 180,
+    "total_bytes": 82450526,
     "by_sensitivity": {
-      "конфиденциально": 54,
+      "конфиденциально": 55,
       "внутреннее": 92,
       "публикуемо": 33
     },
@@ -15,7 +15,7 @@
       "ГПУ-библиотека": 27,
       "ГТУ-библиотека": 35,
       "ОВЭ-75": 45,
-      "база ЗИП": 28,
+      "база ЗИП": 29,
       "база ЗИП · таможня": 18,
       "гидрометаллургия": 22,
       "дашборд сорсеров": 3,
@@ -134,7 +134,7 @@
       },
       "last_change": "2026-09-12",
       "last_author": "Claude",
-      "last_commit": "82c10d0",
+      "last_commit": "8b5b17b",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -404,7 +404,9 @@
       },
       "referenced_by": [
         "pnw/tools/build_suppliers.py",
+        "tests/test_publish_library_v2.py",
         "zip/build.py",
+        "zip/tools/cat_stock.py",
         "zip/tools/who_supplies.py"
       ]
     },
@@ -787,14 +789,14 @@
       "referenced_by": [
         "pnw/tools/build_master.py",
         "pnw/tools/parse_crossrefs.py",
+        "scripts/publish_library_v2.py",
+        "tests/test_publish_library_v2.py",
         "zip/build.py",
         "zip/customs/glbs_pull.mjs",
         "zip/tools/aggregate_customs.py",
         "zip/tools/aggregate_prices.py",
         "zip/tools/import_sheet.py",
-        "zip/tools/perf_classes.py",
-        "zip/tools/pilot_order.py",
-        "zip/tools/pilot_pdf.py"
+        "zip/tools/perf_classes.py"
       ]
     },
     {
@@ -1256,7 +1258,7 @@
     {
       "path": "data/chat_snapshot.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 522992,
+      "bytes": 536053,
       "note": "Суточный снимок реакции коммерсантов в чатах сделок. Пишет бот scan.yml (chat_scan.py) раз в сутки. Руками не редактировать: правка в PR откатит свежие данные при мерже. Содержит поимённые метрики 15 сотрудников и LLM-оценки.",
       "format": "json",
       "shape": "объект",
@@ -1374,9 +1376,9 @@
           "site"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-09-12",
       "last_author": "Claude",
-      "last_commit": "52302b9",
+      "last_commit": "8b5b17b",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -3398,6 +3400,68 @@
       },
       "referenced_by": [
         "ove/build.py"
+      ]
+    },
+    {
+      "path": "zip/data/cat_stock_2026-09.json",
+      "subproject": "база ЗИП",
+      "bytes": 84053,
+      "note": "Срочная заявка Caterpillar на 29 позиций (92 шт) с поставкой в Красноярск к 15.10.2026. По решению владельца 11.09.2026 поиск ограничен складами КНР и ЮАР, а запрашиваются только иностранные поставщики — российские импортёры, дилеры и трейдеры в лист не выводятся. Состав: разбор перечня по узлам и ходовым классам; шесть каналов поставки обеих стран со сроками до Красноярска; 20 подтверждённых площадок отгрузки (базисы EXW/FCA/FOB — адрес, отправитель, период, род груза; наличие по нашим парт-номерам не подтверждено нигде, подтверждён только факт отгрузки оттуда в РФ); 19 иностранных отправителей из КНР и ЮАР; четыре крупных игрока рынка ЮАР, которых в нашей базе нет, с явной пометкой «проверять с нуля»; профильный китайский афтермаркет из справочника ODM; оценка закупочной цены по каждой позиции на базисе EXW с вилкой low/base/high и альтернативами «аналог КНР» и «б/у ЮАР», плюс четыре сценария бюджета по всей спецификации (оригинал 174 тыс. USD при ширине 117–269, тяжёлое с разбора 99 тыс.); цены — собственная оценка по классу детали, не котировки: прайса Caterpillar у нас нет, калибровка по нашему же ценовому массиву и рыночным якорям на жгуты и КПП; план сорсера на пять дней и готовый запрос на английском. Строит zip/tools/cat_stock.py; лист — zip/orders/CAT-СТОКИ-СОРСИНГ.pdf (рендер zip/tools/cat_stock_table.py + cat_stock_pdf.py). Заказчик не называется, цен и контактов нет; из таможни перенесены только отправитель, маршрут и род груза — российские получатели, стоимости, веса и номера деклараций не переносятся.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "aftermarket",
+        "budget",
+        "built_by",
+        "channels",
+        "customs_stats",
+        "findings",
+        "groups",
+        "machine",
+        "market_suppliers",
+        "playbook",
+        "positions",
+        "request",
+        "schema",
+        "shipping_points",
+        "suppliers",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "positions",
+        "records": 29,
+        "record_keys": [
+          "alt_exw_usd",
+          "ask",
+          "group",
+          "hs_hint",
+          "line_exw_usd",
+          "name_en",
+          "name_ru",
+          "pn",
+          "pn_cat",
+          "pn_norm",
+          "pp",
+          "price_exw_usd",
+          "qty",
+          "route",
+          "stock_class",
+          "unit"
+        ]
+      },
+      "last_change": null,
+      "last_author": null,
+      "last_commit": null,
+      "updated_by": "неизвестно",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "участники внешнеэкономических сделок"
+        ]
+      },
+      "referenced_by": [
+        "zip/tools/cat_stock.py",
+        "zip/tools/cat_stock_table.py"
       ]
     },
     {
@@ -6087,6 +6151,55 @@
       ]
     },
     {
+      "path": "data/catalog_notes.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 18584,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "data/budget_snapshot.json",
+        "data/chat_snapshot.json",
+        "data/index.json",
+        "gidromet/data/",
+        "gpu/data/bitrix_gpu.json",
+        "gpu/data/coverage.json",
+        "gt/data/ansaldo.json",
+        "gt/data/bitrix_gt.json",
+        "gt/data/dossiers.json",
+        "gt/data/pn_db.json",
+        "gt/data/ship_energoseti.json",
+        "gt/data/ship_lukoil.json",
+        "gt/data/ship_sellers.json",
+        "gt/data/ship_sweep.json",
+        "ove/data/suppliers.json",
+        "pnw/public/data.js",
+        "pnw/public/search.html",
+        "zip/customs/out/",
+        "zip/data/cat_stock_2026-09.json",
+        "zip/data/customs_declarations.json",
+        "zip/data/kp1763_audit.json",
+        "zip/data/perf_class_packets.json",
+        "zip/data/perf_sourcing_map.json",
+        "zip/data/perf_test_requests.json",
+        "zip/data/supplier_crm.json",
+        "zip/data/telsmith_3858.json",
+        "zip/data/telsmith_crossrefs.json",
+        "zip/data/telsmith_nodrawings.json"
+      ],
+      "last_change": "2026-09-12",
+      "last_author": "Claude",
+      "last_commit": "8b5b17b",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "scripts/build_catalog.py"
+      ]
+    },
+    {
       "path": "gpu/data/parts.json",
       "subproject": "ГПУ-библиотека",
       "bytes": 16417,
@@ -6208,54 +6321,6 @@
       "referenced_by": [
         "gt/tools/build_plugs.py",
         "ove/build.py"
-      ]
-    },
-    {
-      "path": "data/catalog_notes.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 15902,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "data/budget_snapshot.json",
-        "data/chat_snapshot.json",
-        "data/index.json",
-        "gidromet/data/",
-        "gpu/data/bitrix_gpu.json",
-        "gpu/data/coverage.json",
-        "gt/data/ansaldo.json",
-        "gt/data/bitrix_gt.json",
-        "gt/data/dossiers.json",
-        "gt/data/pn_db.json",
-        "gt/data/ship_energoseti.json",
-        "gt/data/ship_lukoil.json",
-        "gt/data/ship_sellers.json",
-        "gt/data/ship_sweep.json",
-        "ove/data/suppliers.json",
-        "pnw/public/data.js",
-        "pnw/public/search.html",
-        "zip/customs/out/",
-        "zip/data/customs_declarations.json",
-        "zip/data/kp1763_audit.json",
-        "zip/data/perf_class_packets.json",
-        "zip/data/perf_sourcing_map.json",
-        "zip/data/perf_test_requests.json",
-        "zip/data/supplier_crm.json",
-        "zip/data/telsmith_3858.json",
-        "zip/data/telsmith_crossrefs.json",
-        "zip/data/telsmith_nodrawings.json"
-      ],
-      "last_change": "2026-09-11",
-      "last_author": "Claude",
-      "last_commit": "52302b9",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "публикуемо",
-        "markers": []
-      },
-      "referenced_by": [
-        "scripts/build_catalog.py"
       ]
     },
     {
@@ -7474,7 +7539,8 @@
         "markers": []
       },
       "referenced_by": [
-        "zip/customs/glbs_pull.mjs"
+        "zip/customs/glbs_pull.mjs",
+        "zip/tools/cat_stock.py"
       ]
     },
     {

@@ -34,64 +34,19 @@ import psycopg2
 import psycopg2.extras
 import requests
 
-BASE = os.environ["BITRIX_WEBHOOK_URL"].rstrip("/")
-DB = os.environ["SUPABASE_DB_URL"]
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from segments import SEGMENTS, classify, name_of  # noqa: E402  (после sys.path)
+
+# Секреты читаются лениво: без них модуль всё равно импортируется — иначе его
+# нельзя ни собрать py_compile, ни импортировать из тестов гейта.
+BASE = os.environ.get("BITRIX_WEBHOOK_URL", "").rstrip("/")
+DB = os.environ.get("SUPABASE_DB_URL", "")
 SHARDS = int(os.environ.get("SHARDS", "1"))
 SHARD = int(os.environ.get("SHARD", "0"))
 WORKERS = int(os.environ.get("WORKERS", "12"))
 DAYS = int(os.environ.get("DAYS", "365"))
 LIMIT = int(os.environ.get("LIMIT", "0"))          # 0 — без ограничения
-
-SEGMENTS: dict[str, tuple[str, list[str]]] = {
-    "gpu": ("ГПУ — газопоршневые", ["газопоршн", "когенерац", "мини-тэц", "мини тэц", "гпа-", "гпэс",
-                                    "cummins", "камминз", "qsv", "qsk", "kta38", "kta50", "gta855",
-                                    "g3512", "g3516", "g3520", "g3606",
-                                    "g3608", "g3612", "g3616", "cg170", "cg132",
-                                    "jenbacher", "дженбахер", "innio", "j208", "j312", "j320",
-                                    "j412", "j420", "j612", "j616", "j620", "j624",
-                                    "waukesha", "воукеша", "vhp", "l7042", "f3521", "apg1000",
-                                    "mwm", "tcg 2020", "tcg2020", "tcg 3016", "deutz", "деутц",
-                                    "guascor", "гуаскор", "jichai", "yuchai", "ючай", "weichai",
-                                    "hsk78", "mtu onsite", "свеча зажигания газ"]),
-    "gtu": ("ГТУ — газотурбинные", ["газотурб", "турбин", "sgt", "lm6000", "lm2500", "taurus",
-                                    "centaur", "solar turbines", "гпа"]),
-    "gsho": ("ГШО — горно-шахтное", ["перфоратор", "буров", "epiroc", "atlas copco", "sandvik",
-                                     "tamrock", "normet", "пдм", "коронк", "проходческ"]),
-    "pumps": ("Насосное оборудование", ["насос", "flowserve", "sulzer", "ksb", "grundfos", "цнс",
-                                        "шламов", "warman", "weir", "рабочее колесо"]),
-    "compressors": ("Компрессоры винтовые и воздушные", ["компрессор", "винтов", "ingersoll",
-                                                        "kaeser", "воздуходув", "ресивер",
-                                                        "осушитель воздух", "sullair"]),
-    # Поршневые вынесены из общего сегмента: у них своя номенклатура (клапаны, поршневые кольца,
-    # штоки, сальники, вкладыши) и свой пул изготовителей, а ключи винтового сегмента их не ловят.
-    # Спрос по направлению подтверждён нашими же сделками, разведка по нему не проводилась.
-    "recip": ("Компрессоры поршневые", ["поршнев", "nuovo pignone", "4hf", "ariel", "burckhardt",
-                                        "dresser-rand", "dresser rand", "worthington", "neuman esser",
-                                        "чкд", "ckd", "борсиг", "borsig", "2гм", "4гм", "эк-7",
-                                        "оппозитн", "крейцкопф", "поршневое кольцо", "шток поршн",
-                                        "клапан компрессор", "сальник штока", "гмк компрессор"]),
-    "beneficiation": ("Дробление и обогащение", ["дробилк", "мельниц", "грохот", "флотац",
-                                                 "гидроциклон", "metso", "outotec", "футеровк"]),
-    "valves": ("Трубопроводная арматура", ["задвижк", "затвор", "клапан", "кран шаров", "вентиль",
-                                           "арматур", "фланц"]),
-    "electro": ("Электротехника и приводы", ["трансформатор", "кру", "ктп", "частотн", "чрп",
-                                             "электродвигател", "schneider", "ячейк", "кабель"]),
-    "instrumentation": ("КИПиА и автоматизация", ["датчик", "расходомер", "манометр", "термопар",
-                                                  "emerson", "endress", "yokogawa", "уровнемер"]),
-    "conveying": ("Подъёмно-транспортное", ["конвейер", "транспортёр", "лебёдк", "кран мостов",
-                                            "редуктор", "тельфер", "роликоопор"]),
-    "heat": ("Теплообмен и котельное", ["теплообменник", "alfa laval", "котёл", "котел", "градирн",
-                                        "экономайзер", "калорифер"]),
-    "mining_machines": ("Карьерная спецтехника", ["самосвал", "экскаватор", "белаз", "komatsu",
-                                                  "бульдозер", "автогрейдер"]),
-    "bearings": ("Подшипники и уплотнения", ["подшипник", "skf", "timken", "манжет", "сальник",
-                                             "john crane", "уплотнени"]),
-    "water": ("Водоподготовка и фильтрация", ["мембран", "ультрафильтрац", "осмос", "фильтрующ",
-                                              "фильтроэлемент", "водоподготовк", "картридж"]),
-    "steel": ("Металлопрокат и трубы", ["швеллер", "двутавр", "металлопрокат", "лист стальн",
-                                        "отвод", "тройник", "труба"]),
-    "welding": ("Сварка и инструмент", ["сварочн", "электрод", "проволок", "абразив", "сверло", "фреза"]),
-}
+RETRY_FAILED = os.environ.get("RETRY_FAILED", "") not in ("", "0", "false")
 
 # Колонки спецификации. Спецификации у всех заказчиков свои, но заголовки повторяются.
 COLS = {
@@ -146,16 +101,6 @@ def bx_all(method: str, params: dict) -> list:
         if "next" not in j:
             return out
         start = j["next"]
-
-
-def classify(text: str) -> str | None:
-    t = text.lower().replace("ё", "е")
-    best, score = None, 0
-    for sid, (_n, words) in SEGMENTS.items():
-        n = sum(t.count(w.replace("ё", "е")) for w in words)
-        if n > score:
-            best, score = sid, n
-    return best
 
 
 def sniff(b: bytes) -> str:
@@ -426,7 +371,7 @@ def ensure_segments(cur) -> None:
     lib_demand.segment_id ссылается на lib_segments(id); при пустом справочнике
     вся запись падает с ForeignKeyViolation, а разобранные файлы теряются —
     именно так оборвались все двенадцать частей прогона 08.09.2026.
-    Источник истины — словарь SEGMENTS в этом файле, поэтому справочник
+    Источник истины — словарь SEGMENTS в library/segments.py, поэтому справочник
     наполняем из него, а не поддерживаем вручную в двух местах."""
     psycopg2.extras.execute_values(
         cur,
@@ -436,16 +381,25 @@ def ensure_segments(cur) -> None:
 
 
 def main() -> int:
+    for var in ("BITRIX_WEBHOOK_URL", "SUPABASE_DB_URL"):
+        if not os.environ.get(var):
+            print(f"нет переменной {var}", file=sys.stderr)
+            return 2
     if SHARDS > 1:
         print(f"часть {SHARD + 1} из {SHARDS}", flush=True)
     conn = connect()
     with conn.cursor() as cur:
         ensure_segments(cur)
         conn.commit()
-        cur.execute("select file_id from lib_files")
+        # Повторная попытка для не скачавшихся: «не скачался» — сетевая осечка,
+        # а не свойство файла. «Пусто» и «формат не читаем» повторять незачем:
+        # результат будет тот же, а прогон подорожает.
+        cur.execute("select file_id from lib_files"
+                    + (" where status <> 'не скачался'" if RETRY_FAILED else ""))
         done = {r[0] for r in cur.fetchall()}
     conn.close()
-    print(f"уже разобрано ранее: {len(done)}", flush=True)
+    print(f"уже разобрано ранее: {len(done)}"
+          + (" (файлы со статусом «не скачался» пойдут заново)" if RETRY_FAILED else ""), flush=True)
 
     refs = collect_refs(DAYS)
     mine = [r for r in refs
@@ -534,7 +488,7 @@ def main() -> int:
     print(f"по формату:   {dict(kinds.most_common())}")
     print("позиции по сегментам:")
     for sid, n in segs.most_common():
-        print(f"    {SEGMENTS.get(sid, (sid, []))[0]:32s} {n:>8d}")
+        print(f"    {name_of(sid):32s} {n:>8d}")
     print("\n✓ разбор части завершён")
     return 0
 

@@ -44,8 +44,27 @@ jobs:
             echo "::error::Секрет SUPABASE_DB_URL не задан. Settings → Secrets → Actions → New secret."
             exit 1
           fi
-          psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -f zip/supabase/migrations.sql
-          echo "— схема базы ЗИП применена"
-          psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -f library/supabase/schema.sql
-          echo "— схема библиотеки рынков применена"
-          echo "✓ миграции применены"
+          # ПОРЯДОК ВАЖЕН. Сначала мелкие схемы, в конце — тяжёлая библиотека:
+          # её колонки fts перестраивают таблицы целиком и на больших данных идут
+          # минутами. 11.09.2026 прогон №4 упал на statement timeout в
+          # library/supabase/schema.sql, и из-за set -e до gt_notes дело не дошло —
+          # правки инженеров остались без общей базы.
+          #
+          # И ни один файл больше не отменяет остальные: неудача запоминается,
+          # следующие файлы всё равно применяются, job падает в конце.
+          rc=0
+          apply () {   # apply <файл> <что это>
+            echo "::group::$2 ($1)"
+            if psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -f "$1"; then
+              echo "— $2: применено"
+            else
+              echo "::error file=$1::$2 — не применено, см. журнал шага"
+              rc=1
+            fi
+            echo "::endgroup::"
+          }
+          apply gt/supabase/migrations.sql  "правки инженеров ГТУ"
+          apply zip/supabase/migrations.sql "схема базы ЗИП"
+          apply library/supabase/schema.sql "схема библиотеки рынков"
+          [ "$rc" = 0 ] && echo "✓ миграции применены" || echo "✗ часть миграций не применилась"
+          exit "$rc"

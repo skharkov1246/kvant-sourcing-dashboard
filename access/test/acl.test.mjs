@@ -45,13 +45,13 @@ test("роль сорсинга ограничивает вкладки, точ�
   acl.users["s@kvantpro.com"] = { role: "sourcing", sites: [], tabs: [], note: "", seen: 1 };
   const base = rightsFor(acl, "s@kvantpro.com", {});
   assert.deepEqual(base.tabs, ["sourcing", "contracts", "suppliers"]);
-  assert.deepEqual(base.sites, ["dashboard", "zip", "gt", "gpu"]);
+  assert.deepEqual(base.sites, ["dashboard", "zip", "gt", "gpu", "knowledge"]);
 
   acl.users["s@kvantpro.com"].tabs = ["kam"];
   acl.users["s@kvantpro.com"].sites = ["gok"];
   const wide = rightsFor(acl, "s@kvantpro.com", {});
   assert.deepEqual(wide.tabs, ["sourcing", "kam", "contracts", "suppliers"]);   // порядок — как в TAB_IDS
-  assert.deepEqual(wide.sites, ["dashboard", "zip", "gt", "gpu", "gok"]);
+  assert.deepEqual(wide.sites, ["dashboard", "zip", "gt", "gpu", "knowledge", "gok"]);
 });
 
 test("ADMIN_EMAILS даёт полные права даже при пустой роли — страховка от потери хранилища", () => {
@@ -246,4 +246,24 @@ test("разделение «Базы ЗИП» на ГШО и ГТУ не отн
 test("порядок сайтов в правах всегда как в справочнике", () => {
   const a = normalizeAcl({ version: 2, roles: { r: { name: "Р", sites: ["gok", "dashboard", "gt"], tabs: [] } }, users: {} });
   assert.deepEqual(a.roles.r.sites, ["dashboard", "gt", "gok"]);
+});
+
+test("новая библиотека не расширяет сохранённые роли и точечные права", () => {
+  const acl = normalizeAcl({ version: 2, defaultRole: "employee", roles: {
+    employee: { name: "Сотрудник", sites: ["dashboard", "zip", "gt", "gpu", "ove", "gidromet", "gok"], tabs: [] },
+    custom: { name: "Своя роль", sites: ["gt"], tabs: [] },
+  }, users: { "reader@kvantpro.com": { role: "custom", sites: ["zip"], tabs: [] } } });
+  assert.ok(!rightsFor(acl, "new@kvantpro.com", {}).sites.includes("knowledge"));
+  assert.deepEqual(rightsFor(acl, "reader@kvantpro.com", {}).sites, ["zip", "gt"]);
+  assert.ok(rightsFor(acl, "stepan@kvantpro.com", {}).sites.includes("knowledge"));
+});
+
+test("строгое чтение прав отказывает при отсутствии, ошибке и порче хранилища", async () => {
+  await assert.rejects(loadAcl({}, { strict: true }));
+  const failing = { ACL: { get: async () => { throw new Error("offline"); } } };
+  await assert.rejects(loadAcl(failing, { strict: true }));
+  assert.deepEqual(await loadAcl(failing), defaultAcl(), "поведение прежних маршрутов не меняется");
+  const env = { ACL: kv() };
+  await env.ACL.put(ACL_KEY, "{}");
+  await assert.rejects(loadAcl(env, { strict: true }));
 });
