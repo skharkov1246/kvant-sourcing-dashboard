@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 190,
-    "total_bytes": 93852627,
+    "total_bytes": 93853284,
     "by_sensitivity": {
       "конфиденциально": 57,
       "внутреннее": 101,
@@ -6469,6 +6469,48 @@
       ]
     },
     {
+      "path": "data/chain_coverage.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 20942,
+      "note": "Заполняемость цепочки портала по семи направлениям и восьми звеньям: машина → узел → признак → дефект → ремонтное решение → запчасть → изготовитель → исполнитель. Производный файл, считается scripts/build_chain_coverage.py по фактическим файлам репозитория; ноль означает отсутствие данных, а не то, что они где-то есть. Руками не заполнять. Первый прогон 12.09.2026: 13 клеток из 56, звенья «Признак», «Дефект» и «Исполнитель» не начаты ни по одному направлению.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "common",
+        "empty_everywhere",
+        "goal",
+        "links",
+        "note",
+        "priority_rule",
+        "scope",
+        "segments",
+        "summary",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "links",
+        "records": 8,
+        "record_keys": [
+          "link",
+          "title",
+          "what"
+        ]
+      },
+      "last_change": "2026-09-12",
+      "last_author": "Claude",
+      "last_commit": "da8ad60",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "scripts/build_chain_coverage.py",
+        "scripts/build_chain_page.py",
+        "tests/test_dict.py"
+      ]
+    },
+    {
       "path": "ove/data/bitrix_ove.json",
       "subproject": "ОВЭ-75",
       "bytes": 20614,
@@ -6507,47 +6549,6 @@
         ".github/workflows/ove-deploy.yml",
         "ove/build.py",
         "ove/tools/bitrix_ove.py"
-      ]
-    },
-    {
-      "path": "data/chain_coverage.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 20285,
-      "note": "Заполняемость цепочки портала по семи направлениям и восьми звеньям: машина → узел → признак → дефект → ремонтное решение → запчасть → изготовитель → исполнитель. Производный файл, считается scripts/build_chain_coverage.py по фактическим файлам репозитория; ноль означает отсутствие данных, а не то, что они где-то есть. Руками не заполнять. Первый прогон 12.09.2026: 13 клеток из 56, звенья «Признак», «Дефект» и «Исполнитель» не начаты ни по одному направлению.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "common",
-        "empty_everywhere",
-        "goal",
-        "links",
-        "note",
-        "priority_rule",
-        "segments",
-        "summary",
-        "updated"
-      ],
-      "main_collection": {
-        "key": "links",
-        "records": 8,
-        "record_keys": [
-          "link",
-          "title",
-          "what"
-        ]
-      },
-      "last_change": "2026-09-12",
-      "last_author": "Claude",
-      "last_commit": "da8ad60",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "scripts/build_chain_coverage.py",
-        "scripts/build_chain_page.py",
-        "tests/test_dict.py"
       ]
     },
     {

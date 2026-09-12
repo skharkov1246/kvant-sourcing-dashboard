@@ -93,15 +93,17 @@ def build():
 </header>
 <main>
 <div class="card txt">{e(d['note'])}</div>
+<div class="card" style="border-left:4px solid var(--warn,#fab219)"><b>Что этот счётчик не видит</b>
+<div class="txt">{e(d.get('scope', ''))}</div></div>
 <div class="legend">
   <span><i style="background:rgba(12,163,12,.35)"></i>есть данные, под числом — сколько файлов-источников</span>
-  <span><i style="background:rgba(208,59,59,.35)"></i>пусто: данных нет, а не «где-то есть»</span>
+  <span><i style="background:rgba(208,59,59,.35)"></i>пусто в файлах репозитория — в библиотеке Supabase может быть</span>
 </div>
 <div class="wrap"><table class="chain"><thead><tr><th style="width:190px">Направление</th>{head}
 <th style="width:62px">Итог</th></tr></thead><tbody>{rows}</tbody></table></div>
 <div class="mut">Наведите на клетку — покажет файлы, из которых взято число.
 Правило приоритета: {e(d['priority_rule'])}</div>
-<h2>Звенья, не начатые ни по одному направлению</h2>{empty or '<div class="card">нет — все звенья где-то начаты</div>'}
+<h2>Звенья, не начатые ни по одному направлению — в файлах репозитория</h2>{empty or '<div class="card">нет — все звенья где-то начаты</div>'}
 {f'<h2>Находки</h2>{foreign}' if foreign else ''}
 </main></body></html>"""
     OUT.parent.mkdir(parents=True, exist_ok=True)

@@ -335,3 +335,23 @@ def test_parts_counted_as_unique_numbers_not_rows():
         if cell["n"]:
             assert cell["sources"], f"{seg['segment']}: номера без источника"
 
+
+def test_chain_counter_declares_its_scope():
+    """Счётчик обязан говорить, чего он не видит.
+
+    Он меряет только файлы репозитория. Инженерная библиотека живёт в закрытой
+    Supabase, и часть звеньев закрыта именно там: на 12.09.2026 в lib_defects
+    16 записей, в lib_procedures 34 ремонтные операции, в lib_suppliers 4 480
+    компаний. Без оговорки страница читается как «этих звеньев нет нигде» —
+    и увела бы работу не туда."""
+    cov = json.loads((ROOT / "data" / "chain_coverage.json").read_text(encoding="utf-8"))
+    scope = cov.get("scope", "")
+    assert scope, "счётчик не объявляет свой охват"
+    assert "lib_" in scope and "Supabase" in scope, \
+        "в оговорке не назван второй источник знаний — библиотека"
+
+    page = ROOT / "zip" / "public" / "chain.html"
+    if page.exists():
+        html = page.read_text(encoding="utf-8")
+        assert "Что этот счётчик не видит" in html, "оговорка не попала на страницу"
+
