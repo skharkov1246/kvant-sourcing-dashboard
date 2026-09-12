@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 189,
-    "total_bytes": 91516241,
+    "total_bytes": 91516506,
     "by_sensitivity": {
       "конфиденциально": 57,
       "внутреннее": 99,
@@ -497,6 +497,7 @@
         "library/load_suppliers.py",
         "pnw/tools/build_suppliers.py",
         "scripts/build_chain_coverage.py",
+        "tests/test_dict.py",
         "tests/test_publish_library_v2.py",
         "zip/build.py",
         "zip/tools/cat_stock.py",
@@ -711,7 +712,8 @@
         "gt/tools/build_rfq.py",
         "gt/tools/drop_ru.py",
         "gt/tools/ship_merge.py",
-        "library/load_suppliers.py"
+        "library/load_suppliers.py",
+        "scripts/build_chain_coverage.py"
       ]
     },
     {
@@ -1041,7 +1043,8 @@
         "gt/tools/drop_ru.py",
         "gt/tools/ship_merge.py",
         "library/load_suppliers.py",
-        "pnw/tools/build_suppliers.py"
+        "pnw/tools/build_suppliers.py",
+        "scripts/build_chain_coverage.py"
       ]
     },
     {
@@ -3246,7 +3249,8 @@
       },
       "referenced_by": [
         "gt/build.py",
-        "gt/tools/drop_ru.py"
+        "gt/tools/drop_ru.py",
+        "scripts/build_chain_coverage.py"
       ]
     },
     {
@@ -3293,7 +3297,8 @@
       "referenced_by": [
         "gt/build.py",
         "gt/tools/build_rfq.py",
-        "gt/tools/drop_ru.py"
+        "gt/tools/drop_ru.py",
+        "scripts/build_chain_coverage.py"
       ]
     },
     {
@@ -4338,7 +4343,8 @@
         "gt/build.py",
         "gt/tools/build_rfq.py",
         "gt/tools/drop_ru.py",
-        "pnw/tools/build_suppliers.py"
+        "pnw/tools/build_suppliers.py",
+        "scripts/build_chain_coverage.py"
       ]
     },
     {
@@ -5938,6 +5944,7 @@
       },
       "referenced_by": [
         "pnw/tools/build_suppliers.py",
+        "scripts/build_chain_coverage.py",
         "zip/build.py",
         "zip/tools/import_sheet.py",
         "zip/tools/perf_classes.py",
@@ -6070,7 +6077,7 @@
       ],
       "last_change": "2026-09-12",
       "last_author": "Claude",
-      "last_commit": "950d5bf",
+      "last_commit": "2e6c704",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -6468,6 +6475,45 @@
       ]
     },
     {
+      "path": "data/chain_coverage.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 19976,
+      "note": "Заполняемость цепочки портала по семи направлениям и восьми звеньям: машина → узел → признак → дефект → ремонтное решение → запчасть → изготовитель → исполнитель. Производный файл, считается scripts/build_chain_coverage.py по фактическим файлам репозитория; ноль означает отсутствие данных, а не то, что они где-то есть. Руками не заполнять. Первый прогон 12.09.2026: 13 клеток из 56, звенья «Признак», «Дефект» и «Исполнитель» не начаты ни по одному направлению.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "common",
+        "empty_everywhere",
+        "goal",
+        "links",
+        "note",
+        "priority_rule",
+        "segments",
+        "summary"
+      ],
+      "main_collection": {
+        "key": "links",
+        "records": 8,
+        "record_keys": [
+          "link",
+          "title",
+          "what"
+        ]
+      },
+      "last_change": "2026-09-12",
+      "last_author": "Claude",
+      "last_commit": "950d5bf",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "scripts/build_chain_coverage.py",
+        "tests/test_dict.py"
+      ]
+    },
+    {
       "path": "gpu/data/fleet.json",
       "subproject": "ГПУ-библиотека",
       "bytes": 19970,
@@ -6508,45 +6554,6 @@
       "referenced_by": [
         "gpu/build.py",
         "gpu/tools/build_targets.py"
-      ]
-    },
-    {
-      "path": "data/chain_coverage.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 19711,
-      "note": "Заполняемость цепочки портала по семи направлениям и восьми звеньям: машина → узел → признак → дефект → ремонтное решение → запчасть → изготовитель → исполнитель. Производный файл, считается scripts/build_chain_coverage.py по фактическим файлам репозитория; ноль означает отсутствие данных, а не то, что они где-то есть. Руками не заполнять. Первый прогон 12.09.2026: 13 клеток из 56, звенья «Признак», «Дефект» и «Исполнитель» не начаты ни по одному направлению.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "common",
-        "empty_everywhere",
-        "goal",
-        "links",
-        "note",
-        "priority_rule",
-        "segments",
-        "summary"
-      ],
-      "main_collection": {
-        "key": "links",
-        "records": 8,
-        "record_keys": [
-          "link",
-          "title",
-          "what"
-        ]
-      },
-      "last_change": "2026-09-12",
-      "last_author": "Claude",
-      "last_commit": "950d5bf",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "публикуемо",
-        "markers": []
-      },
-      "referenced_by": [
-        "scripts/build_chain_coverage.py",
-        "tests/test_dict.py"
       ]
     },
     {

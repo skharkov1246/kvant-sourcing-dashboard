@@ -258,3 +258,26 @@ def test_node_classifier_precision_floor():
     p = d["proposal"]
     assert p["would_classify"] + p["would_leave_unresolved"] == p["rows_without_label"]
 
+
+def test_makers_counted_as_companies_not_rows():
+    """Изготовители считаются уникальными компаниями, а не строками.
+
+    Счётчик суммировал строки разных файлов и врал в обе стороны: по ГТУ он видел
+    72 компании, не подключив пять реестров из восьми, а по ГШО — 4368, потому что
+    4309 строк odm_suppliers это связи «позиция × кандидат» на 1289 компаний,
+    а не изготовители. Сумма строк несравнима между направлениями."""
+    cov = json.loads((ROOT / "data" / "chain_coverage.json").read_text(encoding="utf-8"))
+    by_seg = {s["segment"]: s for s in cov["segments"]}
+
+    gsho = next(c for c in by_seg["gsho"]["cells"] if c["link"] == "maker")
+    odm = json.loads((ROOT / "zip" / "data" / "odm_suppliers.json").read_text(encoding="utf-8"))
+    assert gsho["n"] < len(odm), (
+        "изготовителей ГШО не может быть больше, чем строк связей: "
+        f"{gsho['n']} против {len(odm)} — считаются строки, а не компании")
+
+    gtu = next(c for c in by_seg["gtu"]["cells"] if c["link"] == "maker")
+    assert len(gtu["sources"]) >= 6, (
+        f"по ГТУ подключено лишь {len(gtu['sources'])} реестров — "
+        "остальные компании в счёт не попадут")
+    assert gtu["n"] > 1000, "по ГТУ реестров восемь, компаний должно быть заметно больше сотни"
+

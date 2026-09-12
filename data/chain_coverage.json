@@ -402,11 +402,16 @@
           "link": "maker",
           "title": "Изготовитель",
           "what": "кто делает деталь, помимо владельца конструкции",
-          "n": 72,
+          "n": 1635,
           "sources": [
-            "gt/data/tfs_subsuppliers.json",
             "gt/data/suppliers.json",
-            "gt/data/heavy_suppliers.json"
+            "gt/data/heavy_suppliers.json",
+            "gt/data/research_suppliers.json",
+            "gt/data/tfs_subsuppliers.json",
+            "gt/data/sgt400_checklist.json",
+            "gt/data/dossiers.json",
+            "gt/data/site_profiles.json",
+            "gt/data/bitrix_supplier_sites.json"
           ],
           "state": "есть"
         },
@@ -486,10 +491,10 @@
           "link": "maker",
           "title": "Изготовитель",
           "what": "кто делает деталь, помимо владельца конструкции",
-          "n": 88,
+          "n": 75,
           "sources": [
-            "gpu/data/subsuppliers.json",
-            "gpu/data/suppliers.json"
+            "gpu/data/suppliers.json",
+            "gpu/data/subsuppliers.json"
           ],
           "state": "есть"
         },
@@ -573,10 +578,11 @@
           "link": "maker",
           "title": "Изготовитель",
           "what": "кто делает деталь, помимо владельца конструкции",
-          "n": 4368,
+          "n": 1150,
           "sources": [
             "zip/data/odm_suppliers.json",
-            "zip/data/telsmith_suppliers.json"
+            "zip/data/telsmith_suppliers.json",
+            "zip/data/supplier_crm.json"
           ],
           "state": "есть"
         },

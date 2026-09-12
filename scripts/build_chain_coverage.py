@@ -61,6 +61,59 @@ def n(x):
     return len(x) if hasattr(x, "__len__") else 0
 
 
+def nkey(name: str) -> str:
+    """Ключ компании — тот же, что в общем словаре (scripts/build_dict.py)."""
+    import re
+    s = str(name or "").lower().replace("ё", "е")
+    s = re.sub(r"\b(ооо|оао|зао|пао|ао|llc|ltd|inc|gmbh|s\.p\.a|spa|co|corp|company|"
+               r"limited|holding|group|a/s|ab|bv|nv|sas|sa|plc|pte|kg|ag)\b", " ", s)
+    return re.sub(r"[^a-z0-9а-я]+", "", s)[:40]
+
+
+# Реестры компаний по направлениям. Считаются УНИКАЛЬНЫЕ компании, а не строки:
+# одна и та же компания лежит в нескольких реестрах и в тысячах связей с позициями.
+MAKER_FILES = {
+    "gtu": [("gt/data/suppliers.json", None, "name"),
+            ("gt/data/heavy_suppliers.json", "rows", "name"),
+            ("gt/data/research_suppliers.json", "rows", "name"),
+            ("gt/data/tfs_subsuppliers.json", "rows", "name"),
+            ("gt/data/sgt400_checklist.json", "rows", "name"),
+            ("gt/data/dossiers.json", "dossiers", "__key__"),
+            ("gt/data/site_profiles.json", "profiles", "__key__"),
+            ("gt/data/bitrix_supplier_sites.json", "confirmed", "__key__")],
+    # Вложенный реестр: systems[].makers[].name — путь помечен двоеточием.
+    "gpu": [("gpu/data/suppliers.json", "companies", "name"),
+            ("gpu/data/subsuppliers.json", "systems:makers", "name")],
+    "gsho": [("zip/data/odm_suppliers.json", None, "name"),
+             ("zip/data/telsmith_suppliers.json", "suppliers", "name"),
+             ("zip/data/supplier_crm.json", "suppliers", "name")],
+}
+
+
+def unique_makers(seg: str, load_fn):
+    """Множество компаний направления и файлы, из которых они собраны."""
+    keys, srcs = set(), []
+    for rel, path, field in MAKER_FILES.get(seg, []):
+        data = load_fn(rel)
+        if data is None:
+            continue
+        if path and ":" in path:
+            outer, inner = path.split(":", 1)
+            rows = data.get(outer, []) if isinstance(data, dict) else []
+            data = [m for grp in rows if isinstance(grp, dict) for m in grp.get(inner, [])]
+        elif path:
+            data = data.get(path) if isinstance(data, dict) else None
+        if data is None:
+            continue
+        names = list(data) if (field == "__key__" and isinstance(data, dict)) else [
+            x.get(field) for x in data if isinstance(x, dict)]
+        got = {nkey(x) for x in names if x and nkey(x)}
+        if got:
+            keys |= got
+            srcs.append(rel)
+    return keys, srcs
+
+
 def counts() -> dict:
     """Числитель по каждой клетке: что в файлах РЕАЛЬНО есть."""
     c = {s: {k: {"n": 0, "src": []} for k, _t, _d in LINKS} for s, _ in SEGMENTS}
@@ -83,18 +136,12 @@ def counts() -> dict:
     put("gtu", "node", n(gp.get("systems")), "gt/data/parts.json")
     put("gtu", "part", n(load("gt/data/pn_db.json", {}).get("rows")), "gt/data/pn_db.json")
     put("gtu", "part", n(load("gt/data/pn_catalog.json", {}).get("rows")), "gt/data/pn_catalog.json")
-    put("gtu", "maker", n(load("gt/data/tfs_subsuppliers.json", {}).get("rows")), "gt/data/tfs_subsuppliers.json")
-    put("gtu", "maker", n(load("gt/data/suppliers.json", [])), "gt/data/suppliers.json")
-    put("gtu", "maker", n(load("gt/data/heavy_suppliers.json", {}).get("rows")), "gt/data/heavy_suppliers.json")
 
     # ── ГПУ
     put("gpu", "machine", n(load("gpu/data/machines.json", {}).get("machines")), "gpu/data/machines.json")
     put("gpu", "node", n(load("gpu/data/parts.json", {}).get("systems")), "gpu/data/parts.json")
     put("gpu", "part", n(load("gpu/data/demand.json", {}).get("rows")), "gpu/data/demand.json")
     put("gpu", "part", n(load("gpu/data/motortech_cross.json", {}).get("records")), "gpu/data/motortech_cross.json")
-    sub = load("gpu/data/subsuppliers.json", {}).get("systems", [])
-    put("gpu", "maker", sum(n(s.get("makers")) for s in sub), "gpu/data/subsuppliers.json")
-    put("gpu", "maker", n(load("gpu/data/suppliers.json", {}).get("companies")), "gpu/data/suppliers.json")
 
     # ── ГШО
     tel = load("zip/data/telsmith_3858.json", {})
@@ -103,10 +150,16 @@ def counts() -> dict:
     put("gsho", "node", n({r.get("node") for r in tel.get("catalog", []) if r.get("node")}), "zip/data/telsmith_3858.json")
     put("gsho", "part", n(load("zip/data/positions.json", [])), "zip/data/positions.json")
     put("gsho", "part", n(tel.get("catalog")), "zip/data/telsmith_3858.json")
-    put("gsho", "maker", n(load("zip/data/odm_suppliers.json", [])), "zip/data/odm_suppliers.json")
-    put("gsho", "maker", n(load("zip/data/telsmith_suppliers.json", {}).get("suppliers")), "zip/data/telsmith_suppliers.json")
     mat = load("zip/data/material_strategy.json", [])
     put("gsho", "repair", n([x for x in (mat or []) if isinstance(x, dict)]), "zip/data/material_strategy.json")
+
+    # ── изготовители: уникальные компании по каждому направлению
+    for seg in ("gtu", "gpu", "gsho"):
+        keys, srcs = unique_makers(seg, lambda rel: load(rel))
+        for src in srcs:
+            put(seg, "maker", 0, src)
+        c[seg]["maker"]["n"] = len(keys)
+        c[seg]["maker"]["src"] = srcs
 
     # ── сквозные наборы: раскладываются по направлениям по полю раздела
     im = load("pnw/data/item_master.json", {}).get("items", [])
