@@ -805,13 +805,34 @@ async function libraryDrafts(request, env) {
   }
 }
 
+// Main portal Access application, observed in its public login metadata.
+// An AUD identifies the application; it is not a credential or an access grant.
+const ARCHIVE_MAIN_ACCESS_AUD = "f7aa6fda91d7c09c8669240c982a4593a76af459d77a267f0adf8b99f7806ffb";
+function archiveAudience(env) {
+  for (const name of ["ARCHIVE_ACCESS_AUD", "CF_ACCESS_AUD"]) {
+    if (!Object.prototype.hasOwnProperty.call(env || {}, name)) continue;
+    const value = env[name];
+    // Explicit empty/invalid configuration fails closed; only absence falls back.
+    if (typeof value !== "string" || value.length > 2048) return null;
+    const audiences = value.split(",").map((item) => item.trim());
+    if (!audiences.length || audiences.length > 16 ||
+        audiences.some((item) => !/^[a-fA-F0-9]{64}$/.test(item))) return null;
+    return audiences.join(",");
+  }
+  return ARCHIVE_MAIN_ACCESS_AUD;
+}
+
 export default {
   async fetch(request, env, ctx) {
-    const who = await accessOk(request, env);
-    if (!who) return denyPage("Портал КВАНТ");
-
     const url = new URL(request.url);
     const archive = archiveRoute(url.pathname);
+    // Scope the audience to the archive; other applications still use their
+    // existing signed tokens when asking this portal for /api/rights.
+    const archiveAud = archive && archive !== "invalid" ? archiveAudience(env) : undefined;
+    const authEnv = archiveAud ? { ...env, CF_ACCESS_AUD: archiveAud } : env;
+    const who = await accessOk(request, authEnv);
+    if (!who) return denyPage("Портал КВАНТ");
+
     if (archive === "invalid") return archiveJson({ error: "not_found" }, 404);
     const library = archive ? null : libraryRoute(url.pathname);
     if (library === "invalid") return libraryJson({ error: "not_found" }, 404);
@@ -823,8 +844,7 @@ export default {
     // Private archive never enters the shared library, visit logs, or audit text.
     if (archive) {
       if (!rights.admin) return archiveJson({ error: "forbidden" }, 403);
-      if (!String(env.CF_ACCESS_AUD || "").split(",").some((x) => x.trim()))
-        return archiveJson({ error: "archive_access_not_configured" }, 503);
+      if (!archiveAud) return archiveJson({ error: "archive_access_not_configured" }, 503);
       if (request.method !== "GET") return archiveJson({ error: "method_not_allowed" }, 405, { Allow: "GET" });
       if (archive !== "page") return archiveApi(request, env, archive);
       if (url.search) return archiveJson({ error: "invalid_archive_query" }, 400);

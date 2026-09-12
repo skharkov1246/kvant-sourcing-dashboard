@@ -8,12 +8,12 @@ import worker from '../../public/_worker.js';
 import { defaultAcl } from '../acl.js';
 import { archiveRoute, archiveApi, archiveQuery, archiveSearchResult, archiveUnitResult, archiveStatusResult } from '../../public/archive_search.js';
 
-const BASE='https://portal.example.test', TEAM='archive-test.cloudflareaccess.com', AUD='synthetic-audience';
+const BASE='https://portal.example.test', TEAM='archive-test.cloudflareaccess.com', AUD='a'.repeat(64);
 const OWNER='owner@example.test', READER='reader@example.test', KEY='sb_secret_SYNTHETIC_ONLY';
 const b64=(v)=>Buffer.from(v).toString('base64url');
 const pair=await crypto.subtle.generateKey({name:'RSASSA-PKCS1-v1_5',modulusLength:2048,publicExponent:new Uint8Array([1,0,1]),hash:'SHA-256'},true,['sign','verify']);
 const jwk={...await crypto.subtle.exportKey('jwk',pair.publicKey),kid:'archive-fixture',alg:'RS256'};
-async function token(email,aud=AUD) {const data=b64(JSON.stringify({alg:'RS256',kid:jwk.kid}))+'.'+b64(JSON.stringify({email,aud,iss:'https://'+TEAM,exp:Math.floor(Date.now()/1000)+600}));return data+'.'+b64(await crypto.subtle.sign('RSASSA-PKCS1-v1_5',pair.privateKey,new TextEncoder().encode(data)));}
+async function token(email,aud=AUD,claims={}) {const data=b64(JSON.stringify({alg:'RS256',kid:jwk.kid}))+'.'+b64(JSON.stringify({email,aud,iss:'https://'+TEAM,exp:Math.floor(Date.now()/1000)+600,...claims}));return data+'.'+b64(await crypto.subtle.sign('RSASSA-PKCS1-v1_5',pair.privateKey,new TextEncoder().encode(data)));}
 function envFor(){const acl=defaultAcl();acl.defaultRole='guest';acl.users[READER]={role:'guest',sites:['knowledge'],tabs:[]};const box=new Map([['acl:v1',JSON.stringify(acl)]]);const writes=[],assets=[];return {CF_ACCESS_TEAM:TEAM,CF_ACCESS_AUD:AUD,__certs:{keys:[jwk]},ADMIN_EMAILS:OWNER,SUPABASE_SERVICE_KEY:KEY,writes,assets,ACL:{get:async(k,o)=>{const raw=box.get(k)??null;return o?.type==='json'&&raw!==null?JSON.parse(raw):raw;},put:async(...args)=>writes.push(args)},ASSETS:{fetch:async req=>{assets.push(new URL(req.url).pathname);return new Response('<!doctype html><title>ARCHIVE_SHELL</title>',{headers:{'Content-Type':'text/html'}});}}};}
 const ctx={waitUntil:()=>{throw new Error('Archive must not enqueue visit/audit work');}};
 async function call(env,path,email=OWNER,init={}){const headers=new Headers(init.headers);if(email)headers.set('Cf-Access-Jwt-Assertion',await token(email,init.aud??AUD));return worker.fetch(new Request(BASE+path,{...init,headers}),env,ctx);}
@@ -39,9 +39,9 @@ test('anonymous, forged, wrong-audience and non-admin requests perform zero RPC 
   });
 });
 
-test('strict missing/corrupt ACL and missing archive audience fail before RPC',async()=>{
+test('strict missing/corrupt ACL fails before RPC',async()=>{
   await withFetch(()=>{throw new Error('No request');},async(calls)=>{
-    for(const mutate of [env=>{delete env.ACL;},env=>{env.ACL.get=async()=>{throw new Error('SECRET DB FAILURE');};},env=>{env.ACL.get=async()=>({roles:[]});},env=>{delete env.CF_ACCESS_AUD;}]){
+    for(const mutate of [env=>{delete env.ACL;},env=>{env.ACL.get=async()=>{throw new Error('SECRET DB FAILURE');};},env=>{env.ACL.get=async()=>({roles:[]});}]){
       const env=envFor();mutate(env);const r=await call(env,'/api/library/archive/status');assert.equal(r.status,503);assert.doesNotMatch(await r.text(),/SECRET|FAILURE/);assert.equal(env.assets.length,0);
     }assert.equal(calls.length,0);
   });
@@ -150,4 +150,95 @@ test('full-fragment control fetches exact IDs and renders full source as plain t
   const full='<img src=x onerror=SECRET()> '+ 'ф'.repeat(1700),short=full.slice(0,1600);const calls=[];
   const ui=fakeUI(async url=>{calls.push(url);if(url.endsWith('/status'))return response(statusResult());if(url.includes('/unit?'))return response({found:true,item:item({text:full,text_length:full.length,is_excerpt:false}),scope:'imported_archive_text',all_versions:true,full_archive:false});return response(searchResult([item({text:short,text_length:full.length,text_truncated:true})]));});await tick();ui.nodes.get('query').value='AB';await ui.nodes.get('searchForm').listeners.submit({preventDefault(){}});
   const walk=el=>[el,...el.children.flatMap(walk)];const button=walk(ui.nodes.get('results')).find(el=>el.tagName==='button'&&el.textContent==='Прочитать полный фрагмент');assert.ok(button);await button.listeners.click();assert.equal(calls.at(-1),'/api/library/archive/unit?extraction_id=12&unit_key=page%3A7');assert.match(ui.nodes.get('results').textContent,/<img src=x onerror=SECRET\(\)>/);assert.match(ui.nodes.get('results').textContent,/Полный фрагмент/);assert.equal(button.hidden,true);
+});
+
+const MAIN_AUD='f7aa6fda91d7c09c8669240c982a4593a76af459d77a267f0adf8b99f7806ffb';
+const OTHER_AUD='b'.repeat(64), THIRD_AUD='c'.repeat(64);
+test('absent archive/global AUD uses the verified main application and still requires admin',async()=>{
+  await withFetch(()=>response(statusResult()),async(calls)=>{
+    const env=envFor();delete env.CF_ACCESS_AUD;
+    const before={...env};
+    assert.equal((await call(env,'/api/library/archive/status',OWNER,{aud:MAIN_AUD})).status,200);
+    assert.equal(calls.length,1);
+    for(const email of [READER,'guest@example.test',null])assert.equal((await call(env,'/api/library/archive/status',email,{aud:MAIN_AUD})).status,403);
+    assert.equal((await call(env,'/api/library/archive/status',OWNER,{aud:OTHER_AUD})).status,403);
+    assert.equal(calls.length,1);assert.equal(env.assets.length,0);assert.equal(env.writes.length,0);
+    assert.equal(Object.hasOwn(env,'CF_ACCESS_AUD'),false);assert.deepEqual(Object.keys(env),Object.keys(before));
+  });
+});
+
+test('archive-only AUD override takes precedence without overwriting global audience',async()=>{
+  await withFetch(()=>response(statusResult()),async(calls)=>{
+    const env=envFor();env.ARCHIVE_ACCESS_AUD=OTHER_AUD;
+    assert.equal((await call(env,'/api/library/archive/status',OWNER,{aud:OTHER_AUD})).status,200);
+    for(const aud of [AUD,MAIN_AUD,THIRD_AUD])assert.equal((await call(env,'/api/library/archive/status',OWNER,{aud})).status,403);
+    assert.equal(calls.length,1);assert.equal(env.CF_ACCESS_AUD,AUD);assert.equal(env.ARCHIVE_ACCESS_AUD,OTHER_AUD);
+  });
+});
+
+test('archive fallback to configured global AUD and comma-separated rotations require exact matches',async()=>{
+  await withFetch(()=>response(statusResult()),async(calls)=>{
+    const env=envFor();
+    assert.equal((await call(env,'/api/library/archive/status',OWNER,{aud:AUD})).status,200);
+    assert.equal((await call(env,'/api/library/archive/status',OWNER,{aud:MAIN_AUD})).status,403);
+    env.ARCHIVE_ACCESS_AUD=' '+OTHER_AUD+' , '+THIRD_AUD+' ';
+    for(const aud of [OTHER_AUD,THIRD_AUD,[MAIN_AUD,THIRD_AUD]])assert.equal((await call(env,'/api/library/archive/status',OWNER,{aud})).status,200);
+    for(const aud of [OTHER_AUD.slice(1),OTHER_AUD+'0',[],[AUD,MAIN_AUD],null,64])assert.equal((await call(env,'/api/library/archive/status',OWNER,{aud})).status,403);
+    assert.equal(calls.length,4);
+  });
+});
+
+test('explicit empty or invalid archive AUD never falls back to a valid global/default value',async()=>{
+  await withFetch(()=>{throw new Error('No RPC');},async(calls)=>{
+    for(const value of ['', ' ', null, undefined, [], {}, 123, 'invalid', OTHER_AUD+',', ','+OTHER_AUD, OTHER_AUD+',,'+THIRD_AUD, 'b'.repeat(63), 'b'.repeat(65), 'b'.repeat(2049), Array(17).fill(OTHER_AUD).join(',')]){
+      const env=envFor();env.ARCHIVE_ACCESS_AUD=value;
+      const r=await call(env,'/api/library/archive/status');assert.equal(r.status,503,String(value));
+      assert.equal((await r.json()).error,'archive_access_not_configured');assert.equal(env.assets.length,0);assert.equal(env.writes.length,0);
+    }
+    for(const value of ['', ' ', null, undefined]){
+      const env=envFor();env.CF_ACCESS_AUD=value;
+      assert.equal((await call(env,'/api/library/archive/status',OWNER,{aud:MAIN_AUD})).status,503);
+    }
+    assert.equal(calls.length,0);
+  });
+});
+
+test('wrong issuer, expired and tampered main-audience tokens cannot access archive',async()=>{
+  await withFetch(()=>{throw new Error('No RPC');},async(calls)=>{
+    const env=envFor();delete env.CF_ACCESS_AUD;
+    const expired=await token(OWNER,MAIN_AUD,{exp:Math.floor(Date.now()/1000)-120});
+    const wrongIssuer=await token(OWNER,MAIN_AUD,{iss:'https://other-team.cloudflareaccess.com'});
+    const tampered=(await token(OWNER,OTHER_AUD)).split('.');
+    const payload=JSON.parse(Buffer.from(tampered[1],'base64url'));payload.aud=MAIN_AUD;tampered[1]=b64(JSON.stringify(payload));
+    for(const jwt of [expired,wrongIssuer,tampered.join('.')]){
+      const r=await call(env,'/api/library/archive/status',null,{headers:{'Cf-Access-Jwt-Assertion':jwt}});
+      assert.equal(r.status,403);assert.equal(env.assets.length,0);assert.equal(env.writes.length,0);
+    }
+    assert.equal(calls.length,0);
+  });
+});
+
+test('archive-only configuration does not change cross-app rights verification or global checks',async()=>{
+  await withFetch(()=>{throw new Error('No RPC');},async(calls)=>{
+    const rights=async(env,aud)=>worker.fetch(new Request(BASE+'/api/rights',{headers:{'Cf-Access-Jwt-Assertion':await token(OWNER,aud)}}),env,{waitUntil:p=>Promise.resolve(p).catch(()=>{})});
+    for(const archiveAud of [undefined,'',MAIN_AUD,OTHER_AUD]){
+      const env=envFor();delete env.CF_ACCESS_AUD;env.ARCHIVE_ACCESS_AUD=archiveAud;
+      assert.equal((await rights(env,THIRD_AUD)).status,200);
+    }
+    const env=envFor();env.ARCHIVE_ACCESS_AUD=OTHER_AUD;
+    assert.equal((await rights(env,AUD)).status,200);
+    assert.equal((await rights(env,OTHER_AUD)).status,403);
+    assert.equal(env.CF_ACCESS_AUD,AUD);assert.equal(calls.length,0);
+  });
+});
+
+test('default archive AUD also gates page aliases before exposing assets',async()=>{
+  await withFetch(()=>{throw new Error('No RPC');},async(calls)=>{
+    for(const path of ['/library/archive','/library/archive/','/archive.html']){
+      const env=envFor();delete env.CF_ACCESS_AUD;
+      assert.equal((await call(env,path,OWNER,{aud:OTHER_AUD})).status,403);assert.equal(env.assets.length,0);
+      assert.equal((await call(env,path,OWNER,{aud:MAIN_AUD})).status,200);assert.deepEqual(env.assets,['/archive.html']);
+    }
+    assert.equal(calls.length,0);
+  });
 });
