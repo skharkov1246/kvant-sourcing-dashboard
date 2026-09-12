@@ -32,7 +32,10 @@ TERMS: dict[str, tuple[str, ...]] = {
     "прогар": ("прогар", "прожог"),
     "трещина": ("трещин", "растрескив"),
     "износ": ("износ", "выработка металла", "истирани"),
-    "эрозия": ("эрози",),
+    # «~» впереди значит регулярное выражение. Нужно ровно здесь:
+    # «электроэрозионная обработка» — это способ ремонта, а не дефект, и по
+    # подстроке «эрози» он попадал в находки.
+    "эрозия": ("~(?<!электро)(?<!электро-)эрози",),
     "коррозия": ("коррози", "ржавчин", "окалин"),
     "вибрация": ("вибрац", "биение", "дисбаланс", "разбаланс"),
     "помпаж": ("помпаж",),
@@ -87,9 +90,20 @@ def sentences(text: str) -> list[str]:
     return out
 
 
+_TERM_RX = {вид: tuple(re.compile(w[1:]) for w in слова if w.startswith("~"))
+            for вид, слова in TERMS.items()}
+_TERM_SUB = {вид: tuple(w for w in слова if not w.startswith("~"))
+             for вид, слова in TERMS.items()}
+
+
 def terms_in(s: str) -> list[str]:
-    low = s.lower()
-    return sorted({вид for вид, слова in TERMS.items() if any(w in low for w in слова)})
+    low = norm(s).lower()
+    out = set()
+    for вид in TERMS:
+        if any(w in low for w in _TERM_SUB[вид]) or any(
+                rx.search(low) for rx in _TERM_RX[вид]):
+            out.add(вид)
+    return sorted(out)
 
 
 def equip_in(s: str) -> bool:
