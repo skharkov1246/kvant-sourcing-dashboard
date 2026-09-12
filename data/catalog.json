@@ -730,6 +730,7 @@
       },
       "referenced_by": [
         "scripts/build_chain_coverage.py",
+        "scripts/build_chain_page.py",
         "tests/test_dict.py",
         "zip/tools/build_recip_page.py"
       ]
@@ -869,6 +870,7 @@
       },
       "referenced_by": [
         "scripts/build_chain_coverage.py",
+        "scripts/build_chain_page.py",
         "tests/test_dict.py",
         "zip/tools/build_recon_pages.py",
         "zip/tools/extract_recon.py"
@@ -903,6 +905,7 @@
       },
       "referenced_by": [
         "scripts/build_chain_coverage.py",
+        "scripts/build_chain_page.py",
         "scripts/build_symptom_index.py",
         "tests/test_dict.py",
         "zip/tools/build_diag_page.py",
@@ -998,6 +1001,7 @@
       },
       "referenced_by": [
         "scripts/build_chain_coverage.py",
+        "scripts/build_chain_page.py",
         "tests/test_dict.py",
         "zip/tools/build_recon_pages.py",
         "zip/tools/extract_recon.py"
@@ -1328,6 +1332,7 @@
       },
       "referenced_by": [
         "scripts/build_chain_coverage.py",
+        "scripts/build_chain_page.py",
         "tests/test_dict.py",
         "zip/tools/build_recon_pages.py",
         "zip/tools/extract_recon.py"
@@ -1530,6 +1535,7 @@
       },
       "referenced_by": [
         "scripts/build_chain_coverage.py",
+        "scripts/build_chain_page.py",
         "tests/test_dict.py",
         "zip/tools/build_oem_page.py",
         "zip/tools/extract_oem_atlas.py"
@@ -2839,6 +2845,7 @@
       "referenced_by": [
         "library/load_crossrefs.py",
         "scripts/build_chain_coverage.py",
+        "scripts/build_chain_page.py",
         "scripts/build_dict.py",
         "zip/tools/build_telsmith_page.py",
         "zip/tools/telsmith_parse.py",
