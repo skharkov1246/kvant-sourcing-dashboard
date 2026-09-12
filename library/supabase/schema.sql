@@ -184,6 +184,14 @@ create table if not exists lib_defects (
 create index if not exists lib_defects_unit on lib_defects (unit_id);
 create index if not exists lib_defects_pn   on lib_defects (part_number);
 
+-- Извлечение из текстов ТЗ добавляет к дефекту происхождение и встречаемость:
+-- то, что встретилось в сотне заданий, — типовое требование, а не находка.
+alter table lib_defects add column if not exists seen        int default 1;
+alter table lib_defects add column if not exists terms       text[];
+alter table lib_defects add column if not exists deal_id     text;
+alter table lib_defects add column if not exists source_file text;
+create index if not exists lib_defects_seen on lib_defects (seen desc);
+
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 3. Поставщики: кто в мире делает это оборудование и его части.
 create table if not exists lib_suppliers (
@@ -363,6 +371,8 @@ alter table lib_files enable row level security;
 -- спецификаций: разбор не извлёк из них ни одной позиции. Отметка о
 -- распознавании нужна для возобновляемости: повторный прогон пропускает
 -- уже распознанное. Колонки nullable и без default — правка каталога.
+alter table lib_files add column if not exists defects_at timestamptz;   -- когда из файла вынимали дефекты
+create index if not exists lib_files_defects on lib_files (defects_at) where defects_at is null;
 alter table lib_files add column if not exists ocr_at    timestamptz;
 alter table lib_files add column if not exists ocr_chars int;
 create index if not exists lib_files_ocr on lib_files (ocr_at) where ocr_at is null;

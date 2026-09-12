@@ -1465,7 +1465,8 @@
       "referenced_by": [
         "gt/tools/ansaldo_report.py",
         "gt/tools/build_ansaldo.py",
-        "library/load_equipment.py"
+        "library/load_equipment.py",
+        "library/load_repair.py"
       ]
     },
     {
@@ -2281,7 +2282,8 @@
         "gt/public/hot.html",
         "gt/tools/build_hot.py",
         "gt/tools/build_lot.py",
-        "gt/tools/drop_ru.py"
+        "gt/tools/drop_ru.py",
+        "library/load_repair.py"
       ]
     },
     {
@@ -4319,7 +4321,8 @@
         ]
       },
       "referenced_by": [
-        "gt/tools/build_cummins.py"
+        "gt/tools/build_cummins.py",
+        "library/load_repair.py"
       ]
     },
     {
@@ -6263,6 +6266,7 @@
         "gt/tools/drop_ru.py",
         "library/equipment.py",
         "library/load_equipment.py",
+        "library/load_repair.py",
         "tests/test_library_equipment.py"
       ]
     },
@@ -7057,6 +7061,7 @@
         "gt/tools/drop_ru.py",
         "library/equipment.py",
         "library/load_equipment.py",
+        "library/load_repair.py",
         "tests/test_library_equipment.py"
       ]
     },
