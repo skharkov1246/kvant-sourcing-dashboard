@@ -85,19 +85,166 @@ create index if not exists lib_parts_oem  on lib_parts (oem);
 create index if not exists lib_parts_equip on lib_parts (target_equipment);
 
 -- ─────────────────────────────────────────────────────────────────────────────
--- 2б. Ребро «запчасть → исполнитель». Без него ответить «кто делает эту деталь»
---     можно только перебором: у поставщика в описании тысяча позиций текстом.
-create table if not exists lib_part_suppliers (
-  part_id     text   not null references lib_parts(id) on delete cascade,
-  supplier_id bigint not null references lib_suppliers(id) on delete cascade,
-  makes       text,                         -- что именно делает под эту позицию
-  catalog_url text,
-  confidence  text default 'med',
+-- 2в. Машина и узел — первые два звена цепочки портала (CLAUDE.md, «Куда мы
+--     идём»). До сих пор их не было вовсе: деталь знала машину строкой
+--     («SGT-400», «Cyclone», «Taurus 70, Taurus 70MD»), и свести две записи об
+--     одной машине можно было только глазами.
+create table if not exists lib_models (
+  id           text primary key,            -- нормализованное имя: sgt400
+  name         text not null,               -- SGT-400
+  oem          text,                        -- Siemens Energy
+  family       text,                        -- sgt | finspong | heavy | solar
+  family_title text,
+  legacy       text,                        -- Cyclone — имя до смены владельца завода
+  power        text,
+  efficiency   text,
+  shafts       text,
+  use_case     text,                        -- где стоит: ГПА, генерация, когенерация
+  aliases      text[],                      -- все написания, по которым её ищут
+  note         text,
+  source       text,
+  created_at   timestamptz default now(),
+  updated_at   timestamptz default now()
+);
+create index if not exists lib_models_family on lib_models (family);
+
+-- Узлы машины деревом: система («Горячий тракт») → компонент («Жаровая труба»).
+-- Узлы у промышленных ГТУ общие для Solar и Siemens, поэтому дерево одно на все
+-- машины, а не своё на каждую.
+create table if not exists lib_units (
+  id          text primary key,             -- hot | hot.combustion-liner
+  parent_id   text references lib_units(id) on delete set null,
+  name        text not null,
+  name_en     text,
+  crit        text,                         -- A останавливает машину, B плановая, C расходник
+  aftermarket text,                         -- насколько узел доступен помимо OEM
+  note        text,
   source      text,
   created_at  timestamptz default now(),
-  primary key (part_id, supplier_id)
+  updated_at  timestamptz default now()
 );
-create index if not exists lib_part_suppliers_sup on lib_part_suppliers (supplier_id);
+create index if not exists lib_units_parent on lib_units (parent_id);
+
+-- Ребро «запчасть → машина». Деталь встаёт на несколько машин, машина собирает
+-- тысячи деталей — строкой в lib_parts.model это не выразить: по «Taurus 70,
+-- Taurus 70MD» не выбрать обе машины.
+create table if not exists lib_part_models (
+  part_id    text not null references lib_parts(id) on delete cascade,
+  model_id   text not null references lib_models(id) on delete cascade,
+  source     text,
+  created_at timestamptz default now(),
+  primary key (part_id, model_id)
+);
+create index if not exists lib_part_models_model on lib_part_models (model_id);
+
+-- Взаимозаменяемость: чей это на самом деле номер и чем позицию можно закрыть.
+-- Каталожный номер сборщика почти никогда не номер изготовителя: Telsmith 14T47 —
+-- это серийный подшипник SKF/Timken, и без такой связи сорсер ищет несуществующую
+-- деталь у несуществующего изготовителя.
+create table if not exists lib_part_alt (
+  part_id    text not null references lib_parts(id) on delete cascade,
+  alt_pn     text not null,
+  kind       text not null,              -- номер изготовителя | замена | наш номер | аналог
+  alt_maker  text,
+  evidence   text,
+  confidence text default 'med',
+  source     text,
+  created_at timestamptz default now(),
+  primary key (part_id, alt_pn, kind)
+);
+create index if not exists lib_part_alt_pn on lib_part_alt (alt_pn);
+
+-- Ведомость: из чего собрана машина, с уровнем вложенности и количеством. Без
+-- неё «узел → запчасть» держится на словах описания, а не на конструкции.
+create table if not exists lib_bom (
+  id        text primary key,
+  machine   text not null,
+  model_id  text references lib_models(id) on delete set null,
+  scheme    text,
+  level     int,
+  part_id   text references lib_parts(id) on delete set null,
+  part_no   text not null,
+  own_no    text,                        -- наш внутренний номер, если заведён
+  qty       text,
+  name      text,
+  source    text,
+  created_at timestamptz default now()
+);
+create index if not exists lib_bom_machine on lib_bom (machine);
+create index if not exists lib_bom_part on lib_bom (part_id);
+
+-- Парк: какая машина где стоит и чья. Без этого справочник машин отвечает «что
+-- бывает», а не «что чинить у этого заказчика», а сорсинг живёт вторым вопросом.
+create table if not exists lib_fleet (
+  id         text primary key,
+  site       text not null,               -- площадка: ТЭЦ, энергоблок, КС
+  owner      text,
+  model_id   text references lib_models(id) on delete set null,
+  model_raw  text,                        -- как машина названа в источнике
+  units      text,                        -- сколько машин на площадке
+  year       text,
+  note       text,
+  source     text,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+create index if not exists lib_fleet_model on lib_fleet (model_id);
+create index if not exists lib_fleet_owner on lib_fleet (owner);
+
+alter table lib_parts add column if not exists unit_id    text references lib_units(id) on delete set null;
+alter table lib_parts add column if not exists unit_rule  text;   -- чем определён узел
+alter table lib_parts add column if not exists pn_pattern text;   -- шифровка номера у OEM
+alter table lib_parts add column if not exists qty_demand numeric;-- сколько спрашивали
+create index if not exists lib_parts_unit on lib_parts (unit_id);
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- 2г. Диагностика, дефект и ремонтное решение — середина цепочки портала. Здесь
+--     лежит то, что отличает инженерный портал от прайс-листа: как проверяют
+--     узел, чем он выходит из строя и что с этим делают.
+create table if not exists lib_procedures (
+  id            text primary key,
+  kind          text not null,              -- инспекция | контроль | ремонт | покрытие | модернизация
+  name          text not null,
+  unit_id       text references lib_units(id) on delete set null,
+  scope         text,                       -- что именно делают
+  duration      text,                       -- 3–5 недель
+  model_family  text,                       -- к какому семейству машин относится
+  performer     text,                       -- кто выполняет, если известно
+  performer_key text,                       -- нормализованное имя для связи с lib_suppliers
+  source        text,
+  created_at    timestamptz default now(),
+  updated_at    timestamptz default now()
+);
+create index if not exists lib_procedures_kind on lib_procedures (kind);
+create index if not exists lib_procedures_unit on lib_procedures (unit_id);
+create index if not exists lib_procedures_perf on lib_procedures (performer_key);
+
+-- Дефект и решение хранятся вместе: без решения дефект — это жалоба, а не знание.
+-- Последствие отделено от причины сознательно: закупщику нужно первое («прогар,
+-- вылет фрагментов, мгновенный останов»), инженеру — второе.
+create table if not exists lib_defects (
+  id          text primary key,
+  name        text not null,
+  unit_id     text references lib_units(id) on delete set null,
+  part_number text,                         -- каталожный номер, если дефект привязан к детали
+  model       text,
+  cause       text,
+  consequence text,
+  fix         text,                         -- ремонтное решение
+  source      text,
+  created_at  timestamptz default now(),
+  updated_at  timestamptz default now()
+);
+create index if not exists lib_defects_unit on lib_defects (unit_id);
+create index if not exists lib_defects_pn   on lib_defects (part_number);
+
+-- Извлечение из текстов ТЗ добавляет к дефекту происхождение и встречаемость:
+-- то, что встретилось в сотне заданий, — типовое требование, а не находка.
+alter table lib_defects add column if not exists seen        int default 1;
+alter table lib_defects add column if not exists terms       text[];
+alter table lib_defects add column if not exists deal_id     text;
+alter table lib_defects add column if not exists source_file text;
+create index if not exists lib_defects_seen on lib_defects (seen desc);
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 3. Поставщики: кто в мире делает это оборудование и его части.
@@ -121,6 +268,34 @@ create table if not exists lib_suppliers (
   unique (segment_id, name)
 );
 create index if not exists lib_suppliers_seg on lib_suppliers (segment_id);
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- 3а. Ребро «запчасть → исполнитель». Без него ответить «кто делает эту деталь»
+--     можно только перебором: у поставщика в описании тысяча позиций текстом.
+create table if not exists lib_part_suppliers (
+  part_id     text   not null references lib_parts(id) on delete cascade,
+  supplier_id bigint not null references lib_suppliers(id) on delete cascade,
+  makes       text,                         -- что именно делает под эту позицию
+  catalog_url text,
+  confidence  text default 'med',
+  source      text,
+  created_at  timestamptz default now(),
+  primary key (part_id, supplier_id)
+);
+create index if not exists lib_part_suppliers_sup on lib_part_suppliers (supplier_id);
+
+-- Проверка наличия у продавцов добавляет к ребру то, ради чего сорсер и звонит:
+-- есть ли на складе, за сколько и когда. Вердикт хранится словом продавца
+-- («oem_only», «pn_not_found»), а не сводится к «да/нет»: разница между «номер
+-- не найден» и «только у OEM» — это две разные дальнейшие работы.
+alter table lib_part_suppliers add column if not exists verdict   text;
+alter table lib_part_suppliers add column if not exists in_stock  text;
+alter table lib_part_suppliers add column if not exists stock_qty text;
+alter table lib_part_suppliers add column if not exists lead_time text;
+alter table lib_part_suppliers add column if not exists price     numeric;
+alter table lib_part_suppliers add column if not exists currency  text;
+create index if not exists lib_part_suppliers_verdict on lib_part_suppliers (verdict);
+
 
 -- Исполнители приходят из семи разных исследований, и одна компания встречается
 -- под разными написаниями. Ключ — нормализованное имя (library/load_suppliers.py):
@@ -218,6 +393,16 @@ alter table lib_suppliers enable row level security;
 alter table lib_prices    enable row level security;
 alter table lib_knowledge enable row level security;
 alter table lib_losses    enable row level security;
+alter table lib_parts     enable row level security;
+alter table lib_part_suppliers enable row level security;
+alter table lib_models    enable row level security;
+alter table lib_units     enable row level security;
+alter table lib_part_models    enable row level security;
+alter table lib_procedures     enable row level security;
+alter table lib_defects        enable row level security;
+alter table lib_fleet          enable row level security;
+alter table lib_part_alt       enable row level security;
+alter table lib_bom            enable row level security;
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 9. Реестр разобранных файлов. Нужен для возобновляемости: обход 22 тысяч
@@ -255,6 +440,8 @@ alter table lib_files enable row level security;
 -- спецификаций: разбор не извлёк из них ни одной позиции. Отметка о
 -- распознавании нужна для возобновляемости: повторный прогон пропускает
 -- уже распознанное. Колонки nullable и без default — правка каталога.
+alter table lib_files add column if not exists defects_at timestamptz;   -- когда из файла вынимали дефекты
+create index if not exists lib_files_defects on lib_files (defects_at) where defects_at is null;
 alter table lib_files add column if not exists ocr_at    timestamptz;
 alter table lib_files add column if not exists ocr_chars int;
 create index if not exists lib_files_ocr on lib_files (ocr_at) where ocr_at is null;
