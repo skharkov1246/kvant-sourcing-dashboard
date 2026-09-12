@@ -330,6 +330,25 @@ def main() -> int:
                                             confidence, source)
             values %s on conflict (part_id, supplier_id) do nothing""",
             готовые, page_size=500)
+        # Изготовитель позиции — тоже исполнитель, и это самая дешёвая связь из
+        # существующих: у 72 % деталей изготовитель назван в самой записи. До
+        # этого 11 716 деталей не имели ни одного исполнителя, хотя про них
+        # известно, кто их делает. Ключ считается так же, как у компаний, иначе
+        # «Siemens Energy» и «Siemens Energy,» окажутся разными фирмами.
+        cur.execute("""
+            insert into lib_part_suppliers (part_id, supplier_id, makes, confidence, source)
+            select p.id, s.id, 'изготовитель позиции', 'high', 'изготовитель (OEM) по каталогу'
+              from lib_parts p
+              join lib_suppliers s
+                on s.name_key is not null
+               and replace(s.name_key, ' ', '') =
+                   lower(regexp_replace(coalesce(p.oem, ''), '[^0-9a-zA-Zа-яА-Я]', '', 'g'))
+             where coalesce(btrim(p.oem), '') <> ''
+            on conflict (part_id, supplier_id) do nothing""")
+        по_изготовителю = cur.rowcount
+        if по_изготовителю:
+            print(f"  связей «деталь → изготовитель» добавлено: {по_изготовителю}")
+
         # Наличие пишется вторым и обновляет ребро: «кто делает» и «у кого есть»
         # — про одну и ту же пару, и разносить их по двум строкам незачем.
         psycopg2.extras.execute_values(cur, """
