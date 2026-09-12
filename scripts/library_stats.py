@@ -89,6 +89,21 @@ select (select count(*) from lib_parts where unit_id is null)                   
           (select 1 from lib_prices pr where pr.part_id = p.id))                 as без_цены,
        (select count(*) from lib_knowledge where unit_id is null)                as статей_без_узла"""
 
+# Проверка цепочки на конкретных номерах. Оба номера — публичные каталожные
+# обозначения изготовителей, они и так опубликованы в репозитории: MW21215M
+# (камера сгорания Siemens SGT-400, наша закупка) и 7W-4377 (катушка зажигания
+# Caterpillar). Печатаются ТОЛЬКО числа: сколько машин, исполнителей, цен и
+# замен нашлось. Это проверка того, что цепочка в живой базе действительно
+# собирается, а не только в локальной копии.
+ПРОБНЫЕ_НОМЕРА = ("mw21215m", "7w4377")
+CHAIN_ONE_SQL = """
+select (select count(*) from lib_parts where id = %(k)s)                          as деталь,
+       (select count(*) from lib_part_models where part_id = %(k)s)                as машин,
+       (select count(*) from lib_part_suppliers where part_id = %(k)s)             as исполнителей,
+       (select count(*) from lib_prices where part_id = %(k)s)                     as цен,
+       (select count(*) from lib_part_alt where part_id = %(k)s)                   as замен,
+       (select count(*) from lib_bom where part_id = %(k)s)                        as в_ведомости"""
+
 # Смычка спроса с каталогом: сколько строк спроса опознано по артикулу.
 LINKED_SQL = """
 select (select count(*) from lib_demand_catalog)                                 as строк_спроса,
@@ -236,6 +251,18 @@ def main() -> int:
                        "деталей без цены", "статей разведки без узла")
             for label, value in zip(подписи, one(cur, GAPS_SQL)):
                 print(f"  {label:28}{num(value)}")
+            block("цепочка по пробному номеру (только числа)")
+            print(f"  {'номер':12}{'деталь':>8}{'машин':>8}{'исполн.':>9}{'цен':>6}"
+                  f"{'замен':>8}{'ведом.':>8}")
+            for k in ПРОБНЫЕ_НОМЕРА:
+                try:
+                    cur.execute(CHAIN_ONE_SQL, {"k": k})
+                    строка = cur.fetchone()
+                except Exception:
+                    continue
+                значения = "".join(num(v, w) for v, w in
+                                   zip(строка, (8, 8, 9, 6, 8, 8)))
+                print(f"  {k:12}{значения}")
             if table_exists(cur, "lib_demand_catalog"):
                 block("спрос, опознанный по каталогу")
                 for label, value in zip(("строк спроса с известной деталью", "разных деталей",
