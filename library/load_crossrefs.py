@@ -148,6 +148,18 @@ def build_alts() -> list[dict]:
                     add(свой, str(чужой), вид, марка, r.get("url"),
                         "кросс-каталог MOTORTECH")
 
+    # Ведомость состава: наш внутренний номер и номер изготовителя — одна деталь.
+    # KV30 0001 и Epiroc 7490 0290 74 не связать значит закупать дважды.
+    for m in load("zip/data/bom.json", "machines"):
+        for запись in list(m.get("parts") or []) + list(m.get("kits") or []):
+            чужой = str(запись.get("epiroc_pn") or запись.get("oem_pn") or "").strip()
+            свой = str(запись.get("kv_pn") or "").strip()
+            if not (чужой and свой):
+                continue
+            add(чужой, свой, "наш номер", "КВАНТ", None, "ведомость состава")
+            add(свой, чужой, "номер изготовителя", m.get("oem") or None, None,
+                "ведомость состава")
+
     for r in load("zip/data/telsmith_crossrefs.json", "crossrefs"):
         add(r.get("telsmith_pn"), r.get("real_pn"), "номер изготовителя",
             r.get("real_maker"), r.get("evidence_url"), "кросс-таблица Telsmith",
@@ -196,17 +208,43 @@ def build_motortech_parts() -> dict[str, dict]:
     return детали
 
 
+def имя_машины(m: dict) -> str:
+    return str(m.get("name") or "").strip()
+
+
 def build_bom() -> tuple[list[dict], dict[str, dict], list[dict]]:
     """Ведомость → строки состава, новые детали и машина."""
     строки, детали, машины = [], {}, {}
     for m in load("zip/data/bom.json", "machines"):
-        имя = str(m.get("name") or "").strip()
+        имя = имя_машины(m)
         if not имя:
             continue
         ключ_машины = eq.norm_model(имя) if eq.looks_like_machine(имя) else None
         if ключ_машины:
             машины[ключ_машины] = {"id": ключ_машины, "name": имя[:200],
                                    "source": "ведомость состава"}
+        # Сервисные наборы — тоже позиции: у них свой номер изготовителя и свой
+        # наш номер, их так же закупают и так же задваивают.
+        for j, k in enumerate(m.get("kits") or []):
+            pn = str(k.get("oem_pn") or "").strip()
+            if not pn:
+                continue
+            key = part_key(pn)
+            имя = str(k.get("name") or pn)
+            детали.setdefault(key, {
+                "id": key, "catalog_no": pn[:120], "name": имя[:400], "oem": None,
+                "model": имя_машины(m)[:600], "category": "сервисный набор",
+                "segment_id": classify(f"{имя} {имя_машины(m)}"),
+                "unit_id": eq.unit_of(имя), "source": "ведомость состава: комплекты"})
+            строки.append({
+                "id": f"{ключ_машины or part_key(имя_машины(m))}.комплект.{j}",
+                "machine": имя_машины(m)[:200], "model_id": ключ_машины,
+                "scheme": str(k.get("scheme") or "")[:40] or None, "level": None,
+                "part_id": key, "part_no": pn[:120],
+                "own_no": str(k.get("kv_pn") or "")[:120] or None,
+                "qty": str(k.get("qty") or "")[:40] or None, "name": имя[:400],
+                "source": "ведомость состава: комплекты"})
+
         for i, p in enumerate(m.get("parts") or []):
             pn = str(p.get("epiroc_pn") or p.get("pn") or "").strip()
             if not pn:
