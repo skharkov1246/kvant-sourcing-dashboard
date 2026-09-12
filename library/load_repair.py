@@ -5,6 +5,13 @@
 узел проверяют, чем он выходит из строя и что с этим делают. До сих пор их не
 было вовсе — были только позиции и поставщики.
 
+ПРИЗНАКИ — ЗАГОТОВКА, И ТАК ПОМЕЧЕНЫ. library/data/symptoms.json собран по общей
+практике диагностики вращающегося оборудования и по брошюрам OEM там, где это
+указано в поле basis. Это не измерение по нашему парку: уверенность у всех строк
+низкая, источник назван заготовкой, и инженер сервиса должен их подтвердить.
+Выдавать такое за факт нельзя, а не иметь вовсе — хуже: звено «признак» было
+пустым, и цепочка рвалась на входе, с которого приходит эксплуатация.
+
 ЧЕСТНО О ОБЪЁМЕ. Материала в репозитории мало: разведка Ansaldo (этапы ремонта,
 уровни инспекций, ремонтные центры, матрица модернизаций) и проработки отдельных
 позиций с описанием риска и рекомендацией. Это десятки строк, а не тысячи. Здесь
@@ -173,6 +180,33 @@ def build_defects() -> dict[str, dict]:
     return defects
 
 
+def build_symptoms() -> dict[str, dict]:
+    """Признаки: по чему видно, что машина нездорова.
+
+    Справочник-заготовка: связки взяты из общей практики диагностики и из
+    брошюр OEM там, где это указано в поле basis. Уверенность низкая у всех
+    строк, пока инженер сервиса их не подтвердил, — и это записано в данных,
+    а не в голове."""
+    out: dict[str, dict] = {}
+    d = load("library/data/symptoms.json")
+    for r in (d.get("rows") or []):
+        имя = clean(r.get("name"))
+        if not имя:
+            continue
+        unit = r.get("unit")
+        out[ident("признак", имя)] = {
+            "id": ident("признак", имя), "name": имя[:300],
+            "unit_id": unit if unit in UNITS else None,
+            "measure": clean(r.get("measure"))[:600] or None,
+            "defect": clean(r.get("defect"))[:1000] or None,
+            "confirm": clean(r.get("confirm"))[:1000] or None,
+            "basis": clean(r.get("basis"))[:300] or None,
+            "confidence": "low",
+            "source": "справочник признаков (заготовка, требует проверки инженером)",
+        }
+    return out
+
+
 def узлы() -> set[str]:
     d = load("gt/data/parts.json")
     ids = set()
@@ -189,6 +223,7 @@ UNITS = узлы()
 def main() -> int:
     proc = build_procedures()
     defects = build_defects()
+    symptoms = build_symptoms()
 
     print("=== операции ===")
     for k, n in Counter(p["kind"] for p in proc.values()).most_common():
@@ -197,6 +232,14 @@ def main() -> int:
     с_исполнителем = sum(1 for p in proc.values() if p["performer_key"])
     print(f"  с названным исполнителем: {с_исполнителем}")
     print(f"  с определённым узлом:     {sum(1 for p in proc.values() if p['unit_id'])}")
+
+    print("\n=== признаки ===")
+    print(f"  записей: {len(symptoms)}")
+    print(f"  с узлом: {sum(1 for s in symptoms.values() if s['unit_id'])}")
+    без_узла = [s["name"] for s in symptoms.values() if not s["unit_id"]]
+    if без_узла:
+        print(f"  без узла: {len(без_узла)} — узел в справочнике не найден, проверьте имена")
+    print("  ВСЕ с низкой уверенностью: справочник-заготовка, нужна проверка инженером")
 
     print("\n=== дефекты и ремонтные решения ===")
     print(f"  записей: {len(defects)}")
@@ -231,6 +274,17 @@ def main() -> int:
               p["model_family"], p["performer"], p["performer_key"], p["source"])
              for p in proc.values()], page_size=500)
         psycopg2.extras.execute_values(cur, """
+            insert into lib_symptoms (id, name, unit_id, measure, defect, confirm, basis,
+                                      confidence, source)
+            values %s
+            on conflict (id) do update set
+              unit_id = excluded.unit_id, measure = excluded.measure,
+              defect = excluded.defect, confirm = excluded.confirm,
+              basis = excluded.basis, updated_at = now()""",
+            [(s["id"], s["name"], s["unit_id"], s["measure"], s["defect"], s["confirm"],
+              s["basis"], s["confidence"], s["source"]) for s in symptoms.values()],
+            page_size=200)
+        psycopg2.extras.execute_values(cur, """
             insert into lib_defects (id, name, unit_id, part_number, model, cause,
                                      consequence, fix, source)
             values %s
@@ -241,7 +295,7 @@ def main() -> int:
               d["consequence"], d["fix"], d["source"]) for d in defects.values()],
             page_size=500)
         conn.commit()
-        for t in ("lib_procedures", "lib_defects"):
+        for t in ("lib_procedures", "lib_defects", "lib_symptoms"):
             cur.execute(f"select count(*) from {t}")
             print(f"  {t:16}{cur.fetchone()[0]:>6}")
         # Сколько исполнителей ремонта нашлись в общей базе компаний — это и есть

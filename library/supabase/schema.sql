@@ -242,6 +242,25 @@ create table if not exists lib_defects (
   created_at  timestamptz default now(),
   updated_at  timestamptz default now()
 );
+-- Признак — вход в цепочку с той стороны, с которой приходит эксплуатация:
+-- «выросла вибрация», «разброс по термопарам». Отдельная таблица, а не поле
+-- дефекта: один признак ведёт к нескольким дефектам, и один дефект даёт
+-- несколько признаков.
+create table if not exists lib_symptoms (
+  id         text primary key,
+  name       text not null,
+  unit_id    text references lib_units(id) on delete set null,
+  measure    text,                        -- по чему видно: что и чем меряют
+  defect     text,                        -- что это обычно значит
+  confirm    text,                        -- чем подтвердить
+  basis      text,                        -- откуда связка взята
+  confidence text default 'low',
+  source     text,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+create index if not exists lib_symptoms_unit on lib_symptoms (unit_id);
+
 create index if not exists lib_defects_unit on lib_defects (unit_id);
 create index if not exists lib_defects_pn   on lib_defects (part_number);
 
@@ -437,6 +456,7 @@ alter table lib_defects        enable row level security;
 alter table lib_fleet          enable row level security;
 alter table lib_part_alt       enable row level security;
 alter table lib_bom            enable row level security;
+alter table lib_symptoms       enable row level security;
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 9. Реестр разобранных файлов. Нужен для возобновляемости: обход 22 тысяч

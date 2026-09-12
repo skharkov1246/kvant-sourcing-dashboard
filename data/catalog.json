@@ -4,12 +4,12 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 189,
-    "total_bytes": 91516506,
+    "datasets": 190,
+    "total_bytes": 91530532,
     "by_sensitivity": {
       "конфиденциально": 57,
       "внутреннее": 99,
-      "публикуемо": 33
+      "публикуемо": 34
     },
     "by_subproject": {
       "ГПУ-библиотека": 27,
@@ -17,6 +17,7 @@
       "ОВЭ-75": 45,
       "база ЗИП": 30,
       "база ЗИП · таможня": 18,
+      "библиотека рынков": 1,
       "гидрометаллургия": 22,
       "дашборд сорсеров": 4,
       "каталог PN (веб)": 1,
@@ -5979,6 +5980,67 @@
       ]
     },
     {
+      "path": "data/catalog_notes.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 30167,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "data/budget_snapshot.json",
+        "data/chain_coverage.json",
+        "data/chat_snapshot.json",
+        "data/index.json",
+        "dict/",
+        "dict/node_map.json",
+        "gidromet/data/",
+        "gpu/data/bitrix_gpu.json",
+        "gpu/data/coverage.json",
+        "gt/data/ansaldo.json",
+        "gt/data/bitrix_gt.json",
+        "gt/data/dossiers.json",
+        "gt/data/pn_db.json",
+        "gt/data/ship_energoseti.json",
+        "gt/data/ship_lukoil.json",
+        "gt/data/ship_sellers.json",
+        "gt/data/ship_sweep.json",
+        "library/data/symptoms.json",
+        "library/docfilter.py",
+        "library/indexer.py",
+        "library/load_parts.py",
+        "library/load_suppliers.py",
+        "library/ocr.py",
+        "library/reparse.py",
+        "library/supabase/schema_junk.sql",
+        "ove/data/suppliers.json",
+        "pnw/data/contacts_found.json",
+        "pnw/data/crossrefs.json",
+        "pnw/data/item_master.json",
+        "pnw/data/kv_registry.json",
+        "pnw/data/numbers.json",
+        "pnw/data/part_suppliers.json",
+        "pnw/data/supplier_master.json",
+        "pnw/public/data.js",
+        "pnw/public/search.html",
+        "zip/customs/out/",
+        "zip/data/cat_stock_2026-09.json",
+        "zip/data/customs_declarations.json",
+        "zip/data/kp1763_audit.json",
+        "zip/data/machines.json"
+      ],
+      "last_change": "2026-09-12",
+      "last_author": "skharkov1246",
+      "last_commit": "fe786fa",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "scripts/build_catalog.py"
+      ]
+    },
+    {
       "path": "gidromet/data/razvilki.json",
       "subproject": "гидрометаллургия",
       "bytes": 29953,
@@ -6051,67 +6113,6 @@
       "referenced_by": [
         "ove/tools/build_bim_plan.py",
         "ove/tools/ifc_check.py"
-      ]
-    },
-    {
-      "path": "data/catalog_notes.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 29432,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "data/budget_snapshot.json",
-        "data/chain_coverage.json",
-        "data/chat_snapshot.json",
-        "data/index.json",
-        "dict/",
-        "dict/node_map.json",
-        "gidromet/data/",
-        "gpu/data/bitrix_gpu.json",
-        "gpu/data/coverage.json",
-        "gt/data/ansaldo.json",
-        "gt/data/bitrix_gt.json",
-        "gt/data/dossiers.json",
-        "gt/data/pn_db.json",
-        "gt/data/ship_energoseti.json",
-        "gt/data/ship_lukoil.json",
-        "gt/data/ship_sellers.json",
-        "gt/data/ship_sweep.json",
-        "library/docfilter.py",
-        "library/indexer.py",
-        "library/load_parts.py",
-        "library/load_suppliers.py",
-        "library/ocr.py",
-        "library/reparse.py",
-        "library/supabase/schema_junk.sql",
-        "ove/data/suppliers.json",
-        "pnw/data/contacts_found.json",
-        "pnw/data/crossrefs.json",
-        "pnw/data/item_master.json",
-        "pnw/data/kv_registry.json",
-        "pnw/data/numbers.json",
-        "pnw/data/part_suppliers.json",
-        "pnw/data/supplier_master.json",
-        "pnw/public/data.js",
-        "pnw/public/search.html",
-        "zip/customs/out/",
-        "zip/data/cat_stock_2026-09.json",
-        "zip/data/customs_declarations.json",
-        "zip/data/kp1763_audit.json",
-        "zip/data/machines.json",
-        "zip/data/perf_class_packets.json"
-      ],
-      "last_change": "2026-09-12",
-      "last_author": "skharkov1246",
-      "last_commit": "fe786fa",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "scripts/build_catalog.py"
       ]
     },
     {
@@ -6930,6 +6931,42 @@
         "scripts/build_dict.py",
         "zip/build.py",
         "zip/tools/perf_classes.py"
+      ]
+    },
+    {
+      "path": "library/data/symptoms.json",
+      "subproject": "библиотека рынков",
+      "bytes": 13291,
+      "note": "Признаки неисправности вращающегося оборудования: по чему видно, что машина нездорова, что это обычно значит и чем подтверждается. Звено «признак» цепочки портала. СПРАВОЧНИК-ЗАГОТОВКА, не измерение по парку: связки взяты из общей практики диагностики и из брошюр OEM (поле basis), уверенность у всех строк низкая, требуется проверка инженером сервиса. Загружается library/load_repair.py в lib_symptoms.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "note",
+        "rows",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 24,
+        "record_keys": [
+          "basis",
+          "confirm",
+          "defect",
+          "measure",
+          "name",
+          "unit"
+        ]
+      },
+      "last_change": null,
+      "last_author": null,
+      "last_commit": null,
+      "updated_by": "неизвестно",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "library/load_repair.py"
       ]
     },
     {
