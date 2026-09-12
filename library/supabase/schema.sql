@@ -79,6 +79,18 @@ create table if not exists lib_suppliers (
 );
 create index if not exists lib_suppliers_seg on lib_suppliers (segment_id);
 
+-- Исполнители приходят из семи разных исследований, и одна компания встречается
+-- под разными написаниями. Ключ — нормализованное имя (library/load_suppliers.py):
+-- без кавычек, форм собственности, регистра и пунктуации. Уникальность по
+-- coalesce(segment_id,''), а не по segment_id: в SQL NULL не равен NULL, поэтому
+-- обычное unique(segment_id, name) пропустило бы любое число дублей без сегмента.
+alter table lib_suppliers add column if not exists name_key      text;
+alter table lib_suppliers add column if not exists city          text;
+alter table lib_suppliers add column if not exists contact_email text;
+alter table lib_suppliers add column if not exists contact_phone text;
+create unique index if not exists lib_suppliers_key
+  on lib_suppliers (coalesce(segment_id, ''), name_key);
+
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 4. Ценообразование: из чего складывается цена и какова она у разных источников.
 create table if not exists lib_prices (
