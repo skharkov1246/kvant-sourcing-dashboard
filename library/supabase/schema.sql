@@ -372,6 +372,10 @@ alter table lib_suppliers add column if not exists name_key      text;
 alter table lib_suppliers add column if not exists city          text;
 alter table lib_suppliers add column if not exists contact_email text;
 alter table lib_suppliers add column if not exists contact_phone text;
+-- Стадия переписки и дата последнего касания: самое прикладное, что о поставщике
+-- вообще можно знать — отвечает на «звонить ли снова». Приходит из CRM-выгрузки.
+alter table lib_suppliers add column if not exists stage     text;
+alter table lib_suppliers add column if not exists last_comm text;
 create unique index if not exists lib_suppliers_key
   on lib_suppliers (coalesce(segment_id, ''), name_key);
 

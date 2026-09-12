@@ -107,6 +107,9 @@ SOURCES = [
     ("zip/data/tfs_supply_chain.json", "suppliers", "цепочка поставок ТФС"),
     ("zip/data/material_process.json", None, "обработка материалов"),
     ("gpu/data/suppliers.json", "companies", "библиотека ГПУ"),
+    ("gt/data/site_profiles.json", "profiles", "профили сайтов"),
+    ("gt/data/bitrix_supplier_sites.json", "confirmed", "подтверждённые сайты"),
+    ("zip/data/supplier_crm.json", "suppliers", "переписка с поставщиками"),
     ("gpu/data/subsuppliers.json", "systems[].makers", "субпоставщики ГПУ"),
     ("gt/data/research_suppliers.json", "rows", "исследование ГТУ"),
     ("gt/data/dossiers.json", "dossiers", "досье компаний"),
@@ -126,13 +129,13 @@ def shape(r: dict, origin: str) -> dict | None:
     if not name or len(name) < 2:
         return None
     what = first(r, "what", "products", "makes", "capability", "production", "real_maker",
-                 "sys", "depth", "role", "_группа",
+                 "sys", "depth", "role", "_группа", "desc", "direction", "ev",
                  "equipment", "covers_classes", "covers", "hook", "profile", "angle",
                  "families", "note")
     return {
         "name": name[:300],
         "key": norm(name),
-        "country": first(r, "country", "seller_country")[:80] or None,
+        "country": first(r, "country", "seller_country", "geo")[:80] or None,
         "city": first(r, "city")[:120] or None,
         "kind": first(r, "kind", "role", "tier", "relation", "category")[:60] or None,
         "site": first(r, "site", "url", "link", "catalog_url", "seller_url",
@@ -144,6 +147,10 @@ def shape(r: dict, origin: str) -> dict | None:
         "confidence": (first(r, "confidence", "conf", "relevance") or "med")[:10],
         "contact_email": first(r, "email", "emails", "contact_email")[:200] or None,
         "contact_phone": first(r, "phone", "phones", "contact_phone", "whatsapp")[:120] or None,
+        # Переписка с поставщиком: на какой стадии разговор и чего ждём. Самое
+        # прикладное поле из всех — оно отвечает «звонить ли снова».
+        "stage": first(r, "stage")[:120] or None,
+        "last_comm": first(r, "last_comm")[:120] or None,
         "segment_id": classify(" ".join(x for x in (what, name) if x)),
         "researched_by": origin,
     }
@@ -193,7 +200,7 @@ def main() -> int:
     заполнено = Counter()
     for r in rows:
         for k in ("country", "city", "site", "strengths", "contact_email", "contact_phone",
-                  "kind", "moq", "certificates"):
+                  "kind", "moq", "certificates", "stage"):
             заполнено[k] += bool(r.get(k))
     print("\n=== полнота полей ===")
     for k, n in заполнено.most_common():
@@ -237,6 +244,8 @@ def main() -> int:
               sanctions     = coalesce(lib_suppliers.sanctions, excluded.sanctions),
               contact_email = coalesce(lib_suppliers.contact_email, excluded.contact_email),
               contact_phone = coalesce(lib_suppliers.contact_phone, excluded.contact_phone),
+              stage         = coalesce(excluded.stage, lib_suppliers.stage),
+              last_comm     = coalesce(excluded.last_comm, lib_suppliers.last_comm),
               researched_by = excluded.researched_by""" if по_имени
                     else "on conflict do nothing")
         if not по_имени:
@@ -245,12 +254,14 @@ def main() -> int:
         psycopg2.extras.execute_values(cur, f"""
             insert into lib_suppliers
               (segment_id, name, name_key, country, city, kind, site, strengths, moq,
-               certificates, sanctions, confidence, contact_email, contact_phone, researched_by)
+               certificates, sanctions, confidence, contact_email, contact_phone,
+               researched_by, stage, last_comm)
             values %s
             {конфликт}""",
             [(r["segment_id"], r["name"], r["key"], r["country"], r["city"], r["kind"],
               r["site"], r["strengths"], r["moq"], r["certificates"], r["sanctions"],
-              r["confidence"], r["contact_email"], r["contact_phone"], r["researched_by"])
+              r["confidence"], r["contact_email"], r["contact_phone"], r["researched_by"],
+              r.get("stage"), r.get("last_comm"))
              for r in rows], page_size=500)
         conn.commit()
         cur.execute("select count(*) from lib_suppliers")

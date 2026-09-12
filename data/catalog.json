@@ -3323,6 +3323,7 @@
       "referenced_by": [
         "gt/build.py",
         "gt/tools/drop_ru.py",
+        "library/load_suppliers.py",
         "scripts/build_chain_coverage.py"
       ]
     },
@@ -4422,6 +4423,7 @@
         "gt/build.py",
         "gt/tools/build_rfq.py",
         "gt/tools/drop_ru.py",
+        "library/load_suppliers.py",
         "pnw/tools/build_suppliers.py",
         "scripts/build_chain_coverage.py"
       ]
@@ -6089,6 +6091,7 @@
         ]
       },
       "referenced_by": [
+        "library/load_suppliers.py",
         "pnw/tools/build_suppliers.py",
         "scripts/build_chain_coverage.py",
         "zip/build.py",
