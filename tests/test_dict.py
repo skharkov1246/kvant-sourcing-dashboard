@@ -137,3 +137,27 @@ def test_catalog_sees_uncommitted_code_files():
     finally:
         probe.unlink(missing_ok=True)
 
+
+def test_chain_coverage_is_fresh_and_honest():
+    """Счётчик цепочки портала пересобран и не приукрашивает.
+
+    Ноль в клетке обязан означать отсутствие данных, а не «данные где-то есть»:
+    по этой карте выбирается следующая работа, и приукрашенный ноль увёл бы
+    усилия не туда."""
+    r = subprocess.run([sys.executable, str(ROOT / "scripts" / "build_chain_coverage.py"), "--check"],
+                       capture_output=True, text=True)
+    assert r.returncode == 0, f"счётчик цепочки устарел: {r.stdout}{r.stderr}"
+
+    cov = json.loads((ROOT / "data" / "chain_coverage.json").read_text(encoding="utf-8"))
+    assert len(cov["links"]) == 8, "цепочка портала — восемь звеньев"
+    assert cov["summary"]["cells_total"] == len(cov["segments"]) * 8
+    for seg in cov["segments"]:
+        for cell in seg["cells"]:
+            # Клетка с числом обязана называть файлы, откуда оно взято, — иначе
+            # цифру нельзя проверить, и она ничем не лучше выдуманной.
+            if cell["n"]:
+                assert cell["sources"], f"{seg['segment']}/{cell['link']}: число без источника"
+                assert cell["state"] == "есть"
+            else:
+                assert cell["state"] == "пусто"
+

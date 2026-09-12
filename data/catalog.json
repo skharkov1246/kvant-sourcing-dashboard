@@ -4,12 +4,12 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 187,
-    "total_bytes": 91456030,
+    "datasets": 188,
+    "total_bytes": 91475999,
     "by_sensitivity": {
       "конфиденциально": 57,
       "внутреннее": 98,
-      "публикуемо": 32
+      "публикуемо": 33
     },
     "by_subproject": {
       "ГПУ-библиотека": 27,
@@ -18,7 +18,7 @@
       "база ЗИП": 29,
       "база ЗИП · таможня": 18,
       "гидрометаллургия": 22,
-      "дашборд сорсеров": 3,
+      "дашборд сорсеров": 4,
       "каталог PN (веб)": 1,
       "каталог PN · данные": 7
     }
@@ -274,6 +274,7 @@
       "referenced_by": [
         "gt/build.py",
         "pnw/tools/build_master.py",
+        "scripts/build_chain_coverage.py",
         "scripts/build_dict.py",
         "tests/test_core.py"
       ]
@@ -409,6 +410,7 @@
         "pnw/tools/build_master.py",
         "pnw/tools/build_search.py",
         "pnw/tools/build_suppliers.py",
+        "scripts/build_chain_coverage.py",
         "scripts/build_dict.py",
         "tests/test_dict.py",
         "zip/tools/perf_classes.py"
@@ -438,8 +440,8 @@
         ]
       },
       "last_change": "2026-09-12",
-      "last_author": "Claude",
-      "last_commit": "b661b34",
+      "last_author": "skharkov1246",
+      "last_commit": "bde21dc",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -492,6 +494,7 @@
         "library/load_parts.py",
         "library/load_suppliers.py",
         "pnw/tools/build_suppliers.py",
+        "scripts/build_chain_coverage.py",
         "tests/test_publish_library_v2.py",
         "zip/build.py",
         "zip/tools/cat_stock.py",
@@ -879,13 +882,13 @@
         "library/load_parts.py",
         "pnw/tools/build_master.py",
         "pnw/tools/parse_crossrefs.py",
+        "scripts/build_chain_coverage.py",
         "scripts/build_dict.py",
         "scripts/publish_library_v2.py",
         "tests/test_publish_library_v2.py",
         "zip/build.py",
         "zip/customs/glbs_pull.mjs",
-        "zip/tools/aggregate_customs.py",
-        "zip/tools/aggregate_prices.py"
+        "zip/tools/aggregate_customs.py"
       ]
     },
     {
@@ -1801,6 +1804,7 @@
       },
       "referenced_by": [
         "library/load_suppliers.py",
+        "scripts/build_chain_coverage.py",
         "zip/tools/build_telsmith_page.py",
         "zip/tools/telsmith_report.py"
       ]
@@ -2556,6 +2560,7 @@
         ]
       },
       "referenced_by": [
+        "scripts/build_chain_coverage.py",
         "scripts/build_dict.py",
         "zip/tools/build_telsmith_page.py",
         "zip/tools/telsmith_parse.py",
@@ -3114,7 +3119,7 @@
         "gt/tools/build_rfq.py",
         "gt/tools/ship_merge.py",
         "gt/tools/ship_report.py",
-        "scripts/build_dict.py"
+        "scripts/build_chain_coverage.py"
       ]
     },
     {
@@ -3743,7 +3748,8 @@
       },
       "referenced_by": [
         "gpu/build.py",
-        "gpu/tools/parse_motortech.py"
+        "gpu/tools/parse_motortech.py",
+        "scripts/build_chain_coverage.py"
       ]
     },
     {
@@ -4471,6 +4477,7 @@
       },
       "referenced_by": [
         "gpu/build.py",
+        "scripts/build_chain_coverage.py",
         "scripts/build_dict.py"
       ]
     },
@@ -4884,7 +4891,8 @@
         "markers": []
       },
       "referenced_by": [
-        "gt/build.py"
+        "gt/build.py",
+        "scripts/build_chain_coverage.py"
       ]
     },
     {
@@ -5555,6 +5563,7 @@
         "markers": []
       },
       "referenced_by": [
+        "scripts/build_chain_coverage.py",
         "scripts/build_dict.py",
         "zip/build.py",
         "zip/tools/perf_classes.py"
@@ -6108,6 +6117,67 @@
       ]
     },
     {
+      "path": "data/catalog_notes.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 27673,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "data/budget_snapshot.json",
+        "data/chain_coverage.json",
+        "data/chat_snapshot.json",
+        "data/index.json",
+        "dict/",
+        "gidromet/data/",
+        "gpu/data/bitrix_gpu.json",
+        "gpu/data/coverage.json",
+        "gt/data/ansaldo.json",
+        "gt/data/bitrix_gt.json",
+        "gt/data/dossiers.json",
+        "gt/data/pn_db.json",
+        "gt/data/ship_energoseti.json",
+        "gt/data/ship_lukoil.json",
+        "gt/data/ship_sellers.json",
+        "gt/data/ship_sweep.json",
+        "library/docfilter.py",
+        "library/indexer.py",
+        "library/load_parts.py",
+        "library/load_suppliers.py",
+        "library/ocr.py",
+        "library/reparse.py",
+        "library/supabase/schema_junk.sql",
+        "ove/data/suppliers.json",
+        "pnw/data/contacts_found.json",
+        "pnw/data/crossrefs.json",
+        "pnw/data/item_master.json",
+        "pnw/data/kv_registry.json",
+        "pnw/data/numbers.json",
+        "pnw/data/part_suppliers.json",
+        "pnw/data/supplier_master.json",
+        "pnw/public/data.js",
+        "pnw/public/search.html",
+        "zip/customs/out/",
+        "zip/data/cat_stock_2026-09.json",
+        "zip/data/customs_declarations.json",
+        "zip/data/kp1763_audit.json",
+        "zip/data/perf_class_packets.json",
+        "zip/data/perf_sourcing_map.json",
+        "zip/data/perf_test_requests.json"
+      ],
+      "last_change": "2026-09-12",
+      "last_author": "skharkov1246",
+      "last_commit": "bde21dc",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "scripts/build_catalog.py"
+      ]
+    },
+    {
       "path": "zip/data/demand.json",
       "subproject": "база ЗИП",
       "bytes": 27663,
@@ -6151,7 +6221,7 @@
         "gt/tools/build_rfq.py",
         "gt/tools/ship_merge.py",
         "gt/tools/ship_report.py",
-        "scripts/build_dict.py"
+        "scripts/build_chain_coverage.py"
       ]
     },
     {
@@ -6188,67 +6258,6 @@
       "referenced_by": [
         "ove/build.py",
         "ove/tools/revisions.py"
-      ]
-    },
-    {
-      "path": "data/catalog_notes.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 26828,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "data/budget_snapshot.json",
-        "data/chat_snapshot.json",
-        "data/index.json",
-        "dict/",
-        "gidromet/data/",
-        "gpu/data/bitrix_gpu.json",
-        "gpu/data/coverage.json",
-        "gt/data/ansaldo.json",
-        "gt/data/bitrix_gt.json",
-        "gt/data/dossiers.json",
-        "gt/data/pn_db.json",
-        "gt/data/ship_energoseti.json",
-        "gt/data/ship_lukoil.json",
-        "gt/data/ship_sellers.json",
-        "gt/data/ship_sweep.json",
-        "library/docfilter.py",
-        "library/indexer.py",
-        "library/load_parts.py",
-        "library/load_suppliers.py",
-        "library/ocr.py",
-        "library/reparse.py",
-        "library/supabase/schema_junk.sql",
-        "ove/data/suppliers.json",
-        "pnw/data/contacts_found.json",
-        "pnw/data/crossrefs.json",
-        "pnw/data/item_master.json",
-        "pnw/data/kv_registry.json",
-        "pnw/data/numbers.json",
-        "pnw/data/part_suppliers.json",
-        "pnw/data/supplier_master.json",
-        "pnw/public/data.js",
-        "pnw/public/search.html",
-        "zip/customs/out/",
-        "zip/data/cat_stock_2026-09.json",
-        "zip/data/customs_declarations.json",
-        "zip/data/kp1763_audit.json",
-        "zip/data/perf_class_packets.json",
-        "zip/data/perf_sourcing_map.json",
-        "zip/data/perf_test_requests.json",
-        "zip/data/supplier_crm.json"
-      ],
-      "last_change": "2026-09-12",
-      "last_author": "Claude",
-      "last_commit": "e6759b1",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "scripts/build_catalog.py"
       ]
     },
     {
@@ -6290,6 +6299,7 @@
         "gt/tools/drop_ru.py",
         "gt/tools/ship_merge.py",
         "library/load_suppliers.py",
+        "scripts/build_chain_coverage.py",
         "scripts/build_dict.py"
       ]
     },
@@ -6405,6 +6415,7 @@
       "referenced_by": [
         "gpu/build.py",
         "gt/build.py",
+        "scripts/build_chain_coverage.py",
         "scripts/build_dict.py"
       ]
     },
@@ -6485,6 +6496,45 @@
       ]
     },
     {
+      "path": "data/chain_coverage.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 19124,
+      "note": "Заполняемость цепочки портала по семи направлениям и восьми звеньям: машина → узел → признак → дефект → ремонтное решение → запчасть → изготовитель → исполнитель. Производный файл, считается scripts/build_chain_coverage.py по фактическим файлам репозитория; ноль означает отсутствие данных, а не то, что они где-то есть. Руками не заполнять. Первый прогон 12.09.2026: 13 клеток из 56, звенья «Признак», «Дефект» и «Исполнитель» не начаты ни по одному направлению.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "common",
+        "empty_everywhere",
+        "goal",
+        "links",
+        "note",
+        "priority_rule",
+        "segments",
+        "summary"
+      ],
+      "main_collection": {
+        "key": "links",
+        "records": 8,
+        "record_keys": [
+          "link",
+          "title",
+          "what"
+        ]
+      },
+      "last_change": null,
+      "last_author": null,
+      "last_commit": null,
+      "updated_by": "неизвестно",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "scripts/build_chain_coverage.py",
+        "tests/test_dict.py"
+      ]
+    },
+    {
       "path": "gpu/data/parts.json",
       "subproject": "ГПУ-библиотека",
       "bytes": 16417,
@@ -6524,6 +6574,7 @@
         "gt/tools/build_hot.py",
         "gt/tools/build_lot.py",
         "gt/tools/drop_ru.py",
+        "scripts/build_chain_coverage.py",
         "scripts/build_dict.py"
       ]
     },
@@ -6571,7 +6622,8 @@
         "gt/tools/drop_ru.py",
         "gt/tools/ship_merge.py",
         "library/load_suppliers.py",
-        "pnw/tools/build_suppliers.py"
+        "pnw/tools/build_suppliers.py",
+        "scripts/build_chain_coverage.py"
       ]
     },
     {
@@ -6786,6 +6838,7 @@
       },
       "referenced_by": [
         "gpu/build.py",
+        "scripts/build_chain_coverage.py",
         "scripts/build_dict.py",
         "zip/build.py",
         "zip/tools/perf_classes.py"
@@ -6980,6 +7033,7 @@
       "referenced_by": [
         "gpu/build.py",
         "gt/build.py",
+        "scripts/build_chain_coverage.py",
         "scripts/build_dict.py"
       ]
     },
@@ -7094,6 +7148,7 @@
       "referenced_by": [
         "gpu/build.py",
         "gpu/tools/coverage.py",
+        "scripts/build_chain_coverage.py",
         "tests/test_dict.py"
       ]
     },
@@ -7317,6 +7372,7 @@
         "gt/tools/build_hot.py",
         "gt/tools/build_lot.py",
         "gt/tools/drop_ru.py",
+        "scripts/build_chain_coverage.py",
         "scripts/build_dict.py"
       ]
     },
@@ -7661,6 +7717,7 @@
         "gt/tools/drop_ru.py",
         "gt/tools/ship_merge.py",
         "library/load_suppliers.py",
+        "scripts/build_chain_coverage.py",
         "scripts/build_dict.py"
       ]
     },
