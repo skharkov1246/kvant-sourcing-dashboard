@@ -886,6 +886,7 @@
         "markers": []
       },
       "referenced_by": [
+        "library/load_equipment.py",
         "library/load_parts.py",
         "pnw/tools/build_master.py",
         "pnw/tools/parse_crossrefs.py",
@@ -894,8 +895,7 @@
         "scripts/publish_library_v2.py",
         "tests/test_publish_library_v2.py",
         "zip/build.py",
-        "zip/customs/glbs_pull.mjs",
-        "zip/tools/aggregate_customs.py"
+        "zip/customs/glbs_pull.mjs"
       ]
     },
     {

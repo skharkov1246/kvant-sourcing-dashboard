@@ -100,6 +100,24 @@ def build_models() -> tuple[dict[str, dict], dict[str, str]]:
                 for part in eq.split_machines(legacy):
                     alias.setdefault(eq.norm_model(part), key)
 
+    # Реестр dict/machine.json собран обходом строковых полей всех баз (#239):
+    # 208 обозначений со сведёнными написаниями — ST14 и ST-14 там уже одна
+    # машина. Берём оттуда И машины, И написания: своим порогом по встречаемости
+    # их не получить, а без написаний половина связей не находится. Мусор реестра
+    # («не указана (вероятно Mars)») отсекается тем же отбором looks_like_machine.
+    for r in load("dict/machine.json").get("records", []):
+        имя = str(r.get("name") or "").strip()
+        if not eq.looks_like_machine(имя):
+            continue
+        key = add(имя, family=None, source="реестр машин (dict/machine.json)")
+        if not key:
+            continue
+        models[key]["segment_id"] = r.get("segment") if r.get("segment") != "other" else None
+        models[key]["kind"] = r.get("kind")
+        for написание in (r.get("spellings") or []):
+            models[key]["aliases"].add(str(написание)[:120])
+            alias.setdefault(eq.norm_model(str(написание)), key)
+
     for m in load("gt/data/ansaldo.json").get("models", []):
         add(m["name"], oem="Ansaldo Energia", family="ansaldo",
             family_title="Ansaldo Energia / семейство V-машин",
@@ -212,6 +230,19 @@ def build_parts(models, alias, units):
     for r in rows:
         take(r.get("pn"), r.get("desc"), r.get("oem"), r.get("mach"), r.get("seg"),
              r.get("qty"), r.get("pat"), "партномера потребности")
+    # Каталог ЗИП: машина лежит в поле model («TH-540, 545i», «ST14»), и связи
+    # оттуда не строились вовсе — 752 позиции горно-шахтного висели без машины.
+    # Сами позиции уже загружены load_parts.py, поэтому здесь только рёбра.
+    for r in load("zip/data/positions.json"):
+        key = part_key(r.get("catalog_norm") or r.get("catalog_no") or "")
+        if not key:
+            continue
+        for м in eq.split_machines(str(r.get("model") or "")):
+            k = alias.get(eq.norm_model(м))
+            if k:
+                edges.add((key, k))
+            elif м:
+                не_опознано[м] += 1
     for r in cat:
         take(r.get("pn"), r.get("desc"), None, r.get("model"), r.get("system"),
              None, None, "публичные каталоги")
@@ -256,7 +287,7 @@ def main() -> int:
     fleet = build_fleet(alias)
 
     print("=== машины ===")
-    fam = Counter(m.get("family") or "из партномеров" for m in models.values())
+    fam = Counter(m.get("family") or (m.get("source") or "—") for m in models.values())
     for f, n in fam.most_common():
         print(f"  {f:26}{num(n)}")
     print(f"  всего машин:{num(len(models))}   (из них по партномерам: {добавлено})")
@@ -319,7 +350,8 @@ def main() -> int:
         indexer.ensure_segments(cur)
         psycopg2.extras.execute_values(cur, """
             insert into lib_models (id, name, oem, family, family_title, legacy, power,
-                                    efficiency, shafts, use_case, aliases, note, source)
+                                    efficiency, shafts, use_case, aliases, note, source,
+                                    segment_id, kind)
             values %s
             on conflict (id) do update set
               name = excluded.name, oem = coalesce(lib_models.oem, excluded.oem),
@@ -331,11 +363,14 @@ def main() -> int:
               shafts = coalesce(lib_models.shafts, excluded.shafts),
               use_case = coalesce(lib_models.use_case, excluded.use_case),
               aliases = excluded.aliases, note = coalesce(lib_models.note, excluded.note),
+              segment_id = coalesce(lib_models.segment_id, excluded.segment_id),
+              kind = coalesce(lib_models.kind, excluded.kind),
               updated_at = now()""",
             [(m["id"], m["name"][:200], (m.get("oem") or None), m.get("family"),
               (m.get("family_title") or None), m.get("legacy"), m.get("power"),
               m.get("efficiency"), m.get("shafts"), m.get("use_case"),
-              sorted(a[:120] for a in m["aliases"]), m.get("note"), m.get("source"))
+              sorted(a[:120] for a in m["aliases"]), m.get("note"), m.get("source"),
+              m.get("segment_id"), m.get("kind"))
              for m in models.values()], page_size=500)
 
         # Системы раньше компонентов: parent_id ссылается на ту же таблицу.
@@ -386,10 +421,19 @@ def main() -> int:
             [(f["id"], f["site"], f["owner"], f["model_id"], f["model_raw"], f["units"],
               f["year"], f["note"], f["source"]) for f in fleet.values()], page_size=200)
 
+        # Ребро ставится только на деталь, которая в каталоге есть. Часть позиций
+        # каталога ЗИП заведена без каталожного номера — там ключ считается по
+        # имени, и здесь он не совпадёт; висячая ссылка уронила бы всю вставку
+        # по внешнему ключу.
+        cur.execute("select id from lib_parts")
+        известные = {r[0] for r in cur.fetchall()}
+        годные = [(a, b) for a, b in sorted(edges) if a in известные]
         psycopg2.extras.execute_values(cur, """
             insert into lib_part_models (part_id, model_id, source)
             values %s on conflict (part_id, model_id) do nothing""",
-            [(a, b, "партномера потребности") for a, b in sorted(edges)], page_size=500)
+            [(a, b, "связь по полю машины") for a, b in годные], page_size=500)
+        if len(годные) < len(edges):
+            print(f"  рёбер отброшено (деталь не в каталоге): {len(edges) - len(годные)}")
         conn.commit()
 
         for t in ("lib_models", "lib_units", "lib_parts", "lib_part_models", "lib_fleet"):

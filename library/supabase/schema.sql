@@ -107,6 +107,13 @@ create table if not exists lib_models (
   updated_at   timestamptz default now()
 );
 create index if not exists lib_models_family on lib_models (family);
+-- Направление и вид машины: реестр dict/machine.json разводит обозначения по
+-- сегментам КВАНТа (gtu, gsho) и видам (турбина, горная машина). Без этого
+-- справочник машин отвечает только по ГТУ, а половина реестра — горно-шахтное.
+alter table lib_models add column if not exists segment_id text
+  references lib_segments(id) on delete set null;
+alter table lib_models add column if not exists kind text;
+create index if not exists lib_models_segment on lib_models (segment_id);
 
 -- Узлы машины деревом: система («Горячий тракт») → компонент («Жаровая труба»).
 -- Узлы у промышленных ГТУ общие для Solar и Siemens, поэтому дерево одно на все
