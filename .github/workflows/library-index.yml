@@ -2,6 +2,11 @@ name: Библиотека — разбор вложений Битрикса
 
 # Сплошной разбор файлов, привязанных к сделкам: номенклатура из спецификаций
 # ложится в Supabase (lib_demand), состояние каждого файла — в lib_files.
+#
+# Вход «ocr» переключает прогон на распознавание сканов (library/ocr.py): файлы
+# без текстового слоя скачиваются заново и читаются tesseract. Потоков там
+# меньше — распознавание упирается в процессор, а не в сеть. Без входа «apply»
+# распознавание идёт вхолостую и ничего не пишет.
 # Возобновляемо: повторный запуск пропускает уже разобранное.
 #
 # Только ручной запуск. Работа делится на 12 частей, идущих параллельно; каждая
@@ -28,6 +33,14 @@ on:
       workers:
         description: "Потоков скачивания в каждой части"
         default: "12"
+      ocr:
+        description: "Распознавать сканы (tesseract) вместо обычного разбора"
+        type: boolean
+        default: false
+      apply:
+        description: "Писать результат распознавания в базу (для ocr)"
+        type: boolean
+        default: false
       retry_failed:
         description: "Повторить файлы со статусом «не скачался» (сетевая осечка, а не свойство файла)"
         type: boolean
@@ -59,6 +72,14 @@ jobs:
       - name: Установка зависимостей
         run: pip install --quiet requests openpyxl xlrd pypdf psycopg2-binary
 
+      - name: Установка распознавания (только для ocr)
+        if: inputs.ocr
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq tesseract-ocr tesseract-ocr-rus poppler-utils
+          tesseract --version | head -1
+
       - name: Проверка секретов
         env:
           B: ${{ secrets.BITRIX_WEBHOOK_URL }}
@@ -83,4 +104,11 @@ jobs:
           DAYS: ${{ inputs.days }}
           LIMIT: ${{ inputs.limit }}
           RETRY_FAILED: ${{ inputs.retry_failed && '1' || '' }}
-        run: python library/indexer.py
+          APPLY: ${{ inputs.apply && '1' || '' }}
+        run: |
+          set -euo pipefail
+          if [ "${{ inputs.ocr }}" = "true" ]; then
+            WORKERS=4 python library/ocr.py
+          else
+            python library/indexer.py
+          fi
