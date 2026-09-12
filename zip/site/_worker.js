@@ -197,6 +197,9 @@ async function stampAuthor(request, who) {
 
 async function proxyDb(request, env, who) {
   const url = new URL(request.url);
+  // Keep the explicit notes guard and its existing user-facing explanation.
+  if (url.pathname === "/db" + NOTES_PATH && request.method === "DELETE")
+    return dbReject("правки не удаляются: снимайте флагом removed", 405);
   const route = zipDbRoute(url, request.method);
   if (route.error) return dbReject(route.error, route.status || 403);
   for (const name of ["Accept-Profile", "Content-Profile"]) {
