@@ -70,6 +70,22 @@ def norm_pn(pn: str) -> str:
     return re.sub(r"[^0-9A-Z]", "", str(pn or "").upper())
 
 
+def pretty_pn(pn: str) -> str:
+    """Каталожное написание номера Caterpillar: 4238524 → 423-8524, 1R1808 → 1R-1808.
+
+    В нашем справочнике номер местами лежит без дефиса (catalog_no = «5772006»),
+    а в каталоге Caterpillar, в прайсах дилеров и в заявках он всегда с дефисом.
+    Номер, не похожий на схему Caterpillar (ALN0681, MK-CAT-1528), не трогаем.
+    """
+    s = str(pn or "").strip().upper()
+    if re.fullmatch(r"\d{7}", s):
+        return f"{s[:3]}-{s[3:]}"
+    m = re.fullmatch(r"(\d[A-Z])(\d{4})", s)
+    if m:
+        return f"{m.group(1)}-{m.group(2)}"
+    return str(pn or "").strip()
+
+
 def load(path: Path, default=None):
     if not path.exists():
         return default
@@ -111,7 +127,7 @@ def merge_parts(slices: dict) -> tuple[list, list]:
     for key in PART_SLICES:
         d = slices.get(key) or {}
         for r in d.get("rows") or []:
-            pn = str(r.get("pn") or "").strip()
+            pn = pretty_pn(r.get("pn"))
             k = norm_pn(pn)
             if not k:
                 continue
@@ -151,7 +167,7 @@ def merge_parts(slices: dict) -> tuple[list, list]:
                 cur["sources"].append(src)
             for a in r.get("alts") or []:
                 brand = str(a.get("brand") or "").strip()
-                apn = str(a.get("pn") or "").strip()
+                apn = pretty_pn(a.get("pn"))
                 if not brand or not apn:
                     continue
                 pair = {"brand": brand, "pn": apn, "kind": str(a.get("kind") or "аналог").strip(),
@@ -186,9 +202,9 @@ def own_positions() -> list:
         blob = f"{p.get('model', '')} {p.get('applications', '')}"
         if "R1700" not in blob.upper():
             continue
-        pn = str(p.get("catalog_no") or "").strip()
+        pn = pretty_pn(p.get("catalog_no"))
         pns = [pn] if pn else []
-        pns += [m.group(1) for m in PN_RE.finditer(f"{p.get('name', '')} {p.get('note', '')}")]
+        pns += [pretty_pn(m.group(1)) for m in PN_RE.finditer(f"{p.get('name', '')} {p.get('note', '')}")]
         rows.append({
             "position_id": p.get("id"), "pp": p.get("pp"), "kv": kv_by_src.get(p.get("id")),
             "pn": pn, "pns": sorted({x for x in pns if x}),
@@ -351,7 +367,7 @@ def link_own_to_parts(parts: list, alts: list, own: list) -> tuple[int, int]:
         # кроссы из нашего разбора aliases — такие же аналоги, только проверенные нами
         for x in o["crossrefs"]:
             brand = (x.get("brand") or "").strip() or "не определён"
-            apn = (x.get("number") or "").strip()
+            apn = pretty_pn(x.get("number"))
             if not apn:
                 continue
             pair = {"brand": brand, "pn": apn,

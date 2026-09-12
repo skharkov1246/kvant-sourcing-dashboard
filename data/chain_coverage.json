@@ -530,9 +530,10 @@
           "link": "node",
           "title": "Узел",
           "what": "состав машины разобран по узлам",
-          "n": 20,
+          "n": 26,
           "sources": [
-            "zip/data/telsmith_3858.json"
+            "zip/data/telsmith_3858.json",
+            "zip/data/r1700.json"
           ],
           "state": "есть"
         },
@@ -566,10 +567,11 @@
           "link": "part",
           "title": "Запчасть",
           "what": "номенклатура с номерами, готовая к запросу",
-          "n": 1918,
+          "n": 2005,
           "sources": [
             "zip/data/positions.json",
             "zip/data/telsmith_3858.json",
+            "zip/data/r1700.json",
             "pnw/data/item_master.json"
           ],
           "state": "есть"

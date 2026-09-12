@@ -18,6 +18,7 @@
 from __future__ import annotations
 
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -86,7 +87,8 @@ MAKER_FILES = {
             ("gpu/data/subsuppliers.json", "systems:makers", "name")],
     "gsho": [("zip/data/odm_suppliers.json", None, "name"),
              ("zip/data/telsmith_suppliers.json", "suppliers", "name"),
-             ("zip/data/supplier_crm.json", "suppliers", "name")],
+             ("zip/data/supplier_crm.json", "suppliers", "name"),
+             ("zip/data/r1700.json", "orgs", "org")],
 }
 
 
@@ -152,6 +154,16 @@ def counts() -> dict:
     put("gsho", "part", n(tel.get("catalog")), "zip/data/telsmith_3858.json")
     mat = load("zip/data/material_strategy.json", [])
     put("gsho", "repair", n([x for x in (mat or []) if isinstance(x, dict)]), "zip/data/material_strategy.json")
+    # досье машины Caterpillar R1700G: паспорт, узлы, перечень деталей, исполнители ремонта
+    r17 = load("zip/data/r1700.json", {})
+    src17 = "zip/data/r1700.json"
+    put("gsho", "machine", 1 if (r17.get("variants") or r17.get("specs")) else 0, src17)
+    put("gsho", "node", n({x.get("node") for x in r17.get("parts", []) if x.get("node")}), src17)
+    put("gsho", "part", n(r17.get("parts")), src17)
+    put("gsho", "contractor", n([o for o in r17.get("orgs", [])
+                                 if re.search(r"ремонт|сервис|restor|repair",
+                                              f"{o.get('kind', '')} {o.get('role', '')} {o.get('note', '')}",
+                                              re.I)]), src17)
 
     # ── изготовители: уникальные компании по каждому направлению
     for seg in ("gtu", "gpu", "gsho"):
