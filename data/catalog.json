@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 180,
-    "total_bytes": 82453143,
+    "total_bytes": 82455005,
     "by_sensitivity": {
       "конфиденциально": 55,
       "внутреннее": 93,
@@ -403,6 +403,8 @@
         "markers": []
       },
       "referenced_by": [
+        "library/load_parts.py",
+        "library/load_suppliers.py",
         "pnw/tools/build_suppliers.py",
         "tests/test_publish_library_v2.py",
         "zip/build.py",
@@ -617,7 +619,8 @@
         "gt/build.py",
         "gt/tools/build_rfq.py",
         "gt/tools/drop_ru.py",
-        "gt/tools/ship_merge.py"
+        "gt/tools/ship_merge.py",
+        "library/load_suppliers.py"
       ]
     },
     {
@@ -787,6 +790,7 @@
         "markers": []
       },
       "referenced_by": [
+        "library/load_parts.py",
         "pnw/tools/build_master.py",
         "pnw/tools/parse_crossrefs.py",
         "scripts/publish_library_v2.py",
@@ -795,8 +799,7 @@
         "zip/customs/glbs_pull.mjs",
         "zip/tools/aggregate_customs.py",
         "zip/tools/aggregate_prices.py",
-        "zip/tools/import_sheet.py",
-        "zip/tools/perf_classes.py"
+        "zip/tools/import_sheet.py"
       ]
     },
     {
@@ -946,6 +949,7 @@
         "gt/tools/build_rfq.py",
         "gt/tools/drop_ru.py",
         "gt/tools/ship_merge.py",
+        "library/load_suppliers.py",
         "pnw/tools/build_suppliers.py"
       ]
     },
@@ -1340,6 +1344,7 @@
         ]
       },
       "referenced_by": [
+        "library/load_suppliers.py",
         "pnw/tools/build_suppliers.py",
         "zip/tools/bearing_report.py"
       ]
@@ -1642,6 +1647,7 @@
         ]
       },
       "referenced_by": [
+        "library/load_suppliers.py",
         "zip/tools/build_telsmith_page.py",
         "zip/tools/telsmith_report.py"
       ]
@@ -1694,6 +1700,7 @@
         ]
       },
       "referenced_by": [
+        "library/load_suppliers.py",
         "pnw/tools/build_suppliers.py",
         "zip/tools/bearing_report.py"
       ]
@@ -2223,6 +2230,7 @@
         "markers": []
       },
       "referenced_by": [
+        "library/load_suppliers.py",
         "pnw/tools/build_suppliers.py",
         "zip/build.py"
       ]
@@ -2815,11 +2823,11 @@
         "gt/tools/build_rfq.py",
         "gt/tools/drop_ru.py",
         "gt/tools/ship_merge.py",
+        "library/load_parts.py",
+        "library/load_suppliers.py",
         "ove/build.py",
         "ove/tools/bitrix_ove.py",
-        "ove/tools/build_rfq.py",
-        "ove/tools/check_tkp.py",
-        "pnw/tools/build_search.py"
+        "ove/tools/build_rfq.py"
       ]
     },
     {
@@ -3302,7 +3310,8 @@
       "referenced_by": [
         "gt/tools/build_rfq.py",
         "gt/tools/drop_ru.py",
-        "gt/tools/ship_merge.py"
+        "gt/tools/ship_merge.py",
+        "library/load_suppliers.py"
       ]
     },
     {
@@ -4990,11 +4999,11 @@
         "gt/tools/build_rfq.py",
         "gt/tools/drop_ru.py",
         "gt/tools/ship_merge.py",
+        "library/load_parts.py",
+        "library/load_suppliers.py",
         "ove/build.py",
         "ove/tools/bitrix_ove.py",
-        "ove/tools/build_rfq.py",
-        "ove/tools/check_tkp.py",
-        "pnw/tools/build_search.py"
+        "ove/tools/build_rfq.py"
       ]
     },
     {
@@ -5489,11 +5498,11 @@
         "gt/tools/build_rfq.py",
         "gt/tools/drop_ru.py",
         "gt/tools/ship_merge.py",
+        "library/load_parts.py",
+        "library/load_suppliers.py",
         "ove/build.py",
         "ove/tools/bitrix_ove.py",
-        "ove/tools/build_rfq.py",
-        "ove/tools/check_tkp.py",
-        "pnw/tools/build_search.py"
+        "ove/tools/build_rfq.py"
       ]
     },
     {
@@ -5957,7 +5966,64 @@
         "gt/build.py",
         "gt/tools/build_rfq.py",
         "gt/tools/drop_ru.py",
-        "gt/tools/ship_merge.py"
+        "gt/tools/ship_merge.py",
+        "library/load_suppliers.py"
+      ]
+    },
+    {
+      "path": "data/catalog_notes.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 23063,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "data/budget_snapshot.json",
+        "data/chat_snapshot.json",
+        "data/index.json",
+        "gidromet/data/",
+        "gpu/data/bitrix_gpu.json",
+        "gpu/data/coverage.json",
+        "gt/data/ansaldo.json",
+        "gt/data/bitrix_gt.json",
+        "gt/data/dossiers.json",
+        "gt/data/pn_db.json",
+        "gt/data/ship_energoseti.json",
+        "gt/data/ship_lukoil.json",
+        "gt/data/ship_sellers.json",
+        "gt/data/ship_sweep.json",
+        "library/docfilter.py",
+        "library/indexer.py",
+        "library/load_parts.py",
+        "library/load_suppliers.py",
+        "library/ocr.py",
+        "library/reparse.py",
+        "library/supabase/schema_junk.sql",
+        "ove/data/suppliers.json",
+        "pnw/public/data.js",
+        "pnw/public/search.html",
+        "zip/customs/out/",
+        "zip/data/cat_stock_2026-09.json",
+        "zip/data/customs_declarations.json",
+        "zip/data/kp1763_audit.json",
+        "zip/data/perf_class_packets.json",
+        "zip/data/perf_sourcing_map.json",
+        "zip/data/perf_test_requests.json",
+        "zip/data/supplier_crm.json",
+        "zip/data/telsmith_3858.json",
+        "zip/data/telsmith_crossrefs.json",
+        "zip/data/telsmith_nodrawings.json"
+      ],
+      "last_change": "2026-09-12",
+      "last_author": "Claude",
+      "last_commit": "180f09f",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "scripts/build_catalog.py"
       ]
     },
     {
@@ -5994,59 +6060,6 @@
       },
       "referenced_by": [
         "ove/build.py"
-      ]
-    },
-    {
-      "path": "data/catalog_notes.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 21201,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "data/budget_snapshot.json",
-        "data/chat_snapshot.json",
-        "data/index.json",
-        "gidromet/data/",
-        "gpu/data/bitrix_gpu.json",
-        "gpu/data/coverage.json",
-        "gt/data/ansaldo.json",
-        "gt/data/bitrix_gt.json",
-        "gt/data/dossiers.json",
-        "gt/data/pn_db.json",
-        "gt/data/ship_energoseti.json",
-        "gt/data/ship_lukoil.json",
-        "gt/data/ship_sellers.json",
-        "gt/data/ship_sweep.json",
-        "library/docfilter.py",
-        "library/indexer.py",
-        "library/ocr.py",
-        "library/supabase/schema_junk.sql",
-        "ove/data/suppliers.json",
-        "pnw/public/data.js",
-        "pnw/public/search.html",
-        "zip/customs/out/",
-        "zip/data/cat_stock_2026-09.json",
-        "zip/data/customs_declarations.json",
-        "zip/data/kp1763_audit.json",
-        "zip/data/perf_class_packets.json",
-        "zip/data/perf_sourcing_map.json",
-        "zip/data/perf_test_requests.json",
-        "zip/data/supplier_crm.json",
-        "zip/data/telsmith_3858.json",
-        "zip/data/telsmith_crossrefs.json",
-        "zip/data/telsmith_nodrawings.json"
-      ],
-      "last_change": "2026-09-12",
-      "last_author": "skharkov1246",
-      "last_commit": "37d0055",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "scripts/build_catalog.py"
       ]
     },
     {
@@ -6288,6 +6301,7 @@
         "gt/tools/build_rfq.py",
         "gt/tools/drop_ru.py",
         "gt/tools/ship_merge.py",
+        "library/load_suppliers.py",
         "pnw/tools/build_suppliers.py"
       ]
     },
@@ -7372,7 +7386,8 @@
         "gt/build.py",
         "gt/tools/build_rfq.py",
         "gt/tools/drop_ru.py",
-        "gt/tools/ship_merge.py"
+        "gt/tools/ship_merge.py",
+        "library/load_suppliers.py"
       ]
     },
     {
