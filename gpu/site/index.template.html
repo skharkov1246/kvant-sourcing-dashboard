@@ -318,7 +318,15 @@ footer{padding:0 22px 24px;color:var(--mut);font-size:11.5px}
   <h2>Модельный ряд</h2>
   <p class="mut" id="md-src"></p>
   <div class="box warn" id="md-rule"></div>
-  <div id="md-oems"></div>
+  <div class="k" id="md-tiles"></div>
+  <div class="filters">
+    <div class="f-field" style="flex:1"><label>поиск по обозначению двигателя во всех марках</label>
+      <input id="md-q" placeholder="L7042GSI · SFGLD 560 · 16V4000 · J420 · QSV91G · G3516…" style="width:100%"></div>
+    <span class="count" id="md-q-out"></span>
+  </div>
+  <div id="md-found"></div>
+  <div class="chips" id="md-pick"></div>
+  <div id="md-card"></div>
   <h2>Смежные линейки</h2>
   <div class="tblwrap"><table><thead><tr><th>Марка</th><th>Линейка</th><th>Значение для подбора</th></tr></thead><tbody id="md-adj"></tbody></table></div>
 </section>
@@ -423,6 +431,15 @@ footer{padding:0 22px 24px;color:var(--mut);font-size:11.5px}
     <p class="mut" id="am-intro"></p>
     <div class="chips" id="am-pick"></div>
     <div id="am-body"></div>
+  </div>
+
+  <!-- угол 4: ремонт или замена -->
+  <div id="an-a-repair" style="display:none">
+    <p id="ar-intro"></p>
+    <div class="box warn" id="ar-rule"></div>
+    <div class="k" id="ar-tiles"></div>
+    <div class="chips" id="ar-pick"></div>
+    <div id="ar-body"></div>
   </div>
 
   <h3 id="an-rules-t"></h3>
@@ -573,6 +590,8 @@ const MACHINES = __MACHINES_JSON__;
 const RFQPACK  = __RFQPACK_JSON__;
 const GLOSSARY = __GLOSSARY_JSON__;
 const ACLASS   = __ACLASS_JSON__;
+const OEMDOCS  = __OEMDOCS_JSON__;
+const REPAIR   = __REPAIR_JSON__;
 const BUILT_AT = "__BUILT_AT__";
 
 const $ = s => document.querySelector(s);
@@ -1061,29 +1080,217 @@ function fillSelect(sel, values, allLabel) {
   render();
 })();
 
-/* ── Модельный ряд ────────────────────────────────────────────────────────────── */
+/* ── Модельный ряд: библиотека марок ──────────────────────────────────────────── */
 (function () {
   $("#md-src").textContent = MODELS.source;
   $("#md-rule").innerHTML = "<b>Важно.</b> " + esc(MODELS.rule);
-  const host = $("#md-oems");
-  MODELS.oems.forEach(o => {
-    const c = el("div", "card");
-    c.innerHTML = `<h3 style="margin-top:0">${esc(o.name)} — ${esc(o.full)}</h3>
+
+  const docsBy = {}; (OEMDOCS.oems || []).forEach(o => docsBy[o.key] = o);
+  const oems = MODELS.oems;
+  const nMan = (OEMDOCS.oems || []).reduce((a, o) => a + (o.manuals || []).length, 0);
+  const nManOk = (OEMDOCS.oems || []).reduce((a, o) =>
+    a + (o.manuals || []).filter(m => m.link_status === "открыт").length, 0);
+  const nInt = (OEMDOCS.oems || []).reduce((a, o) => a + (o.overhaul || []).length, 0);
+
+  $("#md-tiles").innerHTML = [
+    [oems.length, "марок в библиотеке"],
+    [oems.reduce((a, o) => a + o.models.length, 0), "моделей двигателей"],
+    [nMan ? `${nManOk} из ${nMan}` : "—", "документов изготовителей скачиваются"],
+    [nInt, "интервалов регламента"],
+  ].map(([v, k]) => `<div class="kpi"><b>${esc(v)}</b><span>${esc(k)}</span></div>`).join("");
+
+  /* Отметка у объёма: сошёлся ли паспорт с расчётом по диаметру и ходу.
+     Сорсер должен видеть проверку, а не верить цифре из брошюры на слово. */
+  function volume(m) {
+    const v = m.disp_l == null ? "—" : m.disp_l;
+    if (m.calc_l == null) return esc(v);
+    const dev = m.dev_pct == null ? 0 : m.dev_pct;
+    return Math.abs(dev) <= 3
+      ? `${esc(v)} <span class="mut" title="Расчёт по диаметру и ходу: ${esc(m.calc_l)} л — сходится">✓</span>`
+      : `${esc(v)} <span class="pill d" title="Расчёт по диаметру и ходу: ${esc(m.calc_l)} л">расчёт ${esc(m.calc_l)} л</span>`;
+  }
+  const bore = m => (m.bore_mm && m.stroke_mm) ? `${esc(m.bore_mm)} × ${esc(m.stroke_mm)}` : "—";
+  const applic = m => [m.gas, m.app, m.eff ? "КПД " + m.eff : ""].filter(Boolean).map(esc).join(" · ") || "—";
+
+  function modelTable(rows, withBrand) {
+    return `<div class="tblwrap"><table><thead><tr>
+      ${withBrand ? "<th>Марка</th>" : ""}<th>Модель</th><th>Серия</th><th>Цил.</th>
+      <th class="num">D × S, мм</th><th class="num">Объём, л</th><th class="num">л/цил.</th>
+      <th class="num">Мощность</th><th>об/мин</th><th>Топливо и применение</th><th>Примечание</th></tr></thead>
+      <tbody>${rows.map(m => `<tr>
+        ${withBrand ? `<td>${esc(m._brand)}</td>` : ""}
+        <td><b>${esc(m.model)}</b></td><td class="mut">${esc(m.series || "—")}</td><td>${esc(m.cyl)}</td>
+        <td class="num">${bore(m)}</td><td class="num">${volume(m)}</td>
+        <td class="num">${esc(m.disp_cyl_l == null ? "—" : m.disp_cyl_l)}</td>
+        <td class="num">${esc(m.kwe || "—")}</td><td>${esc(m.rpm || "—")}</td>
+        <td>${applic(m)}</td><td class="mut">${esc(m.note || "")}</td></tr>`).join("")}</tbody>
+    </table></div>`;
+  }
+
+  /* Статус ссылки на документ — чтобы не выяснять щелчком по каждой строке. */
+  const LST = { "открыт": "a", "онлайн": "b", "браузер": "c", "платный": "lo", "нет файла": "d", "не отвечает": "d" };
+  function manualRows(list) {
+    return `<div class="tblwrap"><table><thead><tr>
+      <th>Документ</th><th>Вид</th><th>Номер и язык</th><th>Ссылка</th><th>Охват</th><th>Что берётся из документа</th>
+      </tr></thead><tbody>${list.map(m => `<tr>
+        <td><b>${esc(m.title)}</b></td><td class="mut">${esc(m.type || "")}</td>
+        <td class="mono">${esc(m.doc_no || "—")}${m.lang ? ` <span class="mut">${esc(m.lang)}</span>` : ""}</td>
+        <td><a href="${esc(m.url)}" target="_blank" rel="noopener">открыть</a>
+          ${m.link_status ? ` <span class="pill ${LST[m.link_status] || ""}" title="${esc(m.link_detail || "")}">${esc(m.link_status)}</span>` : ""}</td>
+        <td class="mut">${esc(m.covers || "")}</td><td>${esc(m.what_inside || "")}</td></tr>`).join("")}</tbody></table></div>`;
+  }
+  function overhaulRows(list) {
+    return `<div class="tblwrap"><table><thead><tr>
+      <th>Интервал</th><th>Выполняемые работы</th><th>Закупаемые позиции</th><th>Источник</th>
+      </tr></thead><tbody>${list.map(o => `<tr>
+        <td><b>${esc(o.interval)}</b></td><td>${esc(o.work)}</td>
+        <td class="mono">${esc(o.parts || "—")}</td><td class="mut">${esc(o.source || "")}</td></tr>`).join("")}</tbody></table></div>`;
+  }
+
+  function card(o) {
+    const d = docsBy[o.key] || {};
+    const man = d.manuals || [], ovh = d.overhaul || [], cav = d.caveats || [];
+    return `<div class="card">
+      <h3 style="margin-top:0">${esc(o.name)}</h3>
+      <div class="mut">${esc(o.full)}</div>
+      ${o.owner ? `<div class="mut" style="margin-bottom:6px"><b>Владелец марки:</b> ${esc(o.owner)}</div>` : ""}
       <div class="mut" style="margin-bottom:6px">${esc(o.status)}</div>
       <p>${esc(o.note)}</p>
       <p class="note"><b>Номера:</b> ${esc(o.parts_logic)}</p>
-      <div class="tblwrap"><table><thead><tr>
-        <th>Модель</th><th>Цил.</th><th class="num">Объём, л</th><th class="num">кВт эл.</th>
-        <th>об/мин</th><th>КПД</th><th>Применение</th><th>Примечание</th></tr></thead>
-        <tbody>${o.models.map(m => `<tr>
-          <td><b>${esc(m.model)}</b></td><td>${esc(m.cyl)}</td><td class="num">${esc(m.disp_l)}</td>
-          <td class="num">${esc(m.kwe)}</td><td>${esc(m.rpm)}</td><td>${esc(m.eff)}</td>
-          <td>${esc(m.app)}</td><td class="mut">${esc(m.note || "")}</td></tr>`).join("")}</tbody>
-      </table></div>`;
-    host.append(c);
+      ${o.brand_note ? `<p class="note"><b>Написание марки в документах:</b> ${esc(o.brand_note)}</p>` : ""}
+      <h4>Модели — ${o.models.length}</h4>
+      ${modelTable(o.models, false)}
+      ${(man.length || ovh.length) ? `<div class="acc" id="md-acc-${esc(o.key)}"></div>` : ""}
+      ${cav.length ? `<div class="box warn"><b>Чего в этих данных нет и что не проверено.</b>
+        <ul>${cav.map(c => `<li>${esc(c)}</li>`).join("")}</ul></div>` : ""}
+    </div>`;
+  }
+
+  function show(o) {
+    $("#md-card").innerHTML = card(o);
+    const d = docsBy[o.key] || {};
+    const items = [];
+    if ((d.manuals || []).length) items.push({
+      title: "Документация изготовителя",
+      sub: OEMDOCS.rule ? `<span class="mut">${esc(OEMDOCS.rule.slice(0, 110))}…</span>` : "",
+      n: d.manuals.length + " док.", body: manualRows(d.manuals),
+    });
+    if ((d.overhaul || []).length) items.push({
+      title: "Регламент и капитальный ремонт", n: d.overhaul.length + " интервалов",
+      body: overhaulRows(d.overhaul),
+    });
+    const host = $("#md-acc-" + o.key);
+    if (host && items.length) acc(host, items);
+  }
+
+  const pickHost = $("#md-pick");
+  oems.forEach((o, i) => {
+    const b = el("div", "chip" + (i === 0 ? " on" : ""),
+      `${esc(o.name)} <span class="mut">${o.models.length}</span>`);
+    b.onclick = () => {
+      pickHost.querySelectorAll(".chip").forEach(x => x.classList.remove("on"));
+      b.classList.add("on"); show(o);
+    };
+    pickHost.append(b);
   });
+  show(oems[0]);
+  /* Переход к карточке марки из поиска и с других вкладок. */
+  function toOem(key) {
+    const i = oems.findIndex(o => o.key === key);
+    if (i < 0) return;
+    pickHost.querySelectorAll(".chip").forEach((x, j) => x.classList.toggle("on", j === i));
+    show(oems[i]);
+    $("#md-card").scrollIntoView({ block: "start" });
+  }
+  window.mdToOem = toOem;
+
+  /* Поиск по обозначению сразу во всех марках: обычный путь снабженца —
+     в заявке написано «L7042GSI», а какой это изготовитель, ещё неизвестно. */
+  const ALL = [];
+  oems.forEach(o => o.models.forEach(m => ALL.push(Object.assign({ _brand: o.name, _key: o.key }, m))));
+  $("#md-q").oninput = e => {
+    const v = e.target.value.trim().toLowerCase().replace(/[\s-]/g, "");
+    if (v.length < 2) { $("#md-found").innerHTML = ""; $("#md-q-out").textContent = ""; return; }
+    const hit = ALL.filter(m => [m.model, m.series, m._brand].join(" ").toLowerCase().replace(/[\s-]/g, "").includes(v));
+    $("#md-q-out").textContent = hit.length ? `найдено: ${hit.length}` : "не найдено";
+    $("#md-found").innerHTML = hit.length
+      ? modelTable(hit.slice(0, 40), true) + (hit.length > 40 ? `<p class="mut">показаны первые 40 из ${hit.length}</p>` : "")
+        + `<p class="note">Марки в выдаче: ${[...new Set(hit.map(m => m._key))].map(k =>
+            `<a href="javascript:void(0)" onclick="mdToOem('${esc(k)}')">${esc(ALL.find(m => m._key === k)._brand)}</a>`).join(" · ")}</p>`
+      : `<p class="mut">Обозначения этого двигателя в библиотеке нет. Если агрегат в работе — запросите у владельца серийный номер двигателя и заводскую табличку, и заведите модель в <span class="mono">gpu/data/models.json</span>.</p>`;
+  };
+
   $("#md-adj").innerHTML = MODELS.adjacent.map(a =>
     `<tr><td><b>${esc(a.name)}</b></td><td>${esc(a.line)}</td><td>${esc(a.why)}</td></tr>`).join("");
+})();
+
+/* ── Ремонт или замена: четвёртый угол входа в аналоги ───────────────────────── */
+(function () {
+  const oems = REPAIR.oems || [];
+  if (!oems.length) return;
+  $("#ar-intro").textContent = REPAIR.intro || "";
+  $("#ar-rule").innerHTML = "<b>Главное различие.</b> " + esc(REPAIR.rule || "");
+
+  const KINDS = REPAIR.kinds || {};
+  const KPILL = { technical: "d", commercial: "a", mixed: "c", warranty: "b" };
+  const KNAME = { technical: "техническая", commercial: "коммерческая", mixed: "смешанная", warranty: "гарантийная" };
+  const RPILL = { yes: "a", limited: "c", no: "d", unknown: "lo" };
+  const RNAME = { yes: "восстанавливается", limited: "ограниченно", no: "не восстанавливается", unknown: "не установлено" };
+
+  const flat = k => oems.reduce((a, o) => a + (o[k] || []).length, 0);
+  const genuine = oems.flatMap(o => o.genuine_required || []);
+  $("#ar-tiles").innerHTML = [
+    [flat("repairability"), "узлов разобрано по ремонтопригодности"],
+    [oems.flatMap(o => o.repairability || []).filter(r => r.repairable === "yes").length, "узлов восстанавливаются"],
+    [genuine.filter(g => g.kind === "technical").length, "позиций «только оригинал» по технике"],
+    [genuine.filter(g => g.kind === "commercial").length, "позиций, где требование коммерческое"],
+  ].map(([v, k]) => `<div class="kpi"><b>${esc(v)}</b><span>${esc(k)}</span></div>`).join("");
+
+  function body(o) {
+    const rep = o.repairability || [], gen = o.genuine_required || [], sub = o.subsuppliers || [];
+    return `<div class="card">
+      <h3 style="margin-top:0">${esc(o.name)}</h3>
+
+      <h4>Ремонтопригодность узлов — что можно восстановить вместо покупки новой детали</h4>
+      ${rep.length ? `<div class="tblwrap"><table><thead><tr>
+        <th>Узел</th><th>Решение</th><th>Кто восстанавливает</th><th>Цена к новой</th>
+        <th>Конструктивное основание</th></tr></thead><tbody>${rep.map(r => `<tr>
+        <td><b>${esc(r.unit)}</b></td>
+        <td><span class="pill ${RPILL[r.repairable] || ""}">${esc(RNAME[r.repairable] || r.repairable)}</span></td>
+        <td>${esc(r.who || "")}</td><td class="mut">${esc(r.ratio_vs_new || "нет цифры в открытых источниках")}</td>
+        <td>${esc(r.note || "")}</td></tr>`).join("")}</tbody></table></div>`
+        : `<p class="mut">По этой марке ремонтопригодность ещё не разобрана.</p>`}
+
+      <h4>Обязательный оригинал — и природа требования</h4>
+      ${gen.length ? `<div class="tblwrap"><table><thead><tr>
+        <th>Узел или материал</th><th>Природа требования</th><th>Основание</th><th>Источник</th>
+        </tr></thead><tbody>${gen.map(g => `<tr>
+        <td><b>${esc(g.unit)}</b></td>
+        <td><span class="pill ${KPILL[g.kind] || ""}" title="${esc(KINDS[g.kind] || "")}">${esc(KNAME[g.kind] || g.kind)}</span></td>
+        <td>${esc(g.reason || "")}</td><td class="mut">${esc(g.source || "")}</td></tr>`).join("")}</tbody></table></div>`
+        : `<p class="mut">По этой марке перечень обязательного оригинала ещё не составлен.</p>`}
+
+      <h4>Кто фактически делает узлы этой марки</h4>
+      ${sub.length ? `<div class="tblwrap"><table><thead><tr>
+        <th>Узел</th><th>Изготовитель</th><th>Чем подтверждено</th><th>Риск замены через изготовителя узла</th>
+        </tr></thead><tbody>${sub.map(x => `<tr>
+        <td><b>${esc(x.unit)}</b></td><td><b>${esc(x.maker)}</b></td>
+        <td>${esc(x.evidence || "")}</td><td>${esc(x.risk || "")}</td></tr>`).join("")}</tbody></table></div>`
+        : `<p class="mut">По этой марке изготовители узлов ещё не установлены.</p>`}
+    </div>`;
+  }
+
+  const pickHost = $("#ar-pick");
+  oems.forEach((o, i) => {
+    const b = el("div", "chip" + (i === 0 ? " on" : ""),
+      `${esc(o.name)} <span class="mut">${(o.repairability || []).length}</span>`);
+    b.onclick = () => {
+      pickHost.querySelectorAll(".chip").forEach(x => x.classList.remove("on"));
+      b.classList.add("on"); $("#ar-body").innerHTML = body(o);
+    };
+    pickHost.append(b);
+  });
+  $("#ar-body").innerHTML = body(oems[0]);
 })();
 
 /* ── Ведомости ЗИП ──────────────────────────────────────────────────────── */
@@ -1334,7 +1541,8 @@ function fillSelect(sel, values, allLabel) {
   const pill = code => `<span class="pill ${VPILL[code]}">${esc(VERD[code].name)}</span>`;
 
   /* ── переключатель углов входа ── */
-  const ANGLES = [["an-a-class", "По классу детали"], ["an-a-pn", "По номеру"], ["an-a-mach", "По машине"]];
+  const ANGLES = [["an-a-class", "По классу детали"], ["an-a-pn", "По номеру"], ["an-a-mach", "По машине"],
+                  ["an-a-repair", "Ремонт или замена"]];
   const angleHost = $("#an-angle");
   ANGLES.forEach(([id, name], i) => {
     const b = el("div", "chip" + (i === 0 ? " on" : ""), esc(name));

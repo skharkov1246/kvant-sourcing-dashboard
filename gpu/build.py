@@ -53,6 +53,8 @@ FILES = {
     "__GLOSSARY_JSON__": "glossary.json",
     "__ACLASS_JSON__": "analog_classes.json",
     "__COVERAGE_JSON__": "coverage.json",
+    "__OEMDOCS_JSON__": "oem_docs.json",
+    "__REPAIR_JSON__": "repair.json",
 }
 
 
