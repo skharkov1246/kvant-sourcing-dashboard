@@ -246,6 +246,43 @@ def имя_машины(m: dict) -> str:
     return str(m.get("name") or "").strip()
 
 
+def build_telsmith() -> tuple[list[dict], dict[str, dict], dict[str, dict]]:
+    """Ведомость щековой дробилки Telsmith 3858: 414 строк по 20 сборкам.
+
+    Вторая машина с ведомостью — и первая, где узлы названы по-своему: «ВАЛ
+    ЭКСЦЕНТРИКОВЫЙ», «СИСТЕМА МАСЛЯНОЙ СМАЗКИ». Сводить их к дереву узлов ГТУ
+    нельзя, поэтому имя сборки хранится как есть, рядом с номером позиции и
+    страницей чертежа: по ним деталь ищут в каталоге изготовителя."""
+    d = load("zip/data/telsmith_3858.json", "catalog")
+    мета = load("zip/data/telsmith_3858.json", "machine")
+    имя = str((мета or {}).get("name") or "Telsmith 3858").strip()
+    ключ = eq.norm_model(имя) if eq.looks_like_machine(имя) else None
+    машины = {ключ: {"id": ключ, "name": имя[:200], "source": "ведомость состава"}} if ключ else {}
+    строки, детали = [], {}
+    for i, r in enumerate(d):
+        pn = str(r.get("eid") or "").strip()
+        наим = str(r.get("name") or "").strip()
+        if not pn:
+            continue
+        key = part_key(pn)
+        узел = str(r.get("node") or "").strip()
+        детали.setdefault(key, {
+            "id": key, "catalog_no": pn[:120], "name": (наим or pn)[:400],
+            "oem": "Telsmith (ASTEC)", "model": имя[:600],
+            "category": узел[:120] or None,
+            "segment_id": classify(f"{наим} {узел} дробилка"),
+            "unit_id": eq.unit_of(наим), "source": "ведомость Telsmith 3858"})
+        строки.append({
+            "id": f"{ключ or 'telsmith3858'}.{i}", "machine": имя[:200], "model_id": ключ,
+            "scheme": None, "level": None, "part_id": key, "part_no": pn[:120],
+            "own_no": str(r.get("oem") or "")[:120] or None,
+            "qty": str(r.get("qty") or "")[:40] or None, "name": (наим or pn)[:400],
+            "node": узел[:200] or None, "position_no": str(r.get("poz") or "")[:40] or None,
+            "page": str(r.get("page") or "")[:40] or None,
+            "source": "ведомость Telsmith 3858"})
+    return строки, детали, машины
+
+
 def build_bom() -> tuple[list[dict], dict[str, dict], list[dict]]:
     """Ведомость → строки состава, новые детали и машина."""
     строки, детали, машины = [], {}, {}
@@ -307,6 +344,10 @@ def main() -> int:
     строки, детали, машины = build_bom()
     зажигание = build_motortech_parts()
     шифровки = build_patterns()
+    т_строки, т_детали, т_машины = build_telsmith()
+    строки += т_строки
+    детали.update({k: v for k, v in т_детали.items() if k not in детали})
+    машины.update(т_машины)
     for k, v in зажигание.items():
         детали.setdefault(k, v)
 
@@ -325,6 +366,8 @@ def main() -> int:
     print("\n=== ведомости ===")
     print(f"  машин: {len(машины)} · строк состава: {num(len(строки))} · "
           f"деталей: {len(детали)}")
+    узлы_вед = {s["node"] for s in строки if s.get("node")}
+    print(f"  сборок названо в ведомостях: {len(узлы_вед)}")
     сузлом = sum(1 for d in детали.values() if d["unit_id"])
     print(f"  с определённым узлом: {сузлом} · со своим номером: "
           f"{sum(1 for s in строки if s['own_no'])}")
@@ -383,13 +426,16 @@ def main() -> int:
 
         psycopg2.extras.execute_values(cur, """
             insert into lib_bom (id, machine, model_id, scheme, level, part_id, part_no,
-                                 own_no, qty, name, source)
+                                 own_no, qty, name, source, node, position_no, page)
             values %s
             on conflict (id) do update set
-              qty = excluded.qty, name = excluded.name, part_id = excluded.part_id""",
+              qty = excluded.qty, name = excluded.name, part_id = excluded.part_id,
+              node = excluded.node, position_no = excluded.position_no,
+              page = excluded.page""",
             [(s["id"], s["machine"], s["model_id"], s["scheme"], s["level"],
               s["part_id"] if s["part_id"] in известные else None, s["part_no"],
-              s["own_no"], s["qty"], s["name"], s["source"]) for s in строки],
+              s["own_no"], s["qty"], s["name"], s["source"], s.get("node"),
+              s.get("position_no"), s.get("page")) for s in строки],
             page_size=500)
         conn.commit()
         print(f"\n  связей записано: {len(годные)} из {len(alts)} "

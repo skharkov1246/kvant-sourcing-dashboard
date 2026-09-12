@@ -196,6 +196,14 @@ create table if not exists lib_bom (
   source    text,
   created_at timestamptz default now()
 );
+-- Узел в ведомости — как он назван в самой ведомости («ВАЛ ЭКСЦЕНТРИКОВЫЙ»),
+-- а не как в нашем дереве узлов: у дробилки свои сборки, сводить их к турбинным
+-- нельзя. Номер позиции и страница чертежа нужны, чтобы найти деталь в каталоге
+-- изготовителя.
+alter table lib_bom add column if not exists node text;
+alter table lib_bom add column if not exists position_no text;
+alter table lib_bom add column if not exists page text;
+create index if not exists lib_bom_node on lib_bom (node);
 create index if not exists lib_bom_machine on lib_bom (machine);
 create index if not exists lib_bom_part on lib_bom (part_id);
 

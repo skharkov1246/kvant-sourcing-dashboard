@@ -49,31 +49,57 @@ DAYS = int(os.environ.get("DAYS", "400"))
 PAGES = int(os.environ.get("PAGES", "12"))          # страниц PDF на файл
 DPI = int(os.environ.get("DPI", "200"))
 LANG = os.environ.get("OCR_LANG", "rus+eng")
+# Режим сегментации страницы. Основной — блочный (--psm 6), как и был; если он
+# не дал ничего, идёт вторая попытка с автоматической сегментацией (--psm 3):
+# на фотографии листа блочный режим иногда молчит. Гипотезу, что именно в нём
+# причина 233 пустых файлов из 400, проверка на синтетических картинках НЕ
+# подтвердила — все режимы читали их одинаково. Поэтому основной режим не
+# меняем, а причину пустоты начинаем записывать (ниже).
+PSM_MAIN = os.environ.get("OCR_PSM", "6")
+PSM_RETRY = os.environ.get("OCR_PSM_RETRY", "3")
 TIMEOUT = int(os.environ.get("OCR_TIMEOUT", "120"))
 
-# Кандидаты: текста нет, значит разбор не дал ничего. «Формат не читаем» сюда не
-# берём — это архивы и экзотика, распознавать в них нечего.
+# Кандидаты: текста нет, значит разбор не дал ничего. Форматы, в которых
+# распознавать нечего, отсекаются ЗДЕСЬ, а не в обработчике: в первой части
+# прогона 118 файлов из 400 оказались xlsx/docx, архивами и экзотикой —
+# скачались, дошли до tesseract и вернули «формат не читаем». Это треть
+# впустую потраченного времени части.
 CANDIDATES = """
 select file_id from lib_files
  where ocr_at is null
    and (status = 'пусто' or kind = 'изображение')
-   and status <> 'не скачался'"""
+   and status <> 'не скачался'
+   and coalesce(kind, '') in ('изображение', 'pdf', '')"""
 
 
 def num(v, w=12):
     return f"{v:,}".replace(",", " ").rjust(w)
 
 
-def ocr_image(path: str) -> str:
+def ocr_image(path: str, psm: str = PSM_MAIN) -> tuple[str, str]:
+    """Текст и ПОЧЕМУ его столько. Второе важнее первого.
+
+    Раньше любая неудача возвращала пустую строку, и файл получал статус
+    «пусто» — тот же, что у настоящей фотографии без надписей. В итоге 233
+    пустых файла из 400 не говорили ничего: то ли текста нет, то ли tesseract
+    не уложился в таймаут. Статус не должен врать (CLAUDE.md, правило 15),
+    поэтому причина возвращается отдельно и доезжает до lib_files.reason."""
     try:
-        r = subprocess.run(["tesseract", path, "stdout", "-l", LANG, "--psm", "6"],
+        r = subprocess.run(["tesseract", path, "stdout", "-l", LANG, "--psm", psm],
                            capture_output=True, timeout=TIMEOUT)
-        return r.stdout.decode("utf-8", "ignore")
-    except Exception:
-        return ""
+    except subprocess.TimeoutExpired:
+        return "", "таймаут распознавания"
+    except FileNotFoundError:
+        return "", "tesseract не установлен"
+    except Exception as e:
+        return "", f"сбой запуска: {type(e).__name__}"
+    текст = r.stdout.decode("utf-8", "ignore")
+    if r.returncode != 0:
+        return текст, f"tesseract вернул код {r.returncode}"
+    return текст, ("текста не найдено" if not текст.strip() else "")
 
 
-def ocr_pdf(blob: bytes, tmp: str) -> str:
+def ocr_pdf(blob: bytes, tmp: str) -> tuple[str, str]:
     """PDF без текстового слоя: разворачиваем страницы в картинки и читаем их."""
     src = os.path.join(tmp, "in.pdf")
     with open(src, "wb") as f:
@@ -81,13 +107,32 @@ def ocr_pdf(blob: bytes, tmp: str) -> str:
     try:
         subprocess.run(["pdftoppm", "-r", str(DPI), "-png", "-l", str(PAGES), src,
                         os.path.join(tmp, "p")], capture_output=True, timeout=TIMEOUT * 2)
-    except Exception:
-        return ""
-    parts = []
-    for name in sorted(os.listdir(tmp)):
-        if name.startswith("p") and name.endswith(".png"):
-            parts.append(ocr_image(os.path.join(tmp, name)))
-    return "\n".join(parts)
+    except subprocess.TimeoutExpired:
+        return "", "таймаут разворота PDF в картинки"
+    except Exception as e:
+        return "", f"сбой pdftoppm: {type(e).__name__}"
+    страницы = [n for n in sorted(os.listdir(tmp))
+                if n.startswith("p") and n.endswith(".png")]
+    if not страницы:
+        return "", "pdftoppm не дал ни одной страницы"
+    parts, причины = [], []
+    for name in страницы:
+        текст, причина = ocr_image(os.path.join(tmp, name))
+        parts.append(текст)
+        if причина:
+            причины.append(причина)
+    итог = "\n".join(parts)
+    if итог.strip():
+        return итог, ""
+    return почему_пусто(причины, len(страницы))
+
+
+def почему_пусто(причины: list[str], страниц: int) -> tuple[str, str]:
+    """Почему у PDF не вышло: таймаут хотя бы одной страницы важнее пустоты."""
+    for p in причины:
+        if "таймаут" in p or "код" in p or "не установлен" in p:
+            return "", f"{p} (страниц {страниц})"
+    return "", f"текста не найдено на {страниц} страницах"
 
 
 def recognise(ref: dict) -> tuple[dict, list[dict]]:
@@ -104,21 +149,27 @@ def recognise(ref: dict) -> tuple[dict, list[dict]]:
     rec["kind"] = kind
     with tempfile.TemporaryDirectory() as tmp:
         if kind == "pdf":
-            text = ocr_pdf(blob, tmp)
+            text, причина = ocr_pdf(blob, tmp)
         elif kind == "изображение":
             p = os.path.join(tmp, "img")
             with open(p, "wb") as f:
                 f.write(blob)
-            text = ocr_image(p)
+            text, причина = ocr_image(p, PSM_MAIN)
+            if not text.strip() and "таймаут" not in причина:
+                # Вторая попытка другим режимом сегментации: на фотографии
+                # листа блочный режим иногда молчит. После таймаута не
+                # повторяем — вторая попытка тоже не уложится.
+                text, причина2 = ocr_image(p, PSM_RETRY)
+                причина = "" if text.strip() else f"{причина}; повтор: {причина2}"
         else:
             rec["status"] = "формат не читаем"
-            rec["reason"] = "распознавать нечего"
+            rec["reason"] = f"распознавать нечего: {kind}"
             return rec, []
 
     rec["chars"] = len(text)
     if not text.strip():
         rec["status"] = "пусто"
-        rec["reason"] = "распознавание не дало текста"
+        rec["reason"] = причина or "распознавание не дало текста"
         return rec, []
 
     # Те же ворота, что и в обычном разборе: правило одно на оба места вызова.
@@ -184,6 +235,7 @@ def main() -> int:
 
     stat: Counter = Counter()
     kinds: Counter = Counter()
+    причины: Counter = Counter()
     segs: Counter = Counter()
     total_items = 0
     buf_files: list[tuple] = []
@@ -221,6 +273,8 @@ def main() -> int:
             stat[rec["status"]] += 1
             if rec["kind"]:
                 kinds[rec["kind"]] += 1
+            if rec["status"] in ("пусто", "формат не читаем"):
+                причины[(rec["reason"] or "—")[:60]] += 1
             total_items += rec["rows_found"]
             for it in items:
                 segs[it["segment_id"] or "—"] += 1
@@ -242,6 +296,10 @@ def main() -> int:
     print(f"файлов: {sum(stat.values())} · позиций из сканов: {total_items}")
     print(f"по состоянию: {dict(stat.most_common())}")
     print(f"по формату:   {dict(kinds.most_common())}")
+    if причины:
+        print("почему ничего не вышло (это и есть указание, что чинить):")
+        for причина, n in причины.most_common(8):
+            print(f"    {причина:62}{n:>6}")
     print("позиции по сегментам:")
     for sid, n in segs.most_common(20):
         print(f"    {name_of(None if sid == '—' else sid):32s} {n:>8d}")
