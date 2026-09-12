@@ -403,6 +403,7 @@
         "markers": []
       },
       "referenced_by": [
+        "library/load_parts.py",
         "library/load_suppliers.py",
         "pnw/tools/build_suppliers.py",
         "tests/test_publish_library_v2.py",
@@ -789,6 +790,7 @@
         "markers": []
       },
       "referenced_by": [
+        "library/load_parts.py",
         "pnw/tools/build_master.py",
         "pnw/tools/parse_crossrefs.py",
         "scripts/publish_library_v2.py",
@@ -797,8 +799,7 @@
         "zip/customs/glbs_pull.mjs",
         "zip/tools/aggregate_customs.py",
         "zip/tools/aggregate_prices.py",
-        "zip/tools/import_sheet.py",
-        "zip/tools/perf_classes.py"
+        "zip/tools/import_sheet.py"
       ]
     },
     {
@@ -2822,11 +2823,11 @@
         "gt/tools/build_rfq.py",
         "gt/tools/drop_ru.py",
         "gt/tools/ship_merge.py",
+        "library/load_parts.py",
         "library/load_suppliers.py",
         "ove/build.py",
         "ove/tools/bitrix_ove.py",
-        "ove/tools/build_rfq.py",
-        "ove/tools/check_tkp.py"
+        "ove/tools/build_rfq.py"
       ]
     },
     {
@@ -4998,11 +4999,11 @@
         "gt/tools/build_rfq.py",
         "gt/tools/drop_ru.py",
         "gt/tools/ship_merge.py",
+        "library/load_parts.py",
         "library/load_suppliers.py",
         "ove/build.py",
         "ove/tools/bitrix_ove.py",
-        "ove/tools/build_rfq.py",
-        "ove/tools/check_tkp.py"
+        "ove/tools/build_rfq.py"
       ]
     },
     {
@@ -5497,11 +5498,11 @@
         "gt/tools/build_rfq.py",
         "gt/tools/drop_ru.py",
         "gt/tools/ship_merge.py",
+        "library/load_parts.py",
         "library/load_suppliers.py",
         "ove/build.py",
         "ove/tools/bitrix_ove.py",
-        "ove/tools/build_rfq.py",
-        "ove/tools/check_tkp.py"
+        "ove/tools/build_rfq.py"
       ]
     },
     {
@@ -6015,7 +6016,7 @@
       ],
       "last_change": "2026-09-12",
       "last_author": "Claude",
-      "last_commit": "0a06a7a",
+      "last_commit": "180f09f",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
