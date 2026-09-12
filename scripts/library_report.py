@@ -104,16 +104,21 @@ def собрать(cur) -> dict:
 
 CSS = """
 @page { size: A4; margin: 12mm 10mm; }
-body { font-family: "DejaVu Sans", Arial, sans-serif; font-size: 9.5pt; color: #111; }
+body { font-family: "DejaVu Sans", Arial, sans-serif; font-size: 8.8pt; color: #111; }
 h1 { font-size: 17pt; margin: 0 0 2mm; }
-h2 { font-size: 12pt; margin: 6mm 0 2mm; border-bottom: 1.5px solid #111; padding-bottom: 1mm; }
+/* Заголовок не остаётся один в конце страницы, а короткий раздел не рвётся:
+   иначе на последнюю страницу уезжают две строки, и проверка PDF справедливо
+   считает её полупустой. */
+h2 { font-size: 11pt; margin: 4.5mm 0 1.5mm; border-bottom: 1.5px solid #111;
+     padding-bottom: 0.8mm; page-break-after: avoid; }
+section { page-break-inside: avoid; }
 .sub { color: #555; font-size: 8.5pt; margin-bottom: 4mm; }
 table.t { width: 100%; border-collapse: collapse; table-layout: fixed; margin-bottom: 3mm; }
 .t thead { display: table-header-group; }
 .t tr { page-break-inside: avoid; }
-.t th { background: #f0f0f0; text-align: left; padding: 1.6mm 2mm; font-size: 8.5pt;
+.t th { background: #f0f0f0; text-align: left; padding: 1.2mm 1.6mm; font-size: 8pt;
         border: 0.4px solid #bbb; }
-.t td { padding: 1.6mm 2mm; border: 0.4px solid #ddd; vertical-align: top;
+.t td { padding: 1.2mm 1.6mm; border: 0.4px solid #ddd; vertical-align: top;
         word-wrap: break-word; overflow-wrap: anywhere; }
 td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
 td.big { font-size: 11pt; font-weight: bold; text-align: right; }
@@ -179,19 +184,21 @@ def html_doc(d: dict) -> str:
 <th style="width:54%">чем закрыто</th><th style="width:16%">до этой работы</th></tr></thead>
 <tbody>{строки}</tbody></table>
 
-<h2>Что теперь отвечается одним запросом</h2>
+<section><h2>Что теперь отвечается одним запросом</h2>
 <table class="t"><thead><tr><th style="width:42%">вопрос сорсера</th>
 <th style="width:58%">чем закрывается</th></tr></thead><tbody>{воп}</tbody></table>
 
-<h2>Машины с наибольшим числом связанных позиций</h2>
+</section>
+
+<section><h2>Машины с наибольшим числом связанных позиций</h2>
 <table class="t"><thead><tr><th style="width:70%">машина</th>
-<th style="width:30%">позиций</th></tr></thead><tbody>{маш}</tbody></table>
+<th style="width:30%">позиций</th></tr></thead><tbody>{маш}</tbody></table></section>
 
-<h2>Узлы с наибольшим числом позиций</h2>
+<section><h2>Узлы с наибольшим числом позиций</h2>
 <table class="t"><thead><tr><th style="width:56%">узел</th><th style="width:14%">критичность</th>
-<th style="width:30%">позиций</th></tr></thead><tbody>{узл}</tbody></table>
+<th style="width:30%">позиций</th></tr></thead><tbody>{узл}</tbody></table></section>
 
-<h2>Где узкие места — это и есть следующая работа</h2>
+<section><h2>Где узкие места — это и есть следующая работа</h2>
 <table class="t"><thead><tr><th style="width:62%">чего не хватает</th>
 <th style="width:38%">позиций</th></tr></thead><tbody>
 <tr><td>Деталей без узла</td><td class="num">{n(d['без_узла'])}</td></tr>
@@ -200,14 +207,14 @@ def html_doc(d: dict) -> str:
 <tr><td>Деталей без цены</td><td class="num">{n(d['без_цены'])}</td></tr>
 <tr><td>Статей разведки без узла (всего статей {n(d['статьи'])})</td>
     <td class="num">{n(d['статьи'] - d['статьи_узел'])}</td></tr>
-</tbody></table>
+</tbody></table></section>
 
-<h2>Сырьё</h2>
+<section><h2>Сырьё</h2>
 <table class="t"><thead><tr><th style="width:70%">источник</th>
 <th style="width:30%">строк</th></tr></thead><tbody>
 <tr><td>Спрос из спецификаций сделок (lib_demand){' — по прогону в живой базе' if 'спрос' in PROD else ''}</td><td class="num">{n(d['спрос'])}</td></tr>
 <tr><td>Разобранных вложений Битрикса (lib_files){' — по прогону в живой базе' if 'файлы' in PROD else ''}</td><td class="num">{n(d['файлы'])}</td></tr>
-</tbody></table>
+</tbody></table></section>
 </body></html>"""
 
 
