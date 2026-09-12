@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow,noarchive"><title>Поиск в закрытом архиве · КВАНТ</title>
+<style>
+:root{color-scheme:light;--ink:#183029;--muted:#63736d;--line:#dce3dd;--accent:#205d45;--paper:#fff;--bg:#f4f6f2}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}main{max-width:980px;margin:auto;padding:28px 24px 64px}nav{display:flex;gap:22px;flex-wrap:wrap;margin-bottom:34px}a{color:var(--accent);text-underline-offset:4px}h1{font-size:clamp(26px,4vw,38px);line-height:1.18;letter-spacing:-.03em;margin:12px 0}h2{font-size:20px;line-height:1.35;margin:0 0 10px}p{margin:8px 0 14px}.muted{color:var(--muted)}.tag{display:inline-block;font-size:12px;letter-spacing:.06em;text-transform:uppercase;padding:5px 9px;border:1px solid var(--line);border-radius:4px}.panel,.result{padding:22px;background:var(--paper);border:1px solid var(--line);border-radius:12px;margin:18px 0}.intro{max-width:770px}label{display:block;font-size:14px;font-weight:650;margin-bottom:6px}.fields{display:grid;grid-template-columns:minmax(0,1fr) 195px;gap:14px}input,select,button{font:inherit;border:1px solid #9baea2;border-radius:7px;min-height:46px}input,select{width:100%;padding:9px 12px;background:#fff;color:var(--ink)}button{padding:9px 18px;background:var(--accent);color:#fff;cursor:pointer;font-weight:650}button:disabled{opacity:.6;cursor:wait}button.secondary{background:#fff;color:var(--accent)}.actions{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:14px}.status{padding:12px 0;color:var(--muted)}.error{color:#92332a}.result{overflow-wrap:anywhere}.result-title{font-size:18px;margin-bottom:7px}.meta{display:flex;gap:8px 18px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin-bottom:14px}.excerpt{white-space:pre-wrap;font-size:15px;line-height:1.65}.details{font-size:13px;color:var(--muted);margin-top:14px}.details summary{cursor:pointer}.locator{white-space:pre-wrap;overflow-wrap:anywhere;margin:10px 0}code{font-size:12px;overflow-wrap:anywhere}.empty{padding:24px;border:1px dashed #a5b4aa;border-radius:10px}input:focus-visible,select:focus-visible,button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid #97b6a0;outline-offset:3px}[hidden]{display:none!important}@media(max-width:600px){main{padding:20px 16px 40px}.fields{grid-template-columns:1fr}.panel,.result{padding:17px}nav{gap:14px;margin-bottom:25px}}
+</style>
+</head>
+<body><main>
+<nav aria-label="Навигация"><a href="/">← Портал</a><a href="/library">Библиотека знаний</a></nav>
+<div class="tag">Закрытый архив · только для администратора</div>
+<h1>Найти в исходных материалах</h1>
+<p class="intro muted">Ищите модель, артикул или слова из документа. Поиск охватывает загруженные текстовые фрагменты, включая исторические версии.</p>
+<section class="panel" aria-labelledby="coverageTitle"><h2 id="coverageTitle">Что доступно для поиска</h2><div id="coverage" class="status" role="status">Проверяем состав доступного архива…</div><button id="refreshStatus" class="secondary" type="button">Обновить сведения</button></section>
+<form id="searchForm" class="panel" autocomplete="off">
+<div class="fields"><div><label for="query">Что найти</label><input id="query" name="query" type="search" minlength="2" maxlength="400" placeholder="Модель, артикул или описание" autocomplete="off" spellcheck="false" required aria-describedby="searchHint"></div>
+<div><label for="sourceKind">Источник</label><select id="sourceKind"><option value="">Все доступные источники</option><option value="attachment">Вложения</option><option value="crm">Карточки CRM</option><option value="activity">Активности</option><option value="timeline">Хронология</option><option value="mail">Почта</option><option value="chat">Чаты</option><option value="task">Задачи</option><option value="other">Другие источники</option></select></div></div>
+<div class="actions"><button id="submitSearch" type="submit">Найти в архиве</button><button id="clearSearch" class="secondary" type="button">Очистить</button><span id="searchHint" class="muted">От 2 до 200 символов · до 20 фрагментов</span></div>
+</form>
+<div id="searchStatus" class="status" role="status" aria-live="polite">Введите запрос. Поиск не запускается автоматически.</div>
+<section id="results" aria-label="Результаты поиска"></section>
+</main>
+<script>
+(() => {
+  'use strict';
+  const $ = (id) => document.getElementById(id);
+  const state = { epoch: 0, controller: null, statusEpoch: 0 };
+  const names = { attachment:'Вложение', crm:'CRM', activity:'Активность', timeline:'Хронология', mail:'Почта', chat:'Чат', task:'Задача', other:'Другой источник' };
+  const node = (tag, className, content) => { const el=document.createElement(tag); if(className)el.className=className; if(content!==undefined)el.textContent=String(content); return el; };
+  const date = (value) => { if(!value)return 'не указана'; const d=new Date(value); return Number.isFinite(d.getTime())?d.toLocaleString('ru-RU'):String(value); };
+  function errorMessage(status, code) {
+    if(status===401||status===403)return 'Нет доступа к закрытому архиву. Нужен действующий вход администратора портала.';
+    if(status===400)return 'Проверьте запрос: от 2 до 200 символов, без служебных символов.';
+    if(code==='archive_not_configured'||code==='archive_access_not_configured')return 'Подключение архива ещё не настроено. Это не означает, что документов нет.';
+    if(status===409)return 'Поисковая база ещё не готова к этому запросу. Повторите позже.';
+    return 'Не удалось получить ответ архива. Это ошибка подключения, а не пустая выдача. Повторите запрос позже.';
+  }
+  async function request(path, signal) {
+    const response=await fetch(path,{credentials:'same-origin',cache:'no-store',redirect:'error',signal});
+    let value;try{value=await response.json();}catch{throw new Error(errorMessage(response.status));}
+    if(!response.ok)throw new Error(errorMessage(response.status,value?.error));
+    if(!value||typeof value!=='object')throw new Error('Получен некорректный ответ архива.');
+    return value;
+  }
+  async function refreshStatus() {
+    const epoch=++state.statusEpoch;const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),15000);
+    $('refreshStatus').disabled=true;$('coverage').className='status';$('coverage').textContent='Проверяем состав доступного архива…';
+    try{const value=await request('/api/library/archive/status',controller.signal);if(epoch!==state.statusEpoch)return;
+      if(value.scope!=='imported_archive_text'||value.full_archive!==false)throw new Error('Не удалось подтвердить границы доступного архива.');
+      if(!value.counts||!/^\d+$/.test(value.counts.text_units)||!/^\d+$/.test(value.counts.object_versions))throw new Error('Не удалось проверить состав доступного архива.');
+      $('coverage').replaceChildren(node('p','','Текстовых фрагментов: '+BigInt(value.counts.text_units).toLocaleString('ru-RU')+'. Версий записей: '+BigInt(value.counts.object_versions).toLocaleString('ru-RU')+'.'),node('p','muted','Файлы, ещё не включённые в импорт, здесь не ищутся. Исторические версии показаны отдельно.'));
+      if(value.last_run){const labels={collecting:'сбор продолжается',complete:'импорт завершён',partial:'частичный импорт',failed:'импорт завершился ошибкой'};$('coverage').append(node('p','muted','Последний импорт: '+(labels[value.last_run.status]||'статус не определён')+' · '+date(value.last_run.finished_at||value.last_run.started_at)));}
+    }catch(error){if(epoch!==state.statusEpoch)return;$('coverage').className='status error';$('coverage').textContent=error.name==='AbortError'?'Архив не ответил вовремя. Состав доступных материалов пока не проверен.':error.message;}
+    finally{clearTimeout(timer);if(epoch===state.statusEpoch)$('refreshStatus').disabled=false;}
+  }
+  function renderResults(value) {
+    if(!Array.isArray(value.items)||value.scope!=='imported_archive_text'||value.full_archive!==false||value.all_versions!==true||value.returned!==value.items.length)throw new Error('Не удалось проверить ответ поиска.');
+    $('results').replaceChildren();
+    for(const item of value.items){const card=node('article','result');card.append(node('h2','result-title',(item.title||'Источник без названия')+(item.title_truncated?'…':'')));const meta=node('div','meta');meta.append(node('span','',names[item.source_kind]||item.source_kind),node('span','','Дата источника: '+date(item.source_created_at)),node('span','','Изменён: '+date(item.source_updated_at)));const excerpt=node('div','excerpt',item.text);card.append(meta,excerpt);
+      if(item.text_truncated){card.append(node('p','muted','Показано начало фрагмента. Совпадение может находиться дальше в тексте.'));const open=node('button','secondary','Прочитать полный фрагмент');open.type='button';const note=node('div','status');open.addEventListener('click',async()=>{open.disabled=true;note.textContent='Загружаем полный фрагмент…';const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),15000);try{const data=await request('/api/library/archive/unit?'+new URLSearchParams({extraction_id:item.extraction_id,unit_key:item.unit_key}),controller.signal);if(!data.found){note.textContent='Фрагмент не найден в текущем импорте.';return;}if(!data.item||data.item.extraction_id!==item.extraction_id||data.item.unit_key!==item.unit_key||data.item.is_excerpt!==false)throw new Error('Не удалось проверить полную версию фрагмента.');excerpt.textContent=data.item.text;note.textContent='Полный фрагмент · '+data.item.text_length+' символов. Это извлечённый текст, а не заново прочитанный оригинал.';open.hidden=true;}catch(error){note.className='status error';note.textContent=error.name==='AbortError'?'Фрагмент не загрузился вовремя.':error.message;}finally{clearTimeout(timer);open.disabled=false;}});card.append(open,note);}
+      const details=node('details','details');details.append(node('summary','','Где находится фрагмент и какая это версия'));
+      details.append(node('div','locator',JSON.stringify(item.locator,null,2)),node('div','','Источник: '+(item.source_id||'идентификатор не указан')),node('div','','Версия источника: '+(item.source_version_id||'не указана')),node('div','','Фрагмент: '+item.unit_key+' · '+item.unit_kind),node('div','','Извлечение: '+item.extraction_id));
+      if(item.raw_json_pointer!==null)details.append(node('div','locator','Координата в исходном ответе: '+item.raw_json_pointer));
+      for(const [label,key]of [['SHA-256 исходного файла','input_blob_sha256'],['SHA-256 исходного ответа','raw_blob_sha256'],['SHA-256 извлечения','extraction_output_sha256'],['SHA-256 полного текста фрагмента','text_sha256']])if(item[key])details.append(node('p','',label+': '),node('code','',item[key]));card.append(details);$('results').append(card);}
+    $('searchStatus').className='status';
+    $('searchStatus').textContent=value.items.length?'Найдено фрагментов: '+value.items.length+'.'+(value.has_more?' Есть ещё совпадения: уточните запрос или выберите источник.':''):'В доступном поисковом индексе совпадений не найдено. Это не подтверждает отсутствие материала во всём архиве.';
+  }
+  async function search(event) {
+    event?.preventDefault();const q=$('query').value.trim();
+    if([...q].length<2||[...q].length>200||new TextEncoder().encode(q).length>800||/[\u0000-\u001f\u007f]/.test(q)){$('searchStatus').className='status error';$('searchStatus').textContent='Введите от 2 до 200 символов без служебных знаков.';return;}
+    const epoch=++state.epoch;state.controller?.abort();const controller=new AbortController();state.controller=controller;const timer=setTimeout(()=>controller.abort(),15000);
+    $('submitSearch').disabled=true;$('results').replaceChildren();$('searchStatus').className='status';$('searchStatus').textContent='Ищем в доступном архиве…';
+    const query=new URLSearchParams({q,limit:'20'});if($('sourceKind').value)query.set('source_kind',$('sourceKind').value);
+    try{const value=await request('/api/library/archive/search?'+query,controller.signal);if(epoch===state.epoch)renderResults(value);}
+    catch(error){if(epoch!==state.epoch)return;$('searchStatus').className='status error';$('searchStatus').textContent=error.name==='AbortError'?'Поиск не ответил вовремя. Попробуйте уточнить запрос и повторить.':error.message;}
+    finally{clearTimeout(timer);if(epoch===state.epoch){state.controller=null;$('submitSearch').disabled=false;}}
+  }
+  $('searchForm').addEventListener('submit',search);$('refreshStatus').addEventListener('click',refreshStatus);
+  $('clearSearch').addEventListener('click',()=>{state.epoch++;state.controller?.abort();state.controller=null;$('submitSearch').disabled=false;$('query').value='';$('results').replaceChildren();$('searchStatus').className='status';$('searchStatus').textContent='Введите запрос. Поиск не запускается автоматически.';$('query').focus();});
+  refreshStatus();
+})();
+</script>
+</body></html>
