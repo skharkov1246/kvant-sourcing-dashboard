@@ -115,6 +115,108 @@ def timestamp(value, optional=False):
     return parsed.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
 
 
+SERVICE_STAGES = ("inspection", "diagnostics", "failure_analysis", "repair", "maintenance", "post_repair_verification")
+SERVICE_STAGE_LABELS = {"inspection": "Осмотр", "diagnostics": "Диагностика", "failure_analysis": "Анализ отказов",
+    "repair": "Ремонт", "maintenance": "Техническое обслуживание", "post_repair_verification": "Проверка после ремонта"}
+# ECMAScript String.trim whitespace: validate the same bytes as the Worker.
+SERVICE_WHITESPACE = "\u0009\u000a\u000b\u000c\u000d\u0020\u00a0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u2028\u2029\u202f\u205f\u3000\ufeff"
+
+
+def service_knowledge(sources):
+    """Validate additive reference knowledge; never normalise or rewrite evidence."""
+    if not isinstance(sources, dict) or "service_knowledge" not in sources:
+        return None
+    value = sources["service_knowledge"]
+    code = "INVALID_SERVICE_KNOWLEDGE"
+
+    def fields(obj, names):
+        require(isinstance(obj, dict) and set(obj) == set(names.split()), code)
+
+    def text(item, maximum, empty=False, nullable=False):
+        if item is None and nullable:
+            return
+        require(isinstance(item, str), code)
+        try:
+            length = len(item.encode("utf-16-le")) // 2
+        except UnicodeError:
+            raise PublishError(code) from None
+        require(length <= maximum and (empty or bool(item.strip(SERVICE_WHITESPACE))), code)
+
+    def sequence(items, maximum, minimum=0):
+        require(isinstance(items, list) and minimum <= len(items) <= maximum, code)
+
+    def strings(items, count, maximum):
+        sequence(items, count)
+        for item in items:
+            text(item, maximum)
+
+    refs = sources.get("references")
+    require(sources.get("kind") == "knowledge" and isinstance(refs, list), code)
+
+    def indices(items, minimum=0):
+        sequence(items, 8, minimum)
+        # JSON numbers have one type in the Worker: match Number.isSafeInteger
+        # without admitting booleans or changing the original numeric value.
+        require(all(type(i) in (int, float) and 0 <= i < len(refs) and i == int(i) for i in items), code)
+        for i in items:
+            ref = refs[int(i)]
+            require((isinstance(ref, str) and bool(ref.strip(SERVICE_WHITESPACE))) or
+                    (isinstance(ref, dict) and any(isinstance(ref.get(k), str) and ref[k].strip(SERVICE_WHITESPACE)
+                     for k in ("title", "name", "url", "sha256", "source_sha256"))), code)
+
+    fields(value, "schema_version equipment_family model_scope assembly service_stage evidence applicability diagnostic_checks repair_decision customer_content engineering_procedure")
+    require(type(value["schema_version"]) in (int, float) and value["schema_version"] == 1 and
+            value["customer_content"] is False and value["engineering_procedure"] is False, code)
+    require(isinstance(value["service_stage"], str) and value["service_stage"] in SERVICE_STAGES, code)
+    family = value["equipment_family"]
+    if family is not None:
+        fields(family, "id label")
+        text(family["id"], 80)
+        require(ID.fullmatch(family["id"]) is not None, code)
+        text(family["label"], 160)
+    scope = value["model_scope"]
+    fields(scope, "level manufacturers models note")
+    require(scope["level"] in ("unknown", "generic", "family", "model"), code)
+    strings(scope["manufacturers"], 8, 120)
+    strings(scope["models"], 12, 120)
+    require(scope["level"] != "model" or bool(scope["models"]), code)
+    text(scope["note"], 1000, True)
+    text(value["assembly"], 300, nullable=True)
+    sequence(value["evidence"], 32, 1)
+    for item in value["evidence"]:
+        fields(item, "reference_index claim")
+        indices([item["reference_index"]], 1)
+        text(item["claim"], 1000)
+    application = value["applicability"]
+    fields(application, "status note limits")
+    require(application["status"] in ("unknown", "generic_reference", "source_scoped"), code)
+    text(application["note"], 2000, True)
+    strings(application["limits"], 20, 1000)
+    sequence(value["diagnostic_checks"], 24)
+    for item in value["diagnostic_checks"]:
+        fields(item, "check method result_interpretation reference_indices basis")
+        text(item["check"], 600)
+        text(item["method"], 1500, nullable=True)
+        text(item["result_interpretation"], 1500, nullable=True)
+        require(item["basis"] in ("source_guidance", "proposed_workflow"), code)
+        indices(item["reference_indices"], 1)
+    decision = value["repair_decision"]
+    fields(decision, "status note reference_indices")
+    require(decision["status"] in ("not_established", "assessment_framework", "source_guidance"), code)
+    text(decision["note"], 2000, True)
+    indices(decision["reference_indices"], 0 if decision["status"] == "not_established" else 1)
+    require(len(encode(value)) <= 32 * 1024, code)
+    return value
+
+
+def service_summary(sources):
+    value = service_knowledge(sources)
+    if value is None:
+        return None
+    return {key: copy.deepcopy(value[key]) for key in
+            ("schema_version", "equipment_family", "model_scope", "assembly", "service_stage")}
+
+
 def article(value):
     require(isinstance(value, dict), "INVALID_ARTICLE")
     # Preserve additional properties on unrelated existing articles and sources.
@@ -126,6 +228,7 @@ def article(value):
                   updated_at=timestamp(value.get("updated_at"), True))
     result["sources"] = {} if value.get("sources") is None else copy.deepcopy(value["sources"])
     require(isinstance(result["sources"], (dict, list)), "INVALID_SOURCES")
+    service_knowledge(result["sources"])
     encode(result)
     return result
 

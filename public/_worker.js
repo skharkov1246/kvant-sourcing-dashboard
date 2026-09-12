@@ -15,7 +15,7 @@
 //
 // САМООБНОВЛЕНИЕ: если данные старше 2 ч, воркер триггерит пересборку через
 // GitHub repository_dispatch (секрет GH_DISPATCH_TOKEN); без секрета просто выключено.
-import { libraryV2, libraryV2Segments } from "./library_v2.js";
+import { libraryV2, libraryV2Segments, validateServiceKnowledge } from "./library_v2.js";
 
 const GH_REPO = "skharkov1246/kvant-sourcing-dashboard";
 const FRESH_MS = 2 * 3600 * 1000;          // порог свежести — 2 часа
@@ -606,6 +606,7 @@ function libraryDocument(value) {
     if (!libraryObject(a)) libraryInvalid();
     const sources = a.sources == null ? {} : a.sources;
     if (!libraryObject(sources) && !Array.isArray(sources)) libraryInvalid();
+    try { validateServiceKnowledge(sources); } catch { libraryInvalid(); }
     return { id: libraryId(a.id), segment_id: libraryId(a.segment_id), title: libraryString(a.title, 300),
       topic: libraryString(a.topic, 200, true), body: libraryString(a.body, 160000), sources,
       confidence: a.confidence == null ? "med" : libraryString(a.confidence, 40),

@@ -94,6 +94,28 @@ test("v2 routes retain Access/ACL gate and v1 publication cannot fork the v2 lib
   assert.equal((await draft.json()).status, "pending");
 });
 
+test("verified owner service draft preserves evidence while case declarations and reader writes are refused", async () => {
+  const env = envFor(); await emptyV2(env);
+  const article = sample("draft:12345678-1234-1234-1234-123456789012", "v2-only-segment").articles[0];
+  article.sources.kind = "knowledge";
+  article.sources.service_knowledge = { schema_version: 1, equipment_family: null,
+    model_scope: { level: "generic", manufacturers: [], models: [], note: "Synthetic scope" }, assembly: null,
+    service_stage: "inspection", evidence: [{ reference_index: 0, claim: "Synthetic source claim" }],
+    applicability: { status: "generic_reference", note: "Unknown exact applicability", limits: [] },
+    diagnostic_checks: [{ check: "Synthetic question", method: null, result_interpretation: null, basis: "proposed_workflow", reference_indices: [0] }],
+    repair_decision: { status: "not_established", note: "", reference_indices: [] }, customer_content: false, engineering_procedure: false };
+  const init = body => ({ method: "POST", headers: { Origin: ORIGIN, "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  assert.equal((await call(env, "/admin/library/drafts", READER, init(article))).status, 403);
+  assert.equal((await call(env, "/admin/library/drafts", OWNER, init(article))).status, 200);
+  assert.deepEqual(JSON.parse(env.ACL.box.get("library:draft:" + article.id)).article.sources, article.sources);
+  const before = env.writes.filter(k => k.startsWith("library:")).length;
+  const invalid = structuredClone(article); invalid.id = "draft:12345678-1234-1234-1234-123456789013"; invalid.sources.service_knowledge.customer_content = true;
+  assert.equal((await call(env, "/admin/library/drafts", OWNER, init(invalid))).status, 400);
+  delete invalid.sources.service_knowledge.customer_content; invalid.sources.service_knowledge.asset_id = "synthetic-case";
+  assert.equal((await call(env, "/admin/library/drafts", OWNER, init(invalid))).status, 400);
+  assert.equal(env.writes.filter(k => k.startsWith("library:")).length, before);
+});
+
 test("Access JWT is verified before library pages, API and publication", async () => {
   const env = envFor();
   await publish(env);

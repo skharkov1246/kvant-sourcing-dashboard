@@ -411,6 +411,9 @@ def kind(row):
 def summary(row):
     sources = row["sources"]
     result_sources = {"kind": kind(row)}
+    service = v1.service_summary(sources)
+    if service is not None:
+        result_sources["service_summary"] = service
     truncated = False
     if isinstance(sources, dict):
         for key in ("component_fields", "supplier_fields", "price_fields", "library_relations", "typedfields", "references",
@@ -437,6 +440,9 @@ def search_text(row):
     # Full strings, including body and all structured sources. The worker uses
     # the same Unicode lowercase operation; no field is silently truncated.
     strings = [row["title"], row["topic"], row["body"]]
+    service = v1.service_knowledge(row["sources"])
+    if service is not None:
+        strings.append(v1.SERVICE_STAGE_LABELS[service["service_stage"]])
     if kind(row) == "component":
         fields = row["sources"].get("component_fields", {})
         if isinstance(fields, dict):
@@ -743,6 +749,8 @@ class Builder:
         self.counts = defaultdict(lambda: defaultdict(int))
         self.confidence_counts = defaultdict(lambda: defaultdict(int))
         self.count, self.last_id = 0, None
+        self.service_count = 0
+        self.service_families, self.service_stages = {}, defaultdict(int)
         self.body_rows, self.body_bytes = [], 0
         self.relations = relations or {}
         self.relation_targets_seen, self.relation_suppliers_seen = set(), set()
@@ -799,6 +807,16 @@ class Builder:
         self.last_id = row["id"]
         self.count += 1
         v1.require(self.count <= MAX_ARTICLES, "ARTICLE_LIMIT")
+        service = v1.service_knowledge(normalized["sources"])
+        if service is not None:
+            self.service_count += 1
+            self.service_stages[service["service_stage"]] += 1
+            family = service["equipment_family"]
+            if family is not None:
+                previous = self.service_families.setdefault(family["id"], {**family, "count": 0})
+                v1.require(previous["label"] == family["label"], "SERVICE_FAMILY_LABEL_CONFLICT")
+                previous["count"] += 1
+                v1.require(len(self.service_families) <= 512, "SERVICE_FAMILY_LIMIT")
         size = len(encode(row)) + 1
         if len(self.body_rows) >= PAGE_ROWS or self.body_bytes + size > BODY_BLOCK_BYTES:
             self.flush_bodies()
@@ -828,10 +846,16 @@ class Builder:
         for counts in self.confidence_counts.values():
             for name, count in counts.items():
                 confidence[name] += count
-        return {"version": 2, "revision": revision, "published_at": published_at,
+        manifest = {"version": 2, "revision": revision, "published_at": published_at,
                 "article_count": self.count, "segments": segments,
                 "counts_by_confidence": dict(sorted(confidence.items())),
                 "directory": roots.get(("directory", "", "")), "search_version": "unicode-lower-substring-v1"}
+        if self.service_count:
+            manifest["service_facets"] = {"schema_version": 1, "article_count": self.service_count,
+                "equipment_families": [self.service_families[key] for key in sorted(self.service_families)],
+                "service_stages": [{"id": stage, "count": self.service_stages[stage]}
+                                   for stage in v1.SERVICE_STAGES if self.service_stages[stage]]}
+        return manifest
 
 
 DATABASE_STAGES = frozenset(("connect", "segments_execute", "segments_fetch",
