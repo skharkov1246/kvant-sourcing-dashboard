@@ -2,13 +2,16 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { libraryV2, libraryV2Segments } from "../../public/library_v2.js";
+import { libraryV2, libraryV2Segments, validateServiceKnowledge } from "../../public/library_v2.js";
 
 const python = process.env.LIBRARY_TEST_PYTHON || "python3";
 const fixture = fileURLToPath(new URL("../../tests/test_publish_library_v2.py", import.meta.url));
 const raw = execFileSync(python, [fixture, "6001"], { maxBuffer: 64 * 1024 * 1024,
   env: { PATH: process.env.PATH, PYTHONDONTWRITEBYTECODE: "1", PYTHONPATH: process.env.PYTHONPATH || "" } });
 const initial = JSON.parse(raw);
+const serviceValues = JSON.parse(execFileSync(python, [fixture, "1101", "service"], { maxBuffer: 64 * 1024 * 1024,
+  env: { PATH: process.env.PATH, PYTHONDONTWRITEBYTECODE: "1", PYTHONPATH: process.env.PYTHONPATH || "" } }));
+const serviceRevision = JSON.parse(serviceValues["library:v2:current"]).revision;
 const revision = JSON.parse(initial["library:v2:current"]).revision;
 const base = "https://portal.example.test";
 function env(values = initial) {
@@ -148,4 +151,83 @@ test("invalid queries/ids/methods never list unrelated KV or mutate", async () =
   assert.equal((await call(e, "/api/library/v2", { method: "POST" })).status, 405);
   assert.equal((await call(e, "/api/library/v2/article?id=absent")).status, 404);
   assert.ok(e.calls.every((key) => key.startsWith("library:v2:")));
+});
+
+test("service facets describe the whole publication and preserve full generic knowledge", async () => {
+  const e = env(serviceValues);
+  const metadata = (await call(e, "/api/library/v2")).value;
+  assert.equal(metadata.capabilities.service_filters, true);
+  assert.equal(metadata.service_facets.article_count, 1101);
+  assert.deepEqual(metadata.service_facets.equipment_families.map(f => [f.id, f.count]), [["common", 1090], ["rare", 11]]);
+  const detail = (await call(e, url("/api/library/v2/article", { revision: serviceRevision, id: "synthetic:001099" }))).value.article;
+  const before = JSON.stringify(detail.sources);
+  assert.equal(validateServiceKnowledge(detail.sources).diagnostic_checks[0].basis, "proposed_workflow");
+  assert.equal(JSON.stringify(detail.sources), before);
+  assert.equal(detail.sources.service_knowledge.customer_content, false);
+  assert.equal(detail.sources.service_knowledge.engineering_procedure, false);
+});
+
+test("service nonempty validation uses ECMAScript whitespace without rewriting source strings", async () => {
+  const original=(await call(env(serviceValues),url("/api/library/v2/article",{id:"synthetic:001099"}))).value.article.sources;
+  for (const [value,accepted] of [[String.fromCodePoint(0x85),true],[String.fromCodePoint(0x1c),true],[String.fromCodePoint(0xfeff),false],[" \t\n",false]]) {
+    for (const target of ["claim","label","reference"]) {
+      const sources=structuredClone(original),service=sources.service_knowledge;
+      if(target==="claim")service.evidence[0].claim=value;
+      else if(target==="label")service.equipment_family.label=value;
+      else sources.references=[{title:value}];
+      const before=JSON.stringify(sources);
+      if(accepted)validateServiceKnowledge(sources);else assert.throws(()=>validateServiceKnowledge(sources),/invalid_service_knowledge/);
+      assert.equal(JSON.stringify(sources),before);
+    }
+  }
+});
+
+test("exact service family and stage scan beyond an empty first page with no skipped matches", async () => {
+  const e = env(serviceValues), found = []; let cursor, complete = false, scanned = 0, pages = 0, emptyPartial = false;
+  while (!complete) {
+    const params = { revision: serviceRevision, equipment_family: "rare", service_stage: "diagnostics", limit: "25" };
+    if (cursor) params.cursor = cursor;
+    const r = await call(e, url("/api/library/v2/articles", params));
+    assert.equal(r.status, 200); assert.equal(r.value.total, null);
+    assert.equal(r.value.filter_scope, "service_knowledge_all_published_articles");
+    if (!r.value.complete && r.value.items.length === 0) emptyPartial = true;
+    for (const item of r.value.items) { assert.equal(item.sources.service_summary.equipment_family.id, "rare"); assert.equal(item.sources.service_summary.service_stage, "diagnostics"); found.push(item.id); }
+    scanned += r.value.scanned; cursor = r.value.next_cursor; complete = r.value.complete; pages++;
+    assert.ok(pages < 30);
+  }
+  assert.ok(emptyPartial); assert.ok(pages > 1); assert.equal(scanned, 1101);
+  assert.deepEqual(found, ["synthetic:001093", "synthetic:001099"]);
+});
+
+test("service cursor binds both filters, query and page size; unsupported old revisions fail explicitly", async () => {
+  const e = env(serviceValues), query = { revision: serviceRevision, equipment_family: "rare", service_stage: "diagnostics", limit: "1" };
+  const first = await call(e, url("/api/library/v2/articles", query));
+  assert.ok(first.value.next_cursor);
+  for (const changed of [{ equipment_family: "common" }, { service_stage: "repair" }, { q: "changed" }, { limit: "2" }]) {
+    const r = await call(e, url("/api/library/v2/articles", { ...query, ...changed, cursor: first.value.next_cursor }));
+    assert.equal(r.status, 400); assert.equal(r.value.error, "invalid_cursor");
+  }
+  assert.equal((await call(e, "/api/library/v2/articles?equipment_family=absent")).value.error, "unknown_equipment_family");
+  assert.equal((await call(e, "/api/library/v2/articles?service_stage=made-up")).status, 400);
+  assert.equal((await call(e, "/api/library/v2/articles?service_stage=repair&kind=price")).status, 400);
+  const old = await call(env(), "/api/library/v2/articles?service_stage=repair");
+  assert.equal(old.status, 400); assert.equal(old.value.error, "service_filters_unavailable");
+});
+
+test("Russian service-stage wording is searchable across the complete exact family scope", async () => {
+  const e = env(serviceValues), ids = []; let cursor, complete = false;
+  while (!complete) { const params = { revision: serviceRevision, equipment_family: "rare", q: "ДИАГНОСТИКА" }; if(cursor)params.cursor=cursor;
+    const r = await call(e, url("/api/library/v2/articles", params)); assert.equal(r.status, 200); ids.push(...r.value.items.map(a=>a.id)); cursor=r.value.next_cursor; complete=r.value.complete; }
+  assert.deepEqual(ids,["synthetic:001093","synthetic:001099"]);
+});
+
+test("service declaration does not accept private cases, invented stages or unbound evidence", async () => {
+  const e = env(serviceValues);
+  const article = (await call(e, "/api/library/v2/article?id=synthetic:000000")).value.article;
+  for (const mutate of [s => { s.service_knowledge.customer_content = true; }, s => { s.service_knowledge.asset_id = "case"; },
+    s => { delete s.service_knowledge.diagnostic_checks[0].basis; }, s => { s.service_knowledge.evidence[0].reference_index = true; },
+    s => { s.service_knowledge.evidence[0].reference_index = 1; }, s => { s.kind = "supplier"; }]) {
+    const sources = structuredClone(article.sources); mutate(sources);
+    assert.throws(() => validateServiceKnowledge(sources), /invalid_service_knowledge/);
+  }
 });

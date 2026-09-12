@@ -5,6 +5,7 @@ const PREFIX = "library:v2:blob:";
 const ID = /^[A-Za-z0-9][A-Za-z0-9:_-]{0,159}$/;
 const HASH = /^[a-f0-9]{64}$/;
 const KINDS = ["knowledge", "supplier", "price", "component"];
+export const SERVICE_STAGES = ["inspection", "diagnostics", "failure_analysis", "repair", "maintenance", "post_repair_verification"];
 const VALUE_BYTES = 4 * 1024 * 1024;
 const RESPONSE_BYTES = 2 * 1024 * 1024;
 const READ_LIMIT = 18;
@@ -19,6 +20,61 @@ function requireValue(condition, code = "library_v2_corrupt", status = 503) {
   if (!condition) throw new Failure(code, status);
 }
 function object(value) { return value !== null && typeof value === "object" && !Array.isArray(value); }
+export function validateServiceKnowledge(sources) {
+  if (!object(sources) || !Object.hasOwn(sources, "service_knowledge")) return null;
+  const value = sources.service_knowledge;
+  const check = condition => requireValue(condition, "invalid_service_knowledge", 400);
+  const fields = (obj, names) => { const keys = names.split(" "); check(object(obj) && Object.keys(obj).length === keys.length && keys.every(k => Object.hasOwn(obj, k))); };
+  const text = (item, maximum, empty = false, nullable = false) => {
+    if (item === null && nullable) return;
+    check(typeof item === "string" && item.length <= maximum && (empty || !!item.trim()));
+    for (let i = 0; i < item.length; i++) { const n = item.charCodeAt(i);
+      if (n >= 0xd800 && n <= 0xdbff) { const next = item.charCodeAt(++i); check(next >= 0xdc00 && next <= 0xdfff); }
+      else check(n < 0xdc00 || n > 0xdfff);
+    }
+  };
+  const sequence = (items, maximum, minimum = 0) => check(Array.isArray(items) && items.length >= minimum && items.length <= maximum);
+  const strings = (items, count, maximum) => { sequence(items, count); items.forEach(item => text(item, maximum)); };
+  check(sources.kind === "knowledge" && Array.isArray(sources.references));
+  const indices = (items, minimum = 0) => { sequence(items, 8, minimum); check(items.every(i => Number.isSafeInteger(i) && i >= 0 && i < sources.references.length)); for (const i of items) { const ref = sources.references[i]; check((typeof ref === "string" && !!ref.trim()) || (object(ref) && ["title", "name", "url", "sha256", "source_sha256"].some(k => typeof ref[k] === "string" && !!ref[k].trim()))); } };
+  fields(value, "schema_version equipment_family model_scope assembly service_stage evidence applicability diagnostic_checks repair_decision customer_content engineering_procedure");
+  check(value.schema_version === 1 && value.customer_content === false && value.engineering_procedure === false && SERVICE_STAGES.includes(value.service_stage));
+  if (value.equipment_family !== null) { fields(value.equipment_family, "id label"); text(value.equipment_family.id, 80); check(ID.test(value.equipment_family.id)); text(value.equipment_family.label, 160); }
+  const scope = value.model_scope;
+  fields(scope, "level manufacturers models note"); check(["unknown", "generic", "family", "model"].includes(scope.level));
+  strings(scope.manufacturers, 8, 120); strings(scope.models, 12, 120); check(scope.level !== "model" || scope.models.length > 0); text(scope.note, 1000, true);
+  text(value.assembly, 300, false, true);
+  sequence(value.evidence, 32, 1);
+  for (const item of value.evidence) { fields(item, "reference_index claim"); indices([item.reference_index], 1); text(item.claim, 1000); }
+  const application = value.applicability;
+  fields(application, "status note limits"); check(["unknown", "generic_reference", "source_scoped"].includes(application.status)); text(application.note, 2000, true); strings(application.limits, 20, 1000);
+  sequence(value.diagnostic_checks, 24);
+  for (const item of value.diagnostic_checks) { fields(item, "check method result_interpretation reference_indices basis"); text(item.check, 600); text(item.method, 1500, false, true); text(item.result_interpretation, 1500, false, true); check(["source_guidance", "proposed_workflow"].includes(item.basis)); indices(item.reference_indices, 1); }
+  const decision = value.repair_decision;
+  fields(decision, "status note reference_indices"); check(["not_established", "assessment_framework", "source_guidance"].includes(decision.status)); text(decision.note, 2000, true); indices(decision.reference_indices, decision.status === "not_established" ? 0 : 1);
+  check(encoder.encode(JSON.stringify(value)).length <= 32 * 1024);
+  return value;
+}
+
+function serviceFacets(manifest) {
+  const value = manifest.service_facets;
+  if (value === undefined) return null;
+  requireValue(object(value) && value.schema_version === 1 && integer(value.article_count, 1, manifest.article_count) &&
+    Array.isArray(value.equipment_families) && value.equipment_families.length <= 512 && Array.isArray(value.service_stages));
+  const families = new Set(), stages = new Set(); let familyCount = 0, stageCount = 0;
+  for (const family of value.equipment_families) { requireValue(object(family) && typeof family.id === "string" && family.id.length <= 80 && ID.test(family.id) && !families.has(family.id) && typeof family.label === "string" && family.label.trim() && family.label.length <= 160 && integer(family.count, 1, value.article_count)); families.add(family.id); familyCount += family.count; }
+  for (const stage of value.service_stages) { requireValue(object(stage) && SERVICE_STAGES.includes(stage.id) && !stages.has(stage.id) && integer(stage.count, 1, value.article_count)); stages.add(stage.id); stageCount += stage.count; }
+  requireValue(stageCount === value.article_count && familyCount <= value.article_count);
+  return value;
+}
+
+function serviceSummary(summary) {
+  const value = summary.sources.service_summary;
+  if (value === undefined) return null;
+  requireValue(summary.sources.kind === "knowledge" && object(value) && value.schema_version === 1 && SERVICE_STAGES.includes(value.service_stage));
+  if (value.equipment_family !== null) requireValue(object(value.equipment_family) && typeof value.equipment_family.id === "string" && ID.test(value.equipment_family.id));
+  return value;
+}
 function integer(value, min, max) { return Number.isSafeInteger(value) && value >= min && value <= max; }
 async function sha(raw) {
   const result = await crypto.subtle.digest("SHA-256", encoder.encode(raw));
@@ -71,6 +127,7 @@ function validateManifest(manifest, pointer) {
     typeof manifest.published_at === "string" && manifest.published_at === pointer.published_at &&
     integer(manifest.article_count, 0, 250000) && Array.isArray(manifest.segments) && manifest.segments.length <= 100);
   const seen = new Set();
+  serviceFacets(manifest);
   const confidence = Object.create(null);
   let count = 0;
   for (const segment of manifest.segments) {
@@ -180,18 +237,25 @@ function selectedGroups(manifest, segmentId, kind, category) {
 }
 
 async function listing(reader, manifest, url) {
-  const allowed = new Set(["revision", "segment_id", "kind", "q", "limit", "cursor"]);
+  const allowed = new Set(["revision", "segment_id", "kind", "q", "limit", "cursor", "equipment_family", "service_stage"]);
   requireValue([...url.searchParams.keys()].every((k) => allowed.has(k) && url.searchParams.getAll(k).length === 1), "invalid_query", 400);
   const segmentId = url.searchParams.get("segment_id") || "";
   const kind = url.searchParams.get("kind") || "";
+  const family = url.searchParams.get("equipment_family") || "", stage = url.searchParams.get("service_stage") || "";
+  const facets = serviceFacets(manifest), serviceFilter = !!(family || stage);
+  requireValue(!serviceFilter || (facets && (!kind || kind === "knowledge")), "service_filters_unavailable", 400);
+  requireValue(!family || facets.equipment_families.some(f => f.id === family), "unknown_equipment_family", 400);
+  requireValue(!stage || SERVICE_STAGES.includes(stage), "invalid_service_stage", 400);
   const q = (url.searchParams.get("q") || "").trim().toLowerCase();
   const limitRaw = url.searchParams.get("limit") || "25";
   requireValue((!segmentId || ID.test(segmentId)) && (!kind || KINDS.includes(kind)) && q.length <= 200 &&
     /^[1-9][0-9]?$/.test(limitRaw) && Number(limitRaw) <= 50, "invalid_query", 400);
   const limit = Number(limitRaw);
-  const fingerprint = await sha(JSON.stringify([manifest.revision, segmentId, kind, q, limit]));
+  const queryIdentity = [manifest.revision, segmentId, kind, q, limit];
+  if (serviceFilter) queryIdentity.push(family, stage);
+  const fingerprint = await sha(JSON.stringify(queryIdentity));
   const category = q ? "search" : "catalog";
-  const groups = selectedGroups(manifest, segmentId, kind, category);
+  const groups = selectedGroups(manifest, segmentId, serviceFilter ? "knowledge" : kind, category);
   const scopeTotal = groups.reduce((n, g) => n + g.count, 0);
   let group = 0, offset = 0;
   if (url.searchParams.has("cursor")) {
@@ -215,7 +279,9 @@ async function listing(reader, manifest, url) {
         typeof summary.title === "string" && typeof summary.excerpt === "string" &&
         encoder.encode(JSON.stringify(summary)).length <= 32 * 1024);
       requireValue(!q || typeof entry.text === "string");
-      if (!q || entry.text.includes(q)) items.push(summary);
+      const service = serviceFilter ? serviceSummary(summary) : null;
+      if ((!q || entry.text.includes(q)) && (!serviceFilter || (service &&
+          (!family || service.equipment_family?.id === family) && (!stage || service.service_stage === stage)))) items.push(summary);
       scanned++; offset++;
     }
     if (offset === current.count) { group++; offset = 0; }
@@ -223,7 +289,8 @@ async function listing(reader, manifest, url) {
   const complete = group === groups.length;
   const next = complete ? null : cursorEncode({ v: 2, revision: manifest.revision, query: fingerprint, group, offset });
   return { version: 2, revision: manifest.revision, items, next_cursor: next, complete, scanned,
-    matched_in_batch: items.length, total: q ? null : scopeTotal, scope_total: scopeTotal,
+    matched_in_batch: items.length, total: q || serviceFilter ? null : scopeTotal, scope_total: scopeTotal,
+    filter_scope: serviceFilter ? "service_knowledge_all_published_articles" : null,
     search_scope: q ? "full_title_topic_body_sources_substring" : null, order: "segment_kind_id" };
 }
 
@@ -239,9 +306,9 @@ export async function libraryV2(request, env, admin = false) {
       requireValue([...url.searchParams.keys()].every((k) => k === "revision") && url.searchParams.getAll("revision").length <= 1, "invalid_query", 400);
       return publicResponse({ version: 2, revision: manifest.revision, published_at: manifest.published_at,
         article_count: manifest.article_count, counts_by_confidence: manifest.counts_by_confidence,
-        segments: manifest.segments.map(({ indexes, ...s }) => s), admin,
+        segments: manifest.segments.map(({ indexes, ...s }) => s), admin, service_facets: serviceFacets(manifest),
         capabilities: { pagination: true, search: "progressive_full_text_substring", revision_pinning: true,
-          max_page_size: 50, order: "segment_kind_id" } });
+          max_page_size: 50, order: "segment_kind_id", service_filters: !!manifest.service_facets } });
     }
     if (url.pathname === "/api/library/v2/articles") return publicResponse(await listing(reader, manifest, url));
     if (url.pathname === "/api/library/v2/article") {

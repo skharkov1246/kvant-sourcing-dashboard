@@ -1284,9 +1284,131 @@ def test_filter_cartridge_label_does_not_invent_a_water_treatment_application():
     assert p.component_type_label(source, "water") == "Фильтрующий картридж"
 
 
+def service_row(n=0):
+    item = row(n)
+    item["sources"]["kind"] = "knowledge"
+    family = "rare" if n >= 1090 else "common"
+    item["sources"]["service_knowledge"] = {
+        "schema_version": 1, "equipment_family": {"id": family, "label": "Учебное семейство " + family},
+        "model_scope": {"level": "generic", "manufacturers": [], "models": [], "note": "Не модель агрегата"},
+        "assembly": "Учебный узел Ω", "service_stage": p.v1.SERVICE_STAGES[n % 6],
+        "evidence": [{"reference_index": 0, "claim": "Только синтетическое основание"}],
+        "applicability": {"status": "generic_reference", "note": "Применимость не установлена", "limits": ["Вымышленный пример"]},
+        "diagnostic_checks": [{"check": "Учебная проверка", "method": None,
+            "result_interpretation": "Не выполненное измерение", "reference_indices": [0], "basis": "proposed_workflow"}],
+        "repair_decision": {"status": "assessment_framework", "note": "Только рамка оценки", "reference_indices": [0]},
+        "customer_content": False, "engineering_procedure": False}
+    return item
+
+
+def test_service_originals_summary_facets_and_noop_are_lossless():
+    rows = [service_row(i) for i in range(12)]
+    unrelated = row(194, managed=False)
+    original = copy.deepcopy(rows + [unrelated])
+    cf = CF([unrelated])
+    p.run(DB(rows), cf, NOW)
+    _, doc = manifest(cf)
+    assert materialized(cf) == {r["id"]: r for r in original}
+    assert rows == original[:-1]
+    assert doc["service_facets"]["article_count"] == 12
+    assert sum(s["count"] for s in doc["service_facets"]["service_stages"]) == 12
+    assert doc["service_facets"]["equipment_families"] == [{"id": "common", "label": "Учебное семейство common", "count": 12}]
+    summary = p.summary(rows[0])
+    assert summary["sources"]["service_summary"] == p.v1.service_summary(rows[0]["sources"])
+    assert "Учебный узел Ω".lower() in p.search_text(rows[0])
+    assert p.run(DB(rows), cf, NOW)["changed"] is False
+
+
+def test_service_summary_survives_large_optional_source_metadata():
+    item = service_row()
+    item["sources"]["typedfields"] = {"original": "λ" * 18000}
+    result = p.summary(item)
+    assert result["sources"]["service_summary"]["assembly"] == "Учебный узел Ω"
+    assert result["sources_truncated"] is True
+    assert len(p.encode(result["sources"])) <= p.SUMMARY_SOURCES_BYTES
+    assert item["sources"]["typedfields"]["original"] == "λ" * 18000
+
+
+def test_service_russian_stage_search_and_reader_vocabulary_match():
+    html = (SCRIPTS.parent / "public/library.html").read_text()
+    match = re.search(r"const SERVICE_STAGE_LABELS=({[^;]+});", html)
+    labels = dict(re.findall(r"([a-z_]+):'([^']+)'", match.group(1)))
+    assert labels == p.v1.SERVICE_STAGE_LABELS
+    assert tuple(labels) == p.v1.SERVICE_STAGES
+    item = service_row(1)
+    assert "диагностика" in p.search_text(item)
+    assert p.v1.service_summary(item["sources"])["service_stage"] == "diagnostics"
+
+
+def test_service_integer_json_numbers_match_worker_semantics_without_normalizing_source():
+    item = service_row()
+    item["sources"]["service_knowledge"]["schema_version"] = 1.0
+    item["sources"]["service_knowledge"]["evidence"][0]["reference_index"] = 0.0
+    before = json.dumps(item)
+    assert json.dumps(p.v1.article(item)) == before
+    item["sources"]["service_knowledge"]["evidence"][0]["reference_index"] = 0.5
+    with pytest.raises(p.v1.PublishError, match="INVALID_SERVICE_KNOWLEDGE"):
+        p.v1.article(item)
+
+
+@pytest.mark.parametrize("value, accepted", [(chr(0x85), True), (chr(0x1c), True), (chr(0xfeff), False), (" \t\n", False)])
+def test_service_nonempty_uses_worker_whitespace_without_normalization(value, accepted):
+    for target in ("claim", "label", "reference"):
+        item = service_row()
+        service = item["sources"]["service_knowledge"]
+        if target == "claim":
+            service["evidence"][0]["claim"] = value
+        elif target == "label":
+            service["equipment_family"]["label"] = value
+        else:
+            item["sources"]["references"] = [{"title": value}]
+        before = copy.deepcopy(item["sources"])
+        if accepted:
+            assert p.v1.article(item)["sources"] == before
+        else:
+            with pytest.raises(p.v1.PublishError, match="INVALID_SERVICE_KNOWLEDGE"):
+                p.v1.article(item)
+
+
+@pytest.mark.parametrize("mutation", [
+    lambda s: s["service_knowledge"].update(customer_content=True),
+    lambda s: s["service_knowledge"].update(engineering_procedure=True),
+    lambda s: s["service_knowledge"].update(asset_id="forbidden-case-field"),
+    lambda s: s["service_knowledge"].update(service_stage="unknown-stage"),
+    lambda s: s["service_knowledge"]["diagnostic_checks"][0].pop("basis"),
+    lambda s: s["service_knowledge"]["evidence"][0].update(reference_index=True),
+    lambda s: s["service_knowledge"]["evidence"][0].update(reference_index=1),
+    lambda s: s["service_knowledge"]["model_scope"].update(level="model"),
+    lambda s: s.update(kind="supplier"),
+    lambda s: s.update(references=[None]),
+    lambda s: s.update(references=[{}]),
+    lambda s: s["service_knowledge"].update(equipment_family={"id": "../bad", "label": "bad"}),
+])
+def test_service_contract_rejects_unsupported_or_unbound_claims(mutation):
+    item = service_row()
+    mutation(item["sources"])
+    with pytest.raises(p.v1.PublishError, match="INVALID_SERVICE_KNOWLEDGE"):
+        p.v1.article(item)
+
+
+def test_service_conflicting_family_labels_fail_before_current_changes():
+    cf = CF()
+    p.run(DB([row(99)]), cf, NOW)
+    before = cf.values[p.CURRENT]
+    a, b = service_row(0), service_row(1)
+    b["sources"]["service_knowledge"]["equipment_family"]["label"] = "Иное семейство"
+    with pytest.raises(p.v1.PublishError, match="SERVICE_FAMILY_LABEL_CONFLICT"):
+        p.run(DB([a, b]), cf, NOW)
+    assert cf.values[p.CURRENT] == before
+
+
 if __name__ == "__main__":
     # Synthetic cross-runtime fixture over stdout only, consumed by Node tests.
     count = int(sys.argv[1]) if len(sys.argv) > 1 else 195
-    cf = CF([row(i, managed=i != 194) for i in range(min(count, 195))])
-    p.run(DB([row(i) for i in range(count) if i != 194]), cf, NOW)
+    if len(sys.argv) > 2 and sys.argv[2] == "service":
+        cf = CF()
+        p.run(DB([service_row(i) for i in range(count)]), cf, NOW)
+    else:
+        cf = CF([row(i, managed=i != 194) for i in range(min(count, 195))])
+        p.run(DB([row(i) for i in range(count) if i != 194]), cf, NOW)
     print(json.dumps({k: v.decode() for k, v in cf.values.items()}, ensure_ascii=False))
