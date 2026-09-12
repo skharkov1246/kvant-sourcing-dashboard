@@ -309,6 +309,33 @@ alter table lib_suppliers add column if not exists contact_phone text;
 create unique index if not exists lib_suppliers_key
   on lib_suppliers (coalesce(segment_id, ''), name_key);
 
+-- А вот это мина, и вот почему. Ключ выше включает сегмент, а сегмент считается
+-- правилом по тексту о компании. Стоит правилу измениться — и та же компания
+-- получает другой сегмент, обычный ключ не срабатывает, и в таблице появляется
+-- второй экземпляр одной фирмы. Обнаружено сравнением двух прогонов: 77 таких
+-- пар из 4 480 после расширения списка источников.
+--
+-- Правильный ключ — имя без сегмента: компания это компания, а сегмент у неё
+-- признак. Индекс строится ТОЛЬКО если дублей ещё нет, и молча ничего не делает,
+-- если они уже появились: удалять чужие строки миграция не должна, это решение
+-- владельца (CLAUDE.md). Тогда в журнале останется предупреждение.
+do $$
+declare дублей int;
+begin
+  if exists (select 1 from information_schema.columns
+              where table_name = 'lib_suppliers' and column_name = 'name_key') then
+    select count(*) into дублей from (
+      select name_key from lib_suppliers where name_key is not null
+       group by name_key having count(*) > 1) t;
+    if дублей = 0 then
+      create unique index if not exists lib_suppliers_name_key
+        on lib_suppliers (name_key) where name_key is not null;
+    else
+      raise warning 'lib_suppliers: % дублей по name_key — уникальный индекс не построен, нужна ручная сверка', дублей;
+    end if;
+  end if;
+end $$;
+
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 4. Ценообразование: из чего складывается цена и какова она у разных источников.
 create table if not exists lib_prices (

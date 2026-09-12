@@ -14,11 +14,16 @@
 from __future__ import annotations
 
 import html
+import json
 import os
 import sys
 from datetime import date
 
 DSN = os.environ.get("PGDSN") or os.environ.get("SUPABASE_DB_URL", "")
+# Числа, измеренные в живой базе, когда отчёт собирается не из неё. Нужно ровно
+# для спроса и вложений: они есть только в проде, а справочники — те же файлы
+# репозитория и совпадают до строки. Подмена видна в отчёте подписью.
+PROD = json.loads(os.environ.get("PROD_COUNTS", "{}") or "{}")
 
 
 def E(x) -> str:
@@ -60,6 +65,9 @@ def собрать(cur) -> dict:
         "файлы": q(cur, "select count(*) from lib_files"),
         "контакты": q(cur, "select count(*) from lib_suppliers where contact_email is not null"),
     }
+    for ключ, значение in PROD.items():
+        if ключ in d:
+            d[ключ] = значение
     try:
         cur.execute("""
             select m.name, count(distinct pm.part_id)
@@ -164,8 +172,8 @@ def html_doc(d: dict) -> str:
 <h2>Сырьё</h2>
 <table class="t"><thead><tr><th style="width:70%">источник</th>
 <th style="width:30%">строк</th></tr></thead><tbody>
-<tr><td>Спрос из спецификаций сделок (lib_demand)</td><td class="num">{n(d['спрос'])}</td></tr>
-<tr><td>Разобранных вложений Битрикса (lib_files)</td><td class="num">{n(d['файлы'])}</td></tr>
+<tr><td>Спрос из спецификаций сделок (lib_demand){' — по прогону в живой базе' if 'спрос' in PROD else ''}</td><td class="num">{n(d['спрос'])}</td></tr>
+<tr><td>Разобранных вложений Битрикса (lib_files){' — по прогону в живой базе' if 'файлы' in PROD else ''}</td><td class="num">{n(d['файлы'])}</td></tr>
 </tbody></table>
 </body></html>"""
 

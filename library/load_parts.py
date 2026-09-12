@@ -298,10 +298,19 @@ def main() -> int:
                 ценовые.append((p["segment_id"], p["name"][:400], p["catalog_no"], значение,
                                 p["price_cur"], f"{p['price_src'] or 'каталог'} · {граница}",
                                 "каталог ЗИП", "med"))
+        # Сначала снимаем прежние цены этого источника, потом вставляем заново.
+        # У lib_prices нет ключа, по которому цену можно опознать — одна деталь
+        # даёт две границы, и обе законны, — поэтому on conflict тут не работает,
+        # а без удаления повторный прогон задваивает цены. Проверено сравнением:
+        # два прогона подряд дали 3 986 строк вместо 2 498.
+        cur.execute("delete from lib_prices where source_url = %s", ("каталог ЗИП",))
+        снято = cur.rowcount
         psycopg2.extras.execute_values(cur, """
             insert into lib_prices (segment_id, item_name, part_number, price, currency,
                                     source, source_url, confidence)
             values %s""", ценовые, page_size=500)
+        if снято:
+            print(f"  прежних цен этого источника снято: {снято}")
         conn.commit()
 
         for t in ("lib_parts", "lib_part_suppliers", "lib_prices"):

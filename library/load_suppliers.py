@@ -11,6 +11,11 @@
 строки сохраняется в researched_by — без него нельзя будет понять, откуда взялось
 противоречие, когда два исследования разойдутся в оценке одной компании.
 
+ПОВТОРНЫЙ ПРОГОН ОБНОВЛЯЕТ, А НЕ ДОБАВЛЯЕТ. Ключ — только имя, без сегмента:
+сегмент считается правилом по тексту о компании, правило меняется, и ключ с
+сегментом пропустил бы ту же фирму второй раз. Так и вышло при сравнении двух
+прогонов — 77 пар из 4 480.
+
 ДУБЛИ. Одна компания встречается в нескольких файлах под разными написаниями
 («ООО Ромашка», «Ромашка, ООО», «Romashka LLC»). Ключом служит нормализованное
 имя: без кавычек, форм собственности, регистра и пунктуации. При совпадении
@@ -198,12 +203,37 @@ def main() -> int:
         # на lib_segments, и при пустом справочнике всё падает по внешнему ключу.
         import indexer
         indexer.ensure_segments(cur)
-        psycopg2.extras.execute_values(cur, """
+        # Обновляем по имени, если уникальный индекс по name_key построен. Он
+        # строится миграцией только на базе без дублей; если дубли уже есть,
+        # индекса нет, и ON CONFLICT по нему упал бы целиком. Тогда пишем
+        # «do nothing» и честно предупреждаем: повторный прогон обновлений не
+        # принесёт, пока дубли не разобраны вручную.
+        cur.execute("select count(*) from pg_indexes where tablename = 'lib_suppliers' "
+                    "and indexname = 'lib_suppliers_name_key'")
+        по_имени = cur.fetchone()[0] > 0
+        конфликт = ("""on conflict (name_key) where name_key is not null do update set
+              segment_id    = excluded.segment_id,
+              country       = coalesce(lib_suppliers.country, excluded.country),
+              city          = coalesce(lib_suppliers.city, excluded.city),
+              kind          = coalesce(lib_suppliers.kind, excluded.kind),
+              site          = coalesce(lib_suppliers.site, excluded.site),
+              strengths     = coalesce(lib_suppliers.strengths, excluded.strengths),
+              moq           = coalesce(lib_suppliers.moq, excluded.moq),
+              certificates  = coalesce(lib_suppliers.certificates, excluded.certificates),
+              sanctions     = coalesce(lib_suppliers.sanctions, excluded.sanctions),
+              contact_email = coalesce(lib_suppliers.contact_email, excluded.contact_email),
+              contact_phone = coalesce(lib_suppliers.contact_phone, excluded.contact_phone),
+              researched_by = excluded.researched_by""" if по_имени
+                    else "on conflict do nothing")
+        if not по_имени:
+            print("  ВНИМАНИЕ: уникального индекса по имени нет (в базе есть дубли) — "
+                  "запись идёт без обновления существующих строк")
+        psycopg2.extras.execute_values(cur, f"""
             insert into lib_suppliers
               (segment_id, name, name_key, country, city, kind, site, strengths, moq,
                certificates, sanctions, confidence, contact_email, contact_phone, researched_by)
             values %s
-            on conflict do nothing""",
+            {конфликт}""",
             [(r["segment_id"], r["name"], r["key"], r["country"], r["city"], r["kind"],
               r["site"], r["strengths"], r["moq"], r["certificates"], r["sanctions"],
               r["confidence"], r["contact_email"], r["contact_phone"], r["researched_by"])
