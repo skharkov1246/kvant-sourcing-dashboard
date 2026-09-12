@@ -137,3 +137,147 @@ def test_catalog_sees_uncommitted_code_files():
     finally:
         probe.unlink(missing_ok=True)
 
+
+def test_chain_coverage_is_fresh_and_honest():
+    """Счётчик цепочки портала пересобран и не приукрашивает.
+
+    Ноль в клетке обязан означать отсутствие данных, а не «данные где-то есть»:
+    по этой карте выбирается следующая работа, и приукрашенный ноль увёл бы
+    усилия не туда."""
+    r = subprocess.run([sys.executable, str(ROOT / "scripts" / "build_chain_coverage.py"), "--check"],
+                       capture_output=True, text=True)
+    assert r.returncode == 0, f"счётчик цепочки устарел: {r.stdout}{r.stderr}"
+
+    cov = json.loads((ROOT / "data" / "chain_coverage.json").read_text(encoding="utf-8"))
+    assert len(cov["links"]) == 8, "цепочка портала — восемь звеньев"
+    assert cov["summary"]["cells_total"] == len(cov["segments"]) * 8
+    for seg in cov["segments"]:
+        for cell in seg["cells"]:
+            # Клетка с числом обязана называть файлы, откуда оно взято, — иначе
+            # цифру нельзя проверить, и она ничем не лучше выдуманной.
+            if cell["n"]:
+                assert cell["sources"], f"{seg['segment']}/{cell['link']}: число без источника"
+                assert cell["state"] == "есть"
+            else:
+                assert cell["state"] == "пусто"
+
+
+def test_gsho_machine_registry():
+    """Реестр машин ГШО собран и склеивает написания одной машины.
+
+    Счётчик цепочки показывал по ГШО одну машину при 1918 позициях номенклатуры:
+    обозначения лежали внутри строкового поля machine через запятую и отдельной
+    сущностью не существовали. Реестр закрывает первое звено цепочки."""
+    r = subprocess.run([sys.executable, str(ROOT / "zip" / "tools" / "build_machines.py"), "--check"],
+                       capture_output=True, text=True)
+    assert r.returncode == 0, f"реестр машин устарел: {r.stdout}{r.stderr}"
+
+    d = json.loads((ROOT / "zip" / "data" / "machines.json").read_text(encoding="utf-8"))
+    assert d["stats"]["machines"] > 50, "машин подозрительно мало — проверьте разбор поля machine"
+    keys = [m["machine_key"] for m in d["machines"]]
+    assert len(keys) == len(set(keys)), "ключи машин повторяются"
+
+    # Смысл реестра — склейка написаний. ST14 и ST-14 обязаны быть одной машиной.
+    merged = [m for m in d["machines"] if len(m["spellings"]) > 1]
+    assert merged, "ни одно написание не склеилось — проверьте mkey()"
+
+    # Бренд — один изготовитель, а не перечень: поле brand в источнике бывает
+    # списком «Epiroc, Normet, Paus», и такой список не должен попасть в реестр.
+    for b in d["brands"]:
+        assert "," not in b["brand"], f"в бренд попал перечень: {b['brand']}"
+
+    # Число позиций у машины обязано быть положительным: машина без единой детали
+    # означает, что она попала в реестр из мусорного значения поля.
+    assert all(m["parts"] > 0 for m in d["machines"])
+
+
+def test_machine_registry_does_not_inflate():
+    """Реестр машин не подмешивает к машинам неразобранное.
+
+    Поле mach базы PN содержит не только машины: туда попали детали
+    («Уплотнение кольцевое»), корзины бренда («Solar (сток)») и машины совсем
+    других сегментов. Подмешать их к турбинам значит завысить заполняемость
+    цепочки — а по ней выбирается следующая работа."""
+    m = json.loads((DICT / "machine.json").read_text(encoding="utf-8"))
+    kinds = {r["kind"] for r in m["records"]}
+    assert kinds <= {"turbine", "other_machine", "mining_machine"}, \
+        f"в реестр попал неразобранный вид: {kinds}"
+    # Виды part, bucket и unknown обязаны быть посчитаны, но НЕ попасть в записи.
+    for bad in ("part", "bucket", "unknown"):
+        assert m["pn_db_kinds"].get(bad, 0) > 0, f"вид {bad} перестал считаться — проверьте классификатор"
+    keys = [r["machine_key"] for r in m["records"]]
+    assert len(keys) == len(set(keys))
+
+
+def test_machine_classifier_catches_flagship_models():
+    """Классификатор обязан ловить самые массовые машины базы.
+
+    Замыкающий \\b в семействах ломал правило молча: в LM2500 граница слова
+    после «LM2» не наступает, и самая массовая машина базы — 3664 позиции —
+    проваливалась в «не определено»."""
+    m = _load_builder()
+    for name in ("LM2500", "LM6000", "GE Frame 6B", "RB211-535", "SGT-400",
+                 "Taurus 60S", "Centaur 50 (по документу)", "GE LMS100"):
+        kind, _stem = m.mach_kind(name)
+        assert kind == "turbine", f"{name} не опознана как турбина, а как {kind}"
+    for name in ("Уплотнение кольцевое", "Шкаф управления PMS МЛСК Ф-1"):
+        assert m.mach_kind(name)[0] == "part", f"{name} принята за машину"
+    assert m.mach_kind("Solar (сток)")[0] == "bucket"
+    assert m.mach_kind("Буровой насос 12T1600")[0] == "other_machine"
+
+
+def test_node_map_is_fresh_and_complete():
+    """Карта узлов пересобрана и не теряет метки молча.
+
+    Ключи таблицы соответствия приводятся тем же правилом, каким по ней ищут.
+    Без этого «Крепёж» в таблице и «крепеж» в запросе — разные строки, и 828
+    размеченных человеком строк уходили в «не определено», не подав признака."""
+    r = subprocess.run([sys.executable, str(ROOT / "scripts" / "build_node_map.py"), "--check"],
+                       capture_output=True, text=True)
+    assert r.returncode == 0, f"карта узлов устарела: {r.stdout}{r.stderr}"
+
+    d = json.loads((DICT / "node_map.json").read_text(encoding="utf-8"))
+    assert d["labels"]["unmapped"] == [], \
+        f"метки не сведены к узлам: {d['labels']['unmapped']}"
+    assert d["labels"]["distinct"] > 40, "меток стало подозрительно мало"
+
+
+def test_node_classifier_precision_floor():
+    """Точность классификатора измеряется на ручной разметке и не должна падать.
+
+    Классификатор предлагает разметку для строк без метки — по этому предложению
+    потом принимают решение. Заявленная, но не измеренная точность бесполезна,
+    поэтому порог закреплён здесь и проверяется на каждом PR."""
+    d = json.loads((DICT / "node_map.json").read_text(encoding="utf-8"))
+    c = d["classifier"]
+    assert c["judged"] >= 1000, "выборка для измерения точности слишком мала"
+    assert c["precision_pct"] >= 80, (
+        f"точность упала до {c['precision_pct']} %: проверьте правила, "
+        f"путаница — {c['top_confusions'][:3]}")
+    # Предложение не должно молча объявлять разобранным то, что не разобрано.
+    p = d["proposal"]
+    assert p["would_classify"] + p["would_leave_unresolved"] == p["rows_without_label"]
+
+
+def test_makers_counted_as_companies_not_rows():
+    """Изготовители считаются уникальными компаниями, а не строками.
+
+    Счётчик суммировал строки разных файлов и врал в обе стороны: по ГТУ он видел
+    72 компании, не подключив пять реестров из восьми, а по ГШО — 4368, потому что
+    4309 строк odm_suppliers это связи «позиция × кандидат» на 1289 компаний,
+    а не изготовители. Сумма строк несравнима между направлениями."""
+    cov = json.loads((ROOT / "data" / "chain_coverage.json").read_text(encoding="utf-8"))
+    by_seg = {s["segment"]: s for s in cov["segments"]}
+
+    gsho = next(c for c in by_seg["gsho"]["cells"] if c["link"] == "maker")
+    odm = json.loads((ROOT / "zip" / "data" / "odm_suppliers.json").read_text(encoding="utf-8"))
+    assert gsho["n"] < len(odm), (
+        "изготовителей ГШО не может быть больше, чем строк связей: "
+        f"{gsho['n']} против {len(odm)} — считаются строки, а не компании")
+
+    gtu = next(c for c in by_seg["gtu"]["cells"] if c["link"] == "maker")
+    assert len(gtu["sources"]) >= 6, (
+        f"по ГТУ подключено лишь {len(gtu['sources'])} реестров — "
+        "остальные компании в счёт не попадут")
+    assert gtu["n"] > 1000, "по ГТУ реестров восемь, компаний должно быть заметно больше сотни"
+

@@ -184,6 +184,84 @@ def build_system() -> dict:
             "scopes": sorted(by_scope), "count": len(flat), "records": flat}
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# Машины. Обозначения лежат внутри строковых полей и отдельной сущностью не
+# существуют. Поле mach базы PN содержит не только машины: туда попали детали
+# («Уплотнение кольцевое»), корзины бренда («Solar (сток)») и машины совсем
+# других сегментов (буровые насосы, превенторы). Классификатор разводит их по
+# видам явно; вид «не определено» сохраняется как видимый хвост для разбора,
+# а не подмешивается к машинам.
+MACH_NOTE = re.compile(r"\s*\((сток|общая|sepoc|по документу|унифиц\w*|разные|все)[^)]*\)\s*", re.I)
+MACH_BUCKET = re.compile(r"^(solar|ge|siemens|rolls-?royce)(\s+(пакет|compressor|общая|сток))?$", re.I)
+# Замыкающего \b в семействах нет намеренно: он не срабатывает внутри
+# обозначения — в LM2500 граница после «LM2» не наступает, и правило молча
+# переставало ловить самую массовую машину базы.
+MACH_GT = re.compile(r"\b(lms\d|lm\d|sgt|taurus|centaur|mars|titan|saturn|avon|olympus|spey|"
+                     r"proteus|tyne|coberra|rb\d|frame\s*\d|ms\d{4}|tb\d{4}|gt\d{1,2}|"
+                     r"v\d{2}\.|трент|trent)", re.I)
+MACH_OTHER = re.compile(r"насос|превентор|вентилятор|компрессор|лебёдк|лебедк|станц|опреснит|"
+                        r"агрегат|привод|установк", re.I)
+MACH_PART = re.compile(r"кольц|шкаф|клапан|фильтр|прокладк|болт|гайк|датчик|труб|подшипник|"
+                       r"уплотн|шланг|кабель|реле|модуль|плат|блок|комплект|втулк|диск|лопат|"
+                       r"форсунк|свеч|щуп|масл|смазк|выкл\.|автомат", re.I)
+
+
+def mach_kind(name: str) -> tuple[str, str]:
+    """Вид обозначения и его основа без пометки источника."""
+    stem = MACH_NOTE.sub(" ", str(name or "")).strip(" ,")
+    if not stem:
+        return "empty", ""
+    if MACH_BUCKET.match(stem):
+        return "bucket", stem
+    if MACH_GT.search(stem):
+        return "turbine", stem
+    if MACH_OTHER.search(stem):
+        return "other_machine", stem
+    if MACH_PART.search(stem):
+        return "part", stem
+    return "unknown", stem
+
+
+def mkey(name: str) -> str:
+    return re.sub(r"[^A-Z0-9А-Я]", "", str(name or "").upper())
+
+
+def build_machine() -> dict:
+    """Реестр машин по направлениям: из базы PN (ГТУ) и из реестра ГШО."""
+    recs: dict[str, dict] = {}
+
+    def add(name, seg, kind, src, parts=1):
+        k = mkey(name)
+        if not k or len(k) < 2:
+            return
+        r = recs.setdefault(k, {"machine_key": k, "name": name, "segment": seg, "kind": kind,
+                                "spellings": [], "parts": 0, "sources": []})
+        r["parts"] += parts
+        if name not in r["spellings"]:
+            r["spellings"].append(name)
+        if src not in r["sources"]:
+            r["sources"].append(src)
+
+    counts: dict[str, int] = {}
+    for row in load("gt/data/pn_db.json", {}).get("rows", []):
+        kind, stem = mach_kind(row.get("mach"))
+        counts[kind] = counts.get(kind, 0) + 1
+        if kind in ("turbine", "other_machine"):
+            add(stem, "gtu" if kind == "turbine" else "other", kind, "gt/data/pn_db.json")
+
+    for m in load("zip/data/machines.json", {}).get("machines", []):
+        add(m["name"], "gsho", "mining_machine", "zip/data/machines.json", m.get("parts", 1))
+
+    out = sorted(recs.values(), key=lambda x: (-x["parts"], x["name"]))
+    by_seg: dict[str, int] = {}
+    for r in out:
+        by_seg[r["segment"]] = by_seg.get(r["segment"], 0) + 1
+    return {"note": "Реестр машин: обозначения вынуты из строковых полей баз и разведены по видам. "
+                    "Вид unknown в реестр не попадает и остаётся в счётчике видимым хвостом — "
+                    "подмешивать неразобранное к машинам значит завышать заполняемость.",
+            "count": len(out), "by_segment": by_seg, "pn_db_kinds": counts, "records": out}
+
+
 def build_chain() -> dict:
     """Рёбра «владелец конструкции → изготовитель узла» с доказательством."""
     edges: dict[tuple, dict] = {}
@@ -247,7 +325,8 @@ def build_chain() -> dict:
 
 
 def build() -> dict:
-    return {"oem": build_oem(), "system": build_system(), "chain": build_chain()}
+    return {"oem": build_oem(), "system": build_system(), "chain": build_chain(),
+            "machine": build_machine()}
 
 
 def main() -> int:
@@ -256,6 +335,7 @@ def main() -> int:
         "oem.json": data["oem"],
         "system.json": data["system"],
         "chain.json": data["chain"],
+        "machine.json": data["machine"],
         "summary.json": {
             "note": "Словарь — проекция существующих баз. Источники не изменяются; "
                     "пересобирается python scripts/build_dict.py.",
@@ -265,6 +345,8 @@ def main() -> int:
             "chain_edges": data["chain"]["count"],
             "chain_makers": data["chain"]["makers"],
             "chain_routing_notes": data["chain"]["routing_notes"],
+            "machines": data["machine"]["count"],
+            "machines_by_segment": data["machine"]["by_segment"],
         },
     }
     if "--check" in sys.argv:
@@ -287,7 +369,8 @@ def main() -> int:
     s = files["summary.json"]
     print(f"✓ dict/: производителей {s['oem_keys']}, узлов {s['system_keys']} "
           f"в областях {s['system_scopes']}, рёбер {s['chain_edges']} "
-          f"(изготовителей {s['chain_makers']}, указаний к закупке {s['chain_routing_notes']})")
+          f"(изготовителей {s['chain_makers']}, указаний к закупке {s['chain_routing_notes']}), "
+          f"машин {s['machines']} {s['machines_by_segment']}")
     return 0
 
 

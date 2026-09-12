@@ -1,0 +1,1416 @@
+{
+  "note": "Реестр машин ГШО, выведенный из справочника деталей: обозначения лежали внутри строкового поля machine через запятую и отдельной сущностью не существовали. Собирается zip/tools/build_machines.py; руками не заполнять. Паспортных данных не содержит — их в наших файлах нет, это предмет разведки.",
+  "source": "pnw/data/item_master.json, раздел «ЗИП ГШО»",
+  "stats": {
+    "positions": 752,
+    "machines": 76,
+    "brands": 6,
+    "merged_spellings": 20,
+    "parts_linked": 1856
+  },
+  "brands": [
+    {
+      "brand": "Epiroc",
+      "machines": 30,
+      "parts": 749
+    },
+    {
+      "brand": "Normet",
+      "machines": 28,
+      "parts": 641
+    },
+    {
+      "brand": "Sandvik Tamrock",
+      "machines": 9,
+      "parts": 343
+    },
+    {
+      "brand": "Caterpillar",
+      "machines": 5,
+      "parts": 116
+    },
+    {
+      "brand": "Atlas Copco",
+      "machines": 3,
+      "parts": 6
+    },
+    {
+      "brand": "Deutz",
+      "machines": 1,
+      "parts": 1
+    }
+  ],
+  "machines": [
+    {
+      "machine_key": "TH540",
+      "name": "TH-540",
+      "brand": "Sandvik Tamrock",
+      "brand_key": "sandviktamrock",
+      "spellings": [
+        "TH-540",
+        "TH540",
+        "TH 540"
+      ],
+      "parts": 145,
+      "nodes": [
+        "05 Гидравлика",
+        "12 Прочее",
+        "10 Электрика/датчики",
+        "06 Фильтры",
+        "07 Двигатель",
+        "03 РТИ/уплотнения (общие)",
+        "08 Трансмиссия/мосты/тормоза",
+        "09 Метизы/крепёж",
+        "11 Расходники прочие",
+        "01 Перфоратор: уплотнения/ремкомплекты",
+        "04 Подшипники"
+      ],
+      "n_nodes": 11
+    },
+    {
+      "machine_key": "ST14",
+      "name": "ST14",
+      "brand": "Epiroc",
+      "brand_key": "epiroc",
+      "spellings": [
+        "ST14",
+        "ST-14"
+      ],
+      "parts": 130,
+      "nodes": [
+        "02 Перфоратор: механика (хвостовик/букса/боёк/аккумулятор/клапан)",
+        "10 Электрика/датчики",
+        "12 Прочее",
+        "05 Гидравлика",
+        "06 Фильтры",
+        "01 Перфоратор: уплотнения/ремкомплекты",
+        "07 Двигатель",
+        "09 Метизы/крепёж",
+        "08 Трансмиссия/мосты/тормоза",
+        "03 РТИ/уплотнения (общие)"
+      ],
+      "n_nodes": 10
+    },
+    {
+      "machine_key": "SIMBAM6C",
+      "name": "Simba M6C",
+      "brand": "Epiroc",
+      "brand_key": "epiroc",
+      "spellings": [
+        "Simba M6C"
+      ],
+      "parts": 123,
+      "nodes": [
+        "02 Перфоратор: механика (хвостовик/букса/боёк/аккумулятор/клапан)",
+        "06 Фильтры",
+        "01 Перфоратор: уплотнения/ремкомплекты",
+        "04 Подшипники",
+        "10 Электрика/датчики",
+        "05 Гидравлика",
+        "07 Двигатель",
+        "03 РТИ/уплотнения (общие)",
+        "12 Прочее",
+        "09 Метизы/крепёж"
+      ],
+      "n_nodes": 10
+    },
+    {
+      "machine_key": "545I",
+      "name": "545i",
+      "brand": "Sandvik Tamrock",
+      "brand_key": "sandviktamrock",
+      "spellings": [
+        "545i"
+      ],
+      "parts": 97,
+      "nodes": [
+        "05 Гидравлика",
+        "10 Электрика/датчики",
+        "12 Прочее",
+        "06 Фильтры",
+        "08 Трансмиссия/мосты/тормоза",
+        "03 РТИ/уплотнения (общие)",
+        "11 Расходники прочие",
+        "04 Подшипники"
+      ],
+      "n_nodes": 8
+    },
+    {
+      "machine_key": "SIMBAE7C",
+      "name": "Simba E7C",
+      "brand": "Epiroc",
+      "brand_key": "epiroc",
+      "spellings": [
+        "Simba E7C"
+      ],
+      "parts": 97,
+      "nodes": [
+        "02 Перфоратор: механика (хвостовик/букса/боёк/аккумулятор/клапан)",
+        "06 Фильтры",
+        "04 Подшипники",
+        "10 Электрика/датчики",
+        "05 Гидравлика",
+        "01 Перфоратор: уплотнения/ремкомплекты",
+        "07 Двигатель",
+        "12 Прочее",
+        "03 РТИ/уплотнения (общие)",
+        "09 Метизы/крепёж"
+      ],
+      "n_nodes": 10
+    },
+    {
+      "machine_key": "R1700G",
+      "name": "R1700G",
+      "brand": "Caterpillar",
+      "brand_key": "caterpillar",
+      "spellings": [
+        "R1700G"
+      ],
+      "parts": 87,
+      "nodes": [
+        "12 Прочее",
+        "05 Гидравлика",
+        "10 Электрика/датчики",
+        "06 Фильтры",
+        "08 Трансмиссия/мосты/тормоза",
+        "07 Двигатель",
+        "03 РТИ/уплотнения (общие)"
+      ],
+      "n_nodes": 7
+    },
+    {
+      "machine_key": "BOOMERM2C",
+      "name": "Boomer M2C",
+      "brand": "Epiroc",
+      "brand_key": "epiroc",
+      "spellings": [
+        "Boomer M2C"
+      ],
+      "parts": 78,
+      "nodes": [
+        "02 Перфоратор: механика (хвостовик/букса/боёк/аккумулятор/клапан)",
+        "06 Фильтры",
+        "01 Перфоратор: уплотнения/ремкомплекты",
+        "07 Двигатель",
+        "04 Подшипники",
+        "03 РТИ/уплотнения (общие)",
+        "05 Гидравлика",
+        "12 Прочее",
+        "10 Электрика/датчики"
+      ],
+      "n_nodes": 9
+    },
+    {
+      "machine_key": "BOOMERM2D",
+      "name": "Boomer M2D",
+      "brand": "Epiroc",
+      "brand_key": "epiroc",
+      "spellings": [
+        "Boomer M2D"
+      ],
+      "parts": 68,
+      "nodes": [
+        "06 Фильтры",
+        "02 Перфоратор: механика (хвостовик/букса/боёк/аккумулятор/клапан)",
+        "01 Перфоратор: уплотнения/ремкомплекты",
+        "07 Двигатель",
+        "03 РТИ/уплотнения (общие)",
+        "04 Подшипники",
+        "05 Гидравлика",
+        "10 Электрика/датчики",
+        "12 Прочее"
+      ],
+      "n_nodes": 9
+    },
+    {
+      "machine_key": "SPRAYMECLF050VC",
+      "name": "Spraymec LF 050 VC",
+      "brand": "Normet",
+      "brand_key": "normet",
+      "spellings": [
+        "Spraymec LF 050 VC",
+        "Spraymec LF050VC"
+      ],
+      "parts": 56,
+      "nodes": [
+        "05 Гидравлика",
+        "06 Фильтры",
+        "08 Трансмиссия/мосты/тормоза",
+        "03 РТИ/уплотнения (общие)",
+        "07 Двигатель",
+        "04 Подшипники",
+        "12 Прочее",
+        "10 Электрика/датчики",
+        "09 Метизы/крепёж",
+        "11 Расходники прочие"
+      ],
+      "n_nodes": 10
+    },
+    {
+      "machine_key": "BOLTECM",
+      "name": "Boltec M",
+      "brand": "Epiroc",
+      "brand_key": "epiroc",
+      "spellings": [
+        "Boltec M"
+      ],
+      "parts": 52,
+      "nodes": [
+        "06 Фильтры",
+        "02 Перфоратор: механика (хвостовик/букса/боёк/аккумулятор/клапан)",
+        "07 Двигатель",
+        "01 Перфоратор: уплотнения/ремкомплекты",
+        "10 Электрика/датчики",
+        "05 Гидравлика",
+        "12 Прочее",
+        "04 Подшипники"
+      ],
+      "n_nodes": 8
+    },
+    {
+      "machine_key": "BOOMERS2",
+      "name": "Boomer S2",
+      "brand": "Epiroc",
+      "brand_key": "epiroc",
+      "spellings": [
+        "Boomer S2"
+      ],
+      "parts": 51,
+      "nodes": [
+        "06 Фильтры",
+        "02 Перфоратор: механика (хвостовик/букса/боёк/аккумулятор/клапан)",
+        "03 РТИ/уплотнения (общие)",
+        "05 Гидравлика",
+        "12 Прочее",
+        "04 Подшипники",
+        "07 Двигатель",
+        "10 Электрика/датчики",
+        "01 Перфоратор: уплотнения/ремкомплекты"
+      ],
+      "n_nodes": 9
+    },
+    {
+      "machine_key": "SCAMEC2000S",
+      "name": "Scamec 2000 S",
+      "brand": "Normet",
+      "brand_key": "normet",
+      "spellings": [
+        "Scamec 2000 S",
+        "Scamec 2000S"
+      ],
+      "parts": 48,
+      "nodes": [
+        "06 Фильтры",
+        "05 Гидравлика",
+        "04 Подшипники",
+        "08 Трансмиссия/мосты/тормоза",
+        "07 Двигатель",
+        "10 Электрика/датчики",
+        "03 РТИ/уплотнения (общие)",
+        "12 Прочее"
+      ],
+      "n_nodes": 8
+    },
+    {
+      "machine_key": "CHARMEC1605BE",
+      "name": "Charmec 1605 BE",
+      "brand": "Normet",
+      "brand_key": "normet",
+      "spellings": [
+        "Charmec 1605 BE",
+        "Charmec 1605BE"
+      ],
+      "parts": 44,
+      "nodes": [
+        "05 Гидравлика",
+        "06 Фильтры",
+        "04 Подшипники",
+        "08 Трансмиссия/мосты/тормоза",
+        "07 Двигатель",
+        "12 Прочее",
+        "03 РТИ/уплотнения (общие)",
+        "10 Электрика/датчики"
+      ],
+      "n_nodes": 8
+    },
+    {
+      "machine_key": "HIMECLF905",
+      "name": "Himec LF 905",
+      "brand": "Normet",
+      "brand_key": "normet",
+      "spellings": [
+        "Himec LF 905",
+        "Himec LF905"
+      ],
+      "parts": 42,
+      "nodes": [
+        "06 Фильтры",
+        "05 Гидравлика",
+        "08 Трансмиссия/мосты/тормоза",
+        "07 Двигатель",
+        "04 Подшипники",
+        "12 Прочее",
+        "03 РТИ/уплотнения (общие)",
+        "10 Электрика/датчики"
+      ],
+      "n_nodes": 8
+    },
+    {
+      "machine_key": "UTIMECLF600TRANSMIXER",
+      "name": "Utimec LF 600 Transmixer",
+      "brand": "Normet",
+      "brand_key": "normet",
+      "spellings": [
+        "Utimec LF 600 Transmixer",
+        "Utimec LF600 Transmixer"
+      ],
+      "parts": 35,
+      "nodes": [
+        "05 Гидравлика",
+        "06 Фильтры",
+        "08 Трансмиссия/мосты/тормоза",
+        "07 Двигатель",
+        "12 Прочее",
+        "04 Подшипники",
+        "10 Электрика/датчики",
+        "03 РТИ/уплотнения (общие)"
+      ],
+      "n_nodes": 8
+    },
+    {
+      "machine_key": "SPRAYMECLF050DC",
+      "name": "Spraymec LF 050 DC",
+      "brand": "Normet",
+      "brand_key": "normet",
+      "spellings": [
+        "Spraymec LF 050 DC",
+        "Spraymec LF050DC"
+      ],
+      "parts": 34,
+      "nodes": [
+        "05 Гидравлика",
+        "06 Фильтры",
+        "03 РТИ/уплотнения (общие)",
+        "07 Двигатель",
+        "12 Прочее",
+        "08 Трансмиссия/мосты/тормоза",
+        "09 Метизы/крепёж",
+        "04 Подшипники",
+        "11 Расходники прочие"
+      ],
+      "n_nodes": 9
+    },
+    {
+      "machine_key": "UTIMECLF130MATERIALLUBE",
+      "name": "Utimec LF 130 Material Lube",
+      "brand": "Normet",
+      "brand_key": "normet",
+      "spellings": [
+        "Utimec LF 130 Material Lube"
+      ],
+      "parts": 34,
+      "nodes": [
+        "06 Фильтры",
+        "05 Гидравлика",
+        "08 Трансмиссия/мосты/тормоза",
+        "07 Двигатель",
+        "04 Подшипники",
+        "12 Прочее",
+        "10 Электрика/датчики",
+        "03 РТИ/уплотнения (общие)"
+      ],
+      "n_nodes": 8
+    },
+    {
+      "machine_key": "CHARMEC1605B",
+      "name": "Charmec 1605 B",
+      "brand": "Normet",
+      "brand_key": "normet",
+      "spellings": [
+        "Charmec 1605 B",
+        "Charmec 1605B"
+      ],
+      "parts": 33,
+      "nodes": [
+        "05 Гидравлика",
+        "06 Фильтры",
+        "04 Подшипники",
+        "07 Двигатель",
+        "08 Трансмиссия/мосты/тормоза",
+        "12 Прочее",
+        "03 РТИ/уплотнения (общие)",
+        "10 Электрика/датчики"
+      ],
+      "n_nodes": 8
+    },
+    {
+      "machine_key": "CHARMECMF050DROBOT",
+      "name": "Charmec MF 050 D Robot",
+      "brand": "Normet",
+      "brand_key": "normet",
+      "spellings": [
+        "Charmec MF 050 D Robot",
+        "Charmec MF050 D Robot"
+      ],
+      "parts": 33,
+      "nodes": [
+        "05 Гидравлика",
+        "06 Фильтры",
+        "07 Двигатель",
+        "08 Трансмиссия/мосты/тормоза",
+        "12 Прочее",
+        "04 Подшипники",
+        "03 РТИ/уплотнения (общие)",
+        "10 Электрика/датчики"
+      ],
+      "n_nodes": 8
+    },
+    {
+      "machine_key": "UTILIFTMF540",
+      "name": "Utilift MF 540",
+      "brand": "Normet",
+      "brand_key": "normet",
+      "spellings": [
+        "Utilift MF 540"
+      ],
+      "parts": 33,
+      "nodes": [
+        "06 Фильтры",
+        "05 Гидравлика",
+        "07 Двигатель",
+        "12 Прочее",
+        "08 Трансмиссия/мосты/тормоза",
+        "04 Подшипники",
+        "10 Электрика/датчики",
+        "03 РТИ/уплотнения (общие)"
+      ],
+      "n_nodes": 8
+    },
+    {
+      "machine_key": "UTIMECLF1000FUEL",
+      "name": "Utimec LF 1000 Fuel",
+      "brand": "Normet",
+      "brand_key": "normet",
+      "spellings": [
+        "Utimec LF 1000 Fuel",
+        "Utimec LF1000 Fuel",
+        "Utimec LF1000Fuel"
+      ],
+      "parts": 33,
+      "nodes": [
+        "06 Фильтры",
+        "05 Гидравлика",
+        "08 Трансмиссия/мосты/тормоза",
+        "07 Двигатель",
+        "12 Прочее",
+        "04 Подшипники",
+        "10 Электрика/датчики",
+        "03 РТИ/уплотнения (общие)"
+      ],
+      "n_nodes": 8
+    },
+    {
+      "machine_key": "CHARMEC1610B",
+      "name": "Charmec 1610 B",
+      "brand": "Normet",
+      "brand_key": "normet",
+      "spellings": [
+        "Charmec 1610 B",
+        "Charmec 1610B"
+      ],
+      "parts": 30,
+      "nodes": [
+        "05 Гидравлика",
+        "06 Фильтры",
+        "07 Двигатель",
+        "08 Трансмиссия/мосты/тормоза",
+        "04 Подшипники",
+        "12 Прочее",
+        "10 Электрика/датчики",
+        "03 РТИ/уплотнения (общие)"
+      ],
+      "n_nodes": 8
+    },
+    {
+      "machine_key": "UTIMECLF130MATERIAL",
+      "name": "Utimec LF 130 Material",
+      "brand": "Normet",
+      "brand_key": "normet",
+      "spellings": [
+        "Utimec LF 130 Material",
+        "Utimec LF130Material"
+      ],
+      "parts": 30,
+      "nodes": [
+        "06 Фильтры",
+        "05 Гидравлика",
+        "08 Трансмиссия/мосты/тормоза",
+        "07 Двигатель",
+        "12 Прочее",
+        "04 Подшипники",
+        "10 Электрика/датчики",
+        "03 РТИ/уплотнения (общие)"
+      ],
+      "n_nodes": 8
+    },
+    {
+      "machine_key": "UTIMECLF300TYRE",
+      "name": "Utimec LF 300 Tyre",
+      "brand": "Normet",
+      "brand_key": "normet",
+      "spellings": [
+        "Utimec LF 300 Tyre",
+        "Utimec LF300 Tyre"
+      ],
+      "parts": 30,
+      "nodes": [
+        "05 Гидравлика",
+        "06 Фильтры",
+        "08 Трансмиссия/мосты/тормоза",
+        "07 Двигатель",
+        "04 Подшипники",
+        "12 Прочее",
+        "10 Электрика/датчики",
+        "03 РТИ/уплотнения (общие)"
+      ],
+      "n_nodes": 8
+    },
+    {
+      "machine_key": "UTIMECLF100E",
+      "name": "Utimec LF 100 E",
+      "brand": "Normet",
+      "brand_key": "normet",
+      "spellings": [
+        "Utimec LF 100 E",
+        "Utimec LF100E"
+      ],
+      "parts": 28,
+      "nodes": [
+        "05 Гидравлика",
+        "07 Двигатель",
+        "08 Трансмиссия/мосты/тормоза",
+        "06 Фильтры",
+        "12 Прочее",
+        "04 Подшипники",
+        "10 Электрика/датчики",
+        "03 РТИ/уплотнения (общие)"
+      ],
+      "n_nodes": 8
+    },
+    {
+      "machine_key": "UTILIFTLF540",
+      "name": "Utilift LF 540",
+      "brand": "Normet",
+      "brand_key": "normet",
+      "spellings": [
+        "Utilift LF 540"
+      ],
+      "parts": 25,
+      "nodes": [
+        "06 Фильтры",
+        "05 Гидравлика",
+        "07 Двигатель",
+        "08 Трансмиссия/мосты/тормоза",
+        "12 Прочее",
+        "04 Подшипники",
+        "10 Электрика/датчики",
+        "03 РТИ/уплотнения (общие)"
+      ],
+      "n_nodes": 8
+    },
+    {
+      "machine_key": "TH545I",
+      "name": "TH545i",
+      "brand": "Sandvik Tamrock",
+      "brand_key": "sandviktamrock",
+      "spellings": [
+        "TH545i"
+      ],
+      "parts": 24,
+      "nodes": [
+        "12 Прочее",
+        "09 Метизы/крепёж",
+        "07 Двигатель",
+        "05 Гидравлика",
+        "10 Электрика/датчики",
+        "06 Фильтры",
+        "08 Трансмиссия/мосты/тормоза",
+        "03 РТИ/уплотнения (общие)",
+        "01 Перфоратор: уплотнения/ремкомплекты"
+      ],
+      "n_nodes": 9
+    },
+    {
+      "machine_key": "EASERL",
+      "name": "Easer L",
+      "brand": "Epiroc",
+      "brand_key": "epiroc",
+      "spellings": [
+        "Easer L"
+      ],
+      "parts": 22,
+      "nodes": [
+        "06 Фильтры",
+        "02 Перфоратор: механика (хвостовик/букса/боёк/аккумулятор/клапан)",
+        "12 Прочее",
+        "10 Электрика/датчики",
+        "01 Перфоратор: уплотнения/ремкомплекты",
+        "07 Двигатель",
+        "05 Гидравлика",
+        "04 Подшипники"
+      ],
+      "n_nodes": 8
+    },
+    {
+      "machine_key": "ТН545",
+      "name": "ТН 545",
+      "brand": "Sandvik Tamrock",
+      "brand_key": "sandviktamrock",
+      "spellings": [
+        "ТН 545"
+      ],
+      "parts": 21,
+      "nodes": [
+        "12 Прочее",
+        "05 Гидравлика",
+        "07 Двигатель",
+        "06 Фильтры",
+        "10 Электрика/датчики",
+        "08 Трансмиссия/мосты/тормоза",
+        "01 Перфоратор: уплотнения/ремкомплекты"
+      ],
+      "n_nodes": 7
+    },
+    {
+      "machine_key": "LH410",
+      "name": "LH410",
+      "brand": "Sandvik Tamrock",
+      "brand_key": "sandviktamrock",
+      "spellings": [
+        "LH410",
+        "LH-410"
+      ],
+      "parts": 20,
+      "nodes": [
+        "12 Прочее",
+        "06 Фильтры",
+        "05 Гидравлика",
+        "09 Метизы/крепёж",
+        "10 Электрика/датчики",
+        "07 Двигатель",
+        "03 РТИ/уплотнения (общие)"
+      ],
+      "n_nodes": 7
+    },
+    {
+      "machine_key": "UTIMEC1420LUBEHD",
+      "name": "Utimec 1420 Lube HD",
+      "brand": "Normet",
+      "brand_key": "normet",
+      "spellings": [
+        "Utimec 1420 Lube HD"
+      ],
+      "parts": 20,
+      "nodes": [
+        "05 Гидравлика",
+        "08 Трансмиссия/мосты/тормоза",
+        "07 Двигатель",
+        "06 Фильтры",
+        "12 Прочее",
+        "04 Подшипники",
+        "10 Электрика/датчики",
+        "03 РТИ/уплотнения (общие)"
+      ],
+      "n_nodes": 8
+    },
+    {
+      "machine_key": "MT42",
+      "name": "MT 42",
+      "brand": "Epiroc",
+      "brand_key": "epiroc",
+      "spellings": [
+        "MT 42",
+        "MT42"
+      ],
+      "parts": 19,
+      "nodes": [
+        "06 Фильтры",
+        "10 Электрика/датчики",
+        "01 Перфоратор: уплотнения/ремкомплекты",
+        "02 Перфоратор: механика (хвостовик/букса/боёк/аккумулятор/клапан)",
+        "03 РТИ/уплотнения (общие)",
+        "05 Гидравлика",
+        "04 Подшипники"
+      ],
+      "n_nodes": 7
+    },
+    {
+      "machine_key": "ST7",
+      "name": "ST7",
+      "brand": "Epiroc",
+      "brand_key": "epiroc",
+      "spellings": [
+        "ST7",
+        "ST-7"
+      ],
+      "parts": 19,
+      "nodes": [
+        "06 Фильтры",
+        "10 Электрика/датчики",
+        "02 Перфоратор: механика (хвостовик/букса/боёк/аккумулятор/клапан)",
+        "07 Двигатель",
+        "05 Гидравлика",
+        "12 Прочее"
+      ],
+      "n_nodes": 6
+    },
+    {
+      "machine_key": "TH320",
+      "name": "TH-320",
+      "brand": "Sandvik Tamrock",
+      "brand_key": "sandviktamrock",
+      "spellings": [
+        "TH-320",
+        "TH320"
+      ],
+      "parts": 17,
+      "nodes": [
+        "06 Фильтры",
+        "05 Гидравлика",
+        "12 Прочее",
+        "07 Двигатель",
+        "09 Метизы/крепёж"
+      ],
+      "n_nodes": 5
+    },
+    {
+      "machine_key": "BOOMERS1DDH",
+      "name": "Boomer S1 D-DH",
+      "brand": "Epiroc",
+      "brand_key": "epiroc",
+      "spellings": [
+        "Boomer S1 D-DH"
+      ],
+      "parts": 16,
+      "nodes": [
+        "02 Перфоратор: механика (хвостовик/букса/боёк/аккумулятор/клапан)",
+        "06 Фильтры",
+        "03 РТИ/уплотнения (общие)",
+        "04 Подшипники",
+        "05 Гидравлика",
+        "07 Двигатель",
+        "01 Перфоратор: уплотнения/ремкомплекты"
+      ],
+      "n_nodes": 7
+    },
+    {
+      "machine_key": "E7CCOP3060",
+      "name": "E7C COP 3060",
+      "brand": "Epiroc",
+      "brand_key": "epiroc",
+      "spellings": [
+        "E7C COP 3060"
+      ],
+      "parts": 14,
+      "nodes": [
+        "02 Перфоратор: механика (хвостовик/букса/боёк/аккумулятор/клапан)",
+        "01 Перфоратор: уплотнения/ремкомплекты"
+      ],
+      "n_nodes": 2
+    },
+    {
+      "machine_key": "E7CCOP4050",
+      "name": "E7C COP 4050",
+      "brand": "Epiroc",
+      "brand_key": "epiroc",
+      "spellings": [
+        "E7C COP 4050"
+      ],
+      "parts": 14,
+      "nodes": [
+        "02 Перфоратор: механика (хвостовик/букса/боёк/аккумулятор/клапан)",
+        "01 Перфоратор: уплотнения/ремкомплекты"
+      ],
+      "n_nodes": 2
+    },
+    {
+      "machine_key": "SPRAYMEC1050WPC",
+      "name": "Spraymec 1050 WPC",
+      "brand": "Normet",
+      "brand_key": "normet",
+      "spellings": [
+        "Spraymec 1050 WPC"
+      ],
+      "parts": 14,
+      "nodes": [
+        "05 Гидравлика",
+        "06 Фильтры",
+        "07 Двигатель",
+        "12 Прочее",
+        "04 Подшипники"
+      ],
+      "n_nodes": 5
+    },
+    {
+      "machine_key": "ТН320",
+      "name": "ТН 320",
+      "brand": "Sandvik Tamrock",
+      "brand_key": "sandviktamrock",
+      "spellings": [
+        "ТН 320"
+      ],
+      "parts": 12,
+      "nodes": [
+        "10 Электрика/датчики",
+        "12 Прочее",
+        "04 Подшипники",
+        "05 Гидравлика",
+        "08 Трансмиссия/мосты/тормоза"
+      ],
+      "n_nodes": 5
+    },
+    {
+      "machine_key": "CHARMEC1305",
+      "name": "Charmec 1305",
+      "brand": "Normet",
+      "brand_key": "normet",
+      "spellings": [
+        "Charmec 1305"
+      ],
+      "parts": 11,
+      "nodes": [
+        "06 Фильтры",
+        "05 Гидравлика",
+        "07 Двигатель",
+        "08 Трансмиссия/мосты/тормоза",
+        "04 Подшипники"
+      ],
+      "n_nodes": 5
+    },
+    {
+      "machine_key": "CS56B",
+      "name": "CS56B",
+      "brand": "Caterpillar",
+      "brand_key": "caterpillar",
+      "spellings": [
+        "CS56B"
+      ],
+      "parts": 9,
+      "nodes": [
+        "06 Фильтры"
+      ],
+      "n_nodes": 1
+    },
+    {
+      "machine_key": "CHARMEC1610BE",
+      "name": "Charmec 1610 BE",
+      "brand": "Normet",
+      "brand_key": "normet",
+      "spellings": [
+        "Charmec 1610 BE",
+        "Charmec 1610BE"
+      ],
+      "parts": 9,
+      "nodes": [
+        "05 Гидравлика",
+        "06 Фильтры",
+        "08 Трансмиссия/мосты/тормоза",
+        "12 Прочее"
+      ],
+      "n_nodes": 4
+    },
+    {
+      "machine_key": "UG20K",
+      "name": "UG20K",
+      "brand": "Caterpillar",
+      "brand_key": "caterpillar",
+      "spellings": [
+        "UG20K"
+      ],
+      "parts": 9,
+      "nodes": [
+        "06 Фильтры"
+      ],
+      "n_nodes": 1
+    },
+    {
+      "machine_key": "BOLTECMEPIROCCOPRR14",
+      "name": "Boltec M Epiroc COP RR14",
+      "brand": "Epiroc",
+      "brand_key": "epiroc",
+      "spellings": [
+        "Boltec M Epiroc COP RR14"
+      ],
+      "parts": 8,
+      "nodes": [
+        "02 Перфоратор: механика (хвостовик/букса/боёк/аккумулятор/клапан)",
+        "01 Перфоратор: уплотнения/ремкомплекты"
+      ],
+      "n_nodes": 2
+    },
+    {
+      "machine_key": "BOOMERS2COPMD20",
+      "name": "Boomer S2 COP MD 20+",
+      "brand": "Epiroc",
+      "brand_key": "epiroc",
+      "spellings": [
+        "Boomer S2 COP MD 20+"
+      ],
+      "parts": 8,
+      "nodes": [
+        "02 Перфоратор: механика (хвостовик/букса/боёк/аккумулятор/клапан)",
+        "01 Перфоратор: уплотнения/ремкомплекты"
+      ],
+      "n_nodes": 2
+    },
+    {
+      "machine_key": "R1600G",
+      "name": "R1600G",
+      "brand": "Caterpillar",
+      "brand_key": "caterpillar",
+      "spellings": [
+        "R1600G"
+      ],
+      "parts": 8,
+      "nodes": [
+        "06 Фильтры",
+        "03 РТИ/уплотнения (общие)",
+        "12 Прочее"
+      ],
+      "n_nodes": 3
+    },
+    {
+      "machine_key": "CHARMECMF504DV",
+      "name": "Charmec MF504 D (V",
+      "brand": "Normet",
+      "brand_key": "normet",
+      "spellings": [
+        "Charmec MF504 D (V"
+      ],
+      "parts": 7,
+      "nodes": [
+        "05 Гидравлика",
+        "12 Прочее",
+        "06 Фильтры",
+        "04 Подшипники"
+      ],
+      "n_nodes": 4
+    },
+    {
+      "machine_key": "M2DCOP2238HD",
+      "name": "M2D COP 2238 HD+",
+      "brand": "Epiroc",
+      "brand_key": "epiroc",
+      "spellings": [
+        "M2D COP 2238 HD+"
+      ],
+      "parts": 7,
+      "nodes": [
+        "02 Перфоратор: механика (хвостовик/букса/боёк/аккумулятор/клапан)",
+        "01 Перфоратор: уплотнения/ремкомплекты"
+      ],
+      "n_nodes": 2
+    },
+    {
+      "machine_key": "UTIMECLF404CABLE",
+      "name": "Utimec LF404 CABLE",
+      "brand": "Normet",
+      "brand_key": "normet",
+      "spellings": [
+        "Utimec LF404 CABLE"
+      ],
+      "parts": 6,
+      "nodes": [
+        "05 Гидравлика",
+        "07 Двигатель",
+        "04 Подшипники"
+      ],
+      "n_nodes": 3
+    },
+    {
+      "machine_key": "WJ6",
+      "name": "WJ6",
+      "brand": "Sandvik Tamrock",
+      "brand_key": "sandviktamrock",
+      "spellings": [
+        "WJ6"
+      ],
+      "parts": 6,
+      "nodes": [
+        "06 Фильтры",
+        "07 Двигатель"
+      ],
+      "n_nodes": 2
+    },
+    {
+      "machine_key": "BOLTECMEPIROCCOP1028",
+      "name": "Boltec M Epiroc COP 1028",
+      "brand": "Epiroc",
+      "brand_key": "epiroc",
+      "spellings": [
+        "Boltec M Epiroc COP 1028"
+      ],
+      "parts": 5,
+      "nodes": [
+        "02 Перфоратор: механика (хвостовик/букса/боёк/аккумулятор/клапан)"
+      ],
+      "n_nodes": 1
+    },
+    {
+      "machine_key": "SIMBAM6COLD",
+      "name": "Simba M6C (old",
+      "brand": "Atlas Copco",
+      "brand_key": "atlascopco",
+      "spellings": [
+        "Simba M6C (old"
+      ],
+      "parts": 4,
+      "nodes": [
+        "06 Фильтры",
+        "04 Подшипники",
+        "05 Гидравлика",
+        "02 Перфоратор: механика (хвостовик/букса/боёк/аккумулятор/клапан)"
+      ],
+      "n_nodes": 4
+    },
+    {
+      "machine_key": "R1600H",
+      "name": "R1600H",
+      "brand": "Caterpillar",
+      "brand_key": "caterpillar",
+      "spellings": [
+        "R1600H"
+      ],
+      "parts": 3,
+      "nodes": [
+        "06 Фильтры",
+        "07 Двигатель"
+      ],
+      "n_nodes": 2
+    },
+    {
+      "machine_key": "514",
+      "name": "514",
+      "brand": "Epiroc",
+      "brand_key": "epiroc",
+      "spellings": [
+        "514"
+      ],
+      "parts": 2,
+      "nodes": [
+        "06 Фильтры"
+      ],
+      "n_nodes": 1
+    },
+    {
+      "machine_key": "BOLTECMCOP1028",
+      "name": "Boltec M COP 1028",
+      "brand": "Epiroc",
+      "brand_key": "epiroc",
+      "spellings": [
+        "Boltec M COP 1028"
+      ],
+      "parts": 2,
+      "nodes": [
+        "02 Перфоратор: механика (хвостовик/букса/боёк/аккумулятор/клапан)",
+        "01 Перфоратор: уплотнения/ремкомплекты"
+      ],
+      "n_nodes": 2
+    },
+    {
+      "machine_key": "E7C",
+      "name": "E7C",
+      "brand": "Epiroc",
+      "brand_key": "epiroc",
+      "spellings": [
+        "E7C"
+      ],
+      "parts": 2,
+      "nodes": [
+        "02 Перфоратор: механика (хвостовик/букса/боёк/аккумулятор/клапан)",
+        "05 Гидравлика"
+      ],
+      "n_nodes": 2
+    },
+    {
+      "machine_key": "PAUSUNI504",
+      "name": "PAUS UNI 50-4",
+      "brand": "Epiroc",
+      "brand_key": "epiroc",
+      "spellings": [
+        "PAUS UNI 50-4"
+      ],
+      "parts": 2,
+      "nodes": [
+        "06 Фильтры"
+      ],
+      "n_nodes": 1
+    },
+    {
+      "machine_key": "SIMBAE7C513",
+      "name": "Simba E7C 513",
+      "brand": "Epiroc",
+      "brand_key": "epiroc",
+      "spellings": [
+        "Simba E7C 513"
+      ],
+      "parts": 2,
+      "nodes": [
+        "06 Фильтры"
+      ],
+      "n_nodes": 1
+    },
+    {
+      "machine_key": "503",
+      "name": "50-3",
+      "brand": "Epiroc",
+      "brand_key": "epiroc",
+      "spellings": [
+        "50-3"
+      ],
+      "parts": 1,
+      "nodes": [
+        "06 Фильтры"
+      ],
+      "n_nodes": 1
+    },
+    {
+      "machine_key": "CHARMECMF504DVHIMECLF905",
+      "name": "Charmec MF504 D (V) Himec LF 905",
+      "brand": "Normet",
+      "brand_key": "normet",
+      "spellings": [
+        "Charmec MF504 D (V) Himec LF 905"
+      ],
+      "parts": 1,
+      "nodes": [
+        "05 Гидравлика"
+      ],
+      "n_nodes": 1
+    },
+    {
+      "machine_key": "HENCONLIBERATORCHARGER",
+      "name": "Hencon Liberator Charger",
+      "brand": "Epiroc",
+      "brand_key": "epiroc",
+      "spellings": [
+        "Hencon Liberator Charger"
+      ],
+      "parts": 1,
+      "nodes": [
+        "06 Фильтры"
+      ],
+      "n_nodes": 1
+    },
+    {
+      "machine_key": "M2D",
+      "name": "M2D",
+      "brand": "Epiroc",
+      "brand_key": "epiroc",
+      "spellings": [
+        "M2D"
+      ],
+      "parts": 1,
+      "nodes": [
+        "02 Перфоратор: механика (хвостовик/букса/боёк/аккумулятор/клапан)"
+      ],
+      "n_nodes": 1
+    },
+    {
+      "machine_key": "PAUSUNI503BSE",
+      "name": "PAUS UNI 50-3 BS-E",
+      "brand": "Epiroc",
+      "brand_key": "epiroc",
+      "spellings": [
+        "PAUS UNI 50-3 BS-E"
+      ],
+      "parts": 1,
+      "nodes": [
+        "06 Фильтры"
+      ],
+      "n_nodes": 1
+    },
+    {
+      "machine_key": "PAUSUNI505SV",
+      "name": "PAUS UNI 50-5 SV",
+      "brand": "Epiroc",
+      "brand_key": "epiroc",
+      "spellings": [
+        "PAUS UNI 50-5 SV"
+      ],
+      "parts": 1,
+      "nodes": [
+        "06 Фильтры"
+      ],
+      "n_nodes": 1
+    },
+    {
+      "machine_key": "ST14OLD",
+      "name": "ST14 (old",
+      "brand": "Epiroc",
+      "brand_key": "epiroc",
+      "spellings": [
+        "ST14 (old"
+      ],
+      "parts": 1,
+      "nodes": [
+        "12 Прочее"
+      ],
+      "n_nodes": 1
+    },
+    {
+      "machine_key": "SIMBAE7C4050MUX",
+      "name": "Simba E7C 4050 MUX",
+      "brand": "Epiroc",
+      "brand_key": "epiroc",
+      "spellings": [
+        "Simba E7C 4050 MUX"
+      ],
+      "parts": 1,
+      "nodes": [
+        "01 Перфоратор: уплотнения/ремкомплекты"
+      ],
+      "n_nodes": 1
+    },
+    {
+      "machine_key": "SIMBAL6COLD",
+      "name": "Simba L6C (old",
+      "brand": "Atlas Copco",
+      "brand_key": "atlascopco",
+      "spellings": [
+        "Simba L6C (old"
+      ],
+      "parts": 1,
+      "nodes": [
+        "04 Подшипники"
+      ],
+      "n_nodes": 1
+    },
+    {
+      "machine_key": "SIMBAM7COLD",
+      "name": "Simba M7C (old",
+      "brand": "Atlas Copco",
+      "brand_key": "atlascopco",
+      "spellings": [
+        "Simba M7C (old"
+      ],
+      "parts": 1,
+      "nodes": [
+        "04 Подшипники"
+      ],
+      "n_nodes": 1
+    },
+    {
+      "machine_key": "SPRAYMEC050VC",
+      "name": "Spraymec 050VC",
+      "brand": "Normet",
+      "brand_key": "normet",
+      "spellings": [
+        "Spraymec 050VC"
+      ],
+      "parts": 1,
+      "nodes": [
+        "05 Гидравлика"
+      ],
+      "n_nodes": 1
+    },
+    {
+      "machine_key": "TRANSMIXERLF600",
+      "name": "Transmixer LF 600",
+      "brand": "Deutz",
+      "brand_key": "deutz",
+      "spellings": [
+        "Transmixer LF 600"
+      ],
+      "parts": 1,
+      "nodes": [
+        "07 Двигатель"
+      ],
+      "n_nodes": 1
+    },
+    {
+      "machine_key": "UTILIFT1905BHD",
+      "name": "Utilift 1905B HD",
+      "brand": "Normet",
+      "brand_key": "normet",
+      "spellings": [
+        "Utilift 1905B HD"
+      ],
+      "parts": 1,
+      "nodes": [
+        "03 РТИ/уплотнения (общие)"
+      ],
+      "n_nodes": 1
+    },
+    {
+      "machine_key": "UTIMEC1000MATERIALHD",
+      "name": "Utimec 1000 Material HD",
+      "brand": "Normet",
+      "brand_key": "normet",
+      "spellings": [
+        "Utimec 1000 Material HD"
+      ],
+      "parts": 1,
+      "nodes": [
+        "07 Двигатель"
+      ],
+      "n_nodes": 1
+    },
+    {
+      "machine_key": "UTIMECLF130",
+      "name": "Utimec LF130",
+      "brand": "Normet",
+      "brand_key": "normet",
+      "spellings": [
+        "Utimec LF130"
+      ],
+      "parts": 1,
+      "nodes": [
+        "07 Двигатель"
+      ],
+      "n_nodes": 1
+    },
+    {
+      "machine_key": "WJ6А",
+      "name": "WJ6А",
+      "brand": "Sandvik Tamrock",
+      "brand_key": "sandviktamrock",
+      "spellings": [
+        "WJ6А"
+      ],
+      "parts": 1,
+      "nodes": [
+        "06 Фильтры"
+      ],
+      "n_nodes": 1
+    },
+    {
+      "machine_key": "АВТОБЕТОНОСМЕСИТЕЛЬМАЙНТЕХНИК",
+      "name": "Автобетоносмеситель - майнтехник",
+      "brand": "Normet",
+      "brand_key": "normet",
+      "spellings": [
+        "Автобетоносмеситель - майнтехник"
+      ],
+      "parts": 1,
+      "nodes": [
+        "06 Фильтры"
+      ],
+      "n_nodes": 1
+    },
+    {
+      "machine_key": "МТ42",
+      "name": "МТ42",
+      "brand": "Epiroc",
+      "brand_key": "epiroc",
+      "spellings": [
+        "МТ42"
+      ],
+      "parts": 1,
+      "nodes": [
+        "06 Фильтры"
+      ],
+      "n_nodes": 1
+    }
+  ]
+}
