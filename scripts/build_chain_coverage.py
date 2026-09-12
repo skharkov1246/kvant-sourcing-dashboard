@@ -280,6 +280,35 @@ def counts() -> dict:
             put(seg, "symptom", len(ok), "dict/symptom.json")
             put(seg, "symptom", len(s_set[seg]["draft"] - ok), "dict/symptom.json", draft=True)
 
+    # ── ремонтные решения и исполнители (разведка 12.09.2026).
+    # Технологии восстановления — наплавка, механическая обработка, обратное
+    # проектирование — машинно-независимы: одна и та же расточка постели
+    # подшипника нужна и турбине, и насосу, и электродвигателю. Поэтому идут во
+    # все направления, КРОМЕ КИПиА: датчик давления не наплавляют.
+    rp = load("zip/data/repair_recon.json", {})
+    if rp.get("tech_angles"):
+        CHECKED = {"подтверждено", "частично"}
+        tech = [t for a in rp["tech_angles"] for t in a["technologies"]]
+        ok = [t for t in tech if t["verdict"]["verdict"] in CHECKED]
+        draft = [t for t in tech if t["verdict"]["verdict"] not in CHECKED
+                 and t["verdict"]["verdict"] != "опровергнуто"]
+        for seg in ("gtu", "gpu", "gsho", "recip", "pumps", "electro"):
+            put(seg, "repair", len(ok), "zip/data/repair_recon.json")
+            put(seg, "repair", len(draft), "zip/data/repair_recon.json", draft=True)
+        # Исполнители привязаны к направлению углом разведки, а не общим фондом:
+        # кто чинит насос и кто перематывает статор — разные заводы. Карточки,
+        # где сама разведка написала «по вращающимся машинам НЕ исполнитель»,
+        # в звено не идут: это отрицательный вывод, а не запись об исполнителе.
+        CONTR_SEG = {"ru_pumps": ["pumps"], "ru_compressors": ["recip", "gtu"],
+                     "ru_electro": ["electro"]}
+        import re as _re
+        for a in rp["contractor_angles"]:
+            good = [c for c in a["contractors"]
+                    if not _re.search(r"НЕ исполнитель", str(c.get("kind") or ""), _re.I)]
+            for seg in CONTR_SEG.get(a["key"], []):
+                put(seg, "contractor", 0, "zip/data/repair_recon.json")
+                put(seg, "contractor", len(good), "zip/data/repair_recon.json", draft=True)
+
     # ── изготовители: уникальные компании по каждому направлению.
     # Атлас разведки лежит одним файлом на все направления, поэтому подмешивается
     # ПОСЛЕ и по тому же ключу компании: иначе один завод, попавший и в реестр
@@ -290,20 +319,58 @@ def counts() -> dict:
         k = nkey(m.get("name"))
         if k:
             atlas_keys.setdefault(m.get("segment"), set()).add(k)
+
+    # Разведка по насосам, КИПиА и электротехнике: в звено «изготовитель» идут
+    # только те, кто делает. Трейдер, дистрибьютор, институт и ассоциация —
+    # не изготовители, и подмешивать их значит завысить звено вдвое.
+    import re as _re2
+    MAKES = _re2.compile(r"oem|изготовител|завод", _re2.I)
+    NOT_MAKES = _re2.compile(r"трейдер|дистрибьютор|ассоциац|институт|витрин", _re2.I)
+    dirs = load("zip/data/dirs_recon.json", {})
+    dirs_src = {}
+    for a in dirs.get("angles", []):
+        for comp_rec in a.get("companies", []):
+            kind = str(comp_rec.get("kind") or "")
+            if not MAKES.search(kind) or NOT_MAKES.search(kind):
+                continue
+            k = nkey(comp_rec.get("name"))
+            if k:
+                atlas_keys.setdefault(a["segment"], set()).add(k)
+                dirs_src[a["segment"]] = "zip/data/dirs_recon.json"
+
+    # Цепочки субпоставщиков: изготовитель первого и второго уровня — это
+    # ровно то, кого мы ищем за маркой на шильдике.
+    subs = load("zip/data/subsupplier_recon.json", {})
+    subs_src = {}
+    for sg in subs.get("segments", []):
+        for ch in sg.get("chains", []):
+            for who in (ch.get("tier1"), ch.get("tier2")):
+                k = nkey(who)
+                if k and len(k) > 2:
+                    atlas_keys.setdefault(sg["segment"], set()).add(k)
+                    subs_src[sg["segment"]] = "zip/data/subsupplier_recon.json"
     if atlas_keys.get("recip") and c["recip"]["maker"]["n"]:
         rc2 = load("zip/data/recip_recon.json", {})
         comp = {nkey(x.get("name")) for a in rc2.get("angles", [])
                 for x in a.get("companies", []) if x.get("name")}
         comp.discard("")
         comp |= atlas_keys["recip"]
+        comp.discard("")
         c["recip"]["maker"]["n"] = len(comp)
         c["recip"]["maker"]["src"] = ["zip/data/recip_recon.json", "zip/data/oem_atlas.json"]
-    for seg in ("gtu", "gpu", "gsho"):
+    for seg in ("gtu", "gpu", "gsho", "pumps", "instrum", "electro"):
         keys, srcs = unique_makers(seg, lambda rel: load(rel))
         extra = atlas_keys.get(seg, set())
         if extra:
             keys |= extra
-            srcs = srcs + ["zip/data/oem_atlas.json"]
+            if any(m.get("segment") == seg for m in atlas.get("makers", [])):
+                srcs = srcs + ["zip/data/oem_atlas.json"]
+            if dirs_src.get(seg):
+                srcs = srcs + [dirs_src[seg]]
+            if subs_src.get(seg):
+                srcs = srcs + [subs_src[seg]]
+        if not keys:
+            continue
         for src in srcs:
             put(seg, "maker", 0, src)
         c[seg]["maker"]["n"] = len(keys)

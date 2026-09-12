@@ -142,6 +142,14 @@ def build():
     (OUT / "vendor").mkdir(exist_ok=True)
     shutil.copy2(SITE / "vendor" / "supabase.js", OUT / "vendor" / "supabase.js")
 
+    # разборы разведок: наборы данных для страниц и для счётчика цепочки.
+    # Журнал разведки лежит вне репозитория, поэтому шаг необязательный:
+    # нет журнала — наборы остаются как есть, сборка не падает.
+    try:
+        subprocess.run([sys.executable, str(ROOT / "tools" / "extract_recon.py")], check=True)
+    except Exception as ex:
+        print(f"разборы разведок: пропущены ({ex})")
+
     # индекс «признак → дефект»: производная проекция каталога дефектов.
     # Собирается ДО страниц: и страница диагностики, и счётчик цепочки её читают.
     try:
@@ -153,7 +161,7 @@ def build():
     # страницы-разведки: собираются из тех же данных zip/data, но своим сборщиком.
     # Каждая — самодостаточный HTML рядом с индексом; падение одной не роняет деплой.
     for mod in ("build_telsmith_page", "build_audit_page", "build_recip_page", "build_diag_page",
-                "build_oem_page"):
+                "build_oem_page", "build_recon_pages"):
         try:
             subprocess.run([sys.executable, str(ROOT / "tools" / f"{mod}.py")], check=True)
         except Exception as ex:

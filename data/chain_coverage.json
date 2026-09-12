@@ -113,10 +113,13 @@
           "link": "maker",
           "title": "Изготовитель",
           "what": "кто делает деталь, помимо владельца конструкции",
-          "n": 0,
+          "n": 107,
           "draft": 0,
-          "sources": [],
-          "state": "пусто"
+          "sources": [
+            "zip/data/dirs_recon.json",
+            "zip/data/subsupplier_recon.json"
+          ],
+          "state": "есть"
         },
         {
           "link": "contractor",
@@ -128,9 +131,9 @@
           "state": "пусто"
         }
       ],
-      "filled": 0,
+      "filled": 1,
       "of": 8,
-      "pct": 0
+      "pct": 12
     },
     {
       "segment": "electro",
@@ -180,10 +183,12 @@
           "link": "repair",
           "title": "Ремонтное решение",
           "what": "чем восстанавливают, границы применимости",
-          "n": 0,
-          "draft": 0,
-          "sources": [],
-          "state": "пусто"
+          "n": 13,
+          "draft": 25,
+          "sources": [
+            "zip/data/repair_recon.json"
+          ],
+          "state": "есть"
         },
         {
           "link": "part",
@@ -198,24 +203,29 @@
           "link": "maker",
           "title": "Изготовитель",
           "what": "кто делает деталь, помимо владельца конструкции",
-          "n": 0,
+          "n": 80,
           "draft": 0,
-          "sources": [],
-          "state": "пусто"
+          "sources": [
+            "zip/data/dirs_recon.json",
+            "zip/data/subsupplier_recon.json"
+          ],
+          "state": "есть"
         },
         {
           "link": "contractor",
           "title": "Исполнитель",
           "what": "кому отдать работы по ремонту",
           "n": 0,
-          "draft": 0,
-          "sources": [],
-          "state": "пусто"
+          "draft": 9,
+          "sources": [
+            "zip/data/repair_recon.json"
+          ],
+          "state": "черновик"
         }
       ],
-      "filled": 0,
+      "filled": 2,
       "of": 8,
-      "pct": 0
+      "pct": 25
     },
     {
       "segment": "pumps",
@@ -265,10 +275,12 @@
           "link": "repair",
           "title": "Ремонтное решение",
           "what": "чем восстанавливают, границы применимости",
-          "n": 0,
-          "draft": 0,
-          "sources": [],
-          "state": "пусто"
+          "n": 13,
+          "draft": 25,
+          "sources": [
+            "zip/data/repair_recon.json"
+          ],
+          "state": "есть"
         },
         {
           "link": "part",
@@ -283,24 +295,29 @@
           "link": "maker",
           "title": "Изготовитель",
           "what": "кто делает деталь, помимо владельца конструкции",
-          "n": 0,
+          "n": 93,
           "draft": 0,
-          "sources": [],
-          "state": "пусто"
+          "sources": [
+            "zip/data/dirs_recon.json",
+            "zip/data/subsupplier_recon.json"
+          ],
+          "state": "есть"
         },
         {
           "link": "contractor",
           "title": "Исполнитель",
           "what": "кому отдать работы по ремонту",
           "n": 0,
-          "draft": 0,
-          "sources": [],
-          "state": "пусто"
+          "draft": 20,
+          "sources": [
+            "zip/data/repair_recon.json"
+          ],
+          "state": "черновик"
         }
       ],
-      "filled": 2,
+      "filled": 4,
       "of": 8,
-      "pct": 25
+      "pct": 50
     },
     {
       "segment": "gtu",
@@ -355,10 +372,12 @@
           "link": "repair",
           "title": "Ремонтное решение",
           "what": "чем восстанавливают, границы применимости",
-          "n": 0,
-          "draft": 0,
-          "sources": [],
-          "state": "пусто"
+          "n": 13,
+          "draft": 25,
+          "sources": [
+            "zip/data/repair_recon.json"
+          ],
+          "state": "есть"
         },
         {
           "link": "part",
@@ -377,7 +396,7 @@
           "link": "maker",
           "title": "Изготовитель",
           "what": "кто делает деталь, помимо владельца конструкции",
-          "n": 1656,
+          "n": 1708,
           "draft": 0,
           "sources": [
             "gt/data/suppliers.json",
@@ -388,7 +407,8 @@
             "gt/data/dossiers.json",
             "gt/data/site_profiles.json",
             "gt/data/bitrix_supplier_sites.json",
-            "zip/data/oem_atlas.json"
+            "zip/data/oem_atlas.json",
+            "zip/data/subsupplier_recon.json"
           ],
           "state": "есть"
         },
@@ -397,14 +417,16 @@
           "title": "Исполнитель",
           "what": "кому отдать работы по ремонту",
           "n": 0,
-          "draft": 0,
-          "sources": [],
-          "state": "пусто"
+          "draft": 24,
+          "sources": [
+            "zip/data/repair_recon.json"
+          ],
+          "state": "черновик"
         }
       ],
-      "filled": 6,
+      "filled": 7,
       "of": 8,
-      "pct": 75
+      "pct": 88
     },
     {
       "segment": "gpu",
@@ -458,10 +480,12 @@
           "link": "repair",
           "title": "Ремонтное решение",
           "what": "чем восстанавливают, границы применимости",
-          "n": 0,
-          "draft": 0,
-          "sources": [],
-          "state": "пусто"
+          "n": 13,
+          "draft": 25,
+          "sources": [
+            "zip/data/repair_recon.json"
+          ],
+          "state": "есть"
         },
         {
           "link": "part",
@@ -480,12 +504,13 @@
           "link": "maker",
           "title": "Изготовитель",
           "what": "кто делает деталь, помимо владельца конструкции",
-          "n": 101,
+          "n": 149,
           "draft": 0,
           "sources": [
             "gpu/data/suppliers.json",
             "gpu/data/subsuppliers.json",
-            "zip/data/oem_atlas.json"
+            "zip/data/oem_atlas.json",
+            "zip/data/subsupplier_recon.json"
           ],
           "state": "есть"
         },
@@ -499,9 +524,9 @@
           "state": "пусто"
         }
       ],
-      "filled": 6,
+      "filled": 7,
       "of": 8,
-      "pct": 75
+      "pct": 88
     },
     {
       "segment": "gsho",
@@ -556,10 +581,11 @@
           "link": "repair",
           "title": "Ремонтное решение",
           "what": "чем восстанавливают, границы применимости",
-          "n": 7,
-          "draft": 0,
+          "n": 20,
+          "draft": 25,
           "sources": [
-            "zip/data/material_strategy.json"
+            "zip/data/material_strategy.json",
+            "zip/data/repair_recon.json"
           ],
           "state": "есть"
         },
@@ -580,13 +606,14 @@
           "link": "maker",
           "title": "Изготовитель",
           "what": "кто делает деталь, помимо владельца конструкции",
-          "n": 1178,
+          "n": 1200,
           "draft": 0,
           "sources": [
             "zip/data/odm_suppliers.json",
             "zip/data/telsmith_suppliers.json",
             "zip/data/supplier_crm.json",
-            "zip/data/oem_atlas.json"
+            "zip/data/oem_atlas.json",
+            "zip/data/subsupplier_recon.json"
           ],
           "state": "есть"
         },
@@ -656,10 +683,11 @@
           "link": "repair",
           "title": "Ремонтное решение",
           "what": "чем восстанавливают, границы применимости",
-          "n": 23,
-          "draft": 0,
+          "n": 36,
+          "draft": 25,
           "sources": [
-            "zip/data/recip_recon.json"
+            "zip/data/recip_recon.json",
+            "zip/data/repair_recon.json"
           ],
           "state": "есть"
         },
@@ -678,7 +706,7 @@
           "link": "maker",
           "title": "Изготовитель",
           "what": "кто делает деталь, помимо владельца конструкции",
-          "n": 191,
+          "n": 216,
           "draft": 0,
           "sources": [
             "zip/data/recip_recon.json",
@@ -691,9 +719,11 @@
           "title": "Исполнитель",
           "what": "кому отдать работы по ремонту",
           "n": 0,
-          "draft": 0,
-          "sources": [],
-          "state": "пусто"
+          "draft": 24,
+          "sources": [
+            "zip/data/repair_recon.json"
+          ],
+          "state": "черновик"
         }
       ],
       "filled": 7,
@@ -701,13 +731,7 @@
       "pct": 88
     }
   ],
-  "empty_everywhere": [
-    {
-      "link": "contractor",
-      "title": "Исполнитель",
-      "what": "кому отдать работы по ремонту"
-    }
-  ],
+  "empty_everywhere": [],
   "common": {
     "chain_edges": 285,
     "chain_makers": 247,
@@ -719,11 +743,11 @@
   "summary": {
     "segments": 7,
     "links": 8,
-    "cells_filled": 28,
-    "cells_draft_only": 4,
-    "cells_with_draft": 14,
-    "draft_rows": 754,
+    "cells_filled": 35,
+    "cells_draft_only": 8,
+    "cells_with_draft": 24,
+    "draft_rows": 981,
     "cells_total": 56,
-    "links_not_started": 1
+    "links_not_started": 0
   }
 }

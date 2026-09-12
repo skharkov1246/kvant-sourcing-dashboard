@@ -450,3 +450,67 @@ def test_oem_atlas_declares_its_own_incompleteness():
             f"в ключ страны попал свободный текст: {m['country']}"
         # Исходное значение сохраняется целиком: в нём адрес завода, он нужнее ключа.
         assert m["country_raw"], f"{m['name']}: потеряно исходное значение страны"
+
+
+def test_recon_batch_verdicts_are_explicit():
+    """Три разведки 12.09.2026: у каждой записи вердикт, и он не приукрашивает.
+
+    По этим наборам будут заказывать детали и отдавать работы подрядчикам.
+    Запись без вердикта читалась бы как проверенная, поэтому «угол без скептика»
+    существует отдельным значением и обязано стоять там, где скептика не было:
+    из тридцати шести скептиков этих трёх разведок отработали пять."""
+    ALLOWED = {"подтверждено", "частично", "опровергнуто", "непроверяемо",
+               "скептик не сослался", "угол без скептика"}
+
+    dirs = json.loads((ROOT / "zip" / "data" / "dirs_recon.json").read_text(encoding="utf-8"))
+    items = [x for a in dirs["angles"] for x in a["findings"] + a["companies"]]
+    assert items, "набор пуст"
+    assert all(x["verdict"]["verdict"] == "угол без скептика" for x in items), \
+        "по насосам, КИПиА и электротехнике скептик не отработал ни по одному углу — " \
+        "любой другой вердикт означает, что проверка приписана задним числом"
+    assert dirs["stats"]["with_skeptic"] == 0
+
+    rep = json.loads((ROOT / "zip" / "data" / "repair_recon.json").read_text(encoding="utf-8"))
+    tech = [t for a in rep["tech_angles"] for t in a["technologies"]]
+    cont = [c for a in rep["contractor_angles"] for c in a["contractors"]]
+    assert len(tech) >= 40 and len(cont) >= 50
+    for x in tech + cont:
+        assert x["verdict"]["verdict"] in ALLOWED
+    # Исполнители скептика не получили — все до одного.
+    assert all(c["verdict"]["verdict"] == "угол без скептика" for c in cont)
+    # Проверенные утверждения угла не выбрасываются: потерянная проверка хуже
+    # отсутствующей, потому что о ней никто не узнает.
+    claims = [v for a in rep["tech_angles"] if a["skeptic"]
+              for v in a["skeptic"]["checked_claims"]]
+    assert len(claims) == rep["stats"]["checked_claims"] > 50
+    assert all(v["verdict"] in ALLOWED and v["claim"] for v in claims)
+
+    subs = json.loads((ROOT / "zip" / "data" / "subsupplier_recon.json").read_text(encoding="utf-8"))
+    assert subs["stats"]["chains"] >= 100 and subs["stats"]["rules"] >= 70
+    for sg in subs["segments"]:
+        for x in sg["chains"] + sg["rules"]:
+            assert x["verdict"]["verdict"] in ALLOWED
+        # Направление со скептиком не может целиком остаться «углом без скептика»
+        # и наоборот: это означало бы, что привязка вердиктов развалилась.
+        if sg["skeptic"]:
+            assert any(x["verdict"]["verdict"] != "угол без скептика" for x in sg["rules"])
+        else:
+            assert all(x["verdict"]["verdict"] == "угол без скептика"
+                       for x in sg["chains"] + sg["rules"])
+    # Правило чтения номера без указания, где оно ломается, — приглашение
+    # ошибиться в закупке: именно на границе правила и рождается не та деталь.
+    rules = [r for sg in subs["segments"] for r in sg["rules"]]
+    assert sum(1 for r in rules if (r.get("breaks") or "").strip()) >= len(rules) * 0.9
+
+
+def test_every_chain_link_started_somewhere():
+    """Ни одно звено цепочки не пусто во всех направлениях сразу.
+
+    12.09.2026 таких звеньев было три: признак, дефект, исполнитель. Тест
+    удерживает достигнутое: если звено снова опустеет везде, это регрессия
+    данных, и увидеть её надо на гейте, а не через месяц на портале."""
+    cov = json.loads((ROOT / "data" / "chain_coverage.json").read_text(encoding="utf-8"))
+    assert cov["empty_everywhere"] == [], \
+        "звено пусто во всех направлениях: " + \
+        ", ".join(x["title"] for x in cov["empty_everywhere"])
+    assert cov["summary"]["links_not_started"] == 0
