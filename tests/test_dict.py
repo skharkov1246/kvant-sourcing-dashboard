@@ -190,3 +190,38 @@ def test_gsho_machine_registry():
     # означает, что она попала в реестр из мусорного значения поля.
     assert all(m["parts"] > 0 for m in d["machines"])
 
+
+def test_machine_registry_does_not_inflate():
+    """Реестр машин не подмешивает к машинам неразобранное.
+
+    Поле mach базы PN содержит не только машины: туда попали детали
+    («Уплотнение кольцевое»), корзины бренда («Solar (сток)») и машины совсем
+    других сегментов. Подмешать их к турбинам значит завысить заполняемость
+    цепочки — а по ней выбирается следующая работа."""
+    m = json.loads((DICT / "machine.json").read_text(encoding="utf-8"))
+    kinds = {r["kind"] for r in m["records"]}
+    assert kinds <= {"turbine", "other_machine", "mining_machine"}, \
+        f"в реестр попал неразобранный вид: {kinds}"
+    # Виды part, bucket и unknown обязаны быть посчитаны, но НЕ попасть в записи.
+    for bad in ("part", "bucket", "unknown"):
+        assert m["pn_db_kinds"].get(bad, 0) > 0, f"вид {bad} перестал считаться — проверьте классификатор"
+    keys = [r["machine_key"] for r in m["records"]]
+    assert len(keys) == len(set(keys))
+
+
+def test_machine_classifier_catches_flagship_models():
+    """Классификатор обязан ловить самые массовые машины базы.
+
+    Замыкающий \\b в семействах ломал правило молча: в LM2500 граница слова
+    после «LM2» не наступает, и самая массовая машина базы — 3664 позиции —
+    проваливалась в «не определено»."""
+    m = _load_builder()
+    for name in ("LM2500", "LM6000", "GE Frame 6B", "RB211-535", "SGT-400",
+                 "Taurus 60S", "Centaur 50 (по документу)", "GE LMS100"):
+        kind, _stem = m.mach_kind(name)
+        assert kind == "turbine", f"{name} не опознана как турбина, а как {kind}"
+    for name in ("Уплотнение кольцевое", "Шкаф управления PMS МЛСК Ф-1"):
+        assert m.mach_kind(name)[0] == "part", f"{name} принята за машину"
+    assert m.mach_kind("Solar (сток)")[0] == "bucket"
+    assert m.mach_kind("Буровой насос 12T1600")[0] == "other_machine"
+

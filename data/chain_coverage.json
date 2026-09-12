@@ -345,9 +345,10 @@
           "link": "machine",
           "title": "Машина",
           "what": "модель опознаётся и описана",
-          "n": 27,
+          "n": 107,
           "sources": [
-            "gt/data/models.json"
+            "gt/data/models.json",
+            "dict/machine.json"
           ],
           "state": "есть"
         },
@@ -613,7 +614,10 @@
   "common": {
     "chain_edges": 285,
     "chain_makers": 247,
-    "oem_keys": 277
+    "oem_keys": 277,
+    "machines_total": 208,
+    "machines_foreign_segment": 52,
+    "machines_foreign_note": "Машины, найденные внутри базы ГТУ, но относящиеся к направлению, которого у нас нет: буровое и нефтепромысловое оборудование — насосы, превенторы, цементировочные агрегаты, верхние приводы. Кандидат в новое направление портала."
   },
   "summary": {
     "segments": 7,

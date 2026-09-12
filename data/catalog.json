@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 189,
-    "total_bytes": 91514811,
+    "total_bytes": 91515542,
     "by_sensitivity": {
       "конфиденциально": 57,
       "внутреннее": 99,
@@ -5600,10 +5600,10 @@
           "spellings"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-12",
+      "last_author": "Claude",
+      "last_commit": "7a56c95",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -6019,42 +6019,9 @@
       ]
     },
     {
-      "path": "ove/data/eco_prelim.json",
-      "subproject": "ОВЭ-75",
-      "bytes": 28621,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "note",
-        "sections",
-        "updated"
-      ],
-      "main_collection": {
-        "key": "sections",
-        "records": 4,
-        "record_keys": [
-          "items",
-          "note",
-          "title"
-        ]
-      },
-      "last_change": "2026-08-28",
-      "last_author": "skharkov1246",
-      "last_commit": "c112683",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "ove/build.py"
-      ]
-    },
-    {
       "path": "data/catalog_notes.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 28550,
+      "bytes": 28733,
       "note": "",
       "format": "json",
       "shape": "объект",
@@ -6102,7 +6069,7 @@
       ],
       "last_change": "2026-09-12",
       "last_author": "Claude",
-      "last_commit": "1210697",
+      "last_commit": "7a56c95",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -6110,6 +6077,39 @@
       },
       "referenced_by": [
         "scripts/build_catalog.py"
+      ]
+    },
+    {
+      "path": "ove/data/eco_prelim.json",
+      "subproject": "ОВЭ-75",
+      "bytes": 28621,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "note",
+        "sections",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "sections",
+        "records": 4,
+        "record_keys": [
+          "items",
+          "note",
+          "title"
+        ]
+      },
+      "last_change": "2026-08-28",
+      "last_author": "skharkov1246",
+      "last_commit": "c112683",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "ove/build.py"
       ]
     },
     {
@@ -6510,6 +6510,45 @@
       ]
     },
     {
+      "path": "data/chain_coverage.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 19711,
+      "note": "Заполняемость цепочки портала по семи направлениям и восьми звеньям: машина → узел → признак → дефект → ремонтное решение → запчасть → изготовитель → исполнитель. Производный файл, считается scripts/build_chain_coverage.py по фактическим файлам репозитория; ноль означает отсутствие данных, а не то, что они где-то есть. Руками не заполнять. Первый прогон 12.09.2026: 13 клеток из 56, звенья «Признак», «Дефект» и «Исполнитель» не начаты ни по одному направлению.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "common",
+        "empty_everywhere",
+        "goal",
+        "links",
+        "note",
+        "priority_rule",
+        "segments",
+        "summary"
+      ],
+      "main_collection": {
+        "key": "links",
+        "records": 8,
+        "record_keys": [
+          "link",
+          "title",
+          "what"
+        ]
+      },
+      "last_change": "2026-09-12",
+      "last_author": "Claude",
+      "last_commit": "7a56c95",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "scripts/build_chain_coverage.py",
+        "tests/test_dict.py"
+      ]
+    },
+    {
       "path": "gpu/data/targets.json",
       "subproject": "ГПУ-библиотека",
       "bytes": 19306,
@@ -6540,45 +6579,6 @@
       "referenced_by": [
         "gpu/build.py",
         "gpu/tools/build_targets.py"
-      ]
-    },
-    {
-      "path": "data/chain_coverage.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 19163,
-      "note": "Заполняемость цепочки портала по семи направлениям и восьми звеньям: машина → узел → признак → дефект → ремонтное решение → запчасть → изготовитель → исполнитель. Производный файл, считается scripts/build_chain_coverage.py по фактическим файлам репозитория; ноль означает отсутствие данных, а не то, что они где-то есть. Руками не заполнять. Первый прогон 12.09.2026: 13 клеток из 56, звенья «Признак», «Дефект» и «Исполнитель» не начаты ни по одному направлению.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "common",
-        "empty_everywhere",
-        "goal",
-        "links",
-        "note",
-        "priority_rule",
-        "segments",
-        "summary"
-      ],
-      "main_collection": {
-        "key": "links",
-        "records": 8,
-        "record_keys": [
-          "link",
-          "title",
-          "what"
-        ]
-      },
-      "last_change": "2026-09-12",
-      "last_author": "Claude",
-      "last_commit": "1210697",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "публикуемо",
-        "markers": []
-      },
-      "referenced_by": [
-        "scripts/build_chain_coverage.py",
-        "tests/test_dict.py"
       ]
     },
     {

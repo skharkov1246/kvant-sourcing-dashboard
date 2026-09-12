@@ -76,6 +76,9 @@ def counts() -> dict:
     # ── ГТУ
     gm = load("gt/data/models.json", {})
     put("gtu", "machine", sum(n(f.get("models")) for f in gm.get("families", [])), "gt/data/models.json")
+    mach = load("dict/machine.json", {})
+    put("gtu", "machine", sum(1 for m in mach.get("records", []) if m.get("segment") == "gtu"),
+        "dict/machine.json")
     gp = load("gt/data/parts.json", {})
     put("gtu", "node", n(gp.get("systems")), "gt/data/parts.json")
     put("gtu", "part", n(load("gt/data/pn_db.json", {}).get("rows")), "gt/data/pn_db.json")
@@ -118,8 +121,16 @@ def counts() -> dict:
     # ── словарь: изготовители по рёбрам цепочки (сегмент словарь не знает,
     # поэтому рёбра считаются общим фондом и в клетки направлений не идут)
     ch = load("dict/chain.json", {})
+    mach = load("dict/machine.json", {})
+    other = [m for m in mach.get("records", []) if m.get("segment") == "other"]
     common = {"chain_edges": n(ch.get("records")), "chain_makers": ch.get("makers", 0),
-              "oem_keys": load("dict/oem.json", {}).get("count", 0)}
+              "oem_keys": load("dict/oem.json", {}).get("count", 0),
+              "machines_total": mach.get("count", 0),
+              "machines_foreign_segment": len(other),
+              "machines_foreign_note": "Машины, найденные внутри базы ГТУ, но относящиеся к "
+                                       "направлению, которого у нас нет: буровое и нефтепромысловое "
+                                       "оборудование — насосы, превенторы, цементировочные агрегаты, "
+                                       "верхние приводы. Кандидат в новое направление портала."}
     return c, common
 
 
