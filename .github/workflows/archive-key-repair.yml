@@ -1,0 +1,60 @@
+name: Архив — однократное исправление серверного подключения
+on:
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths:
+      - scripts/repair_archive_key.py
+      - library/supabase/archive_key_repair_20260912.sql
+      - .github/workflows/archive-key-repair.yml
+permissions:
+  contents: read
+concurrency:
+  group: archive-key-repair-20260912
+  cancel-in-progress: false
+jobs:
+  repair:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    outputs:
+      ready_to_publish: ${{ steps.repair.outputs.ready_to_publish }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Установка клиента базы
+        run: python -m pip install --quiet --disable-pip-version-check psycopg2-binary==2.9.10
+      - name: Проверка или исправление единственной настройки
+        id: repair
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python scripts/repair_archive_key.py
+
+  publish:
+    needs: repair
+    if: github.ref == 'refs/heads/main' && needs.repair.outputs.ready_to_publish == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    permissions:
+      contents: read
+      actions: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Публикация текущей проверенной версии
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ARCHIVE_KEY_REPAIRED: ${{ needs.repair.outputs.ready_to_publish }}
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python scripts/dispatch_archive_republish.py
