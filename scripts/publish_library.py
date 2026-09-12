@@ -33,6 +33,8 @@ ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9:_-]{0,159}\Z")
 CF_ID = re.compile(r"[a-fA-F0-9]{32}\Z")
 KINDS = {"knowledge", "supplier", "price", "component"}
 READBACK_DELAYS = (0, 2, 5, 15, 30, 30)
+TRANSPORT_REASONS = frozenset(("http_error", "timeout", "network_error", "incomplete_http"))
+TRANSPORT_HTTP_STATUSES = frozenset((429, 500, 502, 503, 504))
 ARTICLE_COLUMNS = "segment_id, title, topic, body, sources, confidence, updated_at"
 KNOWLEDGE_SQL = f"""SELECT {ARTICLE_COLUMNS} FROM public.lib_knowledge
 WHERE researched_by = %s AND sources->>'publication_approved' = 'true'
@@ -322,6 +324,7 @@ class Cloudflare:
         if body is not None:
             require(isinstance(body, bytes) and len(body) <= MAX_BYTES, "LIBRARY_TOO_LARGE")
         attempts = 3 if method == "GET" else 1
+        transport_reason, transport_status = None, None
         for attempt in range(attempts):
             req = request.Request(self.base + path, data=body, method=method,
                 headers={"Authorization": "Bearer " + self.token, "Accept": "application/json", "Content-Type": "application/json"})
@@ -347,15 +350,29 @@ class Cloudflare:
                     raise PublishError("CLOUDFLARE_REDIRECT_REJECTED") from None
                 if status != 429 and status not in (500, 502, 503, 504):
                     raise PublishError("CLOUDFLARE_HTTP_FAILED") from None
-            except (error.URLError, TimeoutError, OSError, http.client.HTTPException):
-                pass
+                transport_reason, transport_status = "http_error", status
+            except (error.URLError, TimeoutError, OSError, http.client.HTTPException) as failure:
+                transport_status = None
+                if isinstance(failure, TimeoutError) or (isinstance(failure, error.URLError) and
+                                                         isinstance(failure.reason, TimeoutError)):
+                    transport_reason = "timeout"
+                elif isinstance(failure, http.client.HTTPException):
+                    transport_reason = "incomplete_http"
+                else:
+                    transport_reason = "network_error"
             if method == "PUT":
                 # A timeout may follow a successful write. Never repeat a PUT
                 # blindly over a later editor; inspect the exact value instead.
-                raise PublishError("CLOUDFLARE_WRITE_OUTCOME_UNCONFIRMED")
+                uncertain = PublishError("CLOUDFLARE_WRITE_OUTCOME_UNCONFIRMED")
+                uncertain.transport_reason = transport_reason
+                uncertain.transport_http_status = transport_status
+                raise uncertain from None
             if attempt < attempts - 1:
                 self.sleep((2, 5)[attempt])
-        raise PublishError("CLOUDFLARE_RETRIES_EXHAUSTED")
+        exhausted = PublishError("CLOUDFLARE_RETRIES_EXHAUSTED")
+        exhausted.transport_reason = transport_reason
+        exhausted.transport_http_status = transport_status
+        raise exhausted from None
 
     def envelope(self, method, path, body=None):
         value = decode(self.call(method, path, body))

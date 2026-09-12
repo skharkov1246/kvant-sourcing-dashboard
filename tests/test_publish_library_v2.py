@@ -291,7 +291,8 @@ def test_readback_failure_has_only_fingerprints_and_keeps_exact_six_attempts(key
     failure = caught.value
     assert str(failure) == "KV_READBACK_NOT_CONFIRMED"
     assert failure.proof == {"key_kind": kind, "expected": p.value_fingerprint(expected),
-        "attempts": [{"attempt": i + 1, **p.value_fingerprint(value)} for i, value in enumerate(values)]}
+        "attempts": [{"attempt": i + 1, **p.value_fingerprint(value)} for i, value in enumerate(values)],
+        "write_context": {"outcome": "not_observed", "elapsed_ms": None}}
     assert len(reads) == 6 and sleeps == [2, 5, 15, 30, 30] and sum(sleeps) == 82 and writes == []
     serialized = json.dumps(failure.proof)
     assert all(value not in serialized for value in ("PRIVATE", "namespace", key))
@@ -337,6 +338,88 @@ def test_readback_exception_proof_cannot_smuggle_unknown_fields_or_raw_values():
             p.KVReadbackError("cas_blob", expected, attempts)
     with pytest.raises(p.v1.PublishError, match="INVALID_READBACK_KIND"):
         p.KVReadbackError("PRIVATE", fingerprint, attempts)
+
+
+@pytest.mark.parametrize("outcome", ["acknowledged", "transport_uncertain"])
+def test_exact_put_context_is_timed_once_and_reported_without_retry(outcome, monkeypatch):
+    cf, reads, sleeps, _ = readback_client([None] * 6)
+    del cf.put  # Exercise the real diagnostic override, not the fixture stub.
+    cf.value_path = lambda namespace, key: "/synthetic"
+    clock = iter([100.0, 130.25])
+    monkeypatch.setattr(p.time, "monotonic", lambda: next(clock))
+    calls = []
+    def envelope(method, path, raw):
+        calls.append((method, raw))
+        if outcome == "transport_uncertain":
+            raise p.v1.PublishError("CLOUDFLARE_WRITE_OUTCOME_UNCONFIRMED")
+        return {"success": True}
+    cf.envelope = envelope
+    with pytest.raises(p.KVReadbackError) as caught:
+        cf.put("PRIVATE namespace", p.CURRENT, b'PRIVATE content')
+        cf.verify("PRIVATE namespace", p.CURRENT, b'PRIVATE content')
+    context = {"outcome": outcome, "elapsed_ms": 30250}
+    if outcome == "transport_uncertain":
+        context.update(reason=None, http_status=None)
+    assert caught.value.proof["write_context"] == context
+    assert calls == [("PUT", b'PRIVATE content')]
+    assert len(reads) == 6 and sum(sleeps) == 82
+    assert "PRIVATE" not in json.dumps(caught.value.proof)
+
+
+@pytest.mark.parametrize("different", ["namespace", "key", "expected"])
+def test_write_context_never_moves_to_a_different_verification(different, monkeypatch):
+    cf, _, _, _ = readback_client([None] * 6)
+    del cf.put
+    cf.value_path = lambda namespace, key: "/synthetic"
+    cf.envelope = lambda *args: {"success": True}
+    monkeypatch.setattr(p.time, "monotonic", lambda: 100.0)
+    cf.put("namespace-one", p.CURRENT, b'one')
+    values = {"namespace": "namespace-one", "key": p.CURRENT, "expected": b'one'}
+    values[different] = b'two' if different == "expected" else "different"
+    with pytest.raises(p.KVReadbackError) as caught:
+        cf.verify(values["namespace"], values["key"], values["expected"])
+    assert caught.value.proof["write_context"] == {"outcome": "not_observed", "elapsed_ms": None}
+
+
+def test_a_later_failed_put_clears_previous_context_and_preserves_access_error(monkeypatch):
+    cf, _, _, _ = readback_client([None] * 6)
+    del cf.put
+    cf.value_path = lambda namespace, key: "/synthetic"
+    cf.envelope = lambda *args: {"success": True}
+    monkeypatch.setattr(p.time, "monotonic", lambda: 1.0)
+    cf.put("synthetic", p.CURRENT, b'one')
+    failure = p.v1.PublishError("CLOUDFLARE_KV_ACCESS_DENIED")
+    def denied(*args): raise failure
+    cf.envelope = denied
+    with pytest.raises(p.v1.PublishError) as caught:
+        cf.put("synthetic", p.CURRENT, b'one')
+    assert caught.value is failure
+    with pytest.raises(p.KVReadbackError) as caught:
+        cf.verify("synthetic", p.CURRENT, b'one')
+    assert caught.value.proof["write_context"]["outcome"] == "not_observed"
+
+
+@pytest.mark.parametrize("duration,expected", [(999999, p.MAX_WRITE_ELAPSED_MS), (-1, 0)])
+def test_write_duration_is_bounded(duration, expected, monkeypatch):
+    cf, _, _, _ = readback_client([])
+    del cf.put
+    cf.value_path = lambda namespace, key: "/synthetic"
+    cf.envelope = lambda *args: {"success": True}
+    clock = iter([100.0, 100.0 + duration])
+    monkeypatch.setattr(p.time, "monotonic", lambda: next(clock))
+    cf.put("synthetic", p.CURRENT, b'one')
+    assert cf.write_context("synthetic", p.CURRENT, p.value_fingerprint(b'one'))["elapsed_ms"] == expected
+
+
+@pytest.mark.parametrize("context", [{"outcome": "PRIVATE", "elapsed_ms": 1},
+    {"outcome": "acknowledged", "elapsed_ms": True}, {"outcome": "transport_uncertain", "elapsed_ms": -1},
+    {"outcome": "acknowledged", "elapsed_ms": 300001}, {"outcome": "not_observed", "elapsed_ms": 1},
+    {"outcome": "acknowledged", "elapsed_ms": 1, "raw_key": "PRIVATE"}])
+def test_readback_write_context_has_a_closed_safe_shape(context):
+    fingerprint = p.value_fingerprint(b'synthetic')
+    attempts = [{"attempt": i + 1, **fingerprint} for i in range(6)]
+    with pytest.raises(p.v1.PublishError, match="INVALID_WRITE_CONTEXT"):
+        p.KVReadbackError("cas_blob", fingerprint, attempts, context)
 
 
 def published_audit_fixture():
@@ -479,6 +562,242 @@ def test_unknown_mode_fails_before_any_external_client(mode, monkeypatch, capsys
     output = capsys.readouterr()
     assert json.loads(output.out) == {"ok": False, "error": "INVALID_PUBLISH_MODE"}
     assert output.err == ""
+
+
+@pytest.mark.parametrize("actual", [None, b'wrong', b'known synthetic blob'])
+def test_known_blob_audit_is_a_single_read_without_changing_current(actual):
+    expected = b'known synthetic blob'
+    ref = {"sha256": p.digest(expected), "bytes": len(expected)}
+    cf = published_audit_fixture()
+    if actual is not None:
+        cf.values[p.PREFIX + ref["sha256"]] = actual
+    before = dict(cf.values)
+    result = p.audit_blob(cf, ref)
+    assert result == {"expected": p.value_fingerprint(expected), "observed": p.value_fingerprint(actual),
+                      "match": actual == expected}
+    assert cf.reads == [p.PREFIX + ref["sha256"]] and cf.values == before and cf.puts == []
+
+
+@pytest.mark.parametrize("arguments", [
+    {"LIBRARY_AUDIT_BLOB_SHA256": "a" * 64}, {"LIBRARY_AUDIT_BLOB_BYTES": "1"},
+    {"LIBRARY_AUDIT_BLOB_SHA256": "", "LIBRARY_AUDIT_BLOB_BYTES": ""},
+    {"LIBRARY_AUDIT_BLOB_SHA256": "A" * 64, "LIBRARY_AUDIT_BLOB_BYTES": "1"},
+    {"LIBRARY_AUDIT_BLOB_SHA256": "PRIVATE", "LIBRARY_AUDIT_BLOB_BYTES": "1"},
+    *[{"LIBRARY_AUDIT_BLOB_SHA256": "a" * 64, "LIBRARY_AUDIT_BLOB_BYTES": n}
+      for n in ("0", "-1", "01", "+1", "1.0", "1\n", "4194305", 1, True)]])
+def test_invalid_known_blob_argument_pair_fails_before_external_clients(arguments, monkeypatch, capsys):
+    def forbidden(*args): pytest.fail("Invalid blob arguments must not construct any client")
+    monkeypatch.setattr(p, "Cloudflare", forbidden)
+    monkeypatch.setattr(p, "Database", forbidden)
+    assert p.main({"LIBRARY_PUBLISH_MODE": "audit", **arguments}) == 1
+    output = capsys.readouterr()
+    assert json.loads(output.out) == {"ok": False, "error": "INVALID_BLOB_AUDIT_ARGUMENTS"}
+    assert output.err == ""
+    assert p.blob_audit_spec({}) is None
+
+
+def test_main_known_blob_audit_mode_has_no_database_and_missing_is_not_failure(monkeypatch, capsys):
+    cf = published_audit_fixture()
+    monkeypatch.setattr(p, "Cloudflare", lambda *args: cf)
+    def forbidden(*args): pytest.fail("Readonly audit must not instantiate DB or publish")
+    monkeypatch.setattr(p, "Database", forbidden)
+    monkeypatch.setattr(p, "run", forbidden)
+    arguments = {"LIBRARY_PUBLISH_MODE": "audit", "LIBRARY_AUDIT_BLOB_SHA256": "a" * 64,
+                 "LIBRARY_AUDIT_BLOB_BYTES": "4194304"}
+    assert p.main(arguments) == 0
+    output = capsys.readouterr()
+    result = json.loads(output.out)
+    assert result["ok"] is True and result["articles"] == 2 and result["blob_audit"]["match"] is False
+    assert result["blob_audit"]["observed"]["presence"] == "missing"
+    assert output.err == "" and cf.puts == []
+
+
+def test_main_publishes_after_independent_missing_blob_diagnostic_in_correct_order(monkeypatch, capsys):
+    cf = published_audit_fixture()
+    monkeypatch.setattr(p, "Cloudflare", lambda *args: cf)
+    calls = []
+    original_get = cf.get
+    def get(namespace, key):
+        calls.append(key)
+        return original_get(namespace, key)
+    cf.get = get
+    def database(*args):
+        assert calls[-1] == p.PREFIX + "a" * 64
+        calls.append("database")
+        return object()
+    monkeypatch.setattr(p, "Database", database)
+    monkeypatch.setattr(p, "run", lambda *args: {"ok": True, "synthetic": True})
+    assert p.main({"LIBRARY_AUDIT_BLOB_SHA256": "a" * 64, "LIBRARY_AUDIT_BLOB_BYTES": "1"}) == 0
+    output = capsys.readouterr()
+    events = [json.loads(line) for line in output.err.splitlines()]
+    assert [event["event"] for event in events] == ["prepublish_audit", "blob_audit"]
+    assert events[1]["audit"]["match"] is False and json.loads(output.out)["ok"] is True
+    assert calls[-1] == "database" and cf.puts == []
+
+
+def test_optional_blob_get_error_preserves_safe_code(monkeypatch, capsys):
+    cf = published_audit_fixture()
+    original_get = cf.get
+    def get(namespace, key):
+        if key == p.PREFIX + "a" * 64:
+            raise p.v1.PublishError("CLOUDFLARE_KV_ACCESS_DENIED")
+        return original_get(namespace, key)
+    cf.get = get
+    monkeypatch.setattr(p, "Cloudflare", lambda *args: cf)
+    def forbidden(*args): pytest.fail("Failed GET must not be ignored as a missing blob")
+    monkeypatch.setattr(p, "Database", forbidden)
+    assert p.main({"LIBRARY_AUDIT_BLOB_SHA256": "a" * 64, "LIBRARY_AUDIT_BLOB_BYTES": "1"}) == 1
+    output = capsys.readouterr()
+    assert json.loads(output.out) == {"ok": False, "error": "CLOUDFLARE_KV_ACCESS_DENIED"}
+
+
+@pytest.mark.parametrize("uncertain", [False, True])
+def test_real_http_wrapper_keeps_30_second_timeout_one_put_and_six_gets(uncertain):
+    calls, sleeps = [], []
+    class Response:
+        status = 200
+        raw = b'{"success":true}'
+        headers = {"Content-Length": str(len(raw))}
+        def __enter__(self): return self
+        def __exit__(self, *args): pass
+        def read(self, size): return self.raw
+    class Opener:
+        def open(self, request, timeout):
+            calls.append((request.method, timeout))
+            if request.method == "PUT":
+                if uncertain:
+                    raise TimeoutError("PRIVATE transport error")
+                return Response()
+            raise p.v1.error.HTTPError(request.full_url, 404, "PRIVATE missing response", {}, None)
+    cf = p.Cloudflare("a" * 32, "synthetic-token", opener=Opener(), sleep=sleeps.append)
+    with pytest.raises(p.KVReadbackError) as caught:
+        cf.put("b" * 32, p.CURRENT, b'synthetic expected')
+        cf.verify("b" * 32, p.CURRENT, b'synthetic expected')
+    assert calls == [("PUT", 30)] + [("GET", 30)] * 6
+    assert sleeps == [2, 5, 15, 30, 30]
+    assert caught.value.proof["write_context"]["outcome"] == ("transport_uncertain" if uncertain else "acknowledged")
+    assert "PRIVATE" not in json.dumps(caught.value.proof)
+
+
+def private_transport_failure(request, case):
+    import io
+    if type(case) is int:
+        return p.v1.error.HTTPError(request.full_url, case, "PRIVATE HTTP reason",
+            {"X-Private": "PRIVATE header"}, io.BytesIO(b'PRIVATE HTTP error body'))
+    if case == "timeout":
+        return TimeoutError("PRIVATE timeout address")
+    if case == "url_timeout":
+        return p.v1.error.URLError(TimeoutError("PRIVATE wrapped timeout"))
+    if case == "url_error":
+        return p.v1.error.URLError("PRIVATE network host credential")
+    if case == "os_error":
+        return OSError("PRIVATE connection reset")
+    if case == "incomplete":
+        return p.v1.http.client.IncompleteRead(b'PRIVATE partial HTTP body', 100)
+    raise AssertionError("Unknown synthetic case")
+
+
+@pytest.mark.parametrize("case,reason,status", [(429, "http_error", 429), (500, "http_error", 500),
+    (502, "http_error", 502), (503, "http_error", 503), (504, "http_error", 504),
+    ("timeout", "timeout", None), ("url_timeout", "timeout", None),
+    ("url_error", "network_error", None), ("os_error", "network_error", None),
+    ("incomplete", "incomplete_http", None)])
+def test_uncertain_put_keeps_safe_transport_reason_without_body_or_retry(case, reason, status, monkeypatch, capsys):
+    calls, sleeps = [], []
+    class Opener:
+        def open(self, request, timeout):
+            calls.append((request.method, timeout))
+            if request.method == "PUT":
+                raise private_transport_failure(request, case)
+            raise private_transport_failure(request, 404)
+    cf = p.Cloudflare("a" * 32, "synthetic-token", opener=Opener(), sleep=sleeps.append)
+    with pytest.raises(p.KVReadbackError) as caught:
+        cf.put("b" * 32, p.PREFIX + "a" * 64, b'PRIVATE expected material')
+    failure = caught.value
+    context = failure.proof["write_context"]
+    assert context["outcome"] == "transport_uncertain"
+    assert context["reason"] == reason and context["http_status"] == status
+    assert type(context["elapsed_ms"]) is int and 0 <= context["elapsed_ms"] <= p.MAX_WRITE_ELAPSED_MS
+    assert calls == [("PUT", 30)] + [("GET", 30)] * 6 and sleeps == [2, 5, 15, 30, 30]
+    monkeypatch.setattr(p, "Cloudflare", lambda *args: CF())
+    monkeypatch.setattr(p, "Database", lambda *args: object())
+    def fail(*args): raise failure
+    monkeypatch.setattr(p, "run", fail)
+    assert p.main({}) == 1
+    output = capsys.readouterr()
+    assert json.loads(output.out)["readback"]["write_context"] == context
+    assert all(private not in output.out + output.err for private in
+               ("PRIVATE", "synthetic-token", "X-Private", "api.cloudflare.com", "a" * 32, "b" * 32))
+
+
+@pytest.mark.parametrize("case,reason,status", [(429, "http_error", 429), (500, "http_error", 500),
+    ("timeout", "timeout", None), ("url_error", "network_error", None),
+    ("incomplete", "incomplete_http", None)])
+def test_get_only_transport_failure_has_no_put_context_and_retains_retries(case, reason, status):
+    calls, sleeps = [], []
+    class Opener:
+        def open(self, request, timeout):
+            calls.append((request.method, timeout))
+            raise private_transport_failure(request, case)
+    cf = p.Cloudflare("a" * 32, "synthetic-token", opener=Opener(), sleep=sleeps.append)
+    with pytest.raises(p.v1.PublishError) as caught:
+        cf.verify("b" * 32, p.CURRENT, b'expected')
+    assert str(caught.value) == "CLOUDFLARE_RETRIES_EXHAUSTED"
+    assert not isinstance(caught.value, p.KVReadbackError)
+    assert caught.value.transport_reason == reason and caught.value.transport_http_status == status
+    assert calls == [("GET", 30)] * 3 and sleeps == [2, 5]
+    assert cf.write_context("b" * 32, p.CURRENT, p.value_fingerprint(b'expected')) == {
+        "outcome": "not_observed", "elapsed_ms": None}
+
+
+def test_transport_reason_is_not_copied_from_another_put_or_retained_after_ack(monkeypatch):
+    cf, _, _, _ = readback_client([b'one'] + [None] * 6)
+    del cf.put
+    cf.value_path = lambda namespace, key: "/synthetic"
+    monkeypatch.setattr(p.time, "monotonic", lambda: 100.0)
+    failure = p.v1.PublishError("CLOUDFLARE_WRITE_OUTCOME_UNCONFIRMED")
+    failure.transport_reason, failure.transport_http_status = "http_error", 429
+    def uncertain(*args): raise failure
+    cf.envelope = uncertain
+    cf.put("synthetic", p.CURRENT, b'one')
+    assert cf.write_context("synthetic", p.CURRENT, p.value_fingerprint(b'one'))["http_status"] == 429
+    with pytest.raises(p.KVReadbackError) as caught:
+        cf.verify("other-namespace", p.CURRENT, b'one')
+    assert caught.value.proof["write_context"] == {"outcome": "not_observed", "elapsed_ms": None}
+    cf.envelope = lambda *args: {"success": True}
+    cf.put("synthetic", p.CURRENT, b'one')
+    assert cf.write_context("synthetic", p.CURRENT, p.value_fingerprint(b'one')) == {
+        "outcome": "acknowledged", "elapsed_ms": 0}
+
+
+@pytest.mark.parametrize("reason,status", [("PRIVATE", 500), ("http_error", 403),
+    ("http_error", True), ("http_error", "500"), (["timeout"], None)])
+def test_untrusted_transport_detail_attributes_are_discarded(reason, status):
+    cf, _, _, _ = readback_client([None] * 6)
+    del cf.put
+    cf.value_path = lambda namespace, key: "/synthetic"
+    failure = p.v1.PublishError("CLOUDFLARE_WRITE_OUTCOME_UNCONFIRMED")
+    failure.transport_reason, failure.transport_http_status = reason, status
+    def uncertain(*args): raise failure
+    cf.envelope = uncertain
+    with pytest.raises(p.KVReadbackError) as caught:
+        cf.put("synthetic", p.CURRENT, b'one')
+    context = caught.value.proof["write_context"]
+    assert context["reason"] is context["http_status"] is None
+    assert "PRIVATE" not in json.dumps(context)
+
+
+@pytest.mark.parametrize("context", [
+    {"outcome": "acknowledged", "elapsed_ms": 1, "reason": "timeout", "http_status": None},
+    {"outcome": "not_observed", "elapsed_ms": None, "reason": None, "http_status": None},
+    {"outcome": "transport_uncertain", "elapsed_ms": 1, "reason": "PRIVATE", "http_status": None},
+    {"outcome": "transport_uncertain", "elapsed_ms": 1, "reason": "timeout", "http_status": 500},
+    {"outcome": "transport_uncertain", "elapsed_ms": 1, "reason": "http_error", "http_status": 404}])
+def test_safe_transport_reason_and_status_cannot_be_added_to_wrong_outcome(context):
+    fingerprint = p.value_fingerprint(b'synthetic')
+    attempts = [{"attempt": i + 1, **fingerprint} for i in range(6)]
+    with pytest.raises(p.v1.PublishError, match="INVALID_WRITE_CONTEXT"):
+        p.KVReadbackError("cas_blob", fingerprint, attempts, context)
 
 
 def test_source_bundle_has_named_server_cursor_and_readonly_transaction():
