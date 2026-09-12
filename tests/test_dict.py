@@ -161,3 +161,32 @@ def test_chain_coverage_is_fresh_and_honest():
             else:
                 assert cell["state"] == "пусто"
 
+
+def test_gsho_machine_registry():
+    """Реестр машин ГШО собран и склеивает написания одной машины.
+
+    Счётчик цепочки показывал по ГШО одну машину при 1918 позициях номенклатуры:
+    обозначения лежали внутри строкового поля machine через запятую и отдельной
+    сущностью не существовали. Реестр закрывает первое звено цепочки."""
+    r = subprocess.run([sys.executable, str(ROOT / "zip" / "tools" / "build_machines.py"), "--check"],
+                       capture_output=True, text=True)
+    assert r.returncode == 0, f"реестр машин устарел: {r.stdout}{r.stderr}"
+
+    d = json.loads((ROOT / "zip" / "data" / "machines.json").read_text(encoding="utf-8"))
+    assert d["stats"]["machines"] > 50, "машин подозрительно мало — проверьте разбор поля machine"
+    keys = [m["machine_key"] for m in d["machines"]]
+    assert len(keys) == len(set(keys)), "ключи машин повторяются"
+
+    # Смысл реестра — склейка написаний. ST14 и ST-14 обязаны быть одной машиной.
+    merged = [m for m in d["machines"] if len(m["spellings"]) > 1]
+    assert merged, "ни одно написание не склеилось — проверьте mkey()"
+
+    # Бренд — один изготовитель, а не перечень: поле brand в источнике бывает
+    # списком «Epiroc, Normet, Paus», и такой список не должен попасть в реестр.
+    for b in d["brands"]:
+        assert "," not in b["brand"], f"в бренд попал перечень: {b['brand']}"
+
+    # Число позиций у машины обязано быть положительным: машина без единой детали
+    # означает, что она попала в реестр из мусорного значения поля.
+    assert all(m["parts"] > 0 for m in d["machines"])
+

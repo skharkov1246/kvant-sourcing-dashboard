@@ -96,6 +96,7 @@ def counts() -> dict:
     # ── ГШО
     tel = load("zip/data/telsmith_3858.json", {})
     put("gsho", "machine", 1 if tel.get("machine") else 0, "zip/data/telsmith_3858.json")
+    put("gsho", "machine", n(load("zip/data/machines.json", {}).get("machines")), "zip/data/machines.json")
     put("gsho", "node", n({r.get("node") for r in tel.get("catalog", []) if r.get("node")}), "zip/data/telsmith_3858.json")
     put("gsho", "part", n(load("zip/data/positions.json", [])), "zip/data/positions.json")
     put("gsho", "part", n(tel.get("catalog")), "zip/data/telsmith_3858.json")
