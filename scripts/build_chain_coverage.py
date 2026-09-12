@@ -183,13 +183,14 @@ def unique_makers(seg: str, load_fn):
 
 def counts() -> dict:
     """Числитель по каждой клетке: что в файлах РЕАЛЬНО есть."""
-    c = {s: {k: {"n": 0, "src": []} for k, _t, _d in LINKS} for s, _ in SEGMENTS}
+    c = {s: {k: {"n": 0, "draft": 0, "src": []} for k, _t, _d in LINKS} for s, _ in SEGMENTS}
 
-    def put(seg, link, num, src):
+    def put(seg, link, num, src, draft=False):
+        """draft=True — данные есть, но проверку не проходили: отдельный счёт."""
         if not num:
             return
         cell = c[seg][link]
-        cell["n"] += num
+        cell["draft" if draft else "n"] += num
         if src not in cell["src"]:
             cell["src"].append(src)
 
@@ -229,12 +230,147 @@ def counts() -> dict:
         put("recip", "repair", len(checked("ru_service")), "zip/data/recip_recon.json")
         comp = {nkey(c.get("name")) for a in rc.get("angles", [])
                 for c in a.get("companies", []) if c.get("name")}
+        comp.discard("")
+        src_recip = ["zip/data/recip_recon.json"]
         c["recip"]["maker"]["n"] = len(comp)
-        c["recip"]["maker"]["src"] = ["zip/data/recip_recon.json"]
+        c["recip"]["maker"]["src"] = src_recip
 
-    # ── изготовители: уникальные компании по каждому направлению
-    for seg in ("gtu", "gpu", "gsho"):
+    # ── диагностика: признак и дефект. Единственные два звена, пустые везде.
+    # Привязка к направлению по области разведки, плюс два узла-исключения:
+    # электрическая машина и КИПиА встречаются внутри разведки турбомашин,
+    # но принадлежат своим направлениям. Общая часть (вибро- и невибрационные
+    # методы) машинно-независима и потому идёт во ВСЕ направления — это не
+    # добивка числа, а то, чем эти методы и являются: нормы ISO 20816 и анализ
+    # масла одинаковы для турбины, насоса и дробилки.
+    sym = load("dict/symptom.json", {})
+    if sym.get("defect_rows"):
+        # Общая часть идёт только во вращающиеся и возвратно-поступательные машины.
+        # КИПиА и электротехника получают ТОЛЬКО свои узлы (правило NODE_SEG ниже):
+        # дефекты подшипника качения к датчику давления отношения не имеют, и
+        # раздача им общего блока была бы добивкой числа.
+        SCOPE_SEG = {"turbo": ["gtu"], "pumps": ["pumps"], "recip": ["recip"],
+                     "common": ["gtu", "gpu", "gsho", "recip", "pumps"]}
+        NODE_SEG = {"Электрическая машина и питание": "electro",
+                    "КИП, САУ, защиты": "instrum"}
+        CHECKED = {"подтверждено", "частично"}
+        REJECTED = {"опровергнуто"}  # забракованное скептиком не данные, а урок
+        rows = sym["defect_rows"]
+        # признак → множество индексов дефектов
+        sym_of = {}
+        for r in sym["records"]:
+            for i in r["defects"]:
+                sym_of.setdefault(i, set()).add(r["key"])
+        d_cnt = {s: {"n": 0, "draft": 0} for s, _ in SEGMENTS}
+        s_set = {s: {"n": set(), "draft": set()} for s, _ in SEGMENTS}
+        for i, r in enumerate(rows):
+            segs = set(SCOPE_SEG.get(r["scope"], []))
+            if r["node"] in NODE_SEG:
+                segs.add(NODE_SEG[r["node"]])
+            if r["verdict"] in REJECTED:
+                continue
+            bucket = "n" if r["verdict"] in CHECKED else "draft"
+            for seg in segs:
+                d_cnt[seg][bucket] += 1
+                s_set[seg][bucket] |= sym_of.get(i, set())
+        for seg, _ in SEGMENTS:
+            put(seg, "defect", d_cnt[seg]["n"], "zip/data/diagnostics_recon.json")
+            put(seg, "defect", d_cnt[seg]["draft"], "zip/data/diagnostics_recon.json", draft=True)
+            # признак считается один раз: проверенный не должен дублироваться в черновике
+            ok = s_set[seg]["n"]
+            put(seg, "symptom", len(ok), "dict/symptom.json")
+            put(seg, "symptom", len(s_set[seg]["draft"] - ok), "dict/symptom.json", draft=True)
+
+    # ── ремонтные решения и исполнители (разведка 12.09.2026).
+    # Технологии восстановления — наплавка, механическая обработка, обратное
+    # проектирование — машинно-независимы: одна и та же расточка постели
+    # подшипника нужна и турбине, и насосу, и электродвигателю. Поэтому идут во
+    # все направления, КРОМЕ КИПиА: датчик давления не наплавляют.
+    rp = load("zip/data/repair_recon.json", {})
+    if rp.get("tech_angles"):
+        CHECKED = {"подтверждено", "частично"}
+        tech = [t for a in rp["tech_angles"] for t in a["technologies"]]
+        ok = [t for t in tech if t["verdict"]["verdict"] in CHECKED]
+        draft = [t for t in tech if t["verdict"]["verdict"] not in CHECKED
+                 and t["verdict"]["verdict"] != "опровергнуто"]
+        for seg in ("gtu", "gpu", "gsho", "recip", "pumps", "electro"):
+            put(seg, "repair", len(ok), "zip/data/repair_recon.json")
+            put(seg, "repair", len(draft), "zip/data/repair_recon.json", draft=True)
+        # Исполнители привязаны к направлению углом разведки, а не общим фондом:
+        # кто чинит насос и кто перематывает статор — разные заводы. Карточки,
+        # где сама разведка написала «по вращающимся машинам НЕ исполнитель»,
+        # в звено не идут: это отрицательный вывод, а не запись об исполнителе.
+        CONTR_SEG = {"ru_pumps": ["pumps"], "ru_compressors": ["recip", "gtu"],
+                     "ru_electro": ["electro"]}
+        import re as _re
+        for a in rp["contractor_angles"]:
+            good = [c for c in a["contractors"]
+                    if not _re.search(r"НЕ исполнитель", str(c.get("kind") or ""), _re.I)]
+            for seg in CONTR_SEG.get(a["key"], []):
+                put(seg, "contractor", 0, "zip/data/repair_recon.json")
+                put(seg, "contractor", len(good), "zip/data/repair_recon.json", draft=True)
+
+    # ── изготовители: уникальные компании по каждому направлению.
+    # Атлас разведки лежит одним файлом на все направления, поэтому подмешивается
+    # ПОСЛЕ и по тому же ключу компании: иначе один завод, попавший и в реестр
+    # поставщиков, и в атлас, сосчитался бы дважды.
+    atlas = load("zip/data/oem_atlas.json", {})
+    atlas_keys = {}
+    for m in atlas.get("makers", []):
+        k = nkey(m.get("name"))
+        if k:
+            atlas_keys.setdefault(m.get("segment"), set()).add(k)
+
+    # Разведка по насосам, КИПиА и электротехнике: в звено «изготовитель» идут
+    # только те, кто делает. Трейдер, дистрибьютор, институт и ассоциация —
+    # не изготовители, и подмешивать их значит завысить звено вдвое.
+    import re as _re2
+    MAKES = _re2.compile(r"oem|изготовител|завод", _re2.I)
+    NOT_MAKES = _re2.compile(r"трейдер|дистрибьютор|ассоциац|институт|витрин", _re2.I)
+    dirs = load("zip/data/dirs_recon.json", {})
+    dirs_src = {}
+    for a in dirs.get("angles", []):
+        for comp_rec in a.get("companies", []):
+            kind = str(comp_rec.get("kind") or "")
+            if not MAKES.search(kind) or NOT_MAKES.search(kind):
+                continue
+            k = nkey(comp_rec.get("name"))
+            if k:
+                atlas_keys.setdefault(a["segment"], set()).add(k)
+                dirs_src[a["segment"]] = "zip/data/dirs_recon.json"
+
+    # Цепочки субпоставщиков: изготовитель первого и второго уровня — это
+    # ровно то, кого мы ищем за маркой на шильдике.
+    subs = load("zip/data/subsupplier_recon.json", {})
+    subs_src = {}
+    for sg in subs.get("segments", []):
+        for ch in sg.get("chains", []):
+            for who in (ch.get("tier1"), ch.get("tier2")):
+                k = nkey(who)
+                if k and len(k) > 2:
+                    atlas_keys.setdefault(sg["segment"], set()).add(k)
+                    subs_src[sg["segment"]] = "zip/data/subsupplier_recon.json"
+    if atlas_keys.get("recip") and c["recip"]["maker"]["n"]:
+        rc2 = load("zip/data/recip_recon.json", {})
+        comp = {nkey(x.get("name")) for a in rc2.get("angles", [])
+                for x in a.get("companies", []) if x.get("name")}
+        comp.discard("")
+        comp |= atlas_keys["recip"]
+        comp.discard("")
+        c["recip"]["maker"]["n"] = len(comp)
+        c["recip"]["maker"]["src"] = ["zip/data/recip_recon.json", "zip/data/oem_atlas.json"]
+    for seg in ("gtu", "gpu", "gsho", "pumps", "instrum", "electro"):
         keys, srcs = unique_makers(seg, lambda rel: load(rel))
+        extra = atlas_keys.get(seg, set())
+        if extra:
+            keys |= extra
+            if any(m.get("segment") == seg for m in atlas.get("makers", [])):
+                srcs = srcs + ["zip/data/oem_atlas.json"]
+            if dirs_src.get(seg):
+                srcs = srcs + [dirs_src[seg]]
+            if subs_src.get(seg):
+                srcs = srcs + [subs_src[seg]]
+        if not keys:
+            continue
         for src in srcs:
             put(seg, "maker", 0, src)
         c[seg]["maker"]["n"] = len(keys)
@@ -272,9 +408,12 @@ def build() -> dict:
         cells = []
         for key, title, what in LINKS:
             cell = c[sid][key]
+            state = "есть" if cell["n"] else ("черновик" if cell["draft"] else "пусто")
             cells.append({"link": key, "title": title, "what": what,
-                          "n": cell["n"], "sources": cell["src"],
-                          "state": "есть" if cell["n"] else "пусто"})
+                          "n": cell["n"], "draft": cell["draft"], "sources": cell["src"],
+                          "state": state})
+            # Клетка «есть 2 / черновик 51» не должна читаться как «есть 2».
+            # Черновик показывается всегда, счётом заполненных клеток не становится.
         filled = sum(1 for x in cells if x["n"])
         rows.append({"segment": sid, "title": stitle, "cells": cells,
                      "filled": filled, "of": len(LINKS),
@@ -285,7 +424,7 @@ def build() -> dict:
     empty_everywhere = [
         {"link": k, "title": t, "what": w}
         for k, t, w in LINKS
-        if all(next(c for c in r["cells"] if c["link"] == k)["n"] == 0 for r in rows)
+        if all(next(c for c in r["cells"] if c["link"] == k)["state"] == "пусто" for r in rows)
     ]
     from datetime import date
     return {
@@ -298,7 +437,10 @@ def build() -> dict:
                  "счётчик её НЕ ВИДИТ — ключа базы в сборке нет. Поэтому ноль в клетке означает "
                  "«нет в файлах репозитория», а не «нет нигде»: часть звеньев закрыта именно "
                  "в библиотеке. Её состояние ведётся отдельно — таблица звеньев в CLAUDE.md и "
-                 "scripts/library_report.py, которому нужен SUPABASE_DB_URL.",
+                 "scripts/library_report.py, которому нужен SUPABASE_DB_URL. ЧЕРНОВИК: число со "
+                 "знаком ~ — строки, которые собраны, но проверку скептиком не проходили. Они не "
+                 "засчитываются в заполненные клетки: заполненной клетка становится по "
+                 "проверенным данным, а не по собранным.",
         "goal": "Инженерный портал ремонта и сервиса динамического оборудования (CLAUDE.md).",
         "priority_rule": "Пустое звено важнее улучшения заполненного.",
         "links": [{"link": k, "title": t, "what": w} for k, t, w in LINKS],
@@ -309,6 +451,10 @@ def build() -> dict:
             "segments": len(rows),
             "links": len(LINKS),
             "cells_filled": sum(r["filled"] for r in rows),
+            "cells_draft_only": sum(1 for r in rows for x in r["cells"]
+                                    if x["state"] == "черновик"),
+            "cells_with_draft": sum(1 for r in rows for x in r["cells"] if x["draft"]),
+            "draft_rows": sum(x["draft"] for r in rows for x in r["cells"]),
             "cells_total": len(rows) * len(LINKS),
             "links_not_started": len(empty_everywhere),
         },
