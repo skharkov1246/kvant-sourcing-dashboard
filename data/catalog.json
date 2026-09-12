@@ -4,12 +4,12 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 192,
-    "total_bytes": 93877643,
+    "datasets": 194,
+    "total_bytes": 93908260,
     "by_sensitivity": {
       "конфиденциально": 57,
-      "внутреннее": 101,
-      "публикуемо": 34
+      "внутреннее": 102,
+      "публикуемо": 35
     },
     "by_subproject": {
       "ГПУ-библиотека": 27,
@@ -17,7 +17,7 @@
       "ОВЭ-75": 45,
       "база ЗИП": 31,
       "база ЗИП · таможня": 18,
-      "библиотека рынков": 2,
+      "библиотека рынков": 4,
       "гидрометаллургия": 22,
       "дашборд сорсеров": 4,
       "каталог PN (веб)": 1,
@@ -5749,6 +5749,67 @@
       ]
     },
     {
+      "path": "data/catalog_notes.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 33965,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "data/budget_snapshot.json",
+        "data/chain_coverage.json",
+        "data/chat_snapshot.json",
+        "data/index.json",
+        "dict/",
+        "dict/node_map.json",
+        "gidromet/data/",
+        "gpu/data/bitrix_gpu.json",
+        "gpu/data/coverage.json",
+        "gt/data/ansaldo.json",
+        "gt/data/bitrix_gt.json",
+        "gt/data/dossiers.json",
+        "gt/data/pn_db.json",
+        "gt/data/ship_energoseti.json",
+        "gt/data/ship_lukoil.json",
+        "gt/data/ship_sellers.json",
+        "gt/data/ship_sweep.json",
+        "library/data/defect_types.json",
+        "library/data/methods.json",
+        "library/data/repairs.json",
+        "library/data/symptoms.json",
+        "library/docfilter.py",
+        "library/indexer.py",
+        "library/load_parts.py",
+        "library/load_suppliers.py",
+        "library/ocr.py",
+        "library/reparse.py",
+        "library/supabase/schema_junk.sql",
+        "ove/data/suppliers.json",
+        "pnw/data/contacts_found.json",
+        "pnw/data/crossrefs.json",
+        "pnw/data/item_master.json",
+        "pnw/data/kv_registry.json",
+        "pnw/data/numbers.json",
+        "pnw/data/part_suppliers.json",
+        "pnw/data/supplier_master.json",
+        "pnw/public/data.js",
+        "pnw/public/search.html",
+        "zip/customs/out/",
+        "zip/data/cat_stock_2026-09.json"
+      ],
+      "last_change": "2026-09-12",
+      "last_author": "Claude",
+      "last_commit": "960af9b",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "scripts/build_catalog.py"
+      ]
+    },
+    {
       "path": "ove/data/bi_register.json",
       "subproject": "ОВЭ-75",
       "bytes": 33887,
@@ -5913,67 +5974,6 @@
         "ove/build.py",
         "ove/tools/bitrix_ove.py",
         "ove/tools/build_rfq.py"
-      ]
-    },
-    {
-      "path": "data/catalog_notes.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 32115,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "data/budget_snapshot.json",
-        "data/chain_coverage.json",
-        "data/chat_snapshot.json",
-        "data/index.json",
-        "dict/",
-        "dict/node_map.json",
-        "gidromet/data/",
-        "gpu/data/bitrix_gpu.json",
-        "gpu/data/coverage.json",
-        "gt/data/ansaldo.json",
-        "gt/data/bitrix_gt.json",
-        "gt/data/dossiers.json",
-        "gt/data/pn_db.json",
-        "gt/data/ship_energoseti.json",
-        "gt/data/ship_lukoil.json",
-        "gt/data/ship_sellers.json",
-        "gt/data/ship_sweep.json",
-        "library/data/methods.json",
-        "library/data/symptoms.json",
-        "library/docfilter.py",
-        "library/indexer.py",
-        "library/load_parts.py",
-        "library/load_suppliers.py",
-        "library/ocr.py",
-        "library/reparse.py",
-        "library/supabase/schema_junk.sql",
-        "ove/data/suppliers.json",
-        "pnw/data/contacts_found.json",
-        "pnw/data/crossrefs.json",
-        "pnw/data/item_master.json",
-        "pnw/data/kv_registry.json",
-        "pnw/data/numbers.json",
-        "pnw/data/part_suppliers.json",
-        "pnw/data/supplier_master.json",
-        "pnw/public/data.js",
-        "pnw/public/search.html",
-        "zip/customs/out/",
-        "zip/data/cat_stock_2026-09.json",
-        "zip/data/customs_declarations.json",
-        "zip/data/kp1763_audit.json"
-      ],
-      "last_change": "2026-09-12",
-      "last_author": "Claude",
-      "last_commit": "a6843da",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "scripts/build_catalog.py"
       ]
     },
     {
@@ -6447,6 +6447,44 @@
       ]
     },
     {
+      "path": "library/data/symptoms.json",
+      "subproject": "библиотека рынков",
+      "bytes": 21427,
+      "note": "Признаки неисправности вращающегося оборудования: по чему видно, что машина нездорова, что это обычно значит и чем подтверждается. Звено «признак» цепочки портала. СПРАВОЧНИК-ЗАГОТОВКА, не измерение по парку: связки взяты из общей практики диагностики и из брошюр OEM (поле basis), уверенность у всех строк низкая, требуется проверка инженером сервиса. Загружается library/load_repair.py в lib_symptoms.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "note",
+        "rows",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 24,
+        "record_keys": [
+          "basis",
+          "confirm",
+          "confirm_ops",
+          "defect",
+          "defect_refs",
+          "measure",
+          "name",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-12",
+      "last_author": "Claude",
+      "last_commit": "960af9b",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "library/load_repair.py"
+      ]
+    },
+    {
       "path": "ove/data/audit_log.json",
       "subproject": "ОВЭ-75",
       "bytes": 21236,
@@ -6684,10 +6722,10 @@
       ]
     },
     {
-      "path": "library/data/symptoms.json",
+      "path": "library/data/defect_types.json",
       "subproject": "библиотека рынков",
-      "bytes": 18125,
-      "note": "Признаки неисправности вращающегося оборудования: по чему видно, что машина нездорова, что это обычно значит и чем подтверждается. Звено «признак» цепочки портала. СПРАВОЧНИК-ЗАГОТОВКА, не измерение по парку: связки взяты из общей практики диагностики и из брошюр OEM (поле basis), уверенность у всех строк низкая, требуется проверка инженером сервиса. Загружается library/load_repair.py в lib_symptoms.",
+      "bytes": 17871,
+      "note": "Типовые дефекты вращающегося оборудования: 25 записей с узлом, причиной, последствием и ссылкой на ремонтную операцию. Звено «дефект» цепочки портала. Прежде дефекты были только позиционные («риск отказа соплового аппарата»), а признак и дефект связывались текстом, а не ссылкой: перейти от «металла в масле» к дефекту было нельзя. СПРАВОЧНИК-ЗАГОТОВКА: причины и последствия из общей практики, уверенность низкая, требуется проверка инженером сервиса. Загружается library/load_repair.py в lib_defects, связи — в lib_symptom_defects и lib_defect_ops.",
       "format": "json",
       "shape": "объект",
       "top_keys": [
@@ -6697,27 +6735,27 @@
       ],
       "main_collection": {
         "key": "rows",
-        "records": 24,
+        "records": 25,
         "record_keys": [
           "basis",
-          "confirm",
-          "confirm_ops",
-          "defect",
-          "measure",
+          "cause",
+          "consequence",
+          "fix_ops",
           "name",
           "unit"
         ]
       },
       "last_change": "2026-09-12",
       "last_author": "Claude",
-      "last_commit": "a6843da",
+      "last_commit": "960af9b",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
         "markers": []
       },
       "referenced_by": [
-        "library/load_repair.py"
+        "library/load_repair.py",
+        "tests/test_library_repair.py"
       ]
     },
     {
@@ -7710,6 +7748,41 @@
       },
       "referenced_by": [
         "gpu/build.py"
+      ]
+    },
+    {
+      "path": "library/data/repairs.json",
+      "subproject": "библиотека рынков",
+      "bytes": 7594,
+      "note": "Ремонтные операции по механике, обвязке и КИП: 15 записей с узлом и объёмом работ. Разведка OEM собрана по горячему тракту и по ремонту генераторов, поэтому дефекты «износ вкладыша», «забитый маслофильтр», «дрейф датчика» вести было некуда — а отказывает чаще всего именно это. СПРАВОЧНИК-ЗАГОТОВКА: операции из общей практики, сроков и стоимости нет (их у нас нет), требуется проверка инженером сервиса. Загружается library/load_repair.py в lib_procedures с видом «ремонт».",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "note",
+        "rows",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 15,
+        "record_keys": [
+          "basis",
+          "name",
+          "scope",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-12",
+      "last_author": "Claude",
+      "last_commit": "960af9b",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "library/load_repair.py",
+        "tests/test_library_repair.py"
       ]
     },
     {
