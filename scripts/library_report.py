@@ -79,6 +79,8 @@ def собрать(cur) -> dict:
              where not exists (select 1 from lib_part_suppliers s where s.part_id = p.id)"""),
         "без_цены": q(cur, """select count(*) from lib_parts p
              where not exists (select 1 from lib_prices pr where pr.part_id = p.id)"""),
+        "спрос_опознан": q(cur, "select count(*) from lib_demand_catalog"),
+        "сделок_опознано": q(cur, "select count(distinct deal_id) from lib_demand_catalog"),
     }
     for ключ, значение in PROD.items():
         if ключ in d:
@@ -214,6 +216,9 @@ def html_doc(d: dict) -> str:
 <th style="width:30%">строк</th></tr></thead><tbody>
 <tr><td>Спрос из спецификаций сделок (lib_demand){' — по прогону в живой базе' if 'спрос' in PROD else ''}</td><td class="num">{n(d['спрос'])}</td></tr>
 <tr><td>Разобранных вложений Битрикса (lib_files){' — по прогону в живой базе' if 'файлы' in PROD else ''}</td><td class="num">{n(d['файлы'])}</td></tr>
+<tr class="q"><td><b>Строк спроса, опознанных по каталогу</b> — сведены по артикулу с известной
+    деталью, на {n(d['сделок_опознано'])} сделках</td>
+    <td class="num">{n(d['спрос_опознан'])}</td></tr>
 </tbody></table></section>
 </body></html>"""
 
