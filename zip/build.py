@@ -142,9 +142,17 @@ def build():
     (OUT / "vendor").mkdir(exist_ok=True)
     shutil.copy2(SITE / "vendor" / "supabase.js", OUT / "vendor" / "supabase.js")
 
+    # индекс «признак → дефект»: производная проекция каталога дефектов.
+    # Собирается ДО страниц: и страница диагностики, и счётчик цепочки её читают.
+    try:
+        subprocess.run([sys.executable, str(ROOT.parent / "scripts" / "build_symptom_index.py")],
+                       check=True)
+    except Exception as ex:
+        print(f"индекс признаков: пропущен ({ex})")
+
     # страницы-разведки: собираются из тех же данных zip/data, но своим сборщиком.
     # Каждая — самодостаточный HTML рядом с индексом; падение одной не роняет деплой.
-    for mod in ("build_telsmith_page", "build_audit_page", "build_recip_page"):
+    for mod in ("build_telsmith_page", "build_audit_page", "build_recip_page", "build_diag_page"):
         try:
             subprocess.run([sys.executable, str(ROOT / "tools" / f"{mod}.py")], check=True)
         except Exception as ex:

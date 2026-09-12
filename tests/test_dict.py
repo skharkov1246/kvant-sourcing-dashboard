@@ -158,8 +158,20 @@ def test_chain_coverage_is_fresh_and_honest():
             if cell["n"]:
                 assert cell["sources"], f"{seg['segment']}/{cell['link']}: число без источника"
                 assert cell["state"] == "есть"
+            elif cell.get("draft"):
+                # Черновик — собрано, но скептиком не проверено. Клетка не считается
+                # заполненной: иначе «собрал» читалось бы как «проверил».
+                assert cell["state"] == "черновик"
+                assert cell["sources"], f"{seg['segment']}/{cell['link']}: черновик без источника"
             else:
                 assert cell["state"] == "пусто"
+
+    # Заполненные клетки считаются по проверенным данным, не по собранным.
+    filled = sum(1 for s_ in cov["segments"] for c in s_["cells"] if c["state"] == "есть")
+    assert cov["summary"]["cells_filled"] == filled, \
+        "в заполненные клетки просочился черновик — тогда карта перестаёт показывать, где пусто"
+    draft_only = sum(1 for s_ in cov["segments"] for c in s_["cells"] if c["state"] == "черновик")
+    assert cov["summary"]["cells_draft_only"] == draft_only
 
 
 def test_gsho_machine_registry():
@@ -355,3 +367,59 @@ def test_chain_counter_declares_its_scope():
         html = page.read_text(encoding="utf-8")
         assert "Что этот счётчик не видит" in html, "оговорка не попала на страницу"
 
+
+def test_diagnostics_verdicts_are_explicit():
+    """У каждого факта и каждого дефекта разведки по диагностике стоит вердикт.
+
+    Пустое поле вердикта читается как «проверено, всё хорошо», и это была бы
+    ложь: скептик адресно проверял численные нормы, а каталог дефектов — точечно.
+    Поэтому «скептик не сослался» существует отдельным значением и обязано
+    стоять там, где проверки не было."""
+    d = json.loads((ROOT / "zip" / "data" / "diagnostics_recon.json").read_text(encoding="utf-8"))
+    assert d["stats"]["angles"] >= 5
+    ALLOWED = {"подтверждено", "частично", "опровергнуто", "непроверяемо",
+               "скептик не сослался", "угол без скептика"}
+    for a in d["angles"]:
+        for item in a["findings"] + a["defects"]:
+            v = item.get("verdict")
+            assert isinstance(v, dict) and v.get("verdict") in ALLOWED, \
+                f"{a['key']}: вердикт отсутствует или не из словаря — {v}"
+        # Вердикт без адреса означает, что проверка скептика потерялась по дороге.
+        if a["skeptic"]:
+            assert not a["skeptic"]["orphan_verdicts"], \
+                f"{a['key']}: вердикты скептика не легли ни на один факт"
+
+    # Оговорка о непроверенных стандартах обязана остаться в файле дословно:
+    # сгладить её — значит выдать несверенные цифры за сверенные.
+    assert "403" in d["caveat"] and "ISO 10816-3" in d["caveat"], \
+        "оговорка скептика о недоступных стандартах пропала из набора"
+
+
+def test_symptom_index_is_fresh_and_measured():
+    """Индекс «признак → дефект» пересобран, и его охват измерен, а не заявлен.
+
+    Звено «признак» было пустым во всех направлениях. Индекс закрывает его
+    разбором поля симптомов, и главное здесь — не число признаков, а доля
+    дефектов, до которых индекс дотянулся, и полный список тех, до кого нет."""
+    r = subprocess.run([sys.executable, str(ROOT / "scripts" / "build_symptom_index.py"), "--check"],
+                       capture_output=True, text=True)
+    assert r.returncode == 0, f"индекс признаков устарел: {r.stdout}{r.stderr}"
+
+    d = json.loads((ROOT / "dict" / "symptom.json").read_text(encoding="utf-8"))
+    cov = d["coverage"]
+    assert cov["pct"] >= 90, f"охват признаками просел до {cov['pct']} % — правило ослабло"
+    # Список непокрытых обязан лежать целиком, а не числом: без него следующая
+    # ошибка снова будет неизмеримой.
+    assert len(cov["unmatched"]) == cov["unmatched_count"]
+    assert cov["with_symptom"] + cov["unmatched_count"] == cov["defects"]
+
+    # Узлы сведены полностью: «не разобран» в готовом индексе означает, что
+    # правило не дописано, а такой узел не найдётся поиском.
+    assert not cov["nodes_unmatched"], f"узлы без правила: {cov['nodes_unmatched']}"
+
+    # Признак обязан вести к дефектам, а дефект — нести запчасти: иначе цепочка
+    # обрывается там же, где начиналась.
+    for rec in d["records"]:
+        assert rec["defects"], f"признак {rec['key']} ни на что не указывает"
+    assert all(r["parts"] for r in d["defect_rows"]), \
+        "у дефекта пустое поле запчастей — звено «дефект → запчасть» разорвано"

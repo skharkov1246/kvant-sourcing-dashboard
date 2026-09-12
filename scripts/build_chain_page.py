@@ -31,6 +31,8 @@ table.chain th{white-space:normal;vertical-align:bottom}
 table.chain td.c{text-align:center;font-variant-numeric:tabular-nums}
 td.zero{background:rgba(208,59,59,.10);color:var(--crit,#d03b3b);font-weight:600}
 td.has{background:rgba(12,163,12,.08)}
+td.draft{background:rgba(250,178,25,.14);color:var(--warn,#a87b06);font-weight:600}
+td .dr{font-size:10px;font-weight:400;color:var(--warn,#a87b06);white-space:nowrap}
 .seg{font-weight:600;text-align:left}
 .legend{display:flex;gap:14px;flex-wrap:wrap;margin:8px 0;font-size:12px;color:var(--ink2)}
 .legend i{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:5px}
@@ -49,12 +51,19 @@ def build():
     for r in segs:
         cells = ""
         for c in r["cells"]:
-            cls = "has" if c["n"] else "zero"
+            # Три состояния, не два: «есть», «черновик» (собрано, но не проверено)
+            # и «пусто». Черновик показан всегда, даже когда рядом есть проверенное:
+            # клетка «2» при 147 непроверенных строках читалась бы как «почти пусто».
+            draft = c.get("draft", 0)
+            cls = "has" if c["n"] else ("draft" if draft else "zero")
             title = e("; ".join(c["sources"])) if c["sources"] else "источников нет"
+            if draft:
+                title += f" · черновик: {draft} строк без проверки скептиком"
             cells += (f'<td class="c {cls}" title="{title}">'
                       f'{c["n"] if c["n"] else "—"}'
+                      + (f'<div class="dr">+{draft} черн.</div>' if draft else "")
                       + (f'<div class="mut" style="font-size:10px">{len(c["sources"])} ф.</div>'
-                         if c["sources"] else "")
+                         if c["sources"] and not draft else "")
                       + "</td>")
         rows += (f'<tr><td class="seg">{e(r["title"])}'
                  f'<div class="bar"><i style="width:{r["pct"]}%"></i></div></td>{cells}'
@@ -75,8 +84,8 @@ def build():
 <title>Заполняемость портала — карта цепочки</title>
 <style>{CSS}{EXTRA}</style></head><body>
 <header>
-<div class="mut"><a href="./">← ГШО · рабочая база</a> · <a href="./recip.html">поршневые компрессоры</a>
- · <a href="./telsmith.html">Telsmith 3858</a></div>
+<div class="mut"><a href="./">← ГШО · рабочая база</a> · <a href="./diag.html">диагностика и дефекты</a>
+ · <a href="./recip.html">поршневые компрессоры</a> · <a href="./telsmith.html">Telsmith 3858</a></div>
 <h1>Заполняемость портала: где пусто</h1>
 <div class="sub">Цель — инженерный портал ремонта и сервиса динамического оборудования.
 Пользователь проходит цепочку целиком: машина → узел → признак → дефект → ремонтное решение →
@@ -84,6 +93,7 @@ def build():
 уже есть, а какие пусты. Обновлено {e(d.get('updated', ''))}.</div>
 <div class="kpi">
 <div><b>{s['cells_filled']} / {s['cells_total']}</b><span>клеток заполнено</span></div>
+<div><b>{s.get('draft_rows', 0)}</b><span>строк черновика ждут проверки</span></div>
 <div><b>{s['links_not_started']}</b><span>звеньев не начато нигде</span></div>
 <div><b>{s['segments']}</b><span>направлений</span></div>
 <div><b>{com.get('machines_total', 0)}</b><span>машин в реестре</span></div>
@@ -97,6 +107,7 @@ def build():
 <div class="txt">{e(d.get('scope', ''))}</div></div>
 <div class="legend">
   <span><i style="background:rgba(12,163,12,.35)"></i>есть данные, под числом — сколько файлов-источников</span>
+  <span><i style="background:rgba(250,178,25,.35)"></i>черновик: собрано, но скептиком не проверено — в заполненные не идёт</span>
   <span><i style="background:rgba(208,59,59,.35)"></i>пусто в файлах репозитория — в библиотеке Supabase может быть</span>
 </div>
 <div class="wrap"><table class="chain"><thead><tr><th style="width:190px">Направление</th>{head}

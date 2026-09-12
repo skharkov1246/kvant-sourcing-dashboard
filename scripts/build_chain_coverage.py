@@ -183,13 +183,14 @@ def unique_makers(seg: str, load_fn):
 
 def counts() -> dict:
     """Числитель по каждой клетке: что в файлах РЕАЛЬНО есть."""
-    c = {s: {k: {"n": 0, "src": []} for k, _t, _d in LINKS} for s, _ in SEGMENTS}
+    c = {s: {k: {"n": 0, "draft": 0, "src": []} for k, _t, _d in LINKS} for s, _ in SEGMENTS}
 
-    def put(seg, link, num, src):
+    def put(seg, link, num, src, draft=False):
+        """draft=True — данные есть, но проверку не проходили: отдельный счёт."""
         if not num:
             return
         cell = c[seg][link]
-        cell["n"] += num
+        cell["draft" if draft else "n"] += num
         if src not in cell["src"]:
             cell["src"].append(src)
 
@@ -232,6 +233,51 @@ def counts() -> dict:
         c["recip"]["maker"]["n"] = len(comp)
         c["recip"]["maker"]["src"] = ["zip/data/recip_recon.json"]
 
+    # ── диагностика: признак и дефект. Единственные два звена, пустые везде.
+    # Привязка к направлению по области разведки, плюс два узла-исключения:
+    # электрическая машина и КИПиА встречаются внутри разведки турбомашин,
+    # но принадлежат своим направлениям. Общая часть (вибро- и невибрационные
+    # методы) машинно-независима и потому идёт во ВСЕ направления — это не
+    # добивка числа, а то, чем эти методы и являются: нормы ISO 20816 и анализ
+    # масла одинаковы для турбины, насоса и дробилки.
+    sym = load("dict/symptom.json", {})
+    if sym.get("defect_rows"):
+        # Общая часть идёт только во вращающиеся и возвратно-поступательные машины.
+        # КИПиА и электротехника получают ТОЛЬКО свои узлы (правило NODE_SEG ниже):
+        # дефекты подшипника качения к датчику давления отношения не имеют, и
+        # раздача им общего блока была бы добивкой числа.
+        SCOPE_SEG = {"turbo": ["gtu"], "pumps": ["pumps"], "recip": ["recip"],
+                     "common": ["gtu", "gpu", "gsho", "recip", "pumps"]}
+        NODE_SEG = {"Электрическая машина и питание": "electro",
+                    "КИП, САУ, защиты": "instrum"}
+        CHECKED = {"подтверждено", "частично"}
+        REJECTED = {"опровергнуто"}  # забракованное скептиком не данные, а урок
+        rows = sym["defect_rows"]
+        # признак → множество индексов дефектов
+        sym_of = {}
+        for r in sym["records"]:
+            for i in r["defects"]:
+                sym_of.setdefault(i, set()).add(r["key"])
+        d_cnt = {s: {"n": 0, "draft": 0} for s, _ in SEGMENTS}
+        s_set = {s: {"n": set(), "draft": set()} for s, _ in SEGMENTS}
+        for i, r in enumerate(rows):
+            segs = set(SCOPE_SEG.get(r["scope"], []))
+            if r["node"] in NODE_SEG:
+                segs.add(NODE_SEG[r["node"]])
+            if r["verdict"] in REJECTED:
+                continue
+            bucket = "n" if r["verdict"] in CHECKED else "draft"
+            for seg in segs:
+                d_cnt[seg][bucket] += 1
+                s_set[seg][bucket] |= sym_of.get(i, set())
+        for seg, _ in SEGMENTS:
+            put(seg, "defect", d_cnt[seg]["n"], "zip/data/diagnostics_recon.json")
+            put(seg, "defect", d_cnt[seg]["draft"], "zip/data/diagnostics_recon.json", draft=True)
+            # признак считается один раз: проверенный не должен дублироваться в черновике
+            ok = s_set[seg]["n"]
+            put(seg, "symptom", len(ok), "dict/symptom.json")
+            put(seg, "symptom", len(s_set[seg]["draft"] - ok), "dict/symptom.json", draft=True)
+
     # ── изготовители: уникальные компании по каждому направлению
     for seg in ("gtu", "gpu", "gsho"):
         keys, srcs = unique_makers(seg, lambda rel: load(rel))
@@ -272,9 +318,12 @@ def build() -> dict:
         cells = []
         for key, title, what in LINKS:
             cell = c[sid][key]
+            state = "есть" if cell["n"] else ("черновик" if cell["draft"] else "пусто")
             cells.append({"link": key, "title": title, "what": what,
-                          "n": cell["n"], "sources": cell["src"],
-                          "state": "есть" if cell["n"] else "пусто"})
+                          "n": cell["n"], "draft": cell["draft"], "sources": cell["src"],
+                          "state": state})
+            # Клетка «есть 2 / черновик 51» не должна читаться как «есть 2».
+            # Черновик показывается всегда, счётом заполненных клеток не становится.
         filled = sum(1 for x in cells if x["n"])
         rows.append({"segment": sid, "title": stitle, "cells": cells,
                      "filled": filled, "of": len(LINKS),
@@ -285,7 +334,7 @@ def build() -> dict:
     empty_everywhere = [
         {"link": k, "title": t, "what": w}
         for k, t, w in LINKS
-        if all(next(c for c in r["cells"] if c["link"] == k)["n"] == 0 for r in rows)
+        if all(next(c for c in r["cells"] if c["link"] == k)["state"] == "пусто" for r in rows)
     ]
     from datetime import date
     return {
@@ -298,7 +347,10 @@ def build() -> dict:
                  "счётчик её НЕ ВИДИТ — ключа базы в сборке нет. Поэтому ноль в клетке означает "
                  "«нет в файлах репозитория», а не «нет нигде»: часть звеньев закрыта именно "
                  "в библиотеке. Её состояние ведётся отдельно — таблица звеньев в CLAUDE.md и "
-                 "scripts/library_report.py, которому нужен SUPABASE_DB_URL.",
+                 "scripts/library_report.py, которому нужен SUPABASE_DB_URL. ЧЕРНОВИК: число со "
+                 "знаком ~ — строки, которые собраны, но проверку скептиком не проходили. Они не "
+                 "засчитываются в заполненные клетки: заполненной клетка становится по "
+                 "проверенным данным, а не по собранным.",
         "goal": "Инженерный портал ремонта и сервиса динамического оборудования (CLAUDE.md).",
         "priority_rule": "Пустое звено важнее улучшения заполненного.",
         "links": [{"link": k, "title": t, "what": w} for k, t, w in LINKS],
@@ -309,6 +361,10 @@ def build() -> dict:
             "segments": len(rows),
             "links": len(LINKS),
             "cells_filled": sum(r["filled"] for r in rows),
+            "cells_draft_only": sum(1 for r in rows for x in r["cells"]
+                                    if x["state"] == "черновик"),
+            "cells_with_draft": sum(1 for r in rows for x in r["cells"] if x["draft"]),
+            "draft_rows": sum(x["draft"] for r in rows for x in r["cells"]),
             "cells_total": len(rows) * len(LINKS),
             "links_not_started": len(empty_everywhere),
         },
