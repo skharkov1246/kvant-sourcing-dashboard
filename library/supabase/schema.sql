@@ -137,6 +137,24 @@ create table if not exists lib_part_models (
 );
 create index if not exists lib_part_models_model on lib_part_models (model_id);
 
+-- Парк: какая машина где стоит и чья. Без этого справочник машин отвечает «что
+-- бывает», а не «что чинить у этого заказчика», а сорсинг живёт вторым вопросом.
+create table if not exists lib_fleet (
+  id         text primary key,
+  site       text not null,               -- площадка: ТЭЦ, энергоблок, КС
+  owner      text,
+  model_id   text references lib_models(id) on delete set null,
+  model_raw  text,                        -- как машина названа в источнике
+  units      text,                        -- сколько машин на площадке
+  year       text,
+  note       text,
+  source     text,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+create index if not exists lib_fleet_model on lib_fleet (model_id);
+create index if not exists lib_fleet_owner on lib_fleet (owner);
+
 alter table lib_parts add column if not exists unit_id    text references lib_units(id) on delete set null;
 alter table lib_parts add column if not exists unit_rule  text;   -- чем определён узел
 alter table lib_parts add column if not exists pn_pattern text;   -- шифровка номера у OEM
@@ -229,6 +247,18 @@ create table if not exists lib_part_suppliers (
   primary key (part_id, supplier_id)
 );
 create index if not exists lib_part_suppliers_sup on lib_part_suppliers (supplier_id);
+
+-- Проверка наличия у продавцов добавляет к ребру то, ради чего сорсер и звонит:
+-- есть ли на складе, за сколько и когда. Вердикт хранится словом продавца
+-- («oem_only», «pn_not_found»), а не сводится к «да/нет»: разница между «номер
+-- не найден» и «только у OEM» — это две разные дальнейшие работы.
+alter table lib_part_suppliers add column if not exists verdict   text;
+alter table lib_part_suppliers add column if not exists in_stock  text;
+alter table lib_part_suppliers add column if not exists stock_qty text;
+alter table lib_part_suppliers add column if not exists lead_time text;
+alter table lib_part_suppliers add column if not exists price     numeric;
+alter table lib_part_suppliers add column if not exists currency  text;
+create index if not exists lib_part_suppliers_verdict on lib_part_suppliers (verdict);
 
 
 -- Исполнители приходят из семи разных исследований, и одна компания встречается
@@ -334,6 +364,7 @@ alter table lib_units     enable row level security;
 alter table lib_part_models    enable row level security;
 alter table lib_procedures     enable row level security;
 alter table lib_defects        enable row level security;
+alter table lib_fleet          enable row level security;
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 9. Реестр разобранных файлов. Нужен для возобновляемости: обход 22 тысяч

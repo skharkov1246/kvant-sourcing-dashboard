@@ -218,10 +218,42 @@ def build_parts(models, alias, units):
     return parts, edges, не_опознано, unit_stat, добавлено, unit_stat
 
 
+def build_fleet(alias: dict[str, str]) -> dict[str, dict]:
+    """Парк: площадка, владелец, машина. Модель в источнике записана как
+    «V64.3A (Siemens)» — завод в скобках, поэтому ключ ищется по очищенному
+    имени, а исходная запись сохраняется целиком."""
+    import re as _re
+    fleet: dict[str, dict] = {}
+    for r in load("gt/data/ansaldo.json").get("fleet_ru", []):
+        площадка = _re.sub(r"<[^>]+>", " ", str(r.get("plant") or "")).strip()
+        if not площадка:
+            continue
+        сырое = str(r.get("model") or "")
+        ключ = None
+        for имя in eq.split_machines(sub_tags(сырое)):
+            ключ = alias.get(eq.norm_model(имя))
+            if ключ:
+                break
+        ид = "парк." + NOT_KEY.sub("", площадка.lower())[:40]
+        fleet[ид] = {"id": ид, "site": площадка[:300], "owner": str(r.get("owner") or "")[:200] or None,
+                     "model_id": ключ, "model_raw": сырое[:200] or None,
+                     "units": str(r.get("units") or "")[:40] or None,
+                     "year": str(r.get("year") or "")[:40] or None,
+                     "note": sub_tags(str(r.get("note") or ""))[:1000] or None,
+                     "source": "парк V-машин в РФ, разведка Ansaldo"}
+    return fleet
+
+
+def sub_tags(s: str) -> str:
+    import re as _re
+    return " ".join(_re.sub(r"<[^>]+>", " ", s or "").split())
+
+
 def main() -> int:
     models, alias = build_models()
     units = build_units()
     parts, edges, не_опознано, unit_stat, добавлено, _ = build_parts(models, alias, units)
+    fleet = build_fleet(alias)
 
     print("=== машины ===")
     fam = Counter(m.get("family") or "из партномеров" for m in models.values())
@@ -262,6 +294,12 @@ def main() -> int:
               f"{sum(не_опознано.values())} упоминаний")
         for m, n in не_опознано.most_common(5):
             print(f"    {m[:44]:46}{num(n)}")
+
+    print("\n=== парк ===")
+    print(f"  площадок:{num(len(fleet))}   машина опознана у "
+          f"{sum(1 for f in fleet.values() if f['model_id'])}")
+    владельцы = Counter(f["owner"] or "—" for f in fleet.values())
+    print(f"  владельцев: {len(владельцы)}")
 
     if not APPLY:
         print("\nхолостой прогон — в базе ничего не изменилось. Для записи: APPLY=1")
@@ -339,12 +377,22 @@ def main() -> int:
               p["qty_demand"], p["source"]) for p in parts.values()], page_size=500)
 
         psycopg2.extras.execute_values(cur, """
+            insert into lib_fleet (id, site, owner, model_id, model_raw, units, year,
+                                   note, source)
+            values %s
+            on conflict (id) do update set
+              owner = excluded.owner, model_id = excluded.model_id,
+              units = excluded.units, note = excluded.note, updated_at = now()""",
+            [(f["id"], f["site"], f["owner"], f["model_id"], f["model_raw"], f["units"],
+              f["year"], f["note"], f["source"]) for f in fleet.values()], page_size=200)
+
+        psycopg2.extras.execute_values(cur, """
             insert into lib_part_models (part_id, model_id, source)
             values %s on conflict (part_id, model_id) do nothing""",
             [(a, b, "партномера потребности") for a, b in sorted(edges)], page_size=500)
         conn.commit()
 
-        for t in ("lib_models", "lib_units", "lib_parts", "lib_part_models"):
+        for t in ("lib_models", "lib_units", "lib_parts", "lib_part_models", "lib_fleet"):
             cur.execute(f"select count(*) from {t}")
             print(f"  {t:18}{num(cur.fetchone()[0])}")
     conn.close()
