@@ -402,6 +402,16 @@ create table if not exists lib_knowledge (
   updated_at   timestamptz default now()
 );
 create index if not exists lib_knowledge_seg on lib_knowledge (segment_id, topic);
+-- Статья знает свой сегмент, но не узел и не машину, а спрашивают именно так:
+-- «что мы знаем про горячий тракт SGT-400». Связи ставит library/link_knowledge.py
+-- по тем же правилам, что размечают позиции, — правило одно на оба места.
+alter table lib_knowledge add column if not exists unit_id  text
+  references lib_units(id) on delete set null;
+alter table lib_knowledge add column if not exists model_id text
+  references lib_models(id) on delete set null;
+alter table lib_knowledge add column if not exists link_rule text;   -- чем связь поставлена
+create index if not exists lib_knowledge_unit  on lib_knowledge (unit_id);
+create index if not exists lib_knowledge_model on lib_knowledge (model_id);
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 6. Разбор проигрышей: почему сделка не доехала до реализации. Главный источник
