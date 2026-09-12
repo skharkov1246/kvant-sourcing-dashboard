@@ -83,20 +83,6 @@ do $$ begin
   end if;
 end $$;
 
--- Задним числом: каким путём разобраны 22 тыс. уже лежащих файлов. Без этого
--- калибровку нельзя расслоить по пути разбора, а весь риск — в текстовом пути.
--- Признак «таблица» = у файла есть хоть одна строка со структурной колонкой:
--- unit/qty/oem заполняются ТОЛЬКО в items_from_rows при найденной шапке.
-update lib_files f set parse_path = case
-    when f.kind = 'pdf' then 'текст'
-    when exists (select 1 from lib_demand d
-                  where d.source_file = f.file_id
-                    and (d.qty is not null or coalesce(btrim(d.unit),'') <> ''
-                         or coalesce(btrim(d.oem),'') <> '')) then 'таблица'
-    when f.kind = 'старый office' then 'таблица'
-    else 'текст' end
- where f.parse_path is null and f.status = 'разобран';
-
 -- Контракт для всех потребителей: в новом коде обращаться сюда, а не в lib_demand.
 -- drop+create, а не create or replace: replace не переживёт добавления колонки
 -- в lib_demand и уронит файл миграции. security_invoker требует PostgreSQL 15+.
@@ -106,3 +92,31 @@ create view lib_demand_live with (security_invoker = true) as
    where not exists (select 1 from lib_row_junk j
                       where j.demand_id = d.id and j.revoked_at is null);
 revoke all on lib_demand_live from anon, authenticated;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Задним числом: каким путём разобраны уже лежащие файлы. Нужно, чтобы расслоить
+-- калибровку по пути разбора — весь риск в текстовом пути.
+--
+-- Признак «таблица» = у файла есть хоть одна строка со структурной колонкой:
+-- unit/qty/oem заполняются ТОЛЬКО в items_from_rows при найденной шапке.
+--
+-- ПОДЗАПРОС ОБЯЗАН БЫТЬ НЕЗАВИСИМЫМ ОТ ОБНОВЛЯЕМОЙ СТРОКИ. Первая версия
+-- спрашивала «exists (… where d.source_file = f.file_id)»: такой подзапрос
+-- коррелирован, внутри CASE он не хешируется и выполняется заново для каждого из
+-- пятнадцати тысяч файлов по таблице в полтора миллиона строк. Прогон 12.09.2026
+-- не уложился в двенадцать минут и был снят. Форма «file_id in (select …)» ни на
+-- что во внешней строке не ссылается, поэтому планировщик считает её один раз и
+-- складывает в хеш.
+--
+-- Досчёт стоит ПОСЛЕ представления: он не нужен ни разметке, ни сводке, и если
+-- когда-нибудь снова окажется медленным, он не должен заблокировать то, ради чего
+-- вся миграция затевалась.
+update lib_files f set parse_path = case
+    when f.kind = 'pdf' then 'текст'
+    when f.file_id in (select source_file from lib_demand
+                        where qty is not null
+                           or coalesce(btrim(unit), '') <> ''
+                           or coalesce(btrim(oem), '') <> '') then 'таблица'
+    when f.kind = 'старый office' then 'таблица'
+    else 'текст' end
+ where f.parse_path is null and f.status = 'разобран';
