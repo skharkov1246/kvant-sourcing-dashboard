@@ -42,6 +42,9 @@ TABLES = [
     ("lib_symptoms", "признаки: по чему видно неисправность"),
     ("lib_procedures", "инспекции, контроль, ремонт, покрытия"),
     ("lib_defects", "дефекты с последствием и решением"),
+    ("lib_symptom_ops", "ребро «признак → чем подтвердить»"),
+    ("lib_symptom_defects", "ребро «признак → дефект»"),
+    ("lib_defect_ops", "ребро «дефект → чем лечить»"),
     ("lib_bom", "ведомости состава машин"),
     ("lib_fleet", "парк: какая машина где стоит"),
 ]
@@ -60,11 +63,11 @@ select 'узел',
 union all
 select 'признак',
        (select count(*) from lib_symptoms),
-       (select count(*) from lib_symptoms where unit_id is not null)
+       (select count(*) from lib_symptoms s where {признак_ведёт_дальше})
 union all
 select 'дефект',
        (select count(*) from lib_defects),
-       (select count(*) from lib_defects where fix is not null)
+       (select count(*) from lib_defects d where {дефект_ведёт_дальше})
 union all
 select 'ремонтное решение',
        (select count(*) from lib_procedures),
@@ -87,7 +90,10 @@ select (select count(*) from lib_parts where unit_id is null)                   
           (select 1 from lib_part_suppliers s where s.part_id = p.id))           as без_исполнителя,
        (select count(*) from lib_parts p where not exists
           (select 1 from lib_prices pr where pr.part_id = p.id))                 as без_цены,
-       (select count(*) from lib_knowledge where unit_id is null)                as статей_без_узла"""
+       (select count(*) from lib_knowledge where unit_id is null)                as статей_без_узла,
+       (select count(*) from lib_symptoms s where not ({признак_ведёт_дальше}))  as признаков_без_дефекта,
+       (select count(*) from lib_defects d where not ({дефект_ведёт_дальше}))     as дефектов_без_решения,
+       (select count(*) from lib_procedures where duration is null)              as операций_без_срока"""
 
 # Проверка цепочки на конкретных номерах. Оба номера — публичные каталожные
 # обозначения изготовителей, они и так опубликованы в репозитории: MW21215M
@@ -242,14 +248,28 @@ def main() -> int:
                       f"   файлов{num(files_marked or 0, 8)}{mark}")
 
         if present.get("lib_models") is not None:
+            # Связи середины цепочки появились позже таблиц. Если миграция ещё
+            # не применена, уточнение считается по старому признаку (узел у
+            # признака, текст решения у дефекта), а сводка отвечает, а не падает.
+            связи = {
+                "признак_ведёт_дальше":
+                    "exists (select 1 from lib_symptom_defects sd where sd.symptom_id = s.id)"
+                    if table_exists(cur, "lib_symptom_defects") else "s.unit_id is not null",
+                "дефект_ведёт_дальше":
+                    "(d.fix is not null or exists "
+                    "(select 1 from lib_defect_ops o where o.defect_id = d.id))"
+                    if table_exists(cur, "lib_defect_ops") else "d.fix is not null",
+            }
             block("заполняемость цепочки портала")
             print(f"  {'звено':22}{'записей':>10}{'из них с уточнением':>22}")
-            for звено, всего, уточнено in rows(cur, CHAIN_SQL):
+            for звено, всего, уточнено in rows(cur, CHAIN_SQL.format(**связи)):
                 print(f"  {звено:22}{num(всего, 10)}{num(уточнено, 22)}")
             block("чего не хватает — это и есть следующая работа")
             подписи = ("деталей без узла", "деталей без машины", "деталей без исполнителя",
-                       "деталей без цены", "статей разведки без узла")
-            for label, value in zip(подписи, one(cur, GAPS_SQL)):
+                       "деталей без цены", "статей разведки без узла",
+                       "признаков без дефекта", "дефектов без решения",
+                       "операций без срока")
+            for label, value in zip(подписи, one(cur, GAPS_SQL.format(**связи))):
                 print(f"  {label:28}{num(value)}")
             block("цепочка по пробному номеру (только числа)")
             print(f"  {'номер':12}{'деталь':>8}{'машин':>8}{'исполн.':>9}{'цен':>6}"
