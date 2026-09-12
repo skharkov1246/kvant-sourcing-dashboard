@@ -4,18 +4,18 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 191,
-    "total_bytes": 93870480,
+    "datasets": 192,
+    "total_bytes": 95289398,
     "by_sensitivity": {
       "конфиденциально": 57,
-      "внутреннее": 101,
+      "внутреннее": 102,
       "публикуемо": 33
     },
     "by_subproject": {
       "ГПУ-библиотека": 27,
       "ГТУ-библиотека": 35,
       "ОВЭ-75": 45,
-      "база ЗИП": 31,
+      "база ЗИП": 32,
       "база ЗИП · таможня": 18,
       "библиотека рынков": 1,
       "гидрометаллургия": 22,
@@ -70,9 +70,9 @@
           "val"
         ]
       },
-      "last_change": "2026-07-07",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "4a1bb8c",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
@@ -192,9 +192,9 @@
           "val"
         ]
       },
-      "last_change": "2026-07-07",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "4a1bb8c",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
@@ -212,9 +212,9 @@
       "bytes": 6146458,
       "note": "Копия базы PN для веб-каталога. Байт-в-байт дубль gt/public/wizard/data.js (по 6,1 МБ каждый).",
       "format": "js",
-      "last_change": "2026-08-23",
-      "last_author": "Kimi Agent",
-      "last_commit": "a1f6db9",
+      "last_change": "2026-08-28",
+      "last_author": "skharkov1246",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -264,9 +264,9 @@
           "vf"
         ]
       },
-      "last_change": "2026-08-27",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "5aa78f3",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -301,9 +301,9 @@
         "key": "rows",
         "records": 23280
       },
-      "last_change": "2026-07-10",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "debbad5",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -360,9 +360,9 @@
           "val"
         ]
       },
-      "last_change": "2026-07-07",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "4a1bb8c",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
@@ -490,9 +490,9 @@
         "terms",
         "updated_at"
       ],
-      "last_change": "2026-07-02",
-      "last_author": "Claude",
-      "last_commit": "1a0bf54",
+      "last_change": "2026-08-28",
+      "last_author": "skharkov1246",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -555,9 +555,9 @@
           "val"
         ]
       },
-      "last_change": "2026-07-07",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "4a1bb8c",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
@@ -614,9 +614,9 @@
           "val"
         ]
       },
-      "last_change": "2026-07-07",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "4a1bb8c",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
@@ -673,9 +673,9 @@
           "val"
         ]
       },
-      "last_change": "2026-07-07",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "4a1bb8c",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
@@ -748,9 +748,9 @@
         "key": "dossiers",
         "records": 1359
       },
-      "last_change": "2026-08-18",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "5e72d14",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
@@ -812,9 +812,9 @@
           "val"
         ]
       },
-      "last_change": "2026-07-07",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "4a1bb8c",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
@@ -825,6 +825,41 @@
         ]
       },
       "referenced_by": []
+    },
+    {
+      "path": "zip/data/diagnostics_recon.json",
+      "subproject": "база ЗИП",
+      "bytes": 1414228,
+      "note": "Разведка по диагностике и дефектам динамического оборудования: пять углов (вибродиагностика, невибрационные методы, турбомашины, насосы, поршневые), 225 численных норм с источником и 233 карточки дефектов «признак → причина → метод → последствие → ремонтопригодность → запчасти». У каждого угла был собственный скептик с заданием опровергать по умолчанию; вердикт стоит у каждой строки. Из 225 норм подтверждена 71, поправлено 118, забраковано 11, признано непроверяемыми 25. Каталог дефектов проверен точечно — 9 строк из 233, остальные несут вердикт «скептик не сослался» и ждут отдельного прохода проверки. ВАЖНО: полные тексты ISO 10816-3, ISO 13373-9, ISO 13379-1 и ISO 17359 выгрузить не удалось (403/404), поэтому численные значения из них перед рабочим применением обязаны быть сверены с официальным текстом. Собрано zip/tools/extract_diagnostics.py из журнала разведки.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "angles",
+        "caveat",
+        "generated",
+        "method",
+        "stats",
+        "subject"
+      ],
+      "main_collection": {
+        "key": "stats",
+        "records": 10
+      },
+      "last_change": "2026-09-12",
+      "last_author": "Claude",
+      "last_commit": "d8165b2",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "scripts/build_chain_coverage.py",
+        "scripts/build_symptom_index.py",
+        "tests/test_dict.py",
+        "zip/tools/build_diag_page.py",
+        "zip/tools/extract_diagnostics.py"
+      ]
     },
     {
       "path": "zip/customs/out/customs_8466_2023-01-01_2023-12-31.json",
@@ -873,9 +908,9 @@
           "val"
         ]
       },
-      "last_change": "2026-07-07",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "4a1bb8c",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
@@ -925,9 +960,9 @@
         "target_equipment",
         "updated_at"
       ],
-      "last_change": "2026-07-02",
-      "last_author": "Claude",
-      "last_commit": "1a0bf54",
+      "last_change": "2026-08-28",
+      "last_author": "skharkov1246",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -1084,9 +1119,9 @@
           "what"
         ]
       },
-      "last_change": "2026-08-18",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "a51e700",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
@@ -1131,9 +1166,9 @@
           "usd_lo"
         ]
       },
-      "last_change": "2026-08-08",
-      "last_author": "Claude",
-      "last_commit": "f1149d1",
+      "last_change": "2026-08-28",
+      "last_author": "skharkov1246",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -1230,9 +1265,9 @@
           "val"
         ]
       },
-      "last_change": "2026-07-07",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "4a1bb8c",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
@@ -1310,9 +1345,9 @@
           "unit"
         ]
       },
-      "last_change": "2026-08-08",
-      "last_author": "Claude",
-      "last_commit": "b8858b4",
+      "last_change": "2026-08-28",
+      "last_author": "skharkov1246",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -1374,9 +1409,9 @@
           "val"
         ]
       },
-      "last_change": "2026-07-07",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "4a1bb8c",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
@@ -1435,9 +1470,9 @@
           "val"
         ]
       },
-      "last_change": "2026-07-07",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "4a1bb8c",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
@@ -1736,9 +1771,9 @@
           "val"
         ]
       },
-      "last_change": "2026-08-05",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "7db483d",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
@@ -1779,7 +1814,7 @@
       },
       "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "b9efc83",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -1952,9 +1987,9 @@
         "url",
         "year"
       ],
-      "last_change": "2026-07-10",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "debbad5",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
@@ -2063,9 +2098,9 @@
           "val"
         ]
       },
-      "last_change": "2026-07-07",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "4a1bb8c",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
@@ -2197,9 +2232,9 @@
           "status"
         ]
       },
-      "last_change": "2026-08-06",
-      "last_author": "Claude",
-      "last_commit": "e2eb8a1",
+      "last_change": "2026-08-28",
+      "last_author": "skharkov1246",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
@@ -2349,9 +2384,9 @@
         "key": "checks",
         "records": 238
       },
-      "last_change": "2026-08-21",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "c80990f",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -2448,9 +2483,9 @@
         "relevance",
         "url"
       ],
-      "last_change": "2026-07-07",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "4a1bb8c",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -2492,9 +2527,9 @@
           "unit"
         ]
       },
-      "last_change": "2026-08-18",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "e724a48",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
@@ -2670,7 +2705,7 @@
       },
       "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "b9efc83",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -2705,9 +2740,9 @@
           "source"
         ]
       },
-      "last_change": "2026-08-21",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "c745e02",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
@@ -2746,9 +2781,9 @@
           "source"
         ]
       },
-      "last_change": "2026-08-21",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "c745e02",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
@@ -2823,9 +2858,9 @@
           "source"
         ]
       },
-      "last_change": "2026-08-21",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "c745e02",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
@@ -2907,7 +2942,7 @@
       },
       "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "b9efc83",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -2964,9 +2999,9 @@
           "val"
         ]
       },
-      "last_change": "2026-08-05",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "7db483d",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
@@ -2997,9 +3032,9 @@
           "name"
         ]
       },
-      "last_change": "2026-08-06",
-      "last_author": "Claude",
-      "last_commit": "9367019",
+      "last_change": "2026-08-28",
+      "last_author": "skharkov1246",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -3045,7 +3080,7 @@
       },
       "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "b9efc83",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -3123,9 +3158,9 @@
         "source",
         "unit"
       ],
-      "last_change": "2026-07-05",
-      "last_author": "Claude",
-      "last_commit": "24a0816",
+      "last_change": "2026-08-28",
+      "last_author": "skharkov1246",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
@@ -3230,9 +3265,9 @@
           "what"
         ]
       },
-      "last_change": "2026-08-21",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "c745e02",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
@@ -3312,9 +3347,9 @@
         "key": "profiles",
         "records": 162
       },
-      "last_change": "2026-08-18",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "29bc2dc",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -3357,9 +3392,9 @@
           "what"
         ]
       },
-      "last_change": "2026-08-18",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "5e72d14",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
@@ -3392,9 +3427,9 @@
         "summary",
         "test_protocol"
       ],
-      "last_change": "2026-07-07",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "4a1bb8c",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -3428,9 +3463,9 @@
           "source"
         ]
       },
-      "last_change": "2026-08-21",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "c745e02",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
@@ -3475,9 +3510,9 @@
           "why"
         ]
       },
-      "last_change": "2026-08-27",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "84ec8e4",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
@@ -3544,9 +3579,9 @@
         "key": "overrides",
         "records": 160
       },
-      "last_change": "2026-08-09",
-      "last_author": "Claude",
-      "last_commit": "20aced1",
+      "last_change": "2026-08-28",
+      "last_author": "skharkov1246",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -3581,9 +3616,9 @@
           "what"
         ]
       },
-      "last_change": "2026-08-08",
-      "last_author": "Claude",
-      "last_commit": "694ee62",
+      "last_change": "2026-08-28",
+      "last_author": "skharkov1246",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
@@ -3644,9 +3679,9 @@
           "val"
         ]
       },
-      "last_change": "2026-07-07",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "4a1bb8c",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
@@ -3683,9 +3718,9 @@
           "where"
         ]
       },
-      "last_change": "2026-08-13",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "19e30c4",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -3780,9 +3815,9 @@
           "stats"
         ]
       },
-      "last_change": "2026-07-09",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "83a1167",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -3824,9 +3859,9 @@
           "url"
         ]
       },
-      "last_change": "2026-08-22",
-      "last_author": "Claude",
-      "last_commit": "f8adae9",
+      "last_change": "2026-08-28",
+      "last_author": "skharkov1246",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -4018,7 +4053,7 @@
       },
       "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "b9efc83",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -4062,9 +4097,9 @@
           "why"
         ]
       },
-      "last_change": "2026-08-13",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "eec0a61",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -4272,9 +4307,9 @@
           "val"
         ]
       },
-      "last_change": "2026-07-07",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "4a1bb8c",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
@@ -4409,9 +4444,9 @@
         "key": "confirmed",
         "records": 161
       },
-      "last_change": "2026-08-18",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "29bc2dc",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
@@ -4600,9 +4635,9 @@
           "title"
         ]
       },
-      "last_change": "2026-08-13",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "d6f5114",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -4711,9 +4746,9 @@
           "usd_year"
         ]
       },
-      "last_change": "2026-08-13",
-      "last_author": "Claude",
-      "last_commit": "13a6b73",
+      "last_change": "2026-08-28",
+      "last_author": "skharkov1246",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -4862,9 +4897,9 @@
           "status"
         ]
       },
-      "last_change": "2026-08-27",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "84ec8e4",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -4904,9 +4939,9 @@
           "src"
         ]
       },
-      "last_change": "2026-08-13",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "19e30c4",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -4975,9 +5010,9 @@
           "system"
         ]
       },
-      "last_change": "2026-08-06",
-      "last_author": "Claude",
-      "last_commit": "9ec3b40",
+      "last_change": "2026-08-28",
+      "last_author": "skharkov1246",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -5095,7 +5130,7 @@
       },
       "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "b9efc83",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -5170,9 +5205,9 @@
           "year"
         ]
       },
-      "last_change": "2026-07-09",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "6bf8795",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
@@ -5293,9 +5328,9 @@
           "status"
         ]
       },
-      "last_change": "2026-08-13",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "ad744ff",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -5394,9 +5429,9 @@
           "note"
         ]
       },
-      "last_change": "2026-08-13",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "19e30c4",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -5465,9 +5500,9 @@
         "key": "fields",
         "records": 53
       },
-      "last_change": "2026-08-05",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "7db483d",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
@@ -5510,9 +5545,9 @@
           "src"
         ]
       },
-      "last_change": "2026-08-13",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "19e30c4",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -5619,9 +5654,9 @@
           "title"
         ]
       },
-      "last_change": "2026-08-13",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "d6f5114",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -5649,9 +5684,9 @@
         "rationale",
         "sources"
       ],
-      "last_change": "2026-07-05",
-      "last_author": "Claude",
-      "last_commit": "61663d1",
+      "last_change": "2026-08-28",
+      "last_author": "skharkov1246",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -5736,9 +5771,9 @@
           "title"
         ]
       },
-      "last_change": "2026-08-13",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "d6f5114",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -5790,6 +5825,67 @@
         "ove/tools/bi_check.py",
         "ove/tools/build_release.py",
         "ove/tools/docframe.py"
+      ]
+    },
+    {
+      "path": "data/catalog_notes.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 33751,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "data/budget_snapshot.json",
+        "data/chain_coverage.json",
+        "data/chat_snapshot.json",
+        "data/index.json",
+        "dict/",
+        "dict/node_map.json",
+        "dict/symptom.json",
+        "gidromet/data/",
+        "gpu/data/bitrix_gpu.json",
+        "gpu/data/coverage.json",
+        "gt/data/ansaldo.json",
+        "gt/data/bitrix_gt.json",
+        "gt/data/dossiers.json",
+        "gt/data/pn_db.json",
+        "gt/data/ship_energoseti.json",
+        "gt/data/ship_lukoil.json",
+        "gt/data/ship_sellers.json",
+        "gt/data/ship_sweep.json",
+        "library/data/symptoms.json",
+        "library/docfilter.py",
+        "library/indexer.py",
+        "library/load_parts.py",
+        "library/load_suppliers.py",
+        "library/ocr.py",
+        "library/reparse.py",
+        "library/supabase/schema_junk.sql",
+        "ove/data/suppliers.json",
+        "pnw/data/contacts_found.json",
+        "pnw/data/crossrefs.json",
+        "pnw/data/item_master.json",
+        "pnw/data/kv_registry.json",
+        "pnw/data/numbers.json",
+        "pnw/data/part_suppliers.json",
+        "pnw/data/supplier_master.json",
+        "pnw/public/data.js",
+        "pnw/public/search.html",
+        "zip/customs/out/",
+        "zip/data/cat_stock_2026-09.json",
+        "zip/data/customs_declarations.json",
+        "zip/data/diagnostics_recon.json"
+      ],
+      "last_change": "2026-09-12",
+      "last_author": "Claude",
+      "last_commit": "d8165b2",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "scripts/build_catalog.py"
       ]
     },
     {
@@ -5851,9 +5947,9 @@
         "key": "protection",
         "records": 11
       },
-      "last_change": "2026-08-13",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "d677c21",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -5891,9 +5987,9 @@
         "verified",
         "years"
       ],
-      "last_change": "2026-08-06",
-      "last_author": "Claude",
-      "last_commit": "d6897e3",
+      "last_change": "2026-08-28",
+      "last_author": "skharkov1246",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
@@ -5943,9 +6039,9 @@
           "when"
         ]
       },
-      "last_change": "2026-08-27",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "84ec8e4",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -5979,9 +6075,9 @@
           "site"
         ]
       },
-      "last_change": "2026-08-18",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "a51e700",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -5990,67 +6086,6 @@
       "referenced_by": [
         "gt/tools/drop_ru.py",
         "library/load_suppliers.py"
-      ]
-    },
-    {
-      "path": "data/catalog_notes.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 31158,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "data/budget_snapshot.json",
-        "data/chain_coverage.json",
-        "data/chat_snapshot.json",
-        "data/index.json",
-        "dict/",
-        "dict/node_map.json",
-        "gidromet/data/",
-        "gpu/data/bitrix_gpu.json",
-        "gpu/data/coverage.json",
-        "gt/data/ansaldo.json",
-        "gt/data/bitrix_gt.json",
-        "gt/data/dossiers.json",
-        "gt/data/pn_db.json",
-        "gt/data/ship_energoseti.json",
-        "gt/data/ship_lukoil.json",
-        "gt/data/ship_sellers.json",
-        "gt/data/ship_sweep.json",
-        "library/data/symptoms.json",
-        "library/docfilter.py",
-        "library/indexer.py",
-        "library/load_parts.py",
-        "library/load_suppliers.py",
-        "library/ocr.py",
-        "library/reparse.py",
-        "library/supabase/schema_junk.sql",
-        "ove/data/suppliers.json",
-        "pnw/data/contacts_found.json",
-        "pnw/data/crossrefs.json",
-        "pnw/data/item_master.json",
-        "pnw/data/kv_registry.json",
-        "pnw/data/numbers.json",
-        "pnw/data/part_suppliers.json",
-        "pnw/data/supplier_master.json",
-        "pnw/public/data.js",
-        "pnw/public/search.html",
-        "zip/customs/out/",
-        "zip/data/cat_stock_2026-09.json",
-        "zip/data/customs_declarations.json",
-        "zip/data/kp1763_audit.json",
-        "zip/data/machines.json"
-      ],
-      "last_change": "2026-09-12",
-      "last_author": "skharkov1246",
-      "last_commit": "29239a7",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "scripts/build_catalog.py"
       ]
     },
     {
@@ -6080,9 +6115,9 @@
           "waiting"
         ]
       },
-      "last_change": "2026-07-09",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "8cdaf8d",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
@@ -6162,9 +6197,9 @@
         "key": "cde",
         "records": 13
       },
-      "last_change": "2026-08-27",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "5aa78f3",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -6198,7 +6233,7 @@
       },
       "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "b9efc83",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -6265,9 +6300,9 @@
         "key": "common_gr",
         "records": 13
       },
-      "last_change": "2026-08-13",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "d677c21",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -6309,7 +6344,7 @@
       },
       "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "b9efc83",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -6344,9 +6379,9 @@
         "supplier",
         "year"
       ],
-      "last_change": "2026-07-05",
-      "last_author": "Claude",
-      "last_commit": "24a0816",
+      "last_change": "2026-08-28",
+      "last_author": "skharkov1246",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
@@ -6447,45 +6482,9 @@
       ]
     },
     {
-      "path": "ove/data/audit_log.json",
-      "subproject": "ОВЭ-75",
-      "bytes": 21236,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "items",
-        "note",
-        "stats",
-        "updated"
-      ],
-      "main_collection": {
-        "key": "items",
-        "records": 31,
-        "record_keys": [
-          "fix",
-          "sev",
-          "status",
-          "what",
-          "zone"
-        ]
-      },
-      "last_change": "2026-08-28",
-      "last_author": "skharkov1246",
-      "last_commit": "b9efc83",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "ove/build.py"
-      ]
-    },
-    {
       "path": "data/chain_coverage.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 20942,
+      "bytes": 23039,
       "note": "Заполняемость цепочки портала по семи направлениям и восьми звеньям: машина → узел → признак → дефект → ремонтное решение → запчасть → изготовитель → исполнитель. Производный файл, считается scripts/build_chain_coverage.py по фактическим файлам репозитория; ноль означает отсутствие данных, а не то, что они где-то есть. Руками не заполнять. Первый прогон 12.09.2026: 13 клеток из 56, звенья «Признак», «Дефект» и «Исполнитель» не начаты ни по одному направлению.",
       "format": "json",
       "shape": "объект",
@@ -6511,8 +6510,8 @@
         ]
       },
       "last_change": "2026-09-12",
-      "last_author": "skharkov1246",
-      "last_commit": "0c5be8f",
+      "last_author": "Claude",
+      "last_commit": "d8165b2",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -6522,6 +6521,42 @@
         "scripts/build_chain_coverage.py",
         "scripts/build_chain_page.py",
         "tests/test_dict.py"
+      ]
+    },
+    {
+      "path": "ove/data/audit_log.json",
+      "subproject": "ОВЭ-75",
+      "bytes": 21236,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "items",
+        "note",
+        "stats",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "items",
+        "records": 31,
+        "record_keys": [
+          "fix",
+          "sev",
+          "status",
+          "what",
+          "zone"
+        ]
+      },
+      "last_change": "2026-08-28",
+      "last_author": "skharkov1246",
+      "last_commit": "c112683",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "ove/build.py"
       ]
     },
     {
@@ -6793,9 +6828,9 @@
           "what"
         ]
       },
-      "last_change": "2026-08-18",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "29bc2dc",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
@@ -6837,9 +6872,9 @@
           "world"
         ]
       },
-      "last_change": "2026-08-13",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "d677c21",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
@@ -6904,9 +6939,9 @@
         "key": "3",
         "records": 6
       },
-      "last_change": "2026-07-09",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "e572127",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
@@ -6941,9 +6976,9 @@
           "status"
         ]
       },
-      "last_change": "2026-08-27",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "84ec8e4",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
@@ -7056,7 +7091,7 @@
       },
       "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "b9efc83",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
@@ -7101,7 +7136,7 @@
       },
       "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "b9efc83",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
@@ -7179,9 +7214,9 @@
           "what"
         ]
       },
-      "last_change": "2026-08-13",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "d677c21",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
@@ -7212,9 +7247,9 @@
           "title"
         ]
       },
-      "last_change": "2026-08-06",
-      "last_author": "Claude",
-      "last_commit": "d6897e3",
+      "last_change": "2026-08-28",
+      "last_author": "skharkov1246",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
@@ -7450,9 +7485,9 @@
           "who"
         ]
       },
-      "last_change": "2026-08-27",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "84ec8e4",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
@@ -7551,9 +7586,9 @@
           "title"
         ]
       },
-      "last_change": "2026-08-06",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "e1c38b0",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
@@ -7598,9 +7633,9 @@
           "year"
         ]
       },
-      "last_change": "2026-08-13",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "d677c21",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
@@ -7778,7 +7813,7 @@
       },
       "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "6823fb7",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
@@ -7810,9 +7845,9 @@
           "title"
         ]
       },
-      "last_change": "2026-08-06",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "e1c38b0",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
@@ -7898,9 +7933,9 @@
           "what"
         ]
       },
-      "last_change": "2026-08-06",
-      "last_author": "Claude",
-      "last_commit": "d6897e3",
+      "last_change": "2026-08-28",
+      "last_author": "skharkov1246",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
@@ -7944,9 +7979,9 @@
           "rule"
         ]
       },
-      "last_change": "2026-08-07",
-      "last_author": "Claude",
-      "last_commit": "7fd8b91",
+      "last_change": "2026-08-28",
+      "last_author": "skharkov1246",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
@@ -7973,9 +8008,9 @@
         "key": "positions_no_open_price",
         "records": 530
       },
-      "last_change": "2026-07-04",
-      "last_author": "Claude",
-      "last_commit": "c4ac8cd",
+      "last_change": "2026-08-28",
+      "last_author": "skharkov1246",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
@@ -8077,9 +8112,9 @@
         "key": "hs",
         "records": 3
       },
-      "last_change": "2026-08-05",
+      "last_change": "2026-08-28",
       "last_author": "skharkov1246",
-      "last_commit": "7db483d",
+      "last_commit": "c112683",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
