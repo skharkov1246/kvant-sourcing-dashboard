@@ -66,5 +66,6 @@ jobs:
           apply gt/supabase/migrations.sql  "правки инженеров ГТУ"
           apply zip/supabase/migrations.sql "схема базы ЗИП"
           apply library/supabase/schema.sql "схема библиотеки рынков"
+          apply library/supabase/schema_junk.sql "разметка текста документов"
           [ "$rc" = 0 ] && echo "✓ миграции применены" || echo "✗ часть миграций не применилась"
           exit "$rc"
