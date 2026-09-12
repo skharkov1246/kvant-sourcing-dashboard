@@ -4,18 +4,18 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 189,
-    "total_bytes": 91516506,
+    "datasets": 190,
+    "total_bytes": 93746849,
     "by_sensitivity": {
       "конфиденциально": 57,
-      "внутреннее": 99,
-      "публикуемо": 33
+      "внутреннее": 101,
+      "публикуемо": 32
     },
     "by_subproject": {
       "ГПУ-библиотека": 27,
       "ГТУ-библиотека": 35,
       "ОВЭ-75": 45,
-      "база ЗИП": 30,
+      "база ЗИП": 31,
       "база ЗИП · таможня": 18,
       "гидрометаллургия": 22,
       "дашборд сорсеров": 4,
@@ -680,6 +680,51 @@
         ]
       },
       "referenced_by": []
+    },
+    {
+      "path": "zip/data/recip_recon.json",
+      "subproject": "база ЗИП",
+      "bytes": 2229097,
+      "note": "Разведка направления «Поршневые компрессоры»: 14 углов, 636 фактов с источником, 193 карточки компаний, 137 закрытых тупиков. У десяти углов был собственный скептик с заданием опровергать по умолчанию, четыре угла добора запускались без скептика — это видно в поле skeptic. Вердикт приложен к каждому факту поимённо: подтверждено 218, частично 152, непроверяемо 44, опровергнуто 5, «скептик не сослался» 94, «не проверялся» 123. Пустого вердикта нет ни у одного факта: пустое поле читалось бы как «всё хорошо». Публикуется на странице /recip.html.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "angles",
+        "critic",
+        "generated",
+        "method",
+        "stats",
+        "subject"
+      ],
+      "main_collection": {
+        "key": "angles",
+        "records": 14,
+        "record_keys": [
+          "companies",
+          "dead_ends",
+          "findings",
+          "gaps",
+          "key",
+          "missing",
+          "overall",
+          "skeptic",
+          "summary",
+          "title"
+        ]
+      },
+      "last_change": null,
+      "last_author": null,
+      "last_commit": null,
+      "updated_by": "неизвестно",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "scripts/build_chain_coverage.py",
+        "tests/test_dict.py",
+        "zip/tools/build_recip_page.py"
+      ]
     },
     {
       "path": "gt/data/dossiers.json",
@@ -5608,8 +5653,8 @@
         ]
       },
       "last_change": "2026-09-12",
-      "last_author": "Claude",
-      "last_commit": "7a56c95",
+      "last_author": "skharkov1246",
+      "last_commit": "fe786fa",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -5952,6 +5997,67 @@
       ]
     },
     {
+      "path": "data/catalog_notes.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 30425,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "data/budget_snapshot.json",
+        "data/chain_coverage.json",
+        "data/chat_snapshot.json",
+        "data/index.json",
+        "dict/",
+        "dict/node_map.json",
+        "gidromet/data/",
+        "gpu/data/bitrix_gpu.json",
+        "gpu/data/coverage.json",
+        "gt/data/ansaldo.json",
+        "gt/data/bitrix_gt.json",
+        "gt/data/dossiers.json",
+        "gt/data/pn_db.json",
+        "gt/data/ship_energoseti.json",
+        "gt/data/ship_lukoil.json",
+        "gt/data/ship_sellers.json",
+        "gt/data/ship_sweep.json",
+        "library/docfilter.py",
+        "library/indexer.py",
+        "library/load_parts.py",
+        "library/load_suppliers.py",
+        "library/ocr.py",
+        "library/reparse.py",
+        "library/supabase/schema_junk.sql",
+        "ove/data/suppliers.json",
+        "pnw/data/contacts_found.json",
+        "pnw/data/crossrefs.json",
+        "pnw/data/item_master.json",
+        "pnw/data/kv_registry.json",
+        "pnw/data/numbers.json",
+        "pnw/data/part_suppliers.json",
+        "pnw/data/supplier_master.json",
+        "pnw/public/data.js",
+        "pnw/public/search.html",
+        "zip/customs/out/",
+        "zip/data/cat_stock_2026-09.json",
+        "zip/data/customs_declarations.json",
+        "zip/data/kp1763_audit.json",
+        "zip/data/machines.json",
+        "zip/data/perf_class_packets.json"
+      ],
+      "last_change": "2026-09-12",
+      "last_author": "skharkov1246",
+      "last_commit": "fe786fa",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "scripts/build_catalog.py"
+      ]
+    },
+    {
       "path": "gidromet/data/razvilki.json",
       "subproject": "гидрометаллургия",
       "bytes": 29953,
@@ -6024,67 +6130,6 @@
       "referenced_by": [
         "ove/tools/build_bim_plan.py",
         "ove/tools/ifc_check.py"
-      ]
-    },
-    {
-      "path": "data/catalog_notes.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 29432,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "data/budget_snapshot.json",
-        "data/chain_coverage.json",
-        "data/chat_snapshot.json",
-        "data/index.json",
-        "dict/",
-        "dict/node_map.json",
-        "gidromet/data/",
-        "gpu/data/bitrix_gpu.json",
-        "gpu/data/coverage.json",
-        "gt/data/ansaldo.json",
-        "gt/data/bitrix_gt.json",
-        "gt/data/dossiers.json",
-        "gt/data/pn_db.json",
-        "gt/data/ship_energoseti.json",
-        "gt/data/ship_lukoil.json",
-        "gt/data/ship_sellers.json",
-        "gt/data/ship_sweep.json",
-        "library/docfilter.py",
-        "library/indexer.py",
-        "library/load_parts.py",
-        "library/load_suppliers.py",
-        "library/ocr.py",
-        "library/reparse.py",
-        "library/supabase/schema_junk.sql",
-        "ove/data/suppliers.json",
-        "pnw/data/contacts_found.json",
-        "pnw/data/crossrefs.json",
-        "pnw/data/item_master.json",
-        "pnw/data/kv_registry.json",
-        "pnw/data/numbers.json",
-        "pnw/data/part_suppliers.json",
-        "pnw/data/supplier_master.json",
-        "pnw/public/data.js",
-        "pnw/public/search.html",
-        "zip/customs/out/",
-        "zip/data/cat_stock_2026-09.json",
-        "zip/data/customs_declarations.json",
-        "zip/data/kp1763_audit.json",
-        "zip/data/machines.json",
-        "zip/data/perf_class_packets.json"
-      ],
-      "last_change": "2026-09-12",
-      "last_author": "Claude",
-      "last_commit": "2e6c704",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "scripts/build_catalog.py"
       ]
     },
     {
@@ -6436,6 +6481,45 @@
       ]
     },
     {
+      "path": "data/chain_coverage.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 20229,
+      "note": "Заполняемость цепочки портала по семи направлениям и восьми звеньям: машина → узел → признак → дефект → ремонтное решение → запчасть → изготовитель → исполнитель. Производный файл, считается scripts/build_chain_coverage.py по фактическим файлам репозитория; ноль означает отсутствие данных, а не то, что они где-то есть. Руками не заполнять. Первый прогон 12.09.2026: 13 клеток из 56, звенья «Признак», «Дефект» и «Исполнитель» не начаты ни по одному направлению.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "common",
+        "empty_everywhere",
+        "goal",
+        "links",
+        "note",
+        "priority_rule",
+        "segments",
+        "summary"
+      ],
+      "main_collection": {
+        "key": "links",
+        "records": 8,
+        "record_keys": [
+          "link",
+          "title",
+          "what"
+        ]
+      },
+      "last_change": "2026-09-12",
+      "last_author": "skharkov1246",
+      "last_commit": "fe786fa",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "scripts/build_chain_coverage.py",
+        "tests/test_dict.py"
+      ]
+    },
+    {
       "path": "gpu/data/models.json",
       "subproject": "ГПУ-библиотека",
       "bytes": 20045,
@@ -6472,45 +6556,6 @@
         "gt/build.py",
         "scripts/build_chain_coverage.py",
         "scripts/build_dict.py"
-      ]
-    },
-    {
-      "path": "data/chain_coverage.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 19976,
-      "note": "Заполняемость цепочки портала по семи направлениям и восьми звеньям: машина → узел → признак → дефект → ремонтное решение → запчасть → изготовитель → исполнитель. Производный файл, считается scripts/build_chain_coverage.py по фактическим файлам репозитория; ноль означает отсутствие данных, а не то, что они где-то есть. Руками не заполнять. Первый прогон 12.09.2026: 13 клеток из 56, звенья «Признак», «Дефект» и «Исполнитель» не начаты ни по одному направлению.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "common",
-        "empty_everywhere",
-        "goal",
-        "links",
-        "note",
-        "priority_rule",
-        "segments",
-        "summary"
-      ],
-      "main_collection": {
-        "key": "links",
-        "records": 8,
-        "record_keys": [
-          "link",
-          "title",
-          "what"
-        ]
-      },
-      "last_change": "2026-09-12",
-      "last_author": "Claude",
-      "last_commit": "950d5bf",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "публикуемо",
-        "markers": []
-      },
-      "referenced_by": [
-        "scripts/build_chain_coverage.py",
-        "tests/test_dict.py"
       ]
     },
     {

@@ -153,6 +153,24 @@ def counts() -> dict:
     mat = load("zip/data/material_strategy.json", [])
     put("gsho", "repair", n([x for x in (mat or []) if isinstance(x, dict)]), "zip/data/material_strategy.json")
 
+    # ── Поршневые компрессоры: разведка направления. Считаются только факты
+    # с вердиктом проверки — «скептик не сослался» и «не проверялся» в звено
+    # не идут: неподтверждённое не заполняет клетку.
+    rc = load("zip/data/recip_recon.json", {})
+    if rc:
+        OK = {"подтверждено", "частично"}
+        ang = {a["key"]: a for a in rc.get("angles", [])}
+        checked = lambda a: [f for f in ang.get(a, {}).get("findings", []) if f.get("verdict") in OK]
+        put("recip", "machine", len(checked("machine")), "zip/data/recip_recon.json")
+        put("recip", "node", len(checked("bom")), "zip/data/recip_recon.json")
+        put("recip", "part", sum(len(checked(a)) for a in ("valves", "rings", "metal")),
+            "zip/data/recip_recon.json")
+        put("recip", "repair", len(checked("ru_service")), "zip/data/recip_recon.json")
+        comp = {nkey(c.get("name")) for a in rc.get("angles", [])
+                for c in a.get("companies", []) if c.get("name")}
+        c["recip"]["maker"]["n"] = len(comp)
+        c["recip"]["maker"]["src"] = ["zip/data/recip_recon.json"]
+
     # ── изготовители: уникальные компании по каждому направлению
     for seg in ("gtu", "gpu", "gsho"):
         keys, srcs = unique_makers(seg, lambda rel: load(rel))

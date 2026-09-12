@@ -46,79 +46,6 @@
   ],
   "segments": [
     {
-      "segment": "recip",
-      "title": "Поршневые компрессоры",
-      "cells": [
-        {
-          "link": "machine",
-          "title": "Машина",
-          "what": "модель опознаётся и описана",
-          "n": 0,
-          "sources": [],
-          "state": "пусто"
-        },
-        {
-          "link": "node",
-          "title": "Узел",
-          "what": "состав машины разобран по узлам",
-          "n": 0,
-          "sources": [],
-          "state": "пусто"
-        },
-        {
-          "link": "symptom",
-          "title": "Признак",
-          "what": "по чему видно, что машина нездорова",
-          "n": 0,
-          "sources": [],
-          "state": "пусто"
-        },
-        {
-          "link": "defect",
-          "title": "Дефект",
-          "what": "каталог дефектов: что ломается и почему",
-          "n": 0,
-          "sources": [],
-          "state": "пусто"
-        },
-        {
-          "link": "repair",
-          "title": "Ремонтное решение",
-          "what": "чем восстанавливают, границы применимости",
-          "n": 0,
-          "sources": [],
-          "state": "пусто"
-        },
-        {
-          "link": "part",
-          "title": "Запчасть",
-          "what": "номенклатура с номерами, готовая к запросу",
-          "n": 0,
-          "sources": [],
-          "state": "пусто"
-        },
-        {
-          "link": "maker",
-          "title": "Изготовитель",
-          "what": "кто делает деталь, помимо владельца конструкции",
-          "n": 0,
-          "sources": [],
-          "state": "пусто"
-        },
-        {
-          "link": "contractor",
-          "title": "Исполнитель",
-          "what": "кому отдать работы по ремонту",
-          "n": 0,
-          "sources": [],
-          "state": "пусто"
-        }
-      ],
-      "filled": 0,
-      "of": 8,
-      "pct": 0
-    },
-    {
       "segment": "pumps",
       "title": "Насосы",
       "cells": [
@@ -598,6 +525,89 @@
       "filled": 5,
       "of": 8,
       "pct": 62
+    },
+    {
+      "segment": "recip",
+      "title": "Поршневые компрессоры",
+      "cells": [
+        {
+          "link": "machine",
+          "title": "Машина",
+          "what": "модель опознаётся и описана",
+          "n": 35,
+          "sources": [
+            "zip/data/recip_recon.json"
+          ],
+          "state": "есть"
+        },
+        {
+          "link": "node",
+          "title": "Узел",
+          "what": "состав машины разобран по узлам",
+          "n": 16,
+          "sources": [
+            "zip/data/recip_recon.json"
+          ],
+          "state": "есть"
+        },
+        {
+          "link": "symptom",
+          "title": "Признак",
+          "what": "по чему видно, что машина нездорова",
+          "n": 0,
+          "sources": [],
+          "state": "пусто"
+        },
+        {
+          "link": "defect",
+          "title": "Дефект",
+          "what": "каталог дефектов: что ломается и почему",
+          "n": 0,
+          "sources": [],
+          "state": "пусто"
+        },
+        {
+          "link": "repair",
+          "title": "Ремонтное решение",
+          "what": "чем восстанавливают, границы применимости",
+          "n": 23,
+          "sources": [
+            "zip/data/recip_recon.json"
+          ],
+          "state": "есть"
+        },
+        {
+          "link": "part",
+          "title": "Запчасть",
+          "what": "номенклатура с номерами, готовая к запросу",
+          "n": 173,
+          "sources": [
+            "zip/data/recip_recon.json"
+          ],
+          "state": "есть"
+        },
+        {
+          "link": "maker",
+          "title": "Изготовитель",
+          "what": "кто делает деталь, помимо владельца конструкции",
+          "n": 171,
+          "sources": [
+            "zip/data/recip_recon.json"
+          ],
+          "state": "есть"
+        },
+        {
+          "link": "contractor",
+          "title": "Исполнитель",
+          "what": "кому отдать работы по ремонту",
+          "n": 0,
+          "sources": [],
+          "state": "пусто"
+        }
+      ],
+      "filled": 5,
+      "of": 8,
+      "pct": 62
     }
   ],
   "empty_everywhere": [
@@ -628,7 +638,7 @@
   "summary": {
     "segments": 7,
     "links": 8,
-    "cells_filled": 13,
+    "cells_filled": 18,
     "cells_total": 56,
     "links_not_started": 3
   }

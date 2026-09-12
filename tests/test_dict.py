@@ -281,3 +281,31 @@ def test_makers_counted_as_companies_not_rows():
         "остальные компании в счёт не попадут")
     assert gtu["n"] > 1000, "по ГТУ реестров восемь, компаний должно быть заметно больше сотни"
 
+
+def test_recip_recon_marks_unverified_explicitly():
+    """У каждого факта разведки есть вердикт, и он не пустой.
+
+    Пустое поле вердикта читается как «проверено, всё хорошо». Состояния
+    «скептик не сослался» и «не проверялся» — разные вещи, и обе означают,
+    что факт подтверждённым считать нельзя."""
+    d = json.loads((ROOT / "zip" / "data" / "recip_recon.json").read_text(encoding="utf-8"))
+    allowed = {"подтверждено", "частично", "опровергнуто", "непроверяемо",
+               "скептик не сослался", "не проверялся"}
+    for a in d["angles"]:
+        for f in a["findings"]:
+            assert f.get("verdict") in allowed, f"{a['key']}: вердикт «{f.get('verdict')}»"
+            assert f.get("source"), f"{a['key']}/{f['topic']}: факт без источника"
+        # Угол без скептика обязан честно об этом сообщать.
+        if not a["skeptic"]:
+            assert all(f["verdict"] == "не проверялся" for f in a["findings"])
+
+    # Счётчик цепочки обязан брать только проверенное: неподтверждённое
+    # не заполняет звено.
+    cov = json.loads((ROOT / "data" / "chain_coverage.json").read_text(encoding="utf-8"))
+    recip = next(s for s in cov["segments"] if s["segment"] == "recip")
+    ok = sum(1 for a in d["angles"] for f in a["findings"]
+             if f["verdict"] in ("подтверждено", "частично"))
+    total = sum(len(a["findings"]) for a in d["angles"])
+    assert ok < total, "все факты помечены проверенными — проверьте разбор вердиктов"
+    assert recip["filled"] >= 4, "разведка не дошла до счётчика цепочки"
+
