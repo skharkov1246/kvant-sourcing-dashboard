@@ -8,6 +8,8 @@ reports/
 # дашборд-снимки содержат ПДн — генерируются в CI, в репозиторий не кладём
 # (гейт public/_worker.js при этом остаётся в репозитории)
 public/*.html
+# Статическая оболочка библиотеки не содержит данных; материалы приходят из закрытого API.
+!public/library.html
 
 # крупный дамп Bitrix — в репозитории не нужен
 agent/corpus.json
@@ -21,3 +23,21 @@ scheduler/.wrangler/
 # база ЗИП: public/ — артефакт сборки (собирается build.py/CI), в репозиторий не кладём
 zip/public/
 zip/customs/recon/
+
+# локальное состояние тестового контура доступов
+access/.contour/
+# кэш wrangler содержит account_id и e-mail владельца — в публичном репозитории не нужен
+*/.wrangler/
+
+# промежуточные дампы зонда Bitrix (scripts/bitrix_probe.py) — артефакты, не исходники
+scripts/_coll_*.json
+
+# каталоги проверок
+smoke/
+.pytest_cache/
+.ruff_cache/
+
+# база фундамента: коммерческие данные, в публичный репозиторий не кладём
+base/kvant.db
+base/kvant.db-*
+base/*.json

@@ -32,6 +32,14 @@ a{color:var(--s1);text-decoration:none} a:hover{text-decoration:underline}
 header{padding:18px 22px 0}
 h1{font-size:21px;margin:0 0 2px}
 .sub{color:var(--ink2);font-size:12.5px}
+.libnav{padding:14px 22px 0;max-width:1280px}
+.libnav-h{font-size:12.5px;color:var(--mut);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px}
+.libnav-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:8px}
+.lc{display:block;border:1px solid var(--border);background:var(--surface);border-radius:10px;padding:9px 11px;color:var(--ink);text-decoration:none}
+.lc:hover{border-color:var(--s1);text-decoration:none}
+.lc b{display:block;font-size:13px;margin-bottom:2px}
+.lc span{display:block;color:var(--ink2);font-size:11.5px;line-height:1.35}
+@media(max-width:700px){.libnav{padding-left:12px;padding-right:12px}}
 nav{position:sticky;top:0;z-index:5;background:var(--page);display:flex;gap:4px;flex-wrap:wrap;padding:10px 22px;border-bottom:1px solid var(--grid)}
 nav button{border:1px solid var(--border);background:var(--surface);color:var(--ink2);padding:6px 13px;border-radius:18px;font:600 13px system-ui;cursor:pointer}
 nav button.on{background:var(--s1);border-color:var(--s1);color:#fff}
@@ -147,9 +155,29 @@ footer{padding:0 22px 24px;color:var(--mut);font-size:11.5px}
   <div class="sub">Справочник для сорсеров КВАНТ: машины · номенклатура ЗИП · шифровки PN · библиотека производителей (OEM / независимые / реверс) · таможня РФ · мировые базы. Сборка: __BUILT_AT__</div>
   <div class="sub" style="margin-top:6px"><a href="./lot" style="font-weight:700">→ Лот ЛУКОЙЛ: рабочее меню</a> — горячая часть · план рассылки · склады · трейдеры · блоки по направлениям</div>
 </header>
+<div class="libnav">
+  <div class="libnav-h">Разделы библиотеки — по машинам и по темам</div>
+  <div class="libnav-g">
+    <a class="lc" href="./ansaldo"><b>Ansaldo Energia и семейство V-машин</b><span>21 вкладка: наследие Alstom, горячий тракт, партномера четырёх школ, керамика, апгрейды, парк РФ и СНГ, аутмаркет</span></a>
+    <a class="lc" href="./f4000"><b>SGT5-4000F (V94.3A)</b><span>субпоставщики и независимый рынок</span></a>
+    <a class="lc" href="./v643a"><b>V64.3A / AE64.3A / SGT-1000F</b><span>субпоставщики и склады</span></a>
+    <a class="lc" href="./ms6001b"><b>GE Frame 6B (MS6001B)</b><span>субпоставщики и склады</span></a>
+    <a class="lc" href="./lm6000"><b>GE LM6000</b><span>субпоставщики, MRO и склады</span></a>
+    <a class="lc" href="./solar"><b>Solar Turbines (Saturn → Titan)</b><span>субпоставщики и склады</span></a>
+    <a class="lc" href="./cummins"><b>Cummins QSK60G</b><span>свечи и фильтры: мировой пул поставщиков</span></a>
+    <a class="lc" href="./plugs"><b>Свечи зажигания ГПУ</b><span>закупки и адресаты на оригинал</span></a>
+    <a class="lc" href="./hot"><b>Камеры сгорания и горелки</b><span>глубокий разбор лота</span></a>
+    <a class="lc" href="./rfq"><b>Покрытие запросами</b><span>критичный ЗИП ЛУКОЙЛ: что запрошено, что нет</span></a>
+    <a class="lc" href="./wizard/"><b>Мастер партномеров</b><span>база PN: шифровки, разбор номера, справочник</span></a>
+    <a class="lc" href="./wizard/search.html"><b>Поиск детали по любому номеру</b><span>KV · бренд · изготовитель · аналог · номер поставщика — единый вход по всем разделам</span></a>
+    <a class="lc" href="https://kvant-zip.pages.dev/"><b>ГШО — горно-шахтное оборудование</b><span>соседний раздел: перфораторы, дробилки, ЗИП, таможня</span></a>
+  </div>
+</div>
 <nav id="nav"></nav>
 <main id="main"></main>
 <footer>Контакты SGT-блока верифицированы 05.08.2026 (таможня РФ HS 8411 + сайты компаний); Solar-блок — публичные данные, контакты брать с сайтов при первом RFQ. Полная таможенная база и ЗИП-платформа: kvant-zip.pages.dev</footer>
+<!-- Общие правки: перенос старых заметок, общая база и подпись автора. См. gt/site/notes.js -->
+<script src="./notes.js"></script>
 <script>
 const SUPPLIERS = __SUPPLIERS_JSON__;
 const MODELS = __MODELS_JSON__;
@@ -304,13 +332,27 @@ const nrm = s => {
  return k;
 };
 
-/* правки пользователя: статусы, заметки, скрытые, свои поставщики — в localStorage этого браузера */
+/* Правки пользователя: статусы, заметки, скрытые, свои поставщики.
+   localStorage — быстрый локальный слой и аварийная копия; общая база (видна коллегам,
+   переживает смену браузера) — в gt_notes через notes.js. Ключ правки — нормализованное
+   имя компании, и это ровно та мина, на которой заметки терялись: при склейке дублей
+   карточка исчезала из выдачи вместе со своим ключом. Теперь ключ при склейке
+   переносится (adoptEdits), а всё, что не нашло хозяина, показывается списком. */
 let EDITS;
 try{ EDITS = JSON.parse(localStorage.getItem('gt_edits_v2')) || {}; }catch(e){ EDITS = {}; }
 EDITS.st = EDITS.st||{}; EDITS.note = EDITS.note||{}; EDITS.hide = EDITS.hide||{}; EDITS.add = EDITS.add||[]; EDITS.ex = EDITS.ex||{};
 EDITS.why = EDITS.why||{};      // причины скрытия: ключ → {act, why, name, at}
 EDITS.exwhy = EDITS.exwhy||{};  // причины «не запрашивать»
-function saveEdits(){ try{ localStorage.setItem('gt_edits_v2', JSON.stringify(EDITS)); }catch(e){} }
+function saveEdits(){
+ try{ localStorage.setItem('gt_edits_v2', JSON.stringify(EDITS)); }
+ catch(e){
+  // Раньше здесь стоял пустой catch: при переполнении квоты браузера правка
+  // молча не сохранялась, и человек узнавал об этом, только не найдя её потом.
+  console.error('правки не сохранены в браузере:', e);
+  const box = document.getElementById('pk-notes');
+  if(box) box.innerHTML = '<div class="box warn" style="font-size:12.5px"><b>Правка не сохранилась в браузере</b> ('+esc(e.message||String(e))+'). Выгрузите правки кнопкой «⬇ правки» и сообщите владельцу.</div>';
+ }
+}
 
 function pickModels(text){
  const out = new Set();
@@ -344,6 +386,23 @@ const siteDomain = s => {
  const m = String(s||'').toLowerCase().trim().match(/(?:https?:\/\/)?(?:www\.)?([a-z0-9.\-]+\.[a-z]{2,})/);
  return m ? m[1] : '';
 };
+/* Перенос правок на выжившую карточку. Вызывается ПЕРЕД map.delete(k): без него
+   заметка остаётся привязанной к ключу, которого в выдаче больше нет — так и
+   «пропали» комментарии после схлопывания дублей 17.08 и 21.08.2026. */
+function adoptEdits(from, to, name){
+ if(!from || !to || from===to) return 0;
+ let moved = 0;
+ for(const f of ['note','st','ex','why','exwhy']){
+  const box = EDITS[f]; if(!box || box[from]===undefined) continue;
+  if(box[to]===undefined || box[to]==='' ){ box[to] = box[from]; moved++; }
+  else if(f==='note' && box[to]!==box[from]) box[to] = box[to] + ' · ' + box[from];  // две заметки — обе нужны
+  ADOPTED.push({from, to, name: name||'', field: f});
+ }
+ if(moved) saveEdits();
+ return moved;
+}
+const ADOPTED = [];    // что перенесли за эту загрузку — показывается инженеру
+
 function mergeByDomain(map){
  const byDom = new Map();
  for(const [k,r] of map){
@@ -377,6 +436,7 @@ function mergeByDomain(map){
    keep.altNames = keep.altNames || [];
    if(!keep.altNames.includes(r.name)) keep.altNames.push(r.name);
    if(r.altNames) r.altNames.forEach(n=>{ if(!keep.altNames.includes(n)) keep.altNames.push(n); });
+   adoptEdits(k, keep.key, r.name);
    map.delete(k);
   }
  }
@@ -416,6 +476,7 @@ function mergeByNameBase(map){
    keep.altNames = keep.altNames || [];
    if(!keep.altNames.includes(r.name)) keep.altNames.push(r.name);
    if(r.altNames) r.altNames.forEach(n=>{ if(!keep.altNames.includes(n)) keep.altNames.push(n); });
+   adoptEdits(k, keep.key, r.name);
    map.delete(k);
   }
  }
@@ -767,13 +828,14 @@ function pkCard(r){
     <button class="btn" data-act="note" title="заметка">${note?'✏ заметка':'+ заметка'}</button>
     <button class="btn" data-act="hide" title="${hidden?'вернуть в список':'скрыть из списка'}">${hidden?'↩ вернуть':'✕ скрыть'}</button>
    </div>
-   ${note?`<div class="note">${esc(note)}</div>`:''}
+   ${note?`<div class="note">${esc(note)}${(()=>{const s=window.KVN&&KVN.get('note',[r.key].concat(r.altNames||[]));return s&&s.author?`<div class="mut" style="font-size:11px;margin-top:3px">${esc(KVN.signature(s, note))}</div>`:'';})()}</div>`:''}
    ${st?`<div class="pill st-${st}" style="margin-top:6px">${ST_NAME[st]}</div>`:''}
   </div>
  </div>`;
 }
 let pkState = {model:'', seg:'', typ:'', ex:'', q:'', sort:'score', showHidden:false};
 function pkFilters(){
+ pkOrphanBadge();
  const s = pkState;
  s.model = document.getElementById('pk-model').value;
  s.seg = document.getElementById('pk-seg').value;
@@ -841,19 +903,36 @@ function pkExportEdits(){
  const a = document.createElement('a'); a.href=URL.createObjectURL(blob);
  a.download='gtu_edits_'+new Date().toISOString().slice(0,10)+'.json'; a.click();
 }
+/* Слияние без потерь: чужая правка НЕ затирает свою. Раньше здесь стоял
+   Object.assign, и импорт коллеги молча перезаписывал собственные заметки —
+   отката не было. Теперь при расхождении обе сохраняются через « · ». */
+function mergeBox(mine, theirs, joinText){
+ for(const k of Object.keys(theirs||{})){
+  const a = mine[k], b = theirs[k];
+  if(a === undefined || a === '' || a === null){ mine[k] = b; continue; }
+  if(JSON.stringify(a) === JSON.stringify(b)) continue;
+  mine[k] = joinText && typeof a === 'string' && typeof b === 'string' ? a + ' · ' + b : a;
+ }
+}
 function pkImportEdits(inp){
  const f = inp.files && inp.files[0]; if(!f) return;
  f.text().then(t=>{
   try{
    const e = JSON.parse(t);
-   Object.assign(EDITS.st, e.st||{}); Object.assign(EDITS.note, e.note||{}); Object.assign(EDITS.hide, e.hide||{}); Object.assign(EDITS.ex, e.ex||{});
-   Object.assign(EDITS.why, e.why||{}); Object.assign(EDITS.exwhy, e.exwhy||{});
+   // копия до слияния: если импорт окажется не тем файлом, вернуться есть куда
+   try{ localStorage.setItem('gt_edits_before_import', JSON.stringify(EDITS)); }catch(err){}
+   mergeBox(EDITS.st, e.st||{}); mergeBox(EDITS.note, e.note||{}, true); mergeBox(EDITS.hide, e.hide||{}); mergeBox(EDITS.ex, e.ex||{});
+   mergeBox(EDITS.why, e.why||{}); mergeBox(EDITS.exwhy, e.exwhy||{});
    if(e.pn){ EDITS.pn = EDITS.pn||{st:{},note:{},hide:{},over:{},add:[]};
-    Object.assign(EDITS.pn.st, e.pn.st||{}); Object.assign(EDITS.pn.note, e.pn.note||{});
-    Object.assign(EDITS.pn.hide, e.pn.hide||{}); Object.assign(EDITS.pn.over, e.pn.over||{});
+    mergeBox(EDITS.pn.st, e.pn.st||{}); mergeBox(EDITS.pn.note, e.pn.note||{});
+    mergeBox(EDITS.pn.hide, e.pn.hide||{}); mergeBox(EDITS.pn.over, e.pn.over||{});
     for(const a of (e.pn.add||[])) if(!EDITS.pn.add.some(x=>x.pn===a.pn)) EDITS.pn.add.push(a); }
    for(const a of (e.add||[])) if(!EDITS.add.some(x=>nrm(x.name)===nrm(a.name))) EDITS.add.push(a);
    saveEdits(); UNI=null; buildUnified(); pkFilters();
+   if(window.KVN){
+    for(const k of Object.keys(e.note||{})) KVN.save({scope:'index', key:k, kind:'note', text:e.note[k]});
+    toastNotes('Импортированные правки отправлены в общую базу — коллеги их увидят');
+   }
   }catch(err){ alert('Не удалось прочитать файл правок: '+err.message); }
  });
 }
@@ -946,12 +1025,14 @@ function rPicker(){
    <input id="pk-q" placeholder="компания, страна, деталь, заметка…" oninput="pkFilters()"></div>
  </div>
  <div class="chips" id="pk-active" style="margin:6px 0"></div>
+ <div id="pk-notes" style="margin:6px 0"></div>
  <div class="filters" style="margin-top:2px">
   <button class="btn primary" onclick="pkAddForm()">+ Добавить поставщика</button>
   <button class="btn" onclick="pkCSV()">⬇ CSV</button>
   <button class="btn" onclick="pkExportEdits()" title="статусы, заметки и добавленные компании — файлом">⬇ правки</button>
   <label class="btn" style="cursor:pointer">⬆ импорт правок<input type="file" accept=".json" style="display:none" onchange="pkImportEdits(this)"></label>
   <button class="btn" onclick="pkLists()" id="pk-lists-btn">📋 Списки исключений</button>
+  <button class="btn" onclick="pkNotesPanel()" id="pk-notes-btn" title="заметки, потерявшие карточку, и перенос правок в общую базу">🔎 Мои заметки</button>
   <label style="font-size:12.5px;color:var(--ink2);display:flex;align-items:center;gap:5px"><input type="checkbox" id="pk-hid" onchange="pkFilters()"> показывать скрытых</label>
   <span class="count" id="pk-count"></span>
  </div>
@@ -981,7 +1062,16 @@ document.addEventListener('click', e=>{
   if(btn.dataset.act==='note'){
    const cur = EDITS.note[k]||'';
    const v = prompt('Заметка по поставщику (пусто — удалить):', cur);
-   if(v!==null){ if(v.trim()) EDITS.note[k]=v.trim(); else delete EDITS.note[k]; saveEdits(); pkFilters(); }
+   if(v!==null){
+    if(v.trim()) EDITS.note[k]=v.trim(); else delete EDITS.note[k];
+    saveEdits(); pkFilters();
+    // в общую базу: автора проставит воркер по подписи входа, подделать нельзя
+    if(window.KVN){
+     const rec = UNI.find(r=>r.key===k) || {};
+     KVN.save({scope:'index', key:k, names:[rec.name||''].concat(rec.altNames||[]),
+               kind:'note', text:v.trim(), removed:!v.trim()});
+    }
+   }
   }
   if(btn.dataset.act==='hide'){
    const nm = btn.closest('.sup').querySelector('h4').textContent;
@@ -993,6 +1083,7 @@ document.addEventListener('click', e=>{
     EDITS.hide[k]=1; EDITS.why[k]={act:'hide', why:why.trim(), name:nm, at:new Date().toISOString().slice(0,10)};
    }
    saveEdits(); pkFilters();
+   if(window.KVN && EDITS.why[k]) KVN.save({scope:'index', key:k, names:[nm], kind:'why', text:EDITS.why[k].why||''});
   }
   if(btn.dataset.act==='ex-go'||btn.dataset.act==='ex-hold'){
    const v = btn.dataset.act==='ex-go'?'go':'hold';
@@ -1007,6 +1098,11 @@ document.addEventListener('click', e=>{
     EDITS.ex[k]='go'; delete EDITS.exwhy[k];
    }
    saveEdits(); pkFilters();
+   // оценка эксперта и причина — такая же правка инженера, как заметка
+   if(window.KVN){
+    KVN.save({scope:'index', key:k, names:[nm], kind:'ex', text:EDITS.ex[k]||'', removed:!EDITS.ex[k]});
+    if(EDITS.exwhy[k]) KVN.save({scope:'index', key:k, names:[nm], kind:'exwhy', text:EDITS.exwhy[k].why||''});
+   }
   }
   if(btn.dataset.act==='unhide'){ delete EDITS.hide[k]; delete EDITS.why[k]; saveEdits(); pkFilters(); }
   if(btn.dataset.act==='unhold'){ delete EDITS.ex[k]; delete EDITS.exwhy[k]; saveEdits(); pkFilters(); }
@@ -1014,6 +1110,10 @@ document.addEventListener('click', e=>{
 });
 document.addEventListener('change', e=>{
  const sel = e.target.closest('.sup select[data-act="status"]');
+ if(sel && window.KVN){
+  const k = sel.closest('.sup').dataset.k;
+  setTimeout(()=>KVN.save({scope:'index', key:k, kind:'st', text:EDITS.st[k]||'', removed:!EDITS.st[k]}), 0);
+ }
  if(sel){
   const k = sel.closest('.sup').dataset.k;
   if(sel.value) EDITS.st[k]=sel.value; else delete EDITS.st[k];
@@ -1519,6 +1619,126 @@ function rDB(){
  <div class="box"><b>Ограничение, которое принять:</b> парк SGT сидит на долгосрочных сервисных договорах Siemens (LTSA) — открытых тендеров «на партномер» нет. Тендерные порталы дают операторов и подрядчиков, а цены на детали — только shipment-базы и прямые КП заводов. Уже работает: glbs.io — таможня РФ/ЕАЭС, ${CUSTOMS.total_records.toLocaleString('ru')} деклараций HS 8411 в базе.</div>`;
 }
 
+/* ---------- Заметки: подпись, общая база, спасение осиротевших ---------- */
+/* Ключи всех живых карточек — по ним отличаем заметку с хозяином от осиротевшей. */
+function liveKeys(){
+ const out = new Set();
+ for(const r of UNI){
+  out.add(r.key);
+  (r.altNames||[]).forEach(n=>out.add(nrm(n)));
+ }
+ (EDITS.add||[]).forEach(a=>out.add(nrm(a.name||'')));
+ return [...out];
+}
+
+/* Заметки, чьи ключи не совпали ни с одной карточкой. Это и есть «пропавшие
+   комментарии»: текст жив, но показывать его было негде. */
+function orphanNotes(){
+ const live = new Set(liveKeys()), out = [];
+ for(const f of ['note','why','exwhy']){
+  const box = EDITS[f]||{};
+  for(const k of Object.keys(box)){
+   if(live.has(k)) continue;
+   const v = box[k];
+   const text = (f==='note') ? v : (v&&v.why)||'';
+   if(!text) continue;
+   out.push({key:k, field:f, text, name:(v&&v.name)||''});
+  }
+ }
+ if(window.KVN) KVN.orphans(liveKeys()).forEach(r=>{
+  if(out.some(o=>o.key===r.key && o.text===r.text)) return;
+  out.push({key:r.key, field:r.kind, text:r.text, name:(r.names||[])[0]||'', author:r.author, at:r.at});
+ });
+ return out;
+}
+
+/* Счётчик заметок без карточки. Молчаливая потеря — то, с чего всё началось:
+   схлопывание дублей прошло тихо, и никто не увидел, что комментарии отвязались.
+   Теперь число висит на вкладке подбора и требует внимания. */
+function pkOrphanBadge(){
+ const btn = document.getElementById('pk-notes-btn');
+ if(!btn) return;
+ let n = 0;
+ try{ n = orphanNotes().length; }catch(e){ return; }
+ btn.textContent = n ? `🔎 Мои заметки · ${n} без карточки` : '🔎 Мои заметки';
+ btn.classList.toggle('primary', n > 0);
+}
+
+function pkNotesPanel(){
+ const box = document.getElementById('pk-notes');
+ if(!box) return;
+ if(box.dataset.open==='1'){ box.innerHTML=''; box.dataset.open='0'; return; }
+ box.dataset.open='1';
+ const orph = orphanNotes();
+ const live = window.KVN && KVN.live();
+ const rows = (window.KVN ? KVN.rows() : []).filter(r=>!r.removed && r.text);
+ box.innerHTML = `<div class="box">
+  <b>Мои заметки и правки</b>
+  <div class="mut" style="font-size:12px;margin:4px 0 8px">
+   ${live ? 'общая база на связи — правки видны коллегам и переживают смену браузера'
+          : 'общая база недоступна: правки пишутся в этот браузер и уйдут в базу при следующей загрузке'}
+   · в общей базе: ${rows.length} · перенесено при склейке дублей за эту загрузку: ${ADOPTED.length}
+  </div>
+  ${orph.length ? `<div style="font-size:13px"><b>Заметки без карточки — ${orph.length}</b>
+   <div class="mut" style="font-size:12px;margin:2px 0 6px">Компания склеилась с другой, была скрыта фильтром или переименована. Текст цел — перенесите его на живую карточку или скопируйте.</div>
+   ${orph.map((o,i)=>`<div class="card" style="margin:4px 0;padding:7px 10px">
+     <div>${esc(o.text)}</div>
+     <div class="mut" style="font-size:11px;margin-top:3px">ключ: ${esc(o.key)}${o.name?' · '+esc(o.name):''}${o.author?' · '+esc(o.author):''}${o.at?' · '+esc(String(o.at).slice(0,10)):''}
+      <button class="btn" style="padding:1px 7px;margin-left:6px" onclick="pkReattach(${i})">перенести на…</button></div>
+    </div>`).join('')}</div>`
+   : '<div class="mut" style="font-size:12.5px">Заметок без карточки нет — всё привязано.</div>'}
+ </div>`;
+ window.__ORPH = orph;
+}
+
+/* Перенос осиротевшей заметки на живую компанию: спрашиваем название, ищем по
+   нормализованному имени, переносим и в локальные правки, и в общую базу. */
+function pkReattach(i){
+ const o = (window.__ORPH||[])[i]; if(!o) return;
+ const name = prompt('На какую компанию перенести заметку?\n\n«'+o.text+'»', o.name||'');
+ if(!name) return;
+ const k = nrm(name);
+ const hit = UNI.find(r=>r.key===k || (r.altNames||[]).some(n=>nrm(n)===k));
+ if(!hit){ alert('Компания «'+name+'» в списке не найдена. Проверьте написание.'); return; }
+ const field = (o.field==='note'||o.field==='why'||o.field==='exwhy') ? o.field : 'note';
+ if(field==='note') EDITS.note[hit.key] = (EDITS.note[hit.key] ? EDITS.note[hit.key]+' · ' : '') + o.text;
+ else EDITS.note[hit.key] = (EDITS.note[hit.key] ? EDITS.note[hit.key]+' · ' : '') + o.text;
+ delete (EDITS[o.field]||{})[o.key];
+ saveEdits();
+ if(window.KVN){
+  KVN.save({scope:'index', key:hit.key, names:[hit.name], kind:'note', text:o.text});
+  KVN.save({scope:'index', key:o.key, kind:o.field, text:'', removed:true});
+ }
+ pkNotesPanel(); pkNotesPanel(); pkFilters();
+}
+
+/* Общая база: подпись автора и слияние с локальными правками. Локальное важнее
+   для скорости, серверное — для того, чтобы видели коллеги. */
+function notesBoot(){
+ if(!window.KVN) return;
+ KVN.me();
+ KVN.load('index').then(()=>KVN.migrate()).then(res=>{
+  // серверные заметки, которых нет локально, показываем сразу
+  KVN.rows().forEach(r=>{
+   if(r.scope!=='index' || r.removed || !r.text) return;
+   if(r.kind==='note' && !EDITS.note[r.key]) EDITS.note[r.key] = r.text;
+   if(r.kind==='st' && !EDITS.st[r.key]) EDITS.st[r.key] = r.text;
+   if(r.kind==='ex' && !EDITS.ex[r.key]) EDITS.ex[r.key] = r.text;
+  });
+  saveEdits();
+  if(rendered.picker) pkFilters();
+  const n = (res&&res.found)||0;
+  if(n) toastNotes('Перенесено в общую базу правок: '+n);
+ });
+}
+
+function toastNotes(msg){
+ const box = document.getElementById('pk-notes');
+ if(box && box.dataset.open!=='1'){
+  box.innerHTML = `<div class="box info" style="font-size:12.5px">${esc(msg)} · <a href="#" onclick="pkNotesPanel();return false">показать</a></div>`;
+ }
+}
+
 /* ---------- Каркас ---------- */
 const R = {picker:rPicker, overview:rOverview, machines:rMachines, parts:rParts, pn:rPN, pndb:rPndb, suppliers:rSuppliers, bitrix:rBitrix, customs:rCustoms, db:rDB};
 const nav = document.getElementById('nav'), main = document.getElementById('main');
@@ -1535,6 +1755,7 @@ function show(id){
 }
 nav.addEventListener('click', e=>{ const b=e.target.closest('button'); if(b) show(b.dataset.t); });
 show(TABS.some(([id])=>id===location.hash.slice(1)) ? location.hash.slice(1) : 'picker');
+notesBoot();
 </script>
 </body>
 </html>

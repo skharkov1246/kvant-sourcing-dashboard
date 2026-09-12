@@ -4,11 +4,8 @@ name: GOK project deploy
 # (проект kvant-gok). Отдельный домен, отдельный проект Pages — дашборд сорсеров,
 # база ЗИП, сайт ОВЭ-75 и ГПУ-библиотека не затрагиваются.
 #
-# ВНИМАНИЕ: у этого сайта НЕТ гейта доступа. В factory/public намеренно нет
-# _worker.js, поэтому Cloudflare Pages отдаёт статику всем без пароля.
-# Так распорядился владелец 17.08.2026 («клади на публичный, в открытом доступе»).
-# Если понадобится закрыть — скопировать ove/public/_worker.js в factory/public/
-# и добавить в этот workflow шаг записи секрета BASIC_AUTH_PASS (см. gpu-deploy.yml).
+# Гейт доступа: factory/public/_worker.js — вход через Cloudflare Access (портал КВАНТ),
+# паролей нет. Закрыт по распоряжению владельца 07.09.2026.
 #
 # Сборки нет: страница самодостаточна (весь CSS, JS и графика встроены),
 # деплоится как есть.
@@ -28,6 +25,7 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v5
 
@@ -35,16 +33,20 @@ jobs:
         run: |
           set -euo pipefail
           test -f factory/public/index.html
-          # гейта быть не должно: наличие _worker.js молча закрыло бы сайт
-          if [ -f factory/public/_worker.js ]; then
-            echo "::error::в factory/public появился _worker.js — сайт задуман открытым, проверьте намеренно ли это"
-            exit 1
-          fi
+          # гейт обязателен: без него сайт открыт всему интернету
+          test -f factory/public/_worker.js || { echo "::error::нет factory/public/_worker.js — сайт был бы открыт"; exit 1; }
           # страница обязана быть самодостаточной: внешние ресурсы в Pages не подтянутся
           if grep -Eq '(src|href)="https?://' factory/public/index.html; then
             echo "::error::в странице есть ссылки на внешние ресурсы — встройте их"
             exit 1
           fi
+
+      - name: Фиксация версии wrangler на прогон
+        run: |
+          set -euo pipefail
+          v="$(npm view wrangler version)"
+          echo "WRANGLER_VERSION=$v" >> "$GITHUB_ENV"
+          echo "wrangler зафиксирован на $v (одна версия на все шаги прогона)"
 
       - name: Деплой на Cloudflare Pages (kvant-gok)
         env:
@@ -53,12 +55,12 @@ jobs:
         run: |
           set -euo pipefail
           # создать проект, если его ещё нет (иначе тихо пропустить)
-          npx --yes wrangler@latest pages project create kvant-gok \
+          npx --yes wrangler@${WRANGLER_VERSION} pages project create kvant-gok \
             --production-branch=main 2>/dev/null || true
           # ASCII commit-message: иначе wrangler цепляет кириллицу git-коммита → CF отвергает (8000111).
           ok=0
           for i in 1 2 3; do
-            if npx --yes wrangler@latest pages deploy factory/public \
+            if npx --yes wrangler@${WRANGLER_VERSION} pages deploy factory/public \
                  --project-name=kvant-gok --branch=main \
                  --commit-dirty=true --commit-message="gok project deploy"; then
               ok=1; break

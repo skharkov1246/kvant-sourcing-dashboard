@@ -616,7 +616,14 @@ window.__PRODUCT__ = __PRODUCT_JSON__;
 window.__CONTRACTS__ = __CONTRACTS_JSON__;
 window.__REPS__ = __REPS_JSON__;
 window.__ADVISOR__ = __ADVISOR_JSON__;
-const M = window.__DATA__, INS = window.__INSIGHTS__;
+const M = window.__DATA__ || {}, INS = window.__INSIGHTS__ || {};
+// Защита от неполной выгрузки: недостающие блоки заменяем пустыми. Раньше одно
+// отсутствующее поле (например weekly) роняло весь скрипт и гасило все 9 вкладок.
+for(const [_k,_d] of [['kpi',{}],['sourcersA',[]],['weekly',[]],['coverage',{}],['chain',[]],
+                      ['catList',[]],['supplierMix',null],['send',{}],['period',{label:'—'}]]){
+  if(M[_k]==null) M[_k]=_d;
+}
+for(const _k of ['hist','byCat','weekly','uncovered']){ if(M.coverage[_k]==null) M.coverage[_k]=[]; }
 const cs = getComputedStyle(document.documentElement);
 const k = M.kpi, A = M.sourcersA, cov = M.coverage;
 const NS = "http://www.w3.org/2000/svg";
@@ -1619,14 +1626,19 @@ const LAZY={
   suppliers:renderSuppliers,
 };
 const _lazyDone={};
-function ensureTab(t){ if(LAZY[t]&&!_lazyDone[t]){ _lazyDone[t]=1; LAZY[t](); } }
-document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{
-  document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('act',x===b));
-  const t=b.dataset.tab;
-  ensureTab(t);
-  ['sourcing','company','kam','eng','prod','reps','contracts','suppliers','cohorts','advisor'].forEach(n=>{const el=document.getElementById('tab-'+n); if(el) el.hidden=(n!==t);});
-  window.scrollTo(0,0);
-}));
+function ensureTab(t){
+  if(!LAZY[t]||_lazyDone[t]) return;
+  _lazyDone[t]=1;
+  try{ LAZY[t](); }
+  catch(err){                                   // одна сломанная вкладка не гасит остальные
+    console.error('вкладка '+t+':',err);
+    const el=document.getElementById('tab-'+t);
+    if(el) el.innerHTML='<section class="card"><div class="secttl">Вкладка не отрисовалась</div>'
+      +'<div class="note">Данные для этого раздела неполные или повреждены. Остальные вкладки работают. '
+      +'Техническая причина: '+_esc(String(err&&err.message||err))+'</div></section>';
+  }
+}
+window.ensureTab=ensureTab;
 // ---- Сорсинг: скорость до первого запроса поставщикам (создание сделки → первый СП-166) ----
 (function(){
   const TD=(window.__COMPANY__&&window.__COMPANY__.ttrRFQ);
@@ -1654,13 +1666,41 @@ requestAnimationFrame(()=>setTimeout(()=>{
 // ---- статус обновления данных: датчик ПО ВОЗРАСТУ данных (зелёный = свежее 2 ч).
 // При устаревании сайт сам опрашивает сервер и перезагружается, когда придёт свежий деплой
 // (воркер при заходе на устаревший сайт триггерит пересборку — см. _worker.js / АВТООБНОВЛЕНИЕ.md).
+window.__RENDER_OK__=1;
+</script>
+
+<!-- Базовый слой: работает независимо от основного скрипта.
+     Если рендер данных упадёт, переключение вкладок и датчик свежести остаются живыми. -->
+<script>
+(function(){
+  const _esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('act',x===b));
+    const t=b.dataset.tab;
+    try{ if(window.ensureTab) window.ensureTab(t); }catch(e){ console.error(e); }
+    ['sourcing','company','kam','eng','prod','reps','contracts','suppliers','cohorts','advisor']
+      .forEach(n=>{const el=document.getElementById('tab-'+n); if(el) el.hidden=(n!==t);});
+    window.scrollTo(0,0);
+  }));
+  // основной скрипт выставляет флаг в самом конце; его отсутствие = рендер оборвался
+  if(!window.__RENDER_OK__){
+    const host=document.getElementById('tab-sourcing')||document.body;
+    const d=document.createElement('div');
+    d.className='card';
+    d.style.cssText='margin:12px 0;border-left:3px solid var(--warn,#c60)';
+    d.innerHTML='<div class="secttl">Дашборд отрисован частично</div><div class="note">'
+      +'Основной скрипт остановился на ошибке — часть блоков может отсутствовать. '
+      +'Данные на странице от последней успешной сборки; переключение вкладок работает.</div>';
+    host.prepend(d);
+  }
+})();
 (function(){
   const el=document.getElementById('updstatus'); if(!el) return;
   const gen=new Date("__GENERATED_AT__");
   const okGen=!isNaN(gen.getTime());
   const fmt=new Intl.DateTimeFormat('ru-RU',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit',timeZone:'Europe/Moscow'});
   const lastTxt=okGen?fmt.format(gen):'—';
-  const FRESH=2*3600*1000, GRACE=3*3600*1000;     // ≤2ч — зелёный; 2–3ч — обновляется; >3ч — устарело
+  const FRESH=7*3600*1000, GRACE=9*3600*1000;     // пересборка раз в 6 ч (deploy.yml «7 */6») + запас на сборку
   const agoTxt=ms=>{const m=Math.floor(ms/60000);if(m<1)return 'только что';if(m<60)return m+' мин назад';const h=Math.floor(m/60),mm=m%60;return h+' ч'+(mm?' '+mm+' мин':'')+' назад';};
   let polling=false;
   async function freshStamp(){                     // метка свежести: /gen (пара байт) → фолбэк на скачивание страницы

@@ -1,0 +1,176 @@
+name: Gate — проверки перед мержем
+
+# Быстрый (2–4 мин) барьер на пути в main. Ничего не деплоит и не коммитит.
+# Ловит то, что раньше попадало в прод и обнаруживалось на живом сайте:
+#   • сломанный Python (синтаксис, неопределённые имена);
+#   • сломанный рендер дашборда и незаменённые плейсхолдеры;
+#   • откат бот-файлов (data/chat_snapshot.json) при мерже из долгоживущей ветки;
+#   • секреты и вебхуки, случайно попавшие в коммит.
+# Чтобы гейт стал обязательным: Settings → Rules → Rulesets → main → Require status checks → gate.
+on:
+  pull_request:
+  push:
+    branches-ignore: [main]      # main проверяется своим деплой-workflow
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gate:
+    name: gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: library_sql_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: synthetic-library-ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d library_sql_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      LIBRARY_SQL_TEST_DSN: postgresql://postgres:synthetic-library-ci@127.0.0.1:5432/library_sql_test
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0          # нужен для сравнения с base-веткой
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Установка зависимостей
+        run: pip install --quiet -r requirements.txt ruff pytest psycopg2-binary==2.9.10
+
+      - name: Ruff — ошибки кода
+        run: ruff check .
+
+      - name: Компиляция всех модулей
+        run: |
+          set -euo pipefail
+          find . -name '*.py' -not -path './.venv/*' -not -path './reports/*' -print0 \
+            | xargs -0 -n50 python -m py_compile
+          echo "✓ все модули компилируются"
+
+      - name: Тесты ядра
+        run: python -m pytest -q
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Тесты доступов (вход, права, резка вкладок)
+        run: node --test access/test/*.test.mjs
+
+      - name: Синтаксис гейтов Cloudflare
+        run: |
+          set -euo pipefail
+          for f in public/_worker.js gpu/public/_worker.js ove/public/_worker.js \
+                   zip/site/_worker.js gidromet/public/_worker.js factory/public/_worker.js; do
+            node --check "$f"
+          done
+          echo "✓ все гейты синтаксически целы"
+
+      - name: Smoke-рендер дашборда на синтетических данных
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import sys, types
+          sys.modules.setdefault("dotenv", types.SimpleNamespace(load_dotenv=lambda *a, **k: None))
+          sys.path.insert(0, ".")
+          import dashboard
+          from tests import fixture
+          m = fixture.build_metrics()
+          dashboard.write(m, {"source": "rules", "items": []}, "smoke/index.html")
+          print("собрано smoke/index.html")
+          PY
+          python scripts/validate_dashboard.py smoke/index.html
+
+      - name: Каталог данных актуален
+        run: python scripts/build_catalog.py --check
+
+      - name: Поисковый индекс актуален
+        run: python scripts/build_index.py --check
+
+      - name: Бот-файлы не должны меняться в PR
+        if: github.event_name == 'pull_request'
+        run: |
+          set -euo pipefail
+          base="origin/${{ github.base_ref }}"
+          changed="$(git diff --name-only "$base"...HEAD || true)"
+          bad="$(echo "$changed" | grep -E '^(data/chat_snapshot\.json|data/budget_snapshot\.json|gt/data/bitrix_gt\.json)$' || true)"
+          if [ -n "$bad" ]; then
+            echo "::error::в PR изменены файлы, которыми управляют боты:"
+            echo "$bad"
+            echo "Верните их к состоянию базовой ветки: git checkout $base -- $bad"
+            echo "Иначе мерж откатит свежий снимок и дашборд соберётся на устаревших данных."
+            exit 1
+          fi
+          echo "бот-файлы не тронуты"
+
+      # Страницы и правки библиотеки ГТУ не должны исчезать мержем.
+      # Так уже было: PR #168 (01.09.2026) смержился от устаревшего main и унёс
+      # /gt/plugs целиком — страницу, данные, шаблон и сборщик; заметили не сразу,
+      # чинили отдельным мержем 99eeeb7. Для одиннадцати страниц библиотеки
+      # исходником деплоя служит именно gt/public/*.html, поэтому удаление здесь —
+      # это удаление с боевого сайта.
+      - name: Страницы ГТУ и модуль правок не должны удаляться
+        if: github.event_name == 'pull_request'
+        run: |
+          set -euo pipefail
+          base="origin/${{ github.base_ref }}"
+          gone="$(git diff --diff-filter=D --name-only "$base"...HEAD -- 'gt/public/*.html' 'gt/site/*.html' 'gt/site/notes.js' 'gt/data/*.json' || true)"
+          if [ -n "$gone" ]; then
+            echo "::error::PR удаляет страницы или данные библиотеки ГТУ:"
+            echo "$gone"
+            echo "Если это не задумано — верните их: git checkout $base -- <файл>"
+            echo "Так уже терялась страница /gt/plugs (PR #168)."
+            exit 1
+          fi
+          echo "страницы ГТУ на месте"
+
+      # Модуль правок инженеров подключён на всех страницах, где есть заметки.
+      # Без него правка пишется только в localStorage браузера и не попадает в
+      # общую базу — ровно та потеря, из-за которой «пропали комментарии».
+      - name: Правки инженеров ГТУ ведут в общую базу
+        run: python -m pytest tests/test_gt_notes.py -q
+
+      - name: Поиск секретов в изменённых файлах
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            files="$(git diff --name-only origin/${{ github.base_ref }}...HEAD --diff-filter=ACM || true)"
+          else
+            files="$(git diff --name-only HEAD~1...HEAD --diff-filter=ACM 2>/dev/null || git ls-files)"
+          fi
+          [ -z "$files" ] && { echo "нет изменённых файлов"; exit 0; }
+          # шаблоны: вебхук Bitrix с токеном, ключи Anthropic/AWS/GitHub, приватные ключи
+          pattern='bitrix24\.ru/rest/[0-9]+/[A-Za-z0-9]{10,}|sk-ant-[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{30,}|AKIA[0-9A-Z]{16}|BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY'
+          hits=""
+          for f in $files; do
+            [ -f "$f" ] || continue
+            case "$f" in *.png|*.jpg|*.pdf|*.zip|*.docx|*.xlsx|*.woff2|*.npz) continue;; esac
+            if grep -nEI "$pattern" "$f" >/dev/null 2>&1; then hits="$hits $f"; fi
+          done
+          if [ -n "$hits" ]; then
+            echo "::error::возможные секреты в файлах:$hits"
+            echo "Уберите значение из кода, положите его в GitHub Secrets и отзовите скомпрометированный ключ."
+            exit 1
+          fi
+          echo "✓ секретов не найдено"
+
+      - name: Сводка
+        if: always()
+        run: echo "Гейт завершён со статусом ${{ job.status }}"

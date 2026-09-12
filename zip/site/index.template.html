@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="ru"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>База ЗИП — снабжение / прайс / ODM</title>
+<title>ГШО — горно-шахтное оборудование: снабжение, прайс, ODM</title>
 <style>
 :root{--bg:#f4f6f9;--pan:#ffffff;--ln:#dde3ea;--tx:#1b2330;--mut:#5d6b7a;--acc:#1f6feb;--ok:#1a7f37;--w:#9a6700;--bad:#cf222e}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:13px/1.45 -apple-system,Segoe UI,Roboto,Arial}
@@ -77,11 +77,11 @@ table.pt .eur{color:#0b5;font-variant-numeric:tabular-nums}
 #bomdetail:empty{display:none}
 #bomdetail{background:#fffbea;border:1px solid #f0dfa8;border-radius:8px;padding:10px 12px;margin:8px 0;font-size:12px}
 </style></head><body>
-<div id="banner"><b>Рабочая база ЗИП</b> · __N_POS__ позиций · __N_WITH_ODM__ с ODM · __N_ODM__ ODM-записей (high __N_HI__/med __N_ME__/low __N_LO__) · обновлено __UPDATED__. Правки сохраняются для всей команды. Логина нет — ссылку шли коллегам.</div>
+<div id="banner"><b>ГШО · рабочая база</b> · __N_POS__ позиций · __N_WITH_ODM__ с ODM · __N_ODM__ ODM-записей (high __N_HI__/med __N_ME__/low __N_LO__) · обновлено __UPDATED__. Правки сохраняются для всей команды. Вход — по корпоративной почте через портал КВАНТ.</div>
 <header>
   <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
-    <div><b>База ЗИП · локализация производства</b> <span class="pill" id="cnt">…</span> <span class="pill" id="mode">…</span></div>
-    <div class="tabs"><button class="on" data-t="grid">Позиции</button><button data-t="sup">Поставщики</button><button data-t="wh">Склад</button><button data-t="dem">Спрос</button><button data-t="cust">Таможня</button><button data-t="bom">Разработка</button><button data-t="mat">Материалы</button><button data-t="stats">Обзор</button><button data-t="log">Журнал</button><button id="expPos" class="exp">⬇ позиции</button><button id="expOdm" class="exp">⬇ ODM</button><button id="expPrices" class="exp">⬇ цены</button><button id="expSamples" class="exp">⬇ образцы</button><button id="expSup" class="exp">⬇ поставщики</button><a href="./orders/pilot-order-1.pdf" target="_blank" class="exp" style="text-decoration:none;background:#1a7f37;color:#fff;border-color:#1a7f37" title="Пилотный заказ №1 — PDF для закупок">📄 Заказ №1 (PDF)</a></div>
+    <div><b>ГШО · локализация производства</b> <span class="pill" id="cnt">…</span> <span class="pill" id="mode">…</span></div>
+    <div class="tabs"><button class="on" data-t="grid">Позиции</button><button data-t="sup">Поставщики</button><button data-t="wh">Склад</button><button data-t="dem">Спрос</button><button data-t="cust">Таможня</button><button data-t="bom">Разработка</button><button data-t="mat">Материалы</button><button data-t="stats">Обзор</button><button data-t="log">Журнал</button><button data-t="docs">Разделы</button><button id="expPos" class="exp">⬇ позиции</button><button id="expOdm" class="exp">⬇ ODM</button><button id="expPrices" class="exp">⬇ цены</button><button id="expSamples" class="exp">⬇ образцы</button><button id="expSup" class="exp">⬇ поставщики</button><a href="./orders/pilot-order-1.pdf" target="_blank" class="exp" style="text-decoration:none;background:#1a7f37;color:#fff;border-color:#1a7f37" title="Пилотный заказ №1 — PDF для закупок">📄 Заказ №1 (PDF)</a><a href="./telsmith.html" class="exp" style="text-decoration:none" title="Реестр разведки по щековой дробилке Telsmith 3858">⛏ Telsmith 3858</a><a href="./search.html" class="exp" style="text-decoration:none" title="Поиск детали по любому номеру">🔎 Поиск по номеру</a></div>
   </div>
   <div class="bar" id="ctrls">
     <input id="q" type="text" placeholder="поиск: каталог, наименование, модель, OEM…">
@@ -105,10 +105,15 @@ table.pt .eur{color:#0b5;font-variant-numeric:tabular-nums}
 <div id="mat" class="hide" style="padding:12px"></div>
 <div id="stats" class="hide" style="padding:12px"></div>
 <div id="log" class="hide" style="padding:12px"></div>
+<div id="docs" class="hide" style="padding:12px"></div>
 <div id="toast"></div>
 <script src="./vendor/supabase.js"></script>
 <script>
-const SUPA_URL="https://vpjliavuuxjcvtxbthlp.supabase.co", SUPA_KEY="sb_publishable_z74BF5VzezeQfTc9fni-ZA_HMyTKRTJ";
+// База ходит через собственный воркер сайта: /db/* → Supabase. Ключ подставляет
+// воркер (zip/site/_worker.js) уже ПОСЛЕ проверки входа Cloudflare Access, поэтому
+// в странице его больше нет и браузер посетителя его не получает.
+// SUPA_KEY — заглушка: supabase-js требует непустую строку, воркер её перезаписывает.
+const SUPA_URL=location.origin+"/db", SUPA_KEY="via-worker";
 const SEED=[/*__SEED__*/];
 const DEMAND=[/*__DEMAND__*/];
 const COMPET=[/*__COMPET__*/];
@@ -880,10 +885,44 @@ async function logHtml(){
   return "<table class='ot'><thead><tr><th>Когда</th><th>Кто</th><th>Таблица</th><th>Строка</th><th>Действие</th><th>Изменения</th></tr></thead><tbody>"+
    (data||[]).map(r=>`<tr><td class='cn'>${new Date(r.at).toLocaleString()}</td><td>${esc(r.actor_email||r.actor||"")}</td><td>${esc(r.table_name)}</td><td class='cn'>${esc(r.row_id)}</td><td>${esc(r.action)}</td><td class='mut' style='max-width:420px'>${esc(JSON.stringify(r.changes||{}).slice(0,300))}</td></tr>`).join("")+"</tbody></table>";
 }
+// Разделы: всё, что собрано по ГШО, из одного места. Раньше из интерфейса вела
+// единственная ссылка на пилотный заказ, а остальные отчёты и страницы-разведки
+// открывались только по прямому адресу.
+const SECTIONS=[
+ {g:"Страницы-разведки",items:[
+  {t:"Щековая дробилка Telsmith 3858",d:"197 позиций потребности на 198,6 млн ₽, 414 строк каталога по 20 узлам, цены аутмаркета, 42 вердикта по заводам, 32 доказательства изготовления, работа без чертежей",u:"./telsmith.html"},
+  {t:"Аудит КП №1763",d:"Бронзовые гильзы и втулки на 16,76 млн ₽: поставщик-посредник, арифметика цены, 185 проверенных фактов по шести направлениям",u:"./audit-kp1763.html"},
+ ]},
+ {g:"Инструменты",items:[
+  {t:"Поиск детали по любому номеру",d:"Единый вход: номер KV, бренда, реального изготовителя, аналога или поставщика — карточка детали со всеми известными номерами",u:"./search.html"},
+  {t:"ГТУ-библиотека",d:"Соседний раздел: газотурбинные установки — Ansaldo, LM6000, Frame 6B, Solar, SGT, свечи и горелки",u:"./gt/"},
+  {t:"Мастер партномеров",d:"База PN: шифровки, разбор номера, справочник",u:"./gt/wizard/"},
+ ]},
+ {g:"Отчёты по сорсингу",items:[
+  {t:"Телсмит — сорсинг",d:"Печатный отчёт по щековой дробилке",u:"./orders/telsmith-sourcing.pdf",csv:"./orders/telsmith-need.csv"},
+  {t:"Перфораторы — сорсинг",d:"Классы деталей гидроперфораторов Sandvik/Epiroc: что запрашивать, приёмка образца, риски",u:"./orders/drifters-sourcing.pdf",csv:"./orders/drifters-sourcing.csv"},
+  {t:"Подшипники — отчёт",d:"Разбор подшипниковой номенклатуры и цен",u:"./orders/bearings-report.pdf"},
+  {t:"Поставщики по блокам",d:"Кого запрашивать по узлам",u:"./orders/suppliers-by-block.pdf"},
+  {t:"Кто уже поставляет",d:"Действующие каналы поставки по таможне",u:"./orders/who-supplies.pdf"},
+  {t:"Поставщики SGT-400",d:"Мировой пул по газотурбинному блоку",u:"./orders/sgt400-suppliers.pdf",csv:"./orders/sgt400-world-suppliers.csv"},
+  {t:"Базы данных для закупок",d:"Какими торговыми базами пользуемся и что в них искать",u:"./orders/trade-databases.pdf"},
+  {t:"Пилотный заказ №1",d:"Первый заказ на локализацию: спецификация и RFQ",u:"./orders/pilot-order-1.pdf",csv:"./orders/pilot_order_rfq.csv"},
+ ]},
+];
+function docsHtml(){
+ return SECTIONS.map(g=>`<h3 style="margin:14px 0 6px">${esc(g.g)}</h3>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:8px">`+
+  g.items.map(i=>`<a href="${esc(i.u)}" target="_blank" style="display:block;border:1px solid #d5d8dd;
+   border-radius:8px;padding:10px 12px;background:#fff;text-decoration:none;color:inherit">
+   <b style="display:block;margin-bottom:3px">${esc(i.t)}</b>
+   <span class="mut" style="font-size:12px;line-height:1.4">${esc(i.d)}</span>
+   ${i.csv?`<div style="margin-top:5px"><span class="pill">⬇ CSV</span></div>`:""}</a>`).join("")+
+  `</div>`).join("");
+}
 document.querySelectorAll(".tabs [data-t]").forEach(b=>b.onclick=async()=>{
   document.querySelectorAll(".tabs [data-t]").forEach(x=>x.classList.remove("on"));b.classList.add("on");
   const t=b.dataset.t;$("grid").classList.toggle("hide",t!="grid");$("ctrls").style.visibility=t=="grid"?"visible":"hidden";
-  $("suppliers").classList.toggle("hide",t!="sup");$("wh").classList.toggle("hide",t!="wh");$("dem").classList.toggle("hide",t!="dem");$("cust").classList.toggle("hide",t!="cust");$("bom").classList.toggle("hide",t!="bom");$("mat").classList.toggle("hide",t!="mat");$("stats").classList.toggle("hide",t!="stats");$("log").classList.toggle("hide",t!="log");
+  $("suppliers").classList.toggle("hide",t!="sup");$("wh").classList.toggle("hide",t!="wh");$("dem").classList.toggle("hide",t!="dem");$("cust").classList.toggle("hide",t!="cust");$("bom").classList.toggle("hide",t!="bom");$("mat").classList.toggle("hide",t!="mat");$("stats").classList.toggle("hide",t!="stats");$("log").classList.toggle("hide",t!="log");$("docs").classList.toggle("hide",t!="docs");
   if(t=="sup")$("suppliers").innerHTML=supHtml();
   if(t=="wh")$("wh").innerHTML=whHtml();
   if(t=="dem"){$("dem").innerHTML=demHtml();if($("comptab"))$("comptab").innerHTML=compTable("");}
@@ -892,6 +931,7 @@ document.querySelectorAll(".tabs [data-t]").forEach(b=>b.onclick=async()=>{
   if(t=="mat"){$("mat").innerHTML=matHtml();if($("mattab"))$("mattab").innerHTML=matSupTable("");}
   if(t=="stats")$("stats").innerHTML=statsHtml();
   if(t=="log")$("log").innerHTML=await logHtml();
+  if(t=="docs")$("docs").innerHTML=docsHtml();
 });
 $("expPos").onclick=()=>{
   const cols=["pp","category","catalog_no","catalog_norm","name","oem","model","loc_status","criticality","owner","annual_qty","lead_time_days","moq","plan_price","target_equipment","material_type","applications","aliases","price_eur_competitor","price_min","price_max","price_src","hs_code","bitrix_status","odm_count","sample_count","rec_node","rec_material","note"];

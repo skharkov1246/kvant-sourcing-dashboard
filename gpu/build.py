@@ -52,6 +52,7 @@ FILES = {
     "__RFQPACK_JSON__": "rfq_pack.json",
     "__GLOSSARY_JSON__": "glossary.json",
     "__ACLASS_JSON__": "analog_classes.json",
+    "__COVERAGE_JSON__": "coverage.json",
 }
 
 
@@ -81,7 +82,18 @@ def compact(obj) -> str:
     return json.dumps(obj, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
 
 
+def refresh_coverage() -> None:
+    """Заполняемость считается перед сборкой: показатель, отстающий от данных, врёт."""
+    import subprocess
+    try:
+        subprocess.run([sys.executable, str(ROOT / "tools" / "coverage.py")],
+                       check=True, capture_output=True)
+    except Exception as ex:  # счётчик не должен ронять сборку сайта
+        print(f"   заполняемость: пропущена ({ex})")
+
+
 def main() -> None:
+    refresh_coverage()
     tpl = (SITE / "index.template.html").read_text(encoding="utf-8")
 
     data = {ph: load(fn) for ph, fn in FILES.items()}

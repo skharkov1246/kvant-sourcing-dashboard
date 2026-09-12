@@ -1,0 +1,203 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@page{size:A4;margin:13mm 11mm}
+body{font:10.5px/1.5 'DejaVu Sans',Arial,sans-serif;color:#111;margin:0}
+h1{font-size:20px;margin:0 0 4px}
+h2{font-size:13.5px;margin:15px 0 5px;background:#1b2330;color:#fff;padding:5px 9px;border-radius:3px;page-break-after:avoid}
+h3{font-size:11.5px;margin:10px 0 4px;color:#0b3d91;page-break-after:avoid}
+.mut{color:#555;font-size:9.5px}
+table{border-collapse:collapse;width:100%;margin:4px 0}
+tr{page-break-inside:avoid}
+th,td{border:1px solid #bbb;padding:3px 6px;text-align:left;vertical-align:top;font-size:9.5px}
+th{background:#eef2f7} b{color:#0b3d91}
+.box{border:1px solid #ccc;border-left:4px solid #1a7f37;border-radius:4px;padding:7px 11px;margin:6px 0;page-break-inside:avoid}
+.warn{border-left-color:#c62828;background:#fff8f8}
+.num{text-align:right;white-space:nowrap}
+ul{margin:3px 0 3px 16px;padding:0} li{margin:2px 0}
+.kpi{display:inline-block;border:1px solid #bbb;border-radius:4px;padding:5px 9px;margin:2px 4px 2px 0;font-size:10px}
+.kpi b{font-size:14px;color:#1a7f37}
+</style></head><body>
+<h1>Кто уже поставляет и производит: карта готовых каналов</h1>
+<div class="mut">ЗИП гидроперфораторов Epiroc / Atlas Copco COP  Sandvik HL-HLX  Montabert  Furukawa ·
+01.09.2026 · Собрано из накопленной базы проекта  без новых допущений.
+Назначение: не искать заново то  что уже найдено и проверено.</div>
+<div style="margin:8px 0">
+<span class="kpi"><b>752</b> позиций в базе</span>
+<span class="kpi"><b>750</b> с найденным производителем</span>
+<span class="kpi"><b>276</b> с ценой</span>
+<span class="kpi"><b>76</b> с ЗАВОДСКИМ КП</span>
+<span class="kpi"><b>30</b> поставщиков в CRM</span>
+<span class="kpi"><b>23 280</b> таможенных деклараций</span>
+</div>
+<div class="box"><b>Короткий ответ, что уже не надо изобретать.</b>
+По номенклатуре перфораторов рынок поставщиков уже вскрыт: найдены производители на 750 позиций
+из 752, по 76 позициям есть цены напрямую с заводов, 30 поставщиков заведены в CRM
+и с частью уже идёт переписка. Канал в РФ работает — по таможне видно 2555 отгрузок ЗИП буровой
+техники за 2023–2026 и конкретные экспортёры, которые возят регулярно. Заново стоит искать только то,
+чего в этом отчёте нет: многослойные подшипники и цельнобронзовые втулки (по ним отдельный отчёт).</div>
+<h2>A. Заводы, которые уже дали нам цены</h2>
+<div class="mut">Это не маркетплейс и не парсинг — прямые коммерческие предложения заводов. Самая ценная часть базы: цена подтверждена конкретным поставщиком.</div>
+<table><tr><th style="width:22%">Завод</th><th class="num" style="width:11%">Позиций в КП</th><th class="num" style="width:13%">Медиана, $</th><th class="num" style="width:16%">Диапазон, $</th><th>Чем интересен</th></tr>
+<tr><td><b>WMS</b></td><td class="num">70</td><td class="num">130.1</td><td class="num">1–1763</td><td class="mut">Турция, Анкара (WMS/Atmaca) — комплектные COP и металл-ЗИП. Широчайшее покрытие, но цены у верхней границы: реселлер на уровне OEM</td></tr>
+<tr><td><b>Sanshan</b></td><td class="num">29</td><td class="num">8.0</td><td class="num">0–100</td><td class="mut">Китай, Шаньдун — внутренности COP: поршень, гильза, драйвер. Самые низкие цены в выборке</td></tr>
+<tr><td><b>YLF</b></td><td class="num">28</td><td class="num">58.0</td><td class="num">3–680</td><td class="mut">Китай — металл-ЗИП, ровный прайс по втулкам и направляющим</td></tr>
+<tr><td><b>Fuxuan</b></td><td class="num">22</td><td class="num">40.9</td><td class="num">2–1317</td><td class="mut">Китай, Цзиньхуа — металл и втулки для перфораторов</td></tr>
+<tr><td><b>Mindrill</b></td><td class="num">9</td><td class="num">21.6</td><td class="num">1–323</td><td class="mut">Индия — дрифтеры-аналоги 1838 / 2238 / MD20, самый дешёвый вход</td></tr>
+<tr><td><b>KAT</b></td><td class="num">7</td><td class="num">54.1</td><td class="num">28–94</td><td class="mut">Китай, Шаньдун, Ляочэн — хвостовики и втулки COP 1036–2238</td></tr>
+</table>
+<div class="box warn"><b>Вывод, который стоит денег.</b> Разброс медиан между заводами —
+от 8 $ (Sanshan) до 130 $ (WMS) на сопоставимой номенклатуре, то есть <b>шестнадцатикратный</b>.
+WMS удобен широтой ассортимента, но по позициям, которые закрывают Sanshan, YLF, Fuxuan и KAT,
+переплата кратная. Прежде чем размещать заказ у одного поставщика «за всё», разложить корзину
+по специализациям.</div>
+<h2>Б. С кем уже идёт работа: CRM прозвона</h2>
+<div class="mut"><b>К/П</b>: 11 · <b>Ответил — взял в работу</b>: 7 · <b>Написали — ждём</b>: 7 · <b>Написали — ждём (прозвон)</b>: 4 · <b>Отказ (по хвостовикам/втулкам)</b>: 1</div>
+<table><tr><th style="width:19%">Поставщик</th><th style="width:9%">Тип</th><th style="width:20%">География</th><th style="width:30%">Направление</th><th style="width:22%">Стадия</th></tr>
+<tr><td><b>LianHuaShan Rock Tools</b></td><td>Завод</td><td>Китай, Ляонин, Хулудао</td><td>Хвостовики, shank adapters, guide bushings</td><td class="mut">Отказ (по хвостовикам/втулкам)</td></tr>
+<tr><td><b>Sanshan / Zuanshan</b></td><td>Завод</td><td>Китай, Шаньдун, Янгу / Ляочэн</td><td>Внутренности COP: piston, liner, driver</td><td class="mut">К/П</td></tr>
+<tr><td><b>Shandong KAT Drilling</b></td><td>Завод</td><td>Китай, Шаньдун, Ляочэн</td><td>Shank adapters COP 1036-2238</td><td class="mut">К/П</td></tr>
+<tr><td><b>Biaotuo / BPSEAL</b></td><td>Завод</td><td>Китай, Хэбэй, Синтай</td><td>РТИ: PU/PTFE seals, O-rings</td><td class="mut">Написали — ждём (прозвон)</td></tr>
+<tr><td><b>Xingtai Huimen Seals</b></td><td>Завод</td><td>Китай, Хэбэй, Синтай</td><td>РТИ: oil seals, O-rings, valve seals</td><td class="mut">Написали — ждём (прозвон)</td></tr>
+<tr><td><b>Nanjing Hovoo</b></td><td>Трейдер</td><td>Китай, Цзянсу, Нанкин</td><td>COP seal kits 2238/3060/4050</td><td class="mut">К/П</td></tr>
+<tr><td><b>Qingdao Hendac Prime</b></td><td>Завод</td><td>Китай, Шаньдун, Циндао</td><td>РТИ (авто): oil/PU seals</td><td class="mut">Ответил — взял в работу</td></tr>
+<tr><td><b>Jiangxi Woserld / Siton</b></td><td>Завод</td><td>Китай (Woserld Цзянси / Siton)</td><td>Внутренности COP: piston/guide/bushing/driver</td><td class="mut">Ответил — взял в работу</td></tr>
+<tr><td><b>WMS / Atmaca</b></td><td>Завод</td><td>Турция, Анкара</td><td>Комплектные COP + металл-ЗИП</td><td class="mut">К/П</td></tr>
+<tr><td><b>Mindrill Systems</b></td><td>Завод</td><td>Индия</td><td>Дрифтеры-аналоги 1838/2238/MD20</td><td class="mut">К/П</td></tr>
+<tr><td><b>Shijiazhuang Hanjiu</b></td><td>Завод</td><td>Китай, Хэбэй, Шицзячжуан</td><td>GAP-мотор (orbital, Char-Lynn equiv)</td><td class="mut">К/П</td></tr>
+<tr><td><b>Ningbo Zhongyi Hydraulic Motor</b></td><td>Завод</td><td>Китай, Чжэцзян, Нинбо</td><td>GAP-мотор (orbital + radial-piston)</td><td class="mut">Ответил — взял в работу</td></tr>
+<tr><td><b>Jining Jinjia Hydraulic</b></td><td>Завод</td><td>Китай, Шаньдун, Цзинин</td><td>GAP-мотор (orbital)</td><td class="mut">К/П</td></tr>
+<tr><td><b>Jining Liyuan Hydraulic</b></td><td>Завод</td><td>Китай, Шаньдун, Цзинин</td><td>GAP-мотор (orbital+axial)</td><td class="mut">Написали — ждём</td></tr>
+<tr><td><b>Ningbo Helm Tower Noda</b></td><td>Завод</td><td>Китай, Чжэцзян, Нинбо</td><td>GAP-мотор (radial-piston)</td><td class="mut">Написали — ждём</td></tr>
+<tr><td><b>Ningbo Chaori Hydraulic</b></td><td>Завод</td><td>Китай, Чжэцзян, Нинбо (Фэнхуа)</td><td>GAP-клапан (charging valve)</td><td class="mut">К/П</td></tr>
+<tr><td><b>Ningbo Milehertz</b></td><td>Завод</td><td>Китай, Чжэцзян, Нинбо</td><td>GAP-клапан (charging kit/valve)</td><td class="mut">Написали — ждём</td></tr>
+<tr><td><b>Difon Machinery</b></td><td>Завод</td><td>Китай</td><td>GAP-клапан (custom machining)</td><td class="mut">Ответил — взял в работу</td></tr>
+<tr><td><b>Dongfang Yoyik</b></td><td>Трейдер</td><td>Китай, Сычуань, Дэян</td><td>GAP-клапан (YAV charging valve)</td><td class="mut">Написали — ждём</td></tr>
+<tr><td><b>Litian / Litech</b></td><td>Завод</td><td>Китай, Ляонин, Хулудао</td><td>Хвостовики COP1028-4050</td><td class="mut">Ответил — взял в работу</td></tr>
+<tr><td><b>Pulanka Rock Tools</b></td><td>Завод</td><td>Китай, Чжэцзян, Тайчжоу</td><td>Хвостовики + drifter ЗИП</td><td class="mut">Ответил — взял в работу</td></tr>
+<tr><td><b>Xiamen Bestlink</b></td><td>Завод</td><td>Китай, Фуцзянь, Сямэнь</td><td>Хвостовики shank COP1838/4050</td><td class="mut">Написали — ждём</td></tr>
+<tr><td><b>GMD Equipment</b></td><td>Завод</td><td>Китай, Фуцзянь, Сямэнь</td><td>Хвостовики shank COP1838</td><td class="mut">Написали — ждём (прозвон)</td></tr>
+<tr><td><b>Prodrill (Xiamen)</b></td><td>Завод</td><td>Китай, Фуцзянь, Сямэнь</td><td>Хвостовики shank COP1838 + буры</td><td class="mut">Написали — ждём (прозвон)</td></tr>
+<tr><td><b>Guangdong DEF Seals</b></td><td>Завод</td><td>Китай, Гуандун, Дунгуань</td><td>РТИ / hydraulic seals</td><td class="mut">Ответил — взял в работу</td></tr>
+<tr><td><b>Jinhua Fuxuan Machinery</b></td><td>Завод</td><td>Китай, Чжэцзян, Цзиньхуа</td><td>Металл / bushing rock drill</td><td class="mut">К/П</td></tr>
+<tr><td><b>Xiamen Yonglianfeng</b></td><td>Завод</td><td>Китай, Фуцзянь, Сямэнь</td><td>Металл COP1838/1840</td><td class="mut">К/П</td></tr>
+<tr><td><b>Xi&#x27;an Meiwa</b></td><td>Трейдер</td><td>Китай, Шэньси, Сиань</td><td>COP seal kits</td><td class="mut">К/П</td></tr>
+<tr><td><b>Answk</b></td><td>Трейдер</td><td>Китай, Гуандун, Гуанчжоу</td><td>COP overhaul kits</td><td class="mut">Написали — ждём</td></tr>
+<tr><td><b>Fujis-seal</b></td><td>Трейдер</td><td>Китай</td><td>COP seal kits</td><td class="mut">Написали — ждём</td></tr>
+</table>
+<h3>Открытые задачи прозвона</h3><table><tr><th style="width:7%">Приор.</th><th style="width:20%">Кому</th><th style="width:20%">Контакт</th><th>О чём спросить</th></tr>
+<tr><td>П1</td><td><b>Biaotuo / BPSEAL</b></td><td class="mut">тел. на bpseal.en.made-in-china.com
+(почта oilseal@bpseal.com)</td><td>Полное молчание с 23.06. Получили список уплотнений (28)? Считают по OEM-кроссу или нужны размеры (ID/OD/H/материал)? Льют сами PU/PTFE? ВЗЯТЬ WeChat/менеджера.</td></tr>
+<tr><td>П2</td><td><b>Xingtai Huimen Seals</b></td><td class="mut">+86 319 7656928
+WA +86 15832965899
+fyyf1988@163.com</td><td>Молчит после отправки списка. Получили? Считают по OEM-кроссу или нужны размеры? Кто менеджер, WeChat?</td></tr>
+<tr><td>П2</td><td><b>GMD Equipment</b></td><td class="mut">тел. найти (Сямэнь)
+info@gmd-eqpt.com</td><td>Молчит, менеджера нет. Делают shank adapters / втулки / детали top-hammer сами? ВЗЯТЬ email/WeChat менеджера.</td></tr>
+<tr><td>П2</td><td><b>Prodrill (Xiamen)</b></td><td class="mut">+86 18959243380</td><td>Молчит с 25.06. Куют хвостовики сами (ковка/термичка)? Делают под COP1838? Кто менеджер, образец?</td></tr>
+<tr><td>П2/П3</td><td><b>Xiamen Bestlink</b></td><td class="mut">WeChat/тел +86 13600966313 (Richard Chen)</td><td>Richard добавлен в WeChat, скинули списки, но тишина. Позвони/напиши: получил ли файлы, кто считает shank/COP. Для чистой пересылки — нейтральный focused RFQ.</td></tr>
+<tr><td>П3</td><td><b>Pulanka Rock Tools</b></td><td class="mut">+86 576 82737372
++86 18267645159 (WeChat)</td><td>08.07 ОТВЕТИЛ, попросил переслать список — переслали. Звонить ТОЛЬКО если после этого замолчит: что уверенно делают, своя ли ковка, когда цены.</td></tr>
+<tr><td>П3</td><td><b>Dongfang Yoyik</b></td><td class="mut">+86 838 2206509
+WeChat +86 13547042288 (Miss Li)</td><td>Резерв по зарядному клапану. Звонить ТОЛЬКО если тема клапана оживёт / не отвечает в WeChat.</td></tr>
+</table>
+<h2>В. Производители, привязанные к позициям (ODM)</h2>
+<div class="mut">Найдены производители на 750 позиций из 752. Столбец «позиций» — сколько наших номенклатурных строк закрывает поставщик.</div>
+<table><tr><th class="num" style="width:8%">Позиций</th><th style="width:26%">Поставщик</th><th style="width:9%">Страна</th><th style="width:9%">Дов.</th><th>Что делает</th></tr>
+<tr><td class="num"><b>261</b></td><td>Shanghai GDOO Mining Technology Ltd.</td><td>China</td><td>med</td><td class="mut">Normet Scamec 2000 S / Charmec spare parts, фильтрэлементы и ЗИП</td></tr>
+<tr><td class="num"><b>170</b></td><td>Hambition Mining</td><td>China</td><td>high</td><td class="mut">Epiroc/Atlas Copco Scooptram ST7/ST14/MT42 replacement parts incl. engine/filter group</td></tr>
+<tr><td class="num"><b>117</b></td><td>Hambition Drivetrain Components &amp; Parts Co</td><td>China</td><td>high</td><td class="mut">ЗИП Atlas Copco/Epiroc Scooptram ST7 (вкл. фильтры/гидросистему)</td></tr>
+<tr><td class="num"><b>116</b></td><td>FMRIBT</td><td>China</td><td>med</td><td class="mut">ЗИП подземных буровых Epiroc Boomer/Simba/Boltec (узлы гидробака/фильтрации)</td></tr>
+<tr><td class="num"><b>92</b></td><td>Jinan Duobo Intelligent Technology Co., Lt</td><td>China</td><td>high</td><td class="mut">Original/replacement Normet Charmec &amp; Utimec spare parts incl. main/security filter elem</td></tr>
+<tr><td class="num"><b>59</b></td><td>Shanghai GDOO Mining Technology Ltd</td><td>China</td><td>med</td><td class="mut">ЗИП Atlas Copco/Epiroc/Sandvik буровых (гидро/расходные узлы)</td></tr>
+<tr><td class="num"><b>58</b></td><td>Shanghai Machfans Machinery Limited</td><td>China</td><td>high</td><td class="mut">Normet Charmec/Utimec/Spraymec spare parts incl. filters, hydraulic components</td></tr>
+<tr><td class="num"><b>57</b></td><td>Nanjing Hovoo Machinery Technology Co., Lt</td><td></td><td>med</td><td class="mut">Уплотнения/пыльники PU+PTFE+резина для rock drill COP-серии (Epiroc/Atlas Copco), включа</td></tr>
+<tr><td class="num"><b>55</b></td><td>Guangzhou Answk Technology Co., Ltd.</td><td>China</td><td>med</td><td class="mut">Фильтры и ЗИП Epiroc (буровые Boomer/Simba): масляные/воздушные/гидравлические фильтры</td></tr>
+<tr><td class="num"><b>51</b></td><td>Vixon Machinery Equipment</td><td>China</td><td>med</td><td class="mut">Epiroc/Atlas Copco mining electrics &amp; sensors (angle/linear sensors)</td></tr>
+<tr><td class="num"><b>49</b></td><td>JiangXi Ruiqian Auto Parts Co., Ltd</td><td>China</td><td>med</td><td class="mut">Маслоотделители воздух/масло (air-oil separator), фильтры топливные/масляные/воздушные/г</td></tr>
+<tr><td class="num"><b>48</b></td><td>Shanghai Machfans</td><td>China</td><td>med</td><td class="mut">Normet original/aftermarket ЗИП, Charmec/Scamec фильтры</td></tr>
+<tr><td class="num"><b>48</b></td><td>Xi&#x27;an Huizhong Mechanical Equipment Co., L</td><td>China</td><td>med</td><td class="mut">ЗИП буровых Epiroc/Atlas Copco (буровые установки, перфораторы, гидравлика)</td></tr>
+<tr><td class="num"><b>47</b></td><td>Doobotec</td><td>China</td><td>med</td><td class="mut">Original/aftermarket Epiroc Atlas Copco MT42 drilling machine and truck spare parts</td></tr>
+<tr><td class="num"><b>47</b></td><td>Toparts</td><td>China</td><td>low</td><td class="mut">Rock drill / drifter seal kits &amp; spare parts (Epiroc/Atlas Copco COP series)</td></tr>
+<tr><td class="num"><b>46</b></td><td>Guangzhou Answk Technology Co., Ltd</td><td>China</td><td>med</td><td class="mut">ЗИП Epiroc Boomer/Simba/Boltec (узлы рамы/гидравлики/электрики)</td></tr>
+</table>
+<h2>Г. Кто уже везёт ЗИП буровой техники в РФ</h2>
+<div class="mut">Отфильтровано из 23 280 деклараций за 2023–2026: оставлены только те  где есть наш партномер либо признак буровой техники и OEM. Ядро — 2 555 отгрузок. Это готовые каналы: компании уже прошли таможню с этой номенклатурой.</div>
+<table><tr><th class="num" style="width:8%">Отгрузок</th><th style="width:8%">Происх.</th><th style="width:12%">Годы</th><th>Экспортёр</th></tr>
+<tr><td class="num"><b>112</b></td><td>CN</td><td>2023–2024</td><td>CHANGSHA TITAN CONSTRUCTION MACHINERY TRADING CO. LT</td></tr>
+<tr><td class="num"><b>74</b></td><td>CN</td><td>2023–2023</td><td>GUIZHOU SINODRILLS EQUIPMENT CO.LTD</td></tr>
+<tr><td class="num"><b>69</b></td><td>CN</td><td>2023–2025</td><td>TAIZHOU SHANHE TRADING CO. LTD</td></tr>
+<tr><td class="num"><b>53</b></td><td>CN</td><td>2023–2025</td><td>PUTIAN QIDELI ENGINEERING EQUIPMENT CO. LTD</td></tr>
+<tr><td class="num"><b>44</b></td><td>CN</td><td>2023–2024</td><td>LHS ROCK DRILLING TOOLS (LIAONING) MACHINERY EQUIPME</td></tr>
+<tr><td class="num"><b>42</b></td><td>KZ</td><td>2025–2026</td><td>ТОО &quot;Мир Инструмента - Алматы&quot;</td></tr>
+<tr><td class="num"><b>38</b></td><td>CN</td><td>2023–2024</td><td>SANDVIK</td></tr>
+<tr><td class="num"><b>37</b></td><td>CN</td><td>2023–2024</td><td>TIANJIN QIANGLI PNEUMATIC TOOLS COMMERCE &amp; TRADE CO.</td></tr>
+<tr><td class="num"><b>36</b></td><td>CN</td><td>2023–2025</td><td>SHANDONG TOPS PDC BIT CO. LTD</td></tr>
+<tr><td class="num"><b>34</b></td><td>CN</td><td>2023–2024</td><td>TIANJIN IBEST INTERNATIONAL TRADE CO. LTD</td></tr>
+<tr><td class="num"><b>32</b></td><td>CN</td><td>2023–2023</td><td>LEAD GROUP CO.LTD</td></tr>
+<tr><td class="num"><b>29</b></td><td>CN</td><td>2023–2023</td><td>GUIYANG SPECIAL STEEL (GSS) ROCK TOOLS INC</td></tr>
+<tr><td class="num"><b>29</b></td><td>CN</td><td>2024–2024</td><td>TAIZHOU SHANHE TRADING CO. LTD.</td></tr>
+<tr><td class="num"><b>23</b></td><td>CN</td><td>2024–2024</td><td>SHANDONG TOPS PDC BIT CO. LTD.</td></tr>
+<tr><td class="num"><b>23</b></td><td>CN</td><td>2024–2024</td><td>SANDVIK COROMANT.</td></tr>
+<tr><td class="num"><b>22</b></td><td>CN</td><td>2023–2024</td><td>TIANJIN IBEST INTERNATIONAL TRADE CO. LTD.</td></tr>
+<tr><td class="num"><b>21</b></td><td>CN</td><td>2023–2025</td><td>NANTONG SUPANCHOR GEOTECHNICAL SYSTEMS CO. LTD</td></tr>
+<tr><td class="num"><b>21</b></td><td>SE</td><td>2023–2025</td><td>SANDVIK COROMANT</td></tr>
+<tr><td class="num"><b>20</b></td><td>CN</td><td>2023–2024</td><td>TAIZHOU DARTS MACHINERY TRADE CO. LTD</td></tr>
+<tr><td class="num"><b>20</b></td><td>CN</td><td>2023–2023</td><td>ZHEJIANG KAISHAN HEAVY INDUSTRY CO. LTD</td></tr>
+<tr><td class="num"><b>19</b></td><td>KZ</td><td>2025–2026</td><td>ТОО &quot;SOLID DRILLING SOLUTIONS - QAZAQSTAN (СОЛИД ДРИ</td></tr>
+<tr><td class="num"><b>18</b></td><td>CN</td><td>2023–2024</td><td>HUNAN NEW DIAMOND CONSTRUCTION MACHINERY CO. LTD.</td></tr>
+<tr><td class="num"><b>17</b></td><td>CN</td><td>2023–2023</td><td>GSS ROCK TOOLS INC</td></tr>
+<tr><td class="num"><b>16</b></td><td>CN</td><td>2023–2023</td><td>BEIJING XLHJ INTERNATIONAL TRADING COMPANY LTD</td></tr>
+</table>
+<h2>Д. Кто везёт ровно наши партномера</h2>
+<div class="mut">Самое точное попадание: в описании декларации совпал наш каталожный номер. Показывает, у кого физически берут именно эту деталь и кто её уже растаможил.</div>
+<table><tr><th style="width:13%">Партномер</th><th style="width:24%">Наименование</th><th class="num" style="width:8%">Декл.</th><th style="width:30%">Экспортёр</th><th style="width:25%">Импортёр в РФ</th></tr>
+<tr><td><b>COP1838</b></td><td>—</td><td class="num">13</td><td>QINGDAO HAMBITION DRIVETRAIN COMPO, AKKOM MAKINE IMALAT SANAYI VE TICA</td><td class="mut">ООО&quot;ДРИЛТУЛС</td></tr>
+<tr><td><b>BG01048662</b></td><td>—</td><td class="num">7</td><td>SANDVIK, MIA ANTALYA INSAAT SAN. VE TIC A.S</td><td class="mut">ООО&quot;ПРОММАШТЕХНОЛОГИИ</td></tr>
+<tr><td><b>1838HD</b></td><td>—</td><td class="num">4</td><td>SHANDONG YANGGU TIANYUE ROCK DRILL, DELSAN GROUP LLC</td><td class="mut">ООО ГК&quot;АЛЬФА-СПК-ДЖИТЕЙЧ</td></tr>
+<tr><td><b>56045189</b></td><td>Клапан 56045189 Sandvik Tamrock</td><td class="num">4</td><td>PARKER, SANDVIK MINING AND CONSTRUCTION SV</td><td class="mut">ООО&quot;МОДЕРН МАШИНЕРИ ФАР ИСТ</td></tr>
+<tr><td><b>56042643</b></td><td>Клапан 56042643 Sandvik Tamrock</td><td class="num">4</td><td>Товарищество с ограниченной ответс, ARAMINE CO. LTD</td><td class="mut">ООО&quot;ПРОММАШТЕХНОЛОГИИ</td></tr>
+<tr><td><b>56041887</b></td><td>Клапан 56041887 Sandvik Tamrock</td><td class="num">3</td><td>ТОО &quot;Global Trade Solution&quot;, SANDVIK</td><td class="mut">ООО&quot;РЕСУРС</td></tr>
+<tr><td><b>56072531</b></td><td>Клапан 56072531 Normet</td><td class="num">3</td><td>ТОО &quot;Global Trade Solution&quot;, DANFOSS</td><td class="mut">ООО&quot;РЕСУРС</td></tr>
+<tr><td><b>3177308500</b></td><td>Мотор 3177 3085 00 Atlas Copco</td><td class="num">2</td><td>YANGZI</td><td class="mut">АО&quot;ПОЛЮС МАГАДАН</td></tr>
+<tr><td><b>R1700G</b></td><td>—</td><td class="num">2</td><td>CATERPILLAR INC, MILEQUIP CORPORATION</td><td class="mut">АО&quot;ЧГГК</td></tr>
+<tr><td><b>F11010</b></td><td>—</td><td class="num">2</td><td>SHIJIAZHUANG BAILE ELECTROMECHANIC, ГИДРОНЕКС ООО</td><td class="mut">ООО&quot;АЗИЯ ДЕЛИВЕРИ СЕРВИС</td></tr>
+<tr><td><b>3115376800</b></td><td>Клапан 3115 3768 00 Atlas Copco</td><td class="num">2</td><td>ОТСУТСТВУЕТ, MIA ANTALYA INSAAT SAN. VE TIC A.S</td><td class="mut">ООО&quot;МОДЕРН МАШИНЕРИ ФАР ИСТ</td></tr>
+<tr><td><b>2125135</b></td><td>Двигатель 212-5135 Caterpillar</td><td class="num">2</td><td>ZHEJIANG TONGDA ELECTRICAL APPLIAN, ZHEJIANG TONGDA ELECTRICAL APPLIAN</td><td class="mut">ООО&quot;УРАЛОПТИНСТРУМЕНТ</td></tr>
+<tr><td><b>3177307200</b></td><td>—</td><td class="num">2</td><td>DELSAN GROUP IS MAK. LTD. STI. ТУР, АТЛАС КОПКО (ATLAS COPCO)</td><td class="mut">ООО&quot;ЯКУТСПЕЦСТРОЙ</td></tr>
+<tr><td><b>04004080</b></td><td>Патрон 04004080 Sandvik Tamrock</td><td class="num">2</td><td>OKB ZUBR VOSTOK CO. LTD.</td><td class="mut">ООО&quot;ЮТЭК-ТЕХНО</td></tr>
+<tr><td><b>5000480</b></td><td>Элемент фильтрующий 500-0480 Caterpillar</td><td class="num">2</td><td>ИП Воронин Игорь Валентинович</td><td class="mut">ООО&quot;ИНКОР</td></tr>
+<tr><td><b>2201052</b></td><td>—</td><td class="num">2</td><td>ТОО &quot;Мир Инструмента - Алматы&quot;</td><td class="mut">ООО&quot;МИР ИНСТРУМЕНТА</td></tr>
+</table>
+<h2>Е. Кто на рынке РФ: импортёры этой номенклатуры</h2>
+<div class="mut">Не поставщики, а игроки рынка — конкуренты и потенциальные партнёры. Полезно понимать, кто уже держит канал и какие объёмы проходят.</div>
+<table><tr><th class="num" style="width:10%">Отгрузок</th><th>Импортёр</th><th class="num" style="width:10%">Отгрузок</th><th>Импортёр</th></tr>
+<tr><td class="num"><b>200</b></td><td>ООО&quot;ТИВИДЖИ</td><td class="num"><b>185</b></td><td>ООО&quot;ПОМБУР</td></tr>
+<tr><td class="num"><b>133</b></td><td>АО&quot;МАШИНОСТРОИТЕЛЬНЫЙ ХОЛДИНГ</td><td class="num"><b>101</b></td><td>ООО&quot;МОДЕРН МАШИНЕРИ ФАР ИСТ</td></tr>
+<tr><td class="num"><b>88</b></td><td>ООО&quot;ДРИЛТУЛС</td><td class="num"><b>86</b></td><td>ООО&quot;СТРОЙКОМПОЗИТ-Н</td></tr>
+<tr><td class="num"><b>72</b></td><td>ООО&quot;БИТ</td><td class="num"><b>67</b></td><td>ООО&quot;АЛМАЗНЫЙ БУР</td></tr>
+<tr><td class="num"><b>62</b></td><td>ООО&quot;АСПЕКТ-28</td><td class="num"><b>58</b></td><td>ООО&quot;БУРТЕХПРОМ</td></tr>
+<tr><td class="num"><b>54</b></td><td>ООО ЛК&quot;СИБИМПЭКС</td><td class="num"><b>51</b></td><td>ООО&quot;АБМ</td></tr>
+<tr><td class="num"><b>49</b></td><td>ООО&quot;АТРИУМ</td><td class="num"><b>49</b></td><td>ООО&quot;МАШИНАРИ ПРИМ</td></tr>
+<tr><td class="num"><b>43</b></td><td>ООО&quot;ГК ПРОМРЕСУРС</td><td class="num"><b>42</b></td><td>ООО&quot;МИР ИНСТРУМЕНТА</td></tr>
+</table>
+<h2>Ж. Что из этого следует</h2>
+<div class="box">
+<ul>
+<li><b>Поставщиков искать заново не нужно.</b> Производитель найден почти на всю номенклатуру,
+поставщики заведены в CRM, часть уже в стадии «К/П», часть ответила и взяла запрос в работу.</li>
+<li><b>Первым делом — не новый поиск, а дожим молчащих.</b> В прозвоне висят открытые задачи
+по Biaotuo, Xingtai Huimen, GMD, Prodrill, Xiamen Bestlink: списки отправлены, ответа нет.
+Это дешевле любого нового поиска.</li>
+<li><b>Разложить корзину по специализациям.</b> Медианы заводов различаются в 16 раз.
+Уплотнения — у профильных РТИ-заводов (Biaotuo, Xingtai Huimen, Hovoo, Fujis),
+внутренности COP — у Sanshan и Woserld, хвостовики — у LianHuaShan, KAT, Litian, Prodrill,
+гидромоторы — у Shijiazhuang Hanjiu и Ningbo Zhongyi. Один поставщик «за всё» обходится дороже.</li>
+<li><b>Турция как запасной канал.</b> WMS/Atmaca (Анкара) и ALFAROK возят в РФ регулярно,
+таможня это подтверждает. Дороже Китая, но короче плечо и меньше вопросов на границе.</li>
+<li><b>Казахстан — рабочий транзит.</b> В ядре отгрузок видны ТОО «Мир Инструмента-Алматы»,
+«К2 Восток», «Global Trade Solution», «Solid Drilling Solutions». Через них уже идёт поток.</li>
+<li><b>Единственная незакрытая тема</b> — многослойные подшипники скольжения и цельнобронзовые
+втулки. По ним поставщиков в этой базе нет, поиск вёлся отдельно: см. отчёт
+«Подшипник скольжения и бронзовая втулка».</li>
+</ul></div>
+<div class="mut" style="margin-top:8px">Источники: собственная база проекта —
+таможенные декларации РФ 2023–2026 (glbs.io), живые КП поставщиков, ODM-привязки, CRM прозвона.
+Внешние допущения не добавлялись. Где данных нет — прочерк.</div></body></html>

@@ -1,135 +1,155 @@
-"""CI-зонд v18: ЗИП Cummins QSK60G — что уже запрашивал сорсинг.
+"""Зонд v34: подстановка ключа в ссылку выдачи файла.
 
-Отвечает на два вопроса перед новым заходом по позициям
-«Свеча зажигания 18.049-01 (Cummins 4380132/4390446/5544762)» и
-«Фильтр масляный 9050 (Fleetguard LF9050 / Cummins 4920071)»:
+Проверка v31 могла быть ошибочной. Ссылка downloadUrl у Битрикса, как правило, уже
+содержит параметр auth= с пустым значением. Я дописывал второй auth= в конец —
+портал читает первый, пустой, и отдаёт страницу входа. То есть «страница входа
+25 из 25» могла означать не «путь закрыт», а «ключ подставлен не туда».
 
-1. Были ли у нас сделки/запросы СП-166 по Cummins / QSK / QSV / газопоршневым —
-   и чем закончились (стадия, сорсер, дата).
-2. Заводили ли мы уже компании-кандидаты мирового пула (Hatraco, PeriParts,
-   Techie, Ghaddar, TVH, Diesel Parts Direct …) и слали ли им запросы.
+Здесь ключ подставляется четырьмя способами, и печатается, чем ответил каждый:
+  как есть · дописан в конец · подставлен в существующий пустой auth= ·
+  собран заново из идентификатора файла.
 
-Печатает компактную сводку в лог Actions (секреты не выводятся).
-Запуск: gh workflow run probe.yml --ref <ветка>  |  Actions → Bitrix probe.
+ПЕЧАТАЮТСЯ ТОЛЬКО ПРИЗНАКИ ССЫЛКИ (есть ли в ней auth=, относительная ли она),
+КОДЫ ОТВЕТОВ И ДОЛИ. Сами ссылки, имена файлов и содержимое не выводятся.
 """
 from __future__ import annotations
 
-import json
-import sys
-from collections import defaultdict
-from pathlib import Path
+import os
+import re
+from collections import Counter
+from datetime import datetime, timedelta, timezone
+from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
-ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT))
+import requests
 
-from bitrix_client import BitrixClient  # noqa: E402
-from config import SPA_ENTITY_TYPE_ID, Settings  # noqa: E402
+BASE = os.environ["BITRIX_WEBHOOK_URL"].rstrip("/")
+m = re.match(r"(https://[^/]+)/rest/(\d+)/([^/]+)", BASE)
+PORTAL, USER_ID, TOKEN = (m.group(1), m.group(2), m.group(3)) if m else ("", "", "")
+N = 20
 
-# 1. ключевые слова по технике и позициям
-KEYWORDS = ["Cummins", "Камминз", "Камминс", "QSK", "QSV", "газопоршн",
-            "ГПЭС", "ГПУ", "свеча зажигания", "свечи зажигания",
-            "LF9050", "4380132", "4390446", "5544762", "4924504", "5373898",
-            "18.049", "4920071"]
 
-# 2. мировой пул кандидатов по этим позициям (имена как их знает рынок)
-CANDIDATES = [
-    "Hatraco", "PeriParts", "Peri-Parts", "Techie", "Stitt", "Altronic",
-    "Champion", "Federal-Mogul", "Federal Mogul", "BERU", "Denso", "NGK",
-    "Motortech", "ERS", "RM Walsh", "Walsh",
-    "Diesel Parts Direct", "Area Diesel", "Source One", "FinditParts",
-    "Reliable Industries", "Everything Truck", "AGA Parts", "Supply Spare",
-    "FridayParts", "Friday Parts", "Makano", "Yemparts", "Buymachineryparts",
-    "Ghaddar", "Al Khalij", "Alkhalij", "TVH", "Dynatrade", "Radiant",
-    "Fleetguard", "Donaldson", "Baldwin", "WIX", "Sakura", "Hifi", "MANN",
-    "Cummins", "Filters King", "Hanton", "Sparkplugs", "Sinotruk",
-    "Dongfeng", "Chongqing", "Aksa", "Teksan", "Karatay",
-]
+def bx(method: str, params: dict) -> dict:
+    for _ in range(3):
+        try:
+            r = requests.post(f"{BASE}/{method}.json", json=params, timeout=60)
+            r.raise_for_status()
+            return r.json()
+        except Exception:
+            continue
+    return {}
 
-SELECT = ["id", "title", "stageId", "createdTime", "parentId2", "companyId",
-          "assignedById", "ufCrm18Supplier", "ufCrm18SupplContact", "opportunity"]
+
+def bx_all(method: str, params: dict) -> list:
+    out, start = [], 0
+    while True:
+        j = bx(method, {**params, "start": start})
+        res = j.get("result")
+        items = res.get("items") if isinstance(res, dict) and "items" in res else res
+        out += items or []
+        if "next" not in j:
+            return out
+        start = j["next"]
+
+
+def probe(u: str) -> str:
+    if not u:
+        return "ссылки нет"
+    try:
+        r = requests.get(u, timeout=45)
+        if r.status_code != 200:
+            return f"http {r.status_code}"
+        b = r.content
+        if b[:2] == b"PK":
+            return "ФАЙЛ xlsx/docx"
+        if b[:4] == b"%PDF":
+            return "ФАЙЛ pdf"
+        if b[:8] == b"\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1":
+            return "ФАЙЛ office"
+        s = b.lstrip()[:1]
+        if s == b"<":
+            return "страница входа (html)"
+        return f"ФАЙЛ иное ({len(b)} б)"
+    except Exception as e:
+        return f"ошибка {type(e).__name__}"
+
+
+def with_auth(u: str) -> str:
+    """Подставляет ключ в существующий параметр auth=, а не дописывает второй."""
+    p = urlparse(u)
+    q = parse_qs(p.query, keep_blank_values=True)
+    q["auth"] = [TOKEN]
+    return urlunparse(p._replace(query=urlencode(q, doseq=True)))
 
 
 def main() -> int:
-    client = BitrixClient(Settings.load().bitrix_webhook_url)
-    users = client.users()
-    stages = client.spa_stages(SPA_ENTITY_TYPE_ID, 24)
+    print("=== Зонд v34: как правильно подставить ключ в ссылку файла ===\n")
+    since = (datetime.now(timezone.utc) - timedelta(days=365)).strftime("%Y-%m-%dT00:00:00+03:00")
+    uf = bx("crm.deal.userfield.list", {"order": {"FIELD_NAME": "ASC"}}).get("result") or []
+    ff = [str(u["FIELD_NAME"]) for u in uf if u.get("USER_TYPE_ID") == "file"]
+    deals = bx_all("crm.deal.list", {"filter": {">=DATE_CREATE": since},
+                                     "select": ["ID"], "order": {"ID": "DESC"}})
+    ids = [str(d["ID"]) for d in deals[:200]]
 
-    def who(uid):
-        return users.get(str(uid), f"#{uid}")
-
-    def stage(sid):
-        return stages.get(str(sid), str(sid))
-
-    print("=== 1. Сделки по ключевым словам (Cummins / QSK / газопоршневые / свечи) ===")
-    deals: dict[str, dict] = {}
-    for kw in KEYWORDS:
-        for d in client.list_paged("crm.deal.list", {
-            "filter": {"%TITLE": kw},
-            "select": ["ID", "TITLE", "STAGE_ID", "DATE_CREATE", "ASSIGNED_BY_ID", "OPPORTUNITY"],
-        }):
-            deals[str(d["ID"])] = d
-    print(f"  найдено сделок: {len(deals)}")
-    for d in sorted(deals.values(), key=lambda x: str(x.get("DATE_CREATE")), reverse=True)[:40]:
-        print(f"  #{d['ID']} {str(d.get('DATE_CREATE'))[:10]} {str(d.get('TITLE'))[:95]!r} "
-              f"стадия={d.get('STAGE_ID')} отв={who(d.get('ASSIGNED_BY_ID'))}")
-
-    print("\n=== 2. Запросы СП-166 по тем же словам (в названии) + привязанные к сделкам ===")
-    rfqs: dict[str, dict] = {}
-    for kw in KEYWORDS:
-        for r in client.list_items(SPA_ENTITY_TYPE_ID, filter={"%title": kw}, select=SELECT):
-            rfqs[str(r["id"])] = r
-    ids = list(deals)
+    refs: list[dict] = []
     for i in range(0, len(ids), 50):
-        for r in client.list_items(SPA_ENTITY_TYPE_ID, filter={"parentId2": ids[i:i + 50]}, select=SELECT):
-            rfqs[str(r["id"])] = r
-    print(f"  найдено запросов: {len(rfqs)}")
+        j = bx("crm.deal.list", {"filter": {"ID": ids[i:i + 50]}, "select": ["ID"] + ff})
+        for x in j.get("result") or []:
+            for f in ff:
+                v = x.get(f)
+                if not v:
+                    continue
+                for fo in (v if isinstance(v, list) else [v]):
+                    if isinstance(fo, dict) and fo.get("downloadUrl"):
+                        refs.append(fo)
+        if len(refs) >= N:
+            break
+    refs = refs[:N]
+    print(f"вложений в выборке: {len(refs)}")
+    if not refs:
+        print("вложений не найдено")
+        return 0
 
-    comp_ids = {str(r.get("companyId")) for r in rfqs.values() if r.get("companyId")}
-    names = client.companies_by_ids(comp_ids) if comp_ids else {}
-    by_comp: dict[str, list] = defaultdict(list)
-    for r in sorted(rfqs.values(), key=lambda x: str(x.get("createdTime")), reverse=True):
-        cname = names.get(str(r.get("companyId"))) or (r.get("ufCrm18Supplier") or "—")
-        by_comp[str(cname)].append(r)
-        print(f"  #{r['id']} {str(r.get('createdTime'))[:10]} {str(r.get('title'))[:80]!r} "
-              f"→ {str(cname)[:45]} | {stage(r.get('stageId'))} | {who(r.get('assignedById'))}")
+    # признаки ссылки — без самой ссылки
+    sample_u = str(refs[0]["downloadUrl"])
+    pr = urlparse(sample_u)
+    q = parse_qs(pr.query, keep_blank_values=True)
+    print(f"ссылка относительная: {'да' if not sample_u.startswith('http') else 'нет'}")
+    print(f"путь ссылки: {pr.path}")
+    print(f"имена параметров: {sorted(q.keys())}")
+    print(f"параметр auth присутствует: {'да' if 'auth' in q else 'нет'}"
+          f" · пустой: {'да' if q.get('auth') == [''] else 'нет'}\n")
 
-    print("\n=== 3. Кому из этих поставщиков уже слали (свод) ===")
-    for cname, items in sorted(by_comp.items(), key=lambda kv: -len(kv[1])):
-        last = str(items[0].get("createdTime"))[:10]
-        print(f"  {len(items):>3} запр. | посл. {last} | {cname[:70]}")
+    res: dict[str, Counter] = {}
 
-    print("\n=== 4. Компании мирового пула: есть ли в базе и слали ли запросы ===")
-    found_any = False
-    for cand in CANDIDATES:
-        comps = client.list_paged("crm.company.list", {
-            "filter": {"%TITLE": cand}, "select": ["ID", "TITLE", "WEB", "EMAIL"]})
-        if not comps:
-            continue
-        found_any = True
-        for c in comps[:5]:
-            cid = str(c["ID"])
-            items = client.list_items(SPA_ENTITY_TYPE_ID, filter={"companyId": cid}, select=SELECT)
-            items.sort(key=lambda x: str(x.get("createdTime")), reverse=True)
-            head = (f"  [{cand}] #{cid} {str(c.get('TITLE'))[:60]!r} — запросов СП-166: {len(items)}")
-            print(head)
-            for r in items[:5]:
-                print(f"        {str(r.get('createdTime'))[:10]} {str(r.get('title'))[:70]!r} "
-                      f"| {stage(r.get('stageId'))} | {who(r.get('assignedById'))}")
-    if not found_any:
-        print("  ни одна компания мирового пула в базе не заведена")
+    def note(way: str, out: str) -> None:
+        res.setdefault(way, Counter())[out] += 1
 
-    print("\n=== 5. Машиночитаемый срез (для сайта) ===")
-    dump = {
-        "deals": [{"id": d["ID"], "title": d.get("TITLE"), "stage": d.get("STAGE_ID"),
-                   "created": str(d.get("DATE_CREATE"))[:10]} for d in deals.values()],
-        "rfqs": [{"id": r["id"], "title": r.get("title"),
-                  "company": names.get(str(r.get("companyId"))) or r.get("ufCrm18Supplier"),
-                  "stage": stage(r.get("stageId")), "created": str(r.get("createdTime"))[:10],
-                  "sourcer": who(r.get("assignedById"))} for r in rfqs.values()],
-    }
-    print(json.dumps(dump, ensure_ascii=False)[:60000])
+    for fo in refs:
+        for key in ("downloadUrl", "showUrl"):
+            u = str(fo.get(key) or "")
+            if not u:
+                continue
+            full = u if u.startswith("http") else PORTAL + u
+            note(f"{key}: как есть", probe(full))
+            sep = "&" if "?" in full else "?"
+            note(f"{key}: ключ дописан в конец", probe(f"{full}{sep}auth={TOKEN}"))
+            note(f"{key}: ключ подставлен в auth=", probe(with_auth(full)))
+        fid = fo.get("id")
+        if fid:
+            note("собрана заново: /rest/.../download",
+                 probe(f"{BASE}/download.json?fileId={fid}"))
+            note("собрана заново: uf.php с ключом",
+                 probe(with_auth(f"{PORTAL}/bitrix/tools/disk/uf.php?attachedId={fid}&action=download&auth=")))
+
+    print("=== ЧТО ОТВЕТИЛ КАЖДЫЙ СПОСОБ ===")
+    for way, c in res.items():
+        good = sum(n for o, n in c.items() if o.startswith("ФАЙЛ"))
+        mark = "  ✔ РАБОТАЕТ" if good else ""
+        print(f"{way:44s} годных {good:>3d} из {sum(c.values()):>3d} · {dict(c.most_common(3))}{mark}")
+
+    print("\n✓ зонд v34 завершён")
     return 0
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    main()
