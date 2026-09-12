@@ -303,6 +303,7 @@
         "markers": []
       },
       "referenced_by": [
+        "gt/tools/ship_export.py",
         "gt/tools/ship_map.py",
         "gt/tools/ship_merge.py"
       ]
@@ -1132,6 +1133,7 @@
         "gt/public/plugs.html",
         "gt/tools/build_lot_xlsx.py",
         "gt/tools/build_rfq.py",
+        "gt/tools/ship_export.py",
         "gt/tools/ship_merge.py",
         "gt/tools/ship_report.py"
       ]
@@ -2910,9 +2912,9 @@
         "gt/public/plugs.html",
         "gt/tools/build_lot_xlsx.py",
         "gt/tools/build_rfq.py",
+        "gt/tools/ship_export.py",
         "gt/tools/ship_merge.py",
-        "gt/tools/ship_report.py",
-        "zip/build.py"
+        "gt/tools/ship_report.py"
       ]
     },
     {
@@ -5880,9 +5882,9 @@
         "gt/public/plugs.html",
         "gt/tools/build_lot_xlsx.py",
         "gt/tools/build_rfq.py",
+        "gt/tools/ship_export.py",
         "gt/tools/ship_merge.py",
-        "gt/tools/ship_report.py",
-        "zip/build.py"
+        "gt/tools/ship_report.py"
       ]
     },
     {
@@ -6079,8 +6081,8 @@
         "zip/data/telsmith_nodrawings.json"
       ],
       "last_change": "2026-09-12",
-      "last_author": "skharkov1246",
-      "last_commit": "9a3905b",
+      "last_author": "Claude",
+      "last_commit": "15268b1",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
