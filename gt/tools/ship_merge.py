@@ -15,6 +15,7 @@ from __future__ import annotations
 import json
 import re
 import sys
+from collections import Counter
 from datetime import date
 from pathlib import Path
 
@@ -61,7 +62,49 @@ def clean_name(name: str) -> str:
 def key(name: str) -> str:
     """Имя компании без орг-формы, регистра и пунктуации — для сопоставления."""
     n = ORG_TAIL.sub("", clean_name(name))
-    return re.sub(r"[^0-9a-zа-я ]", "", n.lower()).strip()
+    return re.sub(r"[^0-9a-zа-я ]", " ", n.lower()).strip()
+
+
+# описание вместо названия: писать туда некуда, в адресаты такое пускать нельзя
+NOT_A_COMPANY = re.compile(
+    r"^(любой|любые|разные|прочие|независимые|официальные|авторизованные|"
+    r"дистрибьютор|дистрибьюторы|поставщик|поставщики|продавцы|изготовители)\b"
+    r"|\b(прямой запрос|найдено мной|подтверждение вместо|замена источника|"
+    r"также|несколько продавцов|и её дистрибьюторы|арт\.)\b", re.I)
+# маркетплейсы и крупные сети — односложные имена, которые безопасно схлопывать
+SINGLE_WORD_OK = {"ebay", "amazon", "radwell", "newark", "mouser", "grainger",
+                  "zoro", "alibaba", "aliexpress", "farnell", "digikey"}
+
+
+def is_company(name: str) -> bool:
+    """Отличает компанию от описания класса поставщиков."""
+    n = clean_name(name)
+    if not n or len(n) < 2 or len(n) > 70:
+        return False
+    return not NOT_A_COMPANY.search(n)
+
+
+def canon_keys(keys) -> dict:
+    """Сводит написания одной компании: «Solar Turbines PartStore» → «Solar Turbines».
+
+    Правило: короткий ключ поглощает длинный, если тот начинается с него целыми
+    словами. Односложные поглощают только из списка известных площадок — иначе
+    «Siemens» съел бы «Siemens Energy», а это разные адресаты.
+    """
+    uniq = sorted({k for k in keys if k}, key=lambda k: (len(k.split()), len(k)))
+    canon = {}
+    for k in uniq:
+        base = canon.get(k, k)
+        for other in uniq:
+            if other == k or other in canon:
+                continue
+            words = base.split()
+            if len(words) < 2 and base not in SINGLE_WORD_OK:
+                continue
+            if other.startswith(base + " "):
+                canon[other] = base
+        canon.setdefault(k, base)
+    return canon
 
 
 def contact_index() -> dict:
@@ -112,6 +155,13 @@ def contact_index() -> dict:
             raw = s(r.get("seller_key"))
             if raw and raw not in idx:
                 idx[raw] = idx.get(key(r.get("seller")), {})
+
+    # дубль-индекс без пробелов: «ТЕК-ЭЛ» даёт ключ «тек эл», а в справочнике
+    # лежит слитное «текэл» — иначе уже собранный контакт теряется
+    for k, v in list(idx.items()):
+        flat = k.replace(" ", "")
+        if flat and flat != k and flat not in idx:
+            idx[flat] = v
     return idx
 
 VERDICTS = ("in_stock", "available_lead", "pn_found_no_stock", "oem_only",
@@ -169,7 +219,8 @@ def sellers_list(raw: dict) -> list:
         seen.add(k)
         out.append({"seller": clean_name(name) or name, "seller_key": k, "url": s(url),
                     "country": s(country), "price": num(price), "lead_time": s(lead),
-                    "note": s(note)})
+                    "note": s(note), "basis": "по этой детали",
+                    "is_company": is_company(name)})
 
     push(raw.get("seller"), raw.get("seller_url"), raw.get("seller_country"),
          raw.get("price"), raw.get("lead_time"))
@@ -244,6 +295,8 @@ def attach_clusters(rows: list) -> None:
             for sl in r.get("sellers") or []:
                 if not (sl.get("emails") or sl.get("phones")):
                     continue  # в подсказку идут только те, кому есть куда написать
+                if not is_company(sl["seller"]):
+                    continue  # «любой дистрибьютор уплотнений» — не адресат
                 c = pool.setdefault(sl["seller_key"], dict(sl, lines=0))
                 c["lines"] += 1
 
@@ -256,12 +309,73 @@ def attach_clusters(rows: list) -> None:
                 if c["seller_key"] in seen:
                     continue
                 seen.add(c["seller_key"])
-                picked.append({k: v for k, v in c.items() if k != "lines"})
+                # цена, срок и ссылка относятся к ЧУЖОЙ детали — по этой строке
+                # они не действуют, поэтому в подсказку кластера не переносятся
+                picked.append({
+                    "seller": c["seller"], "seller_key": c["seller_key"],
+                    "country": c.get("country", ""), "site": c.get("site", ""),
+                    "emails": c.get("emails", []), "phones": c.get("phones", []),
+                    "basis": "кластер",
+                })
                 if len(picked) >= 4:
                     break
             if len(picked) >= 4:
                 break
         r["cluster_sellers"] = picked
+
+
+def unify_sellers(rows: list) -> dict:
+    """Сводит написания одной компании к каноническому и убирает дубли внутри строки.
+
+    До этого «Solar Turbines», «Solar Turbines PartStore» и «Solar Turbines shop»
+    считались тремя адресатами, и число компаний в карте закупки было завышено.
+    """
+    names: dict[str, str] = {}
+    for r in rows:
+        for sl in r.get("sellers") or []:
+            k = sl["seller_key"]
+            # каноническим показываем самое короткое написание: оно ближе к названию
+            if k not in names or len(sl["seller"]) < len(names[k]):
+                names[k] = sl["seller"]
+
+    canon = canon_keys(names)
+    aliases: dict[str, list] = {}
+    for raw, ck in canon.items():
+        aliases.setdefault(ck, []).append(raw)
+
+    for r in rows:
+        seen, merged = set(), []
+        for sl in r.get("sellers") or []:
+            ck = canon.get(sl["seller_key"], sl["seller_key"])
+            if ck in seen:
+                continue
+            seen.add(ck)
+            sl["seller_key"] = ck
+            sl["seller"] = names.get(ck, sl["seller"])
+            # флаг считаем по каноническому имени: описание могло прийти из
+            # длинного написания, которое мы только что схлопнули
+            sl["is_company"] = is_company(sl["seller"])
+            merged.append(sl)
+        r["sellers"] = merged
+    return aliases
+
+
+def stock_grade(r: dict) -> str:
+    """Насколько наличие твёрдое.
+
+    Разбор показал, что «225 на складе» смешивало три разные вещи: подтверждённый
+    остаток на весь объём, наличие без числа остатка и формулировку «отгрузим,
+    если есть». В деньги и в план отгрузки имеет право идти только первое.
+    """
+    if r["verdict"] != "in_stock":
+        return "нет"
+    if r["in_stock"] == "conditional":
+        return "условный"
+    if r["checked_by"] == "проверка 08.2026":
+        return "устаревший"          # август, ссылки с тех пор не перепроверялись
+    if r["covers_qty"] == "full":
+        return "твёрдый"
+    return "частичный"
 
 
 def load_rows(path: Path, key: str) -> list:
@@ -315,11 +429,23 @@ def main() -> int:
         rec.update({k: v for k, v in (checks.get(pn) or blank(pn)).items() if k != "pn"})
         out.append(rec)
 
+    aliases = unify_sellers(out)
+
     # контакты — на продавца, а не на позицию: один справочник на всю выкладку
     contacts = contact_index()
+
+    def find_contact(k):
+        """Ищем и по каноническому ключу, и по всем исходным написаниям."""
+        cands = [k, *aliases.get(k, [])]
+        for cand in cands + [c.replace(" ", "") for c in cands]:
+            c = contacts.get(cand)
+            if c and (c.get("emails") or c.get("phones")):
+                return c
+        return None
+
     for rec in out:
         for sl in rec.get("sellers") or []:
-            c = contacts.get(sl["seller_key"])
+            c = find_contact(sl["seller_key"])
             if c:
                 sl["emails"] = c["emails"][:3]
                 sl["phones"] = c["phones"][:2]
@@ -329,6 +455,8 @@ def main() -> int:
                 sl["emails"], sl["phones"] = [], []
                 sl["site"] = sl["url"]
 
+    for rec in out:
+        rec["stock_grade"] = stock_grade(rec)
     attach_clusters(out)
 
     out.sort(key=lambda r: (r["sheet"], r["cat"], r["pn"]))
@@ -350,16 +478,18 @@ def main() -> int:
     own = sum(1 for r in out if any(sl.get("emails") or sl.get("phones")
                                     for sl in r.get("sellers") or []))
     any_c = sum(1 for r in out if contacted(r))
-    three = sum(1 for r in out if len(contacted(r)) >= 3)
+    grades = Counter(r["stock_grade"] for r in out if r["stock_grade"] != "нет")
+    comps = {sl["seller_key"] for r in out for sl in r.get("sellers") or []}
     print(f"позиций {len(out)}, проверено {checked}, без проверки {len(out) - checked}")
-    print(f"  контакт по самой строке: {own}")
-    print(f"  контакт по строке или её кластеру: {any_c} ({round(100 * any_c / len(out))}%)")
-    print(f"  три и больше адресатов с контактом: {three}")
-    print(f"  БЕЗ единого адресата: {len(out) - any_c}")
+    print(f"  наличие: твёрдое {grades['твёрдый']}, частичное {grades['частичный']}, "
+          f"условное {grades['условный']}, устаревшее {grades['устаревший']}")
+    print(f"  контакт ПО САМОЙ ДЕТАЛИ: {own} ({round(100 * own / len(out))}%)")
+    print(f"  плюс родовой адрес кластера: {any_c - own}; без адресата {len(out) - any_c}")
+    print(f"  компаний-адресатов после сведения написаний: {len(comps)}")
     for sheet in sorted({r["sheet"] for r in out}):
         n = [r for r in out if r["sheet"] == sheet]
-        st = sum(1 for r in n if r["verdict"] == "in_stock")
-        print(f"  {sheet}: {len(n)} позиций, на складе {st}")
+        print(f"  {sheet}: {len(n)} позиций, твёрдый склад "
+              f"{sum(1 for r in n if r['stock_grade'] == 'твёрдый')}")
     return 0
 
 
