@@ -223,6 +223,47 @@ def norm(raw: dict, source: str) -> dict:
     return r
 
 
+def attach_clusters(rows: list) -> None:
+    """Кластер строки и адресаты кластера — чтобы «кому писать» было по каждой строке.
+
+    По самой позиции продавец находится не всегда: на неопознанный чертёжный номер
+    карточки в вебе нет в принципе. Но у соседних строк того же бренда и класса
+    адресаты есть, и писать по ним надо тому же кругу компаний. Кластер —
+    (лист, бренд заявки, категория), запасной — (лист, категория).
+    """
+    def wide(r):
+        return f'{r["sheet"]} · {r["cat"]}'
+
+    def tight(r):
+        return f'{r["sheet"]} · {r["man"]} · {r["cat"]}' if r.get("man") else wide(r)
+
+    pools: dict[str, dict] = {}
+    for r in rows:
+        for scope in (tight(r), wide(r)):
+            pool = pools.setdefault(scope, {})
+            for sl in r.get("sellers") or []:
+                if not (sl.get("emails") or sl.get("phones")):
+                    continue  # в подсказку идут только те, кому есть куда написать
+                c = pool.setdefault(sl["seller_key"], dict(sl, lines=0))
+                c["lines"] += 1
+
+    for r in rows:
+        r["cluster"] = tight(r)
+        own = {sl["seller_key"] for sl in r.get("sellers") or []}
+        picked, seen = [], set(own)
+        for scope in (tight(r), wide(r)):
+            for c in sorted(pools.get(scope, {}).values(), key=lambda x: -x["lines"]):
+                if c["seller_key"] in seen:
+                    continue
+                seen.add(c["seller_key"])
+                picked.append({k: v for k, v in c.items() if k != "lines"})
+                if len(picked) >= 4:
+                    break
+            if len(picked) >= 4:
+                break
+        r["cluster_sellers"] = picked
+
+
 def load_rows(path: Path, key: str) -> list:
     if not path.exists():
         return []
@@ -288,6 +329,8 @@ def main() -> int:
                 sl["emails"], sl["phones"] = [], []
                 sl["site"] = sl["url"]
 
+    attach_clusters(out)
+
     out.sort(key=lambda r: (r["sheet"], r["cat"], r["pn"]))
     DST.write_text(json.dumps({
         "updated": date.today().isoformat(),
@@ -299,12 +342,20 @@ def main() -> int:
         "rows": out,
     }, ensure_ascii=False, indent=1))
 
+    def contacted(r):
+        return [sl for sl in (r.get("sellers") or []) + (r.get("cluster_sellers") or [])
+                if sl.get("emails") or sl.get("phones")]
+
     checked = sum(1 for r in out if r["verdict"] != "not_checked")
-    three = sum(1 for r in out if len(r.get("sellers") or []) >= 3)
-    withc = sum(1 for r in out if any(sl.get("emails") or sl.get("phones")
-                                      for sl in r.get("sellers") or []))
+    own = sum(1 for r in out if any(sl.get("emails") or sl.get("phones")
+                                    for sl in r.get("sellers") or []))
+    any_c = sum(1 for r in out if contacted(r))
+    three = sum(1 for r in out if len(contacted(r)) >= 3)
     print(f"позиций {len(out)}, проверено {checked}, без проверки {len(out) - checked}")
-    print(f"  с 3+ адресатами: {three}; хотя бы с одним контактом: {withc}")
+    print(f"  контакт по самой строке: {own}")
+    print(f"  контакт по строке или её кластеру: {any_c} ({round(100 * any_c / len(out))}%)")
+    print(f"  три и больше адресатов с контактом: {three}")
+    print(f"  БЕЗ единого адресата: {len(out) - any_c}")
     for sheet in sorted({r["sheet"] for r in out}):
         n = [r for r in out if r["sheet"] == sheet]
         st = sum(1 for r in n if r["verdict"] == "in_stock")

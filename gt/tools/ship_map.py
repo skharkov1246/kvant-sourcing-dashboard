@@ -19,6 +19,8 @@ ROOT = Path(__file__).resolve().parent.parent.parent
 DATA = ROOT / "gt/data/ship_lukoil.json"
 HTML = ROOT / "gt/docs/ЗАКУПКА-ЛУКОЙЛ.html"
 PDF = ROOT / "gt/docs/ЗАКУПКА-ЛУКОЙЛ.pdf"
+LINES_HTML = ROOT / "gt/docs/ЗАКУПКА-ЛУКОЙЛ-ПОСТРОЧНО.html"
+LINES_PDF = ROOT / "gt/docs/ЗАКУПКА-ЛУКОЙЛ-ПОСТРОЧНО.pdf"
 CHROME = [
     "/opt/pw-browsers/chromium-1194/chrome-linux/chrome",
     "/usr/bin/chromium", "/usr/bin/chromium-browser", "/usr/bin/google-chrome",
@@ -130,23 +132,40 @@ li { margin-bottom: 1.5mm; line-height: 1.35; }
 """
 
 
+def one_addressee(sl: dict) -> str:
+    bits = [f'<b>{E(sl["seller"])}</b>']
+    if sl.get("country"):
+        bits.append(E(sl["country"]))
+    for em in (sl.get("emails") or [])[:2]:
+        bits.append(f'<span class="pn">{E(em)}</span>')
+    for ph in (sl.get("phones") or [])[:1]:
+        bits.append(E(ph))
+    if not (sl.get("emails") or sl.get("phones")):
+        bits.append(f'<span class="dim">{E(sl.get("site") or "контакт не собран")}</span>')
+    if sl.get("lead_time"):
+        bits.append(f'<span class="dim">{E(sl["lead_time"])}</span>')
+    return " · ".join(bits)
+
+
 def addressees(r: dict, limit: int = 4) -> str:
-    """Строка адресатов: кому писать по этой позиции, с контактом, если он есть."""
-    out = []
-    for sl in (r.get("sellers") or [])[:limit]:
-        bits = [f'<b>{E(sl["seller"])}</b>']
-        if sl.get("country"):
-            bits.append(E(sl["country"]))
-        for em in (sl.get("emails") or [])[:2]:
-            bits.append(f'<span class="pn">{E(em)}</span>')
-        for ph in (sl.get("phones") or [])[:1]:
-            bits.append(E(ph))
-        if not (sl.get("emails") or sl.get("phones")):
-            bits.append(f'<span class="dim">{E(sl.get("site") or "контакт не собран")}</span>')
-        if sl.get("lead_time"):
-            bits.append(f'<span class="dim">{E(sl["lead_time"])}</span>')
-        out.append(" · ".join(bits))
-    return " ⁄ ".join(out)
+    """Кому писать по позиции.
+
+    Сначала те, у кого эта деталь реально найдена. Если их меньше четырёх —
+    добираем адресатами кластера (лист · бренд · категория): по неопознанному
+    чертёжному номеру продавца нет, но круг компаний по такому классу известен.
+    """
+    own = (r.get("sellers") or [])[:limit]
+    parts = [one_addressee(sl) for sl in own]
+    left = limit - len(parts)
+    if left > 0:
+        # адресаты кластера у сотен строк одни и те же — печатаем именами,
+        # а контакты держим один раз в разделе 2, иначе документ не открыть
+        extra = [f'<b>{E(sl["seller"])}</b>' + (f' · {E(sl["country"])}' if sl.get("country") else "")
+                 for sl in (r.get("cluster_sellers") or [])[:left]]
+        if extra:
+            parts.append('<span class="dim">по кластеру «' + E(r.get("cluster", "")) +
+                         '» (контакты — раздел 2):</span> ' + " ⁄ ".join(extra))
+    return " ⁄ ".join(parts)
 
 
 def rows_table(rows: list[dict], cols: list, with_addr: bool = False) -> str:
@@ -225,6 +244,44 @@ def supplier_map(rows: list[dict]) -> str:
         ("Закрывают весь объём", 8), ("Закупка, USD", 9), ("Типовой срок", 13),
         ("Лист", 8), ("Что берут", 22)]))
     return f'<table class="t"><thead><tr>{head}</tr></thead>{"".join(cards)}</table>'
+
+
+def clusters(rows: list[dict]) -> str:
+    """Кластеры заявки: сколько строк, что со складом и кому писать по всему кластеру."""
+    cl: dict[str, dict] = {}
+    for r in rows:
+        c = cl.setdefault(r.get("cluster") or "—", {
+            "lines": 0, "qty": 0, "stock": 0, "val": 0.0, "addr": {}, "pns": []})
+        c["lines"] += 1
+        c["qty"] += int(r.get("qty") or 0)
+        c["val"] += line_value(r)
+        if r["verdict"] == "in_stock":
+            c["stock"] += 1
+        if len(c["pns"]) < 12:
+            c["pns"].append(r["pn"])
+        for sl in (r.get("sellers") or []) + (r.get("cluster_sellers") or []):
+            if sl.get("emails") or sl.get("phones"):
+                a = c["addr"].setdefault(sl["seller_key"], dict(sl, n=0))
+                a["n"] += 1
+    if not cl:
+        return '<p class="dim">Кластеров нет.</p>'
+
+    head = "".join(f'<th style="width:{w}%">{E(t)}</th>' for t, w in [
+        ("Кластер", 22), ("Строк", 5), ("Штук", 6), ("Со склада", 6),
+        ("Закупка, USD", 8), ("Кому писать по кластеру", 53)])
+    bodies = []
+    for name, c in sorted(cl.items(), key=lambda t: (-t[1]["lines"], t[0])):
+        top = sorted(c["addr"].values(), key=lambda x: -x["n"])[:5]
+        who = " ⁄ ".join(one_addressee(a) for a in top) or \
+            '<span class="dim">адресата с контактом нет</span>'
+        bodies.append(
+            f'<tbody class="p"><tr class="d">'
+            f'<td><b>{E(name)}</b></td><td>{c["lines"]}</td><td>{c["qty"]}</td>'
+            f'<td>{c["stock"]}</td><td>{ru(c["val"]) if c["val"] else "—"}</td>'
+            f"<td>{who}</td></tr>"
+            f'<tr class="n"><td colspan="6"><span class="pn">'
+            f'{E(", ".join(c["pns"]))}{" …" if c["lines"] > 12 else ""}</span></td></tr></tbody>')
+    return f'<table class="t"><thead><tr>{head}</tr></thead>{"".join(bodies)}</table>'
 
 
 def directory(rows: list[dict]) -> str:
@@ -318,7 +375,7 @@ def gaps_table(rows: list[dict]) -> list:
     return out
 
 
-def build_html(doc: dict) -> str:
+def build_html(doc: dict, lines_only: bool = False) -> str:
     rows = doc["rows"]
     by_sheet = defaultdict(list)
     for r in rows:
@@ -343,6 +400,7 @@ def build_html(doc: dict) -> str:
             and not (r.get("real_maker") or "").strip()]
     sellers = {seller_key(r) for r in stock + lead if r.get("seller")}
     addr_comp = {sl["seller_key"] for r in rows for sl in r.get("sellers") or []}
+    cl_names = {r.get("cluster") for r in rows}
     stock_val = sum(line_value(r) for r in stock)
     gaps = gaps_table(rows)
     over = [g for g in gaps if g[1]]
@@ -414,21 +472,26 @@ eBay, Zoro, Grainger, DO Supply, shop.solarturbines.com) закрыта от а�
         "<h3>Покрытие по вердиктам</h3>", kpi,
         "</div>",
         '<div class="sec"><h2>1. Что делать</h2>' + todo + "</div>",
-        f'<div class="sec"><h2>2. Карта закупки: у кого что брать — {len(sellers)} продавцов</h2>'
+        f'<div class="sec"><h2>2. Кластеры заявки: кому писать — {len(cl_names)}</h2>'
+        '<p class="lead">Кластер — лист, бренд заявки и класс номенклатуры. По неопознанному '
+        'чертёжному номеру продавца нет, но круг компаний по такому классу известен из соседних '
+        'строк: писать надо им. Под каждым кластером — его артикулы.</p>'
+        + clusters(rows) + "</div>",
+        f'<div class="sec"><h2>3. Карта закупки: у кого что брать — {len(sellers)} продавцов</h2>'
         '<p class="lead">Только продавцы с подтверждённым складом или названным сроком. '
         'Сортировка по числу наших позиций: сверху те, у кого одним письмом закрывается больше '
         'всего строк. «Склад сейчас» — позиции с безусловным наличием; остальные условные '
         '(«отгрузим, если есть»).</p>' + supplier_map(rows) + "</div>",
-        f'<div class="sec"><h2>3. Справочник адресатов: кому писать — {len(addr_comp)} компаний</h2>'
+        f'<div class="sec"><h2>4. Справочник адресатов: кому писать — {len(addr_comp)} компаний</h2>'
         '<p class="lead">Контакты сняты со страниц самих компаний; адреса по шаблону не '
         'конструировались — где не напечатан, там прочерк и адрес сайта. Сортировка по числу '
         'наших строк: сверху те, у кого одним письмом закрывается больше всего заявки.</p>'
         + directory(rows) + "</div>",
-        f'<div class="sec"><h2>4. Изготовители узлов под шильдой OEM — {len(makers)}</h2>'
+        f'<div class="sec"><h2>5. Изготовители узлов под шильдой OEM — {len(makers)}</h2>'
         '<p class="lead">Правило первоисточника: на узле стоит имя реального изготовителя, а не '
         'OEM. Прямой каталог изготовителя дешевле в 2–10 раз. Это список адресатов для прямых '
         'запросов.</p>' + makers_table(rows) + "</div>",
-        f'<div class="sec"><h2>5. Закрывается стандартом или подбором — {len(subs)}</h2>'
+        f'<div class="sec"><h2>6. Закрывается стандартом или подбором — {len(subs)}</h2>'
         '<p class="lead">Класс C: искать оригинальный номер OEM по этим строкам не нужно. '
         'В колонке «чем закрывается» — конкретное обозначение; в примечании — что уточнить '
         'у заказчика, чтобы подобрать однозначно.</p>' + substitutes_table(rows) + "</div>",
@@ -454,13 +517,25 @@ eBay, Zoro, Grainger, DO Supply, shop.solarturbines.com) закрыта от а�
             rr["_shift"] = ru(abs((mid - u) * float(r.get("qty") or 0)))
             g_rows.append(rr)
         parts.append(
-            f'<div class="sec"><h2>6. Цена расходится с нашей вилкой в 2,5+ раза — {len(gaps)}</h2>'
+            f'<div class="sec"><h2>7. Цена расходится с нашей вилкой в 2,5+ раза — {len(gaps)}</h2>'
             '<p class="lead">«Сдвиг по строке» — на сколько меняется сумма строки, если взять цену '
             'продавца вместо нашей вилки. Проверять до отправки ТКП: завышение заказчик заметит '
             'раньше нас, занижение съест маржу.</p>' + rows_table(g_rows, cols) + "</div>")
 
-    n = 7
-    for sheet in sheets:
+    if lines_only:      # приложение: только построчные таблицы
+        parts = [
+            '<div class="sec">',
+            "<h1>Закупка по заявке ЛУКОЙЛ: построчное приложение</h1>",
+            f'<p class="lead dim">Все {len(rows)} позиций обоих листов · '
+            f'обновлено {E(doc.get("updated"))}</p>',
+            '<p class="lead">Приложение к документу «Закупка по заявке ЛУКОЙЛ: у кого что '
+            'брать». Сводка, кластеры с контактами, справочник адресатов, изготовители узлов '
+            'и расхождения цен — там; здесь только строки.</p>',
+            "</div>",
+        ]
+
+    n = 8
+    for sheet in (sheets if lines_only else []):
         srows = by_sheet[sheet]
         first = True
         for v in ORDER:
@@ -469,7 +544,8 @@ eBay, Zoro, Grainger, DO Supply, shop.solarturbines.com) закрыта от а�
                 continue
             vr.sort(key=lambda r: -line_value(r))
             if first:  # заголовок листа живёт на той же странице, что и первая таблица
-                head = (f'<h2>{n}. Построчно: лист «{E(sheet)}» — {len(srows)} позиций</h2>'
+                num = "" if lines_only else f"{n}. "
+                head = (f'<h2>{num}Построчно: лист «{E(sheet)}» — {len(srows)} позиций</h2>'
                         '<p class="lead">Разделы идут от отгружаемого к неопознанному, '
                         'внутри каждого — по убыванию стоимости строки.</p>'
                         f'<h3>{E(VERDICT_RU[v])} — {len(vr)}</h3>')
@@ -479,9 +555,28 @@ eBay, Zoro, Grainger, DO Supply, shop.solarturbines.com) закрыта от а�
                 head = f'<h2>«{E(sheet)}» · {E(VERDICT_RU[v])} — {len(vr)}</h2>'
             parts.append(f'<div class="sec">{head}' + rows_table(vr, LINE_COLS, with_addr=True) + "</div>")
 
+    if not lines_only:
+        parts.append(
+            '<div class="sec"><h2>Построчные таблицы — в приложении</h2>'
+            f'<p class="lead">Все {len(rows)} позиций обоих листов с продавцом, наличием, '
+            'сроком, ценой и адресатами лежат в отдельном файле '
+            '«ЗАКУПКА-ЛУКОЙЛ-ПОСТРОЧНО.pdf» — он вынесен, чтобы этот документ открывался '
+            'и читался.</p></div>')
+
     return ("<!doctype html><html lang='ru'><head><meta charset='utf-8'>"
-            "<title>Закупка ЛУКОЙЛ</title>"
+            f"<title>{'Закупка ЛУКОЙЛ построчно' if lines_only else 'Закупка ЛУКОЙЛ'}</title>"
             f"<style>{CSS}</style></head><body>{''.join(parts)}</body></html>")
+
+
+def render(doc: dict, html_path: Path, pdf_path: Path, lines_only: bool, exe: str) -> None:
+    html_path.write_text(build_html(doc, lines_only), encoding="utf-8")
+    subprocess.run(
+        [exe, "--headless", "--disable-gpu", "--no-sandbox", "--no-pdf-header-footer",
+         "--run-all-compositor-stages-before-draw", "--virtual-time-budget=120000",
+         f"--print-to-pdf={pdf_path}", html_path.as_uri()],
+        check=True, capture_output=True,
+    )
+    print(f"{pdf_path.name}: {pdf_path.stat().st_size / 1e6:.1f} МБ")
 
 
 def main() -> int:
@@ -490,20 +585,13 @@ def main() -> int:
         return 1
     doc = json.loads(DATA.read_text())
     HTML.parent.mkdir(parents=True, exist_ok=True)
-    HTML.write_text(build_html(doc), encoding="utf-8")
-    print(f"HTML: {HTML.name} {HTML.stat().st_size:,} байт")
-
     exe = next((c for c in CHROME if Path(c).exists()), None)
     if not exe:
         print("Chromium не найден — PDF не собран", file=sys.stderr)
         return 1
-    subprocess.run(
-        [exe, "--headless", "--disable-gpu", "--no-sandbox", "--no-pdf-header-footer",
-         "--run-all-compositor-stages-before-draw", "--virtual-time-budget=120000",
-         f"--print-to-pdf={PDF}", HTML.as_uri()],
-        check=True, capture_output=True,
-    )
-    print(f"PDF:  {PDF.name} {PDF.stat().st_size:,} байт")
+    # два файла: рабочий документ открывается, полное построчное приложение — отдельно
+    render(doc, HTML, PDF, False, exe)
+    render(doc, LINES_HTML, LINES_PDF, True, exe)
     return 0
 
 
