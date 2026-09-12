@@ -24,6 +24,36 @@ SQL_SHA256 = "0a08ef49fee5e7fd4006498446b322e6336d769bbdc6434035cb8c79c6a8bc8e"
 TERMINAL = {"complete", "failed", "expired", "application_unknown"}
 SAFE = {"CONFIG_INVALID", "DB_TARGET_INVALID", "DB_REQUIRED", "DB_OWNER_INVALID", "BUSY", "SQL_CHANGED", "STATE_INVALID", "VAULT_UNSAFE", "VAULT_KEY_INVALID", "EXPIRED", "RPC_UNSAFE", "HTTP_FAILED", "HTTP_RESPONSE_INVALID", "HTTP_LIMIT", "PROBE_REJECTED", "CF_CHANGED", "PATCH_UNKNOWN", "REPAIR_FAILED", "CLEANUP_FAILED"}
 
+# Only our fixed SQL messages may cross the diagnostic output boundary.
+SQL_ERRORS = {
+    "REPAIR_POSTGRES_REQUIRED", "REPAIR_VAULT_UNAVAILABLE", "REPAIR_VAULT_READ_UNSAFE",
+    "REPAIR_NAME_COLLISION", "REPAIR_STAGE_INVALID", "REPAIR_STAGE_CLOSED",
+    "REPAIR_STAGE_UNSAFE", "REPAIR_STAGE_COLLISION", "REPAIR_STAGE_REJECTED",
+    "REPAIR_DEFAULT_ACL_UNSAFE", "REPAIR_EFFECTIVE_ACL_UNSAFE",
+}
+STAGES = {"configuration", "connect", "start_install", "schema_reload", "metadata", "repair"}
+
+
+def safe_diagnostics(error, progress):
+    stage = progress.get("stage")
+    result = {"stage": stage if type(stage) is str and stage in STAGES else "repair"}
+    # Never stringify database errors or read detail, context, DSN, or parameters.
+    try:
+        code = error.pgcode
+        if type(code) is str and re.fullmatch(r"[0-9A-Z]{5}", code):
+            result["sqlstate"] = code
+    except Exception:  # noqa: BLE001, S110 -- diagnostics can raise; logging could disclose credentials.
+        pass
+    try:
+        message = error.diag.message_primary
+        if type(message) is str and message in SQL_ERRORS:
+            result["sql_error"] = message
+    except Exception:  # noqa: BLE001, S110 -- never fall back to raw exception text.
+        pass
+    if type(error) is IndexError:
+        result["exception_type"] = "IndexError"
+    return result
+
 
 class RepairError(Exception):
     pass
@@ -140,32 +170,46 @@ def cf_config(value):
 
 
 class Database:
-    def __init__(self, conn):
+    def __init__(self, conn, progress=None):
+        self.progress = {} if progress is None else progress
         self.conn = conn
         self.conn.autocommit = True
 
     def one(self, sql, args=()):
         with self.conn.cursor() as cur:
-            cur.execute(sql, args)
+            if args:
+                cur.execute(sql, args)
+            else:
+                # Passing even () enables psycopg percent interpolation (e.g. %ROWTYPE).
+                cur.execute(sql)
             rows = cur.fetchmany(2)
             require(len(rows) == 1, "STATE_INVALID")
             return rows[0]
 
     def execute(self, sql, args=()):
         with self.conn.cursor() as cur:
-            cur.execute(sql, args)
+            if args:
+                cur.execute(sql, args)
+            else:
+                # Passing even () enables psycopg percent interpolation (e.g. %ROWTYPE).
+                cur.execute(sql)
             return cur.rowcount
 
     def start(self):
+        self.progress["stage"] = "start_install"
         require(self.one("SELECT current_user")[0] == "postgres", "DB_OWNER_INVALID")
         require(self.one("SELECT pg_try_advisory_lock(20260912, 712)")[0] is True, "BUSY")
         raw = SQL_PATH.read_bytes()
         require(hashlib.sha256(raw).hexdigest() == SQL_SHA256, "SQL_CHANGED")
         self.execute(raw.decode("utf-8"))
+        self.progress["stage"] = "schema_reload"
         self.execute("NOTIFY pgrst, 'reload schema'")
         self.metadata()
+        self.progress["stage"] = "repair"
 
     def metadata(self):
+        previous_stage = self.progress.get("stage", "repair")
+        self.progress["stage"] = "metadata"
         row = self.one("""SELECT pg_get_userbyid(c.relowner), pg_get_userbyid(n.nspowner), obj_description(c.oid, 'pg_class'),
           EXISTS (SELECT 1 FROM aclexplode(COALESCE(c.relacl, acldefault('r', c.relowner))) x WHERE x.grantee <> c.relowner),
           EXISTS (SELECT 1 FROM aclexplode(COALESCE(n.nspacl, acldefault('n', n.nspowner))) x WHERE x.grantee <> n.nspowner)
@@ -190,6 +234,7 @@ class Database:
             unsafe = self.one("""SELECT EXISTS (SELECT 1 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
               WHERE n.nspname='vault' AND c.relkind IN ('r','v','m','p') AND has_any_column_privilege(%s,c.oid,'SELECT'))""", (role,))[0]
             require(unsafe is False, "VAULT_UNSAFE")
+        self.progress["stage"] = previous_stage
 
     def state(self):
         self.metadata()
@@ -281,20 +326,23 @@ def repair(db, http, token):
 def main(env=None):
     env = os.environ if env is None else env
     result = {"phase": "failed", "ready_to_publish": False}
+    progress = {"stage": "configuration"}
     try:
         import psycopg2
         from psycopg2.extensions import parse_dsn
         require(env.get("CLOUDFLARE_ACCOUNT_ID") == ACCOUNT, "CONFIG_INVALID")
         token = env.get("CLOUDFLARE_API_TOKEN")
         require(isinstance(token, str) and 1 <= len(token) <= 4096 and not any(c.isspace() for c in token), "CONFIG_INVALID")
-        conn = psycopg2.connect(**dsn_params(env.get("SUPABASE_DB_URL"), parse_dsn))
+        params = dsn_params(env.get("SUPABASE_DB_URL"), parse_dsn)
+        progress["stage"] = "connect"
+        conn = psycopg2.connect(**params)
         try:
-            result = repair(Database(conn), Http(), token)
+            result = repair(Database(conn, progress), Http(), token)
         finally:
             conn.close()
     except Exception as error:  # noqa: BLE001 -- output is restricted to constant error codes.
         code = str(error) if isinstance(error, RepairError) and str(error) in SAFE else "REPAIR_FAILED"
-        print(json.dumps({"ok": False, "error": code, **result}))
+        print(json.dumps({"ok": False, "error": code, **result, **safe_diagnostics(error, progress)}))
         return 1
     if env.get("GITHUB_OUTPUT"):
         with open(env["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
