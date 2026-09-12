@@ -149,6 +149,13 @@ def build():
             subprocess.run([sys.executable, str(ROOT / "tools" / f"{mod}.py")], check=True)
         except Exception as ex:
             print(f"{mod}: пропущен ({ex})")
+    # Карта заполняемости цепочки: счёт по всем подпроектам, поэтому сборщик
+    # лежит в scripts/, а страница кладётся сюда же, рядом с разведками.
+    try:
+        subprocess.run([sys.executable, str(ROOT.parent / "scripts" / "build_chain_coverage.py")], check=True)
+        subprocess.run([sys.executable, str(ROOT.parent / "scripts" / "build_chain_page.py")], check=True)
+    except Exception as ex:
+        print(f"карта цепочки: пропущена ({ex})")
 
     # единый поиск детали по номеру (pnw/public/search.html) — 3,4 МБ самодостаточного HTML.
     # Кладём в оба периметра: корень сайта закрыт правом «zip», /gt/ — правом «gt», и держатель

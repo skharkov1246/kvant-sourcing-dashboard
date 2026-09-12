@@ -227,7 +227,9 @@ def build() -> dict:
         for k, t, w in LINKS
         if all(next(c for c in r["cells"] if c["link"] == k)["n"] == 0 for r in rows)
     ]
+    from datetime import date
     return {
+        "updated": date.today().isoformat(),
         "note": "Заполняемость цепочки портала: машина → узел → признак → дефект → ремонтное "
                 "решение → запчасть → изготовитель → исполнитель. Считается "
                 "scripts/build_chain_coverage.py по фактическим файлам; ноль означает, что "
@@ -252,7 +254,9 @@ def main() -> int:
     fresh = build()
     text = json.dumps(fresh, ensure_ascii=False, indent=2) + "\n"
     if "--check" in sys.argv:
-        if not OUT.exists() or json.loads(OUT.read_text(encoding="utf-8")) != fresh:
+        strip = lambda o: {k: v for k, v in o.items() if k != "updated"}
+        old = json.loads(OUT.read_text(encoding="utf-8")) if OUT.exists() else None
+        if old is None or strip(old) != strip(fresh):
             print("✗ data/chain_coverage.json устарел — выполните: "
                   "python scripts/build_chain_coverage.py", file=sys.stderr)
             return 1

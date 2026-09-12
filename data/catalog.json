@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 190,
-    "total_bytes": 93746849,
+    "total_bytes": 93746876,
     "by_sensitivity": {
       "конфиденциально": 57,
       "внутреннее": 101,
@@ -712,10 +712,10 @@
           "title"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-12",
+      "last_author": "Claude",
+      "last_commit": "a43c257",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -6046,8 +6046,8 @@
         "zip/data/perf_class_packets.json"
       ],
       "last_change": "2026-09-12",
-      "last_author": "skharkov1246",
-      "last_commit": "fe786fa",
+      "last_author": "Claude",
+      "last_commit": "a43c257",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -6483,7 +6483,7 @@
     {
       "path": "data/chain_coverage.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 20229,
+      "bytes": 20256,
       "note": "Заполняемость цепочки портала по семи направлениям и восьми звеньям: машина → узел → признак → дефект → ремонтное решение → запчасть → изготовитель → исполнитель. Производный файл, считается scripts/build_chain_coverage.py по фактическим файлам репозитория; ноль означает отсутствие данных, а не то, что они где-то есть. Руками не заполнять. Первый прогон 12.09.2026: 13 клеток из 56, звенья «Признак», «Дефект» и «Исполнитель» не начаты ни по одному направлению.",
       "format": "json",
       "shape": "объект",
@@ -6495,7 +6495,8 @@
         "note",
         "priority_rule",
         "segments",
-        "summary"
+        "summary",
+        "updated"
       ],
       "main_collection": {
         "key": "links",
@@ -6507,8 +6508,8 @@
         ]
       },
       "last_change": "2026-09-12",
-      "last_author": "skharkov1246",
-      "last_commit": "fe786fa",
+      "last_author": "Claude",
+      "last_commit": "a43c257",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -6516,6 +6517,7 @@
       },
       "referenced_by": [
         "scripts/build_chain_coverage.py",
+        "scripts/build_chain_page.py",
         "tests/test_dict.py"
       ]
     },
@@ -7250,6 +7252,7 @@
         "gpu/build.py",
         "gpu/tools/coverage.py",
         "scripts/build_chain_coverage.py",
+        "scripts/build_chain_page.py",
         "tests/test_dict.py"
       ]
     },
