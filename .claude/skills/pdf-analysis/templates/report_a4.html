@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Заголовок отчёта</title>
+<style>
+  /* Каркас A4-отчёта в стиле «ведомость на белой бумаге» (правило владельца от 04.09.2026, см. навык tkp-vedomost). */
+  @page { size: A4; margin: 20mm 15mm 20mm 20mm; }
+  * { box-sizing: border-box; }
+  body { font-family: "Times New Roman", "Liberation Serif", "FreeSerif", serif; font-size: 11pt; line-height: 1.28; color: #000; background: #fff; margin: 0; }
+  p { margin: 0 0 2.2mm; text-align: justify; }
+  h1 { font-size: 13pt; font-weight: normal; text-align: center; text-transform: uppercase; letter-spacing: 0.6px; margin: 5mm 0 1.5mm; }
+  h2 { font-size: 11pt; font-weight: normal; margin: 5mm 0 2mm; page-break-after: avoid; }
+  h3 { font-size: 11pt; font-weight: normal; font-style: italic; margin: 3.5mm 0 1.5mm; page-break-after: avoid; }
+  .sub { text-align: center; margin: 0 0 4mm; }
+  table { width: 100%; border-collapse: collapse; margin: 1.5mm 0 3.5mm; font-size: 9.5pt; line-height: 1.22; }
+  th, td { border: 0.5pt solid #000; padding: 1.2mm 1.6mm; vertical-align: top; text-align: left; font-weight: normal; overflow-wrap: anywhere; }
+  th { text-align: center; }
+  .num { white-space: nowrap; text-align: right; }
+  table.comm { table-layout: fixed; } table.comm th.num { white-space: normal; }  /* ширины — только в th первой строки */
+  table.spec td:first-child { width: 28%; }
+  pre { font-family: "Liberation Mono", "DejaVu Sans Mono", monospace; font-size: 8.4pt; line-height: 1.28; white-space: pre-wrap; border: 0.5pt solid #000; padding: 2mm 2.5mm; margin: 1.5mm 0 3.5mm; }
+  small { font-size: 9pt; }
+  .foot { margin-top: 4mm; font-size: 9pt; }
+  .nb { page-break-inside: avoid; }
+  .pb { page-break-before: always; }   /* ставить точечно, иначе полупустые страницы */
+</style>
+</head>
+<body>
+
+<h1>Заголовок отчёта</h1>
+<div class="sub">Подзаголовок: объём исходных данных, метод, дата.</div>
+
+<h2>Итог</h2>
+<p>Один абзац с выводом и цифрами — то, ради чего отчёт открывают. Без жирных выделений и плашек.</p>
+
+<h2>1. Раздел</h2>
+<table>
+<tr><th style="width:25%">Колонка</th><th>Колонка</th></tr>
+<tr><td>Значение</td><td>Значение</td></tr>
+</table>
+
+<h2>2. Характеристики</h2>
+<table class="spec nb">
+<tr><td>Параметр</td><td>Значение</td><td>Параметр</td><td>Значение</td></tr>
+</table>
+
+<div class="foot">Источник данных, метод, оговорки.</div>
+
+</body>
+</html>
