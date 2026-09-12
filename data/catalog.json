@@ -273,6 +273,8 @@
       },
       "referenced_by": [
         "gt/build.py",
+        "library/load_crossrefs.py",
+        "library/load_equipment.py",
         "pnw/tools/build_master.py",
         "scripts/build_chain_coverage.py",
         "scripts/build_dict.py",
@@ -987,7 +989,10 @@
         "markers": []
       },
       "referenced_by": [
-        "gt/tools/ship_merge.py"
+        "gt/tools/ship_merge.py",
+        "library/load_crossrefs.py",
+        "library/load_parts.py",
+        "library/load_suppliers.py"
       ]
     },
     {
@@ -1044,7 +1049,10 @@
       },
       "referenced_by": [
         "gt/tools/ship_merge.py",
-        "gt/tools/ship_report.py"
+        "gt/tools/ship_report.py",
+        "library/load_crossrefs.py",
+        "library/load_parts.py",
+        "library/load_suppliers.py"
       ]
     },
     {
@@ -1268,6 +1276,7 @@
         "markers": []
       },
       "referenced_by": [
+        "library/load_crossrefs.py",
         "scripts/build_dict.py",
         "zip/tools/build_telsmith_page.py"
       ]
@@ -1598,7 +1607,8 @@
         "markers": []
       },
       "referenced_by": [
-        "gt/tools/ship_merge.py"
+        "gt/tools/ship_merge.py",
+        "library/load_suppliers.py"
       ]
     },
     {
@@ -1671,7 +1681,9 @@
       },
       "referenced_by": [
         "gt/tools/ansaldo_report.py",
-        "gt/tools/build_ansaldo.py"
+        "gt/tools/build_ansaldo.py",
+        "library/load_equipment.py",
+        "library/load_repair.py"
       ]
     },
     {
@@ -2407,7 +2419,8 @@
         ]
       },
       "referenced_by": [
-        "gt/tools/build_plugs.py"
+        "gt/tools/build_plugs.py",
+        "library/load_suppliers.py"
       ]
     },
     {
@@ -2488,7 +2501,8 @@
         "gt/public/hot.html",
         "gt/tools/build_hot.py",
         "gt/tools/build_lot.py",
-        "gt/tools/drop_ru.py"
+        "gt/tools/drop_ru.py",
+        "library/load_repair.py"
       ]
     },
     {
@@ -2699,7 +2713,8 @@
       "referenced_by": [
         "gt/public/ansaldo.html",
         "gt/tools/build_v643a.py",
-        "gt/tools/drop_ru.py"
+        "gt/tools/drop_ru.py",
+        "library/load_suppliers.py"
       ]
     },
     {
@@ -2738,7 +2753,8 @@
       },
       "referenced_by": [
         "gt/tools/build_solar.py",
-        "gt/tools/drop_ru.py"
+        "gt/tools/drop_ru.py",
+        "library/load_suppliers.py"
       ]
     },
     {
@@ -2814,7 +2830,8 @@
       },
       "referenced_by": [
         "gt/tools/build_lm6000.py",
-        "gt/tools/drop_ru.py"
+        "gt/tools/drop_ru.py",
+        "library/load_suppliers.py"
       ]
     },
     {
@@ -3076,6 +3093,7 @@
         "markers": []
       },
       "referenced_by": [
+        "library/load_crossrefs.py",
         "pnw/tools/build_master.py",
         "pnw/tools/parse_crossrefs.py",
         "scripts/build_dict.py",
@@ -3219,7 +3237,8 @@
       "referenced_by": [
         "gt/public/ansaldo.html",
         "gt/tools/build_f4000.py",
-        "gt/tools/drop_ru.py"
+        "gt/tools/drop_ru.py",
+        "library/load_suppliers.py"
       ]
     },
     {
@@ -3345,6 +3364,7 @@
         "gt/build.py",
         "gt/tools/build_rfq.py",
         "gt/tools/drop_ru.py",
+        "library/load_suppliers.py",
         "scripts/build_chain_coverage.py"
       ]
     },
@@ -3373,6 +3393,7 @@
         "markers": []
       },
       "referenced_by": [
+        "library/load_suppliers.py",
         "zip/build.py"
       ]
     },
@@ -3412,7 +3433,8 @@
       },
       "referenced_by": [
         "gt/tools/build_ms6001b.py",
-        "gt/tools/drop_ru.py"
+        "gt/tools/drop_ru.py",
+        "library/load_suppliers.py"
       ]
     },
     {
@@ -3758,6 +3780,7 @@
         "markers": []
       },
       "referenced_by": [
+        "library/load_crossrefs.py",
         "zip/build.py",
         "zip/tools/import_bom.py",
         "zip/tools/perf_classes.py",
@@ -4608,7 +4631,8 @@
         ]
       },
       "referenced_by": [
-        "gt/tools/build_cummins.py"
+        "gt/tools/build_cummins.py",
+        "library/load_repair.py"
       ]
     },
     {
@@ -4949,6 +4973,7 @@
       },
       "referenced_by": [
         "gt/build.py",
+        "library/load_equipment.py",
         "scripts/build_chain_coverage.py"
       ]
     },
@@ -5950,7 +5975,8 @@
         "markers": []
       },
       "referenced_by": [
-        "gt/tools/drop_ru.py"
+        "gt/tools/drop_ru.py",
+        "library/load_suppliers.py"
       ]
     },
     {
@@ -6512,7 +6538,7 @@
       },
       "last_change": "2026-09-12",
       "last_author": "Claude",
-      "last_commit": "523009b",
+      "last_commit": "da8ad60",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -6559,6 +6585,8 @@
       "referenced_by": [
         "gpu/build.py",
         "gt/build.py",
+        "library/equipment.py",
+        "library/load_equipment.py",
         "scripts/build_chain_coverage.py",
         "scripts/build_dict.py"
       ]
@@ -6679,9 +6707,10 @@
         "gt/tools/build_hot.py",
         "gt/tools/build_lot.py",
         "gt/tools/drop_ru.py",
-        "scripts/build_chain_coverage.py",
-        "scripts/build_dict.py",
-        "scripts/build_node_map.py"
+        "library/equipment.py",
+        "library/load_equipment.py",
+        "library/load_repair.py",
+        "scripts/build_chain_coverage.py"
       ]
     },
     {
@@ -6765,6 +6794,7 @@
       },
       "referenced_by": [
         "gt/tools/build_plugs.py",
+        "library/load_suppliers.py",
         "ove/build.py"
       ]
     },
@@ -6904,6 +6934,7 @@
         ]
       },
       "referenced_by": [
+        "library/load_suppliers.py",
         "zip/tools/build_checklist.py",
         "zip/tools/suppliers_pdf.py"
       ]
@@ -7139,6 +7170,8 @@
       "referenced_by": [
         "gpu/build.py",
         "gt/build.py",
+        "library/equipment.py",
+        "library/load_equipment.py",
         "scripts/build_chain_coverage.py",
         "scripts/build_dict.py"
       ]
@@ -7479,9 +7512,10 @@
         "gt/tools/build_hot.py",
         "gt/tools/build_lot.py",
         "gt/tools/drop_ru.py",
-        "scripts/build_chain_coverage.py",
-        "scripts/build_dict.py",
-        "scripts/build_node_map.py"
+        "library/equipment.py",
+        "library/load_equipment.py",
+        "library/load_repair.py",
+        "scripts/build_chain_coverage.py"
       ]
     },
     {

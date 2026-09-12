@@ -76,6 +76,20 @@ def load(path: str, key: str | None):
 # Что читаем и как называется поле с именем компании в каждом файле.
 SOURCES = [
     ("zip/data/odm_suppliers.json", None, "производство ЗИП"),
+    ("gt/data/ship_sellers.json", "rows", "адресаты заявки ЛУКОЙЛ"),
+    ("gt/data/ship_sweep.json", "rows", "продавцы по сплошной проверке"),
+    ("gt/data/ship_energoseti.json", "rows", "продавцы по заявке Энергосети"),
+    ("gt/data/sgt400_checklist.json", "rows", "чек-лист SGT-400"),
+    ("gt/data/solar.json", "companies", "разведка Solar"),
+    ("gt/data/lm6000.json", "companies", "разведка LM6000"),
+    ("gt/data/ms6001b.json", "companies", "разведка Frame 6B"),
+    ("gt/data/sgt4000f.json", "companies", "разведка SGT5-4000F"),
+    ("gt/data/v643a.json", "companies", "разведка V64.3A"),
+    ("gt/data/plugs_world.json", "addressees", "производители свечей"),
+    ("gt/data/removed_ru.json", "items", "ушедшие из РФ"),
+    ("gt/data/suppliers.json", None, "профили поставщиков ГТУ"),
+    ("zip/data/tfs_supply_chain.json", "suppliers", "цепочка поставок ТФС"),
+    ("zip/data/material_process.json", None, "обработка материалов"),
     ("gt/data/research_suppliers.json", "rows", "исследование ГТУ"),
     ("gt/data/dossiers.json", "dossiers", "досье компаний"),
     ("zip/data/material_suppliers.json", None, "материалы"),
@@ -90,25 +104,27 @@ SOURCES = [
 
 def shape(r: dict, origin: str) -> dict | None:
     """Одна форма из разных наборов полей."""
-    name = first(r, "name", "company", "title")
+    name = first(r, "name", "company", "title", "seller", "n")
     if not name or len(name) < 2:
         return None
-    what = first(r, "what", "products", "makes", "capability", "production",
-                 "equipment", "covers_classes", "hook", "profile", "note")
+    what = first(r, "what", "products", "makes", "capability", "production", "real_maker",
+                 "equipment", "covers_classes", "covers", "hook", "profile", "angle",
+                 "families", "note")
     return {
         "name": name[:300],
         "key": norm(name),
-        "country": first(r, "country")[:80] or None,
+        "country": first(r, "country", "seller_country")[:80] or None,
         "city": first(r, "city")[:120] or None,
         "kind": first(r, "kind", "role", "tier", "relation", "category")[:60] or None,
-        "site": first(r, "site", "url", "link", "catalog_url")[:300] or None,
+        "site": first(r, "site", "url", "link", "catalog_url", "seller_url",
+                      "rfq_url")[:300] or None,
         "strengths": what[:1000] or None,
         "moq": first(r, "moq")[:120] or None,
         "certificates": first(r, "qc", "certificates", "certs")[:300] or None,
-        "sanctions": first(r, "risk", "risks", "sanctions")[:300] or None,
+        "sanctions": first(r, "risk", "risks", "sanctions", "ru_access")[:300] or None,
         "confidence": (first(r, "confidence", "conf", "relevance") or "med")[:10],
-        "contact_email": first(r, "email", "contact_email")[:200] or None,
-        "contact_phone": first(r, "phone", "contact_phone", "whatsapp")[:120] or None,
+        "contact_email": first(r, "email", "emails", "contact_email")[:200] or None,
+        "contact_phone": first(r, "phone", "phones", "contact_phone", "whatsapp")[:120] or None,
         "segment_id": classify(" ".join(x for x in (what, name) if x)),
         "researched_by": origin,
     }

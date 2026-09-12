@@ -42,6 +42,12 @@ APPLY = os.environ.get("APPLY", "") not in ("", "0", "false")
 
 POSITIONS = "zip/data/positions.json"
 LINKS = "zip/data/odm_suppliers.json"
+# Сплошные проверки наличия по заявкам: деталь, продавец, склад, срок и цена
+# в одной строке. Это единственный наш источник, где сказано не «кто делает», а
+# «у кого сейчас есть» — ради этого сорсер и звонит.
+SWEEPS = (("gt/data/ship_sweep.json", "проверка наличия (ЛУКОЙЛ)"),
+          ("gt/data/ship_energoseti.json", "проверка наличия (Энергосети)"))
+PAREN = re.compile(r"\([^)]*\)")
 NOT_KEY = re.compile(r"[^0-9a-zа-яё]+")
 
 
@@ -57,7 +63,20 @@ def part_key(catalog_no: str, fallback: str) -> str:
 
 def load(path: str):
     full = os.path.join(ROOT, path)
-    return json.load(open(full, encoding="utf-8")) if os.path.exists(full) else []
+    if not os.path.exists(full):
+        return []
+    d = json.load(open(full, encoding="utf-8"))
+    return d if isinstance(d, list) else (d.get("rows") or [])
+
+
+def число(v):
+    """Цена из проверки наличия приходит строкой, пустой строкой и числом."""
+    if isinstance(v, (int, float)):
+        return float(v)
+    try:
+        return float(str(v).replace(" ", "").replace(",", ".")) if v else None
+    except ValueError:
+        return None
 
 
 def main() -> int:
@@ -101,6 +120,48 @@ def main() -> int:
             continue
         parts[key] = новая
 
+    # Проверки наличия: деталь + продавец + склад + срок + цена одной строкой.
+    наличие: dict[tuple, dict] = {}
+    новых_деталей = 0
+    for путь, откуда in SWEEPS:
+        for r in load(путь):
+            pn = str(r.get("pn") or "").strip()
+            key = part_key(pn, r.get("name", ""))
+            if not key:
+                continue
+            if key not in parts:
+                новых_деталей += 1
+                parts[key] = {
+                    "id": key, "pos_id": None, "catalog_no": pn[:120],
+                    "name": str(r.get("name") or pn)[:400],
+                    "oem": str(r.get("man") or r.get("real_maker") or "")[:200] or None,
+                    "model": str(r.get("model") or "")[:600] or None,
+                    "category": str(r.get("cat") or r.get("kind") or "")[:120] or None,
+                    "segment_id": classify(f"{r.get('name') or ''} {r.get('cat') or ''}"),
+                    "hs_code": None, "material": None, "applications": None,
+                    "target_equipment": str(r.get("model") or "")[:200] or None,
+                    "aliases": [], "qty_quarter": None, "status": None,
+                    "price_min": число(r.get("usd_lo")), "price_max": число(r.get("usd_hi")),
+                    "price_cur": str(r.get("currency") or "USD")[:10],
+                    "price_src": откуда,
+                }
+            продавец = PAREN.sub(" ", str(r.get("seller") or ""))
+            ключ_продавца = norm_company(продавец)
+            if not ключ_продавца:
+                continue
+            наличие[(key, ключ_продавца)] = {
+                "part_id": key, "supplier_key": ключ_продавца,
+                "makes": str(r.get("note") or r.get("real_maker") or "")[:1000] or None,
+                "catalog_url": str(r.get("seller_url") or "")[:400] or None,
+                "confidence": "med", "source": откуда,
+                "verdict": str(r.get("verdict") or "")[:40] or None,
+                "in_stock": str(r.get("in_stock") or "")[:40] or None,
+                "stock_qty": str(r.get("stock_qty") or "")[:40] or None,
+                "lead_time": str(r.get("lead_time") or "")[:120] or None,
+                "price": число(r.get("price")),
+                "currency": str(r.get("currency") or "USD")[:10],
+            }
+
     по_позиции = {p["pos_id"]: p["id"] for p in parts.values() if p["pos_id"] is not None}
     рёбра: dict[tuple, dict] = {}
     без_позиции = 0
@@ -137,6 +198,14 @@ def main() -> int:
     print("\n  по сегментам:")
     for sid, n in seg.most_common(8):
         print(f"    {name_of(None if sid == '—' else sid):32}{n:>6}")
+
+    print("\n=== проверка наличия у продавцов ===")
+    print(f"  строк проверки:{len(наличие):>10}   (деталей добавлено: {новых_деталей})")
+    вердикты = Counter(e["verdict"] or "—" for e in наличие.values())
+    for v, n in вердикты.most_common(6):
+        print(f"    {v:28}{n:>6}")
+    с_ценой = sum(1 for e in наличие.values() if e["price"])
+    print(f"  из них с ценой продавца: {с_ценой}")
 
     print("\n=== связка «запчасть → исполнитель» ===")
     print(f"  связок в файле:{len(links):>10}")
@@ -195,11 +264,30 @@ def main() -> int:
                     e["confidence"], e["source"])
                    for e in рёбра.values() if e["supplier_key"] in по_ключу]
         не_нашлись = len(рёбра) - len(готовые)
+        наличие_готовое = [
+            (e["part_id"], по_ключу[e["supplier_key"]], e["makes"], e["catalog_url"],
+             e["confidence"], e["source"], e["verdict"], e["in_stock"], e["stock_qty"],
+             e["lead_time"], e["price"], e["currency"])
+            for e in наличие.values() if e["supplier_key"] in по_ключу]
         psycopg2.extras.execute_values(cur, """
             insert into lib_part_suppliers (part_id, supplier_id, makes, catalog_url,
                                             confidence, source)
             values %s on conflict (part_id, supplier_id) do nothing""",
             готовые, page_size=500)
+        # Наличие пишется вторым и обновляет ребро: «кто делает» и «у кого есть»
+        # — про одну и ту же пару, и разносить их по двум строкам незачем.
+        psycopg2.extras.execute_values(cur, """
+            insert into lib_part_suppliers (part_id, supplier_id, makes, catalog_url,
+                                            confidence, source, verdict, in_stock,
+                                            stock_qty, lead_time, price, currency)
+            values %s
+            on conflict (part_id, supplier_id) do update set
+              verdict = excluded.verdict, in_stock = excluded.in_stock,
+              stock_qty = excluded.stock_qty, lead_time = excluded.lead_time,
+              price = coalesce(excluded.price, lib_part_suppliers.price),
+              currency = excluded.currency,
+              catalog_url = coalesce(lib_part_suppliers.catalog_url, excluded.catalog_url)""",
+            наличие_готовое, page_size=500)
 
         # Цена коридором: две строки на позицию, нижняя и верхняя граница.
         ценовые = []
