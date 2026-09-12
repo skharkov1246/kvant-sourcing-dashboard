@@ -1325,7 +1325,8 @@
         "gt/tools/build_lot_xlsx.py",
         "gt/tools/build_rfq.py",
         "gt/tools/ship_merge.py",
-        "gt/tools/ship_report.py"
+        "gt/tools/ship_report.py",
+        "library/load_parts.py"
       ]
     },
     {
@@ -2630,6 +2631,7 @@
         ]
       },
       "referenced_by": [
+        "library/load_crossrefs.py",
         "scripts/build_chain_coverage.py",
         "scripts/build_dict.py",
         "zip/tools/build_telsmith_page.py",
@@ -3194,7 +3196,7 @@
         "gt/tools/build_rfq.py",
         "gt/tools/ship_merge.py",
         "gt/tools/ship_report.py",
-        "scripts/build_chain_coverage.py"
+        "library/load_parts.py"
       ]
     },
     {
@@ -6359,7 +6361,7 @@
         "gt/tools/build_rfq.py",
         "gt/tools/ship_merge.py",
         "gt/tools/ship_report.py",
-        "scripts/build_chain_coverage.py"
+        "library/load_parts.py"
       ]
     },
     {
@@ -6704,8 +6706,8 @@
         ]
       },
       "last_change": "2026-09-12",
-      "last_author": "Claude",
-      "last_commit": "d38d8ab",
+      "last_author": "skharkov1246",
+      "last_commit": "c520c54",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",

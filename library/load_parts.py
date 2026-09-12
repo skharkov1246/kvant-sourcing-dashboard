@@ -189,6 +189,32 @@ def main() -> int:
             "source": "каталог ЗИП",
         }
 
+    # ─── позиции заявок на закупку ──────────────────────────────────────────
+    # 2 089 строк из живых заявок: номер, изготовитель, наименование, категория
+    # и количество. Это не каталог и не проверка наличия — это то, что у нас
+    # реально просили, и до сих пор в каталог деталей не попадало.
+    из_заявок = 0
+    for r in load("gt/data/rfq_demand.json"):
+        pn = str(r.get("pn") or "").strip()
+        наим = str(r.get("name") or "").strip()
+        key = part_key(pn, наим)
+        if not key or not наим:
+            continue
+        if key in parts:
+            continue
+        из_заявок += 1
+        текст = f"{наим} {r.get('cat') or ''} {r.get('man') or ''}"
+        parts[key] = {
+            "id": key, "pos_id": None, "catalog_no": pn[:120] or наим[:120],
+            "name": наим[:400], "oem": str(r.get("man") or "")[:200] or None,
+            "model": None, "category": str(r.get("cat") or "")[:120] or None,
+            "segment_id": classify(текст), "hs_code": None, "material": None,
+            "applications": None, "target_equipment": None, "aliases": [],
+            "qty_quarter": r.get("qty") if isinstance(r.get("qty"), (int, float)) else None,
+            "status": None, "price_min": None, "price_max": None,
+            "price_cur": "USD", "price_src": None,
+        }
+
     # ─── цены из отдельных файлов ────────────────────────────────────────────
     # Ключ детали: где есть position_id — по нему, где нет — по номеру.
     по_id = {r.get("id"): part_key(r.get("catalog_norm") or r.get("catalog_no"),
@@ -232,6 +258,7 @@ def main() -> int:
 
     print("=== запчасти ===")
     print(f"  позиций в каталоге:{len(positions):>8}")
+    print(f"  добавлено из заявок на закупку:{из_заявок:>6}")
     print(f"  различных деталей: {len(parts):>8}" +
           (f"   (столкновений ключа: {столкновения})" if столкновения else ""))
     заполнено = Counter()
