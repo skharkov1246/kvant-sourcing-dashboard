@@ -50,8 +50,12 @@ page-break-inside:avoid;font-size:9.5px}
 .kpi{display:flex;gap:8px;margin:6px 0;flex-wrap:wrap}
 .kpi div{flex:1 1 130px;border:1px solid #ccc;border-radius:4px;padding:6px 9px}
 .kpi b{display:block;font-size:15px;color:#111}
-.sec{page-break-before:always}
-.sec:first-of-type{page-break-before:auto}
+.sec{break-inside:auto}
+h2{break-after:avoid}
+h3{break-after:avoid}
+/* Принудительного разрыва перед разделом нет: с ним короткий раздел уезжал на свою
+   страницу и оставлял полупустую (проверка scripts/pdf_check.py это и показала).
+   Разделы текут, а заголовок не отрывается от своей таблицы. */
 ul{margin:3px 0 3px 15px;padding:0}li{margin:1.5px 0}
 """
 
