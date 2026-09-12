@@ -36,6 +36,7 @@ DATA_DIRS = {
     "zip/customs/out": "база ЗИП · таможня",
     "gpu/data": "ГПУ-библиотека",
     "gidromet/data": "гидрометаллургия",
+    "pnw/data": "каталог PN · данные",
     "pnw/public": "каталог PN (веб)",
 }
 CODE_EXT = {".py", ".js", ".mjs", ".html", ".yml", ".yaml", ".toml"}

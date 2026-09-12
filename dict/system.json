@@ -1,0 +1,376 @@
+{
+  "note": "Классификаторы узлов живут в пяти местах и не сводятся автоматически: ключ уникален только внутри своей области (scope), а не глобально. Таблица показывает, какие значения существуют и откуда пришли.",
+  "scopes": [
+    "gpu",
+    "gsho",
+    "gtu"
+  ],
+  "count": 43,
+  "records": [
+    {
+      "scope": "gpu",
+      "system_key": "air",
+      "title": "Воздух и наддув",
+      "sources": [
+        "gpu/data/parts.json:systems[].key",
+        "gpu/data/subsuppliers.json:systems[].sys",
+        "gpu/data/demand.json:systems{}"
+      ]
+    },
+    {
+      "scope": "gpu",
+      "system_key": "control",
+      "title": "САУ и электрика",
+      "sources": [
+        "gpu/data/parts.json:systems[].key",
+        "gpu/data/subsuppliers.json:systems[].sys",
+        "gpu/data/demand.json:systems{}"
+      ]
+    },
+    {
+      "scope": "gpu",
+      "system_key": "cooling",
+      "title": "Охлаждение",
+      "sources": [
+        "gpu/data/parts.json:systems[].key",
+        "gpu/data/demand.json:systems{}"
+      ]
+    },
+    {
+      "scope": "gpu",
+      "system_key": "coupling",
+      "title": "Муфты и виброразвязка",
+      "sources": [
+        "gpu/data/subsuppliers.json:systems[].sys"
+      ]
+    },
+    {
+      "scope": "gpu",
+      "system_key": "cpg",
+      "title": "ЦПГ: поршень, гильза, кольца",
+      "sources": [
+        "gpu/data/parts.json:systems[].key",
+        "gpu/data/subsuppliers.json:systems[].sys",
+        "gpu/data/demand.json:systems{}"
+      ]
+    },
+    {
+      "scope": "gpu",
+      "system_key": "crank",
+      "title": "КШМ",
+      "sources": [
+        "gpu/data/parts.json:systems[].key",
+        "gpu/data/subsuppliers.json:systems[].sys"
+      ]
+    },
+    {
+      "scope": "gpu",
+      "system_key": "exhaust",
+      "title": "Выхлоп и катализ",
+      "sources": [
+        "gpu/data/parts.json:systems[].key",
+        "gpu/data/subsuppliers.json:systems[].sys"
+      ]
+    },
+    {
+      "scope": "gpu",
+      "system_key": "filtration",
+      "title": "Фильтрация",
+      "sources": [
+        "gpu/data/parts.json:systems[].key",
+        "gpu/data/subsuppliers.json:systems[].sys",
+        "gpu/data/demand.json:systems{}"
+      ]
+    },
+    {
+      "scope": "gpu",
+      "system_key": "gas",
+      "title": "Газовый тракт и смесеобразование",
+      "sources": [
+        "gpu/data/parts.json:systems[].key",
+        "gpu/data/subsuppliers.json:systems[].sys",
+        "gpu/data/demand.json:systems{}"
+      ]
+    },
+    {
+      "scope": "gpu",
+      "system_key": "gen",
+      "title": "Генератор и муфта",
+      "sources": [
+        "gpu/data/parts.json:systems[].key",
+        "gpu/data/subsuppliers.json:systems[].sys"
+      ]
+    },
+    {
+      "scope": "gpu",
+      "system_key": "hardware",
+      "title": "Крепёж",
+      "sources": [
+        "gpu/data/demand.json:systems{}"
+      ]
+    },
+    {
+      "scope": "gpu",
+      "system_key": "head",
+      "title": "ГБЦ и клапаны",
+      "sources": [
+        "gpu/data/parts.json:systems[].key",
+        "gpu/data/subsuppliers.json:systems[].sys",
+        "gpu/data/demand.json:systems{}"
+      ]
+    },
+    {
+      "scope": "gpu",
+      "system_key": "hoses",
+      "title": "Шланги и трубопроводы",
+      "sources": [
+        "gpu/data/parts.json:systems[].key",
+        "gpu/data/demand.json:systems{}"
+      ]
+    },
+    {
+      "scope": "gpu",
+      "system_key": "ignition",
+      "title": "Зажигание",
+      "sources": [
+        "gpu/data/parts.json:systems[].key",
+        "gpu/data/subsuppliers.json:systems[].sys",
+        "gpu/data/demand.json:systems{}"
+      ]
+    },
+    {
+      "scope": "gpu",
+      "system_key": "mech",
+      "title": "Механика и приводы",
+      "sources": [
+        "gpu/data/demand.json:systems{}"
+      ]
+    },
+    {
+      "scope": "gpu",
+      "system_key": "oil",
+      "title": "Масла и химия",
+      "sources": [
+        "gpu/data/subsuppliers.json:systems[].sys"
+      ]
+    },
+    {
+      "scope": "gpu",
+      "system_key": "other",
+      "title": "Прочее",
+      "sources": [
+        "gpu/data/demand.json:systems{}"
+      ]
+    },
+    {
+      "scope": "gpu",
+      "system_key": "seals",
+      "title": "Уплотнения и прокладки",
+      "sources": [
+        "gpu/data/parts.json:systems[].key",
+        "gpu/data/demand.json:systems{}"
+      ]
+    },
+    {
+      "scope": "gpu",
+      "system_key": "sensors",
+      "title": "Датчики и КИП",
+      "sources": [
+        "gpu/data/parts.json:systems[].key",
+        "gpu/data/demand.json:systems{}"
+      ]
+    },
+    {
+      "scope": "gsho",
+      "system_key": "Accumulator diaphragm / membrane (accumulator diaphragm) — эластомерная мембрана газового аккумулятора гидроперфоратора/гидромолота, разделяющая азот и гидромасло",
+      "title": "Accumulator diaphragm / membrane (accumulator diaphragm) — эластомерная мембрана газового аккумулятора гидроперфоратора/гидромолота, разделяющая азот и гидромасло",
+      "sources": [
+        "zip/data/material_strategy.json:[].part_class"
+      ]
+    },
+    {
+      "scope": "gsho",
+      "system_key": "Боёк / поршень-ударник (piston/striker) гидроперфоратора",
+      "title": "Боёк / поршень-ударник (piston/striker) гидроперфоратора",
+      "sources": [
+        "zip/data/material_strategy.json:[].part_class"
+      ]
+    },
+    {
+      "scope": "gsho",
+      "system_key": "Буровой инструмент для горных работ: перфораторные коронки (drill bits) с твердосплавными вставками (buttons) и буровые штанги / хвостовики-адаптеры (drifter rods, shank adapters). Гибридный узел «твердый сплав WC-Co + цементуемая легированная сталь».",
+      "title": "Буровой инструмент для горных работ: перфораторные коронки (drill bits) с твердосплавными вставками (buttons) и буровые штанги / хвостовики-адаптеры (drifter rods, shank adapters). Гибридный узел «твердый сплав WC-Co + цементуемая легированная сталь».",
+      "sources": [
+        "zip/data/material_strategy.json:[].part_class"
+      ]
+    },
+    {
+      "scope": "gsho",
+      "system_key": "Передняя головка и цилиндр корпуса гидроперфоратора (front head / cylinder body of a hydraulic percussion rock drill / drifter) — статичный несущий узел, воспринимающий ударно-импульсную и знакопеременную нагрузку, посадку/смятие в зоне направляющих втулок хвостовика (shank) и абразивно-эрозионный износ от промывочной среды по каналам и цилиндровой расточке.",
+      "title": "Передняя головка и цилиндр корпуса гидроперфоратора (front head / cylinder body of a hydraulic percussion rock drill / drifter) — статичный несущий узел, воспринимающий ударно-импульсную и знакопеременную нагрузку, посадку/смятие в зоне направляющих втулок хвостовика (shank) и абразивно-эрозионный износ от промывочной среды по каналам и цилиндровой расточке.",
+      "sources": [
+        "zip/data/material_strategy.json:[].part_class"
+      ]
+    },
+    {
+      "scope": "gsho",
+      "system_key": "Поворотные втулки и буксы перфоратора (rotation / chuck bushing hydraulic drifter) — сменная деталь трения, передающая крутящий момент на шлицы/грани хвостовика (shank adapter) и воспринимающая радиальные и ударные нагрузки; работает на смятие граней, галлинг и контактную усталость.",
+      "title": "Поворотные втулки и буксы перфоратора (rotation / chuck bushing hydraulic drifter) — сменная деталь трения, передающая крутящий момент на шлицы/грани хвостовика (shank adapter) и воспринимающая радиальные и ударные нагрузки; работает на смятие граней, галлинг и контактную усталость.",
+      "sources": [
+        "zip/data/material_strategy.json:[].part_class"
+      ]
+    },
+    {
+      "scope": "gsho",
+      "system_key": "Уплотнения, манжеты и мембраны (U-rings / rod & piston seals, аккумуляторные диафрагмы) гидроперфоратора — эластомерно-полимерный узел, НЕ стальной. «Обработка» здесь = система вулканизации/сшивки + твёрдость по Шору + армирование, а не термо/химико-термическая обработка стали.",
+      "title": "Уплотнения, манжеты и мембраны (U-rings / rod & piston seals, аккумуляторные диафрагмы) гидроперфоратора — эластомерно-полимерный узел, НЕ стальной. «Обработка» здесь = система вулканизации/сшивки + твёрдость по Шору + армирование, а не термо/химико-термическая обработка стали.",
+      "sources": [
+        "zip/data/material_strategy.json:[].part_class"
+      ]
+    },
+    {
+      "scope": "gsho",
+      "system_key": "Хвостовик / буксовый узел гидроперфоратора (shank adapter / driver chuck, striking bar) — ударно-вращательный элемент, передающий импульс, крутящий момент, подачу и промывку; цементуемая Ni-Cr-Mo сталь с твёрдым поверхностным слоем и вязкой сердцевиной.",
+      "title": "Хвостовик / буксовый узел гидроперфоратора (shank adapter / driver chuck, striking bar) — ударно-вращательный элемент, передающий импульс, крутящий момент, подачу и промывку; цементуемая Ni-Cr-Mo сталь с твёрдым поверхностным слоем и вязкой сердцевиной.",
+      "sources": [
+        "zip/data/material_strategy.json:[].part_class"
+      ]
+    },
+    {
+      "scope": "gsho",
+      "system_key": "вал",
+      "title": "Эксцентриковый вал, подшипники, корпуса, шестерни (поковка, расточка)",
+      "sources": [
+        "zip/data/telsmith_3858.json:classes[].key"
+      ]
+    },
+    {
+      "scope": "gsho",
+      "system_key": "гидравлика",
+      "title": "Гидравлика: цилиндры, насосы, клапаны, РВД",
+      "sources": [
+        "zip/data/telsmith_3858.json:classes[].key"
+      ]
+    },
+    {
+      "scope": "gsho",
+      "system_key": "крепёж",
+      "title": "Крепёж: болты, гайки, шайбы, шпильки",
+      "sources": [
+        "zip/data/telsmith_3858.json:classes[].key"
+      ]
+    },
+    {
+      "scope": "gsho",
+      "system_key": "прочее",
+      "title": "Прочее",
+      "sources": [
+        "zip/data/telsmith_3858.json:classes[].key"
+      ]
+    },
+    {
+      "scope": "gsho",
+      "system_key": "распорная",
+      "title": "Распорная плита, седло, зажимы (литьё + расчёт на срез)",
+      "sources": [
+        "zip/data/telsmith_3858.json:classes[].key"
+      ]
+    },
+    {
+      "scope": "gsho",
+      "system_key": "рти",
+      "title": "Уплотнения, кольца, прокладки",
+      "sources": [
+        "zip/data/telsmith_3858.json:classes[].key"
+      ]
+    },
+    {
+      "scope": "gsho",
+      "system_key": "смазка",
+      "title": "Смазка и фильтрация: станции, баки, фильтры",
+      "sources": [
+        "zip/data/telsmith_3858.json:classes[].key"
+      ]
+    },
+    {
+      "scope": "gsho",
+      "system_key": "футеровка",
+      "title": "Футеровки и клинья щёк (литьё, марганцовистая сталь)",
+      "sources": [
+        "zip/data/telsmith_3858.json:classes[].key"
+      ]
+    },
+    {
+      "scope": "gsho",
+      "system_key": "электрика",
+      "title": "Датчики, реле, панели, трансформаторы",
+      "sources": [
+        "zip/data/telsmith_3858.json:classes[].key"
+      ]
+    },
+    {
+      "scope": "gtu",
+      "system_key": "compressor",
+      "title": "Осевой компрессор",
+      "sources": [
+        "gt/data/parts.json:systems[].id"
+      ]
+    },
+    {
+      "scope": "gtu",
+      "system_key": "consumables",
+      "title": "Фильтры и расходники",
+      "sources": [
+        "gt/data/parts.json:systems[].id"
+      ]
+    },
+    {
+      "scope": "gtu",
+      "system_key": "controls",
+      "title": "САУ, КИП, электрика",
+      "sources": [
+        "gt/data/parts.json:systems[].id"
+      ]
+    },
+    {
+      "scope": "gtu",
+      "system_key": "fuel",
+      "title": "Топливная система",
+      "sources": [
+        "gt/data/parts.json:systems[].id"
+      ]
+    },
+    {
+      "scope": "gtu",
+      "system_key": "hot",
+      "title": "Горячий тракт (камера сгорания)",
+      "sources": [
+        "gt/data/parts.json:systems[].id"
+      ]
+    },
+    {
+      "scope": "gtu",
+      "system_key": "package",
+      "title": "Пакет / вспомсистемы (BOP)",
+      "sources": [
+        "gt/data/parts.json:systems[].id"
+      ]
+    },
+    {
+      "scope": "gtu",
+      "system_key": "rotor",
+      "title": "Ротор, опоры, уплотнения",
+      "sources": [
+        "gt/data/parts.json:systems[].id"
+      ]
+    },
+    {
+      "scope": "gtu",
+      "system_key": "turbine",
+      "title": "Турбина (ВД + силовая)",
+      "sources": [
+        "gt/data/parts.json:systems[].id"
+      ]
+    }
+  ]
+}

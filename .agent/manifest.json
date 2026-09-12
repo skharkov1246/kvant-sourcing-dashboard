@@ -27,7 +27,9 @@
     "dry_run_metrics": "python main.py --dry-run   # нужен BITRIX_WEBHOOK_URL в .env",
     "lookup": "python scripts/lookup.py <значение>   # где лежит парт-номер, производитель, организация",
     "refresh_index": "python scripts/build_index.py",
-    "check_index": "python scripts/build_index.py --check"
+    "check_index": "python scripts/build_index.py --check",
+    "refresh_dict": "python scripts/build_dict.py   # общий словарь баз (проекция)",
+    "check_dict": "python scripts/build_dict.py --check"
   },
   "subprojects": [
     {
@@ -102,7 +104,9 @@
     "refresh": "python scripts/build_catalog.py",
     "rule": "новый набор данных → добавить пояснение в data/catalog_notes.json и пересобрать каталог",
     "index": "data/index.json",
-    "index_note": "поиск по значению: парт-номера, производители, модели, коды ТН ВЭД, организации. Персональные и ценовые поля в индекс не включены — список исключений внутри файла"
+    "index_note": "поиск по значению: парт-номера, производители, модели, коды ТН ВЭД, организации. Персональные и ценовые поля в индекс не включены — список исключений внутри файла",
+    "dict": "dict/ — общий словарь: производители, классификаторы узлов, цепочки изготовителей",
+    "dict_note": "Проекция семи подпроектов, собирается scripts/build_dict.py и ничего в источниках не меняет. Свежесть закреплена тестом tests/test_dict.py, который гоняет гейт."
   },
   "bot_files": [
     {
