@@ -3785,6 +3785,7 @@
       "referenced_by": [
         "gpu/build.py",
         "gpu/tools/parse_motortech.py",
+        "library/load_crossrefs.py",
         "scripts/build_chain_coverage.py"
       ]
     },
@@ -4514,6 +4515,7 @@
       },
       "referenced_by": [
         "gpu/build.py",
+        "library/load_equipment.py",
         "scripts/build_chain_coverage.py",
         "scripts/build_dict.py",
         "tests/test_dict.py",
@@ -5648,6 +5650,7 @@
       },
       "referenced_by": [
         "gpu/build.py",
+        "library/load_equipment.py",
         "scripts/build_chain_coverage.py",
         "scripts/build_dict.py",
         "tests/test_dict.py",
@@ -6587,7 +6590,8 @@
       },
       "referenced_by": [
         "gpu/build.py",
-        "gpu/tools/build_targets.py"
+        "gpu/tools/build_targets.py",
+        "library/load_equipment.py"
       ]
     },
     {

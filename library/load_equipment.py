@@ -118,6 +118,30 @@ def build_models() -> tuple[dict[str, dict], dict[str, str]]:
             models[key]["aliases"].add(str(написание)[:120])
             alias.setdefault(eq.norm_model(str(написание)), key)
 
+    # Библиотека ГПУ: 14 газопоршневых машин с паспортом (число цилиндров, ход,
+    # объём, мощность, КПД) — полнее, чем у газовых турбин. Второе направление
+    # в справочнике машин: до этого lib_models отвечала только по ГТУ и ГШО.
+    for m in load("gpu/data/machines.json").get("machines", []):
+        имя = f"{m.get('oem') or ''} {m.get('model') or ''}".strip()
+        if not eq.looks_like_machine(имя):
+            имя = str(m.get("model") or "")
+        key = add(имя, oem=m.get("oem"), family="gpu",
+                  family_title="ГПУ — газопоршневые (библиотека ГПУ)",
+                  source="библиотека ГПУ")
+        if not key:
+            continue
+        п = m.get("passport") or {}
+        models[key]["power"] = models[key].get("power") or п.get("kwe")
+        models[key]["efficiency"] = models[key].get("efficiency") or п.get("eff")
+        models[key]["shafts"] = models[key].get("shafts") or п.get("cyl")
+        models[key]["note"] = models[key].get("note") or п.get("combustion")
+        models[key]["segment_id"] = "gpu"
+        models[key]["kind"] = "gas_engine"
+        for псевдоним in (m.get("model"), m.get("key")):
+            if псевдоним:
+                models[key]["aliases"].add(str(псевдоним)[:120])
+                alias.setdefault(eq.norm_model(str(псевдоним)), key)
+
     for m in load("gt/data/ansaldo.json").get("models", []):
         add(m["name"], oem="Ansaldo Energia", family="ansaldo",
             family_title="Ansaldo Energia / семейство V-машин",
@@ -148,6 +172,27 @@ def build_units() -> dict[str, dict]:
                           "name_en": c.get("en"), "crit": c.get("crit"),
                           "aftermarket": None, "note": c.get("note"),
                           "source": "номенклатура ЗИП ГТУ"}
+    # Узлы ГПУ — своё поддерево: ЦПГ, КШМ, ГБЦ у газопоршневой машины свои, и
+    # смешивать их с турбинными нельзя. Префикс «gpu.» разводит деревья.
+    for sysrec in load("gpu/data/parts.json").get("systems", []):
+        sid = "gpu." + str(sysrec.get("key") or "")
+        if sid == "gpu.":
+            continue
+        словом = str(sysrec.get("crit") or "")
+        units[sid] = {"id": sid, "parent_id": None, "name": f"ГПУ: {sysrec['name']}"[:300],
+                      "name_en": (sysrec.get("en") or None) and str(sysrec["en"])[:300],
+                      "crit": eq.crit_of(словом), "aftermarket": None,
+                      "note": (f"критичность в библиотеке ГПУ: {словом}" if словом else None),
+                      "source": "библиотека ГПУ"}
+        for it in (sysrec.get("items") or []):
+            cid = f"{sid}.{eq.slug_en(it.get('en', ''))}"
+            if cid.endswith("."):
+                continue
+            units[cid] = {"id": cid, "parent_id": sid, "name": it.get("ru", "")[:300],
+                          "name_en": it.get("en"), "crit": eq.crit_of(словом),
+                          "aftermarket": None, "note": it.get("note"),
+                          "source": "библиотека ГПУ"}
+
     for uid, ru, en, crit in eq.EXTRA_UNITS:
         units.setdefault(uid, {"id": uid, "parent_id": None, "name": ru, "name_en": en,
                                "crit": crit, "aftermarket": None, "note": None,
@@ -255,6 +300,20 @@ def build_fleet(alias: dict[str, str]) -> dict[str, dict]:
     имени, а исходная запись сохраняется целиком."""
     import re as _re
     fleet: dict[str, dict] = {}
+    for r in load("gpu/data/fleet.json").get("objects", []):
+        имя = sub_tags(str(r.get("name") or "")).strip()
+        if not имя:
+            continue
+        ид = "парк.гпу." + NOT_KEY.sub("", имя.lower())[:40]
+        fleet[ид] = {"id": ид, "site": имя[:300],
+                     "owner": str(r.get("owner") or "")[:200] or None,
+                     "model_id": None, "model_raw": None,
+                     "units": (f"{r.get('mw')} МВт" if r.get("mw") else None),
+                     "year": None,
+                     "note": " · ".join(x for x in (r.get("status"), r.get("seg"),
+                                                    r.get("note")) if x)[:1000] or None,
+                     "source": "парк ГПУ, библиотека ГПУ"}
+
     for r in load("gt/data/ansaldo.json").get("fleet_ru", []):
         площадка = _re.sub(r"<[^>]+>", " ", str(r.get("plant") or "")).strip()
         if not площадка:

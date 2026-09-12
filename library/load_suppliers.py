@@ -68,10 +68,21 @@ def first(d: dict, *keys) -> str:
 
 
 def load(path: str, key: str | None):
+    """Строки из файла. Ключ вида «systems[].makers» разворачивает вложенность:
+    у субпоставщиков ГПУ компании лежат внутри систем, и без этого в базу попала
+    бы система («Зажигание: контроллеры, катушки…») вместо компаний."""
     full = os.path.join(ROOT, path)
     if not os.path.exists(full):
         return []
     d = json.load(open(full, encoding="utf-8"))
+    if key and "[]." in key:
+        внешний, внутренний = key.split("[].", 1)
+        out = []
+        for группа in (d.get(внешний) or []):
+            for r in (группа.get(внутренний) or []):
+                if isinstance(r, dict):
+                    out.append(dict(r, _группа=группа.get("name") or группа.get("sys")))
+        return out
     rows = d if isinstance(d, list) else (d.get(key) if key else d)
     if isinstance(rows, dict):                      # досье: ключ — имя компании
         return [dict(v, name=k) for k, v in rows.items() if isinstance(v, dict)]
@@ -95,6 +106,8 @@ SOURCES = [
     ("gt/data/suppliers.json", None, "профили поставщиков ГТУ"),
     ("zip/data/tfs_supply_chain.json", "suppliers", "цепочка поставок ТФС"),
     ("zip/data/material_process.json", None, "обработка материалов"),
+    ("gpu/data/suppliers.json", "companies", "библиотека ГПУ"),
+    ("gpu/data/subsuppliers.json", "systems[].makers", "субпоставщики ГПУ"),
     ("gt/data/research_suppliers.json", "rows", "исследование ГТУ"),
     ("gt/data/dossiers.json", "dossiers", "досье компаний"),
     ("zip/data/material_suppliers.json", None, "материалы"),
@@ -113,6 +126,7 @@ def shape(r: dict, origin: str) -> dict | None:
     if not name or len(name) < 2:
         return None
     what = first(r, "what", "products", "makes", "capability", "production", "real_maker",
+                 "sys", "depth", "role", "_группа",
                  "equipment", "covers_classes", "covers", "hook", "profile", "angle",
                  "families", "note")
     return {

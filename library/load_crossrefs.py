@@ -101,6 +101,10 @@ def num(v, w=9):
     return f"{v:,}".replace(",", " ").rjust(w)
 
 
+def brand_of(запись) -> str:
+    return (запись.get("brand") or "") if isinstance(запись, dict) else ""
+
+
 def build_alts() -> list[dict]:
     alts: dict[tuple, dict] = {}
 
@@ -127,11 +131,69 @@ def build_alts() -> list[dict]:
             for кандидат in номера_из(str(r.get("substitute") or "")):
                 add(r.get("pn"), кандидат, "замена", r.get("real_maker"),
                     str(r.get("substitute"))[:600], откуда, conf="low")
+    # Кросс-каталоги MOTORTECH по газопоршневым: «эта катушка равна вот этой у
+    # Caterpillar/Jenbacher». В поле kind написано, равнозначная это замена или
+    # только подходит. И номера, и кроссы лежат СПИСКАМИ — их надо разворачивать,
+    # иначе в таблицу попадёт строка «['06.50.034']» и пройдёт все проверки:
+    # цифры есть, знаков мало, кириллицы нет.
+    for r in load("gpu/data/motortech_cross.json", "records"):
+        вид = "замена" if "equivalent" in str(r.get("kind") or "").lower() else "аналог"
+        свои = [str(x) for x in (r.get("motortech") or []) if x]
+        for бренд in (r.get("cross") or []):
+            марка = str(brand_of(бренд))
+            for чужой in (бренд.get("pns") or []) if isinstance(бренд, dict) else []:
+                for свой in свои:
+                    add(str(чужой), свой, вид, "MOTORTECH", r.get("url"),
+                        "кросс-каталог MOTORTECH")
+                    add(свой, str(чужой), вид, марка, r.get("url"),
+                        "кросс-каталог MOTORTECH")
+
     for r in load("zip/data/telsmith_crossrefs.json", "crossrefs"):
         add(r.get("telsmith_pn"), r.get("real_pn"), "номер изготовителя",
             r.get("real_maker"), r.get("evidence_url"), "кросс-таблица Telsmith",
             r.get("confidence") or "med")
     return list(alts.values())
+
+
+# Тип позиции в кросс-каталоге записан по-английски («ignition coil», «pickup»).
+# Все они из системы зажигания газопоршневой машины — узел известен заранее, и
+# гадать по тексту незачем.
+ЗАЖИГАНИЕ = ("ignition", "spark", "coil", "pickup", "lead", "harness", "trigger",
+             "extension", "boot", "detonation")
+
+
+def build_motortech_parts() -> dict[str, dict]:
+    """Детали из кросс-каталога: номер OEM и номер MOTORTECH — реальные позиции.
+
+    Без них связи взаимозаменяемости повисают: ребро ставится только на деталь,
+    которая есть в каталоге, а катушек зажигания Caterpillar у нас не было."""
+    детали: dict[str, dict] = {}
+
+    def положи(pn, марка, тип, движки, url):
+        key = part_key(pn)
+        if not key or not похоже_на_номер(str(pn)):
+            return
+        тип = (тип or "").strip() or "позиция системы зажигания"
+        unit = "gpu.ignition" if any(w in тип.lower() for w in ЗАЖИГАНИЕ) else None
+        детали.setdefault(key, {
+            "id": key, "catalog_no": str(pn)[:120],
+            "name": f"{тип} ({марка})"[:400] if марка else тип[:400],
+            "oem": (марка or None) and str(марка)[:200],
+            "model": (движки or None) and str(движки)[:600],
+            "category": "зажигание" if unit else None,
+            "segment_id": "gpu", "unit_id": unit,
+            "source": "кросс-каталог MOTORTECH", "url": url})
+
+    for r in load("gpu/data/motortech_cross.json", "records"):
+        тип, движки, url = r.get("part"), r.get("engines"), r.get("url")
+        for pn in (r.get("motortech") or []):
+            положи(pn, "MOTORTECH", тип, движки, url)
+        for бренд in (r.get("cross") or []):
+            if not isinstance(бренд, dict):
+                continue
+            for pn in (бренд.get("pns") or []):
+                положи(pn, бренд.get("brand"), тип, движки, url)
+    return детали
 
 
 def build_bom() -> tuple[list[dict], dict[str, dict], list[dict]]:
@@ -171,6 +233,9 @@ def build_bom() -> tuple[list[dict], dict[str, dict], list[dict]]:
 def main() -> int:
     alts = build_alts()
     строки, детали, машины = build_bom()
+    зажигание = build_motortech_parts()
+    for k, v in зажигание.items():
+        детали.setdefault(k, v)
 
     print("=== взаимозаменяемость ===")
     print(f"  связей: {num(len(alts))}")
@@ -178,6 +243,8 @@ def main() -> int:
         print(f"    {k:26}{num(n)}")
     print(f"  с названным изготовителем: {sum(1 for a in alts if a['alt_maker'])}")
     print(f"  различных деталей: {len({a['part_id'] for a in alts})}")
+
+    print(f"\n  деталей из кросс-каталога MOTORTECH: {len(зажигание)}")
 
     print("\n=== ведомости ===")
     print(f"  машин: {len(машины)} · строк состава: {num(len(строки))} · "
