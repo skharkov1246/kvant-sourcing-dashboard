@@ -92,7 +92,7 @@ jobs:
 
       - name: Выгрузка артефактов разведки
         if: ${{ inputs.mode == 'recon' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: glbs-recon
           path: zip/customs/recon
