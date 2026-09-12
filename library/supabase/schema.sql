@@ -161,6 +161,25 @@ create table if not exists lib_part_alt (
 );
 create index if not exists lib_part_alt_pn on lib_part_alt (alt_pn);
 
+-- Как читать номер: вход в цепочку с того, что у сорсера есть на руках — шильдик
+-- или строка из заявки. «MW21215M» — завод Линкольн, пять цифр и буква ревизии;
+-- семь цифр без разделителей — Cummins, и у него номера образуют цепочку замен.
+-- Ловушки хранятся отдельным полем: именно они стоят денег («401088700» — это
+-- тот же 4010887 с лишними нулями).
+create table if not exists lib_pn_patterns (
+  id         text primary key,
+  oem        text not null,
+  pattern    text,                       -- MW#####X[/NN] или словесное описание
+  meaning    text,
+  examples   text,
+  traps      text,
+  status     text,                       -- подтверждено закупкой | из каталога | гипотеза
+  source     text,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+create index if not exists lib_pn_patterns_oem on lib_pn_patterns (oem);
+
 -- Ведомость: из чего собрана машина, с уровнем вложенности и количеством. Без
 -- неё «узел → запчасть» держится на словах описания, а не на конструкции.
 create table if not exists lib_bom (
@@ -479,6 +498,7 @@ alter table lib_fleet          enable row level security;
 alter table lib_part_alt       enable row level security;
 alter table lib_bom            enable row level security;
 alter table lib_symptoms       enable row level security;
+alter table lib_pn_patterns    enable row level security;
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 9. Реестр разобранных файлов. Нужен для возобновляемости: обход 22 тысяч

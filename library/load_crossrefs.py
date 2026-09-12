@@ -25,6 +25,7 @@ Epiroc 7490 0290 74 — одна деталь, и не связать их зн�
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import re
@@ -148,6 +149,18 @@ def build_alts() -> list[dict]:
                     add(свой, str(чужой), вид, марка, r.get("url"),
                         "кросс-каталог MOTORTECH")
 
+    # Ведомость состава: наш внутренний номер и номер изготовителя — одна деталь.
+    # KV30 0001 и Epiroc 7490 0290 74 не связать значит закупать дважды.
+    for m in load("zip/data/bom.json", "machines"):
+        for запись in list(m.get("parts") or []) + list(m.get("kits") or []):
+            чужой = str(запись.get("epiroc_pn") or запись.get("oem_pn") or "").strip()
+            свой = str(запись.get("kv_pn") or "").strip()
+            if not (чужой and свой):
+                continue
+            add(чужой, свой, "наш номер", "КВАНТ", None, "ведомость состава")
+            add(свой, чужой, "номер изготовителя", m.get("oem") or None, None,
+                "ведомость состава")
+
     for r in load("zip/data/telsmith_crossrefs.json", "crossrefs"):
         add(r.get("telsmith_pn"), r.get("real_pn"), "номер изготовителя",
             r.get("real_maker"), r.get("evidence_url"), "кросс-таблица Telsmith",
@@ -196,17 +209,76 @@ def build_motortech_parts() -> dict[str, dict]:
     return детали
 
 
+def build_patterns() -> dict[str, dict]:
+    """Шифровки номеров: как по номеру понять, чей он и что означает.
+
+    Это вход в цепочку с того, что у сорсера на руках, — со строки из заявки.
+    Ловушки хранятся отдельно, потому что стоят денег: «401088700» — это тот же
+    4010887 с дописанными нулями, и по первому номеру не найдётся ничего."""
+    out: dict[str, dict] = {}
+
+    def add_pat(oem, pattern, meaning, examples, traps, status, source):
+        oem = str(oem or "").strip()
+        ключ = pattern or meaning or ""
+        if not oem or not ключ:
+            return
+        ид = "шифр." + hashlib.sha1(f"{oem}|{ключ}".encode()).hexdigest()[:12]
+        out[ид] = {"id": ид, "oem": oem[:200], "pattern": str(pattern or "")[:200] or None,
+                   "meaning": str(meaning or "")[:2000] or None,
+                   "examples": str(examples or "")[:1000] or None,
+                   "traps": str(traps or "")[:2000] or None,
+                   "status": str(status or "")[:60] or None, "source": source}
+
+    for section in load("gt/data/pn_guide.json", "sections"):
+        oem = str(section.get("title") or "").strip()
+        for r in (section.get("rules") or []):
+            add_pat(oem, r.get("pattern"), r.get("meaning"), r.get("examples"),
+                    None, r.get("status"), "справочник шифровок ГТУ")
+    for b in load("gpu/data/pn_guide.json", "brands"):
+        правила = "; ".join(str(x) for x in (b.get("rules") or []))
+        ловушки = "; ".join(str(x) for x in (b.get("traps") or []))
+        add_pat(b.get("brand"), None, f"{b.get('format') or ''} {правила}".strip(),
+                None, ловушки, None, "справочник шифровок ГПУ")
+    return out
+
+
+def имя_машины(m: dict) -> str:
+    return str(m.get("name") or "").strip()
+
+
 def build_bom() -> tuple[list[dict], dict[str, dict], list[dict]]:
     """Ведомость → строки состава, новые детали и машина."""
     строки, детали, машины = [], {}, {}
     for m in load("zip/data/bom.json", "machines"):
-        имя = str(m.get("name") or "").strip()
+        имя = имя_машины(m)
         if not имя:
             continue
         ключ_машины = eq.norm_model(имя) if eq.looks_like_machine(имя) else None
         if ключ_машины:
             машины[ключ_машины] = {"id": ключ_машины, "name": имя[:200],
                                    "source": "ведомость состава"}
+        # Сервисные наборы — тоже позиции: у них свой номер изготовителя и свой
+        # наш номер, их так же закупают и так же задваивают.
+        for j, k in enumerate(m.get("kits") or []):
+            pn = str(k.get("oem_pn") or "").strip()
+            if not pn:
+                continue
+            key = part_key(pn)
+            имя = str(k.get("name") or pn)
+            детали.setdefault(key, {
+                "id": key, "catalog_no": pn[:120], "name": имя[:400], "oem": None,
+                "model": имя_машины(m)[:600], "category": "сервисный набор",
+                "segment_id": classify(f"{имя} {имя_машины(m)}"),
+                "unit_id": eq.unit_of(имя), "source": "ведомость состава: комплекты"})
+            строки.append({
+                "id": f"{ключ_машины or part_key(имя_машины(m))}.комплект.{j}",
+                "machine": имя_машины(m)[:200], "model_id": ключ_машины,
+                "scheme": str(k.get("scheme") or "")[:40] or None, "level": None,
+                "part_id": key, "part_no": pn[:120],
+                "own_no": str(k.get("kv_pn") or "")[:120] or None,
+                "qty": str(k.get("qty") or "")[:40] or None, "name": имя[:400],
+                "source": "ведомость состава: комплекты"})
+
         for i, p in enumerate(m.get("parts") or []):
             pn = str(p.get("epiroc_pn") or p.get("pn") or "").strip()
             if not pn:
@@ -234,6 +306,7 @@ def main() -> int:
     alts = build_alts()
     строки, детали, машины = build_bom()
     зажигание = build_motortech_parts()
+    шифровки = build_patterns()
     for k, v in зажигание.items():
         детали.setdefault(k, v)
 
@@ -245,6 +318,9 @@ def main() -> int:
     print(f"  различных деталей: {len({a['part_id'] for a in alts})}")
 
     print(f"\n  деталей из кросс-каталога MOTORTECH: {len(зажигание)}")
+
+    print(f"  шифровок номеров: {len(шифровки)} "
+          f"(с ловушками: {sum(1 for x in шифровки.values() if x['traps'])})")
 
     print("\n=== ведомости ===")
     print(f"  машин: {len(машины)} · строк состава: {num(len(строки))} · "
@@ -296,6 +372,16 @@ def main() -> int:
             [(a["part_id"], a["alt_pn"], a["kind"], a["alt_maker"], a["evidence"],
               a["confidence"], a["source"]) for a in годные], page_size=500)
         psycopg2.extras.execute_values(cur, """
+            insert into lib_pn_patterns (id, oem, pattern, meaning, examples, traps,
+                                         status, source)
+            values %s
+            on conflict (id) do update set
+              meaning = excluded.meaning, examples = excluded.examples,
+              traps = excluded.traps, status = excluded.status, updated_at = now()""",
+            [(x["id"], x["oem"], x["pattern"], x["meaning"], x["examples"], x["traps"],
+              x["status"], x["source"]) for x in шифровки.values()], page_size=200)
+
+        psycopg2.extras.execute_values(cur, """
             insert into lib_bom (id, machine, model_id, scheme, level, part_id, part_no,
                                  own_no, qty, name, source)
             values %s
@@ -308,7 +394,7 @@ def main() -> int:
         conn.commit()
         print(f"\n  связей записано: {len(годные)} из {len(alts)} "
               f"(остальные — на деталь, которой в каталоге нет)")
-        for t in ("lib_part_alt", "lib_bom", "lib_parts"):
+        for t in ("lib_part_alt", "lib_bom", "lib_pn_patterns", "lib_parts"):
             cur.execute(f"select count(*) from {t}")
             print(f"  {t:16}{num(cur.fetchone()[0])}")
     conn.close()
