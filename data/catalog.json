@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 179,
-    "total_bytes": 82103391,
+    "total_bytes": 82350730,
     "by_sensitivity": {
       "конфиденциально": 54,
       "внутреннее": 92,
@@ -85,7 +85,7 @@
     {
       "path": "gt/data/ship_lukoil.json",
       "subproject": "ГТУ-библиотека",
-      "bytes": 6512834,
+      "bytes": 6666910,
       "note": "Сводная карта закупки по всей заявке ЛУКОЙЛ: 1642 уникальных артикула обоих листов («Энергосети» 1198, НВН 444) с результатом проверки наличия. Производный файл — собирается gt/tools/ship_merge.py из rfq_demand.json и трёх поколений проверок (rfq_prices.json:checks, ship_energoseti.json, ship_sweep.json); поздняя проверка перекрывает раннюю, непроверенные строки помечены not_checked. Руками не заполнять. Отчёт — gt/tools/ship_map.py → gt/docs/ЗАКУПКА-ЛУКОЙЛ.pdf: карта «у кого что брать», изготовители узлов под шильдой OEM, позиции под подбор по стандарту, расхождения цен.",
       "format": "json",
       "shape": "объект",
@@ -132,9 +132,9 @@
           "verdict"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-09-12",
       "last_author": "Claude",
-      "last_commit": "52302b9",
+      "last_commit": "82c10d0",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -833,10 +833,10 @@
           "verdict"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-12",
+      "last_author": "Claude",
+      "last_commit": "82c10d0",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -1343,6 +1343,50 @@
       ]
     },
     {
+      "path": "gt/data/ship_sellers.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 414366,
+      "note": "Справочник адресатов по заявке ЛУКОЙЛ: 461 компания, найденная проверкой наличия, с контактами для рассылки запросов цен — e-mail отдела продаж, телефон, страница формы RFQ, сайт, страна и город, роль на рынке (OEM / дилер / независимый сток / трейдер / изготовитель / маркетплейс / сервис), чем полезны по нашей номенклатуре и справочная пометка проходимости прямого запроса из РФ. Контакты сняты со страниц самих компаний workflow lukoil-seller-contacts 09.2026 в два прогона; адреса по шаблону не конструировались: где не напечатан, стоит found=false. Контакты организаций — внутреннее.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "method",
+        "rows",
+        "source",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 461,
+        "record_keys": [
+          "city",
+          "country",
+          "covers",
+          "emails",
+          "found",
+          "note",
+          "phones",
+          "rfq_url",
+          "role",
+          "ru_access",
+          "seller",
+          "seller_key",
+          "site"
+        ]
+      },
+      "last_change": "2026-09-11",
+      "last_author": "Claude",
+      "last_commit": "52302b9",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/ship_merge.py"
+      ]
+    },
+    {
       "path": "gt/data/ansaldo.json",
       "subproject": "ГТУ-библиотека",
       "bytes": 399548,
@@ -1650,50 +1694,6 @@
       "referenced_by": [
         "pnw/tools/build_suppliers.py",
         "zip/tools/bearing_report.py"
-      ]
-    },
-    {
-      "path": "gt/data/ship_sellers.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 321167,
-      "note": "Справочник адресатов по заявке ЛУКОЙЛ: 363 компании, найденные проверкой наличия, с контактами для рассылки запросов цен — e-mail отдела продаж, телефон, страница формы RFQ, сайт, страна и город, роль на рынке (OEM / дилер / независимый сток / трейдер / изготовитель / маркетплейс / сервис), чем полезны по нашей номенклатуре и справочная пометка проходимости прямого запроса из РФ. Контакты сняты со страниц самих компаний workflow lukoil-seller-contacts 09.2026; адреса по шаблону не конструировались. Контактные данные организаций — внутреннее.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "method",
-        "rows",
-        "source",
-        "updated"
-      ],
-      "main_collection": {
-        "key": "rows",
-        "records": 363,
-        "record_keys": [
-          "city",
-          "country",
-          "covers",
-          "emails",
-          "found",
-          "note",
-          "phones",
-          "rfq_url",
-          "role",
-          "ru_access",
-          "seller",
-          "seller_key",
-          "site"
-        ]
-      },
-      "last_change": "2026-09-11",
-      "last_author": "Claude",
-      "last_commit": "52302b9",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "gt/tools/ship_merge.py"
       ]
     },
     {
@@ -6213,7 +6213,7 @@
     {
       "path": "data/catalog_notes.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 15838,
+      "bytes": 15902,
       "note": "",
       "format": "json",
       "shape": "объект",
