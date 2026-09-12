@@ -92,13 +92,16 @@ UNIT_RULES: tuple[tuple[str, tuple[str, ...]], ...] = (
     ("controls.vibration-probes", ("вибродатчик", "проксиметр", "вибрац", "vibration", "bently")),
     ("controls.solenoids", ("соленоид", "актуатор", "solenoid", "actuator", "конечник")),
     ("controls.flame-scanners", ("датчик пламени", "flame scanner", "уф-датчик")),
-    ("controls", ("датчик", "sensor", "кип", "реле", "преобразователь", "switch", "электрик",
-                  "кабель", "cable", "harness", "коммутатор", "модуль", "module",
-                  "transducer", "контакт")),
+    ("controls", ("датчик", "sensor", "кип", "реле", "relay", "преобразователь", "switch",
+                  "электрик", "кабель", "cable", "harness", "коммутатор", "модуль", "module",
+                  "transducer", "контакт", "fuse", "breaker", "transmitter", "detector",
+                  "connector", "gauge", "manometr", "манометр", "indicator", "монитор",
+                  "monitor", "circuit", "лампа", "light", "lamp", "power supply", "card")),
     ("consumables.inlet-air-filters", ("фильтр квоу", "фильтр воздуш", "inlet air filter")),
     ("consumables.lube-oil-filters", ("маслофильтр", "фильтр масл", "сепаратор", "oil filter")),
     ("consumables.turbine-oil", ("турбинное масло", "turbine oil", "смазка", "lubricant")),
-    ("seals", ("уплотнени", "прокладк", "сальник", "gasket", "o-ring", "seal")),
+    ("seals", ("уплотнени", "прокладк", "сальник", "gasket", "o-ring", "o'ring", "oring",
+               "packing", "seal")),
     ("consumables", ("фильтр", "filter", "расходник")),
     ("package.starter-system", ("стартер", "starter", "пусков")),
     ("package.lube-oil-pumps", ("маслонасос", "насос масл", "oil pump")),
@@ -108,9 +111,14 @@ UNIT_RULES: tuple[tuple[str, tuple[str, ...]], ...] = (
                            "fire supp")),
     ("package", ("насос", "pump", "теплообмен", "вспомогательн", "bop")),
     ("fasteners", ("болт", "винт", "гайка", "шайба", "шпилька", "шплинт", "крепёж", "крепеж",
-                   "стопорное кольцо", "screw", "bolt", "nut", "washer", "stud",
-                   "retaining ring", "cotter")),
+                   "стопорное кольцо", "кронштейн", "screw", "bolt", "nut", "washer", "stud",
+                   "retaining ring", "cotter", "bracket", "spacer", "shim")),
     ("tooling", ("оснастка", "инструмент", "приспособлени", "tooling", "fixture")),
+    # Трубопроводная часть — самая крупная неопознанная группа партномеров:
+    # рукава, трубки, фитинги и хомуты, 920 позиций на разметке.
+    ("piping", ("трубопровод", "рукав", "шланг", "фитинг", "hose", "tube", "tubing",
+                "fitting", "clamp", "хомут", "штуцер", "adapter", "переходник",
+                "flange", "фланец", "elbow", "piping")),
     ("generator", ("генератор", "возбудител", "статор", "generator", "exciter", "stator")),
 )
 
@@ -125,6 +133,7 @@ EXTRA_UNITS: tuple[tuple[str, str, str, str], ...] = (
     ("tooling", "Оснастка и инструмент", "tooling / fixtures", "C"),
     ("exhaust", "Выхлопной тракт и диффузор", "exhaust duct / diffuser", "B"),
     ("generator", "Генератор и возбудитель", "generator / exciter", "A"),
+    ("piping", "Трубопроводы, рукава и арматура", "piping / hoses / fittings", "C"),
 )
 
 
