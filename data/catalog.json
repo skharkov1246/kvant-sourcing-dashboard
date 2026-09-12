@@ -211,6 +211,7 @@
       "referenced_by": [
         "gt/build.py",
         "pnw/tools/build_master.py",
+        "scripts/build_dict.py",
         "tests/test_core.py"
       ]
     },
@@ -345,6 +346,8 @@
         "pnw/tools/build_master.py",
         "pnw/tools/build_search.py",
         "pnw/tools/build_suppliers.py",
+        "scripts/build_dict.py",
+        "tests/test_dict.py",
         "zip/tools/perf_classes.py"
       ]
     },
@@ -371,9 +374,9 @@
           "owner"
         ]
       },
-      "last_change": "2026-09-01",
+      "last_change": "2026-09-12",
       "last_author": "Claude",
-      "last_commit": "e2f716f",
+      "last_commit": "b661b34",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -381,7 +384,8 @@
       },
       "referenced_by": [
         "pnw/tools/build_master.py",
-        "pnw/tools/build_search.py"
+        "pnw/tools/build_search.py",
+        "tests/test_dict.py"
       ]
     },
     {
@@ -807,14 +811,14 @@
       "referenced_by": [
         "pnw/tools/build_master.py",
         "pnw/tools/parse_crossrefs.py",
+        "scripts/build_dict.py",
         "scripts/publish_library_v2.py",
         "tests/test_publish_library_v2.py",
         "zip/build.py",
         "zip/customs/glbs_pull.mjs",
         "zip/tools/aggregate_customs.py",
         "zip/tools/aggregate_prices.py",
-        "zip/tools/import_sheet.py",
-        "zip/tools/perf_classes.py"
+        "zip/tools/import_sheet.py"
       ]
     },
     {
@@ -933,6 +937,7 @@
         "pnw/tools/build_search.py",
         "pnw/tools/build_suppliers.py",
         "pnw/tools/harvest_contacts.py",
+        "tests/test_dict.py",
         "zip/tools/perf_classes.py"
       ]
     },
@@ -1032,6 +1037,7 @@
         "markers": []
       },
       "referenced_by": [
+        "scripts/build_dict.py",
         "zip/tools/build_telsmith_page.py"
       ]
     },
@@ -2324,6 +2330,7 @@
         ]
       },
       "referenced_by": [
+        "scripts/build_dict.py",
         "zip/tools/build_telsmith_page.py",
         "zip/tools/telsmith_parse.py",
         "zip/tools/telsmith_report.py"
@@ -2788,6 +2795,7 @@
       "referenced_by": [
         "pnw/tools/build_master.py",
         "pnw/tools/parse_crossrefs.py",
+        "scripts/build_dict.py",
         "zip/tools/build_telsmith_page.py"
       ]
     },
@@ -2878,6 +2886,7 @@
         "gt/public/plugs.html",
         "gt/tools/build_lot_xlsx.py",
         "gt/tools/build_rfq.py",
+        "scripts/build_dict.py",
         "zip/build.py",
         "zip/tools/parse_demand.py"
       ]
@@ -4233,7 +4242,8 @@
         "markers": []
       },
       "referenced_by": [
-        "gpu/build.py"
+        "gpu/build.py",
+        "scripts/build_dict.py"
       ]
     },
     {
@@ -5317,6 +5327,7 @@
         "markers": []
       },
       "referenced_by": [
+        "scripts/build_dict.py",
         "zip/build.py",
         "zip/tools/perf_classes.py"
       ]
@@ -5910,6 +5921,7 @@
         "gt/public/plugs.html",
         "gt/tools/build_lot_xlsx.py",
         "gt/tools/build_rfq.py",
+        "scripts/build_dict.py",
         "zip/build.py",
         "zip/tools/parse_demand.py"
       ]
@@ -5986,7 +5998,8 @@
         "gpu/build.py",
         "gt/build.py",
         "gt/tools/build_rfq.py",
-        "gt/tools/drop_ru.py"
+        "gt/tools/drop_ru.py",
+        "scripts/build_dict.py"
       ]
     },
     {
@@ -6100,7 +6113,8 @@
       },
       "referenced_by": [
         "gpu/build.py",
-        "gt/build.py"
+        "gt/build.py",
+        "scripts/build_dict.py"
       ]
     },
     {
@@ -6220,9 +6234,9 @@
         "zip/data/telsmith_crossrefs.json",
         "zip/data/telsmith_nodrawings.json"
       ],
-      "last_change": "2026-09-11",
-      "last_author": "skharkov1246",
-      "last_commit": "8f4b482",
+      "last_change": "2026-09-12",
+      "last_author": "Claude",
+      "last_commit": "b661b34",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
@@ -6271,7 +6285,8 @@
         "gt/public/hot.html",
         "gt/tools/build_hot.py",
         "gt/tools/build_lot.py",
-        "gt/tools/drop_ru.py"
+        "gt/tools/drop_ru.py",
+        "scripts/build_dict.py"
       ]
     },
     {
@@ -6531,6 +6546,7 @@
       },
       "referenced_by": [
         "gpu/build.py",
+        "scripts/build_dict.py",
         "zip/build.py",
         "zip/tools/perf_classes.py"
       ]
@@ -6723,7 +6739,8 @@
       },
       "referenced_by": [
         "gpu/build.py",
-        "gt/build.py"
+        "gt/build.py",
+        "scripts/build_dict.py"
       ]
     },
     {
@@ -6836,7 +6853,8 @@
       },
       "referenced_by": [
         "gpu/build.py",
-        "gpu/tools/coverage.py"
+        "gpu/tools/coverage.py",
+        "tests/test_dict.py"
       ]
     },
     {
@@ -7058,7 +7076,8 @@
         "gt/public/hot.html",
         "gt/tools/build_hot.py",
         "gt/tools/build_lot.py",
-        "gt/tools/drop_ru.py"
+        "gt/tools/drop_ru.py",
+        "scripts/build_dict.py"
       ]
     },
     {
@@ -7399,7 +7418,8 @@
       "referenced_by": [
         "gt/build.py",
         "gt/tools/build_rfq.py",
-        "gt/tools/drop_ru.py"
+        "gt/tools/drop_ru.py",
+        "scripts/build_dict.py"
       ]
     },
     {

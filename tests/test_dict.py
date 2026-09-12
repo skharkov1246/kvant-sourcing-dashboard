@@ -110,3 +110,30 @@ def test_pnw_data_is_catalogued():
     sens = {d["path"]: d["sensitivity"]["level"] for d in cat["datasets"]}
     assert sens["pnw/data/supplier_master.json"] == "конфиденциально", \
         "реестр с контактами поставщиков должен быть помечен как конфиденциальный"
+
+
+def test_catalog_sees_uncommitted_code_files():
+    """Каталог обязан видеть ещё не закоммиченный файл кода.
+
+    Сборщик составлял список файлов по git ls-files, то есть по индексу git.
+    Новый сборщик или тест попадал туда только после коммита, поэтому каталог,
+    собранный локально ПЕРЕД коммитом, отличался от каталога, который CI считает
+    ПОСЛЕ него, и проверка --check краснела на каждом PR с новым файлом кода.
+    Так дважды падал гейт. Локальный прогон обязан предсказывать результат CI."""
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location("build_catalog", ROOT / "scripts" / "build_catalog.py")
+    bc = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(bc)
+
+    probe = ROOT / "scripts" / "_probe_uncommitted.py"
+    probe.write_text('OPEN = "coverage.json"\n', encoding="utf-8")
+    try:
+        fresh = bc.build()
+        cov = [d for d in fresh["datasets"] if d["path"] == "gpu/data/coverage.json"]
+        assert cov, "gpu/data/coverage.json пропал из каталога"
+        assert "scripts/_probe_uncommitted.py" in cov[0].get("referenced_by", []), \
+            "каталог не видит незакоммиченный файл кода — проверка --check снова будет краснеть в CI"
+    finally:
+        probe.unlink(missing_ok=True)
+
