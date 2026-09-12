@@ -1,0 +1,4257 @@
+{
+  "note": "Производители: ключ nkey(name) и все написания, найденные в базах. Разные написания одной компании собраны под одним ключом — это и есть то, чего сегодня нет ни в одном подпроекте.",
+  "count": 277,
+  "records": [
+    {
+      "oem_key": "skf",
+      "name": "Ab Skf",
+      "spellings": [
+        {
+          "spelling": "Ab Skf",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Skf",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Skf Gmbh",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "\"Skf\"",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "SKF",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "SKF",
+          "where": "zip/data/positions.json:[].oem"
+        },
+        {
+          "spelling": "SKF",
+          "where": "pnw/data/item_master.json:items[].brand"
+        },
+        {
+          "spelling": "Ab Skf",
+          "where": "pnw/data/item_master.json:items[].maker"
+        },
+        {
+          "spelling": "Skf",
+          "where": "pnw/data/item_master.json:items[].maker"
+        },
+        {
+          "spelling": "Skf Gmbh",
+          "where": "pnw/data/item_master.json:items[].maker"
+        },
+        {
+          "spelling": "\"Skf\"",
+          "where": "pnw/data/item_master.json:items[].maker"
+        },
+        {
+          "spelling": "SKF",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 12
+    },
+    {
+      "oem_key": "bentlynevada",
+      "name": "Bently Nevada, Llc",
+      "spellings": [
+        {
+          "spelling": "Bently Nevada",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Bently Nevada, Llc",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Bently Nevada, Inc.",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "BENTLY NEVADA",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Bently Nevada",
+          "where": "pnw/data/item_master.json:items[].maker"
+        },
+        {
+          "spelling": "Bently Nevada, Llc",
+          "where": "pnw/data/item_master.json:items[].maker"
+        },
+        {
+          "spelling": "Bently Nevada, Inc.",
+          "where": "pnw/data/item_master.json:items[].maker"
+        },
+        {
+          "spelling": "BENTLY NEVADA",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 8
+    },
+    {
+      "oem_key": "grundfos",
+      "name": "Grundfos Holding A/S",
+      "spellings": [
+        {
+          "spelling": "Grundfos Holding A/S",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Grundfos Gmbh",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "«Grundfos Holding A/S»",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Grundfos Holding A/S",
+          "where": "pnw/data/item_master.json:items[].maker"
+        },
+        {
+          "spelling": "Grundfos Gmbh",
+          "where": "pnw/data/item_master.json:items[].maker"
+        },
+        {
+          "spelling": "«Grundfos Holding A/S»",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 6
+    },
+    {
+      "oem_key": "skfautomotivecomponentcorporation",
+      "name": "Skf Automotive Component Corporation",
+      "spellings": [
+        {
+          "spelling": "\"Skf Automotivecomponentcorporation\"",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Skf Automotivecomponentcorporation",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Skf Automotive Component Corporation",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "\"Skf Automotivecomponentcorporation\"",
+          "where": "pnw/data/item_master.json:items[].maker"
+        },
+        {
+          "spelling": "Skf Automotivecomponentcorporation",
+          "where": "pnw/data/item_master.json:items[].maker"
+        },
+        {
+          "spelling": "Skf Automotive Component Corporation",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 6
+    },
+    {
+      "oem_key": "atlascopco",
+      "name": "Atlas Copco",
+      "spellings": [
+        {
+          "spelling": "Atlas Copco",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Atlas Copco",
+          "where": "zip/data/positions.json:[].oem"
+        },
+        {
+          "spelling": "Atlas Copco",
+          "where": "pnw/data/item_master.json:items[].brand"
+        },
+        {
+          "spelling": "Atlas Copco",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 4
+    },
+    {
+      "oem_key": "atlascopcoairpowernv",
+      "name": "Atlas Copco Airpower N.V",
+      "spellings": [
+        {
+          "spelling": "Atlas Copco Airpower N.V.",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Atlas Copco Airpower N.V",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Atlas Copco Airpower N.V.",
+          "where": "pnw/data/item_master.json:items[].maker"
+        },
+        {
+          "spelling": "Atlas Copco Airpower N.V",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 4
+    },
+    {
+      "oem_key": "caterpillar",
+      "name": "Caterpillar",
+      "spellings": [
+        {
+          "spelling": "Caterpillar",
+          "where": "gpu/data/models.json:oems[].name"
+        },
+        {
+          "spelling": "Caterpillar",
+          "where": "gpu/data/machines.json:machines[].oem"
+        },
+        {
+          "spelling": "Caterpillar",
+          "where": "zip/data/positions.json:[].oem"
+        },
+        {
+          "spelling": "Caterpillar",
+          "where": "pnw/data/item_master.json:items[].brand"
+        }
+      ],
+      "n_spellings": 4
+    },
+    {
+      "oem_key": "cryostar",
+      "name": "Cryostar",
+      "spellings": [
+        {
+          "spelling": "Cryostar",
+          "where": "gt/data/pn_db.json:rows[].oem"
+        },
+        {
+          "spelling": "Cryostar",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Cryostar",
+          "where": "pnw/data/item_master.json:items[].brand"
+        },
+        {
+          "spelling": "Cryostar",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 4
+    },
+    {
+      "oem_key": "cummins",
+      "name": "Cummins",
+      "spellings": [
+        {
+          "spelling": "Cummins",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Cummins",
+          "where": "gpu/data/models.json:oems[].name"
+        },
+        {
+          "spelling": "Cummins",
+          "where": "gpu/data/machines.json:machines[].oem"
+        },
+        {
+          "spelling": "Cummins",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 4
+    },
+    {
+      "oem_key": "donaldson",
+      "name": "Donaldson Company, Inc",
+      "spellings": [
+        {
+          "spelling": "Donaldson Company, Inc",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Donaldson Company, Inc.",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Donaldson Company, Inc",
+          "where": "pnw/data/item_master.json:items[].maker"
+        },
+        {
+          "spelling": "Donaldson Company, Inc.",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 4
+    },
+    {
+      "oem_key": "epiroc",
+      "name": "Epiroc",
+      "spellings": [
+        {
+          "spelling": "Epiroc",
+          "where": "zip/data/positions.json:[].oem"
+        },
+        {
+          "spelling": "EPIROC",
+          "where": "zip/data/positions.json:[].oem"
+        },
+        {
+          "spelling": "Epiroc",
+          "where": "pnw/data/item_master.json:items[].brand"
+        },
+        {
+          "spelling": "EPIROC",
+          "where": "pnw/data/item_master.json:items[].brand"
+        }
+      ],
+      "n_spellings": 4
+    },
+    {
+      "oem_key": "flexitallic",
+      "name": "Flexitallic",
+      "spellings": [
+        {
+          "spelling": "\"Flexitallic\"",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "FLEXITALLIC",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "\"Flexitallic\"",
+          "where": "pnw/data/item_master.json:items[].maker"
+        },
+        {
+          "spelling": "FLEXITALLIC",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 4
+    },
+    {
+      "oem_key": "grundfoshungarymanufacturing",
+      "name": "Grundfos Hungary Manufacturing Ltd",
+      "spellings": [
+        {
+          "spelling": "Grundfos Hungary Manufacturing Ltd.",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Grundfos Hungary Manufacturing Ltd",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Grundfos Hungary Manufacturing Ltd.",
+          "where": "pnw/data/item_master.json:items[].maker"
+        },
+        {
+          "spelling": "Grundfos Hungary Manufacturing Ltd",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 4
+    },
+    {
+      "oem_key": "inniojenbacher",
+      "name": "INNIO Jenbacher",
+      "spellings": [
+        {
+          "spelling": "INNIO Jenbacher",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "INNIO Jenbacher",
+          "where": "gpu/data/models.json:oems[].name"
+        },
+        {
+          "spelling": "INNIO Jenbacher",
+          "where": "gpu/data/machines.json:machines[].oem"
+        },
+        {
+          "spelling": "INNIO Jenbacher",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 4
+    },
+    {
+      "oem_key": "normet",
+      "name": "Normet Group",
+      "spellings": [
+        {
+          "spelling": "Normet",
+          "where": "zip/data/positions.json:[].oem"
+        },
+        {
+          "spelling": "Normet Group",
+          "where": "zip/data/positions.json:[].oem"
+        },
+        {
+          "spelling": "Normet",
+          "where": "pnw/data/item_master.json:items[].brand"
+        },
+        {
+          "spelling": "Normet Group",
+          "where": "pnw/data/item_master.json:items[].brand"
+        }
+      ],
+      "n_spellings": 4
+    },
+    {
+      "oem_key": "parkerhannifin",
+      "name": "Parker Hannifin Corp",
+      "spellings": [
+        {
+          "spelling": "Parker Hannifin",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Parker Hannifin Corp",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Parker Hannifin",
+          "where": "pnw/data/item_master.json:items[].maker"
+        },
+        {
+          "spelling": "Parker Hannifin Corp",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 4
+    },
+    {
+      "oem_key": "rochestergauges",
+      "name": "Rochester Gauges",
+      "spellings": [
+        {
+          "spelling": "Rochester Gauges",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "ROCHESTER GAUGES",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Rochester Gauges",
+          "where": "pnw/data/item_master.json:items[].maker"
+        },
+        {
+          "spelling": "ROCHESTER GAUGES",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 4
+    },
+    {
+      "oem_key": "rosemount",
+      "name": "Rosemount, Inc",
+      "spellings": [
+        {
+          "spelling": "Rosemount, Inc",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "ROSEMOUNT",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Rosemount, Inc",
+          "where": "pnw/data/item_master.json:items[].maker"
+        },
+        {
+          "spelling": "ROSEMOUNT",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 4
+    },
+    {
+      "oem_key": "siemens",
+      "name": "Siemens Ag",
+      "spellings": [
+        {
+          "spelling": "Siemens",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Siemens Ag",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Siemens",
+          "where": "pnw/data/item_master.json:items[].maker"
+        },
+        {
+          "spelling": "Siemens Ag",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 4
+    },
+    {
+      "oem_key": "siemensenergy",
+      "name": "Siemens Energy Ag",
+      "spellings": [
+        {
+          "spelling": "Siemens Energy",
+          "where": "gt/data/pn_db.json:rows[].oem"
+        },
+        {
+          "spelling": "Siemens Energy Ag",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Siemens Energy",
+          "where": "pnw/data/item_master.json:items[].brand"
+        },
+        {
+          "spelling": "Siemens Energy Ag",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 4
+    },
+    {
+      "oem_key": "versaproducts",
+      "name": "Versa PRODUCTS COMPANY INC.",
+      "spellings": [
+        {
+          "spelling": "Versa Products",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Versa PRODUCTS COMPANY INC.",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Versa Products",
+          "where": "pnw/data/item_master.json:items[].maker"
+        },
+        {
+          "spelling": "Versa PRODUCTS COMPANY INC.",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 4
+    },
+    {
+      "oem_key": "woodward",
+      "name": "Woodward",
+      "spellings": [
+        {
+          "spelling": "Woodward",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Woodward",
+          "where": "gt/data/pn_db.json:rows[].oem"
+        },
+        {
+          "spelling": "Woodward",
+          "where": "pnw/data/item_master.json:items[].maker"
+        },
+        {
+          "spelling": "Woodward",
+          "where": "pnw/data/item_master.json:items[].brand"
+        }
+      ],
+      "n_spellings": 4
+    },
+    {
+      "oem_key": "deutz",
+      "name": "Deutz",
+      "spellings": [
+        {
+          "spelling": "Deutz",
+          "where": "gpu/data/models.json:adjacent[].name"
+        },
+        {
+          "spelling": "Deutz",
+          "where": "zip/data/positions.json:[].oem"
+        },
+        {
+          "spelling": "Deutz",
+          "where": "pnw/data/item_master.json:items[].brand"
+        }
+      ],
+      "n_spellings": 3
+    },
+    {
+      "oem_key": "330180330105speedprobe",
+      "name": "330180/330105 (speed probe)",
+      "spellings": [
+        {
+          "spelling": "330180/330105 (speed probe)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "330180/330105 (speed probe)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "330180x005proximitor",
+      "name": "330180-X0-05 (proximitor)",
+      "spellings": [
+        {
+          "spelling": "330180-X0-05 (proximitor)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "330180-X0-05 (proximitor)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "abb",
+      "name": "ABB",
+      "spellings": [
+        {
+          "spelling": "ABB",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "ABB",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "agastatteconnectivity",
+      "name": "Agastat (TE Connectivity)",
+      "spellings": [
+        {
+          "spelling": "Agastat (TE Connectivity)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Agastat (TE Connectivity)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "airpaxsensatacarlingтиповойдляпакетовsol",
+      "name": "Airpax (Sensata) / Carling — типовой для пакетов Solar",
+      "spellings": [
+        {
+          "spelling": "Airpax (Sensata) / Carling — типовой для пакетов Solar",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Airpax (Sensata) / Carling — типовой для пакетов Solar",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "altaindustries",
+      "name": "ALTA industries",
+      "spellings": [
+        {
+          "spelling": "ALTA industries",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "ALTA industries",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "amot",
+      "name": "AMOT",
+      "spellings": [
+        {
+          "spelling": "AMOT",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "AMOT",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "arkwinindustries",
+      "name": "Arkwin Industries",
+      "spellings": [
+        {
+          "spelling": "Arkwin Industries",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Arkwin Industries",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "asco",
+      "name": "ASCO",
+      "spellings": [
+        {
+          "spelling": "ASCO",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "ASCO",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "ashcroft",
+      "name": "Ashcroft",
+      "spellings": [
+        {
+          "spelling": "Ashcroft",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Ashcroft",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "ateliersfrancois",
+      "name": "Ateliers Francois Sa",
+      "spellings": [
+        {
+          "spelling": "Ateliers Francois Sa",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Ateliers Francois Sa",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "atlascopcocrepellesas",
+      "name": "Atlas Copco Crepelle S.A.S.",
+      "spellings": [
+        {
+          "spelling": "Atlas Copco Crepelle S.A.S.",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Atlas Copco Crepelle S.A.S.",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "atlascopcoenergas",
+      "name": "Atlas Copco Energas Gmbh",
+      "spellings": [
+        {
+          "spelling": "Atlas Copco Energas Gmbh",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Atlas Copco Energas Gmbh",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "atlascopcoindia",
+      "name": "Atlas Copco (India) Ltd.",
+      "spellings": [
+        {
+          "spelling": "Atlas Copco (India) Ltd.",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Atlas Copco (India) Ltd.",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "atlascopcoindustrialtechnique",
+      "name": "Atlas Copco Industrial Technique Ab",
+      "spellings": [
+        {
+          "spelling": "Atlas Copco Industrial Technique Ab",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Atlas Copco Industrial Technique Ab",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "atlascopcoitaliasrl",
+      "name": "Atlas Copco Italia S.R.L.",
+      "spellings": [
+        {
+          "spelling": "Atlas Copco Italia S.R.L.",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Atlas Copco Italia S.R.L.",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "atlascopcousa",
+      "name": "Atlas Copco Usa",
+      "spellings": [
+        {
+          "spelling": "Atlas Copco Usa",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Atlas Copco Usa",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "baldwinfilters",
+      "name": "Baldwin Filters",
+      "spellings": [
+        {
+          "spelling": "Baldwin Filters",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Baldwin Filters",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "bellgossettxylem",
+      "name": "Bell & Gossett (Xylem)",
+      "spellings": [
+        {
+          "spelling": "Bell & Gossett (Xylem)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Bell & Gossett (Xylem)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "bentlynevadabakerhughes",
+      "name": "Bently Nevada (Baker Hughes)",
+      "spellings": [
+        {
+          "spelling": "Bently Nevada (Baker Hughes)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Bently Nevada (Baker Hughes)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "bentlynevadaoesolarповибрации",
+      "name": "Bently Nevada (OE Solar по вибрации)",
+      "spellings": [
+        {
+          "spelling": "Bently Nevada (OE Solar по вибрации)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Bently Nevada (OE Solar по вибрации)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "bentlynevadawilcoxonтип",
+      "name": "Bently Nevada / Wilcoxon (тип.)",
+      "spellings": [
+        {
+          "spelling": "Bently Nevada / Wilcoxon (тип.)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Bently Nevada / Wilcoxon (тип.)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "bentlynevadaпопрофилю",
+      "name": "Bently Nevada (по профилю)",
+      "spellings": [
+        {
+          "spelling": "Bently Nevada (по профилю)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Bently Nevada (по профилю)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "bosch",
+      "name": "Bosch",
+      "spellings": [
+        {
+          "spelling": "Bosch",
+          "where": "zip/data/positions.json:[].oem"
+        },
+        {
+          "spelling": "Bosch",
+          "where": "pnw/data/item_master.json:items[].brand"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "braun",
+      "name": "Braun",
+      "spellings": [
+        {
+          "spelling": "Braun",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Braun",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "cameronslb",
+      "name": "Cameron (SLB)",
+      "spellings": [
+        {
+          "spelling": "Cameron (SLB)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Cameron (SLB)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "camfil",
+      "name": "Camfil",
+      "spellings": [
+        {
+          "spelling": "Camfil",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Camfil",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "camfilfarr",
+      "name": "Camfil Farr",
+      "spellings": [
+        {
+          "spelling": "Camfil Farr",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Camfil Farr",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "cashco",
+      "name": "Cashco",
+      "spellings": [
+        {
+          "spelling": "Cashco",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Cashco",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "caterpillarсоединенныештатыамерики",
+      "name": "Caterpillar, СОЕДИНЕННЫЕ ШТАТЫ АМЕРИКИ",
+      "spellings": [
+        {
+          "spelling": "Caterpillar, СОЕДИНЕННЫЕ ШТАТЫ АМЕРИКИ",
+          "where": "zip/data/positions.json:[].oem"
+        },
+        {
+          "spelling": "Caterpillar, СОЕДИНЕННЫЕ ШТАТЫ АМЕРИКИ",
+          "where": "pnw/data/item_master.json:items[].brand"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "ccscustomcontrolsensors",
+      "name": "CCS (Custom Control Sensors)",
+      "spellings": [
+        {
+          "spelling": "CCS (Custom Control Sensors)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "CCS (Custom Control Sensors)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "ccsdwyeroesolarпореледавления",
+      "name": "CCS / Dwyer (OE Solar по реле давления)",
+      "spellings": [
+        {
+          "spelling": "CCS / Dwyer (OE Solar по реле давления)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "CCS / Dwyer (OE Solar по реле давления)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "ccssorashcroftподиапазонуизтз",
+      "name": "CCS/SOR/Ashcroft (по диапазону из ТЗ)",
+      "spellings": [
+        {
+          "spelling": "CCS/SOR/Ashcroft (по диапазону из ТЗ)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "CCS/SOR/Ashcroft (по диапазону из ТЗ)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "championaerospace",
+      "name": "Champion Aerospace",
+      "spellings": [
+        {
+          "spelling": "Champion Aerospace",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Champion Aerospace",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "championaerospaceunisonтип",
+      "name": "Champion Aerospace / Unison (тип.)",
+      "spellings": [
+        {
+          "spelling": "Champion Aerospace / Unison (тип.)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Champion Aerospace / Unison (тип.)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "championaerospaceтип",
+      "name": "Champion Aerospace (тип.)",
+      "spellings": [
+        {
+          "spelling": "Champion Aerospace (тип.)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Champion Aerospace (тип.)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "championunisonexciterпопрофилю",
+      "name": "Champion/Unison exciter (по профилю)",
+      "spellings": [
+        {
+          "spelling": "Champion/Unison exciter (по профилю)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Champion/Unison exciter (по профилю)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "championunisonigniterпопрофилю",
+      "name": "Champion/Unison igniter (по профилю)",
+      "spellings": [
+        {
+          "spelling": "Champion/Unison igniter (по профилю)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Champion/Unison igniter (по профилю)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "circleseal",
+      "name": "Circle Seal",
+      "spellings": [
+        {
+          "spelling": "Circle Seal",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Circle Seal",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "cliffordandsnell",
+      "name": "Clifford and Snell",
+      "spellings": [
+        {
+          "spelling": "Clifford and Snell",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Clifford and Snell",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "comairrotron",
+      "name": "Comair Rotron",
+      "spellings": [
+        {
+          "spelling": "Comair Rotron",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Comair Rotron",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "commercialintertech",
+      "name": "Commercial Intertech",
+      "spellings": [
+        {
+          "spelling": "Commercial Intertech",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Commercial Intertech",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "craneveyor",
+      "name": "CraneVeyor",
+      "spellings": [
+        {
+          "spelling": "CraneVeyor",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "CraneVeyor",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "cryostaroemилисервисcryostarремонтпообра",
+      "name": "Cryostar (OEM) или сервис Cryostar/ремонт по образцу",
+      "spellings": [
+        {
+          "spelling": "Cryostar (OEM) или сервис Cryostar/ремонт по образцу",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Cryostar (OEM) или сервис Cryostar/ремонт по образцу",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "cryostarsas",
+      "name": "Cryostar S.A.S",
+      "spellings": [
+        {
+          "spelling": "Cryostar S.A.S",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Cryostar S.A.S",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "cumminsгазовыедвигателиqsk",
+      "name": "Cummins (газовые двигатели QSK)",
+      "spellings": [
+        {
+          "spelling": "Cummins (газовые двигатели QSK)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Cummins (газовые двигатели QSK)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "dana",
+      "name": "Dana",
+      "spellings": [
+        {
+          "spelling": "Dana",
+          "where": "zip/data/positions.json:[].oem"
+        },
+        {
+          "spelling": "Dana",
+          "where": "pnw/data/item_master.json:items[].brand"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "detectorelectronicsdettronics",
+      "name": "Detector Electronics (Det-Tronics)",
+      "spellings": [
+        {
+          "spelling": "Detector Electronics (Det-Tronics)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Detector Electronics (Det-Tronics)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "dettronicsdetectorelectronics",
+      "name": "Det-Tronics (Detector Electronics)",
+      "spellings": [
+        {
+          "spelling": "Det-Tronics (Detector Electronics)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Det-Tronics (Detector Electronics)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "dettronicsoesolarпогазопожарке",
+      "name": "Det-Tronics (OE Solar по газо-пожарке)",
+      "spellings": [
+        {
+          "spelling": "Det-Tronics (OE Solar по газо-пожарке)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Det-Tronics (OE Solar по газо-пожарке)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "dettronicsпопрофилюfg",
+      "name": "Det-Tronics (по профилю F&G)",
+      "spellings": [
+        {
+          "spelling": "Det-Tronics (по профилю F&G)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Det-Tronics (по профилю F&G)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "dimersro",
+      "name": "Dimer S.R.O.",
+      "spellings": [
+        {
+          "spelling": "Dimer S.R.O.",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Dimer S.R.O.",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "donaldsonfiltrationdeutschland",
+      "name": "Donaldson Filtration Deutschland Gmbh",
+      "spellings": [
+        {
+          "spelling": "Donaldson Filtration Deutschland Gmbh",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Donaldson Filtration Deutschland Gmbh",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "donaldsonfrance",
+      "name": "Donaldson France Sas",
+      "spellings": [
+        {
+          "spelling": "Donaldson France Sas",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Donaldson France Sas",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "donaldsonmiddleeastfiltrationsystemsllc",
+      "name": "Donaldson Middle East Filtration Systems L.L.C",
+      "spellings": [
+        {
+          "spelling": "Donaldson Middle East Filtration Systems L.L.C",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Donaldson Middle East Filtration Systems L.L.C",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "dongfengcumminsengine",
+      "name": "Dongfeng Cummins Engine Company",
+      "spellings": [
+        {
+          "spelling": "Dongfeng Cummins Engine Company",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Dongfeng Cummins Engine Company",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "dowmolykote",
+      "name": "Dow (Molykote)",
+      "spellings": [
+        {
+          "spelling": "Dow (Molykote)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Dow (Molykote)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "drillmec",
+      "name": "Drillmec",
+      "spellings": [
+        {
+          "spelling": "Drillmec",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Drillmec",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "druckbakerhughes",
+      "name": "Druck (Baker Hughes)",
+      "spellings": [
+        {
+          "spelling": "Druck (Baker Hughes)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Druck (Baker Hughes)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "dwyerinstruments",
+      "name": "Dwyer Instruments",
+      "spellings": [
+        {
+          "spelling": "Dwyer Instruments",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Dwyer Instruments",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "dynalco",
+      "name": "DYNALCO",
+      "spellings": [
+        {
+          "spelling": "DYNALCO",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "DYNALCO",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "elomatic",
+      "name": "El-O-Matic",
+      "spellings": [
+        {
+          "spelling": "El-O-Matic",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "El-O-Matic",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "emersonprocessrosemount",
+      "name": "EMERSON PROCESS Rosemount",
+      "spellings": [
+        {
+          "spelling": "EMERSON PROCESS Rosemount",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "EMERSON PROCESS Rosemount",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "emersonrosemount",
+      "name": "Emerson Rosemount",
+      "spellings": [
+        {
+          "spelling": "Emerson Rosemount",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Emerson Rosemount",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "emersonrosemountoesolarпотрансмиттерам",
+      "name": "Emerson Rosemount (OE Solar по трансмиттерам)",
+      "spellings": [
+        {
+          "spelling": "Emerson Rosemount (OE Solar по трансмиттерам)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Emerson Rosemount (OE Solar по трансмиттерам)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "enersyssaftтип",
+      "name": "EnerSys/Saft (тип.)",
+      "spellings": [
+        {
+          "spelling": "EnerSys/Saft (тип.)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "EnerSys/Saft (тип.)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "epirocnormet",
+      "name": "Epiroc, Normet",
+      "spellings": [
+        {
+          "spelling": "Epiroc, Normet",
+          "where": "zip/data/positions.json:[].oem"
+        },
+        {
+          "spelling": "Epiroc, Normet",
+          "where": "pnw/data/item_master.json:items[].brand"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "epirocnormetdeutz",
+      "name": "Epiroc/Normet/Deutz",
+      "spellings": [
+        {
+          "spelling": "Epiroc/Normet/Deutz",
+          "where": "zip/data/positions.json:[].oem"
+        },
+        {
+          "spelling": "Epiroc/Normet/Deutz",
+          "where": "pnw/data/item_master.json:items[].brand"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "epirocnormethencon",
+      "name": "Epiroc, Normet, Hencon",
+      "spellings": [
+        {
+          "spelling": "Epiroc, Normet, Hencon",
+          "where": "zip/data/positions.json:[].oem"
+        },
+        {
+          "spelling": "Epiroc, Normet, Hencon",
+          "where": "pnw/data/item_master.json:items[].brand"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "epirocnormetpaus",
+      "name": "Epiroc, Normet, Paus",
+      "spellings": [
+        {
+          "spelling": "Epiroc, Normet, Paus",
+          "where": "zip/data/positions.json:[].oem"
+        },
+        {
+          "spelling": "Epiroc, Normet, Paus",
+          "where": "pnw/data/item_master.json:items[].brand"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "epirocpaus",
+      "name": "Epiroc, PAUS",
+      "spellings": [
+        {
+          "spelling": "Epiroc, PAUS",
+          "where": "zip/data/positions.json:[].oem"
+        },
+        {
+          "spelling": "Epiroc, PAUS",
+          "where": "pnw/data/item_master.json:items[].brand"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "exide",
+      "name": "Exide",
+      "spellings": [
+        {
+          "spelling": "Exide",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Exide",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "faudi",
+      "name": "Faudi",
+      "spellings": [
+        {
+          "spelling": "Faudi",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Faudi",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "federalsignal",
+      "name": "Federal Signal",
+      "spellings": [
+        {
+          "spelling": "Federal Signal",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Federal Signal",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "fishercontrol",
+      "name": "FISHER CONTROL",
+      "spellings": [
+        {
+          "spelling": "FISHER CONTROL",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "FISHER CONTROL",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "fleetguardcummins",
+      "name": "Fleetguard (Cummins)",
+      "spellings": [
+        {
+          "spelling": "Fleetguard (Cummins)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Fleetguard (Cummins)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "flendergraffenstaden",
+      "name": "FLENDER GRAFFENSTADEN",
+      "spellings": [
+        {
+          "spelling": "FLENDER GRAFFENSTADEN",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "FLENDER GRAFFENSTADEN",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "formspragaerofit",
+      "name": "Formsprag (Aerofit)",
+      "spellings": [
+        {
+          "spelling": "Formsprag (Aerofit)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Formsprag (Aerofit)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "foxboroschneider",
+      "name": "Foxboro (Schneider)",
+      "spellings": [
+        {
+          "spelling": "Foxboro (Schneider)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Foxboro (Schneider)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "ge",
+      "name": "GE",
+      "spellings": [
+        {
+          "spelling": "GE",
+          "where": "gt/data/pn_db.json:rows[].oem"
+        },
+        {
+          "spelling": "GE",
+          "where": "pnw/data/item_master.json:items[].brand"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "generalelectric",
+      "name": "General Electric Company",
+      "spellings": [
+        {
+          "spelling": "General Electric Company",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "General Electric Company",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "generalelectricity",
+      "name": "General Electricity Company S.P.A.",
+      "spellings": [
+        {
+          "spelling": "General Electricity Company S.P.A.",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "General Electricity Company S.P.A.",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "gilkesclydeunion",
+      "name": "Gilkes (ClydeUnion)",
+      "spellings": [
+        {
+          "spelling": "Gilkes (ClydeUnion)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Gilkes (ClydeUnion)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "goswitch",
+      "name": "GO SWITCH",
+      "spellings": [
+        {
+          "spelling": "GO SWITCH",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "GO SWITCH",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "gravertechnologies",
+      "name": "Graver Technologies",
+      "spellings": [
+        {
+          "spelling": "Graver Technologies",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Graver Technologies",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "grundfoscroatiadoo",
+      "name": "Grundfos Croatia D.O.O.",
+      "spellings": [
+        {
+          "spelling": "Grundfos Croatia D.O.O.",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Grundfos Croatia D.O.O.",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "grundfospompyspzoo",
+      "name": "Grundfos Pompy Sp. Z.O.O.",
+      "spellings": [
+        {
+          "spelling": "Grundfos Pompy Sp. Z.O.O.",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Grundfos Pompy Sp. Z.O.O.",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "grundfospumpenfabrik",
+      "name": "Grundfos Pumpenfabrik Gmbh",
+      "spellings": [
+        {
+          "spelling": "Grundfos Pumpenfabrik Gmbh",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Grundfos Pumpenfabrik Gmbh",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "grundfospumpsshanghai",
+      "name": "Grundfos Pumps (Shanghai) Co. Ltd",
+      "spellings": [
+        {
+          "spelling": "Grundfos Pumps (Shanghai) Co. Ltd",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Grundfos Pumps (Shanghai) Co. Ltd",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "grundfossrbljadoomanufacturing",
+      "name": "Grundfos Srblja D.O.O. (Manufacturing)",
+      "spellings": [
+        {
+          "spelling": "Grundfos Srblja D.O.O. (Manufacturing)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Grundfos Srblja D.O.O. (Manufacturing)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "henkeldowрасходка",
+      "name": "Henkel / Dow (расходка)",
+      "spellings": [
+        {
+          "spelling": "Henkel / Dow (расходка)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Henkel / Dow (расходка)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "henkelloctite",
+      "name": "Henkel Loctite",
+      "spellings": [
+        {
+          "spelling": "Henkel Loctite",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Henkel Loctite",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "hermeticswitch",
+      "name": "Hermetic Switch",
+      "spellings": [
+        {
+          "spelling": "Hermetic Switch",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Hermetic Switch",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "hydac",
+      "name": "Hydac",
+      "spellings": [
+        {
+          "spelling": "Hydac",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Hydac",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "hydradynehydraulics",
+      "name": "HYDRADYNE HYDRAULICS",
+      "spellings": [
+        {
+          "spelling": "HYDRADYNE HYDRAULICS",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "HYDRADYNE HYDRAULICS",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "iminorgren",
+      "name": "Imi Norgren Limited",
+      "spellings": [
+        {
+          "spelling": "Imi Norgren Limited",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Imi Norgren Limited",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "imoindustries",
+      "name": "IMO INDUSTRIES INC",
+      "spellings": [
+        {
+          "spelling": "IMO INDUSTRIES INC",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "IMO INDUSTRIES INC",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "itt",
+      "name": "ITT",
+      "spellings": [
+        {
+          "spelling": "ITT",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "ITT",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "ittindustries",
+      "name": "ITT Industries",
+      "spellings": [
+        {
+          "spelling": "ITT Industries",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "ITT Industries",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "jetlube",
+      "name": "JET LUBE",
+      "spellings": [
+        {
+          "spelling": "JET LUBE",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "JET LUBE",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "jumo",
+      "name": "Jumo",
+      "spellings": [
+        {
+          "spelling": "Jumo",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Jumo",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "kessler",
+      "name": "Kessler",
+      "spellings": [
+        {
+          "spelling": "Kessler",
+          "where": "zip/data/positions.json:[].oem"
+        },
+        {
+          "spelling": "Kessler",
+          "where": "pnw/data/item_master.json:items[].brand"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "kesslerellis",
+      "name": "KESSLER - ELLIS",
+      "spellings": [
+        {
+          "spelling": "KESSLER - ELLIS",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "KESSLER - ELLIS",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "kiddefenwal",
+      "name": "Kidde-Fenwal",
+      "spellings": [
+        {
+          "spelling": "Kidde-Fenwal",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Kidde-Fenwal",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "kimray",
+      "name": "Kimray",
+      "spellings": [
+        {
+          "spelling": "Kimray",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Kimray",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "kinetrol",
+      "name": "Kinetrol",
+      "spellings": [
+        {
+          "spelling": "Kinetrol",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Kinetrol",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "kochengineering",
+      "name": "Koch Engineering",
+      "spellings": [
+        {
+          "spelling": "Koch Engineering",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Koch Engineering",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "krauf",
+      "name": "Krauf",
+      "spellings": [
+        {
+          "spelling": "Krauf",
+          "where": "zip/data/positions.json:[].oem"
+        },
+        {
+          "spelling": "Krauf",
+          "where": "pnw/data/item_master.json:items[].brand"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "lamarche",
+      "name": "LaMarche",
+      "spellings": [
+        {
+          "spelling": "LaMarche",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "LaMarche",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "littelfusebussmanneatonпоамперажу",
+      "name": "Littelfuse/Bussmann (Eaton) — по амперажу",
+      "spellings": [
+        {
+          "spelling": "Littelfuse/Bussmann (Eaton) — по амперажу",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Littelfuse/Bussmann (Eaton) — по амперажу",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "lovejoytimken",
+      "name": "Lovejoy (Timken)",
+      "spellings": [
+        {
+          "spelling": "Lovejoy (Timken)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Lovejoy (Timken)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "magnetek",
+      "name": "Magnetek",
+      "spellings": [
+        {
+          "spelling": "Magnetek",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Magnetek",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "marflex",
+      "name": "MarFlex",
+      "spellings": [
+        {
+          "spelling": "MarFlex",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "MarFlex",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "mcmastercarr",
+      "name": "McMaster-Carr",
+      "spellings": [
+        {
+          "spelling": "McMaster-Carr",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "McMaster-Carr",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "mcmastercarrпотаможне",
+      "name": "McMaster-Carr (по таможне)",
+      "spellings": [
+        {
+          "spelling": "McMaster-Carr (по таможне)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "McMaster-Carr (по таможне)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "meanwellphoenixcontact24vdcпомощности",
+      "name": "Mean Well/Phoenix Contact — 24 VDC по мощности",
+      "spellings": [
+        {
+          "spelling": "Mean Well/Phoenix Contact — 24 VDC по мощности",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Mean Well/Phoenix Contact — 24 VDC по мощности",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "medceaton",
+      "name": "MEDC (Eaton)",
+      "spellings": [
+        {
+          "spelling": "MEDC (Eaton)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "MEDC (Eaton)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "meggittmeggittcontrols",
+      "name": "Meggitt (Meggitt Controls)",
+      "spellings": [
+        {
+          "spelling": "Meggitt (Meggitt Controls)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Meggitt (Meggitt Controls)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "metrix",
+      "name": "Metrix",
+      "spellings": [
+        {
+          "spelling": "Metrix",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Metrix",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "metsoautomation",
+      "name": "Metso Automation",
+      "spellings": [
+        {
+          "spelling": "Metso Automation",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Metso Automation",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "midwestinstrument",
+      "name": "Mid-West Instrument",
+      "spellings": [
+        {
+          "spelling": "Mid-West Instrument",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Mid-West Instrument",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "minimax",
+      "name": "Minimax",
+      "spellings": [
+        {
+          "spelling": "Minimax",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Minimax",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "moog",
+      "name": "Moog",
+      "spellings": [
+        {
+          "spelling": "Moog",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Moog",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "moogпопрофилюсервоклапановge",
+      "name": "Moog (по профилю сервоклапанов GE)",
+      "spellings": [
+        {
+          "spelling": "Moog (по профилю сервоклапанов GE)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Moog (по профилю сервоклапанов GE)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "mtecorporation",
+      "name": "MTE Corporation",
+      "spellings": [
+        {
+          "spelling": "MTE Corporation",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "MTE Corporation",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "muellersteam",
+      "name": "Mueller Steam",
+      "spellings": [
+        {
+          "spelling": "Mueller Steam",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Mueller Steam",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "munters",
+      "name": "Munters",
+      "spellings": [
+        {
+          "spelling": "Munters",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Munters",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "mwmcaterpillarenergy",
+      "name": "MWM (Caterpillar Energy)",
+      "spellings": [
+        {
+          "spelling": "MWM (Caterpillar Energy)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "MWM (Caterpillar Energy)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "naksealingtechnologies",
+      "name": "NAK Sealing Technologies",
+      "spellings": [
+        {
+          "spelling": "NAK Sealing Technologies",
+          "where": "zip/data/positions.json:[].oem"
+        },
+        {
+          "spelling": "NAK Sealing Technologies",
+          "where": "pnw/data/item_master.json:items[].brand"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "nationaloilwellvarconov",
+      "name": "National Oilwell Varco (NOV)",
+      "spellings": [
+        {
+          "spelling": "National Oilwell Varco (NOV)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "National Oilwell Varco (NOV)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "nibco",
+      "name": "Nibco",
+      "spellings": [
+        {
+          "spelling": "Nibco",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Nibco",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "norgren",
+      "name": "Norgren",
+      "spellings": [
+        {
+          "spelling": "Norgren",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Norgren",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "ohmite",
+      "name": "Ohmite",
+      "spellings": [
+        {
+          "spelling": "Ohmite",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Ohmite",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "oleobi",
+      "name": "Oleobi",
+      "spellings": [
+        {
+          "spelling": "Oleobi",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Oleobi",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "palldanaher",
+      "name": "Pall (Danaher)",
+      "spellings": [
+        {
+          "spelling": "Pall (Danaher)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Pall (Danaher)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "pallindustrialhydraulics",
+      "name": "Pall Industrial Hydraulics",
+      "spellings": [
+        {
+          "spelling": "Pall Industrial Hydraulics",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Pall Industrial Hydraulics",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "panduitpansteelhightemp",
+      "name": "Panduit (Pan-Steel) — high temp",
+      "spellings": [
+        {
+          "spelling": "Panduit (Pan-Steel) — high temp",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Panduit (Pan-Steel) — high temp",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "parker",
+      "name": "Parker",
+      "spellings": [
+        {
+          "spelling": "Parker",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Parker",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "parkerhannifinmanufacturingfrancesas",
+      "name": "Parker Hannifin Manufacturing France S.A.S.",
+      "spellings": [
+        {
+          "spelling": "Parker Hannifin Manufacturing France S.A.S.",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Parker Hannifin Manufacturing France S.A.S.",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "parkerhannifinтип",
+      "name": "Parker Hannifin (тип.)",
+      "spellings": [
+        {
+          "spelling": "Parker Hannifin (тип.)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Parker Hannifin (тип.)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "parkerhcse",
+      "name": "Parker Hcse",
+      "spellings": [
+        {
+          "spelling": "Parker Hcse",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Parker Hcse",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "parkerhydraulics",
+      "name": "Parker Hydraulics",
+      "spellings": [
+        {
+          "spelling": "Parker Hydraulics",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Parker Hydraulics",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "pccvalvesandcontrols",
+      "name": "PCC Valves and Controls",
+      "spellings": [
+        {
+          "spelling": "PCC Valves and Controls",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "PCC Valves and Controls",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "pepperlfuchs",
+      "name": "Pepperl+Fuchs",
+      "spellings": [
+        {
+          "spelling": "Pepperl+Fuchs",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Pepperl+Fuchs",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "pepperlfuchsrsd",
+      "name": "Pepperl+Fuchs / RSD",
+      "spellings": [
+        {
+          "spelling": "Pepperl+Fuchs / RSD",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Pepperl+Fuchs / RSD",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "phoenixcontact",
+      "name": "PHOENIX CONTACT",
+      "spellings": [
+        {
+          "spelling": "PHOENIX CONTACT",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "PHOENIX CONTACT",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "pizzato",
+      "name": "Pizzato",
+      "spellings": [
+        {
+          "spelling": "Pizzato",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Pizzato",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "pompesgrundfosdistributionsas",
+      "name": "Pompes Grundfos Distribution S.A.S.",
+      "spellings": [
+        {
+          "spelling": "Pompes Grundfos Distribution S.A.S.",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Pompes Grundfos Distribution S.A.S.",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "pompesgrundfossa",
+      "name": "Pompes Grundfos S.A.",
+      "spellings": [
+        {
+          "spelling": "Pompes Grundfos S.A.",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Pompes Grundfos S.A.",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "prodematrejddoo",
+      "name": "Prodema Trejd Doo",
+      "spellings": [
+        {
+          "spelling": "Prodema Trejd Doo",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Prodema Trejd Doo",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "renata",
+      "name": "Renata",
+      "spellings": [
+        {
+          "spelling": "Renata",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Renata",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "rochem",
+      "name": "Rochem",
+      "spellings": [
+        {
+          "spelling": "Rochem",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Rochem",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "rockwellautomationallenbradley",
+      "name": "Rockwell Automation (Allen-Bradley)",
+      "spellings": [
+        {
+          "spelling": "Rockwell Automation (Allen-Bradley)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Rockwell Automation (Allen-Bradley)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "rocol",
+      "name": "Rocol",
+      "spellings": [
+        {
+          "spelling": "Rocol",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Rocol",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "rollsroyce",
+      "name": "Rolls-Royce",
+      "spellings": [
+        {
+          "spelling": "Rolls-Royce",
+          "where": "gt/data/pn_db.json:rows[].oem"
+        },
+        {
+          "spelling": "Rolls-Royce",
+          "where": "pnw/data/item_master.json:items[].brand"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "rosemountengineering",
+      "name": "Rosemount Engineering Inc.",
+      "spellings": [
+        {
+          "spelling": "Rosemount Engineering Inc.",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Rosemount Engineering Inc.",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "rosemounttankradar",
+      "name": "Rosemount Tank Radar Ab",
+      "spellings": [
+        {
+          "spelling": "Rosemount Tank Radar Ab",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Rosemount Tank Radar Ab",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "rsd",
+      "name": "RSD",
+      "spellings": [
+        {
+          "spelling": "RSD",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "RSD",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "saft",
+      "name": "Saft",
+      "spellings": [
+        {
+          "spelling": "Saft",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Saft",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "saia",
+      "name": "SAIA",
+      "spellings": [
+        {
+          "spelling": "SAIA",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "SAIA",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "sandviktamrock",
+      "name": "Sandvik Tamrock",
+      "spellings": [
+        {
+          "spelling": "Sandvik Tamrock",
+          "where": "zip/data/positions.json:[].oem"
+        },
+        {
+          "spelling": "Sandvik Tamrock",
+          "where": "pnw/data/item_master.json:items[].brand"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "schroederindustries",
+      "name": "Schroeder Industries",
+      "spellings": [
+        {
+          "spelling": "Schroeder Industries",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Schroeder Industries",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "selco",
+      "name": "Selco",
+      "spellings": [
+        {
+          "spelling": "Selco",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Selco",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "shanghaifleetguardfilter",
+      "name": "Shanghai Fleetguard Filter Co., Ltd.",
+      "spellings": [
+        {
+          "spelling": "Shanghai Fleetguard Filter Co., Ltd.",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Shanghai Fleetguard Filter Co., Ltd.",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "shanghaigdoominingtechnology",
+      "name": "Shanghai Gdoo Mining Technology Limited",
+      "spellings": [
+        {
+          "spelling": "Shanghai Gdoo Mining Technology Limited",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Shanghai Gdoo Mining Technology Limited",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "siemensdemagdelavalturbomachinery",
+      "name": "Siemens Demag Delaval Turbomachinery, Inc",
+      "spellings": [
+        {
+          "spelling": "Siemens Demag Delaval Turbomachinery, Inc",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Siemens Demag Delaval Turbomachinery, Inc",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "siemensdigitalindustriessimatic",
+      "name": "Siemens Digital Industries (SIMATIC)",
+      "spellings": [
+        {
+          "spelling": "Siemens Digital Industries (SIMATIC)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Siemens Digital Industries (SIMATIC)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "siemensenergyindustrialturbomachinery",
+      "name": "Siemens Energy Industrial Turbomachinery Limited",
+      "spellings": [
+        {
+          "spelling": "Siemens Energy Industrial Turbomachinery Limited",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Siemens Energy Industrial Turbomachinery Limited",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "siemenssro",
+      "name": "Siemens S.R.O.",
+      "spellings": [
+        {
+          "spelling": "Siemens S.R.O.",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Siemens S.R.O.",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "skffrancesa",
+      "name": "Skf France S.A",
+      "spellings": [
+        {
+          "spelling": "Skf France S.A",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Skf France S.A",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "skflubricationsystemsgermany",
+      "name": "Skf Lubrication Systems Germany Gmbh",
+      "spellings": [
+        {
+          "spelling": "Skf Lubrication Systems Germany Gmbh",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Skf Lubrication Systems Germany Gmbh",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "skfsealingsolutionsaustria",
+      "name": "Skf Sealing Solutions Austria Gmbh",
+      "spellings": [
+        {
+          "spelling": "Skf Sealing Solutions Austria Gmbh",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Skf Sealing Solutions Austria Gmbh",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "skfsolutionfactorygoteborg",
+      "name": "Skf Solution Factory Goteborg",
+      "spellings": [
+        {
+          "spelling": "Skf Solution Factory Goteborg",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Skf Solution Factory Goteborg",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "slb",
+      "name": "SLB",
+      "spellings": [
+        {
+          "spelling": "SLB",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "SLB",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "solahd",
+      "name": "Sola HD",
+      "spellings": [
+        {
+          "spelling": "Sola HD",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Sola HD",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "solarshopsolarturbinescom",
+      "name": "Solar (shop.solarturbines.com)",
+      "spellings": [
+        {
+          "spelling": "Solar (shop.solarturbines.com)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Solar (shop.solarturbines.com)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "solarshopпроизводительзарядных",
+      "name": "Solar (shop) / производитель зарядных",
+      "spellings": [
+        {
+          "spelling": "Solar (shop) / производитель зарядных",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Solar (shop) / производитель зарядных",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "solartoolingаналогriverhawk",
+      "name": "Solar tooling; аналог: Riverhawk",
+      "spellings": [
+        {
+          "spelling": "Solar tooling; аналог: Riverhawk",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Solar tooling; аналог: Riverhawk",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "solarturbines",
+      "name": "Solar Turbines",
+      "spellings": [
+        {
+          "spelling": "Solar Turbines",
+          "where": "gt/data/pn_db.json:rows[].oem"
+        },
+        {
+          "spelling": "Solar Turbines",
+          "where": "pnw/data/item_master.json:items[].brand"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "solarдизайнафтермаркетfluitek",
+      "name": "Solar (дизайн); афтермаркет: Fluitek",
+      "spellings": [
+        {
+          "spelling": "Solar (дизайн); афтермаркет: Fluitek",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Solar (дизайн); афтермаркет: Fluitek",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "solarпрокладкафорсунки",
+      "name": "Solar (прокладка форсунки)",
+      "spellings": [
+        {
+          "spelling": "Solar (прокладка форсунки)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Solar (прокладка форсунки)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "soldo",
+      "name": "Soldo",
+      "spellings": [
+        {
+          "spelling": "Soldo",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Soldo",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "sor",
+      "name": "SOR Inc.",
+      "spellings": [
+        {
+          "spelling": "SOR Inc.",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "SOR Inc.",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "swagelok",
+      "name": "Swagelok",
+      "spellings": [
+        {
+          "spelling": "Swagelok",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Swagelok",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "tcthermoelectricтип",
+      "name": "TC Ltd / Thermo Electric (тип.)",
+      "spellings": [
+        {
+          "spelling": "TC Ltd / Thermo Electric (тип.)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "TC Ltd / Thermo Electric (тип.)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "tditechdevelopment",
+      "name": "TDI (Tech Development)",
+      "spellings": [
+        {
+          "spelling": "TDI (Tech Development)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "TDI (Tech Development)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "techiflon",
+      "name": "Techiflon Sas",
+      "spellings": [
+        {
+          "spelling": "Techiflon Sas",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Techiflon Sas",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "tecniflonsas",
+      "name": "Tecniflon S.A.S.",
+      "spellings": [
+        {
+          "spelling": "Tecniflon S.A.S.",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Tecniflon S.A.S.",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "tescocorporation",
+      "name": "Tesco Corporation",
+      "spellings": [
+        {
+          "spelling": "Tesco Corporation",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Tesco Corporation",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "tesi",
+      "name": "Tesi S.P.A",
+      "spellings": [
+        {
+          "spelling": "Tesi S.P.A",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Tesi S.P.A",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "thetatechinternational",
+      "name": "Theta Tech International Ltd",
+      "spellings": [
+        {
+          "spelling": "Theta Tech International Ltd",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Theta Tech International Ltd",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "transcykal",
+      "name": "Transcykal",
+      "spellings": [
+        {
+          "spelling": "Transcykal",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Transcykal",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "universalsilencer",
+      "name": "Universal Silencer",
+      "spellings": [
+        {
+          "spelling": "Universal Silencer",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Universal Silencer",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "uvflamesensorпопрофилюhoneywellfireye",
+      "name": "UV flame sensor (по профилю Honeywell/Fireye)",
+      "spellings": [
+        {
+          "spelling": "UV flame sensor (по профилю Honeywell/Fireye)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "UV flame sensor (по профилю Honeywell/Fireye)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "versaprod",
+      "name": "VERSA PROD",
+      "spellings": [
+        {
+          "spelling": "VERSA PROD",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "VERSA PROD",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "versaproductsoesolarпосоленоидамсерияvvs",
+      "name": "Versa Products (OE Solar по соленоидам) — серия V/VSG",
+      "spellings": [
+        {
+          "spelling": "Versa Products (OE Solar по соленоидам) — серия V/VSG",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Versa Products (OE Solar по соленоидам) — серия V/VSG",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "vibrometermeggitt",
+      "name": "Vibro-Meter (Meggitt)",
+      "spellings": [
+        {
+          "spelling": "Vibro-Meter (Meggitt)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Vibro-Meter (Meggitt)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "vikingpump",
+      "name": "Viking Pump",
+      "spellings": [
+        {
+          "spelling": "Viking Pump",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Viking Pump",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "volvo",
+      "name": "Volvo",
+      "spellings": [
+        {
+          "spelling": "Volvo",
+          "where": "zip/data/positions.json:[].oem"
+        },
+        {
+          "spelling": "Volvo",
+          "where": "pnw/data/item_master.json:items[].brand"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "wago",
+      "name": "Wago",
+      "spellings": [
+        {
+          "spelling": "Wago",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Wago",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "waukeshainnio",
+      "name": "Waukesha (INNIO)",
+      "spellings": [
+        {
+          "spelling": "Waukesha (INNIO)",
+          "where": "gpu/data/models.json:adjacent[].name"
+        },
+        {
+          "spelling": "Waukesha (INNIO)",
+          "where": "gpu/data/machines.json:machines[].oem"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "webster",
+      "name": "Webster",
+      "spellings": [
+        {
+          "spelling": "Webster",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Webster",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "weidmuller",
+      "name": "Weidmuller",
+      "spellings": [
+        {
+          "spelling": "Weidmuller",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Weidmuller",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "welkerengineering",
+      "name": "Welker Engineering",
+      "spellings": [
+        {
+          "spelling": "Welker Engineering",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Welker Engineering",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "welkernorgrenoesolarпорегуляторам",
+      "name": "Welker/Norgren (OE Solar по регуляторам)",
+      "spellings": [
+        {
+          "spelling": "Welker/Norgren (OE Solar по регуляторам)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Welker/Norgren (OE Solar по регуляторам)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "weschler",
+      "name": "Weschler",
+      "spellings": [
+        {
+          "spelling": "Weschler",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Weschler",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "westwoodauburnbeckett",
+      "name": "Westwood Auburn (Beckett)",
+      "spellings": [
+        {
+          "spelling": "Westwood Auburn (Beckett)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Westwood Auburn (Beckett)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "whiteyworcestercontrols",
+      "name": "Whitey / Worcester Controls",
+      "spellings": [
+        {
+          "spelling": "Whitey / Worcester Controls",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Whitey / Worcester Controls",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "wlgoregoretex",
+      "name": "W. L. Gore (Gore-Tex)",
+      "spellings": [
+        {
+          "spelling": "W. L. Gore (Gore-Tex)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "W. L. Gore (Gore-Tex)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "yokogawaoeпоофицдокументуsolar3r111voliv",
+      "name": "Yokogawa (OE по офиц. документу Solar 3R111/Vol.IV)",
+      "spellings": [
+        {
+          "spelling": "Yokogawa (OE по офиц. документу Solar 3R111/Vol.IV)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Yokogawa (OE по офиц. документу Solar 3R111/Vol.IV)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "youngtouchstonekelvion",
+      "name": "Young Touchstone (Kelvion)",
+      "spellings": [
+        {
+          "spelling": "Young Touchstone (Kelvion)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Young Touchstone (Kelvion)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "изготавливаетсявкитаеjykj131",
+      "name": "Изготавливается в Китае (jykj131)",
+      "spellings": [
+        {
+          "spelling": "Изготавливается в Китае (jykj131)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Изготавливается в Китае (jykj131)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "крепежныйзаводпоспецификацииdinisoэквива",
+      "name": "Крепёжный завод по спецификации (DIN/ISO-эквивалент, никель) (частичная спецификация — дособрать по образцу/ТЗ)",
+      "spellings": [
+        {
+          "spelling": "Крепёжный завод по спецификации (DIN/ISO-эквивалент, никель) — OEM не нужен",
+          "where": "pnw/data/item_master.json:items[].maker"
+        },
+        {
+          "spelling": "Крепёжный завод по спецификации (DIN/ISO-эквивалент, никель) (частичная спецификация — дособрать по образцу/ТЗ)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "мирколец",
+      "name": "Мир Колец",
+      "spellings": [
+        {
+          "spelling": "Мир Колец",
+          "where": "zip/data/positions.json:[].oem"
+        },
+        {
+          "spelling": "Мир Колец",
+          "where": "pnw/data/item_master.json:items[].brand"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "прочие",
+      "name": "Прочие",
+      "spellings": [
+        {
+          "spelling": "Прочие",
+          "where": "gt/data/pn_db.json:rows[].oem"
+        },
+        {
+          "spelling": "Прочие",
+          "where": "pnw/data/item_master.json:items[].brand"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "типовыеeaoabbschneiderпоформату",
+      "name": "Типовые: EAO/ABB/Schneider — по формату",
+      "spellings": [
+        {
+          "spelling": "Типовые: EAO/ABB/Schneider — по формату",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Типовые: EAO/ABB/Schneider — по формату",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "типовыеswagelokparkercirclesealпопарамет",
+      "name": "Типовые: Swagelok/Parker/Circle Seal — по параметрам из ТЗ",
+      "spellings": [
+        {
+          "spelling": "Типовые: Swagelok/Parker/Circle Seal — по параметрам из ТЗ",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Типовые: Swagelok/Parker/Circle Seal — по параметрам из ТЗ",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 2
+    },
+    {
+      "oem_key": "3mпотипу",
+      "name": "3M (по типу)",
+      "spellings": [
+        {
+          "spelling": "3M (по типу)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "abbsiemensomronпотипу",
+      "name": "ABB/Siemens/OMRON (по типу)",
+      "spellings": [
+        {
+          "spelling": "ABB/Siemens/OMRON (по типу)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "amotvernathermпотипу",
+      "name": "AMOT / Vernatherm (по типу)",
+      "spellings": [
+        {
+          "spelling": "AMOT / Vernatherm (по типу)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "guangxiyuchaiweichai",
+      "name": "Guangxi Yuchai / Weichai",
+      "spellings": [
+        {
+          "spelling": "Guangxi Yuchai / Weichai",
+          "where": "gpu/data/models.json:adjacent[].name"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "guascorsiemensenergy",
+      "name": "Guascor (Siemens Energy)",
+      "spellings": [
+        {
+          "spelling": "Guascor (Siemens Energy)",
+          "where": "gpu/data/models.json:adjacent[].name"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "jichaijinandieselcnpc",
+      "name": "Jichai (Jinan Diesel, CNPC)",
+      "spellings": [
+        {
+          "spelling": "Jichai (Jinan Diesel, CNPC)",
+          "where": "gpu/data/models.json:adjacent[].name"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "mturollsroycepowersystems",
+      "name": "MTU / Rolls-Royce Power Systems",
+      "spellings": [
+        {
+          "spelling": "MTU / Rolls-Royce Power Systems",
+          "where": "gpu/data/models.json:adjacent[].name"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "mwmcaterpillar",
+      "name": "MWM / Caterpillar",
+      "spellings": [
+        {
+          "spelling": "MWM / Caterpillar",
+          "where": "gpu/data/machines.json:machines[].oem"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "mwmcaterpillarenergysolutions",
+      "name": "MWM (Caterpillar Energy Solutions)",
+      "spellings": [
+        {
+          "spelling": "MWM (Caterpillar Energy Solutions)",
+          "where": "gpu/data/models.json:adjacent[].name"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "palldonaldsonparkerpecofacetпотипу",
+      "name": "Pall/Donaldson/Parker/PECOFacet (по типу)",
+      "spellings": [
+        {
+          "spelling": "Pall/Donaldson/Parker/PECOFacet (по типу)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "panduitpansteelthomasbettsпотипу",
+      "name": "Panduit (Pan-Steel) / Thomas&Betts (по типу)",
+      "spellings": [
+        {
+          "spelling": "Panduit (Pan-Steel) / Thomas&Betts (по типу)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "parkeroringлюбойпоas568",
+      "name": "Parker O-Ring / любой по AS568",
+      "spellings": [
+        {
+          "spelling": "Parker O-Ring / любой по AS568",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "perkinsfgwilson",
+      "name": "Perkins / FG Wilson",
+      "spellings": [
+        {
+          "spelling": "Perkins / FG Wilson",
+          "where": "gpu/data/models.json:adjacent[].name"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "siemensdigitalindustriesпрямойзаказпокод",
+      "name": "Siemens Digital Industries — прямой заказ по коду (SIMATIC/SIRIUS)",
+      "spellings": [
+        {
+          "spelling": "Siemens Digital Industries — прямой заказ по коду (SIMATIC/SIRIUS)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "siemensenergyлинкольнилиреверспообразцуч",
+      "name": "Siemens Energy (Линкольн) или реверс по образцу/чертежу",
+      "spellings": [
+        {
+          "spelling": "Siemens Energy (Линкольн) или реверс по образцу/чертежу",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "siemensenergyлинкольнпо64кодуилиespпарас",
+      "name": "Siemens Energy (Линкольн) по 64/-коду; или ESP-пара → сток",
+      "spellings": [
+        {
+          "spelling": "Siemens Energy (Линкольн) по 64/-коду; или ESP-пара → сток",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "siemenssgt100400заводлинкольнвеликобрита",
+      "name": "Siemens SGT-100…400 (завод Линкольн, Великобритания)",
+      "spellings": [
+        {
+          "spelling": "Siemens SGT-100…400 (завод Линкольн, Великобритания)",
+          "where": "gt/data/models.json:families[].title"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "siemenssgt500800заводфинспонгшвецияexabb",
+      "name": "Siemens SGT-500…800 (завод Финспонг, Швеция — ex-ABB STAL)",
+      "spellings": [
+        {
+          "spelling": "Siemens SGT-500…800 (завод Финспонг, Швеция — ex-ABB STAL)",
+          "where": "gt/data/models.json:families[].title"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "skftimkenrenkпотипу",
+      "name": "SKF / Timken / RENK (по типу)",
+      "spellings": [
+        {
+          "spelling": "SKF / Timken / RENK (по типу)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "solarturbinesсандиегосшаcaterpillar",
+      "name": "Solar Turbines (Сан-Диего, США — Caterpillar)",
+      "spellings": [
+        {
+          "spelling": "Solar Turbines (Сан-Диего, США — Caterpillar)",
+          "where": "gt/data/models.json:families[].title"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "solarдизайннезависимыеbdbagtреверсремонт",
+      "name": "Solar (дизайн) → независимые: BDB/AGT/реверс-ремонт (EthosEnergy)",
+      "spellings": [
+        {
+          "spelling": "Solar (дизайн) → независимые: BDB/AGT/реверс-ремонт (EthosEnergy)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "solarстокantoniinternational",
+      "name": "Solar; сток: Antoni International",
+      "spellings": [
+        {
+          "spelling": "Solar; сток: Antoni International",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "vikingparkerпотипу",
+      "name": "Viking/Parker (по типу)",
+      "spellings": [
+        {
+          "spelling": "Viking/Parker (по типу)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "wrtsil",
+      "name": "Wärtsilä",
+      "spellings": [
+        {
+          "spelling": "Wärtsilä",
+          "where": "gpu/data/models.json:adjacent[].name"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "заказпоспецификации",
+      "name": "Заказ по спецификации",
+      "spellings": [
+        {
+          "spelling": "Заказ по спецификации",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "заказпоспецификацииочищающаяжидкостьпосо",
+      "name": "Заказ по спецификации: очищающая жидкость (по составу из ТЗ)",
+      "spellings": [
+        {
+          "spelling": "Заказ по спецификации: очищающая жидкость (по составу из ТЗ)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "заказпоспецификациипрокладкапогабаритума",
+      "name": "Заказ по спецификации: прокладка по габариту/материалу (Flexitallic/Garlock-тип)",
+      "spellings": [
+        {
+          "spelling": "Заказ по спецификации: прокладка по габариту/материалу (Flexitallic/Garlock-тип)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "заказпоспецификацииразмерыизописания",
+      "name": "Заказ по спецификации (размеры из описания)",
+      "spellings": [
+        {
+          "spelling": "Заказ по спецификации (размеры из описания)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "заказпоспецификацииспиральнаяпрокладкаor",
+      "name": "Заказ по спецификации: спиральная прокладка/O-ring по габариту (Flexitallic-тип) (частичная спецификация — дособрать по образцу/ТЗ)",
+      "spellings": [
+        {
+          "spelling": "Заказ по спецификации: спиральная прокладка/O-ring по габариту (Flexitallic-тип) (частичная спецификация — дособрать по образцу/ТЗ)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "заказпоспецификациистеклотрос1подлине",
+      "name": "Заказ по спецификации: стеклотрос 1\" (по длине)",
+      "spellings": [
+        {
+          "spelling": "Заказ по спецификации: стеклотрос 1\" (по длине)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "заказпоспецификацииэкструзионноеуплотнен",
+      "name": "Заказ по спецификации: экструзионное уплотнение 303 SS",
+      "spellings": [
+        {
+          "spelling": "Заказ по спецификации: экструзионное уплотнение 303 SS",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "закупкапоспецификацииматериалстандартoem",
+      "name": "Закупка по спецификации (материал+стандарт) — OEM не нужен",
+      "spellings": [
+        {
+          "spelling": "Закупка по спецификации (материал+стандарт) — OEM не нужен",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "крепежныйзаводпоспецификациидюймовыйкреп",
+      "name": "Крепёжный завод по спецификации (дюймовый крепёж BSP/UNC)",
+      "spellings": [
+        {
+          "spelling": "Крепёжный завод по спецификации (дюймовый крепёж BSP/UNC)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "крепежныйзаводпоспецификацииразмеризопис",
+      "name": "Крепёжный завод по спецификации (размер из описания, IH-стандарты Solar)",
+      "spellings": [
+        {
+          "spelling": "Крепёжный завод по спецификации (размер из описания, IH-стандарты Solar)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "любойдистрибьюторстандартапрямойзаказoem",
+      "name": "Любой дистрибьютор стандарта (прямой заказ, OEM не нужен)",
+      "spellings": [
+        {
+          "spelling": "Любой дистрибьютор стандарта (прямой заказ, OEM не нужен)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "оснасткаsolarарендауmroethosenergygolten",
+      "name": "Оснастка Solar: аренда у MRO (EthosEnergy/Goltens) или OEM",
+      "spellings": [
+        {
+          "spelling": "Оснастка Solar: аренда у MRO (EthosEnergy/Goltens) или OEM",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "тяжелыегтуgesiemensalstomэнергетикаиболь",
+      "name": "Тяжёлые ГТУ (GE / Siemens / Alstom) — энергетика и большие ГПА",
+      "spellings": [
+        {
+          "spelling": "Тяжёлые ГТУ (GE / Siemens / Alstom) — энергетика и большие ГПА",
+          "where": "gt/data/models.json:families[].title"
+        }
+      ],
+      "n_spellings": 1
+    }
+  ]
+}

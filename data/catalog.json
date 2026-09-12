@@ -4,22 +4,23 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 180,
-    "total_bytes": 82455005,
+    "datasets": 189,
+    "total_bytes": 91516506,
     "by_sensitivity": {
-      "конфиденциально": 55,
-      "внутреннее": 93,
-      "публикуемо": 32
+      "конфиденциально": 57,
+      "внутреннее": 99,
+      "публикуемо": 33
     },
     "by_subproject": {
       "ГПУ-библиотека": 27,
       "ГТУ-библиотека": 35,
       "ОВЭ-75": 45,
-      "база ЗИП": 29,
+      "база ЗИП": 30,
       "база ЗИП · таможня": 18,
       "гидрометаллургия": 22,
-      "дашборд сорсеров": 3,
-      "каталог PN (веб)": 1
+      "дашборд сорсеров": 4,
+      "каталог PN (веб)": 1,
+      "каталог PN · данные": 7
     }
   },
   "datasets": [
@@ -275,6 +276,9 @@
         "library/load_crossrefs.py",
         "library/load_equipment.py",
         "pnw/tools/build_master.py",
+        "scripts/build_chain_coverage.py",
+        "scripts/build_dict.py",
+        "scripts/build_node_map.py",
         "tests/test_core.py"
       ]
     },
@@ -368,6 +372,92 @@
       "referenced_by": []
     },
     {
+      "path": "pnw/data/item_master.json",
+      "subproject": "каталог PN · данные",
+      "bytes": 3767383,
+      "note": "Сквозной справочник деталей: 13164 карточки с номером KV, названием, брендом, реальным изготовителем, узлом и машиной. Ключ KV выдаётся один раз и навсегда через pnw/data/kv_registry.json. Собирается pnw/tools/build_master.py из zip/data/positions.json и gt/data/pn_db.json.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "count",
+        "items",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "items",
+        "records": 13164,
+        "record_keys": [
+          "brand",
+          "equipment",
+          "hs",
+          "kv",
+          "machine",
+          "maker",
+          "material",
+          "name",
+          "node",
+          "note",
+          "section",
+          "src_id"
+        ]
+      },
+      "last_change": "2026-09-01",
+      "last_author": "Claude",
+      "last_commit": "eab1588",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "pnw/tools/build_master.py",
+        "pnw/tools/build_search.py",
+        "pnw/tools/build_suppliers.py",
+        "scripts/build_chain_coverage.py",
+        "scripts/build_dict.py",
+        "tests/test_dict.py",
+        "zip/tools/build_machines.py",
+        "zip/tools/perf_classes.py"
+      ]
+    },
+    {
+      "path": "pnw/data/numbers.json",
+      "subproject": "каталог PN · данные",
+      "bytes": 3761349,
+      "note": "Указатель номеров для поиска детали: 29345 строк вида «номер → KV». Четыре вида номера: свой (13164), бренда (13309), изготовителя (2265), аналога (607). Собственный номер добавлен 12.09.2026 — до этого поиск по KV возвращал ноль, хотя KV приведён примером в подсказке самой страницы поиска.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "count",
+        "rows",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 29345,
+        "record_keys": [
+          "kind",
+          "kv",
+          "number",
+          "number_norm",
+          "owner"
+        ]
+      },
+      "last_change": "2026-09-01",
+      "last_author": "Claude",
+      "last_commit": "e2f716f",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "pnw/tools/build_master.py",
+        "pnw/tools/build_search.py",
+        "tests/test_dict.py"
+      ]
+    },
+    {
       "path": "zip/data/odm_suppliers.json",
       "subproject": "база ЗИП",
       "bytes": 3292954,
@@ -408,6 +498,8 @@
         "library/load_parts.py",
         "library/load_suppliers.py",
         "pnw/tools/build_suppliers.py",
+        "scripts/build_chain_coverage.py",
+        "tests/test_dict.py",
         "tests/test_publish_library_v2.py",
         "zip/build.py",
         "zip/tools/cat_stock.py",
@@ -622,7 +714,8 @@
         "gt/tools/build_rfq.py",
         "gt/tools/drop_ru.py",
         "gt/tools/ship_merge.py",
-        "library/load_suppliers.py"
+        "library/load_suppliers.py",
+        "scripts/build_chain_coverage.py"
       ]
     },
     {
@@ -795,13 +888,13 @@
         "library/load_parts.py",
         "pnw/tools/build_master.py",
         "pnw/tools/parse_crossrefs.py",
+        "scripts/build_chain_coverage.py",
+        "scripts/build_dict.py",
         "scripts/publish_library_v2.py",
         "tests/test_publish_library_v2.py",
         "zip/build.py",
         "zip/customs/glbs_pull.mjs",
-        "zip/tools/aggregate_customs.py",
-        "zip/tools/aggregate_prices.py",
-        "zip/tools/import_sheet.py"
+        "zip/tools/aggregate_customs.py"
       ]
     },
     {
@@ -958,7 +1051,8 @@
         "gt/tools/drop_ru.py",
         "gt/tools/ship_merge.py",
         "library/load_suppliers.py",
-        "pnw/tools/build_suppliers.py"
+        "pnw/tools/build_suppliers.py",
+        "scripts/build_chain_coverage.py"
       ]
     },
     {
@@ -1002,6 +1096,41 @@
         "gt/tools/build_rfq.py",
         "gt/tools/ship_merge.py",
         "gt/tools/ship_report.py"
+      ]
+    },
+    {
+      "path": "pnw/data/supplier_master.json",
+      "subproject": "каталог PN · данные",
+      "bytes": 777443,
+      "note": "Сводный реестр поставщиков по всем сегментам: 1978 карточек, 440 адресов электронной почты и 253 телефона. Собирается pnw/tools/build_suppliers.py из gt/data/research_suppliers.json, gt/data/heavy_suppliers.json, gt/data/bitrix_supplier_sites.json и zip/data/bearing_sites_*.json. ВНУТРЕННЕЕ: контактные данные компаний. Источники этого файла помечены как конфиденциальные, а сам он до 12.09.2026 в каталог не попадал вовсе — каталог сканировал только pnw/public.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "count",
+        "suppliers",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "suppliers",
+        "records": 1978
+      },
+      "last_change": "2026-09-01",
+      "last_author": "Claude",
+      "last_commit": "73c4e8c",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "адреса электронной почты",
+          "телефоны"
+        ]
+      },
+      "referenced_by": [
+        "pnw/tools/build_search.py",
+        "pnw/tools/build_suppliers.py",
+        "pnw/tools/harvest_contacts.py",
+        "tests/test_dict.py",
+        "zip/tools/perf_classes.py"
       ]
     },
     {
@@ -1101,6 +1230,7 @@
       },
       "referenced_by": [
         "library/load_crossrefs.py",
+        "scripts/build_dict.py",
         "zip/tools/build_telsmith_page.py"
       ]
     },
@@ -1356,6 +1486,37 @@
         "library/load_suppliers.py",
         "pnw/tools/build_suppliers.py",
         "zip/tools/bearing_report.py"
+      ]
+    },
+    {
+      "path": "pnw/data/kv_registry.json",
+      "subproject": "каталог PN · данные",
+      "bytes": 434208,
+      "note": "Реестр выданных номеров KV: устойчивый ключ детали → номер. Ключи вида «zip:<id позиции>» и «gt:<нормализованный номер>». НЕ РЕДАКТИРОВАТЬ вручную: смена ключа означает выдачу нового KV на ту же деталь, а номер обещан постоянным.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "assigned",
+        "items",
+        "next_seq",
+        "note",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "assigned",
+        "records": 13164
+      },
+      "last_change": "2026-09-01",
+      "last_author": "Claude",
+      "last_commit": "eab1588",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "pnw/tools/build_master.py",
+        "pnw/tools/kv_number.py"
       ]
     },
     {
@@ -1660,6 +1821,7 @@
       },
       "referenced_by": [
         "library/load_suppliers.py",
+        "scripts/build_chain_coverage.py",
         "zip/tools/build_telsmith_page.py",
         "zip/tools/telsmith_report.py"
       ]
@@ -2417,6 +2579,8 @@
         ]
       },
       "referenced_by": [
+        "scripts/build_chain_coverage.py",
+        "scripts/build_dict.py",
         "zip/tools/build_telsmith_page.py",
         "zip/tools/telsmith_parse.py",
         "zip/tools/telsmith_report.py"
@@ -2848,6 +3012,48 @@
       ]
     },
     {
+      "path": "pnw/data/crossrefs.json",
+      "subproject": "каталог PN · данные",
+      "bytes": 135481,
+      "note": "Кросс-референсы номеров: номер бренда → номер аналога или изготовителя. Разбирается pnw/tools/parse_crossrefs.py.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "note",
+        "rows",
+        "source",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 753,
+        "record_keys": [
+          "brand",
+          "catalog_no",
+          "kind",
+          "number",
+          "number_norm",
+          "position_id",
+          "source"
+        ]
+      },
+      "last_change": "2026-09-01",
+      "last_author": "Claude",
+      "last_commit": "e2f716f",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "library/load_crossrefs.py",
+        "pnw/tools/build_master.py",
+        "pnw/tools/parse_crossrefs.py",
+        "scripts/build_dict.py",
+        "zip/tools/build_telsmith_page.py"
+      ]
+    },
+    {
       "path": "zip/data/competitor_prices.json",
       "subproject": "база ЗИП",
       "bytes": 132965,
@@ -2936,7 +3142,7 @@
         "gt/tools/build_rfq.py",
         "gt/tools/ship_merge.py",
         "gt/tools/ship_report.py",
-        "zip/build.py"
+        "scripts/build_chain_coverage.py"
       ]
     },
     {
@@ -3062,7 +3268,8 @@
       },
       "referenced_by": [
         "gt/build.py",
-        "gt/tools/drop_ru.py"
+        "gt/tools/drop_ru.py",
+        "scripts/build_chain_coverage.py"
       ]
     },
     {
@@ -3110,7 +3317,8 @@
         "gt/build.py",
         "gt/tools/build_rfq.py",
         "gt/tools/drop_ru.py",
-        "library/load_suppliers.py"
+        "library/load_suppliers.py",
+        "scripts/build_chain_coverage.py"
       ]
     },
     {
@@ -3570,7 +3778,8 @@
       },
       "referenced_by": [
         "gpu/build.py",
-        "gpu/tools/parse_motortech.py"
+        "gpu/tools/parse_motortech.py",
+        "scripts/build_chain_coverage.py"
       ]
     },
     {
@@ -3611,6 +3820,37 @@
       },
       "referenced_by": [
         "gidromet/build.py"
+      ]
+    },
+    {
+      "path": "pnw/data/part_suppliers.json",
+      "subproject": "каталог PN · данные",
+      "bytes": 66862,
+      "note": "Связь «деталь → поставщики» по 750 деталям. Ссылается на ключи карточек pnw/data/supplier_master.json — при смене правила нормализации имени связи рвутся.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "note",
+        "parts",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "parts",
+        "records": 750
+      },
+      "last_change": "2026-09-01",
+      "last_author": "Claude",
+      "last_commit": "73c4e8c",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "pnw/tools/build_search.py",
+        "pnw/tools/build_suppliers.py",
+        "pnw/tools/harvest_contacts.py",
+        "zip/tools/perf_classes.py"
       ]
     },
     {
@@ -4126,7 +4366,8 @@
         "gt/build.py",
         "gt/tools/build_rfq.py",
         "gt/tools/drop_ru.py",
-        "pnw/tools/build_suppliers.py"
+        "pnw/tools/build_suppliers.py",
+        "scripts/build_chain_coverage.py"
       ]
     },
     {
@@ -4266,7 +4507,11 @@
         "markers": []
       },
       "referenced_by": [
-        "gpu/build.py"
+        "gpu/build.py",
+        "scripts/build_chain_coverage.py",
+        "scripts/build_dict.py",
+        "tests/test_dict.py",
+        "zip/tools/build_machines.py"
       ]
     },
     {
@@ -4341,6 +4586,39 @@
       "referenced_by": [
         "gt/tools/build_cummins.py",
         "library/load_repair.py"
+      ]
+    },
+    {
+      "path": "pnw/data/contacts_found.json",
+      "subproject": "каталог PN · данные",
+      "bytes": 54534,
+      "note": "Слой обогащения контактов: адреса и телефоны, собранные pnw/tools/harvest_contacts.py со страниц контактов поставщиков. Исходный реестр не перезаписывается. ВНУТРЕННЕЕ: контактные данные.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "contacts",
+        "note",
+        "source",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "contacts",
+        "records": 125
+      },
+      "last_change": "2026-09-01",
+      "last_author": "Claude",
+      "last_commit": "73c4e8c",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "адреса электронной почты",
+          "телефоны"
+        ]
+      },
+      "referenced_by": [
+        "pnw/tools/build_suppliers.py",
+        "pnw/tools/harvest_contacts.py"
       ]
     },
     {
@@ -4648,7 +4926,8 @@
       },
       "referenced_by": [
         "gt/build.py",
-        "library/load_equipment.py"
+        "library/load_equipment.py",
+        "scripts/build_chain_coverage.py"
       ]
     },
     {
@@ -5319,8 +5598,54 @@
         "markers": []
       },
       "referenced_by": [
+        "scripts/build_chain_coverage.py",
+        "scripts/build_dict.py",
         "zip/build.py",
         "zip/tools/perf_classes.py"
+      ]
+    },
+    {
+      "path": "zip/data/machines.json",
+      "subproject": "база ЗИП",
+      "bytes": 37896,
+      "note": "Реестр машин ГШО, выведенный из справочника деталей: 76 машин в 6 брендах, 1856 связей с номенклатурой. Обозначения лежали внутри строкового поля machine через запятую и отдельной сущностью не существовали — счётчик цепочки видел по направлению одну машину при 1918 позициях. Склеены написания у 20 машин (ST14 и ST-14, TH-540 и TH540 и TH 540). Производный файл, собирается zip/tools/build_machines.py; руками не заполнять. Паспортных данных не содержит — в наших файлах их нет, это предмет разведки.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "brands",
+        "machines",
+        "note",
+        "source",
+        "stats"
+      ],
+      "main_collection": {
+        "key": "machines",
+        "records": 76,
+        "record_keys": [
+          "brand",
+          "brand_key",
+          "machine_key",
+          "n_nodes",
+          "name",
+          "nodes",
+          "parts",
+          "spellings"
+        ]
+      },
+      "last_change": null,
+      "last_author": null,
+      "last_commit": null,
+      "updated_by": "неизвестно",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gpu/build.py",
+        "scripts/build_chain_coverage.py",
+        "scripts/build_dict.py",
+        "tests/test_dict.py",
+        "zip/tools/build_machines.py"
       ]
     },
     {
@@ -5645,6 +5970,7 @@
       },
       "referenced_by": [
         "pnw/tools/build_suppliers.py",
+        "scripts/build_chain_coverage.py",
         "zip/build.py",
         "zip/tools/import_sheet.py",
         "zip/tools/perf_classes.py",
@@ -5724,6 +6050,67 @@
       "referenced_by": [
         "ove/tools/build_bim_plan.py",
         "ove/tools/ifc_check.py"
+      ]
+    },
+    {
+      "path": "data/catalog_notes.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 29432,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "data/budget_snapshot.json",
+        "data/chain_coverage.json",
+        "data/chat_snapshot.json",
+        "data/index.json",
+        "dict/",
+        "dict/node_map.json",
+        "gidromet/data/",
+        "gpu/data/bitrix_gpu.json",
+        "gpu/data/coverage.json",
+        "gt/data/ansaldo.json",
+        "gt/data/bitrix_gt.json",
+        "gt/data/dossiers.json",
+        "gt/data/pn_db.json",
+        "gt/data/ship_energoseti.json",
+        "gt/data/ship_lukoil.json",
+        "gt/data/ship_sellers.json",
+        "gt/data/ship_sweep.json",
+        "library/docfilter.py",
+        "library/indexer.py",
+        "library/load_parts.py",
+        "library/load_suppliers.py",
+        "library/ocr.py",
+        "library/reparse.py",
+        "library/supabase/schema_junk.sql",
+        "ove/data/suppliers.json",
+        "pnw/data/contacts_found.json",
+        "pnw/data/crossrefs.json",
+        "pnw/data/item_master.json",
+        "pnw/data/kv_registry.json",
+        "pnw/data/numbers.json",
+        "pnw/data/part_suppliers.json",
+        "pnw/data/supplier_master.json",
+        "pnw/public/data.js",
+        "pnw/public/search.html",
+        "zip/customs/out/",
+        "zip/data/cat_stock_2026-09.json",
+        "zip/data/customs_declarations.json",
+        "zip/data/kp1763_audit.json",
+        "zip/data/machines.json",
+        "zip/data/perf_class_packets.json"
+      ],
+      "last_change": "2026-09-12",
+      "last_author": "skharkov1246",
+      "last_commit": "57e9e6f",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "scripts/build_catalog.py"
       ]
     },
     {
@@ -5915,7 +6302,7 @@
         "gt/tools/build_rfq.py",
         "gt/tools/ship_merge.py",
         "gt/tools/ship_report.py",
-        "zip/build.py"
+        "scripts/build_chain_coverage.py"
       ]
     },
     {
@@ -5992,63 +6379,9 @@
         "gt/tools/build_rfq.py",
         "gt/tools/drop_ru.py",
         "gt/tools/ship_merge.py",
-        "library/load_suppliers.py"
-      ]
-    },
-    {
-      "path": "data/catalog_notes.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 23063,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "data/budget_snapshot.json",
-        "data/chat_snapshot.json",
-        "data/index.json",
-        "gidromet/data/",
-        "gpu/data/bitrix_gpu.json",
-        "gpu/data/coverage.json",
-        "gt/data/ansaldo.json",
-        "gt/data/bitrix_gt.json",
-        "gt/data/dossiers.json",
-        "gt/data/pn_db.json",
-        "gt/data/ship_energoseti.json",
-        "gt/data/ship_lukoil.json",
-        "gt/data/ship_sellers.json",
-        "gt/data/ship_sweep.json",
-        "library/docfilter.py",
-        "library/indexer.py",
-        "library/load_parts.py",
         "library/load_suppliers.py",
-        "library/ocr.py",
-        "library/reparse.py",
-        "library/supabase/schema_junk.sql",
-        "ove/data/suppliers.json",
-        "pnw/public/data.js",
-        "pnw/public/search.html",
-        "zip/customs/out/",
-        "zip/data/cat_stock_2026-09.json",
-        "zip/data/customs_declarations.json",
-        "zip/data/kp1763_audit.json",
-        "zip/data/perf_class_packets.json",
-        "zip/data/perf_sourcing_map.json",
-        "zip/data/perf_test_requests.json",
-        "zip/data/supplier_crm.json",
-        "zip/data/telsmith_3858.json",
-        "zip/data/telsmith_crossrefs.json",
-        "zip/data/telsmith_nodrawings.json"
-      ],
-      "last_change": "2026-09-12",
-      "last_author": "skharkov1246",
-      "last_commit": "57e9e6f",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "scripts/build_catalog.py"
+        "scripts/build_chain_coverage.py",
+        "scripts/build_dict.py"
       ]
     },
     {
@@ -6164,7 +6497,48 @@
         "gpu/build.py",
         "gt/build.py",
         "library/equipment.py",
-        "library/load_equipment.py"
+        "library/load_equipment.py",
+        "scripts/build_chain_coverage.py",
+        "scripts/build_dict.py"
+      ]
+    },
+    {
+      "path": "data/chain_coverage.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 19976,
+      "note": "Заполняемость цепочки портала по семи направлениям и восьми звеньям: машина → узел → признак → дефект → ремонтное решение → запчасть → изготовитель → исполнитель. Производный файл, считается scripts/build_chain_coverage.py по фактическим файлам репозитория; ноль означает отсутствие данных, а не то, что они где-то есть. Руками не заполнять. Первый прогон 12.09.2026: 13 клеток из 56, звенья «Признак», «Дефект» и «Исполнитель» не начаты ни по одному направлению.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "common",
+        "empty_everywhere",
+        "goal",
+        "links",
+        "note",
+        "priority_rule",
+        "segments",
+        "summary"
+      ],
+      "main_collection": {
+        "key": "links",
+        "records": 8,
+        "record_keys": [
+          "link",
+          "title",
+          "what"
+        ]
+      },
+      "last_change": null,
+      "last_author": null,
+      "last_commit": null,
+      "updated_by": "неизвестно",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "scripts/build_chain_coverage.py",
+        "tests/test_dict.py"
       ]
     },
     {
@@ -6286,7 +6660,7 @@
         "library/equipment.py",
         "library/load_equipment.py",
         "library/load_repair.py",
-        "tests/test_library_equipment.py"
+        "scripts/build_chain_coverage.py"
       ]
     },
     {
@@ -6333,7 +6707,8 @@
         "gt/tools/drop_ru.py",
         "gt/tools/ship_merge.py",
         "library/load_suppliers.py",
-        "pnw/tools/build_suppliers.py"
+        "pnw/tools/build_suppliers.py",
+        "scripts/build_chain_coverage.py"
       ]
     },
     {
@@ -6550,6 +6925,8 @@
       },
       "referenced_by": [
         "gpu/build.py",
+        "scripts/build_chain_coverage.py",
+        "scripts/build_dict.py",
         "zip/build.py",
         "zip/tools/perf_classes.py"
       ]
@@ -6744,7 +7121,9 @@
         "gpu/build.py",
         "gt/build.py",
         "library/equipment.py",
-        "library/load_equipment.py"
+        "library/load_equipment.py",
+        "scripts/build_chain_coverage.py",
+        "scripts/build_dict.py"
       ]
     },
     {
@@ -6857,7 +7236,9 @@
       },
       "referenced_by": [
         "gpu/build.py",
-        "gpu/tools/coverage.py"
+        "gpu/tools/coverage.py",
+        "scripts/build_chain_coverage.py",
+        "tests/test_dict.py"
       ]
     },
     {
@@ -7083,7 +7464,7 @@
         "library/equipment.py",
         "library/load_equipment.py",
         "library/load_repair.py",
-        "tests/test_library_equipment.py"
+        "scripts/build_chain_coverage.py"
       ]
     },
     {
@@ -7426,7 +7807,9 @@
         "gt/tools/build_rfq.py",
         "gt/tools/drop_ru.py",
         "gt/tools/ship_merge.py",
-        "library/load_suppliers.py"
+        "library/load_suppliers.py",
+        "scripts/build_chain_coverage.py",
+        "scripts/build_dict.py"
       ]
     },
     {
