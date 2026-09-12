@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 180,
-    "total_bytes": 82454373,
+    "total_bytes": 82455005,
     "by_sensitivity": {
       "конфиденциально": 55,
       "внутреннее": 93,
@@ -403,6 +403,7 @@
         "markers": []
       },
       "referenced_by": [
+        "library/load_suppliers.py",
         "pnw/tools/build_suppliers.py",
         "tests/test_publish_library_v2.py",
         "zip/build.py",
@@ -617,7 +618,8 @@
         "gt/build.py",
         "gt/tools/build_rfq.py",
         "gt/tools/drop_ru.py",
-        "gt/tools/ship_merge.py"
+        "gt/tools/ship_merge.py",
+        "library/load_suppliers.py"
       ]
     },
     {
@@ -946,6 +948,7 @@
         "gt/tools/build_rfq.py",
         "gt/tools/drop_ru.py",
         "gt/tools/ship_merge.py",
+        "library/load_suppliers.py",
         "pnw/tools/build_suppliers.py"
       ]
     },
@@ -1340,6 +1343,7 @@
         ]
       },
       "referenced_by": [
+        "library/load_suppliers.py",
         "pnw/tools/build_suppliers.py",
         "zip/tools/bearing_report.py"
       ]
@@ -1642,6 +1646,7 @@
         ]
       },
       "referenced_by": [
+        "library/load_suppliers.py",
         "zip/tools/build_telsmith_page.py",
         "zip/tools/telsmith_report.py"
       ]
@@ -1694,6 +1699,7 @@
         ]
       },
       "referenced_by": [
+        "library/load_suppliers.py",
         "pnw/tools/build_suppliers.py",
         "zip/tools/bearing_report.py"
       ]
@@ -2223,6 +2229,7 @@
         "markers": []
       },
       "referenced_by": [
+        "library/load_suppliers.py",
         "pnw/tools/build_suppliers.py",
         "zip/build.py"
       ]
@@ -2815,11 +2822,11 @@
         "gt/tools/build_rfq.py",
         "gt/tools/drop_ru.py",
         "gt/tools/ship_merge.py",
+        "library/load_suppliers.py",
         "ove/build.py",
         "ove/tools/bitrix_ove.py",
         "ove/tools/build_rfq.py",
-        "ove/tools/check_tkp.py",
-        "pnw/tools/build_search.py"
+        "ove/tools/check_tkp.py"
       ]
     },
     {
@@ -3302,7 +3309,8 @@
       "referenced_by": [
         "gt/tools/build_rfq.py",
         "gt/tools/drop_ru.py",
-        "gt/tools/ship_merge.py"
+        "gt/tools/ship_merge.py",
+        "library/load_suppliers.py"
       ]
     },
     {
@@ -4990,11 +4998,11 @@
         "gt/tools/build_rfq.py",
         "gt/tools/drop_ru.py",
         "gt/tools/ship_merge.py",
+        "library/load_suppliers.py",
         "ove/build.py",
         "ove/tools/bitrix_ove.py",
         "ove/tools/build_rfq.py",
-        "ove/tools/check_tkp.py",
-        "pnw/tools/build_search.py"
+        "ove/tools/check_tkp.py"
       ]
     },
     {
@@ -5489,11 +5497,11 @@
         "gt/tools/build_rfq.py",
         "gt/tools/drop_ru.py",
         "gt/tools/ship_merge.py",
+        "library/load_suppliers.py",
         "ove/build.py",
         "ove/tools/bitrix_ove.py",
         "ove/tools/build_rfq.py",
-        "ove/tools/check_tkp.py",
-        "pnw/tools/build_search.py"
+        "ove/tools/check_tkp.py"
       ]
     },
     {
@@ -5957,13 +5965,14 @@
         "gt/build.py",
         "gt/tools/build_rfq.py",
         "gt/tools/drop_ru.py",
-        "gt/tools/ship_merge.py"
+        "gt/tools/ship_merge.py",
+        "library/load_suppliers.py"
       ]
     },
     {
       "path": "data/catalog_notes.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 22431,
+      "bytes": 23063,
       "note": "",
       "format": "json",
       "shape": "объект",
@@ -5984,6 +5993,7 @@
         "gt/data/ship_sweep.json",
         "library/docfilter.py",
         "library/indexer.py",
+        "library/load_parts.py",
         "library/load_suppliers.py",
         "library/ocr.py",
         "library/reparse.py",
@@ -6004,8 +6014,8 @@
         "zip/data/telsmith_nodrawings.json"
       ],
       "last_change": "2026-09-12",
-      "last_author": "skharkov1246",
-      "last_commit": "eb88554",
+      "last_author": "Claude",
+      "last_commit": "0a06a7a",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -6290,6 +6300,7 @@
         "gt/tools/build_rfq.py",
         "gt/tools/drop_ru.py",
         "gt/tools/ship_merge.py",
+        "library/load_suppliers.py",
         "pnw/tools/build_suppliers.py"
       ]
     },
@@ -7374,7 +7385,8 @@
         "gt/build.py",
         "gt/tools/build_rfq.py",
         "gt/tools/drop_ru.py",
-        "gt/tools/ship_merge.py"
+        "gt/tools/ship_merge.py",
+        "library/load_suppliers.py"
       ]
     },
     {

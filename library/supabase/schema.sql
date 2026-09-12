@@ -57,6 +57,49 @@ create index if not exists lib_demand_pn  on lib_demand (part_number);
 create index if not exists lib_demand_oem on lib_demand (oem);
 
 -- ─────────────────────────────────────────────────────────────────────────────
+-- 2а. Каталог запчастей. Это НЕ спрос: lib_demand — что спрашивали, lib_parts —
+--     что мы знаем о самой детали. Звено «запчасть» цепочки портала (CLAUDE.md,
+--     «Куда мы идём»): каталожный номер, изготовитель, модели оборудования, где
+--     применяется, материал, код ТН ВЭД.
+create table if not exists lib_parts (
+  id           text primary key,            -- нормализованный каталожный номер
+  catalog_no   text not null,
+  name         text not null,
+  oem          text,
+  model        text,                        -- модели оборудования, где стоит
+  category     text,
+  segment_id   text references lib_segments(id) on delete set null,
+  hs_code      text,
+  material     text,
+  applications text,
+  target_equipment text,                    -- узел или система: ВСО, ходовая, гидравлика
+  aliases      text[],                      -- иные написания каталожного номера
+  qty_quarter  numeric,                     -- потребность в квартал
+  status       text,                        -- продавали | запрашивали | не трогали
+  source       text,
+  created_at   timestamptz default now(),
+  updated_at   timestamptz default now()
+);
+create index if not exists lib_parts_seg  on lib_parts (segment_id);
+create index if not exists lib_parts_oem  on lib_parts (oem);
+create index if not exists lib_parts_equip on lib_parts (target_equipment);
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- 2б. Ребро «запчасть → исполнитель». Без него ответить «кто делает эту деталь»
+--     можно только перебором: у поставщика в описании тысяча позиций текстом.
+create table if not exists lib_part_suppliers (
+  part_id     text   not null references lib_parts(id) on delete cascade,
+  supplier_id bigint not null references lib_suppliers(id) on delete cascade,
+  makes       text,                         -- что именно делает под эту позицию
+  catalog_url text,
+  confidence  text default 'med',
+  source      text,
+  created_at  timestamptz default now(),
+  primary key (part_id, supplier_id)
+);
+create index if not exists lib_part_suppliers_sup on lib_part_suppliers (supplier_id);
+
+-- ─────────────────────────────────────────────────────────────────────────────
 -- 3. Поставщики: кто в мире делает это оборудование и его части.
 create table if not exists lib_suppliers (
   id           bigint generated always as identity primary key,
