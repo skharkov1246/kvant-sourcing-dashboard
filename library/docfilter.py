@@ -56,7 +56,21 @@ UNIT = (r"шт|штук[аи]?|компл|комплект[аов]*|к-?т|на�
 QTY_UNIT = re.compile(r"(?<![а-яёa-z0-9])\d[\d\s.,]*\s*(?:" + UNIT + r")(?![а-яёa-z])", re.I)
 UNIT_QTY = re.compile(r"(?<![а-яёa-z0-9])(?:" + UNIT + r")\.?\s+\d", re.I)
 BARE_ML = re.compile(r"(?<![а-яёa-z0-9])\d[\d\s.,]*\s*[мл](?![а-яёa-z0-9])", re.I)
-_DATE = re.compile(r"^\d{1,2}[.\-/]\d{1,2}[.\-/]\d{2,4}$|^\d{4}[.\-/]\d{1,2}[.\-/]\d{1,2}$")
+# Дата отсеивается по КАЛЕНДАРНЫМ границам, а не по одной форме записи.
+# Свободный шаблон «\d{4}-\d{1,2}-\d{1,2}» принимал за дату артикул 8752-45-65
+# (ГОСТ 8752, размер 45-65) и терял его. Проверка диапазонов держит настоящие
+# даты отсеянными, а артикулы пропускает.
+_DATE_RX = re.compile(r"^(\d{1,4})[.\-/](\d{1,2})[.\-/](\d{1,4})$")
+
+
+def _is_date(t: str) -> bool:
+    m = _DATE_RX.match(t)
+    if not m:
+        return False
+    a, b, c = (int(x) for x in m.groups())
+    день_первым = 1 <= a <= 31 and 1 <= b <= 12 and (1900 <= c <= 2100 or c <= 99)
+    год_первым = 1900 <= a <= 2100 and 1 <= b <= 12 and 1 <= c <= 31
+    return день_первым or год_первым
 _SECT = re.compile(r"^\d{1,2}\.\d{1,2}(\.\d{1,3})*$")
 _LAW = re.compile(r"^\d{1,3}[-\s]?(фз|пп|рф|н)$", re.I)
 _THOU = re.compile(r"^\d{1,3}([\s ]\d{3})+([.,]\d{1,2})?$")
@@ -66,8 +80,10 @@ HASL = re.compile(r"[A-Za-zА-Яа-яЁё]")
 ABBR = re.compile(r"^[A-ZА-ЯЁ]{2,}(нг|мс)?(\([А-ЯЁA-Z]\))?([-/][0-9A-ZА-ЯЁ]+)+$")
 
 def _clean(t): return t.strip(".,;:()")
+
+
 def _rubbish(t):
-    return bool(_DATE.match(t) or _SECT.match(t) or _LAW.match(t) or _THOU.match(t)
+    return bool(_is_date(t) or _SECT.match(t) or _LAW.match(t) or _THOU.match(t)
                 or (t.isdigit() and len(t) == 4 and 1900 < int(t) < 2100))
 
 def marks_pn(s):
@@ -80,13 +96,37 @@ def marks_pn(s):
             out.append(t)
     return out
 
+# Слова, рядом с которыми число — это сумма или цена, а не артикул.
+MONEY = re.compile(r"(?<![а-яё])(рубл|руб\.|сумм|цена|цену|цены|стоимост|итого|ндс|тариф)", re.I)
+
+
 def part_number_of(s):
+    """Артикул из строки. Пусто — честный ответ: артикула в строке нет.
+
+    Три отсева, каждый оплачен разбором ошибки:
+      • мусор (_rubbish) — даты, номера пунктов, годы, разряды тысяч. Прежнее
+        выражение на line.upper() принимало за артикул 01.09.2026 и 223-ФЗ;
+      • типоразмер (45х65х10, 3х2,5) — это размер, а не артикул. Без отсева
+        «Манжета 45х65х10 ГОСТ 8752-79» получала артикулом свой размер;
+      • голое число при денежных словах в строке — это сумма. Четырёхзначные
+        числа принимаются, иначе теряются канонические номера подшипников
+        (6205, 22315): в строке «Подшипник SKF 22315 EK» артикул — именно они."""
+    text = s or ""
+    money = bool(MONEY.search(text))
     best = ""
-    for m in TOKEN.finditer(s or ""):
+    for m in TOKEN.finditer(text):
         t = _clean(m.group(0))
-        if len(t) < 4 or _rubbish(t):
+        if len(t) < 4 or _rubbish(t) or SIZE.search(t):
             continue
-        ok = (HASD.search(t) and HASL.search(t)) or (t.isdigit() and 6 <= len(t) <= 14) \
+        # Ду150, Ру16, М12 — условный проход и резьба, это параметр, а не артикул.
+        if DUPN.match(t):
+            continue
+        # Токен сразу после «№» — номер документа или позиции в списке.
+        before = text[:m.start()].rstrip()
+        if before.endswith("№") or before.endswith("No") or before.endswith("#"):
+            continue
+        ok = (HASD.search(t) and HASL.search(t)) \
+             or (t.isdigit() and 4 <= len(t) <= 14 and not money) \
              or (re.fullmatch(r"\d{2,6}([-/]\d{2,6}){1,3}", t) is not None)
         if ok and len(t) > len(best):
             best = t

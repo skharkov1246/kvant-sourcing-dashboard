@@ -35,7 +35,8 @@ import psycopg2.extras
 import requests
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from segments import SEGMENTS, classify, name_of  # noqa: E402  (после sys.path)
+import docfilter  # noqa: E402  (после sys.path)
+from segments import SEGMENTS, classify, name_of  # noqa: E402
 
 # Секреты читаются лениво: без них модуль всё равно импортируется — иначе его
 # нельзя ни собрать py_compile, ни импортировать из тестов гейта.
@@ -47,6 +48,10 @@ WORKERS = int(os.environ.get("WORKERS", "12"))
 DAYS = int(os.environ.get("DAYS", "365"))
 LIMIT = int(os.environ.get("LIMIT", "0"))          # 0 — без ограничения
 RETRY_FAILED = os.environ.get("RETRY_FAILED", "") not in ("", "0", "false")
+# Ворота спецификации можно выключить без выката кода — на случай, если правило
+# начнёт отбрасывать нужное. Выключение видно в журнале прогона.
+SPECGATE = os.environ.get("SPECGATE", "1") not in ("", "0", "false")
+PARSER_VERSION = 2
 
 # Колонки спецификации. Спецификации у всех заказчиков свои, но заголовки повторяются.
 COLS = {
@@ -57,7 +62,6 @@ COLS = {
     "qty": ["кол-во", "количество", "кол.", "qty", "quantity"],
     "unit": ["ед.изм", "ед. изм", "единица", "unit", "ед-ца", "ед."],
 }
-PN_RE = re.compile(r"\b(?=[A-Z0-9]*[0-9])[A-Z0-9][A-Z0-9\-./]{4,24}\b")
 NOISE_ROW = re.compile(r"^(итого|всего|подпись|примечан|№|n\s*п/п|приложение)", re.I)
 
 
@@ -143,15 +147,47 @@ def rows_from_xls(b: bytes) -> list[list[str]]:
     return out
 
 
-def text_from_docx(b: bytes) -> str:
+def docx_xml(b: bytes) -> str:
     try:
         z = zipfile.ZipFile(io.BytesIO(b))
         if "word/document.xml" in z.namelist():
-            raw = z.read("word/document.xml").decode("utf-8", "ignore")
-            return " ".join(re.findall(r"<w:t[^>]*>([^<]{1,400})</w:t>", raw))
+            return z.read("word/document.xml").decode("utf-8", "ignore")
     except Exception:
         return ""
     return ""
+
+
+def text_from_docx(b: bytes) -> str:
+    """Весь текст документа. ВНИМАНИЕ: это одна строка без переводов.
+
+    Спецификация в .docx почти всегда лежит таблицей, и её надо читать
+    rows_from_docx. Эта функция годится только для определения сегмента по
+    тексту файла целиком: склейка всего документа в одну строку означает, что
+    text.splitlines() даст ровно один элемент, и построчный разбор потеряет всё.
+    Именно так до 12.09.2026 терялись ячейки таблиц во всех .docx."""
+    raw = docx_xml(b)
+    return " ".join(re.findall(r"<w:t[^>]*>([^<]{1,400})</w:t>", raw)) if raw else ""
+
+
+def rows_from_docx(b: bytes) -> list[list[str]]:
+    """Таблицы документа построчно: <w:tr> — строка, <w:tc> — ячейка.
+
+    Без этого спецификация в .docx не читается вовсе: текстовый путь склеивает
+    документ в одну строку. Разметка Word разносит текст ячейки по нескольким
+    <w:t> (правки, форматирование, автозамена), поэтому куски ячейки склеиваем."""
+    raw = docx_xml(b)
+    if not raw:
+        return []
+    out: list[list[str]] = []
+    for tr in re.findall(r"<w:tr[\s>].*?</w:tr>", raw, re.S):
+        cells = []
+        for tc in re.findall(r"<w:tc[\s>].*?</w:tc>", tr, re.S):
+            cells.append(" ".join(re.findall(r"<w:t[^>]*>([^<]{0,400})</w:t>", tc)).strip())
+        if any(cells):
+            out.append(cells)
+        if len(out) >= 4000:
+            break
+    return out
 
 
 def text_from_pdf(b: bytes) -> str:
@@ -218,8 +254,13 @@ def items_from_rows(rows: list[list[str]]) -> list[dict]:
         if len(name) < 4 or name.isdigit():
             continue
         if not rec.get("part_number"):
-            m = PN_RE.search(joined.upper())
-            rec["part_number"] = m.group(0) if m else ""
+            # Прежнее выражение искало по joined.upper() и принимало за артикул
+            # дату 01.09.2026, номер закона 223-ФЗ и любое пятизначное число.
+            # docfilter.part_number_of отбрасывает даты, номера пунктов, годы и
+            # разряды тысяч. Замена действует только на новые разборы: пересчёт
+            # накопленных 113 769 парт-номеров — это UPDATE на полтора миллиона
+            # строк с пересчётом fts, отдельная задача.
+            rec["part_number"] = docfilter.part_number_of(joined)
         rec["_row"] = joined[:600]
         out.append(rec)
         if len(out) >= 3000:
@@ -298,7 +339,9 @@ def handle(ref: dict) -> tuple[dict, list[dict]]:
     fid = str(fo.get("id") or fo.get("ID"))
     rec = {"file_id": fid, "deal_id": ref["deal"], "origin": ref["origin"], "field": ref["field"],
            "kind": None, "size_bytes": None, "status": "не скачался", "reason": None,
-           "chars": 0, "rows_found": 0, "segment_id": None, "sha256": None}
+           "chars": 0, "rows_found": 0, "segment_id": None, "sha256": None,
+           "parse_path": None, "header_found": None, "doc_class": None,
+           "class_rule": None, "text_lines": None, "item_lines": None}
     b = download(fo)
     if not b:
         return rec, []
@@ -313,7 +356,14 @@ def handle(ref: dict) -> tuple[dict, list[dict]]:
             try:
                 rows = rows_from_xlsx(b)
             except Exception:
-                text = text_from_docx(b)
+                # Это .docx. Спецификация в нём лежит таблицей; берём таблицу
+                # только при найденной шапке, иначе ветка «самая длинная ячейка»
+                # превратит таблицу реквизитов и подписей в строки номенклатуры.
+                drows = rows_from_docx(b)
+                if drows and header_map(drows)[0] >= 0:
+                    rows = drows
+                else:
+                    text = text_from_docx(b)
         elif kind == "старый office":
             rows = rows_from_xls(b)
         elif kind == "pdf":
@@ -327,26 +377,58 @@ def handle(ref: dict) -> tuple[dict, list[dict]]:
     if rows:
         items = items_from_rows(rows)
         text = " ".join(r.get("_row", "") for r in items)[:200000]
+        rec["parse_path"] = "таблица"
+        rec["header_found"] = header_map(rows)[0] >= 0
     elif text:
-        for line in text.splitlines():
-            line = line.strip()
-            if len(line) > 8 and not NOISE_ROW.match(line):
-                m = PN_RE.search(line.upper())
-                items.append({"item_name": line[:300], "part_number": m.group(0) if m else "",
-                              "oem": "", "unit": "", "qty": None, "_row": line[:600]})
-            if len(items) >= 2000:
-                break
+        # ВОРОТА СПЕЦИФИКАЦИИ. До 12.09.2026 здесь любая строка длиннее восьми
+        # знаков становилась позицией номенклатуры, и в спрос лёг текст извещений
+        # о закупке, проектов договоров и форм КП — 369 171 строка, четверть базы.
+        #
+        # Отказ выносится ЦЕЛИКОМ ПО ФАЙЛУ, а не по строке. Построчный отказ стоил
+        # бы до сорока процентов позиций даже в заведомо хорошей спецификации:
+        # продолжение наименования, перенесённое на вторую строку, никаких
+        # признаков позиции не несёт. Внутри принятого файла пишутся все строки.
+        lines = [ln.strip() for ln in text.splitlines()
+                 if len(ln.strip()) > 8 and not NOISE_ROW.match(ln.strip())]
+        spec_n = prose_n = 0
+        for ln in lines:
+            sp, pr = docfilter.row_marks(ln[:300])
+            spec_n += bool(sp)
+            prose_n += bool(pr and not sp)
+        rec["parse_path"], rec["header_found"] = "текст", False
+        rec["text_lines"], rec["item_lines"] = len(lines), spec_n
+        verdict = docfilter.file_verdict(len(lines), spec_n, prose_n)
+        if verdict == "документация" and SPECGATE:
+            rec["chars"] = len(text)
+            rec["status"] = "текст без спецификации"
+            rec["reason"] = (f"строк {len(lines)} · с признаками позиции {spec_n} · "
+                             f"с признаками текста {prose_n}")      # только агрегаты
+            rec["doc_class"], rec["class_rule"] = "документация", docfilter.RULE_VERSION
+            return rec, []
+        for ln in lines[:2000]:
+            items.append({"item_name": ln[:300], "part_number": docfilter.part_number_of(ln),
+                          "oem": "", "unit": "", "qty": None, "_row": ln[:600]})
 
     rec["chars"] = len(text)
     rec["rows_found"] = len(items)
     rec["segment_id"] = classify(text) if text else None
     if not items:
-        rec["status"] = "пусто"
-        rec["reason"] = "нет текстового слоя" if kind in ("pdf", "изображение") else "позиции не распознаны"
+        # «Пусто» перестало врать: тендерный PDF с текстовым слоем, но без позиций,
+        # раньше ложился как «нет текстового слоя», и оценка объёма распознавания
+        # сканов по этому статусу была завышена.
+        rec["status"] = "пусто" if not rec["chars"] else "текст без спецификации"
+        rec["reason"] = ("нет текстового слоя" if not rec["chars"]
+                         else "позиции не распознаны")
         return rec, []
     rec["status"] = "разобран"
     for it in items:
-        it["segment_id"] = classify(it.get("_row", "")) or rec["segment_id"]
+        # Сегмент СТРОКИ — по самой строке. Наследование от файла помечается
+        # отдельно: пока оно молчаливо, segment_id нельзя использовать как эталон
+        # (текст строки — подмножество текста файла, поэтому файл либо весь
+        # классифицирован, либо весь нет, и любое измерение по нему тавтологично).
+        own = classify(it.get("_row", ""))
+        it["segment_id"] = own or rec["segment_id"]
+        it["segment_rule"] = "строка" if own else ("файл" if rec["segment_id"] else None)
         it["deal_id"] = ref["deal"]
         it["source_file"] = fid
     return rec, items
@@ -429,7 +511,8 @@ def main() -> int:
                 try:
                     psycopg2.extras.execute_values(cur, """
                         insert into lib_demand
-                          (segment_id, deal_id, item_name, oem, part_number, qty, unit, source, source_file)
+                          (segment_id, deal_id, item_name, oem, part_number, qty, unit, source,
+                           source_file, segment_rule)
                         values %s""", buf_items, page_size=500)
                 except (psycopg2.Error, ValueError) as e:
                     # одна испорченная строка не должна стоить всего пакета: двадцать минут
@@ -439,8 +522,9 @@ def main() -> int:
                     for row in buf_items:
                         try:
                             cur.execute("""insert into lib_demand
-                                (segment_id, deal_id, item_name, oem, part_number, qty, unit, source, source_file)
-                                values (%s,%s,%s,%s,%s,%s,%s,%s,%s)""", row)
+                                (segment_id, deal_id, item_name, oem, part_number, qty, unit, source,
+                                 source_file, segment_rule)
+                                values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""", row)
                         except (psycopg2.Error, ValueError):
                             conn.rollback()
                             bad += 1
@@ -450,11 +534,17 @@ def main() -> int:
                 psycopg2.extras.execute_values(cur, """
                     insert into lib_files
                       (file_id, deal_id, origin, field, kind, size_bytes, status, reason,
-                       chars, rows_found, segment_id, sha256)
+                       chars, rows_found, segment_id, sha256,
+                       parse_path, header_found, doc_class, class_rule,
+                       text_lines, item_lines, parser_version)
                     values %s
                     on conflict (file_id) do update set
                       status = excluded.status, reason = excluded.reason, chars = excluded.chars,
                       rows_found = excluded.rows_found, segment_id = excluded.segment_id,
+                      parse_path = excluded.parse_path, header_found = excluded.header_found,
+                      doc_class = excluded.doc_class, class_rule = excluded.class_rule,
+                      text_lines = excluded.text_lines, item_lines = excluded.item_lines,
+                      parser_version = excluded.parser_version,
                       processed_at = now()""", buf_files, page_size=500)
         conn.commit()
         conn.close()
@@ -470,12 +560,16 @@ def main() -> int:
             total_items += rec["rows_found"]
             buf_files.append((rec["file_id"], rec["deal_id"], rec["origin"], rec["field"], rec["kind"],
                               rec["size_bytes"], rec["status"], pg(rec["reason"]), rec["chars"],
-                              rec["rows_found"], rec["segment_id"], rec["sha256"]))
+                              rec["rows_found"], rec["segment_id"], rec["sha256"],
+                              rec["parse_path"], rec["header_found"], rec["doc_class"],
+                              rec["class_rule"], rec["text_lines"], rec["item_lines"],
+                              PARSER_VERSION))
             for it in items:
                 buf_items.append((it["segment_id"], it["deal_id"], pg(it["item_name"])[:500],
                                   pg(it.get("oem"))[:200], pg(it.get("part_number"))[:120],
                                   it.get("qty"), pg(it.get("unit"))[:40],
-                                  "спецификация сделки", it["source_file"]))
+                                  "спецификация сделки", it["source_file"],
+                                  it.get("segment_rule")))
             if len(buf_files) >= 200 or len(buf_items) >= 4000:
                 flush()
             if n % 200 == 0:

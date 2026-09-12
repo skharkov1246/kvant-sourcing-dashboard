@@ -32,10 +32,12 @@ DATA_DIRS = {
     "data": "дашборд сорсеров",
     "ove/data": "ОВЭ-75",
     "gt/data": "ГТУ-библиотека",
+    "library/data": "библиотека рынков",
     "zip/data": "база ЗИП",
     "zip/customs/out": "база ЗИП · таможня",
     "gpu/data": "ГПУ-библиотека",
     "gidromet/data": "гидрометаллургия",
+    "pnw/data": "каталог PN · данные",
     "pnw/public": "каталог PN (веб)",
 }
 CODE_EXT = {".py", ".js", ".mjs", ".html", ".yml", ".yaml", ".toml"}
@@ -116,7 +118,15 @@ def consumers(rel: str, code_files: list[Path]) -> list[str]:
 
 
 def build() -> dict:
-    tracked = [ROOT / p for p in sh("git", "ls-files").splitlines() if p]
+    # Файлы берём отслеживаемые ПЛЮС новые, ещё не закоммиченные (но не игнорируемые).
+    # Иначе каталог собирается с разным составом до и после коммита: новый сборщик
+    # в момент локального прогона git не видит, а в CI он уже в индексе — и проверка
+    # --check краснеет на каждом PR, который добавляет файл кода. Так дважды падал
+    # гейт (PR #210 и #234). В CI дерево чистое, поэтому --others там ничего не добавляет
+    # и поведение не меняется; меняется только локальный прогон, который теперь
+    # предсказывает результат CI точно.
+    listed = sh("git", "ls-files", "--cached", "--others", "--exclude-standard")
+    tracked = [ROOT / p for p in dict.fromkeys(listed.splitlines()) if p]
     code_files = [f for f in tracked if f.suffix in CODE_EXT and f.exists()
                   and "public/index.html" not in str(f) and f.stat().st_size < 3_000_000]
     notes = json.loads(NOTES.read_text(encoding="utf-8")) if NOTES.exists() else {}

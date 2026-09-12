@@ -120,3 +120,50 @@ update lib_files f set parse_path = case
     when f.kind = 'старый office' then 'таблица'
     else 'текст' end
  where f.parse_path is null and f.status = 'разобран';
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Индекс под переразбор (library/reparse.py). Выборка старых строк файла без
+-- него — последовательный проход по полутора миллионам строк на каждый из тысяч
+-- файлов; ровно на такой коррелированной выборке 12.09.2026 уже подвисла
+-- миграция. Строится CONCURRENTLY: обычный CREATE INDEX берёт SHARE-блокировку и
+-- остановит запись индексатора на всё время построения.
+--
+-- CONCURRENTLY нельзя выполнять внутри транзакции — psql выполняет каждый
+-- оператор отдельно, поэтому здесь это работает. Оператор стоит ПОСЛЕДНИМ:
+-- если он не пройдёт (например, при идущем прогоне индексатора), всё
+-- остальное уже применено.
+create index concurrently if not exists lib_demand_src on lib_demand (source_file);
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Смычка спроса с каталогом. В lib_demand полтора миллиона строк с артикулами,
+-- в lib_parts — двенадцать тысяч опознанных деталей с машиной, узлом и
+-- исполнителями. Пока они не связаны, спрос остаётся текстом: по нему нельзя
+-- сказать ни какую машину чаще всего спрашивают, ни какой узел.
+--
+-- Ключ считается одной функцией на оба конца — так же, как part_key в
+-- загрузчиках (без регистра, пунктуации и с «ё» → «е»). Если развести правило
+-- по двум местам, оно разойдётся, и связь молча опустеет.
+create or replace function lib_pn_key(t text) returns text
+  language sql immutable parallel safe as $$
+    -- Порядок важен: сначала регистр, потом «ё». В обратном порядке заглавная
+    -- «Ё» переживает замену, после lower() становится «ё» и вылетает как
+    -- посторонний знак — ключ «шайба12» вместо «шайба12е». Ровно на этом
+    -- разошлись SQL и Python при первой сверке.
+    select left(regexp_replace(replace(lower(coalesce(t, '')), 'ё', 'е'),
+                               '[^0-9a-zа-я]', '', 'g'), 80)
+  $$;
+
+drop view if exists lib_demand_catalog;
+create view lib_demand_catalog with (security_invoker = true) as
+  select d.id, d.deal_id, d.item_name, d.part_number, d.qty, d.unit,
+         d.segment_id as demand_segment, d.source,
+         p.id as part_id, p.name as part_name, p.oem, p.unit_id, p.model
+    from lib_demand d
+    join lib_parts p on p.id = lib_pn_key(d.part_number)
+   where coalesce(btrim(d.part_number), '') <> '';
+
+-- Индекс по тому же выражению: без него соединение полутора миллионов строк с
+-- каталогом — последовательный проход с пересчётом функции на каждой строке.
+-- CONCURRENTLY и последним оператором — по той же причине, что выше.
+create index concurrently if not exists lib_demand_pnkey
+  on lib_demand (lib_pn_key(part_number));

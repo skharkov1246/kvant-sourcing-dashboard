@@ -1,0 +1,357 @@
+"""Общий словарь баз данных: свежесть и инварианты проекции.
+
+ЗАЧЕМ. dict/ — проекция семи подпроектов, а не место хранения. Проекция, отставшая
+от источников, хуже её отсутствия: по ней принимают решения, а она показывает
+позавчерашнюю картину. Гейт запускает pytest на каждый PR, поэтому сверка свежести
+живёт здесь, а не отдельным шагом workflow — трогать .github/workflows без владельца
+нельзя (CLAUDE.md, раздел «трогать нельзя»).
+
+Отдельно закреплены инварианты, которые ломались бы молча: собственный номер КВАНТ
+обязан быть в указателе поиска (до 12.09.2026 его там не было, и поиск по KV давал
+ноль при том, что KV приведён примером в подсказке самой страницы), а рёбра цепочки
+не должны смешивать изготовителей с указаниями к закупке.
+"""
+from __future__ import annotations
+
+import importlib.util
+import json
+import subprocess
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+DICT = ROOT / "dict"
+
+
+def _load_builder():
+    spec = importlib.util.spec_from_file_location("build_dict", ROOT / "scripts" / "build_dict.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def test_dict_is_fresh():
+    """Словарь пересобран после последней правки источников."""
+    r = subprocess.run([sys.executable, str(ROOT / "scripts" / "build_dict.py"), "--check"],
+                       capture_output=True, text=True)
+    assert r.returncode == 0, f"словарь устарел: {r.stdout}{r.stderr}"
+
+
+def test_dict_files_exist():
+    for name in ("oem.json", "system.json", "chain.json", "summary.json"):
+        assert (DICT / name).exists(), f"нет dict/{name}"
+
+
+def test_oem_keys_are_unique_and_merge_spellings():
+    """Ключ производителя один на компанию — ради этого словарь и заводился."""
+    recs = json.loads((DICT / "oem.json").read_text(encoding="utf-8"))["records"]
+    keys = [r["oem_key"] for r in recs]
+    assert len(keys) == len(set(keys)), "ключи производителей повторяются"
+    assert all(r["oem_key"] for r in recs), "пустой ключ производителя"
+    # Смысл словаря — склейка написаний. Если ни одна компания не склеилась,
+    # значит нормализация перестала работать и проекция бесполезна.
+    merged = [r for r in recs if r["n_spellings"] > 1]
+    assert merged, "ни одно написание не склеилось — проверьте nkey()"
+
+
+def test_chain_separates_makers_from_routing_notes():
+    """Указание «закупка по спецификации» — не изготовитель, и путать их нельзя."""
+    ch = json.loads((DICT / "chain.json").read_text(encoding="utf-8"))
+    kinds = {e["kind"] for e in ch["records"]}
+    assert kinds <= {"maker", "routing_note"}, f"неизвестный вид ребра: {kinds}"
+    assert ch["makers"] > 0 and ch["routing_notes"] > 0
+    for e in ch["records"]:
+        if e["kind"] == "maker":
+            assert e["to_key"], f"у изготовителя нет ключа: {e['to']}"
+        else:
+            assert not e["to_key"], f"указанию к закупке присвоен ключ компании: {e['to']}"
+
+
+def test_self_edge_is_in_house_not_subsupplier():
+    """Ребро компании в саму себя означает собственное изготовление, а не субпоставку."""
+    ch = json.loads((DICT / "chain.json").read_text(encoding="utf-8"))
+    for e in ch["records"]:
+        if e["kind"] == "maker" and e["from_key"] and e["from_key"] == e["to_key"]:
+            assert e["relation"] == "in_house", f"самоссылка помечена как {e['relation']}: {e['from']}"
+
+
+def test_normalizers_are_stable():
+    """Нормализация — канон для всего репозитория, её поведение закреплено."""
+    m = _load_builder()
+    assert m.nkey("AB SKF") == m.nkey("SKF GmbH") == m.nkey('"SKF"') == "skf"
+    # Кириллица и латиница не склеиваются: «СКФ» и SKF — разные ключи, и это верно,
+    # потому что по-русски так пишут и другие компании.
+    assert m.nkey("ООО «СКФ»") != m.nkey("SKF")
+    assert m.nkey("Bently Nevada, LLC") == m.nkey("BENTLY NEVADA") == "bentlynevada"
+    assert m.norm_pn("1R-1807") == "1R1807"
+    assert m.norm_pn("3222 1881 41") == "3222188141"
+    assert m.clean_name('«Grundfos Holding A/S»') == "Grundfos Holding A/S"
+
+
+def test_own_kv_number_is_searchable():
+    """Поиск по собственному номеру КВАНТ обязан работать: KV приведён примером
+    в подсказке страницы поиска, а до 12.09.2026 возвращал ноль результатов."""
+    rows = json.loads((ROOT / "pnw" / "data" / "numbers.json").read_text(encoding="utf-8"))["rows"]
+    own = [r for r in rows if r["kind"] == "свой"]
+    items = json.loads((ROOT / "pnw" / "data" / "item_master.json").read_text(encoding="utf-8"))["items"]
+    assert len(own) == len(items), "свой номер есть не у каждой детали"
+    assert all(r["owner"] == "КВАНТ" for r in own)
+    assert all(r["number_norm"].startswith("KV") for r in own)
+
+
+def test_pnw_data_is_catalogued():
+    """Каталог данных обязан видеть pnw/data: там 440 адресов и 253 телефона,
+    а до 12.09.2026 каталог сканировал только pnw/public и не знал о них (правило 6)."""
+    cat = json.loads((ROOT / "data" / "catalog.json").read_text(encoding="utf-8"))
+    paths = {d["path"] for d in cat["datasets"]}
+    for need in ("pnw/data/supplier_master.json", "pnw/data/item_master.json",
+                 "pnw/data/numbers.json"):
+        assert need in paths, f"{need} не попал в каталог данных"
+    sens = {d["path"]: d["sensitivity"]["level"] for d in cat["datasets"]}
+    assert sens["pnw/data/supplier_master.json"] == "конфиденциально", \
+        "реестр с контактами поставщиков должен быть помечен как конфиденциальный"
+
+
+def test_catalog_sees_uncommitted_code_files():
+    """Каталог обязан видеть ещё не закоммиченный файл кода.
+
+    Сборщик составлял список файлов по git ls-files, то есть по индексу git.
+    Новый сборщик или тест попадал туда только после коммита, поэтому каталог,
+    собранный локально ПЕРЕД коммитом, отличался от каталога, который CI считает
+    ПОСЛЕ него, и проверка --check краснела на каждом PR с новым файлом кода.
+    Так дважды падал гейт. Локальный прогон обязан предсказывать результат CI."""
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location("build_catalog", ROOT / "scripts" / "build_catalog.py")
+    bc = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(bc)
+
+    probe = ROOT / "scripts" / "_probe_uncommitted.py"
+    probe.write_text('OPEN = "coverage.json"\n', encoding="utf-8")
+    try:
+        fresh = bc.build()
+        cov = [d for d in fresh["datasets"] if d["path"] == "gpu/data/coverage.json"]
+        assert cov, "gpu/data/coverage.json пропал из каталога"
+        assert "scripts/_probe_uncommitted.py" in cov[0].get("referenced_by", []), \
+            "каталог не видит незакоммиченный файл кода — проверка --check снова будет краснеть в CI"
+    finally:
+        probe.unlink(missing_ok=True)
+
+
+def test_chain_coverage_is_fresh_and_honest():
+    """Счётчик цепочки портала пересобран и не приукрашивает.
+
+    Ноль в клетке обязан означать отсутствие данных, а не «данные где-то есть»:
+    по этой карте выбирается следующая работа, и приукрашенный ноль увёл бы
+    усилия не туда."""
+    r = subprocess.run([sys.executable, str(ROOT / "scripts" / "build_chain_coverage.py"), "--check"],
+                       capture_output=True, text=True)
+    assert r.returncode == 0, f"счётчик цепочки устарел: {r.stdout}{r.stderr}"
+
+    cov = json.loads((ROOT / "data" / "chain_coverage.json").read_text(encoding="utf-8"))
+    assert len(cov["links"]) == 8, "цепочка портала — восемь звеньев"
+    assert cov["summary"]["cells_total"] == len(cov["segments"]) * 8
+    for seg in cov["segments"]:
+        for cell in seg["cells"]:
+            # Клетка с числом обязана называть файлы, откуда оно взято, — иначе
+            # цифру нельзя проверить, и она ничем не лучше выдуманной.
+            if cell["n"]:
+                assert cell["sources"], f"{seg['segment']}/{cell['link']}: число без источника"
+                assert cell["state"] == "есть"
+            else:
+                assert cell["state"] == "пусто"
+
+
+def test_gsho_machine_registry():
+    """Реестр машин ГШО собран и склеивает написания одной машины.
+
+    Счётчик цепочки показывал по ГШО одну машину при 1918 позициях номенклатуры:
+    обозначения лежали внутри строкового поля machine через запятую и отдельной
+    сущностью не существовали. Реестр закрывает первое звено цепочки."""
+    r = subprocess.run([sys.executable, str(ROOT / "zip" / "tools" / "build_machines.py"), "--check"],
+                       capture_output=True, text=True)
+    assert r.returncode == 0, f"реестр машин устарел: {r.stdout}{r.stderr}"
+
+    d = json.loads((ROOT / "zip" / "data" / "machines.json").read_text(encoding="utf-8"))
+    assert d["stats"]["machines"] > 50, "машин подозрительно мало — проверьте разбор поля machine"
+    keys = [m["machine_key"] for m in d["machines"]]
+    assert len(keys) == len(set(keys)), "ключи машин повторяются"
+
+    # Смысл реестра — склейка написаний. ST14 и ST-14 обязаны быть одной машиной.
+    merged = [m for m in d["machines"] if len(m["spellings"]) > 1]
+    assert merged, "ни одно написание не склеилось — проверьте mkey()"
+
+    # Бренд — один изготовитель, а не перечень: поле brand в источнике бывает
+    # списком «Epiroc, Normet, Paus», и такой список не должен попасть в реестр.
+    for b in d["brands"]:
+        assert "," not in b["brand"], f"в бренд попал перечень: {b['brand']}"
+
+    # Число позиций у машины обязано быть положительным: машина без единой детали
+    # означает, что она попала в реестр из мусорного значения поля.
+    assert all(m["parts"] > 0 for m in d["machines"])
+
+
+def test_machine_registry_does_not_inflate():
+    """Реестр машин не подмешивает к машинам неразобранное.
+
+    Поле mach базы PN содержит не только машины: туда попали детали
+    («Уплотнение кольцевое»), корзины бренда («Solar (сток)») и машины совсем
+    других сегментов. Подмешать их к турбинам значит завысить заполняемость
+    цепочки — а по ней выбирается следующая работа."""
+    m = json.loads((DICT / "machine.json").read_text(encoding="utf-8"))
+    kinds = {r["kind"] for r in m["records"]}
+    assert kinds <= {"turbine", "other_machine", "mining_machine"}, \
+        f"в реестр попал неразобранный вид: {kinds}"
+    # Виды part, bucket и unknown обязаны быть посчитаны, но НЕ попасть в записи.
+    for bad in ("part", "bucket", "unknown"):
+        assert m["pn_db_kinds"].get(bad, 0) > 0, f"вид {bad} перестал считаться — проверьте классификатор"
+    keys = [r["machine_key"] for r in m["records"]]
+    assert len(keys) == len(set(keys))
+
+
+def test_machine_classifier_catches_flagship_models():
+    """Классификатор обязан ловить самые массовые машины базы.
+
+    Замыкающий \\b в семействах ломал правило молча: в LM2500 граница слова
+    после «LM2» не наступает, и самая массовая машина базы — 3664 позиции —
+    проваливалась в «не определено»."""
+    m = _load_builder()
+    for name in ("LM2500", "LM6000", "GE Frame 6B", "RB211-535", "SGT-400",
+                 "Taurus 60S", "Centaur 50 (по документу)", "GE LMS100"):
+        kind, _stem = m.mach_kind(name)
+        assert kind == "turbine", f"{name} не опознана как турбина, а как {kind}"
+    for name in ("Уплотнение кольцевое", "Шкаф управления PMS МЛСК Ф-1"):
+        assert m.mach_kind(name)[0] == "part", f"{name} принята за машину"
+    assert m.mach_kind("Solar (сток)")[0] == "bucket"
+    assert m.mach_kind("Буровой насос 12T1600")[0] == "other_machine"
+
+
+def test_node_map_is_fresh_and_complete():
+    """Карта узлов пересобрана и не теряет метки молча.
+
+    Ключи таблицы соответствия приводятся тем же правилом, каким по ней ищут.
+    Без этого «Крепёж» в таблице и «крепеж» в запросе — разные строки, и 828
+    размеченных человеком строк уходили в «не определено», не подав признака."""
+    r = subprocess.run([sys.executable, str(ROOT / "scripts" / "build_node_map.py"), "--check"],
+                       capture_output=True, text=True)
+    assert r.returncode == 0, f"карта узлов устарела: {r.stdout}{r.stderr}"
+
+    d = json.loads((DICT / "node_map.json").read_text(encoding="utf-8"))
+    assert d["labels"]["unmapped"] == [], \
+        f"метки не сведены к узлам: {d['labels']['unmapped']}"
+    assert d["labels"]["distinct"] > 40, "меток стало подозрительно мало"
+
+
+def test_node_classifier_precision_floor():
+    """Точность классификатора измеряется на ручной разметке и не должна падать.
+
+    Классификатор предлагает разметку для строк без метки — по этому предложению
+    потом принимают решение. Заявленная, но не измеренная точность бесполезна,
+    поэтому порог закреплён здесь и проверяется на каждом PR."""
+    d = json.loads((DICT / "node_map.json").read_text(encoding="utf-8"))
+    c = d["classifier"]
+    assert c["judged"] >= 1000, "выборка для измерения точности слишком мала"
+    assert c["precision_pct"] >= 80, (
+        f"точность упала до {c['precision_pct']} %: проверьте правила, "
+        f"путаница — {c['top_confusions'][:3]}")
+    # Предложение не должно молча объявлять разобранным то, что не разобрано.
+    p = d["proposal"]
+    assert p["would_classify"] + p["would_leave_unresolved"] == p["rows_without_label"]
+
+
+def test_makers_counted_as_companies_not_rows():
+    """Изготовители считаются уникальными компаниями, а не строками.
+
+    Счётчик суммировал строки разных файлов и врал в обе стороны: по ГТУ он видел
+    72 компании, не подключив пять реестров из восьми, а по ГШО — 4368, потому что
+    4309 строк odm_suppliers это связи «позиция × кандидат» на 1289 компаний,
+    а не изготовители. Сумма строк несравнима между направлениями."""
+    cov = json.loads((ROOT / "data" / "chain_coverage.json").read_text(encoding="utf-8"))
+    by_seg = {s["segment"]: s for s in cov["segments"]}
+
+    gsho = next(c for c in by_seg["gsho"]["cells"] if c["link"] == "maker")
+    odm = json.loads((ROOT / "zip" / "data" / "odm_suppliers.json").read_text(encoding="utf-8"))
+    assert gsho["n"] < len(odm), (
+        "изготовителей ГШО не может быть больше, чем строк связей: "
+        f"{gsho['n']} против {len(odm)} — считаются строки, а не компании")
+
+    gtu = next(c for c in by_seg["gtu"]["cells"] if c["link"] == "maker")
+    assert len(gtu["sources"]) >= 6, (
+        f"по ГТУ подключено лишь {len(gtu['sources'])} реестров — "
+        "остальные компании в счёт не попадут")
+    assert gtu["n"] > 1000, "по ГТУ реестров восемь, компаний должно быть заметно больше сотни"
+
+
+def test_recip_recon_marks_unverified_explicitly():
+    """У каждого факта разведки есть вердикт, и он не пустой.
+
+    Пустое поле вердикта читается как «проверено, всё хорошо». Состояния
+    «скептик не сослался» и «не проверялся» — разные вещи, и обе означают,
+    что факт подтверждённым считать нельзя."""
+    d = json.loads((ROOT / "zip" / "data" / "recip_recon.json").read_text(encoding="utf-8"))
+    allowed = {"подтверждено", "частично", "опровергнуто", "непроверяемо",
+               "скептик не сослался", "не проверялся"}
+    for a in d["angles"]:
+        for f in a["findings"]:
+            assert f.get("verdict") in allowed, f"{a['key']}: вердикт «{f.get('verdict')}»"
+            assert f.get("source"), f"{a['key']}/{f['topic']}: факт без источника"
+        # Угол без скептика обязан честно об этом сообщать.
+        if not a["skeptic"]:
+            assert all(f["verdict"] == "не проверялся" for f in a["findings"])
+
+    # Счётчик цепочки обязан брать только проверенное: неподтверждённое
+    # не заполняет звено.
+    cov = json.loads((ROOT / "data" / "chain_coverage.json").read_text(encoding="utf-8"))
+    recip = next(s for s in cov["segments"] if s["segment"] == "recip")
+    ok = sum(1 for a in d["angles"] for f in a["findings"]
+             if f["verdict"] in ("подтверждено", "частично"))
+    total = sum(len(a["findings"]) for a in d["angles"])
+    assert ok < total, "все факты помечены проверенными — проверьте разбор вердиктов"
+    assert recip["filled"] >= 4, "разведка не дошла до счётчика цепочки"
+
+
+def test_parts_counted_as_unique_numbers_not_rows():
+    """Запчасти считаются уникальными партномерами, а не строками файлов.
+
+    Третий случай одной и той же болезни счётчика: суммы строк из файлов, которые
+    пересекаются. По ГТУ складывались 12 442 строки базы PN и 10 986 строк сквозного
+    справочника, который ИЗ НЕЁ ЖЕ И СОБРАН, — получалось 25 041 вместо 12 934.
+    Номера берутся из явных полей, а не угадываются по тексту: иначе в номера
+    попадают обозначения машин вроде QSV91G."""
+    cov = json.loads((ROOT / "data" / "chain_coverage.json").read_text(encoding="utf-8"))
+    by_seg = {s["segment"]: s for s in cov["segments"]}
+
+    gtu = next(c for c in by_seg["gtu"]["cells"] if c["link"] == "part")
+    pn_db = json.loads((ROOT / "gt" / "data" / "pn_db.json").read_text(encoding="utf-8"))["rows"]
+    im = json.loads((ROOT / "pnw" / "data" / "item_master.json").read_text(encoding="utf-8"))["items"]
+    gtu_items = sum(1 for x in im if x.get("section") == "ГТУ")
+    assert gtu["n"] < len(pn_db) + gtu_items, (
+        f"по ГТУ {gtu['n']} номеров при {len(pn_db)} строках базы PN и {gtu_items} строках "
+        "справочника — это сумма пересекающихся файлов, а не уникальные номера")
+
+    # Номер короче четырёх знаков — это индекс строки, а не партномер.
+    for seg in by_seg.values():
+        cell = next(c for c in seg["cells"] if c["link"] == "part")
+        if cell["n"]:
+            assert cell["sources"], f"{seg['segment']}: номера без источника"
+
+
+def test_chain_counter_declares_its_scope():
+    """Счётчик обязан говорить, чего он не видит.
+
+    Он меряет только файлы репозитория. Инженерная библиотека живёт в закрытой
+    Supabase, и часть звеньев закрыта именно там: на 12.09.2026 в lib_defects
+    16 записей, в lib_procedures 34 ремонтные операции, в lib_suppliers 4 480
+    компаний. Без оговорки страница читается как «этих звеньев нет нигде» —
+    и увела бы работу не туда."""
+    cov = json.loads((ROOT / "data" / "chain_coverage.json").read_text(encoding="utf-8"))
+    scope = cov.get("scope", "")
+    assert scope, "счётчик не объявляет свой охват"
+    assert "lib_" in scope and "Supabase" in scope, \
+        "в оговорке не назван второй источник знаний — библиотека"
+
+    page = ROOT / "zip" / "public" / "chain.html"
+    if page.exists():
+        html = page.read_text(encoding="utf-8")
+        assert "Что этот счётчик не видит" in html, "оговорка не попала на страницу"
+

@@ -2,6 +2,21 @@ name: Библиотека — разбор вложений Битрикса
 
 # Сплошной разбор файлов, привязанных к сделкам: номенклатура из спецификаций
 # ложится в Supabase (lib_demand), состояние каждого файла — в lib_files.
+#
+# Вход «reparse» переключает прогон на переразбор уже разобранных файлов новым
+# разборщиком: правки #233 действуют только на новые файлы, а накопленные 9 920
+# файлов xlsx/docx разбирались кодом, терявшим таблицы .docx целиком. Старые
+# строки не удаляются, а помечаются — откат по ключу прогона.
+#
+# Вход «defects» переключает прогон на извлечение дефектов из текстов ТЗ
+# (library/harvest_defects.py): ворота спецификации выбрасывают тендерные
+# документы целиком, а в них написано, что прогорает, трескается и вибрирует.
+# Спрос при этом не трогается — пишется только lib_defects.
+#
+# Вход «ocr» переключает прогон на распознавание сканов (library/ocr.py): файлы
+# без текстового слоя скачиваются заново и читаются tesseract. Потоков там
+# меньше — распознавание упирается в процессор, а не в сеть. Без входа «apply»
+# распознавание идёт вхолостую и ничего не пишет.
 # Возобновляемо: повторный запуск пропускает уже разобранное.
 #
 # Только ручной запуск. Работа делится на 12 частей, идущих параллельно; каждая
@@ -28,6 +43,25 @@ on:
       workers:
         description: "Потоков скачивания в каждой части"
         default: "12"
+      ocr:
+        description: "Распознавать сканы (tesseract) вместо обычного разбора"
+        type: boolean
+        default: false
+      apply:
+        description: "Писать результат распознавания в базу (для ocr)"
+        type: boolean
+        default: false
+      reparse:
+        description: "Переразобрать уже разобранные файлы новым разборщиком"
+        type: boolean
+        default: false
+      defects:
+        description: "Извлечь дефекты из текстов ТЗ (не трогает спрос)"
+        type: boolean
+        default: false
+      kinds:
+        description: "Форматы для переразбора"
+        default: "xlsx/docx"
       retry_failed:
         description: "Повторить файлы со статусом «не скачался» (сетевая осечка, а не свойство файла)"
         type: boolean
@@ -59,6 +93,14 @@ jobs:
       - name: Установка зависимостей
         run: pip install --quiet requests openpyxl xlrd pypdf psycopg2-binary
 
+      - name: Установка распознавания (только для ocr)
+        if: inputs.ocr
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq tesseract-ocr tesseract-ocr-rus poppler-utils
+          tesseract --version | head -1
+
       - name: Проверка секретов
         env:
           B: ${{ secrets.BITRIX_WEBHOOK_URL }}
@@ -83,4 +125,15 @@ jobs:
           DAYS: ${{ inputs.days }}
           LIMIT: ${{ inputs.limit }}
           RETRY_FAILED: ${{ inputs.retry_failed && '1' || '' }}
-        run: python library/indexer.py
+          APPLY: ${{ inputs.apply && '1' || '' }}
+        run: |
+          set -euo pipefail
+          if [ "${{ inputs.ocr }}" = "true" ]; then
+            WORKERS=4 python library/ocr.py
+          elif [ "${{ inputs.defects }}" = "true" ]; then
+            python library/harvest_defects.py
+          elif [ "${{ inputs.reparse }}" = "true" ]; then
+            KINDS="${{ inputs.kinds }}" python library/reparse.py
+          else
+            python library/indexer.py
+          fi

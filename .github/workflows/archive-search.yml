@@ -1,0 +1,41 @@
+name: Архив — подключение закрытого серверного поиска
+
+# Only additive archive schema, restricted service RPCs and aggregate checks.
+# Originals stay in private Storage. No customer content or credentials in logs.
+on:
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths:
+      - library/supabase/archive_schema.sql
+      - library/supabase/archive_search.sql
+      - scripts/activate_archive_search.py
+      - .github/workflows/archive-search.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: archive-search-activation
+  cancel-in-progress: false
+
+jobs:
+  activate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Установка клиента базы
+        run: python -m pip install --quiet --disable-pip-version-check psycopg2-binary==2.9.10
+      - name: Применение схемы и проверка доступа
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: python scripts/activate_archive_search.py
