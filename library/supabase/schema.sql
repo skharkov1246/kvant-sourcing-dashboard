@@ -144,6 +144,47 @@ alter table lib_parts add column if not exists qty_demand numeric;-- сколь�
 create index if not exists lib_parts_unit on lib_parts (unit_id);
 
 -- ─────────────────────────────────────────────────────────────────────────────
+-- 2г. Диагностика, дефект и ремонтное решение — середина цепочки портала. Здесь
+--     лежит то, что отличает инженерный портал от прайс-листа: как проверяют
+--     узел, чем он выходит из строя и что с этим делают.
+create table if not exists lib_procedures (
+  id            text primary key,
+  kind          text not null,              -- инспекция | контроль | ремонт | покрытие | модернизация
+  name          text not null,
+  unit_id       text references lib_units(id) on delete set null,
+  scope         text,                       -- что именно делают
+  duration      text,                       -- 3–5 недель
+  model_family  text,                       -- к какому семейству машин относится
+  performer     text,                       -- кто выполняет, если известно
+  performer_key text,                       -- нормализованное имя для связи с lib_suppliers
+  source        text,
+  created_at    timestamptz default now(),
+  updated_at    timestamptz default now()
+);
+create index if not exists lib_procedures_kind on lib_procedures (kind);
+create index if not exists lib_procedures_unit on lib_procedures (unit_id);
+create index if not exists lib_procedures_perf on lib_procedures (performer_key);
+
+-- Дефект и решение хранятся вместе: без решения дефект — это жалоба, а не знание.
+-- Последствие отделено от причины сознательно: закупщику нужно первое («прогар,
+-- вылет фрагментов, мгновенный останов»), инженеру — второе.
+create table if not exists lib_defects (
+  id          text primary key,
+  name        text not null,
+  unit_id     text references lib_units(id) on delete set null,
+  part_number text,                         -- каталожный номер, если дефект привязан к детали
+  model       text,
+  cause       text,
+  consequence text,
+  fix         text,                         -- ремонтное решение
+  source      text,
+  created_at  timestamptz default now(),
+  updated_at  timestamptz default now()
+);
+create index if not exists lib_defects_unit on lib_defects (unit_id);
+create index if not exists lib_defects_pn   on lib_defects (part_number);
+
+-- ─────────────────────────────────────────────────────────────────────────────
 -- 3. Поставщики: кто в мире делает это оборудование и его части.
 create table if not exists lib_suppliers (
   id           bigint generated always as identity primary key,
@@ -283,6 +324,8 @@ alter table lib_part_suppliers enable row level security;
 alter table lib_models    enable row level security;
 alter table lib_units     enable row level security;
 alter table lib_part_models    enable row level security;
+alter table lib_procedures     enable row level security;
+alter table lib_defects        enable row level security;
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 9. Реестр разобранных файлов. Нужен для возобновляемости: обход 22 тысяч

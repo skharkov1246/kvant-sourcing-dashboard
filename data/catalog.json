@@ -272,6 +272,7 @@
       },
       "referenced_by": [
         "gt/build.py",
+        "library/load_equipment.py",
         "pnw/tools/build_master.py",
         "tests/test_core.py"
       ]
@@ -1463,7 +1464,8 @@
       },
       "referenced_by": [
         "gt/tools/ansaldo_report.py",
-        "gt/tools/build_ansaldo.py"
+        "gt/tools/build_ansaldo.py",
+        "library/load_equipment.py"
       ]
     },
     {
@@ -4624,7 +4626,8 @@
         "markers": []
       },
       "referenced_by": [
-        "gt/build.py"
+        "gt/build.py",
+        "library/load_equipment.py"
       ]
     },
     {
@@ -6015,8 +6018,8 @@
         "zip/data/telsmith_nodrawings.json"
       ],
       "last_change": "2026-09-12",
-      "last_author": "Claude",
-      "last_commit": "180f09f",
+      "last_author": "skharkov1246",
+      "last_commit": "57e9e6f",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -6137,7 +6140,9 @@
       },
       "referenced_by": [
         "gpu/build.py",
-        "gt/build.py"
+        "gt/build.py",
+        "library/equipment.py",
+        "library/load_equipment.py"
       ]
     },
     {
@@ -6255,7 +6260,10 @@
         "gt/public/hot.html",
         "gt/tools/build_hot.py",
         "gt/tools/build_lot.py",
-        "gt/tools/drop_ru.py"
+        "gt/tools/drop_ru.py",
+        "library/equipment.py",
+        "library/load_equipment.py",
+        "tests/test_library_equipment.py"
       ]
     },
     {
@@ -6709,7 +6717,9 @@
       },
       "referenced_by": [
         "gpu/build.py",
-        "gt/build.py"
+        "gt/build.py",
+        "library/equipment.py",
+        "library/load_equipment.py"
       ]
     },
     {
@@ -7044,7 +7054,10 @@
         "gt/public/hot.html",
         "gt/tools/build_hot.py",
         "gt/tools/build_lot.py",
-        "gt/tools/drop_ru.py"
+        "gt/tools/drop_ru.py",
+        "library/equipment.py",
+        "library/load_equipment.py",
+        "tests/test_library_equipment.py"
       ]
     },
     {
