@@ -1097,7 +1097,8 @@
         "gt/tools/build_lot_xlsx.py",
         "gt/tools/build_rfq.py",
         "gt/tools/ship_merge.py",
-        "gt/tools/ship_report.py"
+        "gt/tools/ship_report.py",
+        "library/load_parts.py"
       ]
     },
     {
@@ -1914,6 +1915,7 @@
         ]
       },
       "referenced_by": [
+        "library/load_parts.py",
         "pnw/tools/build_suppliers.py",
         "zip/build.py",
         "zip/tools/aggregate_customs.py",
@@ -3083,6 +3085,7 @@
         ]
       },
       "referenced_by": [
+        "library/load_parts.py",
         "zip/build.py",
         "zip/tools/parse_demand.py"
       ]
@@ -3700,6 +3703,7 @@
         ]
       },
       "referenced_by": [
+        "library/load_parts.py",
         "zip/tools/cat_stock.py",
         "zip/tools/cat_stock_table.py"
       ]

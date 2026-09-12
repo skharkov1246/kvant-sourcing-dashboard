@@ -384,6 +384,18 @@ create table if not exists lib_prices (
 );
 create index if not exists lib_prices_seg on lib_prices (segment_id);
 create index if not exists lib_prices_pn  on lib_prices (part_number);
+-- Цена без привязки к детали и без источника поступления — это просто число.
+-- part_id связывает её с каталогом, feed помечает поток, из которого она пришла:
+-- по feed загрузчик снимает свои прежние строки и потому идемпотентен (у цены
+-- нет естественного ключа — одна деталь законно имеет и минимум, и максимум).
+alter table lib_prices add column if not exists part_id  text
+  references lib_parts(id) on delete cascade;
+alter table lib_prices add column if not exists feed     text;
+alter table lib_prices add column if not exists country  text;
+alter table lib_prices add column if not exists year     int;
+alter table lib_prices add column if not exists exporter text;
+create index if not exists lib_prices_part on lib_prices (part_id);
+create index if not exists lib_prices_feed on lib_prices (feed);
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 5. Знание об оборудовании: устройство, режимы работы, критерии подбора,
