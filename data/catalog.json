@@ -4,18 +4,18 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 193,
-    "total_bytes": 95132598,
+    "datasets": 196,
+    "total_bytes": 98731720,
     "by_sensitivity": {
       "конфиденциально": 57,
-      "внутреннее": 103,
+      "внутреннее": 106,
       "публикуемо": 33
     },
     "by_subproject": {
       "ГПУ-библиотека": 27,
       "ГТУ-библиотека": 35,
       "ОВЭ-75": 45,
-      "база ЗИП": 33,
+      "база ЗИП": 36,
       "база ЗИП · таможня": 18,
       "библиотека рынков": 1,
       "гидрометаллургия": 22,
@@ -305,7 +305,7 @@
       },
       "last_change": "2026-09-12",
       "last_author": "skharkov1246",
-      "last_commit": "9a3905b",
+      "last_commit": "ed3d7eb",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -829,6 +829,52 @@
       "referenced_by": []
     },
     {
+      "path": "zip/data/dirs_recon.json",
+      "subproject": "база ЗИП",
+      "bytes": 1467686,
+      "note": "Насосы, КИПиА, электротехника: 731 факт с источником и 229 карточек компаний по 14 углам разведки — три направления, которых в портале не было вовсе. Углы: типы и стандарты, расходная номенклатура и ресурс, торцевые уплотнения, гидравлическая часть, классы приборов, кто делает начинку для брендов, регулирующие клапаны, электродвигатели, частотные преобразователи, трансформаторы и РУ, российское производство, аутмаркет. ВАЖНО: проверку скептиком не проходила НИ ОДНА запись — все 15 скептиков упёрлись в недельный лимит сессии 12.09.2026, поэтому у каждой записи стоит вердикт «угол без скептика». Пользоваться как отправной точкой можно, ссылаться в коммерческом предложении — нет. Собрано zip/tools/extract_recon.py.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "angles",
+        "generated",
+        "method",
+        "stats",
+        "subject"
+      ],
+      "main_collection": {
+        "key": "angles",
+        "records": 14,
+        "record_keys": [
+          "angle",
+          "companies",
+          "dead_ends",
+          "findings",
+          "gaps",
+          "key",
+          "segment",
+          "segment_title",
+          "skeptic",
+          "summary",
+          "title"
+        ]
+      },
+      "last_change": "2026-09-12",
+      "last_author": "Claude",
+      "last_commit": "5063daf",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "scripts/build_chain_coverage.py",
+        "tests/test_dict.py",
+        "zip/tools/build_recon_pages.py",
+        "zip/tools/extract_recon.py"
+      ]
+    },
+    {
       "path": "zip/data/diagnostics_recon.json",
       "subproject": "база ЗИП",
       "bytes": 1414228,
@@ -923,6 +969,39 @@
         ]
       },
       "referenced_by": []
+    },
+    {
+      "path": "zip/data/subsupplier_recon.json",
+      "subproject": "база ЗИП",
+      "bytes": 1358715,
+      "note": "Субпоставщики двух уровней и правила чтения каталожных номеров: 150 цепочек «OEM → узел → кто делает первого уровня → кто делает ему» по семи направлениям, 78 правил чтения номера изготовителя с примерами и указанием, где правило ломается, 78 совпадений с нашей базой. У 90 цепочек из 150 узел покупается напрямую, минуя OEM — это и есть рабочий результат для закупки. Скептик отработал по ГТУ и ГПУ (2 направления из 7): из 47 проверенных утверждений забраковано 12, преимущественно шифровки, выведенные по нашей же выборке и на ней же проверенные. Собрано zip/tools/extract_recon.py.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "generated",
+        "method",
+        "segments",
+        "stats",
+        "subject"
+      ],
+      "main_collection": {
+        "key": "stats",
+        "records": 11
+      },
+      "last_change": "2026-09-12",
+      "last_author": "Claude",
+      "last_commit": "5063daf",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "scripts/build_chain_coverage.py",
+        "tests/test_dict.py",
+        "zip/tools/build_recon_pages.py",
+        "zip/tools/extract_recon.py"
+      ]
     },
     {
       "path": "zip/data/positions.json",
@@ -1218,6 +1297,40 @@
         "pnw/tools/harvest_contacts.py",
         "tests/test_dict.py",
         "zip/tools/perf_classes.py"
+      ]
+    },
+    {
+      "path": "zip/data/repair_recon.json",
+      "subproject": "база ЗИП",
+      "bytes": 768121,
+      "note": "Ремонтные решения и исполнители: 44 технологии восстановления (наплавка и напыление, механическая обработка с балансировкой, обратное проектирование) с границами применимости, рисками, требованиями к оборудованию, приёмкой и экономикой; 55 исполнителей в 33 городах России, у 52 заявлен собственный передел. Закрывает последние два звена цепочки портала — «ремонтное решение» и «исполнитель». Скептики проверили 96 утверждений по технологиям: подтверждено 21, поправлено 51, забраковано 15, непроверяемо 9; среди забракованного — сквозная ссылка на отменённый РД 03-615-03 вместо действующих ФНП (приказ Ростехнадзора № 519 от 11.12.2020). Карточки исполнителей проверку НЕ проходили: соответствующие углы упёрлись в лимит. Собрано zip/tools/extract_recon.py из журнала разведки.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "contractor_angles",
+        "generated",
+        "method",
+        "stats",
+        "subject",
+        "tech_angles"
+      ],
+      "main_collection": {
+        "key": "stats",
+        "records": 12
+      },
+      "last_change": "2026-09-12",
+      "last_author": "Claude",
+      "last_commit": "5063daf",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "scripts/build_chain_coverage.py",
+        "tests/test_dict.py",
+        "zip/tools/build_recon_pages.py",
+        "zip/tools/extract_recon.py"
       ]
     },
     {
@@ -5687,6 +5800,67 @@
       ]
     },
     {
+      "path": "data/catalog_notes.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 39958,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "data/budget_snapshot.json",
+        "data/chain_coverage.json",
+        "data/chat_snapshot.json",
+        "data/index.json",
+        "dict/",
+        "dict/node_map.json",
+        "dict/symptom.json",
+        "gidromet/data/",
+        "gpu/data/bitrix_gpu.json",
+        "gpu/data/coverage.json",
+        "gt/data/ansaldo.json",
+        "gt/data/bitrix_gt.json",
+        "gt/data/dossiers.json",
+        "gt/data/pn_db.json",
+        "gt/data/ship_energoseti.json",
+        "gt/data/ship_lukoil.json",
+        "gt/data/ship_sellers.json",
+        "gt/data/ship_sweep.json",
+        "gt/docs/ЗАКУПКА-ЛУКОЙЛ.csv",
+        "library/data/symptoms.json",
+        "library/docfilter.py",
+        "library/indexer.py",
+        "library/load_parts.py",
+        "library/load_suppliers.py",
+        "library/ocr.py",
+        "library/reparse.py",
+        "library/supabase/schema_junk.sql",
+        "ove/data/suppliers.json",
+        "pnw/data/contacts_found.json",
+        "pnw/data/crossrefs.json",
+        "pnw/data/item_master.json",
+        "pnw/data/kv_registry.json",
+        "pnw/data/numbers.json",
+        "pnw/data/part_suppliers.json",
+        "pnw/data/supplier_master.json",
+        "pnw/public/data.js",
+        "pnw/public/search.html",
+        "zip/customs/out/",
+        "zip/data/cat_stock_2026-09.json",
+        "zip/data/customs_declarations.json"
+      ],
+      "last_change": "2026-09-12",
+      "last_author": "Claude",
+      "last_commit": "5063daf",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "scripts/build_catalog.py"
+      ]
+    },
+    {
       "path": "ove/data/disc_a.json",
       "subproject": "ОВЭ-75",
       "bytes": 38724,
@@ -5800,67 +5974,6 @@
         "scripts/build_dict.py",
         "tests/test_dict.py",
         "zip/tools/build_machines.py"
-      ]
-    },
-    {
-      "path": "data/catalog_notes.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 36165,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "data/budget_snapshot.json",
-        "data/chain_coverage.json",
-        "data/chat_snapshot.json",
-        "data/index.json",
-        "dict/",
-        "dict/node_map.json",
-        "dict/symptom.json",
-        "gidromet/data/",
-        "gpu/data/bitrix_gpu.json",
-        "gpu/data/coverage.json",
-        "gt/data/ansaldo.json",
-        "gt/data/bitrix_gt.json",
-        "gt/data/dossiers.json",
-        "gt/data/pn_db.json",
-        "gt/data/ship_energoseti.json",
-        "gt/data/ship_lukoil.json",
-        "gt/data/ship_sellers.json",
-        "gt/data/ship_sweep.json",
-        "gt/docs/ЗАКУПКА-ЛУКОЙЛ.csv",
-        "library/data/symptoms.json",
-        "library/docfilter.py",
-        "library/indexer.py",
-        "library/load_parts.py",
-        "library/load_suppliers.py",
-        "library/ocr.py",
-        "library/reparse.py",
-        "library/supabase/schema_junk.sql",
-        "ove/data/suppliers.json",
-        "pnw/data/contacts_found.json",
-        "pnw/data/crossrefs.json",
-        "pnw/data/item_master.json",
-        "pnw/data/kv_registry.json",
-        "pnw/data/numbers.json",
-        "pnw/data/part_suppliers.json",
-        "pnw/data/supplier_master.json",
-        "pnw/public/data.js",
-        "pnw/public/search.html",
-        "zip/customs/out/",
-        "zip/data/cat_stock_2026-09.json",
-        "zip/data/customs_declarations.json"
-      ],
-      "last_change": "2026-09-12",
-      "last_author": "Claude",
-      "last_commit": "5f4a9d7",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "scripts/build_catalog.py"
       ]
     },
     {
@@ -6542,7 +6655,7 @@
     {
       "path": "data/chain_coverage.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 23196,
+      "bytes": 24003,
       "note": "Заполняемость цепочки портала по семи направлениям и восьми звеньям: машина → узел → признак → дефект → ремонтное решение → запчасть → изготовитель → исполнитель. Производный файл, считается scripts/build_chain_coverage.py по фактическим файлам репозитория; ноль означает отсутствие данных, а не то, что они где-то есть. Руками не заполнять. Первый прогон 12.09.2026: 13 клеток из 56, звенья «Признак», «Дефект» и «Исполнитель» не начаты ни по одному направлению.",
       "format": "json",
       "shape": "объект",
@@ -6569,7 +6682,7 @@
       },
       "last_change": "2026-09-12",
       "last_author": "Claude",
-      "last_commit": "5f4a9d7",
+      "last_commit": "5063daf",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
