@@ -519,10 +519,11 @@
           "link": "machine",
           "title": "Машина",
           "what": "модель опознаётся и описана",
-          "n": 77,
+          "n": 78,
           "sources": [
             "zip/data/telsmith_3858.json",
-            "zip/data/machines.json"
+            "zip/data/machines.json",
+            "zip/data/r1700.json"
           ],
           "state": "есть"
         },
@@ -530,7 +531,7 @@
           "link": "node",
           "title": "Узел",
           "what": "состав машины разобран по узлам",
-          "n": 26,
+          "n": 30,
           "sources": [
             "zip/data/telsmith_3858.json",
             "zip/data/r1700.json"
@@ -567,7 +568,7 @@
           "link": "part",
           "title": "Запчасть",
           "what": "номенклатура с номерами, готовая к запросу",
-          "n": 2005,
+          "n": 2199,
           "sources": [
             "zip/data/positions.json",
             "zip/data/telsmith_3858.json",
@@ -580,11 +581,12 @@
           "link": "maker",
           "title": "Изготовитель",
           "what": "кто делает деталь, помимо владельца конструкции",
-          "n": 1150,
+          "n": 1279,
           "sources": [
             "zip/data/odm_suppliers.json",
             "zip/data/telsmith_suppliers.json",
-            "zip/data/supplier_crm.json"
+            "zip/data/supplier_crm.json",
+            "zip/data/r1700.json"
           ],
           "state": "есть"
         },
@@ -592,14 +594,16 @@
           "link": "contractor",
           "title": "Исполнитель",
           "what": "кому отдать работы по ремонту",
-          "n": 0,
-          "sources": [],
-          "state": "пусто"
+          "n": 40,
+          "sources": [
+            "zip/data/r1700.json"
+          ],
+          "state": "есть"
         }
       ],
-      "filled": 5,
+      "filled": 6,
       "of": 8,
-      "pct": 62
+      "pct": 75
     }
   ],
   "empty_everywhere": [
@@ -612,11 +616,6 @@
       "link": "defect",
       "title": "Дефект",
       "what": "каталог дефектов: что ломается и почему"
-    },
-    {
-      "link": "contractor",
-      "title": "Исполнитель",
-      "what": "кому отдать работы по ремонту"
     }
   ],
   "common": {
@@ -630,8 +629,8 @@
   "summary": {
     "segments": 7,
     "links": 8,
-    "cells_filled": 13,
+    "cells_filled": 14,
     "cells_total": 56,
-    "links_not_started": 3
+    "links_not_started": 2
   }
 }

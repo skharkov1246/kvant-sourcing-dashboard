@@ -1,0 +1,3354 @@
+{
+ "slice": "engine",
+ "rows": [
+  {
+   "pn": "466-1614",
+   "name_ru": "Комплект прокладок ГБЦ (набор)",
+   "name_en": "Cylinder Head Gasket Set",
+   "node": "01 Двигатель",
+   "applic": "C10 / C11 / C12 — семейство 3176/C10-C13; R1700G поздних лет (C11 ACERT)",
+   "qty": "1",
+   "interval": "при капремонте",
+   "alts": [
+    {
+     "brand": "Interstate-McBee",
+     "pn": "MCBC13013GC",
+     "kind": "аналог",
+     "note": "комплект прокладок ГБЦ C13, тот же блок"
+    },
+    {
+     "brand": "PAI Industries",
+     "pn": "331410",
+     "kind": "аналог",
+     "note": "Cat 316-4416 head gasket kit"
+    }
+   ],
+   "price_usd": "505.02",
+   "source": "https://highwayandheavyparts.com/product/caterpillar-c10-c11-c12-cylinder-head-gasket-set-new-4661614/",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "221-9392",
+   "name_ru": "Прокладка ГБЦ",
+   "name_en": "Cylinder Head Gasket",
+   "node": "01 Двигатель",
+   "applic": "C11 / C13 (345C/345D/349D, 966H/972H, 621H-627H)",
+   "qty": "1",
+   "interval": "при снятии ГБЦ",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "331463",
+     "kind": "аналог",
+     "note": "CATERPILLAR 2219392 cylinder head gasket (C13)"
+    },
+    {
+     "brand": "Fab Heavy Parts",
+     "pn": "2219392",
+     "kind": "аналог",
+     "note": "афтермаркет, $120.09"
+    }
+   ],
+   "price_usd": "103.63",
+   "source": "https://www.dieselpartsdirect.com/ds2219392",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "10R-2602",
+   "name_ru": "Головка блока цилиндров Stage 2 (в сборе)",
+   "name_en": "Loaded Cylinder Head, Stage 2",
+   "node": "01 Двигатель",
+   "applic": "C11 / C13 — реман/новая Cat, взаимозаменяема в семействе",
+   "qty": "1",
+   "interval": "при капремонте",
+   "alts": [
+    {
+     "brand": "Heavy Duty Kits",
+     "pn": "10R2602",
+     "kind": "реман Cat",
+     "note": "$3 099 за головку в сборе"
+    },
+    {
+     "brand": "PAI Industries",
+     "pn": "360441E",
+     "kind": "аналог",
+     "note": "Cat 305-0617 new cylinder head assembly (C13)"
+    }
+   ],
+   "price_usd": "3099.00",
+   "source": "https://www.heavydutykits.com/product-category/caterpillar/c-series-engines/cat-c11/parts-for-c11/",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "305-0617",
+   "name_ru": "Головка блока цилиндров (голая)",
+   "name_en": "Cylinder Head, bare",
+   "node": "01 Двигатель",
+   "applic": "C13 по каталогу PAI; поставщики Made-in-China (tunwayparts, gztengfei) указывают C11/C13 — для C11 нужна сверка по S/N",
+   "qty": "1",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "360441E",
+     "kind": "аналог",
+     "note": "CATERPILLAR 3050617 new cylinder head assembly (C13), $5075.83"
+    },
+    {
+     "brand": "ahjicheng / tunwayparts (CN)",
+     "pn": "305-0617",
+     "kind": "аналог",
+     "note": "китайские заводы, литьё + мехобработка"
+    }
+   ],
+   "price_usd": "5075.83",
+   "source": "https://www.woodlineparts.com/products/pai-360441e-caterpillar-3050617-new-cylinder-head-assembly-c13",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "197-9330",
+   "name_ru": "Гильза цилиндра с уплотнением",
+   "name_en": "Cylinder Liner with Seal",
+   "node": "01 Двигатель",
+   "applic": "C11 (в каталоге PAI гильза 197-9330 указана и для C12)",
+   "qty": "6",
+   "interval": "при капремонте",
+   "alts": [
+    {
+     "brand": "Heavy Duty Kits",
+     "pn": "1979330S",
+     "kind": "аналог",
+     "note": "гильза с уплотнением для Cat C11"
+    },
+    {
+     "brand": "PAI Industries",
+     "pn": "361613",
+     "kind": "аналог",
+     "note": "CYLINDER LINER (C12) — 1979330, 1482130, 1300859, $102.27"
+    }
+   ],
+   "price_usd": "",
+   "source": "https://www.heavydutykits.com/product-category/caterpillar/c-series-engines/cat-c11/parts-for-c11/",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "104-3560",
+   "name_ru": "Уплотнительное кольцо гильзы (O-ring)",
+   "name_en": "Liner Seal O-ring",
+   "node": "01 Двигатель",
+   "applic": "C11 / C12 / C13",
+   "qty": "6",
+   "interval": "при капремонте",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "321295",
+     "kind": "аналог",
+     "note": "O-RING 5.53in ID x 0.075 CS, упаковка 6 шт, $20.16"
+    }
+   ],
+   "price_usd": "7.98",
+   "source": "https://highwayandheavyparts.com/product/liner-seal-for-caterpillar-c12/",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "339-8176",
+   "name_ru": "Поршень",
+   "name_en": "Piston",
+   "node": "01 Двигатель",
+   "applic": "C11 (в т.ч. двигатель R1700G C11 ACERT)",
+   "qty": "6",
+   "interval": "при капремонте",
+   "alts": [
+    {
+     "brand": "Interstate-McBee",
+     "pn": "M CK3398176P",
+     "kind": "комплект",
+     "note": "KIT-CYLINDER C11: поршень+гильза+кольца+палец, $576.17"
+    },
+    {
+     "brand": "Buy Machinery Parts",
+     "pn": "339-8176",
+     "kind": "аналог",
+     "note": "$265.58"
+    },
+    {
+     "brand": "Eamon Long",
+     "pn": "3398176LK",
+     "kind": "комплект",
+     "note": "piston & liner kit C11"
+    }
+   ],
+   "price_usd": "265.58",
+   "source": "https://www.buymachineryparts.com/products/piston-339-8176-suitable-for-caterpillar-c11-engines",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "197-9381",
+   "name_ru": "Поршень (PAI 311170)",
+   "name_en": "Piston",
+   "node": "01 Двигатель",
+   "applic": "C11",
+   "qty": "6",
+   "interval": "при капремонте",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "311170",
+     "kind": "аналог",
+     "note": "CATERPILLAR 1979381 PISTON (C11), $376.59"
+    },
+    {
+     "brand": "PAI Industries",
+     "pn": "311171",
+     "kind": "комплект",
+     "note": "PISTON KIT (C11), $431.66"
+    }
+   ],
+   "price_usd": "376.59",
+   "source": "https://www.woodlineparts.com/products/pai-311170-caterpillar-1979381-piston-c11",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "197-9257",
+   "name_ru": "Кольцо поршневое промежуточное",
+   "name_en": "Piston Ring (Intermediate)",
+   "node": "01 Двигатель",
+   "applic": "C11",
+   "qty": "6",
+   "interval": "при капремонте",
+   "alts": [
+    {
+     "brand": "Heavy Duty Kits",
+     "pn": "1979257",
+     "kind": "аналог",
+     "note": "$45.00"
+    },
+    {
+     "brand": "PAI Industries",
+     "pn": "305064",
+     "kind": "комплект",
+     "note": "PISTON RING SET (3176/C10/C11/C12/C13), $71.92"
+    }
+   ],
+   "price_usd": "45.00",
+   "source": "https://www.heavydutykits.com/product-category/caterpillar/c-series-engines/cat-c11/parts-for-c11/",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "238-2717",
+   "name_ru": "Кольцо поршневое верхнее",
+   "name_en": "Top Piston Ring",
+   "node": "01 Двигатель",
+   "applic": "C11",
+   "qty": "6",
+   "interval": "при капремонте",
+   "alts": [
+    {
+     "brand": "Heavy Duty Kits",
+     "pn": "2382717",
+     "kind": "аналог",
+     "note": "$30.39"
+    },
+    {
+     "brand": "Interstate-McBee",
+     "pn": "M-RSC13E",
+     "kind": "комплект",
+     "note": "piston ring set, то же семейство"
+    }
+   ],
+   "price_usd": "30.39",
+   "source": "https://www.heavydutykits.com/product-category/caterpillar/c-series-engines/cat-c11/parts-for-c11/",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "197-9326",
+   "name_ru": "Стопорное кольцо поршневого пальца",
+   "name_en": "Piston Pin Retainer",
+   "node": "01 Двигатель",
+   "applic": "C11",
+   "qty": "12",
+   "interval": "при капремонте",
+   "alts": [
+    {
+     "brand": "Heavy Duty Kits",
+     "pn": "1979326",
+     "kind": "аналог",
+     "note": "$5.67"
+    }
+   ],
+   "price_usd": "5.67",
+   "source": "https://www.heavydutykits.com/product-category/caterpillar/c-series-engines/cat-c11/parts-for-c11/",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "276-7222",
+   "name_ru": "Форсунка охлаждения поршня",
+   "name_en": "Piston Cooling Nozzle",
+   "node": "01 Двигатель",
+   "applic": "C11 / C13 (замена 226-6478)",
+   "qty": "6",
+   "interval": "при капремонте",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "345007",
+     "kind": "аналог",
+     "note": "CATERPILLAR 2767222 (C11/C13) (2266478), $26.86"
+    },
+    {
+     "brand": "Buy Machinery Parts",
+     "pn": "276-7222",
+     "kind": "аналог",
+     "note": "$92.36"
+    }
+   ],
+   "price_usd": "26.86",
+   "source": "https://www.woodlineparts.com/products/pai-345007-caterpillar-2767222-piston-cooling-nozzle-c11-c13-2266478-woodlineparts-com",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "225-5441",
+   "name_ru": "Шатун в сборе",
+   "name_en": "Connecting Rod Assembly",
+   "node": "01 Двигатель",
+   "applic": "C11 (кросс 223-9133, 160-8192, 10R-2788)",
+   "qty": "6",
+   "interval": "при капремонте",
+   "alts": [
+    {
+     "brand": "hnlore (CN)",
+     "pn": "225-5441",
+     "kind": "аналог",
+     "note": "завод Henan Lore, кросс 2239133/1608192/10R2788"
+    },
+    {
+     "brand": "PAI Industries",
+     "pn": "371613OEM",
+     "kind": "аналог",
+     "note": "Cat 223-9150 connecting rod (C13) OEM, $1059.20"
+    }
+   ],
+   "price_usd": "",
+   "source": "https://hcqppart.en.made-in-china.com/product/MpXUjiVxZfcO/China-Caterpillar-C11-Connecting-Rod-Assembly-225-5441.html",
+   "confidence": "low",
+   "verdict": ""
+  },
+  {
+   "pn": "115-2972",
+   "name_ru": "Втулка шатуна",
+   "name_en": "Connecting Rod Bushing",
+   "node": "01 Двигатель",
+   "applic": "3176 / C10 / C11 / C12 (семейство C11)",
+   "qty": "6",
+   "interval": "при капремонте",
+   "alts": [
+    {
+     "brand": "Interstate-McBee",
+     "pn": "1152972",
+     "kind": "аналог",
+     "note": "$27.80"
+    },
+    {
+     "brand": "hcqppart (CN)",
+     "pn": "115-2972",
+     "kind": "аналог",
+     "note": "китайский завод, C11/C13"
+    }
+   ],
+   "price_usd": "27.80",
+   "source": "https://www.woodlineparts.com/products/interstate-mcbee-caterpillar-1152972-connecting-rod-bushing-3176-c10-c12",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "292-0484",
+   "name_ru": "Вкладыши шатунные, комплект (STD)",
+   "name_en": "Connecting Rod Bearing Set, STD",
+   "node": "01 Двигатель",
+   "applic": "C11 (пара; кросс 116-1089)",
+   "qty": "6",
+   "interval": "при капремонте",
+   "alts": [
+    {
+     "brand": "Interstate-McBee",
+     "pn": "2920484",
+     "kind": "аналог",
+     "note": "$25.08 (C12/C13/3196)"
+    },
+    {
+     "brand": "IPD",
+     "pn": "2920484",
+     "kind": "аналог",
+     "note": "$31.48"
+    },
+    {
+     "brand": "Heavy Duty Kits",
+     "pn": "2920484",
+     "kind": "аналог",
+     "note": "$31.91"
+    }
+   ],
+   "price_usd": "37.66",
+   "source": "https://www.dieselpartsdirect.com/ds2920484",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "116-1089",
+   "name_ru": "Вкладыш шатунный (STD)",
+   "name_en": "Connecting Rod Bearing, STD",
+   "node": "01 Двигатель",
+   "applic": "3176 / 3196 / C10 / C11 / C12 / C13",
+   "qty": "6",
+   "interval": "при капремонте",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "370125",
+     "kind": "аналог",
+     "note": "ROD BEARING STD, $32.32"
+    },
+    {
+     "brand": "Interstate-McBee",
+     "pn": "2920484",
+     "kind": "аналог",
+     "note": "комплект, кросс 1161089"
+    }
+   ],
+   "price_usd": "24.29",
+   "source": "https://www.dieselpartsdirect.com/ds1161089",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "4P-8167",
+   "name_ru": "Вкладыш шатунный (STD)",
+   "name_en": "Rod Bearing, STD",
+   "node": "01 Двигатель",
+   "applic": "3176 / C10 / C11 / C12 / C13",
+   "qty": "6",
+   "interval": "при капремонте",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "370205",
+     "kind": "аналог",
+     "note": "$34.72"
+    }
+   ],
+   "price_usd": "34.72",
+   "source": "https://www.woodlineparts.com/products/pai-370205-caterpillar-4p8167-rod-bearing-std-3176-c10-c11-c12-c13",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "243-6717",
+   "name_ru": "Вкладыши коренные + упорные, комплект (STD)",
+   "name_en": "Main & Thrust Bearing Set, STD",
+   "node": "01 Двигатель",
+   "applic": "3176 / 3196 / C10 / C11 / C12 / C13",
+   "qty": "1",
+   "interval": "при капремонте",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "370223",
+     "kind": "аналог",
+     "note": "MAIN BEARING SET STD, $320.82"
+    },
+    {
+     "brand": "PAI Industries",
+     "pn": "370223HP",
+     "kind": "аналог",
+     "note": "High Performance, $626.38"
+    },
+    {
+     "brand": "Heavy Duty Kits",
+     "pn": "243-6717",
+     "kind": "аналог",
+     "note": "$333.82"
+    }
+   ],
+   "price_usd": "376.09",
+   "source": "https://www.dieselpartsdirect.com/ds2436717",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "211-0587",
+   "name_ru": "Вкладыш коренной (STD)",
+   "name_en": "Main Bearing, STD",
+   "node": "01 Двигатель",
+   "applic": "3176 / 3196 / C10 / C11 / C12 / C13",
+   "qty": "7",
+   "interval": "при капремонте",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "370216",
+     "kind": "аналог",
+     "note": "$39.88"
+    },
+    {
+     "brand": "PAI Industries",
+     "pn": "370216HP",
+     "kind": "аналог",
+     "note": "HP, $76.17"
+    }
+   ],
+   "price_usd": "34.22",
+   "source": "https://www.dieselpartsdirect.com/ds2110587",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "211-0588",
+   "name_ru": "Вкладыш коренной (STD, верхний)",
+   "name_en": "Main Bearing, STD",
+   "node": "01 Двигатель",
+   "applic": "3176 / 3196 / C10 / C11 / C12 / C13",
+   "qty": "7",
+   "interval": "при капремонте",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "370210HP",
+     "kind": "аналог",
+     "note": "HP, $80.32"
+    },
+    {
+     "brand": "hcqppart (CN)",
+     "pn": "211-0588",
+     "kind": "аналог",
+     "note": "main bearing bush C10-C13"
+    }
+   ],
+   "price_usd": "33.49",
+   "source": "https://www.dieselpartsdirect.com/ds2110588",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "246-3144",
+   "name_ru": "Полукольцо упорное коленвала",
+   "name_en": "Crankshaft Thrust Washer",
+   "node": "01 Двигатель",
+   "applic": "3176 / 3196 / C10 / C11 / C12",
+   "qty": "1",
+   "interval": "при капремонте",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "370222HP",
+     "kind": "аналог",
+     "note": "THRUST WASHER STD HP, $155.01"
+    },
+    {
+     "brand": "hcqppart (CN)",
+     "pn": "246-3144",
+     "kind": "аналог",
+     "note": "crankshaft thrust plate C11/C13"
+    }
+   ],
+   "price_usd": "32.68",
+   "source": "https://www.dieselpartsdirect.com/ds2463144",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "223-7467",
+   "name_ru": "Распредвал",
+   "name_en": "Camshaft",
+   "node": "01 Двигатель",
+   "applic": "C11 / C13 (в т.ч. Truck AD22)",
+   "qty": "1",
+   "interval": "при капремонте",
+   "alts": [
+    {
+     "brand": "Fab Heavy Parts",
+     "pn": "223-7467",
+     "kind": "аналог",
+     "note": "$878.75"
+    },
+    {
+     "brand": "BPS Diesel",
+     "pn": "2237467",
+     "kind": "аналог",
+     "note": "C13 camshaft with gear, $1025"
+    }
+   ],
+   "price_usd": "1,624.12",
+   "source": "https://www.dieselpartsdirect.com/ds2237467",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "223-7468",
+   "name_ru": "Распредвал (кросс 10R-2132)",
+   "name_en": "Camshaft",
+   "node": "01 Двигатель",
+   "applic": "C11 / C13 — 345C/345D/349D, 966H/972H, 980C/980F, 725/730, 14M/16M",
+   "qty": "1",
+   "interval": "при капремонте",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "391895",
+     "kind": "аналог",
+     "note": "CATERPILLAR 2237468, 10R2132 CAMSHAFT (C13), $1622.32"
+    },
+    {
+     "brand": "Fab Heavy Parts",
+     "pn": "223-7468",
+     "kind": "аналог",
+     "note": "$1668.35"
+    }
+   ],
+   "price_usd": "1668.35",
+   "source": "https://www.fabheavyparts.com/products/camshaft-2237468-223-7468-fits-for-caterpillar-cat-c11-c13-engine-345c-345d-349d-966h-972h-980c-980f-725-730-14m-16m",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "230-0065",
+   "name_ru": "Распредвал",
+   "name_en": "Camshaft",
+   "node": "01 Двигатель",
+   "applic": "C11 / C13 — Petroleum Power Train TH35-C11I, CX31-P600-C11I",
+   "qty": "1",
+   "interval": "при капремонте",
+   "alts": [
+    {
+     "brand": "Fab Heavy Parts",
+     "pn": "230-0065",
+     "kind": "аналог",
+     "note": "$838.43"
+    }
+   ],
+   "price_usd": "1,302.75",
+   "source": "https://www.dieselpartsdirect.com/ds2300065",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "10R-2131",
+   "name_ru": "Распредвал (Cat Reman)",
+   "name_en": "Camshaft, Reman",
+   "node": "01 Двигатель",
+   "applic": "C11 / C13 (Truck AD22)",
+   "qty": "1",
+   "interval": "при капремонте",
+   "alts": [
+    {
+     "brand": "Fab Heavy Parts",
+     "pn": "10R2131",
+     "kind": "аналог",
+     "note": "$1038.02"
+    }
+   ],
+   "price_usd": "1038.02",
+   "source": "https://www.fabheavyparts.com/products/camshaft-10r2131-10r-2131-fits-for-caterpillar-cat-engine-c11-c13-truck-ad22",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "187-8969",
+   "name_ru": "Втулка распредвала (передняя)",
+   "name_en": "Camshaft Bearing, front",
+   "node": "01 Двигатель",
+   "applic": "C11 / C13",
+   "qty": "1",
+   "interval": "при капремонте",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "351559",
+     "kind": "аналог",
+     "note": "CAMSHAFT BEARING FRONT (C13), $42.97"
+    },
+    {
+     "brand": "hcqppart (CN)",
+     "pn": "187-8969",
+     "kind": "аналог",
+     "note": "camshaft bush C11/C13"
+    }
+   ],
+   "price_usd": "13.83",
+   "source": "https://www.dieselpartsdirect.com/ds1878969",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "216-5583",
+   "name_ru": "Втулка распредвала (промежуточная; кросс 128-0416)",
+   "name_en": "Camshaft Bearing, intermediate",
+   "node": "01 Двигатель",
+   "applic": "3176 / C10 / C11 / C12 / C13",
+   "qty": "5",
+   "interval": "при капремонте",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "351561",
+     "kind": "аналог",
+     "note": "$36.75"
+    },
+    {
+     "brand": "PAI Industries",
+     "pn": "351565",
+     "kind": "комплект",
+     "note": "CAMSHAFT BEARING KIT, $231.10"
+    }
+   ],
+   "price_usd": "36.75",
+   "source": "https://www.woodlineparts.com/products/pai-351561-caterpillar-2165583-1280416-camshaft-bearing-int-3176-c10-c11-c12-c13",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "216-5584",
+   "name_ru": "Втулка распредвала (передняя; кросс 130-0872, 131-6659)",
+   "name_en": "Camshaft Bearing, front",
+   "node": "01 Двигатель",
+   "applic": "3176 / C10 / C11 / C12 / C13",
+   "qty": "1",
+   "interval": "при капремонте",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "351562",
+     "kind": "аналог",
+     "note": "$36.75"
+    }
+   ],
+   "price_usd": "36.75",
+   "source": "https://www.woodlineparts.com/products/pai-351562-caterpillar-2165584-1300872-1316659-camshaft-bearing-front-3176-c10-c11-c12-c13",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "192-9213",
+   "name_ru": "Клапан впускной (усиленный)",
+   "name_en": "Intake Valve (HP)",
+   "node": "01 Двигатель",
+   "applic": "3176 / C10 / C11 / C12 / C13",
+   "qty": "12",
+   "interval": "при ремонте ГБЦ",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "391955HP",
+     "kind": "аналог",
+     "note": "$95.80"
+    },
+    {
+     "brand": "Interstate-McBee",
+     "pn": "7E9578",
+     "kind": "аналог",
+     "note": "intake valve, кросс 7C-5215, $15.49"
+    }
+   ],
+   "price_usd": "95.80",
+   "source": "https://www.woodlineparts.com/products/pai-391955hp-caterpillar-1929213-intake-valve-3176-c10-c11-c12-c13-hp",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "133-7029",
+   "name_ru": "Клапан выпускной",
+   "name_en": "Exhaust Valve",
+   "node": "01 Двигатель",
+   "applic": "3176 / C10 / C11 / C12 / C13",
+   "qty": "12",
+   "interval": "при ремонте ГБЦ",
+   "alts": [
+    {
+     "brand": "IPD",
+     "pn": "1337029",
+     "kind": "аналог",
+     "note": "$32.32"
+    },
+    {
+     "brand": "PAI Industries",
+     "pn": "391964HP",
+     "kind": "аналог",
+     "note": "HP, $93.30"
+    },
+    {
+     "brand": "Interstate-McBee",
+     "pn": "1337029",
+     "kind": "аналог",
+     "note": "кросс 7C-1586, $26.10"
+    }
+   ],
+   "price_usd": "93.30",
+   "source": "https://www.woodlineparts.com/products/pai-391964hp-caterpillar-1337029-exhaust-valve-3176-c10-c11-c12-c13-hp",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "252-7802",
+   "name_ru": "Клапан впускной",
+   "name_en": "Intake Valve",
+   "node": "01 Двигатель",
+   "applic": "C11 / C13A Turbo",
+   "qty": "12",
+   "interval": "при ремонте ГБЦ",
+   "alts": [
+    {
+     "brand": "hcqppart (CN)",
+     "pn": "252-7802",
+     "kind": "аналог",
+     "note": "китайский завод, C11 intake valve"
+    }
+   ],
+   "price_usd": "",
+   "source": "https://hcqppart.en.made-in-china.com/product/HZwtgyDOPdcI/China-Caterpillar-C11-Engine-Intake-Valve-C13A-Turbo-Diesel-Engine-Spare-Parts-2527802-252-7802.html",
+   "confidence": "low",
+   "verdict": ""
+  },
+  {
+   "pn": "224-3028",
+   "name_ru": "Клапан впускной/выпускной",
+   "name_en": "Inlet / Exhaust Valve",
+   "node": "01 Двигатель",
+   "applic": "C11 / C13",
+   "qty": "12",
+   "interval": "при ремонте ГБЦ",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "391966",
+     "kind": "аналог",
+     "note": "CATERPILLAR 2243030 EXHAUST VALVE (C13) Italy, $104.70 за 2"
+    },
+    {
+     "brand": "CN OEM",
+     "pn": "224-3028",
+     "kind": "аналог",
+     "note": "поставщик Made-in-China"
+    }
+   ],
+   "price_usd": "",
+   "source": "https://dahaiterexparts.en.made-in-china.com/product/YGqrkpXHRfRQ/China-OEM-Quality-Machinery-Engine-Parts-Inlet-Exhaust-Valve-2243028-for-Caterpillar-Engine-C11-C13.html",
+   "confidence": "low",
+   "verdict": ""
+  },
+  {
+   "pn": "268-2953",
+   "name_ru": "Направляющая клапана",
+   "name_en": "Valve Guide",
+   "node": "01 Двигатель",
+   "applic": "3176 / C10 / C11 / C12 / C13",
+   "qty": "24",
+   "interval": "при ремонте ГБЦ",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "391996",
+     "kind": "аналог",
+     "note": "упаковка 6 шт, $46.07"
+    }
+   ],
+   "price_usd": "46.07",
+   "source": "https://www.woodlineparts.com/products/pai-391996-caterpillar-2682953-valve-guide-3176-c10-c11-c12-c13",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "179-9454",
+   "name_ru": "Седло впускного клапана",
+   "name_en": "Intake Valve Seat",
+   "node": "01 Двигатель",
+   "applic": "3176 / 3196 / C10 / C12 (семейство C11)",
+   "qty": "12",
+   "interval": "при ремонте ГБЦ",
+   "alts": [
+    {
+     "brand": "Woodline / 22-1812-8",
+     "pn": "1799454",
+     "kind": "аналог",
+     "note": "$5.05"
+    }
+   ],
+   "price_usd": "5.05",
+   "source": "https://www.woodlineparts.com/products/22-1812-8-caterpillar-1799454-intake-valve-seat-3176-3196-c10-c12",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "224-4441",
+   "name_ru": "Пружина клапана (внутренняя)",
+   "name_en": "Valve Spring (Inner)",
+   "node": "01 Двигатель",
+   "applic": "3176 / C10 / C11 / C12 / C13",
+   "qty": "24",
+   "interval": "при ремонте ГБЦ",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "392046",
+     "kind": "аналог",
+     "note": "$9.53"
+    }
+   ],
+   "price_usd": "9.53",
+   "source": "https://www.woodlineparts.com/products/pai-392046-caterpillar-2244441-valve-spring-inner-3176-c10-c11-c12-c13",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "214-0586",
+   "name_ru": "Пружина клапана (внутренняя)",
+   "name_en": "Valve Spring (Inner)",
+   "node": "01 Двигатель",
+   "applic": "3176 / C10 / C11 / C12 / C13",
+   "qty": "24",
+   "interval": "при ремонте ГБЦ",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "392045",
+     "kind": "аналог",
+     "note": "$13.52"
+    }
+   ],
+   "price_usd": "13.52",
+   "source": "https://www.woodlineparts.com/products/pai-392045-caterpillar-2140586-valve-spring-inner-3176-c10-c11-c12-c13",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "7E-7977",
+   "name_ru": "Ротатор клапана в сборе",
+   "name_en": "Valve Rotator Assembly",
+   "node": "01 Двигатель",
+   "applic": "3176 / C10 / C11 / C12 / C13",
+   "qty": "12",
+   "interval": "при ремонте ГБЦ",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "392033",
+     "kind": "аналог",
+     "note": "$57.81"
+    },
+    {
+     "brand": "PAI Industries",
+     "pn": "392033E",
+     "kind": "аналог",
+     "note": "эконом-линия, $43.24"
+    }
+   ],
+   "price_usd": "57.81",
+   "source": "https://www.woodlineparts.com/products/pai-392033-caterpillar-7e7977-valve-rotator-assembly-3176-c10-c11-c12-c13",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "341-8889",
+   "name_ru": "Толкатель (штанга) форсунки",
+   "name_en": "Pushrod (Injector)",
+   "node": "01 Двигатель",
+   "applic": "3176 / C10 / C12 (семейство C11, MEUI)",
+   "qty": "6",
+   "interval": "при ремонте ГБЦ",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "391836",
+     "kind": "аналог",
+     "note": "$56.87"
+    }
+   ],
+   "price_usd": "56.87",
+   "source": "https://www.woodlineparts.com/products/pai-391836-caterpillar-341-8889-pushrod-injector-3176-c10-c12",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "319-0270",
+   "name_ru": "Толкатель (штанга) клапана",
+   "name_en": "Pushrod (Valve)",
+   "node": "01 Двигатель",
+   "applic": "C13 (двигатель нового R1700); для C11 проверить по S/N",
+   "qty": "12",
+   "interval": "при ремонте ГБЦ",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "391839",
+     "kind": "аналог",
+     "note": "$40.84"
+    },
+    {
+     "brand": "PAI Industries",
+     "pn": "391838",
+     "kind": "аналог",
+     "note": "Cat 319-0271 pushrod injector C13, $28.61"
+    }
+   ],
+   "price_usd": "40.84",
+   "source": "https://www.woodlineparts.com/products/pai-391839-caterpillar-3190270-pushrod-valve-c13",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "226-4755",
+   "name_ru": "Сальник коленвала передний (комплект)",
+   "name_en": "Front Crankshaft Seal Kit",
+   "node": "01 Двигатель",
+   "applic": "C10 / C11 / C12 / C13, 3176C / 3196",
+   "qty": "1",
+   "interval": "при капремонте",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "336018",
+     "kind": "аналог",
+     "note": "FRONT CRANKSHAFT SEAL KIT (C10/C12/C13), $45.53"
+    },
+    {
+     "brand": "HHP",
+     "pn": "1694166",
+     "kind": "аналог",
+     "note": "Cat 169-4166 front seal kit, $41.65"
+    }
+   ],
+   "price_usd": "31.89",
+   "source": "https://www.dieselpartsdirect.com/ds2264755",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "7C-1728",
+   "name_ru": "Сальник коленвала задний",
+   "name_en": "Rear Crankshaft Seal",
+   "node": "01 Двигатель",
+   "applic": "3176C / C10 / C11 / C12 / C13",
+   "qty": "1",
+   "interval": "при капремонте",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "336016",
+     "kind": "аналог",
+     "note": "REAR CRANKSHAFT SEAL KIT, $53.43"
+    },
+    {
+     "brand": "HHP",
+     "pn": "2264757",
+     "kind": "аналог",
+     "note": "Cat 226-4757 rear seal kit, $43.49"
+    }
+   ],
+   "price_usd": "50.90",
+   "source": "https://www.dieselpartsdirect.com/ds7C1728",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "167-8125",
+   "name_ru": "Демпфер (гаситель крутильных колебаний) коленвала",
+   "name_en": "Crankshaft Damper",
+   "node": "01 Двигатель",
+   "applic": "C11 / C13",
+   "qty": "1",
+   "interval": "по состоянию",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "302009",
+     "kind": "аналог",
+     "note": "CRANKSHAFT DAMPER (C11/C13) USA, $507.53"
+    }
+   ],
+   "price_usd": "507.53",
+   "source": "https://www.woodlineparts.com/products/pai-302009-caterpillar-1678125-crankshaft-damper-c11-c13-usa",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "290-3280",
+   "name_ru": "Маховик",
+   "name_en": "Flywheel",
+   "node": "01 Двигатель",
+   "applic": "3176 / C10 / C11 / C12 / C13",
+   "qty": "1",
+   "interval": "по состоянию",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "360511",
+     "kind": "аналог",
+     "note": "FLYWHEEL (3176/C10/C11/C12/C13) USA, $442.77"
+    },
+    {
+     "brand": "HHP",
+     "pn": "2903280",
+     "kind": "аналог",
+     "note": "новый, $473.18"
+    }
+   ],
+   "price_usd": "",
+   "source": "https://www.dieselpartsdirect.com/ds2903280",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "148-1973",
+   "name_ru": "Картер маховика",
+   "name_en": "Flywheel Housing",
+   "node": "01 Двигатель",
+   "applic": "3176 / C10 / C12 (семейство C11)",
+   "qty": "1",
+   "interval": "по состоянию",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "360472",
+     "kind": "аналог",
+     "note": "$935.71"
+    },
+    {
+     "brand": "PAI Industries",
+     "pn": "360475",
+     "kind": "аналог",
+     "note": "Cat 222-3089 flywheel housing, $1902.15"
+    }
+   ],
+   "price_usd": "935.71",
+   "source": "https://www.woodlineparts.com/products/pai-360472-caterpillar-1481973-flywheel-housing-3176-c10-c12-usa",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "210-4460",
+   "name_ru": "Болт ГБЦ",
+   "name_en": "Cylinder Head Screw / Bolt",
+   "node": "01 Двигатель",
+   "applic": "C11 / C13",
+   "qty": "26",
+   "interval": "при снятии ГБЦ",
+   "alts": [
+    {
+     "brand": "IPD",
+     "pn": "2104460",
+     "kind": "аналог",
+     "note": "BOLT CYLINDER HEAD C13, $2.11"
+    },
+    {
+     "brand": "Interstate-McBee",
+     "pn": "MCBC13HBK",
+     "kind": "комплект",
+     "note": "Cylinder Head Bolt Kit C13, $261.07"
+    }
+   ],
+   "price_usd": "5.67",
+   "source": "https://www.dieselpartsdirect.com/ds2104460",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "116-1107",
+   "name_ru": "Плита упорная",
+   "name_en": "Thrust Plate",
+   "node": "01 Двигатель",
+   "applic": "C10 / C12 / C13 (семейство C11)",
+   "qty": "1",
+   "interval": "при капремонте",
+   "alts": [
+    {
+     "brand": "HHP",
+     "pn": "2463144",
+     "kind": "аналог",
+     "note": "Cat 246-3144 thrust washer"
+    }
+   ],
+   "price_usd": "31.51",
+   "source": "https://highwayandheavyparts.com/product/2463144-caterpillar-c12-thrust-plate-new-370222hp/",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "361-2584",
+   "name_ru": "Комплект прокладок верхний (C11)",
+   "name_en": "Engine Upper Gasket Kit",
+   "node": "01 Двигатель",
+   "applic": "C11",
+   "qty": "1",
+   "interval": "при капремонте",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "331542",
+     "kind": "аналог",
+     "note": "ENGINE UPPER GASKET KIT (C11) USA, $1065.86"
+    },
+    {
+     "brand": "HHP",
+     "pn": "331542",
+     "kind": "аналог",
+     "note": "Caterpillar C11 Upper Gasket Kit, $1518.78"
+    }
+   ],
+   "price_usd": "1065.86",
+   "source": "https://www.woodlineparts.com/products/pai-331542-caterpillar-3612584-engine-upper-gasket-kit-c11-usa",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "313-6846",
+   "name_ru": "Комплект прокладок нижний (C11)",
+   "name_en": "Lower Gasket Set",
+   "node": "01 Двигатель",
+   "applic": "C11",
+   "qty": "1",
+   "interval": "при капремонте",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "331557",
+     "kind": "аналог",
+     "note": "GASKET SET, LOWER (C11), $378.36"
+    }
+   ],
+   "price_usd": "378.36",
+   "source": "https://www.woodlineparts.com/products/pai-331557-caterpillar-3136846-gasket-set-lower-c11",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "313-6898",
+   "name_ru": "Комплект прокладок передний",
+   "name_en": "Front Gasket Kit",
+   "node": "01 Двигатель",
+   "applic": "C11 / C13",
+   "qty": "1",
+   "interval": "при капремонте",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "331511",
+     "kind": "аналог",
+     "note": "FRONT GASKET KIT (C11/C13) USA, $307.64"
+    },
+    {
+     "brand": "HHP",
+     "pn": "2302167",
+     "kind": "аналог",
+     "note": "Cat 230-2167 front gasket kit, $347.57"
+    }
+   ],
+   "price_usd": "307.64",
+   "source": "https://www.woodlineparts.com/products/pai-331511-caterpillar-3136898-front-gasket-kit-c11-c13-usa",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "226-6620",
+   "name_ru": "Комплект прокладок задней части блока",
+   "name_en": "Rear Structure Gasket Kit",
+   "node": "01 Двигатель",
+   "applic": "C11 / C12 / C13",
+   "qty": "1",
+   "interval": "при капремонте",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "331453",
+     "kind": "аналог",
+     "note": "$96.74"
+    },
+    {
+     "brand": "Cat",
+     "pn": "473-2594",
+     "kind": "OEM",
+     "note": "Rear Structure gasket & seal kit — R1700 rig-out catalog"
+    }
+   ],
+   "price_usd": "96.74",
+   "source": "https://www.woodlineparts.com/products/pai-331453-caterpillar-2266620-rear-structure-gasket-kit-c11-c12-c13",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "217-3673",
+   "name_ru": "Прокладка поддона (комплект с 217-3674)",
+   "name_en": "Oil Pan Gasket Kit",
+   "node": "01 Двигатель",
+   "applic": "C11 / C13",
+   "qty": "1",
+   "interval": "при снятии поддона",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "331450",
+     "kind": "аналог",
+     "note": "OIL PAN GASKET KIT (C11/C13) (2173673, 2173674), $249.15"
+    },
+    {
+     "brand": "PAI Industries",
+     "pn": "331428",
+     "kind": "аналог",
+     "note": "OIL PAN GASKET (C13), $129.69"
+    }
+   ],
+   "price_usd": "249.15",
+   "source": "https://www.woodlineparts.com/products/pai-331450-caterpillar-oil-pan-gasket-kit-c11-c13-2173673-2173674",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "200-2284",
+   "name_ru": "Прокладка задняя",
+   "name_en": "Gasket, Rear",
+   "node": "01 Двигатель",
+   "applic": "3176 / C10 / C11 / C12 / C13",
+   "qty": "1",
+   "interval": "при капремонте",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "331596",
+     "kind": "аналог",
+     "note": "$76.27"
+    }
+   ],
+   "price_usd": "76.27",
+   "source": "https://www.woodlineparts.com/products/pai-331596-caterpillar-2002284-gasket-rear-3176-c10-c11-c12-c13",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "109-5309",
+   "name_ru": "Прокладка основания клапанной крышки",
+   "name_en": "Valve Cover Base Gasket",
+   "node": "01 Двигатель",
+   "applic": "семейство 3176/C10-C13",
+   "qty": "1",
+   "interval": "при вскрытии ГБЦ",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "331386",
+     "kind": "аналог",
+     "note": "$79.68"
+    },
+    {
+     "brand": "PAI Industries",
+     "pn": "331280",
+     "kind": "аналог",
+     "note": "Cat 5P-5678-3 valve cover gasket, рулон 3 м, $28.38"
+    }
+   ],
+   "price_usd": "79.68",
+   "source": "https://www.woodlineparts.com/products/pai-331386-caterpillar-1095309-valve-cover-base-gasket-usa",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "7C-8292",
+   "name_ru": "Изолятор клапанной крышки",
+   "name_en": "Valve Cover Isolator",
+   "node": "01 Двигатель",
+   "applic": "C10 / C12 / C13 (семейство C11)",
+   "qty": "12",
+   "interval": "при вскрытии ГБЦ",
+   "alts": [
+    {
+     "brand": "HHP",
+     "pn": "7C8292",
+     "kind": "аналог",
+     "note": "$2.61"
+    }
+   ],
+   "price_usd": "2.61",
+   "source": "https://highwayandheavyparts.com/product/7c8292-caterpillar-isolator/",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "117-0219",
+   "name_ru": "Прокладка воздушного компрессора",
+   "name_en": "Air Compressor Gasket",
+   "node": "01 Двигатель",
+   "applic": "C12 (семейство C11); на R1700G — при наличии компрессора",
+   "qty": "1",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "331465",
+     "kind": "аналог",
+     "note": "упаковка 5 шт, $25.71"
+    },
+    {
+     "brand": "PAI Industries",
+     "pn": "331492",
+     "kind": "аналог",
+     "note": "Cat 223-3505 air compressor gasket C13, $86.42"
+    }
+   ],
+   "price_usd": "25.71",
+   "source": "https://www.woodlineparts.com/products/pack-of-5-pai-331465-caterpillar-1170219-air-compressor-gasket-c12-usa",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "223-1608",
+   "name_ru": "Насос масляный (33 зуба; кросс 10R-2130)",
+   "name_en": "Oil Pump Assembly",
+   "node": "01 Двигатель",
+   "applic": "C10 / C11 / C13 — 621H/621K/623H, 345C/345D",
+   "qty": "1",
+   "interval": "по состоянию",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "341308",
+     "kind": "аналог",
+     "note": "OIL PUMP ASSY 33 TEETH (C10/C13) (10R2130), $609.53"
+    },
+    {
+     "brand": "Interstate-McBee",
+     "pn": "M 2231608",
+     "kind": "аналог",
+     "note": "PUMP, OIL, C13, $503.16"
+    },
+    {
+     "brand": "Fab Heavy Parts",
+     "pn": "223-1608",
+     "kind": "аналог",
+     "note": "$305.69"
+    }
+   ],
+   "price_usd": "1,240.88",
+   "source": "https://www.dieselpartsdirect.com/ds2231608",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "233-5220",
+   "name_ru": "Насос масляный",
+   "name_en": "Oil Pump Assembly",
+   "node": "01 Двигатель",
+   "applic": "C10 / C11 / C12 / C13 / 3176B / 3176C / 3196",
+   "qty": "1",
+   "interval": "по состоянию",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "341313",
+     "kind": "аналог",
+     "note": "OIL PUMP ASSEMBLY (C10/C12/3176C) USA, $473.88"
+    },
+    {
+     "brand": "PAI Industries",
+     "pn": "341313E",
+     "kind": "аналог",
+     "note": "эконом, $293.70"
+    },
+    {
+     "brand": "Fab Heavy Parts",
+     "pn": "233-5220",
+     "kind": "аналог",
+     "note": "$447.99"
+    }
+   ],
+   "price_usd": "447.99",
+   "source": "https://www.fabheavyparts.com/products/oil-pump-233-5220-for-caterpillar-cat-engine-c11-c13-3176-3176b-3176c-3196-compactor-815f-816f",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "249-0707",
+   "name_ru": "Форсунка MEUI (кросс 10R-1305, 232-1197)",
+   "name_en": "Fuel Injector MEUI",
+   "node": "02 Топливная система",
+   "applic": "C11 — двигатель R1700G C11 ACERT",
+   "qty": "6",
+   "interval": "по состоянию / при падении мощности",
+   "alts": [
+    {
+     "brand": "Cat Reman",
+     "pn": "10R-1305",
+     "kind": "реман OEM",
+     "note": "HHP $354.54 обменная"
+    },
+    {
+     "brand": "Fab Heavy Parts",
+     "pn": "249-0707",
+     "kind": "аналог",
+     "note": "$731.99"
+    },
+    {
+     "brand": "dgguanlian (CN)",
+     "pn": "249-0707",
+     "kind": "аналог",
+     "note": "New EUI injector C11"
+    }
+   ],
+   "price_usd": "731.99",
+   "source": "https://www.fabheavyparts.com/products/fuel-injector-10r-1305-249-0707-232-1197-for-caterpillar-cat-engine-c11-c13-remanufactured",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "249-0712",
+   "name_ru": "Форсунка MEUI (кросс 10R-3147)",
+   "name_en": "Fuel Injector MEUI",
+   "node": "02 Топливная система",
+   "applic": "C11 — 725/730 самосвалы, 966H; семейство C11/C13",
+   "qty": "6",
+   "interval": "по состоянию",
+   "alts": [
+    {
+     "brand": "Fab Heavy Parts",
+     "pn": "249-0712",
+     "kind": "реман",
+     "note": "$676.93"
+    },
+    {
+     "brand": "Diesel Parts Direct",
+     "pn": "2490712",
+     "kind": "аналог",
+     "note": "$1453.32"
+    },
+    {
+     "brand": "zhaoanautoparts (CN)",
+     "pn": "249-0712",
+     "kind": "аналог",
+     "note": "китайский завод"
+    }
+   ],
+   "price_usd": "676.93",
+   "source": "https://www.fabheavyparts.com/products/fuel-injector-249-0712-for-caterpillar-cat-engine-c11-dump-truck-725-730-wheel-loader-966h-remanufactured",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "249-0713",
+   "name_ru": "Форсунка MEUI",
+   "name_en": "Fuel Injector MEUI",
+   "node": "02 Топливная система",
+   "applic": "C11 / C13 — 345C/345D/349D, 966H/972H, 980C/980F, 621H-623K",
+   "qty": "6",
+   "interval": "по состоянию",
+   "alts": [
+    {
+     "brand": "Buy Machinery Parts",
+     "pn": "249-0713",
+     "kind": "OEM Injector Gp-Fuel",
+     "note": "$718.80"
+    },
+    {
+     "brand": "Fab Heavy Parts",
+     "pn": "249-0713",
+     "kind": "аналог",
+     "note": "$604.55 за 1, $2949.16 за 6"
+    },
+    {
+     "brand": "shandong-jade-parts (CN)",
+     "pn": "249-0713",
+     "kind": "аналог",
+     "note": "кросс 253-0616, 253-0618"
+    }
+   ],
+   "price_usd": "2949.16",
+   "source": "https://www.fabheavyparts.com/products/6-pcs-fuel-injector-249-0713-for-caterpillar-cat-engine-c11-c13-excavator-345c-345c-l-345d-345d-l-349d-349d-w345",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "10R-1274",
+   "name_ru": "Форсунка MEUI, реман Cat",
+   "name_en": "Fuel Injector, Reman",
+   "node": "02 Топливная система",
+   "applic": "C11 (минимум 6 шт в заказе)",
+   "qty": "6",
+   "interval": "по состоянию",
+   "alts": [
+    {
+     "brand": "Internet Diesel",
+     "pn": "10R1274",
+     "kind": "реман Cat",
+     "note": "$265 за шт при заказе от 6"
+    }
+   ],
+   "price_usd": "265.00",
+   "source": "https://internetdiesel.com/products/caterpillar-c11-injectors-reman-10r1274",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "10R-2977",
+   "name_ru": "Форсунка MEUI, реман Cat",
+   "name_en": "Fuel Injector, Reman",
+   "node": "02 Топливная система",
+   "applic": "C11",
+   "qty": "6",
+   "interval": "по состоянию",
+   "alts": [
+    {
+     "brand": "Internet Diesel",
+     "pn": "10R2977",
+     "kind": "реман Cat",
+     "note": "$265 за шт при заказе от 6"
+    }
+   ],
+   "price_usd": "265.00",
+   "source": "https://internetdiesel.com/products/caterpillar-c11-injectors-reman-10r2977",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "10R-6162",
+   "name_ru": "Форсунка MEUI, реман Cat",
+   "name_en": "Fuel Injector, Reman",
+   "node": "02 Топливная система",
+   "applic": "C11",
+   "qty": "6",
+   "interval": "по состоянию",
+   "alts": [
+    {
+     "brand": "Internet Diesel",
+     "pn": "10R6162",
+     "kind": "реман Cat",
+     "note": "$324.95 за шт при заказе от 6"
+    }
+   ],
+   "price_usd": "324.95",
+   "source": "https://internetdiesel.com/products/caterpillar-c11-injectors-reman-10r6162",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "229-1631",
+   "name_ru": "Форсунка MEUI",
+   "name_en": "Fuel Injector",
+   "node": "02 Топливная система",
+   "applic": "C10 / C11 / C12 / C13",
+   "qty": "6",
+   "interval": "по состоянию",
+   "alts": [
+    {
+     "brand": "Fab Heavy Parts",
+     "pn": "229-1631",
+     "kind": "реман",
+     "note": "$613.07 за 1, $3483.85 за 6"
+    }
+   ],
+   "price_usd": "613.07",
+   "source": "https://www.fabheavyparts.com/products/fuel-injector-229-1631-2291631-fits-for-caterpillar-c10-c11-c12-c13-diesel-engine-remanufactured",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "317-5278",
+   "name_ru": "Форсунка MEUI",
+   "name_en": "Fuel Injector",
+   "node": "02 Топливная система",
+   "applic": "C10 / C11 / C12 / C13 — 14H/140H грейдеры",
+   "qty": "6",
+   "interval": "по состоянию",
+   "alts": [
+    {
+     "brand": "Fab Heavy Parts",
+     "pn": "317-5278",
+     "kind": "аналог",
+     "note": "$677.77"
+    },
+    {
+     "brand": "gvidar (CN)",
+     "pn": "317-5278",
+     "kind": "аналог",
+     "note": "китайский завод"
+    }
+   ],
+   "price_usd": "677.77",
+   "source": "https://www.fabheavyparts.com/products/fuel-injector-317-5278-for-caterpillar-cat-engine-c10-c11-c12-c13-motor-grader-14h-140h-143h-160h-163h-remanufactured",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "116-1102",
+   "name_ru": "Гильза (стакан) форсунки",
+   "name_en": "Injector Sleeve",
+   "node": "02 Топливная система",
+   "applic": "3176 / C10 / C11 / C12 / C13",
+   "qty": "6",
+   "interval": "при ремонте ГБЦ",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "392086",
+     "kind": "аналог",
+     "note": "$78.70"
+    },
+    {
+     "brand": "PAI Industries",
+     "pn": "392087",
+     "kind": "аналог",
+     "note": "Cat 263-4920 stainless steel sleeve, $124.75 за 6"
+    }
+   ],
+   "price_usd": "78.70",
+   "source": "https://www.woodlineparts.com/products/pai-392086-caterpillar-1161102-injector-sleeve-3176-c10-c11-c12-c13",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "248-1394",
+   "name_ru": "Ремкомплект уплотнений форсунки (наружные)",
+   "name_en": "Fuel Injector O-Ring Kit (external)",
+   "node": "02 Топливная система",
+   "applic": "C11 / C13; у Cat тот же номер — «Single Fuel Injector» gasket & seal kit для R1700",
+   "qty": "6",
+   "interval": "при снятии форсунки",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "321285",
+     "kind": "аналог",
+     "note": "FUEL INJECTOR O-RING KIT (EXTERNAL) USA, $9.01"
+    },
+    {
+     "brand": "Cat",
+     "pn": "248-1394",
+     "kind": "OEM",
+     "note": "R1700 Rig Out Catalog, раздел ENGINE REBUILD — GASKET & SEAL KITS"
+    }
+   ],
+   "price_usd": "9.01",
+   "source": "https://www.woodlineparts.com/products/pai-321285-caterpillar-2481394-fuel-injector-o-ring-kit-external-usa",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "223-5850",
+   "name_ru": "Ремкомплект уплотнений форсунки",
+   "name_en": "Fuel Injector O-Ring Kit",
+   "node": "02 Топливная система",
+   "applic": "семейство 3176/C10-C13",
+   "qty": "6",
+   "interval": "при снятии форсунки",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "321430",
+     "kind": "аналог",
+     "note": "$7.72"
+    }
+   ],
+   "price_usd": "7.72",
+   "source": "https://www.woodlineparts.com/products/pai-321430-caterpillar-2235850-fuel-injector-o-ring-kit-usa",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "384-8611",
+   "name_ru": "Насос топливный низкого давления (подкачивающий)",
+   "name_en": "Fuel Transfer Pump",
+   "node": "02 Топливная система",
+   "applic": "3176 / C10 / C11 / C12 / C13",
+   "qty": "1",
+   "interval": "по состоянию",
+   "alts": [
+    {
+     "brand": "IPD",
+     "pn": "3848611",
+     "kind": "аналог",
+     "note": "$320.27"
+    },
+    {
+     "brand": "Interstate-McBee",
+     "pn": "3848611",
+     "kind": "аналог",
+     "note": "$312.22"
+    },
+    {
+     "brand": "Fab Heavy Parts",
+     "pn": "384-8612",
+     "kind": "аналог",
+     "note": "lift pump C11/C18, $176.96"
+    }
+   ],
+   "price_usd": "320.27",
+   "source": "https://www.woodlineparts.com/products/ipd-caterpillar-3848611-fuel-transfer-pump-3176-c10-c11-c12-c13",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "190-8970",
+   "name_ru": "Основание насоса прокачки топлива",
+   "name_en": "Fuel Priming Pump Base Assembly",
+   "node": "02 Топливная система",
+   "applic": "3126B / C7 / C11 / C13 / C15 / 3512C",
+   "qty": "1",
+   "interval": "по состоянию",
+   "alts": [
+    {
+     "brand": "Fab Heavy Parts",
+     "pn": "190-8970",
+     "kind": "аналог",
+     "note": "$302.38"
+    },
+    {
+     "brand": "ynrspparts (CN)",
+     "pn": "190-8970",
+     "kind": "аналог",
+     "note": "китайский завод, C7-C18"
+    }
+   ],
+   "price_usd": "302.38",
+   "source": "https://www.fabheavyparts.com/products/fuel-priming-pump-base-assembly-190-8970-for-caterpillar-cat-engine-3126b-3512c-c7-c11-c13-c15-c27-c32",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "128-2050",
+   "name_ru": "Насос топливоподкачивающий (OEM)",
+   "name_en": "Fuel Supply Pump",
+   "node": "02 Топливная система",
+   "applic": "C10 / C12 (семейство C11) — сверить по S/N двигателя",
+   "qty": "1",
+   "interval": "по состоянию",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "380161OEM",
+     "kind": "OEM",
+     "note": "$562.10"
+    }
+   ],
+   "price_usd": "562.10",
+   "source": "https://www.woodlineparts.com/products/pai-380161oem-caterpillar-1282050-fuel-supply-pump-c10-c12-oem",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "317-8354",
+   "name_ru": "Комплект прокладок топливной системы (C11)",
+   "name_en": "Gasket Kit, Fuel",
+   "node": "02 Топливная система",
+   "applic": "C11",
+   "qty": "1",
+   "interval": "при ремонте топливной",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "331545",
+     "kind": "аналог",
+     "note": "GASKET KIT, FUEL (C11), $53.36"
+    }
+   ],
+   "price_usd": "53.36",
+   "source": "https://www.woodlineparts.com/products/pai-331545-caterpillar-3178354-gasket-kit-fuel-c11",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "249-0093",
+   "name_ru": "Жгут проводов форсунок",
+   "name_en": "Injector Wiring Harness",
+   "node": "02 Топливная система",
+   "applic": "C11 / C13",
+   "qty": "1",
+   "interval": "по состоянию",
+   "alts": [
+    {
+     "brand": "Buy Machinery Parts",
+     "pn": "249-0093",
+     "kind": "аналог",
+     "note": "$248.00 / 16AWG версия $249.99"
+    },
+    {
+     "brand": "Cat",
+     "pn": "278-6394",
+     "kind": "OEM",
+     "note": "служебный ремкомплект жгута форсунок для R1700, см. M0132787"
+    }
+   ],
+   "price_usd": "249.99",
+   "source": "https://www.buymachineryparts.com/products/16awg-injector-wiring-harness-249-0093-for-caterpillar-cat-c11-c13-truck-engine",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "228-5811",
+   "name_ru": "Насос водяной в сборе (кросс 352-0206)",
+   "name_en": "Water Pump Assembly",
+   "node": "03 Охлаждение",
+   "applic": "C11 / C13; PAI также указывает 3176 / C10 / C12",
+   "qty": "1",
+   "interval": "по состоянию",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "381824",
+     "kind": "аналог",
+     "note": "WATER PUMP ASSY (C11/C13) (3520206), $764.78"
+    },
+    {
+     "brand": "PAI Industries",
+     "pn": "381814",
+     "kind": "аналог",
+     "note": "3176/C10/C11/C12/C13, $726.47"
+    }
+   ],
+   "price_usd": "764.78",
+   "source": "https://www.woodlineparts.com/products/pai-381824-caterpillar-2285811-water-pump-assy-c11-c13-3520206",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "352-0206",
+   "name_ru": "Насос водяной (кросс 10R-2129)",
+   "name_en": "Water Pump",
+   "node": "03 Охлаждение",
+   "applic": "R1700G / R1600 — прямое указание машины; также 966H/972H/980",
+   "qty": "1",
+   "interval": "по состоянию",
+   "alts": [
+    {
+     "brand": "Buy Machinery Parts",
+     "pn": "352-0206",
+     "kind": "аналог",
+     "note": "$415.68"
+    },
+    {
+     "brand": "PAI Industries",
+     "pn": "381824",
+     "kind": "аналог",
+     "note": "Cat 228-5811, тот же насос"
+    },
+    {
+     "brand": "dironparts (CN)",
+     "pn": "352-0206",
+     "kind": "аналог",
+     "note": "кросс 10R-2129"
+    }
+   ],
+   "price_usd": "764.78",
+   "source": "https://www.woodlineparts.com/products/pai-381824-caterpillar-2285811-water-pump-assy-c11-c13-3520206",
+   "confidence": "med",
+   "verdict": "сомнителен",
+   "note": "проверено вручную 12.09.2026: номер существует (PUMP GP-WATER, альт. 10R-2129), витрины дают R1700G/R1600, но Diesel Parts Direct относит насос к C13, а у R1700G — 3176C/C11. Перед заказом сверить по серийнику двигателя"
+  },
+  {
+   "pn": "352-0205",
+   "name_ru": "Насос водяной",
+   "name_en": "Water Pump",
+   "node": "03 Охлаждение",
+   "applic": "C11 / C13 — 345C/345D/349D, 966H/972H/980C",
+   "qty": "1",
+   "interval": "по состоянию",
+   "alts": [
+    {
+     "brand": "Fab Heavy Parts",
+     "pn": "352-0205",
+     "kind": "аналог",
+     "note": "$322.07"
+    },
+    {
+     "brand": "Buy Machinery Parts",
+     "pn": "352-0205",
+     "kind": "аналог",
+     "note": "$350.28"
+    }
+   ],
+   "price_usd": "322.07",
+   "source": "https://www.fabheavyparts.com/products/water-pump-352-0205-3520205-for-caterpillar-engine-c11-c13-excavator-cat-345c-345d-349d-wheel-loader-966h-972h-980c",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "313-6851",
+   "name_ru": "Комплект прокладок водяного насоса (C11)",
+   "name_en": "Gasket Kit, Water Pump",
+   "node": "03 Охлаждение",
+   "applic": "C11",
+   "qty": "1",
+   "interval": "при замене насоса",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "331543",
+     "kind": "аналог",
+     "note": "$66.95"
+    },
+    {
+     "brand": "Cat",
+     "pn": "473-2197",
+     "kind": "OEM",
+     "note": "Water Pump Installation kit — R1700 Rig Out Catalog"
+    }
+   ],
+   "price_usd": "66.95",
+   "source": "https://www.woodlineparts.com/products/pai-331543-caterpillar-3136851-gasket-kit-water-pump-c11",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "350-5417",
+   "name_ru": "Сальник водяного насоса",
+   "name_en": "Water Pump Seal",
+   "node": "03 Охлаждение",
+   "applic": "3176 / C7 / C9 / C10 / C11 / C12 / C13",
+   "qty": "1",
+   "interval": "при ремонте насоса",
+   "alts": [
+    {
+     "brand": "IPD",
+     "pn": "3505417",
+     "kind": "аналог",
+     "note": "$32.32"
+    },
+    {
+     "brand": "Interstate-McBee",
+     "pn": "3505417",
+     "kind": "аналог",
+     "note": "$24.55"
+    }
+   ],
+   "price_usd": "32.32",
+   "source": "https://www.woodlineparts.com/products/ipd-3505417-water-pump-seal-3176-c7-c9-c10-c11-c12-c13",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "247-7133",
+   "name_ru": "Термостат",
+   "name_en": "Water Temperature Regulator (Thermostat)",
+   "node": "03 Охлаждение",
+   "applic": "C9 / C11 / C12 / C13 / C15 / C18 / 3176B / 3196",
+   "qty": "2",
+   "interval": "при ТО системы охлаждения",
+   "alts": [
+    {
+     "brand": "Buy Machinery Parts",
+     "pn": "247-7133",
+     "kind": "аналог",
+     "note": "$59.88"
+    },
+    {
+     "brand": "Fab Heavy Parts",
+     "pn": "247-7133",
+     "kind": "аналог",
+     "note": "$42.84; комплект с прокладкой 4N-1156 $115.81"
+    }
+   ],
+   "price_usd": "42.84",
+   "source": "https://www.fabheavyparts.com/products/thermostat-247-7133-for-caterpillar-engine-c9-c12-c15-c18-3176b-3196-3306-3408",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "115-4223",
+   "name_ru": "Термостат",
+   "name_en": "Thermostat",
+   "node": "03 Охлаждение",
+   "applic": "по MiC — C7/C9/C11/C13/C15; Diesel Parts Direct подтверждает только 3126/C7",
+   "qty": "2",
+   "interval": "при ТО системы охлаждения",
+   "alts": [
+    {
+     "brand": "Diesel Parts Direct",
+     "pn": "1154223",
+     "kind": "аналог",
+     "note": "подтверждает 3126/C7, не C11"
+    }
+   ],
+   "price_usd": "",
+   "source": "https://www.dieselpartsdirect.com/ds1154223",
+   "confidence": "low",
+   "verdict": ""
+  },
+  {
+   "pn": "236-8745",
+   "name_ru": "Сердцевина маслоохладителя в сборе",
+   "name_en": "Oil Cooler Core Assembly",
+   "node": "03 Охлаждение",
+   "applic": "C11 / C13",
+   "qty": "1",
+   "interval": "по состоянию",
+   "alts": [
+    {
+     "brand": "Interstate-McBee",
+     "pn": "2368745",
+     "kind": "аналог",
+     "note": "$946.94"
+    }
+   ],
+   "price_usd": "946.94",
+   "source": "https://www.woodlineparts.com/products/interstate-mcbee-caterpillar-2368745-oil-cooler-core-assembly-c11-c13",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "317-8084",
+   "name_ru": "Комплект прокладок маслоохладителя (C11)",
+   "name_en": "Oil Cooler Gasket Kit",
+   "node": "03 Охлаждение",
+   "applic": "C11 / C13",
+   "qty": "1",
+   "interval": "при снятии маслоохладителя",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "331546",
+     "kind": "аналог",
+     "note": "OIL COOLER GASKET KIT (C11/C13) USA, $203.41"
+    }
+   ],
+   "price_usd": "203.41",
+   "source": "https://www.woodlineparts.com/products/pai-331546-caterpillar-3178084-oil-cooler-gasket-kit-c11-c13-usa",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "265-5324",
+   "name_ru": "Комплект прокладок маслоохладителя",
+   "name_en": "Oil Cooler Gasket Kit",
+   "node": "03 Охлаждение",
+   "applic": "C10 / C12 / C13 (семейство C11)",
+   "qty": "1",
+   "interval": "при снятии маслоохладителя",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "331512",
+     "kind": "аналог",
+     "note": "$235.52"
+    },
+    {
+     "brand": "IPD",
+     "pn": "2655324",
+     "kind": "аналог",
+     "note": "$107.44"
+    },
+    {
+     "brand": "HHP",
+     "pn": "2655324",
+     "kind": "аналог",
+     "note": "$174.92"
+    }
+   ],
+   "price_usd": "242.74",
+   "source": "https://www.dieselpartsdirect.com/ds2655324",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "4W-9822",
+   "name_ru": "Маслоохладитель",
+   "name_en": "Oil Cooler",
+   "node": "03 Охлаждение",
+   "applic": "3176C / C10 / C11 / C18 — R1600 / R1700G, 980C, D8N/D8T",
+   "qty": "1",
+   "interval": "по состоянию",
+   "alts": [
+    {
+     "brand": "Buy Machinery Parts",
+     "pn": "4W-9822",
+     "kind": "аналог",
+     "note": "$2112.00"
+    }
+   ],
+   "price_usd": "2112.00",
+   "source": "https://www.buymachineryparts.com/products/oil-cooler-4w-9822-for-caterpillar-cat-3176c-c-10-c11-c18-engine-980c-d8n-d8t-r1600-r1700g-cx31-c13i",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "236-8990",
+   "name_ru": "Радиатор водяной (кросс 256-5309)",
+   "name_en": "Water Radiator",
+   "node": "03 Охлаждение",
+   "applic": "C11 / C13 — 966H/972H/980C/980F; на R1700G сверить по каталогу машины",
+   "qty": "1",
+   "interval": "по состоянию",
+   "alts": [
+    {
+     "brand": "Buy Machinery Parts",
+     "pn": "236-8990",
+     "kind": "аналог",
+     "note": "$1287.14"
+    }
+   ],
+   "price_usd": "1287.14",
+   "source": "https://www.buymachineryparts.com/products/water-radiator-236-8990-256-5309-for-caterpillar-cat-engine-c11-c13-wheel-loader-966h-972h-980c-980f",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "480-5255",
+   "name_ru": "Радиатор Gp (высокоэффективный, альтернатива)",
+   "name_en": "Radiator Gp",
+   "node": "03 Охлаждение",
+   "applic": "R1700 (C13) — официальный Rig Out Catalog, см. M0076660",
+   "qty": "1",
+   "interval": "модернизация",
+   "alts": [
+    {
+     "brand": "Cat",
+     "pn": "480-5255",
+     "kind": "OEM",
+     "note": "Cooling System Package, Radiator Alternative"
+    }
+   ],
+   "price_usd": "",
+   "source": "https://s7d2.scene7.com/is/content/Caterpillar/CM20250303-9c012-bbe34",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "4N-3092",
+   "name_ru": "Вентилятор",
+   "name_en": "Fan",
+   "node": "03 Охлаждение",
+   "applic": "3126B / 3176B / 3306 / 3406 / C9 / C11 / C13 / C15 / C18",
+   "qty": "1",
+   "interval": "по состоянию",
+   "alts": [
+    {
+     "brand": "Buy Machinery Parts",
+     "pn": "4N-3092",
+     "kind": "аналог",
+     "note": "$1322.69"
+    }
+   ],
+   "price_usd": "1322.69",
+   "source": "https://www.buymachineryparts.com/products/fan-4n-3092-for-caterpillar-cat-engine-3126b-3176b-3306-3406-3408-3412-c9-c11-c13-c15-c18-excavator-350l-350-a",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "242-6057",
+   "name_ru": "Прокладка корпуса (термостата/водяного тракта)",
+   "name_en": "Housing Gasket",
+   "node": "03 Охлаждение",
+   "applic": "C11 / C13",
+   "qty": "1",
+   "interval": "при разборке",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "331485",
+     "kind": "аналог",
+     "note": "$14.94"
+    }
+   ],
+   "price_usd": "14.94",
+   "source": "https://www.woodlineparts.com/products/pai-331485-caterpillar-2426057-gasket-housing-c13",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "101-1635",
+   "name_ru": "Прокладка трубок водяного насоса",
+   "name_en": "Water Pump Lines Gasket",
+   "node": "03 Охлаждение",
+   "applic": "C10 / C12 / C13 (семейство C11)",
+   "qty": "2",
+   "interval": "при разборке",
+   "alts": [
+    {
+     "brand": "HHP",
+     "pn": "1011635",
+     "kind": "аналог",
+     "note": "$0.77"
+    }
+   ],
+   "price_usd": "1.08",
+   "source": "https://www.dieselpartsdirect.com/ds1011635",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "118-2797",
+   "name_ru": "Прокладка группы водяных трубок",
+   "name_en": "Water Lines Group Gasket",
+   "node": "03 Охлаждение",
+   "applic": "C10 / C12 / C13 (семейство C11)",
+   "qty": "2",
+   "interval": "при разборке",
+   "alts": [
+    {
+     "brand": "HHP",
+     "pn": "1182797",
+     "kind": "аналог",
+     "note": "$3.48"
+    }
+   ],
+   "price_usd": "3.48",
+   "source": "https://highwayandheavyparts.com/product/1182797-caterpillar-gasket/",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "10R-2474",
+   "name_ru": "Турбокомпрессор (новый Cat)",
+   "name_en": "Turbocharger",
+   "node": "04 Воздух/выпуск",
+   "applic": "C11; кросс 241-6969/241-6970/241-6971, 242-1306, 252-4592/93/94, Garrett 750346-xxxx",
+   "qty": "1",
+   "interval": "по состоянию",
+   "alts": [
+    {
+     "brand": "HHP",
+     "pn": "10R2474",
+     "kind": "новый",
+     "note": "$2952.63, ISO 9001:2015"
+    },
+    {
+     "brand": "Garrett",
+     "pn": "750346-0001…9003",
+     "kind": "аналог",
+     "note": "заводской номер картриджа/турбины"
+    }
+   ],
+   "price_usd": "2,952.63",
+   "source": "https://highwayandheavyparts.com/product/turbocharger-for-caterpillar-c11/",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "10R-2087",
+   "name_ru": "Турбокомпрессор низкого давления",
+   "name_en": "Low Pressure Turbocharger",
+   "node": "04 Воздух/выпуск",
+   "applic": "C11 (двухступенчатая схема)",
+   "qty": "1",
+   "interval": "по состоянию",
+   "alts": [
+    {
+     "brand": "HHP",
+     "pn": "10R2087",
+     "kind": "новый Garrett",
+     "note": "$1446.20; реман $1397.17"
+    },
+    {
+     "brand": "Garrett",
+     "pn": "7503469001R",
+     "kind": "реман",
+     "note": "$1443.73 у HHP"
+    }
+   ],
+   "price_usd": "1,446.20",
+   "source": "https://highwayandheavyparts.com/product/10r2087-garrett-low-pressure-turbocharger-for-caterpillar-c11-new/",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "247-2965",
+   "name_ru": "Турбокомпрессор (кросс 10R-7290)",
+   "name_en": "Turbocharger",
+   "node": "04 Воздух/выпуск",
+   "applic": "C11 / C13",
+   "qty": "1",
+   "interval": "по состоянию",
+   "alts": [
+    {
+     "brand": "Buy Machinery Parts",
+     "pn": "247-2965",
+     "kind": "аналог",
+     "note": "$760.71"
+    }
+   ],
+   "price_usd": "760.71",
+   "source": "https://www.buymachineryparts.com/products/heavy-duty-turbocharger-247-2965-10r-7290-for-caterpillar-cat-c11-c13-engines",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "255-8862",
+   "name_ru": "Турбокомпрессор GTA4502S (кросс 762550-0003)",
+   "name_en": "Turbocharger GTA4502S",
+   "node": "04 Воздух/выпуск",
+   "applic": "C11 / C13 — самосвалы 725/730",
+   "qty": "1",
+   "interval": "по состоянию",
+   "alts": [
+    {
+     "brand": "Fab Heavy Parts",
+     "pn": "255-8862",
+     "kind": "аналог",
+     "note": "$902.72"
+    },
+    {
+     "brand": "Garrett",
+     "pn": "762550-0003",
+     "kind": "аналог",
+     "note": "заводской номер"
+    }
+   ],
+   "price_usd": "902.72",
+   "source": "https://www.fabheavyparts.com/products/turbo-gta4502s-turbocharger-255-8862-762550-0003-for-caterpillar-cat-engine-c11-c13-truck-725-730",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "268-4346",
+   "name_ru": "Турбокомпрессор GTA4594BS",
+   "name_en": "Turbocharger GTA4594BS",
+   "node": "04 Воздух/выпуск",
+   "applic": "C11 (промышленный, TH35-C11I)",
+   "qty": "1",
+   "interval": "по состоянию",
+   "alts": [
+    {
+     "brand": "Fab Heavy Parts",
+     "pn": "268-4346",
+     "kind": "аналог",
+     "note": "$1567.12"
+    },
+    {
+     "brand": "Buy Machinery Parts",
+     "pn": "268-4346",
+     "kind": "аналог",
+     "note": "$1680.00"
+    }
+   ],
+   "price_usd": "1680.00",
+   "source": "https://www.buymachineryparts.com/products/turbo-gta4594bs-turbocharger-268-4346-for-caterpillar-cat-engine-c11-th35-c11i",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "256-7737",
+   "name_ru": "Турбокомпрессор GTA4502BS (кросс 247-2960)",
+   "name_en": "Turbocharger GTA4502BS",
+   "node": "04 Воздух/выпуск",
+   "applic": "C11 — RM-300, TH35-C11; MiC добавляет C11 B5K00001-up",
+   "qty": "1",
+   "interval": "по состоянию",
+   "alts": [
+    {
+     "brand": "Fab Heavy Parts",
+     "pn": "256-7737",
+     "kind": "аналог",
+     "note": "$1170.52"
+    },
+    {
+     "brand": "xibairun (CN)",
+     "pn": "256-7737 / 247-2980",
+     "kind": "аналог",
+     "note": "GTA4594BS для C11 B5K00001-up"
+    }
+   ],
+   "price_usd": "1170.52",
+   "source": "https://www.fabheavyparts.com/products/turbocharger-256-7737-247-2960-fit-caterpillar-rm-300-th35-c11-engine-c11-turbo-gta4502bs-fab-heavy-co",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "194-1116",
+   "name_ru": "Турбокомпрессор GT4288R",
+   "name_en": "Turbocharger GT4288R",
+   "node": "04 Воздух/выпуск",
+   "applic": "R1600G / R1700G — двигатели 3176C / C10 / 3306 (ранние R1700G до C11 ACERT)",
+   "qty": "1",
+   "interval": "по состоянию",
+   "alts": [
+    {
+     "brand": "Fab Heavy Parts",
+     "pn": "194-1116",
+     "kind": "аналог",
+     "note": "$663.04"
+    },
+    {
+     "brand": "Buy Machinery Parts",
+     "pn": "194-1116",
+     "kind": "аналог",
+     "note": "$783.10"
+    },
+    {
+     "brand": "Garrett",
+     "pn": "GT4288R",
+     "kind": "аналог",
+     "note": "заводское обозначение"
+    }
+   ],
+   "price_usd": "663.04",
+   "source": "https://www.fabheavyparts.com/products/turbo-gt4288r-turbocharger-194-1116-fit-caterpillar-engine-3176c-c10-3306-truck-r1600g-r1700g-fab-heavy-co",
+   "confidence": "high",
+   "verdict": "подтверждён",
+   "note": "проверено вручную 12.09.2026: турбина GT4288R для 3176C/C10/3306, в применимости продавцов прямо указаны R1600G и R1700G"
+  },
+  {
+   "pn": "248-0840",
+   "name_ru": "Прокладка турбокомпрессора",
+   "name_en": "Turbocharger Gasket",
+   "node": "04 Воздух/выпуск",
+   "applic": "C11",
+   "qty": "1",
+   "interval": "при снятии турбины",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "331329",
+     "kind": "аналог",
+     "note": "упаковка 5 шт, $39.47"
+    },
+    {
+     "brand": "Interstate-McBee",
+     "pn": "M 2480840",
+     "kind": "аналог",
+     "note": "$5.62"
+    },
+    {
+     "brand": "IPD",
+     "pn": "2480840",
+     "kind": "аналог",
+     "note": "$6.02"
+    }
+   ],
+   "price_usd": "5.62",
+   "source": "https://www.woodlineparts.com/products/m-2480840-turbocharger-gasket-for-caterpillar-c11-engines",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "436-7102",
+   "name_ru": "Комплект прокладок установки турбокомпрессора",
+   "name_en": "Turbocharger Installation Gasket Set",
+   "node": "04 Воздух/выпуск",
+   "applic": "C10 / C12 / C13 (семейство C11)",
+   "qty": "1",
+   "interval": "при снятии турбины",
+   "alts": [
+    {
+     "brand": "Interstate-McBee",
+     "pn": "M 4367102",
+     "kind": "аналог",
+     "note": "$124.49"
+    },
+    {
+     "brand": "HHP",
+     "pn": "4367102",
+     "kind": "аналог",
+     "note": "$123.25"
+    },
+    {
+     "brand": "Cat",
+     "pn": "568-2583",
+     "kind": "OEM",
+     "note": "Turbo Installation gasket & seal kit для R1700"
+    }
+   ],
+   "price_usd": "123.25",
+   "source": "https://highwayandheavyparts.com/product/4367102-caterpillar-gasketset-turbo/",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "245-9750",
+   "name_ru": "Шпилька турбокомпрессора M10x1.5x50",
+   "name_en": "Turbocharger Stud",
+   "node": "04 Воздух/выпуск",
+   "applic": "семейство 3176/C10-C13",
+   "qty": "4",
+   "interval": "при снятии турбины",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "340117",
+     "kind": "аналог",
+     "note": "упаковка 4 шт, $37.52"
+    },
+    {
+     "brand": "PAI Industries",
+     "pn": "340117E",
+     "kind": "аналог",
+     "note": "эконом, $30.45"
+    }
+   ],
+   "price_usd": "30.45",
+   "source": "https://www.woodlineparts.com/products/pack-of-4-pai-340117e-caterpillar-2459750-turbo-stud-mtg",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "8T-7044",
+   "name_ru": "Шпилька турбокомпрессора M10x1.5x40",
+   "name_en": "Turbocharger Stud",
+   "node": "04 Воздух/выпуск",
+   "applic": "семейство 3176/C10-C13",
+   "qty": "4",
+   "interval": "при снятии турбины",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "340120",
+     "kind": "аналог",
+     "note": "упаковка 4 шт, $63.43"
+    }
+   ],
+   "price_usd": "63.43",
+   "source": "https://www.woodlineparts.com/products/pack-of-4-pai-340120-caterpillar-8t7044-turbocharger-stud-m10-x-1-5-x-40-usa",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "197-8418",
+   "name_ru": "Прокладка маслоподающей трубки турбины",
+   "name_en": "Turbocharger Oil Supply Gasket",
+   "node": "04 Воздух/выпуск",
+   "applic": "семейство 3176/C10-C13",
+   "qty": "2",
+   "interval": "при снятии турбины",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "331276",
+     "kind": "аналог",
+     "note": "упаковка 6 шт, $45.02"
+    }
+   ],
+   "price_usd": "45.02",
+   "source": "https://www.woodlineparts.com/products/pack-of-6-pai-331276-caterpillar-1978418-turbocharger-oil-supply-gasket",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "1S-4295",
+   "name_ru": "Прокладка выпускная турбины (кросс 7H-1558)",
+   "name_en": "Turbocharger Exhaust Gasket",
+   "node": "04 Воздух/выпуск",
+   "applic": "семейство 3176/C10-C13",
+   "qty": "1",
+   "interval": "при снятии турбины",
+   "alts": [
+    {
+     "brand": "Interstate-McBee",
+     "pn": "1S4295",
+     "kind": "аналог",
+     "note": "$9.24"
+    },
+    {
+     "brand": "PAI Industries",
+     "pn": "331212",
+     "kind": "аналог",
+     "note": "упаковка 5 шт, $37.92"
+    }
+   ],
+   "price_usd": "9.24",
+   "source": "https://www.woodlineparts.com/products/interstate-mcbee-caterpillar-1s4295-turbocharger-exhaust-gasket-7h1558",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "229-3567",
+   "name_ru": "Коллектор выпускной, центральная секция (C11)",
+   "name_en": "Center Exhaust Manifold",
+   "node": "04 Воздух/выпуск",
+   "applic": "C11",
+   "qty": "1",
+   "interval": "по состоянию",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "381273",
+     "kind": "аналог",
+     "note": "CENTER EXHAUST MANIFOLD (C11), $691.50"
+    },
+    {
+     "brand": "PAI Industries",
+     "pn": "340102",
+     "kind": "комплект",
+     "note": "EXHAUST MANIFOLD INSTALL KIT (C11), $421.64"
+    }
+   ],
+   "price_usd": "691.50",
+   "source": "https://www.woodlineparts.com/products/pai-381273-caterpillar-2293567-center-exhaust-manifold-c11",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "250-4409",
+   "name_ru": "Коллектор выпускной",
+   "name_en": "Exhaust Manifold",
+   "node": "04 Воздух/выпуск",
+   "applic": "C11 / C13",
+   "qty": "1",
+   "interval": "по состоянию",
+   "alts": [
+    {
+     "brand": "Buy Machinery Parts",
+     "pn": "250-4409",
+     "kind": "аналог",
+     "note": "$2180.40"
+    },
+    {
+     "brand": "PAI Industries",
+     "pn": "381227",
+     "kind": "аналог",
+     "note": "Cat 250-4408 center exhaust manifold C13, $432.65"
+    }
+   ],
+   "price_usd": "2180.40",
+   "source": "https://www.buymachineryparts.com/products/exhaust-manifold-250-4409-caterpillar-c11-c13-engines",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "283-2238",
+   "name_ru": "Прокладка выпускного коллектора",
+   "name_en": "Exhaust Manifold Gasket",
+   "node": "04 Воздух/выпуск",
+   "applic": "C11 / C13 — 345C/345D",
+   "qty": "6",
+   "interval": "при снятии коллектора",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "331457",
+     "kind": "аналог",
+     "note": "упаковка 6 шт, $39.60"
+    },
+    {
+     "brand": "HHP",
+     "pn": "2832238",
+     "kind": "аналог",
+     "note": "$4.46"
+    }
+   ],
+   "price_usd": "6.21",
+   "source": "https://www.dieselpartsdirect.com/ds2832238",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "250-9274",
+   "name_ru": "Уплотнение (набивка) выпускного коллектора",
+   "name_en": "Exhaust Manifold Packing",
+   "node": "04 Воздух/выпуск",
+   "applic": "C11 / C13",
+   "qty": "6",
+   "interval": "при снятии коллектора",
+   "alts": [
+    {
+     "brand": "Interstate-McBee",
+     "pn": "2509274",
+     "kind": "аналог",
+     "note": "$21.88"
+    },
+    {
+     "brand": "PAI Industries",
+     "pn": "331456",
+     "kind": "аналог",
+     "note": "EXHAUST PACKING GASKET (C13) USA, $149.48"
+    }
+   ],
+   "price_usd": "21.88",
+   "source": "https://www.woodlineparts.com/products/interstate-mcbee-caterpillar-2509274-exhaust-manifold-packing-c13",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "116-3715",
+   "name_ru": "Шпилька выпускного коллектора",
+   "name_en": "Exhaust Manifold Stud",
+   "node": "04 Воздух/выпуск",
+   "applic": "C11 / 3176",
+   "qty": "12",
+   "interval": "при снятии коллектора",
+   "alts": [
+    {
+     "brand": "HHP",
+     "pn": "1163715",
+     "kind": "аналог",
+     "note": "$10.37"
+    },
+    {
+     "brand": "PAI Industries",
+     "pn": "380190",
+     "kind": "комплект",
+     "note": "EXHAUST MANIFOLD STUD KIT (3176/C10/C11/C12/C13) USA, $234.30"
+    },
+    {
+     "brand": "PAI Industries",
+     "pn": "340118",
+     "kind": "аналог",
+     "note": "Cat 224-5445 stud M10x1.5x70, $65.18 за 5"
+    }
+   ],
+   "price_usd": "10.37",
+   "source": "https://highwayandheavyparts.com/product/1163715-caterpillar-c12-c13-exhaust-manifold-stud-new/",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "224-5426",
+   "name_ru": "Прокладка впускного коллектора",
+   "name_en": "Air Inlet Gasket",
+   "node": "04 Воздух/выпуск",
+   "applic": "3176 / C10 / C11 / C12 / C13",
+   "qty": "1",
+   "interval": "при разборке",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "331469",
+     "kind": "аналог",
+     "note": "$13.02"
+    }
+   ],
+   "price_usd": "13.02",
+   "source": "https://www.woodlineparts.com/products/pai-331469-caterpillar-2245426-air-inlet-gasket-3176-c10-c11-c12-c13",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "109-5307",
+   "name_ru": "Прокладка интеркулера (ATAAC)",
+   "name_en": "Aftercooler Gasket",
+   "node": "04 Воздух/выпуск",
+   "applic": "C10 / C12 / C13 (семейство C11); R1700G — ATAAC",
+   "qty": "2",
+   "interval": "при снятии интеркулера",
+   "alts": [
+    {
+     "brand": "HHP",
+     "pn": "1095307",
+     "kind": "аналог",
+     "note": "$25.77"
+    }
+   ],
+   "price_usd": "25.77",
+   "source": "https://highwayandheavyparts.com/product/1095307-caterpillar-gasket/",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "4P-4369",
+   "name_ru": "Проставка выпускного коллектора",
+   "name_en": "Exhaust Manifold Spacer",
+   "node": "04 Воздух/выпуск",
+   "applic": "C10 / C12 / C13 (семейство C11)",
+   "qty": "6",
+   "interval": "при снятии коллектора",
+   "alts": [
+    {
+     "brand": "HHP",
+     "pn": "4P4369",
+     "kind": "аналог",
+     "note": "$12.58"
+    }
+   ],
+   "price_usd": "12.58",
+   "source": "https://highwayandheavyparts.com/product/4p4369-caterpillar-c13-c10-exhaust-manifold-spacer-new/",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "9X-8281",
+   "name_ru": "Шпилька крепления турбокомпрессора",
+   "name_en": "Turbocharger Mounting Stud",
+   "node": "04 Воздух/выпуск",
+   "applic": "C11 (у HHP в карточке C11, номер с префиксом M)",
+   "qty": "4",
+   "interval": "при снятии турбины",
+   "alts": [
+    {
+     "brand": "HHP",
+     "pn": "M9X8281",
+     "kind": "аналог",
+     "note": "$13.93"
+    }
+   ],
+   "price_usd": "13.93",
+   "source": "https://highwayandheavyparts.com/product/9x8281-caterpillar-c15-turbocharger-mounting-stud-new-fp9x8281/",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "197-9642",
+   "name_ru": "Шкив натяжной (8 ручьёв)",
+   "name_en": "Idler Pulley, 8 grooves",
+   "node": "01 Двигатель",
+   "applic": "C7 / C9 / C11 / C12 / C13 / C15 / 3126",
+   "qty": "1",
+   "interval": "при замене ремня",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "381245",
+     "kind": "аналог",
+     "note": "IDLER PULLEY, $124.12"
+    },
+    {
+     "brand": "hcqppart (CN)",
+     "pn": "197-9642",
+     "kind": "аналог",
+     "note": "8 grooves pulley idler C9/C11/C13"
+    }
+   ],
+   "price_usd": "108.24",
+   "source": "https://www.dieselpartsdirect.com/ds1979642",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "236-2314",
+   "name_ru": "Шкив натяжной",
+   "name_en": "Idler Pulley",
+   "node": "01 Двигатель",
+   "applic": "C11 / C13 / C15 / C16 / C9.3 — 627H/627K, AD45B/AD55",
+   "qty": "1",
+   "interval": "при замене ремня",
+   "alts": [
+    {
+     "brand": "Fab Heavy Parts",
+     "pn": "236-2314",
+     "kind": "аналог",
+     "note": "$117.60"
+    }
+   ],
+   "price_usd": "117.60",
+   "source": "https://www.fabheavyparts.com/products/idler-pulley-236-2314-2362314-fits-for-caterpillar-cat-engine-c16-c11-c13-c15-c9-3-tractor-627h-627k-627k-lrc-truck-ad45b-ad55",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "211-7895",
+   "name_ru": "Натяжитель ремня",
+   "name_en": "Belt Tensioner",
+   "node": "01 Двигатель",
+   "applic": "C11 / C13 — 345C/345D/349D, грейдеры 14M/16M",
+   "qty": "1",
+   "interval": "при замене ремня",
+   "alts": [
+    {
+     "brand": "Fab Heavy Parts",
+     "pn": "211-7895",
+     "kind": "аналог",
+     "note": "$133.04"
+    },
+    {
+     "brand": "Buy Machinery Parts",
+     "pn": "211-7895",
+     "kind": "аналог",
+     "note": "$134.82"
+    }
+   ],
+   "price_usd": "133.04",
+   "source": "https://www.fabheavyparts.com/products/new-belt-tensioner-211-7895-2117895-for-caterpillar-cat-excavator-345c-345d-349d-grader-14m-16m-engine-c11-c13",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "190-0649",
+   "name_ru": "Натяжитель ремня",
+   "name_en": "Belt Tensioner",
+   "node": "01 Двигатель",
+   "applic": "3406E / C10 / C12 / C15 (семейство C11) — сверить по S/N",
+   "qty": "1",
+   "interval": "при замене ремня",
+   "alts": [
+    {
+     "brand": "PAI Industries",
+     "pn": "381250",
+     "kind": "аналог",
+     "note": "BELT TENSIONER USA, $286.08"
+    }
+   ],
+   "price_usd": "286.08",
+   "source": "https://www.woodlineparts.com/products/pai-381250-caterpillar-190-0649-belt-tensioner-3406e-c10-c12-c15-usa",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "7M-4710",
+   "name_ru": "Ремень приводной",
+   "name_en": "Belt",
+   "node": "01 Двигатель",
+   "applic": "Caterpillar, в каталоге HHP в разделе C11",
+   "qty": "1",
+   "interval": "ТО 1000 ч / по состоянию",
+   "alts": [
+    {
+     "brand": "HHP",
+     "pn": "7M4710",
+     "kind": "новый Cat",
+     "note": "$44.71"
+    }
+   ],
+   "price_usd": "44.71",
+   "source": "https://highwayandheavyparts.com/product/7m4710-caterpillar-belt-new/",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "10R-8909",
+   "name_ru": "Стартёр 24 В, 13 зубьев (кросс 363-9839)",
+   "name_en": "Starter Motor 24V",
+   "node": "10 Электрика/датчики/освещение",
+   "applic": "C11 / C13 — 966H/972H",
+   "qty": "1",
+   "interval": "по состоянию",
+   "alts": [
+    {
+     "brand": "Fab Heavy Parts",
+     "pn": "10R-8909",
+     "kind": "аналог",
+     "note": "$700.00"
+    },
+    {
+     "brand": "Cat",
+     "pn": "3N-3763 / 352-7994 / 533-1539",
+     "kind": "OEM ремкомплекты",
+     "note": "Starter Repair Kits — R1700 Rig Out Catalog"
+    }
+   ],
+   "price_usd": "700.00",
+   "source": "https://www.fabheavyparts.com/products/24v-13t-starter-motor-10r-8909-363-9839-fits-for-caterpillar-c11-c13-engine-wheel-loader-966h-972h",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "435-1239",
+   "name_ru": "Стартёр",
+   "name_en": "Starter Motor",
+   "node": "10 Электрика/датчики/освещение",
+   "applic": "C7 / C9 / C11 / C13 / C15 / C18",
+   "qty": "1",
+   "interval": "по состоянию",
+   "alts": [
+    {
+     "brand": "Fab Heavy Parts",
+     "pn": "435-1239",
+     "kind": "аналог",
+     "note": "$781.94"
+    },
+    {
+     "brand": "Fab Heavy Parts",
+     "pn": "435-1240",
+     "kind": "аналог",
+     "note": "24 В версия, $835.34"
+    }
+   ],
+   "price_usd": "781.94",
+   "source": "https://www.fabheavyparts.com/products/starter-motor-435-1239-for-caterpillar-cat-engine-c7-c9-c11-c13-c15-c18",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "10R-8910",
+   "name_ru": "Стартёр",
+   "name_en": "Starter Motor",
+   "node": "10 Электрика/датчики/освещение",
+   "applic": "3406 / C11 / C13 / C15",
+   "qty": "1",
+   "interval": "по состоянию",
+   "alts": [
+    {
+     "brand": "Fab Heavy Parts",
+     "pn": "10R8910",
+     "kind": "аналог",
+     "note": "$464.24"
+    }
+   ],
+   "price_usd": "464.24",
+   "source": "https://www.fabheavyparts.com/products/starter-motor-10r-8910-for-caterpillar-engine-cat-3406-c11-c13-c15",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "10R-9095",
+   "name_ru": "Генератор 24 В 95 А (кросс 220-8305)",
+   "name_en": "Alternator 24V 95A",
+   "node": "10 Электрика/датчики/освещение",
+   "applic": "3176C / C11 / C13 — 140H, CX31-C13I, RM-300, TH35",
+   "qty": "1",
+   "interval": "по состоянию",
+   "alts": [
+    {
+     "brand": "Fab Heavy Parts",
+     "pn": "10R9095",
+     "kind": "аналог",
+     "note": "$561.12"
+    },
+    {
+     "brand": "Cat",
+     "pn": "478-4961 / 478-4962 / 478-4963 / 478-4964 / 478-4967",
+     "kind": "OEM ремкомплекты",
+     "note": "Alternator Repair Kits — R1700 Rig Out Catalog"
+    }
+   ],
+   "price_usd": "561.12",
+   "source": "https://www.fabheavyparts.com/products/24v-95a-alternator-10r9095-220-8305-2208305-fits-caterpillar-140h-3176c-c11-c13-cx31-c13i-rm-300-th35-c11i-th35-c13i",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "336-1558",
+   "name_ru": "Генератор 12 В (кросс 20R-4038)",
+   "name_en": "Alternator 12V",
+   "node": "10 Электрика/датчики/освещение",
+   "applic": "C6.6 / C9 / C11 / C13",
+   "qty": "1",
+   "interval": "по состоянию",
+   "alts": [
+    {
+     "brand": "Fab Heavy Parts",
+     "pn": "336-1558",
+     "kind": "аналог",
+     "note": "$843.51"
+    },
+    {
+     "brand": "CN OEM",
+     "pn": "336-1558 / 20R-4038",
+     "kind": "аналог",
+     "note": "Made-in-China, 12V alternator C11/C13"
+    }
+   ],
+   "price_usd": "843.51",
+   "source": "https://www.fabheavyparts.com/products/12v-alternator-336-1558-3361558-for-caterpillar-cat-engine-c11-c13-c9-c6-6",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "239-3478",
+   "name_ru": "Датчик давления масла",
+   "name_en": "Oil Pressure Sensor / Switch",
+   "node": "10 Электрика/датчики/освещение",
+   "applic": "C11 / C13 / C15 / C18 — E345C, E349D",
+   "qty": "1",
+   "interval": "по состоянию",
+   "alts": [
+    {
+     "brand": "Buy Machinery Parts",
+     "pn": "239-3478",
+     "kind": "аналог",
+     "note": "$60.28"
+    },
+    {
+     "brand": "Diesel Parts Direct",
+     "pn": "2393478",
+     "kind": "аналог",
+     "note": "$46.33"
+    }
+   ],
+   "price_usd": "46.33",
+   "source": "https://www.dieselpartsdirect.com/ds2393478",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "274-6717",
+   "name_ru": "Датчик-выключатель давления масла",
+   "name_en": "Oil Pressure Sensor Switch",
+   "node": "10 Электрика/датчики/освещение",
+   "applic": "C9 / C11 / C13 / C15 / C18, 3516C",
+   "qty": "1",
+   "interval": "по состоянию",
+   "alts": [
+    {
+     "brand": "Buy Machinery Parts",
+     "pn": "274-6717",
+     "kind": "аналог",
+     "note": "$74.76"
+    },
+    {
+     "brand": "Buy Machinery Parts",
+     "pn": "274-6718",
+     "kind": "аналог",
+     "note": "близкий номер, $64.92"
+    }
+   ],
+   "price_usd": "74.76",
+   "source": "https://www.buymachineryparts.com/products/oil-pressure-sensor-switch-274-6717-for-caterpillar-cat-engine-c11-c13-c15-c18-c9-power-module-3516c-pm3516",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "269-1983",
+   "name_ru": "Датчик положения (частота/фаза)",
+   "name_en": "Position (Speed/Timing) Sensor",
+   "node": "10 Электрика/датчики/освещение",
+   "applic": "C11 / C13 / C15 / C18 / C9.3 / C175 и др.",
+   "qty": "1",
+   "interval": "по состоянию",
+   "alts": [
+    {
+     "brand": "Fab Heavy Parts",
+     "pn": "269-1983",
+     "kind": "аналог",
+     "note": "$78.40"
+    }
+   ],
+   "price_usd": "78.40",
+   "source": "https://www.fabheavyparts.com/products/position-sensor-269-1983-2691983-ca2691983-fits-for-caterpillar-cat-engine-c175-c11-c9-3-c13-c15-c18-c27-c32-3512e-c175-16-c175-20-c7-1-3516-c3-3b-c4-4-c3-4",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "239-2395",
+   "name_ru": "Датчик давления",
+   "name_en": "Pressure Sensor",
+   "node": "10 Электрика/датчики/освещение",
+   "applic": "C11 / C13 / C15 — 345C, 725/730/735/740, 825H/826H/836H",
+   "qty": "1",
+   "interval": "по состоянию",
+   "alts": [
+    {
+     "brand": "Fab Heavy Parts",
+     "pn": "239-2395",
+     "kind": "аналог",
+     "note": "$72.80"
+    }
+   ],
+   "price_usd": "72.80",
+   "source": "https://www.fabheavyparts.com/products/pressure-sensor-2392395-239-2395-fits-for-caterpillar-c11-c13-c15-engine-345c-725-730-735-740-825h-826h-836h",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "3E-7692",
+   "name_ru": "Выключатель-датчик давления",
+   "name_en": "Pressure Switch Sensor",
+   "node": "10 Электрика/датчики/освещение",
+   "applic": "3116 / 3126 / 3176 / 3196 / 3406 / C11 / C15 — 725/730/735/740, 953C/963B/963C",
+   "qty": "1",
+   "interval": "по состоянию",
+   "alts": [
+    {
+     "brand": "Fab Heavy Parts",
+     "pn": "3E-7692",
+     "kind": "аналог",
+     "note": "$69.44"
+    }
+   ],
+   "price_usd": "69.44",
+   "source": "https://www.fabheavyparts.com/products/switch-sensor-3e-7692-3e7692-fits-for-caterpillar-cat-engine-3116-3126-3196-3056-3176-3406-c11-c15-truck-725-730-735-740-loader-953c-963b-963c-tractor-d5m-d6m-replacement",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "212-9450",
+   "name_ru": "Блок управления двигателем (ECM)",
+   "name_en": "Engine ECM Controller",
+   "node": "10 Электрика/датчики/освещение",
+   "applic": "R1600 / R1700 / R2900 / AD55, 345B / 365BL / 385B — прямое указание машины",
+   "qty": "1",
+   "interval": "по состоянию",
+   "alts": [
+    {
+     "brand": "Fab Heavy Parts",
+     "pn": "212-9450",
+     "kind": "новый",
+     "note": "$3484.00"
+    }
+   ],
+   "price_usd": "3484.00",
+   "source": "https://www.fabheavyparts.com/products/212-9450-2129450-ecm-controller-for-caterpillar-365bl-345b",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "372-7932",
+   "name_ru": "Блок управления (ECU)",
+   "name_en": "Electronic Control Unit",
+   "node": "10 Электрика/датчики/освещение",
+   "applic": "C7 / C11 / C13 / C15 / C18",
+   "qty": "1",
+   "interval": "по состоянию",
+   "alts": [
+    {
+     "brand": "Buy Machinery Parts",
+     "pn": "372-7932",
+     "kind": "аналог",
+     "note": "$4579.50"
+    },
+    {
+     "brand": "Buy Machinery Parts",
+     "pn": "262-1408",
+     "kind": "аналог",
+     "note": "ECU 3512B/C6.6/C11, $3189.54"
+    }
+   ],
+   "price_usd": "4579.50",
+   "source": "https://www.buymachineryparts.com/products/electronic-control-unit-372-7932-for-caterpillar-cat-engine-c11-c13-c15-c18-c7",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "247-4863",
+   "name_ru": "Жгут проводов двигателя",
+   "name_en": "Wiring Harness",
+   "node": "10 Электрика/датчики/освещение",
+   "applic": "C11 — погрузчик 966H",
+   "qty": "1",
+   "interval": "по состоянию",
+   "alts": [
+    {
+     "brand": "Fab Heavy Parts",
+     "pn": "247-4863",
+     "kind": "аналог",
+     "note": "$657.56"
+    },
+    {
+     "brand": "Buy Machinery Parts",
+     "pn": "247-4863",
+     "kind": "аналог",
+     "note": "$588.00"
+    },
+    {
+     "brand": "Buy Machinery Parts",
+     "pn": "372-4548",
+     "kind": "аналог",
+     "note": "жгут для промышленного C11, $333.40"
+    }
+   ],
+   "price_usd": "657.56",
+   "source": "https://www.fabheavyparts.com/products/wiring-harness-247-4863-2474863-for-caterpillar-cat-engine-c11-loader-966h",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "174-2032",
+   "name_ru": "Фильтр масляный",
+   "name_en": "Oil Filter",
+   "node": "06 Фильтры и жидкости",
+   "applic": "R1700G / R2900 / R2900G / R3000H — прямое указание машины",
+   "qty": "1",
+   "interval": "500 ч",
+   "alts": [
+    {
+     "brand": "RJ (aftermarket)",
+     "pn": "RJ9905",
+     "kind": "аналог",
+     "note": "$65.99, кросс на 174-2032"
+    },
+    {
+     "brand": "Caterpillar",
+     "pn": "1R-1808",
+     "kind": "OEM",
+     "note": "масляный фильтр ДВС по перечню КВАНТ для R1700G"
+    }
+   ],
+   "price_usd": "65.99",
+   "source": "https://www.buymachineryparts.com/products/oil-filter-replaces-174-2032-1742032-fits-caterpillar-r1700g-r2900-r2900g-r3000h-scania-g370-scania-dc13-116-370",
+   "confidence": "med",
+   "verdict": ""
+  }
+ ],
+ "notes": "Двигатель R1700G: ранние машины (серийные префиксы SBR/XBR) шли с Cat 3176C ATAAC 231 кВт, поздние — с Cat C11 ACERT 241/263 кВт; новый R1700 (с 2019) — Cat C13. Поэтому применимость собрана по семейству 3176/3196/C10/C11/C12/C13: это один блок и один ряд деталей, и каталоги PAI/IPD/Interstate-McBee перечисляют их через слэш. C15 к R1700/R1700G не относится — проверено по спецификациям (R1700 = C13), поэтому C15-позиции в срез не включены.\nТопливная система C11 — MEUI (механический привод, электронное управление): отдельного ТНВД и трубок высокого давления нет, есть подкачивающий насос 384-8611/384-8612, насос прокачки 190-8970 и шесть насос-форсунок. Это меняет ведомость ЗИП: вместо ТНВД закупается комплект форсунок и уплотнений 248-1394/223-5850.\nИсточники по убыванию силы: официальный Cat R1700 Rig Out Catalog (CM20250303) — ремкомплекты прокладок, стартёра, генератора, радиатор; каталог Diesel Parts Direct (в заголовке страницы прямо перечислены двигатели); Woodline Parts — витрина PAI/IPD/Interstate-McBee, где в наименовании стоит и номер Cat, и номер аналога; Highway & Heavy Parts и Heavy Duty Kits — категории C11 с кросс-референсами; Fab Heavy Parts / Buy Machinery Parts — афтермаркет с разбором применимости; Made-in-China — китайские заводы (hcqppart, hnlore, zhaoanautoparts, xibairun, tunwayparts, dironparts), проверялись только как источник альтернатив.\nЦены — розница витрин США в USD на 12.09.2026, для ориентира, а не для оферты.",
+ "gaps": "1. Не добыт ни один Cat PN из самого каталога машины SEBP3612 (R1700G, SBR00001-UP, C11): avspare, 777parts и parts.cat.com отдают 403/502/блокировку, Scribd закрыт. Поэтому строки привязаны к двигателю C11, а не к иллюстрации узла R1700G — номера коллектора, интеркулера, опор двигателя и глушителя именно этой машины не подтверждены.\n2. Опоры двигателя (engine mounts) не найдены ни в одном источнике по C11 — ни Cat PN, ни аналога. Пробел.\n3. Глушитель / каталитический нейтрализатор (у R1700G — очистка выхлопа под требования вентиляции шахты) не найден: у аftermarket-витрин таких позиций нет, а Cat-номера закрыты в SIS.\n4. Коленвал для C11 отдельным номером не найден — PAI даёт только C13 (313-3997) и шестерню 187-8972; для C11 нужен прогон по SIS или запрос дилеру.\n5. Толкатели-плунжеры (lifters/tappets) для семейства не нашлись ни у PAI, ни у McBee — только штанги 341-8889 и 319-0270.\n6. Сердцевина интеркулера (ATAAC core) — только прокладка 109-5307; сам сердечник для R1700G не подтверждён.\n7. Ресурсы (interval) заполнены по смыслу ремонта, а не по регламенту Cat: OMM R1700G (SEBU-документ) не читался, числа 500/1000 ч взяты из перечня КВАНТ и из общей практики Cat — требуют сверки с OMM.\n8. Термостат: 247-7133 подтверждён витринами как C9-C18, а 115-4223 подтверждается только MiC — Diesel Parts Direct для него даёт 3126/C7. Один из двух номеров к C11 не относится; нужен разбор по S/N двигателя.\n9. Турбина: для C11 найдено пять разных номеров (10R-2474, 10R-2087, 247-2965, 255-8862, 268-4346, 256-7737) — они относятся к разным исполнениям (одно- и двухступенчатые, промышленные TH35/RM-300). Какое стоит на R1700G конкретной машины — определяется по S/N двигателя, вслепую заказывать нельзя.\n10. Цены на позиции из Cat Rig Out Catalog отсутствуют: официальный документ их не публикует."
+}

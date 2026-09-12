@@ -4,18 +4,18 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 191,
-    "total_bytes": 92436424,
+    "datasets": 197,
+    "total_bytes": 93472498,
     "by_sensitivity": {
-      "конфиденциально": 58,
-      "внутреннее": 101,
+      "конфиденциально": 60,
+      "внутреннее": 105,
       "публикуемо": 32
     },
     "by_subproject": {
       "ГПУ-библиотека": 27,
       "ГТУ-библиотека": 35,
       "ОВЭ-75": 45,
-      "база ЗИП": 32,
+      "база ЗИП": 38,
       "база ЗИП · таможня": 18,
       "гидрометаллургия": 22,
       "дашборд сорсеров": 4,
@@ -842,6 +842,67 @@
       "referenced_by": []
     },
     {
+      "path": "zip/data/r1700.json",
+      "subproject": "база ЗИП",
+      "bytes": 1360678,
+      "note": "Досье машины Caterpillar R1700G (ПДМ подземных работ): паспорт и модификации, узлы, документация Caterpillar по номерам форм, перечень запчастей с нашими номерами KV, кроссы вторичного рынка, официальные дилеры, заводы неоригинала, поставщики РФ/СНГ, маршруты ввоза по таможне, ценовые ориентиры, площадки торгов и эксплуатанты. Каждая строка с источником и уровнем доверия; вердикт — итог независимой перепроверки. Строит zip/tools/r1700_dossier.py из zip/data/r1700_recon/, positions.json, pnw/, таможни и справочника ODM. Руками не править.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "alts",
+        "built_by",
+        "docs",
+        "gaps",
+        "machine",
+        "node_tree",
+        "nodes",
+        "orgs",
+        "own",
+        "parts",
+        "playbook",
+        "prices",
+        "schema",
+        "specs",
+        "stats",
+        "tenders",
+        "updated",
+        "variants"
+      ],
+      "main_collection": {
+        "key": "alts",
+        "records": 466,
+        "record_keys": [
+          "alt_pn",
+          "alt_pn_norm",
+          "brand",
+          "kind",
+          "note",
+          "pn",
+          "pn_norm"
+        ]
+      },
+      "last_change": "2026-09-12",
+      "last_author": "Claude",
+      "last_commit": "b4fc87a",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "адреса электронной почты",
+          "телефоны",
+          "участники внешнеэкономических сделок"
+        ]
+      },
+      "referenced_by": [
+        "scripts/build_chain_coverage.py",
+        "tests/test_r1700_dossier.py",
+        "zip/tools/build_r1700.py",
+        "zip/tools/r1700_dossier.py",
+        "zip/tools/r1700_report.py",
+        "zip/tools/r1700_sql.py"
+      ]
+    },
+    {
       "path": "zip/data/positions.json",
       "subproject": "база ЗИП",
       "bytes": 1064958,
@@ -1099,65 +1160,6 @@
         "gt/tools/build_rfq.py",
         "gt/tools/ship_merge.py",
         "gt/tools/ship_report.py"
-      ]
-    },
-    {
-      "path": "zip/data/r1700.json",
-      "subproject": "база ЗИП",
-      "bytes": 815352,
-      "note": "Досье машины Caterpillar R1700G (ПДМ подземных работ): паспорт и модификации, узлы, документация Caterpillar по номерам форм, перечень запчастей с нашими номерами KV, кроссы вторичного рынка, официальные дилеры, заводы неоригинала, поставщики РФ/СНГ, маршруты ввоза по таможне, ценовые ориентиры, площадки торгов и эксплуатанты. Каждая строка с источником и уровнем доверия; вердикт — итог независимой перепроверки. Строит zip/tools/r1700_dossier.py из zip/data/r1700_recon/, positions.json, pnw/, таможни и справочника ODM. Руками не править.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "alts",
-        "built_by",
-        "docs",
-        "gaps",
-        "machine",
-        "node_tree",
-        "nodes",
-        "orgs",
-        "own",
-        "parts",
-        "playbook",
-        "prices",
-        "schema",
-        "specs",
-        "stats",
-        "tenders",
-        "updated",
-        "variants"
-      ],
-      "main_collection": {
-        "key": "alts",
-        "records": 167,
-        "record_keys": [
-          "alt_pn",
-          "alt_pn_norm",
-          "brand",
-          "kind",
-          "note",
-          "pn",
-          "pn_norm"
-        ]
-      },
-      "last_change": "2026-09-12",
-      "last_author": "Claude",
-      "last_commit": "b4fc87a",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "конфиденциально",
-        "markers": [
-          "участники внешнеэкономических сделок"
-        ]
-      },
-      "referenced_by": [
-        "scripts/build_chain_coverage.py",
-        "tests/test_r1700_dossier.py",
-        "zip/tools/build_r1700.py",
-        "zip/tools/r1700_dossier.py",
-        "zip/tools/r1700_report.py",
-        "zip/tools/r1700_sql.py"
       ]
     },
     {
@@ -3308,6 +3310,52 @@
       ]
     },
     {
+      "path": "zip/data/r1700_recon/traders.json",
+      "subproject": "база ЗИП",
+      "bytes": 115185,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "gaps",
+        "notes",
+        "rows",
+        "slice"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 91,
+        "record_keys": [
+          "brands",
+          "city",
+          "confidence",
+          "country",
+          "email",
+          "kind",
+          "note",
+          "org",
+          "phone",
+          "role",
+          "site",
+          "source",
+          "stock",
+          "verdict"
+        ]
+      },
+      "last_change": null,
+      "last_author": null,
+      "last_commit": null,
+      "updated_by": "неизвестно",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "адреса электронной почты",
+          "телефоны"
+        ]
+      },
+      "referenced_by": []
+    },
+    {
       "path": "gt/data/site_profiles.json",
       "subproject": "ГТУ-библиотека",
       "bytes": 112817,
@@ -3554,6 +3602,47 @@
         "zip/tools/r1700_bitrix.py",
         "zip/tools/r1700_dossier.py"
       ]
+    },
+    {
+      "path": "zip/data/r1700_recon/engine.json",
+      "subproject": "база ЗИП",
+      "bytes": 102338,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "gaps",
+        "notes",
+        "rows",
+        "slice"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 131,
+        "record_keys": [
+          "alts",
+          "applic",
+          "confidence",
+          "interval",
+          "name_en",
+          "name_ru",
+          "node",
+          "pn",
+          "price_usd",
+          "qty",
+          "source",
+          "verdict"
+        ]
+      },
+      "last_change": null,
+      "last_author": null,
+      "last_commit": null,
+      "updated_by": "неизвестно",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
     },
     {
       "path": "zip/data/perf_test_requests.json",
@@ -3821,6 +3910,51 @@
       ]
     },
     {
+      "path": "zip/data/r1700_recon/docs.json",
+      "subproject": "база ЗИП",
+      "bytes": 82773,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "gaps",
+        "notes",
+        "rows",
+        "slice"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 100,
+        "record_keys": [
+          "confidence",
+          "covers",
+          "form",
+          "kind",
+          "lang",
+          "media",
+          "price",
+          "source",
+          "title_ru",
+          "url",
+          "verdict",
+          "where"
+        ]
+      },
+      "last_change": null,
+      "last_author": null,
+      "last_commit": null,
+      "updated_by": "неизвестно",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "ove/build.py",
+        "ove/tools/build_paket.py",
+        "ove/tools/build_release.py"
+      ]
+    },
+    {
       "path": "zip/data/bom.json",
       "subproject": "база ЗИП",
       "bytes": 81322,
@@ -3941,6 +4075,48 @@
       ]
     },
     {
+      "path": "zip/data/r1700_recon/drive.json",
+      "subproject": "база ЗИП",
+      "bytes": 68486,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "gaps",
+        "notes",
+        "rows",
+        "slice"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 82,
+        "record_keys": [
+          "alts",
+          "applic",
+          "confidence",
+          "interval",
+          "name_en",
+          "name_ru",
+          "node",
+          "note",
+          "pn",
+          "price_usd",
+          "qty",
+          "source",
+          "verdict"
+        ]
+      },
+      "last_change": null,
+      "last_author": null,
+      "last_commit": null,
+      "updated_by": "неизвестно",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
+    },
+    {
       "path": "pnw/data/part_suppliers.json",
       "subproject": "каталог PN · данные",
       "bytes": 66862,
@@ -4005,6 +4181,52 @@
       "referenced_by": [
         "gidromet/build.py"
       ]
+    },
+    {
+      "path": "zip/data/r1700_recon/dealers.json",
+      "subproject": "база ЗИП",
+      "bytes": 66560,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "gaps",
+        "notes",
+        "rows",
+        "slice"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 42,
+        "record_keys": [
+          "brands",
+          "city",
+          "confidence",
+          "country",
+          "email",
+          "kind",
+          "note",
+          "org",
+          "phone",
+          "role",
+          "site",
+          "source",
+          "stock",
+          "verdict"
+        ]
+      },
+      "last_change": null,
+      "last_author": null,
+      "last_commit": null,
+      "updated_by": "неизвестно",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "адреса электронной почты",
+          "телефоны"
+        ]
+      },
+      "referenced_by": []
     },
     {
       "path": "ove/data/zakladki.json",
@@ -4670,6 +4892,44 @@
       "referenced_by": [
         "ove/tools/build_disc.py"
       ]
+    },
+    {
+      "path": "zip/data/r1700_recon/spec.json",
+      "subproject": "база ЗИП",
+      "bytes": 55445,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "gaps",
+        "nodes",
+        "notes",
+        "rows",
+        "slice",
+        "variants"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 83,
+        "record_keys": [
+          "confidence",
+          "param",
+          "source",
+          "unit",
+          "value",
+          "variant",
+          "verdict"
+        ]
+      },
+      "last_change": null,
+      "last_author": null,
+      "last_commit": null,
+      "updated_by": "неизвестно",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
     },
     {
       "path": "gt/data/cummins_qsk60.json",
@@ -6581,45 +6841,6 @@
       ]
     },
     {
-      "path": "data/chain_coverage.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 20046,
-      "note": "Заполняемость цепочки портала по семи направлениям и восьми звеньям: машина → узел → признак → дефект → ремонтное решение → запчасть → изготовитель → исполнитель. Производный файл, считается scripts/build_chain_coverage.py по фактическим файлам репозитория; ноль означает отсутствие данных, а не то, что они где-то есть. Руками не заполнять. Первый прогон 12.09.2026: 13 клеток из 56, звенья «Признак», «Дефект» и «Исполнитель» не начаты ни по одному направлению.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "common",
-        "empty_everywhere",
-        "goal",
-        "links",
-        "note",
-        "priority_rule",
-        "segments",
-        "summary"
-      ],
-      "main_collection": {
-        "key": "links",
-        "records": 8,
-        "record_keys": [
-          "link",
-          "title",
-          "what"
-        ]
-      },
-      "last_change": "2026-09-12",
-      "last_author": "Claude",
-      "last_commit": "b4fc87a",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "scripts/build_chain_coverage.py",
-        "tests/test_dict.py"
-      ]
-    },
-    {
       "path": "gpu/data/models.json",
       "subproject": "ГПУ-библиотека",
       "bytes": 20045,
@@ -6658,6 +6879,45 @@
         "library/load_equipment.py",
         "scripts/build_chain_coverage.py",
         "scripts/build_dict.py"
+      ]
+    },
+    {
+      "path": "data/chain_coverage.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 20007,
+      "note": "Заполняемость цепочки портала по семи направлениям и восьми звеньям: машина → узел → признак → дефект → ремонтное решение → запчасть → изготовитель → исполнитель. Производный файл, считается scripts/build_chain_coverage.py по фактическим файлам репозитория; ноль означает отсутствие данных, а не то, что они где-то есть. Руками не заполнять. Первый прогон 12.09.2026: 13 клеток из 56, звенья «Признак», «Дефект» и «Исполнитель» не начаты ни по одному направлению.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "common",
+        "empty_everywhere",
+        "goal",
+        "links",
+        "note",
+        "priority_rule",
+        "segments",
+        "summary"
+      ],
+      "main_collection": {
+        "key": "links",
+        "records": 8,
+        "record_keys": [
+          "link",
+          "title",
+          "what"
+        ]
+      },
+      "last_change": "2026-09-12",
+      "last_author": "Claude",
+      "last_commit": "b4fc87a",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "scripts/build_chain_coverage.py",
+        "tests/test_dict.py"
       ]
     },
     {
