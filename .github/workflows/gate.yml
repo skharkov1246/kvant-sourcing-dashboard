@@ -105,10 +105,10 @@ jobs:
         run: python scripts/build_index.py --check
 
       # Правило разметки узлов сверяется с ручной разметкой инженеров (2 096
-      # строк). Порог ниже достигнутого (86 % точность, 81 % охват) на два
+      # строк). Порог ниже достигнутого (91 % точность, 94 % охват) на два
       # пункта: он держит от обвала, а не от колебания на одной строке.
       - name: Разметка узлов не хуже порога
-        run: python scripts/library_units_check.py --min-precision 84 --min-coverage 78
+        run: python scripts/library_units_check.py --min-precision 89 --min-coverage 92
 
       - name: Бот-файлы не должны меняться в PR
         if: github.event_name == 'pull_request'

@@ -61,6 +61,23 @@ def split_machines(s: str) -> list[str]:
 # Правила «слово → узел». Порядок значим: первое совпадение выигрывает, поэтому
 # частные правила идут раньше общих. Идентификаторы узлов — из gt/data/parts.json
 # (система) и её компонентов (система.имя-по-английски).
+# ЗАКРЫТЫЙ СПИСОК, ПРОВЕРЯЕМЫЙ ДО ОБЩИХ ПРАВИЛ. Три слова по-русски значат в
+# арматуре и в роторе разное, и общее правило на них ошибалось измеримо — 143
+# случая из 243 расхождений с разметкой инженеров приходились на них одних:
+#   «муфта» — и соединительная муфта вала (ротор), и резьбовая муфта труб
+#     (арматура), и термоусадочная кабельная муфта (электрика);
+#   «редуктор» — и мультипликатор (пакет), и переходник труб меньшего диаметра,
+#     отчего «Переходник труба–труба (редуктор) 1 x 3/4» уходил в шестерни;
+#   «регулятор» — и регулятор топлива, и автоматический регулятор напряжения.
+# Список закрытый и с указанием диаметра или трубы в самом наименовании: правило 7
+# — обвинять можно только закрытым списком, иначе уточнение станет новой ошибкой.
+СНАЧАЛА: tuple[tuple[str, tuple[str, ...]], ...] = (
+    ("controls", ("термоусадочн", "муфта кабельн", "кабельная муфта",
+                  "voltage regulator", "регулятор напряж")),
+    ("fasteners", ("тройник", "переходник труба", "муфта переходн", "муфта проходн",
+                   "ниппель", "сгон", "бобышка", "полугайка")),
+)
+
 UNIT_RULES: tuple[tuple[str, tuple[str, ...]], ...] = (
     # ПОРЯДОК ИЗМЕРЕН, А НЕ УГАДАН. На 2 096 строках, размеченных инженерами
     # вручную, прежний порядок давал точность 81 %: крупнейшая ошибка —
@@ -83,30 +100,36 @@ UNIT_RULES: tuple[tuple[str, tuple[str, ...]], ...] = (
     ("turbine", ("лопатк", "турбина высокого", "силовая турбина", "blade")),
     ("compressor.inlet-guide-vanes", ("вна", "входной направляющий", "igv", "inlet guide")),
     ("compressor.bleed", ("антипомпажн", "сбросной клапан", "bleed valve", "blow-off")),
-    ("compressor", ("компрессор", "compressor", "квоу")),
+    ("compressor", ("компрессор", "compressor", "квоу", "рабочее колесо", "impeller",
+                    "воздухозабор")),
     ("rotor.journal-bearings", ("подшипник опорн", "вкладыш", "journal bearing", "баббит")),
     ("rotor.thrust-bearing", ("подшипник упорн", "thrust bearing")),
     ("rotor.dry-gas-seals", ("сухое газовое", "сухие газовые", "dry gas seal", "dgs")),
     ("rotor.couplings", ("муфта", "торсион", "coupling")),
     ("rotor.labyrinth-seals", ("лабиринтн", "labyrinth")),
-    ("rotor", ("подшипник", "bearing", "ротор", "rotor")),
-    ("seals", ("уплотнени", "прокладк", "сальник", "gasket", "o-ring", "o'ring", "oring",
-               "packing", "seal")),
+    ("rotor", ("подшипник", "bearing", "ротор", "rotor", "shaft", "вал турбин", "вала")),
+    ("seals", ("уплотнени", "уплотнительн", "прокладк", "сальник", "gasket", "o-ring",
+               "o'ring", "oring", "packing", "seal", "о-образн", "кольцо лабиринт")),
     ("consumables.inlet-air-filters", ("фильтр квоу", "фильтр воздуш", "inlet air filter")),
     ("consumables.lube-oil-filters", ("маслофильтр", "фильтр масл", "сепаратор", "oil filter")),
     ("consumables.turbine-oil", ("турбинное масло", "turbine oil", "смазка", "lubricant")),
-    ("consumables", ("фильтр", "filter", "расходник", "strainer", "сетка фильтр")),
+    ("consumables", ("фильтр", "filter", "расходник", "strainer", "сетка фильтр",
+                     "герметик", "coalescer", "коалесцер")),
     ("fuel.fuel-metering", ("дозирован", "metering valve", "регулятор топлив")),
     ("fuel.shut-off-valves", ("стопорн", "отсечн", "shut-off", "shutoff")),
     ("fuel.fuel-manifolds", ("коллектор топлив", "fuel manifold", "рукав", "flex hose")),
     ("fuel.fuel-gas-filters", ("фильтр топлив", "fuel gas filter")),
-    ("fuel", ("топлив", "fuel", "клапан", "valve")),
+    ("fuel", ("топлив", "fuel", "клапан", "valve", "regulator")),
     ("controls.control-system", ("контроллер", "сау", "plc", "шкаф управления", "control system")),
     ("controls.exhaust-thermocouples", ("термопар", "thermocouple", "egt")),
     ("controls.vibration-probes", ("вибродатчик", "проксиметр", "вибрац", "vibration", "bently")),
     ("controls.solenoids", ("соленоид", "актуатор", "solenoid", "actuator", "конечник")),
     ("controls.flame-scanners", ("датчик пламени", "flame scanner", "уф-датчик")),
     ("controls", ("датчик", "sensor", "кип", "реле", "relay", "преобразователь", "switch",
+                  "probe", "contactor", "diode", "terminal", "conduit", "meter",
+                  "flowmeter", "пирометр", "предохранител", "блок питания", "расходомер",
+                  "индикатор уровня", "выключател", "переключател", "battery", "батаре",
+                  "аккумулятор",
                   "электрик", "кабель", "cable", "harness", "коммутатор", "модуль", "module",
                   "transducer", "контакт", "fuse", "breaker", "transmitter", "detector",
                   "connector", "gauge", "manometr", "манометр", "indicator", "монитор",
@@ -118,16 +141,20 @@ UNIT_RULES: tuple[tuple[str, tuple[str, ...]], ...] = (
     ("package.enclosure-ventilation", ("кожух", "вентиляц", "пожаротушен", "газоанализ", "enclosure",
                            "fire supp")),
     ("package", ("насос", "pump", "теплообмен", "вспомогательн", "bop", "motor",
+                 "нагревател",
                  "электродвигател", "heater", "подогревател", "insulation", "blanket",
                  "теплоизоляц", "изоляц")),
     ("fasteners", ("болт", "винт", "гайка", "шайба", "шпилька", "шплинт", "крепёж", "крепеж",
                    "стопорное кольцо", "кронштейн", "screw", "bolt", "nut", "washer", "stud",
                    "retaining ring", "cotter", "bracket", "spacer", "shim",
                    "clamp", "хомут", "fitting", "фитинг", "adapter", "переходник",
-                   "retainer", "support", "strap", "стяжк", "опора крепл")),
+                   "retainer", "support", "strap", "стяжк", "опора крепл",
+                   "retaining", "dowel", "штифт", "штуцер", "уголок", "заглушка",
+                   "обжимн")),
+    ("exhaust", ("выхлоп", "exhaust", "диффузор", "diffuser", "дымовая труба")),
     ("tooling", ("оснастка", "инструмент", "приспособлени", "tooling", "fixture")),
     ("piping", ("трубопровод", "рукав", "шланг", "hose", "tube", "tubing",
-                "штуцер", "flange", "фланец", "elbow", "piping", "compensator",
+                "flange", "фланец", "elbow", "piping", "compensator",
                 "компенсатор")),
     ("generator", ("генератор", "возбудител", "статор", "generator", "exciter", "stator")),
 )
@@ -154,10 +181,15 @@ EXTRA_UNITS: tuple[tuple[str, str, str, str], ...] = (
 # ровно трёхбуквенными, поэтому порог 3, а не 4: четырёхбуквенное «seal» должно
 # ловиться и во множественном числе.
 _WHOLE = 3
-_COMPILED = tuple(
-    (unit, tuple((w, re.compile(rf"(?<![0-9a-zа-яё]){re.escape(w)}(?![0-9a-zа-яё])"))
-                 for w in words))
-    for unit, words in UNIT_RULES)
+def _скомпилировать(правила):
+    return tuple(
+        (unit, tuple((w, re.compile(rf"(?<![0-9a-zа-яё]){re.escape(w)}(?![0-9a-zа-яё])"))
+                     for w in words))
+        for unit, words in правила)
+
+
+_СНАЧАЛА = _скомпилировать(СНАЧАЛА)
+_COMPILED = _скомпилировать(UNIT_RULES)
 
 
 # Критичность у библиотеки ГПУ записана словами, у номенклатуры ГТУ — буквами.
@@ -189,7 +221,7 @@ def unit_of(text: str) -> str | None:
     t = (text or "").lower().replace("ё", "е")
     if len(t) < 3:
         return None
-    for unit, words in _COMPILED:
+    for unit, words in _СНАЧАЛА + _COMPILED:
         for w, rx in words:
             if (rx.search(t) if len(w) <= _WHOLE else w in t):
                 return unit
