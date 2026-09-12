@@ -261,6 +261,26 @@ def report(files: Files, scan, real, shadow):
     gate4 = shaky / len(big) * 100 if big else 0.0
 
     # ── ГЕЙТ 5 ─────────────────────────────────────────────────────────────────
+    block("СЕТКА ПОРОГОВ. цена ослабления, посчитана за тот же проход")
+    print("  Пороги не контракт — контракт гейты. Таблица показывает, чем оплачен")
+    print("  каждый шаг ослабления: сколько прибавится помеченного и сколько")
+    print("  настоящей номенклатуры при этом попадёт под нож.")
+    etalon_ids = {rid for rid, _fi in etalon}
+    print(f"\n  {'защита≤':>8}{'проза≥':>8}{'файлов':>9}{'строк':>10}{'ложных':>8}{'доля ложных':>13}")
+    base_spec, base_prose = df.MAX_SPEC_SHARE, df.MIN_PROSE_SHARE
+    for ms in (0.05, 0.10, 0.15, 0.20, 0.30, 0.50):
+        for mp in (0.12, 0.20):
+            df.MAX_SPEC_SHARE, df.MIN_PROSE_SHARE = ms, mp
+            v_real, v_sh = files.verdicts()
+            f_n = sum(1 for v in v_real if v == "документация")
+            r_n = sum(1 for fi in scan["cand_file"] if v_real[fi] == "документация")
+            sh = {scan["sh_id"][i] for i, fi in enumerate(scan["sh_file"])
+                  if v_sh[fi] == "документация"}
+            fp = len(sh & etalon_ids)
+            print(f"  {ms:>8.2f}{mp:>8.2f}{num(f_n, 9)}{num(r_n, 10)}{num(fp, 8)}"
+                  f"{pct(fp, len(etalon_ids)):>13}")
+    df.MAX_SPEC_SHARE, df.MIN_PROSE_SHARE = base_spec, base_prose
+
     block("ГЕЙТ 5. польза — не блокирующий")
     print(f"  помечено строк:{num(len(marked), 27)}")
     print(f"  осуждено файлов:{num(doc_files, 26)}")
