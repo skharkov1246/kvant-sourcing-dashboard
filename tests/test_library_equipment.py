@@ -120,3 +120,40 @@ def test_идентификатор_компонента_устойчив_и_ч�
     assert eq.slug_en("combustion liner / can") == "combustion-liner"
     assert eq.slug_en("nozzle guide vanes (NGV)") == "nozzle-guide-vanes"
     assert eq.slug_en("") == ""
+
+
+# ─── поиск машины в тексте статьи ────────────────────────────────────────────
+def test_машина_в_тексте_ищется_целым_словом_и_длинная_раньше_короткой():
+    """«ST14» подстрокой находится внутри «ST1400», «Mars» — внутри «Marshall».
+    А «SGT-400» не должно съедаться более коротким «SGT»."""
+    lk = load("link_knowledge")
+    шаблоны = lk.машинный_шаблон([("sgt400", ["SGT-400"]), ("sgt", ["SGT"]),
+                                  ("st14", ["ST14"]), ("mars90", ["Mars 90"])])
+
+    def найти(текст):
+        for rx, key in шаблоны:
+            if rx.search(текст):
+                return key
+        return None
+
+    assert найти("Ремонт камеры SGT-400 по регламенту") == "sgt400"
+    assert найти("Буровая машина ST14, замена коронок") == "st14"
+    assert найти("Партия ST1400 на складе") is None
+    assert найти("Marshall Islands, судовая поставка") is None
+    assert найти("Ничего про машины") is None
+
+
+def test_слишком_короткое_написание_в_поиск_не_идёт():
+    lk = load("link_knowledge")
+    assert lk.машинный_шаблон([("st8", ["ST8"])]) == []
+
+
+def test_критичность_приводится_к_одной_шкале():
+    """У библиотеки ГПУ критичность словами, у номенклатуры ГТУ — буквами. Две
+    шкалы в одной колонке ломают запрос «покажи критичные узлы»."""
+    assert eq.crit_of("критично") == "A"
+    assert eq.crit_of("расходники") == "C"
+    assert eq.crit_of("капремонт") == eq.crit_of("важно") == "B"
+    assert eq.crit_of("A") == "A"                  # буква остаётся буквой
+    assert eq.crit_of("по проекту") is None        # зависит от проекта
+    assert eq.crit_of(None) is None

@@ -107,6 +107,13 @@ create table if not exists lib_models (
   updated_at   timestamptz default now()
 );
 create index if not exists lib_models_family on lib_models (family);
+-- Направление и вид машины: реестр dict/machine.json разводит обозначения по
+-- сегментам КВАНТа (gtu, gsho) и видам (турбина, горная машина). Без этого
+-- справочник машин отвечает только по ГТУ, а половина реестра — горно-шахтное.
+alter table lib_models add column if not exists segment_id text
+  references lib_segments(id) on delete set null;
+alter table lib_models add column if not exists kind text;
+create index if not exists lib_models_segment on lib_models (segment_id);
 
 -- Узлы машины деревом: система («Горячий тракт») → компонент («Жаровая труба»).
 -- Узлы у промышленных ГТУ общие для Solar и Siemens, поэтому дерево одно на все
@@ -235,6 +242,25 @@ create table if not exists lib_defects (
   created_at  timestamptz default now(),
   updated_at  timestamptz default now()
 );
+-- Признак — вход в цепочку с той стороны, с которой приходит эксплуатация:
+-- «выросла вибрация», «разброс по термопарам». Отдельная таблица, а не поле
+-- дефекта: один признак ведёт к нескольким дефектам, и один дефект даёт
+-- несколько признаков.
+create table if not exists lib_symptoms (
+  id         text primary key,
+  name       text not null,
+  unit_id    text references lib_units(id) on delete set null,
+  measure    text,                        -- по чему видно: что и чем меряют
+  defect     text,                        -- что это обычно значит
+  confirm    text,                        -- чем подтвердить
+  basis      text,                        -- откуда связка взята
+  confidence text default 'low',
+  source     text,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+create index if not exists lib_symptoms_unit on lib_symptoms (unit_id);
+
 create index if not exists lib_defects_unit on lib_defects (unit_id);
 create index if not exists lib_defects_pn   on lib_defects (part_number);
 
@@ -309,6 +335,33 @@ alter table lib_suppliers add column if not exists contact_phone text;
 create unique index if not exists lib_suppliers_key
   on lib_suppliers (coalesce(segment_id, ''), name_key);
 
+-- А вот это мина, и вот почему. Ключ выше включает сегмент, а сегмент считается
+-- правилом по тексту о компании. Стоит правилу измениться — и та же компания
+-- получает другой сегмент, обычный ключ не срабатывает, и в таблице появляется
+-- второй экземпляр одной фирмы. Обнаружено сравнением двух прогонов: 77 таких
+-- пар из 4 480 после расширения списка источников.
+--
+-- Правильный ключ — имя без сегмента: компания это компания, а сегмент у неё
+-- признак. Индекс строится ТОЛЬКО если дублей ещё нет, и молча ничего не делает,
+-- если они уже появились: удалять чужие строки миграция не должна, это решение
+-- владельца (CLAUDE.md). Тогда в журнале останется предупреждение.
+do $$
+declare дублей int;
+begin
+  if exists (select 1 from information_schema.columns
+              where table_name = 'lib_suppliers' and column_name = 'name_key') then
+    select count(*) into дублей from (
+      select name_key from lib_suppliers where name_key is not null
+       group by name_key having count(*) > 1) t;
+    if дублей = 0 then
+      create unique index if not exists lib_suppliers_name_key
+        on lib_suppliers (name_key) where name_key is not null;
+    else
+      raise warning 'lib_suppliers: % дублей по name_key — уникальный индекс не построен, нужна ручная сверка', дублей;
+    end if;
+  end if;
+end $$;
+
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 4. Ценообразование: из чего складывается цена и какова она у разных источников.
 create table if not exists lib_prices (
@@ -331,6 +384,18 @@ create table if not exists lib_prices (
 );
 create index if not exists lib_prices_seg on lib_prices (segment_id);
 create index if not exists lib_prices_pn  on lib_prices (part_number);
+-- Цена без привязки к детали и без источника поступления — это просто число.
+-- part_id связывает её с каталогом, feed помечает поток, из которого она пришла:
+-- по feed загрузчик снимает свои прежние строки и потому идемпотентен (у цены
+-- нет естественного ключа — одна деталь законно имеет и минимум, и максимум).
+alter table lib_prices add column if not exists part_id  text
+  references lib_parts(id) on delete cascade;
+alter table lib_prices add column if not exists feed     text;
+alter table lib_prices add column if not exists country  text;
+alter table lib_prices add column if not exists year     int;
+alter table lib_prices add column if not exists exporter text;
+create index if not exists lib_prices_part on lib_prices (part_id);
+create index if not exists lib_prices_feed on lib_prices (feed);
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 5. Знание об оборудовании: устройство, режимы работы, критерии подбора,
@@ -349,6 +414,16 @@ create table if not exists lib_knowledge (
   updated_at   timestamptz default now()
 );
 create index if not exists lib_knowledge_seg on lib_knowledge (segment_id, topic);
+-- Статья знает свой сегмент, но не узел и не машину, а спрашивают именно так:
+-- «что мы знаем про горячий тракт SGT-400». Связи ставит library/link_knowledge.py
+-- по тем же правилам, что размечают позиции, — правило одно на оба места.
+alter table lib_knowledge add column if not exists unit_id  text
+  references lib_units(id) on delete set null;
+alter table lib_knowledge add column if not exists model_id text
+  references lib_models(id) on delete set null;
+alter table lib_knowledge add column if not exists link_rule text;   -- чем связь поставлена
+create index if not exists lib_knowledge_unit  on lib_knowledge (unit_id);
+create index if not exists lib_knowledge_model on lib_knowledge (model_id);
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 6. Разбор проигрышей: почему сделка не доехала до реализации. Главный источник
@@ -403,6 +478,7 @@ alter table lib_defects        enable row level security;
 alter table lib_fleet          enable row level security;
 alter table lib_part_alt       enable row level security;
 alter table lib_bom            enable row level security;
+alter table lib_symptoms       enable row level security;
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 9. Реестр разобранных файлов. Нужен для возобновляемости: обход 22 тысяч

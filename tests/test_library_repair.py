@@ -68,3 +68,17 @@ def test_дефект_хранится_вместе_с_решением():
     for d in defects.values():
         assert d["consequence"], d["name"]
         assert d["unit_id"] is None or d["unit_id"] in rp.UNITS
+
+
+def test_признаки_помечены_заготовкой_и_ведут_в_существующий_узел():
+    """Справочник признаков составлен не по нашим измерениям, и это обязано быть
+    видно в данных: низкая уверенность у каждой строки и названный источник
+    связки. Иначе заготовка через месяц станет неотличима от факта."""
+    symptoms = rp.build_symptoms()
+    assert len(symptoms) >= 20, "справочник признаков перестал читаться"
+    for s in symptoms.values():
+        assert s["confidence"] == "low", s["name"]
+        assert "заготовка" in (s["source"] or ""), s["name"]
+        assert s["basis"], s["name"]
+        assert s["measure"] and s["defect"] and s["confirm"], s["name"]
+        assert s["unit_id"] in rp.UNITS, f"{s['name']}: узел {s['unit_id']} не существует"

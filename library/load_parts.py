@@ -47,6 +47,13 @@ LINKS = "zip/data/odm_suppliers.json"
 # «у кого сейчас есть» — ради этого сорсер и звонит.
 SWEEPS = (("gt/data/ship_sweep.json", "проверка наличия (ЛУКОЙЛ)"),
           ("gt/data/ship_energoseti.json", "проверка наличия (Энергосети)"))
+# Цены, собранные разными способами, лежат в четырёх файлах и в аналитику не
+# попадали. Поток («feed») помечает происхождение: по нему загрузчик снимает
+# свои прежние строки, а в выборке видно, чему верить.
+FEED_КАТАЛОГ = "каталог ЗИП"
+FEED_ЗАПИСИ = "записи о ценах"
+FEED_КОНКУРЕНТЫ = "прайсы конкурентов"
+FEED_RFQ = "ценовые коридоры RFQ"
 PAREN = re.compile(r"\([^)]*\)")
 NOT_KEY = re.compile(r"[^0-9a-zа-яё]+")
 
@@ -61,12 +68,12 @@ def part_key(catalog_no: str, fallback: str) -> str:
     return t or NOT_KEY.sub("", (fallback or "").lower())[:60]
 
 
-def load(path: str):
+def load(path: str, key: str = "rows"):
     full = os.path.join(ROOT, path)
     if not os.path.exists(full):
         return []
     d = json.load(open(full, encoding="utf-8"))
-    return d if isinstance(d, list) else (d.get("rows") or [])
+    return d if isinstance(d, list) else (d.get(key) or [])
 
 
 def число(v):
@@ -182,6 +189,47 @@ def main() -> int:
             "source": "каталог ЗИП",
         }
 
+    # ─── цены из отдельных файлов ────────────────────────────────────────────
+    # Ключ детали: где есть position_id — по нему, где нет — по номеру.
+    по_id = {r.get("id"): part_key(r.get("catalog_norm") or r.get("catalog_no"),
+                                   r.get("name", "")) for r in positions}
+    цены_извне: list[dict] = []
+
+    def цена(key, price, currency, источник, feed, **kw):
+        if not key or price in (None, "", 0):
+            return
+        try:
+            p = float(str(price).replace(" ", "").replace(",", "."))
+        except ValueError:
+            return
+        if p <= 0:
+            return
+        цены_извне.append({"part_id": key, "price": p, "currency": (currency or "USD")[:10],
+                           "source": (источник or feed)[:200], "feed": feed,
+                           "source_url": (kw.get("url") or None) and str(kw["url"])[:400],
+                           "country": (kw.get("country") or None) and str(kw["country"])[:80],
+                           "year": kw.get("year") if isinstance(kw.get("year"), int) else None,
+                           "exporter": (kw.get("exporter") or None) and str(kw["exporter"])[:200],
+                           "confidence": (kw.get("conf") or "med")[:10]})
+
+    for r in load("zip/data/price_records.json"):
+        цена(по_id.get(r.get("position_id")), r.get("unit_price"), r.get("currency"),
+             f"{r.get('source') or ''} · {r.get('exporter') or ''}".strip(" ·"),
+             FEED_ЗАПИСИ, url=r.get("url"), country=r.get("country"), year=r.get("year"),
+             exporter=r.get("exporter"), conf=r.get("confidence"))
+    for r in load("zip/data/competitor_prices.json"):
+        цена(part_key(r.get("catalog_no"), r.get("name", "")), r.get("price_rub"), "RUB",
+             r.get("source"), FEED_КОНКУРЕНТЫ, conf="med")
+    for r in load("gt/data/rfq_prices.json", "prices"):
+        for граница, значение in (("минимум", r.get("usd_lo")), ("максимум", r.get("usd_hi"))):
+            цена(part_key(r.get("pn"), ""), значение, "USD",
+                 f"{r.get('basis') or 'RFQ'} · {граница}", FEED_RFQ,
+                 url=r.get("url"), conf=r.get("conf"))
+    for r in load("zip/data/cat_stock_2026-09.json", "positions"):
+        цена(part_key(r.get("pn_norm") or r.get("pn"), r.get("name_ru", "")),
+             r.get("price_exw_usd") or r.get("line_exw_usd"), "USD",
+             "склад поставщика, EXW", FEED_ЗАПИСИ, conf="med")
+
     print("=== запчасти ===")
     print(f"  позиций в каталоге:{len(positions):>8}")
     print(f"  различных деталей: {len(parts):>8}" +
@@ -223,6 +271,11 @@ def main() -> int:
     ист = Counter(p["price_src"] or "не указан" for p in цены)
     for k, n in ист.most_common(6):
         print(f"    {k[:44]:46}{n:>6}")
+    print(f"\n  цен из отдельных файлов: {len(цены_извне)}")
+    for k, n in Counter(c["feed"] for c in цены_извне).most_common():
+        print(f"    {k:28}{n:>6}")
+    print(f"  из них с ссылкой на источник: "
+          f"{sum(1 for c in цены_извне if c['source_url'])}")
 
     if not APPLY:
         print("\nхолостой прогон — в базе ничего не изменилось. Для записи: APPLY=1")
@@ -256,6 +309,9 @@ def main() -> int:
               p["segment_id"], p["hs_code"], p["material"], p["applications"],
               p["target_equipment"], p["aliases"], p["qty_quarter"], p["status"], "каталог ЗИП")
              for p in parts.values()], page_size=500)
+
+        cur.execute("select id from lib_parts")
+        известные_детали = {r[0] for r in cur.fetchall()}
 
         # Исполнителя ищем по тому же нормализованному ключу, каким он загружен.
         cur.execute("select name_key, id from lib_suppliers where name_key is not null")
@@ -297,11 +353,35 @@ def main() -> int:
                     continue
                 ценовые.append((p["segment_id"], p["name"][:400], p["catalog_no"], значение,
                                 p["price_cur"], f"{p['price_src'] or 'каталог'} · {граница}",
-                                "каталог ЗИП", "med"))
+                                None, "med", p["id"], FEED_КАТАЛОГ,
+                                None, None, None))
+        # Сначала снимаем прежние цены этого источника, потом вставляем заново.
+        # У lib_prices нет ключа, по которому цену можно опознать — одна деталь
+        # даёт две границы, и обе законны, — поэтому on conflict тут не работает,
+        # а без удаления повторный прогон задваивает цены. Проверено сравнением:
+        # два прогона подряд дали 3 986 строк вместо 2 498.
+        потоки = [FEED_КАТАЛОГ, FEED_ЗАПИСИ, FEED_КОНКУРЕНТЫ, FEED_RFQ]
+        cur.execute("delete from lib_prices where feed = any(%s) or source_url = %s",
+                    (потоки, FEED_КАТАЛОГ))
+        снято = cur.rowcount
+        # Цена ставится только на деталь из каталога: part_id — внешний ключ.
+        # Прайсы конкурентов почти целиком отваливаются здесь, и это правильно:
+        # «МХ 5101.00» — номер холдинга-конкурента, а не наша позиция.
+        мимо = sum(1 for c in цены_извне if c["part_id"] not in известные_детали)
+        for c in цены_извне:
+            if c["part_id"] in известные_детали:
+                ценовые.append((None, None, None, c["price"], c["currency"], c["source"],
+                                c["source_url"], c["confidence"], c["part_id"], c["feed"],
+                                c["country"], c["year"], c["exporter"]))
+        if мимо:
+            print(f"  цен мимо каталога (детали нет у нас): {мимо} из {len(цены_извне)}")
         psycopg2.extras.execute_values(cur, """
             insert into lib_prices (segment_id, item_name, part_number, price, currency,
-                                    source, source_url, confidence)
+                                    source, source_url, confidence, part_id, feed,
+                                    country, year, exporter)
             values %s""", ценовые, page_size=500)
+        if снято:
+            print(f"  прежних цен этого источника снято: {снято}")
         conn.commit()
 
         for t in ("lib_parts", "lib_part_suppliers", "lib_prices"):
