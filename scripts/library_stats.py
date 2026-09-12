@@ -30,6 +30,8 @@ TABLES = [
     ("lib_prices", "цены с базисом и источником"),
     ("lib_losses", "разбор проигранных сделок"),
     ("lib_segments", "справочник сегментов"),
+    ("lib_row_junk", "пометки «это не номенклатура, а текст документа»"),
+    ("lib_mark_runs", "журнал прогонов разметки"),
     ("gt_notes", "правки инженеров в библиотеке ГТУ"),
 ]
 
@@ -41,11 +43,20 @@ select count(*)                                              as всего,
        count(distinct nullif(btrim(oem), ''))                as изготовителей,
        count(distinct nullif(btrim(deal_id), ''))            as сделок,
        count(distinct nullif(btrim(source_file), ''))        as файлов_источников
-from lib_demand"""
+from {src}"""
 
 BY_SEGMENT_SQL = """
 select coalesce(d.segment_id, '—') as sid, count(*) as n
-from lib_demand d group by 1 order by 2 desc"""
+from {src} d group by 1 order by 2 desc"""
+
+# Разметка: сколько помечено, сколько снято, какими прогонами.
+JUNK_SQL = """
+select rule,
+       count(*) filter (where revoked_at is null) as действует,
+       count(*) filter (where revoked_at is not null) as снято
+from lib_row_junk group by 1 order by 2 desc"""
+RUNS_SQL = ("select run_id, mode, rows_marked, files_marked, reverted_at is not null "
+            "from lib_mark_runs order by started_at desc limit 10")
 
 FILES_SQL = "select status, count(*), coalesce(sum(rows_found), 0) from lib_files group by 1 order by 2 desc"
 KINDS_SQL = "select coalesce(kind, '—'), count(*) from lib_files group by 1 order by 2 desc"
@@ -74,6 +85,13 @@ def one(cur, sql: str):
 def rows(cur, sql: str):
     cur.execute(sql)
     return cur.fetchall()
+
+
+def live(cur) -> str:
+    """Имя источника спроса. До применения миграции представления ещё нет —
+    сводка обязана работать и тогда, иначе её нельзя снять «до»."""
+    cur.execute("select to_regclass('public.lib_demand_live') is not null")
+    return "lib_demand_live" if cur.fetchone()[0] else "lib_demand"
 
 
 def block(head: str) -> None:
@@ -113,17 +131,19 @@ def main() -> int:
             present[name] = n
             print(f"{name:16}{num(n)}  {note}")
 
+        src = live(cur)
         if present.get("lib_demand"):
-            block("спрос: что именно у нас спрашивали")
+            block("спрос: что именно у нас спрашивали"
+                  + ("" if src == "lib_demand" else " (без помеченного текста документов)"))
             cols = ("всего позиций", "с сегментом", "без сегмента",
                     "разных парт-номеров", "разных изготовителей", "сделок", "файлов-источников")
-            for label, value in zip(cols, one(cur, DEMAND_SQL)):
+            for label, value in zip(cols, one(cur, DEMAND_SQL.format(src=src))):
                 print(f"  {label:24}{num(value)}")
-            total = present["lib_demand"]
+            total = one(cur, f"select count(*) from {src}")[0]
 
             block("спрос по сегментам")
             print(f"  {'сегмент':34}{'позиций':>12}{'доля':>9}")
-            for sid, n in rows(cur, BY_SEGMENT_SQL):
+            for sid, n in rows(cur, BY_SEGMENT_SQL.format(src=src)):
                 nm = name_of(None if sid == "—" else sid)
                 print(f"  {nm:34}{num(n)}{n / total * 100:>8.1f}%")
 
@@ -136,6 +156,15 @@ def main() -> int:
             print(f"  {'формат':28}{'файлов':>10}")
             for kind, n in rows(cur, KINDS_SQL):
                 print(f"  {kind:28}{num(n, 10)}")
+
+        if present.get("lib_row_junk") is not None and "lib_row_junk" in present:
+            block("разметка текста документов")
+            for rule_name, act, rev in rows(cur, JUNK_SQL):
+                print(f"  правило {rule_name:20}действует{num(act, 12)}   снято{num(rev, 10)}")
+            for run_id, mode, marked, files_marked, reverted in rows(cur, RUNS_SQL):
+                mark = " · ОТКАЧЕН" if reverted else ""
+                print(f"  {run_id:26}{mode:12}строк{num(marked or 0, 12)}"
+                      f"   файлов{num(files_marked or 0, 8)}{mark}")
 
         if "gt_notes" in present:
             block("правки инженеров ГТУ")
