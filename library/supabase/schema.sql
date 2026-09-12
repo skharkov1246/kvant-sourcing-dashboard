@@ -301,6 +301,31 @@ create table if not exists lib_symptom_ops (
 );
 create index if not exists lib_symptom_ops_proc on lib_symptom_ops (procedure_id);
 
+-- Признак → дефект и дефект → ремонтное решение. До этих двух таблиц середина
+-- цепочки связывалась текстом: у признака в поле defect было написано
+-- «износ или проворот вкладыша», а в справочнике дефектов лежала запись с таким
+-- именем — и перейти по ней было нельзя, потому что связи не было. Обе таблицы
+-- многие-ко-многим сознательно: один признак даёт несколько дефектов (рост
+-- вибрации 1× — и дисбаланс, и износ вкладыша), и один дефект лечится
+-- несколькими операциями (прогар жаровой трубы — купонный ремонт И покрытие).
+create table if not exists lib_symptom_defects (
+  symptom_id text not null references lib_symptoms(id) on delete cascade,
+  defect_id  text not null references lib_defects(id)  on delete cascade,
+  source     text,
+  created_at timestamptz default now(),
+  primary key (symptom_id, defect_id)
+);
+create index if not exists lib_symptom_defects_defect on lib_symptom_defects (defect_id);
+
+create table if not exists lib_defect_ops (
+  defect_id    text not null references lib_defects(id)    on delete cascade,
+  procedure_id text not null references lib_procedures(id) on delete cascade,
+  source       text,
+  created_at   timestamptz default now(),
+  primary key (defect_id, procedure_id)
+);
+create index if not exists lib_defect_ops_proc on lib_defect_ops (procedure_id);
+
 create index if not exists lib_defects_unit on lib_defects (unit_id);
 create index if not exists lib_defects_pn   on lib_defects (part_number);
 
@@ -525,6 +550,8 @@ alter table lib_bom            enable row level security;
 alter table lib_symptoms       enable row level security;
 alter table lib_pn_patterns    enable row level security;
 alter table lib_symptom_ops    enable row level security;
+alter table lib_symptom_defects enable row level security;
+alter table lib_defect_ops     enable row level security;
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 9. Реестр разобранных файлов. Нужен для возобновляемости: обход 22 тысяч

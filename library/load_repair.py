@@ -151,6 +151,15 @@ def build_procedures() -> dict[str, dict]:
         add("контроль", r.get("name"), scope=r.get("scope"), unit_id=r.get("unit"),
             source="справочник методов (заготовка, требует проверки инженером)"
                    + (f": {основание}" if основание else ""))
+
+    # Ремонт механики, обвязки и КИП. Разведка OEM собрана по горячему тракту и
+    # по генераторам, поэтому дефект «износ вкладыша» или «забитый маслофильтр»
+    # вести было некуда — а отказывает чаще всего именно это.
+    for r in (load("library/data/repairs.json").get("rows") or []):
+        основание = clean(r.get("basis"))
+        add("ремонт", r.get("name"), scope=r.get("scope"), unit_id=r.get("unit"),
+            source="справочник ремонтных операций (заготовка, требует проверки инженером)"
+                   + (f": {основание}" if основание else ""))
     return proc
 
 
@@ -189,6 +198,24 @@ def build_defects() -> dict[str, dict]:
             "consequence": жизнь[:4000], "fix": clean(p.get("note"))[:4000] or None,
             "source": "номенклатура горячего тракта, разведка Ansaldo",
         }
+    # Типы дефектов: чем машина выходит из строя вообще, а не «риск отказа вот
+    # этой детали». Без них признак не мог сослаться на дефект: в справочнике
+    # лежали только позиционные записи, а признак говорит об узле.
+    for r in (load("library/data/defect_types.json").get("rows") or []):
+        имя = clean(r.get("name"))
+        if not имя:
+            continue
+        unit = r.get("unit")
+        defects[ident("тип дефекта", имя)] = {
+            "id": ident("тип дефекта", имя), "name": имя[:300],
+            "unit_id": unit if unit in UNITS else None, "part_number": None,
+            "model": None, "cause": clean(r.get("cause"))[:4000] or None,
+            "consequence": clean(r.get("consequence"))[:4000] or None,
+            "fix": None,
+            "source": "справочник типовых дефектов (заготовка, требует проверки "
+                      f"инженером): {clean(r.get('basis'))}",
+            "ops": [str(x) for x in (r.get("fix_ops") or [])],
+        }
     return defects
 
 
@@ -216,6 +243,7 @@ def build_symptoms() -> dict[str, dict]:
             "confidence": "low",
             "source": "справочник признаков (заготовка, требует проверки инженером)",
             "ops": [str(x) for x in (r.get("confirm_ops") or [])],
+            "defects": [str(x) for x in (r.get("defect_refs") or [])],
         }
     return out
 
@@ -252,6 +280,41 @@ def ops_edges(symptoms: dict, proc: dict) -> tuple[list[tuple], list[str]]:
     return рёбра, потерянные
 
 
+def ссылки_на_операции(записи: dict, proc: dict, источник: str) -> tuple[list, list]:
+    """Ссылка «ремонт|Балансировка ротора на месте» → идентификатор операции.
+
+    Та же механика, что у признаков: точное совпадение вида и имени, а
+    ненайденное попадает в список — тест на гейте по нему падает."""
+    рёбра, потерянные = [], []
+    for z in записи.values():
+        for ссылка in z.get("ops", []):
+            kind, _, name = ссылка.partition("|")
+            ид = ident(kind.strip(), name.strip())
+            if ид in proc:
+                рёбра.append((z["id"], ид, источник))
+            else:
+                потерянные.append(ссылка)
+    return рёбра, потерянные
+
+
+def defect_edges(symptoms: dict, defects: dict) -> tuple[list, list]:
+    """Признак → дефект по имени типа дефекта, а не по совпадению текста.
+
+    До этого связь существовала только словами: у признака в поле defect было
+    написано «износ или проворот вкладыша», и человек догадывался, что речь о
+    той же записи справочника. Машина так не догадывается."""
+    по_имени = {d["name"]: d["id"] for d in defects.values()}
+    рёбра, потерянные = [], []
+    for s in symptoms.values():
+        for имя in s.get("defects", []):
+            ид = по_имени.get(имя)
+            if ид:
+                рёбра.append((s["id"], ид, "справочник признаков"))
+            else:
+                потерянные.append(имя)
+    return рёбра, потерянные
+
+
 def main() -> int:
     proc = build_procedures()
     defects = build_defects()
@@ -266,6 +329,9 @@ def main() -> int:
     print(f"  с определённым узлом:     {sum(1 for p in proc.values() if p['unit_id'])}")
 
     рёбра_оп, потерянные = ops_edges(symptoms, proc)
+    рёбра_деф, потерянные_деф = defect_edges(symptoms, defects)
+    рёбра_лечения, потерянные_лечения = ссылки_на_операции(
+        defects, proc, "справочник типовых дефектов")
 
     print("\n=== признаки ===")
     print(f"  записей: {len(symptoms)}")
@@ -287,10 +353,24 @@ def main() -> int:
 
     print("\n=== дефекты и ремонтные решения ===")
     print(f"  записей: {len(defects)}")
-    print(f"  с решением: {sum(1 for d in defects.values() if d['fix'])}")
-    print(f"  с узлом:    {sum(1 for d in defects.values() if d['unit_id'])}")
-    print("\n  ЭТО МАЛО. Основной объём знаний о дефектах лежит в текстах ТЗ —")
-    print("  в файлах со статусом «текст без спецификации», их извлечение отдельно.")
+    print(f"  с решением текстом:  {sum(1 for d in defects.values() if d['fix'])}")
+    print(f"  с узлом:             {sum(1 for d in defects.values() if d['unit_id'])}")
+    print(f"  связей «признак → дефект»: {len(рёбра_деф)} "
+          f"у {len({r[0] for r in рёбра_деф})} признаков")
+    if потерянные_деф:
+        print(f"  ССЫЛКИ В НИКУДА: {len(потерянные_деф)} — дефекта с таким именем нет: "
+              f"{потерянные_деф[:3]}")
+    print(f"  связей «дефект → чем лечить»: {len(рёбра_лечения)} "
+          f"у {len({r[0] for r in рёбра_лечения})} дефектов")
+    if потерянные_лечения:
+        print(f"  ССЫЛКИ В НИКУДА: {len(потерянные_лечения)} — операции нет: "
+              f"{потерянные_лечения[:3]}")
+    без_лечения = len(defects) - len({r[0] for r in рёбра_лечения})
+    if без_лечения:
+        print(f"  БЕЗ РЕМОНТНОГО РЕШЕНИЯ: {без_лечения} — это позиционные записи "
+              f"«риск отказа детали», у них решение лежит текстом в поле fix")
+    print("\n  СРОКОВ И СТОИМОСТИ РЕМОНТА НЕТ НИ У ОДНОЙ ОПЕРАЦИИ — их у нас нет,")
+    print("  и придумывать их нельзя. Это следующая работа по звену «решение».")
 
     if not APPLY:
         print("\nхолостой прогон — в базе ничего не изменилось. Для записи: APPLY=1")
@@ -338,13 +418,26 @@ def main() -> int:
                                      consequence, fix, source)
             values %s
             on conflict (id) do update set
-              unit_id = excluded.unit_id, consequence = excluded.consequence,
+              unit_id = excluded.unit_id, cause = excluded.cause,
+              consequence = excluded.consequence,
               fix = excluded.fix, updated_at = now()""",
             [(d["id"], d["name"], d["unit_id"], d["part_number"], d["model"], d["cause"],
               d["consequence"], d["fix"], d["source"]) for d in defects.values()],
             page_size=500)
+        # Рёбра ставятся ПОСЛЕ обеих таблиц: внешние ключи ведут и в признаки,
+        # и в дефекты, и в операции.
+        for таблица, колонки, рёбра in (
+                ("lib_symptom_defects", "symptom_id, defect_id, source", рёбра_деф),
+                ("lib_defect_ops", "defect_id, procedure_id, source", рёбра_лечения)):
+            if not рёбра:
+                continue
+            ключ = ", ".join(колонки.split(", ")[:2])
+            psycopg2.extras.execute_values(cur, f"""
+                insert into {таблица} ({колонки}) values %s
+                on conflict ({ключ}) do nothing""", рёбра, page_size=200)
         conn.commit()
-        for t in ("lib_procedures", "lib_defects", "lib_symptoms", "lib_symptom_ops"):
+        for t in ("lib_procedures", "lib_defects", "lib_symptoms", "lib_symptom_ops",
+                  "lib_symptom_defects", "lib_defect_ops"):
             cur.execute(f"select count(*) from {t}")
             print(f"  {t:16}{cur.fetchone()[0]:>6}")
         # Сколько исполнителей ремонта нашлись в общей базе компаний — это и есть
