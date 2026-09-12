@@ -228,7 +228,19 @@ function render(){
   $("grid").innerHTML=h+"</tbody></table>";
   $("cnt").textContent=a.length+" / "+POS.length;
 }
-function buildDetail(d){const odm=ODM[d.id]||[];return masterBox(d)+sheetBox(d)+materialBox(d)+infoBox(d)+bitrixBox(d)+priceBox(d)+sampleBox(d)+drawBox(d)+odmCards(d,odm);}
+function buildDetail(d){const odm=ODM[d.id]||[];return dossierBox(d)+masterBox(d)+sheetBox(d)+materialBox(d)+infoBox(d)+bitrixBox(d)+priceBox(d)+sampleBox(d)+drawBox(d)+odmCards(d,odm);}
+// Досье машины: позиция, применимая к машине с собранным досье, должна вести на него.
+// Без этой ссылки досье живёт отдельной страницей, а сорсер работает в «Позициях».
+const DOSSIERS=[{re:/R1700/i,key:"R1700G",title:"Caterpillar R1700G — ПДМ подземных работ",url:"./r1700.html"}];
+function dossierBox(d){
+  const s=(d.model||"")+" "+(d.applications||"")+" "+(d.name||"");
+  const m=DOSSIERS.find(x=>x.re.test(s));if(!m)return"";
+  const pn=encodeURIComponent(d.catalog_no||"");
+  return `<div class="mbx" style="background:#f0f7ff;border-color:#bcd8f5"><div class="mbx-t">🚜 Досье машины: ${esc(m.title)}</div>
+    <div style="font-size:12px">Документация, полный перечень запчастей с аналогами, дилеры, заводы неоригинала,
+    поставщики РФ, цены и площадки торгов — <a href="${m.url}" target="_blank" rel="noopener"><b>открыть досье</b></a>${pn?` ·
+    <a href="${m.url}#pn=${pn}" target="_blank" rel="noopener">найти в досье ${esc(d.catalog_no)}</a>`:""}</div></div>`;
+}
 function sheetBox(d){
   const m=d.sheet_meta;if(!m)return"";
   const rows=[];
