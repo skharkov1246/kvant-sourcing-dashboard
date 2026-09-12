@@ -85,19 +85,63 @@ create index if not exists lib_parts_oem  on lib_parts (oem);
 create index if not exists lib_parts_equip on lib_parts (target_equipment);
 
 -- ─────────────────────────────────────────────────────────────────────────────
--- 2б. Ребро «запчасть → исполнитель». Без него ответить «кто делает эту деталь»
---     можно только перебором: у поставщика в описании тысяча позиций текстом.
-create table if not exists lib_part_suppliers (
-  part_id     text   not null references lib_parts(id) on delete cascade,
-  supplier_id bigint not null references lib_suppliers(id) on delete cascade,
-  makes       text,                         -- что именно делает под эту позицию
-  catalog_url text,
-  confidence  text default 'med',
+-- 2в. Машина и узел — первые два звена цепочки портала (CLAUDE.md, «Куда мы
+--     идём»). До сих пор их не было вовсе: деталь знала машину строкой
+--     («SGT-400», «Cyclone», «Taurus 70, Taurus 70MD»), и свести две записи об
+--     одной машине можно было только глазами.
+create table if not exists lib_models (
+  id           text primary key,            -- нормализованное имя: sgt400
+  name         text not null,               -- SGT-400
+  oem          text,                        -- Siemens Energy
+  family       text,                        -- sgt | finspong | heavy | solar
+  family_title text,
+  legacy       text,                        -- Cyclone — имя до смены владельца завода
+  power        text,
+  efficiency   text,
+  shafts       text,
+  use_case     text,                        -- где стоит: ГПА, генерация, когенерация
+  aliases      text[],                      -- все написания, по которым её ищут
+  note         text,
+  source       text,
+  created_at   timestamptz default now(),
+  updated_at   timestamptz default now()
+);
+create index if not exists lib_models_family on lib_models (family);
+
+-- Узлы машины деревом: система («Горячий тракт») → компонент («Жаровая труба»).
+-- Узлы у промышленных ГТУ общие для Solar и Siemens, поэтому дерево одно на все
+-- машины, а не своё на каждую.
+create table if not exists lib_units (
+  id          text primary key,             -- hot | hot.combustion-liner
+  parent_id   text references lib_units(id) on delete set null,
+  name        text not null,
+  name_en     text,
+  crit        text,                         -- A останавливает машину, B плановая, C расходник
+  aftermarket text,                         -- насколько узел доступен помимо OEM
+  note        text,
   source      text,
   created_at  timestamptz default now(),
-  primary key (part_id, supplier_id)
+  updated_at  timestamptz default now()
 );
-create index if not exists lib_part_suppliers_sup on lib_part_suppliers (supplier_id);
+create index if not exists lib_units_parent on lib_units (parent_id);
+
+-- Ребро «запчасть → машина». Деталь встаёт на несколько машин, машина собирает
+-- тысячи деталей — строкой в lib_parts.model это не выразить: по «Taurus 70,
+-- Taurus 70MD» не выбрать обе машины.
+create table if not exists lib_part_models (
+  part_id    text not null references lib_parts(id) on delete cascade,
+  model_id   text not null references lib_models(id) on delete cascade,
+  source     text,
+  created_at timestamptz default now(),
+  primary key (part_id, model_id)
+);
+create index if not exists lib_part_models_model on lib_part_models (model_id);
+
+alter table lib_parts add column if not exists unit_id    text references lib_units(id) on delete set null;
+alter table lib_parts add column if not exists unit_rule  text;   -- чем определён узел
+alter table lib_parts add column if not exists pn_pattern text;   -- шифровка номера у OEM
+alter table lib_parts add column if not exists qty_demand numeric;-- сколько спрашивали
+create index if not exists lib_parts_unit on lib_parts (unit_id);
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 3. Поставщики: кто в мире делает это оборудование и его части.
@@ -121,6 +165,22 @@ create table if not exists lib_suppliers (
   unique (segment_id, name)
 );
 create index if not exists lib_suppliers_seg on lib_suppliers (segment_id);
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- 3а. Ребро «запчасть → исполнитель». Без него ответить «кто делает эту деталь»
+--     можно только перебором: у поставщика в описании тысяча позиций текстом.
+create table if not exists lib_part_suppliers (
+  part_id     text   not null references lib_parts(id) on delete cascade,
+  supplier_id bigint not null references lib_suppliers(id) on delete cascade,
+  makes       text,                         -- что именно делает под эту позицию
+  catalog_url text,
+  confidence  text default 'med',
+  source      text,
+  created_at  timestamptz default now(),
+  primary key (part_id, supplier_id)
+);
+create index if not exists lib_part_suppliers_sup on lib_part_suppliers (supplier_id);
+
 
 -- Исполнители приходят из семи разных исследований, и одна компания встречается
 -- под разными написаниями. Ключ — нормализованное имя (library/load_suppliers.py):
@@ -218,6 +278,11 @@ alter table lib_suppliers enable row level security;
 alter table lib_prices    enable row level security;
 alter table lib_knowledge enable row level security;
 alter table lib_losses    enable row level security;
+alter table lib_parts     enable row level security;
+alter table lib_part_suppliers enable row level security;
+alter table lib_models    enable row level security;
+alter table lib_units     enable row level security;
+alter table lib_part_models    enable row level security;
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 9. Реестр разобранных файлов. Нужен для возобновляемости: обход 22 тысяч
