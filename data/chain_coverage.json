@@ -377,7 +377,7 @@
           "link": "maker",
           "title": "Изготовитель",
           "what": "кто делает деталь, помимо владельца конструкции",
-          "n": 1635,
+          "n": 1656,
           "draft": 0,
           "sources": [
             "gt/data/suppliers.json",
@@ -387,7 +387,8 @@
             "gt/data/sgt400_checklist.json",
             "gt/data/dossiers.json",
             "gt/data/site_profiles.json",
-            "gt/data/bitrix_supplier_sites.json"
+            "gt/data/bitrix_supplier_sites.json",
+            "zip/data/oem_atlas.json"
           ],
           "state": "есть"
         },
@@ -479,11 +480,12 @@
           "link": "maker",
           "title": "Изготовитель",
           "what": "кто делает деталь, помимо владельца конструкции",
-          "n": 75,
+          "n": 101,
           "draft": 0,
           "sources": [
             "gpu/data/suppliers.json",
-            "gpu/data/subsuppliers.json"
+            "gpu/data/subsuppliers.json",
+            "zip/data/oem_atlas.json"
           ],
           "state": "есть"
         },
@@ -578,12 +580,13 @@
           "link": "maker",
           "title": "Изготовитель",
           "what": "кто делает деталь, помимо владельца конструкции",
-          "n": 1150,
+          "n": 1178,
           "draft": 0,
           "sources": [
             "zip/data/odm_suppliers.json",
             "zip/data/telsmith_suppliers.json",
-            "zip/data/supplier_crm.json"
+            "zip/data/supplier_crm.json",
+            "zip/data/oem_atlas.json"
           ],
           "state": "есть"
         },
@@ -675,10 +678,11 @@
           "link": "maker",
           "title": "Изготовитель",
           "what": "кто делает деталь, помимо владельца конструкции",
-          "n": 179,
+          "n": 191,
           "draft": 0,
           "sources": [
-            "zip/data/recip_recon.json"
+            "zip/data/recip_recon.json",
+            "zip/data/oem_atlas.json"
           ],
           "state": "есть"
         },

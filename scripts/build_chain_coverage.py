@@ -230,8 +230,10 @@ def counts() -> dict:
         put("recip", "repair", len(checked("ru_service")), "zip/data/recip_recon.json")
         comp = {nkey(c.get("name")) for a in rc.get("angles", [])
                 for c in a.get("companies", []) if c.get("name")}
+        comp.discard("")
+        src_recip = ["zip/data/recip_recon.json"]
         c["recip"]["maker"]["n"] = len(comp)
-        c["recip"]["maker"]["src"] = ["zip/data/recip_recon.json"]
+        c["recip"]["maker"]["src"] = src_recip
 
     # ── диагностика: признак и дефект. Единственные два звена, пустые везде.
     # Привязка к направлению по области разведки, плюс два узла-исключения:
@@ -278,9 +280,30 @@ def counts() -> dict:
             put(seg, "symptom", len(ok), "dict/symptom.json")
             put(seg, "symptom", len(s_set[seg]["draft"] - ok), "dict/symptom.json", draft=True)
 
-    # ── изготовители: уникальные компании по каждому направлению
+    # ── изготовители: уникальные компании по каждому направлению.
+    # Атлас разведки лежит одним файлом на все направления, поэтому подмешивается
+    # ПОСЛЕ и по тому же ключу компании: иначе один завод, попавший и в реестр
+    # поставщиков, и в атлас, сосчитался бы дважды.
+    atlas = load("zip/data/oem_atlas.json", {})
+    atlas_keys = {}
+    for m in atlas.get("makers", []):
+        k = nkey(m.get("name"))
+        if k:
+            atlas_keys.setdefault(m.get("segment"), set()).add(k)
+    if atlas_keys.get("recip") and c["recip"]["maker"]["n"]:
+        rc2 = load("zip/data/recip_recon.json", {})
+        comp = {nkey(x.get("name")) for a in rc2.get("angles", [])
+                for x in a.get("companies", []) if x.get("name")}
+        comp.discard("")
+        comp |= atlas_keys["recip"]
+        c["recip"]["maker"]["n"] = len(comp)
+        c["recip"]["maker"]["src"] = ["zip/data/recip_recon.json", "zip/data/oem_atlas.json"]
     for seg in ("gtu", "gpu", "gsho"):
         keys, srcs = unique_makers(seg, lambda rel: load(rel))
+        extra = atlas_keys.get(seg, set())
+        if extra:
+            keys |= extra
+            srcs = srcs + ["zip/data/oem_atlas.json"]
         for src in srcs:
             put(seg, "maker", 0, src)
         c[seg]["maker"]["n"] = len(keys)

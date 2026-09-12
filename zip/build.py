@@ -152,7 +152,8 @@ def build():
 
     # страницы-разведки: собираются из тех же данных zip/data, но своим сборщиком.
     # Каждая — самодостаточный HTML рядом с индексом; падение одной не роняет деплой.
-    for mod in ("build_telsmith_page", "build_audit_page", "build_recip_page", "build_diag_page"):
+    for mod in ("build_telsmith_page", "build_audit_page", "build_recip_page", "build_diag_page",
+                "build_oem_page"):
         try:
             subprocess.run([sys.executable, str(ROOT / "tools" / f"{mod}.py")], check=True)
         except Exception as ex:
