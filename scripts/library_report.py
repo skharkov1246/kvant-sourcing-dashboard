@@ -64,6 +64,21 @@ def собрать(cur) -> dict:
         "спрос": q(cur, "select count(*) from lib_demand"),
         "файлы": q(cur, "select count(*) from lib_files"),
         "контакты": q(cur, "select count(*) from lib_suppliers where contact_email is not null"),
+        "признаки": q(cur, "select count(*) from lib_symptoms"),
+        "замены": q(cur, "select count(*) from lib_part_alt"),
+        "замены_детали": q(cur, "select count(distinct part_id) from lib_part_alt"),
+        "ведомость": q(cur, "select count(*) from lib_bom"),
+        "цены_детали": q(cur, "select count(distinct part_id) from lib_prices"),
+        "цены_ссылки": q(cur, "select count(*) from lib_prices where source_url is not null"),
+        "статьи": q(cur, "select count(*) from lib_knowledge"),
+        "статьи_узел": q(cur, "select count(*) from lib_knowledge where unit_id is not null"),
+        "без_узла": q(cur, "select count(*) from lib_parts where unit_id is null"),
+        "без_машины": q(cur, """select count(*) from lib_parts p
+             where not exists (select 1 from lib_part_models m where m.part_id = p.id)"""),
+        "без_исполнителя": q(cur, """select count(*) from lib_parts p
+             where not exists (select 1 from lib_part_suppliers s where s.part_id = p.id)"""),
+        "без_цены": q(cur, """select count(*) from lib_parts p
+             where not exists (select 1 from lib_prices pr where pr.part_id = p.id)"""),
     }
     for ключ, значение in PROD.items():
         if ключ in d:
@@ -113,11 +128,18 @@ def html_doc(d: dict) -> str:
          "(SGT-400 = Cyclone): в каталогах aftermarket ищут по нему", "было 0"),
         ("Узел", n(d["узлы"]) + " узлов", f"{n(d['системы'])} систем + компоненты, "
          "критичность A/B/C", "было 0"),
+        ("Признак", n(d["признаки"]) + " признаков", "узел, что меряют, вероятный дефект, "
+         "чем подтвердить — заготовка по общей практике, нужна проверка инженером", "было 0"),
         ("Диагностика", n(d["операции"]) + " операций", "уровни инспекций со сроками, "
          "методы неразрушающего контроля", "было 0"),
         ("Дефект", n(d["дефекты"]) + " записей", "последствие и ремонтное решение вместе", "было 0"),
         ("Запчасть", n(d["детали"]) + " деталей", f"узел определён у {n(d['детали_с_узлом'])}; "
-         f"{n(d['ребра_машина'])} связей с машиной; {n(d['цены'])} цен", "было 752"),
+         f"{n(d['ребра_машина'])} связей с машиной; {n(d['замены'])} связей "
+         f"взаимозаменяемости на {n(d['замены_детали'])} деталей; {n(d['ведомость'])} строк "
+         f"ведомости состава", "было 752"),
+        ("Цена", n(d["цены"]) + " цен", f"на {n(d['цены_детали'])} деталей, "
+         f"{n(d['цены_ссылки'])} со ссылкой на источник; поток происхождения у каждой",
+         "было 0"),
         ("Исполнитель", n(d["исполнители"]) + " компаний", f"{n(d['ребра_исполнитель'])} связей "
          f"с деталью, из них {n(d['наличие'])} с проверкой наличия ({n(d['в_наличии'])} в наличии); "
          f"{n(d['контакты'])} с контактом", "было 0"),
@@ -168,6 +190,17 @@ def html_doc(d: dict) -> str:
 <h2>Узлы с наибольшим числом позиций</h2>
 <table class="t"><thead><tr><th style="width:56%">узел</th><th style="width:14%">критичность</th>
 <th style="width:30%">позиций</th></tr></thead><tbody>{узл}</tbody></table>
+
+<h2>Где узкие места — это и есть следующая работа</h2>
+<table class="t"><thead><tr><th style="width:62%">чего не хватает</th>
+<th style="width:38%">позиций</th></tr></thead><tbody>
+<tr><td>Деталей без узла</td><td class="num">{n(d['без_узла'])}</td></tr>
+<tr><td>Деталей без связи с машиной</td><td class="num">{n(d['без_машины'])}</td></tr>
+<tr><td>Деталей без исполнителя</td><td class="num">{n(d['без_исполнителя'])}</td></tr>
+<tr><td>Деталей без цены</td><td class="num">{n(d['без_цены'])}</td></tr>
+<tr><td>Статей разведки без узла (всего статей {n(d['статьи'])})</td>
+    <td class="num">{n(d['статьи'] - d['статьи_узел'])}</td></tr>
+</tbody></table>
 
 <h2>Сырьё</h2>
 <table class="t"><thead><tr><th style="width:70%">источник</th>
