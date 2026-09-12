@@ -4,18 +4,18 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 190,
-    "total_bytes": 91530532,
+    "datasets": 191,
+    "total_bytes": 93867310,
     "by_sensitivity": {
       "конфиденциально": 57,
-      "внутреннее": 99,
-      "публикуемо": 34
+      "внутреннее": 101,
+      "публикуемо": 33
     },
     "by_subproject": {
       "ГПУ-библиотека": 27,
       "ГТУ-библиотека": 35,
       "ОВЭ-75": 45,
-      "база ЗИП": 30,
+      "база ЗИП": 31,
       "база ЗИП · таможня": 18,
       "библиотека рынков": 1,
       "гидрометаллургия": 22,
@@ -281,7 +281,8 @@
         "scripts/build_dict.py",
         "scripts/build_node_map.py",
         "scripts/library_units_check.py",
-        "tests/test_core.py"
+        "tests/test_core.py",
+        "tests/test_dict.py"
       ]
     },
     {
@@ -456,6 +457,7 @@
       "referenced_by": [
         "pnw/tools/build_master.py",
         "pnw/tools/build_search.py",
+        "scripts/build_chain_coverage.py",
         "tests/test_dict.py"
       ]
     },
@@ -684,6 +686,51 @@
         ]
       },
       "referenced_by": []
+    },
+    {
+      "path": "zip/data/recip_recon.json",
+      "subproject": "база ЗИП",
+      "bytes": 2334821,
+      "note": "Разведка направления «Поршневые компрессоры»: 15 углов, 685 фактов с источником, 203 карточки компаний, 148 закрытых тупиков. У десяти углов был собственный скептик с заданием опровергать по умолчанию, пять углов добора запускались без скептика — это видно в поле skeptic. Вердикт приложен к каждому факту поимённо: подтверждено 218, частично 152, непроверяемо 44, опровергнуто 5, «скептик не сослался» 94, «не проверялся» 172. Пустого вердикта нет ни у одного факта: пустое поле читалось бы как «всё хорошо». Публикуется на странице /recip.html.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "angles",
+        "critic",
+        "generated",
+        "method",
+        "stats",
+        "subject"
+      ],
+      "main_collection": {
+        "key": "angles",
+        "records": 15,
+        "record_keys": [
+          "companies",
+          "dead_ends",
+          "findings",
+          "gaps",
+          "key",
+          "missing",
+          "overall",
+          "skeptic",
+          "summary",
+          "title"
+        ]
+      },
+      "last_change": null,
+      "last_author": null,
+      "last_commit": null,
+      "updated_by": "неизвестно",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "scripts/build_chain_coverage.py",
+        "tests/test_dict.py",
+        "zip/tools/build_recip_page.py"
+      ]
     },
     {
       "path": "gt/data/dossiers.json",
@@ -5172,7 +5219,8 @@
         "markers": []
       },
       "referenced_by": [
-        "gpu/build.py"
+        "gpu/build.py",
+        "scripts/build_chain_coverage.py"
       ]
     },
     {
@@ -5941,55 +5989,9 @@
       ]
     },
     {
-      "path": "zip/data/supplier_crm.json",
-      "subproject": "база ЗИП",
-      "bytes": 30784,
-      "note": "CRM поставщиков базы ЗИП: стадии переговоров, комментарии, контакты.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "calls",
-        "suppliers",
-        "updated"
-      ],
-      "main_collection": {
-        "key": "suppliers",
-        "records": 30,
-        "record_keys": [
-          "comments",
-          "contacts",
-          "direction",
-          "geo",
-          "kind",
-          "last_comm",
-          "name",
-          "stage",
-          "waiting"
-        ]
-      },
-      "last_change": "2026-07-09",
-      "last_author": "skharkov1246",
-      "last_commit": "8cdaf8d",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "конфиденциально",
-        "markers": [
-          "телефоны"
-        ]
-      },
-      "referenced_by": [
-        "pnw/tools/build_suppliers.py",
-        "scripts/build_chain_coverage.py",
-        "zip/build.py",
-        "zip/tools/import_sheet.py",
-        "zip/tools/perf_classes.py",
-        "zip/tools/who_supplies.py"
-      ]
-    },
-    {
       "path": "data/catalog_notes.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 30167,
+      "bytes": 31158,
       "note": "",
       "format": "json",
       "shape": "объект",
@@ -6045,6 +6047,52 @@
       },
       "referenced_by": [
         "scripts/build_catalog.py"
+      ]
+    },
+    {
+      "path": "zip/data/supplier_crm.json",
+      "subproject": "база ЗИП",
+      "bytes": 30784,
+      "note": "CRM поставщиков базы ЗИП: стадии переговоров, комментарии, контакты.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "calls",
+        "suppliers",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "suppliers",
+        "records": 30,
+        "record_keys": [
+          "comments",
+          "contacts",
+          "direction",
+          "geo",
+          "kind",
+          "last_comm",
+          "name",
+          "stage",
+          "waiting"
+        ]
+      },
+      "last_change": "2026-07-09",
+      "last_author": "skharkov1246",
+      "last_commit": "8cdaf8d",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "телефоны"
+        ]
+      },
+      "referenced_by": [
+        "pnw/tools/build_suppliers.py",
+        "scripts/build_chain_coverage.py",
+        "zip/build.py",
+        "zip/tools/import_sheet.py",
+        "zip/tools/perf_classes.py",
+        "zip/tools/who_supplies.py"
       ]
     },
     {
@@ -6430,6 +6478,48 @@
       ]
     },
     {
+      "path": "data/chain_coverage.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 20942,
+      "note": "Заполняемость цепочки портала по семи направлениям и восьми звеньям: машина → узел → признак → дефект → ремонтное решение → запчасть → изготовитель → исполнитель. Производный файл, считается scripts/build_chain_coverage.py по фактическим файлам репозитория; ноль означает отсутствие данных, а не то, что они где-то есть. Руками не заполнять. Первый прогон 12.09.2026: 13 клеток из 56, звенья «Признак», «Дефект» и «Исполнитель» не начаты ни по одному направлению.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "common",
+        "empty_everywhere",
+        "goal",
+        "links",
+        "note",
+        "priority_rule",
+        "scope",
+        "segments",
+        "summary",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "links",
+        "records": 8,
+        "record_keys": [
+          "link",
+          "title",
+          "what"
+        ]
+      },
+      "last_change": "2026-09-12",
+      "last_author": "skharkov1246",
+      "last_commit": "fe786fa",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "scripts/build_chain_coverage.py",
+        "scripts/build_chain_page.py",
+        "tests/test_dict.py"
+      ]
+    },
+    {
       "path": "ove/data/bitrix_ove.json",
       "subproject": "ОВЭ-75",
       "bytes": 20614,
@@ -6509,45 +6599,6 @@
         "library/load_equipment.py",
         "scripts/build_chain_coverage.py",
         "scripts/build_dict.py"
-      ]
-    },
-    {
-      "path": "data/chain_coverage.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 19976,
-      "note": "Заполняемость цепочки портала по семи направлениям и восьми звеньям: машина → узел → признак → дефект → ремонтное решение → запчасть → изготовитель → исполнитель. Производный файл, считается scripts/build_chain_coverage.py по фактическим файлам репозитория; ноль означает отсутствие данных, а не то, что они где-то есть. Руками не заполнять. Первый прогон 12.09.2026: 13 клеток из 56, звенья «Признак», «Дефект» и «Исполнитель» не начаты ни по одному направлению.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "common",
-        "empty_everywhere",
-        "goal",
-        "links",
-        "note",
-        "priority_rule",
-        "segments",
-        "summary"
-      ],
-      "main_collection": {
-        "key": "links",
-        "records": 8,
-        "record_keys": [
-          "link",
-          "title",
-          "what"
-        ]
-      },
-      "last_change": "2026-09-12",
-      "last_author": "skharkov1246",
-      "last_commit": "fe786fa",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "публикуемо",
-        "markers": []
-      },
-      "referenced_by": [
-        "scripts/build_chain_coverage.py",
-        "tests/test_dict.py"
       ]
     },
     {
@@ -7284,6 +7335,7 @@
         "gpu/build.py",
         "gpu/tools/coverage.py",
         "scripts/build_chain_coverage.py",
+        "scripts/build_chain_page.py",
         "tests/test_dict.py"
       ]
     },
