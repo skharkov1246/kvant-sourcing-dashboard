@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 180,
-    "total_bytes": 82451643,
+    "total_bytes": 81736728,
     "by_sensitivity": {
       "конфиденциально": 55,
       "внутреннее": 92,
@@ -81,69 +81,6 @@
         ]
       },
       "referenced_by": []
-    },
-    {
-      "path": "gt/data/ship_lukoil.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 6666910,
-      "note": "Сводная карта закупки по всей заявке ЛУКОЙЛ: 1642 уникальных артикула обоих листов («Энергосети» 1198, НВН 444) с результатом проверки наличия. Производный файл — собирается gt/tools/ship_merge.py из rfq_demand.json и трёх поколений проверок (rfq_prices.json:checks, ship_energoseti.json, ship_sweep.json); поздняя проверка перекрывает раннюю, непроверенные строки помечены not_checked. Руками не заполнять. Отчёт — gt/tools/ship_map.py → gt/docs/ЗАКУПКА-ЛУКОЙЛ.pdf: карта «у кого что брать», изготовители узлов под шильдой OEM, позиции под подбор по стандарту, расхождения цен.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "method",
-        "rows",
-        "source",
-        "updated"
-      ],
-      "main_collection": {
-        "key": "rows",
-        "records": 1642,
-        "record_keys": [
-          "cat",
-          "checked_by",
-          "cluster",
-          "cluster_sellers",
-          "conf",
-          "covers_qty",
-          "currency",
-          "in_stock",
-          "kind",
-          "lead_time",
-          "man",
-          "model",
-          "name",
-          "note",
-          "pack_qty",
-          "pn",
-          "price",
-          "qty",
-          "real_maker",
-          "real_pn",
-          "seller",
-          "seller_country",
-          "seller_url",
-          "sellers",
-          "sheet",
-          "stock_qty",
-          "substitute",
-          "unit",
-          "usd_hi",
-          "usd_lo",
-          "verdict"
-        ]
-      },
-      "last_change": "2026-09-12",
-      "last_author": "Claude",
-      "last_commit": "8b5b17b",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "gt/tools/ship_map.py",
-        "gt/tools/ship_merge.py"
-      ]
     },
     {
       "path": "zip/customs/out/customs_8207_2024-01-01_2024-12-31.json",
@@ -304,6 +241,70 @@
         "zip/build.py",
         "zip/tools/aggregate_customs.py",
         "zip/tools/who_supplies.py"
+      ]
+    },
+    {
+      "path": "gt/data/ship_lukoil.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 5951995,
+      "note": "Сводная карта закупки по всей заявке ЛУКОЙЛ: 1642 уникальных артикула обоих листов («Энергосети» 1198, НВН 444) с результатом проверки наличия. Производный файл — собирается gt/tools/ship_merge.py из rfq_demand.json и трёх поколений проверок (rfq_prices.json:checks, ship_energoseti.json, ship_sweep.json); поздняя проверка перекрывает раннюю, непроверенные строки помечены not_checked. Руками не заполнять. Отчёт — gt/tools/ship_map.py → gt/docs/ЗАКУПКА-ЛУКОЙЛ.pdf: карта «у кого что брать», изготовители узлов под шильдой OEM, позиции под подбор по стандарту, расхождения цен.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "method",
+        "rows",
+        "source",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 1642,
+        "record_keys": [
+          "cat",
+          "checked_by",
+          "cluster",
+          "cluster_sellers",
+          "conf",
+          "covers_qty",
+          "currency",
+          "in_stock",
+          "kind",
+          "lead_time",
+          "man",
+          "model",
+          "name",
+          "note",
+          "pack_qty",
+          "pn",
+          "price",
+          "qty",
+          "real_maker",
+          "real_pn",
+          "seller",
+          "seller_country",
+          "seller_url",
+          "sellers",
+          "sheet",
+          "stock_grade",
+          "stock_qty",
+          "substitute",
+          "unit",
+          "usd_hi",
+          "usd_lo",
+          "verdict"
+        ]
+      },
+      "last_change": "2026-09-12",
+      "last_author": "skharkov1246",
+      "last_commit": "9a3905b",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/ship_map.py",
+        "gt/tools/ship_merge.py"
       ]
     },
     {
@@ -836,8 +837,8 @@
         ]
       },
       "last_change": "2026-09-12",
-      "last_author": "Claude",
-      "last_commit": "82c10d0",
+      "last_author": "skharkov1246",
+      "last_commit": "9a3905b",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -891,9 +892,9 @@
           "verdict"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "Claude",
-      "last_commit": "0381ae3",
+      "last_change": "2026-09-12",
+      "last_author": "skharkov1246",
+      "last_commit": "9a3905b",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -1377,8 +1378,8 @@
         ]
       },
       "last_change": "2026-09-12",
-      "last_author": "Claude",
-      "last_commit": "8b5b17b",
+      "last_author": "skharkov1246",
+      "last_commit": "9a3905b",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -6157,8 +6158,8 @@
         "zip/data/telsmith_nodrawings.json"
       ],
       "last_change": "2026-09-12",
-      "last_author": "Claude",
-      "last_commit": "2013d5a",
+      "last_author": "skharkov1246",
+      "last_commit": "9a3905b",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
