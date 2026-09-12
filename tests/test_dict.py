@@ -309,3 +309,29 @@ def test_recip_recon_marks_unverified_explicitly():
     assert ok < total, "все факты помечены проверенными — проверьте разбор вердиктов"
     assert recip["filled"] >= 4, "разведка не дошла до счётчика цепочки"
 
+
+def test_parts_counted_as_unique_numbers_not_rows():
+    """Запчасти считаются уникальными партномерами, а не строками файлов.
+
+    Третий случай одной и той же болезни счётчика: суммы строк из файлов, которые
+    пересекаются. По ГТУ складывались 12 442 строки базы PN и 10 986 строк сквозного
+    справочника, который ИЗ НЕЁ ЖЕ И СОБРАН, — получалось 25 041 вместо 12 934.
+    Номера берутся из явных полей, а не угадываются по тексту: иначе в номера
+    попадают обозначения машин вроде QSV91G."""
+    cov = json.loads((ROOT / "data" / "chain_coverage.json").read_text(encoding="utf-8"))
+    by_seg = {s["segment"]: s for s in cov["segments"]}
+
+    gtu = next(c for c in by_seg["gtu"]["cells"] if c["link"] == "part")
+    pn_db = json.loads((ROOT / "gt" / "data" / "pn_db.json").read_text(encoding="utf-8"))["rows"]
+    im = json.loads((ROOT / "pnw" / "data" / "item_master.json").read_text(encoding="utf-8"))["items"]
+    gtu_items = sum(1 for x in im if x.get("section") == "ГТУ")
+    assert gtu["n"] < len(pn_db) + gtu_items, (
+        f"по ГТУ {gtu['n']} номеров при {len(pn_db)} строках базы PN и {gtu_items} строках "
+        "справочника — это сумма пересекающихся файлов, а не уникальные номера")
+
+    # Номер короче четырёх знаков — это индекс строки, а не партномер.
+    for seg in by_seg.values():
+        cell = next(c for c in seg["cells"] if c["link"] == "part")
+        if cell["n"]:
+            assert cell["sources"], f"{seg['segment']}: номера без источника"
+

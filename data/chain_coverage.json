@@ -318,11 +318,11 @@
           "link": "part",
           "title": "Запчасть",
           "what": "номенклатура с номерами, готовая к запросу",
-          "n": 25041,
+          "n": 12934,
           "sources": [
             "gt/data/pn_db.json",
             "gt/data/pn_catalog.json",
-            "pnw/data/item_master.json"
+            "pnw/data/numbers.json"
           ],
           "state": "есть"
         },
@@ -408,10 +408,11 @@
           "link": "part",
           "title": "Запчасть",
           "what": "номенклатура с номерами, готовая к запросу",
-          "n": 255,
+          "n": 565,
           "sources": [
             "gpu/data/demand.json",
-            "gpu/data/motortech_cross.json"
+            "gpu/data/motortech_cross.json",
+            "gpu/data/analogs.json"
           ],
           "state": "есть"
         },
@@ -494,11 +495,11 @@
           "link": "part",
           "title": "Запчасть",
           "what": "номенклатура с номерами, готовая к запросу",
-          "n": 1918,
+          "n": 1874,
           "sources": [
             "zip/data/positions.json",
             "zip/data/telsmith_3858.json",
-            "pnw/data/item_master.json"
+            "pnw/data/numbers.json"
           ],
           "state": "есть"
         },

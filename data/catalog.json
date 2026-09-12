@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 190,
-    "total_bytes": 93852598,
+    "total_bytes": 93852627,
     "by_sensitivity": {
       "конфиденциально": 57,
       "внутреннее": 101,
@@ -277,7 +277,8 @@
         "scripts/build_chain_coverage.py",
         "scripts/build_dict.py",
         "scripts/build_node_map.py",
-        "tests/test_core.py"
+        "tests/test_core.py",
+        "tests/test_dict.py"
       ]
     },
     {
@@ -452,6 +453,7 @@
       "referenced_by": [
         "pnw/tools/build_master.py",
         "pnw/tools/build_search.py",
+        "scripts/build_chain_coverage.py",
         "tests/test_dict.py"
       ]
     },
@@ -714,7 +716,7 @@
       },
       "last_change": "2026-09-12",
       "last_author": "Claude",
-      "last_commit": "a43c257",
+      "last_commit": "523009b",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -5184,7 +5186,8 @@
         "markers": []
       },
       "referenced_by": [
-        "gpu/build.py"
+        "gpu/build.py",
+        "scripts/build_chain_coverage.py"
       ]
     },
     {
@@ -6047,7 +6050,7 @@
       ],
       "last_change": "2026-09-12",
       "last_author": "Claude",
-      "last_commit": "a43c257",
+      "last_commit": "523009b",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -6483,7 +6486,7 @@
     {
       "path": "data/chain_coverage.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 20256,
+      "bytes": 20285,
       "note": "Заполняемость цепочки портала по семи направлениям и восьми звеньям: машина → узел → признак → дефект → ремонтное решение → запчасть → изготовитель → исполнитель. Производный файл, считается scripts/build_chain_coverage.py по фактическим файлам репозитория; ноль означает отсутствие данных, а не то, что они где-то есть. Руками не заполнять. Первый прогон 12.09.2026: 13 клеток из 56, звенья «Признак», «Дефект» и «Исполнитель» не начаты ни по одному направлению.",
       "format": "json",
       "shape": "объект",
@@ -6509,7 +6512,7 @@
       },
       "last_change": "2026-09-12",
       "last_author": "Claude",
-      "last_commit": "77690aa",
+      "last_commit": "523009b",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",

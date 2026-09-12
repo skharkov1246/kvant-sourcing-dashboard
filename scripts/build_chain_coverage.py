@@ -70,6 +70,73 @@ def nkey(name: str) -> str:
     return re.sub(r"[^a-z0-9а-я]+", "", s)[:40]
 
 
+# Партномера по направлениям. Берутся из ЯВНЫХ полей номера, а не угадываются
+# регулярным выражением по тексту: иначе в номера попадают обозначения машин
+# (QSV91G) и марки материалов. Считаются уникальные номера, а не строки — по той
+# же причине, по которой изготовители считаются компаниями: сумма строк разных
+# файлов несравнима между направлениями.
+PN_FIELDS = {
+    "gtu": [("gt/data/pn_db.json", "rows", ["pn", "mpn"]),
+            ("gt/data/pn_catalog.json", "rows", ["pn"])],
+    "gpu": [("gpu/data/demand.json", "rows", ["pn"]),
+            ("gpu/data/motortech_cross.json", "records", ["part", "motortech", "cross"]),
+            ("gpu/data/analogs.json", "families", ["oem_pns"])],
+    "gsho": [("zip/data/positions.json", None, ["catalog_no"]),
+             ("zip/data/telsmith_3858.json", "need", ["oem"]),
+             ("zip/data/telsmith_3858.json", "catalog", ["oem"])],
+}
+# Сквозной справочник деталей: раздел указан полем section, номер — полями
+# ниже. Он идёт в ТО ЖЕ множество номеров, а не отдельной добавкой сверху:
+# иначе одна и та же деталь считается дважды — под своим номером и под номером
+# бренда из реестра направления.
+ITEM_MASTER_SECTION = {"gtu": "ГТУ", "gsho": "ЗИП ГШО"}
+
+
+def unique_pns(seg: str, load_fn):
+    """Множество партномеров направления и файлы, из которых они собраны."""
+    keys, srcs = set(), []
+    for rel, path, fields in PN_FIELDS.get(seg, []):
+        data = load_fn(rel)
+        if data is None:
+            continue
+        if path:
+            data = data.get(path) if isinstance(data, dict) else None
+        if not data:
+            continue
+        got = set()
+        for row in data:
+            if not isinstance(row, dict):
+                continue
+            for f in fields:
+                v = row.get(f)
+                for one in (v if isinstance(v, list) else [v]):
+                    k = norm_pn(one)
+                    if len(k) >= 4:          # короче — это не номер, а индекс строки
+                        got.add(k)
+        if got:
+            keys |= got
+            if rel not in srcs:
+                srcs.append(rel)
+
+    section = ITEM_MASTER_SECTION.get(seg)
+    if section:
+        im = load_fn("pnw/data/item_master.json") or {}
+        nums = load_fn("pnw/data/numbers.json") or {}
+        kv_of_section = {it["kv"] for it in im.get("items", []) if it.get("section") == section}
+        got = {norm_pn(r.get("number")) for r in nums.get("rows", [])
+               if r.get("kv") in kv_of_section and r.get("kind") != "свой"}
+        got = {k for k in got if len(k) >= 4}
+        if got:
+            keys |= got
+            srcs.append("pnw/data/numbers.json")
+    return keys, srcs
+
+
+def norm_pn(pn) -> str:
+    import re
+    return re.sub(r"[^A-Z0-9А-Я]", "", str(pn or "").upper())
+
+
 # Реестры компаний по направлениям. Считаются УНИКАЛЬНЫЕ компании, а не строки:
 # одна и та же компания лежит в нескольких реестрах и в тысячах связей с позициями.
 MAKER_FILES = {
@@ -134,22 +201,16 @@ def counts() -> dict:
         "dict/machine.json")
     gp = load("gt/data/parts.json", {})
     put("gtu", "node", n(gp.get("systems")), "gt/data/parts.json")
-    put("gtu", "part", n(load("gt/data/pn_db.json", {}).get("rows")), "gt/data/pn_db.json")
-    put("gtu", "part", n(load("gt/data/pn_catalog.json", {}).get("rows")), "gt/data/pn_catalog.json")
 
     # ── ГПУ
     put("gpu", "machine", n(load("gpu/data/machines.json", {}).get("machines")), "gpu/data/machines.json")
     put("gpu", "node", n(load("gpu/data/parts.json", {}).get("systems")), "gpu/data/parts.json")
-    put("gpu", "part", n(load("gpu/data/demand.json", {}).get("rows")), "gpu/data/demand.json")
-    put("gpu", "part", n(load("gpu/data/motortech_cross.json", {}).get("records")), "gpu/data/motortech_cross.json")
 
     # ── ГШО
     tel = load("zip/data/telsmith_3858.json", {})
     put("gsho", "machine", 1 if tel.get("machine") else 0, "zip/data/telsmith_3858.json")
     put("gsho", "machine", n(load("zip/data/machines.json", {}).get("machines")), "zip/data/machines.json")
     put("gsho", "node", n({r.get("node") for r in tel.get("catalog", []) if r.get("node")}), "zip/data/telsmith_3858.json")
-    put("gsho", "part", n(load("zip/data/positions.json", [])), "zip/data/positions.json")
-    put("gsho", "part", n(tel.get("catalog")), "zip/data/telsmith_3858.json")
     mat = load("zip/data/material_strategy.json", [])
     put("gsho", "repair", n([x for x in (mat or []) if isinstance(x, dict)]), "zip/data/material_strategy.json")
 
@@ -180,14 +241,13 @@ def counts() -> dict:
         c[seg]["maker"]["src"] = srcs
 
     # ── сквозные наборы: раскладываются по направлениям по полю раздела
-    im = load("pnw/data/item_master.json", {}).get("items", [])
-    sec = {"ЗИП ГШО": "gsho", "ГТУ": "gtu"}
-    for it in im:
-        seg = sec.get(it.get("section"))
-        if seg:
-            c[seg]["part"]["n"] += 1
-            if "pnw/data/item_master.json" not in c[seg]["part"]["src"]:
-                c[seg]["part"]["src"].append("pnw/data/item_master.json")
+
+    # ── запчасти: уникальные партномера по каждому направлению
+    for seg in ("gtu", "gpu", "gsho"):
+        keys, srcs = unique_pns(seg, lambda rel: load(rel))
+        if keys:
+            c[seg]["part"]["n"] = len(keys)
+            c[seg]["part"]["src"] = srcs
 
     # ── словарь: изготовители по рёбрам цепочки (сегмент словарь не знает,
     # поэтому рёбра считаются общим фондом и в клетки направлений не идут)
