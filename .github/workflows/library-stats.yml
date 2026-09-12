@@ -8,6 +8,12 @@ name: Библиотека — сводка и переклассификаци�
 #   diag           — из чего состоят позиции без сегмента: есть ли у них
 #                    классифицированные соседи и каких слов не хватает словарю.
 #                    Ничего не меняет.
+#   diag-junk      — то же по СТРОКАМ, помеченным как текст документа: два
+#                    частотных списка рядом — самая наглядная проверка разметки.
+#   mark           — вхолостую: сколько строк правило сочло текстом тендерного
+#                    документа и шесть гейтов приёмки. Ничего не меняет.
+#   mark-apply     — запись пометок. Запись отменяется сама, если гейты не сошлись.
+#   mark-revert    — снять пометки прогона (вход run_id). Секунды.
 #   reclassify     — вхолостую: сколько позиций без сегмента удалось бы разобрать
 #                    и каким правилом. Ничего не меняет.
 #   reclassify-apply — то же самое с записью сегмента в lib_demand.
@@ -23,7 +29,10 @@ on:
         description: "Что делать"
         type: choice
         default: stats
-        options: [stats, diag, reclassify, reclassify-apply]
+        options: [stats, diag, diag-junk, mark, mark-apply, mark-revert, reclassify, reclassify-apply]
+      run_id:
+        description: "Ключ прогона разметки — только для mark-revert"
+        default: ""
       rule_deal:
         description: "Наследовать сегмент по сделке (слабое правило, для reclassify)"
         type: boolean
@@ -73,6 +82,36 @@ jobs:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
         run: python library/diag_demand.py
 
+      - name: Разведка по помеченному тексту документов
+        if: inputs.job == 'diag-junk'
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          SOURCE: junk
+        run: python library/diag_demand.py
+
+      - name: Разметка вхолостую — гейты приёмки
+        if: inputs.job == 'mark'
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: python library/mark_prose.py
+
+      - name: Разметка с записью
+        if: inputs.job == 'mark-apply'
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          APPLY: "1"
+        run: python library/mark_prose.py
+
+      - name: Откат разметки
+        if: inputs.job == 'mark-revert'
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          REVERT: ${{ inputs.run_id }}
+        run: |
+          set -euo pipefail
+          [ -n "${REVERT:-}" ] || { echo "::error::для отката нужен вход run_id"; exit 1; }
+          python library/mark_prose.py
+
       - name: Переклассификация вхолостую
         if: inputs.job == 'reclassify'
         env:
@@ -88,8 +127,8 @@ jobs:
           APPLY: "1"
         run: python library/reclassify.py
 
-      - name: Сводка после переклассификации
-        if: inputs.job == 'reclassify-apply'
+      - name: Сводка после
+        if: inputs.job == 'reclassify-apply' || inputs.job == 'mark-apply' || inputs.job == 'mark-revert'
         env:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
         run: python scripts/library_stats.py

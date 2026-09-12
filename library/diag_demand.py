@@ -22,7 +22,12 @@ MIN_FREQ раз во всей выборке. Названия компаний,
 такой фильтр не проходят: они либо не кириллица, либо встречаются единицами.
 Ни одного наименования целиком, ни одного номера сделки в выводе нет.
 
-    SUPABASE_DB_URL=... python library/diag_demand.py
+    SUPABASE_DB_URL=... python library/diag_demand.py              # спрос без прозы
+    SUPABASE_DB_URL=... SOURCE=junk python library/diag_demand.py  # то, что помечено
+
+ДВА СПИСКА РЯДОМ — самая наглядная проверка разметки без показа содержимого:
+слева должно остаться «уплотнение, прокладка, манжета, болт», справа —
+«поставки, закупочной, договора, процедуры».
 """
 from __future__ import annotations
 
@@ -35,7 +40,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from segments import SEGMENTS  # noqa: E402  (после sys.path)
 
 MIN_LEN = int(os.environ.get("MIN_LEN", "6"))
-MIN_FREQ = int(os.environ.get("MIN_FREQ", "200"))
+MIN_FREQ = int(os.environ.get("MIN_FREQ", "0"))     # 0 — считать от размера выборки
+SOURCE = os.environ.get("SOURCE", "live")           # live | junk
 TOP = int(os.environ.get("TOP", "60"))
 
 # Только кириллица: латиница — это марки и парт-номера, им в частотном списке
@@ -50,21 +56,36 @@ select count(*)                                                         as вс�
        count(*) filter (where coalesce(btrim(oem), '') <> '')           as с_изготовителем,
        count(distinct source_file)                                      as файлов,
        count(distinct deal_id)                                          as сделок
-from lib_demand where segment_id is null"""
+from {src} d where d.segment_id is null"""
 
 # Ключевой вопрос: есть ли у безсегментной строки классифицированные соседи.
 NEIGHBOURS_SQL = """
-with пустые as (select distinct {key} as k from lib_demand where segment_id is null and {key} is not null),
-     полные as (select distinct {key} as k from lib_demand where segment_id is not null and {key} is not null)
+with пустые as (select distinct {key} as k from {src} where segment_id is null and {key} is not null),
+     полные as (select distinct {key} as k from {src} where segment_id is not null and {key} is not null)
 select (select count(*) from пустые),
        (select count(*) from пустые join полные using (k))"""
 
 KINDS_SQL = """
 select coalesce(f.kind, '—'), count(*)
-from lib_demand d join lib_files f on f.file_id = d.source_file
+from {src} d join lib_files f on f.file_id = d.source_file
 where d.segment_id is null group by 1 order by 2 desc"""
 
-NAMES_SQL = "select item_name from lib_demand where segment_id is null and item_name is not null"
+NAMES_SQL = "select item_name from lib_demand_src where segment_id is null and item_name is not null"
+
+
+def source_table(cur) -> tuple[str, str]:
+    """Откуда брать выборку. До применения миграции представления нет — разведка
+    обязана работать и тогда."""
+    cur.execute("select to_regclass('public.lib_demand_live') is not null")
+    has_view = bool(cur.fetchone()[0])
+    if SOURCE == "junk":
+        if not has_view:
+            return "lib_demand", "вся база (таблицы пометок ещё нет)"
+        return ("(select d.* from lib_demand d join lib_row_junk j on j.demand_id = d.id "
+                "and j.revoked_at is null)"), "помеченное как текст документа"
+    if has_view:
+        return "lib_demand_live", "спрос без помеченного текста документов"
+    return "lib_demand", "вся база (разметка ещё не применялась)"
 
 
 def main() -> int:
@@ -75,11 +96,13 @@ def main() -> int:
     import psycopg2
 
     known = {w for _n, words in SEGMENTS.values() for w in words}
-    conn = psycopg2.connect(url, connect_timeout=20)
+    conn = psycopg2.connect(url, connect_timeout=20, options="-c statement_timeout=900000")
     conn.autocommit = True
     with conn.cursor() as cur:
-        print("=== что это за строки ===")
-        cur.execute(SHAPE_SQL)
+        src, what_src = source_table(cur)
+        print(f"источник: {what_src}")
+        print("\n=== что это за строки ===")
+        cur.execute(SHAPE_SQL.format(src=src))
         labels = ("позиций без сегмента", "без наименования", "наименование короче 6 знаков",
                   "с парт-номером", "с изготовителем", "разных файлов", "разных сделок")
         for label, value in zip(labels, cur.fetchone()):
@@ -87,19 +110,25 @@ def main() -> int:
 
         print("\n=== есть ли классифицированные соседи ===")
         for key, what in (("source_file", "файлов"), ("deal_id", "сделок")):
-            cur.execute(NEIGHBOURS_SQL.format(key=key))
+            cur.execute(NEIGHBOURS_SQL.format(key=key, src=src))
             всего, общих = cur.fetchone()
             доля = общих / всего * 100 if всего else 0
             print(f"  {what} с безсегментными строками: {всего:,}".replace(",", " "))
             print(f"    из них содержат хоть одну строку с сегментом: {общих:,} ({доля:.1f}%)".replace(",", " "))
 
         print("\n=== в каких файлах лежат ===")
-        cur.execute(KINDS_SQL)
+        cur.execute(KINDS_SQL.format(src=src))
         for kind, n in cur.fetchall():
             print(f"  {kind:24}{n:>12,}".replace(",", " "))
 
-        print(f"\n=== частые слова, которых нет в словаре (от {MIN_LEN} букв, от {MIN_FREQ} раз) ===")
-        cur.execute(NAMES_SQL)
+        # Порог частоты — от размера выборки, а не абсолютный: после разметки
+        # выборка сожмётся, и «от двухсот раз» перестанет быть защитой — редкое
+        # слово может оказаться названием завода или города.
+        cur.execute(f"select count(*) from {src} d where d.segment_id is null")
+        sample_rows = cur.fetchone()[0] or 0
+        floor = MIN_FREQ or max(200, sample_rows // 1000)
+        print(f"\n=== частые слова, которых нет в словаре (от {MIN_LEN} букв, от {floor} раз) ===")
+        cur.execute(NAMES_SQL.replace("lib_demand_src", src))
         freq: Counter = Counter()
         while True:
             chunk = cur.fetchmany(20000)
@@ -108,7 +137,7 @@ def main() -> int:
             for (name,) in chunk:
                 freq.update(set(WORD.findall(name.lower().replace("ё", "е"))))
         новые = [(w, n) for w, n in freq.most_common()
-                 if n >= MIN_FREQ and not any(k in w or w in k for k in known)]
+                 if n >= floor and not any(k in w or w in k for k in known)]
         print(f"  разных слов всего: {len(freq):,}".replace(",", " "))
         for w, n in новые[:TOP]:
             print(f"    {w:28}{n:>10,}".replace(",", " "))
