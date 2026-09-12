@@ -32,6 +32,7 @@ table.chain td.c{text-align:center;font-variant-numeric:tabular-nums}
 td.zero{background:rgba(208,59,59,.10);color:var(--crit,#d03b3b);font-weight:600}
 td.has{background:rgba(12,163,12,.08)}
 td.draft{background:rgba(250,178,25,.14);color:var(--warn,#a87b06);font-weight:600}
+td.c a{color:inherit;text-decoration:underline;text-underline-offset:2px}
 td .dr{font-size:10px;font-weight:400;color:var(--warn,#a87b06);white-space:nowrap}
 .seg{font-weight:600;text-align:left}
 .legend{display:flex;gap:14px;flex-wrap:wrap;margin:8px 0;font-size:12px;color:var(--ink2)}
@@ -39,6 +40,28 @@ td .dr{font-size:10px;font-weight:400;color:var(--warn,#a87b06);white-space:nowr
 .bar{height:7px;border-radius:4px;background:var(--chip);overflow:hidden;margin-top:4px}
 .bar>i{display:block;height:100%;background:var(--s1)}
 """
+
+
+# Из какой страницы портала пришло число клетки. Без этого карта говорит
+# «признак ~20» и не даёт на них посмотреть: цифра есть, дороги к ней нет.
+PAGE_OF = {
+    "zip/data/diagnostics_recon.json": ("./diag.html", "диагностика и дефекты"),
+    "dict/symptom.json": ("./diag.html", "признак → дефект"),
+    "zip/data/oem_atlas.json": ("./oem.html", "атлас производителей"),
+    "zip/data/repair_recon.json": ("./repair.html", "ремонт и исполнители"),
+    "zip/data/subsupplier_recon.json": ("./subs.html", "субпоставщики"),
+    "zip/data/dirs_recon.json": ("./dirs.html", "насосы, КИПиА, электротехника"),
+    "zip/data/recip_recon.json": ("./recip.html", "поршневые компрессоры"),
+    "zip/data/telsmith_3858.json": ("./telsmith.html", "Telsmith 3858"),
+}
+
+
+def cell_link(sources):
+    """Первая страница, на которой это число можно посмотреть глазами."""
+    for src in sources:
+        if src in PAGE_OF:
+            return PAGE_OF[src]
+    return None
 
 
 def build():
@@ -59,8 +82,11 @@ def build():
             title = e("; ".join(c["sources"])) if c["sources"] else "источников нет"
             if draft:
                 title += f" · черновик: {draft} строк без проверки скептиком"
-            cells += (f'<td class="c {cls}" title="{title}">'
-                      f'{c["n"] if c["n"] else "—"}'
+            link = cell_link(c["sources"])
+            num = f'{c["n"] if c["n"] else "—"}'
+            if link:
+                num = f'<a href="{link[0]}" title="{e(link[1])}">{num}</a>'
+            cells += (f'<td class="c {cls}" title="{title}">{num}'
                       + (f'<div class="dr">+{draft} черн.</div>' if draft else "")
                       + (f'<div class="mut" style="font-size:10px">{len(c["sources"])} ф.</div>'
                          if c["sources"] and not draft else "")
@@ -84,8 +110,10 @@ def build():
 <title>Заполняемость портала — карта цепочки</title>
 <style>{CSS}{EXTRA}</style></head><body>
 <header>
-<div class="mut"><a href="./">← ГШО · рабочая база</a> · <a href="./diag.html">диагностика и дефекты</a>
- · <a href="./recip.html">поршневые компрессоры</a> · <a href="./telsmith.html">Telsmith 3858</a></div>
+<div class="mut"><a href="./">← ГШО · рабочая база</a> · <a href="./diag.html">диагностика</a>
+ · <a href="./oem.html">производители</a> · <a href="./repair.html">ремонт и исполнители</a>
+ · <a href="./subs.html">субпоставщики</a> · <a href="./dirs.html">насосы и КИП</a>
+ · <a href="./recip.html">поршневые</a></div>
 <h1>Заполняемость портала: где пусто</h1>
 <div class="sub">Цель — инженерный портал ремонта и сервиса динамического оборудования.
 Пользователь проходит цепочку целиком: машина → узел → признак → дефект → ремонтное решение →
@@ -112,7 +140,8 @@ def build():
 </div>
 <div class="wrap"><table class="chain"><thead><tr><th style="width:190px">Направление</th>{head}
 <th style="width:62px">Итог</th></tr></thead><tbody>{rows}</tbody></table></div>
-<div class="mut">Наведите на клетку — покажет файлы, из которых взято число.
+<div class="mut">Наведите на клетку — покажет файлы, из которых взято число;
+подчёркнутое число открывает страницу, где эти данные можно посмотреть.
 Правило приоритета: {e(d['priority_rule'])}</div>
 <h2>Звенья, не начатые ни по одному направлению — в файлах репозитория</h2>{empty or '<div class="card">нет — все звенья где-то начаты</div>'}
 {f'<h2>Находки</h2>{foreign}' if foreign else ''}
