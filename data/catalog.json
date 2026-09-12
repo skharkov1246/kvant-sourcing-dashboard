@@ -4,18 +4,18 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 192,
-    "total_bytes": 95289398,
+    "datasets": 193,
+    "total_bytes": 95846608,
     "by_sensitivity": {
       "конфиденциально": 57,
-      "внутреннее": 102,
+      "внутреннее": 103,
       "публикуемо": 33
     },
     "by_subproject": {
       "ГПУ-библиотека": 27,
       "ГТУ-библиотека": 35,
       "ОВЭ-75": 45,
-      "база ЗИП": 32,
+      "база ЗИП": 33,
       "база ЗИП · таможня": 18,
       "библиотека рынков": 1,
       "гидрометаллургия": 22,
@@ -1362,6 +1362,61 @@
         "gt/tools/ship_merge.py",
         "gt/tools/ship_report.py",
         "library/load_parts.py"
+      ]
+    },
+    {
+      "path": "zip/data/oem_atlas.json",
+      "subproject": "база ЗИП",
+      "bytes": 555544,
+      "note": "Атлас производителей динамического оборудования: 101 изготовитель из 16 стран (42 китайских, 19 США, 15 германских, 7 японских) по семи парам «направление × регион» — ГТУ, ГПУ и ГШО по Западу и Китаю плюс поршневые компрессоры по Западу. У каждого: владелец и прежние названия, действующие и снятые линейки с характеристиками, место на рынке, сайт и источник. Главное — 93 правила чтения обозначения машины и каталожного номера детали: то, чем расшифровывается номенклатура изготовителя при поиске аналога. Плюс 58 связей лицензий и СП (кто под чьей маркой собирает) и 82 закрытых тупика. ВАЖНО: атлас НЕПОЛОН — 7 пар из 18, недостающие одиннадцать перечислены в поле completeness.pairs_missing; отсутствие изготовителя означает, что до его направления разведка не дошла, а не что его нет. Собрано zip/tools/extract_oem_atlas.py из журнала разведки.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "completeness",
+        "generated",
+        "makers",
+        "pairs",
+        "stats",
+        "subject"
+      ],
+      "main_collection": {
+        "key": "makers",
+        "records": 101,
+        "record_keys": [
+          "active_lines",
+          "confidence",
+          "country",
+          "country_note",
+          "country_raw",
+          "discontinued",
+          "former_names",
+          "lines",
+          "name",
+          "owner",
+          "pn_system",
+          "rank",
+          "region",
+          "region_title",
+          "segment",
+          "segment_title",
+          "site",
+          "source",
+          "specs"
+        ]
+      },
+      "last_change": "2026-09-12",
+      "last_author": "Claude",
+      "last_commit": "5f4a9d7",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "scripts/build_chain_coverage.py",
+        "tests/test_dict.py",
+        "zip/tools/build_oem_page.py",
+        "zip/tools/extract_oem_atlas.py"
       ]
     },
     {
@@ -5784,53 +5839,9 @@
       ]
     },
     {
-      "path": "ove/data/bi_register.json",
-      "subproject": "ОВЭ-75",
-      "bytes": 33887,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "note",
-        "rev",
-        "rows"
-      ],
-      "main_collection": {
-        "key": "rows",
-        "records": 65,
-        "record_keys": [
-          "code",
-          "contents_from",
-          "drop_head",
-          "gantt",
-          "kind",
-          "lot",
-          "source",
-          "sources",
-          "stage",
-          "status",
-          "title",
-          "tz"
-        ]
-      },
-      "last_change": "2026-09-03",
-      "last_author": "skharkov1246",
-      "last_commit": "9d0b92c",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "ove/tools/bi_check.py",
-        "ove/tools/build_release.py",
-        "ove/tools/docframe.py"
-      ]
-    },
-    {
       "path": "data/catalog_notes.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 33751,
+      "bytes": 35260,
       "note": "",
       "format": "json",
       "shape": "объект",
@@ -5878,7 +5889,7 @@
       ],
       "last_change": "2026-09-12",
       "last_author": "Claude",
-      "last_commit": "d8165b2",
+      "last_commit": "5f4a9d7",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -5886,6 +5897,50 @@
       },
       "referenced_by": [
         "scripts/build_catalog.py"
+      ]
+    },
+    {
+      "path": "ove/data/bi_register.json",
+      "subproject": "ОВЭ-75",
+      "bytes": 33887,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "note",
+        "rev",
+        "rows"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 65,
+        "record_keys": [
+          "code",
+          "contents_from",
+          "drop_head",
+          "gantt",
+          "kind",
+          "lot",
+          "source",
+          "sources",
+          "stage",
+          "status",
+          "title",
+          "tz"
+        ]
+      },
+      "last_change": "2026-09-03",
+      "last_author": "skharkov1246",
+      "last_commit": "9d0b92c",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "ove/tools/bi_check.py",
+        "ove/tools/build_release.py",
+        "ove/tools/docframe.py"
       ]
     },
     {
@@ -6484,7 +6539,7 @@
     {
       "path": "data/chain_coverage.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 23039,
+      "bytes": 23196,
       "note": "Заполняемость цепочки портала по семи направлениям и восьми звеньям: машина → узел → признак → дефект → ремонтное решение → запчасть → изготовитель → исполнитель. Производный файл, считается scripts/build_chain_coverage.py по фактическим файлам репозитория; ноль означает отсутствие данных, а не то, что они где-то есть. Руками не заполнять. Первый прогон 12.09.2026: 13 клеток из 56, звенья «Признак», «Дефект» и «Исполнитель» не начаты ни по одному направлению.",
       "format": "json",
       "shape": "объект",
@@ -6511,7 +6566,7 @@
       },
       "last_change": "2026-09-12",
       "last_author": "Claude",
-      "last_commit": "d8165b2",
+      "last_commit": "5f4a9d7",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
