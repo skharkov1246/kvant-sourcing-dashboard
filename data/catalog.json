@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 191,
-    "total_bytes": 93867310,
+    "total_bytes": 93870480,
     "by_sensitivity": {
       "конфиденциально": 57,
       "внутреннее": 101,
@@ -6679,6 +6679,43 @@
       ]
     },
     {
+      "path": "library/data/symptoms.json",
+      "subproject": "библиотека рынков",
+      "bytes": 16461,
+      "note": "Признаки неисправности вращающегося оборудования: по чему видно, что машина нездорова, что это обычно значит и чем подтверждается. Звено «признак» цепочки портала. СПРАВОЧНИК-ЗАГОТОВКА, не измерение по парку: связки взяты из общей практики диагностики и из брошюр OEM (поле basis), уверенность у всех строк низкая, требуется проверка инженером сервиса. Загружается library/load_repair.py в lib_symptoms.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "note",
+        "rows",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 24,
+        "record_keys": [
+          "basis",
+          "confirm",
+          "confirm_ops",
+          "defect",
+          "measure",
+          "name",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-12",
+      "last_author": "Claude",
+      "last_commit": "d38d8ab",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "library/load_repair.py"
+      ]
+    },
+    {
       "path": "gpu/data/parts.json",
       "subproject": "ГПУ-библиотека",
       "bytes": 16417,
@@ -6990,42 +7027,6 @@
         "scripts/build_dict.py",
         "zip/build.py",
         "zip/tools/perf_classes.py"
-      ]
-    },
-    {
-      "path": "library/data/symptoms.json",
-      "subproject": "библиотека рынков",
-      "bytes": 13291,
-      "note": "Признаки неисправности вращающегося оборудования: по чему видно, что машина нездорова, что это обычно значит и чем подтверждается. Звено «признак» цепочки портала. СПРАВОЧНИК-ЗАГОТОВКА, не измерение по парку: связки взяты из общей практики диагностики и из брошюр OEM (поле basis), уверенность у всех строк низкая, требуется проверка инженером сервиса. Загружается library/load_repair.py в lib_symptoms.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "note",
-        "rows",
-        "updated"
-      ],
-      "main_collection": {
-        "key": "rows",
-        "records": 24,
-        "record_keys": [
-          "basis",
-          "confirm",
-          "defect",
-          "measure",
-          "name",
-          "unit"
-        ]
-      },
-      "last_change": "2026-09-12",
-      "last_author": "skharkov1246",
-      "last_commit": "29239a7",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "публикуемо",
-        "markers": []
-      },
-      "referenced_by": [
-        "library/load_repair.py"
       ]
     },
     {

@@ -203,6 +203,7 @@ def build_symptoms() -> dict[str, dict]:
             "basis": clean(r.get("basis"))[:300] or None,
             "confidence": "low",
             "source": "справочник признаков (заготовка, требует проверки инженером)",
+            "ops": [str(x) for x in (r.get("confirm_ops") or [])],
         }
     return out
 
@@ -220,6 +221,25 @@ def узлы() -> set[str]:
 UNITS = узлы()
 
 
+def ops_edges(symptoms: dict, proc: dict) -> tuple[list[tuple], list[str]]:
+    """Рёбра «признак → операция» по точному имени, а не по совпадению текста.
+
+    Ссылка вида «контроль|ЛЮМ (fluorescent penetrant)» превращается в тот же
+    идентификатор, каким операция заведена: вид плюс имя. Опечатка в ссылке не
+    создаёт тихо пустую связь — она попадает в список ненайденных, а тест на
+    гейте по этому списку падает."""
+    рёбра, потерянные = [], []
+    for s in symptoms.values():
+        for ссылка in s.get("ops", []):
+            kind, _, name = ссылка.partition("|")
+            ид = ident(kind.strip(), name.strip())
+            if ид in proc:
+                рёбра.append((s["id"], ид, "справочник признаков"))
+            else:
+                потерянные.append(ссылка)
+    return рёбра, потерянные
+
+
 def main() -> int:
     proc = build_procedures()
     defects = build_defects()
@@ -233,12 +253,19 @@ def main() -> int:
     print(f"  с названным исполнителем: {с_исполнителем}")
     print(f"  с определённым узлом:     {sum(1 for p in proc.values() if p['unit_id'])}")
 
+    рёбра_оп, потерянные = ops_edges(symptoms, proc)
+
     print("\n=== признаки ===")
     print(f"  записей: {len(symptoms)}")
     print(f"  с узлом: {sum(1 for s in symptoms.values() if s['unit_id'])}")
     без_узла = [s["name"] for s in symptoms.values() if not s["unit_id"]]
     if без_узла:
         print(f"  без узла: {len(без_узла)} — узел в справочнике не найден, проверьте имена")
+    print(f"  связей «признак → чем подтвердить»: {len(рёбра_оп)} "
+          f"у {len({r[0] for r in рёбра_оп})} признаков")
+    if потерянные:
+        print(f"  ССЫЛКИ В НИКУДА: {len(потерянные)} — операции с таким именем нет: "
+              f"{потерянные[:3]}")
     print("  ВСЕ с низкой уверенностью: справочник-заготовка, нужна проверка инженером")
 
     print("\n=== дефекты и ремонтные решения ===")
@@ -284,6 +311,11 @@ def main() -> int:
             [(s["id"], s["name"], s["unit_id"], s["measure"], s["defect"], s["confirm"],
               s["basis"], s["confidence"], s["source"]) for s in symptoms.values()],
             page_size=200)
+        if рёбра_оп:
+            psycopg2.extras.execute_values(cur, """
+                insert into lib_symptom_ops (symptom_id, procedure_id, source)
+                values %s on conflict (symptom_id, procedure_id) do nothing""",
+                рёбра_оп, page_size=200)
         psycopg2.extras.execute_values(cur, """
             insert into lib_defects (id, name, unit_id, part_number, model, cause,
                                      consequence, fix, source)
@@ -295,7 +327,7 @@ def main() -> int:
               d["consequence"], d["fix"], d["source"]) for d in defects.values()],
             page_size=500)
         conn.commit()
-        for t in ("lib_procedures", "lib_defects", "lib_symptoms"):
+        for t in ("lib_procedures", "lib_defects", "lib_symptoms", "lib_symptom_ops"):
             cur.execute(f"select count(*) from {t}")
             print(f"  {t:16}{cur.fetchone()[0]:>6}")
         # Сколько исполнителей ремонта нашлись в общей базе компаний — это и есть

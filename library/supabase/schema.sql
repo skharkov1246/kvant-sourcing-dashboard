@@ -280,6 +280,19 @@ create table if not exists lib_symptoms (
 );
 create index if not exists lib_symptoms_unit on lib_symptoms (unit_id);
 
+-- Ребро «признак → чем подтвердить». Текстом это уже написано в самом признаке,
+-- но по тексту нельзя выбрать «все признаки, которые проверяются вихретоковым
+-- контролем», а сорсеру и инженеру нужно именно это: на инспекции время
+-- ограничено, и она планируется от метода, а не от симптома.
+create table if not exists lib_symptom_ops (
+  symptom_id   text not null references lib_symptoms(id) on delete cascade,
+  procedure_id text not null references lib_procedures(id) on delete cascade,
+  source       text,
+  created_at   timestamptz default now(),
+  primary key (symptom_id, procedure_id)
+);
+create index if not exists lib_symptom_ops_proc on lib_symptom_ops (procedure_id);
+
 create index if not exists lib_defects_unit on lib_defects (unit_id);
 create index if not exists lib_defects_pn   on lib_defects (part_number);
 
@@ -499,6 +512,7 @@ alter table lib_part_alt       enable row level security;
 alter table lib_bom            enable row level security;
 alter table lib_symptoms       enable row level security;
 alter table lib_pn_patterns    enable row level security;
+alter table lib_symptom_ops    enable row level security;
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 9. Реестр разобранных файлов. Нужен для возобновляемости: обход 22 тысяч
