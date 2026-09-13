@@ -315,7 +315,7 @@ def build_ms5001() -> tuple[list[dict], dict[str, dict], dict[str, dict]]:
                      "source": "ведомость MS5001PA ТО-70000"}} if ключ else {}
     строки, детали = [], {}
     for i, r in enumerate(d):
-        pn = str(r.get("eid") or "").strip()
+        pn = str(r.get("pn") or "").strip()
         наим = str(r.get("name") or "").strip()
         if not pn:
             continue

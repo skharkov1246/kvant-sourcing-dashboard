@@ -13,7 +13,8 @@
   "kind": "технико-коммерческое предложение КВАНТ заказчику",
   "ref": "исх. №99-77 от 08.06.2026, Rev. 1",
   "sheet": "ТО-70000",
-  "note": "В репозиторий перенесена только техническая часть: номер позиции, каталожный номер, наименование, количество. Цены, заказчик-плательщик, условия сделки и контактное лицо — коммерческие и персональные данные, в публичный репозиторий не кладутся (CLAUDE.md, правило 5). Загрузка цен в закрытую базу — library/load_tkp_prices.py, читает исходный файл по пути из TKP_XLSX, сам файл здесь не хранится."
+  "note": "В репозиторий перенесена только техническая часть: номер позиции, каталожный номер, наименование, количество. Цены, заказчик-плательщик, условия сделки и контактное лицо — коммерческие и персональные данные, в публичный репозиторий не кладутся (CLAUDE.md, правило 5). Загрузка цен в закрытую базу — library/load_tkp_prices.py, читает исходный файл по пути из TKP_XLSX, сам файл здесь не хранится.",
+  "fields": "pn — каталожный номер Nuovo Pignone; имя поля именно pn, а не eid: по FIELD_GROUPS в scripts/build_index.py индексируется pn, и под другим именем номера в поиск не попадут."
  },
  "completeness": {
   "positions_quoted": 198,
@@ -50,7 +51,7 @@
  "catalog": [
   {
    "poz": "1",
-   "eid": "SMO0411370",
+   "pn": "SMO0411370",
    "name": "Fuel Nozzles PEK/ ТОПЛИВНАЯ ФОРСУНКА (УЛУЧШЕННАЯ)",
    "qty": 10,
    "node": "hot.fuel-injectors",
@@ -58,7 +59,7 @@
   },
   {
    "poz": "2",
-   "eid": "SMO0391475",
+   "pn": "SMO0391475",
    "name": "CAP & LINER PEK/ ЖАРОВЫЕ ТРУБЫ (УЛУЧШЕННЫЕ)",
    "qty": 10,
    "node": "hot.combustion-liner",
@@ -66,7 +67,7 @@
   },
   {
    "poz": "3",
-   "eid": "SMO0683504",
+   "pn": "SMO0683504",
    "name": "Transition Piece PEK/ ПЕРЕХОДНОЙ ЭЛЕМЕНТ (УЛУЧШЕННЫЙ)",
    "qty": 10,
    "node": "hot.transition-piece",
@@ -74,7 +75,7 @@
   },
   {
    "poz": "4",
-   "eid": "SMO1734909",
+   "pn": "SMO1734909",
    "name": "Сопловой аппарат 1-й ступени (улучшенные)",
    "qty": 1,
    "node": "turbine.nozzle-guide-vanes",
@@ -82,7 +83,7 @@
   },
   {
    "poz": "5",
-   "eid": "SMO1173900",
+   "pn": "SMO1173900",
    "name": "Комплект рабочих лопаток 1-й ступени (улучшенные)",
    "qty": 1,
    "node": null,
@@ -90,7 +91,7 @@
   },
   {
    "poz": "6",
-   "eid": "SMO0620031",
+   "pn": "SMO0620031",
    "name": "1st stage shroud /К-Т ШРАУД-БЛОКОВ 1 СТУП.",
    "qty": 1,
    "node": "turbine.shroud",
@@ -98,7 +99,7 @@
   },
   {
    "poz": "7",
-   "eid": "SMO1734722",
+   "pn": "SMO1734722",
    "name": "2nd stage nozzle / СОПЛОВОЙ АППАРАТ 2 СТ.",
    "qty": 1,
    "node": "turbine.nozzle-guide-vanes",
@@ -106,7 +107,7 @@
   },
   {
    "poz": "8",
-   "eid": "SMO1188600",
+   "pn": "SMO1188600",
    "name": "2nd stage bucket /К-Т РАБ. ЛОПАТОК 2 СТ.",
    "qty": 1,
    "node": null,
@@ -114,7 +115,7 @@
   },
   {
    "poz": "9",
-   "eid": "SMO0620032",
+   "pn": "SMO0620032",
    "name": "2nd stage shroud / К-Т ШРАУД-БЛОКОВ 2 СТУП.",
    "qty": 1,
    "node": "turbine.shroud",
@@ -122,7 +123,7 @@
   },
   {
    "poz": "10",
-   "eid": "SMO37790",
+   "pn": "SMO37790",
    "name": "Комплект опорных подшипников ГТУ (№1 и №2)",
    "qty": 2,
    "node": "rotor",
@@ -130,7 +131,7 @@
   },
   {
    "poz": "15",
-   "eid": "RTO65880",
+   "pn": "RTO65880",
    "name": "THERMOCOUPLE",
    "qty": 4,
    "node": "controls.exhaust-thermocouples",
@@ -138,7 +139,7 @@
   },
   {
    "poz": "16",
-   "eid": "RTO326450210B",
+   "pn": "RTO326450210B",
    "name": "THERMOCOUPLE",
    "qty": 2,
    "node": "controls.exhaust-thermocouples",
@@ -146,7 +147,7 @@
   },
   {
    "poz": "17",
-   "eid": "RTO326450310B",
+   "pn": "RTO326450310B",
    "name": "THERMOCOUPLE",
    "qty": 2,
    "node": "controls.exhaust-thermocouples",
@@ -154,7 +155,7 @@
   },
   {
    "poz": "18",
-   "eid": "RTO326520010B",
+   "pn": "RTO326520010B",
    "name": "THERMOCOUPLE",
    "qty": 2,
    "node": "controls.exhaust-thermocouples",
@@ -162,7 +163,7 @@
   },
   {
    "poz": "19",
-   "eid": "RTO95490",
+   "pn": "RTO95490",
    "name": "THERMOCOUPLE",
    "qty": 4,
    "node": "controls.exhaust-thermocouples",
@@ -170,7 +171,7 @@
   },
   {
    "poz": "20",
-   "eid": "RTO77740",
+   "pn": "RTO77740",
    "name": "TEMPERATURE RESISTANCE",
    "qty": 2,
    "node": null,
@@ -178,7 +179,7 @@
   },
   {
    "poz": "21",
-   "eid": "MAM000125",
+   "pn": "MAM000125",
    "name": "SEALANT",
    "qty": 1,
    "node": "seals",
@@ -186,7 +187,7 @@
   },
   {
    "poz": "27",
-   "eid": "RTO95490",
+   "pn": "RTO95490",
    "name": "THERMOCOUPLE",
    "qty": 2,
    "node": "controls.exhaust-thermocouples",
@@ -194,7 +195,7 @@
   },
   {
    "poz": "32",
-   "eid": "SMR67407",
+   "pn": "SMR67407",
    "name": "SPARK PLUG TUBE",
    "qty": 2,
    "node": "hot.igniter",
@@ -202,7 +203,7 @@
   },
   {
    "poz": "36",
-   "eid": "GQF19044",
+   "pn": "GQF19044",
    "name": "SCREW 3/4-10UNCX1 3/4",
    "qty": 2,
    "node": "fasteners",
@@ -210,7 +211,7 @@
   },
   {
    "poz": "37",
-   "eid": "SMQ20980",
+   "pn": "SMQ20980",
    "name": "STRIP",
    "qty": 58,
    "node": null,
@@ -218,7 +219,7 @@
   },
   {
    "poz": "38",
-   "eid": "KFZ326250004",
+   "pn": "KFZ326250004",
    "name": "GASKET",
    "qty": 4,
    "node": "seals",
@@ -226,7 +227,7 @@
   },
   {
    "poz": "39",
-   "eid": "SMR50235",
+   "pn": "SMR50235",
    "name": "SECURITY PLATE",
    "qty": 16,
    "node": null,
@@ -234,7 +235,7 @@
   },
   {
    "poz": "40",
-   "eid": "GTG19050",
+   "pn": "GTG19050",
    "name": "SCREW 3/4-10UNCX2",
    "qty": 10,
    "node": "fasteners",
@@ -242,7 +243,7 @@
   },
   {
    "poz": "41",
-   "eid": "GFY38203",
+   "pn": "GFY38203",
    "name": "SCREW 1 1/2-8UNX8",
    "qty": 5,
    "node": "fasteners",
@@ -250,7 +251,7 @@
   },
   {
    "poz": "42",
-   "eid": "FGN47538",
+   "pn": "FGN47538",
    "name": "NUT 1 1/2-8UNC",
    "qty": 6,
    "node": "fasteners",
@@ -258,7 +259,7 @@
   },
   {
    "poz": "43",
-   "eid": "RPQ38360",
+   "pn": "RPQ38360",
    "name": "STUD-BOLT 1 1/2",
    "qty": 2,
    "node": "fasteners",
@@ -266,7 +267,7 @@
   },
   {
    "poz": "44",
-   "eid": "RPQ47788",
+   "pn": "RPQ47788",
    "name": "STUD BOLT",
    "qty": 4,
    "node": "fasteners",
@@ -274,7 +275,7 @@
   },
   {
    "poz": "45",
-   "eid": "SMP24556",
+   "pn": "SMP24556",
    "name": "HALF RING",
    "qty": 2,
    "node": null,
@@ -282,7 +283,7 @@
   },
   {
    "poz": "46",
-   "eid": "RPQ38361",
+   "pn": "RPQ38361",
    "name": "STUD-BOLT 1 1/28UN-2A",
    "qty": 4,
    "node": "fasteners",
@@ -290,7 +291,7 @@
   },
   {
    "poz": "47",
-   "eid": "RFR330950000",
+   "pn": "RFR330950000",
    "name": "HELI-COIL 1/2-13UNCX1,5",
    "qty": 8,
    "node": null,
@@ -298,7 +299,7 @@
   },
   {
    "poz": "48",
-   "eid": "RFR330030000",
+   "pn": "RFR330030000",
    "name": "HELI-COIL 3/4-10UNCX1",
    "qty": 4,
    "node": null,
@@ -306,7 +307,7 @@
   },
   {
    "poz": "49",
-   "eid": "SMR53809",
+   "pn": "SMR53809",
    "name": "SEALING PLATE",
    "qty": 27,
    "node": "seals",
@@ -314,7 +315,7 @@
   },
   {
    "poz": "50",
-   "eid": "RPQ35552",
+   "pn": "RPQ35552",
    "name": "STUD BOLT 1-8UNC-2A",
    "qty": 4,
    "node": "fasteners",
@@ -322,7 +323,7 @@
   },
   {
    "poz": "51",
-   "eid": "RPP02988",
+   "pn": "RPP02988",
    "name": "PIN",
    "qty": 4,
    "node": null,
@@ -330,7 +331,7 @@
   },
   {
    "poz": "52",
-   "eid": "GTG25063",
+   "pn": "GTG25063",
    "name": "SCREW 1-8UNCX2 1/2",
    "qty": 12,
    "node": "fasteners",
@@ -338,7 +339,7 @@
   },
   {
    "poz": "53",
-   "eid": "GTG25095",
+   "pn": "GTG25095",
    "name": "SCREW 1-8UNCX3 3/4",
    "qty": 16,
    "node": "fasteners",
@@ -346,7 +347,7 @@
   },
   {
    "poz": "54",
-   "eid": "FGC53625",
+   "pn": "FGC53625",
    "name": "NUT 1-8UNC",
    "qty": 24,
    "node": "fasteners",
@@ -354,7 +355,7 @@
   },
   {
    "poz": "55",
-   "eid": "SMR50008",
+   "pn": "SMR50008",
    "name": "SAFETY PLATE",
    "qty": 10,
    "node": null,
@@ -362,7 +363,7 @@
   },
   {
    "poz": "56",
-   "eid": "GQF12025",
+   "pn": "GQF12025",
    "name": "SCREW 1/2-13UNCX1",
    "qty": 10,
    "node": "fasteners",
@@ -370,7 +371,7 @@
   },
   {
    "poz": "57",
-   "eid": "KFZ294560004",
+   "pn": "KFZ294560004",
    "name": "GASKET",
    "qty": 2,
    "node": "seals",
@@ -378,7 +379,7 @@
   },
   {
    "poz": "58",
-   "eid": "KFZ294570004",
+   "pn": "KFZ294570004",
    "name": "GASKET",
    "qty": 2,
    "node": "seals",
@@ -386,7 +387,7 @@
   },
   {
    "poz": "59",
-   "eid": "HEH06019",
+   "pn": "HEH06019",
    "name": "SCREW 1/4-20UNCX3/4",
    "qty": 2,
    "node": "fasteners",
@@ -394,7 +395,7 @@
   },
   {
    "poz": "60",
-   "eid": "FLC019007016",
+   "pn": "FLC019007016",
    "name": "WASHER D.19/7X1.6",
    "qty": 2,
    "node": "fasteners",
@@ -402,7 +403,7 @@
   },
   {
    "poz": "62",
-   "eid": "KFZ00050",
+   "pn": "KFZ00050",
    "name": "STRIP PACKING",
    "qty": 11,
    "node": "seals",
@@ -410,7 +411,7 @@
   },
   {
    "poz": "63",
-   "eid": "KFZ00050",
+   "pn": "KFZ00050",
    "name": "STRIP PACKING",
    "qty": 11,
    "node": "seals",
@@ -418,7 +419,7 @@
   },
   {
    "poz": "64",
-   "eid": "RVR20549",
+   "pn": "RVR20549",
    "name": "SCREW",
    "qty": 10,
    "node": "fasteners",
@@ -426,7 +427,7 @@
   },
   {
    "poz": "65",
-   "eid": "SMR64787",
+   "pn": "SMR64787",
    "name": "LOCK PLATE",
    "qty": 10,
    "node": null,
@@ -434,7 +435,7 @@
   },
   {
    "poz": "66",
-   "eid": "RVR20180",
+   "pn": "RVR20180",
    "name": "SCREW",
    "qty": 10,
    "node": "fasteners",
@@ -442,7 +443,7 @@
   },
   {
    "poz": "67",
-   "eid": "SMR44648",
+   "pn": "SMR44648",
    "name": "SEAL END",
    "qty": 10,
    "node": "seals",
@@ -450,7 +451,7 @@
   },
   {
    "poz": "68",
-   "eid": "FFF14619",
+   "pn": "FFF14619",
    "name": "NUT 3/4-10UNC",
    "qty": 20,
    "node": "fasteners",
@@ -458,7 +459,7 @@
   },
   {
    "poz": "69",
-   "eid": "SMR50011",
+   "pn": "SMR50011",
    "name": "SAFETY PLATE",
    "qty": 20,
    "node": null,
@@ -466,7 +467,7 @@
   },
   {
    "poz": "71",
-   "eid": "GTG19076",
+   "pn": "GTG19076",
    "name": "SCREW 3/4-10UNCX3",
    "qty": 6,
    "node": "fasteners",
@@ -474,7 +475,7 @@
   },
   {
    "poz": "74",
-   "eid": "GTG15076",
+   "pn": "GTG15076",
    "name": "SCREW 5/8-11UNCX3",
    "qty": 12,
    "node": "fasteners",
@@ -482,7 +483,7 @@
   },
   {
    "poz": "75",
-   "eid": "GTG15076",
+   "pn": "GTG15076",
    "name": "SCREW 5/8-11UNCX3",
    "qty": 42,
    "node": "fasteners",
@@ -490,7 +491,7 @@
   },
   {
    "poz": "76",
-   "eid": "FFE14615",
+   "pn": "FFE14615",
    "name": "NUT 5/8-11UNC",
    "qty": 12,
    "node": "fasteners",
@@ -498,7 +499,7 @@
   },
   {
    "poz": "78",
-   "eid": "FGC53615",
+   "pn": "FGC53615",
    "name": "NUT 5/8-11UNC",
    "qty": 42,
    "node": "fasteners",
@@ -506,7 +507,7 @@
   },
   {
    "poz": "79",
-   "eid": "FGC53619",
+   "pn": "FGC53619",
    "name": "NUT 3/4-10UNC",
    "qty": 6,
    "node": "fasteners",
@@ -514,7 +515,7 @@
   },
   {
    "poz": "80",
-   "eid": "SMP20938",
+   "pn": "SMP20938",
    "name": "RETAINING RING",
    "qty": 30,
    "node": "fasteners",
@@ -522,7 +523,7 @@
   },
   {
    "poz": "81",
-   "eid": "RFR330060000",
+   "pn": "RFR330060000",
    "name": "HELI-COIL 5/8-11UNC X1",
    "qty": 80,
    "node": null,
@@ -530,7 +531,7 @@
   },
   {
    "poz": "82",
-   "eid": "RPQ47535",
+   "pn": "RPQ47535",
    "name": "SEAL PIN",
    "qty": 36,
    "node": "seals",
@@ -538,7 +539,7 @@
   },
   {
    "poz": "83",
-   "eid": "SMU45785",
+   "pn": "SMU45785",
    "name": "KEY",
    "qty": 2,
    "node": null,
@@ -546,7 +547,7 @@
   },
   {
    "poz": "84",
-   "eid": "SMU45786",
+   "pn": "SMU45786",
    "name": "KEY",
    "qty": 34,
    "node": null,
@@ -554,7 +555,7 @@
   },
   {
    "poz": "85",
-   "eid": "RPQ01843",
+   "pn": "RPQ01843",
    "name": "DOWEL PIN",
    "qty": 30,
    "node": null,
@@ -562,7 +563,7 @@
   },
   {
    "poz": "86",
-   "eid": "SMU45788",
+   "pn": "SMU45788",
    "name": "KEY",
    "qty": 2,
    "node": null,
@@ -570,7 +571,7 @@
   },
   {
    "poz": "87",
-   "eid": "SMU45789",
+   "pn": "SMU45789",
    "name": "KEY",
    "qty": 28,
    "node": null,
@@ -578,7 +579,7 @@
   },
   {
    "poz": "88",
-   "eid": "SMO1513600",
+   "pn": "SMO1513600",
    "name": "OIL DEFLECTOR FOR BEARING #1",
    "qty": 1,
    "node": "rotor",
@@ -586,7 +587,7 @@
   },
   {
    "poz": "89",
-   "eid": "SMS23188",
+   "pn": "SMS23188",
    "name": "SEAL OIL 2/2",
    "qty": 1,
    "node": "seals",
@@ -594,7 +595,7 @@
   },
   {
    "poz": "90",
-   "eid": "RPP02259",
+   "pn": "RPP02259",
    "name": "LOCK PIN",
    "qty": 1,
    "node": null,
@@ -602,7 +603,7 @@
   },
   {
    "poz": "91",
-   "eid": "FJV06031",
+   "pn": "FJV06031",
    "name": "PIN 1/4X1 1/4",
    "qty": 2,
    "node": null,
@@ -610,7 +611,7 @@
   },
   {
    "poz": "92",
-   "eid": "FGD34625",
+   "pn": "FGD34625",
    "name": "NUT 1-8UNC",
    "qty": 2,
    "node": "fasteners",
@@ -618,7 +619,7 @@
   },
   {
    "poz": "93",
-   "eid": "FLC063027040",
+   "pn": "FLC063027040",
    "name": "WASHER D.63/27X4",
    "qty": 2,
    "node": "fasteners",
@@ -626,7 +627,7 @@
   },
   {
    "poz": "94",
-   "eid": "GFU06019",
+   "pn": "GFU06019",
    "name": "SCREW 1/4-20UNCX3/4",
    "qty": 2,
    "node": "fasteners",
@@ -634,7 +635,7 @@
   },
   {
    "poz": "95",
-   "eid": "SMQ33902",
+   "pn": "SMQ33902",
    "name": "PIN",
    "qty": 1,
    "node": null,
@@ -642,7 +643,7 @@
   },
   {
    "poz": "96",
-   "eid": "FJV06063",
+   "pn": "FJV06063",
    "name": "PIN 1/4X2 1/2",
    "qty": 2,
    "node": null,
@@ -650,7 +651,7 @@
   },
   {
    "poz": "97",
-   "eid": "GFU06044",
+   "pn": "GFU06044",
    "name": "SCREW 1/4-20UNCX1 3/4",
    "qty": 2,
    "node": "fasteners",
@@ -658,7 +659,7 @@
   },
   {
    "poz": "98",
-   "eid": "SMP56006",
+   "pn": "SMP56006",
    "name": "AIR SEAL",
    "qty": 1,
    "node": "seals",
@@ -666,7 +667,7 @@
   },
   {
    "poz": "99",
-   "eid": "SMO44774",
+   "pn": "SMO44774",
    "name": "OIL SEAL RING",
    "qty": 1,
    "node": "seals",
@@ -674,7 +675,7 @@
   },
   {
    "poz": "100",
-   "eid": "RFR331010000",
+   "pn": "RFR331010000",
    "name": "HELI-COIL 3/8-16UNCX2DA",
    "qty": 10,
    "node": null,
@@ -682,7 +683,7 @@
   },
   {
    "poz": "101",
-   "eid": "RFR331040000",
+   "pn": "RFR331040000",
    "name": "HELI-COIL 3/8-16UNCX1,5D",
    "qty": 2,
    "node": null,
@@ -690,7 +691,7 @@
   },
   {
    "poz": "102",
-   "eid": "RFR331030000",
+   "pn": "RFR331030000",
    "name": "HELI-COIL 1/4-20UNCX2DA",
    "qty": 5,
    "node": null,
@@ -698,7 +699,7 @@
   },
   {
    "poz": "103",
-   "eid": "RPQ02578",
+   "pn": "RPQ02578",
    "name": "DOWEL PIN",
    "qty": 2,
    "node": null,
@@ -706,7 +707,7 @@
   },
   {
    "poz": "104",
-   "eid": "RPP38364",
+   "pn": "RPP38364",
    "name": "SPECIAL TIE ROD",
    "qty": 2,
    "node": null,
@@ -714,7 +715,7 @@
   },
   {
    "poz": "105",
-   "eid": "GFU19063",
+   "pn": "GFU19063",
    "name": "SCREW 3/4-10UNCX2 1/2",
    "qty": 5,
    "node": "fasteners",
@@ -722,7 +723,7 @@
   },
   {
    "poz": "106",
-   "eid": "GFS31101",
+   "pn": "GFS31101",
    "name": "SCREW 1 1/4-8UNX4",
    "qty": 2,
    "node": "fasteners",
@@ -730,7 +731,7 @@
   },
   {
    "poz": "107",
-   "eid": "GFU25139",
+   "pn": "GFU25139",
    "name": "SCREW 1-8UNCX5 1/2",
    "qty": 2,
    "node": "fasteners",
@@ -738,7 +739,7 @@
   },
   {
    "poz": "108",
-   "eid": "GFU25114",
+   "pn": "GFU25114",
    "name": "SCREW 1-8UNCX4 1/2",
    "qty": 2,
    "node": "fasteners",
@@ -746,7 +747,7 @@
   },
   {
    "poz": "109",
-   "eid": "GFS31127",
+   "pn": "GFS31127",
    "name": "SCREW 1 1/4-8UNX5",
    "qty": 2,
    "node": "fasteners",
@@ -754,7 +755,7 @@
   },
   {
    "poz": "110",
-   "eid": "FGN16531",
+   "pn": "FGN16531",
    "name": "NUT1 1/4-8UNC",
    "qty": 4,
    "node": null,
@@ -762,7 +763,7 @@
   },
   {
    "poz": "111",
-   "eid": "GTG31190",
+   "pn": "GTG31190",
    "name": "SCREW 1 1/4-8UNX7 1/2",
    "qty": 2,
    "node": "fasteners",
@@ -770,7 +771,7 @@
   },
   {
    "poz": "112",
-   "eid": "SMR50017",
+   "pn": "SMR50017",
    "name": "SAFETY PLATE",
    "qty": 2,
    "node": null,
@@ -778,7 +779,7 @@
   },
   {
    "poz": "113",
-   "eid": "GQF19127",
+   "pn": "GQF19127",
    "name": "SCREW 3/4-10UNCX5",
    "qty": 2,
    "node": "fasteners",
@@ -786,7 +787,7 @@
   },
   {
    "poz": "114",
-   "eid": "RVO21186",
+   "pn": "RVO21186",
    "name": "SPECIAL SCREW",
    "qty": 2,
    "node": "fasteners",
@@ -794,7 +795,7 @@
   },
   {
    "poz": "115",
-   "eid": "FJK09050",
+   "pn": "FJK09050",
    "name": "PIN 3/8X2",
    "qty": 2,
    "node": null,
@@ -802,7 +803,7 @@
   },
   {
    "poz": "116",
-   "eid": "HEK12057",
+   "pn": "HEK12057",
    "name": "SCREW 1/2-13UNCX2 1/4",
    "qty": 2,
    "node": "fasteners",
@@ -810,7 +811,7 @@
   },
   {
    "poz": "117",
-   "eid": "GRA25095",
+   "pn": "GRA25095",
    "name": "SCREW 1-8UNCX3 3/4",
    "qty": 6,
    "node": "fasteners",
@@ -818,7 +819,7 @@
   },
   {
    "poz": "118",
-   "eid": "GRA15038",
+   "pn": "GRA15038",
    "name": "SCREW 5/8-11UNCX1 1/2",
    "qty": 3,
    "node": "fasteners",
@@ -826,7 +827,7 @@
   },
   {
    "poz": "119",
-   "eid": "SMR50010",
+   "pn": "SMR50010",
    "name": "SAFETY PLATE",
    "qty": 3,
    "node": null,
@@ -834,7 +835,7 @@
   },
   {
    "poz": "120",
-   "eid": "RPQ02659",
+   "pn": "RPQ02659",
    "name": "DOWEL PIN",
    "qty": 2,
    "node": null,
@@ -842,7 +843,7 @@
   },
   {
    "poz": "121",
-   "eid": "RFR330000000",
+   "pn": "RFR330000000",
    "name": "HELI-COIL 1-8UNCX2DA",
    "qty": 3,
    "node": null,
@@ -850,7 +851,7 @@
   },
   {
    "poz": "122",
-   "eid": "SMO37790",
+   "pn": "SMO37790",
    "name": "JOURNAL BEARING",
    "qty": 1,
    "node": "rotor.journal-bearings",
@@ -858,7 +859,7 @@
   },
   {
    "poz": "123",
-   "eid": "RFR330950000",
+   "pn": "RFR330950000",
    "name": "HELI-COIL 1/2-13UNCX1,5",
    "qty": 3,
    "node": null,
@@ -866,7 +867,7 @@
   },
   {
    "poz": "124",
-   "eid": "FGC53619",
+   "pn": "FGC53619",
    "name": "NUT 3/4-10UNC",
    "qty": 2,
    "node": "fasteners",
@@ -874,7 +875,7 @@
   },
   {
    "poz": "125",
-   "eid": "SMR50011",
+   "pn": "SMR50011",
    "name": "SAFETY PLATE",
    "qty": 2,
    "node": null,
@@ -882,7 +883,7 @@
   },
   {
    "poz": "126",
-   "eid": "GTG19088",
+   "pn": "GTG19088",
    "name": "SCREW 3/4-10UNCX3 1/2",
    "qty": 2,
    "node": "fasteners",
@@ -890,7 +891,7 @@
   },
   {
    "poz": "127",
-   "eid": "FGJ31619",
+   "pn": "FGJ31619",
    "name": "NUT 3/4-10UNC",
    "qty": 2,
    "node": "fasteners",
@@ -898,7 +899,7 @@
   },
   {
    "poz": "128",
-   "eid": "RPQ32597",
+   "pn": "RPQ32597",
    "name": "STUD-BOLT",
    "qty": 2,
    "node": "fasteners",
@@ -906,7 +907,7 @@
   },
   {
    "poz": "129",
-   "eid": "FFF066190450",
+   "pn": "FFF066190450",
    "name": "NUT 3/4-10UNC",
    "qty": 2,
    "node": "fasteners",
@@ -914,7 +915,7 @@
   },
   {
    "poz": "130",
-   "eid": "RPQ32509",
+   "pn": "RPQ32509",
    "name": "STUD-BOLT",
    "qty": 2,
    "node": "fasteners",
@@ -922,7 +923,7 @@
   },
   {
    "poz": "131",
-   "eid": "GTG19069",
+   "pn": "GTG19069",
    "name": "SCREW 3/4-10UNCX2 3/4",
    "qty": 17,
    "node": "fasteners",
@@ -930,7 +931,7 @@
   },
   {
    "poz": "132",
-   "eid": "RPQ02261",
+   "pn": "RPQ02261",
    "name": "PIN",
    "qty": 2,
    "node": null,
@@ -938,7 +939,7 @@
   },
   {
    "poz": "134",
-   "eid": "RPQ38513",
+   "pn": "RPQ38513",
    "name": "STUD BOLT",
    "qty": 4,
    "node": "fasteners",
@@ -946,7 +947,7 @@
   },
   {
    "poz": "135",
-   "eid": "GRW12019",
+   "pn": "GRW12019",
    "name": "SCREW 1/2-20UNFX3/4",
    "qty": 2,
    "node": "fasteners",
@@ -954,7 +955,7 @@
   },
   {
    "poz": "136",
-   "eid": "GTG31292",
+   "pn": "GTG31292",
    "name": "SCREW 1 1/4-8UNX11 1/2",
    "qty": 2,
    "node": "fasteners",
@@ -962,7 +963,7 @@
   },
   {
    "poz": "137",
-   "eid": "GTG31133",
+   "pn": "GTG31133",
    "name": "SCREW 1 1/4-8UNX5 1/4",
    "qty": 20,
    "node": "fasteners",
@@ -970,7 +971,7 @@
   },
   {
    "poz": "138",
-   "eid": "GFY31088",
+   "pn": "GFY31088",
    "name": "SCREW 1 1/4-8UNX3 1/2",
    "qty": 32,
    "node": "fasteners",
@@ -978,7 +979,7 @@
   },
   {
    "poz": "139",
-   "eid": "FFF14531",
+   "pn": "FFF14531",
    "name": "NUT 1 1/4-8UNC",
    "qty": 3,
    "node": "fasteners",
@@ -986,7 +987,7 @@
   },
   {
    "poz": "140",
-   "eid": "RPQ02804",
+   "pn": "RPQ02804",
    "name": "DOWEL PIN",
    "qty": 4,
    "node": null,
@@ -994,7 +995,7 @@
   },
   {
    "poz": "141",
-   "eid": "RFR331180000",
+   "pn": "RFR331180000",
    "name": "HELI-COIL 1 1/4-8UN X1",
    "qty": 7,
    "node": null,
@@ -1002,7 +1003,7 @@
   },
   {
    "poz": "142",
-   "eid": "GFY31127",
+   "pn": "GFY31127",
    "name": "SCREW 1 1/4-8UNX5",
    "qty": 4,
    "node": "fasteners",
@@ -1010,7 +1011,7 @@
   },
   {
    "poz": "143",
-   "eid": "GTG19063",
+   "pn": "GTG19063",
    "name": "SCREW 3/4-10UNCX2 1/2",
    "qty": 4,
    "node": "fasteners",
@@ -1018,7 +1019,7 @@
   },
   {
    "poz": "144",
-   "eid": "RFR330950000",
+   "pn": "RFR330950000",
    "name": "HELI-COIL 1/2-13UNCX1,5",
    "qty": 2,
    "node": null,
@@ -1026,7 +1027,7 @@
   },
   {
    "poz": "145",
-   "eid": "HEH12076",
+   "pn": "HEH12076",
    "name": "SCREW 1/2-13UNCX3",
    "qty": 4,
    "node": "fasteners",
@@ -1034,7 +1035,7 @@
   },
   {
    "poz": "146",
-   "eid": "RPQ02646",
+   "pn": "RPQ02646",
    "name": "DOWEL PIN",
    "qty": 4,
    "node": null,
@@ -1042,7 +1043,7 @@
   },
   {
    "poz": "147",
-   "eid": "RFR330030000",
+   "pn": "RFR330030000",
    "name": "HELI-COIL 3/4-10UNCX1",
    "qty": 4,
    "node": null,
@@ -1050,7 +1051,7 @@
   },
   {
    "poz": "148",
-   "eid": "RFR331060000",
+   "pn": "RFR331060000",
    "name": "HELI-COIL 1/2-13UNC X2",
    "qty": 4,
    "node": null,
@@ -1058,7 +1059,7 @@
   },
   {
    "poz": "149",
-   "eid": "RPQ21079",
+   "pn": "RPQ21079",
    "name": "DOWEL PIN",
    "qty": 8,
    "node": null,
@@ -1066,7 +1067,7 @@
   },
   {
    "poz": "150",
-   "eid": "HEH09044",
+   "pn": "HEH09044",
    "name": "SCREW_3/8-16UNC 1 3/4",
    "qty": 36,
    "node": "fasteners",
@@ -1074,7 +1075,7 @@
   },
   {
    "poz": "151",
-   "eid": "RPQ35660",
+   "pn": "RPQ35660",
    "name": "STUD-BOLT",
    "qty": 2,
    "node": "fasteners",
@@ -1082,7 +1083,7 @@
   },
   {
    "poz": "152",
-   "eid": "RDQ01327",
+   "pn": "RDQ01327",
    "name": "SELF-LOCKING NUT 1-8UNC",
    "qty": 4,
    "node": "fasteners",
@@ -1090,7 +1091,7 @@
   },
   {
    "poz": "153",
-   "eid": "HEK06012",
+   "pn": "HEK06012",
    "name": "SCREW 1/4-20UNCX1/2",
    "qty": 64,
    "node": "fasteners",
@@ -1098,7 +1099,7 @@
   },
   {
    "poz": "154",
-   "eid": "RMO19605",
+   "pn": "RMO19605",
    "name": "SPRING CUP",
    "qty": 64,
    "node": null,
@@ -1106,7 +1107,7 @@
   },
   {
    "poz": "155",
-   "eid": "RPQ47510",
+   "pn": "RPQ47510",
    "name": "DOWEL PIN",
    "qty": 32,
    "node": null,
@@ -1114,7 +1115,7 @@
   },
   {
    "poz": "156",
-   "eid": "GQF09012",
+   "pn": "GQF09012",
    "name": "SCREW 3/8-16UNCX1/2",
    "qty": 30,
    "node": "fasteners",
@@ -1122,7 +1123,7 @@
   },
   {
    "poz": "157",
-   "eid": "FNP03105",
+   "pn": "FNP03105",
    "name": "WASHER D.10.5",
    "qty": 30,
    "node": "fasteners",
@@ -1130,7 +1131,7 @@
   },
   {
    "poz": "158",
-   "eid": "SMP21483",
+   "pn": "SMP21483",
    "name": "SHIM",
    "qty": 138,
    "node": "fasteners",
@@ -1138,7 +1139,7 @@
   },
   {
    "poz": "159",
-   "eid": "HEH09031",
+   "pn": "HEH09031",
    "name": "SCREW 3/8-16UNCX1 1/4",
    "qty": 32,
    "node": "fasteners",
@@ -1146,7 +1147,7 @@
   },
   {
    "poz": "160",
-   "eid": "FLA025007016",
+   "pn": "FLA025007016",
    "name": "WASHER D.25/7X1.6",
    "qty": 64,
    "node": "fasteners",
@@ -1154,7 +1155,7 @@
   },
   {
    "poz": "161",
-   "eid": "SMT5954716",
+   "pn": "SMT5954716",
    "name": "WASHER, THRUST",
    "qty": 64,
    "node": "fasteners",
@@ -1162,7 +1163,7 @@
   },
   {
    "poz": "162",
-   "eid": "RPQ06298",
+   "pn": "RPQ06298",
    "name": "SPECIAL PIN",
    "qty": 2,
    "node": null,
@@ -1170,7 +1171,7 @@
   },
   {
    "poz": "163",
-   "eid": "SMO1513400",
+   "pn": "SMO1513400",
    "name": "OIL DEFLECTOR",
    "qty": 1,
    "node": null,
@@ -1178,7 +1179,7 @@
   },
   {
    "poz": "164",
-   "eid": "HRQ060190003",
+   "pn": "HRQ060190003",
    "name": "SCREW 1/4-20UNCX3/4",
    "qty": 1,
    "node": "fasteners",
@@ -1186,7 +1187,7 @@
   },
   {
    "poz": "165",
-   "eid": "RPQ02188",
+   "pn": "RPQ02188",
    "name": "DOWEL PIN",
    "qty": 2,
    "node": null,
@@ -1194,7 +1195,7 @@
   },
   {
    "poz": "166",
-   "eid": "GTG19057",
+   "pn": "GTG19057",
    "name": "SCREW 3/4-10UNCX2 1/4",
    "qty": 10,
    "node": "fasteners",
@@ -1202,7 +1203,7 @@
   },
   {
    "poz": "167",
-   "eid": "GTG19057",
+   "pn": "GTG19057",
    "name": "SCREW 3/4-10UNCX2 1/4",
    "qty": 24,
    "node": "fasteners",
@@ -1210,7 +1211,7 @@
   },
   {
    "poz": "168",
-   "eid": "RFR330000000",
+   "pn": "RFR330000000",
    "name": "HELI-COIL 1-8UNCX2DA",
    "qty": 4,
    "node": null,
@@ -1218,7 +1219,7 @@
   },
   {
    "poz": "169",
-   "eid": "HEH25139",
+   "pn": "HEH25139",
    "name": "SCREW 1-8UNCX5 1/2",
    "qty": 4,
    "node": "fasteners",
@@ -1226,7 +1227,7 @@
   },
   {
    "poz": "170",
-   "eid": "RPP02651",
+   "pn": "RPP02651",
    "name": "PIN",
    "qty": 2,
    "node": null,
@@ -1234,7 +1235,7 @@
   },
   {
    "poz": "171",
-   "eid": "GTG12076",
+   "pn": "GTG12076",
    "name": "SCREW 1/2-13UNCX3",
    "qty": 2,
    "node": "fasteners",
@@ -1242,7 +1243,7 @@
   },
   {
    "poz": "172",
-   "eid": "FPD06040",
+   "pn": "FPD06040",
    "name": "PIN 6X40",
    "qty": 1,
    "node": null,
@@ -1250,7 +1251,7 @@
   },
   {
    "poz": "173",
-   "eid": "HQA090880453",
+   "pn": "HQA090880453",
    "name": "SCREW 3/8-16UNCX3 1/2",
    "qty": 1,
    "node": "fasteners",
@@ -1258,7 +1259,7 @@
   },
   {
    "poz": "174",
-   "eid": "HQA091010453",
+   "pn": "HQA091010453",
    "name": "SCREW 3/8-16UNCX4",
    "qty": 3,
    "node": "fasteners",
@@ -1266,7 +1267,7 @@
   },
   {
    "poz": "175",
-   "eid": "HEH06025",
+   "pn": "HEH06025",
    "name": "SCREW 1/4-20UNCX1",
    "qty": 4,
    "node": "fasteners",
@@ -1274,7 +1275,7 @@
   },
   {
    "poz": "176",
-   "eid": "SMO37790",
+   "pn": "SMO37790",
    "name": "JOURNAL BEARING",
    "qty": 1,
    "node": "rotor.journal-bearings",
@@ -1282,7 +1283,7 @@
   },
   {
    "poz": "177",
-   "eid": "RFR330950000",
+   "pn": "RFR330950000",
    "name": "HELI-COIL 1/2-13UNCX1,5",
    "qty": 1,
    "node": null,
@@ -1290,7 +1291,7 @@
   },
   {
    "poz": "178",
-   "eid": "RPQ02646",
+   "pn": "RPQ02646",
    "name": "DOWEL PIN",
    "qty": 8,
    "node": null,
@@ -1298,7 +1299,7 @@
   },
   {
    "poz": "179",
-   "eid": "RFR330030000",
+   "pn": "RFR330030000",
    "name": "HELI-COIL 3/4-10UNCX1",
    "qty": 24,
    "node": null,
@@ -1306,7 +1307,7 @@
   },
   {
    "poz": "180",
-   "eid": "RFR330060000",
+   "pn": "RFR330060000",
    "name": "HELI-COIL 5/8-11UNC X1",
    "qty": 8,
    "node": null,
@@ -1314,7 +1315,7 @@
   },
   {
    "poz": "182",
-   "eid": "RCO36183",
+   "pn": "RCO36183",
    "name": "UNLOAD THRUST BEARING",
    "qty": 1,
    "node": "rotor.thrust-bearing",
@@ -1322,7 +1323,7 @@
   },
   {
    "poz": "183",
-   "eid": "RCO36182",
+   "pn": "RCO36182",
    "name": "LOAD THRUST BEARING",
    "qty": 1,
    "node": "rotor.thrust-bearing",
@@ -1330,7 +1331,7 @@
   },
   {
    "poz": "184",
-   "eid": "SMP22533",
+   "pn": "SMP22533",
    "name": "SHIM",
    "qty": 1,
    "node": "fasteners",
@@ -1338,7 +1339,7 @@
   },
   {
    "poz": "185",
-   "eid": "SMP22534",
+   "pn": "SMP22534",
    "name": "SHIM",
    "qty": 1,
    "node": "fasteners",
@@ -1346,7 +1347,7 @@
   },
   {
    "poz": "186",
-   "eid": "GRA19063",
+   "pn": "GRA19063",
    "name": "SCREW 3/4-10UNCX2 1/2",
    "qty": 9,
    "node": "fasteners",
@@ -1354,7 +1355,7 @@
   },
   {
    "poz": "187",
-   "eid": "GFU19127",
+   "pn": "GFU19127",
    "name": "SCREW 3/4-10UNCX5",
    "qty": 2,
    "node": "fasteners",
@@ -1362,7 +1363,7 @@
   },
   {
    "poz": "188",
-   "eid": "HEH25069",
+   "pn": "HEH25069",
    "name": "SCREW 1-8UNCX2 3/4",
    "qty": 14,
    "node": "fasteners",
@@ -1370,7 +1371,7 @@
   },
   {
    "poz": "189",
-   "eid": "RPQ02659",
+   "pn": "RPQ02659",
    "name": "DOWEL PIN",
    "qty": 2,
    "node": null,
@@ -1378,7 +1379,7 @@
   },
   {
    "poz": "190",
-   "eid": "RPQ02662",
+   "pn": "RPQ02662",
    "name": "DOWEL PIN",
    "qty": 2,
    "node": null,
@@ -1386,7 +1387,7 @@
   },
   {
    "poz": "191",
-   "eid": "GRA19120",
+   "pn": "GRA19120",
    "name": "SCREW 3/4-10UNCX4 3/4",
    "qty": 8,
    "node": "fasteners",
@@ -1394,7 +1395,7 @@
   },
   {
    "poz": "192",
-   "eid": "RPQ02218",
+   "pn": "RPQ02218",
    "name": "DOWEL PIN",
    "qty": 3,
    "node": null,
@@ -1402,7 +1403,7 @@
   },
   {
    "poz": "193",
-   "eid": "RPQ06294",
+   "pn": "RPQ06294",
    "name": "DOWEL PIN",
    "qty": 3,
    "node": null,
@@ -1410,7 +1411,7 @@
   },
   {
    "poz": "194",
-   "eid": "GFY38152",
+   "pn": "GFY38152",
    "name": "SCREW 1 1/2-8UNX6",
    "qty": 26,
    "node": "fasteners",
@@ -1418,7 +1419,7 @@
   },
   {
    "poz": "195",
-   "eid": "GTG25063",
+   "pn": "GTG25063",
    "name": "SCREW 1-8UNCX2 1/2",
    "qty": 8,
    "node": "fasteners",
@@ -1426,7 +1427,7 @@
   },
   {
    "poz": "196",
-   "eid": "GTG19088",
+   "pn": "GTG19088",
    "name": "SCREW 3/4-10UNCX3 1/2",
    "qty": 15,
    "node": "fasteners",
@@ -1434,7 +1435,7 @@
   },
   {
    "poz": "197",
-   "eid": "KFZ217550794",
+   "pn": "KFZ217550794",
    "name": "GASKET",
    "qty": 1,
    "node": "seals",
@@ -1442,7 +1443,7 @@
   },
   {
    "poz": "198",
-   "eid": "KCX027921920",
+   "pn": "KCX027921920",
    "name": "GASKET 8-150",
    "qty": 2,
    "node": "seals",
@@ -1450,7 +1451,7 @@
   },
   {
    "poz": "200",
-   "eid": "KFZ269830844",
+   "pn": "KFZ269830844",
    "name": "SPIROMETAL GASKET",
    "qty": 18,
    "node": "seals",
@@ -1458,7 +1459,7 @@
   },
   {
    "poz": "201",
-   "eid": "KFZ269830844",
+   "pn": "KFZ269830844",
    "name": "SPIROMETAL GASKET",
    "qty": 3,
    "node": "seals",
@@ -1466,7 +1467,7 @@
   },
   {
    "poz": "202",
-   "eid": "KFZ269880844",
+   "pn": "KFZ269880844",
    "name": "GASKET 3-600",
    "qty": 1,
    "node": "seals",
@@ -1474,7 +1475,7 @@
   },
   {
    "poz": "203",
-   "eid": "KFZ269880844",
+   "pn": "KFZ269880844",
    "name": "GASKET 3-600",
    "qty": 3,
    "node": "seals",
@@ -1482,7 +1483,7 @@
   },
   {
    "poz": "204",
-   "eid": "KFZ269880844",
+   "pn": "KFZ269880844",
    "name": "GASKET 3-600",
    "qty": 1,
    "node": "seals",
@@ -1490,7 +1491,7 @@
   },
   {
    "poz": "205",
-   "eid": "SMP64612",
+   "pn": "SMP64612",
    "name": "LOCKING PLATE",
    "qty": 16,
    "node": null,
@@ -1498,7 +1499,7 @@
   },
   {
    "poz": "206",
-   "eid": "GQF15038",
+   "pn": "GQF15038",
    "name": "SCREW 5/8-11UNCX1 1/2",
    "qty": 32,
    "node": "fasteners",
@@ -1506,7 +1507,7 @@
   },
   {
    "poz": "209",
-   "eid": "FLC025010016",
+   "pn": "FLC025010016",
    "name": "WASHER D.25,5/10,3X1,6",
    "qty": 30,
    "node": "fasteners",
@@ -1514,7 +1515,7 @@
   },
   {
    "poz": "211",
-   "eid": "FLA057013040",
+   "pn": "FLA057013040",
    "name": "WASHER D.57/13X4",
    "qty": 23,
    "node": "fasteners",
@@ -1522,7 +1523,7 @@
   },
   {
    "poz": "213",
-   "eid": "FNP031300450",
+   "pn": "FNP031300450",
    "name": "WASHER D.13",
    "qty": 23,
    "node": "fasteners",
@@ -1530,7 +1531,7 @@
   },
   {
    "poz": "214",
-   "eid": "KFZ303740684",
+   "pn": "KFZ303740684",
    "name": "GASKET",
    "qty": 1,
    "node": "seals",
@@ -1538,7 +1539,7 @@
   },
   {
    "poz": "216",
-   "eid": "FLC057016040",
+   "pn": "FLC057016040",
    "name": "WASHER D.57/16X4",
    "qty": 17,
    "node": "fasteners",
@@ -1546,7 +1547,7 @@
   },
   {
    "poz": "217",
-   "eid": "KFZ190660684",
+   "pn": "KFZ190660684",
    "name": "GASKET",
    "qty": 56,
    "node": "seals",
@@ -1554,7 +1555,7 @@
   },
   {
    "poz": "218",
-   "eid": "KFZ238920684",
+   "pn": "KFZ238920684",
    "name": "GASKET",
    "qty": 1,
    "node": "seals",
@@ -1562,7 +1563,7 @@
   },
   {
    "poz": "219",
-   "eid": "KFZ238920684",
+   "pn": "KFZ238920684",
    "name": "GASKET",
    "qty": 1,
    "node": "seals",
@@ -1570,7 +1571,7 @@
   },
   {
    "poz": "221",
-   "eid": "RRP41490",
+   "pn": "RRP41490",
    "name": "WASHER D.I.16",
    "qty": 21,
    "node": "fasteners",
@@ -1578,7 +1579,7 @@
   },
   {
    "poz": "222",
-   "eid": "KFZ303950604",
+   "pn": "KFZ303950604",
    "name": "GASKET",
    "qty": 2,
    "node": "seals",
@@ -1586,7 +1587,7 @@
   },
   {
    "poz": "223",
-   "eid": "FNC011500450",
+   "pn": "FNC011500450",
    "name": "WASHER D.15",
    "qty": 31,
    "node": "fasteners",
@@ -1594,7 +1595,7 @@
   },
   {
    "poz": "225",
-   "eid": "RRP41491",
+   "pn": "RRP41491",
    "name": "WASHER D.16",
    "qty": 10,
    "node": "fasteners",
@@ -1602,7 +1603,7 @@
   },
   {
    "poz": "227",
-   "eid": "SMR56146",
+   "pn": "SMR56146",
    "name": "SEAL SEGMENT",
    "qty": 28,
    "node": "seals",
@@ -1610,7 +1611,7 @@
   },
   {
    "poz": "228",
-   "eid": "KFZ237280044",
+   "pn": "KFZ237280044",
    "name": "GASKET (SPLIT IN 4 SEGMENT)",
    "qty": 2,
    "node": "seals",
@@ -1618,7 +1619,7 @@
   },
   {
    "poz": "233",
-   "eid": "FLC031014025",
+   "pn": "FLC031014025",
    "name": "WASHER D.31/14X2.5",
    "qty": 19,
    "node": "fasteners",
@@ -1626,7 +1627,7 @@
   },
   {
    "poz": "234",
-   "eid": "MAN002262",
+   "pn": "MAN002262",
    "name": "FIBER CERAMIC TAPE",
    "qty": 1,
    "node": null,
