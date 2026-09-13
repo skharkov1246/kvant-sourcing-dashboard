@@ -28,6 +28,7 @@ SHIP = ROOT / "gt/data/ship_energoseti.json"
 SWEEP = ROOT / "gt/data/ship_sweep.json"
 RECHECK = ROOT / "gt/data/ship_recheck.json"
 BLOCKED = ROOT / "gt/data/ship_blocked.json"
+FX = ROOT / "gt/data/fx_rates.json"
 SELLERS = ROOT / "gt/data/ship_sellers.json"
 DST = ROOT / "gt/data/ship_lukoil.json"
 
@@ -45,6 +46,36 @@ ORG_TAIL = re.compile(
     r"Co\.?|Corp\.?|AG|Limited|Company|Pvt\.?|ООО|АО|ЗАО)\b\.?", re.I)
 EMAIL = re.compile(r"[\w.+-]+@[\w-]+\.[\w.]{2,}")
 PHONE = re.compile(r"\+\d[\d\-\s()]{7,}\d")
+
+
+def fx_rates() -> dict:
+    """Курсы к доллару на дату выгрузки. Без них суммы врут кратно."""
+    if not FX.exists():
+        return {"USD": 1.0}
+    return json.loads(FX.read_text()).get("rates", {"USD": 1.0})
+
+
+RATES = fx_rates()
+
+
+def to_usd(price, currency: str):
+    """Цена в долларах. None, если валюта неизвестна — молча считать её долларом нельзя.
+
+    Разбор 13.09.2026: unit_price не смотрел на валюту вовсе, и в сумму закупки
+    попадали 12 642 CZK как 12 642 USD, 7 422 RUB как 7 422 USD. По 35 твёрдым
+    строкам из 85 цена была не в долларах — итог завышался примерно на треть.
+    """
+    if price in (None, ""):
+        return None
+    try:
+        p = float(price)
+    except (TypeError, ValueError):
+        return None
+    cur = (s(currency) or "USD").upper()
+    rate = RATES.get(cur)
+    if not rate:
+        return None
+    return p / rate
 
 
 def clean_name(name: str) -> str:
@@ -202,6 +233,7 @@ def blank(pn: str) -> dict:
         "lead_time": "", "price": None, "currency": "USD", "pack_qty": 1,
         "covers_qty": "unknown", "real_maker": "", "real_pn": "", "substitute": "",
         "note": "", "checked_by": "", "sellers": [],
+        "price_usd": None, "unit_price_usd": None,
     }
 
 
@@ -465,6 +497,23 @@ def main() -> int:
                 sl["emails"], sl["phones"] = [], []
                 sl["site"] = sl["url"]
 
+    # цена в долларах — ОДИН раз здесь, чтобы ни один потребитель датасета
+    # не складывал кроны с рублями. Курс — gt/data/fx_rates.json с датой.
+    no_rate = []
+    for rec in out:
+        usd = to_usd(rec.get("price"), rec.get("currency"))
+        rec["price_usd"] = round(usd, 4) if usd is not None else None
+        if usd is None:
+            rec["unit_price_usd"] = None
+            if rec.get("price") not in (None, ""):
+                no_rate.append(rec["currency"])
+        else:
+            try:
+                pack = float(rec.get("pack_qty") or 1) or 1.0
+            except (TypeError, ValueError):
+                pack = 1.0
+            rec["unit_price_usd"] = round(usd / pack, 4)
+
     for rec in out:
         rec["stock_grade"] = stock_grade(rec)
     attach_clusters(out)
@@ -473,10 +522,15 @@ def main() -> int:
     DST.write_text(json.dumps({
         "updated": date.today().isoformat(),
         "source": "Заявка ЛУКОЙЛ (листы «Энергосети» и «НВН»): наличие у продавцов по всей номенклатуре",
-        "method": "gt/tools/ship_merge.py сводит gt/data/rfq_demand.json с тремя поколениями "
-                  "проверок: rfq_prices.json:checks (08.2026), ship_energoseti.json (505 строк) "
-                  "и ship_sweep.json (остаток 863). Поздняя проверка перекрывает раннюю; "
-                  "строки без проверки помечены not_checked.",
+        "method": "gt/tools/ship_merge.py сводит gt/data/rfq_demand.json с пятью поколениями "
+                  "проверок: rfq_prices.json:checks (08.2026), ship_energoseti.json (505 строк), "
+                  "ship_sweep.json (остаток 863), ship_recheck.json (62 строки августовского "
+                  "наличия) и ship_blocked.json (31 строка из-под ботозащиты). Поздняя проверка "
+                  "перекрывает раннюю; строки без проверки помечены not_checked.",
+        "fx": "price_usd и unit_price_usd пересчитаны по gt/data/fx_rates.json. Считать надо "
+              "по ним: цены сняты в девяти валютах, и сложение price как есть завышало сумму "
+              "закупки примерно на треть. Курс справочный на дату выгрузки, не курс сделки — "
+              "любая сумма из него несёт оговорку.",
         "rows": out,
     }, ensure_ascii=False, indent=1))
 
@@ -496,6 +550,16 @@ def main() -> int:
     print(f"  контакт ПО САМОЙ ДЕТАЛИ: {own} ({round(100 * own / len(out))}%)")
     print(f"  плюс родовой адрес кластера: {any_c - own}; без адресата {len(out) - any_c}")
     print(f"  компаний-адресатов после сведения написаний: {len(comps)}")
+    firm_usd = sum((r["unit_price_usd"] or 0) * (r.get("qty") or 0) for r in out
+                   if r["stock_grade"] == "твёрдый" and r.get("covers_qty") == "full")
+    cur = Counter(r["currency"] for r in out
+                  if r["stock_grade"] == "твёрдый" and r.get("covers_qty") == "full"
+                  and r.get("price"))
+    print(f"  закупка по твёрдым строкам: {firm_usd:,.0f} USD "
+          f"(валют в них {len(cur)}: {', '.join(f'{k}×{v}' for k, v in cur.most_common())})")
+    if no_rate:
+        print(f"  ВНИМАНИЕ: цена без известного курса у {len(no_rate)} строк: "
+              f"{', '.join(sorted(set(no_rate)))} — в сумму не вошли")
     for sheet in sorted({r["sheet"] for r in out}):
         n = [r for r in out if r["sheet"] == sheet]
         print(f"  {sheet}: {len(n)} позиций, твёрдый склад "

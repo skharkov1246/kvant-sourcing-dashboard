@@ -25,7 +25,7 @@ COLS = [
     "pn", "sheet", "cluster", "man", "model", "name", "cat", "qty", "unit",
     "verdict", "stock_grade", "in_stock", "stock_qty", "lead_time", "covers_qty",
     "seller", "seller_country", "seller_url", "seller_kind",
-    "price", "currency", "pack_qty", "unit_price",
+    "price", "currency", "pack_qty", "price_usd", "unit_price",
     "line_value_full_volume", "in_firm_total",
     "our_usd_lo", "our_usd_hi", "our_conf", "price_gap",
     "real_maker", "real_pn", "substitute", "checked_by", "note",
@@ -34,14 +34,14 @@ COLS = [
 
 
 def unit_price(r: dict):
-    p = r.get("price")
-    if p in (None, ""):
-        return None
-    try:
-        pack = float(r.get("pack_qty") or 1) or 1.0
-        return float(p) / pack
-    except (TypeError, ValueError):
-        return None
+    """Цена за штуку В ДОЛЛАРАХ — из unit_price_usd, посчитанного ship_merge.py.
+
+    Сырой price складывать нельзя: он в девяти валютах. Это ломало не только сумму
+    закупки, но и price_gap — рублёвая цена 32 566 RUB против вилки 45–165 USD
+    давала «завышено в 197 раз», хотя на деле это 386 USD и завышение в 2,3 раза.
+    """
+    u = r.get("unit_price_usd")
+    return None if u in (None, "") else float(u)
 
 
 def line_value(r: dict) -> float:
@@ -98,6 +98,7 @@ def row_out(r: dict) -> dict:
         "covers_qty": r["covers_qty"], "seller": r["seller"],
         "seller_country": r["seller_country"], "seller_url": r["seller_url"],
         "seller_kind": r["kind"], "price": r["price"], "currency": r["currency"],
+        "price_usd": r.get("price_usd") or "",
         "pack_qty": r["pack_qty"],
         "unit_price": round(u, 4) if u is not None else "",
         "line_value_full_volume": round(line_value(r), 2) or "",
@@ -158,7 +159,8 @@ METHOD = """# Закупка по заявке ЛУКОЙЛ: метод и гр�
 ## Формулы
 
 ```
-unit_price             = price / pack_qty
+price_usd              = price, пересчитанная в доллары по gt/data/fx_rates.json
+unit_price             = price_usd / pack_qty   — В ДОЛЛАРАХ, не в валюте продавца
 line_value_full_volume = unit_price * qty   ТОЛЬКО если covers_qty == "full", иначе 0
 in_firm_total          = да, если при этом stock_grade == "твёрдый"
 price_gap              = отношение середины нашей вилки к unit_price, если оно >= 2.5
@@ -266,7 +268,8 @@ def main() -> int:
         f"| Твёрдое наличие | {len(firm)} | verdict=in_stock, не conditional, "
         "не из августа, covers_qty=full |",
         f"| Закупка по твёрдым строкам | {firm_val:,.0f} USD | сумма unit_price*qty "
-        "по этим строкам |".replace(",", " "),
+        "по этим строкам; цены шести валют приведены к доллару по справочному курсу "
+        "на 13 Sep 2026, см. gt/data/fx_rates.json |".replace(",", " "),
         f"| Подтверждённый объём, любой вердикт | {full_val:,.0f} USD | вся колонка "
         "line_value_full_volume |".replace(",", " "),
         f"| Наличие без покрытия объёма | {grades['частичный']} | деталь есть, "
