@@ -5,10 +5,10 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 192,
-    "total_bytes": 93211644,
+    "total_bytes": 93216397,
     "by_sensitivity": {
-      "конфиденциально": 57,
-      "внутреннее": 102,
+      "конфиденциально": 58,
+      "внутреннее": 101,
       "публикуемо": 33
     },
     "by_subproject": {
@@ -5314,6 +5314,49 @@
       ]
     },
     {
+      "path": "gt/data/ms5001_vankor.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 43791,
+      "note": "Ведомость запасных частей ГТУ GE MS5001 (исполнение MS5001PA) на инспекцию ТО-70000 — сделка «Юнипро / Ванкор», ГТЭС-200: 198 строк, 175 каталожных номеров Nuovo Pignone, узел определён у 137 строк. Первая ведомость состава по тяжёлой ГТУ; ни один из этих номеров в базе до сих пор не встречался. Источник — технико-коммерческое предложение КВАНТ заказчику (исх. №99-77 от 08.06.2026, Rev. 1), сам файл в репозиторий не кладётся. Перенесена только техническая часть: номер позиции, каталожный номер, наименование, количество, узел. Цены, заказчик-плательщик, условия сделки и контактное лицо сюда НЕ перенесены — это коммерческие и персональные данные (CLAUDE.md, правило 5); их загрузка в закрытую базу идёт отдельно, library/load_tkp_prices.py, из исходного файла по пути TKP_XLSX. Добавлен раздел channel: сверка 175 номеров и слов MS5001/MS5002 с 42 311 таможенными записями. Ни один номер в описаниях деклараций не встречается — второй цены оттуда не взять; зато по Frame 5 есть 55 деклараций 2023–2025 и 10 экспортёров, из них Nuovo Pignone International S.r.l. в 35 записях, и ровно одна запись именно по MS5001PA (RTP POWER SE, Китай через Турцию, 01.05.2024). Экспортёр — не поставщик и не наличие, это точка, с которой начинается поиск исполнителя. Нумерация перечня доходит до 234, предложено 198: 36 номеров позиций в документе отсутствуют — разрыв в самом предложении, а не в разборе.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "catalog",
+        "channel",
+        "completeness",
+        "machine",
+        "source",
+        "stats",
+        "warnings"
+      ],
+      "main_collection": {
+        "key": "catalog",
+        "records": 198,
+        "record_keys": [
+          "block",
+          "name",
+          "node",
+          "pn",
+          "poz",
+          "qty"
+        ]
+      },
+      "last_change": "2026-09-13",
+      "last_author": "Claude",
+      "last_commit": "72b1e8c",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "участники внешнеэкономических сделок"
+        ]
+      },
+      "referenced_by": [
+        "library/load_crossrefs.py",
+        "library/load_tkp_prices.py"
+      ]
+    },
+    {
       "path": "gpu/data/suppliers.json",
       "subproject": "ГПУ-библиотека",
       "bytes": 43463,
@@ -5597,46 +5640,6 @@
       ]
     },
     {
-      "path": "gt/data/ms5001_vankor.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 39795,
-      "note": "Ведомость запасных частей ГТУ GE MS5001 (исполнение MS5001PA) на инспекцию ТО-70000 — сделка «Юнипро / Ванкор», ГТЭС-200: 198 строк, 175 каталожных номеров Nuovo Pignone, узел определён у 137 строк. Первая ведомость состава по тяжёлой ГТУ; ни один из этих номеров в базе до сих пор не встречался. Источник — технико-коммерческое предложение КВАНТ заказчику (исх. №99-77 от 08.06.2026, Rev. 1), сам файл в репозиторий не кладётся. Перенесена только техническая часть: номер позиции, каталожный номер, наименование, количество, узел. Цены, заказчик-плательщик, условия сделки и контактное лицо сюда НЕ перенесены — это коммерческие и персональные данные (CLAUDE.md, правило 5); их загрузка в закрытую базу идёт отдельно, library/load_tkp_prices.py, из исходного файла по пути TKP_XLSX. Нумерация перечня доходит до 234, предложено 198: 36 номеров позиций в документе отсутствуют — разрыв в самом предложении, а не в разборе.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "catalog",
-        "completeness",
-        "machine",
-        "source",
-        "stats",
-        "warnings"
-      ],
-      "main_collection": {
-        "key": "catalog",
-        "records": 198,
-        "record_keys": [
-          "block",
-          "name",
-          "node",
-          "pn",
-          "poz",
-          "qty"
-        ]
-      },
-      "last_change": "2026-09-13",
-      "last_author": "Claude",
-      "last_commit": "db517f5",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "library/load_crossrefs.py",
-        "library/load_tkp_prices.py"
-      ]
-    },
-    {
       "path": "ove/data/disc_a.json",
       "subproject": "ОВЭ-75",
       "bytes": 38724,
@@ -5792,53 +5795,9 @@
       ]
     },
     {
-      "path": "ove/data/bi_register.json",
-      "subproject": "ОВЭ-75",
-      "bytes": 33887,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "note",
-        "rev",
-        "rows"
-      ],
-      "main_collection": {
-        "key": "rows",
-        "records": 65,
-        "record_keys": [
-          "code",
-          "contents_from",
-          "drop_head",
-          "gantt",
-          "kind",
-          "lot",
-          "source",
-          "sources",
-          "stage",
-          "status",
-          "title",
-          "tz"
-        ]
-      },
-      "last_change": "2026-09-10",
-      "last_author": "skharkov1246",
-      "last_commit": "4a7a9db",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "ove/tools/bi_check.py",
-        "ove/tools/build_release.py",
-        "ove/tools/docframe.py"
-      ]
-    },
-    {
       "path": "data/catalog_notes.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 33662,
+      "bytes": 34419,
       "note": "",
       "format": "json",
       "shape": "объект",
@@ -5886,7 +5845,7 @@
       ],
       "last_change": "2026-09-13",
       "last_author": "Claude",
-      "last_commit": "db517f5",
+      "last_commit": "72b1e8c",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -5894,6 +5853,50 @@
       },
       "referenced_by": [
         "scripts/build_catalog.py"
+      ]
+    },
+    {
+      "path": "ove/data/bi_register.json",
+      "subproject": "ОВЭ-75",
+      "bytes": 33887,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "note",
+        "rev",
+        "rows"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 65,
+        "record_keys": [
+          "code",
+          "contents_from",
+          "drop_head",
+          "gantt",
+          "kind",
+          "lot",
+          "source",
+          "sources",
+          "stage",
+          "status",
+          "title",
+          "tz"
+        ]
+      },
+      "last_change": "2026-09-10",
+      "last_author": "skharkov1246",
+      "last_commit": "4a7a9db",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "ove/tools/bi_check.py",
+        "ove/tools/build_release.py",
+        "ove/tools/docframe.py"
       ]
     },
     {
