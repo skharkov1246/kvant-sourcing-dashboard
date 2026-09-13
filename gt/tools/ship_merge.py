@@ -6,6 +6,7 @@
   gt/data/rfq_prices.json      — наши ценовые вилки и ранняя проверка 08.2026 (checks)
   gt/data/ship_energoseti.json — проверка 505 строк «Энергосетей» 09.2026
   gt/data/ship_sweep.json      — сплошная проверка остатка 863 строк 09.2026
+  gt/data/ship_recheck.json    — перепроверка 62 строк августовского наличия по ссылкам
 
 Позднейшая проверка перекрывает раннюю. Строки заявки без проверки попадают в
 датасет с вердиктом not_checked — так видно реальное покрытие, а не подогнанное.
@@ -24,6 +25,7 @@ DEMAND = ROOT / "gt/data/rfq_demand.json"
 PRICES = ROOT / "gt/data/rfq_prices.json"
 SHIP = ROOT / "gt/data/ship_energoseti.json"
 SWEEP = ROOT / "gt/data/ship_sweep.json"
+RECHECK = ROOT / "gt/data/ship_recheck.json"
 SELLERS = ROOT / "gt/data/ship_sellers.json"
 DST = ROOT / "gt/data/ship_lukoil.json"
 
@@ -374,7 +376,11 @@ def stock_grade(r: dict) -> str:
     if r["checked_by"] == "проверка 08.2026":
         return "устаревший"          # август, ссылки с тех пор не перепроверялись
     if r["covers_qty"] == "full":
-        return "твёрдый"
+        # «в наличии» без числа остатка закрывает ровно одну штуку: на две и больше
+        # это уже обещание, а не подтверждение
+        if (r["stock_qty"] or "").strip() or int(r.get("qty") or 0) <= 1:
+            return "твёрдый"
+        return "частичный"
     return "частичный"
 
 
@@ -412,6 +418,7 @@ def main() -> int:
         (PRICES, "checks", "проверка 08.2026"),
         (SHIP, "rows", "проверка 505 строк 09.2026"),
         (SWEEP, "rows", "сплошная проверка остатка 09.2026"),
+        (RECHECK, "rows", "перепроверка ссылок 09.2026"),
     ):
         rows = prices_doc["checks"] if path == PRICES else load_rows(path, coll)
         for raw in rows:
