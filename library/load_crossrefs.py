@@ -25,6 +25,7 @@ Epiroc 7490 0290 74 — одна деталь, и не связать их зн�
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import re
@@ -101,6 +102,10 @@ def num(v, w=9):
     return f"{v:,}".replace(",", " ").rjust(w)
 
 
+def brand_of(запись) -> str:
+    return (запись.get("brand") or "") if isinstance(запись, dict) else ""
+
+
 def build_alts() -> list[dict]:
     alts: dict[tuple, dict] = {}
 
@@ -127,6 +132,35 @@ def build_alts() -> list[dict]:
             for кандидат in номера_из(str(r.get("substitute") or "")):
                 add(r.get("pn"), кандидат, "замена", r.get("real_maker"),
                     str(r.get("substitute"))[:600], откуда, conf="low")
+    # Кросс-каталоги MOTORTECH по газопоршневым: «эта катушка равна вот этой у
+    # Caterpillar/Jenbacher». В поле kind написано, равнозначная это замена или
+    # только подходит. И номера, и кроссы лежат СПИСКАМИ — их надо разворачивать,
+    # иначе в таблицу попадёт строка «['06.50.034']» и пройдёт все проверки:
+    # цифры есть, знаков мало, кириллицы нет.
+    for r in load("gpu/data/motortech_cross.json", "records"):
+        вид = "замена" if "equivalent" in str(r.get("kind") or "").lower() else "аналог"
+        свои = [str(x) for x in (r.get("motortech") or []) if x]
+        for бренд in (r.get("cross") or []):
+            марка = str(brand_of(бренд))
+            for чужой in (бренд.get("pns") or []) if isinstance(бренд, dict) else []:
+                for свой in свои:
+                    add(str(чужой), свой, вид, "MOTORTECH", r.get("url"),
+                        "кросс-каталог MOTORTECH")
+                    add(свой, str(чужой), вид, марка, r.get("url"),
+                        "кросс-каталог MOTORTECH")
+
+    # Ведомость состава: наш внутренний номер и номер изготовителя — одна деталь.
+    # KV30 0001 и Epiroc 7490 0290 74 не связать значит закупать дважды.
+    for m in load("zip/data/bom.json", "machines"):
+        for запись in list(m.get("parts") or []) + list(m.get("kits") or []):
+            чужой = str(запись.get("epiroc_pn") or запись.get("oem_pn") or "").strip()
+            свой = str(запись.get("kv_pn") or "").strip()
+            if not (чужой and свой):
+                continue
+            add(чужой, свой, "наш номер", "КВАНТ", None, "ведомость состава")
+            add(свой, чужой, "номер изготовителя", m.get("oem") or None, None,
+                "ведомость состава")
+
     for r in load("zip/data/telsmith_crossrefs.json", "crossrefs"):
         add(r.get("telsmith_pn"), r.get("real_pn"), "номер изготовителя",
             r.get("real_maker"), r.get("evidence_url"), "кросс-таблица Telsmith",
@@ -134,17 +168,154 @@ def build_alts() -> list[dict]:
     return list(alts.values())
 
 
+# Тип позиции в кросс-каталоге записан по-английски («ignition coil», «pickup»).
+# Все они из системы зажигания газопоршневой машины — узел известен заранее, и
+# гадать по тексту незачем.
+ЗАЖИГАНИЕ = ("ignition", "spark", "coil", "pickup", "lead", "harness", "trigger",
+             "extension", "boot", "detonation")
+
+
+def build_motortech_parts() -> dict[str, dict]:
+    """Детали из кросс-каталога: номер OEM и номер MOTORTECH — реальные позиции.
+
+    Без них связи взаимозаменяемости повисают: ребро ставится только на деталь,
+    которая есть в каталоге, а катушек зажигания Caterpillar у нас не было."""
+    детали: dict[str, dict] = {}
+
+    def положи(pn, марка, тип, движки, url):
+        key = part_key(pn)
+        if not key or not похоже_на_номер(str(pn)):
+            return
+        тип = (тип or "").strip() or "позиция системы зажигания"
+        unit = "gpu.ignition" if any(w in тип.lower() for w in ЗАЖИГАНИЕ) else None
+        детали.setdefault(key, {
+            "id": key, "catalog_no": str(pn)[:120],
+            "name": f"{тип} ({марка})"[:400] if марка else тип[:400],
+            "oem": (марка or None) and str(марка)[:200],
+            "model": (движки or None) and str(движки)[:600],
+            "category": "зажигание" if unit else None,
+            "segment_id": "gpu", "unit_id": unit,
+            "source": "кросс-каталог MOTORTECH", "url": url})
+
+    for r in load("gpu/data/motortech_cross.json", "records"):
+        тип, движки, url = r.get("part"), r.get("engines"), r.get("url")
+        for pn in (r.get("motortech") or []):
+            положи(pn, "MOTORTECH", тип, движки, url)
+        for бренд in (r.get("cross") or []):
+            if not isinstance(бренд, dict):
+                continue
+            for pn in (бренд.get("pns") or []):
+                положи(pn, бренд.get("brand"), тип, движки, url)
+    return детали
+
+
+def build_patterns() -> dict[str, dict]:
+    """Шифровки номеров: как по номеру понять, чей он и что означает.
+
+    Это вход в цепочку с того, что у сорсера на руках, — со строки из заявки.
+    Ловушки хранятся отдельно, потому что стоят денег: «401088700» — это тот же
+    4010887 с дописанными нулями, и по первому номеру не найдётся ничего."""
+    out: dict[str, dict] = {}
+
+    def add_pat(oem, pattern, meaning, examples, traps, status, source):
+        oem = str(oem or "").strip()
+        ключ = pattern or meaning or ""
+        if not oem or not ключ:
+            return
+        ид = "шифр." + hashlib.sha1(f"{oem}|{ключ}".encode()).hexdigest()[:12]
+        out[ид] = {"id": ид, "oem": oem[:200], "pattern": str(pattern or "")[:200] or None,
+                   "meaning": str(meaning or "")[:2000] or None,
+                   "examples": str(examples or "")[:1000] or None,
+                   "traps": str(traps or "")[:2000] or None,
+                   "status": str(status or "")[:60] or None, "source": source}
+
+    for section in load("gt/data/pn_guide.json", "sections"):
+        oem = str(section.get("title") or "").strip()
+        for r in (section.get("rules") or []):
+            add_pat(oem, r.get("pattern"), r.get("meaning"), r.get("examples"),
+                    None, r.get("status"), "справочник шифровок ГТУ")
+    for b in load("gpu/data/pn_guide.json", "brands"):
+        правила = "; ".join(str(x) for x in (b.get("rules") or []))
+        ловушки = "; ".join(str(x) for x in (b.get("traps") or []))
+        add_pat(b.get("brand"), None, f"{b.get('format') or ''} {правила}".strip(),
+                None, ловушки, None, "справочник шифровок ГПУ")
+    return out
+
+
+def имя_машины(m: dict) -> str:
+    return str(m.get("name") or "").strip()
+
+
+def build_telsmith() -> tuple[list[dict], dict[str, dict], dict[str, dict]]:
+    """Ведомость щековой дробилки Telsmith 3858: 414 строк по 20 сборкам.
+
+    Вторая машина с ведомостью — и первая, где узлы названы по-своему: «ВАЛ
+    ЭКСЦЕНТРИКОВЫЙ», «СИСТЕМА МАСЛЯНОЙ СМАЗКИ». Сводить их к дереву узлов ГТУ
+    нельзя, поэтому имя сборки хранится как есть, рядом с номером позиции и
+    страницей чертежа: по ним деталь ищут в каталоге изготовителя."""
+    d = load("zip/data/telsmith_3858.json", "catalog")
+    мета = load("zip/data/telsmith_3858.json", "machine")
+    имя = str((мета or {}).get("name") or "Telsmith 3858").strip()
+    ключ = eq.norm_model(имя) if eq.looks_like_machine(имя) else None
+    машины = {ключ: {"id": ключ, "name": имя[:200], "source": "ведомость состава"}} if ключ else {}
+    строки, детали = [], {}
+    for i, r in enumerate(d):
+        pn = str(r.get("eid") or "").strip()
+        наим = str(r.get("name") or "").strip()
+        if not pn:
+            continue
+        key = part_key(pn)
+        узел = str(r.get("node") or "").strip()
+        детали.setdefault(key, {
+            "id": key, "catalog_no": pn[:120], "name": (наим or pn)[:400],
+            "oem": "Telsmith (ASTEC)", "model": имя[:600],
+            "category": узел[:120] or None,
+            "segment_id": classify(f"{наим} {узел} дробилка"),
+            "unit_id": eq.unit_of(наим), "source": "ведомость Telsmith 3858"})
+        строки.append({
+            "id": f"{ключ or 'telsmith3858'}.{i}", "machine": имя[:200], "model_id": ключ,
+            "scheme": None, "level": None, "part_id": key, "part_no": pn[:120],
+            "own_no": str(r.get("oem") or "")[:120] or None,
+            "qty": str(r.get("qty") or "")[:40] or None, "name": (наим or pn)[:400],
+            "node": узел[:200] or None, "position_no": str(r.get("poz") or "")[:40] or None,
+            "page": str(r.get("page") or "")[:40] or None,
+            "source": "ведомость Telsmith 3858"})
+    return строки, детали, машины
+
+
 def build_bom() -> tuple[list[dict], dict[str, dict], list[dict]]:
     """Ведомость → строки состава, новые детали и машина."""
     строки, детали, машины = [], {}, {}
     for m in load("zip/data/bom.json", "machines"):
-        имя = str(m.get("name") or "").strip()
+        имя = имя_машины(m)
         if not имя:
             continue
         ключ_машины = eq.norm_model(имя) if eq.looks_like_machine(имя) else None
         if ключ_машины:
             машины[ключ_машины] = {"id": ключ_машины, "name": имя[:200],
                                    "source": "ведомость состава"}
+        # Сервисные наборы — тоже позиции: у них свой номер изготовителя и свой
+        # наш номер, их так же закупают и так же задваивают.
+        for j, k in enumerate(m.get("kits") or []):
+            pn = str(k.get("oem_pn") or "").strip()
+            if not pn:
+                continue
+            key = part_key(pn)
+            имя = str(k.get("name") or pn)
+            детали.setdefault(key, {
+                "id": key, "catalog_no": pn[:120], "name": имя[:400], "oem": None,
+                "model": имя_машины(m)[:600], "category": "сервисный набор",
+                "segment_id": classify(f"{имя} {имя_машины(m)}"),
+                "unit_id": eq.unit_of(имя), "source": "ведомость состава: комплекты"})
+            строки.append({
+                "id": f"{ключ_машины or part_key(имя_машины(m))}.комплект.{j}",
+                "machine": имя_машины(m)[:200], "model_id": ключ_машины,
+                "scheme": str(k.get("scheme") or "")[:40] or None, "level": None,
+                "part_id": key, "part_no": pn[:120],
+                "own_no": str(k.get("kv_pn") or "")[:120] or None,
+                "qty": str(k.get("qty") or "")[:40] or None, "name": имя[:400],
+                "source": "ведомость состава: комплекты"})
+
         for i, p in enumerate(m.get("parts") or []):
             pn = str(p.get("epiroc_pn") or p.get("pn") or "").strip()
             if not pn:
@@ -171,6 +342,14 @@ def build_bom() -> tuple[list[dict], dict[str, dict], list[dict]]:
 def main() -> int:
     alts = build_alts()
     строки, детали, машины = build_bom()
+    зажигание = build_motortech_parts()
+    шифровки = build_patterns()
+    т_строки, т_детали, т_машины = build_telsmith()
+    строки += т_строки
+    детали.update({k: v for k, v in т_детали.items() if k not in детали})
+    машины.update(т_машины)
+    for k, v in зажигание.items():
+        детали.setdefault(k, v)
 
     print("=== взаимозаменяемость ===")
     print(f"  связей: {num(len(alts))}")
@@ -179,9 +358,16 @@ def main() -> int:
     print(f"  с названным изготовителем: {sum(1 for a in alts if a['alt_maker'])}")
     print(f"  различных деталей: {len({a['part_id'] for a in alts})}")
 
+    print(f"\n  деталей из кросс-каталога MOTORTECH: {len(зажигание)}")
+
+    print(f"  шифровок номеров: {len(шифровки)} "
+          f"(с ловушками: {sum(1 for x in шифровки.values() if x['traps'])})")
+
     print("\n=== ведомости ===")
     print(f"  машин: {len(машины)} · строк состава: {num(len(строки))} · "
           f"деталей: {len(детали)}")
+    узлы_вед = {s["node"] for s in строки if s.get("node")}
+    print(f"  сборок названо в ведомостях: {len(узлы_вед)}")
     сузлом = sum(1 for d in детали.values() if d["unit_id"])
     print(f"  с определённым узлом: {сузлом} · со своим номером: "
           f"{sum(1 for s in строки if s['own_no'])}")
@@ -229,19 +415,32 @@ def main() -> int:
             [(a["part_id"], a["alt_pn"], a["kind"], a["alt_maker"], a["evidence"],
               a["confidence"], a["source"]) for a in годные], page_size=500)
         psycopg2.extras.execute_values(cur, """
-            insert into lib_bom (id, machine, model_id, scheme, level, part_id, part_no,
-                                 own_no, qty, name, source)
+            insert into lib_pn_patterns (id, oem, pattern, meaning, examples, traps,
+                                         status, source)
             values %s
             on conflict (id) do update set
-              qty = excluded.qty, name = excluded.name, part_id = excluded.part_id""",
+              meaning = excluded.meaning, examples = excluded.examples,
+              traps = excluded.traps, status = excluded.status, updated_at = now()""",
+            [(x["id"], x["oem"], x["pattern"], x["meaning"], x["examples"], x["traps"],
+              x["status"], x["source"]) for x in шифровки.values()], page_size=200)
+
+        psycopg2.extras.execute_values(cur, """
+            insert into lib_bom (id, machine, model_id, scheme, level, part_id, part_no,
+                                 own_no, qty, name, source, node, position_no, page)
+            values %s
+            on conflict (id) do update set
+              qty = excluded.qty, name = excluded.name, part_id = excluded.part_id,
+              node = excluded.node, position_no = excluded.position_no,
+              page = excluded.page""",
             [(s["id"], s["machine"], s["model_id"], s["scheme"], s["level"],
               s["part_id"] if s["part_id"] in известные else None, s["part_no"],
-              s["own_no"], s["qty"], s["name"], s["source"]) for s in строки],
+              s["own_no"], s["qty"], s["name"], s["source"], s.get("node"),
+              s.get("position_no"), s.get("page")) for s in строки],
             page_size=500)
         conn.commit()
         print(f"\n  связей записано: {len(годные)} из {len(alts)} "
               f"(остальные — на деталь, которой в каталоге нет)")
-        for t in ("lib_part_alt", "lib_bom", "lib_parts"):
+        for t in ("lib_part_alt", "lib_bom", "lib_pn_patterns", "lib_parts"):
             cur.execute(f"select count(*) from {t}")
             print(f"  {t:16}{num(cur.fetchone()[0])}")
     conn.close()

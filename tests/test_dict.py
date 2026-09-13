@@ -281,3 +281,77 @@ def test_makers_counted_as_companies_not_rows():
         "остальные компании в счёт не попадут")
     assert gtu["n"] > 1000, "по ГТУ реестров восемь, компаний должно быть заметно больше сотни"
 
+
+def test_recip_recon_marks_unverified_explicitly():
+    """У каждого факта разведки есть вердикт, и он не пустой.
+
+    Пустое поле вердикта читается как «проверено, всё хорошо». Состояния
+    «скептик не сослался» и «не проверялся» — разные вещи, и обе означают,
+    что факт подтверждённым считать нельзя."""
+    d = json.loads((ROOT / "zip" / "data" / "recip_recon.json").read_text(encoding="utf-8"))
+    allowed = {"подтверждено", "частично", "опровергнуто", "непроверяемо",
+               "скептик не сослался", "не проверялся"}
+    for a in d["angles"]:
+        for f in a["findings"]:
+            assert f.get("verdict") in allowed, f"{a['key']}: вердикт «{f.get('verdict')}»"
+            assert f.get("source"), f"{a['key']}/{f['topic']}: факт без источника"
+        # Угол без скептика обязан честно об этом сообщать.
+        if not a["skeptic"]:
+            assert all(f["verdict"] == "не проверялся" for f in a["findings"])
+
+    # Счётчик цепочки обязан брать только проверенное: неподтверждённое
+    # не заполняет звено.
+    cov = json.loads((ROOT / "data" / "chain_coverage.json").read_text(encoding="utf-8"))
+    recip = next(s for s in cov["segments"] if s["segment"] == "recip")
+    ok = sum(1 for a in d["angles"] for f in a["findings"]
+             if f["verdict"] in ("подтверждено", "частично"))
+    total = sum(len(a["findings"]) for a in d["angles"])
+    assert ok < total, "все факты помечены проверенными — проверьте разбор вердиктов"
+    assert recip["filled"] >= 4, "разведка не дошла до счётчика цепочки"
+
+
+def test_parts_counted_as_unique_numbers_not_rows():
+    """Запчасти считаются уникальными партномерами, а не строками файлов.
+
+    Третий случай одной и той же болезни счётчика: суммы строк из файлов, которые
+    пересекаются. По ГТУ складывались 12 442 строки базы PN и 10 986 строк сквозного
+    справочника, который ИЗ НЕЁ ЖЕ И СОБРАН, — получалось 25 041 вместо 12 934.
+    Номера берутся из явных полей, а не угадываются по тексту: иначе в номера
+    попадают обозначения машин вроде QSV91G."""
+    cov = json.loads((ROOT / "data" / "chain_coverage.json").read_text(encoding="utf-8"))
+    by_seg = {s["segment"]: s for s in cov["segments"]}
+
+    gtu = next(c for c in by_seg["gtu"]["cells"] if c["link"] == "part")
+    pn_db = json.loads((ROOT / "gt" / "data" / "pn_db.json").read_text(encoding="utf-8"))["rows"]
+    im = json.loads((ROOT / "pnw" / "data" / "item_master.json").read_text(encoding="utf-8"))["items"]
+    gtu_items = sum(1 for x in im if x.get("section") == "ГТУ")
+    assert gtu["n"] < len(pn_db) + gtu_items, (
+        f"по ГТУ {gtu['n']} номеров при {len(pn_db)} строках базы PN и {gtu_items} строках "
+        "справочника — это сумма пересекающихся файлов, а не уникальные номера")
+
+    # Номер короче четырёх знаков — это индекс строки, а не партномер.
+    for seg in by_seg.values():
+        cell = next(c for c in seg["cells"] if c["link"] == "part")
+        if cell["n"]:
+            assert cell["sources"], f"{seg['segment']}: номера без источника"
+
+
+def test_chain_counter_declares_its_scope():
+    """Счётчик обязан говорить, чего он не видит.
+
+    Он меряет только файлы репозитория. Инженерная библиотека живёт в закрытой
+    Supabase, и часть звеньев закрыта именно там: на 12.09.2026 в lib_defects
+    16 записей, в lib_procedures 34 ремонтные операции, в lib_suppliers 4 480
+    компаний. Без оговорки страница читается как «этих звеньев нет нигде» —
+    и увела бы работу не туда."""
+    cov = json.loads((ROOT / "data" / "chain_coverage.json").read_text(encoding="utf-8"))
+    scope = cov.get("scope", "")
+    assert scope, "счётчик не объявляет свой охват"
+    assert "lib_" in scope and "Supabase" in scope, \
+        "в оговорке не назван второй источник знаний — библиотека"
+
+    page = ROOT / "zip" / "public" / "chain.html"
+    if page.exists():
+        html = page.read_text(encoding="utf-8")
+        assert "Что этот счётчик не видит" in html, "оговорка не попала на страницу"
+

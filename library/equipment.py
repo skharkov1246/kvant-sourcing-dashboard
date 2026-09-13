@@ -62,6 +62,13 @@ def split_machines(s: str) -> list[str]:
 # частные правила идут раньше общих. Идентификаторы узлов — из gt/data/parts.json
 # (система) и её компонентов (система.имя-по-английски).
 UNIT_RULES: tuple[tuple[str, tuple[str, ...]], ...] = (
+    # ПОРЯДОК ИЗМЕРЕН, А НЕ УГАДАН. На 2 096 строках, размеченных инженерами
+    # вручную, прежний порядок давал точность 81 %: крупнейшая ошибка —
+    # хомуты, фитинги и переходники уходили в «трубопроводы», а инженеры
+    # относят их к крепежу (163 случая); прокладки клапанов и топливные
+    # фильтры перехватывало общее правило «топливо». Поэтому уплотнения и
+    # фильтры проверяются РАНЬШЕ топлива, а хомуты и фитинги отнесены к
+    # крепежу. Меняешь порядок — перемеряй: см. scripts/library_units_check.py
     ("hot.combustion-liner", ("жаровая труба", "жаровые трубы", "combustion liner", "flame tube")),
     ("hot.main-burner", ("горелк", "burner", "dle")),
     ("hot.igniter", ("запальник", "свеча", "зажигани", "igniter", "spark plug", "розжиг")),
@@ -72,6 +79,7 @@ UNIT_RULES: tuple[tuple[str, tuple[str, ...]], ...] = (
     ("turbine.nozzle-guide-vanes", ("сопловая лопатка", "сопловой аппарат", "направляющая лопатка",
                                     "nozzle guide", "ngv", "vane")),
     ("turbine.turbine-discs", ("диск турбины", "turbine disc")),
+    ("turbine.shroud", ("бандаж", "кольцевой сегмент", "shroud")),
     ("turbine", ("лопатк", "турбина высокого", "силовая турбина", "blade")),
     ("compressor.inlet-guide-vanes", ("вна", "входной направляющий", "igv", "inlet guide")),
     ("compressor.bleed", ("антипомпажн", "сбросной клапан", "bleed valve", "blow-off")),
@@ -82,6 +90,12 @@ UNIT_RULES: tuple[tuple[str, tuple[str, ...]], ...] = (
     ("rotor.couplings", ("муфта", "торсион", "coupling")),
     ("rotor.labyrinth-seals", ("лабиринтн", "labyrinth")),
     ("rotor", ("подшипник", "bearing", "ротор", "rotor")),
+    ("seals", ("уплотнени", "прокладк", "сальник", "gasket", "o-ring", "o'ring", "oring",
+               "packing", "seal")),
+    ("consumables.inlet-air-filters", ("фильтр квоу", "фильтр воздуш", "inlet air filter")),
+    ("consumables.lube-oil-filters", ("маслофильтр", "фильтр масл", "сепаратор", "oil filter")),
+    ("consumables.turbine-oil", ("турбинное масло", "turbine oil", "смазка", "lubricant")),
+    ("consumables", ("фильтр", "filter", "расходник", "strainer", "сетка фильтр")),
     ("fuel.fuel-metering", ("дозирован", "metering valve", "регулятор топлив")),
     ("fuel.shut-off-valves", ("стопорн", "отсечн", "shut-off", "shutoff")),
     ("fuel.fuel-manifolds", ("коллектор топлив", "fuel manifold", "рукав", "flex hose")),
@@ -97,28 +111,24 @@ UNIT_RULES: tuple[tuple[str, tuple[str, ...]], ...] = (
                   "transducer", "контакт", "fuse", "breaker", "transmitter", "detector",
                   "connector", "gauge", "manometr", "манометр", "indicator", "монитор",
                   "monitor", "circuit", "лампа", "light", "lamp", "power supply", "card")),
-    ("consumables.inlet-air-filters", ("фильтр квоу", "фильтр воздуш", "inlet air filter")),
-    ("consumables.lube-oil-filters", ("маслофильтр", "фильтр масл", "сепаратор", "oil filter")),
-    ("consumables.turbine-oil", ("турбинное масло", "turbine oil", "смазка", "lubricant")),
-    ("seals", ("уплотнени", "прокладк", "сальник", "gasket", "o-ring", "o'ring", "oring",
-               "packing", "seal")),
-    ("consumables", ("фильтр", "filter", "расходник")),
     ("package.starter-system", ("стартер", "starter", "пусков")),
     ("package.lube-oil-pumps", ("маслонасос", "насос масл", "oil pump")),
     ("package.oil-coolers", ("аво", "теплообменник", "маслоохладител", "oil cooler")),
     ("package.gearbox", ("редуктор", "gearbox", "мультипликатор")),
     ("package.enclosure-ventilation", ("кожух", "вентиляц", "пожаротушен", "газоанализ", "enclosure",
                            "fire supp")),
-    ("package", ("насос", "pump", "теплообмен", "вспомогательн", "bop")),
+    ("package", ("насос", "pump", "теплообмен", "вспомогательн", "bop", "motor",
+                 "электродвигател", "heater", "подогревател", "insulation", "blanket",
+                 "теплоизоляц", "изоляц")),
     ("fasteners", ("болт", "винт", "гайка", "шайба", "шпилька", "шплинт", "крепёж", "крепеж",
                    "стопорное кольцо", "кронштейн", "screw", "bolt", "nut", "washer", "stud",
-                   "retaining ring", "cotter", "bracket", "spacer", "shim")),
+                   "retaining ring", "cotter", "bracket", "spacer", "shim",
+                   "clamp", "хомут", "fitting", "фитинг", "adapter", "переходник",
+                   "retainer", "support", "strap", "стяжк", "опора крепл")),
     ("tooling", ("оснастка", "инструмент", "приспособлени", "tooling", "fixture")),
-    # Трубопроводная часть — самая крупная неопознанная группа партномеров:
-    # рукава, трубки, фитинги и хомуты, 920 позиций на разметке.
-    ("piping", ("трубопровод", "рукав", "шланг", "фитинг", "hose", "tube", "tubing",
-                "fitting", "clamp", "хомут", "штуцер", "adapter", "переходник",
-                "flange", "фланец", "elbow", "piping")),
+    ("piping", ("трубопровод", "рукав", "шланг", "hose", "tube", "tubing",
+                "штуцер", "flange", "фланец", "elbow", "piping", "compensator",
+                "компенсатор")),
     ("generator", ("генератор", "возбудител", "статор", "generator", "exciter", "stator")),
 )
 
@@ -148,6 +158,30 @@ _COMPILED = tuple(
     (unit, tuple((w, re.compile(rf"(?<![0-9a-zа-яё]){re.escape(w)}(?![0-9a-zа-яё])"))
                  for w in words))
     for unit, words in UNIT_RULES)
+
+
+# Критичность у библиотеки ГПУ записана словами, у номенклатуры ГТУ — буквами.
+# Хранить оба словаря в одной колонке значит потерять запрос «покажи критичные
+# узлы», поэтому слова приводятся к буквам, а исходная формулировка остаётся в
+# примечании узла. Смысл букв: A останавливает машину или идёт долго,
+# B плановая замена, C расходник.
+CRIT_WORDS = {
+    "критично": "A",
+    "капремонт": "B",
+    "верхний ремонт": "B",
+    "важно": "B",
+    "по состоянию": "B",
+    "расходники": "C",
+    "по проекту": None,          # зависит от проекта — буквы тут не будет
+}
+
+
+def crit_of(v: str | None) -> str | None:
+    """Критичность буквой. Уже буква — возвращается как есть."""
+    t = (v or "").strip()
+    if t in ("A", "B", "C"):
+        return t
+    return CRIT_WORDS.get(t.lower())
 
 
 def unit_of(text: str) -> str | None:
@@ -222,6 +256,39 @@ OEM_NAMES = frozenset((
     "siemens", "siemensenergy", "ansaldo", "ansaldoenergia", "alstom", "abb",
     "rollsroyce", "rr", "caterpillar", "cat", "mitsubishi", "mhi", "man", "kawasaki",
 ))
+
+
+# Короткое имя изготовителя в записи о детали и полное имя его карточки в базе
+# компаний — не одно и то же: в каталоге написано «GE», а карточка называется
+# «GE Vernova (General Electric)». Псевдонимы заведены только там, где выбор
+# однозначен: головная компания и есть изготовитель своих деталей. За этими
+# четырьмя именами 6 326 позиций каталога.
+#
+# ПО ПРЕФИКСУ ЭТО ДЕЛАТЬ НЕЛЬЗЯ, и вот почему: в базе рядом лежат «Caterpillar»
+# и «Caterpillar gear pump (made-in-china supplier)» — второе НЕ Caterpillar, а
+# китайский поставщик похожих насосов. Автоматическая склейка по началу имени
+# связала бы деталь OEM с чужой фирмой, поэтому список короткий и ручной.
+OEM_ALIAS = {
+    "ge": "ge vernova general electric",
+    "general electric": "ge vernova general electric",
+    "siemens": "siemens energy",
+    "solar": "solar turbines",
+}
+
+# Имена, которые изготовителем не являются: так помечают «неизвестно».
+OEM_JUNK = frozenset(("прочие", "прочий oem", "прочее", "не указан", "неизвестно",
+                      "разные", "различные", "n a", "na", "нет данных"))
+
+
+def oem_is_real(name: str) -> bool:
+    """Годится ли строка из поля «изготовитель» в карточку компании.
+
+    Отсекается то, чем в каталоге помечают незнание («Прочие», «не указан»),
+    слишком короткое и слишком длинное: семисловное — это описание, а не имя."""
+    t = " ".join((name or "").lower().replace("ё", "е").split())
+    if len(t) < 3 or t in OEM_JUNK:
+        return False
+    return len(t.split()) <= 6
 
 
 def looks_like_machine(name: str, key: str | None = None) -> bool:

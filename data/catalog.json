@@ -4,19 +4,20 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 199,
-    "total_bytes": 93642083,
+    "datasets": 202,
+    "total_bytes": 95364539,
     "by_sensitivity": {
       "конфиденциально": 60,
-      "внутреннее": 106,
-      "публикуемо": 33
+      "внутреннее": 108,
+      "публикуемо": 34
     },
     "by_subproject": {
       "ГПУ-библиотека": 27,
-      "ГТУ-библиотека": 35,
+      "ГТУ-библиотека": 36,
       "ОВЭ-75": 45,
-      "база ЗИП": 40,
+      "база ЗИП": 41,
       "база ЗИП · таможня": 18,
+      "библиотека рынков": 1,
       "гидрометаллургия": 22,
       "дашборд сорсеров": 4,
       "каталог PN (веб)": 1,
@@ -82,69 +83,6 @@
         ]
       },
       "referenced_by": []
-    },
-    {
-      "path": "gt/data/ship_lukoil.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 6666910,
-      "note": "Сводная карта закупки по всей заявке ЛУКОЙЛ: 1642 уникальных артикула обоих листов («Энергосети» 1198, НВН 444) с результатом проверки наличия. Производный файл — собирается gt/tools/ship_merge.py из rfq_demand.json и трёх поколений проверок (rfq_prices.json:checks, ship_energoseti.json, ship_sweep.json); поздняя проверка перекрывает раннюю, непроверенные строки помечены not_checked. Руками не заполнять. Отчёт — gt/tools/ship_map.py → gt/docs/ЗАКУПКА-ЛУКОЙЛ.pdf: карта «у кого что брать», изготовители узлов под шильдой OEM, позиции под подбор по стандарту, расхождения цен.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "method",
-        "rows",
-        "source",
-        "updated"
-      ],
-      "main_collection": {
-        "key": "rows",
-        "records": 1642,
-        "record_keys": [
-          "cat",
-          "checked_by",
-          "cluster",
-          "cluster_sellers",
-          "conf",
-          "covers_qty",
-          "currency",
-          "in_stock",
-          "kind",
-          "lead_time",
-          "man",
-          "model",
-          "name",
-          "note",
-          "pack_qty",
-          "pn",
-          "price",
-          "qty",
-          "real_maker",
-          "real_pn",
-          "seller",
-          "seller_country",
-          "seller_url",
-          "sellers",
-          "sheet",
-          "stock_qty",
-          "substitute",
-          "unit",
-          "usd_hi",
-          "usd_lo",
-          "verdict"
-        ]
-      },
-      "last_change": "2026-09-12",
-      "last_author": "skharkov1246",
-      "last_commit": "9a3905b",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "gt/tools/ship_map.py",
-        "gt/tools/ship_merge.py"
-      ]
     },
     {
       "path": "zip/customs/out/customs_8207_2024-01-01_2024-12-31.json",
@@ -279,7 +217,9 @@
         "scripts/build_chain_coverage.py",
         "scripts/build_dict.py",
         "scripts/build_node_map.py",
-        "tests/test_core.py"
+        "scripts/library_units_check.py",
+        "tests/test_core.py",
+        "tests/test_dict.py"
       ]
     },
     {
@@ -311,6 +251,71 @@
         "zip/tools/aggregate_customs.py",
         "zip/tools/r1700_dossier.py",
         "zip/tools/who_supplies.py"
+      ]
+    },
+    {
+      "path": "gt/data/ship_lukoil.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 5945265,
+      "note": "Сводная карта закупки по всей заявке ЛУКОЙЛ: 1642 уникальных артикула обоих листов («Энергосети» 1198, НВН 444) с результатом проверки наличия. Производный файл — собирается gt/tools/ship_merge.py из rfq_demand.json и трёх поколений проверок (rfq_prices.json:checks, ship_energoseti.json, ship_sweep.json); поздняя проверка перекрывает раннюю, непроверенные строки помечены not_checked. Руками не заполнять. Отчёт — gt/tools/ship_map.py → gt/docs/ЗАКУПКА-ЛУКОЙЛ.pdf: карта «у кого что брать», изготовители узлов под шильдой OEM, позиции под подбор по стандарту, расхождения цен.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "method",
+        "rows",
+        "source",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 1642,
+        "record_keys": [
+          "cat",
+          "checked_by",
+          "cluster",
+          "cluster_sellers",
+          "conf",
+          "covers_qty",
+          "currency",
+          "in_stock",
+          "kind",
+          "lead_time",
+          "man",
+          "model",
+          "name",
+          "note",
+          "pack_qty",
+          "pn",
+          "price",
+          "qty",
+          "real_maker",
+          "real_pn",
+          "seller",
+          "seller_country",
+          "seller_url",
+          "sellers",
+          "sheet",
+          "stock_grade",
+          "stock_qty",
+          "substitute",
+          "unit",
+          "usd_hi",
+          "usd_lo",
+          "verdict"
+        ]
+      },
+      "last_change": "2026-09-12",
+      "last_author": "skharkov1246",
+      "last_commit": "9a3905b",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/ship_export.py",
+        "gt/tools/ship_map.py",
+        "gt/tools/ship_merge.py"
       ]
     },
     {
@@ -456,6 +461,7 @@
       "referenced_by": [
         "pnw/tools/build_master.py",
         "pnw/tools/build_search.py",
+        "scripts/build_chain_coverage.py",
         "tests/test_dict.py"
       ]
     },
@@ -685,6 +691,51 @@
         ]
       },
       "referenced_by": []
+    },
+    {
+      "path": "zip/data/recip_recon.json",
+      "subproject": "база ЗИП",
+      "bytes": 2334821,
+      "note": "Разведка направления «Поршневые компрессоры»: 15 углов, 685 фактов с источником, 203 карточки компаний, 148 закрытых тупиков. У десяти углов был собственный скептик с заданием опровергать по умолчанию, пять углов добора запускались без скептика — это видно в поле skeptic. Вердикт приложен к каждому факту поимённо: подтверждено 218, частично 152, непроверяемо 44, опровергнуто 5, «скептик не сослался» 94, «не проверялся» 172. Пустого вердикта нет ни у одного факта: пустое поле читалось бы как «всё хорошо». Публикуется на странице /recip.html.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "angles",
+        "critic",
+        "generated",
+        "method",
+        "stats",
+        "subject"
+      ],
+      "main_collection": {
+        "key": "angles",
+        "records": 15,
+        "record_keys": [
+          "companies",
+          "dead_ends",
+          "findings",
+          "gaps",
+          "key",
+          "missing",
+          "overall",
+          "skeptic",
+          "summary",
+          "title"
+        ]
+      },
+      "last_change": null,
+      "last_author": null,
+      "last_commit": null,
+      "updated_by": "неизвестно",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "scripts/build_chain_coverage.py",
+        "tests/test_dict.py",
+        "zip/tools/build_recip_page.py"
+      ]
     },
     {
       "path": "gt/data/dossiers.json",
@@ -949,6 +1000,7 @@
         "markers": []
       },
       "referenced_by": [
+        "library/load_equipment.py",
         "library/load_parts.py",
         "pnw/tools/build_master.py",
         "pnw/tools/parse_crossrefs.py",
@@ -957,8 +1009,7 @@
         "scripts/publish_library_v2.py",
         "tests/test_publish_library_v2.py",
         "zip/build.py",
-        "zip/customs/glbs_pull.mjs",
-        "zip/tools/aggregate_customs.py"
+        "zip/customs/glbs_pull.mjs"
       ]
     },
     {
@@ -1159,7 +1210,8 @@
         "gt/tools/build_lot_xlsx.py",
         "gt/tools/build_rfq.py",
         "gt/tools/ship_merge.py",
-        "gt/tools/ship_report.py"
+        "gt/tools/ship_report.py",
+        "library/load_parts.py"
       ]
     },
     {
@@ -1338,8 +1390,10 @@
         "gt/public/plugs.html",
         "gt/tools/build_lot_xlsx.py",
         "gt/tools/build_rfq.py",
+        "gt/tools/ship_export.py",
         "gt/tools/ship_merge.py",
-        "gt/tools/ship_report.py"
+        "gt/tools/ship_report.py",
+        "library/load_parts.py"
       ]
     },
     {
@@ -1465,7 +1519,7 @@
     {
       "path": "data/chat_snapshot.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 536053,
+      "bytes": 549734,
       "note": "Суточный снимок реакции коммерсантов в чатах сделок. Пишет бот scan.yml (chat_scan.py) раз в сутки. Руками не редактировать: правка в PR откатит свежие данные при мерже. Содержит поимённые метрики 15 сотрудников и LLM-оценки.",
       "format": "json",
       "shape": "объект",
@@ -1977,6 +2031,7 @@
         ]
       },
       "referenced_by": [
+        "library/load_parts.py",
         "pnw/tools/build_suppliers.py",
         "zip/build.py",
         "zip/tools/aggregate_customs.py",
@@ -1985,8 +2040,7 @@
         "zip/tools/perf_classes.py",
         "zip/tools/pilot_order.py",
         "zip/tools/pilot_pdf.py",
-        "zip/tools/r1700_bitrix.py",
-        "zip/tools/who_supplies.py"
+        "zip/tools/r1700_bitrix.py"
       ]
     },
     {
@@ -2645,6 +2699,7 @@
         ]
       },
       "referenced_by": [
+        "library/load_crossrefs.py",
         "scripts/build_chain_coverage.py",
         "scripts/build_dict.py",
         "zip/tools/build_telsmith_page.py",
@@ -3148,6 +3203,7 @@
         ]
       },
       "referenced_by": [
+        "library/load_parts.py",
         "zip/build.py",
         "zip/tools/parse_demand.py"
       ]
@@ -3207,9 +3263,9 @@
         "gt/public/plugs.html",
         "gt/tools/build_lot_xlsx.py",
         "gt/tools/build_rfq.py",
+        "gt/tools/ship_export.py",
         "gt/tools/ship_merge.py",
-        "gt/tools/ship_report.py",
-        "scripts/build_chain_coverage.py"
+        "gt/tools/ship_report.py"
       ]
     },
     {
@@ -3382,6 +3438,7 @@
       "referenced_by": [
         "gt/build.py",
         "gt/tools/drop_ru.py",
+        "library/load_suppliers.py",
         "scripts/build_chain_coverage.py"
       ]
     },
@@ -3905,6 +3962,7 @@
         ]
       },
       "referenced_by": [
+        "library/load_parts.py",
         "zip/tools/cat_stock.py",
         "zip/tools/cat_stock_table.py"
       ]
@@ -4031,6 +4089,7 @@
       "referenced_by": [
         "gpu/build.py",
         "gpu/tools/parse_motortech.py",
+        "library/load_crossrefs.py",
         "scripts/build_chain_coverage.py"
       ]
     },
@@ -4070,6 +4129,55 @@
         "markers": []
       },
       "referenced_by": []
+    },
+    {
+      "path": "gt/data/ship_recheck.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 74448,
+      "note": "Перепроверка 62 строк «устаревшего» наличия заявки ЛУКОЙЛ: по каждой открывалась ссылка августовской проверки и фиксировалось, что страница отдаёт сегодня. Мёртвых ссылок не найдено ни одной, но 31 строка закрыта ботозащитой площадки (eBay, Newark, ABB eMart) — это не «мертво», но и не подтверждение, поэтому складом такие строки не считаются; одна ссылка вела на карточку другого артикула. Полное покрытие объёма подтвердилось у шести. Поле recheck_verdict хранит исходный вердикт перепроверки до отображения в общий словарь. Собрано тремя агентами 12.09.2026, читается gt/tools/ship_merge.py как позднейшее поколение проверки.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "method",
+        "rows",
+        "source",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 62,
+        "record_keys": [
+          "covers_qty",
+          "currency",
+          "in_stock",
+          "kind",
+          "lead_time",
+          "note",
+          "pack_qty",
+          "pn",
+          "price",
+          "real_maker",
+          "real_pn",
+          "recheck_verdict",
+          "seller",
+          "seller_country",
+          "seller_url",
+          "stock_qty",
+          "substitute",
+          "verdict"
+        ]
+      },
+      "last_change": null,
+      "last_author": null,
+      "last_commit": null,
+      "updated_by": "неизвестно",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/ship_merge.py"
+      ]
     },
     {
       "path": "gidromet/data/postav.json",
@@ -4743,6 +4851,7 @@
         "gt/build.py",
         "gt/tools/build_rfq.py",
         "gt/tools/drop_ru.py",
+        "library/load_suppliers.py",
         "pnw/tools/build_suppliers.py",
         "scripts/build_chain_coverage.py"
       ]
@@ -4885,6 +4994,7 @@
       },
       "referenced_by": [
         "gpu/build.py",
+        "library/load_equipment.py",
         "scripts/build_chain_coverage.py",
         "scripts/build_dict.py",
         "tests/test_dict.py",
@@ -5579,7 +5689,8 @@
         "markers": []
       },
       "referenced_by": [
-        "gpu/build.py"
+        "gpu/build.py",
+        "scripts/build_chain_coverage.py"
       ]
     },
     {
@@ -6057,6 +6168,7 @@
       },
       "referenced_by": [
         "gpu/build.py",
+        "library/load_equipment.py",
         "scripts/build_chain_coverage.py",
         "scripts/build_dict.py",
         "tests/test_dict.py",
@@ -6100,6 +6212,67 @@
       },
       "referenced_by": [
         "ove/tools/build_disc.py"
+      ]
+    },
+    {
+      "path": "data/catalog_notes.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 35231,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "data/budget_snapshot.json",
+        "data/chain_coverage.json",
+        "data/chat_snapshot.json",
+        "data/index.json",
+        "dict/",
+        "dict/node_map.json",
+        "gidromet/data/",
+        "gpu/data/bitrix_gpu.json",
+        "gpu/data/coverage.json",
+        "gt/data/ansaldo.json",
+        "gt/data/bitrix_gt.json",
+        "gt/data/dossiers.json",
+        "gt/data/pn_db.json",
+        "gt/data/ship_energoseti.json",
+        "gt/data/ship_lukoil.json",
+        "gt/data/ship_recheck.json",
+        "gt/data/ship_sellers.json",
+        "gt/data/ship_sweep.json",
+        "gt/docs/ЗАКУПКА-ЛУКОЙЛ.csv",
+        "library/data/symptoms.json",
+        "library/docfilter.py",
+        "library/indexer.py",
+        "library/load_parts.py",
+        "library/load_suppliers.py",
+        "library/ocr.py",
+        "library/reparse.py",
+        "library/supabase/schema_junk.sql",
+        "ove/data/suppliers.json",
+        "pnw/data/contacts_found.json",
+        "pnw/data/crossrefs.json",
+        "pnw/data/item_master.json",
+        "pnw/data/kv_registry.json",
+        "pnw/data/numbers.json",
+        "pnw/data/part_suppliers.json",
+        "pnw/data/supplier_master.json",
+        "pnw/public/data.js",
+        "pnw/public/search.html",
+        "zip/customs/out/",
+        "zip/data/cat_stock_2026-09.json",
+        "zip/data/customs_declarations.json"
+      ],
+      "last_change": "2026-09-12",
+      "last_author": "Claude",
+      "last_commit": "9c85fe9",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "scripts/build_catalog.py"
       ]
     },
     {
@@ -6312,67 +6485,6 @@
       ]
     },
     {
-      "path": "data/catalog_notes.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 31472,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "data/budget_snapshot.json",
-        "data/chain_coverage.json",
-        "data/chat_snapshot.json",
-        "data/index.json",
-        "dict/",
-        "dict/node_map.json",
-        "gidromet/data/",
-        "gpu/data/bitrix_gpu.json",
-        "gpu/data/coverage.json",
-        "gt/data/ansaldo.json",
-        "gt/data/bitrix_gt.json",
-        "gt/data/dossiers.json",
-        "gt/data/pn_db.json",
-        "gt/data/ship_energoseti.json",
-        "gt/data/ship_lukoil.json",
-        "gt/data/ship_sellers.json",
-        "gt/data/ship_sweep.json",
-        "library/docfilter.py",
-        "library/indexer.py",
-        "library/load_parts.py",
-        "library/load_suppliers.py",
-        "library/ocr.py",
-        "library/reparse.py",
-        "library/supabase/schema_junk.sql",
-        "ove/data/suppliers.json",
-        "pnw/data/contacts_found.json",
-        "pnw/data/crossrefs.json",
-        "pnw/data/item_master.json",
-        "pnw/data/kv_registry.json",
-        "pnw/data/numbers.json",
-        "pnw/data/part_suppliers.json",
-        "pnw/data/supplier_master.json",
-        "pnw/public/data.js",
-        "pnw/public/search.html",
-        "zip/customs/out/",
-        "zip/data/cat_stock_2026-09.json",
-        "zip/data/customs_declarations.json",
-        "zip/data/kp1763_audit.json",
-        "zip/data/machines.json",
-        "zip/data/perf_class_packets.json"
-      ],
-      "last_change": "2026-09-12",
-      "last_author": "Claude",
-      "last_commit": "9c85fe9",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "scripts/build_catalog.py"
-      ]
-    },
-    {
       "path": "gt/data/removed_ru.json",
       "subproject": "ГТУ-библиотека",
       "bytes": 31270,
@@ -6445,6 +6557,7 @@
         ]
       },
       "referenced_by": [
+        "library/load_suppliers.py",
         "pnw/tools/build_suppliers.py",
         "scripts/build_chain_coverage.py",
         "zip/build.py",
@@ -6716,9 +6829,9 @@
         "gt/public/plugs.html",
         "gt/tools/build_lot_xlsx.py",
         "gt/tools/build_rfq.py",
+        "gt/tools/ship_export.py",
         "gt/tools/ship_merge.py",
-        "gt/tools/ship_report.py",
-        "scripts/build_chain_coverage.py"
+        "gt/tools/ship_report.py"
       ]
     },
     {
@@ -6837,6 +6950,48 @@
       ]
     },
     {
+      "path": "data/chain_coverage.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 20938,
+      "note": "Заполняемость цепочки портала по семи направлениям и восьми звеньям: машина → узел → признак → дефект → ремонтное решение → запчасть → изготовитель → исполнитель. Производный файл, считается scripts/build_chain_coverage.py по фактическим файлам репозитория; ноль означает отсутствие данных, а не то, что они где-то есть. Руками не заполнять. Первый прогон 12.09.2026: 13 клеток из 56, звенья «Признак», «Дефект» и «Исполнитель» не начаты ни по одному направлению.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "common",
+        "empty_everywhere",
+        "goal",
+        "links",
+        "note",
+        "priority_rule",
+        "scope",
+        "segments",
+        "summary",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "links",
+        "records": 8,
+        "record_keys": [
+          "link",
+          "title",
+          "what"
+        ]
+      },
+      "last_change": "2026-09-13",
+      "last_author": "Claude",
+      "last_commit": "199e2a4",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "scripts/build_chain_coverage.py",
+        "scripts/build_chain_page.py",
+        "tests/test_dict.py"
+      ]
+    },
+    {
       "path": "ove/data/bitrix_ove.json",
       "subproject": "ОВЭ-75",
       "bytes": 20614,
@@ -6919,45 +7074,6 @@
       ]
     },
     {
-      "path": "data/chain_coverage.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 20007,
-      "note": "Заполняемость цепочки портала по семи направлениям и восьми звеньям: машина → узел → признак → дефект → ремонтное решение → запчасть → изготовитель → исполнитель. Производный файл, считается scripts/build_chain_coverage.py по фактическим файлам репозитория; ноль означает отсутствие данных, а не то, что они где-то есть. Руками не заполнять. Первый прогон 12.09.2026: 13 клеток из 56, звенья «Признак», «Дефект» и «Исполнитель» не начаты ни по одному направлению.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "common",
-        "empty_everywhere",
-        "goal",
-        "links",
-        "note",
-        "priority_rule",
-        "segments",
-        "summary"
-      ],
-      "main_collection": {
-        "key": "links",
-        "records": 8,
-        "record_keys": [
-          "link",
-          "title",
-          "what"
-        ]
-      },
-      "last_change": "2026-09-13",
-      "last_author": "Claude",
-      "last_commit": "199e2a4",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "scripts/build_chain_coverage.py",
-        "tests/test_dict.py"
-      ]
-    },
-    {
       "path": "gpu/data/fleet.json",
       "subproject": "ГПУ-библиотека",
       "bytes": 19970,
@@ -6997,7 +7113,8 @@
       },
       "referenced_by": [
         "gpu/build.py",
-        "gpu/tools/build_targets.py"
+        "gpu/tools/build_targets.py",
+        "library/load_equipment.py"
       ]
     },
     {
@@ -7031,6 +7148,43 @@
       "referenced_by": [
         "gpu/build.py",
         "gpu/tools/build_targets.py"
+      ]
+    },
+    {
+      "path": "library/data/symptoms.json",
+      "subproject": "библиотека рынков",
+      "bytes": 16461,
+      "note": "Признаки неисправности вращающегося оборудования: по чему видно, что машина нездорова, что это обычно значит и чем подтверждается. Звено «признак» цепочки портала. СПРАВОЧНИК-ЗАГОТОВКА, не измерение по парку: связки взяты из общей практики диагностики и из брошюр OEM (поле basis), уверенность у всех строк низкая, требуется проверка инженером сервиса. Загружается library/load_repair.py в lib_symptoms.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "note",
+        "rows",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 24,
+        "record_keys": [
+          "basis",
+          "confirm",
+          "confirm_ops",
+          "defect",
+          "measure",
+          "name",
+          "unit"
+        ]
+      },
+      "last_change": null,
+      "last_author": null,
+      "last_commit": null,
+      "updated_by": "неизвестно",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "library/load_repair.py"
       ]
     },
     {
@@ -7696,6 +7850,7 @@
         "gpu/build.py",
         "gpu/tools/coverage.py",
         "scripts/build_chain_coverage.py",
+        "scripts/build_chain_page.py",
         "tests/test_dict.py"
       ]
     },
@@ -7850,7 +8005,8 @@
       },
       "referenced_by": [
         "gpu/build.py",
-        "gt/build.py"
+        "gt/build.py",
+        "library/load_crossrefs.py"
       ]
     },
     {
@@ -8173,7 +8329,8 @@
       },
       "referenced_by": [
         "gpu/build.py",
-        "gt/build.py"
+        "gt/build.py",
+        "library/load_crossrefs.py"
       ]
     },
     {

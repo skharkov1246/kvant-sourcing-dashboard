@@ -16,6 +16,7 @@
 // САМООБНОВЛЕНИЕ: если данные старше 2 ч, воркер триггерит пересборку через
 // GitHub repository_dispatch (секрет GH_DISPATCH_TOKEN); без секрета просто выключено.
 import { libraryV2, libraryV2Segments } from "./library_v2.js";
+import { archiveRoute, archiveApi, archiveJson, archiveHeaders } from "./archive_search.js";
 
 const GH_REPO = "skharkov1246/kvant-sourcing-dashboard";
 const FRESH_MS = 2 * 3600 * 1000;          // порог свежести — 2 часа
@@ -804,18 +805,58 @@ async function libraryDrafts(request, env) {
   }
 }
 
+// Main portal Access application, observed in its public login metadata.
+// An AUD identifies the application; it is not a credential or an access grant.
+const ARCHIVE_MAIN_ACCESS_AUD = "f7aa6fda91d7c09c8669240c982a4593a76af459d77a267f0adf8b99f7806ffb";
+function archiveAudience(env) {
+  for (const name of ["ARCHIVE_ACCESS_AUD", "CF_ACCESS_AUD"]) {
+    if (!Object.prototype.hasOwnProperty.call(env || {}, name)) continue;
+    const value = env[name];
+    // Explicit empty/invalid configuration fails closed; only absence falls back.
+    if (typeof value !== "string" || value.length > 2048) return null;
+    const audiences = value.split(",").map((item) => item.trim());
+    if (!audiences.length || audiences.length > 16 ||
+        audiences.some((item) => !/^[a-fA-F0-9]{64}$/.test(item))) return null;
+    return audiences.join(",");
+  }
+  return ARCHIVE_MAIN_ACCESS_AUD;
+}
+
 export default {
   async fetch(request, env, ctx) {
-    const who = await accessOk(request, env);
+    const url = new URL(request.url);
+    const archive = archiveRoute(url.pathname);
+    // Scope the audience to the archive; other applications still use their
+    // existing signed tokens when asking this portal for /api/rights.
+    const archiveAud = archive && archive !== "invalid" ? archiveAudience(env) : undefined;
+    const authEnv = archiveAud ? { ...env, CF_ACCESS_AUD: archiveAud } : env;
+    const who = await accessOk(request, authEnv);
     if (!who) return denyPage("Портал КВАНТ");
 
-    const url = new URL(request.url);
-    const library = libraryRoute(url.pathname);
+    if (archive === "invalid") return archiveJson({ error: "not_found" }, 404);
+    const library = archive ? null : libraryRoute(url.pathname);
     if (library === "invalid") return libraryJson({ error: "not_found" }, 404);
     let acl;
-    try { acl = await loadAcl(env, { strict: !!library }); }
+    try { acl = await loadAcl(env, { strict: !!(library || archive) }); }
     catch { return libraryJson({ error: "library_unavailable" }, 503); }
     const rights = rightsFor(acl, who.email, env);
+
+    // Private archive never enters the shared library, visit logs, or audit text.
+    if (archive) {
+      if (!rights.admin) return archiveJson({ error: "forbidden" }, 403);
+      if (!archiveAud) return archiveJson({ error: "archive_access_not_configured" }, 503);
+      if (request.method !== "GET") return archiveJson({ error: "method_not_allowed" }, 405, { Allow: "GET" });
+      if (archive !== "page") return archiveApi(request, env, archive);
+      if (url.search) return archiveJson({ error: "invalid_archive_query" }, 400);
+      try {
+        const asset = await env.ASSETS.fetch(new Request(url.origin + "/archive.html", { headers: request.headers }));
+        if (!asset.ok) return archiveJson({ error: "archive_page_unavailable" }, 503);
+        const headers = archiveHeaders(asset.headers);
+        headers.set("Content-Type", "text/html; charset=utf-8");
+        headers.set("Content-Security-Policy", "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'");
+        return new Response(asset.body, { headers });
+      } catch { return archiveJson({ error: "archive_page_unavailable" }, 503); }
+    }
 
     // Отметка о входе. Ставится и на /api/rights, поэтому в списке оказываются и те,
     // кто зашёл сразу на дашборд или на другой сайт по закладке, минуя портал.
@@ -1436,6 +1477,7 @@ section h2 span{font-size:12px;font-weight:400;letter-spacing:0;text-transform:n
 <div class="top"><div><div class="eyebrow">КВАНТ · единый вход</div><h1>Портал</h1></div>
 <div class="who">${esc(who.email)}${rights.admin ? '<a href="/admin">доступы</a>' : ""}<a href="https://${esc(team)}/cdn-cgi/access/logout">выйти</a></div></div>
 ${mine.length ? sections : empty}
+${rights.admin ? '<section><h2>Закрытый архив<span>доступ администратора</span></h2><div class="grid"><a class="tile" href="/library/archive"><div class="n">Поиск в архиве</div><div class="d">Исходные тексты, координаты фрагментов и исторические версии. Поиск по доступному индексу.</div></a></div></section>' : ''}
 <div class="note">Вход по корпоративной почте, сессия действует месяц. Права на разделы назначает владелец.</div>
 </div></body></html>`;
   return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store",

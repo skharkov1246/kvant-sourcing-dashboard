@@ -120,3 +120,72 @@ def test_идентификатор_компонента_устойчив_и_ч�
     assert eq.slug_en("combustion liner / can") == "combustion-liner"
     assert eq.slug_en("nozzle guide vanes (NGV)") == "nozzle-guide-vanes"
     assert eq.slug_en("") == ""
+
+
+# ─── поиск машины в тексте статьи ────────────────────────────────────────────
+def test_машина_в_тексте_ищется_целым_словом_и_длинная_раньше_короткой():
+    """«ST14» подстрокой находится внутри «ST1400», «Mars» — внутри «Marshall».
+    А «SGT-400» не должно съедаться более коротким «SGT»."""
+    lk = load("link_knowledge")
+    шаблоны = lk.машинный_шаблон([("sgt400", ["SGT-400"]), ("sgt", ["SGT"]),
+                                  ("st14", ["ST14"]), ("mars90", ["Mars 90"])])
+
+    def найти(текст):
+        for rx, key in шаблоны:
+            if rx.search(текст):
+                return key
+        return None
+
+    assert найти("Ремонт камеры SGT-400 по регламенту") == "sgt400"
+    assert найти("Буровая машина ST14, замена коронок") == "st14"
+    assert найти("Партия ST1400 на складе") is None
+    assert найти("Marshall Islands, судовая поставка") is None
+    assert найти("Ничего про машины") is None
+
+
+def test_слишком_короткое_написание_в_поиск_не_идёт():
+    lk = load("link_knowledge")
+    assert lk.машинный_шаблон([("st8", ["ST8"])]) == []
+
+
+def test_критичность_приводится_к_одной_шкале():
+    """У библиотеки ГПУ критичность словами, у номенклатуры ГТУ — буквами. Две
+    шкалы в одной колонке ломают запрос «покажи критичные узлы»."""
+    assert eq.crit_of("критично") == "A"
+    assert eq.crit_of("расходники") == "C"
+    assert eq.crit_of("капремонт") == eq.crit_of("важно") == "B"
+    assert eq.crit_of("A") == "A"                  # буква остаётся буквой
+    assert eq.crit_of("по проекту") is None        # зависит от проекта
+    assert eq.crit_of(None) is None
+
+
+# ─── изготовитель как исполнитель ────────────────────────────────────────────
+def test_пометка_незнания_в_карточку_изготовителя_не_идёт():
+    """В поле «изготовитель» незнание помечают словами, и такие «фирмы» в базе
+    компаний заводить нельзя: «Прочие» — не изготовитель 242 деталей."""
+    for s in ("Прочие", "прочий OEM", "не указан", "неизвестно", "—", ""):
+        assert not eq.oem_is_real(s), s
+
+
+def test_настоящее_имя_изготовителя_проходит():
+    for s in ("Telsmith", "Cryostar", "Sandvik Tamrock", "GE Vernova (General Electric)"):
+        assert eq.oem_is_real(s), s
+
+
+def test_описание_вместо_имени_в_карточку_не_идёт():
+    assert not eq.oem_is_real("серийный подшипник стороннего изготовителя SKF Timken FAG NSK")
+
+
+def test_псевдонимы_изготовителей_ведут_к_полному_имени_и_их_мало():
+    """Список короткий и ручной сознательно: склейка по началу имени связала бы
+    «Caterpillar» с «Caterpillar gear pump (made-in-china supplier)» — а это
+    другая фирма."""
+    assert eq.OEM_ALIAS["ge"] == eq.OEM_ALIAS["general electric"]
+    assert eq.OEM_ALIAS["siemens"].startswith("siemens energy")
+    assert len(eq.OEM_ALIAS) <= 8, "псевдонимов стало много — значит, начали угадывать"
+    for короткое, полное in eq.OEM_ALIAS.items():
+        # Полное имя обязано содержать короткое как слово (в любом месте: карточка
+        # GE называется «GE Vernova (General Electric)», и «general electric»
+        # стоит в ней не первым). Иначе это уже не псевдоним, а другая фирма.
+        assert полное != короткое, короткое
+        assert короткое in полное, f"{короткое} → {полное}: это не то же имя"

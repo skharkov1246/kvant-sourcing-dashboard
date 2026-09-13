@@ -65,3 +65,16 @@ def test_взаимозаменяемость_и_ведомость_собира
     строки, детали, машины = lc.build_bom()
     assert строки and детали, "ведомость перестала читаться"
     assert all(s["part_no"] for s in строки)
+
+
+def test_ключ_запроса_по_номеру_считается_так_же_как_при_загрузке():
+    """scripts/library_part.py ищет деталь по тому же ключу, каким она
+    загружена. Разойдись нормализация — запрос «560-170-80» не найдёт деталь
+    «56017080», и это выглядело бы как «нет данных», а не как ошибка."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location(
+        "kvant_library_part", ROOT / "scripts" / "library_part.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    for номер in ("560-170-80", "56 017 080", "MW21215M", "64/60030070/1", "ШАЙБА-12Ё"):
+        assert mod.part_key(номер) == lc.part_key(номер), номер
