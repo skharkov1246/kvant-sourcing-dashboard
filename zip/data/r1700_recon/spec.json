@@ -1,0 +1,1118 @@
+{
+ "slice": "spec",
+ "rows": [
+  {
+   "param": "Двигатель — модель",
+   "value": "Cat C11 ACERT, рядный 6-цилиндровый, ATAAC (воздух-воздух)",
+   "unit": "",
+   "variant": "R1700G (SBR/XBR)",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Двигатель — полная мощность SAE J1995, VR-исполнение",
+   "value": "263",
+   "unit": "кВт (353 л.с.)",
+   "variant": "R1700G (SBR/XBR)",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Двигатель — полная мощность SAE J1995, Tier 3 (1–3 передача / 4 передача)",
+   "value": "242 / 263",
+   "unit": "кВт (324/353 л.с.)",
+   "variant": "R1700G (SBR/XBR)",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Двигатель — полезная мощность SAE J1349 / ISO 9249 / 80-1269-EEC (1–3 / 4 передача)",
+   "value": "218 / 241",
+   "unit": "кВт (293/323 л.с.)",
+   "variant": "R1700G (SBR/XBR)",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Двигатель — номинальные обороты",
+   "value": "1800",
+   "unit": "об/мин",
+   "variant": "R1700G (SBR/XBR)",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Двигатель — диаметр цилиндра (bore)",
+   "value": "130",
+   "unit": "мм",
+   "variant": "R1700G (SBR/XBR)",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Двигатель — ход поршня (stroke)",
+   "value": "140",
+   "unit": "мм",
+   "variant": "R1700G (SBR/XBR)",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Двигатель — рабочий объём",
+   "value": "11,1",
+   "unit": "л (680 куб. дюйм)",
+   "variant": "R1700G (SBR/XBR)",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Двигатель — стандарт выбросов",
+   "value": "U.S. EPA Tier 3 / EU Stage IIIA; опционально пакет VR (Ventilation Reduction) для снижения требуемой вентиляции; опционально сажевый фильтр Cat DPF (только с VR, требует ULSD 15 ppm и масла CJ-4)",
+   "unit": "",
+   "variant": "R1700G (SBR/XBR)",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Двигатель — топливная система",
+   "value": "MEUI (механический привод, электронноуправляемая насос-форсунка), прямой впрыск высокого давления; ЭБУ ADEM IV",
+   "unit": "",
+   "variant": "R1700G (SBR/XBR)",
+   "source": "https://amt-inc.ca/wp-content/uploads/2015/03/CAT-R1700G-Undergound-Loader-Full-Brochure.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Двигатель — высота начала дерейтинга",
+   "value": "3050",
+   "unit": "м",
+   "variant": "R1700G (SBR/XBR)",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Двигатель ранней машины — арр. ДВС 145-1730 = ENG AR 3176 (не C11)",
+   "value": "3176 (арр. 145-1730), снят с машины 8XZ00237 2000 г.в.",
+   "unit": "",
+   "variant": "R1700G (8XZ)",
+   "source": "https://parts.cat.com/en/catcorp/145-1730",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "param": "Двигатель — прочие аналоги семейства по объёму",
+   "value": "R1600H — тот же Cat C11, 11,1 л, bore 130 / stroke 140; R1600G и ранний R1700G — 3176/3176C",
+   "unit": "",
+   "variant": "родня",
+   "source": "https://s7d2.scene7.com/is/content/Caterpillar/CM20220926-d2996-7c866",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Номинальная грузоподъёмность — транспортировка (tramming)",
+   "value": "14 000",
+   "unit": "кг (30 865 lb)",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Номинальная грузоподъёмность — погрузка в самосвал (truck loading)",
+   "value": "12 500",
+   "unit": "кг (27 558 lb)",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Полная масса машины (gross machine mass), спецалог 2011/2014",
+   "value": "52 500",
+   "unit": "кг (115 745 lb)",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Полная масса машины — транспортировка / погрузка (поздняя редакция техспеки)",
+   "value": "54 500 / 53 000",
+   "unit": "кг",
+   "variant": "R1700G поздний",
+   "source": "https://s7d2.scene7.com/is/content/Caterpillar/CM20130824-57791-59913",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Масса пустой машины (передний / задний мост)",
+   "value": "38 500 (16 940 / 21 560)",
+   "unit": "кг",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Масса загруженной машины (передний / задний мост)",
+   "value": "51 000 (37 077 / 13 923)",
+   "unit": "кг",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Усилие отрыва (breakout force, SAE)",
+   "value": "20 885",
+   "unit": "кг (46 051 lb)",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Статическая опрокидывающая нагрузка — прямо, стрела горизонтально",
+   "value": "31 781",
+   "unit": "кг",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Статическая опрокидывающая нагрузка — полное складывание",
+   "value": "26 306",
+   "unit": "кг",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Ёмкость ковша — диапазон",
+   "value": "4,6–8,8",
+   "unit": "м³ (6,0–11,5 yd³)",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Ковш стандартный 5,7 м³ — каталожный номер",
+   "value": "252-7194 (ширина по кромке 2772 мм)",
+   "unit": "",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Ковши разгрузочные — каталожные номера и ёмкости",
+   "value": "256-0862 = 4,6 м³; 255-9970 = 5,0 м³; 252-7194 = 5,7 м³ (станд.); 226-5404 = 6,6 м³; 256-0356 = 7,3 м³; 256-0386 = 8,8 м³ (легкий материал)",
+   "unit": "",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Ковш с выталкивателем (ejector) 5,6 м³ — каталожный номер",
+   "value": "281-1125 (в редакции 2014); 281-0445 в ранней редакции",
+   "unit": "",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Ширина ковша по режущей кромке (по типоразмерам)",
+   "value": "2672 / 2672 / 2772 / 2932 / 2982 / 3492 / 2780",
+   "unit": "мм",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Угол разгрузки при максимальном подъёме",
+   "value": "46",
+   "unit": "градусов",
+   "variant": "R1700G",
+   "source": "https://amt-inc.ca/wp-content/uploads/2015/03/CAT-R1700G-Undergound-Loader-Full-Brochure.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Ковши нового поколения — каталожные номера",
+   "value": "467-1827 = 5,7 м³ (станд.); 467-1828 = 6,1 м³; 467-1829 = 6,6 м³; 467-1830 = 7,5 м³; 561-1775 = 6,8 м³ болтовой; GET модульный приварной 6Y-2107",
+   "unit": "",
+   "variant": "R1700 / R1700 XE",
+   "source": "https://s7d2.scene7.com/is/content/Caterpillar/CM20220831-47b57-f400c",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Длина общая — транспортное положение (станд. ковш 5,7 м³)",
+   "value": "10 589",
+   "unit": "мм",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Длина общая — положение копания (станд. ковш)",
+   "value": "10 973",
+   "unit": "мм",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Ширина по шинам",
+   "value": "2650",
+   "unit": "мм",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Ширина машины без ковша",
+   "value": "2689",
+   "unit": "мм",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Высота по верху ROPS",
+   "value": "2557",
+   "unit": "мм",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Высота по верху капота",
+   "value": "1968",
+   "unit": "мм",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Колёсная база",
+   "value": "3680",
+   "unit": "мм",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Дорожный просвет",
+   "value": "429",
+   "unit": "мм",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Высота максимальной разгрузки",
+   "value": "4899",
+   "unit": "мм",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Просвет под ковшом при разгрузке на макс. подъёме (станд. ковш)",
+   "value": "2443",
+   "unit": "мм",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Высота пальца ковша при макс. подъёме",
+   "value": "4104",
+   "unit": "мм",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Вылет (reach) при макс. подъёме, станд. ковш",
+   "value": "1741",
+   "unit": "мм",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Расстояние от оси переднего моста до шарнира / от заднего моста до бампера",
+   "value": "1840 / 3439",
+   "unit": "мм",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Рекомендуемый габарит выработки (ширина × высота)",
+   "value": "4000 × 4000",
+   "unit": "мм",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Наружный радиус поворота (clearance radius)",
+   "value": "6878",
+   "unit": "мм",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Внутренний радиус поворота",
+   "value": "3229",
+   "unit": "мм",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Угол складывания (articulation angle)",
+   "value": "44",
+   "unit": "градусов",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Качание заднего моста (axle oscillation)",
+   "value": "8",
+   "unit": "градусов",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Трансмиссия — тип",
+   "value": "Планетарная powershift Cat, 4 передачи вперёд / 4 назад, электронное автоматическое переключение (ручной или авторежим), нейтрализатор трансмиссии левой педалью",
+   "unit": "",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Гидротрансформатор",
+   "value": "Высокомоментный ГТР Cat; на машине 8XZ00237 арр. ГТР 180-3568, арр. КП 164-4239",
+   "unit": "",
+   "variant": "R1700G (8XZ)",
+   "source": "https://www.worthyparts.com/wrecking-dismantling-detail/r1700g-8xz-loader/2317/",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "param": "Скорости вперёд 1/2/3/4",
+   "value": "4,7 / 8,3 / 14,3 / 24,1",
+   "unit": "км/ч",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Скорости назад 1/2/3/4",
+   "value": "5,4 / 9,4 / 16,4 / 25,3",
+   "unit": "км/ч",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Заправка трансмиссии",
+   "value": "47",
+   "unit": "л",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Мосты — тип",
+   "value": "Мосты Cat, бортовые редукторы двойной планетарной редукции; задний мост качающийся; охлаждение тормозов через мосты (brake axle cooling) — стандарт",
+   "unit": "",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Мосты — арр. с конкретной машины 8XZ00237",
+   "value": "передний мост 162-5507, задний мост 162-5508; бортовой редуктор (wheel end) 172-4827 одинаковый на всех 4 позициях; дифференциал передний 219-7996, задний 219-7997",
+   "unit": "",
+   "variant": "R1700G (8XZ)",
+   "source": "https://www.worthyparts.com/wrecking-dismantling-detail/r1700g-8xz-loader/2317/",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "param": "Заправка переднего моста и бортовых редукторов",
+   "value": "61 (90 с маслоохладителем моста)",
+   "unit": "л",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Заправка заднего моста и бортовых редукторов",
+   "value": "61 (90 с маслоохладителем моста)",
+   "unit": "л",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Тормоза — тип",
+   "value": "Полностью гидравлические закрытые маслопогружённые многодисковые SAFR на четыре колеса; рабочий контур — модулируемое гидравлическое давление, стояночный — пружинный с гидравлическим отпуском (spring applied, fluid released), независимые поршни рабочего и стояночного контуров",
+   "unit": "",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Тормоза — стандарты",
+   "value": "ISO 3450, AS2958.1, CAN-CSA424.30-M90",
+   "unit": "",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Шины — типоразмер",
+   "value": "26.5 × 25, 36 PLY, VSMS/STMS L-5S; опция 26.5 × R25 VSMS L-5S Bridgestone. Диски 5-секционные бескамерные (стандарт)",
+   "unit": "",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Шины — родня (несовместимо с R1700G)",
+   "value": "R1700 и R1700 XE — 26.5R25 (ширина по шинам 2767 мм, +64 мм колея); R1600G — 18.00×25 28 PLY; R1600H — 18×R25; R1300G — 17.5×R25 VSMS",
+   "unit": "",
+   "variant": "родня",
+   "source": "https://s7d2.scene7.com/is/content/Caterpillar/CM20220831-47b57-f400c",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Гидравлика — схема",
+   "value": "Высокопроизводительные насосы, большие цилиндры подъёма и наклона; пилотное джойстиковое управление рабочим оборудованием; рулевое управление STIC (совмещённый контроллер руля и трансмиссии); опция Ride Control (азотный гидроаккумулятор в контуре подъёма)",
+   "unit": "",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Гидравлика — объём гидробака",
+   "value": "125",
+   "unit": "л",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Гидравлика — время цикла: подъём / разгрузка / опускание порожнего / полный цикл",
+   "value": "6,8 / 2,9 / 2,4 / 12,1",
+   "unit": "с",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Гидравлика — цилиндры конкретной машины 8XZ00237",
+   "value": "цилиндр подъёма 141-1974 (левый и правый одинаковые), цилиндр наклона 180-9367",
+   "unit": "",
+   "variant": "R1700G (8XZ)",
+   "source": "https://www.worthyparts.com/wrecking-dismantling-detail/r1700g-8xz-loader/2317/",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "param": "Гидравлика — параметры контура (опубликованы только для нового поколения)",
+   "value": "Контур подъёма/наклона: электрогидравлический, positive flow control, flow sharing; насос аксиально-поршневой переменной производительности с load sense; макс. расход 297 л/мин; главный предохранительный клапан 34 000 кПа (4932 psi); цилиндр подъёма Ø170 мм, ход 830 мм; цилиндр наклона Ø210 мм, ход 564 мм",
+   "unit": "",
+   "variant": "R1700 XE (для R1700G не публикуется)",
+   "source": "https://s7d2.scene7.com/is/content/Caterpillar/CM20210911-5d964-1c065",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Заправка — картер ДВС с фильтром",
+   "value": "34",
+   "unit": "л",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Заправка — система охлаждения",
+   "value": "63",
+   "unit": "л",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Заправка — топливный бак основной",
+   "value": "569 (в ранней редакции 570)",
+   "unit": "л",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Заправка — топливный бак дополнительный (если установлен)",
+   "value": "446 (в ранней редакции 420)",
+   "unit": "л",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Электрика — пуск",
+   "value": "Электрический стартер 24 В; розетка вспомогательного пуска; выключатель массы АКБ на уровне земли",
+   "unit": "",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Электрика — генератор",
+   "value": "95 А (стандарт)",
+   "unit": "А",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Электрика — автомат защиты / питание в кабине",
+   "value": "автомат 80 А; питание 12 В в кабине; АКБ низкообслуживаемые",
+   "unit": "",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Электрика — родня",
+   "value": "R1700 (2019+): генератор 150 А, стартер 24 В; R1700 XE: бортовая 24 В (АКБ низкообслуживаемые, выключатель массы и изоляции 24 В) плюс высоковольтный тяговый контур 715 В",
+   "unit": "",
+   "variant": "родня",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/r1700.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Электрика — контроль и диагностика",
+   "value": "Cat Electronic Monitoring System (CatEMS), диагностический разъём; опции: VIMS Gen 3, Command for Underground, Payload Control System (PCS) или Loadrite L2180",
+   "unit": "",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Система пожаротушения",
+   "value": "Опция: Ansul сухой порошок либо пена на водной основе (foam, water based); опция выключателя останова ДВС при срабатывании пожаротушения",
+   "unit": "",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Система пожаротушения — родня",
+   "value": "R1700 (2019+): Ansul wet (пенная), активация из кабины",
+   "unit": "",
+   "variant": "R1700",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/r1700.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Кабина — исполнение и вентиляция/фильтрация",
+   "value": "Стандарт — открытая станция ROPS/FOPS. Опция — закрытая ROPS/FOPS с кондиционером, наддувом кабины и фильтром (cab pressurizer and filter), обогревателем, обдувом стекла (demister), плафоном",
+   "unit": "",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Кабина — стандарты защитных конструкций",
+   "value": "ROPS: ISO 3471, SAE J1040, AS2294.2, EN13510. FOPS: BS EN ISO 3449, SAE J231, AS2294.3",
+   "unit": "",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Кабина — каталожный номер группы закрытой кабины ROPS",
+   "value": "215-2795 (Cab Gp — Enclosed ROPS)",
+   "unit": "",
+   "variant": "R1700G",
+   "source": "https://www.worthyparts.com/parts-detail/cat-r1700g-cab-gp-enclosed-rops/963/",
+   "confidence": "low",
+   "verdict": ""
+  },
+  {
+   "param": "Уровень шума",
+   "value": "Для R1700G Cat не публикует. Для R1700 XE: в кабине 71 ±2,5 дБ(А), звуковая мощность 104 ±2,5 дБ(А) по ISO 6395:2008/6396:2008 (в ECO-режиме 77 и 100 дБ(А))",
+   "unit": "",
+   "variant": "R1700 XE",
+   "source": "https://s7d2.scene7.com/is/content/Caterpillar/CM20210911-5d964-1c065",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Расчётные массы для графика тягового усилия (rimpull)",
+   "value": "порожняя E = 38 500 кг, загруженная L = 51 000 кг; шины 26.5×25; 4 передачи + прямой привод",
+   "unit": "",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Смазка",
+   "value": "Полуцентрализованные точки смазки (стандарт); опция — централизованная и автоматическая система смазки",
+   "unit": "",
+   "variant": "R1700G",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng_14.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "param": "Мощность по карточке продукта Cat (расхождение с спецалогом)",
+   "value": "345 л.с. / 257 кВт (Tier 3) — карточка Cat CPC; спецалог даёт 242/263 кВт SAE J1995. Перед торгами сверять по серийному номеру",
+   "unit": "",
+   "variant": "R1700G",
+   "source": "https://h-cpc.cat.com/cmms/v2?f=product&it=product&cid=406&lid=en&sc=US&gid=13866081&pid=18233686&nc=1",
+   "confidence": "med",
+   "verdict": ""
+  }
+ ],
+ "variants": [
+  {
+   "model": "R1700G (серийный префикс 8XZ)",
+   "years": "с 2000 г. (машина 8XZ00237 — 2000 г.в.)",
+   "serial_prefix": "8XZ (8XZ00001-UP)",
+   "engine": "Cat 3176 (арр. ДВС 145-1730)",
+   "power_kw": "н/д (по спецалогу более поздних машин 242/263)",
+   "bucket_m3": "4,6–8,8",
+   "payload_t": "14 (транспортировка) / 12,5 (погрузка)",
+   "weight_t": "38,5 порожняя / 52,5 полная",
+   "tyres": "26.5 × 25 36 PLY STMS L-5S",
+   "note": "РАННЕЕ поколение. Двигатель НЕ C11: арр. 145-1730 по каталогу Cat = ENG AR 3176. Значит запчасти ДВС (фильтры, форсунки, помпа, турбина, прокладки) с C11-машин НЕ подходят. Ходовая и мосты при этом свои: мост передний 162-5507, задний 162-5508, бортовой редуктор 172-4827 (один на все 4 позиции), дифференциалы 219-7996/219-7997, ГТР 180-3568, КП 164-4239, цилиндр подъёма 141-1974, наклона 180-9367. Каталог запчастей — SEBP3045.",
+   "source": "https://www.worthyparts.com/wrecking-dismantling-detail/r1700g-8xz-loader/2317/"
+  },
+  {
+   "model": "R1700G (серийный префикс SBR)",
+   "years": "середина 2000-х – 2018 (замещён R1700 в 2019)",
+   "serial_prefix": "SBR (SBR00001-UP)",
+   "engine": "Cat C11 ACERT, 6 цил., 11,1 л",
+   "power_kw": "242/263 (SAE J1995); 263 для VR",
+   "bucket_m3": "4,6–8,8",
+   "payload_t": "14 / 12,5",
+   "weight_t": "38,5 порожняя / 52,5–54,5 полная",
+   "tyres": "26.5 × 25 36 PLY VSMS/STMS L-5S",
+   "note": "Основное исполнение под наши 87 позиций КВАНТ (фильтры 1R-1808, 1R-0762, 132-7167 — это C11). Каталог запчастей SEBP3612 «R1700G Load Haul Dump SBR00001-UP (MACHINE) POWERED BY C11 Engine». Сервис-мануал существует отдельным изданием под SBR.",
+   "source": "https://spare.avspart.com/caterpillar/sebp3612/"
+  },
+  {
+   "model": "R1700G (серийный префикс XBR)",
+   "years": "поздние машины серии G",
+   "serial_prefix": "XBR",
+   "engine": "Cat C11 ACERT",
+   "power_kw": "242/263",
+   "bucket_m3": "4,6–8,8",
+   "payload_t": "14 / 12,5",
+   "weight_t": "38,5 / 52,5–54,5",
+   "tyres": "26.5 × 25 / 26.5 × R25",
+   "note": "Внешне и по спецификации совпадает с SBR; интерфейсы дистанционного управления (RCT) поставляются одной позицией «под SBR/XBR», то есть электроника этих двух префиксов совместима. В поздней редакции техспеки выросла полная масса: 54 500 кг транспортировка / 53 000 кг погрузка.",
+   "source": "https://rct-global.com/part/interface-to-suit-r1700g-serial-number-sbr-xbr/"
+  },
+  {
+   "model": "R1700 (новое поколение)",
+   "years": "с 2019 (анонс на базе платформы R1700, апрель 2019)",
+   "serial_prefix": "н/д — уточнять по SIS",
+   "engine": "Cat C13, 6 цил., 12,5 л",
+   "power_kw": "269 (Tier 3/Stage IIIA и VR, ISO 14396) / 257 (Stage V)",
+   "bucket_m3": "5,7–8,6",
+   "payload_t": "15",
+   "weight_t": "43,2 эксплуатационная / 62,7 полная загруженная",
+   "tyres": "26.5R25",
+   "note": "Габариты кузова сохранены от R1700G, но взаимозаменяемость минимальная: другой ДВС (C13 против C11), бак DEF 27 л, колея шире на 64 мм, мосты усилены и дифференциал унифицирован с R2900, заправки другие (охлаждение 75 л, картер 37 л, гидробак 135 л, топливо 486 л, мосты 148/141 л, КП 54 л). Скорости выше: 4,9/9,2/16,4/28,8 вперёд. Генератор 150 А. Ковши серии 467-18xx с GET 6Y-2107. Есть Auto Dig, авторетардер, ride control с 5 км/ч.",
+   "source": "https://s7d2.scene7.com/is/content/Caterpillar/CM20220831-47b57-f400c"
+  },
+  {
+   "model": "R1700 XE (аккумуляторная)",
+   "years": "представлена MINExpo 09.2021, коммерческие поставки с I кв. 2022",
+   "serial_prefix": "н/д",
+   "engine": "Без ДВС. Тяговый электродвигатель switched reluctance 250 кВт пик / 220 кВт номинал, момент 3200/660 Н·м, КПД 95 %; вспомогательный двигатель 226 кВт, 600/531 Н·м, КПД 96 %",
+   "power_kw": "250 (тяга, пик)",
+   "bucket_m3": "5,7–7,5",
+   "payload_t": "15",
+   "weight_t": "48,7 эксплуатационная / 63,7 с грузом; транспортная 51,9",
+   "tyres": "26.5R25",
+   "note": "Батарея Li-Ion 213 кВт·ч, 715 В номинал, охлаждение жидкостное; бортовая ультрабыстрая зарядка: <30 мин одним MEC500, <20 мин двумя, максимум 840 кВт, до 4C. Инвертор 350 А / 715 В DC, IP67/IP69K. Ресурс до ТО электрокомпонентов 12 000–13 000 ч. Гидравлика: 297 л/мин, клапан 34 000 кПа, цилиндр подъёма Ø170×830, наклона Ø210×564. Совпадают с R1700 ковши (467-1827…1830, 561-1775) и шины; всё дизельное — нет.",
+   "source": "https://s7d2.scene7.com/is/content/Caterpillar/CM20210911-5d964-1c065"
+  },
+  {
+   "model": "R1600G",
+   "years": "поколение G (снят с производства, замещён R1600H)",
+   "serial_prefix": "н/д",
+   "engine": "Cat 3176C EUI ATAAC, 10,3 л, bore 125 / stroke 140, Tier 2",
+   "power_kw": "185/200 полная SAE J1995; 165/180 полезная",
+   "bucket_m3": "4,2–5,9",
+   "payload_t": "10,2",
+   "weight_t": "29,8 порожняя / 40,0 полная",
+   "tyres": "18.00 × 25 28 PLY STMS L5S",
+   "note": "Обороты 2100 (а не 1800). Класс ниже R1700G, но узлы частично общие по номенклатуре заправок: КП 47 л, гидробак 125 л — те же цифры, что у R1700G. Ковши 227-4702/203-1792/227-4704/227-4703, ejector 229-1676. Двигатель 3176C — родня ранним R1700G (8XZ).",
+   "source": "https://mcdowellequipment.com/wp-content/uploads/2024/08/R1600G-English.pdf"
+  },
+  {
+   "model": "R1600H",
+   "years": "текущее производство (замена R1600G)",
+   "serial_prefix": "н/д",
+   "engine": "Cat C11, 11,1 л, bore 130 / stroke 140, 1800 об/мин",
+   "power_kw": "202 (VR и Tier 3, ISO 14396)",
+   "bucket_m3": "4,2–5,9",
+   "payload_t": "10,2",
+   "weight_t": "30,15 эксплуатационная / 44,2 полная",
+   "tyres": "18 × R25",
+   "note": "САМАЯ ВАЖНАЯ родня по запчастям: тот же двигатель Cat C11, что у R1700G SBR/XBR — фильтры, форсунки, помпа, турбина, ремни ищутся по одной номенклатуре. Совпадают и заправки: картер 34 л, КП 47 л, гидробак 125 л. НЕ совпадают: шины (18×R25 против 26.5×25), мосты (заправка 80 л против 61/90), топливный бак 400 л, охлаждение 61 л, угол складывания 42,5° и качание 10°. Ковши 514-5710/203-1792/227-4704/514-5720, ejector 260-5198, болтовой 598-8733.",
+   "source": "https://s7d2.scene7.com/is/content/Caterpillar/CM20220926-d2996-7c866"
+  },
+  {
+   "model": "R1300G",
+   "years": "поколение G, самая малая ПДМ Cat",
+   "serial_prefix": "н/д",
+   "engine": "Cat 3306B DITA, 10,5 л, bore 120,7 / stroke 152,4, 2200 об/мин",
+   "power_kw": "123 (165 л.с.)",
+   "bucket_m3": "2,4–3,4",
+   "payload_t": "6,8",
+   "weight_t": "20,95 порожняя / 27,75 полная",
+   "tyres": "17.5 × R25 VSMS",
+   "note": "Другой класс и другой двигатель (3306B — механика старого семейства). Пересечений с R1700G по ДВС, мостам, ковшам нет. Заправки: картер 25 л, КП 45 л, гидробак 88 л, охлаждение 67 л, мосты 38/42 л, топливо 295 л. Складывание 42,5°, качание 10°.",
+   "source": "https://s7d2.scene7.com/is/content/Caterpillar/C681897"
+  }
+ ],
+ "nodes": [
+  {
+   "node": "01 Двигатель Cat C11 ACERT (на 8XZ — 3176)",
+   "children": [
+    "блок и ГБЦ",
+    "поршневая группа и вкладыши",
+    "коленвал и маховик",
+    "насос-форсунки MEUI и ТНВД",
+    "турбокомпрессор",
+    "охладитель наддува ATAAC",
+    "водяная помпа и термостат",
+    "масляный насос и теплообменник",
+    "ремни привода и натяжитель",
+    "стартер 24 В и генератор 95 А",
+    "ЭБУ ADEM IV и жгуты",
+    "выхлоп, каталитический глушитель, DPF (опция)"
+   ],
+   "crit": "A"
+  },
+  {
+   "node": "02 Топливная система",
+   "children": [
+    "основной бак 569 л",
+    "дополнительный бак 446 л",
+    "электрический подкачивающий насос",
+    "фильтр грубой очистки",
+    "фильтр тонкой очистки",
+    "датчик уровня топлива",
+    "топливопроводы в двойной оплётке",
+    "ручной топливный кран (опция)"
+   ],
+   "crit": "A"
+  },
+  {
+   "node": "03 Система охлаждения",
+   "children": [
+    "радиатор поперечного потока с откидной решёткой",
+    "маслоохладитель гидравлики (откидной, задняя рама)",
+    "маслоохладитель мостов (опция)",
+    "вентилятор и привод",
+    "патрубки и хомуты",
+    "датчик уровня и температуры ОЖ",
+    "подушки крепления радиатора"
+   ],
+   "crit": "A"
+  },
+  {
+   "node": "04 Воздухоочистка ДВС",
+   "children": [
+    "предочиститель на впуске",
+    "внешний фильтроэлемент",
+    "внутренний (защитный) фильтроэлемент",
+    "индикатор засорённости",
+    "впускные патрубки",
+    "датчик температуры/давления впускного воздуха"
+   ],
+   "crit": "A"
+  },
+  {
+   "node": "05 Гидротрансформатор и КП",
+   "children": [
+    "гидротрансформатор (арр. 180-3568 на 8XZ)",
+    "планетарная КП powershift 4F/4R (арр. 164-4239 на 8XZ)",
+    "насос ГТР и перекачной насос ГМП",
+    "фильтр масла КП и кран слива",
+    "ЭБУ переключения (ECPC)",
+    "нейтрализатор трансмиссии",
+    "карданные валы и опоры",
+    "подушки крепления ГМП",
+    "датчики температуры и давления"
+   ],
+   "crit": "A"
+  },
+  {
+   "node": "06 Мосты и бортовые редукторы",
+   "children": [
+    "передний мост 162-5507",
+    "задний мост качающийся 162-5508",
+    "дифференциал передний 219-7996",
+    "дифференциал задний 219-7997",
+    "бортовые редукторы 172-4827 (4 шт., один номер)",
+    "планетарки двойной редукции",
+    "уплотнения Duo-Cone",
+    "шпильки и ступицы"
+   ],
+   "crit": "A"
+  },
+  {
+   "node": "07 Тормозная система SAFR",
+   "children": [
+    "маслопогружённые многодисковые тормоза 4 колёс",
+    "поршни рабочего контура",
+    "поршни стояночного (пружина + гидроотпуск)",
+    "тормозные педали 188-7496 / 188-7497",
+    "выключатели педалей 105-6117 / 105-6118",
+    "тормозные клапаны 186-8817 / 260-9632",
+    "соленоид 186-9083",
+    "датчики давления 361-8400 / 421-9097 / 459-2599 / 3E-7692",
+    "кнопка стояночного тормоза 370-2574",
+    "аккумуляторы давления",
+    "контур промывки тормозов (brake axle cooling)"
+   ],
+   "crit": "A"
+  },
+  {
+   "node": "08 Рулевое управление STIC",
+   "children": [
+    "контроллер STIC (руль + трансмиссия)",
+    "цилиндры поворота (комплект уплотнений 163-6223)",
+    "рулевой джойстик-клапан 249-5615",
+    "насос рулевого контура",
+    "аварийное (вторичное) рулевое управление (опция)",
+    "палец блокировки складывания рамы"
+   ],
+   "crit": "A"
+  },
+  {
+   "node": "09 Рабочая гидравлика",
+   "children": [
+    "сдвоенный шестерённый насос 169-4621",
+    "распределитель и секции",
+    "цилиндры подъёма (141-1974 на 8XZ)",
+    "цилиндр наклона (180-9367 на 8XZ)",
+    "комплекты уплотнений цилиндров (246-0659 и др.)",
+    "пилотные джойстики 186-9790 / 491-3721",
+    "фильтр гидросистемы 1R-0722",
+    "гидробак 125 л",
+    "рукава Cat XT и фитинги O-ring face seal",
+    "Ride Control с азотным аккумулятором (опция)"
+   ],
+   "crit": "A"
+  },
+  {
+   "node": "10 Рама, шарнир, стрела",
+   "children": [
+    "передняя полурама",
+    "задняя полурама",
+    "шарнир (spread hitch) с верхним и нижним пальцами на роликовых подшипниках",
+    "стрела Z-bar с литой поперечной трубой",
+    "рычаг и тяга опрокидывания",
+    "уплотнённые пальцы и втулки",
+    "защитные накладки 100×50 мм",
+    "откидные защиты картера ДВС и ГМП",
+    "брызговики передние и задние"
+   ],
+   "crit": "B"
+  },
+  {
+   "node": "11 Ковш и ГЭИ (GET)",
+   "children": [
+    "ковш 252-7194 (станд. 5,7 м³) и типоразмеры 256-0862…256-0386",
+    "ковш с выталкивателем 281-1125",
+    "режущая кромка (кромка Hardox 450)",
+    "зубья и адаптеры",
+    "литые углы (shark ready)",
+    "накладки MAS и MAWPS",
+    "защитные бары и пятовые накладки",
+    "износная облицовка"
+   ],
+   "crit": "B"
+  },
+  {
+   "node": "12 Колёса и шины",
+   "children": [
+    "шины 26.5 × 25 36 PLY L-5S",
+    "диски 5-секционные бескамерные",
+    "вентили и удлинители",
+    "болты и гайки крепления",
+    "запасной диск (опция)"
+   ],
+   "crit": "A"
+  },
+  {
+   "node": "13 Кабина и рабочее место",
+   "children": [
+    "группа закрытой кабины ROPS/FOPS 215-2795",
+    "подрессоренное сиденье и ремень с инерционной катушкой",
+    "кондиционер: компрессор 3E-1906, фильтр 231-0167, вентилятор радиатора 378-7650",
+    "отопитель 378-7565 и эл. моторчик вентилятора 212-5135",
+    "наддув кабины и фильтр (салонный фильтр 378-7609, компенсатор 541-3404)",
+    "стеклоочистители и обдув стекла",
+    "дисплей CatEMS, приборы и индикаторы",
+    "педаль акселератора 577-2006",
+    "концевик двери 353-5983",
+    "звуковые сигналы и сигнал заднего хода"
+   ],
+   "crit": "B"
+  },
+  {
+   "node": "14 Электрооборудование и датчики",
+   "children": [
+    "АКБ низкообслуживаемые 24 В и выключатель массы",
+    "генератор 197-8820 (аналог Krauf ALN0681)",
+    "стартер 338-3454",
+    "предохранители и автомат 80 А (171-2210)",
+    "жгуты 204-4311 / 434-1525",
+    "датчики давления 221-3411 / 305-6873",
+    "датчики температуры 134-2252 / 256-6453 / 264-4297",
+    "датчики уровня 132-6277 / 239-9957 / 430-9448 / 430-9449",
+    "освещение галогенное или LED, фары рабочие",
+    "камера заднего вида (опция)",
+    "разъём диагностики"
+   ],
+   "crit": "B"
+  },
+  {
+   "node": "15 Безопасность и пожаротушение",
+   "children": [
+    "система пожаротушения Ansul (порошок или пена)",
+    "выключатель останова ДВС на уровне земли",
+    "дополнительные выключатели останова",
+    "ROPS/FOPS конструкция",
+    "пальцы фиксации стрелы",
+    "палец блокировки складывания",
+    "противоскользящие поверхности деки",
+    "трёхточечный доступ, поручни",
+    "светоотражающая лента (опция)"
+   ],
+   "crit": "A"
+  },
+  {
+   "node": "16 Смазка и обслуживание",
+   "children": [
+    "полуцентрализованные точки смазки",
+    "централизованная/автоматическая смазка (опция)",
+    "насос системы смазки 211-3336 и фильтр 211-3342",
+    "фитинги смазки",
+    "порты S·O·S (ОЖ, масло ДВС, гидравлика, ГМП)",
+    "система быстрой заправки Fast Fill (опция)",
+    "смотровые стёкла уровней на уровне земли"
+   ],
+   "crit": "C"
+  },
+  {
+   "node": "17 Технологии и автоматизация",
+   "children": [
+    "VIMS Gen 3 (опция)",
+    "Command for Underground (опция)",
+    "Electronic Access Module",
+    "интерфейс дистанционного управления Cattron или RCT (под SBR/XBR)",
+    "система контроля загрузки PCS или Loadrite L2180",
+    "таймер холостого хода"
+   ],
+   "crit": "C"
+  },
+  {
+   "node": "18 Транспортировка и вспомогательное",
+   "children": [
+    "рама задняя под mine transfer (опция)",
+    "подъёмная группа mine transfer",
+    "буксирная серьга и крюк восстановления",
+    "бар восстановления",
+    "система растормаживания для буксировки",
+    "антивандальные чехлы на перевозку"
+   ],
+   "crit": "C"
+  }
+ ],
+ "notes": "Паспорт собран по официальным документам Caterpillar: спецалоги R1700G AEHQ6387 (10-2011) и AEHQ6387-01 (09-2014), техспека R1700G (CM20130824), техспеки R1700 (CM20220831), R1700 XE (CM20210911), R1600H (CM20220926), R1600G и R1300G. PDF извлекались локально (pure-python распаковка FlateDecode-потоков), поэтому цифры взяты из самих таблиц Cat, а не из пересказов. ГЛАВНАЯ НАХОДКА для торгов: R1700G существует в двух двигательных исполнениях. Ранние машины префикса 8XZ (с 2000 г.) несут арр. ДВС 145-1730, который по каталогу Cat расшифровывается как ENG AR 3176, а не C11. Все 87 наших позиций по фильтрам и ДВС (1R-1808, 1R-0762, 132-7167, 6I-2510, 423-8524, 352-0206, 248-5513, 5R-7276, 338-3454) относятся к C11-машинам SBR/XBR. Перед закупкой обязательно снимать серийный префикс с шильдика. Вторая находка: бортовой редуктор 172-4827 стоит на всех четырёх позициях — один номер вместо четырёх, это напрямую сокращает складскую номенклатуру. Третья: Cat C11 у R1700G и R1600H — один двигатель, поэтому расходники ДВС ищутся общей номенклатурой на два парка, а мосты, шины и ковши — нет. Новое поколение R1700 (2019+, C13) сохранило габариты и колёсную базу 3680 мм, но сменило ДВС, расширило колею на 64 мм, унифицировало дифференциал с R2900 и поменяло все заправочные объёмы — рассчитывать на взаимозаменяемость с R1700G нельзя нигде, кроме мелочей крепежа.",
+ "gaps": "1) Гидравлические давления и производительность насосов для самого R1700G Cat не публикует ни в спецалоге, ни в техспеке — в файле приведены только опубликованные цифры нового поколения (R1700 XE: 297 л/мин, клапан 34 000 кПа, цилиндры Ø170×830 и Ø210×564). Для R1700G нужен сервис-мануал SENR/RENR по префиксу (SBR/XBR) — закрытый источник, через дилера или SIS. 2) Ёмкость АКБ в А·ч не публикуется ни для одной модели ряда: в перечнях только «low maintenance batteries» и 24 В. 3) Уровень шума и вибрации для R1700G не опубликован (для R1700 XE есть: 71/104 дБ(А)). 4) Мощность раннего 8XZ-исполнения подтвердить не удалось: цифру 3176C 231 кВт (310 л.с.) выдавали только сводки поисковика, ни одной страницы с ней я не открыл — в файл она не внесена. 5) Годы выпуска R1700G точно не документированы: подтверждены только нижняя граница 2000 г. (машина 8XZ00237, 2000 г.в., ревизия каталога запчастей от 31.07.2000) и факт замещения моделью R1700 в 2019 г.; календарные интервалы для SBR и XBR нужны из SIS. 6) Серийные префиксы найдены три (8XZ, SBR, XBR); полный список префиксов и их привязка к годам — только SIS. 7) Модельных обозначений ГТР и КП Caterpillar не даёт (только арр. 180-3568 и 164-4239 с одной конкретной машины). 8) Расхождение по массе: спецалоги 2011/2014 дают полную 52 500 кг, поздняя техспека — 54 500/53 000 кг; какой ревизии соответствует конкретная машина, определяется префиксом. 9) Расхождение по качанию заднего моста: Cat даёт 8°, вторичные каталоги (speceps) — 16°; принято 8° по Cat. 10) Расхождение по мощности: карточка продукта Cat CPC даёт 257 кВт/345 л.с. Tier 3, спецалог — 242/263 кВт SAE J1995; строка внесена отдельно с пометкой сверять по серийному номеру."
+}
