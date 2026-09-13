@@ -4,16 +4,16 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 192,
-    "total_bytes": 93225315,
+    "datasets": 193,
+    "total_bytes": 93497842,
     "by_sensitivity": {
       "конфиденциально": 57,
-      "внутреннее": 102,
+      "внутреннее": 103,
       "публикуемо": 33
     },
     "by_subproject": {
       "ГПУ-библиотека": 27,
-      "ГТУ-библиотека": 36,
+      "ГТУ-библиотека": 37,
       "ОВЭ-75": 45,
       "база ЗИП": 31,
       "база ЗИП · таможня": 18,
@@ -303,9 +303,9 @@
           "verdict"
         ]
       },
-      "last_change": "2026-09-12",
-      "last_author": "Claude",
-      "last_commit": "692e091",
+      "last_change": "2026-09-13",
+      "last_author": "skharkov1246",
+      "last_commit": "d16688b",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -314,7 +314,8 @@
       "referenced_by": [
         "gt/tools/ship_export.py",
         "gt/tools/ship_map.py",
-        "gt/tools/ship_merge.py"
+        "gt/tools/ship_merge.py",
+        "gt/tools/ship_rfq.py"
       ]
     },
     {
@@ -1455,7 +1456,7 @@
     {
       "path": "data/chat_snapshot.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 536053,
+      "bytes": 549734,
       "note": "Суточный снимок реакции коммерсантов в чатах сделок. Пишет бот scan.yml (chat_scan.py) раз в сутки. Руками не редактировать: правка в PR откатит свежие данные при мерже. Содержит поимённые метрики 15 сотрудников и LLM-оценки.",
       "format": "json",
       "shape": "объект",
@@ -1468,9 +1469,9 @@
         "key": "assessment",
         "records": 15
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-09-12",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "e455ab2",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "конфиденциально",
@@ -2152,6 +2153,47 @@
       },
       "referenced_by": [
         "zip/tools/build_telsmith_page.py"
+      ]
+    },
+    {
+      "path": "gt/data/ship_rfq_letters.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 256263,
+      "note": "Пакет запросов твёрдых предложений по заявке ЛУКОЙЛ: 96 писем, по одному на адресата, со списком его позиций, ссылками на его же карточки товара и восемью вопросами, ответы на которые превращают карточку витрины в предложение — остаток числом на сегодня, срок под весь наш объём, цена за объём, срок действия, Инкотермс, состояние и гарантия, страна происхождения, условия возврата. Собраны 243 связки «позиция — продавец» по 193 строкам со складом в любой из трёх градаций (твёрдый, объём не закрыт, условный). Производный файл: собирается gt/tools/ship_rfq.py из gt/data/ship_lukoil.json, отдельно не редактируется. Площадки (eBay, Amazon, Alibaba) адресатами не считаются: письмо в маркетплейс не уходит никому. Адресаты кластера в запросы не идут — «работает по такому классу» и «у него есть эта деталь» разные утверждения. Почты — только опубликованные компаниями коммерческие ящики отделов продаж, те же, что в gt/data/ship_sellers.json; персональных адресов нет. Имя заказчика в текстах писем не названо намеренно. Читаемая версия — gt/docs/ЗАПРОСЫ-ЛУКОЙЛ.pdf, для слияния почты — gt/docs/ЗАПРОСЫ-ЛУКОЙЛ.csv.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "letters",
+        "source"
+      ],
+      "main_collection": {
+        "key": "letters",
+        "records": 96,
+        "record_keys": [
+          "body",
+          "cc",
+          "country",
+          "firm_lines",
+          "lang",
+          "lines",
+          "phones",
+          "pns",
+          "qty_total",
+          "seller",
+          "subject",
+          "to"
+        ]
+      },
+      "last_change": "2026-09-13",
+      "last_author": "Claude",
+      "last_commit": "31258ed",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/ship_rfq.py"
       ]
     },
     {
@@ -3879,9 +3921,9 @@
           "verdict"
         ]
       },
-      "last_change": "2026-09-12",
-      "last_author": "Claude",
-      "last_commit": "692e091",
+      "last_change": "2026-09-13",
+      "last_author": "skharkov1246",
+      "last_commit": "d16688b",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -5762,6 +5804,67 @@
       ]
     },
     {
+      "path": "data/catalog_notes.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 35773,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "data/budget_snapshot.json",
+        "data/chain_coverage.json",
+        "data/chat_snapshot.json",
+        "data/index.json",
+        "dict/",
+        "dict/node_map.json",
+        "gidromet/data/",
+        "gpu/data/bitrix_gpu.json",
+        "gpu/data/coverage.json",
+        "gt/data/ansaldo.json",
+        "gt/data/bitrix_gt.json",
+        "gt/data/dossiers.json",
+        "gt/data/pn_db.json",
+        "gt/data/ship_energoseti.json",
+        "gt/data/ship_lukoil.json",
+        "gt/data/ship_recheck.json",
+        "gt/data/ship_rfq_letters.json",
+        "gt/data/ship_sellers.json",
+        "gt/data/ship_sweep.json",
+        "gt/docs/ЗАКУПКА-ЛУКОЙЛ.csv",
+        "gt/docs/ЗАПРОСЫ-ЛУКОЙЛ.csv",
+        "library/data/symptoms.json",
+        "library/docfilter.py",
+        "library/indexer.py",
+        "library/load_parts.py",
+        "library/load_suppliers.py",
+        "library/ocr.py",
+        "library/reparse.py",
+        "library/supabase/schema_junk.sql",
+        "ove/data/suppliers.json",
+        "pnw/data/contacts_found.json",
+        "pnw/data/crossrefs.json",
+        "pnw/data/item_master.json",
+        "pnw/data/kv_registry.json",
+        "pnw/data/numbers.json",
+        "pnw/data/part_suppliers.json",
+        "pnw/data/supplier_master.json",
+        "pnw/public/data.js",
+        "pnw/public/search.html",
+        "zip/customs/out/"
+      ],
+      "last_change": "2026-09-13",
+      "last_author": "Claude",
+      "last_commit": "31258ed",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "scripts/build_catalog.py"
+      ]
+    },
+    {
       "path": "ove/data/disc_c.json",
       "subproject": "ОВЭ-75",
       "bytes": 35757,
@@ -5879,67 +5982,6 @@
         "ove/build.py",
         "ove/tools/build_paket.py",
         "ove/tools/build_release.py"
-      ]
-    },
-    {
-      "path": "data/catalog_notes.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 33190,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "data/budget_snapshot.json",
-        "data/chain_coverage.json",
-        "data/chat_snapshot.json",
-        "data/index.json",
-        "dict/",
-        "dict/node_map.json",
-        "gidromet/data/",
-        "gpu/data/bitrix_gpu.json",
-        "gpu/data/coverage.json",
-        "gt/data/ansaldo.json",
-        "gt/data/bitrix_gt.json",
-        "gt/data/dossiers.json",
-        "gt/data/pn_db.json",
-        "gt/data/ship_energoseti.json",
-        "gt/data/ship_lukoil.json",
-        "gt/data/ship_recheck.json",
-        "gt/data/ship_sellers.json",
-        "gt/data/ship_sweep.json",
-        "gt/docs/ЗАКУПКА-ЛУКОЙЛ.csv",
-        "library/data/symptoms.json",
-        "library/docfilter.py",
-        "library/indexer.py",
-        "library/load_parts.py",
-        "library/load_suppliers.py",
-        "library/ocr.py",
-        "library/reparse.py",
-        "library/supabase/schema_junk.sql",
-        "ove/data/suppliers.json",
-        "pnw/data/contacts_found.json",
-        "pnw/data/crossrefs.json",
-        "pnw/data/item_master.json",
-        "pnw/data/kv_registry.json",
-        "pnw/data/numbers.json",
-        "pnw/data/part_suppliers.json",
-        "pnw/data/supplier_master.json",
-        "pnw/public/data.js",
-        "pnw/public/search.html",
-        "zip/customs/out/",
-        "zip/data/cat_stock_2026-09.json",
-        "zip/data/customs_declarations.json"
-      ],
-      "last_change": "2026-09-12",
-      "last_author": "Claude",
-      "last_commit": "692e091",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "scripts/build_catalog.py"
       ]
     },
     {
