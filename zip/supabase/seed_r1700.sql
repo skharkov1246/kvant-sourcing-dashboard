@@ -379,6 +379,8 @@ insert into mach_parts (machine_key, pn, pn_norm, name_ru, name_en, node, applic
   ('R1700G', '430-9449', '4309449', 'Датчик 430-9449 Caterpillar', null, '10 Электрика/датчики/освещение', 'ПДМ Caterpillar R1700G (двигатель CAT); датчик уровня охлаждающей жидкости; также двигатели CAT C7/C9/C11/C13/C15/C18/C27/C32, 3126, D6N, 793F/795F/797F, 3512/3516', null, null, null, 55.0, 180.0, 'KV-000571-0', 415, 'ожидает', 'high', 'наша база', 'zip/data/positions.json — перечень ЗИП ГШО', 'уровня ож | СКК: 741935'),
   ('R1700G', '434-1525', '4341525', 'Проводка 434-1525 Caterpillar', null, '10 Электрика/датчики/освещение', 'ПДМ Caterpillar R1700G (электропроводка/жгут); электросистема подземного погрузчика R1700-серии', null, null, null, 0.09, 0.09, 'KV-000370-7', 217, 'ожидает', 'high', 'наша база', 'zip/data/positions.json — перечень ЗИП ГШО', '- | СКК: 595066'),
   ('R1700G', '435-1239', '4351239', 'Стартёр', 'Starter Motor', '10 Электрика/датчики/освещение', 'C7 / C9 / C11 / C13 / C15 / C18', '1', 'по состоянию', '781.94', null, null, null, null, null, 'med', null, 'https://www.fabheavyparts.com/products/starter-motor-435-1239-for-caterpillar-cat-engine-c7-c9-c11-c13-c15-c18', null),
+  ('R1700G', '1U-3552', '1U3552', 'Коронка ковша, система J550', 'Tooth J550', '12 Рама/шарнир/стрела/ковш', 'система J550; по спискам поставщиков износа идёт на экскаваторы E345/E349. Применимость к ковшу R1700G НЕ подтверждена — размер коронки берётся из каталога машины', null, 'по износу', null, null, null, null, null, null, 'low', 'сомнителен', 'https://bdiwearparts.com/pages/bucket-teeth-adapter-wear-parts-list-for-cat-brand', 'номер существует и торгуется вторичным рынком; в заявку по R1700G — только после сверки размера по SEBP'),
+  ('R1700G', '6Y-0359', '6Y0359', 'Коронка рыхлителя', 'Ripper Tooth', '12 Рама/шарнир/стрела/ковш', 'оригинальная коронка рыхлителя Cat; к ПДМ R1700G отношения не подтверждено', null, 'по износу', null, null, null, null, null, null, 'low', 'сомнителен', 'https://www.ebay.de/itm/372911450924', 'включено как ориентир по классу изделия, а не как позиция к заказу'),
   ('R1700G', '114-5333', '1145333', 'Переключатель 114-5333 Caterpillar', null, '14 Пожаротушение/смазка/прочее', 'Caterpillar ПДМ/СДО LHD: R1700G (binary AC/pressure switch w/ Deutsch harness); same switch также встречается на CAT 320B экск. и колёсных погрузчиках 904B/906/910G', null, null, null, 8.0, 60.0, 'KV-000359-0', 206, 'ожидает', 'high', 'наша база', 'zip/data/positions.json — перечень ЗИП ГШО', '- | СКК: 175357'),
   ('R1700G', '139-2118', '1392118', 'Переключатель 139-2118 Caterpillar', null, '14 Пожаротушение/смазка/прочее', 'Caterpillar ПДМ/СДО LHD: R1700G (toggle switch AS); same toggle switch применяется на CAT скреперах 637G/627G и подземных самосвалах AD60/AD55/AD45B/AD30', null, null, null, 10.0, 200.0, 'KV-000360-8', 207, 'ожидает', 'high', 'наша база', 'zip/data/positions.json — перечень ЗИП ГШО', '- | СКК: 947644'),
   ('R1700G', '177-4113', '1774113', 'Джойстик 177-4113 Caterpillar', null, '14 Пожаротушение/смазка/прочее', 'ПДМ (LHD) Caterpillar серии R: R1700G, R1600G, R1600H, R1300G — джойстик управления (CONTROL GP-STIC / GP-HANDLE), система STIC', null, null, null, 250.0, 450.0, 'KV-000314-5', 161, 'ожидает', 'high', 'наша база', 'zip/data/positions.json — перечень ЗИП ГШО', '- | СКК: 691869'),
@@ -710,6 +712,8 @@ insert into mach_part_alts (machine_key, pn_norm, brand, alt_pn, alt_pn_norm, ki
   ('R1700G', '4H6112', 'Aftermarket.Express', '4H-6112', '4H6112', 'новый неоригинал', '$9.12 (OEM $15.55), склад Texas — https://aftermarket.express/caterpillar/4h6112'),
   ('R1700G', '2419841', 'Caterpillar', '241-9851', '2419851', 'смежный кожух', 'GUARD GP-DRIVE SHAFT-HITCH, зона центрального шарнира'),
   ('R1700G', '2419841', 'Caterpillar', '276-3275', '2763275', 'смежный кожух', 'GUARD GP-DRIVE SHAFT (TRANSMISSION)'),
+  ('R1700G', '1U3552', 'BDI Wear Parts', '1U-3552', '1U3552', 'аналог', 'в перечне совместимости с Cat'),
+  ('R1700G', '1U3552', 'HCE Parts', '1U-3552', '1U3552', 'аналог', 'в перечне совместимости с Cat'),
   ('R1700G', '4238524', 'Donaldson', 'P550900', 'P550900', 'аналог', 'из нашего разбора aliases (pnw/data/crossrefs.json)'),
   ('R1700G', '4238524', 'Fleetguard', 'FS19820', 'FS19820', 'аналог', 'из нашего разбора aliases (pnw/data/crossrefs.json)'),
   ('R1700G', '4238524', 'Fleetguard', 'FS19843', 'FS19843', 'аналог', 'из нашего разбора aliases (pnw/data/crossrefs.json)'),
@@ -807,12 +811,12 @@ insert into mach_part_alts (machine_key, pn_norm, brand, alt_pn, alt_pn_norm, ki
   ('R1700G', '1145333', 'не определён', '14-5458', '145458', 'номер без бренда', 'из нашего разбора aliases (pnw/data/crossrefs.json)'),
   ('R1700G', '1145333', 'INA', 'MC-1318K', 'MC1318K', 'аналог', 'из нашего разбора aliases (pnw/data/crossrefs.json)'),
   ('R1700G', '1392118', 'не определён', '8906K5419', '8906K5419', 'номер без бренда', 'из нашего разбора aliases (pnw/data/crossrefs.json)'),
-  ('R1700G', '3T1730', 'не определён', '3T-1730', '3T1730', 'номер без бренда', 'из нашего разбора aliases (pnw/data/crossrefs.json)'),
-  ('R1700G', '3520206', 'не определён', '10R-2129', '10R2129', 'номер без бренда', 'из нашего разбора aliases (pnw/data/crossrefs.json)'),
-  ('R1700G', '4341525', 'не определён', 'CAT 434-1525', 'CAT4341525', 'номер без бренда', 'из нашего разбора aliases (pnw/data/crossrefs.json)')
+  ('R1700G', '3T1730', 'не определён', '3T-1730', '3T1730', 'номер без бренда', 'из нашего разбора aliases (pnw/data/crossrefs.json)')
 on conflict (machine_key, pn_norm, brand, alt_pn_norm) do update set alt_pn = excluded.alt_pn, kind = excluded.kind, note = excluded.note;
 
 insert into mach_part_alts (machine_key, pn_norm, brand, alt_pn, alt_pn_norm, kind, note) values
+  ('R1700G', '3520206', 'не определён', '10R-2129', '10R2129', 'номер без бренда', 'из нашего разбора aliases (pnw/data/crossrefs.json)'),
+  ('R1700G', '4341525', 'не определён', 'CAT 434-1525', 'CAT4341525', 'номер без бренда', 'из нашего разбора aliases (pnw/data/crossrefs.json)'),
   ('R1700G', '2044311', 'не определён', 'CAT 204-4311', 'CAT2044311', 'номер без бренда', 'из нашего разбора aliases (pnw/data/crossrefs.json)'),
   ('R1700G', '2485513', 'не определён', '4W-4794', '4W4794', 'номер без бренда', 'из нашего разбора aliases (pnw/data/crossrefs.json)'),
   ('R1700G', '2485513', 'не определён', '174-3504', '1743504', 'номер без бренда', 'из нашего разбора aliases (pnw/data/crossrefs.json)'),
@@ -1288,4 +1292,4 @@ insert into mach_customs (machine_key, dt, importer, inn, exporter, origin, inco
 
 commit;
 
--- деталей 287, аналогов 467, каналов 133, документов 100, цен 0, параметров 83, торгов 53, таможня 116
+-- деталей 289, аналогов 469, каналов 133, документов 100, цен 0, параметров 83, торгов 53, таможня 116

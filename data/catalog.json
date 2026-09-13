@@ -4,18 +4,18 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 204,
-    "total_bytes": 95913303,
+    "datasets": 205,
+    "total_bytes": 95922908,
     "by_sensitivity": {
       "конфиденциально": 60,
       "внутреннее": 110,
-      "публикуемо": 34
+      "публикуемо": 35
     },
     "by_subproject": {
       "ГПУ-библиотека": 27,
       "ГТУ-библиотека": 38,
       "ОВЭ-75": 45,
-      "база ЗИП": 41,
+      "база ЗИП": 42,
       "база ЗИП · таможня": 18,
       "библиотека рынков": 1,
       "гидрометаллургия": 22,
@@ -835,7 +835,7 @@
     {
       "path": "zip/data/r1700.json",
       "subproject": "база ЗИП",
-      "bytes": 1443064,
+      "bytes": 1447086,
       "note": "Досье машины Caterpillar R1700G (ПДМ подземных работ): паспорт и модификации, узлы, документация Caterpillar по номерам форм, перечень запчастей с нашими номерами KV, кроссы вторичного рынка, официальные дилеры, заводы неоригинала, поставщики РФ/СНГ, маршруты ввоза по таможне, ценовые ориентиры, площадки торгов и эксплуатанты. Каждая строка с источником и уровнем доверия; вердикт — итог независимой перепроверки. Строит zip/tools/r1700_dossier.py из zip/data/r1700_recon/, positions.json, pnw/, таможни и справочника ODM. Руками не править.",
       "format": "json",
       "shape": "объект",
@@ -861,7 +861,7 @@
       ],
       "main_collection": {
         "key": "alts",
-        "records": 467,
+        "records": 469,
         "record_keys": [
           "alt_pn",
           "alt_pn_norm",
@@ -8425,6 +8425,48 @@
         "gt/build.py",
         "library/load_crossrefs.py"
       ]
+    },
+    {
+      "path": "zip/data/r1700_recon/get.json",
+      "subproject": "база ЗИП",
+      "bytes": 5583,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "gaps",
+        "notes",
+        "rows",
+        "slice"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 2,
+        "record_keys": [
+          "alts",
+          "applic",
+          "confidence",
+          "interval",
+          "name_en",
+          "name_ru",
+          "node",
+          "note",
+          "pn",
+          "price_usd",
+          "qty",
+          "source",
+          "verdict"
+        ]
+      },
+      "last_change": null,
+      "last_author": null,
+      "last_commit": null,
+      "updated_by": "неизвестно",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": []
     },
     {
       "path": "gpu/data/bitrix_gpu.json",
