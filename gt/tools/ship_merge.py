@@ -7,6 +7,7 @@
   gt/data/ship_energoseti.json — проверка 505 строк «Энергосетей» 09.2026
   gt/data/ship_sweep.json      — сплошная проверка остатка 863 строк 09.2026
   gt/data/ship_recheck.json    — перепроверка 62 строк августовского наличия по ссылкам
+  gt/data/ship_blocked.json    — поиск 31 строки, чьи ссылки отдают 403, на отдающих витринах
 
 Позднейшая проверка перекрывает раннюю. Строки заявки без проверки попадают в
 датасет с вердиктом not_checked — так видно реальное покрытие, а не подогнанное.
@@ -26,6 +27,7 @@ PRICES = ROOT / "gt/data/rfq_prices.json"
 SHIP = ROOT / "gt/data/ship_energoseti.json"
 SWEEP = ROOT / "gt/data/ship_sweep.json"
 RECHECK = ROOT / "gt/data/ship_recheck.json"
+BLOCKED = ROOT / "gt/data/ship_blocked.json"
 SELLERS = ROOT / "gt/data/ship_sellers.json"
 DST = ROOT / "gt/data/ship_lukoil.json"
 
@@ -419,6 +421,7 @@ def main() -> int:
         (SHIP, "rows", "проверка 505 строк 09.2026"),
         (SWEEP, "rows", "сплошная проверка остатка 09.2026"),
         (RECHECK, "rows", "перепроверка ссылок 09.2026"),
+        (BLOCKED, "rows", "обход ботозащиты 09.2026"),
     ):
         rows = prices_doc["checks"] if path == PRICES else load_rows(path, coll)
         for raw in rows:
