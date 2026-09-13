@@ -407,6 +407,49 @@ def bitrix_facts(parts: list) -> dict:
     return b
 
 
+def own_prices(bitrix: dict, parts: list) -> list:
+    """Ценовые факты из нашей базы — в раздел «Цены» досье.
+
+    175 записей с продавцом, валютой и ссылкой лежали в price_records и были видны
+    только внутри карточки детали. Для торгов нужна сводная таблица: без неё нельзя
+    ни назвать цену, ни понять, чем берёт конкурент. Уровень («оригинал» / «аналог»)
+    берётся из примечания записи, а не угадывается: где в примечании нет ни OEM, ни
+    genuine, ни aftermarket — пишем «не определён», и это честнее выдуманной метки.
+    """
+    idx = {p["pn_norm"]: p for p in parts}
+    out = []
+    for r in bitrix.get("prices") or []:
+        if not r.get("unit_price"):
+            continue
+        pn = pretty_pn(r.get("pn"))
+        note = f"{r.get('note') or ''} {r.get('seller') or ''}".lower()
+        if "aftermarket" in note or "аналог" in note or "made-to-fit" in note:
+            tier = "аналог"
+        elif "oem" in note or "genuine" in note or "оригинал" in note:
+            tier = "оригинал"
+        else:
+            tier = "не определён"
+        p = idx.get(norm_pn(pn))
+        out.append({
+            "pn": pn,
+            "name_ru": (p or {}).get("name_ru") or r.get("name"),
+            "tier": tier,
+            "brand": "Caterpillar" if tier == "оригинал" else (r.get("seller") or ""),
+            "price": r.get("unit_price"),
+            "currency": r.get("currency"),
+            "seller": r.get("seller"),
+            "region": r.get("country"),
+            "date": r.get("year"),
+            "url": r.get("url"),
+            "confidence": r.get("confidence") or "med",
+            "verdict": "наша база",
+            "note": r.get("note"),
+            "source": r.get("url") or "zip/data/price_records.json",
+        })
+    out.sort(key=lambda x: (x["pn"], str(x["tier"])))
+    return out
+
+
 def orgs(slices: dict) -> list:
     out = []
     for key in ORG_SLICES:
@@ -527,6 +570,10 @@ def build() -> dict:
     spec = sl.get("spec") or {}
     docs = [r for r in (sl.get("docs") or {}).get("rows") or [] if str(r.get("form") or "").strip()]
     prices = (sl.get("prices") or {}).get("rows") or []
+    # Разведка цен не прогналась (лимит API) — поднимаем в раздел то, что есть у нас
+    # самих: ценовые факты price_records с продавцом, валютой и ссылкой.
+    if not prices:
+        prices = own_prices(bitrix, parts)
     tnd = sl.get("tenders") or {}
 
     # Покрытие: без него непонятно, чем ещё нельзя торговать.
