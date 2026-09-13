@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-12",
+  "updated": "2026-09-13",
   "note": "Заполняемость цепочки портала: машина → узел → признак → дефект → ремонтное решение → запчасть → изготовитель → исполнитель. Считается scripts/build_chain_coverage.py по фактическим файлам РЕПОЗИТОРИЯ.",
   "scope": "ЧТО СЧИТАЕТСЯ. Только файлы репозитория: gt/data, gpu/data, zip/data, pnw/data, dict/. Инженерная библиотека живёт в закрытой Supabase (таблицы lib_*), и этот счётчик её НЕ ВИДИТ — ключа базы в сборке нет. Поэтому ноль в клетке означает «нет в файлах репозитория», а не «нет нигде»: часть звеньев закрыта именно в библиотеке. Её состояние ведётся отдельно — таблица звеньев в CLAUDE.md и scripts/library_report.py, которому нужен SUPABASE_DB_URL.",
   "goal": "Инженерный портал ремонта и сервиса динамического оборудования (CLAUDE.md).",
@@ -442,94 +442,6 @@
       "pct": 50
     },
     {
-      "segment": "gsho",
-      "title": "ГШО — горно-шахтное",
-      "cells": [
-        {
-          "link": "machine",
-          "title": "Машина",
-          "what": "модель опознаётся и описана",
-          "n": 77,
-          "sources": [
-            "zip/data/telsmith_3858.json",
-            "zip/data/machines.json"
-          ],
-          "state": "есть"
-        },
-        {
-          "link": "node",
-          "title": "Узел",
-          "what": "состав машины разобран по узлам",
-          "n": 20,
-          "sources": [
-            "zip/data/telsmith_3858.json"
-          ],
-          "state": "есть"
-        },
-        {
-          "link": "symptom",
-          "title": "Признак",
-          "what": "по чему видно, что машина нездорова",
-          "n": 0,
-          "sources": [],
-          "state": "пусто"
-        },
-        {
-          "link": "defect",
-          "title": "Дефект",
-          "what": "каталог дефектов: что ломается и почему",
-          "n": 0,
-          "sources": [],
-          "state": "пусто"
-        },
-        {
-          "link": "repair",
-          "title": "Ремонтное решение",
-          "what": "чем восстанавливают, границы применимости",
-          "n": 7,
-          "sources": [
-            "zip/data/material_strategy.json"
-          ],
-          "state": "есть"
-        },
-        {
-          "link": "part",
-          "title": "Запчасть",
-          "what": "номенклатура с номерами, готовая к запросу",
-          "n": 1874,
-          "sources": [
-            "zip/data/positions.json",
-            "zip/data/telsmith_3858.json",
-            "pnw/data/numbers.json"
-          ],
-          "state": "есть"
-        },
-        {
-          "link": "maker",
-          "title": "Изготовитель",
-          "what": "кто делает деталь, помимо владельца конструкции",
-          "n": 1150,
-          "sources": [
-            "zip/data/odm_suppliers.json",
-            "zip/data/telsmith_suppliers.json",
-            "zip/data/supplier_crm.json"
-          ],
-          "state": "есть"
-        },
-        {
-          "link": "contractor",
-          "title": "Исполнитель",
-          "what": "кому отдать работы по ремонту",
-          "n": 0,
-          "sources": [],
-          "state": "пусто"
-        }
-      ],
-      "filled": 5,
-      "of": 8,
-      "pct": 62
-    },
-    {
       "segment": "recip",
       "title": "Поршневые компрессоры",
       "cells": [
@@ -611,6 +523,99 @@
       "filled": 5,
       "of": 8,
       "pct": 62
+    },
+    {
+      "segment": "gsho",
+      "title": "ГШО — горно-шахтное",
+      "cells": [
+        {
+          "link": "machine",
+          "title": "Машина",
+          "what": "модель опознаётся и описана",
+          "n": 78,
+          "sources": [
+            "zip/data/telsmith_3858.json",
+            "zip/data/machines.json",
+            "zip/data/r1700.json"
+          ],
+          "state": "есть"
+        },
+        {
+          "link": "node",
+          "title": "Узел",
+          "what": "состав машины разобран по узлам",
+          "n": 30,
+          "sources": [
+            "zip/data/telsmith_3858.json",
+            "zip/data/r1700.json"
+          ],
+          "state": "есть"
+        },
+        {
+          "link": "symptom",
+          "title": "Признак",
+          "what": "по чему видно, что машина нездорова",
+          "n": 0,
+          "sources": [],
+          "state": "пусто"
+        },
+        {
+          "link": "defect",
+          "title": "Дефект",
+          "what": "каталог дефектов: что ломается и почему",
+          "n": 0,
+          "sources": [],
+          "state": "пусто"
+        },
+        {
+          "link": "repair",
+          "title": "Ремонтное решение",
+          "what": "чем восстанавливают, границы применимости",
+          "n": 7,
+          "sources": [
+            "zip/data/material_strategy.json"
+          ],
+          "state": "есть"
+        },
+        {
+          "link": "part",
+          "title": "Запчасть",
+          "what": "номенклатура с номерами, готовая к запросу",
+          "n": 1874,
+          "sources": [
+            "zip/data/positions.json",
+            "zip/data/telsmith_3858.json",
+            "pnw/data/numbers.json"
+          ],
+          "state": "есть"
+        },
+        {
+          "link": "maker",
+          "title": "Изготовитель",
+          "what": "кто делает деталь, помимо владельца конструкции",
+          "n": 1279,
+          "sources": [
+            "zip/data/odm_suppliers.json",
+            "zip/data/telsmith_suppliers.json",
+            "zip/data/supplier_crm.json",
+            "zip/data/r1700.json"
+          ],
+          "state": "есть"
+        },
+        {
+          "link": "contractor",
+          "title": "Исполнитель",
+          "what": "кому отдать работы по ремонту",
+          "n": 40,
+          "sources": [
+            "zip/data/r1700.json"
+          ],
+          "state": "есть"
+        }
+      ],
+      "filled": 6,
+      "of": 8,
+      "pct": 75
     }
   ],
   "empty_everywhere": [
@@ -623,11 +628,6 @@
       "link": "defect",
       "title": "Дефект",
       "what": "каталог дефектов: что ломается и почему"
-    },
-    {
-      "link": "contractor",
-      "title": "Исполнитель",
-      "what": "кому отдать работы по ремонту"
     }
   ],
   "common": {
@@ -641,8 +641,8 @@
   "summary": {
     "segments": 7,
     "links": 8,
-    "cells_filled": 18,
+    "cells_filled": 19,
     "cells_total": 56,
-    "links_not_started": 3
+    "links_not_started": 2
   }
 }

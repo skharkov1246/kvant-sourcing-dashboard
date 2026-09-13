@@ -29,7 +29,9 @@
     "refresh_index": "python scripts/build_index.py",
     "check_index": "python scripts/build_index.py --check",
     "refresh_dict": "python scripts/build_dict.py   # общий словарь баз (проекция)",
-    "check_dict": "python scripts/build_dict.py --check"
+    "check_dict": "python scripts/build_dict.py --check",
+    "machine_dossier": "python zip/tools/r1700_bitrix.py && python zip/tools/r1700_dossier.py && python zip/tools/build_r1700.py && python zip/tools/r1700_sql.py   # досье машины ГШО: данные, страница, SQL",
+    "machine_dossier_pdf": "python zip/tools/r1700_report.py && python zip/tools/r1700_pdf.py   # справочный отчёт по машине"
   },
   "subprojects": [
     {

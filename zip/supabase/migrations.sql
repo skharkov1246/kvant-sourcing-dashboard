@@ -172,3 +172,181 @@ create policy samples_write on storage.objects for insert
 drop policy if exists samples_delete on storage.objects;
 create policy samples_delete on storage.objects for delete
   to anon, authenticated using (bucket_id = 'samples');
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- 7. Досье машины: машина → узел → деталь → аналог → канал → цена → торги.
+--    Добавлено 12.09.2026 под Caterpillar R1700G (zip/data/r1700.json), но схема
+--    машинно-независимая: machine_key — ключ любой машины реестра ГШО, поэтому
+--    вторая и третья машины ложатся сюда же без миграции.
+--    Данные заливает zip/supabase/seed_r1700.sql (генерируется zip/tools/r1700_sql.py).
+create table if not exists mach_machines (
+  machine_key  text primary key,          -- 'R1700G'
+  name         text not null,             -- 'Caterpillar R1700G'
+  brand        text,
+  kind         text,                      -- 'погрузочно-доставочная машина (ПДМ / LHD)'
+  family       text,                      -- родня и преемники, где применимость общая
+  note         text,
+  updated      date,
+  created_at   timestamptz default now(),
+  updated_at   timestamptz default now()
+);
+
+create table if not exists mach_docs (
+  id           bigint generated always as identity primary key,
+  machine_key  text not null references mach_machines(machine_key) on delete cascade,
+  form         text not null,             -- номер формы: SEBP3045, SEBU7494, RENR…
+  title        text,
+  kind         text,                      -- каталог запчастей | эксплуатация | ремонт | схемы
+  lang         text,
+  covers       text,                      -- серийные префиксы / модификации
+  media        text,
+  where_get    text,
+  url          text,
+  price        text,
+  confidence   text default 'med',
+  verdict      text,                      -- итог второго прохода проверки
+  unique (machine_key, form)
+);
+create index if not exists mach_docs_machine on mach_docs (machine_key);
+
+create table if not exists mach_parts (
+  id             bigint generated always as identity primary key,
+  machine_key    text not null references mach_machines(machine_key) on delete cascade,
+  pn             text not null,           -- парт-номер как напечатан: 1R-1808
+  pn_norm        text not null,           -- только буквы и цифры: 1R1808
+  name_ru        text,
+  name_en        text,
+  node           text,                    -- узел из перечня досье
+  applic         text,                    -- применимость и модификации
+  qty            text,
+  interval_h     text,                    -- интервал замены (как в руководстве)
+  price_usd      text,
+  price_eur_min  numeric,
+  price_eur_max  numeric,
+  kv             text,                    -- наш внутренний номер (KV-…)
+  position_id    bigint,                  -- связь с positions, если позиция наша
+  bitrix_status  text,                    -- 'продавали' | 'квотировали'
+  confidence     text default 'med',
+  verdict        text,
+  sources        text,                    -- источники через ' | '
+  note           text,
+  unique (machine_key, pn_norm)
+);
+create index if not exists mach_parts_machine on mach_parts (machine_key);
+create index if not exists mach_parts_node    on mach_parts (machine_key, node);
+create index if not exists mach_parts_pn      on mach_parts (pn_norm);
+
+create table if not exists mach_part_alts (
+  id           bigint generated always as identity primary key,
+  machine_key  text not null references mach_machines(machine_key) on delete cascade,
+  pn_norm      text not null,             -- оригинал, к которому кросс
+  brand        text not null,
+  alt_pn       text not null,
+  alt_pn_norm  text not null,
+  kind         text,                      -- аналог | оригинал | номер без бренда
+  note         text,
+  unique (machine_key, pn_norm, brand, alt_pn_norm)
+);
+create index if not exists mach_alts_pn  on mach_part_alts (machine_key, pn_norm);
+create index if not exists mach_alts_alt on mach_part_alts (alt_pn_norm);
+
+create table if not exists mach_channels (
+  id           bigint generated always as identity primary key,
+  machine_key  text not null references mach_machines(machine_key) on delete cascade,
+  org          text not null,
+  lane         text,                      -- 'dealers' | 'aftermarket' | 'traders'
+  kind         text,
+  country      text,
+  city         text,
+  role         text,
+  brands       text,
+  site         text,
+  email        text,
+  phone        text,
+  stock        text,
+  note         text,
+  source       text,
+  confidence   text default 'med',
+  verdict      text,
+  unique (machine_key, org, lane)
+);
+create index if not exists mach_channels_machine on mach_channels (machine_key, lane);
+
+create table if not exists mach_prices (
+  id           bigint generated always as identity primary key,
+  machine_key  text not null references mach_machines(machine_key) on delete cascade,
+  pn           text,
+  name         text,
+  tier         text,                      -- оригинал | аналог | эконом
+  brand        text,
+  price        text,
+  currency     text,
+  seller       text,
+  region       text,
+  dt           text,                      -- дата факта как в источнике
+  url          text,
+  confidence   text default 'med',
+  verdict      text
+);
+create index if not exists mach_prices_machine on mach_prices (machine_key, pn);
+
+create table if not exists mach_specs (
+  id           bigint generated always as identity primary key,
+  machine_key  text not null references mach_machines(machine_key) on delete cascade,
+  param        text not null,
+  value        text,
+  unit         text,
+  variant      text,
+  source       text,
+  confidence   text default 'med'
+);
+create index if not exists mach_specs_machine on mach_specs (machine_key);
+
+create table if not exists mach_tenders (
+  id           bigint generated always as identity primary key,
+  machine_key  text not null references mach_machines(machine_key) on delete cascade,
+  kind         text not null,             -- 'площадка' | 'эксплуатант' | 'требование'
+  name         text,
+  detail       text,
+  extra        text,
+  source       text,
+  confidence   text default 'med'
+);
+create index if not exists mach_tenders_machine on mach_tenders (machine_key, kind);
+
+create table if not exists mach_customs (
+  id           bigint generated always as identity primary key,
+  machine_key  text not null references mach_machines(machine_key) on delete cascade,
+  dt           text,
+  importer     text,
+  inn          text,
+  exporter     text,
+  origin       text,
+  incoterms    text,
+  place        text,
+  hs10         text,
+  pn           text,
+  descr        text,
+  usd_kg       text,
+  src          text
+);
+create index if not exists mach_customs_machine  on mach_customs (machine_key);
+create index if not exists mach_customs_importer on mach_customs (importer);
+
+drop trigger if exists mach_machines_touch on mach_machines;
+create trigger mach_machines_touch before update on mach_machines
+  for each row execute function zip_touch_updated_at();
+
+-- RLS: как у остальных таблиц базы ЗИП — сайт работает anon-ключом за гейтом Access.
+do $$
+declare t text;
+begin
+  foreach t in array array['mach_machines','mach_docs','mach_parts','mach_part_alts',
+                           'mach_channels','mach_prices','mach_specs','mach_tenders','mach_customs']
+  loop
+    execute format('alter table %I enable row level security', t);
+    execute format('drop policy if exists %I on %I', t || '_all', t);
+    execute format('create policy %I on %I for all to anon, authenticated using (true) with check (true)',
+                   t || '_all', t);
+  end loop;
+end $$;
