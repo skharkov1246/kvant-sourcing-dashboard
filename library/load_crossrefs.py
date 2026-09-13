@@ -283,6 +283,61 @@ def build_telsmith() -> tuple[list[dict], dict[str, dict], dict[str, dict]]:
     return строки, детали, машины
 
 
+def build_ms5001() -> tuple[list[dict], dict[str, dict], dict[str, dict]]:
+    """Перечень запчастей ГТУ GE MS5001PA на инспекцию 70 000 часов (сделка Юнипро/Ванкор).
+
+    Третья машина с ведомостью и первая тяжёлая ГТУ: 198 строк, 175 каталожных
+    номеров Nuovo Pignone, ни одного из них до сих пор в базе не было.
+
+    ПОЧЕМУ МАШИНА КАТАЛОЖНАЯ, А НЕ «MS5001PA». Исполнение PA — не отдельная
+    турбина, а вариант GE MS5001, который уже есть в gt/data/models.json.
+    Завести вторую карточку значит развести по ней сделки и ведомость: по
+    шильдику «MS5001PA» нашлась бы ведомость без истории, по «GE MS5001» —
+    история без ведомости. Исполнение уходит в scheme строки состава, а
+    шильдик приводится к каталожной машине псевдонимом в models.json.
+
+    ПОЧЕМУ НОМЕР ПОЗИЦИИ ВАЖНЕЕ ПОРЯДКА СТРОК. Нумерация исходного перечня идёт
+    до 234, а строк 198: 36 номеров в предложении отсутствуют. Порядковый номер
+    строки этого не покажет, номер позиции — покажет, поэтому он и хранится.
+
+    ПОЧЕМУ ОДИН НОМЕР В НЕСКОЛЬКИХ СТРОКАХ НЕ СВОДИТСЯ ЗДЕСЬ. Перечень собран по
+    сборкам, и один крепёж попадает в несколько. Сложить количества значит
+    потерять, к какой сборке они относятся; своди их при закупке, а не в базе.
+    Ведомость хранит строки как есть, деталь заводится один раз.
+    """
+    d = load("gt/data/ms5001_vankor.json", "catalog")
+    мета = load("gt/data/ms5001_vankor.json", "machine")
+    имя = str((мета or {}).get("name") or "GE MS5001").strip()
+    исполнение = str((мета or {}).get("execution") or "").strip()
+    схема = (f"ТО-70000 ({исполнение})" if исполнение else "ТО-70000")[:40]
+    ключ = eq.norm_model(имя) if eq.looks_like_machine(имя) else None
+    машины = {ключ: {"id": ключ, "name": имя[:200],
+                     "source": "ведомость MS5001PA ТО-70000"}} if ключ else {}
+    строки, детали = [], {}
+    for i, r in enumerate(d):
+        pn = str(r.get("eid") or "").strip()
+        наим = str(r.get("name") or "").strip()
+        if not pn:
+            continue
+        key = part_key(pn)
+        детали.setdefault(key, {
+            "id": key, "catalog_no": pn[:120], "name": (наим or pn)[:400],
+            "oem": "Nuovo Pignone (GE Vernova)", "model": имя[:600],
+            "category": str(r.get("block") or "")[:120] or None,
+            "segment_id": classify(f"{наим} газовая турбина"),
+            "unit_id": r.get("node") or eq.unit_of(наим),
+            "source": "ведомость MS5001PA ТО-70000"})
+        строки.append({
+            "id": f"{ключ or 'ms5001'}.то70000.{i}", "machine": имя[:200],
+            "model_id": ключ, "scheme": схема, "level": None,
+            "part_id": key, "part_no": pn[:120], "own_no": None,
+            "qty": str(r.get("qty") or "")[:40] or None, "name": (наим or pn)[:400],
+            "node": str(r.get("block") or "")[:200] or None,
+            "position_no": str(r.get("poz") or "")[:40] or None, "page": None,
+            "source": "ведомость MS5001PA ТО-70000"})
+    return строки, детали, машины
+
+
 def build_bom() -> tuple[list[dict], dict[str, dict], list[dict]]:
     """Ведомость → строки состава, новые детали и машина."""
     строки, детали, машины = [], {}, {}
@@ -348,6 +403,10 @@ def main() -> int:
     строки += т_строки
     детали.update({k: v for k, v in т_детали.items() if k not in детали})
     машины.update(т_машины)
+    м_строки, м_детали, м_машины = build_ms5001()
+    строки += м_строки
+    детали.update({k: v for k, v in м_детали.items() if k not in детали})
+    машины.update(м_машины)
     for k, v in зажигание.items():
         детали.setdefault(k, v)
 
