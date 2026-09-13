@@ -10,6 +10,11 @@
   "family": "R1700G · R1700 (2019+) · R1700 XE (аккумуляторная) · R1600G/H · R1300G",
   "why": "Машина из нашего реестра ГШО: 87 позиций в справочнике «ЗИП ГШО», подтверждённый ввоз в РФ по таможне, эксплуатанты в РФ есть. Досье собрано, чтобы выходить на торги по комплектующим с номерами, аналогами, каналами и ценами, а не с одним наименованием."
  },
+ "policy": {
+  "ask_scope": "только иностранные поставщики и заводы",
+  "decided": "2026-09-13",
+  "why": "Решение владельца: «русских не рассматриваем». То же решение действовало по срочной заявке CAT (zip/tools/cat_stock.py): запрашивали только КНР и ЮАР. Российские компании из данных не удалены — они остаются картиной рынка и списком конкурентов, кто уже возит по таможне, — но помечены ru=true, ask=false и в перечень «кого запрашивать» не выводятся."
+ },
  "nodes": [
   "01 Двигатель",
   "02 Топливная система",
@@ -18229,7 +18234,9 @@
    "source": "https://www.borusancat.com/en/contact/map",
    "confidence": "high",
    "verdict": "",
-   "slice": "dealers"
+   "slice": "dealers",
+   "ru": false,
+   "ask": true
   },
   {
    "org": "Borusan Cat Kyrgyzstan (BMGS Kyrgyzstan)",
@@ -18246,7 +18253,9 @@
    "source": "https://www.borusancat.com/en/contact/map",
    "confidence": "high",
    "verdict": "",
-   "slice": "dealers"
+   "slice": "dealers",
+   "ru": false,
+   "ask": true
   },
   {
    "org": "Borusan Makina ve Güç Sistemleri Azerbaijan (BMGS Azerbaijan)",
@@ -18263,7 +18272,9 @@
    "source": "https://im-mining.com/2023/12/12/caterpillar-borusan-make-historic-underground-equipment-delivery-to-anglo-asian-mining-in-azerbaijan/",
    "confidence": "high",
    "verdict": "",
-   "slice": "dealers"
+   "slice": "dealers",
+   "ru": false,
+   "ask": true
   },
   {
    "org": "Borusan Makina ve Güç Sistemleri Georgia (BMGS Georgia)",
@@ -18280,7 +18291,9 @@
    "source": "https://www.borusancat.com/en/contact/map",
    "confidence": "high",
    "verdict": "",
-   "slice": "dealers"
+   "slice": "dealers",
+   "ru": false,
+   "ask": true
   },
   {
    "org": "Borusan Makina ve Güç Sistemleri A.Ş. (Borusan Cat Türkiye)",
@@ -18297,7 +18310,9 @@
    "source": "https://www.borusancat.com/tr/part",
    "confidence": "high",
    "verdict": "",
-   "slice": "dealers"
+   "slice": "dealers",
+   "ru": false,
+   "ask": true
   },
   {
    "org": "ИП ООО «Zeppelin Central Asia Machinery»",
@@ -18314,7 +18329,9 @@
    "source": "https://www.zeppelin.uz/contacts",
    "confidence": "high",
    "verdict": "",
-   "slice": "dealers"
+   "slice": "dealers",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "Zeppelin Tajikistan",
@@ -18331,7 +18348,9 @@
    "source": "https://www.zeppelin.tj/brands/cat/",
    "confidence": "high",
    "verdict": "",
-   "slice": "dealers"
+   "slice": "dealers",
+   "ru": false,
+   "ask": true
   },
   {
    "org": "ООО «Zeppelin Armenia»",
@@ -18348,7 +18367,9 @@
    "source": "https://www.zeppelin.am/eng/",
    "confidence": "high",
    "verdict": "",
-   "slice": "dealers"
+   "slice": "dealers",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "Barloworld Mongolia LLC (ранее Wagner Asia Equipment LLC)",
@@ -18365,7 +18386,9 @@
    "source": "https://catused.cat.com/en/dealer.aspx?orgid=%7B42e2f3fa-97f8-46f0-916c-673c0c9b2063%7D",
    "confidence": "high",
    "verdict": "",
-   "slice": "dealers"
+   "slice": "dealers",
+   "ru": false,
+   "ask": true
   },
   {
    "org": "Mohamed Abdulrahman Al-Bahar LLC",
@@ -18382,7 +18405,9 @@
    "source": "https://www.albahar.com/contact-us/locate-us/uae/",
    "confidence": "high",
    "verdict": "",
-   "slice": "dealers"
+   "slice": "dealers",
+   "ru": false,
+   "ask": true
   },
   {
    "org": "Lei Shing Hong Machinery Ltd (LSHM)",
@@ -18399,7 +18424,9 @@
    "source": "https://www.lsh.com/machinery/",
    "confidence": "high",
    "verdict": "",
-   "slice": "dealers"
+   "slice": "dealers",
+   "ru": false,
+   "ask": true
   },
   {
    "org": "Lei Shing Hong Machinery North China (ранее WesTrac China)",
@@ -18416,7 +18443,9 @@
    "source": "https://www.miningglobal.com/automation-and-ai/seven-group-holdings-sells-chinese-mining-machinery-arm-lei-shing-hong-dollar428mn",
    "confidence": "med",
    "verdict": "",
-   "slice": "dealers"
+   "slice": "dealers",
+   "ru": false,
+   "ask": true
   },
   {
    "org": "China Engineers Limited (CEL), группа Sime Darby",
@@ -18433,7 +18462,9 @@
    "source": "https://www.simeindustrial.com/caterpillar-dealership/china-engineers-limited",
    "confidence": "high",
    "verdict": "",
-   "slice": "dealers"
+   "slice": "dealers",
+   "ru": false,
+   "ask": true
   },
   {
    "org": "Gmmco Limited (CK Birla Group)",
@@ -18450,7 +18481,9 @@
    "source": "https://www.gmmco.in/contact-us",
    "confidence": "high",
    "verdict": "",
-   "slice": "dealers"
+   "slice": "dealers",
+   "ru": false,
+   "ask": true
   },
   {
    "org": "Gainwell Commosales Pvt Ltd (ранее Tractors India Pvt Ltd, TIPL)",
@@ -18467,7 +18500,9 @@
    "source": "https://northamericanmining.com/index.php/2022/04/19/gainwell-engineering-caterpillar-sign-underground-tech-deal/",
    "confidence": "med",
    "verdict": "",
-   "slice": "dealers"
+   "slice": "dealers",
+   "ru": false,
+   "ask": true
   },
   {
    "org": "Eltrak S.A. (ELTRAK Group)",
@@ -18484,7 +18519,9 @@
    "source": "https://www.cat.com/en_US/by-industry/marine/mak-dealer-locator.html",
    "confidence": "med",
    "verdict": "",
-   "slice": "dealers"
+   "slice": "dealers",
+   "ru": false,
+   "ask": true
   },
   {
    "org": "ООО «Восточная Техника» (ВТ), группа Barloworld",
@@ -18501,7 +18538,9 @@
    "source": "https://www.vost-tech.ru/",
    "confidence": "high",
    "verdict": "",
-   "slice": "dealers"
+   "slice": "dealers",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "ООО «Мантрак Восток» (Mantrac Group, Mansour)",
@@ -18518,7 +18557,9 @@
    "source": "http://mantracvostok.ru/",
    "confidence": "high",
    "verdict": "",
-   "slice": "dealers"
+   "slice": "dealers",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "ООО «Цеппелин Русланд» (Zeppelin Russland)",
@@ -18535,7 +18576,9 @@
    "source": "https://www.zeppelin.ru/products/arkhiv/brand-cat/r1700g/",
    "confidence": "high",
    "verdict": "",
-   "slice": "dealers"
+   "slice": "dealers",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "ООО «Амур Машинери» / «Сахалин Машинери»",
@@ -18552,7 +18595,9 @@
    "source": "https://exkavator.ru/dealers/producer/caterpillar",
    "confidence": "med",
    "verdict": "",
-   "slice": "dealers"
+   "slice": "dealers",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "Caterpillar Inc.",
@@ -18569,7 +18614,9 @@
    "source": "https://leave-russia.org/caterpillar",
    "confidence": "high",
    "verdict": "",
-   "slice": "dealers"
+   "slice": "dealers",
+   "ru": false,
+   "ask": true
   },
   {
    "org": "ООО «ПСК-Новые решения» / Balchug Capital (Давид Амарян)",
@@ -18586,7 +18633,9 @@
    "source": "https://leave-russia.org/caterpillar",
    "confidence": "med",
    "verdict": "",
-   "slice": "dealers"
+   "slice": "dealers",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "Cat® Parts Store (parts.cat.com)",
@@ -18603,7 +18652,9 @@
    "source": "https://www.borusancat.com/tr/part",
    "confidence": "med",
    "verdict": "",
-   "slice": "dealers"
+   "slice": "dealers",
+   "ru": false,
+   "ask": true
   },
   {
    "org": "Cat® SIS 2.0 / SIS2GO (sis2.cat.com)",
@@ -18620,7 +18671,9 @@
    "source": "https://www.petersoncat.com/parts/cat-service-information-system",
    "confidence": "med",
    "verdict": "",
-   "slice": "dealers"
+   "slice": "dealers",
+   "ru": false,
+   "ask": true
   },
   {
    "org": "АО «ВЭД Агент»",
@@ -18637,7 +18690,9 @@
    "source": "https://ved-agent.fis.ru/",
    "confidence": "med",
    "verdict": "",
-   "slice": "dealers"
+   "slice": "dealers",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "ООО «СПК-Импорт» (spkamur.ru)",
@@ -18654,7 +18709,9 @@
    "source": "https://spkamur.ru/",
    "confidence": "high",
    "verdict": "",
-   "slice": "dealers"
+   "slice": "dealers",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "ООО «Хорошая Техника» (catparts.tech)",
@@ -18671,7 +18728,9 @@
    "source": "https://catparts.tech/",
    "confidence": "med",
    "verdict": "",
-   "slice": "dealers"
+   "slice": "dealers",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "caterpillar-russia.com (поставки оборудования и запчастей Caterpillar)",
@@ -18688,7 +18747,9 @@
    "source": "https://caterpillar-russia.com/",
    "confidence": "low",
    "verdict": "",
-   "slice": "dealers"
+   "slice": "dealers",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "ProfiMiner (каталог поставщиков горной техники и запчастей)",
@@ -18705,7 +18766,9 @@
    "source": "https://profiminer.ru/company/ccategory-part-dealer/",
    "confidence": "med",
    "verdict": "",
-   "slice": "dealers"
+   "slice": "dealers",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "ТОО «Hartex»",
@@ -18722,7 +18785,9 @@
    "source": "https://hartex.kz/catalog/caterpillar/",
    "confidence": "high",
    "verdict": "",
-   "slice": "dealers"
+   "slice": "dealers",
+   "ru": false,
+   "ask": true
   },
   {
    "org": "ТОО «Диггер-Про КЗ» (zemlekop.kz)",
@@ -18739,7 +18804,9 @@
    "source": "https://zemlekop.kz/cat/",
    "confidence": "high",
    "verdict": "",
-   "slice": "dealers"
+   "slice": "dealers",
+   "ru": false,
+   "ask": true
   },
   {
    "org": "Q-Parts (quality-parts.kz / q-parts.kz)",
@@ -18756,7 +18823,9 @@
    "source": "https://quality-parts.kz/g7223758-cat-caterpillar",
    "confidence": "med",
    "verdict": "",
-   "slice": "dealers"
+   "slice": "dealers",
+   "ru": false,
+   "ask": true
   },
   {
    "org": "ТОО «Rapid Parts Distribution» (RPD)",
@@ -18773,7 +18842,9 @@
    "source": "https://rpd.kz/",
    "confidence": "high",
    "verdict": "",
-   "slice": "dealers"
+   "slice": "dealers",
+   "ru": false,
+   "ask": true
   },
   {
    "org": "Mechon International LLC FZ",
@@ -18790,7 +18861,9 @@
    "source": "https://mechoninternational.com/brand/caterpillar-spare-parts-suppliers-dubai",
    "confidence": "high",
    "verdict": "",
-   "slice": "dealers"
+   "slice": "dealers",
+   "ru": false,
+   "ask": true
   },
   {
    "org": "Middle East Equipment and Tractors FZE LLC (METRAC)",
@@ -18807,7 +18880,9 @@
    "source": "https://metrac.me/",
    "confidence": "high",
    "verdict": "",
-   "slice": "dealers"
+   "slice": "dealers",
+   "ru": false,
+   "ask": true
   },
   {
    "org": "Al Burhan Spare Parts TR.",
@@ -18824,7 +18899,9 @@
    "source": "https://alburhanspares.com/cat/caterpillar-genuine-parts/",
    "confidence": "med",
    "verdict": "",
-   "slice": "dealers"
+   "slice": "dealers",
+   "ru": false,
+   "ask": true
   },
   {
    "org": "AEI Supplies FZE",
@@ -18841,7 +18918,9 @@
    "source": "https://aeisupplies.com/caterpillar-parts-supplier-in-uae/",
    "confidence": "med",
    "verdict": "",
-   "slice": "dealers"
+   "slice": "dealers",
+   "ru": false,
+   "ask": true
   },
   {
    "org": "Autoverse (ОАЭ)",
@@ -18858,7 +18937,9 @@
    "source": "https://autoverse.ae/caterpillar-genuine-parts-in-dubai/",
    "confidence": "med",
    "verdict": "",
-   "slice": "dealers"
+   "slice": "dealers",
+   "ru": false,
+   "ask": true
   },
   {
    "org": "STOPARTS LTD (бренд SORS)",
@@ -18875,7 +18956,9 @@
    "source": "https://sors.tech/your-global-source-for-quality-caterpillar-spare-parts-genuine-and-aftermarket-solutions-from-stoparts-ltd/",
    "confidence": "med",
    "verdict": "",
-   "slice": "dealers"
+   "slice": "dealers",
+   "ru": false,
+   "ask": true
   },
   {
    "org": "Worthy Parts",
@@ -18892,7 +18975,9 @@
    "source": "https://www.worthyparts.com/machine-detail/r1700g-underground-loader-1025/1025/",
    "confidence": "med",
    "verdict": "",
-   "slice": "dealers"
+   "slice": "dealers",
+   "ru": false,
+   "ask": true
   },
   {
    "org": "Shandong Tuoxing (tuoxing.com)",
@@ -18909,7 +18994,9 @@
    "source": "https://www.tuoxing.com/application/lhd-caterpillar-r1700g",
    "confidence": "low",
    "verdict": "",
-   "slice": "dealers"
+   "slice": "dealers",
+   "ru": false,
+   "ask": true
   },
   {
    "org": "Snabus.ru",
@@ -18926,7 +19013,9 @@
    "source": "https://www.snabus.ru/lhd-loaders/cat-lhd-loaders/caterpillar-r1700g-lhd-loader/",
    "confidence": "low",
    "verdict": "",
-   "slice": "dealers"
+   "slice": "dealers",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "ООО «Восточная Техника» (Vostochnaya Technica)",
@@ -18943,7 +19032,9 @@
    "source": "https://www.vost-tech.ru/kontakty/",
    "confidence": "high",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "ООО «Цеппелин Русланд» (Zeppelin Russland)",
@@ -18960,7 +19051,9 @@
    "source": "https://zeppelin.ru/products/mashiny-podzem/r1700g",
    "confidence": "high",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "Borusan Cat Kazakhstan (ИП «Борусан Макина Казахстан»)",
@@ -18977,7 +19070,9 @@
    "source": "https://www.borusancat.kz/en/equipment/new/13866077/Underground-Hard-Rock/18233686/R1700G",
    "confidence": "high",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "Borusan Cat Kazakhstan — Центр восстановления компонентов",
@@ -18994,7 +19089,9 @@
    "source": "https://www.borusancat.kz/ru/restoration-repair/remont-korobok-peredach-i-gidrotransformatorov",
    "confidence": "high",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": false,
+   "ask": true
   },
   {
    "org": "Borusan Cat Kyrgyzstan (Borusan Makina)",
@@ -19011,7 +19108,9 @@
    "source": "https://www.amcham.kg/en/members/borusan-makina/",
    "confidence": "med",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": false,
+   "ask": true
   },
   {
    "org": "Barloworld Mongolia LLC",
@@ -19028,7 +19127,9 @@
    "source": "https://catused.cat.com/en/dealer.aspx?orgid=%7B42e2f3fa-97f8-46f0-916c-673c0c9b2063%7D",
    "confidence": "med",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": false,
+   "ask": true
   },
   {
    "org": "Wagner Asia Equipment LLC",
@@ -19045,7 +19146,9 @@
    "source": "http://www.mongolianbusinessdatabase.com/base/companydetials?id=3449",
    "confidence": "low",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": false,
+   "ask": true
   },
   {
    "org": "ООО «БИЗНЕС СЕРВИС»",
@@ -19062,7 +19165,9 @@
    "source": "https://bs-nk.ru/kontakty",
    "confidence": "high",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "ООО «СПК-Импорт»",
@@ -19079,7 +19184,9 @@
    "source": "https://spkamur.ru/",
    "confidence": "high",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "ООО «Китспецтех»",
@@ -19096,7 +19203,9 @@
    "source": "https://kitspectex.ru/",
    "confidence": "high",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "ООО «Техномир-ДВ»",
@@ -19113,7 +19222,9 @@
    "source": "https://tehnomirdv.ru/",
    "confidence": "high",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "АО «ВЭД Агент»",
@@ -19130,7 +19241,9 @@
    "source": "https://ved-agent.fis.ru/",
    "confidence": "med",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "ООО «Зиптех-Сервис» (ZIPTEH SERVICE)",
@@ -19147,7 +19260,9 @@
    "source": "https://www.zipteh.ru/o-nas/",
    "confidence": "high",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "ООО «Спецмашсоюз»",
@@ -19164,7 +19279,9 @@
    "source": "https://s-mashsouz.ru/o-kompanii/",
    "confidence": "high",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "ООО «Майнинг Солюшнс»",
@@ -19181,7 +19298,9 @@
    "source": "https://mining-solutions.ru/contacts/",
    "confidence": "high",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "ООО «СПТ» («Современные промышленные технологии»)",
@@ -19198,7 +19317,9 @@
    "source": "https://sptehno.com/",
    "confidence": "high",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "ООО «Сервис Модерн Солюшенс»",
@@ -19215,7 +19336,9 @@
    "source": "https://profiminer.ru/company/servicemodern/",
    "confidence": "high",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "ООО «Карьер-Сервис» (QS Group)",
@@ -19232,7 +19355,9 @@
    "source": "https://qsgrp.com/sale/gorno-shahtnoe-oborudovanie/podzemnye-pogruzchiki/",
    "confidence": "high",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "ООО «Модерн Машинери Фар Ист» (Modern Machinery)",
@@ -19249,7 +19374,9 @@
    "source": "https://www.modernmachinery.ru/po-tipu-tekhniki/podzemnaya-tekhnika-i-pdm.html",
    "confidence": "high",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "ООО «РДС» (RockDrilling Service)",
@@ -19266,7 +19393,9 @@
    "source": "https://rockdrilling.ru/",
    "confidence": "high",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "Группа «Техсервис» (ТС Групп)",
@@ -19283,7 +19412,9 @@
    "source": "https://www.tsgroup.ru/katalog/gorno-shakhtnoe-oborudovanie/podzemnaya-tekhnika/",
    "confidence": "high",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "«Запчасти CAT, Sandvik, Atlas Copco, Liebherr, Epiroc» (витрина на orgs.biz)",
@@ -19300,7 +19431,9 @@
    "source": "https://club221854066.orgs.biz/",
    "confidence": "med",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "ProfiMiner (отраслевой справочник горной промышленности)",
@@ -19317,7 +19450,9 @@
    "source": "https://profiminer.ru/company/ccategory-part-dealer/brand-caterpillar/loc-russia/",
    "confidence": "high",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "ООО «Ремонтно-техническая компания» (РТК)",
@@ -19334,7 +19469,9 @@
    "source": "https://profiminer.ru/company/rtk/",
    "confidence": "high",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "ООО «КАТ» (PARTS CAT)",
@@ -19351,7 +19488,9 @@
    "source": "https://parts-cat.ru/services/remont-kpp-spetstekhniki-sat-saterpillar-v-moskve/",
    "confidence": "high",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "ООО «СтАТ-Сервис»",
@@ -19368,7 +19507,9 @@
    "source": "https://cat-serv.ru/zapchasti/originalnye/caterpillar",
    "confidence": "high",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "CAT-trade Group (ctg-parts.ru)",
@@ -19385,7 +19526,9 @@
    "source": "https://ctg-parts.ru/catalog/caterpillar/",
    "confidence": "med",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "DG Trade",
@@ -19402,7 +19545,9 @@
    "source": "https://dg-trade.ru/catalog/navesnoe-oborudovanie/zubya-i-koronki/sistema-zubev-caterpillar/",
    "confidence": "high",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "ООО «САТ» (CAT48.RU)",
@@ -19419,7 +19564,9 @@
    "source": "https://www.cat48.ru/filters.html",
    "confidence": "high",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "ЦТП-РУС (ctp-rus.ru)",
@@ -19436,7 +19583,9 @@
    "source": "https://ctp-rus.ru/zapchasti/zapchasti-caterpillar/",
    "confidence": "high",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "ООО «Промтехно» (spetstech.ru)",
@@ -19453,7 +19602,9 @@
    "source": "https://spetstech.ru/catalog/khodovaya-chast/1311651-kryshka-katka-caterpillar-itr-usco/",
    "confidence": "high",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "ООО «Балткам»",
@@ -19470,7 +19621,9 @@
    "source": "https://www.baltkam.ru/get_brand_full_info?brandName=ITR+USCO",
    "confidence": "med",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "«Механика Сити Партс» (74parts.ru)",
@@ -19487,7 +19640,9 @@
    "source": "https://74parts.ru/info/brands/itr-usco/",
    "confidence": "med",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "«УДТ-Техника» (udt-technika.ru)",
@@ -19504,7 +19659,9 @@
    "source": "https://www.udt-technika.ru/itr-usco.html",
    "confidence": "low",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "ООО «Снабавто»",
@@ -19521,7 +19678,9 @@
    "source": "https://snabavto.com/category/caterpillar/",
    "confidence": "med",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "«СТК-Комплектация» (stk-parts.ru)",
@@ -19538,7 +19697,9 @@
    "source": "https://stk-parts.ru/caterpillar/",
    "confidence": "med",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "«Трактор-Запчасть» (traktorzapchast.ru)",
@@ -19555,7 +19716,9 @@
    "source": "https://traktorzapchast.ru/catalog/cat/",
    "confidence": "med",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "ООО «Спецтехно» (spec-tehno.com)",
@@ -19572,7 +19735,9 @@
    "source": "https://spec-tehno.com/",
    "confidence": "med",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "ООО «Гренар» (GRENAR)",
@@ -19589,7 +19754,9 @@
    "source": "https://grenar.ru/brands/caterpillar/",
    "confidence": "med",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "ООО «Компания ИмПарт» (iMachinery)",
@@ -19606,7 +19773,9 @@
    "source": "https://imachinery.ru/",
    "confidence": "high",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "ООО «ОТГ-ДВ»",
@@ -19623,7 +19792,9 @@
    "source": "http://www.otg-dv.ru/index.html",
    "confidence": "med",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "Novus Parts",
@@ -19640,7 +19811,9 @@
    "source": "https://novusparts.ru/",
    "confidence": "med",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "«Спецтехснаб» (spectexsnab.ru)",
@@ -19657,7 +19830,9 @@
    "source": "https://spectexsnab.ru/",
    "confidence": "low",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "ООО «Детройт-СТ»",
@@ -19674,7 +19849,9 @@
    "source": "https://detroit-st.ru/motors/caterpillar/caterpillar-s11-s13-s15-s18-/",
    "confidence": "high",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "ООО «ДСТС»",
@@ -19691,7 +19868,9 @@
    "source": "https://filters-dsts.ru/filters/catalog/caterpillar/maslyanyie-filtryi.html",
    "confidence": "high",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "ООО «Доринг»",
@@ -19708,7 +19887,9 @@
    "source": "https://doring.ru/katalog/caterpillar/",
    "confidence": "high",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "ООО «СпецАвтоРесурс»",
@@ -19725,7 +19906,9 @@
    "source": "https://specavtoresurs.ru/filtry_i_filtruiushchiie_eliemienty",
    "confidence": "high",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "ООО «СТГ» (stg-oil.ru)",
@@ -19742,7 +19925,9 @@
    "source": "https://stg-oil.ru/catalog/filtry/donaldson/",
    "confidence": "med",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "ARMET GROUP (ООО «АРМЕТ РУС»)",
@@ -19759,7 +19944,9 @@
    "source": "https://armetgroup.ru/get",
    "confidence": "high",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "«Звено» (zveno.ru)",
@@ -19776,7 +19963,9 @@
    "source": "https://zveno.ru/contacts/",
    "confidence": "high",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "«Интертрактор» (inter-tractor.ru)",
@@ -19793,7 +19982,9 @@
    "source": "https://www.inter-tractor.ru/catalog/koronki/",
    "confidence": "med",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "«Азия-Трак» (25gus.ru)",
@@ -19810,7 +20001,9 @@
    "source": "https://25gus.ru/catalog/drugie_zapchasti/koronki_i_adaptery/",
    "confidence": "med",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "«Земер МГ» (z-mg.ru)",
@@ -19827,7 +20020,9 @@
    "source": "http://www.parts.z-mg.ru/CATERPILLAR-Tooth.aspx",
    "confidence": "high",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "«Орион» (orion-chel.ru)",
@@ -19844,7 +20039,9 @@
    "source": "https://orion-chel.ru/produkciya/koronki-kovsha/koronki-cat/",
    "confidence": "med",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "ООО «Профессионал» (profdst.ru)",
@@ -19861,7 +20058,9 @@
    "source": "https://profdst.ru/1c/katalog-koronok-adapterov-zashchity/sistemy-mirovykh-proizvoditeley/hensley/",
    "confidence": "med",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "«ТСЦ» (t-s-c.ru)",
@@ -19878,7 +20077,9 @@
    "source": "https://t-s-c.ru/products/spare/hodovaya-sistema/",
    "confidence": "low",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "ООО «Специализированный Гидравлический Сервис» (Спецгидросервис)",
@@ -19895,7 +20096,9 @@
    "source": "https://specgidro42.ru/",
    "confidence": "high",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "ООО «ЦСС»",
@@ -19912,7 +20115,9 @@
    "source": "https://kemcss.ru/izgotovlenie-i-remont-gidroczilindrov/",
    "confidence": "high",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "ООО «Ленспецсервис Групп»",
@@ -19929,7 +20134,9 @@
    "source": "https://lenspecservice.ru/blog/obshhee/remont-gidravliki-specztexniki-caterpillar/",
    "confidence": "med",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "«СП-Гидропривод» (sp-gidro.ru)",
@@ -19946,7 +20153,9 @@
    "source": "https://www.sp-gidro.ru/caterpillar-0",
    "confidence": "med",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "«Ремгидро» (remgidro.ru)",
@@ -19963,7 +20172,9 @@
    "source": "https://remgidro.ru/remont-gidronasosov/caterpillar",
    "confidence": "low",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "«Белгидросила Групп»",
@@ -19980,7 +20191,9 @@
    "source": "https://belgidrosila.ru/gidro-blog/gidromotoryi/remont-gidromotorov-caterpillar/",
    "confidence": "low",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "ООО «Дормаш Групп»",
@@ -19997,7 +20210,9 @@
    "source": "https://dormash-group.ru/remont-spectehniki/dvigately-caterpillar",
    "confidence": "high",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "«СпецТехМастер» (spectechmaster.ru)",
@@ -20014,7 +20229,9 @@
    "source": "https://spectechmaster.ru/remont-dvigateley-caterpillar",
    "confidence": "med",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "«Атлет» (atlet-spb.ru)",
@@ -20031,7 +20248,9 @@
    "source": "http://www.atlet-spb.ru/remont_caterpillar",
    "confidence": "med",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "ООО «Спецтранссервис»",
@@ -20048,7 +20267,9 @@
    "source": "https://spectransservice.ru/remont-dvigatelei-spectehniki/remont-dvigatelej-caterpillar/",
    "confidence": "med",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "777parts (777parts.net / 777parts.com)",
@@ -20065,7 +20286,9 @@
    "source": "https://777parts.net/caterpillar.html",
    "confidence": "high",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": false,
+   "ask": true
   },
   {
    "org": "AVSpare.com",
@@ -20082,7 +20305,9 @@
    "source": "https://avspare.com/caterpillar/arm/",
    "confidence": "high",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": false,
+   "ask": true
   },
   {
    "org": "EPCATALOGS",
@@ -20099,7 +20324,9 @@
    "source": "https://epcatalogs.com/",
    "confidence": "med",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": false,
+   "ask": true
   },
   {
    "org": "Machineryline",
@@ -20116,7 +20343,9 @@
    "source": "https://machineryline.info/-/spare-parts/underground-mining-loaders/Caterpillar--c2028fc1102tm2512",
    "confidence": "med",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": false,
+   "ask": true
   },
   {
    "org": "Ozon",
@@ -20133,7 +20362,9 @@
    "source": "https://www.ozon.ru/product/toplivnyy-filtr-caterpillar-cat-1r-0751-1r0751-1413544635/",
    "confidence": "high",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "ФарПост (farpost.ru)",
@@ -20150,7 +20381,9 @@
    "source": "https://www.farpost.ru/vladivostok/zapchasti/model/caterpillar/",
    "confidence": "med",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "Alibaba.com",
@@ -20167,7 +20400,9 @@
    "source": "https://www.alibaba.com/countrysearch/CN/caterpillar-spare-parts.html",
    "confidence": "med",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": false,
+   "ask": true
   },
   {
    "org": "Made-in-China.com",
@@ -20184,7 +20419,9 @@
    "source": "https://www.made-in-china.com/products-search/hot-china-products/Caterpillar_Parts.html",
    "confidence": "med",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": false,
+   "ask": true
   },
   {
    "org": "Bonovo Machinery & Equipment Co., Ltd",
@@ -20201,7 +20438,9 @@
    "source": "https://bonovo-china.en.made-in-china.com/product/hxrUtYugOKWF/China-Bonovo-Loader-Bucket-Underground-Loader-Bucket-for-Cat-R1600.html",
    "confidence": "med",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": false,
+   "ask": true
   },
   {
    "org": "Beray Parts (bri-parts.com)",
@@ -20218,7 +20457,9 @@
    "source": "https://www.bri-parts.com/product/underground-lhd-loader-bucket-for-cat-r1300-r1600-r1700-r2900-r3000/",
    "confidence": "med",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": false,
+   "ask": true
   },
   {
    "org": "Tuoxing Group",
@@ -20235,7 +20476,9 @@
    "source": "https://www.tuoxing.com/application/lhd-caterpillar-r1700g",
    "confidence": "med",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": false,
+   "ask": true
   },
   {
    "org": "Tornado Heavy Equipment Parts",
@@ -20252,7 +20495,9 @@
    "source": "https://tornadoparts.com/collections/caterpillar-underground-mining-loader-r1700-xe",
    "confidence": "med",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": false,
+   "ask": true
   },
   {
    "org": "METRAC (metrac.me)",
@@ -20269,7 +20514,9 @@
    "source": "https://metrac.me/",
    "confidence": "med",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": false,
+   "ask": true
   },
   {
    "org": "JAK Parts",
@@ -20286,7 +20533,9 @@
    "source": "https://www.jakparts.com/mining-spare-parts",
    "confidence": "med",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": false,
+   "ask": true
   },
   {
    "org": "Gulf Instruments",
@@ -20303,7 +20552,9 @@
    "source": "https://gulfinstruments.com/diesel-engine-brands/caterpillar-diesel-engine-spare-parts-supplier-in-dubai-uae/",
    "confidence": "med",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": false,
+   "ask": true
   },
   {
    "org": "ТОО «Quality Parts»",
@@ -20320,7 +20571,9 @@
    "source": "https://quality-parts.kz/g7223758-cat-caterpillar",
    "confidence": "med",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": false,
+   "ask": true
   },
   {
    "org": "Rapid Parts Distribution (rpd.kz)",
@@ -20337,7 +20590,9 @@
    "source": "https://rpd.kz/%D0%B7%D0%B0%D0%BF%D1%87%D0%B0%D1%81%D1%82%D0%B8-caterpillar/",
    "confidence": "med",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": false,
+   "ask": true
   },
   {
    "org": "ТОО «Диггер-Про КЗ» (zemlekop.kz)",
@@ -20354,7 +20609,9 @@
    "source": "https://zemlekop.kz/cat/",
    "confidence": "med",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": false,
+   "ask": true
   },
   {
    "org": "ООО «РЕКСПАРТ» (jkt.by)",
@@ -20371,7 +20628,9 @@
    "source": "https://jkt.by/company/",
    "confidence": "med",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "ООО «Завод специальных машин Плюс» (ЗСМ)",
@@ -20388,7 +20647,9 @@
    "source": "https://zcm.by/catalog/zapasnyie-chasti/caterpillar/",
    "confidence": "med",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "«Спецторг-МВПО» (sptorg.by)",
@@ -20405,7 +20666,9 @@
    "source": "https://sptorg.by/caterpillar/",
    "confidence": "med",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": false,
+   "ask": true
   },
   {
    "org": "«С-Трейд» (es-trade.by)",
@@ -20422,7 +20685,9 @@
    "source": "https://es-trade.by/product-category/zapchasti-caterpillar/",
    "confidence": "low",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": false,
+   "ask": true
   },
   {
    "org": "«Дизель Техно Ресурс» (diztech.by)",
@@ -20439,7 +20704,9 @@
    "source": "https://diztech.by/product-category/caterpillar/",
    "confidence": "low",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": false,
+   "ask": true
   },
   {
    "org": "rostender.info (ООО «Тендеры и закупки»)",
@@ -20456,7 +20723,9 @@
    "source": "https://rostender.info/category/tendery-caterpillar",
    "confidence": "high",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   },
   {
    "org": "Контур.Закупки (zakupki.kontur.ru)",
@@ -20473,7 +20742,9 @@
    "source": "https://zakupki.kontur.ru/category/zapchasti-dlya-spectehniki",
    "confidence": "high",
    "verdict": "",
-   "slice": "traders"
+   "slice": "traders",
+   "ru": true,
+   "ask": false
   }
  ],
  "prices": [
@@ -39006,19 +39277,19 @@
    "how": "Запрос по трём каналам одновременно: дилер СНГ, независимый склад, завод-изготовитель."
   },
   {
-   "step": "Проверить действующие каналы ввоза: ООО \"СК-КОМПЛЕКТ\", ООО \"КИТСПЕЦТЕХ\", ООО \"СПК-ИМПОРТ\", ООО \"МЕТЛЕОНИКС\", ООО \"ПБ ЛОГИСТИКА\"",
-   "why": "По таможне 116 отгрузок Caterpillar, импортёров — 35. У этих компаний канал уже работает: это и конкуренты, и возможные партнёры.",
-   "how": "Сверить их ИНН и профиль, запросить условия перепродажи, сравнить цену их канала со своей ставкой по маршруту."
+   "step": "Разобрать конкурентов по таможне: ООО \"СК-КОМПЛЕКТ\", ООО \"КИТСПЕЦТЕХ\", ООО \"СПК-ИМПОРТ\", ООО \"МЕТЛЕОНИКС\", ООО \"ПБ ЛОГИСТИКА\"",
+   "why": "По таможне 116 отгрузок Caterpillar, импортёров — 35. Это российские компании, и по решению владельца запросы им не идут: они нужны как картина рынка — чей канал уже работает, каким маршрутом и по какой цене за килограмм.",
+   "how": "Смотреть их маршруты и отправителей: отправитель из Китая или Турции, который возит им, — наш потенциальный адресат напрямую."
   },
   {
-   "step": "Задать дилерам (42) один вопрос до цены — отгружаете ли в РФ",
+   "step": "Задать иностранным дилерам (29) один вопрос до цены — отгружаете ли в РФ",
    "why": "Прайс без готовности отгружать не стоит ничего, а переписка о ценах занимает недели.",
    "how": "Письмо на английском одним абзацем: модель, серийный номер, перечень, вопрос об отгрузке."
   },
   {
-   "step": "Разослать РФ-поставщикам (91) запрос наличия по ходовым позициям",
-   "why": "Наличие на складе в РФ снимает срок и таможню — это единственный способ выиграть закупку с коротким сроком поставки.",
-   "how": "Смарт-процесс «Запросы поставщикам» Битрикса, письмо с перечнем и сроком ответа 3 дня."
+   "step": "Разослать запрос наличия иностранным поставщикам (23)",
+   "why": "По решению владельца российские компании в лист запроса не выводятся: их 68, и они остаются картиной конкурентов, а не адресатами. Спрашиваем заводы и склады Казахстана, Китая, ОАЭ, Турции и дальше по кольцу.",
+   "how": "Смарт-процесс «Запросы поставщикам» Битрикса, письмо на английском с перечнем и сроком ответа 3 дня."
   }
  ],
  "gaps": {

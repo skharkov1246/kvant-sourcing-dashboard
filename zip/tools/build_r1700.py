@@ -180,32 +180,51 @@ def build():
 <th>Номер аналога</th><th>Вид</th><th>Примечание</th></tr></thead><tbody></tbody></table></div>"""))
 
     # ── 6. Оригинал: дилеры ─────────────────────────────────────────────────
-    dealers = [o for o in d["orgs"] if o["slice"] == "dealers"]
+    POLICY = d.get("policy") or {}
+    pol_note = (f'<div class="card" style="border-left:3px solid var(--warn)"><b>Лист запроса: '
+                f'{e(POLICY.get("ask_scope"))}</b><div class="txt">{e(POLICY.get("why"))}</div>'
+                f'<div class="mut">Решение от {e(POLICY.get("decided"))}</div></div>') if POLICY else ""
+
+    def split_ask(rows):
+        """Кого запрашиваем и кто остаётся картиной рынка — по решению владельца."""
+        return [o for o in rows if o.get("ask")], [o for o in rows if not o.get("ask")]
+
+    dealers_all = [o for o in d["orgs"] if o["slice"] == "dealers"]
+    dealers, dealers_ru = split_ask(dealers_all)
+    ru_block = lambda rows, title: (
+        f'<details style="margin-top:10px"><summary class="mut">{title} · {len(rows)} — '
+        f'по решению владельца в лист запроса не выводятся</summary>'
+        + cards(rows, [("kind", "Тип"), ("city", "Город"), ("role", "Роль"), ("note", "Чем полезен")],
+                "org", "site") + "</details>") if rows else ""
+
     S.append(("deal", f"Оригинал · {len(dealers)}", f"""
-<h2>Официальные каналы Caterpillar</h2>
+<h2>Официальные каналы Caterpillar</h2>{pol_note}
 <div class="mut">Первый вопрос дилеру — не цена, а готовность отгружать в РФ. От ответа зависит
 весь маршрут. Второй — подтверждение применимости по серийному номеру машины.</div>
 <div class="bar"><input id="qdl" placeholder="поиск: организация, страна, роль…"><span class="mut" id="cntdl"></span></div>
 <div id="listdl">{cards(dealers, [("role", "Роль"), ("country", "Страна"), ("city", "Город"),
                                   ("brands", "Бренды"), ("stock", "Наличие и срок"),
                                   ("email", "Почта"), ("phone", "Телефон"), ("note", "Чем полезен")],
-                        "org", "site")}</div>"""))
+                        "org", "site")}</div>
+{ru_block(dealers_ru, "Российские компании этого направления")}"""))
 
     # ── 7. Неоригинал ───────────────────────────────────────────────────────
-    after = [o for o in d["orgs"] if o["slice"] == "aftermarket"]
+    after_all = [o for o in d["orgs"] if o["slice"] == "aftermarket"]
+    after, after_ru = split_ask(after_all)
     odm = own["odm"]
     odm_cards = "".join(f"""<div class="card"><b>{e(o.get('org'))}</b> {conf_tag(o.get('confidence'))}
 <div class="txt">{e(o.get('makes'))}</div>
 <div class="mut">{e(o.get('region'))}, {e(o.get('country'))} · {link(o.get('site'))} ·
 из нашего справочника ODM</div></div>""" for o in odm[:400])
     S.append(("after", f"Неоригинал · {len(after)}+{len(odm)}", f"""
-<h2>Кто делает неоригинал</h2>
+<h2>Кто делает неоригинал</h2>{pol_note}
 <div class="mut">Разделяй изготовителя и торговца: на торгах письмо изготовителя о применимости
 весит больше прайса перекупщика.</div>
 <div class="bar"><input id="qaf" placeholder="поиск: завод, бренд, что делает…"><span class="mut" id="cntaf"></span></div>
 <div id="listaf">{cards(after, [("kind", "Тип"), ("country", "Страна"), ("city", "Город"),
                                 ("brands", "Бренды и узлы"), ("stock", "Партия и срок"),
                                 ("email", "Почта"), ("note", "Что покрывает")], "org", "site")}</div>
+{ru_block(after_ru, "Российские заводы")}
 <h2>Заводы из нашего справочника ODM с упоминанием Caterpillar · {len(odm)}</h2>
 <div class="mut">Показаны первые {min(400, len(odm))} по уровню доверия. Полный перечень —
 в zip/data/odm_suppliers.json и на вкладке «Позиции».</div>
@@ -213,7 +232,8 @@ def build():
 <div id="listodm">{odm_cards}</div>"""))
 
     # ── 8. Поставщики и маршруты ────────────────────────────────────────────
-    traders = [o for o in d["orgs"] if o["slice"] == "traders"]
+    traders_all = [o for o in d["orgs"] if o["slice"] == "traders"]
+    traders, traders_ru = split_ask(traders_all)
     imp = "".join(f'<tr><td>{e(x["org"])}</td><td class="n">{num(x["shipments"])}</td></tr>'
                   for x in cst["importers"][:60])
     exp = "".join(f'<tr><td>{e(x["org"])}</td><td class="n">{num(x["shipments"])}</td></tr>'
@@ -226,12 +246,13 @@ def build():
                   f' {e(x.get("incoterms"))} {e(x.get("place"))} · ТН ВЭД {e(x.get("hs10"))} · {e(x.get("src"))}</div></div>'
                   for x in cst["r1700_rows"])
     S.append(("sup", f"Поставщики · {len(traders)}", f"""
-<h2>Кого запрашивать в РФ и СНГ</h2>
+<h2>Кого запрашивать</h2>{pol_note}
 <div class="bar"><input id="qtr" placeholder="поиск: компания, город, что держат…"><span class="mut" id="cnttr"></span></div>
 <div id="listtr">{cards(traders, [("kind", "Тип"), ("country", "Страна"), ("city", "Город"),
                                   ("brands", "Бренды"), ("stock", "Склад и срок"),
                                   ("email", "Почта"), ("phone", "Телефон"), ("note", "Чем полезен")],
                         "org", "site")}</div>
+{ru_block(traders_ru, "Российские торговцы и исполнители")}
 <h2>Ввоз Caterpillar по нашей таможенной выгрузке</h2>
 <div class="mut">{e(cst['note'])} Строк с признаком Caterpillar — {num(len(cst['rows']))}.
 Это не мнение, а факт отгрузки: у этих компаний канал уже работает.</div>
