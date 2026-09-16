@@ -5,11 +5,11 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 208,
-    "total_bytes": 97092564,
+    "total_bytes": 97152881,
     "by_sensitivity": {
       "конфиденциально": 61,
-      "внутреннее": 113,
-      "публикуемо": 34
+      "внутреннее": 114,
+      "публикуемо": 33
     },
     "by_subproject": {
       "ГПУ-библиотека": 27,
@@ -693,6 +693,68 @@
       "referenced_by": []
     },
     {
+      "path": "zip/data/r1700.json",
+      "subproject": "база ЗИП",
+      "bytes": 2335609,
+      "note": "Досье машины Caterpillar R1700G (ПДМ подземных работ): паспорт и модификации, узлы, документация Caterpillar по номерам форм, перечень запчастей с нашими номерами KV, кроссы вторичного рынка, официальные дилеры, заводы неоригинала, поставщики РФ/СНГ, маршруты ввоза по таможне, ценовые ориентиры, площадки торгов и эксплуатанты. Каждая строка с источником и уровнем доверия; вердикт — итог независимой перепроверки. Строит zip/tools/r1700_dossier.py из zip/data/r1700_recon/, positions.json, pnw/, таможни и справочника ODM. Руками не править.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "alts",
+        "built_by",
+        "docs",
+        "gaps",
+        "machine",
+        "node_tree",
+        "nodes",
+        "orgs",
+        "own",
+        "parts",
+        "playbook",
+        "policy",
+        "prices",
+        "schema",
+        "specs",
+        "stats",
+        "tenders",
+        "updated",
+        "variants"
+      ],
+      "main_collection": {
+        "key": "alts",
+        "records": 730,
+        "record_keys": [
+          "alt_pn",
+          "alt_pn_norm",
+          "brand",
+          "kind",
+          "note",
+          "pn",
+          "pn_norm"
+        ]
+      },
+      "last_change": "2026-09-16",
+      "last_author": "Claude",
+      "last_commit": "79e93d8",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "адреса электронной почты",
+          "телефоны",
+          "участники внешнеэкономических сделок"
+        ]
+      },
+      "referenced_by": [
+        "scripts/build_chain_coverage.py",
+        "tests/test_r1700_dossier.py",
+        "zip/tools/build_r1700.py",
+        "zip/tools/r1700_dossier.py",
+        "zip/tools/r1700_report.py",
+        "zip/tools/r1700_sql.py"
+      ]
+    },
+    {
       "path": "zip/data/recip_recon.json",
       "subproject": "база ЗИП",
       "bytes": 2334821,
@@ -735,68 +797,6 @@
         "scripts/build_chain_coverage.py",
         "tests/test_dict.py",
         "zip/tools/build_recip_page.py"
-      ]
-    },
-    {
-      "path": "zip/data/r1700.json",
-      "subproject": "база ЗИП",
-      "bytes": 2305456,
-      "note": "Досье машины Caterpillar R1700G (ПДМ подземных работ): паспорт и модификации, узлы, документация Caterpillar по номерам форм, перечень запчастей с нашими номерами KV, кроссы вторичного рынка, официальные дилеры, заводы неоригинала, поставщики РФ/СНГ, маршруты ввоза по таможне, ценовые ориентиры, площадки торгов и эксплуатанты. Каждая строка с источником и уровнем доверия; вердикт — итог независимой перепроверки. Строит zip/tools/r1700_dossier.py из zip/data/r1700_recon/, positions.json, pnw/, таможни и справочника ODM. Руками не править.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "alts",
-        "built_by",
-        "docs",
-        "gaps",
-        "machine",
-        "node_tree",
-        "nodes",
-        "orgs",
-        "own",
-        "parts",
-        "playbook",
-        "policy",
-        "prices",
-        "schema",
-        "specs",
-        "stats",
-        "tenders",
-        "updated",
-        "variants"
-      ],
-      "main_collection": {
-        "key": "alts",
-        "records": 720,
-        "record_keys": [
-          "alt_pn",
-          "alt_pn_norm",
-          "brand",
-          "kind",
-          "note",
-          "pn",
-          "pn_norm"
-        ]
-      },
-      "last_change": "2026-09-16",
-      "last_author": "Claude",
-      "last_commit": "79e93d8",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "конфиденциально",
-        "markers": [
-          "адреса электронной почты",
-          "телефоны",
-          "участники внешнеэкономических сделок"
-        ]
-      },
-      "referenced_by": [
-        "scripts/build_chain_coverage.py",
-        "tests/test_r1700_dossier.py",
-        "zip/tools/build_r1700.py",
-        "zip/tools/r1700_dossier.py",
-        "zip/tools/r1700_report.py",
-        "zip/tools/r1700_sql.py"
       ]
     },
     {
@@ -6444,6 +6444,48 @@
       ]
     },
     {
+      "path": "zip/data/r1700_recon/get.json",
+      "subproject": "база ЗИП",
+      "bytes": 35747,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "gaps",
+        "notes",
+        "rows",
+        "slice"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 15,
+        "record_keys": [
+          "alts",
+          "applic",
+          "confidence",
+          "interval",
+          "name_en",
+          "name_ru",
+          "node",
+          "note",
+          "pn",
+          "price_usd",
+          "qty",
+          "source",
+          "verdict"
+        ]
+      },
+      "last_change": "2026-09-13",
+      "last_author": "skharkov1246",
+      "last_commit": "5908e91",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
+    },
+    {
       "path": "data/catalog_notes.json",
       "subproject": "дашборд сорсеров",
       "bytes": 35231,
@@ -8561,48 +8603,6 @@
         "gt/build.py",
         "library/load_crossrefs.py"
       ]
-    },
-    {
-      "path": "zip/data/r1700_recon/get.json",
-      "subproject": "база ЗИП",
-      "bytes": 5583,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "gaps",
-        "notes",
-        "rows",
-        "slice"
-      ],
-      "main_collection": {
-        "key": "rows",
-        "records": 2,
-        "record_keys": [
-          "alts",
-          "applic",
-          "confidence",
-          "interval",
-          "name_en",
-          "name_ru",
-          "node",
-          "note",
-          "pn",
-          "price_usd",
-          "qty",
-          "source",
-          "verdict"
-        ]
-      },
-      "last_change": "2026-09-13",
-      "last_author": "skharkov1246",
-      "last_commit": "5908e91",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "публикуемо",
-        "markers": []
-      },
-      "referenced_by": []
     },
     {
       "path": "gpu/data/bitrix_gpu.json",
