@@ -1,0 +1,1230 @@
+{
+ "slice": "wheels",
+ "rows": [
+  {
+   "pn": "26.5-25 36PR STMS L5S",
+   "name_ru": "Шина 26.5-25, 36 слоёв, рисунок STMS, класс L5S (заводская, гладкая, подземная)",
+   "name_en": "Tire, 26.5 x 25, 36-Ply STMS L5S",
+   "node": "13 Колёса и шины",
+   "applic": "R1700G — штатная шина по спецалогу (машина 8XZ/SBR/XBR); габаритная ширина по шинам 2650 мм",
+   "qty": "4",
+   "interval": "замена по износу протектора",
+   "alts": [
+    {
+     "brand": "Caterpillar",
+     "pn": "26.5 x R25 VSMS2 L5 Bridgestone",
+     "kind": "заводская аранжировка",
+     "note": "раздел Tire Arrangements спецификации R1700G"
+    },
+    {
+     "brand": "Caterpillar",
+     "pn": "26.5 x 25 VSDL Bridgestone",
+     "kind": "заводская аранжировка",
+     "note": "там же"
+    },
+    {
+     "brand": "Caterpillar",
+     "pn": "26.5 x 25, 32 Ply Goodyear",
+     "kind": "заводская аранжировка",
+     "note": "там же"
+    }
+   ],
+   "price_usd": "",
+   "source": "https://www.teknoxgroup.com/fileadmin/user_upload/R1700G_eng.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "26.5R25",
+   "name_ru": "Типоразмер шин R1700 нового поколения (радиальная 26.5R25), ширина по шинам 2767 мм",
+   "name_en": "Tire Size 26.5R25",
+   "node": "13 Колёса и шины",
+   "applic": "R1700 (2019+), R1700 XE — родня R1700G; у R1700G тот же посадочный 25\", но заводская — диагональная 26.5-25",
+   "qty": "4",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Bridgestone",
+     "pn": "VSMS2",
+     "kind": "заводская аранжировка",
+     "note": "Tires must be selected from mandatory attachments"
+    },
+    {
+     "brand": "Bridgestone",
+     "pn": "VSDL",
+     "kind": "заводская аранжировка",
+     "note": "там же"
+    }
+   ],
+   "price_usd": "",
+   "source": "https://s7d2.scene7.com/is/content/Caterpillar/CM20220831-47b57-f400c",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "257-8035",
+   "name_ru": "Шина 26.5x25 STMS гладкая, 36 слоёв (каталожный номер Cat)",
+   "name_en": "TIRE-26.5X25 STMS-SLICK 36 PLY",
+   "node": "13 Колёса и шины",
+   "applic": "Совпадает по обозначению со штатной шиной R1700G «26.5 x 25 36 PLY STMS L5S»; привязка к модели на странице не указана",
+   "qty": "4",
+   "interval": "",
+   "alts": [],
+   "price_usd": "",
+   "source": "https://spare.avspart.com/caterpillar/tire/2578035/",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "26.5R25 VSMS2 L5S D2A 2*",
+   "name_ru": "Шина Bridgestone VSMS2 26.5R25 L5S (гладкая, для подземных ПДМ)",
+   "name_en": "Bridgestone VSMS2 26.5R25 L5S D2A 2* radial",
+   "node": "13 Колёса и шины",
+   "applic": "R1700G / R1700 — заводская аранжировка Cat «Tire, 26.5 x R25, VSMS2 L5 Bridgestone»",
+   "qty": "4",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Bridgestone",
+     "pn": "4604",
+     "kind": "артикул продавца",
+     "note": "Boltz Equipment Parts, США"
+    }
+   ],
+   "price_usd": "11298",
+   "source": "https://boltzequipmentparts.com/products/26-5r25-bridgestone-vsms2-v-steel-smooth-tread-mine-service-2-l5s-d2a-2-radial-tire-4604",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "26.5R25 VSDL L5 D2A",
+   "name_ru": "Шина Bridgestone VSDL 26.5R25 L5 (глубокий рисунок D-Lug, подземные рудники и карьеры)",
+   "name_en": "Bridgestone VSDL (V-Steel D-Lug) 26.5R25 L5 D2A",
+   "node": "13 Колёса и шины",
+   "applic": "R1700G / R1700 — заводская аранжировка Cat «Tire, 26.5 x 25, VSDL, Bridgestone»",
+   "qty": "4",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Caterpillar",
+     "pn": "аранжировка VSDL",
+     "kind": "OEM-опция",
+     "note": "подтверждена спецификацией R1700G"
+    }
+   ],
+   "price_usd": "",
+   "source": "https://otrtires.com/product/26-5r25-bridgestone-vsdl-d2a-2/",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "26.5R25 XMine D2 2* TL",
+   "name_ru": "Шина Michelin XMine D2 26.5R25, 2 звезды, L5 радиальная",
+   "name_en": "Michelin XMine D2 26.5R25 2* TL",
+   "node": "13 Колёса и шины",
+   "applic": "Подземные рудники и карьеры, класс L5; типоразмер совпадает с R1700 / R1700G",
+   "qty": "4",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Michelin",
+     "pn": "MCHN-OTR-020613",
+     "kind": "артикул продавца",
+     "note": "OTRUSA.COM"
+    }
+   ],
+   "price_usd": "10736.30",
+   "source": "https://otrusa.com/products/26-5r25-2-michelin-xmine-d2-tl",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "26.5R25 X MINE D2+ PRO L5",
+   "name_ru": "Шина Michelin X MINE D2+ PRO 26.5R25 L5 (наличие в РФ)",
+   "name_en": "Michelin X MINE D2+ PRO 26.5R25 L5",
+   "node": "13 Колёса и шины",
+   "applic": "Подземная техника (раздел «подземная техника» поставщика); типоразмер R1700 / R1700G",
+   "qty": "4",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Michelin",
+     "pn": "26.5R25 XLD D2 L5T",
+     "kind": "вариант того же поставщика",
+     "note": "также в наличии, цена по запросу"
+    }
+   ],
+   "price_usd": "цена по запросу",
+   "source": "https://rtyre.ru/store/krupnogabaritnyebr-shiny/podzemnaya-tehnika/",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "26.5R25 EARTHMAX SR 50 L-5",
+   "name_ru": "Шина BKT Earthmax SR 50 26.5R25 L-5 (глубокий рисунок)",
+   "name_en": "BKT EARTHMAX SR 50 L-5 TL 26.5R25",
+   "node": "13 Колёса и шины",
+   "applic": "Типоразмер 26.5R25, класс L5 — замена штатной 26.5-25 L5S на R1700G при переходе на радиальную",
+   "qty": "4",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "BKT",
+     "pn": "94032303",
+     "kind": "артикул производителя",
+     "note": "по каталогу продавца"
+    },
+    {
+     "brand": "BKT",
+     "pn": "94065516 (SR53 L-5 *** CR)",
+     "kind": "аналог",
+     "note": "6028 USD там же"
+    }
+   ],
+   "price_usd": "6080",
+   "source": "https://boltzequipmentparts.com/products/26-5r25-bkt-earthmax-sr-50-l-5-tl-tire-94032303",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "26.5R25 EARTHMAX SR 55 L-5S",
+   "name_ru": "Шина BKT Earthmax SR 55 26.5R25 L-5S (гладкая, подземная)",
+   "name_en": "BKT EARTHMAX SR 55 L-5S (SMOOTH) TL 26.5R25",
+   "node": "13 Колёса и шины",
+   "applic": "Класс L5S — прямой аналог штатного STMS L5S R1700G по классу и рисунку",
+   "qty": "4",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "BKT",
+     "pn": "94042128",
+     "kind": "артикул производителя",
+     "note": ""
+    }
+   ],
+   "price_usd": "7361",
+   "source": "https://boltzequipmentparts.com/products/29-5r25-bkt-earthmax-sr-55-l-5s-smooth-tl-tire-94044160",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "26.5-25 36PR SM 55 L-5S",
+   "name_ru": "Шина BKT SM 55 SMOOTH 26.5-25 36PR L-5S (диагональная гладкая)",
+   "name_en": "BKT SM 55 SMOOTH 26.5-25 36PR L-5S TL",
+   "node": "13 Колёса и шины",
+   "applic": "Диагональная 26.5-25, 36 слоёв, L5S — совпадает со штатной R1700G по размеру, слойности и классу",
+   "qty": "4",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "BKT",
+     "pn": "26.5-25 32PR SM 55 L-5S STBT",
+     "kind": "вариант",
+     "note": "825 994 RUB там же"
+    },
+    {
+     "brand": "BKT",
+     "pn": "26.5-25 28PR SM 55 L-5S STBT",
+     "kind": "вариант",
+     "note": "765 576 RUB там же"
+    }
+   ],
+   "price_usd": "804466 RUB",
+   "source": "https://sgshina.ru/kgsh/dlya-frontalnyh-pogruzchikov/shiny-26-5-25",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "26.5-25 LOADER SPECIAL L5",
+   "name_ru": "Шина BKT Loader Special 26.5-25 28PR L-5",
+   "name_en": "BKT Loader Special 26.5-25 28PR L-5 TL",
+   "node": "13 Колёса и шины",
+   "applic": "Диагональная 26.5-25 L5; ниже штатной по слойности (28 против 36) — проверять по нагрузке на ось",
+   "qty": "4",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "BKT",
+     "pn": "94034536",
+     "kind": "артикул производителя",
+     "note": "5603 USD у Boltz Equipment Parts"
+    }
+   ],
+   "price_usd": "285351 RUB",
+   "source": "https://sgshina.ru/kgsh/dlya-frontalnyh-pogruzchikov/shiny-26-5-25",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "26.5R25 MS502 Minextra L5S",
+   "name_ru": "Шина Maxam MS502 Minextra 26.5R25 L5S (гладкая)",
+   "name_en": "Maxam MS502 Minextra 26.5R25 L5S TL radial",
+   "node": "13 Колёса и шины",
+   "applic": "Класс L5S, типоразмер 26.5R25 — аналог VSMS2 по назначению (подземные ПДМ)",
+   "qty": "4",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Maxam",
+     "pn": "V342105 (J 2**)",
+     "kind": "артикул производителя",
+     "note": "6221 USD"
+    },
+    {
+     "brand": "Maxam",
+     "pn": "V342191 (K 3***)",
+     "kind": "артикул производителя",
+     "note": "5756 USD"
+    },
+    {
+     "brand": "Maxam",
+     "pn": "V342845 (MS501 L5)",
+     "kind": "аналог с рисунком",
+     "note": "6221 USD"
+    }
+   ],
+   "price_usd": "6221",
+   "source": "https://boltzequipmentparts.com/products/26-5r25-maxam-ms502-minextra-j-2-l5s-tl-radial-tire-v342105",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "26.5-25 БЕЛ-10М 32PR",
+   "name_ru": "Шина Белшина БЕЛ-10М 26.5-25, 32 слоя (раздел «подземная техника»)",
+   "name_en": "Belshina BEL-10M 26.5-25 32PR",
+   "node": "13 Колёса и шины",
+   "applic": "Подземная техника; типоразмер совпадает со штатной R1700G. Класс L5/L5S продавцом не указан — уточнять",
+   "qty": "4",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Белшина",
+     "pn": "БЕЛ-10М ЕС ГРУЗ 28",
+     "kind": "вариант слойности",
+     "note": "323 700 RUB в том же разделе"
+    }
+   ],
+   "price_usd": "345300 RUB",
+   "source": "https://rtyre.ru/store/krupnogabaritnyebr-shiny/podzemnaya-tehnika/265-25-bel-10m-es-gruz-32-belshina/",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "26.5-25 БЕЛ-6 32PR",
+   "name_ru": "Шина Белшина БЕЛ-6 26.5-25, 32 слоя (для фронтальных погрузчиков)",
+   "name_en": "Belshina BEL-6 26.5-25 32PR",
+   "node": "13 Колёса и шины",
+   "applic": "Типоразмер совпадает с R1700G, но раздел — фронтальные погрузчики, не подземка: рисунок и стойкость к порезам ниже",
+   "qty": "4",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Белшина",
+     "pn": "БЕЛ-6 ЕС ГРУЗ 28",
+     "kind": "вариант слойности",
+     "note": "240 100 RUB"
+    }
+   ],
+   "price_usd": "256100 RUB",
+   "source": "https://rtyre.ru/store/krupnogabaritnyebr-shiny/dlya-frontalnykh-pogruzchikov/265-25-bel-6-es-gruz-32-belshina/",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "26.5R25 ET5A",
+   "name_ru": "Шина Techking ET5A 26.5R25 ** 193B/209A2 TL (погрузчик)",
+   "name_en": "Techking ET5A 26.5R25 ** 193B/209A2 TL Loader",
+   "node": "13 Колёса и шины",
+   "applic": "Типоразмер 26.5R25; у Techking подземная линейка — ETSM/ETNT/ETUM (L5S), ET5A — погрузочная",
+   "qty": "4",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Techking",
+     "pn": "MATE D2S 26.5R25 L5 TL",
+     "kind": "L5 того же бренда",
+     "note": "цена по запросу, techking.ru"
+    }
+   ],
+   "price_usd": "153870 RUB",
+   "source": "https://sgshina.ru/kgsh/dlya-frontalnyh-pogruzchikov/techking-26-5r25-**-193b-209a2-tl-et5a-loader",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "26.5R25 TL538S+ L5**",
+   "name_ru": "Шина Triangle TL538S+ 26.5R25 L5** T1 TL",
+   "name_en": "Triangle TL538S+ 26.5R25 L5** T1 TL",
+   "node": "13 Колёса и шины",
+   "applic": "Класс L5, типоразмер 26.5R25 — китайский аналог VSDL по классу",
+   "qty": "4",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Triangle",
+     "pn": "TB516 E3** (26.5R25)",
+     "kind": "более лёгкий класс",
+     "note": "4023.45 USD у OTRUSA"
+    }
+   ],
+   "price_usd": "265574 RUB",
+   "source": "https://sgshina.ru/novye/26-5r25-triangle-tl538s-l5-t1-tl",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "26.5-25 Y524 L5 32PR",
+   "name_ru": "Шина Yokohama Y524 26.5-25 32PR TL L5 CP",
+   "name_en": "Yokohama Y524 26.5-25 32PR TL L5 CP",
+   "node": "13 Колёса и шины",
+   "applic": "Диагональная 26.5-25, 32 слоя, L5 — близка к штатной R1700G",
+   "qty": "4",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Yokohama",
+     "pn": "Y545 L4 (26.5-25 32PR)",
+     "kind": "более лёгкий класс",
+     "note": "233 889 RUB"
+    }
+   ],
+   "price_usd": "276803 RUB",
+   "source": "https://sgshina.ru/kgsh/dlya-frontalnyh-pogruzchikov/shiny-26-5-25",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "26.5-25 ER-122 203B",
+   "name_ru": "Шина Nortec ER-122 26.5-25 203B (российский бренд)",
+   "name_en": "Nortec ER-122 26.5-25 203B",
+   "node": "13 Колёса и шины",
+   "applic": "Типоразмер 26.5-25; класс L3/L4 (погрузочный), не L5S — для подземки как бюджетный вариант с оговоркой",
+   "qty": "4",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "AOTAI",
+     "pn": "26.5-25 28PR E3/L3",
+     "kind": "бюджетный аналог",
+     "note": "73 000 RUB"
+    },
+    {
+     "brand": "Deestone",
+     "pn": "D313 26.5-25 28PR",
+     "kind": "бюджетный аналог",
+     "note": "93 600 RUB"
+    }
+   ],
+   "price_usd": "93945 RUB",
+   "source": "https://sgshina.ru/kgsh/dlya-frontalnyh-pogruzchikov/nortec-er-122-26-5-25-203-b",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "26.5-25 EM-60 32PR",
+   "name_ru": "Шина Mitas EM-60 26.5-25 32PR 192B",
+   "name_en": "Mitas EM-60 26.5-25 32PR 192B",
+   "node": "13 Колёса и шины",
+   "applic": "Диагональная 26.5-25, 32 слоя, класс L3 — для тихих трасс, не для забоя",
+   "qty": "4",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Mitas",
+     "pn": "EM-30 26.5-25 32PR",
+     "kind": "вариант рисунка",
+     "note": "181 044 RUB"
+    }
+   ],
+   "price_usd": "160518 RUB",
+   "source": "https://sgshina.ru/kgsh/dlya-frontalnyh-pogruzchikov/shiny-26-5-25",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "26.5-25 40PR CONDOR L5S UGM",
+   "name_ru": "Шина Condor 26.5-25 40PR L5S UGM TL (underground mining)",
+   "name_en": "CONDOR 26.5-25 40PR L5S UGM TL",
+   "node": "13 Колёса и шины",
+   "applic": "Прямо помечена UGM (подземные рудники), L5S, 40 слоёв — самая «подземная» из бюджетных под 26.5-25",
+   "qty": "4",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "CONDOR",
+     "pn": "26.5-25 36PR L5S",
+     "kind": "вариант слойности",
+     "note": "3864.43 USD"
+    }
+   ],
+   "price_usd": "4035.99",
+   "source": "https://otrusa.com/products/26-5-25-40pr-condor-l5s-ugm-tl",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "26.5-25 MS708 solid",
+   "name_ru": "Цельнолитая бандажная шина Maxam MS708 26.5-25, гладкая, посадка 25-22",
+   "name_en": "Maxam MS708 Smooth (25-22 aperture) Solid Press On 26.5-25",
+   "node": "13 Колёса и шины",
+   "applic": "Замена пневматики на полностью непрокалываемую; требует соответствия посадочного 25-22 (как у штатного обода R1700G)",
+   "qty": "4",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "OTR",
+     "pn": "OTR0-OTR-143108 SolidBoss R-4",
+     "kind": "аналог",
+     "note": "10102.41 USD у OTRUSA"
+    }
+   ],
+   "price_usd": "10811",
+   "source": "https://boltzequipmentparts.com/products/26-5-25-maxam-ms708-smooth-25-22-aperture-solid-press-on-tire-v53030",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "Заполнение 26.5-25 ПУ",
+   "name_ru": "Заполнение шины 26.5-25 полиуретаном (услуга, РФ)",
+   "name_en": "Polyurethane tyre filling, 26.5-25",
+   "node": "13 Колёса и шины",
+   "applic": "Любая шина 26.5-25 на R1700G; исключает простой из-за прокола, повышает массу колеса — пересчитывать нагрузку на мост",
+   "qty": "4 шины",
+   "interval": "однократно на шину",
+   "alts": [
+    {
+     "brand": "ООО «МВБ», Луховицы МО",
+     "pn": "заполнение 23.5-25 — 538 560 RUB",
+     "kind": "другой исполнитель в РФ",
+     "note": "строки 26.5-25 в их прайсе нет; msk@ooo-mvb.ru"
+    },
+    {
+     "brand": "Arnco",
+     "pn": "Superflex / Perneu",
+     "kind": "марки наполнителя",
+     "note": "названы исполнителем как рабочие составы"
+    }
+   ],
+   "price_usd": "255000 RUB",
+   "source": "https://sgshina.ru/uslugi/zapolnenie-shin-poliuretanom",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "26.5-25 «Сота» 18/16 мм",
+   "name_ru": "Цепи противоскольжения/шинозащитные шипованные 26.5-25, рисунок «Сота», протектор 18 мм, борт 16 мм",
+   "name_en": "Studded tyre protection chains 26.5-25, honeycomb pattern",
+   "node": "13 Колёса и шины",
+   "applic": "26.5-25 / 26.5R25; российский изготовитель (ООО «Уральские цепи», Екатеринбург, +7 343 287-98-48), сталь 54-60 HRC",
+   "qty": "1 шт.",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Уральские цепи",
+     "pn": "под заказ по типоразмеру",
+     "kind": "изготовление в РФ",
+     "note": "поставляют цепи с 2010 г."
+    }
+   ],
+   "price_usd": "200000 RUB",
+   "source": "https://snowchains-ural.ru/tsepi-protivoskolzheniya/dlya-spetstekhniki/dlya-shin-26-5-25",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "26.5-25L5 TRYGG SMT 160",
+   "name_ru": "Цепи Trygg SMT 160 (16 мм) для шин 26.5-25 класса L5, пара",
+   "name_en": "TRYGG SMT 160 (16MM) 26.5-25L5 - 1 Pair",
+   "node": "13 Колёса и шины",
+   "applic": "Исполнение под шину L5 26.5-25 (профиль штатной R1700G)",
+   "qty": "2 пары на машину",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "TRYGG",
+     "pn": "TRY0-TCC-227876 (26.5-25 SMT 160)",
+     "kind": "версия под не-L5",
+     "note": "5583.20 USD"
+    },
+    {
+     "brand": "TRYGG",
+     "pn": "TRY0-TCC-222485 (SMT Combo 160)",
+     "kind": "комбинированный рисунок",
+     "note": "5729.41 USD"
+    }
+   ],
+   "price_usd": "6498.67",
+   "source": "https://otrusa.com/products/26-5-25l5-trygg-smt-160-16mm-1-pair",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "26.5-25L5 TRYGG Beaver",
+   "name_ru": "Цепи Trygg Beaver Loader-Grader для шин 26.5-25 L5, пара (тяжёлое исполнение)",
+   "name_en": "TRYGG Beaver Loader-Grader 26.5-25L5 - 1 Pair",
+   "node": "13 Колёса и шины",
+   "applic": "Тяжёлое защитное исполнение под L5 26.5-25",
+   "qty": "2 пары на машину",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "TRYGG",
+     "pn": "TRY0-TCC-227771 (26.5-25)",
+     "kind": "версия под не-L5",
+     "note": "10969.80 USD"
+    }
+   ],
+   "price_usd": "11432.06",
+   "source": "https://otrusa.com/products/26-5-25l5-trygg-beaver-loader-grader-1-pair",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "TPC 26.5-25 4x4 18mm",
+   "name_ru": "Шинозащитные цепи Tough Rock TPC 26.5-25 4x4, звено 18 мм (2 цепи в ящике)",
+   "name_en": "TPC 26.5-25 4x4 18mm Tough Rock (2 chains per crate)",
+   "node": "13 Колёса и шины",
+   "applic": "Шинозащита 26.5-25; 4x4 — квадратное звено, рудничное применение",
+   "qty": "2 ящика на машину",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Tough",
+     "pn": "TOUG-TPC-010061 (20 мм)",
+     "kind": "более тяжёлое звено",
+     "note": "8995.00 USD"
+    },
+    {
+     "brand": "Las Zirh",
+     "pn": "LSZH-TPC-003279 (X18 Universal HD Square)",
+     "kind": "аналог",
+     "note": "7497.00 USD за 2 шт."
+    }
+   ],
+   "price_usd": "11692.78",
+   "source": "https://otrusa.com/products/tpc-26-5-25-4x4-18mm-tough-rock-2-per-crate",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "26.5-25 Quality Chain Square 2-Link",
+   "name_ru": "Цепи Quality Chain Loader-Grader, квадратное легированное звено, шаг 2 звена, 26.5-25, пара",
+   "name_en": "Quality Chain Loader-Grader Square Link Alloy 2-Link Spacing 26.5-25 - 1 Pair",
+   "node": "13 Колёса и шины",
+   "applic": "26.5-25; плотный шаг — больше защиты, меньше самоочистки",
+   "qty": "2 пары на машину",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Quality Chain",
+     "pn": "QUCC-TCC-227759 (шаг 4 звена)",
+     "kind": "более редкий шаг",
+     "note": "2943.90 USD"
+    },
+    {
+     "brand": "Quality Chain",
+     "pn": "QUCC-TCC-227765 (Nordic Premium Studded)",
+     "kind": "шипованный",
+     "note": "6188.90 USD"
+    }
+   ],
+   "price_usd": "4940.54",
+   "source": "https://otrusa.com/products/26-5-25-quality-chain-loader-grader-square-link-alloy-2-link-spacing-1-pair",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "475-0563",
+   "name_ru": "Ободья бескамерные, комплект 4 шт. (Cat)",
+   "name_en": "Rims, Tubeless, set of (4)",
+   "node": "13 Колёса и шины",
+   "applic": "R1700 (нов. пок.) — названы в Rig-Out как единственные, с которыми работает система контроля давления 571-0004; для R1700G номер не подтверждён",
+   "qty": "4",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Caterpillar",
+     "pn": "571-0004",
+     "kind": "сопряжённый узел",
+     "note": "Control AR системы контроля давления шин, только с этими ободьями"
+    }
+   ],
+   "price_usd": "",
+   "source": "https://s7d2.scene7.com/is/content/Caterpillar/CM20250303-9c012-bbe34",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "Rims, 5-Piece, Tubeless",
+   "name_ru": "Ободья разборные 5-составные, бескамерные — штатное исполнение R1700G",
+   "name_en": "Rims, 5-Piece, Tubeless",
+   "node": "13 Колёса и шины",
+   "applic": "R1700G: в базу входит только «допуск на стандартный бескамерный обод», шина выбирается отдельно из обязательных опций. Опции обода: маркировка ободьев, запасной (камерный/бескамерный), камерное исполнение",
+   "qty": "4",
+   "interval": "",
+   "alts": [],
+   "price_usd": "",
+   "source": "https://s7d2.scene7.com/is/content/Caterpillar/CM20130824-57791-59913",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "WA25X22-5",
+   "name_ru": "Колесо разборное 5-составное, посадочный 25x22, тяжёлое исполнение под R1700G (неоригинал)",
+   "name_en": "WA25X22-5 Wheel Assembly, Five Piece, Heavy-Duty, Caterpillar R1700G",
+   "node": "13 Колёса и шины",
+   "applic": "R1700G — заявлено продавцом. Состав: база обода, посадочное кольцо борта, 2 бортовых фланца, замочное кольцо; O-ring и шина отдельно",
+   "qty": "4",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Boltz Equipment Parts",
+     "pn": "WA25X22-5-20BH-966",
+     "kind": "то же колесо под Cat 966",
+     "note": "3058 USD — ориентир цены на 5-составное 25x22"
+    }
+   ],
+   "price_usd": "цена по запросу",
+   "source": "https://boltzequipmentparts.com/products/wa25x22-5-wheel-assembly-five-piece-for-heavy-equipment",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "25-22.00/3.0",
+   "name_ru": "Обод стальной OTR 25-22.00/3.0 под шину 26.5R25 для CAT R1700G (3- и 5-составный)",
+   "name_en": "OTR steel wheel rim 25-22.00/3.0 for CAT R1700G, 26.5R25",
+   "node": "13 Колёса и шины",
+   "applic": "R1700G — заявлено изготовителем; сталь S355R/Q355/45#/50Mn, ISO9001",
+   "qty": "4",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Anyang Rarlong Machinery Co., Ltd. (Аньян, Хэнань, КНР)",
+     "pn": "25-22.00/3.0",
+     "kind": "изготовитель обода",
+     "note": "MOQ 1 шт., срок 5-15 дн. со склада"
+    }
+   ],
+   "price_usd": "713.60",
+   "source": "https://rarlong.en.made-in-china.com/product/kduAmVICLMWw/China-Cat-Load-Haul-Dump-Loader-R1700g-Tyre-Size-26-5r25-25-Inch-Steel-Wheel-Rim-25-22-00-3-0-OTR-Steel-Wheel-Rim.html",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "163-1302",
+   "name_ru": "Обод в сборе, 5-составный (аранжировка) — родня R1300G Series II",
+   "name_en": "RIM AR - 5-PIECE",
+   "node": "13 Колёса и шины",
+   "applic": "R1300G Series II (RSL1-UP). Состав: 163-1299 MOUNTING GP-RIM x4 + 158-3041 RIM GP-DEMOUNTABLE x4. На R1700G размер другой (25x22 против 17.5x25), но схема узла та же",
+   "qty": "1",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Caterpillar",
+     "pn": "163-1301",
+     "kind": "3-составная аранжировка",
+     "note": "с 158-3042 RIM GP-DEMOUNTABLE"
+    },
+    {
+     "brand": "Caterpillar",
+     "pn": "241-3927",
+     "kind": "состав 5-составного обода",
+     "note": "241-3938 RIM (17.5-25), 241-3928 FLANGE x2, 217-0285 BAND-BEAD SEAT, 216-3082 RING-LOCK, 2D-2443 SEAL-O-RING"
+    }
+   ],
+   "price_usd": "",
+   "source": "https://mcdowellequipment.com/wp-content/uploads/Parts-Manual.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "6B-6682",
+   "name_ru": "Гайка полная 3/4-16 UNF крепления обода (16 шт. на колесо)",
+   "name_en": "NUT-FULL (3/4-16-THD)",
+   "node": "13 Колёса и шины",
+   "applic": "R1300G Series II, группа 163-1299 MOUNTING GP-RIM. Резьба 3/4-16 — стандартный крепёж обода Cat; на R1700G проверять по своему каталогу",
+   "qty": "16 на колесо",
+   "interval": "контроль момента при каждом ТО",
+   "alts": [
+    {
+     "brand": "Caterpillar",
+     "pn": "6V-2360",
+     "kind": "парная шайба",
+     "note": "WASHER-HARD 20x32x3 мм, 16 шт. в той же группе"
+    }
+   ],
+   "price_usd": "",
+   "source": "https://mcdowellequipment.com/wp-content/uploads/Parts-Manual.pdf",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "308-9259",
+   "name_ru": "Шпилька колеса (16 шт. в ступице колёсного редуктора)",
+   "name_en": "STUD-WHEEL",
+   "node": "13 Колёса и шины",
+   "applic": "R1300G Series II, группа 216-0223 WHEEL & FINAL DRIVE GP. Для R1700G номер шпильки отдельный — не переносить напрямую",
+   "qty": "16 на колесо",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Caterpillar",
+     "pn": "8R-4087",
+     "kind": "сопряжённая деталь",
+     "note": "WHEEL (ступица) в той же группе"
+    }
+   ],
+   "price_usd": "",
+   "source": "https://mcdowellequipment.com/wp-content/uploads/Parts-Manual.pdf",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "186-9269",
+   "name_ru": "Вентиль шинный для разборного обода",
+   "name_en": "VALVE-TIRE",
+   "node": "13 Колёса и шины",
+   "applic": "R1300G Series II, входит и в 3-составный (158-3042), и в 5-составный (158-3041) обод — расходник, общий для семейства ПДМ Cat",
+   "qty": "1 на колесо",
+   "interval": "при каждой переборке колеса",
+   "alts": [
+    {
+     "brand": "Caterpillar",
+     "pn": "180-6426",
+     "kind": "камера",
+     "note": "TUBE GP-TIRE для камерного исполнения"
+    }
+   ],
+   "price_usd": "",
+   "source": "https://mcdowellequipment.com/wp-content/uploads/Parts-Manual.pdf",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "26.5R25 SP1000",
+   "name_ru": "Камера шинная 26.5R25 (для камерного исполнения обода)",
+   "name_en": "Inner Tube 26.5R25 SP1000",
+   "node": "13 Колёса и шины",
+   "applic": "26.5R25 — только если обод камерного исполнения (опция R1700G «Tube Type»)",
+   "qty": "1 на колесо",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Mixed-Brand",
+     "pn": "MXBD-TAC-163300 (TRJ1175C)",
+     "kind": "вариант вентиля",
+     "note": "185.78 USD"
+    },
+    {
+     "brand": "Mixed-Brand",
+     "pn": "MXBD-TAC-162649",
+     "kind": "флиппер/ободная лента 26.5-25",
+     "note": "172.69 USD"
+    }
+   ],
+   "price_usd": "151.44",
+   "source": "https://otrusa.com/products/26-5r25-inner-tube-mixed-brand-sp1000",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "571-0004",
+   "name_ru": "Блок контроля давления в шинах (TPMS), беспроводные датчики в колёсах",
+   "name_en": "Control AR - Tire Pressure Monitor",
+   "node": "13 Колёса и шины",
+   "applic": "R1700 (нов. пок.). Работает только с ободьями 475-0563 (бескамерные, компл. 4). Совместим с Cat ET и Product Link",
+   "qty": "1",
+   "interval": "",
+   "alts": [],
+   "price_usd": "",
+   "source": "https://s7d2.scene7.com/is/content/Caterpillar/CM20250303-9c012-bbe34",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "617-4671",
+   "name_ru": "Противооткатные упоры колёс с кронштейном хранения",
+   "name_en": "CHOCK GP - WHEEL",
+   "node": "13 Колёса и шины",
+   "applic": "R1700 (нов. пок.), машины 438 и выше. Ссылка на SEBU9952, раздел Use of Wheel Chocks",
+   "qty": "1 компл.",
+   "interval": "",
+   "alts": [],
+   "price_usd": "",
+   "source": "https://s7d2.scene7.com/is/content/Caterpillar/CM20250303-9c012-bbe34",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "344-9995",
+   "name_ru": "Шарнир сочленения полурам (группа)",
+   "name_en": "HITCH GP-ARTICULATING",
+   "node": "12 Рама/шарнир/стрела/ковш",
+   "applic": "R1700 (нов. пок.), машины 1-348; с 349 и выше — 621-7787. Угол складывания 44 град. Верхний и нижний пальцы на роликовых подшипниках",
+   "qty": "1",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Caterpillar",
+     "pn": "621-7787",
+     "kind": "исполнение с маш. 349",
+     "note": "тот же узел, поздняя редакция; SI M0067832"
+    },
+    {
+     "brand": "Caterpillar",
+     "pn": "484-2061",
+     "kind": "смежный узел",
+     "note": "PIN GP-SEAL, пальцы управления ковшом"
+    }
+   ],
+   "price_usd": "",
+   "source": "https://s7d2.scene7.com/is/content/Caterpillar/CM20250303-9c012-bbe34",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "270-1815",
+   "name_ru": "Шарнир сочленения полурам в сборе — родня R1300G Series II",
+   "name_en": "HITCH GP-ARTICULATING",
+   "node": "12 Рама/шарнир/стрела/ковш",
+   "applic": "R1300G Series II (RSL1501-UP), часть 257-5976 CHASSIS AR. Схема узла та же, что на R1700G: верхний палец + нижний палец на конических подшипниках с регулировкой пакетами прокладок",
+   "qty": "1",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Caterpillar",
+     "pn": "1V-8850 / 5K-3499",
+     "kind": "пальцы шарнира",
+     "note": "PIN (верхний) и PIN-LOWER"
+    },
+    {
+     "brand": "Caterpillar",
+     "pn": "241-9851",
+     "kind": "смежный узел",
+     "note": "GUARD GP-DRIVE SHAFT (HITCH) — ограждение кардана в шарнире"
+    }
+   ],
+   "price_usd": "",
+   "source": "https://mcdowellequipment.com/wp-content/uploads/Parts-Manual.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "1J-2860",
+   "name_ru": "Чашка конического подшипника шарнира (верхний узел), 2 шт.",
+   "name_en": "CUP-BEARING",
+   "node": "12 Рама/шарнир/стрела/ковш",
+   "applic": "R1300G Series II, группа 270-1815 HITCH GP-ARTICULATING. Пара к конусу 1J-4757",
+   "qty": "2",
+   "interval": "при переборке шарнира",
+   "alts": [
+    {
+     "brand": "Caterpillar",
+     "pn": "1J-4757",
+     "kind": "конус того же подшипника",
+     "note": "CONE-BEARING, 2 шт."
+    },
+    {
+     "brand": "Caterpillar",
+     "pn": "3K-6454",
+     "kind": "манжета узла",
+     "note": "SEAL-LIP TYPE, 2 шт."
+    }
+   ],
+   "price_usd": "",
+   "source": "https://mcdowellequipment.com/wp-content/uploads/Parts-Manual.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "7D-8637",
+   "name_ru": "Чашка конического подшипника шарнира (нижний узел), 2 шт.",
+   "name_en": "CUP-BEARING",
+   "node": "12 Рама/шарнир/стрела/ковш",
+   "applic": "R1300G Series II, группа 270-1815. Пара к конусу 7D-8636",
+   "qty": "2",
+   "interval": "при переборке шарнира",
+   "alts": [
+    {
+     "brand": "Caterpillar",
+     "pn": "7D-8636",
+     "kind": "конус того же подшипника",
+     "note": "CONE-BEARING, 2 шт."
+    },
+    {
+     "brand": "Caterpillar",
+     "pn": "6H-3999",
+     "kind": "манжета узла",
+     "note": "SEAL-LIP TYPE, 2 шт."
+    }
+   ],
+   "price_usd": "",
+   "source": "https://mcdowellequipment.com/wp-content/uploads/Parts-Manual.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "1V-8848",
+   "name_ru": "Пакет регулировочных прокладок шарнира (20 прокладок)",
+   "name_en": "SHIM PACK (INCLUDES 20-SHIMS)",
+   "node": "12 Рама/шарнир/стрела/ковш",
+   "applic": "R1300G Series II, группа 270-1815. Наличие трёх пакетов прокладок в узле — прямое указание, что шарнир регулируют и перебирают, а не меняют целиком",
+   "qty": "1",
+   "interval": "при переборке шарнира",
+   "alts": [
+    {
+     "brand": "Caterpillar",
+     "pn": "5K-3492",
+     "kind": "пакет 19 прокладок",
+     "note": "тот же узел"
+    },
+    {
+     "brand": "Caterpillar",
+     "pn": "5K-3489",
+     "kind": "пакет 18 прокладок",
+     "note": "тот же узел"
+    },
+    {
+     "brand": "Caterpillar",
+     "pn": "4V-1901",
+     "kind": "втулка узла",
+     "note": "BUSHING — расточка и замена втулки вместо замены полурамы"
+    }
+   ],
+   "price_usd": "",
+   "source": "https://mcdowellequipment.com/wp-content/uploads/Parts-Manual.pdf",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "5K-3501",
+   "name_ru": "Крышка верхнего подшипникового узла шарнира",
+   "name_en": "CAP-UPPER",
+   "node": "12 Рама/шарнир/стрела/ковш",
+   "applic": "R1300G Series II, группа 270-1815",
+   "qty": "1",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Caterpillar",
+     "pn": "5K-3502",
+     "kind": "нижняя крышка",
+     "note": "CAP-LOWER"
+    },
+    {
+     "brand": "Caterpillar",
+     "pn": "8R-9798",
+     "kind": "стопор",
+     "note": "PLATE-LOCK"
+    },
+    {
+     "brand": "Caterpillar",
+     "pn": "5K-3490 / 5K-3491",
+     "kind": "распорки",
+     "note": "SPACER"
+    }
+   ],
+   "price_usd": "",
+   "source": "https://mcdowellequipment.com/wp-content/uploads/Parts-Manual.pdf",
+   "confidence": "med",
+   "verdict": ""
+  },
+  {
+   "pn": "491-6030",
+   "name_ru": "Штанга фиксации складывания полурам (блокировка шарнира при обслуживании)",
+   "name_en": "LINK GP - Steering Frame Lock",
+   "node": "12 Рама/шарнир/стрела/ковш",
+   "applic": "R1700 (нов. пок.). Бортовая штанга, позволяет безопасно работать у шарнира. SI M0084637",
+   "qty": "1",
+   "interval": "перед каждой работой у шарнира",
+   "alts": [
+    {
+     "brand": "Caterpillar",
+     "pn": "507-5478",
+     "kind": "смежная защита",
+     "note": "COVER GP, страховочные пальцы стрелы, стандартный ковш"
+    },
+    {
+     "brand": "Caterpillar",
+     "pn": "507-5479",
+     "kind": "смежная защита",
+     "note": "COVER GP, эжекторный ковш"
+    }
+   ],
+   "price_usd": "",
+   "source": "https://s7d2.scene7.com/is/content/Caterpillar/CM20250303-9c012-bbe34",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "467-1797",
+   "name_ru": "Система растормаживания с задней защитной плитой и буксировочным крюком",
+   "name_en": "BRAKE AR-RELEASE (with fixed rear mounted protective plate and hook arrangement)",
+   "node": "12 Рама/шарнир/стрела/ковш",
+   "applic": "R1700 (нов. пок.). Болтовое исполнение; растормаживает стояночный тормоз, чтобы вытащить машину из забоя. SEBU9952",
+   "qty": "1",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Caterpillar",
+     "pn": "467-1818",
+     "kind": "версия для США",
+     "note": "BRAKE AR-RELEASE (US)"
+    }
+   ],
+   "price_usd": "",
+   "source": "https://s7d2.scene7.com/is/content/Caterpillar/CM20250303-9c012-bbe34",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "467-1823",
+   "name_ru": "Группа поручней верхней площадки (машины 1-454)",
+   "name_en": "HANDRAIL GROUP",
+   "node": "12 Рама/шарнир/стрела/ковш",
+   "applic": "R1700 (нов. пок.). С машины 455 — 630-3809. Защита персонала при доступе на верхнюю площадку. SEBU9952",
+   "qty": "1",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Caterpillar",
+     "pn": "630-3809",
+     "kind": "с маш. 455",
+     "note": ""
+    },
+    {
+     "brand": "Caterpillar",
+     "pn": "467-1819 / 630-1956",
+     "kind": "вторая группа поручней",
+     "note": "1-453 / 454-UP"
+    },
+    {
+     "brand": "Caterpillar",
+     "pn": "522-8184",
+     "kind": "группа поручней",
+     "note": ""
+    },
+    {
+     "brand": "Caterpillar",
+     "pn": "551-0868",
+     "kind": "поручень в сборе",
+     "note": "HANDRAIL ASSEMBLY"
+    }
+   ],
+   "price_usd": "",
+   "source": "https://s7d2.scene7.com/is/content/Caterpillar/CM20250303-9c012-bbe34",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "484-1590",
+   "name_ru": "Крыло заднее (брызговик)",
+   "name_en": "FENDER GP-REAR",
+   "node": "12 Рама/шарнир/стрела/ковш",
+   "applic": "R1700 (нов. пок.). Не даёт грязи с шин попадать на кабину, площадку и ступени",
+   "qty": "1",
+   "interval": "",
+   "alts": [
+    {
+     "brand": "Caterpillar",
+     "pn": "484-1580",
+     "kind": "переднее крыло, маш. 1-167",
+     "note": "FENDER GP-FRONT"
+    },
+    {
+     "brand": "Caterpillar",
+     "pn": "572-7516",
+     "kind": "переднее крыло, маш. 168 и выше",
+     "note": "FENDER GP-FRONT"
+    }
+   ],
+   "price_usd": "",
+   "source": "https://s7d2.scene7.com/is/content/Caterpillar/CM20250303-9c012-bbe34",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "472-0655",
+   "name_ru": "Бруски износа на борт кабины",
+   "name_en": "BAR GP-WEAR",
+   "node": "12 Рама/шарнир/стрела/ковш",
+   "applic": "R1700 (нов. пок.). У R1700G аналогичное решение в базе: Protection Wear Bars 100x50 мм и Rear Frame Protection Wear Bars — их наваривают/меняют вместо ремонта борта",
+   "qty": "1 компл.",
+   "interval": "по износу",
+   "alts": [
+    {
+     "brand": "Caterpillar",
+     "pn": "472-0660",
+     "kind": "защита остекления",
+     "note": "GUARD GP-WINDOW, стальная на заднее боковое окно"
+    },
+    {
+     "brand": "Caterpillar",
+     "pn": "472-0658",
+     "kind": "защита фар",
+     "note": "GUARD GP-LIGHT, поликарбонат на стрелу и NEEF"
+    }
+   ],
+   "price_usd": "",
+   "source": "https://s7d2.scene7.com/is/content/Caterpillar/CM20250303-9c012-bbe34",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "Protection Wear Bars 100x50",
+   "name_ru": "Бруски защиты рамы 100x50 мм и защита задней полурамы (штатно на R1700G)",
+   "name_en": "Protection Wear Bars 100 x 50 mm / Rear Frame Protection Wear Bars",
+   "node": "12 Рама/шарнир/стрела/ковш",
+   "applic": "R1700G — в стандартной комплектации; расходный наварной элемент: восстанавливают сваркой, полурамы при этом не меняют. Парт-номера в спецификации нет",
+   "qty": "компл.",
+   "interval": "по износу",
+   "alts": [
+    {
+     "brand": "Caterpillar",
+     "pn": "Wear Protection Bars: Cab/ROPS, Hydraulic Tank, Radiator, Wear Plate Rear Underneath",
+     "kind": "опции защиты по спецификации",
+     "note": "раздел Optional Attachments R1700G"
+    }
+   ],
+   "price_usd": "",
+   "source": "https://s7d2.scene7.com/is/content/Caterpillar/CM20130824-57791-59913",
+   "confidence": "high",
+   "verdict": ""
+  },
+  {
+   "pn": "212-7779",
+   "name_ru": "Ремкомплект амортизатора подвески сиденья",
+   "name_en": "SHOCK ABSORBER KIT",
+   "node": "11 Кабина/органы управления/безопасность",
+   "applic": "R1700 (нов. пок.). Кабина/ROPS на R1700G посажена на упругие опоры к раме; отдельных парт-номеров этих опор в открытых источниках нет, а по сиденью ремонт задокументирован",
+   "qty": "1",
+   "interval": "по состоянию",
+   "alts": [
+    {
+     "brand": "Caterpillar",
+     "pn": "370-8065",
+     "kind": "ремкомплект амортизатора, маш. 1-195",
+     "note": "SHOCK KIT"
+    },
+    {
+     "brand": "Caterpillar",
+     "pn": "194-4282",
+     "kind": "амортизатор, маш. 196 и выше",
+     "note": "SHOCK ABS KIT"
+    },
+    {
+     "brand": "Caterpillar",
+     "pn": "370-8156",
+     "kind": "подшипники шарниров подвески сиденья",
+     "note": "BEARING KIT, маш. 1-195"
+    }
+   ],
+   "price_usd": "",
+   "source": "https://s7d2.scene7.com/is/content/Caterpillar/CM20250303-9c012-bbe34",
+   "confidence": "med",
+   "verdict": ""
+  }
+ ],
+ "notes": "ТИПОРАЗМЕР. R1700G штатно ходит на диагональной 26.5-25 (26.5 x 25) 36 слоёв, рисунок STMS, класс L5S — это записано и в спецалоге дилера, и в технической спецификации Cat; габаритная ширина по шинам 2650 мм. Заводские аранжировки шин R1700G ровно три: 26.5 x R25 VSMS2 L5 Bridgestone, 26.5 x 25 VSDL Bridgestone, 26.5 x 25 32 Ply Goodyear. У R1700 нового поколения типоразмер уже радиальный 26.5R25 (ширина 2767 мм) и аранжировки только Bridgestone VSMS2 и VSDL. Обод штатно — разборный 5-составный бескамерный, посадочный 25-22; в базовую цену машины входит только допуск на обод, шина выбирается отдельно из обязательных опций. ЦЕНЫ. Валюта указана явно: без пометки — USD (американские продавцы, розница со склада), с пометкой RUB — рублёвые цены российских продавцов без НДС, как они стоят на странице. Разброс по 26.5R25 L5/L5S огромный: Bridgestone VSMS2 11 298 USD, Michelin XMine D2 10 736 USD, BKT SR 55 L5S 7 361 USD, Maxam MS502 L5S 5 756-6 221 USD, Condor 40PR L5S UGM 4 036 USD. В рублях BKT SM 55 L5S 26.5-25 стоит 765-826 тыс. руб., Белшина БЕЛ-10М (подземный раздел) 324-345 тыс. руб., Techking ET5A 154 тыс. руб., Nortec ER-122 94 тыс. руб. — но последние две не L5S, и сравнивать их с VSMS2 по цене нельзя. Ни одна цена не домножена и не пересчитана между валютами. ЦЕПИ. Считать надо парами и на машину: Trygg/Quality Chain продаются парой (одна ось), Tough Rock и Las Zirh — ящиком на две цепи. На четырёхколёсную машину нужно две пары. Российский изготовитель нашёлся один с ценой — «Уральские цепи» (Екатеринбург), 26.5-25 шипованные «Сота» 18/16 мм, 200 000 руб. за штуку. ЗАПОЛНЕНИЕ ПОЛИУРЕТАНОМ. Услуга в РФ есть и на нужный типоразмер: 26.5-25 — 255 000 руб. за шину (sgshina.ru, составы Arnco Superflex/Perneu). Второй исполнитель (ООО «МВБ», Луховицы) прайс до 23.5-25 = 538 560 руб., строки 26.5-25 у него нет. Заполненное колесо тяжелее — нагрузку на мост и тормозной путь надо пересчитывать. РАМА И ШАРНИР. Официальный источник парт-номеров по несущим конструкциям — каталог Cat Rig Out по R1700 (CM20250303): шарнир 344-9995 / 621-7787, штанга фиксации складывания 491-6030, растормаживание с буксировочным крюком 467-1797, поручни, крылья, бруски износа, противооткатные упоры. По самому шарниру полный состав (пальцы, чашки и конусы подшипников, манжеты, пакеты прокладок, втулка) удалось развернуть только по родне R1300G Series II из открытого каталога SEBP3608 — схема узла та же, номера другие. РЕМОНТОПРИГОДНОСТЬ. Три пакета регулировочных прокладок (1V-8848 на 20, 5K-3492 на 19, 5K-3489 на 18 прокладок) и отдельная втулка 4V-1901 в составе шарнира означают, что шарнир штатно регулируют и перебирают: меняют подшипники, манжеты и втулку, выставляют натяг прокладками — полурамы при этом не трогают. Бруски защиты рамы 100x50 мм и защита задней полурамы на R1700G стоят в базе именно как расходные наварные элементы: их восстанавливают сваркой. Поручни, крылья, защита окна и фар — болтовые, меняются узлом.",
+ "gaps": "1. Нет ни одного парт-номера Cat на обод и шину именно R1700G. Каталоги SEBP3045 (8XZ), SEBP3612 (SBR) и SEBP6869 (XBR) лежат на avspare.com / spare.avspart.com / 777parts.net, и все три зеркала отдают 403 (Cloudflare) и на WebFetch, и на curl с любым UA, и через текстовый прокси. В выдаче каталога видны названия групп «2574657 RIM GP-DEMOUNTABLE (5-PIECE)» и «2574659 RIM AR (5-PIECE)» для R1700G, но сами страницы открыть не удалось — в таблицу эти номера не поставлены. 257-8035 (TIRE-26.5X25 STMS-SLICK 36 PLY) взят по URL и заголовку карточки каталога, привязка к R1700G выведена по совпадению обозначения со спецификацией. 2. Обод 475-0563 — это R1700 нового поколения, не R1700G. Для R1700G подтверждено только словесное описание «Rims, 5-Piece, Tubeless» без номера. 3. Крепёж обода (гайка 6B-6682 3/4-16, шайба 6V-2360, шпилька 308-9259) — номера R1300G Series II. Момент затяжки не найден: он в SEBU8211 (руководство по эксплуатации R1700G), которое в открытом доступе не лежит. 4. ROPS/FOPS: подтверждено только соответствие ISO 3471 / ISO 3449 и наличие опции «Wear Protection Bars — Cab/ROPS». Парт-номера самой конструкции ROPS/FOPS и её упругих опор к раме не найдены ни в одном открытом источнике. То же по полурамам как таким: номеров передней и задней полурамы нет. 5. Цепи Erlau, Pewag и RUD: подземные линейки у всех трёх есть (у Erlau раздел MINING, у Pewag — Underground Mining & Tunneling), но каталоги рендерятся скриптами, и ни модели под 26.5-25, ни цены вытащить не удалось. Из реально найденных цен на шинозащиту под 26.5-25 — Trygg, Quality Chain, Tough Rock, Las Zirh и «Уральские цепи». 6. Bridgestone VSDL 26.5R25 и Goodyear 26.5-25 32 Ply — применимость к R1700G заводская, подтверждена спецификацией Cat, но цены не добыты: у продавца со страницей VSDL цена не публикуется, дилерский прайс Bridgestone/Goodyear закрыт. 7. Дисков 25\" (25-22.00) в российской розничной выдаче не нашлось: у поставщика с разделом «Диски» максимум W15Lx28. Оригинальный обод в РФ, судя по этому, только под заказ. 8. Бюджет WebSearch в сессии выбран полностью (200/200) на середине работы; вторая половина сбора шла прямыми загрузками страниц, а все поисковые системы (DuckDuckGo, Bing, Mojeek, Brave, Startpage, Yandex) отдают капчу на curl. Из-за этого не проверены направления: Aeolus, Advance, Double Coin, Armour, Kama (отдельно от Nortec), прайсы дилеров Cat на обода, и российские изготовители шинозащитных цепей кроме «Уральских цепей»."
+}

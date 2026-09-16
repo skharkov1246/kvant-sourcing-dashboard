@@ -41,8 +41,12 @@ th,td{border:1px solid #bbb;padding:3px 5px;text-align:left;vertical-align:top;f
 word-wrap:break-word;overflow-wrap:anywhere}
 th{background:#eef2f7}
 b{color:#0b3d91}
-.pn{font-family:'DejaVu Sans Mono',monospace;white-space:nowrap}
-.num{text-align:right;white-space:nowrap}
+/* Запрет переноса распирал таблицу: в колонки «номер» и «цифра» попадают не только
+   короткие значения, но и целые фразы паспорта («н/д (по спецкаталогу более поздних
+   машин 242/263)»). Переносим по пробелам: сам парт-номер пробелов не содержит и
+   остаётся целым, а фраза переносится и таблица не выходит за печатное поле. */
+.pn{font-family:'DejaVu Sans Mono',monospace;white-space:normal;overflow-wrap:normal}
+.num{text-align:right;white-space:normal;overflow-wrap:anywhere}
 .box{border:1px solid #ccc;border-left:4px solid #1a7f37;border-radius:4px;padding:6px 10px;margin:6px 0;
 page-break-inside:avoid;font-size:9.5px}
 .warn{border-left-color:#c62828;background:#fff8f8}
