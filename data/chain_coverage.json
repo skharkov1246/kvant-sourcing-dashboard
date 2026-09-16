@@ -593,7 +593,7 @@
           "link": "maker",
           "title": "Изготовитель",
           "what": "кто делает деталь, помимо владельца конструкции",
-          "n": 1339,
+          "n": 1344,
           "sources": [
             "zip/data/odm_suppliers.json",
             "zip/data/telsmith_suppliers.json",
@@ -606,7 +606,7 @@
           "link": "contractor",
           "title": "Исполнитель",
           "what": "кому отдать работы по ремонту",
-          "n": 48,
+          "n": 49,
           "sources": [
             "zip/data/r1700.json"
           ],

@@ -4,18 +4,18 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 207,
-    "total_bytes": 96260315,
+    "datasets": 208,
+    "total_bytes": 97092564,
     "by_sensitivity": {
       "конфиденциально": 61,
-      "внутреннее": 111,
-      "публикуемо": 35
+      "внутреннее": 113,
+      "публикуемо": 34
     },
     "by_subproject": {
       "ГПУ-библиотека": 27,
       "ГТУ-библиотека": 36,
       "ОВЭ-75": 45,
-      "база ЗИП": 46,
+      "база ЗИП": 47,
       "база ЗИП · таможня": 18,
       "библиотека рынков": 1,
       "гидрометаллургия": 22,
@@ -740,7 +740,7 @@
     {
       "path": "zip/data/r1700.json",
       "subproject": "база ЗИП",
-      "bytes": 1908751,
+      "bytes": 2305456,
       "note": "Досье машины Caterpillar R1700G (ПДМ подземных работ): паспорт и модификации, узлы, документация Caterpillar по номерам форм, перечень запчастей с нашими номерами KV, кроссы вторичного рынка, официальные дилеры, заводы неоригинала, поставщики РФ/СНГ, маршруты ввоза по таможне, ценовые ориентиры, площадки торгов и эксплуатанты. Каждая строка с источником и уровнем доверия; вердикт — итог независимой перепроверки. Строит zip/tools/r1700_dossier.py из zip/data/r1700_recon/, positions.json, pnw/, таможни и справочника ODM. Руками не править.",
       "format": "json",
       "shape": "объект",
@@ -767,7 +767,7 @@
       ],
       "main_collection": {
         "key": "alts",
-        "records": 649,
+        "records": 720,
         "record_keys": [
           "alt_pn",
           "alt_pn_norm",
@@ -2625,6 +2625,52 @@
       ]
     },
     {
+      "path": "zip/data/r1700_recon/traders.json",
+      "subproject": "база ЗИП",
+      "bytes": 184970,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "gaps",
+        "notes",
+        "rows",
+        "slice"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 93,
+        "record_keys": [
+          "brands",
+          "city",
+          "confidence",
+          "country",
+          "email",
+          "kind",
+          "note",
+          "org",
+          "phone",
+          "role",
+          "site",
+          "source",
+          "stock",
+          "verdict"
+        ]
+      },
+      "last_change": "2026-09-13",
+      "last_author": "skharkov1246",
+      "last_commit": "3b64303",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "адреса электронной почты",
+          "телефоны"
+        ]
+      },
+      "referenced_by": []
+    },
+    {
       "path": "ove/data/bi_lot2.json",
       "subproject": "ОВЭ-75",
       "bytes": 178391,
@@ -3030,6 +3076,49 @@
       ]
     },
     {
+      "path": "zip/data/r1700_recon/elec.json",
+      "subproject": "база ЗИП",
+      "bytes": 149584,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "gaps",
+        "notes",
+        "review",
+        "rows",
+        "slice"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 122,
+        "record_keys": [
+          "alts",
+          "applic",
+          "confidence",
+          "interval",
+          "name_en",
+          "name_ru",
+          "node",
+          "note",
+          "pn",
+          "price_usd",
+          "qty",
+          "source",
+          "verdict"
+        ]
+      },
+      "last_change": null,
+      "last_author": null,
+      "last_commit": null,
+      "updated_by": "неизвестно",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
+    },
+    {
       "path": "zip/customs/out/customs_841181_2023-01-01_2026-03-31.json",
       "subproject": "база ЗИП · таможня",
       "bytes": 147860,
@@ -3294,6 +3383,52 @@
       ]
     },
     {
+      "path": "zip/data/r1700_recon/docs.json",
+      "subproject": "база ЗИП",
+      "bytes": 132374,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "gaps",
+        "notes",
+        "rows",
+        "slice"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 102,
+        "record_keys": [
+          "confidence",
+          "covers",
+          "form",
+          "kind",
+          "lang",
+          "media",
+          "note",
+          "price",
+          "source",
+          "title_ru",
+          "url",
+          "verdict",
+          "where"
+        ]
+      },
+      "last_change": "2026-09-13",
+      "last_author": "skharkov1246",
+      "last_commit": "3b64303",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "ove/build.py",
+        "ove/tools/build_paket.py",
+        "ove/tools/build_release.py"
+      ]
+    },
+    {
       "path": "gpu/data/demand.json",
       "subproject": "ГПУ-библиотека",
       "bytes": 127476,
@@ -3403,6 +3538,44 @@
       ]
     },
     {
+      "path": "zip/data/r1700_recon/tenders.json",
+      "subproject": "база ЗИП",
+      "bytes": 123506,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "checklist",
+        "gaps",
+        "notes",
+        "owners",
+        "platforms",
+        "rows",
+        "slice"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 47,
+        "record_keys": [
+          "confidence",
+          "note",
+          "source",
+          "topic",
+          "value",
+          "verdict"
+        ]
+      },
+      "last_change": "2026-09-13",
+      "last_author": "skharkov1246",
+      "last_commit": "3b64303",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
+    },
+    {
       "path": "zip/data/perf_sourcing_map.json",
       "subproject": "база ЗИП",
       "bytes": 121244,
@@ -3451,35 +3624,31 @@
       ]
     },
     {
-      "path": "zip/data/r1700_recon/traders.json",
+      "path": "zip/data/r1700_recon/spec.json",
       "subproject": "база ЗИП",
-      "bytes": 115185,
+      "bytes": 116414,
       "note": "",
       "format": "json",
       "shape": "объект",
       "top_keys": [
         "gaps",
+        "nodes",
         "notes",
         "rows",
-        "slice"
+        "slice",
+        "variants"
       ],
       "main_collection": {
         "key": "rows",
-        "records": 91,
+        "records": 86,
         "record_keys": [
-          "brands",
-          "city",
           "confidence",
-          "country",
-          "email",
-          "kind",
           "note",
-          "org",
-          "phone",
-          "role",
-          "site",
+          "param",
           "source",
-          "stock",
+          "unit",
+          "value",
+          "variant",
           "verdict"
         ]
       },
@@ -3488,11 +3657,8 @@
       "last_commit": "3b64303",
       "updated_by": "человек/агент",
       "sensitivity": {
-        "level": "конфиденциально",
-        "markers": [
-          "адреса электронной почты",
-          "телефоны"
-        ]
+        "level": "внутреннее",
+        "markers": []
       },
       "referenced_by": []
     },
@@ -3691,6 +3857,52 @@
         "zip/build.py",
         "zip/tools/aggregate_customs.py"
       ]
+    },
+    {
+      "path": "zip/data/r1700_recon/dealers.json",
+      "subproject": "база ЗИП",
+      "bytes": 104457,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "gaps",
+        "notes",
+        "rows",
+        "slice"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 44,
+        "record_keys": [
+          "brands",
+          "city",
+          "confidence",
+          "country",
+          "email",
+          "kind",
+          "note",
+          "org",
+          "phone",
+          "role",
+          "site",
+          "source",
+          "stock",
+          "verdict"
+        ]
+      },
+      "last_change": "2026-09-13",
+      "last_author": "skharkov1246",
+      "last_commit": "3b64303",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "адреса электронной почты",
+          "телефоны"
+        ]
+      },
+      "referenced_by": []
     },
     {
       "path": "zip/data/r1700_bitrix.json",
@@ -4053,51 +4265,6 @@
       ]
     },
     {
-      "path": "zip/data/r1700_recon/docs.json",
-      "subproject": "база ЗИП",
-      "bytes": 82773,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "gaps",
-        "notes",
-        "rows",
-        "slice"
-      ],
-      "main_collection": {
-        "key": "rows",
-        "records": 100,
-        "record_keys": [
-          "confidence",
-          "covers",
-          "form",
-          "kind",
-          "lang",
-          "media",
-          "price",
-          "source",
-          "title_ru",
-          "url",
-          "verdict",
-          "where"
-        ]
-      },
-      "last_change": "2026-09-13",
-      "last_author": "skharkov1246",
-      "last_commit": "3b64303",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "ove/build.py",
-        "ove/tools/build_paket.py",
-        "ove/tools/build_release.py"
-      ]
-    },
-    {
       "path": "zip/data/r1700_recon/aftermarket.json",
       "subproject": "база ЗИП",
       "bytes": 82746,
@@ -4223,43 +4390,6 @@
         "library/load_crossrefs.py",
         "scripts/build_chain_coverage.py"
       ]
-    },
-    {
-      "path": "zip/data/r1700_recon/tenders.json",
-      "subproject": "база ЗИП",
-      "bytes": 76053,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "checklist",
-        "gaps",
-        "notes",
-        "owners",
-        "platforms",
-        "rows",
-        "slice"
-      ],
-      "main_collection": {
-        "key": "rows",
-        "records": 43,
-        "record_keys": [
-          "confidence",
-          "source",
-          "topic",
-          "value",
-          "verdict"
-        ]
-      },
-      "last_change": "2026-09-13",
-      "last_author": "skharkov1246",
-      "last_commit": "3b64303",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": []
     },
     {
       "path": "gt/data/ship_recheck.json",
@@ -4415,52 +4545,6 @@
       "referenced_by": [
         "gidromet/build.py"
       ]
-    },
-    {
-      "path": "zip/data/r1700_recon/dealers.json",
-      "subproject": "база ЗИП",
-      "bytes": 66560,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "gaps",
-        "notes",
-        "rows",
-        "slice"
-      ],
-      "main_collection": {
-        "key": "rows",
-        "records": 42,
-        "record_keys": [
-          "brands",
-          "city",
-          "confidence",
-          "country",
-          "email",
-          "kind",
-          "note",
-          "org",
-          "phone",
-          "role",
-          "site",
-          "source",
-          "stock",
-          "verdict"
-        ]
-      },
-      "last_change": "2026-09-13",
-      "last_author": "skharkov1246",
-      "last_commit": "3b64303",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "конфиденциально",
-        "markers": [
-          "адреса электронной почты",
-          "телефоны"
-        ]
-      },
-      "referenced_by": []
     },
     {
       "path": "ove/data/zakladki.json",
@@ -5181,44 +5265,6 @@
       "referenced_by": [
         "ove/tools/build_disc.py"
       ]
-    },
-    {
-      "path": "zip/data/r1700_recon/spec.json",
-      "subproject": "база ЗИП",
-      "bytes": 55445,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "gaps",
-        "nodes",
-        "notes",
-        "rows",
-        "slice",
-        "variants"
-      ],
-      "main_collection": {
-        "key": "rows",
-        "records": 83,
-        "record_keys": [
-          "confidence",
-          "param",
-          "source",
-          "unit",
-          "value",
-          "variant",
-          "verdict"
-        ]
-      },
-      "last_change": "2026-09-13",
-      "last_author": "skharkov1246",
-      "last_commit": "3b64303",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": []
     },
     {
       "path": "zip/data/r1700_recon/wheels.json",
@@ -6668,6 +6714,48 @@
       ]
     },
     {
+      "path": "zip/data/r1700_recon/filters.json",
+      "subproject": "база ЗИП",
+      "bytes": 31401,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "gaps",
+        "notes",
+        "rows",
+        "slice"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 11,
+        "record_keys": [
+          "alts",
+          "applic",
+          "confidence",
+          "interval",
+          "name_en",
+          "name_ru",
+          "node",
+          "note",
+          "pn",
+          "price_usd",
+          "qty",
+          "source",
+          "verdict"
+        ]
+      },
+      "last_change": "2026-09-13",
+      "last_author": "skharkov1246",
+      "last_commit": "3b64303",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": []
+    },
+    {
       "path": "gt/data/removed_ru.json",
       "subproject": "ГТУ-библиотека",
       "bytes": 31270,
@@ -7909,48 +7997,6 @@
       "referenced_by": [
         "gpu/build.py"
       ]
-    },
-    {
-      "path": "zip/data/r1700_recon/filters.json",
-      "subproject": "база ЗИП",
-      "bytes": 11146,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "gaps",
-        "notes",
-        "rows",
-        "slice"
-      ],
-      "main_collection": {
-        "key": "rows",
-        "records": 10,
-        "record_keys": [
-          "alts",
-          "applic",
-          "confidence",
-          "interval",
-          "name_en",
-          "name_ru",
-          "node",
-          "note",
-          "pn",
-          "price_usd",
-          "qty",
-          "source",
-          "verdict"
-        ]
-      },
-      "last_change": "2026-09-13",
-      "last_author": "skharkov1246",
-      "last_commit": "3b64303",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "публикуемо",
-        "markers": []
-      },
-      "referenced_by": []
     },
     {
       "path": "ove/data/bi_release.json",
