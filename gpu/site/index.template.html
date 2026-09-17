@@ -359,6 +359,9 @@ footer{padding:0 22px 24px;color:var(--mut);font-size:11.5px}
   <h3>Та же ведомость с ценой собственного импорта</h3>
   <p class="mut" id="oh-zp-intro"></p>
   <div class="k" id="oh-zp-tiles"></div>
+  <div class="tblwrap"><table><thead><tr>
+    <th>Достоверность цены</th><th class="num">Строк</th><th class="num">Сумма, ₽</th><th class="num">Доля ЗИП</th>
+  </tr></thead><tbody id="oh-zp-conf"></tbody></table></div>
   <div class="tblwrap"><table class="sortable"><thead><tr>
     <th>Система</th><th>Позиция</th><th>Номер</th><th class="num">Кол-во</th>
     <th class="num">$ за ед.</th><th class="num">₽ за ед. с ввозом</th><th class="num">Сумма, ₽</th>
@@ -1926,6 +1929,10 @@ function fillSelect(sel, values, allLabel) {
   $("#oh-zp-intro").textContent = ZP.intro || "";
   $("#oh-zp-tiles").innerHTML = (ZP.totals || []).map(t =>
     `<div class="tile"><b>${num(t.value)}</b><span>${esc(t.what)}</span></div>`).join("");
+  const zpTot = (ZP.totals || []).length ? ZP.totals[0].value : 0;
+  $("#oh-zp-conf").innerHTML = (ZP.confidence || []).map(c => `<tr>
+    <td>${esc(c.conf)}</td><td class="num">${num(c.lines)}</td><td class="num">${num(c.rub)}</td>
+    <td class="num">${zpTot ? (c.rub / zpTot * 100).toFixed(1) + " %" : "—"}</td></tr>`).join("");
   $("#oh-zp").innerHTML = (ZP.lines || []).map(l => `<tr>
     <td class="mut">${esc(l.system || "")}</td><td>${esc(l.name)}</td>
     <td>${l.pn ? `<span class="tag">${esc(l.pn)}</span>` : ""}</td>
