@@ -493,6 +493,12 @@ def run(args) -> int:
         print(f"  ✓ действующих {_st['active']}, уволенных {_st['fired']}; открытых сделок {_rc['openTotal']}: "
               f"за КАМами {_rc['kam']}, за продукт-оунерами {_rc['prod']}, ни за кем {_rc['none']}, "
               f"на уволенных {_rc['orphan']}")
+        # гигиена ведения — в журнал прогона: по нему видно динамику день ко дню, не открывая
+        # сайт. Только агрегаты и собственные подписи кода (правило публичного репозитория).
+        _bad = [h for h in people_data.get("hygiene", []) if not h["ok"]]
+        _pc = lambda h: f"{h['val']}%" if h["unit"] == "%" else str(h["val"])
+        print(f"  гигиена Bitrix: не в норме {len(_bad)} из {len(people_data.get('hygiene', []))}"
+              + ("; " + " · ".join(f"{h['lbl']} — {_pc(h)}" for h in _bad) if _bad else ""))
     except Exception as e:
         print(f"  ⚠ вкладки «КАМы»/«Продукт-оунеры» пропущены: {type(e).__name__}: {e}")
 

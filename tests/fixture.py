@@ -227,3 +227,52 @@ def build_reps(**kw) -> dict:
     """Синтетика → настоящий reps.compute → данные вкладки «Коммерсанты»."""
     import reps as reps_mod
     return reps_mod.compute(PeopleStub(), as_of=PEOPLE_TODAY, created=CREATED, orders_src=ORDERS, **kw)
+
+
+# ---------------------------------------------------------------- «Советы знатока»
+# Отдельный маленький корпус: вкладка советника считается не по составу людей, а по
+# когорте сделок и сроку «создана → вошла в реализацию». Держим его здесь, чтобы
+# smoke-рендер собирал вкладку с данными: до 17.09.2026 она уходила в проверку пустой,
+# и сломанный помесячный прогноз (пустой график на живых данных) никто не ловил.
+ADV_TODAY = PEOPLE_TODAY
+
+
+def adv_deal(did, cat, stage, amt, created, *, close="", sem="P", title=""):
+    return {"ID": str(did), "TITLE": title or f"Сделка {did}", "CATEGORY_ID": cat,
+            "STAGE_ID": stage, "STAGE_SEMANTIC_ID": sem, "OPPORTUNITY": amt,
+            "CURRENCY_ID": "EUR", "DATE_CREATE": created + "T10:00:00+03:00",
+            "CLOSEDATE": (close + "T10:00:00+03:00") if close else "",
+            "ASSIGNED_BY_ID": "1", "COMPANY_ID": "100"}
+
+
+# пять побед в воронке «2» — хватает на собственную медиану срока; в воронке «4» победа одна
+ADV_DEALS = [adv_deal(10 + i, "2", "C2:WON", 100_000, "2026-01-10",
+                      title=f"{900 + i}. Поставка насоса") for i in range(5)]
+ADV_DEALS += [adv_deal(20, "4", "C4:WON", 50_000, "2026-02-01", title="910. Поставка фильтра")]
+# открытые: плановая дата в будущем (план), в прошлом (автопростановка) и её отсутствие
+ADV_DEALS += [adv_deal(301, "2", "C2:EXECUTING", 300_000, "2026-08-01", close="2026-11-20"),
+              adv_deal(302, "2", "C2:EXECUTING", 200_000, "2026-08-01", close="2025-03-01"),
+              adv_deal(303, "4", "C4:NEW", 100_000, "2026-09-01"),
+              adv_deal(304, "2", "C2:NEW", 40_000, "2026-06-01", sem="F")]
+ADV_REALIZE = {str(10 + i): "2026-03-11" for i in range(5)} | {"20": "2026-07-31"}
+ADV_STAGES = {"C2:EXECUTING": "Тендерное предложение выдано", "C4:NEW": "Новая заявка",
+              "C2:NEW": "Новый тендер", "C2:WON": "Реализация", "C4:WON": "Реализация"}
+ADV_CATS = {"2": "Тендеры", "4": "Запросы"}
+
+
+class AdvisorStub(PeopleStub):
+    """Тот же клиент плюс прошлогодняя когорта и названия компаний."""
+
+    def list_deals_fast(self, **kw):
+        return [adv_deal(900 + i, "2", "C2:NEW", 10_000, "2025-05-01") for i in range(4)]
+
+    def companies_by_ids(self, ids):
+        return {str(c): f"Клиент {c}" for c in ids}
+
+
+def build_advisor(**kw) -> dict:
+    """Синтетика → настоящий advisor.compute → данные вкладки «Советы знатока»."""
+    import advisor as advisor_mod
+    return advisor_mod.compute(AdvisorStub(), as_of=ADV_TODAY, deals=ADV_DEALS, orders=[],
+                               realize_date=ADV_REALIZE, deal_stage_names=ADV_STAGES,
+                               category_names=ADV_CATS, **kw)
