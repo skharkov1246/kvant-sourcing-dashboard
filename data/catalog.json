@@ -6342,7 +6342,8 @@
         "markers": []
       },
       "referenced_by": [
-        "scripts/build_catalog.py"
+        "scripts/build_catalog.py",
+        "tests/test_catalog_guard.py"
       ]
     },
     {
