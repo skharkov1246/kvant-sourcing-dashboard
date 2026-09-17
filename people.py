@@ -24,7 +24,7 @@
 которую сегодня не ведёт никто.
 
 ЧТО СЧИТАЕТСЯ ПРОСРОЧКОЙ. Не CLOSEDATE: у всех 2 695 открытых сделок она заполнена,
-у 2 624 — в прошлом, в будущем нет ни одной, то есть это не план, а автопростановка.
+у 2 624 — в прошлом, а будущая дата лишь у 71 (2,6 %): это не план, а автопростановка.
 Просрочка берётся из заказов поставщикам СП-172, поле «Date of deadline to customer»
 (149 просроченных из 328 живых заказов с датой) — это обещание клиенту, а не поле CRM.
 
@@ -142,6 +142,7 @@ def roster(client: BitrixClient) -> dict[str, dict]:
                 "name": " ".join(x for x in [u.get("LAST_NAME"), u.get("NAME")] if x).strip() or f"user#{uid}",
                 "pos": (u.get("WORK_POSITION") or "").strip(),
                 "depts": [str(x) for x in (dd if isinstance(dd, list) else [dd]) if str(x)],
+                "hired": str(u.get("UF_EMPLOYMENT_DATE") or "")[:10],
                 "active": (str(act).lower() in ("y", "true", "1")) if act is not None else default_active,
             }
     return people
@@ -305,6 +306,43 @@ def head_gaps(role: str, people: dict[str, dict], role_of: dict[str, str],
             for d, n in cnt.most_common() if not dept_head.get(d)]
 
 
+# Должность, по которой человека можно предложить в руководители отдела.
+BOSS_POS = re.compile(r"head of|chief|director|руководител|начальник|директор|\blead\b", re.I)
+
+
+def headless_departments(people: dict[str, dict], deps: dict[str, str],
+                         dept_head: dict[str, str]) -> list[dict]:
+    """Отделы без руководителя и кто в них годится в начальники.
+
+    Назначение — воля владельца, а не вычисление, поэтому строка ничего не решает:
+    показывает состав отдела, должности и стаж, а кандидатом называет того, у кого
+    должность руководительская, при равенстве — кто дольше в компании. Отдел без
+    единого действующего сотрудника так и помечается: там вопрос не к кадрам, а к
+    структуре — такой узел либо наполняют, либо закрывают.
+    """
+    by_dept: dict[str, list[dict]] = defaultdict(list)
+    for uid, p in people.items():
+        if not p.get("active"):
+            continue
+        for d in (p.get("depts") or []):
+            by_dept[d].append({"uid": uid, "name": p["name"], "pos": p.get("pos") or "—",
+                               "hired": p.get("hired") or ""})
+    out = []
+    for d in deps:
+        if dept_head.get(d):
+            continue
+        staff = by_dept.get(d, [])
+        ranked = sorted(staff, key=lambda x: (0 if BOSS_POS.search(x["pos"]) else 1,
+                                              x["hired"] or "9999-99-99", x["name"]))
+        for x in ranked:
+            x["why"] = ("должность руководителя" if BOSS_POS.search(x["pos"])
+                        else ("дольше всех в отделе" if x is ranked[0] and x["hired"] else "в отделе"))
+        out.append({"id": d, "name": deps.get(d, d), "staff": len(staff),
+                    "empty": not staff, "cands": ranked[:4]})
+    out.sort(key=lambda r: (r["empty"], -r["staff"], r["name"]))
+    return out
+
+
 def head_scorecard(block: dict, rows: list[dict]) -> list[dict]:
     """Управленческие метрики роли: факт против предложенной нормы.
 
@@ -412,6 +450,23 @@ def hygiene(*, people: dict[str, dict], role_of: dict[str, str], deps: dict[str,
     return out
 
 
+def _promise_stats(p: dict) -> dict:
+    """Сводка обещаний клиенту: сколько живых заказов имеют срок и сколько сорвано.
+
+    Отдельная цифра нужна потому, что просрочка сделки считается ИЗ заказа: если срока
+    в заказе нет, сделка выглядит благополучной, хотя обещание по ней просто не записано.
+    """
+    days = sorted(p["days"])
+    live = p["live"] or 1
+    return {
+        "live": p["live"], "withDl": p["withDl"], "noDl": p["noDl"], "late": p["late"],
+        "coverPct": round(p["withDl"] / live * 100),
+        "latePct": (round(p["late"] / p["withDl"] * 100) if p["withDl"] else 0),
+        "medDays": (days[len(days) // 2] if days else None),
+        "maxDays": (days[-1] if days else None),
+    }
+
+
 def _boss_of(uid: str, person: dict, people: dict[str, dict], dept_head: dict[str, str]) -> str:
     """Непосредственный руководитель человека — из UF_HEAD его отдела. В отличие от
     «руководителя роли», это в портале заполнено почти везде. Если человек сам
@@ -467,6 +522,9 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
     order_deals: set[str] = set()     # есть непроигранный заказ (в т.ч. уже исполненный)
     live_deals: set[str] = set()      # заказ ещё в работе
     late_deals: dict[str, int] = {}
+    # обещание клиенту меряется по самому заказу, а не по сделке: срок стоит там.
+    # Заказ без срока — не «в порядке», а неизмеримый: просрочку по нему никто не увидит.
+    promise = {"live": 0, "withDl": 0, "noDl": 0, "late": 0, "days": []}
     for o in orders:
         did = str(o.get("parentId2") or "")
         stage = str(o.get("stageId") or "")
@@ -478,9 +536,13 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             continue
         live_deals.add(did)
         dl = str(o.get(DL_CUSTOMER) or "")[:10]
-        if dl and dl < today_iso:
+        promise["live"] += 1
+        promise["withDl" if len(dl) == 10 else "noDl"] += 1
+        if len(dl) == 10 and dl < today_iso:
             days = (today - dt.date.fromisoformat(dl)).days
             late_deals[did] = max(days, late_deals.get(did, 0))
+            promise["late"] += 1
+            promise["days"].append(days)
 
     # --- роли людей
     role_of, why_of = {}, {}
@@ -759,12 +821,13 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         "orphanCovered": sum(1 for d in details if not d["ownLive"] and (d["kam"] or d["prod"])),
     }
     staff = {
-        "total": len(people),
+        "total": len(people), "depts": len(deps),
         "active": sum(1 for p in people.values() if p["active"]),
         "fired": sum(1 for p in people.values() if not p["active"]),
         "kam": sum(1 for u, p in people.items() if p["active"] and role_of.get(u) == "kam"),
         "prod": sum(1 for u, p in people.items() if p["active"] and role_of.get(u) == "prod"),
     }
+    gaps_all = headless_departments(people, deps, dept_head)
     hyg = hygiene(people=people, role_of=role_of, deps=deps, dept_head=dept_head,
                   details=details, kam=kam, prod=prod, orphan=orphan, recon=recon,
                   field_use=field_use, close_future=close_future)
@@ -773,6 +836,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         "label": f"на {today.strftime('%d.%m.%Y')}",
         "roles": {"kam": kam, "prod": prod},
         "orphan": orphan, "recon": recon, "staff": staff, "hygiene": hyg,
+        "headless": gaps_all, "promise": _promise_stats(promise),
         "deals": details,
         "params": {"stale": STALE_DAYS, "dead": DEAD_DAYS, "mult": OUTLIER_MULT,
                    "medAmt": _money(med_amt), "bigCut": _money(big_cut)},

@@ -85,6 +85,32 @@ def check_size(html: str, errors: list[str]) -> None:
         errors.append(f"страница подозрительно велика: {n} байт > {MAX_BYTES}")
 
 
+
+def _field_weights(obj, limit: int = 5) -> list[tuple[int, str]]:
+    """Из чего сложился вес блока: топ полей по объёму сериализации.
+
+    Для словаря — вес каждого ключа верхнего уровня; для списка однотипных записей —
+    суммарный вес каждого поля записи. Без этого ужимать страницу можно только на глаз,
+    а правило репозитория требует сначала померить.
+    """
+    def size(x) -> int:
+        return len(json.dumps(x, ensure_ascii=False, separators=(",", ":")).encode())
+
+    if isinstance(obj, dict):
+        rows = [(size(v) + len(k) + 4, k) for k, v in obj.items()]
+    elif isinstance(obj, list) and obj and isinstance(obj[0], dict):
+        agg: dict[str, int] = {}
+        for it in obj:
+            if not isinstance(it, dict):
+                continue
+            for k, v in it.items():
+                agg[k] = agg.get(k, 0) + size(v) + len(k) + 4
+        rows = [(v, k) for k, v in agg.items()]
+    else:
+        return []
+    return sorted(rows, reverse=True)[:limit]
+
+
 def extract_data(html: str, errors: list[str], sizes: dict[str, int] | None = None) -> dict[str, object]:
     blobs: dict[str, object] = {}
     for name, raw in DATA_RE.findall(html):
@@ -281,6 +307,14 @@ def main() -> int:
     heavy = sorted(((v, k) for k, v in sizes.items() if v > 64 * 1024), reverse=True)[:6]
     if heavy:
         print("  вес данных: " + " · ".join(f"{k.strip('_').lower()} {v // 1024} КБ" for v, k in heavy))
+    # у самых тяжёлых блоков — разбивка по полям: что именно занимает мегабайты
+    for v, k in heavy[:3]:
+        if v < 512 * 1024:
+            continue
+        top = _field_weights(blobs.get(k))
+        if top:
+            print(f"    {k.strip('_').lower()}: "
+                  + " · ".join(f"{nm} {sz // 1024} КБ" for sz, nm in top))
     for n in notes:
         print(f"  {n}")
     for w in warns:

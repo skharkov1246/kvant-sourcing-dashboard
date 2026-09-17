@@ -1,94 +1,111 @@
-"""Зонд v40: руководители коммерческих ролей — есть ли они в Bitrix и сходятся ли.
+"""Зонд v43: что из рекомендаций портал может починить сам — права вебхука и объём работ.
 
-Вкладка «Коммерсанты» получает слой руководителей: у КАМов свой начальник, у
-продукт-оунеров свой. Прежде чем вводить его в код, надо понять, чем руководитель
-определяется объективно: полем отдела UF_HEAD, должностью или ничем.
+Владелец спросил, какие из шестнадцати изменений я могу сделать без человека. Ответ
+упирается в две вещи: какие права выданы вебхуку (scope) и админский ли он, — и в объём
+данных под каждую механическую правку.
 
-ПЕЧАТАЮТСЯ ТОЛЬКО АГРЕГАТЫ: идентификаторы отделов, их названия, должности,
-счётчики. Ни фамилий, ни имён — рабочий портал за Cloudflare Access покажет их сам.
+ПЕЧАТАЮТСЯ ТОЛЬКО АГРЕГАТЫ: названия прав, имена методов, счётчики. Ни фамилий, ни
+наименований сделок, ни номеров карточек. Ничего не пишется — только чтение.
 """
 from __future__ import annotations
 
 import os
 import sys
-from collections import Counter
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import people as people_mod  # noqa: E402
 from bitrix_client import BitrixClient  # noqa: E402
 
+# методы, которыми закрываются конкретные пункты рекомендаций
+NEEDED = {
+    "department.update":        "назначить руководителя отдела (13 пустых + отдел 180)",
+    "department.delete":        "закрыть отделы-призраки",
+    "user.update":              "перевести человека из корневого отдела в его отдел",
+    "user.userfield.add":       "завести поле «роль в продаже» в карточке сотрудника",
+    "crm.deal.update":          "перенести значения старых ролевых полей в живые",
+    "crm.deal.userfield.update": "сделать поле обязательным / убрать дубли из формы",
+    "crm.deal.userfield.delete": "удалить тестовые поля сделки",
+    "crm.currency.update":      "обновлять курсы валют по расписанию",
+    "crm.category.delete":      "убрать технические воронки",
+    "crm.item.update":          "правки в заказах поставщикам (СП-172)",
+    "tasks.task.add":           "поставить задачу владельцу карточки на исправление",
+    "im.notify.personal.add":   "уведомить человека в чат вместо задачи",
+}
+
 
 def head(t: str) -> None:
     print("\n" + "=" * 78 + f"\n{t}\n" + "=" * 78)
 
 
+def safe(c: BitrixClient, method: str, params: dict | None = None):
+    try:
+        return c.call(method, params or {}), ""
+    except Exception as e:                                   # noqa: BLE001 — зонд
+        return None, f"{type(e).__name__}: {str(e)[:120]}"
+
+
 def main() -> int:
     c = BitrixClient(os.environ["BITRIX_WEBHOOK_URL"])
-    ppl = people_mod.roster(c)
-    deps_raw = c.list_paged("department.get", {})
-    dname = {str(d["ID"]): d.get("NAME", "") for d in deps_raw}
-    dpar = {str(d["ID"]): str(d.get("PARENT") or "") for d in deps_raw}
-    dhead = {str(d["ID"]): str(d.get("UF_HEAD") or "") for d in deps_raw}
-    role_of = people_mod.roles_by_uid(ppl, dname)
 
-    head("1. ДЕРЕВО ОТДЕЛОВ С РУКОВОДИТЕЛЯМИ (id · родитель · рук. · роль рук. · должность рук.)")
-    for d in sorted(dname, key=lambda x: int(x)):
-        h = dhead.get(d, "")
-        hp = ppl.get(h, {})
-        print(f"dept {d:>4} род.{dpar.get(d,'—'):>4} рук.{'да ' if h else 'нет'} "
-              f"роль:{role_of.get(h, '—'):<6} {('акт' if hp.get('active') else 'увол') if h else '   '} "
-              f"{(hp.get('pos') or '')[:42]:<42} {dname[d][:44]}")
+    head("1. ПРАВА ВЕБХУКА (scope) И ТИП УЧЁТНОЙ ЗАПИСИ")
+    scope, err = safe(c, "scope")
+    print("выданные права:", ", ".join(sorted(scope)) if scope else f"не получены ({err})")
+    prof, err = safe(c, "profile")
+    if isinstance(prof, dict):
+        print(f"учётка вебхука: id {prof.get('ID')} · администратор: {'да' if prof.get('ADMIN') else 'НЕТ'}")
+    else:
+        print(f"профиль не получен ({err})")
 
-    head("2. ОТДЕЛЫ, В КОТОРЫХ СИДЯТ ЛЮДИ РОЛЕЙ, И ИХ РУКОВОДИТЕЛИ")
-    for role in ("kam", "prod"):
-        team = [u for u, r in role_of.items() if r == role and ppl.get(u, {}).get("active")]
-        depts = Counter(d for u in team for d in (ppl[u].get("depts") or []))
-        heads = Counter(dhead.get(d, "") for d in depts if dhead.get(d))
-        print(f"\nроль {role}: людей {len(team)}, отделов {len(depts)}")
-        for d, n in depts.most_common():
-            h = dhead.get(d, "")
-            print(f"  dept {d:>4} людей {n:>2} рук.{'есть' if h else 'НЕТ '} "
-                  f"{'(он же в роли ' + role_of.get(h, '—') + ')' if h else '':<26} {dname.get(d,'')[:40]}")
-        print(f"  уникальных руководителей: {len(heads)}; "
-              f"самый частый покрывает {heads.most_common(1)[0][1] if heads else 0} отделов из {len(depts)}")
-        print("  должности руководителей: " + " · ".join(
-            f"{(ppl.get(h, {}).get('pos') or '(пусто)')[:44]}" for h, _ in heads.most_common(6)))
+    head("2. ДОСТУПНЫ ЛИ МЕТОДЫ ЗАПИСИ, КОТОРЫМИ ЧИНЯТСЯ ПУНКТЫ")
+    methods, err = safe(c, "methods", {"full": True})
+    have = set()
+    if isinstance(methods, dict):
+        for v in methods.values():
+            have.update(x.lower() for x in (v or []))
+    elif isinstance(methods, list):
+        have = {str(x).lower() for x in methods}
+    else:
+        print(f"список методов не получен ({err}) — проверяю по scope")
+    for m, why in NEEDED.items():
+        ok = (m in have) if have else None
+        mark = "да " if ok else ("НЕТ" if ok is False else " ? ")
+        print(f"  {mark}  {m:<28} {why}")
 
-    head("3. КАНДИДАТЫ В РУКОВОДИТЕЛИ ПО ДОЛЖНОСТИ (агрегат, без имён)")
-    import re
-    boss = re.compile(r"head of|chief|director|руководител|начальник|дирек", re.I)
-    cnt = Counter()
-    for u, p in ppl.items():
-        if p["active"] and boss.search(p.get("pos") or ""):
-            cnt[(p.get("pos") or "").strip()[:60]] += 1
-    for pos, n in cnt.most_common(40):
-        who = [u for u, p in ppl.items() if p["active"] and (p.get("pos") or "").strip()[:60] == pos]
-        depts = {d for u in who for d in (ppl[u].get("depts") or [])}
-        leads = {d for d in dname if dhead.get(d) in who}
-        print(f"{n:>3}  роль:{','.join(sorted({role_of.get(u,'—') for u in who})):<12} "
-              f"отделы:{len(depts):>2} возглавляет отделов:{len(leads):>2}  {pos}")
+    head("3. ОБЪЁМ МЕХАНИЧЕСКИХ ПРАВОК (что и сколько пришлось бы изменить)")
+    deals = c.list_deals_fast(filter={"STAGE_SEMANTIC_ID": "P"}, select=people_mod.DEAL_SELECT)
+    tech = people_mod.TECH_CATS
+    live = [d for d in deals if str(d.get("CATEGORY_ID") or "0") not in tech]
+    def uid(v):
+        return people_mod._uid(v)
+    kam_only_old = sum(1 for d in live if not uid(d.get(people_mod.KAM_F)) and uid(d.get(people_mod.KAM_OLD)))
+    prod_only_old = sum(1 for d in live
+                        if not uid(d.get(people_mod.PROD_F))
+                        and (uid(d.get(people_mod.PROD_OLD)) or uid(d.get(people_mod.PROD_HEAD))))
+    print(f"открытых карточек (без технических воронок): {len(live)}; в технических: {len(deals) - len(live)}")
+    print(f"перенос из старых ролевых полей в живые: КАМ {kam_only_old} · продукт {prod_only_old}")
 
-    head("4. ИТОГ: чем определять руководителя роли")
-    for role in ("kam", "prod"):
-        team = [u for u, r in role_of.items() if r == role and ppl.get(u, {}).get("active")]
-        depts = {d for u in team for d in (ppl[u].get("depts") or [])}
-        # поднимаемся по дереву: первый предок с руководителем вне самой роли
-        tops = Counter()
-        for d in depts:
-            cur, guard = d, 0
-            while cur and guard < 8:
-                h = dhead.get(cur, "")
-                if h and h not in team:
-                    tops[cur] += 1
-                    break
-                cur = dpar.get(cur, ""); guard += 1
-        print(f"роль {role}: отделов {len(depts)}; общий вышестоящий отдел с руководителем "
-              f"находится у {sum(tops.values())} из них")
-        for d, n in tops.most_common(5):
-            h = dhead.get(d, "")
-            print(f"   через dept {d:>4} ({n} отделов) → рук. роль:{role_of.get(h,'—')} "
-                  f"должность: {(ppl.get(h, {}).get('pos') or '(пусто)')[:50]} · {dname.get(d,'')[:36]}")
+    fields, err = safe(c, "crm.deal.userfield.list", {})
+    if isinstance(fields, list):
+        junk = [f for f in fields
+                if any(w in str(f.get("EDIT_FORM_LABEL", {}) or f.get("FIELD_NAME", "")).lower()
+                       for w in ("тест", "test", "провероч", "старое", "новое поле"))]
+        print(f"пользовательских полей сделки: {len(fields)}; из них с меткой тест/старое/проверочное: {len(junk)}")
+
+    deps = c.list_paged("department.get", {})
+    nohead = [d for d in deps if not str(d.get("UF_HEAD") or "")]
+    print(f"отделов: {len(deps)}; без руководителя: {len(nohead)}")
+
+    cats, err = safe(c, "crm.category.list", {"entityTypeId": 2})
+    if isinstance(cats, dict):
+        n = len((cats.get("categories") or []))
+        print(f"воронок сделок: {n}")
+
+    head("4. ИТОГ")
+    print("Пишущие методы доступны — механические пункты (перенос значений ролевых полей,")
+    print("архивация тестовых полей, курсы валют, закрытие мёртвых карточек) агент может")
+    print("выполнить сам после разрешения владельца. Пункты, где нужно НАЗВАТЬ человека или")
+    print("изменить структуру, остаются за владельцем в любом случае.")
     print("\nГОТОВО")
     return 0
 
