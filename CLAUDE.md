@@ -46,7 +46,13 @@
 
 - Точка входа: `main.py` → тянет данные из Bitrix → модули метрик → рендер HTML.
 - Модули расчёта: `metrics.py`, `company.py`, `advisor.py`, `reps.py`, `kam.py`,
-  `contracts.py`, `insights.py`, `stages.py`, `period.py`.
+  `people.py`, `contracts.py`, `insights.py`, `stages.py`, `period.py`.
+- `people.py` — вкладки «КАМы» и «Продукт-оунеры»: состав из Bitrix (действующие
+  против уволенных), загрузка людей (проработка / реализация), просрочка по
+  дедлайнам заказов, застой, гигиена карточек. Атрибуция сделки — полем «КАМ»
+  (`UF_CRM_1740390857`) или «Product leader» (`UF_CRM_1779187425`), и лишь потом
+  по ответственному: ответственный — исполнитель, а не коммерсант (из 1 812 сделок
+  с заполненным полем «КАМ» он отличается от КАМа у 1 601).
 - Вёрстка: **`templates/dashboard_core.html`** — один самодостаточный HTML-шаблон
   (встроенные CSS+JS, данные подставляются плейсхолдерами `__..._JSON__`). 9 вкладок.
 - Сборка HTML: `dashboard.py`.
@@ -69,7 +75,7 @@
    ```
    Правки вёрстки — дополнительно smoke-рендер и валидация:
    ```bash
-   python -c "import sys,types;sys.modules.setdefault('dotenv',types.SimpleNamespace(load_dotenv=lambda *a,**k:None));sys.path.insert(0,'.');import dashboard;from tests import fixture;dashboard.write(fixture.build_metrics(),{'source':'rules','items':[]},'smoke/index.html')"
+   python -c "import sys,types;sys.modules.setdefault('dotenv',types.SimpleNamespace(load_dotenv=lambda *a,**k:None));sys.path.insert(0,'.');import dashboard;from tests import fixture;dashboard.write(fixture.build_metrics(),{'source':'rules','items':[]},'smoke/index.html',people=fixture.build_people())"
    python scripts/validate_dashboard.py smoke/index.html
    ```
    Правки метрик — `python main.py --dry-run` (нужен `BITRIX_WEBHOOK_URL` в `.env`).

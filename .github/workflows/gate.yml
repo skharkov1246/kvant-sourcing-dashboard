@@ -93,7 +93,8 @@ jobs:
           import dashboard
           from tests import fixture
           m = fixture.build_metrics()
-          dashboard.write(m, {"source": "rules", "items": []}, "smoke/index.html")
+          dashboard.write(m, {"source": "rules", "items": []}, "smoke/index.html",
+                          people=fixture.build_people())
           print("собрано smoke/index.html")
           PY
           python scripts/validate_dashboard.py smoke/index.html
