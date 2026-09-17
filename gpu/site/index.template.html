@@ -362,6 +362,13 @@ footer{padding:0 22px 24px;color:var(--mut);font-size:11.5px}
     <th>Этап</th><th>Ед.</th><th>Количество</th><th>На чём основано</th>
   </tr></thead><tbody id="oh-labor"></tbody></table></div>
 
+  <h3>Заводские величины</h3>
+  <p class="mut" id="oh-fd-intro"></p>
+  <div class="tblwrap"><table><thead><tr><th>Величина</th><th>Значение</th></tr></thead><tbody id="oh-fd"></tbody></table></div>
+
+  <h3>Ставки, подтверждённые прайсами</h3>
+  <div class="tblwrap"><table><thead><tr><th>Что</th><th>Ставка, ₽</th><th>Достоверность</th></tr></thead><tbody id="oh-rates"></tbody></table></div>
+
   <h3>Цены, которые удалось подтвердить</h3>
   <div class="box warn" id="oh-transparency"></div>
   <div class="tblwrap"><table><thead><tr>
@@ -1893,6 +1900,11 @@ function fillSelect(sel, values, allLabel) {
     <td>${esc(l.stage)}</td><td>${esc(l.unit)}</td><td class="num">${num(l.qty)}</td>
     <td class="mut">${esc(l.basis || "")}</td></tr>`).join("");
 
+  const FD = OVERHAUL.factory_data || {};
+  $("#oh-fd-intro").textContent = FD.intro || "";
+  $("#oh-fd").innerHTML = (FD.rows || []).map(r => `<tr><td>${esc(r.what)}</td><td><b>${esc(r.value)}</b></td></tr>`).join("");
+  $("#oh-rates").innerHTML = ((OVERHAUL.labor_model || {}).rates || []).map(r => `<tr>
+    <td>${esc(r.what)}</td><td class="num">${num(r.rub)}</td><td class="mut">${esc(r.conf)}</td></tr>`).join("");
   $("#oh-transparency").innerHTML = `<b>Почему цен мало.</b> ${esc(OVERHAUL.price_transparency || "")}`;
   const usdTxt = v => v == null ? "—" : "$ " + num(v);
   $("#oh-anchors").innerHTML = (OVERHAUL.price_anchors || []).map(a => `<tr>
