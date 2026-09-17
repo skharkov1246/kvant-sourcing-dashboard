@@ -598,11 +598,20 @@ def build() -> dict:
 
     spec = sl.get("spec") or {}
     docs = [r for r in (sl.get("docs") or {}).get("rows") or [] if str(r.get("form") or "").strip()]
-    prices = (sl.get("prices") or {}).get("rows") or []
-    # Разведка цен не прогналась (лимит API) — поднимаем в раздел то, что есть у нас
-    # самих: ценовые факты price_records с продавцом, валютой и ссылкой.
-    if not prices:
-        prices = own_prices(bitrix, parts)
+    prices = list((sl.get("prices") or {}).get("rows") or [])
+    # К ценам разведки добавляем свои: price_records — продавец, валюта, ссылка.
+    # Свой факт не хуже найденного, а по части позиций он единственный. Дубль
+    # снимаем по паре «номер + продавец + цена»: одна и та же карточка могла
+    # попасть и в разведку, и в нашу базу.
+    seen = {(str(r.get("pn") or "").upper(), str(r.get("seller") or "").lower(),
+             str(r.get("price") or "")) for r in prices}
+    for r in own_prices(bitrix, parts):
+        k = (str(r.get("pn") or "").upper(), str(r.get("seller") or "").lower(),
+             str(r.get("price") or ""))
+        if k in seen:
+            continue
+        seen.add(k)
+        prices.append(r)
     tnd = sl.get("tenders") or {}
 
     # Покрытие: без него непонятно, чем ещё нельзя торговать.
