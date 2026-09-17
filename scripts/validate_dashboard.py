@@ -125,6 +125,9 @@ def check_browser(path: Path, errors: list[str], warns: list[str]) -> None:
     if not chrome:
         warns.append("Chromium не найден — проверка рендера пропущена")
         return
+    # Вкладки строятся лениво, при первом открытии, поэтому открываем их все в ЭТОМ
+    # же прогоне: отдельный второй запуск Chromium стоил на раннере около двух минут.
+    page = _with_tabs_opened(path)
     # три попытки: обычный headless, один процесс, старый headless.
     # На раннерах GitHub встречаются сборки Chrome, где --dump-dom не отдаёт
     # ничего в первых двух режимах.
@@ -132,10 +135,14 @@ def check_browser(path: Path, errors: list[str], warns: list[str]) -> None:
                 (["--single-process"], 60, "--headless=new"),
                 ([], 60, "--headless=old")]
     dom, log = "", ""
-    for extra, timeout, mode in attempts:
-        dom, log = _chrome_run(chrome, path, extra, timeout, mode)
-        if dom.strip():
-            break
+    try:
+        for extra, timeout, mode in attempts:
+            dom, log = _chrome_run(chrome, page, extra, timeout, mode)
+            if dom.strip():
+                break
+    finally:
+        if page != path:
+            page.unlink(missing_ok=True)
     if not dom.strip():
         # Пустой ответ браузера — отсутствие данных, а не доказательство поломки.
         # Структурные проверки выше отработали и остаются в силе, поэтому
@@ -152,6 +159,7 @@ def check_browser(path: Path, errors: list[str], warns: list[str]) -> None:
     for tab in ("tab-sourcing", "tab-company"):
         if f'id="{tab}"' not in dom and f"id='{tab}'" not in dom:
             warns.append(f"в DOM нет блока {tab}")
+    _check_tabs_dom(dom, errors)
 
 
 # Вкладки строятся лениво — при первом открытии. Поэтому обычный прогон проверяет
@@ -161,37 +169,33 @@ LAZY_TABS = ["company", "kam", "eng", "prod", "reps", "contracts", "suppliers", 
 _TAB_FAIL = "Вкладка не отрисовалась"
 
 
-def check_tabs(path: Path, errors: list[str], warns: list[str]) -> None:
-    chrome = find_chrome()
-    if not chrome:
-        return
+def _with_tabs_opened(path: Path) -> Path:
+    """Копия страницы, открывающая все ленивые вкладки. Если скрипт вставить некуда —
+    возвращаем исходный файл: базовая проверка рендера важнее проверки вкладок."""
+    html = path.read_text(encoding="utf-8", errors="replace")
+    if "</body>" not in html:
+        return path
     inject = ("<script>try{[%s].forEach(function(t){try{window.ensureTab&&window.ensureTab(t)}"
               "catch(e){console.error('вкладка '+t+': '+e)}})}catch(e){console.error('ensureTab: '+e)}</script>"
               % ",".join(f"'{t}'" for t in LAZY_TABS))
-    html = path.read_text(encoding="utf-8", errors="replace")
     tmp = path.parent / (path.stem + ".tabs.html")
     tmp.write_text(html.replace("</body>", inject + "</body>", 1), encoding="utf-8")
-    try:
-        dom, log = _chrome_run(chrome, tmp, [], 75)
-        if not dom.strip():
-            warns.append("Chromium не отдал DOM вкладок — проверка ленивых вкладок не выполнена")
-            return
-        bad = [ln for ln in log.splitlines()
-               if re.search(r"вкладка |\bERROR:CONSOLE\b|Uncaught|SyntaxError|is not defined|is not a function", ln)]
-        if bad:
-            errors.append("JS-ошибки при открытии вкладок: " + " | ".join(b[-160:] for b in bad[:3]))
-        # текст-маркер есть и в исходнике обработчика ensureTab, поэтому ищем его
-        # только в разметке: скрипты из DOM вырезаем
-        body = re.sub(r"(?is)<script[^>]*>.*?</script>", " ", dom)
-        if _TAB_FAIL in body:
-            broken = []
-            for tab in LAZY_TABS:
-                m = re.search(r'id="tab-%s"(.*?)(?=<div id="tab-|</body>)' % tab, body, re.S)
-                if m and _TAB_FAIL in m.group(1):
-                    broken.append(tab)
-            errors.append("вкладка отрисовалась с ошибкой: " + (", ".join(broken) or "не определить какая"))
-    finally:
-        tmp.unlink(missing_ok=True)
+    return tmp
+
+
+def _check_tabs_dom(dom: str, errors: list[str]) -> None:
+    """Разбор DOM после принудительного открытия вкладок: какая не отрисовалась."""
+    # текст-маркер есть и в исходнике обработчика ensureTab, поэтому ищем его
+    # только в разметке: скрипты из DOM вырезаем
+    body = re.sub(r"(?is)<script[^>]*>.*?</script>", " ", dom)
+    if _TAB_FAIL not in body:
+        return
+    broken = []
+    for tab in LAZY_TABS:
+        m = re.search(r'id="tab-%s"(.*?)(?=<div id="tab-|</body>)' % tab, body, re.S)
+        if m and _TAB_FAIL in m.group(1):
+            broken.append(tab)
+    errors.append("вкладка отрисовалась с ошибкой: " + (", ".join(broken) or "не определить какая"))
 
 
 def main() -> int:
@@ -215,7 +219,6 @@ def main() -> int:
     check_content(blobs, errors, a.allow_empty)
     if not a.no_browser:
         check_browser(path, errors, warns)
-        check_tabs(path, errors, warns)
 
     kb = len(html.encode()) // 1024
     print(f"• {path}: {kb} КБ, блоков данных {len([k for k, v in blobs.items() if v is not None])}")
