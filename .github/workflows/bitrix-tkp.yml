@@ -101,8 +101,12 @@ jobs:
         run: |
           set -euo pipefail
           test -s out/tkp_full.json || { echo "выгрузки нет — документ собирать нечем"; exit 0; }
+          # Имя несёт охват: по одному заказчику прогонов несколько, и два
+          # одноимённых файла в разных артефактах не отличить друг от друга.
+          SCOPE="${{ inputs.deal }}"
+          [ -n "$SCOPE" ] || SCOPE="${{ inputs.keyword }}"
           python gt/tools/ship_offer.py --tkp out/tkp_full.json \
-            --out "${{ runner.temp }}/pdf/КП-ЛУКОЙЛ-ЗАПАС-НА-СНИЖЕНИЕ.pdf"
+            --out "${{ runner.temp }}/pdf/ЗАПАС-НА-СНИЖЕНИЕ-$SCOPE.pdf"
 
       - name: Выгрузка документа артефактом
         if: always() && inputs.dry_run != true
