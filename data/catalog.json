@@ -4,16 +4,16 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 217,
-    "total_bytes": 99598931,
+    "datasets": 219,
+    "total_bytes": 99633635,
     "by_sensitivity": {
       "конфиденциально": 62,
       "внутреннее": 120,
-      "публикуемо": 35
+      "публикуемо": 37
     },
     "by_subproject": {
       "ГПУ-библиотека": 29,
-      "ГТУ-библиотека": 40,
+      "ГТУ-библиотека": 42,
       "ОВЭ-75": 45,
       "база ЗИП": 49,
       "база ЗИП · таможня": 18,
@@ -70,9 +70,9 @@
           "val"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "конфиденциально",
@@ -129,9 +129,9 @@
           "val"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "конфиденциально",
@@ -149,9 +149,9 @@
       "bytes": 6146458,
       "note": "Копия базы PN для веб-каталога. Байт-в-байт дубль gt/public/wizard/data.js (по 6,1 МБ каждый).",
       "format": "js",
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "внутреннее",
@@ -201,9 +201,9 @@
           "vf"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "внутреннее",
@@ -285,9 +285,12 @@
         "markers": []
       },
       "referenced_by": [
+        "gt/tools/ship_brand.py",
         "gt/tools/ship_export.py",
         "gt/tools/ship_map.py",
         "gt/tools/ship_merge.py",
+        "gt/tools/ship_priced.py",
+        "gt/tools/ship_questions.py",
         "gt/tools/ship_rfq.py",
         "tests/test_ship_fx.py"
       ]
@@ -308,9 +311,9 @@
         "key": "rows",
         "records": 23280
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "внутреннее",
@@ -368,9 +371,9 @@
           "val"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "конфиденциально",
@@ -412,10 +415,10 @@
           "src_id"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "Claude",
+      "last_commit": "eab1588",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -499,9 +502,9 @@
         "terms",
         "updated_at"
       ],
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "внутреннее",
@@ -629,9 +632,9 @@
           "val"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "конфиденциально",
@@ -688,9 +691,9 @@
           "val"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "конфиденциально",
@@ -747,9 +750,9 @@
           "val"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "конфиденциально",
@@ -822,9 +825,9 @@
         "key": "dossiers",
         "records": 1359
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "конфиденциально",
@@ -886,9 +889,9 @@
           "val"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "конфиденциально",
@@ -947,9 +950,9 @@
           "val"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "конфиденциально",
@@ -999,9 +1002,9 @@
         "target_equipment",
         "updated_at"
       ],
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "внутреннее",
@@ -1158,9 +1161,9 @@
           "what"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "конфиденциально",
@@ -1205,9 +1208,9 @@
           "usd_lo"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "внутреннее",
@@ -1215,9 +1218,11 @@
       },
       "referenced_by": [
         "gpu/tools/build_demand.py",
+        "gt/tools/bitrix_tkp.py",
         "gt/tools/build_lot_xlsx.py",
         "gt/tools/build_rfq.py",
         "gt/tools/ship_merge.py",
+        "gt/tools/ship_priced.py",
         "gt/tools/ship_report.py",
         "library/load_parts.py"
       ]
@@ -1238,10 +1243,10 @@
         "key": "suppliers",
         "records": 1978
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "Claude",
+      "last_commit": "73c4e8c",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
         "markers": [
@@ -1304,9 +1309,9 @@
           "val"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "конфиденциально",
@@ -1344,10 +1349,10 @@
           "verdict"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-09",
+      "last_author": "skharkov1246",
+      "last_commit": "2fe20e9",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -1420,9 +1425,9 @@
           "unit"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "внутреннее",
@@ -1485,9 +1490,9 @@
           "val"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "конфиденциально",
@@ -1546,9 +1551,9 @@
           "val"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "конфиденциально",
@@ -1598,10 +1603,10 @@
           "tech"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "Claude",
+      "last_commit": "fe1a0a2",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
         "markers": [
@@ -1678,10 +1683,10 @@
         "key": "assigned",
         "records": 13164
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "Claude",
+      "last_commit": "eab1588",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -1748,10 +1753,10 @@
           "what"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-10",
+      "last_author": "skharkov1246",
+      "last_commit": "cf69989",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
         "markers": [
@@ -1812,9 +1817,9 @@
           "val"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "конфиденциально",
@@ -1853,15 +1858,16 @@
           "why"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
       },
       "referenced_by": [
+        "gt/tools/ship_questions.py",
         "ove/build.py",
         "ove/tools/build_questions.py"
       ]
@@ -1889,10 +1895,10 @@
           "method"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-09",
+      "last_author": "skharkov1246",
+      "last_commit": "2fe20e9",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -1935,10 +1941,10 @@
           "whatsapp"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-09",
+      "last_author": "skharkov1246",
+      "last_commit": "2fe20e9",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
         "markers": [
@@ -1989,10 +1995,10 @@
           "tech"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "Claude",
+      "last_commit": "ff95bd6",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
         "markers": [
@@ -2069,9 +2075,9 @@
         "url",
         "year"
       ],
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "конфиденциально",
@@ -2120,10 +2126,10 @@
           "top_down_usd"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-09",
+      "last_author": "skharkov1246",
+      "last_commit": "2fe20e9",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -2180,9 +2186,9 @@
           "val"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "конфиденциально",
@@ -2219,10 +2225,10 @@
           "title"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "97d8e0c",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -2253,10 +2259,10 @@
           "scope"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-09",
+      "last_author": "skharkov1246",
+      "last_commit": "2fe20e9",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
         "markers": [
@@ -2363,9 +2369,9 @@
           "status"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "конфиденциально",
@@ -2449,10 +2455,10 @@
           "summary"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "Claude",
+      "last_commit": "d630b10",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -2486,10 +2492,10 @@
           "title"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "97d8e0c",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -2610,9 +2616,9 @@
         "key": "checks",
         "records": 238
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "внутреннее",
@@ -2673,10 +2679,10 @@
           "what_they_have"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "Claude",
+      "last_commit": "91b954d",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
         "markers": [
@@ -2751,9 +2757,9 @@
         "relevance",
         "url"
       ],
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "внутреннее",
@@ -2795,9 +2801,9 @@
           "unit"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "конфиденциально",
@@ -2846,10 +2852,10 @@
           "sut"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "9ebf5b2",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -2929,10 +2935,10 @@
           "title"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "97d8e0c",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -2969,10 +2975,10 @@
           "qty"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-09",
+      "last_author": "skharkov1246",
+      "last_commit": "2fe20e9",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
         "markers": [
@@ -3017,9 +3023,9 @@
           "title"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "внутреннее",
@@ -3054,9 +3060,9 @@
           "source"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "конфиденциально",
@@ -3095,9 +3101,9 @@
           "source"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "конфиденциально",
@@ -3137,10 +3143,10 @@
           "title"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "97d8e0c",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -3172,9 +3178,9 @@
           "source"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "конфиденциально",
@@ -3324,7 +3330,7 @@
       },
       "last_change": "2026-09-17",
       "last_author": "skharkov1246",
-      "last_commit": "ef48b4f",
+      "last_commit": "1debb49",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -3354,10 +3360,10 @@
           "scope"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-09",
+      "last_author": "skharkov1246",
+      "last_commit": "2fe20e9",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -3399,9 +3405,9 @@
           "verdict"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "внутреннее",
@@ -3501,9 +3507,9 @@
           "val"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "конфиденциально",
@@ -3576,9 +3582,9 @@
           "name"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "внутреннее",
@@ -3622,9 +3628,9 @@
           "zh"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "внутреннее",
@@ -3669,10 +3675,10 @@
           "source"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "Claude",
+      "last_commit": "e2f716f",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -3703,9 +3709,9 @@
         "source",
         "unit"
       ],
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "конфиденциально",
@@ -3804,10 +3810,10 @@
           "usd_lo"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "a9fad8a",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -3856,9 +3862,9 @@
           "what"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "конфиденциально",
@@ -3944,10 +3950,10 @@
           "with_quote"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-02",
+      "last_author": "Claude",
+      "last_commit": "6449942",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
         "markers": [
@@ -4015,9 +4021,9 @@
         "key": "profiles",
         "records": 162
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "внутреннее",
@@ -4060,9 +4066,9 @@
           "what"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "конфиденциально",
@@ -4095,9 +4101,9 @@
         "summary",
         "test_protocol"
       ],
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "внутреннее",
@@ -4131,9 +4137,9 @@
           "source"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "конфиденциально",
@@ -4178,9 +4184,9 @@
           "why"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "конфиденциально",
@@ -4361,10 +4367,10 @@
           "summary"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-02",
+      "last_author": "Claude",
+      "last_commit": "9b87444",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -4389,9 +4395,9 @@
         "key": "overrides",
         "records": 160
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "внутреннее",
@@ -4477,9 +4483,9 @@
           "what"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "конфиденциально",
@@ -4537,15 +4543,15 @@
       },
       "referenced_by": [
         "gpu/tools/build_demand.py",
+        "gt/tools/bitrix_tkp.py",
         "gt/tools/build_lot_xlsx.py",
         "gt/tools/build_rfq.py",
         "gt/tools/ship_merge.py",
+        "gt/tools/ship_priced.py",
         "gt/tools/ship_report.py",
         "library/load_parts.py",
         "zip/build.py",
-        "zip/tools/build_telsmith_page.py",
-        "zip/tools/parse_demand.py",
-        "zip/tools/telsmith_report.py"
+        "zip/tools/build_telsmith_page.py"
       ]
     },
     {
@@ -4594,9 +4600,9 @@
           "val"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "конфиденциально",
@@ -4633,9 +4639,9 @@
           "where"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "внутреннее",
@@ -4693,9 +4699,9 @@
         ]
       },
       "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_author": "skharkov1246",
+      "last_commit": "8f4b482",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
         "markers": [
@@ -4730,9 +4736,9 @@
           "stats"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "внутреннее",
@@ -4774,9 +4780,9 @@
           "url"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "внутреннее",
@@ -4866,10 +4872,10 @@
           "zamechanie"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "9ebf5b2",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -4894,10 +4900,10 @@
         "key": "parts",
         "records": 750
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "Claude",
+      "last_commit": "73c4e8c",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -4932,10 +4938,10 @@
           "text"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "9ebf5b2",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -4971,10 +4977,10 @@
           "uzel"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "97d8e0c",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -5015,9 +5021,9 @@
           "title"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "внутреннее",
@@ -5061,9 +5067,9 @@
           "why"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "внутреннее",
@@ -5104,10 +5110,10 @@
           "verdict_why"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "b15ad17",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -5140,10 +5146,10 @@
         "title",
         "with_quote"
       ],
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-02",
+      "last_author": "Claude",
+      "last_commit": "6449942",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
         "markers": [
@@ -5178,10 +5184,10 @@
           "text"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "9ebf5b2",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -5212,10 +5218,10 @@
           "v"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "9ebf5b2",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -5271,9 +5277,9 @@
           "val"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "конфиденциально",
@@ -5308,10 +5314,10 @@
           "text"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "9ebf5b2",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -5382,10 +5388,10 @@
           "text"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "9ebf5b2",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -5418,10 +5424,10 @@
           "text"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "9ebf5b2",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -5447,9 +5453,9 @@
         "key": "confirmed",
         "records": 161
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "конфиденциально",
@@ -5490,10 +5496,10 @@
           "text"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "9ebf5b2",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -5525,10 +5531,10 @@
           "text"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "9ebf5b2",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -5556,10 +5562,10 @@
         "key": "trust",
         "records": 3
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "e94cc48",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -5594,10 +5600,10 @@
           "why"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "e94cc48",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -5639,9 +5645,9 @@
           "title"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "внутреннее",
@@ -5649,6 +5655,68 @@
       },
       "referenced_by": [
         "ove/tools/build_disc.py"
+      ]
+    },
+    {
+      "path": "data/catalog_notes.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 55731,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "data/budget_snapshot.json",
+        "data/chain_coverage.json",
+        "data/chat_snapshot.json",
+        "data/import_cost.json",
+        "data/index.json",
+        "dict/",
+        "dict/node_map.json",
+        "gidromet/data/",
+        "gpu/data/bitrix_gpu.json",
+        "gpu/data/coverage.json",
+        "gpu/data/faults.json",
+        "gpu/data/overhaul_qsk60.json",
+        "gt/data/ansaldo.json",
+        "gt/data/bitrix_gt.json",
+        "gt/data/bitrix_tkp_index.json",
+        "gt/data/dossiers.json",
+        "gt/data/faults.json",
+        "gt/data/fx_rates.json",
+        "gt/data/pn_db.json",
+        "gt/data/ship_blocked.json",
+        "gt/data/ship_decoded.json",
+        "gt/data/ship_energoseti.json",
+        "gt/data/ship_lukoil.json",
+        "gt/data/ship_questions.json",
+        "gt/data/ship_recheck.json",
+        "gt/data/ship_rfq_letters.json",
+        "gt/data/ship_sellers.json",
+        "gt/data/ship_sweep.json",
+        "gt/docs/ЗАКУПКА-ЛУКОЙЛ.csv",
+        "gt/docs/ЗАПРОСЫ-ЛУКОЙЛ.csv",
+        "gt/docs/ЛУКОЙЛ-СИМЕНС-SGT-400.pdf",
+        "gt/docs/ЛУКОЙЛ-СОЛАР-TAURUS.pdf",
+        "gt/docs/РАЗВЕДКА-ЦЕН-ЛУКОЙЛ.pdf",
+        "library/data/symptoms.json",
+        "library/docfilter.py",
+        "library/indexer.py",
+        "library/load_parts.py",
+        "library/load_suppliers.py",
+        "library/ocr.py",
+        "library/reparse.py"
+      ],
+      "last_change": "2026-09-17",
+      "last_author": "Claude",
+      "last_commit": "b4dc0dd",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "scripts/build_catalog.py",
+        "tests/test_catalog_guard.py"
       ]
     },
     {
@@ -5670,10 +5738,10 @@
         "key": "bitrix",
         "records": 7
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "Claude",
+      "last_commit": "dc2d3f1",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
         "markers": [
@@ -5703,10 +5771,10 @@
         "key": "contacts",
         "records": 125
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "Claude",
+      "last_commit": "73c4e8c",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
         "markers": [
@@ -5750,9 +5818,9 @@
           "usd_year"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "внутреннее",
@@ -5787,10 +5855,10 @@
           "text"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "9ebf5b2",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -5823,10 +5891,10 @@
           "text"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "9ebf5b2",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -5861,10 +5929,10 @@
         "key": "nahodki",
         "records": 3
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-02",
+      "last_author": "skharkov1246",
+      "last_commit": "b0c4b18",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -5901,9 +5969,9 @@
           "status"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "внутреннее",
@@ -5943,9 +6011,9 @@
           "src"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "внутреннее",
@@ -5978,10 +6046,10 @@
           "text"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "9ebf5b2",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -6014,9 +6082,9 @@
           "system"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "внутреннее",
@@ -6053,10 +6121,10 @@
           "text"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "9ebf5b2",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -6088,10 +6156,10 @@
           "text"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "9ebf5b2",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -6133,9 +6201,9 @@
           "tz"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "внутреннее",
@@ -6168,78 +6236,16 @@
           "text"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "gidromet/build.py"
-      ]
-    },
-    {
-      "path": "data/catalog_notes.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 46727,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "data/budget_snapshot.json",
-        "data/chain_coverage.json",
-        "data/chat_snapshot.json",
-        "data/import_cost.json",
-        "data/index.json",
-        "dict/",
-        "dict/node_map.json",
-        "gidromet/data/",
-        "gpu/data/bitrix_gpu.json",
-        "gpu/data/coverage.json",
-        "gpu/data/faults.json",
-        "gpu/data/overhaul_qsk60.json",
-        "gt/data/ansaldo.json",
-        "gt/data/bitrix_gt.json",
-        "gt/data/dossiers.json",
-        "gt/data/faults.json",
-        "gt/data/fx_rates.json",
-        "gt/data/pn_db.json",
-        "gt/data/ship_blocked.json",
-        "gt/data/ship_energoseti.json",
-        "gt/data/ship_lukoil.json",
-        "gt/data/ship_recheck.json",
-        "gt/data/ship_rfq_letters.json",
-        "gt/data/ship_sellers.json",
-        "gt/data/ship_sweep.json",
-        "gt/docs/ЗАКУПКА-ЛУКОЙЛ.csv",
-        "gt/docs/ЗАПРОСЫ-ЛУКОЙЛ.csv",
-        "library/data/symptoms.json",
-        "library/docfilter.py",
-        "library/indexer.py",
-        "library/load_parts.py",
-        "library/load_suppliers.py",
-        "library/ocr.py",
-        "library/reparse.py",
-        "library/supabase/schema_junk.sql",
-        "ove/data/suppliers.json",
-        "pnw/data/contacts_found.json",
-        "pnw/data/crossrefs.json",
-        "pnw/data/item_master.json",
-        "pnw/data/kv_registry.json"
-      ],
-      "last_change": "2026-09-17",
+      "last_change": "2026-09-01",
       "last_author": "skharkov1246",
-      "last_commit": "9b13495",
+      "last_commit": "9ebf5b2",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
       },
       "referenced_by": [
-        "scripts/build_catalog.py",
-        "tests/test_catalog_guard.py"
+        "gidromet/build.py"
       ]
     },
     {
@@ -6272,9 +6278,9 @@
           "year"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "конфиденциально",
@@ -6316,10 +6322,10 @@
           "title"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "e94cc48",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -6354,10 +6360,10 @@
           "text"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "9ebf5b2",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -6396,9 +6402,9 @@
           "status"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "внутреннее",
@@ -6449,10 +6455,10 @@
           "what"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "e94cc48",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
         "markers": [
@@ -6497,9 +6503,9 @@
           "note"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "внутреннее",
@@ -6533,10 +6539,10 @@
           "text"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "9ebf5b2",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -6568,9 +6574,9 @@
         "key": "fields",
         "records": 53
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "конфиденциально",
@@ -6613,9 +6619,9 @@
           "src"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "внутреннее",
@@ -6648,10 +6654,10 @@
           "text"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "9ebf5b2",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -6684,10 +6690,10 @@
           "text"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "9ebf5b2",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -6722,9 +6728,9 @@
           "title"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "внутреннее",
@@ -6752,9 +6758,9 @@
         "rationale",
         "sources"
       ],
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "внутреннее",
@@ -6840,9 +6846,9 @@
           "title"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "внутреннее",
@@ -6924,10 +6930,10 @@
           "tz"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-03",
+      "last_author": "skharkov1246",
+      "last_commit": "9d0b92c",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -6961,10 +6967,10 @@
           "name"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-03",
+      "last_author": "skharkov1246",
+      "last_commit": "9d0b92c",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -6997,9 +7003,9 @@
         "key": "protection",
         "records": 11
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "внутреннее",
@@ -7037,9 +7043,9 @@
         "verified",
         "years"
       ],
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "конфиденциально",
@@ -7089,9 +7095,9 @@
           "when"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "внутреннее",
@@ -7167,9 +7173,9 @@
           "site"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "внутреннее",
@@ -7207,9 +7213,9 @@
           "waiting"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "конфиденциально",
@@ -7251,10 +7257,10 @@
           "v"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "d7311e6",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -7290,9 +7296,9 @@
         "key": "cde",
         "records": 13
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "внутреннее",
@@ -7324,9 +7330,9 @@
           "title"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "внутреннее",
@@ -7360,10 +7366,10 @@
           "title"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "e94cc48",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -7393,9 +7399,9 @@
         "key": "common_gr",
         "records": 13
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "внутреннее",
@@ -7435,9 +7441,9 @@
           "qty"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "внутреннее",
@@ -7472,9 +7478,9 @@
         "supplier",
         "year"
       ],
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "конфиденциально",
@@ -7518,10 +7524,10 @@
           "removed"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "97d8e0c",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -7555,10 +7561,10 @@
           "why"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "e94cc48",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -7598,9 +7604,9 @@
           "zone"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "внутреннее",
@@ -7682,10 +7688,10 @@
           "name"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "3e32e6d",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -7720,10 +7726,10 @@
           "why"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "e94cc48",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -7767,10 +7773,10 @@
           "status"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "e94cc48",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
         "markers": []
@@ -7801,10 +7807,10 @@
         "key": "item_names",
         "records": 18
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "e94cc48",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
         "markers": []
@@ -7812,6 +7818,45 @@
       "referenced_by": [
         "gpu/build.py",
         "gpu/tools/build_targets.py"
+      ]
+    },
+    {
+      "path": "gt/data/ship_questions.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 16753,
+      "note": "Вопросы к заказчику по заявке ЛУКОЙЛ: 13 позиций на 5 208 штук, по которым запрос цены уйдёт впустую, пока не расшифрована номенклатура. Не производная от данных, а вывод инженера по разбору проверок, поэтому файл ведётся руками. Шесть родов неясности: неизвестна фасовка (DCA4 — не артикул, а семейство: пинта, канистра 1,89 л, ведро 18,9 л, бочка 208 л или вовсе фильтр, разброс по деньгам в двадцать раз); комплекты или штуки (свечи Jenbacher идут банками по 4, 587 комплектов это 2 348 свечей); снятый или несуществующий номер (цепочки 334976 → 389588 → 433894, 201601 → 255377 → 1219674, 263174 → 1219670; номер 265174 не найден ни у одного из семи поставщиков); не определён тип машины (657541 для Type 2/3/4 кабель зажигания, для Type 6 наконечник свечи — разные изделия); не определено исполнение (класс прочности крепежа SGT-400 в номере Ruston не закодирован; размер высокотемпературной стяжки из номера не выводится); наименование расходится с каталогом (4970773 в заявке уплотнительная шайба, у Cummins RING, SPARK PLUG). По каждой строке записано, что уже установлено самостоятельно, чтобы заказчик подтверждал, а не искал заново. Правило: пока строка здесь, она не идёт ни в письма запроса цен, ни в сумму закупки. Читаемая версия — gt/docs/ВОПРОСЫ-ЗАКАЗЧИКУ-ЛУКОЙЛ.pdf, собирается gt/tools/ship_questions.py.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "method",
+        "questions",
+        "rule",
+        "source",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "questions",
+        "records": 13,
+        "record_keys": [
+          "ask",
+          "cost",
+          "kind",
+          "known",
+          "pn",
+          "qty",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-13",
+      "last_author": "Claude",
+      "last_commit": "02ecfc8",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/ship_questions.py"
       ]
     },
     {
@@ -7876,10 +7921,10 @@
           "name"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "e94cc48",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
         "markers": []
@@ -7924,9 +7969,9 @@
           "what"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "конфиденциально",
@@ -7968,9 +8013,9 @@
           "world"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "публикуемо",
@@ -8035,9 +8080,9 @@
         "key": "3",
         "records": 6
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "публикуемо",
@@ -8072,9 +8117,9 @@
           "status"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "публикуемо",
@@ -8106,10 +8151,10 @@
         "key": "target",
         "records": 8
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-08-06",
+      "last_author": "Claude",
+      "last_commit": "a038eb7",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
         "markers": [
@@ -8149,10 +8194,10 @@
           "why"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "e94cc48",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
         "markers": []
@@ -8185,9 +8230,9 @@
           "what"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "публикуемо",
@@ -8230,9 +8275,9 @@
         "key": "site",
         "records": 12
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "конфиденциально",
@@ -8276,10 +8321,10 @@
           "why"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "e94cc48",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
         "markers": []
@@ -8310,9 +8355,9 @@
           "what"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "публикуемо",
@@ -8393,9 +8438,9 @@
           "title"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "публикуемо",
@@ -8429,10 +8474,10 @@
         "key": "questions_to_customer",
         "records": 8
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "e94cc48",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
         "markers": []
@@ -8464,10 +8509,10 @@
           "src"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-03",
+      "last_author": "skharkov1246",
+      "last_commit": "9d0b92c",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
         "markers": []
@@ -8507,10 +8552,10 @@
           "why"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "e94cc48",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
         "markers": []
@@ -8546,10 +8591,10 @@
           "title"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "e94cc48",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
         "markers": []
@@ -8584,9 +8629,9 @@
           "who"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "публикуемо",
@@ -8620,10 +8665,10 @@
           "traps"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "e94cc48",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
         "markers": []
@@ -8651,10 +8696,10 @@
         "key": "how_to_use",
         "records": 4
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "e94cc48",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
         "markers": []
@@ -8686,9 +8731,9 @@
           "title"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "публикуемо",
@@ -8733,9 +8778,9 @@
           "year"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "публикуемо",
@@ -8743,6 +8788,36 @@
       },
       "referenced_by": [
         "ove/build.py"
+      ]
+    },
+    {
+      "path": "gt/data/ship_decoded.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 8947,
+      "note": "Расшифровка номенклатуры Siemens SGT-400 и Solar Turbines по заявке ЛУКОЙЛ: 19 позиций, по которым разбор дал стандарт, изготовителя узла или прямой отказ с причиной. Ведётся руками: это вывод инженера, а не производная от данных. Главное содержание — схема девятизначных номеров Ruston/Alstom (SGT-400 = Cyclone, наследное имя есть в lib_models): разряды кодируют тип изделия, покрытие, диаметр резьбы и длину, и правило сошлось на 85 строках из 85 открытой ведомости SGT-400 на 437 позиций — проверено скриптом. Этим стандартный крепёж заявки переводится из «артикул не опознан» в «заказывается по DIN у любого крепёжного поставщика». ПРЕДУПРЕЖДЕНИЕ, записанное в самом файле: схема НЕ даёт класса прочности, для несущего крепежа турбины его обязан подтвердить чертёж или OEM. Отдельно помечены две позиции, которые стандартом закрывать нельзя: RW21222/4 и RW21223/1 — чертёжные детали камеры сгорания, где товарная легированная сталь класса 12.9 в горячей зоне разупрочняется. По Solar вскрыты изготовители узлов под шильдой OEM (спиральная прокладка → Flexitallic, шнур витон → Global O-Ring, лист CNAF → KLINGERSIL, губчатая лента → LAMATEK) и честно зафиксированы два отказа: 199515-1 и 1062000 не опознаны, потому что Solar не публикует ни материала, ни толщины. Поле conf у каждой строки говорит, чем расшифровка подтверждена — ведомостью или гипотезой. Читается gt/tools/ship_brand.py.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "method",
+        "rows",
+        "source",
+        "updated",
+        "warning"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 19
+      },
+      "last_change": "2026-09-17",
+      "last_author": "Claude",
+      "last_commit": "48fb1e1",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/ship_brand.py"
       ]
     },
     {
@@ -8765,10 +8840,10 @@
         "key": "rules",
         "records": 4
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "e94cc48",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
         "markers": []
@@ -8805,10 +8880,10 @@
           "to"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "e94cc48",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
         "markers": []
@@ -8835,10 +8910,10 @@
         "key": "what_makes_us_expert",
         "records": 4
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "e94cc48",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
         "markers": []
@@ -8872,10 +8947,10 @@
           "what"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "e94cc48",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
         "markers": []
@@ -8911,9 +8986,9 @@
           "start"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "публикуемо",
@@ -8945,9 +9020,9 @@
           "title"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "публикуемо",
@@ -8992,10 +9067,10 @@
           "title"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "e94cc48",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
         "markers": [
@@ -9033,9 +9108,9 @@
           "what"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "конфиденциально",
@@ -9079,9 +9154,9 @@
           "rule"
         ]
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "публикуемо",
@@ -9108,9 +9183,9 @@
         "key": "positions_no_open_price",
         "records": 530
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "публикуемо",
@@ -9139,10 +9214,10 @@
         "key": "eng",
         "records": 4
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "КВАНТ · проверка связи",
+      "last_commit": "66c5527",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
         "markers": [
@@ -9215,10 +9290,10 @@
           "now"
         ]
       },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "97d8e0c",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
         "markers": []
@@ -9245,9 +9320,9 @@
         "key": "hs",
         "records": 3
       },
-      "last_change": "2026-09-11",
+      "last_change": "2026-08-31",
       "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
+      "last_commit": "11f2331",
       "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "публикуемо",
@@ -9267,10 +9342,10 @@
       "shape": "список",
       "records": 54,
       "record_keys": [],
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "6fde732",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
         "markers": []
@@ -9309,9 +9384,11 @@
         "markers": []
       },
       "referenced_by": [
+        "gt/tools/ship_brand.py",
         "gt/tools/ship_export.py",
         "gt/tools/ship_map.py",
         "gt/tools/ship_merge.py",
+        "gt/tools/ship_priced.py",
         "tests/test_ship_fx.py"
       ]
     }
