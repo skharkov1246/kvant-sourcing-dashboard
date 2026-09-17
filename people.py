@@ -64,7 +64,7 @@ DEAL_FIELDS = [KAM_F, KAM_OLD, PROD_F, PROD_OLD, PROD_HEAD]
 DL_CUSTOMER = "ufCrm20_1728900218435"   # дедлайн клиенту на заказе СП-172
 
 DEAL_SELECT = ["ID", "TITLE", "CATEGORY_ID", "STAGE_ID", "STAGE_SEMANTIC_ID", "OPPORTUNITY",
-               "CURRENCY_ID", "DATE_CREATE", "MOVED_TIME", "LAST_ACTIVITY_TIME",
+               "CURRENCY_ID", "DATE_CREATE", "CLOSEDATE", "MOVED_TIME", "LAST_ACTIVITY_TIME",
                "ASSIGNED_BY_ID", "COMPANY_ID"] + DEAL_FIELDS
 
 # --- роль по ДОЛЖНОСТИ (Bitrix WORK_POSITION): проверяется первой, она точнее отдела
@@ -335,6 +335,75 @@ def head_scorecard(block: dict, rows: list[dict]) -> list[dict]:
     return out
 
 
+# Гигиена ведения Bitrix: двенадцать замеров, каждый — предпосылка управленческого
+# вопроса, а не оценка человека. Пока строка красная, соответствующая цифра на портале
+# либо считается с оговоркой, либо не считается вовсе: без руководителя отдела нет
+# цепочки подчинения, без плановой даты нет прогноза, без суммы нет сравнения людей.
+# Порядок строк — порядок работ: сверху то, что чинится за день настройкой, снизу то,
+# что требует регламента и времени людей.
+HYGIENE = {
+    "deptHead":  ("отделов без руководителя (UF_HEAD)", 0, "≤", "шт",
+                  "без него нет цепочки подчинения: отчёт по руководителю и эскалация — вручную"),
+    "deptFired": ("отделов, где руководителем стоит уволенный", 0, "≤", "шт",
+                  "задачи и согласования уходят в никуда"),
+    "deptGhost": ("отделов без единого действующего сотрудника", 0, "≤", "шт",
+                  "узел в структуре есть, отвечать за него некому"),
+    "rootStaff": ("человек сидит прямо в корневом отделе", 0, "≤", "чел",
+                  "у них нет руководителя, кроме владельца компании"),
+    "roleField": ("старых ролевых полей ещё в ходу", 0, "≤", "шт",
+                  "дубли полей «КАМ»/«Product leader» — человек не знает, какое заполнять"),
+    "kamField":  ("сделок КАМов закреплено полем «КАМ»", 90, "≥", "%",
+                  "иначе роль определяется владельцем карточки, а он исполнитель"),
+    "prodField": ("сделок продуктов закреплено полем «Product leader»", 90, "≥", "%",
+                  "то же самое для продуктовых направлений"),
+    "noRole":    ("открытых сделок без коммерсанта вообще", 0, "≤", "шт",
+                  "карточка не попадает ни в чью нагрузку"),
+    "onFired":   ("открытых сделок ведёт уволенный", 0, "≤", "шт",
+                  "работа висит на человеке, которого нет в компании"),
+    "future":    ("открытых сделок с плановой датой в будущем", 80, "≥", "%",
+                  "без неё нет прогноза выручки и просрочки по сделке"),
+    "withAmt":   ("открытых сделок с суммой и клиентом", 90, "≥", "%",
+                  "без них портфель человека несравним"),
+    "alive":     ("открытых сделок с движением за полгода", 95, "≥", "%",
+                  "брошенные карточки раздувают воронку и прогноз"),
+}
+
+
+def hygiene(*, people: dict[str, dict], role_of: dict[str, str], deps: dict[str, str],
+            dept_head: dict[str, str], details: list[dict], kam: dict, prod: dict,
+            orphan: dict, recon: dict, field_use: dict[str, int], close_future: int) -> list[dict]:
+    """Состояние ведения Bitrix в двенадцати числах — то, что чинится настройкой, а не работой.
+
+    Считается по тем же данным, что и вкладки ролей: состав, отделы, открытые сделки
+    (без технических воронок). Каждая строка — факт, предложенная норма и что именно
+    она чинит. Норма здесь про заполнение справочников, а не про результат людей.
+    """
+    live = len(details) or 1
+    active_depts = {d for u, p in people.items() if p.get("active") for d in (p.get("depts") or [])}
+    fact = {
+        "deptHead":  sum(1 for d in deps if not dept_head.get(d)),
+        "deptFired": sum(1 for d, h in dept_head.items() if h and not people.get(h, {}).get("active")),
+        "deptGhost": sum(1 for d in deps if d not in active_depts),
+        "rootStaff": sum(1 for u, p in people.items() if p.get("active") and "1" in (p.get("depts") or [])),
+        "roleField": sum(1 for f in (KAM_OLD, PROD_OLD, PROD_HEAD) if field_use.get(f)),
+        "kamField":  round(kam["totals"]["byField"] / kam["totals"]["open"] * 100) if kam["totals"]["open"] else 0,
+        "prodField": round(prod["totals"]["byField"] / prod["totals"]["open"] * 100) if prod["totals"]["open"] else 0,
+        "noRole":    recon["none"],
+        "onFired":   orphan["n"],
+        "future":    round(close_future / live * 100),
+        "withAmt":   round(sum(1 for d in details if not d["noAmt"] and not d["noComp"]) / live * 100),
+        "alive":     round(sum(1 for d in details if (d["idle"] or 0) <= DEAD_DAYS) / live * 100),
+    }
+    extra = {"onFired": orphan["sum"], "noRole": recon["noneSum"]}
+    out = []
+    for key, (label, norm, op, unit, why) in HYGIENE.items():
+        v = fact[key]
+        out.append({"k": key, "lbl": label, "val": v, "unit": unit, "norm": norm, "op": op,
+                    "why": why, "sum": extra.get(key, ""),
+                    "ok": bool(v <= norm if op == "≤" else v >= norm)})
+    return out
+
+
 def _boss_of(uid: str, person: dict, people: dict[str, dict], dept_head: dict[str, str]) -> str:
     """Непосредственный руководитель человека — из UF_HEAD его отдела. В отличие от
     «руководителя роли», это в портале заполнено почти везде. Если человек сам
@@ -438,6 +507,8 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
     details: list[dict] = []
     uncovered = {"kam": [0, 0.0], "prod": [0, 0.0]}            # сделки без закреплённой роли
     tech = 0
+    field_use: Counter = Counter()     # какие ролевые поля реально заполняют (для гигиены)
+    close_future = 0                   # у скольких открытых плановая дата закрытия в будущем
 
     for d in open_deals:
         cat = str(d.get("CATEGORY_ID") or "0")
@@ -460,6 +531,12 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         owner = str(d.get("ASSIGNED_BY_ID") or "")
         kam_uid, kam_src = attribute(d, "kam")
         prod_uid, prod_src = attribute(d, "prod")
+        for f in DEAL_FIELDS:
+            if _uid(d.get(f)):
+                field_use[f] += 1
+        cd = str(d.get("CLOSEDATE") or "")[:10]
+        if cd > today_iso:
+            close_future += 1
 
         def put(bucket: dict, src: str = "") -> None:
             bucket["open"] += 1
@@ -675,10 +752,14 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         "kam": sum(1 for u, p in people.items() if p["active"] and role_of.get(u) == "kam"),
         "prod": sum(1 for u, p in people.items() if p["active"] and role_of.get(u) == "prod"),
     }
+    hyg = hygiene(people=people, role_of=role_of, deps=deps, dept_head=dept_head,
+                  details=details, kam=kam, prod=prod, orphan=orphan, recon=recon,
+                  field_use=field_use, close_future=close_future)
+
     return {
         "label": f"на {today.strftime('%d.%m.%Y')}",
         "roles": {"kam": kam, "prod": prod},
-        "orphan": orphan, "recon": recon, "staff": staff,
+        "orphan": orphan, "recon": recon, "staff": staff, "hygiene": hyg,
         "deals": details,
         "params": {"stale": STALE_DAYS, "dead": DEAD_DAYS, "mult": OUTLIER_MULT,
                    "medAmt": _money(med_amt), "bigCut": _money(big_cut)},
