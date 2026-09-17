@@ -40,12 +40,46 @@ def _fake_runs(monkeypatch, answers):
     return calls
 
 
-def test_бюджет_времени_растёт_с_размером_страницы(tmp_path, monkeypatch):
+def test_бюджет_времени_растёт_с_размером_но_остаётся_небольшим(tmp_path, monkeypatch):
+    # замер 17.09.2026: 10,4 МБ со всеми вкладками отдают DOM за ~3 с, 14 МБ — за 4,3 с.
+    # Бюджет обязан быть кратным запасом к этому, а не сотнями секунд: длинный бюджет
+    # не приближает результат, он только удлиняет зависание.
     calls = _fake_runs(monkeypatch, lambda p: (PAGE * 40, ""))
     errors, warns = [], []
     vd.check_browser(_page(tmp_path, size_mb=8), errors, warns)
     assert not errors
-    assert calls[0][1] >= 8 * 25          # 25 секунд на мегабайт, не фиксированные 75
+    assert 45 <= calls[0][1] <= 120
+
+
+def test_старый_headless_не_используется(tmp_path, monkeypatch):
+    # --headless=old удалён из Chrome ≥132: rc=1 и пустой stdout за 0,03 с. Пока он
+    # стоял последней «запасной» попыткой, проверка рендера боевой страницы не
+    # выполнялась вовсе — при этом деплой считал её пройденной.
+    modes = []
+    monkeypatch.setattr(vd, "find_chrome", lambda: "/bin/true")
+    monkeypatch.setattr(vd, "_chrome_run",
+                        lambda chrome, path, extra, timeout, headless="--headless=new":
+                        (modes.append(headless), ("", "пусто"))[1])
+    errors, warns = [], []
+    vd.check_browser(_page(tmp_path), errors, warns)
+    assert modes and all(m == "--headless=new" for m in modes)
+
+
+def test_dom_напечатанный_зависшим_браузером_не_выбрасывается(tmp_path, monkeypatch):
+    # Chrome печатает DOM и иногда не завершается (фоновые процессы профиля).
+    # Раньше в этом случае вывод выбрасывался вместе с TimeoutExpired, и проверка
+    # молча превращалась в «браузер ничего не отдал» — так она и не работала с 14.09.
+    import subprocess
+    monkeypatch.setattr(vd, "find_chrome", lambda: "/bin/true")
+
+    def run(cmd, capture_output=True, text=True, timeout=None):
+        raise subprocess.TimeoutExpired(cmd, timeout, output=PAGE * 40, stderr="висит")
+
+    monkeypatch.setattr(subprocess, "run", run)
+    errors, warns = [], []
+    vd.check_browser(_page(tmp_path), errors, warns)
+    assert not errors                                  # DOM получен, рендер проверен
+    assert any("не завершился" in w for w in warns)     # но про зависание сказано вслух
 
 
 def test_если_с_вкладками_не_успели_базовая_проверка_всё_равно_выполняется(tmp_path, monkeypatch):
