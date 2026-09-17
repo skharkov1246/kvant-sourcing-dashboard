@@ -538,6 +538,15 @@ def contacts(slices: dict, org_rows: list) -> dict:
         o["contact_url"] = r.get("url") or ""
         o["contact_verdict"] = r.get("verdict") or ""
         o["contact_note"] = r.get("note") or ""
+        # Часть сайтов живьём закрыта WAF, и адрес снят с архивного снимка. Это
+        # не то же самое, что адрес с живой страницы: снимку бывает больше года,
+        # и письмо может отбиться. Пометка обязана быть видна рядом с адресом,
+        # иначе сорсер посчитает такой адрес проверенным сегодня.
+        o["contact_archived"] = "web.archive.org" in (r.get("url") or "")
+        if o["contact_archived"]:
+            o["contact_src"] = ("снят с архивного снимка страницы — живьём сайт закрыт; "
+                                "перед рассылкой проверить, что адрес ещё жив")
+            stat["адрес из архивного снимка"] += 1
         if r.get("verdict") == "снят":
             o["ask"] = False
             o["ask_off"] = f"канал снят при проверке контактов: {r.get('note') or 'адресата нет'}"
@@ -601,6 +610,37 @@ def orgs(slices: dict) -> list:
             o["ask"] = False
             o["ask_off"] = f"та же организация, что «{best[h][1]['org']}» (один домен {h})"
     return out
+
+
+def dedupe_by_email(org_rows: list) -> int:
+    """Один адрес — одно письмо, даже если брендов под ним несколько.
+
+    Бренд, чей бизнес передан другому владельцу, честно получает адрес нового
+    владельца (Hastings → Baldwin/Parker: у обоих один адрес в Кирни, а архив
+    показывает редирект собственного домена). Но в листе запроса это два письма
+    на один ящик. Сводим по адресу, оставляя строку с бо́льшим доверием: письмо
+    всё равно называет обе номенклатуры. Строки не удаляются.
+
+    Сводится только то, что осталось в листе: у выпавших по другим причинам
+    адрес уже не используется.
+    """
+    seen, n = {}, 0
+    rank = {"high": 2, "med": 1, "low": 0}
+    for o in org_rows:
+        mail = (o.get("email") or "").strip().lower()
+        if not mail or not o.get("ask"):
+            continue
+        prev = seen.get(mail)
+        if prev is None:
+            seen[mail] = o
+            continue
+        weak, strong = sorted((prev, o), key=lambda x: rank.get(x.get("confidence"), 0))
+        seen[mail] = strong
+        weak["ask"] = False
+        weak["dup_of"] = strong["org"]
+        weak["ask_off"] = f"тот же адрес запроса, что у «{strong['org']}» ({mail})"
+        n += 1
+    return n
 
 
 def faults(slices: dict, parts: list) -> list:
@@ -769,6 +809,9 @@ def build() -> dict:
     tnd = sl.get("tenders") or {}
     flt = faults(sl, parts)
     cstat = contacts(sl, org_rows)
+    merged = dedupe_by_email(org_rows)
+    if merged:
+        cstat["сведено по общему адресу"] = merged
 
     # Покрытие: без него непонятно, чем ещё нельзя торговать.
     by_node = Counter(p["node"] or "— не определён" for p in parts)
@@ -855,6 +898,7 @@ def build() -> dict:
             "orgs_ask_no_contact": sum(1 for o in org_rows if o.get("ask")
                                        and not (o.get("email") or "").strip()
                                        and not (o.get("contact_form") or "").strip()),
+            "orgs_ask_archived": sum(1 for o in org_rows if o.get("ask") and o.get("contact_archived")),
             "orgs_ask_off": dict(Counter(o.get("ask_off") for o in org_rows if o.get("ask_off"))),
             "contacts": cstat,
             "prices": len(prices),

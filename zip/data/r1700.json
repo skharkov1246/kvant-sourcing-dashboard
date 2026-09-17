@@ -28807,7 +28807,8 @@
    "contact_lang": "en",
    "contact_url": "https://www.barloworld.mn/",
    "contact_verdict": "подтверждён",
-   "contact_note": "Корень сайта отдаёт 200, но это Next.js-приложение: почты в разметке нет, встроена только форма обратной связи (поля-подсказки на монгольском: \"Овогоо оруулна уу\", \"Утасны дугаараа оруулна уу\", placeholder почты — заглушка \"example@email.com\"). /contact, /en/contact, /mn/holbogdoh — все 404. Прямого адреса у канала нет, запрос уйдёт только формой."
+   "contact_note": "Корень сайта отдаёт 200, но это Next.js-приложение: почты в разметке нет, встроена только форма обратной связи (поля-подсказки на монгольском: \"Овогоо оруулна уу\", \"Утасны дугаараа оруулна уу\", placeholder почты — заглушка \"example@email.com\"). /contact, /en/contact, /mn/holbogdoh — все 404. Прямого адреса у канала нет, запрос уйдёт только формой.",
+   "contact_archived": false
   },
   {
    "org": "Mohamed Abdulrahman Al-Bahar LLC",
@@ -28914,7 +28915,7 @@
    "role": "авторизованный дилер Cat по северу и востоку Индии и Бутану; сестринская Gainwell Engineering по лицензии Caterpillar делает подземную технику room-and-pillar и поставляет к ней запчасти",
    "brands": "Caterpillar",
    "site": "https://www.gainwellindia.com/",
-   "email": "",
+   "email": "marketing@gainwellindia.com",
    "phone": "",
    "stock": "более 80 филиалов, площадок и цехов; завод подземной техники на 35 акрах в Панагархе (Западная Бенгалия)",
    "note": "проверено 16.09.2026: статус подтверждён — Gainwell Commosales Pvt Ltd (ранее Tractors India Pvt Ltd) авторизованный дилер Cat по северу и востоку Индии и Бутану, штаб-квартира Колката, 4 территории, свыше 2 000 сотрудников, более 80 филиалов, офисов, мастерских и прокатных точек. Лицензионное соглашение Gainwell Engineering с Caterpillar (февраль 2022) и завод на 35 акрах в Панагархе (Западная Бенгалия, ~500 крор рупий) подтверждены. ОГОВОРКА ПОДТВЕРЖДЕНА, а не снята: лицензия покрывает room-and-pillar — проходческие комбайны, face haulers, крепеустановщики, скипы-скупы, MUV, питатели-дробилки, highwall miners. Подземных ПДМ класса R1700G в перечне лицензии НЕТ, мандата по ним у Gainwell нет. Сайт gainwellindia.com из нашей среды отдаёт 503 (бот-защита), содержание взято по отраслевым первоисточникам.",
@@ -28926,9 +28927,11 @@
    "ask": true,
    "contact_form": "",
    "contact_lang": "en",
-   "contact_url": "https://www.gainwellindia.com/contact-us/",
-   "contact_verdict": "сомнителен",
-   "contact_note": "HTTP 503 на всех попытках: корень, /contact-us и /contact-us/ через curl, и WebFetch тоже 503. Тело ответа 800-810 байт — заглушка WAF. Страница не открылась, адрес не проверен."
+   "contact_url": "https://web.archive.org/web/20260207044118/https://www.gainwellindia.com/contact_us/zonal_headquarters",
+   "contact_verdict": "подтверждён",
+   "contact_note": "Дословно со страницы «Zonal Headquarters» собственного сайта: \"Greater Noida Unnati Gainwell Commosales Private Limited 1-C/1 Ecotech II, Udyog Vihar Greater Noida – 201306 Uttar Pradesh Phone: +91 120 6659000 Phone(Parts Store): +91 120 665 9302 E-mail: marketing@gainwellindia.com\". Живой сайт по-прежнему закрыт: 503 (заглушка WAF 800-830 байт) на /contact-us/, /contact_us/zonal_headquarters, /contact_us/area_office — и через WebFetch, и через curl с браузерными заголовками (User-Agent, Accept-Language, Sec-Fetch-*); домен gainwell.co.in не отвечает. Страница открылась только архивным снимком Wayback от 07.02.2026. На той же странице есть персональные ящики сотрудников (имя.фамилия@) — не брал, репозиторий публичный.",
+   "contact_archived": true,
+   "contact_src": "снят с архивного снимка страницы — живьём сайт закрыт; перед рассылкой проверить, что адрес ещё жив"
   },
   {
    "org": "Eltrak S.A. (ELTRAK Group)",
@@ -28952,7 +28955,8 @@
    "contact_lang": "en",
    "contact_url": "https://eltrak.gr/en/",
    "contact_verdict": "подтверждён",
-   "contact_note": "Дословно с англоязычной главной: \"15 Thivaidos str., 14564, Nea Kifisia , Athens, Greece Tel.: +30210 8196800 Fax: +30210 8078214 E-mail: info@eltrak.gr\"."
+   "contact_note": "Дословно с англоязычной главной: \"15 Thivaidos str., 14564, Nea Kifisia , Athens, Greece Tel.: +30210 8196800 Fax: +30210 8078214 E-mail: info@eltrak.gr\".",
+   "contact_archived": false
   },
   {
    "org": "ООО «Восточная Техника» (ВТ), группа Barloworld",
@@ -29052,11 +29056,13 @@
    "slice": "dealers",
    "ru": false,
    "ask": true,
-   "contact_form": "https://www.caterpillar.com/en/support/contact.html",
+   "contact_form": "https://www.caterpillar.com/en/contact.html",
    "contact_lang": "en",
-   "contact_url": "https://www.caterpillar.com/en/support/contact.html",
-   "contact_verdict": "сомнителен",
-   "contact_note": "HTTP 403 через curl на caterpillar.com и cat.com (тело 409-415 байт, блокировка WAF), WebFetch — таймаут 60 с. Страница не открылась, адрес не проверен. Форма указана по адресу, который пробовали, но её содержимое не подтверждено. Практически: производитель по запросам цен работает через дилера, не напрямую."
+   "contact_url": "https://web.archive.org/web/20260101021609/https://www.caterpillar.com/en/contact.html",
+   "contact_verdict": "подтверждён",
+   "contact_note": "Форма найдена дословно: страница озаглавлена \"Caterpillar | Contact Form\", заголовок раздела \"Contact Us\" — открылась архивным снимком Wayback от 01.01.2026, почты на ней нет. Живые страницы по-прежнему закрыты: 403 через curl с браузерными заголовками на caterpillar.com/en/contact/contact-us.html, /en/company/code-of-conduct/office-of-business-practices.html, cat.com/en_US/support/contact-us.html и careers.caterpillar.com (тело 400-470 байт), WebFetch — таймаут 60 с либо 503. Живым открылся только investors.caterpillar.com: дословно \"CATshareservices@cat.com\" и \"CATir@CAT.com\" — это отдел по работе с акционерами, а не канал запроса цен, поэтому в email не ставил. Архивная cat.com/en_US/support/contact-us.html (снимок 14.12.2025) по запчастям и ценам отправляет к дилеру, дословно: \"Caterpillar Inc.'s headquarters is located in Irving, Texas.\" и \"...requests, please contact your Cat dealer.\"",
+   "contact_archived": true,
+   "contact_src": "снят с архивного снимка страницы — живьём сайт закрыт; перед рассылкой проверить, что адрес ещё жив"
   },
   {
    "org": "ООО «ПСК-Новые решения» / Balchug Capital (Давид Амарян)",
@@ -29097,11 +29103,13 @@
    "ru": false,
    "ask": false,
    "ask_off": "магазин Caterpillar с заказом из личного кабинета, не адресат запроса цен",
-   "contact_form": "",
+   "contact_form": "https://parts.cat.com/en/catcorp/contact-us",
    "contact_lang": "en",
-   "contact_url": "https://parts.cat.com/",
+   "contact_url": "https://web.archive.org/web/20190916165620/https://parts.cat.com/en/catcorp/contact-us",
    "contact_verdict": "сомнителен",
-   "contact_note": "HTTP 403 через curl. Страница не открылась. По назначению это интернет-магазин с заказом из личного кабинета дилера, а не адресат письма с запросом цены — почты у канала не предполагается."
+   "contact_note": "Живая страница не открылась: 403 через curl с браузерными заголовками на /en/catcorp/contact-us, WebFetch — 503. В архиве Wayback единственный снимок — 16.09.2019; на нём страница формы озаглавлена дословно \"Contact Us for Cat® Parts Store\", почты нет. Свежих снимков нет: запросы на 2023, 2024, 2025 и 2026 год отдают тот же снимок 2019 года, поэтому нынешнее состояние формы не подтверждено. По назначению это интернет-магазин с заказом из личного кабинета дилера, а не адресат письма с запросом цены — почты у канала не предполагается.",
+   "contact_archived": true,
+   "contact_src": "снят с архивного снимка страницы — живьём сайт закрыт; перед рассылкой проверить, что адрес ещё жив"
   },
   {
    "org": "Cat® SIS 2.0 / SIS2GO (sis2.cat.com)",
@@ -29126,7 +29134,8 @@
    "contact_lang": "en",
    "contact_url": "https://sis2.cat.com/",
    "contact_verdict": "подтверждён",
-   "contact_note": "Страница открылась (200), почтовых адресов в разметке нет вообще. Это портал подписки на техническую документацию со входом в личный кабинет, ни адреса, ни формы коммерческого запроса на нём нет. Для листа запроса цен канал непригоден — убрать."
+   "contact_note": "Страница открылась (200), почтовых адресов в разметке нет вообще. Это портал подписки на техническую документацию со входом в личный кабинет, ни адреса, ни формы коммерческого запроса на нём нет. Для листа запроса цен канал непригоден — убрать.",
+   "contact_archived": false
   },
   {
    "org": "АО «ВЭД Агент» (ИНН 5404454954, ОГРН 1125476021483)",
@@ -29364,7 +29373,8 @@
    "contact_lang": "en",
    "contact_url": "https://alburhanspares.com/contact-us/",
    "contact_verdict": "подтверждён",
-   "contact_note": "Дословно со страницы контактов: \"+971 6 539 0953 +971 56 669 0325 Shop No 2 Hassan Baba Hassan Building Caterpillar Road Industrial Area 3 Sharjah <именной ящик сотрудника — вырезан> sales@alburhanspares.com\". Взят профильный sales@; именные ящики сотрудников на той же странице не выношу — публичный репозиторий."
+   "contact_note": "Дословно со страницы контактов: \"+971 6 539 0953 +971 56 669 0325 Shop No 2 Hassan Baba Hassan Building Caterpillar Road Industrial Area 3 Sharjah <именной ящик сотрудника — вырезан> sales@alburhanspares.com\". Взят профильный sales@; именные ящики сотрудников на той же странице не выношу — публичный репозиторий.",
+   "contact_archived": false
   },
   {
    "org": "AEI Supplies FZE",
@@ -29421,7 +29431,9 @@
    "verdict": "подтверждён",
    "slice": "dealers",
    "ru": false,
-   "ask": true
+   "ask": false,
+   "dup_of": "Stoparts Ltd.",
+   "ask_off": "тот же адрес запроса, что у «Stoparts Ltd.» (info@stoparts.com)"
   },
   {
    "org": "Worthy Parts",
@@ -29464,7 +29476,8 @@
    "contact_lang": "en",
    "contact_url": "https://www.tuoxing.com/contact-us",
    "contact_verdict": "подтверждён",
-   "contact_note": "Страница контактов открылась (200). Почта на ней спрятана обфускацией Cloudflare; после раскрытия это именной ящик сотрудника вида имя.фамилия@tuoxingmachinery.com — по правилу публичного репозитория не выношу. Корпоративного ящика (sales@/info@/export@) на сайте нет. Дословно видимая часть: \"Tel: +86-18561032768 E-mail: [email protected]\". Запрос — формой."
+   "contact_note": "Страница контактов открылась (200). Почта на ней спрятана обфускацией Cloudflare; после раскрытия это именной ящик сотрудника вида имя.фамилия@tuoxingmachinery.com — по правилу публичного репозитория не выношу. Корпоративного ящика (sales@/info@/export@) на сайте нет. Дословно видимая часть: \"Tel: +86-18561032768 E-mail: [email protected]\". Запрос — формой.",
+   "contact_archived": false
   },
   {
    "org": "Snabus.ru",
@@ -29508,7 +29521,8 @@
    "contact_lang": "en",
    "contact_url": "https://www.zahidtractor.com/contact/",
    "contact_verdict": "подтверждён",
-   "contact_note": "Дословно со страницы контактов: \"Alternatively, please call our Customer Service Center at (toll free): 800 2444 999 For information on machines, parts, and services please contact: inquiry@zahid.com Head Office Amir Fahad Street P.O Box 8928 Jeddah 21492 Kingdom of Saudi Arabia\". Адрес прямо назван как канал по запчастям."
+   "contact_note": "Дословно со страницы контактов: \"Alternatively, please call our Customer Service Center at (toll free): 800 2444 999 For information on machines, parts, and services please contact: inquiry@zahid.com Head Office Amir Fahad Street P.O Box 8928 Jeddah 21492 Kingdom of Saudi Arabia\". Адрес прямо назван как канал по запчастям.",
+   "contact_archived": false
   },
   {
    "org": "Caterpillar R1700G — статус модели в дилерских каталогах (служебная строка)",
@@ -29533,6 +29547,7 @@
    "contact_url": "",
    "contact_verdict": "снят",
    "contact_note": "Это служебная строка самого досье, а не организация: поля site нет, адресата не существует. Из листа запроса убрать — писать некому.",
+   "contact_archived": false,
    "ask_off": "канал снят при проверке контактов: Это служебная строка самого досье, а не организация: поля site нет, адресата не существует. Из листа запроса убрать — писать некому."
   },
   {
@@ -29543,7 +29558,7 @@
    "role": "производитель-заказчик и дистрибьютор собственного бренда CTP для Caterpillar и Komatsu (собственный завод в Майами только строится)",
    "brands": "CTP, Costex",
    "site": "https://www.costex.com/",
-   "email": "",
+   "email": "sales@costex.com",
    "phone": "",
    "stock": "склады Майами и Даллас; отгрузка в 140 стран; в РФ — через дистрибьюторов (Аймашинери, ЗИПТЕХ-СЕРВИС, 74parts)",
    "note": "Закрывает по узлам R1700G: комплекты капремонта ДВС (3304/3306/3116/C7/C9/C13), фрикционные и тормозные диски, диски ПКП, ремкомплекты гидроцилиндров, РВД и шланги, турбокомпрессоры, подшипники, ремни, режущие элементы. Ровно C11/C15 ACERT в публичном перечне двигателей не заявлен — проверять по номеру. 45 000+ номенклатуры, склад 380 тыс. кв. футов. || ПРОВЕРКА 17.09.2026: Компания реальна и совпадает по цифрам: основана 1980, Doral, 5800 NW 74th Ave, склад 380 тыс. кв. футов, 45 000+ номенклатуры, отгрузка в 140+ стран, комплекты капремонта ровно 3304/3306/3116/C7/C9/C13. БЫЛО «крупнейший в США производитель» — исправлено: по их же сообщению отдельное производственное здание в Майами достраивается только в 2026, до этого CTP — марка на заказном производстве и дистрибуция. C11 (двигатель R1700G) в публичном перечне комплектов по-прежнему нет — подтверждается исходная оговорка.",
@@ -29555,9 +29570,10 @@
    "ask": true,
    "contact_form": "https://www.costex.com/contact-us/",
    "contact_lang": "en",
-   "contact_url": "https://www.costex.com/contact-us/",
-   "contact_verdict": "сомнителен",
-   "contact_note": "HTTP 403 на costex.com, www.costex.com, /contact-us/ и /contact/ через curl (тело ~5,6 КБ — страница блокировки), WebFetch — тоже 403. Страница не открылась, адрес не проверен. Отдельно: сайт ctpparts.com к этой компании не привязан проверкой и корпоративных адресов не содержит — оттуда ничего не брал."
+   "contact_url": "https://carlislecbf.com/support/find-a-distributor/costex-tractor-parts-ctp",
+   "contact_verdict": "подтверждён",
+   "contact_note": "Адрес нашёлся дважды. Живая сторонняя страница дистрибьюторов Carlisle Brake & Friction, дословно: \"Costex Tractor Parts (CTP)\", \"6100 N.W. 77th Court Miami, FL 33166\", \"305-592-9769\", \"sales@costex.com\". Плюс собственная страница контактов архивным снимком Wayback от 03.08.2025, дословно в шапке: \"1 800 321-2451 | 305 592-9769 | GET A QUOTE | sales@costex.com | dallas@costex.com\" — там почты закрыты обфускацией Cloudflare (data-cfemail) и раскрыты из этой же разметки. Живой costex.com по-прежнему 403 на корне, /contact-us/ и /contact/ — curl с браузерными заголовками и WebFetch.",
+   "contact_archived": false
   },
   {
    "org": "Interstate-McBee, LLC",
@@ -29581,7 +29597,8 @@
    "contact_lang": "en",
    "contact_url": "https://interstate-mcbee.com/contact-us/",
    "contact_verdict": "подтверждён",
-   "contact_note": "Страница контактов открылась (200), почтовых адресов на ней нет ни одного — только телефоны: \"Main: 216-881-0015 or 800-321-4234\", региональные продажи (Florida 800-660-6228, Texas 844-836-2841, California 800-522-6163, Nebraska 844-250-2375) и адрес \"Interstate Diesel 4901 Lakeside Ave. Cleveland, OH 44114\". Единственный найденный на сайте ящик стоит на служебной странице при подписи \"Website feedback?\" — это канал замечаний по сайту, а не продаж, в лист не ставлю."
+   "contact_note": "Страница контактов открылась (200), почтовых адресов на ней нет ни одного — только телефоны: \"Main: 216-881-0015 or 800-321-4234\", региональные продажи (Florida 800-660-6228, Texas 844-836-2841, California 800-522-6163, Nebraska 844-250-2375) и адрес \"Interstate Diesel 4901 Lakeside Ave. Cleveland, OH 44114\". Единственный найденный на сайте ящик стоит на служебной странице при подписи \"Website feedback?\" — это канал замечаний по сайту, а не продаж, в лист не ставлю.",
+   "contact_archived": false
   },
   {
    "org": "IPD (Industrial Parts Depot, LLC)",
@@ -29605,7 +29622,8 @@
    "contact_lang": "en",
    "contact_url": "https://www.ipdparts.com/applications/caterpillar/",
    "contact_verdict": "подтверждён",
-   "contact_note": "Адрес в машиночитаемой разметке организации на странице раздела Caterpillar, дословно: \"contactPoint\": [{ \"@type\": \"ContactPoint\", \"contactType\": \"Customer Service\", \"email\": \"sales@ipdparts.com\", \"areaServed\": \"Worldwide\", \"availableLanguage\": [\"English\", \"Spanish\"] }]. Назначение и охват заявлены самой компанией."
+   "contact_note": "Адрес в машиночитаемой разметке организации на странице раздела Caterpillar, дословно: \"contactPoint\": [{ \"@type\": \"ContactPoint\", \"contactType\": \"Customer Service\", \"email\": \"sales@ipdparts.com\", \"areaServed\": \"Worldwide\", \"availableLanguage\": [\"English\", \"Spanish\"] }]. Назначение и охват заявлены самой компанией.",
+   "contact_archived": false
   },
   {
    "org": "PAI Industries, Inc.",
@@ -29629,7 +29647,8 @@
    "contact_lang": "en",
    "contact_url": "https://pai.com/contact-us",
    "contact_verdict": "подтверждён",
-   "contact_note": "paiindustries.com/contact-us отдаёт 301 на pai.com/contact-us; на открывшейся странице (200) почтовых адресов нет. Дословно видны телефоны: \"Phone: 770-822-1000 Fax: 770-822-1421\" и бесплатный 1.800.654.3721; форма запроса — по адресу в поле contact_form."
+   "contact_note": "paiindustries.com/contact-us отдаёт 301 на pai.com/contact-us; на открывшейся странице (200) почтовых адресов нет. Дословно видны телефоны: \"Phone: 770-822-1000 Fax: 770-822-1421\" и бесплатный 1.800.654.3721; форма запроса — по адресу в поле contact_form.",
+   "contact_archived": false
   },
   {
    "org": "Reliance Power Parts (Nivel Heavy Duty)",
@@ -29653,7 +29672,8 @@
    "contact_lang": "en",
    "contact_url": "https://www.reliancepowerparts.com/contact-us",
    "contact_verdict": "подтверждён",
-   "contact_note": "Страница контактов открылась через curl (200, 77 КБ), ни одного почтового адреса в разметке нет — ни текстом, ни в mailto, ни под обфускацией Cloudflare. Связь только формой. (WebFetch по тому же адресу отдавал 503, страницу забрал curl.)"
+   "contact_note": "Страница контактов открылась через curl (200, 77 КБ), ни одного почтового адреса в разметке нет — ни текстом, ни в mailto, ни под обфускацией Cloudflare. Связь только формой. (WebFetch по тому же адресу отдавал 503, страницу забрал curl.)",
+   "contact_archived": false
   },
   {
    "org": "Weir ESCO (ESCO Group LLC)",
@@ -29677,7 +29697,8 @@
    "contact_lang": "en",
    "contact_url": "https://www.global.weir/",
    "contact_verdict": "подтверждён",
-   "contact_note": "Адрес в машиночитаемой разметке организации на корпоративной странице группы, дословно: \"contactPoint\": [ { \"@type\": \"ContactPoint\", \"contactType\": \"Customer Service\", \"telephone\": \"+44-141-637-7111\", \"email\": \"info@global.weir\", \"areaServed\": \"Worldwide\" }. ОГОВОРКА: это общий адрес группы Weir, а не отдела ESCO — сайт esco.weir отдаёт 403 и отдельного адреса ESCO подтвердить не удалось. Письмо придётся адресовать с явным указанием ESCO и модели."
+   "contact_note": "Адрес в машиночитаемой разметке организации на корпоративной странице группы, дословно: \"contactPoint\": [ { \"@type\": \"ContactPoint\", \"contactType\": \"Customer Service\", \"telephone\": \"+44-141-637-7111\", \"email\": \"info@global.weir\", \"areaServed\": \"Worldwide\" }. ОГОВОРКА: это общий адрес группы Weir, а не отдела ESCO — сайт esco.weir отдаёт 403 и отдельного адреса ESCO подтвердить не удалось. Письмо придётся адресовать с явным указанием ESCO и модели.",
+   "contact_archived": false
   },
   {
    "org": "Hensley Industries, Inc. (Komatsu Group)",
@@ -29701,7 +29722,8 @@
    "contact_lang": "en",
    "contact_url": "https://www.hensleyind.com/contact/",
    "contact_verdict": "подтверждён",
-   "contact_note": "Страница контактов открылась (200, 129 КБ). Все найденные на ней адреса — именные ящики региональных менеджеров вида имя.фамилия@hensleyind.com, привязанные к карте территорий (\"tooltipContent\":\"<Имя Фамилия> - <адрес>\"); по правилу публичного репозитория не выношу. Общего корпоративного ящика (sales@/info@) на сайте нет, /contact-us/ и /company/ отдают 404. Запрос — формой."
+   "contact_note": "Страница контактов открылась (200, 129 КБ). Все найденные на ней адреса — именные ящики региональных менеджеров вида имя.фамилия@hensleyind.com, привязанные к карте территорий (\"tooltipContent\":\"<Имя Фамилия> - <адрес>\"); по правилу публичного репозитория не выношу. Общего корпоративного ящика (sales@/info@) на сайте нет, /contact-us/ и /company/ отдают 404. Запрос — формой.",
+   "contact_archived": false
   },
   {
    "org": "Metalogenia S.A. (MTG)",
@@ -29725,7 +29747,8 @@
    "contact_lang": "en",
    "contact_url": "https://mtgcorp.com/en/",
    "contact_verdict": "подтверждён",
-   "contact_note": "Дословно с англоязычной страницы: \"Something went wrong. If the error persists, please contact directly to info@mtgcorp.com\". ОГОВОРКА: адрес взят из служебного текста подсказки конфигуратора, а не из блока «Контакты» — как канал продаж прямо не назван, хотя домен и форма записи корпоративные."
+   "contact_note": "Дословно с англоязычной страницы: \"Something went wrong. If the error persists, please contact directly to info@mtgcorp.com\". ОГОВОРКА: адрес взят из служебного текста подсказки конфигуратора, а не из блока «Контакты» — как канал продаж прямо не назван, хотя домен и форма записи корпоративные.",
+   "contact_archived": false
   },
   {
    "org": "Combi Wear Parts AB",
@@ -29754,7 +29777,7 @@
    "role": "крупнейший в мире поставщик неоригинала для землеройной техники, производство под маркой ITR",
    "brands": "ITR, USCO",
    "site": "https://www.usco.it/en/",
-   "email": "",
+   "email": "info@usco.it",
    "phone": "+39 059 9780111",
    "stock": "заводы Италия/Германия/Испания/США/Бразилия/Китай, склады в ЕС; в РФ официального склада нет",
    "note": "Из 50 000+ позиций для R1700G полезны именно repair parts, а не ходовая: пальцы и втулки шарниров, сальники и ремкомплекты гидроцилиндров, GET, крепёж, элементы рулевого и сочленения. USCO с 1989 начинал именно как специалист по Caterpillar. Ходовая часть (гусеницы) к колёсной ПДМ неприменима. || ПРОВЕРКА 17.09.2026: Подтверждено: USCO начала в 1989 именно с торговли запчастями Caterpillar, производство появилось после поглощения ITR. Номенклатура группы включает repair parts, GET, ковши, демонтажное оборудование — то есть в отличие от Berco и ITM у USCO есть позиции, применимые к КОЛЁСНОЙ машине. 57 распределительных центров, 174 страны. Оговорка про неприменимость гусеничной ходовой верна.",
@@ -29766,9 +29789,10 @@
    "ask": true,
    "contact_form": "",
    "contact_lang": "en",
-   "contact_url": "https://www.usco.it/en/",
-   "contact_verdict": "сомнителен",
-   "contact_note": "Домен живой (usco.it разрешается в 77.89.29.89), но страница не открылась ни одним способом: curl падает с \"curl: (60) SSL certificate problem: unable to get local issuer certificate\" (в том числе с явным CA-бандлом), WebFetch отдаёт HTTP 503. Адрес не проверен."
+   "contact_url": "https://exhibitors.bauma.de/en/exhibitors-and-products/exhibitors-brand-names/exhibitors-brand-names-details/exhibitorDetail/ID/1381011/?cHash=051540dd4142e75afb90501c9f480f8a",
+   "contact_verdict": "подтверждён",
+   "contact_note": "Дословно с живой карточки экспонента bauma (данные подаёт сама компания): \"USCO S.p.A.\", \"Address Via delle Nazioni 65 41122 Modena Italy\", \"Contact Bus. Phone: +39 059 9780272 E-mail: info@usco.it Website: https://www.itrworld.com/\". Собственный usco.it так и не открылся: curl падает на проверке сертификата (\"SSL certificate problem: unable to get local issuer certificate\"), по http — 503, WebFetch — 503 на /en/contacts/, /en/contacts и /contatti/. Живым открылся также itrworld.com/contacts/ — там юридический блок \"USCO SpA Via delle Nazioni, 65 41122 Modena (MO) – Italy tel: +39 059 9780111 VAT nr. : IT01893120368\", но почты на нём нет; на itragri.com/en/contacts/ — info@itragri.com, это другая компания группы.",
+   "contact_archived": false
   },
   {
    "org": "Italtractor ITM S.p.A. (ITM Group)",
@@ -29817,7 +29841,7 @@
    "role": "производитель и дистрибьютор альтернативных запчастей Caterpillar, есть представительства в РФ",
    "brands": "Blumaq",
    "site": "https://www.blumaq.com/",
-   "email": "",
+   "email": "blumaq@blumaq.com",
    "phone": "",
    "stock": "склад 6 000 кв. м, 90 000+ номеров; подтверждён филиал в МОСКВЕ (Blumaq Russia, 90 000+ позиций); Самара и прочие города НЕ подтверждены",
    "note": "Единственный из крупных европейских неоригиналов с заявленным присутствием в РФ. По R1700G закрывает фрикционные диски тормозной системы Caterpillar, уплотнения, детали ДВС, гидравлику, GET. Купил итальянского производителя шасси Campadelli & Trentini, то есть часть номенклатуры — собственное производство, часть — торговля. ISO 9001:2015. || ПРОВЕРКА 17.09.2026: ИСПРАВЛЕНО присутствие в РФ: подтверждается только московский филиал (Blumaq Russia, заявлено 90 000+ позиций на складе). Самара, Краснодар, Ростов-на-Дону, Волгоград, Астрахань, Мин. Воды и Сочи в проверке не подтвердились — список городов был перенесён без источника. Остальное (Ла-Валь-д-Уишо, альтернативные запчасти Cat, фрикционные диски) в силе.",
@@ -29829,9 +29853,10 @@
    "ask": true,
    "contact_form": "",
    "contact_lang": "es",
-   "contact_url": "https://www.blumaq.com/",
-   "contact_verdict": "сомнителен",
-   "contact_note": "Домен живой (blumaq.com разрешается в 213.4.83.172), но страница не открылась: curl падает с \"curl: (60) SSL certificate problem: unable to get local issuer certificate\" (в том числе с явным CA-бандлом), WebFetch отдаёт HTTP 503. Адрес не проверен."
+   "contact_url": "https://exhibitors.bauma.de/en/exhibitors-and-products/exhibitors-brand-names/exhibitors-brand-names-details/exhibitorDetail/ID/1381677/?cHash=48bdc7ac3915ccd62cfa60c4208476fe",
+   "contact_verdict": "подтверждён",
+   "contact_note": "Дословно с живой карточки экспонента bauma (данные подаёт сама компания): \"Address Pol. Ind. Belcaire, Parcela 202 12600 Vall d`Uxo (Castellón) Spain\", \"Contact Bus. Phone: +34 964697212 Fax: +34 964697040 E-mail: blumaq@blumaq.com Website: https://www.blumaq.com\". Собственный blumaq.com не открылся: curl падает на проверке сертификата и по http, WebFetch — 503 на /en/contact/ и /es/contacto/. Отдельно на живом каталоге Empresite (empresite.eleconomista.es/BLUMAQ.html) по BLUMAQ SA указан другой адрес — дословно \"mail@blumaq.com\", телефоны 964697030 и 964697201; в поле взят адрес с карточки экспонента, потому что её заполняет сама компания.",
+   "contact_archived": false
   },
   {
    "org": "Baldwin Filters (подразделение Parker Hannifin)",
@@ -29841,7 +29866,7 @@
    "role": "вертикально интегрированный производитель фильтров для внедорожной техники",
    "brands": "Baldwin",
    "site": "https://www.baldwinfilters.com/",
-   "email": "",
+   "email": "baldwin.info@parker.com",
    "phone": "",
    "stock": "производство Керни (NE) и Янктон (SD); в РФ — через дистрибьюторов фильтров",
    "note": "Закрывает ПОЛНЫЙ фильтровый набор R1700G по официальному кросс-листу Caterpillar: 423-8524 -> BF1397-SP/BF1399SP (сепаратор), 1R-0762 -> BF7753 (топливный), 1R-1808 -> B7299/B7402/B7507 (масляный ДВС), 1R-0722 -> PT83/PT8461 (гидравлика), 6I-2510 -> RS3515 и 132-7167 -> RS3514 (воздушные), 231-0167 -> RS3542 (кабина). ISO 9001 / TS 16949. || ПРОВЕРКА 17.09.2026: ИСТОЧНИК ОКАЗАЛСЯ НЕ ТЕМ. Документ Caterpillar CM20231004 скачан и разобран (4 страницы, 11 841 знак). Его название — «CAT FILTERS. FIND THE RIGHT CAT FILTER TO REPLACE A COMPETITOR. APPLICATION GUIDE», но по содержанию это инструкция по пользованию онлайн-подборщиком Cat плюс таблица «MOVE UP FOR INCREASED FILTER EFFICIENCY» — переход между СОБСТВЕННЫМИ фильтрами Cat (Standard -> Advanced -> Ultra-High Efficiency). В документе НЕТ НИ ОДНОГО названия стороннего бренда (проверено поиском по Baldwin, Donaldson, Fleetguard, WIX, MANN, Luber-finer, Hengst, Sakura, HIFI, Fram, Purolator — ноль совпадений) и НЕТ НИ ОДНОГО из кросс-номеров, приписанных ему в этом срезе (проверено по всем ~50 номерам — ноль совпадений). Утверждение «применимость доказана документом изготовителя оборудования» снято по всем восьми фильтровым строкам. Сами кросс-номера при этом проверены отдельно и в основном верны — источник заменён на перекрёстную сверку каталогов Donaldson/Baldwin/Fleetguard и независимых кросс-баз. По Baldwin подтверждены: BF7753 <-> 1R-0762, B7299 <-> 1R-1808, PT83 <-> 1R-0722, BF1397SP/BF1399SP <-> 423-8524 (номер 4328524 присутствует в списке применимости пары Donaldson P550900), RS3515 <-> 6I-2510. ВАЖНО для оценки независимости источников: Baldwin — подразделение Parker Hannifin, то есть та же корпорация, что и строка Parker в этом же срезе; плюс бизнес Hastings Filters передан Baldwin. Три «независимых» позиции листа — один владелец.",
@@ -29853,9 +29878,10 @@
    "ask": true,
    "contact_form": "",
    "contact_lang": "en",
-   "contact_url": "https://www.baldwinfilters.com/contact-us",
-   "contact_verdict": "сомнителен",
-   "contact_note": "HTTP 403 через curl на корне; /contact-us отдаёт 301 на http://www.baldwinfilters.com/contact-us.html, который через WebFetch тоже 403. Страница не открылась, адрес не проверен."
+   "contact_url": "https://discover.parker.com/WelcomeToPHConnect",
+   "contact_verdict": "подтверждён",
+   "contact_note": "Дословно с живой страницы Parker «Baldwin FilterLink / PHConnect»: \"baldwin.info@parker.com\", \"308.234.1951\", \"800.822.5394\", \"4400 E Highway 30, Kearney, NE, 68847\". Собственный сайт бренда по-прежнему закрыт: 403 на baldwinfilters.com/us/en/contact-us.html и на ph.baldwinfilters.com/baldwin/en/contact-us — curl с браузерными заголовками и WebFetch; архивный снимок своей /us/en/contact-us.html от 09.01.2026 — пустое JS-приложение (\"You need to enable JavaScript to run this app\"), почты в разметке нет.",
+   "contact_archived": false
   },
   {
    "org": "Donaldson Company, Inc.",
@@ -29879,7 +29905,8 @@
    "contact_lang": "en",
    "contact_url": "https://www.donaldson.com/en-us/about-us/contact-us/",
    "contact_verdict": "подтверждён",
-   "contact_note": "Страница контактов открылась (200, 170 КБ), почтовых адресов нет ни одного. Дословно виден только почтовый адрес штаб-квартиры: \"1400 W 94th Street, Bloomington, MN 55431\"; связь — формой по ссылке /en/contact/."
+   "contact_note": "Страница контактов открылась (200, 170 КБ), почтовых адресов нет ни одного. Дословно виден только почтовый адрес штаб-квартиры: \"1400 W 94th Street, Bloomington, MN 55431\"; связь — формой по ссылке /en/contact/.",
+   "contact_archived": false
   },
   {
    "org": "Fleetguard (Atmus Filtration Technologies, ранее Cummins Filtration)",
@@ -29903,7 +29930,8 @@
    "contact_lang": "en",
    "contact_url": "https://www.atmus.com/contact-us",
    "contact_verdict": "подтверждён",
-   "contact_note": "Сайт материнской Atmus открылся (200). Дословно со страницы: \"Fleetguard support: Get support here.\" со ссылкой на https://www.fleetguard.com/getsupport (проверено отдельно — 200). Почтовые адреса на странице есть, но только непрофильные: пресс-служба и отношения с инвесторами (последний — именной ящик руководителя), в лист не ставлю. Корпоративного адреса продаж/поддержки на сайте нет, запрос — формой."
+   "contact_note": "Сайт материнской Atmus открылся (200). Дословно со страницы: \"Fleetguard support: Get support here.\" со ссылкой на https://www.fleetguard.com/getsupport (проверено отдельно — 200). Почтовые адреса на странице есть, но только непрофильные: пресс-служба и отношения с инвесторами (последний — именной ящик руководителя), в лист не ставлю. Корпоративного адреса продаж/поддержки на сайте нет, запрос — формой.",
+   "contact_archived": false
   },
   {
    "org": "WIX Filters",
@@ -29927,7 +29955,8 @@
    "contact_lang": "en",
    "contact_url": "https://www.wixfilters.com/en-us/contact-us.html",
    "contact_verdict": "подтверждён",
-   "contact_note": "Страница контактов открылась (200), почты нет. Дословно: \"1 WIX Way P.O. Box 1967 Gastonia, NC 28054 U.S. Product & Customer Service: 800-949-6698\" и \"Complete the form below, and we will get back to you soon with the information you need.\" Связь — формой."
+   "contact_note": "Страница контактов открылась (200), почты нет. Дословно: \"1 WIX Way P.O. Box 1967 Gastonia, NC 28054 U.S. Product & Customer Service: 800-949-6698\" и \"Complete the form below, and we will get back to you soon with the information you need.\" Связь — формой.",
+   "contact_archived": false
   },
   {
    "org": "MANN+HUMMEL GmbH",
@@ -29951,7 +29980,8 @@
    "contact_lang": "en",
    "contact_url": "https://www.mann-hummel.com/en/contact/",
    "contact_verdict": "подтверждён",
-   "contact_note": "Страница контактов открылась (200, 177 КБ), почтовых адресов нет. Виден только телефон штаб-квартиры \"+49 7141 98-0\" в подвале; сайт направляет на форму по адресу в поле contact_form. Немецкая компания, но англоязычная версия сайта полная — писать можно по-английски."
+   "contact_note": "Страница контактов открылась (200, 177 КБ), почтовых адресов нет. Виден только телефон штаб-квартиры \"+49 7141 98-0\" в подвале; сайт направляет на форму по адресу в поле contact_form. Немецкая компания, но англоязычная версия сайта полная — писать можно по-английски.",
+   "contact_archived": false
   },
   {
    "org": "Luber-finer (Champion Laboratories / First Brands Group)",
@@ -29995,7 +30025,8 @@
    "contact_lang": "en",
    "contact_url": "https://www.hengst.com/en/contact",
    "contact_verdict": "подтверждён",
-   "contact_note": "Страница контактов открылась (200, 675 КБ), корпоративных почтовых адресов в разметке нет — ни текстом, ни в mailto, ни под обфускацией Cloudflare. Единственные совпадения по символу @ — это имена пунктов меню сайта (\"MyAirfiltration.com\", \"Passive oil mist separator Blue.net\"), не адреса. Связь только формой."
+   "contact_note": "Страница контактов открылась (200, 675 КБ), корпоративных почтовых адресов в разметке нет — ни текстом, ни в mailto, ни под обфускацией Cloudflare. Единственные совпадения по символу @ — это имена пунктов меню сайта (\"MyAirfiltration.com\", \"Passive oil mist separator Blue.net\"), не адреса. Связь только формой.",
+   "contact_archived": false
   },
   {
    "org": "SAKURA Filter",
@@ -30019,7 +30050,8 @@
    "contact_lang": "en",
    "contact_url": "https://www.sakurafilter.com/contact",
    "contact_verdict": "подтверждён",
-   "contact_note": "Дословно со страницы контактов: \"Sales & Marketing Division Head Office Komplek Industri ADR Desa Kadujaya, Curug Tangerang, Banten INDONESIA Phone : (62-21) 5949 2169 (Hunting) Fax : (62-21) 5949 2168 Email : sales.marketing@adr-group.com\". Ящик отдела, не сотрудника; домен adr-group.com — головная группа ADR, владелец марки Sakura."
+   "contact_note": "Дословно со страницы контактов: \"Sales & Marketing Division Head Office Komplek Industri ADR Desa Kadujaya, Curug Tangerang, Banten INDONESIA Phone : (62-21) 5949 2169 (Hunting) Fax : (62-21) 5949 2168 Email : sales.marketing@adr-group.com\". Ящик отдела, не сотрудника; домен adr-group.com — головная группа ADR, владелец марки Sakura.",
+   "contact_archived": false
   },
   {
    "org": "HIFI FILTER (группа SOFIMA)",
@@ -30043,7 +30075,8 @@
    "contact_lang": "en",
    "contact_url": "https://www.hifi-filter.com/en/contact",
    "contact_verdict": "подтверждён",
-   "contact_note": "Страница контактов открылась (200, 207 КБ), почтовых адресов нет ни одного. Сайт предлагает только форму: в подвале ссылка \"Contactez-nous\" ведёт на ту же форму (французская версия — https://hifi-filter.com/fr/contact/). Связь формой."
+   "contact_note": "Страница контактов открылась (200, 207 КБ), почтовых адресов нет ни одного. Сайт предлагает только форму: в подвале ссылка \"Contactez-nous\" ведёт на ту же форму (французская версия — https://hifi-filter.com/fr/contact/). Связь формой.",
+   "contact_archived": false
   },
   {
    "org": "Parker Hannifin Corporation",
@@ -30053,7 +30086,7 @@
    "role": "производитель рукавов, фитингов и уплотнений, в т.ч. для подземной горной гидравлики",
    "brands": "Parker, GlobalCore, ToughCover, Coalmaster",
    "site": "https://www.parker.com/",
-   "email": "",
+   "email": "cparker@support.parker.com",
    "phone": "",
    "stock": "сеть ParkerStore; в РФ — через локальных сборщиков РВД по лицензии/оснастке",
    "note": "Для R1700G закрывает изготовление РВД взамен оригинальных: серия 387 GlobalCore 3000 psi в размерах -4…-32, покрытие ToughCover (стойкость к истиранию в 80 раз выше стандарта) и SuperTough, плюс шахтная серия Coalmaster — прямо для подземной абразивной среды. Это то место, где неоригинал дешевле и доступнее оригинала без потери класса. || ПРОВЕРКА 17.09.2026: Проверено по частностям, и все совпали: серия 387 GlobalCore — 3 000 psi во всех типоразмерах, исполнение по ISO 18752, покрытия Standard / ToughCover / SuperTough; ToughCover даёт 80-кратную стойкость к истиранию против стандартного покрытия, SuperTough — 450-кратную; шахтная серия Coalmaster существует в исполнениях CM2TC (двухоплёточный), CM4TC и CM6TC (четырёх- и шестиспиральный) прямо для абразивной подземной гидравлики. Уверенность med -> high. Учитывать при торге: Parker владеет Baldwin (строка 13) и принял бизнес Hastings.",
@@ -30065,9 +30098,11 @@
    "ask": true,
    "contact_form": "",
    "contact_lang": "en",
-   "contact_url": "https://www.parker.com/",
-   "contact_verdict": "сомнителен",
-   "contact_note": "HTTP 403 через curl на parker.com и на ph.parker.com/us/en/contact-us; WebFetch по /us/en/support/contact-us.html — тоже 403. Страница не открылась, адрес не проверен."
+   "contact_url": "https://web.archive.org/web/20260115092559/https://help.parker.com/us/en/support",
+   "contact_verdict": "подтверждён",
+   "contact_note": "Дословно из подвала собственной страницы поддержки Parker: \"Americas\", \"USA, Canada, Mexico\", ссылка \"mailto:cparker@support.parker.com\" с подписью \"cparker@support.parker.com\" и телефон \"1-800-272-7537\". Страница открылась архивным снимком Wayback от 15.01.2026. Живые страницы закрыты: 403 на help.parker.com/us/en/support, parker.com/us/en/contact.html, parker.com/ae/en/contact.html, ph.parker.com/us/en/contact-us и ph.parker.com/ae/en/category — curl с браузерными заголовками и WebFetch; архив собственной /us/en/contact.html — пустое JS-приложение. Живыми открылись investors.parker.com (дословно \"phir@parker.com\" — отдел по работе с инвесторами) и discover.parker.com; в email взят адрес клиентской поддержки, а не инвесторский. В каталоге Parker (PDF, 290 стр., HY-катал. цилиндров с открытого зеркала wilson-company.com) из почт только \"mctrain@parker.com\" — учебный отдел, не взят.",
+   "contact_archived": true,
+   "contact_src": "снят с архивного снимка страницы — живьём сайт закрыт; перед рассылкой проверить, что адрес ещё жив"
   },
   {
    "org": "HYDAC International GmbH",
@@ -30077,7 +30112,7 @@
    "role": "производитель фильтроэлементов и гидрокомпонентов, отдельное направление mining",
    "brands": "HYDAC",
    "site": "https://www.hydac.com/en-us/industry-solutions/mining/",
-   "email": "",
+   "email": "info@hydac.com",
    "phone": "",
    "stock": "глобальная сеть; в РФ есть локальные поставщики аналогов элементов HYDAC",
    "note": "Заявляет замены более 70 000 сторонних изделий от 60+ производителей — то есть способен изготовить аналог гидравлического/смазочного элемента Caterpillar по чертежу и посадке. Для R1700G это гидравлика (аналог 1R-0722) и смазочный фильтр 150 мкм (211-3342). Конкретных кросс-номеров против нашего набора не видел — нужна заявка в HYDAC с оригинальным номером. || ПРОВЕРКА 17.09.2026: ИСПРАВЛЕНО существо утверждения. Программа замен у HYDAC реальна и называется BetterFit (catalog.hydac.com, раздел elements-betterfit), но она замещает элементы ДРУГИХ ФИЛЬТРОВЫХ ПРОИЗВОДИТЕЛЕЙ — Pall, Eaton, Parker, Schroeder, Internormen и т. п. Это не то же самое, что изготовление аналога машинного фильтра Caterpillar по чертежу и посадке, как было записано. Ни одного кросса HYDAC против 1R-0722 или 211-3342 не найдено. Направление держать, но как запрос на подбор по посадочным размерам, а не как готовую применимость.",
@@ -30087,11 +30122,12 @@
    "slice": "aftermarket",
    "ru": false,
    "ask": true,
-   "contact_form": "",
+   "contact_form": "https://www.hydac.com/en/contact-form/",
    "contact_lang": "de",
-   "contact_url": "https://www.hydac.com/",
-   "contact_verdict": "сомнителен",
-   "contact_note": "HTTP 403 через curl на hydac.com, /en-us/contact-us.html и hydac.de/kontakt (тело 553 байта — заглушка WAF); WebFetch по /en-us/contact.html — 404. Страница не открылась, адрес не проверен."
+   "contact_url": "https://www.hydac.com/en/imprint/",
+   "contact_verdict": "подтверждён",
+   "contact_note": "Живая страница выходных данных открылась (тот же домен, что раньше отдавал 403 на контактных путях): дословно \"HYDAC International GmbH\", \"Industriestraße, 66280 Sulzbach/Saar, Germany\", \"Phone: +49 6897 509-01\", \"Email: info(at)hydac.com\", \"Commercial Register: HRB 948 (Saarbrücken Local Court)\". На странице адрес записан с обфускацией \"(at)\" — в поле поставлен как info@hydac.com, это та же строка, а не догадка. Живой открылась и форма /en/contact-form/ с заголовком \"How can we help you? Send us your request or feedback quickly and easily using the HYDAC contact form!\". Ранее пробованные /en-us/contact-us.html и hydac.de/kontakt — по-прежнему 403/404; региональный hydac.com.au даёт \"customer.services@hydac.com.au\" (австралийская дочерняя компания, не взят).",
+   "contact_archived": false
   },
   {
    "org": "Trelleborg Sealing Solutions",
@@ -30115,7 +30151,8 @@
    "contact_lang": "en",
    "contact_url": "https://www.trelleborg.com/en/about-us/contact-us",
    "contact_verdict": "подтверждён",
-   "contact_note": "Страница контактов открылась (200, 158 КБ). Все почтовые адреса на ней — именные ящики сотрудников отделов по связям с инвесторами и прессой, записанные в виде \"имя.фамилия(at)trelleborg.com\" (дословный пример подписи: \"Vice President Investor Relations\"); по правилу публичного репозитория не выношу, и к закупке запчастей они всё равно не относятся. Отдельные страницы /en/seals/contact и /en/seals/about-us/contact-us отдают 404. Связь — формой."
+   "contact_note": "Страница контактов открылась (200, 158 КБ). Все почтовые адреса на ней — именные ящики сотрудников отделов по связям с инвесторами и прессой, записанные в виде \"имя.фамилия(at)trelleborg.com\" (дословный пример подписи: \"Vice President Investor Relations\"); по правилу публичного репозитория не выношу, и к закупке запчастей они всё равно не относятся. Отдельные страницы /en/seals/contact и /en/seals/about-us/contact-us отдают 404. Связь — формой.",
+   "contact_archived": false
   },
   {
    "org": "Gates Corporation",
@@ -30125,7 +30162,7 @@
    "role": "производитель рукавов, ремней и шлангов для гидравлики",
    "brands": "Gates, MegaSys",
    "site": "https://www.gates.com/us/en/fluid-power/industrial-hose/mining-hose-and-couplings.html",
-   "email": "",
+   "email": "mena@gates.com",
    "phone": "",
    "stock": "дистрибуция глобальная; в РФ представлены ремни и шланги через автокомпонентные каналы",
    "note": "Назван в задании как поставщик гидравлики. Страница гидравлики Gates при загрузке отдала почти пустой каркас (786 символов текста), поэтому по факту НИЧЕГО конкретного о покрытии R1700G не подтверждено. Строку оставляю как задел: направление верное (РВД, ремни привода вентилятора и компрессора), но требует отдельной проверки по каталогу. || ПРОВЕРКА 17.09.2026: БЫЛО «ничего конкретного не подтверждено, страница отдала пустой каркас» — исправлено: у Gates есть отдельный горный каталог (Mining Products Catalog) и профильная линейка. Подтверждено: спиральные рукава MegaSys EFG3K/EFG4K/EFG5K/EFG6K/G8K, нитриловая внутренняя трубка, 1 000 000 циклов импульсных испытаний, диапазон -40…+250 F; покрытия MegaTuff и XtraTuff Plus (25-кратная стойкость к истиранию); соответствие MSHA 2G по огнестойкости — это прямое требование ПОДЗЕМНОЙ выработки; фитинги в исполнении Caterpillar Style O-Ring Flange. Уверенность low -> med, направление подтверждено фактами, а не предположением.",
@@ -30135,11 +30172,13 @@
    "slice": "aftermarket",
    "ru": false,
    "ask": true,
-   "contact_form": "",
+   "contact_form": "https://www.gates.com/us/en/customer-support/contact-us.html",
    "contact_lang": "en",
-   "contact_url": "https://www.gates.com/",
-   "contact_verdict": "сомнителен",
-   "contact_note": "HTTP 403 через curl. Дословно из тела ответа: \"Attention Required! | Cloudflare ... Sorry, you have been blocked You are unable to access gates.com\". Страница не открылась, адрес не проверен."
+   "contact_url": "https://web.archive.org/web/20251213162008/https://www.gates.com/in/en/where-to-buy/oil-and-gas.html",
+   "contact_verdict": "подтверждён",
+   "contact_note": "Дословно с собственной страницы Gates (архивный снимок Wayback от 13.12.2025): \"Middle East\", \"GATES - MENA REGION CONTACT DETAILS\", \"DUBAI - UAE\", \"Gates Engineering & Services FZCO\", \"Middle East and Africa Region Headquarters\", \"Jebel Ali Free Zone, P. O. Box 61046\", \"Dubai, United Arab Emirates\", \"mena@gates.com / jebelali@gates.com\", \"T: +971 4 886 1414 / 810 4500\" — почты закрыты обфускацией Cloudflare (data-cfemail) и раскрыты из этой же разметки; это региональный штаб по Ближнему Востоку и Африке, откуда идёт экспорт. На собственной странице контактов (снимок 12.01.2026) из почт только \"MakeMyMetal@gates.com\" (отдел металлообработки), по нашему профилю дан лишь телефон, дословно: \"GATES INDUSTRIAL TECHNICAL & ENGINEERING SUPPORT ... Industrial Hose & Industrial Hydraulics (303) 744-5070\", плюс форма \"Get in Touch\" — её URL и стоит в contact_form. Живой gates.com закрыт Cloudflare: 403 на /us/en/customer-support/contact-us.html, /in/en/where-to-buy/oil-and-gas.html и на CDN /content/dam/... (curl с браузерными заголовками и WebFetch), unchain.gates.com — 530; investors.gates.com открылся живым (\"investorrelations@gates.com\" — инвесторский, не взят); gatesindia.com — припаркованный домен, не Gates. Персональный ящик сотрудника с той же страницы не брал.",
+   "contact_archived": true,
+   "contact_src": "снят с архивного снимка страницы — живьём сайт закрыт; перед рассылкой проверить, что адрес ещё жив"
   },
   {
    "org": "Kastaş Sealing Technologies A.Ş.",
@@ -30163,7 +30202,8 @@
    "contact_lang": "en",
    "contact_url": "https://www.kastas.com/contact-us",
    "contact_verdict": "подтверждён",
-   "contact_note": "Адрес спрятан обфускацией Cloudflare, после раскрытия — info@kastas.com. Дословно окружение на странице контактов: \"İdari: Atatürk Plastik OSB 1.Cadde No:6 35660 Menemen / IZMIR / TURKEY T : +90 (232) 397 60 00 F : +90 (232) 502 25 28 E : [email protected]\" — это блок головного офиса в Измире. На той же странице есть europe@kastas.com (дочерняя Kastas Sealing Technologies Europe GmbH, Quickborn, Германия) — запасной вариант, если нужен европейский склад."
+   "contact_note": "Адрес спрятан обфускацией Cloudflare, после раскрытия — info@kastas.com. Дословно окружение на странице контактов: \"İdari: Atatürk Plastik OSB 1.Cadde No:6 35660 Menemen / IZMIR / TURKEY T : +90 (232) 397 60 00 F : +90 (232) 502 25 28 E : [email protected]\" — это блок головного офиса в Измире. На той же странице есть europe@kastas.com (дочерняя Kastas Sealing Technologies Europe GmbH, Quickborn, Германия) — запасной вариант, если нужен европейский склад.",
+   "contact_archived": false
   },
   {
    "org": "Megatech Construction Machinery Spare Parts Ltd. (ранее Yesilova)",
@@ -30220,12 +30260,14 @@
    "verdict": "исправлен",
    "slice": "aftermarket",
    "ru": false,
-   "ask": true,
+   "ask": false,
    "contact_form": "",
    "contact_lang": "tr",
    "contact_url": "https://www.valuepart.com/",
-   "contact_verdict": "сомнителен",
-   "contact_note": "Домен не разрешается из этой сети: DNS отдаёт \"Temporary failure in name resolution\" на valuepart.com и www.valuepart.com, прокси на CONNECT отвечает 502 и по https, и по http. Соседние домены (usco.it, blumaq.com) при этом разрешаются, то есть дело не в самом резолвере. Похоже, что сайт не работает, но подтвердить NXDOMAIN однозначно не удалось — перед снятием канала перепроверить из обычной сети."
+   "contact_verdict": "снят",
+   "contact_note": "Канал снят: организация не находится ни по одному своему домену. valuepart.com и www.valuepart.com не разрешаются в DNS (нет A-записи), как и valuepart.eu, valuepart.net, vpundercarriage.com. Домен valuepartturkey.com живой (по http отдаёт редирект на /en/default.asp, 200), но это сайт другой компании: заголовок \"Megatech\", дословно в подвале \"Yedpa Tic. Merkezi H2, Pasaj 1 No:45 34750 Atasehir, Istanbul, Turkey sales@megatech-tr.com\" и \"© Copyright 2026 by Megatech-tr.com\", про Valuepart или Yesilova на страницах /en/default.asp, ?page=kontak и ?page=hakkimizda ни слова. valuepartinc.com отдаёт 200, но это подменённый домен с индонезийскими статьями про онлайн-казино; vpt.com.tr — страница продажи домена (Turnic Internet Technologies LTD). Адрес Megatech в email не ставил: это другая организация.",
+   "contact_archived": false,
+   "ask_off": "канал снят при проверке контактов: Канал снят: организация не находится ни по одному своему домену. valuepart.com и www.valuepart.com не разрешаются в DNS (нет A-записи), как и valuepart.eu, valuepart.net, vpundercarriage.com. Домен valuepartturkey.com живой (по http отдаёт редирект на /en/default.asp, 200), но это сайт другой компании: заголовок \"Megatech\", дословно в подвале \"Yedpa Tic. Merkezi H2, Pasaj 1 No:45 34750 Atasehir, Istanbul, Turkey sales@megatech-tr.com\" и \"© Copyright 2026 by Megatech-tr.com\", про Valuepart или Yesilova на страницах /en/default.asp, ?page=kontak и ?page=hakkimizda ни слова. valuepartinc.com отдаёт 200, но это подменённый домен с индонезийскими статьями про онлайн-казино; vpt.com.tr — страница продажи домена (Turnic Internet Technologies LTD). Адрес Megatech в email не ставил: это другая организация."
   },
   {
    "org": "Stoparts Ltd.",
@@ -30268,7 +30310,8 @@
    "contact_lang": "en",
    "contact_url": "https://seigomachinery.com/contact-us/",
    "contact_verdict": "подтверждён",
-   "contact_note": "Страница контактов открылась (200). Корпоративного ящика вида sales@/info@ нет: опубликованы только личные ящики сотрудников — один на своём домене по имени, и рядом с ним, дословно в одном блоке \"E-mail ... Whatsapp Number +1 7789982348 +86 13160822969\", ещё два на gmail.com и hotmail.com. Публиковать их в открытом репозитории нельзя, и как корпоративный канал они не годятся. Запрос — формой."
+   "contact_note": "Страница контактов открылась (200). Корпоративного ящика вида sales@/info@ нет: опубликованы только личные ящики сотрудников — один на своём домене по имени, и рядом с ним, дословно в одном блоке \"E-mail ... Whatsapp Number +1 7789982348 +86 13160822969\", ещё два на gmail.com и hotmail.com. Публиковать их в открытом репозитории нельзя, и как корпоративный канал они не годятся. Запрос — формой.",
+   "contact_archived": false
   },
   {
    "org": "Ningbo Sanjin Engineering Machinery Co., Ltd (NBSJ)",
@@ -30292,7 +30335,8 @@
    "contact_lang": "en",
    "contact_url": "https://www.nbsj-get.com/contact-us",
    "contact_verdict": "подтверждён",
-   "contact_note": "Дословно со страницы \"Contact Us\": \"Phone +86-574-82830922 E-mail: eric@nbsj-get.com\". ОГОВОРКА: это единственный адрес, который компания публикует как свой контактный, и он на её собственном домене, но ящик именной (имя без фамилии), не отдела. Если письмо уйдёт в пустоту — дублировать формой по тому же адресу страницы."
+   "contact_note": "Дословно со страницы \"Contact Us\": \"Phone +86-574-82830922 E-mail: eric@nbsj-get.com\". ОГОВОРКА: это единственный адрес, который компания публикует как свой контактный, и он на её собственном домене, но ящик именной (имя без фамилии), не отдела. Если письмо уйдёт в пустоту — дублировать формой по тому же адресу страницы.",
+   "contact_archived": false
   },
   {
    "org": "Jining Kunhang Hydraulic Machinery Co., Ltd.",
@@ -30316,7 +30360,8 @@
    "contact_lang": "en",
    "contact_url": "https://jnkunhang.en.made-in-china.com/contact-info.html",
    "contact_verdict": "подтверждён",
-   "contact_note": "Витрина на made-in-china.com. Страница «Contact Info» открылась (200), прямой почты поставщика на ней нет и по устройству площадки не бывает: контакты закрыты, связь идёт только через форму запроса («Contact Now» / «Send Inquiry») внутри made-in-china.com. Канал рабочий, но письмом с вложением ТЗ им не воспользоваться — нужен аккаунт на площадке."
+   "contact_note": "Витрина на made-in-china.com. Страница «Contact Info» открылась (200), прямой почты поставщика на ней нет и по устройству площадки не бывает: контакты закрыты, связь идёт только через форму запроса («Contact Now» / «Send Inquiry») внутри made-in-china.com. Канал рабочий, но письмом с вложением ТЗ им не воспользоваться — нужен аккаунт на площадке.",
+   "contact_archived": false
   },
   {
    "org": "Jining Haochang Group Co., Ltd.",
@@ -30340,7 +30385,8 @@
    "contact_lang": "en",
    "contact_url": "https://haochanggroup.en.made-in-china.com/contact-info.html",
    "contact_verdict": "подтверждён",
-   "contact_note": "Витрина на made-in-china.com. Страница «Contact Info» открылась (200), прямой почты поставщика на ней нет и по устройству площадки не бывает: контакты закрыты, связь идёт только через форму запроса («Contact Now» / «Send Inquiry») внутри made-in-china.com. Канал рабочий, но письмом с вложением ТЗ им не воспользоваться — нужен аккаунт на площадке."
+   "contact_note": "Витрина на made-in-china.com. Страница «Contact Info» открылась (200), прямой почты поставщика на ней нет и по устройству площадки не бывает: контакты закрыты, связь идёт только через форму запроса («Contact Now» / «Send Inquiry») внутри made-in-china.com. Канал рабочий, но письмом с вложением ТЗ им не воспользоваться — нужен аккаунт на площадке.",
+   "contact_archived": false
   },
   {
    "org": "Quanzhou Fuwei Machinery Co., Ltd",
@@ -30364,7 +30410,8 @@
    "contact_lang": "en",
    "contact_url": "https://fwmach.en.made-in-china.com/contact-info.html",
    "contact_verdict": "подтверждён",
-   "contact_note": "Витрина на made-in-china.com. Страница «Contact Info» открылась (200), прямой почты поставщика на ней нет и по устройству площадки не бывает: контакты закрыты, связь идёт только через форму запроса («Contact Now» / «Send Inquiry») внутри made-in-china.com. Канал рабочий, но письмом с вложением ТЗ им не воспользоваться — нужен аккаунт на площадке."
+   "contact_note": "Витрина на made-in-china.com. Страница «Contact Info» открылась (200), прямой почты поставщика на ней нет и по устройству площадки не бывает: контакты закрыты, связь идёт только через форму запроса («Contact Now» / «Send Inquiry») внутри made-in-china.com. Канал рабочий, но письмом с вложением ТЗ им не воспользоваться — нужен аккаунт на площадке.",
+   "contact_archived": false
   },
   {
    "org": "Hangzhou Henli Friction Material Co., Ltd.",
@@ -30389,6 +30436,7 @@
    "contact_url": "http://www.hzhlmc.com/eindex.asp",
    "contact_verdict": "снят",
    "contact_note": "Домен мёртв: DNS не знает ни www.hzhlmc.com (\"Name or service not known\"), ни hzhlmc.com (\"No address associated with hostname\"). Ни по http, ни по https соединение не устанавливается. Канал убрать из листа запроса.",
+   "contact_archived": false,
    "ask_off": "канал снят при проверке контактов: Домен мёртв: DNS не знает ни www.hzhlmc.com (\"Name or service not known\"), ни hzhlmc.com (\"No address associated with hostname\"). Ни по http, ни по https соединение не устанавливается. Канал убрать из листа запроса."
   },
   {
@@ -30413,7 +30461,8 @@
    "contact_lang": "en",
    "contact_url": "https://www.fricwelauto.com/",
    "contact_verdict": "подтверждён",
-   "contact_note": "Дословно из блока контактов на главной: \"Contact us Xianghu, Xiaoshan, Hangzhou 311203, China. +86-0571- 8239 1193 sales@fricwelauto.com\". Профильный корпоративный ящик продаж на своём домене."
+   "contact_note": "Дословно из блока контактов на главной: \"Contact us Xianghu, Xiaoshan, Hangzhou 311203, China. +86-0571- 8239 1193 sales@fricwelauto.com\". Профильный корпоративный ящик продаж на своём домене.",
+   "contact_archived": false
   },
   {
    "org": "Jiangxi Aili New Material Technology Co., Ltd. (Aili, Ичунь)",
@@ -30437,7 +30486,8 @@
    "contact_lang": "en",
    "contact_url": "https://www.ailiget.com/",
    "contact_verdict": "подтверждён",
-   "contact_note": "Дословно с главной: \"Protector Contact Us E-mail: export@ailicasting.com Phone: +8613677950055\". На странице /contact-us тот же адрес перечислен в блоке \"Email <именной ящик сотрудника — вырезан> export@ailicasting.com sales01@baumaparts.com sales02@baumaparts.com sales03@baumaparts.com\". Взят export@ как профильный на собственном домене; ящики sales01..03@baumaparts.com — вторая торговая марка той же группы, именной ящик сотрудника не выношу."
+   "contact_note": "Дословно с главной: \"Protector Contact Us E-mail: export@ailicasting.com Phone: +8613677950055\". На странице /contact-us тот же адрес перечислен в блоке \"Email <именной ящик сотрудника — вырезан> export@ailicasting.com sales01@baumaparts.com sales02@baumaparts.com sales03@baumaparts.com\". Взят export@ как профильный на собственном домене; ящики sales01..03@baumaparts.com — вторая торговая марка той же группы, именной ящик сотрудника не выношу.",
+   "contact_archived": false
   },
   {
    "org": "ООО «Техно-ГМ»",
@@ -30741,7 +30791,8 @@
    "contact_lang": "ru",
    "contact_url": "https://difa.by/",
    "contact_verdict": "подтверждён",
-   "contact_note": "Адрес виден в шапке главной страницы ссылкой mailto, дословно рядом с переключателем языка: \"sales@difa.by Ru\". Компания белорусская (ru=false в досье), под запрет по российским контрагентам не подпадает."
+   "contact_note": "Адрес виден в шапке главной страницы ссылкой mailto, дословно рядом с переключателем языка: \"sales@difa.by Ru\". Компания белорусская (ru=false в досье), под запрет по российским контрагентам не подпадает.",
+   "contact_archived": false
   },
   {
    "org": "ООО «Реготмас»",
@@ -30868,7 +30919,8 @@
    "contact_lang": "ru",
    "contact_url": "https://minecon.kz/",
    "contact_verdict": "подтверждён",
-   "contact_note": "Сайт открылся (200). Дословно из шапки: \"Пн-Пт 08:00-17:00, Сб-Вс выходной Личный кабинет +7 (700) 727-38-88 +7 (705) 529-00-93 О компании Продукция Доставка Контакты <адрес> Чат Whatsapp\". Единственный опубликованный ящик — именной, вида фамилия.имя@mineconkz.com, в открытый репозиторий не выношу. Корпоративного адреса на сайте нет; страница /contacts отдаёт 404. Остаются телефон, чат и WhatsApp."
+   "contact_note": "Сайт открылся (200). Дословно из шапки: \"Пн-Пт 08:00-17:00, Сб-Вс выходной Личный кабинет +7 (700) 727-38-88 +7 (705) 529-00-93 О компании Продукция Доставка Контакты <адрес> Чат Whatsapp\". Единственный опубликованный ящик — именной, вида фамилия.имя@mineconkz.com, в открытый репозиторий не выношу. Корпоративного адреса на сайте нет; страница /contacts отдаёт 404. Остаются телефон, чат и WhatsApp.",
+   "contact_archived": false
   },
   {
    "org": "Xuzhou MMT Machinery Co., Ltd.",
@@ -30892,7 +30944,8 @@
    "contact_lang": "en",
    "contact_url": "https://mmtcat.en.made-in-china.com/contact-info.html",
    "contact_verdict": "подтверждён",
-   "contact_note": "Витрина на made-in-china.com. Страница «Contact Info» открылась (200), прямой почты поставщика на ней нет и по устройству площадки не бывает: контакты закрыты, связь идёт только через форму запроса («Contact Now» / «Send Inquiry») внутри made-in-china.com. Канал рабочий, но письмом с вложением ТЗ им не воспользоваться — нужен аккаунт на площадке."
+   "contact_note": "Витрина на made-in-china.com. Страница «Contact Info» открылась (200), прямой почты поставщика на ней нет и по устройству площадки не бывает: контакты закрыты, связь идёт только через форму запроса («Contact Now» / «Send Inquiry») внутри made-in-china.com. Канал рабочий, но письмом с вложением ТЗ им не воспользоваться — нужен аккаунт на площадке.",
+   "contact_archived": false
   },
   {
    "org": "Hastings Premium Filters (бизнес передан Baldwin Filters / Parker Hannifin)",
@@ -30902,7 +30955,7 @@
    "role": "американская марка фильтров, закрывающая набор R1700G; самостоятельным поставщиком больше не является",
    "brands": "Hastings",
    "site": "http://catalog.hastingsfilter.com/",
-   "email": "",
+   "email": "baldwin.info@parker.com",
    "phone": "",
    "stock": "отдельной дистрибуции нет: заказ идёт через Baldwin/Parker",
    "note": "ДОБАВЛЕНО ПРОВЕРКОЙ 17.09.2026: закрывает собственный пробел №9 исходного среза («Hastings в срез не вынесен»). Кроссы против нашего набора подтверждены: FF1129 <-> 1R-0762 (топливный), AF2211 <-> 6I-2510 (воздушный). Существует официальный сводный кросс-лист Caterpillar–Hastings–Baldwin–Donaldson, изданный Parker — это, в отличие от CM20231004, действительно документ с марками и номерами, и именно он должен стоять источником у фильтровых строк. ВАЖНО ДЛЯ ЗАКУПКИ: бизнес Hastings перешёл к родственной Baldwin Filters, то есть Hastings не добавляет ни девятого независимого поставщика, ни девятой цены — это ещё одна марка внутри Parker Hannifin.",
@@ -30911,12 +30964,15 @@
    "verdict": "подтверждён",
    "slice": "aftermarket",
    "ru": false,
-   "ask": true,
+   "ask": false,
    "contact_form": "",
    "contact_lang": "en",
-   "contact_url": "http://catalog.hastingsfilter.com/",
-   "contact_verdict": "сомнителен",
-   "contact_note": "catalog.hastingsfilter.com отдаёт HTTP 503 (тело 115 байт), www.hastingsfilter.com — HTTP 403. Страница не открылась, адрес не проверен. Отдельно: по самому досье бизнес марки передан Baldwin Filters / Parker Hannifin, так что канал, скорее всего, отработал своё — проверять его имеет смысл вместе с Baldwin."
+   "contact_url": "https://discover.parker.com/WelcomeToPHConnect",
+   "contact_verdict": "подтверждён",
+   "contact_note": "Оговорка: в email стоит адрес нынешнего владельца бренда, а не собственная почта Hastings. Собственный сайт так и не открылся: www.hastingsfilter.com — 301 с http на https и затем 403 (заглушка WAF), catalog.hastingsfilter.com — 503, hastingsfilters.com/Contacts.html — 503; curl с браузерными заголовками и WebFetch. В архиве Wayback корень hastingsfilter.com уводит редиректом на baldwinfilters.com, а снимок catalog.hastingsfilter.com от 15.01.2022 в подвале даёт дословно \"© 2009 Hastings Premium Filters 4400 East Highway 30 Kearney, NE 68847 Ph: 800-887-8836 Fax: 800-210-6906\" — адрес и телефон есть, почты нет ни на одной странице. Адрес \"baldwin.info@parker.com\" взят дословно с живой страницы Parker «Baldwin FilterLink / PHConnect», там же \"4400 E Highway 30, Kearney, NE, 68847\" — та же площадка в Кирни, куда перешёл бизнес марки.",
+   "contact_archived": false,
+   "dup_of": "Baldwin Filters (подразделение Parker Hannifin)",
+   "ask_off": "тот же адрес запроса, что у «Baldwin Filters (подразделение Parker Hannifin)» (baldwin.info@parker.com)"
   },
   {
    "org": "ООО «Восточная Техника» (Vostochnaya Technica)",
@@ -31005,7 +31061,8 @@
    "contact_lang": "ru",
    "contact_url": "https://www.borusancat.kz/ru/contact/map",
    "contact_verdict": "подтверждён",
-   "contact_note": "Адрес взят с карты локаций дилера, дословно из карточки казахстанского представительства: \"locationTypeText\":\"RegionalRepresentative\",\"city\":\"NUR-SULTAN (ASTANA)\",\"phone\":\"8 800 0800 228\",\"email\":\"info-bmk@borusan.com\". Это общий ящик Borusan Makina Kazakhstan; отдельного адреса у Центра восстановления компонентов на сайте нет, в письме тему ремонта узла надо называть явно."
+   "contact_note": "Адрес взят с карты локаций дилера, дословно из карточки казахстанского представительства: \"locationTypeText\":\"RegionalRepresentative\",\"city\":\"NUR-SULTAN (ASTANA)\",\"phone\":\"8 800 0800 228\",\"email\":\"info-bmk@borusan.com\". Это общий ящик Borusan Makina Kazakhstan; отдельного адреса у Центра восстановления компонентов на сайте нет, в письме тему ремонта узла надо называть явно.",
+   "contact_archived": false
   },
   {
    "org": "Borusan Cat Kyrgyzstan (Borusan Makina)",
@@ -31031,7 +31088,8 @@
    "contact_lang": "ru",
    "contact_url": "https://www.borusancat.kg/ru",
    "contact_verdict": "подтверждён",
-   "contact_note": "Адрес стоит ссылкой mailto в шапке русскоязычной версии сайта: \"info-bmkg@borusan.com\". Подтверждается независимо картой локаций Borusan: \"locationTypeText\":\"RegionalRepresentative\",\"city\":\"Balykchy\",\"phone\":\"+996 228 858 858\",\"email\":\"Info-bmkg@borusan.com\",\"website\":\"borusancat.kg\"."
+   "contact_note": "Адрес стоит ссылкой mailto в шапке русскоязычной версии сайта: \"info-bmkg@borusan.com\". Подтверждается независимо картой локаций Borusan: \"locationTypeText\":\"RegionalRepresentative\",\"city\":\"Balykchy\",\"phone\":\"+996 228 858 858\",\"email\":\"Info-bmkg@borusan.com\",\"website\":\"borusancat.kg\".",
+   "contact_archived": false
   },
   {
    "org": "Barloworld Mongolia LLC",
@@ -31057,7 +31115,8 @@
    "contact_lang": "en",
    "contact_url": "https://www.barloworld.mn/",
    "contact_verdict": "подтверждён",
-   "contact_note": "Дубль канала Barloworld Mongolia в досье, результат тот же: корень сайта 200, почты в разметке нет, /contact и /mn/holbogdoh — 404, на главной только встроенная форма обратной связи с монгольскими подсказками полей. Прямого адреса нет. Перед рассылкой две строки досье стоит свести в одну."
+   "contact_note": "Дубль канала Barloworld Mongolia в досье, результат тот же: корень сайта 200, почты в разметке нет, /contact и /mn/holbogdoh — 404, на главной только встроенная форма обратной связи с монгольскими подсказками полей. Прямого адреса нет. Перед рассылкой две строки досье стоит свести в одну.",
+   "contact_archived": false
   },
   {
    "org": "Wagner Asia Equipment LLC",
@@ -32271,7 +32330,7 @@
    "role": "онлайн-каталог запчастей Caterpillar, Komatsu, Hitachi, Case, Volvo, JCB и др. с запросом ТКП поставщикам",
    "brands": "Caterpillar и ещё ~10 марок",
    "site": "https://777parts.net/caterpillar.html",
-   "email": "",
+   "email": "info@777parts.net",
    "phone": "",
    "stock": "не склад — каталог применимости + функция запроса цены у поставщиков",
    "note": "Главная польза не цена, а ПРИМЕНИМОСТЬ: на карточке детали показан список моделей и узлов, в которые она входит. Именно так проверяется, что позиция с R1600G/R2900 подходит на R1700G — наш случай по родне машины. Есть русская версия ru.777parts.net. Сайт закрыт защитой Cloudflare, через скрипт не читается — работать браузером. ПРОВЕРКА 16.09.2026 (поставщики и исполнители РФ/СНГ): каталог реален и жив: 777parts.net и русская ru.777parts.net отдают карточки Cat с применимостью по моделям, база заявлена более 6 млн позиций. Прямое чтение по-прежнему закрыто Cloudflare (403) — работать браузером, как и записано.",
@@ -32282,11 +32341,13 @@
    "ru": false,
    "ask": false,
    "ask_off": "справочный каталог применяемости, не продавец",
-   "contact_form": "",
+   "contact_form": "https://777parts.net/contact.html",
    "contact_lang": "en",
-   "contact_url": "https://777parts.net/",
-   "contact_verdict": "сомнителен",
-   "contact_note": "HTTP 403 через curl и на корне 777parts.net, и на /caterpillar.html (тело ~5,6 КБ — страница блокировки). Страница не открылась, адрес не проверен. По назначению это справочный каталог применяемости, а не продавец — как адресат запроса цен ценности почти не имеет."
+   "contact_url": "https://web.archive.org/web/20250701115523/https://777parts.net/contact.html",
+   "contact_verdict": "подтверждён",
+   "contact_note": "Дословно с собственной страницы контактов (архивный снимок Wayback от 01.07.2025): \"If you are looking for spare parts, please fill out the following form.\" и \"Questions and suggestions are welcome by email:\" — сам адрес на странице закрыт обфускацией Cloudflare (data-cfemail=\"b8d1d6ded7f88f8f8fc8d9cacccb96d6ddcc\") и раскрыт из этой же разметки: info@777parts.net. На странице есть и форма запроса запчастей (поля Brand, Model, Part No, Part Description, Qty, Condition, Manufacturer). Живой сайт по-прежнему 403 на 777parts.net/contact.html, /about, 777parts.com/contact.html и www.777parts.org/contacts/ — curl с браузерными заголовками и WebFetch. По назначению это справочный каталог применяемости, а не продавец.",
+   "contact_archived": true,
+   "contact_src": "снят с архивного снимка страницы — живьём сайт закрыт; перед рассылкой проверить, что адрес ещё жив"
   },
   {
    "org": "AVSpare.com",
@@ -32296,7 +32357,7 @@
    "role": "онлайн-каталог запчастей (аналог Caterpillar SIS, Case, Kobelco, Hitachi HOP, Volvo Prosis) с поиском по номеру и модели",
    "brands": "Caterpillar, Case, Doosan, JCB, John Deere, Hitachi, Kobelco, Volvo",
    "site": "https://avspare.com/",
-   "email": "",
+   "email": "spare@avspare.com",
    "phone": "",
    "stock": "не склад — каталог с картинками узлов и списком применимости, есть request list",
    "note": "Уже подтверждено на их страницах, что R1700G стоит в общем списке применимости с D6H, D6R, D7H, D7R, D8N, D8R, R1600, R1600G, R1600H, R2900, R2900G, R3000H (пример — 6V8658 ARM AS-WIPER). То есть AVSpare прямо даёт то, чего нам не хватает: сколько родни у каждой позиции. Поиск по номеру работает без регистрации. ПРОВЕРКА 16.09.2026 (поставщики и исполнители РФ/СНГ): ГЛАВНОЕ ПОДТВЕРЖДЕНИЕ НАПРАВЛЕНИЯ: применимость 6V8658 ARM AS-WIPER на R1700G вместе с D6H, D6R, D7H, D7R, D8N, D8R, R1600, R1600G, R1600H, R2900, R2900G, R3000H подтверждена независимо. Механизм «развернуть перечень одной машины на родню» работает. Сам сайт отдаёт 403 роботу — читать браузером.",
@@ -32309,9 +32370,11 @@
    "ask_off": "справочный каталог применяемости, не продавец",
    "contact_form": "",
    "contact_lang": "en",
-   "contact_url": "https://avspare.com/",
-   "contact_verdict": "сомнителен",
-   "contact_note": "HTTP 403 через curl на корне и на /contact/ (тело 556 байт — заглушка). Страница не открылась, адрес не проверен. По назначению — справочный каталог применяемости, не продавец."
+   "contact_url": "https://web.archive.org/web/20251211045119/https://avspare.com/contacts/",
+   "contact_verdict": "подтверждён",
+   "contact_note": "Дословно с собственной страницы контактов (архивный снимок Wayback от 11.12.2025): \"Suppliers: We are open for cooperation with suppliers of spare parts for special machinery. Please send your price in the mail spare@avspare.com Pls send you parts request in body mail, no attached!!!\", \"Parts departament email: spare@avspare.com\", \"AVSpare LTD 141 47th Street Brooklyn, NY, 11232\". Живой сайт по-прежнему закрыт: 403 на avspare.com/contacts/ и корне по https (тело 555-556 байт), 503 по http, WebFetch — 502; avspart.com/contact-us/ — 500. По назначению — справочный каталог применяемости, не продавец.",
+   "contact_archived": true,
+   "contact_src": "снят с архивного снимка страницы — живьём сайт закрыт; перед рассылкой проверить, что адрес ещё жив"
   },
   {
    "org": "EPCATALOGS",
@@ -32336,7 +32399,8 @@
    "contact_lang": "en",
    "contact_url": "https://www.epcatalogs.com/information/contacts/",
    "contact_verdict": "подтверждён",
-   "contact_note": "Страница контактов открылась (200). Почтового адреса на ней нет, дословно: \"Please don't hesitate to contact us for any question: ... Skype instant messaging ... Send E-Mail from our website\" — то есть только форма на сайте и Skype. Отдельно: продают они электронные каталоги и диагностическое ПО, а не запчасти, — для листа запроса цен на детали канал не по адресу."
+   "contact_note": "Страница контактов открылась (200). Почтового адреса на ней нет, дословно: \"Please don't hesitate to contact us for any question: ... Skype instant messaging ... Send E-Mail from our website\" — то есть только форма на сайте и Skype. Отдельно: продают они электронные каталоги и диагностическое ПО, а не запчасти, — для листа запроса цен на детали канал не по адресу.",
+   "contact_archived": false
   },
   {
    "org": "Machineryline",
@@ -32419,7 +32483,8 @@
    "contact_lang": "en",
    "contact_url": "https://www.alibaba.com/countrysearch/CN/caterpillar-spare-parts.html",
    "contact_verdict": "подтверждён",
-   "contact_note": "Страница открылась (200). Прямой почты ни площадки, ни поставщиков на ней нет и по устройству Alibaba не бывает: связь идёт формой «Contact Supplier» / «Request for Quotation» внутри площадки, по каждому объявлению отдельно. Единого адресата у канала не существует — писать письмом нельзя, нужен аккаунт."
+   "contact_note": "Страница открылась (200). Прямой почты ни площадки, ни поставщиков на ней нет и по устройству Alibaba не бывает: связь идёт формой «Contact Supplier» / «Request for Quotation» внутри площадки, по каждому объявлению отдельно. Единого адресата у канала не существует — писать письмом нельзя, нужен аккаунт.",
+   "contact_archived": false
   },
   {
    "org": "Made-in-China.com",
@@ -32443,7 +32508,8 @@
    "contact_lang": "en",
    "contact_url": "https://www.made-in-china.com/products-search/hot-china-products/Caterpillar_Parts.html",
    "contact_verdict": "подтверждён",
-   "contact_note": "Страница открылась (200). Прямой почты нет: единственные совпадения по символу @ в разметке — имена файлов библиотек оформления. Связь с поставщиками — только формой «Contact Now» / «Send Inquiry» внутри площадки, по каждому объявлению отдельно. Единого адресата у канала нет."
+   "contact_note": "Страница открылась (200). Прямой почты нет: единственные совпадения по символу @ в разметке — имена файлов библиотек оформления. Связь с поставщиками — только формой «Contact Now» / «Send Inquiry» внутри площадки, по каждому объявлению отдельно. Единого адресата у канала нет.",
+   "contact_archived": false
   },
   {
    "org": "Bonovo Machinery & Equipment Co., Ltd",
@@ -32467,7 +32533,8 @@
    "contact_lang": "en",
    "contact_url": "https://bonovo-china.en.made-in-china.com/contact-info.html",
    "contact_verdict": "подтверждён",
-   "contact_note": "Витрина на made-in-china.com. Страница «Contact Info» открылась (200), прямой почты поставщика на ней нет и по устройству площадки не бывает: контакты закрыты, связь идёт только через форму запроса («Contact Now» / «Send Inquiry») внутри made-in-china.com. Канал рабочий, но письмом с вложением ТЗ им не воспользоваться — нужен аккаунт на площадке."
+   "contact_note": "Витрина на made-in-china.com. Страница «Contact Info» открылась (200), прямой почты поставщика на ней нет и по устройству площадки не бывает: контакты закрыты, связь идёт только через форму запроса («Contact Now» / «Send Inquiry») внутри made-in-china.com. Канал рабочий, но письмом с вложением ТЗ им не воспользоваться — нужен аккаунт на площадке.",
+   "contact_archived": false
   },
   {
    "org": "Beray Parts (bri-parts.com)",
@@ -32491,7 +32558,8 @@
    "contact_lang": "en",
    "contact_url": "https://www.bri-parts.com/",
    "contact_verdict": "подтверждён",
-   "contact_note": "Дословно из блока контактов на главной: \"No. 255 Tiangao Lane, Yinzhou District 314000, Ningbo, China Amy info@bri-parts.com bri-parts.com\". Ящик корпоративный (info@ на своём домене), хотя рядом и указано имя менеджера."
+   "contact_note": "Дословно из блока контактов на главной: \"No. 255 Tiangao Lane, Yinzhou District 314000, Ningbo, China Amy info@bri-parts.com bri-parts.com\". Ящик корпоративный (info@ на своём домене), хотя рядом и указано имя менеджера.",
+   "contact_archived": false
   },
   {
    "org": "Tuoxing Group",
@@ -32517,7 +32585,8 @@
    "contact_lang": "en",
    "contact_url": "https://www.tuoxing.com/",
    "contact_verdict": "подтверждён",
-   "contact_note": "Та же организация и тот же сайт, что и в строке «Shandong Tuoxing». В подвале главной дословно: \"Contact Us Add: Xizhao Village, Yidao Town, Yantai, Shandong, China Tel: +86-18561032768 E-mail: [email protected]\" — почта скрыта обфускацией Cloudflare, после раскрытия это именной ящик сотрудника (имя.фамилия@tuoxingmachinery.com), в открытый репозиторий не выношу. Корпоративного ящика нет, запрос — формой. Две строки досье стоит свести в одну."
+   "contact_note": "Та же организация и тот же сайт, что и в строке «Shandong Tuoxing». В подвале главной дословно: \"Contact Us Add: Xizhao Village, Yidao Town, Yantai, Shandong, China Tel: +86-18561032768 E-mail: [email protected]\" — почта скрыта обфускацией Cloudflare, после раскрытия это именной ящик сотрудника (имя.фамилия@tuoxingmachinery.com), в открытый репозиторий не выношу. Корпоративного ящика нет, запрос — формой. Две строки досье стоит свести в одну.",
+   "contact_archived": false
   },
   {
    "org": "Tornado Heavy Equipment Parts",
@@ -32581,7 +32650,8 @@
    "contact_lang": "en",
    "contact_url": "https://www.jakparts.com/",
    "contact_verdict": "подтверждён",
-   "contact_note": "Адрес стоит ссылкой на страницах сайта под подписью \"Email\" (скрыт обфускацией Cloudflare, после раскрытия — sales@jakparts.ae); рядом дословно: \"Contact +971 6 552 1700 Email\". Профильный ящик продаж; обратите внимание — домен почты .ae, а сайт .com, это не опечатка."
+   "contact_note": "Адрес стоит ссылкой на страницах сайта под подписью \"Email\" (скрыт обфускацией Cloudflare, после раскрытия — sales@jakparts.ae); рядом дословно: \"Contact +971 6 552 1700 Email\". Профильный ящик продаж; обратите внимание — домен почты .ae, а сайт .com, это не опечатка.",
+   "contact_archived": false
   },
   {
    "org": "Gulf Instruments",
@@ -55019,12 +55089,12 @@
    "how": "Смотреть их маршруты и отправителей: отправитель из Китая или Турции, который возит им, — наш потенциальный адресат напрямую."
   },
   {
-   "step": "Задать иностранным дилерам (27) один вопрос до цены — отгружаете ли в РФ",
+   "step": "Задать иностранным дилерам (26) один вопрос до цены — отгружаете ли в РФ",
    "why": "Прайс без готовности отгружать не стоит ничего, а переписка о ценах занимает недели.",
    "how": "Письмо на английском одним абзацем: модель, серийный номер, перечень, вопрос об отгрузке."
   },
   {
-   "step": "Запустить пробники у 40 иностранных заводов неоригинала",
+   "step": "Запустить пробники у 38 иностранных заводов неоригинала",
    "why": "Без образца и протокола испытаний неоригинал на торгах не проходит техническую часть.",
    "how": "По одной позиции на завод, с приёмкой по нашей карте замеров — как сделано по перфораторам."
   },
@@ -55125,21 +55195,25 @@
    "FR": 1,
    "BY": 6
   },
-  "orgs_ask": 78,
-  "orgs_ask_with_email": 45,
-  "orgs_ask_form_only": 24,
-  "orgs_ask_no_contact": 9,
+  "orgs_ask": 75,
+  "orgs_ask_with_email": 52,
+  "orgs_ask_form_only": 23,
+  "orgs_ask_no_contact": 0,
+  "orgs_ask_archived": 4,
   "orgs_ask_off": {
    "решение владельца: русских не рассматриваем": 91,
    "та же организация, что «Lei Shing Hong Machinery Ltd (LSHM)» (один домен lsh.com)": 1,
    "магазин Caterpillar с заказом из личного кабинета, не адресат запроса цен": 1,
    "портал подписки на документацию, запчасти не продаёт": 1,
    "снят при проверке: строка не подтвердилась": 4,
+   "тот же адрес запроса, что у «Stoparts Ltd.» (info@stoparts.com)": 1,
    "канал снят при проверке контактов: Это служебная строка самого досье, а не организация: поля site нет, адресата не существует. Из листа запроса убрать — писать некому.": 1,
+   "канал снят при проверке контактов: Канал снят: организация не находится ни по одному своему домену. valuepart.com и www.valuepart.com не разрешаются в DNS (нет A-записи), как и valuepart.eu, valuepart.net, vpundercarriage.com. Домен valuepartturkey.com живой (по http отдаёт редирект на /en/default.asp, 200), но это сайт другой компании: заголовок \"Megatech\", дословно в подвале \"Yedpa Tic. Merkezi H2, Pasaj 1 No:45 34750 Atasehir, Istanbul, Turkey sales@megatech-tr.com\" и \"© Copyright 2026 by Megatech-tr.com\", про Valuepart или Yesilova на страницах /en/default.asp, ?page=kontak и ?page=hakkimizda ни слова. valuepartinc.com отдаёт 200, но это подменённый домен с индонезийскими статьями про онлайн-казино; vpt.com.tr — страница продажи домена (Turnic Internet Technologies LTD). Адрес Megatech в email не ставил: это другая организация.": 1,
    "канал снят при проверке контактов: Домен мёртв: DNS не знает ни www.hzhlmc.com (\"Name or service not known\"), ни hzhlmc.com (\"No address associated with hostname\"). Ни по http, ни по https соединение не устанавливается. Канал убрать из листа запроса.": 1,
    "та же организация, что «ООО «Компания ИмПарт» (iMachinery)» (один домен imachinery.ru)": 1,
    "та же организация, что «ООО «Зиптех-Сервис» (ZIPTEH SERVICE)» (один домен zipteh.ru)": 1,
    "та же организация, что ««Механика Сити Партс» (74parts.ru)» (один домен 74parts.ru)": 1,
+   "тот же адрес запроса, что у «Baldwin Filters (подразделение Parker Hannifin)» (baldwin.info@parker.com)": 1,
    "та же организация, что «ООО «Восточная Техника» (ВТ), группа Barloworld» (один домен vost-tech.ru)": 1,
    "та же организация, что «ООО «Цеппелин Русланд» (Zeppelin Russland)» (один домен zeppelin.ru)": 1,
    "та же организация, что «Borusan Makina Kazakhstan LLP (BMGS Kazakhstan, Borusan Cat Казахстан)» (один домен borusancat.kz)": 2,
@@ -55158,9 +55232,11 @@
    "та же организация, что «ТОО «Диггер-Про КЗ» (zemlekop.kz)» (один домен zemlekop.kz)": 1
   },
   "contacts": {
-   "только форма": 28,
-   "почта добавлена": 16,
-   "снято по контактам": 2
+   "только форма": 32,
+   "почта добавлена": 27,
+   "адрес из архивного снимка": 7,
+   "снято по контактам": 3,
+   "сведено по общему адресу": 2
   },
   "prices": 262,
   "faults": 76,

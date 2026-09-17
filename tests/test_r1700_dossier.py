@@ -328,3 +328,49 @@ def test_адрес_не_придумывается_а_мёртвый_канал
     assert by["Мёртвый сайт"]["ask"] is False and "снят" in by["Мёртвый сайт"]["ask_off"]
     assert by["Своя почта уже была"]["email"] == "old@example.com", "свой адрес не перетирается"
     assert stat["почта добавлена"] == 1 and stat["снято по контактам"] == 1
+
+
+def test_один_адрес_не_получает_два_письма():
+    """Корпус придуман. Бренд, чей бизнес передан другому владельцу, честно
+    получает адрес нового владельца — но в листе запроса это два письма на один
+    ящик. Побеждает строка с бо́льшим доверием; письмо всё равно назовёт обе
+    номенклатуры. Строки не удаляются.
+    """
+    dedupe = _load("r1700_dossier").dedupe_by_email
+    rows = [
+        {"org": "Владелец бренда", "email": "sales@example.com", "confidence": "high", "ask": True},
+        {"org": "Переданный бренд", "email": "Sales@Example.com", "confidence": "med", "ask": True},
+        {"org": "Другая контора", "email": "other@example.com", "confidence": "high", "ask": True},
+        {"org": "Уже не в листе", "email": "sales@example.com", "confidence": "high", "ask": False},
+        {"org": "Без адреса", "email": "", "confidence": "low", "ask": True},
+    ]
+    assert dedupe(rows) == 1
+    by = {o["org"]: o for o in rows}
+    assert by["Владелец бренда"]["ask"] is True, "остаётся строка с бо́льшим доверием"
+    assert by["Переданный бренд"]["ask"] is False
+    assert by["Переданный бренд"]["dup_of"] == "Владелец бренда"
+    assert "тот же адрес запроса" in by["Переданный бренд"]["ask_off"]
+    # выпавшую по другой причине строку адрес уже не касается
+    assert by["Уже не в листе"].get("dup_of") is None
+    assert by["Другая контора"]["ask"] is True and by["Без адреса"]["ask"] is True
+
+
+def test_адрес_из_архива_помечен():
+    """Снимку бывает больше года — такой адрес нельзя подавать как проверенный."""
+    mod = _load("r1700_dossier")
+    org_rows = [{"org": "Живая страница", "email": "", "ask": True, "ru": False},
+                {"org": "Только архив", "email": "", "ask": True, "ru": False}]
+    slices = {"contacts": {"rows": [
+        {"org": "Живая страница", "email": "a@example.com",
+         "url": "https://example.com/contact", "verdict": "подтверждён"},
+        {"org": "Только архив", "email": "b@example.com",
+         "url": "https://web.archive.org/web/2025/https://example.org/contact",
+         "verdict": "подтверждён"},
+    ]}}
+    stat = mod.contacts(slices, org_rows)
+    by = {o["org"]: o for o in org_rows}
+    assert by["Живая страница"]["contact_archived"] is False
+    assert by["Живая страница"].get("contact_src") is None
+    assert by["Только архив"]["contact_archived"] is True
+    assert "архивного снимка" in by["Только архив"]["contact_src"]
+    assert stat["адрес из архивного снимка"] == 1

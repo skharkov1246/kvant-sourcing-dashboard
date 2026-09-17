@@ -206,7 +206,8 @@ def build():
                 "org", "site") + "</details>") if rows else ""
 
     # Поля адреса — одни и те же во всех трёх направлениях.
-    CONTACT = [("email", "Почта"), ("contact_form", "Форма запроса"), ("contact_lang", "Язык письма")]
+    CONTACT = [("email", "Почта"), ("contact_form", "Форма запроса"), ("contact_lang", "Язык письма"),
+               ("contact_src", "Оговорка по адресу")]
 
     S.append(("deal", f"Оригинал · {len(dealers)}", f"""
 <h2>Официальные каналы Caterpillar</h2>{pol_note}

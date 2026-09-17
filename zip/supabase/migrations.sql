@@ -437,3 +437,10 @@ alter table mach_channels add column if not exists contact_lang    text;
 alter table mach_channels add column if not exists contact_url     text;
 alter table mach_channels add column if not exists contact_verdict text;
 alter table mach_channels add column if not exists dup_of          text;
+
+-- Адрес, снятый с архивного снимка страницы: живьём сайт под WAF, а почта
+-- взята из копии за прошлый год. Это не то же самое, что адрес с живой
+-- страницы — снимку бывает больше года, и письмо может отбиться. Пометка
+-- обязана лежать рядом с адресом, иначе он выглядит проверенным сегодня.
+alter table mach_channels add column if not exists contact_archived boolean;
+alter table mach_channels add column if not exists contact_src      text;
