@@ -328,6 +328,36 @@ def build() -> str:
             if byd.get(k):
                 a(f"<tr><td class='l'>{E(k)}</td><td class='v'>{ru(byd[k])}</td></tr>")
         a("</table>")
+        # Покрытие заявки файлами — главное число этого раздела. Считается по
+        # артикулам, найденным С ЦЕНОЙ, а не по числу файлов: файл найден — не
+        # значит, что в нём наша позиция.
+        seen = set()
+        for x in invrows:
+            if int(x.get("priced") or 0):
+                seen |= {norm_pn(p) for p in (x.get("pns") or [])}
+        want = {norm_pn(r["pn"]) for r in rows if r.get("pn")}
+        cov = seen & want
+        covrows = [r for r in rows if norm_pn(r["pn"]) in cov]
+        nocov = [r for r in rows if norm_pn(r["pn"]) not in cov]
+        a("<h3>Покрытие заявки файлами из Bitrix</h3>")
+        a("<table class='k'>")
+        a(f"<tr><td class='l'>артикулов заявки найдено в файлах с ценой</td>"
+          f"<td class='v'>{ru(len(cov))}</td>"
+          f"<td class='dim'>из {ru(len(want))}; их экспозиция "
+          f"{ru(sum(map(expo, covrows)))} USD. Это НИЖНЯЯ оценка: опись хранит "
+          f"не больше 400 артикулов на файл, а сам прогон отчитался о 1 133 "
+          f"точных совпадениях</td></tr>")
+        a(f"<tr><td class='l'>строк, которых в файлах Bitrix нет</td>"
+          f"<td class='v'>{ru(len(nocov))}</td>"
+          f"<td class='dim'>экспозиция {ru(sum(map(expo, nocov)))} USD. По ним в "
+          f"системе нет ни выставленной цены, ни входящего КП — только наша "
+          f"разведка</td></tr>")
+        a("</table>")
+        if nocov:
+            a("<p><b>Самые дорогие строки без файла в системе:</b> "
+              + " · ".join(f"{E(r['pn'])} ({ru(expo(r))} USD)"
+                           for r in sorted(nocov, key=lambda r: -expo(r))[:8])
+              + ".</p>")
         a("<div class='do'><b>Почему это важно именно для защиты</b>"
           "<p>157 файлов в полях «Result, ТКП» и «Economics of the project» — "
           "это выставленные заказчику цены и наш расчёт по ним. В товарных "
