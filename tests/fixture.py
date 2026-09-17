@@ -130,12 +130,12 @@ STAGE_META = {"C4:NEW": {"name": "Новая заявка", "sem": "P", "sort": 
 
 
 def deal(did, cat, stage, amt, owner, *, kam=None, prod=None, moved="2026-09-10",
-         company=100, created="2026-03-01", sem="P"):
+         company=100, created="2026-03-01", sem="P", close=""):
     d = {"ID": did, "TITLE": f"Сделка {did}", "CATEGORY_ID": cat, "STAGE_ID": stage,
          "STAGE_SEMANTIC_ID": sem, "OPPORTUNITY": amt, "CURRENCY_ID": "EUR",
          "DATE_CREATE": created + "T10:00:00+03:00", "MOVED_TIME": moved + "T10:00:00+03:00",
          "LAST_ACTIVITY_TIME": moved + "T10:00:00+03:00", "ASSIGNED_BY_ID": owner,
-         "COMPANY_ID": company}
+         "COMPANY_ID": company, "CLOSEDATE": (close + "T10:00:00+03:00") if close else ""}
     if kam:
         d[KAM_F] = str(kam)
     if prod:
@@ -145,11 +145,11 @@ def deal(did, cat, stage, amt, owner, *, kam=None, prod=None, moved="2026-09-10"
 
 OPEN_DEALS = [
     # КАМ стоит полем, а ответственный — сорсер: сделка должна уйти КАМу (1), не сорсеру (3)
-    deal(101, "8", "C8:UC_1", 200_000, owner=3, kam=1),
+    deal(101, "8", "C8:UC_1", 200_000, owner=3, kam=1, close="2026-12-01"),
     # реализация: воронка 0, есть заказ с просроченным дедлайном клиенту
-    deal(102, "0", "0:NEW", 500_000, owner=1, kam=1),
+    deal(102, "0", "0:NEW", 500_000, owner=1, kam=1, close="2026-11-15"),
     # продуктовая сделка полем Product leader
-    deal(103, "4", "C4:NEW", 80_000, owner=3, prod=2),
+    deal(103, "4", "C4:NEW", 80_000, owner=3, prod=2, close="2026-02-01"),
     # ничья: поля пусты, владелец — сорсер (не коммерсант)
     deal(104, "4", "C4:NEW", 40_000, owner=3),
     # владелец-КАМ без поля: атрибуция по владельцу

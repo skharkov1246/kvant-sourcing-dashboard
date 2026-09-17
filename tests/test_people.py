@@ -211,3 +211,39 @@ def test_в_строке_человека_виден_его_руководите
     rows = {p["uid"]: p for p in build()["roles"]["kam"]["people"]}
     assert rows["1"]["boss"] == "руководит группой"     # сама возглавляет группу
     assert rows["4"]["boss"] == "Астахова Вера"         # её руководитель — глава группы
+
+
+# ------------------------------------------------------------------ гигиена ведения
+def test_гигиена_меряет_справочники_а_не_людей():
+    rows = {x["k"]: x for x in build()["hygiene"]}
+    assert set(rows) == set(people_mod.HYGIENE)
+    # в корпусе у двух отделов руководитель не заполнен — строка обязана это показать
+    assert rows["deptHead"]["val"] == 2 and rows["deptHead"]["ok"] is False
+    # а там, где справочник в порядке, строка зелёная
+    assert rows["deptGhost"]["val"] == 0 and rows["deptGhost"]["ok"] is True
+
+
+def test_плановая_дата_считается_только_будущая():
+    """CLOSEDATE в прошлом — автопростановка, а не план: в числитель она не идёт."""
+    rows = {x["k"]: x for x in build()["hygiene"]}
+    # семь живых карточек (техническая воронка исключена), плановая дата в будущем у двух
+    assert rows["future"]["val"] == round(2 / 7 * 100)
+    assert rows["future"]["ok"] is False
+
+
+def test_бесхозные_и_ничьи_сделки_показаны_числом_и_деньгами():
+    r = build()
+    rows = {x["k"]: x for x in r["hygiene"]}
+    assert rows["onFired"]["val"] == r["orphan"]["n"] and rows["onFired"]["sum"] == r["orphan"]["sum"]
+    assert rows["noRole"]["val"] == r["recon"]["none"] and rows["noRole"]["sum"] == r["recon"]["noneSum"]
+
+
+def test_старые_ролевые_поля_считаются_только_когда_их_реально_заполняют():
+    r = build()
+    assert {x["k"]: x for x in r["hygiene"]}["roleField"]["val"] == 0
+    dirty = people_mod.hygiene(
+        people={}, role_of={}, deps={}, dept_head={}, details=[],
+        kam={"totals": {"byField": 0, "open": 0}}, prod={"totals": {"byField": 0, "open": 0}},
+        orphan={"n": 0, "sum": "0"}, recon={"none": 0, "noneSum": "0"},
+        field_use={people_mod.KAM_OLD: 12, people_mod.PROD_HEAD: 3}, close_future=0)
+    assert {x["k"]: x for x in dirty}["roleField"]["val"] == 2
