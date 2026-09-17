@@ -31,13 +31,15 @@ def _json_for_script(obj) -> str:
 
 def render(metrics: dict, insights: dict, *, title: str = DEFAULT_TITLE, company: dict | None = None,
            kam: dict | None = None, eng: dict | None = None, prod: dict | None = None,
-           contracts: dict | None = None, reps: dict | None = None, advisor: dict | None = None) -> str:
+           contracts: dict | None = None, reps: dict | None = None, advisor: dict | None = None,
+           people: dict | None = None) -> str:
     html = TEMPLATE.read_text(encoding="utf-8")
     html = html.replace("__TITLE__", title)
     html = html.replace("__DATA_JSON__", _json_for_script(metrics))
     html = html.replace("__INSIGHTS_JSON__", _json_for_script(insights))
     html = html.replace("__COMPANY_JSON__", _json_for_script(company) if company else "null")
     html = html.replace("__KAM_JSON__", _json_for_script(kam) if kam else "null")
+    html = html.replace("__PEOPLE_JSON__", _json_for_script(people) if people else "null")
     html = html.replace("__ENG_JSON__", _json_for_script(eng) if eng else "null")
     html = html.replace("__PRODUCT_JSON__", _json_for_script(prod) if prod else "null")
     html = html.replace("__CONTRACTS_JSON__", _json_for_script(contracts) if contracts else "null")
@@ -52,9 +54,9 @@ def render(metrics: dict, insights: dict, *, title: str = DEFAULT_TITLE, company
 def write(metrics: dict, insights: dict, out_path: str | Path, *, title: str = DEFAULT_TITLE,
           company: dict | None = None, kam: dict | None = None,
           eng: dict | None = None, prod: dict | None = None, contracts: dict | None = None,
-          reps: dict | None = None, advisor: dict | None = None) -> Path:
+          reps: dict | None = None, advisor: dict | None = None, people: dict | None = None) -> Path:
     out = Path(out_path)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(render(metrics, insights, title=title, company=company, kam=kam, eng=eng, prod=prod,
-                          contracts=contracts, reps=reps, advisor=advisor), encoding="utf-8")
+                          contracts=contracts, reps=reps, advisor=advisor, people=people), encoding="utf-8")
     return out

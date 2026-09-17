@@ -8,6 +8,7 @@ from __future__ import annotations
 import datetime as dt
 import random
 
+import people as people_mod
 import period as period_mod
 import stages as stages_mod
 
@@ -87,3 +88,125 @@ def build_metrics(**kw) -> dict:
     return metrics_mod.build(d["period"], d["rfqs"], d["deal_index"], d["period_deals"],
                              d["dept_a_ids"], d["names"], d["since"],
                              d["deal_stage_names"], d["category_names"])
+
+
+# ------------------------------------------------------------------ коммерсанты
+# Придуманный состав и портфель для вкладок «КАМы»/«Продукт-оунеры». Формы записей
+# повторяют ответы Bitrix (user.get, department.get, crm.deal.list, СП-172), поэтому
+# показатели считает настоящий people.compute, а не подделанный словарь.
+PEOPLE_TODAY = dt.date(2026, 9, 17)
+KAM_F, PROD_F = people_mod.KAM_F, people_mod.PROD_F
+DL = people_mod.DL_CUSTOMER
+
+USERS = [
+    # действующие
+    {"ID": 1, "LAST_NAME": "Астахова", "NAME": "Вера", "ACTIVE": "Y", "UF_DEPARTMENT": [10],
+     "WORK_POSITION": "Key Account Manager, Mining"},
+    {"ID": 2, "LAST_NAME": "Бортник", "NAME": "Илья", "ACTIVE": "Y", "UF_DEPARTMENT": [12],
+     "WORK_POSITION": "Head of compressor department"},
+    {"ID": 3, "LAST_NAME": "Вьюгин", "NAME": "Пётр", "ACTIVE": "Y", "UF_DEPARTMENT": [14],
+     "WORK_POSITION": "Supplier Sourcing Manager"},
+    {"ID": 4, "LAST_NAME": "Гущина", "NAME": "Лада", "ACTIVE": "Y", "UF_DEPARTMENT": [10],
+     "WORK_POSITION": "Project Manager"},        # роль — по отделу (клиентская группа)
+    {"ID": 6, "LAST_NAME": "Ежов", "NAME": "Тарас", "ACTIVE": "Y", "UF_DEPARTMENT": [12],
+     "WORK_POSITION": "Project Manager"},        # продуктовый отдел, сделок нет
+]
+FIRED = [{"ID": 5, "LAST_NAME": "Донцов", "NAME": "Юрий", "ACTIVE": "N", "UF_DEPARTMENT": [10],
+          "WORK_POSITION": "Key Account Manager, Oil and Gas"}]
+DEPTS = [{"ID": 10, "NAME": "Группа по работе с ПАО «Северный синтез»"},
+         {"ID": 12, "NAME": "Группа по компрессорному оборудованию"},
+         {"ID": 14, "NAME": "Отдел поиска поставщиков"}]
+CATS = {"0": "Реализация", "4": "Запросы", "8": "Северный синтез", "22": "Тестовая воронка"}
+STAGE_META = {"C4:NEW": {"name": "Новая заявка", "sem": "P", "sort": 10, "cat": "4"},
+              "C8:UC_1": {"name": "ТКП выдано", "sem": "P", "sort": 20, "cat": "8"},
+              "0:NEW": {"name": "Договор согласуется", "sem": "P", "sort": 10, "cat": "0"},
+              "C22:NEW": {"name": "Новая", "sem": "P", "sort": 10, "cat": "22"}}
+
+
+def deal(did, cat, stage, amt, owner, *, kam=None, prod=None, moved="2026-09-10",
+         company=100, created="2026-03-01", sem="P"):
+    d = {"ID": did, "TITLE": f"Сделка {did}", "CATEGORY_ID": cat, "STAGE_ID": stage,
+         "STAGE_SEMANTIC_ID": sem, "OPPORTUNITY": amt, "CURRENCY_ID": "EUR",
+         "DATE_CREATE": created + "T10:00:00+03:00", "MOVED_TIME": moved + "T10:00:00+03:00",
+         "LAST_ACTIVITY_TIME": moved + "T10:00:00+03:00", "ASSIGNED_BY_ID": owner,
+         "COMPANY_ID": company}
+    if kam:
+        d[KAM_F] = str(kam)
+    if prod:
+        d[PROD_F] = str(prod)
+    return d
+
+
+OPEN_DEALS = [
+    # КАМ стоит полем, а ответственный — сорсер: сделка должна уйти КАМу (1), не сорсеру (3)
+    deal(101, "8", "C8:UC_1", 200_000, owner=3, kam=1),
+    # реализация: воронка 0, есть заказ с просроченным дедлайном клиенту
+    deal(102, "0", "0:NEW", 500_000, owner=1, kam=1),
+    # продуктовая сделка полем Product leader
+    deal(103, "4", "C4:NEW", 80_000, owner=3, prod=2),
+    # ничья: поля пусты, владелец — сорсер (не коммерсант)
+    deal(104, "4", "C4:NEW", 40_000, owner=3),
+    # владелец-КАМ без поля: атрибуция по владельцу
+    deal(105, "8", "C8:UC_1", 70_000, owner=4),
+    # застоявшаяся сделка уволенного: бесхозная
+    deal(106, "8", "C8:UC_1", 90_000, owner=5, moved="2025-01-10"),
+    # техническая воронка — не в счёт
+    deal(107, "22", "C22:NEW", 1_000, owner=1, kam=1),
+    # без суммы и без клиента — косяк гигиены
+    deal(108, "4", "C4:NEW", 0, owner=1, kam=1, company=0),
+]
+# Победа в этом портале — перевод в воронку реализации, а не семантика стадии:
+# 201 помечена «успех», но в реализацию не переводилась и заказов не имеет — не победа;
+# 203 названа номером реализации («912. …») — победа без заказа и без семантики.
+CREATED = OPEN_DEALS + [
+    deal(201, "8", "C8:UC_1", 300_000, owner=1, kam=1, sem="S", created="2026-02-01"),
+    deal(202, "8", "C8:UC_1", 150_000, owner=1, kam=1, sem="F", created="2026-02-10"),
+    dict(deal(203, "8", "C8:UC_1", 220_000, owner=1, kam=1, created="2026-02-20"),
+         TITLE="912. Поставка узла"),
+]
+ORDERS = [
+    {"id": 900, "stageId": "DT172_26:UC_1", "opportunity": 400_000, "currencyId": "EUR",
+     "parentId2": 102, "assignedById": 3, DL: "2026-08-01"},          # просрочен на 47 дней
+    {"id": 901, "stageId": "DT172_26:SUCCESS", "opportunity": 50_000, "currencyId": "EUR",
+     "parentId2": 103, "assignedById": 3, DL: "2026-12-01"},
+    {"id": 902, "stageId": "DT172_26:FAIL", "opportunity": 999_000, "currencyId": "EUR",
+     "parentId2": 104, "assignedById": 3, DL: "2026-01-01"},          # проигранный не считается
+]
+
+
+class PeopleStub:
+    """Минимальный Bitrix: отдаёт придуманный корпус в форме реальных ответов."""
+
+    def list_paged(self, method, params=None):
+        params = params or {}
+        if method == "user.get":
+            only_fired = (params.get("FILTER") or {}).get("ACTIVE") == "N"
+            return FIRED if only_fired else USERS
+        if method == "department.get":
+            return DEPTS
+        return []
+
+    def categories(self):
+        return dict(CATS)
+
+    def deal_stage_meta(self):
+        return dict(STAGE_META)
+
+    def call(self, method, params=None):
+        if method == "crm.currency.list":
+            return [{"CURRENCY": "EUR", "AMOUNT": 1, "AMOUNT_CNT": 1}]
+        return []
+
+    def list_deals_fast(self, **kw):
+        return []
+
+    def list_items(self, *a, **kw):
+        return []
+
+
+
+
+def build_people(**kw) -> dict:
+    """Синтетика → настоящий people.compute → данные вкладок той же формы, что в проде."""
+    return people_mod.compute(PeopleStub(), as_of=PEOPLE_TODAY, open_deals=OPEN_DEALS,
+                              created=CREATED, orders=ORDERS, **kw)

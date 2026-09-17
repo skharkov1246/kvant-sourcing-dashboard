@@ -1,155 +1,102 @@
-"""Зонд v34: подстановка ключа в ссылку выдачи файла.
+"""Зонд v39: повторный прогон people.compute после правок победы и выбросов.
 
-Проверка v31 могла быть ошибочной. Ссылка downloadUrl у Битрикса, как правило, уже
-содержит параметр auth= с пустым значением. Я дописывал второй auth= в конец —
-портал читает первый, пустой, и отдаёт страницу входа. То есть «страница входа
-25 из 25» могла означать не «путь закрыт», а «ключ подставлен не туда».
+Гейт считает вкладки на придуманном корпусе: секретов Bitrix в нём нет. Поэтому
+ошибки, которые видны только на живых данных (роль не распозналась по реальной
+должности, поле пришло списком, стадия без справочника), доезжали бы до прода.
+Здесь модуль запускается по-настоящему и печатает агрегаты результата.
 
-Здесь ключ подставляется четырьмя способами, и печатается, чем ответил каждый:
-  как есть · дописан в конец · подставлен в существующий пустой auth= ·
-  собран заново из идентификатора файла.
-
-ПЕЧАТАЮТСЯ ТОЛЬКО ПРИЗНАКИ ССЫЛКИ (есть ли в ней auth=, относительная ли она),
-КОДЫ ОТВЕТОВ И ДОЛИ. Сами ссылки, имена файлов и содержимое не выводятся.
+ПЕЧАТАЮТСЯ ТОЛЬКО АГРЕГАТЫ: счётчики, суммы, доли, должности и названия отделов.
+Ни фамилий, ни названий сделок, ни клиентов. Самое важное — в конце.
 """
 from __future__ import annotations
 
 import os
-import re
+import sys
+import time
 from collections import Counter
-from datetime import datetime, timedelta, timezone
-from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
-import requests
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-BASE = os.environ["BITRIX_WEBHOOK_URL"].rstrip("/")
-m = re.match(r"(https://[^/]+)/rest/(\d+)/([^/]+)", BASE)
-PORTAL, USER_ID, TOKEN = (m.group(1), m.group(2), m.group(3)) if m else ("", "", "")
-N = 20
+import people as people_mod  # noqa: E402
+from bitrix_client import BitrixClient  # noqa: E402
 
 
-def bx(method: str, params: dict) -> dict:
-    for _ in range(3):
-        try:
-            r = requests.post(f"{BASE}/{method}.json", json=params, timeout=60)
-            r.raise_for_status()
-            return r.json()
-        except Exception:
-            continue
-    return {}
-
-
-def bx_all(method: str, params: dict) -> list:
-    out, start = [], 0
-    while True:
-        j = bx(method, {**params, "start": start})
-        res = j.get("result")
-        items = res.get("items") if isinstance(res, dict) and "items" in res else res
-        out += items or []
-        if "next" not in j:
-            return out
-        start = j["next"]
-
-
-def probe(u: str) -> str:
-    if not u:
-        return "ссылки нет"
-    try:
-        r = requests.get(u, timeout=45)
-        if r.status_code != 200:
-            return f"http {r.status_code}"
-        b = r.content
-        if b[:2] == b"PK":
-            return "ФАЙЛ xlsx/docx"
-        if b[:4] == b"%PDF":
-            return "ФАЙЛ pdf"
-        if b[:8] == b"\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1":
-            return "ФАЙЛ office"
-        s = b.lstrip()[:1]
-        if s == b"<":
-            return "страница входа (html)"
-        return f"ФАЙЛ иное ({len(b)} б)"
-    except Exception as e:
-        return f"ошибка {type(e).__name__}"
-
-
-def with_auth(u: str) -> str:
-    """Подставляет ключ в существующий параметр auth=, а не дописывает второй."""
-    p = urlparse(u)
-    q = parse_qs(p.query, keep_blank_values=True)
-    q["auth"] = [TOKEN]
-    return urlunparse(p._replace(query=urlencode(q, doseq=True)))
+def head(t: str) -> None:
+    print("\n" + "=" * 78 + f"\n{t}\n" + "=" * 78)
 
 
 def main() -> int:
-    print("=== Зонд v34: как правильно подставить ключ в ссылку файла ===\n")
-    since = (datetime.now(timezone.utc) - timedelta(days=365)).strftime("%Y-%m-%dT00:00:00+03:00")
-    uf = bx("crm.deal.userfield.list", {"order": {"FIELD_NAME": "ASC"}}).get("result") or []
-    ff = [str(u["FIELD_NAME"]) for u in uf if u.get("USER_TYPE_ID") == "file"]
-    deals = bx_all("crm.deal.list", {"filter": {">=DATE_CREATE": since},
-                                     "select": ["ID"], "order": {"ID": "DESC"}})
-    ids = [str(d["ID"]) for d in deals[:200]]
+    c = BitrixClient(os.environ["BITRIX_WEBHOOK_URL"])
+    t0 = time.time()
+    people = people_mod.roster(c)
+    deps = {str(d["ID"]): d.get("NAME", "") for d in c.list_paged("department.get", {})}
 
-    refs: list[dict] = []
-    for i in range(0, len(ids), 50):
-        j = bx("crm.deal.list", {"filter": {"ID": ids[i:i + 50]}, "select": ["ID"] + ff})
-        for x in j.get("result") or []:
-            for f in ff:
-                v = x.get(f)
-                if not v:
-                    continue
-                for fo in (v if isinstance(v, list) else [v]):
-                    if isinstance(fo, dict) and fo.get("downloadUrl"):
-                        refs.append(fo)
-        if len(refs) >= N:
-            break
-    refs = refs[:N]
-    print(f"вложений в выборке: {len(refs)}")
-    if not refs:
-        print("вложений не найдено")
-        return 0
+    head("1. РАСПОЗНАВАНИЕ РОЛЕЙ (каскад должность → отдел → не коммерсант)")
+    roles = Counter(); why = Counter(); pos_of_role = {"kam": Counter(), "prod": Counter()}
+    for uid, p in people.items():
+        if not p["active"]:
+            continue
+        r, w = people_mod.resolve_role(p, deps)
+        roles[r] += 1; why[(r, w)] += 1
+        if r in pos_of_role:
+            pos_of_role[r][p["pos"] or "(пусто)"] += 1
+    print("действующих по ролям: " + " · ".join(f"{k}={v}" for k, v in roles.most_common()))
+    print("как определено: " + " · ".join(f"{r}/{w}={n}" for (r, w), n in why.most_common()))
+    for r in ("kam", "prod"):
+        print(f"\nдолжности роли «{r}»:")
+        for p, n in pos_of_role[r].most_common(20):
+            print(f"  {n:>3}  {p}")
 
-    # признаки ссылки — без самой ссылки
-    sample_u = str(refs[0]["downloadUrl"])
-    pr = urlparse(sample_u)
-    q = parse_qs(pr.query, keep_blank_values=True)
-    print(f"ссылка относительная: {'да' if not sample_u.startswith('http') else 'нет'}")
-    print(f"путь ссылки: {pr.path}")
-    print(f"имена параметров: {sorted(q.keys())}")
-    print(f"параметр auth присутствует: {'да' if 'auth' in q else 'нет'}"
-          f" · пустой: {'да' if q.get('auth') == [''] else 'нет'}\n")
+    head("2. ПРОГОН people.compute НА ЖИВЫХ ДАННЫХ")
+    t1 = time.time()
+    data = people_mod.compute(c)
+    print(f"посчитано за {time.time()-t1:.1f} с (всего с состава {time.time()-t0:.1f} с)")
+    st, rc = data["staff"], data["recon"]
+    print(f"состав: всего {st['total']} · действующих {st['active']} · отключённых {st['fired']} "
+          f"· в роли КАМ {st['kam']} · в роли продукт-оунер {st['prod']}")
+    print(f"портфель: открытых (без технических воронок) {rc['openTotal']} · технических отброшено {rc['tech']}")
+    print(f"покрытие: за КАМами {rc['kam']} · за продукт-оунерами {rc['prod']} · и там, и там {rc['both']} "
+          f"· ни за кем {rc['none']} ({rc['noneSum']}) · на уволенных {rc['orphan']} ({rc['orphanSum']}), "
+          f"из них с живой ролью {rc['orphanCovered']}")
 
-    res: dict[str, Counter] = {}
+    for key in ("kam", "prod"):
+        b = data["roles"][key]; t = b["totals"]
+        head(f"3. РОЛЬ «{key}» — итоги")
+        print(f"людей с сделками {t['peopleAll']} (действующих {t['people']}) · без единой сделки {len(b['idlePeople'])}")
+        print(f"открытых {t['open']} · из них закреплено полем карточки {t['byField']} "
+              f"({t['byField']*100//max(1,t['open'])}%) · роль не закреплена у {b['uncovered']['n']} ({b['uncovered']['sum']})")
+        print(f"проработка {t['presale']} шт / {t['presaleSum']} · реализация {t['real']} шт / {t['realSum']} "
+              f"· закупка {t['buy']} · маржа {t['margin']} ({t['marginPct']}%)")
+        print(f"год: создано {t['created']} · выиграно {t['won']} ({t['wonSum']}) · проиграно {t['lost']} "
+              f"· win-rate {t['winRate']}% · взвешенный пайплайн {t['weighted']}")
+        print(f"риски: просрочено {t['late']} ({t['lateSum']}) · застой {t['stale']} · брошено {t['dead']} "
+              f"· без суммы {t['noAmt']} · без клиента {t['noComp']} · маржа в минус {t['neg']} "
+              f"· чистых карточек {t['cleanPct']}%")
+        print(f"выбросы по сумме: {t['big']} карточек на {t['bigSum']} — это {t['bigShare']}% суммы роли")
+        print(f"нагрузка: на человека {t['perPersonDeals']} · медиана {t['medianDeals']} · максимум {t['maxDeals']} "
+              f"· денег на человека {t['perPersonSum']}")
+        print("воронки: " + " · ".join(f"{f['cat']}={f['n']}" for f in b["funnels"][:8]))
+        print("распределение нагрузки по людям (сделок, без имён): "
+              + ", ".join(str(p["open"]) for p in sorted(b["people"], key=lambda x: -x["open"])[:15]))
 
-    def note(way: str, out: str) -> None:
-        res.setdefault(way, Counter())[out] += 1
-
-    for fo in refs:
-        for key in ("downloadUrl", "showUrl"):
-            u = str(fo.get(key) or "")
-            if not u:
-                continue
-            full = u if u.startswith("http") else PORTAL + u
-            note(f"{key}: как есть", probe(full))
-            sep = "&" if "?" in full else "?"
-            note(f"{key}: ключ дописан в конец", probe(f"{full}{sep}auth={TOKEN}"))
-            note(f"{key}: ключ подставлен в auth=", probe(with_auth(full)))
-        fid = fo.get("id")
-        if fid:
-            note("собрана заново: /rest/.../download",
-                 probe(f"{BASE}/download.json?fileId={fid}"))
-            note("собрана заново: uf.php с ключом",
-                 probe(with_auth(f"{PORTAL}/bitrix/tools/disk/uf.php?attachedId={fid}&action=download&auth=")))
-
-    print("=== ЧТО ОТВЕТИЛ КАЖДЫЙ СПОСОБ ===")
-    for way, c in res.items():
-        good = sum(n for o, n in c.items() if o.startswith("ФАЙЛ"))
-        mark = "  ✔ РАБОТАЕТ" if good else ""
-        print(f"{way:44s} годных {good:>3d} из {sum(c.values()):>3d} · {dict(c.most_common(3))}{mark}")
-
-    print("\n✓ зонд v34 завершён")
+    head("4. ЧТО ДОЛЖЕН УВИДЕТЬ ВЛАДЕЛЕЦ — проверка на пустоту")
+    bad = []
+    if not data["roles"]["kam"]["people"]:
+        bad.append("во вкладке КАМов нет ни одного человека")
+    if not data["roles"]["prod"]["people"]:
+        bad.append("во вкладке продукт-оунеров нет ни одного человека")
+    if rc["openTotal"] < 100:
+        bad.append(f"открытых сделок подозрительно мало: {rc['openTotal']}")
+    if data["roles"]["kam"]["totals"]["byField"] == 0:
+        bad.append("поле «КАМ» нигде не прочиталось — атрибуция свалилась на владельца")
+    pr = data["params"]
+    print(f"медианная открытая сделка {pr['medAmt']} · порог выброса {pr['bigCut']} ({pr['mult']} медиан)")
+    if data["roles"]["kam"]["totals"]["won"] == 0:
+        bad.append("по роли КАМ ноль побед — определение победы снова не совпало с портом")
+    print("ПРОБЛЕМЫ: " + ("; ".join(bad) if bad else "нет, данные для вкладок полные"))
+    print("\nГОТОВО")
     return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

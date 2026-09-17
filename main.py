@@ -27,6 +27,7 @@ import insights as insights_mod
 import kam as kam_mod
 import contracts as contracts_mod
 import metrics as metrics_mod
+import people as people_mod
 import period as period_mod
 import reps as reps_mod
 from bitrix_client import BitrixClient
@@ -387,14 +388,16 @@ def run(args) -> int:
     ins = insights_mod.generate(m, settings, use_llm=use_llm)
     print(f"  источник: {ins.get('_source')}")
 
-    company_data = kam_data = eng_data = prod_data = reps_data = None
+    company_data = kam_data = eng_data = prod_data = reps_data = people_data = None
     deals_ytd = orders_ytd = deal_owner = deal_sale = None
     # --- общий пул сделок/заказов YTD (нужен Пульсу + отраслевым вкладкам) ---
     try:
         print("• Общий пул сделок/заказов (YTD)…")
         ys = "2026-01-01T00:00:00"
         deals_ytd = client.list_deals_fast(filter={">=DATE_CREATE": ys},
-            select=["ID", "TITLE", "CATEGORY_ID", "STAGE_ID", "STAGE_SEMANTIC_ID", "OPPORTUNITY", "CURRENCY_ID", "DATE_CREATE", "CLOSEDATE", "ASSIGNED_BY_ID", "COMPANY_ID"])
+            select=["ID", "TITLE", "CATEGORY_ID", "STAGE_ID", "STAGE_SEMANTIC_ID", "OPPORTUNITY", "CURRENCY_ID",
+                    "DATE_CREATE", "CLOSEDATE", "ASSIGNED_BY_ID", "COMPANY_ID", "MOVED_TIME", "LAST_ACTIVITY_TIME"]
+                   + people_mod.DEAL_FIELDS)
         orders_ytd = client.list_items(172, filter={">=createdTime": ys},
             select=["id", "title", "stageId", "opportunity", "currencyId", "createdTime", "parentId2", "assignedById"])
         # заказы СП-172: исключаем проигранные (…:FAIL) — это не контрактная выручка
@@ -460,6 +463,17 @@ def run(args) -> int:
             except Exception as e:
                 print(f"  ⚠ {label} пропущена: {type(e).__name__}: {e}")
 
+    try:
+        print("• Коммерсанты: состав из Bitrix, загрузка КАМов и продукт-оунеров…")
+        deals_open = client.list_deals_fast(filter={"STAGE_SEMANTIC_ID": "P"}, select=people_mod.DEAL_SELECT)
+        people_data = people_mod.compute(client, as_of=p.end, open_deals=deals_open, created=deals_ytd)
+        _st = people_data["staff"]; _rc = people_data["recon"]
+        print(f"  ✓ действующих {_st['active']}, уволенных {_st['fired']}; открытых сделок {_rc['openTotal']}: "
+              f"за КАМами {_rc['kam']}, за продукт-оунерами {_rc['prod']}, ни за кем {_rc['none']}, "
+              f"на уволенных {_rc['orphan']}")
+    except Exception as e:
+        print(f"  ⚠ вкладки «КАМы»/«Продукт-оунеры» пропущены: {type(e).__name__}: {e}")
+
     contracts_data = None
     try:
         print("• Контракты в реализации (СП-172, все непроигранные)…")
@@ -490,7 +504,7 @@ def run(args) -> int:
     html_path = out_dir / f"dashboard_{slug}.html"
     dashboard.write(m, ins, html_path, title=f"Сорсинг · {p.label}",
                     company=company_data, kam=kam_data, eng=eng_data, prod=prod_data,
-                    contracts=contracts_data, reps=reps_data, advisor=advisor_data)
+                    contracts=contracts_data, reps=reps_data, advisor=advisor_data, people=people_data)
     print(f"  ✓ дашборд: {html_path}")
 
     if args.open:
