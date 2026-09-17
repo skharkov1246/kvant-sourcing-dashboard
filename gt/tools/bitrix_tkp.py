@@ -75,8 +75,9 @@ RFQ_FILE_FIELDS = {
     "ufCrm18_1703712059311": ("Processed offer", "входящее"),
     "ufCrm18_1703712074559": ("Processed offer with descriptions / archive", "входящее"),
     "ufCrm18_1727423346": ("Request file", "наш запрос"),
-    "ufCrm18_1730999038678": ("Мануал, чертеж, шильд", "не цены"),
-    "ufCrm18_1730999106096": ("Bank Details", "не цены"),
+    # сорсер мог положить КП не в тот слот, поэтому это «неизвестно», а не отказ
+    "ufCrm18_1730999038678": ("Мануал, чертеж, шильд", "неизвестно"),
+    "ufCrm18_1730999106096": ("Bank Details", "неизвестно"),
 }
 RFQ_SELECT = ["id", "title", "stageId", "parentId2", "ufCrm18Supplier", "companyId",
               "createdTime", "assignedById"]
@@ -350,29 +351,59 @@ def file_fields(bx: BitrixClient, entity: int) -> dict:
 
 
 def objs(v) -> list:
-    """Файловые объекты из значения поля.
+    """Файловые объекты из значения поля. Три разные формы, и все встречаются.
 
-    Требуем urlMachine, а не просто id: это единственная рабочая ссылка для
-    вебхука, и ровно этой проверки не хватало в первой версии. Все четыре
-    сборщика вложений в репозитории её делают.
+    Проверка документации 17.09.2026 поймала форму, на которой прежний код
+    терял файлы молча: FILES комментария таймлайна приходит СЛОВАРЁМ, где ключ
+    совпадает с id файла — {"10": {id, name, urlDownload, authorId}}. Прежний
+    objs получал такой словарь, считал его ОДНИМ объектом, не находил в нём
+    ссылки и возвращал пустоту. Файл при этом есть.
+
+    Требуем ссылку или id: у файла CRM это urlMachine, у файла Диска — числовой
+    ID, по которому ссылку ещё надо спросить у disk.file.get.
     """
     if not v:
         return []
+    items: list = []
+    if isinstance(v, list):
+        items = v
+    elif isinstance(v, dict):
+        # словарь по id: все значения — словари. Иначе это сам объект.
+        vals = [x for x in v.values() if isinstance(x, dict)]
+        items = vals if vals and len(vals) == len(v) else [v]
+    else:
+        return []
     out = []
-    for o in (v if isinstance(v, list) else [v]):
-        if isinstance(o, dict) and (o.get("urlMachine") or o.get("downloadUrl")):
+    for o in items:
+        if not isinstance(o, dict):
+            continue
+        if o.get("urlMachine") or o.get("downloadUrl") or o.get("ID") or o.get("id"):
             out.append(o)
     return out
 
 
 def cand(origin: str, field: str, field_name: str, direction: str, o: dict,
-         extra: str = "") -> dict:
+         extra: str = "", via: str = "") -> dict:
+    """Кандидат на скачивание.
+
+    Поле via говорит, КАК брать байты, и это не косметика. Документация:
+    у файлового поля CRM рабочая ссылка — urlMachine с одноразовым токеном; а
+    вот urlDownload из FILES комментария таймлайна токена НЕ содержит, и
+    серверный клиент получит по нему html-страницу вместо файла. Там нужен
+    disk.file.get по id. Перепутать эти два пути — значит разобрать страницу
+    входа как спецификацию.
+    """
+    fid = str(o.get("id") or o.get("ID") or "")
+    url = o.get("urlMachine") or ""
+    if not via:
+        via = "ссылка" if url else "диск"
     return {
         "origin": origin, "field": field, "field_name": field_name,
-        "direction": direction,
-        "file_id": str(o.get("id") or o.get("ID") or ""),
+        "direction": direction, "via": via,
+        "file_id": fid,
         "file_name": o.get("name") or o.get("fileName") or o.get("NAME") or "",
-        "url": o.get("urlMachine") or o.get("downloadUrl") or "",
+        "url": url,
+        "author": str(o.get("authorName") or o.get("authorId") or ""),
         "context": extra,
     }
 
@@ -423,7 +454,17 @@ def from_rfq(bx: BitrixClient, did: int) -> tuple[list, int]:
 
 
 def from_timeline(bx: BitrixClient, did: int) -> list:
-    """Шаг 3: комментарии таймлайна. Сюда сорсер кладёт полученное КП."""
+    """Шаг 3: комментарии таймлайна. Сюда сорсер кладёт полученное КП.
+
+    Две поправки по документации, каждая стоила бы потерянных файлов.
+    Первая: FILES приходит словарём по id, и objs это теперь умеет.
+    Вторая: urlDownload здесь БЕЗ токена — байты берутся через disk.file.get,
+    поэтому via="диск".
+
+    Автор берётся у САМОГО ФАЙЛА (authorId/authorName внутри записи FILES), а
+    не у комментария: комментарий мог написать один человек, а файл приложить
+    другой, и для направления важен второй.
+    """
     out = []
     try:
         r = bx.call("crm.timeline.comment.list", {
@@ -437,8 +478,9 @@ def from_timeline(bx: BitrixClient, did: int) -> list:
     for c in rows:
         txt = str(c.get("COMMENT") or "")[:200]
         for o in objs(c.get("FILES")):
-            out.append(cand(f"комментарий {c.get('ID')}", "FILES", "вложение комментария",
-                            direction_from_text(txt), o, extra=txt))
+            out.append(cand(f"комментарий {c.get('ID')}", "FILES",
+                            "вложение комментария", direction_from_text(txt), o,
+                            extra=txt, via="диск"))
     return out
 
 
@@ -466,28 +508,55 @@ def direction_from_text(txt: str) -> str:
     return "неизвестно"
 
 
-def from_activities(bx: BitrixClient, did: int) -> list:
-    """Шаг 4: дела сделки — письма и звонки. У дела есть DIRECTION."""
-    out = []
+def from_activities(bx: BitrixClient, did: int) -> tuple[list, list]:
+    """Шаг 4: дела сделки — письма и звонки. Возвращает (файлы, тела писем).
+
+    Три поправки по документации:
+    1. Тело письма приходит прямо в DESCRIPTION — скачивать нечего, и цена
+       вполне может лежать в самом письме, а не во вложении. Раньше я этого не
+       брал вовсе и терял такие КП целиком.
+    2. DIRECTION есть только у писем (TYPE_ID=4). У задач, звонков и
+       уведомлений он пустой, и считать пустоту «исходящим» нельзя.
+    3. FILES у дела — тип diskfile, и его ID это НАСТОЯЩИЙ идентификатор Диска,
+       в отличие от id файлового поля CRM. Значит via="диск".
+
+    И главное ограничение, которое надо помнить: КП, которое сорсер скачал с
+    личной почты и приложил руками, дела не создаёт вовсе — DIRECTION по нему
+    не появится никогда. Поэтому признак отбрасывает наше надёжно, а вот
+    подтверждает чужое далеко не всегда.
+    """
+    out, bodies = [], []
     try:
         rows = bx.list_paged("crm.activity.list", {
             "filter": {"OWNER_ID": did, "OWNER_TYPE_ID": DEAL_ENTITY},
-            "select": ["ID", "SUBJECT", "DIRECTION", "FILES", "STORAGE_ELEMENT_IDS",
-                       "PROVIDER_TYPE_ID", "AUTHOR_ID"]})
+            "select": ["ID", "SUBJECT", "DESCRIPTION", "DIRECTION", "FILES",
+                       "STORAGE_ELEMENT_IDS", "PROVIDER_TYPE_ID", "TYPE_ID",
+                       "AUTHOR_ID"]})
     except Exception as e:
         say(f"    дела: не прочитались ({type(e).__name__})")
-        return out
+        return out, bodies
     for a in rows:
-        # DIRECTION: 1 — входящее, 2 — исходящее (документация crm.activity)
+        # DIRECTION: 1 входящее, 2 исходящее — но только у письма
         d = str(a.get("DIRECTION") or "")
-        direction = "входящее" if d == "1" else ("наш запрос" if d == "2" else "неизвестно")
+        is_mail = str(a.get("TYPE_ID") or "") == "4"
+        if is_mail and d == "1":
+            direction = "входящее"
+        elif is_mail and d == "2":
+            direction = "наш запрос"
+        else:
+            direction = "неизвестно"
         subj = str(a.get("SUBJECT") or "")[:200]
         if direction == "неизвестно":
             direction = direction_from_text(subj)
+        body = str(a.get("DESCRIPTION") or "")
+        if body and direction != "наш запрос":
+            # тело письма разбирается как текст: цена могла прийти прямо в нём
+            bodies.append({"origin": f"письмо {a.get('ID')}", "direction": direction,
+                           "subject": subj, "text": body})
         for o in objs(a.get("FILES")):
             out.append(cand(f"дело {a.get('ID')}", "FILES", "вложение дела",
-                            direction, o, extra=subj))
-    return out
+                            direction, o, extra=subj, via="диск"))
+    return out, bodies
 
 
 def from_chat(bx: BitrixClient, did: int) -> list:
@@ -546,6 +615,42 @@ def fetch(url: str, timeout: int = 45):
     return body, "ок"
 
 
+def disk_url(bx: BitrixClient, fid: str) -> str:
+    """Ссылка на файл Диска по его id.
+
+    Нужна там, где прямой ссылки нет или она без токена: вложения комментариев
+    таймлайна и дел. retries=1 намеренно — нехватка прав и «нет такого файла»
+    неустранимы, и повторять их шесть раз с растущей паузой значит подвесить
+    прогон, как это и случилось в первый раз.
+    """
+    for method, key in (("disk.file.get", "DOWNLOAD_URL"),
+                        ("disk.attachedObject.get", "DOWNLOAD_URL")):
+        try:
+            r = bx.call(method, {"id": fid}, retries=1) or {}
+        except Exception:
+            continue
+        if isinstance(r, dict):
+            u = r.get(key) or (r.get("result") or {}).get(key) if isinstance(
+                r.get("result"), dict) else r.get(key)
+            if u:
+                return u
+    return ""
+
+
+def take(bx: BitrixClient, c: dict):
+    """Байты кандидата: по ссылке или через Диск, смотря что за источник."""
+    if c.get("via") == "ссылка" and c.get("url"):
+        return fetch(c["url"])
+    if c.get("file_id"):
+        u = disk_url(bx, c["file_id"])
+        if u:
+            return fetch(u)
+        return None, "Диск не отдал ссылку (нет скоупа disk или файла нет)"
+    if c.get("url"):
+        return fetch(c["url"])
+    return None, "ни ссылки, ни id"
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     g = ap.add_mutually_exclusive_group(required=True)
@@ -578,7 +683,7 @@ def main() -> int:
     say(f"файловых полей у сделки: {len(ffields)}")
 
     # --- сбор кандидатов: сделка за сделкой, с прогрессом ---
-    cands, seen, rfq_total = [], set(), 0
+    cands, seen, rfq_total, bodies = [], set(), 0, []
     for n, did in enumerate(ids, 1):
         say(f"[{n}/{len(ids)}] сделка {did}")
         got = []
@@ -587,7 +692,9 @@ def main() -> int:
         rfq_total += cnt
         got += rq
         got += from_timeline(bx, did)
-        got += from_activities(bx, did)
+        acts, mail_bodies = from_activities(bx, did)
+        got += acts
+        bodies += mail_bodies
         got += from_chat(bx, did)
         fresh = 0
         for c in got:
@@ -649,7 +756,7 @@ def main() -> int:
             encoding="utf-8")
 
     for n, c in enumerate(take[:a.max_files], 1):
-        body, how = fetch(c["url"])
+        body, how = take(bx, c)
         rec = {k: v for k, v in c.items() if k != "url"}
         rec["download"] = how
         rec["size"] = len(body) if body else 0
@@ -666,8 +773,19 @@ def main() -> int:
         pr = price_rows(rows, hdr) if rows else []
         n_rows += len(rows)
         n_price += len(pr)
-        status = ("пусто" if not body else "разобран" if pr
-                  else "текст без цен" if rows else "не разобрался")
+        # статус не должен врать (правило 15 CLAUDE.md): pdf без текстового
+        # слоя — это скан под распознавание, а не «пусто» и не «не КП»
+        low = (c["file_name"] or "").lower()
+        if pr:
+            status = "разобран"
+        elif rows:
+            status = "текст без цен"
+        elif low.endswith(".pdf"):
+            status = "скан, требуется распознавание"
+        elif low.endswith((".jpg", ".jpeg", ".png", ".tif", ".tiff")):
+            status = "картинка, требуется распознавание"
+        else:
+            status = "не разобрался"
         full.append(dict(rec, parse_path=how_parsed, header=hdr, status=status, prices=pr))
         index.append(dict(rec, parse_path=how_parsed, status=status, rows=len(rows),
                           priced=len(pr), pns=sorted({p["pn"] for p in pr})[:400]))
@@ -675,6 +793,27 @@ def main() -> int:
             say(f"  [{n}/{min(len(take), a.max_files)}] скачано {n_dl}, "
                 f"строк {n_rows}, с ценой {n_price}, {(time.time()-t0)/60:.1f} мин")
             dump()
+
+    # тела писем: КП могло прийти текстом, без вложения. Скачивать нечего —
+    # DESCRIPTION дела уже у нас, и он идёт тем же разбором, что и файл.
+    n_mail = 0
+    for b in bodies:
+        rows = rows_from_text(b["text"].encode("utf-8", "ignore"))
+        hdr = header_map(rows) if rows else {}
+        pr = price_rows(rows, hdr) if rows else []
+        if not pr:
+            continue
+        n_mail += 1
+        rec = {"origin": b["origin"], "field": "DESCRIPTION", "field_name": "тело письма",
+               "direction": b["direction"], "via": "текст письма", "file_id": "",
+               "file_name": f'письмо: {b["subject"][:80]}', "author": "", "context": "",
+               "download": "не требуется", "size": len(b["text"])}
+        full.append(dict(rec, parse_path="текст", header=hdr, status="разобран", prices=pr))
+        index.append(dict(rec, parse_path="текст", status="разобран", rows=len(rows),
+                          priced=len(pr), pns=sorted({x["pn"] for x in pr})[:400]))
+        n_price += len(pr)
+    if bodies:
+        say(f"тел писем просмотрено: {len(bodies)}, с ценами: {n_mail}")
 
     dump()
     say(f"скачано файлов: {n_dl} из {min(len(take), a.max_files)}")
