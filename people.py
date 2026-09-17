@@ -31,6 +31,12 @@
 ЗАСТОЙ — по MOVED_TIME (дата последней смены стадии). Пороги подобраны по факту:
 без движения 90 дней — 1 890 сделок, 180 дней — 1 580. Поэтому «застой» = 90 дней,
 «брошено» = 180; порог 30 дней бессмысленен — под него попадает 86% портфеля.
+
+КАРТОЧКИ-ВЫБРОСЫ. Базовая валюта портала — EUR (проверено), пересчёт верен, но
+пайплайн всё равно раздут: медианная открытая сделка — около €100 тыс., а десяток
+карточек несёт сотни миллионов. Поэтому сумма роли всегда показывается вместе с
+числом выбросов (сумма ≥ 50 медиан) и их долей: без этого «пайплайн €1,5 млрд»
+выглядит фактом, хотя держится на карточках, где сумму нужно просто проверить.
 """
 from __future__ import annotations
 
@@ -43,6 +49,7 @@ from bitrix_client import BitrixClient
 YEAR_START = "2026-01-01T00:00:00"
 ORDERS_SINCE = "2025-01-01T00:00:00"
 REALIZE_CAT = "0"             # воронка «Реализация»
+OUTLIER_MULT = 50             # сумма ≥ стольких медиан — карточка-выброс, сумму надо проверить
 STALE_DAYS = 90               # без смены стадии дольше — застой
 DEAD_DAYS = 180               # ...дольше — брошено
 TECH_CATS = {"6", "22", "24", "26", "28"}   # реклама, тестовые, адаптационная — вне управленческого счёта
@@ -74,6 +81,13 @@ DEPT_BACK = re.compile(r"поиска поставщик|тендерн|сопр
 DEPT_PROD = re.compile(r"насос|турбин|компрессор|фильтрац|грануляц|динамическ\w* оборудован|"
                        r"кип\b|скут|\bзра\b|оборудован", re.I)
 DEPT_KAM = re.compile(r"группа по работе с|ключев|работе с заказчик|спецпроект|шельф", re.I)
+
+
+def _regno(title) -> int:
+    """Номер реализации в начале названия сделки («871. …»); точка обязательна —
+    иначе под правило попадают коды PO и артикулы."""
+    m = re.match(r"\s*(\d{1,4})(?:/\d+)?\.", str(title or ""))
+    return int(m.group(1)) if m else 0
 
 
 def _money(v: float) -> str:
@@ -151,11 +165,26 @@ def resolve_role(person: dict, dept_names: dict[str, str]) -> tuple[str, str]:
     return "other", "не коммерческая роль"
 
 
+def deal_categories(client: BitrixClient) -> dict[str, str]:
+    """{id воронки: имя}. Берём crm.category.list: он знает настоящее имя воронки 0
+    («Реализация»), тогда как crm.dealcategory.list её не возвращает вовсе и в
+    справочнике клиента она подписана служебной «Общая»."""
+    try:
+        res = client.call("crm.category.list", {"entityTypeId": 2}) or {}
+        items = (res.get("categories") if isinstance(res, dict) else res) or []
+        m = {str(c.get("id")): (c.get("name") or f"воронка #{c.get('id')}") for c in items if c.get("id") is not None}
+        if m:
+            return m
+    except Exception:
+        pass
+    return {str(k): v for k, v in (client.categories() or {}).items()}
+
+
 def _blank() -> dict:
     return {"open": 0, "presale": 0, "presaleSum": 0.0, "real": 0, "realSum": 0.0, "buy": 0.0,
             "late": 0, "lateSum": 0.0, "stale": 0, "dead": 0, "noAmt": 0, "noComp": 0,
             "neg": 0, "clean": 0, "created": 0, "won": 0, "wonSum": 0.0, "lost": 0, "lostSum": 0.0,
-            "byField": 0, "ages": []}
+            "byField": 0, "big": 0, "bigSum": 0.0, "ages": []}
 
 
 def compute(client: BitrixClient, *, as_of: dt.date | None = None,
@@ -165,7 +194,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
     today_iso = today.isoformat()
     people = roster(client)
     deps = {str(d["ID"]): d.get("NAME", "") for d in client.list_paged("department.get", {})}
-    cats = {str(k): v for k, v in (client.categories() or {}).items()}
+    cats = deal_categories(client)
     stage_meta = client.deal_stage_meta()
     catname = lambda c: cats.get(str(c), f"воронка #{c}")
 
@@ -184,7 +213,8 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
 
     # --- заказы поставщикам: закупка на сделку, живой заказ, просроченное обещание клиенту
     buy_by_deal: dict[str, float] = defaultdict(float)
-    live_deals: set[str] = set()
+    order_deals: set[str] = set()     # есть непроигранный заказ (в т.ч. уже исполненный)
+    live_deals: set[str] = set()      # заказ ещё в работе
     late_deals: dict[str, int] = {}
     for o in orders:
         did = str(o.get("parentId2") or "")
@@ -192,6 +222,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         if not did or stage.endswith(":FAIL"):
             continue
         buy_by_deal[did] += eur(o.get("opportunity"), o.get("currencyId"))
+        order_deals.add(did)
         if stage.endswith(":SUCCESS"):
             continue
         live_deals.add(did)
@@ -217,6 +248,14 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             return owner, "владелец"
         return "", ""
 
+    # порог «карточки-выброса» берётся от самих данных: медиана положительных сумм
+    # открытых сделок (в €), умноженная на OUTLIER_MULT
+    _amts = sorted(eur(d.get("OPPORTUNITY"), d.get("CURRENCY_ID")) for d in open_deals
+                   if str(d.get("CATEGORY_ID") or "0") not in TECH_CATS
+                   and eur(d.get("OPPORTUNITY"), d.get("CURRENCY_ID")) > 0)
+    med_amt = (_amts[len(_amts) // 2] if _amts else 0.0)
+    big_cut = med_amt * OUTLIER_MULT
+
     agg: dict[tuple[str, str], dict] = defaultdict(_blank)     # (роль, uid) → показатели
     owner_agg: dict[str, dict] = defaultdict(_blank)           # владелец → показатели (для бесхозных)
     funnels: dict[str, Counter] = defaultdict(Counter)
@@ -234,13 +273,16 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         did = str(d["ID"])
         amt = eur(d.get("OPPORTUNITY"), d.get("CURRENCY_ID"))
         buy = buy_by_deal.get(did, 0.0)
-        in_real = cat == REALIZE_CAT or did in live_deals or buy > 0
+        in_real = (cat == REALIZE_CAT or did in order_deals or buy > 0
+                   or _regno(d.get("TITLE")) > 0)
         idle = _days_since(d.get("MOVED_TIME") or d.get("LAST_ACTIVITY_TIME"), today)
         late_days = late_deals.get(did, 0)
         no_amt = not amt
         no_comp = not d.get("COMPANY_ID") or str(d.get("COMPANY_ID")) == "0"
         neg = in_real and buy > 0 and amt > 0 and (amt - buy) < 0
-        flawed = bool(late_days or no_amt or no_comp or neg or (idle is not None and idle > STALE_DAYS))
+        big = bool(big_cut and amt >= big_cut)
+        flawed = bool(late_days or no_amt or no_comp or neg or big
+                      or (idle is not None and idle > STALE_DAYS))
         owner = str(d.get("ASSIGNED_BY_ID") or "")
         kam_uid, kam_src = attribute(d, "kam")
         prod_uid, prod_src = attribute(d, "prod")
@@ -264,6 +306,8 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             bucket["noAmt"] += no_amt
             bucket["noComp"] += no_comp
             bucket["neg"] += neg
+            if big:
+                bucket["big"] += 1; bucket["bigSum"] += amt
             bucket["clean"] += (not flawed)
 
         for role, uid, src in (("kam", kam_uid, kam_src), ("prod", prod_uid, prod_src)):
@@ -287,33 +331,41 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             "amt": _money(amt), "raw": round(amt), "buyRaw": round(buy),
             "state": "real" if in_real else "presale",
             "idle": idle, "late": late_days, "noAmt": no_amt, "noComp": no_comp, "neg": neg,
-            "date": str(d.get("DATE_CREATE", ""))[:10],
+            "big": big, "date": str(d.get("DATE_CREATE", ""))[:10],
         })
 
-    # --- результат года: создано / выиграно / проиграно (когорта 2026)
+    # --- результат года: создано / выиграно / проиграно (когорта 2026).
+    # ВЫИГРАНА — это НЕ STAGE_SEMANTIC_ID='S': в этом портале победа означает перевод
+    # сделки в воронку «Реализация», где она живёт в рабочих стадиях («Оплата получена |
+    # Закрытие сделки» и т.п.) с семантикой «в работе». Замер: из 1 662 сделок роли КАМ
+    # семантику успеха имеет ОДНА, а в реализацию переведены сотни. Поэтому победа
+    # считается так же, как в остальном дашборде: воронка реализации, либо заказ
+    # поставщику, либо номер реализации в названии.
     for d in created:
         cat = str(d.get("CATEGORY_ID") or "0")
         if cat in TECH_CATS:
             continue
+        did = str(d["ID"])
         amt = eur(d.get("OPPORTUNITY"), d.get("CURRENCY_ID"))
         sem = (d.get("STAGE_SEMANTIC_ID") or "").upper()
+        reached = (cat == REALIZE_CAT or did in order_deals or _regno(d.get("TITLE")) > 0)
         owner = str(d.get("ASSIGNED_BY_ID") or "")
         targets = [(r, u) for r, (u, _s) in
                    (("kam", attribute(d, "kam")), ("prod", attribute(d, "prod"))) if u]
         for role, uid in targets:
             b = agg[(role, uid)]
             b["created"] += 1
-            if sem == "S":
-                b["won"] += 1; b["wonSum"] += amt
-            elif sem == "F":
+            if sem == "F":
                 b["lost"] += 1; b["lostSum"] += amt
+            elif reached:
+                b["won"] += 1; b["wonSum"] += amt
         if owner:
             b = owner_agg[owner]
             b["created"] += 1
-            if sem == "S":
-                b["won"] += 1; b["wonSum"] += amt
-            elif sem == "F":
+            if sem == "F":
                 b["lost"] += 1; b["lostSum"] += amt
+            elif reached:
+                b["won"] += 1; b["wonSum"] += amt
 
     def row(uid: str, a: dict) -> dict:
         p = people.get(uid, {"name": f"user#{uid}", "pos": "", "depts": [], "active": False})
@@ -335,6 +387,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             "late": a["late"], "lateSum": _money(a["lateSum"]),
             "stale": a["stale"], "dead": a["dead"],
             "noAmt": a["noAmt"], "noComp": a["noComp"], "neg": a["neg"],
+            "big": a["big"], "bigSum": _money(a["bigSum"]),
             "flaws": a["open"] - a["clean"],
             "cleanPct": (round(a["clean"] / a["open"] * 100) if a["open"] else None),
             "medIdle": (ages[len(ages) // 2] if ages else None),
@@ -390,6 +443,9 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
                 "late": tot["late"], "lateSum": _money(tot["lateSum"]),
                 "stale": tot["stale"], "dead": tot["dead"], "noAmt": tot["noAmt"],
                 "noComp": tot["noComp"], "neg": tot["neg"],
+                "big": tot["big"], "bigSum": _money(tot["bigSum"]),
+                "bigShare": (round(tot["bigSum"] / (tot["presaleSum"] + tot["realSum"]) * 100)
+                             if (tot["presaleSum"] + tot["realSum"]) else 0),
                 "flaws": tot["open"] - tot["clean"],
                 "cleanPct": (round(tot["clean"] / tot["open"] * 100) if tot["open"] else None),
                 "perPersonDeals": (round(tot["open"] / n, 1) if n else 0),
