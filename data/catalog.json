@@ -4,16 +4,16 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 213,
-    "total_bytes": 98973447,
+    "datasets": 215,
+    "total_bytes": 99438463,
     "by_sensitivity": {
       "конфиденциально": 62,
-      "внутреннее": 117,
+      "внутреннее": 119,
       "публикуемо": 34
     },
     "by_subproject": {
-      "ГПУ-библиотека": 27,
-      "ГТУ-библиотека": 39,
+      "ГПУ-библиотека": 28,
+      "ГТУ-библиотека": 40,
       "ОВЭ-75": 45,
       "база ЗИП": 49,
       "база ЗИП · таможня": 18,
@@ -563,8 +563,8 @@
         ]
       },
       "last_change": "2026-09-17",
-      "last_author": "Claude",
-      "last_commit": "475f449",
+      "last_author": "skharkov1246",
+      "last_commit": "51e0bc5",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
@@ -574,7 +574,9 @@
         ]
       },
       "referenced_by": [
+        "gt/tools/build_faults.py",
         "scripts/build_chain_coverage.py",
+        "tests/test_faults_slices.py",
         "tests/test_r1700_dossier.py",
         "zip/tools/build_r1700.py",
         "zip/tools/r1700_dossier.py",
@@ -2267,6 +2269,55 @@
       ]
     },
     {
+      "path": "gpu/data/faults.json",
+      "subproject": "ГПУ-библиотека",
+      "bytes": 248061,
+      "note": "То же по газопоршневым: 79 строк, все 14 систем из gpu/data/parts.json. Подтверждено документом 28, общая практика 47 — доля ниже, чем по ГШО, и это свойство направления: сводного открытого документа с кодами по газопоршневым не публикует никто, сервисные руководства Jenbacher, Cummins Gas, CAT Gas, MWM и Waukesha закрыты. Открытыми оказались документы другого рода (Cat LEBW4982-01 по детонационной защите, руководства MOTORTECH по зажиганию, Jenbacher TA 1000-1109 по маслу, руководство Environment Agency по свалочному газу) — их хватило на состав газа, детонацию, смесеобразование и вибрацию, но не на пороги, зазоры и моменты затяжки. Отдельное поле fuel: признаки на биогазе, свалочном и шахтном газе (сера, силоксаны, хлор) отличаются от природного, смешивать их в одну строку нельзя. Все 210 парт-номеров сверены с gpu/data/*.json.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "gaps",
+        "notes",
+        "rows",
+        "slice",
+        "source_note",
+        "stats"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 79,
+        "record_keys": [
+          "codes",
+          "confidence",
+          "confirm",
+          "defect",
+          "fuel",
+          "machine",
+          "measure",
+          "node",
+          "note",
+          "parts",
+          "repair",
+          "symptom",
+          "url",
+          "verdict"
+        ]
+      },
+      "last_change": "2026-09-17",
+      "last_author": "Claude",
+      "last_commit": "b443489",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/build_faults.py",
+        "scripts/build_chain_coverage.py",
+        "tests/test_faults_slices.py"
+      ]
+    },
+    {
       "path": "data/budget_snapshot.json",
       "subproject": "дашборд сорсеров",
       "bytes": 244926,
@@ -2489,7 +2540,59 @@
         "level": "внутреннее",
         "markers": []
       },
-      "referenced_by": []
+      "referenced_by": [
+        "gt/tools/build_faults.py",
+        "scripts/build_chain_coverage.py",
+        "tests/test_faults_slices.py"
+      ]
+    },
+    {
+      "path": "gt/data/faults.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 213993,
+      "note": "Связки «признак → узел → что меряют → дефект → чем подтвердить → ремонт → номера» по газотурбинным, 79 строк по 14 узлам. Вердикт «подтверждён» (65) означает, что строка дословно есть в скачанном документе — GE GER-3620P, ISO 20816-4, руководство GMRC по КВОУ, спецификация Solar Taurus 60; «не проверялся» (11) — общая инженерная практика по газовым турбинам, а не наш документ. В счётчик заполняемости цепочки идут только подтверждённые. Коды САУ пусты во всех строках: публичных перечней GE Mark VI/VIe, Siemens SPPA-T3000 и Solar Turbotronic нет, они выдаются владельцам через сервисные порталы. По SGT и Solar нет ни одного порога изготовителя — все числа из GER-3620P и ISO, это оговорено в строках. Все 184 парт-номера сверены с gt/data/pn_db.json.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "gaps",
+        "notes",
+        "rows",
+        "slice",
+        "source_note",
+        "stats"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 79,
+        "record_keys": [
+          "codes",
+          "confidence",
+          "confirm",
+          "defect",
+          "machine",
+          "measure",
+          "node",
+          "note",
+          "parts",
+          "repair",
+          "symptom",
+          "url",
+          "verdict"
+        ]
+      },
+      "last_change": "2026-09-17",
+      "last_author": "Claude",
+      "last_commit": "b443489",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/build_faults.py",
+        "scripts/build_chain_coverage.py",
+        "tests/test_faults_slices.py"
+      ]
     },
     {
       "path": "gt/data/badge_overrides.json",
@@ -5187,8 +5290,8 @@
         ]
       },
       "last_change": "2026-09-17",
-      "last_author": "Claude",
-      "last_commit": "475f449",
+      "last_author": "skharkov1246",
+      "last_commit": "51e0bc5",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
@@ -5444,6 +5547,7 @@
       },
       "referenced_by": [
         "gpu/build.py",
+        "gt/public/faults.html",
         "library/load_equipment.py",
         "scripts/build_chain_coverage.py",
         "scripts/build_dict.py",
@@ -5864,7 +5968,8 @@
       "referenced_by": [
         "gt/build.py",
         "library/load_equipment.py",
-        "scripts/build_chain_coverage.py"
+        "scripts/build_chain_coverage.py",
+        "tests/test_faults_slices.py"
       ]
     },
     {
@@ -6102,6 +6207,7 @@
       },
       "referenced_by": [
         "gpu/build.py",
+        "gt/public/faults.html",
         "scripts/build_chain_coverage.py"
       ]
     },
@@ -6139,6 +6245,68 @@
       },
       "referenced_by": [
         "gidromet/build.py"
+      ]
+    },
+    {
+      "path": "data/catalog_notes.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 44939,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "data/budget_snapshot.json",
+        "data/chain_coverage.json",
+        "data/chat_snapshot.json",
+        "data/index.json",
+        "dict/",
+        "dict/node_map.json",
+        "gidromet/data/",
+        "gpu/data/bitrix_gpu.json",
+        "gpu/data/coverage.json",
+        "gpu/data/faults.json",
+        "gt/data/ansaldo.json",
+        "gt/data/bitrix_gt.json",
+        "gt/data/dossiers.json",
+        "gt/data/faults.json",
+        "gt/data/fx_rates.json",
+        "gt/data/pn_db.json",
+        "gt/data/ship_blocked.json",
+        "gt/data/ship_energoseti.json",
+        "gt/data/ship_lukoil.json",
+        "gt/data/ship_recheck.json",
+        "gt/data/ship_rfq_letters.json",
+        "gt/data/ship_sellers.json",
+        "gt/data/ship_sweep.json",
+        "gt/docs/ЗАКУПКА-ЛУКОЙЛ.csv",
+        "gt/docs/ЗАПРОСЫ-ЛУКОЙЛ.csv",
+        "library/data/symptoms.json",
+        "library/docfilter.py",
+        "library/indexer.py",
+        "library/load_parts.py",
+        "library/load_suppliers.py",
+        "library/ocr.py",
+        "library/reparse.py",
+        "library/supabase/schema_junk.sql",
+        "ove/data/suppliers.json",
+        "pnw/data/contacts_found.json",
+        "pnw/data/crossrefs.json",
+        "pnw/data/item_master.json",
+        "pnw/data/kv_registry.json",
+        "pnw/data/numbers.json",
+        "pnw/data/part_suppliers.json"
+      ],
+      "last_change": "2026-09-17",
+      "last_author": "Claude",
+      "last_commit": "b443489",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "scripts/build_catalog.py",
+        "tests/test_catalog_guard.py"
       ]
     },
     {
@@ -6282,68 +6450,6 @@
       },
       "referenced_by": [
         "ove/build.py"
-      ]
-    },
-    {
-      "path": "data/catalog_notes.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 42244,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "data/budget_snapshot.json",
-        "data/chain_coverage.json",
-        "data/chat_snapshot.json",
-        "data/index.json",
-        "dict/",
-        "dict/node_map.json",
-        "gidromet/data/",
-        "gpu/data/bitrix_gpu.json",
-        "gpu/data/coverage.json",
-        "gt/data/ansaldo.json",
-        "gt/data/bitrix_gt.json",
-        "gt/data/dossiers.json",
-        "gt/data/fx_rates.json",
-        "gt/data/pn_db.json",
-        "gt/data/ship_blocked.json",
-        "gt/data/ship_energoseti.json",
-        "gt/data/ship_lukoil.json",
-        "gt/data/ship_recheck.json",
-        "gt/data/ship_rfq_letters.json",
-        "gt/data/ship_sellers.json",
-        "gt/data/ship_sweep.json",
-        "gt/docs/ЗАКУПКА-ЛУКОЙЛ.csv",
-        "gt/docs/ЗАПРОСЫ-ЛУКОЙЛ.csv",
-        "library/data/symptoms.json",
-        "library/docfilter.py",
-        "library/indexer.py",
-        "library/load_parts.py",
-        "library/load_suppliers.py",
-        "library/ocr.py",
-        "library/reparse.py",
-        "library/supabase/schema_junk.sql",
-        "ove/data/suppliers.json",
-        "pnw/data/contacts_found.json",
-        "pnw/data/crossrefs.json",
-        "pnw/data/item_master.json",
-        "pnw/data/kv_registry.json",
-        "pnw/data/numbers.json",
-        "pnw/data/part_suppliers.json",
-        "pnw/data/supplier_master.json",
-        "pnw/public/data.js"
-      ],
-      "last_change": "2026-09-17",
-      "last_author": "skharkov1246",
-      "last_commit": "eb1008f",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "scripts/build_catalog.py",
-        "tests/test_catalog_guard.py"
       ]
     },
     {
@@ -6642,6 +6748,7 @@
       },
       "referenced_by": [
         "gpu/build.py",
+        "gt/public/faults.html",
         "library/load_equipment.py",
         "scripts/build_chain_coverage.py",
         "scripts/build_dict.py",
@@ -7449,7 +7556,7 @@
     {
       "path": "data/chain_coverage.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 20752,
+      "bytes": 21019,
       "note": "Заполняемость цепочки портала по семи направлениям и восьми звеньям: машина → узел → признак → дефект → ремонтное решение → запчасть → изготовитель → исполнитель. Производный файл, считается scripts/build_chain_coverage.py по фактическим файлам репозитория; ноль означает отсутствие данных, а не то, что они где-то есть. Руками не заполнять. Первый прогон 12.09.2026: 13 клеток из 56, звенья «Признак», «Дефект» и «Исполнитель» не начаты ни по одному направлению.",
       "format": "json",
       "shape": "объект",
@@ -7475,17 +7582,19 @@
         ]
       },
       "last_change": "2026-09-17",
-      "last_author": "skharkov1246",
-      "last_commit": "eb1008f",
+      "last_author": "Claude",
+      "last_commit": "b443489",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
       },
       "referenced_by": [
+        "gt/public/faults.html",
         "scripts/build_chain_coverage.py",
         "scripts/build_chain_page.py",
         "tests/test_dict.py",
+        "tests/test_faults_slices.py",
         "tests/test_r1700_dossier.py"
       ]
     },
@@ -7721,14 +7830,14 @@
       "referenced_by": [
         "gpu/build.py",
         "gt/build.py",
+        "gt/public/faults.html",
         "gt/public/hot.html",
         "gt/tools/build_hot.py",
         "gt/tools/build_lot.py",
         "gt/tools/drop_ru.py",
         "library/equipment.py",
         "library/load_equipment.py",
-        "library/load_repair.py",
-        "scripts/build_chain_coverage.py"
+        "library/load_repair.py"
       ]
     },
     {
@@ -8305,9 +8414,11 @@
       "referenced_by": [
         "gpu/build.py",
         "gpu/tools/coverage.py",
+        "gt/public/faults.html",
         "scripts/build_chain_coverage.py",
         "scripts/build_chain_page.py",
         "tests/test_dict.py",
+        "tests/test_faults_slices.py",
         "tests/test_r1700_dossier.py"
       ]
     },
@@ -8492,7 +8603,8 @@
         "markers": []
       },
       "referenced_by": [
-        "gpu/build.py"
+        "gpu/build.py",
+        "gt/public/faults.html"
       ]
     },
     {
@@ -8528,14 +8640,14 @@
       "referenced_by": [
         "gpu/build.py",
         "gt/build.py",
+        "gt/public/faults.html",
         "gt/public/hot.html",
         "gt/tools/build_hot.py",
         "gt/tools/build_lot.py",
         "gt/tools/drop_ru.py",
         "library/equipment.py",
         "library/load_equipment.py",
-        "library/load_repair.py",
-        "scripts/build_chain_coverage.py"
+        "library/load_repair.py"
       ]
     },
     {

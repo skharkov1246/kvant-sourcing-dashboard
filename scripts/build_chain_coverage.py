@@ -221,18 +221,59 @@ def counts() -> dict:
     put("gsho", "machine", 1 if (r17.get("variants") or r17.get("specs")) else 0, src17)
     put("gsho", "node", n({x.get("node") for x in r17.get("parts", []) if x.get("node")}), src17)
     put("gsho", "part", n(r17.get("parts")), src17)
-    put("gsho", "contractor", n([o for o in r17.get("orgs", [])
-                                 if re.search(r"ремонт|сервис|restor|repair",
-                                              f"{o.get('kind', '')} {o.get('role', '')} {o.get('note', '')}",
-                                              re.I)]), src17)
+    # «Исполнитель» — утверждение о компании, а не защита строки, поэтому список
+    # закрытый. Прежнее правило искало «ремонт|сервис» ещё и в свободном тексте
+    # примечания и давало 51 вместо 21: в исполнители попадали изготовитель
+    # уплотнений, завод РВД, поставщики фильтров и торговцы, у которых слово
+    # «сервис» стояло в описании, — а также портал сервисной ИНФОРМАЦИИ Cat SIS.
+    # Теперь считается явная категория данных плюс роль, где ремонт назван как
+    # занятие компании; продавец ремонтных РУКОВОДСТВ и каталогов исключается
+    # отдельно — он торгует документами, а не чинит машины.
+    CONTRACTOR = re.compile(r"ремонт|ребилд|восстановлен|восстановительн|капремонт"
+                            r"|overhaul|refurbish|\bMRO\b", re.I)
+    CONTRACTOR_DOC = re.compile(r"ремонтн\w*\s+(руководств|каталог|документац|литератур)", re.I)
+
+    def is_contractor(org: dict) -> bool:
+        if (org.get("kind") or "").strip() == "ремонт":
+            return True
+        role = f"{org.get('role', '')} {org.get('what', '')}".strip()
+        return bool(CONTRACTOR.search(role)) and not CONTRACTOR_DOC.search(role)
+
+    put("gsho", "contractor", n([o for o in r17.get("orgs", []) if is_contractor(o)]), src17)
+
+    # Исполнители ремонта по ГТУ: те же правила на справочниках направления.
+    for rel in ("gt/data/suppliers.json", "gt/data/heavy_suppliers.json"):
+        rows = load(rel, [])
+        rows = rows if isinstance(rows, list) else (rows.get("suppliers") or rows.get("rows") or [])
+        rows = [x for x in rows if isinstance(x, dict)]
+        if rows:
+            put("gtu", "contractor", n([x for x in rows if is_contractor(x)]), rel)
     # Признак, дефект и ремонтное решение: считаются только строки, подтверждённые
     # документом. Общая инженерная практика («не проверялся») клетку не заполняет —
     # иначе счётчик покажет знание, которого у нас нет. Это та же граница, что у
     # поршневых: в звено идёт проверенное, а не собранное.
-    fl = [x for x in r17.get("faults", []) if x.get("verdict") == "подтверждён"]
-    put("gsho", "symptom", n({x.get("symptom") for x in fl if x.get("symptom")}), src17)
-    put("gsho", "defect", n({x.get("defect") for x in fl if x.get("defect")}), src17)
-    put("gsho", "repair", n({x.get("repair") for x in fl if x.get("repair")}), src17)
+    def faults_links(seg: str, rows: list, src: str) -> None:
+        """Признак, дефект и ремонтное решение из среза связок направления.
+
+        Считаются только строки с вердиктом «подтверждён» — те, что дословно
+        есть в скачанном документе. Общая инженерная практика («не проверялся»)
+        клетку не заполняет: иначе счётчик покажет знание, которого у нас нет.
+        Это та же граница, что у поршневых, где в звено идут только факты,
+        прошедшие проверку.
+        """
+        ok = [x for x in rows if x.get("verdict") == "подтверждён"]
+        for link in ("symptom", "defect", "repair"):
+            put(seg, link, n({x.get(link) for x in ok if x.get(link)}), src)
+
+    faults_links("gsho", r17.get("faults", []), src17)
+
+    # Те же связки по газотурбинным и газопоршневым. Срез лежит отдельным файлом
+    # направления, а не внутри досье машины: по ГТУ и ГПУ машин десятки, и строка
+    # чаще относится к классу, чем к одной модели.
+    for seg, rel in (("gtu", "gt/data/faults.json"), ("gpu", "gpu/data/faults.json")):
+        fl = load(rel, {})
+        if fl.get("rows"):
+            faults_links(seg, fl["rows"], rel)
 
     # ── Поршневые компрессоры: разведка направления. Считаются только факты
     # с вердиктом проверки — «скептик не сослался» и «не проверялся» в звено
