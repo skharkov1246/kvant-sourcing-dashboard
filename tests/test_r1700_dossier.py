@@ -192,3 +192,33 @@ def test_решение_владельца_о_каналах_доезжает_д
     # числовые спутники объявлены
     assert "add column if not exists price_num numeric" in ddl
     assert "add column if not exists price_usd_num numeric" in ddl
+
+
+def test_в_лист_запроса_не_попадают_снятые_и_российские():
+    """Корпус придуман. Проверка снимает канал, когда он не подтвердился.
+
+    До этой правки ask считался как «не российский», и три поставщика с
+    вердиктом «снят» оставались в листе запроса: один торгует гусеничной
+    ходовой (для колёсной ПДМ неприменима), у второго источник оказался от
+    другой машины. Письмо такому поставщику — ровно то, ради чего проверка и
+    делалась. «Сомнителен» из листа не убираем: запрос и есть способ снять
+    сомнение.
+    """
+    orgs = _load("r1700_dossier").orgs
+    slices = {"dealers": {"rows": [
+        {"org": "Foreign Dealer Ltd", "country": "AE", "verdict": "подтверждён"},
+        {"org": "Wrong Machine Parts Inc", "country": "US", "verdict": "снят"},
+        {"org": "Maybe Trading Co", "country": "CN", "verdict": "сомнителен"},
+        {"org": "ООО «Запчасть»", "country": "RU", "verdict": "подтверждён"},
+        {"org": "Российская компания", "country": "", "verdict": "подтверждён"},
+        {"org": "  ", "country": "DE", "verdict": "подтверждён"},
+    ]}}
+    out = orgs(slices)
+    assert len(out) == 5, "строка без названия в перечень не идёт"
+    ask = sorted(o["org"] for o in out if o["ask"])
+    assert ask == ["Foreign Dealer Ltd", "Maybe Trading Co"], ask
+    # снятые и российские остаются в данных, но помечены
+    ru = sorted(o["org"] for o in out if o["ru"])
+    assert ru == ["ООО «Запчасть»", "Российская компания"], ru
+    dropped = [o for o in out if o["verdict"] == "снят"]
+    assert len(dropped) == 1 and not dropped[0]["ask"], "снятый остаётся в данных, но не в запросе"
