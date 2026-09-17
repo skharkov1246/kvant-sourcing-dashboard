@@ -153,3 +153,97 @@ def test_цена_берётся_последним_числом_а_не_наи�
     assert got and got[0]["price"] == 86.89
     got2 = T.price_rows([("стр.1", 1, ["1794-ACNR15", "86", "3119,32"])], {})
     assert got2 and got2[0]["price"] == 3119.32
+
+
+# --- адресный обход: направление файла и отсев не-файлов -------------------
+# Написано по разбору 17.09.2026, который вскрыл, что первая версия не получила
+# бы ни одного файла и разобрала бы страницу входа как спецификацию.
+
+
+def test_файловый_объект_требует_машинной_ссылки():
+    """id без urlMachine — не файл.
+
+    Этой проверки не хватало в первой версии, а все четыре сборщика вложений в
+    репозитории её делают: urlMachine и есть единственная рабочая для вебхука
+    ссылка, а id без неё — мёртвая или не файловая запись.
+    """
+    assert T.objs({"id": 7}) == [], "словарь с id, но без ссылки принят за файл"
+    assert T.objs("CO_9634") == [], "crm-привязка принята за файл"
+    assert T.objs(None) == []
+    assert T.objs(123) == []
+    got = T.objs([{"id": 1, "urlMachine": "https://x/1"},
+                  {"id": 2, "downloadUrl": "https://x/2"},
+                  {"id": 3}])
+    assert len(got) == 2, "взяты не только объекты со ссылкой"
+
+
+def test_направление_по_имени_поля_сп166():
+    """Владелец требовал брать чужие КП, а не наши запросы, и чтобы это было
+    очевидно из контекста. Контекст — имя файлового поля смарт-процесса."""
+    assert T.RFQ_FILE_FIELDS["ufCrm18_1700698211875"][1] == "входящее"   # КП поставщика
+    assert T.RFQ_FILE_FIELDS["ufCrm18_1731179998"][1] == "входящее"      # Offer from supplier
+    assert T.RFQ_FILE_FIELDS["ufCrm18_1727423346"][1] == "наш запрос"    # Request file
+    assert T.RFQ_FILE_FIELDS["ufCrm18_1730999106096"][1] == "не цены"    # Bank Details
+    incoming = [k for k, (_, d) in T.RFQ_FILE_FIELDS.items() if d == "входящее"]
+    assert len(incoming) >= 2, "входящих полей должно быть несколько"
+
+
+def test_направление_по_тексту_сомнение_даёт_неизвестно():
+    """Асимметрия цены ошибки: отброшенное КП мы не увидим никогда, а наш же
+    запрос виден сразу по отсутствию цен. Значит при сомнении — «неизвестно»."""
+    assert T.direction_from_text("Получили КП от поставщика, во вложении цены") == "входящее"
+    assert T.direction_from_text("Отправили запрос и ТЗ поставщику") == "наш запрос"
+    # и то и другое в одной фразе — сомнение, а не выбор
+    assert T.direction_from_text("отправили запрос, получили предложение") == "неизвестно"
+    assert T.direction_from_text("") == "неизвестно"
+    assert T.direction_from_text("файл") == "неизвестно"
+
+
+def test_страница_входа_не_принимается_за_файл():
+    """Вебхук без прав на ссылку получает страницу входа с кодом 200.
+
+    Измерено в base/collect_attachments.py. Без этой проверки инструмент
+    разобрал бы html страницы входа как спецификацию и отчитался бы «текст без
+    цен» — то есть соврал бы о причине.
+    """
+    import types
+
+    page = ("<html><head><title>Bitrix24</title></head><body>"
+            "<form action='/auth/login'>вход</form></body></html>" + "x" * 300).encode()
+    real = ("Артикул;Цена\n3420932;86,89\n" + "y" * 300).encode()
+
+    def fake_get(url, timeout=0):
+        body = page if "bad" in url else real
+        return types.SimpleNamespace(status_code=200, content=body)
+
+    import sys as _s
+    mod = _s.modules.setdefault("requests", types.SimpleNamespace())
+    old = getattr(mod, "get", None)
+    mod.get = fake_get
+    try:
+        body, how = T.fetch("https://portal/bad")
+        assert body is None
+        assert "страница входа" in how, how
+        body2, how2 = T.fetch("https://portal/good")
+        assert body2 is not None and how2 == "ок"
+    finally:
+        if old is not None:
+            mod.get = old
+
+
+def test_короткий_ответ_считается_пустым():
+    import types
+    import sys as _s
+
+    def fake_get(url, timeout=0):
+        return types.SimpleNamespace(status_code=200, content=b"tiny")
+
+    mod = _s.modules.setdefault("requests", types.SimpleNamespace())
+    old = getattr(mod, "get", None)
+    mod.get = fake_get
+    try:
+        body, how = T.fetch("https://portal/x")
+        assert body is None and how == "пусто"
+    finally:
+        if old is not None:
+            mod.get = old
