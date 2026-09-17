@@ -1403,7 +1403,8 @@
       },
       "referenced_by": [
         ".github/workflows/bitrix-tkp.yml",
-        "gt/tools/bitrix_tkp.py"
+        "gt/tools/bitrix_tkp.py",
+        "gt/tools/ship_inventory.py"
       ]
     },
     {
