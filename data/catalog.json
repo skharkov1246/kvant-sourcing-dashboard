@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 216,
-    "total_bytes": 99497057,
+    "total_bytes": 99498077,
     "by_sensitivity": {
       "конфиденциально": 62,
       "внутреннее": 120,
@@ -5550,13 +5550,15 @@
       },
       "last_change": "2026-09-17",
       "last_author": "skharkov1246",
-      "last_commit": "9aa0cb6",
+      "last_commit": "703388a",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
       },
-      "referenced_by": []
+      "referenced_by": [
+        "gpu/build.py"
+      ]
     },
     {
       "path": "gpu/data/machines.json",
@@ -8313,6 +8315,56 @@
       ]
     },
     {
+      "path": "gpu/data/coverage.json",
+      "subproject": "ГПУ-библиотека",
+      "bytes": 12125,
+      "note": "Заполняемость базы ГПУ: сколько машин с разобранным списком применяемости, поставщиков с рабочим адресом, позиций заявки с ценой, проверкой и кроссом, и сколько систем двигателя закрыто всеми четырьмя слоями (потребность, аналоги, изготовители узлов, поставщики). Производный файл — считается gpu/tools/coverage.py по фактическим данным gpu/data и пересчитывается при каждой сборке сайта; руками не заполнять. Публикуется на kvant-gpu, раздел «Обзор → Заполняемость базы».",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "context",
+        "intro",
+        "machines",
+        "method",
+        "metrics",
+        "systems",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "systems",
+        "records": 19,
+        "record_keys": [
+          "analogs",
+          "demand",
+          "key",
+          "layers",
+          "name",
+          "pct",
+          "status",
+          "subsuppliers",
+          "suppliers"
+        ]
+      },
+      "last_change": "2026-09-11",
+      "last_author": "github-actions[bot]",
+      "last_commit": "381a14f",
+      "updated_by": "бот (workflow)",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "gpu/build.py",
+        "gpu/tools/coverage.py",
+        "gt/public/faults.html",
+        "scripts/build_chain_coverage.py",
+        "scripts/build_chain_page.py",
+        "tests/test_dict.py",
+        "tests/test_faults_slices.py",
+        "tests/test_r1700_dossier.py"
+      ]
+    },
+    {
       "path": "gt/data/models.json",
       "subproject": "ГТУ-библиотека",
       "bytes": 11790,
@@ -8417,56 +8469,6 @@
         "ove/tools/bidocs/vedomost.py",
         "ove/tools/build_release.py",
         "ove/tools/docframe.py"
-      ]
-    },
-    {
-      "path": "gpu/data/coverage.json",
-      "subproject": "ГПУ-библиотека",
-      "bytes": 11105,
-      "note": "Заполняемость базы ГПУ: сколько машин с разобранным списком применяемости, поставщиков с рабочим адресом, позиций заявки с ценой, проверкой и кроссом, и сколько систем двигателя закрыто всеми четырьмя слоями (потребность, аналоги, изготовители узлов, поставщики). Производный файл — считается gpu/tools/coverage.py по фактическим данным gpu/data и пересчитывается при каждой сборке сайта; руками не заполнять. Публикуется на kvant-gpu, раздел «Обзор → Заполняемость базы».",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "context",
-        "intro",
-        "machines",
-        "method",
-        "metrics",
-        "systems",
-        "updated"
-      ],
-      "main_collection": {
-        "key": "systems",
-        "records": 19,
-        "record_keys": [
-          "analogs",
-          "demand",
-          "key",
-          "layers",
-          "name",
-          "pct",
-          "status",
-          "subsuppliers",
-          "suppliers"
-        ]
-      },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
-      "sensitivity": {
-        "level": "публикуемо",
-        "markers": []
-      },
-      "referenced_by": [
-        "gpu/build.py",
-        "gpu/tools/coverage.py",
-        "gt/public/faults.html",
-        "scripts/build_chain_coverage.py",
-        "scripts/build_chain_page.py",
-        "tests/test_dict.py",
-        "tests/test_faults_slices.py",
-        "tests/test_r1700_dossier.py"
       ]
     },
     {
