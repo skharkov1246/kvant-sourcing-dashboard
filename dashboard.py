@@ -29,13 +29,53 @@ def _json_for_script(obj) -> str:
     return json.dumps(obj, ensure_ascii=False).replace("</", "<\\/")
 
 
+# Самые тяжёлые массивы страницы — списки одинаковых записей. Замер живой страницы
+# 17.09.2026: подробности запросов сорсеров 2 227 КБ, сделки когорт 1 456 КБ, заказы и
+# таймлайн контрактов 1 234 КБ. В обычном JSON имена полей повторяются в КАЖДОЙ записи:
+# у сорсеров это 6 467 записей по тринадцать ключей — сотни килобайт чистого повтора.
+# Пакуем такие списки в {f: [имена], r: [[значения]]}: содержимое то же, читается на
+# клиенте один раз функцией _unpack. Пилот на самом тяжёлом списке; остальные — после
+# замера выигрыша, чтобы не менять форму данных там, где это ничего не даёт.
+PACK_MARK = "_p"
+
+
+def _pack_records(rows: list) -> dict | list:
+    """Список одинаковых записей → {f: имена полей, r: строки значений}."""
+    if not isinstance(rows, list) or len(rows) < 20 or not all(isinstance(r, dict) for r in rows):
+        return rows
+    fields: list[str] = []
+    seen: set[str] = set()
+    for r in rows:
+        for k in r:
+            if k not in seen:
+                seen.add(k)
+                fields.append(k)
+    return {PACK_MARK: 1, "f": fields, "r": [[r.get(k) for k in fields] for r in rows]}
+
+
+def _pack_metrics(metrics: dict) -> dict:
+    """Копия метрик, где подробности запросов упакованы. Исходный словарь не трогаем:
+    его же пишет отчёт в reports/ и читают другие модули."""
+    src = metrics.get("sourcersA")
+    if not isinstance(src, list) or not src:
+        return metrics
+    out = dict(metrics)
+    out["sourcersA"] = [
+        (dict(s, details=_pack_records(s["details"]))
+         if isinstance(s, dict) and isinstance(s.get("details"), list) else s)
+        for s in src
+    ]
+    return out
+
+
+
 def render(metrics: dict, insights: dict, *, title: str = DEFAULT_TITLE, company: dict | None = None,
            kam: dict | None = None, eng: dict | None = None, prod: dict | None = None,
            contracts: dict | None = None, reps: dict | None = None, advisor: dict | None = None,
            people: dict | None = None) -> str:
     html = TEMPLATE.read_text(encoding="utf-8")
     html = html.replace("__TITLE__", title)
-    html = html.replace("__DATA_JSON__", _json_for_script(metrics))
+    html = html.replace("__DATA_JSON__", _json_for_script(_pack_metrics(metrics)))
     html = html.replace("__INSIGHTS_JSON__", _json_for_script(insights))
     html = html.replace("__COMPANY_JSON__", _json_for_script(company) if company else "null")
     html = html.replace("__KAM_JSON__", _json_for_script(kam) if kam else "null")
