@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 219,
-    "total_bytes": 99633751,
+    "total_bytes": 99633635,
     "by_sensitivity": {
       "конфиденциально": 62,
       "внутреннее": 120,
@@ -5660,7 +5660,7 @@
     {
       "path": "data/catalog_notes.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 55847,
+      "bytes": 55731,
       "note": "",
       "format": "json",
       "shape": "объект",
@@ -5695,9 +5695,9 @@
         "gt/data/ship_sweep.json",
         "gt/docs/ЗАКУПКА-ЛУКОЙЛ.csv",
         "gt/docs/ЗАПРОСЫ-ЛУКОЙЛ.csv",
-        "gt/docs/ЗАЩИТА-ЦЕН-ЛУКОЙЛ.pdf",
         "gt/docs/ЛУКОЙЛ-СИМЕНС-SGT-400.pdf",
         "gt/docs/ЛУКОЙЛ-СОЛАР-TAURUS.pdf",
+        "gt/docs/РАЗВЕДКА-ЦЕН-ЛУКОЙЛ.pdf",
         "library/data/symptoms.json",
         "library/docfilter.py",
         "library/indexer.py",
@@ -5708,7 +5708,7 @@
       ],
       "last_change": "2026-09-17",
       "last_author": "Claude",
-      "last_commit": "699ef25",
+      "last_commit": "b4dc0dd",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
