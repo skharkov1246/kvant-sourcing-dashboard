@@ -1009,6 +1009,7 @@ const METH={
   'p.load':{t:'Загрузка по людям',what:'Кто сколько ведёт: сделки, деньги, просрочка, косяки — по каждому человеку роли.',src:'Поле сделки «КАМ» (UF_CRM_1740390857) или «Product leader» (UF_CRM_1779187425); где пусто — ответственный за сделку, если он сам этой роли.',formula:'«Доля» = (проработка + реализация) этого человека ÷ сумма по роли. «Косяки» = сделки хотя бы с одним признаком из раздела 4.',note:'Ответственный (ASSIGNED_BY_ID) — исполнитель, а не КАМ: из 1 812 сделок с заполненным полем «КАМ» он отличается от КАМа у 1 601. Поэтому нагрузка коммерсанта считается по полю роли, а не по владельцу карточки.'},
   'p.funnel':{t:'Где стоят сделки',what:'Разрез портфеля роли по воронкам и стадиям Bitrix.',src:'CATEGORY_ID и STAGE_ID открытых сделок + справочник стадий (crm.status.list).',formula:'Число сделок и Σ продаж по каждой воронке; стадии — топ-20 по числу сделок.'},
   'p.result':{t:'Результат года и ожидание',what:'Что роль сделала с 01.01 и сколько денег ждать дальше.',src:'crm.deal.list по дате создания с 01.01.2026 (STAGE_SEMANTIC_ID: S — выиграна, F — проиграна).',formula:'win-rate = выиграно ÷ (выиграно + проиграно). «Законтрактовано» = Σ открытых сделок в реализации (факт). «Взвешенный пайплайн» = Σ проработки × win-rate роли (оценка).',note:'Складывать эти два числа нельзя: первое — факт по сделкам, которые уже в реализации, второе — вероятностная оценка. В заголовок отчёта идёт только факт.'},
+  'p.fix':{t:'Кому что исправить',what:'Тот же список косяков, но разложенный по людям: не «в роли 1 400 плохих карточек», а «у этого человека 96, и вот они».',src:'Открытые сделки роли (атрибуция полем карточки, затем владельцем) + поля OPPORTUNITY, COMPANY_ID, CLOSEDATE, MOVED_TIME и дедлайн клиенту на заказе СП-172.',formula:'Карточка попадает в столбец, если у неё нет суммы, нет клиента, плановая дата не в будущем, стадия не менялась дольше 180 дней или сорван срок клиенту. Один и тот же документ может стоять в нескольких столбцах; «всего» считает карточки, а не отметки.',note:'Строка — это поручение, а не оценка человека: три четверти попаданий сюда чинятся заполнением полей за минуту. Люди без единой проблемной карточки в таблицу не выводятся.'},
   'p.flaws':{t:'Косяки и риски',what:'Что мешает верить портфелю роли и где рвётся обязательство перед клиентом.',src:'Дедлайн клиенту на заказе СП-172 (Date of deadline to customer), MOVED_TIME сделки, суммы и привязка компании.',formula:'Просрочка = дата обещания клиенту прошла, заказ не закрыт. Застой = стадия не менялась дольше 90 дней, брошено — дольше 180. Плюс сделки без суммы, без клиента, с продажей ниже закупки и карточки-выбросы: сумма ≥ 50 медиан открытой сделки (порог берётся от самих данных, а не назначается).',note:'Поле CLOSEDATE под просрочку не годится: оно заполнено у всех 2 695 открытых сделок, у 2 624 — прошедшей датой, а будущая дата лишь у 71 (2,6 %). Это автопростановка, а не план. Выбросы по сумме важны отдельно: базовая валюта портала — EUR и пересчёт верен, но медианная открытая сделка около €100 тыс., а десяток карточек несёт сотни миллионов — пока их не проверили, итог пайплайна не факт.'},
   'p.cover':{t:'Покрытие ролью и бесхозные сделки',what:'Сколько портфеля закреплено за людьми, сколько ни за кем и сколько висит на уволенных.',src:'Поля роли на карточке + user.get (ACTIVE).',formula:'«Закреплено» = сделки с определённым человеком роли. «Ни за кем» = ни КАМа, ни продукт-оунера при действующем ответственном. «На уволенных» = открытые сделки, чей ответственный отключён в Bitrix.',note:'Роли пересекаются, поэтому сходится не сумма (КАМ + продукт-оунер ≠ всего), а покрытие: закреплено / ни за кем / на уволенных.'},
   'd.people':{t:'До человека',what:'Те же метрики по каждому сотруднику группы.',src:'группировка по ASSIGNED_BY_ID внутри групп.',formula:'Сделки / пайплайн / заказы / выручка / зак-сд по сотруднику.',note:'Клик по сотруднику — его сделки и заказы.'},
@@ -1775,6 +1776,29 @@ function renderPeople(P,role,elId,opt){
   h+=`<div class="secttl"><b>5</b> · Косяки и риски${qmark('p.flaws')}</div><section class="card">`
     +`<div class="note">Чистых карточек у роли: <b>${T.cleanPct==null?'—':T.cleanPct+'%'}</b> (${T.open-T.flaws} из ${T.open}). Клик по признаку — список сделок.</div>`
     +`<div class="statleg" style="margin:0">`+FL.map(f=>`<span class="stchip drill" data-pk="${f[0]}"><i class="dot" style="background:var(--${f[3]})"></i>${f[1]} <b>${f[2]}</b></span>`).join('')+`</div></section>`;
+  // 5б — те же косяки, но разложенные по людям: диагноз превращается в поручение
+  const FIXK=[['noAmt','без суммы',d=>d.noAmt],['noComp','без клиента',d=>d.noComp],
+              ['noPlan','без плановой даты',d=>!d.plan],
+              ['dead','стоят '+PR.dead+'+ дн',d=>d.idle!=null&&d.idle>PR.dead],
+              ['late','сорван срок клиенту',d=>d.late>0]];
+  const fixRows=(R.people||[]).filter(p=>p.active).map(p=>{
+    const md=D.filter(d=>mine(d)===p.uid);
+    return {uid:p.uid,name:p.name,pos:p.pos,open:md.length,
+            cells:FIXK.map(f=>md.filter(f[2]).length),
+            total:md.filter(d=>FIXK.some(f=>f[2](d))).length};
+  }).filter(r=>r.total).sort((a,b)=>b.total-a.total);
+  if(fixRows.length){
+    const tot=FIXK.map((f,i)=>fixRows.reduce((a,r)=>a+r.cells[i],0));
+    h+=`<div class="secttl"><b>5</b>б · Кому что исправить${qmark('p.fix')}</div><section class="card">`
+      +`<div class="note">Тот же список, что выше, но по людям: с этим можно идти к человеку. Клик по числу — его карточки этого вида. Люди без проблемных карточек не показаны.</div>`
+      +`<table><thead><tr><th>Сотрудник</th>`+FIXK.map(f=>`<th class="r">${f[1]}</th>`).join('')+`<th class="r">всего</th><th class="r">из скольких</th></tr></thead><tbody>`
+      +fixRows.map(r=>`<tr><td><div class="who">${_esc(r.name)}</div><div class="dep">${_esc(r.pos||'')}</div></td>`
+        +r.cells.map((n,i)=>`<td class="num r">${n?`<span class="drill" data-pfix="${_esc(r.uid)}|${FIXK[i][0]}"><b>${n}</b></span>`:'<span class="dimv">—</span>'}</td>`).join('')
+        +`<td class="num r"><b style="color:var(--a)">${r.total}</b></td><td class="num r dimv">${r.open}</td></tr>`).join('')
+      +`</tbody><tfoot><tr style="border-top:2px solid var(--line)"><td><b>Итого</b></td>`
+      +tot.map(n=>`<td class="num r"><b>${n}</b></td>`).join('')
+      +`<td class="num r"><b>${fixRows.reduce((a,r)=>a+r.total,0)}</b></td><td class="num r dimv">${fixRows.reduce((a,r)=>a+r.open,0)}</td></tr></tfoot></table></section>`;
+  }
   // 5 — покрытие ролью и бесхозные
   const OR=P.orphan||{rows:[],n:0};
   h+=`<div class="secttl"><b>6</b> · Кто закреплён, а кто нет${qmark('p.cover')}</div><section class="card">`
@@ -1810,7 +1834,9 @@ function renderPeople(P,role,elId,opt){
   const roleDeals=D.filter(d=>mine(d));
   el.addEventListener('click',ev=>{
     if(ev.target.closest('.qq'))return;
-    const p=ev.target.closest('[data-puid]'),k=ev.target.closest('[data-pk]'),c=ev.target.closest('[data-pcat]'),ow=ev.target.closest('[data-pown]');
+    const p=ev.target.closest('[data-puid]'),k=ev.target.closest('[data-pk]'),c=ev.target.closest('[data-pcat]'),ow=ev.target.closest('[data-pown]'),fx=ev.target.closest('[data-pfix]');
+    if(fx){const [uid,kind]=fx.dataset.pfix.split('|'),f=FIXK.find(x=>x[0]===kind),per=(R.people||[]).find(x=>x.uid===uid)||{};
+      openPeopleDeals(D.filter(d=>mine(d)===uid&&f[2](d)),per.name||uid,'Что исправить · '+f[1]);return;}
     if(p){const uid=p.dataset.puid,per=(R.people||[]).find(x=>x.uid===uid)||{};
       openPeopleDeals(D.filter(d=>mine(d)===uid),per.name||uid,`${o.unit} · ${per.pos||''}`);}
     else if(ow){const uid=ow.dataset.pown,per=(OR.rows||[]).find(x=>x.uid===uid)||{};
