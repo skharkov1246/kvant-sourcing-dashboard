@@ -85,10 +85,12 @@ def check_size(html: str, errors: list[str]) -> None:
         errors.append(f"страница подозрительно велика: {n} байт > {MAX_BYTES}")
 
 
-def extract_data(html: str, errors: list[str]) -> dict[str, object]:
+def extract_data(html: str, errors: list[str], sizes: dict[str, int] | None = None) -> dict[str, object]:
     blobs: dict[str, object] = {}
     for name, raw in DATA_RE.findall(html):
         raw = raw.strip()
+        if sizes is not None:
+            sizes[name] = len(raw.encode())
         if raw in ("null", "undefined"):
             blobs[name] = None
             continue
@@ -267,13 +269,18 @@ def main() -> int:
     notes: list[str] = []
     check_placeholders(html, errors)
     check_size(html, errors)
-    blobs = extract_data(html, errors)
+    sizes: dict[str, int] = {}
+    blobs = extract_data(html, errors, sizes)
     check_content(blobs, errors, a.allow_empty)
     if not a.no_browser:
         check_browser(path, errors, warns, notes)
 
     kb = len(html.encode()) // 1024
     print(f"• {path}: {kb} КБ, блоков данных {len([k for k, v in blobs.items() if v is not None])}")
+    # из чего сложился вес: без разбивки любая борьба за размер страницы — гадание
+    heavy = sorted(((v, k) for k, v in sizes.items() if v > 64 * 1024), reverse=True)[:6]
+    if heavy:
+        print("  вес данных: " + " · ".join(f"{k.strip('_').lower()} {v // 1024} КБ" for v, k in heavy))
     for n in notes:
         print(f"  {n}")
     for w in warns:
