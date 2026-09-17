@@ -403,6 +403,7 @@ footer{padding:0 22px 24px;color:var(--mut);font-size:11.5px}
     <th>Что сравниваем</th><th>Цена</th><th>Без НДС</th><th>Источник</th>
   </tr></thead><tbody id="oh-mc"></tbody></table></div>
   <div class="box warn" id="oh-mc-verdict"></div>
+  <div class="box info" id="oh-mc-lever"></div>
 
   <h3>Запрос цен: что спрашивать</h3>
   <p id="oh-rfq-why"></p>
@@ -416,6 +417,11 @@ footer{padding:0 22px 24px;color:var(--mut);font-size:11.5px}
   <div class="tblwrap"><table><thead><tr>
     <th>Компания</th><th>Страна</th><th>Почему этот адрес</th><th>История в Bitrix</th>
   </tr></thead><tbody id="oh-addr"></tbody></table></div>
+
+  <h3>Риски и чем они снимаются</h3>
+  <div class="tblwrap"><table><thead><tr>
+    <th>Риск</th><th>Чем оборачивается</th><th>Что делать</th>
+  </tr></thead><tbody id="oh-risks"></tbody></table></div>
 
   <h3>Вопросы заказчику</h3>
   <div class="card"><ul id="oh-quest"></ul></div>
@@ -1971,6 +1977,7 @@ function fillSelect(sel, values, allLabel) {
     <td>${esc(r.what)}</td><td class="num">${num(r.price)} ₽</td>
     <td class="num">${r.net ? num(r.net) + " ₽" : "—"}</td>
     <td>${/^https?:/.test(r.source || "") ? `<a href="${esc(r.source)}" target="_blank" rel="noopener">страница</a>` : esc(r.source || "")}</td></tr>`).join("");
+  $("#oh-mc-lever").innerHTML = MC.lever ? `<b>Рычаг.</b> ${esc(MC.lever)}` : "";
   $("#oh-mc-verdict").innerHTML = `<b>Вывод.</b> ${esc(MC.verdict || "")}`
     + (MC.correction ? `<div class="mut" style="margin-top:6px"><b>Отменённый вывод.</b> ${esc(MC.correction)}</div>` : "");
 
@@ -1989,6 +1996,8 @@ function fillSelect(sel, values, allLabel) {
   $("#oh-addr").innerHTML = (RQ.addressees || []).map(a => `<tr>
     <td><b>${esc(a.name)}</b></td><td>${esc(a.country)}</td><td>${esc(a.why)}</td>
     <td>${a.bitrix === "доходили до сделки" ? `<span class="pill ok">${esc(a.bitrix)}</span>` : esc(a.bitrix || "")}</td></tr>`).join("");
+  $("#oh-risks").innerHTML = (OVERHAUL.risks || []).map(r => `<tr>
+    <td><b>${esc(r.risk)}</b></td><td>${esc(r.impact)}</td><td class="mut">${esc(r.mitigation)}</td></tr>`).join("");
   $("#oh-quest").innerHTML = (OVERHAUL.open_questions || []).map(q => `<li>${esc(q)}</li>`).join("");
 
   $("#pb-tpl").querySelectorAll("button[data-tpl]").forEach(b => b.onclick = () => {
