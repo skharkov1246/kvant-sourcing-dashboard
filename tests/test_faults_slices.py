@@ -103,3 +103,49 @@ def test_в_звено_цепочки_идёт_только_подтверждё
         assert by_seg[name]["symptom"] == len(ok), (
             f"{name}: в клетку «признак» попало не то, что подтверждено")
         assert by_seg[name]["symptom"] < len(rows), f"{name}: подтверждено не может быть всё"
+
+
+def test_исполнитель_не_считается_по_свободному_тексту():
+    """Корпус придуман. «Исполнитель» — утверждение о компании, не защита строки.
+
+    Прежнее правило искало «ремонт|сервис» ещё и в примечании и дало по ГШО
+    51 вместо 21: в исполнители попадали изготовитель уплотнений, завод РВД,
+    поставщики фильтров и портал сервисной ИНФОРМАЦИИ Cat SIS — у всех слово
+    стояло в описании, а не в занятии. Правило должно обвинять закрытым списком.
+    """
+    import importlib.util
+    spec = importlib.util.spec_from_file_location(
+        "bcc", ROOT / "scripts" / "build_chain_coverage.py")
+    src = (ROOT / "scripts" / "build_chain_coverage.py").read_text(encoding="utf-8")
+    assert "CONTRACTOR_DOC" in src, "исключение для продавцов ремонтных руководств снято"
+    assert "org.get('note'" not in src.split("def is_contractor")[1].split("def ")[0], \
+        "исполнитель снова считается по свободному тексту примечания"
+
+    import re
+    narrow = re.compile(r"ремонт|ребилд|восстановлен|восстановительн|капремонт"
+                        r"|overhaul|refurbish|\bMRO\b", re.I)
+    doc = re.compile(r"ремонтн\w*\s+(руководств|каталог|документац|литератур)", re.I)
+
+    def is_contractor(o):
+        if (o.get("kind") or "").strip() == "ремонт":
+            return True
+        role = f"{o.get('role', '')} {o.get('what', '')}".strip()
+        return bool(narrow.search(role)) and not doc.search(role)
+
+    yes = [
+        {"org": "Цех ребилда", "kind": "ремонт", "role": ""},
+        {"org": "Независимый MRO", "kind": "торговец", "role": "независимый сервис MRO, лопатки"},
+        {"org": "Моторный завод", "kind": "торговец", "role": "капитальный ремонт двигателей"},
+    ]
+    no = [
+        {"org": "Изготовитель уплотнений", "kind": "производитель-неоригинал",
+         "role": "10 000 стандартных уплотнений", "note": "годится в сервисный комплект и ремонт"},
+        {"org": "Продавец каталогов", "kind": "маркетплейс",
+         "role": "продажа электронных каталогов запчастей и ремонтных руководств"},
+        {"org": "Портал документации", "kind": "маркетплейс",
+         "role": "официальная система сервисной информации"},
+        {"org": "Торговец фильтрами", "kind": "торговец", "role": "шесть брендов фильтров",
+         "note": "закрывает весь сервисный контур"},
+    ]
+    assert all(is_contractor(o) for o in yes), [o["org"] for o in yes if not is_contractor(o)]
+    assert not any(is_contractor(o) for o in no), [o["org"] for o in no if is_contractor(o)]
