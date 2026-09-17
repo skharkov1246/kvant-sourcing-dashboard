@@ -21,6 +21,9 @@ D, OUT = ROOT / "data", ROOT / "public"
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from build_telsmith_page import CSS  # общая вёрстка страниц-разведок  # noqa: E402
+# В этом модуле num() уже занят форматированием числа для вёрстки,
+# поэтому разбор цены берём под своим именем.
+from r1700_dossier import num as price_num  # то же правило разбора, что у базы  # noqa: E402
 
 e = lambda s: html.escape(str(s if s is not None else ""))
 J = lambda o: json.dumps(o, ensure_ascii=False, separators=(",", ":"))
@@ -342,6 +345,19 @@ def build():
         "qty": p.get("qty"), "interval": p.get("interval"), "kvs": ", ".join(p.get("kv") or []),
         "nalt": len(p.get("alts") or []), "price": p.get("price_usd") or (
             f"{p.get('price_eur_min')}–{p.get('price_eur_max')} EUR" if p.get("price_eur_min") else ""),
+        # Спутник для сортировки: в колонке цены лежит строка, а строки
+        # сравниваются посимвольно — «9787» оказывалось выше «1 240.88».
+        # Пусто там, где строка не является ценой целиком («99.80 OEM / 62.00
+        # аналог», «цена по запросу»): такие позиции уходят в конец обоих
+        # направлений, а не притворяются дешёвыми.
+        "price_n": price_num(p.get("price_usd")) if price_num(p.get("price_usd")) is not None
+        else (p.get("price_eur_min") or None),
+        # Валюта нужна самой сортировке: 0.09 EUR и 0.41 USD — не одна шкала.
+        # Сравниваем только внутри валюты, доллар идёт первой группой (320 строк
+        # против 40 евровых), евро второй, строки без числа — последними.
+        "price_cur": "USD" if price_num(p.get("price_usd")) is not None
+        else ("EUR" if p.get("price_eur_min") else None),
+        "qty_n": price_num(p.get("qty")),
         "bitrix_status": p.get("bitrix_status") or "", "confidence": p.get("confidence"),
         "verdict": p.get("verdict"), "sources": p.get("sources") or [],
         "alts": p.get("alts") or [], "note": p.get("note") or "",
@@ -371,7 +387,18 @@ function rowsP(){const q=$("qp").value.toLowerCase(),nd=$("fnode").value,vr=$("f
     (!al||x.nalt>0)&&(!kv||x.kvs)&&
     (!q||[x.pn,x.name_ru,x.node,x.applic,x.kvs,x.note,(x.alts||[]).map(a=>a.brand+" "+a.pn).join(" ")]
       .join(" ").toLowerCase().includes(q)));
-  r.sort((a,b)=>{const A=a[sp.k]??"",B=b[sp.k]??"";return (A>B?1:A<B?-1:0)*sp.d;});return r;}
+  // Колонки с числовым спутником сортируем числом, остальные — строкой.
+  // Строки без числа (оговорка, «цена по запросу») уходят вниз при любом
+  // направлении: иначе по убыванию они заняли бы место самых дорогих.
+  const NUM={price:"price_n",qty:"qty_n",nalt:"nalt"};
+  const CUR={USD:0,EUR:1};
+  r.sort((a,b)=>{const nk=NUM[sp.k];
+    if(nk){const A=a[nk],B=b[nk];
+      if(A==null&&B==null)return 0; if(A==null)return 1; if(B==null)return -1;
+      if(nk==="price_n"){const ca=CUR[a.price_cur]??9,cb=CUR[b.price_cur]??9;
+        if(ca!==cb)return ca-cb;}   // разные валюты не сравниваем, а разводим
+      return (A-B)*sp.d;}
+    const A=a[sp.k]??"",B=b[sp.k]??"";return (A>B?1:A<B?-1:0)*sp.d;});return r;}
 function drawP(){const r=rowsP();
   $("tp").tBodies[0].innerHTML=r.map((x,i)=>`<tr data-i="${P.indexOf(x)}">
    <td class="pn">${esc(x.pn)}</td><td>${esc(x.name_ru)}</td><td>${esc(x.node)}</td>

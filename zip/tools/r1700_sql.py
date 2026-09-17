@@ -15,9 +15,12 @@ mach_tenders, mach_customs.
 from __future__ import annotations
 
 import json
-import re
 import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+from r1700_dossier import num  # одно правило разбора цены на сборщик и на базу  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 REPO = ROOT.parent
@@ -37,28 +40,6 @@ def q(v) -> str:
     if not s:
         return "null"
     return "'" + s.replace("'", "''") + "'"
-
-
-def num(v):
-    """Число из строки цены — или None, если строка не разбирается целиком.
-
-    В базе рядом с текстовой ценой лежит числовая: text-колонка сравнивается
-    лексикографически, и по ней «максимум» доллара выходил 99.76 при строках в
-    тысячи. Разбираем только то, что является ценой полностью: «0.46 OEM / 0.15
-    аналог (за дюйм)» числом не станет — оговорка важнее удобства. Запятая как
-    разделитель тысяч («1,240.88») снимается, как десятичный знак — не
-    поддерживается: «1,24» неотличимо от «1,240» без догадки.
-    """
-    if v is None or isinstance(v, bool):
-        return None
-    if isinstance(v, (int, float)):
-        return float(v)
-    s = str(v).strip().replace("\u00a0", "").replace(" ", "")
-    if re.fullmatch(r"\d{1,3}(,\d{3})+(\.\d+)?", s):
-        s = s.replace(",", "")
-    if not re.fullmatch(r"\d+(\.\d+)?", s):
-        return None
-    return float(s)
 
 
 def ins(table: str, cols: list[str], rows: list[list], conflict: str | None = None) -> str:
