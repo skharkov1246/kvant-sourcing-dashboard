@@ -484,7 +484,7 @@ def run(args) -> int:
 
     try:
         print("• Коммерсанты (персональные дашборды + контрольные точки)…")
-        reps_data = reps_mod.compute(client, realize_date=realize_date, as_of=p.end)
+        reps_data = reps_mod.compute(client, realize_date=realize_date, as_of=p.end, created=deals_ytd)
         print(f"  ✓ коммерсантов: {len(reps_data['reps'])}")
     except Exception as e:
         print(f"  ⚠ вкладка «Коммерсанты» пропущена: {type(e).__name__}: {e}")

@@ -1,6 +1,16 @@
 """Вкладка «Коммерсанты» — персональные дашборды менеджеров с контрольными точками.
 
-Считает по 4 коммерческим сотрудникам (можно расширить) измеримые KPI:
+СОСТАВ И АТРИБУЦИЯ — как во вкладках ролей (people.py), а не списком фамилий в коде:
+  • кого показываем: действующие сотрудники, у которых роль КАМ или продукт-оунер
+    (каскад «должность → отдел»), и на кого записана хотя бы одна сделка этого года.
+    Раньше здесь жил список из 16 фамилий — он устаревал с каждым увольнением и наймом;
+    в портале на 17.09.2026 действующих 157 и отключённых 88.
+  • чья сделка: поле карточки «КАМ» / «Product leader», и лишь потом ответственный.
+    Ответственный — исполнитель: у 1 601 сделки из 1 812 он не совпадает с КАМом.
+    Пока эта вкладка считала по ответственному, она показывала другую нагрузку тех же
+    людей, чем вкладки «КАМы» и «Продукт-оунеры».
+
+Считает по каждому коммерсанту измеримые KPI:
   ОБЪЁМ:    активных сделок + Σ пайплайн (€); создано (сделки ЭТОГО года, с 01.01.2026).
   РЕЗУЛЬТАТ: в реализации (шт) + конверсия %; продажи (€); маржа (€); средний чек.
   КАЧЕСТВО: проиграно (шт); win-rate = выиграно ÷ (выиграно+проиграно).
@@ -15,30 +25,32 @@ import datetime as dt
 import re
 from collections import Counter, defaultdict
 
+import people as people_mod
 from bitrix_client import BitrixClient
 
 YEAR_START = "2026-01-01T00:00:00"   # работаем только в этом году
 
-# кого показываем (имя для вкладки → паттерн поиска в имени пользователя Bitrix)
-REPS = [
-    ("Полупанов", r"polupanov"),
-    ("Щуренков", r"shchurenkov|schurenkov|shurenkov"),
-    ("Ситдиков", r"sitdikov"),
-    ("Зорин", r"\bzorin\b"),
-    ("Володин", r"volodin"),
-    ("Черкасов", r"cherkas"),
-    ("Филиппенко", r"filippenko|filipenko"),
-    # руководящий коммерческий блок
-    ("Морговский", r"morgovsky"),                 # Dmitry, CCO (не Olga Morgovskaya)
-    ("Чавкин", r"chavkin"),                       # Alexey, Deputy CO
-    ("Сокольников", r"vyacheslav sokolnikov"),    # Vyacheslav (не Kirill, Engineer)
-    # референсные коммерсанты (топ по числу сделок-2026, клиентский фронт)
-    ("Миловидов", r"milovidov"),                  # KAM, Shelf
-    ("Старкова", r"starkova"),                    # KAM, Mining
-    ("Швед", r"shved"),                           # Project Implementation Manager
-    ("Корнилова", r"kornilova"),                  # Project Manager
-    ("Шипулев", r"shipulev"),                     # Project Manager
-]
+# на вкладку попадает коммерсант, у которого есть хотя бы столько сделок этого года:
+# нулевые карточки людей, за которыми числится одна случайная сделка, только шумят.
+MIN_DEALS = 3
+ROLE_LABEL = {"kam": "КАМ", "prod": "Продукт-оунер"}
+
+
+def rep_roster(client) -> tuple[dict, dict, dict]:
+    """(состав портала, роль по uid, действующие коммерсанты {uid: роль}) — из Bitrix."""
+    ppl = people_mod.roster(client)
+    deps = {str(d["ID"]): d.get("NAME", "") for d in client.list_paged("department.get", {})}
+    role_of = people_mod.roles_by_uid(ppl, deps)
+    live = {u: r for u, r in role_of.items()
+            if r in people_mod.COMMERCIAL_ROLES and ppl.get(u, {}).get("active")}
+    return ppl, role_of, live
+
+
+def _label(name: str, uid: str) -> str:
+    """Короткая подпись для вкладки — фамилия из имени Bitrix."""
+    parts = [x for x in str(name or "").split() if x]
+    return parts[0] if parts else f"user#{uid}"
+
 
 # контрольные точки (монотонная шкала уровней 0..5)
 CHECKPOINTS = ["Создано", "ТКП выдано", "В реализации", "Договор подписан", "Отгружено", "Завершено"]
@@ -198,22 +210,18 @@ _REACT_NUM = ["mentions", "self", "coll", "none", "medMin", "withinSla", "w30", 
 def scan_chat_reaction(client, *, as_of=None, collect_samples=False):
     """Суточный скан чатов сделок → реакция по сотрудникам (+ выборка текста для AI-оценки).
     Возвращает (react_dict, rep_ids, unames). Стадия сделки — упрощённо: кат.0/№ → 'real', иначе 'presale'."""
-    import re as _re
     today = as_of or dt.date.today()
     unames = client.users()
-    rep_ids = {}
-    for label, pat in REPS:
-        rx = _re.compile(pat, _re.I)
-        uid = next((u for u, n in unames.items() if rx.search(n or "")), None)
-        if uid:
-            rep_ids[label] = str(uid)
+    ppl, role_of, live = rep_roster(client)
+    rep_ids = {_label(ppl[u]["name"], u): u for u in live}
     ids = list(rep_ids.values())
-    deals = client.list_deals_fast(filter={">=DATE_CREATE": YEAR_START, "ASSIGNED_BY_ID": ids},
-                                   select=["ID", "TITLE", "ASSIGNED_BY_ID", "CATEGORY_ID"])
+    deals = client.list_deals_fast(
+        filter={">=DATE_CREATE": YEAR_START},
+        select=["ID", "TITLE", "ASSIGNED_BY_ID", "CATEGORY_ID"] + people_mod.DEAL_FIELDS)
     downer = {}; dstage = {}
     idset = set(ids)
     for d in deals:
-        o = str(d.get("ASSIGNED_BY_ID") or "")
+        o, _role, _src = people_mod.responsible(d, role_of, ppl)
         if o in idset:
             did = str(d["ID"]); downer[did] = o
             is_real = str(d.get("CATEGORY_ID")) == "0" or _regno(d.get("TITLE")) > 0
@@ -280,32 +288,41 @@ def _pctile(sv: list, p: float):
     return round(sv[f] + (sv[c] - sv[f]) * (k - f))
 
 
-def compute(client: BitrixClient, *, realize_date: dict | None = None, as_of: dt.date | None = None) -> dict:
+def compute(client: BitrixClient, *, realize_date: dict | None = None, as_of: dt.date | None = None,
+            created: list[dict] | None = None) -> dict:
     today = as_of or dt.date.today()
     today_iso = today.isoformat()
     unames = client.users()
 
-    # сопоставляем имена → id
-    rep_ids = {}
-    for label, pat in REPS:
-        rx = re.compile(pat, re.I)
-        uid = next((u for u, n in unames.items() if rx.search(n or "")), None)
-        if uid:
-            rep_ids[label] = str(uid)
-    ids = list(rep_ids.values())
-    if not ids:
-        return {"reps": [], "labels": [l for l, _ in REPS], "window": "—"}
+    # состав — из Bitrix: действующие сотрудники коммерческих ролей
+    ppl, role_of, live = rep_roster(client)
+    if not live:
+        return {"reps": [], "labels": [], "window": "—"}
 
     # курсы → €
     curlist = client.call("crm.currency.list", {}) or []
     rate = {x.get("CURRENCY"): (float(x.get("AMOUNT") or 1) / float(x.get("AMOUNT_CNT") or 1)) for x in curlist}
     eur = lambda o, cu: float(o or 0) * rate.get(cu, 1.0)
 
-    # сделки этих менеджеров с 2025 (портфель целиком)
-    deals = client.list_deals_fast(
-        filter={">=DATE_CREATE": YEAR_START, "ASSIGNED_BY_ID": ids},
-        select=["ID", "TITLE", "ASSIGNED_BY_ID", "STAGE_ID", "STAGE_SEMANTIC_ID", "CATEGORY_ID",
-                "OPPORTUNITY", "CURRENCY_ID", "DATE_CREATE", "CLOSEDATE", "MOVED_TIME", "COMPANY_ID"])
+    # сделки года целиком: фильтровать по ответственному нельзя — коммерсант стоит
+    # в поле карточки, а ответственным чаще числится исполнитель
+    if created is None:
+        created = client.list_deals_fast(
+            filter={">=DATE_CREATE": YEAR_START},
+            select=["ID", "TITLE", "ASSIGNED_BY_ID", "STAGE_ID", "STAGE_SEMANTIC_ID", "CATEGORY_ID",
+                    "OPPORTUNITY", "CURRENCY_ID", "DATE_CREATE", "CLOSEDATE", "MOVED_TIME",
+                    "COMPANY_ID"] + people_mod.DEAL_FIELDS)
+    deals = created
+    # у каждой сделки — свой коммерсант (поле карточки → ответственный)
+    rep_of: dict[str, str] = {}
+    for d in deals:
+        uid, _role, _src = people_mod.responsible(d, role_of, ppl)
+        if uid in live:
+            rep_of[str(d["ID"])] = uid
+    counts = Counter(rep_of.values())
+    rep_ids = {_label(ppl[u]["name"], u): u for u in live if counts[u] >= MIN_DEALS}
+    if not rep_ids:
+        return {"reps": [], "labels": [], "window": "—"}
 
     # имена стадий всех затронутых воронок
     cats = {str(d.get("CATEGORY_ID")) for d in deals}
@@ -353,7 +370,7 @@ def compute(client: BitrixClient, *, realize_date: dict | None = None, as_of: dt
 
     reps_out = []
     for label, uid in rep_ids.items():
-        mine = [d for d in deals if str(d.get("ASSIGNED_BY_ID")) == uid]
+        mine = [d for d in deals if rep_of.get(str(d["ID"])) == uid]
         created = len(mine)
         lvlcnt = Counter()      # сколько на каждом уровне (текущем)
         passed = Counter()      # сколько ДОСТИГЛО уровня k (level>=k)
@@ -428,7 +445,9 @@ def compute(client: BitrixClient, *, realize_date: dict | None = None, as_of: dt
         bymon = [{"m": MLBL[int(m[5:7])] + " " + m[:4], "mk": m, "c": bym_c[m], "r": bym_r[m]} for m in months]
         ttw.sort()
         reps_out.append({
-            "label": label, "uid": uid, "name": unames.get(uid, label),
+            "label": label, "uid": uid, "name": unames.get(uid, ppl.get(uid, {}).get("name", label)),
+            "role": ROLE_LABEL.get(role_of.get(uid, ""), "коммерсант"),
+            "pos": ppl.get(uid, {}).get("pos", "") or "—",
             "kpis": {
                 "created": created, "open": open_n, "openSum": _money(open_sum), "openSumRaw": round(open_sum),
                 "real": real_n, "conv": round(real_n / created * 100) if created else 0,
@@ -451,9 +470,8 @@ def compute(client: BitrixClient, *, realize_date: dict | None = None, as_of: dt
             "deals": sorted(detail, key=lambda r: -r["raw"]),
         })
 
-    # порядок как в REPS
-    order = {l: i for i, (l, _) in enumerate(REPS)}
-    reps_out.sort(key=lambda r: order.get(r["label"], 99))
+    # порядок — по выручке в реализации: сверху те, кто принёс больше
+    reps_out.sort(key=lambda r: -r["kpis"]["salesRaw"])
     return {
         "reps": reps_out,
         "labels": [r["label"] for r in reps_out],
