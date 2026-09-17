@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 221,
-    "total_bytes": 100328029,
+    "total_bytes": 100832339,
     "by_sensitivity": {
       "конфиденциально": 62,
       "внутреннее": 123,
@@ -1229,6 +1229,39 @@
       ]
     },
     {
+      "path": "gt/data/bitrix_tkp_index.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 843907,
+      "note": "Опись вложений по сделке из Bitrix24 БЕЗ ЦЕН: какие файлы приложены к сделке и к привязанным записям СП-166, чем каждый разобран, сколько строк дал и по каким артикулам в нём нашлась цена. Цены намеренно исключены — репозиторий публичный, а цены заказчику это коммерческие данные (правило 5 CLAUDE.md, SECURITY.md). Полная выгрузка с ценами уезжает артефактом прогона и в репозиторий не попадает; воркфлоу отдельным шагом проверяет, что в описи нет пар «price: число», и отменяет коммит, если нашёл. Зачем нужно: владелец выставил заказчику ТВЁРДЫЕ цены и защищает именно их, а в товарных строках сделки их нет — они лежат в приложенных ТКП, прайсах и входящих КП. Разведочные вилки из gt/data/rfq_prices.json этими ценами НЕ являются: в основаниях там дословно «дистрибьюторы», «аналог», «экспертная вилка». Собирается gt/tools/bitrix_tkp.py, запуск руками через Actions. ЗАМЕР ХОЛОСТОГО ПРОГОНА 17.09.2026, по нему инструмент и правился: 137 сделок по слову «ЛУКОЙЛ», 475 привязанных запросов поставщикам, 1998 файлов. Имя файла есть только у 12 из 1998 — Bitrix в файловом объекте crm.item.list его не отдаёт, поэтому формат узнаётся по заголовку отдачи и по магическим байтам. Направление читается по имени поля и делится на четыре группы, а не на две: «наша цена» (Result, ТКП и Economics of the project — там выставленные заказчику цены), «входящее» (Offer from supplier(s), КП поставщика), «наш запрос» (Offer from us, Request file) и «заявка» (Техническая спецификация). До этой правки 1509 файлов из 1998 уходили в «неизвестно», потому что направление читалось только по восьми зашитым кодам СП-166, а у сделки 25 своих файловых полей.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "method",
+        "scopes",
+        "source",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "scopes",
+        "records": 2
+      },
+      "last_change": "2026-09-17",
+      "last_author": "Claude",
+      "last_commit": "7ed05ac",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        ".github/workflows/bitrix-tkp.yml",
+        "gt/tools/bitrix_tkp.py",
+        "gt/tools/ship_brief.py",
+        "gt/tools/ship_inventory.py",
+        "scripts/merge_tkp_index.py"
+      ]
+    },
+    {
       "path": "pnw/data/supplier_master.json",
       "subproject": "каталог PN · данные",
       "bytes": 777443,
@@ -1325,6 +1358,42 @@
       "referenced_by": []
     },
     {
+      "path": "data/chat_snapshot.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 643426,
+      "note": "Суточный снимок реакции коммерсантов в чатах сделок. Пишет бот scan.yml (chat_scan.py) раз в сутки. Руками не редактировать: правка в PR откатит свежие данные при мерже. Содержит поимённые метрики 15 сотрудников и LLM-оценки.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "assessment",
+        "days",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "assessment",
+        "records": 15
+      },
+      "last_change": "2026-09-17",
+      "last_author": "github-actions[bot]",
+      "last_commit": "7d54019",
+      "updated_by": "бот (workflow)",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "оценки и данные сотрудников"
+        ]
+      },
+      "referenced_by": [
+        ".github/workflows/gate.yml",
+        ".github/workflows/scan.yml",
+        "chat_scan.py",
+        "gpu/tools/bitrix_gpu.py",
+        "reps.py",
+        "scripts/budget_snapshot.py",
+        "zip/tools/r1700_bitrix.py"
+      ]
+    },
+    {
       "path": "zip/data/telsmith_crossrefs.json",
       "subproject": "база ЗИП",
       "bytes": 599926,
@@ -1362,42 +1431,6 @@
         "library/load_crossrefs.py",
         "scripts/build_dict.py",
         "zip/tools/build_telsmith_page.py"
-      ]
-    },
-    {
-      "path": "data/chat_snapshot.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 568264,
-      "note": "Суточный снимок реакции коммерсантов в чатах сделок. Пишет бот scan.yml (chat_scan.py) раз в сутки. Руками не редактировать: правка в PR откатит свежие данные при мерже. Содержит поимённые метрики 15 сотрудников и LLM-оценки.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "assessment",
-        "days",
-        "updated"
-      ],
-      "main_collection": {
-        "key": "assessment",
-        "records": 15
-      },
-      "last_change": "2026-09-16",
-      "last_author": "github-actions[bot]",
-      "last_commit": "9b770b2",
-      "updated_by": "бот (workflow)",
-      "sensitivity": {
-        "level": "конфиденциально",
-        "markers": [
-          "оценки и данные сотрудников"
-        ]
-      },
-      "referenced_by": [
-        ".github/workflows/gate.yml",
-        ".github/workflows/scan.yml",
-        "chat_scan.py",
-        "gpu/tools/bitrix_gpu.py",
-        "reps.py",
-        "scripts/budget_snapshot.py",
-        "zip/tools/r1700_bitrix.py"
       ]
     },
     {
@@ -1695,39 +1728,6 @@
       "referenced_by": [
         "pnw/tools/build_master.py",
         "pnw/tools/kv_number.py"
-      ]
-    },
-    {
-      "path": "gt/data/bitrix_tkp_index.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 414759,
-      "note": "Опись вложений по сделке из Bitrix24 БЕЗ ЦЕН: какие файлы приложены к сделке и к привязанным записям СП-166, чем каждый разобран, сколько строк дал и по каким артикулам в нём нашлась цена. Цены намеренно исключены — репозиторий публичный, а цены заказчику это коммерческие данные (правило 5 CLAUDE.md, SECURITY.md). Полная выгрузка с ценами уезжает артефактом прогона и в репозиторий не попадает; воркфлоу отдельным шагом проверяет, что в описи нет пар «price: число», и отменяет коммит, если нашёл. Зачем нужно: владелец выставил заказчику ТВЁРДЫЕ цены и защищает именно их, а в товарных строках сделки их нет — они лежат в приложенных ТКП, прайсах и входящих КП. Разведочные вилки из gt/data/rfq_prices.json этими ценами НЕ являются: в основаниях там дословно «дистрибьюторы», «аналог», «экспертная вилка». Собирается gt/tools/bitrix_tkp.py, запуск руками через Actions. ЗАМЕР ХОЛОСТОГО ПРОГОНА 17.09.2026, по нему инструмент и правился: 137 сделок по слову «ЛУКОЙЛ», 475 привязанных запросов поставщикам, 1998 файлов. Имя файла есть только у 12 из 1998 — Bitrix в файловом объекте crm.item.list его не отдаёт, поэтому формат узнаётся по заголовку отдачи и по магическим байтам. Направление читается по имени поля и делится на четыре группы, а не на две: «наша цена» (Result, ТКП и Economics of the project — там выставленные заказчику цены), «входящее» (Offer from supplier(s), КП поставщика), «наш запрос» (Offer from us, Request file) и «заявка» (Техническая спецификация). До этой правки 1509 файлов из 1998 уходили в «неизвестно», потому что направление читалось только по восьми зашитым кодам СП-166, а у сделки 25 своих файловых полей.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "method",
-        "scopes",
-        "source",
-        "updated"
-      ],
-      "main_collection": {
-        "key": "scopes",
-        "records": 2
-      },
-      "last_change": "2026-09-17",
-      "last_author": "github-actions[bot]",
-      "last_commit": "04d8861",
-      "updated_by": "бот (workflow)",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        ".github/workflows/bitrix-tkp.yml",
-        "gt/tools/bitrix_tkp.py",
-        "gt/tools/ship_brief.py",
-        "gt/tools/ship_inventory.py",
-        "scripts/merge_tkp_index.py"
       ]
     },
     {

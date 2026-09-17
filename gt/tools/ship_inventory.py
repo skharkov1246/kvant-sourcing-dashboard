@@ -290,11 +290,22 @@ def build(doc: dict) -> str:
     a("<thead><tr><th>источник</th><th class='n'>всего</th><th class='n'>наша цена</th>"
       "<th class='n'>входящее</th><th class='n'>неизвестно</th>"
       "<th class='n'>заявка</th><th class='n'>наш запрос</th></tr></thead><tbody>")
-    for o, c in sorted(per.items(), key=lambda kv: (-sum(kv[1].values()), str(kv[0]))):
+    # Отсекаем источники с одним файлом: их сотни, и таблица из них — шум, а не
+    # сведение. Скрытое НАЗЫВАЕТСЯ числом, а не молчится (иначе усечение
+    # читается как «покрыли всё»).
+    ranked = sorted(per.items(), key=lambda kv: (-sum(kv[1].values()), str(kv[0])))
+    shown = [x for x in ranked if sum(x[1].values()) > 1]
+    hidden = [x for x in ranked if sum(x[1].values()) == 1]
+    for o, c in shown:
         a(f"<tr><td class='pn'>{E(o)}</td><td class='n'>{ru(sum(c.values()))}</td>"
           + "".join(f"<td class='n'>{ru(c.get(d, 0)) if c.get(d) else '—'}</td>"
                     for d in DIR_ORDER) + "</tr>")
-    a("</tbody></table></div>")
+    a("</tbody></table>")
+    if hidden:
+        a(f"<p class='dim'>Не показаны {ru(len(hidden))} источников, у которых "
+          f"ровно один файл — вместе они дают {ru(len(hidden))} файлов. Строки "
+          f"по ним есть в наборе данных, в документе они были бы шумом.</p>")
+    a("</div>")
 
     a("<div class='sec'><h2>Что делать с этим дальше</h2><ol>")
     a(f"<li><b>Разобрать {ru(min(len(wanted), 400))} файлов в порядке ценности.</b> "
