@@ -39,8 +39,12 @@ h1 { font-size: 18pt; margin: 0 0 2mm; }
 h2 { font-size: 12pt; margin: 0 0 2.5mm; border-bottom: 1.4pt solid #111; padding-bottom: 1mm; }
 h3 { font-size: 9.5pt; margin: 4mm 0 1.5mm; }
 p { margin: 0 0 2.5mm; line-height: 1.4; }
-.sec { page-break-before: always; }
-.sec:first-child { page-break-before: auto; }
+/* Разделы ТЕКУТ, а не начинаются с новой страницы. Принудительный разрыв
+   оставлял полупустые страницы, когда охват описи маленький (93 файла вместо
+   1998) — pdf_check это ловит. Не рвём только заголовок от своего текста. */
+.sec { margin-bottom: 4mm; }
+h2 { page-break-after: avoid; }
+h3 { page-break-after: avoid; }
 .lead { font-size: 9pt; }
 .dim { color: #666; }
 table.t { width: 100%; border-collapse: collapse; table-layout: fixed; margin-bottom: 3mm; }
@@ -100,8 +104,61 @@ def bar(part: int, whole: int) -> str:
     return (f'<span class="barb"><span class="bar" style="width:{pct:.1f}%"></span></span>')
 
 
+def flatten(doc: dict, scope: str | None = None) -> tuple[list, dict, list]:
+    """Опись, сводка и список охватов. Понимает оба формата.
+
+    Опись накопительная: ключ `scopes` — охват прогона (слово в названии сделки
+    либо её id). Прогон обновляет только свой охват. Прежний однопрогонный
+    формат с верхним `inventory` тоже читается — иначе документ переставал
+    собираться на старых файлах, и это выглядело бы как отсутствие данных.
+    """
+    sc = doc.get("scopes")
+    if not isinstance(sc, dict):
+        return (doc.get("inventory") or []), doc, ["(прежний формат)"]
+    names = sorted(sc)
+    if scope:
+        names = [n for n in names if n == scope] or names
+    inv, sums = [], {"deals": 0, "rfq_items": 0, "files": 0, "downloaded": 0}
+    for n in names:
+        v = sc.get(n) or {}
+        inv += (v.get("inventory") or [])
+        for k in sums:
+            try:
+                sums[k] += int(v.get(k) or 0)
+            except (TypeError, ValueError):
+                pass
+    return inv, sums, names
+
+
+def scope_table(doc: dict) -> str:
+    """Что за охваты в описи и сколько в каждом.
+
+    Складывать их можно только осознанно: одна сделка попадает в два охвата,
+    если её название подходит под оба слова. Документ об этом говорит вслух,
+    чтобы сумма не выглядела покрытием.
+    """
+    sc = doc.get("scopes")
+    if not isinstance(sc, dict):
+        return ""
+    h = ["<h3>Охваты описи</h3><p>Опись накопительная: каждый прогон пишет свой "
+         "охват и не касается чужих. Числа по охватам НЕ складываются слепо — "
+         "одна сделка попадает в два охвата, если подходит под оба слова.</p>",
+         "<table class='t'><colgroup><col style='width:48mm'><col style='width:20mm'>"
+         "<col style='width:22mm'><col style='width:22mm'><col></colgroup>",
+         "<thead><tr><th>охват</th><th class='n'>сделок</th><th class='n'>запросов</th>"
+         "<th class='n'>файлов</th><th>состояние</th></tr></thead><tbody>"]
+    for n in sorted(sc):
+        v = sc[n] or {}
+        h.append(f"<tr><td>{E(n)}</td><td class='n'>{ru(v.get('deals'))}</td>"
+                 f"<td class='n'>{ru(v.get('rfq_items'))}</td>"
+                 f"<td class='n'>{ru(len(v.get('inventory') or []))}</td>"
+                 f"<td>{E(v.get('state') or v.get('updated') or '')}</td></tr>")
+    h.append("</tbody></table>")
+    return "".join(h)
+
+
 def build(doc: dict) -> str:
-    inv = doc["inventory"]
+    inv, sums, scopes = flatten(doc)
     total = len(inv)
     by_dir = Counter(x.get("direction") or "неизвестно" for x in inv)
     by_kind = Counter(kind_of(x.get("origin")) for x in inv)
@@ -135,8 +192,12 @@ def build(doc: dict) -> str:
       "запросы поставщикам → таймлайн → дела → чат. Цен в описи нет намеренно — "
       "репозиторий публичный, цены уезжают отдельно.</p>")
     a("<table class='k'>")
-    a(f"<tr><td class='l'>сделок обойдено</td><td class='big'>{ru(doc.get('deals', len(deals)))}</td></tr>")
-    a(f"<tr><td class='l'>запросов поставщикам</td><td class='big'>{ru(doc.get('rfq_items', 0))}</td></tr>")
+    a(f"<tr><td class='l'>охватов в описи</td><td class='big'>{ru(len(scopes))}</td>"
+      f"<td class='dim'>{E(', '.join(scopes))}</td></tr>")
+    a(f"<tr><td class='l'>сделок обойдено</td>"
+      f"<td class='big'>{ru(sums.get('deals') or len(deals))}</td></tr>")
+    a(f"<tr><td class='l'>запросов поставщикам</td>"
+      f"<td class='big'>{ru(sums.get('rfq_items', 0))}</td></tr>")
     a(f"<tr><td class='l'>файлов найдено</td><td class='big'>{ru(total)}</td></tr>")
     a(f"<tr><td class='l'>из них с именем файла</td><td>{ru(named)} — "
       f"остальным имя даёт заголовок отдачи или магические байты, "
@@ -144,8 +205,9 @@ def build(doc: dict) -> str:
     a(f"<tr><td class='l'>к разбору</td><td class='big'>{ru(len(wanted))}</td></tr>")
     a(f"<tr><td class='l'>отсечено направлением</td><td>{ru(cut)} — "
       f"заявка заказчика и наши исходящие запросы</td></tr>")
-    if doc.get("downloaded"):
-        a(f"<tr><td class='l'>скачано и разобрано</td><td class='big'>{ru(doc['downloaded'])}</td></tr>")
+    if sums.get("downloaded"):
+        a(f"<tr><td class='l'>скачано и разобрано</td>"
+          f"<td class='big'>{ru(sums['downloaded'])}</td></tr>")
         a(f"<tr><td class='l'>строк с парой «артикул — цена»</td><td class='big'>{ru(priced)}</td></tr>")
         a(f"<tr><td class='l'>уникальных артикулов с ценой</td><td class='big'>{ru(len(pns))}</td></tr>")
     else:
@@ -186,7 +248,9 @@ def build(doc: dict) -> str:
     a("</tbody></table>")
     a("<h3>Каким путём качается</h3><p>")
     a(" · ".join(f"<b>{E(k or 'не определено')}</b> {ru(v)}" for k, v in by_via.most_common()))
-    a("</p></div>")
+    a("</p>")
+    a(scope_table(doc))
+    a("</div>")
 
     a("<div class='sec'><h2>Поля карточек: где что лежит</h2>")
     a("<p>Полный перечень полей, в которых нашлись файлы. Колонка «направление» "
@@ -255,7 +319,7 @@ def main() -> int:
         print(f"нет {SRC} — сначала gt/tools/bitrix_tkp.py", file=sys.stderr)
         return 1
     doc = json.loads(SRC.read_text(encoding="utf-8"))
-    if not doc.get("inventory"):
+    if not flatten(doc)[0]:
         print("опись пуста", file=sys.stderr)
         return 1
     OUT.mkdir(parents=True, exist_ok=True)
@@ -271,7 +335,7 @@ def main() -> int:
          "--run-all-compositor-stages-before-draw", "--virtual-time-budget=120000",
          f"--print-to-pdf={pp}", hp.as_uri()],
         check=True, capture_output=True)
-    print(f"{pp.name}: файлов в описи {len(doc['inventory'])}, "
+    print(f"{pp.name}: файлов в описи {len(flatten(doc)[0])}, "
           f"{pp.stat().st_size / 1e6:.1f} МБ")
     return 0
 

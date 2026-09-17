@@ -86,6 +86,23 @@ def load(name: str):
     return json.loads(p.read_text(encoding="utf-8"))
 
 
+def inv_flatten(doc: dict) -> tuple[list, dict, list]:
+    """Опись, сводка и охваты. Понимает и накопительный формат, и прежний."""
+    sc = doc.get("scopes")
+    if not isinstance(sc, dict):
+        return (doc.get("inventory") or []), doc, ["(прежний формат)"]
+    inv, sums = [], {"deals": 0, "rfq_items": 0, "files": 0, "downloaded": 0}
+    for n in sorted(sc):
+        v = sc.get(n) or {}
+        inv += (v.get("inventory") or [])
+        for k in sums:
+            try:
+                sums[k] += int(v.get(k) or 0)
+            except (TypeError, ValueError):
+                pass
+    return inv, sums, sorted(sc)
+
+
 def norm_pn(pn) -> str:
     """Только буквы и цифры, до первого разделителя-комментария."""
     t = str(pn or "").split("(")[0]
@@ -141,7 +158,7 @@ def build() -> str:
     qs = (load("ship_questions.json") or {}).get("questions") or []
     dec = (load("ship_decoded.json") or {}).get("rows") or {}
     inv = (load("bitrix_tkp_index.json") or {})
-    invrows = inv.get("inventory") or []
+    invrows, invsums, invscopes = inv_flatten(inv)
 
     tot = sum(map(expo, rows))
     priced = [r for r in rows if r.get("unit_price_usd") not in (None, "")]
@@ -301,9 +318,11 @@ def build() -> str:
     if invrows:
         a("<div class='sec'><h2>Что нашлось в Bitrix</h2>")
         byd = Counter(x.get("direction") for x in invrows)
-        a(f"<p>Обойдено {ru(inv.get('deals'))} сделок и "
-          f"{ru(inv.get('rfq_items'))} запросов поставщикам, найдено "
-          f"{ru(len(invrows))} файлов.</p>")
+        a(f"<p>Обойдено {ru(invsums.get('deals'))} сделок и "
+          f"{ru(invsums.get('rfq_items'))} запросов поставщикам, найдено "
+          f"{ru(len(invrows))} файлов. Охваты описи: "
+          f"{E(', '.join(invscopes))} — числа по ним не складываются слепо, "
+          f"одна сделка попадает в два охвата, если подходит под оба слова.</p>")
         a("<table class='k'>")
         for k in ("наша цена", "входящее", "неизвестно", "заявка", "наш запрос"):
             if byd.get(k):

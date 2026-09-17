@@ -132,18 +132,24 @@ jobs:
           test -f gt/data/bitrix_tkp_index.json || exit 0
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add gt/data/bitrix_tkp_index.json
-          git diff --cached --quiet && { echo "опись не изменилась"; exit 0; }
-          git commit -m "Опись входящих КП из Bitrix (без цен)"
-          # Прогон длится десятки минут, и за это время в ветку успевают лечь
-          # чужие коммиты — прогон 17.09.2026 потерял из-за этого готовую опись:
-          # commit прошёл, push отбился «fetch first». Поэтому подтягиваем чужое
-          # перебазированием и повторяем; своё при этом не теряется, чужое не
-          # затирается (никакого --force).
+          # Прогон длится минуты, и за это время в ветку ложатся чужие коммиты
+          # в ТОТ ЖЕ файл описи. Перебазирование тут не работает — конфликт, и
+          # `git pull --rebase` падает; так прогон 17.09.2026 дважды потерял
+          # готовую опись. Слияние у этого файла не текстовое, а по смыслу: у
+          # описи ключ `scopes`, и каждый охват свой. Поэтому на каждой попытке
+          # берём свежую ветку и вливаем в неё СВОЙ охват, не касаясь чужих.
+          cp gt/data/bitrix_tkp_index.json "$RUNNER_TEMP/mine.json"
           for i in 1 2 3 4; do
+            git fetch origin "$GITHUB_REF_NAME"
+            git reset --hard "origin/$GITHUB_REF_NAME"
+            python scripts/merge_tkp_index.py \
+              --mine "$RUNNER_TEMP/mine.json" \
+              --into gt/data/bitrix_tkp_index.json || exit 1
+            git add gt/data/bitrix_tkp_index.json
+            git diff --cached --quiet && { echo "опись не изменилась"; exit 0; }
+            git commit -m "Опись входящих КП из Bitrix (без цен)"
             git push && exit 0
-            echo "push отбит, подтягиваю ветку (попытка $i)"
-            git pull --rebase origin "$GITHUB_REF_NAME" || exit 1
+            echo "push отбит, беру свежую ветку и вливаю снова (попытка $i)"
             sleep $((i * 3))
           done
           echo "::error::опись не удалось запушить за четыре попытки"

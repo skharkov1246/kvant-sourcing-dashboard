@@ -73,29 +73,59 @@ def to_usd(price, cur: str, rates: dict):
         return None
 
 
-def our_prices(tkp_path: Path, rates: dict) -> dict:
-    """Артикул → лучшая (наименьшая) выставленная цена в долларах.
+# Направления файлов, из которых берётся цена. Разделение обязательно:
+# прогон 17.09.2026 собрал документ «выставленные цены», не глядя на
+# направление вовсе, и брал МИНИМУМ по всем файлам. То есть в графу «выставлено
+# заказчику» попадала бы цена из КП поставщика — там она заведомо ниже, и запас
+# на снижение выходил бы нарисованным или нулевым. Цена ошибки прямая: на
+# защите такую цифру опровергает сам поставщик.
+DIR_OURS = {"наша цена"}          # Result, ТКП и Economics of the project
+DIR_SUPPLIER = {"входящее"}       # КП поставщика, Offer from supplier(s)
+DIR_SKIP = {"наш запрос", "заявка"}   # наши исходящие и требования заказчика
 
-    Наименьшая, а не первая: один и тот же артикул попадается в нескольких
-    файлах — в исходном ТКП и в правках. Осторожная оценка запаса берёт
-    меньшую выставленную цену, иначе запас окажется нарисованным.
+
+def prices_by_direction(tkp_path: Path, rates: dict) -> tuple[dict, dict, dict]:
+    """Три словаря «артикул → цена»: наша выставленная, КП поставщика, неопознанное.
+
+    В каждом — НАИМЕНЬШАЯ найденная цена по артикулу, а не первая: один и тот
+    же артикул попадается в нескольких файлах (исходное ТКП и правки), и
+    осторожная оценка запаса берёт меньшую выставленную цену, иначе запас
+    окажется нарисованным.
+
+    «Неопознанное» держится ОТДЕЛЬНО и в графу выставленных цен не идёт: сорсер
+    мог положить КП не в тот слот, но выдавать догадку за выставленную цену
+    нельзя. Оно показывается своей графой, с пометкой.
     """
     doc = json.loads(tkp_path.read_text())
-    out: dict[str, dict] = {}
+    ours: dict[str, dict] = {}
+    supp: dict[str, dict] = {}
+    unk: dict[str, dict] = {}
     for f in doc.get("files", []):
+        d = (f.get("direction") or "неизвестно").strip()
+        if d in DIR_SKIP:
+            continue
+        bucket = ours if d in DIR_OURS else supp if d in DIR_SUPPLIER else unk
         for p in f.get("prices", []):
             usd = to_usd(p.get("price"), p.get("currency"), rates)
             if usd is None:
                 continue
             k = norm_key(p["pn"])
-            prev = out.get(k)
+            prev = bucket.get(k)
             if prev is None or usd < prev["usd"]:
-                out[k] = {"usd": usd, "raw_price": p["price"],
-                          "currency": p.get("currency") or "USD",
-                          "file": f.get("file_name", ""), "origin": f.get("origin", ""),
-                          "sheet": p.get("sheet", ""), "row": p.get("row"),
-                          "rule": p.get("class_rule", ""), "line": p.get("raw", "")}
-    return out
+                bucket[k] = {"usd": usd, "raw_price": p["price"],
+                             "currency": p.get("currency") or "USD",
+                             "direction": d,
+                             "field": f.get("field_name", ""),
+                             "file": f.get("file_name", ""),
+                             "origin": f.get("origin", ""),
+                             "sheet": p.get("sheet", ""), "row": p.get("row"),
+                             "rule": p.get("class_rule", ""), "line": p.get("raw", "")}
+    return ours, supp, unk
+
+
+def our_prices(tkp_path: Path, rates: dict) -> dict:
+    """Только наша выставленная цена. Оставлено для обратной совместимости."""
+    return prices_by_direction(tkp_path, rates)[0]
 
 
 CSS = """

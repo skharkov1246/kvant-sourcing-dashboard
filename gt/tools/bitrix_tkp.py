@@ -768,6 +768,48 @@ def disk_url(bx: BitrixClient, fid: str) -> str:
     return ""
 
 
+def write_index(path: str, scope: str, payload: dict) -> None:
+    """Опись НАКОПИТЕЛЬНАЯ по охватам, а не перезаписываемая.
+
+    Прогон 17.09.2026 по слову «Энергосети» затёр картину по слову «ЛУКОЙЛ»:
+    1998 файлов и 137 сделок пропали из файла, а документ «что есть в системе»
+    на них и опирался. Каждый охват (ключевое слово или id сделки) — своя
+    запись; прогон обновляет только свою и не касается чужих.
+
+    Верхних полей `inventory` / `deals` в файле больше НЕТ: они создавали
+    иллюзию, будто опись описывает всё, тогда как описывали они последний
+    прогон. Читатели обязаны выбрать охват или сложить их сами.
+    """
+    pth = Path(path)
+    pth.parent.mkdir(parents=True, exist_ok=True)
+    doc = {}
+    if pth.exists():
+        try:
+            doc = json.loads(pth.read_text(encoding="utf-8"))
+        except ValueError:
+            doc = {}
+    scopes = doc.get("scopes")
+    if not isinstance(scopes, dict):
+        # старый однопрогонный формат: сохраняем его как охват «(прежний прогон)»,
+        # чтобы прежние цифры не исчезли молча
+        scopes = {}
+        if doc.get("inventory"):
+            scopes["(прежний прогон)"] = {
+                k: doc[k] for k in
+                ("updated", "state", "deals", "rfq_items", "files", "downloaded",
+                 "inventory") if k in doc}
+    scopes[scope] = payload
+    Path(path).write_text(json.dumps(
+        {"updated": date.today().isoformat(),
+         "source": "Bitrix24: опись входящих КП, адресный обход по сделкам, БЕЗ цен",
+         "method": "цены исключены намеренно: репозиторий публичный. Здесь "
+                   "происхождение файла, направление, способ разбора, число строк "
+                   "и артикулы с ценой — этого хватает, чтобы свести с заявкой. "
+                   "Опись накопительная: ключ верхнего уровня scopes — охват "
+                   "прогона (ключевое слово в названии сделки либо её id).",
+         "scopes": scopes}, ensure_ascii=False, indent=1), encoding="utf-8")
+
+
 def take(bx: BitrixClient, c: dict):
     """Байты кандидата: по ссылке или через Диск, смотря что за источник.
 
@@ -811,7 +853,9 @@ def main() -> int:
         deals = bx.list_paged("crm.deal.list", {"filter": {"%TITLE": a.keyword},
                                                 "select": ["ID", "TITLE"]})
         ids = sorted(int(d["ID"]) for d in deals)
-    say(f"сделок к обходу: {len(ids)}")
+    # охват прогона — ключ, под которым его опись ляжет в накопительный файл
+    scope = f"сделка {a.deal}" if a.deal else f"слово «{a.keyword}»"
+    say(f"сделок к обходу: {len(ids)} · охват описи: {scope}")
 
     ffields = file_fields(bx, DEAL_ENTITY)
     say(f"файловых полей у сделки: {len(ffields)}")
@@ -839,14 +883,12 @@ def main() -> int:
         — восемнадцатиминутный обход при 45-минутном пределе шага означал, что
         всё держится на том, чтобы уложиться. Теперь частичная опись есть всегда.
         """
-        Path(a.out_index).parent.mkdir(parents=True, exist_ok=True)
-        Path(a.out_index).write_text(json.dumps(
-            {"updated": "holostoy" if a.dry_run else date.today().isoformat(),
-             "state": f"обход: {done} из {len(ids)} сделок",
-             "deals": len(ids), "rfq_items": rfq_total,
-             "files": len(cands), "downloaded": 0,
-             "inventory": [{k: v for k, v in c.items() if k != "url"} for c in cands]},
-            ensure_ascii=False, indent=1), encoding="utf-8")
+        write_index(a.out_index, scope, {
+            "updated": "holostoy" if a.dry_run else date.today().isoformat(),
+            "state": f"обход: {done} из {len(ids)} сделок",
+            "deals": len(ids), "rfq_items": rfq_total,
+            "files": len(cands), "downloaded": 0,
+            "inventory": [{k: v for k, v in c.items() if k != "url"} for c in cands]})
 
     for n, did in enumerate(ids, 1):
         say(f"[{n}/{len(ids)}] сделка {did}")
@@ -899,12 +941,11 @@ def main() -> int:
     say(f"в пределе {a.max_files} по направлению: {ordered}")
 
     if a.dry_run:
-        Path(a.out_index).parent.mkdir(parents=True, exist_ok=True)
-        Path(a.out_index).write_text(json.dumps(
-            {"updated": "holostoy", "deals": len(ids), "rfq_items": rfq_total,
-             "files": len(cands), "downloaded": 0,
-             "inventory": [{k: v for k, v in c.items() if k != "url"} for c in cands]},
-            ensure_ascii=False, indent=1), encoding="utf-8")
+        write_index(a.out_index, scope, {
+            "updated": "holostoy", "state": "холостой прогон, обход завершён",
+            "deals": len(ids), "rfq_items": rfq_total,
+            "files": len(cands), "downloaded": 0,
+            "inventory": [{k: v for k, v in c.items() if k != "url"} for c in cands]})
         say("холостой прогон: ничего не скачано, опись записана")
         return 0
 
@@ -919,16 +960,11 @@ def main() -> int:
              "source": "Bitrix24: входящие КП по сделке, адресный обход",
              "warning": "СОДЕРЖИТ КОММЕРЧЕСКИЕ ЦЕНЫ. В публичный репозиторий не коммитить.",
              "deals": ids, "files": full}, ensure_ascii=False, indent=1), encoding="utf-8")
-        Path(a.out_index).parent.mkdir(parents=True, exist_ok=True)
-        Path(a.out_index).write_text(json.dumps(
-            {"updated": date.today().isoformat(),
-             "source": "Bitrix24: опись входящих КП по сделке, БЕЗ цен",
-             "method": "цены исключены намеренно: репозиторий публичный. Здесь "
-                       "происхождение файла, направление, способ разбора, число строк "
-                       "и артикулы с ценой — этого хватает, чтобы свести с заявкой.",
-             "deals": len(ids), "rfq_items": rfq_total, "files": len(cands),
-             "downloaded": n_dl, "inventory": index}, ensure_ascii=False, indent=1),
-            encoding="utf-8")
+        write_index(a.out_index, scope, {
+            "updated": date.today().isoformat(),
+            "state": f"разобрано {n_dl} файлов из {min(len(todo), a.max_files)}",
+            "deals": len(ids), "rfq_items": rfq_total, "files": len(cands),
+            "downloaded": n_dl, "inventory": index})
 
     for n, c in enumerate(todo[:a.max_files], 1):
         body, how, got_name = take(bx, c)
