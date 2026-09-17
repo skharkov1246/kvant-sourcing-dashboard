@@ -234,6 +234,48 @@ def build(rows: list, ours: dict, fx_day: str) -> str:
             f"<style>{CSS}</style></head><body>{''.join(parts)}</body></html>")
 
 
+def diagnose(rows: list, ours: dict) -> None:
+    """Почему пересечение получилось таким, а не «сошлось 0 — и всё».
+
+    Прогон 17.09.2026 извлёк 2 053 артикула с ценой и НЕ СОШЁЛСЯ с заявкой ни
+    одной позицией. Одно это число не отличает «файлы не от той сделки» от
+    «сопоставление сломано», а лечатся эти беды по-разному. Поэтому печатаем
+    ещё три признака: форму извлечённых номеров, пересечение по началу номера
+    и пересечение по цифровой части. Если все три нули — файлы действительно
+    про другое; если хоть один даёт совпадения — виновато сопоставление.
+
+    Печатаются ТОЛЬКО артикулы, без цен: журнал прогона публичный (правило 17
+    CLAUDE.md), а номенклатурные номера в репозитории и так открыты.
+    """
+    want = {norm_key(r["pn"]) for r in rows if r.get("pn")}
+    got = set(ours)
+    print(f"  артикулов в заявке: {len(want)} · извлечено из файлов: {len(got)} "
+          f"· пересечение точное: {len(want & got)}")
+    if not want or not got:
+        return
+    # по началу номера: заказчик мог приписать суффикс учётной системы
+    pref = sum(1 for w in want if any(g.startswith(w[:6]) for g in got) and len(w) >= 6)
+    print(f"  совпадений по первым шести знакам: {pref}")
+    # по цифровой части: расхождение бывает только в буквенном префиксе
+    digits_want = {re.sub(r"[^0-9]", "", w) for w in want}
+    digits_got = {re.sub(r"[^0-9]", "", g) for g in got}
+    digits_want.discard("")
+    digits_got.discard("")
+    print(f"  совпадений по цифровой части: {len(digits_want & digits_got)}")
+    # форма извлечённых номеров: длина и наличие букв говорят, номера это вообще
+    # или мусор разбора
+    shapes = Counter()
+    for g in sorted(got):
+        shapes[f"{len(g)} знаков, "
+               f"{'с буквами' if re.search(r'[A-Z]', g) else 'только цифры'}"] += 1
+    print("  форма извлечённых номеров (топ-8): "
+          + " · ".join(f"{k}: {v}" for k, v in shapes.most_common(8)))
+    print("  примеры извлечённых номеров: "
+          + ", ".join(sorted(got)[:12]))
+    print("  примеры номеров заявки:      "
+          + ", ".join(sorted(want)[:12]))
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--tkp", required=True, help="полная выгрузка bitrix_tkp.py")
@@ -275,6 +317,7 @@ def main() -> int:
         check=True, capture_output=True)
     matched = sum(1 for r in rows if norm_key(r["pn"]) in ours)
     print(f"сошлось со заявкой: {matched} позиций")
+    diagnose(rows, ours)
     print(f"{out} — {out.stat().st_size / 1e6:.1f} МБ (вне репозитория, не коммитится)")
     return 0
 
