@@ -4,12 +4,12 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 216,
-    "total_bytes": 99539689,
+    "datasets": 217,
+    "total_bytes": 99543495,
     "by_sensitivity": {
       "конфиденциально": 62,
       "внутреннее": 120,
-      "публикуемо": 34
+      "публикуемо": 35
     },
     "by_subproject": {
       "ГПУ-библиотека": 29,
@@ -19,7 +19,7 @@
       "база ЗИП · таможня": 18,
       "библиотека рынков": 1,
       "гидрометаллургия": 22,
-      "дашборд сорсеров": 4,
+      "дашборд сорсеров": 5,
       "каталог PN (веб)": 1,
       "каталог PN · данные": 7
     }
@@ -6179,6 +6179,68 @@
       ]
     },
     {
+      "path": "data/catalog_notes.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 46727,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "data/budget_snapshot.json",
+        "data/chain_coverage.json",
+        "data/chat_snapshot.json",
+        "data/import_cost.json",
+        "data/index.json",
+        "dict/",
+        "dict/node_map.json",
+        "gidromet/data/",
+        "gpu/data/bitrix_gpu.json",
+        "gpu/data/coverage.json",
+        "gpu/data/faults.json",
+        "gpu/data/overhaul_qsk60.json",
+        "gt/data/ansaldo.json",
+        "gt/data/bitrix_gt.json",
+        "gt/data/dossiers.json",
+        "gt/data/faults.json",
+        "gt/data/fx_rates.json",
+        "gt/data/pn_db.json",
+        "gt/data/ship_blocked.json",
+        "gt/data/ship_energoseti.json",
+        "gt/data/ship_lukoil.json",
+        "gt/data/ship_recheck.json",
+        "gt/data/ship_rfq_letters.json",
+        "gt/data/ship_sellers.json",
+        "gt/data/ship_sweep.json",
+        "gt/docs/ЗАКУПКА-ЛУКОЙЛ.csv",
+        "gt/docs/ЗАПРОСЫ-ЛУКОЙЛ.csv",
+        "library/data/symptoms.json",
+        "library/docfilter.py",
+        "library/indexer.py",
+        "library/load_parts.py",
+        "library/load_suppliers.py",
+        "library/ocr.py",
+        "library/reparse.py",
+        "library/supabase/schema_junk.sql",
+        "ove/data/suppliers.json",
+        "pnw/data/contacts_found.json",
+        "pnw/data/crossrefs.json",
+        "pnw/data/item_master.json",
+        "pnw/data/kv_registry.json"
+      ],
+      "last_change": "2026-09-17",
+      "last_author": "Claude",
+      "last_commit": "bd36379",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "scripts/build_catalog.py",
+        "tests/test_catalog_guard.py"
+      ]
+    },
+    {
       "path": "zip/data/customs_market.json",
       "subproject": "база ЗИП",
       "bytes": 46205,
@@ -6221,68 +6283,6 @@
       "referenced_by": [
         "zip/build.py",
         "zip/tools/aggregate_customs.py"
-      ]
-    },
-    {
-      "path": "data/catalog_notes.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 46067,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "data/budget_snapshot.json",
-        "data/chain_coverage.json",
-        "data/chat_snapshot.json",
-        "data/index.json",
-        "dict/",
-        "dict/node_map.json",
-        "gidromet/data/",
-        "gpu/data/bitrix_gpu.json",
-        "gpu/data/coverage.json",
-        "gpu/data/faults.json",
-        "gpu/data/overhaul_qsk60.json",
-        "gt/data/ansaldo.json",
-        "gt/data/bitrix_gt.json",
-        "gt/data/dossiers.json",
-        "gt/data/faults.json",
-        "gt/data/fx_rates.json",
-        "gt/data/pn_db.json",
-        "gt/data/ship_blocked.json",
-        "gt/data/ship_energoseti.json",
-        "gt/data/ship_lukoil.json",
-        "gt/data/ship_recheck.json",
-        "gt/data/ship_rfq_letters.json",
-        "gt/data/ship_sellers.json",
-        "gt/data/ship_sweep.json",
-        "gt/docs/ЗАКУПКА-ЛУКОЙЛ.csv",
-        "gt/docs/ЗАПРОСЫ-ЛУКОЙЛ.csv",
-        "library/data/symptoms.json",
-        "library/docfilter.py",
-        "library/indexer.py",
-        "library/load_parts.py",
-        "library/load_suppliers.py",
-        "library/ocr.py",
-        "library/reparse.py",
-        "library/supabase/schema_junk.sql",
-        "ove/data/suppliers.json",
-        "pnw/data/contacts_found.json",
-        "pnw/data/crossrefs.json",
-        "pnw/data/item_master.json",
-        "pnw/data/kv_registry.json",
-        "pnw/data/numbers.json"
-      ],
-      "last_change": "2026-09-17",
-      "last_author": "skharkov1246",
-      "last_commit": "9aa0cb6",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "scripts/build_catalog.py",
-        "tests/test_catalog_guard.py"
       ]
     },
     {
@@ -9154,6 +9154,39 @@
         "ove/tools/build_disc.py",
         "ove/tools/build_docx.py",
         "ove/tools/build_questions.py"
+      ]
+    },
+    {
+      "path": "data/import_cost.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 3146,
+      "note": "Курс и ставки ввоза: как валютная цена поставщика превращается в нашу рублёвую себестоимость. Правило одно на весь портал, считает library/landed.py. Мы импортируем сами, поэтому цена российского перепродавца — не себестоимость, а конкурент: разрыв по одной позиции доходит до шести раз. Доли стека пока оценки по практике, а не наши измеренные затраты.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "confidence",
+        "fx",
+        "rule",
+        "stack",
+        "updated",
+        "vat",
+        "what_it_is",
+        "why_it_matters"
+      ],
+      "main_collection": {
+        "key": "fx",
+        "records": 4
+      },
+      "last_change": "2026-09-17",
+      "last_author": "Claude",
+      "last_commit": "bd36379",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "library/landed.py"
       ]
     },
     {
