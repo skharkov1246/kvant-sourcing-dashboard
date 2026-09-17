@@ -25,6 +25,7 @@ import sys
 import tempfile
 from pathlib import Path
 
+_HUNG = "[браузер не завершился за]"
 PLACEHOLDER_RE = re.compile(r"__[A-Z][A-Z0-9_]*__")
 DATA_RE = re.compile(r"window\.(__[A-Z_]+__)\s*=\s*(.+?);\s*$", re.MULTILINE)
 MIN_BYTES = 50_000          # ниже — заведомо обрубленная страница
@@ -110,13 +111,21 @@ def _chrome_run(chrome: str, path: Path, extra: list[str], timeout: int, headles
                "--disable-sync", "--disable-crash-reporter",
                "--disable-background-timer-throttling",
                "--disable-features=Translate,BackForwardCache,MediaRouter",
+               "--disable-component-update", "--metrics-recording-only", "--mute-audio",
                f"--user-data-dir={td}", "--virtual-time-budget=5000",
                "--enable-logging=stderr", "--v=0", *extra,
                "--dump-dom", path.resolve().as_uri()]
         try:
             r = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
         except subprocess.TimeoutExpired as e:
-            return "", (e.stderr or b"").decode("utf-8", "replace") if isinstance(e.stderr, bytes) else (e.stderr or "")
+            # Chrome печатает DOM, но иногда не завершается: фоновые процессы профиля
+            # держат его (о них уже сказано выше). Раньше в этой ветке возвращалась
+            # пустая строка — вместе с исключением выбрасывался УЖЕ НАПЕЧАТАННЫЙ DOM,
+            # и проверка молча превращалась в «браузер ничего не отдал». Замер
+            # 17.09.2026: страница 10,4 МБ со всеми открытыми вкладками отдаёт DOM за
+            # ~3 с, так что таймаут — это почти всегда незавершение, а не отсутствие вывода.
+            dec = lambda v: v.decode("utf-8", "replace") if isinstance(v, bytes) else (v or "")
+            return dec(e.stdout), dec(e.stderr) + f"\n{_HUNG} {timeout} с"
     return r.stdout, r.stderr
 
 
@@ -128,18 +137,22 @@ def check_browser(path: Path, errors: list[str], warns: list[str]) -> None:
     # Вкладки строятся лениво, при первом открытии, поэтому открываем их все в ЭТОМ
     # же прогоне: отдельный второй запуск Chromium стоил на раннере около двух минут.
     #
-    # Бюджет времени считается от размера страницы. Боевой дашборд — это 10+ МБ
-    # встроенных данных, и открытие всех вкладок строит DOM в несколько раз больше;
-    # с прежними 75 секундами браузер не успевал, отдавал пустоту, и проверка рендера
-    # МОЛЧА не выполнялась — ровно та дыра, ради закрытия которой она и писалась.
-    # Если с вкладками не уложились, последняя попытка идёт по чистой странице:
-    # базовая проверка рендера важнее проверки вкладок и не должна пропадать вместе с ней.
+    # Бюджет времени — небольшой и от размера страницы. Замер 17.09.2026 на этом же
+    # шаблоне: 10,4 МБ со всеми открытыми вкладками — DOM за ~3 с, 14 МБ — за 4,3 с,
+    # даже если данные материализуются в таблицу — 15 с. Значит сотни секунд ожидания
+    # не приближают результат: они лишь удлиняют зависание. Открытие девяти вкладок
+    # стоит +0,28 % DOM — проверять их на боевой странице не дороже, чем не проверять.
+    #
+    # Режима --headless=old здесь нет намеренно: в Chrome ≥132 он удалён (rc=1 и пустой
+    # stdout за 0,03 с), и «запасная попытка по чистой странице» на нём была фиктивной —
+    # именно из-за неё проверка рендера боевой страницы не выполнялась с 14.09.2026,
+    # оставляя в журнале «Chromium не отдал DOM». Запасная попытка теперь тоже new.
     mb = max(1, len(path.read_bytes()) // (1024 * 1024))
-    budget = min(300, max(90, 25 * mb))
+    budget = min(120, max(45, 8 * mb))
     page = _with_tabs_opened(path)
     attempts = [(page, [], budget, "--headless=new"),
                 (page, ["--single-process"], budget, "--headless=new"),
-                (path, [], min(180, budget), "--headless=old")]
+                (path, [], budget, "--headless=new")]
     dom, log, with_tabs = "", "", False
     try:
         for target, extra, timeout, mode in attempts:
@@ -161,6 +174,8 @@ def check_browser(path: Path, errors: list[str], warns: list[str]) -> None:
     if not with_tabs:
         warns.append(f"вкладки не проверены: страница {mb} МБ, браузер не уложился в {budget} с — "
                      "проверен только базовый рендер")
+    if _HUNG in log:
+        warns.append(f"браузер не завершился за {budget} с — DOM взят из его вывода")
     bad = [ln for ln in log.splitlines()
            if re.search(r"\bERROR:CONSOLE\b|Uncaught|SyntaxError|is not defined|is not a function", ln)]
     if bad:
