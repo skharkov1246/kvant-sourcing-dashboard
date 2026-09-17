@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 216,
-    "total_bytes": 99487867,
+    "total_bytes": 99505103,
     "by_sensitivity": {
       "конфиденциально": 62,
       "внутреннее": 120,
@@ -5061,6 +5061,57 @@
       ]
     },
     {
+      "path": "gpu/data/overhaul_qsk60.json",
+      "subproject": "ГПУ-библиотека",
+      "bytes": 64124,
+      "note": "Капитальный ремонт Cummins QSK60 (дизельный V16 60,2 л, генераторное исполнение): 55 этапов объёма работ с местом и ответственным, ведомость ЗИП на 46 позиций с количеством на двигатель, расчётная трудоёмкость 1 272 нормо-часа по этапам и семь подтверждённых ценовых якорей со ссылками (комплект капремонта, турбина HX83, насос-форсунка, прокладки ГБЦ, ставка трала, курс ЦБ). Источник объёма — тендерная ведомость нефтегазового заказчика, обезличенная: имён, месторождения и реквизитов нет. Итоговых сумм в наборе нет намеренно — цена головок блока публично не раскрывается, и без КП любая сумма была бы выдумкой.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "bom",
+        "caveat",
+        "correction",
+        "labor_model",
+        "machine",
+        "market_check",
+        "open_questions",
+        "price_anchors",
+        "price_transparency",
+        "rfq",
+        "sibling_note",
+        "source",
+        "stage_stats",
+        "stages",
+        "updated",
+        "what_it_is"
+      ],
+      "main_collection": {
+        "key": "stages",
+        "records": 55,
+        "record_keys": [
+          "group",
+          "kind",
+          "n",
+          "owner",
+          "place",
+          "system",
+          "text",
+          "zip"
+        ]
+      },
+      "last_change": "2026-09-17",
+      "last_author": "skharkov1246",
+      "last_commit": "73977bb",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gpu/build.py"
+      ]
+    },
+    {
       "path": "zip/data/perf_class_packets.json",
       "subproject": "база ЗИП",
       "bytes": 63460,
@@ -6089,51 +6140,6 @@
       ]
     },
     {
-      "path": "gpu/data/overhaul_qsk60.json",
-      "subproject": "ГПУ-библиотека",
-      "bytes": 47908,
-      "note": "Капитальный ремонт Cummins QSK60 (дизельный V16 60,2 л, генераторное исполнение): 55 этапов объёма работ с местом и ответственным, ведомость ЗИП на 46 позиций с количеством на двигатель, расчётная трудоёмкость 1 272 нормо-часа по этапам и семь подтверждённых ценовых якорей со ссылками (комплект капремонта, турбина HX83, насос-форсунка, прокладки ГБЦ, ставка трала, курс ЦБ). Источник объёма — тендерная ведомость нефтегазового заказчика, обезличенная: имён, месторождения и реквизитов нет. Итоговых сумм в наборе нет намеренно — цена головок блока публично не раскрывается, и без КП любая сумма была бы выдумкой.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "bom",
-        "caveat",
-        "labor_model",
-        "machine",
-        "open_questions",
-        "price_anchors",
-        "sibling_note",
-        "source",
-        "stage_stats",
-        "stages",
-        "updated",
-        "what_it_is"
-      ],
-      "main_collection": {
-        "key": "stages",
-        "records": 55,
-        "record_keys": [
-          "group",
-          "kind",
-          "n",
-          "owner",
-          "place",
-          "system",
-          "text",
-          "zip"
-        ]
-      },
-      "last_change": "2026-09-17",
-      "last_author": "Claude",
-      "last_commit": "bd66547",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": []
-    },
-    {
       "path": "gidromet/data/proverka.json",
       "subproject": "гидрометаллургия",
       "bytes": 47526,
@@ -6263,8 +6269,8 @@
         "pnw/data/numbers.json"
       ],
       "last_change": "2026-09-17",
-      "last_author": "Claude",
-      "last_commit": "bd66547",
+      "last_author": "skharkov1246",
+      "last_commit": "9aa0cb6",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -8311,6 +8317,56 @@
       ]
     },
     {
+      "path": "gpu/data/coverage.json",
+      "subproject": "ГПУ-библиотека",
+      "bytes": 12125,
+      "note": "Заполняемость базы ГПУ: сколько машин с разобранным списком применяемости, поставщиков с рабочим адресом, позиций заявки с ценой, проверкой и кроссом, и сколько систем двигателя закрыто всеми четырьмя слоями (потребность, аналоги, изготовители узлов, поставщики). Производный файл — считается gpu/tools/coverage.py по фактическим данным gpu/data и пересчитывается при каждой сборке сайта; руками не заполнять. Публикуется на kvant-gpu, раздел «Обзор → Заполняемость базы».",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "context",
+        "intro",
+        "machines",
+        "method",
+        "metrics",
+        "systems",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "systems",
+        "records": 19,
+        "record_keys": [
+          "analogs",
+          "demand",
+          "key",
+          "layers",
+          "name",
+          "pct",
+          "status",
+          "subsuppliers",
+          "suppliers"
+        ]
+      },
+      "last_change": "2026-09-17",
+      "last_author": "skharkov1246",
+      "last_commit": "f872f9c",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "gpu/build.py",
+        "gpu/tools/coverage.py",
+        "gt/public/faults.html",
+        "scripts/build_chain_coverage.py",
+        "scripts/build_chain_page.py",
+        "tests/test_dict.py",
+        "tests/test_faults_slices.py",
+        "tests/test_r1700_dossier.py"
+      ]
+    },
+    {
       "path": "gt/data/models.json",
       "subproject": "ГТУ-библиотека",
       "bytes": 11790,
@@ -8415,56 +8471,6 @@
         "ove/tools/bidocs/vedomost.py",
         "ove/tools/build_release.py",
         "ove/tools/docframe.py"
-      ]
-    },
-    {
-      "path": "gpu/data/coverage.json",
-      "subproject": "ГПУ-библиотека",
-      "bytes": 11105,
-      "note": "Заполняемость базы ГПУ: сколько машин с разобранным списком применяемости, поставщиков с рабочим адресом, позиций заявки с ценой, проверкой и кроссом, и сколько систем двигателя закрыто всеми четырьмя слоями (потребность, аналоги, изготовители узлов, поставщики). Производный файл — считается gpu/tools/coverage.py по фактическим данным gpu/data и пересчитывается при каждой сборке сайта; руками не заполнять. Публикуется на kvant-gpu, раздел «Обзор → Заполняемость базы».",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "context",
-        "intro",
-        "machines",
-        "method",
-        "metrics",
-        "systems",
-        "updated"
-      ],
-      "main_collection": {
-        "key": "systems",
-        "records": 19,
-        "record_keys": [
-          "analogs",
-          "demand",
-          "key",
-          "layers",
-          "name",
-          "pct",
-          "status",
-          "subsuppliers",
-          "suppliers"
-        ]
-      },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
-      "sensitivity": {
-        "level": "публикуемо",
-        "markers": []
-      },
-      "referenced_by": [
-        "gpu/build.py",
-        "gpu/tools/coverage.py",
-        "gt/public/faults.html",
-        "scripts/build_chain_coverage.py",
-        "scripts/build_chain_page.py",
-        "tests/test_dict.py",
-        "tests/test_faults_slices.py",
-        "tests/test_r1700_dossier.py"
       ]
     },
     {

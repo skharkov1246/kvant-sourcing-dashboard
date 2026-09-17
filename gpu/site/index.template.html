@@ -338,6 +338,60 @@ footer{padding:0 22px 24px;color:var(--mut);font-size:11.5px}
   <div id="pl-lists"></div>
 </section>
 
+<section id="t-overhaul">
+  <h2>Капитальный ремонт</h2>
+  <p class="mut" id="oh-src"></p>
+  <div class="k" id="oh-tiles"></div>
+  <div class="box info" id="oh-machine"></div>
+  <div class="box warn" id="oh-caveat"></div>
+
+  <h3>Объём работ по этапам</h3>
+  <p class="mut">Где этап называется заменой узла, там деньги уходят в ЗИП, а не в труд. Это главное соотношение такого договора.</p>
+  <div class="tblwrap"><table class="sortable"><thead><tr>
+    <th>№</th><th>Тип</th><th>Место</th><th>Чей счёт</th><th>ЗИП</th><th>Содержание</th>
+  </tr></thead><tbody id="oh-stages"></tbody></table></div>
+
+  <h3>Ведомость ЗИП на один двигатель</h3>
+  <div class="tblwrap"><table class="sortable"><thead><tr>
+    <th>Система</th><th>Позиция</th><th>Номер</th><th>Количество</th><th>Строка тендера</th>
+  </tr></thead><tbody id="oh-bom"></tbody></table></div>
+
+  <h3>Трудоёмкость</h3>
+  <p class="mut" id="oh-labor-note"></p>
+  <div class="tblwrap"><table><thead><tr>
+    <th>Этап</th><th>Ед.</th><th>Количество</th><th>На чём основано</th>
+  </tr></thead><tbody id="oh-labor"></tbody></table></div>
+
+  <h3>Цены, которые удалось подтвердить</h3>
+  <div class="box warn" id="oh-transparency"></div>
+  <div class="tblwrap"><table><thead><tr>
+    <th>Позиция</th><th>Оригинал</th><th>Аналог или восстановленное</th><th>Источник</th>
+  </tr></thead><tbody id="oh-anchors"></tbody></table></div>
+
+  <h3>Проверка сверху: ремонт против замены двигателя</h3>
+  <p class="mut" id="oh-mc-intro"></p>
+  <div class="tblwrap"><table><thead><tr>
+    <th>Что сравниваем</th><th>Цена</th><th>Без НДС</th><th>Источник</th>
+  </tr></thead><tbody id="oh-mc"></tbody></table></div>
+  <div class="box warn" id="oh-mc-verdict"></div>
+
+  <h3>Запрос цен: что спрашивать</h3>
+  <p id="oh-rfq-why"></p>
+  <div class="tblwrap"><table><thead><tr>
+    <th>№</th><th>Позиция</th><th>Номера</th><th>На 1 дв.</th><th>На 2 дв.</th><th>Что спросить кроме цены</th>
+  </tr></thead><tbody id="oh-rfq"></tbody></table></div>
+  <div class="chips" id="oh-letter-pick"></div>
+  <div id="oh-letter"></div>
+
+  <h3>Кому отправлять</h3>
+  <div class="tblwrap"><table><thead><tr>
+    <th>Компания</th><th>Страна</th><th>Почему этот адрес</th><th>История в Bitrix</th>
+  </tr></thead><tbody id="oh-addr"></tbody></table></div>
+
+  <h3>Вопросы заказчику</h3>
+  <div class="card"><ul id="oh-quest"></ul></div>
+</section>
+
 <section id="t-demand">
   <h2>Текущая заявка</h2>
   <p class="mut" id="dm-src"></p>
@@ -573,6 +627,7 @@ const MACHINES = __MACHINES_JSON__;
 const RFQPACK  = __RFQPACK_JSON__;
 const GLOSSARY = __GLOSSARY_JSON__;
 const ACLASS   = __ACLASS_JSON__;
+const OVERHAUL = __OVERHAUL_JSON__;
 const BUILT_AT = "__BUILT_AT__";
 
 const $ = s => document.querySelector(s);
@@ -582,7 +637,7 @@ const num = n => (n == null || n === "") ? "—" : Number(n).toLocaleString("ru-
 const usd = n => (n == null || n === "") ? "—" : "$" + Number(n).toLocaleString("ru-RU");
 $("#built").textContent = BUILT_AT; $("#built2").textContent = BUILT_AT;
 
-/* ── навигация: пять корневых разделов, в каждом — до четырёх подразделов ─ */
+/* ── навигация: пять корневых разделов, в каждом — до пяти подразделов ── */
 const NAV = [
   ["Обзор", [
     ["t-over", "Общие сведения"], ["t-cover", "Заполняемость базы"],
@@ -592,7 +647,8 @@ const NAV = [
     ["t-pn", "Строение обозначений"], ["t-gloss", "Словарь терминов"]]],
   ["Оборудование", [
     ["t-models", "Модельный ряд"], ["t-mach", "Состав по узлам"],
-    ["t-parts", "Ведомости ЗИП"], ["t-cons", "Расходные материалы"]]],
+    ["t-parts", "Ведомости ЗИП"], ["t-cons", "Расходные материалы"],
+    ["t-overhaul", "Капитальный ремонт"]]],
   ["Поставщики", [
     ["t-sup", "Реестр поставщиков"], ["t-subs", "Изготовители узлов"],
     ["t-chan", "Каналы поставки и ввоз"], ["t-bx", "Ранее направленные запросы"]]],
@@ -1800,6 +1856,77 @@ function fillSelect(sel, values, allLabel) {
     <td>${esc(m.oem)}</td><td><b>${esc(m.model)}</b></td><td class="num">${num(m.units)}</td>
     <td class="num">${m.passport ? "есть" : "—"}</td>
     <td><span class="pill ${m.partlist ? "ok" : "bad"}">${m.partlist ? "разобран" : "нет"}</span></td></tr>`).join("");
+
+  /* ── капитальный ремонт ─────────────────────────────────────────────── */
+  const OHS = OVERHAUL.stage_stats || {};
+  $("#oh-src").textContent = OVERHAUL.source;
+  $("#oh-tiles").innerHTML = [
+    [OHS["всего"], "этапов объёма работ"],
+    [OHS["с заменой ЗИП"], "из них замена узла"],
+    [(OVERHAUL.bom || []).length, "позиций в ведомости ЗИП"],
+    [num((OVERHAUL.labor_model || {}).total_nh), "нормо-часов на двигатель"],
+    [(OVERHAUL.price_anchors || []).length, "цен подтверждено ссылкой"],
+    [((OVERHAUL.rfq || {}).addressees || []).length, "адресатов запроса"],
+  ].map(([b, s]) => `<div class="tile"><b>${esc(b)}</b><span>${esc(s)}</span></div>`).join("");
+
+  const M = OVERHAUL.machine || {};
+  $("#oh-machine").innerHTML = `<b>${esc(M.model || "")}.</b> ${esc(M.rating || "")}. ${esc(M.config || "")}.
+    Топливная система: ${esc(M.fuel_system || "")}. Масса ${esc(M.mass_kg || "")}. Ресурс до капремонта ${esc(M.tbo_h || "")}.
+    <ul style="margin:6px 0 0">${(M.facts || []).map(f => `<li>${esc(f.fact)}${f.source ? ` <a href="${esc(f.source)}" target="_blank" rel="noopener">источник</a>` : ""}</li>`).join("")}</ul>`;
+  $("#oh-caveat").innerHTML = `<b>Чего здесь нет.</b> ${esc(OVERHAUL.caveat || "")}`;
+
+  $("#oh-stages").innerHTML = (OVERHAUL.stages || []).map(s => `<tr>
+    <td class="num">${esc(s.n)}</td><td>${esc(s.kind)}</td><td>${esc(s.place)}</td>
+    <td>${s.owner === "заказчик" ? '<span class="pill ok">заказчик</span>' : "подрядчик"}</td>
+    <td>${s.zip ? '<span class="pill">нужен</span>' : ""}</td>
+    <td>${esc(s.text)}</td></tr>`).join("");
+
+  $("#oh-bom").innerHTML = (OVERHAUL.bom || []).map(b => `<tr>
+    <td>${esc(b.system)}</td><td>${esc(b.name)}</td>
+    <td>${b.pn ? `<span class="tag">${esc(b.pn)}</span>` : ""}</td>
+    <td class="num">${esc(b.qty)} ${esc(b.unit)}</td>
+    <td class="mut">${esc(b.tender_line || "")}</td></tr>`).join("");
+
+  const LM = OVERHAUL.labor_model || {};
+  $("#oh-labor-note").textContent = LM.intro || "";
+  $("#oh-labor").innerHTML = (LM.lines || []).map(l => `<tr>
+    <td>${esc(l.stage)}</td><td>${esc(l.unit)}</td><td class="num">${num(l.qty)}</td>
+    <td class="mut">${esc(l.basis || "")}</td></tr>`).join("");
+
+  $("#oh-transparency").innerHTML = `<b>Почему цен мало.</b> ${esc(OVERHAUL.price_transparency || "")}`;
+  const usdTxt = v => v == null ? "—" : "$ " + num(v);
+  $("#oh-anchors").innerHTML = (OVERHAUL.price_anchors || []).map(a => `<tr>
+    <td>${esc(a.what)}${a.note ? `<div class="mut">${esc(a.note)}</div>` : ""}</td>
+    <td class="num">${a.oem_usd != null ? usdTxt(a.oem_usd) : (a.rub_per_usd ? num(a.rub_per_usd) + " ₽/$" : "—")}</td>
+    <td class="num">${a.aftermarket_usd != null ? usdTxt(a.aftermarket_usd)
+       : a.reman_usd != null ? usdTxt(a.reman_usd)
+       : a.rub_per_km_lo ? num(a.rub_per_km_lo) + "–" + num(a.rub_per_km_hi) + " ₽/км" : "—"}</td>
+    <td>${a.source ? `<a href="${esc(a.source)}" target="_blank" rel="noopener">страница</a>` : ""}</td></tr>`).join("");
+
+  const MC = OVERHAUL.market_check || {};
+  $("#oh-mc-intro").textContent = MC.intro || "";
+  $("#oh-mc").innerHTML = (MC.rows || []).map(r => `<tr>
+    <td>${esc(r.what)}</td><td class="num">${num(r.price)} ₽</td>
+    <td class="num">${r.net ? num(r.net) + " ₽" : "—"}</td>
+    <td>${/^https?:/.test(r.source || "") ? `<a href="${esc(r.source)}" target="_blank" rel="noopener">страница</a>` : esc(r.source || "")}</td></tr>`).join("");
+  $("#oh-mc-verdict").innerHTML = `<b>Вывод.</b> ${esc(MC.verdict || "")}`;
+
+  const RQ = OVERHAUL.rfq || {};
+  $("#oh-rfq-why").textContent = RQ.why || "";
+  $("#oh-rfq").innerHTML = (RQ.items || []).map(i => `<tr>
+    <td class="num">${esc(i.n)}</td><td>${esc(i.name)}</td>
+    <td>${i.pn ? `<span class="tag">${esc(i.pn)}</span>` : ""}</td>
+    <td class="num">${esc(i.qty_1)}</td><td class="num">${esc(i.qty_2)}</td>
+    <td class="mut">${esc(i.ask || "")}</td></tr>`).join("");
+  $("#oh-letter-pick").innerHTML = [["letter_ru", "текст запроса по-русски"], ["letter_en", "по-английски"]]
+    .map(([k, n]) => `<button class="pill" data-oh="${k}">${esc(n)}</button>`).join("");
+  $("#oh-letter-pick").querySelectorAll("button[data-oh]").forEach(b => b.onclick = () => {
+    $("#oh-letter").innerHTML = `<div class="card"><p>${esc(RQ[b.dataset.oh] || "")}</p></div>`;
+  });
+  $("#oh-addr").innerHTML = (RQ.addressees || []).map(a => `<tr>
+    <td><b>${esc(a.name)}</b></td><td>${esc(a.country)}</td><td>${esc(a.why)}</td>
+    <td>${a.bitrix === "доходили до сделки" ? `<span class="pill ok">${esc(a.bitrix)}</span>` : esc(a.bitrix || "")}</td></tr>`).join("");
+  $("#oh-quest").innerHTML = (OVERHAUL.open_questions || []).map(q => `<li>${esc(q)}</li>`).join("");
 
   $("#pb-tpl").querySelectorAll("button[data-tpl]").forEach(b => b.onclick = () => {
     const txt = PLAYBOOK.templates[+b.dataset.tpl].text;
