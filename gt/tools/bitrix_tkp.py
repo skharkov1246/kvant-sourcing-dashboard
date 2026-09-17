@@ -188,8 +188,16 @@ def rows_from_pdf(content: bytes) -> list[tuple[str, int, list]]:
         except Exception:
             continue
         for i, line in enumerate(txt.splitlines(), 1):
-            if line.strip():
-                out.append((f"стр.{pno}", i, [line.strip()]))
+            line = line.strip()
+            if not line:
+                continue
+            # в pdf нет колонок: строка приходит текстом. Отдать её одной
+            # ячейкой нельзя — тогда из «964587C1 109 2,93» ценой оказывался
+            # сам артикул. Режем по двум пробелам, а если их нет — по одному.
+            cells = re.split(r"\s{2,}", line)
+            if len(cells) < 2:
+                cells = line.split()
+            out.append((f"стр.{pno}", i, cells))
     return out
 
 
@@ -275,8 +283,8 @@ def price_rows(rows: list, hdr: dict) -> list[dict]:
             nums = [to_num(c) for j, c in enumerate(cells) if j not in skip]
             nums = [n for n in nums if n is not None]
             if nums:
-                price = max(nums)
-                rule = "наибольшее число строки (заголовок не опознан)"
+                price = nums[-1]
+                rule = "последнее число строки (заголовок не опознан)"
         if pn and price:
             out.append({
                 "pn": pn, "price": price, "sheet": sheet, "row": i,
