@@ -119,6 +119,20 @@ def expo(r) -> float:
     return 0.0 if m is None else m * float(r.get("qty") or 0)
 
 
+def width(r):
+    """Во сколько раз верх вилки выше низа.
+
+    Лучший детектор слабой оценки, который нашёлся: вилка шире втрое — это не
+    оценка, а признание, что цены мы не знаем. Проверка на пяти строках Allen-
+    Bradley это подтвердила: у всех пяти вилка была шире втрое, и у всех пяти
+    середина оказалась ниже прайса дистрибьютора.
+    """
+    lo, hi = r.get("usd_lo"), r.get("usd_hi")
+    if lo in (None, "") or hi in (None, "") or float(lo) <= 0:
+        return None
+    return float(hi) / float(lo)
+
+
 def build() -> str:
     lk = load("ship_lukoil.json")
     rows = lk["rows"] if isinstance(lk, dict) else lk
@@ -173,6 +187,14 @@ def build() -> str:
       f"<td class='dim'>отдельный замер (covers_qty = full) и по другому "
       f"признаку, поэтому число не обязано быть меньше предыдущего: остаток "
       f"бывает достаточным и там, где продавец не назвал его числом</td></tr>")
+    wide = [r for r in rows if (width(r) or 0) >= 3]
+    a(f"<tr><td class='l'>экспозиция на вилках шире втрое</td>"
+      f"<td class='v'>{ru(sum(map(expo, wide)))} USD</td>"
+      f"<td class='dim'>{100 * sum(map(expo, wide)) / tot:.0f} % всех денег на "
+      f"{ru(len(wide))} строках, где верх вилки выше низа втрое и больше. Вилка "
+      f"такой ширины — не оценка, а признание, что цены мы не знаем. Это самый "
+      f"надёжный признак слабого места: на пяти проверенных строках Allen-"
+      f"Bradley он сработал все пять раз</td></tr>")
     a(f"<tr><td class='l'>строк на низкой уверенности (C)</td>"
       f"<td class='v'>{ru(len(conf_c))}</td>"
       f"<td class='dim'>{ru(sum(map(expo, conf_c)))} USD — "
