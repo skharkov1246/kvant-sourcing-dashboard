@@ -412,6 +412,48 @@ def sniff(content: bytes) -> str:
     return ".bin"
 
 
+def rows_from_zip(content: bytes) -> tuple[list, str]:
+    """Строки из архива: КП часто присылают запакованным.
+
+    Замер боевого прогона по «НВН» 17.09.2026: десять файлов получили «формат не
+    поддержан», а base/parse_archives.py в этом же репозитории существует именно
+    потому, что предложения приходят архивами. Внутрь заходим на ОДИН уровень:
+    архив в архиве бывает, но редко, а бесконечная вложенность — способ
+    подвесить прогон.
+
+    Имя участника архива есть, поэтому разбор выбирается по нему, а не по
+    магическим байтам, и это надёжнее.
+    """
+    import zipfile
+    try:
+        z = zipfile.ZipFile(io.BytesIO(content))
+    except Exception as e:
+        return [], f"архив не открылся ({type(e).__name__})"
+    rows, opened, skipped = [], 0, 0
+    for name in z.namelist():
+        low = name.lower()
+        if low.endswith("/") or not low.endswith(
+                (".xlsx", ".xlsm", ".xls", ".csv", ".txt", ".tsv", ".pdf")):
+            skipped += 1
+            continue
+        try:
+            body = z.read(name)
+        except Exception:
+            skipped += 1
+            continue
+        got, _ = parse(name, body)
+        if got:
+            # лист помечаем именем файла внутри архива, иначе непонятно, откуда
+            # взялась строка
+            rows += [(f"{name}:{sheet}", r, cells) for sheet, r, cells in got]
+            opened += 1
+        else:
+            skipped += 1
+    if not rows:
+        return [], f"архив: разбираемого внутри нет (пропущено {skipped})"
+    return rows, f"архив ({opened} файлов внутри, пропущено {skipped})"
+
+
 def parse(name: str, content: bytes):
     """Возвращает (строки, способ). Отказ выносится ПО ФАЙЛУ, а не по строке —
     правило 13 CLAUDE.md: построчный отказ теряет до 40 % позиций."""
@@ -440,6 +482,8 @@ def parse(name: str, content: bytes):
             return rows, tag
     if low.endswith((".png", ".jpg", ".jpeg", ".tif", ".tiff", ".bmp")):
         return rows_from_ocr(low, content)
+    if low.endswith((".zip", ".xlsx", ".docx")) or content[:2] == b"PK":
+        return rows_from_zip(content)
     return [], "формат не поддержан"
 
 
@@ -1075,6 +1119,9 @@ def main() -> int:
             continue
         n_dl += 1
         rows, how_parsed = parse(c["file_name"], body)
+        # какой формат узнан по байтам — иначе «формат не поддержан» остаётся
+        # загадкой, и следующая ошибка снова будет неизмеримой (правило 16)
+        rec["sniffed"] = sniff(body)
         hdr = header_map(rows) if rows else {}
         pr = price_rows(rows, hdr) if rows else []
         n_rows += len(rows)

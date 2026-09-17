@@ -476,3 +476,64 @@ def test_распознанный_шум_не_считается_текстом(
     monkeypatch.setattr(T, "ocr_image_text", lambda b: "  |. ,\n")
     rows, how = T.rows_from_ocr("snap.png", b"\x89PNG" + b"\x00" * 300)
     assert rows == [] and "текста нет" in how
+
+
+def _zip_of(files: dict) -> bytes:
+    """Придуманный архив: имя → содержимое."""
+    import io as _io
+    import zipfile
+    buf = _io.BytesIO()
+    with zipfile.ZipFile(buf, "w") as z:
+        for n, b in files.items():
+            z.writestr(n, b)
+    return buf.getvalue()
+
+
+def test_кп_внутри_архива_разбирается():
+    """Замер по «НВН»: десять файлов получили «формат не поддержан», а
+    предложения в этом портале приходят и архивами."""
+    body = _zip_of({
+        "КП/оферта.csv": "Артикул;Наименование;Кол-во;Цена\n3420932;прокладка;566;86,89\n",
+        "КП/письмо.txt": "здравствуйте, направляем предложение",
+        "КП/логотип.png": b"\x89PNG\r\n\x1a\n",
+    })
+    rows, how = T.parse("пакет.zip", body)
+    assert rows, how
+    assert "архив" in how
+    pr = T.price_rows(rows, T.header_map(rows))
+    assert len(pr) == 1 and pr[0]["pn"] == "3420932"
+    assert abs(pr[0]["price"] - 86.89) < 0.01
+
+
+def test_лист_несёт_имя_файла_внутри_архива():
+    """Иначе непонятно, откуда взялась строка, а происхождение обязано быть."""
+    body = _zip_of({"offer/a.csv": "Артикул;Цена\nX1;10\n"})
+    rows, _ = T.parse("p.zip", body)
+    assert any("offer/a.csv" in str(sheet) for sheet, _, _ in rows), rows
+
+
+def test_архив_без_разбираемого_отказывает_с_числом():
+    body = _zip_of({"a.png": b"\x89PNG", "b.exe": b"MZ"})
+    rows, how = T.parse("p.zip", body)
+    assert rows == []
+    assert "пропущено 2" in how, how
+
+
+def test_битый_архив_не_валит_прогон():
+    rows, how = T.parse("p.zip", b"PK\x03\x04" + b"\x00" * 50)
+    assert rows == [] and "архив" in how
+
+
+def test_xlsx_не_уходит_в_разбор_архива_хотя_он_и_zip():
+    """xlsx — тоже zip, но у него свой разбор, и он должен сработать первым."""
+    import io as _io
+    from openpyxl import Workbook
+    wb = Workbook()
+    ws = wb.active
+    ws.append(["Артикул", "Цена"])
+    ws.append(["X1", 10])
+    buf = _io.BytesIO()
+    wb.save(buf)
+    rows, how = T.parse("спец.xlsx", buf.getvalue())
+    assert how == "xlsx", how
+    assert rows
