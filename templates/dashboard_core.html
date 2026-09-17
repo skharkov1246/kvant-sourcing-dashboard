@@ -774,7 +774,7 @@ function openDrw(uid){
   const tot=SBUCK.reduce((a,[k])=>a+(b[k]||0),0)||1;
   const sup=s.bySupplier||[];
   const _dk=d=>(d.mailDt||d.dtx||d.dt||'');   // хронологический ключ: время письма → создание карточки
-  const allDet=(s.details||[]).slice().sort((a,b2)=>{const ka=_dk(a),kb=_dk(b2);return ka<kb?1:(ka>kb?-1:0);});
+  const allDet=_unpack(s.details).slice().sort((a,b2)=>{const ka=_dk(a),kb=_dk(b2);return ka<kb?1:(ka>kb?-1:0);});
   const body=document.getElementById('drwBody');
   function render(filter){
     let h=`<div class="h">Распределение по статусам · клик — фильтр</div>`;
@@ -1325,6 +1325,13 @@ function renderReps(R){
   draw();
 }
 // ---- вкладка «Контракты»: один список заказов СП-172 с поиском и сортировкой
+// Списки одинаковых записей приходят упакованными: имена полей один раз, значения
+// строками. Разворачиваем при чтении — на странице экономит сотни килобайт повторов.
+function _unpack(x){
+  if(!x) return [];
+  if(!x._p) return Array.isArray(x)?x:[];
+  return x.r.map(a=>{const o={};x.f.forEach((k,i)=>{const v=a[i];if(v!==null&&v!==undefined)o[k]=v;});return o;});
+}
 const _stShort=n=>String(n||'').split(' | ')[0];   // короткое имя стадии (до « | »)
 function openContract(x){
   document.getElementById('drwName').textContent=(x.seq?`№${x.seq} · `:'')+(x.customer!=='—'?x.customer:x.title.slice(0,40));
