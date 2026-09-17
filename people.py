@@ -395,11 +395,19 @@ def hygiene(*, people: dict[str, dict], role_of: dict[str, str], deps: dict[str,
         "alive":     round(sum(1 for d in details if (d["idle"] or 0) <= DEAD_DAYS) / live * 100),
     }
     extra = {"onFired": orphan["sum"], "noRole": recon["noneSum"]}
+    # поимённо — только отделы: это короткий список, и по нему сразу видно, что править.
+    # Людей по фамилиям сюда не кладём: строка про состояние справочника, а не про них.
+    names = {
+        "deptHead":  [deps.get(d, d) for d in deps if not dept_head.get(d)],
+        "deptFired": [deps.get(d, d) for d, h in dept_head.items()
+                      if h and not people.get(h, {}).get("active")],
+        "deptGhost": [deps.get(d, d) for d in deps if d not in active_depts],
+    }
     out = []
     for key, (label, norm, op, unit, why) in HYGIENE.items():
         v = fact[key]
         out.append({"k": key, "lbl": label, "val": v, "unit": unit, "norm": norm, "op": op,
-                    "why": why, "sum": extra.get(key, ""),
+                    "why": why, "sum": extra.get(key, ""), "names": sorted(names.get(key, []))[:20],
                     "ok": bool(v <= norm if op == "≤" else v >= norm)})
     return out
 
@@ -583,6 +591,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             "state": "real" if in_real else "presale",
             "idle": idle, "late": late_days, "noAmt": no_amt, "noComp": no_comp, "neg": neg,
             "big": big, "date": str(d.get("DATE_CREATE", ""))[:10],
+            "plan": cd > today_iso,
         })
 
     # --- результат года: создано / выиграно / проиграно (когорта 2026).

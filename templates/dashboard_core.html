@@ -1174,13 +1174,18 @@ function renderReps(R){
     const wcol=rr=>{const n=rr.waitN||0,g=rr.waitGt1d||0; const c=g>0?'var(--nr)':(n>0?'var(--amber)':'var(--mut)'); const sub=g?` <span class="dimv">(${g}>сут)</span>`:''; return `<td class="num r" style="color:${c}" title="макс ${rr.waitMaxDays||0} дн">${n}${sub}</td>`;};
     const acol=rr=>{const d=rr.lastPostDays; if(d==null)return '<td class="num r dimv">—</td>'; const c=d>3?'var(--nr)':(d>1?'var(--amber)':'var(--ok)'); return `<td class="num r" style="color:${c}">${d} дн</td>`;};
     const rows=reps.map(r=>{const k=r.kpis, rr=r.react||{}, as=rr.assessment;return `<tr class="drill" data-r="${r.uid}"><td><div class="who">${_esc(r.label)} <span class="dimv" style="font-weight:400">${_esc(r.role||'')}</span></div><div class="dep">${_esc(r.pos||r.name)}</div>${as?`<div class="dep" style="color:var(--a2)">Opus: вовл ${as.eng} · проф ${as.prof}</div>`:''}</td><td class="num r">${k.created}</td><td class="num r" style="color:var(--ok)">${k.real}</td><td class="num r">${k.conv}%</td><td class="num r">${k.sales}</td><td class="num r"><b>${k.winRate}%</b></td>${rcol(rr)}<td class="num r">${rr.days?(rr.withinSla||0)+'%':'<span class="dimv">—</span>'}</td><td class="num r">${rr.days?(rr.handledPct||0)+'%':'<span class="dimv">—</span>'}</td>${wcol(rr)}${acol(rr)}</tr>`;}).join('');
+    // строки гигиены, за которыми стоит список сделок, — кликабельны: диагноз без
+    // перечня карточек остаётся диагнозом, а работать надо по списку
+    const HYGF={noRole:d=>!d.kam&&!d.prod&&d.ownLive, onFired:d=>!d.ownLive,
+                withAmt:d=>d.noAmt||d.noComp, alive:d=>d.idle!=null&&d.idle>((PP&&PP.params&&PP.params.dead)||180),
+                future:d=>!d.plan};
     let hyg='';
     if(PP&&PP.hygiene&&PP.hygiene.length){
       const H=PP.hygiene, bad=H.filter(x=>!x.ok).length, pc=x=>x.unit==='%'?'%':'';
       hyg=`<div class="secttl"><b>·</b> Гигиена Bitrix${qmark('p.hyg')}</div><section class="card">`
-        +`<div class="note">Не в норме <b style="color:${bad?'var(--nr)':'var(--ok)'}">${bad}</b> из ${H.length} строк. Это состояние справочников, а не работа людей: пока строка красная, цифра рядом на портале считается с оговоркой либо не считается вовсе. Каждая строка чинится настройкой Bitrix или регламентом заполнения.</div>`
+        +`<div class="note">Не в норме <b style="color:${bad?'var(--nr)':'var(--ok)'}">${bad}</b> из ${H.length} строк. Это состояние справочников, а не работа людей: пока строка красная, цифра рядом на портале считается с оговоркой либо не считается вовсе. Каждая строка чинится настройкой Bitrix или регламентом заполнения. Строки со списком сделок открываются кликом.</div>`
         +`<table><thead><tr><th>Что меряем</th><th class="r">факт</th><th class="r">норма</th><th>что это чинит</th></tr></thead><tbody>`
-        +H.map(x=>`<tr><td>${_esc(x.lbl)}</td><td class="num r" style="color:${x.ok?'var(--ok)':'var(--nr)'}"><b>${x.val}${pc(x)}</b>${x.sum?` <span class="dimv">${_esc(x.sum)}</span>`:''}</td><td class="num r dimv">${x.op} ${x.norm}${pc(x)}</td><td class="dimv">${_esc(x.why)}</td></tr>`).join('')
+        +H.map(x=>`<tr${HYGF[x.k]?` class="drill" data-hyg="${x.k}"`:''}><td>${_esc(x.lbl)}</td><td class="num r" style="color:${x.ok?'var(--ok)':'var(--nr)'}"><b>${x.val}${pc(x)}</b>${x.sum?` <span class="dimv">${_esc(x.sum)}</span>`:''}</td><td class="num r dimv">${x.op} ${x.norm}${pc(x)}</td><td class="dimv">${_esc(x.why)}${(x.names&&x.names.length)?`<div style="margin-top:3px;color:var(--ink)">${x.names.map(n=>_esc(n)).join(' · ')}</div>`:''}</td></tr>`).join('')
         +`</tbody></table></section>`;
     }
     let cmp='';
@@ -1270,6 +1275,9 @@ function renderReps(R){
     h+=navHtml()+(sel==='all'?overview():(isRole?`<div id="repsRole"></div>`:detail(byUid(sel))));
     el.innerHTML=h;
     el.querySelectorAll('[data-r]').forEach(b=>b.addEventListener('click',()=>{sel=b.dataset.r;draw();window.scrollTo(0,0);}));
+    el.querySelectorAll('[data-hyg]').forEach(n=>n.addEventListener('click',()=>{
+      const k=n.dataset.hyg, f=HYGF[k], row=(PP.hygiene||[]).find(x=>x.k===k);
+      if(f&&PP.deals)openPeopleDeals(PP.deals.filter(f),row?row.lbl:'Гигиена','Гигиена Bitrix · что чинить');}));
     if(isRole){
       const role=sel.slice(5);
       renderPeople(PP,role,'repsRole',{noHead:1});
