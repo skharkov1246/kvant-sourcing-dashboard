@@ -157,20 +157,30 @@ li { margin-bottom: 1.4mm; line-height: 1.38; }
 """
 
 
-def build(rows: list, ours: dict, fx_day: str) -> str:
+def build(rows: list, ours: dict, fx_day: str, supp: dict | None = None) -> str:
     rates = load_rates()
+    supp = supp or {}
     joined = []
     for r in rows:
         o = ours.get(norm_key(r["pn"]))
         if not o:
             continue
-        mk = r.get("unit_price_usd")
-        mk = float(mk) if mk not in (None, "") else None
-        if mk is not None and mk <= 0:
-            mk = None          # ноль — заглушка витрины, запас по нему не считается
+        web = r.get("unit_price_usd")
+        web = float(web) if web not in (None, "") else None
+        if web is not None and web <= 0:
+            web = None         # ноль — заглушка витрины, запас по нему не считается
+        # КП поставщика из вложения сделки — свидетельство СИЛЬНЕЕ карточки с
+        # витрины: это письменное предложение контрагента по этой самой заявке,
+        # а не цена неизвестного продавца неизвестного исполнения. Поэтому за
+        # цену закупки берём его, когда оно есть, а витрину держим рядом.
+        sp = supp.get(norm_key(r["pn"]))
+        offer = sp["usd"] if sp else None
+        mk = offer if offer is not None else web
+        src = "КП поставщика" if offer is not None else ("витрина" if web else "")
         qty = int(r.get("qty") or 0)
         room = (o["usd"] - mk) if mk is not None else None
-        joined.append({"r": r, "o": o, "mk": mk, "qty": qty, "room": room,
+        joined.append({"r": r, "o": o, "mk": mk, "web": web, "offer": offer,
+                       "sp": sp, "src": src, "qty": qty, "room": room,
                        "room_total": (room * qty) if room is not None else None})
 
     checked = [j for j in joined if j["mk"] is not None]
@@ -190,8 +200,9 @@ def build(rows: list, ours: dict, fx_day: str) -> str:
         f"""<table class="k"><tbody>
 <tr><td class="l">Сошлось с заявкой</td><td class="big">{len(joined)}</td>
 <td class="dim">позиций, где есть и выставленная цена, и строка заявки</td></tr>
-<tr><td class="l">Рынок проверен</td><td class="big">{len(checked)}</td>
-<td class="dim">по остальным {len(nomk)} цену закупки найти не удалось — запас неизвестен</td></tr>
+<tr><td class="l">Закупка подтверждена</td><td class="big">{len(checked)}</td>
+<td class="dim">из них КП поставщика из вложений сделки — {sum(1 for j in checked if j["offer"] is not None)},
+остальное карточка продавца с витрины. По {len(nomk)} строкам цены закупки нет вовсе — запас неизвестен</td></tr>
 <tr><td class="l">Запас на снижение</td><td class="big">{ru(room_sum)} USD</td>
 <td class="dim">сумма по {len(ok)} строкам, где выставлено дороже найденной закупки.
 Это предел торга, а не прибыль: расходы, логистика и пошлины сюда не входят</td></tr>
@@ -216,19 +227,22 @@ def build(rows: list, ours: dict, fx_day: str) -> str:
 
     cols = [
         ("Артикул", 9, lambda j: f'<span class="pn">{E(j["r"]["pn"])}</span>'),
-        ("Наименование", 17, lambda j: E((j["r"].get("name") or "")[:120])),
+        ("Наименование", 26, lambda j: E((j["r"].get("name") or "")[:120])),
         ("Кол-во", 4, lambda j: ru(j["qty"])),
         ("Выставлено, USD/шт", 7, lambda j: money(j["o"]["usd"])),
         ("В валюте ТКП", 7, lambda j: f'{money(j["o"]["raw_price"])} {E(j["o"]["currency"])}'),
-        ("Закупка найдена, USD/шт", 7, lambda j: money(j["mk"]) if j["mk"] is not None else ""),
+        ("КП поставщика, USD/шт", 7,
+         lambda j: money(j["offer"]) if j["offer"] is not None else ""),
+        ("Витрина, USD/шт", 6, lambda j: money(j["web"]) if j["web"] is not None else ""),
         ("Запас, USD/шт", 6, lambda j: ("" if j["room"] is None else
                                         (f'<span class="bad">{money(j["room"])}</span>'
                                          if j["room"] < 0 else money(j["room"])))),
         ("Запас на объём, USD", 7, lambda j: ("" if j["room_total"] is None else
                                               (f'<span class="bad">{ru(j["room_total"])}</span>'
                                                if j["room_total"] < 0 else ru(j["room_total"])))),
+        ("Чем подтверждено", 6, lambda j: E(j["src"])),
         ("Наличие", 5, lambda j: E(j["r"].get("stock_grade", ""))),
-        ("Продавец", 14, lambda j: E(((j["r"].get("sellers") or [{}])[0].get("seller") or "")[:60])),
+        ("Продавец", 10, lambda j: E(((j["r"].get("sellers") or [{}])[0].get("seller") or "")[:60])),
     ]
 
     def table(js: list) -> str:
@@ -239,9 +253,15 @@ def build(rows: list, ours: dict, fx_day: str) -> str:
         for j in js:
             tds = "".join(f"<td>{fn(j)}</td>" for _, _, fn in cols)
             o = j["o"]
-            src = (f'<b>Откуда выставленная цена:</b> {E(o["origin"])}, файл '
-                   f'«{E(o["file"])}», лист {E(o["sheet"])}, строка {E(o["row"])}; '
-                   f'{E(o["rule"])}')
+            src = (f'<b>Откуда выставленная цена:</b> {E(o["origin"])}, поле '
+                   f'«{E(o.get("field") or "")}», файл «{E(o["file"])}», лист '
+                   f'{E(o["sheet"])}, строка {E(o["row"])}; {E(o["rule"])}')
+            sp = j.get("sp")
+            if sp:
+                src += (f' <b>· Откуда КП поставщика:</b> {E(sp["origin"])}, поле '
+                        f'«{E(sp.get("field") or "")}», файл «{E(sp["file"])}», '
+                        f'строка {E(sp["row"])}, {money(sp["raw_price"])} '
+                        f'{E(sp["currency"])}')
             bodies.append(f'<tbody class="p"><tr>{tds}</tr>'
                           f'<tr class="b"><td colspan="{len(cols)}">{src}</td></tr></tbody>')
         return f'<table class="t"><thead><tr>{th}</tr></thead>{"".join(bodies)}</table>'
@@ -252,7 +272,9 @@ def build(rows: list, ours: dict, fx_day: str) -> str:
         ("Запас на снижение есть", ok,
          "Сортировка по размеру запаса на объём: здесь есть чем торговаться."),
         ("Цена закупки не найдена — запас неизвестен", nomk,
-         "Выставленная цена есть, подтверждения закупочной нет."),
+         "Выставленная цена есть, а подтверждения закупочной нет ни КП "
+         "поставщика, ни карточкой продавца. Это не «дорого» и не «дёшево» — "
+         "это отсутствие данных, и складывать такие строки с остальными нельзя."),
     ], 1):
         if not js:
             continue
@@ -329,13 +351,15 @@ def main() -> int:
         return 1
     rows = json.loads(DATA.read_text())["rows"]
     rates = load_rates()
-    ours = our_prices(tkp, rates)
+    ours, supp, unk = prices_by_direction(tkp, rates)
+    print(f"артикулов: выставлено нами {len(ours)}, в КП поставщиков {len(supp)}, "
+          f"в неопознанных файлах {len(unk)} (в документ не идут)")
     fx_day = json.loads(FX.read_text()).get("fetched", "")[5:16] if FX.exists() else ""
     print(f"артикулов с выставленной ценой: {len(ours)}")
 
     html_path = out.with_suffix(".html")
     html_path.parent.mkdir(parents=True, exist_ok=True)
-    html_path.write_text(build(rows, ours, fx_day), encoding="utf-8")
+    html_path.write_text(build(rows, ours, fx_day, supp), encoding="utf-8")
     exe = next((c for c in CHROME if Path(c).exists()), None)
     if not exe:
         print("Chromium не найден — PDF не собран", file=sys.stderr)
