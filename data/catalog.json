@@ -4,16 +4,16 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 220,
-    "total_bytes": 100228757,
+    "datasets": 221,
+    "total_bytes": 100361516,
     "by_sensitivity": {
       "конфиденциально": 62,
-      "внутреннее": 121,
+      "внутреннее": 122,
       "публикуемо": 37
     },
     "by_subproject": {
       "ГПУ-библиотека": 29,
-      "ГТУ-библиотека": 43,
+      "ГТУ-библиотека": 44,
       "ОВЭ-75": 45,
       "база ЗИП": 49,
       "база ЗИП · таможня": 18,
@@ -292,6 +292,7 @@
         "gt/tools/ship_offer.py",
         "gt/tools/ship_priced.py",
         "gt/tools/ship_questions.py",
+        "gt/tools/ship_reverify.py",
         "gt/tools/ship_rfq.py",
         "tests/test_ship_fx.py"
       ]
@@ -1366,7 +1367,7 @@
     {
       "path": "gt/data/bitrix_tkp_index.json",
       "subproject": "ГТУ-библиотека",
-      "bytes": 592012,
+      "bytes": 586915,
       "note": "Опись вложений по сделке из Bitrix24 БЕЗ ЦЕН: какие файлы приложены к сделке и к привязанным записям СП-166, чем каждый разобран, сколько строк дал и по каким артикулам в нём нашлась цена. Цены намеренно исключены — репозиторий публичный, а цены заказчику это коммерческие данные (правило 5 CLAUDE.md, SECURITY.md). Полная выгрузка с ценами уезжает артефактом прогона и в репозиторий не попадает; воркфлоу отдельным шагом проверяет, что в описи нет пар «price: число», и отменяет коммит, если нашёл. Зачем нужно: владелец выставил заказчику ТВЁРДЫЕ цены и защищает именно их, а в товарных строках сделки их нет — они лежат в приложенных ТКП, прайсах и входящих КП. Разведочные вилки из gt/data/rfq_prices.json этими ценами НЕ являются: в основаниях там дословно «дистрибьюторы», «аналог», «экспертная вилка». Собирается gt/tools/bitrix_tkp.py, запуск руками через Actions. ЗАМЕР ХОЛОСТОГО ПРОГОНА 17.09.2026, по нему инструмент и правился: 137 сделок по слову «ЛУКОЙЛ», 475 привязанных запросов поставщикам, 1998 файлов. Имя файла есть только у 12 из 1998 — Bitrix в файловом объекте crm.item.list его не отдаёт, поэтому формат узнаётся по заголовку отдачи и по магическим байтам. Направление читается по имени поля и делится на четыре группы, а не на две: «наша цена» (Result, ТКП и Economics of the project — там выставленные заказчику цены), «входящее» (Offer from supplier(s), КП поставщика), «наш запрос» (Offer from us, Request file) и «заявка» (Техническая спецификация). До этой правки 1509 файлов из 1998 уходили в «неизвестно», потому что направление читалось только по восьми зашитым кодам СП-166, а у сделки 25 своих файловых полей.",
       "format": "json",
       "shape": "объект",
@@ -1394,9 +1395,9 @@
         ]
       },
       "last_change": "2026-09-17",
-      "last_author": "Claude",
-      "last_commit": "443b90d",
-      "updated_by": "человек/агент",
+      "last_author": "github-actions[bot]",
+      "last_commit": "65c044e",
+      "updated_by": "бот (workflow)",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
@@ -3694,6 +3695,56 @@
       ]
     },
     {
+      "path": "gt/data/ship_reverify.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 135756,
+      "note": "Перепроверка крупнейших строк заявки ЛУКОЙЛ: по каждой строке заново установлено, что это за изделие, кто его делает на самом деле и под каким своим номером, жив ли номер, сколько позиция стоит в открытых каналах, есть ли рабочий канал закупки и что мешает закрыть строку. Отбор строк — по экспозиции: топ-60 дают 67 % от 9 277 410 USD экспозиции всей заявки (экспозиция = середина нашей оценочной вилки, умноженная на количество). Поле band_verdict говорит, что стало с нашей прежней оценкой: ЗАНИЖЕНА, ЗАВЫШЕНА, ВЕРНА или НЕЧЕМ ПРОВЕРИТЬ. Последнее — НЕ «дорого» и не «дёшево», а отсутствие открытой цены во всех каналах; складывать эти группы в одну цифру нельзя. Поле skeptics несёт результат проверки вывода на опровержение; пустой список означает, что проверка не прогонялась, и приравнивать это к подтверждению нельзя — исследователь уже был пойман на выдуманной цитате. ВНИМАНИЕ: набор пополняется по ходу, и до окончания прогона он ЧАСТИЧНЫЙ — число строк в нём меньше шестидесяти. Собирается рабочим процессом перепроверки, читается gt/tools/ship_reverify.py. Цены здесь рыночные, из открытых карточек продавцов; выставленных заказчику цен в наборе нет.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "rows",
+        "source",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 9,
+        "record_keys": [
+          "band_verdict",
+          "blocker",
+          "channel",
+          "contacts",
+          "lead_time",
+          "lifecycle",
+          "note",
+          "pn",
+          "price_authorized",
+          "price_high",
+          "price_kind",
+          "price_low",
+          "price_source",
+          "real_maker",
+          "real_pn",
+          "recommended",
+          "skeptics",
+          "stock",
+          "volume_note",
+          "what_it_is"
+        ]
+      },
+      "last_change": "2026-09-17",
+      "last_author": "Claude",
+      "last_commit": "d6742a5",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/ship_reverify.py"
+      ]
+    },
+    {
       "path": "pnw/data/crossrefs.json",
       "subproject": "каталог PN · данные",
       "bytes": 135481,
@@ -5336,6 +5387,68 @@
       "referenced_by": []
     },
     {
+      "path": "data/catalog_notes.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 60589,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "data/budget_snapshot.json",
+        "data/chain_coverage.json",
+        "data/chat_snapshot.json",
+        "data/import_cost.json",
+        "data/index.json",
+        "dict/",
+        "dict/node_map.json",
+        "gidromet/data/",
+        "gpu/data/bitrix_gpu.json",
+        "gpu/data/coverage.json",
+        "gpu/data/faults.json",
+        "gpu/data/overhaul_qsk60.json",
+        "gt/data/ansaldo.json",
+        "gt/data/bitrix_gt.json",
+        "gt/data/bitrix_tkp_index.json",
+        "gt/data/dossiers.json",
+        "gt/data/faults.json",
+        "gt/data/fx_rates.json",
+        "gt/data/pn_db.json",
+        "gt/data/ship_blocked.json",
+        "gt/data/ship_decoded.json",
+        "gt/data/ship_energoseti.json",
+        "gt/data/ship_lukoil.json",
+        "gt/data/ship_questions.json",
+        "gt/data/ship_recheck.json",
+        "gt/data/ship_reverify.json",
+        "gt/data/ship_rfq_letters.json",
+        "gt/data/ship_sellers.json",
+        "gt/data/ship_sweep.json",
+        "gt/docs/ЗАКУПКА-ЛУКОЙЛ.csv",
+        "gt/docs/ЗАПРОСЫ-ЛУКОЙЛ.csv",
+        "gt/docs/ЛУКОЙЛ-СИМЕНС-SGT-400.pdf",
+        "gt/docs/ЛУКОЙЛ-СОЛАР-TAURUS.pdf",
+        "gt/docs/РАЗВЕДКА-ЦЕН-ЛУКОЙЛ.pdf",
+        "gt/tools/ship_offer.py",
+        "library/data/symptoms.json",
+        "library/docfilter.py",
+        "library/indexer.py",
+        "library/load_parts.py",
+        "library/load_suppliers.py"
+      ],
+      "last_change": "2026-09-17",
+      "last_author": "Claude",
+      "last_commit": "d6742a5",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "scripts/build_catalog.py",
+        "tests/test_catalog_guard.py"
+      ]
+    },
+    {
       "path": "gidromet/data/serebro.json",
       "subproject": "гидрометаллургия",
       "bytes": 59946,
@@ -5478,68 +5591,6 @@
       },
       "referenced_by": [
         "gidromet/build.py"
-      ]
-    },
-    {
-      "path": "data/catalog_notes.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 58489,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "data/budget_snapshot.json",
-        "data/chain_coverage.json",
-        "data/chat_snapshot.json",
-        "data/import_cost.json",
-        "data/index.json",
-        "dict/",
-        "dict/node_map.json",
-        "gidromet/data/",
-        "gpu/data/bitrix_gpu.json",
-        "gpu/data/coverage.json",
-        "gpu/data/faults.json",
-        "gpu/data/overhaul_qsk60.json",
-        "gt/data/ansaldo.json",
-        "gt/data/bitrix_gt.json",
-        "gt/data/bitrix_tkp_index.json",
-        "gt/data/dossiers.json",
-        "gt/data/faults.json",
-        "gt/data/fx_rates.json",
-        "gt/data/pn_db.json",
-        "gt/data/ship_blocked.json",
-        "gt/data/ship_decoded.json",
-        "gt/data/ship_energoseti.json",
-        "gt/data/ship_lukoil.json",
-        "gt/data/ship_questions.json",
-        "gt/data/ship_recheck.json",
-        "gt/data/ship_rfq_letters.json",
-        "gt/data/ship_sellers.json",
-        "gt/data/ship_sweep.json",
-        "gt/docs/ЗАКУПКА-ЛУКОЙЛ.csv",
-        "gt/docs/ЗАПРОСЫ-ЛУКОЙЛ.csv",
-        "gt/docs/ЛУКОЙЛ-СИМЕНС-SGT-400.pdf",
-        "gt/docs/ЛУКОЙЛ-СОЛАР-TAURUS.pdf",
-        "gt/docs/РАЗВЕДКА-ЦЕН-ЛУКОЙЛ.pdf",
-        "gt/tools/ship_offer.py",
-        "library/data/symptoms.json",
-        "library/docfilter.py",
-        "library/indexer.py",
-        "library/load_parts.py",
-        "library/load_suppliers.py",
-        "library/ocr.py"
-      ],
-      "last_change": "2026-09-17",
-      "last_author": "Claude",
-      "last_commit": "443b90d",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "scripts/build_catalog.py",
-        "tests/test_catalog_guard.py"
       ]
     },
     {
