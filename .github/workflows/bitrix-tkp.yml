@@ -59,6 +59,18 @@ jobs:
       - name: Установка зависимостей
         run: pip install --quiet -r requirements.txt openpyxl xlrd pypdf
 
+      # Распознавание. Замер боевого прогона 17.09.2026 по «Энергосети»: из 93
+      # файлов 24 картинки и 3 скана без текстового слоя — 29 % файлов, и цены в
+      # них есть, просто не текстом. Без tesseract инструмент честно пишет
+      # «распознавание недоступно», но файлы остаются непрочитанными.
+      - name: Установка распознавания
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq tesseract-ocr tesseract-ocr-rus poppler-utils
+          pip install --quiet pytesseract pillow pdf2image
+          tesseract --version | head -1
+
       - name: Выгрузка входящих КП
         id: extract
         timeout-minutes: 100         # меньше таймаута задания: последующие шаги успеют

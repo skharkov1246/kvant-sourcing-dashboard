@@ -301,6 +301,72 @@ def rows_from_pdf(content: bytes) -> list[tuple[str, int, list]]:
     return out
 
 
+# Распознавание. Боевой прогон по «Энергосети» 17.09.2026: из 93 файлов 24
+# оказались картинками и 3 сканами без текстового слоя — 29 % файлов, и цены в
+# них есть, просто не в виде текста. Способ взят из base/reparse.py, где он уже
+# работает на этом же корпусе: pytesseract с языками rus+eng, мелкие картинки
+# увеличиваются вдвое (иначе распознаются плохо).
+#
+# Отсутствие tesseract — НЕ ошибка разбора: инструмент должен честно сказать
+# «распознавание недоступно», а не «не разобрался». Иначе оценка объёма работы
+# по сканам занижается, как это уже было (правило 15 CLAUDE.md).
+OCR_LANG = "rus+eng"
+OCR_MAX_PAGES = 12
+OCR_MIN_CHARS = 40          # меньше — шум распознавания, а не текст
+
+
+def ocr_available() -> bool:
+    try:
+        import pytesseract
+        pytesseract.get_tesseract_version()
+        return True
+    except Exception:
+        return False
+
+
+def ocr_image_text(content: bytes) -> str:
+    import pytesseract
+    from PIL import Image
+    img = Image.open(io.BytesIO(content))
+    if img.mode not in ("L", "RGB"):
+        img = img.convert("RGB")
+    if max(img.size) < 900:
+        img = img.resize((img.width * 2, img.height * 2))
+    return pytesseract.image_to_string(img, lang=OCR_LANG)
+
+
+def ocr_pdf_text(content: bytes) -> str:
+    try:
+        from pdf2image import convert_from_bytes
+        pages = convert_from_bytes(content, dpi=200, first_page=1,
+                                   last_page=OCR_MAX_PAGES)
+    except Exception:
+        return ""
+    import pytesseract
+    out = []
+    for pg in pages:
+        try:
+            out.append(pytesseract.image_to_string(pg, lang=OCR_LANG))
+        except Exception:
+            continue
+    return "\n".join(out)
+
+
+def rows_from_ocr(name: str, content: bytes) -> tuple[list, str]:
+    """Строки из картинки или скана. Возвращает (строки, способ)."""
+    if not ocr_available():
+        return [], "распознавание недоступно (нет tesseract)"
+    low = (name or "").lower()
+    try:
+        txt = (ocr_pdf_text(content) if low.endswith(".pdf")
+               else ocr_image_text(content))
+    except Exception as e:
+        return [], f"распознавание не удалось ({type(e).__name__})"
+    if len(txt.strip()) < OCR_MIN_CHARS:
+        return [], "распознано, но текста нет"
+    return rows_from_text(txt.encode("utf-8")), "распознавание"
+
+
 PARSERS = [
     ((".xlsx", ".xlsm"), rows_from_xlsx, "xlsx"),
     ((".xls",), rows_from_xls, "xls"),
@@ -356,9 +422,24 @@ def parse(name: str, content: bytes):
     for exts, fn, tag in PARSERS:
         if low.endswith(exts):
             try:
-                return fn(content), tag
+                rows = fn(content)
             except Exception as e:
+                # ОШИБКА чтения pdf — это тоже случай скана: извлекатель текста
+                # спотыкается ровно там, где текстового слоя нет. Отдавать такой
+                # файл как «не разобрался» значит терять его цены совсем.
+                if low.endswith(".pdf"):
+                    got, how = rows_from_ocr(low, content)
+                    if got:
+                        return got, how
+                    return [], f"{tag}: не разобрался ({type(e).__name__}); {how}"
                 return [], f"{tag}: не разобрался ({type(e).__name__})"
+            # pdf без текстового слоя — это скан, и он идёт в распознавание, а
+            # не объявляется пустым (правило 15 CLAUDE.md: статус не должен врать)
+            if not rows and low.endswith(".pdf"):
+                return rows_from_ocr(low, content)
+            return rows, tag
+    if low.endswith((".png", ".jpg", ".jpeg", ".tif", ".tiff", ".bmp")):
+        return rows_from_ocr(low, content)
     return [], "формат не поддержан"
 
 
@@ -1001,10 +1082,19 @@ def main() -> int:
         # статус не должен врать (правило 15 CLAUDE.md): pdf без текстового
         # слоя — это скан под распознавание, а не «пусто» и не «не КП»
         low = (c["file_name"] or "").lower()
+        # Статус читает СПОСОБ разбора, а не только расширение: после появления
+        # распознавания «картинка» может оказаться и разобранной, и нераспознанной
+        # по разным причинам, и склеивать эти случаи значит врать о объёме работы
+        # (правило 15 CLAUDE.md).
         if pr:
-            status = "разобран"
+            status = "распознан" if how_parsed == "распознавание" else "разобран"
         elif rows:
-            status = "текст без цен"
+            status = ("распознан, цен нет" if how_parsed == "распознавание"
+                      else "текст без цен")
+        elif "распознавание недоступно" in how_parsed:
+            status = "скан или картинка, распознавание недоступно"
+        elif how_parsed.startswith("распознано") or how_parsed.startswith("распознавание"):
+            status = f"скан или картинка: {how_parsed}"
         elif low.endswith(".pdf"):
             status = "скан, требуется распознавание"
         elif low.endswith((".jpg", ".jpeg", ".png", ".tif", ".tiff")):

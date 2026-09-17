@@ -431,3 +431,48 @@ def test_заявка_тоже_входит_потому_что_в_ней_ест
     assert T.dir_from_field("Техническая спецификация") == "заявка"
     # а вот наши исходящие по-прежнему за бортом: это ориентиры поставщику
     assert "наш запрос" not in T.WANTED
+
+
+def test_распознавание_отказывает_честно_когда_его_нет(monkeypatch):
+    """Отсутствие tesseract — НЕ ошибка разбора.
+
+    Если бы оно им считалось, статус стал бы «не разобрался», и оценка объёма
+    работы по сканам занизилась бы — ровно то, чего запрещает правило 15
+    CLAUDE.md. Инструмент обязан сказать «распознавание недоступно».
+    """
+    monkeypatch.setattr(T, "ocr_available", lambda: False)
+    rows, how = T.rows_from_ocr("snap.png", b"\x89PNG\r\n\x1a\n" + b"\x00" * 300)
+    assert rows == []
+    assert "распознавание недоступно" in how
+
+
+def test_картинка_уходит_в_распознавание_а_не_в_неподдержанный_формат(monkeypatch):
+    monkeypatch.setattr(T, "ocr_available", lambda: False)
+    rows, how = T.parse("шильдик.jpg", b"\xff\xd8\xff" + b"\x00" * 400)
+    assert rows == [] and "распознавание" in how, how
+    # а вот чертёж dwg распознаванием не спасти — там честный отказ по формату
+    rows2, how2 = T.parse("чертёж.dwg", b"\x00\x01binary")
+    assert "не поддержан" in how2
+
+
+def test_pdf_без_текстового_слоя_идёт_в_распознавание(monkeypatch):
+    """Прежде такой файл объявлялся «скан, требуется распознавание» и на этом
+    всё. Теперь распознавание пробуется, а статус говорит, чем кончилось."""
+    monkeypatch.setattr(T, "ocr_available", lambda: True)
+    # текст должен быть длиннее порога шума (40 знаков), иначе распознавание
+    # честно скажет «текста нет» — и первая версия теста на это и попалась
+    monkeypatch.setattr(T, "ocr_pdf_text", lambda b: (
+        "Спецификация к предложению\n"
+        "Артикул;Наименование;Кол-во;Цена\n"
+        "3420932;прокладка;566;86,89\n"))
+    rows, how = T.parse("скан.pdf", b"%PDF-1.4\n" + b"\x00" * 400)
+    assert how == "распознавание"
+    pr = T.price_rows(rows, T.header_map(rows))
+    assert len(pr) == 1 and pr[0]["pn"] == "3420932"
+
+
+def test_распознанный_шум_не_считается_текстом(monkeypatch):
+    monkeypatch.setattr(T, "ocr_available", lambda: True)
+    monkeypatch.setattr(T, "ocr_image_text", lambda b: "  |. ,\n")
+    rows, how = T.rows_from_ocr("snap.png", b"\x89PNG" + b"\x00" * 300)
+    assert rows == [] and "текста нет" in how
