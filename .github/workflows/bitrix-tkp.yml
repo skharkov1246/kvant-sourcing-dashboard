@@ -88,6 +88,27 @@ jobs:
           if-no-files-found: warn
           retention-days: 7
 
+      # Документ собирается ЗДЕСЬ, а не в сессии агента: у агента нет секрета
+      # вебхука, а артефакт он скачать не может. Иначе цены остаются в раннере
+      # и до владельца не доходят вовсе.
+      - name: Свод выставленных цен с рынком (PDF)
+        if: always() && inputs.dry_run != true
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          test -s out/tkp_full.json || { echo "выгрузки нет — документ собирать нечем"; exit 0; }
+          python gt/tools/ship_offer.py --tkp out/tkp_full.json \
+            --out "${{ runner.temp }}/pdf/КП-ЛУКОЙЛ-ЗАПАС-НА-СНИЖЕНИЕ.pdf"
+
+      - name: Выгрузка документа артефактом
+        if: always() && inputs.dry_run != true
+        uses: actions/upload-artifact@v4
+        with:
+          name: tkp-pdf
+          path: ${{ runner.temp }}/pdf/*.pdf
+          if-no-files-found: warn
+          retention-days: 7
+
       - name: Проверка, что в описи нет цен
         if: always()
         id: guard
