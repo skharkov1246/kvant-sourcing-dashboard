@@ -47,10 +47,10 @@ test("роль сорсинга ограничивает вкладки, точ�
   assert.deepEqual(base.tabs, ["sourcing", "contracts", "suppliers"]);
   assert.deepEqual(base.sites, ["dashboard", "zip", "gt", "gpu", "knowledge"]);
 
-  acl.users["s@kvantpro.com"].tabs = ["kam"];
+  acl.users["s@kvantpro.com"].tabs = ["eng"];
   acl.users["s@kvantpro.com"].sites = ["gok"];
   const wide = rightsFor(acl, "s@kvantpro.com", {});
-  assert.deepEqual(wide.tabs, ["sourcing", "kam", "contracts", "suppliers"]);   // порядок — как в TAB_IDS
+  assert.deepEqual(wide.tabs, ["sourcing", "eng", "contracts", "suppliers"]);   // порядок — как в TAB_IDS
   assert.deepEqual(wide.sites, ["dashboard", "zip", "gt", "gpu", "knowledge", "gok"]);
 });
 
@@ -81,13 +81,15 @@ test("испорченный документ из хранилища чинит
 
   const b = normalizeAcl({
     defaultRole: "нет-такой-роли",
+    // «kam» — вкладка, которой больше нет: она стала подменю внутри «Коммерсантов»,
+    // и права на неё обязаны переехать на «reps», а не исчезнуть
     roles: { weird: { name: "Странная", sites: ["dashboard", "марс"], tabs: ["kam", "выдумка"] }, broken: null },
     users: { " MIXED@Kvant.Com ": { role: "нет-такой", sites: ["gpu", "х"], tabs: ["сорсинг"], note: "x".repeat(500), seen: "3" },
              bad: 5 },
   });
   assert.equal(b.defaultRole, "employee");
   assert.deepEqual(b.roles.weird.sites, ["dashboard"]);
-  assert.deepEqual(b.roles.weird.tabs, ["kam"]);
+  assert.deepEqual(b.roles.weird.tabs, ["reps"]);
   assert.equal(b.roles.weird.admin, false);
   assert.equal(b.roles.broken, undefined);
   assert.ok(b.users["mixed@kvant.com"], "почта пользователя приводится к нижнему регистру и обрезается");
@@ -172,12 +174,15 @@ test("шаблон и модуль согласованы: все вкладки
 });
 
 test("одна вкладка: чужие кнопки, панели и данные вырезаны", () => {
-  const out = cutDashboard(page(), ["kam"]);
-  assert.match(out, /data-tab="kam"/);
-  for (const t of TAB_IDS) if (t !== "kam") assert.doesNotMatch(out, new RegExp(`data-tab="${t}"`), `осталась кнопка ${t}`);
-  assert.match(out, /window\.__KAM__ = \["MOCK-KAM"\]/, "данные своей вкладки должны остаться");
-  for (const p of PAYLOADS) if (p !== "KAM") assert.ok(!out.includes(`MOCK-${p}`), `данные ${p} утекли в страницу`);
-  for (const p of PAYLOADS) if (p !== "KAM") assert.match(out, new RegExp(`window\\.__${p}__ = __kvNoData\\(\\);`), `${p} не заменён пустышкой`);
+  // «Коммерсанты» читают четыре массива: свой REPS плюс состав ролей и оба разреза,
+  // которые раньше были отдельными вкладками. Всё остальное обязано быть вырезано.
+  const MINE = ["REPS", "PEOPLE", "KAM", "PRODUCT"];
+  const out = cutDashboard(page(), ["reps"]);
+  assert.match(out, /data-tab="reps"/);
+  for (const t of TAB_IDS) if (t !== "reps") assert.doesNotMatch(out, new RegExp(`data-tab="${t}"`), `осталась кнопка ${t}`);
+  for (const p of MINE) assert.match(out, new RegExp(`window\\.__${p}__ = \\["MOCK-${p}"\\]`), `данные ${p} должны остаться`);
+  for (const p of PAYLOADS) if (!MINE.includes(p)) assert.ok(!out.includes(`MOCK-${p}`), `данные ${p} утекли в страницу`);
+  for (const p of PAYLOADS) if (!MINE.includes(p)) assert.match(out, new RegExp(`window\\.__${p}__ = __kvNoData\\(\\);`), `${p} не заменён пустышкой`);
   assert.ok(out.includes("function __kvNoData()"), "пустышка не подставлена");
   assert.doesNotMatch(out, /<div id="tab-company" hidden><\/div>/, "осталась панель чужой вкладки");
   assert.match(out, /<div id="tab-sourcing" hidden>/, "панель «Сорсинга» не спрятана");
