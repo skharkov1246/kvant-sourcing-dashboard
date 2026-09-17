@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
+import time
 import json
 import os
 import sys
@@ -389,19 +390,27 @@ def run(args) -> int:
     print(f"  источник: {ins.get('_source')}")
 
     company_data = kam_data = eng_data = prod_data = reps_data = people_data = None
-    deals_ytd = orders_ytd = deal_owner = deal_sale = None
+    deals_ytd = orders_ytd = orders_all = deal_owner = deal_sale = None
     # --- общий пул сделок/заказов YTD (нужен Пульсу + отраслевым вкладкам) ---
     try:
         print("• Общий пул сделок/заказов (YTD)…")
+        _t = time.time()
         ys = "2026-01-01T00:00:00"
         deals_ytd = client.list_deals_fast(filter={">=DATE_CREATE": ys},
             select=["ID", "TITLE", "CATEGORY_ID", "STAGE_ID", "STAGE_SEMANTIC_ID", "OPPORTUNITY", "CURRENCY_ID",
                     "DATE_CREATE", "CLOSEDATE", "ASSIGNED_BY_ID", "COMPANY_ID", "MOVED_TIME", "LAST_ACTIVITY_TIME"]
                    + people_mod.DEAL_FIELDS)
-        orders_ytd = client.list_items(172, filter={">=createdTime": ys},
-            select=["id", "title", "stageId", "opportunity", "currencyId", "createdTime", "parentId2", "assignedById"])
+        # заказы СП-172 тянем ОДИН раз с 2025 и со сроком клиенту: тот же список нужен
+        # и вкладкам ролей (просрочка), и «Коммерсантам». Раньше каждая вкладка ходила
+        # за ними отдельно — три выгрузки одного и того же на каждую сборку.
+        orders_all = client.list_items(172, filter={">=createdTime": "2025-01-01T00:00:00"},
+            select=["id", "title", "stageId", "opportunity", "currencyId", "createdTime", "parentId2",
+                    "assignedById", people_mod.DL_CUSTOMER])
         # заказы СП-172: исключаем проигранные (…:FAIL) — это не контрактная выручка
-        orders_ytd = [o for o in orders_ytd if not str(o.get("stageId", "")).endswith(":FAIL")]
+        orders_ytd = [o for o in orders_all
+                      if not str(o.get("stageId", "")).endswith(":FAIL")
+                      and str(o.get("createdTime", ""))[:4] >= "2026"]
+        print(f"  заказов СП-172 с 2025: {len(orders_all)}, из них непроигранных в 2026: {len(orders_ytd)}")
         # курсы → база € (для продаж сделок)
         _cur = client.call("crm.currency.list", {}) or []
         _rate = {x.get("CURRENCY"): (float(x.get("AMOUNT") or 1) / float(x.get("AMOUNT_CNT") or 1)) for x in _cur}
@@ -424,6 +433,7 @@ def run(args) -> int:
         _cnames = client.companies_by_ids(_comp_ids)
         deal_group = {str(d["ID"]): kam_mod.client_dir(_cnames.get(str(d.get("COMPANY_ID")), "")) for d in deals_ytd}
         print(f"  клиентских направлений КАМ: {len(set(deal_group.values()))}")
+        print(f"  общий пул собран за {time.time() - _t:.0f} с")
     except Exception as e:
         deal_group = None
         print(f"  ⚠ общий пул не получен — Пульс/КАМ/Инж/Продукт пропущены: {type(e).__name__}: {e}")
@@ -465,8 +475,20 @@ def run(args) -> int:
 
     try:
         print("• Коммерсанты: состав из Bitrix, загрузка КАМов и продукт-оунеров…")
-        deals_open = client.list_deals_fast(filter={"STAGE_SEMANTIC_ID": "P"}, select=people_mod.DEAL_SELECT)
-        people_data = people_mod.compute(client, as_of=p.end, open_deals=deals_open, created=deals_ytd)
+        # открытые сделки ЭТОГО года уже есть в общем пуле — доливаем только те,
+        # что заведены раньше и до сих пор открыты (иначе выгружаем 2 700 карточек дважды)
+        if deals_ytd is None:                      # общий пул не собрался — тянем всё сами
+            deals_open = None
+        else:
+            open_ytd = [d for d in deals_ytd if (d.get("STAGE_SEMANTIC_ID") or "").upper() == "P"]
+            older = client.list_deals_fast(filter={"STAGE_SEMANTIC_ID": "P", "<DATE_CREATE": ys},
+                                           select=people_mod.DEAL_SELECT)
+            deals_open = open_ytd + older
+            print(f"  открытых сделок: {len(deals_open)} (в этом году {len(open_ytd)}, раньше {len(older)})")
+        _t = time.time()
+        people_data = people_mod.compute(client, as_of=p.end, open_deals=deals_open, created=deals_ytd,
+                                         orders=orders_all)
+        print(f"  посчитано за {time.time() - _t:.0f} с")
         _st = people_data["staff"]; _rc = people_data["recon"]
         print(f"  ✓ действующих {_st['active']}, уволенных {_st['fired']}; открытых сделок {_rc['openTotal']}: "
               f"за КАМами {_rc['kam']}, за продукт-оунерами {_rc['prod']}, ни за кем {_rc['none']}, "
@@ -484,7 +506,8 @@ def run(args) -> int:
 
     try:
         print("• Коммерсанты (персональные дашборды + контрольные точки)…")
-        reps_data = reps_mod.compute(client, realize_date=realize_date, as_of=p.end)
+        reps_data = reps_mod.compute(client, realize_date=realize_date, as_of=p.end, created=deals_ytd,
+                                     orders_src=orders_all)
         print(f"  ✓ коммерсантов: {len(reps_data['reps'])}")
     except Exception as e:
         print(f"  ⚠ вкладка «Коммерсанты» пропущена: {type(e).__name__}: {e}")

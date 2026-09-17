@@ -192,9 +192,14 @@ class PeopleStub:
     def deal_stage_meta(self):
         return dict(STAGE_META)
 
+    def users(self):
+        return {str(u["ID"]): f'{u["LAST_NAME"]} {u["NAME"]}' for u in USERS + FIRED}
+
     def call(self, method, params=None):
         if method == "crm.currency.list":
             return [{"CURRENCY": "EUR", "AMOUNT": 1, "AMOUNT_CNT": 1}]
+        if method == "crm.status.list":
+            return [{"STATUS_ID": k, "NAME": v["name"]} for k, v in STAGE_META.items()]
         return []
 
     def list_deals_fast(self, **kw):
@@ -210,3 +215,9 @@ def build_people(**kw) -> dict:
     """Синтетика → настоящий people.compute → данные вкладок той же формы, что в проде."""
     return people_mod.compute(PeopleStub(), as_of=PEOPLE_TODAY, open_deals=OPEN_DEALS,
                               created=CREATED, orders=ORDERS, **kw)
+
+
+def build_reps(**kw) -> dict:
+    """Синтетика → настоящий reps.compute → данные вкладки «Коммерсанты»."""
+    import reps as reps_mod
+    return reps_mod.compute(PeopleStub(), as_of=PEOPLE_TODAY, created=CREATED, orders_src=ORDERS, **kw)

@@ -180,6 +180,33 @@ def deal_categories(client: BitrixClient) -> dict[str, str]:
     return {str(k): v for k, v in (client.categories() or {}).items()}
 
 
+COMMERCIAL_ROLES = ("kam", "prod")
+
+
+def roles_by_uid(people: dict[str, dict], dept_names: dict[str, str]) -> dict[str, str]:
+    """{uid: роль} по всему составу — чтобы каскад «должность → отдел» считался один раз."""
+    return {uid: resolve_role(p, dept_names)[0] for uid, p in people.items()}
+
+
+def responsible(deal: dict, role_of: dict[str, str], people: dict[str, dict]) -> tuple[str, str, str]:
+    """Кто ведёт сделку как коммерсант: (uid, роль, источник).
+
+    Тот же каскад, что во вкладках ролей, но для персональных дашбордов: человек
+    обязан быть действующим — карточка уволенного не должна попадать ему в KPI.
+    Возвращает пустые строки, если коммерсанта у сделки нет.
+    """
+    for field, role in ((KAM_F, "kam"), (KAM_OLD, "kam"),
+                        (PROD_F, "prod"), (PROD_OLD, "prod"), (PROD_HEAD, "prod")):
+        u = _uid(deal.get(field))
+        if u and people.get(u, {}).get("active"):
+            return u, role, "поле"
+    owner = str(deal.get("ASSIGNED_BY_ID") or "")
+    role = role_of.get(owner, "")
+    if owner and role in COMMERCIAL_ROLES and people.get(owner, {}).get("active"):
+        return owner, role, "ответственный"
+    return "", "", ""
+
+
 def _blank() -> dict:
     return {"open": 0, "presale": 0, "presaleSum": 0.0, "real": 0, "realSum": 0.0, "buy": 0.0,
             "late": 0, "lateSum": 0.0, "stale": 0, "dead": 0, "noAmt": 0, "noComp": 0,

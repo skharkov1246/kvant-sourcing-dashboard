@@ -145,3 +145,34 @@ def test_форма_payload_не_теряет_ключей_которые_чит
         assert TOTAL_KEYS <= set(block["totals"])
         for row in block["people"]:
             assert ROW_KEYS <= set(row)
+
+
+# ------------------------------------------------------------------ вкладка «Коммерсанты»
+# reps.py считал по «Ответственному» и по списку фамилий в коде — и показывал другую
+# нагрузку тех же людей, чем вкладки ролей. Теперь состав и атрибуция общие.
+def test_коммерсанты_берут_состав_и_атрибуцию_из_общего_правила():
+    import reps as reps_mod
+    r = reps_mod.compute(fixture.PeopleStub(), as_of=fixture.PEOPLE_TODAY, created=fixture.CREATED)
+    by_uid = {x["uid"]: x for x in r["reps"]}
+    assert "1" in by_uid                      # КАМ с шестью сделками года на вкладке
+    assert "3" not in by_uid                  # сорсер-ответственный — не коммерсант
+    assert by_uid["1"]["role"] == "КАМ"
+    # сделка 101 записана на сорсера, а КАМом стоит наш человек — она должна быть у него
+    assert "101" in {d["id"] for d in by_uid["1"]["deals"]}
+
+
+def test_коммерсант_с_единственной_сделкой_не_засоряет_вкладку():
+    import reps as reps_mod
+    r = reps_mod.compute(fixture.PeopleStub(), as_of=fixture.PEOPLE_TODAY, created=fixture.CREATED)
+    # у Гущиной (uid 4) одна сделка — ниже порога MIN_DEALS
+    assert "4" not in {x["uid"] for x in r["reps"]}
+
+
+def test_просрочка_коммерсанта_из_дедлайна_заказа_а_не_из_closedate():
+    import reps as reps_mod
+    r = reps_mod.compute(fixture.PeopleStub(), as_of=fixture.PEOPLE_TODAY,
+                         created=fixture.CREATED, orders_src=fixture.ORDERS)
+    kam = next(x for x in r["reps"] if x["uid"] == "1")
+    assert kam["kpis"]["overdue"] == 1          # ровно сделка 102 с просроченным заказом
+    d102 = next(d for d in kam["deals"] if d["id"] == "102")
+    assert d102["ovd"] and d102["ovdDays"] == 47
