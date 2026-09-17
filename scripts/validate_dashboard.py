@@ -311,10 +311,19 @@ def main() -> int:
     for v, k in heavy[:3]:
         if v < 512 * 1024:
             continue
-        top = _field_weights(blobs.get(k))
-        if top:
-            print(f"    {k.strip('_').lower()}: "
-                  + " · ".join(f"{nm} {sz // 1024} КБ" for sz, nm in top))
+        blob = blobs.get(k)
+        top = _field_weights(blob)
+        if not top:
+            continue
+        name = k.strip("_").lower()
+        print(f"    {name}: " + " · ".join(f"{nm} {sz // 1024} КБ" for sz, nm in top))
+        # ещё уровень вниз по самому тяжёлому ключу: у блоков-словарей вес сидит
+        # внутри одного массива записей, и правит его не блок, а конкретное поле
+        if isinstance(blob, dict) and top and top[0][0] > 512 * 1024:
+            inner = _field_weights(blob.get(top[0][1]))
+            if inner:
+                print(f"      {name}.{top[0][1]}: "
+                      + " · ".join(f"{nm} {sz // 1024} КБ" for sz, nm in inner))
     for n in notes:
         print(f"  {n}")
     for w in warns:
