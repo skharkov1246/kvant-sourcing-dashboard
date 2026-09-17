@@ -350,3 +350,97 @@ begin
                    t || '_all', t);
   end loop;
 end $$;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- 7а. Числовые спутники и решение владельца по каналам.
+--
+-- Цены лежали текстом, и это ломало базу как инструмент торгов: в text-колонке
+-- min/max считаются лексикографически, поэтому по рублям выходило min 1158.30
+-- при max 846.00, а по долларам «максимум» 99.76 при строках в тысячи. Сортировка
+-- и сумма по цене были недостоверны для всех, кто читает базу мимо страницы.
+--
+-- Исходную строку не трогаем — в ней бывает оговорка («0.46 OEM / 0.15 аналог
+-- (за дюйм)»), и по правилу «сохраняй, почему получилось значение» она остаётся
+-- как есть. Рядом добавляем число: заполняется только там, где строка целиком
+-- разбирается как цена, иначе null. Разделитель тысяч запятой («1,240.88») —
+-- та же цена, поэтому она снимается перед разбором; запятая как десятичный знак
+-- не поддерживается умышленно: «1,24» нельзя отличить от «1,240» без догадки.
+alter table mach_prices add column if not exists price_num numeric;
+alter table mach_parts  add column if not exists price_usd_num numeric;
+alter table mach_parts  add column if not exists qty_num numeric;
+create index if not exists mach_prices_num on mach_prices (machine_key, price_num);
+
+-- Решение владельца «русских не рассматриваем» жило только в JSON и на странице.
+-- Кто читает базу напрямую, получал российские компании в листе запроса. Флаг
+-- переносится в таблицу, а лист запроса выносится отдельным представлением,
+-- чтобы его нельзя было собрать мимо решения. Строки не удаляются: ошибочную
+-- пометку снимают одной командой, удалённую компанию не вернуть.
+alter table mach_channels add column if not exists ru  boolean;
+alter table mach_channels add column if not exists ask boolean;
+create index if not exists mach_channels_ask_ix on mach_channels (machine_key, ask);
+
+create or replace view mach_channels_ask as
+  select * from mach_channels where coalesce(ask, not coalesce(ru, false));
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- 7б. mach_faults — звено «признак → дефект» цепочки портала.
+--
+-- До сих пор оно было пустым по всем машинам: деталь в базе была, а как на неё
+-- выйти от того, что видит оператор, — нет. Одна строка = связка «признак →
+-- узел → что меряют → дефект → чем подтвердить → ремонтное решение → номера».
+--
+-- verdict обязателен и разделяет два разных утверждения: «подтверждён» — строка
+-- дословно есть в скачанном документе, «не проверялся» — общая практика по
+-- вращающемуся оборудованию. Смешивать их нельзя: на общей практике нельзя
+-- строить предсменную процедуру.
+create table if not exists mach_faults (
+  id           bigint generated always as identity primary key,
+  machine_key  text not null references mach_machines(machine_key) on delete cascade,
+  symptom      text not null,            -- что видит, слышит или меряет человек
+  node         text,                     -- узел из перечня досье
+  measure      text,                     -- что меряют и чем
+  defect       text,                     -- вероятный дефект
+  confirm      text,                     -- чем подтвердить (НК, разборка, замер)
+  repair       text,                     -- ремонтное решение
+  parts        text,                     -- номера под решение через ' · '
+  codes        text,                     -- коды диагностики (CID/FMI/EID)
+  url          text,
+  confidence   text default 'low',
+  verdict      text not null default 'не проверялся',
+  note         text
+);
+create index if not exists mach_faults_machine on mach_faults (machine_key, node);
+create index if not exists mach_faults_verdict on mach_faults (machine_key, verdict);
+
+do $$
+begin
+  execute 'alter table mach_faults enable row level security';
+  execute 'drop policy if exists mach_faults_all on mach_faults';
+  execute 'create policy mach_faults_all on mach_faults for all to anon, authenticated using (true) with check (true)';
+end $$;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- 7в. Адрес запроса и причина, по которой канал из запроса выпал.
+--
+-- Лист запроса был нерабочим наполовину: из 94 иностранных каналов прямая почта
+-- была у 36. Адрес добран по контактным страницам; где почты нет — записана
+-- форма площадки (на made-in-china и Alibaba прямой почты не бывает по
+-- устройству витрины, только форма).
+--
+-- ask_off — почему канал не в листе. Причин четыре, и раньше все они выглядели
+-- как «решение владельца»: решение владельца, снят проверкой, дубль по домену,
+-- справочный каталог вместо продавца. Без этой колонки нельзя ни объяснить
+-- цифру, ни вернуть канал, когда причина отпадёт.
+alter table mach_channels add column if not exists ask_off         text;
+alter table mach_channels add column if not exists contact_form    text;
+alter table mach_channels add column if not exists contact_lang    text;
+alter table mach_channels add column if not exists contact_url     text;
+alter table mach_channels add column if not exists contact_verdict text;
+alter table mach_channels add column if not exists dup_of          text;
+
+-- Адрес, снятый с архивного снимка страницы: живьём сайт под WAF, а почта
+-- взята из копии за прошлый год. Это не то же самое, что адрес с живой
+-- страницы — снимку бывает больше года, и письмо может отбиться. Пометка
+-- обязана лежать рядом с адресом, иначе он выглядит проверенным сегодня.
+alter table mach_channels add column if not exists contact_archived boolean;
+alter table mach_channels add column if not exists contact_src      text;

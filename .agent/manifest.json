@@ -20,7 +20,7 @@
   "commands": {
     "tests": "python -m pytest -q",
     "lint": "ruff check .",
-    "smoke_render": "python -c \"import sys,types;sys.modules.setdefault('dotenv',types.SimpleNamespace(load_dotenv=lambda *a,**k:None));sys.path.insert(0,'.');import dashboard;from tests import fixture;dashboard.write(fixture.build_metrics(),{'source':'rules','items':[]},'smoke/index.html')\" && python scripts/validate_dashboard.py smoke/index.html",
+    "smoke_render": "python -c \"import sys,types;sys.modules.setdefault('dotenv',types.SimpleNamespace(load_dotenv=lambda *a,**k:None));sys.path.insert(0,'.');import dashboard;from tests import fixture;dashboard.write(fixture.build_metrics(),{'source':'rules','items':[]},'smoke/index.html',people=fixture.build_people(),reps=fixture.build_reps())\" && python scripts/validate_dashboard.py smoke/index.html",
     "validate_html": "python scripts/validate_dashboard.py <путь к html>",
     "refresh_catalog": "python scripts/build_catalog.py",
     "check_catalog": "python scripts/build_catalog.py --check",

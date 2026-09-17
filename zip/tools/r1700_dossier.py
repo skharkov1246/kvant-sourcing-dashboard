@@ -86,6 +86,28 @@ def pretty_pn(pn: str) -> str:
     return str(pn or "").strip()
 
 
+def num(v):
+    """Число из строки цены — или None, если строка не разбирается целиком.
+
+    В базе рядом с текстовой ценой лежит числовая: text-колонка сравнивается
+    лексикографически, и по ней «максимум» доллара выходил 99.76 при строках в
+    тысячи. Разбираем только то, что является ценой полностью: «0.46 OEM / 0.15
+    аналог (за дюйм)» числом не станет — оговорка важнее удобства. Запятая как
+    разделитель тысяч («1,240.88») снимается, как десятичный знак — не
+    поддерживается: «1,24» неотличимо от «1,240» без догадки.
+    """
+    if v is None or isinstance(v, bool):
+        return None
+    if isinstance(v, (int, float)):
+        return float(v)
+    s = str(v).strip().replace("\u00a0", "").replace(" ", "")
+    if re.fullmatch(r"\d{1,3}(,\d{3})+(\.\d+)?", s):
+        s = s.replace(",", "")
+    if not re.fullmatch(r"\d+(\.\d+)?", s):
+        return None
+    return float(s)
+
+
 def load(path: Path, default=None):
     if not path.exists():
         return default
@@ -407,6 +429,133 @@ def bitrix_facts(parts: list) -> dict:
     return b
 
 
+def own_prices(bitrix: dict, parts: list) -> list:
+    """Ценовые факты из нашей базы — в раздел «Цены» досье.
+
+    175 записей с продавцом, валютой и ссылкой лежали в price_records и были видны
+    только внутри карточки детали. Для торгов нужна сводная таблица: без неё нельзя
+    ни назвать цену, ни понять, чем берёт конкурент. Уровень («оригинал» / «аналог»)
+    берётся из примечания записи, а не угадывается: где в примечании нет ни OEM, ни
+    genuine, ни aftermarket — пишем «не определён», и это честнее выдуманной метки.
+    """
+    idx = {p["pn_norm"]: p for p in parts}
+    out = []
+    for r in bitrix.get("prices") or []:
+        if not r.get("unit_price"):
+            continue
+        pn = pretty_pn(r.get("pn"))
+        note = f"{r.get('note') or ''} {r.get('seller') or ''}".lower()
+        if "aftermarket" in note or "аналог" in note or "made-to-fit" in note:
+            tier = "аналог"
+        elif "oem" in note or "genuine" in note or "оригинал" in note:
+            tier = "оригинал"
+        else:
+            tier = "не определён"
+        p = idx.get(norm_pn(pn))
+        out.append({
+            "pn": pn,
+            "name_ru": (p or {}).get("name_ru") or r.get("name"),
+            "tier": tier,
+            "brand": "Caterpillar" if tier == "оригинал" else (r.get("seller") or ""),
+            "price": r.get("unit_price"),
+            "currency": r.get("currency"),
+            "seller": r.get("seller"),
+            "region": r.get("country"),
+            "date": r.get("year"),
+            "url": r.get("url"),
+            "confidence": r.get("confidence") or "med",
+            "verdict": "наша база",
+            "note": r.get("note"),
+            "source": r.get("url") or "zip/data/price_records.json",
+        })
+    out.sort(key=lambda x: (x["pn"], str(x["tier"])))
+    return out
+
+
+# Решение владельца 13.09.2026: «русских не рассматриваем». В лист запроса идут
+# только иностранные поставщики и заводы — как в срочной заявке CAT (zip/tools/cat_stock.py),
+# где по тому же решению запрашивали только КНР и ЮАР. Российские компании из данных НЕ
+# удаляются: они остаются фактом рынка и конкурентной картиной (кто уже возит по таможне),
+# но помечаются ru=true и в перечень «кого запрашивать» не выводятся. Пометка, а не
+# удаление: решение владельца может смениться, а вычищенные строки не вернуть.
+RU_MARK = re.compile(r"\b(ООО|ОАО|АО|ЗАО|ПАО|ИП)\b|россий|russia|\bрф\b", re.I)
+RU_COUNTRY = {"RU", "РФ", "РОССИЯ", "RUSSIA"}
+
+
+def is_ru(o: dict) -> bool:
+    """Российская ли организация. Страна — первый признак, написание имени — второй."""
+    if (o.get("country") or "").strip().upper() in RU_COUNTRY:
+        return True
+    return bool(RU_MARK.search(f"{o.get('org', '')} {o.get('city', '')} {o.get('country', '')}"))
+
+
+# Каналы, которые вообще не адресаты запроса цен. Список закрытый и по домену,
+# а не по признаку: «маркетплейс» носят и Alibaba с made-in-china, куда запрос
+# как раз уходит формой. Эти пять — каталоги применяемости, магазин с заказом из
+# личного кабинета и портал подписки на документацию. Из данных не убираются:
+# как справочники они нужны, в лист запроса — нет.
+NOT_RFQ = {
+    "parts.cat.com": "магазин Caterpillar с заказом из личного кабинета, не адресат запроса цен",
+    "sis2.cat.com": "портал подписки на документацию, запчасти не продаёт",
+    "777parts.net": "справочный каталог применяемости, не продавец",
+    "avspare.com": "справочный каталог применяемости, не продавец",
+    "epcatalogs.com": "продаёт каталоги и ПО, а не запчасти",
+}
+
+
+def host(u: str) -> str:
+    """Домен без www — по нему сводятся дубли и узнаются справочные каталоги."""
+    m = re.search(r"https?://([^/]+)", str(u or "").strip(), re.I)
+    return re.sub(r"^www\.", "", m.group(1).lower()) if m else ""
+
+
+def contacts(slices: dict, org_rows: list) -> dict:
+    """Адрес для запроса цен: почта, форма площадки, язык письма.
+
+    Лист запроса без адреса нерабочий: из 94 иностранных каналов почта была у 36.
+    Здесь адреса добираются по контактным страницам. Правило одно и жёсткое:
+    адрес обязан дословно быть на скачанной странице. Сконструированный по домену
+    «info@<домен>» не адрес, а догадка, и такие в срез не попадали.
+
+    Вердикт «снят» в срезе контактов означает мёртвый сайт или отсутствие
+    адресата вообще — такой канал уходит из листа запроса, но остаётся в данных.
+    """
+    by_org = {}
+    for r in (slices.get("contacts") or {}).get("rows") or []:
+        name = str(r.get("org") or "").strip()
+        if name:
+            by_org[name] = r
+    stat = Counter()
+    for o in org_rows:
+        r = by_org.get(o["org"])
+        if not r:
+            continue
+        if not (o.get("email") or "").strip() and (r.get("email") or "").strip():
+            o["email"] = r["email"].strip()
+            stat["почта добавлена"] += 1
+        o["contact_form"] = r.get("contact_form") or ""
+        o["contact_lang"] = r.get("lang") or ""
+        o["contact_url"] = r.get("url") or ""
+        o["contact_verdict"] = r.get("verdict") or ""
+        o["contact_note"] = r.get("note") or ""
+        # Часть сайтов живьём закрыта WAF, и адрес снят с архивного снимка. Это
+        # не то же самое, что адрес с живой страницы: снимку бывает больше года,
+        # и письмо может отбиться. Пометка обязана быть видна рядом с адресом,
+        # иначе сорсер посчитает такой адрес проверенным сегодня.
+        o["contact_archived"] = "web.archive.org" in (r.get("url") or "")
+        if o["contact_archived"]:
+            o["contact_src"] = ("снят с архивного снимка страницы — живьём сайт закрыт; "
+                                "перед рассылкой проверить, что адрес ещё жив")
+            stat["адрес из архивного снимка"] += 1
+        if r.get("verdict") == "снят":
+            o["ask"] = False
+            o["ask_off"] = f"канал снят при проверке контактов: {r.get('note') or 'адресата нет'}"
+            stat["снято по контактам"] += 1
+        elif o.get("contact_form"):
+            stat["только форма"] += 1
+    return dict(stat)
+
+
 def orgs(slices: dict) -> list:
     out = []
     for key in ORG_SLICES:
@@ -420,6 +569,115 @@ def orgs(slices: dict) -> list:
                 "stock": r.get("stock") or "", "note": r.get("note") or "", "source": r.get("source") or "",
                 "confidence": r.get("confidence") or "low", "verdict": r.get("verdict") or "", "slice": key,
             })
+    for o in out:
+        o["ru"] = is_ru(o)
+        # В лист запроса не выводятся две вещи, и обе остаются в данных.
+        # Первая — российские компании (решение владельца выше). Вторая —
+        # снятые проверкой: «снят» означает, что канал не подтвердился
+        # (источник оказался от другой машины, номенклатура не подходит
+        # машине). Письмо такому поставщику — ровно тот позор, ради которого
+        # проверка и делалась. «Сомнителен» из запроса не убираем: запрос и
+        # есть способ снять сомнение.
+        o["ask"] = not o["ru"] and o.get("verdict") != "снят"
+        if o.get("verdict") == "снят":
+            o["ask_off"] = "снят при проверке: строка не подтвердилась"
+        elif o["ru"]:
+            o["ask_off"] = "решение владельца: русских не рассматриваем"
+        # справочный каталог — не адресат запроса
+        why = NOT_RFQ.get(host(o.get("site")))
+        if why:
+            o["ask"] = False
+            o["ask_off"] = why
+    # Одна организация приходила двумя строками из разных направлений
+    # (Barloworld Mongolia — из дилеров и из торговцев, Tuoxing — с двух страниц
+    # одного сайта). Для картины рынка это безобидно, для листа запроса — два
+    # письма в один адрес. Сводим по домену, оставляя строку с бо́льшим числом
+    # заполненных полей; пустой сайт не сводит ничего.
+    best = {}
+    for o in out:
+        h = host(o.get("site"))
+        if not h:
+            continue
+        filled = sum(1 for v in o.values() if str(v or "").strip())
+        prev = best.get(h)
+        if prev is None or filled > prev[0]:
+            best[h] = (filled, o)
+    keep = {id(v[1]) for v in best.values()}
+    for o in out:
+        h = host(o.get("site"))
+        if h and id(o) not in keep:
+            o["dup_of"] = best[h][1]["org"]
+            o["ask"] = False
+            o["ask_off"] = f"та же организация, что «{best[h][1]['org']}» (один домен {h})"
+    return out
+
+
+def dedupe_by_email(org_rows: list) -> int:
+    """Один адрес — одно письмо, даже если брендов под ним несколько.
+
+    Бренд, чей бизнес передан другому владельцу, честно получает адрес нового
+    владельца (Hastings → Baldwin/Parker: у обоих один адрес в Кирни, а архив
+    показывает редирект собственного домена). Но в листе запроса это два письма
+    на один ящик. Сводим по адресу, оставляя строку с бо́льшим доверием: письмо
+    всё равно называет обе номенклатуры. Строки не удаляются.
+
+    Сводится только то, что осталось в листе: у выпавших по другим причинам
+    адрес уже не используется.
+    """
+    seen, n = {}, 0
+    rank = {"high": 2, "med": 1, "low": 0}
+    for o in org_rows:
+        mail = (o.get("email") or "").strip().lower()
+        if not mail or not o.get("ask"):
+            continue
+        prev = seen.get(mail)
+        if prev is None:
+            seen[mail] = o
+            continue
+        weak, strong = sorted((prev, o), key=lambda x: rank.get(x.get("confidence"), 0))
+        seen[mail] = strong
+        weak["ask"] = False
+        weak["dup_of"] = strong["org"]
+        weak["ask_off"] = f"тот же адрес запроса, что у «{strong['org']}» ({mail})"
+        n += 1
+    return n
+
+
+def faults(slices: dict, parts: list) -> list:
+    """Признак → узел → что меряют → дефект → чем подтвердить → ремонт → запчасти.
+
+    Два звена цепочки портала («признак» и «дефект») до сих пор были пустыми ни
+    по одной машине. Здесь они появляются впервые, и поэтому важнее обычного не
+    выдать общую инженерную практику за документ: вердикт «подтверждён» ставится
+    только там, где строка дословно есть в скачанном документе, «не проверялся» —
+    там, где это практика по вращающемуся оборудованию.
+
+    Номера деталей сверяются с перечнем досье: строка не может ссылаться на
+    номер, которого у машины нет. Несведённый номер не выбрасывается молча, а
+    попадает в unknown_parts — иначе следующая ошибка снова будет неизмеримой.
+    """
+    have = {p["pn"] for p in parts}
+    out = []
+    for r in (slices.get("faults") or {}).get("rows") or []:
+        if not str(r.get("symptom") or "").strip():
+            continue
+        pns = [str(x).strip() for x in (r.get("parts") or []) if str(x).strip()]
+        out.append({
+            "symptom": r.get("symptom"),
+            "node": r.get("node") or "",
+            "measure": r.get("measure") or "",
+            "defect": r.get("defect") or "",
+            "confirm": r.get("confirm") or "",
+            "repair": r.get("repair") or "",
+            "parts": [x for x in pns if x in have],
+            "unknown_parts": [x for x in pns if x not in have],
+            "codes": r.get("codes") or "",
+            "url": r.get("url") or "",
+            "confidence": r.get("confidence") or "low",
+            "verdict": r.get("verdict") or "не проверялся",
+            "note": r.get("note") or "",
+        })
+    out.sort(key=lambda x: (x["node"], x["symptom"]))
     return out
 
 
@@ -478,30 +736,38 @@ def playbook(parts: list, docs: list, org_rows: list, customs: dict, bitrix: dic
     if imps:
         top = ", ".join(x["org"] for x in imps[:5])
         out.append({
-            "step": f"Проверить действующие каналы ввоза: {top}",
+            "step": f"Разобрать конкурентов по таможне: {top}",
             "why": f"По таможне {len(customs.get('rows') or [])} отгрузок Caterpillar, импортёров — "
-                   f"{len(imps)}. У этих компаний канал уже работает: это и конкуренты, и возможные партнёры.",
-            "how": "Сверить их ИНН и профиль, запросить условия перепродажи, сравнить цену их канала "
-                   "со своей ставкой по маршруту.",
+                   f"{len(imps)}. Это российские компании, и по решению владельца запросы им не идут: "
+                   f"они нужны как картина рынка — чей канал уже работает, каким маршрутом и по какой "
+                   f"цене за килограмм.",
+            "how": "Смотреть их маршруты и отправителей: отправитель из Китая или Турции, который возит "
+                   "им, — наш потенциальный адресат напрямую.",
         })
+    dealers = [o for o in dealers if o.get("ask")]
     if dealers:
         out.append({
-            "step": f"Задать дилерам ({len(dealers)}) один вопрос до цены — отгружаете ли в РФ",
+            "step": f"Задать иностранным дилерам ({len(dealers)}) один вопрос до цены — отгружаете ли в РФ",
             "why": "Прайс без готовности отгружать не стоит ничего, а переписка о ценах занимает недели.",
             "how": "Письмо на английском одним абзацем: модель, серийный номер, перечень, вопрос об отгрузке.",
         })
+    makers = [o for o in makers if o.get("ask")]
     if makers:
         out.append({
-            "step": f"Запустить пробники у {len(makers)} заводов неоригинала",
+            "step": f"Запустить пробники у {len(makers)} иностранных заводов неоригинала",
             "why": "Без образца и протокола испытаний неоригинал на торгах не проходит техническую часть.",
             "how": "По одной позиции на завод, с приёмкой по нашей карте замеров — как сделано по перфораторам.",
         })
-    if traders:
+    ask_traders = [o for o in traders if o.get("ask")]
+    ru_traders = [o for o in traders if not o.get("ask")]
+    if ask_traders:
         out.append({
-            "step": f"Разослать РФ-поставщикам ({len(traders)}) запрос наличия по ходовым позициям",
-            "why": "Наличие на складе в РФ снимает срок и таможню — это единственный способ выиграть "
-                   "закупку с коротким сроком поставки.",
-            "how": "Смарт-процесс «Запросы поставщикам» Битрикса, письмо с перечнем и сроком ответа 3 дня.",
+            "step": f"Разослать запрос наличия иностранным поставщикам ({len(ask_traders)})",
+            "why": "По решению владельца российские компании в лист запроса не выводятся: их "
+                   f"{len(ru_traders)}, и они остаются картиной конкурентов, а не адресатами. "
+                   "Спрашиваем заводы и склады Казахстана, Китая, ОАЭ, Турции и дальше по кольцу.",
+            "how": "Смарт-процесс «Запросы поставщикам» Битрикса, письмо на английском с перечнем "
+                   "и сроком ответа 3 дня.",
         })
     if dropped:
         out.append({
@@ -526,8 +792,26 @@ def build() -> dict:
 
     spec = sl.get("spec") or {}
     docs = [r for r in (sl.get("docs") or {}).get("rows") or [] if str(r.get("form") or "").strip()]
-    prices = (sl.get("prices") or {}).get("rows") or []
+    prices = list((sl.get("prices") or {}).get("rows") or [])
+    # К ценам разведки добавляем свои: price_records — продавец, валюта, ссылка.
+    # Свой факт не хуже найденного, а по части позиций он единственный. Дубль
+    # снимаем по паре «номер + продавец + цена»: одна и та же карточка могла
+    # попасть и в разведку, и в нашу базу.
+    seen = {(str(r.get("pn") or "").upper(), str(r.get("seller") or "").lower(),
+             str(r.get("price") or "")) for r in prices}
+    for r in own_prices(bitrix, parts):
+        k = (str(r.get("pn") or "").upper(), str(r.get("seller") or "").lower(),
+             str(r.get("price") or ""))
+        if k in seen:
+            continue
+        seen.add(k)
+        prices.append(r)
     tnd = sl.get("tenders") or {}
+    flt = faults(sl, parts)
+    cstat = contacts(sl, org_rows)
+    merged = dedupe_by_email(org_rows)
+    if merged:
+        cstat["сведено по общему адресу"] = merged
 
     # Покрытие: без него непонятно, чем ещё нельзя торговать.
     by_node = Counter(p["node"] or "— не определён" for p in parts)
@@ -552,6 +836,14 @@ def build() -> dict:
                    "Досье собрано, чтобы выходить на торги по комплектующим с номерами, "
                    "аналогами, каналами и ценами, а не с одним наименованием.",
         },
+        "policy": {
+            "ask_scope": "только иностранные поставщики и заводы",
+            "decided": "2026-09-13",
+            "why": "Решение владельца: «русских не рассматриваем». То же решение действовало по срочной "
+                   "заявке CAT (zip/tools/cat_stock.py): запрашивали только КНР и ЮАР. Российские компании "
+                   "из данных не удалены — они остаются картиной рынка и списком конкурентов, кто уже возит "
+                   "по таможне, — но помечены ru=true, ask=false и в перечень «кого запрашивать» не выводятся.",
+        },
         "nodes": NODES,
         "specs": spec.get("rows") or [],
         "variants": spec.get("variants") or [],
@@ -573,6 +865,7 @@ def build() -> dict:
             "odm": odm,
             "bitrix": bitrix,
         },
+        "faults": flt,
         "playbook": playbook(parts, docs, org_rows, customs, bitrix, prices),
         "gaps": {k: (v.get("gaps") or "") for k, v in sl.items() if v.get("gaps")},
         "stats": {
@@ -597,7 +890,24 @@ def build() -> dict:
             "orgs": len(org_rows),
             "orgs_by_kind": dict(Counter(o["kind"] for o in org_rows)),
             "orgs_by_country": dict(Counter(o["country"] for o in org_rows)),
+            "orgs_ask": sum(1 for o in org_rows if o.get("ask")),
+            "orgs_ask_with_email": sum(1 for o in org_rows if o.get("ask") and (o.get("email") or "").strip()),
+            "orgs_ask_form_only": sum(1 for o in org_rows if o.get("ask")
+                                      and not (o.get("email") or "").strip()
+                                      and (o.get("contact_form") or "").strip()),
+            "orgs_ask_no_contact": sum(1 for o in org_rows if o.get("ask")
+                                       and not (o.get("email") or "").strip()
+                                       and not (o.get("contact_form") or "").strip()),
+            "orgs_ask_archived": sum(1 for o in org_rows if o.get("ask") and o.get("contact_archived")),
+            "orgs_ask_off": dict(Counter(o.get("ask_off") for o in org_rows if o.get("ask_off"))),
+            "contacts": cstat,
             "prices": len(prices),
+            "faults": len(flt),
+            "faults_by_node": dict(Counter(f["node"] or "— не определён" for f in flt)),
+            "faults_verdicts": dict(Counter(f["verdict"] for f in flt)),
+            "faults_with_parts": sum(1 for f in flt if f["parts"]),
+            "faults_with_codes": sum(1 for f in flt if f["codes"]),
+            "faults_unknown_parts": sorted({x for f in flt for x in f["unknown_parts"]}),
             "own_positions": len(own),
             "customs_rows": len(customs["rows"]),
             "customs_importers": len(customs["importers"]),

@@ -137,7 +137,12 @@ test("дашборд режется по правам: чужих данных �
   await seed(env, { "k@kvantpro.com": { role: "kam", sites: [], tabs: [], note: "", seen: 1 } });
   const html = await (await call(env, "/dashboard", "k@kvantpro.com")).text();
   assert.ok(html.includes("MOCK-KAM") && html.includes("MOCK-COMPANY"), "своих данных нет");
-  for (const p of ["ENG", "PRODUCT", "ADVISOR", "CONTRACTS", "DATA", "INSIGHTS"]) {
+  // Роль «КАМ» получает вкладку «Коммерсанты», а в ней обе роли под одним начальником —
+  // значит и продуктовый разрез (PRODUCT, PEOPLE) ей виден по построению. Это решение
+  // владельца, а не утечка: кому продуктовый разрез показывать нельзя, тому не выдаётся
+  // вкладка «Коммерсанты» целиком.
+  assert.ok(html.includes("MOCK-PRODUCT") && html.includes("MOCK-PEOPLE"), "разрез ролей должен быть доступен");
+  for (const p of ["ENG", "ADVISOR", "CONTRACTS", "DATA", "INSIGHTS"]) {
     assert.ok(!html.includes(`MOCK-${p}`), `данные ${p} утекли КАМу`);
   }
   assert.doesNotMatch(html, /data-tab="advisor"/);

@@ -1,8 +1,18 @@
 {
- "updated": "2026-09-10",
+ "updated": "2026-09-17",
  "source": "Bitrix24: сделки по ключевым словам ГТУ + СП-166 «Запросы поставщикам»",
  "live": true,
  "deals": [
+  {
+   "id": "23374",
+   "title": "Л-ЭС (бн)/02/ поставка масляного радиатора Solar",
+   "models": [
+    "Solar (модель уточнить)"
+   ],
+   "stage": "C10:NEW",
+   "created": "2026-09-17",
+   "rfqs": []
+  },
   {
    "id": "23146",
    "title": "048-7436-26 T-111 Выполнение работ по техническому обслуживанию при наработке 4000 и 8000 часов, а также услуг по удаленной поддержке при эксплуатации газотурбинных агрегатов Solar Mars 100 ООО \"ЛУКОЙЛ-Пермнефтеоргсинтез\" в 2027 - 2029 годах",
@@ -25,11 +35,11 @@
   },
   {
    "id": "22946",
-   "title": "2140380/1 Комп. прокладок, Комп. фитинг-адап. SGT",
+   "title": "2140380/2 Комп. прокладок, Комп. фитинг-адап. SGT",
    "models": [
     "Siemens (модель уточнить)"
    ],
-   "stage": "C2:EXECUTING",
+   "stage": "C2:14",
    "created": "2026-08-27",
    "rfqs": [
     {
@@ -88,7 +98,7 @@
     },
     {
      "id": "41592",
-     "title": "WTT Паша tg",
+     "title": "WTT Паша форсунки titan 130",
      "created": "2026-08-18",
      "supplier": "Wuxi Weishi Turbine Technology Co., Ltd. (Wuxi Heyi Power System Co., Ltd.)",
      "stage": "In Correspondance",
@@ -115,7 +125,7 @@
    "models": [
     "GE 9F/9FA"
    ],
-   "stage": "C2:EXECUTING",
+   "stage": "C2:14",
    "created": "2026-08-03",
    "rfqs": [
     {
@@ -4057,7 +4067,7 @@
      "title": "tks pro 8поз. Mars 100 ПНОС",
      "created": "2026-08-17",
      "supplier": "TKS PRO GmbH",
-     "stage": "Request Sent",
+     "stage": "In Correspondance",
      "sourcer": "Ekaterina Kornilova",
      "models": [
       "Mars 100"
