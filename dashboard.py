@@ -25,8 +25,10 @@ def _update_stamps() -> tuple[str, str]:
 
 
 def _json_for_script(obj) -> str:
-    # безопасно вставлять в <script>: нейтрализуем закрывающий тег
-    return json.dumps(obj, ensure_ascii=False).replace("</", "<\\/")
+    # безопасно вставлять в <script>: нейтрализуем закрывающий тег.
+    # separators без пробелов: json.dumps по умолчанию ставит «, » и «: », а на странице
+    # в 10 МБ это около мегабайта пробелов — десятая часть веса, отданная ни за что.
+    return json.dumps(obj, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
 
 
 # Самые тяжёлые массивы страницы — списки одинаковых записей. Замер живой страницы
@@ -53,6 +55,18 @@ def _pack_records(rows: list) -> dict | list:
     return {PACK_MARK: 1, "f": fields, "r": [[r.get(k) for k in fields] for r in rows]}
 
 
+def _pack_company(company: dict | None) -> dict | None:
+    """То же для сделок когорт: один список на 1 456 КБ, читается в одном месте."""
+    if not isinstance(company, dict):
+        return company
+    coh = company.get("cohorts")
+    if not isinstance(coh, dict) or not isinstance(coh.get("deals"), list):
+        return company
+    out = dict(company)
+    out["cohorts"] = dict(coh, deals=_pack_records(coh["deals"]))
+    return out
+
+
 def _pack_metrics(metrics: dict) -> dict:
     """Копия метрик, где подробности запросов упакованы. Исходный словарь не трогаем:
     его же пишет отчёт в reports/ и читают другие модули."""
@@ -77,7 +91,7 @@ def render(metrics: dict, insights: dict, *, title: str = DEFAULT_TITLE, company
     html = html.replace("__TITLE__", title)
     html = html.replace("__DATA_JSON__", _json_for_script(_pack_metrics(metrics)))
     html = html.replace("__INSIGHTS_JSON__", _json_for_script(insights))
-    html = html.replace("__COMPANY_JSON__", _json_for_script(company) if company else "null")
+    html = html.replace("__COMPANY_JSON__", _json_for_script(_pack_company(company)) if company else "null")
     html = html.replace("__KAM_JSON__", _json_for_script(kam) if kam else "null")
     html = html.replace("__PEOPLE_JSON__", _json_for_script(people) if people else "null")
     html = html.replace("__ENG_JSON__", _json_for_script(eng) if eng else "null")

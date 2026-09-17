@@ -1120,7 +1120,7 @@ function renderDir(D, elId, opt){
 function renderCohorts(C){
   const el=document.getElementById('tab-cohorts'); if(!el) return;
   if(!C||!C.cohorts){ el.innerHTML='<div class="note" style="padding:20px 0">нет данных</div>'; return; }
-  const D=(C.cohorts&&C.cohorts.deals)||C.deals||[], Q=C.cohorts.quarters||[], M=C.cohorts.months||[];
+  const _cd=C.cohorts&&C.cohorts.deals, D=_cd?_unpack(_cd):(C.deals||[]), Q=C.cohorts.quarters||[], M=C.cohorts.months||[];
   const cohLbl=(C.cohorts&&C.cohorts.label)||C.label;
   const qOf=mm=>`${mm.slice(0,4)}-Q${Math.floor((parseInt(mm.slice(5,7),10)-1)/3)+1}`;
   const seg=(p,col,tip)=>p?`<i style="width:${p}%;background:${col}" title="${tip}"></i>`:'';
