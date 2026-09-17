@@ -316,7 +316,8 @@ def build(rows: list, ours: dict, fx_day: str, supp: dict | None = None) -> str:
             f"<style>{CSS}</style></head><body>{''.join(parts)}</body></html>")
 
 
-def diagnose(rows: list, ours: dict) -> None:
+def diagnose(rows: list, ours: dict, supp: dict | None = None,
+             unk: dict | None = None) -> None:
     """Почему пересечение получилось таким, а не «сошлось 0 — и всё».
 
     Прогон 17.09.2026 извлёк 2 053 артикула с ценой и НЕ СОШЁЛСЯ с заявкой ни
@@ -333,6 +334,16 @@ def diagnose(rows: list, ours: dict) -> None:
     got = set(ours)
     print(f"  артикулов в заявке: {len(want)} · извлечено из файлов: {len(got)} "
           f"· пересечение точное: {len(want & got)}")
+    # ПОКРЫТИЕ ПО КП ПОСТАВЩИКОВ измеряется отдельно, и это не мелочь: прогон по
+    # «НВН» 17.09.2026 отчитался «сошлось 0», хотя в КП поставщиков было 321
+    # артикул — их пересечение с заявкой измерителем НЕ считалось вовсе, и
+    # отсутствие числа читалось как отсутствие покрытия.
+    for name, other in (("в КП поставщиков", supp), ("в неопознанных файлах", unk)):
+        if other is None:
+            continue
+        k = set(other)
+        print(f"  {name}: {len(k)} артикулов · пересечение с заявкой: "
+              f"{len(want & k)}")
     if not want or not got:
         return
     # по началу номера: заказчик мог приписать суффикс учётной системы
@@ -385,9 +396,10 @@ def main() -> int:
     print(f"артикулов: в файлах с направлением «наша цена» {len(ours)}, "
           f"в КП поставщиков {len(supp)}, в файлах без установленного "
           f"направления {len(unk)}")
-    ours = price_side(ours, unk)
-    print(f"в левую часть документа идёт {len(ours)} артикулов "
+    side = price_side(ours, unk)
+    print(f"в левую часть документа идёт {len(side)} артикулов "
           f"(с пометкой поля у каждого)")
+    ours = side
     fx_day = json.loads(FX.read_text()).get("fetched", "")[5:16] if FX.exists() else ""
     print(f"артикулов с выставленной ценой: {len(ours)}")
 
@@ -405,7 +417,7 @@ def main() -> int:
         check=True, capture_output=True)
     matched = sum(1 for r in rows if norm_key(r["pn"]) in ours)
     print(f"сошлось со заявкой: {matched} позиций")
-    diagnose(rows, ours)
+    diagnose(rows, ours, supp, unk)
     print(f"{out} — {out.stat().st_size / 1e6:.1f} МБ (вне репозитория, не коммитится)")
     return 0
 
