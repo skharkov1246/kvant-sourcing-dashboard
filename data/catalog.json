@@ -4,16 +4,16 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 207,
-    "total_bytes": 96026738,
+    "datasets": 208,
+    "total_bytes": 96039630,
     "by_sensitivity": {
       "конфиденциально": 60,
       "внутреннее": 110,
-      "публикуемо": 37
+      "публикуемо": 38
     },
     "by_subproject": {
       "ГПУ-библиотека": 27,
-      "ГТУ-библиотека": 40,
+      "ГТУ-библиотека": 41,
       "ОВЭ-75": 45,
       "база ЗИП": 42,
       "база ЗИП · таможня": 18,
@@ -285,6 +285,7 @@
         "markers": []
       },
       "referenced_by": [
+        "gt/tools/ship_brand.py",
         "gt/tools/ship_export.py",
         "gt/tools/ship_map.py",
         "gt/tools/ship_merge.py",
@@ -5671,6 +5672,67 @@
       ]
     },
     {
+      "path": "data/catalog_notes.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 47737,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "data/budget_snapshot.json",
+        "data/chain_coverage.json",
+        "data/chat_snapshot.json",
+        "data/index.json",
+        "dict/",
+        "dict/node_map.json",
+        "gidromet/data/",
+        "gpu/data/bitrix_gpu.json",
+        "gpu/data/coverage.json",
+        "gt/data/ansaldo.json",
+        "gt/data/bitrix_gt.json",
+        "gt/data/dossiers.json",
+        "gt/data/fx_rates.json",
+        "gt/data/pn_db.json",
+        "gt/data/ship_blocked.json",
+        "gt/data/ship_decoded.json",
+        "gt/data/ship_energoseti.json",
+        "gt/data/ship_lukoil.json",
+        "gt/data/ship_questions.json",
+        "gt/data/ship_recheck.json",
+        "gt/data/ship_rfq_letters.json",
+        "gt/data/ship_sellers.json",
+        "gt/data/ship_sweep.json",
+        "gt/docs/ЗАКУПКА-ЛУКОЙЛ.csv",
+        "gt/docs/ЗАПРОСЫ-ЛУКОЙЛ.csv",
+        "gt/docs/ЛУКОЙЛ-СИМЕНС-SGT-400.pdf",
+        "gt/docs/ЛУКОЙЛ-СОЛАР-TAURUS.pdf",
+        "library/data/symptoms.json",
+        "library/docfilter.py",
+        "library/indexer.py",
+        "library/load_parts.py",
+        "library/load_suppliers.py",
+        "library/ocr.py",
+        "library/reparse.py",
+        "library/supabase/schema_junk.sql",
+        "ove/data/suppliers.json",
+        "pnw/data/contacts_found.json",
+        "pnw/data/crossrefs.json",
+        "pnw/data/item_master.json",
+        "pnw/data/kv_registry.json"
+      ],
+      "last_change": "2026-09-17",
+      "last_author": "Claude",
+      "last_commit": "48fb1e1",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "scripts/build_catalog.py"
+      ]
+    },
+    {
       "path": "gidromet/data/proverka.json",
       "subproject": "гидрометаллургия",
       "bytes": 47526,
@@ -5873,67 +5935,6 @@
         "ove/tools/calc_ove.py",
         "ove/tools/check_tkp.py",
         "ove/tools/equip2ifc.py"
-      ]
-    },
-    {
-      "path": "data/catalog_notes.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 43792,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "data/budget_snapshot.json",
-        "data/chain_coverage.json",
-        "data/chat_snapshot.json",
-        "data/index.json",
-        "dict/",
-        "dict/node_map.json",
-        "gidromet/data/",
-        "gpu/data/bitrix_gpu.json",
-        "gpu/data/coverage.json",
-        "gt/data/ansaldo.json",
-        "gt/data/bitrix_gt.json",
-        "gt/data/dossiers.json",
-        "gt/data/fx_rates.json",
-        "gt/data/pn_db.json",
-        "gt/data/ship_blocked.json",
-        "gt/data/ship_energoseti.json",
-        "gt/data/ship_lukoil.json",
-        "gt/data/ship_questions.json",
-        "gt/data/ship_recheck.json",
-        "gt/data/ship_rfq_letters.json",
-        "gt/data/ship_sellers.json",
-        "gt/data/ship_sweep.json",
-        "gt/docs/ЗАКУПКА-ЛУКОЙЛ.csv",
-        "gt/docs/ЗАПРОСЫ-ЛУКОЙЛ.csv",
-        "library/data/symptoms.json",
-        "library/docfilter.py",
-        "library/indexer.py",
-        "library/load_parts.py",
-        "library/load_suppliers.py",
-        "library/ocr.py",
-        "library/reparse.py",
-        "library/supabase/schema_junk.sql",
-        "ove/data/suppliers.json",
-        "pnw/data/contacts_found.json",
-        "pnw/data/crossrefs.json",
-        "pnw/data/item_master.json",
-        "pnw/data/kv_registry.json",
-        "pnw/data/numbers.json",
-        "pnw/data/part_suppliers.json",
-        "pnw/data/supplier_master.json"
-      ],
-      "last_change": "2026-09-13",
-      "last_author": "Claude",
-      "last_commit": "02ecfc8",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "scripts/build_catalog.py"
       ]
     },
     {
@@ -8258,6 +8259,36 @@
       ]
     },
     {
+      "path": "gt/data/ship_decoded.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 8947,
+      "note": "Расшифровка номенклатуры Siemens SGT-400 и Solar Turbines по заявке ЛУКОЙЛ: 19 позиций, по которым разбор дал стандарт, изготовителя узла или прямой отказ с причиной. Ведётся руками: это вывод инженера, а не производная от данных. Главное содержание — схема девятизначных номеров Ruston/Alstom (SGT-400 = Cyclone, наследное имя есть в lib_models): разряды кодируют тип изделия, покрытие, диаметр резьбы и длину, и правило сошлось на 85 строках из 85 открытой ведомости SGT-400 на 437 позиций — проверено скриптом. Этим стандартный крепёж заявки переводится из «артикул не опознан» в «заказывается по DIN у любого крепёжного поставщика». ПРЕДУПРЕЖДЕНИЕ, записанное в самом файле: схема НЕ даёт класса прочности, для несущего крепежа турбины его обязан подтвердить чертёж или OEM. Отдельно помечены две позиции, которые стандартом закрывать нельзя: RW21222/4 и RW21223/1 — чертёжные детали камеры сгорания, где товарная легированная сталь класса 12.9 в горячей зоне разупрочняется. По Solar вскрыты изготовители узлов под шильдой OEM (спиральная прокладка → Flexitallic, шнур витон → Global O-Ring, лист CNAF → KLINGERSIL, губчатая лента → LAMATEK) и честно зафиксированы два отказа: 199515-1 и 1062000 не опознаны, потому что Solar не публикует ни материала, ни толщины. Поле conf у каждой строки говорит, чем расшифровка подтверждена — ведомостью или гипотезой. Читается gt/tools/ship_brand.py.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "method",
+        "rows",
+        "source",
+        "updated",
+        "warning"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 19
+      },
+      "last_change": "2026-09-17",
+      "last_author": "Claude",
+      "last_commit": "48fb1e1",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/ship_brand.py"
+      ]
+    },
+    {
       "path": "gpu/data/stock.json",
       "subproject": "ГПУ-библиотека",
       "bytes": 8308,
@@ -8830,6 +8861,7 @@
         "markers": []
       },
       "referenced_by": [
+        "gt/tools/ship_brand.py",
         "gt/tools/ship_export.py",
         "gt/tools/ship_map.py",
         "gt/tools/ship_merge.py",
