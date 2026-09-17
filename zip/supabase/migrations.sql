@@ -350,3 +350,34 @@ begin
                    t || '_all', t);
   end loop;
 end $$;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- 7а. Числовые спутники и решение владельца по каналам.
+--
+-- Цены лежали текстом, и это ломало базу как инструмент торгов: в text-колонке
+-- min/max считаются лексикографически, поэтому по рублям выходило min 1158.30
+-- при max 846.00, а по долларам «максимум» 99.76 при строках в тысячи. Сортировка
+-- и сумма по цене были недостоверны для всех, кто читает базу мимо страницы.
+--
+-- Исходную строку не трогаем — в ней бывает оговорка («0.46 OEM / 0.15 аналог
+-- (за дюйм)»), и по правилу «сохраняй, почему получилось значение» она остаётся
+-- как есть. Рядом добавляем число: заполняется только там, где строка целиком
+-- разбирается как цена, иначе null. Разделитель тысяч запятой («1,240.88») —
+-- та же цена, поэтому она снимается перед разбором; запятая как десятичный знак
+-- не поддерживается умышленно: «1,24» нельзя отличить от «1,240» без догадки.
+alter table mach_prices add column if not exists price_num numeric;
+alter table mach_parts  add column if not exists price_usd_num numeric;
+alter table mach_parts  add column if not exists qty_num numeric;
+create index if not exists mach_prices_num on mach_prices (machine_key, price_num);
+
+-- Решение владельца «русских не рассматриваем» жило только в JSON и на странице.
+-- Кто читает базу напрямую, получал российские компании в листе запроса. Флаг
+-- переносится в таблицу, а лист запроса выносится отдельным представлением,
+-- чтобы его нельзя было собрать мимо решения. Строки не удаляются: ошибочную
+-- пометку снимают одной командой, удалённую компанию не вернуть.
+alter table mach_channels add column if not exists ru  boolean;
+alter table mach_channels add column if not exists ask boolean;
+create index if not exists mach_channels_ask_ix on mach_channels (machine_key, ask);
+
+create or replace view mach_channels_ask as
+  select * from mach_channels where coalesce(ask, not coalesce(ru, false));

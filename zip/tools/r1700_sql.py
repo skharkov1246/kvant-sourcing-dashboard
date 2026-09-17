@@ -15,6 +15,7 @@ mach_tenders, mach_customs.
 from __future__ import annotations
 
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -36,6 +37,28 @@ def q(v) -> str:
     if not s:
         return "null"
     return "'" + s.replace("'", "''") + "'"
+
+
+def num(v):
+    """Число из строки цены — или None, если строка не разбирается целиком.
+
+    В базе рядом с текстовой ценой лежит числовая: text-колонка сравнивается
+    лексикографически, и по ней «максимум» доллара выходил 99.76 при строках в
+    тысячи. Разбираем только то, что является ценой полностью: «0.46 OEM / 0.15
+    аналог (за дюйм)» числом не станет — оговорка важнее удобства. Запятая как
+    разделитель тысяч («1,240.88») снимается, как десятичный знак — не
+    поддерживается: «1,24» неотличимо от «1,240» без догадки.
+    """
+    if v is None or isinstance(v, bool):
+        return None
+    if isinstance(v, (int, float)):
+        return float(v)
+    s = str(v).strip().replace("\u00a0", "").replace(" ", "")
+    if re.fullmatch(r"\d{1,3}(,\d{3})+(\.\d+)?", s):
+        s = s.replace(",", "")
+    if not re.fullmatch(r"\d+(\.\d+)?", s):
+        return None
+    return float(s)
 
 
 def ins(table: str, cols: list[str], rows: list[list], conflict: str | None = None) -> str:
@@ -95,13 +118,15 @@ def build() -> str:
         seen.add(p["pn_norm"])
         prows.append([mk, p["pn"], p["pn_norm"], p.get("name_ru"), p.get("name_en"), p.get("node"),
                       p.get("applic"), p.get("qty"), p.get("interval"), p.get("price_usd"),
+                      num(p.get("price_usd")), num(p.get("qty")),
                       p.get("price_eur_min"), p.get("price_eur_max"),
                       ", ".join(p.get("kv") or []) or None, p.get("position_id"),
                       p.get("bitrix_status"), p.get("confidence"), p.get("verdict"),
                       " | ".join(p.get("sources") or []) or None, p.get("note")])
     L.append(ins("mach_parts",
                  ["machine_key", "pn", "pn_norm", "name_ru", "name_en", "node", "applic", "qty",
-                  "interval_h", "price_usd", "price_eur_min", "price_eur_max", "kv", "position_id",
+                  "interval_h", "price_usd", "price_usd_num", "qty_num",
+                  "price_eur_min", "price_eur_max", "kv", "position_id",
                   "bitrix_status", "confidence", "verdict", "sources", "note"],
                  prows, conflict="machine_key, pn_norm"))
 
@@ -127,19 +152,21 @@ def build() -> str:
         seen.add(key)
         crows.append([mk, o["org"], o["slice"], o.get("kind"), o.get("country"), o.get("city"),
                       o.get("role"), o.get("brands"), o.get("site"), o.get("email"), o.get("phone"),
-                      o.get("stock"), o.get("note"), o.get("source"), o.get("confidence"), o.get("verdict")])
+                      o.get("stock"), o.get("note"), o.get("source"), o.get("confidence"), o.get("verdict"),
+                      bool(o.get("ru")), bool(o.get("ask"))])
     L.append(ins("mach_channels",
                  ["machine_key", "org", "lane", "kind", "country", "city", "role", "brands",
-                  "site", "email", "phone", "stock", "note", "source", "confidence", "verdict"],
+                  "site", "email", "phone", "stock", "note", "source", "confidence", "verdict",
+                  "ru", "ask"],
                  crows, conflict="machine_key, org, lane"))
 
     # цены, параметры, торги, таможня — наборы без естественного ключа: перезаливаем целиком
     L.append(f"delete from mach_prices  where machine_key = {q(mk)};")
     L.append(ins("mach_prices",
-                 ["machine_key", "pn", "name", "tier", "brand", "price", "currency", "seller",
-                  "region", "dt", "url", "confidence", "verdict"],
+                 ["machine_key", "pn", "name", "tier", "brand", "price", "price_num", "currency",
+                  "seller", "region", "dt", "url", "confidence", "verdict"],
                  [[mk, x.get("pn"), x.get("name_ru") or x.get("name"), x.get("tier"), x.get("brand"),
-                   x.get("price"), x.get("currency"), x.get("seller"), x.get("region"),
+                   x.get("price"), num(x.get("price")), x.get("currency"), x.get("seller"), x.get("region"),
                    x.get("date"), x.get("url"), x.get("confidence"), x.get("verdict")]
                   for x in d.get("prices") or []]))
 

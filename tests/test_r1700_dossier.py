@@ -143,3 +143,52 @@ def test_досье_и_страница_собираются_на_живых_д�
     assert len(norms) == len(set(norms)), "в перечне не должно быть дублей по номеру"
     for x in d["parts"]:
         assert x["sources"], f"деталь {x['pn']} без источника"
+
+
+def test_число_из_цены_не_угадывает():
+    """Числовой спутник цены: разбираем только то, что является ценой целиком.
+
+    Корпус придуман. До этой правки цена лежала в базе текстом, и агрегаты по
+    ней считались лексикографически: по рублям выходил «минимум» 1158.30 при
+    «максимуме» 846.00. Спутник обязан быть пустым там, где строка несёт
+    оговорку, иначе оговорка потеряется, а число окажется выдуманным.
+    """
+    num = _load("r1700_sql").num
+    # чистые цены
+    assert num("5143.89") == 5143.89
+    assert num("846") == 846.0
+    assert num(" 78.60 ") == 78.6
+    assert num(12.5) == 12.5 and num(7) == 7.0
+    # разделитель тысяч запятой — та же цена
+    assert num("1,240.88") == 1240.88
+    assert num("688,990") == 688990.0
+    # запятая как десятичный знак не поддерживается: «1,24» неотличимо от «1,240»
+    assert num("1,24") is None
+    # оговорка важнее удобства: числом такие строки не становятся
+    assert num("0.46 OEM / 0.15 аналог (за дюйм)") is None
+    assert num("от 500") is None
+    assert num("713.60 / 10 Pieces(MOQ)") is None
+    assert num("1 на колесо") is None
+    assert num("~120") is None
+    assert num("-5") is None
+    # пустое и мусор
+    assert num(None) is None and num("") is None and num("   ") is None
+    assert num(True) is None and num(False) is None
+
+
+def test_решение_владельца_о_каналах_доезжает_до_базы():
+    """«Русских не рассматриваем» должно быть колонкой, а не только на странице.
+
+    Кто читает базу мимо страницы, обязан получить тот же лист запроса.
+    """
+    src = (ROOT / "zip" / "tools" / "r1700_sql.py").read_text(encoding="utf-8")
+    assert '"ru", "ask"' in src, "флаги решения владельца не пишутся в mach_channels"
+    ddl = (ROOT / "zip" / "supabase" / "migrations.sql").read_text(encoding="utf-8")
+    assert "add column if not exists ask boolean" in ddl
+    assert "create or replace view mach_channels_ask" in ddl
+    # представление не должно пропускать российские компании
+    view = ddl.split("create or replace view mach_channels_ask")[1]
+    assert "coalesce(ask, not coalesce(ru, false))" in view
+    # числовые спутники объявлены
+    assert "add column if not exists price_num numeric" in ddl
+    assert "add column if not exists price_usd_num numeric" in ddl
