@@ -525,15 +525,23 @@ def test_битый_архив_не_валит_прогон():
 
 
 def test_xlsx_не_уходит_в_разбор_архива_хотя_он_и_zip():
-    """xlsx — тоже zip, но у него свой разбор, и он должен сработать первым."""
-    import io as _io
-    from openpyxl import Workbook
-    wb = Workbook()
-    ws = wb.active
-    ws.append(["Артикул", "Цена"])
-    ws.append(["X1", 10])
-    buf = _io.BytesIO()
-    wb.save(buf)
-    rows, how = T.parse("спец.xlsx", buf.getvalue())
-    assert how == "xlsx", how
-    assert rows
+    """xlsx — тоже zip, но у него свой разбор, и он обязан сработать первым.
+
+    Проверяется ПОРЯДОК, а не сам разбор, поэтому openpyxl тут не нужен: гейт
+    его не устанавливает, и первая версия теста на этом и упала. Даже когда
+    разбор xlsx не удался, способ обязан называться «xlsx», а не «архив» —
+    иначе таблица уехала бы в архивную ветку и потеряла листы.
+    """
+    body = b"PK\x03\x04" + b"xl/workbook.xml" + b"\x00" * 200
+    assert T.sniff(body) == ".xlsx"
+    _, how = T.parse("спец.xlsx", body)
+    assert how.startswith("xlsx"), how
+    assert "архив" not in how
+
+
+def test_docx_и_zip_идут_в_архивный_разбор():
+    """А вот у docx своего разбора нет, и он должен пойти как архив."""
+    body = b"PK\x03\x04" + b"word/document.xml" + b"\x00" * 200
+    assert T.sniff(body) == ".zip"
+    _, how = T.parse("письмо.docx", body)
+    assert "архив" in how, how
