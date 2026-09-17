@@ -32,7 +32,11 @@ on:
         default: false
       max_files:
         description: предел числа файлов
-        default: "400"
+        # Замер холостого прогона 17.09.2026: к разбору 1219 файлов (наша цена
+        # 157, входящее 581, неопознанное 481). Прежние 400 отрезали бы две
+        # трети — и не хвост, а середину: 400 покрывают «нашу цену», входящие и
+        # только треть неопознанного.
+        default: "900"
         required: false
 
 permissions:
@@ -45,7 +49,7 @@ concurrency:
 jobs:
   extract:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6
@@ -57,7 +61,7 @@ jobs:
 
       - name: Выгрузка входящих КП
         id: extract
-        timeout-minutes: 45          # меньше таймаута задания: последующие шаги успеют
+        timeout-minutes: 100         # меньше таймаута задания: последующие шаги успеют
         env:
           BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
           PYTHONUNBUFFERED: "1"      # прогресс виден по ходу, а не блоками

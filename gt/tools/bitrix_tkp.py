@@ -540,6 +540,14 @@ def from_rfq(bx: BitrixClient, did: int, rfields: dict | None = None) -> tuple[l
     как оговорка поверх — там направление выверено вручную.
     """
     fields = dict(rfields or {}) or {c: t for c, (t, _) in RFQ_FILE_FIELDS.items()}
+    # Выборку держим короткой: поля, которые мы всё равно не скачиваем (наш
+    # исходящий запрос, заявка заказчика), спрашивать незачем. Замеров, что
+    # длинная выборка замедляет обход, У МЕНЯ НЕТ: и с восемью зашитыми полями,
+    # и со всеми полями портала обход 137 сделок занял 4 мин 52 с. Это
+    # предосторожность, а не исправление измеренной беды.
+    fields = {c: t for c, t in fields.items()
+              if c in RFQ_FILE_FIELDS
+              or dir_from_field(t) not in ("наш запрос", "заявка")}
     try:
         items = bx.list_items(SPA_RFQ, filter={"parentId2": did},
                               select=RFQ_SELECT + list(fields))
@@ -822,6 +830,24 @@ def main() -> int:
 
     # --- сбор кандидатов: сделка за сделкой, с прогрессом ---
     cands, seen, rfq_total, bodies = [], set(), 0, []
+
+    def dump_inventory(done: int) -> None:
+        """Опись по ходу обхода, а не только в конце.
+
+        Правило, оплаченное первым прогоном: результат, записанный только в
+        конце, таймаут уносит целиком. Холостой путь этому правилу не подчинялся
+        — восемнадцатиминутный обход при 45-минутном пределе шага означал, что
+        всё держится на том, чтобы уложиться. Теперь частичная опись есть всегда.
+        """
+        Path(a.out_index).parent.mkdir(parents=True, exist_ok=True)
+        Path(a.out_index).write_text(json.dumps(
+            {"updated": "holostoy" if a.dry_run else date.today().isoformat(),
+             "state": f"обход: {done} из {len(ids)} сделок",
+             "deals": len(ids), "rfq_items": rfq_total,
+             "files": len(cands), "downloaded": 0,
+             "inventory": [{k: v for k, v in c.items() if k != "url"} for c in cands]},
+            ensure_ascii=False, indent=1), encoding="utf-8")
+
     for n, did in enumerate(ids, 1):
         say(f"[{n}/{len(ids)}] сделка {did}")
         got = []
@@ -847,6 +873,8 @@ def main() -> int:
             by_dir[c["direction"]] = by_dir.get(c["direction"], 0) + 1
         say(f"    запросов СП-166: {cnt} · файлов найдено {len(got)}, новых {fresh}"
             + (f" · по направлению: {by_dir}" if by_dir else ""))
+        if n % 20 == 0 or n == len(ids):
+            dump_inventory(n)
 
     say(f"итого кандидатов: {len(cands)} (дублей снято {len(seen) - len(cands) if len(seen) > len(cands) else 0})")
     by_field = {}
