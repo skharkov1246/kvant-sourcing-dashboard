@@ -25,22 +25,30 @@ from collections import Counter, defaultdict
 from pathlib import Path
 from xml.etree import ElementTree as ET
 
-# как называется нужное поле у разных баз (ищем вхождение, регистр не важен)
-FIELDS = {
-    "date": ["дата", "g072", "gd1", "дата декларации"],
-    "decl": ["номер декларации", "№ декларации", "g281", "гтд"],
-    "recipient": ["получател", "импортер", "импортёр", "g082"],
-    "inn": ["инн", "g081"],
-    "sender": ["отправител", "экспортер", "экспортёр", "g31_11", "контрагент", "g022"],
-    "producer": ["изготовител", "производител", "producer"],
-    "brand": ["товарный знак", "марка", "бренд", "g31_12"],
-    "country": ["страна происхожд", "g34"],
-    "dispatch": ["страна отправл", "g15a"],
-    "hs": ["тн вэд", "тнвэд", "код товара", "g33", "hs"],
-    "desc": ["описание", "наименование товара", "g31_1"],
-    "qty": ["количество", "кол-во", "g0121"],
-    "net": ["вес нетто", "нетто", "g38"],
-    "value": ["фактурная", "стоимость", "g42", "инвойс"],
+# Как называется нужное поле у разных баз. Для каждого поля: что должно встретиться
+# в заголовке и что встречаться не должно. Отрицательные признаки обязательны:
+# в выгрузке ГТД рядом стоят «ИНН отправителя» и «ИНН получателя», «Наименование
+# получателя» и «Адрес получателя», «Общая таможенная стоимость» и «Фактурная
+# стоимость» — без отсева первый же похожий заголовок забирает поле себе.
+FIELDS: dict[str, tuple[list[str], list[str]]] = {
+    "date": (["дата регистрации", "дата декларац", "g072", "дата"], ["выпуск", "оплат"]),
+    "decl": (["номер декларации", "№ декларации", "g281", "гтд"], ["бланк", "листов"]),
+    "recipient": (["наименование получател", "получател", "импортер", "импортёр", "g082"],
+                  ["инн", "адрес", "код", "огрн", "кпп", "стран"]),
+    # голый «ИНН» в простых выгрузках — это ИНН получателя; чужие ИНН отсекаем явно
+    "inn": (["инн получател", "g081", "инн"],
+            ["отправител", "экспортер", "экспортёр", "декларант", "контрактодержател", "перевозчик"]),
+    "sender": (["наименование отправител", "отправител", "экспортер", "экспортёр", "g022", "контрагент"],
+               ["инн", "адрес", "код", "огрн", "кпп", "стран", "дата"]),
+    "producer": (["изготовител", "производител", "g31_11", "producer"], ["стран"]),
+    "brand": (["товарный знак", "марка", "бренд", "g31_12"], []),
+    "country": (["страна происхожд", "страны происхожд", "g16"], ["код"]),
+    "dispatch": (["страна отправл", "страны отправл", "g15a"], []),
+    "hs": (["тн вэд", "тнвэд", "код товара", "g33", "hs"], []),
+    "desc": (["описание", "наименование товара", "g31_1"], ["всего", "знак"]),
+    "qty": (["количество товара", "кол-во товара", "g31_7"], ["мест", "листов", "наименован", "транспорт"]),
+    "net": (["вес нетто", "нетто", "g38"], []),
+    "value": (["фактурная", "стоимость", "инвойс", "g42"], ["таможенная", "общая", "статистическ"]),
 }
 PARTS_HS = ("8483", "8484", "7325", "8482", "8481")   # комплектующие и литьё
 PUMPS_HS = ("8413",)                                   # готовые насосы
@@ -49,10 +57,18 @@ DRIVE_HS = ("8406", "8501", "8502")                    # турбины и эл�
 
 def _col(name: str) -> str | None:
     low = str(name or "").strip().lower()
-    for key, marks in FIELDS.items():
-        if any(m in low for m in marks):
+    for key, (marks, stop) in FIELDS.items():
+        if any(m in low for m in marks) and not any(x in low for x in stop):
             return key
     return None
+
+
+def _colnum(ref: str) -> int:
+    """A1 -> 0, B2 -> 1. Позиция нужна: пустые ячейки в XML просто пропущены."""
+    n = 0
+    for ch in re.match(r"([A-Z]*)", str(ref or "")).group(1):
+        n = n * 26 + (ord(ch) - 64)
+    return max(n - 1, 0)
 
 
 def read_csv(path: Path) -> list[dict]:
@@ -74,27 +90,26 @@ def read_xlsx(path: Path) -> list[dict]:
         if "xl/sharedStrings.xml" in z.namelist():
             for si in ET.fromstring(z.read("xl/sharedStrings.xml")):
                 shared.append("".join(t.text or "" for t in si.iter(f"{ns}t")))
-        sheets = [n for n in z.namelist() if re.fullmatch(r"xl/worksheets/sheet\d+\.xml", n)]
-        rows: list[list[str]] = []
-        for row in ET.fromstring(z.read(sorted(sheets)[0])).iter(f"{ns}row"):
-            cells: list[str] = []
+        sheets = sorted(n for n in z.namelist() if re.fullmatch(r"xl/worksheets/sheet\d+\.xml", n))
+        if not sheets:
+            return []
+        rows: list[dict[int, str]] = []
+        for row in ET.fromstring(z.read(sheets[0])).iter(f"{ns}row"):
+            cells: dict[int, str] = {}
             for c in row.iter(f"{ns}c"):
-                v = c.find(f"{ns}v")
-                txt = "" if v is None else (v.text or "")
-                if c.get("t") == "s" and txt.isdigit():
-                    txt = shared[int(txt)] if int(txt) < len(shared) else ""
-                idx = re.match(r"([A-Z]+)", c.get("r") or "")
-                pos = 0
-                for ch in (idx.group(1) if idx else ""):
-                    pos = pos * 26 + (ord(ch) - 64)
-                while len(cells) < max(pos - 1, 0):
-                    cells.append("")
-                cells.append(txt)
+                if c.get("t") == "inlineStr":
+                    txt = "".join(t.text or "" for t in c.iter(f"{ns}t"))
+                else:
+                    v = c.find(f"{ns}v")
+                    txt = "" if v is None else (v.text or "")
+                    if c.get("t") == "s" and txt.isdigit():
+                        txt = shared[int(txt)] if int(txt) < len(shared) else ""
+                cells[_colnum(c.get("r"))] = txt.strip()
             rows.append(cells)
     if not rows:
         return []
     head = rows[0]
-    return [dict(zip(head, r)) for r in rows[1:] if any(x for x in r)]
+    return [{head.get(i, str(i)): v for i, v in r.items()} for r in rows[1:] if any(r.values())]
 
 
 def read_glbs_json(path: Path) -> list[dict]:
@@ -119,6 +134,16 @@ def normalize(rows: list[dict]) -> list[dict]:
         if any(rec.values()):
             out.append(rec)
     return out
+
+
+def as_date(s: str) -> tuple[str, str, str] | None:
+    """ГГГГ-ММ-ДД или ДД.ММ.ГГГГ -> (год, месяц, день). Границы периода нельзя брать
+    сравнением строк: «20.07.2022» лексически больше «03.11.2022»."""
+    iso = re.search(r"(\d{4})-(\d{2})-(\d{2})", str(s or ""))
+    if iso:
+        return iso.group(1), iso.group(2), iso.group(3)
+    rus = re.search(r"(\d{2})\.(\d{2})\.(\d{4})", str(s or ""))
+    return (rus.group(3), rus.group(2), rus.group(1)) if rus else None
 
 
 def num(s: str) -> float:
@@ -173,15 +198,16 @@ def main() -> int:
         code = re.sub(r"\D", "", r.get("hs", ""))[:4]
         if code:
             hs4[code] += 1
-        m = re.search(r"(\d{4})-(\d{2})", r.get("date", ""))
-        if m:
-            quarters[f"{m.group(1)}-Q{(int(m.group(2)) - 1) // 3 + 1}"] += 1
+        parsed = as_date(r.get("date", ""))
+        if parsed:
+            year, month, _ = parsed
+            quarters[f"{year}-Q{(int(month) - 1) // 3 + 1}"] += 1
 
     total = len(rows)
     share = lambda group: round(100 * sum(v for k, v in hs4.items() if k.startswith(group)) / total, 1)
     print(f"строк после фильтра: {total}")
-    print(f"период: {min((r.get('date','') for r in rows if r.get('date')), default='—')}"
-          f" … {max((r.get('date','') for r in rows if r.get('date')), default='—')}")
+    dated = sorted((r["date"] for r in rows if as_date(r.get("date", ""))), key=as_date)
+    print(f"период: {dated[0] if dated else '—'} … {dated[-1] if dated else '—'}")
     print(f"\nотправители (топ {a.top}):")
     for snd, cnt in senders.most_common(a.top):
         print(f"  {cnt:4d} · нетто {s_weight[snd]:12,.0f} кг · сумма {s_value[snd]:14,.0f} · {snd[:70]}")
