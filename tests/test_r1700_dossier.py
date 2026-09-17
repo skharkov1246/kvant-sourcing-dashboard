@@ -222,3 +222,54 @@ def test_в_лист_запроса_не_попадают_снятые_и_рос
     assert ru == ["ООО «Запчасть»", "Российская компания"], ru
     dropped = [o for o in out if o["verdict"] == "снят"]
     assert len(dropped) == 1 and not dropped[0]["ask"], "снятый остаётся в данных, но не в запросе"
+
+
+def test_признаки_сверяются_с_ведомостью_и_не_врут_о_проверке():
+    """Корпус придуман. Звено «признак → дефект» появляется впервые.
+
+    Две вещи, которые здесь легче всего испортить: сослаться на номер, которого
+    у машины нет, и выдать общую инженерную практику за документ. Номер, не
+    сошедшийся с ведомостью, не выбрасывается молча, а попадает в
+    unknown_parts — иначе следующая ошибка снова будет неизмеримой.
+    """
+    faults = _load("r1700_dossier").faults
+    parts = [{"pn": "999-0001"}, {"pn": "999-0002"}]
+    slices = {"faults": {"rows": [
+        {"symptom": "Стук в приводе под нагрузкой", "node": "07 Трансмиссия",
+         "parts": ["999-0001", "999-0009"], "verdict": "подтверждён", "confidence": "med"},
+        {"symptom": "Перегрев масла", "node": "05 Гидравлика",
+         "parts": ["999-0002"], "verdict": "не проверялся"},
+        {"symptom": "   ", "node": "01 Двигатель", "parts": ["999-0001"]},
+    ]}}
+    out = faults(slices, parts)
+    assert len(out) == 2, "строка без признака в звено не идёт"
+    first = [x for x in out if x["node"] == "07 Трансмиссия"][0]
+    assert first["parts"] == ["999-0001"], "номер не из ведомости в строку не попадает"
+    assert first["unknown_parts"] == ["999-0009"], "несведённый номер обязан быть виден"
+    second = [x for x in out if x["node"] == "05 Гидравлика"][0]
+    assert second["verdict"] == "не проверялся"
+    assert second["confidence"] == "low", "без указания доверия ставится низкое"
+    # порядок: по узлу, затем по признаку — чтобы дифф файла был читаемым
+    assert [x["node"] for x in out] == sorted(x["node"] for x in out)
+
+
+def test_в_звено_цепочки_идёт_только_подтверждённое():
+    """Счётчик заполняемости не должен считать общую практику знанием.
+
+    Строка с вердиктом «не проверялся» — это практика по вращающемуся
+    оборудованию, а не наш документ. Если считать её, счётчик покажет знание,
+    которого у нас нет.
+    """
+    src = (ROOT / "scripts" / "build_chain_coverage.py").read_text(encoding="utf-8")
+    assert 'x.get("verdict") == "подтверждён"' in src
+    assert 'put("gsho", "symptom"' in src and 'put("gsho", "defect"' in src
+    p = ROOT / "data" / "chain_coverage.json"
+    if not p.exists():
+        return
+    cov = json.loads(p.read_text(encoding="utf-8"))
+    gsho = [s for s in cov["segments"] if s["segment"] == "gsho"][0]
+    cells = {c["link"]: c["n"] for c in gsho["cells"]}
+    dossier = json.loads((ROOT / "zip" / "data" / "r1700.json").read_text(encoding="utf-8"))
+    ok = {x["symptom"] for x in dossier.get("faults", []) if x["verdict"] == "подтверждён"}
+    assert cells["symptom"] == len(ok), "в клетку «признак» попало больше, чем подтверждено"
+    assert cells["symptom"] < len(dossier.get("faults", [])), "подтверждено не может быть всё"

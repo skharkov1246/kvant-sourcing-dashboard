@@ -515,6 +515,44 @@ def orgs(slices: dict) -> list:
     return out
 
 
+def faults(slices: dict, parts: list) -> list:
+    """Признак → узел → что меряют → дефект → чем подтвердить → ремонт → запчасти.
+
+    Два звена цепочки портала («признак» и «дефект») до сих пор были пустыми ни
+    по одной машине. Здесь они появляются впервые, и поэтому важнее обычного не
+    выдать общую инженерную практику за документ: вердикт «подтверждён» ставится
+    только там, где строка дословно есть в скачанном документе, «не проверялся» —
+    там, где это практика по вращающемуся оборудованию.
+
+    Номера деталей сверяются с перечнем досье: строка не может ссылаться на
+    номер, которого у машины нет. Несведённый номер не выбрасывается молча, а
+    попадает в unknown_parts — иначе следующая ошибка снова будет неизмеримой.
+    """
+    have = {p["pn"] for p in parts}
+    out = []
+    for r in (slices.get("faults") or {}).get("rows") or []:
+        if not str(r.get("symptom") or "").strip():
+            continue
+        pns = [str(x).strip() for x in (r.get("parts") or []) if str(x).strip()]
+        out.append({
+            "symptom": r.get("symptom"),
+            "node": r.get("node") or "",
+            "measure": r.get("measure") or "",
+            "defect": r.get("defect") or "",
+            "confirm": r.get("confirm") or "",
+            "repair": r.get("repair") or "",
+            "parts": [x for x in pns if x in have],
+            "unknown_parts": [x for x in pns if x not in have],
+            "codes": r.get("codes") or "",
+            "url": r.get("url") or "",
+            "confidence": r.get("confidence") or "low",
+            "verdict": r.get("verdict") or "не проверялся",
+            "note": r.get("note") or "",
+        })
+    out.sort(key=lambda x: (x["node"], x["symptom"]))
+    return out
+
+
 def playbook(parts: list, docs: list, org_rows: list, customs: dict, bitrix: dict, prices: list) -> list:
     """Прикладные шаги, посчитанные из данных досье, а не выдуманные.
 
@@ -641,6 +679,7 @@ def build() -> dict:
         seen.add(k)
         prices.append(r)
     tnd = sl.get("tenders") or {}
+    flt = faults(sl, parts)
 
     # Покрытие: без него непонятно, чем ещё нельзя торговать.
     by_node = Counter(p["node"] or "— не определён" for p in parts)
@@ -694,6 +733,7 @@ def build() -> dict:
             "odm": odm,
             "bitrix": bitrix,
         },
+        "faults": flt,
         "playbook": playbook(parts, docs, org_rows, customs, bitrix, prices),
         "gaps": {k: (v.get("gaps") or "") for k, v in sl.items() if v.get("gaps")},
         "stats": {
@@ -719,6 +759,12 @@ def build() -> dict:
             "orgs_by_kind": dict(Counter(o["kind"] for o in org_rows)),
             "orgs_by_country": dict(Counter(o["country"] for o in org_rows)),
             "prices": len(prices),
+            "faults": len(flt),
+            "faults_by_node": dict(Counter(f["node"] or "— не определён" for f in flt)),
+            "faults_verdicts": dict(Counter(f["verdict"] for f in flt)),
+            "faults_with_parts": sum(1 for f in flt if f["parts"]),
+            "faults_with_codes": sum(1 for f in flt if f["codes"]),
+            "faults_unknown_parts": sorted({x for f in flt for x in f["unknown_parts"]}),
             "own_positions": len(own),
             "customs_rows": len(customs["rows"]),
             "customs_importers": len(customs["importers"]),

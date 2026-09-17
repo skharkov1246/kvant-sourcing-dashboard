@@ -283,6 +283,40 @@ def build():
 <th>Цена</th><th>Вал.</th><th>Продавец</th><th>Регион</th><th>Дата</th><th>Доверие</th><th>Ист.</th>
 </tr></thead><tbody>{pr}</tbody></table>"""))
 
+    # ── 9а. Признаки и дефекты ──────────────────────────────────────────────
+    flt = d.get("faults") or []
+    # Номер детали кликабелен: со строки дефекта сорсер попадает прямо в карточку
+    # позиции, а не ищет её руками в перечне из 561 строки.
+    def pnlist(pns):
+        return " · ".join(f'<a href="#pn={e(x)}" class="pn">{e(x)}</a>' for x in pns) or \
+            '<span class="mut">номеров под это решение в ведомости нет</span>'
+
+    fr = "".join(f"""<tr data-node="{e(x.get('node'))}"><td><b>{e(x.get('symptom'))}</b>
+<div class="mut">{e(x.get('node'))}</div></td>
+<td class="mut">{e(x.get('measure'))}</td>
+<td>{e(x.get('defect'))}{f'<div class="mut">коды: {e(x.get("codes"))}</div>' if x.get('codes') else ''}</td>
+<td class="mut">{e(x.get('confirm'))}</td>
+<td>{e(x.get('repair'))}<div>{pnlist(x.get('parts') or [])}</div></td>
+<td>{conf_tag(x.get('confidence'))}<div>{verdict_tag(x.get('verdict'))}</div></td>
+<td>{link(x.get('url'), '↗')}</td></tr>"""
+                  for x in flt)
+    fst = (d.get("stats") or {})
+    fv = fst.get("faults_verdicts") or {}
+    S.append(("faults", f"Признаки и дефекты · {len(flt)}", f"""
+<h2>От признака к ремонтному решению и номерам</h2>
+<div class="mut">Звено «признак → дефект» до сих пор было пустым по всем машинам портала.
+Строк {num(len(flt))} по {num(len(fst.get('faults_by_node') or {}))} узлам, с каталожными
+номерами {num(fst.get('faults_with_parts'))}, с кодами диагностики {num(fst.get('faults_with_codes'))}.
+Подтверждено документом {num(fv.get('подтверждён', 0))}, общая практика без нашего документа —
+{num(fv.get('не проверялся', 0))}, сомнительно {num(fv.get('сомнителен', 0))}.</div>
+<div class="mut"><b>Чего здесь нет:</b> порогов замера по этой машине. Руководства Cat по R1700G
+(SEBU8211, KENR6256/6262/6264/6266, SENR9888) закрыты: catpublications отдаёт обложку, зеркала SIS —
+403. Строка говорит, что мерить и чем подтверждать; норму берите из SIS под серийный номер.</div>
+<div class="bar"><input id="qf" placeholder="поиск: признак, дефект, узел, номер, код…"><span class="mut" id="cntf"></span></div>
+<table class="ot" id="tf"><thead><tr><th>Признак</th><th>Что меряют</th><th>Вероятный дефект</th>
+<th>Чем подтвердить</th><th>Ремонтное решение и номера</th><th>Доверие</th><th>Ист.</th>
+</tr></thead><tbody>{fr}</tbody></table>"""))
+
     # ── 10. Торги ───────────────────────────────────────────────────────────
     t = d["tenders"]
     pl = "".join(f"""<div class="card"><b>{e(x.get('name'))}</b> {conf_tag(x.get('confidence'))}
@@ -469,7 +503,7 @@ function trows(inp,tbl,cnt){const el=$(inp);if(!el)return;const f=()=>{const q=e
   $(tbl).tBodies[0].querySelectorAll("tr").forEach(r=>{
     const hit=!q||r.textContent.toLowerCase().includes(q);r.style.display=hit?"":"none";if(hit)n++;});
   $(cnt).textContent=n+" строк";};el.oninput=f;f();}
-trows("qd","td","cntd");trows("qpr","tpr","cntpr");
+trows("qd","td","cntd");trows("qpr","tpr","cntpr");trows("qf","tf","cntf");
 """
     js = js.replace("__P__", J(pjs)).replace("__A__", J(d["alts"]))
 

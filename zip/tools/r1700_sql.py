@@ -7,8 +7,8 @@
 Actions → «ZIP base — apply DB migrations» (psql -f).
 
 Таблицы (создаются в zip/supabase/migrations.sql, раздел 7): mach_machines,
-mach_docs, mach_parts, mach_part_alts, mach_channels, mach_prices, mach_specs,
-mach_tenders, mach_customs.
+mach_docs, mach_parts, mach_part_alts, mach_channels, mach_prices, mach_faults,
+mach_specs, mach_tenders, mach_customs.
 
 Запуск: python zip/tools/r1700_sql.py
 """
@@ -151,6 +151,17 @@ def build() -> str:
                    x.get("date"), x.get("url"), x.get("confidence"), x.get("verdict")]
                   for x in d.get("prices") or []]))
 
+    # признаки и дефекты — набор без естественного ключа, перезаливаем целиком
+    L.append(f"delete from mach_faults  where machine_key = {q(mk)};")
+    L.append(ins("mach_faults",
+                 ["machine_key", "symptom", "node", "measure", "defect", "confirm", "repair",
+                  "parts", "codes", "url", "confidence", "verdict", "note"],
+                 [[mk, x.get("symptom"), x.get("node"), x.get("measure"), x.get("defect"),
+                   x.get("confirm"), x.get("repair"), " · ".join(x.get("parts") or []) or None,
+                   x.get("codes"), x.get("url"), x.get("confidence"),
+                   x.get("verdict") or "не проверялся", x.get("note")]
+                  for x in d.get("faults") or []]))
+
     L.append(f"delete from mach_specs   where machine_key = {q(mk)};")
     L.append(ins("mach_specs",
                  ["machine_key", "param", "value", "unit", "variant", "source", "confidence"],
@@ -181,6 +192,7 @@ def build() -> str:
     counts = {
         "деталей": len(prows), "аналогов": len(arows), "каналов": len(crows),
         "документов": len(d.get("docs") or []), "цен": len(d.get("prices") or []),
+        "признаков": len(d.get("faults") or []),
         "параметров": len(d.get("specs") or []), "торгов": len(trows),
         "таможня": len(d["own"]["customs"]["rows"]),
     }
