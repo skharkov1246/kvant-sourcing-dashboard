@@ -417,11 +417,20 @@ $("csvp").onclick=()=>csv("r1700_parts.csv",rowsP(),
 $("csva").onclick=()=>csv("r1700_crossrefs.csv",rowsA(),["pn","brand","alt_pn","kind","note"]);
 drawP();drawA();
 // глубокая ссылка из карточки позиции базы ЗИП: r1700.html#pn=1R-1808 — открыть на этой детали
-(function(){const h=new URLSearchParams((location.hash||"").replace(/^#/,""));
+function openByHash(){const h=new URLSearchParams((location.hash||"").replace(/^#/,""));
   const pn=h.get("pn");if(!pn)return;
   document.querySelector('nav button[data-s="parts"]').click();
   $("qp").value=pn;drawP();
-  const tr=$("tp").tBodies[0].querySelector("tr[data-i]");if(tr){tr.click();tr.scrollIntoView({block:"center"});}})();
+  // поиск по подстроке ловит и примечания соседних строк, поэтому карточку
+  // открываем по точному совпадению номера, а первую строку берём только если
+  // точного нет: иначе ссылка на 1R-1808 открывала карточку 174-2032.
+  const rs=[...$("tp").tBodies[0].querySelectorAll("tr[data-i]")];
+  const want=pn.trim().toUpperCase();
+  const tr=rs.find(r=>(r.cells[0]||{}).textContent.trim().toUpperCase()===want)||rs[0];
+  if(tr){tr.click();tr.scrollIntoView({block:"center"});}}
+// вторая ссылка вида #pn=… с этой же страницы меняет только хеш, документ не
+// перезагружается — без hashchange карточка осталась бы от первой ссылки.
+openByHash();addEventListener("hashchange",openByHash);
 // ── живой поиск по карточкам и простым таблицам
 function cards(inp,list,cnt){const el=$(inp);if(!el)return;const f=()=>{const q=el.value.toLowerCase();let n=0;
   $(list).querySelectorAll(":scope > .card").forEach(c=>{
