@@ -356,6 +356,15 @@ footer{padding:0 22px 24px;color:var(--mut);font-size:11.5px}
     <th>Система</th><th>Позиция</th><th>Номер</th><th>Количество</th><th>Строка тендера</th>
   </tr></thead><tbody id="oh-bom"></tbody></table></div>
 
+  <h3>Та же ведомость с ценой собственного импорта</h3>
+  <p class="mut" id="oh-zp-intro"></p>
+  <div class="k" id="oh-zp-tiles"></div>
+  <div class="tblwrap"><table class="sortable"><thead><tr>
+    <th>Система</th><th>Позиция</th><th>Номер</th><th class="num">Кол-во</th>
+    <th class="num">$ за ед.</th><th class="num">₽ за ед. с ввозом</th><th class="num">Сумма, ₽</th>
+    <th>База</th><th>Достоверность</th>
+  </tr></thead><tbody id="oh-zp"></tbody></table></div>
+
   <h3>Трудоёмкость</h3>
   <p class="mut" id="oh-labor-note"></p>
   <div class="tblwrap"><table><thead><tr>
@@ -368,6 +377,12 @@ footer{padding:0 22px 24px;color:var(--mut);font-size:11.5px}
 
   <h3>Ставки, подтверждённые прайсами</h3>
   <div class="tblwrap"><table><thead><tr><th>Что</th><th>Ставка, ₽</th><th>Достоверность</th></tr></thead><tbody id="oh-rates"></tbody></table></div>
+
+  <h3>База цены: ЗИП считается по импорту</h3>
+  <div class="box warn" id="oh-pb-head"></div>
+  <p id="oh-pb-why"></p>
+  <div class="tblwrap"><table><thead><tr><th>Составляющая ввоза</th><th>Значение</th></tr></thead><tbody id="oh-pb"></tbody></table></div>
+  <div class="box info" id="oh-pb-corr"></div>
 
   <h3>Цены, которые удалось подтвердить</h3>
   <div class="box warn" id="oh-transparency"></div>
@@ -1901,6 +1916,20 @@ function fillSelect(sel, values, allLabel) {
     <td class="num">${esc(b.qty)} ${esc(b.unit)}</td>
     <td class="mut">${esc(b.tender_line || "")}</td></tr>`).join("");
 
+  const ZP = OVERHAUL.zip_priced || {};
+  $("#oh-zp-intro").textContent = ZP.intro || "";
+  $("#oh-zp-tiles").innerHTML = (ZP.totals || []).map(t =>
+    `<div class="tile"><b>${num(t.value)}</b><span>${esc(t.what)}</span></div>`).join("");
+  $("#oh-zp").innerHTML = (ZP.lines || []).map(l => `<tr>
+    <td class="mut">${esc(l.system || "")}</td><td>${esc(l.name)}</td>
+    <td>${l.pn ? `<span class="tag">${esc(l.pn)}</span>` : ""}</td>
+    <td class="num">${esc(l.qty)} ${esc(l.unit || "")}</td>
+    <td class="num">${l.usd != null ? "$ " + num(l.usd) : "—"}</td>
+    <td class="num">${l.price != null ? num(l.price) : "—"}</td>
+    <td class="num">${l.price != null && l.qty != null ? num(l.qty * l.price) : "—"}</td>
+    <td class="mut">${esc(l.basis || "")}</td>
+    <td class="mut">${esc(l.confidence || "")}</td></tr>`).join("");
+
   const LM = OVERHAUL.labor_model || {};
   $("#oh-labor-note").textContent = LM.intro || "";
   $("#oh-labor").innerHTML = (LM.lines || []).map(l => `<tr>
@@ -1912,6 +1941,11 @@ function fillSelect(sel, values, allLabel) {
   $("#oh-fd").innerHTML = (FD.rows || []).map(r => `<tr><td>${esc(r.what)}</td><td><b>${esc(r.value)}</b></td></tr>`).join("");
   $("#oh-rates").innerHTML = ((OVERHAUL.labor_model || {}).rates || []).map(r => `<tr>
     <td>${esc(r.what)}</td><td class="num">${num(r.rub)}</td><td class="mut">${esc(r.conf)}</td></tr>`).join("");
+  const PB = OVERHAUL.price_basis || {};
+  $("#oh-pb-head").innerHTML = `<b>${esc(PB.headline || "")}</b>`;
+  $("#oh-pb-why").textContent = PB.why || "";
+  $("#oh-pb").innerHTML = (PB.stack || []).map(r => `<tr><td>${esc(r.what)}</td><td><b>${esc(r.value)}</b></td></tr>`).join("");
+  $("#oh-pb-corr").innerHTML = PB.correction ? `<b>Поправка.</b> ${esc(PB.correction)}` : "";
   $("#oh-transparency").innerHTML = `<b>Почему цен мало.</b> ${esc(OVERHAUL.price_transparency || "")}`;
   const usdTxt = v => v == null ? "—" : "$ " + num(v);
   $("#oh-anchors").innerHTML = (OVERHAUL.price_anchors || []).map(a => `<tr>
@@ -1937,7 +1971,8 @@ function fillSelect(sel, values, allLabel) {
     <td>${esc(r.what)}</td><td class="num">${num(r.price)} ₽</td>
     <td class="num">${r.net ? num(r.net) + " ₽" : "—"}</td>
     <td>${/^https?:/.test(r.source || "") ? `<a href="${esc(r.source)}" target="_blank" rel="noopener">страница</a>` : esc(r.source || "")}</td></tr>`).join("");
-  $("#oh-mc-verdict").innerHTML = `<b>Вывод.</b> ${esc(MC.verdict || "")}`;
+  $("#oh-mc-verdict").innerHTML = `<b>Вывод.</b> ${esc(MC.verdict || "")}`
+    + (MC.correction ? `<div class="mut" style="margin-top:6px"><b>Отменённый вывод.</b> ${esc(MC.correction)}</div>` : "");
 
   const RQ = OVERHAUL.rfq || {};
   $("#oh-rfq-why").textContent = RQ.why || "";
