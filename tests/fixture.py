@@ -220,4 +220,4 @@ def build_people(**kw) -> dict:
 def build_reps(**kw) -> dict:
     """Синтетика → настоящий reps.compute → данные вкладки «Коммерсанты»."""
     import reps as reps_mod
-    return reps_mod.compute(PeopleStub(), as_of=PEOPLE_TODAY, created=CREATED, **kw)
+    return reps_mod.compute(PeopleStub(), as_of=PEOPLE_TODAY, created=CREATED, orders_src=ORDERS, **kw)

@@ -166,3 +166,13 @@ def test_коммерсант_с_единственной_сделкой_не_з
     r = reps_mod.compute(fixture.PeopleStub(), as_of=fixture.PEOPLE_TODAY, created=fixture.CREATED)
     # у Гущиной (uid 4) одна сделка — ниже порога MIN_DEALS
     assert "4" not in {x["uid"] for x in r["reps"]}
+
+
+def test_просрочка_коммерсанта_из_дедлайна_заказа_а_не_из_closedate():
+    import reps as reps_mod
+    r = reps_mod.compute(fixture.PeopleStub(), as_of=fixture.PEOPLE_TODAY,
+                         created=fixture.CREATED, orders_src=fixture.ORDERS)
+    kam = next(x for x in r["reps"] if x["uid"] == "1")
+    assert kam["kpis"]["overdue"] == 1          # ровно сделка 102 с просроченным заказом
+    d102 = next(d for d in kam["deals"] if d["id"] == "102")
+    assert d102["ovd"] and d102["ovdDays"] == 47

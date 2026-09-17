@@ -289,7 +289,7 @@ def _pctile(sv: list, p: float):
 
 
 def compute(client: BitrixClient, *, realize_date: dict | None = None, as_of: dt.date | None = None,
-            created: list[dict] | None = None) -> dict:
+            created: list[dict] | None = None, orders_src: list[dict] | None = None) -> dict:
     today = as_of or dt.date.today()
     today_iso = today.isoformat()
     unames = client.users()
@@ -332,16 +332,28 @@ def compute(client: BitrixClient, *, realize_date: dict | None = None, as_of: dt
         for s in (client.call("crm.status.list", {"filter": {"ENTITY_ID": ent}, "select": ["STATUS_ID", "NAME"]}) or []):
             stage_name[str(s.get("STATUS_ID"))] = s.get("NAME") or ""
 
-    # заказы поставщикам (закупка/контрактность) с 2025
-    orders = client.list_items(172, filter={">=createdTime": YEAR_START},
-                               select=["id", "stageId", "opportunity", "currencyId", "parentId2"])
+    # заказы поставщикам: закупка, признак контракта и СРОК, обещанный клиенту
+    orders = orders_src if orders_src is not None else client.list_items(
+        172, filter={">=createdTime": YEAR_START},
+        select=["id", "stageId", "opportunity", "currencyId", "parentId2", people_mod.DL_CUSTOMER])
     orders = [o for o in orders if not str(o.get("stageId", "")).endswith(":FAIL")]
     order_parents = {str(o.get("parentId2")) for o in orders if o.get("parentId2")}
     buy_by_deal = defaultdict(float)
+    late_deals: dict[str, int] = {}     # сделка → на сколько дней просрочено обещание клиенту
     for o in orders:
         did = str(o.get("parentId2") or "")
-        if did:
-            buy_by_deal[did] += eur(o.get("opportunity"), o.get("currencyId"))
+        if not did:
+            continue
+        buy_by_deal[did] += eur(o.get("opportunity"), o.get("currencyId"))
+        if str(o.get("stageId", "")).endswith(":SUCCESS"):
+            continue                    # заказ исполнен — обещание закрыто
+        dl = str(o.get(people_mod.DL_CUSTOMER) or "")[:10]
+        if dl and dl < today_iso:
+            try:
+                days = (today - dt.date.fromisoformat(dl)).days
+            except ValueError:
+                continue
+            late_deals[did] = max(days, late_deals.get(did, 0))
 
     realize_date = realize_date or {}
 
@@ -387,11 +399,14 @@ def compute(client: BitrixClient, *, realize_date: dict | None = None, as_of: dt
             sem = (d.get("STAGE_SEMANTIC_ID") or "").upper()
             is_open = (not is_lost) and (not realized) and sem != "S"
             cls = "lost" if is_lost else ("real" if realized else "early")
-            ovd = is_open and bool(cd) and cd < today_iso
+            # ПРОСРОЧКА — сорванное обещание клиенту (дедлайн живого заказа СП-172),
+            # а не CLOSEDATE: это поле в портале проставляется автоматически и у всех
+            # открытых сделок лежит в прошлом — по нему «просрочено» было бы всё.
+            ovd = did in late_deals
             stuck = False
             if is_open and mv:
                 try:
-                    stuck = (today - dt.date.fromisoformat(mv)).days > 30
+                    stuck = (today - dt.date.fromisoformat(mv)).days > people_mod.STALE_DAYS
                 except Exception:
                     pass
             if is_lost:
@@ -412,16 +427,16 @@ def compute(client: BitrixClient, *, realize_date: dict | None = None, as_of: dt
                         pass
             elif is_open:
                 open_n += 1; open_sum += amt
-                if ovd:
-                    overdue_n += 1; overdue_sum += amt
                 if stuck:
                     stuck_n += 1
+            if ovd:
+                overdue_n += 1; overdue_sum += amt
             detail.append({
                 "id": did, "t": (d.get("TITLE") or f"Сделка #{did}")[:90],
                 "raw": round(amt), "amt": _money(amt), "date": str(d.get("DATE_CREATE", ""))[:10],
                 "stage": stage_name.get(str(d.get("STAGE_ID")), str(d.get("STAGE_ID"))),
                 "lvl": (None if is_lost else lvl), "cls": cls, "seq": _regno(d.get("TITLE")),
-                "ovd": ovd, "stuck": stuck, "sem": sem or "P",
+                "ovd": ovd, "ovdDays": late_deals.get(did, 0), "stuck": stuck, "sem": sem or "P",
                 "c": "", "o": label,
             })
         closed_won_lost = real_n + lost
