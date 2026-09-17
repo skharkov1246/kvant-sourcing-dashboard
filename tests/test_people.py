@@ -247,3 +247,18 @@ def test_старые_ролевые_поля_считаются_только_к
         orphan={"n": 0, "sum": "0"}, recon={"none": 0, "noneSum": "0"},
         field_use={people_mod.KAM_OLD: 12, people_mod.PROD_HEAD: 3}, close_future=0)
     assert {x["k"]: x for x in dirty}["roleField"]["val"] == 2
+
+
+def test_портфель_без_выбросов_считается_рядом_с_полным():
+    """Одна карточка на порядок дороже прочих не должна молча решать сумму роли."""
+    huge = fixture.deal(109, "8", "C8:UC_1", 20_000_000, owner=1, kam=1)
+    r = people_mod.compute(fixture.PeopleStub(), as_of=fixture.PEOPLE_TODAY,
+                           open_deals=OPEN_DEALS + [huge], created=fixture.CREATED,
+                           orders=fixture.ORDERS)
+    t = r["roles"]["kam"]["totals"]
+    assert t["big"] == 1 and t["bigShare"] >= 90       # выброс виден и назван числом
+    # полный портфель включает выброс, очищенный — нет
+    assert t["cleanRaw"] == round(t["presaleRaw"] + t["realRaw"] - 20_000_000)
+    rows = {p["uid"]: p for p in r["roles"]["kam"]["people"]}
+    assert rows["1"]["bigRaw"] == 20_000_000
+    assert rows["1"]["loadClean"] == rows["1"]["presaleRaw"] + rows["1"]["realRaw"] - 20_000_000

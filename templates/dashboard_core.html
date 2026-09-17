@@ -1199,6 +1199,7 @@ function renderReps(R){
         +row('win-rate года',(t)=>`${t.winRate}%`)
         +row('просрочено клиенту',(t)=>`${t.late} · ${t.lateSum}`)
         +row('без движения 90+ дн',(t)=>t.stale)
+        +row('портфель без карточек-выбросов',(t)=>`${t.cleanSum} <small class="dimv">выбросов ${t.big}, в них ${t.bigShare}%</small>`)
         +row('чистых карточек',(t)=>t.cleanPct==null?'—':t.cleanPct+'%')
         +row('закреплено полем карточки',(t)=>t.open?Math.round(t.byField/t.open*100)+'%':'—')
         +row('руководитель',(t,b)=>(b.head&&b.head.name)?(_esc(b.head.name)+(b.head.confirmed?'':' <span class="dimv">прокси</span>')):'<span class="dimv">не определён</span>')
@@ -1709,7 +1710,7 @@ function renderPeople(P,role,elId,opt){
   const KPI=[
     ['Людей в роли',String(T.people),`из ${S.active||0} действующих в портале · уволенных ${S.fired||0}`,'','staff'],
     ['Сделок в работе',String(T.open),`${T.perPersonDeals} на человека · медиана ${T.medianDeals} · максимум ${T.maxDeals}`,'','all'],
-    ['В проработке',T.presaleSum,`${T.presale} сделок · торг не выигран`+(T.big?` · ${T.bigShare}% суммы держат ${T.big} карточек-выбросов`:''),'ok','presale'],
+    ['В проработке',T.presaleSum,`${T.presale} сделок · торг не выигран`+(T.big?` · ${T.bigShare}% суммы держат ${T.big} карточек-выбросов, без них портфель роли ${T.cleanSum}`:''),'ok','presale'],
     ['В реализации',T.realSum,`${T.real} сделок · маржа ${T.margin} (${T.marginPct}%)`,'ok','real'],
     ['Просрочено клиенту',String(T.late),`Σ ${T.lateSum} · дедлайн заказа прошёл`,T.late?'warn':'ok','late'],
     ['Без движения '+PR.stale+'+ дн',String(T.stale),`из них ${T.dead} стоят дольше ${PR.dead} дн`,T.stale?'amber':'ok','stale'],
