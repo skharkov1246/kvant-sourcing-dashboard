@@ -1,20 +1,23 @@
-"""Зонд v38: базовая валюта портала и порядок сумм.
+"""Зонд v39: повторный прогон people.compute после правок победы и выбросов.
 
-Прогон v37 дал по роли КАМ пайплайн €1 571,9 млн. Либо в карточках такие суммы,
-либо базовая валюта портала — не евро, и весь дашборд подписывает рубли значком €.
-Вопрос стоит дороже вкладки: под этим значком считаются все деньги во всех вкладках.
+Гейт считает вкладки на придуманном корпусе: секретов Bitrix в нём нет. Поэтому
+ошибки, которые видны только на живых данных (роль не распозналась по реальной
+должности, поле пришло списком, стадия без справочника), доезжали бы до прода.
+Здесь модуль запускается по-настоящему и печатает агрегаты результата.
 
-Печатаются курсы, признак базовой валюты, раскладка открытых сделок по валютам и
-порядок сумм (перцентили, крупнейшие — числом, без названий сделок и клиентов).
+ПЕЧАТАЮТСЯ ТОЛЬКО АГРЕГАТЫ: счётчики, суммы, доли, должности и названия отделов.
+Ни фамилий, ни названий сделок, ни клиентов. Самое важное — в конце.
 """
 from __future__ import annotations
 
 import os
 import sys
-from collections import Counter, defaultdict
+import time
+from collections import Counter
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+import people as people_mod  # noqa: E402
 from bitrix_client import BitrixClient  # noqa: E402
 
 
@@ -24,46 +27,73 @@ def head(t: str) -> None:
 
 def main() -> int:
     c = BitrixClient(os.environ["BITRIX_WEBHOOK_URL"])
+    t0 = time.time()
+    people = people_mod.roster(c)
+    deps = {str(d["ID"]): d.get("NAME", "") for d in c.list_paged("department.get", {})}
 
-    head("1. СПРАВОЧНИК ВАЛЮТ (crm.currency.list)")
-    cur = c.call("crm.currency.list", {}) or []
-    base = None
-    for x in cur:
-        is_base = str(x.get("BASE")).upper() in ("Y", "1", "TRUE")
-        if is_base:
-            base = x.get("CURRENCY")
-        print(f"{str(x.get('CURRENCY')):<5} AMOUNT={x.get('AMOUNT')} AMOUNT_CNT={x.get('AMOUNT_CNT')} "
-              f"BASE={x.get('BASE')} {'← базовая' if is_base else ''}")
-    print(f"\nБАЗОВАЯ ВАЛЮТА ПОРТАЛА: {base or 'не определена'}")
+    head("1. РАСПОЗНАВАНИЕ РОЛЕЙ (каскад должность → отдел → не коммерсант)")
+    roles = Counter(); why = Counter(); pos_of_role = {"kam": Counter(), "prod": Counter()}
+    for uid, p in people.items():
+        if not p["active"]:
+            continue
+        r, w = people_mod.resolve_role(p, deps)
+        roles[r] += 1; why[(r, w)] += 1
+        if r in pos_of_role:
+            pos_of_role[r][p["pos"] or "(пусто)"] += 1
+    print("действующих по ролям: " + " · ".join(f"{k}={v}" for k, v in roles.most_common()))
+    print("как определено: " + " · ".join(f"{r}/{w}={n}" for (r, w), n in why.most_common()))
+    for r in ("kam", "prod"):
+        print(f"\nдолжности роли «{r}»:")
+        for p, n in pos_of_role[r].most_common(20):
+            print(f"  {n:>3}  {p}")
 
-    head("2. ОТКРЫТЫЕ СДЕЛКИ ПО ВАЛЮТАМ КАРТОЧКИ")
-    op = c.list_deals_fast(filter={"STAGE_SEMANTIC_ID": "P"},
-                           select=["ID", "CATEGORY_ID", "OPPORTUNITY", "CURRENCY_ID", "STAGE_ID"])
-    by = Counter(str(d.get("CURRENCY_ID")) for d in op)
-    sums = defaultdict(float)
-    for d in op:
-        sums[str(d.get("CURRENCY_ID"))] += float(d.get("OPPORTUNITY") or 0)
-    for k, n in by.most_common():
-        print(f"{k:<6} сделок {n:>5}  Σ в валюте карточки {sums[k]:,.0f}".replace(",", " "))
+    head("2. ПРОГОН people.compute НА ЖИВЫХ ДАННЫХ")
+    t1 = time.time()
+    data = people_mod.compute(c)
+    print(f"посчитано за {time.time()-t1:.1f} с (всего с состава {time.time()-t0:.1f} с)")
+    st, rc = data["staff"], data["recon"]
+    print(f"состав: всего {st['total']} · действующих {st['active']} · отключённых {st['fired']} "
+          f"· в роли КАМ {st['kam']} · в роли продукт-оунер {st['prod']}")
+    print(f"портфель: открытых (без технических воронок) {rc['openTotal']} · технических отброшено {rc['tech']}")
+    print(f"покрытие: за КАМами {rc['kam']} · за продукт-оунерами {rc['prod']} · и там, и там {rc['both']} "
+          f"· ни за кем {rc['none']} ({rc['noneSum']}) · на уволенных {rc['orphan']} ({rc['orphanSum']}), "
+          f"из них с живой ролью {rc['orphanCovered']}")
 
-    head("3. ПОРЯДОК СУММ (в валюте карточки, без пересчёта)")
-    vals = sorted(float(d.get("OPPORTUNITY") or 0) for d in op if float(d.get("OPPORTUNITY") or 0) > 0)
-    if vals:
-        q = lambda p: vals[min(len(vals) - 1, int(len(vals) * p / 100))]
-        print(f"сделок с суммой: {len(vals)} из {len(op)}")
-        print(f"P50 {q(50):,.0f} · P75 {q(75):,.0f} · P90 {q(90):,.0f} · P99 {q(99):,.0f} · max {vals[-1]:,.0f}"
-              .replace(",", " "))
-        print("десять крупнейших сумм: " + " · ".join(f"{v:,.0f}".replace(",", " ") for v in vals[-10:]))
-        big = [d for d in op if float(d.get("OPPORTUNITY") or 0) >= 1e9]
-        print(f"карточек с суммой ≥ 1 млрд в валюте карточки: {len(big)}")
-        cb = Counter(str(d.get("CURRENCY_ID")) for d in big)
-        print("их валюты: " + (" · ".join(f"{k}×{v}" for k, v in cb.most_common()) or "—"))
-        cc = Counter(str(d.get("CATEGORY_ID")) for d in big)
-        print("их воронки: " + (" · ".join(f"cat{k}×{v}" for k, v in cc.most_common()) or "—"))
+    for key in ("kam", "prod"):
+        b = data["roles"][key]; t = b["totals"]
+        head(f"3. РОЛЬ «{key}» — итоги")
+        print(f"людей с сделками {t['peopleAll']} (действующих {t['people']}) · без единой сделки {len(b['idlePeople'])}")
+        print(f"открытых {t['open']} · из них закреплено полем карточки {t['byField']} "
+              f"({t['byField']*100//max(1,t['open'])}%) · роль не закреплена у {b['uncovered']['n']} ({b['uncovered']['sum']})")
+        print(f"проработка {t['presale']} шт / {t['presaleSum']} · реализация {t['real']} шт / {t['realSum']} "
+              f"· закупка {t['buy']} · маржа {t['margin']} ({t['marginPct']}%)")
+        print(f"год: создано {t['created']} · выиграно {t['won']} ({t['wonSum']}) · проиграно {t['lost']} "
+              f"· win-rate {t['winRate']}% · взвешенный пайплайн {t['weighted']}")
+        print(f"риски: просрочено {t['late']} ({t['lateSum']}) · застой {t['stale']} · брошено {t['dead']} "
+              f"· без суммы {t['noAmt']} · без клиента {t['noComp']} · маржа в минус {t['neg']} "
+              f"· чистых карточек {t['cleanPct']}%")
+        print(f"выбросы по сумме: {t['big']} карточек на {t['bigSum']} — это {t['bigShare']}% суммы роли")
+        print(f"нагрузка: на человека {t['perPersonDeals']} · медиана {t['medianDeals']} · максимум {t['maxDeals']} "
+              f"· денег на человека {t['perPersonSum']}")
+        print("воронки: " + " · ".join(f"{f['cat']}={f['n']}" for f in b["funnels"][:8]))
+        print("распределение нагрузки по людям (сделок, без имён): "
+              + ", ".join(str(p["open"]) for p in sorted(b["people"], key=lambda x: -x["open"])[:15]))
 
-    head("4. ИТОГ")
-    print(f"Базовая валюта: {base}. Если это не EUR, подпись «€» во всех вкладках неверна: "
-          f"суммы приводятся к базовой валюте портала, а называются евро.")
+    head("4. ЧТО ДОЛЖЕН УВИДЕТЬ ВЛАДЕЛЕЦ — проверка на пустоту")
+    bad = []
+    if not data["roles"]["kam"]["people"]:
+        bad.append("во вкладке КАМов нет ни одного человека")
+    if not data["roles"]["prod"]["people"]:
+        bad.append("во вкладке продукт-оунеров нет ни одного человека")
+    if rc["openTotal"] < 100:
+        bad.append(f"открытых сделок подозрительно мало: {rc['openTotal']}")
+    if data["roles"]["kam"]["totals"]["byField"] == 0:
+        bad.append("поле «КАМ» нигде не прочиталось — атрибуция свалилась на владельца")
+    pr = data["params"]
+    print(f"медианная открытая сделка {pr['medAmt']} · порог выброса {pr['bigCut']} ({pr['mult']} медиан)")
+    if data["roles"]["kam"]["totals"]["won"] == 0:
+        bad.append("по роли КАМ ноль побед — определение победы снова не совпало с портом")
+    print("ПРОБЛЕМЫ: " + ("; ".join(bad) if bad else "нет, данные для вкладок полные"))
     print("\nГОТОВО")
     return 0
 
