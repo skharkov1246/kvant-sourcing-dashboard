@@ -7,8 +7,8 @@
 Actions → «ZIP base — apply DB migrations» (psql -f).
 
 Таблицы (создаются в zip/supabase/migrations.sql, раздел 7): mach_machines,
-mach_docs, mach_parts, mach_part_alts, mach_channels, mach_prices, mach_specs,
-mach_tenders, mach_customs.
+mach_docs, mach_parts, mach_part_alts, mach_channels, mach_prices, mach_faults,
+mach_specs, mach_tenders, mach_customs.
 
 Запуск: python zip/tools/r1700_sql.py
 """
@@ -134,11 +134,14 @@ def build() -> str:
         crows.append([mk, o["org"], o["slice"], o.get("kind"), o.get("country"), o.get("city"),
                       o.get("role"), o.get("brands"), o.get("site"), o.get("email"), o.get("phone"),
                       o.get("stock"), o.get("note"), o.get("source"), o.get("confidence"), o.get("verdict"),
-                      bool(o.get("ru")), bool(o.get("ask"))])
+                      bool(o.get("ru")), bool(o.get("ask")), o.get("ask_off"),
+                      o.get("contact_form"), o.get("contact_lang"), o.get("contact_url"),
+                      o.get("contact_verdict"), o.get("dup_of")])
     L.append(ins("mach_channels",
                  ["machine_key", "org", "lane", "kind", "country", "city", "role", "brands",
                   "site", "email", "phone", "stock", "note", "source", "confidence", "verdict",
-                  "ru", "ask"],
+                  "ru", "ask", "ask_off", "contact_form", "contact_lang", "contact_url",
+                  "contact_verdict", "dup_of"],
                  crows, conflict="machine_key, org, lane"))
 
     # цены, параметры, торги, таможня — наборы без естественного ключа: перезаливаем целиком
@@ -150,6 +153,17 @@ def build() -> str:
                    x.get("price"), num(x.get("price")), x.get("currency"), x.get("seller"), x.get("region"),
                    x.get("date"), x.get("url"), x.get("confidence"), x.get("verdict")]
                   for x in d.get("prices") or []]))
+
+    # признаки и дефекты — набор без естественного ключа, перезаливаем целиком
+    L.append(f"delete from mach_faults  where machine_key = {q(mk)};")
+    L.append(ins("mach_faults",
+                 ["machine_key", "symptom", "node", "measure", "defect", "confirm", "repair",
+                  "parts", "codes", "url", "confidence", "verdict", "note"],
+                 [[mk, x.get("symptom"), x.get("node"), x.get("measure"), x.get("defect"),
+                   x.get("confirm"), x.get("repair"), " · ".join(x.get("parts") or []) or None,
+                   x.get("codes"), x.get("url"), x.get("confidence"),
+                   x.get("verdict") or "не проверялся", x.get("note")]
+                  for x in d.get("faults") or []]))
 
     L.append(f"delete from mach_specs   where machine_key = {q(mk)};")
     L.append(ins("mach_specs",
@@ -181,6 +195,7 @@ def build() -> str:
     counts = {
         "деталей": len(prows), "аналогов": len(arows), "каналов": len(crows),
         "документов": len(d.get("docs") or []), "цен": len(d.get("prices") or []),
+        "признаков": len(d.get("faults") or []),
         "параметров": len(d.get("specs") or []), "торгов": len(trows),
         "таможня": len(d["own"]["customs"]["rows"]),
     }

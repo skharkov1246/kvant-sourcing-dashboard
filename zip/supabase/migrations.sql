@@ -381,3 +381,59 @@ create index if not exists mach_channels_ask_ix on mach_channels (machine_key, a
 
 create or replace view mach_channels_ask as
   select * from mach_channels where coalesce(ask, not coalesce(ru, false));
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- 7б. mach_faults — звено «признак → дефект» цепочки портала.
+--
+-- До сих пор оно было пустым по всем машинам: деталь в базе была, а как на неё
+-- выйти от того, что видит оператор, — нет. Одна строка = связка «признак →
+-- узел → что меряют → дефект → чем подтвердить → ремонтное решение → номера».
+--
+-- verdict обязателен и разделяет два разных утверждения: «подтверждён» — строка
+-- дословно есть в скачанном документе, «не проверялся» — общая практика по
+-- вращающемуся оборудованию. Смешивать их нельзя: на общей практике нельзя
+-- строить предсменную процедуру.
+create table if not exists mach_faults (
+  id           bigint generated always as identity primary key,
+  machine_key  text not null references mach_machines(machine_key) on delete cascade,
+  symptom      text not null,            -- что видит, слышит или меряет человек
+  node         text,                     -- узел из перечня досье
+  measure      text,                     -- что меряют и чем
+  defect       text,                     -- вероятный дефект
+  confirm      text,                     -- чем подтвердить (НК, разборка, замер)
+  repair       text,                     -- ремонтное решение
+  parts        text,                     -- номера под решение через ' · '
+  codes        text,                     -- коды диагностики (CID/FMI/EID)
+  url          text,
+  confidence   text default 'low',
+  verdict      text not null default 'не проверялся',
+  note         text
+);
+create index if not exists mach_faults_machine on mach_faults (machine_key, node);
+create index if not exists mach_faults_verdict on mach_faults (machine_key, verdict);
+
+do $$
+begin
+  execute 'alter table mach_faults enable row level security';
+  execute 'drop policy if exists mach_faults_all on mach_faults';
+  execute 'create policy mach_faults_all on mach_faults for all to anon, authenticated using (true) with check (true)';
+end $$;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- 7в. Адрес запроса и причина, по которой канал из запроса выпал.
+--
+-- Лист запроса был нерабочим наполовину: из 94 иностранных каналов прямая почта
+-- была у 36. Адрес добран по контактным страницам; где почты нет — записана
+-- форма площадки (на made-in-china и Alibaba прямой почты не бывает по
+-- устройству витрины, только форма).
+--
+-- ask_off — почему канал не в листе. Причин четыре, и раньше все они выглядели
+-- как «решение владельца»: решение владельца, снят проверкой, дубль по домену,
+-- справочный каталог вместо продавца. Без этой колонки нельзя ни объяснить
+-- цифру, ни вернуть канал, когда причина отпадёт.
+alter table mach_channels add column if not exists ask_off         text;
+alter table mach_channels add column if not exists contact_form    text;
+alter table mach_channels add column if not exists contact_lang    text;
+alter table mach_channels add column if not exists contact_url     text;
+alter table mach_channels add column if not exists contact_verdict text;
+alter table mach_channels add column if not exists dup_of          text;

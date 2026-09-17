@@ -209,6 +209,31 @@ def build():
               e(x.get("price")), e(x.get("currency")), e(x.get("seller")), e(x.get("region")),
               e(x.get("date")), e(x.get("confidence"))] for x in d["prices"]]) + "</div>")
 
+    # ── признаки и дефекты ──────────────────────────────────────────────────
+    if d.get("faults"):
+        st = d.get("stats") or {}
+        fv = st.get("faults_verdicts") or {}
+        H.append('<div class="sec"><h2>От признака к ремонту и номерам · '
+                 + num(len(d["faults"])) + "</h2>"
+                 + '<p class="mut">Подтверждено документом ' + num(fv.get("подтверждён", 0))
+                 + ", общая практика без нашего документа — " + num(fv.get("не проверялся", 0))
+                 + ", сомнительно " + num(fv.get("сомнителен", 0))
+                 + ". Порогов замера по R1700G здесь нет: руководства Cat по этой машине "
+                   "(SEBU8211, KENR6256/6262/6264/6266) закрыты, зеркала SIS отдают 403. "
+                   "Строка говорит, что мерить и чем подтверждать; норму берите из SIS "
+                   "под серийный номер.</p>"
+                 + table(
+            [("Признак", 17, ""), ("Узел", 9, ""), ("Что меряют", 17, ""),
+             ("Вероятный дефект", 17, ""), ("Чем подтвердить", 15, ""),
+             ("Ремонт и номера", 19, ""), ("Пров.", 6, "")],
+            [[e(x.get("symptom")), e(x.get("node")), e(x.get("measure")),
+              e(x.get("defect")) + (f'<br><span class="mut">коды: {e(x.get("codes"))}</span>'
+                                    if x.get("codes") else ""),
+              e(x.get("confirm")),
+              e(x.get("repair")) + (f'<br><span class="pn">{e(" · ".join(x.get("parts") or []))}</span>'
+                                    if x.get("parts") else ""),
+              e(x.get("verdict"))] for x in d["faults"]]) + "</div>")
+
     # ── торги ───────────────────────────────────────────────────────────────
     t = d["tenders"]
     if t.get("platforms") or t.get("owners") or t.get("checklist"):

@@ -194,11 +194,19 @@ def build():
 
     dealers_all = [o for o in d["orgs"] if o["slice"] == "dealers"]
     dealers, dealers_ru = split_ask(dealers_all)
+    # Раньше здесь стоял один заголовок «по решению владельца». Теперь канал
+    # выпадает из листа запроса по четырём разным причинам — решение владельца,
+    # снят проверкой, дубль по домену, справочный каталог, — и каждая пишется у
+    # своей строки. Один общий заголовок на четыре причины врал бы о трёх из них.
     ru_block = lambda rows, title: (
         f'<details style="margin-top:10px"><summary class="mut">{title} · {len(rows)} — '
-        f'по решению владельца в лист запроса не выводятся</summary>'
-        + cards(rows, [("kind", "Тип"), ("city", "Город"), ("role", "Роль"), ("note", "Чем полезен")],
+        f'в лист запроса не выводятся, из данных не удалены</summary>'
+        + cards(rows, [("ask_off", "Почему не запрашиваем"), ("kind", "Тип"), ("city", "Город"),
+                       ("role", "Роль"), ("note", "Чем полезен")],
                 "org", "site") + "</details>") if rows else ""
+
+    # Поля адреса — одни и те же во всех трёх направлениях.
+    CONTACT = [("email", "Почта"), ("contact_form", "Форма запроса"), ("contact_lang", "Язык письма")]
 
     S.append(("deal", f"Оригинал · {len(dealers)}", f"""
 <h2>Официальные каналы Caterpillar</h2>{pol_note}
@@ -207,7 +215,7 @@ def build():
 <div class="bar"><input id="qdl" placeholder="поиск: организация, страна, роль…"><span class="mut" id="cntdl"></span></div>
 <div id="listdl">{cards(dealers, [("role", "Роль"), ("country", "Страна"), ("city", "Город"),
                                   ("brands", "Бренды"), ("stock", "Наличие и срок"),
-                                  ("email", "Почта"), ("phone", "Телефон"), ("note", "Чем полезен")],
+                                  *CONTACT, ("phone", "Телефон"), ("note", "Чем полезен")],
                         "org", "site")}</div>
 {ru_block(dealers_ru, "Российские компании этого направления")}"""))
 
@@ -226,7 +234,7 @@ def build():
 <div class="bar"><input id="qaf" placeholder="поиск: завод, бренд, что делает…"><span class="mut" id="cntaf"></span></div>
 <div id="listaf">{cards(after, [("kind", "Тип"), ("country", "Страна"), ("city", "Город"),
                                 ("brands", "Бренды и узлы"), ("stock", "Партия и срок"),
-                                ("email", "Почта"), ("note", "Что покрывает")], "org", "site")}</div>
+                                *CONTACT, ("note", "Что покрывает")], "org", "site")}</div>
 {ru_block(after_ru, "Российские заводы")}
 <h2>Заводы из нашего справочника ODM с упоминанием Caterpillar · {len(odm)}</h2>
 <div class="mut">Показаны первые {min(400, len(odm))} по уровню доверия. Полный перечень —
@@ -253,7 +261,7 @@ def build():
 <div class="bar"><input id="qtr" placeholder="поиск: компания, город, что держат…"><span class="mut" id="cnttr"></span></div>
 <div id="listtr">{cards(traders, [("kind", "Тип"), ("country", "Страна"), ("city", "Город"),
                                   ("brands", "Бренды"), ("stock", "Склад и срок"),
-                                  ("email", "Почта"), ("phone", "Телефон"), ("note", "Чем полезен")],
+                                  *CONTACT, ("phone", "Телефон"), ("note", "Чем полезен")],
                         "org", "site")}</div>
 {ru_block(traders_ru, "Российские торговцы и исполнители")}
 <h2>Ввоз Caterpillar по нашей таможенной выгрузке</h2>
@@ -282,6 +290,40 @@ def build():
 <table class="ot" id="tpr"><thead><tr><th>PN</th><th>Наименование</th><th>Уровень</th><th>Бренд</th>
 <th>Цена</th><th>Вал.</th><th>Продавец</th><th>Регион</th><th>Дата</th><th>Доверие</th><th>Ист.</th>
 </tr></thead><tbody>{pr}</tbody></table>"""))
+
+    # ── 9а. Признаки и дефекты ──────────────────────────────────────────────
+    flt = d.get("faults") or []
+    # Номер детали кликабелен: со строки дефекта сорсер попадает прямо в карточку
+    # позиции, а не ищет её руками в перечне из 561 строки.
+    def pnlist(pns):
+        return " · ".join(f'<a href="#pn={e(x)}" class="pn">{e(x)}</a>' for x in pns) or \
+            '<span class="mut">номеров под это решение в ведомости нет</span>'
+
+    fr = "".join(f"""<tr data-node="{e(x.get('node'))}"><td><b>{e(x.get('symptom'))}</b>
+<div class="mut">{e(x.get('node'))}</div></td>
+<td class="mut">{e(x.get('measure'))}</td>
+<td>{e(x.get('defect'))}{f'<div class="mut">коды: {e(x.get("codes"))}</div>' if x.get('codes') else ''}</td>
+<td class="mut">{e(x.get('confirm'))}</td>
+<td>{e(x.get('repair'))}<div>{pnlist(x.get('parts') or [])}</div></td>
+<td>{conf_tag(x.get('confidence'))}<div>{verdict_tag(x.get('verdict'))}</div></td>
+<td>{link(x.get('url'), '↗')}</td></tr>"""
+                  for x in flt)
+    fst = (d.get("stats") or {})
+    fv = fst.get("faults_verdicts") or {}
+    S.append(("faults", f"Признаки и дефекты · {len(flt)}", f"""
+<h2>От признака к ремонтному решению и номерам</h2>
+<div class="mut">Звено «признак → дефект» до сих пор было пустым по всем машинам портала.
+Строк {num(len(flt))} по {num(len(fst.get('faults_by_node') or {}))} узлам, с каталожными
+номерами {num(fst.get('faults_with_parts'))}, с кодами диагностики {num(fst.get('faults_with_codes'))}.
+Подтверждено документом {num(fv.get('подтверждён', 0))}, общая практика без нашего документа —
+{num(fv.get('не проверялся', 0))}, сомнительно {num(fv.get('сомнителен', 0))}.</div>
+<div class="mut"><b>Чего здесь нет:</b> порогов замера по этой машине. Руководства Cat по R1700G
+(SEBU8211, KENR6256/6262/6264/6266, SENR9888) закрыты: catpublications отдаёт обложку, зеркала SIS —
+403. Строка говорит, что мерить и чем подтверждать; норму берите из SIS под серийный номер.</div>
+<div class="bar"><input id="qf" placeholder="поиск: признак, дефект, узел, номер, код…"><span class="mut" id="cntf"></span></div>
+<table class="ot" id="tf"><thead><tr><th>Признак</th><th>Что меряют</th><th>Вероятный дефект</th>
+<th>Чем подтвердить</th><th>Ремонтное решение и номера</th><th>Доверие</th><th>Ист.</th>
+</tr></thead><tbody>{fr}</tbody></table>"""))
 
     # ── 10. Торги ───────────────────────────────────────────────────────────
     t = d["tenders"]
@@ -469,7 +511,7 @@ function trows(inp,tbl,cnt){const el=$(inp);if(!el)return;const f=()=>{const q=e
   $(tbl).tBodies[0].querySelectorAll("tr").forEach(r=>{
     const hit=!q||r.textContent.toLowerCase().includes(q);r.style.display=hit?"":"none";if(hit)n++;});
   $(cnt).textContent=n+" строк";};el.oninput=f;f();}
-trows("qd","td","cntd");trows("qpr","tpr","cntpr");
+trows("qd","td","cntd");trows("qpr","tpr","cntpr");trows("qf","tf","cntf");
 """
     js = js.replace("__P__", J(pjs)).replace("__A__", J(d["alts"]))
 

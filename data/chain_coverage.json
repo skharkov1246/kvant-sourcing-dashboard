@@ -555,25 +555,30 @@
           "link": "symptom",
           "title": "Признак",
           "what": "по чему видно, что машина нездорова",
-          "n": 0,
-          "sources": [],
-          "state": "пусто"
+          "n": 55,
+          "sources": [
+            "zip/data/r1700.json"
+          ],
+          "state": "есть"
         },
         {
           "link": "defect",
           "title": "Дефект",
           "what": "каталог дефектов: что ломается и почему",
-          "n": 0,
-          "sources": [],
-          "state": "пусто"
+          "n": 55,
+          "sources": [
+            "zip/data/r1700.json"
+          ],
+          "state": "есть"
         },
         {
           "link": "repair",
           "title": "Ремонтное решение",
           "what": "чем восстанавливают, границы применимости",
-          "n": 7,
+          "n": 62,
           "sources": [
-            "zip/data/material_strategy.json"
+            "zip/data/material_strategy.json",
+            "zip/data/r1700.json"
           ],
           "state": "есть"
         },
@@ -613,23 +618,12 @@
           "state": "есть"
         }
       ],
-      "filled": 6,
+      "filled": 8,
       "of": 8,
-      "pct": 75
+      "pct": 100
     }
   ],
-  "empty_everywhere": [
-    {
-      "link": "symptom",
-      "title": "Признак",
-      "what": "по чему видно, что машина нездорова"
-    },
-    {
-      "link": "defect",
-      "title": "Дефект",
-      "what": "каталог дефектов: что ломается и почему"
-    }
-  ],
+  "empty_everywhere": [],
   "common": {
     "chain_edges": 285,
     "chain_makers": 247,
@@ -641,8 +635,8 @@
   "summary": {
     "segments": 7,
     "links": 8,
-    "cells_filled": 19,
+    "cells_filled": 21,
     "cells_total": 56,
-    "links_not_started": 2
+    "links_not_started": 0
   }
 }
