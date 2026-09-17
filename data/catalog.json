@@ -286,6 +286,7 @@
       },
       "referenced_by": [
         "gt/tools/ship_brand.py",
+        "gt/tools/ship_brief.py",
         "gt/tools/ship_export.py",
         "gt/tools/ship_map.py",
         "gt/tools/ship_merge.py",
@@ -293,8 +294,7 @@
         "gt/tools/ship_priced.py",
         "gt/tools/ship_questions.py",
         "gt/tools/ship_reverify.py",
-        "gt/tools/ship_rfq.py",
-        "tests/test_ship_fx.py"
+        "gt/tools/ship_rfq.py"
       ]
     },
     {
@@ -1405,6 +1405,7 @@
       "referenced_by": [
         ".github/workflows/bitrix-tkp.yml",
         "gt/tools/bitrix_tkp.py",
+        "gt/tools/ship_brief.py",
         "gt/tools/ship_inventory.py"
       ]
     },
@@ -1912,6 +1913,7 @@
         "markers": []
       },
       "referenced_by": [
+        "gt/tools/ship_brief.py",
         "gt/tools/ship_questions.py",
         "ove/build.py",
         "ove/tools/build_questions.py"
@@ -3741,6 +3743,7 @@
         "markers": []
       },
       "referenced_by": [
+        "gt/tools/ship_brief.py",
         "gt/tools/ship_reverify.py"
       ]
     },
@@ -7792,6 +7795,7 @@
         "markers": []
       },
       "referenced_by": [
+        "gt/tools/ship_brief.py",
         "gt/tools/ship_questions.py"
       ]
     },
@@ -7981,7 +7985,8 @@
         "markers": []
       },
       "referenced_by": [
-        "gt/tools/ship_brand.py"
+        "gt/tools/ship_brand.py",
+        "gt/tools/ship_brief.py"
       ]
     },
     {
