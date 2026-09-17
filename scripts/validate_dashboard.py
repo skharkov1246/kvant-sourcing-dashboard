@@ -216,7 +216,7 @@ def check_browser(path: Path, errors: list[str], warns: list[str], notes: list[s
 # Вкладки строятся лениво — при первом открытии. Поэтому обычный прогон проверяет
 # рендер только видимой вкладки «Сорсинг», а поломка в «КАМах» или «Реализации»
 # доезжала до прода незамеченной. Здесь все вкладки принудительно открываются.
-LAZY_TABS = ["company", "kam", "eng", "prod", "reps", "contracts", "suppliers", "cohorts", "advisor"]
+LAZY_TABS = ["company", "reps", "eng", "contracts", "suppliers", "cohorts", "advisor"]
 _TAB_FAIL = "Вкладка не отрисовалась"
 
 

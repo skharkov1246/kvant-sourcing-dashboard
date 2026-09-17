@@ -182,6 +182,21 @@ def deal_categories(client: BitrixClient) -> dict[str, str]:
 
 COMMERCIAL_ROLES = ("kam", "prod")
 
+# Нормы, по которым меряется РУКОВОДИТЕЛЬ роли. Это предложение, а не утверждённый
+# регламент: цифры подобраны по тому, что видно в портале сегодня, и должны быть
+# либо подтверждены владельцем, либо заменены его собственными. На вкладке они
+# так и подписаны — «норма предложена».
+HEAD_NORMS = {
+    "idle": (0, "людей без единой сделки", "≤"),          # человек в роли, на ком ничего не записано
+    "skew": (3.0, "перекос нагрузки (макс ÷ медиана)", "≤"),
+    "top3": (60, "доля портфеля у трёх самых загруженных, %", "≤"),
+    "byField": (90, "сделок закреплено полем карточки, %", "≥"),
+    "onFired": (0, "сделок роли ведёт уволенный", "≤"),
+    "latePct": (5, "доля сделок с сорванным сроком клиенту, %", "≤"),
+    "stalePct": (30, "доля сделок без движения 90+ дней, %", "≤"),
+    "cleanPct": (60, "доля карточек без косяков, %", "≥"),
+}
+
 
 def roles_by_uid(people: dict[str, dict], dept_names: dict[str, str]) -> dict[str, str]:
     """{uid: роль} по всему составу — чтобы каскад «должность → отдел» считался один раз."""
@@ -207,6 +222,135 @@ def responsible(deal: dict, role_of: dict[str, str], people: dict[str, dict]) ->
     return "", "", ""
 
 
+def find_head(role: str, people: dict[str, dict], role_of: dict[str, str],
+              dept_names: dict[str, str], dept_head: dict[str, str],
+              dept_parent: dict[str, str]) -> dict:
+    """Руководитель роли — из Bitrix, а не из списка в коде.
+
+    Каскад, от твёрдого к мягкому; чем определено — показывается в строке, чтобы
+    атрибуцию можно было оспорить фактом:
+      1. руководитель (UF_HEAD) отдела, где сидят люди роли, если он сам не в команде
+         и покрывает больше одного отдела;
+      2. подъём по дереву отделов до первого предка с руководителем вне команды;
+      3. должность вида «Head of…», «Chief…», «Директор», «Руководитель…» среди тех,
+         чьи отделы пересекаются с отделами роли;
+      4. не определён — так и пишем, а не подставляем «самого главного».
+    """
+    team = [u for u, r in role_of.items() if r == role and people.get(u, {}).get("active")]
+    if not team:
+        return {"uid": "", "name": "", "pos": "", "how": "в роли нет действующих людей", "team": 0}
+    depts = Counter(d for u in team for d in (people[u].get("depts") or []))
+    teamset = set(team)
+
+    def card(uid: str, how: str) -> dict:
+        p = people.get(uid, {})
+        return {"uid": uid, "name": p.get("name", uid), "pos": p.get("pos") or "—",
+                "how": how, "team": len(team), "active": bool(p.get("active")),
+                "inRole": uid in teamset}
+
+    # 1 — прямой руководитель отделов роли. Замер 17.09.2026: в этом портале так не
+    # выходит — у каждого отдела роли свой руководитель, и в восьми случаях из десяти
+    # он сам член роли (начальник своей группы, а не над ролью). Ветка оставлена: она
+    # сработает, как только в Bitrix появится общий руководитель у нескольких отделов.
+    direct = Counter(dept_head.get(d, "") for d in depts if dept_head.get(d) and dept_head[d] not in teamset)
+    if direct:
+        uid, n = direct.most_common(1)[0]
+        if n > 1 or len(depts) == 1:
+            c = card(uid, f"руководитель отдела в Bitrix ({n} из {len(depts)} отделов роли)")
+            c.update(cover=n, depts=len(depts), confirmed=n * 2 >= len(depts))
+            return c
+
+    # 2 — подъём по дереву до первого предка с руководителем вне команды
+    up = Counter()
+    for d in depts:
+        cur, guard = d, 0
+        while cur and guard < 8:
+            h = dept_head.get(cur, "")
+            if h and h not in teamset:
+                up[h] += 1
+                break
+            cur = dept_parent.get(cur, "")
+            guard += 1
+    if up:
+        uid, n = up.most_common(1)[0]
+        c = card(uid, f"руководитель вышестоящего отдела ({n} из {len(depts)} отделов роли)")
+        # «подтверждён» — только если вышестоящий покрывает большинство отделов роли.
+        # Для продукт-оунеров правило сейчас проваливается: у зонтичного отдела
+        # «Ответственные за Продуктовые направления» не заполнен руководитель, и подъём
+        # проскакивает его насквозь до коммерческого отдела.
+        c.update(cover=n, depts=len(depts), confirmed=n * 2 >= len(depts) and n >= 3)
+        return c
+
+    # 3 — по должности среди тех, кто сидит в тех же отделах
+    boss = re.compile(r"head of|chief|director|руководител|начальник|директор", re.I)
+    cand = [u for u, p in people.items()
+            if p.get("active") and boss.search(p.get("pos") or "")
+            and set(p.get("depts") or []) & set(depts)]
+    if cand:
+        c = card(cand[0], "должность руководителя в том же отделе")
+        c.update(cover=1, depts=len(depts), confirmed=False)
+        return c
+    return {"uid": "", "name": "", "pos": "", "how": "в Bitrix не указан", "team": len(team),
+            "cover": 0, "depts": len(depts), "confirmed": False}
+
+
+def head_gaps(role: str, people: dict[str, dict], role_of: dict[str, str],
+              dept_names: dict[str, str], dept_head: dict[str, str]) -> list[dict]:
+    """Отделы роли, у которых в Bitrix не заполнен руководитель. Пока они пусты,
+    начальник роли определяется прокси-правилом; заполнить их — работа на минуту,
+    и после неё вкладка называет руководителя сама."""
+    team = [u for u, r in role_of.items() if r == role and people.get(u, {}).get("active")]
+    cnt = Counter(d for u in team for d in (people[u].get("depts") or []))
+    return [{"id": d, "name": dept_names.get(d, d), "people": n}
+            for d, n in cnt.most_common() if not dept_head.get(d)]
+
+
+def head_scorecard(block: dict, rows: list[dict]) -> list[dict]:
+    """Управленческие метрики роли: факт против предложенной нормы.
+
+    Это не оценка человека, а состояние участка: перекос нагрузки, покрытие
+    атрибуцией, просрочка, застой, чистота карточек. Каждая строка — что считаем,
+    сколько вышло, какая норма предложена и уложились ли.
+    """
+    t = block["totals"]
+    opens = sorted(r["open"] for r in rows) or [0]
+    med = opens[len(opens) // 2] or 1
+    load = sorted((r["loadRaw"] for r in rows), reverse=True)
+    total_load = sum(load) or 1
+    fact = {
+        "idle": len(block["idlePeople"]),
+        "skew": round(opens[-1] / med, 1) if med else 0,
+        "top3": round(sum(load[:3]) / total_load * 100),
+        "byField": (round(t["byField"] / t["open"] * 100) if t["open"] else 0),
+        "onFired": sum(r["open"] for r in rows if not r["active"]),
+        "latePct": (round(t["late"] / t["open"] * 100) if t["open"] else 0),
+        "stalePct": (round(t["stale"] / t["open"] * 100) if t["open"] else 0),
+        "cleanPct": (t["cleanPct"] if t["cleanPct"] is not None else 0),
+    }
+    out = []
+    for key, (norm, label, op) in HEAD_NORMS.items():
+        v = fact[key]
+        ok = (v <= norm) if op == "≤" else (v >= norm)
+        out.append({"k": key, "lbl": label, "val": v, "norm": norm, "op": op, "ok": bool(ok)})
+    return out
+
+
+def _boss_of(uid: str, person: dict, people: dict[str, dict], dept_head: dict[str, str]) -> str:
+    """Непосредственный руководитель человека — из UF_HEAD его отдела. В отличие от
+    «руководителя роли», это в портале заполнено почти везде. Если человек сам
+    возглавляет свою группу, так и пишем, а не ставим прочерк."""
+    self_lead = False
+    for d in (person.get("depts") or []):
+        h = dept_head.get(d, "")
+        if not h:
+            continue
+        if h == uid:
+            self_lead = True
+            continue
+        return people.get(h, {}).get("name", "") or "—"
+    return "руководит группой" if self_lead else "—"
+
+
 def _blank() -> dict:
     return {"open": 0, "presale": 0, "presaleSum": 0.0, "real": 0, "realSum": 0.0, "buy": 0.0,
             "late": 0, "lateSum": 0.0, "stale": 0, "dead": 0, "noAmt": 0, "noComp": 0,
@@ -220,7 +364,10 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
     today = as_of or dt.date.today()
     today_iso = today.isoformat()
     people = roster(client)
-    deps = {str(d["ID"]): d.get("NAME", "") for d in client.list_paged("department.get", {})}
+    _deps_raw = client.list_paged("department.get", {})
+    deps = {str(d["ID"]): d.get("NAME", "") for d in _deps_raw}
+    dept_head = {str(d["ID"]): str(d.get("UF_HEAD") or "") for d in _deps_raw}
+    dept_parent = {str(d["ID"]): str(d.get("PARENT") or "") for d in _deps_raw}
     cats = deal_categories(client)
     stage_meta = client.deal_stage_meta()
     catname = lambda c: cats.get(str(c), f"воронка #{c}")
@@ -403,6 +550,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             "uid": uid, "name": p["name"], "pos": p["pos"] or "—",
             "dept": ", ".join(deps.get(x, x) for x in (p.get("depts") or [])) or "—",
             "active": bool(p.get("active")), "why": why_of.get(uid, ""),
+            "boss": _boss_of(uid, p, people, dept_head),
             "open": a["open"], "byField": a["byField"],
             "presale": a["presale"], "presaleSum": _money(a["presaleSum"]), "presaleRaw": round(a["presaleSum"]),
             "real": a["real"], "realSum": _money(a["realSum"]), "realRaw": round(a["realSum"]),
@@ -445,8 +593,17 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
                        if p["active"] and role_of.get(u) == role
                        and not agg[(role, u)]["open"] and not agg[(role, u)]["created"]]
         unc_n, unc_sum = uncovered[role]
+        block_head = find_head(role, people, role_of, deps, dept_head, dept_parent)
+        gaps = head_gaps(role, people, role_of, deps, dept_head)
+        # Руководитель считается ПОДТВЕРЖДЁННЫМ, только когда у всех отделов роли в
+        # Bitrix заполнен руководитель и найденный сам не входит в роль. Иначе это
+        # прокси: правило поднимается по дереву и проскакивает пустой зонтичный отдел,
+        # приземляясь на кого-то выше. Врать в такой строке дороже, чем признать пробел.
+        block_head["confirmed"] = bool(block_head.get("uid")) and not block_head.get("inRole") and not gaps
         return {
             "key": role,
+            "head": block_head,
+            "headGaps": gaps,
             "people": rows,
             "idlePeople": sorted(idle_people, key=lambda x: x["name"]),
             "funnels": [{"cat": catname(c), "catId": c, "n": k, "sum": _money(funnel_sum[role][c]),
@@ -483,6 +640,8 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         }
 
     kam, prod = block("kam"), block("prod")
+    for b in (kam, prod):
+        b["headScore"] = head_scorecard(b, b["people"])
 
     # --- бесхозное: открытые сделки уволенных владельцев
     fired_rows = [row(u, a) for u, a in owner_agg.items()

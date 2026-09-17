@@ -96,12 +96,12 @@ def test_если_с_вкладками_не_успели_базовая_про�
 
 def test_сломанная_вкладка_ловится_и_называется(tmp_path, monkeypatch):
     broken = ('<html><body><div id="tab-sourcing">ок</div><div id="tab-company"></div>'
-              '<div id="tab-kam"><section><div class="secttl">' + vd._TAB_FAIL + '</div></section></div>'
+              '<div id="tab-reps"><section><div class="secttl">' + vd._TAB_FAIL + '</div></section></div>'
               + "<span>наполнитель</span>" * 4000 + "</body></html>")
     _fake_runs(monkeypatch, lambda p: (broken, ""))
     errors, warns = [], []
     vd.check_browser(_page(tmp_path), errors, warns)
-    assert any("kam" in e for e in errors)
+    assert any("reps" in e for e in errors)
 
 
 def test_временный_файл_с_вкладками_не_остаётся_на_диске(tmp_path, monkeypatch):
