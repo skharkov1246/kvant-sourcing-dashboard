@@ -489,6 +489,64 @@ def is_ru(o: dict) -> bool:
     return bool(RU_MARK.search(f"{o.get('org', '')} {o.get('city', '')} {o.get('country', '')}"))
 
 
+# Каналы, которые вообще не адресаты запроса цен. Список закрытый и по домену,
+# а не по признаку: «маркетплейс» носят и Alibaba с made-in-china, куда запрос
+# как раз уходит формой. Эти пять — каталоги применяемости, магазин с заказом из
+# личного кабинета и портал подписки на документацию. Из данных не убираются:
+# как справочники они нужны, в лист запроса — нет.
+NOT_RFQ = {
+    "parts.cat.com": "магазин Caterpillar с заказом из личного кабинета, не адресат запроса цен",
+    "sis2.cat.com": "портал подписки на документацию, запчасти не продаёт",
+    "777parts.net": "справочный каталог применяемости, не продавец",
+    "avspare.com": "справочный каталог применяемости, не продавец",
+    "epcatalogs.com": "продаёт каталоги и ПО, а не запчасти",
+}
+
+
+def host(u: str) -> str:
+    """Домен без www — по нему сводятся дубли и узнаются справочные каталоги."""
+    m = re.search(r"https?://([^/]+)", str(u or "").strip(), re.I)
+    return re.sub(r"^www\.", "", m.group(1).lower()) if m else ""
+
+
+def contacts(slices: dict, org_rows: list) -> dict:
+    """Адрес для запроса цен: почта, форма площадки, язык письма.
+
+    Лист запроса без адреса нерабочий: из 94 иностранных каналов почта была у 36.
+    Здесь адреса добираются по контактным страницам. Правило одно и жёсткое:
+    адрес обязан дословно быть на скачанной странице. Сконструированный по домену
+    «info@<домен>» не адрес, а догадка, и такие в срез не попадали.
+
+    Вердикт «снят» в срезе контактов означает мёртвый сайт или отсутствие
+    адресата вообще — такой канал уходит из листа запроса, но остаётся в данных.
+    """
+    by_org = {}
+    for r in (slices.get("contacts") or {}).get("rows") or []:
+        name = str(r.get("org") or "").strip()
+        if name:
+            by_org[name] = r
+    stat = Counter()
+    for o in org_rows:
+        r = by_org.get(o["org"])
+        if not r:
+            continue
+        if not (o.get("email") or "").strip() and (r.get("email") or "").strip():
+            o["email"] = r["email"].strip()
+            stat["почта добавлена"] += 1
+        o["contact_form"] = r.get("contact_form") or ""
+        o["contact_lang"] = r.get("lang") or ""
+        o["contact_url"] = r.get("url") or ""
+        o["contact_verdict"] = r.get("verdict") or ""
+        o["contact_note"] = r.get("note") or ""
+        if r.get("verdict") == "снят":
+            o["ask"] = False
+            o["ask_off"] = f"канал снят при проверке контактов: {r.get('note') or 'адресата нет'}"
+            stat["снято по контактам"] += 1
+        elif o.get("contact_form"):
+            stat["только форма"] += 1
+    return dict(stat)
+
+
 def orgs(slices: dict) -> list:
     out = []
     for key in ORG_SLICES:
@@ -512,6 +570,36 @@ def orgs(slices: dict) -> list:
         # проверка и делалась. «Сомнителен» из запроса не убираем: запрос и
         # есть способ снять сомнение.
         o["ask"] = not o["ru"] and o.get("verdict") != "снят"
+        if o.get("verdict") == "снят":
+            o["ask_off"] = "снят при проверке: строка не подтвердилась"
+        elif o["ru"]:
+            o["ask_off"] = "решение владельца: русских не рассматриваем"
+        # справочный каталог — не адресат запроса
+        why = NOT_RFQ.get(host(o.get("site")))
+        if why:
+            o["ask"] = False
+            o["ask_off"] = why
+    # Одна организация приходила двумя строками из разных направлений
+    # (Barloworld Mongolia — из дилеров и из торговцев, Tuoxing — с двух страниц
+    # одного сайта). Для картины рынка это безобидно, для листа запроса — два
+    # письма в один адрес. Сводим по домену, оставляя строку с бо́льшим числом
+    # заполненных полей; пустой сайт не сводит ничего.
+    best = {}
+    for o in out:
+        h = host(o.get("site"))
+        if not h:
+            continue
+        filled = sum(1 for v in o.values() if str(v or "").strip())
+        prev = best.get(h)
+        if prev is None or filled > prev[0]:
+            best[h] = (filled, o)
+    keep = {id(v[1]) for v in best.values()}
+    for o in out:
+        h = host(o.get("site"))
+        if h and id(o) not in keep:
+            o["dup_of"] = best[h][1]["org"]
+            o["ask"] = False
+            o["ask_off"] = f"та же организация, что «{best[h][1]['org']}» (один домен {h})"
     return out
 
 
@@ -680,6 +768,7 @@ def build() -> dict:
         prices.append(r)
     tnd = sl.get("tenders") or {}
     flt = faults(sl, parts)
+    cstat = contacts(sl, org_rows)
 
     # Покрытие: без него непонятно, чем ещё нельзя торговать.
     by_node = Counter(p["node"] or "— не определён" for p in parts)
@@ -758,6 +847,16 @@ def build() -> dict:
             "orgs": len(org_rows),
             "orgs_by_kind": dict(Counter(o["kind"] for o in org_rows)),
             "orgs_by_country": dict(Counter(o["country"] for o in org_rows)),
+            "orgs_ask": sum(1 for o in org_rows if o.get("ask")),
+            "orgs_ask_with_email": sum(1 for o in org_rows if o.get("ask") and (o.get("email") or "").strip()),
+            "orgs_ask_form_only": sum(1 for o in org_rows if o.get("ask")
+                                      and not (o.get("email") or "").strip()
+                                      and (o.get("contact_form") or "").strip()),
+            "orgs_ask_no_contact": sum(1 for o in org_rows if o.get("ask")
+                                       and not (o.get("email") or "").strip()
+                                       and not (o.get("contact_form") or "").strip()),
+            "orgs_ask_off": dict(Counter(o.get("ask_off") for o in org_rows if o.get("ask_off"))),
+            "contacts": cstat,
             "prices": len(prices),
             "faults": len(flt),
             "faults_by_node": dict(Counter(f["node"] or "— не определён" for f in flt)),

@@ -28743,7 +28743,8 @@
    "verdict": "исправлен",
    "slice": "dealers",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "Zeppelin Tajikistan",
@@ -28781,7 +28782,8 @@
    "verdict": "исправлен",
    "slice": "dealers",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "Barloworld Mongolia LLC (ранее Wagner Asia Equipment LLC)",
@@ -28800,7 +28802,12 @@
    "verdict": "исправлен",
    "slice": "dealers",
    "ru": false,
-   "ask": true
+   "ask": true,
+   "contact_form": "https://www.barloworld.mn/",
+   "contact_lang": "en",
+   "contact_url": "https://www.barloworld.mn/",
+   "contact_verdict": "подтверждён",
+   "contact_note": "Корень сайта отдаёт 200, но это Next.js-приложение: почты в разметке нет, встроена только форма обратной связи (поля-подсказки на монгольском: \"Овогоо оруулна уу\", \"Утасны дугаараа оруулна уу\", placeholder почты — заглушка \"example@email.com\"). /contact, /en/contact, /mn/holbogdoh — все 404. Прямого адреса у канала нет, запрос уйдёт только формой."
   },
   {
    "org": "Mohamed Abdulrahman Al-Bahar LLC",
@@ -28857,7 +28864,9 @@
    "verdict": "подтверждён",
    "slice": "dealers",
    "ru": false,
-   "ask": true
+   "ask": false,
+   "dup_of": "Lei Shing Hong Machinery Ltd (LSHM)",
+   "ask_off": "та же организация, что «Lei Shing Hong Machinery Ltd (LSHM)» (один домен lsh.com)"
   },
   {
    "org": "China Engineers Limited (CEL), группа Sime Darby",
@@ -28914,7 +28923,12 @@
    "verdict": "подтверждён",
    "slice": "dealers",
    "ru": false,
-   "ask": true
+   "ask": true,
+   "contact_form": "",
+   "contact_lang": "en",
+   "contact_url": "https://www.gainwellindia.com/contact-us/",
+   "contact_verdict": "сомнителен",
+   "contact_note": "HTTP 503 на всех попытках: корень, /contact-us и /contact-us/ через curl, и WebFetch тоже 503. Тело ответа 800-810 байт — заглушка WAF. Страница не открылась, адрес не проверен."
   },
   {
    "org": "Eltrak S.A. (ELTRAK Group)",
@@ -28924,7 +28938,7 @@
    "role": "официальный дилер Caterpillar в Греции (с 1982 г.) и Болгарии; по линии судовых двигателей MaK территория Cat включает KZ, KG, TJ, TM, UZ, AM, AZ, GE, MD, MN, UA",
    "brands": "Caterpillar, MaK",
    "site": "https://eltrak.gr/en/",
-   "email": "",
+   "email": "info@eltrak.gr",
    "phone": "+30 210 8196800",
    "stock": "склады в Греции и Болгарии",
    "note": "ОГОВОРКА ПРОВЕРЕНА И ПОДТВЕРЖДЕНА 16.09.2026, строку держим именно ради неё. Сайт eltrak.gr открывается (200). По локатору дилеров MaK (Caterpillar) территория обслуживания Eltrak (15 Thivaidos St, Неа-Кифисия, Афины, +30 210-8196800) действительно включает Армению, Азербайджан, Грузию, Казахстан, Киргизию, Молдову, Монголию, Таджикистан, Туркменистан, Украину и Узбекистан — плюс Германию, Австрию, Болгарию, Кипр, Чехию, Эстонию, Венгрию, Латвию, Литву, Польшу, Румынию, Словакию, Швейцарию. Но это территория СУДОВЫХ ДВИГАТЕЛЕЙ MaK, а не землеройной и горной техники Cat: по машинам в этих странах дилеры Borusan и Zeppelin. Для R1700G Eltrak не канал. Уточнение по структуре: Caterpillar в Греции представляет ELTRAK, в Болгарии — COLTRAK Bulgaria (с 2006 г.), обе в группе.",
@@ -28933,7 +28947,12 @@
    "verdict": "подтверждён",
    "slice": "dealers",
    "ru": false,
-   "ask": true
+   "ask": true,
+   "contact_form": "",
+   "contact_lang": "en",
+   "contact_url": "https://eltrak.gr/en/",
+   "contact_verdict": "подтверждён",
+   "contact_note": "Дословно с англоязычной главной: \"15 Thivaidos str., 14564, Nea Kifisia , Athens, Greece Tel.: +30210 8196800 Fax: +30210 8078214 E-mail: info@eltrak.gr\"."
   },
   {
    "org": "ООО «Восточная Техника» (ВТ), группа Barloworld",
@@ -28952,7 +28971,8 @@
    "verdict": "исправлен",
    "slice": "dealers",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "ООО «Мантрак Восток» (Mantrac Group, Mansour)",
@@ -28971,7 +28991,8 @@
    "verdict": "подтверждён",
    "slice": "dealers",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "ООО «Цеппелин Русланд» (Zeppelin Russland)",
@@ -28990,7 +29011,8 @@
    "verdict": "подтверждён",
    "slice": "dealers",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "ООО «Амур Машинери» / «Сахалин Машинери»",
@@ -29009,7 +29031,8 @@
    "verdict": "исправлен",
    "slice": "dealers",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "Caterpillar Inc.",
@@ -29028,7 +29051,12 @@
    "verdict": "подтверждён",
    "slice": "dealers",
    "ru": false,
-   "ask": true
+   "ask": true,
+   "contact_form": "https://www.caterpillar.com/en/support/contact.html",
+   "contact_lang": "en",
+   "contact_url": "https://www.caterpillar.com/en/support/contact.html",
+   "contact_verdict": "сомнителен",
+   "contact_note": "HTTP 403 через curl на caterpillar.com и cat.com (тело 409-415 байт, блокировка WAF), WebFetch — таймаут 60 с. Страница не открылась, адрес не проверен. Форма указана по адресу, который пробовали, но её содержимое не подтверждено. Практически: производитель по запросам цен работает через дилера, не напрямую."
   },
   {
    "org": "ООО «ПСК-Новые решения» / Balchug Capital (Давид Амарян)",
@@ -29047,7 +29075,8 @@
    "verdict": "подтверждён",
    "slice": "dealers",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "Cat® Parts Store (parts.cat.com)",
@@ -29066,7 +29095,13 @@
    "verdict": "подтверждён",
    "slice": "dealers",
    "ru": false,
-   "ask": true
+   "ask": false,
+   "ask_off": "магазин Caterpillar с заказом из личного кабинета, не адресат запроса цен",
+   "contact_form": "",
+   "contact_lang": "en",
+   "contact_url": "https://parts.cat.com/",
+   "contact_verdict": "сомнителен",
+   "contact_note": "HTTP 403 через curl. Страница не открылась. По назначению это интернет-магазин с заказом из личного кабинета дилера, а не адресат письма с запросом цены — почты у канала не предполагается."
   },
   {
    "org": "Cat® SIS 2.0 / SIS2GO (sis2.cat.com)",
@@ -29085,7 +29120,13 @@
    "verdict": "подтверждён",
    "slice": "dealers",
    "ru": false,
-   "ask": true
+   "ask": false,
+   "ask_off": "портал подписки на документацию, запчасти не продаёт",
+   "contact_form": "",
+   "contact_lang": "en",
+   "contact_url": "https://sis2.cat.com/",
+   "contact_verdict": "подтверждён",
+   "contact_note": "Страница открылась (200), почтовых адресов в разметке нет вообще. Это портал подписки на техническую документацию со входом в личный кабинет, ни адреса, ни формы коммерческого запроса на нём нет. Для листа запроса цен канал непригоден — убрать."
   },
   {
    "org": "АО «ВЭД Агент» (ИНН 5404454954, ОГРН 1125476021483)",
@@ -29104,7 +29145,8 @@
    "verdict": "исправлен",
    "slice": "dealers",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "ООО «СПК-Импорт» (spkamur.ru)",
@@ -29123,7 +29165,8 @@
    "verdict": "подтверждён",
    "slice": "dealers",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "ООО «Хорошая Техника» (catparts.tech)",
@@ -29142,7 +29185,8 @@
    "verdict": "подтверждён",
    "slice": "dealers",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "caterpillar-russia.com (поставки оборудования и запчастей Caterpillar)",
@@ -29161,7 +29205,8 @@
    "verdict": "снят",
    "slice": "dealers",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "снят при проверке: строка не подтвердилась"
   },
   {
    "org": "ProfiMiner (каталог поставщиков горной техники и запчастей)",
@@ -29180,7 +29225,8 @@
    "verdict": "подтверждён",
    "slice": "dealers",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "ТОО «Hartex»",
@@ -29304,7 +29350,7 @@
    "role": "поставщик оригинальных запчастей Caterpillar (более 30 лет на рынке)",
    "brands": "Caterpillar",
    "site": "https://alburhanspares.com/",
-   "email": "",
+   "email": "sales@alburhanspares.com",
    "phone": "+971 6 539 0953",
    "stock": "магазин № 2, Hassan Baba Hassan Building, Caterpillar Road, Industrial Area 3, Шарджа; рабочие часы Пн-Сб 9:00-17:00",
    "note": "ассортимент по сайту — двигательная и гидравлическая тема: фильтры, форсунки, водяные насосы, ECM/ECU, гидронасосы, поршни, турбокомпрессоры. Ровно то, что расходуется на C11/C15. Публичная почта на сайте персонифицирована, поэтому не приводим — связь по телефону и через форму. Проверено 16.09.2026: сайт открывается (200), адрес подтверждён дословно и в разметке организации — «Shop No 2 Hassan Baba Hassan Building Caterpillar Road Industrial Area 3 Sharjah», раздел Caterpillar Genuine Parts на месте.",
@@ -29313,7 +29359,12 @@
    "verdict": "подтверждён",
    "slice": "dealers",
    "ru": false,
-   "ask": true
+   "ask": true,
+   "contact_form": "",
+   "contact_lang": "en",
+   "contact_url": "https://alburhanspares.com/contact-us/",
+   "contact_verdict": "подтверждён",
+   "contact_note": "Дословно со страницы контактов: \"+971 6 539 0953 +971 56 669 0325 Shop No 2 Hassan Baba Hassan Building Caterpillar Road Industrial Area 3 Sharjah <именной ящик сотрудника — вырезан> sales@alburhanspares.com\". Взят профильный sales@; именные ящики сотрудников на той же странице не выношу — публичный репозиторий."
   },
   {
    "org": "AEI Supplies FZE",
@@ -29408,7 +29459,12 @@
    "verdict": "подтверждён",
    "slice": "dealers",
    "ru": false,
-   "ask": true
+   "ask": true,
+   "contact_form": "https://www.tuoxing.com/contact-us",
+   "contact_lang": "en",
+   "contact_url": "https://www.tuoxing.com/contact-us",
+   "contact_verdict": "подтверждён",
+   "contact_note": "Страница контактов открылась (200). Почта на ней спрятана обфускацией Cloudflare; после раскрытия это именной ящик сотрудника вида имя.фамилия@tuoxingmachinery.com — по правилу публичного репозитория не выношу. Корпоративного ящика (sales@/info@/export@) на сайте нет. Дословно видимая часть: \"Tel: +86-18561032768 E-mail: [email protected]\". Запрос — формой."
   },
   {
    "org": "Snabus.ru",
@@ -29427,7 +29483,8 @@
    "verdict": "подтверждён",
    "slice": "dealers",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "Zahid Tractor & Heavy Machinery Co. Ltd (Zahid Group)",
@@ -29437,7 +29494,7 @@
    "role": "официальный дилер Caterpillar в Саудовской Аравии более 75 лет (с 1950 г.); строительная, горная и энергетическая техника",
    "brands": "Caterpillar",
    "site": "https://www.zahidtractor.com/",
-   "email": "",
+   "email": "inquiry@zahid.com",
    "phone": "",
    "stock": "сеть по Саудовской Аравии; глубина склада по подземной технике не проверена",
    "note": "ДОБАВЛЕНО ПРОВЕРЯЮЩИМ 16.09.2026, потому что это звено меняет картину по «Восточной Технике» и Монголии. Zahid Group — дилер Caterpillar в Саудовской Аравии с 1950 г., и именно он через дочернюю Gulf Falcon Holding вошёл в консорциум, выкупивший Barloworld: Entsha (ЮАР) 51 %, Zahid Group 49 %, сумма ~23 млрд рэндов / 1,3-1,4 млрд долл., сделка закрыта 22.01.2026, делистинг Barloworld с JSE 27.01.2026. Практический смысл: конечным совладельцем российской ООО «Восточная Техника» и монгольской Barloworld Mongolia теперь является действующий дилер Cat из Саудовской Аравии. Это, во-первых, объясняет, почему вопрос BIS по ВТ закрывали до завершения сделки, а во-вторых, даёт ещё один официальный дилерский периметр в той же группе. Прямым каналом на РФ не является и не станет: ни один официальный дилер Cat на российского получателя не отгружает. Контакты не проверял — строку завёл ради связи владения, а не как адрес для запроса.",
@@ -29446,7 +29503,12 @@
    "verdict": "подтверждён",
    "slice": "dealers",
    "ru": false,
-   "ask": true
+   "ask": true,
+   "contact_form": "",
+   "contact_lang": "en",
+   "contact_url": "https://www.zahidtractor.com/contact/",
+   "contact_verdict": "подтверждён",
+   "contact_note": "Дословно со страницы контактов: \"Alternatively, please call our Customer Service Center at (toll free): 800 2444 999 For information on machines, parts, and services please contact: inquiry@zahid.com Head Office Amir Fahad Street P.O Box 8928 Jeddah 21492 Kingdom of Saudi Arabia\". Адрес прямо назван как канал по запчастям."
   },
   {
    "org": "Caterpillar R1700G — статус модели в дилерских каталогах (служебная строка)",
@@ -29465,7 +29527,13 @@
    "verdict": "подтверждён",
    "slice": "dealers",
    "ru": false,
-   "ask": true
+   "ask": false,
+   "contact_form": "",
+   "contact_lang": "",
+   "contact_url": "",
+   "contact_verdict": "снят",
+   "contact_note": "Это служебная строка самого досье, а не организация: поля site нет, адресата не существует. Из листа запроса убрать — писать некому.",
+   "ask_off": "канал снят при проверке контактов: Это служебная строка самого досье, а не организация: поля site нет, адресата не существует. Из листа запроса убрать — писать некому."
   },
   {
    "org": "Costex Tractor Parts (CTP / Costex Corporation)",
@@ -29484,7 +29552,12 @@
    "verdict": "исправлен",
    "slice": "aftermarket",
    "ru": false,
-   "ask": true
+   "ask": true,
+   "contact_form": "https://www.costex.com/contact-us/",
+   "contact_lang": "en",
+   "contact_url": "https://www.costex.com/contact-us/",
+   "contact_verdict": "сомнителен",
+   "contact_note": "HTTP 403 на costex.com, www.costex.com, /contact-us/ и /contact/ через curl (тело ~5,6 КБ — страница блокировки), WebFetch — тоже 403. Страница не открылась, адрес не проверен. Отдельно: сайт ctpparts.com к этой компании не привязан проверкой и корпоративных адресов не содержит — оттуда ничего не брал."
   },
   {
    "org": "Interstate-McBee, LLC",
@@ -29503,7 +29576,12 @@
    "verdict": "исправлен",
    "slice": "aftermarket",
    "ru": false,
-   "ask": true
+   "ask": true,
+   "contact_form": "https://interstate-mcbee.com/contact/",
+   "contact_lang": "en",
+   "contact_url": "https://interstate-mcbee.com/contact-us/",
+   "contact_verdict": "подтверждён",
+   "contact_note": "Страница контактов открылась (200), почтовых адресов на ней нет ни одного — только телефоны: \"Main: 216-881-0015 or 800-321-4234\", региональные продажи (Florida 800-660-6228, Texas 844-836-2841, California 800-522-6163, Nebraska 844-250-2375) и адрес \"Interstate Diesel 4901 Lakeside Ave. Cleveland, OH 44114\". Единственный найденный на сайте ящик стоит на служебной странице при подписи \"Website feedback?\" — это канал замечаний по сайту, а не продаж, в лист не ставлю."
   },
   {
    "org": "IPD (Industrial Parts Depot, LLC)",
@@ -29513,7 +29591,7 @@
    "role": "производитель поршневой группы и гильз для Caterpillar, premium-эконом уровня OEM",
    "brands": "IPD, IPDSteel",
    "site": "https://www.ipdparts.com/applications/caterpillar/",
-   "email": "",
+   "email": "sales@ipdparts.com",
    "phone": "+1 310-530-1900",
    "stock": "склад США; в РФ представителя нет",
    "note": "Поршни (в т.ч. цельностальные IPDSteel, которых нет у Cat), гильзы с патентованным Crevice Seal, кольца, комплекты цилиндров, in-frame/out-of-frame наборы. Отдельная литература по C15 и 3400/C15 — это база двигателя R1700G (C11/C15 ACERT). Уровень OEM-grade и выше по заявлению производителя. || ПРОВЕРКА 17.09.2026: БЫЛО обоснование «литература по C15 и 3400/C15 — это база двигателя R1700G (C11/C15 ACERT)» — неверно по существу: C15 к R1700G отношения не имеет. Проверка страницы применимости IPD показала, что в перечне двигателей есть и C11, и 3176C — то есть ОБА двигателя R1700G (поздний C11 ACERT и ранний 3176C). Вывод сохраняется, но по другой причине; ссылка на литературу C15 из обоснования убрана.",
@@ -29522,7 +29600,12 @@
    "verdict": "исправлен",
    "slice": "aftermarket",
    "ru": false,
-   "ask": true
+   "ask": true,
+   "contact_form": "",
+   "contact_lang": "en",
+   "contact_url": "https://www.ipdparts.com/applications/caterpillar/",
+   "contact_verdict": "подтверждён",
+   "contact_note": "Адрес в машиночитаемой разметке организации на странице раздела Caterpillar, дословно: \"contactPoint\": [{ \"@type\": \"ContactPoint\", \"contactType\": \"Customer Service\", \"email\": \"sales@ipdparts.com\", \"areaServed\": \"Worldwide\", \"availableLanguage\": [\"English\", \"Spanish\"] }]. Назначение и охват заявлены самой компанией."
   },
   {
    "org": "PAI Industries, Inc.",
@@ -29541,7 +29624,12 @@
    "verdict": "исправлен",
    "slice": "aftermarket",
    "ru": false,
-   "ask": true
+   "ask": true,
+   "contact_form": "https://store.paiindustries.com/feedback-forms/new",
+   "contact_lang": "en",
+   "contact_url": "https://pai.com/contact-us",
+   "contact_verdict": "подтверждён",
+   "contact_note": "paiindustries.com/contact-us отдаёт 301 на pai.com/contact-us; на открывшейся странице (200) почтовых адресов нет. Дословно видны телефоны: \"Phone: 770-822-1000 Fax: 770-822-1421\" и бесплатный 1.800.654.3721; форма запроса — по адресу в поле contact_form."
   },
   {
    "org": "Reliance Power Parts (Nivel Heavy Duty)",
@@ -29560,7 +29648,12 @@
    "verdict": "подтверждён",
    "slice": "aftermarket",
    "ru": false,
-   "ask": true
+   "ask": true,
+   "contact_form": "https://www.reliancepowerparts.com/contact-us",
+   "contact_lang": "en",
+   "contact_url": "https://www.reliancepowerparts.com/contact-us",
+   "contact_verdict": "подтверждён",
+   "contact_note": "Страница контактов открылась через curl (200, 77 КБ), ни одного почтового адреса в разметке нет — ни текстом, ни в mailto, ни под обфускацией Cloudflare. Связь только формой. (WebFetch по тому же адресу отдавал 503, страницу забрал curl.)"
   },
   {
    "org": "Weir ESCO (ESCO Group LLC)",
@@ -29570,7 +29663,7 @@
    "role": "мировой производитель износостойкого инструмента (GET) для ковшей погрузчиков и экскаваторов",
    "brands": "ESCO, Ultralok, Nemisys, MaxDRP",
    "site": "https://www.global.weir/product-catalogue/construction-wear-parts/wheel-loader/",
-   "email": "",
+   "email": "info@global.weir",
    "phone": "",
    "stock": "сеть дистрибьюторов Weir; поставок в РФ после 2022 официально нет",
    "note": "Ключевое для ПДМ: зубья и адаптеры ковша колёсного погрузчика, губы Loadmaster, бокорезы, защиты. MaxDRP прямо позиционируется как замена коронок Caterpillar со шкворневым (side-pin) креплением — это система R1700G. Уровень выше OEM по стойкости, цена соответствующая. || ПРОВЕРКА 17.09.2026: БЫЛО «MaxDRP — это система R1700G». Проверено: MaxDRP действительно заявлен как замена коронок Caterpillar со шкворневым (side-pin) креплением, но это линия ESCO для ЭКСКАВАТОРОВ и рыхлителей; для колёсных погрузчиков ESCO ведёт Ultralok и Super V. Какая система стоит на ковше конкретной R1700G — определяется по самому ковшу, а не по марке машины. Строка остаётся полезной, но конкретную систему в запрос вписывать только после осмотра ковша.",
@@ -29579,7 +29672,12 @@
    "verdict": "исправлен",
    "slice": "aftermarket",
    "ru": false,
-   "ask": true
+   "ask": true,
+   "contact_form": "",
+   "contact_lang": "en",
+   "contact_url": "https://www.global.weir/",
+   "contact_verdict": "подтверждён",
+   "contact_note": "Адрес в машиночитаемой разметке организации на корпоративной странице группы, дословно: \"contactPoint\": [ { \"@type\": \"ContactPoint\", \"contactType\": \"Customer Service\", \"telephone\": \"+44-141-637-7111\", \"email\": \"info@global.weir\", \"areaServed\": \"Worldwide\" }. ОГОВОРКА: это общий адрес группы Weir, а не отдела ESCO — сайт esco.weir отдаёт 403 и отдельного адреса ESCO подтвердить не удалось. Письмо придётся адресовать с явным указанием ESCO и модели."
   },
   {
    "org": "Hensley Industries, Inc. (Komatsu Group)",
@@ -29598,7 +29696,12 @@
    "verdict": "подтверждён",
    "slice": "aftermarket",
    "ru": false,
-   "ask": true
+   "ask": true,
+   "contact_form": "https://www.hensleyind.com/contact/",
+   "contact_lang": "en",
+   "contact_url": "https://www.hensleyind.com/contact/",
+   "contact_verdict": "подтверждён",
+   "contact_note": "Страница контактов открылась (200, 129 КБ). Все найденные на ней адреса — именные ящики региональных менеджеров вида имя.фамилия@hensleyind.com, привязанные к карте территорий (\"tooltipContent\":\"<Имя Фамилия> - <адрес>\"); по правилу публичного репозитория не выношу. Общего корпоративного ящика (sales@/info@) на сайте нет, /contact-us/ и /company/ отдают 404. Запрос — формой."
   },
   {
    "org": "Metalogenia S.A. (MTG)",
@@ -29608,7 +29711,7 @@
    "role": "испанский производитель GET и систем защиты ковша, патентованные зубья и адаптеры",
    "brands": "MTG, MTG Systems, ProMet, StarMet",
    "site": "https://mtgcorp.com/en/",
-   "email": "",
+   "email": "info@mtgcorp.com",
    "phone": "+34 93 741 70 00",
    "stock": "300+ дилеров в 60 странах; отдельный офис США (+1 281 872 15 00); поставки в РФ — через третьи страны",
    "note": "Зубья, адаптеры, защита кромки и бортов ковша, бронеэлементы для горной и строительной техники. Прямо заявлена совместимость с оригинальными стойками рыхлителя Caterpillar. Собственная марка стали (MTG Steels) и своё литьё — уровень OEM-grade. || ПРОВЕРКА 17.09.2026: Компания подтверждена: Metalogenia S.A., завод в Монсоне, 280+ сотрудников, 300+ дилеров в 60 странах, офис и склад в Хьюстоне, филиалы в Шанхае и Чили. ИСПРАВЛЕНО: совместимость заявлена с ОРИГИНАЛЬНЫМИ АДАПТЕРАМИ Caterpillar, а не «со стойками рыхлителя». Система StarMet покрывает погрузчики 9–350 т (R1700G, 39 т, попадает), ProMet — защита ковша.",
@@ -29617,7 +29720,12 @@
    "verdict": "исправлен",
    "slice": "aftermarket",
    "ru": false,
-   "ask": true
+   "ask": true,
+   "contact_form": "",
+   "contact_lang": "en",
+   "contact_url": "https://mtgcorp.com/en/",
+   "contact_verdict": "подтверждён",
+   "contact_note": "Дословно с англоязычной страницы: \"Something went wrong. If the error persists, please contact directly to info@mtgcorp.com\". ОГОВОРКА: адрес взят из служебного текста подсказки конфигуратора, а не из блока «Контакты» — как канал продаж прямо не назван, хотя домен и форма записи корпоративные."
   },
   {
    "org": "Combi Wear Parts AB",
@@ -29655,7 +29763,12 @@
    "verdict": "подтверждён",
    "slice": "aftermarket",
    "ru": false,
-   "ask": true
+   "ask": true,
+   "contact_form": "",
+   "contact_lang": "en",
+   "contact_url": "https://www.usco.it/en/",
+   "contact_verdict": "сомнителен",
+   "contact_note": "Домен живой (usco.it разрешается в 77.89.29.89), но страница не открылась ни одним способом: curl падает с \"curl: (60) SSL certificate problem: unable to get local issuer certificate\" (в том числе с явным CA-бандлом), WebFetch отдаёт HTTP 503. Адрес не проверен."
   },
   {
    "org": "Italtractor ITM S.p.A. (ITM Group)",
@@ -29674,7 +29787,8 @@
    "verdict": "снят",
    "slice": "aftermarket",
    "ru": false,
-   "ask": false
+   "ask": false,
+   "ask_off": "снят при проверке: строка не подтвердилась"
   },
   {
    "org": "Berco S.p.A. (thyssenkrupp Forged Technologies)",
@@ -29712,7 +29826,12 @@
    "verdict": "исправлен",
    "slice": "aftermarket",
    "ru": false,
-   "ask": true
+   "ask": true,
+   "contact_form": "",
+   "contact_lang": "es",
+   "contact_url": "https://www.blumaq.com/",
+   "contact_verdict": "сомнителен",
+   "contact_note": "Домен живой (blumaq.com разрешается в 213.4.83.172), но страница не открылась: curl падает с \"curl: (60) SSL certificate problem: unable to get local issuer certificate\" (в том числе с явным CA-бандлом), WebFetch отдаёт HTTP 503. Адрес не проверен."
   },
   {
    "org": "Baldwin Filters (подразделение Parker Hannifin)",
@@ -29731,7 +29850,12 @@
    "verdict": "исправлен",
    "slice": "aftermarket",
    "ru": false,
-   "ask": true
+   "ask": true,
+   "contact_form": "",
+   "contact_lang": "en",
+   "contact_url": "https://www.baldwinfilters.com/contact-us",
+   "contact_verdict": "сомнителен",
+   "contact_note": "HTTP 403 через curl на корне; /contact-us отдаёт 301 на http://www.baldwinfilters.com/contact-us.html, который через WebFetch тоже 403. Страница не открылась, адрес не проверен."
   },
   {
    "org": "Donaldson Company, Inc.",
@@ -29750,7 +29874,12 @@
    "verdict": "исправлен",
    "slice": "aftermarket",
    "ru": false,
-   "ask": true
+   "ask": true,
+   "contact_form": "https://www.donaldson.com/en-us/about-us/contact-us/",
+   "contact_lang": "en",
+   "contact_url": "https://www.donaldson.com/en-us/about-us/contact-us/",
+   "contact_verdict": "подтверждён",
+   "contact_note": "Страница контактов открылась (200, 170 КБ), почтовых адресов нет ни одного. Дословно виден только почтовый адрес штаб-квартиры: \"1400 W 94th Street, Bloomington, MN 55431\"; связь — формой по ссылке /en/contact/."
   },
   {
    "org": "Fleetguard (Atmus Filtration Technologies, ранее Cummins Filtration)",
@@ -29769,7 +29898,12 @@
    "verdict": "исправлен",
    "slice": "aftermarket",
    "ru": false,
-   "ask": true
+   "ask": true,
+   "contact_form": "https://www.fleetguard.com/getsupport",
+   "contact_lang": "en",
+   "contact_url": "https://www.atmus.com/contact-us",
+   "contact_verdict": "подтверждён",
+   "contact_note": "Сайт материнской Atmus открылся (200). Дословно со страницы: \"Fleetguard support: Get support here.\" со ссылкой на https://www.fleetguard.com/getsupport (проверено отдельно — 200). Почтовые адреса на странице есть, но только непрофильные: пресс-служба и отношения с инвесторами (последний — именной ящик руководителя), в лист не ставлю. Корпоративного адреса продаж/поддержки на сайте нет, запрос — формой."
   },
   {
    "org": "WIX Filters",
@@ -29788,7 +29922,12 @@
    "verdict": "исправлен",
    "slice": "aftermarket",
    "ru": false,
-   "ask": true
+   "ask": true,
+   "contact_form": "https://www.wixfilters.com/en-us/contact-us.html",
+   "contact_lang": "en",
+   "contact_url": "https://www.wixfilters.com/en-us/contact-us.html",
+   "contact_verdict": "подтверждён",
+   "contact_note": "Страница контактов открылась (200), почты нет. Дословно: \"1 WIX Way P.O. Box 1967 Gastonia, NC 28054 U.S. Product & Customer Service: 800-949-6698\" и \"Complete the form below, and we will get back to you soon with the information you need.\" Связь — формой."
   },
   {
    "org": "MANN+HUMMEL GmbH",
@@ -29807,7 +29946,12 @@
    "verdict": "исправлен",
    "slice": "aftermarket",
    "ru": false,
-   "ask": true
+   "ask": true,
+   "contact_form": "https://www.mann-hummel.com/en/contact.html",
+   "contact_lang": "en",
+   "contact_url": "https://www.mann-hummel.com/en/contact/",
+   "contact_verdict": "подтверждён",
+   "contact_note": "Страница контактов открылась (200, 177 КБ), почтовых адресов нет. Виден только телефон штаб-квартиры \"+49 7141 98-0\" в подвале; сайт направляет на форму по адресу в поле contact_form. Немецкая компания, но англоязычная версия сайта полная — писать можно по-английски."
   },
   {
    "org": "Luber-finer (Champion Laboratories / First Brands Group)",
@@ -29826,7 +29970,8 @@
    "verdict": "снят",
    "slice": "aftermarket",
    "ru": false,
-   "ask": false
+   "ask": false,
+   "ask_off": "снят при проверке: строка не подтвердилась"
   },
   {
    "org": "Hengst SE",
@@ -29845,7 +29990,12 @@
    "verdict": "исправлен",
    "slice": "aftermarket",
    "ru": false,
-   "ask": true
+   "ask": true,
+   "contact_form": "https://www.hengst.com/en/contact",
+   "contact_lang": "en",
+   "contact_url": "https://www.hengst.com/en/contact",
+   "contact_verdict": "подтверждён",
+   "contact_note": "Страница контактов открылась (200, 675 КБ), корпоративных почтовых адресов в разметке нет — ни текстом, ни в mailto, ни под обфускацией Cloudflare. Единственные совпадения по символу @ — это имена пунктов меню сайта (\"MyAirfiltration.com\", \"Passive oil mist separator Blue.net\"), не адреса. Связь только формой."
   },
   {
    "org": "SAKURA Filter",
@@ -29855,7 +30005,7 @@
    "role": "бренд фильтров индонезийского производства, широко представлен в кросс-листах по Caterpillar",
    "brands": "SAKURA",
    "site": "https://www.sakurafilter.com/",
-   "email": "",
+   "email": "sales.marketing@adr-group.com",
    "phone": "",
    "stock": "производство и склады в Азии; в РФ через азиатские каналы",
    "note": "По кросс-листу Caterpillar закрывает воздушную группу R1700G: 6I-2510 -> A5563, 132-7167 -> A5564, 231-0167 -> A8506 (кабина). По топливу, маслу и гидравлике в листе не заявлен. Юрлицо и завод под этой маркой не проверены — нужна сверка перед закупкой. || ПРОВЕРКА 17.09.2026: ИСТОЧНИК ОКАЗАЛСЯ НЕ ТЕМ. Документ Caterpillar CM20231004 скачан и разобран (4 страницы, 11 841 знак). Его название — «CAT FILTERS. FIND THE RIGHT CAT FILTER TO REPLACE A COMPETITOR. APPLICATION GUIDE», но по содержанию это инструкция по пользованию онлайн-подборщиком Cat плюс таблица «MOVE UP FOR INCREASED FILTER EFFICIENCY» — переход между СОБСТВЕННЫМИ фильтрами Cat (Standard -> Advanced -> Ultra-High Efficiency). В документе НЕТ НИ ОДНОГО названия стороннего бренда (проверено поиском по Baldwin, Donaldson, Fleetguard, WIX, MANN, Luber-finer, Hengst, Sakura, HIFI, Fram, Purolator — ноль совпадений) и НЕТ НИ ОДНОГО из кросс-номеров, приписанных ему в этом срезе (проверено по всем ~50 номерам — ноль совпадений). Утверждение «применимость доказана документом изготовителя оборудования» снято по всем восьми фильтровым строкам. ПЛЮС ИСПРАВЛЕНА СТРАНА И ВЛАДЕЛЕЦ. БЫЛО «японский бренд, JP». На самом деле SAKURA — марка индонезийской PT Selamat Sempurna Tbk (группа ADR), производство в Северной Джакарте и Бантене, мощность около 96 млн изделий в год, марка зарегистрирована в 100+ странах. Официальный сайт — sakurafilter.com; указанный в строке sakura-filter.com их сайтом не является (на обращение отдал 503). Кросс A5563 <-> 6I-2510 подтверждён. Исходная оговорка «юрлицо и завод не проверены» закрыта — юрлицо установлено.",
@@ -29864,7 +30014,12 @@
    "verdict": "исправлен",
    "slice": "aftermarket",
    "ru": false,
-   "ask": true
+   "ask": true,
+   "contact_form": "",
+   "contact_lang": "en",
+   "contact_url": "https://www.sakurafilter.com/contact",
+   "contact_verdict": "подтверждён",
+   "contact_note": "Дословно со страницы контактов: \"Sales & Marketing Division Head Office Komplek Industri ADR Desa Kadujaya, Curug Tangerang, Banten INDONESIA Phone : (62-21) 5949 2169 (Hunting) Fax : (62-21) 5949 2168 Email : sales.marketing@adr-group.com\". Ящик отдела, не сотрудника; домен adr-group.com — головная группа ADR, владелец марки Sakura."
   },
   {
    "org": "HIFI FILTER (группа SOFIMA)",
@@ -29883,7 +30038,12 @@
    "verdict": "исправлен",
    "slice": "aftermarket",
    "ru": false,
-   "ask": true
+   "ask": true,
+   "contact_form": "https://www.hifi-filter.com/en/contact",
+   "contact_lang": "en",
+   "contact_url": "https://www.hifi-filter.com/en/contact",
+   "contact_verdict": "подтверждён",
+   "contact_note": "Страница контактов открылась (200, 207 КБ), почтовых адресов нет ни одного. Сайт предлагает только форму: в подвале ссылка \"Contactez-nous\" ведёт на ту же форму (французская версия — https://hifi-filter.com/fr/contact/). Связь формой."
   },
   {
    "org": "Parker Hannifin Corporation",
@@ -29902,7 +30062,12 @@
    "verdict": "подтверждён",
    "slice": "aftermarket",
    "ru": false,
-   "ask": true
+   "ask": true,
+   "contact_form": "",
+   "contact_lang": "en",
+   "contact_url": "https://www.parker.com/",
+   "contact_verdict": "сомнителен",
+   "contact_note": "HTTP 403 через curl на parker.com и на ph.parker.com/us/en/contact-us; WebFetch по /us/en/support/contact-us.html — тоже 403. Страница не открылась, адрес не проверен."
   },
   {
    "org": "HYDAC International GmbH",
@@ -29921,7 +30086,12 @@
    "verdict": "исправлен",
    "slice": "aftermarket",
    "ru": false,
-   "ask": true
+   "ask": true,
+   "contact_form": "",
+   "contact_lang": "de",
+   "contact_url": "https://www.hydac.com/",
+   "contact_verdict": "сомнителен",
+   "contact_note": "HTTP 403 через curl на hydac.com, /en-us/contact-us.html и hydac.de/kontakt (тело 553 байта — заглушка WAF); WebFetch по /en-us/contact.html — 404. Страница не открылась, адрес не проверен."
   },
   {
    "org": "Trelleborg Sealing Solutions",
@@ -29940,7 +30110,12 @@
    "verdict": "подтверждён",
    "slice": "aftermarket",
    "ru": false,
-   "ask": true
+   "ask": true,
+   "contact_form": "https://www.trelleborg.com/en/about-us/contact-us",
+   "contact_lang": "en",
+   "contact_url": "https://www.trelleborg.com/en/about-us/contact-us",
+   "contact_verdict": "подтверждён",
+   "contact_note": "Страница контактов открылась (200, 158 КБ). Все почтовые адреса на ней — именные ящики сотрудников отделов по связям с инвесторами и прессой, записанные в виде \"имя.фамилия(at)trelleborg.com\" (дословный пример подписи: \"Vice President Investor Relations\"); по правилу публичного репозитория не выношу, и к закупке запчастей они всё равно не относятся. Отдельные страницы /en/seals/contact и /en/seals/about-us/contact-us отдают 404. Связь — формой."
   },
   {
    "org": "Gates Corporation",
@@ -29959,7 +30134,12 @@
    "verdict": "исправлен",
    "slice": "aftermarket",
    "ru": false,
-   "ask": true
+   "ask": true,
+   "contact_form": "",
+   "contact_lang": "en",
+   "contact_url": "https://www.gates.com/",
+   "contact_verdict": "сомнителен",
+   "contact_note": "HTTP 403 через curl. Дословно из тела ответа: \"Attention Required! | Cloudflare ... Sorry, you have been blocked You are unable to access gates.com\". Страница не открылась, адрес не проверен."
   },
   {
    "org": "Kastaş Sealing Technologies A.Ş.",
@@ -29969,7 +30149,7 @@
    "role": "турецкий производитель гидравлических и пневматических уплотнений полного цикла",
    "brands": "Kastas, SmartSeal, K-Flon",
    "site": "https://www.kastas.com/en",
-   "email": "",
+   "email": "info@kastas.com",
    "phone": "",
    "stock": "производство Измир — новый корпус 55 000 кв. м (склад внутри 4 200 кв. м); европейский логистический центр Гамбург (с 2014) и центр продаж/поддержки Квикборн, Германия",
    "note": "10 000+ стандартных уплотнений, направление — строительная, горная и сельхозтехника. Полный цикл: смесь резины, термопласты, пресс-формы, ИСО 9001 и TS/16949, FEA-расчёт. Для R1700G это ремкомплекты гидроцилиндров и вращающихся соединений — подбор по посадкам. Экспорт больше 50 %. || ПРОВЕРКА 17.09.2026: ИСПРАВЛЕНЫ ТРИ ЧАСТНОСТИ. Площадка в Измире — 55 000 кв. м нового корпуса (было 40 000), все производственные подразделения сведены под одну крышу, складская часть 4 200 кв. м. Европейский склад — не абстрактная «Германия», а логистический центр в ГАМБУРГЕ (открыт 2014) плюс сервис и продажи в Квикборне. Отгрузка за 24 часа не подтверждена — цифру из строки убрать до подтверждения письмом. Профиль (полный цикл, гидравлические и пневматические уплотнения, горная и строительная техника) подтверждён.",
@@ -29978,7 +30158,12 @@
    "verdict": "исправлен",
    "slice": "aftermarket",
    "ru": false,
-   "ask": true
+   "ask": true,
+   "contact_form": "",
+   "contact_lang": "en",
+   "contact_url": "https://www.kastas.com/contact-us",
+   "contact_verdict": "подтверждён",
+   "contact_note": "Адрес спрятан обфускацией Cloudflare, после раскрытия — info@kastas.com. Дословно окружение на странице контактов: \"İdari: Atatürk Plastik OSB 1.Cadde No:6 35660 Menemen / IZMIR / TURKEY T : +90 (232) 397 60 00 F : +90 (232) 502 25 28 E : [email protected]\" — это блок головного офиса в Измире. На той же странице есть europe@kastas.com (дочерняя Kastas Sealing Technologies Europe GmbH, Quickborn, Германия) — запасной вариант, если нужен европейский склад."
   },
   {
    "org": "Megatech Construction Machinery Spare Parts Ltd. (ранее Yesilova)",
@@ -30035,7 +30220,12 @@
    "verdict": "исправлен",
    "slice": "aftermarket",
    "ru": false,
-   "ask": true
+   "ask": true,
+   "contact_form": "",
+   "contact_lang": "tr",
+   "contact_url": "https://www.valuepart.com/",
+   "contact_verdict": "сомнителен",
+   "contact_note": "Домен не разрешается из этой сети: DNS отдаёт \"Temporary failure in name resolution\" на valuepart.com и www.valuepart.com, прокси на CONNECT отвечает 502 и по https, и по http. Соседние домены (usco.it, blumaq.com) при этом разрешаются, то есть дело не в самом резолвере. Похоже, что сайт не работает, но подтвердить NXDOMAIN однозначно не удалось — перед снятием канала перепроверить из обычной сети."
   },
   {
    "org": "Stoparts Ltd.",
@@ -30073,7 +30263,12 @@
    "verdict": "исправлен",
    "slice": "aftermarket",
    "ru": false,
-   "ask": true
+   "ask": true,
+   "contact_form": "https://seigomachinery.com/contact-us/",
+   "contact_lang": "en",
+   "contact_url": "https://seigomachinery.com/contact-us/",
+   "contact_verdict": "подтверждён",
+   "contact_note": "Страница контактов открылась (200). Корпоративного ящика вида sales@/info@ нет: опубликованы только личные ящики сотрудников — один на своём домене по имени, и рядом с ним, дословно в одном блоке \"E-mail ... Whatsapp Number +1 7789982348 +86 13160822969\", ещё два на gmail.com и hotmail.com. Публиковать их в открытом репозитории нельзя, и как корпоративный канал они не годятся. Запрос — формой."
   },
   {
    "org": "Ningbo Sanjin Engineering Machinery Co., Ltd (NBSJ)",
@@ -30083,7 +30278,7 @@
    "role": "литейный завод GET: зубья и адаптеры ковша, в т.ч. систем Caterpillar",
    "brands": "NBSJ",
    "site": "https://www.nbsj-get.com/",
-   "email": "",
+   "email": "eric@nbsj-get.com",
    "phone": "+86 574 82830922",
    "stock": "собственный завод 36 000 кв. м, 8 000 т/год; экспорт в Россию, Казахстан, Монголию и 55+ стран",
    "note": "Льют по выплавляемым моделям (lost wax investment casting) зубья Cat J-серии (в каталоге, например, 1U3352RC и 9W8552RC), адаптеры, зубья рыхлителя, режущие кромки. Для R1700G это расходник номер один: зубья и адаптеры ковша. Экспорт в РФ/КЗ заявлен прямо — значит есть отработанная логистика и документы. Уровень — эконом/средний, стойкость ниже ESCO, цена в разы ниже. Публичный контакт на сайте — личный адрес менеджера, поэтому не приведён: писать через форму на сайте или на общий ящик, запрошенный отдельно. || ПРОВЕРКА 17.09.2026: Подтверждено по их сайту: собственная литейка, участок 36 000 кв. м, годовая мощность 8 000 т, литьё по выплавляемым моделям с полным описанием передела (восковка — сборка блока — оболочка — прокалка — входной химконтроль — заливка — выбивка — газовая резка — зачистка — ТЕРМООБРАБОТКА — дробеструйка — контроль — окраска), специализация на GET более 15 лет, экспорт в 55+ стран. НЕ ПОДТВЕРЖДЕНО: адресный экспорт именно в Россию, Казахстан и Монголию — цифра 55+ стран есть, поимённого списка нет. Для оценки логистики в РФ это надо спросить письмом, а не считать доказанным.",
@@ -30092,7 +30287,12 @@
    "verdict": "подтверждён",
    "slice": "aftermarket",
    "ru": false,
-   "ask": true
+   "ask": true,
+   "contact_form": "https://www.nbsj-get.com/contact-us",
+   "contact_lang": "en",
+   "contact_url": "https://www.nbsj-get.com/contact-us",
+   "contact_verdict": "подтверждён",
+   "contact_note": "Дословно со страницы \"Contact Us\": \"Phone +86-574-82830922 E-mail: eric@nbsj-get.com\". ОГОВОРКА: это единственный адрес, который компания публикует как свой контактный, и он на её собственном домене, но ящик именной (имя без фамилии), не отдела. Если письмо уйдёт в пустоту — дублировать формой по тому же адресу страницы."
   },
   {
    "org": "Jining Kunhang Hydraulic Machinery Co., Ltd.",
@@ -30111,7 +30311,12 @@
    "verdict": "сомнителен",
    "slice": "aftermarket",
    "ru": false,
-   "ask": true
+   "ask": true,
+   "contact_form": "https://jnkunhang.en.made-in-china.com/contact-info.html",
+   "contact_lang": "en",
+   "contact_url": "https://jnkunhang.en.made-in-china.com/contact-info.html",
+   "contact_verdict": "подтверждён",
+   "contact_note": "Витрина на made-in-china.com. Страница «Contact Info» открылась (200), прямой почты поставщика на ней нет и по устройству площадки не бывает: контакты закрыты, связь идёт только через форму запроса («Contact Now» / «Send Inquiry») внутри made-in-china.com. Канал рабочий, но письмом с вложением ТЗ им не воспользоваться — нужен аккаунт на площадке."
   },
   {
    "org": "Jining Haochang Group Co., Ltd.",
@@ -30130,7 +30335,12 @@
    "verdict": "исправлен",
    "slice": "aftermarket",
    "ru": false,
-   "ask": true
+   "ask": true,
+   "contact_form": "https://haochanggroup.en.made-in-china.com/contact-info.html",
+   "contact_lang": "en",
+   "contact_url": "https://haochanggroup.en.made-in-china.com/contact-info.html",
+   "contact_verdict": "подтверждён",
+   "contact_note": "Витрина на made-in-china.com. Страница «Contact Info» открылась (200), прямой почты поставщика на ней нет и по устройству площадки не бывает: контакты закрыты, связь идёт только через форму запроса («Contact Now» / «Send Inquiry») внутри made-in-china.com. Канал рабочий, но письмом с вложением ТЗ им не воспользоваться — нужен аккаунт на площадке."
   },
   {
    "org": "Quanzhou Fuwei Machinery Co., Ltd",
@@ -30149,7 +30359,12 @@
    "verdict": "сомнителен",
    "slice": "aftermarket",
    "ru": false,
-   "ask": true
+   "ask": true,
+   "contact_form": "https://fwmach.en.made-in-china.com/contact-info.html",
+   "contact_lang": "en",
+   "contact_url": "https://fwmach.en.made-in-china.com/contact-info.html",
+   "contact_verdict": "подтверждён",
+   "contact_note": "Витрина на made-in-china.com. Страница «Contact Info» открылась (200), прямой почты поставщика на ней нет и по устройству площадки не бывает: контакты закрыты, связь идёт только через форму запроса («Contact Now» / «Send Inquiry») внутри made-in-china.com. Канал рабочий, но письмом с вложением ТЗ им не воспользоваться — нужен аккаунт на площадке."
   },
   {
    "org": "Hangzhou Henli Friction Material Co., Ltd.",
@@ -30168,7 +30383,13 @@
    "verdict": "подтверждён",
    "slice": "aftermarket",
    "ru": false,
-   "ask": true
+   "ask": false,
+   "contact_form": "",
+   "contact_lang": "zh",
+   "contact_url": "http://www.hzhlmc.com/eindex.asp",
+   "contact_verdict": "снят",
+   "contact_note": "Домен мёртв: DNS не знает ни www.hzhlmc.com (\"Name or service not known\"), ни hzhlmc.com (\"No address associated with hostname\"). Ни по http, ни по https соединение не устанавливается. Канал убрать из листа запроса.",
+   "ask_off": "канал снят при проверке контактов: Домен мёртв: DNS не знает ни www.hzhlmc.com (\"Name or service not known\"), ни hzhlmc.com (\"No address associated with hostname\"). Ни по http, ни по https соединение не устанавливается. Канал убрать из листа запроса."
   },
   {
    "org": "FRICWEL AUTOMOTIVE LIMITED",
@@ -30178,7 +30399,7 @@
    "role": "производитель фрикционных материалов с 1992, есть готовые позиции под номера Caterpillar",
    "brands": "Fricwel",
    "site": "https://www.fricwelauto.com/",
-   "email": "",
+   "email": "sales@fricwelauto.com",
    "phone": "",
    "stock": "завод 24 000 кв. м (Xiaoshan, Ханчжоу, No. 302-34 Renmin Rd., Chengxiang Street, 311203); рынки включают Восточную Европу; есть русскоговорящий менеджер",
    "note": "В каталоге прямо есть фрикционные диски под номера Caterpillar (например карточки 1P4110 и мокрый тормозной/трансмиссионный диск 551717). MOQ 100–300 шт. на позицию, срок 1 мес в низкий сезон и 1–3 мес в высокий — для R1700G это закупка партией на парк, а не на одну машину. Наличие русскоязычного менеджера снижает трение переписки. || ПРОВЕРКА 17.09.2026: Подтверждено: производство фрикционных материалов с 1992, собственная площадка в Сяошане, отдельный корпоративный сайт fricwelauto.com (в строке стояла только витрина на made-in-china). Каталожная карточка фрикционного диска под Caterpillar 1P4110 подтверждена. УТОЧНЕНО: производственная площадь 24 000 кв. м (было «25 000+»), переезд в этот корпус — 2008. MOQ 100–300 шт. и срок 1–3 мес. остаются словами поставщика — запрашивать письменно.",
@@ -30187,7 +30408,12 @@
    "verdict": "подтверждён",
    "slice": "aftermarket",
    "ru": false,
-   "ask": true
+   "ask": true,
+   "contact_form": "",
+   "contact_lang": "en",
+   "contact_url": "https://www.fricwelauto.com/",
+   "contact_verdict": "подтверждён",
+   "contact_note": "Дословно из блока контактов на главной: \"Contact us Xianghu, Xiaoshan, Hangzhou 311203, China. +86-0571- 8239 1193 sales@fricwelauto.com\". Профильный корпоративный ящик продаж на своём домене."
   },
   {
    "org": "Jiangxi Aili New Material Technology Co., Ltd. (Aili, Ичунь)",
@@ -30197,7 +30423,7 @@
    "role": "литейный завод GET, зубья ковша под системы Caterpillar (J-серия)",
    "brands": "Aili",
    "site": "https://www.ailiget.com/",
-   "email": "",
+   "email": "export@ailicasting.com",
    "phone": "",
    "stock": "40 лет литейного опыта, мощность 24 000 т/год, порты Нинбо и Шанхай",
    "note": "Зубья ковша ковкой и точным литьём под Caterpillar J-серию (в карточке — J200 для мини-экскаватора), режущие элементы. Для R1700G нужен крупный типоразмер, поэтому запрашивать именно погрузочную серию под коронки Cat со шкворнем. Уровень эконом, контроль качества — по образцам. На странице указан только мобильный номер менеджера, поэтому не приведён: выходить через форму на сайте. || ПРОВЕРКА 17.09.2026: ИСПРАВЛЕНО НАЗВАНИЕ И РАСШИРЕН ВЫВОД. Полное имя — Jiangxi Aili New Material Technology Co., Ltd. (сайты ailiget.com и ailiparts.com), а не «Aili (Yichun) precision casting». Подтверждено: основана в 1980, около 40 лет литейного опыта, площадь 110 000 кв. м, 200+ сотрудников, мощность 24 000 т/год, экспорт в 100+ стран, склад 20 000 кв. м и 3 000 позиций в наличии. ГЛАВНОЕ ДЛЯ НАС: оговорка «в карточке только J200 для мини-экскаватора, нужен крупный типоразмер» снята — у Aili есть весь ряд системы Cat J: J200, J220, J250, J300, J350 и J700 HD, а также адаптеры (1U0307 под J300) и угловые адаптеры 8E5308/8E5309. Крупные типоразмеры под ковш ПДМ в номенклатуре есть; конкретный размер определять по ковшу.",
@@ -30206,7 +30432,12 @@
    "verdict": "исправлен",
    "slice": "aftermarket",
    "ru": false,
-   "ask": true
+   "ask": true,
+   "contact_form": "",
+   "contact_lang": "en",
+   "contact_url": "https://www.ailiget.com/",
+   "contact_verdict": "подтверждён",
+   "contact_note": "Дословно с главной: \"Protector Contact Us E-mail: export@ailicasting.com Phone: +8613677950055\". На странице /contact-us тот же адрес перечислен в блоке \"Email <именной ящик сотрудника — вырезан> export@ailicasting.com sales01@baumaparts.com sales02@baumaparts.com sales03@baumaparts.com\". Взят export@ как профильный на собственном домене; ящики sales01..03@baumaparts.com — вторая торговая марка той же группы, именной ящик сотрудника не выношу."
   },
   {
    "org": "ООО «Техно-ГМ»",
@@ -30225,7 +30456,8 @@
    "verdict": "подтверждён",
    "slice": "aftermarket",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "АО «Уральский завод РТИ» (Урал-РТИ)",
@@ -30244,7 +30476,8 @@
    "verdict": "",
    "slice": "aftermarket",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "ООО ТД «РВД»",
@@ -30263,7 +30496,8 @@
    "verdict": "",
    "slice": "aftermarket",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "ГК «Гидроимпульс»",
@@ -30282,7 +30516,8 @@
    "verdict": "",
    "slice": "aftermarket",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "ООО «Завод Таланмаш»",
@@ -30301,7 +30536,8 @@
    "verdict": "",
    "slice": "aftermarket",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "КРПМС (Калугаремпутьмаш-Сервис)",
@@ -30320,7 +30556,8 @@
    "verdict": "",
    "slice": "aftermarket",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "ЗАО «Шахтинский завод Гидропривод»",
@@ -30339,7 +30576,8 @@
    "verdict": "",
    "slice": "aftermarket",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "ГК «Профессионал» (Проф-ДСТ)",
@@ -30358,7 +30596,8 @@
    "verdict": "",
    "slice": "aftermarket",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "Технопарк «Импульс»",
@@ -30377,7 +30616,8 @@
    "verdict": "",
    "slice": "aftermarket",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "ООО «Армет» (Armet Group)",
@@ -30396,7 +30636,8 @@
    "verdict": "подтверждён",
    "slice": "aftermarket",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "ООО «УралГидроКомплект»",
@@ -30415,7 +30656,8 @@
    "verdict": "",
    "slice": "aftermarket",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "ООО «Кентек»",
@@ -30434,7 +30676,8 @@
    "verdict": "",
    "slice": "aftermarket",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "ООО «Невский фильтр»",
@@ -30453,7 +30696,8 @@
    "verdict": "",
    "slice": "aftermarket",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "ООО «Экофил» (EKOFIL)",
@@ -30472,7 +30716,8 @@
    "verdict": "подтверждён",
    "slice": "aftermarket",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "СОАО «ДИФА» (DIFA)",
@@ -30482,7 +30727,7 @@
    "role": "белорусский завод фильтров полного цикла (проектирование — производство — поставка)",
    "brands": "DIFA",
    "site": "https://difa.by/",
-   "email": "",
+   "email": "sales@difa.by",
    "phone": "",
    "stock": "завод Витебск; в РФ официальный поставщик «ДИФА-АВК» (difa-avk.ru)",
    "note": "1000+ типов фильтров и фильтроэлементов по воздуху, топливу, маслу и рабочей жидкости гидросистем; в каталоге есть позиции с указанием аналога Caterpillar. Для R1700G это доступный в ЕАЭС канал без ВЭД: расчёт в рублях, доставка за дни. Конкретное соответствие нашему набору фильтров нужно проверить по их подборщику. || ПРОВЕРКА 17.09.2026: ИСПРАВЛЕНЫ ЦИФРЫ И УТОЧНЁН СТАТУС. СОАО «ДИФА» — российско-белорусское совместное предприятие, крупнейший производитель фильтров в Белоруссии, Витебск; система качества сертифицирована по IATF 16949; собственная аккредитованная испытательная лаборатория со сравнительными испытаниями против оригиналов. Номенклатура — 800+ типов фильтров и фильтроэлементов (в строке было «1000+»). В каталоге действительно есть позиции с указанием аналога Caterpillar, но НИ ОДНА из них не сошлась с нашим набором из семи фильтров R1700G — соответствие остаётся гипотезой, как и записано. Канал в ЕАЭС без ВЭД — довод в силе.",
@@ -30491,7 +30736,12 @@
    "verdict": "исправлен",
    "slice": "aftermarket",
    "ru": false,
-   "ask": true
+   "ask": true,
+   "contact_form": "",
+   "contact_lang": "ru",
+   "contact_url": "https://difa.by/",
+   "contact_verdict": "подтверждён",
+   "contact_note": "Адрес виден в шапке главной страницы ссылкой mailto, дословно рядом с переключателем языка: \"sales@difa.by Ru\". Компания белорусская (ru=false в досье), под запрет по российским контрагентам не подпадает."
   },
   {
    "org": "ООО «Реготмас»",
@@ -30510,7 +30760,8 @@
    "verdict": "исправлен",
    "slice": "aftermarket",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "ООО «Традиция-К»",
@@ -30529,7 +30780,8 @@
    "verdict": "",
    "slice": "aftermarket",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "ООО «Аймашинери» (imachinery.ru)",
@@ -30548,7 +30800,9 @@
    "verdict": "",
    "slice": "aftermarket",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "та же организация, что «ООО «Компания ИмПарт» (iMachinery)» (один домен imachinery.ru)",
+   "dup_of": "ООО «Компания ИмПарт» (iMachinery)"
   },
   {
    "org": "ООО «ЗИПТЕХ-СЕРВИС»",
@@ -30567,7 +30821,9 @@
    "verdict": "",
    "slice": "aftermarket",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "та же организация, что «ООО «Зиптех-Сервис» (ZIPTEH SERVICE)» (один домен zipteh.ru)",
+   "dup_of": "ООО «Зиптех-Сервис» (ZIPTEH SERVICE)"
   },
   {
    "org": "МС Партс (74parts.ru)",
@@ -30586,7 +30842,9 @@
    "verdict": "",
    "slice": "aftermarket",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "та же организация, что ««Механика Сити Партс» (74parts.ru)» (один домен 74parts.ru)",
+   "dup_of": "«Механика Сити Партс» (74parts.ru)"
   },
   {
    "org": "MineCon (ТОО, minecon.kz)",
@@ -30605,7 +30863,12 @@
    "verdict": "подтверждён",
    "slice": "aftermarket",
    "ru": false,
-   "ask": true
+   "ask": true,
+   "contact_form": "https://minecon.kz/",
+   "contact_lang": "ru",
+   "contact_url": "https://minecon.kz/",
+   "contact_verdict": "подтверждён",
+   "contact_note": "Сайт открылся (200). Дословно из шапки: \"Пн-Пт 08:00-17:00, Сб-Вс выходной Личный кабинет +7 (700) 727-38-88 +7 (705) 529-00-93 О компании Продукция Доставка Контакты <адрес> Чат Whatsapp\". Единственный опубликованный ящик — именной, вида фамилия.имя@mineconkz.com, в открытый репозиторий не выношу. Корпоративного адреса на сайте нет; страница /contacts отдаёт 404. Остаются телефон, чат и WhatsApp."
   },
   {
    "org": "Xuzhou MMT Machinery Co., Ltd.",
@@ -30624,7 +30887,12 @@
    "verdict": "подтверждён",
    "slice": "aftermarket",
    "ru": false,
-   "ask": true
+   "ask": true,
+   "contact_form": "https://mmtcat.en.made-in-china.com/contact-info.html",
+   "contact_lang": "en",
+   "contact_url": "https://mmtcat.en.made-in-china.com/contact-info.html",
+   "contact_verdict": "подтверждён",
+   "contact_note": "Витрина на made-in-china.com. Страница «Contact Info» открылась (200), прямой почты поставщика на ней нет и по устройству площадки не бывает: контакты закрыты, связь идёт только через форму запроса («Contact Now» / «Send Inquiry») внутри made-in-china.com. Канал рабочий, но письмом с вложением ТЗ им не воспользоваться — нужен аккаунт на площадке."
   },
   {
    "org": "Hastings Premium Filters (бизнес передан Baldwin Filters / Parker Hannifin)",
@@ -30643,7 +30911,12 @@
    "verdict": "подтверждён",
    "slice": "aftermarket",
    "ru": false,
-   "ask": true
+   "ask": true,
+   "contact_form": "",
+   "contact_lang": "en",
+   "contact_url": "http://catalog.hastingsfilter.com/",
+   "contact_verdict": "сомнителен",
+   "contact_note": "catalog.hastingsfilter.com отдаёт HTTP 503 (тело 115 байт), www.hastingsfilter.com — HTTP 403. Страница не открылась, адрес не проверен. Отдельно: по самому досье бизнес марки передан Baldwin Filters / Parker Hannifin, так что канал, скорее всего, отработал своё — проверять его имеет смысл вместе с Baldwin."
   },
   {
    "org": "ООО «Восточная Техника» (Vostochnaya Technica)",
@@ -30662,7 +30935,9 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "та же организация, что «ООО «Восточная Техника» (ВТ), группа Barloworld» (один домен vost-tech.ru)",
+   "dup_of": "ООО «Восточная Техника» (ВТ), группа Barloworld"
   },
   {
    "org": "ООО «Цеппелин Русланд» (Zeppelin Russland)",
@@ -30681,7 +30956,9 @@
    "verdict": "исправлен",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "та же организация, что «ООО «Цеппелин Русланд» (Zeppelin Russland)» (один домен zeppelin.ru)",
+   "dup_of": "ООО «Цеппелин Русланд» (Zeppelin Russland)"
   },
   {
    "org": "Borusan Cat Kazakhstan (ИП «Борусан Макина Казахстан»)",
@@ -30700,7 +30977,9 @@
    "verdict": "исправлен",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "та же организация, что «Borusan Makina Kazakhstan LLP (BMGS Kazakhstan, Borusan Cat Казахстан)» (один домен borusancat.kz)",
+   "dup_of": "Borusan Makina Kazakhstan LLP (BMGS Kazakhstan, Borusan Cat Казахстан)"
   },
   {
    "org": "Borusan Cat Kazakhstan — Центр восстановления компонентов",
@@ -30710,7 +30989,7 @@
    "role": "сертифицированный ребилд коробок передач и гидротрансформаторов Caterpillar по стандартам завода",
    "brands": "Caterpillar",
    "site": "https://www.borusancat.kz/ru/restoration-repair/remont-korobok-peredach-i-gidrotransformatorov",
-   "email": "",
+   "email": "info-bmk@borusan.com",
    "phone": "+7 727 244 33 77",
    "stock": "цех восстановления, стендовые испытания по спецификации завода",
    "note": "Прямая замена покупке КП/гидротрансформатора на R1700G: заявлено восстановление всех коробок и гидротрансформаторов Cat — от 416 до 797, то есть модельный ряд ПДМ попадает. Цикл: мойка, разборка, инспекция деталей, отчёт по каждому компоненту, сборка, тест по спецификации. Для нас это ориентир по цене «ремонт vs новый узел» и площадка в ЕАЭС. ПРОВЕРКА 16.09.2026 (поставщики и исполнители РФ/СНГ): ГОРОД ИСПРАВЛЕН. БЫЛО: «Алматы». СТАЛО: «Караганда» — центр восстановления компонентов расположен в Караганде, а не в Алматы (Алматы — головной офис дилера). Для нас это лучше: Караганда ближе к рудничному поясу Центрального Казахстана. Сами заявления подтверждены дословно: «В ЦВК осуществляется восстановление всех видов коробок передач и гидротрансформаторов, начиная с экскаватора-погрузчика Cat 416 и заканчивая крупнейшим самосвалом Cat 797», цикл мойка — разборка с инспекцией деталей — отчёт по компонентам — испытания и регулировка по спецификации завода, цех на 3 зоны разборки и 4 зоны сборки. Заявление по ремонту КП и гидротрансформатора подтверждено. Оговорка: «от 416 до 797» — это диапазон по размеру, прямого упоминания ПДМ линейки R нет, применимость к R1700G подтверждать запросом.",
@@ -30719,7 +30998,14 @@
    "verdict": "исправлен",
    "slice": "traders",
    "ru": false,
-   "ask": true
+   "ask": false,
+   "dup_of": "Borusan Makina Kazakhstan LLP (BMGS Kazakhstan, Borusan Cat Казахстан)",
+   "ask_off": "та же организация, что «Borusan Makina Kazakhstan LLP (BMGS Kazakhstan, Borusan Cat Казахстан)» (один домен borusancat.kz)",
+   "contact_form": "",
+   "contact_lang": "ru",
+   "contact_url": "https://www.borusancat.kz/ru/contact/map",
+   "contact_verdict": "подтверждён",
+   "contact_note": "Адрес взят с карты локаций дилера, дословно из карточки казахстанского представительства: \"locationTypeText\":\"RegionalRepresentative\",\"city\":\"NUR-SULTAN (ASTANA)\",\"phone\":\"8 800 0800 228\",\"email\":\"info-bmk@borusan.com\". Это общий ящик Borusan Makina Kazakhstan; отдельного адреса у Центра восстановления компонентов на сайте нет, в письме тему ремонта узла надо называть явно."
   },
   {
    "org": "Borusan Cat Kyrgyzstan (Borusan Makina)",
@@ -30729,7 +31015,7 @@
    "role": "официальный дилер Caterpillar в Кыргызстане",
    "brands": "Caterpillar",
    "site": "https://www.borusancat.kg/",
-   "email": "",
+   "email": "info-bmkg@borusan.com",
    "phone": "",
    "stock": "официальный страновой сайт дилера с разделом подземной техники; поставка через структуру Borusan",
    "note": "Второй вход в ту же дилерскую сеть Borusan, но с киргизской юрисдикцией — полезен как альтернативный маршрут платежа и ввоза внутри ЕАЭС, когда казахстанский контур упирается в комплаенс. Заявлены оригинальные масла и запчасти Cat для горной техники. ПРОВЕРКА 16.09.2026 (поставщики и исполнители РФ/СНГ): НАЙДЕН САЙТ, КОТОРОГО В ЗАПИСИ НЕ БЫЛО. БЫЛО: поле site пустое, источник — карточка в торговой палате, уверенность med. СТАЛО: https://www.borusancat.kg/ — официальный страновой сайт Borusan Cat Кыргызстан, живой, на русской версии подтверждены и Caterpillar, и подземная тематика; есть карточка подземного погрузчика R1700 (.../ru|en/equipment/new/13866077/underground-hard-rock/730743084457382/r1700). Дилерство подтверждено собственным сайтом, а не только справочником — уверенность поднята до high. Это второй рабочий вход в сеть Borusan внутри ЕАЭС.",
@@ -30738,7 +31024,14 @@
    "verdict": "исправлен",
    "slice": "traders",
    "ru": false,
-   "ask": true
+   "ask": false,
+   "dup_of": "Borusan Cat Kyrgyzstan (BMGS Kyrgyzstan)",
+   "ask_off": "та же организация, что «Borusan Cat Kyrgyzstan (BMGS Kyrgyzstan)» (один домен borusancat.kg)",
+   "contact_form": "",
+   "contact_lang": "ru",
+   "contact_url": "https://www.borusancat.kg/ru",
+   "contact_verdict": "подтверждён",
+   "contact_note": "Адрес стоит ссылкой mailto в шапке русскоязычной версии сайта: \"info-bmkg@borusan.com\". Подтверждается независимо картой локаций Borusan: \"locationTypeText\":\"RegionalRepresentative\",\"city\":\"Balykchy\",\"phone\":\"+996 228 858 858\",\"email\":\"Info-bmkg@borusan.com\",\"website\":\"borusancat.kg\"."
   },
   {
    "org": "Barloworld Mongolia LLC",
@@ -30757,7 +31050,14 @@
    "verdict": "исправлен",
    "slice": "traders",
    "ru": false,
-   "ask": true
+   "ask": false,
+   "dup_of": "Barloworld Mongolia LLC (ранее Wagner Asia Equipment LLC)",
+   "ask_off": "та же организация, что «Barloworld Mongolia LLC (ранее Wagner Asia Equipment LLC)» (один домен barloworld.mn)",
+   "contact_form": "https://www.barloworld.mn/",
+   "contact_lang": "en",
+   "contact_url": "https://www.barloworld.mn/",
+   "contact_verdict": "подтверждён",
+   "contact_note": "Дубль канала Barloworld Mongolia в досье, результат тот же: корень сайта 200, почты в разметке нет, /contact и /mn/holbogdoh — 404, на главной только встроенная форма обратной связи с монгольскими подсказками полей. Прямого адреса нет. Перед рассылкой две строки досье стоит свести в одну."
   },
   {
    "org": "Wagner Asia Equipment LLC",
@@ -30776,7 +31076,8 @@
    "verdict": "снят",
    "slice": "traders",
    "ru": false,
-   "ask": false
+   "ask": false,
+   "ask_off": "снят при проверке: строка не подтвердилась"
   },
   {
    "org": "ООО «БИЗНЕС СЕРВИС»",
@@ -30795,7 +31096,8 @@
    "verdict": "исправлен",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "ООО «СПК-Импорт»",
@@ -30814,7 +31116,9 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "та же организация, что «ООО «СПК-Импорт» (spkamur.ru)» (один домен spkamur.ru)",
+   "dup_of": "ООО «СПК-Импорт» (spkamur.ru)"
   },
   {
    "org": "ООО «Китспецтех»",
@@ -30833,7 +31137,8 @@
    "verdict": "исправлен",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "ООО «Техномир-ДВ»",
@@ -30852,7 +31157,8 @@
    "verdict": "исправлен",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "АО «ВЭД Агент»",
@@ -30871,7 +31177,8 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "ООО «Зиптех-Сервис» (ZIPTEH SERVICE)",
@@ -30890,7 +31197,8 @@
    "verdict": "исправлен",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "ООО «Спецмашсоюз»",
@@ -30909,7 +31217,8 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "ООО «Майнинг Солюшнс»",
@@ -30928,7 +31237,8 @@
    "verdict": "исправлен",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "ООО «СПТ» («Современные промышленные технологии»)",
@@ -30947,7 +31257,8 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "ООО «Сервис Модерн Солюшенс»",
@@ -30966,7 +31277,8 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "ООО «Карьер-Сервис» (QS Group)",
@@ -30985,7 +31297,8 @@
    "verdict": "исправлен",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "ООО «Модерн Машинери Фар Ист» (Modern Machinery)",
@@ -31004,7 +31317,8 @@
    "verdict": "исправлен",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "ООО «РДС» (RockDrilling Service)",
@@ -31023,7 +31337,8 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "Группа «Техсервис» (ТС Групп)",
@@ -31042,7 +31357,8 @@
    "verdict": "исправлен",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "«Запчасти CAT, Sandvik, Atlas Copco, Liebherr, Epiroc» (витрина на orgs.biz)",
@@ -31061,7 +31377,8 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "ProfiMiner (отраслевой справочник горной промышленности)",
@@ -31080,7 +31397,9 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "та же организация, что «ProfiMiner (каталог поставщиков горной техники и запчастей)» (один домен profiminer.ru)",
+   "dup_of": "ProfiMiner (каталог поставщиков горной техники и запчастей)"
   },
   {
    "org": "ООО «Ремонтно-техническая компания» (РТК)",
@@ -31099,7 +31418,8 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "ООО «КАТ» (PARTS CAT)",
@@ -31118,7 +31438,8 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "ООО «СтАТ-Сервис»",
@@ -31137,7 +31458,8 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "CAT-trade Group (ctg-parts.ru)",
@@ -31156,7 +31478,8 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "DG Trade",
@@ -31175,7 +31498,8 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "ООО «САТ» (CAT48.RU)",
@@ -31194,7 +31518,8 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "ЦТП-РУС (ctp-rus.ru)",
@@ -31213,7 +31538,8 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "ООО «Промтехно» (spetstech.ru)",
@@ -31232,7 +31558,8 @@
    "verdict": "исправлен",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "ООО «Балткам»",
@@ -31251,7 +31578,8 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "«Механика Сити Партс» (74parts.ru)",
@@ -31270,7 +31598,8 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "«УДТ-Техника» (udt-technika.ru)",
@@ -31289,7 +31618,8 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "ООО «Снабавто»",
@@ -31308,7 +31638,8 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "«СТК-Комплектация» (stk-parts.ru)",
@@ -31327,7 +31658,8 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "«Трактор-Запчасть» (traktorzapchast.ru)",
@@ -31346,7 +31678,8 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "ООО «Спецтехно» (spec-tehno.com)",
@@ -31365,7 +31698,8 @@
    "verdict": "исправлен",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "ООО «Гренар» (GRENAR)",
@@ -31384,7 +31718,8 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "ООО «Компания ИмПарт» (iMachinery)",
@@ -31403,7 +31738,8 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "ООО «ОТГ-ДВ»",
@@ -31422,7 +31758,8 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "Novus Parts",
@@ -31441,7 +31778,8 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "«Спецтехснаб» (spectexsnab.ru)",
@@ -31460,7 +31798,8 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "ООО «Детройт-СТ»",
@@ -31479,7 +31818,8 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "ООО «ДСТС»",
@@ -31498,7 +31838,8 @@
    "verdict": "исправлен",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "ООО «Доринг»",
@@ -31517,7 +31858,8 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "ООО «СпецАвтоРесурс»",
@@ -31536,7 +31878,8 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "ООО «СТГ» (stg-oil.ru)",
@@ -31555,7 +31898,8 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "ARMET GROUP (ООО «АРМЕТ РУС»)",
@@ -31574,7 +31918,9 @@
    "verdict": "исправлен",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "та же организация, что «ООО «Армет» (Armet Group)» (один домен armetgroup.ru)",
+   "dup_of": "ООО «Армет» (Armet Group)"
   },
   {
    "org": "«Звено» (zveno.ru)",
@@ -31593,7 +31939,8 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "«Интертрактор» (inter-tractor.ru)",
@@ -31612,7 +31959,8 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "«Азия-Трак» (25gus.ru)",
@@ -31631,7 +31979,8 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "«Земер МГ» (z-mg.ru)",
@@ -31650,7 +31999,8 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "«Орион» (orion-chel.ru)",
@@ -31669,7 +32019,8 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "ООО «Профессионал» (profdst.ru)",
@@ -31688,7 +32039,9 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "та же организация, что «ГК «Профессионал» (Проф-ДСТ)» (один домен profdst.ru)",
+   "dup_of": "ГК «Профессионал» (Проф-ДСТ)"
   },
   {
    "org": "«ТСЦ» (t-s-c.ru)",
@@ -31707,7 +32060,8 @@
    "verdict": "сомнителен",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "ООО «Специализированный Гидравлический Сервис» (Спецгидросервис)",
@@ -31726,7 +32080,8 @@
    "verdict": "исправлен",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "ООО «ЦСС»",
@@ -31745,7 +32100,8 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "ООО «Ленспецсервис Групп»",
@@ -31764,7 +32120,8 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "«СП-Гидропривод» (sp-gidro.ru)",
@@ -31783,7 +32140,8 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "«Ремгидро» (remgidro.ru)",
@@ -31802,7 +32160,8 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "«Белгидросила Групп»",
@@ -31821,7 +32180,8 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "ООО «Дормаш Групп»",
@@ -31840,7 +32200,8 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "«СпецТехМастер» (spectechmaster.ru)",
@@ -31859,7 +32220,8 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "«Атлет» (atlet-spb.ru)",
@@ -31878,7 +32240,8 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "ООО «Спецтранссервис»",
@@ -31897,7 +32260,8 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "777parts (777parts.net / 777parts.com)",
@@ -31916,7 +32280,13 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": false,
-   "ask": true
+   "ask": false,
+   "ask_off": "справочный каталог применяемости, не продавец",
+   "contact_form": "",
+   "contact_lang": "en",
+   "contact_url": "https://777parts.net/",
+   "contact_verdict": "сомнителен",
+   "contact_note": "HTTP 403 через curl и на корне 777parts.net, и на /caterpillar.html (тело ~5,6 КБ — страница блокировки). Страница не открылась, адрес не проверен. По назначению это справочный каталог применяемости, а не продавец — как адресат запроса цен ценности почти не имеет."
   },
   {
    "org": "AVSpare.com",
@@ -31935,7 +32305,13 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": false,
-   "ask": true
+   "ask": false,
+   "ask_off": "справочный каталог применяемости, не продавец",
+   "contact_form": "",
+   "contact_lang": "en",
+   "contact_url": "https://avspare.com/",
+   "contact_verdict": "сомнителен",
+   "contact_note": "HTTP 403 через curl на корне и на /contact/ (тело 556 байт — заглушка). Страница не открылась, адрес не проверен. По назначению — справочный каталог применяемости, не продавец."
   },
   {
    "org": "EPCATALOGS",
@@ -31954,7 +32330,13 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": false,
-   "ask": true
+   "ask": false,
+   "ask_off": "продаёт каталоги и ПО, а не запчасти",
+   "contact_form": "https://www.epcatalogs.com/information/contacts/",
+   "contact_lang": "en",
+   "contact_url": "https://www.epcatalogs.com/information/contacts/",
+   "contact_verdict": "подтверждён",
+   "contact_note": "Страница контактов открылась (200). Почтового адреса на ней нет, дословно: \"Please don't hesitate to contact us for any question: ... Skype instant messaging ... Send E-Mail from our website\" — то есть только форма на сайте и Skype. Отдельно: продают они электронные каталоги и диагностическое ПО, а не запчасти, — для листа запроса цен на детали канал не по адресу."
   },
   {
    "org": "Machineryline",
@@ -31992,7 +32374,8 @@
    "verdict": "сомнителен",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "ФарПост (farpost.ru)",
@@ -32011,7 +32394,8 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "Alibaba.com",
@@ -32030,7 +32414,12 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": false,
-   "ask": true
+   "ask": true,
+   "contact_form": "https://www.alibaba.com/countrysearch/CN/caterpillar-spare-parts.html",
+   "contact_lang": "en",
+   "contact_url": "https://www.alibaba.com/countrysearch/CN/caterpillar-spare-parts.html",
+   "contact_verdict": "подтверждён",
+   "contact_note": "Страница открылась (200). Прямой почты ни площадки, ни поставщиков на ней нет и по устройству Alibaba не бывает: связь идёт формой «Contact Supplier» / «Request for Quotation» внутри площадки, по каждому объявлению отдельно. Единого адресата у канала не существует — писать письмом нельзя, нужен аккаунт."
   },
   {
    "org": "Made-in-China.com",
@@ -32049,7 +32438,12 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": false,
-   "ask": true
+   "ask": true,
+   "contact_form": "https://www.made-in-china.com/products-search/hot-china-products/Caterpillar_Parts.html",
+   "contact_lang": "en",
+   "contact_url": "https://www.made-in-china.com/products-search/hot-china-products/Caterpillar_Parts.html",
+   "contact_verdict": "подтверждён",
+   "contact_note": "Страница открылась (200). Прямой почты нет: единственные совпадения по символу @ в разметке — имена файлов библиотек оформления. Связь с поставщиками — только формой «Contact Now» / «Send Inquiry» внутри площадки, по каждому объявлению отдельно. Единого адресата у канала нет."
   },
   {
    "org": "Bonovo Machinery & Equipment Co., Ltd",
@@ -32068,7 +32462,12 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": false,
-   "ask": true
+   "ask": true,
+   "contact_form": "https://bonovo-china.en.made-in-china.com/contact-info.html",
+   "contact_lang": "en",
+   "contact_url": "https://bonovo-china.en.made-in-china.com/contact-info.html",
+   "contact_verdict": "подтверждён",
+   "contact_note": "Витрина на made-in-china.com. Страница «Contact Info» открылась (200), прямой почты поставщика на ней нет и по устройству площадки не бывает: контакты закрыты, связь идёт только через форму запроса («Contact Now» / «Send Inquiry») внутри made-in-china.com. Канал рабочий, но письмом с вложением ТЗ им не воспользоваться — нужен аккаунт на площадке."
   },
   {
    "org": "Beray Parts (bri-parts.com)",
@@ -32078,7 +32477,7 @@
    "role": "экспортёр ковшей, зубьев, адаптеров, режущих кромок и ходовой",
    "brands": "под Cat R1300, R1600, R1700, R2900, R3000",
    "site": "https://www.bri-parts.com/",
-   "email": "",
+   "email": "info@bri-parts.com",
    "phone": "",
    "stock": "экспорт, производство под заказ",
    "note": "Карточка товара названа прямо «Underground LHD Loader Bucket for CAT R1300 R1600 R1700 R2900 R3000» — вся линейка ПДМ Cat, включая нашу. Второй китайский изготовитель на ту же номенклатуру, нужен для сравнения цены с Bonovo. ПРОВЕРКА 16.09.2026 (поставщики и исполнители РФ/СНГ): ПРОВЕРИТЬ НЕ УДАЛОСЬ. БЫЛО: уверенность med, карточка «Underground LHD Loader Bucket for CAT R1300 R1600 R1700 R2900 R3000». СТАЛО: и корень сайта, и карточка отдают HTTP 202 с пустым телом (14–169 байт) — страница не отдаётся ни загрузчику, ни повторному заходу, содержимое подтвердить нельзя. Заголовок карточки известен только по поисковой выдаче. До прямого контакта считать неподтверждённым; вторым китайским изготовителем на ту же номенклатуру пока считать только Bonovo (строка выше), у которого страница открывается и R1700 на ней есть.",
@@ -32087,7 +32486,12 @@
    "verdict": "сомнителен",
    "slice": "traders",
    "ru": false,
-   "ask": true
+   "ask": true,
+   "contact_form": "",
+   "contact_lang": "en",
+   "contact_url": "https://www.bri-parts.com/",
+   "contact_verdict": "подтверждён",
+   "contact_note": "Дословно из блока контактов на главной: \"No. 255 Tiangao Lane, Yinzhou District 314000, Ningbo, China Amy info@bri-parts.com bri-parts.com\". Ящик корпоративный (info@ на своём домене), хотя рядом и указано имя менеджера."
   },
   {
    "org": "Tuoxing Group",
@@ -32106,7 +32510,14 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": false,
-   "ask": true
+   "ask": false,
+   "dup_of": "Shandong Tuoxing (tuoxing.com)",
+   "ask_off": "та же организация, что «Shandong Tuoxing (tuoxing.com)» (один домен tuoxing.com)",
+   "contact_form": "https://www.tuoxing.com/contact-us",
+   "contact_lang": "en",
+   "contact_url": "https://www.tuoxing.com/",
+   "contact_verdict": "подтверждён",
+   "contact_note": "Та же организация и тот же сайт, что и в строке «Shandong Tuoxing». В подвале главной дословно: \"Contact Us Add: Xizhao Village, Yidao Town, Yantai, Shandong, China Tel: +86-18561032768 E-mail: [email protected]\" — почта скрыта обфускацией Cloudflare, после раскрытия это именной ящик сотрудника (имя.фамилия@tuoxingmachinery.com), в открытый репозиторий не выношу. Корпоративного ящика нет, запрос — формой. Две строки досье стоит свести в одну."
   },
   {
    "org": "Tornado Heavy Equipment Parts",
@@ -32144,7 +32555,9 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": false,
-   "ask": true
+   "ask": false,
+   "dup_of": "Middle East Equipment and Tractors FZE LLC (METRAC)",
+   "ask_off": "та же организация, что «Middle East Equipment and Tractors FZE LLC (METRAC)» (один домен metrac.me)"
   },
   {
    "org": "JAK Parts",
@@ -32154,7 +32567,7 @@
    "role": "поставщик запчастей Caterpillar для горного оборудования по ОАЭ и странам Залива",
    "brands": "Caterpillar",
    "site": "https://www.jakparts.com/",
-   "email": "",
+   "email": "sales@jakparts.ae",
    "phone": "+971 6 552 1700",
    "stock": "склад в Шардже, поставка по ОАЭ, Саудовской Аравии, Катару, Кувейту, Бахрейну, Оману",
    "note": "Профиль «mining spare parts» по Cat: гидравлика, износ, конвейеры. Годится как второй эмиратский источник на оригинал и как проверка цены METRAC. Прямых поставок в РФ не заявляют — работать через посредника. ПРОВЕРКА 16.09.2026 (поставщики и исполнители РФ/СНГ): сайт жив, раздел mining spare parts открывается, Caterpillar и горная тематика подтверждены.",
@@ -32163,7 +32576,12 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": false,
-   "ask": true
+   "ask": true,
+   "contact_form": "",
+   "contact_lang": "en",
+   "contact_url": "https://www.jakparts.com/",
+   "contact_verdict": "подтверждён",
+   "contact_note": "Адрес стоит ссылкой на страницах сайта под подписью \"Email\" (скрыт обфускацией Cloudflare, после раскрытия — sales@jakparts.ae); рядом дословно: \"Contact +971 6 552 1700 Email\". Профильный ящик продаж; обратите внимание — домен почты .ae, а сайт .com, это не опечатка."
   },
   {
    "org": "Gulf Instruments",
@@ -32201,7 +32619,9 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": false,
-   "ask": true
+   "ask": false,
+   "dup_of": "Q-Parts (quality-parts.kz / q-parts.kz)",
+   "ask_off": "та же организация, что «Q-Parts (quality-parts.kz / q-parts.kz)» (один домен quality-parts.kz)"
   },
   {
    "org": "Rapid Parts Distribution (rpd.kz)",
@@ -32220,7 +32640,9 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": false,
-   "ask": true
+   "ask": false,
+   "dup_of": "ТОО «Rapid Parts Distribution» (RPD)",
+   "ask_off": "та же организация, что «ТОО «Rapid Parts Distribution» (RPD)» (один домен rpd.kz)"
   },
   {
    "org": "ТОО «Диггер-Про КЗ» (zemlekop.kz)",
@@ -32239,7 +32661,9 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": false,
-   "ask": true
+   "ask": false,
+   "dup_of": "ТОО «Диггер-Про КЗ» (zemlekop.kz)",
+   "ask_off": "та же организация, что «ТОО «Диггер-Про КЗ» (zemlekop.kz)» (один домен zemlekop.kz)"
   },
   {
    "org": "ООО «РЕКСПАРТ» (jkt.by)",
@@ -32258,7 +32682,8 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "ООО «Завод специальных машин Плюс» (ЗСМ)",
@@ -32277,7 +32702,8 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "«Спецторг-МВПО» (sptorg.by)",
@@ -32353,7 +32779,8 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "Контур.Закупки (zakupki.kontur.ru)",
@@ -32372,7 +32799,8 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "АО «ЛОНМАДИ» (интернет-магазин shop.lonmadi.ru)",
@@ -32391,7 +32819,8 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   },
   {
    "org": "«Сумотори» (интернет-магазин shop.sumotori.ru)",
@@ -32410,7 +32839,8 @@
    "verdict": "подтверждён",
    "slice": "traders",
    "ru": true,
-   "ask": false
+   "ask": false,
+   "ask_off": "решение владельца: русских не рассматриваем"
   }
  ],
  "prices": [
@@ -54589,18 +55019,18 @@
    "how": "Смотреть их маршруты и отправителей: отправитель из Китая или Турции, который возит им, — наш потенциальный адресат напрямую."
   },
   {
-   "step": "Задать иностранным дилерам (31) один вопрос до цены — отгружаете ли в РФ",
+   "step": "Задать иностранным дилерам (27) один вопрос до цены — отгружаете ли в РФ",
    "why": "Прайс без готовности отгружать не стоит ничего, а переписка о ценах занимает недели.",
    "how": "Письмо на английском одним абзацем: модель, серийный номер, перечень, вопрос об отгрузке."
   },
   {
-   "step": "Запустить пробники у 41 иностранных заводов неоригинала",
+   "step": "Запустить пробники у 40 иностранных заводов неоригинала",
    "why": "Без образца и протокола испытаний неоригинал на торгах не проходит техническую часть.",
    "how": "По одной позиции на завод, с приёмкой по нашей карте замеров — как сделано по перфораторам."
   },
   {
-   "step": "Разослать запрос наличия иностранным поставщикам (22)",
-   "why": "По решению владельца российские компании в лист запроса не выводятся: их 71, и они остаются картиной конкурентов, а не адресатами. Спрашиваем заводы и склады Казахстана, Китая, ОАЭ, Турции и дальше по кольцу.",
+   "step": "Разослать запрос наличия иностранным поставщикам (11)",
+   "why": "По решению владельца российские компании в лист запроса не выводятся: их 82, и они остаются картиной конкурентов, а не адресатами. Спрашиваем заводы и склады Казахстана, Китая, ОАЭ, Турции и дальше по кольцу.",
    "how": "Смарт-процесс «Запросы поставщикам» Битрикса, письмо на английском с перечнем и сроком ответа 3 дня."
   },
   {
@@ -54627,7 +55057,7 @@
   "wheels": "1. Парт-номера Cat на обод и шину именно R1700G по-прежнему нет. Каталоги SEBP3045 (8XZ), SEBP3612 (SBR) и SEBP6869 (XBR) лежат на avspare.com / spare.avspart.com / 777parts.net, и все зеркала закрыты: при повторной проверке 16.09.2026 spare.avspart.com отдаёт 403 на curl с браузерным UA и 503 на WebFetch, 777parts.net — 403. Названия групп «2574657 RIM GP-DEMOUNTABLE (5-PIECE)» и «2574659 RIM AR (5-PIECE)» видны только в выдаче поисковика; подтвердить их не удалось, поиск по «2574657» ничего не дал — в таблицу они не поставлены и ставить их по заголовку нельзя. 257-8035 остаётся сомнительным по той же причине: карточка не открывается, привязка к R1700G нигде не показана, а рядом существует почти такой же номер 257-8026. 2. Обод 475-0563 — это R1700 нового поколения, не R1700G (подтверждено дословно по Rig Out). Для R1700G подтверждено только словесное описание «Rims, 5-Piece, Tubeless» без номера; посадочный размер обода Cat не публикует, 25×22.00/3.0 выведен из типоразмера шины. Болтовой круг и число отверстий обода R1700G неизвестны: у неоригинального колеса под Cat 966 их 20, у родственного R1300G Series II обод держат 16 гаек 3/4-16. 3. Крепёж обода (гайка 6B-6682 3/4-16, шайба 6V-2360, шпилька 308-9259) — номера R1300G Series II. Момент затяжки не найден: он в SEBU8211 (руководство по эксплуатации R1700G), которого в открытом доступе нет. 4. ROPS/FOPS: подтверждено только соответствие ISO 3471 / ISO 3449 и наличие опции «Wear Protection Bars — Cab/ROPS». Парт-номеров самой конструкции ROPS/FOPS, её упругих опор и полурам нет ни в одном открытом источнике. 5. Цепи Erlau, Pewag и RUD: подземные линейки у всех трёх есть, но каталоги рендерятся скриптами, модели под 26.5-25 и цены вытащить не удалось. Из реально найденных цен на шинозащиту под 26.5-25 — Trygg, Quality Chain, Tough Rock, Las Zirh и «Уральские цепи», причём у последних не названа единица продажи. 6. Цен на заводские аранжировки нет ни на одну: Bridgestone VSDL 26.5R25 — «Request Quote», Bridgestone STMS 26.5-25 36PR — «Request Quote» / «Call for Price», по Goodyear «26.5 × 25, 32 Ply» вообще не удалось установить, какая это модель (в этом размере у Goodyear в продаже видны только радиальные RL-5K и RL-5S). Дилерские прайсы Bridgestone и Goodyear закрыты. 7. Дисков 25\" (25-22.00) в российской розничной выдаче не нашлось; оригинальный обод в РФ не найден, китайский — только биржевым объявлением с ценой от партии в 10 штук. 8. Класс TRA у российских продавцов не указывается вообще: ни на одной карточке sgshina.ru и rtyre.ru нет поля класса, есть только слойность и раздел каталога. Для подземной машины это ключевой параметр, и запрашивать его придётся письмом по каждой позиции."
  },
  "stats": {
-  "recon_slices": 15,
+  "recon_slices": 16,
   "parts": 561,
   "parts_by_node": {
    "01 Двигатель": 66,
@@ -54694,6 +55124,43 @@
    "ID": 1,
    "FR": 1,
    "BY": 6
+  },
+  "orgs_ask": 78,
+  "orgs_ask_with_email": 45,
+  "orgs_ask_form_only": 24,
+  "orgs_ask_no_contact": 9,
+  "orgs_ask_off": {
+   "решение владельца: русских не рассматриваем": 91,
+   "та же организация, что «Lei Shing Hong Machinery Ltd (LSHM)» (один домен lsh.com)": 1,
+   "магазин Caterpillar с заказом из личного кабинета, не адресат запроса цен": 1,
+   "портал подписки на документацию, запчасти не продаёт": 1,
+   "снят при проверке: строка не подтвердилась": 4,
+   "канал снят при проверке контактов: Это служебная строка самого досье, а не организация: поля site нет, адресата не существует. Из листа запроса убрать — писать некому.": 1,
+   "канал снят при проверке контактов: Домен мёртв: DNS не знает ни www.hzhlmc.com (\"Name or service not known\"), ни hzhlmc.com (\"No address associated with hostname\"). Ни по http, ни по https соединение не устанавливается. Канал убрать из листа запроса.": 1,
+   "та же организация, что «ООО «Компания ИмПарт» (iMachinery)» (один домен imachinery.ru)": 1,
+   "та же организация, что «ООО «Зиптех-Сервис» (ZIPTEH SERVICE)» (один домен zipteh.ru)": 1,
+   "та же организация, что ««Механика Сити Партс» (74parts.ru)» (один домен 74parts.ru)": 1,
+   "та же организация, что «ООО «Восточная Техника» (ВТ), группа Barloworld» (один домен vost-tech.ru)": 1,
+   "та же организация, что «ООО «Цеппелин Русланд» (Zeppelin Russland)» (один домен zeppelin.ru)": 1,
+   "та же организация, что «Borusan Makina Kazakhstan LLP (BMGS Kazakhstan, Borusan Cat Казахстан)» (один домен borusancat.kz)": 2,
+   "та же организация, что «Borusan Cat Kyrgyzstan (BMGS Kyrgyzstan)» (один домен borusancat.kg)": 1,
+   "та же организация, что «Barloworld Mongolia LLC (ранее Wagner Asia Equipment LLC)» (один домен barloworld.mn)": 1,
+   "та же организация, что «ООО «СПК-Импорт» (spkamur.ru)» (один домен spkamur.ru)": 1,
+   "та же организация, что «ProfiMiner (каталог поставщиков горной техники и запчастей)» (один домен profiminer.ru)": 1,
+   "та же организация, что «ООО «Армет» (Armet Group)» (один домен armetgroup.ru)": 1,
+   "та же организация, что «ГК «Профессионал» (Проф-ДСТ)» (один домен profdst.ru)": 1,
+   "справочный каталог применяемости, не продавец": 2,
+   "продаёт каталоги и ПО, а не запчасти": 1,
+   "та же организация, что «Shandong Tuoxing (tuoxing.com)» (один домен tuoxing.com)": 1,
+   "та же организация, что «Middle East Equipment and Tractors FZE LLC (METRAC)» (один домен metrac.me)": 1,
+   "та же организация, что «Q-Parts (quality-parts.kz / q-parts.kz)» (один домен quality-parts.kz)": 1,
+   "та же организация, что «ТОО «Rapid Parts Distribution» (RPD)» (один домен rpd.kz)": 1,
+   "та же организация, что «ТОО «Диггер-Про КЗ» (zemlekop.kz)» (один домен zemlekop.kz)": 1
+  },
+  "contacts": {
+   "только форма": 28,
+   "почта добавлена": 16,
+   "снято по контактам": 2
   },
   "prices": 262,
   "faults": 76,

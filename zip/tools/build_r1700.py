@@ -194,11 +194,19 @@ def build():
 
     dealers_all = [o for o in d["orgs"] if o["slice"] == "dealers"]
     dealers, dealers_ru = split_ask(dealers_all)
+    # Раньше здесь стоял один заголовок «по решению владельца». Теперь канал
+    # выпадает из листа запроса по четырём разным причинам — решение владельца,
+    # снят проверкой, дубль по домену, справочный каталог, — и каждая пишется у
+    # своей строки. Один общий заголовок на четыре причины врал бы о трёх из них.
     ru_block = lambda rows, title: (
         f'<details style="margin-top:10px"><summary class="mut">{title} · {len(rows)} — '
-        f'по решению владельца в лист запроса не выводятся</summary>'
-        + cards(rows, [("kind", "Тип"), ("city", "Город"), ("role", "Роль"), ("note", "Чем полезен")],
+        f'в лист запроса не выводятся, из данных не удалены</summary>'
+        + cards(rows, [("ask_off", "Почему не запрашиваем"), ("kind", "Тип"), ("city", "Город"),
+                       ("role", "Роль"), ("note", "Чем полезен")],
                 "org", "site") + "</details>") if rows else ""
+
+    # Поля адреса — одни и те же во всех трёх направлениях.
+    CONTACT = [("email", "Почта"), ("contact_form", "Форма запроса"), ("contact_lang", "Язык письма")]
 
     S.append(("deal", f"Оригинал · {len(dealers)}", f"""
 <h2>Официальные каналы Caterpillar</h2>{pol_note}
@@ -207,7 +215,7 @@ def build():
 <div class="bar"><input id="qdl" placeholder="поиск: организация, страна, роль…"><span class="mut" id="cntdl"></span></div>
 <div id="listdl">{cards(dealers, [("role", "Роль"), ("country", "Страна"), ("city", "Город"),
                                   ("brands", "Бренды"), ("stock", "Наличие и срок"),
-                                  ("email", "Почта"), ("phone", "Телефон"), ("note", "Чем полезен")],
+                                  *CONTACT, ("phone", "Телефон"), ("note", "Чем полезен")],
                         "org", "site")}</div>
 {ru_block(dealers_ru, "Российские компании этого направления")}"""))
 
@@ -226,7 +234,7 @@ def build():
 <div class="bar"><input id="qaf" placeholder="поиск: завод, бренд, что делает…"><span class="mut" id="cntaf"></span></div>
 <div id="listaf">{cards(after, [("kind", "Тип"), ("country", "Страна"), ("city", "Город"),
                                 ("brands", "Бренды и узлы"), ("stock", "Партия и срок"),
-                                ("email", "Почта"), ("note", "Что покрывает")], "org", "site")}</div>
+                                *CONTACT, ("note", "Что покрывает")], "org", "site")}</div>
 {ru_block(after_ru, "Российские заводы")}
 <h2>Заводы из нашего справочника ODM с упоминанием Caterpillar · {len(odm)}</h2>
 <div class="mut">Показаны первые {min(400, len(odm))} по уровню доверия. Полный перечень —
@@ -253,7 +261,7 @@ def build():
 <div class="bar"><input id="qtr" placeholder="поиск: компания, город, что держат…"><span class="mut" id="cnttr"></span></div>
 <div id="listtr">{cards(traders, [("kind", "Тип"), ("country", "Страна"), ("city", "Город"),
                                   ("brands", "Бренды"), ("stock", "Склад и срок"),
-                                  ("email", "Почта"), ("phone", "Телефон"), ("note", "Чем полезен")],
+                                  *CONTACT, ("phone", "Телефон"), ("note", "Чем полезен")],
                         "org", "site")}</div>
 {ru_block(traders_ru, "Российские торговцы и исполнители")}
 <h2>Ввоз Caterpillar по нашей таможенной выгрузке</h2>

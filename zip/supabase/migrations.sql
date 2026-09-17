@@ -418,3 +418,22 @@ begin
   execute 'drop policy if exists mach_faults_all on mach_faults';
   execute 'create policy mach_faults_all on mach_faults for all to anon, authenticated using (true) with check (true)';
 end $$;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- 7в. Адрес запроса и причина, по которой канал из запроса выпал.
+--
+-- Лист запроса был нерабочим наполовину: из 94 иностранных каналов прямая почта
+-- была у 36. Адрес добран по контактным страницам; где почты нет — записана
+-- форма площадки (на made-in-china и Alibaba прямой почты не бывает по
+-- устройству витрины, только форма).
+--
+-- ask_off — почему канал не в листе. Причин четыре, и раньше все они выглядели
+-- как «решение владельца»: решение владельца, снят проверкой, дубль по домену,
+-- справочный каталог вместо продавца. Без этой колонки нельзя ни объяснить
+-- цифру, ни вернуть канал, когда причина отпадёт.
+alter table mach_channels add column if not exists ask_off         text;
+alter table mach_channels add column if not exists contact_form    text;
+alter table mach_channels add column if not exists contact_lang    text;
+alter table mach_channels add column if not exists contact_url     text;
+alter table mach_channels add column if not exists contact_verdict text;
+alter table mach_channels add column if not exists dup_of          text;
