@@ -127,18 +127,25 @@ def check_browser(path: Path, errors: list[str], warns: list[str]) -> None:
         return
     # Вкладки строятся лениво, при первом открытии, поэтому открываем их все в ЭТОМ
     # же прогоне: отдельный второй запуск Chromium стоил на раннере около двух минут.
+    #
+    # Бюджет времени считается от размера страницы. Боевой дашборд — это 10+ МБ
+    # встроенных данных, и открытие всех вкладок строит DOM в несколько раз больше;
+    # с прежними 75 секундами браузер не успевал, отдавал пустоту, и проверка рендера
+    # МОЛЧА не выполнялась — ровно та дыра, ради закрытия которой она и писалась.
+    # Если с вкладками не уложились, последняя попытка идёт по чистой странице:
+    # базовая проверка рендера важнее проверки вкладок и не должна пропадать вместе с ней.
+    mb = max(1, len(path.read_bytes()) // (1024 * 1024))
+    budget = min(300, max(90, 25 * mb))
     page = _with_tabs_opened(path)
-    # три попытки: обычный headless, один процесс, старый headless.
-    # На раннерах GitHub встречаются сборки Chrome, где --dump-dom не отдаёт
-    # ничего в первых двух режимах.
-    attempts = [([], 75, "--headless=new"),
-                (["--single-process"], 60, "--headless=new"),
-                ([], 60, "--headless=old")]
-    dom, log = "", ""
+    attempts = [(page, [], budget, "--headless=new"),
+                (page, ["--single-process"], budget, "--headless=new"),
+                (path, [], min(180, budget), "--headless=old")]
+    dom, log, with_tabs = "", "", False
     try:
-        for extra, timeout, mode in attempts:
-            dom, log = _chrome_run(chrome, page, extra, timeout, mode)
+        for target, extra, timeout, mode in attempts:
+            dom, log = _chrome_run(chrome, target, extra, timeout, mode)
             if dom.strip():
+                with_tabs = target is page and page != path
                 break
     finally:
         if page != path:
@@ -148,8 +155,12 @@ def check_browser(path: Path, errors: list[str], warns: list[str]) -> None:
         # Структурные проверки выше отработали и остаются в силе, поэтому
         # предупреждаем, но не блокируем деплой исправного дашборда.
         tail = " | ".join(log.strip().splitlines()[-2:])[:200]
-        warns.append(f"Chromium не отдал DOM — проверка рендера не выполнена ({tail or 'без вывода'})")
+        warns.append(f"Chromium не отдал DOM за {budget} с — проверка рендера не выполнена "
+                     f"({tail or 'без вывода'})")
         return
+    if not with_tabs:
+        warns.append(f"вкладки не проверены: страница {mb} МБ, браузер не уложился в {budget} с — "
+                     "проверен только базовый рендер")
     bad = [ln for ln in log.splitlines()
            if re.search(r"\bERROR:CONSOLE\b|Uncaught|SyntaxError|is not defined|is not a function", ln)]
     if bad:
@@ -159,7 +170,8 @@ def check_browser(path: Path, errors: list[str], warns: list[str]) -> None:
     for tab in ("tab-sourcing", "tab-company"):
         if f'id="{tab}"' not in dom and f"id='{tab}'" not in dom:
             warns.append(f"в DOM нет блока {tab}")
-    _check_tabs_dom(dom, errors)
+    if with_tabs:
+        _check_tabs_dom(dom, errors)
 
 
 # Вкладки строятся лениво — при первом открытии. Поэтому обычный прогон проверяет
