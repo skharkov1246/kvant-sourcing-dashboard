@@ -1658,7 +1658,7 @@ function openPeopleDeals(list,title,sub){
 function renderPeople(P,role,elId){
   const el=document.getElementById(elId); if(!el) return;
   if(!P||!P.roles||!P.roles[role]){ el.innerHTML='<section class="card"><div class="note">Состав коммерсантов не загрузился — вкладка пуста. Остальные вкладки работают.</div></section>'; return; }
-  const R=P.roles[role],T=R.totals,o=_PROLE[role],D=P.deals||[],S=P.staff||{},RC=P.recon||{},PR=P.params||{stale:90,dead:180};
+  const R=P.roles[role],T=R.totals,o=_PROLE[role],D=P.deals||[],S=P.staff||{},RC=P.recon||{},PR=Object.assign({stale:90,dead:180,mult:50,medAmt:'—',bigCut:'—'},P.params||{});
   const mine=d=>role==='kam'?d.kam:d.prod;
   const totLoad=R.people.reduce((a,p)=>a+p.loadRaw,0)||1;
   const KPI=[
