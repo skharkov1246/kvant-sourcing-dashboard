@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 213,
-    "total_bytes": 98887363,
+    "total_bytes": 98944672,
     "by_sensitivity": {
       "конфиденциально": 62,
       "внутреннее": 117,
@@ -523,7 +523,7 @@
     {
       "path": "zip/data/r1700.json",
       "subproject": "база ЗИП",
-      "bytes": 2882020,
+      "bytes": 2939329,
       "note": "Досье машины Caterpillar R1700G (ПДМ подземных работ): паспорт и модификации, узлы, документация Caterpillar по номерам форм, перечень запчастей с нашими номерами KV, кроссы вторичного рынка, официальные дилеры, заводы неоригинала, поставщики РФ/СНГ, маршруты ввоза по таможне, ценовые ориентиры, площадки торгов и эксплуатанты. Каждая строка с источником и уровнем доверия; вердикт — итог независимой перепроверки. Строит zip/tools/r1700_dossier.py из zip/data/r1700_recon/, positions.json, pnw/, таможни и справочника ODM. Руками не править.",
       "format": "json",
       "shape": "объект",
@@ -564,7 +564,7 @@
       },
       "last_change": "2026-09-17",
       "last_author": "Claude",
-      "last_commit": "5885046",
+      "last_commit": "2681a77",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
@@ -5929,10 +5929,10 @@
           "verdict"
         ]
       },
-      "last_change": null,
-      "last_author": null,
-      "last_commit": null,
-      "updated_by": "неизвестно",
+      "last_change": "2026-09-17",
+      "last_author": "Claude",
+      "last_commit": "2681a77",
+      "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
         "markers": [
