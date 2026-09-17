@@ -1,0 +1,1200 @@
+{
+ "source": "обход ботозащиты агентами 09.2026",
+ "method": "агенты искали 31 артикул, чьи ссылки отдают 403, на витринах, которые страницу отдают. covers_qty=full только при числе остатка, покрывающем потребность; наличие преемника вместо оригинала помечено is_substitute и твёрдым не считается",
+ "rows": [
+  {
+   "pn": "1017905",
+   "verdict": "in_stock",
+   "seller": "Gaddis Corp (gaddisny.com)",
+   "seller_url": "https://www.gaddisny.com/pack-of-3-flexitallic-spiral-wound-gasket-style-cgi-304-fg-cs-for-2-300-600-flanges",
+   "seller_country": "US",
+   "in_stock": "conditional",
+   "stock_qty": "",
+   "lead_time": "STOCK ITEMS WILL SHIP SAME-DAY IF ORDERED BY (текст баннера сайта)",
+   "price": "35.95",
+   "currency": "USD",
+   "pack_qty": 3,
+   "covers_qty": "unknown",
+   "kind": "distributor",
+   "real_maker": "Flexitallic",
+   "real_pn": "FLEX-CGI-2-300/600",
+   "substitute": "Flexitallic Style CGI, 304SS windings / flexible graphite filler / CS inner+outer ring, 2\" ANSI 300/600 — типоразмерный аналог, НЕ номер Solar",
+   "is_substitute": false,
+   "note": "ОБХОД БОТОЗАЩИТЫ 09.2026: прежняя ссылка отдавала 403, артикул искали заново на отдающих витринах. Это НЕ артикул 1017905, а подбор по типоразмеру, как разрешено заданием. Карточка: '(PACK OF 3) Flexitallic Spiral Wound Gasket, Style CGI, 304/FG/CS, for 2”-300/600 Flanges', SKU FLEX-CGI-2-300/600, $35.95 за упаковку из 3 шт (≈$11.98/шт), размеры на странице: внутр. кольцо ID 2.19\", уплотняющий элемент ID 2.75\" / OD 3.38\", центрирующее кольцо OD 4.38\". На 21 шт нужно 7 упаковок. Расхождение, которое надо снять с инженером до заказа: у Solar в наименовании 'spiral 2.0 CL300 RF 304' стиль прокладки не назван, CGI (с внутренним кольцом) и CG (только наружное) — разные изделия; у того же продавца в каталоге для 2\" в наличии только CGI. Числа остатка на карточке нет, статус наличия в разметке не проставлен — склад не подтверждён.",
+   "alt_sellers": [
+    {
+     "seller": "Barakastock (Baraka Agencies)",
+     "url": "https://www.barakastock.com/products/bs-no-bpo07757",
+     "country": "QA",
+     "price": "0.00",
+     "lead_time": "",
+     "note": "Карточка под точным номером Solar Turbines 1017905, описание на странице: 'GASKET,SPIRAL WOUND: 2IN PIPE,CLASS 300,304 STAINLESS STEEL WINDING' — совпадает с заявкой. Цена $0.00, то есть RFQ; в разметке Shopify inventory_quantity=1, но при нулевой цене это признак карточки-заявки, а не подтверждённого остатка."
+    },
+    {
+     "seller": "USA Tech (industrial-usa.com)",
+     "url": "https://industrial-usa.com/shop/industrial-equipment/solar-turbines/solar-turbines-1017905/",
+     "country": "US",
+     "price": "",
+     "lead_time": "",
+     "note": "Карточка под номером 1017905, описание: '1017905 – (SOLAR TURBINES GASKET – SPIRAL – CL300)'. Ни цены, ни остатка, ни кнопки покупки — только 'Read more'/запрос. Почты и телефона на странице карточки нет. Собственный магазин Solar (shop.solarturbines.com) на прямые URL по 1017905 отдаёт 404; soluparts.com — 403."
+    }
+   ],
+   "emails": [
+    "INFO@GADDISNY.COM"
+   ],
+   "phones": [
+    "(516) 759-3100"
+   ]
+  },
+  {
+   "pn": "1046415-30",
+   "verdict": "in_stock",
+   "seller": "Quick Time Engineering Inc (quicktimeonline.com)",
+   "seller_url": "https://www.quicktimeonline.com/1786-xt",
+   "seller_country": "MY",
+   "in_stock": "conditional",
+   "stock_qty": "",
+   "lead_time": "In Stock. Usually Ships in 1 - 7 Working Days.",
+   "price": "38.00",
+   "currency": "USD",
+   "pack_qty": 1,
+   "covers_qty": "unknown",
+   "kind": "distributor",
+   "real_maker": "Allen-Bradley / Rockwell Automation",
+   "real_pn": "1786-XT",
+   "substitute": "",
+   "is_substitute": false,
+   "note": "ОБХОД БОТОЗАЩИТЫ 09.2026: прежняя ссылка отдавала 403, артикул искали заново на отдающих витринах. Ищется не по номеру Solar, а по вскрытому эквиваленту 1786-XT. Карточка: 'Your Price: USD38.00', 'Retail Price: USD54.00', 'Availability: In Stock. Usually Ships in 1 - 7 Working Days.' Числа остатка на странице нет — склад не подтверждён, на 25 шт. нужен отдельный запрос. Адрес на сайте: First Floor, Tang Kah Wah Shophouse, Jalan Bunga Mayang, 87030 Labuan, Malaysia; Tel +6012-3626252; на сайте также 'Toll free 800 828 6650'. Почта на странице замаскирована ([email protected]) — выписать нечего.",
+   "alt_sellers": [
+    {
+     "seller": "PLC Barn",
+     "url": "https://www.plcbarn.com/products/allen-bradley-1786-xt-a-controlnet-75-ohm-trunk-terminator",
+     "country": "US",
+     "price": "23.46",
+     "lead_time": "",
+     "note": "Эквивалент 1786-XT/A, новый излишек в запечатанных упаковках. Остаток назван числом: 2 шт. — закрывает 2 из 25. Другие площадки с названным остатком по 1786-XT, все мелкие: IQElectro (США, iqelectro.com/products/1786-xt-allen-bradley-terminating-resistor) — '1 in Stock', $45.00, sales@iqelectro.com, +1 (828) 222-3490; Automation Recovery (США) — 'Quantity In Stock: 1', $2.00, sales@automationrecovery.com, (586) 741-5274. Elit GlobalStore (Эстония, elit.ee/product@1786-XT.html) — €9,20/шт (индикативно), но 'Availability: 21 days', то есть под заказ. Агрегатор Octopart (403 на выгрузку) показывает у TodayComponents 191 шт по $22.36 — карточку открыть не удалось, поиск на todaycomponents.com по '1786-XT' даёт 0 результатов, поэтому как подтверждение не засчитываю."
+    },
+    {
+     "seller": "Barakastock (Baraka Agencies)",
+     "url": "https://www.barakastock.com/products/bs-no-bpo07788",
+     "country": "QA",
+     "price": "0.00",
+     "lead_time": "",
+     "note": "Карточка под точным номером Solar Turbines 1046415-30, описание на странице: 'PLUG: CONTROLNET TERMINATOR,75 OHM'. Цена $0.00 — это RFQ-заглушка, не цена; кнопки покупки с ценой нет. Описание раскрывает, что под шильдой Solar идёт стандартный терминатор ControlNet 75 Ом = Allen-Bradley 1786-XT (у Rockwell статус 'Active Mature', снятия с производства нет). Собственный магазин Solar (shop.solarturbines.com) карточку 1046415-30 по прямым URL не отдаёт (404/логин), поэтому цены OEM нет."
+    }
+   ],
+   "emails": [],
+   "phones": [
+    "+6012-3626252",
+    "800 828 6650"
+   ]
+  },
+  {
+   "pn": "1701/15",
+   "verdict": "in_stock",
+   "seller": "6G Controls",
+   "seller_url": "https://www.6gcontrols.com/products/bently-nevada-1701-15-141379-01-proximitor-input-monitor/",
+   "seller_country": "CN",
+   "in_stock": "yes",
+   "stock_qty": "15 in stock",
+   "lead_time": "Typically 1–3 working days after payment confirmation (subject to stock)",
+   "price": "",
+   "currency": "USD",
+   "pack_qty": 1,
+   "covers_qty": "partial",
+   "kind": "marketplace",
+   "real_maker": "Bently Nevada (GE / Baker Hughes)",
+   "real_pn": "141379-01 — собственный номер Bently Nevada для модуля 1701/15. Номер Solar Turbines на том же изделии — 1034549-20, номер на шильде — 138427-01",
+   "substitute": "",
+   "is_substitute": false,
+   "note": "ОБХОД БОТОЗАЩИТЫ 09.2026: прежняя ссылка отдавала 403, артикул искали заново на отдающих витринах. Модуль FieldMoniter Proximitor Input Monitor, 2 канала, радиальная вибрация и осевой сдвиг, питание 24 В DC. Остаток 15 шт назван числом — это шестая часть нужных 98. Заявлено «Brand New», гарантия 12 месяцев, отгрузка из Сямыня, оплата T/T или Western Union. Перекрёстные номера снял с карточки другого продавца (auto2mation, позиция Out of stock) — они позволяют искать тот же модуль по номеру 141379-01, что вдвое расширяет выдачу.",
+   "alt_sellers": [
+    {
+     "seller": "PowerDCS",
+     "url": "https://www.powerdcs.com/products/bently-nevada-141379-01-1701-15-proximitor-input-monitor",
+     "country": "CN",
+     "price": "",
+     "lead_time": "Generally it is 2-3 days if the goods are in stock",
+     "note": "Остаток 10 шт числом, «100% brand new», гарантия 12 месяцев. Цена на странице не опубликована — только по запросу. Внимание: почтовый домен 5gplc.com совпадает с доменом продавца 6G Controls из предыдущей строки, то есть 15 и 10 шт могут оказаться одним и тем же складом, а не двумя независимыми. Складывать 15+10 в 25 нельзя без прямого подтверждения у обоих."
+    },
+    {
+     "seller": "ControlDCS",
+     "url": "https://www.controldcs.com/bently-nevada-1701-15-proximitor-input-monitor_p43966.html",
+     "country": "CN",
+     "price": "",
+     "lead_time": "In stock",
+     "note": "Карточка заявляет «New and original», MOQ 1, наличие — но остаток числом НЕ назван, поэтому in_stock conditional и covers_qty unknown. Условия: FOB Сямынь, оплата T/T 100% предоплата, гарантия 1 год, возврат 15 дней. Общая картина по позиции: модуль снят с производства, у авторизованной дистрибуции его нет — Santa Clara Systems держит карточку 1701-15-01 со статусом «Out of Stock» (тел. 1.888.450.0301), auto2mation — «Out of stock». 98 шт одним лотом на открытом рынке не набирается; реальные пути — сбор по 10–15 шт у нескольких брокеров с входным контролем либо переход на актуальную серию Bently Nevada 3500."
+    }
+   ],
+   "emails": [
+    "sales6@5gplc.com"
+   ],
+   "phones": []
+  },
+  {
+   "pn": "1794-OB8EPXT",
+   "verdict": "in_stock",
+   "seller": "Williams Automation Inc",
+   "seller_url": "https://williamsautomation.com/products/allen-bradley-1794-ob8epxt",
+   "seller_country": "US",
+   "in_stock": "yes",
+   "stock_qty": "3 In stock",
+   "lead_time": "Estimated Delivery between September 16 and September 21 with free shipping; Lead times can range from 1 to 4 business days; overnight available",
+   "price": "515.57",
+   "currency": "USD",
+   "pack_qty": 1,
+   "covers_qty": "partial",
+   "kind": "distributor",
+   "real_maker": "",
+   "real_pn": "",
+   "substitute": "",
+   "is_substitute": false,
+   "note": "ОБХОД БОТОЗАЩИТЫ 09.2026: прежняя ссылка отдавала 403, артикул искали заново на отдающих витринах. Единственный по этому артикулу продавец с остатком, названным числом: 3 шт. из 24. Карточка прямо предупреждает: 'Williams Automation is NOT an authorized distributor for ALLEN BRADLEY / ROCKWELL AUTOMATION... the product is used surplus', гарантии Rockwell и лицензии прошивки нет. Адрес Aiken, SC 29803.",
+   "alt_sellers": [
+    {
+     "seller": "Santa Clara Systems, Inc.",
+     "url": "https://www.santaclarasystems.com/allen-bradley/1794-ob8epxt",
+     "country": "US",
+     "price": "",
+     "lead_time": "In Stock. We can ship this part today! Late West Coast Shipping (5PM PST)",
+     "note": "Карточка говорит 'In Stock' и 'In stock and ready to ship', но ни числа остатка, ни цены: продажа только через RFQ-форму. Склад не подтверждён. Явная оговорка на странице: 'not an authorized distributor or representative', товар из складских излишков."
+    },
+    {
+     "seller": "Top Brands PLC (topbrandsplc.com)",
+     "url": "https://www.topbrandsplc.com/products/allen-bradley-1794-ob8epxt-8-point-digital-output-module",
+     "country": "CN",
+     "price": "350.00",
+     "lead_time": "",
+     "note": "На карточке: 'In stock', '1000 left', Condition: 'Brand New & in Stock', $350.00. Ставлю covers_qty=unknown намеренно: '1000 left' — типовая заглушка инвентаря Shopify, а не складской остаток, продавец анонимный брокер (почты в подвале — topbrandsplc@camvect.com и sales7@cambia.cn, домены не совпадают с витриной, телефона нет). До подтверждения письмом число 1000 в расчёт закупки не ставить. Тот же профиль у plcdcspro.com ($123.00, 'In stock!', без числа и без контактов). Radwell по этому артикулу (карточка 403 и для WebFetch, и для curl) в выдаче показывает 1 шт в оригинальной упаковке $522.00, 5 шт в упаковке Radwell $486.00, refurbished $332.00 — карточку открыть не удалось, поэтому как подтверждённое не привожу."
+    }
+   ],
+   "emails": [
+    "sales@williamsautomation.com"
+   ],
+   "phones": [
+    "(803) 761-7027"
+   ]
+  },
+  {
+   "pn": "1SBN010010R1010",
+   "verdict": "in_stock",
+   "seller": "PLC Direct (Radwell-независимый склад излишков)",
+   "seller_url": "https://plc-direct.com/products/1sbn010010r1010",
+   "seller_country": "US",
+   "in_stock": "yes",
+   "stock_qty": "10 verified stock",
+   "lead_time": "",
+   "price": "138.87",
+   "currency": "USD",
+   "pack_qty": 1,
+   "covers_qty": "full",
+   "kind": "distributor",
+   "real_maker": "",
+   "real_pn": "",
+   "substitute": "",
+   "is_substitute": false,
+   "note": "ОБХОД БОТОЗАЩИТЫ 09.2026: прежняя ссылка отдавала 403, артикул искали заново на отдающих витринах. Карточка называет остаток числом: 'Sealed Surplus — 10 verified stock' по 138,87 USD за шт. Варианты 'Never Used Surplus' и 'Used' — Sold out. 10 шт ≥ 5 нужных, покрытие полное. Оговорка по цене: 138,87 USD — это цена склада излишков, она в разы выше каталожной ABB на этот блок контактов (порядок 10–25 USD). Перед закупкой сравнить с прайсом авторизованного дистрибьютора ABB: позиция серийная и снятой не значится.",
+   "alt_sellers": [
+    {
+     "seller": "Kempston Controls",
+     "url": "https://www.kempstoncontrols.com/1SBN010010R1010/ABB/sku/113715",
+     "country": "GB",
+     "price": "",
+     "lead_time": "",
+     "note": "Карточка существует по прямой ссылке, но сервер на запрос отдал HTTP 405 — страницу открыть не удалось, поэтому ни остаток, ни цену с неё я не снял и в поля не ставлю. В поисковой выдаче мелькали 33 шт и 9,92/7,94 — это НЕ подтверждение, цифры с карточки не читались. Лид годен только для запроса: наименование в карточке 'CA5-10, CONTACT BLOCK, FRONT MOUNT, 1NO, 6 A, 690 V, 1 POLE, SCREW CLAMP'."
+    }
+   ],
+   "emails": [
+    "support@plc-direct.com"
+   ],
+   "phones": [
+    "(847) 242-1595"
+   ]
+  },
+  {
+   "pn": "1SFA619402R5022",
+   "verdict": "pn_found_no_stock",
+   "seller": "Santa Clara Systems",
+   "seller_url": "https://www.santaclarasystems.com/abb/cl-502g",
+   "seller_country": "US",
+   "in_stock": "no",
+   "stock_qty": "",
+   "lead_time": "",
+   "price": "",
+   "currency": "USD",
+   "pack_qty": 1,
+   "covers_qty": "unknown",
+   "kind": "distributor",
+   "real_maker": "",
+   "real_pn": "",
+   "substitute": "CL2-502G / 1SFA619403R5022",
+   "is_substitute": false,
+   "note": "ОБХОД БОТОЗАЩИТЫ 09.2026: прежняя ссылка отдавала 403, артикул искали заново на отдающих витринах. Карточка CL-502G открывается, статус дословно 'Out of Stock', цена не показана. В карточке каталожный номер написан как 1SFA619402S5022 (S вместо R) — расхождение с запрошенным. Kele (https://www.kele.com/product/panel-fabrication/pilot-lights-and-selector-switches/abb/cl-502g, тел. 877.826.9045) по этой же позиции пишет дословно: 'This item has been discontinued and is no longer available for purchase.' Серия CL снята и заменена на CL2. Radwell по CL-502G отдал 403, не проверялся.",
+   "alt_sellers": [
+    {
+     "seller": "Barakastock (Baraka Agencies)",
+     "url": "https://www.barakastock.com/products/bs-no-bsabbcp1028",
+     "country": "QA",
+     "price": "",
+     "lead_time": "",
+     "note": "Единственная найденная карточка ровно с запрошенным номером 1SFA619402R5022. Внутренний артикул продавца CTT.ABB.PILT.1SFA619402R5022, наименование дословно 'ABB PILOT LIGHT#CL-502G#24V a.c./d.c.'. Цена на карточке показана как $0.00 — то есть цены нет, это запрос. Остаток числом не назван, наличие на карточке не заявлено. Покупать только после письменного подтверждения остатка и цены."
+    },
+    {
+     "seller": "Automation Distribution",
+     "url": "https://automationdistribution.com/abb-cl2-502g-green-pilot-light/",
+     "country": "US",
+     "price": "251.85",
+     "lead_time": "",
+     "note": "ЗАМЕНА: CL2-502G, упаковка по 10 шт. ВНИМАНИЕ: наличие 17 — это НЕ запрошенный 1SFA619402R5022, а преемник CL2-502G. ABB заменила серию CL на CL2: 1SFA619402R5022 → 1SFA619403R5022. Цена 251,85 USD — за УПАКОВКУ 10 шт (25,19 USD/шт), россыпью не продаётся, то есть под потребность 5 шт придётся взять 10. Остаток 17 — это 17 упаковок, потребность 5 шт закрывается одной. Замену обязан подтвердить инженер: CL2 совпадает по 22 мм вырезу и 24 В AC/DC, но это другое изделие. Второй продавец преемника — Electrihub (https://electrihub.com/abb-indicating-lamp-1SFA619403R5022, 6,69 USD/шт, тел. +1 (888) 293-7436), но статус дословно 'Back Ordered' — под заказ."
+    }
+   ],
+   "emails": [],
+   "phones": [
+    "1.888.450.0301"
+   ]
+  },
+  {
+   "pn": "1TNA920611R0002",
+   "verdict": "in_stock",
+   "seller": "Topbrands PLC Limited",
+   "seller_url": "https://www.topbrandsplc.com/products/abb-1tna920611r0002-m102-m-modbus-rtu-module",
+   "seller_country": "CN",
+   "in_stock": "conditional",
+   "stock_qty": "",
+   "lead_time": "",
+   "price": "540.00",
+   "currency": "USD",
+   "pack_qty": 1,
+   "covers_qty": "unknown",
+   "kind": "distributor",
+   "real_maker": "",
+   "real_pn": "",
+   "substitute": "",
+   "is_substitute": false,
+   "note": "ОБХОД БОТОЗАЩИТЫ 09.2026: прежняя ссылка отдавала 403, артикул искали заново на отдающих витринах. Карточка «ABB 1TNA920611R0002 M102-M MODBUS RTU Module». На странице: «Condition: Brand New & in Stock», гарантия 1 год на новые и оригинальные позиции; в микроразметке availability=InStock, price 540.00 USD. Числа остатка нет — склад не подтверждён, на 5 шт не закрывается по подтверждённым данным.",
+   "alt_sellers": [
+    {
+     "seller": "PLC Group S.r.l. (площадка us.automationparts.com)",
+     "url": "https://us.automationparts.com/abb/accessories-and-other-products/1tna920611r0002ipd",
+     "country": "IT",
+     "price": "2035.65",
+     "lead_time": "",
+     "note": "Карточка «1TNA920611R0002IPD ABB – M102-M», описание «RELAY,M102-M, RTU, CT 0.24-63.0A». На странице: «Availability: In Stock», «Condition: New», «Warranty: 12 Months · Express delivery»; в микроразметке availability=InStock, itemCondition=NewCondition, price 2035.65 USD. Числа остатка нет. Это маркетплейс: товар продаёт сторонний коммерческий пользователь под свою ответственность, PLC Group только площадка. Разброс с Topbrands почти четырёхкратный ($540 против $2 035,65) — по обоим требовать фото шильдика и подтверждение оригинала до оплаты."
+    },
+    {
+     "seller": "CWLY Automation",
+     "url": "https://www.cwlyautomation.com/product/5545.html",
+     "country": "CN",
+     "price": "",
+     "lead_time": "",
+     "note": "Карточка «1TNA920611R0002 ABB M102-M with MD21 24VDC 0.24 63A 24VDC», описание «M102-M, MODBUS RTU, CT 0.24-63.0A, DI:24VDC, Auxiliary Supply: 24VDC», Part Type: New, Minimum Order Quantity: 1 piece. Ни цены, ни остатка на странице нет. ВАЖНО ДЛЯ ЗАЯВКИ (состав подтверждён перечнем на hkxy-abb.ltd): 1TNA920611R0002 — это сам блок M102-M на 24 В DC; комплект «M102-M + панель MD21» имеет другой номер 1TNA920611R2002, панель MD21 отдельно — 1TNA920500R0002, трансформатор TA201 — 1TNA920005R2101. Часть продавцов подмешивает комплект к запросу на блок — сверить с заказчиком, что нужно. Официальная карточка ABB new.abb.com/products/1TNA920611R0002 существует, но соединение обрывается (HTTP/2 INTERNAL_ERROR)."
+    }
+   ],
+   "emails": [
+    "topbrandsplc@camvect.com",
+    "sales7@cambia.cn"
+   ],
+   "phones": [
+    "+86 180 3027 3592"
+   ]
+  },
+  {
+   "pn": "30111013-1",
+   "verdict": "pn_found_no_stock",
+   "seller": "Filter Element Store",
+   "seller_url": "https://filterelementstore.com/varco-30111013-kit-filter-replacement/",
+   "seller_country": "unknown",
+   "in_stock": "conditional",
+   "stock_qty": "",
+   "lead_time": "Contact us for lead time",
+   "price": "205.00",
+   "currency": "USD",
+   "pack_qty": 1,
+   "covers_qty": "unknown",
+   "kind": "distributor",
+   "real_maker": "Schroeder Industries — под шильдой NOV/Varco стоит фильтроэлемент Schroeder KM60V",
+   "real_pn": "KM60V (K-серия, 60 мкм, уплотнение Viton)",
+   "substitute": "",
+   "is_substitute": true,
+   "note": "НА СКЛАДЕ ЗАМЕНА, НЕ ОРИГИНАЛ: 30111013-KIT, аналог Schroeder KM60V. ОБХОД БОТОЗАЩИТЫ 09.2026: прежняя ссылка отдавала 403, артикул искали заново на отдающих витринах. Карточка на VARCO 30111013-KIT, цена 205,00 USD, наличие дословно 'in stock', но ЧИСЛА остатка нет — поэтому conditional и покрытие 4 шт неизвестно. Два важных расхождения. Первое: карточка на -KIT (элемент + кольцо), а нужен -1 (элемент отдельно); по каталогу NOV 30111013-1 это 'ASSY,FILTER,60-MICRON,OIL' с кольцом — сверить комплектность письмом. Второе: это НЕ оригинал, страница прямо пишет, что элемент даёт 'equal to or better filtration performance based on the original OEM filter specifications' — аналог, не OEM. Вскрытие изготовителя: связка 30111013 = Schroeder KM60V подтверждается карточкой Aeliya Marine Tech (https://aeliyamarinetech.com/products/schroeder-km60v, Mfg P/N '30111013-kit', модель Km60V, sales@aeliyamarinetech.com, +91 9725218537), но цена там выведена как US $0.00 и остатка нет.",
+   "alt_sellers": [
+    {
+     "seller": "Aftermarket Filtration (AFE)",
+     "url": "https://aftermarketfiltration.com/products/afe-km60-schroeder",
+     "country": "unknown",
+     "price": "90.73",
+     "lead_time": "1-2 Weeks",
+     "note": "ЗАМЕНА: AFE-KM60, аналог. Аналог по вскрытому номеру изготовителя: AFE-KM60, тонкость 60 мкм совпадает, цена 90,73 USD, срок с карточки дословно '1-2 Weeks', наличие на карточке не заявлено — склада нет. Страница прямо оговаривает, что товар 'not affiliated with the Original Equipment Manufacturer'. ОТДЕЛЬНО ПРЕДУПРЕЖДЕНИЕ по третьему аналогу: Filtration Point FP79611 (https://www.filtrationpoint.com/fp79611.html, 91,31 USD, sales@filtrationpoint.com, (888) 442-9959, США) продаётся как замена Schroeder KM60V, но на его карточке тонкость указана 74 микрона, а не 60 — по ТЗ ЛУКОЙЛа нужны 60 мкм, брать нельзя. Индекс V у KM60V — материал уплотнения (Viton); при заказе просто 'KM60' уплотнение может оказаться другим, сверять с рабочей средой (масло редуктора топ-драйва)."
+    }
+   ],
+   "emails": [],
+   "phones": []
+  },
+  {
+   "pn": "3332291",
+   "verdict": "pn_not_found",
+   "seller": "",
+   "seller_url": "",
+   "seller_country": "",
+   "in_stock": "no",
+   "stock_qty": "",
+   "lead_time": "",
+   "price": "",
+   "currency": "USD",
+   "pack_qty": 1,
+   "covers_qty": "unknown",
+   "kind": "oem",
+   "real_maker": "Solar Turbines Incorporated (Caterpillar)",
+   "real_pn": "",
+   "substitute": "",
+   "is_substitute": false,
+   "note": "ОБХОД БОТОЗАЩИТЫ 09.2026: прежняя ссылка отдавала 403, артикул искали заново на отдающих витринах. Артикул на открытых витринах не найден — ни одной карточки товара. Где искал: общий поиск по номеру с привязками «Solar Turbines», «o-ring», «valve cover», «seal ring», «Taurus 60»; каталоги перекрёстных ссылок по уплотнительным кольцам (MS/AN, SAE AIR63, Global O-Ring, Precision Associates); специализированные поставщики турбинных запчастей — peri-parts.com (отдаёт 403), turbineparts.com, southeastoverseas.com, gtaturbines.com, its-parts.com; фирменный магазин Solar Turbines shop.solarturbines.com и solarcertifiedparts.solar.cat.com — поиск по номеру без авторизации не отдаётся. Проверил гипотезу, что это семизначный номер Caterpillar в форме 332-2291 — совпадений нет. Вывод: позиция закрытой номенклатуры Solar Turbines, публичной дистрибуции не имеет; покупается либо через фирменный PartStore Solar по контракту, либо у держателей складов ЗИП по запросу. Дополнительный ход, который сработал на позиции 5: карточки продавцов турбинного ЗИП публикуют перекрёстные номера «Solar# — BN#», поэтому номер Solar может вскрыться через каталог изготовителя-субпоставщика уплотнения, а не через номер Solar.",
+   "alt_sellers": [],
+   "emails": [],
+   "phones": []
+  },
+  {
+   "pn": "3408549",
+   "verdict": "available_lead",
+   "seller": "ООО «Техзапчасти Интер-Трек» (iNTERTREK.info)",
+   "seller_url": "http://intertrek.info/pn/3408549?art=c4b1cfdae95b2cdb932d5bd8deb9a125",
+   "seller_country": "RU",
+   "in_stock": "conditional",
+   "stock_qty": "1 (колонка «Наличие»)",
+   "lead_time": "40 (колонка «Срок, дни»)",
+   "price": "32566",
+   "currency": "RUB",
+   "pack_qty": 1,
+   "covers_qty": "partial",
+   "kind": "distributor",
+   "real_maker": "",
+   "real_pn": "",
+   "substitute": "",
+   "is_substitute": false,
+   "note": "ОБХОД БОТОЗАЩИТЫ 09.2026: прежняя ссылка отдавала 403, артикул искали заново на отдающих витринах. Строка каталога: 3408549 / «Датчик давления» / англ. SENSOR,PRESSURE / двигатель Cummins GQSK60 / вес 0,15 кг / Наличие 1 / Цена 32 566,00 руб / Срок 40 дн. КРИТИЧНО: колонка «Обновлено» показывает 21.10.16 — это запись прошлой проверки десятилетней давности, а не сегодняшний остаток. Числом остатка считать нельзя без перезапроса на mail@intertrek.ru. Нужно 7 шт — даже по записи закрывается только 1.",
+   "alt_sellers": [
+    {
+     "seller": "Cummins Original Parts (COP), Санкт-Петербург",
+     "url": "https://cop-spb.ru/p48040047-datchik-davleniya-cummins.html",
+     "country": "RU",
+     "price": "35009",
+     "lead_time": "",
+     "note": "Карточка «Датчик давления Cummins 3408549», Артикул: 3408549, Производитель: Cummins. Цена на карточке 35 009 р., но строкой ниже прямо написано «Наличие и стоимость уточните у менеджера по телефону 8 800 707-86-10» — то есть ни цена, ни наличие продавцом не подтверждены. Склада за этой строкой нет."
+    },
+    {
+     "seller": "SONI POWER (The Generator Specialist)",
+     "url": "https://sonipower.com/cummins/kta-qsk-qsv/other-models/qsv81-qsv91/SP-3408549/",
+     "country": "IN",
+     "price": "",
+     "lead_time": "",
+     "note": "Карточка SP-3408549 «PRESSURE SENSOR – QSV81 / QSV91». На месте цены только кнопка «Get a quote» — ни цены, ни остатка. Артикул подтверждён как двигательный: другие источники относят 3408549 к Cummins QSK95 / QSV91G (топливный датчик давления), zapchasti-ekb.ru (Екатеринбург, order@zapchasti-ekb.ru) держит карточку без цены и без остатка. Где ещё искал: Mouser, DigiKey, RS, Allied, Galco, Automation24, Conrad, TME, Rexel, EU Automation — двигательные детали Cummins в этих каталогах не ведутся в принципе; Radwell, Octopart, FindItParts, DieselPartsDirect, shop.cummins.com — либо 403 Cloudflare, либо 404 по артикулу."
+    }
+   ],
+   "emails": [
+    "mail@intertrek.ru"
+   ],
+   "phones": [
+    "+7 (8352) 48-81-64",
+    "+7 (8352) 21-80-22"
+   ]
+  },
+  {
+   "pn": "3AX1103-2E",
+   "verdict": "in_stock",
+   "seller": "Electricals Shop (SM Industrial Solutions LLC)",
+   "seller_url": "https://electricals-shop.com/product/3ax1103-2e-siemens/",
+   "seller_country": "US",
+   "in_stock": "conditional",
+   "stock_qty": "",
+   "lead_time": "",
+   "price": "3265.68",
+   "currency": "USD",
+   "pack_qty": 1,
+   "covers_qty": "unknown",
+   "kind": "distributor",
+   "real_maker": "",
+   "real_pn": "",
+   "substitute": "",
+   "is_substitute": false,
+   "note": "ОБХОД БОТОЗАЩИТЫ 09.2026: прежняя ссылка отдавала 403, артикул искали заново на отдающих витринах. Карточка с кнопкой 'Add to cart', в разметке schema.org/InStock, цена $3 265,68, описание совпадает ('accessory for 3AH,3AK,3AE undervoltage release DC 110V incl. varistor'). Числа остатка нет — склад не подтверждён. Оговорка: цена выглядит завышенной против AUD 2 223 (≈$1 460) у PLC World, а сама витрина — сплошной прайс-лист Siemens без остатков; адрес на сайте 1621 Central Ave, Cheyenne, WY 82001. Перед заказом цену и наличие подтверждать письмом. WiAutomation по этому же артикулу показывает статус backorder (карточка 403).",
+   "alt_sellers": [
+    {
+     "seller": "PLC World Australia",
+     "url": "https://plcworld.com.au/product/3ax1103-2e-siemens/",
+     "country": "AU",
+     "price": "2223.19",
+     "lead_time": "Standard order — Delivery: 10 business day; Rush order — Delivery: 1 business day",
+     "note": "Два варианта на карточке: 'Standard order' AUD 2 223,19 со сроком 10 рабочих дней и 'Rush order' AUD 3 222,01 со сроком 1 рабочий день; в обоих поле 'Stock:' заполнено прочерком — склада нет, это поставка под заказ. Состояние 'Surplus/new in original packaging', гарантия 12 месяцев."
+    },
+    {
+     "seller": "Kempston Controls",
+     "url": "https://www.kempstoncontrols.com/3AX1103-2E/Siemens/sku/1897451",
+     "country": "GB",
+     "price": "",
+     "lead_time": "",
+     "note": "Самое важное по этой позиции: на карточке вместо цены стоит статус 'Discontinued', в спецификации 'Generic code: DISCONTD', 'Pricing Unit: Each', 'Last Known Country of Origin: Germany', вес 0,634 кг. Описание совпадает: 'accessory for 3AH,3AK,3AE undervoltage release DC 110V incl. varistor'. Замена на странице не названа. Официальный Siemens Industry Mall / SiePortal отдаёт 403 и мне, статус жизненного цикла у изготовителя подтвердить не удалось — это надо запросить у Siemens напрямую, прежде чем закупать 14 шт."
+    }
+   ],
+   "emails": [
+    "Sales@electricals-shop.com"
+   ],
+   "phones": [
+    "+1-503-486-4092"
+   ]
+  },
+  {
+   "pn": "3AXD50000038423",
+   "verdict": "in_stock",
+   "seller": "Topbrands PLC Limited",
+   "seller_url": "https://www.topbrandsplc.com/products/abb-afin-02c-3axd50000038423-motor-control-board",
+   "seller_country": "CN",
+   "in_stock": "conditional",
+   "stock_qty": "In stock, 1000 left",
+   "lead_time": "",
+   "price": "",
+   "currency": "USD",
+   "pack_qty": 1,
+   "covers_qty": "unknown",
+   "kind": "distributor",
+   "real_maker": "ABB",
+   "real_pn": "AFIN-02C",
+   "substitute": "",
+   "is_substitute": false,
+   "note": "ОБХОД БОТОЗАЩИТЫ 09.2026: прежняя ссылка отдавала 403, артикул искали заново на отдающих витринах. Карточка 'ABB AFIN-02C 3AXD50000038423 Motor Control Board', состояние 'Brand New & in Stock', гарантия 12 месяцев, происхождение указано Швеция, компания в Сямыне (КНР). Остаток на странице написан числом — '1000 left', но это типовое значение счётчика магазина на Shopify, а не подтверждённый склад: цены при этом нет вообще. Поэтому наличие ставлю conditional и covers_qty unknown, хотя формально 1000 > 9. Число проверять звонком до включения в закупку.",
+   "alt_sellers": [
+    {
+     "seller": "Eltra Trade",
+     "url": "https://eltra-trade.com/products/abb-afin-02c",
+     "country": "SK",
+     "price": "",
+     "lead_time": "3-6 недель в зависимости от страны",
+     "note": "Карточка: 'Motor control board', новая, вес 0,1 кг, габариты 100x140x30 мм, происхождение Эстония или Индия. Цена — 'Price on Request'. Склада нет, работа под заказ со сроком 3-6 недель. Почта на странице замаскирована скриптом и в текст не отдалась — не привожу, чтобы не выдумывать. Ценное с карточки: AFIN-02C является заменой AFIN-01C и обратно совместим — если у ЛУКОЙЛа на объекте стоят старые AFIN-01C, они закрываются этой же позицией."
+    },
+    {
+     "seller": "Platt Electric Supply (Rexel USA)",
+     "url": "https://www.platt.com/p/1431159/abb/abb-3axd50000038423fan-inverter-pcb-afin-02c-/abb3axd50000038423",
+     "country": "US",
+     "price": "",
+     "lead_time": "",
+     "note": "Это витрина сети Rexel в США (Platt). Позиция заведена в каталог: item # 1431159, описание 'ABB 3AXD50000038423 FAN INVERTER PCB AFIN-02C', но остаток прямо указан числом — 0 по всей компании, цена 'Call for price'. Ценность записи в том, что артикул подтверждён авторизованным каналом ABB в США: можно заказывать через Rexel с заводским сроком. Kempston Controls (Великобритания) и inverterdrive.com (Великобритания) карточку не отдали (405/403), их данные в отчёт не вошли."
+    }
+   ],
+   "emails": [
+    "topbrandsplc@camvect.com"
+   ],
+   "phones": [
+    "+86 180 3027 3592"
+   ]
+  },
+  {
+   "pn": "55.34.9.024.0040 с розеткой 94.74",
+   "verdict": "in_stock",
+   "seller": "DigiKey",
+   "seller_url": "https://www.digikey.com/en/products/detail/finder-relays-inc/55-34-9-024-0040/10055920",
+   "seller_country": "US",
+   "in_stock": "yes",
+   "stock_qty": "55.34.9.024.0040 — 716 In Stock у DigiKey; 94.74 — 297 units in stock у DigiKey",
+   "lead_time": "6 weeks (заводской срок для дозаказа); складская позиция отгружается сразу",
+   "price": 21.44,
+   "currency": "USD",
+   "pack_qty": 1,
+   "covers_qty": "full",
+   "kind": "distributor",
+   "real_maker": "Finder Relays, Inc.",
+   "real_pn": "55.34.9.024.0040, DigiKey 2066-55.34.9.024.0040-ND",
+   "substitute": "",
+   "is_substitute": false,
+   "note": "ОБХОД БОТОЗАЩИТЫ 09.2026. СОСТАВНАЯ СТРОКА: реле и розетка проверялись отдельно и сведены в одну позицию. Потребность 69 комплектов. Цена строки — сумма половин. 55.34.9.024.0040: Карточка: RELAY GEN PURPOSE 4PDT 7A 24V, катушка 24 В DC, статус Active, упаковка Bulk. Цена $13.88 за штуку при qty 1; ступени на карточке: 10 — $12.37, 30 — $11.70, 50 — $11.41, 100 — $11.01, 250 — $10.52. На нужные 69 шт попадает ступень 50 = $11.41/шт. Остаток 716 назван числом и перекрывает 69 шт целиком. | 94.74: Вторая половина позиции 6 — розетка под реле 55.34. Карточка: SOCKET FOR 55.34 RELAYS, 14 контактов, винтовой зажим, DIN-рейка, совместима с 55.32 и 55.34, статус Active. Остаток 297 шт числом, перекрывает 69 шт целиком. Цена $7.56 за штуку при qty 1; на 69 шт попадает ступень 50 = $6.21/шт. Полное обозначение на витрине — 94.74SMA, это исполнение артикула 94.74 из заявки. Реле и розетка закрываются одной отгрузкой у одного продавца.",
+   "alt_sellers": [
+    {
+     "seller": "FactoryMation",
+     "url": "https://www.factorymation.com/55-34-9-024-0040",
+     "country": "US",
+     "price": "10.35",
+     "lead_time": "Typically Ships Within 5-7 Days",
+     "note": "Цена ниже, чем у DigiKey — $10.35 за штуку, но продажа кратно 10 шт и остаток числом не назван, только срок отгрузки 5–7 дней, поэтому in_stock conditional и covers_qty unknown. На карточке отдельная оговорка: «Non-cancelable, Non-returnable» — заказ не отменяется и не возвращается. На 69 шт придётся брать 70."
+    }
+   ],
+   "emails": [],
+   "phones": []
+  },
+  {
+   "pn": "6ES7 131-4BD01-0AA0",
+   "verdict": "in_stock",
+   "seller": "DD Parts Solution",
+   "seller_url": "https://ddpartssolution.com/products/siemens-6es7131-4bd01-0aa0-simatic-et-200s-digital-input-module-4-di-24v-dc",
+   "seller_country": "US",
+   "in_stock": "yes",
+   "stock_qty": "+10 Available",
+   "lead_time": "United States — Fast Free Shipping",
+   "price": "32.00",
+   "currency": "USD",
+   "pack_qty": 1,
+   "covers_qty": "partial",
+   "kind": "distributor",
+   "real_maker": "",
+   "real_pn": "",
+   "substitute": "",
+   "is_substitute": false,
+   "note": "ОБХОД БОТОЗАЩИТЫ 09.2026: прежняя ссылка отдавала 403, артикул искали заново на отдающих витринах. Три исполнения на одной карточке: Refurbished $32.00, 'DDPARTSSOLUTION Packaging' $51.00, 'Original Packaging' $72.00. Статус 'In Stock', остаток написан как '+10 Available' — верхняя граница не названа, 10 из 24 закрыто наверняка, остальное под запрос. Важно для закупки: у Siemens этот модуль идёт упаковкой по 5 шт (PU=5), 24 шт = 5 упаковок; здесь продают поштучно.",
+   "alt_sellers": [
+    {
+     "seller": "CNC-Shopping (cnc-shopping.us)",
+     "url": "https://www.cnc-shopping.us/siemens-6es7131-4bd01-0aa0-simatic-dp-5-electronic-modules-for-et-200s-4di-24vdc.html",
+     "country": "FR",
+     "price": "66.60",
+     "lead_time": "stock available / Immediate shipment; Ships from: FRANCE Warehouse; DHL Worldwide Express 24/48h",
+     "note": "Карточка: состояние Refurbished, 'Ships from: FRANCE Warehouse', 'stock available — Immediate shipment', гарантия 3 месяца (возврат на завод), $66.60. Числа остатка нет — склад не подтверждён. Почты на странице нет, только телефон."
+    },
+    {
+     "seller": "B2E Surplus",
+     "url": "https://www.b2esurplus.com/siemens-6es7131-4bd01-0aa0-simatic-dp-electronic-module-for-et200s-4di-24vdc-refurbished/",
+     "country": "US",
+     "price": "27.90",
+     "lead_time": "In Stock - Ships Immediately",
+     "note": "Condition: Refurbished, гарантия 90 дней. Остаток назван числом — 1 шт. из 24. Прочие проверенные: sparecrux.com (Индия) — INR 9 896,53, в разметке inventory 2 шт; industrial-plc.com — 'In Stock 5 Items', но цена на карточке $0.99, то есть заглушка, в расчёт не годится; plc-city.com, jc-electronics.com, wiautomation.com, manescontrolsltd.co.uk отдают 403 и мне тоже."
+    }
+   ],
+   "emails": [
+    "sales@ddpartssolution.com"
+   ],
+   "phones": [
+    "+1 (689) 275-3558"
+   ]
+  },
+  {
+   "pn": "6ES7197-1LA04-0XA0",
+   "verdict": "in_stock",
+   "seller": "Classic Automation",
+   "seller_url": "https://www.classicautomation.com/6es7197-1la04-0xa0",
+   "seller_country": "US",
+   "in_stock": "conditional",
+   "stock_qty": "",
+   "lead_time": "на карточке 'Ask'",
+   "price": "",
+   "currency": "USD",
+   "pack_qty": 1,
+   "covers_qty": "unknown",
+   "kind": "distributor",
+   "real_maker": "Siemens",
+   "real_pn": "",
+   "substitute": "6ES7197-1LA12-0XA0 — более новый Y-Link (SIMATIC S7-400H и AS 410H); у PLC Direct (США) на карточке https://plc-direct.com/products/6es7197-1la12-0xa0 указано '12 units in stock', 2 087,71 USD, состояние Sealed Surplus, тел. (847) 242-1595, support@plc-direct.com. ВАЖНО: карточка PLC Direct НЕ называет его официальной заменой для -1LA04-, совместимость обязан подтвердить Siemens или служба КИПиА",
+   "is_substitute": false,
+   "note": "ОБХОД БОТОЗАЩИТЫ 09.2026: прежняя ссылка отдавала 403, артикул искали заново на отдающих витринах. Карточка: 'Y-LINK F. CONNECT. OF 1CHANNEL DP-SLAVES', SIMATIC S7-400. Написано 'In stock', но числа остатка нет — склад не подтверждён; цена тоже 'Ask'. Состояние — восстановленный/бывший в употреблении, гарантия 2 года, есть услуга ремонта. Отдельно к заявке: в списке позиция названа 'интерфейсный модуль Profibus ET200M/LINK', а по каталогу Siemens 6ES7197-1LA04-0XA0 — это Y-Link для подключения одноканальных DP-slave к S7-400H на базе IM153-BA02, с явной оговоркой 'not fit for PCS7 V6.1'. Наименование в заявке стоит уточнить у заказчика до закупки 8 шт.",
+   "alt_sellers": [
+    {
+     "seller": "Shanghai ZZ Import And Export Co., Ltd",
+     "url": "https://zzexport.com/product/6es7197-1la04-0xa0-siemens-simatic-s7-400h-y-link-for-connecting-single-channel-dp-slaves-to-s7-400h-based-on-im153-ba02-not-fit-for-pcs7-v6-1/",
+     "country": "CN",
+     "price": "",
+     "lead_time": "",
+     "note": "Артикул заведён карточкой с полным заводским описанием 'Y-LINK FOR CONNECTING SINGLE-CHANNEL DP SLAVES TO S7-400H BASED ON IM153-BA02 (NOT FIT FOR PCS7 V6.1)'. Ни цены, ни наличия: на странице написано 'Please contact us to check'. Менеджер — Alex Gao, часы работы пн-пт 8-19, сб 8-14 по китайскому времени. Склад не подтверждён ничем."
+    },
+    {
+     "seller": "Chinesespare (Hong Kong)",
+     "url": "http://www.chinesespare.com/more.php?id=58759",
+     "country": "HK",
+     "price": "",
+     "lead_time": "",
+     "note": "Карточка 'MODULE 6ES7197-1LA04-0XA0', тип SIMATIC S7-400H, габариты 40x125x130 мм, изготовитель Siemens. Цена — 'Inquiry', наличие не заявлено. Витрина посредническая. Проверены также plchardware.com и plc-trade.com — обе отдали 403, их данные не подтверждены. SiePortal (сайт Siemens) карточку не отдал: страница грузится скриптом, статус жизненного цикла и заводскую цену снять не удалось — это стоит запросить у Siemens напрямую, позиция для S7-400H старая и, вероятно, снята с производства."
+    }
+   ],
+   "emails": [
+    "sales@classicautomation.com"
+   ],
+   "phones": [
+    "+1 585-241-6010"
+   ]
+  },
+  {
+   "pn": "6ES7197-1LB00-0XA0",
+   "verdict": "in_stock",
+   "seller": "Santa Clara Systems",
+   "seller_url": "https://www.santaclarasystems.com/siemens/6es7197-1lb00-0xa0",
+   "seller_country": "US",
+   "in_stock": "conditional",
+   "stock_qty": "",
+   "lead_time": "«We can ship this part today!»",
+   "price": "",
+   "currency": "USD",
+   "pack_qty": 1,
+   "covers_qty": "unknown",
+   "kind": "distributor",
+   "real_maker": "",
+   "real_pn": "",
+   "substitute": "",
+   "is_substitute": false,
+   "note": "ОБХОД БОТОЗАЩИТЫ 09.2026: прежняя ссылка отдавала 403, артикул искали заново на отдающих витринах. На странице: «In Stock», «In stock and ready to ship», «We can ship this part today!», Condition: New Only, Product Type: Coupler Module, вес 0,562 lb, страна происхождения Germany, UPC 662643225273. Ни цены, ни числа остатка на карточке нет — склад не подтверждён числом, на 5 шт не закрывается по подтверждённым данным. Почты на странице нет, только телефон.",
+   "alt_sellers": [
+    {
+     "seller": "PLC2Day.com B.V.",
+     "url": "https://www.plc2day.com/buy-siemens-6es7197-1lb00-0xa0-2401020021",
+     "country": "NL",
+     "price": "123.36",
+     "lead_time": "",
+     "note": "Карточка «SIEMENS 6ES7197-1LB00-0XA0», описание «SIMATIC S7, Y coupler for setting up a Y-Link for redundant controllers, E-Stand: 03», EAN по HS 85389091. В микроразметке availability=InStock, price 123.36 EUR. Цены на карточке: базовая €128,20 (€105,95 без НДС) и со скидкой −4 % €123,36 (€101,95 без НДС) — все с НДС, если не помечено «Excl. Tax». ВАЖНО: в блоке характеристик стоит «Product Condition: Used» — позиция бывшая в употреблении, не новая. Числа остатка нет (шаблон магазина держит в разметке все три состояния сразу, «In stock / Backorder allowed / Out of stock», поэтому визуальной плашке верить нельзя — опираться только на availability=InStock в микроразметке). Адрес: Bornhemweg 147, 4731 TC Oudenbosch, NL. Radwell и EU Automation по этому артикулу открыть не удалось (Cloudflare 403), Siemens Industry Mall тоже отдаёт 403 — официальную цену и статус жизненного цикла подтвердить не вышло."
+    }
+   ],
+   "emails": [],
+   "phones": [
+    "1.888.450.0301"
+   ]
+  },
+  {
+   "pn": "6ES7321-1BL00-0AA0",
+   "verdict": "in_stock",
+   "seller": "MRO Electric",
+   "seller_url": "https://www.mroelectric.com/product/6ES7321-1BL00-0AA0",
+   "seller_country": "US",
+   "in_stock": "yes",
+   "stock_qty": "Refurbished — 2 in stock; New — 1 in stock",
+   "lead_time": "Ships Today (отгрузка в тот же день при заказе до отсечки)",
+   "price": "560.00",
+   "currency": "USD",
+   "pack_qty": 1,
+   "covers_qty": "partial",
+   "kind": "distributor",
+   "real_maker": "Siemens",
+   "real_pn": "",
+   "substitute": "",
+   "is_substitute": false,
+   "note": "ОБХОД БОТОЗАЩИТЫ 09.2026: прежняя ссылка отдавала 403, артикул искали заново на отдающих витринах. Карточка: 'SIMATIC S7 32 POINT, DIGITAL, ISOLATED, 24 VDC, 1 X 40 POLE'. Две цены: восстановленный 426,00 USD (2 шт) и новый 560,00 USD (1 шт), обе за штуку. В поле price поставлена цена нового. Гарантия MRO 2 года, бесплатная доставка. Суммарно 3 шт при потребности 11 — закрывает четверть, для полного объёма нужен сбор с нескольких продавцов.",
+   "alt_sellers": [
+    {
+     "seller": "Industrial Automation Co. (IAC)",
+     "url": "https://industrialautomationco.com/products/siemens-6es7321-1bl00-0aa0",
+     "country": "US",
+     "price": "584.00",
+     "lead_time": "доставка 14-16 сентября; отгрузка следующим днём при заказе до 16:00 ET",
+     "note": "Карточка показывает артикул с суффиксом -FS, описание 'SIMATIC S7-300, DIGITAL INPUT SM 321, OPTICALLY ISOLATED 32DI, 24 V DC, 1 X 40 PIN', состояние New, гарантия 2 года с возможностью продления до 10 лет. Оговорка на самой странице: 'This product is not available for online purchase' — цена 584,00 USD показана, но покупка идёт через запрос КП, то есть цена может не подтвердиться. Остаток 1 шт из нужных 11."
+    },
+    {
+     "seller": "Santa Clara Systems, Inc.",
+     "url": "https://www.santaclarasystems.com/siemens/6es7321-1bl00-0aa0",
+     "country": "US",
+     "price": "",
+     "lead_time": "отгрузка в тот же день при заказе до 15:00 PT",
+     "note": "Карточка 'Digital Input Module | SM 321 | SIMATIC S7-300', состояние 'New Only', написано 'We can ship this part today!' — но числа остатка нет, склад не подтверждён. Цена на странице не показана. Адрес: 2060 North Loop Road, Alameda, CA 94502. На странице прямо оговорено: 'not a Siemens Authorized Distributor'. Почты на карточке нет."
+    }
+   ],
+   "emails": [
+    "sales@mroelectric.com"
+   ],
+   "phones": [
+    "(800) 691-8511"
+   ]
+  },
+  {
+   "pn": "6ES7960-1AA04-0XA0",
+   "verdict": "in_stock",
+   "seller": "PLC Direct",
+   "seller_url": "https://plc-direct.com/products/6es7960-1aa04-0xa0",
+   "seller_country": "US",
+   "in_stock": "yes",
+   "stock_qty": "10 verified stock",
+   "lead_time": "",
+   "price": "169.38",
+   "currency": "USD",
+   "pack_qty": 1,
+   "covers_qty": "full",
+   "kind": "distributor",
+   "real_maker": "",
+   "real_pn": "",
+   "substitute": "6ES7960-1AA06-0XA0 (V6) — следующая ревизия того же синхромодуля",
+   "is_substitute": false,
+   "note": "ОБХОД БОТОЗАЩИТЫ 09.2026: прежняя ссылка отдавала 403, артикул искали заново на отдающих витринах. Карточка товара с остатком числом: 'Sealed Surplus — 10 verified stock' по 169,38 USD за шт; 'Never Used Surplus' и 'Used' — Sold out. 10 ≥ 4, покрытие полное. Это ревизия V4 синхромодуля SIMATIC S7-400H (патч-кабель до 10 м); в текущем каталоге Siemens ей отвечает V6 (6ES7960-1AA06-0XA0) — при замене ревизии сверять допустимость с конфигурацией H-системы, ревизии модулей в паре CPU 41xH смешивать нельзя без проверки. WiAutomation показывал 1 шт в наличии по 490,81 USD, но их страница отдала 403 — цифра НЕ подтверждена, в поля не внесена; при остатке 1 шт покрытие всё равно было бы частичным.",
+   "alt_sellers": [],
+   "emails": [
+    "support@plc-direct.com"
+   ],
+   "phones": [
+    "(847) 242-1595"
+   ]
+  },
+  {
+   "pn": "6ES7960-1AA06-0XA0",
+   "verdict": "in_stock",
+   "seller": "PLC Direct",
+   "seller_url": "https://plc-direct.com/products/6es7960-1aa06-0xa0",
+   "seller_country": "US",
+   "in_stock": "yes",
+   "stock_qty": "8 verified stock (Sealed Surplus); 5 verified stock (Never Used Surplus)",
+   "lead_time": "",
+   "price": "538.64",
+   "currency": "USD",
+   "pack_qty": 1,
+   "covers_qty": "full",
+   "kind": "distributor",
+   "real_maker": "",
+   "real_pn": "",
+   "substitute": "",
+   "is_substitute": false,
+   "note": "ОБХОД БОТОЗАЩИТЫ 09.2026: прежняя ссылка отдавала 403, артикул искали заново на отдающих витринах. Настоящая карточка товара с остатком, названным числом — то, чего августовская проверка не дала (там была ссылка на страницу поиска eBay). Два исполнения: 'Sealed Surplus' 538,64 USD — 8 verified stock; 'Never Used Surplus' 468,17 USD — 5 verified stock; 'Used' — Sold out. Любого из двух хватает на 4 шт, покрытие полное. Наименование по Siemens: SIMATIC S7-400H, синхромодуль V6 для патч-кабеля до 10 м. Оговорка: склад излишков, не авторизованный канал Siemens; гарантия и происхождение — вопрос к продавцу письмом. Eltra Trade показывал 408,69 EUR при сроке 3–6 недель, но карточку я не открывал — цифра не подтверждена.",
+   "alt_sellers": [],
+   "emails": [
+    "support@plc-direct.com"
+   ],
+   "phones": [
+    "(847) 242-1595"
+   ]
+  },
+  {
+   "pn": "7030B085",
+   "verdict": "pn_found_no_stock",
+   "seller": "Raptor Supplies",
+   "seller_url": "https://www.raptorsupplies.com/pd/schroeder/k25",
+   "seller_country": "GB",
+   "in_stock": "conditional",
+   "stock_qty": "17 In Stock — ВНИМАНИЕ: это остаток по позиции Schroeder K25, а не по артикулу 7030B085",
+   "lead_time": "Ships within 2 days",
+   "price": "25.77",
+   "currency": "USD",
+   "pack_qty": 1,
+   "covers_qty": "unknown",
+   "kind": "distributor",
+   "real_maker": "Schroeder Industries",
+   "real_pn": "K25",
+   "substitute": "Schroeder K25; кросс-номера с карточки: 52YT65, 925773, HC9700FKT9H (Pall), 5.03.09D25P (Hydac)",
+   "is_substitute": true,
+   "note": "НА СКЛАДЕ ЗАМЕНА, НЕ ОРИГИНАЛ: Schroeder K25, эквивалентность не доказана. ОБХОД БОТОЗАЩИТЫ 09.2026: прежняя ссылка отдавала 403, артикул искали заново на отдающих витринах. Карточка не на запрошенный артикул, а на предполагаемый аналог Schroeder K25: 'Hydraulic Filter Element', среда целлюлоза/бумага, тонкость 25 мкм, макс. давление 150 psi, уплотнение нитрил. Цена 25,77 USD за штуку без НДС (со скидкой 13% от 29,62 USD), остаток 17 шт, отгрузка в течение 2 дней. Кросс-номера на карточке: 52YT65, 925773, HC9700FKT9H (на странице отнесён к Pall), 5.03.09D25P (на странице отнесён к Hydac) — номер 925773 на Grainger значится как собственный номер Schroeder, атрибуция Raptor к Parker сомнительна. Все цифры относятся к K25, а не к 7030B085: в сумму закупки по заявке ЛУКОЙЛа эта строка идти не может, пока эквивалентность не подтверждена. Заводской номер позиции K25 в каталоге Schroeder — item 7628675 (https://catalog.schroederindustries.com/item/elements/k-hydraulic-cartridge-filter-element/7628675), там цена только по запросу, наличие не указано; геометрия элемента: наружный 99 мм, внутренний 41 мм, высота 231 мм, масса 0,64 кг — эти размеры и надо сверить с натурным элементом.",
+   "alt_sellers": [
+    {
+     "seller": "",
+     "url": "",
+     "country": "",
+     "price": "",
+     "lead_time": "",
+     "note": "Артикул 7030B085 не найден ни на одной допустимой витрине. Где искал: Mouser, DigiKey, RS Components, Allied Electronics, Galco, Radwell, Automation24, Conrad, TME, Rexel, PLC Center, Octopart, EU Automation; собственный каталог Schroeder Industries (catalog.schroederindustries.com); кросс-таблицы Parker, Hydac, Donaldson, Pall (sonafilter.com, swiftfilters.com, nationalfilters.com, catalog.hydac.com); российские поставщики фильтроэлементов. Единственная привязка артикула к изделию — заголовок листинга на исключённой площадке: 'SCHROEDER K25 Hydraulikfilterelement 7030B085 31017857'. Собственный номер 31017857 в каталоге Schroeder тоже не находится. То есть связь 7030B085 = Schroeder K25 подтверждена только заголовком стороннего продавца и требует проверки по чертежу или по шильдику корпуса фильтра перед любой закупкой. Отдельно: поиск по чистому '7030B085' даёт также торговые данные по направляющему распределителю буровой лебёдки NOV — то есть номер не уникален и может принадлежать другому изделию."
+    }
+   ],
+   "emails": [
+    "sales@raptorsupplies.com"
+   ],
+   "phones": [
+    "+44 203 287 5224"
+   ]
+  },
+  {
+   "pn": "750-880",
+   "verdict": "in_stock",
+   "seller": "ControlTech Supply Limited",
+   "seller_url": "https://www.controltech-supply.com/products/wago-750-880-ethernet-controller-in-stock",
+   "seller_country": "CN",
+   "in_stock": "yes",
+   "stock_qty": "Low stock: 8 left",
+   "lead_time": "1–3 дня для позиций со склада; отгрузка в течение 3 дней после оплаты; доставка 7–15 дней",
+   "price": "180.00",
+   "currency": "USD",
+   "pack_qty": 1,
+   "covers_qty": "full",
+   "kind": "distributor",
+   "real_maker": "",
+   "real_pn": "",
+   "substitute": "",
+   "is_substitute": false,
+   "note": "ОБХОД БОТОЗАЩИТЫ 09.2026: прежняя ссылка отдавала 403, артикул искали заново на отдающих витринах. Карточка «WAGO 750-880 Ethernet Controller In Stock». На странице числом написано «Low stock: 8 left», в микроразметке availability=InStock, price 180.00 USD, sku 750-880. 8 шт ≥ нужных 5 — количество закрывается. Условия: 100 % T/T до отгрузки, гарантия 1 год, доставка DHL/UPS/FedEx/TNT/EMS. Адрес: 1100 Linjiang East Road, Bailongqiao, Wucheng District, Jinhua City, Zhejiang. Оговорка: WAGO сняла 750-880 с производства (на карточке производителя присутствует вкладка «Successor model», DigiKey по варианту 750-880/040-001 пишет «This product is no longer available at DigiKey»), поэтому все живые предложения — вторичный/складской остаток, а не поток с завода.",
+   "alt_sellers": [
+    {
+     "seller": "6G Controls (High Five PLC Solution Limited)",
+     "url": "https://www.6gcontrols.com/products/wago-750-880-controller-ethernet-brand-new-in-stock/",
+     "country": "CN",
+     "price": "",
+     "lead_time": "1–3 рабочих дня после подтверждения оплаты",
+     "note": "Карточка «Wago 750-880 Controller ETHERNET Brand new in Stock». Числом на странице: «Low stock: 10 left» — 10 ≥ нужных 5, количество закрывается. Product No.: 750-880, Condition: Brand New, Country of origin: Germany, порт отгрузки Xiamen, гарантия 12 месяцев, оплата T/T или Western Union. ЦЕНЫ НА СТРАНИЦЕ НЕТ: вместо кнопки покупки стоит «Request a quote». В микроразметке лежит $9,90 — для Ethernet-контроллера это явная заглушка шаблона магазина, ценой её считать нельзя, поле оставлено пустым. Адрес: No.601, Hongwen Liuli, Siming District, Xiamen, Fujian 361000."
+    },
+    {
+     "seller": "OnlineElec (EuroComp/Camden)",
+     "url": "https://www.onlineelec.com/parts/wago/remote-i-o/series-750/wago-750-880/",
+     "country": "US",
+     "price": "",
+     "lead_time": "",
+     "note": "Карточка 750-880 есть, состояние New, но на месте наличия — «OutOfStock» / «Out Of Stock» и «Please Contact Us for Stock Availability»; цена не показана. Единственный найденный западный продавец с открытой страницей — и тот пуст. Где ещё искал по 750-880: Radwell, Galco, SOS Electronic, Octopart, PLC-City — все отдают Cloudflare-заглушку (HTTP 403); DigiKey по варианту 750-880/040-001 отвечает «This product is no longer available at DigiKey»; на сайте WAGO у 750-880 присутствует вкладка «Successor model» (номер преемника подгружается скриптом и на статической странице не виден); Mouser карточку базового 750-880 не показывает. Newark и eBay не трогались по условию задачи."
+    }
+   ],
+   "emails": [
+    "sales@controltech-supply.com"
+   ],
+   "phones": [
+    "+86 18857985841"
+   ]
+  },
+  {
+   "pn": "82749",
+   "verdict": "pn_found_no_stock",
+   "seller": "Aeliya Marine Tech",
+   "seller_url": "https://aeliyamarine.com/products/v-arco-82749-filter-pressure-element",
+   "seller_country": "IN",
+   "in_stock": "conditional",
+   "stock_qty": "",
+   "lead_time": "Orders ship within 24 hours",
+   "price": "280.24",
+   "currency": "USD",
+   "pack_qty": 1,
+   "covers_qty": "unknown",
+   "kind": "distributor",
+   "real_maker": "",
+   "real_pn": "перекрёстные номера с карточки: Xref X000245565, Mat# 297682, изготовитель указан как Nov-national",
+   "substitute": "",
+   "is_substitute": false,
+   "note": "ОБХОД БОТОЗАЩИТЫ 09.2026: прежняя ссылка отдавала 403, артикул искали заново на отдающих витринах. Единственная найденная карточка товара ровно на 82749. Наименование дословно 'Element, Filter Pressure', состояние New, вес 830 г, SKU 58756, цена 280,24 USD за шт (со скидкой 5% от 294,99). Остаток числом НЕ назван: на карточке есть лишь селектор количества со значением 2 PCS по умолчанию — это поле заказа, а не склад, поэтому наличие ставлю conditional, покрытие 4 шт неизвестно. Срок 'Orders ship within 24 hours' взят с карточки дословно. Больше нигде артикул не нашёлся: на бренд-странице VARCO у Filter Element Store (https://filterelementstore.com/brands/VARCO.html) номера 82749 нет вовсе. Перед закупкой запросить письмом остаток на 4 шт.",
+   "alt_sellers": [],
+   "emails": [
+    "sales@aeliyamarine.com"
+   ],
+   "phones": [
+    "+91 97252 18536"
+   ]
+  },
+  {
+   "pn": "A12B23HWB",
+   "verdict": "in_stock",
+   "seller": "BuyQual",
+   "seller_url": "https://www.buyqual.com/costech-a12b23hwb-w00-230v-0-130-0-110a-20-19w-2wires-cooling-fan.html",
+   "seller_country": "CN",
+   "in_stock": "conditional",
+   "stock_qty": "",
+   "lead_time": "",
+   "price": "8.00",
+   "currency": "USD",
+   "pack_qty": 1,
+   "covers_qty": "unknown",
+   "kind": "distributor",
+   "real_maker": "",
+   "real_pn": "",
+   "substitute": "",
+   "is_substitute": false,
+   "note": "ОБХОД БОТОЗАЩИТЫ 09.2026: прежняя ссылка отдавала 403, артикул искали заново на отдающих витринах. Карточка «Costech A12B23HWB W00 230V 0.130/0.110A 20/19W 2wires Cooling Fan». SKU A12B23HWB W00, Manufacturer: Costech, AC, 230 В, 0,130/0,110 A, 20/19 Вт, 2 провода. Плашки «In Stock» на этой карточке НЕТ (разметка наличия закомментирована), есть только маркетинговая строка «Stock and sold many» и кнопка «Add to Cart» — числа остатка нет, склад не подтверждён. Цена за штуку $8,00; объёмные тарифы: от 2 шт $7,50, от 4 шт $7,00, от 10 шт $6,50 — на нужные 6 шт выходит $7,00/шт. Расхождение по габариту: карточка пишет 120×120×25 мм, тогда как 20/19-ваттный 230-вольтовый Costech обычно 120×120×38 — снять у продавца до заказа. Почты на странице нет (адрес скрыт скриптом), контакт — WhatsApp/WeChat. Pennine Components (UK) в выдаче показывает A12B23HWB за £40,65, но сайт не отвечает (connection reset) — не подтверждено, в расчёт не берётся.",
+   "alt_sellers": [
+    {
+     "seller": "BuyQual (исполнение WQ56)",
+     "url": "https://www.buyqual.com/costech-a12b23hwb-wq56-230v-20-19w-2wires-cooling-fan.html",
+     "country": "CN",
+     "price": "10.00",
+     "lead_time": "",
+     "note": "Второе исполнение того же базового артикула: «Costech A12B23HWB WQ56 230V 20/19W 2wires Cooling Fan». Цена $10,00 за штуку, объёмные тарифы $9,50 / $9,00 / $8,50. Как и на W00 — «Stock and sold many», числа остатка нет. Суффикс после артикула (W00, WQ56, WF0) отличает исполнение по выводам и подшипнику; какой стоит на машине — надо снять с шильдика снятого вентилятора, иначе можно взять негодное исполнение."
+    },
+    {
+     "seller": "Enapart LLC (витрина Ontrium)",
+     "url": "https://www.ontrium.com/en/usa/brands/costech/a12b23hwb",
+     "country": "US",
+     "price": "",
+     "lead_time": "",
+     "note": "Карточка артикула есть, «Condition: New (Unused)», но цена в микроразметке 0.00, а текст страницы прямо говорит: «Our team of experts will find the best sales prices» и «We are not a distributor of Costech but we can sell their products to you at good prices». Это брокерский запрос цены, а не склад. Адрес: 1100 Northwest Loop 410, Ste 700, San Antonio, TX 78213. Телефон на странице подписан заголовком «Phone», самого номера в тексте нет."
+    }
+   ],
+   "emails": [],
+   "phones": [
+    "+86 18676708729"
+   ]
+  },
+  {
+   "pn": "BN1701/15",
+   "verdict": "in_stock",
+   "seller": "ControlTech Supply Limited",
+   "seller_url": "https://www.controltech-supply.com/products/bently-nevada-1701-15-141379-01-proximitor-input-module",
+   "seller_country": "CN",
+   "in_stock": "yes",
+   "stock_qty": "Low stock: 6 left",
+   "lead_time": "для складских позиций отгрузка 1-3 дня после оплаты; по несклацким — договорная",
+   "price": "",
+   "currency": "USD",
+   "pack_qty": 1,
+   "covers_qty": "partial",
+   "kind": "distributor",
+   "real_maker": "Bently Nevada (GE Vernova), США",
+   "real_pn": "141379-01",
+   "substitute": "",
+   "is_substitute": false,
+   "note": "ОБХОД БОТОЗАЩИТЫ 09.2026: прежняя ссылка отдавала 403, артикул искали заново на отдающих витринах. Карточка товара: 'Bently Nevada 1701/15 141379-01 Proximitor Input Module', two-channel, вес 1000 г, гарантия 12 месяцев, страна происхождения USA, порт отгрузки Сямынь, оплата T/T 100% предоплата. Цена на карточке не показана — только запрос. Остаток 6 шт при потребности 12, покрывает половину. Артикул в заявке 'BN1701/15' = серия Bently Nevada 1701 FieldMonitor, модуль 1701/15 (Proximitor Input Monitor для радиальной вибрации и осевого сдвига), заводской номер GE 141379-01.",
+   "alt_sellers": [
+    {
+     "seller": "BentlyDCS Automation",
+     "url": "https://www.bentlydcs.com/product/bently-nevada-1701-15-fieldmonitor-proximitor-input-monitor/",
+     "country": "CN",
+     "price": "",
+     "lead_time": "",
+     "note": "Карточка 'BENTLY NEVADA 1701/15 FieldMonitor Proximitor Input Monitor', SKU 1246241, на странице написано 'In stock' без числа остатка — склад не подтверждён. Цены нет. Адрес продавца — провинция Фуцзянь, КНР; почта на бесплатном домене gmail, для закупки ЛУКОЙЛа это признак посредника, а не дистрибьютора."
+    },
+    {
+     "seller": "AutoControl Global",
+     "url": "https://www.autocontrolglobal.com/products/bently-nevada-1701-15-141379-01-fieldmonitor-proximitor-input-monitor",
+     "country": "US",
+     "price": "",
+     "lead_time": "",
+     "note": "Карточка по артикулу 141379-01: состояние 'New with Original Package', гарантия 12 месяцев, страна происхождения USA. Наличие и цена на странице не указаны вообще, только кнопка 'Request a quote'. Контактов на карточке нет — почту и телефон не привожу, чтобы не выдумывать. Отдельно: Artisan Technology Group (artisantg.com) в выдаче показывает 1701/15 за 1 350 USD и '5+ в наличии', но карточка отдаёт 403 (Cloudflare), проверить написанное на ней не удалось — в отчёт не ставлю."
+    }
+   ],
+   "emails": [
+    "sales@controltech-supply.com"
+   ],
+   "phones": [
+    "+86 15395923051"
+   ]
+  },
+  {
+   "pn": "BPZ:SKC62",
+   "verdict": "in_stock",
+   "seller": "Todo-Control (Barcelona)",
+   "seller_url": "https://www.todo-control.com/actuator-skc62-siemens",
+   "seller_country": "ES",
+   "in_stock": "yes",
+   "stock_qty": "Stock: 1 units",
+   "lead_time": "Delivery: 24-48h",
+   "price": "1173.50",
+   "currency": "EUR",
+   "pack_qty": 1,
+   "covers_qty": "partial",
+   "kind": "distributor",
+   "real_maker": "",
+   "real_pn": "",
+   "substitute": "",
+   "is_substitute": false,
+   "note": "ОБХОД БОТОЗАЩИТЫ 09.2026: прежняя ссылка отдавала 403, артикул искали заново на отдающих витринах. Карточка 'SKC62 Siemens, Electro-hydraulic actuators for valves': 'Stock 1 units', 'Delivery: 24-48h', цена 1 173,50 € (было 1 277,00 €), 'Taxes not included'. Остаток назван числом — 1 шт. из 21.",
+   "alt_sellers": [
+    {
+     "seller": "2K Shops",
+     "url": "https://www.2kshops.com/siemens-skc62/",
+     "country": "GB",
+     "price": "823.03",
+     "lead_time": "Usually ships within 4 to 6 working days. For express delivery please contact us.",
+     "note": "SKU на карточке — SKC62, Condition: New, цена 'Now: £823.03'. Поле 'Current Stock:' на странице пустое, срок — 4-6 рабочих дней, то есть поставка под заказ, а не со склада. Описание совпадает с нужным исполнением: 2800 N, 40 мм, AC 24 V, DC 0...10 V/4...20 mA, spring return."
+    },
+    {
+     "seller": "SIPATEC d.o.o.",
+     "url": "https://www.sipatec.org/skc62/",
+     "country": "RS",
+     "price": "1064.00",
+     "lead_time": "",
+     "note": "Карточка с точным SKU 'BPZ:SKC62', цена 1 064,00 €, есть кнопка 'Add to cart', но ни остатка, ни срока не указано; в подвале прямо сказано 'Prices are in EUR, VAT is not included. The availability and prices can vary by country.' Прочее по этому артикулу: Bola Systems (BE/CZ, bolasystems.com/lift-actuator-siemens-skc-62-skc62) — 'Out of stock - can be requested', в разметке OutOfStock; usedindustrialparts.com (NL, б/у, parts@usedindustrialparts.com, +31 6 12 94 31 59) — $476.86, 'In stock' без числа; RS Online (no.rs-online.com/web/p/valve-actuators/2825268) и Radwell отдают 403 и мне. Почта на сайте SIPATEC замаскирована ([email protected]) — выдумывать не стал."
+    }
+   ],
+   "emails": [
+    "consultas@todo-control.com"
+   ],
+   "phones": [
+    "+34 93 454 2006"
+   ]
+  },
+  {
+   "pn": "C9-A41FX/DC24V + S9-M",
+   "verdict": "in_stock",
+   "seller": "TSI Solutions",
+   "seller_url": "https://www.tsisolutions.us/itemdetail/?itemCode=C9-A41FX%2F024VDC",
+   "seller_country": "US",
+   "in_stock": "yes",
+   "stock_qty": "C9-A41FX/DC24V — 895 EA Available у TSI Solutions; S9-M — 5563 EA Available у TSI Solutions",
+   "lead_time": "Typically Ships Within 6 Days",
+   "price": 41.6,
+   "currency": "USD",
+   "pack_qty": 1,
+   "covers_qty": "full",
+   "kind": "distributor",
+   "real_maker": "Comat Releco, вошедшая в TURCK. На витринах позиция идёт под шильдой TURCK, серия QRC",
+   "real_pn": "C9-A41FX/024VDC — текущее написание артикула у TURCK. Старое написание Releco C9-A41FX24D — то же изделие",
+   "substitute": "",
+   "is_substitute": false,
+   "note": "ОБХОД БОТОЗАЩИТЫ 09.2026. СОСТАВНАЯ СТРОКА: реле и розетка проверялись отдельно и сведены в одну позицию. Потребность 179 комплектов. Цена строки — сумма половин. C9-A41FX/DC24V: Авторизованный дистрибьютор TURCK. Остаток 895 EA назван числом и перекрывает нужные 179 шт целиком, цена $27.40 за штуку. Изделие: миниатюрное реле 4PDT, 5 A, 24 В DC, 14 выводов, с диодом и светодиодом. Розетку см. отдельной строкой S9-M — у того же продавца. | S9-M: Вторая половина позиции 2 заявки — розетка под реле C9-A41FX. Остаток 5 563 EA числом, перекрывает 179 шт целиком, $14.20 за штуку. Розетка на 14 выводов, винтовой зажим, монтаж на DIN-рейку, 6 A / 250 В. Комплект реле+розетка на 179 машинокомплектов закрывается у одного продавца одной отгрузкой.",
+   "alt_sellers": [],
+   "emails": [
+    "sales@tsisolutions.us"
+   ],
+   "phones": [
+    "(770) 879-3500"
+   ]
+  },
+  {
+   "pn": "DFB123812H",
+   "verdict": "in_stock",
+   "seller": "BuyQual",
+   "seller_url": "https://www.buyqual.com/dc-dfb123812h-12v-0-60a-2-wires-cooling-fan.html",
+   "seller_country": "CN",
+   "in_stock": "conditional",
+   "stock_qty": "",
+   "lead_time": "",
+   "price": "7.50",
+   "currency": "USD",
+   "pack_qty": 1,
+   "covers_qty": "unknown",
+   "kind": "distributor",
+   "real_maker": "Young Lin Tech Co., Ltd. (Тайвань); на карточке написано YONG LIN",
+   "real_pn": "DFB123812H",
+   "substitute": "",
+   "is_substitute": false,
+   "note": "ОБХОД БОТОЗАЩИТЫ 09.2026: прежняя ссылка отдавала 403, артикул искали заново на отдающих витринах. Карточка «YONG LIN DFB123812H 12V 7.2W 2wires 3wires Cooling Fan». Part Number DFB123812H, Brand YONG LIN, размер 120×120×38 мм, 12 В, 7,2 Вт, 2/3 провода. Плашка «In Stock» на карточке есть, числа остатка нет — склад не подтверждён. Цена $7,50 за штуку; объёмные тарифы: от 2 шт $7,00, от 4 шт $6,50, от 10 шт $6,00 — на нужные 6 шт $6,50/шт; исполнение на 3 провода дороже на $0,10. ПРОВЕРКА ИЗГОТОВИТЕЛЯ: гипотеза про Delta Electronics не подтвердилась. Во всех найденных источниках изготовитель — Young Lin Tech (Тайвань); у Delta 120-мм осевые идут под префиксами AFB/FFB/PFB/BFB, префикса DFB у неё нет. Карточку на fandevice.com найти не удалось (страница отдаёт мягкий 404), Amazon и eBay не считаются: Amazon отдаёт CAPTCHA, eBay по условию задачи не трогался.",
+   "alt_sellers": [],
+   "emails": [],
+   "phones": [
+    "+86 18676708729"
+   ]
+  },
+  {
+   "pn": "HDIBATTE260DOTAA",
+   "verdict": "in_stock",
+   "seller": "Toos Global",
+   "seller_url": "https://toosglobal.com/products/hdi-hdibatt-e260-dot-aa-battery-power-pack-new",
+   "seller_country": "IN",
+   "in_stock": "conditional",
+   "stock_qty": "3 units available (на той же странице стоит статус Sold out — противоречие)",
+   "lead_time": "ready to ship immediately",
+   "price": "",
+   "currency": "USD",
+   "pack_qty": 1,
+   "covers_qty": "unknown",
+   "kind": "distributor",
+   "real_maker": "HDI Instruments, LLC (США)",
+   "real_pn": "HDIBATT-E260-DOT-AA",
+   "substitute": "",
+   "is_substitute": false,
+   "note": "ОБХОД БОТОЗАЩИТЫ 09.2026: прежняя ссылка отдавала 403, артикул искали заново на отдающих витринах. Карточка 'HDI HDIBATT-E260-DOT-AA BATTERY POWER PACK NEW', сделано в США, состояние New. Цена указана как 0,00 USD — то есть цены фактически нет, продажа по запросу. Страница одновременно пишет '3 units available' и 'Sold out', поэтому наличие ставлю conditional, а не yes. На карточке перечислены ещё номера: 2065262700, 7093000, 709-92618 — вероятно кросс-номера тела батареи, требуют проверки. Из нужных 10 шт даже заявленные 3 закрывают меньше трети.",
+   "alt_sellers": [
+    {
+     "seller": "Aeliya Marine Tech Pvt. Ltd.",
+     "url": "https://aeliyamarinetech.com/products/hdi-hdibatt-e260-dot-aa-power-pack-battery",
+     "country": "IN",
+     "price": "",
+     "lead_time": "4-8 рабочих дней до большинства стран, доставка бесплатная экспресс",
+     "note": "Карточка: 'Lithium Inorganic 3.6V Battery', E260 Power Pack, Class 1, Groups A,B,C,D, масса 430 г, SKU 58757. Изготовитель на карточке — HDI Instruments / Tadiran Ltd, то есть под шильдой HDI стоят литиевые элементы Tadiran: при срыве поставки HDI имеет смысл искать эквивалент по элементу Tadiran. Цена показана как 0,00 USD (то есть отсутствует), наличие на странице не заявлено. Гарантия 30 дней от даты поставки. Батарея литиевая — отгрузка авиа подпадает под IATA, срок реально будет больше заявленного."
+    },
+    {
+     "seller": "Auto2Mation",
+     "url": "https://auto2mation.com/hdi-hdibatt-e260-dot-aa-power-pack-battery.html",
+     "country": "IN",
+     "price": "",
+     "lead_time": "обработка складских позиций 24 часа, перевозчики DHL/FedEx",
+     "note": "Карточка SKU 58757, состояние New, описание совпадает с Aeliya (те же 430 г, Class 1 Groups A,B,C,D) — два индийских магазина из Бхавнагара с общей номенклатурой, вероятно один источник. Статус прямо: Out of stock, цена 0,00 USD. Почты на карточке нет, только форма. Проверены также snshipspare.com (Индия) — 'Out of stock', 'New - Open Box', тел. +91 94277 40188; unitedmarineservices.in — ни цены, ни наличия; adghaloilfield.com (Дубай, тел. +971-4-2679402) — цена 10,00 GBP, что на два порядка ниже рыночных ~780 USD и явно является заглушкой, в расчёт не берётся. Итог: на доступных витринах подтверждённого склада по этому артикулу нет."
+    }
+   ],
+   "emails": [
+    "info@toosglobal.com",
+    "sales@toosglobal.com"
+   ],
+   "phones": [
+    "+91 81409 03903"
+   ]
+  },
+  {
+   "pn": "PLC-RSC-24DC/21-21/ATEX, 2980461",
+   "verdict": "in_stock",
+   "seller": "Aeliya Marine Tech",
+   "seller_url": "https://aeliyamarinetech.com/products/phoenix-contact-plc-rsc-24dc-21-21atex-2980461-interface-relay-module",
+   "seller_country": "IN",
+   "in_stock": "yes",
+   "stock_qty": "Only 1 left",
+   "lead_time": "Free Expedited Shipping from India, срок не назван",
+   "price": "70.99",
+   "currency": "USD",
+   "pack_qty": 1,
+   "covers_qty": "partial",
+   "kind": "marketplace",
+   "real_maker": "Phoenix Contact",
+   "real_pn": "2980461",
+   "substitute": "",
+   "is_substitute": false,
+   "note": "ОБХОД БОТОЗАЩИТЫ 09.2026: прежняя ссылка отдавала 403, артикул искали заново на отдающих витринах. Оригинальный артикул, новый, но остаток названный числом — ровно 1 шт из нужных 156. Склад Бхавнагар, Индия, гарантия работоспособности 30 дней. Это не источник закупки, а доказательство, что оригинал ещё ходит по вторичному рынку поштучно. Для сравнения: турецкий Boyut Endustriyel держит карточку того же артикула по $100.00 со статусом Sold out.",
+   "alt_sellers": [
+    {
+     "seller": "DigiKey",
+     "url": "https://www.digikey.com/product-detail/en/phoenix-contact/2980461/277-4846-ND/2242359",
+     "country": "US",
+     "price": "",
+     "lead_time": "",
+     "note": "ЗАМЕНА: 2909509 (/EX вместо /ATEX). Карточка живая, но статус жизненного цикла: «Obsolete and no longer manufactured». Цены и остатка нет. На той же карточке DigiKey указывает прямую замену — Phoenix Contact 2909509. Это ключевой факт по позиции: оригинал 2980461 снят с производства, закупать 156 шт нужно заменой либо искать складские хвосты у брокеров."
+    },
+    {
+     "seller": "DigiKey",
+     "url": "https://www.digikey.com/en/products/detail/phoenix-contact/2909509/7327782",
+     "country": "US",
+     "price": "24.76",
+     "lead_time": "6 weeks (standard) для дозаказа",
+     "note": "ЗАМЕНА: 2909509 (/EX вместо /ATEX). ЭТО ЗАМЕНА, НЕ ОРИГИНАЛ. Карточка: 572 шт на складе, $24.76 за штуку, статус Active, упаковка Bulk, 6 A, 2 перекидных, катушка 24 В DC, розетка в комплекте, допуск ATEX/IECEx зона 2 и Class I Div. 2 — то есть взрывозащита оригинала сохранена. Остаток 572 перекрывает нужные 156 шт целиком. Обозначение отличается от оригинала: у оригинала /ATEX, у замены /EX — перед закупкой замену обязан подтвердить инженер по КИП, ссылка на «прямую замену» у дистрибьютора решением заказчика не является."
+    }
+   ],
+   "emails": [
+    "sales@aeliyamarinetech.com"
+   ],
+   "phones": [
+    "+91 9725218537"
+   ]
+  },
+  {
+   "pn": "RTE24024",
+   "verdict": "in_stock",
+   "seller": "DigiKey",
+   "seller_url": "https://www.digikey.com/en/products/detail/te-connectivity-potter-brumfield-relays/RTE24024/1095363",
+   "seller_country": "US",
+   "in_stock": "yes",
+   "stock_qty": "4,099 In Stock",
+   "lead_time": "19 Weeks (Manufacturer Standard) для дозаказа; складская позиция отгружается сразу",
+   "price": "6.02",
+   "currency": "USD",
+   "pack_qty": 1,
+   "covers_qty": "full",
+   "kind": "distributor",
+   "real_maker": "TE Connectivity / Schrack (бренд Potter & Brumfield). НЕ Schneider Electric и НЕ Releco — исходная атрибуция в заявке ошибочна",
+   "real_pn": "RTE24024 (кат. TE 1-1393243-0), DigiKey PB989-ND",
+   "substitute": "",
+   "is_substitute": false,
+   "note": "ОБХОД БОТОЗАЩИТЫ 09.2026: прежняя ссылка отдавала 403, артикул искали заново на отдающих витринах. Карточка товара: General Purpose Relay DPDT (2 Form C) 24VDC Coil Through Hole, 8 A, упаковка Tube, статус Active. Цена $6.02 за штуку при qty 1; на карточке ступени: 20 шт — $5.18, 40 — $5.00, 60 — $4.90, 100 — $4.78, 260 — $4.55, 500 — $4.41, 1000 — $4.25. На нужные 311 шт попадает ступень 260 = $4.55/шт. Остаток 4 099 назван числом и перекрывает 311 шт целиком.",
+   "alt_sellers": [
+    {
+     "seller": "SINLIN Electronics",
+     "url": "https://www.sinlinelec.com/part-item/00360080-RTE24024.html",
+     "country": "US",
+     "price": "4.10",
+     "lead_time": "Can ship immediately",
+     "note": "Независимый сток-дистрибьютор (не авторизованный). Остаток 3 132 шт назван числом, цена $4.10 за штуку при qty 1, отгрузка немедленная. Почта на странице скрыта маской «[email protected]» — реального адреса нет, поле оставлено пустым намеренно. Проверить происхождение партии до оплаты: авторизации TE у продавца на странице не заявлено."
+    },
+    {
+     "seller": "Sigma Surplus",
+     "url": "https://sigmasurplus.com/te-connectivity-rte24024-relay/",
+     "country": "US",
+     "price": "3.99",
+     "lead_time": "",
+     "note": "Четыре состояния на карточке: «Never Used — Original Packaging», «Never Used — SIGMA Packaging» и «SIGMA Certified Refurbished» — все три Out of stock. В наличии только позиция Used по $3.99, количество числом не названо. Для закупки 311 шт новых не годится, привожу как замер рынка б/у. Отдельно: сайт изготовителя te.com по этому артикулу отвечает «This product is not currently available» — прямой продажи с завода нет, только через дистрибуцию."
+    }
+   ],
+   "emails": [],
+   "phones": []
+  },
+  {
+   "pn": "TAS-311DG",
+   "verdict": "pn_found_no_stock",
+   "seller": "Instru-Measure",
+   "seller_url": "https://instru-measure.com/deif-2962010100-01-tas-311dg-variant-01-tas-311dg-ac-transducer-for-voltage-customised-ac-voltage-aux-supply/",
+   "seller_country": "unknown",
+   "in_stock": "conditional",
+   "stock_qty": "",
+   "lead_time": "",
+   "price": "589.66",
+   "currency": "USD",
+   "pack_qty": 1,
+   "covers_qty": "unknown",
+   "kind": "distributor",
+   "real_maker": "DEIF A/S",
+   "real_pn": "2962010100 01 (исполнение 01 — измерение напряжения, питание AC)",
+   "substitute": "",
+   "is_substitute": false,
+   "note": "ОБХОД БОТОЗАЩИТЫ 09.2026: прежняя ссылка отдавала 403, артикул искали заново на отдающих витринах. Карточка ровно на заводское исполнение DEIF 2962010100 01, цена 589,66 USD за шт. Поле 'Current Stock:' на карточке ЕСТЬ, но число в нём не выведено — значит подтверждённого склада нет, ставлю conditional. Страна продавца на странице не указана, расчёт в USD. У того же продавца отдельными карточками лежат исполнения 02 (напряжение, DC-питание) и 03 (фазовый угол) — выбирать по шильдику с площадки.",
+   "alt_sellers": [
+    {
+     "seller": "Alliance Power Solution (APSE)",
+     "url": "https://www.apse-online.com/index.php?route=product/product&path=195&product_id=667",
+     "country": "MM",
+     "price": "",
+     "lead_time": "",
+     "note": "Карточка ровно на TAS-311DG, статус дословно 'Pre-Order' — склада нет, только заказ. Цена на карточке выведена как 0.00 Ks (мьянманский кьят), то есть цены фактически нет. Третий канал — Ship Automation (Индия, https://www.shipautomation.com/product/deif-tas-311dg-selectable-ac-transducer/, info@shipautomation.com, +91 8092424242): карточка есть, ни цены, ни остатка на ней не показано. Карточка NEMO Supply по ссылке из выдачи отдала другой товар (ADDE-541BA), то есть по TAS-311DG не подтверждает ничего."
+    },
+    {
+     "seller": "DEIF A/S (изготовитель)",
+     "url": "https://www.deif.com/products/tas-311dg-ac-transducer/",
+     "country": "DK",
+     "price": "",
+     "lead_time": "",
+     "note": "ГЛАВНОЕ: настоящий изготовитель — НЕ Tasco и НЕ Toshiba. Это DEIF A/S, Дания; шильда Siemens SGT-400 — комплектация пакета, TAS = линейка преобразователей DEIF. Изделие на сайте изготовителя живое, снятым не помечено, преемник не назван (в отличие от соседнего TAC-311DG, который с производства снят). Цены и остатка на сайте изготовителя нет — только каталог. КРИТИЧНО ДЛЯ ЗАКУПКИ: TAS-311DG — преобразователь, конфигурируемый на заводе, он поставляется исполнением под измеряемую величину (U, I, f, фазовый угол), диапазон входа и вид выхода. Без снятия исполнения со старого прибора (табличка, заказной номер 2962010100 XX и диапазон) заказ бессмысленен: придёт прибор на другую величину. С площадки нужен полный шильдик."
+    }
+   ],
+   "emails": [],
+   "phones": []
+  }
+ ]
+}

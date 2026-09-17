@@ -1,5 +1,5 @@
 {
- "updated": "2026-09-12",
+ "updated": "2026-09-13",
  "source": "Справочник адресатов по заявке ЛУКОЙЛ: контакты для рассылки запросов цен",
  "method": "workflow lukoil-seller-contacts: по каждой компании прямой фетч страниц контактов её сайта (поиск только при неизвестном домене). Адреса и телефоны — только те, что напечатаны на странице; конструирование адресов по шаблону запрещено. ru_access — справочная оценка проходимости прямого запроса из РФ, не фильтр: собраны все.",
  "rows": [
@@ -8278,6 +8278,839 @@
    "ru_access": "неизвестно",
    "found": false,
    "note": "Не компания, а категория из разбора: конкретного юрлица за ключом нет, искать нечего. Пружины проще размещать на российских заводах по чертежу — нужен список от владельца, тогда соберу контакты."
+  },
+  {
+   "seller_key": "aeliya marine tech",
+   "seller": "Aeliya Marine Tech",
+   "site": "https://aeliyamarine.com/products/v-arco-82749-filter-pressure-element",
+   "emails": [
+    "sales@aeliyamarine.com",
+    "sales@aeliyamarinetech.com"
+   ],
+   "phones": [
+    "+91 97252 18536",
+    "+91 9725218537"
+   ],
+   "rfq_url": "",
+   "country": "Индия",
+   "city": "",
+   "role": "",
+   "covers": "строка заявки 82749",
+   "ru_access": "неизвестно",
+   "found": true,
+   "note": "Найден обходом ботозащиты 09.2026: артикул искали заново на витринах, которые отдают страницу. Контакты — только те, что напечатаны на сайте."
+  },
+  {
+   "seller_key": "aftermarket filtration",
+   "seller": "Aftermarket Filtration",
+   "site": "https://aftermarketfiltration.com/products/afe-km60-schroeder",
+   "emails": [],
+   "phones": [],
+   "rfq_url": "",
+   "country": "",
+   "city": "",
+   "role": "",
+   "covers": "строка заявки 30111013-1",
+   "ru_access": "неизвестно",
+   "found": false,
+   "note": "Найден обходом ботозащиты 09.2026: артикул искали заново на витринах, которые отдают страницу. Контакты — только те, что напечатаны на сайте."
+  },
+  {
+   "seller_key": "alliance power solution",
+   "seller": "Alliance Power Solution",
+   "site": "https://www.apse-online.com/index.php?route=product/product&path=195&product_id=667",
+   "emails": [
+    "apsemarketing2020@gmail.com",
+    "Marketing@alliancepowersolution.com",
+    "waizinmin@alliancepowersolution.com",
+    "info@alliancepowersolution.com"
+   ],
+   "phones": [
+    "09405885995",
+    "09405885996",
+    "09798827297",
+    "0989700668"
+   ],
+   "rfq_url": "",
+   "country": "Мьянма",
+   "city": "",
+   "role": "",
+   "covers": "строка заявки TAS-311DG",
+   "ru_access": "неизвестно",
+   "found": true,
+   "note": "Найден обходом ботозащиты 09.2026: артикул искали заново на витринах, которые отдают страницу. Контакты — только те, что напечатаны на сайте."
+  },
+  {
+   "seller_key": "auto2mation",
+   "seller": "Auto2Mation",
+   "site": "https://auto2mation.com/hdi-hdibatt-e260-dot-aa-power-pack-battery.html",
+   "emails": [],
+   "phones": [
+    "+91 9725218535"
+   ],
+   "rfq_url": "",
+   "country": "Индия",
+   "city": "",
+   "role": "",
+   "covers": "строка заявки HDIBATTE260DOTAA",
+   "ru_access": "неизвестно",
+   "found": true,
+   "note": "Найден обходом ботозащиты 09.2026: артикул искали заново на витринах, которые отдают страницу. Контакты — только те, что напечатаны на сайте."
+  },
+  {
+   "seller_key": "autocontrol global",
+   "seller": "AutoControl Global",
+   "site": "https://www.autocontrolglobal.com/products/bently-nevada-1701-15-141379-01-fieldmonitor-proximitor-input-monitor",
+   "emails": [],
+   "phones": [],
+   "rfq_url": "",
+   "country": "США",
+   "city": "",
+   "role": "",
+   "covers": "строка заявки BN1701/15",
+   "ru_access": "неизвестно",
+   "found": false,
+   "note": "Найден обходом ботозащиты 09.2026: артикул искали заново на витринах, которые отдают страницу. Контакты — только те, что напечатаны на сайте."
+  },
+  {
+   "seller_key": "automation distribution",
+   "seller": "Automation Distribution",
+   "site": "https://automationdistribution.com/abb-cl2-502g-green-pilot-light/",
+   "emails": [],
+   "phones": [],
+   "rfq_url": "",
+   "country": "США",
+   "city": "",
+   "role": "",
+   "covers": "строка заявки 1SFA619402R5022",
+   "ru_access": "неизвестно",
+   "found": false,
+   "note": "Найден обходом ботозащиты 09.2026: артикул искали заново на витринах, которые отдают страницу. Контакты — только те, что напечатаны на сайте."
+  },
+  {
+   "seller_key": "bentlydcs automation",
+   "seller": "BentlyDCS Automation",
+   "site": "https://www.bentlydcs.com/product/bently-nevada-1701-15-fieldmonitor-proximitor-input-monitor/",
+   "emails": [
+    "changxin2025@gmail.com"
+   ],
+   "phones": [
+    "+86 15359213550"
+   ],
+   "rfq_url": "",
+   "country": "КНР",
+   "city": "",
+   "role": "",
+   "covers": "строка заявки BN1701/15",
+   "ru_access": "неизвестно",
+   "found": true,
+   "note": "Найден обходом ботозащиты 09.2026: артикул искали заново на витринах, которые отдают страницу. Контакты — только те, что напечатаны на сайте."
+  },
+  {
+   "seller_key": "chinesespare",
+   "seller": "Chinesespare",
+   "site": "http://www.chinesespare.com/more.php?id=58759",
+   "emails": [
+    "info@chinesespare.com"
+   ],
+   "phones": [
+    "+852 6432 7800"
+   ],
+   "rfq_url": "",
+   "country": "Гонконг",
+   "city": "",
+   "role": "",
+   "covers": "строка заявки 6ES7197-1LA04-0XA0",
+   "ru_access": "неизвестно",
+   "found": true,
+   "note": "Найден обходом ботозащиты 09.2026: артикул искали заново на витринах, которые отдают страницу. Контакты — только те, что напечатаны на сайте."
+  },
+  {
+   "seller_key": "classic automation",
+   "seller": "Classic Automation",
+   "site": "https://www.classicautomation.com/6es7197-1la04-0xa0",
+   "emails": [
+    "sales@classicautomation.com"
+   ],
+   "phones": [
+    "+1 585-241-6010"
+   ],
+   "rfq_url": "",
+   "country": "США",
+   "city": "",
+   "role": "",
+   "covers": "строка заявки 6ES7197-1LA04-0XA0",
+   "ru_access": "неизвестно",
+   "found": true,
+   "note": "Найден обходом ботозащиты 09.2026: артикул искали заново на витринах, которые отдают страницу. Контакты — только те, что напечатаны на сайте."
+  },
+  {
+   "seller_key": "controldcs",
+   "seller": "ControlDCS",
+   "site": "https://www.controldcs.com/bently-nevada-1701-15-proximitor-input-monitor_p43966.html",
+   "emails": [
+    "sale2@askplc.com"
+   ],
+   "phones": [
+    "+86-18030132586"
+   ],
+   "rfq_url": "",
+   "country": "КНР",
+   "city": "",
+   "role": "",
+   "covers": "строка заявки 1701/15",
+   "ru_access": "неизвестно",
+   "found": true,
+   "note": "Найден обходом ботозащиты 09.2026: артикул искали заново на витринах, которые отдают страницу. Контакты — только те, что напечатаны на сайте."
+  },
+  {
+   "seller_key": "controltech supply",
+   "seller": "ControlTech Supply Limited",
+   "site": "https://www.controltech-supply.com/products/bently-nevada-1701-15-141379-01-proximitor-input-module",
+   "emails": [
+    "sales@controltech-supply.com"
+   ],
+   "phones": [
+    "+86 15395923051"
+   ],
+   "rfq_url": "",
+   "country": "КНР",
+   "city": "",
+   "role": "",
+   "covers": "строка заявки BN1701/15",
+   "ru_access": "неизвестно",
+   "found": true,
+   "note": "Найден обходом ботозащиты 09.2026: артикул искали заново на витринах, которые отдают страницу. Контакты — только те, что напечатаны на сайте."
+  },
+  {
+   "seller_key": "deif a s",
+   "seller": "DEIF A/S",
+   "site": "https://www.deif.com/products/tas-311dg-ac-transducer/",
+   "emails": [],
+   "phones": [],
+   "rfq_url": "",
+   "country": "Дания",
+   "city": "",
+   "role": "",
+   "covers": "строка заявки TAS-311DG",
+   "ru_access": "неизвестно",
+   "found": false,
+   "note": "Найден обходом ботозащиты 09.2026: артикул искали заново на витринах, которые отдают страницу. Контакты — только те, что напечатаны на сайте."
+  },
+  {
+   "seller_key": "diba",
+   "seller": "DIBACo GmbH",
+   "site": "https://dibaco-co.de",
+   "emails": [
+    "sales@dibaco-co.de",
+    "info@dibaco-co.de"
+   ],
+   "phones": [
+    "+49 6021 4959001"
+   ],
+   "rfq_url": "",
+   "country": "Германия",
+   "city": "",
+   "role": "",
+   "covers": "Инжиниринг и экспорт КИПиА и систем управления (DCS/ESD/PLC, датчики давления/температуры/расхода, приводы) для нефтегаза и нефтехимии; заявлены и запчасти по Siemens SGT-400; целевой рынок — Ближний Восток.",
+   "ru_access": "неизвестно",
+   "found": true,
+   "note": "Собственный сайт отдаёт 403 (Cloudflare). Контакты сняты из открытых источников: https://web.archive.org/web/20220430065525/https://dibaco-co.de/ и https://web.archive.org/web/20210318020658/https://dibaco-co.de/ (шапка: «Ludwigstr. 4, 63739 Aschaffenburg, Germany | Call us (+49 6021) 4959001 | Send us a mail sales@dibaco-co.de»; подвал: «© 2017 Dibaco GmbH | +49 6021 4959001 | info@dibaco-co.de»). Юрисдикция уточнена: Германия, Ашаффенбург (Бавария), не Нидерланды; это DIBACo GmbH с доменом dibaco-co.de — не путать с dibaco AG (Штутгарт, info@dibaco.de) и DIBACO Abdichtungstechnik GmbH (Минден, стройизоляция), это другие компании. Контакты увидены на архивных копиях главной страницы 2021 и 2022 годов: живой домен сейчас не открывается вовсе (сертификат не покрывает имя хоста, 503 через фетчер), свежих снимков в архиве нет, поэтому адрес и телефон могут быть устаревшими — перед рассылкой стоит проверить доставку. Компания зарегистрирована в 2018 году; в нашей базе она уже проходила как продавец по Siemens SGT-400."
+  },
+  {
+   "seller_key": "factorymation",
+   "seller": "FactoryMation",
+   "site": "https://www.factorymation.com/55-34-9-024-0040",
+   "emails": [
+    "support@factorymation.com"
+   ],
+   "phones": [
+    "1-800-972-0436"
+   ],
+   "rfq_url": "",
+   "country": "США",
+   "city": "",
+   "role": "",
+   "covers": "строка заявки 55.34.9.024.0040",
+   "ru_access": "неизвестно",
+   "found": true,
+   "note": "Найден обходом ботозащиты 09.2026: артикул искали заново на витринах, которые отдают страницу. Контакты — только те, что напечатаны на сайте."
+  },
+  {
+   "seller_key": "filter element store",
+   "seller": "Filter Element Store",
+   "site": "https://filterelementstore.com/varco-30111013-kit-filter-replacement/",
+   "emails": [],
+   "phones": [],
+   "rfq_url": "",
+   "country": "",
+   "city": "",
+   "role": "",
+   "covers": "строка заявки 30111013-1",
+   "ru_access": "неизвестно",
+   "found": false,
+   "note": "Найден обходом ботозащиты 09.2026: артикул искали заново на витринах, которые отдают страницу. Контакты — только те, что напечатаны на сайте."
+  },
+  {
+   "seller_key": "instru measure",
+   "seller": "Instru-Measure",
+   "site": "https://instru-measure.com/deif-2962010100-01-tas-311dg-variant-01-tas-311dg-ac-transducer-for-voltage-customised-ac-voltage-aux-supply/",
+   "emails": [],
+   "phones": [],
+   "rfq_url": "",
+   "country": "",
+   "city": "",
+   "role": "",
+   "covers": "строка заявки TAS-311DG",
+   "ru_access": "неизвестно",
+   "found": false,
+   "note": "Найден обходом ботозащиты 09.2026: артикул искали заново на витринах, которые отдают страницу. Контакты — только те, что напечатаны на сайте."
+  },
+  {
+   "seller_key": "kempston controls",
+   "seller": "Kempston Controls",
+   "site": "https://www.kempstoncontrols.com/1SBN010010R1010/ABB/sku/113715",
+   "emails": [],
+   "phones": [],
+   "rfq_url": "",
+   "country": "Великобритания",
+   "city": "",
+   "role": "",
+   "covers": "строка заявки 1SBN010010R1010",
+   "ru_access": "неизвестно",
+   "found": false,
+   "note": "Найден обходом ботозащиты 09.2026: артикул искали заново на витринах, которые отдают страницу. Контакты — только те, что напечатаны на сайте."
+  },
+  {
+   "seller_key": "platt electric supply",
+   "seller": "Platt Electric Supply",
+   "site": "https://www.platt.com/p/1431159/abb/abb-3axd50000038423fan-inverter-pcb-afin-02c-/abb3axd50000038423",
+   "emails": [],
+   "phones": [
+    "(800) 257-5288"
+   ],
+   "rfq_url": "",
+   "country": "США",
+   "city": "",
+   "role": "",
+   "covers": "строка заявки 3AXD50000038423",
+   "ru_access": "неизвестно",
+   "found": true,
+   "note": "Найден обходом ботозащиты 09.2026: артикул искали заново на витринах, которые отдают страницу. Контакты — только те, что напечатаны на сайте."
+  },
+  {
+   "seller_key": "plc direct",
+   "seller": "PLC Direct",
+   "site": "https://plc-direct.com/products/1sbn010010r1010",
+   "emails": [
+    "support@plc-direct.com"
+   ],
+   "phones": [
+    "(847) 242-1595"
+   ],
+   "rfq_url": "",
+   "country": "США",
+   "city": "",
+   "role": "",
+   "covers": "строка заявки 1SBN010010R1010",
+   "ru_access": "неизвестно",
+   "found": true,
+   "note": "Найден обходом ботозащиты 09.2026: артикул искали заново на витринах, которые отдают страницу. Контакты — только те, что напечатаны на сайте."
+  },
+  {
+   "seller_key": "powerdcs",
+   "seller": "PowerDCS",
+   "site": "https://www.powerdcs.com/products/bently-nevada-141379-01-1701-15-proximitor-input-monitor",
+   "emails": [
+    "Pambo@5gplc.com"
+   ],
+   "phones": [
+    "+86 13306036024"
+   ],
+   "rfq_url": "",
+   "country": "КНР",
+   "city": "",
+   "role": "",
+   "covers": "строка заявки 1701/15",
+   "ru_access": "неизвестно",
+   "found": true,
+   "note": "Найден обходом ботозащиты 09.2026: артикул искали заново на витринах, которые отдают страницу. Контакты — только те, что напечатаны на сайте."
+  },
+  {
+   "seller_key": "shanghai zz import and export",
+   "seller": "Shanghai ZZ Import And Export Co., Ltd",
+   "site": "https://zzexport.com/product/6es7197-1la04-0xa0-siemens-simatic-s7-400h-y-link-for-connecting-single-channel-dp-slaves-to-s7-400h-based-on-im153-ba02-not-fit-for-pcs7-v6-1/",
+   "emails": [
+    "zz@zzexport.com",
+    "zzexportco@gmail.com"
+   ],
+   "phones": [
+    "+86 17022331234"
+   ],
+   "rfq_url": "",
+   "country": "КНР",
+   "city": "",
+   "role": "",
+   "covers": "строка заявки 6ES7197-1LA04-0XA0",
+   "ru_access": "неизвестно",
+   "found": true,
+   "note": "Найден обходом ботозащиты 09.2026: артикул искали заново на витринах, которые отдают страницу. Контакты — только те, что напечатаны на сайте."
+  },
+  {
+   "seller_key": "sigma surplus",
+   "seller": "Sigma Surplus",
+   "site": "https://sigmasurplus.com/te-connectivity-rte24024-relay/",
+   "emails": [],
+   "phones": [],
+   "rfq_url": "",
+   "country": "США",
+   "city": "",
+   "role": "",
+   "covers": "строка заявки RTE24024",
+   "ru_access": "неизвестно",
+   "found": false,
+   "note": "Найден обходом ботозащиты 09.2026: артикул искали заново на витринах, которые отдают страницу. Контакты — только те, что напечатаны на сайте."
+  },
+  {
+   "seller_key": "sinlin electronics",
+   "seller": "SINLIN Electronics",
+   "site": "https://www.sinlinelec.com/part-item/00360080-RTE24024.html",
+   "emails": [],
+   "phones": [
+    "+1(972)-777-4218"
+   ],
+   "rfq_url": "",
+   "country": "США",
+   "city": "",
+   "role": "",
+   "covers": "строка заявки RTE24024",
+   "ru_access": "неизвестно",
+   "found": true,
+   "note": "Найден обходом ботозащиты 09.2026: артикул искали заново на витринах, которые отдают страницу. Контакты — только те, что напечатаны на сайте."
+  },
+  {
+   "seller_key": "toos global",
+   "seller": "Toos Global",
+   "site": "https://toosglobal.com/products/hdi-hdibatt-e260-dot-aa-battery-power-pack-new",
+   "emails": [
+    "info@toosglobal.com",
+    "sales@toosglobal.com"
+   ],
+   "phones": [
+    "+91 81409 03903"
+   ],
+   "rfq_url": "",
+   "country": "Индия",
+   "city": "",
+   "role": "",
+   "covers": "строка заявки HDIBATTE260DOTAA",
+   "ru_access": "неизвестно",
+   "found": true,
+   "note": "Найден обходом ботозащиты 09.2026: артикул искали заново на витринах, которые отдают страницу. Контакты — только те, что напечатаны на сайте."
+  },
+  {
+   "seller_key": "tsi solutions",
+   "seller": "TSI Solutions",
+   "site": "https://www.tsisolutions.us/itemdetail/?itemCode=C9-A41FX%2F024VDC",
+   "emails": [
+    "sales@tsisolutions.us"
+   ],
+   "phones": [
+    "(770) 879-3500"
+   ],
+   "rfq_url": "",
+   "country": "США",
+   "city": "",
+   "role": "",
+   "covers": "строка заявки C9-A41FX/DC24V",
+   "ru_access": "неизвестно",
+   "found": true,
+   "note": "Найден обходом ботозащиты 09.2026: артикул искали заново на витринах, которые отдают страницу. Контакты — только те, что напечатаны на сайте."
+  },
+  {
+   "seller_key": "2k shops",
+   "seller": "2K Shops",
+   "site": "https://www.2kshops.com/siemens-skc62/",
+   "emails": [
+    "sales@2kshops.com"
+   ],
+   "phones": [
+    "+44 2036952386"
+   ],
+   "rfq_url": "",
+   "country": "Великобритания",
+   "city": "",
+   "role": "",
+   "covers": "строка заявки BPZ:SKC62",
+   "ru_access": "неизвестно",
+   "found": true,
+   "note": "Найден обходом ботозащиты 09.2026: артикул искали заново на витринах, которые отдают страницу. Контакты — только те, что напечатаны на сайте."
+  },
+  {
+   "seller_key": "buyqual",
+   "seller": "BuyQual",
+   "site": "https://www.buyqual.com/costech-a12b23hwb-w00-230v-0-130-0-110a-20-19w-2wires-cooling-fan.html",
+   "emails": [],
+   "phones": [
+    "+86 18676708729"
+   ],
+   "rfq_url": "",
+   "country": "КНР",
+   "city": "",
+   "role": "",
+   "covers": "строка заявки A12B23HWB",
+   "ru_access": "неизвестно",
+   "found": true,
+   "note": "Найден обходом ботозащиты 09.2026: артикул искали заново на витринах, которые отдают страницу. Контакты — только те, что напечатаны на сайте."
+  },
+  {
+   "seller_key": "cnc shopping",
+   "seller": "CNC-Shopping",
+   "site": "https://www.cnc-shopping.us/siemens-6es7131-4bd01-0aa0-simatic-dp-5-electronic-modules-for-et-200s-4di-24vdc.html",
+   "emails": [],
+   "phones": [
+    "+1 305-600-0525"
+   ],
+   "rfq_url": "",
+   "country": "FR",
+   "city": "",
+   "role": "",
+   "covers": "строка заявки 6ES7 131-4BD01-0AA0",
+   "ru_access": "неизвестно",
+   "found": true,
+   "note": "Найден обходом ботозащиты 09.2026: артикул искали заново на витринах, которые отдают страницу. Контакты — только те, что напечатаны на сайте."
+  },
+  {
+   "seller_key": "cummins original parts   санкт петербург",
+   "seller": "Cummins Original Parts , Санкт-Петербург",
+   "site": "https://cop-spb.ru/p48040047-datchik-davleniya-cummins.html",
+   "emails": [
+    "sale@cop-spb.ru"
+   ],
+   "phones": [
+    "+7 (812) 385-06-20",
+    "+7 (495) 151-19-30",
+    "8 800 707-86-10",
+    "+7 (911) 284-97-35"
+   ],
+   "rfq_url": "",
+   "country": "RU",
+   "city": "",
+   "role": "",
+   "covers": "строка заявки 3408549",
+   "ru_access": "неизвестно",
+   "found": true,
+   "note": "Найден обходом ботозащиты 09.2026: артикул искали заново на витринах, которые отдают страницу. Контакты — только те, что напечатаны на сайте."
+  },
+  {
+   "seller_key": "cwly automation",
+   "seller": "CWLY Automation",
+   "site": "https://www.cwlyautomation.com/product/5545.html",
+   "emails": [
+    "info@cwlyautomation.com"
+   ],
+   "phones": [
+    "+86 136 6712 1125"
+   ],
+   "rfq_url": "",
+   "country": "КНР",
+   "city": "",
+   "role": "",
+   "covers": "строка заявки 1TNA920611R0002",
+   "ru_access": "неизвестно",
+   "found": true,
+   "note": "Найден обходом ботозащиты 09.2026: артикул искали заново на витринах, которые отдают страницу. Контакты — только те, что напечатаны на сайте."
+  },
+  {
+   "seller_key": "dd parts solution",
+   "seller": "DD Parts Solution",
+   "site": "https://ddpartssolution.com/products/siemens-6es7131-4bd01-0aa0-simatic-et-200s-digital-input-module-4-di-24v-dc",
+   "emails": [
+    "sales@ddpartssolution.com"
+   ],
+   "phones": [
+    "+1 (689) 275-3558"
+   ],
+   "rfq_url": "",
+   "country": "США",
+   "city": "",
+   "role": "",
+   "covers": "строка заявки 6ES7 131-4BD01-0AA0",
+   "ru_access": "неизвестно",
+   "found": true,
+   "note": "Найден обходом ботозащиты 09.2026: артикул искали заново на витринах, которые отдают страницу. Контакты — только те, что напечатаны на сайте."
+  },
+  {
+   "seller_key": "electricals shop",
+   "seller": "Electricals Shop",
+   "site": "https://electricals-shop.com/product/3ax1103-2e-siemens/",
+   "emails": [
+    "Sales@electricals-shop.com"
+   ],
+   "phones": [
+    "+1-503-486-4092"
+   ],
+   "rfq_url": "",
+   "country": "США",
+   "city": "",
+   "role": "",
+   "covers": "строка заявки 3AX1103-2E",
+   "ru_access": "неизвестно",
+   "found": true,
+   "note": "Найден обходом ботозащиты 09.2026: артикул искали заново на витринах, которые отдают страницу. Контакты — только те, что напечатаны на сайте."
+  },
+  {
+   "seller_key": "enapart",
+   "seller": "Enapart LLC",
+   "site": "https://www.ontrium.com/en/usa/brands/costech/a12b23hwb",
+   "emails": [
+    "sales@enapart.com"
+   ],
+   "phones": [],
+   "rfq_url": "",
+   "country": "США",
+   "city": "",
+   "role": "",
+   "covers": "строка заявки A12B23HWB",
+   "ru_access": "неизвестно",
+   "found": true,
+   "note": "Найден обходом ботозащиты 09.2026: артикул искали заново на витринах, которые отдают страницу. Контакты — только те, что напечатаны на сайте."
+  },
+  {
+   "seller_key": "onlineelec",
+   "seller": "OnlineElec",
+   "site": "https://www.onlineelec.com/parts/wago/remote-i-o/series-750/wago-750-880/",
+   "emails": [],
+   "phones": [],
+   "rfq_url": "",
+   "country": "США",
+   "city": "",
+   "role": "",
+   "covers": "строка заявки 750-880",
+   "ru_access": "неизвестно",
+   "found": false,
+   "note": "Найден обходом ботозащиты 09.2026: артикул искали заново на витринах, которые отдают страницу. Контакты — только те, что напечатаны на сайте."
+  },
+  {
+   "seller_key": "plc barn",
+   "seller": "PLC Barn",
+   "site": "https://www.plcbarn.com/products/allen-bradley-1786-xt-a-controlnet-75-ohm-trunk-terminator",
+   "emails": [
+    "sales@plcbarn.com"
+   ],
+   "phones": [
+    "866-PLC-BARN"
+   ],
+   "rfq_url": "",
+   "country": "США",
+   "city": "",
+   "role": "",
+   "covers": "строка заявки 1046415-30",
+   "ru_access": "неизвестно",
+   "found": true,
+   "note": "Найден обходом ботозащиты 09.2026: артикул искали заново на витринах, которые отдают страницу. Контакты — только те, что напечатаны на сайте."
+  },
+  {
+   "seller_key": "plc group",
+   "seller": "PLC Group S.r.l",
+   "site": "https://us.automationparts.com/abb/accessories-and-other-products/1tna920611r0002ipd",
+   "emails": [
+    "info@automationparts.com"
+   ],
+   "phones": [],
+   "rfq_url": "",
+   "country": "IT",
+   "city": "",
+   "role": "",
+   "covers": "строка заявки 1TNA920611R0002",
+   "ru_access": "неизвестно",
+   "found": true,
+   "note": "Найден обходом ботозащиты 09.2026: артикул искали заново на витринах, которые отдают страницу. Контакты — только те, что напечатаны на сайте."
+  },
+  {
+   "seller_key": "plc world australia",
+   "seller": "PLC World Australia",
+   "site": "https://plcworld.com.au/product/3ax1103-2e-siemens/",
+   "emails": [
+    "sales@plcworld.com.au"
+   ],
+   "phones": [],
+   "rfq_url": "",
+   "country": "AU",
+   "city": "",
+   "role": "",
+   "covers": "строка заявки 3AX1103-2E",
+   "ru_access": "неизвестно",
+   "found": true,
+   "note": "Найден обходом ботозащиты 09.2026: артикул искали заново на витринах, которые отдают страницу. Контакты — только те, что напечатаны на сайте."
+  },
+  {
+   "seller_key": "plc2day com",
+   "seller": "PLC2Day.com B.V",
+   "site": "https://www.plc2day.com/buy-siemens-6es7197-1lb00-0xa0-2401020021",
+   "emails": [
+    "info@plc2day.com"
+   ],
+   "phones": [
+    "+31-165201180"
+   ],
+   "rfq_url": "",
+   "country": "NL",
+   "city": "",
+   "role": "",
+   "covers": "строка заявки 6ES7197-1LB00-0XA0",
+   "ru_access": "неизвестно",
+   "found": true,
+   "note": "Найден обходом ботозащиты 09.2026: артикул искали заново на витринах, которые отдают страницу. Контакты — только те, что напечатаны на сайте."
+  },
+  {
+   "seller_key": "quick time engineering",
+   "seller": "Quick Time Engineering Inc",
+   "site": "https://www.quicktimeonline.com/1786-xt",
+   "emails": [],
+   "phones": [
+    "+6012-3626252",
+    "800 828 6650"
+   ],
+   "rfq_url": "",
+   "country": "MY",
+   "city": "",
+   "role": "",
+   "covers": "строка заявки 1046415-30",
+   "ru_access": "неизвестно",
+   "found": true,
+   "note": "Найден обходом ботозащиты 09.2026: артикул искали заново на витринах, которые отдают страницу. Контакты — только те, что напечатаны на сайте."
+  },
+  {
+   "seller_key": "sipatec d o o",
+   "seller": "SIPATEC d.o.o",
+   "site": "https://www.sipatec.org/skc62/",
+   "emails": [],
+   "phones": [
+    "+381 11 367 03 01",
+    "+381 60 81 70 235"
+   ],
+   "rfq_url": "",
+   "country": "RS",
+   "city": "",
+   "role": "",
+   "covers": "строка заявки BPZ:SKC62",
+   "ru_access": "неизвестно",
+   "found": true,
+   "note": "Найден обходом ботозащиты 09.2026: артикул искали заново на витринах, которые отдают страницу. Контакты — только те, что напечатаны на сайте."
+  },
+  {
+   "seller_key": "soni power",
+   "seller": "SONI POWER",
+   "site": "https://sonipower.com/cummins/kta-qsk-qsv/other-models/qsv81-qsv91/SP-3408549/",
+   "emails": [
+    "soni@sonipower.com",
+    "sales@sonipower.com"
+   ],
+   "phones": [
+    "+91 9433017781",
+    "+91 9433017782",
+    "+91 33 2210 0525"
+   ],
+   "rfq_url": "",
+   "country": "Индия",
+   "city": "",
+   "role": "",
+   "covers": "строка заявки 3408549",
+   "ru_access": "неизвестно",
+   "found": true,
+   "note": "Найден обходом ботозащиты 09.2026: артикул искали заново на витринах, которые отдают страницу. Контакты — только те, что напечатаны на сайте."
+  },
+  {
+   "seller_key": "todo control",
+   "seller": "Todo-Control",
+   "site": "https://www.todo-control.com/actuator-skc62-siemens",
+   "emails": [
+    "consultas@todo-control.com"
+   ],
+   "phones": [
+    "+34 93 454 2006"
+   ],
+   "rfq_url": "",
+   "country": "ES",
+   "city": "",
+   "role": "",
+   "covers": "строка заявки BPZ:SKC62",
+   "ru_access": "неизвестно",
+   "found": true,
+   "note": "Найден обходом ботозащиты 09.2026: артикул искали заново на витринах, которые отдают страницу. Контакты — только те, что напечатаны на сайте."
+  },
+  {
+   "seller_key": "top brands plc",
+   "seller": "Top Brands PLC",
+   "site": "https://www.topbrandsplc.com/products/allen-bradley-1794-ob8epxt-8-point-digital-output-module",
+   "emails": [
+    "topbrandsplc@camvect.com",
+    "sales7@cambia.cn"
+   ],
+   "phones": [],
+   "rfq_url": "",
+   "country": "КНР",
+   "city": "",
+   "role": "",
+   "covers": "строка заявки 1794-OB8EPXT",
+   "ru_access": "неизвестно",
+   "found": true,
+   "note": "Найден обходом ботозащиты 09.2026: артикул искали заново на витринах, которые отдают страницу. Контакты — только те, что напечатаны на сайте."
+  },
+  {
+   "seller_key": "usa tech",
+   "seller": "USA Tech",
+   "site": "https://industrial-usa.com/shop/industrial-equipment/solar-turbines/solar-turbines-1017905/",
+   "emails": [],
+   "phones": [],
+   "rfq_url": "",
+   "country": "США",
+   "city": "",
+   "role": "",
+   "covers": "строка заявки 1017905",
+   "ru_access": "неизвестно",
+   "found": false,
+   "note": "Найден обходом ботозащиты 09.2026: артикул искали заново на витринах, которые отдают страницу. Контакты — только те, что напечатаны на сайте."
+  },
+  {
+   "seller_key": "williams automation",
+   "seller": "Williams Automation Inc",
+   "site": "https://williamsautomation.com/products/allen-bradley-1794-ob8epxt",
+   "emails": [
+    "sales@williamsautomation.com"
+   ],
+   "phones": [
+    "(803) 761-7027"
+   ],
+   "rfq_url": "",
+   "country": "США",
+   "city": "",
+   "role": "",
+   "covers": "строка заявки 1794-OB8EPXT",
+   "ru_access": "неизвестно",
+   "found": true,
+   "note": "Найден обходом ботозащиты 09.2026: артикул искали заново на витринах, которые отдают страницу. Контакты — только те, что напечатаны на сайте."
+  },
+  {
+   "seller_key": "техзапчасти интер трек",
+   "seller": "ООО «Техзапчасти Интер-Трек»",
+   "site": "http://intertrek.info/pn/3408549?art=c4b1cfdae95b2cdb932d5bd8deb9a125",
+   "emails": [
+    "mail@intertrek.ru"
+   ],
+   "phones": [
+    "+7 (8352) 48-81-64",
+    "+7 (8352) 21-80-22"
+   ],
+   "rfq_url": "",
+   "country": "RU",
+   "city": "",
+   "role": "",
+   "covers": "строка заявки 3408549",
+   "ru_access": "неизвестно",
+   "found": true,
+   "note": "Найден обходом ботозащиты 09.2026: артикул искали заново на витринах, которые отдают страницу. Контакты — только те, что напечатаны на сайте."
   }
  ]
 }
