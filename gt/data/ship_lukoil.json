@@ -1,5 +1,5 @@
 {
- "updated": "2026-09-13",
+ "updated": "2026-09-17",
  "source": "Заявка ЛУКОЙЛ (листы «Энергосети» и «НВН»): наличие у продавцов по всей номенклатуре",
  "method": "gt/tools/ship_merge.py сводит gt/data/rfq_demand.json с пятью поколениями проверок: rfq_prices.json:checks (08.2026), ship_energoseti.json (505 строк), ship_sweep.json (остаток 863), ship_recheck.json (62 строки августовского наличия) и ship_blocked.json (31 строка из-под ботозащиты). Поздняя проверка перекрывает раннюю; строки без проверки помечены not_checked.",
  "fx": "price_usd и unit_price_usd пересчитаны по gt/data/fx_rates.json. Считать надо по ним: цены сняты в девяти валютах, и сложение price как есть завышало сумму закупки примерно на треть. Курс справочный на дату выгрузки, не курс сделки — любая сумма из него несёт оговорку.",
@@ -2052,8 +2052,8 @@
      "site": "https://www.ebay.com/sch/i.html?_nkw=Aplisens+PC-28"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "НВН · Aplisens · датчики и КИП",
    "cluster_sellers": [
@@ -2833,8 +2833,8 @@
      "site": "https://platinum-international.store/product/pneumatic-system/electrical-coils/wam-6740000050-solenoid-coil/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "НВН · WAM · зажигание и свечи",
    "cluster_sellers": []
@@ -3754,8 +3754,8 @@
      "site": "https://www.slb.com/products-and-services/innovating-in-oil-and-gas/well-construction/well-cementing/skid-mounted-cementing-units/cps-763-ultradeepwater-cementing-pump"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "НВН · Schlumberger Company · клапаны и арматура",
    "cluster_sellers": [
@@ -4031,8 +4031,8 @@
      "site": "https://scf-inc.com/fluid-end-valve/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "НВН · Schlumberger Company · клапаны и арматура",
    "cluster_sellers": [
@@ -5290,8 +5290,8 @@
      "site": "https://us.rs-online.com/product/ebm-papst/4650n/70105464/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "НВН · EBMPAPST · клапаны и арматура",
    "cluster_sellers": [
@@ -7679,8 +7679,8 @@
      "site": "https://us.rs-online.com/product/sunon-fans/mec0381v1-000u-g99/70240082/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "НВН · Sunon · клапаны и арматура",
    "cluster_sellers": [
@@ -7780,8 +7780,8 @@
      "site": "https://jxpetro.en.made-in-china.com/product/yFkGBqjKKNUs/China-Drillmec-12t1600-with-12p160-Valve-Covers-Liners-Gaskets-Valve-Seats-Inserts-Pistons.html"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "НВН · Drillmec S.p.A. · клапаны и арматура",
    "cluster_sellers": [
@@ -8086,8 +8086,8 @@
      "site": "https://bigironflow.com/products/copy-of-gate-valve-repair-kit-minor-premium-mr-75-4-bore-5-xxh-410ss-nace-oem"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "НВН · FORUM · клапаны и арматура",
    "cluster_sellers": [
@@ -8550,8 +8550,8 @@
      "site": "https://www.h-screening.com/parts/mi-swaco-mongoose-shale-shaker-parts/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "НВН · Mi Swaco · крепёж",
    "cluster_sellers": [
@@ -8621,8 +8621,8 @@
      "site": "https://www.tdsparts.com/tesco-top-drive-parts-tesco-tds-parts-product/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "НВН · Tesco Corporation · крепёж",
    "cluster_sellers": []
@@ -9311,8 +9311,8 @@
      "site": "https://betterdrilling2008.en.made-in-china.com/product/JXVxCnIPJqUk/China-Nov-Tong-Dies-Inserts-16402-6-16402-2-16401-6-16401-2.html"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "НВН · NATIONAL OILWELL VARCO · механика и приводы",
    "cluster_sellers": [
@@ -9420,8 +9420,8 @@
      "site": "https://www.nabors.com/wp-content/uploads/2021/11/top_drive_pb188_-_tesco_grabber_configurator_options.pdf"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "НВН · Tesco Corporation · механика и приводы",
    "cluster_sellers": [
@@ -9978,8 +9978,8 @@
      "site": "https://shop.in.abb.com/3axd50000260706/preventive-maintenance-kit-9-years-acs800-107-0580-7.html"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "НВН · ABB · механика и приводы",
    "cluster_sellers": [
@@ -11076,8 +11076,8 @@
      "site": "https://www.nabors.com"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "НВН · Tesco Corporation · механика и приводы",
    "cluster_sellers": [
@@ -11185,8 +11185,8 @@
      "site": "https://www.prmdrilling.com/products/swaco-md-shaker-actuator-pneumatic-with-v-toggle"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "НВН · Mi Swaco · механика и приводы",
    "cluster_sellers": [
@@ -12176,8 +12176,8 @@
      "site": "https://store.danfoss.com/en/Spare-parts-for-desalination-Pumps/Valve-plate-kit%2C-APP-6-5%3B-APP-7-2%3B-APP-5-1%3B-APP-8-2/p/180B4158"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "НВН · Danfoss · насосы",
    "cluster_sellers": [
@@ -13730,8 +13730,8 @@
      "site": "https://store.danfoss.com/en/Spare-part-for-APP-5-1-8-2/p/180B4154"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "НВН · Danfoss · насосы",
    "cluster_sellers": [
@@ -14334,8 +14334,8 @@
      "site": "https://jxpetro.en.made-in-china.com/product/yFkGBqjKKNUs/China-Drillmec-12t1600-with-12p160-Valve-Covers-Liners-Gaskets-Valve-Seats-Inserts-Pistons.html"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "НВН · Drillmec S.p.A. · прокладки и уплотнения",
    "cluster_sellers": [
@@ -14435,8 +14435,8 @@
      "site": "https://lakepetro.en.made-in-china.com/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "НВН · Drillmec S.p.A. · прокладки и уплотнения",
    "cluster_sellers": [
@@ -14985,8 +14985,8 @@
      "site": "https://scf-inc.com/fluid-end-valve/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "НВН · Schlumberger Company · прокладки и уплотнения",
    "cluster_sellers": [
@@ -15164,8 +15164,8 @@
      "site": "https://www.mudpump-parts.com/sale-12976888-nov-12-p-160-fliud-end-suction-mud-pump-module-1292243-1292244-for-drilling-rigs.html"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "НВН · NATIONAL OILWELL VARCO · прокладки и уплотнения",
    "cluster_sellers": [
@@ -15904,8 +15904,8 @@
      "site": "https://jxpetro.en.made-in-china.com/product/yFkGBqjKKNUs/China-Drillmec-12t1600-with-12p160-Valve-Covers-Liners-Gaskets-Valve-Seats-Inserts-Pistons.html"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "НВН · Drillmec S.p.A. · прокладки и уплотнения",
    "cluster_sellers": [
@@ -16351,8 +16351,8 @@
      "site": "https://meyer-fabritech.com/ram-bop-packers-and-top-seals/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "НВН · Drilltech Manufacturing Co., Ltd,Cangzhou · прокладки и уплотнения",
    "cluster_sellers": [
@@ -16628,8 +16628,8 @@
      "site": "https://www.drilltechmfg.com/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "НВН · Drilltech Manufacturing Co., Ltd,Cangzhou · прокладки и уплотнения",
    "cluster_sellers": [
@@ -20110,8 +20110,8 @@
      "site": "https://us.wiautomation.com/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "НВН · ABB · прочее",
    "cluster_sellers": [
@@ -20506,8 +20506,8 @@
      "site": "https://www.amazon.de/Vossloh-Schwabe-ELXe-238-527-EVG/dp/B00K7YBKK8"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "НВН · Vossloh Schwabe · прочее",
    "cluster_sellers": [
@@ -22590,8 +22590,8 @@
      "site": "https://www.pieffeci.com/en-US/standard-series-clamps.aspx"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "НВН · PI.EFFE.CI. · прочее",
    "cluster_sellers": [
@@ -24218,8 +24218,8 @@
      "site": "https://www.findchips.com/search/SKM195GB066D"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "НВН · SEMIKRON · прочее",
    "cluster_sellers": [
@@ -24424,8 +24424,8 @@
      "site": "https://www.chipdip.ru/product0/8020082173"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "НВН · TDM · прочее",
    "cluster_sellers": [
@@ -25197,8 +25197,8 @@
      "site": "https://www.se.com/us/en/product/ZBVB1/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "НВН · Schneider Electric · прочее",
    "cluster_sellers": [
@@ -25299,8 +25299,8 @@
      "site": "https://www.se.com/us/en/product/ZBVB3/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "НВН · Schneider Electric · прочее",
    "cluster_sellers": [
@@ -26099,8 +26099,8 @@
      "site": "https://www.bigironflow.com/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "НВН · FMC Technologies · ремкомплекты и наборы",
    "cluster_sellers": [
@@ -27098,8 +27098,8 @@
      "site": "https://www.ebay.com/sch/i.html?_nkw=30175768"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "НВН · NATIONAL OILWELL VARCO · фильтры",
    "cluster_sellers": [
@@ -27389,8 +27389,8 @@
      "site": "https://drillpartsolutions.com/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "НВН · Drillmec S.p.A. / Oleobi S.r.l. · фильтры",
    "cluster_sellers": [
@@ -27580,8 +27580,8 @@
      "site": "https://www.scribd.com/document/895476948/Drillmec-Spare-Parts-Price-List-2015-Euro"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "НВН · Drillmec S.p.A. / Oleobi S.r.l. · фильтры",
    "cluster_sellers": [
@@ -28557,8 +28557,8 @@
      "site": "https://www.motion.com/products/sku/05638970"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "НВН · Drillmec S.p.A. / Oleobi S.r.l. · фильтры",
    "cluster_sellers": [
@@ -30082,8 +30082,8 @@
      "site": "https://us.rs-online.com/product/abb/1sda050960r1/70470560/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "НВН · ABB · электрика и автоматика",
    "cluster_sellers": [
@@ -30553,8 +30553,8 @@
      "site": "https://shop.in.abb.com/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "НВН · ABB · электрика и автоматика",
    "cluster_sellers": [
@@ -30663,8 +30663,8 @@
      "site": "https://us.wiautomation.com/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "НВН · ABB · электрика и автоматика",
    "cluster_sellers": [
@@ -34357,8 +34357,8 @@
      "site": "https://eltra-trade.com/products/abb-3axd"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "НВН · ABB · электрика и автоматика",
    "cluster_sellers": [
@@ -34744,8 +34744,8 @@
      "site": "https://www.scribd.com/document/895476948/Drillmec-Spare-Parts-Price-List-2015-Euro"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "НВН · Drillmec S.p.A. / Oleobi S.r.l. · электрика и автоматика",
    "cluster_sellers": [
@@ -35358,8 +35358,8 @@
      "site": "https://www.amazon.com/RTAC-01-64610805-ABB-Encoder-Windows/dp/B07JNPG3YJ"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "НВН · ABB · электрика и автоматика",
    "cluster_sellers": [
@@ -36112,8 +36112,8 @@
      "site": "https://www.standardelectricsupply.com/WAGO-750-530-Digital-PLC-Output-Module-8-Outputs"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "НВН · WAGO · электрика и автоматика",
    "cluster_sellers": [
@@ -37961,8 +37961,8 @@
      "site": "https://www.directindustry.com/prod/frer/product-88827-2395381.html"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "НВН · FRER · электрика и автоматика",
    "cluster_sellers": [
@@ -39214,8 +39214,8 @@
      "site": "https://www.rexelusa.com/p/341400/mersen/p310007/605340357595/ms7v1-9bs"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "НВН · Ferraz Shawmut · электрика и автоматика",
    "cluster_sellers": [
@@ -39326,8 +39326,8 @@
      "site": "https://spwindustrial.com/ferraz-shawmut-pc44ud75v22ctd-protistor-fuses-750vac-urd-2200a-1536y/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "НВН · Protistor · электрика и автоматика",
    "cluster_sellers": [
@@ -40845,8 +40845,8 @@
      "site": "https://www.standardelectricsupply.com/346092-Schneider-Electric-XB4BD21"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "НВН · Schneider Electric · электрика и автоматика",
    "cluster_sellers": [
@@ -43042,8 +43042,8 @@
      "site": "https://www.ebay.com/sch/i.html?_nkw=Crompton+Integra+1530+multifunction+meter"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Siemens · датчики и КИП",
    "cluster_sellers": [
@@ -43149,8 +43149,8 @@
      "site": "https://www.artisantg.com/TestMeasurement/85034-2/GE-Bently-Nevada-FieldMonitor-1701-2-Channel-Transducer-I-O-Module"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Solar · датчики и КИП",
    "cluster_sellers": [
@@ -43791,8 +43791,8 @@
      "site": "https://www.onergys.de/en/electrical-engineering/transducer-jenbacher-285285-original.html"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Jenbacher/INNIO · датчики и КИП",
    "cluster_sellers": [
@@ -43898,8 +43898,8 @@
      "site": "https://777parts.com/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Cummins · датчики и КИП",
    "cluster_sellers": [
@@ -44007,8 +44007,8 @@
      "site": "https://777parts.com/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Cummins · датчики и КИП",
    "cluster_sellers": [
@@ -44497,8 +44497,8 @@
      "site": "https://www.machinerytrader.com/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Cummins · датчики и КИП",
    "cluster_sellers": [
@@ -44606,8 +44606,8 @@
      "site": "https://parts.cummins.com/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Cummins · датчики и КИП",
    "cluster_sellers": [
@@ -44715,8 +44715,8 @@
      "site": "https://www.onergys.de/en/topseller/jenbacher/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Jenbacher/INNIO · датчики и КИП",
    "cluster_sellers": [
@@ -44822,8 +44822,8 @@
      "site": "https://parts.cummins.com/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Cummins · датчики и КИП",
    "cluster_sellers": [
@@ -45050,8 +45050,8 @@
      "site": "https://firsttruckparts.com/products/3929935-genuine-cummins%C2%AE-mass-fuel-flow-sensor"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Cummins · датчики и КИП",
    "cluster_sellers": [
@@ -45159,8 +45159,8 @@
      "site": "https://www.amazon.com/4088832-4088833-4076841-Temperature-Suitable/dp/B0DPDHM5N3"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Cummins · датчики и КИП",
    "cluster_sellers": [
@@ -45268,8 +45268,8 @@
      "site": "https://shop.cummins.com/SC/product/cummins-pressure-sensor-4921517/01t4N0000048gmbQAA"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Cummins · датчики и КИП",
    "cluster_sellers": [
@@ -45834,8 +45834,8 @@
      "site": "https://www.ebay.com/itm/800165962602"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Cummins · датчики и КИП",
    "cluster_sellers": [
@@ -47235,8 +47235,8 @@
      "site": "https://turbineblade.net/sgt-400-gas-turbine-spare-parts/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Siemens · датчики и КИП",
    "cluster_sellers": [
@@ -48010,8 +48010,8 @@
      "site": "https://www.siemens-energy.com/us/en/home/products-services/product/sgt-400.html"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Siemens · датчики и КИП",
    "cluster_sellers": [
@@ -48549,8 +48549,8 @@
      "site": "https://www.esporim.com/siemens-energy-mw03632-thermocouple-probe-sleeved-turbine-model-sgt-300/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Siemens · датчики и КИП",
    "cluster_sellers": [
@@ -49105,8 +49105,8 @@
      "site": "https://echoiceparts.com/item/POW%201109190"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Jenbacher/INNIO · зажигание и свечи",
    "cluster_sellers": [
@@ -49211,8 +49211,8 @@
      "site": "https://www.mopamotorparts.com/spark-plug-12420480-suitable-for-mwm-deutz-engines/12420480"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · DEUTZ · зажигание и свечи",
    "cluster_sellers": [
@@ -49321,8 +49321,8 @@
      "site": "https://echoiceparts.com/item/JEN--1214569"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Jenbacher/INNIO · зажигание и свечи",
    "cluster_sellers": [
@@ -49427,8 +49427,8 @@
      "site": "https://s1partscenter.com/brands/cummins/electrical/4327849"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Cummins · зажигание и свечи",
    "cluster_sellers": [
@@ -49644,8 +49644,8 @@
      "site": "https://www.dieselengines.parts/cummins-4380132-plug-spark-original-oem-part/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Cummins · зажигание и свечи",
    "cluster_sellers": [
@@ -49752,8 +49752,8 @@
      "site": "https://www.onergys.de/en/engine-technology/spark-plugs-ignition-system/ignition-coil-jenbacher-487181-original.html"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Jenbacher/INNIO · зажигание и свечи",
    "cluster_sellers": [
@@ -49861,8 +49861,8 @@
      "site": "https://aftermarket.supply/cummins/3920773.html"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Cummins · зажигание и свечи",
    "cluster_sellers": [
@@ -49973,8 +49973,8 @@
      "site": "https://sleequipment.com/catalog/product/view/id/4113372/s/5373898-cummins-2023/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Cummins · зажигание и свечи",
    "cluster_sellers": [
@@ -50077,8 +50077,8 @@
      "site": "https://shop.cummins.com/SC/product/cummins-ignition-coil-5634407/01tKY000001zp81YAA"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Cummins · зажигание и свечи",
    "cluster_sellers": [
@@ -50441,8 +50441,8 @@
      "site": "https://www.tradebearings.com/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Швейцария  ABB · зажигание и свечи",
    "cluster_sellers": [
@@ -51469,8 +51469,8 @@
      "site": "https://www.bearingshell.com/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Швейцария  ABB · зажигание и свечи",
    "cluster_sellers": [
@@ -59556,8 +59556,8 @@
      "site": "https://www.gas-turbine-parts.com/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Siemens · клапаны и арматура",
    "cluster_sellers": [
@@ -63230,8 +63230,8 @@
      "site": "https://www.ebay.com/sch/i.html?_nkw=moog+D633+servo+valve"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Siemens · клапаны и арматура",
    "cluster_sellers": [
@@ -63340,8 +63340,8 @@
      "site": "https://www.ebay.com/sch/i.html?_nkw=moog+D634+servo+valve"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Siemens · клапаны и арматура",
    "cluster_sellers": [
@@ -63810,8 +63810,8 @@
      "site": "https://www.ebay.com/sch/i.html?_nkw=Kinetrol+actuator"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Siemens · клапаны и арматура",
    "cluster_sellers": [
@@ -63920,8 +63920,8 @@
      "site": "https://www.ebay.com/sch/i.html?_nkw=Kinetrol+actuator"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Siemens · клапаны и арматура",
    "cluster_sellers": [
@@ -64814,8 +64814,8 @@
      "site": "https://www.aftfasteners.com/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Siemens · крепёж",
    "cluster_sellers": [
@@ -65063,8 +65063,8 @@
      "site": "https://www.aftfasteners.com/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Siemens · крепёж",
    "cluster_sellers": [
@@ -75901,8 +75901,8 @@
      "site": "https://shop.solarturbines.com/hardware/bolts/bolt/903118c1"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Solar · крепёж",
    "cluster_sellers": [
@@ -80965,8 +80965,8 @@
      "site": "https://www.amazon.com/Molykote-Valve-Lubricant-Sealant-Tube/dp/B0B37J51FB"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Siemens · масла и химия",
    "cluster_sellers": [
@@ -81165,8 +81165,8 @@
      "site": "https://www.aftfasteners.com/loctite-572-thread-sealant-low-strength-50-ml-tube-white-1-tube/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Siemens · масла и химия",
    "cluster_sellers": [
@@ -81362,8 +81362,8 @@
      "site": "https://www.silmid.com/us/lubricants/anti-seize-lubricants/Rocol-Anti-Seize-Compound-available-in-various-sizes/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Siemens · масла и химия",
    "cluster_sellers": [
@@ -81471,8 +81471,8 @@
      "site": "https://glasgowspares.com/saacke-sevis-fsm-025b66-z-m-servomotor-626000/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Германия, Bosch · механика и приводы",
    "cluster_sellers": [
@@ -81579,8 +81579,8 @@
      "site": "https://www.spares4less.com/SAACKE-Stellmotor-sevis-FSM-100B80-611165-230V-50-60Hz-281W-80sek-120-NOV"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Германия, Bosch · механика и приводы",
    "cluster_sellers": [
@@ -82755,8 +82755,8 @@
      "site": "https://www.dieselpartsdirect.com/3423495"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Cummins · механика и приводы",
    "cluster_sellers": [
@@ -83427,8 +83427,8 @@
      "site": "https://www.radwell.com/Buy/BELIMO/BELIMO/AF24-SR%20US"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · BELIMO · механика и приводы",
    "cluster_sellers": [
@@ -85512,8 +85512,8 @@
      "site": "https://www.brookcrompton.com/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · BROOK · механика и приводы",
    "cluster_sellers": [
@@ -86029,8 +86029,8 @@
      "site": "https://www.ksb.com/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · KSB · насосы",
    "cluster_sellers": [
@@ -86644,8 +86644,8 @@
      "site": "https://jaescompany.com/catalogo_prodotti.php?producer=POMPETRAVAINI"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Италия,  Pompetravaini · насосы",
    "cluster_sellers": [
@@ -90077,8 +90077,8 @@
      "site": "https://www.ebay.com/shop/solar-turbines?_nkw=solar+turbines"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Solar · прокладки и уплотнения",
    "cluster_sellers": [
@@ -90738,8 +90738,8 @@
      "site": "https://shop.solarturbines.com/gasket,o-ring,seal/gaskets/round-gasket/1008726"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Solar · прокладки и уплотнения",
    "cluster_sellers": [
@@ -91869,8 +91869,8 @@
      "site": "https://shop.solarturbines.com/ShopSolar/product/1017891/01tUm00000DinwUIAR"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Solar · прокладки и уплотнения",
    "cluster_sellers": [
@@ -92681,8 +92681,8 @@
      "site": "https://www.stsindustrial.com/products/1-150-spiral-wound-gasket-304-fg-cs/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Solar · прокладки и уплотнения",
    "cluster_sellers": [
@@ -93706,8 +93706,8 @@
      "site": "https://shop.solarturbines.com/gasket,o-ring,seal/seals/extrusion-seal/1062000"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Solar · прокладки и уплотнения",
    "cluster_sellers": [
@@ -93812,8 +93812,8 @@
      "site": "https://shop.solarturbines.com/fabrication/shim/1062952-1"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Solar · прокладки и уплотнения",
    "cluster_sellers": [
@@ -93918,8 +93918,8 @@
      "site": "https://shop.solarturbines.com/fabrication/shim/1062952-1"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Solar · прокладки и уплотнения",
    "cluster_sellers": [
@@ -97360,8 +97360,8 @@
      "site": "https://www.ebay.com/itm/223737908084"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Solar · прокладки и уплотнения",
    "cluster_sellers": [
@@ -97806,8 +97806,8 @@
      "site": "https://shop.solarturbines.com/gasket,o-ring,seal/gaskets/round-gasket/304649-100"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Solar · прокладки и уплотнения",
    "cluster_sellers": [
@@ -98053,8 +98053,8 @@
      "site": "https://www.onergys.de/en/topseller/jenbacher/scraper-ring-one112570-jenbacher-363977.html"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Jenbacher/INNIO · прокладки и уплотнения",
    "cluster_sellers": [
@@ -98661,8 +98661,8 @@
      "site": "https://www.onergys.de/en/topseller/jenbacher/cylinder-head-gasket-jenbacher-337295-original.html"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Jenbacher/INNIO · прокладки и уплотнения",
    "cluster_sellers": [
@@ -102400,8 +102400,8 @@
      "site": "https://www.powerup.at/shop/category/jenbacher/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Jenbacher/INNIO · прокладки и уплотнения",
    "cluster_sellers": [
@@ -102506,8 +102506,8 @@
      "site": "https://shop.cummins.com/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Cummins · прокладки и уплотнения",
    "cluster_sellers": [
@@ -104530,8 +104530,8 @@
      "site": "https://shop.solarturbines.com/gasket,o-ring,seal/elastomer-rings/o-ring/903246c1"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Solar · прокладки и уплотнения",
    "cluster_sellers": [
@@ -105461,8 +105461,8 @@
      "site": "https://shop.solarturbines.com/gasket,o-ring,seal/elastomer-rings/o-ring/903732c1"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Solar · прокладки и уплотнения",
    "cluster_sellers": [
@@ -110160,8 +110160,8 @@
      "site": "https://www.ebay.com/shop/solar-turbines?_nkw=solar+turbines"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Siemens · прокладки и уплотнения",
    "cluster_sellers": [
@@ -112920,8 +112920,8 @@
      "site": "https://www.ebay.com/itm/223737806541"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Siemens · прокладки и уплотнения",
    "cluster_sellers": [
@@ -116607,8 +116607,8 @@
      "site": "https://www.onergys.de/en/engine-technology/fuel-system/throttle-valves/blocking-flap-jenbacher-133257-original.html"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Jenbacher/INNIO · прочее",
    "cluster_sellers": [
@@ -118731,8 +118731,8 @@
      "site": "https://www.dosupply.com/automation/allen-bradley-plc/flex-i-o-1794/1794-OB8EP"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Solar · прочее",
    "cluster_sellers": [
@@ -119628,8 +119628,8 @@
      "site": "https://www.onergys.de/en/engines/for-jenbacher-engines/pulse-generator-jenbacher-200673-original.html"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Jenbacher/INNIO · прочее",
    "cluster_sellers": [
@@ -120573,8 +120573,8 @@
      "site": "https://shop.cummins.com/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Cummins · прочее",
    "cluster_sellers": [
@@ -121236,8 +121236,8 @@
      "site": "https://www.mariteksolutions.com/product/saacke-fls-09-uv-5-flame-scanner-sensor/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · SAACKE · прочее",
    "cluster_sellers": [
@@ -121446,8 +121446,8 @@
      "site": "https://www.peri-parts.com/436392-jenbacher-original-terminalsteckertb12x20-008.html"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Jenbacher/INNIO · прочее",
    "cluster_sellers": [
@@ -121551,8 +121551,8 @@
      "site": "https://www.powerup.at/shop/category/jenbacher/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Jenbacher/INNIO · прочее",
    "cluster_sellers": [
@@ -123346,8 +123346,8 @@
      "site": "https://www.peri-parts.com/9000799-jenbacher-original-servomotor-1a9.html"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Jenbacher/INNIO · прочее",
    "cluster_sellers": [
@@ -126255,8 +126255,8 @@
      "site": "https://www.finditparts.com/products/7893501/fleetguard-dca75l"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Fleetguard · прочее",
    "cluster_sellers": [
@@ -126652,8 +126652,8 @@
      "site": "https://www.pepperl-fuchs.com/en-us/products-gp25581/42264"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Solar · прочее",
    "cluster_sellers": [
@@ -127335,8 +127335,8 @@
      "site": "https://www.pepperl-fuchs.com/en-us/products-gp25581/93101"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Solar · прочее",
    "cluster_sellers": [
@@ -129469,8 +129469,8 @@
      "site": "https://www.batterystore.com/ls14250-3pf-1-2aa-saft-lithium-battery-w-2-pin-positive/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Cummins · прочее",
    "cluster_sellers": [
@@ -130217,8 +130217,8 @@
      "site": "https://www.123bearing.com/lubricant-adhesive/adhesive/adhesive/424-20g-loctite"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Siemens · прочее",
    "cluster_sellers": [
@@ -131542,8 +131542,8 @@
      "site": "https://www.nevatom.ru/catalog/nagrevateli_elektricheskie_nek_nep/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Россия · прочее",
    "cluster_sellers": [
@@ -132034,8 +132034,8 @@
      "site": "https://www.filtersource.com/cross-reference/186212-100"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Solar · ремкомплекты и наборы",
    "cluster_sellers": [
@@ -139251,8 +139251,8 @@
      "site": "https://turbineblade.net/sgt-400-spare-parts-list/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Siemens · соединения и фитинги",
    "cluster_sellers": [
@@ -140154,8 +140154,8 @@
      "site": "https://shop.solarturbines.com/filtration-components/filter-element-kit/1060817-20"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Solar · фильтры",
    "cluster_sellers": [
@@ -140261,8 +140261,8 @@
      "site": "https://www.peri-parts.com/106081740-solar-turbines-original-filter-element-740.html"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Solar · фильтры",
    "cluster_sellers": [
@@ -140521,8 +140521,8 @@
      "site": "https://aidafilters.en.made-in-china.com"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Solar · фильтры",
    "cluster_sellers": [
@@ -140765,8 +140765,8 @@
      "site": "https://shop.solarturbines.com/filtration-components/filter-element/1087491-3"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Solar · фильтры",
    "cluster_sellers": [
@@ -140872,8 +140872,8 @@
      "site": "https://shop.solarturbines.com/filtration-components/filter-element/1089034-3"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Solar · фильтры",
    "cluster_sellers": [
@@ -141066,8 +141066,8 @@
      "site": "https://www.oilfilter-crossreference.com/convert/DEUTZ/12128936"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · DEUTZ · фильтры",
    "cluster_sellers": [
@@ -141278,8 +141278,8 @@
      "site": "https://www.onergys.de/en/bluefriday/oil-filter-turbocharger-fleetguard-lf3402-mwm-12272453.html"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · DEUTZ · фильтры",
    "cluster_sellers": [
@@ -141467,8 +141467,8 @@
      "site": "https://www.scribd.com/document/480669661/02-208-xls"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Jenbacher/INNIO · фильтры",
    "cluster_sellers": [
@@ -141683,8 +141683,8 @@
      "site": "https://uk.rs-online.com/web/c/fasteners-fixings/thread-inserts/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Siemens · фильтры",
    "cluster_sellers": [
@@ -141791,8 +141791,8 @@
      "site": "https://shopglmw.com/product/filter-insert-for-jenbacher-1219670/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Jenbacher/INNIO · фильтры",
    "cluster_sellers": [
@@ -141894,8 +141894,8 @@
      "site": "https://www.onergys.de/en/bluefriday/filter-cartridge-mann-lc-15-001-x.html"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Jenbacher/INNIO · фильтры",
    "cluster_sellers": [
@@ -142107,8 +142107,8 @@
      "site": "https://www.dieselpartsdirect.com/4011521"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Cummins · фильтры",
    "cluster_sellers": [
@@ -142427,8 +142427,8 @@
      "site": "https://www.onergys.de/en/engine-technology/filter/gas-filter/filter-cartridge-jenbacher-628476-original.html"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Jenbacher/INNIO · фильтры",
    "cluster_sellers": [
@@ -142529,8 +142529,8 @@
      "site": "https://www.onergys.de/en/engines/for-jenbacher-engines/filter-cartridge-jenbacher-628477-original.html"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Jenbacher/INNIO · фильтры",
    "cluster_sellers": [
@@ -142859,8 +142859,8 @@
      "site": "https://turbineblade.net/siemens-sgt-400-turbine-part-numbers/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Siemens · фильтры",
    "cluster_sellers": [
@@ -143100,8 +143100,8 @@
      "site": "https://turbineblade.net/sgt-400-spare-parts-list/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Siemens · фильтры",
    "cluster_sellers": [
@@ -144103,8 +144103,8 @@
      "site": "https://www.amazon.com/Cummins-Filtration-Fleetguard-LF9050-Filter/dp/B0844KW4L6"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Cummins · фильтры",
    "cluster_sellers": [
@@ -144583,8 +144583,8 @@
      "site": "https://www.aafintl.com/en/industry/energy-product/hydrocel-offshore-gt-filter/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Siemens · фильтры",
    "cluster_sellers": [
@@ -145046,8 +145046,8 @@
      "site": "https://shop.cummins.com/SC/product/fleetguard-water-spinon-filter-wf2075/01t4N0000048p26QAA"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Cummins · фильтры",
    "cluster_sellers": [
@@ -146319,8 +146319,8 @@
      "site": "https://shop.cummins.com/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Cummins · шланги и трубки",
    "cluster_sellers": [
@@ -146423,8 +146423,8 @@
      "site": "https://shop.cummins.com/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Cummins · шланги и трубки",
    "cluster_sellers": [
@@ -149153,8 +149153,8 @@
      "site": "https://www.ebay.com/itm/123315668276"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Solar · электрика и автоматика",
    "cluster_sellers": [
@@ -149370,8 +149370,8 @@
      "site": "https://shop.solarturbines.com/electronic/fuses/fuse/1043265-5"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Solar · электрика и автоматика",
    "cluster_sellers": [
@@ -149483,8 +149483,8 @@
      "site": "https://www.ebay.com/itm/123315668276"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Solar · электрика и автоматика",
    "cluster_sellers": [
@@ -149919,8 +149919,8 @@
      "site": "https://shop.solarturbines.com/electronic/base/flex/1051931-67"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Solar · электрика и автоматика",
    "cluster_sellers": [
@@ -151985,8 +151985,8 @@
      "site": "https://www.onergys.de/en/By-Manufacturer/Jenbacher/Relay-Jenbacher-1233756-original.html"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Finder · электрика и автоматика",
    "cluster_sellers": [
@@ -152085,8 +152085,8 @@
      "site": "https://www.elettronew.com/en/prodotti/categoria/finder-522.html"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Finder · электрика и автоматика",
    "cluster_sellers": [
@@ -152270,8 +152270,8 @@
      "site": "https://www.elettronew.com/en/prodotti/categoria/finder-522.html"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Finder · электрика и автоматика",
    "cluster_sellers": [
@@ -153275,8 +153275,8 @@
      "site": "https://4dcontrols.com/shop/170105-bently-nevada-terminal-base-11-slot-for-field-monitor-system/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Solar · электрика и автоматика",
    "cluster_sellers": [
@@ -153963,8 +153963,8 @@
      "site": "https://www.newgenplc.com/products/bently-nevada-170190-01e-daul-galvanic-isolator-module-in-stock"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Solar · электрика и автоматика",
    "cluster_sellers": [
@@ -156746,8 +156746,8 @@
      "site": "https://www.tme.com/us/en-us/katalog/relays_40/p,schrack_188/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · SCHRACK-TE CONNECTIVITY · электрика и автоматика",
    "cluster_sellers": [
@@ -157186,8 +157186,8 @@
      "site": "https://iggnita.com/urun/relay-1-change-over-contact-1w-dc-24-jenbacher-363865-orijinal/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Finder · электрика и автоматика",
    "cluster_sellers": [
@@ -157290,8 +157290,8 @@
      "site": "https://octopart.com/part/siemens/3RT2024-1BB40"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Siemens · электрика и автоматика",
    "cluster_sellers": [
@@ -157397,8 +157397,8 @@
      "site": "https://octopart.com/part/siemens/3RT2926-2PA01"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Siemens · электрика и автоматика",
    "cluster_sellers": [
@@ -158753,8 +158753,8 @@
      "site": "https://www.onergys.de/en/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Jenbacher/INNIO · электрика и автоматика",
    "cluster_sellers": [
@@ -161014,8 +161014,8 @@
      "site": "https://www.tme.eu/en/katalog/circuit-breakers_100285/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Siemens · электрика и автоматика",
    "cluster_sellers": [
@@ -162915,8 +162915,8 @@
      "site": "https://m.indiamart.com/proddetail/simatic-dp-electronics-module-f-et200s-2ai-tc-high-feature-6es7134-4nb01-0ab0-2856650519491.html"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Siemens · электрика и автоматика",
    "cluster_sellers": [
@@ -163133,8 +163133,8 @@
      "site": "https://www.plchardware.com/Products/SM-6ES7138-4CA01-0AA0.aspx"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Siemens · электрика и автоматика",
    "cluster_sellers": [
@@ -166025,8 +166025,8 @@
      "site": "https://www.radwell.com/en-US/Buy/ALLEN%20BRADLEY/ALLEN%20BRADLEY/700-FSM3UU23-EX"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Solar · электрика и автоматика",
    "cluster_sellers": [
@@ -167827,8 +167827,8 @@
      "site": "https://www.ebay.com/sch/i.html?_nkw=Releco+C2-A29X+relay"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Siemens · электрика и автоматика",
    "cluster_sellers": [
@@ -168567,8 +168567,8 @@
      "site": "https://www.tme.eu/en/katalog/fuses_112610/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Siemens · электрика и автоматика",
    "cluster_sellers": [
@@ -169091,8 +169091,8 @@
      "site": "https://www.tme.eu/en/katalog/wires_100047/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Siemens · электрика и автоматика",
    "cluster_sellers": [
@@ -169198,8 +169198,8 @@
      "site": "https://www.tme.eu/en/katalog/wires_100047/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Siemens · электрика и автоматика",
    "cluster_sellers": [
@@ -169305,8 +169305,8 @@
      "site": "https://www.tme.eu/en/katalog/wires_100047/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Siemens · электрика и автоматика",
    "cluster_sellers": [
@@ -169412,8 +169412,8 @@
      "site": "https://www.tme.eu/en/katalog/wires_100047/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Siemens · электрика и автоматика",
    "cluster_sellers": [
@@ -171550,8 +171550,8 @@
      "site": "https://us.rs-online.com/product/pepperl-fuchs-process-automation/kcd2-rr-ex1/70093765/"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Solar · электрика и автоматика",
    "cluster_sellers": [
@@ -172174,8 +172174,8 @@
      "site": "https://www.pepperl-fuchs.com/en-us/products-gp25581/30689"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Solar · электрика и автоматика",
    "cluster_sellers": [
@@ -172280,8 +172280,8 @@
      "site": "https://www.standardelectricsupply.com/PepperlFuchs-KFD2-VR2-EX1-50M-Voltage-Repeater"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Solar · электрика и автоматика",
    "cluster_sellers": [
@@ -172677,8 +172677,8 @@
      "site": "https://www.codale.com/product/detail/333149/allen-bradley-rockwell-700-fsm3uu23"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Solar · электрика и автоматика",
    "cluster_sellers": [
@@ -173001,8 +173001,8 @@
      "site": "https://www.electricautomationnetwork.com/en/siemens/lzx-pt370024-lzxpt370024-siemens-plug-in-relay-3-co-contacts-24v-dc-10a-width-225mm"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Siemens · электрика и автоматика",
    "cluster_sellers": [
@@ -173831,8 +173831,8 @@
      "site": "https://www.amazon.com/C9A41X24D-RELECO-Relay-LAMP-24VDC/dp/B07HCL81SC"
     }
    ],
-   "price_usd": 0.0,
-   "unit_price_usd": 0.0,
+   "price_usd": null,
+   "unit_price_usd": null,
    "stock_grade": "нет",
    "cluster": "Энергосети · Siemens · электрика и автоматика",
    "cluster_sellers": [

@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 219,
-    "total_bytes": 99633635,
+    "total_bytes": 99635472,
     "by_sensitivity": {
       "конфиденциально": 62,
       "внутреннее": 120,
@@ -225,7 +225,7 @@
     {
       "path": "gt/data/ship_lukoil.json",
       "subproject": "ГТУ-библиотека",
-      "bytes": 6122320,
+      "bytes": 6122672,
       "note": "Сводная карта закупки по всей заявке ЛУКОЙЛ: 1642 уникальных артикула обоих листов («Энергосети» 1198, НВН 444) с результатом проверки наличия. Производный файл — собирается gt/tools/ship_merge.py из rfq_demand.json и трёх поколений проверок (rfq_prices.json:checks, ship_energoseti.json, ship_sweep.json); поздняя проверка перекрывает раннюю, непроверенные строки помечены not_checked. Руками не заполнять. Отчёт — gt/tools/ship_map.py → gt/docs/ЗАКУПКА-ЛУКОЙЛ.pdf: карта «у кого что брать», изготовители узлов под шильдой OEM, позиции под подбор по стандарту, расхождения цен.",
       "format": "json",
       "shape": "объект",
@@ -276,9 +276,9 @@
           "verdict"
         ]
       },
-      "last_change": "2026-09-13",
-      "last_author": "skharkov1246",
-      "last_commit": "0472a78",
+      "last_change": "2026-09-17",
+      "last_author": "Claude",
+      "last_commit": "2b19009",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -289,6 +289,7 @@
         "gt/tools/ship_export.py",
         "gt/tools/ship_map.py",
         "gt/tools/ship_merge.py",
+        "gt/tools/ship_offer.py",
         "gt/tools/ship_priced.py",
         "gt/tools/ship_questions.py",
         "gt/tools/ship_rfq.py",
@@ -1218,7 +1219,6 @@
       },
       "referenced_by": [
         "gpu/tools/build_demand.py",
-        "gt/tools/bitrix_tkp.py",
         "gt/tools/build_lot_xlsx.py",
         "gt/tools/build_rfq.py",
         "gt/tools/ship_merge.py",
@@ -4543,7 +4543,6 @@
       },
       "referenced_by": [
         "gpu/tools/build_demand.py",
-        "gt/tools/bitrix_tkp.py",
         "gt/tools/build_lot_xlsx.py",
         "gt/tools/build_rfq.py",
         "gt/tools/ship_merge.py",
@@ -4551,7 +4550,8 @@
         "gt/tools/ship_report.py",
         "library/load_parts.py",
         "zip/build.py",
-        "zip/tools/build_telsmith_page.py"
+        "zip/tools/build_telsmith_page.py",
+        "zip/tools/parse_demand.py"
       ]
     },
     {
@@ -5575,6 +5575,68 @@
       ]
     },
     {
+      "path": "data/catalog_notes.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 57216,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "data/budget_snapshot.json",
+        "data/chain_coverage.json",
+        "data/chat_snapshot.json",
+        "data/import_cost.json",
+        "data/index.json",
+        "dict/",
+        "dict/node_map.json",
+        "gidromet/data/",
+        "gpu/data/bitrix_gpu.json",
+        "gpu/data/coverage.json",
+        "gpu/data/faults.json",
+        "gpu/data/overhaul_qsk60.json",
+        "gt/data/ansaldo.json",
+        "gt/data/bitrix_gt.json",
+        "gt/data/bitrix_tkp_index.json",
+        "gt/data/dossiers.json",
+        "gt/data/faults.json",
+        "gt/data/fx_rates.json",
+        "gt/data/pn_db.json",
+        "gt/data/ship_blocked.json",
+        "gt/data/ship_decoded.json",
+        "gt/data/ship_energoseti.json",
+        "gt/data/ship_lukoil.json",
+        "gt/data/ship_questions.json",
+        "gt/data/ship_recheck.json",
+        "gt/data/ship_rfq_letters.json",
+        "gt/data/ship_sellers.json",
+        "gt/data/ship_sweep.json",
+        "gt/docs/ЗАКУПКА-ЛУКОЙЛ.csv",
+        "gt/docs/ЗАПРОСЫ-ЛУКОЙЛ.csv",
+        "gt/docs/ЛУКОЙЛ-СИМЕНС-SGT-400.pdf",
+        "gt/docs/ЛУКОЙЛ-СОЛАР-TAURUS.pdf",
+        "gt/docs/РАЗВЕДКА-ЦЕН-ЛУКОЙЛ.pdf",
+        "gt/tools/ship_offer.py",
+        "library/data/symptoms.json",
+        "library/docfilter.py",
+        "library/indexer.py",
+        "library/load_parts.py",
+        "library/load_suppliers.py",
+        "library/ocr.py"
+      ],
+      "last_change": "2026-09-17",
+      "last_author": "Claude",
+      "last_commit": "2b19009",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "scripts/build_catalog.py",
+        "tests/test_catalog_guard.py"
+      ]
+    },
+    {
       "path": "gpu/data/machines.json",
       "subproject": "ГПУ-библиотека",
       "bytes": 56132,
@@ -5655,68 +5717,6 @@
       },
       "referenced_by": [
         "ove/tools/build_disc.py"
-      ]
-    },
-    {
-      "path": "data/catalog_notes.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 55731,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "data/budget_snapshot.json",
-        "data/chain_coverage.json",
-        "data/chat_snapshot.json",
-        "data/import_cost.json",
-        "data/index.json",
-        "dict/",
-        "dict/node_map.json",
-        "gidromet/data/",
-        "gpu/data/bitrix_gpu.json",
-        "gpu/data/coverage.json",
-        "gpu/data/faults.json",
-        "gpu/data/overhaul_qsk60.json",
-        "gt/data/ansaldo.json",
-        "gt/data/bitrix_gt.json",
-        "gt/data/bitrix_tkp_index.json",
-        "gt/data/dossiers.json",
-        "gt/data/faults.json",
-        "gt/data/fx_rates.json",
-        "gt/data/pn_db.json",
-        "gt/data/ship_blocked.json",
-        "gt/data/ship_decoded.json",
-        "gt/data/ship_energoseti.json",
-        "gt/data/ship_lukoil.json",
-        "gt/data/ship_questions.json",
-        "gt/data/ship_recheck.json",
-        "gt/data/ship_rfq_letters.json",
-        "gt/data/ship_sellers.json",
-        "gt/data/ship_sweep.json",
-        "gt/docs/ЗАКУПКА-ЛУКОЙЛ.csv",
-        "gt/docs/ЗАПРОСЫ-ЛУКОЙЛ.csv",
-        "gt/docs/ЛУКОЙЛ-СИМЕНС-SGT-400.pdf",
-        "gt/docs/ЛУКОЙЛ-СОЛАР-TAURUS.pdf",
-        "gt/docs/РАЗВЕДКА-ЦЕН-ЛУКОЙЛ.pdf",
-        "library/data/symptoms.json",
-        "library/docfilter.py",
-        "library/indexer.py",
-        "library/load_parts.py",
-        "library/load_suppliers.py",
-        "library/ocr.py",
-        "library/reparse.py"
-      ],
-      "last_change": "2026-09-17",
-      "last_author": "Claude",
-      "last_commit": "b4dc0dd",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "scripts/build_catalog.py",
-        "tests/test_catalog_guard.py"
       ]
     },
     {
@@ -7847,9 +7847,9 @@
           "unit"
         ]
       },
-      "last_change": "2026-09-13",
-      "last_author": "Claude",
-      "last_commit": "02ecfc8",
+      "last_change": "2026-09-17",
+      "last_author": "skharkov1246",
+      "last_commit": "af3d509",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
@@ -8809,8 +8809,8 @@
         "records": 19
       },
       "last_change": "2026-09-17",
-      "last_author": "Claude",
-      "last_commit": "48fb1e1",
+      "last_author": "skharkov1246",
+      "last_commit": "af3d509",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
@@ -9388,6 +9388,7 @@
         "gt/tools/ship_export.py",
         "gt/tools/ship_map.py",
         "gt/tools/ship_merge.py",
+        "gt/tools/ship_offer.py",
         "gt/tools/ship_priced.py",
         "tests/test_ship_fx.py"
       ]

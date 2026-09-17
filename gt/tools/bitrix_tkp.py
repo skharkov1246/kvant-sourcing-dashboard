@@ -1,33 +1,49 @@
 #!/usr/bin/env python3
-"""Выгрузка ТКП по сделке из Bitrix24: цены из ВЛОЖЕННЫХ ФАЙЛОВ, не из товарных строк.
+"""Входящие КП по сделке из Bitrix24: адресный обход, файл за файлом.
 
-Зачем. Владелец выставил заказчику твёрдые цены, и защищать предстоит именно их.
-В товарных строках сделки этих цен нет (проверено владельцем), они лежат в
-приложенных файлах — ТКП, прайсах, входящих КП поставщиков. Разведочные вилки из
-gt/data/rfq_prices.json ими НЕ являются: там в основаниях дословно стоит
-«дистрибьюторы», «аналог», «экспертная вилка» — это наша оценка рынка.
+Распоряжение владельца 17.09.2026: «Никаких массовых выгрузок не нужно делать.
+Они бесполезны и только тратят ресурс. Ты смотришь, читаешь сделку, читаешь
+запросы поставщикам, а потом уже видишь файлы и потом их загружаешь. Причём
+файлы должны быть не наши исходящие запросы поставщикам, а те, которые появляются
+от сорсеров или от контрагентов». Этот инструмент переписан под такой порядок.
 
-Что делает (нужен BITRIX_WEBHOOK_URL в окружении):
-1) находит сделки по ключевому слову в названии (по умолчанию ЛУКОЙЛ);
-2) собирает файлы из трёх мест, а не из одного: файловые UF-поля сделки,
-   вложения таймлайна и файловые поля привязанных записей СП-166 «Запросы
-   поставщикам» — входящие КП живут именно там;
-3) качает каждый файл тремя стратегиями подряд (disk.file.get → DOWNLOAD_URL,
-   disk.attachedObject.get, готовый urlMachine из объекта);
-4) разбирает xlsx, xls, csv, txt и pdf в строки таблицы;
-5) из строк достаёт пары «артикул — цена», сохраняя исходную строку целиком и
-   происхождение: файл, лист, номер строки, способ разбора.
+ЧЕМ ОН ОТЛИЧАЕТСЯ ОТ ПЕРВОЙ ПОПЫТКИ, которая повисла на 28 минутах и не дала ни
+одного файла. Разбор 17.09.2026 вскрыл четыре ошибки, и все четыре учтены здесь:
 
-ДВА ВЫХОДА, и это не прихоть. Репозиторий публичный, а цены заказчику —
-коммерческие данные (SECURITY.md, правило 5 CLAUDE.md):
-  --out-full <путь>  полная выгрузка с ценами. НЕ коммитится, уезжает артефактом.
-  --out-index <путь> опись БЕЗ цен: какие файлы есть, сколько строк разобрано,
-                     по каким артикулам цена найдена. Безопасна для репозитория.
+1. crm.deal.list для файлов НЕ ГОДИТСЯ. Его файловые поля отдают ссылки вида
+   crm_show_file.php, которым нужна сессия портала, — вебхук получает СТРАНИЦУ
+   ВХОДА с кодом 200 и разбирает её как спецификацию. Рабочий путь один:
+   crm.item.list с entityTypeId=2 и ссылка urlMachine. Это измерено в
+   base/collect_attachments.py и base/fetch_files.py, здесь оно повторено.
+2. Маска select=["*"] файловых полей НЕ ВОЗВРАЩАЕТ. Поля берутся из
+   crm.item.fields по type == "file" — одним вызовом за прогон.
+3. Ссылка urlMachine уже лежит в объекте, и спрашивать её у disk.* незачем.
+   Прежний порядок платил два дросселированных вызова на каждый файл, а при
+   ошибке уходил в шесть повторов с паузой до 3,5 минут.
+4. Результат писался только в конце, поэтому таймаут унёс всё. Здесь запись
+   идёт по ходу, после каждого файла.
 
-В журнал прогона идут только агрегаты: ни наименований позиций, ни цен, ни имён
-файлов заказчика — по правилу 17 CLAUDE.md.
+НАПРАВЛЕНИЕ ФАЙЛА определяется ИМЕНЕМ ПОЛЯ, а не догадкой по названию файла.
+У смарт-процесса 166 «Запросы поставщикам» восемь файловых полей (их состав
+записан в base/fetch_rfq.py), и они прямо делятся на наши и чужие: «КП
+поставщика» и «Offer from supplier» — входящие, «Request file» — наш исходящий
+запрос. Это и есть та очевидность из контекста, которую требовал владелец.
 
-Запуск: Actions → «Bitrix ТКП по сделке» → Run workflow.
+Где ещё искать, кроме полей карточки: комментарии таймлайна, дела (у дела есть
+поле DIRECTION — готовый признак входящего письма) и чат сделки, включая
+открытые линии с внешним контрагентом.
+
+ДВА ВЫХОДА, потому что репозиторий публичный, а цены заказчику коммерческие
+(правило 5 CLAUDE.md, SECURITY.md):
+  --out-full   полная выгрузка с ценами. Артефактом, в репозиторий не идёт.
+  --out-index  опись БЕЗ цен: что за файл, откуда, чем разобран, сколько строк.
+
+Холостой прогон обязателен перед скачиванием (правило 3 CLAUDE.md):
+  python gt/tools/bitrix_tkp.py --keyword ЛУКОЙЛ --dry-run
+показывает, сколько файлов нашлось и каких, не скачивая ни одного.
+
+В журнал идут только агрегаты и имена полей (правило 17): ни наименований
+позиций, ни цен, ни имён файлов заказчика.
 """
 from __future__ import annotations
 
@@ -37,6 +53,7 @@ import json
 import os
 import re
 import sys
+import time
 from datetime import date
 from pathlib import Path
 
@@ -45,10 +62,29 @@ sys.path.insert(0, str(ROOT))
 
 from bitrix_client import BitrixClient  # noqa: E402
 
-SPA_RFQ = 166  # смарт-процесс «Запросы поставщикам»
+DEAL_ENTITY = 2
+SPA_RFQ = 166
 
-# артикул: те же паттерны, что уже используются в gt/tools/bitrix_attachments.py,
-# плюс общий вид «буквы-цифры от пяти знаков» для неопознанных номенклатур
+# Восемь файловых полей СП-166 — состав из base/fetch_rfq.py, там он выверен на
+# живом портале. Направление проставлено по смыслу названия: это и есть признак,
+# который владелец назвал «очевидным из контекста».
+RFQ_FILE_FIELDS = {
+    "ufCrm18_1700698211875": ("КП поставщика", "входящее"),
+    "ufCrm18_1731179998": ("Offer from supplier", "входящее"),
+    "ufCrm18_1703711961310": ("Offer, old", "входящее"),
+    "ufCrm18_1703712059311": ("Processed offer", "входящее"),
+    "ufCrm18_1703712074559": ("Processed offer with descriptions / archive", "входящее"),
+    "ufCrm18_1727423346": ("Request file", "наш запрос"),
+    # сорсер мог положить КП не в тот слот, поэтому это «неизвестно», а не отказ
+    "ufCrm18_1730999038678": ("Мануал, чертеж, шильд", "неизвестно"),
+    "ufCrm18_1730999106096": ("Bank Details", "неизвестно"),
+}
+RFQ_SELECT = ["id", "title", "stageId", "parentId2", "ufCrm18Supplier", "companyId",
+              "createdTime", "assignedById"]
+
+# что берём в разбор: входящее — обязательно, остальное только с --all-files
+WANTED = {"входящее"}
+
 PN_RES = [
     r"\b\d{6,7}-\d{1,4}(?:-\d{1,4})?\b", r"\b\d{6}C\d\b", r"\b64/\d{8}/\d{1,4}\b",
     r"\b[MR][WTU]\d{4,5}[A-Z]?(?:/\d+)?\b", r"\bCT\d{3,5}[A-Z]?/\d+\b",
@@ -61,11 +97,9 @@ PN_RES = [
 NBSP = "\u00a0"
 CYR = str.maketrans({"А": "A", "В": "B", "С": "C", "Е": "E", "К": "K", "М": "M",
                      "Н": "H", "О": "O", "Р": "P", "Т": "T", "Х": "X"})
-# число с пробелами/запятыми как разделителями: «1 234,56», «1,234.56», «86.89»
-NUM_RE = re.compile(r"(?<![\dA-Za-z./-])(\d{1,3}(?:[  ]\d{3})+(?:[.,]\d{1,2})?"
+NUM_RE = re.compile(r"(?<![\dA-Za-z./-])(\d{1,3}(?:[ \u00a0]\d{3})+(?:[.,]\d{1,2})?"
                     r"|\d+[.,]\d{1,2}|\d{2,9})(?![\dA-Za-z/-])")
 CUR_RE = re.compile(r"\b(USD|EUR|RUB|RUR|GBP|CNY|руб|долл|евро|\$|€|₽)\b", re.I)
-# заголовки колонок, по которым опознаём, где цена, а где количество
 H_PRICE = re.compile(r"цена|стоим|price|amount|сумма|тариф|ставка", re.I)
 H_QTY = re.compile(r"кол-?в|количест|qty|quantity|шт\b|ед\b", re.I)
 H_PN = re.compile(r"артик|парт|номер|part|p/?n|каталож|обознач", re.I)
@@ -222,8 +256,6 @@ def parse(name: str, content: bytes):
     return [], "формат не поддержан"
 
 
-# ------------------------------------------------------- вытаскивание цен из строк
-
 def header_map(rows: list) -> dict:
     """Ищем строку заголовков в первых 25 строках и запоминаем, какая колонка чем."""
     best, best_hits = {}, 0
@@ -294,140 +326,507 @@ def price_rows(rows: list, hdr: dict) -> list[dict]:
     return out
 
 
-# ---------------------------------------------------------------------- скачивание
 
-def download(bx: BitrixClient, fobj: dict):
-    """Три стратегии подряд. Возвращает (bytes|None, чем получилось)."""
-    import requests
-    fid = fobj.get("id") or fobj.get("ID")
-    for how, getter in (
-        ("disk.file.get", lambda: (bx.call("disk.file.get", {"id": fid}) or {}).get("DOWNLOAD_URL")),
-        ("disk.attachedObject.get",
-         lambda: ((bx.call("disk.attachedObject.get", {"id": fid}) or {}).get("DOWNLOAD_URL"))),
-        ("urlMachine", lambda: fobj.get("urlMachine") or fobj.get("downloadUrl")),
-    ):
-        try:
-            url = getter()
-            if not url:
-                continue
-            rr = requests.get(url, timeout=90)
-            if rr.status_code == 200 and len(rr.content) > 200:
-                return rr.content, how
-        except Exception:
-            continue
-    return None, "недоступно"
+# ------------------------------------------------------------ сбор кандидатов
+# Порядок ровно такой, какой задал владелец: сначала читаем сделку, потом
+# запросы поставщикам, потом видим файлы — и лишь затем качаем.
 
 
-def file_objs(v) -> list[dict]:
+def say(msg: str) -> None:
+    """Прогресс в журнал. flush обязателен: stdout в Actions буферизован
+    блоками, и без него прогон выглядит повисшим, а не идущим."""
+    print(msg, flush=True)
+
+
+def file_fields(bx: BitrixClient, entity: int) -> dict:
+    """Файловые поля сущности: код → название. Один вызов за прогон.
+
+    Маска select=["*"] файловые поля НЕ возвращает — это и было причиной, по
+    которой первая версия не получила ни одного файла.
+    """
+    r = bx.call("crm.item.fields", {"entityTypeId": entity}) or {}
+    fields = (r.get("fields") if isinstance(r, dict) else None) or {}
+    return {k: (v.get("title") or k) for k, v in fields.items()
+            if isinstance(v, dict) and v.get("type") == "file"}
+
+
+def objs(v) -> list:
+    """Файловые объекты из значения поля. Три разные формы, и все встречаются.
+
+    Проверка документации 17.09.2026 поймала форму, на которой прежний код
+    терял файлы молча: FILES комментария таймлайна приходит СЛОВАРЁМ, где ключ
+    совпадает с id файла — {"10": {id, name, urlDownload, authorId}}. Прежний
+    objs получал такой словарь, считал его ОДНИМ объектом, не находил в нём
+    ссылки и возвращал пустоту. Файл при этом есть.
+
+    Требуем ссылку или id: у файла CRM это urlMachine, у файла Диска — числовой
+    ID, по которому ссылку ещё надо спросить у disk.file.get.
+    """
     if not v:
         return []
-    items = v if isinstance(v, list) else [v]
-    return [x for x in items if isinstance(x, dict) and (x.get("id") or x.get("ID"))]
+    items: list = []
+    if isinstance(v, list):
+        items = v
+    elif isinstance(v, dict):
+        # словарь по id: все значения — словари. Иначе это сам объект.
+        vals = [x for x in v.values() if isinstance(x, dict)]
+        items = vals if vals and len(vals) == len(v) else [v]
+    else:
+        return []
+    out = []
+    for o in items:
+        if not isinstance(o, dict):
+            continue
+        if o.get("urlMachine") or o.get("downloadUrl") or o.get("ID") or o.get("id"):
+            out.append(o)
+    return out
+
+
+def cand(origin: str, field: str, field_name: str, direction: str, o: dict,
+         extra: str = "", via: str = "") -> dict:
+    """Кандидат на скачивание.
+
+    Поле via говорит, КАК брать байты, и это не косметика. Документация:
+    у файлового поля CRM рабочая ссылка — urlMachine с одноразовым токеном; а
+    вот urlDownload из FILES комментария таймлайна токена НЕ содержит, и
+    серверный клиент получит по нему html-страницу вместо файла. Там нужен
+    disk.file.get по id. Перепутать эти два пути — значит разобрать страницу
+    входа как спецификацию.
+    """
+    fid = str(o.get("id") or o.get("ID") or "")
+    url = o.get("urlMachine") or ""
+    if not via:
+        via = "ссылка" if url else "диск"
+    return {
+        "origin": origin, "field": field, "field_name": field_name,
+        "direction": direction, "via": via,
+        "file_id": fid,
+        "file_name": o.get("name") or o.get("fileName") or o.get("NAME") or "",
+        "url": url,
+        "author": str(o.get("authorName") or o.get("authorId") or ""),
+        "context": extra,
+    }
+
+
+def from_deal(bx: BitrixClient, did: int, ffields: dict) -> list:
+    """Шаг 1: файловые поля самой карточки сделки.
+
+    Через crm.item.list с entityTypeId=2, а НЕ crm.deal.list: у последнего
+    ссылки ведут на crm_show_file.php, где нужна сессия портала, и вебхук
+    получает страницу входа с кодом 200.
+    """
+    if not ffields:
+        return []
+    r = bx.call("crm.item.list", {"entityTypeId": DEAL_ENTITY, "filter": {"@id": [did]},
+                                  "select": ["id", "title"] + list(ffields)}) or {}
+    items = (r.get("items") if isinstance(r, dict) else None) or []
+    out = []
+    for it in items:
+        for code, title in ffields.items():
+            for o in objs(it.get(code)):
+                # у сделки направление по имени поля не читается — помечаем как
+                # неизвестное и решаем уже по содержимому файла
+                out.append(cand(f"сделка {did}", code, title, "неизвестно", o))
+    return out
+
+
+def from_rfq(bx: BitrixClient, did: int) -> tuple[list, int]:
+    """Шаг 2: привязанные записи СП-166 «Запросы поставщикам».
+
+    Здесь направление читается прямо: имя файлового поля говорит, наш это
+    запрос или присланное поставщиком КП.
+    """
+    try:
+        items = bx.list_items(SPA_RFQ, filter={"parentId2": did},
+                              select=RFQ_SELECT + list(RFQ_FILE_FIELDS))
+    except Exception as e:
+        say(f"    СП-166: не прочитались ({type(e).__name__})")
+        return [], 0
+    out = []
+    for it in items:
+        rid = it.get("id")
+        sup = str(it.get("ufCrm18Supplier") or "")
+        for code, (title, direction) in RFQ_FILE_FIELDS.items():
+            for o in objs(it.get(code)):
+                out.append(cand(f"СП-166 {rid}", code, title, direction, o,
+                                extra=f"поставщик {sup}" if sup else ""))
+    return out, len(items)
+
+
+def from_timeline(bx: BitrixClient, did: int) -> list:
+    """Шаг 3: комментарии таймлайна. Сюда сорсер кладёт полученное КП.
+
+    Две поправки по документации, каждая стоила бы потерянных файлов.
+    Первая: FILES приходит словарём по id, и objs это теперь умеет.
+    Вторая: urlDownload здесь БЕЗ токена — байты берутся через disk.file.get,
+    поэтому via="диск".
+
+    Автор берётся у САМОГО ФАЙЛА (authorId/authorName внутри записи FILES), а
+    не у комментария: комментарий мог написать один человек, а файл приложить
+    другой, и для направления важен второй.
+    """
+    out = []
+    try:
+        r = bx.call("crm.timeline.comment.list", {
+            "filter": {"ENTITY_ID": did, "ENTITY_TYPE": "deal"},
+            "select": ["ID", "COMMENT", "FILES", "AUTHOR_ID", "CREATED"]}) or {}
+        rows = (r.get("result") if isinstance(r, dict) else None) or (
+            r if isinstance(r, list) else [])
+    except Exception as e:
+        say(f"    таймлайн: не прочитался ({type(e).__name__})")
+        return out
+    for c in rows:
+        txt = str(c.get("COMMENT") or "")[:200]
+        for o in objs(c.get("FILES")):
+            out.append(cand(f"комментарий {c.get('ID')}", "FILES",
+                            "вложение комментария", direction_from_text(txt), o,
+                            extra=txt, via="диск"))
+    return out
+
+
+INCOMING_WORDS = re.compile(
+    r"получ|присл|прише?л|во влож|предлож|оффер|offer|quotat|proposal|"
+    r"ответ|от поставщик|цены|прайс", re.I)
+OUTGOING_WORDS = re.compile(
+    r"отправ|направ|запрос|высла|разосла|наше тз|наш запрос|rfq|request", re.I)
+
+
+def direction_from_text(txt: str) -> str:
+    """Направление по тексту рядом с файлом. Слабый признак, но лучше, чем ничего.
+
+    Асимметрия цены ошибки: ошибочно отброшенное КП мы не увидим никогда, а
+    ошибочно взятый наш же запрос виден сразу по отсутствию цен. Поэтому при
+    любом сомнении — «неизвестно», а не «наш запрос».
+    """
+    if not txt:
+        return "неизвестно"
+    inc, out = bool(INCOMING_WORDS.search(txt)), bool(OUTGOING_WORDS.search(txt))
+    if inc and not out:
+        return "входящее"
+    if out and not inc:
+        return "наш запрос"
+    return "неизвестно"
+
+
+def from_activities(bx: BitrixClient, did: int) -> tuple[list, list]:
+    """Шаг 4: дела сделки — письма и звонки. Возвращает (файлы, тела писем).
+
+    Три поправки по документации:
+    1. Тело письма приходит прямо в DESCRIPTION — скачивать нечего, и цена
+       вполне может лежать в самом письме, а не во вложении. Раньше я этого не
+       брал вовсе и терял такие КП целиком.
+    2. DIRECTION есть только у писем (TYPE_ID=4). У задач, звонков и
+       уведомлений он пустой, и считать пустоту «исходящим» нельзя.
+    3. FILES у дела — тип diskfile, и его ID это НАСТОЯЩИЙ идентификатор Диска,
+       в отличие от id файлового поля CRM. Значит via="диск".
+
+    И главное ограничение, которое надо помнить: КП, которое сорсер скачал с
+    личной почты и приложил руками, дела не создаёт вовсе — DIRECTION по нему
+    не появится никогда. Поэтому признак отбрасывает наше надёжно, а вот
+    подтверждает чужое далеко не всегда.
+    """
+    out, bodies = [], []
+    try:
+        rows = bx.list_paged("crm.activity.list", {
+            "filter": {"OWNER_ID": did, "OWNER_TYPE_ID": DEAL_ENTITY},
+            "select": ["ID", "SUBJECT", "DESCRIPTION", "DIRECTION", "FILES",
+                       "STORAGE_ELEMENT_IDS", "PROVIDER_TYPE_ID", "TYPE_ID",
+                       "AUTHOR_ID"]})
+    except Exception as e:
+        say(f"    дела: не прочитались ({type(e).__name__})")
+        return out, bodies
+    for a in rows:
+        # DIRECTION: 1 входящее, 2 исходящее — но только у письма
+        d = str(a.get("DIRECTION") or "")
+        is_mail = str(a.get("TYPE_ID") or "") == "4"
+        if is_mail and d == "1":
+            direction = "входящее"
+        elif is_mail and d == "2":
+            direction = "наш запрос"
+        else:
+            direction = "неизвестно"
+        subj = str(a.get("SUBJECT") or "")[:200]
+        if direction == "неизвестно":
+            direction = direction_from_text(subj)
+        body = str(a.get("DESCRIPTION") or "")
+        if body and direction != "наш запрос":
+            # тело письма разбирается как текст: цена могла прийти прямо в нём
+            bodies.append({"origin": f"письмо {a.get('ID')}", "direction": direction,
+                           "subject": subj, "text": body})
+        for o in objs(a.get("FILES")):
+            out.append(cand(f"дело {a.get('ID')}", "FILES", "вложение дела",
+                            direction, o, extra=subj, via="диск"))
+    return out, bodies
+
+
+def from_chat(bx: BitrixClient, did: int) -> list:
+    """Шаг 5: чат сделки, включая открытые линии с внешним контрагентом.
+
+    Владелец прямо сказал, что КП кидают в переписку. Скоуп im может быть не
+    выдан — тогда фиксируем причину, а не молчим.
+    """
+    out = []
+    try:
+        cid = bx.deal_chat_id(did)
+    except Exception as e:
+        say(f"    чат: id не получен ({type(e).__name__})")
+        return out
+    if not cid:
+        return out
+    try:
+        msgs = bx.chat_messages(cid, limit=200)
+    except Exception as e:
+        say(f"    чат {cid}: сообщения не прочитались ({type(e).__name__})")
+        return out
+    for m in msgs or []:
+        txt = str(m.get("text") or m.get("TEXT") or "")[:200]
+        direction = direction_from_text(txt)
+        for key in ("files", "FILES", "attach", "ATTACH"):
+            for o in objs(m.get(key)):
+                out.append(cand(f"чат {cid}", key, "файл чата", direction, o, extra=txt))
+    return out
+
+
+# ---------------------------------------------------------------- скачивание
+
+def fetch(url: str, timeout: int = 45):
+    """Байты по машинной ссылке. Прямой GET, без вызовов disk.*.
+
+    urlMachine уже лежит в объекте и содержит одноразовый токен. Прежняя версия
+    спрашивала ссылку у disk.file.get и disk.attachedObject.get ПЕРЕД тем как
+    посмотреть в объект — два дросселированных вызова на каждый файл впустую, а
+    при ошибке шесть повторов с паузой до 3,5 минут. Отсюда и 28 минут.
+    """
+    import requests
+    try:
+        rr = requests.get(url, timeout=timeout)
+    except Exception as e:
+        return None, f"сеть: {type(e).__name__}"
+    if rr.status_code != 200:
+        return None, f"HTTP {rr.status_code}"
+    body = rr.content
+    if len(body) < 200:
+        return None, "пусто"
+    # вебхук без прав получает страницу входа с кодом 200 — это измерено в
+    # base/collect_attachments.py. Такую «спецификацию» разбирать нельзя.
+    head = body[:600].lower()
+    if b"<html" in head and (b"login" in head or b"auth" in head or b"bitrix" in head):
+        return None, "страница входа вместо файла (нет прав на ссылку)"
+    return body, "ок"
+
+
+def disk_url(bx: BitrixClient, fid: str) -> str:
+    """Ссылка на файл Диска по его id.
+
+    Нужна там, где прямой ссылки нет или она без токена: вложения комментариев
+    таймлайна и дел. retries=1 намеренно — нехватка прав и «нет такого файла»
+    неустранимы, и повторять их шесть раз с растущей паузой значит подвесить
+    прогон, как это и случилось в первый раз.
+    """
+    for method, key in (("disk.file.get", "DOWNLOAD_URL"),
+                        ("disk.attachedObject.get", "DOWNLOAD_URL")):
+        try:
+            r = bx.call(method, {"id": fid}, retries=1) or {}
+        except Exception:
+            continue
+        if isinstance(r, dict):
+            u = r.get(key) or (r.get("result") or {}).get(key) if isinstance(
+                r.get("result"), dict) else r.get(key)
+            if u:
+                return u
+    return ""
+
+
+def take(bx: BitrixClient, c: dict):
+    """Байты кандидата: по ссылке или через Диск, смотря что за источник."""
+    if c.get("via") == "ссылка" and c.get("url"):
+        return fetch(c["url"])
+    if c.get("file_id"):
+        u = disk_url(bx, c["file_id"])
+        if u:
+            return fetch(u)
+        return None, "Диск не отдал ссылку (нет скоупа disk или файла нет)"
+    if c.get("url"):
+        return fetch(c["url"])
+    return None, "ни ссылки, ни id"
 
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--keyword", default="ЛУКОЙЛ", help="подстрока в названии сделки")
-    ap.add_argument("--out-full", default="tkp_full.json", help="полная выгрузка С ЦЕНАМИ")
-    ap.add_argument("--out-index", default="gt/data/bitrix_tkp_index.json",
-                    help="опись БЕЗ цен для репозитория")
+    g = ap.add_mutually_exclusive_group(required=True)
+    g.add_argument("--deal", type=int, help="одна сделка по id")
+    g.add_argument("--keyword", help="подстрока в названии сделки")
+    ap.add_argument("--dry-run", action="store_true",
+                    help="холостой прогон: показать найденные файлы, ничего не качая")
+    ap.add_argument("--all-files", action="store_true",
+                    help="качать и наши запросы тоже, не только входящие")
+    ap.add_argument("--max-files", type=int, default=400, help="предел числа файлов")
+    ap.add_argument("--out-full", default="tkp_full.json")
+    ap.add_argument("--out-index", default="gt/data/bitrix_tkp_index.json")
     a = ap.parse_args()
 
     wh = (os.getenv("BITRIX_WEBHOOK_URL") or "").strip()
     if not wh:
-        print("нет BITRIX_WEBHOOK_URL", file=sys.stderr)
+        say("нет BITRIX_WEBHOOK_URL")
         return 1
     bx = BitrixClient(wh)
 
-    deals = {str(d["ID"]): d for d in bx.list_paged(
-        "crm.deal.list", {"filter": {"%TITLE": a.keyword},
-                          "select": ["ID", "TITLE", "CATEGORY_ID", "STAGE_ID"]})}
-    print(f"сделок по ключу: {len(deals)}")
+    if a.deal:
+        ids = [a.deal]
+    else:
+        deals = bx.list_paged("crm.deal.list", {"filter": {"%TITLE": a.keyword},
+                                                "select": ["ID", "TITLE"]})
+        ids = sorted(int(d["ID"]) for d in deals)
+    say(f"сделок к обходу: {len(ids)}")
 
-    uf = bx.call("crm.deal.userfield.list", {"order": {"FIELD_NAME": "ASC"}}) or {}
-    ufl = uf.get("result", uf) if isinstance(uf, dict) else uf
-    deal_file_fields = [u["FIELD_NAME"] for u in (ufl or [])
-                        if u.get("USER_TYPE_ID") == "file"]
-    print(f"файловых полей сделки: {len(deal_file_fields)}")
+    ffields = file_fields(bx, DEAL_ENTITY)
+    say(f"файловых полей у сделки: {len(ffields)}")
 
-    # источники файлов: сделки + привязанные СП-166
-    sources: list[tuple[str, str, dict]] = []
-    ids = sorted(int(k) for k in deals)
-    for i in range(0, len(ids), 50):
-        got = bx.call("crm.deal.list", {"filter": {"ID": ids[i:i + 50]},
-                                        "select": ["ID", "TITLE"] + deal_file_fields}) or {}
-        for x in (got.get("result", got) if isinstance(got, dict) else got):
-            for fld in deal_file_fields:
-                for fo in file_objs(x.get(fld)):
-                    sources.append((f"сделка {x['ID']}", fld, fo))
+    # --- сбор кандидатов: сделка за сделкой, с прогрессом ---
+    cands, seen, rfq_total, bodies = [], set(), 0, []
+    for n, did in enumerate(ids, 1):
+        say(f"[{n}/{len(ids)}] сделка {did}")
+        got = []
+        got += from_deal(bx, did, ffields)
+        rq, cnt = from_rfq(bx, did)
+        rfq_total += cnt
+        got += rq
+        got += from_timeline(bx, did)
+        acts, mail_bodies = from_activities(bx, did)
+        got += acts
+        bodies += mail_bodies
+        got += from_chat(bx, did)
+        fresh = 0
+        for c in got:
+            key = c["file_id"] or c["url"][:120]
+            if key in seen:
+                continue
+            seen.add(key)
+            cands.append(c)
+            fresh += 1
+        by_dir = {}
+        for c in got:
+            by_dir[c["direction"]] = by_dir.get(c["direction"], 0) + 1
+        say(f"    запросов СП-166: {cnt} · файлов найдено {len(got)}, новых {fresh}"
+            + (f" · по направлению: {by_dir}" if by_dir else ""))
 
-    n_rfq = 0
-    for did in ids:
-        try:
-            items = bx.list_items(SPA_RFQ, filter={"parentId2": did})
-        except Exception:
-            items = []
-        n_rfq += len(items)
-        for it in items:
-            for k, v in it.items():
-                for fo in file_objs(v):
-                    sources.append((f"СП-166 {it.get('id')}", k, fo))
-    print(f"привязанных запросов СП-166: {n_rfq}")
-    print(f"файлов-кандидатов: {len(sources)}")
+    say(f"итого кандидатов: {len(cands)} (дублей снято {len(seen) - len(cands) if len(seen) > len(cands) else 0})")
+    by_field = {}
+    for c in cands:
+        k = f'{c["field_name"]} [{c["direction"]}]'
+        by_field[k] = by_field.get(k, 0) + 1
+    for k in sorted(by_field, key=lambda x: -by_field[x]):
+        say(f"    {by_field[k]:>4}  {k}")
 
+    take = [c for c in cands if a.all_files or c["direction"] in WANTED
+            or c["direction"] == "неизвестно"]
+    say(f"к разбору: {len(take)} (входящие и неопознанные; наши запросы "
+        f"{'включены' if a.all_files else 'исключены'})")
+
+    if a.dry_run:
+        Path(a.out_index).parent.mkdir(parents=True, exist_ok=True)
+        Path(a.out_index).write_text(json.dumps(
+            {"updated": "holostoy", "deals": len(ids), "rfq_items": rfq_total,
+             "files": len(cands), "downloaded": 0,
+             "inventory": [{k: v for k, v in c.items() if k != "url"} for c in cands]},
+            ensure_ascii=False, indent=1), encoding="utf-8")
+        say("холостой прогон: ничего не скачано, опись записана")
+        return 0
+
+    # --- скачивание и разбор: по одному, с записью ПОСЛЕ КАЖДОГО файла ---
     full, index = [], []
     n_dl = n_rows = n_price = 0
-    for origin, field, fo in sources:
-        name = fo.get("fileName") or fo.get("name") or ""
-        content, how = download(bx, fo)
-        rec = {"origin": origin, "field": field,
-               "file_id": fo.get("id") or fo.get("ID"), "file_name": name,
-               "download": how, "size": len(content) if content else 0}
-        if not content:
-            index.append(dict(rec, rows=0, priced=0, parse_path=""))
+    t0 = time.time()
+
+    def dump():
+        Path(a.out_full).write_text(json.dumps(
+            {"updated": date.today().isoformat(),
+             "source": "Bitrix24: входящие КП по сделке, адресный обход",
+             "warning": "СОДЕРЖИТ КОММЕРЧЕСКИЕ ЦЕНЫ. В публичный репозиторий не коммитить.",
+             "deals": ids, "files": full}, ensure_ascii=False, indent=1), encoding="utf-8")
+        Path(a.out_index).parent.mkdir(parents=True, exist_ok=True)
+        Path(a.out_index).write_text(json.dumps(
+            {"updated": date.today().isoformat(),
+             "source": "Bitrix24: опись входящих КП по сделке, БЕЗ цен",
+             "method": "цены исключены намеренно: репозиторий публичный. Здесь "
+                       "происхождение файла, направление, способ разбора, число строк "
+                       "и артикулы с ценой — этого хватает, чтобы свести с заявкой.",
+             "deals": len(ids), "rfq_items": rfq_total, "files": len(cands),
+             "downloaded": n_dl, "inventory": index}, ensure_ascii=False, indent=1),
+            encoding="utf-8")
+
+    for n, c in enumerate(take[:a.max_files], 1):
+        body, how = take(bx, c)
+        rec = {k: v for k, v in c.items() if k != "url"}
+        rec["download"] = how
+        rec["size"] = len(body) if body else 0
+        if not body:
+            index.append(dict(rec, rows=0, priced=0, parse_path="", status="не скачан"))
+            if n % 10 == 0 or n == len(take):
+                say(f"  [{n}/{min(len(take), a.max_files)}] скачано {n_dl}, "
+                    f"строк {n_rows}, с ценой {n_price}, {(time.time()-t0)/60:.1f} мин")
+                dump()
             continue
         n_dl += 1
-        rows, how_parsed = parse(name, content)
+        rows, how_parsed = parse(c["file_name"], body)
         hdr = header_map(rows) if rows else {}
         pr = price_rows(rows, hdr) if rows else []
         n_rows += len(rows)
         n_price += len(pr)
-        # статус файла не должен врать (правило 15 CLAUDE.md)
-        status = ("пусто" if not content else
-                  "разобран" if pr else
-                  "текст без цен" if rows else
-                  "не разобрался")
+        # статус не должен врать (правило 15 CLAUDE.md): pdf без текстового
+        # слоя — это скан под распознавание, а не «пусто» и не «не КП»
+        low = (c["file_name"] or "").lower()
+        if pr:
+            status = "разобран"
+        elif rows:
+            status = "текст без цен"
+        elif low.endswith(".pdf"):
+            status = "скан, требуется распознавание"
+        elif low.endswith((".jpg", ".jpeg", ".png", ".tif", ".tiff")):
+            status = "картинка, требуется распознавание"
+        else:
+            status = "не разобрался"
         full.append(dict(rec, parse_path=how_parsed, header=hdr, status=status, prices=pr))
-        index.append(dict(rec, parse_path=how_parsed, status=status,
-                          rows=len(rows), priced=len(pr),
-                          pns=sorted({p["pn"] for p in pr})[:400]))
+        index.append(dict(rec, parse_path=how_parsed, status=status, rows=len(rows),
+                          priced=len(pr), pns=sorted({p["pn"] for p in pr})[:400]))
+        if n % 10 == 0 or n == min(len(take), a.max_files):
+            say(f"  [{n}/{min(len(take), a.max_files)}] скачано {n_dl}, "
+                f"строк {n_rows}, с ценой {n_price}, {(time.time()-t0)/60:.1f} мин")
+            dump()
 
-    Path(a.out_full).write_text(json.dumps(
-        {"updated": date.today().isoformat(),
-         "source": f"Bitrix24: вложения сделок по ключу «{a.keyword}» и привязанных СП-166",
-         "warning": "СОДЕРЖИТ КОММЕРЧЕСКИЕ ЦЕНЫ. В публичный репозиторий не коммитить.",
-         "files": full}, ensure_ascii=False, indent=1), encoding="utf-8")
+    # тела писем: КП могло прийти текстом, без вложения. Скачивать нечего —
+    # DESCRIPTION дела уже у нас, и он идёт тем же разбором, что и файл.
+    n_mail = 0
+    for b in bodies:
+        rows = rows_from_text(b["text"].encode("utf-8", "ignore"))
+        hdr = header_map(rows) if rows else {}
+        pr = price_rows(rows, hdr) if rows else []
+        if not pr:
+            continue
+        n_mail += 1
+        rec = {"origin": b["origin"], "field": "DESCRIPTION", "field_name": "тело письма",
+               "direction": b["direction"], "via": "текст письма", "file_id": "",
+               "file_name": f'письмо: {b["subject"][:80]}', "author": "", "context": "",
+               "download": "не требуется", "size": len(b["text"])}
+        full.append(dict(rec, parse_path="текст", header=hdr, status="разобран", prices=pr))
+        index.append(dict(rec, parse_path="текст", status="разобран", rows=len(rows),
+                          priced=len(pr), pns=sorted({x["pn"] for x in pr})[:400]))
+        n_price += len(pr)
+    if bodies:
+        say(f"тел писем просмотрено: {len(bodies)}, с ценами: {n_mail}")
 
-    outi = Path(a.out_index)
-    outi.parent.mkdir(parents=True, exist_ok=True)
-    outi.write_text(json.dumps(
-        {"updated": date.today().isoformat(),
-         "source": f"Bitrix24: опись вложений по ключу «{a.keyword}», БЕЗ цен",
-         "method": "цены намеренно исключены: репозиторий публичный. Здесь только "
-                   "происхождение файла, способ разбора, число строк и артикулы, по "
-                   "которым цена найдена — этого достаточно, чтобы свести выгрузку с "
-                   "заявкой, не раскрывая коммерческих условий.",
-         "deals": len(deals), "rfq_items": n_rfq, "files": len(sources),
-         "downloaded": n_dl, "inventory": index}, ensure_ascii=False, indent=1),
-        encoding="utf-8")
-
-    # только агрегаты в журнал (правило 17 CLAUDE.md)
-    print(f"скачано файлов: {n_dl} из {len(sources)}")
-    print(f"строк разобрано: {n_rows}")
-    print(f"строк с парой «артикул — цена»: {n_price}")
-    print(f"уникальных артикулов с ценой: {len({p['pn'] for f in full for p in f['prices']})}")
-    print(f"полная выгрузка → {a.out_full} (артефакт, не коммитится)")
-    print(f"опись без цен → {a.out_index}")
+    dump()
+    say(f"скачано файлов: {n_dl} из {min(len(take), a.max_files)}")
+    say(f"строк разобрано: {n_rows}")
+    say(f"строк с парой «артикул — цена»: {n_price}")
+    say(f"уникальных артикулов с ценой: {len({p['pn'] for f in full for p in f['prices']})}")
+    st = {}
+    for r in index:
+        st[r["status"]] = st.get(r["status"], 0) + 1
+    say(f"по статусу файлов: {st}")
+    if len(take) > a.max_files:
+        say(f"ВНИМАНИЕ: предел --max-files {a.max_files}, не разобрано "
+            f"{len(take) - a.max_files} файлов — это не «всё покрыто»")
     return 0
 
 

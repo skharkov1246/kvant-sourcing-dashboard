@@ -71,6 +71,12 @@ def to_usd(price, currency: str):
         p = float(price)
     except (TypeError, ValueError):
         return None
+    if p <= 0:
+        # НОЛЬ И ОТРИЦАТЕЛЬНОЕ — НЕ ЦЕНА. На брокерских витринах «$0.00» и «1,00»
+        # это заглушка карточки-заявки, а не предложение. Разбор 17.09.2026: таких
+        # строк 176, и все они попадали в «рынок ниже нашей оценки», раздувая его
+        # с 58 до 234 строк. Отсутствие цены честнее нуля.
+        return None
     cur = (s(currency) or "USD").upper()
     rate = RATES.get(cur)
     if not rate:
@@ -499,14 +505,23 @@ def main() -> int:
 
     # цена в долларах — ОДИН раз здесь, чтобы ни один потребитель датасета
     # не складывал кроны с рублями. Курс — gt/data/fx_rates.json с датой.
-    no_rate = []
+    no_rate, zero_price = [], 0
     for rec in out:
         usd = to_usd(rec.get("price"), rec.get("currency"))
         rec["price_usd"] = round(usd, 4) if usd is not None else None
         if usd is None:
             rec["unit_price_usd"] = None
             if rec.get("price") not in (None, ""):
-                no_rate.append(rec["currency"])
+                # две разные причины, и путать их нельзя: заглушка витрины и
+                # валюта без курса лечатся по-разному
+                try:
+                    is_zero = float(rec["price"]) <= 0
+                except (TypeError, ValueError):
+                    is_zero = False
+                if is_zero:
+                    zero_price += 1
+                else:
+                    no_rate.append(rec["currency"])
         else:
             try:
                 pack = float(rec.get("pack_qty") or 1) or 1.0
@@ -557,6 +572,9 @@ def main() -> int:
                   and r.get("price"))
     print(f"  закупка по твёрдым строкам: {firm_usd:,.0f} USD "
           f"(валют в них {len(cur)}: {', '.join(f'{k}×{v}' for k, v in cur.most_common())})")
+    if zero_price:
+        print(f"  заглушек вместо цены (ноль на витрине): {zero_price} строк — "
+              "в сравнение и в сумму не идут")
     if no_rate:
         print(f"  ВНИМАНИЕ: цена без известного курса у {len(no_rate)} строк: "
               f"{', '.join(sorted(set(no_rate)))} — в сумму не вошли")

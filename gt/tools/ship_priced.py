@@ -60,7 +60,10 @@ def money(n) -> str:
 
 def unit(r):
     u = r.get("unit_price_usd")
-    return None if u in (None, "") else float(u)
+    if u in (None, ""):
+        return None
+    u = float(u)
+    return None if u <= 0 else u   # ноль — заглушка витрины, а не цена
 
 
 def band_state(r) -> str:

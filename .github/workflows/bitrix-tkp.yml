@@ -1,27 +1,39 @@
-name: Bitrix ТКП по сделке
+name: Bitrix входящие КП по сделке
 
-# Выгружает цены из ВЛОЖЕННЫХ ФАЙЛОВ сделки и привязанных СП-166 «Запросы
-# поставщикам»: в товарных строках их нет, они лежат в ТКП, прайсах и входящих КП.
-# Запускается только руками — это чтение коммерческих данных, расписанию тут делать
-# нечего.
+# Адресный обход: сделка → запросы поставщикам → таймлайн → дела → чат, и только
+# потом файлы, по одному. Никаких массовых выгрузок (распоряжение владельца
+# 17.09.2026): они бесполезны и жгут ресурс.
 #
-# ДВА ВЫХОДА, и они разного режима:
-#   артефакт tkp-full  — полная выгрузка С ЦЕНАМИ. Живёт 7 дней, в репозиторий НЕ
-#                        попадает: репозиторий публичный (SECURITY.md, правило 5).
-#   коммит             — gt/data/bitrix_tkp_index.json, опись БЕЗ цен: происхождение
-#                        файла, способ разбора, число строк, артикулы с ценой.
-#                        Этого хватает, чтобы свести выгрузку с заявкой.
+# ТРИ ДЕФЕКТА ПЕРВОЙ ВЕРСИИ, из-за которых прогон на 28 минутах унёс всё:
+#   артефакт выгружался без if: always() — при убитом шаге не выгружался вовсе;
+#   страж цен стоял ПЕРЕД артефактом и в случае срабатывания убивал его вместе
+#     с результатом;
+#   у шага не было своего таймаута, поэтому его резал таймаут задания, и
+#     последующие шаги не выполнялись.
+# Здесь: артефакт первым и всегда, у шага свой таймаут меньше задания, страж
+# стоит после артефакта и валит только коммит.
 on:
   workflow_dispatch:
     inputs:
+      deal:
+        description: id одной сделки (точнее и быстрее ключевого слова)
+        required: false
       keyword:
-        description: Подстрока в названии сделки
+        description: подстрока в названии сделки, если id неизвестен
         default: ЛУКОЙЛ
-        required: true
-      commit_index:
-        description: Коммитить опись без цен в репозиторий
+        required: false
+      dry_run:
+        description: холостой прогон — показать найденные файлы, ничего не качая
         type: boolean
         default: true
+      all_files:
+        description: качать и наши исходящие запросы тоже
+        type: boolean
+        default: false
+      max_files:
+        description: предел числа файлов
+        default: "400"
+        required: false
 
 permissions:
   contents: write
@@ -33,7 +45,7 @@ concurrency:
 jobs:
   extract:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6
@@ -43,43 +55,59 @@ jobs:
       - name: Установка зависимостей
         run: pip install --quiet -r requirements.txt openpyxl xlrd pypdf
 
-      - name: Выгрузка цен из вложений
+      - name: Выгрузка входящих КП
+        id: extract
+        timeout-minutes: 45          # меньше таймаута задания: последующие шаги успеют
         env:
           BITRIX_WEBHOOK_URL: ${{ secrets.BITRIX_WEBHOOK_URL }}
+          PYTHONUNBUFFERED: "1"      # прогресс виден по ходу, а не блоками
         run: |
           set -euo pipefail
           [ -n "${BITRIX_WEBHOOK_URL:-}" ] || { echo "::error::нет секрета BITRIX_WEBHOOK_URL"; exit 1; }
           mkdir -p out
-          python gt/tools/bitrix_tkp.py \
-            --keyword "${{ inputs.keyword }}" \
+          ARGS=""
+          if [ -n "${{ inputs.deal }}" ]; then ARGS="--deal ${{ inputs.deal }}"
+          else ARGS="--keyword ${{ inputs.keyword }}"; fi
+          if [ "${{ inputs.dry_run }}" = "true" ]; then ARGS="$ARGS --dry-run"; fi
+          if [ "${{ inputs.all_files }}" = "true" ]; then ARGS="$ARGS --all-files"; fi
+          python gt/tools/bitrix_tkp.py $ARGS \
+            --max-files "${{ inputs.max_files }}" \
             --out-full out/tkp_full.json \
             --out-index gt/data/bitrix_tkp_index.json
 
-      # Страховка от утечки: если в описи вдруг окажется слово «price» с числом —
-      # коммит не делаем. Дешевле перестраховаться, чем вычищать историю git.
+      # ПЕРВЫМ и ВСЕГДА: даже если шаг выше убит таймаутом, частичный результат
+      # уже записан по ходу и должен уехать владельцу.
+      - name: Выгрузка результата артефактом
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tkp-full
+          path: |
+            out/tkp_full.json
+            gt/data/bitrix_tkp_index.json
+          if-no-files-found: warn
+          retention-days: 7
+
       - name: Проверка, что в описи нет цен
+        if: always()
+        id: guard
         run: |
           set -euo pipefail
+          test -f gt/data/bitrix_tkp_index.json || { echo "описи нет — нечего коммитить"; exit 0; }
           if grep -qE '"price"[[:space:]]*:[[:space:]]*[0-9]' gt/data/bitrix_tkp_index.json; then
             echo "::error::в описи найдены цены — коммит отменён"
             exit 1
           fi
           echo "✓ цен в описи нет"
 
-      - name: Полная выгрузка — артефактом, не в репозиторий
-        uses: actions/upload-artifact@v4
-        with:
-          name: tkp-full
-          path: out/tkp_full.json
-          retention-days: 7
-
       - name: Коммит описи без цен
-        if: ${{ inputs.commit_index }}
+        if: success() && steps.guard.outcome == 'success'
         run: |
           set -euo pipefail
+          test -f gt/data/bitrix_tkp_index.json || exit 0
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add gt/data/bitrix_tkp_index.json
           git diff --cached --quiet && { echo "опись не изменилась"; exit 0; }
-          git commit -m "Опись вложений ТКП из Bitrix (без цен)"
+          git commit -m "Опись входящих КП из Bitrix (без цен)"
           git push

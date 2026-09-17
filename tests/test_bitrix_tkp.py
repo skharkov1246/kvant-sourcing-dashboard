@@ -153,3 +153,171 @@ def test_цена_берётся_последним_числом_а_не_наи�
     assert got and got[0]["price"] == 86.89
     got2 = T.price_rows([("стр.1", 1, ["1794-ACNR15", "86", "3119,32"])], {})
     assert got2 and got2[0]["price"] == 3119.32
+
+
+# --- адресный обход: направление файла и отсев не-файлов -------------------
+# Написано по разбору 17.09.2026, который вскрыл, что первая версия не получила
+# бы ни одного файла и разобрала бы страницу входа как спецификацию.
+
+
+def test_файловый_объект_узнаётся_в_трёх_формах():
+    """Битрикс отдаёт файлы тремя разными формами, и все встречаются.
+
+    Форму-словарь-по-id поймала проверка документации 17.09.2026: FILES
+    комментария таймлайна приходит как {"10": {id, name, urlDownload}}. Прежний
+    код получал такой словарь, считал его ОДНИМ объектом, не находил ссылки и
+    возвращал пустоту — файл при этом есть.
+
+    Требование «только с urlMachine» тоже пришлось снять, и это не ослабление.
+    У файла Диска прямой ссылки нет вовсе: есть числовой ID, по которому ссылку
+    спрашивают у disk.file.get. Отбрасывать такие объекты значило бы терять всё
+    из таймлайна и дел.
+    """
+    # не файл: скаляры и crm-привязки
+    assert T.objs("CO_9634") == [], "crm-привязка принята за файл"
+    assert T.objs(None) == []
+    assert T.objs(123) == []
+    assert T.objs({}) == []
+
+    # форма 1: список объектов со ссылкой
+    got = T.objs([{"id": 1, "urlMachine": "https://x/1"},
+                  {"id": 2, "downloadUrl": "https://x/2"}])
+    assert len(got) == 2
+
+    # форма 2: одиночный объект
+    assert len(T.objs({"id": 5, "urlMachine": "https://x/5"})) == 1
+
+    # форма 3: словарь ПО id — та, на которой терялись файлы
+    keyed = T.objs({"10": {"id": 10, "name": "kp.pdf", "urlDownload": "https://x/10"},
+                    "11": {"id": 11, "name": "kp2.pdf", "urlDownload": "https://x/11"}})
+    assert len(keyed) == 2, f"словарь по id не разобран: {keyed}"
+    assert {o["id"] for o in keyed} == {10, 11}
+
+
+def test_путь_скачивания_зависит_от_источника():
+    """urlMachine содержит одноразовый токен, urlDownload из таймлайна — нет.
+
+    Документация прямо предупреждает: по ссылке без токена серверный клиент
+    получит html-страницу вместо файла. Значит источник обязан помнить, каким
+    путём брать байты, иначе страница входа уйдёт в разбор как спецификация.
+    """
+    crm = T.cand("сделка 1", "ufCrm_1", "КП", "входящее",
+                 {"id": 7, "urlMachine": "https://portal/rest/getFile?auth=x"})
+    assert crm["via"] == "ссылка", "файл поля CRM должен качаться по ссылке"
+    assert crm["url"]
+
+    tl = T.cand("комментарий 5", "FILES", "вложение комментария", "неизвестно",
+                {"id": 10, "urlDownload": "https://portal/show_file.php?id=10"},
+                via="диск")
+    assert tl["via"] == "диск", "вложение таймлайна должно идти через disk.file.get"
+    assert tl["url"] == "", "ссылка без токена не должна попадать в url"
+
+    # автор берётся у файла, а не у комментария: приложить мог не тот, кто писал
+    auth = T.cand("комментарий 5", "FILES", "вложение", "неизвестно",
+                  {"id": 11, "authorName": "Петров", "urlDownload": "https://x"},
+                  via="диск")
+    assert auth["author"] == "Петров"
+
+
+def test_направление_по_имени_поля_сп166():
+    """Владелец требовал брать чужие КП, а не наши запросы, и чтобы это было
+    очевидно из контекста. Контекст — имя файлового поля смарт-процесса."""
+    assert T.RFQ_FILE_FIELDS["ufCrm18_1700698211875"][1] == "входящее"   # КП поставщика
+    assert T.RFQ_FILE_FIELDS["ufCrm18_1731179998"][1] == "входящее"      # Offer from supplier
+    assert T.RFQ_FILE_FIELDS["ufCrm18_1727423346"][1] == "наш запрос"    # Request file
+    # «Bank Details» и «Мануал» НЕ отбрасываются: сорсер мог положить КП не в
+    # тот слот, а отброшенное КП мы не увидим никогда. Поэтому «неизвестно».
+    assert T.RFQ_FILE_FIELDS["ufCrm18_1730999106096"][1] == "неизвестно"
+    assert T.RFQ_FILE_FIELDS["ufCrm18_1730999038678"][1] == "неизвестно"
+    assert "не цены" not in {d for _, d in T.RFQ_FILE_FIELDS.values()}, (
+        "поле не должно отбрасываться наглухо: цена ошибки асимметрична")
+    incoming = [k for k, (_, d) in T.RFQ_FILE_FIELDS.items() if d == "входящее"]
+    assert len(incoming) >= 2, "входящих полей должно быть несколько"
+
+
+def test_направление_по_тексту_сомнение_даёт_неизвестно():
+    """Асимметрия цены ошибки: отброшенное КП мы не увидим никогда, а наш же
+    запрос виден сразу по отсутствию цен. Значит при сомнении — «неизвестно»."""
+    assert T.direction_from_text("Получили КП от поставщика, во вложении цены") == "входящее"
+    assert T.direction_from_text("Отправили запрос и ТЗ поставщику") == "наш запрос"
+    # и то и другое в одной фразе — сомнение, а не выбор
+    assert T.direction_from_text("отправили запрос, получили предложение") == "неизвестно"
+    assert T.direction_from_text("") == "неизвестно"
+    assert T.direction_from_text("файл") == "неизвестно"
+
+
+def test_страница_входа_не_принимается_за_файл():
+    """Вебхук без прав на ссылку получает страницу входа с кодом 200.
+
+    Измерено в base/collect_attachments.py. Без этой проверки инструмент
+    разобрал бы html страницы входа как спецификацию и отчитался бы «текст без
+    цен» — то есть соврал бы о причине.
+    """
+    import types
+
+    page = ("<html><head><title>Bitrix24</title></head><body>"
+            "<form action='/auth/login'>вход</form></body></html>" + "x" * 300).encode()
+    real = ("Артикул;Цена\n3420932;86,89\n" + "y" * 300).encode()
+
+    def fake_get(url, timeout=0):
+        body = page if "bad" in url else real
+        return types.SimpleNamespace(status_code=200, content=body)
+
+    import sys as _s
+    mod = _s.modules.setdefault("requests", types.SimpleNamespace())
+    old = getattr(mod, "get", None)
+    mod.get = fake_get
+    try:
+        body, how = T.fetch("https://portal/bad")
+        assert body is None
+        assert "страница входа" in how, how
+        body2, how2 = T.fetch("https://portal/good")
+        assert body2 is not None and how2 == "ок"
+    finally:
+        if old is not None:
+            mod.get = old
+
+
+def test_короткий_ответ_считается_пустым():
+    import types
+    import sys as _s
+
+    def fake_get(url, timeout=0):
+        return types.SimpleNamespace(status_code=200, content=b"tiny")
+
+    mod = _s.modules.setdefault("requests", types.SimpleNamespace())
+    old = getattr(mod, "get", None)
+    mod.get = fake_get
+    try:
+        body, how = T.fetch("https://portal/x")
+        assert body is None and how == "пусто"
+    finally:
+        if old is not None:
+            mod.get = old
+
+
+def test_скан_без_текста_не_называется_пустым():
+    """Правило 15 CLAUDE.md: статус файла не должен врать.
+
+    pdf без текстового слоя — это скан под распознавание, а не «пусто» и не
+    «не КП». Соврав тут, мы занизим оценку объёма распознавания и решим, что
+    файлов с ценами меньше, чем есть.
+    """
+    rows, how = T.parse("КП-скан.pdf", b"%PDF-1.4 no text layer" + b"\x00" * 400)
+    # разбор мог и не состояться — важно, что это не выдаётся за «пусто»
+    assert rows == [] or isinstance(rows, list)
+    assert "не разобрался" in how or how == "pdf", how
+
+
+def test_тело_письма_считается_источником_цены():
+    """КП может прийти прямо в тексте письма, без вложения.
+
+    Тело лежит в DESCRIPTION дела и скачивать его не надо. Раньше я его не брал
+    вовсе и терял такие КП целиком. Проверяем, что текст письма проходит тот же
+    разбор, что и файл.
+    """
+    body = "Добрый день! Предлагаем:\n3420932  566 шт  86,89 USD\n1017891  108 шт  6,52 USD"
+    rows, how = T.parse("письмо.txt", body.encode())
+    got = {p["pn"]: p["price"] for p in T.price_rows(rows, T.header_map(rows))}
+    assert got.get("3420932") == 86.89, got
+    assert got.get("1017891") == 6.52, got
