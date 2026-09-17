@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 217,
-    "total_bytes": 99580886,
+    "total_bytes": 99598931,
     "by_sensitivity": {
       "конфиденциально": 62,
       "внутреннее": 120,
@@ -3278,6 +3278,63 @@
       "referenced_by": []
     },
     {
+      "path": "gpu/data/overhaul_qsk60.json",
+      "subproject": "ГПУ-библиотека",
+      "bytes": 154146,
+      "note": "Капитальный ремонт Cummins QSK60 (дизельный V16 60,2 л, генераторное исполнение): 55 этапов объёма работ с местом и ответственным, ведомость ЗИП на 46 позиций с количеством на двигатель, расчётная трудоёмкость 1 272 нормо-часа по этапам и семь подтверждённых ценовых якорей со ссылками (комплект капремонта, турбина HX83, насос-форсунка, прокладки ГБЦ, ставка трала, курс ЦБ). Источник объёма — тендерная ведомость нефтегазового заказчика, обезличенная: имён, месторождения и реквизитов нет. Итоговых сумм в наборе нет намеренно — цена головок блока публично не раскрывается, и без КП любая сумма была бы выдумкой.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "bom",
+        "caveat",
+        "correction",
+        "factory_data",
+        "labor_benchmark",
+        "labor_model",
+        "logistics",
+        "machine",
+        "market_check",
+        "open_questions",
+        "price_anchors",
+        "price_basis",
+        "price_transparency",
+        "rfq",
+        "risks",
+        "sibling_note",
+        "source",
+        "stage_stats",
+        "stages",
+        "updated",
+        "what_it_is",
+        "zip_priced"
+      ],
+      "main_collection": {
+        "key": "stages",
+        "records": 55,
+        "record_keys": [
+          "group",
+          "kind",
+          "n",
+          "owner",
+          "place",
+          "system",
+          "text",
+          "zip"
+        ]
+      },
+      "last_change": "2026-09-17",
+      "last_author": "skharkov1246",
+      "last_commit": "ef48b4f",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gpu/build.py"
+      ]
+    },
+    {
       "path": "zip/data/telsmith_brands.json",
       "subproject": "база ЗИП",
       "bytes": 153461,
@@ -3584,62 +3641,6 @@
         "ove/build.py",
         "ove/tools/bitrix_ove.py",
         "ove/tools/build_rfq.py"
-      ]
-    },
-    {
-      "path": "gpu/data/overhaul_qsk60.json",
-      "subproject": "ГПУ-библиотека",
-      "bytes": 136101,
-      "note": "Капитальный ремонт Cummins QSK60 (дизельный V16 60,2 л, генераторное исполнение): 55 этапов объёма работ с местом и ответственным, ведомость ЗИП на 46 позиций с количеством на двигатель, расчётная трудоёмкость 1 272 нормо-часа по этапам и семь подтверждённых ценовых якорей со ссылками (комплект капремонта, турбина HX83, насос-форсунка, прокладки ГБЦ, ставка трала, курс ЦБ). Источник объёма — тендерная ведомость нефтегазового заказчика, обезличенная: имён, месторождения и реквизитов нет. Итоговых сумм в наборе нет намеренно — цена головок блока публично не раскрывается, и без КП любая сумма была бы выдумкой.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "bom",
-        "caveat",
-        "correction",
-        "factory_data",
-        "labor_model",
-        "logistics",
-        "machine",
-        "market_check",
-        "open_questions",
-        "price_anchors",
-        "price_basis",
-        "price_transparency",
-        "rfq",
-        "risks",
-        "sibling_note",
-        "source",
-        "stage_stats",
-        "stages",
-        "updated",
-        "what_it_is",
-        "zip_priced"
-      ],
-      "main_collection": {
-        "key": "stages",
-        "records": 55,
-        "record_keys": [
-          "group",
-          "kind",
-          "n",
-          "owner",
-          "place",
-          "system",
-          "text",
-          "zip"
-        ]
-      },
-      "last_change": "2026-09-17",
-      "last_author": "skharkov1246",
-      "last_commit": "e2fa208",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "gpu/build.py"
       ]
     },
     {
