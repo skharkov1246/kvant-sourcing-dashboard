@@ -450,6 +450,23 @@ def hygiene(*, people: dict[str, dict], role_of: dict[str, str], deps: dict[str,
     return out
 
 
+def _promise_stats(p: dict) -> dict:
+    """Сводка обещаний клиенту: сколько живых заказов имеют срок и сколько сорвано.
+
+    Отдельная цифра нужна потому, что просрочка сделки считается ИЗ заказа: если срока
+    в заказе нет, сделка выглядит благополучной, хотя обещание по ней просто не записано.
+    """
+    days = sorted(p["days"])
+    live = p["live"] or 1
+    return {
+        "live": p["live"], "withDl": p["withDl"], "noDl": p["noDl"], "late": p["late"],
+        "coverPct": round(p["withDl"] / live * 100),
+        "latePct": (round(p["late"] / p["withDl"] * 100) if p["withDl"] else 0),
+        "medDays": (days[len(days) // 2] if days else None),
+        "maxDays": (days[-1] if days else None),
+    }
+
+
 def _boss_of(uid: str, person: dict, people: dict[str, dict], dept_head: dict[str, str]) -> str:
     """Непосредственный руководитель человека — из UF_HEAD его отдела. В отличие от
     «руководителя роли», это в портале заполнено почти везде. Если человек сам
@@ -505,6 +522,9 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
     order_deals: set[str] = set()     # есть непроигранный заказ (в т.ч. уже исполненный)
     live_deals: set[str] = set()      # заказ ещё в работе
     late_deals: dict[str, int] = {}
+    # обещание клиенту меряется по самому заказу, а не по сделке: срок стоит там.
+    # Заказ без срока — не «в порядке», а неизмеримый: просрочку по нему никто не увидит.
+    promise = {"live": 0, "withDl": 0, "noDl": 0, "late": 0, "days": []}
     for o in orders:
         did = str(o.get("parentId2") or "")
         stage = str(o.get("stageId") or "")
@@ -516,9 +536,13 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
             continue
         live_deals.add(did)
         dl = str(o.get(DL_CUSTOMER) or "")[:10]
-        if dl and dl < today_iso:
+        promise["live"] += 1
+        promise["withDl" if len(dl) == 10 else "noDl"] += 1
+        if len(dl) == 10 and dl < today_iso:
             days = (today - dt.date.fromisoformat(dl)).days
             late_deals[did] = max(days, late_deals.get(did, 0))
+            promise["late"] += 1
+            promise["days"].append(days)
 
     # --- роли людей
     role_of, why_of = {}, {}
@@ -812,7 +836,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         "label": f"на {today.strftime('%d.%m.%Y')}",
         "roles": {"kam": kam, "prod": prod},
         "orphan": orphan, "recon": recon, "staff": staff, "hygiene": hyg,
-        "headless": gaps_all,
+        "headless": gaps_all, "promise": _promise_stats(promise),
         "deals": details,
         "params": {"stale": STALE_DAYS, "dead": DEAD_DAYS, "mult": OUTLIER_MULT,
                    "medAmt": _money(med_amt), "bigCut": _money(big_cut)},

@@ -280,3 +280,12 @@ def test_пустой_отдел_помечен_и_кандидатов_не_в�
     by = {r["id"]: r for r in rows}
     assert by["9"]["empty"] is True and by["9"]["cands"] == []
     assert by["7"]["empty"] is False and by["7"]["cands"][0]["name"] == "Иванов Иван"
+
+
+def test_обещания_клиенту_считаются_по_заказу_а_не_по_сделке():
+    """Заказ без срока — не «в порядке», а неизмеримый: он обязан быть виден отдельно."""
+    m = build()["promise"]
+    assert m["live"] == 1 and m["withDl"] == 1 and m["noDl"] == 0
+    assert m["late"] == 1 and m["medDays"] == m["maxDays"] == 47
+    pure = people_mod._promise_stats({"live": 4, "withDl": 1, "noDl": 3, "late": 0, "days": []})
+    assert pure["coverPct"] == 25 and pure["latePct"] == 0 and pure["medDays"] is None
