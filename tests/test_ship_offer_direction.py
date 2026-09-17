@@ -103,3 +103,39 @@ def test_без_кп_поставщика_запас_считается_к_ви�
     html = O.build(rows, ours, "17.09", supp)
     assert "витрина" in html
     assert "10 000" in html or "10000" in html   # 50000 − 40000 на 2 шт = 20 000
+
+
+def test_левая_часть_берёт_и_неопознанное_но_с_пометкой(tmp_path):
+    """Иначе документ выходит пустым при работающей выгрузке.
+
+    Боевой прогон 17.09.2026: у полей «Result, ТКП» и «Economics of the
+    project» шесть файлов и НИ ОДНОЙ цены (картинки и сканы), а 1 843 строки с
+    ценой лежат в «Result file», которое по имени в «наша цена» не попадает.
+    Взяли только «нашу цену» — получили ноль совпадений из 1 638.
+    """
+    ours, supp, unk = O.prices_by_direction(corpus(tmp_path), RATES)
+    side = O.price_side(ours, unk)
+    assert side["AF25545"]["usd"] == 300, "«наша цена» должна иметь приоритет"
+    assert side["AF25545"]["direction"] == "наша цена"
+    # а если своей цены по артикулу нет — берём неопознанную, не теряя артикул
+    side2 = O.price_side({}, unk)
+    assert side2["AF25545"]["usd"] == 7
+    assert side2["AF25545"]["field"] == "Documents, Bot"
+
+
+def test_в_документе_видно_поле_и_что_направление_не_установлено(tmp_path):
+    rows = [{"pn": "AF25545", "name": "фильтр", "qty": 10,
+             "unit_price_usd": 250, "stock_grade": "твёрдый", "sellers": []}]
+    _, supp, unk = O.prices_by_direction(corpus(tmp_path), RATES)
+    html = O.build(rows, O.price_side({}, unk), "17.09", supp)
+    assert "Documents, Bot" in html, "имя поля не показано"
+    assert "направление не установлено" in html, "догадка выдана за факт"
+
+
+def test_своя_цена_не_помечается_неустановленной(tmp_path):
+    rows = [{"pn": "AF25545", "name": "фильтр", "qty": 10,
+             "unit_price_usd": 250, "stock_grade": "твёрдый", "sellers": []}]
+    ours, supp, unk = O.prices_by_direction(corpus(tmp_path), RATES)
+    html = O.build(rows, O.price_side(ours, unk), "17.09", supp)
+    assert "Result, ТКП" in html
+    assert "направление не установлено" not in html

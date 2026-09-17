@@ -128,6 +128,29 @@ def our_prices(tkp_path: Path, rates: dict) -> dict:
     return prices_by_direction(tkp_path, rates)[0]
 
 
+def price_side(ours: dict, unk: dict) -> dict:
+    """Левая часть документа: цена из файла сделки, с указанием поля.
+
+    Почему не только «наша цена». Боевой прогон 17.09.2026: у поля «Result,
+    ТКП» и «Economics of the project» нашлось шесть файлов и НИ ОДНОЙ цены —
+    это картинки и сканы. А 1 843 строки с ценой лежат в поле «Result file» и
+    1 431 в «Техническая спецификация», которые по имени в «наша цена» не
+    попадают. Если взять только «нашу цену», документ выходит пустым при
+    работающей выгрузке — так и случилось.
+
+    Гадать, что «Result file» — это наше ТКП, нельзя: подписать чужую цену
+    своей хуже, чем не подписать вовсе. Поэтому берём и то и другое, но КАЖДАЯ
+    строка несёт имя поля, из которого цена взята, и признак, установлено ли
+    направление. Владелец смотрит на имя поля и говорит, его это файл или нет —
+    это вопрос на одну минуту, а документ работает уже сейчас.
+
+    Приоритет у «нашей цены»: если артикул есть и там и там, берём её.
+    """
+    out = dict(unk)
+    out.update(ours)
+    return out
+
+
 CSS = """
 @page { size: A4 landscape; margin: 9mm 8mm; }
 body { font-family: "DejaVu Sans", Arial, sans-serif; font-size: 7.5pt; color: #111; margin: 0; }
@@ -199,7 +222,10 @@ def build(rows: list, ours: dict, fx_day: str, supp: dict | None = None) -> str:
         'выставленного, запаса нет: строка убыточна при текущей цене.</p>',
         f"""<table class="k"><tbody>
 <tr><td class="l">Сошлось с заявкой</td><td class="big">{len(joined)}</td>
-<td class="dim">позиций, где есть и выставленная цена, и строка заявки</td></tr>
+<td class="dim">позиций, где есть и цена из файла сделки, и строка заявки. Из них
+направление файла установлено как «выставлено нами» у
+{sum(1 for j in joined if j["o"].get("direction") in DIR_OURS)};
+у остальных поле указано в таблице, и подтвердить его — вопрос одной минуты</td></tr>
 <tr><td class="l">Закупка подтверждена</td><td class="big">{len(checked)}</td>
 <td class="dim">из них КП поставщика из вложений сделки — {sum(1 for j in checked if j["offer"] is not None)},
 остальное карточка продавца с витрины. По {len(nomk)} строкам цены закупки нет вовсе — запас неизвестен</td></tr>
@@ -227,7 +253,7 @@ def build(rows: list, ours: dict, fx_day: str, supp: dict | None = None) -> str:
 
     cols = [
         ("Артикул", 9, lambda j: f'<span class="pn">{E(j["r"]["pn"])}</span>'),
-        ("Наименование", 26, lambda j: E((j["r"].get("name") or "")[:120])),
+        ("Наименование", 18, lambda j: E((j["r"].get("name") or "")[:120])),
         ("Кол-во", 4, lambda j: ru(j["qty"])),
         ("Выставлено, USD/шт", 7, lambda j: money(j["o"]["usd"])),
         ("В валюте ТКП", 7, lambda j: f'{money(j["o"]["raw_price"])} {E(j["o"]["currency"])}'),
@@ -241,8 +267,12 @@ def build(rows: list, ours: dict, fx_day: str, supp: dict | None = None) -> str:
                                               (f'<span class="bad">{ru(j["room_total"])}</span>'
                                                if j["room_total"] < 0 else ru(j["room_total"])))),
         ("Чем подтверждено", 6, lambda j: E(j["src"])),
+        ("Поле, откуда цена", 9,
+         lambda j: (f'{E(j["o"].get("field") or "")}'
+                    + ("" if j["o"].get("direction") in DIR_OURS
+                       else ' <span class="bad">направление не установлено</span>'))),
         ("Наличие", 5, lambda j: E(j["r"].get("stock_grade", ""))),
-        ("Продавец", 10, lambda j: E(((j["r"].get("sellers") or [{}])[0].get("seller") or "")[:60])),
+        ("Продавец", 6, lambda j: E(((j["r"].get("sellers") or [{}])[0].get("seller") or "")[:60])),
     ]
 
     def table(js: list) -> str:
@@ -352,8 +382,12 @@ def main() -> int:
     rows = json.loads(DATA.read_text())["rows"]
     rates = load_rates()
     ours, supp, unk = prices_by_direction(tkp, rates)
-    print(f"артикулов: выставлено нами {len(ours)}, в КП поставщиков {len(supp)}, "
-          f"в неопознанных файлах {len(unk)} (в документ не идут)")
+    print(f"артикулов: в файлах с направлением «наша цена» {len(ours)}, "
+          f"в КП поставщиков {len(supp)}, в файлах без установленного "
+          f"направления {len(unk)}")
+    ours = price_side(ours, unk)
+    print(f"в левую часть документа идёт {len(ours)} артикулов "
+          f"(с пометкой поля у каждого)")
     fx_day = json.loads(FX.read_text()).get("fetched", "")[5:16] if FX.exists() else ""
     print(f"артикулов с выставленной ценой: {len(ours)}")
 
