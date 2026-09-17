@@ -1,18 +1,16 @@
-"""Зонд v39: повторный прогон people.compute после правок победы и выбросов.
+"""Зонд v40: руководители коммерческих ролей — есть ли они в Bitrix и сходятся ли.
 
-Гейт считает вкладки на придуманном корпусе: секретов Bitrix в нём нет. Поэтому
-ошибки, которые видны только на живых данных (роль не распозналась по реальной
-должности, поле пришло списком, стадия без справочника), доезжали бы до прода.
-Здесь модуль запускается по-настоящему и печатает агрегаты результата.
+Вкладка «Коммерсанты» получает слой руководителей: у КАМов свой начальник, у
+продукт-оунеров свой. Прежде чем вводить его в код, надо понять, чем руководитель
+определяется объективно: полем отдела UF_HEAD, должностью или ничем.
 
-ПЕЧАТАЮТСЯ ТОЛЬКО АГРЕГАТЫ: счётчики, суммы, доли, должности и названия отделов.
-Ни фамилий, ни названий сделок, ни клиентов. Самое важное — в конце.
+ПЕЧАТАЮТСЯ ТОЛЬКО АГРЕГАТЫ: идентификаторы отделов, их названия, должности,
+счётчики. Ни фамилий, ни имён — рабочий портал за Cloudflare Access покажет их сам.
 """
 from __future__ import annotations
 
 import os
 import sys
-import time
 from collections import Counter
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -27,73 +25,70 @@ def head(t: str) -> None:
 
 def main() -> int:
     c = BitrixClient(os.environ["BITRIX_WEBHOOK_URL"])
-    t0 = time.time()
-    people = people_mod.roster(c)
-    deps = {str(d["ID"]): d.get("NAME", "") for d in c.list_paged("department.get", {})}
+    ppl = people_mod.roster(c)
+    deps_raw = c.list_paged("department.get", {})
+    dname = {str(d["ID"]): d.get("NAME", "") for d in deps_raw}
+    dpar = {str(d["ID"]): str(d.get("PARENT") or "") for d in deps_raw}
+    dhead = {str(d["ID"]): str(d.get("UF_HEAD") or "") for d in deps_raw}
+    role_of = people_mod.roles_by_uid(ppl, dname)
 
-    head("1. РАСПОЗНАВАНИЕ РОЛЕЙ (каскад должность → отдел → не коммерсант)")
-    roles = Counter(); why = Counter(); pos_of_role = {"kam": Counter(), "prod": Counter()}
-    for uid, p in people.items():
-        if not p["active"]:
-            continue
-        r, w = people_mod.resolve_role(p, deps)
-        roles[r] += 1; why[(r, w)] += 1
-        if r in pos_of_role:
-            pos_of_role[r][p["pos"] or "(пусто)"] += 1
-    print("действующих по ролям: " + " · ".join(f"{k}={v}" for k, v in roles.most_common()))
-    print("как определено: " + " · ".join(f"{r}/{w}={n}" for (r, w), n in why.most_common()))
-    for r in ("kam", "prod"):
-        print(f"\nдолжности роли «{r}»:")
-        for p, n in pos_of_role[r].most_common(20):
-            print(f"  {n:>3}  {p}")
+    head("1. ДЕРЕВО ОТДЕЛОВ С РУКОВОДИТЕЛЯМИ (id · родитель · рук. · роль рук. · должность рук.)")
+    for d in sorted(dname, key=lambda x: int(x)):
+        h = dhead.get(d, "")
+        hp = ppl.get(h, {})
+        print(f"dept {d:>4} род.{dpar.get(d,'—'):>4} рук.{'да ' if h else 'нет'} "
+              f"роль:{role_of.get(h, '—'):<6} {('акт' if hp.get('active') else 'увол') if h else '   '} "
+              f"{(hp.get('pos') or '')[:42]:<42} {dname[d][:44]}")
 
-    head("2. ПРОГОН people.compute НА ЖИВЫХ ДАННЫХ")
-    t1 = time.time()
-    data = people_mod.compute(c)
-    print(f"посчитано за {time.time()-t1:.1f} с (всего с состава {time.time()-t0:.1f} с)")
-    st, rc = data["staff"], data["recon"]
-    print(f"состав: всего {st['total']} · действующих {st['active']} · отключённых {st['fired']} "
-          f"· в роли КАМ {st['kam']} · в роли продукт-оунер {st['prod']}")
-    print(f"портфель: открытых (без технических воронок) {rc['openTotal']} · технических отброшено {rc['tech']}")
-    print(f"покрытие: за КАМами {rc['kam']} · за продукт-оунерами {rc['prod']} · и там, и там {rc['both']} "
-          f"· ни за кем {rc['none']} ({rc['noneSum']}) · на уволенных {rc['orphan']} ({rc['orphanSum']}), "
-          f"из них с живой ролью {rc['orphanCovered']}")
+    head("2. ОТДЕЛЫ, В КОТОРЫХ СИДЯТ ЛЮДИ РОЛЕЙ, И ИХ РУКОВОДИТЕЛИ")
+    for role in ("kam", "prod"):
+        team = [u for u, r in role_of.items() if r == role and ppl.get(u, {}).get("active")]
+        depts = Counter(d for u in team for d in (ppl[u].get("depts") or []))
+        heads = Counter(dhead.get(d, "") for d in depts if dhead.get(d))
+        print(f"\nроль {role}: людей {len(team)}, отделов {len(depts)}")
+        for d, n in depts.most_common():
+            h = dhead.get(d, "")
+            print(f"  dept {d:>4} людей {n:>2} рук.{'есть' if h else 'НЕТ '} "
+                  f"{'(он же в роли ' + role_of.get(h, '—') + ')' if h else '':<26} {dname.get(d,'')[:40]}")
+        print(f"  уникальных руководителей: {len(heads)}; "
+              f"самый частый покрывает {heads.most_common(1)[0][1] if heads else 0} отделов из {len(depts)}")
+        print("  должности руководителей: " + " · ".join(
+            f"{(ppl.get(h, {}).get('pos') or '(пусто)')[:44]}" for h, _ in heads.most_common(6)))
 
-    for key in ("kam", "prod"):
-        b = data["roles"][key]; t = b["totals"]
-        head(f"3. РОЛЬ «{key}» — итоги")
-        print(f"людей с сделками {t['peopleAll']} (действующих {t['people']}) · без единой сделки {len(b['idlePeople'])}")
-        print(f"открытых {t['open']} · из них закреплено полем карточки {t['byField']} "
-              f"({t['byField']*100//max(1,t['open'])}%) · роль не закреплена у {b['uncovered']['n']} ({b['uncovered']['sum']})")
-        print(f"проработка {t['presale']} шт / {t['presaleSum']} · реализация {t['real']} шт / {t['realSum']} "
-              f"· закупка {t['buy']} · маржа {t['margin']} ({t['marginPct']}%)")
-        print(f"год: создано {t['created']} · выиграно {t['won']} ({t['wonSum']}) · проиграно {t['lost']} "
-              f"· win-rate {t['winRate']}% · взвешенный пайплайн {t['weighted']}")
-        print(f"риски: просрочено {t['late']} ({t['lateSum']}) · застой {t['stale']} · брошено {t['dead']} "
-              f"· без суммы {t['noAmt']} · без клиента {t['noComp']} · маржа в минус {t['neg']} "
-              f"· чистых карточек {t['cleanPct']}%")
-        print(f"выбросы по сумме: {t['big']} карточек на {t['bigSum']} — это {t['bigShare']}% суммы роли")
-        print(f"нагрузка: на человека {t['perPersonDeals']} · медиана {t['medianDeals']} · максимум {t['maxDeals']} "
-              f"· денег на человека {t['perPersonSum']}")
-        print("воронки: " + " · ".join(f"{f['cat']}={f['n']}" for f in b["funnels"][:8]))
-        print("распределение нагрузки по людям (сделок, без имён): "
-              + ", ".join(str(p["open"]) for p in sorted(b["people"], key=lambda x: -x["open"])[:15]))
+    head("3. КАНДИДАТЫ В РУКОВОДИТЕЛИ ПО ДОЛЖНОСТИ (агрегат, без имён)")
+    import re
+    boss = re.compile(r"head of|chief|director|руководител|начальник|дирек", re.I)
+    cnt = Counter()
+    for u, p in ppl.items():
+        if p["active"] and boss.search(p.get("pos") or ""):
+            cnt[(p.get("pos") or "").strip()[:60]] += 1
+    for pos, n in cnt.most_common(40):
+        who = [u for u, p in ppl.items() if p["active"] and (p.get("pos") or "").strip()[:60] == pos]
+        depts = {d for u in who for d in (ppl[u].get("depts") or [])}
+        leads = {d for d in dname if dhead.get(d) in who}
+        print(f"{n:>3}  роль:{','.join(sorted({role_of.get(u,'—') for u in who})):<12} "
+              f"отделы:{len(depts):>2} возглавляет отделов:{len(leads):>2}  {pos}")
 
-    head("4. ЧТО ДОЛЖЕН УВИДЕТЬ ВЛАДЕЛЕЦ — проверка на пустоту")
-    bad = []
-    if not data["roles"]["kam"]["people"]:
-        bad.append("во вкладке КАМов нет ни одного человека")
-    if not data["roles"]["prod"]["people"]:
-        bad.append("во вкладке продукт-оунеров нет ни одного человека")
-    if rc["openTotal"] < 100:
-        bad.append(f"открытых сделок подозрительно мало: {rc['openTotal']}")
-    if data["roles"]["kam"]["totals"]["byField"] == 0:
-        bad.append("поле «КАМ» нигде не прочиталось — атрибуция свалилась на владельца")
-    pr = data["params"]
-    print(f"медианная открытая сделка {pr['medAmt']} · порог выброса {pr['bigCut']} ({pr['mult']} медиан)")
-    if data["roles"]["kam"]["totals"]["won"] == 0:
-        bad.append("по роли КАМ ноль побед — определение победы снова не совпало с портом")
-    print("ПРОБЛЕМЫ: " + ("; ".join(bad) if bad else "нет, данные для вкладок полные"))
+    head("4. ИТОГ: чем определять руководителя роли")
+    for role in ("kam", "prod"):
+        team = [u for u, r in role_of.items() if r == role and ppl.get(u, {}).get("active")]
+        depts = {d for u in team for d in (ppl[u].get("depts") or [])}
+        # поднимаемся по дереву: первый предок с руководителем вне самой роли
+        tops = Counter()
+        for d in depts:
+            cur, guard = d, 0
+            while cur and guard < 8:
+                h = dhead.get(cur, "")
+                if h and h not in team:
+                    tops[cur] += 1
+                    break
+                cur = dpar.get(cur, ""); guard += 1
+        print(f"роль {role}: отделов {len(depts)}; общий вышестоящий отдел с руководителем "
+              f"находится у {sum(tops.values())} из них")
+        for d, n in tops.most_common(5):
+            h = dhead.get(d, "")
+            print(f"   через dept {d:>4} ({n} отделов) → рук. роль:{role_of.get(h,'—')} "
+                  f"должность: {(ppl.get(h, {}).get('pos') or '(пусто)')[:50]} · {dname.get(d,'')[:36]}")
     print("\nГОТОВО")
     return 0
 
