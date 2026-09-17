@@ -84,7 +84,7 @@
    ```
    Правки вёрстки — дополнительно smoke-рендер и валидация:
    ```bash
-   python -c "import sys,types;sys.modules.setdefault('dotenv',types.SimpleNamespace(load_dotenv=lambda *a,**k:None));sys.path.insert(0,'.');import dashboard;from tests import fixture;dashboard.write(fixture.build_metrics(),{'source':'rules','items':[]},'smoke/index.html',people=fixture.build_people(),reps=fixture.build_reps())"
+   python -c "import sys,types;sys.modules.setdefault('dotenv',types.SimpleNamespace(load_dotenv=lambda *a,**k:None));sys.path.insert(0,'.');import dashboard;from tests import fixture;dashboard.write(fixture.build_metrics(),{'source':'rules','items':[]},'smoke/index.html',people=fixture.build_people(),reps=fixture.build_reps(),advisor=fixture.build_advisor())"
    python scripts/validate_dashboard.py smoke/index.html
    ```
    Правки метрик — `python main.py --dry-run` (нужен `BITRIX_WEBHOOK_URL` в `.env`).
