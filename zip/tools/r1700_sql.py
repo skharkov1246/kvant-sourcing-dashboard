@@ -136,12 +136,13 @@ def build() -> str:
                       o.get("stock"), o.get("note"), o.get("source"), o.get("confidence"), o.get("verdict"),
                       bool(o.get("ru")), bool(o.get("ask")), o.get("ask_off"),
                       o.get("contact_form"), o.get("contact_lang"), o.get("contact_url"),
-                      o.get("contact_verdict"), o.get("dup_of")])
+                      o.get("contact_verdict"), o.get("dup_of"),
+                      bool(o.get("contact_archived")), o.get("contact_src")])
     L.append(ins("mach_channels",
                  ["machine_key", "org", "lane", "kind", "country", "city", "role", "brands",
                   "site", "email", "phone", "stock", "note", "source", "confidence", "verdict",
                   "ru", "ask", "ask_off", "contact_form", "contact_lang", "contact_url",
-                  "contact_verdict", "dup_of"],
+                  "contact_verdict", "dup_of", "contact_archived", "contact_src"],
                  crows, conflict="machine_key, org, lane"))
 
     # цены, параметры, торги, таможня — наборы без естественного ключа: перезаливаем целиком
