@@ -18,6 +18,10 @@ import json
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+from r1700_dossier import num  # одно правило разбора цены на сборщик и на базу  # noqa: E402
+
 ROOT = Path(__file__).resolve().parents[1]
 REPO = ROOT.parent
 SRC = ROOT / "data" / "r1700.json"
@@ -95,13 +99,15 @@ def build() -> str:
         seen.add(p["pn_norm"])
         prows.append([mk, p["pn"], p["pn_norm"], p.get("name_ru"), p.get("name_en"), p.get("node"),
                       p.get("applic"), p.get("qty"), p.get("interval"), p.get("price_usd"),
+                      num(p.get("price_usd")), num(p.get("qty")),
                       p.get("price_eur_min"), p.get("price_eur_max"),
                       ", ".join(p.get("kv") or []) or None, p.get("position_id"),
                       p.get("bitrix_status"), p.get("confidence"), p.get("verdict"),
                       " | ".join(p.get("sources") or []) or None, p.get("note")])
     L.append(ins("mach_parts",
                  ["machine_key", "pn", "pn_norm", "name_ru", "name_en", "node", "applic", "qty",
-                  "interval_h", "price_usd", "price_eur_min", "price_eur_max", "kv", "position_id",
+                  "interval_h", "price_usd", "price_usd_num", "qty_num",
+                  "price_eur_min", "price_eur_max", "kv", "position_id",
                   "bitrix_status", "confidence", "verdict", "sources", "note"],
                  prows, conflict="machine_key, pn_norm"))
 
@@ -127,19 +133,21 @@ def build() -> str:
         seen.add(key)
         crows.append([mk, o["org"], o["slice"], o.get("kind"), o.get("country"), o.get("city"),
                       o.get("role"), o.get("brands"), o.get("site"), o.get("email"), o.get("phone"),
-                      o.get("stock"), o.get("note"), o.get("source"), o.get("confidence"), o.get("verdict")])
+                      o.get("stock"), o.get("note"), o.get("source"), o.get("confidence"), o.get("verdict"),
+                      bool(o.get("ru")), bool(o.get("ask"))])
     L.append(ins("mach_channels",
                  ["machine_key", "org", "lane", "kind", "country", "city", "role", "brands",
-                  "site", "email", "phone", "stock", "note", "source", "confidence", "verdict"],
+                  "site", "email", "phone", "stock", "note", "source", "confidence", "verdict",
+                  "ru", "ask"],
                  crows, conflict="machine_key, org, lane"))
 
     # цены, параметры, торги, таможня — наборы без естественного ключа: перезаливаем целиком
     L.append(f"delete from mach_prices  where machine_key = {q(mk)};")
     L.append(ins("mach_prices",
-                 ["machine_key", "pn", "name", "tier", "brand", "price", "currency", "seller",
-                  "region", "dt", "url", "confidence", "verdict"],
+                 ["machine_key", "pn", "name", "tier", "brand", "price", "price_num", "currency",
+                  "seller", "region", "dt", "url", "confidence", "verdict"],
                  [[mk, x.get("pn"), x.get("name_ru") or x.get("name"), x.get("tier"), x.get("brand"),
-                   x.get("price"), x.get("currency"), x.get("seller"), x.get("region"),
+                   x.get("price"), num(x.get("price")), x.get("currency"), x.get("seller"), x.get("region"),
                    x.get("date"), x.get("url"), x.get("confidence"), x.get("verdict")]
                   for x in d.get("prices") or []]))
 

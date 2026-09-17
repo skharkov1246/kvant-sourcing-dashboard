@@ -21,6 +21,9 @@ D, OUT = ROOT / "data", ROOT / "public"
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from build_telsmith_page import CSS  # общая вёрстка страниц-разведок  # noqa: E402
+# В этом модуле num() уже занят форматированием числа для вёрстки,
+# поэтому разбор цены берём под своим именем.
+from r1700_dossier import num as price_num  # то же правило разбора, что у базы  # noqa: E402
 
 e = lambda s: html.escape(str(s if s is not None else ""))
 J = lambda o: json.dumps(o, ensure_ascii=False, separators=(",", ":"))
@@ -180,32 +183,51 @@ def build():
 <th>Номер аналога</th><th>Вид</th><th>Примечание</th></tr></thead><tbody></tbody></table></div>"""))
 
     # ── 6. Оригинал: дилеры ─────────────────────────────────────────────────
-    dealers = [o for o in d["orgs"] if o["slice"] == "dealers"]
+    POLICY = d.get("policy") or {}
+    pol_note = (f'<div class="card" style="border-left:3px solid var(--warn)"><b>Лист запроса: '
+                f'{e(POLICY.get("ask_scope"))}</b><div class="txt">{e(POLICY.get("why"))}</div>'
+                f'<div class="mut">Решение от {e(POLICY.get("decided"))}</div></div>') if POLICY else ""
+
+    def split_ask(rows):
+        """Кого запрашиваем и кто остаётся картиной рынка — по решению владельца."""
+        return [o for o in rows if o.get("ask")], [o for o in rows if not o.get("ask")]
+
+    dealers_all = [o for o in d["orgs"] if o["slice"] == "dealers"]
+    dealers, dealers_ru = split_ask(dealers_all)
+    ru_block = lambda rows, title: (
+        f'<details style="margin-top:10px"><summary class="mut">{title} · {len(rows)} — '
+        f'по решению владельца в лист запроса не выводятся</summary>'
+        + cards(rows, [("kind", "Тип"), ("city", "Город"), ("role", "Роль"), ("note", "Чем полезен")],
+                "org", "site") + "</details>") if rows else ""
+
     S.append(("deal", f"Оригинал · {len(dealers)}", f"""
-<h2>Официальные каналы Caterpillar</h2>
+<h2>Официальные каналы Caterpillar</h2>{pol_note}
 <div class="mut">Первый вопрос дилеру — не цена, а готовность отгружать в РФ. От ответа зависит
 весь маршрут. Второй — подтверждение применимости по серийному номеру машины.</div>
 <div class="bar"><input id="qdl" placeholder="поиск: организация, страна, роль…"><span class="mut" id="cntdl"></span></div>
 <div id="listdl">{cards(dealers, [("role", "Роль"), ("country", "Страна"), ("city", "Город"),
                                   ("brands", "Бренды"), ("stock", "Наличие и срок"),
                                   ("email", "Почта"), ("phone", "Телефон"), ("note", "Чем полезен")],
-                        "org", "site")}</div>"""))
+                        "org", "site")}</div>
+{ru_block(dealers_ru, "Российские компании этого направления")}"""))
 
     # ── 7. Неоригинал ───────────────────────────────────────────────────────
-    after = [o for o in d["orgs"] if o["slice"] == "aftermarket"]
+    after_all = [o for o in d["orgs"] if o["slice"] == "aftermarket"]
+    after, after_ru = split_ask(after_all)
     odm = own["odm"]
     odm_cards = "".join(f"""<div class="card"><b>{e(o.get('org'))}</b> {conf_tag(o.get('confidence'))}
 <div class="txt">{e(o.get('makes'))}</div>
 <div class="mut">{e(o.get('region'))}, {e(o.get('country'))} · {link(o.get('site'))} ·
 из нашего справочника ODM</div></div>""" for o in odm[:400])
     S.append(("after", f"Неоригинал · {len(after)}+{len(odm)}", f"""
-<h2>Кто делает неоригинал</h2>
+<h2>Кто делает неоригинал</h2>{pol_note}
 <div class="mut">Разделяй изготовителя и торговца: на торгах письмо изготовителя о применимости
 весит больше прайса перекупщика.</div>
 <div class="bar"><input id="qaf" placeholder="поиск: завод, бренд, что делает…"><span class="mut" id="cntaf"></span></div>
 <div id="listaf">{cards(after, [("kind", "Тип"), ("country", "Страна"), ("city", "Город"),
                                 ("brands", "Бренды и узлы"), ("stock", "Партия и срок"),
                                 ("email", "Почта"), ("note", "Что покрывает")], "org", "site")}</div>
+{ru_block(after_ru, "Российские заводы")}
 <h2>Заводы из нашего справочника ODM с упоминанием Caterpillar · {len(odm)}</h2>
 <div class="mut">Показаны первые {min(400, len(odm))} по уровню доверия. Полный перечень —
 в zip/data/odm_suppliers.json и на вкладке «Позиции».</div>
@@ -213,7 +235,8 @@ def build():
 <div id="listodm">{odm_cards}</div>"""))
 
     # ── 8. Поставщики и маршруты ────────────────────────────────────────────
-    traders = [o for o in d["orgs"] if o["slice"] == "traders"]
+    traders_all = [o for o in d["orgs"] if o["slice"] == "traders"]
+    traders, traders_ru = split_ask(traders_all)
     imp = "".join(f'<tr><td>{e(x["org"])}</td><td class="n">{num(x["shipments"])}</td></tr>'
                   for x in cst["importers"][:60])
     exp = "".join(f'<tr><td>{e(x["org"])}</td><td class="n">{num(x["shipments"])}</td></tr>'
@@ -226,12 +249,13 @@ def build():
                   f' {e(x.get("incoterms"))} {e(x.get("place"))} · ТН ВЭД {e(x.get("hs10"))} · {e(x.get("src"))}</div></div>'
                   for x in cst["r1700_rows"])
     S.append(("sup", f"Поставщики · {len(traders)}", f"""
-<h2>Кого запрашивать в РФ и СНГ</h2>
+<h2>Кого запрашивать</h2>{pol_note}
 <div class="bar"><input id="qtr" placeholder="поиск: компания, город, что держат…"><span class="mut" id="cnttr"></span></div>
 <div id="listtr">{cards(traders, [("kind", "Тип"), ("country", "Страна"), ("city", "Город"),
                                   ("brands", "Бренды"), ("stock", "Склад и срок"),
                                   ("email", "Почта"), ("phone", "Телефон"), ("note", "Чем полезен")],
                         "org", "site")}</div>
+{ru_block(traders_ru, "Российские торговцы и исполнители")}
 <h2>Ввоз Caterpillar по нашей таможенной выгрузке</h2>
 <div class="mut">{e(cst['note'])} Строк с признаком Caterpillar — {num(len(cst['rows']))}.
 Это не мнение, а факт отгрузки: у этих компаний канал уже работает.</div>
@@ -321,6 +345,19 @@ def build():
         "qty": p.get("qty"), "interval": p.get("interval"), "kvs": ", ".join(p.get("kv") or []),
         "nalt": len(p.get("alts") or []), "price": p.get("price_usd") or (
             f"{p.get('price_eur_min')}–{p.get('price_eur_max')} EUR" if p.get("price_eur_min") else ""),
+        # Спутник для сортировки: в колонке цены лежит строка, а строки
+        # сравниваются посимвольно — «9787» оказывалось выше «1 240.88».
+        # Пусто там, где строка не является ценой целиком («99.80 OEM / 62.00
+        # аналог», «цена по запросу»): такие позиции уходят в конец обоих
+        # направлений, а не притворяются дешёвыми.
+        "price_n": price_num(p.get("price_usd")) if price_num(p.get("price_usd")) is not None
+        else (p.get("price_eur_min") or None),
+        # Валюта нужна самой сортировке: 0.09 EUR и 0.41 USD — не одна шкала.
+        # Сравниваем только внутри валюты, доллар идёт первой группой (320 строк
+        # против 40 евровых), евро второй, строки без числа — последними.
+        "price_cur": "USD" if price_num(p.get("price_usd")) is not None
+        else ("EUR" if p.get("price_eur_min") else None),
+        "qty_n": price_num(p.get("qty")),
         "bitrix_status": p.get("bitrix_status") or "", "confidence": p.get("confidence"),
         "verdict": p.get("verdict"), "sources": p.get("sources") or [],
         "alts": p.get("alts") or [], "note": p.get("note") or "",
@@ -350,7 +387,18 @@ function rowsP(){const q=$("qp").value.toLowerCase(),nd=$("fnode").value,vr=$("f
     (!al||x.nalt>0)&&(!kv||x.kvs)&&
     (!q||[x.pn,x.name_ru,x.node,x.applic,x.kvs,x.note,(x.alts||[]).map(a=>a.brand+" "+a.pn).join(" ")]
       .join(" ").toLowerCase().includes(q)));
-  r.sort((a,b)=>{const A=a[sp.k]??"",B=b[sp.k]??"";return (A>B?1:A<B?-1:0)*sp.d;});return r;}
+  // Колонки с числовым спутником сортируем числом, остальные — строкой.
+  // Строки без числа (оговорка, «цена по запросу») уходят вниз при любом
+  // направлении: иначе по убыванию они заняли бы место самых дорогих.
+  const NUM={price:"price_n",qty:"qty_n",nalt:"nalt"};
+  const CUR={USD:0,EUR:1};
+  r.sort((a,b)=>{const nk=NUM[sp.k];
+    if(nk){const A=a[nk],B=b[nk];
+      if(A==null&&B==null)return 0; if(A==null)return 1; if(B==null)return -1;
+      if(nk==="price_n"){const ca=CUR[a.price_cur]??9,cb=CUR[b.price_cur]??9;
+        if(ca!==cb)return ca-cb;}   // разные валюты не сравниваем, а разводим
+      return (A-B)*sp.d;}
+    const A=a[sp.k]??"",B=b[sp.k]??"";return (A>B?1:A<B?-1:0)*sp.d;});return r;}
 function drawP(){const r=rowsP();
   $("tp").tBodies[0].innerHTML=r.map((x,i)=>`<tr data-i="${P.indexOf(x)}">
    <td class="pn">${esc(x.pn)}</td><td>${esc(x.name_ru)}</td><td>${esc(x.node)}</td>
@@ -396,11 +444,20 @@ $("csvp").onclick=()=>csv("r1700_parts.csv",rowsP(),
 $("csva").onclick=()=>csv("r1700_crossrefs.csv",rowsA(),["pn","brand","alt_pn","kind","note"]);
 drawP();drawA();
 // глубокая ссылка из карточки позиции базы ЗИП: r1700.html#pn=1R-1808 — открыть на этой детали
-(function(){const h=new URLSearchParams((location.hash||"").replace(/^#/,""));
+function openByHash(){const h=new URLSearchParams((location.hash||"").replace(/^#/,""));
   const pn=h.get("pn");if(!pn)return;
   document.querySelector('nav button[data-s="parts"]').click();
   $("qp").value=pn;drawP();
-  const tr=$("tp").tBodies[0].querySelector("tr[data-i]");if(tr){tr.click();tr.scrollIntoView({block:"center"});}})();
+  // поиск по подстроке ловит и примечания соседних строк, поэтому карточку
+  // открываем по точному совпадению номера, а первую строку берём только если
+  // точного нет: иначе ссылка на 1R-1808 открывала карточку 174-2032.
+  const rs=[...$("tp").tBodies[0].querySelectorAll("tr[data-i]")];
+  const want=pn.trim().toUpperCase();
+  const tr=rs.find(r=>(r.cells[0]||{}).textContent.trim().toUpperCase()===want)||rs[0];
+  if(tr){tr.click();tr.scrollIntoView({block:"center"});}}
+// вторая ссылка вида #pn=… с этой же страницы меняет только хеш, документ не
+// перезагружается — без hashchange карточка осталась бы от первой ссылки.
+openByHash();addEventListener("hashchange",openByHash);
 // ── живой поиск по карточкам и простым таблицам
 function cards(inp,list,cnt){const el=$(inp);if(!el)return;const f=()=>{const q=el.value.toLowerCase();let n=0;
   $(list).querySelectorAll(":scope > .card").forEach(c=>{
