@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 213,
-    "total_bytes": 98944672,
+    "total_bytes": 98973447,
     "by_sensitivity": {
       "конфиденциально": 62,
       "внутреннее": 117,
@@ -523,7 +523,7 @@
     {
       "path": "zip/data/r1700.json",
       "subproject": "база ЗИП",
-      "bytes": 2939329,
+      "bytes": 2956228,
       "note": "Досье машины Caterpillar R1700G (ПДМ подземных работ): паспорт и модификации, узлы, документация Caterpillar по номерам форм, перечень запчастей с нашими номерами KV, кроссы вторичного рынка, официальные дилеры, заводы неоригинала, поставщики РФ/СНГ, маршруты ввоза по таможне, ценовые ориентиры, площадки торгов и эксплуатанты. Каждая строка с источником и уровнем доверия; вердикт — итог независимой перепроверки. Строит zip/tools/r1700_dossier.py из zip/data/r1700_recon/, positions.json, pnw/, таможни и справочника ODM. Руками не править.",
       "format": "json",
       "shape": "объект",
@@ -564,7 +564,7 @@
       },
       "last_change": "2026-09-17",
       "last_author": "Claude",
-      "last_commit": "2681a77",
+      "last_commit": "475f449",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "конфиденциально",
@@ -2482,8 +2482,8 @@
         ]
       },
       "last_change": "2026-09-17",
-      "last_author": "Claude",
-      "last_commit": "5885046",
+      "last_author": "skharkov1246",
+      "last_commit": "eb1008f",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -5161,6 +5161,45 @@
       ]
     },
     {
+      "path": "zip/data/r1700_recon/contacts.json",
+      "subproject": "база ЗИП",
+      "bytes": 59850,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "rows",
+        "source_note"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 58,
+        "record_keys": [
+          "confidence",
+          "contact_form",
+          "email",
+          "lang",
+          "note",
+          "org",
+          "phone",
+          "url",
+          "verdict"
+        ]
+      },
+      "last_change": "2026-09-17",
+      "last_author": "Claude",
+      "last_commit": "475f449",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "адреса электронной почты",
+          "телефоны"
+        ]
+      },
+      "referenced_by": []
+    },
+    {
       "path": "gidromet/data/capex.json",
       "subproject": "гидрометаллургия",
       "bytes": 59587,
@@ -5904,45 +5943,6 @@
       ]
     },
     {
-      "path": "zip/data/r1700_recon/contacts.json",
-      "subproject": "база ЗИП",
-      "bytes": 47974,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "rows",
-        "source_note"
-      ],
-      "main_collection": {
-        "key": "rows",
-        "records": 58,
-        "record_keys": [
-          "confidence",
-          "contact_form",
-          "email",
-          "lang",
-          "note",
-          "org",
-          "phone",
-          "url",
-          "verdict"
-        ]
-      },
-      "last_change": "2026-09-17",
-      "last_author": "Claude",
-      "last_commit": "2681a77",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "конфиденциально",
-        "markers": [
-          "адреса электронной почты",
-          "телефоны"
-        ]
-      },
-      "referenced_by": []
-    },
-    {
       "path": "ove/data/hedge.json",
       "subproject": "ОВЭ-75",
       "bytes": 47959,
@@ -6334,8 +6334,8 @@
         "pnw/public/data.js"
       ],
       "last_change": "2026-09-17",
-      "last_author": "Claude",
-      "last_commit": "5885046",
+      "last_author": "skharkov1246",
+      "last_commit": "eb1008f",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -7475,8 +7475,8 @@
         ]
       },
       "last_change": "2026-09-17",
-      "last_author": "Claude",
-      "last_commit": "5885046",
+      "last_author": "skharkov1246",
+      "last_commit": "eb1008f",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
