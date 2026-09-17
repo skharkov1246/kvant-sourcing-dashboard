@@ -144,3 +144,14 @@ def test_в_журнал_попадает_какой_браузер_и_кака�
     notes = []
     vd.check_browser(_page(tmp_path), [], [], notes)
     assert any("Chrome 141" in n for n in notes)
+
+
+def test_разбивка_веса_по_полям_считает_и_список_и_словарь():
+    """Ужимать страницу без замера нельзя: сначала надо знать, какое поле её держит."""
+    rows = [{"id": i, "title": "наименование позиции " * 8, "flag": False} for i in range(50)]
+    top = {nm: sz for sz, nm in vd._field_weights(rows)}
+    assert set(top) == {"id", "title", "flag"}
+    assert top["title"] > top["id"] > 0            # длинный текст тяжелее числа
+    bykey = {nm: sz for sz, nm in vd._field_weights({"a": rows, "b": 1})}
+    assert bykey["a"] > bykey["b"]
+    assert vd._field_weights([1, 2, 3]) == []      # не однотипные записи — разбивки нет
