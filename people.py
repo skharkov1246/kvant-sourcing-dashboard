@@ -142,6 +142,7 @@ def roster(client: BitrixClient) -> dict[str, dict]:
                 "name": " ".join(x for x in [u.get("LAST_NAME"), u.get("NAME")] if x).strip() or f"user#{uid}",
                 "pos": (u.get("WORK_POSITION") or "").strip(),
                 "depts": [str(x) for x in (dd if isinstance(dd, list) else [dd]) if str(x)],
+                "hired": str(u.get("UF_EMPLOYMENT_DATE") or "")[:10],
                 "active": (str(act).lower() in ("y", "true", "1")) if act is not None else default_active,
             }
     return people
@@ -303,6 +304,43 @@ def head_gaps(role: str, people: dict[str, dict], role_of: dict[str, str],
     cnt = Counter(d for u in team for d in (people[u].get("depts") or []))
     return [{"id": d, "name": dept_names.get(d, d), "people": n}
             for d, n in cnt.most_common() if not dept_head.get(d)]
+
+
+# Должность, по которой человека можно предложить в руководители отдела.
+BOSS_POS = re.compile(r"head of|chief|director|руководител|начальник|директор|\blead\b", re.I)
+
+
+def headless_departments(people: dict[str, dict], deps: dict[str, str],
+                         dept_head: dict[str, str]) -> list[dict]:
+    """Отделы без руководителя и кто в них годится в начальники.
+
+    Назначение — воля владельца, а не вычисление, поэтому строка ничего не решает:
+    показывает состав отдела, должности и стаж, а кандидатом называет того, у кого
+    должность руководительская, при равенстве — кто дольше в компании. Отдел без
+    единого действующего сотрудника так и помечается: там вопрос не к кадрам, а к
+    структуре — такой узел либо наполняют, либо закрывают.
+    """
+    by_dept: dict[str, list[dict]] = defaultdict(list)
+    for uid, p in people.items():
+        if not p.get("active"):
+            continue
+        for d in (p.get("depts") or []):
+            by_dept[d].append({"uid": uid, "name": p["name"], "pos": p.get("pos") or "—",
+                               "hired": p.get("hired") or ""})
+    out = []
+    for d in deps:
+        if dept_head.get(d):
+            continue
+        staff = by_dept.get(d, [])
+        ranked = sorted(staff, key=lambda x: (0 if BOSS_POS.search(x["pos"]) else 1,
+                                              x["hired"] or "9999-99-99", x["name"]))
+        for x in ranked:
+            x["why"] = ("должность руководителя" if BOSS_POS.search(x["pos"])
+                        else ("дольше всех в отделе" if x is ranked[0] and x["hired"] else "в отделе"))
+        out.append({"id": d, "name": deps.get(d, d), "staff": len(staff),
+                    "empty": not staff, "cands": ranked[:4]})
+    out.sort(key=lambda r: (r["empty"], -r["staff"], r["name"]))
+    return out
 
 
 def head_scorecard(block: dict, rows: list[dict]) -> list[dict]:
@@ -759,12 +797,13 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         "orphanCovered": sum(1 for d in details if not d["ownLive"] and (d["kam"] or d["prod"])),
     }
     staff = {
-        "total": len(people),
+        "total": len(people), "depts": len(deps),
         "active": sum(1 for p in people.values() if p["active"]),
         "fired": sum(1 for p in people.values() if not p["active"]),
         "kam": sum(1 for u, p in people.items() if p["active"] and role_of.get(u) == "kam"),
         "prod": sum(1 for u, p in people.items() if p["active"] and role_of.get(u) == "prod"),
     }
+    gaps_all = headless_departments(people, deps, dept_head)
     hyg = hygiene(people=people, role_of=role_of, deps=deps, dept_head=dept_head,
                   details=details, kam=kam, prod=prod, orphan=orphan, recon=recon,
                   field_use=field_use, close_future=close_future)
@@ -773,6 +812,7 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         "label": f"на {today.strftime('%d.%m.%Y')}",
         "roles": {"kam": kam, "prod": prod},
         "orphan": orphan, "recon": recon, "staff": staff, "hygiene": hyg,
+        "headless": gaps_all,
         "deals": details,
         "params": {"stale": STALE_DAYS, "dead": DEAD_DAYS, "mult": OUTLIER_MULT,
                    "medAmt": _money(med_amt), "bigCut": _money(big_cut)},
