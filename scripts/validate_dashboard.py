@@ -184,7 +184,12 @@ def check_tabs(path: Path, errors: list[str], warns: list[str]) -> None:
         # только в разметке: скрипты из DOM вырезаем
         body = re.sub(r"(?is)<script[^>]*>.*?</script>", " ", dom)
         if _TAB_FAIL in body:
-            errors.append("одна из вкладок отрисовалась с ошибкой (в DOM есть «%s»)" % _TAB_FAIL)
+            broken = []
+            for tab in LAZY_TABS:
+                m = re.search(r'id="tab-%s"(.*?)(?=<div id="tab-|</body>)' % tab, body, re.S)
+                if m and _TAB_FAIL in m.group(1):
+                    broken.append(tab)
+            errors.append("вкладка отрисовалась с ошибкой: " + (", ".join(broken) or "не определить какая"))
     finally:
         tmp.unlink(missing_ok=True)
 

@@ -494,5 +494,6 @@ def compute(client: BitrixClient, *, as_of: dt.date | None = None,
         "roles": {"kam": kam, "prod": prod},
         "orphan": orphan, "recon": recon, "staff": staff,
         "deals": details,
-        "params": {"stale": STALE_DAYS, "dead": DEAD_DAYS},
+        "params": {"stale": STALE_DAYS, "dead": DEAD_DAYS, "mult": OUTLIER_MULT,
+                   "medAmt": _money(med_amt), "bigCut": _money(big_cut)},
     }

@@ -119,3 +119,29 @@ def test_итоги_роли_считают_конверсию_и_взвешен
     # взвешенный пайплайн — оценка: проработка, умноженная на конверсию роли
     assert t["weightedRaw"] == round(t["presaleRaw"] * t["winRate"] / 100)
     assert t["realRaw"] != t["weightedRaw"]        # факт и оценка — разные числа
+
+
+# ------------------------------------------------------------------ форма payload
+# Вкладка читает эти ключи напрямую. Однажды расширенный params не попал в возврат
+# (замена в коде не совпала с целью), и подписи в шаблоне молча стали «undefined» —
+# поймал только живой прогон. Теперь форму держит тест.
+PAYLOAD_KEYS = {"label", "roles", "orphan", "recon", "staff", "deals", "params"}
+PARAM_KEYS = {"stale", "dead", "mult", "medAmt", "bigCut"}
+TOTAL_KEYS = {"people", "open", "byField", "presale", "presaleSum", "real", "realSum", "buy",
+              "margin", "marginPct", "created", "won", "wonSum", "lost", "winRate", "weighted",
+              "late", "lateSum", "stale", "dead", "noAmt", "noComp", "neg", "big", "bigSum",
+              "bigShare", "flaws", "cleanPct", "perPersonDeals", "medianDeals", "maxDeals"}
+ROW_KEYS = {"uid", "name", "pos", "dept", "active", "why", "open", "presale", "presaleSum",
+            "real", "realSum", "margin", "late", "stale", "flaws", "loadRaw"}
+
+
+def test_форма_payload_не_теряет_ключей_которые_читает_вкладка():
+    r = build()
+    assert PAYLOAD_KEYS <= set(r)
+    assert PARAM_KEYS <= set(r["params"])
+    for role in ("kam", "prod"):
+        block = r["roles"][role]
+        assert {"people", "idlePeople", "funnels", "stages", "uncovered", "totals"} <= set(block)
+        assert TOTAL_KEYS <= set(block["totals"])
+        for row in block["people"]:
+            assert ROW_KEYS <= set(row)
