@@ -25,27 +25,48 @@ import sys
 import tempfile
 from pathlib import Path
 
-_HUNG = "[браузер не завершился за]"
+_HUNG = "браузер не завершился за"
 PLACEHOLDER_RE = re.compile(r"__[A-Z][A-Z0-9_]*__")
 DATA_RE = re.compile(r"window\.(__[A-Z_]+__)\s*=\s*(.+?);\s*$", re.MULTILINE)
 MIN_BYTES = 50_000          # ниже — заведомо обрубленная страница
 MAX_BYTES = 40_000_000      # выше — что-то пошло не так со встраиванием
 
+# Порядок важен. Раньше первыми стояли `chromium`/`chromium-browser`, а в образах
+# Ubuntu это обычно snap-обёртка: в контейнере CI она не запускается и ВИСИТ, ничего
+# не печатая. Валидатор при этом рапортовал «Chromium не отдал DOM», не называя, какой
+# бинарь он вообще взял, — и проверка рендера боевой страницы не работала неделями.
+# Сначала деб-сборки Chrome, потом локальный Chromium Playwright, snap-подверженные
+# имена — последними.
 CHROME_CANDIDATES = [
     os.getenv("CHROME_PATH") or "",
+    "google-chrome-stable", "google-chrome",
     "/opt/pw-browsers/chromium-1194/chrome-linux/chrome",
-    "chromium", "chromium-browser", "google-chrome", "google-chrome-stable",
+    "/usr/bin/chromium", "/usr/bin/chromium-browser",
+    "chromium", "chromium-browser",
 ]
+PROBE_TIMEOUT = 15          # секунд на `--version`: живой браузер отвечает мгновенно
 
 
-def find_chrome() -> str | None:
+def find_chrome() -> tuple[str, str] | tuple[None, None]:
+    """(путь, версия) первого кандидата, который ОТВЕЧАЕТ, а не просто существует.
+
+    Наличие файла ничего не значит: snap-обёртка есть в PATH и виснет при запуске.
+    Поэтому каждый кандидат проверяется вызовом `--version` с коротким таймаутом —
+    это стоит доли секунды и сразу отсекает нерабочие сборки.
+    """
     for c in CHROME_CANDIDATES:
         if not c:
             continue
         p = shutil.which(c) if not c.startswith("/") else (c if Path(c).exists() else None)
-        if p:
-            return p
-    return None
+        if not p:
+            continue
+        try:
+            r = subprocess.run([p, "--version"], capture_output=True, text=True, timeout=PROBE_TIMEOUT)
+        except (subprocess.TimeoutExpired, OSError):
+            continue                       # висит или не запускается — берём следующего
+        if r.returncode == 0 and r.stdout.strip():
+            return p, r.stdout.strip()
+    return None, None
 
 
 def check_placeholders(html: str, errors: list[str]) -> None:
@@ -125,15 +146,18 @@ def _chrome_run(chrome: str, path: Path, extra: list[str], timeout: int, headles
             # 17.09.2026: страница 10,4 МБ со всеми открытыми вкладками отдаёт DOM за
             # ~3 с, так что таймаут — это почти всегда незавершение, а не отсутствие вывода.
             dec = lambda v: v.decode("utf-8", "replace") if isinstance(v, bytes) else (v or "")
-            return dec(e.stdout), dec(e.stderr) + f"\n{_HUNG} {timeout} с"
+            return dec(e.stdout), dec(e.stderr) + f"\n{_HUNG} {timeout} с (вывода не было)"
     return r.stdout, r.stderr
 
 
-def check_browser(path: Path, errors: list[str], warns: list[str]) -> None:
-    chrome = find_chrome()
+def check_browser(path: Path, errors: list[str], warns: list[str], notes: list[str] | None = None) -> None:
+    chrome, version = find_chrome()
     if not chrome:
-        warns.append("Chromium не найден — проверка рендера пропущена")
+        warns.append("рабочего Chromium/Chrome не нашлось (кандидаты не отвечают на --version) — "
+                     "проверка рендера пропущена")
         return
+    if notes is not None:
+        notes.append(f"браузер: {version} ({chrome})")
     # Вкладки строятся лениво, при первом открытии, поэтому открываем их все в ЭТОМ
     # же прогоне: отдельный второй запуск Chromium стоил на раннере около двух минут.
     #
@@ -168,8 +192,8 @@ def check_browser(path: Path, errors: list[str], warns: list[str]) -> None:
         # Структурные проверки выше отработали и остаются в силе, поэтому
         # предупреждаем, но не блокируем деплой исправного дашборда.
         tail = " | ".join(log.strip().splitlines()[-2:])[:200]
-        warns.append(f"Chromium не отдал DOM за {budget} с — проверка рендера не выполнена "
-                     f"({tail or 'без вывода'})")
+        warns.append(f"{version} не отдал DOM за {budget} с — проверка рендера не выполнена. "
+                     f"Браузер: {chrome}. Хвост вывода: {tail or 'пусто'}")
         return
     if not with_tabs:
         warns.append(f"вкладки не проверены: страница {mb} МБ, браузер не уложился в {budget} с — "
@@ -240,15 +264,18 @@ def main() -> int:
 
     errors: list[str] = []
     warns: list[str] = []
+    notes: list[str] = []
     check_placeholders(html, errors)
     check_size(html, errors)
     blobs = extract_data(html, errors)
     check_content(blobs, errors, a.allow_empty)
     if not a.no_browser:
-        check_browser(path, errors, warns)
+        check_browser(path, errors, warns, notes)
 
     kb = len(html.encode()) // 1024
     print(f"• {path}: {kb} КБ, блоков данных {len([k for k, v in blobs.items() if v is not None])}")
+    for n in notes:
+        print(f"  {n}")
     for w in warns:
         print(f"  ⚠ {w}")
     if errors:

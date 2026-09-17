@@ -29,7 +29,7 @@ def _page(tmp_path: Path, size_mb: int = 0) -> Path:
 
 def _fake_runs(monkeypatch, answers):
     """answers: функция (path) → (dom, log). Подменяет запуск браузера."""
-    monkeypatch.setattr(vd, "find_chrome", lambda: "/bin/true")
+    monkeypatch.setattr(vd, "find_chrome", lambda: ("/bin/true", "Chrome 141 (тест)"))
     calls = []
 
     def run(chrome, path, extra, timeout, headless="--headless=new"):
@@ -56,7 +56,7 @@ def test_старый_headless_не_используется(tmp_path, monkeypat
     # стоял последней «запасной» попыткой, проверка рендера боевой страницы не
     # выполнялась вовсе — при этом деплой считал её пройденной.
     modes = []
-    monkeypatch.setattr(vd, "find_chrome", lambda: "/bin/true")
+    monkeypatch.setattr(vd, "find_chrome", lambda: ("/bin/true", "Chrome 141 (тест)"))
     monkeypatch.setattr(vd, "_chrome_run",
                         lambda chrome, path, extra, timeout, headless="--headless=new":
                         (modes.append(headless), ("", "пусто"))[1])
@@ -70,7 +70,7 @@ def test_dom_напечатанный_зависшим_браузером_не_�
     # Раньше в этом случае вывод выбрасывался вместе с TimeoutExpired, и проверка
     # молча превращалась в «браузер ничего не отдал» — так она и не работала с 14.09.
     import subprocess
-    monkeypatch.setattr(vd, "find_chrome", lambda: "/bin/true")
+    monkeypatch.setattr(vd, "find_chrome", lambda: ("/bin/true", "Chrome 141 (тест)"))
 
     def run(cmd, capture_output=True, text=True, timeout=None):
         raise subprocess.TimeoutExpired(cmd, timeout, output=PAGE * 40, stderr="висит")
@@ -109,3 +109,38 @@ def test_временный_файл_с_вкладками_не_остаётся
     page = _page(tmp_path)
     vd.check_browser(page, [], [])
     assert not (tmp_path / "index.tabs.html").exists()
+
+
+def test_браузер_выбирается_по_ответу_на_версию_а_не_по_наличию_файла(monkeypatch):
+    # snap-обёртка chromium есть в PATH и при запуске ВИСИТ, ничего не печатая.
+    # Из-за неё проверка рендера боевой страницы не работала: валидатор брал первый
+    # попавшийся файл и потом молча ждал его до таймаута.
+    import subprocess
+    monkeypatch.setattr(vd, "CHROME_CANDIDATES", ["", "зависающий", "рабочий"])
+    monkeypatch.setattr(vd.shutil, "which", lambda c: "/usr/bin/" + c)
+
+    def run(cmd, capture_output=True, text=True, timeout=None):
+        if cmd[0].endswith("зависающий"):
+            raise subprocess.TimeoutExpired(cmd, timeout)
+        return subprocess.CompletedProcess(cmd, 0, "Google Chrome 141.0.0.0\n", "")
+
+    monkeypatch.setattr(subprocess, "run", run)
+    path, version = vd.find_chrome()
+    assert path == "/usr/bin/рабочий"
+    assert "141" in version
+
+
+def test_если_ни_один_браузер_не_отвечает_проверка_пропускается_с_понятным_текстом(tmp_path, monkeypatch):
+    monkeypatch.setattr(vd, "find_chrome", lambda: (None, None))
+    errors, warns = [], []
+    vd.check_browser(_page(tmp_path), errors, warns)
+    assert not errors
+    assert any("не отвечают" in w for w in warns)
+
+
+def test_в_журнал_попадает_какой_браузер_и_какая_версия(tmp_path, monkeypatch):
+    # без этой строки диагностика «почему не отдал DOM» стоит отдельного расследования
+    _fake_runs(monkeypatch, lambda p: (PAGE * 40, ""))
+    notes = []
+    vd.check_browser(_page(tmp_path), [], [], notes)
+    assert any("Chrome 141" in n for n in notes)
