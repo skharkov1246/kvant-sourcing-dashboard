@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 216,
-    "total_bytes": 99512975,
+    "total_bytes": 99515136,
     "by_sensitivity": {
       "конфиденциально": 62,
       "внутреннее": 120,
@@ -4782,49 +4782,9 @@
       ]
     },
     {
-      "path": "gidromet/data/postav.json",
-      "subproject": "гидрометаллургия",
-      "bytes": 73868,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "blocks",
-        "boxes",
-        "footnote",
-        "lead",
-        "sections",
-        "tiles"
-      ],
-      "main_collection": {
-        "key": "blocks",
-        "records": 18,
-        "record_keys": [
-          "blok",
-          "cn",
-          "critical",
-          "dostupnost",
-          "rf",
-          "sostav",
-          "zamechanie"
-        ]
-      },
-      "last_change": "2026-09-11",
-      "last_author": "github-actions[bot]",
-      "last_commit": "381a14f",
-      "updated_by": "бот (workflow)",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "gidromet/build.py"
-      ]
-    },
-    {
       "path": "gpu/data/overhaul_qsk60.json",
       "subproject": "ГПУ-библиотека",
-      "bytes": 71996,
+      "bytes": 74157,
       "note": "Капитальный ремонт Cummins QSK60 (дизельный V16 60,2 л, генераторное исполнение): 55 этапов объёма работ с местом и ответственным, ведомость ЗИП на 46 позиций с количеством на двигатель, расчётная трудоёмкость 1 272 нормо-часа по этапам и семь подтверждённых ценовых якорей со ссылками (комплект капремонта, турбина HX83, насос-форсунка, прокладки ГБЦ, ставка трала, курс ЦБ). Источник объёма — тендерная ведомость нефтегазового заказчика, обезличенная: имён, месторождения и реквизитов нет. Итоговых сумм в наборе нет намеренно — цена головок блока публично не раскрывается, и без КП любая сумма была бы выдумкой.",
       "format": "json",
       "shape": "объект",
@@ -4864,7 +4824,7 @@
       },
       "last_change": "2026-09-17",
       "last_author": "skharkov1246",
-      "last_commit": "a8d5f96",
+      "last_commit": "0726b08",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -4872,6 +4832,46 @@
       },
       "referenced_by": [
         "gpu/build.py"
+      ]
+    },
+    {
+      "path": "gidromet/data/postav.json",
+      "subproject": "гидрометаллургия",
+      "bytes": 73868,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "blocks",
+        "boxes",
+        "footnote",
+        "lead",
+        "sections",
+        "tiles"
+      ],
+      "main_collection": {
+        "key": "blocks",
+        "records": 18,
+        "record_keys": [
+          "blok",
+          "cn",
+          "critical",
+          "dostupnost",
+          "rf",
+          "sostav",
+          "zamechanie"
+        ]
+      },
+      "last_change": "2026-09-11",
+      "last_author": "github-actions[bot]",
+      "last_commit": "381a14f",
+      "updated_by": "бот (workflow)",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gidromet/build.py"
       ]
     },
     {

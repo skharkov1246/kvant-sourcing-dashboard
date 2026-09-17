@@ -378,6 +378,8 @@ footer{padding:0 22px 24px;color:var(--mut);font-size:11.5px}
   <h3>Логистика: как двигатель едет на площадку</h3>
   <p class="mut" id="oh-lg-intro"></p>
   <div class="card"><ul id="oh-lg"></ul></div>
+  <div class="tblwrap"><table><thead><tr><th>Ремонтная площадка</th><th>Вывоз и возврат, ₽</th></tr></thead><tbody id="oh-lg-routes"></tbody></table></div>
+  <div class="tblwrap"><table><thead><tr><th>Ставка</th><th>Значение</th><th>Достоверность</th></tr></thead><tbody id="oh-lg-rates"></tbody></table></div>
   <div class="box info" id="oh-lg-concl"></div>
 
   <h3>Проверка сверху: ремонт против замены двигателя</h3>
@@ -1923,6 +1925,10 @@ function fillSelect(sel, values, allLabel) {
   const LG = OVERHAUL.logistics || {};
   $("#oh-lg-intro").textContent = LG.intro || "";
   $("#oh-lg").innerHTML = (LG.facts || []).map(f => `<li>${esc(f.fact)}${f.source ? ` <a href="${esc(f.source)}" target="_blank" rel="noopener">источник</a>` : ""}</li>`).join("");
+  $("#oh-lg-routes").innerHTML = (LG.routes || []).map(r => `<tr><td>${esc(r.to)}</td><td class="num">${num(r.rub)}</td></tr>`).join("");
+  $("#oh-lg-rates").innerHTML = (LG.rates || []).map(r => `<tr><td>${esc(r.what)}</td>
+    <td class="num">${r.rub_per_km ? num(r.rub_per_km) + " ₽/км" : r.rub_per_day ? num(r.rub_per_day) + " ₽/сутки" : r.rub ? num(r.rub) + " ₽" : esc(r.pct || "")}</td>
+    <td class="mut">${esc(r.conf)}</td></tr>`).join("");
   $("#oh-lg-concl").innerHTML = `<b>Вывод.</b> ${esc(LG.conclusion || "")}`;
 
   const MC = OVERHAUL.market_check || {};
