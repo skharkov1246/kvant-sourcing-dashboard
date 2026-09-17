@@ -1219,7 +1219,6 @@
       },
       "referenced_by": [
         "gpu/tools/build_demand.py",
-        "gt/tools/bitrix_tkp.py",
         "gt/tools/build_lot_xlsx.py",
         "gt/tools/build_rfq.py",
         "gt/tools/ship_merge.py",
@@ -4544,7 +4543,6 @@
       },
       "referenced_by": [
         "gpu/tools/build_demand.py",
-        "gt/tools/bitrix_tkp.py",
         "gt/tools/build_lot_xlsx.py",
         "gt/tools/build_rfq.py",
         "gt/tools/ship_merge.py",
@@ -4552,7 +4550,8 @@
         "gt/tools/ship_report.py",
         "library/load_parts.py",
         "zip/build.py",
-        "zip/tools/build_telsmith_page.py"
+        "zip/tools/build_telsmith_page.py",
+        "zip/tools/parse_demand.py"
       ]
     },
     {
