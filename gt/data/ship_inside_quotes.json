@@ -2,7 +2,7 @@
  "updated": "2026-09-18",
  "source": "Опись вложений сделок Bitrix (gt/data/bitrix_tkp_index.json) против номеров заявки (gt/data/ship_lukoil.json). Считает gt/tools/inside_quotes.py.",
  "what_it_gives": "Адрес, где цена уже лежит: номер сделки, имя файла, сколько в нём строк и сколько с ценой. Самих цен здесь нет и не будет — репозиторий публичный.",
- "quote_files_scanned": 739,
+ "quote_files_scanned": 740,
  "template_files_excluded": {
   "count": 40,
   "of_them_counted_by_old_loose_rule": 40,
