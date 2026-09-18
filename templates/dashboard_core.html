@@ -535,7 +535,26 @@
   </div>
 </div>
 
-<div class="secttl"><b>4</b> · Покрытие сделок сорсингом</div>
+<div class="secttl"><b>4</b> · Кто заводит запросы</div>
+<div class="kpis" id="kpisOrigin" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px"></div>
+<div class="grid">
+  <div>
+    <section class="card">
+      <h2>Запросы, заведённые вне отдела поиска поставщиков</h2>
+      <div class="note">Считается по автору карточки (<span class="mono">createdBy</span>), а не по ответственному: очередь грузит тот, кто завёл запрос, даже если ответственным тут же назначили сорсера. «Передано сорсингу» — доля таких карточек, где ответственным стал сотрудник отдела.</div>
+      <div id="originOutside"></div>
+    </section>
+  </div>
+  <div>
+    <section class="card">
+      <h2>Откуда приходят запросы</h2>
+      <div class="note">Подразделение автора карточки. «Автоматизация портала» — карточки без автора: их создал робот, а не человек.</div>
+      <div class="barlist" id="originDept"></div>
+    </section>
+  </div>
+</div>
+
+<div class="secttl"><b>5</b> · Покрытие сделок сорсингом</div>
 <div class="kpis" id="kpisCov" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px"></div>
 <div class="grid">
   <div>
@@ -566,7 +585,7 @@
   <div id="covWeeklyBody" style="margin-top:6px"></div>
 </section>
 
-<div class="secttl"><b>5</b> · Реально отправлено vs создано (+ фейк-отправки)</div>
+<div class="secttl"><b>6</b> · Реально отправлено vs создано (+ фейк-отправки)</div>
 <section class="card">
   <h2><span class="tag a">БЛОК A</span> Письмо действительно ушло поставщику?</h2>
   <div class="note">«С письмом» = на карточке есть исходящее CRM-письмо (факт отправки). «Без письма» — карточка создана, но письма через систему не было. «Фейк» = карточка двинута из «Новый», но письма нет. «Дожим%» = доля карточек с ≥2 письмами.</div>
@@ -577,7 +596,7 @@
   </table>
 </section>
 
-<div class="secttl"><b>6</b> · Разнообразие поставщиков</div>
+<div class="secttl"><b>7</b> · Разнообразие поставщиков</div>
 <div class="grid">
   <section class="card"><h2>Основные запрошенные поставщики</h2><div class="note">Доля запросов (СП-166, блок A) по поставщикам — насколько диверсифицирована база. Наведи на сектор — имя и число запросов.</div><div class="pie" id="supPie"></div></section>
   <section class="card"><h2>Поставщиков на сорсера</h2><div class="note">Сколько РАЗНЫХ поставщиков запрашивает каждый — ширина воронки поиска. Клик — кому и что слал.</div><div id="supPerSorcer" class="ownlist"></div></section>
@@ -619,6 +638,7 @@ const M = window.__DATA__ || {}, INS = window.__INSIGHTS__ || {};
 // Защита от неполной выгрузки: недостающие блоки заменяем пустыми. Раньше одно
 // отсутствующее поле (например weekly) роняло весь скрипт и гасило все 9 вкладок.
 for(const [_k,_d] of [['kpi',{}],['sourcersA',[]],['weekly',[]],['coverage',{}],['chain',[]],
+                      ['origin',{summary:{},byDept:[],outsideCreators:[],byCreator:[]}],
                       ['catList',[]],['supplierMix',null],['send',{}],['period',{label:'—'}]]){
   if(M[_k]==null) M[_k]=_d;
 }
@@ -716,6 +736,33 @@ document.getElementById('legChain').innerHTML=
 // ---- categories fed by sourcing
 const cats=M.catList, catMax=Math.max(1,...cats.map(c=>c.v));
 document.getElementById('catList').innerHTML=cats.map(c=>`<div class="blrow"><div class="blt"><span>${_esc(c.cat)}</span><b>${c.v} · ${c.p}%</b></div><div class="bltrack"><i style="width:0%" data-w="${c.v/catMax*100}"></i></div></div>`).join('');
+
+// ---- кто заводит запросы
+// Считаем по автору карточки, а не по ответственному: очередь грузит тот, кто
+// завёл запрос, даже если ответственным тут же назначили сорсера.
+const ORG = M.origin && M.origin.summary ? M.origin : {summary:{},byDept:[],outsideCreators:[]};
+const og = ORG.summary;
+document.getElementById('kpisOrigin').innerHTML=[
+ ['','Завёл сорсинг',og.sourcing||0,(og.sourcingPct||0)+'% всех запросов','',''],
+ ['warn','Завели другие',og.outside||0,(og.outsidePct||0)+'% · людей: '+(og.outsidePeople||0),'warn',''],
+ ['amber','Создала автоматика',og.auto||0,(og.autoPct||0)+'% · без автора','amber',''],
+ ['','Передано сорсингу',og.handoff||0,'из заведённых вне отдела · '+(og.handoffPct||0)+'%','',''],
+].map(x=>`<div class="kpi ${x[0]}"><div class="lbl">${x[1]}</div><div class="val ${x[4]}">${x[2]}</div><div class="meta">${x[3]}</div></div>`).join('');
+
+document.getElementById('originDept').innerHTML=(ORG.byDept||[]).map(d=>
+ `<div class="blrow"><div class="blt"><span>${_esc(d.dept)}</span><b>${d.n} · ${d.pct}%</b></div>`+
+ `<div class="bltrack"><i style="width:0%" data-w="${d.w}"></i></div></div>`).join('')
+ || '<span class="dimv">нет данных</span>';
+
+{const _out=ORG.outsideCreators||[];
+ document.getElementById('originOutside').innerHTML=_out.length
+  ? `<table class="tb"><thead><tr><th>Кто завёл</th><th>Подразделение</th><th class="r">Запросов</th><th class="r">Доля</th><th class="r">Передано сорсингу</th><th class="r">Дошло до ТКП</th></tr></thead><tbody>`
+    + _out.map(c=>`<tr><td><div class="who">${_esc(c.name)}</div></td><td class="dimv">${_esc(c.dept)}</td>`
+      + `<td class="num r">${c.n}</td><td class="num r dimv">${c.pct}%</td>`
+      + `<td class="num r">${c.toSourcingPct}%</td>`
+      + `<td class="num r ${c.tkpPct>=50?'q':(c.tkpPct>=30?'dimv':'nrc')}">${c.tkpPct}%</td></tr>`).join('')
+    + `</tbody></table>`
+  : '<span class="dimv">все запросы периода завёл отдел поиска поставщиков либо автоматика</span>';}
 
 // ---- coverage KPIs
 document.getElementById('kpisCov').innerHTML=[

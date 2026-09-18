@@ -33,8 +33,8 @@ import period as period_mod
 import reps as reps_mod
 from bitrix_client import BitrixClient
 
-RFQ_SELECT = ["id", "assignedById", "stageId", "createdTime", "movedTime", "parentId2", "categoryId",
-              "title", "companyId", "ufCrm18Supplier", "ufCrm18SupplContact"]
+RFQ_SELECT = ["id", "assignedById", "createdBy", "stageId", "createdTime", "movedTime", "parentId2",
+              "categoryId", "title", "companyId", "ufCrm18Supplier", "ufCrm18SupplContact"]
 
 SUPPLIER_CRM_FIELDS = ("ufCrm18Supplier", "ufCrm18SupplContact")
 
@@ -284,6 +284,7 @@ def run(args) -> int:
     m = metrics_mod.build(
         p, rfqs, deal_index, period_deals, dept_a_ids,
         names, since, deal_stage_names, category_names,
+        client.user_dept_names(),
     )
 
     _sanity_gates(p, rfqs, period_deals, dept_a_ids, m.get("sourcersA") or [],
