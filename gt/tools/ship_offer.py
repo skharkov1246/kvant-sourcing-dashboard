@@ -389,9 +389,112 @@ def build(rows: list, ours: dict, fx_day: str, supp: dict | None = None) -> str:
         parts.append(f'<div class="sec"><h2>{n}. {E(title)} — {len(js)} строк</h2>'
                      f'<p class="lead">{E(lead)}</p>' + table(js) + "</div>")
 
+    parts.append(reverify_section(rows, supp))
+
     return ("<!doctype html><html lang='ru'><head><meta charset='utf-8'>"
             "<title>Выставленные цены против рынка</title>"
             f"<style>{CSS}</style></head><body>{''.join(parts)}</body></html>")
+
+
+def reverify_rows() -> list[dict]:
+    """Строки перепроверки: только номер, вердикт и основание, без чисел.
+
+    Количество и вилка берутся из сводки заявки, а не отсюда: в самом наборе
+    перепроверки числа хранить запрещено (три строки уже несли выдуманные).
+    """
+    src = ROOT / "gt/data/ship_reverify.json"
+    if not src.exists():
+        return []
+    doc = json.loads(src.read_text(encoding="utf-8"))
+    return doc["rows"] if isinstance(doc, dict) else doc
+
+
+def verdict_vs_offer(lo, hi, offer) -> str:
+    """Что КП поставщика делает с нашей вилкой.
+
+    Это и есть решающее сравнение: письменное предложение контрагента по этой
+    самой заявке сильнее любой карточки с витрины. Где предложения нет, так и
+    написано — «в файлах сделки этой строки нет», без домысла.
+    """
+    if offer is None:
+        return "в файлах сделки этой строки нет"
+    if lo in (None, "") or hi in (None, ""):
+        return "вилки по строке нет — сравнивать не с чем"
+    lo, hi = float(lo), float(hi)
+    if offer > hi:
+        return f"ЗАНИЖЕНИЕ подтверждено поставщиком: он просит выше потолка {money(hi)}"
+    if offer < lo:
+        return f"ЗАВЫШЕНИЕ подтверждено поставщиком: он просит ниже пола {money(lo)}"
+    return "вилка верна: предложение поставщика внутри неё"
+
+
+def reverify_section(rows: list, supp: dict) -> str:
+    """Таблица «наш вердикт против того, что прислал поставщик».
+
+    Зачем отдельным разделом: по этим строкам решение принимается на защите, и
+    разведка по витринам для них — слабейшее доказательство. КП поставщика из
+    вложения сделки закрывает вопрос одной строкой.
+    """
+    rv = reverify_rows()
+    if not rv:
+        return ""
+    by = {norm_key(r["pn"]): r for r in rows if r.get("pn")}
+    out, hits = [], 0
+    for x in rv:
+        pn = str(x.get("pn") or "").split("(")[0].strip()
+        r = by.get(norm_key(pn)) or {}
+        sp, _ = lookup(supp, pn)
+        offer = sp["usd"] if sp else None
+        if offer is not None:
+            hits += 1
+        out.append({"pn": pn, "verdict": (x.get("band_verdict") or ""),
+                    "name": (r.get("name") or ""), "qty": int(r.get("qty") or 0),
+                    "lo": r.get("usd_lo"), "hi": r.get("usd_hi"),
+                    "offer": offer, "sp": sp,
+                    "what": verdict_vs_offer(r.get("usd_lo"), r.get("usd_hi"), offer)})
+    out.sort(key=lambda z: (z["offer"] is None, -(z["offer"] or 0) * z["qty"]))
+    # Агрегат в журнал прогона: сколько перепроверенных строк закрыто письменным
+    # предложением контрагента и что оно делает с вилкой. Только счётчики —
+    # журнал публичный (правило 17 CLAUDE.md).
+    kinds = Counter()
+    for z in out:
+        w = z["what"]
+        kinds["занижение подтверждено" if w.startswith("ЗАНИЖЕНИЕ")
+              else "завышение подтверждено" if w.startswith("ЗАВЫШЕНИЕ")
+              else "вилка верна" if w.startswith("вилка верна")
+              else "предложения нет"] += 1
+    print(f"  перепроверенных строк: {len(out)} · КП поставщика нашлось по {hits}")
+    for k, v in kinds.most_common():
+        print(f"    {k}: {v}")
+    head = (f'<div class="sec"><h2>Перепроверенные строки против КП поставщиков — '
+            f'{len(out)} строк, предложение нашлось по {hits}</h2>'
+            '<p class="lead">По этим строкам решение принимается на защите. '
+            'Письменное предложение контрагента по этой самой заявке сильнее любой '
+            'карточки с витрины, поэтому здесь наш вердикт стоит рядом с тем, что '
+            'поставщик реально прислал. Где предложения в файлах нет, так и '
+            'написано — домысла в этой таблице нет.</p>')
+    th = ('<tr><th style="width:10%">Артикул</th><th style="width:24%">Наименование</th>'
+          '<th style="width:5%">Кол-во</th><th style="width:10%">Наша вилка, USD/шт</th>'
+          '<th style="width:9%">КП поставщика, USD/шт</th>'
+          '<th style="width:14%">Наш вердикт</th>'
+          '<th style="width:28%">Что с этим делает предложение поставщика</th></tr>')
+    body = []
+    for z in out:
+        band = ("—" if z["lo"] in (None, "") or z["hi"] in (None, "")
+                else f'{money(z["lo"])} – {money(z["hi"])}')
+        src = ""
+        if z["sp"]:
+            src = (f'<tr class="b"><td colspan="7"><b>Откуда КП:</b> '
+                   f'{E(z["sp"]["origin"])}, поле «{E(z["sp"].get("field") or "")}», файл '
+                   f'«{E(z["sp"]["file"])}», строка {E(z["sp"]["row"])}, '
+                   f'{money(z["sp"]["raw_price"])} {E(z["sp"]["currency"])}</td></tr>')
+        body.append(f'<tbody class="p"><tr><td><span class="pn">{E(z["pn"])}</span></td>'
+                    f'<td>{E(z["name"][:110])}</td><td>{ru(z["qty"])}</td>'
+                    f'<td>{band}</td>'
+                    f'<td>{money(z["offer"]) if z["offer"] is not None else ""}</td>'
+                    f'<td>{E(z["verdict"][:60])}</td><td>{E(z["what"])}</td></tr>'
+                    f'{src}</tbody>')
+    return head + f'<table class="t"><thead>{th}</thead>{"".join(body)}</table></div>'
 
 
 def diagnose(rows: list, ours: dict, supp: dict | None = None,
@@ -428,6 +531,29 @@ def diagnose(rows: list, ours: dict, supp: dict | None = None,
         k = set(other)
         print(f"  {name}: {len(k)} артикулов · пересечение с заявкой: "
               f"{len(want & k)}")
+    # ГЛАВНЫЙ АГРЕГАТ ДЛЯ ЗАЩИТЫ: что письменные предложения поставщиков делают
+    # с НАШИМИ вилками по всей заявке, а не по сорока перепроверенным строкам.
+    # Печатаются только счётчики строк — сумм и цен в журнале быть не может
+    # (правило 17 CLAUDE.md), а вывод «наши вилки систематически низки» виден
+    # именно счётом.
+    if supp:
+        band = Counter()
+        for r in rows:
+            sp, _ = lookup(supp, r.get("pn"))
+            if not sp or sp.get("usd") is None:
+                continue
+            lo, hi = r.get("usd_lo"), r.get("usd_hi")
+            if lo in (None, "") or hi in (None, ""):
+                band["вилки по строке нет"] += 1
+                continue
+            offer = float(sp["usd"])
+            band["предложение выше потолка вилки" if offer > float(hi)
+                 else "предложение ниже пола вилки" if offer < float(lo)
+                 else "предложение внутри вилки"] += 1
+        if band:
+            print(f"  строк заявки с КП поставщика: {sum(band.values())}")
+            for k, v in band.most_common():
+                print(f"    {k}: {v}")
     if not want or not got:
         return
     # по началу номера: заказчик мог приписать суффикс учётной системы
@@ -453,10 +579,44 @@ def diagnose(rows: list, ours: dict, supp: dict | None = None,
           + ", ".join(sorted(want)[:12]))
 
 
+def band_stats(rows: list, supp: dict) -> dict:
+    """Счётчики «что КП поставщиков делают с нашими вилками». БЕЗ цен и номеров.
+
+    Это единственная часть сравнения, которую можно держать в публичном
+    репозитории: сколько строк заявки закрыто письменным предложением
+    контрагента и в какую сторону оно расходится с нашей вилкой. Сама цена и
+    даже привязка «этот артикул дороже потолка» — коммерческие данные
+    контрагента и остаются в артефакте прогона.
+    """
+    above = inside = below = noband = 0
+    for r in rows:
+        sp, _ = lookup(supp, r.get("pn"))
+        if not sp or sp.get("usd") is None:
+            continue
+        lo, hi = r.get("usd_lo"), r.get("usd_hi")
+        if lo in (None, "") or hi in (None, ""):
+            noband += 1
+            continue
+        offer = float(sp["usd"])
+        if offer > float(hi):
+            above += 1
+        elif offer < float(lo):
+            below += 1
+        else:
+            inside += 1
+    return {"rows_with_offer": above + inside + below + noband,
+            "above_ceiling": above, "inside_band": inside,
+            "below_floor": below, "no_band": noband,
+            "request_rows": len(rows)}
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--tkp", required=True, help="полная выгрузка bitrix_tkp.py")
     ap.add_argument("--out", required=True, help="куда положить PDF (ВНЕ репозитория)")
+    ap.add_argument("--stats-out", help="куда записать счётчики по вилкам (без цен, "
+                                        "можно в репозиторий)")
+    ap.add_argument("--scope", default="", help="охват прогона — попадёт в счётчики")
     a = ap.parse_args()
 
     out = Path(a.out).resolve()
@@ -502,6 +662,21 @@ def main() -> int:
     matched = sum(1 for r in rows if norm_key(r["pn"]) in ours)
     print(f"сошлось со заявкой: {matched} позиций")
     diagnose(rows, ours, supp, unk)
+    if a.stats_out:
+        st = band_stats(rows, supp)
+        st["scope"] = a.scope
+        st["source"] = ("Счётчики по всей заявке: что письменные предложения поставщиков из "
+                        "вложений сделок делают с НАШИМИ вилками. Ни цен, ни привязки цены к "
+                        "артикулу здесь нет и быть не может — это коммерческие данные "
+                        "контрагентов, они остаются в артефакте прогона.")
+        st["method"] = ("Предложение сравнивается с вилкой строки заявки (usd_lo, usd_hi в "
+                        "gt/data/ship_lukoil.json). Выше потолка — наша оценка занижена, ниже "
+                        "пола — завышена, внутри — верна. Считает gt/tools/ship_offer.py.")
+        Path(a.stats_out).write_text(
+            json.dumps(st, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+        print(f"счётчики по вилкам записаны в {a.stats_out}: "
+              f"строк с КП {st['rows_with_offer']}, выше потолка {st['above_ceiling']}, "
+              f"внутри {st['inside_band']}, ниже пола {st['below_floor']}")
     print(f"{out} — {out.stat().st_size / 1e6:.1f} МБ (вне репозитория, не коммитится)")
     return 0
 
