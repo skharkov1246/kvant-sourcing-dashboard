@@ -159,6 +159,8 @@ def gap(src_qty: dict[str, float]) -> dict:
             top.append({"pn": r.get("pn"), "qty_summary": qty, "qty_source": q_src,
                         "usd_gap": round(mid * (qty - q_src), 2)})
     top.sort(key=lambda x: -x["usd_gap"])
+    # Список нужен ВЕСЬ: по нему уходит вопрос заказчику, а обрезанный список
+    # молча превращает «подтвердите 66 номеров» в «подтвердите 20».
     return {
         "pns_measured": seen,
         "qty_equal": covered,
@@ -166,7 +168,7 @@ def gap(src_qty: dict[str, float]) -> dict:
         "usd_by_summary_qty": round(usd_summary, 2),
         "usd_by_source_qty": round(usd_source, 2),
         "usd_at_stake": round(usd_summary - usd_source, 2),
-        "top": top[:20],
+        "top": top,
     }
 
 
