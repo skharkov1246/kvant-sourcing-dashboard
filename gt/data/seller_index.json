@@ -20,14 +20,44 @@
   {
    "host": "kpr-rm.com",
    "why": "Единственная найденная витрина, которая ПЕЧАТАЕТ цены на запчасти Solar Turbines (примеры от 12 до 120 000 USD, корзина живая). Контроль выдуманным номером пройден: по несуществующему номеру отдаёт «No products were found».",
-   "addresses_seen": 517,
+   "addresses_seen": 505,
    "ask_rows_matched": 0
+  },
+  {
+   "host": "dieselpartsdirect.com",
+   "why": "Дилер запчастей дизельных двигателей, печатает цены. Разведка 18.09.2026 сняла у него цену по номеру 3408345 (69,49 USD за genuine-исполнение) и прошла контроль выдуманным номером: 3408399 → «No products were found».",
+   "addresses_seen": 17866,
+   "ask_rows_matched": 7
+  },
+  {
+   "host": "shop.moderngroup.com",
+   "why": "Дилерская витрина, печатает цены (schema.org с priceCurrency и availability). Разведка сняла у него 298,75 USD по номеру 3408346 и 1 513,18 USD по 3644455; контроль выдуманным номером пройден (3644499 → 404). ОГОВОРКА: у него встречаются карточки под чужим брендом на тот же номер, и цена там в разы выше — читать вместе с брендом карточки.",
+   "addresses_seen": 1050176,
+   "ask_rows_matched": 2
+  },
+  {
+   "host": "agkits.com",
+   "why": "Витрина запчастей, печатает цены; разведка 18.09.2026 сняла у неё 2,70 USD по номеру 3087911 и прошла контроль выдуманным номером (404 и на карточку, и на поиск).",
+   "addresses_seen": 93628,
+   "ask_rows_matched": 4
+  },
+  {
+   "host": "turbotech.in",
+   "why": "Витрина турбокомпрессоров и запчастей, печатает цены в рупиях; контроль выдуманным номером пройден (3160Z99Q → 0 результатов при живом соседе 3160404).",
+   "addresses_seen": 29943,
+   "ask_rows_matched": 4
+  },
+  {
+   "host": "controlparts.com",
+   "why": "Витрина промышленной автоматики, печатает цены и наличие; разведка сняла 26,40 USD по номеру 3RT2926-1ER00 и прошла контроль («0 results found» на выдуманный номер).",
+   "addresses_seen": 8015,
+   "ask_rows_matched": 1
   }
  ],
- "addresses_indexed": 394328,
- "keys_indexed": 948373,
- "ask_rows_matched": 401,
- "of_them_had_no_address_before": 220,
+ "addresses_indexed": 1593944,
+ "keys_indexed": 4409238,
+ "ask_rows_matched": 418,
+ "of_them_had_no_address_before": 224,
  "min_key_length": 5,
  "why_min_key": "Ключ короче четырёх знаков номером не считается: «10», «A1» и «SET» дали бы ложные совпадения с половиной заявки.",
  "letters": [
@@ -349,27 +379,40 @@
  "verification": {
   "checked_cards": [
    {
-    "pn": "1007799",
-    "url": "https://hardtoget.parts/product/solar-turbines-1007799/",
+    "pn": "100606",
+    "url": "https://www.agkits.com/Perkins-Engine-Rebuild-Kits-1006-06.aspx",
     "number_on_page": true
    },
    {
-    "pn": "172523-2",
-    "url": "https://hardtoget.parts/product/solar-turbines-172523-2/",
+    "pn": "1794-IRT8",
+    "url": "https://hardtoget.parts/product/solar-turbines-1794-irt8/",
     "number_on_page": true
    },
    {
-    "pn": "SP027886",
-    "url": "https://hardtoget.parts/product/turbine-parts-sp027886/",
+    "pn": "WF2076",
+    "url": "https://www.dieselpartsdirect.com/wf2076",
     "number_on_page": true
    }
   ],
-  "invented_address": "https://hardtoget.parts/product/solar-turbines-9999999-77/",
+  "invented_address": "https://www.agkits.com/Perkins-Engine-Rebuild-Kits-1006-06.aspx/product/solar-turbines-9999999-77/",
   "invented_address_returns_that_number": false,
   "what_it_means": "Номер обязан быть НА СТРАНИЦЕ, а выдуманный адрес того же вида не должен отдавать карточку с этим номером. Если отдаёт — витрина генерирует страницы под любой запрос, и указателю верить нельзя."
  },
  "why_one_letter": "Все совпадения пришлись на одного оператора с двумя каталогами, поэтому это один запрос на все его позиции, а не отдельный разбор по каждой строке. Спрашиваются только те строки, по которым цены у нас ещё нет. Наших цифр, вилок и имени заказчика в письме нет.",
  "rows": [
+  {
+   "pn": "100606",
+   "qty": 3,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "agkits.com",
+     "url": "https://www.agkits.com/Perkins-Engine-Rebuild-Kits-1006-06.aspx"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
   {
    "pn": "1007799",
    "qty": 19,
@@ -3330,6 +3373,10 @@
    "sheet": "Энергосети",
    "cards": [
     {
+     "host": "agkits.com",
+     "url": "https://www.agkits.com/caterpillar-bearing-cup-case-hardened-1200295.aspx"
+    },
+    {
      "host": "hardtoget.parts",
      "url": "https://hardtoget.parts/product/solar-turbines-120029-5/"
     },
@@ -3391,6 +3438,19 @@
    ],
    "had_contacts": false,
    "had_price": false
+  },
+  {
+   "pn": "120554",
+   "qty": 110,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "shop.moderngroup.com",
+     "url": "https://shop.moderngroup.com/900-1902-07-bushing-f-2-7-16-chipper-sheave-m-250-120554/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
   },
   {
    "pn": "120649-18",
@@ -4715,6 +4775,45 @@
    "had_price": true
   },
   {
+   "pn": "3087911",
+   "qty": 373,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "agkits.com",
+     "url": "https://www.agkits.com/cummins-seal-o-ring-3087911.aspx"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "3160404",
+   "qty": 3,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "turbotech.in",
+     "url": "https://turbotech.in/product-tag/3160404/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "3408345",
+   "qty": 10,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "dieselpartsdirect.com",
+     "url": "https://www.dieselpartsdirect.com/3408345"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
    "pn": "372903-1",
    "qty": 1,
    "sheet": "Энергосети",
@@ -4732,6 +4831,45 @@
    "had_price": false
   },
   {
+   "pn": "3RT2926-1ER00",
+   "qty": 5,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "controlparts.com",
+     "url": "https://controlparts.com/products/3rt2926-1er00"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "4067146",
+   "qty": 773,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "agkits.com",
+     "url": "https://www.agkits.com/cummins-ignition-coil-gasket-4067146.aspx"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "4088833",
+   "qty": 10,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "turbotech.in",
+     "url": "https://turbotech.in/product-tag/4088833/"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
    "pn": "420004",
    "qty": 5,
    "sheet": "НВН",
@@ -4745,6 +4883,45 @@
    "had_price": true
   },
   {
+   "pn": "4326595",
+   "qty": 3,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "turbotech.in",
+     "url": "https://turbotech.in/product-tag/4326595/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "4327239",
+   "qty": 3,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "turbotech.in",
+     "url": "https://turbotech.in/product-tag/4327239/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
+   "pn": "4384138",
+   "qty": 3,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "dieselpartsdirect.com",
+     "url": "https://www.dieselpartsdirect.com/4384138"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
+  },
+  {
    "pn": "500-139",
    "qty": 1,
    "sheet": "НВН",
@@ -4756,6 +4933,19 @@
    ],
    "had_contacts": false,
    "had_price": false
+  },
+  {
+   "pn": "5594377",
+   "qty": 7,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "dieselpartsdirect.com",
+     "url": "https://www.dieselpartsdirect.com/5594377"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
   },
   {
    "pn": "5SY6202-7",
@@ -5105,6 +5295,19 @@
    ],
    "had_contacts": true,
    "had_price": true
+  },
+  {
+   "pn": "800306",
+   "qty": 1,
+   "sheet": "НВН",
+   "cards": [
+    {
+     "host": "shop.moderngroup.com",
+     "url": "https://shop.moderngroup.com/800130-big-joe-oem-replaced-by-800306/"
+    }
+   ],
+   "had_contacts": false,
+   "had_price": false
   },
   {
    "pn": "903223C1",
@@ -6433,6 +6636,19 @@
    "had_price": true
   },
   {
+   "pn": "FS1000",
+   "qty": 7,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "dieselpartsdirect.com",
+     "url": "https://www.dieselpartsdirect.com/fs1000"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
    "pn": "FT20025",
    "qty": 1,
    "sheet": "Энергосети",
@@ -7130,6 +7346,19 @@
    "had_price": false
   },
   {
+   "pn": "LF9050",
+   "qty": 483,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "dieselpartsdirect.com",
+     "url": "https://www.dieselpartsdirect.com/lf9050"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
    "pn": "MVI56-MCM",
    "qty": 7,
    "sheet": "Энергосети",
@@ -7158,6 +7387,32 @@
    ],
    "had_contacts": true,
    "had_price": false
+  },
+  {
+   "pn": "WF2075",
+   "qty": 56,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "dieselpartsdirect.com",
+     "url": "https://www.dieselpartsdirect.com/wf2075"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
+  },
+  {
+   "pn": "WF2076",
+   "qty": 7,
+   "sheet": "Энергосети",
+   "cards": [
+    {
+     "host": "dieselpartsdirect.com",
+     "url": "https://www.dieselpartsdirect.com/wf2076"
+    }
+   ],
+   "had_contacts": true,
+   "had_price": true
   }
  ]
 }
