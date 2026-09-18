@@ -4,16 +4,16 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 222,
-    "total_bytes": 101519203,
+    "datasets": 223,
+    "total_bytes": 101670136,
     "by_sensitivity": {
       "конфиденциально": 62,
-      "внутреннее": 124,
+      "внутреннее": 125,
       "публикуемо": 36
     },
     "by_subproject": {
       "ГПУ-библиотека": 29,
-      "ГТУ-библиотека": 45,
+      "ГТУ-библиотека": 46,
       "ОВЭ-75": 45,
       "база ЗИП": 49,
       "база ЗИП · таможня": 18,
@@ -286,6 +286,7 @@
       },
       "referenced_by": [
         "gt/tools/channels.py",
+        "gt/tools/collisions.py",
         "gt/tools/ship_brand.py",
         "gt/tools/ship_brief.py",
         "gt/tools/ship_export.py",
@@ -293,8 +294,7 @@
         "gt/tools/ship_merge.py",
         "gt/tools/ship_offer.py",
         "gt/tools/ship_priced.py",
-        "gt/tools/ship_questions.py",
-        "gt/tools/ship_reverify.py"
+        "gt/tools/ship_questions.py"
       ]
     },
     {
@@ -1473,6 +1473,7 @@
         "gt/public/plugs.html",
         "gt/tools/build_lot_xlsx.py",
         "gt/tools/build_rfq.py",
+        "gt/tools/collisions.py",
         "gt/tools/ship_export.py",
         "gt/tools/ship_merge.py",
         "gt/tools/ship_report.py",
@@ -1733,7 +1734,7 @@
     {
       "path": "gt/data/ship_reverify.json",
       "subproject": "ГТУ-библиотека",
-      "bytes": 425622,
+      "bytes": 404396,
       "note": "Перепроверка крупнейших строк заявки ЛУКОЙЛ: по каждой строке заново установлено, что это за изделие, кто его делает на самом деле и под каким своим номером, жив ли номер, сколько позиция стоит в открытых каналах, есть ли рабочий канал закупки и что мешает закрыть строку. Отбор строк — по экспозиции: топ-60 дают 67 % от 9 277 410 USD экспозиции всей заявки (экспозиция = середина нашей оценочной вилки, умноженная на количество). Поле band_verdict говорит, что стало с нашей прежней оценкой: ЗАНИЖЕНА, ЗАВЫШЕНА, ВЕРНА или НЕЧЕМ ПРОВЕРИТЬ. Последнее — НЕ «дорого» и не «дёшево», а отсутствие открытой цены во всех каналах; складывать эти группы в одну цифру нельзя. Поле skeptics несёт результат проверки вывода на опровержение; пустой список означает, что проверка не прогонялась, и приравнивать это к подтверждению нельзя — исследователь уже был пойман на выдуманной цитате. ВНИМАНИЕ: набор пополняется по ходу, и до окончания прогона он ЧАСТИЧНЫЙ — число строк в нём меньше шестидесяти. Собирается рабочим процессом перепроверки, читается gt/tools/ship_reverify.py. Цены здесь рыночные, из открытых карточек продавцов; выставленных заказчику цен в наборе нет.",
       "format": "json",
       "shape": "объект",
@@ -1770,7 +1771,7 @@
       },
       "last_change": "2026-09-18",
       "last_author": "Claude",
-      "last_commit": "079d178",
+      "last_commit": "49a11f5",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -3166,6 +3167,39 @@
       ]
     },
     {
+      "path": "gt/data/ship_collisions.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 170456,
+      "note": "Замер по самой заявке ЛУКОЙЛ: артикулы, под которыми в заявке стоят РАЗНЫЕ детали. 220 артикулов из 1642 стоят против более чем одного наименования, но дефект — только два доказанных класса: «разные изделия» (наименования попали в разные категории узла либо почти не пересекаются словами) и «противоположные исполнения» (первичный против вторичного) — 36 артикулов на 947 085 USD, 10,2 % экспозиции. Третий класс, «одна позиция, разные записи» (184 артикула), дефектом не объявляется: там тот же предмет, записанный иначе. Зачем: сводка ship_lukoil.json собрана ПО НОМЕРУ, поэтому количества разных деталей складываются в одну строку и к сумме применяется одна вилка — по VS-6-82 сложились 37+37+18+18+18+18 = 146 штук шести разных изделий, и экспозиция такой строки арифметика, а не оценка. У каждой находки записано основание класса и разложение по деталям с количествами. Считает и сверяет gt/tools/collisions.py (--check), противоречия держит tests/test_ship_collisions.py.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "classes",
+        "method",
+        "source",
+        "totals",
+        "updated",
+        "why_it_matters"
+      ],
+      "main_collection": {
+        "key": "totals",
+        "records": 6
+      },
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "49a11f5",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/collisions.py",
+        "gt/tools/ship_brief.py",
+        "tests/test_ship_collisions.py"
+      ]
+    },
+    {
       "path": "gt/data/solar.json",
       "subproject": "ГТУ-библиотека",
       "bytes": 168915,
@@ -3913,9 +3947,9 @@
         "gt/public/plugs.html",
         "gt/tools/build_lot_xlsx.py",
         "gt/tools/build_rfq.py",
+        "gt/tools/collisions.py",
         "gt/tools/ship_export.py",
-        "gt/tools/ship_merge.py",
-        "gt/tools/ship_report.py"
+        "gt/tools/ship_merge.py"
       ]
     },
     {
@@ -5211,6 +5245,68 @@
       ]
     },
     {
+      "path": "data/catalog_notes.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 63915,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "data/budget_snapshot.json",
+        "data/chain_coverage.json",
+        "data/chat_snapshot.json",
+        "data/import_cost.json",
+        "data/index.json",
+        "dict/",
+        "dict/node_map.json",
+        "gidromet/data/",
+        "gpu/data/bitrix_gpu.json",
+        "gpu/data/coverage.json",
+        "gpu/data/faults.json",
+        "gpu/data/overhaul_qsk60.json",
+        "gt/data/ansaldo.json",
+        "gt/data/bitrix_gt.json",
+        "gt/data/bitrix_tkp_index.json",
+        "gt/data/dossiers.json",
+        "gt/data/faults.json",
+        "gt/data/fx_rates.json",
+        "gt/data/pn_db.json",
+        "gt/data/ship_blocked.json",
+        "gt/data/ship_channels.json",
+        "gt/data/ship_collisions.json",
+        "gt/data/ship_decoded.json",
+        "gt/data/ship_energoseti.json",
+        "gt/data/ship_lukoil.json",
+        "gt/data/ship_questions.json",
+        "gt/data/ship_recheck.json",
+        "gt/data/ship_reverify.json",
+        "gt/data/ship_rfq_letters.json",
+        "gt/data/ship_sellers.json",
+        "gt/data/ship_sweep.json",
+        "gt/docs/ЗАКУПКА-ЛУКОЙЛ.csv",
+        "gt/docs/ЗАПРОСЫ-ЛУКОЙЛ.csv",
+        "gt/docs/ЛУКОЙЛ-СИМЕНС-SGT-400.pdf",
+        "gt/docs/ЛУКОЙЛ-СОЛАР-TAURUS.pdf",
+        "gt/docs/РАЗВЕДКА-ЦЕН-ЛУКОЙЛ.pdf",
+        "gt/tools/ship_offer.py",
+        "library/data/symptoms.json",
+        "library/docfilter.py",
+        "library/indexer.py"
+      ],
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "49a11f5",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "scripts/build_catalog.py",
+        "tests/test_catalog_guard.py"
+      ]
+    },
+    {
       "path": "zip/data/perf_class_packets.json",
       "subproject": "база ЗИП",
       "bytes": 63460,
@@ -5315,68 +5411,6 @@
       },
       "referenced_by": [
         "gidromet/build.py"
-      ]
-    },
-    {
-      "path": "data/catalog_notes.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 62212,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "data/budget_snapshot.json",
-        "data/chain_coverage.json",
-        "data/chat_snapshot.json",
-        "data/import_cost.json",
-        "data/index.json",
-        "dict/",
-        "dict/node_map.json",
-        "gidromet/data/",
-        "gpu/data/bitrix_gpu.json",
-        "gpu/data/coverage.json",
-        "gpu/data/faults.json",
-        "gpu/data/overhaul_qsk60.json",
-        "gt/data/ansaldo.json",
-        "gt/data/bitrix_gt.json",
-        "gt/data/bitrix_tkp_index.json",
-        "gt/data/dossiers.json",
-        "gt/data/faults.json",
-        "gt/data/fx_rates.json",
-        "gt/data/pn_db.json",
-        "gt/data/ship_blocked.json",
-        "gt/data/ship_channels.json",
-        "gt/data/ship_decoded.json",
-        "gt/data/ship_energoseti.json",
-        "gt/data/ship_lukoil.json",
-        "gt/data/ship_questions.json",
-        "gt/data/ship_recheck.json",
-        "gt/data/ship_reverify.json",
-        "gt/data/ship_rfq_letters.json",
-        "gt/data/ship_sellers.json",
-        "gt/data/ship_sweep.json",
-        "gt/docs/ЗАКУПКА-ЛУКОЙЛ.csv",
-        "gt/docs/ЗАПРОСЫ-ЛУКОЙЛ.csv",
-        "gt/docs/ЛУКОЙЛ-СИМЕНС-SGT-400.pdf",
-        "gt/docs/ЛУКОЙЛ-СОЛАР-TAURUS.pdf",
-        "gt/docs/РАЗВЕДКА-ЦЕН-ЛУКОЙЛ.pdf",
-        "gt/tools/ship_offer.py",
-        "library/data/symptoms.json",
-        "library/docfilter.py",
-        "library/indexer.py",
-        "library/load_parts.py"
-      ],
-      "last_change": "2026-09-18",
-      "last_author": "Claude",
-      "last_commit": "4509bf4",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "scripts/build_catalog.py",
-        "tests/test_catalog_guard.py"
       ]
     },
     {
@@ -7583,9 +7617,9 @@
         "gt/public/plugs.html",
         "gt/tools/build_lot_xlsx.py",
         "gt/tools/build_rfq.py",
+        "gt/tools/collisions.py",
         "gt/tools/ship_export.py",
-        "gt/tools/ship_merge.py",
-        "gt/tools/ship_report.py"
+        "gt/tools/ship_merge.py"
       ]
     },
     {
@@ -8011,7 +8045,7 @@
       },
       "last_change": "2026-09-18",
       "last_author": "Claude",
-      "last_commit": "4509bf4",
+      "last_commit": "3e20310",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
