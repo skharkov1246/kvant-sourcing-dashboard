@@ -4,16 +4,16 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 232,
-    "total_bytes": 106126165,
+    "datasets": 233,
+    "total_bytes": 106131966,
     "by_sensitivity": {
       "конфиденциально": 62,
       "внутреннее": 131,
-      "публикуемо": 39
+      "публикуемо": 40
     },
     "by_subproject": {
       "ГПУ-библиотека": 29,
-      "ГТУ-библиотека": 55,
+      "ГТУ-библиотека": 56,
       "ОВЭ-75": 45,
       "база ЗИП": 49,
       "база ЗИП · таможня": 18,
@@ -290,11 +290,11 @@
         "gt/tools/confidence_audit.py",
         "gt/tools/demand_collisions.py",
         "gt/tools/english_source.py",
+        "gt/tools/homoglyphs.py",
         "gt/tools/jenbacher_fold.py",
         "gt/tools/maker_basis.py",
         "gt/tools/rfq_en.py",
-        "gt/tools/rv_merge.py",
-        "gt/tools/seller_groups.py"
+        "gt/tools/rv_merge.py"
       ]
     },
     {
@@ -3833,6 +3833,50 @@
       ]
     },
     {
+      "path": "gt/data/ship_questions.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 140076,
+      "note": "Вопросы к заказчику по заявке ЛУКОЙЛ: 54 позиции. Часть ведётся руками (вывод инженера по разбору проверок), часть дописывает gt/tools/collisions.py --questions по замеру gt/data/ship_collisions.json — 32 вопроса о номерах, под которыми в заявке идут РАЗНЫЕ детали: такой вопрос механический, и писать его руками тридцать два раза нечего. У дописанных стоит поле source. Дозапись идемпотентна: повторный прогон не плодит дубликаты, уже заданные номера он называет. Прежний состав, ведомый руками — 22 позиции на 5 208 штук: 13 позиций на 5 208 штук, по которым запрос цены уйдёт впустую, пока не расшифрована номенклатура. Не производная от данных, а вывод инженера по разбору проверок, поэтому файл ведётся руками. Шесть родов неясности: неизвестна фасовка (DCA4 — не артикул, а семейство: пинта, канистра 1,89 л, ведро 18,9 л, бочка 208 л или вовсе фильтр, разброс по деньгам в двадцать раз); комплекты или штуки (свечи Jenbacher идут банками по 4, 587 комплектов это 2 348 свечей); снятый или несуществующий номер (цепочки 334976 → 389588 → 433894, 201601 → 255377 → 1219674, 263174 → 1219670; номер 265174 не найден ни у одного из семи поставщиков); не определён тип машины (657541 для Type 2/3/4 кабель зажигания, для Type 6 наконечник свечи — разные изделия); не определено исполнение (класс прочности крепежа SGT-400 в номере Ruston не закодирован; размер высокотемпературной стяжки из номера не выводится); наименование расходится с каталогом (4970773 в заявке уплотнительная шайба, у Cummins RING, SPARK PLUG). По каждой строке записано, что уже установлено самостоятельно, чтобы заказчик подтверждал, а не искал заново. Правило: пока строка здесь, она не идёт ни в письма запроса цен, ни в сумму закупки. Читаемая версия — gt/docs/ВОПРОСЫ-ЗАКАЗЧИКУ-ЛУКОЙЛ.pdf, собирается gt/tools/ship_questions.py.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "method",
+        "questions",
+        "rule",
+        "source",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "questions",
+        "records": 74,
+        "record_keys": [
+          "ask",
+          "cost",
+          "kind",
+          "known",
+          "pn",
+          "qty",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "23c897d",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/collisions.py",
+        "gt/tools/ship_brief.py",
+        "gt/tools/ship_decisions.py",
+        "gt/tools/ship_final.py",
+        "gt/tools/ship_questions.py",
+        "tests/test_ship_collisions.py"
+      ]
+    },
+    {
       "path": "ove/data/suppliers.json",
       "subproject": "ОВЭ-75",
       "bytes": 139653,
@@ -3883,50 +3927,6 @@
         "ove/build.py",
         "ove/tools/bitrix_ove.py",
         "ove/tools/build_rfq.py"
-      ]
-    },
-    {
-      "path": "gt/data/ship_questions.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 137964,
-      "note": "Вопросы к заказчику по заявке ЛУКОЙЛ: 54 позиции. Часть ведётся руками (вывод инженера по разбору проверок), часть дописывает gt/tools/collisions.py --questions по замеру gt/data/ship_collisions.json — 32 вопроса о номерах, под которыми в заявке идут РАЗНЫЕ детали: такой вопрос механический, и писать его руками тридцать два раза нечего. У дописанных стоит поле source. Дозапись идемпотентна: повторный прогон не плодит дубликаты, уже заданные номера он называет. Прежний состав, ведомый руками — 22 позиции на 5 208 штук: 13 позиций на 5 208 штук, по которым запрос цены уйдёт впустую, пока не расшифрована номенклатура. Не производная от данных, а вывод инженера по разбору проверок, поэтому файл ведётся руками. Шесть родов неясности: неизвестна фасовка (DCA4 — не артикул, а семейство: пинта, канистра 1,89 л, ведро 18,9 л, бочка 208 л или вовсе фильтр, разброс по деньгам в двадцать раз); комплекты или штуки (свечи Jenbacher идут банками по 4, 587 комплектов это 2 348 свечей); снятый или несуществующий номер (цепочки 334976 → 389588 → 433894, 201601 → 255377 → 1219674, 263174 → 1219670; номер 265174 не найден ни у одного из семи поставщиков); не определён тип машины (657541 для Type 2/3/4 кабель зажигания, для Type 6 наконечник свечи — разные изделия); не определено исполнение (класс прочности крепежа SGT-400 в номере Ruston не закодирован; размер высокотемпературной стяжки из номера не выводится); наименование расходится с каталогом (4970773 в заявке уплотнительная шайба, у Cummins RING, SPARK PLUG). По каждой строке записано, что уже установлено самостоятельно, чтобы заказчик подтверждал, а не искал заново. Правило: пока строка здесь, она не идёт ни в письма запроса цен, ни в сумму закупки. Читаемая версия — gt/docs/ВОПРОСЫ-ЗАКАЗЧИКУ-ЛУКОЙЛ.pdf, собирается gt/tools/ship_questions.py.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "method",
-        "questions",
-        "rule",
-        "source",
-        "updated"
-      ],
-      "main_collection": {
-        "key": "questions",
-        "records": 73,
-        "record_keys": [
-          "ask",
-          "cost",
-          "kind",
-          "known",
-          "pn",
-          "qty",
-          "unit"
-        ]
-      },
-      "last_change": "2026-09-18",
-      "last_author": "Claude",
-      "last_commit": "4d4c86b",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "gt/tools/collisions.py",
-        "gt/tools/ship_brief.py",
-        "gt/tools/ship_decisions.py",
-        "gt/tools/ship_final.py",
-        "gt/tools/ship_questions.py",
-        "tests/test_ship_collisions.py"
       ]
     },
     {
@@ -5087,7 +5087,7 @@
     {
       "path": "data/catalog_notes.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 80421,
+      "bytes": 81175,
       "note": "",
       "format": "json",
       "shape": "объект",
@@ -5119,6 +5119,7 @@
         "gt/data/ship_demand_collisions.json",
         "gt/data/ship_energoseti.json",
         "gt/data/ship_english_source.json",
+        "gt/data/ship_homoglyphs.json",
         "gt/data/ship_jenbacher_prices.json",
         "gt/data/ship_lukoil.json",
         "gt/data/ship_maker_basis.json",
@@ -5130,12 +5131,11 @@
         "gt/data/ship_seller_groups.json",
         "gt/data/ship_seller_independence.json",
         "gt/data/ship_sellers.json",
-        "gt/data/ship_stocklist_cross.json",
-        "gt/data/ship_sweep.json"
+        "gt/data/ship_stocklist_cross.json"
       ],
       "last_change": "2026-09-18",
       "last_author": "Claude",
-      "last_commit": "4d4c86b",
+      "last_commit": "23c897d",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -9840,6 +9840,48 @@
       },
       "referenced_by": [
         "ove/build.py"
+      ]
+    },
+    {
+      "path": "gt/data/ship_homoglyphs.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 2935,
+      "note": "Номера заявки ЛУКОЙЛ, в которых кириллическая буква стоит на месте латинской и неотличима от неё на вид («1794-IВ10XOB6XT» с кириллической В). По такому номеру поиск не находил ничего ни у продавца, ни в нашем индексе: ключ «оставить только A–Z и 0–9» кириллическую букву выбрасывал. Свод двойников к латинице добавлен в scripts/build_index.py и scripts/lookup.py; поле артикула в данных не правится. Считает gt/tools/homoglyphs.py.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "items",
+        "pns_with_homoglyphs",
+        "rows_checked",
+        "source",
+        "updated",
+        "usd_exposure",
+        "what_it_is",
+        "what_we_did"
+      ],
+      "main_collection": {
+        "key": "items",
+        "records": 9,
+        "record_keys": [
+          "letters",
+          "name",
+          "pn",
+          "pn_latin",
+          "qty",
+          "usd_exposure"
+        ]
+      },
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "23c897d",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/homoglyphs.py",
+        "tests/test_homoglyphs.py"
       ]
     },
     {
