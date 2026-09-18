@@ -142,3 +142,36 @@ def test_квотируемый_канал_не_значит_что_цены_н�
     assert g["of_them_quote_only_already_answered"] > 0, (
         "ни одна квотируемая строка не отмечена как уже отвеченная — "
         "проверь, что gt/data/ship_inside_quotes.json собран")
+
+
+def test_ступень_цены_учитывает_письменные_предложения_контрагентов():
+    """Цену, названную контрагентом письменно, ступень обязана видеть.
+
+    До 18.09.2026 ступень «цена найдена» считалась только по набору
+    перепроверки, то есть по разведке витрин. Письменная цифра контрагента по
+    этой самой заявке — доказательство сильнее любой карточки, и её в счёте не
+    было вовсе: 195 позиций с подтверждённой ценой в лестницу не попадали, и
+    ступень «есть цена и адрес» показывала 43,7 % денег вместо 67,9 %.
+    """
+    import ship_coverage as sc
+    offered = sc.priced_by_offer()
+    if not offered:
+        pytest.skip("набор gt/data/ship_inside_priced.json не собран")
+    m = sc.measure()
+    po = m["price_from_offer"]
+    assert po["rows"] > 0, "предложения контрагентов не добавили ни одной строки"
+    # Прибавка не может превышать саму ступень: иначе счёт двойной.
+    assert po["rows"] <= m["steps"]["цена найдена"]["rows"]
+    assert po["usd"] <= m["steps"]["цена найдена"]["usd"] + 1.0
+
+
+def test_набор_подтверждённых_цен_не_содержит_чисел():
+    """Он уходит в публичный репозиторий, а цены — данные контрагента."""
+    src = ROOT / "gt/data/ship_inside_priced.json"
+    if not src.exists():
+        pytest.skip("набора нет")
+    doc = json.loads(src.read_text(encoding="utf-8"))
+    for part in doc["parts"]:
+        assert not any(isinstance(v, (int, float)) and not isinstance(v, bool)
+                       for v in part.values()), f"число в записи {part.get('pn')}"
+        assert "price" not in part and "usd" not in part

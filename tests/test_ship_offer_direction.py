@@ -272,3 +272,34 @@ def test_выгрузка_без_градуса_читается_по_прави
     assert not O.price_graded({"class_rule": "последнее число строки (заголовок не опознан)"})
     # происхождение не названо вовсе — значит ценой не считается
     assert not O.price_graded({})
+
+
+def test_пустая_валюта_новой_выгрузки_долларом_не_считается(tmp_path):
+    """Выгрузка, умеющая сказать «валюта не установлена», не подставляет доллар.
+
+    Замер 18.09.2026 по выгрузке «ЛУКОЙЛ»: 14 цен, взятых ИЗ КОЛОНКИ «цена»,
+    несли знак ¥ и пустую валюту — и считались долларами. Это завышение в 6,7
+    раза при юане и в 154 при иене. У прежних выгрузок поля нет, и для них
+    прежний разбор сохранён намеренно.
+    """
+    import json
+
+    import ship_offer as S
+    new = {"files": [{"file_name": "kp.xlsx", "direction": "входящее", "prices": [
+        {"pn": "ZZ-1", "price": 100, "currency": "", "currency_source": "не установлена",
+         "class_rule": "колонка «цена» по заголовку", "is_price": True},
+        {"pn": "ZZ-2", "price": 200, "currency": "USD", "currency_source": "файл",
+         "class_rule": "колонка «цена» по заголовку", "is_price": True},
+    ]}]}
+    old = {"files": [{"file_name": "kp.xlsx", "direction": "входящее", "prices": [
+        {"pn": "ZZ-1", "price": 100, "currency": "",
+         "class_rule": "колонка «цена» по заголовку"},
+    ]}]}
+    pn = tmp_path / "new.json"
+    po = tmp_path / "old.json"
+    pn.write_text(json.dumps(new, ensure_ascii=False), encoding="utf-8")
+    po.write_text(json.dumps(old, ensure_ascii=False), encoding="utf-8")
+    _, supp_new, _ = S.prices_by_direction(pn, {"USD": 1.0})
+    assert "ZZ1" not in supp_new and "ZZ2" in supp_new
+    _, supp_old, _ = S.prices_by_direction(po, {"USD": 1.0})
+    assert "ZZ1" in supp_old

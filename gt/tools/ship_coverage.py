@@ -36,6 +36,7 @@ REVERIFY = ROOT / "gt/data/ship_reverify.json"
 LISTS = ROOT / "gt/data/ship_parts_lists.json"
 QUESTIONS = ROOT / "gt/data/ship_questions.json"
 INSIDE = ROOT / "gt/data/ship_inside_quotes.json"
+PRICED = ROOT / "gt/data/ship_inside_priced.json"
 OUT = ROOT / "gt/data/ship_coverage.json"
 
 
@@ -103,6 +104,24 @@ def answered_keys() -> set:
             for r in json.loads(INSIDE.read_text(encoding="utf-8")).get("rows", [])}
 
 
+def priced_by_offer() -> set:
+    """Номера, по которым цену назвал сам контрагент в приложенном предложении.
+
+    Ступень «цена найдена» считалась только по набору перепроверки, то есть по
+    разведке витрин. Но самое сильное доказательство цены — письменная цифра
+    контрагента по этой самой заявке, и она лежит во вложениях сделок. Замер
+    18.09.2026: таких позиций 195, и в лестницу они не попадали вовсе — она
+    показывала наше знание хуже, чем оно есть.
+
+    Сами цены здесь не нужны и их нет: набор хранит только факт и происхождение
+    (gt/tools/tkp_tables.py --keys-out).
+    """
+    if not PRICED.exists():
+        return set()
+    return {key(p.get("pn")) for p in
+            json.loads(PRICED.read_text(encoding="utf-8")).get("parts", [])}
+
+
 def measure() -> dict:
     ask = json.loads(ASK.read_text(encoding="utf-8"))["rows"]
     rv = {key(r.get("pn")): r for r in json.loads(REVERIFY.read_text(encoding="utf-8"))["rows"]}
@@ -115,6 +134,8 @@ def measure() -> dict:
     # ПРИЗНАКИ независимы: канал бывает назван там, где цены нет, и наоборот.
     asked = asked_keys()
     answered = answered_keys()
+    offered = priced_by_offer()
+    from_offer = [0, 0.0]          # сколько ступень «цена» добрала предложениями
     gap_answered = 0
     gap_answered_usd = 0.0
     gap_wait = gap_open = 0
@@ -141,7 +162,12 @@ def measure() -> dict:
         named = bool(li and str(li.get("descriptions") or "")) or bool(
             x and str(x.get("what_it_is") or "").strip())
         maker = bool(x and str(x.get("maker_short") or "").strip())
-        price = bool(x and num(x.get("price_low")))
+        # Цена есть, если её нашла разведка ЛИБО назвал контрагент письменно.
+        price_rv = bool(x and num(x.get("price_low")))
+        price = price_rv or k in offered
+        if price and not price_rv:
+            from_offer[0] += 1
+            from_offer[1] += e
         channel = bool(x and str(x.get("channel") or "").strip())
         # остаток ЧИСЛОМ: в поле остатка есть цифра, а не только слова
         stock = bool(x and re.search(r"\d", str(x.get("stock") or "")))
@@ -232,6 +258,13 @@ def measure() -> dict:
                        "share_rows": round(100 * v[0] / total_rows, 1),
                        "share_usd": round(100 * v[1] / total_usd, 1) if total_usd else 0.0}
                    for k, v in ladder.items()},
+        "price_from_offer": {
+            "rows": from_offer[0], "usd": round(from_offer[1], 2),
+            "what_it_means": ("Строки, где цену назвал сам контрагент в приложенном к сделке "
+                              "предложении, а разведка по витринам её не нашла. Это сильнейшее "
+                              "доказательство цены из доступных, и до 18.09.2026 ступень "
+                              "«цена найдена» его не учитывала вовсе."),
+        },
         "rows_total": total_rows,
         "usd_total": round(total_usd, 2),
         "rows_without_band": no_band[0],
@@ -273,6 +306,10 @@ def main() -> None:
     print(f"  {g['of_them_open_to_search']:>4} строк | {g['usd_open_to_search']:>11,.0f} USD | "
           f"НАША работа: цена публикуется, её надо найти — задание печатает "
           f"gt/tools/rv_pricehunt.py".replace(",", " "))
+    po = m["price_from_offer"]
+    print(f"  из ступени «цена найдена» {po['rows']} строк на {po['usd']:,.0f} USD дали "
+          f"письменные предложения контрагентов из вложений, а не разведка витрин"
+          .replace(",", " "))
     n = m["quoted_never_reverified"]
     print(f"ВЫДАНО В КП, НЕ ПЕРЕПРОВЕРЯЛОСЬ НИ РАЗУ: {n['rows']} строк на "
           f"{n['usd']:,.0f} USD".replace(",", " "))

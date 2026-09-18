@@ -309,6 +309,8 @@ def main() -> int:
                     help="решение по знаку ¥; без него цены в ¥ не пересчитываются")
     ap.add_argument("--json", help="куда выписать строки с ценами (ВНЕ репозитория)")
     ap.add_argument("--counters", help="куда выписать счётчики (можно в репозиторий)")
+    ap.add_argument("--keys-out", help="куда выписать СПИСОК НОМЕРОВ с подтверждённой ценой, "
+                                      "без самих цен (можно в репозиторий)")
     a = ap.parse_args()
 
     tkp = Path(a.tkp)
@@ -342,6 +344,37 @@ def main() -> int:
         out.write_text(json.dumps({"rows": rows, "counters": c}, ensure_ascii=False, indent=1),
                        encoding="utf-8")
         print(f"{out} — {len(rows)} строк (вне репозитория)")
+    if a.keys_out:
+        # Зачем список без цен. Лестница покрытия (gt/tools/ship_coverage.py) читает
+        # только репозиторий, а самое сильное доказательство цены — письменное
+        # предложение контрагента — лежит вне него. Из-за этого 173 позиции с
+        # найденной ценой в лестницу не попадали вовсе, и она показывала знание
+        # хуже, чем оно есть. Здесь пишется ровно факт «по этому номеру цена в
+        # предложении есть» и её происхождение. Ни числа, ни валюты суммы.
+        seen: dict[str, dict] = {}
+        for r in rows:
+            if r.get("usd") is None:
+                continue
+            seen.setdefault(r["key"], {
+                "pn": r["pn"], "file": r.get("file", ""), "origin": r.get("origin", ""),
+                "direction": r.get("direction", ""),
+                "currency_known": bool(r.get("currency") and "не установлена" not in
+                                       str(r.get("currency"))),
+                "rule": r.get("rule", ""),
+            })
+        Path(a.keys_out).write_text(json.dumps({
+            "updated": "2026-09-18",
+            "source": ("Номера, по которым цена закупки подтверждена письменным предложением "
+                       "контрагента из вложений сделки: единица × количество = итог в той же "
+                       "строке. Пишет gt/tools/tkp_tables.py --keys-out; руками не заполнять."),
+            "what_it_gives": ("Факт и происхождение, БЕЗ ЧИСЕЛ: по этому номеру предложение "
+                              "называет цену, и вот в каком файле какой сделки она стоит. Сами "
+                              "цены — коммерческие данные контрагента и остаются в выгрузке вне "
+                              "репозитория. Нужен лестнице покрытия: без него 173 позиции с "
+                              "найденной ценой в неё не попадали, и она занижала наше знание."),
+            "parts": [dict(v, key=k) for k, v in sorted(seen.items())],
+        }, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+        print(f"номеров с подтверждённой ценой записано в {a.keys_out}: {len(seen)}")
     if a.counters:
         Path(a.counters).write_text(json.dumps({
             "updated": "2026-09-18",

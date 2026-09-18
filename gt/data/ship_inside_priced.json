@@ -1,0 +1,1762 @@
+{
+ "updated": "2026-09-18",
+ "source": "Номера, по которым цена закупки подтверждена письменным предложением контрагента из вложений сделки: единица × количество = итог в той же строке. Пишет gt/tools/tkp_tables.py --keys-out; руками не заполнять.",
+ "what_it_gives": "Факт и происхождение, БЕЗ ЧИСЕЛ: по этому номеру предложение называет цену, и вот в каком файле какой сделки она стоит. Сами цены — коммерческие данные контрагента и остаются в выгрузке вне репозитория. Нужен лестнице покрытия: без него 173 позиции с найденной ценой в неё не попадали, и она занижала наше знание.",
+ "parts": [
+  {
+   "pn": "012633/000",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "012633000"
+  },
+  {
+   "pn": "012653/000",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "012653000"
+  },
+  {
+   "pn": "030553/000",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "030553000"
+  },
+  {
+   "pn": "036613/000",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "036613000"
+  },
+  {
+   "pn": "036616/000",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "036616000"
+  },
+  {
+   "pn": "036629/000",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "036629000"
+  },
+  {
+   "pn": "072279/055",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "072279055"
+  },
+  {
+   "pn": "072279/060",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "072279060"
+  },
+  {
+   "pn": "072280/050",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "072280050"
+  },
+  {
+   "pn": "072280/055",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "072280055"
+  },
+  {
+   "pn": "134-46000-OABO",
+   "file": "Screen Shot 2026-08-13 at 11.57.16 AM.png",
+   "origin": "СП-166 40974",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "13446000OABO"
+  },
+  {
+   "pn": "135-4GB01-OABO",
+   "file": "Screen Shot 2026-08-13 at 11.57.16 AM.png",
+   "origin": "СП-166 40974",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "1354GB01OABO"
+  },
+  {
+   "pn": "138-4CA01-OAAO",
+   "file": "Screen Shot 2026-08-13 at 11.57.16 AM.png",
+   "origin": "СП-166 40974",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "1384CA01OAAO"
+  },
+  {
+   "pn": "1440-DYN02-01RJ",
+   "file": "Quotation-CambiaTech Group Limited.pdf",
+   "origin": "СП-166 41790",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "1440DYN0201RJ"
+  },
+  {
+   "pn": "151-1BA02-0ABO",
+   "file": "Screen Shot 2026-08-13 at 11.57.16 AM.png",
+   "origin": "СП-166 40974",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "1511BA020ABO"
+  },
+  {
+   "pn": "1606-XLDC92D",
+   "file": "Quotation-CambiaTech Group Limited.pdf",
+   "origin": "СП-166 41790",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "1606XLDC92D"
+  },
+  {
+   "pn": "1701/05",
+   "file": "Screen Shot 2026-08-18 at 3.20.01 PM.png",
+   "origin": "СП-166 41218",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "170105"
+  },
+  {
+   "pn": "1701/06",
+   "file": "Quotation-CambiaTech Group Limited.pdf",
+   "origin": "СП-166 41790",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "170106"
+  },
+  {
+   "pn": "1701/10",
+   "file": "Screen Shot 2026-08-18 at 3.20.01 PM.png",
+   "origin": "СП-166 41218",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "170110"
+  },
+  {
+   "pn": "1701/25",
+   "file": "Quotation-CambiaTech Group Limited.pdf",
+   "origin": "СП-166 41790",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "170125"
+  },
+  {
+   "pn": "170180-01-00",
+   "file": "Quotation-CambiaTech Group Limited.pdf",
+   "origin": "СП-166 41790",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "1701800100"
+  },
+  {
+   "pn": "170190-01E",
+   "file": "Quotation-CambiaTech Group Limited.pdf",
+   "origin": "СП-166 41790",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "17019001E"
+  },
+  {
+   "pn": "1756-A7",
+   "file": "Quotation-CambiaTech Group Limited.pdf",
+   "origin": "СП-166 41790",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "1756A7"
+  },
+  {
+   "pn": "1756-CN2RXT",
+   "file": "Quotation-CambiaTech Group Limited.pdf",
+   "origin": "СП-166 41790",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "1756CN2RXT"
+  },
+  {
+   "pn": "1756-ENBT",
+   "file": "Quotation-CambiaTech Group Limited.pdf",
+   "origin": "СП-166 41790",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "1756ENBT"
+  },
+  {
+   "pn": "1756-L63",
+   "file": "Quotation-CambiaTech Group Limited.pdf",
+   "origin": "СП-166 41790",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "1756L63"
+  },
+  {
+   "pn": "1756-L73XT",
+   "file": "Quotation-CambiaTech Group Limited.pdf",
+   "origin": "СП-166 41790",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "1756L73XT"
+  },
+  {
+   "pn": "1756-PB75",
+   "file": "Quotation-CambiaTech Group Limited.pdf",
+   "origin": "СП-166 41790",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "1756PB75"
+  },
+  {
+   "pn": "1756-PBXT",
+   "file": "Quotation-CambiaTech Group Limited.pdf",
+   "origin": "СП-166 41790",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "1756PBXT"
+  },
+  {
+   "pn": "1794-ACNR",
+   "file": "Quotation-CambiaTech Group Limited.pdf",
+   "origin": "СП-166 41790",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "1794ACNR"
+  },
+  {
+   "pn": "1794-ACNR15XT",
+   "file": "Quotation-CambiaTech Group Limited.pdf",
+   "origin": "СП-166 41790",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "1794ACNR15XT"
+  },
+  {
+   "pn": "1794-IF2XOF2IXT",
+   "file": "Quotation-CambiaTech Group Limited.pdf",
+   "origin": "СП-166 41790",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "1794IF2XOF2IXT"
+  },
+  {
+   "pn": "1794-IF4IXT",
+   "file": "Quotation-CambiaTech Group Limited.pdf",
+   "origin": "СП-166 41790",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "1794IF4IXT"
+  },
+  {
+   "pn": "1794-IJ2",
+   "file": "Quotation-CambiaTech Group Limited.pdf",
+   "origin": "СП-166 41790",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "1794IJ2"
+  },
+  {
+   "pn": "1794-IJ2XT",
+   "file": "Quotation-CambiaTech Group Limited.pdf",
+   "origin": "СП-166 41790",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "1794IJ2XT"
+  },
+  {
+   "pn": "1794-IRT8XT",
+   "file": "Quotation-CambiaTech Group Limited.pdf",
+   "origin": "СП-166 41790",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "1794IRT8XT"
+  },
+  {
+   "pn": "1794-OB16PXT",
+   "file": "Quotation-CambiaTech Group Limited.pdf",
+   "origin": "СП-166 41790",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "1794OB16PXT"
+  },
+  {
+   "pn": "1794-OF4I",
+   "file": "Quotation-CambiaTech Group Limited.pdf",
+   "origin": "СП-166 41790",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "1794OF4I"
+  },
+  {
+   "pn": "1794-OF4IXT",
+   "file": "Quotation-CambiaTech Group Limited.pdf",
+   "origin": "СП-166 41790",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "1794OF4IXT"
+  },
+  {
+   "pn": "321-1BH02-0AA0",
+   "file": "Screen Shot 2026-09-01 at 1.40.22 PM.png",
+   "origin": "СП-166 43120",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "3211BH020AA0"
+  },
+  {
+   "pn": "321-1BL00-0AA0",
+   "file": "Screen Shot 2026-09-01 at 1.40.22 PM.png",
+   "origin": "СП-166 43120",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "3211BL000AA0"
+  },
+  {
+   "pn": "322-1BL00-0AA0",
+   "file": "Screen Shot 2026-09-01 at 1.40.22 PM.png",
+   "origin": "СП-166 43120",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "3221BL000AA0"
+  },
+  {
+   "pn": "331-1KF02-0ABO",
+   "file": "Screen Shot 2026-09-01 at 1.40.22 PM.png",
+   "origin": "СП-166 43120",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "3311KF020ABO"
+  },
+  {
+   "pn": "331-7PF01-0ABO",
+   "file": "Screen Shot 2026-09-01 at 1.40.22 PM.png",
+   "origin": "СП-166 43120",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "3317PF010ABO"
+  },
+  {
+   "pn": "331-7PF11-0ABO",
+   "file": "Screen Shot 2026-09-01 at 1.40.22 PM.png",
+   "origin": "СП-166 43120",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "3317PF110ABO"
+  },
+  {
+   "pn": "405-0KA02-0AA0",
+   "file": "Screen Shot 2026-09-01 at 1.40.22 PM.png",
+   "origin": "СП-166 43120",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "4050KA020AA0"
+  },
+  {
+   "pn": "505728/000",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "505728000"
+  },
+  {
+   "pn": "64/03001673/1",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "64030016731"
+  },
+  {
+   "pn": "64/04012025/3",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "64040120253"
+  },
+  {
+   "pn": "64/05002092/2",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "64050020922"
+  },
+  {
+   "pn": "64/05002092/4",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "64050020924"
+  },
+  {
+   "pn": "64/05002095/2",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "64050020952"
+  },
+  {
+   "pn": "64/05002096/3",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "64050020963"
+  },
+  {
+   "pn": "64/05002096/6",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "64050020966"
+  },
+  {
+   "pn": "64/05002110/000001",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "6405002110000001"
+  },
+  {
+   "pn": "64/05002117/31",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "640500211731"
+  },
+  {
+   "pn": "64/05011021/31",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "640501102131"
+  },
+  {
+   "pn": "64/05018001/2",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "64050180012"
+  },
+  {
+   "pn": "64/07010142/6",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "64070101426"
+  },
+  {
+   "pn": "64/07010460/2",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "64070104602"
+  },
+  {
+   "pn": "64/07016038/0011",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "64070160380011"
+  },
+  {
+   "pn": "64/07031054/9",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "64070310549"
+  },
+  {
+   "pn": "64/07104916/9",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "64071049169"
+  },
+  {
+   "pn": "64/09001231/091",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "6409001231091"
+  },
+  {
+   "pn": "64/09001237/13",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "640900123713"
+  },
+  {
+   "pn": "64/09001237/14",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "640900123714"
+  },
+  {
+   "pn": "64/09001237/15",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "640900123715"
+  },
+  {
+   "pn": "64/51004015/6",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "64510040156"
+  },
+  {
+   "pn": "64/51004027/3",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "64510040273"
+  },
+  {
+   "pn": "64/51014009/1",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "64510140091"
+  },
+  {
+   "pn": "64/51031004/12",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "645103100412"
+  },
+  {
+   "pn": "64/51031004/17",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "645103100417"
+  },
+  {
+   "pn": "64/51031004/5",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "64510310045"
+  },
+  {
+   "pn": "64/51031004/6",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "64510310046"
+  },
+  {
+   "pn": "64/51031004/7",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "64510310047"
+  },
+  {
+   "pn": "64/51031004/8",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "64510310048"
+  },
+  {
+   "pn": "64/60001108/1016",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "64600011081016"
+  },
+  {
+   "pn": "64/60001108/1022",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "64600011081022"
+  },
+  {
+   "pn": "64/60003032/2",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "64600030322"
+  },
+  {
+   "pn": "64/60009030/2",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "64600090302"
+  },
+  {
+   "pn": "64/60011016/2",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "64600110162"
+  },
+  {
+   "pn": "64/60013005/4",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "64600130054"
+  },
+  {
+   "pn": "64/60030062/36",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "646003006236"
+  },
+  {
+   "pn": "64/60030062/38",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "646003006238"
+  },
+  {
+   "pn": "64/60030062/39",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "646003006239"
+  },
+  {
+   "pn": "64/60030070/1",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "64600300701"
+  },
+  {
+   "pn": "64/60030079/20",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "646003007920"
+  },
+  {
+   "pn": "64/60030079/21",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "646003007921"
+  },
+  {
+   "pn": "64/60040178/1",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "64600401781"
+  },
+  {
+   "pn": "64/60040226/2",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "64600402262"
+  },
+  {
+   "pn": "64/60040233/16",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "646004023316"
+  },
+  {
+   "pn": "64/60070125/10",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "646007012510"
+  },
+  {
+   "pn": "64/60082032/1",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "64600820321"
+  },
+  {
+   "pn": "64/60082033/1C",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "64600820331C"
+  },
+  {
+   "pn": "64/60082033/4",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "64600820334"
+  },
+  {
+   "pn": "64/60093008/3",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "64600930083"
+  },
+  {
+   "pn": "64/60093008/6",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "64600930086"
+  },
+  {
+   "pn": "64/60097007/1",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "64600970071"
+  },
+  {
+   "pn": "6ES7197-1LA04",
+   "file": "Screen Shot 2026-08-13 at 11.57.16 AM.png",
+   "origin": "СП-166 40974",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "6ES71971LA04"
+  },
+  {
+   "pn": "6ES7197-1LBO0-OXAO",
+   "file": "Screen Shot 2026-08-13 at 11.57.16 AM.png",
+   "origin": "СП-166 40974",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "6ES71971LBO0OXAO"
+  },
+  {
+   "pn": "6ES7321-1BH02-0AA0",
+   "file": "suppliers_22566.xlsx",
+   "origin": "сделка 22566",
+   "direction": "неизвестно",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "6ES73211BH020AA0"
+  },
+  {
+   "pn": "6ES7321-1BHO2-O0AAO",
+   "file": "Screen Shot 2026-08-13 at 11.57.16 AM.png",
+   "origin": "СП-166 40974",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "6ES73211BHO2O0AAO"
+  },
+  {
+   "pn": "6ES7332-5HD01-OABO",
+   "file": "Screen Shot 2026-08-13 at 11.57.16 AM.png",
+   "origin": "СП-166 40974",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "6ES73325HD01OABO"
+  },
+  {
+   "pn": "6ES7341-1CH02-0AE0",
+   "file": "Amikon quotation for RFQ Siemens Simatic.pdf",
+   "origin": "СП-166 40968",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "6ES73411CH020AE0"
+  },
+  {
+   "pn": "6ES7341-1CHO2-OAEO",
+   "file": "Screen Shot 2026-08-13 at 11.57.16 AM.png",
+   "origin": "СП-166 40974",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "6ES73411CHO2OAEO"
+  },
+  {
+   "pn": "6ES7405-0KA02-0AA0",
+   "file": "Amikon quotation for RFQ Siemens Simatic.pdf",
+   "origin": "СП-166 40968",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "6ES74050KA020AA0"
+  },
+  {
+   "pn": "6ES7412-3HJ14-0AB0",
+   "file": "Amikon quotation for RFQ Siemens Simatic.pdf",
+   "origin": "СП-166 40968",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "6ES74123HJ140AB0"
+  },
+  {
+   "pn": "6ES7412-3HJ14-0ABO",
+   "file": "Screen Shot 2026-08-13 at 11.57.16 AM.png",
+   "origin": "СП-166 40974",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "6ES74123HJ140ABO"
+  },
+  {
+   "pn": "6ES7416-5HSO6-O0ABO",
+   "file": "Screen Shot 2026-08-13 at 11.57.16 AM.png",
+   "origin": "СП-166 40974",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "6ES74165HSO6O0ABO"
+  },
+  {
+   "pn": "6ES7952-1AKO0-OAAO",
+   "file": "Screen Shot 2026-08-13 at 11.57.16 AM.png",
+   "origin": "СП-166 40974",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "6ES79521AKO0OAAO"
+  },
+  {
+   "pn": "6ES7952-1AS00-0AA0",
+   "file": "Amikon quotation for RFQ Siemens Simatic.pdf",
+   "origin": "СП-166 40968",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "6ES79521AS000AA0"
+  },
+  {
+   "pn": "6ES7952-1ASO0-O0AAO",
+   "file": "Screen Shot 2026-08-13 at 11.57.16 AM.png",
+   "origin": "СП-166 40974",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "6ES79521ASO0O0AAO"
+  },
+  {
+   "pn": "6ES7960-1AA04",
+   "file": "Screen Shot 2026-08-13 at 11.57.16 AM.png",
+   "origin": "СП-166 40974",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "6ES79601AA04"
+  },
+  {
+   "pn": "6ES7960-1AA06-O0XAO",
+   "file": "Screen Shot 2026-08-13 at 11.57.16 AM.png",
+   "origin": "СП-166 40974",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "6ES79601AA06O0XAO"
+  },
+  {
+   "pn": "6GK1503-3CB00",
+   "file": "Amikon quotation for RFQ Siemens Simatic.pdf",
+   "origin": "СП-166 40968",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "6GK15033CB00"
+  },
+  {
+   "pn": "6GK5206-1BB10-2AA3",
+   "file": "Screen Shot 2026-08-13 at 11.57.16 AM.png",
+   "origin": "СП-166 40974",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "6GK52061BB102AA3"
+  },
+  {
+   "pn": "6GK5208-0BA10-2AA3",
+   "file": "Screen Shot 2026-08-13 at 11.57.16 AM.png",
+   "origin": "СП-166 40974",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "6GK52080BA102AA3"
+  },
+  {
+   "pn": "6GK7443-1EX20-OXEO",
+   "file": "Screen Shot 2026-08-13 at 11.57.16 AM.png",
+   "origin": "СП-166 40974",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "6GK74431EX20OXEO"
+  },
+  {
+   "pn": "6GK7443-1EX30-0XE0",
+   "file": "Amikon quotation for RFQ Siemens Simatic.pdf",
+   "origin": "СП-166 40968",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "6GK74431EX300XE0"
+  },
+  {
+   "pn": "6GK7443-1EX30-OXEO",
+   "file": "Screen Shot 2026-08-13 at 11.57.16 AM.png",
+   "origin": "СП-166 40974",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "6GK74431EX30OXEO"
+  },
+  {
+   "pn": "700-FSK3CU23-EX",
+   "file": "Quotation-CambiaTech Group Limited.pdf",
+   "origin": "СП-166 41790",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "700FSK3CU23EX"
+  },
+  {
+   "pn": "B00-OABO",
+   "file": "Screen Shot 2026-08-13 at 11.57.16 AM.png",
+   "origin": "СП-166 40974",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "B00OABO"
+  },
+  {
+   "pn": "CT1126A/9",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "CT1126A9"
+  },
+  {
+   "pn": "CT1126B/3",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "CT1126B3"
+  },
+  {
+   "pn": "CT1126B/4",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "CT1126B4"
+  },
+  {
+   "pn": "CT1126C/1",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "CT1126C1"
+  },
+  {
+   "pn": "CT3040/3",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "CT30403"
+  },
+  {
+   "pn": "CT3122/1",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "CT31221"
+  },
+  {
+   "pn": "CT336D/32",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "CT336D32"
+  },
+  {
+   "pn": "CT4010J/1",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "CT4010J1"
+  },
+  {
+   "pn": "CT450C/74",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "CT450C74"
+  },
+  {
+   "pn": "CT91012/115",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "CT91012115"
+  },
+  {
+   "pn": "CT91012/65",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "CT9101265"
+  },
+  {
+   "pn": "CT91012/68",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "CT9101268"
+  },
+  {
+   "pn": "CT91035/140",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "CT91035140"
+  },
+  {
+   "pn": "CT91035/16",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "CT9103516"
+  },
+  {
+   "pn": "CT91035/368",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "CT91035368"
+  },
+  {
+   "pn": "CT91035/95",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "CT9103595"
+  },
+  {
+   "pn": "CT91619/50",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "CT9161950"
+  },
+  {
+   "pn": "CT91619/53",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "CT9161953"
+  },
+  {
+   "pn": "CT94851/10",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "CT9485110"
+  },
+  {
+   "pn": "CT94851/7",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "CT948517"
+  },
+  {
+   "pn": "CT94851/8",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "CT948518"
+  },
+  {
+   "pn": "CT95038/01",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "CT9503801"
+  },
+  {
+   "pn": "CT97200/01",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "CT9720001"
+  },
+  {
+   "pn": "MVI56-MCM",
+   "file": "Quotation-CambiaTech Group Limited.pdf",
+   "origin": "СП-166 41790",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "MVI56MCM"
+  },
+  {
+   "pn": "MW03627",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "MW03627"
+  },
+  {
+   "pn": "MW03632",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "MW03632"
+  },
+  {
+   "pn": "MW06026",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "MW06026"
+  },
+  {
+   "pn": "MW14511/1",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "MW145111"
+  },
+  {
+   "pn": "MW21215M",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "MW21215M"
+  },
+  {
+   "pn": "MW21221",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "MW21221"
+  },
+  {
+   "pn": "MW21224A",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "MW21224A"
+  },
+  {
+   "pn": "MW22316B/01",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "MW22316B01"
+  },
+  {
+   "pn": "MW33028A",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "MW33028A"
+  },
+  {
+   "pn": "MW33048A",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "MW33048A"
+  },
+  {
+   "pn": "MW33312B",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "MW33312B"
+  },
+  {
+   "pn": "MW33314A",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "MW33314A"
+  },
+  {
+   "pn": "MW33324A",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "MW33324A"
+  },
+  {
+   "pn": "MW33326A",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "MW33326A"
+  },
+  {
+   "pn": "MW33326B",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "MW33326B"
+  },
+  {
+   "pn": "MW33629",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "MW33629"
+  },
+  {
+   "pn": "MW33640",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "MW33640"
+  },
+  {
+   "pn": "MW34040",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "MW34040"
+  },
+  {
+   "pn": "MW35024B/01",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "MW35024B01"
+  },
+  {
+   "pn": "MW35025B/01",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "MW35025B01"
+  },
+  {
+   "pn": "MW62005",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "MW62005"
+  },
+  {
+   "pn": "MW62005A",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "MW62005A"
+  },
+  {
+   "pn": "MW62018",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "MW62018"
+  },
+  {
+   "pn": "MW71045/1",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "MW710451"
+  },
+  {
+   "pn": "MW71045/2",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "MW710452"
+  },
+  {
+   "pn": "MW71045/3",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "MW710453"
+  },
+  {
+   "pn": "MW71045/4",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "MW710454"
+  },
+  {
+   "pn": "MW71045/5",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "MW710455"
+  },
+  {
+   "pn": "MW71047/1",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "MW710471"
+  },
+  {
+   "pn": "MW71047/2",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "MW710472"
+  },
+  {
+   "pn": "MW71047/3",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "MW710473"
+  },
+  {
+   "pn": "RT06073",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "RT06073"
+  },
+  {
+   "pn": "RW05095",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "RW05095"
+  },
+  {
+   "pn": "RW14007",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "RW14007"
+  },
+  {
+   "pn": "RW14012C",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "RW14012C"
+  },
+  {
+   "pn": "RW14013",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "RW14013"
+  },
+  {
+   "pn": "RW21024/1",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "RW210241"
+  },
+  {
+   "pn": "RW21222/4",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "RW212224"
+  },
+  {
+   "pn": "RW21223/1",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "RW212231"
+  },
+  {
+   "pn": "RW22314/11",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "RW2231411"
+  },
+  {
+   "pn": "RW34020",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "RW34020"
+  },
+  {
+   "pn": "RW34032",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "RW34032"
+  },
+  {
+   "pn": "RW54014",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "RW54014"
+  },
+  {
+   "pn": "RW54017",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "RW54017"
+  },
+  {
+   "pn": "SP027886",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "SP027886"
+  },
+  {
+   "pn": "SP040571",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "SP040571"
+  },
+  {
+   "pn": "ST91035/96",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "ST9103596"
+  },
+  {
+   "pn": "T99/62103",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "T9962103"
+  },
+  {
+   "pn": "T99/62135",
+   "file": "QT 127 SGT-400 minor parts (4).pdf",
+   "origin": "СП-166 41242",
+   "direction": "входящее",
+   "currency_known": true,
+   "rule": "единица × количество = итог в той же строке",
+   "key": "T9962135"
+  }
+ ]
+}
