@@ -162,3 +162,38 @@ def test_сумма_раздела_не_складывается_с_экспоз
     html = so.no_band_section(rows, supp)
     assert "100" in html, "сумма на объём должна считаться"
     assert "Складывать её с экспозицией заявки нельзя" in html
+
+
+def test_счёт_по_перепроверенным_строкам_отдельный(monkeypatch):
+    """Картина по крупным перепроверенным строкам ОБРАТНАЯ общей по заявке.
+
+    Замер прогона 18.09.2026: по 776 строкам заявки предложение выше потолка у
+    222 и ниже пола у 106, а по 22 перепроверенным — наоборот, завышение
+    подтверждено 13 раз против занижения 7. Складывать эти два счёта в один
+    нельзя, поэтому они и считаются отдельно.
+    """
+    monkeypatch.setattr(so, "reverify_rows", lambda: [
+        {"pn": "AA-1"}, {"pn": "BB-2"}, {"pn": "CC-3"}, {"pn": "DD-4"}])
+    rows = [{"pn": "AA-1", "usd_lo": 10, "usd_hi": 20, "qty": 1},
+            {"pn": "BB-2", "usd_lo": 10, "usd_hi": 20, "qty": 1},
+            {"pn": "CC-3", "usd_lo": 10, "usd_hi": 20, "qty": 1},
+            {"pn": "DD-4", "usd_lo": 10, "usd_hi": 20, "qty": 1}]
+    def offer(usd):
+        return {"usd": usd, "raw_price": str(usd), "currency": "USD", "origin": "СП-166 1",
+                "field": "Offer from supplier", "file": "q.pdf", "row": "1", "sheet": "",
+                "rule": "", "direction": "входящее", "line": ""}
+    supp = {"AA1": offer(99.0), "BB2": offer(1.0), "CC3": offer(15.0)}
+    st = so.reverify_stats(rows, supp)
+    assert st == {"rows": 4, "with_offer": 3, "overstated_confirmed": 1,
+                  "understated_confirmed": 1, "band_right": 1, "no_offer": 1}
+
+
+def test_счётчики_по_перепроверке_не_несут_ни_цен_ни_номеров():
+    """Они идут в репозиторий, значит в них может быть только счёт."""
+    rows = [{"pn": "AA-1", "usd_lo": 10, "usd_hi": 20, "qty": 1}]
+    st = so.reverify_stats(rows, {"AA1": {"usd": 99.0, "raw_price": "99", "currency": "USD",
+                                          "origin": "СП-166 1", "field": "f", "file": "q.pdf",
+                                          "row": "1", "sheet": "", "rule": "",
+                                          "direction": "входящее", "line": ""}})
+    for v in st.values():
+        assert isinstance(v, int)

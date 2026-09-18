@@ -429,6 +429,45 @@ def verdict_vs_offer(lo, hi, offer) -> str:
     return "вилка верна: предложение поставщика внутри неё"
 
 
+def reverify_split(rows: list) -> Counter:
+    """Счёт по перепроверенным строкам: что предложение делает с вилкой.
+
+    Отдельной функцией, потому что этот счёт идёт и в журнал прогона, и в
+    счётчики репозитория: по крупным перепроверенным строкам картина ОБРАТНАЯ
+    общей по заявке, и складывать два числа в одно нельзя.
+    """
+    kinds = Counter()
+    for z in rows:
+        w = z.get("what") or ""
+        kinds["занижение подтверждено" if w.startswith("ЗАНИЖЕНИЕ")
+              else "завышение подтверждено" if w.startswith("ЗАВЫШЕНИЕ")
+              else "вилка верна" if w.startswith("вилка верна")
+              else "предложения нет"] += 1
+    return kinds
+
+
+def reverify_stats(rows: list, supp: dict) -> dict:
+    """Те же счётчики, но пригодные для записи в набор: без цен и без номеров."""
+    rv = reverify_rows()
+    if not rv:
+        return {}
+    by = {norm_key(r["pn"]): r for r in rows if r.get("pn")}
+    zs = []
+    for x in rv:
+        pn = str(x.get("pn") or "").split("(")[0].strip()
+        r = by.get(norm_key(pn)) or {}
+        sp, _ = lookup(supp, pn)
+        offer = sp["usd"] if sp else None
+        zs.append({"what": verdict_vs_offer(r.get("usd_lo"), r.get("usd_hi"), offer)})
+    k = reverify_split(zs)
+    return {"rows": len(zs), "with_offer": sum(v for kk, v in k.items()
+                                               if kk != "предложения нет"),
+            "overstated_confirmed": k.get("завышение подтверждено", 0),
+            "understated_confirmed": k.get("занижение подтверждено", 0),
+            "band_right": k.get("вилка верна", 0),
+            "no_offer": k.get("предложения нет", 0)}
+
+
 def reverify_section(rows: list, supp: dict) -> str:
     """Таблица «наш вердикт против того, что прислал поставщик».
 
@@ -454,16 +493,10 @@ def reverify_section(rows: list, supp: dict) -> str:
                     "offer": offer, "sp": sp,
                     "what": verdict_vs_offer(r.get("usd_lo"), r.get("usd_hi"), offer)})
     out.sort(key=lambda z: (z["offer"] is None, -(z["offer"] or 0) * z["qty"]))
-    # Агрегат в журнал прогона: сколько перепроверенных строк закрыто письменным
-    # предложением контрагента и что оно делает с вилкой. Только счётчики —
-    # журнал публичный (правило 17 CLAUDE.md).
-    kinds = Counter()
-    for z in out:
-        w = z["what"]
-        kinds["занижение подтверждено" if w.startswith("ЗАНИЖЕНИЕ")
-              else "завышение подтверждено" if w.startswith("ЗАВЫШЕНИЕ")
-              else "вилка верна" if w.startswith("вилка верна")
-              else "предложения нет"] += 1
+    # Агрегат в журнал прогона и в счётчики: сколько перепроверенных строк закрыто
+    # письменным предложением контрагента и что оно делает с вилкой. Только
+    # счётчики — журнал и репозиторий публичные (правило 17 CLAUDE.md).
+    kinds = reverify_split(out)
     print(f"  перепроверенных строк: {len(out)} · КП поставщика нашлось по {hits}")
     for k, v in kinds.most_common():
         print(f"    {k}: {v}")
@@ -715,6 +748,7 @@ def main() -> int:
     diagnose(rows, ours, supp, unk)
     if a.stats_out:
         st = band_stats(rows, supp)
+        st["reverified"] = reverify_stats(rows, supp)
         st["scope"] = a.scope
         st["source"] = ("Счётчики по всей заявке: что письменные предложения поставщиков из "
                         "вложений сделок делают с НАШИМИ вилками. Ни цен, ни привязки цены к "
