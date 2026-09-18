@@ -4,16 +4,16 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 219,
-    "total_bytes": 99635472,
+    "datasets": 221,
+    "total_bytes": 101166802,
     "by_sensitivity": {
       "конфиденциально": 62,
-      "внутреннее": 120,
-      "публикуемо": 37
+      "внутреннее": 123,
+      "публикуемо": 36
     },
     "by_subproject": {
       "ГПУ-библиотека": 29,
-      "ГТУ-библиотека": 42,
+      "ГТУ-библиотека": 44,
       "ОВЭ-75": 45,
       "база ЗИП": 49,
       "база ЗИП · таможня": 18,
@@ -276,9 +276,9 @@
           "verdict"
         ]
       },
-      "last_change": "2026-09-17",
-      "last_author": "Claude",
-      "last_commit": "2b19009",
+      "last_change": "2026-09-18",
+      "last_author": "skharkov1246",
+      "last_commit": "8df72dd",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -286,14 +286,15 @@
       },
       "referenced_by": [
         "gt/tools/ship_brand.py",
+        "gt/tools/ship_brief.py",
         "gt/tools/ship_export.py",
         "gt/tools/ship_map.py",
         "gt/tools/ship_merge.py",
         "gt/tools/ship_offer.py",
         "gt/tools/ship_priced.py",
         "gt/tools/ship_questions.py",
-        "gt/tools/ship_rfq.py",
-        "tests/test_ship_fx.py"
+        "gt/tools/ship_reverify.py",
+        "gt/tools/ship_rfq.py"
       ]
     },
     {
@@ -966,6 +967,39 @@
       "referenced_by": []
     },
     {
+      "path": "gt/data/bitrix_tkp_index.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 1121164,
+      "note": "Опись вложений по сделке из Bitrix24 БЕЗ ЦЕН: какие файлы приложены к сделке и к привязанным записям СП-166, чем каждый разобран, сколько строк дал и по каким артикулам в нём нашлась цена. Цены намеренно исключены — репозиторий публичный, а цены заказчику это коммерческие данные (правило 5 CLAUDE.md, SECURITY.md). Полная выгрузка с ценами уезжает артефактом прогона и в репозиторий не попадает; воркфлоу отдельным шагом проверяет, что в описи нет пар «price: число», и отменяет коммит, если нашёл. Зачем нужно: владелец выставил заказчику ТВЁРДЫЕ цены и защищает именно их, а в товарных строках сделки их нет — они лежат в приложенных ТКП, прайсах и входящих КП. Разведочные вилки из gt/data/rfq_prices.json этими ценами НЕ являются: в основаниях там дословно «дистрибьюторы», «аналог», «экспертная вилка». Собирается gt/tools/bitrix_tkp.py, запуск руками через Actions. ЗАМЕР ХОЛОСТОГО ПРОГОНА 17.09.2026, по нему инструмент и правился: 137 сделок по слову «ЛУКОЙЛ», 475 привязанных запросов поставщикам, 1998 файлов. Имя файла есть только у 12 из 1998 — Bitrix в файловом объекте crm.item.list его не отдаёт, поэтому формат узнаётся по заголовку отдачи и по магическим байтам. Направление читается по имени поля и делится на четыре группы, а не на две: «наша цена» (Result, ТКП и Economics of the project — там выставленные заказчику цены), «входящее» (Offer from supplier(s), КП поставщика), «наш запрос» (Offer from us, Request file) и «заявка» (Техническая спецификация). До этой правки 1509 файлов из 1998 уходили в «неизвестно», потому что направление читалось только по восьми зашитым кодам СП-166, а у сделки 25 своих файловых полей.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "method",
+        "scopes",
+        "source",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "scopes",
+        "records": 3
+      },
+      "last_change": "2026-09-17",
+      "last_author": "github-actions[bot]",
+      "last_commit": "45c6fc6",
+      "updated_by": "бот (workflow)",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        ".github/workflows/bitrix-tkp.yml",
+        "gt/tools/bitrix_tkp.py",
+        "gt/tools/ship_brief.py",
+        "gt/tools/ship_inventory.py",
+        "scripts/merge_tkp_index.py"
+      ]
+    },
+    {
       "path": "zip/data/positions.json",
       "subproject": "база ЗИП",
       "bytes": 1064958,
@@ -1324,6 +1358,42 @@
       "referenced_by": []
     },
     {
+      "path": "data/chat_snapshot.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 643426,
+      "note": "Суточный снимок реакции коммерсантов в чатах сделок. Пишет бот scan.yml (chat_scan.py) раз в сутки. Руками не редактировать: правка в PR откатит свежие данные при мерже. Содержит поимённые метрики 15 сотрудников и LLM-оценки.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "assessment",
+        "days",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "assessment",
+        "records": 15
+      },
+      "last_change": "2026-09-17",
+      "last_author": "github-actions[bot]",
+      "last_commit": "7d54019",
+      "updated_by": "бот (workflow)",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "оценки и данные сотрудников"
+        ]
+      },
+      "referenced_by": [
+        ".github/workflows/gate.yml",
+        ".github/workflows/scan.yml",
+        "chat_scan.py",
+        "gpu/tools/bitrix_gpu.py",
+        "reps.py",
+        "scripts/budget_snapshot.py",
+        "zip/tools/r1700_bitrix.py"
+      ]
+    },
+    {
       "path": "zip/data/telsmith_crossrefs.json",
       "subproject": "база ЗИП",
       "bytes": 599926,
@@ -1361,42 +1431,6 @@
         "library/load_crossrefs.py",
         "scripts/build_dict.py",
         "zip/tools/build_telsmith_page.py"
-      ]
-    },
-    {
-      "path": "data/chat_snapshot.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 568264,
-      "note": "Суточный снимок реакции коммерсантов в чатах сделок. Пишет бот scan.yml (chat_scan.py) раз в сутки. Руками не редактировать: правка в PR откатит свежие данные при мерже. Содержит поимённые метрики 15 сотрудников и LLM-оценки.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "assessment",
-        "days",
-        "updated"
-      ],
-      "main_collection": {
-        "key": "assessment",
-        "records": 15
-      },
-      "last_change": "2026-09-16",
-      "last_author": "github-actions[bot]",
-      "last_commit": "9b770b2",
-      "updated_by": "бот (workflow)",
-      "sensitivity": {
-        "level": "конфиденциально",
-        "markers": [
-          "оценки и данные сотрудников"
-        ]
-      },
-      "referenced_by": [
-        ".github/workflows/gate.yml",
-        ".github/workflows/scan.yml",
-        "chat_scan.py",
-        "gpu/tools/bitrix_gpu.py",
-        "reps.py",
-        "scripts/budget_snapshot.py",
-        "zip/tools/r1700_bitrix.py"
       ]
     },
     {
@@ -1867,6 +1901,7 @@
         "markers": []
       },
       "referenced_by": [
+        "gt/tools/ship_brief.py",
         "gt/tools/ship_questions.py",
         "ove/build.py",
         "ove/tools/build_questions.py"
@@ -2010,6 +2045,57 @@
         "library/load_suppliers.py",
         "pnw/tools/build_suppliers.py",
         "zip/tools/bearing_report.py"
+      ]
+    },
+    {
+      "path": "gt/data/ship_reverify.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 315189,
+      "note": "Перепроверка крупнейших строк заявки ЛУКОЙЛ: по каждой строке заново установлено, что это за изделие, кто его делает на самом деле и под каким своим номером, жив ли номер, сколько позиция стоит в открытых каналах, есть ли рабочий канал закупки и что мешает закрыть строку. Отбор строк — по экспозиции: топ-60 дают 67 % от 9 277 410 USD экспозиции всей заявки (экспозиция = середина нашей оценочной вилки, умноженная на количество). Поле band_verdict говорит, что стало с нашей прежней оценкой: ЗАНИЖЕНА, ЗАВЫШЕНА, ВЕРНА или НЕЧЕМ ПРОВЕРИТЬ. Последнее — НЕ «дорого» и не «дёшево», а отсутствие открытой цены во всех каналах; складывать эти группы в одну цифру нельзя. Поле skeptics несёт результат проверки вывода на опровержение; пустой список означает, что проверка не прогонялась, и приравнивать это к подтверждению нельзя — исследователь уже был пойман на выдуманной цитате. ВНИМАНИЕ: набор пополняется по ходу, и до окончания прогона он ЧАСТИЧНЫЙ — число строк в нём меньше шестидесяти. Собирается рабочим процессом перепроверки, читается gt/tools/ship_reverify.py. Цены здесь рыночные, из открытых карточек продавцов; выставленных заказчику цен в наборе нет.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "rows",
+        "source",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 30,
+        "record_keys": [
+          "band_verdict",
+          "blocker",
+          "channel",
+          "contacts",
+          "lead_time",
+          "lifecycle",
+          "note",
+          "pn",
+          "price_authorized",
+          "price_high",
+          "price_kind",
+          "price_low",
+          "price_source",
+          "real_maker",
+          "real_pn",
+          "recommended",
+          "skeptics",
+          "stock",
+          "volume_note",
+          "what_it_is"
+        ]
+      },
+      "last_change": "2026-09-17",
+      "last_author": "Claude",
+      "last_commit": "67b4cd3",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/ship_brief.py",
+        "gt/tools/ship_reverify.py"
       ]
     },
     {
@@ -5292,6 +5378,68 @@
       "referenced_by": []
     },
     {
+      "path": "data/catalog_notes.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 60589,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "data/budget_snapshot.json",
+        "data/chain_coverage.json",
+        "data/chat_snapshot.json",
+        "data/import_cost.json",
+        "data/index.json",
+        "dict/",
+        "dict/node_map.json",
+        "gidromet/data/",
+        "gpu/data/bitrix_gpu.json",
+        "gpu/data/coverage.json",
+        "gpu/data/faults.json",
+        "gpu/data/overhaul_qsk60.json",
+        "gt/data/ansaldo.json",
+        "gt/data/bitrix_gt.json",
+        "gt/data/bitrix_tkp_index.json",
+        "gt/data/dossiers.json",
+        "gt/data/faults.json",
+        "gt/data/fx_rates.json",
+        "gt/data/pn_db.json",
+        "gt/data/ship_blocked.json",
+        "gt/data/ship_decoded.json",
+        "gt/data/ship_energoseti.json",
+        "gt/data/ship_lukoil.json",
+        "gt/data/ship_questions.json",
+        "gt/data/ship_recheck.json",
+        "gt/data/ship_reverify.json",
+        "gt/data/ship_rfq_letters.json",
+        "gt/data/ship_sellers.json",
+        "gt/data/ship_sweep.json",
+        "gt/docs/ЗАКУПКА-ЛУКОЙЛ.csv",
+        "gt/docs/ЗАПРОСЫ-ЛУКОЙЛ.csv",
+        "gt/docs/ЛУКОЙЛ-СИМЕНС-SGT-400.pdf",
+        "gt/docs/ЛУКОЙЛ-СОЛАР-TAURUS.pdf",
+        "gt/docs/РАЗВЕДКА-ЦЕН-ЛУКОЙЛ.pdf",
+        "gt/tools/ship_offer.py",
+        "library/data/symptoms.json",
+        "library/docfilter.py",
+        "library/indexer.py",
+        "library/load_parts.py",
+        "library/load_suppliers.py"
+      ],
+      "last_change": "2026-09-17",
+      "last_author": "Claude",
+      "last_commit": "d6742a5",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "scripts/build_catalog.py",
+        "tests/test_catalog_guard.py"
+      ]
+    },
+    {
       "path": "gidromet/data/serebro.json",
       "subproject": "гидрометаллургия",
       "bytes": 59946,
@@ -5572,68 +5720,6 @@
       },
       "referenced_by": [
         "gpu/build.py"
-      ]
-    },
-    {
-      "path": "data/catalog_notes.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 57216,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "data/budget_snapshot.json",
-        "data/chain_coverage.json",
-        "data/chat_snapshot.json",
-        "data/import_cost.json",
-        "data/index.json",
-        "dict/",
-        "dict/node_map.json",
-        "gidromet/data/",
-        "gpu/data/bitrix_gpu.json",
-        "gpu/data/coverage.json",
-        "gpu/data/faults.json",
-        "gpu/data/overhaul_qsk60.json",
-        "gt/data/ansaldo.json",
-        "gt/data/bitrix_gt.json",
-        "gt/data/bitrix_tkp_index.json",
-        "gt/data/dossiers.json",
-        "gt/data/faults.json",
-        "gt/data/fx_rates.json",
-        "gt/data/pn_db.json",
-        "gt/data/ship_blocked.json",
-        "gt/data/ship_decoded.json",
-        "gt/data/ship_energoseti.json",
-        "gt/data/ship_lukoil.json",
-        "gt/data/ship_questions.json",
-        "gt/data/ship_recheck.json",
-        "gt/data/ship_rfq_letters.json",
-        "gt/data/ship_sellers.json",
-        "gt/data/ship_sweep.json",
-        "gt/docs/ЗАКУПКА-ЛУКОЙЛ.csv",
-        "gt/docs/ЗАПРОСЫ-ЛУКОЙЛ.csv",
-        "gt/docs/ЛУКОЙЛ-СИМЕНС-SGT-400.pdf",
-        "gt/docs/ЛУКОЙЛ-СОЛАР-TAURUS.pdf",
-        "gt/docs/РАЗВЕДКА-ЦЕН-ЛУКОЙЛ.pdf",
-        "gt/tools/ship_offer.py",
-        "library/data/symptoms.json",
-        "library/docfilter.py",
-        "library/indexer.py",
-        "library/load_parts.py",
-        "library/load_suppliers.py",
-        "library/ocr.py"
-      ],
-      "last_change": "2026-09-17",
-      "last_author": "Claude",
-      "last_commit": "2b19009",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "scripts/build_catalog.py",
-        "tests/test_catalog_guard.py"
       ]
     },
     {
@@ -7581,6 +7667,46 @@
       ]
     },
     {
+      "path": "gt/data/ship_questions.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 23745,
+      "note": "Вопросы к заказчику по заявке ЛУКОЙЛ: 13 позиций на 5 208 штук, по которым запрос цены уйдёт впустую, пока не расшифрована номенклатура. Не производная от данных, а вывод инженера по разбору проверок, поэтому файл ведётся руками. Шесть родов неясности: неизвестна фасовка (DCA4 — не артикул, а семейство: пинта, канистра 1,89 л, ведро 18,9 л, бочка 208 л или вовсе фильтр, разброс по деньгам в двадцать раз); комплекты или штуки (свечи Jenbacher идут банками по 4, 587 комплектов это 2 348 свечей); снятый или несуществующий номер (цепочки 334976 → 389588 → 433894, 201601 → 255377 → 1219674, 263174 → 1219670; номер 265174 не найден ни у одного из семи поставщиков); не определён тип машины (657541 для Type 2/3/4 кабель зажигания, для Type 6 наконечник свечи — разные изделия); не определено исполнение (класс прочности крепежа SGT-400 в номере Ruston не закодирован; размер высокотемпературной стяжки из номера не выводится); наименование расходится с каталогом (4970773 в заявке уплотнительная шайба, у Cummins RING, SPARK PLUG). По каждой строке записано, что уже установлено самостоятельно, чтобы заказчик подтверждал, а не искал заново. Правило: пока строка здесь, она не идёт ни в письма запроса цен, ни в сумму закупки. Читаемая версия — gt/docs/ВОПРОСЫ-ЗАКАЗЧИКУ-ЛУКОЙЛ.pdf, собирается gt/tools/ship_questions.py.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "method",
+        "questions",
+        "rule",
+        "source",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "questions",
+        "records": 19,
+        "record_keys": [
+          "ask",
+          "cost",
+          "kind",
+          "known",
+          "pn",
+          "qty",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-17",
+      "last_author": "Claude",
+      "last_commit": "a75bd10",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/ship_brief.py",
+        "gt/tools/ship_questions.py"
+      ]
+    },
+    {
       "path": "ove/data/audit_log.json",
       "subproject": "ОВЭ-75",
       "bytes": 21236,
@@ -7821,42 +7947,34 @@
       ]
     },
     {
-      "path": "gt/data/ship_questions.json",
+      "path": "gt/data/ship_decoded.json",
       "subproject": "ГТУ-библиотека",
-      "bytes": 16753,
-      "note": "Вопросы к заказчику по заявке ЛУКОЙЛ: 13 позиций на 5 208 штук, по которым запрос цены уйдёт впустую, пока не расшифрована номенклатура. Не производная от данных, а вывод инженера по разбору проверок, поэтому файл ведётся руками. Шесть родов неясности: неизвестна фасовка (DCA4 — не артикул, а семейство: пинта, канистра 1,89 л, ведро 18,9 л, бочка 208 л или вовсе фильтр, разброс по деньгам в двадцать раз); комплекты или штуки (свечи Jenbacher идут банками по 4, 587 комплектов это 2 348 свечей); снятый или несуществующий номер (цепочки 334976 → 389588 → 433894, 201601 → 255377 → 1219674, 263174 → 1219670; номер 265174 не найден ни у одного из семи поставщиков); не определён тип машины (657541 для Type 2/3/4 кабель зажигания, для Type 6 наконечник свечи — разные изделия); не определено исполнение (класс прочности крепежа SGT-400 в номере Ruston не закодирован; размер высокотемпературной стяжки из номера не выводится); наименование расходится с каталогом (4970773 в заявке уплотнительная шайба, у Cummins RING, SPARK PLUG). По каждой строке записано, что уже установлено самостоятельно, чтобы заказчик подтверждал, а не искал заново. Правило: пока строка здесь, она не идёт ни в письма запроса цен, ни в сумму закупки. Читаемая версия — gt/docs/ВОПРОСЫ-ЗАКАЗЧИКУ-ЛУКОЙЛ.pdf, собирается gt/tools/ship_questions.py.",
+      "bytes": 18397,
+      "note": "Расшифровка номенклатуры Siemens SGT-400 и Solar Turbines по заявке ЛУКОЙЛ: 19 позиций, по которым разбор дал стандарт, изготовителя узла или прямой отказ с причиной. Ведётся руками: это вывод инженера, а не производная от данных. Главное содержание — схема девятизначных номеров Ruston/Alstom (SGT-400 = Cyclone, наследное имя есть в lib_models): разряды кодируют тип изделия, покрытие, диаметр резьбы и длину, и правило сошлось на 85 строках из 85 открытой ведомости SGT-400 на 437 позиций — проверено скриптом. Этим стандартный крепёж заявки переводится из «артикул не опознан» в «заказывается по DIN у любого крепёжного поставщика». ПРЕДУПРЕЖДЕНИЕ, записанное в самом файле: схема НЕ даёт класса прочности, для несущего крепежа турбины его обязан подтвердить чертёж или OEM. Отдельно помечены две позиции, которые стандартом закрывать нельзя: RW21222/4 и RW21223/1 — чертёжные детали камеры сгорания, где товарная легированная сталь класса 12.9 в горячей зоне разупрочняется. По Solar вскрыты изготовители узлов под шильдой OEM (спиральная прокладка → Flexitallic, шнур витон → Global O-Ring, лист CNAF → KLINGERSIL, губчатая лента → LAMATEK) и честно зафиксированы два отказа: 199515-1 и 1062000 не опознаны, потому что Solar не публикует ни материала, ни толщины. Поле conf у каждой строки говорит, чем расшифровка подтверждена — ведомостью или гипотезой. Читается gt/tools/ship_brand.py.",
       "format": "json",
       "shape": "объект",
       "top_keys": [
         "method",
-        "questions",
-        "rule",
+        "rows",
         "source",
-        "updated"
+        "updated",
+        "warning"
       ],
       "main_collection": {
-        "key": "questions",
-        "records": 13,
-        "record_keys": [
-          "ask",
-          "cost",
-          "kind",
-          "known",
-          "pn",
-          "qty",
-          "unit"
-        ]
+        "key": "rows",
+        "records": 27
       },
       "last_change": "2026-09-17",
-      "last_author": "skharkov1246",
-      "last_commit": "af3d509",
+      "last_author": "Claude",
+      "last_commit": "ee6417e",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
         "markers": []
       },
       "referenced_by": [
-        "gt/tools/ship_questions.py"
+        "gt/tools/ship_brand.py",
+        "gt/tools/ship_brief.py"
       ]
     },
     {
@@ -8788,36 +8906,6 @@
       },
       "referenced_by": [
         "ove/build.py"
-      ]
-    },
-    {
-      "path": "gt/data/ship_decoded.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 8947,
-      "note": "Расшифровка номенклатуры Siemens SGT-400 и Solar Turbines по заявке ЛУКОЙЛ: 19 позиций, по которым разбор дал стандарт, изготовителя узла или прямой отказ с причиной. Ведётся руками: это вывод инженера, а не производная от данных. Главное содержание — схема девятизначных номеров Ruston/Alstom (SGT-400 = Cyclone, наследное имя есть в lib_models): разряды кодируют тип изделия, покрытие, диаметр резьбы и длину, и правило сошлось на 85 строках из 85 открытой ведомости SGT-400 на 437 позиций — проверено скриптом. Этим стандартный крепёж заявки переводится из «артикул не опознан» в «заказывается по DIN у любого крепёжного поставщика». ПРЕДУПРЕЖДЕНИЕ, записанное в самом файле: схема НЕ даёт класса прочности, для несущего крепежа турбины его обязан подтвердить чертёж или OEM. Отдельно помечены две позиции, которые стандартом закрывать нельзя: RW21222/4 и RW21223/1 — чертёжные детали камеры сгорания, где товарная легированная сталь класса 12.9 в горячей зоне разупрочняется. По Solar вскрыты изготовители узлов под шильдой OEM (спиральная прокладка → Flexitallic, шнур витон → Global O-Ring, лист CNAF → KLINGERSIL, губчатая лента → LAMATEK) и честно зафиксированы два отказа: 199515-1 и 1062000 не опознаны, потому что Solar не публикует ни материала, ни толщины. Поле conf у каждой строки говорит, чем расшифровка подтверждена — ведомостью или гипотезой. Читается gt/tools/ship_brand.py.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "method",
-        "rows",
-        "source",
-        "updated",
-        "warning"
-      ],
-      "main_collection": {
-        "key": "rows",
-        "records": 19
-      },
-      "last_change": "2026-09-17",
-      "last_author": "skharkov1246",
-      "last_commit": "af3d509",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "публикуемо",
-        "markers": []
-      },
-      "referenced_by": [
-        "gt/tools/ship_brand.py"
       ]
     },
     {

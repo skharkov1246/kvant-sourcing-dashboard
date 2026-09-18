@@ -261,18 +261,21 @@ def test_страница_входа_не_принимается_за_файл()
 
     def fake_get(url, timeout=0):
         body = page if "bad" in url else real
-        return types.SimpleNamespace(status_code=200, content=body)
+        return types.SimpleNamespace(
+            status_code=200, content=body,
+            headers={"Content-Disposition": 'attachment; filename="оферта.csv"'})
 
     import sys as _s
     mod = _s.modules.setdefault("requests", types.SimpleNamespace())
     old = getattr(mod, "get", None)
     mod.get = fake_get
     try:
-        body, how = T.fetch("https://portal/bad")
+        body, how, _ = T.fetch("https://portal/bad")
         assert body is None
         assert "страница входа" in how, how
-        body2, how2 = T.fetch("https://portal/good")
+        body2, how2, name2 = T.fetch("https://portal/good")
         assert body2 is not None and how2 == "ок"
+        assert name2 == "оферта.csv", name2
     finally:
         if old is not None:
             mod.get = old
@@ -283,13 +286,14 @@ def test_короткий_ответ_считается_пустым():
     import sys as _s
 
     def fake_get(url, timeout=0):
-        return types.SimpleNamespace(status_code=200, content=b"tiny")
+        return types.SimpleNamespace(status_code=200, content=b"tiny",
+                                     headers={})
 
     mod = _s.modules.setdefault("requests", types.SimpleNamespace())
     old = getattr(mod, "get", None)
     mod.get = fake_get
     try:
-        body, how = T.fetch("https://portal/x")
+        body, how, _ = T.fetch("https://portal/x")
         assert body is None and how == "пусто"
     finally:
         if old is not None:
@@ -321,3 +325,223 @@ def test_тело_письма_считается_источником_цены(
     got = {p["pn"]: p["price"] for p in T.price_rows(rows, T.header_map(rows))}
     assert got.get("3420932") == 86.89, got
     assert got.get("1017891") == 6.52, got
+
+
+# --- правки по итогам ХОЛОСТОГО прогона 17.09.2026 ---------------------------
+# Прогон дал три числа, каждое из которых меняло поведение:
+#   1998 файлов — и ИМЯ есть только у 12: crm.item.list имени не отдаёт;
+#   1509 файлов уходили в «неизвестно», потому что направление читалось только
+#     по восьми зашитым кодам СП-166, а у сделки 25 своих файловых полей;
+#   предел --max-files 400 отрезал бы хвост в порядке обхода, то есть случайно.
+
+
+def test_имя_берётся_из_заголовка_отдачи():
+    """Единственное место, где имя есть. Две формы заголовка, обе рабочие."""
+    assert T.name_from('attachment; filename="КП Сименс.xlsx"') == "КП Сименс.xlsx"
+    assert T.name_from("attachment; filename*=utf-8''%D0%9A%D0%9F.pdf") == "КП.pdf"
+    assert T.name_from("inline") == ""
+    assert T.name_from("") == ""
+
+
+def test_формат_узнаётся_без_имени():
+    """Без этого 99 % файлов получили бы «формат не поддержан» при рабочей
+    выгрузке — то есть прогон отчитался бы нулём и соврал о причине."""
+    assert T.sniff(b"%PDF-1.7\nxxx") == ".pdf"
+    assert T.sniff(b"PK\x03\x04" + b"xl/workbook.xml" + b"\x00" * 50) == ".xlsx"
+    assert T.sniff(b"PK\x03\x04" + b"word/document.xml" + b"\x00" * 50) == ".zip"
+    assert T.sniff(b"\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1" + b"\x00" * 40) == ".xls"
+    assert T.sniff("Артикул;Цена\n3420932;86,89\n".encode()) == ".txt"
+
+
+def test_двоичное_не_объявляется_текстом():
+    """b"\\x00\\x01binary" — ВАЛИДНЫЙ utf-8, и проверка одной декодировкой
+    объявляла двоичный чертёж текстом. Ноль-байт решает раньше кодировки."""
+    assert T.sniff(b"\x00\x01binary") == ".bin"
+    got, how = T.parse("чертёж.dwg", b"\x00\x01binary")
+    assert got == [] and "не поддержан" in how
+
+
+def test_безымянный_csv_всё_равно_разбирается():
+    """Сквозная проверка: имени нет вовсе, а позиция с ценой должна найтись."""
+    body = ("Артикул;Наименование;Кол-во;Цена\n"
+            "3420932;прокладка;566;86,89\n").encode()
+    rows, how = T.parse("", body)
+    assert rows, "безымянный файл не разобрался"
+    assert how == "текст"
+    pr = T.price_rows(rows, T.header_map(rows))
+    assert len(pr) == 1 and pr[0]["pn"] == "3420932"
+    assert abs(pr[0]["price"] - 86.89) < 0.01, pr[0]
+
+
+def test_направление_по_имени_поля_сделки():
+    """Четыре группы, а не две. «Наша цена» — то, что владелец просил оставить."""
+    assert T.dir_from_field("Offer from supplier(s)") == "входящее"
+    assert T.dir_from_field("КП поставщика") == "входящее"
+    assert T.dir_from_field("Offer, old") == "входящее"
+    assert T.dir_from_field("Offer from us") == "наш запрос"
+    assert T.dir_from_field("Request file") == "наш запрос"
+    assert T.dir_from_field("Result, ТКП") == "наша цена"
+    assert T.dir_from_field("Economics of the project") == "наша цена"
+    assert T.dir_from_field("Техническая спецификация") == "заявка"
+    assert T.dir_from_field("Tender Platform Complexity") == "неизвестно"
+    assert T.dir_from_field("") == "неизвестно"
+
+
+def test_наш_запрос_проверяется_раньше_входящего():
+    """«Processed file for supplier» содержит слово supplier, но это НАШ файл.
+    Порядок правил — часть поведения, а не косметика."""
+    assert T.dir_from_field("Processed file for supplier") == "наш запрос"
+
+
+def test_порядок_разбора_отрезает_картинки_а_не_цены():
+    """Предел есть всегда, значит вопрос — что останется неразобранным."""
+    def c(d, f):
+        return {"direction": d, "field_name": f}
+    items = [
+        c("неизвестно", "Tender Platform Complexity"),
+        c("наш запрос", "Offer from us"),
+        c("входящее", "Offer from supplier(s)"),
+        c("заявка", "Техническая спецификация"),
+        c("наша цена", "Result, ТКП"),
+        c("неизвестно", "вложение дела"),
+    ]
+    order = [x["field_name"] for x in sorted(items, key=T.rank)]
+    assert order[0] == "Result, ТКП", order
+    assert order[1] == "Offer from supplier(s)", order
+    assert order[2] == "вложение дела", order
+    assert order.index("вложение дела") < order.index("Tender Platform Complexity")
+    assert order[-1] == "Offer from us", order
+
+
+def test_наша_цена_входит_в_разбор():
+    """Иначе выставленные цены владельца не скачиваются вовсе."""
+    assert "наша цена" in T.WANTED
+    assert "входящее" in T.WANTED
+
+
+def test_заявка_тоже_входит_потому_что_в_ней_есть_цены():
+    """Исправление правила по замеру, а не по рассуждению.
+
+    Я исключал «Техническую спецификацию» как требования заказчика без цен.
+    Боевой прогон 17.09.2026 показал обратное: 1 431 строка с парой «артикул —
+    цена» и 394 артикула заявки в файлах этого поля. Правило теряло треть
+    покрытия.
+    """
+    assert "заявка" in T.WANTED
+    assert T.dir_from_field("Техническая спецификация") == "заявка"
+    # а вот наши исходящие по-прежнему за бортом: это ориентиры поставщику
+    assert "наш запрос" not in T.WANTED
+
+
+def test_распознавание_отказывает_честно_когда_его_нет(monkeypatch):
+    """Отсутствие tesseract — НЕ ошибка разбора.
+
+    Если бы оно им считалось, статус стал бы «не разобрался», и оценка объёма
+    работы по сканам занизилась бы — ровно то, чего запрещает правило 15
+    CLAUDE.md. Инструмент обязан сказать «распознавание недоступно».
+    """
+    monkeypatch.setattr(T, "ocr_available", lambda: False)
+    rows, how = T.rows_from_ocr("snap.png", b"\x89PNG\r\n\x1a\n" + b"\x00" * 300)
+    assert rows == []
+    assert "распознавание недоступно" in how
+
+
+def test_картинка_уходит_в_распознавание_а_не_в_неподдержанный_формат(monkeypatch):
+    monkeypatch.setattr(T, "ocr_available", lambda: False)
+    rows, how = T.parse("шильдик.jpg", b"\xff\xd8\xff" + b"\x00" * 400)
+    assert rows == [] and "распознавание" in how, how
+    # а вот чертёж dwg распознаванием не спасти — там честный отказ по формату
+    rows2, how2 = T.parse("чертёж.dwg", b"\x00\x01binary")
+    assert "не поддержан" in how2
+
+
+def test_pdf_без_текстового_слоя_идёт_в_распознавание(monkeypatch):
+    """Прежде такой файл объявлялся «скан, требуется распознавание» и на этом
+    всё. Теперь распознавание пробуется, а статус говорит, чем кончилось."""
+    monkeypatch.setattr(T, "ocr_available", lambda: True)
+    # текст должен быть длиннее порога шума (40 знаков), иначе распознавание
+    # честно скажет «текста нет» — и первая версия теста на это и попалась
+    monkeypatch.setattr(T, "ocr_pdf_text", lambda b: (
+        "Спецификация к предложению\n"
+        "Артикул;Наименование;Кол-во;Цена\n"
+        "3420932;прокладка;566;86,89\n"))
+    rows, how = T.parse("скан.pdf", b"%PDF-1.4\n" + b"\x00" * 400)
+    assert how == "распознавание"
+    pr = T.price_rows(rows, T.header_map(rows))
+    assert len(pr) == 1 and pr[0]["pn"] == "3420932"
+
+
+def test_распознанный_шум_не_считается_текстом(monkeypatch):
+    monkeypatch.setattr(T, "ocr_available", lambda: True)
+    monkeypatch.setattr(T, "ocr_image_text", lambda b: "  |. ,\n")
+    rows, how = T.rows_from_ocr("snap.png", b"\x89PNG" + b"\x00" * 300)
+    assert rows == [] and "текста нет" in how
+
+
+def _zip_of(files: dict) -> bytes:
+    """Придуманный архив: имя → содержимое."""
+    import io as _io
+    import zipfile
+    buf = _io.BytesIO()
+    with zipfile.ZipFile(buf, "w") as z:
+        for n, b in files.items():
+            z.writestr(n, b)
+    return buf.getvalue()
+
+
+def test_кп_внутри_архива_разбирается():
+    """Замер по «НВН»: десять файлов получили «формат не поддержан», а
+    предложения в этом портале приходят и архивами."""
+    body = _zip_of({
+        "КП/оферта.csv": "Артикул;Наименование;Кол-во;Цена\n3420932;прокладка;566;86,89\n",
+        "КП/письмо.txt": "здравствуйте, направляем предложение",
+        "КП/логотип.png": b"\x89PNG\r\n\x1a\n",
+    })
+    rows, how = T.parse("пакет.zip", body)
+    assert rows, how
+    assert "архив" in how
+    pr = T.price_rows(rows, T.header_map(rows))
+    assert len(pr) == 1 and pr[0]["pn"] == "3420932"
+    assert abs(pr[0]["price"] - 86.89) < 0.01
+
+
+def test_лист_несёт_имя_файла_внутри_архива():
+    """Иначе непонятно, откуда взялась строка, а происхождение обязано быть."""
+    body = _zip_of({"offer/a.csv": "Артикул;Цена\nX1;10\n"})
+    rows, _ = T.parse("p.zip", body)
+    assert any("offer/a.csv" in str(sheet) for sheet, _, _ in rows), rows
+
+
+def test_архив_без_разбираемого_отказывает_с_числом():
+    body = _zip_of({"a.png": b"\x89PNG", "b.exe": b"MZ"})
+    rows, how = T.parse("p.zip", body)
+    assert rows == []
+    assert "пропущено 2" in how, how
+
+
+def test_битый_архив_не_валит_прогон():
+    rows, how = T.parse("p.zip", b"PK\x03\x04" + b"\x00" * 50)
+    assert rows == [] and "архив" in how
+
+
+def test_xlsx_не_уходит_в_разбор_архива_хотя_он_и_zip():
+    """xlsx — тоже zip, но у него свой разбор, и он обязан сработать первым.
+
+    Проверяется ПОРЯДОК, а не сам разбор, поэтому openpyxl тут не нужен: гейт
+    его не устанавливает, и первая версия теста на этом и упала. Даже когда
+    разбор xlsx не удался, способ обязан называться «xlsx», а не «архив» —
+    иначе таблица уехала бы в архивную ветку и потеряла листы.
+    """
+    body = b"PK\x03\x04" + b"xl/workbook.xml" + b"\x00" * 200
+    assert T.sniff(body) == ".xlsx"
+    _, how = T.parse("спец.xlsx", body)
+    assert how.startswith("xlsx"), how
+    assert "архив" not in how
+
+
+def test_docx_и_zip_идут_в_архивный_разбор():
+    """А вот у docx своего разбора нет, и он должен пойти как архив."""
+    body = b"PK\x03\x04" + b"word/document.xml" + b"\x00" * 200
+    assert T.sniff(body) == ".zip"
+    _, how = T.parse("письмо.docx", body)
+    assert "архив" in how, how

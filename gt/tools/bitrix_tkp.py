@@ -82,8 +82,74 @@ RFQ_FILE_FIELDS = {
 RFQ_SELECT = ["id", "title", "stageId", "parentId2", "ufCrm18Supplier", "companyId",
               "createdTime", "assignedById"]
 
-# что берём в разбор: входящее — обязательно, остальное только с --all-files
-WANTED = {"входящее"}
+# НАПРАВЛЕНИЕ ПО ИМЕНИ ПОЛЯ СДЕЛКИ. Измерено холостым прогоном 17.09.2026: у
+# сделки 25 файловых полей и 1998 файлов, из них по коду поля СП-166 опознавалось
+# лишь 9 — остальные 1509 уходили в «неизвестно» и разбирались бы вслепую. Имена
+# полей сделки говорят прямо, и делятся они на ЧЕТЫРЕ группы, а не на две:
+#   «Offer from us», «Request file» — наши исходящие, цен заказчику там нет;
+#   «Result, ТКП», «Economics of the project» — НАШИ ВЫСТАВЛЕННЫЕ ЦЕНЫ, ровно
+#     то, что владелец просил оставить: «строки, на которые я дал цены»;
+#   «Offer from supplier(s)», «КП поставщика» — входящие от контрагентов;
+#   «Техническая спецификация», «Technical data from customer» — заявка
+#     заказчика, цен в ней нет, и 396 таких файлов не должны съесть предел.
+# Порядок правил значим: «наш запрос» проверяется первым, иначе «Processed file
+# for supplier» попадёт во входящие.
+FIELD_DIR = [
+    (re.compile(r"offer\s+from\s+us|наше?\s+кп|request\s+file|запрос\s+цен"
+                r"|запрос\s+оферт|processed\s+file\s+for\s+supplier", re.I), "наш запрос"),
+    (re.compile(r"result\W*ткп|economics\s+of\s+the\s+project", re.I), "наша цена"),
+    (re.compile(r"offer\s+from\s+supplier|кп\s+поставщика|offer\W*old"
+                r"|processed\s+offer|order\s+confirmation", re.I), "входящее"),
+    (re.compile(r"техническ\w*\s+специф|technical\s+data\s+from\s+customer"
+                r"|customer\s+request", re.I), "заявка"),
+]
+
+# Порядок разбора при пределе --max-files. Предел есть всегда, значит вопрос не
+# «разберём ли всё», а «что останется неразобранным». Остаться должны картинки
+# канбана, а не выставленные цены.
+DIR_PRIORITY = {"наша цена": 0, "входящее": 1, "неизвестно": 2,
+                "заявка": 3, "наш запрос": 4}   # порядок разбора, не фильтр
+# внутри «неизвестно»: вложение письма ценнее канбан-картинки
+FIELD_PRIORITY = [
+    (re.compile(r"вложение\s+(дела|комментария)|result\s+file|other\s*\(important\)"
+                r"|мануал|delivery\s+agreement", re.I), 0),
+    (re.compile(r"tender\s+platform|картинка|kanban|purchasing\s+method"
+                r"|documents,\s*bot|bank\s+details", re.I), 2),
+]
+
+
+def dir_from_field(name: str) -> str:
+    """Направление по имени поля. При сомнении «неизвестно», а не «наш запрос»:
+    отброшенное КП мы не увидим никогда, а наш же запрос виден сразу по
+    отсутствию цен (правило 7 CLAUDE.md — признак либо защищает, либо обвиняет).
+    """
+    for rx, d in FIELD_DIR:
+        if rx.search(name or ""):
+            return d
+    return "неизвестно"
+
+
+def rank(c: dict) -> tuple:
+    fp = 1
+    for rx, p in FIELD_PRIORITY:
+        if rx.search(c.get("field_name") or ""):
+            fp = p
+            break
+    return (DIR_PRIORITY.get(c.get("direction"), 2), fp)
+
+
+# Что берём в разбор. «Заявка» здесь ТОЖЕ, и это исправление моего же правила
+# по замеру. Я считал, что в требованиях заказчика цен нет, и исключал их —
+# боевой прогон 17.09.2026 показал обратное: в файлах поля «Техническая
+# спецификация» 1 431 строка с парой «артикул — цена» и 394 артикула заявки.
+# Похоже, ответ заказчику возвращают в том же шаблоне, в котором пришёл запрос,
+# и цены оказываются в файле с этим именем. Правило, исключавшее их, теряло
+# треть покрытия.
+#
+# «Наш запрос» остаётся исключённым по умолчанию: там цен тоже хватает (1 345
+# строк в одном файле), но это наши ориентиры поставщику, а не выставленное
+# заказчику и не присланное контрагентом. Кто хочет и их — ставит --all-files.
+WANTED = {"входящее", "наша цена", "заявка"}
 
 PN_RES = [
     r"\b\d{6,7}-\d{1,4}(?:-\d{1,4})?\b", r"\b\d{6}C\d\b", r"\b64/\d{8}/\d{1,4}\b",
@@ -235,6 +301,72 @@ def rows_from_pdf(content: bytes) -> list[tuple[str, int, list]]:
     return out
 
 
+# Распознавание. Боевой прогон по «Энергосети» 17.09.2026: из 93 файлов 24
+# оказались картинками и 3 сканами без текстового слоя — 29 % файлов, и цены в
+# них есть, просто не в виде текста. Способ взят из base/reparse.py, где он уже
+# работает на этом же корпусе: pytesseract с языками rus+eng, мелкие картинки
+# увеличиваются вдвое (иначе распознаются плохо).
+#
+# Отсутствие tesseract — НЕ ошибка разбора: инструмент должен честно сказать
+# «распознавание недоступно», а не «не разобрался». Иначе оценка объёма работы
+# по сканам занижается, как это уже было (правило 15 CLAUDE.md).
+OCR_LANG = "rus+eng"
+OCR_MAX_PAGES = 12
+OCR_MIN_CHARS = 40          # меньше — шум распознавания, а не текст
+
+
+def ocr_available() -> bool:
+    try:
+        import pytesseract
+        pytesseract.get_tesseract_version()
+        return True
+    except Exception:
+        return False
+
+
+def ocr_image_text(content: bytes) -> str:
+    import pytesseract
+    from PIL import Image
+    img = Image.open(io.BytesIO(content))
+    if img.mode not in ("L", "RGB"):
+        img = img.convert("RGB")
+    if max(img.size) < 900:
+        img = img.resize((img.width * 2, img.height * 2))
+    return pytesseract.image_to_string(img, lang=OCR_LANG)
+
+
+def ocr_pdf_text(content: bytes) -> str:
+    try:
+        from pdf2image import convert_from_bytes
+        pages = convert_from_bytes(content, dpi=200, first_page=1,
+                                   last_page=OCR_MAX_PAGES)
+    except Exception:
+        return ""
+    import pytesseract
+    out = []
+    for pg in pages:
+        try:
+            out.append(pytesseract.image_to_string(pg, lang=OCR_LANG))
+        except Exception:
+            continue
+    return "\n".join(out)
+
+
+def rows_from_ocr(name: str, content: bytes) -> tuple[list, str]:
+    """Строки из картинки или скана. Возвращает (строки, способ)."""
+    if not ocr_available():
+        return [], "распознавание недоступно (нет tesseract)"
+    low = (name or "").lower()
+    try:
+        txt = (ocr_pdf_text(content) if low.endswith(".pdf")
+               else ocr_image_text(content))
+    except Exception as e:
+        return [], f"распознавание не удалось ({type(e).__name__})"
+    if len(txt.strip()) < OCR_MIN_CHARS:
+        return [], "распознано, но текста нет"
+    return rows_from_text(txt.encode("utf-8")), "распознавание"
+
+
 PARSERS = [
     ((".xlsx", ".xlsm"), rows_from_xlsx, "xlsx"),
     ((".xls",), rows_from_xls, "xls"),
@@ -243,16 +375,115 @@ PARSERS = [
 ]
 
 
+def sniff(content: bytes) -> str:
+    """Расширение по магическим байтам.
+
+    Обязательно, а не «на всякий случай»: холостой прогон 17.09.2026 показал,
+    что ИМЕНИ НЕТ у 1986 файлов из 1998 — crm.item.list в файловом объекте
+    отдаёт только id и ссылку. Разбор выбирается по расширению, поэтому без
+    этого 99 % файлов получили бы «формат не поддержан», и прогон отчитался бы
+    нулём при полностью рабочей выгрузке.
+    """
+    if content[:4] == b"%PDF":
+        return ".pdf"
+    if content[:2] == b"PK":
+        head = content[:4000]
+        if b"xl/" in head or b"workbook.xml" in head:
+            return ".xlsx"
+        return ".zip"
+    if content[:8] == b"\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1":
+        return ".xls"          # старый формат Office; xlrd разберёт
+    if content[:5] == b"{\\rtf" or content[:4] == b"\x7fELF":
+        return ".bin"
+    if content[:3] in (b"\xff\xd8\xff",) or content[:8] == b"\x89PNG\r\n\x1a\n":
+        return ".png"
+    head = content[:4000]
+    # НОЛЬ-БАЙТ РЕШАЕТ РАНЬШЕ КОДИРОВКИ. b"\x00\x01binary" — валидный utf-8, и
+    # проверка одной декодировкой объявляла двоичный чертёж текстом. Текстовый
+    # файл ноль-байтов не содержит.
+    if b"\x00" in head:
+        return ".bin"
+    for enc in ("utf-8", "cp1251"):
+        try:
+            head.decode(enc)
+            return ".txt"
+        except UnicodeDecodeError:
+            continue
+    return ".bin"
+
+
+def rows_from_zip(content: bytes) -> tuple[list, str]:
+    """Строки из архива: КП часто присылают запакованным.
+
+    Замер боевого прогона по «НВН» 17.09.2026: десять файлов получили «формат не
+    поддержан», а base/parse_archives.py в этом же репозитории существует именно
+    потому, что предложения приходят архивами. Внутрь заходим на ОДИН уровень:
+    архив в архиве бывает, но редко, а бесконечная вложенность — способ
+    подвесить прогон.
+
+    Имя участника архива есть, поэтому разбор выбирается по нему, а не по
+    магическим байтам, и это надёжнее.
+    """
+    import zipfile
+    try:
+        z = zipfile.ZipFile(io.BytesIO(content))
+    except Exception as e:
+        return [], f"архив не открылся ({type(e).__name__})"
+    rows, opened, skipped = [], 0, 0
+    for name in z.namelist():
+        low = name.lower()
+        if low.endswith("/") or not low.endswith(
+                (".xlsx", ".xlsm", ".xls", ".csv", ".txt", ".tsv", ".pdf")):
+            skipped += 1
+            continue
+        try:
+            body = z.read(name)
+        except Exception:
+            skipped += 1
+            continue
+        got, _ = parse(name, body)
+        if got:
+            # лист помечаем именем файла внутри архива, иначе непонятно, откуда
+            # взялась строка
+            rows += [(f"{name}:{sheet}", r, cells) for sheet, r, cells in got]
+            opened += 1
+        else:
+            skipped += 1
+    if not rows:
+        return [], f"архив: разбираемого внутри нет (пропущено {skipped})"
+    return rows, f"архив ({opened} файлов внутри, пропущено {skipped})"
+
+
 def parse(name: str, content: bytes):
     """Возвращает (строки, способ). Отказ выносится ПО ФАЙЛУ, а не по строке —
     правило 13 CLAUDE.md: построчный отказ теряет до 40 % позиций."""
     low = (name or "").lower()
+    if not low.endswith(tuple(e for exts, _, _ in PARSERS for e in exts)):
+        low = (name or "") + sniff(content)
+        low = low.lower()
     for exts, fn, tag in PARSERS:
         if low.endswith(exts):
             try:
-                return fn(content), tag
+                rows = fn(content)
             except Exception as e:
+                # ОШИБКА чтения pdf — это тоже случай скана: извлекатель текста
+                # спотыкается ровно там, где текстового слоя нет. Отдавать такой
+                # файл как «не разобрался» значит терять его цены совсем.
+                if low.endswith(".pdf"):
+                    got, how = rows_from_ocr(low, content)
+                    if got:
+                        return got, how
+                    return [], f"{tag}: не разобрался ({type(e).__name__}); {how}"
                 return [], f"{tag}: не разобрался ({type(e).__name__})"
+            # pdf без текстового слоя — это скан, и он идёт в распознавание, а
+            # не объявляется пустым (правило 15 CLAUDE.md: статус не должен врать)
+            if not rows and low.endswith(".pdf"):
+                return rows_from_ocr(low, content)
+            return rows, tag
+    if low.endswith((".png", ".jpg", ".jpeg", ".tif", ".tiff", ".bmp")):
+        return rows_from_ocr(low, content)
+    if low.endswith((".zip", ".xlsx", ".docx")) or content[:2] == b"PK":
+        return rows_from_zip(content)
     return [], "формат не поддержан"
 
 
@@ -424,21 +655,36 @@ def from_deal(bx: BitrixClient, did: int, ffields: dict) -> list:
     for it in items:
         for code, title in ffields.items():
             for o in objs(it.get(code)):
-                # у сделки направление по имени поля не читается — помечаем как
-                # неизвестное и решаем уже по содержимому файла
-                out.append(cand(f"сделка {did}", code, title, "неизвестно", o))
+                # направление читается по ИМЕНИ поля сделки: «Offer from us» —
+                # наше, «Offer from supplier(s)» — входящее, «Result, ТКП» и
+                # «Economics of the project» — наши выставленные цены. До этой
+                # правки все 1509 файлов сделок шли в «неизвестно».
+                out.append(cand(f"сделка {did}", code, title,
+                                dir_from_field(title), o))
     return out
 
 
-def from_rfq(bx: BitrixClient, did: int) -> tuple[list, int]:
+def from_rfq(bx: BitrixClient, did: int, rfields: dict | None = None) -> tuple[list, int]:
     """Шаг 2: привязанные записи СП-166 «Запросы поставщикам».
 
     Здесь направление читается прямо: имя файлового поля говорит, наш это
-    запрос или присланное поставщиком КП.
+    запрос или присланное поставщиком КП. Список полей берётся у портала
+    (`rfields`), а не только из зашитых восьми: на живом портале их больше, и
+    зашитый список молча терял всё, чего в нём нет. Восемь известных остаются
+    как оговорка поверх — там направление выверено вручную.
     """
+    fields = dict(rfields or {}) or {c: t for c, (t, _) in RFQ_FILE_FIELDS.items()}
+    # Выборку держим короткой: поля, которые мы всё равно не скачиваем (наш
+    # исходящий запрос, заявка заказчика), спрашивать незачем. Замеров, что
+    # длинная выборка замедляет обход, У МЕНЯ НЕТ: и с восемью зашитыми полями,
+    # и со всеми полями портала обход 137 сделок занял 4 мин 52 с. Это
+    # предосторожность, а не исправление измеренной беды.
+    fields = {c: t for c, t in fields.items()
+              if c in RFQ_FILE_FIELDS
+              or dir_from_field(t) not in ("наш запрос", "заявка")}
     try:
         items = bx.list_items(SPA_RFQ, filter={"parentId2": did},
-                              select=RFQ_SELECT + list(RFQ_FILE_FIELDS))
+                              select=RFQ_SELECT + list(fields))
     except Exception as e:
         say(f"    СП-166: не прочитались ({type(e).__name__})")
         return [], 0
@@ -446,9 +692,12 @@ def from_rfq(bx: BitrixClient, did: int) -> tuple[list, int]:
     for it in items:
         rid = it.get("id")
         sup = str(it.get("ufCrm18Supplier") or "")
-        for code, (title, direction) in RFQ_FILE_FIELDS.items():
+        for code, title in fields.items():
+            known = RFQ_FILE_FIELDS.get(code)
+            direction = known[1] if known else dir_from_field(title)
             for o in objs(it.get(code)):
-                out.append(cand(f"СП-166 {rid}", code, title, direction, o,
+                out.append(cand(f"СП-166 {rid}", code, known[0] if known else title,
+                                direction, o,
                                 extra=f"поставщик {sup}" if sup else ""))
     return out, len(items)
 
@@ -601,18 +850,34 @@ def fetch(url: str, timeout: int = 45):
     try:
         rr = requests.get(url, timeout=timeout)
     except Exception as e:
-        return None, f"сеть: {type(e).__name__}"
+        return None, f"сеть: {type(e).__name__}", ""
     if rr.status_code != 200:
-        return None, f"HTTP {rr.status_code}"
+        return None, f"HTTP {rr.status_code}", ""
     body = rr.content
     if len(body) < 200:
-        return None, "пусто"
+        return None, "пусто", ""
     # вебхук без прав получает страницу входа с кодом 200 — это измерено в
     # base/collect_attachments.py. Такую «спецификацию» разбирать нельзя.
     head = body[:600].lower()
     if b"<html" in head and (b"login" in head or b"auth" in head or b"bitrix" in head):
-        return None, "страница входа вместо файла (нет прав на ссылку)"
-    return body, "ок"
+        return None, "страница входа вместо файла (нет прав на ссылку)", ""
+    return body, "ок", name_from(rr.headers.get("Content-Disposition", ""))
+
+
+def name_from(cd: str) -> str:
+    """Имя файла из заголовка отдачи — единственное место, где оно есть.
+
+    В файловом объекте crm.item.list имени нет (измерено: 1986 из 1998 без
+    имени), а `Content-Disposition` его несёт. Способ взят из
+    base/fetch_files.py, где он уже проверен на живом портале. Возможны две
+    формы: RFC 5987 с процентным кодированием и простая в кавычках.
+    """
+    from urllib.parse import unquote
+    m = re.search(r"filename\*\s*=\s*utf-8''([^;]+)", cd or "", re.I)
+    if m:
+        return unquote(m.group(1)).strip().strip('"')
+    m = re.search(r'filename\s*=\s*"?([^";]+)', cd or "", re.I)
+    return m.group(1).strip() if m else ""
 
 
 def disk_url(bx: BitrixClient, fid: str) -> str:
@@ -637,18 +902,63 @@ def disk_url(bx: BitrixClient, fid: str) -> str:
     return ""
 
 
+def write_index(path: str, scope: str, payload: dict) -> None:
+    """Опись НАКОПИТЕЛЬНАЯ по охватам, а не перезаписываемая.
+
+    Прогон 17.09.2026 по слову «Энергосети» затёр картину по слову «ЛУКОЙЛ»:
+    1998 файлов и 137 сделок пропали из файла, а документ «что есть в системе»
+    на них и опирался. Каждый охват (ключевое слово или id сделки) — своя
+    запись; прогон обновляет только свою и не касается чужих.
+
+    Верхних полей `inventory` / `deals` в файле больше НЕТ: они создавали
+    иллюзию, будто опись описывает всё, тогда как описывали они последний
+    прогон. Читатели обязаны выбрать охват или сложить их сами.
+    """
+    pth = Path(path)
+    pth.parent.mkdir(parents=True, exist_ok=True)
+    doc = {}
+    if pth.exists():
+        try:
+            doc = json.loads(pth.read_text(encoding="utf-8"))
+        except ValueError:
+            doc = {}
+    scopes = doc.get("scopes")
+    if not isinstance(scopes, dict):
+        # старый однопрогонный формат: сохраняем его как охват «(прежний прогон)»,
+        # чтобы прежние цифры не исчезли молча
+        scopes = {}
+        if doc.get("inventory"):
+            scopes["(прежний прогон)"] = {
+                k: doc[k] for k in
+                ("updated", "state", "deals", "rfq_items", "files", "downloaded",
+                 "inventory") if k in doc}
+    scopes[scope] = payload
+    Path(path).write_text(json.dumps(
+        {"updated": date.today().isoformat(),
+         "source": "Bitrix24: опись входящих КП, адресный обход по сделкам, БЕЗ цен",
+         "method": "цены исключены намеренно: репозиторий публичный. Здесь "
+                   "происхождение файла, направление, способ разбора, число строк "
+                   "и артикулы с ценой — этого хватает, чтобы свести с заявкой. "
+                   "Опись накопительная: ключ верхнего уровня scopes — охват "
+                   "прогона (ключевое слово в названии сделки либо её id).",
+         "scopes": scopes}, ensure_ascii=False, indent=1), encoding="utf-8")
+
+
 def take(bx: BitrixClient, c: dict):
-    """Байты кандидата: по ссылке или через Диск, смотря что за источник."""
+    """Байты кандидата: по ссылке или через Диск, смотря что за источник.
+
+    Возвращает (байты, как прошло, имя из заголовка отдачи).
+    """
     if c.get("via") == "ссылка" and c.get("url"):
         return fetch(c["url"])
     if c.get("file_id"):
         u = disk_url(bx, c["file_id"])
         if u:
             return fetch(u)
-        return None, "Диск не отдал ссылку (нет скоупа disk или файла нет)"
+        return None, "Диск не отдал ссылку (нет скоупа disk или файла нет)", ""
     if c.get("url"):
         return fetch(c["url"])
-    return None, "ни ссылки, ни id"
+    return None, "ни ссылки, ни id", ""
 
 
 def main() -> int:
@@ -677,18 +987,48 @@ def main() -> int:
         deals = bx.list_paged("crm.deal.list", {"filter": {"%TITLE": a.keyword},
                                                 "select": ["ID", "TITLE"]})
         ids = sorted(int(d["ID"]) for d in deals)
-    say(f"сделок к обходу: {len(ids)}")
+    # охват прогона — ключ, под которым его опись ляжет в накопительный файл
+    scope = f"сделка {a.deal}" if a.deal else f"слово «{a.keyword}»"
+    say(f"сделок к обходу: {len(ids)} · охват описи: {scope}")
 
     ffields = file_fields(bx, DEAL_ENTITY)
     say(f"файловых полей у сделки: {len(ffields)}")
+    try:
+        rfields = file_fields(bx, SPA_RFQ)
+    except Exception as e:
+        rfields = {}
+        say(f"файловые поля СП-166 не прочитались ({type(e).__name__}) — "
+            f"беру зашитые восемь")
+    say(f"файловых полей у СП-166: {len(rfields) or len(RFQ_FILE_FIELDS)}")
+    by_dir_fields = {}
+    for t in list(ffields.values()) + list(rfields.values()):
+        d = dir_from_field(t)
+        by_dir_fields[d] = by_dir_fields.get(d, 0) + 1
+    say(f"поля по направлению: {by_dir_fields}")
 
     # --- сбор кандидатов: сделка за сделкой, с прогрессом ---
     cands, seen, rfq_total, bodies = [], set(), 0, []
+
+    def dump_inventory(done: int) -> None:
+        """Опись по ходу обхода, а не только в конце.
+
+        Правило, оплаченное первым прогоном: результат, записанный только в
+        конце, таймаут уносит целиком. Холостой путь этому правилу не подчинялся
+        — восемнадцатиминутный обход при 45-минутном пределе шага означал, что
+        всё держится на том, чтобы уложиться. Теперь частичная опись есть всегда.
+        """
+        write_index(a.out_index, scope, {
+            "updated": "holostoy" if a.dry_run else date.today().isoformat(),
+            "state": f"обход: {done} из {len(ids)} сделок",
+            "deals": len(ids), "rfq_items": rfq_total,
+            "files": len(cands), "downloaded": 0,
+            "inventory": [{k: v for k, v in c.items() if k != "url"} for c in cands]})
+
     for n, did in enumerate(ids, 1):
         say(f"[{n}/{len(ids)}] сделка {did}")
         got = []
         got += from_deal(bx, did, ffields)
-        rq, cnt = from_rfq(bx, did)
+        rq, cnt = from_rfq(bx, did, rfields)
         rfq_total += cnt
         got += rq
         got += from_timeline(bx, did)
@@ -709,6 +1049,8 @@ def main() -> int:
             by_dir[c["direction"]] = by_dir.get(c["direction"], 0) + 1
         say(f"    запросов СП-166: {cnt} · файлов найдено {len(got)}, новых {fresh}"
             + (f" · по направлению: {by_dir}" if by_dir else ""))
+        if n % 20 == 0 or n == len(ids):
+            dump_inventory(n)
 
     say(f"итого кандидатов: {len(cands)} (дублей снято {len(seen) - len(cands) if len(seen) > len(cands) else 0})")
     by_field = {}
@@ -718,18 +1060,26 @@ def main() -> int:
     for k in sorted(by_field, key=lambda x: -by_field[x]):
         say(f"    {by_field[k]:>4}  {k}")
 
-    take = [c for c in cands if a.all_files or c["direction"] in WANTED
+    todo = [c for c in cands if a.all_files or c["direction"] in WANTED
             or c["direction"] == "неизвестно"]
-    say(f"к разбору: {len(take)} (входящие и неопознанные; наши запросы "
+    # Порядок, а не просто фильтр: предел --max-files отрежет хвост, и отрезать
+    # он должен канбан-картинки, а не выставленные цены. Сортировка устойчивая,
+    # поэтому внутри группы сохраняется порядок обхода — сделка за сделкой.
+    todo.sort(key=rank)
+    say(f"к разбору: {len(todo)} (наши цены, входящие и неопознанные; "
+        f"заявка заказчика и наши запросы "
         f"{'включены' if a.all_files else 'исключены'})")
+    ordered = {}
+    for c in todo[:a.max_files]:
+        ordered[c["direction"]] = ordered.get(c["direction"], 0) + 1
+    say(f"в пределе {a.max_files} по направлению: {ordered}")
 
     if a.dry_run:
-        Path(a.out_index).parent.mkdir(parents=True, exist_ok=True)
-        Path(a.out_index).write_text(json.dumps(
-            {"updated": "holostoy", "deals": len(ids), "rfq_items": rfq_total,
-             "files": len(cands), "downloaded": 0,
-             "inventory": [{k: v for k, v in c.items() if k != "url"} for c in cands]},
-            ensure_ascii=False, indent=1), encoding="utf-8")
+        write_index(a.out_index, scope, {
+            "updated": "holostoy", "state": "холостой прогон, обход завершён",
+            "deals": len(ids), "rfq_items": rfq_total,
+            "files": len(cands), "downloaded": 0,
+            "inventory": [{k: v for k, v in c.items() if k != "url"} for c in cands]})
         say("холостой прогон: ничего не скачано, опись записана")
         return 0
 
@@ -744,31 +1094,34 @@ def main() -> int:
              "source": "Bitrix24: входящие КП по сделке, адресный обход",
              "warning": "СОДЕРЖИТ КОММЕРЧЕСКИЕ ЦЕНЫ. В публичный репозиторий не коммитить.",
              "deals": ids, "files": full}, ensure_ascii=False, indent=1), encoding="utf-8")
-        Path(a.out_index).parent.mkdir(parents=True, exist_ok=True)
-        Path(a.out_index).write_text(json.dumps(
-            {"updated": date.today().isoformat(),
-             "source": "Bitrix24: опись входящих КП по сделке, БЕЗ цен",
-             "method": "цены исключены намеренно: репозиторий публичный. Здесь "
-                       "происхождение файла, направление, способ разбора, число строк "
-                       "и артикулы с ценой — этого хватает, чтобы свести с заявкой.",
-             "deals": len(ids), "rfq_items": rfq_total, "files": len(cands),
-             "downloaded": n_dl, "inventory": index}, ensure_ascii=False, indent=1),
-            encoding="utf-8")
+        write_index(a.out_index, scope, {
+            "updated": date.today().isoformat(),
+            "state": f"разобрано {n_dl} файлов из {min(len(todo), a.max_files)}",
+            "deals": len(ids), "rfq_items": rfq_total, "files": len(cands),
+            "downloaded": n_dl, "inventory": index})
 
-    for n, c in enumerate(take[:a.max_files], 1):
-        body, how = take(bx, c)
+    for n, c in enumerate(todo[:a.max_files], 1):
+        body, how, got_name = take(bx, c)
         rec = {k: v for k, v in c.items() if k != "url"}
+        # имя приходит ТОЛЬКО с загрузкой: в файловом объекте его нет у 1986
+        # файлов из 1998. Без него разбор выбирался бы по пустому расширению.
+        if got_name and not rec.get("file_name"):
+            rec["file_name"] = got_name
+            c["file_name"] = got_name
         rec["download"] = how
         rec["size"] = len(body) if body else 0
         if not body:
             index.append(dict(rec, rows=0, priced=0, parse_path="", status="не скачан"))
-            if n % 10 == 0 or n == len(take):
-                say(f"  [{n}/{min(len(take), a.max_files)}] скачано {n_dl}, "
+            if n % 10 == 0 or n == len(todo):
+                say(f"  [{n}/{min(len(todo), a.max_files)}] скачано {n_dl}, "
                     f"строк {n_rows}, с ценой {n_price}, {(time.time()-t0)/60:.1f} мин")
                 dump()
             continue
         n_dl += 1
         rows, how_parsed = parse(c["file_name"], body)
+        # какой формат узнан по байтам — иначе «формат не поддержан» остаётся
+        # загадкой, и следующая ошибка снова будет неизмеримой (правило 16)
+        rec["sniffed"] = sniff(body)
         hdr = header_map(rows) if rows else {}
         pr = price_rows(rows, hdr) if rows else []
         n_rows += len(rows)
@@ -776,10 +1129,19 @@ def main() -> int:
         # статус не должен врать (правило 15 CLAUDE.md): pdf без текстового
         # слоя — это скан под распознавание, а не «пусто» и не «не КП»
         low = (c["file_name"] or "").lower()
+        # Статус читает СПОСОБ разбора, а не только расширение: после появления
+        # распознавания «картинка» может оказаться и разобранной, и нераспознанной
+        # по разным причинам, и склеивать эти случаи значит врать о объёме работы
+        # (правило 15 CLAUDE.md).
         if pr:
-            status = "разобран"
+            status = "распознан" if how_parsed == "распознавание" else "разобран"
         elif rows:
-            status = "текст без цен"
+            status = ("распознан, цен нет" if how_parsed == "распознавание"
+                      else "текст без цен")
+        elif "распознавание недоступно" in how_parsed:
+            status = "скан или картинка, распознавание недоступно"
+        elif how_parsed.startswith("распознано") or how_parsed.startswith("распознавание"):
+            status = f"скан или картинка: {how_parsed}"
         elif low.endswith(".pdf"):
             status = "скан, требуется распознавание"
         elif low.endswith((".jpg", ".jpeg", ".png", ".tif", ".tiff")):
@@ -789,8 +1151,8 @@ def main() -> int:
         full.append(dict(rec, parse_path=how_parsed, header=hdr, status=status, prices=pr))
         index.append(dict(rec, parse_path=how_parsed, status=status, rows=len(rows),
                           priced=len(pr), pns=sorted({p["pn"] for p in pr})[:400]))
-        if n % 10 == 0 or n == min(len(take), a.max_files):
-            say(f"  [{n}/{min(len(take), a.max_files)}] скачано {n_dl}, "
+        if n % 10 == 0 or n == min(len(todo), a.max_files):
+            say(f"  [{n}/{min(len(todo), a.max_files)}] скачано {n_dl}, "
                 f"строк {n_rows}, с ценой {n_price}, {(time.time()-t0)/60:.1f} мин")
             dump()
 
@@ -816,7 +1178,7 @@ def main() -> int:
         say(f"тел писем просмотрено: {len(bodies)}, с ценами: {n_mail}")
 
     dump()
-    say(f"скачано файлов: {n_dl} из {min(len(take), a.max_files)}")
+    say(f"скачано файлов: {n_dl} из {min(len(todo), a.max_files)}")
     say(f"строк разобрано: {n_rows}")
     say(f"строк с парой «артикул — цена»: {n_price}")
     say(f"уникальных артикулов с ценой: {len({p['pn'] for f in full for p in f['prices']})}")
@@ -824,9 +1186,9 @@ def main() -> int:
     for r in index:
         st[r["status"]] = st.get(r["status"], 0) + 1
     say(f"по статусу файлов: {st}")
-    if len(take) > a.max_files:
+    if len(todo) > a.max_files:
         say(f"ВНИМАНИЕ: предел --max-files {a.max_files}, не разобрано "
-            f"{len(take) - a.max_files} файлов — это не «всё покрыто»")
+            f"{len(todo) - a.max_files} файлов — это не «всё покрыто»")
     return 0
 
 
