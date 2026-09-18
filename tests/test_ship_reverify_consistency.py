@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import json
 import re
+import sys
 from pathlib import Path
 
 import pytest
@@ -24,6 +25,9 @@ VERDICTS = {"ЗАНИЖЕНА", "ЗАВЫШЕНА", "ВЕРНА", "НЕ ПОДТ
             "НЕЧЕМ ПРОВЕРИТЬ"}
 PRICED = {"ЗАНИЖЕНА", "ЗАВЫШЕНА", "ВЕРНА"}
 
+sys.path.insert(0, str(ROOT / "gt/tools"))
+from verdicts import UNKNOWN, vkey            # noqa: E402  единый классификатор
+
 
 def rows() -> list[dict]:
     if not SRC.exists():
@@ -33,8 +37,17 @@ def rows() -> list[dict]:
 
 
 def verdict(r: dict) -> str:
-    v = (r.get("band_verdict") or "").upper()
-    return next((k for k in VERDICTS if k in v), "")
+    """Класс вердикта — ТОЛЬКО через общий классификатор.
+
+    Свой поиск подстрокой здесь стоял до 18.09.2026 и делал два теста
+    случайными: перебор шёл по МНОЖЕСТВУ, а строка «ВЕРНА (середина вилки
+    завышена на 35 %)» содержит и «ВЕРНА», и «ЗАВЫШЕНА». Класс зависел от
+    порядка обхода множества, то есть от PYTHONHASHSEED: на двух сидах из
+    четырёх проверка падала на строке, которой никто не касался. Гейт при
+    этом проходил по удаче.
+    """
+    v = vkey(r)
+    return "" if v == UNKNOWN else v
 
 
 def has_number(*vals) -> bool:
@@ -209,9 +222,7 @@ def test_вердикт_опознаётся_началом_текста_а_не
     не подтверждена ничем)» содержит оба слова, и ответ зависел от порядка
     перебора. Здесь закреплено правило: вердикт — это начало текста.
     """
-    import sys
-    sys.path.insert(0, str(ROOT / "gt/tools"))
-    from verdicts import UNKNOWN, VERDICTS as CLOSED, vkey
+    from verdicts import VERDICTS as CLOSED
 
     assert set(CLOSED) == VERDICTS, "закрытый список разошёлся с тем, что проверяет тест"
     bad = [r["pn"] for r in rows() if vkey(r) == UNKNOWN]

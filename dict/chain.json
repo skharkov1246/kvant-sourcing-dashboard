@@ -1,8 +1,8 @@
 {
   "note": "Ребро, а не карточка: уровень субпоставщика — свойство пути, а не компании. Одна и та же компания бывает первым уровнем для одного владельца конструкции и вторым, если между ними стоит пакаджер, поэтому уровень не хранится, а считается обходом. Записи вида routing_note — не компании, а указания к закупке из поля mk базы PN: «закупка по спецификации», «любой дистрибьютор». Для сорсера это ответ не хуже имени завода, поэтому они сохранены отдельным видом.",
-  "count": 303,
-  "makers": 265,
-  "routing_notes": 38,
+  "count": 306,
+  "makers": 269,
+  "routing_notes": 37,
   "records": [
     {
       "from": "Solar Turbines",
@@ -258,13 +258,13 @@
         "Фильтр масляный турбокомпрессора",
         "Гидравлическая силовая установка",
         "Верхний привод TDS-8SA",
-        "Вкладыш фильтра",
         "Бумажная вставка центробежного насоса",
         "Комплект уплотнений центробежного фильтра",
         "Лебедка буровая MAS7000GD-006A",
         "Лебедка буровая MAS7000GD-002A, Лебедка буровая MAS7000GD-006A",
         "Гидравлическая силовая установка AV1.01539.00.00",
-        "Гидравлическая силовая установка AV1.01540.00.OQ"
+        "Гидравлическая силовая установка AV1.01540.00.OQ",
+        "Кран мостовой расстановки свечей 019810366"
       ],
       "proof": [
         "П4: сегмент фильтров"
@@ -272,7 +272,7 @@
       "sources": [
         "gt/data/pn_db.json"
       ],
-      "n": 36,
+      "n": 35,
       "from_is_bucket": true
     },
     {
@@ -691,27 +691,6 @@
     {
       "from": "Siemens Energy",
       "from_key": "siemensenergy",
-      "to": "ABB/Siemens/OMRON (по типу)",
-      "to_key": "",
-      "kind": "routing_note",
-      "relation": "makes_for",
-      "scope": [
-        "Реле",
-        "Шкаф управления PMS МЛСК Ф-1",
-        "SGT-400"
-      ],
-      "proof": [
-        "П4: электрика"
-      ],
-      "sources": [
-        "gt/data/pn_db.json"
-      ],
-      "n": 11,
-      "from_is_bucket": false
-    },
-    {
-      "from": "Siemens Energy",
-      "from_key": "siemensenergy",
       "to": "Заказ по спецификации: спиральная прокладка/O-ring по габариту (Flexitallic-тип) (частичная спецификация — дособрать по образцу/ТЗ)",
       "to_key": "",
       "kind": "routing_note",
@@ -809,6 +788,27 @@
         "gt/data/pn_db.json"
       ],
       "n": 11,
+      "from_is_bucket": false
+    },
+    {
+      "from": "Siemens Energy",
+      "from_key": "siemensenergy",
+      "to": "ABB/Siemens/OMRON (по типу)",
+      "to_key": "",
+      "kind": "routing_note",
+      "relation": "makes_for",
+      "scope": [
+        "Реле",
+        "Шкаф управления PMS МЛСК Ф-1",
+        "SGT-400"
+      ],
+      "proof": [
+        "П4: электрика"
+      ],
+      "sources": [
+        "gt/data/pn_db.json"
+      ],
+      "n": 10,
       "from_is_bucket": false
     },
     {
@@ -1473,25 +1473,6 @@
       "from_is_bucket": false
     },
     {
-      "from": "Siemens Energy",
-      "from_key": "siemensenergy",
-      "to": "TC Ltd / Thermo Electric (тип.)",
-      "to_key": "tcthermoelectricтип",
-      "kind": "maker",
-      "relation": "makes_for",
-      "scope": [
-        "SGT-400"
-      ],
-      "proof": [
-        "П4: сегмент термопар"
-      ],
-      "sources": [
-        "gt/data/pn_db.json"
-      ],
-      "n": 4,
-      "from_is_bucket": false
-    },
-    {
       "from": "Solar Turbines",
       "from_key": "solarturbines",
       "to": "AMOT",
@@ -2032,26 +2013,6 @@
     {
       "from": "Siemens Energy",
       "from_key": "siemensenergy",
-      "to": "SKF / Timken / RENK (по типу)",
-      "to_key": "",
-      "kind": "routing_note",
-      "relation": "makes_for",
-      "scope": [
-        "Электродвигатель 1RA1 452-2HA60-Z",
-        "Электродвигатель AMI 500L2W BSFH"
-      ],
-      "proof": [
-        "П4: сегмент подшипников"
-      ],
-      "sources": [
-        "gt/data/pn_db.json"
-      ],
-      "n": 2,
-      "from_is_bucket": false
-    },
-    {
-      "from": "Siemens Energy",
-      "from_key": "siemensenergy",
       "to": "Druck (Baker Hughes)",
       "to_key": "druckbakerhughes",
       "kind": "maker",
@@ -2111,6 +2072,26 @@
     {
       "from": "Siemens Energy",
       "from_key": "siemensenergy",
+      "to": "RENK AG (Werk Hannover)",
+      "to_key": "renkwerkhannover",
+      "kind": "maker",
+      "relation": "makes_for",
+      "scope": [
+        "Электродвигатель 1RA1 452-2HA60-Z",
+        "Электродвигатель AMI 500L2W BSFH"
+      ],
+      "proof": [
+        "П0 — каталог изготовителя, перепроверка 18.09.2026"
+      ],
+      "sources": [
+        "gt/data/pn_db.json"
+      ],
+      "n": 2,
+      "from_is_bucket": false
+    },
+    {
+      "from": "Siemens Energy",
+      "from_key": "siemensenergy",
       "to": "Siemens Digital Industries (SIMATIC)",
       "to_key": "siemensdigitalindustriessimatic",
       "kind": "maker",
@@ -2121,6 +2102,44 @@
       ],
       "proof": [
         "П2 — заказной код Siemens DI (полная форма)"
+      ],
+      "sources": [
+        "gt/data/pn_db.json"
+      ],
+      "n": 2,
+      "from_is_bucket": false
+    },
+    {
+      "from": "Siemens Energy",
+      "from_key": "siemensenergy",
+      "to": "TC Ltd / Thermo Electric (тип.)",
+      "to_key": "tcthermoelectricтип",
+      "kind": "maker",
+      "relation": "makes_for",
+      "scope": [
+        "SGT-400"
+      ],
+      "proof": [
+        "П4: сегмент термопар"
+      ],
+      "sources": [
+        "gt/data/pn_db.json"
+      ],
+      "n": 2,
+      "from_is_bucket": false
+    },
+    {
+      "from": "Siemens Energy",
+      "from_key": "siemensenergy",
+      "to": "Universal Thermosensors Ltd (UK)",
+      "to_key": "universalthermosensorsuk",
+      "kind": "maker",
+      "relation": "makes_for",
+      "scope": [
+        "SGT-400"
+      ],
+      "proof": [
+        "П0 — каталог изготовителя, перепроверка 18.09.2026"
       ],
       "sources": [
         "gt/data/pn_db.json"
@@ -3037,6 +3056,25 @@
       "relation": "makes_for",
       "scope": [
         "Шкафа генератора газотурбинных установок SIEMENS SGT400 МЛСКФ-1"
+      ],
+      "proof": [
+        "П0 — каталог изготовителя, перепроверка 18.09.2026"
+      ],
+      "sources": [
+        "gt/data/pn_db.json"
+      ],
+      "n": 1,
+      "from_is_bucket": false
+    },
+    {
+      "from": "Siemens Energy",
+      "from_key": "siemensenergy",
+      "to": "Comat Releco / TURCK (C9 series)",
+      "to_key": "comatrelecoturckc9series",
+      "kind": "maker",
+      "relation": "makes_for",
+      "scope": [
+        "Шкаф управления PMS МЛСК Ф-1"
       ],
       "proof": [
         "П0 — каталог изготовителя, перепроверка 18.09.2026"
@@ -5776,6 +5814,25 @@
       "relation": "makes_for",
       "scope": [
         "Турбокомпрессор"
+      ],
+      "proof": [
+        "П0 — каталог изготовителя, перепроверка 18.09.2026"
+      ],
+      "sources": [
+        "gt/data/pn_db.json"
+      ],
+      "n": 1,
+      "from_is_bucket": true
+    },
+    {
+      "from": "Прочие",
+      "from_key": "прочие",
+      "to": "Mann & Hummel (MANN LC 15 001 x)",
+      "to_key": "mannhummelmannlc15001x",
+      "kind": "maker",
+      "relation": "makes_for",
+      "scope": [
+        "Вкладыш фильтра"
       ],
       "proof": [
         "П0 — каталог изготовителя, перепроверка 18.09.2026"

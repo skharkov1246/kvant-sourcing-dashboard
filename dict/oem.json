@@ -1,6 +1,6 @@
 {
   "note": "Производители: ключ nkey(name) и все написания, найденные в базах. Разные написания одной компании собраны под одним ключом — это и есть то, чего сегодня нет ни в одном подпроекте.",
-  "count": 292,
+  "count": 296,
   "records": [
     {
       "oem_key": "skf",
@@ -3917,6 +3917,17 @@
       "n_spellings": 1
     },
     {
+      "oem_key": "comatrelecoturckc9series",
+      "name": "Comat Releco / TURCK (C9 series)",
+      "spellings": [
+        {
+          "spelling": "Comat Releco / TURCK (C9 series)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
       "oem_key": "denso",
       "name": "DENSO",
       "spellings": [
@@ -4027,6 +4038,17 @@
       "n_spellings": 1
     },
     {
+      "oem_key": "mannhummelmannlc15001x",
+      "name": "Mann & Hummel (MANN LC 15 001 x)",
+      "spellings": [
+        {
+          "spelling": "Mann & Hummel (MANN LC 15 001 x)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
       "oem_key": "mturollsroycepowersystems",
       "name": "MTU / Rolls-Royce Power Systems",
       "spellings": [
@@ -4131,6 +4153,17 @@
       "spellings": [
         {
           "spelling": "RENK",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "renkwerkhannover",
+      "name": "RENK AG (Werk Hannover)",
+      "spellings": [
+        {
+          "spelling": "RENK AG (Werk Hannover)",
           "where": "gt/data/pn_db.json:rows[].mk"
         }
       ],
@@ -4253,6 +4286,17 @@
         {
           "spelling": "Solar; сток: Antoni International",
           "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "universalthermosensorsuk",
+      "name": "Universal Thermosensors Ltd (UK)",
+      "spellings": [
+        {
+          "spelling": "Universal Thermosensors Ltd (UK)",
+          "where": "gt/data/pn_db.json:rows[].mk"
         }
       ],
       "n_spellings": 1

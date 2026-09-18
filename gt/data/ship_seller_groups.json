@@ -76,6 +76,21 @@
    ],
    "evidence": "Прямая улика в коде страницы: zip-solutions.com отдаёт документ с «<base href=\"https://hard-to-find.parts/\">» — то есть это буквально тот же сайт. Меню и подвал (COMPANY · VENDORS · SHOP · WANTED · STOCK · CONTACT) и слоган «Hard-To-Find Equipment & Spare Parts | Genuine | Obsolete | Discontinued | OEM Certified | Highly Experienced Non-OEM Manufacturers» совпадают с turbine.parts посимвольно. Телефон +7 495 1081005 и одна маска почты общие у hardtoget.parts и hard-to-find.parts; почта группы — info@hard-to-find.parts и hello@turbine.parts.",
    "affects": "Сток-лист, по которому измерено пересечение с заявкой (78 наших номеров), принадлежит ЭТОМУ оператору. Значит строка, ссылающаяся и на turbine.parts, и на hardtoget.parts, опирается на ОДИН источник, а не на два. Сюда же попадает фильтроэлемент газового топлива Solar, по которому вердикт «занижена» вынесен по ask именно этого листа."
+  },
+  {
+   "group": "Enapart (impexron / ontrium / onrion / usaron)",
+   "kind": "реселлерская сеть под многими вывесками",
+   "domains": [
+    "impexron.de",
+    "impexron.es",
+    "impexron-gmbh.de",
+    "ontrium.com",
+    "onrion.com",
+    "usaron.com",
+    "enapart.com"
+   ],
+   "evidence": "Карточки по одному номеру на всех доменах отданы по единому шаблону «<номер> — <бренд> <страна> Sales Price», а витрина ontrium.com подписана почтой sales@enapart.com. Отдельная улика против подлинности каталога: на карточке термопары MW03627, изготовитель которой назван документом Росстандарта (Universal Thermosensors Ltd), ontrium ставит ЧУЖОЙ бренд «Ge Sensing» и рядом оговорку «Our company is not an authorized distributor or representative for this brand» — то есть каталог сгенерирован, а не собран со склада. Цены ни одна из витрин не публикует: вместо цены форма запроса.",
+   "affects": "Термопарный блок листа «Энергосети» — MW03627, CT4010J/1 и соседние модели серии ТС: это единственные витрины, которые вообще отдают карточку по этим номерам, и шесть их доменов дали бы шесть мнимых свидетелей."
   }
  ]
 }

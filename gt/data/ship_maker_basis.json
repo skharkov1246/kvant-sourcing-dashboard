@@ -8,21 +8,21 @@
   "maker_named": 2860,
   "request_rows_with_band": 857,
   "request_exposure": 9277409.8,
-  "weak_rows_in_request": 171,
-  "weak_usd_in_request": 397627.45,
-  "weak_by_db_basis_rows": 171,
-  "weak_by_db_basis_usd": 397627.45,
+  "weak_rows_in_request": 165,
+  "weak_usd_in_request": 329154.95,
+  "weak_by_db_basis_rows": 165,
+  "weak_by_db_basis_usd": 329154.95,
   "weak_closed_by_reverify_rows": 0,
   "weak_closed_by_reverify_usd": 0.0,
-  "closed_by_reverify_rows": 65,
-  "closed_by_reverify_usd": 5231067.5
+  "closed_by_reverify_rows": 71,
+  "closed_by_reverify_usd": 5299540.0
  },
  "classes": [
   {
    "basis": "каталог изготовителя (перепроверка)",
-   "rows_in_db": 65,
-   "rows_in_request": 65,
-   "usd_in_request": 5231067.5,
+   "rows_in_db": 71,
+   "rows_in_request": 71,
+   "usd_in_request": 5299540.0,
    "why": "изготовитель вскрыт по каталогу при перепроверке строки — это факт со страницы, а не наша оценка; счёт берётся из gt/data/ship_reverify.json и растёт сам по ходу перепроверки"
   },
   {
@@ -62,9 +62,9 @@
   },
   {
    "basis": "догадка по классу",
-   "rows_in_db": 226,
-   "rows_in_request": 171,
-   "usd_in_request": 397627.45,
+   "rows_in_db": 220,
+   "rows_in_request": 165,
+   "usd_in_request": 329154.95,
    "why": "изготовитель выведен из КЛАССА изделия. Это тот же приём, которым VS-4-57 стал виброизолятором; за 18.09.2026 опровергнут дважды открытыми каталогами"
   },
   {
