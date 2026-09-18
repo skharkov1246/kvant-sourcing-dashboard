@@ -34,6 +34,7 @@ ROOT = Path(__file__).resolve().parents[2]
 ASK = ROOT / "gt/data/ship_lukoil.json"
 REVERIFY = ROOT / "gt/data/ship_reverify.json"
 LISTS = ROOT / "gt/data/ship_parts_lists.json"
+QUESTIONS = ROOT / "gt/data/ship_questions.json"
 OUT = ROOT / "gt/data/ship_coverage.json"
 
 
@@ -67,6 +68,25 @@ def quote_only(r: dict) -> bool:
     return any(m in text for m in QUOTE_ONLY)
 
 
+def asked_keys() -> set:
+    """Номера, по которым уже стоит вопрос заказчику.
+
+    Нужны, чтобы разделить разрыв лестницы на две ЧЕСТНО РАЗНЫЕ части. Строка,
+    ждущая ответа заказчика, — это не наша недоработка: пока не названа фасовка,
+    исполнение или настоящий номер, продавец вернёт вопрос, а не цену. Строка,
+    по которой вопроса нет, — наша работа, и её надо делать.
+    """
+    if not QUESTIONS.exists():
+        return set()
+    out = set()
+    for q in json.loads(QUESTIONS.read_text(encoding="utf-8")).get("questions", []):
+        for part in re.split(r"[,/\u00b7]| и ", str(q.get("pn") or "")):
+            k = key(part)
+            if len(k) >= 4:
+                out.add(k)
+    return out
+
+
 def measure() -> dict:
     ask = json.loads(ASK.read_text(encoding="utf-8"))["rows"]
     rv = {key(r.get("pn")): r for r in json.loads(REVERIFY.read_text(encoding="utf-8"))["rows"]}
@@ -77,6 +97,9 @@ def measure() -> dict:
                 listed.setdefault(key(it.get("pn")), it)
 
     # ПРИЗНАКИ независимы: канал бывает назван там, где цены нет, и наоборот.
+    asked = asked_keys()
+    gap_wait = gap_open = 0
+    gap_wait_usd = gap_open_usd = 0.0
     gap_rows = gap_quote = 0
     gap_usd = gap_quote_usd = 0.0
     steps = ["опознано", "изготовитель назван", "цена найдена", "канал назван",
@@ -120,6 +143,12 @@ def measure() -> dict:
             if x and quote_only(x):
                 gap_quote += 1
                 gap_quote_usd += e
+            elif k in asked:
+                gap_wait += 1
+                gap_wait_usd += e
+            else:
+                gap_open += 1
+                gap_open_usd += e
         if named:
             ladder["опознана"][0] += 1
             ladder["опознана"][1] += e
@@ -138,6 +167,10 @@ def measure() -> dict:
             "usd": round(gap_usd, 2),
             "of_them_quote_only": gap_quote,
             "usd_quote_only": round(gap_quote_usd, 2),
+            "of_them_waiting_customer": gap_wait,
+            "usd_waiting_customer": round(gap_wait_usd, 2),
+            "of_them_open_to_search": gap_open,
+            "usd_open_to_search": round(gap_open_usd, 2),
             "what_it_means": ("Строки, где канал назван, а цены нет. Это НЕ значит, что мы не "
                               "дошли: у части таких каналов цены нет в принципе — продавец "
                               "работает только по запросу и прайса не публикует. Счёт "
@@ -175,9 +208,16 @@ def main() -> None:
         print(f"  {s:<20} {v['rows']:>5} строк ({v['share_rows']:>4} %) | "
               f"{v['usd']:>11,.0f} USD ({v['share_usd']:>4} % денег)".replace(",", " "))
     g = m["channel_without_price"]
-    print(f"КАНАЛ ЕСТЬ, ЦЕНЫ НЕТ: {g['rows']} строк на {g['usd']:,.0f} USD; из них у "
-          f"{g['of_them_quote_only']} канал квотируемый — цены он не публикует в принципе "
-          f"({g['usd_quote_only']:,.0f} USD)".replace(",", " "))
+    print(f"КАНАЛ ЕСТЬ, ЦЕНЫ НЕТ: {g['rows']} строк на {g['usd']:,.0f} USD".replace(",", " "))
+    print(f"  {g['of_them_quote_only']:>4} строк | {g['usd_quote_only']:>11,.0f} USD | канал "
+          f"квотируемый: цены он не публикует в принципе, закрывается письмом"
+          .replace(",", " "))
+    print(f"  {g['of_them_waiting_customer']:>4} строк | "
+          f"{g['usd_waiting_customer']:>11,.0f} USD | ждёт ответа заказчика: пока не назван "
+          f"номер или исполнение, продавец вернёт вопрос".replace(",", " "))
+    print(f"  {g['of_them_open_to_search']:>4} строк | {g['usd_open_to_search']:>11,.0f} USD | "
+          f"НАША работа: цена публикуется, её надо найти — задание печатает "
+          f"gt/tools/rv_pricehunt.py".replace(",", " "))
     print(f"  из строк БЕЗ нашей оценки опознано {m['rows_without_band_identified']} — "
           f"они не видны ни в одном денежном счёте")
     if a.write:
