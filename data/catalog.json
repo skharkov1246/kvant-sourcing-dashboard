@@ -1640,7 +1640,7 @@
       },
       "last_change": "2026-09-18",
       "last_author": "Claude",
-      "last_commit": "27235fc",
+      "last_commit": "1da841c",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -1648,6 +1648,7 @@
       },
       "referenced_by": [
         "gt/tools/ship_brief.py",
+        "gt/tools/ship_offer.py",
         "gt/tools/ship_reverify.py",
         "tests/test_ship_reverify_consistency.py"
       ]
