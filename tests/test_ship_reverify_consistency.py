@@ -116,3 +116,39 @@ def test_артикулы_не_дублируются():
             dup.append(r["pn"])
         seen.add(k)
     assert not dup, f"дубликаты артикулов: {dup}"
+
+def test_строка_говорит_о_том_же_предмете_что_заявка():
+    """Разбор обязан быть про ТОТ предмет, который назван в заявке.
+
+    Оплачено ошибкой на VS-4-57 и VS-6-82: предмет строки был выведен из
+    префикса артикула («VS» → бренд Vibrostop → виброизолятор), хотя в заявке
+    прямо стоят изготовитель Victory Energy, модель Vision, наименование
+    «Электрод розжига» и категория «зажигание и свечи». Строки «виброизолятор»
+    в заявке нет ни одной, а вердикт «ЗАВЫШЕНА» с уровнем 30–60 USD/шт был
+    вынесен именно по классу виброопор. Вердикт не о том предмете опаснее
+    отсутствия вердикта.
+    """
+    src = ROOT / "gt/data/ship_lukoil.json"
+    if not src.exists():
+        pytest.skip("сводки заявки нет")
+    ask = {re.sub(r"[^A-Z0-9]", "", str(r.get("pn") or "").upper()): r
+           for r in json.loads(src.read_text(encoding="utf-8"))["rows"]}
+    stop = {"для", "и", "в", "с", "на", "по", "от", "до", "сборе", "шт", "мм", "модель"}
+
+    def words(text: str) -> set[str]:
+        return {w for w in re.findall(r"[а-яёa-z0-9]+", (text or "").lower())
+                if len(w) > 3 and w not in stop}
+
+    bad = []
+    for r in rows():
+        key = re.sub(r"[^A-Z0-9]", "", str(r.get("pn") or "").split("(")[0].upper())
+        row = ask.get(key)
+        if row is None:          # номер записан с пояснением — сверять нечего
+            continue
+        want = words(row.get("name"))
+        have = words(" ".join(str(r.get(k) or "") for k in
+                              ("what_it_is", "note", "volume_head", "recommended")))
+        if want and not (want & have):
+            bad.append(f'{r["pn"]}: в заявке «{(row.get("name") or "")[:40]}», '
+                       f"а в разборе это слово не встречается")
+    assert not bad, f"разбор не о том предмете, что заявка: {bad}"
