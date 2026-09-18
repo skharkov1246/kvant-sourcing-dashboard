@@ -15758,6 +15758,707 @@
      "independent_sources": 0
     }
    ]
+  },
+  "Лист Энергосети — второй проход": {
+   "machine": "Лист Энергосети — второй проход",
+   "lists": [
+    {
+     "url": "http://gas-turbine-parts.com/index.php?m=home&c=View&a=index&aid=NNN",
+     "title": "gas-turbine-parts.com (Hangzhou Gas Turbine Parts Co.Ltd) — сплошной перебор адресов статей",
+     "rows_total": 539,
+     "currency_note": "Цен нет: по всем 539 статьям поиск по образцу «знак валюты + число» и «число + знак валюты» (USD, EUR, GBP, RMB, руб., $, €, £) совпадений не дал. Разделитель разрядов определять не на чем. Это заявленная номенклатура поставки, а не склад.",
+     "what_it_is": "Статьи сайта адресуются одним параметром: index.php?m=home&c=View&a=index&aid=NNN, где NNN — целое от 1. Перебраны адреса 1..800 подряд (700 прежним проходом, 263 этим — повтор всех, что раньше дали 404, плюс диапазон 638..800). Реальных статей 539, остальные 261 — страница «404页面». Максимальный живой aid — 637, дальше до 800 сплошной 404. Дополнительно скачаны 435 страниц рубрикатора (c=Lists&a=index&tid=NN&page=N по 29 рубрикам): в них 535 различных aid, все уже есть в корпусе, а 4 статьи корпуса в рубрикаторе не значатся — это и есть довод за сплошной перебор адресов вместо обхода по рубрикам. Повторная сверка всех 539 статей с остатком в 172 номера дала одно попадание — «30300» против KFD2-СR-Ex1 30.300, ложное, уже отброшенное прежним проходом. Новых перечней на сайте нет: корпус исчерпан."
+    },
+    {
+     "url": "http://www.drillingsolutionsltd.com/",
+     "title": "drillingsolutionsltd.com — 45 битых файлов перекачаны заново",
+     "rows_total": 45,
+     "currency_note": "Цен нет: поиск по образцу «знак валюты + число» и «число + знак валюты» по всем 45 страницам дал 0 совпадений.",
+     "what_it_is": "Прежняя закачка оборвалась: 45 файлов записаны с расширением .gz, но потоком gzip не являются (gzip.BadGzipFile при полном чтении; прежний журнал показывал 46 ошибок чтения, но 46-я — не файл, а обрезка разбора у mine.json на 4000 попаданий). Адреса восстановлены по md5 первых 16 знаков от «адрес + перевод строки» — так их считал прежний загрузчик. Перекачаны все 45 (3,7 МБ), разобраны. Против остатка в 172 номера — НОЛЬ попаданий. Против полного списка 334 — два, оба по номерам, закрытым ещё прежним проходом (6ES7 321-1BL00-0AA0 и 6ES7 322-1BL00-0AA0 в перечне электрики буровой). Содержание страниц — буровое и дизельное: Bomco, Cameron, Canrig, GD, Donaldson, FANUC, GE; к Solar и Siemens SGT отношения не имеет."
+    },
+    {
+     "url": "https://www.scribd.com/document/283920743/Taurus-70-Ipl",
+     "title": "Solar Turbines, Illustrated Parts List, Taurus 70 Gas Turbine-Driven Compressor Set, том IV (508 стр.)",
+     "rows_total": 752,
+     "currency_note": "Цен нет и быть не может: это заводской иллюстрированный каталог деталей, колонки — Index No., Part No., Part Name, Qty, Ref. Desig. Поиск по образцу «знак валюты + число» дал 0 совпадений.",
+     "what_it_is": "Заводской перечень деталей Solar Turbines на Taurus 70 — ровно на нашу машину. Текстовый слой страницы отдаётся обычным curl. Колонки в тексте идут блоками: сначала все Part No. фигуры, затем в том же порядке все Part Name. Выравнивание по позиции проверено на нашем же номере: 1013121-1 -> TRANSMITTER, DIFFERENTIAL PRESSURE при заявке «ПРЕОБРАЗОВАТЕЛЬ, ПЕРЕПАД ДАВЛЕНИЯ, 25 ДЮЙМОВ ВОДЯНОГО СТОЛБА». Выровнено 129 блоков, 1 935 пар «номер — наименование»."
+    },
+    {
+     "url": "https://www.scribd.com/document/283929498/Taurus-70-Ipl",
+     "title": "Solar Turbines, Illustrated Parts List, Taurus 70, второй том (308 стр.)",
+     "rows_total": 531,
+     "currency_note": "Цен нет: заводской каталог деталей, поиск по образцу «знак валюты + число» дал 0 совпадений.",
+     "what_it_is": "Второй том того же каталога, другая комплектация пакета. Выровнено 73 блока, 1 035 пар «номер — наименование»."
+    },
+    {
+     "url": "https://idoc.tips/76681ipl-pdf-free.html",
+     "title": "76681ipl — ещё один Illustrated Parts List Solar Turbines (зеркало idoc.tips)",
+     "rows_total": 595,
+     "currency_note": "Цен нет: заводской каталог деталей.",
+     "what_it_is": "Третья копия заводского каталога на другом хостинге документов. Новых номеров против двух предыдущих не дала — только повторила уже найденные (1019197, 1062253-200, 1062883-200). Колоночная разметка в её текстовом слое не восстанавливается, наименований оттуда не брали."
+    },
+    {
+     "url": "https://5.imimg.com/data5/NQ/YD/MY-2355668/cummins-engine-parts-price-list.pdf",
+     "title": "Cummins — прайс-лист на 599 страниц, 62 307 номеров (колонки Part number / Description / MRP)",
+     "rows_total": 62307,
+     "currency_note": "Разделитель разрядов определён счётом по всему документу: 28 671 число вида «1234.56» (8 670 коротких и 20 001 длинное) при НУЛЕ чисел вида «1,234.56», «1.234,56» и «1234,56». Значит точка отделяет дробную часть, разделителя тысяч в документе нет вовсе. ВАЛЮТА В ДОКУМЕНТЕ НЕ НАЗВАНА: ни «INR», ни «Rs», ни «₹», ни знака валюты — единственная единица «EUR» в тексте относится к наименованию «LONG BLOCK EURO-II». Колонка названа MRP, PDF создан 08.01.2018 в часовом поясе +05:30 и выложен на IndiaMART. Поэтому цена записана числом с оговоркой, в заголовок не идёт.",
+     "what_it_is": "Дилерский прайс-лист на детали Cummins: номер, наименование, MRP. Наши пять номеров нашлись в нём с наименованием, сходящимся с заявкой."
+    },
+    {
+     "url": "https://www.pssao.com/catlog/cummins/Price%20List%20from%20Feb-2024.pdf",
+     "title": "Cummins — прайс-лист с февраля 2024 (колонки Part Number / Description / MRP / TML PART NO. / EMISSION MODE / ENGINE MODEL)",
+     "rows_total": 2973,
+     "currency_note": "Разделитель разрядов определён счётом по всему документу: 2 973 числа вида «1,620» и «9,669» (запятая-тысячи) при НУЛЕ чисел вида «1.234» (точка-тысячи) и НУЛЕ вида «1234,56» (запятая-центы). Тридцать чисел вида «n.nn» — не цены, а объёмы двигателей (0.25, 1.75) и коды (2500.24). Значит запятая разделяет тысячи, цены целые. ВАЛЮТА В ДОКУМЕНТЕ НЕ НАЗВАНА: MRP встречается 165 раз, «Rs», «INR», «₹» — ни разу; соседняя колонка «TML PART NO.» — номера Tata Motors. Цена записана числом с оговоркой.",
+     "what_it_is": "Дилерский прайс-лист Cummins от февраля 2024 года. Наш номер 4384138 нашёлся с наименованием SENSOR,DFN PRESSURE."
+    },
+    {
+     "url": "https://www.cumparts.net/cummins-sensor.html",
+     "title": "Cummins — перечень датчиков, 344 строки (ET No. / Part Name / Part No.)",
+     "rows_total": 344,
+     "currency_note": "Цен нет: поиск по образцу «знак валюты + число» и «число + знак валюты» по всей странице дал 0 совпадений. Разделитель разрядов определять не на чем.",
+     "what_it_is": "Таблица датчиков Cummins с внутренним кодом поставщика, наименованием и номером. Разобрана по строкам таблицы (tr/td), а не по плоскому тексту — иначе наименование и номер смещаются на строку."
+    },
+    {
+     "url": "https://shop.moderngroup.com/ и https://modernequipmentparts.com/",
+     "title": "The Modern Shop (Modern Group) — карточки товара по 17 номерам Cummins",
+     "rows_total": 17,
+     "currency_note": "Цена берётся не из вёрстки, а из машинного блока <script type=\"quoteninja-results\"> на самой странице: там price.without_tax.value числом и price.without_tax.currency = \"USD\" прямо в документе. Разделитель разрядов в таком виде не возникает — значение уже число. Совпадение карточки с номером заявки проверено по полю mpn и по началу названия карточки, а не по тексту страницы: страница поиска повторяет запрос в поле ввода, и одно это совпадением не считается.",
+     "what_it_is": "Магазин запчастей Modern Group; два домена — один каталог. Поиск по номеру: /search.php?search_query=<номер>. Прогнаны все 24 открытых номера Cummins, карточка нашлась у 17. Поле stock_level у всех пусто, поэтому остатка нет ни у одной позиции: «Typically ships within three business days» — срок отгрузки, а не остаток."
+    },
+    {
+     "url": "https://www.industrialautomationco.com/products/siemens-<MLFB>",
+     "title": "Industrial Automation Co — карточки Siemens SIMATIC",
+     "rows_total": 4,
+     "currency_note": "Разделитель разрядов определён счётом по каждой странице отдельно: у 6ES7312-1AE14-0AB0 — 11 чисел вида «n.nn» при нуле любых запятых, у 6ES7414-5HM06-0AB0 — 10 чисел вида «n,nnn.nn» и одно «n.nn» при нуле «n.nnn,nn» и «n,nn». Значит точка отделяет центы, запятая — тысячи. Валюта в самой строке цены: «$856.00 USD», «$3,490.00 USD».",
+     "what_it_is": "Американский продавец автоматики. НЕ заглушка: на три запрошенных номера (3RT2024-1BB45, 6ES7660-2AB31-1CA0, 7UM6211-2EB91-3AA0-L0A) сайт вернул 404, то есть страница появляется только под реальный товар. Таблица «Availability / Quantity / Purchase» даёт состояние, количество и цену построчно."
+    },
+    {
+     "url": "https://www.kempstoncontrols.co.uk/",
+     "title": "Kempston Controls — карточки трёх Siemens SIMATIC",
+     "rows_total": 3,
+     "currency_note": "Разделитель разрядов доказан арифметикой НДС на самой странице: 1026.00 x 1,20 = 1231.20 при «£1,231.20 IncVat» и 10072.00 x 1,20 = 12086.40 при «£12,086.40 IncVat». Значит точка отделяет пенсы, запятая — тысячи. Валюта — фунт стерлингов, знак на странице.",
+     "what_it_is": "Адреса найдены не поиском, а перебором уже скачанного перечня адресов Kempston (kemp_urls.txt, 1 358 470 строк): номер в адресе сверялся нормализованным. Из остатка совпали три полных MLFB Siemens. У 6ES7312-1AE14-0AB0 цена на странице не опубликована (itemprop=price content=\"0.00\", «Price on application»), у двух других — есть. Остатка нет: «Available to Back Order», срок 6-8 дней."
+    },
+    {
+     "url": "https://sigmasurplus.com/pepperl-fuchs-kfd2-cr-ex1-30-300-plc-module/",
+     "title": "SIGMA Surplus — Pepperl & Fuchs KFD2-CR-EX1.30-300, лоты по состоянию",
+     "rows_total": 4,
+     "currency_note": "Разделитель разрядов определён счётом по странице: 11 чисел вида «n.nn» при НУЛЕ чисел вида «n,nnn.nn», «n.nnn,nn» и «n,nn». Значит точка отделяет центы. Валюта — знак $ в строке цены.",
+     "what_it_is": "Продавец излишков. Товар разложен на четыре лота по состоянию, у каждого свой артикул и своё количество: «Never Used - Original Packaging» (292953-1) — $425.99, 1 шт.; «Never Used - SIGMA Packaging» (292953-2) — нет в наличии; «SIGMA Certified Refurbished» (292953-3) — нет в наличии; «Used», не испытан и не ремонтировался (292953-4) — $91.99, 2 шт. Складывать эти лоты в один остаток нельзя."
+    },
+    {
+     "url": "https://www.nexinstrument.com/",
+     "title": "NEX Instrument — карточки Siemens SIMATIC и Pepperl+Fuchs",
+     "rows_total": 4,
+     "currency_note": "ЦЕНЫ С ЭТОГО САЙТА НЕ ВЗЯТЫ. На страницах видны строки вида «USD $ 341.33 PRICE USD,……X1.6=USD…SELLING PRICE» — это внутренняя пометка о закупочной цене и о том, что продажная получается умножением на 1,6, а сама продажная не написана. Брать такое число за цену нельзя.",
+     "what_it_is": "Не заглушка: на 3RT2024-1BB45, 6ES7660-2AB31-1CA0, 7UM6211-2EB91-3AA0-L0A, ADAM-4541 и MTL5533 сайт отдал 404. Пригодился только описаниями: «CPU 312 CPU with MPI interface», «SIMATIC S7-400 Power Supply PS405», «CPU for S7-400H and S7-400F/FH», «Transmitter Supply Isolator, снят с производства, замена KFD2-STC4-EX1»."
+    },
+    {
+     "url": "https://www.santaclarasystems.com/",
+     "title": "Santa Clara Systems — принято две страницы из девяти",
+     "rows_total": 2,
+     "currency_note": "Цен на страницах нет вовсе.",
+     "what_it_is": "ВАЖНО: сайт отдаёт страницу с кодом 200 на ЛЮБУЮ строку в адресе. Проверено подстановкой выдуманного номера: /allen-bradley/zzz-9999-notreal вернул 48 КБ, заголовок «ZZZ-9999-NOTREAL Allen Bradley», состояние «Out of Stock». Значит номер на такой странице — это эхо адреса, а не запись каталога, и «Out of Stock» — состояние по умолчанию. Приняты только страницы со строкой «In Stock. We can ship this part today!», которой у выдуманного номера нет: 1756-A7XT и KFD2-CR-EX1.30-300. Отброшены как эхо адреса: KT973, MV-832, M63-16-16-PM, 700-FSK3CU23-EX, 6181P-15TPW7DC, 6181P-15A2MW71DC, MTL5533, ADAM-4541, 3RT2024-1BB45, 6ES7660-2AB31-1CA0, 7UM6211-2EB91-3AA0-L0A."
+    },
+    {
+     "url": "https://www.southeastoverseas.com/solar1.html",
+     "title": "Southeast Overseas — перечень запчастей Solar, 4 страницы",
+     "rows_total": 1062,
+     "currency_note": "Цен нет: поиск по образцу «знак валюты + число» и «число + знак валюты» по всем четырём страницам дал 0 совпадений.",
+     "what_it_is": "Перечень номенклатуры Solar (Saturn, Centaur, Mercury, Taurus, Mars), которую продавец поставлял в прошлом: номер и короткое наименование. 1 062 различных нормализованных номера. Ни одного совпадения ни с остатком в 172, ни с полным списком 334."
+    },
+    {
+     "url": "https://www.salvex.com/listings/listing_detail.cfm/aucid/182999003/",
+     "title": "Salvex — лот «Solar Turbines Parts - 747 Items»",
+     "rows_total": 747,
+     "currency_note": "Единственная сумма на странице — «Original Wholesale Value: $2,110,825» на весь лот из 747 позиций. К отдельной строке она не относится, на позиции не делится и ценой номера не является.",
+     "what_it_is": "Опись лота ликвидации: Part No. / модель машины / описание. Состав — Saturn, Centaur 40/50, Mars, Package, Compressor. Лот уже снят («No longer available»). Из остатка в 172 номера — ни одного; по полному списку 334 совпал 1088912, закрытый прежним проходом."
+    }
+   ],
+   "pns_matched": 38,
+   "pns_confirmed_by_two_or_more": 11,
+   "pns_that_were_not_found": 14,
+   "usd_exposure_matched": 18185.0,
+   "usd_exposure_that_was_not_found": 4626.0,
+   "by_source": {
+    "sigmasurplus.com": 1,
+    "santaclarasystems.com": 2,
+    "nexinstrument.com": 1,
+    "modernequipmentparts.com": 11,
+    "pssao.com": 1,
+    "cumparts.net": 3,
+    "imimg.com": 5,
+    "industrialautomationco.com": 4,
+    "kempstoncontrols.co.uk": 3,
+    "moderngroup.com": 6,
+    "scribd.com": 14
+   },
+   "not_found_in_lists": 134,
+   "notes": "СЧЁТ. Из 334 открытых номеров листа «Энергосети» прежний проход закрыл 162, осталось 172. Этот проход закрыл ещё 38 (Cummins 18, Solar 16, Siemens 4); осталось 134. Из 38 закрытых 14 прежде числились «номер не найден» (pn_not_found), 6 — «только OEM», 6 — «номер найден, остатка нет», 9 — «в наличии», 3 — «доступен со сроком». Цена есть у 17 номеров из 38, остаток числом — у 3. Сверка, как и прежде, по нормализованному номеру: только латиница A-Z и цифры, кириллические двойники приведены к латинице.\n\nХОД ПЕРВЫЙ: СПЛОШНОЙ ПЕРЕБОР АДРЕСОВ gas-turbine-parts.com — ИСЧЕРПАН, НОВОГО НЕТ. Шаблон адреса статьи: index.php?m=home&c=View&a=index&aid=NNN, единственный параметр — целое aid. Прежний проход перебрал 1..700. Этот проход добрал 263 адреса: все 100, что прежде дали 404 (вдруг это была временная ошибка), и диапазон 638..800. Итого перебрано подряд 800 адресов. Живых статей 539, остальные 261 отдают страницу «404页面»; максимальный живой aid — 637, дальше до 800 сплошной 404. Повторная сверка всех 539 статей с остатком в 172 номера дала одно попадание — «30300» против KFD2-СR-Ex1 30.300, то самое ложное, что прежний проход уже отбросил. Новых перечней на сайте нет.\n  Отдельно проверено, что перебор адресов был правильным способом, а не обход рубрик: скачаны 435 страниц рубрикатора (c=Lists&a=index&tid=NN&page=N, 29 рубрик), в них 535 различных aid — а в корпусе 539, то есть четыре статьи в рубрикаторе не значатся и обходом по рубрикам не нашлись бы.\n  При этом всплыла ошибка разметки в моём собственном первом счёте, и её стоит записать: я отличал живую статью от 404 по наличию подстроки «404» в первых 300 байтах. Статья aid=41 называется «315A4045G001» — в номере есть «404», и статья попала в мусор. Правильный признак — заголовок «404页面». После исправления живых статей оказалось 539, а не 537.\n\nХОД ВТОРОЙ: 45 БИТЫХ ФАЙЛОВ drillingsolutionsltd.com ВОССТАНОВЛЕНЫ, НОВОГО НЕ ДАЛИ. Битых файлов не 46, а 45: в журнале прежнего прохода 46 ошибок чтения, но одна из них — не файл, а обрезка разбора у mine.json на 4000 попаданий. Все 45 записаны с расширением .gz, но потоком gzip не являются (обрыв закачки), причём ошибка вылезает только при ПОЛНОМ чтении: чтение первых 200 байт проходит у 17 из них. Адреса восстановлены по md5 первых 16 знаков от «адрес + перевод строки» — именно так их считал прежний загрузчик через `echo \"$u\" | md5sum`, и без учёта перевода строки ни один адрес не сходился. Перекачаны все 45 (3,7 МБ), разобраны: против остатка в 172 номера — НОЛЬ попаданий; против полного списка 334 — два, и оба по номерам, закрытым ещё прежним проходом. Это ожидаемо: страницы буровые и дизельные (Bomco, Cameron, Canrig, GD, Donaldson, FANUC, GE), а остаток — Solar, Siemens SGT и Cummins.\n\nЧТО ДАЛО ПРИБАВКУ. Не эти два хода, а три новых источника.\n  1) ЗАВОДСКОЙ КАТАЛОГ ДЕТАЛЕЙ SOLAR НА НАШУ МАШИНУ. Illustrated Parts List, Taurus 70 Gas Turbine-Driven Compressor Set, том IV — два разных тома, 508 и 308 страниц. Текстовый слой отдаётся обычным curl. Колонки идут блоками: сначала все Part No. фигуры, затем в том же порядке все Part Name; выравнивание по позиции проверено на нашем же номере — 1013121-1 даёт TRANSMITTER, DIFFERENTIAL PRESSURE при заявке «ПРЕОБРАЗОВАТЕЛЬ, ПЕРЕПАД ДАВЛЕНИЯ, 25 ДЮЙМОВ ВОДЯНОГО СТОЛБА». Выровнено 202 блока, 2 970 пар «номер — наименование». Закрыто 14 номеров Solar, у 10 из них есть заводское наименование, у 4 (1019197, 1062253-200, 233958-1, FT27701-100) номер стоит только в цифровом указателе, где наименования рядом нет; в записи это сказано прямо.\n     Что каталог НЕ даёт: ни цены, ни остатка, ни поставщика. Это подтверждение, что деталь принадлежит нашей машине, и её заводское наименование — не предложение к поставке.\n  2) МАГАЗИН THE MODERN SHOP (Modern Group, два домена — один каталог). Прогнаны поиском все 24 открытых номера Cummins, карточка нашлась у 17. Цена бралась не из вёрстки, а из машинного блока <script type=\"quoteninja-results\"> на самой странице, где стоит price.without_tax.value и currency = \"USD\" — то есть валюта названа в документе. Совпадение карточки с заявкой проверялось по полю mpn и по началу названия, а не по тексту страницы: страница поиска повторяет запрос в поле ввода, и одно это совпадением не считается.\n  3) ДВА ДИЛЕРСКИХ ПРАЙС-ЛИСТА CUMMINS (62 307 и 2 973 номера) — пять и один номер соответственно, с наименованием и ценой.\n\nО ЦЕНАХ. Цена есть у 17 номеров. Разделитель разрядов определён счётом по всему листу отдельно для каждого источника, результат записан в currency_note каждого перечня. Коротко:\n  - прайс-лист Cummins с imimg: 28 671 число вида «1234.56» при НУЛЕ чисел с запятой в любой роли — точка отделяет дробную часть, разделителя тысяч нет;\n  - прайс-лист Cummins с pssao (февраль 2024): 2 973 числа вида «1,620» при НУЛЕ «1.234» и НУЛЕ «1234,56» — запятая разделяет тысячи, цены целые;\n  - Kempston Controls: доказано арифметикой НДС на самой странице — 1026.00 x 1,20 = 1231.20 при «£1,231.20 IncVat», 10072.00 x 1,20 = 12086.40 при «£12,086.40 IncVat»;\n  - Industrial Automation Co: посчитано по каждой странице отдельно — 11 чисел «n.nn» при нуле запятых у 6ES7312, 10 чисел «n,nnn.nn» при нуле «n.nnn,nn» у 6ES7414;\n  - SIGMA Surplus: 11 чисел «n.nn» при нуле всех прочих форм;\n  - The Modern Shop: число приходит уже числом в машинном блоке страницы, вместе со строкой currency = \"USD\", разделитель тут не возникает.\n  ВАЛЮТА У ДВУХ ПРАЙС-ЛИСТОВ CUMMINS В ДОКУМЕНТЕ НЕ НАЗВАНА. Колонка называется MRP, ни «INR», ни «Rs», ни «₹», ни знака валюты в тексте нет (единственное «EUR» — часть наименования «LONG BLOCK EURO-II»). Косвенно: PDF создан в часовом поясе +05:30, выложен на IndiaMART, соседняя колонка второго листа — «TML PART NO.», номера Tata Motors. Этого достаточно, чтобы догадаться, и недостаточно, чтобы написать валюту в заголовок. Поэтому в поле price_quote у этих строк стоит число и оговорка прямо в значении, а рядом всегда есть та же позиция из The Modern Shop с явной валютой USD.\n  Ни одна цена не перенесена с соседней строки, не взята из отрывка поисковой выдачи, не вычислена и не подставлена по классу изделия.\n\nОТКУДА ЦЕНЫ НЕ ВЗЯТЫ, ХОТЯ ОНИ НА СТРАНИЦЕ ЕСТЬ.\n  - NEX Instrument: строки вида «USD $ 341.33 PRICE USD,……X1.6=USD…SELLING PRICE» — это внутренняя пометка о закупочной цене и о правиле наценки; продажная цена на странице не написана вовсе. Такое число ценой не является.\n  - NRI Parts: три цены на странице KFD2-CR-EX1.30-300 ($130.95, $455.80, $102.67) относятся к другим изделиям из блока «similar or compatible products»; у самого KFD2 цены нет.\n  - Modern Shop, карточка 4089332: цена 0 при надписи «Please contact us for the latest pricing» — это отсутствие цены, а не ноль.\n  - Salvex: «Original Wholesale Value: $2,110,825» — на весь лот из 747 позиций; на строку не делится.\n  - Kempston, 6ES7312-1AE14-0AB0: itemprop=price content=\"0.00\" и «Price on application» — цены нет.\n\nОБ ОСТАТКАХ. Остаток числом есть только у трёх номеров и только там, где число написано: «1 In Stock in the United States!» у 6ES7312-1AE14-0AB0 и у 6ES7414-5HM06-0AB0 (у второго — состояние «IAC Certified Refurbished», восстановленный, а не новый), и «Quantity: 1» / «Quantity: 2» у двух лотов KFD2-CR-EX1.30-300 на SIGMA Surplus. Всё прочее остатком не записано: «In Stock. We can ship this part today!» без числа, «Typically ships within three business days», «Available to Back Order, срок 6-8 дней» — это готовность отгрузить и срок, а не остаток.\n\nЛОВУШКА, КОТОРУЮ СТОИТ ЗАПОМНИТЬ: САЙТ-ЗАГЛУШКА. santaclarasystems.com отдаёт код 200 и полноценную страницу на ЛЮБУЮ строку в адресе. Проверено подстановкой выдуманного номера: /allen-bradley/zzz-9999-notreal вернул 48 КБ с заголовком «ZZZ-9999-NOTREAL Allen Bradley» и состоянием «Out of Stock». То есть номер на такой странице — эхо адреса, а не запись каталога. Из девяти страниц этого сайта приняты две — те, где стоит «In Stock. We can ship this part today!», чего у выдуманного номера нет: 1756-A7XT и KFD2-CR-EX1.30-300. Отброшены как эхо адреса: KT973, MV-832, M63-16-16-PM, 700-FSK3CU23-EX, 6181P-15TPW7DC, 6181P-15A2MW71DC, MTL5533, ADAM-4541, 3RT2024-1BB45, 6ES7660-2AB31-1CA0, 7UM6211-2EB91-3AA0-L0A. Проверка «вернул ли сайт 404 на заведомо несуществующий номер» теперь обязательна для каждого нового продавца: industrialautomationco.com и nexinstrument.com её прошли (404 на три и на пять номеров соответственно), и потому их страницы приняты.\n\nО ТРЁХ НОМЕРАХ SIEMENS, ЗАПИСАННЫХ В ЗАЯВКЕ БЕЗ ПРЕФИКСА. В заявке стоят «312-1AE14-0AB0», «405-0KA02-0AA0», «414-5HM06-0AB0», а на всех страницах — полные заказные номера Siemens 6ES7312-1AE14-0AB0, 6ES7405-0KA02-0AA0, 6ES7414-5HM06-0AB0. Это не разные номера, а усечённая запись: «312-1AE14-0AB0» сам по себе заказным номером Siemens не бывает, префикс 6ES7 у семейства обязателен, а наименование в заявке («CPU 312», «PS 405 10A», «CPU 414-5H PN/DP») сходится с каталожным дословно. Записаны как совпадения, но в поле pn_list стоит ПОЛНЫЙ номер со страницы, чтобы разница была видна глазом. Если заказчик считает иначе — эти три строки снимаются одним движением.\n\nРАСХОЖДЕНИЯ, КОТОРЫЕ НУЖНО ПОКАЗАТЬ ЗАКАЗЧИКУ, А НЕ ПРЯТАТЬ.\n  - 4089332: номер совпал, изготовитель Cummins совпал, но карточка называет его «HX40W Turbocharger», а заявка — «Насос охлаждающей жидкости НТК Gilkes (возможен аналог)». Это разные изделия. Строка оставлена, противоречие записано в само наименование.\n  - 3408346: карточка есть и цена есть, но изготовителем в ней назван Hyundai, а не Cummins. В заявке у номера стоит «(возможно аналог)». Строка оставлена с пометкой.\n  - 3865350: в перечне датчиков cumparts.net против номера стоит «SENSOR,PRESSURE ss 34084710», то есть датчик давления, а в заявке — «Датчик оборотов». Строка оставлена с пометкой; наименование приведено дословно.\n  - 4384138: на одном домене Modern Shop две карточки Cummins с разной ценой ($223.86 при «Typically ships» и $242.64 при «Please contact us for the latest pricing») и третья карточка того же номера под маркой Hyundai за $1 051.31. Взята карточка Cummins со сроком отгрузки; остальные названы здесь.\n\nБЛИЗКИЕ НОМЕРА, КОТОРЫЕ СТОИТ СВЕРИТЬ С ЗАКАЗЧИКОМ (совпадениями НЕ записаны).\n  - 993360C (заявка) против 993360C1. Прежний проход нашёл 993360C1 в выдержке заводского каталога и в складском перечне; теперь это подтверждено первоисточником: в Illustrated Parts List Taurus 70 номер 993360C1 стоит с наименованием O-RING в узле Figure 6.16 Fire Cylinder Cabinet, рядом с 993359C1 (тоже O-RING). Похоже, в заявке у номера отсечён последний знак.\n  - 1054813-2 (заявка) против 1054813 — 1054813 стоит в том же каталоге Taurus 70.\n  - 1786-CTK/B (заявка) против 1786-CTK — у Santa Clara есть страница «1786-CTK ... In stock and ready to ship», но это другой номер (без литеры ревизии), и страница того же сайта-заглушки.\n  - Из прежнего прохода остаются в силе: 1013121-1 против 1013121-13 и 1013121-14, 1078325-1 против 1078325-10 и 1078325-17. Сам 1013121-1 этим проходом закрыт по заводскому каталогу.\n\nЧТО ПРОВЕРЕНО И НЕ ДАЛО НИЧЕГО. Southeast Overseas (перечень Solar на 4 страницы, 1 062 номера) — ноль совпадений и с остатком, и с полным списком. Salvex, лот «Solar Turbines Parts - 747 Items» — ноль по остатку, один номер по полному списку, и тот закрыт прежде; лот снят с продажи. turbineblade.net, три страницы Industrial Marine Power по Solar Taurus 60 — ноль. Восемьдесят одна смежная ссылка Scribd — ноль. Три зеркала документов (idoc.tips, dokumen.pub, fdocuments.in) по каталогу Taurus 60 «Vol IV Spare Part Illustration», публикация 72571 — до самого документа добраться не удалось: pdfcoffee.com закрыт Cloudflare (403 «Just a moment...»), на idoc.tips и dokumen.pub его копии нет (404), vdocuments.mx отвечает 202 без содержимого. Это и есть самый очевидный незакрытый ход, см. ниже.\n\nОБРАЩЕНИЙ В СЕТЬ. Gas-turbine-parts.com: 263 адреса статей плюс 435 страниц рубрикатора. Drillingsolutionsltd.com: 45 страниц. Прочее: 4 каталога Cummins в PDF, 7 страниц по Cummins, 73 адреса по магазинам и распространителям (из них 56 ответили 200, 13 — 404, 4 — 429), 3 карточки Kempston, 4 страницы Solar Southeast Overseas, 5 страниц Salvex и Industrial Marine Power, 5 документов Scribd и зеркал, 81 смежная ссылка Scribd, 11 проб зеркал, 1 проверочный запрос с выдуманным номером. Итого около 950 обращений. Поисковая машина использовалась только чтобы узнать адрес; ни одно совпадение не записано по её выдаче — каждое стоит в теле страницы, которая скачана и прочитана.\n\nВ РЕПОЗИТОРИЙ НИЧЕГО НЕ ПИСАЛОСЬ, git не запускался. Всё сложено в рабочую папку.",
+   "items": [
+    {
+     "pn": "KFD2-СR-Ex1 30.300",
+     "name_in_ask": "Барьер искробезопасности Солар Taurus 70 KFD2-СR-Ex1 30.300",
+     "qty": 6,
+     "usd_exposure": 960.0,
+     "verdict_before": "in_stock",
+     "descriptions": [
+      "Pepperl & Fuchs KFD2-CR-EX1.30-300 PLC Module, лот «Never Used - Original Packaging» (SKU 292953-1)",
+      "Тот же товар, лот «Used» — не испытан и не ремонтировался (SKU 292953-4)",
+      "KFD2-CR-EX1.30-300 Pepperl+Fuchs — «In Stock. We can ship this part today!»; числа остатка нет",
+      "Transmitter Supply Isolator; снят с производства, замена KFD2-STC4-EX1"
+     ],
+     "sources": [
+      "sigmasurplus.com",
+      "santaclarasystems.com",
+      "nexinstrument.com"
+     ],
+     "stock_claim": "2 шт.",
+     "independent_sources": 3
+    },
+    {
+     "pn": "4384138",
+     "name_in_ask": "ДАТЧИКИ ПЕРЕПАДА ДАВЛЕНИЯ (возможно аналог)",
+     "qty": 3,
+     "usd_exposure": 0.0,
+     "verdict_before": "in_stock",
+     "descriptions": [
+      "4384138: Cummins OEM Dfn Pressure Sensor",
+      "SENSOR,DFN PRESSURE / TML PART NO. 278614999814 / BSIV, Umbrella EGR, USCR",
+      "SENSOR,DFN PRESSURE (ET No. ETSS296)"
+     ],
+     "sources": [
+      "modernequipmentparts.com",
+      "pssao.com",
+      "cumparts.net"
+     ],
+     "independent_sources": 3
+    },
+    {
+     "pn": "4010887",
+     "name_in_ask": "Вставка бумажная фильтра центрифуги масла 401088700",
+     "qty": 252,
+     "usd_exposure": 5670.0,
+     "verdict_before": "in_stock",
+     "descriptions": [
+      "4010887: Cummins OEM Oil Bypass Filter Element",
+      "ELEMENT,OIL BYPASS FILTER"
+     ],
+     "sources": [
+      "modernequipmentparts.com",
+      "imimg.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "4012662",
+     "name_in_ask": "Двигатель - набор прокладок ГБЦ",
+     "qty": 14,
+     "usd_exposure": 4550.0,
+     "verdict_before": "in_stock",
+     "descriptions": [
+      "4012662: Cummins OEM Single Head Gasket Set",
+      "SET,SINGLE HEAD GASKET"
+     ],
+     "sources": [
+      "modernequipmentparts.com",
+      "imimg.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "3420807",
+     "name_in_ask": "Уплотнение кольцевое 3420807",
+     "qty": 124,
+     "usd_exposure": 1116.0,
+     "verdict_before": "pn_found_no_stock",
+     "descriptions": [
+      "3420807: Cummins OEM O Ring Seal",
+      "SEAL,O RING"
+     ],
+     "sources": [
+      "modernequipmentparts.com",
+      "imimg.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "3420802",
+     "name_in_ask": "Уплотнение кольцевое 3420802",
+     "qty": 62,
+     "usd_exposure": 558.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "3420802: Cummins OEM O Ring Seal",
+      "SEAL,O RING"
+     ],
+     "sources": [
+      "modernequipmentparts.com",
+      "imimg.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "4012747",
+     "name_in_ask": "Шланг главной масляной системы",
+     "qty": 3,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "4012747: Cummins OEM Flexible Hose",
+      "HOSE,FLEXIBLE"
+     ],
+     "sources": [
+      "modernequipmentparts.com",
+      "imimg.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "4326595",
+     "name_in_ask": "ДАТЧИК ПОЛОЖЕНИЯ распредвала (возможно аналог)",
+     "qty": 3,
+     "usd_exposure": 0.0,
+     "verdict_before": "in_stock",
+     "descriptions": [
+      "4326595: Cummins OEM Position Sensor",
+      "SENSOR,POSITION (ET No. ETSS281)"
+     ],
+     "sources": [
+      "modernequipmentparts.com",
+      "cumparts.net"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "312-1AE14-0AB0",
+     "name_in_ask": "CPU 312",
+     "qty": 3,
+     "usd_exposure": 0.0,
+     "verdict_before": "in_stock",
+     "descriptions": [
+      "Siemens 6ES7312-1AE14-0AB0, New; описание Kempston: SIEMENS CPU312, 32KB",
+      "Siemens 6ES7312-1AE14-0AB0 SIEMENS CPU312, 32KB — цена на странице не опубликована (Price on application)"
+     ],
+     "sources": [
+      "industrialautomationco.com",
+      "kempstoncontrols.co.uk"
+     ],
+     "stock_claim": "1 шт. («1 In Stock in the United States!»)",
+     "independent_sources": 2
+    },
+    {
+     "pn": "405-0KA02-0AA0",
+     "name_in_ask": "PS 405 10A",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "in_stock",
+     "descriptions": [
+      "SIMATIC S7-400, POWER SUPPLY PS405, WIDE RANGE 10 A, 24/48/60 V DC; 5 V DC/10 A ATEX APPROVAL MARKING",
+      "SIMATIC S7-400, power supply PS405, wide range 10 A, 24/48/60 V DC; 5 V DC/10 A — «Call for Availability», цены нет"
+     ],
+     "sources": [
+      "kempstoncontrols.co.uk",
+      "industrialautomationco.com"
+     ],
+     "independent_sources": 2
+    },
+    {
+     "pn": "414-5HM06-0AB0",
+     "name_in_ask": "CPU 414-5H PN/DP",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "in_stock",
+     "descriptions": [
+      "SIEMENS SIMATIC S7-400H, CPU 414-5H, 5 INTERFACES: 1X MPI/DP, 1X DP, 1X PN AND 2 FOR SYNC MODULES, 4 MB MEMORY",
+      "Siemens 6ES7414-5HM06-0AB0, состояние «IAC Certified Refurbished» (восстановленный, не новый)"
+     ],
+     "sources": [
+      "kempstoncontrols.co.uk",
+      "industrialautomationco.com"
+     ],
+     "stock_claim": "1 шт. («1 In Stock in the United States!»)",
+     "independent_sources": 2
+    },
+    {
+     "pn": "4012442",
+     "name_in_ask": "Шланг масляной системы",
+     "qty": 7,
+     "usd_exposure": 2135.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "4012442: Cummins OEM Line"
+     ],
+     "sources": [
+      "moderngroup.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "3651213",
+     "name_in_ask": "О-образное уплотнительное кольцо (колодца свечи нижнее)",
+     "qty": 110,
+     "usd_exposure": 990.0,
+     "verdict_before": "available_lead",
+     "descriptions": [
+      "3651213: Cummins OEM D Ring Seal"
+     ],
+     "sources": [
+      "modernequipmentparts.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "4307451",
+     "name_in_ask": "ДАТЧИК ДАВЛЕНИЯ основной датчик давления (возможно аналог)",
+     "qty": 10,
+     "usd_exposure": 775.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "4307451: Cummins OEM Pressure Sensor"
+     ],
+     "sources": [
+      "moderngroup.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "4010857",
+     "name_in_ask": "Уплотнение шланга главной масляной системы",
+     "qty": 21,
+     "usd_exposure": 588.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "4010857: Cummins OEM Sealing Washer"
+     ],
+     "sources": [
+      "moderngroup.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "3865350",
+     "name_in_ask": "Датчик  оборотов Cummins p/n 3865350",
+     "qty": 3,
+     "usd_exposure": 570.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "SENSOR,PRESSURE ss 34084710 (ET No. ETSS255) — в источнике датчик давления, в заявке датчик оборотов"
+     ],
+     "sources": [
+      "cumparts.net"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "3408346",
+     "name_in_ask": "ДАТЧИК ТЕМПЕРАТУРЫ на выхлопных газах турбина (возможно аналог)",
+     "qty": 7,
+     "usd_exposure": 273.0,
+     "verdict_before": "pn_found_no_stock",
+     "descriptions": [
+      "3408346: Hyundai OEM Sensor-Temperature — в источнике изготовителем назван Hyundai, а не Cummins"
+     ],
+     "sources": [
+      "moderngroup.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "2866883",
+     "name_in_ask": "МОДУЛЬ УПРАВЛЕНИЯ ЗАЖИГАНИЕМ",
+     "qty": 3,
+     "usd_exposure": 0.0,
+     "verdict_before": "available_lead",
+     "descriptions": [
+      "2866883: Cummins OEM Ignition Control Module"
+     ],
+     "sources": [
+      "modernequipmentparts.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "2870598",
+     "name_in_ask": "ГИБКИЙ ШЛАНГ (возможно аналог)",
+     "qty": 3,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "2870598: Cummins OEM Flexible Hose"
+     ],
+     "sources": [
+      "modernequipmentparts.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "4089332",
+     "name_in_ask": "Насос охлаждающей жидкости НТК Gilkes (возможен аналог)",
+     "qty": 3,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "4089332: Cummins OEM HX40W Turbocharger — наименование в источнике (турбокомпрессор) противоречит заявке (насос охлаждающей жидкости НТК Gilkes)"
+     ],
+     "sources": [
+      "moderngroup.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "4376121",
+     "name_in_ask": "Насос охлаждающей жидкости ВТК (возможен аналог)",
+     "qty": 3,
+     "usd_exposure": 0.0,
+     "verdict_before": "in_stock",
+     "descriptions": [
+      "4376121: Cummins OEM Water Pump Kit"
+     ],
+     "sources": [
+      "moderngroup.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "4382297",
+     "name_in_ask": "Двигатель - клапан подачи топлива",
+     "qty": 3,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_found_no_stock",
+     "descriptions": [
+      "4382297: Cummins OEM Throttle Kit"
+     ],
+     "sources": [
+      "modernequipmentparts.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "6AV7863-4TB10-0AA0",
+     "name_in_ask": "ПАНЕЛЬНЫЙ МОНИТОР 22\" SIMATIC IFP2200 6AV7863-4TB10-0AA0",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "available_lead",
+     "descriptions": [
+      "SIMATIC IFP2200 Flat Panel 22\" display (16:9), Touch, extended version up to 30 m, 1920x1080, 24 V DC / 100-240 V AC, DisplayPort/DVI — «Call for Availability», цены нет"
+     ],
+     "sources": [
+      "industrialautomationco.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1756-A7XT",
+     "name_in_ask": "Стоечное шасси (7 слотов) Солар Taurus 70MD 1756-A7XT",
+     "qty": 3,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_found_no_stock",
+     "descriptions": [
+      "1756-A7XT Allen Bradley — «In Stock. We can ship this part today!»; числа остатка и цены нет"
+     ],
+     "sources": [
+      "santaclarasystems.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1010135",
+     "name_in_ask": "Уплотнительное кольцо дренажного клапана вспомогательного редуктора Солар Taurus 70 1010135",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "O-RING — Solar Turbines Illustrated Parts List, Taurus 70"
+     ],
+     "sources": [
+      "scribd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1013121-1",
+     "name_in_ask": "ПРЕОБРАЗОВАТЕЛЬ Солар Taurus 70, ПЕРЕПАД ДАВЛЕНИЯ, 25 ДЮЙМОВ ВОДЯНОГО СТОЛБА 1013121-1",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "TRANSMITTER, DIFFERENTIAL PRESSURE — Solar Turbines Illustrated Parts List, Taurus 70 (Figure 6.15 Ancillary Equipment)"
+     ],
+     "sources": [
+      "scribd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1062883-200",
+     "name_in_ask": "КЛАПАН В СБОРЕ Солар Taurus 60S 1062883-200",
+     "qty": 10,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_found_no_stock",
+     "descriptions": [
+      "VALVE ASSY; во втором блоке того же перечня — MODULE, ADAPTER — Solar Turbines Illustrated Parts List, Taurus 70"
+     ],
+     "sources": [
+      "scribd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1064851-4",
+     "name_in_ask": "ПЕРЕКЛЮЧАТЕЛЬ, КНОПКА Солар Taurus 70MD 1064851-4",
+     "qty": 2,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "SWITCH, PUSHBUTTON, LIGHTED — Solar Turbines Illustrated Parts List, Taurus 70"
+     ],
+     "sources": [
+      "scribd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1087370",
+     "name_in_ask": "АВТОМАТИЧЕСКИЙ ВЫКЛЮЧАТЕЛЬ Солар Taurus 70MD, 20 A,  ДВУХПОЛЮСНЫЙ ОДНОПОЗИЦИОННЫЙ, РЕЙКА 1087370",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "CIRCUIT BREAKER, 20 AMP — Solar Turbines Illustrated Parts List, Taurus 70"
+     ],
+     "sources": [
+      "scribd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1087576-100",
+     "name_in_ask": "СИЛЬФОН В СБОРЕ, ВЫХЛОПНАЯ СИСТЕМА Солар Taurus 70 1087576-100",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "BELLOWS, EXPANSION — Solar Turbines Illustrated Parts List, Taurus 70 (Figure 6.21 Exhaust Bellows Installation Kit)"
+     ],
+     "sources": [
+      "scribd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1088209-1000",
+     "name_in_ask": "КЛАПАН ОСНОВНОГО ТОПЛИВНОГО ГАЗА Солар Taurus 70 1088209-1000",
+     "qty": 6,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "VALVE, CONTROL — Solar Turbines Illustrated Parts List, Taurus 70"
+     ],
+     "sources": [
+      "scribd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1093866",
+     "name_in_ask": "ШЛАНГ В СБОРЕ Солар Taurus 70MD, 2,00 ДЮЙМА X 21,75 ДЮЙМА 1093866",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "HOSE — Solar Turbines Illustrated Parts List, Taurus 70 (Figure 5.5 Pre/Post Lube Oil System Common Parts)"
+     ],
+     "sources": [
+      "scribd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "999214C1",
+     "name_in_ask": "КОНТРОЛЬНЫЙ БЛОК Солар Taurus 70MD 999214C1",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "HEAD, CONTROL — Solar Turbines Illustrated Parts List, Taurus 70 (Figure 6.16 Fire Cylinder Cabinet)"
+     ],
+     "sources": [
+      "scribd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "999215C1",
+     "name_in_ask": "ШЛАНГ В СБОРЕ Солар Taurus 70MD, 0,25 ДЮЙМА X 22 ДЮЙМА 999215C1",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "HOSE, DISCHARGE — Solar Turbines Illustrated Parts List, Taurus 70 (Figure 6.16 Fire Cylinder Cabinet)"
+     ],
+     "sources": [
+      "scribd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1019197",
+     "name_in_ask": "УПЛОТНИТЕЛЬНОЕ КОЛЬЦО Солар Taurus 60S 1019197",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "Номер стоит в цифровом указателе Illustrated Parts List Taurus 70 (колонка Part No.); наименование по этому вхождению не восстанавливается — см. notes"
+     ],
+     "sources": [
+      "scribd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "233958-1",
+     "name_in_ask": "Фиксатор Солар Taurus 70MD 233958-1",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_not_found",
+     "descriptions": [
+      "Номер стоит в цифровом указателе Illustrated Parts List Taurus 70 (колонка Part No.); наименование по этому вхождению не восстанавливается — см. notes"
+     ],
+     "sources": [
+      "scribd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "FT27701-100",
+     "name_in_ask": "ИНСТРУМЕНТ, ЦЕНТРОВКА, TAURUS 70 FT27701-100",
+     "qty": 1,
+     "usd_exposure": 0.0,
+     "verdict_before": "oem_only",
+     "descriptions": [
+      "Номер стоит в цифровом указателе Illustrated Parts List Taurus 70 (колонка Part No.); наименование по этому вхождению не восстанавливается — см. notes"
+     ],
+     "sources": [
+      "scribd.com"
+     ],
+     "independent_sources": 1
+    },
+    {
+     "pn": "1062253-200",
+     "name_in_ask": "ШАРОВОЙ КЛАПАН В СБОРЕ, ПРИВОД Солар Taurus 60S 1062253-200",
+     "qty": 4,
+     "usd_exposure": 0.0,
+     "verdict_before": "pn_found_no_stock",
+     "descriptions": [
+      "Номер стоит в цифровом указателе Illustrated Parts List Taurus 70 (колонка Part No.); наименование по этому вхождению не восстанавливается — см. notes"
+     ],
+     "sources": [
+      "scribd.com"
+     ],
+     "independent_sources": 1
+    }
+   ]
   }
  }
 }

@@ -1,0 +1,148 @@
+{
+ "updated": "2026-09-18",
+ "source": "Контроль выдуманным номером. Считает gt/tools/source_control.py.",
+ "method": "По каждому продавцу открывается карточка номера «zzz-9999-notreal», которого не существует. Если продавец отдаёт на него полноценную страницу, его отрицательные утверждения сведением не являются.",
+ "fake_number": "zzz-9999-notreal",
+ "fake_number_numeric": "99999999",
+ "sellers": [
+  {
+   "host": "santaclarasystems.com",
+   "control_fake": {
+    "pn": "zzz-9999-notreal",
+    "http": 200,
+    "bytes": 47421,
+    "echoes_number": true,
+    "says_about_stock": [
+     "out of stock"
+    ],
+    "money_on_page": []
+   },
+   "control_real": {
+    "pn": "1794-IB16",
+    "http": 200,
+    "bytes": 46859,
+    "echoes_number": true,
+    "says_about_stock": [
+     "out of stock"
+    ],
+    "money_on_page": []
+   },
+   "passes": false,
+   "what_it_means": "На ВЫДУМАННЫЙ номер отвечает так же, как на настоящий. Значит его отрицательные утверждения («Out of Stock», «карточки нет») — ответ по умолчанию и сведением НЕ являются. Положительные («In Stock») сведением являются: по умолчанию он так не отвечает."
+  },
+  {
+   "host": "classicautomation.com",
+   "control_fake": {
+    "pn": "99999999",
+    "http": 404,
+    "bytes": 2562053,
+    "echoes_number": false,
+    "says_about_stock": [
+     "in stock",
+     "not found"
+    ],
+    "money_on_page": []
+   },
+   "control_real": {
+    "pn": "127819",
+    "http": 200,
+    "bytes": 2902340,
+    "echoes_number": true,
+    "says_about_stock": [
+     "in stock",
+     "out of stock",
+     "ready to ship",
+     "request a quote"
+    ],
+    "money_on_page": [
+     "$249.00"
+    ]
+   },
+   "passes": true,
+   "what_it_means": "На выдуманный номер отвечает не так, как на настоящий, — значит его «не найдено» и «нет в наличии» можно принимать как сведение."
+  },
+  {
+   "host": "us.automationparts.com",
+   "control_fake": {
+    "pn": "zzz-9999-notreal",
+    "http": 404,
+    "bytes": 2936695,
+    "echoes_number": false,
+    "says_about_stock": [
+     "in stock",
+     "no results",
+     "request a quote"
+    ],
+    "money_on_page": []
+   },
+   "control_real": {
+    "pn": "1794-IB16",
+    "http": 404,
+    "bytes": 2936688,
+    "echoes_number": false,
+    "says_about_stock": [
+     "in stock",
+     "no results",
+     "request a quote"
+    ],
+    "money_on_page": []
+   },
+   "passes": true,
+   "what_it_means": "На выдуманный номер отвечает не так, как на настоящий, — значит его «не найдено» и «нет в наличии» можно принимать как сведение."
+  },
+  {
+   "host": "kempstoncontrols.co.uk",
+   "control_fake": {
+    "pn": "99999999",
+    "http": 404,
+    "bytes": 472586,
+    "echoes_number": false,
+    "says_about_stock": [
+     "in stock",
+     "not found"
+    ],
+    "money_on_page": []
+   },
+   "control_real": {
+    "pn": "74093",
+    "http": 200,
+    "bytes": 78952,
+    "echoes_number": false,
+    "says_about_stock": [
+     "in stock"
+    ],
+    "money_on_page": []
+   },
+   "passes": true,
+   "what_it_means": "На выдуманный номер отвечает не так, как на настоящий, — значит его «не найдено» и «нет в наличии» можно принимать как сведение."
+  },
+  {
+   "host": "automation-warehouse.com",
+   "control_fake": {
+    "pn": "zzz-9999-notreal",
+    "http": 404,
+    "bytes": 237115,
+    "echoes_number": false,
+    "says_about_stock": [
+     "not found"
+    ],
+    "money_on_page": []
+   },
+   "control_real": {
+    "pn": "2cds251001r0427",
+    "http": 200,
+    "bytes": 325199,
+    "echoes_number": true,
+    "says_about_stock": [
+     "in stock"
+    ],
+    "money_on_page": [
+     "$30.16",
+     "$30.16"
+    ]
+   },
+   "passes": true,
+   "what_it_means": "На выдуманный номер отвечает не так, как на настоящий, — значит его «не найдено» и «нет в наличии» можно принимать как сведение."
+  }
+ ]
+}
