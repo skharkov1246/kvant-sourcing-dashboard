@@ -864,11 +864,11 @@
         "gt/tools/seller_groups.py",
         "gt/tools/ship_brief.py",
         "gt/tools/ship_decisions.py",
+        "gt/tools/ship_final.py",
         "gt/tools/ship_offer.py",
         "gt/tools/ship_reverify.py",
         "tests/test_maker_basis.py",
-        "tests/test_ship_decisions.py",
-        "tests/test_ship_reverify_consistency.py"
+        "tests/test_ship_decisions.py"
       ]
     },
     {
@@ -1967,6 +1967,7 @@
         "gt/tools/collisions.py",
         "gt/tools/ship_brief.py",
         "gt/tools/ship_decisions.py",
+        "gt/tools/ship_final.py",
         "gt/tools/ship_questions.py",
         "ove/build.py",
         "ove/tools/build_questions.py",
@@ -4475,6 +4476,7 @@
         "gt/tools/collisions.py",
         "gt/tools/ship_brief.py",
         "gt/tools/ship_decisions.py",
+        "gt/tools/ship_final.py",
         "gt/tools/ship_questions.py",
         "tests/test_ship_collisions.py"
       ]
@@ -4824,12 +4826,12 @@
         "gt/tools/build_lot_xlsx.py",
         "gt/tools/build_rfq.py",
         "gt/tools/confidence_audit.py",
+        "gt/tools/ship_final.py",
         "gt/tools/ship_merge.py",
         "gt/tools/ship_priced.py",
         "gt/tools/ship_report.py",
         "library/load_parts.py",
-        "zip/build.py",
-        "zip/tools/build_telsmith_page.py"
+        "zip/build.py"
       ]
     },
     {
@@ -6030,6 +6032,7 @@
       },
       "referenced_by": [
         "gt/tools/ship_brief.py",
+        "gt/tools/ship_final.py",
         "gt/tools/stocklist_cross.py",
         "tests/test_stocklist_cross.py"
       ]
@@ -8923,7 +8926,9 @@
         "level": "публикуемо",
         "markers": []
       },
-      "referenced_by": []
+      "referenced_by": [
+        "gt/tools/ship_final.py"
+      ]
     },
     {
       "path": "ove/data/bi_release.json",
@@ -9866,6 +9871,7 @@
         ".github/workflows/bitrix-tkp.yml",
         "gt/tools/ship_brief.py",
         "gt/tools/ship_decisions.py",
+        "gt/tools/ship_final.py",
         "tests/test_offer_stats_scopes.py"
       ]
     },
