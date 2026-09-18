@@ -10,6 +10,7 @@
   gt/data/ship_reverify.json       перепроверка крупнейших строк
   gt/data/ship_questions.json      вопросы заказчику
   gt/data/ship_decoded.json        расшифровки номенклатуры
+  gt/data/ship_channels.json       карта каналов закупки по изготовителям
   gt/data/bitrix_tkp_index.json    опись файлов Bitrix без цен
 Выход: gt/docs/СПРАВКА-НА-ЗАЩИТУ-ЛУКОЙЛ.pdf
 
@@ -280,6 +281,84 @@ def build() -> str:
 
     a("</div>")
 
+    ch = load("ship_channels.json") or {}
+    chb = ch.get("brands") or []
+    if chb:
+        cm = ch.get("measure") or {}
+        shift = cm.get("oem_shift") or {}
+        a("<div class='sec'><h2>Где искать цену: карта каналов по изготовителям</h2>")
+        a(f"<p>Вопрос к каждому изготовителю один: публикует ли он цену, и если нет "
+          f"— кто публикует. Карта отвечает на него по "
+          f"{ru(cm.get('exposure_mapped'))} USD из {ru(cm.get('exposure_total'))} — "
+          f"{cm.get('share_pct')} % экспозиции — четырнадцатью брендами, при том что "
+          f"изготовителей в заявке {ru(cm.get('brands_in_request'))}. Столбец с "
+          f"деньгами складывается: строка заявки посчитана ровно один раз, и "
+          f"компонент под шильдиком OEM отнесён своему изготовителю, а не OEM.</p>")
+        a("<table class='t'><colgroup><col style='width:38mm'><col style='width:13mm'>"
+          "<col style='width:20mm'><col style='width:16mm'><col style='width:26mm'>"
+          "<col></colgroup>")
+        a("<thead><tr><th>изготовитель</th><th class='n'>строк</th>"
+          "<th class='n'>экспозиция</th><th class='n'>без оценки</th>"
+          "<th>цена в доступе</th><th>где смотреть</th></tr></thead><tbody>")
+        for b in sorted(chb, key=lambda x: -(x.get("usd") or 0)):
+            a(f"<tr><td><b>{E(b['brand'])}</b></td><td class='n'>{ru(b.get('rows'))}</td>"
+              f"<td class='n'>{ru(b.get('usd'))}</td>"
+              f"<td class='n'>{ru(b.get('no_estimate'))}</td>"
+              f"<td>{E(b.get('state'))}</td>"
+              f"<td>{E((b.get('channel') or '').split(';')[0][:150])}</td></tr>")
+        a("</tbody></table>")
+        open_usd = sum(b.get("usd") or 0 for b in chb if (b.get("state") or "").startswith("прайс открыт"))
+        reg_usd = sum(b.get("usd") or 0 for b in chb if b.get("state") == "по регистрации")
+        ask_usd = sum(b.get("usd") or 0 for b in chb if b.get("state") == "только запрос")
+        a("<table class='k'>")
+        a(f"<tr><td class='l'>цена открыта — проверяется без писем</td>"
+          f"<td class='v'>{ru(open_usd)} USD</td>"
+          f"<td class='dim'>сверяется карточкой продавца сегодня же</td></tr>")
+        a(f"<tr><td class='l'>цена за регистрацией</td><td class='v'>{ru(reg_usd)} USD</td>"
+          f"<td class='dim'>нужен аккаунт, а не переписка: один шаг открывает весь "
+          f"кластер вместе с остатком</td></tr>")
+        a(f"<tr><td class='l'>прайса нет ни у кого — только запрос</td>"
+          f"<td class='v'>{ru(ask_usd)} USD</td>"
+          f"<td class='dim'>здесь «нечем проверить» — форма рынка, а не качество "
+          f"поиска. На защите это защищается каналом, а не ценой</td></tr>")
+        a("</table>")
+        sol = shift.get("Solar Turbines") or {}
+        if sol:
+            a("<div class='warn'><p><b>Поправка к прежней формулировке про Solar.</b> "
+              f"Под шильдиком Solar в заявке 497 строк на 2 396 349 USD, но "
+              f"{ru(sol.get('rows'))} строки из них на {ru(sol.get('usd'))} USD — "
+              f"чужие компоненты ("
+              + ", ".join(f"{E(k)} {v['rows']}" for k, v in
+                          sorted((sol.get("brands") or {}).items(),
+                                 key=lambda kv: -kv[1]["usd"]))
+              + "). Магазин Solar их не закрывает и не должен: у Allen-Bradley и "
+                "Pepperl+Fuchs цена уже открыта у их продавцов, и под их собственным "
+                "номером она в разы ниже, чем под номером Solar. Регистрация в магазине "
+                "Solar закрывает его собственную номенклатуру — 413 строк на "
+                "1 002 915 USD, из которых у 268 оценки нет вовсе.</p></div>")
+        a("<h3>Что установлено по каждому каналу</h3>")
+        for b in sorted(chb, key=lambda x: -(x.get("usd") or 0)):
+            a(f"<p><b>{E(b['brand'])}</b> — {E(b.get('state'))}. "
+              f"{E(b.get('channel'))}<br>"
+              f"<span class='dim'>что проверено: {E(b.get('checked'))}</span><br>"
+              f"действие: {E(b.get('action'))}</p>")
+        for mt in ch.get("methods") or []:
+            a(f"<p><b>Приём: {E(mt.get('method'))}</b> — {E(mt.get('channel'))}<br>"
+              f"<span class='dim'>что проверено: {E(mt.get('checked'))}</span><br>"
+              f"действие: {E(mt.get('action'))}<br>"
+              f"<span class='dim'>оговорка: {E(mt.get('caveat'))}</span></p>")
+        a("<div class='do'><b>Предложение на защиту</b><p>Разделить заявку не по "
+          "листам, а по каналу. Там, где цена открыта, число защищается карточкой "
+          "продавца и спорить не о чем. Там, где цена за регистрацией, нужен один "
+          "административный шаг, а не месяц переписки. Там, где прайса нет ни у "
+          "кого, единственная честная позиция — назвать канал и срок ответа: любая "
+          "цифра в этой части либо из файла контрагента, либо выдумана.</p></div>")
+        a(f"<p class='dim'>Числа карты считает и сверяет gt/tools/channels.py: "
+          f"правило «одна строка заявки — один бренд», компонентный изготовитель "
+          f"старше шильдика. Где стоит «не проверено» — страницу с ценой я не "
+          f"открывал.</p>")
+        a("</div>")
+
     a("<div class='sec'><h2>Что мешает закрыть заявку</h2>")
     a(f"<p>Вопросов к заказчику {ru(len(qs))}, за ними "
       f"{ru(sum(float(x.get('qty') or 0) for x in qs))} штук. Это не наша "
@@ -375,6 +454,11 @@ def build() -> str:
         a("</div>")
 
     a("<div class='sec'><h2>Следующие шаги по порядку</h2><ol>")
+    a("<li><b>Регистрация там, где цена за входом: магазин Solar, ONERGYS и "
+      "iggnita по Jenbacher.</b> Это административный шаг на один час, и он "
+      "открывает цену вместе с остатком по кластеру, где у 268 строк оценки нет "
+      "вовсе. Поштучная разведка того же объёма стоит недели и даёт хуже: "
+      "магазин изготовителя показывает остаток, а витрина перепродавца — нет.</li>")
     a("<li><b>Твёрдые офферы по строкам с подтверждённым остатком.</b> Пока "
       "продавец не подтвердил остаток письмом на наш объём, строка не "
       "отгружаемая, сколько бы «in stock» ни стояло на карточке.</li>")
