@@ -46,6 +46,7 @@ RV = ROOT / "gt/data/ship_reverify.json"
 INDEP = ROOT / "gt/data/ship_seller_independence.json"
 SUBST = ROOT / "gt/data/ship_price_substitutions.json"
 OUT = ROOT / "gt/data/ship_underpriced.json"
+OFFERS = ROOT / "gt/data/ship_offer_stats.json"
 
 #: Язык брокерской витрины — закрытым списком, из самого поля «вид цены».
 #: Обвинять по глагольным формам нельзя (правило репозитория), поэтому только
@@ -132,6 +133,21 @@ def build() -> dict:
             "channel": str(x.get("channel") or "")[:200],
         })
     rows.sort(key=lambda r: -r["gap_total"])
+    # ПИСЬМЕННОЕ ПРЕДЛОЖЕНИЕ — ДОВОД СИЛЬНЕЕ ВИТРИНЫ, и по нему заниженных
+    # строк втрое больше. Этот набор считает только те, где цену нашла
+    # перепроверка в открытом доступе; счётчики прогона по вложениям сделок
+    # говорят, что предложение поставщика выше нашего потолка по 253 строкам.
+    # Суммы по ним здесь нет и быть не может: цены из вложений остаются в
+    # артефакте прогона, репозиторий публичный. Без этой ссылки два числа об
+    # одном предмете читались бы как противоречие.
+    offers = {}
+    if OFFERS.exists():
+        od = json.loads(OFFERS.read_text(encoding="utf-8"))
+        for name, sc in (od.get("scopes") or {}).items():
+            offers[name] = {"rows_with_written_offer": sc.get("rows_with_offer"),
+                            "offer_above_our_ceiling": sc.get("above_ceiling"),
+                            "offer_below_our_floor": sc.get("below_floor"),
+                            "offer_inside_our_band": sc.get("inside_band")}
     tiers = {}
     for t in ("в сумму идёт", "покрытие не подтверждено", "цена не закупочная"):
         part = [r for r in rows if r["tier"] == t]
@@ -153,6 +169,17 @@ def build() -> dict:
         "headline": "Решение принимается по нашей экспозиции: сколько денег НАШЕГО предложения "
                     "стоит на строках, где единственная найденная цена выше нашего потолка.",
         "our_exposure_usd": round(sum(r["our_exposure"] for r in rows), 2),
+        "written_offers": {
+            "why_it_matters": "Письменное предложение поставщика из вложения сделки — довод "
+                              "сильнее карточки витрины: продавец адресовал его нам. По этому "
+                              "признаку заниженных строк втрое больше, чем в разборе ниже.",
+            "why_no_money_here": "Суммы по ним в этом наборе нет и быть не может: цены из "
+                                 "вложений остаются в артефакте прогона, репозиторий "
+                                 "публичный. Считает их прогон «Bitrix входящие КП» "
+                                 "документом «Свод выставленных цен с рынком».",
+            "by_scope": offers,
+            "note": "Охваты не складываются: это разные заявки.",
+        },
         "tiers": tiers, "skipped": skipped, "rows": rows,
     }
 

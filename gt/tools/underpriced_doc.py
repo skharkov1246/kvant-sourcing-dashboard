@@ -142,6 +142,26 @@ def build() -> str:
         a(f"<p>{E(WHAT_TO_DO[name])}</p>")
         a(table(part))
 
+    wo = d.get("written_offers") or {}
+    if wo.get("by_scope"):
+        a("<h2>Довод сильнее витрины: письменные предложения поставщиков</h2>")
+        a(f"<p>{E(wo['why_it_matters'])}</p>")
+        a("<table><thead><tr><th>лист заявки</th><th class='n'>строк с письменным "
+          "предложением</th><th class='n'>предложение ВЫШЕ нашего потолка</th>"
+          "<th class='n'>внутри нашей вилки</th><th class='n'>ниже нашего пола</th>"
+          "</tr></thead><tbody>")
+        for name, v in wo["by_scope"].items():
+            a(f"<tr><td class='k'>{E(name)}</td>"
+              f"<td class='n'>{ru(v['rows_with_written_offer'])}</td>"
+              f"<td class='n'>{ru(v['offer_above_our_ceiling'])}</td>"
+              f"<td class='n'>{ru(v['offer_inside_our_band'])}</td>"
+              f"<td class='n'>{ru(v['offer_below_our_floor'])}</td></tr>")
+        a("</tbody></table>")
+        a(f"<p class='dim'>{E(wo['note'])} {E(wo['why_no_money_here'])} Поэтому таблицы выше "
+          f"и эта таблица не противоречат друг другу: выше — строки, по которым цену нашла "
+          f"разведка в открытом доступе и её можно назвать числом здесь; здесь — строки, по "
+          f"которым цена пришла нам письмом, и она лежит в файле, а не в этом документе.</p>")
+
     a("<h2>Что делать по порядку</h2>")
     a("<p><b>1. Разряд «в сумму идёт» — решение сегодня.</b> По этим строкам оговорок нет: "
       "покрытие подтверждено, цена не брокерская, свидетель не один. Либо новая цена "
