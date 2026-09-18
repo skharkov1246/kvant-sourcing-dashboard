@@ -5,8 +5,8 @@
  "quote_files_scanned": 779,
  "rows_of_request_found": 1014,
  "usd_found": 6702447.3,
- "rows_without_our_price": 838,
- "usd_without_our_price": 3682262.3,
+ "rows_without_our_price": 837,
+ "usd_without_our_price": 3678954.8,
  "min_key_length": 6,
  "found_only_after_folding": 6,
  "folding_note": "Совпадения, найденные только после приведения кириллических букв-двойников к латинице. В заявке номера со смешанным алфавитом, и по такому написанию сверка не находит ничего. Приведение делается ТОЛЬКО когда вся кириллица в обозначении — двойники: иначе русское обозначение калечится в правдоподобный набор знаков и даёт ложное совпадение.",
@@ -2328,43 +2328,6 @@
      "rows": 1564,
      "rows_with_price": 1431,
      "direction": "заявка"
-    }
-   ]
-  },
-  {
-   "pn": "917427С1",
-   "name": "Никелевый противозадирный герметик Солар Taurus 60S 917427С1",
-   "qty": 27,
-   "usd_exposure": 3307.5,
-   "we_already_have_price": false,
-   "found_in": [
-    {
-     "deal": "СП-166 41034",
-     "file": "Quotation p76057.pdf",
-     "rows": 1157,
-     "rows_with_price": 475,
-     "direction": "входящее"
-    },
-    {
-     "deal": "сделка 18020",
-     "file": "Quotation #74640.pdf",
-     "rows": 221,
-     "rows_with_price": 37,
-     "direction": "входящее"
-    },
-    {
-     "deal": "сделка 18020",
-     "file": "Quotation #74640.pdf",
-     "rows": 221,
-     "rows_with_price": 37,
-     "direction": "входящее"
-    },
-    {
-     "deal": "СП-166 24654",
-     "file": "Quotation #74640.pdf",
-     "rows": 221,
-     "rows_with_price": 37,
-     "direction": "входящее"
     }
    ]
   },
