@@ -74,9 +74,17 @@ h2 { font-size: 10.5pt; margin: 6mm 0 2mm; border-bottom: 1.2pt solid #111;
 p { margin: 0 0 2.5mm; line-height: 1.5; }
 .dim { color: #555; font-size: 8.4pt; }
 .lead { border: 1pt solid #111; padding: 3mm; margin-bottom: 4mm; }
+/* Письмо ТЕЧЁТ через страницы. Было page-break-inside: avoid — и тело письма,
+   не влезающее на остаток страницы, уезжало целиком на следующую, оставляя
+   строку «Тема:» одну на пустой странице: замер 18.09.2026 — страница 67 из 77
+   на 48 символов, scripts/pdf_check.py выдал «полупустые страницы». Запрет
+   разрыва работает только для блока меньше страницы, а длина письма зависит от
+   числа позиций в нём и не ограничена ничем. Держать вместе надо не письмо, а
+   заголовок с началом письма — это делает .subj ниже. */
 pre { background: #f6f6f6; border: 0.4pt solid #bbb; padding: 2.5mm; white-space: pre-wrap;
       font-family: "DejaVu Sans Mono", monospace; font-size: 8pt; line-height: 1.45;
-      page-break-inside: avoid; }
+      page-break-inside: auto; orphans: 3; widows: 3; }
+.subj { page-break-after: avoid; }
 table { border-collapse: collapse; width: 100%; font-size: 8.4pt; }
 thead { display: table-header-group; }
 th, td { border: 0.4pt solid #999; padding: 1.2mm 1.6mm; text-align: left; vertical-align: top; }
@@ -244,7 +252,7 @@ def doc(d: dict) -> str:
           f"{ru(L['our_exposure'])} USD нашей экспозиции</h2>")
         if L.get("warning"):
             a(f"<p><b>{E(L['warning'])}</b></p>")
-        a(f"<p><b>Тема:</b> {E(L['subject'])}</p>")
+        a(f"<p class='subj'><b>Тема:</b> {E(L['subject'])}</p>")
         a(f"<pre>{E(L['body'])}</pre>")
     a("<h2>Строки, по которым письма нет: адрес не найден</h2>")
     a(f"<p>{ru(d['rows_without_address'])} строк на {ru(d['usd_without_address'])} долларов "

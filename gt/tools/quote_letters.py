@@ -50,6 +50,12 @@ CHROME = ["/opt/pw-browsers/chromium/chrome-linux/chrome",
           "/opt/pw-browsers/chromium-1194/chrome-linux/chrome",
           "/usr/bin/chromium", "/usr/bin/chromium-browser", "/usr/bin/google-chrome"]
 MAIL = re.compile(r"[\w.+-]+@[\w-]+(?:\.[\w-]+)*\.[A-Za-z]{2,}")
+# Канал без почты. Замер 18.09.2026: из 48 строк, у которых почты нет, у 25 в
+# разборе стоит ссылка и ещё у 6 — телефон, всего на 122 494 USD. Пока они
+# лежали в графе «адреса нет», по ним не было названо никакого действия, хотя
+# спросить было куда: отчёт писал «работа найти адрес», а адрес был прочитан.
+SELLER_URL = re.compile(r"https?://[^\s,;)»\"']+")
+SELLER_TEL = re.compile(r"\+\d[\d\s().-]{7,}\d")
 
 CSS = """
 @page { size: A4 portrait; margin: 14mm 12mm; }
@@ -61,9 +67,17 @@ p { margin: 0 0 2.5mm; line-height: 1.5; }
 .dim { color: #555; font-size: 8.4pt; }
 .warn { border: 1pt solid #111; padding: 2mm; }
 .lead { border: 1pt solid #111; padding: 3mm; margin-bottom: 4mm; }
+/* Письмо ТЕЧЁТ через страницы. Было page-break-inside: avoid — и тело письма,
+   не влезающее на остаток страницы, уезжало целиком на следующую, оставляя
+   строку «Тема:» одну на пустой странице: замер 18.09.2026 — страница 67 из 77
+   на 48 символов, scripts/pdf_check.py выдал «полупустые страницы». Запрет
+   разрыва работает только для блока меньше страницы, а длина письма зависит от
+   числа позиций в нём и не ограничена ничем. Держать вместе надо не письмо, а
+   заголовок с началом письма — это делает .subj ниже. */
 pre { background: #f6f6f6; border: 0.4pt solid #bbb; padding: 2.5mm; white-space: pre-wrap;
       font-family: "DejaVu Sans Mono", monospace; font-size: 8pt; line-height: 1.45;
-      page-break-inside: avoid; }
+      page-break-inside: auto; orphans: 3; widows: 3; }
+.subj { page-break-after: avoid; }
 table { border-collapse: collapse; width: 100%; font-size: 8.4pt; }
 thead { display: table-header-group; }
 th, td { border: 0.4pt solid #999; padding: 1.2mm 1.6mm; text-align: left; vertical-align: top; }
@@ -230,10 +244,20 @@ def candidates() -> tuple[list, list]:
             continue
         a = ask.get(k) or {}
         mails = MAIL.findall(f"{x.get('contacts') or ''} {x.get('channel') or ''}")
+        # Канал продавца, которым можно воспользоваться БЕЗ почты: ссылка или
+        # телефон, прочитанные разбором. Берём как напечатано, не достраивая
+        # домен и не подбирая почту по домену: правило репозитория «не выдавай
+        # родовой адрес за адрес по детали» и запрет додумывать адрес.
+        chan = f"{x.get('contacts') or ''} {x.get('channel') or ''}"
+        url = SELLER_URL.search(chan)
+        tel = SELLER_TEL.search(chan)
         item = {"pn": x.get("pn"), "qty": a.get("qty"), "unit": a.get("unit") or "шт",
                 "maker": short_maker(x.get("maker_short"), a.get("man")),
                 "our_exposure": round(expo(a), 2),
-                "mail": mails[0] if mails else ""}
+                "mail": mails[0] if mails else "",
+                "seller_url": url.group(0).rstrip(".,;") if url else "",
+                "seller_tel": tel.group(0).strip() if tel else "",
+                "seller_note": str(x.get("contacts") or "")}
         (with_mail if mails else without).append(item)
     return with_mail, without
 
@@ -281,6 +305,33 @@ def build() -> dict:
             continue
         still_without.append(it)
     without = still_without
+    # Пятый путь: у продавца нет почты, но разбор прочитал его страницу или
+    # телефон. Такие строки лежали в графе «адреса нет» и не получали никакого
+    # действия — 31 строка на 122 494 USD, по которым спросить было куда.
+    # Отдельный путь, а не письмо: отправляет человек, и вопрос он задаёт
+    # голосом или через чужую форму, поэтому текст тот же, а способ другой.
+    to_seller_channel, no_address = [], []
+    for it in without:
+        if it.get("seller_url") or it.get("seller_tel"):
+            to_seller_channel.append(it)
+        else:
+            no_address.append(it)
+    to_seller_channel.sort(key=lambda z: -z["our_exposure"])
+    seller_tasks = [{
+        "pn": it["pn"], "qty": it.get("qty"), "unit": it.get("unit"),
+        "maker": it.get("maker"),
+        "our_exposure": it["our_exposure"],
+        "page": it.get("seller_url"),
+        "phone": it.get("seller_tel"),
+        "how": ("открыть страницу продавца и задать пять вопросов через её форму"
+                if it.get("seller_url") else "позвонить и задать пять вопросов"),
+        # Адрес канала приводится ЦЕЛИКОМ, как он записан разбором: там же
+        # стоят оговорки вроде «форма без выбора России» и «продавец класса, а
+        # не по детали». Обрезка унесла бы ровно их.
+        "what_the_analysis_read": it.get("seller_note"),
+        "text": body([it]),
+    } for it in to_seller_channel]
+    without = no_address
     form_tasks = []
     for url, items in sorted(to_form.items(),
                              key=lambda kv: -sum(x["our_exposure"] for x in kv[1])):
@@ -364,20 +415,32 @@ def build() -> dict:
         # письма изготовителям, и целое молча теряло эти строки: 267 + 50 + 205
         # против объявленных 472. Тест на сходимость это и поймал.
         "rows_total": (len(with_mail) + sum(len(v) for v in to_maker.values())
-                       + sum(len(v) for v in to_form.values()) + len(without)),
+                       + sum(len(v) for v in to_form.values())
+                       + len(to_seller_channel) + len(without)),
         "usd_total": round(sum(x["our_exposure"] for x in with_mail + without)
                            + sum(x["our_exposure"] for v in to_maker.values() for x in v)
-                           + sum(x["our_exposure"] for v in to_form.values() for x in v), 2),
+                           + sum(x["our_exposure"] for v in to_form.values() for x in v)
+                           + sum(x["our_exposure"] for x in to_seller_channel), 2),
         "rows_with_address": len(with_mail),
         "usd_with_address": round(sum(x["our_exposure"] for x in with_mail), 2),
         "rows_without_address": len(without),
         "usd_without_address": round(sum(x["our_exposure"] for x in without), 2),
         "how_rows_split": ("rows_total = rows_with_address + rows_to_maker + rows_to_form + "
-                           "rows_without_address. Четыре пути: письмо продавцу (цена и "
-                           "наличие), письмо изготовителю (расшифровка номера и "
-                           "авторизованный канал), обращение через форму изготовителя — тем "
-                           "же текстом, но вставляет его человек, — и остаток, по которому "
-                           "адресата нет вовсе."),
+                           "rows_to_seller_channel + rows_without_address. Пять путей: "
+                           "письмо продавцу (цена и наличие), письмо изготовителю "
+                           "(расшифровка номера и авторизованный канал), обращение через "
+                           "форму изготовителя — тем же текстом, но вставляет его человек, "
+                           "— обращение к продавцу без почты по прочитанной странице или "
+                           "телефону, и остаток, по которому адресата нет вовсе."),
+        "rows_to_seller_channel": len(to_seller_channel),
+        "usd_to_seller_channel": round(sum(x["our_exposure"] for x in to_seller_channel), 2),
+        "seller_tasks": seller_tasks,
+        "why_seller_channel_is_not_nothing": (
+            "Замер 18.09.2026: у 48 строк почты продавца нет, но у 25 из них разбор "
+            "прочитал страницу, а ещё у 6 — телефон, всего на 122 494 USD. Пока они "
+            "считались безадресными, отчёт называл по ним работой «найти адрес» — адрес "
+            "при этом был уже найден и записан. Почта по домену не додумывается: "
+            "спрашивают тем каналом, который прочитан."),
         "rows_to_form": sum(len(v) for v in to_form.values()),
         "usd_to_form": round(sum(x["our_exposure"] for v in to_form.values() for x in v), 2),
         "form_tasks": form_tasks,
@@ -388,7 +451,6 @@ def build() -> dict:
                                     "определена». Отправляет человек: посылать что-либо "
                                     "наружу от нашего имени агент сам не станет."),
         "rows_to_maker": sum(len(v) for v in to_maker.values()),
-        "usd_to_maker": round(sum(x["our_exposure"] for v in to_maker.values() for x in v), 2),
         "usd_to_maker": round(sum(x["our_exposure"] for v in to_maker.values() for x in v), 2),
         "what_maker_letter_asks": ("Изготовителю задаётся не цена, а расшифровка внутреннего "
                                   "обозначения в коммерческий номер: по SP1xxxxx, CT9xxxx, "
@@ -448,7 +510,7 @@ def doc(d: dict) -> str:
             a(f"<p class='dim'><b>Что известно про этот канал</b> (из разбора адреса, "
               f"уверенность «{E(L.get('confidence'))}»): "
               f"{E(L['what_is_known_about_channel'])}</p>")
-        a(f"<p><b>Тема:</b> {E(L['subject'])}</p>")
+        a(f"<p class='subj'><b>Тема:</b> {E(L['subject'])}</p>")
         a(f"<pre>{E(L['body'])}</pre>")
     if d.get("form_tasks"):
         a(f"<h2>Через форму обращения: {ru(d['rows_to_form'])} строк на "
@@ -459,6 +521,20 @@ def doc(d: dict) -> str:
               f"{ru(t['our_exposure'])} USD нашей экспозиции</p>")
             a(f"<p>Форма: {E(t['form_url'])}"
               + (f"<br>Телефон: {E(t['phone'])}" if t.get("phone") else "") + "</p>")
+            a(f"<pre>{E(t['text'])}</pre>")
+    if d.get("seller_tasks"):
+        a(f"<h2>Продавец без почты — страница или телефон: {ru(d['rows_to_seller_channel'])} "
+          f"строк на {ru(d['usd_to_seller_channel'])} долларов США</h2>")
+        a(f"<p>{E(d['why_seller_channel_is_not_nothing'])}</p>")
+        for i, t in enumerate(d["seller_tasks"], 1):
+            a(f"<p class='k'>{i}. {E(t['pn'])}"
+              + (f" — {ru(t['qty'])} {E(t['unit'])}" if t.get("qty") else "")
+              + (f", изготовитель {E(t['maker'])}" if t.get("maker") else "")
+              + f" — {ru(t['our_exposure'])} USD нашей экспозиции</p>")
+            a(f"<p>Как спрашивать: {E(t['how'])}."
+              + (f"<br>Страница: {E(t['page'])}" if t.get("page") else "")
+              + (f"<br>Телефон: {E(t['phone'])}" if t.get("phone") else "")
+              + f"<br>Что прочитал разбор: {E(t['what_the_analysis_read'])}</p>")
             a(f"<pre>{E(t['text'])}</pre>")
 
     a("<h2>Что делать с этим документом</h2>")

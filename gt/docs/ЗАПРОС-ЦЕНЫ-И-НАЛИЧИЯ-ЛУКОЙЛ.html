@@ -8,16 +8,24 @@ p { margin: 0 0 2.5mm; line-height: 1.5; }
 .dim { color: #555; font-size: 8.4pt; }
 .warn { border: 1pt solid #111; padding: 2mm; }
 .lead { border: 1pt solid #111; padding: 3mm; margin-bottom: 4mm; }
+/* Письмо ТЕЧЁТ через страницы. Было page-break-inside: avoid — и тело письма,
+   не влезающее на остаток страницы, уезжало целиком на следующую, оставляя
+   строку «Тема:» одну на пустой странице: замер 18.09.2026 — страница 67 из 77
+   на 48 символов, scripts/pdf_check.py выдал «полупустые страницы». Запрет
+   разрыва работает только для блока меньше страницы, а длина письма зависит от
+   числа позиций в нём и не ограничена ничем. Держать вместе надо не письмо, а
+   заголовок с началом письма — это делает .subj ниже. */
 pre { background: #f6f6f6; border: 0.4pt solid #bbb; padding: 2.5mm; white-space: pre-wrap;
       font-family: "DejaVu Sans Mono", monospace; font-size: 8pt; line-height: 1.45;
-      page-break-inside: avoid; }
+      page-break-inside: auto; orphans: 3; widows: 3; }
+.subj { page-break-after: avoid; }
 table { border-collapse: collapse; width: 100%; font-size: 8.4pt; }
 thead { display: table-header-group; }
 th, td { border: 0.4pt solid #999; padding: 1.2mm 1.6mm; text-align: left; vertical-align: top; }
 th { background: #eee; }
 tr { page-break-inside: avoid; }
 .n { text-align: right; white-space: nowrap; }
-</style><h1>Запрос цены и наличия: 121 писем, 267 строк на 6 518 358,25 долларов США</h1><div class='lead'><p><b>Что это.</b> Запрос цены и наличия по строкам, где адресат известен из разбора, а спрашивать никто не начал. Всего таких строк <b>522</b> на <b>8 629 057,75 долларов США</b>; адрес есть у <b>267</b> на <b>6 518 358,25</b>.</p><p><b>Почему это отдельный пакет.</b> У пакетов разные условия: ship_rfq берёт строки со НАЙДЕННЫМ складом, volume_letters — строки с ценой без остатка числом. Строки, где есть только адрес, не подходили ни туда, ни туда — и оказались самым большим классом.</p><p><b>Чего в письме нет.</b> Ни нашей вилки, ни суммы, ни имени заказчика. Письмо уходит наружу, а объём закупки — наша переговорная позиция.</p><p class='dim'>Строк без адреса: 34 на 299 769 долларов США — по ним сначала ищется адрес у изготовителя и в его сети обслуживания. Подбирать получателя по классу изделия нельзя: ответ придёт про класс, а не про эту деталь.</p></div><h2>Порядок отправки по деньгам</h2><table><thead><tr><th class='n'>№</th><th>адресат</th><th class='n'>позиций</th><th class='n'>наша экспозиция, USD</th></tr></thead><tbody><tr><td class='n'>1</td><td>sales@ierfzco.com</td><td class='n'>1</td><td class='n'>720 000</td></tr><tr><td class='n'>2</td><td>sales@gasturbineproduct.com</td><td class='n'>1</td><td class='n'>660 000</td></tr><tr><td class='n'>3</td><td>info@hardtoget.parts</td><td class='n'>18</td><td class='n'>409 357,50</td></tr><tr><td class='n'>4</td><td>sales@hatraco.com</td><td class='n'>1</td><td class='n'>400 027,50</td></tr><tr><td class='n'>5</td><td>sales@cm-motors.ru</td><td class='n'>1</td><td class='n'>312 900</td></tr><tr><td class='n'>6</td><td>info@iggnita.com</td><td class='n'>3</td><td class='n'>296 760</td></tr><tr><td class='n'>7</td><td>info@gowrings.nl</td><td class='n'>10</td><td class='n'>296 300</td></tr><tr><td class='n'>8</td><td>peter@turbineblade.net</td><td class='n'>2</td><td class='n'>252 936</td></tr><tr><td class='n'>9</td><td>info@saacke.com</td><td class='n'>1</td><td class='n'>229 500</td></tr><tr><td class='n'>10</td><td>vision@victoryenergy.com</td><td class='n'>2</td><td class='n'>211 000</td></tr><tr><td class='n'>11</td><td>support@siemens-energy.com</td><td class='n'>16</td><td class='n'>208 150</td></tr><tr><td class='n'>12</td><td>sales@artisantg.com</td><td class='n'>1</td><td class='n'>192 125</td></tr><tr><td class='n'>13</td><td>contact@plcdepartment.com</td><td class='n'>5</td><td class='n'>131 042,50</td></tr><tr><td class='n'>14</td><td>sales@gas-turbine-parts.com ⚠</td><td class='n'>30</td><td class='n'>125 530</td></tr><tr><td class='n'>15</td><td>info@asb-drives.eu</td><td class='n'>1</td><td class='n'>112 200</td></tr><tr><td class='n'>16</td><td>sales@dex.com</td><td class='n'>1</td><td class='n'>112 010</td></tr><tr><td class='n'>17</td><td>saels@gas-turbine-parts.com ⚠</td><td class='n'>4</td><td class='n'>105 576</td></tr><tr><td class='n'>18</td><td>uma@meloauto.com</td><td class='n'>1</td><td class='n'>88 450</td></tr><tr><td class='n'>19</td><td>hello@turbine.parts</td><td class='n'>3</td><td class='n'>82 400</td></tr><tr><td class='n'>20</td><td>info@renk.com</td><td class='n'>5</td><td class='n'>76 800</td></tr><tr><td class='n'>21</td><td>info@turbo-k.com</td><td class='n'>1</td><td class='n'>72 000</td></tr><tr><td class='n'>22</td><td>sales@iqelectro.com</td><td class='n'>2</td><td class='n'>68 130</td></tr><tr><td class='n'>23</td><td>sales@enginepartssuperstore.com</td><td class='n'>1</td><td class='n'>60 550</td></tr><tr><td class='n'>24</td><td>commerce@nriparts.com</td><td class='n'>1</td><td class='n'>60 375</td></tr><tr><td class='n'>25</td><td>sales@aeliyamarinetech.com</td><td class='n'>5</td><td class='n'>56 280</td></tr><tr><td class='n'>26</td><td>info@arthermosensors.co.uk</td><td class='n'>5</td><td class='n'>45 280</td></tr><tr><td class='n'>27</td><td>support@buyparts.online</td><td class='n'>1</td><td class='n'>44 840</td></tr><tr><td class='n'>28</td><td>sales@us.pepperl-fuchs.com</td><td class='n'>4</td><td class='n'>44 360</td></tr><tr><td class='n'>29</td><td>sales@williamsautomation.com</td><td class='n'>2</td><td class='n'>41 790</td></tr><tr><td class='n'>30</td><td>office@powerup.at</td><td class='n'>7</td><td class='n'>41 183,50</td></tr><tr><td class='n'>31</td><td>info@powerbolt.eu</td><td class='n'>1</td><td class='n'>40 050</td></tr><tr><td class='n'>32</td><td>info@fpstechnologies.in</td><td class='n'>1</td><td class='n'>38 650</td></tr><tr><td class='n'>33</td><td>newgenplc@camvect.com</td><td class='n'>1</td><td class='n'>38 000</td></tr><tr><td class='n'>34</td><td>support@industrialzone.com</td><td class='n'>1</td><td class='n'>37 080</td></tr><tr><td class='n'>35</td><td>dbaker@scf-inc.com</td><td class='n'>3</td><td class='n'>33 025</td></tr><tr><td class='n'>36</td><td>info@drilltech.cn</td><td class='n'>4</td><td class='n'>32 480</td></tr><tr><td class='n'>37</td><td>northeastonline@needco.com</td><td class='n'>4</td><td class='n'>32 095</td></tr><tr><td class='n'>38</td><td>sales@kempstoncontrols.co.uk</td><td class='n'>8</td><td class='n'>30 963,50</td></tr><tr><td class='n'>39</td><td>contact@glpumps.com</td><td class='n'>2</td><td class='n'>30 800</td></tr><tr><td class='n'>40</td><td>sales@classicautomation.com</td><td class='n'>3</td><td class='n'>29 695</td></tr><tr><td class='n'>41</td><td>sales@santaclarasystems.com</td><td class='n'>3</td><td class='n'>29 340</td></tr><tr><td class='n'>42</td><td>sales@aeliyamarine.com</td><td class='n'>6</td><td class='n'>29 126</td></tr><tr><td class='n'>43</td><td>info@novi.com.tr</td><td class='n'>1</td><td class='n'>26 775</td></tr><tr><td class='n'>44</td><td>info@goscoenergy.com</td><td class='n'>1</td><td class='n'>25 650</td></tr><tr><td class='n'>45</td><td>info@hard-to-find.parts</td><td class='n'>3</td><td class='n'>24 502,50</td></tr><tr><td class='n'>46</td><td>info@ramautomations.com</td><td class='n'>1</td><td class='n'>23 400</td></tr><tr><td class='n'>47</td><td>info@wetzparts.com</td><td class='n'>2</td><td class='n'>21 571</td></tr><tr><td class='n'>48</td><td>info@oldfilter.com</td><td class='n'>2</td><td class='n'>19 310</td></tr><tr><td class='n'>49</td><td>SERVICE@ABC-CHARGERS.COM</td><td class='n'>1</td><td class='n'>19 000</td></tr><tr><td class='n'>50</td><td>premiumzhangfuzhe@foxmail.com</td><td class='n'>1</td><td class='n'>17 400</td></tr><tr><td class='n'>51</td><td>CathyKu_515@hotmail.com</td><td class='n'>2</td><td class='n'>17 325</td></tr><tr><td class='n'>52</td><td>evachen@transcyko.com</td><td class='n'>1</td><td class='n'>17 000</td></tr><tr><td class='n'>53</td><td>NAsales@brookcrompton.com</td><td class='n'>1</td><td class='n'>16 275</td></tr><tr><td class='n'>54</td><td>info@vbindustrialsupply.com</td><td class='n'>1</td><td class='n'>16 082</td></tr><tr><td class='n'>55</td><td>sales@de.pepperl-fuchs.com</td><td class='n'>1</td><td class='n'>15 910</td></tr><tr><td class='n'>56</td><td>automodulexpert@controlnextech.com</td><td class='n'>1</td><td class='n'>15 600</td></tr><tr><td class='n'>57</td><td>webinfo@maximinc.com</td><td class='n'>1</td><td class='n'>13 860</td></tr><tr><td class='n'>58</td><td>sales@premiumrigparts.com</td><td class='n'>1</td><td class='n'>13 590</td></tr><tr><td class='n'>59</td><td>mail@intertrek.ru</td><td class='n'>1</td><td class='n'>13 520</td></tr><tr><td class='n'>60</td><td>sales@compressorfiltersupply.com</td><td class='n'>1</td><td class='n'>13 000</td></tr><tr><td class='n'>61</td><td>sales@weschler.com</td><td class='n'>3</td><td class='n'>12 500</td></tr><tr><td class='n'>62</td><td>info@filtersource.com</td><td class='n'>1</td><td class='n'>11 400</td></tr><tr><td class='n'>63</td><td>info@eltra-trade.sk</td><td class='n'>1</td><td class='n'>11 025</td></tr><tr><td class='n'>64</td><td>sales@forte2001.ru</td><td class='n'>1</td><td class='n'>10 500</td></tr><tr><td class='n'>65</td><td>chi.sales@mcmaster.com</td><td class='n'>1</td><td class='n'>10 388</td></tr><tr><td class='n'>66</td><td>6gcontrols@5gplc.com</td><td class='n'>1</td><td class='n'>10 200</td></tr><tr><td class='n'>67</td><td>sales@optimuscontrol.com.my</td><td class='n'>1</td><td class='n'>9 900</td></tr><tr><td class='n'>68</td><td>sav@nhp-motoculture.fr</td><td class='n'>1</td><td class='n'>8 525</td></tr><tr><td class='n'>69</td><td>sales@kinetrolusa.com</td><td class='n'>1</td><td class='n'>8 200</td></tr><tr><td class='n'>70</td><td>sales@fueldump.co.uk</td><td class='n'>1</td><td class='n'>6 615</td></tr><tr><td class='n'>71</td><td>info@toosglobal.com</td><td class='n'>1</td><td class='n'>6 250</td></tr><tr><td class='n'>72</td><td>info@hydraulicstore.com</td><td class='n'>1</td><td class='n'>6 125</td></tr><tr><td class='n'>73</td><td>office@vespion.com</td><td class='n'>2</td><td class='n'>6 100</td></tr><tr><td class='n'>74</td><td>leendert.sws@gmail.com</td><td class='n'>1</td><td class='n'>6 090</td></tr><tr><td class='n'>75</td><td>contact@discountfilters.com</td><td class='n'>1</td><td class='n'>6 000</td></tr><tr><td class='n'>76</td><td>info@veza.ru</td><td class='n'>1</td><td class='n'>5 950</td></tr><tr><td class='n'>77</td><td>gparts@moderngroup.com</td><td class='n'>1</td><td class='n'>5 670</td></tr><tr><td class='n'>78</td><td>info@ervor.com</td><td class='n'>1</td><td class='n'>5 425</td></tr><tr><td class='n'>79</td><td>support@plccable.com</td><td class='n'>1</td><td class='n'>5 330</td></tr><tr><td class='n'>80</td><td>topbrandsplc@camvect.com</td><td class='n'>1</td><td class='n'>5 300</td></tr><tr><td class='n'>81</td><td>info@fridayparts.com</td><td class='n'>1</td><td class='n'>5 180</td></tr><tr><td class='n'>82</td><td>info@liebl-ip.de</td><td class='n'>1</td><td class='n'>4 950</td></tr><tr><td class='n'>83</td><td>quote@powerfuse.com</td><td class='n'>1</td><td class='n'>4 680</td></tr><tr><td class='n'>84</td><td>info@marflex.com</td><td class='n'>1</td><td class='n'>4 600</td></tr><tr><td class='n'>85</td><td>barakastock@barakaagencies.com</td><td class='n'>1</td><td class='n'>4 410</td></tr><tr><td class='n'>86</td><td>exportsupport@rs.rsgroup.com</td><td class='n'>1</td><td class='n'>4 100</td></tr><tr><td class='n'>87</td><td>customerservice@travaini.com</td><td class='n'>1</td><td class='n'>4 080</td></tr><tr><td class='n'>88</td><td>roy.pandel@titanoiltools.com</td><td class='n'>2</td><td class='n'>4 040</td></tr><tr><td class='n'>89</td><td>sales@auto2mation.com</td><td class='n'>1</td><td class='n'>3 700</td></tr><tr><td class='n'>90</td><td>sales@drillingsolutionsltd.com</td><td class='n'>1</td><td class='n'>3 540</td></tr><tr><td class='n'>91</td><td>info@axdos.se</td><td class='n'>2</td><td class='n'>3 484</td></tr><tr><td class='n'>92</td><td>info@buyfilteronline.com</td><td class='n'>1</td><td class='n'>3 325</td></tr><tr><td class='n'>93</td><td>rsmotor@rsmotor.es</td><td class='n'>1</td><td class='n'>3 162,50</td></tr><tr><td class='n'>94</td><td>sales@sigmasurplus.com</td><td class='n'>1</td><td class='n'>3 032,25</td></tr><tr><td class='n'>95</td><td>info@weyeahengine.com</td><td class='n'>1</td><td class='n'>2 800</td></tr><tr><td class='n'>96</td><td>spares2@itt.com</td><td class='n'>6</td><td class='n'>2 310</td></tr><tr><td class='n'>97</td><td>sales@sbis.com</td><td class='n'>1</td><td class='n'>2 242,50</td></tr><tr><td class='n'>98</td><td>info@rodvig.ru</td><td class='n'>1</td><td class='n'>2 177</td></tr><tr><td class='n'>99</td><td>sales@hydraulicsonline.com</td><td class='n'>1</td><td class='n'>1 900</td></tr><tr><td class='n'>100</td><td>orders@gasketsupply.com</td><td class='n'>1</td><td class='n'>1 207,50</td></tr><tr><td class='n'>101</td><td>mail@lagerwerk.com</td><td class='n'>1</td><td class='n'>735</td></tr><tr><td class='n'>102</td><td>info@tdm-elektro.ru</td><td class='n'>1</td><td class='n'>700</td></tr><tr><td class='n'>103</td><td>support@elettronew.com</td><td class='n'>2</td><td class='n'>630</td></tr><tr><td class='n'>104</td><td>sealing@saleindustry.com</td><td class='n'>1</td><td class='n'>598,50</td></tr><tr><td class='n'>105</td><td>gts@gasturbineservices.com</td><td class='n'>2</td><td class='n'>228</td></tr><tr><td class='n'>106</td><td>sales@enapart.com</td><td class='n'>2</td><td class='n'>125</td></tr><tr><td class='n'>107</td><td>info@filterserviceandsupply.com</td><td class='n'>1</td><td class='n'>0</td></tr><tr><td class='n'>108</td><td>sales@delafieldcorp.com</td><td class='n'>1</td><td class='n'>0</td></tr><tr><td class='n'>109</td><td>eshop@elpremo.cz</td><td class='n'>1</td><td class='n'>0</td></tr><tr><td class='n'>110</td><td>support@voomisupply.com</td><td class='n'>1</td><td class='n'>0</td></tr><tr><td class='n'>111</td><td>lv.enquiries@gb.abb.com</td><td class='n'>1</td><td class='n'>0</td></tr><tr><td class='n'>112</td><td>sklep@abmicro.pl</td><td class='n'>7</td><td class='n'>0</td></tr><tr><td class='n'>113</td><td>filtration.support.intl@atmus.com</td><td class='n'>4</td><td class='n'>293 631</td></tr><tr><td class='n'>114</td><td>contact.en@innio.com</td><td class='n'>1</td><td class='n'>248 250</td></tr><tr><td class='n'>115</td><td>Shop@solarturbines.com</td><td class='n'>83</td><td class='n'>240 328</td></tr><tr><td class='n'>116</td><td>support@siemens-energy.com</td><td class='n'>16</td><td class='n'>230 697,50</td></tr><tr><td class='n'>117</td><td>sales@us.pepperl-fuchs.com</td><td class='n'>3</td><td class='n'>78 420</td></tr><tr><td class='n'>118</td><td>email.kz@innio.com</td><td class='n'>18</td><td class='n'>68 843,50</td></tr><tr><td class='n'>119</td><td>info@heinzmann.de</td><td class='n'>1</td><td class='n'>37 400</td></tr><tr><td class='n'>120</td><td>spares2@itt.com</td><td class='n'>3</td><td class='n'>6 390</td></tr><tr><td class='n'>121</td><td>order.us@wago.com</td><td class='n'>2</td><td class='n'>2 887,50</td></tr></tbody></table><h2>1. sales@ierfzco.com — 1 позиц., 720 000 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (MW22316B/01)</p><pre>Добрый день!
+</style><h1>Запрос цены и наличия: 125 писем, 298 строк на 6 660 625,25 долларов США</h1><div class='lead'><p><b>Что это.</b> Запрос цены и наличия по строкам, где адресат известен из разбора, а спрашивать никто не начал. Всего таких строк <b>545</b> на <b>8 660 827,30 долларов США</b>; адрес есть у <b>298</b> на <b>6 660 625,25</b>.</p><p><b>Почему это отдельный пакет.</b> У пакетов разные условия: ship_rfq берёт строки со НАЙДЕННЫМ складом, volume_letters — строки с ценой без остатка числом. Строки, где есть только адрес, не подходили ни туда, ни туда — и оказались самым большим классом.</p><p><b>Чего в письме нет.</b> Ни нашей вилки, ни суммы, ни имени заказчика. Письмо уходит наружу, а объём закупки — наша переговорная позиция.</p><p class='dim'>Строк без адреса: 15 на 129 491,25 долларов США — по ним сначала ищется адрес у изготовителя и в его сети обслуживания. Подбирать получателя по классу изделия нельзя: ответ придёт про класс, а не про эту деталь.</p></div><h2>Порядок отправки по деньгам</h2><table><thead><tr><th class='n'>№</th><th>адресат</th><th class='n'>позиций</th><th class='n'>наша экспозиция, USD</th></tr></thead><tbody><tr><td class='n'>1</td><td>sales@ierfzco.com</td><td class='n'>1</td><td class='n'>720 000</td></tr><tr><td class='n'>2</td><td>sales@gasturbineproduct.com</td><td class='n'>1</td><td class='n'>660 000</td></tr><tr><td class='n'>3</td><td>info@hardtoget.parts</td><td class='n'>47</td><td class='n'>481 402</td></tr><tr><td class='n'>4</td><td>sales@hatraco.com</td><td class='n'>1</td><td class='n'>400 027,50</td></tr><tr><td class='n'>5</td><td>sales@cm-motors.ru</td><td class='n'>1</td><td class='n'>312 900</td></tr><tr><td class='n'>6</td><td>info@gowrings.nl</td><td class='n'>10</td><td class='n'>296 300</td></tr><tr><td class='n'>7</td><td>info@motech.com.pk</td><td class='n'>1</td><td class='n'>284 695</td></tr><tr><td class='n'>8</td><td>peter@turbineblade.net</td><td class='n'>2</td><td class='n'>252 936</td></tr><tr><td class='n'>9</td><td>info@saacke.com</td><td class='n'>1</td><td class='n'>229 500</td></tr><tr><td class='n'>10</td><td>vision@victoryenergy.com</td><td class='n'>2</td><td class='n'>211 000</td></tr><tr><td class='n'>11</td><td>support@siemens-energy.com</td><td class='n'>16</td><td class='n'>208 150</td></tr><tr><td class='n'>12</td><td>sales@artisantg.com</td><td class='n'>1</td><td class='n'>192 125</td></tr><tr><td class='n'>13</td><td>contact@plcdepartment.com</td><td class='n'>5</td><td class='n'>131 042,50</td></tr><tr><td class='n'>14</td><td>sales@gas-turbine-parts.com ⚠</td><td class='n'>26</td><td class='n'>113 320</td></tr><tr><td class='n'>15</td><td>info@asb-drives.eu</td><td class='n'>1</td><td class='n'>112 200</td></tr><tr><td class='n'>16</td><td>sales@dex.com</td><td class='n'>1</td><td class='n'>112 010</td></tr><tr><td class='n'>17</td><td>saels@gas-turbine-parts.com ⚠</td><td class='n'>3</td><td class='n'>105 416</td></tr><tr><td class='n'>18</td><td>uma@meloauto.com</td><td class='n'>1</td><td class='n'>88 450</td></tr><tr><td class='n'>19</td><td>hello@turbine.parts</td><td class='n'>5</td><td class='n'>85 960</td></tr><tr><td class='n'>20</td><td>info@renk.com</td><td class='n'>5</td><td class='n'>76 800</td></tr><tr><td class='n'>21</td><td>info@turbo-k.com</td><td class='n'>1</td><td class='n'>72 000</td></tr><tr><td class='n'>22</td><td>parts@energychoice.com</td><td class='n'>1</td><td class='n'>71 692,50</td></tr><tr><td class='n'>23</td><td>sales@iqelectro.com</td><td class='n'>2</td><td class='n'>68 130</td></tr><tr><td class='n'>24</td><td>sales@enginepartssuperstore.com</td><td class='n'>1</td><td class='n'>60 550</td></tr><tr><td class='n'>25</td><td>commerce@nriparts.com</td><td class='n'>1</td><td class='n'>60 375</td></tr><tr><td class='n'>26</td><td>sales@aeliyamarinetech.com</td><td class='n'>6</td><td class='n'>59 780</td></tr><tr><td class='n'>27</td><td>sales@kempstoncontrols.co.uk</td><td class='n'>10</td><td class='n'>47 978,50</td></tr><tr><td class='n'>28</td><td>info@arthermosensors.co.uk</td><td class='n'>5</td><td class='n'>45 280</td></tr><tr><td class='n'>29</td><td>support@buyparts.online</td><td class='n'>1</td><td class='n'>44 840</td></tr><tr><td class='n'>30</td><td>sales@us.pepperl-fuchs.com</td><td class='n'>4</td><td class='n'>44 360</td></tr><tr><td class='n'>31</td><td>sales@williamsautomation.com</td><td class='n'>2</td><td class='n'>41 790</td></tr><tr><td class='n'>32</td><td>office@powerup.at</td><td class='n'>7</td><td class='n'>41 183,50</td></tr><tr><td class='n'>33</td><td>info@powerbolt.eu</td><td class='n'>1</td><td class='n'>40 050</td></tr><tr><td class='n'>34</td><td>info@fpstechnologies.in</td><td class='n'>1</td><td class='n'>38 650</td></tr><tr><td class='n'>35</td><td>newgenplc@camvect.com</td><td class='n'>1</td><td class='n'>38 000</td></tr><tr><td class='n'>36</td><td>sales@santaclarasystems.com</td><td class='n'>4</td><td class='n'>37 500</td></tr><tr><td class='n'>37</td><td>support@industrialzone.com</td><td class='n'>1</td><td class='n'>37 080</td></tr><tr><td class='n'>38</td><td>dbaker@scf-inc.com</td><td class='n'>4</td><td class='n'>34 675</td></tr><tr><td class='n'>39</td><td>info@drilltech.cn</td><td class='n'>4</td><td class='n'>32 480</td></tr><tr><td class='n'>40</td><td>northeastonline@needco.com</td><td class='n'>4</td><td class='n'>32 095</td></tr><tr><td class='n'>41</td><td>contact@glpumps.com</td><td class='n'>2</td><td class='n'>30 800</td></tr><tr><td class='n'>42</td><td>sales@aeliyamarine.com</td><td class='n'>6</td><td class='n'>29 126</td></tr><tr><td class='n'>43</td><td>info@novi.com.tr</td><td class='n'>1</td><td class='n'>26 775</td></tr><tr><td class='n'>44</td><td>info@goscoenergy.com</td><td class='n'>1</td><td class='n'>25 650</td></tr><tr><td class='n'>45</td><td>info@hard-to-find.parts</td><td class='n'>3</td><td class='n'>24 502,50</td></tr><tr><td class='n'>46</td><td>info@ramautomations.com</td><td class='n'>1</td><td class='n'>23 400</td></tr><tr><td class='n'>47</td><td>sales@classicautomation.com</td><td class='n'>2</td><td class='n'>21 535</td></tr><tr><td class='n'>48</td><td>info@oldfilter.com</td><td class='n'>2</td><td class='n'>19 310</td></tr><tr><td class='n'>49</td><td>SERVICE@ABC-CHARGERS.COM</td><td class='n'>1</td><td class='n'>19 000</td></tr><tr><td class='n'>50</td><td>premiumzhangfuzhe@foxmail.com</td><td class='n'>1</td><td class='n'>17 400</td></tr><tr><td class='n'>51</td><td>CathyKu_515@hotmail.com</td><td class='n'>2</td><td class='n'>17 325</td></tr><tr><td class='n'>52</td><td>evachen@transcyko.com</td><td class='n'>1</td><td class='n'>17 000</td></tr><tr><td class='n'>53</td><td>NAsales@brookcrompton.com</td><td class='n'>1</td><td class='n'>16 275</td></tr><tr><td class='n'>54</td><td>info@vbindustrialsupply.com</td><td class='n'>1</td><td class='n'>16 082</td></tr><tr><td class='n'>55</td><td>automodulexpert@controlnextech.com</td><td class='n'>1</td><td class='n'>15 600</td></tr><tr><td class='n'>56</td><td>webinfo@maximinc.com</td><td class='n'>1</td><td class='n'>13 860</td></tr><tr><td class='n'>57</td><td>info@udt.parts</td><td class='n'>1</td><td class='n'>13 750</td></tr><tr><td class='n'>58</td><td>sales@premiumrigparts.com</td><td class='n'>1</td><td class='n'>13 590</td></tr><tr><td class='n'>59</td><td>mail@intertrek.ru</td><td class='n'>1</td><td class='n'>13 520</td></tr><tr><td class='n'>60</td><td>sales@compressorfiltersupply.com</td><td class='n'>1</td><td class='n'>13 000</td></tr><tr><td class='n'>61</td><td>sales@weschler.com</td><td class='n'>3</td><td class='n'>12 500</td></tr><tr><td class='n'>62</td><td>info@iggnita.com</td><td class='n'>2</td><td class='n'>12 065</td></tr><tr><td class='n'>63</td><td>info@filtersource.com</td><td class='n'>1</td><td class='n'>11 400</td></tr><tr><td class='n'>64</td><td>info@eltra-trade.sk</td><td class='n'>1</td><td class='n'>11 025</td></tr><tr><td class='n'>65</td><td>sales@forte2001.ru</td><td class='n'>1</td><td class='n'>10 500</td></tr><tr><td class='n'>66</td><td>chi.sales@mcmaster.com</td><td class='n'>1</td><td class='n'>10 388</td></tr><tr><td class='n'>67</td><td>6gcontrols@5gplc.com</td><td class='n'>1</td><td class='n'>10 200</td></tr><tr><td class='n'>68</td><td>sales@optimuscontrol.com.my</td><td class='n'>1</td><td class='n'>9 900</td></tr><tr><td class='n'>69</td><td>sav@nhp-motoculture.fr</td><td class='n'>1</td><td class='n'>8 525</td></tr><tr><td class='n'>70</td><td>sales@kinetrolusa.com</td><td class='n'>1</td><td class='n'>8 200</td></tr><tr><td class='n'>71</td><td>info@wetzparts.com</td><td class='n'>1</td><td class='n'>7 821</td></tr><tr><td class='n'>72</td><td>sales@fueldump.co.uk</td><td class='n'>1</td><td class='n'>6 615</td></tr><tr><td class='n'>73</td><td>info@toosglobal.com</td><td class='n'>1</td><td class='n'>6 250</td></tr><tr><td class='n'>74</td><td>info@hydraulicstore.com</td><td class='n'>1</td><td class='n'>6 125</td></tr><tr><td class='n'>75</td><td>office@vespion.com</td><td class='n'>2</td><td class='n'>6 100</td></tr><tr><td class='n'>76</td><td>leendert.sws@gmail.com</td><td class='n'>1</td><td class='n'>6 090</td></tr><tr><td class='n'>77</td><td>contact@discountfilters.com</td><td class='n'>1</td><td class='n'>6 000</td></tr><tr><td class='n'>78</td><td>info@veza.ru</td><td class='n'>1</td><td class='n'>5 950</td></tr><tr><td class='n'>79</td><td>gparts@moderngroup.com</td><td class='n'>1</td><td class='n'>5 670</td></tr><tr><td class='n'>80</td><td>info@ervor.com</td><td class='n'>1</td><td class='n'>5 425</td></tr><tr><td class='n'>81</td><td>support@plccable.com</td><td class='n'>1</td><td class='n'>5 330</td></tr><tr><td class='n'>82</td><td>topbrandsplc@camvect.com</td><td class='n'>1</td><td class='n'>5 300</td></tr><tr><td class='n'>83</td><td>info@fridayparts.com</td><td class='n'>1</td><td class='n'>5 180</td></tr><tr><td class='n'>84</td><td>info@liebl-ip.de</td><td class='n'>1</td><td class='n'>4 950</td></tr><tr><td class='n'>85</td><td>quote@powerfuse.com</td><td class='n'>1</td><td class='n'>4 680</td></tr><tr><td class='n'>86</td><td>info@marflex.com</td><td class='n'>1</td><td class='n'>4 600</td></tr><tr><td class='n'>87</td><td>barakastock@barakaagencies.com</td><td class='n'>1</td><td class='n'>4 410</td></tr><tr><td class='n'>88</td><td>exportsupport@rs.rsgroup.com</td><td class='n'>1</td><td class='n'>4 100</td></tr><tr><td class='n'>89</td><td>customerservice@travaini.com</td><td class='n'>1</td><td class='n'>4 080</td></tr><tr><td class='n'>90</td><td>roy.pandel@titanoiltools.com</td><td class='n'>2</td><td class='n'>4 040</td></tr><tr><td class='n'>91</td><td>sales@auto2mation.com</td><td class='n'>1</td><td class='n'>3 700</td></tr><tr><td class='n'>92</td><td>Sales@tobeepump.com</td><td class='n'>1</td><td class='n'>3 540</td></tr><tr><td class='n'>93</td><td>info@axdos.se</td><td class='n'>2</td><td class='n'>3 484</td></tr><tr><td class='n'>94</td><td>info@buyfilteronline.com</td><td class='n'>1</td><td class='n'>3 325</td></tr><tr><td class='n'>95</td><td>rsmotor@rsmotor.es</td><td class='n'>1</td><td class='n'>3 162,50</td></tr><tr><td class='n'>96</td><td>sales@sigmasurplus.com</td><td class='n'>1</td><td class='n'>3 032,25</td></tr><tr><td class='n'>97</td><td>info@weyeahengine.com</td><td class='n'>1</td><td class='n'>2 800</td></tr><tr><td class='n'>98</td><td>spares2@itt.com</td><td class='n'>6</td><td class='n'>2 310</td></tr><tr><td class='n'>99</td><td>sales@sbis.com</td><td class='n'>1</td><td class='n'>2 242,50</td></tr><tr><td class='n'>100</td><td>info@rodvig.ru</td><td class='n'>1</td><td class='n'>2 177</td></tr><tr><td class='n'>101</td><td>sales@hydraulicsonline.com</td><td class='n'>1</td><td class='n'>1 900</td></tr><tr><td class='n'>102</td><td>orders@gasketsupply.com</td><td class='n'>1</td><td class='n'>1 207,50</td></tr><tr><td class='n'>103</td><td>sales@fus-industrial.com</td><td class='n'>1</td><td class='n'>960</td></tr><tr><td class='n'>104</td><td>mail@lagerwerk.com</td><td class='n'>1</td><td class='n'>735</td></tr><tr><td class='n'>105</td><td>info@tdm-elektro.ru</td><td class='n'>1</td><td class='n'>700</td></tr><tr><td class='n'>106</td><td>support@elettronew.com</td><td class='n'>2</td><td class='n'>630</td></tr><tr><td class='n'>107</td><td>sealing@saleindustry.com</td><td class='n'>1</td><td class='n'>598,50</td></tr><tr><td class='n'>108</td><td>gts@gasturbineservices.com</td><td class='n'>2</td><td class='n'>228</td></tr><tr><td class='n'>109</td><td>sales@caplugs.com</td><td class='n'>1</td><td class='n'>160</td></tr><tr><td class='n'>110</td><td>sales@enapart.com</td><td class='n'>1</td><td class='n'>90</td></tr><tr><td class='n'>111</td><td>info@filterserviceandsupply.com</td><td class='n'>1</td><td class='n'>0</td></tr><tr><td class='n'>112</td><td>sales@delafieldcorp.com</td><td class='n'>1</td><td class='n'>0</td></tr><tr><td class='n'>113</td><td>eshop@elpremo.cz</td><td class='n'>1</td><td class='n'>0</td></tr><tr><td class='n'>114</td><td>support@voomisupply.com</td><td class='n'>1</td><td class='n'>0</td></tr><tr><td class='n'>115</td><td>lv.enquiries@gb.abb.com</td><td class='n'>1</td><td class='n'>0</td></tr><tr><td class='n'>116</td><td>sklep@abmicro.pl</td><td class='n'>7</td><td class='n'>0</td></tr><tr><td class='n'>117</td><td>filtration.support.intl@atmus.com</td><td class='n'>4</td><td class='n'>293 631</td></tr><tr><td class='n'>118</td><td>contact.en@innio.com</td><td class='n'>1</td><td class='n'>248 250</td></tr><tr><td class='n'>119</td><td>support@siemens-energy.com</td><td class='n'>18</td><td class='n'>231 228,30</td></tr><tr><td class='n'>120</td><td>Shop@solarturbines.com</td><td class='n'>53</td><td class='n'>167 323,50</td></tr><tr><td class='n'>121</td><td>sales@us.pepperl-fuchs.com</td><td class='n'>3</td><td class='n'>78 420</td></tr><tr><td class='n'>122</td><td>email.kz@innio.com</td><td class='n'>18</td><td class='n'>68 843,50</td></tr><tr><td class='n'>123</td><td>info@heinzmann.de</td><td class='n'>1</td><td class='n'>37 400</td></tr><tr><td class='n'>124</td><td>spares2@itt.com</td><td class='n'>3</td><td class='n'>6 390</td></tr><tr><td class='n'>125</td><td>order.us@wago.com</td><td class='n'>2</td><td class='n'>2 887,50</td></tr></tbody></table><h2>1. sales@ierfzco.com — 1 позиц., 720 000 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (MW22316B/01)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -34,7 +42,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>2. sales@gasturbineproduct.com — 1 позиц., 660 000 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (MW21215M)</p><pre>Добрый день!
+КВАНТ</pre><h2>2. sales@gasturbineproduct.com — 1 позиц., 660 000 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (MW21215M)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -51,7 +59,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>3. info@hardtoget.parts — 18 позиц., 409 357,50 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 18 позиц. (1701/15 (Bently Nevada 141379-01; номер Solar 1034549-20), 1056369-30, 1701/05 и др.)</p><pre>Добрый день!
+КВАНТ</pre><h2>3. info@hardtoget.parts — 47 позиц., 481 402 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 47 позиц. (1701/15 (Bently Nevada 141379-01; номер Solar 1034549-20), 1056369-30, 1701/05 и др.)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -74,18 +82,47 @@ tr { page-break-inside: avoid; }
 9. 1087491-3 — 63 шт, изготовитель Solar
 10. 186232-3000 — 15 шт, изготовитель Solar
 11. 1064405-1 — 4 шт, изготовитель Solar
-12. 1060817-40 — 27 шт, изготовитель Solar
-13. 190185-203 — 4 шт, изготовитель Solar
-14. 190015-10 — 8 шт, изготовитель Solar
-15. 917427С1 — 27 шт, изготовитель Solar
-16. 116091-21 — 2 шт, изготовитель Rochester Sensors (ранее Rochester Gauges, Amphenol)
-17. 950232C1 — 4 шт, изготовитель Solar
-18. 999340C1 — 1 шт, изготовитель Solar
+12. 903316C1 — 18 шт, изготовитель Solar
+13. 1060817-40 — 27 шт, изготовитель Solar
+14. 190537-102 — 5 шт, изготовитель Solar
+15. 190185-203 — 4 шт, изготовитель Solar
+16. 80-30550-900 — 11 шт, изготовитель Solar
+17. 190015-12 — 10 шт, изготовитель Solar
+18. 304649-100 — 108 шт, изготовитель Solar
+19. 190817-14 — 5 шт, изготовитель Solar
+20. 190015-10 — 8 шт, изготовитель Solar
+21. 186648-1 — 5 шт, изготовитель Solar
+22. 1106298-29 — 9 шт, изготовитель Solar
+23. 1051931-67 — 20 шт, изготовитель Solar
+24. 1017891 — 108 шт, изготовитель Solar
+25. 1053038-35 — 7 шт, изготовитель Solar
+26. 917427С1 — 27 шт, изготовитель Solar
+27. 1046415-60 — 23 шт, изготовитель Solar
+28. 1064728-4 — 12 шт, изготовитель Solar
+29. 970564C1 — 8 шт, изготовитель Solar
+30. 1017890 — 17 шт, изготовитель Solar
+31. 1007799 — 19 25 шт/уп, изготовитель Solar
+32. 136845-1 — 18 шт, изготовитель Solar
+33. 1024941 — 6 шт, изготовитель Solar
+34. 116091-21 — 2 шт, изготовитель Rochester Sensors (ранее Rochester Gauges, Amphenol)
+35. 950232C1 — 4 шт, изготовитель Solar
+36. 999340C1 — 1 шт, изготовитель Solar
+37. 131230-6 — 2 шт, изготовитель Solar Turbines
+38. 1105336-1 — 3 шт, изготовитель Solar Turbines
+39. 1078325-10 — 2 шт, изготовитель Solar Turbines
+40. 1023031-1 — 2 шт, изготовитель Solar Turbines
+41. 1064721-14 — 1 шт, изготовитель Solar Turbines
+42. 199543-2 — 5 шт, изготовитель Solar Turbines
+43. 1023031-3 — 2 шт, изготовитель Solar Turbines
+44. 1078325-17 — 2 шт, изготовитель Solar Turbines
+45. 1042018-3400 — 6 шт, изготовитель Solar Turbines
+46. 1023518-201 — 8 шт, изготовитель Solar Turbines
+47. 1065717-300 — 1 шт, изготовитель Solar Turbines
 
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>4. sales@hatraco.com — 1 позиц., 400 027,50 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (4380132)</p><pre>Добрый день!
+КВАНТ</pre><h2>4. sales@hatraco.com — 1 позиц., 400 027,50 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (4380132)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -102,7 +139,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>5. sales@cm-motors.ru — 1 позиц., 312 900 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (5373898)</p><pre>Добрый день!
+КВАНТ</pre><h2>5. sales@cm-motors.ru — 1 позиц., 312 900 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (5373898)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -119,26 +156,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>6. info@iggnita.com — 3 позиц., 296 760 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 3 позиц. (404492-1214569, 487181, 1236100)</p><pre>Добрый день!
-
-Просим дать предложение по позициям ниже.
-По каждой позиции нужны пять ответов:
-
-1) цена за штуку и цена за весь указанный объём;
-2) остаток на складе ЧИСЛОМ на сегодня;
-3) срок поставки под указанное количество целиком;
-4) срок действия цены;
-5) базис поставки (Инкотермс).
-
-Позиции:
-1. 404492-1214569 — 587 шт, изготовитель DENSO
-2. 487181 — 28 шт, изготовитель Jenbacher/INNIO
-3. 1236100 — 66 шт, изготовитель Jenbacher/INNIO
-
-Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
-
-С уважением,
-КВАНТ</pre><h2>7. info@gowrings.nl — 10 позиц., 296 300 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 10 позиц. (CT95038/01, 64/60082038/1, 64/60082041/1 и др.)</p><pre>Добрый день!
+КВАНТ</pre><h2>6. info@gowrings.nl — 10 позиц., 296 300 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 10 позиц. (CT95038/01, 64/60082038/1, 64/60082041/1 и др.)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -164,7 +182,24 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>8. peter@turbineblade.net — 2 позиц., 252 936 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 2 позиц. (64/60040226/2, RW21222/4)</p><pre>Добрый день!
+КВАНТ</pre><h2>7. info@motech.com.pk — 1 позиц., 284 695 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (404492-1214569)</p><pre>Добрый день!
+
+Просим дать предложение по позициям ниже.
+По каждой позиции нужны пять ответов:
+
+1) цена за штуку и цена за весь указанный объём;
+2) остаток на складе ЧИСЛОМ на сегодня;
+3) срок поставки под указанное количество целиком;
+4) срок действия цены;
+5) базис поставки (Инкотермс).
+
+Позиции:
+1. 404492-1214569 — 587 шт, изготовитель DENSO
+
+Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
+
+С уважением,
+КВАНТ</pre><h2>8. peter@turbineblade.net — 2 позиц., 252 936 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 2 позиц. (64/60040226/2, RW21222/4)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -182,7 +217,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>9. info@saacke.com — 1 позиц., 229 500 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (4007922)</p><pre>Добрый день!
+КВАНТ</pre><h2>9. info@saacke.com — 1 позиц., 229 500 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (4007922)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -199,7 +234,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>10. vision@victoryenergy.com — 2 позиц., 211 000 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 2 позиц. (VS-4-57, VS-6-82)</p><pre>Добрый день!
+КВАНТ</pre><h2>10. vision@victoryenergy.com — 2 позиц., 211 000 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 2 позиц. (VS-4-57, VS-6-82)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -217,7 +252,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>11. support@siemens-energy.com — 16 позиц., 208 150 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 16 позиц. (MW35024B/01, SP040571, MW35025B/01 и др.)</p><pre>Добрый день!
+КВАНТ</pre><h2>11. support@siemens-energy.com — 16 позиц., 208 150 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 16 позиц. (MW35024B/01, SP040571, MW35025B/01 и др.)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -232,7 +267,7 @@ tr { page-break-inside: avoid; }
 1. MW35024B/01 — 24 шт, изготовитель Siemens Energy (чертёж завода Линкольн)
 2. SP040571 — 18 шт, изготовитель Siemens
 3. MW35025B/01 — 20 шт, изготовитель Siemens Energy (чертёж завода в Линкольне)
-4. SP103393 — 18 шт, изготовитель Siemens
+4. SP103393 — 18 шт, изготовитель Siemens Energy
 5. CT97200/01 — 16 шт, изготовитель Siemens
 6. 64/04012024/3 — 16 шт, изготовитель Siemens
 7. 64/05002096/6 — 40 шт, изготовитель Siemens
@@ -249,7 +284,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>12. sales@artisantg.com — 1 позиц., 192 125 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (170180-01-05)</p><pre>Добрый день!
+КВАНТ</pre><h2>12. sales@artisantg.com — 1 позиц., 192 125 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (170180-01-05)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -266,7 +301,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>13. contact@plcdepartment.com — 5 позиц., 131 042,50 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 5 позиц. (1756-CN2RXT, 1794-IE8, 1794-IF2XOF2I и др.)</p><pre>Добрый день!
+КВАНТ</pre><h2>13. contact@plcdepartment.com — 5 позиц., 131 042,50 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 5 позиц. (1756-CN2RXT, 1794-IE8, 1794-IF2XOF2I и др.)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -287,7 +322,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>14. sales@gas-turbine-parts.com — 30 позиц., 125 530 USD нашей экспозиции</h2><p class='warn'><b>ЭТОТ АДРЕСАТ УЖЕ ОПУБЛИКОВАЛ НАШУ ЗАЯВКУ в открытом доступе (Hangzhou Gas Turbine Parts Co., Ltd (Китай)). Письмо ему — осознанное решение, а не рассылка.</b></p><p><b>Тема:</b> Запрос цены и наличия: 30 позиц. (MW33326A, SP040528, MW33640 и др.)</p><pre>Добрый день!
+КВАНТ</pre><h2>14. sales@gas-turbine-parts.com — 26 позиц., 113 320 USD нашей экспозиции</h2><p class='warn'><b>ЭТОТ АДРЕСАТ УЖЕ ОПУБЛИКОВАЛ НАШУ ЗАЯВКУ в открытом доступе (Hangzhou Gas Turbine Parts Co., Ltd (Китай)). Письмо ему — осознанное решение, а не рассылка.</b></p><p class='subj'><b>Тема:</b> Запрос цены и наличия: 26 позиц. (MW33326A, SP040528, MW33640 и др.)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -316,24 +351,20 @@ tr { page-break-inside: avoid; }
 15. 64/07010573/36 — 4 шт, изготовитель Siemens
 16. SP115833 — 4 шт, изготовитель Siemens
 17. 64/60003051/4 — 4 шт, изготовитель Siemens
-18. 115612090 — 120 шт, изготовитель Siemens
-19. 115510040 — 252 шт, изготовитель Siemens
-20. SP115908 — 4 шт, изготовитель Siemens
-21. 64/07016038/0011 — 4 шт, изготовитель Siemens
-22. SP100444 — 12 шт, изготовитель Siemens
-23. 64/04012025/3 — 4 шт, изготовитель Siemens
-24. 119410060 — 152 шт, изготовитель Siemens
-25. MW03623 — 8 шт, изготовитель Siemens
-26. 277306012 — 108 шт, изготовитель Siemens
-27. 119410045 — 102 шт, изготовитель Siemens
-28. SP017174 — 4 шт, изготовитель Siemens
-29. CT4017W/37_3 — 6 шт, изготовитель Siemens
-30. 399990001_3 — 20 шт, изготовитель Siemens
+18. SP115908 — 4 шт, изготовитель Siemens
+19. 64/07016038/0011 — 4 шт, изготовитель Siemens
+20. SP100444 — 12 шт, изготовитель Siemens
+21. 64/04012025/3 — 4 шт, изготовитель Siemens
+22. MW03623 — 8 шт, изготовитель Siemens
+23. 277306012 — 108 шт, изготовитель Siemens
+24. SP017174 — 4 шт, изготовитель Siemens
+25. CT4017W/37_3 — 6 шт, изготовитель Siemens
+26. 399990001_3 — 20 шт, изготовитель Siemens
 
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>15. info@asb-drives.eu — 1 позиц., 112 200 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (3AXD50000426157)</p><pre>Добрый день!
+КВАНТ</pre><h2>15. info@asb-drives.eu — 1 позиц., 112 200 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (3AXD50000426157)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -350,7 +381,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>16. sales@dex.com — 1 позиц., 112 010 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (68569591)</p><pre>Добрый день!
+КВАНТ</pre><h2>16. sales@dex.com — 1 позиц., 112 010 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (68569591)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -367,7 +398,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>17. saels@gas-turbine-parts.com — 4 позиц., 105 576 USD нашей экспозиции</h2><p class='warn'><b>ЭТОТ АДРЕСАТ УЖЕ ОПУБЛИКОВАЛ НАШУ ЗАЯВКУ в открытом доступе (Hangzhou Gas Turbine Parts Co., Ltd (Китай)). Письмо ему — осознанное решение, а не рассылка.</b></p><p><b>Тема:</b> Запрос цены и наличия: 4 позиц. (64/60040257/1, 336609055, 328748215 и др.)</p><pre>Добрый день!
+КВАНТ</pre><h2>17. saels@gas-turbine-parts.com — 3 позиц., 105 416 USD нашей экспозиции</h2><p class='warn'><b>ЭТОТ АДРЕСАТ УЖЕ ОПУБЛИКОВАЛ НАШУ ЗАЯВКУ в открытом доступе (Hangzhou Gas Turbine Parts Co., Ltd (Китай)). Письмо ему — осознанное решение, а не рассылка.</b></p><p class='subj'><b>Тема:</b> Запрос цены и наличия: 3 позиц. (64/60040257/1, 336609055, 328748215)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -380,14 +411,13 @@ tr { page-break-inside: avoid; }
 
 Позиции:
 1. 64/60040257/1 — 12 шт, изготовитель Siemens
-2. 336609055 — 4 шт, изготовитель Siemens
-3. 328748215 — 8 шт, изготовитель Siemens
-4. 336609020 — 4 шт, изготовитель Siemens
+2. 336609055 — 4 шт, изготовитель Siemens Energy (номер); изготовитель неизвестен
+3. 328748215 — 8 шт, изготовитель Siemens Energy
 
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>18. uma@meloauto.com — 1 позиц., 88 450 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (170190-01E)</p><pre>Добрый день!
+КВАНТ</pre><h2>18. uma@meloauto.com — 1 позиц., 88 450 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (170190-01E)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -404,7 +434,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>19. hello@turbine.parts — 3 позиц., 82 400 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 3 позиц. (64/60082044/1, 1043614-500, 1063325-1)</p><pre>Добрый день!
+КВАНТ</pre><h2>19. hello@turbine.parts — 5 позиц., 85 960 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 5 позиц. (64/60082044/1, 1043614-500, 1063325-1 и др.)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -419,11 +449,13 @@ tr { page-break-inside: avoid; }
 1. 64/60082044/1 — 10 шт, изготовитель Siemens
 2. 1043614-500 — 8 шт, изготовитель Solar
 3. 1063325-1 — 4 шт, изготовитель Commercial Intertech
+4. 301315-18 — 16 шт, изготовитель Solar
+5. 1059701-8 — 4 шт, изготовитель Solar
 
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>20. info@renk.com — 5 позиц., 76 800 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 5 позиц. (CFkZLB 11-100 12-125 10-125, ZLL EFNLB11-90BM, RENK EFZLB 09-100 и др.)</p><pre>Добрый день!
+КВАНТ</pre><h2>20. info@renk.com — 5 позиц., 76 800 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 5 позиц. (CFkZLB 11-100 12-125 10-125, ZLL EFNLB11-90BM, RENK EFZLB 09-100 и др.)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -444,7 +476,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>21. info@turbo-k.com — 1 позиц., 72 000 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (Turbo-K)</p><pre>Добрый день!
+КВАНТ</pre><h2>21. info@turbo-k.com — 1 позиц., 72 000 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (Turbo-K)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -461,7 +493,24 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>22. sales@iqelectro.com — 2 позиц., 68 130 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 2 позиц. (1046415-79, 1794-ACNR15)</p><pre>Добрый день!
+КВАНТ</pre><h2>22. parts@energychoice.com — 1 позиц., 71 692,50 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (GI3-3)</p><pre>Добрый день!
+
+Просим дать предложение по позициям ниже.
+По каждой позиции нужны пять ответов:
+
+1) цена за штуку и цена за весь указанный объём;
+2) остаток на складе ЧИСЛОМ на сегодня;
+3) срок поставки под указанное количество целиком;
+4) срок действия цены;
+5) базис поставки (Инкотермс).
+
+Позиции:
+1. GI3-3 — 869 шт, изготовитель DENSO
+
+Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
+
+С уважением,
+КВАНТ</pre><h2>23. sales@iqelectro.com — 2 позиц., 68 130 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 2 позиц. (1046415-79, 1794-ACNR15)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -479,7 +528,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>23. sales@enginepartssuperstore.com — 1 позиц., 60 550 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (4025166)</p><pre>Добрый день!
+КВАНТ</pre><h2>24. sales@enginepartssuperstore.com — 1 позиц., 60 550 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (4025166)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -496,7 +545,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>24. commerce@nriparts.com — 1 позиц., 60 375 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (1701/10)</p><pre>Добрый день!
+КВАНТ</pre><h2>25. commerce@nriparts.com — 1 позиц., 60 375 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (1701/10)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -513,7 +562,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>25. sales@aeliyamarinetech.com — 5 позиц., 56 280 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 5 позиц. (EQ3005PCNW, MVI56-MCM, p/n Solar: 962317C1 и др.)</p><pre>Добрый день!
+КВАНТ</pre><h2>26. sales@aeliyamarinetech.com — 6 позиц., 59 780 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 6 позиц. (EQ3005PCNW, MVI56-MCM, p/n Solar: 962317C1 и др.)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -528,13 +577,40 @@ tr { page-break-inside: avoid; }
 1. EQ3005PCNW — 7 шт, изготовитель Det-Tronics (Emerson)
 2. MVI56-MCM — 7 шт, изготовитель ProSoft Technology
 3. p/n Solar: 962317C1 — 4 шт, изготовитель Yokogawa
-4. p/n Solar: 186533-1 — 4 шт, изготовитель Yokogawa
-5. KT973 — 8 шт, изготовитель Solar
+4. 2711514-08-03-99 — 4 ШТ, изготовитель Cameron, a Schlumberger Company
+5. p/n Solar: 186533-1 — 4 шт, изготовитель Yokogawa
+6. KT973 — 8 шт, изготовитель Solar
 
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>26. info@arthermosensors.co.uk — 5 позиц., 45 280 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 5 позиц. (MW03632, MW03627, CT4010J/1 и др.)</p><pre>Добрый день!
+КВАНТ</pre><h2>27. sales@kempstoncontrols.co.uk — 10 позиц., 47 978,50 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 10 позиц. (KFD2-RR-Ex1, C9-A41FX/DC24V + S9-M, 64/09001062/139 и др.)</p><pre>Добрый день!
+
+Просим дать предложение по позициям ниже.
+По каждой позиции нужны пять ответов:
+
+1) цена за штуку и цена за весь указанный объём;
+2) остаток на складе ЧИСЛОМ на сегодня;
+3) срок поставки под указанное количество целиком;
+4) срок действия цены;
+5) базис поставки (Инкотермс).
+
+Позиции:
+1. KFD2-RR-Ex1 — 74 шт, изготовитель Pepperl+Fuchs
+2. C9-A41FX/DC24V + S9-M — 179 шт, изготовитель Comat Releco / TURCK (C9 series)
+3. 64/09001062/139 — 8 шт, изготовитель Pepperl+Fuchs
+4. 1SDA050953R1 — 8 ШТ, изготовитель ABB
+5. 64/09001231/091 — 38 шт, изготовитель Siemens
+6. 64610805 — 6 ШТ, изготовитель ABB
+7. QR-C — 100 шт, изготовитель Releco
+8. 6ES7321-1BL00-0AA0 — 11 шт, изготовитель Siemens
+9. F310022 MC — 13 ШТ, изготовитель Mersen (Ferraz Shawmut)
+10. MR-C — 24 шт, изготовитель Siemens
+
+Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
+
+С уважением,
+КВАНТ</pre><h2>28. info@arthermosensors.co.uk — 5 позиц., 45 280 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 5 позиц. (MW03632, MW03627, CT4010J/1 и др.)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -555,7 +631,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>27. support@buyparts.online — 1 позиц., 44 840 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (4011521)</p><pre>Добрый день!
+КВАНТ</pre><h2>29. support@buyparts.online — 1 позиц., 44 840 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (4011521)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -572,7 +648,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>28. sales@us.pepperl-fuchs.com — 4 позиц., 44 360 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 4 позиц. (KFD2-VR2-Ex1.50M, HiDMux2700, H1SHPSM/32/MM-01 и др.)</p><pre>Добрый день!
+КВАНТ</pre><h2>30. sales@us.pepperl-fuchs.com — 4 позиц., 44 360 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 4 позиц. (KFD2-VR2-Ex1.50M, HiDMux2700, H1SHPSM/32/MM-01 и др.)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -592,7 +668,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>29. sales@williamsautomation.com — 2 позиц., 41 790 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 2 позиц. (1794-IB16, 1794-OB8EPXT)</p><pre>Добрый день!
+КВАНТ</pre><h2>31. sales@williamsautomation.com — 2 позиц., 41 790 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 2 позиц. (1794-IB16, 1794-OB8EPXT)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -610,7 +686,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>30. office@powerup.at — 7 позиц., 41 183,50 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 7 позиц. (133257, 344542-431447, 1180993 и др.)</p><pre>Добрый день!
+КВАНТ</pre><h2>32. office@powerup.at — 7 позиц., 41 183,50 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 7 позиц. (133257, 344542-431447, 1180993 и др.)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -622,18 +698,18 @@ tr { page-break-inside: avoid; }
 5) базис поставки (Инкотермс).
 
 Позиции:
-1. 133257 — 14 шт, изготовитель Jenbacher/INNIO
+1. 133257 — 14 шт, изготовитель INNIO Jenbacher
 2. 344542-431447 — 117 шт, изготовитель Mann &amp; Hummel (MANN LC 15 001 x)
 3. 1180993 — 221 шт, изготовитель Conta-San
 4. 12032892 — 221 шт, изготовитель Conta-San
-5. 319737 — 431 шт, изготовитель Jenbacher/INNIO
+5. 319737 — 431 шт, изготовитель Jenbacher
 6. 1229373 — 7 шт, изготовитель Tyco Electronics
 7. 436392 — 7 шт, изготовитель Jenbacher/INNIO
 
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>31. info@powerbolt.eu — 1 позиц., 40 050 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (RW21223/1)</p><pre>Добрый день!
+КВАНТ</pre><h2>33. info@powerbolt.eu — 1 позиц., 40 050 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (RW21223/1)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -650,7 +726,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>32. info@fpstechnologies.in — 1 позиц., 38 650 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (4351035)</p><pre>Добрый день!
+КВАНТ</pre><h2>34. info@fpstechnologies.in — 1 позиц., 38 650 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (4351035)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -667,7 +743,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>33. newgenplc@camvect.com — 1 позиц., 38 000 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (1701/06)</p><pre>Добрый день!
+КВАНТ</pre><h2>35. newgenplc@camvect.com — 1 позиц., 38 000 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (1701/06)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -684,7 +760,27 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>34. support@industrialzone.com — 1 позиц., 37 080 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (EQ3730DR)</p><pre>Добрый день!
+КВАНТ</pre><h2>36. sales@santaclarasystems.com — 4 позиц., 37 500 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 4 позиц. (MVI56E-MCMXT, 6ES7153-2BA02-0XB0, 1794-OF4IXT и др.)</p><pre>Добрый день!
+
+Просим дать предложение по позициям ниже.
+По каждой позиции нужны пять ответов:
+
+1) цена за штуку и цена за весь указанный объём;
+2) остаток на складе ЧИСЛОМ на сегодня;
+3) срок поставки под указанное количество целиком;
+4) срок действия цены;
+5) базис поставки (Инкотермс).
+
+Позиции:
+1. MVI56E-MCMXT — 6 шт, изготовитель ProSoft Technology
+2. 6ES7153-2BA02-0XB0 — 24 шт, изготовитель Siemens
+3. 1794-OF4IXT — 6 шт, изготовитель Rockwell Automation
+4. 1794-IF4IXT — 6 шт, изготовитель Rockwell Automation
+
+Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
+
+С уважением,
+КВАНТ</pre><h2>37. support@industrialzone.com — 1 позиц., 37 080 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (EQ3730DR)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -701,7 +797,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>35. dbaker@scf-inc.com — 3 позиц., 33 025 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 3 позиц. (595872000, 6011815455, 101258033)</p><pre>Добрый день!
+КВАНТ</pre><h2>38. dbaker@scf-inc.com — 4 позиц., 34 675 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 4 позиц. (595872000, 6011815455, 101258033 и др.)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -716,11 +812,12 @@ tr { page-break-inside: avoid; }
 1. 595872000 — 24 ШТ, изготовитель Schlumberger Company
 2. 6011815455 — 8 ШТ, изготовитель Drilltech Manufacturing Co., Ltd
 3. 101258033 — 15 ШТ, изготовитель NOV
+4. 100913882 — 6 ШТ, изготовитель Schlumberger Company
 
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>36. info@drilltech.cn — 4 позиц., 32 480 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 4 позиц. (6011815400, 6011815654, 6011815714 и др.)</p><pre>Добрый день!
+КВАНТ</pre><h2>39. info@drilltech.cn — 4 позиц., 32 480 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 4 позиц. (6011815400, 6011815654, 6011815714 и др.)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -740,7 +837,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>37. northeastonline@needco.com — 4 позиц., 32 095 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 4 позиц. (1794-OB16P, 1794-IB10XOB6, 1756-PB75 и др.)</p><pre>Добрый день!
+КВАНТ</pre><h2>40. northeastonline@needco.com — 4 позиц., 32 095 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 4 позиц. (1794-OB16P, 1794-IB10XOB6, 1756-PB75 и др.)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -760,31 +857,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>38. sales@kempstoncontrols.co.uk — 8 позиц., 30 963,50 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 8 позиц. (C9-A41FX/DC24V + S9-M, 64/09001062/139, 1SDA050953R1 и др.)</p><pre>Добрый день!
-
-Просим дать предложение по позициям ниже.
-По каждой позиции нужны пять ответов:
-
-1) цена за штуку и цена за весь указанный объём;
-2) остаток на складе ЧИСЛОМ на сегодня;
-3) срок поставки под указанное количество целиком;
-4) срок действия цены;
-5) базис поставки (Инкотермс).
-
-Позиции:
-1. C9-A41FX/DC24V + S9-M — 179 шт, изготовитель Comat Releco / TURCK (C9 series)
-2. 64/09001062/139 — 8 шт, изготовитель Pepperl+Fuchs
-3. 1SDA050953R1 — 8 ШТ, изготовитель ABB
-4. 64/09001231/091 — 38 шт, изготовитель Siemens
-5. 64610805 — 6 ШТ, изготовитель ABB
-6. QR-C — 100 шт, изготовитель Releco
-7. 6ES7321-1BL00-0AA0 — 11 шт, изготовитель Siemens
-8. MR-C — 24 шт, изготовитель Siemens
-
-Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
-
-С уважением,
-КВАНТ</pre><h2>39. contact@glpumps.com — 2 позиц., 30 800 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 2 позиц. (1408 999 9236 п393, п.351 1405 999 0020)</p><pre>Добрый день!
+КВАНТ</pre><h2>41. contact@glpumps.com — 2 позиц., 30 800 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 2 позиц. (1408 999 9236 п393, п.351 1405 999 0020)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -802,45 +875,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>40. sales@classicautomation.com — 3 позиц., 29 695 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 3 позиц. (1794-OB8EP, 6ES7153-2BA02-0XB0, 6ES7412-3HJ14-0AB0)</p><pre>Добрый день!
-
-Просим дать предложение по позициям ниже.
-По каждой позиции нужны пять ответов:
-
-1) цена за штуку и цена за весь указанный объём;
-2) остаток на складе ЧИСЛОМ на сегодня;
-3) срок поставки под указанное количество целиком;
-4) срок действия цены;
-5) базис поставки (Инкотермс).
-
-Позиции:
-1. 1794-OB8EP — 59 шт, изготовитель Rockwell Automation (Allen-Bradley)
-2. 6ES7153-2BA02-0XB0 — 24 шт, изготовитель Siemens
-3. 6ES7412-3HJ14-0AB0 — 2 шт, изготовитель Siemens
-
-Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
-
-С уважением,
-КВАНТ</pre><h2>41. sales@santaclarasystems.com — 3 позиц., 29 340 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 3 позиц. (MVI56E-MCMXT, 1794-OF4IXT, 1794-IF4IXT)</p><pre>Добрый день!
-
-Просим дать предложение по позициям ниже.
-По каждой позиции нужны пять ответов:
-
-1) цена за штуку и цена за весь указанный объём;
-2) остаток на складе ЧИСЛОМ на сегодня;
-3) срок поставки под указанное количество целиком;
-4) срок действия цены;
-5) базис поставки (Инкотермс).
-
-Позиции:
-1. MVI56E-MCMXT — 6 шт, изготовитель ProSoft Technology
-2. 1794-OF4IXT — 6 шт, изготовитель Rockwell Automation
-3. 1794-IF4IXT — 6 шт, изготовитель Rockwell Automation
-
-Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
-
-С уважением,
-КВАНТ</pre><h2>42. sales@aeliyamarine.com — 6 позиц., 29 126 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 6 позиц. (3420932, PLC-RSC-24DC/21-21/ATEX, 2980461, 3332291 и др.)</p><pre>Добрый день!
+КВАНТ</pre><h2>42. sales@aeliyamarine.com — 6 позиц., 29 126 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 6 позиц. (3420932, PLC-RSC-24DC/21-21/ATEX, 2980461, 3332291 и др.)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -862,7 +897,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>43. info@novi.com.tr — 1 позиц., 26 775 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (1060817-10)</p><pre>Добрый день!
+КВАНТ</pre><h2>43. info@novi.com.tr — 1 позиц., 26 775 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (1060817-10)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -879,7 +914,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>44. info@goscoenergy.com — 1 позиц., 25 650 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (RI40390738-02)</p><pre>Добрый день!
+КВАНТ</pre><h2>44. info@goscoenergy.com — 1 позиц., 25 650 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (RI40390738-02)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -896,7 +931,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>45. info@hard-to-find.parts — 3 позиц., 24 502,50 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 3 позиц. (1064728-1, 1069873-1, 1089034-3)</p><pre>Добрый день!
+КВАНТ</pre><h2>45. info@hard-to-find.parts — 3 позиц., 24 502,50 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 3 позиц. (1064728-1, 1069873-1, 1089034-3)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -915,7 +950,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>46. info@ramautomations.com — 1 позиц., 23 400 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (DESC200)</p><pre>Добрый день!
+КВАНТ</pre><h2>46. info@ramautomations.com — 1 позиц., 23 400 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (DESC200)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -932,7 +967,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>47. info@wetzparts.com — 2 позиц., 21 571 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 2 позиц. (4327849, 4970773)</p><pre>Добрый день!
+КВАНТ</pre><h2>47. sales@classicautomation.com — 2 позиц., 21 535 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 2 позиц. (1794-OB8EP, 6ES7412-3HJ14-0AB0)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -944,13 +979,13 @@ tr { page-break-inside: avoid; }
 5) базис поставки (Инкотермс).
 
 Позиции:
-1. 4327849 — 55 шт, изготовитель Cummins
-2. 4970773 — 869 шт, изготовитель Cummins
+1. 1794-OB8EP — 59 шт, изготовитель Rockwell Automation (Allen-Bradley)
+2. 6ES7412-3HJ14-0AB0 — 2 шт, изготовитель Siemens
 
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>48. info@oldfilter.com — 2 позиц., 19 310 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 2 позиц. (64/05002117/31, 64/05002095/2)</p><pre>Добрый день!
+КВАНТ</pre><h2>48. info@oldfilter.com — 2 позиц., 19 310 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 2 позиц. (64/05002117/31, 64/05002095/2)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -968,7 +1003,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>49. SERVICE@ABC-CHARGERS.COM — 1 позиц., 19 000 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (1060367-500)</p><pre>Добрый день!
+КВАНТ</pre><h2>49. SERVICE@ABC-CHARGERS.COM — 1 позиц., 19 000 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (1060367-500)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -985,7 +1020,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>50. premiumzhangfuzhe@foxmail.com — 1 позиц., 17 400 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (MD3K02007-00)</p><pre>Добрый день!
+КВАНТ</pre><h2>50. premiumzhangfuzhe@foxmail.com — 1 позиц., 17 400 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (MD3K02007-00)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1002,7 +1037,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>51. CathyKu_515@hotmail.com — 2 позиц., 17 325 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 2 позиц. (1794-IВ10XOB6XT, 1794-OB16PXT)</p><pre>Добрый день!
+КВАНТ</pre><h2>51. CathyKu_515@hotmail.com — 2 позиц., 17 325 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 2 позиц. (1794-IВ10XOB6XT, 1794-OB16PXT)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1020,7 +1055,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>52. evachen@transcyko.com — 1 позиц., 17 000 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (525743000)</p><pre>Добрый день!
+КВАНТ</pre><h2>52. evachen@transcyko.com — 1 позиц., 17 000 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (525743000)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1037,7 +1072,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>53. NAsales@brookcrompton.com — 1 позиц., 16 275 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (T-DA100L8B)</p><pre>Добрый день!
+КВАНТ</pre><h2>53. NAsales@brookcrompton.com — 1 позиц., 16 275 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (T-DA100L8B)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1054,7 +1089,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>54. info@vbindustrialsupply.com — 1 позиц., 16 082 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (1756-CNBR/D)</p><pre>Добрый день!
+КВАНТ</pre><h2>54. info@vbindustrialsupply.com — 1 позиц., 16 082 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (1756-CNBR/D)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1071,24 +1106,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>55. sales@de.pepperl-fuchs.com — 1 позиц., 15 910 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (KFD2-RR-Ex1)</p><pre>Добрый день!
-
-Просим дать предложение по позициям ниже.
-По каждой позиции нужны пять ответов:
-
-1) цена за штуку и цена за весь указанный объём;
-2) остаток на складе ЧИСЛОМ на сегодня;
-3) срок поставки под указанное количество целиком;
-4) срок действия цены;
-5) базис поставки (Инкотермс).
-
-Позиции:
-1. KFD2-RR-Ex1 — 74 шт, изготовитель Pepperl+Fuchs
-
-Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
-
-С уважением,
-КВАНТ</pre><h2>56. automodulexpert@controlnextech.com — 1 позиц., 15 600 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (BN1701/15)</p><pre>Добрый день!
+КВАНТ</pre><h2>55. automodulexpert@controlnextech.com — 1 позиц., 15 600 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (BN1701/15)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1105,7 +1123,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>57. webinfo@maximinc.com — 1 позиц., 13 860 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (AF25545)</p><pre>Добрый день!
+КВАНТ</pre><h2>56. webinfo@maximinc.com — 1 позиц., 13 860 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (AF25545)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1122,7 +1140,24 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>58. sales@premiumrigparts.com — 1 позиц., 13 590 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (01917447)</p><pre>Добрый день!
+КВАНТ</pre><h2>57. info@udt.parts — 1 позиц., 13 750 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (4327849)</p><pre>Добрый день!
+
+Просим дать предложение по позициям ниже.
+По каждой позиции нужны пять ответов:
+
+1) цена за штуку и цена за весь указанный объём;
+2) остаток на складе ЧИСЛОМ на сегодня;
+3) срок поставки под указанное количество целиком;
+4) срок действия цены;
+5) базис поставки (Инкотермс).
+
+Позиции:
+1. 4327849 — 55 шт, изготовитель Cummins
+
+Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
+
+С уважением,
+КВАНТ</pre><h2>58. sales@premiumrigparts.com — 1 позиц., 13 590 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (01917447)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1139,7 +1174,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>59. mail@intertrek.ru — 1 позиц., 13 520 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (5634409)</p><pre>Добрый день!
+КВАНТ</pre><h2>59. mail@intertrek.ru — 1 позиц., 13 520 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (5634409)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1156,7 +1191,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>60. sales@compressorfiltersupply.com — 1 позиц., 13 000 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (64/05002092/2)</p><pre>Добрый день!
+КВАНТ</pre><h2>60. sales@compressorfiltersupply.com — 1 позиц., 13 000 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (64/05002092/2)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1173,7 +1208,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>61. sales@weschler.com — 3 позиц., 12 500 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 3 позиц. (p/n Solar: 127147-1, p/n Solar: 186665-245, p/n Solar: 962308С1)</p><pre>Добрый день!
+КВАНТ</pre><h2>61. sales@weschler.com — 3 позиц., 12 500 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 3 позиц. (p/n Solar: 127147-1, p/n Solar: 186665-245, p/n Solar: 962308С1)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1192,7 +1227,25 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>62. info@filtersource.com — 1 позиц., 11 400 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (186212-100)</p><pre>Добрый день!
+КВАНТ</pre><h2>62. info@iggnita.com — 2 позиц., 12 065 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 2 позиц. (487181, 1236100)</p><pre>Добрый день!
+
+Просим дать предложение по позициям ниже.
+По каждой позиции нужны пять ответов:
+
+1) цена за штуку и цена за весь указанный объём;
+2) остаток на складе ЧИСЛОМ на сегодня;
+3) срок поставки под указанное количество целиком;
+4) срок действия цены;
+5) базис поставки (Инкотермс).
+
+Позиции:
+1. 487181 — 28 шт, изготовитель Jenbacher/INNIO
+2. 1236100 — 66 шт, изготовитель Jenbacher/INNIO
+
+Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
+
+С уважением,
+КВАНТ</pre><h2>63. info@filtersource.com — 1 позиц., 11 400 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (186212-100)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1209,7 +1262,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>63. info@eltra-trade.sk — 1 позиц., 11 025 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (3AXD50000038423)</p><pre>Добрый день!
+КВАНТ</pre><h2>64. info@eltra-trade.sk — 1 позиц., 11 025 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (3AXD50000038423)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1226,7 +1279,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>64. sales@forte2001.ru — 1 позиц., 10 500 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (659101)</p><pre>Добрый день!
+КВАНТ</pre><h2>65. sales@forte2001.ru — 1 позиц., 10 500 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (659101)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1243,7 +1296,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>65. chi.sales@mcmaster.com — 1 позиц., 10 388 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (70-30093-1)</p><pre>Добрый день!
+КВАНТ</pre><h2>66. chi.sales@mcmaster.com — 1 позиц., 10 388 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (70-30093-1)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1260,7 +1313,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>66. 6gcontrols@5gplc.com — 1 позиц., 10 200 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (170180-01-00)</p><pre>Добрый день!
+КВАНТ</pre><h2>67. 6gcontrols@5gplc.com — 1 позиц., 10 200 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (170180-01-00)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1277,7 +1330,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>67. sales@optimuscontrol.com.my — 1 позиц., 9 900 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (MOOG Mod D633K2018B Rev F, Type R08KZ1M3VWY2)</p><pre>Добрый день!
+КВАНТ</pre><h2>68. sales@optimuscontrol.com.my — 1 позиц., 9 900 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (MOOG Mod D633K2018B Rev F, Type R08KZ1M3VWY2)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1294,7 +1347,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>68. sav@nhp-motoculture.fr — 1 позиц., 8 525 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (628477)</p><pre>Добрый день!
+КВАНТ</pre><h2>69. sav@nhp-motoculture.fr — 1 позиц., 8 525 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (628477)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1311,7 +1364,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>69. sales@kinetrolusa.com — 1 позиц., 8 200 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (SPECIFICATION NO.  Kinetrol ARB050H25FA3LOO)</p><pre>Добрый день!
+КВАНТ</pre><h2>70. sales@kinetrolusa.com — 1 позиц., 8 200 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (SPECIFICATION NO.  Kinetrol ARB050H25FA3LOO)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1328,7 +1381,24 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>70. sales@fueldump.co.uk — 1 позиц., 6 615 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (PEDROLLO HF 50В)</p><pre>Добрый день!
+КВАНТ</pre><h2>71. info@wetzparts.com — 1 позиц., 7 821 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (4970773)</p><pre>Добрый день!
+
+Просим дать предложение по позициям ниже.
+По каждой позиции нужны пять ответов:
+
+1) цена за штуку и цена за весь указанный объём;
+2) остаток на складе ЧИСЛОМ на сегодня;
+3) срок поставки под указанное количество целиком;
+4) срок действия цены;
+5) базис поставки (Инкотермс).
+
+Позиции:
+1. 4970773 — 869 шт, изготовитель Cummins
+
+Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
+
+С уважением,
+КВАНТ</pre><h2>72. sales@fueldump.co.uk — 1 позиц., 6 615 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (PEDROLLO HF 50В)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1345,7 +1415,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>71. info@toosglobal.com — 1 позиц., 6 250 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (HDIBATTE260DOTAA)</p><pre>Добрый день!
+КВАНТ</pre><h2>73. info@toosglobal.com — 1 позиц., 6 250 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (HDIBATTE260DOTAA)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1362,7 +1432,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>72. info@hydraulicstore.com — 1 позиц., 6 125 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (0000385)</p><pre>Добрый день!
+КВАНТ</pre><h2>74. info@hydraulicstore.com — 1 позиц., 6 125 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (0000385)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1379,7 +1449,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>73. office@vespion.com — 2 позиц., 6 100 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 2 позиц. (s245 005 п1097.1, 1000 749 0108 п212)</p><pre>Добрый день!
+КВАНТ</pre><h2>75. office@vespion.com — 2 позиц., 6 100 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 2 позиц. (s245 005 п1097.1, 1000 749 0108 п212)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1397,7 +1467,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>74. leendert.sws@gmail.com — 1 позиц., 6 090 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (180В4131)</p><pre>Добрый день!
+КВАНТ</pre><h2>76. leendert.sws@gmail.com — 1 позиц., 6 090 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (180В4131)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1414,7 +1484,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>75. contact@discountfilters.com — 1 позиц., 6 000 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (SP006612)</p><pre>Добрый день!
+КВАНТ</pre><h2>77. contact@discountfilters.com — 1 позиц., 6 000 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (SP006612)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1431,7 +1501,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>76. info@veza.ru — 1 позиц., 5 950 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (ЭКВСНП1015х620/30)</p><pre>Добрый день!
+КВАНТ</pre><h2>78. info@veza.ru — 1 позиц., 5 950 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (ЭКВСНП1015х620/30)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1448,7 +1518,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>77. gparts@moderngroup.com — 1 позиц., 5 670 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (4010887)</p><pre>Добрый день!
+КВАНТ</pre><h2>79. gparts@moderngroup.com — 1 позиц., 5 670 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (4010887)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1465,7 +1535,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>78. info@ervor.com — 1 позиц., 5 425 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (ERVOR 8970040)</p><pre>Добрый день!
+КВАНТ</pre><h2>80. info@ervor.com — 1 позиц., 5 425 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (ERVOR 8970040)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1482,7 +1552,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>79. support@plccable.com — 1 позиц., 5 330 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (1794-OW8)</p><pre>Добрый день!
+КВАНТ</pre><h2>81. support@plccable.com — 1 позиц., 5 330 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (1794-OW8)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1499,7 +1569,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>80. topbrandsplc@camvect.com — 1 позиц., 5 300 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (3AXD50000000753)</p><pre>Добрый день!
+КВАНТ</pre><h2>82. topbrandsplc@camvect.com — 1 позиц., 5 300 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (3AXD50000000753)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1516,7 +1586,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>81. info@fridayparts.com — 1 позиц., 5 180 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (628476)</p><pre>Добрый день!
+КВАНТ</pre><h2>83. info@fridayparts.com — 1 позиц., 5 180 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (628476)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1533,7 +1603,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>82. info@liebl-ip.de — 1 позиц., 4 950 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (006A64)</p><pre>Добрый день!
+КВАНТ</pre><h2>84. info@liebl-ip.de — 1 позиц., 4 950 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (006A64)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1550,7 +1620,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>83. quote@powerfuse.com — 1 позиц., 4 680 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (A110UD73TTI1000)</p><pre>Добрый день!
+КВАНТ</pre><h2>85. quote@powerfuse.com — 1 позиц., 4 680 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (A110UD73TTI1000)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1567,7 +1637,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>84. info@marflex.com — 1 позиц., 4 600 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (630870)</p><pre>Добрый день!
+КВАНТ</pre><h2>86. info@marflex.com — 1 позиц., 4 600 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (630870)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1584,7 +1654,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>85. barakastock@barakaagencies.com — 1 позиц., 4 410 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (1072904)</p><pre>Добрый день!
+КВАНТ</pre><h2>87. barakastock@barakaagencies.com — 1 позиц., 4 410 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (1072904)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1601,7 +1671,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>86. exportsupport@rs.rsgroup.com — 1 позиц., 4 100 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (64/07010572/100)</p><pre>Добрый день!
+КВАНТ</pre><h2>88. exportsupport@rs.rsgroup.com — 1 позиц., 4 100 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (64/07010572/100)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1618,7 +1688,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>87. customerservice@travaini.com — 1 позиц., 4 080 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (GUART5R02S00K)</p><pre>Добрый день!
+КВАНТ</pre><h2>89. customerservice@travaini.com — 1 позиц., 4 080 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (GUART5R02S00K)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1635,7 +1705,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>88. roy.pandel@titanoiltools.com — 2 позиц., 4 040 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 2 позиц. (Hi5501-PT-1R-100/1k-100, Hi5501-PT-1R-10/100-100)</p><pre>Добрый день!
+КВАНТ</pre><h2>90. roy.pandel@titanoiltools.com — 2 позиц., 4 040 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 2 позиц. (Hi5501-PT-1R-100/1k-100, Hi5501-PT-1R-10/100-100)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1653,7 +1723,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>89. sales@auto2mation.com — 1 позиц., 3 700 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (3265500)</p><pre>Добрый день!
+КВАНТ</pre><h2>91. sales@auto2mation.com — 1 позиц., 3 700 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (3265500)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1670,7 +1740,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>90. sales@drillingsolutionsltd.com — 1 позиц., 3 540 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (Н20613-21А)</p><pre>Добрый день!
+КВАНТ</pre><h2>92. Sales@tobeepump.com — 1 позиц., 3 540 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (Н20613-21А)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1687,7 +1757,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>91. info@axdos.se — 2 позиц., 3 484 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 2 позиц. (6ES7 132-4HB10-0AB0, 6ES7 134-4NB00-0AB0)</p><pre>Добрый день!
+КВАНТ</pre><h2>93. info@axdos.se — 2 позиц., 3 484 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 2 позиц. (6ES7 132-4HB10-0AB0, 6ES7 134-4NB00-0AB0)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1705,7 +1775,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>92. info@buyfilteronline.com — 1 позиц., 3 325 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (ERVOR 7200001)</p><pre>Добрый день!
+КВАНТ</pre><h2>94. info@buyfilteronline.com — 1 позиц., 3 325 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (ERVOR 7200001)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1722,7 +1792,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>93. rsmotor@rsmotor.es — 1 позиц., 3 162,50 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (12128936)</p><pre>Добрый день!
+КВАНТ</pre><h2>95. rsmotor@rsmotor.es — 1 позиц., 3 162,50 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (12128936)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1734,12 +1804,12 @@ tr { page-break-inside: avoid; }
 5) базис поставки (Инкотермс).
 
 Позиции:
-1. 12128936 — 55 шт, изготовитель DEUTZ
+1. 12128936 — 55 шт, изготовитель MWM
 
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>94. sales@sigmasurplus.com — 1 позиц., 3 032,25 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (RTE24024)</p><pre>Добрый день!
+КВАНТ</pre><h2>96. sales@sigmasurplus.com — 1 позиц., 3 032,25 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (RTE24024)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1756,7 +1826,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>95. info@weyeahengine.com — 1 позиц., 2 800 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (12189925)</p><pre>Добрый день!
+КВАНТ</pre><h2>97. info@weyeahengine.com — 1 позиц., 2 800 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (12189925)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1768,12 +1838,12 @@ tr { page-break-inside: avoid; }
 5) базис поставки (Инкотермс).
 
 Позиции:
-1. 12189925 — 28 шт, изготовитель DEUTZ
+1. 12189925 — 28 шт, изготовитель MWM
 
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>96. spares2@itt.com — 6 позиц., 2 310 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 6 позиц. (s240104 поз.208, s240065 поз.73, s240055 поз.331.1 и др.)</p><pre>Добрый день!
+КВАНТ</pre><h2>98. spares2@itt.com — 6 позиц., 2 310 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 6 позиц. (s240104 поз.208, s240065 поз.73, s240055 поз.331.1 и др.)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1789,13 +1859,13 @@ tr { page-break-inside: avoid; }
 2. s240065 поз.73 — 6 ШТ, изготовитель Bornemann
 3. s240055 поз.331.1 — 6 ШТ, изготовитель Bornemann
 4. s240032 поз.342.1 — 6 ШТ, изготовитель Bornemann
-5. s245 005 п331.2 — 6 ШТ, изготовитель Bornemann
-6. s240003 — 6 ШТ, изготовитель Bornemann
+5. s245 005 п331.2 — 6 ШТ, изготовитель ITT Bornemann
+6. s240003 — 6 ШТ, изготовитель ITT Bornemann
 
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>97. sales@sbis.com — 1 позиц., 2 242,50 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (028023)</p><pre>Добрый день!
+КВАНТ</pre><h2>99. sales@sbis.com — 1 позиц., 2 242,50 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (028023)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1812,7 +1882,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>98. info@rodvig.ru — 1 позиц., 2 177 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (3422444)</p><pre>Добрый день!
+КВАНТ</pre><h2>100. info@rodvig.ru — 1 позиц., 2 177 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (3422444)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1829,7 +1899,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>99. sales@hydraulicsonline.com — 1 позиц., 1 900 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (LMP.400.3.B.A.F1.A10.N.P01)</p><pre>Добрый день!
+КВАНТ</pre><h2>101. sales@hydraulicsonline.com — 1 позиц., 1 900 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (LMP.400.3.B.A.F1.A10.N.P01)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1846,7 +1916,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>100. orders@gasketsupply.com — 1 позиц., 1 207,50 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (1017905)</p><pre>Добрый день!
+КВАНТ</pre><h2>102. orders@gasketsupply.com — 1 позиц., 1 207,50 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (1017905)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1863,7 +1933,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>101. mail@lagerwerk.com — 1 позиц., 735 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (C7-A29X/DC24V + S7-C)</p><pre>Добрый день!
+КВАНТ</pre><h2>103. sales@fus-industrial.com — 1 позиц., 960 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (KFD2-СR-Ex1 30.300)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1875,12 +1945,29 @@ tr { page-break-inside: avoid; }
 5) базис поставки (Инкотермс).
 
 Позиции:
-1. C7-A29X/DC24V + S7-C — 21 шт, изготовитель Siemens
+1. KFD2-СR-Ex1 30.300 — 6 шт, изготовитель Pepperl+Fuchs
 
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>102. info@tdm-elektro.ru — 1 позиц., 700 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (SQ0365-0009)</p><pre>Добрый день!
+КВАНТ</pre><h2>104. mail@lagerwerk.com — 1 позиц., 735 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (C7-A29X/DC24V + S7-C)</p><pre>Добрый день!
+
+Просим дать предложение по позициям ниже.
+По каждой позиции нужны пять ответов:
+
+1) цена за штуку и цена за весь указанный объём;
+2) остаток на складе ЧИСЛОМ на сегодня;
+3) срок поставки под указанное количество целиком;
+4) срок действия цены;
+5) базис поставки (Инкотермс).
+
+Позиции:
+1. C7-A29X/DC24V + S7-C — 21 шт, изготовитель Comat Releco
+
+Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
+
+С уважением,
+КВАНТ</pre><h2>105. info@tdm-elektro.ru — 1 позиц., 700 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (SQ0365-0009)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1897,7 +1984,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>103. support@elettronew.com — 2 позиц., 630 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 2 позиц. (1240372, 1246274)</p><pre>Добрый день!
+КВАНТ</pre><h2>106. support@elettronew.com — 2 позиц., 630 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 2 позиц. (1240372, 1246274)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1915,7 +2002,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>104. sealing@saleindustry.com — 1 позиц., 598,50 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (AR-12)</p><pre>Добрый день!
+КВАНТ</pre><h2>107. sealing@saleindustry.com — 1 позиц., 598,50 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (AR-12)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1932,7 +2019,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>105. gts@gasturbineservices.com — 2 позиц., 228 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 2 позиц. (336519130, 328745110)</p><pre>Добрый день!
+КВАНТ</pre><h2>108. gts@gasturbineservices.com — 2 позиц., 228 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 2 позиц. (336519130, 328745110)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1950,7 +2037,24 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>106. sales@enapart.com — 2 позиц., 125 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 2 позиц. (328745100, 420004)</p><pre>Добрый день!
+КВАНТ</pre><h2>109. sales@caplugs.com — 1 позиц., 160 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (336609020)</p><pre>Добрый день!
+
+Просим дать предложение по позициям ниже.
+По каждой позиции нужны пять ответов:
+
+1) цена за штуку и цена за весь указанный объём;
+2) остаток на складе ЧИСЛОМ на сегодня;
+3) срок поставки под указанное количество целиком;
+4) срок действия цены;
+5) базис поставки (Инкотермс).
+
+Позиции:
+1. 336609020 — 4 шт, изготовитель Siemens Energy
+
+Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
+
+С уважением,
+КВАНТ</pre><h2>110. sales@enapart.com — 1 позиц., 90 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (328745100)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1963,12 +2067,11 @@ tr { page-break-inside: avoid; }
 
 Позиции:
 1. 328745100 — 4 шт, изготовитель Siemens
-2. 420004 — 5 ШТ, изготовитель DF Electric
 
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>107. info@filterserviceandsupply.com — 1 позиц., 0 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (3420742)</p><pre>Добрый день!
+КВАНТ</pre><h2>111. info@filterserviceandsupply.com — 1 позиц., 0 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (3420742)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1985,7 +2088,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>108. sales@delafieldcorp.com — 1 позиц., 0 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (1046491)</p><pre>Добрый день!
+КВАНТ</pre><h2>112. sales@delafieldcorp.com — 1 позиц., 0 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (1046491)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -1997,12 +2100,12 @@ tr { page-break-inside: avoid; }
 5) базис поставки (Инкотермс).
 
 Позиции:
-1. 1046491 — 1 шт, изготовитель Solar
+1. 1046491 — 1 шт, изготовитель Delafield Corporation
 
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>109. eshop@elpremo.cz — 1 позиц., 0 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (1478150000)</p><pre>Добрый день!
+КВАНТ</pre><h2>113. eshop@elpremo.cz — 1 позиц., 0 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (1478150000)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -2019,7 +2122,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>110. support@voomisupply.com — 1 позиц., 0 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (903375C1)</p><pre>Добрый день!
+КВАНТ</pre><h2>114. support@voomisupply.com — 1 позиц., 0 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (903375C1)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -2036,7 +2139,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>111. lv.enquiries@gb.abb.com — 1 позиц., 0 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 1 позиц. (1SDA068120R1)</p><pre>Добрый день!
+КВАНТ</pre><h2>115. lv.enquiries@gb.abb.com — 1 позиц., 0 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 1 позиц. (1SDA068120R1)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -2053,7 +2156,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>112. sklep@abmicro.pl — 7 позиц., 0 USD нашей экспозиции</h2><p><b>Тема:</b> Запрос цены и наличия: 7 позиц. (2CDS251001R0024, 2CDS251001R0064, 2CDS251001R0204 и др.)</p><pre>Добрый день!
+КВАНТ</pre><h2>116. sklep@abmicro.pl — 7 позиц., 0 USD нашей экспозиции</h2><p class='subj'><b>Тема:</b> Запрос цены и наличия: 7 позиц. (2CDS251001R0024, 2CDS251001R0064, 2CDS251001R0204 и др.)</p><pre>Добрый день!
 
 Просим дать предложение по позициям ниже.
 По каждой позиции нужны пять ответов:
@@ -2076,7 +2179,7 @@ tr { page-break-inside: avoid; }
 Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
 
 С уважением,
-КВАНТ</pre><h2>113. filtration.support.intl@atmus.com — 4 позиц., 293 631 USD нашей экспозиции</h2><p class='dim'><b>Что известно про этот канал</b> (из разбора адреса, уверенность «высокая»): Страница поддержки изготовителя печатает почтовые адреса по регионам с подписями; выбран «International Customers» — filtration.support.intl@atmus.com. Соседние по той же странице: fleetguard.support.emea@atmus.com — «Europe Support» (для нас второй по применимости), fleetguard.claims.emea@atmus.com — «Europe Claims», filtration.support.am@atmus.com — «Aftermarket Dealers and Distributors», fleetmaster.us@atmus.com — «Product Technical Support», filtration.support.oem@atmus.com — «OEM/First Fit Production Customers», Fleetguard.Returns@atmus.com — «Stock Return Support», custserve.uk@fleetguard.com — «United Kingdom», filtration.support.sng@atmus.com — «Singapore». Телефоны той же страницы: 1-800-223-4583 (US &amp; Canada), +44 204 587 3440 (United Kingdom), +33 805 98 00 62 (France), +32 2 808 76 83 (Belgium). Телефон в поле phone — британский, как ближайший к международному каналу; телефона с подписью «International» на странице нет. Правовое имя прочитано на https://www.fleetguard.com/about-us : «Fleetguard is a brand of Atmus Filtration Technologies, a stand-alone, publicly traded company founded by Cummins in 1958, independent since 2023». Не отдались: /contact-us и /contact-us/ — 404; /contact-sales — форма только с вопросом «What type of customer are you?» (Dealer/Distributor, OEM, End User), цен не запрашивает.</p><p><b>Тема:</b> Запрос по запасным частям Fleetguard: 4 позиц.</p><pre>Добрый день!
+КВАНТ</pre><h2>117. filtration.support.intl@atmus.com — 4 позиц., 293 631 USD нашей экспозиции</h2><p class='dim'><b>Что известно про этот канал</b> (из разбора адреса, уверенность «высокая»): Страница поддержки изготовителя печатает почтовые адреса по регионам с подписями; выбран «International Customers» — filtration.support.intl@atmus.com. Соседние по той же странице: fleetguard.support.emea@atmus.com — «Europe Support» (для нас второй по применимости), fleetguard.claims.emea@atmus.com — «Europe Claims», filtration.support.am@atmus.com — «Aftermarket Dealers and Distributors», fleetmaster.us@atmus.com — «Product Technical Support», filtration.support.oem@atmus.com — «OEM/First Fit Production Customers», Fleetguard.Returns@atmus.com — «Stock Return Support», custserve.uk@fleetguard.com — «United Kingdom», filtration.support.sng@atmus.com — «Singapore». Телефоны той же страницы: 1-800-223-4583 (US &amp; Canada), +44 204 587 3440 (United Kingdom), +33 805 98 00 62 (France), +32 2 808 76 83 (Belgium). Телефон в поле phone — британский, как ближайший к международному каналу; телефона с подписью «International» на странице нет. Правовое имя прочитано на https://www.fleetguard.com/about-us : «Fleetguard is a brand of Atmus Filtration Technologies, a stand-alone, publicly traded company founded by Cummins in 1958, independent since 2023». Не отдались: /contact-us и /contact-us/ — 404; /contact-sales — форма только с вопросом «What type of customer are you?» (Dealer/Distributor, OEM, End User), цен не запрашивает.</p><p class='subj'><b>Тема:</b> Запрос по запасным частям Fleetguard: 4 позиц.</p><pre>Добрый день!
 
 Обращаемся как покупатель запасных частей Fleetguard.
 Просим по позициям ниже:
@@ -2092,7 +2195,7 @@ tr { page-break-inside: avoid; }
 4. AF899M — 41 шт
 
 С уважением,
-КВАНТ</pre><h2>114. contact.en@innio.com — 1 позиц., 248 250 USD нашей экспозиции</h2><p class='dim'><b>Что известно про этот канал</b> (из разбора адреса, уверенность «средняя»): Отдельной почты службы запчастей нет ни на одной прочитанной странице. Общая почта, телефон и полное наименование напечатаны в выходных данных https://www.innio.com/en/imprint/: «Company Name: INNIO Jenbacher GmbH &amp; Co OG», «Registered Office Address: Achenseestrasse 1-3, 6200 Jenbach, Austria», «Tel: +43 5244 600», «E-Mail: contact.en@innio.com». Тот же адрес contact.en@innio.com напечатан на https://www.innio.com/en/contact и на бренд-сайте https://www.jenbacher.com/en/contact/, где стоит форма (разделы обращений — по новым решениям, по обслуживанию существующего оборудования и по счетам). Страница запчастей https://www.jenbacher.com/en/services/genuine-jenbacher-spare-parts/ почты не даёт: ведёт на ту же форму и на личный кабинет https://www.jenbacher.com/en/sign-in/; формулировки про обязательный канал закупки там нет. Что не отдалось: https://www.innio.com/en/who-we-are/locations-contact/ — HTTP 404. Чего не хватает: адресной почты по запчастям и номера сервисного центра — при экспозиции 248 250 USD стоит запросить их первым письмом на общую почту.</p><p><b>Тема:</b> Запрос по запасным частям INNIO Jenbacher: 1 позиц.</p><pre>Добрый день!
+КВАНТ</pre><h2>118. contact.en@innio.com — 1 позиц., 248 250 USD нашей экспозиции</h2><p class='dim'><b>Что известно про этот канал</b> (из разбора адреса, уверенность «средняя»): Отдельной почты службы запчастей нет ни на одной прочитанной странице. Общая почта, телефон и полное наименование напечатаны в выходных данных https://www.innio.com/en/imprint/: «Company Name: INNIO Jenbacher GmbH &amp; Co OG», «Registered Office Address: Achenseestrasse 1-3, 6200 Jenbach, Austria», «Tel: +43 5244 600», «E-Mail: contact.en@innio.com». Тот же адрес contact.en@innio.com напечатан на https://www.innio.com/en/contact и на бренд-сайте https://www.jenbacher.com/en/contact/, где стоит форма (разделы обращений — по новым решениям, по обслуживанию существующего оборудования и по счетам). Страница запчастей https://www.jenbacher.com/en/services/genuine-jenbacher-spare-parts/ почты не даёт: ведёт на ту же форму и на личный кабинет https://www.jenbacher.com/en/sign-in/; формулировки про обязательный канал закупки там нет. Что не отдалось: https://www.innio.com/en/who-we-are/locations-contact/ — HTTP 404. Чего не хватает: адресной почты по запчастям и номера сервисного центра — при экспозиции 248 250 USD стоит запросить их первым письмом на общую почту.</p><p class='subj'><b>Тема:</b> Запрос по запасным частям INNIO Jenbacher: 1 позиц.</p><pre>Добрый день!
 
 Обращаемся как покупатель запасных частей INNIO Jenbacher.
 Просим по позициям ниже:
@@ -2105,102 +2208,7 @@ tr { page-break-inside: avoid; }
 1. 334976-433894 — 662 шт
 
 С уважением,
-КВАНТ</pre><h2>115. Shop@solarturbines.com — 83 позиц., 240 328 USD нашей экспозиции</h2><p class='dim'><b>Что известно про этот канал</b> (из разбора адреса, уверенность «высокая»): Адрес завода найден. Живой solarturbines.com в этой среде закрыт на кромке Akamai: www.solarturbines.com/ и solarturbines.com/en_US/parts.html отдали 403 «Access Denied» с ссылкой errors.edgesuite.net; www.cat.com/en_US/products/new/power-systems.html — тоже 403; parts.solarturbines.com, mysolar.cat.com, esolar/mysolar.solarturbines.com, solarturbines.cat.com, solar.cat.com, www.turbomach.com, www.solarturbines.eu, www.solarturbines.com.cn — соединение не установилось; solarturbines.de отдал заглушку Cloudflare «Just a moment...» и заводу не принадлежит. Поэтому страница запчастей прочитана в копии Internet Archive (снимок 03.06.2025) по указателю CDX. На ней напечатано: «Questions about Parts? Email: Shop@solarturbines.com», «Phone numbers: 1-800-810-7854 (U.S.) 1-619-595-7400 (International)». Тот же адрес и те же телефоны стоят на русской версии той же страницы (ru_RU/services/parts.html, снимок 03.06.2025) — адрес подтверждён дважды. Форма обращения проверена ЖИВОЙ сегодня: https://catsolar.my.salesforce-sites.com/contactus отдала 200, заголовок «Solar Turbines Contact Us», подпись «© 2026 Solar Turbines Incorporated», в списке «Inquiry Direction» есть отдельный пункт «Service Parts», есть поля «Package Serial Number» и «Attachment» — по ней заявку на 83 строки подать можно. ВАЖНАЯ ОГОВОРКА для нашего заказчика: в обязательном поле «Country» этой формы 194 страны, России среди них НЕТ (после Romania сразу Rwanda); Азербайджан, Казахстан и Узбекистан есть. Поле «Equipment Location» обязательное, с пояснением «The location of the package is required in order to assign the proper account manager». Продажа запчастей идёт через собственную сеть Solar, не через дилеров Caterpillar: на странице запчастей напечатано «To Register, please contact your Solar representative to have them request access to specific applications». Дилерский канал Caterpillar проверялся и адреса по запчастям Solar не дал: zeppelin-powersystems.com (мягкий 404, нашлась только zps.achim@zeppelin.com), toromontcat.com/contact-us (200, только infoqc@toromont.com и leads@toromont.com), finning.com и mantracgroup.com — 404; ни на одной из этих страниц Solar не упомянут, поэтому их почты в ответ не ставлю — это был бы родовой адрес вместо адреса по детали.</p><p><b>Тема:</b> Запрос по запасным частям Solar: 83 позиц.</p><pre>Добрый день!
-
-Обращаемся как покупатель запасных частей Solar.
-Просим по позициям ниже:
-
-1) назвать цену и срок поставки либо указать авторизованный канал, через который вы продаёте эти позиции;
-2) подтвердить, действующее ли это обозначение, и назвать замену, если позиция снята;
-3) если обозначение внутреннее, назвать соответствующий коммерческий номер изделия и его изготовителя — по внутренним обозначениям цену получить невозможно ни у одного продавца.
-
-Позиции:
-1. 1019431-1600 — 8 шт
-2. 1075721 — 345 шт
-3. 301315-13 — 4 шт
-4. 2112736-1 — 36 шт
-5. 903316C1 — 18 шт
-6. 190537-102 — 5 шт
-7. 80-30550-900 — 11 шт
-8. 180431-1 — 151 шт
-9. 190015-12 — 10 шт
-10. 190537-302 — 8 шт
-11. 190392-3 — 13 шт
-12. 304649-100 — 108 шт
-13. 190817-14 — 5 шт
-14. 186648-1 — 5 шт
-15. 1106298-29 — 9 шт
-16. 1051931-67 — 20 шт
-17. 1017891 — 108 шт
-18. 1053038-35 — 7 шт
-19. 1059701-10 — 8 шт
-20. 964587C1 — 109 шт
-21. 1043265-1 — 76 шт
-22. 908579C1 — 14 шт
-23. 1046415-60 — 23 шт
-24. 1064728-4 — 12 шт
-25. 1051931-71 — 9 шт
-26. 120765-1 — 4 шт
-27. KFD2-СR-Ex1 30.300 — 6 шт
-28. 70-30815-1 — 4 шт
-29. 1017892 — 19 шт
-30. 903732C1 — 38 шт
-31. 970564C1 — 8 шт
-32. 1017890 — 17 шт
-33. 1007799 — 19 25 шт/уп
-34. 136845-1 — 18 шт
-35. 1024941 — 6 шт
-36. 1034347-1 — 2 шт
-37. 1053038-28 — 1 шт
-38. 1089241-28 — 1 шт
-39. 1022447 — 3 шт
-40. 131230-6 — 2 шт
-41. 1034549-21 — 1 шт
-42. 1051931-69 — 1 шт
-43. 1105336-1 — 3 шт
-44. 1078325-10 — 2 шт
-45. 998882C1 — 1 шт
-46. 1034549-43 — 1 шт
-47. 120712-11 — 1 шт
-48. 993359C1 — 3 шт
-49. 1023031-1 — 2 шт
-50. 120029-1 — 1 шт
-51. 2027098-12 — 1 шт
-52. 120029-8 — 1 шт
-53. 120029-5 — 1 шт
-54. 1064721-14 — 1 шт
-55. 186276-1 — 5 шт
-56. 967664C1 — 1 шт
-57. 190583-1 — 1 шт
-58. 199543-2 — 5 шт
-59. 903537C1 — 4 шт
-60. 955518C1 — 2 шт
-61. 969582C1 — 2 шт
-62. 993672C1 — 1 шт
-63. 1023031-3 — 2 шт
-64. 1078325-17 — 2 шт
-65. 124907-25 — 4 шт
-66. 124907-4 — 3 шт
-67. 1053038-19 — 2 шт
-68. 1119277-304 — 3 шт
-69. 70-31237-1 — 2 шт
-70. 1042018-3400 — 6 шт
-71. 1017902 — 2 шт
-72. 186273-1 — 4 шт
-73. 1023518-201 — 8 шт
-74. 1046485 — 1 шт
-75. 1046489 — 1 шт
-76. 190584-1 — 1 шт
-77. 190584-2 — 1 шт
-78. 604014C1 — 1 шт
-79. 124907-7 — 1 шт
-80. 1106120-2 — 1 шт
-81. 1060150 — 1 шт
-82. 1054986-2 — 1 шт
-83. 1065717-300 — 1 шт
-
-С уважением,
-КВАНТ</pre><h2>116. support@siemens-energy.com — 16 позиц., 230 697,50 USD нашей экспозиции</h2><p class='dim'><b>Что известно про этот канал</b> (из разбора адреса, уверенность «средняя»): На странице контактов Siemens Energy напечатаны общая почта поддержки support@siemens-energy.com, круглосуточный телефон +49 911 6505 6505 и форма «Send us your request» (имя, почта, компания, страна, сообщение). Отдельной почты службы запчастей на сайте нет: страница запчастей https://www.siemens-energy.com/global/en/home/products-services/service-offerings/parts.html даёт только форму «Get in touch with us» с оговоркой «For information and questions, our support team is available 24/7 to assist you in English, Spanish, and German»; адреса .../service/spare-parts-management.html и .../service-offerings/parts/spare-parts.html — 404. Расщепление адресата: артикулы вида 64/60040257/1014 в нашей заявке идут от чертежей завода в Линкольне (Siemens Energy), а BPZ:SKC62 — электрогидравлический привод Siemens Smart Infrastructure (бывшая Building Technologies), его спрашивают через Siemens AG: телефон Customer Care Center +49 89 38035491 и форма контактов, прочитано на https://www.siemens.com/global/en/general/contact.html . Почтовых адресов Siemens AG на той странице нет.</p><p><b>Тема:</b> Запрос по запасным частям Siemens: 16 позиц.</p><pre>Добрый день!
+КВАНТ</pre><h2>119. support@siemens-energy.com — 18 позиц., 231 228,30 USD нашей экспозиции</h2><p class='dim'><b>Что известно про этот канал</b> (из разбора адреса, уверенность «средняя»): На странице контактов Siemens Energy напечатаны общая почта поддержки support@siemens-energy.com, круглосуточный телефон +49 911 6505 6505 и форма «Send us your request» (имя, почта, компания, страна, сообщение). Отдельной почты службы запчастей на сайте нет: страница запчастей https://www.siemens-energy.com/global/en/home/products-services/service-offerings/parts.html даёт только форму «Get in touch with us» с оговоркой «For information and questions, our support team is available 24/7 to assist you in English, Spanish, and German»; адреса .../service/spare-parts-management.html и .../service-offerings/parts/spare-parts.html — 404. Расщепление адресата: артикулы вида 64/60040257/1014 в нашей заявке идут от чертежей завода в Линкольне (Siemens Energy), а BPZ:SKC62 — электрогидравлический привод Siemens Smart Infrastructure (бывшая Building Technologies), его спрашивают через Siemens AG: телефон Customer Care Center +49 89 38035491 и форма контактов, прочитано на https://www.siemens.com/global/en/general/contact.html . Почтовых адресов Siemens AG на той странице нет.</p><p class='subj'><b>Тема:</b> Запрос по запасным частям Siemens: 18 позиц.</p><pre>Добрый день!
 
 Обращаемся как покупатель запасных частей Siemens.
 Просим по позициям ниже:
@@ -2224,11 +2232,78 @@ tr { page-break-inside: avoid; }
 12. 1456598 — 14 шт
 13. 1510078 — 14 шт
 14. 1583320 — 14 шт
-15. 336519145 — 12 шт
-16. C2-A29X/AC120V + S2-S — 4 шт
+15. 151210065 — 48 шт
+16. 336519145 — 12 шт
+17. 211166016 — 32 шт
+18. 231122016 — 32 шт
 
 С уважением,
-КВАНТ</pre><h2>117. sales@us.pepperl-fuchs.com — 3 позиц., 78 420 USD нашей экспозиции</h2><p class='dim'><b>Что известно про этот канал</b> (из разбора адреса, уверенность «высокая»): Страница названа «Contact Customer Service and/or Technical Support, or Find International Locations», в перечне представительств напечатано: «Twinsburg OH 44087 Pepperl+Fuchs Inc. 8093 Darrow Road Twinsburg OH 44087 United States of America www.pepperl-fuchs.com sales@us.pepperl-fuchs.com +1 330 425-3555 +1 330 425-4607» и рядом «Singapore Pepperl+Fuchs Asia Pte. Ltd. … sales@sg.pepperl-fuchs.com +65 6779 9091». Головная запись в подвале: «Pepperl+Fuchs SE Lilienthalstraße 200 68307 Mannheim, Germany E-Mail info@de.pepperl-fuchs.com Phone +49 621 776-0» — это общая почта. В данных того же подвала есть сбытовая структура «Pepperl+Fuchs Vertrieb Deutschland GmbH» с контактами sales@de.pepperl-fuchs.com и +49 621 776-1111, но в видимом тексте страницы она не выведена, поэтому в поле ставлю напечатанную в тексте американскую почту продаж. Обращения через WebFetch к pepperl-fuchs.com отдают 403, страницы прочитаны прямым curl.</p><p><b>Тема:</b> Запрос по запасным частям Pepperl+Fuchs: 3 позиц.</p><pre>Добрый день!
+КВАНТ</pre><h2>120. Shop@solarturbines.com — 53 позиц., 167 323,50 USD нашей экспозиции</h2><p class='dim'><b>Что известно про этот канал</b> (из разбора адреса, уверенность «высокая»): Адрес завода найден. Живой solarturbines.com в этой среде закрыт на кромке Akamai: www.solarturbines.com/ и solarturbines.com/en_US/parts.html отдали 403 «Access Denied» с ссылкой errors.edgesuite.net; www.cat.com/en_US/products/new/power-systems.html — тоже 403; parts.solarturbines.com, mysolar.cat.com, esolar/mysolar.solarturbines.com, solarturbines.cat.com, solar.cat.com, www.turbomach.com, www.solarturbines.eu, www.solarturbines.com.cn — соединение не установилось; solarturbines.de отдал заглушку Cloudflare «Just a moment...» и заводу не принадлежит. Поэтому страница запчастей прочитана в копии Internet Archive (снимок 03.06.2025) по указателю CDX. На ней напечатано: «Questions about Parts? Email: Shop@solarturbines.com», «Phone numbers: 1-800-810-7854 (U.S.) 1-619-595-7400 (International)». Тот же адрес и те же телефоны стоят на русской версии той же страницы (ru_RU/services/parts.html, снимок 03.06.2025) — адрес подтверждён дважды. Форма обращения проверена ЖИВОЙ сегодня: https://catsolar.my.salesforce-sites.com/contactus отдала 200, заголовок «Solar Turbines Contact Us», подпись «© 2026 Solar Turbines Incorporated», в списке «Inquiry Direction» есть отдельный пункт «Service Parts», есть поля «Package Serial Number» и «Attachment» — по ней заявку на 83 строки подать можно. ВАЖНАЯ ОГОВОРКА для нашего заказчика: в обязательном поле «Country» этой формы 194 страны, России среди них НЕТ (после Romania сразу Rwanda); Азербайджан, Казахстан и Узбекистан есть. Поле «Equipment Location» обязательное, с пояснением «The location of the package is required in order to assign the proper account manager». Продажа запчастей идёт через собственную сеть Solar, не через дилеров Caterpillar: на странице запчастей напечатано «To Register, please contact your Solar representative to have them request access to specific applications». Дилерский канал Caterpillar проверялся и адреса по запчастям Solar не дал: zeppelin-powersystems.com (мягкий 404, нашлась только zps.achim@zeppelin.com), toromontcat.com/contact-us (200, только infoqc@toromont.com и leads@toromont.com), finning.com и mantracgroup.com — 404; ни на одной из этих страниц Solar не упомянут, поэтому их почты в ответ не ставлю — это был бы родовой адрес вместо адреса по детали.</p><p class='subj'><b>Тема:</b> Запрос по запасным частям Solar: 53 позиц.</p><pre>Добрый день!
+
+Обращаемся как покупатель запасных частей Solar.
+Просим по позициям ниже:
+
+1) назвать цену и срок поставки либо указать авторизованный канал, через который вы продаёте эти позиции;
+2) подтвердить, действующее ли это обозначение, и назвать замену, если позиция снята;
+3) если обозначение внутреннее, назвать соответствующий коммерческий номер изделия и его изготовителя — по внутренним обозначениям цену получить невозможно ни у одного продавца.
+
+Позиции:
+1. 1019431-1600 — 8 шт
+2. 1075721 — 345 шт
+3. 301315-13 — 4 шт
+4. 2112736-1 — 36 шт
+5. 180431-1 — 151 шт
+6. 190537-302 — 8 шт
+7. 190392-3 — 13 шт
+8. 1059701-10 — 8 шт
+9. 964587C1 — 109 шт
+10. 1043265-1 — 76 шт
+11. 908579C1 — 14 шт
+12. 1051931-71 — 9 шт
+13. 120765-1 — 4 шт
+14. 70-30815-1 — 4 шт
+15. 1017892 — 19 шт
+16. 903732C1 — 38 шт
+17. 1034347-1 — 2 шт
+18. 1053038-28 — 1 шт
+19. 1089241-28 — 1 шт
+20. 1022447 — 3 шт
+21. 1034549-21 — 1 шт
+22. 1051931-69 — 1 шт
+23. 998882C1 — 1 шт
+24. 1034549-43 — 1 шт
+25. 120712-11 — 1 шт
+26. 993359C1 — 3 шт
+27. 120029-1 — 1 шт
+28. 2027098-12 — 1 шт
+29. 120029-8 — 1 шт
+30. 120029-5 — 1 шт
+31. 186276-1 — 5 шт
+32. 967664C1 — 1 шт
+33. 190583-1 — 1 шт
+34. 903537C1 — 4 шт
+35. 955518C1 — 2 шт
+36. 969582C1 — 2 шт
+37. 993672C1 — 1 шт
+38. 124907-25 — 4 шт
+39. 124907-4 — 3 шт
+40. 1053038-19 — 2 шт
+41. 1119277-304 — 3 шт
+42. 70-31237-1 — 2 шт
+43. 1017902 — 2 шт
+44. 186273-1 — 4 шт
+45. 1046485 — 1 шт
+46. 1046489 — 1 шт
+47. 190584-1 — 1 шт
+48. 190584-2 — 1 шт
+49. 604014C1 — 1 шт
+50. 124907-7 — 1 шт
+51. 1106120-2 — 1 шт
+52. 1060150 — 1 шт
+53. 1054986-2 — 1 шт
+
+С уважением,
+КВАНТ</pre><h2>121. sales@us.pepperl-fuchs.com — 3 позиц., 78 420 USD нашей экспозиции</h2><p class='dim'><b>Что известно про этот канал</b> (из разбора адреса, уверенность «высокая»): Страница названа «Contact Customer Service and/or Technical Support, or Find International Locations», в перечне представительств напечатано: «Twinsburg OH 44087 Pepperl+Fuchs Inc. 8093 Darrow Road Twinsburg OH 44087 United States of America www.pepperl-fuchs.com sales@us.pepperl-fuchs.com +1 330 425-3555 +1 330 425-4607» и рядом «Singapore Pepperl+Fuchs Asia Pte. Ltd. … sales@sg.pepperl-fuchs.com +65 6779 9091». Головная запись в подвале: «Pepperl+Fuchs SE Lilienthalstraße 200 68307 Mannheim, Germany E-Mail info@de.pepperl-fuchs.com Phone +49 621 776-0» — это общая почта. В данных того же подвала есть сбытовая структура «Pepperl+Fuchs Vertrieb Deutschland GmbH» с контактами sales@de.pepperl-fuchs.com и +49 621 776-1111, но в видимом тексте страницы она не выведена, поэтому в поле ставлю напечатанную в тексте американскую почту продаж. Обращения через WebFetch к pepperl-fuchs.com отдают 403, страницы прочитаны прямым curl.</p><p class='subj'><b>Тема:</b> Запрос по запасным частям Pepperl+Fuchs: 3 позиц.</p><pre>Добрый день!
 
 Обращаемся как покупатель запасных частей Pepperl+Fuchs.
 Просим по позициям ниже:
@@ -2243,7 +2318,7 @@ tr { page-break-inside: avoid; }
 3. HISHPSM/32/MM-01 — 6 шт
 
 С уважением,
-КВАНТ</pre><h2>118. email.kz@innio.com — 18 позиц., 68 843,50 USD нашей экспозиции</h2><p class='dim'><b>Что известно про этот канал</b> (из разбора адреса, уверенность «средняя»): Две прочитанные почты одного изготовителя: на русскоязычной странице СНГ напечатано «Вы можете связаться с нами, направив письмо на email.kz@innio.com» — её и беру как ближнюю к нам; на англоязычной https://www.innio.com/en/contact/ напечатано «To get in touch with us, send us an email at: contact.en@innio.com, or fill-out the contact form below». Обе — общий вход («Нужно обслужить существующее оборудование?»), выделенной почты службы запчастей нет ни на одной странице. Прочитаны также страницы запчастей https://www.jenbacher.com/en/services/genuine-jenbacher-spare-parts/ и подраздел свечей .../spark-plug/ — на них нет ни почты, ни телефона, только ссылка «Contact Us» на ту же общую форму. Юридическое наименование на прочитанных страницах не напечатано, сказано лишь «JENBACHER is a brand of INNIO.». Для заказа запчастей есть закрытый кабинет «Customer Portal» (myplant) — адрес обращения он не заменяет.</p><p><b>Тема:</b> Запрос по запасным частям Jenbacher/INNIO: 18 позиц.</p><pre>Добрый день!
+КВАНТ</pre><h2>122. email.kz@innio.com — 18 позиц., 68 843,50 USD нашей экспозиции</h2><p class='dim'><b>Что известно про этот канал</b> (из разбора адреса, уверенность «средняя»): Две прочитанные почты одного изготовителя: на русскоязычной странице СНГ напечатано «Вы можете связаться с нами, направив письмо на email.kz@innio.com» — её и беру как ближнюю к нам; на англоязычной https://www.innio.com/en/contact/ напечатано «To get in touch with us, send us an email at: contact.en@innio.com, or fill-out the contact form below». Обе — общий вход («Нужно обслужить существующее оборудование?»), выделенной почты службы запчастей нет ни на одной странице. Прочитаны также страницы запчастей https://www.jenbacher.com/en/services/genuine-jenbacher-spare-parts/ и подраздел свечей .../spark-plug/ — на них нет ни почты, ни телефона, только ссылка «Contact Us» на ту же общую форму. Юридическое наименование на прочитанных страницах не напечатано, сказано лишь «JENBACHER is a brand of INNIO.». Для заказа запчастей есть закрытый кабинет «Customer Portal» (myplant) — адрес обращения он не заменяет.</p><p class='subj'><b>Тема:</b> Запрос по запасным частям Jenbacher/INNIO: 18 позиц.</p><pre>Добрый день!
 
 Обращаемся как покупатель запасных частей Jenbacher/INNIO.
 Просим по позициям ниже:
@@ -2273,7 +2348,7 @@ tr { page-break-inside: avoid; }
 18. 100606 — 3 шт
 
 С уважением,
-КВАНТ</pre><h2>119. info@heinzmann.de — 1 позиц., 37 400 USD нашей экспозиции</h2><p class='dim'><b>Что известно про этот канал</b> (из разбора адреса, уверенность «средняя»): Изготовитель установочных моторов и регуляторов (наш артикул 581336 — мотор установочный к газопоршневой машине Jenbacher/INNIO). На сайте напечатан один почтовый адрес — общий info@heinzmann.de, он же встречается в подвале всех страниц; телефон центрального офиса +49 7673 8208-0. Обращение по запчастям — формой на странице контактов: в ней выбирается направление, среди прочих «Sales and Distribution» и «Technical Support», страница обещает «the right contact person will be happy to deal with your enquiry». Отдельной почты службы запчастей (spares@/parts@) на сайте нет, и я её не достраиваю. Не отдались: /en/service и /en/services — 404; страница /en/contact/sales-network (сеть продаж и сервиса, 380 КБ) содержит из почт только тот же info@heinzmann.de.</p><p><b>Тема:</b> Запрос по запасным частям HEINZMANN: 1 позиц.</p><pre>Добрый день!
+КВАНТ</pre><h2>123. info@heinzmann.de — 1 позиц., 37 400 USD нашей экспозиции</h2><p class='dim'><b>Что известно про этот канал</b> (из разбора адреса, уверенность «средняя»): Изготовитель установочных моторов и регуляторов (наш артикул 581336 — мотор установочный к газопоршневой машине Jenbacher/INNIO). На сайте напечатан один почтовый адрес — общий info@heinzmann.de, он же встречается в подвале всех страниц; телефон центрального офиса +49 7673 8208-0. Обращение по запчастям — формой на странице контактов: в ней выбирается направление, среди прочих «Sales and Distribution» и «Technical Support», страница обещает «the right contact person will be happy to deal with your enquiry». Отдельной почты службы запчастей (spares@/parts@) на сайте нет, и я её не достраиваю. Не отдались: /en/service и /en/services — 404; страница /en/contact/sales-network (сеть продаж и сервиса, 380 КБ) содержит из почт только тот же info@heinzmann.de.</p><p class='subj'><b>Тема:</b> Запрос по запасным частям HEINZMANN: 1 позиц.</p><pre>Добрый день!
 
 Обращаемся как покупатель запасных частей HEINZMANN.
 Просим по позициям ниже:
@@ -2286,7 +2361,7 @@ tr { page-break-inside: avoid; }
 1. 581336 — 17 шт
 
 С уважением,
-КВАНТ</pre><h2>120. spares2@itt.com — 3 позиц., 6 390 USD нашей экспозиции</h2><p class='dim'><b>Что известно про этот канал</b> (из разбора адреса, уверенность «высокая»): Адресная почта службы запчастей напечатана прямо на странице «Spear and Wear Parts» (орфография адреса страницы — заводская): «Email: spares2@itt.com», в том же блоке «our qualified parts service will be of immediate assistance» и «Professional advice together with parts suggestions and quotations». Телефон и адрес завода прочитаны на https://www.bornemann.com/contact-us: «ITT Bornemann GmbH, Industriestrasse 2, 31683 Obernkirchen, Germany, Fon: +49 5724 390-0, Fax: +49 5724 390-290»; там же форма с выбором «After Sales» и «Service». Подвал: «© 2026 ITT INC. | ITT BORNEMANN GmbH». Что не отдалось: https://www.bornemann.com/en/service/ — HTTP 404 (рабочие адреса без /en/).</p><p><b>Тема:</b> Запрос по запасным частям Bornemann: 3 позиц.</p><pre>Добрый день!
+КВАНТ</pre><h2>124. spares2@itt.com — 3 позиц., 6 390 USD нашей экспозиции</h2><p class='dim'><b>Что известно про этот канал</b> (из разбора адреса, уверенность «высокая»): Адресная почта службы запчастей напечатана прямо на странице «Spear and Wear Parts» (орфография адреса страницы — заводская): «Email: spares2@itt.com», в том же блоке «our qualified parts service will be of immediate assistance» и «Professional advice together with parts suggestions and quotations». Телефон и адрес завода прочитаны на https://www.bornemann.com/contact-us: «ITT Bornemann GmbH, Industriestrasse 2, 31683 Obernkirchen, Germany, Fon: +49 5724 390-0, Fax: +49 5724 390-290»; там же форма с выбором «After Sales» и «Service». Подвал: «© 2026 ITT INC. | ITT BORNEMANN GmbH». Что не отдалось: https://www.bornemann.com/en/service/ — HTTP 404 (рабочие адреса без /en/).</p><p class='subj'><b>Тема:</b> Запрос по запасным частям Bornemann: 3 позиц.</p><pre>Добрый день!
 
 Обращаемся как покупатель запасных частей Bornemann.
 Просим по позициям ниже:
@@ -2301,7 +2376,7 @@ tr { page-break-inside: avoid; }
 3. s240100 поз.200 — 6 ШТ
 
 С уважением,
-КВАНТ</pre><h2>121. order.us@wago.com — 2 позиц., 2 887,50 USD нашей экспозиции</h2><p class='dim'><b>Что известно про этот канал</b> (из разбора адреса, уверенность «высокая»): Прочитана карточка обращения на странице «Order and Delivery Status» в разделе «Customer Support»: заголовок «Your contact person at WAGO», имя карточки «Order Entry Support», в ней phone &#x27;(262) 255-6222&#x27; и email &#x27;order.us@wago.com&#x27; — это приёмка заказов, то есть цена и срок по номеру идут туда. На странице «Site Notice» напечатано «WAGO Corporation N120 W19129 Freistadt Rd. Germantown, WI 53022 Phone: 1-800-DIN-RAIL (346-7245)» и общая почта info.us@wago.com. На https://www.wago.com/us/technical-support-contact-page напечатаны почты технической поддержки по направлениям: automationsupport.us@wago.com (сюда относятся 750-530 и 750-880 — модули ввода-вывода), interconnectsupport.us@wago.com, interfacesupport.us@wago.com. Немецкий и глобальный разделы сайта закрыты защитой Cloudflare: /global/contact, /gb/contact, /us/contact — 403 «Just a moment…» и у WebFetch, и у curl; американские страницы отдались прямым curl. Немецкой (заводской) почты заказов поэтому не прочитал.</p><p><b>Тема:</b> Запрос по запасным частям WAGO: 2 позиц.</p><pre>Добрый день!
+КВАНТ</pre><h2>125. order.us@wago.com — 2 позиц., 2 887,50 USD нашей экспозиции</h2><p class='dim'><b>Что известно про этот канал</b> (из разбора адреса, уверенность «высокая»): Прочитана карточка обращения на странице «Order and Delivery Status» в разделе «Customer Support»: заголовок «Your contact person at WAGO», имя карточки «Order Entry Support», в ней phone &#x27;(262) 255-6222&#x27; и email &#x27;order.us@wago.com&#x27; — это приёмка заказов, то есть цена и срок по номеру идут туда. На странице «Site Notice» напечатано «WAGO Corporation N120 W19129 Freistadt Rd. Germantown, WI 53022 Phone: 1-800-DIN-RAIL (346-7245)» и общая почта info.us@wago.com. На https://www.wago.com/us/technical-support-contact-page напечатаны почты технической поддержки по направлениям: automationsupport.us@wago.com (сюда относятся 750-530 и 750-880 — модули ввода-вывода), interconnectsupport.us@wago.com, interfacesupport.us@wago.com. Немецкий и глобальный разделы сайта закрыты защитой Cloudflare: /global/contact, /gb/contact, /us/contact — 403 «Just a moment…» и у WebFetch, и у curl; американские страницы отдались прямым curl. Немецкой (заводской) почты заказов поэтому не прочитал.</p><p class='subj'><b>Тема:</b> Запрос по запасным частям WAGO: 2 позиц.</p><pre>Добрый день!
 
 Обращаемся как покупатель запасных частей WAGO.
 Просим по позициям ниже:
@@ -2315,7 +2390,7 @@ tr { page-break-inside: avoid; }
 2. 750-530 — 5 ШТ
 
 С уважением,
-КВАНТ</pre><h2>Через форму обращения: 90 строк на 604 083 долларов США</h2><p>Форма — не «адреса нет», а другой способ отправки. Среди таких изготовителей ABB (39 строк) и Rockwell (342 600 USD): отнести форму к безадресному остатку значило бы спрятать шестьсот тысяч в графу «работа не определена». Отправляет человек: посылать что-либо наружу от нашего имени агент сам не станет.</p><p class='k'>1. Rockwell Automation — 6 позиц., 342 600 USD нашей экспозиции</p><p>Форма: https://www.rockwellautomation.com/en-us/support/customer-care/submit-a-question-to-customer-care.html</p><pre>Добрый день!
+КВАНТ</pre><h2>Через форму обращения: 97 строк на 615 238 долларов США</h2><p>Форма — не «адреса нет», а другой способ отправки. Среди таких изготовителей ABB (39 строк) и Rockwell (342 600 USD): отнести форму к безадресному остатку значило бы спрятать шестьсот тысяч в графу «работа не определена». Отправляет человек: посылать что-либо наружу от нашего имени агент сам не станет.</p><p class='k'>1. Rockwell Automation — 6 позиц., 342 600 USD нашей экспозиции</p><p>Форма: https://www.rockwellautomation.com/en-us/support/customer-care/submit-a-question-to-customer-care.html</p><pre>Добрый день!
 
 Обращаемся как покупатель запасных частей Rockwell Automation.
 Просим по позициям ниже:
@@ -2384,7 +2459,7 @@ tr { page-break-inside: avoid; }
 39. MPS3-230/24C — 2 ШТ
 
 С уважением,
-КВАНТ</pre><p class='k'>3. Schlumberger Company — 9 позиц., 39 300 USD нашей экспозиции</p><p>Форма: https://www.slb.com/contact-us/speak-with-sales</p><pre>Добрый день!
+КВАНТ</pre><p class='k'>3. Schlumberger Company — 11 позиц., 44 340 USD нашей экспозиции</p><p>Форма: https://www.slb.com/contact-us/speak-with-sales</p><pre>Добрый день!
 
 Обращаемся как покупатель запасных частей Schlumberger Company.
 Просим по позициям ниже:
@@ -2402,10 +2477,12 @@ tr { page-break-inside: avoid; }
 6. 100244318 — 5 ШТ
 7. 1SDA067560R1 — 10 ШТ
 8. SWAG.01.07 — 5 ШТ
-9. 04-1817 — 60 ШТ
+9. 439334000-1 — 48 ШТ
+10. 518532000 — 48 ШТ
+11. 04-1817 — 60 ШТ
 
 С уважением,
-КВАНТ</pre><p class='k'>4. Cummins — 4 позиц., 37 095 USD нашей экспозиции</p><p>Форма: https://quickserve.cummins.com/info/qsol/faqs/contact_us.html</p><pre>Добрый день!
+КВАНТ</pre><p class='k'>4. Cummins — 9 позиц., 43 210 USD нашей экспозиции</p><p>Форма: https://quickserve.cummins.com/info/qsol/faqs/contact_us.html</p><pre>Добрый день!
 
 Обращаемся как покупатель запасных частей Cummins.
 Просим по позициям ниже:
@@ -2419,6 +2496,11 @@ tr { page-break-inside: avoid; }
 2. PP7953-04 — 3 шт
 3. 3929935 — 7 шт
 4. 3929955 — 7 шт
+5. 4012423 — 7 шт
+6. 5594377 — 7 шт
+7. 3422214 — 7 шт
+8. 3160404 — 3 шт
+9. 3160587 — 3 шт
 
 С уважением,
 КВАНТ</pre><p class='k'>5. Drillmec — 26 позиц., 35 282 USD нашей экспозиции</p><p>Форма: https://www.drillmec.com/en/contacts<br>Телефон: +1 281 885 0777</p><pre>Добрый день!
@@ -2501,4 +2583,548 @@ tr { page-break-inside: avoid; }
 3. 363865 — 14 шт
 
 С уважением,
-КВАНТ</pre><h2>Что делать с этим документом</h2><p><b>1. Отправлять сверху вниз.</b> Порядок — по нашей экспозиции. Первые десять адресатов закрывают большую часть суммы, и каждый из них несёт по нескольку позиций: одно письмо закрывает не одну строку.</p><p><b>2. «Нет» — полноценный ответ.</b> Письмо прямо это говорит. Отказ снимает строку с канала и отправляет её искать другого продавца, а молчание держит её в работе месяцами.</p><p><b>3. Ответ записывать числом и с датой.</b> Цена без срока действия и остаток без даты в сумму закупки не идут — это правило уже стоило нам разбора.</p><p><b>4. По 34 строкам на 299 769 долларов США адреса нет — и это следующая работа, а не пропуск.</b> Адрес ищется у изготовителя и в его сети обслуживания. Проверять нашу базу поставщиков по словам названия бесполезно: такая сверка уже дала заведомо ложные пары — фильтр Fleetguard к торговцу программируемыми контроллерами, — то есть ровно «родовой адрес вместо адреса по детали».</p><p class='dim'>Артикулы без адреса, по убыванию нашей экспозиции: GI3-3, MW13048, EQ3700DW, SDN10-24-100P, BELIMO AF24-SR-S, 12420480, STP 42-28-100, SP107762, 400.1, 411.1/.2/.3/.4/.7/.8/.13/.23/.24/.25, 412.1/.2/.4/.5/.10, 507, 180В4158, iSTAT i4MT, KOP160j7MWVPN22, 040A66, 049089-04, RI5031FO00-05, 700-FSM3UU23-EX, 328577, У808750D9J, 107745, 1071411-1, 9090490700, GUART5R11R00K, 50982040, 50981230, 929081, 50981153, 50981247, RI01170В00-66, XB4BD21, 6740000050, A12B23HWB, DFB123812H, MEC0381V1-O00U-G99, 20D561K.</p><p class='dim'>Считает gt/tools/quote_letters.py, набор gt/data/ship_quote_letters.json. Адресат, уже опубликовавший нашу заявку, помечен знаком ⚠ и отдельной строкой в своём письме — см. gt/data/ship_leak.json.</p>
+КВАНТ</pre><h2>Продавец без почты — страница или телефон: 32 строк на 121 099 долларов США</h2><p>Замер 18.09.2026: у 48 строк почты продавца нет, но у 25 из них разбор прочитал страницу, а ещё у 6 — телефон, всего на 122 494 USD. Пока они считались безадресными, отчёт называл по ним работой «найти адрес» — адрес при этом был уже найден и записан. Почта по домену не додумывается: спрашивают тем каналом, который прочитан.</p><p class='k'>1. BELIMO AF24-SR-S — 41 шт, изготовитель Belimo — 24 087,50 USD нашей экспозиции</p><p>Как спрашивать: позвонить и задать пять вопросов.<br>Телефон: +1-847-773-0645<br>Что прочитал разбор: Blackhawk Supply: +1-847-773-0645, Hoffman Estates, IL. Midwest Supply: +1-847-773-1023, тот же адрес.</p><pre>Добрый день!
+
+Просим дать предложение по позициям ниже.
+По каждой позиции нужны пять ответов:
+
+1) цена за штуку и цена за весь указанный объём;
+2) остаток на складе ЧИСЛОМ на сегодня;
+3) срок поставки под указанное количество целиком;
+4) срок действия цены;
+5) базис поставки (Инкотермс).
+
+Позиции:
+1. BELIMO AF24-SR-S — 41 шт, изготовитель Belimo
+
+Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
+
+С уважением,
+КВАНТ</pre><p class='k'>2. STP 42-28-100 — 4 шт, изготовитель SolaHD (Emerson) — 11 800 USD нашей экспозиции</p><p>Как спрашивать: открыть страницу продавца и задать пять вопросов через её форму.<br>Страница: https://www.digikey.com/en/products/detail/solahd/STP-42-28-100/10073073<br>Телефон: +1 (800) 843-9859<br>Что прочитал разбор: DigiKey: https://www.digikey.com/en/products/detail/solahd/STP-42-28-100/10073073. Power/Mation: бесплатный телефон +1 (800) 843-9859, адрес электронной почты на странице скрыт защитой от сбора. Southern Controls: https://www.southerncontrols.com/products/STP4228100. Изготовитель: SolaHD / Emerson, обращение через страницу продукции Emerson. По самой турбине для сверки шильдика: Solar Turbines, +1 619-544-5352.</p><pre>Добрый день!
+
+Просим дать предложение по позициям ниже.
+По каждой позиции нужны пять ответов:
+
+1) цена за штуку и цена за весь указанный объём;
+2) остаток на складе ЧИСЛОМ на сегодня;
+3) срок поставки под указанное количество целиком;
+4) срок действия цены;
+5) базис поставки (Инкотермс).
+
+Позиции:
+1. STP 42-28-100 — 4 шт, изготовитель SolaHD (Emerson)
+
+Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
+
+С уважением,
+КВАНТ</pre><p class='k'>3. SP107762 — 60 шт, изготовитель AAF — 9 900 USD нашей экспозиции</p><p>Как спрашивать: позвонить и задать пять вопросов.<br>Телефон: +44 1670 713477<br>Что прочитал разбор: AAF-LTD (Cramlington, Великобритания) +44 1670 713477; AAF International B.V. (Амстердам) +31 20 549 4411; AAF-S.R.L. (Италия) +39 0331 838 611; AAF-SA (Испания) +34 945 241 800; AAF McQuay (Дубай) +971 433 90894; AAF McQuay Inc. (Луисвилл, США) +1 502 637 0408.</p><pre>Добрый день!
+
+Просим дать предложение по позициям ниже.
+По каждой позиции нужны пять ответов:
+
+1) цена за штуку и цена за весь указанный объём;
+2) остаток на складе ЧИСЛОМ на сегодня;
+3) срок поставки под указанное количество целиком;
+4) срок действия цены;
+5) базис поставки (Инкотермс).
+
+Позиции:
+1. SP107762 — 60 шт, изготовитель AAF
+
+Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
+
+С уважением,
+КВАНТ</pre><p class='k'>4. 180В4158 — 6 ШТ, изготовитель Danfoss — 8 400 USD нашей экспозиции</p><p>Как спрашивать: открыть страницу продавца и задать пять вопросов через её форму.<br>Страница: https://smaalwaterservices.com/products/danfoss-valve-plate-app-5-1-8-2-180b4158<br>Телефон: +1 408 969 2688<br>Что прочитал разбор: Smaal Water Services N.V. — https://smaalwaterservices.com/products/danfoss-valve-plate-app-5-1-8-2-180b4158; ForeverPure — +1 408 969 2688 доб. 1; High Pressure Water Pumps (Ланкашир, Великобритания) — +44 1772 699 999; Lenntech — форма запроса на странице детали</p><pre>Добрый день!
+
+Просим дать предложение по позициям ниже.
+По каждой позиции нужны пять ответов:
+
+1) цена за штуку и цена за весь указанный объём;
+2) остаток на складе ЧИСЛОМ на сегодня;
+3) срок поставки под указанное количество целиком;
+4) срок действия цены;
+5) базис поставки (Инкотермс).
+
+Позиции:
+1. 180В4158 — 6 ШТ, изготовитель Danfoss
+
+Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
+
+С уважением,
+КВАНТ</pre><p class='k'>5. iSTAT i4MT — 8 шт, изготовитель GE Vernova — 7 800 USD нашей экспозиции</p><p>Как спрашивать: открыть страницу продавца и задать пять вопросов через её форму.<br>Страница: https://www.luckinslive.com/product/396812371/GE-Grid-Solutions-Measurement/I4MT<br>Что прочитал разбор: GE Vernova Grid Solutions через gevernova.com (карточка iSTAT i4Mx) и сеть дистрибьюторов. Справочник с карточками серии: https://www.luckinslive.com/product/396812371/GE-Grid-Solutions-Measurement/I4MT. Лист конфигурации: https://files.kempstoncontrols.com/files/acfebfc71d7e435acb7e7438b6ddb224/I4MTX5U4CLLNNX.pdf</p><pre>Добрый день!
+
+Просим дать предложение по позициям ниже.
+По каждой позиции нужны пять ответов:
+
+1) цена за штуку и цена за весь указанный объём;
+2) остаток на складе ЧИСЛОМ на сегодня;
+3) срок поставки под указанное количество целиком;
+4) срок действия цены;
+5) базис поставки (Инкотермс).
+
+Позиции:
+1. iSTAT i4MT — 8 шт, изготовитель GE Vernova
+
+Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
+
+С уважением,
+КВАНТ</pre><p class='k'>6. KOP160j7MWVPN22 — 58 шт, изготовитель Saia-Burgess — 7 250 USD нашей экспозиции</p><p>Как спрашивать: открыть страницу продавца и задать пять вопросов через её форму.<br>Страница: https://www.sprecherschuh.com/content/dam/sprecher-schuh/downloads/xref/control-relays/KOP-SAIA-TIMERtoRZ7.pdf<br>Что прочитал разбор: Таблица соответствия: https://www.sprecherschuh.com/content/dam/sprecher-schuh/downloads/xref/control-relays/KOP-SAIA-TIMERtoRZ7.pdf . Продавец кросса с открытой ценой: Guardian, http://www.guardiancatalog.com/Sprecher-Schuh-RZ7-FSM3UU23-p/rz7-fsm3uu23.htm , 877-934-3585. По самому номеру …22 годного адреса с открытой ценой по-прежнему нет.</p><pre>Добрый день!
+
+Просим дать предложение по позициям ниже.
+По каждой позиции нужны пять ответов:
+
+1) цена за штуку и цена за весь указанный объём;
+2) остаток на складе ЧИСЛОМ на сегодня;
+3) срок поставки под указанное количество целиком;
+4) срок действия цены;
+5) базис поставки (Инкотермс).
+
+Позиции:
+1. KOP160j7MWVPN22 — 58 шт, изготовитель Saia-Burgess
+
+Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
+
+С уважением,
+КВАНТ</pre><p class='k'>7. 040A66 — 6 шт., изготовитель SAACKE — 6 150 USD нашей экспозиции</p><p>Как спрашивать: открыть страницу продавца и задать пять вопросов через её форму.<br>Страница: https://www.saacke.com/<br>Что прочитал разбор: SAACKE GmbH: https://www.saacke.com/ , Südweststr. 13, 28237 Bremen, Deutschland. spares4less (независимый склад по ряду SAACKE): https://www.spares4less.com/SAACKE_2 . Antai Boiler (Shenzhen) Co., Ltd: https://www.made-in-china.com/showroom/at168888/product-detailRfzpkTKUIPcL/China-Saacke-Actuator-Fsm025A66-Servo-Motor-Fsm040A66-Se-Vis.html .</p><pre>Добрый день!
+
+Просим дать предложение по позициям ниже.
+По каждой позиции нужны пять ответов:
+
+1) цена за штуку и цена за весь указанный объём;
+2) остаток на складе ЧИСЛОМ на сегодня;
+3) срок поставки под указанное количество целиком;
+4) срок действия цены;
+5) базис поставки (Инкотермс).
+
+Позиции:
+1. 040A66 — 6 шт., изготовитель SAACKE
+
+Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
+
+С уважением,
+КВАНТ</pre><p class='k'>8. 049089-04 — 4 ШТ, изготовитель Cameron — 5 600 USD нашей экспозиции</p><p>Как спрашивать: открыть страницу продавца и задать пять вопросов через её форму.<br>Страница: https://www.slb.com/products-and-services/innovating-in-oil-and-gas/well-construction/rigs-and-equipment/pressure-control-equipment/annular-bops/dl-annular-bop<br>Что прочитал разбор: SLB, DL Annular: https://www.slb.com/products-and-services/innovating-in-oil-and-gas/well-construction/rigs-and-equipment/pressure-control-equipment/annular-bops/dl-annular-bop . DrillingParts: https://drillingparts.com/typ-dl-annular-cameron-style/typ-dl-11x3000-or-5000psi/type-dl-cameron-699343-01.html</p><pre>Добрый день!
+
+Просим дать предложение по позициям ниже.
+По каждой позиции нужны пять ответов:
+
+1) цена за штуку и цена за весь указанный объём;
+2) остаток на складе ЧИСЛОМ на сегодня;
+3) срок поставки под указанное количество целиком;
+4) срок действия цены;
+5) базис поставки (Инкотермс).
+
+Позиции:
+1. 049089-04 — 4 ШТ, изготовитель Cameron
+
+Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
+
+С уважением,
+КВАНТ</pre><p class='k'>9. 700-FSM3UU23-EX — 27 шт, изготовитель Allen-Bradley (Rockwell Automation) — 3 442,50 USD нашей экспозиции</p><p>Как спрашивать: позвонить и задать пять вопросов.<br>Телефон: +6012-3626252<br>Что прочитал разбор: Quick Time Engineering Inc, First Floor, Tang Kah Wah Shophouse, Jalan Bunga Mayang, 87030 Labuan, Малайзия, тел. +6012-3626252 (адрес и телефон с их же страницы). Teknihaus: +852-8192-8662. Platt / Rexel USA: +1 888 739-3577, цена по регистрации. Rockwell — через «Find your nearest distributor» на карточке изделия.</p><pre>Добрый день!
+
+Просим дать предложение по позициям ниже.
+По каждой позиции нужны пять ответов:
+
+1) цена за штуку и цена за весь указанный объём;
+2) остаток на складе ЧИСЛОМ на сегодня;
+3) срок поставки под указанное количество целиком;
+4) срок действия цены;
+5) базис поставки (Инкотермс).
+
+Позиции:
+1. 700-FSM3UU23-EX — 27 шт, изготовитель Allen-Bradley (Rockwell Automation)
+
+Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
+
+С уважением,
+КВАНТ</pre><p class='k'>10. 115612090 — 120 шт, изготовитель н/у (товарный крепёж) — 3 420 USD нашей экспозиции</p><p>Как спрашивать: открыть страницу продавца и задать пять вопросов через её форму.<br>Страница: https://www.orbitalfasteners.co.uk<br>Что прочитал разбор: Orbital Fasteners Ltd, Уотфорд, Британия — https://www.orbitalfasteners.co.uk (карточки с ценой за штуку и остатком числом); TR Fastenings — https://www.trfastenings.com (каталог, цена по запросу); Siemens Energy — форма обращения https://www.siemens-energy.com/global/en/home/contact.html</p><pre>Добрый день!
+
+Просим дать предложение по позициям ниже.
+По каждой позиции нужны пять ответов:
+
+1) цена за штуку и цена за весь указанный объём;
+2) остаток на складе ЧИСЛОМ на сегодня;
+3) срок поставки под указанное количество целиком;
+4) срок действия цены;
+5) базис поставки (Инкотермс).
+
+Позиции:
+1. 115612090 — 120 шт, изготовитель н/у (товарный крепёж)
+
+Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
+
+С уважением,
+КВАНТ</pre><p class='k'>11. 115510040 — 252 шт, изготовитель н/у (товарный крепёж) — 3 402 USD нашей экспозиции</p><p>Как спрашивать: открыть страницу продавца и задать пять вопросов через её форму.<br>Страница: https://www.orbitalfasteners.co.uk<br>Что прочитал разбор: Orbital Fasteners Ltd, Уотфорд, Британия — https://www.orbitalfasteners.co.uk; Siemens Energy — https://www.siemens-energy.com/global/en/home/contact.html</p><pre>Добрый день!
+
+Просим дать предложение по позициям ниже.
+По каждой позиции нужны пять ответов:
+
+1) цена за штуку и цена за весь указанный объём;
+2) остаток на складе ЧИСЛОМ на сегодня;
+3) срок поставки под указанное количество целиком;
+4) срок действия цены;
+5) базис поставки (Инкотермс).
+
+Позиции:
+1. 115510040 — 252 шт, изготовитель н/у (товарный крепёж)
+
+Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
+
+С уважением,
+КВАНТ</pre><p class='k'>12. 328577 — 138 шт, изготовитель SCHRACK-TE CONNECTIVITY — 3 174 USD нашей экспозиции</p><p>Как спрашивать: позвонить и задать пять вопросов.<br>Телефон: +49 8633 4819920<br>Что прочитал разбор: parts-systems.de: +49 8633 4819920. INNIO Jenbacher — через официальный канал запчастей. НЕ УВИДЕЛ: onergys.de — HTTP 403; у них есть раздел реле, это следующий кандидат на второго продавца.</p><pre>Добрый день!
+
+Просим дать предложение по позициям ниже.
+По каждой позиции нужны пять ответов:
+
+1) цена за штуку и цена за весь указанный объём;
+2) остаток на складе ЧИСЛОМ на сегодня;
+3) срок поставки под указанное количество целиком;
+4) срок действия цены;
+5) базис поставки (Инкотермс).
+
+Позиции:
+1. 328577 — 138 шт, изготовитель SCHRACK-TE CONNECTIVITY
+
+Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
+
+С уважением,
+КВАНТ</pre><p class='k'>13. У808750D9J — 9 шт., изготовитель Германия, SULZER — 3 015 USD нашей экспозиции</p><p>Как спрашивать: открыть страницу продавца и задать пять вопросов через её форму.<br>Страница: https://www.sulzer.com/en/services/spare-parts<br>Что прочитал разбор: Sulzer — форма обращения на https://www.sulzer.com/en/services/spare-parts; L&amp;M Pumps — https://lm-pumps.com/en/products/spare-parts/centrifugal-pumps/sulzer/app</p><pre>Добрый день!
+
+Просим дать предложение по позициям ниже.
+По каждой позиции нужны пять ответов:
+
+1) цена за штуку и цена за весь указанный объём;
+2) остаток на складе ЧИСЛОМ на сегодня;
+3) срок поставки под указанное количество целиком;
+4) срок действия цены;
+5) базис поставки (Инкотермс).
+
+Позиции:
+1. У808750D9J — 9 шт., изготовитель Германия, SULZER
+
+Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
+
+С уважением,
+КВАНТ</pre><p class='k'>14. 107745 — 16 ШТ, изготовитель Geze — 2 960 USD нашей экспозиции</p><p>Как спрашивать: открыть страницу продавца и задать пять вопросов через её форму.<br>Страница: https://www.geze.com/<br>Что прочитал разбор: Werkzeugstore24 GmbH — телефон 06145-954 525 0, Mo–Fr 10:00–16:00, страница обращения на werkzeugstore24.de; b2b-discount.de — страница обращения на b2b-discount.de; GEZE GmbH — https://www.geze.com/</p><pre>Добрый день!
+
+Просим дать предложение по позициям ниже.
+По каждой позиции нужны пять ответов:
+
+1) цена за штуку и цена за весь указанный объём;
+2) остаток на складе ЧИСЛОМ на сегодня;
+3) срок поставки под указанное количество целиком;
+4) срок действия цены;
+5) базис поставки (Инкотермс).
+
+Позиции:
+1. 107745 — 16 ШТ, изготовитель Geze
+
+Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
+
+С уважением,
+КВАНТ</pre><p class='k'>15. 1071411-1 — 12 шт, изготовитель Saia — 2 760 USD нашей экспозиции</p><p>Как спрашивать: открыть страницу продавца и задать пять вопросов через её форму.<br>Страница: http://www.gas-turbine-parts.com/News/Product_FAQ/404.html<br>Телефон: +1 619-544-5352<br>Что прочитал разбор: Hangzhou Gas Turbine Parts — http://www.gas-turbine-parts.com/News/Product_FAQ/404.html, позиция идёт у них под внутренним кодом 800003360 (это новое: по коду с ними можно говорить точнее, чем по номеру Solar). Solar Turbines PartStore: +1 619-544-5352, цена за входом. Al Reza Enterprise (судовая автоматика) держит б/у KOP160J7MWVPN00, 3 шт, реф. MK5970 — но это исполнение -00, не наше.</p><pre>Добрый день!
+
+Просим дать предложение по позициям ниже.
+По каждой позиции нужны пять ответов:
+
+1) цена за штуку и цена за весь указанный объём;
+2) остаток на складе ЧИСЛОМ на сегодня;
+3) срок поставки под указанное количество целиком;
+4) срок действия цены;
+5) базис поставки (Инкотермс).
+
+Позиции:
+1. 1071411-1 — 12 шт, изготовитель Saia
+
+Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
+
+С уважением,
+КВАНТ</pre><p class='k'>16. 119410060 — 152 шт, изготовитель н/у (товарный крепёж) — 2 736 USD нашей экспозиции</p><p>Как спрашивать: открыть страницу продавца и задать пять вопросов через её форму.<br>Страница: https://www.orbitalfasteners.co.uk<br>Что прочитал разбор: Orbital Fasteners Ltd, Уотфорд, Британия — https://www.orbitalfasteners.co.uk; Siemens Energy — https://www.siemens-energy.com/global/en/home/contact.html</p><pre>Добрый день!
+
+Просим дать предложение по позициям ниже.
+По каждой позиции нужны пять ответов:
+
+1) цена за штуку и цена за весь указанный объём;
+2) остаток на складе ЧИСЛОМ на сегодня;
+3) срок поставки под указанное количество целиком;
+4) срок действия цены;
+5) базис поставки (Инкотермс).
+
+Позиции:
+1. 119410060 — 152 шт, изготовитель н/у (товарный крепёж)
+
+Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
+
+С уважением,
+КВАНТ</pre><p class='k'>17. 119410045 — 102 шт, изготовитель н/у (товарный крепёж) — 2 652 USD нашей экспозиции</p><p>Как спрашивать: открыть страницу продавца и задать пять вопросов через её форму.<br>Страница: https://www.orbitalfasteners.co.uk<br>Что прочитал разбор: Orbital Fasteners Ltd, Уотфорд, Британия — https://www.orbitalfasteners.co.uk; Siemens Energy — https://www.siemens-energy.com/global/en/home/contact.html</p><pre>Добрый день!
+
+Просим дать предложение по позициям ниже.
+По каждой позиции нужны пять ответов:
+
+1) цена за штуку и цена за весь указанный объём;
+2) остаток на складе ЧИСЛОМ на сегодня;
+3) срок поставки под указанное количество целиком;
+4) срок действия цены;
+5) базис поставки (Инкотермс).
+
+Позиции:
+1. 119410045 — 102 шт, изготовитель н/у (товарный крепёж)
+
+Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
+
+С уважением,
+КВАНТ</pre><p class='k'>18. 9090490700 — 36 ШТ, изготовитель Drilltech Manufacturing Co., Ltd,Cangzhou — 2 520 USD нашей экспозиции</p><p>Как спрашивать: открыть страницу продавца и задать пять вопросов через её форму.<br>Страница: http://www.drilltech.cn/<br>Что прочитал разбор: Формы обращения на http://www.drilltech.cn/ и https://drilltech.suppliergo.com/; витрина https://www.made-in-china.com/showroom/dtckoy/</p><pre>Добрый день!
+
+Просим дать предложение по позициям ниже.
+По каждой позиции нужны пять ответов:
+
+1) цена за штуку и цена за весь указанный объём;
+2) остаток на складе ЧИСЛОМ на сегодня;
+3) срок поставки под указанное количество целиком;
+4) срок действия цены;
+5) базис поставки (Инкотермс).
+
+Позиции:
+1. 9090490700 — 36 ШТ, изготовитель Drilltech Manufacturing Co., Ltd,Cangzhou
+
+Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
+
+С уважением,
+КВАНТ</pre><p class='k'>19. GUART5R11R00K — 6 шт., изготовитель Италия,  Pompetravaini — 2 400 USD нашей экспозиции</p><p>Как спрашивать: открыть страницу продавца и задать пять вопросов через её форму.<br>Страница: https://jaescompany.com/contatti.php?lang=en<br>Что прочитал разбор: https://jaescompany.com/contatti.php?lang=en (форма обращения JAES, ответ по цене обещан в течение одного рабочего часа); https://www.pompetravaini.com/en/ — обращение к изготовителю</p><pre>Добрый день!
+
+Просим дать предложение по позициям ниже.
+По каждой позиции нужны пять ответов:
+
+1) цена за штуку и цена за весь указанный объём;
+2) остаток на складе ЧИСЛОМ на сегодня;
+3) срок поставки под указанное количество целиком;
+4) срок действия цены;
+5) базис поставки (Инкотермс).
+
+Позиции:
+1. GUART5R11R00K — 6 шт., изготовитель Италия,  Pompetravaini
+
+Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
+
+С уважением,
+КВАНТ</pre><p class='k'>20. PC-28/G1/4/PZ — 6 ШТ, изготовитель Aplisens S.A. (Польша) — 1 590 USD нашей экспозиции</p><p>Как спрашивать: открыть страницу продавца и задать пять вопросов через её форму.<br>Страница: https://prom.ua/p2904410915-aplisens-datchiki-davleniya.html<br>Что прочитал разбор: по детали: «КИПиА , Лічильники» — https://prom.ua/p2904410915-aplisens-datchiki-davleniya.html ; «UAM - виробник манометрів, контрольно-вимірювальних приладів в Україні» — https://prom.ua/p3192152146-preobrazovatel-davleniya-izmeritelnyj.html . класс: APLISENS S.A. (Варшава) — изготовитель, https://www.aplisens.com/pc-28.html ; aplisens.ru — российское представительство, каталог открыт, цен нет.</p><pre>Добрый день!
+
+Просим дать предложение по позициям ниже.
+По каждой позиции нужны пять ответов:
+
+1) цена за штуку и цена за весь указанный объём;
+2) остаток на складе ЧИСЛОМ на сегодня;
+3) срок поставки под указанное количество целиком;
+4) срок действия цены;
+5) базис поставки (Инкотермс).
+
+Позиции:
+1. PC-28/G1/4/PZ — 6 ШТ, изготовитель Aplisens S.A. (Польша)
+
+Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
+
+С уважением,
+КВАНТ</pre><p class='k'>21. 929081 — 6 ШТ, изготовитель NATIONAL OILWELL VARCO — 1 275 USD нашей экспозиции</p><p>Как спрашивать: открыть страницу продавца и задать пять вопросов через её форму.<br>Страница: https://shop.ifp1.com/products/PARKER-929081<br>Что прочитал разбор: IFP Automation: тел. (260) 489-4575 и адрес почты в шапке страницы (на странице показан как скрытый «[email protected]»), вход и оформление заказа на shop.ifp1.com. MPParts: заказ прямо со страницы товара.</p><pre>Добрый день!
+
+Просим дать предложение по позициям ниже.
+По каждой позиции нужны пять ответов:
+
+1) цена за штуку и цена за весь указанный объём;
+2) остаток на складе ЧИСЛОМ на сегодня;
+3) срок поставки под указанное количество целиком;
+4) срок действия цены;
+5) базис поставки (Инкотермс).
+
+Позиции:
+1. 929081 — 6 ШТ, изготовитель NATIONAL OILWELL VARCO
+
+Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
+
+С уважением,
+КВАНТ</pre><p class='k'>22. 50981247 — 4 ШТ, изготовитель Drillmec S.p.A. / Oleobi S.r.l. — 880 USD нашей экспозиции</p><p>Как спрашивать: открыть страницу продавца и задать пять вопросов через её форму.<br>Страница: https://www.drillmec.com/en/spare-parts<br>Телефон: +1 281 885 0777<br>Что прочитал разбор: Drillmec — обращение через общую форму «Contact us» на drillmec.com; DRILLMEC INC., 18320 Imperial Valley Drive, Houston, TX 77060, USA, телефон +1 281 885 0777, факс +1 281 821 4572</p><pre>Добрый день!
+
+Просим дать предложение по позициям ниже.
+По каждой позиции нужны пять ответов:
+
+1) цена за штуку и цена за весь указанный объём;
+2) остаток на складе ЧИСЛОМ на сегодня;
+3) срок поставки под указанное количество целиком;
+4) срок действия цены;
+5) базис поставки (Инкотермс).
+
+Позиции:
+1. 50981247 — 4 ШТ, изготовитель Drillmec S.p.A. / Oleobi S.r.l.
+
+Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
+
+С уважением,
+КВАНТ</pre><p class='k'>23. RI01170В00-66 — 4 ШТ, изготовитель Drillmec S.p.A. / Oleobi S.r.l. — 880 USD нашей экспозиции</p><p>Как спрашивать: открыть страницу продавца и задать пять вопросов через её форму.<br>Страница: https://www.drillmec.com/en/spare-parts<br>Телефон: +1 281 885 0777<br>Что прочитал разбор: Drillmec — обращение через общую форму «Contact us» на drillmec.com; DRILLMEC INC., 18320 Imperial Valley Drive, Houston, TX 77060, USA, телефон +1 281 885 0777, факс +1 281 821 4572</p><pre>Добрый день!
+
+Просим дать предложение по позициям ниже.
+По каждой позиции нужны пять ответов:
+
+1) цена за штуку и цена за весь указанный объём;
+2) остаток на складе ЧИСЛОМ на сегодня;
+3) срок поставки под указанное количество целиком;
+4) срок действия цены;
+5) базис поставки (Инкотермс).
+
+Позиции:
+1. RI01170В00-66 — 4 ШТ, изготовитель Drillmec S.p.A. / Oleobi S.r.l.
+
+Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
+
+С уважением,
+КВАНТ</pre><p class='k'>24. XB4BD21 — 20 ШТ, изготовитель Schneider Electric — 830 USD нашей экспозиции</p><p>Как спрашивать: открыть страницу продавца и задать пять вопросов через её форму.<br>Страница: https://www.ebay.com/p/1035469053<br>Что прочитал разбор: Schneider Electric — форма обращения на se.com; Standard Electric Supply — standardelectricsupply.com (карточка 346092-Schneider-Electric-XB4BD21); B+K Electric — shop.bk-electric.com</p><pre>Добрый день!
+
+Просим дать предложение по позициям ниже.
+По каждой позиции нужны пять ответов:
+
+1) цена за штуку и цена за весь указанный объём;
+2) остаток на складе ЧИСЛОМ на сегодня;
+3) срок поставки под указанное количество целиком;
+4) срок действия цены;
+5) базис поставки (Инкотермс).
+
+Позиции:
+1. XB4BD21 — 20 ШТ, изготовитель Schneider Electric
+
+Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
+
+С уважением,
+КВАНТ</pre><p class='k'>25. ST8 86/21 — 16 шт, изготовитель Henkel (Loctite) — 760 USD нашей экспозиции</p><p>Как спрашивать: открыть страницу продавца и задать пять вопросов через её форму.<br>Страница: https://www.rapidonline.com/loctite-1920914-424-instant-adhesive-epdm-20g-87-7187<br>Что прочитал разбор: адрес по детали: Rapid Electronics Ltd (Великобритания), карточка https://www.rapidonline.com/loctite-1920914-424-instant-adhesive-epdm-20g-87-7187, Order Code 87-7187. Изготовитель: Henkel, карточка изделия next.henkel-adhesives.com (UK), IDH 1920914. Класс (не по детали): 123Bearing — прежний продавец по строке, позиции 424 у него не проверил, его поиск на Algolia отдаётся скриптом.</p><pre>Добрый день!
+
+Просим дать предложение по позициям ниже.
+По каждой позиции нужны пять ответов:
+
+1) цена за штуку и цена за весь указанный объём;
+2) остаток на складе ЧИСЛОМ на сегодня;
+3) срок поставки под указанное количество целиком;
+4) срок действия цены;
+5) базис поставки (Инкотермс).
+
+Позиции:
+1. ST8 86/21 — 16 шт, изготовитель Henkel (Loctite)
+
+Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
+
+С уважением,
+КВАНТ</pre><p class='k'>26. 6740000050 — 10 ШТ, изготовитель WAM — 600 USD нашей экспозиции</p><p>Как спрашивать: открыть страницу продавца и задать пять вопросов через её форму.<br>Страница: https://www.wamgroup.com/en-GB/corporate/Contacts<br>Телефон: +962 79 222 2455<br>Что прочитал разбор: Platinum International Co. for Industrial Technology — +962 79 222 2455, Al Hizam Ring Bldg# 240, Ar Rajeeb, Amman 11953, Иордания; Urzadzenia Przemyslowe — +48 (22) 394-3642, Warszawa, Pańska 73; WAMGROUP — страница обращения https://www.wamgroup.com/en-GB/corporate/Contacts</p><pre>Добрый день!
+
+Просим дать предложение по позициям ниже.
+По каждой позиции нужны пять ответов:
+
+1) цена за штуку и цена за весь указанный объём;
+2) остаток на складе ЧИСЛОМ на сегодня;
+3) срок поставки под указанное количество целиком;
+4) срок действия цены;
+5) базис поставки (Инкотермс).
+
+Позиции:
+1. 6740000050 — 10 ШТ, изготовитель WAM
+
+Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
+
+С уважением,
+КВАНТ</pre><p class='k'>27. A12B23HWB — 6 ШТ, изготовитель Costech — 249 USD нашей экспозиции</p><p>Как спрашивать: открыть страницу продавца и задать пять вопросов через её форму.<br>Страница: https://www.penninecomponents.co.uk/fan-120x38-ball-bearing-230vac-ip20-7801070-a12b23hwb.html<br>Что прочитал разбор: 01706 815737 (отдел продаж Pennine Components Ltd, «Sales : 01706 815737»); страницы обращения: https://www.penninecomponents.co.uk/fan-120x38-ball-bearing-230vac-ip20-7801070-a12b23hwb.html (разделы «Contact Us» и «Product Enquiry»), https://www.buyqual.com/costech-a12b23hwb-w00-230v-0-130-0-110a-20-19w-2wires-cooling-fan.html</p><pre>Добрый день!
+
+Просим дать предложение по позициям ниже.
+По каждой позиции нужны пять ответов:
+
+1) цена за штуку и цена за весь указанный объём;
+2) остаток на складе ЧИСЛОМ на сегодня;
+3) срок поставки под указанное количество целиком;
+4) срок действия цены;
+5) базис поставки (Инкотермс).
+
+Позиции:
+1. A12B23HWB — 6 ШТ, изготовитель Costech
+
+Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
+
+С уважением,
+КВАНТ</pre><p class='k'>28. C2-A29X/AC120V + S2-S — 4 шт, изготовитель Releco / TURCK — 230 USD нашей экспозиции</p><p>Как спрашивать: открыть страницу продавца и задать пять вопросов через её форму.<br>Страница: https://www.turck.us<br>Что прочитал разбор: Turck Inc. USA — тел. (800) 544-7769, https://www.turck.us; Okmarts — форма «Fast Track to a Quote» на карточке https://okmarts.com/comat-releco-relay-c2-a20-dc24v.html; Radwell — форма запроса цены на карточке R4135</p><pre>Добрый день!
+
+Просим дать предложение по позициям ниже.
+По каждой позиции нужны пять ответов:
+
+1) цена за штуку и цена за весь указанный объём;
+2) остаток на складе ЧИСЛОМ на сегодня;
+3) срок поставки под указанное количество целиком;
+4) срок действия цены;
+5) базис поставки (Инкотермс).
+
+Позиции:
+1. C2-A29X/AC120V + S2-S — 4 шт, изготовитель Releco / TURCK
+
+Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
+
+С уважением,
+КВАНТ</pre><p class='k'>29. DFB123812H — 6 ШТ, изготовитель Young Lin — 180 USD нашей экспозиции</p><p>Как спрашивать: открыть страницу продавца и задать пять вопросов через её форму.<br>Страница: https://www.buyqual.com/contacts<br>Телефон: +86 18676708729<br>Что прочитал разбор: BuyQual — https://www.buyqual.com/contacts , WhatsApp/WeChat +86 18676708729</p><pre>Добрый день!
+
+Просим дать предложение по позициям ниже.
+По каждой позиции нужны пять ответов:
+
+1) цена за штуку и цена за весь указанный объём;
+2) остаток на складе ЧИСЛОМ на сегодня;
+3) срок поставки под указанное количество целиком;
+4) срок действия цены;
+5) базис поставки (Инкотермс).
+
+Позиции:
+1. DFB123812H — 6 ШТ, изготовитель Young Lin
+
+Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
+
+С уважением,
+КВАНТ</pre><p class='k'>30. MEC0381V1-O00U-G99 — 6 ШТ, изготовитель Sunon — 93 USD нашей экспозиции</p><p>Как спрашивать: открыть страницу продавца и задать пять вопросов через её форму.<br>Страница: https://us.rs-online.com/product/sunon-fans/mec0381v1-000u-g99/70240082/<br>Что прочитал разбор: https://us.rs-online.com/product/sunon-fans/mec0381v1-000u-g99/70240082/ ; https://www.tme.com/us/en-us/details/mec0381v1-g99/dc12v-fans/sunon/mec0381v1-000u-g99/ ; изготовитель — https://www.sunon.com</p><pre>Добрый день!
+
+Просим дать предложение по позициям ниже.
+По каждой позиции нужны пять ответов:
+
+1) цена за штуку и цена за весь указанный объём;
+2) остаток на складе ЧИСЛОМ на сегодня;
+3) срок поставки под указанное количество целиком;
+4) срок действия цены;
+5) базис поставки (Инкотермс).
+
+Позиции:
+1. MEC0381V1-O00U-G99 — 6 ШТ, изготовитель Sunon
+
+Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
+
+С уважением,
+КВАНТ</pre><p class='k'>31. 420004 — 5 ШТ, изготовитель DF Electric — 35 USD нашей экспозиции</p><p>Как спрашивать: открыть страницу продавца и задать пять вопросов через её форму.<br>Страница: https://www.gersal.com/Articulo/df/420004/<br>Что прочитал разбор: Gersal — https://www.gersal.com/Articulo/df/420004/ ; Grupo Elektra — https://www.clientes.grupoelektra.es/catalogo/producto/044400/1 ; LH.PE — https://lh.pe/420004-fusible-cartucho-500vac-10x38mm-marca-electric-p-10885.html (остаток 124 шт, цена по запросу); изготовитель DF Electric — https://www.dfelectric.es/products/cylindrical-fuse-links</p><pre>Добрый день!
+
+Просим дать предложение по позициям ниже.
+По каждой позиции нужны пять ответов:
+
+1) цена за штуку и цена за весь указанный объём;
+2) остаток на складе ЧИСЛОМ на сегодня;
+3) срок поставки под указанное количество целиком;
+4) срок действия цены;
+5) базис поставки (Инкотермс).
+
+Позиции:
+1. 420004 — 5 ШТ, изготовитель DF Electric
+
+Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
+
+С уважением,
+КВАНТ</pre><p class='k'>32. 20D561K — 20 ШТ, изготовитель SURGING / Bourns — 28 USD нашей экспозиции</p><p>Как спрашивать: открыть страницу продавца и задать пять вопросов через её форму.<br>Страница: https://www.lcsc.com/product-detail/Varistors_SURGING-20D561K_C2839538.html<br>Что прочитал разбор: LCSC — https://www.lcsc.com/product-detail/Varistors_SURGING-20D561K_C2839538.html (карточка с ценой и складом); DigiKey — https://www.digikey.com/en/products/detail/bourns-inc/MOV-20D561K/2798270 (карточка с ценой и складом); HQonline — https://www.hqonline.com/product-detail/varistors-hel-20d561k-2500339434 (карточка HEL, без цены); прежний продавец по заявке — https://www.eleparts.co.kr/goods/search?keyword=20D561K</p><pre>Добрый день!
+
+Просим дать предложение по позициям ниже.
+По каждой позиции нужны пять ответов:
+
+1) цена за штуку и цена за весь указанный объём;
+2) остаток на складе ЧИСЛОМ на сегодня;
+3) срок поставки под указанное количество целиком;
+4) срок действия цены;
+5) базис поставки (Инкотермс).
+
+Позиции:
+1. 20D561K — 20 ШТ, изготовитель SURGING / Bourns
+
+Если позиция снята с производства, просим указать действующую замену и её номер. Если позиции нет в вашей номенклатуре, достаточно одного слова «нет» — это тоже ответ.
+
+С уважением,
+КВАНТ</pre><h2>Что делать с этим документом</h2><p><b>1. Отправлять сверху вниз.</b> Порядок — по нашей экспозиции. Первые десять адресатов закрывают большую часть суммы, и каждый из них несёт по нескольку позиций: одно письмо закрывает не одну строку.</p><p><b>2. «Нет» — полноценный ответ.</b> Письмо прямо это говорит. Отказ снимает строку с канала и отправляет её искать другого продавца, а молчание держит её в работе месяцами.</p><p><b>3. Ответ записывать числом и с датой.</b> Цена без срока действия и остаток без даты в сумму закупки не идут — это правило уже стоило нам разбора.</p><p><b>4. По 15 строкам на 129 491,25 долларов США адреса нет — и это следующая работа, а не пропуск.</b> Адрес ищется у изготовителя и в его сети обслуживания. Проверять нашу базу поставщиков по словам названия бесполезно: такая сверка уже дала заведомо ложные пары — фильтр Fleetguard к торговцу программируемыми контроллерами, — то есть ровно «родовой адрес вместо адреса по детали».</p><p class='dim'>Артикулы без адреса, по убыванию нашей экспозиции: MW13048, EQ3700DW, SDN10-24-100P, 12420480, 400.1, 411.1/.2/.3/.4/.7/.8/.13/.23/.24/.25, 412.1/.2/.4/.5/.10, 507, RI5031FO00-05, 50982040, 6550-100069, 101093888, 100283108, 50981230, 50981153, P310007 MS7V1-9BS, 1020225, ПЦ-102 10х38 6А.</p><p class='dim'>Считает gt/tools/quote_letters.py, набор gt/data/ship_quote_letters.json. Адресат, уже опубликовавший нашу заявку, помечен знаком ⚠ и отдельной строкой в своём письме — см. gt/data/ship_leak.json.</p>

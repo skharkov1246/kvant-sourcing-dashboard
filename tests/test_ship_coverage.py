@@ -101,10 +101,15 @@ def test_разрыв_лестницы_раскладывается_без_по�
     g = doc().get("channel_without_price") or {}
     if "of_them_open_to_search" not in g:
         pytest.skip("замер старой сборки")
+    # Частей четыре с 18.09.2026: «добор уже прошёл и цены не нашёл» выделен из
+    # «нашей работы». Прежние три части звали искать заново 126 строк на
+    # 1 182 811 USD, по которым поиск уже был и вернул пусто, — девять десятых
+    # денег в этой строке отчёта. Действие по ним другое: письмо продавцу.
     parts_rows = (g["of_them_quote_only"] + g["of_them_waiting_customer"]
-                  + g["of_them_open_to_search"])
+                  + g["of_them_open_to_search"] + g.get("of_them_hunted_dry", 0))
     assert parts_rows == g["rows"], (parts_rows, g["rows"])
-    parts_usd = (g["usd_quote_only"] + g["usd_waiting_customer"] + g["usd_open_to_search"])
+    parts_usd = (g["usd_quote_only"] + g["usd_waiting_customer"]
+                 + g["usd_open_to_search"] + g.get("usd_hunted_dry", 0.0))
     assert abs(parts_usd - g["usd"]) < 1.0, (parts_usd, g["usd"])
 
 
@@ -276,3 +281,33 @@ def test_число_по_другому_исполнению_остатком_н
     assert sc.stock_state("0 по нашему исполнению; 30 шт у продавца относятся к /1") == "нет"
     assert sc.stock_state("Ни одного заявленного остатка. Числа 4, 6, 24 EA в чужих "
                           "перечнях — рекомендованный запас на машину") == "нет"
+
+
+def test_высохший_добор_не_называется_нашей_недоработкой():
+    """«Искали и не нашли» и «ещё не искали» — разные вещи с разными действиями.
+
+    Выделено 18.09.2026. Обе группы стояли в отчёте одной строкой «НАША работа:
+    цена публикуется, её надо найти», и она отправляла сорсера к заданию
+    gt/tools/rv_pricehunt.py, которое такие строки не печатает намеренно: из
+    175 строк он выдал бы 16. Замер после разделения: 64 строки на 90 349 USD
+    действительно к поиску и 111 строк на 923 201 USD — с пройденным добором,
+    где работа не второй поиск, а письмо продавцу.
+    """
+    import ship_coverage as sc
+
+    g = doc().get("channel_without_price") or {}
+    if "of_them_hunted_dry" not in g:
+        pytest.skip("замер старой сборки")
+    ask = json.loads((ROOT / "gt/data/ship_lukoil.json").read_text(encoding="utf-8"))["rows"]
+    rvx = {sc.key(r["pn"]): r for r in json.loads(
+        (ROOT / "gt/data/ship_reverify.json").read_text(encoding="utf-8"))["rows"]}
+    # Счёт отчёта «к поиску» обязан совпасть со счётом задания: пока они
+    # расходились, отчёт обещал работу, которой инструмент не выдавал.
+    import rv_pricehunt as ph
+
+    left, _blocked, _inh = ph.select(ph.candidates(ask, rvx))
+    assert g["of_them_open_to_search"] == len(left), (
+        g["of_them_open_to_search"], len(left),
+        "отчёт и задание на добор цены считают по-разному")
+    for _e, _r, x in left:
+        assert not x.get("price_hunt"), "в задание попала строка с пройденным добором"

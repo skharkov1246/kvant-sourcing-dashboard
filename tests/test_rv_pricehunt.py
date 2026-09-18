@@ -104,3 +104,48 @@ def test_строка_с_ответом_в_нашем_вложении_в_раз
         assert ph.key(r.get("pn")) not in house, r.get("pn")
     # части складываются в целое: ни одна строка не посчитана дважды и не выпала
     assert len(left) + len(blocked) + len(inh) == len(ph.candidates(rows, rvx))
+
+
+def test_вычитается_подтверждённая_цена_а_не_адрес_цены(tmp_path, monkeypatch):
+    """Из добора вычитается ship_inside_priced, а не ship_inside_quotes.
+
+    Исправлено 18.09.2026. Наборы отвечают на разные вопросы: quotes — «в каком
+    нашем файле встречается этот номер и есть ли в файле хоть одна цена»,
+    priced — «цена по этому номеру подтверждена: единица × количество = итог в
+    той же строке». На живых данных разница 754 номера против 210, и из-за неё
+    48 строк на 78 242 USD не попадали ни в добор цены, ни в письма: отчёт
+    считал их отвеченными, а не искал по ним никто. Корпус придуман.
+    """
+    import rv_pricehunt as ph
+
+    quotes = tmp_path / "quotes.json"
+    priced = tmp_path / "priced.json"
+    quotes.write_text(json.dumps({"rows": [{"pn": "QQ-7001"}, {"pn": "QQ-7002"}]},
+                                 ensure_ascii=False), encoding="utf-8")
+    priced.write_text(json.dumps({"parts": [{"pn": "QQ-7002", "key": "QQ7002"}]},
+                                 ensure_ascii=False), encoding="utf-8")
+    monkeypatch.setattr(ph, "INSIDE", quotes)
+    monkeypatch.setattr(ph, "PRICED", priced)
+
+    house = ph.in_house_keys()
+    assert house == {"QQ7002"}, "вычитается только подтверждённая цена"
+    assert "QQ7001" not in house, (
+        "номер, у которого есть лишь адрес цены, из добора вычитать нельзя: "
+        "по нему не искал никто")
+
+
+def test_без_набора_подтверждённых_цен_остаётся_прежний_порядок(tmp_path, monkeypatch):
+    """Если подтверждённых цен ещё не собирали — вычитается хотя бы адрес.
+
+    Исправление не должно превращать отсутствие нового набора в отсутствие
+    отсева вовсе: тогда разведка пойдёт в открытый доступ по строкам, чья цена
+    у нас в почте.
+    """
+    import rv_pricehunt as ph
+
+    quotes = tmp_path / "quotes.json"
+    quotes.write_text(json.dumps({"rows": [{"pn": "QQ-7003"}]}, ensure_ascii=False),
+                      encoding="utf-8")
+    monkeypatch.setattr(ph, "INSIDE", quotes)
+    monkeypatch.setattr(ph, "PRICED", tmp_path / "нет-такого-файла.json")
+    assert ph.in_house_keys() == {"QQ7003"}
