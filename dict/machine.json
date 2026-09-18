@@ -1,0 +1,2724 @@
+{
+  "note": "Реестр машин: обозначения вынуты из строковых полей баз и разведены по видам. Вид unknown в реестр не попадает и остаётся в счётчике видимым хвостом — подмешивать неразобранное к машинам значит завышать заполняемость.",
+  "count": 208,
+  "by_segment": {
+    "gtu": 80,
+    "gsho": 76,
+    "other": 52
+  },
+  "pn_db_kinds": {
+    "empty": 1437,
+    "turbine": 8393,
+    "unknown": 111,
+    "part": 200,
+    "bucket": 2085,
+    "other_machine": 216
+  },
+  "records": [
+    {
+      "machine_key": "LM2500",
+      "name": "LM2500",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "LM2500"
+      ],
+      "parts": 3664,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "LM6000",
+      "name": "LM6000",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "LM6000"
+      ],
+      "parts": 1761,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "TAURUS60S",
+      "name": "Taurus 60S",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "Taurus 60S"
+      ],
+      "parts": 841,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "SGT400",
+      "name": "SGT-400",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "SGT-400"
+      ],
+      "parts": 681,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "GEFRAME6B",
+      "name": "GE Frame 6B",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "GE Frame 6B"
+      ],
+      "parts": 288,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "RB211535",
+      "name": "RB211-535",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "RB211-535"
+      ],
+      "parts": 238,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "TH540",
+      "name": "TH-540",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "TH-540"
+      ],
+      "parts": 145,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "ST14",
+      "name": "ST14",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "ST14"
+      ],
+      "parts": 130,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "SIMBAM6C",
+      "name": "Simba M6C",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "Simba M6C"
+      ],
+      "parts": 123,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "TAURUS70MD",
+      "name": "Taurus 70MD",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "Taurus 70MD"
+      ],
+      "parts": 116,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "TAURUS70ИTAURUS70MD",
+      "name": "Taurus 70 и Taurus 70MD",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "Taurus 70 и Taurus 70MD"
+      ],
+      "parts": 105,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "545I",
+      "name": "545i",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "545i"
+      ],
+      "parts": 97,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "SIMBAE7C",
+      "name": "Simba E7C",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "Simba E7C"
+      ],
+      "parts": 97,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "R1700G",
+      "name": "R1700G",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "R1700G"
+      ],
+      "parts": 87,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "BOOMERM2C",
+      "name": "Boomer M2C",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "Boomer M2C"
+      ],
+      "parts": 78,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "BOOMERM2D",
+      "name": "Boomer M2D",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "Boomer M2D"
+      ],
+      "parts": 68,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "CENTAUR50",
+      "name": "Centaur 50",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "Centaur 50"
+      ],
+      "parts": 63,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "SPRAYMECLF050VC",
+      "name": "Spraymec LF 050 VC",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "Spraymec LF 050 VC"
+      ],
+      "parts": 56,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "TAURUS70",
+      "name": "Taurus 70",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "Taurus 70"
+      ],
+      "parts": 53,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "BOLTECM",
+      "name": "Boltec M",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "Boltec M"
+      ],
+      "parts": 52,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "SOLARMARS",
+      "name": "Solar MARS",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "Solar MARS",
+        "Solar Mars"
+      ],
+      "parts": 52,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "BOOMERS2",
+      "name": "Boomer S2",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "Boomer S2"
+      ],
+      "parts": 51,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "SCAMEC2000S",
+      "name": "Scamec 2000 S",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "Scamec 2000 S"
+      ],
+      "parts": 48,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "SGT100",
+      "name": "SGT-100",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "SGT-100"
+      ],
+      "parts": 47,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "CHARMEC1605BE",
+      "name": "Charmec 1605 BE",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "Charmec 1605 BE"
+      ],
+      "parts": 44,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "HIMECLF905",
+      "name": "Himec LF 905",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "Himec LF 905"
+      ],
+      "parts": 42,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "TAURUS70TAURUS70MD",
+      "name": "Taurus 70, Taurus 70MD",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "Taurus 70, Taurus 70MD"
+      ],
+      "parts": 38,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "UTIMECLF600TRANSMIXER",
+      "name": "Utimec LF 600 Transmixer",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "Utimec LF 600 Transmixer"
+      ],
+      "parts": 35,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "SPRAYMECLF050DC",
+      "name": "Spraymec LF 050 DC",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "Spraymec LF 050 DC"
+      ],
+      "parts": 34,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "UTIMECLF130MATERIALLUBE",
+      "name": "Utimec LF 130 Material Lube",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "Utimec LF 130 Material Lube"
+      ],
+      "parts": 34,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "CHARMEC1605B",
+      "name": "Charmec 1605 B",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "Charmec 1605 B"
+      ],
+      "parts": 33,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "CHARMECMF050DROBOT",
+      "name": "Charmec MF 050 D Robot",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "Charmec MF 050 D Robot"
+      ],
+      "parts": 33,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "UTILIFTMF540",
+      "name": "Utilift MF 540",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "Utilift MF 540"
+      ],
+      "parts": 33,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "UTIMECLF1000FUEL",
+      "name": "Utimec LF 1000 Fuel",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "Utimec LF 1000 Fuel"
+      ],
+      "parts": 33,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "AVON15331534",
+      "name": "Avon 1533/1534",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "Avon 1533/1534"
+      ],
+      "parts": 32,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "CHARMEC1610B",
+      "name": "Charmec 1610 B",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "Charmec 1610 B"
+      ],
+      "parts": 30,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "UTIMECLF130MATERIAL",
+      "name": "Utimec LF 130 Material",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "Utimec LF 130 Material"
+      ],
+      "parts": 30,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "UTIMECLF300TYRE",
+      "name": "Utimec LF 300 Tyre",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "Utimec LF 300 Tyre"
+      ],
+      "parts": 30,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "UTIMECLF100E",
+      "name": "Utimec LF 100 E",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "Utimec LF 100 E"
+      ],
+      "parts": 28,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "SOLARCENTAUR",
+      "name": "Solar Centaur",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "Solar Centaur"
+      ],
+      "parts": 25,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "UTILIFTLF540",
+      "name": "Utilift LF 540",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "Utilift LF 540"
+      ],
+      "parts": 25,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "SOLARSATURN",
+      "name": "Solar SATURN",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "Solar SATURN"
+      ],
+      "parts": 24,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "TH545I",
+      "name": "TH545i",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "TH545i"
+      ],
+      "parts": 24,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "TAURUS60STAURUS70",
+      "name": "Taurus 60S, Taurus 70",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "Taurus 60S, Taurus 70"
+      ],
+      "parts": 24,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "SGT700",
+      "name": "SGT-700",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "SGT-700"
+      ],
+      "parts": 23,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "EASERL",
+      "name": "Easer L",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "Easer L"
+      ],
+      "parts": 22,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "ЦЕМЕНТИРОВОЧНЫЙАГРЕГАТCPS763",
+      "name": "Цементировочный агрегат CPS-763",
+      "segment": "other",
+      "kind": "other_machine",
+      "spellings": [
+        "Цементировочный агрегат CPS-763"
+      ],
+      "parts": 22,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "ТН545",
+      "name": "ТН 545",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "ТН 545"
+      ],
+      "parts": 21,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "LH410",
+      "name": "LH410",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "LH410"
+      ],
+      "parts": 20,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "ROLLSROYCERROLYMPUS",
+      "name": "Rolls-Royce RR Olympus",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "Rolls-Royce RR Olympus"
+      ],
+      "parts": 20,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "UTIMEC1420LUBEHD",
+      "name": "Utimec 1420 Lube HD",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "Utimec 1420 Lube HD"
+      ],
+      "parts": 20,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "MT42",
+      "name": "MT 42",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "MT 42"
+      ],
+      "parts": 19,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "ST7",
+      "name": "ST7",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "ST7"
+      ],
+      "parts": 19,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "БУРОВОЙНАСОС12T1600",
+      "name": "Буровой насос 12T1600",
+      "segment": "other",
+      "kind": "other_machine",
+      "spellings": [
+        "Буровой насос 12T1600"
+      ],
+      "parts": 18,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "ROLLSROYCESPEY",
+      "name": "Rolls-Royce Spey",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "Rolls-Royce Spey"
+      ],
+      "parts": 17,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "SOLARCENTAUR40",
+      "name": "Solar CENTAUR 40",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "Solar CENTAUR 40"
+      ],
+      "parts": 17,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "TH320",
+      "name": "TH-320",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "TH-320"
+      ],
+      "parts": 17,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "ШКАФАГЕНЕРАТОРАГАЗОТУРБИННЫХУСТАНОВОКSIEMENSSGT400МЛСКФ1",
+      "name": "Шкафа генератора газотурбинных установок SIEMENS SGT400 МЛСКФ-1",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "Шкафа генератора газотурбинных установок SIEMENS SGT400 МЛСКФ-1"
+      ],
+      "parts": 17,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "BOOMERS1DDH",
+      "name": "Boomer S1 D-DH",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "Boomer S1 D-DH"
+      ],
+      "parts": 16,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "GELMS100",
+      "name": "GE LMS100",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "GE LMS100"
+      ],
+      "parts": 15,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "E7CCOP3060",
+      "name": "E7C COP 3060",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "E7C COP 3060"
+      ],
+      "parts": 14,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "E7CCOP4050",
+      "name": "E7C COP 4050",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "E7C COP 4050"
+      ],
+      "parts": 14,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "SPRAYMEC1050WPC",
+      "name": "Spraymec 1050 WPC",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "Spraymec 1050 WPC"
+      ],
+      "parts": 14,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "BORNEMANNМНОГОФАЗНЫЙНАСОСMPC320100",
+      "name": "Bornemann Многофазный насос MPC 320-100",
+      "segment": "other",
+      "kind": "other_machine",
+      "spellings": [
+        "Bornemann Многофазный насос MPC 320-100"
+      ],
+      "parts": 13,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "SGT600",
+      "name": "SGT-600",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "SGT-600"
+      ],
+      "parts": 13,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "TAURUS60STAURUS70TAURUS70MD",
+      "name": "Taurus 60S, Taurus 70, Taurus 70MD",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "Taurus 60S, Taurus 70, Taurus 70MD"
+      ],
+      "parts": 13,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "ВЕНТИЛЯТОР",
+      "name": "Вентилятор",
+      "segment": "other",
+      "kind": "other_machine",
+      "spellings": [
+        "Вентилятор"
+      ],
+      "parts": 13,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "ПРЕВЕНТОРУНИВЕРСАЛЬНЫЙГИДРАВЛИЧЕСКИЙ18345KDLBOP",
+      "name": "Превентор универсальный гидравлический 18-3/4 5K DL BOP",
+      "segment": "other",
+      "kind": "other_machine",
+      "spellings": [
+        "Превентор универсальный гидравлический 18-3/4 5K DL BOP"
+      ],
+      "parts": 13,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "SATURN20",
+      "name": "Saturn 20",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "Saturn 20"
+      ],
+      "parts": 12,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "SIEMENSTB5000",
+      "name": "Siemens TB5000",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "Siemens TB5000"
+      ],
+      "parts": 12,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "TITAN130",
+      "name": "Titan 130",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "Titan 130"
+      ],
+      "parts": 12,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "ВЕРХНИЙПРИВОД500ESI1350",
+      "name": "Верхний привод 500-ESI-1350",
+      "segment": "other",
+      "kind": "other_machine",
+      "spellings": [
+        "Верхний привод 500-ESI-1350"
+      ],
+      "parts": 12,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "НАСОСMARFLEXMDPC200",
+      "name": "Насос MarFlex MDPC-200",
+      "segment": "other",
+      "kind": "other_machine",
+      "spellings": [
+        "Насос MarFlex MDPC-200"
+      ],
+      "parts": 12,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "ТН320",
+      "name": "ТН 320",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "ТН 320"
+      ],
+      "parts": 12,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "CHARMEC1305",
+      "name": "Charmec 1305",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "Charmec 1305"
+      ],
+      "parts": 11,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "GEFRAME56",
+      "name": "GE Frame 5/6",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "GE Frame 5/6"
+      ],
+      "parts": 11,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "ROLLSROYCERB211",
+      "name": "Rolls-Royce RB211",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "Rolls-Royce RB211"
+      ],
+      "parts": 11,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "SGT400800",
+      "name": "SGT-400/800",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "SGT-400/800"
+      ],
+      "parts": 11,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "БЛОКПОДАЧИЖИДКОГОТОПЛИВАДЛЯГТУSGT400",
+      "name": "Блок подачи жидкого топлива для ГТУ SGT-400",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "Блок подачи жидкого топлива для ГТУ SGT-400"
+      ],
+      "parts": 11,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "ГИДРАВЛИЧЕСКАЯСИЛОВАЯУСТАНОВКАAV1015390000",
+      "name": "Гидравлическая силовая установка AV1.01539.00.00",
+      "segment": "other",
+      "kind": "other_machine",
+      "spellings": [
+        "Гидравлическая силовая установка AV1.01539.00.00"
+      ],
+      "parts": 11,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "ЛЕБЕДКАБУРОВАЯSSGD500",
+      "name": "Лебедка буровая SSGD-500",
+      "segment": "other",
+      "kind": "other_machine",
+      "spellings": [
+        "Лебедка буровая SSGD-500"
+      ],
+      "parts": 11,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "MARS90100",
+      "name": "Mars 90/100",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "Mars 90/100"
+      ],
+      "parts": 10,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "CS56B",
+      "name": "CS56B",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "CS56B"
+      ],
+      "parts": 9,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "CENTAUR40",
+      "name": "Centaur 40",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "Centaur 40"
+      ],
+      "parts": 9,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "CHARMEC1610BE",
+      "name": "Charmec 1610 BE",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "Charmec 1610 BE"
+      ],
+      "parts": 9,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "SGT800",
+      "name": "SGT-800",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "SGT-800"
+      ],
+      "parts": 9,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "UG20K",
+      "name": "UG20K",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "UG20K"
+      ],
+      "parts": 9,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "BOLTECMEPIROCCOPRR14",
+      "name": "Boltec M Epiroc COP RR14",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "Boltec M Epiroc COP RR14"
+      ],
+      "parts": 8,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "BOOMERS2COPMD20",
+      "name": "Boomer S2 COP MD 20+",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "Boomer S2 COP MD 20+"
+      ],
+      "parts": 8,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "R1600G",
+      "name": "R1600G",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "R1600G"
+      ],
+      "parts": 8,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "SATURNCENTAURЭПОХАIH",
+      "name": "Saturn/Centaur (эпоха IH)",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "Saturn/Centaur (эпоха IH)"
+      ],
+      "parts": 8,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "SOLARCENTAUR50",
+      "name": "Solar CENTAUR 50",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "Solar CENTAUR 50"
+      ],
+      "parts": 8,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "ВЕРХНИЙПРИВОДTDS8SA",
+      "name": "Верхний привод TDS-8SA",
+      "segment": "other",
+      "kind": "other_machine",
+      "spellings": [
+        "Верхний привод TDS-8SA"
+      ],
+      "parts": 8,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "ЛЕБЕДКАБУРОВАЯMAS7000GD006A",
+      "name": "Лебедка буровая MAS7000GD-006A",
+      "segment": "other",
+      "kind": "other_machine",
+      "spellings": [
+        "Лебедка буровая MAS7000GD-006A"
+      ],
+      "parts": 8,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "CHARMECMF504DV",
+      "name": "Charmec MF504 D (V",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "Charmec MF504 D (V"
+      ],
+      "parts": 7,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "M2DCOP2238HD",
+      "name": "M2D COP 2238 HD+",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "M2D COP 2238 HD+"
+      ],
+      "parts": 7,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "ГИДРАВЛИЧЕСКАЯСИЛОВАЯУСТАНОВКА",
+      "name": "Гидравлическая силовая установка",
+      "segment": "other",
+      "kind": "other_machine",
+      "spellings": [
+        "Гидравлическая силовая установка"
+      ],
+      "parts": 7,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "TAURUS7070MD",
+      "name": "Taurus 70/70MD",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "Taurus 70/70MD"
+      ],
+      "parts": 6,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "UTIMECLF404CABLE",
+      "name": "Utimec LF404 CABLE",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "Utimec LF404 CABLE"
+      ],
+      "parts": 6,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "WJ6",
+      "name": "WJ6",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "WJ6"
+      ],
+      "parts": 6,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "BOLTECMEPIROCCOP1028",
+      "name": "Boltec M Epiroc COP 1028",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "Boltec M Epiroc COP 1028"
+      ],
+      "parts": 5,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "SOLARTAURUS",
+      "name": "Solar Taurus",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "Solar Taurus"
+      ],
+      "parts": 5,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "TAURUS60",
+      "name": "Taurus 60",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "Taurus 60"
+      ],
+      "parts": 5,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "TAURUS60STAURUS70ШКАФУПРАВЛЕНИЯPMSМЛСПК",
+      "name": "Taurus 60S, Taurus 70, Шкаф управления PMS МЛСПК",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "Taurus 60S, Taurus 70, Шкаф управления PMS МЛСПК"
+      ],
+      "parts": 5,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "НАСОСВЫСОКОГОДАВЛЕНИЯОПРЕСНИТЕЛЬНОЙУСТАНОВКИDANFOSSAPP65",
+      "name": "Насос высокого давления опреснительной установки Danfoss APP6.5",
+      "segment": "other",
+      "kind": "other_machine",
+      "spellings": [
+        "Насос высокого давления опреснительной установки Danfoss APP6.5"
+      ],
+      "parts": 5,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "ПРЕВЕНТОРСДВОЕННЫЙПЛАШЕЧНЫЙ18345000PSI",
+      "name": "Превентор сдвоенный плашечный 18 3/4\"-5000psi",
+      "segment": "other",
+      "kind": "other_machine",
+      "spellings": [
+        "Превентор сдвоенный плашечный 18 3/4\"-5000psi"
+      ],
+      "parts": 5,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "SIMBAM6COLD",
+      "name": "Simba M6C (old",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "Simba M6C (old"
+      ],
+      "parts": 4,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "SOLARTAURUS60",
+      "name": "Solar TAURUS 60",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "Solar TAURUS 60"
+      ],
+      "parts": 4,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "TAURUS70TAURUS70ИTAURUS70MDTAURUS70MD",
+      "name": "Taurus 70, Taurus 70 и Taurus 70MD , Taurus 70MD",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "Taurus 70, Taurus 70 и Taurus 70MD , Taurus 70MD"
+      ],
+      "parts": 4,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "ЗАПЧАСТИПРИВОДА",
+      "name": "ЗАПЧАСТИ ПРИВОДА",
+      "segment": "other",
+      "kind": "other_machine",
+      "spellings": [
+        "ЗАПЧАСТИ ПРИВОДА"
+      ],
+      "parts": 4,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "R1600H",
+      "name": "R1600H",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "R1600H"
+      ],
+      "parts": 3,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "SGT1002S",
+      "name": "SGT-100-2S",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "SGT-100-2S"
+      ],
+      "parts": 3,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "SGT200",
+      "name": "SGT-200",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "SGT-200"
+      ],
+      "parts": 3,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "SIEMENSTB4000",
+      "name": "Siemens TB4000",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "Siemens TB4000"
+      ],
+      "parts": 3,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "TB5000",
+      "name": "TB5000",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "TB5000"
+      ],
+      "parts": 3,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "TAURUS60STAURUS70ИTAURUS70MD",
+      "name": "Taurus 60S, Taurus 70 и Taurus 70MD",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "Taurus 60S, Taurus 70 и Taurus 70MD"
+      ],
+      "parts": 3,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "TAURUS70ИTAURUS70MDTAURUS70MD",
+      "name": "Taurus 70 и Taurus 70MD , Taurus 70MD",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "Taurus 70 и Taurus 70MD , Taurus 70MD"
+      ],
+      "parts": 3,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "ЛЕБЕДКАБУРОВАЯMAS7000GD002AЛЕБЕДКАБУРОВАЯMAS7000GD006A",
+      "name": "Лебедка буровая MAS7000GD-002A, Лебедка буровая MAS7000GD-006A",
+      "segment": "other",
+      "kind": "other_machine",
+      "spellings": [
+        "Лебедка буровая MAS7000GD-002A, Лебедка буровая MAS7000GD-006A"
+      ],
+      "parts": 3,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "ЛЕБЕДКАПОДЪЕМАПЕРСОНАЛАFA2I",
+      "name": "Лебедка подъема персонала FA2i",
+      "segment": "other",
+      "kind": "other_machine",
+      "spellings": [
+        "Лебедка подъема персонала FA2i"
+      ],
+      "parts": 3,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "ПНЕВМАТИЧЕСКАЯЛЕБЕДКАFA5A",
+      "name": "Пневматическая лебедка FA5A",
+      "segment": "other",
+      "kind": "other_machine",
+      "spellings": [
+        "Пневматическая лебедка FA5A"
+      ],
+      "parts": 3,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "514",
+      "name": "514",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "514"
+      ],
+      "parts": 2,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "BOLTECMCOP1028",
+      "name": "Boltec M COP 1028",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "Boltec M COP 1028"
+      ],
+      "parts": 2,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "E7C",
+      "name": "E7C",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "E7C"
+      ],
+      "parts": 2,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "PAUSUNI504",
+      "name": "PAUS UNI 50-4",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "PAUS UNI 50-4"
+      ],
+      "parts": 2,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "SGT100TYPHOON",
+      "name": "SGT-100 (Typhoon)",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "SGT-100 (Typhoon)"
+      ],
+      "parts": 2,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "SIMBAE7C513",
+      "name": "Simba E7C 513",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "Simba E7C 513"
+      ],
+      "parts": 2,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "TB5000RUSTONLINE",
+      "name": "TB5000 / Ruston line",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "TB5000 / Ruston line"
+      ],
+      "parts": 2,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "БУРОВОЙНАСОС12P160",
+      "name": "Буровой насос 12-P-160",
+      "segment": "other",
+      "kind": "other_machine",
+      "spellings": [
+        "Буровой насос 12-P-160"
+      ],
+      "parts": 2,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "ГИДРАВЛИЧЕСКАЯСИЛОВАЯУСТАНОВКАAV10154000OQ",
+      "name": "Гидравлическая силовая установка AV1.01540.00.OQ",
+      "segment": "other",
+      "kind": "other_machine",
+      "spellings": [
+        "Гидравлическая силовая установка AV1.01540.00.OQ"
+      ],
+      "parts": 2,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "ГИДРАВЛИЧЕСКАЯСТАНЦИЯУПРАВЛЕНИЯПРЕВЕНТОРАМИ20026595",
+      "name": "Гидравлическая станция управления превенторами 20026595",
+      "segment": "other",
+      "kind": "other_machine",
+      "spellings": [
+        "Гидравлическая станция управления превенторами 20026595"
+      ],
+      "parts": 2,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "НАСОСДИСТИЛЛЯТАPOMPETRAVAINITCH1003151XRKA4T",
+      "name": "Насос дистиллята Pompetravaini TCH 100-315/1X-RK/A4-T",
+      "segment": "other",
+      "kind": "other_machine",
+      "spellings": [
+        "Насос дистиллята Pompetravaini TCH 100-315/1X-RK/A4-T"
+      ],
+      "parts": 2,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "НАСОСЦЕНТРОБЕЖНЫЕСЭЛЕКТРОПРИВОДОМ8Х6Х14",
+      "name": "Насос центробежные с электроприводом 8Х6Х14",
+      "segment": "other",
+      "kind": "other_machine",
+      "spellings": [
+        "Насос центробежные с электроприводом 8Х6Х14"
+      ],
+      "parts": 2,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "НАСОСЫЦЕНТРОБЕЖНЫЕCAP018X6X14IMP12",
+      "name": "Насосы центробежные CAP 01 8x6x14”, IMP 12”",
+      "segment": "other",
+      "kind": "other_machine",
+      "spellings": [
+        "Насосы центробежные CAP 01 8x6x14”, IMP 12”"
+      ],
+      "parts": 2,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "ПНЕВМАТИЧЕСКАЯЛЕБЕДКАFA7I",
+      "name": "Пневматическая лебедка FA7i",
+      "segment": "other",
+      "kind": "other_machine",
+      "spellings": [
+        "Пневматическая лебедка FA7i"
+      ],
+      "parts": 2,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "ПРЕВЕНТОРОДИНАРНЫЙПЛАШЕЧНЫЙ18345000PSI",
+      "name": "Превентор одинарный плашечный 18 3/4\"-5000psi",
+      "segment": "other",
+      "kind": "other_machine",
+      "spellings": [
+        "Превентор одинарный плашечный 18 3/4\"-5000psi"
+      ],
+      "parts": 2,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "ПРЕВЕНТОРУНИВЕРСАЛЬНЫЙГИДРАВЛИЧЕСКИЙ18345000PSI",
+      "name": "Превентор универсальный гидравлический 18-3/4\" - 5000PSI",
+      "segment": "other",
+      "kind": "other_machine",
+      "spellings": [
+        "Превентор универсальный гидравлический 18-3/4\" - 5000PSI"
+      ],
+      "parts": 2,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "СИСТЕМАПЕРЕМЕЩЕНИЯБУРОВОЙУСТАНОВКИ019810033",
+      "name": "Система перемещения буровой установки 019810033",
+      "segment": "other",
+      "kind": "other_machine",
+      "spellings": [
+        "Система перемещения буровой установки 019810033"
+      ],
+      "parts": 2,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "НЕУКАЗАНАCENTAURTAURUS",
+      "name": "не указана (Centaur/Taurus)",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "не указана (Centaur/Taurus)"
+      ],
+      "parts": 2,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "НЕУКАЗАНАКАТАЛОГSATURNMARS",
+      "name": "не указана (каталог Saturn–Mars)",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "не указана (каталог Saturn–Mars)"
+      ],
+      "parts": 2,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "ЦЕНТРОБЕЖНЫЙКОМПРЕССОРSOLAR",
+      "name": "центробежный компрессор Solar",
+      "segment": "other",
+      "kind": "other_machine",
+      "spellings": [
+        "центробежный компрессор Solar"
+      ],
+      "parts": 2,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "503",
+      "name": "50-3",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "50-3"
+      ],
+      "parts": 1,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "CHARMECMF504DVHIMECLF905",
+      "name": "Charmec MF504 D (V) Himec LF 905",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "Charmec MF504 D (V) Himec LF 905"
+      ],
+      "parts": 1,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "HENCONLIBERATORCHARGER",
+      "name": "Hencon Liberator Charger",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "Hencon Liberator Charger"
+      ],
+      "parts": 1,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "M2D",
+      "name": "M2D",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "M2D"
+      ],
+      "parts": 1,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "PAUSUNI503BSE",
+      "name": "PAUS UNI 50-3 BS-E",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "PAUS UNI 50-3 BS-E"
+      ],
+      "parts": 1,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "PAUSUNI505SV",
+      "name": "PAUS UNI 50-5 SV",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "PAUS UNI 50-5 SV"
+      ],
+      "parts": 1,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "SGT100SGT1002S",
+      "name": "SGT-100 / SGT-100-2S",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "SGT-100 / SGT-100-2S"
+      ],
+      "parts": 1,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "SGT100SGT400",
+      "name": "SGT-100 / SGT-400",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "SGT-100 / SGT-400"
+      ],
+      "parts": 1,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "SGT1002SSGT400",
+      "name": "SGT-100-2S / SGT-400",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "SGT-100-2S / SGT-400"
+      ],
+      "parts": 1,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "SGT200TORNADO",
+      "name": "SGT-200 (Tornado)",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "SGT-200 (Tornado)"
+      ],
+      "parts": 1,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "SGT400CYCLONE",
+      "name": "SGT-400 (Cyclone)",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "SGT-400 (Cyclone)"
+      ],
+      "parts": 1,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "ST14OLD",
+      "name": "ST14 (old",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "ST14 (old"
+      ],
+      "parts": 1,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "SATURN",
+      "name": "Saturn",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "Saturn"
+      ],
+      "parts": 1,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "SATURNСЕРИЯ225XXПОДТВЕРЖДЕНАSALVEX",
+      "name": "Saturn (серия 225xx подтверждена Salvex)",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "Saturn (серия 225xx подтверждена Salvex)"
+      ],
+      "parts": 1,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "SATURNСЕРИЯ2XXXX",
+      "name": "Saturn (серия 2xxxx)",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "Saturn (серия 2xxxx)"
+      ],
+      "parts": 1,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "SATURNСЕРИЯ4XXXX",
+      "name": "Saturn (серия 4xxxx)",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "Saturn (серия 4xxxx)"
+      ],
+      "parts": 1,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "SATURNCENTAUR",
+      "name": "Saturn/Centaur",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "Saturn/Centaur"
+      ],
+      "parts": 1,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "SIEMENSTB3000",
+      "name": "Siemens TB3000",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "Siemens TB3000"
+      ],
+      "parts": 1,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "SIMBAE7C4050MUX",
+      "name": "Simba E7C 4050 MUX",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "Simba E7C 4050 MUX"
+      ],
+      "parts": 1,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "SIMBAL6COLD",
+      "name": "Simba L6C (old",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "Simba L6C (old"
+      ],
+      "parts": 1,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "SIMBAM7COLD",
+      "name": "Simba M7C (old",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "Simba M7C (old"
+      ],
+      "parts": 1,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "SPRAYMEC050VC",
+      "name": "Spraymec 050VC",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "Spraymec 050VC"
+      ],
+      "parts": 1,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "TA1750TB5000",
+      "name": "TA1750 / TB5000",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "TA1750 / TB5000"
+      ],
+      "parts": 1,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "TA1750TB5000SGT200TORNADO",
+      "name": "TA1750 / TB5000 / SGT-200 Tornado",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "TA1750 / TB5000 / SGT-200 Tornado"
+      ],
+      "parts": 1,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "TA1750TB5000TB5400",
+      "name": "TA1750 / TB5000 / TB5400",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "TA1750 / TB5000 / TB5400"
+      ],
+      "parts": 1,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "TAURUS60STAURUS70TAURUS70ИTAURUS70MDTAURUS70MD",
+      "name": "Taurus 60S, Taurus 70, Taurus 70 и Taurus 70MD , Taurus 70MD",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "Taurus 60S, Taurus 70, Taurus 70 и Taurus 70MD , Taurus 70MD"
+      ],
+      "parts": 1,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "TAURUS60STAURUS70MD",
+      "name": "Taurus 60S, Taurus 70MD",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "Taurus 60S, Taurus 70MD"
+      ],
+      "parts": 1,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "TAURUS70TAURUS70ИTAURUS70MD",
+      "name": "Taurus 70, Taurus 70 и Taurus 70MD",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "Taurus 70, Taurus 70 и Taurus 70MD"
+      ],
+      "parts": 1,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "TAURUS70ШКАФУПРАВЛЕНИЯPMSМЛСПК",
+      "name": "Taurus 70, Шкаф управления PMS МЛСПК",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "Taurus 70, Шкаф управления PMS МЛСПК"
+      ],
+      "parts": 1,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "TITAN130ГЕНЕРАТОРНЫЙПАКЕТ",
+      "name": "Titan 130 (генераторный пакет)",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "Titan 130 (генераторный пакет)"
+      ],
+      "parts": 1,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "TITAN130ТАКЖЕВОБЩЕМКАТАЛОГЕSATURNMARS",
+      "name": "Titan 130 (также в общем каталоге Saturn–Mars)",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "Titan 130 (также в общем каталоге Saturn–Mars)"
+      ],
+      "parts": 1,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "TRANSMIXERLF600",
+      "name": "Transmixer LF 600",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "Transmixer LF 600"
+      ],
+      "parts": 1,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "UTILIFT1905BHD",
+      "name": "Utilift 1905B HD",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "Utilift 1905B HD"
+      ],
+      "parts": 1,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "UTIMEC1000MATERIALHD",
+      "name": "Utimec 1000 Material HD",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "Utimec 1000 Material HD"
+      ],
+      "parts": 1,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "UTIMECLF130",
+      "name": "Utimec LF130",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "Utimec LF130"
+      ],
+      "parts": 1,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "WJ6А",
+      "name": "WJ6А",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "WJ6А"
+      ],
+      "parts": 1,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "АВТОБЕТОНОСМЕСИТЕЛЬМАЙНТЕХНИК",
+      "name": "Автобетоносмеситель - майнтехник",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "Автобетоносмеситель - майнтехник"
+      ],
+      "parts": 1,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "БЛОКОХЛАЖДЕНИЯБУРОВОЙЛЕБЕДКИ2000HP",
+      "name": "Блок охлаждения буровой лебедки 2000 HP",
+      "segment": "other",
+      "kind": "other_machine",
+      "spellings": [
+        "Блок охлаждения буровой лебедки 2000 HP"
+      ],
+      "parts": 1,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "БЛОКПОДАЧИЖИДКОГОТОПЛИВАДЛЯГТУSGT400ШКАФУПРАВЛЕНИЯPMSМЛСКФ1",
+      "name": "Блок подачи жидкого топлива для ГТУ SGT-400, Шкаф управления PMS МЛСК Ф-1",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "Блок подачи жидкого топлива для ГТУ SGT-400, Шкаф управления PMS МЛСК Ф-1"
+      ],
+      "parts": 1,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "БЛОКПОДАЧИЖИДКОГОТОПЛИВАДЛЯГТУSGT400ШКАФУПРАВЛЕНИЯPMSМЛСКФ1D172A2",
+      "name": "Блок подачи жидкого топлива для ГТУ SGT-400, Шкаф управления PMS МЛСК Ф-1+D172A2",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "Блок подачи жидкого топлива для ГТУ SGT-400, Шкаф управления PMS МЛСК Ф-1+D172A2"
+      ],
+      "parts": 1,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "БУМАЖНАЯВСТАВКАЦЕНТРОБЕЖНОГОНАСОСА",
+      "name": "Бумажная вставка центробежного насоса",
+      "segment": "other",
+      "kind": "other_machine",
+      "spellings": [
+        "Бумажная вставка центробежного насоса"
+      ],
+      "parts": 1,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "ВАКУУМНЫЙНАСОСPOMPETRAVAINITCHTRSA2002500CSXНАСОСПОДПИТКИДЕАЭРАТОРА",
+      "name": "Вакуумный насос Pompetravaini TCH TRSA 200-2500/C/SX, Насос подпитки деаэратора",
+      "segment": "other",
+      "kind": "other_machine",
+      "spellings": [
+        "Вакуумный насос Pompetravaini TCH TRSA 200-2500/C/SX, Насос подпитки деаэратора"
+      ],
+      "parts": 1,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "ВЕРХНИЙПРИВОДTD500HT",
+      "name": "Верхний привод TD-500-HT",
+      "segment": "other",
+      "kind": "other_machine",
+      "spellings": [
+        "Верхний привод TD-500-HT"
+      ],
+      "parts": 1,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "ГИДРАВЛИЧЕСКАЯСТАНЦИЯУПРАВЛЕНИЯПРЕВЕНТОРОВ2B6012008B15T34P",
+      "name": "Гидравлическая станция управления превенторов 2B6012008B15T34P",
+      "segment": "other",
+      "kind": "other_machine",
+      "spellings": [
+        "Гидравлическая станция управления превенторов 2B6012008B15T34P"
+      ],
+      "parts": 1,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "ГИДРАВЛИЧЕСКАЯСТАНЦИЯУПРАВЛЕНИЯПРЕВЕНТОРОВTC8480",
+      "name": "Гидравлическая станция управления превенторов TC8480",
+      "segment": "other",
+      "kind": "other_machine",
+      "spellings": [
+        "Гидравлическая станция управления превенторов TC8480"
+      ],
+      "parts": 1,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "ЛЕБЕДКАБУРОВАЯMAS7000GD002A",
+      "name": "Лебедка буровая MAS7000GD-002A",
+      "segment": "other",
+      "kind": "other_machine",
+      "spellings": [
+        "Лебедка буровая MAS7000GD-002A"
+      ],
+      "parts": 1,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "ЛЕБЕДКАПНЕВМАТИЧЕСКАЯBU7APTAB20",
+      "name": "Лебедка пневматическая BU7APTAB20",
+      "segment": "other",
+      "kind": "other_machine",
+      "spellings": [
+        "Лебедка пневматическая BU7APTAB20"
+      ],
+      "parts": 1,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "МТ42",
+      "name": "МТ42",
+      "segment": "gsho",
+      "kind": "mining_machine",
+      "spellings": [
+        "МТ42"
+      ],
+      "parts": 1,
+      "sources": [
+        "zip/data/machines.json"
+      ]
+    },
+    {
+      "machine_key": "НАСОСВЫСОКОГОДАВЛЕНИЯОПРЕСНИТЕЛЬНОЙУСТАНОВКИDANFOSSAPP72",
+      "name": "Насос высокого давления опреснительной установки Danfoss APP7.2",
+      "segment": "other",
+      "kind": "other_machine",
+      "spellings": [
+        "Насос высокого давления опреснительной установки Danfoss APP7.2"
+      ],
+      "parts": 1,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "НАСОСОХЛАЖДАЮЩЕЙЖИДКОСТИВТК",
+      "name": "Насос охлаждающей жидкости ВТК",
+      "segment": "other",
+      "kind": "other_machine",
+      "spellings": [
+        "Насос охлаждающей жидкости ВТК"
+      ],
+      "parts": 1,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "НАСОСОХЛАЖДАЮЩЕЙЖИДКОСТИНТКGILKES",
+      "name": "Насос охлаждающей жидкости НТК Gilkes",
+      "segment": "other",
+      "kind": "other_machine",
+      "spellings": [
+        "Насос охлаждающей жидкости НТК Gilkes"
+      ],
+      "parts": 1,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "НАСОСПОДПИТКИДЕАЭРАТОРАPOMPETRAVAINITCH3004501RKES",
+      "name": "Насос подпитки деаэратора Pompetravaini TCH 300-450/1-RK/ES",
+      "segment": "other",
+      "kind": "other_machine",
+      "spellings": [
+        "Насос подпитки деаэратора Pompetravaini TCH 300-450/1-RK/ES"
+      ],
+      "parts": 1,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "НАСОСРЕЦИРКУЛЯЦИИSULZERA72500",
+      "name": "Насос рециркуляции SULZER A72-500",
+      "segment": "other",
+      "kind": "other_machine",
+      "spellings": [
+        "Насос рециркуляции SULZER A72-500"
+      ],
+      "parts": 1,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "НАСОСЦЕНТРОБЕЖНЫЕСЭЛЕКТРОПРИВОДОМ5X6",
+      "name": "Насос центробежные с электроприводом 5x6",
+      "segment": "other",
+      "kind": "other_machine",
+      "spellings": [
+        "Насос центробежные с электроприводом 5x6"
+      ],
+      "parts": 1,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "НАСОСЦИРКУЛЯЦИОННЫЙОЖ",
+      "name": "Насос циркуляционный ОЖ",
+      "segment": "other",
+      "kind": "other_machine",
+      "spellings": [
+        "Насос циркуляционный ОЖ"
+      ],
+      "parts": 1,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "ПРИВОДЭЛЕКТРОГИДРАВЛИЧЕСКИЙSIEMENSSKC622800N40ММAC24ВDC010В4",
+      "name": "ПРИВОД ЭЛЕКТРОГИДРАВЛИЧЕСКИЙ, SIEMENS SKC62, 2800 N, 40мм, AC 24 В, DC 0..10 В 4",
+      "segment": "other",
+      "kind": "other_machine",
+      "spellings": [
+        "ПРИВОД ЭЛЕКТРОГИДРАВЛИЧЕСКИЙ, SIEMENS SKC62, 2800 N, 40мм, AC 24 В, DC 0..10 В 4"
+      ],
+      "parts": 1,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "РЕМОНТНЫЙКОМПЛЕКТОБРАТНОГОКЛАПАНАДЛЯКОМПРЕССОРА",
+      "name": "Ремонтный комплект обратного клапана для компрессора",
+      "segment": "other",
+      "kind": "other_machine",
+      "spellings": [
+        "Ремонтный комплект обратного клапана для компрессора"
+      ],
+      "parts": 1,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "СИТОГИДРОЦИКЛОННАЯУСТАНОВКАMONGOOSEPT312",
+      "name": "Ситогидроциклонная установка Mongoose PT 3-12",
+      "segment": "other",
+      "kind": "other_machine",
+      "spellings": [
+        "Ситогидроциклонная установка Mongoose PT 3-12"
+      ],
+      "parts": 1,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "ТУРБОКОМПРЕССОР",
+      "name": "Турбокомпрессор",
+      "segment": "other",
+      "kind": "other_machine",
+      "spellings": [
+        "Турбокомпрессор"
+      ],
+      "parts": 1,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "УСТРОЙСТВОПОДДЕРЖАНИЯУРОВНЯМАСЛАLM301",
+      "name": "Устройство поддержания уровня масла LM301",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "Устройство поддержания уровня масла LM301"
+      ],
+      "parts": 1,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "ФИЛЬТРМАСЛЯНЫЙТУРБОКОМПРЕССОРА",
+      "name": "Фильтр масляный турбокомпрессора",
+      "segment": "other",
+      "kind": "other_machine",
+      "spellings": [
+        "Фильтр масляный турбокомпрессора"
+      ],
+      "parts": 1,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "ФИЛЬТРУЮЩИЙЭЛЕМЕНТДЛЯКОМПРЕССОРА",
+      "name": "Фильтрующий элемент для компрессора",
+      "segment": "other",
+      "kind": "other_machine",
+      "spellings": [
+        "Фильтрующий элемент для компрессора"
+      ],
+      "parts": 1,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "ЭЛЕКТРИЧЕСКИЙПРИВОДAF24SRSИСПОЛНЕНИЕLACDC24V10VA50HZ1ШТ",
+      "name": "Электрический привод AF24-SR-S (исполнение L) AC/DC 24V, 10VA 50Hz – 1шт.",
+      "segment": "other",
+      "kind": "other_machine",
+      "spellings": [
+        "Электрический привод AF24-SR-S (исполнение L) AC/DC 24V, 10VA 50Hz – 1шт."
+      ],
+      "parts": 1,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "НЕУКАЗАНАCENTAUR50ПОСЕРИИ196XXX",
+      "name": "не указана (Centaur 50 по серии 196xxx)",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "не указана (Centaur 50 по серии 196xxx)"
+      ],
+      "parts": 1,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "НЕУКАЗАНАCENTAURПОСЕРИИ117XXX",
+      "name": "не указана (Centaur по серии 117xxx)",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "не указана (Centaur по серии 117xxx)"
+      ],
+      "parts": 1,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "НЕУКАЗАНАВЕРОЯТНОCENTAURTAURUS",
+      "name": "не указана (вероятно Centaur/Taurus)",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "не указана (вероятно Centaur/Taurus)"
+      ],
+      "parts": 1,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "НЕУКАЗАНАВЕРОЯТНОMARS",
+      "name": "не указана (вероятно Mars)",
+      "segment": "gtu",
+      "kind": "turbine",
+      "spellings": [
+        "не указана (вероятно Mars)"
+      ],
+      "parts": 1,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    },
+    {
+      "machine_key": "ЦЕНТРОБЕЖНЫЙКОМПРЕССОРSOLARCСЕРИЯ",
+      "name": "центробежный компрессор Solar (C-серия)",
+      "segment": "other",
+      "kind": "other_machine",
+      "spellings": [
+        "центробежный компрессор Solar (C-серия)"
+      ],
+      "parts": 1,
+      "sources": [
+        "gt/data/pn_db.json"
+      ]
+    }
+  ]
+}

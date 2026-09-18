@@ -271,6 +271,38 @@ def test_индекс_ссылается_только_на_источники_а
     assert not copies, f"в индексе сборочные копии: {copies[:3]}"
 
 
+# ------------------------------------------------------------------ упаковка записей
+def test_упаковка_повторяющихся_записей_сохраняет_содержимое():
+    """Имена полей в JSON повторяются в каждой записи — на живых данных это сотни
+    килобайт. Упаковка обязана быть обратимой без потерь."""
+    import json
+
+    import dashboard
+    rows = [{"id": i, "subj": f"Запрос {i}", "st": "sent"} for i in range(25)]
+    packed = dashboard._pack_records(rows)
+    assert packed["_p"] == 1 and packed["f"] == ["id", "subj", "st"]
+    back = [dict(zip(packed["f"], r)) for r in packed["r"]]
+    assert back == rows
+    assert len(json.dumps(packed, ensure_ascii=False)) < len(json.dumps(rows, ensure_ascii=False))
+
+
+def test_короткий_список_и_разнородный_не_пакуются():
+    import dashboard
+    short = [{"a": 1}] * 5
+    assert dashboard._pack_records(short) is short
+    mixed = [{"a": 1}] * 30 + [7]
+    assert dashboard._pack_records(mixed) is mixed
+
+
+def test_упаковка_не_портит_исходные_метрики():
+    """Тот же словарь метрик уходит в отчёт reports/ — мутировать его нельзя."""
+    import dashboard
+    src = {"sourcersA": [{"id": "1", "details": [{"a": i} for i in range(30)]}]}
+    out = dashboard._pack_metrics(src)
+    assert isinstance(src["sourcersA"][0]["details"], list)          # исходник цел
+    assert out["sourcersA"][0]["details"]["_p"] == 1                 # копия упакована
+
+
 # ── кто заводит запросы ──────────────────────────────────────────────────────
 # Разбор нужен владельцу, чтобы видеть, кто грузит очередь запросов помимо
 # отдела поиска поставщиков. Считается по автору карточки, а не по ответственному.

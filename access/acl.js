@@ -40,6 +40,8 @@ const SITES = [
     note: "Siemens SGT-100…400 и SGT5-4000F, GE LM6000 и Frame 6B: субпоставщики, MRO, склады" },
   { id: "gpu", group: "lib", name: "ГПУ — газопоршневые установки", href: "https://kvant-gpu.pages.dev/",
     note: "Cummins, Caterpillar, INNIO: поставщики, цены, разрывы OEM/аналог" },
+  { id: "knowledge", group: "lib", name: "Библиотека оборудования и знаний", href: "/library",
+    note: "узлы и детали, изготовители, трейдеры, аналоги, цены и проверенные источники" },
   { id: "ove", group: "proj", name: "ОВЭ-75", href: "https://kvant-ove.pages.dev/",
     note: "обжиг, выщелачивание, электроэкстракция — проект для Кольской ГМК" },
   { id: "gidromet", group: "proj", name: "Гидрометаллургия", href: "https://kvant-gidromet.pages.dev/",
@@ -53,16 +55,17 @@ const SITES = [
 const TABS = [
   { id: "sourcing", name: "Сорсинг", pay: ["DATA", "INSIGHTS"] },
   { id: "company", name: "Пульс компании", pay: ["COMPANY"] },
-  { id: "kam", name: "КАМы", pay: ["KAM"] },
+  // КАМы и продукт-оунеры — не отдельные вкладки, а подменю внутри «Коммерсантов»
+  // (у ролей один начальник). Поэтому «Коммерсанты» читают и состав ролей (PEOPLE),
+  // и направления по клиентам (KAM), и продуктовые линии (PRODUCT).
   { id: "eng", name: "Инжиниринг", pay: ["ENG"] },
-  { id: "prod", name: "Продукт-оунеры", pay: ["PRODUCT"] },
-  { id: "reps", name: "Коммерсанты", pay: ["REPS"] },
+  { id: "reps", name: "Коммерсанты", pay: ["REPS", "PEOPLE", "KAM", "PRODUCT"] },
   { id: "contracts", name: "Реализация", pay: ["CONTRACTS"] },
   { id: "suppliers", name: "Поставщики", pay: ["CONTRACTS"] },
   { id: "cohorts", name: "Когорты", pay: ["COMPANY"] },
   { id: "advisor", name: "Советы знатока", pay: ["ADVISOR"] },
 ];
-const PAYLOADS = ["DATA", "INSIGHTS", "COMPANY", "KAM", "ENG", "PRODUCT", "CONTRACTS", "REPS", "ADVISOR"];
+const PAYLOADS = ["DATA", "INSIGHTS", "COMPANY", "KAM", "ENG", "PRODUCT", "CONTRACTS", "REPS", "PEOPLE", "ADVISOR"];
 const SITE_IDS = SITES.map((s) => s.id);
 const TAB_IDS = TABS.map((t) => t.id);
 
@@ -76,11 +79,11 @@ function defaultAcl() {
       head: { name: "Руководитель", admin: false, sites: SITE_IDS.slice(), tabs: TAB_IDS.slice() },
       employee: { name: "Сотрудник", admin: false, sites: SITE_IDS.slice(), tabs: TAB_IDS.slice() },
       sourcing: { name: "Сорсинг", admin: false,
-        sites: ["dashboard", "zip", "gt", "gpu"], tabs: ["sourcing", "contracts", "suppliers"] },
+        sites: ["dashboard", "zip", "gt", "gpu", "knowledge"], tabs: ["sourcing", "contracts", "suppliers"] },
       kam: { name: "КАМ", admin: false,
-        sites: ["dashboard", "zip", "gt"], tabs: ["company", "kam", "reps", "cohorts"] },
+        sites: ["dashboard", "zip", "gt", "knowledge"], tabs: ["company", "reps", "cohorts"] },
       engineer: { name: "Инженер", admin: false,
-        sites: ["zip", "gt", "gpu", "ove", "gidromet", "gok"], tabs: [] },
+        sites: ["zip", "gt", "gpu", "knowledge", "ove", "gidromet", "gok"], tabs: [] },
       guest: { name: "Гость", admin: false, sites: [], tabs: [] },
     },
     users: {},
@@ -88,6 +91,19 @@ function defaultAcl() {
 }
 
 function normEmail(s) { return String(s || "").trim().toLowerCase(); }
+
+// Вкладки «КАМы» и «Продукт-оунеры» стали подменю внутри «Коммерсантов». Без этой
+// миграции у того, кому выдали только их, после обновления не осталось бы ни одной
+// вкладки — то есть человек потерял бы доступ к дашборду целиком.
+const TAB_MOVED = { kam: "reps", prod: "reps" };
+function migrateTabs(list) {
+  const out = new Set();
+  for (const x of Array.isArray(list) ? list : []) {
+    const id = TAB_MOVED[x] || x;
+    if (TAB_IDS.includes(id)) out.add(id);
+  }
+  return TAB_IDS.filter((x) => out.has(x));
+}
 
 // Разбор документа из хранилища: чинит недостающее, чтобы панель не падала на старых данных.
 function normalizeAcl(raw) {
@@ -106,7 +122,7 @@ function normalizeAcl(raw) {
       name: String(r.name || id),
       admin: !!r.admin,
       sites: sites(r.sites),
-      tabs: (Array.isArray(r.tabs) ? r.tabs : []).filter((x) => TAB_IDS.includes(x)),
+      tabs: migrateTabs(r.tabs),
     };
   }
   const defaultRole = roles[raw.defaultRole] ? raw.defaultRole : d.defaultRole;
@@ -116,7 +132,7 @@ function normalizeAcl(raw) {
     users[normEmail(em)] = {
       role: roles[u.role] ? u.role : defaultRole,
       sites: sites(u.sites),
-      tabs: (Array.isArray(u.tabs) ? u.tabs : []).filter((x) => TAB_IDS.includes(x)),
+      tabs: migrateTabs(u.tabs),
       note: String(u.note || "").slice(0, 200),
       first: String(u.first || ""),
       last: String(u.last || ""),
@@ -128,13 +144,21 @@ function normalizeAcl(raw) {
 
 function aclStore(env) { return (env && (env.ACL || env.VISITS)) || null; }
 
-async function loadAcl(env) {
+async function loadAcl(env, { strict = false } = {}) {
   const kv = aclStore(env);
-  if (!kv) return defaultAcl();
+  if (!kv) {
+    if (strict) throw new Error("acl_unavailable");
+    return defaultAcl();
+  }
   try {
     const raw = await kv.get(ACL_KEY, { type: "json" });
+    if (strict && raw !== null && (!raw || typeof raw !== "object" || Array.isArray(raw) ||
+        !raw.roles || typeof raw.roles !== "object" || Array.isArray(raw.roles))) throw new Error("acl_invalid");
     return normalizeAcl(raw);
-  } catch { return defaultAcl(); }
+  } catch (error) {
+    if (strict) throw error;
+    return defaultAcl();
+  }
 }
 
 async function saveAcl(env, acl) {

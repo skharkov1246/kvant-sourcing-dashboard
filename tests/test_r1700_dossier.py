@@ -1,0 +1,377 @@
+"""Досье машины R1700G: сведение разведки, своих позиций и генерация SQL.
+
+Корпус придуман (правило 18 CLAUDE.md): номера вида 999-0001 в каталоге Caterpillar
+не существуют, и это нарочно — тест проверяет логику сведения, а не данные.
+
+Что закреплено тестами (каждое — цена прошлой ошибки в подобных сборщиках):
+  • один и тот же номер из двух направлений даёт одну строку, а не две;
+  • аналоги из разных направлений копятся, а не затирают друг друга;
+  • вердикт «снят» не затирает «подтверждён» из второго прохода;
+  • своя позиция, которой нет в разведке, попадает в перечень, а не теряется;
+  • SQL идемпотентен по форме (on conflict do update) и экранирует кавычки.
+"""
+import importlib.util
+import json
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def _load(name):
+    """Модули zip/tools не пакет — грузим по пути, как это делает сборка сайта."""
+    path = ROOT / "zip" / "tools" / f"{name}.py"
+    spec = importlib.util.spec_from_file_location(f"_r1700_{name}", path)
+    mod = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = mod
+    spec.loader.exec_module(mod)
+    return mod
+
+
+dossier = _load("r1700_dossier")
+
+
+def test_norm_pn_сводит_написания():
+    assert dossier.norm_pn("1R-1808") == dossier.norm_pn("1r1808") == "1R1808"
+    assert dossier.norm_pn("423-8524") == "4238524"
+    assert dossier.norm_pn(None) == ""
+
+
+def test_merge_parts_сводит_дубли_и_копит_аналоги():
+    slices = {
+        "filters": {"rows": [{
+            "pn": "999-0001", "name_ru": "Фильтр придуманный", "node": "06 Фильтры и жидкости",
+            "qty": "1", "interval": "500 ч", "source": "https://example.test/a", "confidence": "med",
+            "verdict": "снят",
+            "alts": [{"brand": "ТестФильтр", "pn": "TF-1", "kind": "аналог"}],
+        }]},
+        "hyd": {"rows": [{
+            "pn": "999-0001", "name_ru": "", "name_en": "Imaginary Filter", "node": "",
+            "applic": "R1700G", "source": "https://example.test/b", "confidence": "high",
+            "verdict": "подтверждён",
+            "alts": [{"brand": "ДругойБренд", "pn": "DB-2", "kind": "аналог"}],
+        }]},
+    }
+    parts, alts = dossier.merge_parts(slices)
+    assert len(parts) == 1, "один номер — одна строка"
+    p = parts[0]
+    assert p["name_en"] == "Imaginary Filter", "пустое поле добирается из второго направления"
+    assert p["node"] == "06 Фильтры и жидкости", "непустой узел не затирается пустым"
+    assert p["confidence"] == "high", "доверие берётся лучшее"
+    assert p["verdict"] == "подтверждён", "«снят» не должен перебивать «подтверждён»"
+    assert len(p["alts"]) == 2 and len(alts) == 2, "аналоги копятся из обоих направлений"
+    assert len(p["sources"]) == 2, "источники копятся"
+    assert set(p["slices"]) == {"filters", "hyd"}
+
+
+def test_своя_позиция_без_разведки_попадает_в_перечень():
+    parts, alts = [], []
+    own = [{
+        "position_id": 1, "pp": 7, "kv": "KV-000999-9", "pn": "999-0002", "pns": ["999-0002"],
+        "name": "Насос придуманный", "node": "05 Гидравлика", "node_dossier": "05 Гидравлика",
+        "machine": "R1700G", "applications": "R1700G (тест)", "material": None, "hs": None,
+        "note": "тестовая строка", "qty_quarter": 2, "price_min": 10, "price_max": 20,
+        "price_cur": "EUR", "price_src": "тест", "bitrix_status": "продавали", "opendb_signal": None,
+        "crossrefs": [{"number": "X-1", "brand": "ТестБренд", "kind": "analog"},
+                      {"number": "X-2", "brand": "", "kind": "unknown"}],
+    }]
+    linked, added = dossier.link_own_to_parts(parts, alts, own)
+    assert added == 1 and linked == 1
+    p = parts[0]
+    assert p["verdict"] == "наша база" and p["confidence"] == "high"
+    assert p["kv"] == ["KV-000999-9"] and p["position_id"] == 1
+    assert p["price_eur_min"] == 10 and p["bitrix_status"] == "продавали"
+    assert len(p["alts"]) == 2, "кроссы из нашего разбора aliases становятся аналогами"
+    assert any(a["brand"] == "не определён" for a in p["alts"]), "номер без бренда не выбрасывается"
+    assert len(alts) == 2
+
+
+def test_своя_позиция_дополняет_строку_разведки():
+    parts, alts = dossier.merge_parts({"filters": {"rows": [{
+        "pn": "999-0003", "name_ru": "Элемент", "node": "06 Фильтры и жидкости",
+        "source": "https://example.test/c", "confidence": "low", "verdict": "подтверждён", "alts": [],
+    }]}})
+    own = [{
+        "position_id": 42, "pp": 3, "kv": "KV-000998-1", "pn": "9990003", "pns": ["9990003"],
+        "name": "Элемент наш", "node": "06 Фильтры", "node_dossier": "06 Фильтры и жидкости",
+        "machine": "R1700G", "applications": "R1700G", "material": None, "hs": None, "note": "",
+        "qty_quarter": 1, "price_min": 5, "price_max": 9, "price_cur": "EUR", "price_src": "тест",
+        "bitrix_status": None, "opendb_signal": "кросс не подтверждён", "crossrefs": [],
+    }]
+    linked, added = dossier.link_own_to_parts(parts, alts, own)
+    assert (linked, added) == (1, 0), "написание номера без дефиса — тот же номер"
+    assert parts[0]["position_id"] == 42 and parts[0]["kv"] == ["KV-000998-1"]
+    assert parts[0]["verdict"] == "подтверждён", "вердикт разведки сохраняется"
+
+
+def test_playbook_считается_от_цифр():
+    parts = [
+        {"pn": "999-0004", "alts": [], "verdict": "подтверждён", "price_usd": "", "confidence": "med",
+         "bitrix_status": "продавали"},
+        {"pn": "999-0005", "alts": [{"brand": "b", "pn": "1"}], "verdict": "снят", "price_usd": "10",
+         "confidence": "low"},
+    ]
+    steps = dossier.playbook(parts, [], [], {"importers": [], "rows": []}, {}, [])
+    text = json.dumps(steps, ensure_ascii=False)
+    assert steps, "шаги должны считаться даже на пустых каналах"
+    assert "999-0004" in text, "позиция с историей сделки попадает в первый шаг"
+    assert "снят" in text, "о снятых номерах предупреждаем отдельно"
+
+
+def test_sql_идемпотентен_и_экранирует():
+    sql = _load("r1700_sql")
+    assert sql.q("ООО \"Тест'ов\"") == "'ООО \"Тест''ов\"'"
+    assert sql.q("") == "null" and sql.q(None) == "null"
+    stmt = sql.ins("mach_parts", ["machine_key", "pn", "note"],
+                   [["R1700G", "999-0006", "строка с 'кавычкой'"]], conflict="machine_key, pn")
+    assert "on conflict (machine_key, pn) do update set note = excluded.note" in stmt
+    assert "''кавычкой''" in stmt
+    assert sql.ins("mach_parts", ["a"], []).startswith("-- mach_parts: нет строк")
+
+
+def test_досье_и_страница_собираются_на_живых_данных():
+    """Файл досье в репозитории должен быть целым и внутренне согласованным."""
+    p = ROOT / "zip" / "data" / "r1700.json"
+    if not p.exists():
+        return
+    d = json.loads(p.read_text(encoding="utf-8"))
+    assert d["schema"] == "kvant.r1700/1"
+    assert d["machine"]["key"] == "R1700G"
+    assert d["stats"]["parts"] == len(d["parts"])
+    assert d["stats"]["alts"] == len(d["alts"])
+    norms = [x["pn_norm"] for x in d["parts"]]
+    assert len(norms) == len(set(norms)), "в перечне не должно быть дублей по номеру"
+    for x in d["parts"]:
+        assert x["sources"], f"деталь {x['pn']} без источника"
+
+
+def test_число_из_цены_не_угадывает():
+    """Числовой спутник цены: разбираем только то, что является ценой целиком.
+
+    Корпус придуман. До этой правки цена лежала в базе текстом, и агрегаты по
+    ней считались лексикографически: по рублям выходил «минимум» 1158.30 при
+    «максимуме» 846.00. Спутник обязан быть пустым там, где строка несёт
+    оговорку, иначе оговорка потеряется, а число окажется выдуманным.
+    """
+    num = _load("r1700_sql").num
+    # чистые цены
+    assert num("5143.89") == 5143.89
+    assert num("846") == 846.0
+    assert num(" 78.60 ") == 78.6
+    assert num(12.5) == 12.5 and num(7) == 7.0
+    # разделитель тысяч запятой — та же цена
+    assert num("1,240.88") == 1240.88
+    assert num("688,990") == 688990.0
+    # запятая как десятичный знак не поддерживается: «1,24» неотличимо от «1,240»
+    assert num("1,24") is None
+    # оговорка важнее удобства: числом такие строки не становятся
+    assert num("0.46 OEM / 0.15 аналог (за дюйм)") is None
+    assert num("от 500") is None
+    assert num("713.60 / 10 Pieces(MOQ)") is None
+    assert num("1 на колесо") is None
+    assert num("~120") is None
+    assert num("-5") is None
+    # пустое и мусор
+    assert num(None) is None and num("") is None and num("   ") is None
+    assert num(True) is None and num(False) is None
+
+
+def test_решение_владельца_о_каналах_доезжает_до_базы():
+    """«Русских не рассматриваем» должно быть колонкой, а не только на странице.
+
+    Кто читает базу мимо страницы, обязан получить тот же лист запроса.
+    """
+    src = (ROOT / "zip" / "tools" / "r1700_sql.py").read_text(encoding="utf-8")
+    assert '"ru", "ask"' in src, "флаги решения владельца не пишутся в mach_channels"
+    ddl = (ROOT / "zip" / "supabase" / "migrations.sql").read_text(encoding="utf-8")
+    assert "add column if not exists ask boolean" in ddl
+    assert "create or replace view mach_channels_ask" in ddl
+    # представление не должно пропускать российские компании
+    view = ddl.split("create or replace view mach_channels_ask")[1]
+    assert "coalesce(ask, not coalesce(ru, false))" in view
+    # числовые спутники объявлены
+    assert "add column if not exists price_num numeric" in ddl
+    assert "add column if not exists price_usd_num numeric" in ddl
+
+
+def test_в_лист_запроса_не_попадают_снятые_и_российские():
+    """Корпус придуман. Проверка снимает канал, когда он не подтвердился.
+
+    До этой правки ask считался как «не российский», и три поставщика с
+    вердиктом «снят» оставались в листе запроса: один торгует гусеничной
+    ходовой (для колёсной ПДМ неприменима), у второго источник оказался от
+    другой машины. Письмо такому поставщику — ровно то, ради чего проверка и
+    делалась. «Сомнителен» из листа не убираем: запрос и есть способ снять
+    сомнение.
+    """
+    orgs = _load("r1700_dossier").orgs
+    slices = {"dealers": {"rows": [
+        {"org": "Foreign Dealer Ltd", "country": "AE", "verdict": "подтверждён"},
+        {"org": "Wrong Machine Parts Inc", "country": "US", "verdict": "снят"},
+        {"org": "Maybe Trading Co", "country": "CN", "verdict": "сомнителен"},
+        {"org": "ООО «Запчасть»", "country": "RU", "verdict": "подтверждён"},
+        {"org": "Российская компания", "country": "", "verdict": "подтверждён"},
+        {"org": "  ", "country": "DE", "verdict": "подтверждён"},
+    ]}}
+    out = orgs(slices)
+    assert len(out) == 5, "строка без названия в перечень не идёт"
+    ask = sorted(o["org"] for o in out if o["ask"])
+    assert ask == ["Foreign Dealer Ltd", "Maybe Trading Co"], ask
+    # снятые и российские остаются в данных, но помечены
+    ru = sorted(o["org"] for o in out if o["ru"])
+    assert ru == ["ООО «Запчасть»", "Российская компания"], ru
+    dropped = [o for o in out if o["verdict"] == "снят"]
+    assert len(dropped) == 1 and not dropped[0]["ask"], "снятый остаётся в данных, но не в запросе"
+
+
+def test_признаки_сверяются_с_ведомостью_и_не_врут_о_проверке():
+    """Корпус придуман. Звено «признак → дефект» появляется впервые.
+
+    Две вещи, которые здесь легче всего испортить: сослаться на номер, которого
+    у машины нет, и выдать общую инженерную практику за документ. Номер, не
+    сошедшийся с ведомостью, не выбрасывается молча, а попадает в
+    unknown_parts — иначе следующая ошибка снова будет неизмеримой.
+    """
+    faults = _load("r1700_dossier").faults
+    parts = [{"pn": "999-0001"}, {"pn": "999-0002"}]
+    slices = {"faults": {"rows": [
+        {"symptom": "Стук в приводе под нагрузкой", "node": "07 Трансмиссия",
+         "parts": ["999-0001", "999-0009"], "verdict": "подтверждён", "confidence": "med"},
+        {"symptom": "Перегрев масла", "node": "05 Гидравлика",
+         "parts": ["999-0002"], "verdict": "не проверялся"},
+        {"symptom": "   ", "node": "01 Двигатель", "parts": ["999-0001"]},
+    ]}}
+    out = faults(slices, parts)
+    assert len(out) == 2, "строка без признака в звено не идёт"
+    first = [x for x in out if x["node"] == "07 Трансмиссия"][0]
+    assert first["parts"] == ["999-0001"], "номер не из ведомости в строку не попадает"
+    assert first["unknown_parts"] == ["999-0009"], "несведённый номер обязан быть виден"
+    second = [x for x in out if x["node"] == "05 Гидравлика"][0]
+    assert second["verdict"] == "не проверялся"
+    assert second["confidence"] == "low", "без указания доверия ставится низкое"
+    # порядок: по узлу, затем по признаку — чтобы дифф файла был читаемым
+    assert [x["node"] for x in out] == sorted(x["node"] for x in out)
+
+
+def test_в_звено_цепочки_идёт_только_подтверждённое():
+    """Счётчик заполняемости не должен считать общую практику знанием.
+
+    Строка с вердиктом «не проверялся» — это практика по вращающемуся
+    оборудованию, а не наш документ. Если считать её, счётчик покажет знание,
+    которого у нас нет.
+    """
+    # Проверяем результат, а не текст кода: счётчик может считаться как угодно,
+    # но в клетке обязано лежать ровно подтверждённое. Прежняя версия этого
+    # теста искала в сборщике строку 'put("gsho", "symptom"' и покраснела от
+    # безобидного рефакторинга, ничего не сказав о самих цифрах.
+    p = ROOT / "data" / "chain_coverage.json"
+    if not p.exists():
+        return
+    cov = json.loads(p.read_text(encoding="utf-8"))
+    gsho = [s for s in cov["segments"] if s["segment"] == "gsho"][0]
+    cells = {c["link"]: c["n"] for c in gsho["cells"]}
+    dossier = json.loads((ROOT / "zip" / "data" / "r1700.json").read_text(encoding="utf-8"))
+    ok = {x["symptom"] for x in dossier.get("faults", []) if x["verdict"] == "подтверждён"}
+    assert cells["symptom"] == len(ok), "в клетку «признак» попало больше, чем подтверждено"
+    assert cells["symptom"] < len(dossier.get("faults", [])), "подтверждено не может быть всё"
+
+
+def test_дубль_по_домену_сводится_а_справочник_не_адресат():
+    """Корпус придуман. Два письма в один адрес — деньги и репутация на ветер.
+
+    Одна организация приходила двумя строками из разных направлений. Отдельно:
+    «маркетплейс» носят и витрины, куда запрос уходит формой, и справочные
+    каталоги применяемости, которые вообще ничего не продают. Поэтому
+    справочники отсекаются закрытым списком по домену, а не по признаку.
+    """
+    mod = _load("r1700_dossier")
+    slices = {"dealers": {"rows": [
+        {"org": "Foreign Dealer Ltd", "country": "AE", "site": "https://www.example-ae.com/",
+         "verdict": "подтверждён", "note": "полная строка"},
+        {"org": "Foreign Dealer (example-ae.com)", "country": "AE", "site": "https://example-ae.com/parts",
+         "verdict": "подтверждён"},
+        {"org": "Справочный каталог", "country": "US", "site": "https://777parts.net/caterpillar.html",
+         "kind": "маркетплейс", "verdict": "подтверждён"},
+        {"org": "Витрина с формой", "country": "CN", "site": "https://x.en.made-in-china.com/",
+         "kind": "маркетплейс", "verdict": "подтверждён"},
+    ]}}
+    out = mod.orgs(slices)
+    ask = sorted(o["org"] for o in out if o["ask"])
+    assert ask == ["Foreign Dealer Ltd", "Витрина с формой"], ask
+    dup = [o for o in out if o.get("dup_of")]
+    assert len(dup) == 1 and dup[0]["dup_of"] == "Foreign Dealer Ltd"
+    cat = [o for o in out if o["org"] == "Справочный каталог"][0]
+    assert "не продавец" in cat["ask_off"], "причина обязана быть у строки, а не в заголовке"
+    # витрина остаётся: запрос по ней уходит формой площадки
+    assert [o for o in out if o["org"] == "Витрина с формой"][0]["ask"]
+
+
+def test_адрес_не_придумывается_а_мёртвый_канал_уходит_из_запроса():
+    """Корпус придуман. Сконструированный «info@<домен>» — догадка, не адрес."""
+    mod = _load("r1700_dossier")
+    org_rows = [
+        {"org": "С почтой", "email": "", "ask": True, "ru": False},
+        {"org": "Только форма", "email": "", "ask": True, "ru": False},
+        {"org": "Мёртвый сайт", "email": "", "ask": True, "ru": False},
+        {"org": "Своя почта уже была", "email": "old@example.com", "ask": True, "ru": False},
+    ]
+    slices = {"contacts": {"rows": [
+        {"org": "С почтой", "email": "sales@example.com", "lang": "en", "verdict": "подтверждён"},
+        {"org": "Только форма", "email": "", "contact_form": "https://example.com/rfq",
+         "lang": "zh", "verdict": "подтверждён"},
+        {"org": "Мёртвый сайт", "email": "", "verdict": "снят", "note": "домен не резолвится"},
+        {"org": "Своя почта уже была", "email": "new@example.com", "verdict": "подтверждён"},
+    ]}}
+    stat = mod.contacts(slices, org_rows)
+    by = {o["org"]: o for o in org_rows}
+    assert by["С почтой"]["email"] == "sales@example.com"
+    assert by["Только форма"]["email"] == "" and by["Только форма"]["contact_form"]
+    assert by["Мёртвый сайт"]["ask"] is False and "снят" in by["Мёртвый сайт"]["ask_off"]
+    assert by["Своя почта уже была"]["email"] == "old@example.com", "свой адрес не перетирается"
+    assert stat["почта добавлена"] == 1 and stat["снято по контактам"] == 1
+
+
+def test_один_адрес_не_получает_два_письма():
+    """Корпус придуман. Бренд, чей бизнес передан другому владельцу, честно
+    получает адрес нового владельца — но в листе запроса это два письма на один
+    ящик. Побеждает строка с бо́льшим доверием; письмо всё равно назовёт обе
+    номенклатуры. Строки не удаляются.
+    """
+    dedupe = _load("r1700_dossier").dedupe_by_email
+    rows = [
+        {"org": "Владелец бренда", "email": "sales@example.com", "confidence": "high", "ask": True},
+        {"org": "Переданный бренд", "email": "Sales@Example.com", "confidence": "med", "ask": True},
+        {"org": "Другая контора", "email": "other@example.com", "confidence": "high", "ask": True},
+        {"org": "Уже не в листе", "email": "sales@example.com", "confidence": "high", "ask": False},
+        {"org": "Без адреса", "email": "", "confidence": "low", "ask": True},
+    ]
+    assert dedupe(rows) == 1
+    by = {o["org"]: o for o in rows}
+    assert by["Владелец бренда"]["ask"] is True, "остаётся строка с бо́льшим доверием"
+    assert by["Переданный бренд"]["ask"] is False
+    assert by["Переданный бренд"]["dup_of"] == "Владелец бренда"
+    assert "тот же адрес запроса" in by["Переданный бренд"]["ask_off"]
+    # выпавшую по другой причине строку адрес уже не касается
+    assert by["Уже не в листе"].get("dup_of") is None
+    assert by["Другая контора"]["ask"] is True and by["Без адреса"]["ask"] is True
+
+
+def test_адрес_из_архива_помечен():
+    """Снимку бывает больше года — такой адрес нельзя подавать как проверенный."""
+    mod = _load("r1700_dossier")
+    org_rows = [{"org": "Живая страница", "email": "", "ask": True, "ru": False},
+                {"org": "Только архив", "email": "", "ask": True, "ru": False}]
+    slices = {"contacts": {"rows": [
+        {"org": "Живая страница", "email": "a@example.com",
+         "url": "https://example.com/contact", "verdict": "подтверждён"},
+        {"org": "Только архив", "email": "b@example.com",
+         "url": "https://web.archive.org/web/2025/https://example.org/contact",
+         "verdict": "подтверждён"},
+    ]}}
+    stat = mod.contacts(slices, org_rows)
+    by = {o["org"]: o for o in org_rows}
+    assert by["Живая страница"]["contact_archived"] is False
+    assert by["Живая страница"].get("contact_src") is None
+    assert by["Только архив"]["contact_archived"] is True
+    assert "архивного снимка" in by["Только архив"]["contact_src"]
+    assert stat["адрес из архивного снимка"] == 1

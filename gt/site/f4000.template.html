@@ -104,12 +104,34 @@ details.facts summary{cursor:pointer;color:var(--s1);font-size:13px}
 <details class="facts"><summary>Фактура раскрутки с источниками (__N_FACTS__)</summary><div id="facts"></div></details>
 </div>
 
+<!-- Общие правки инженеров: общая база, перенос старых заметок и подпись автора. См. gt/site/index.template.html -->
+<script src="./notes.js"></script>
 <script>
 const F = __F4000_JSON__;
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let M; try{ M = JSON.parse(localStorage.getItem('gt_4000f_v1')) || {}; }catch(e){ M={}; }
 M.st=M.st||{}; M.note=M.note||{};
-const save=()=>{ try{ localStorage.setItem('gt_4000f_v1', JSON.stringify(M)); }catch(e){} };
+/* Общая база правок: заметки и статусы коллег подтягиваются сюда, старые браузерные
+   правки переносятся туда. Локальное важнее для скорости, серверное — чтобы видели коллеги. */
+function notesBoot(){
+ if(!window.KVN) return;
+ const scope='f4000';
+ KVN.me();
+ KVN.seedStore(scope, M, ['st','note']);   // снимок ДО подтягивания: иначе первая правка отправит всё заново
+ KVN.load(scope).then(()=>KVN.migrate()).then(()=>{
+  KVN.rows().forEach(r=>{                  // серверное ставим только туда, где локально пусто
+   if(r.scope!==scope || r.removed || !r.text) return;
+   if(r.kind==='note' && !M.note[r.key]) M.note[r.key]=r.text;
+   if(r.kind==='st'   && !M.st[r.key])   M.st[r.key]=r.text;
+  });
+  KVN.seedStore(scope, M, ['st','note']);  // и ПОСЛЕ: подтянутое уже лежит в базе, слать обратно незачем
+  save(); render();
+ });
+}
+notesBoot();
+const save=()=>{ try{ localStorage.setItem('gt_4000f_v1', JSON.stringify(M)); }catch(e){}
+ if(window.KVN) KVN.syncStore('f4000', M, ['st','note']);   // в базу уйдёт только изменившееся
+};
 const ST=[['sent','📨 отправлено'],['rep','💬 ответил'],['kp','📄 КП'],['no','❌ отказ']];
 const TIERS={
  indep_proven_maker:['★ Независимые с опытом на 94.3A и собственным производством','Первая волна запросов: доказанный опыт именно на этой платформе плюс своё производство компонентов.'],
@@ -142,7 +164,7 @@ function coRow(c){
    ${c.evidence?`<div class="ev">Доказательство: ${esc(c.evidence).replace(/(https?:\/\/\S+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>')}</div>`:''}</div>
   <div><div class="stbar">${ST.map(([v,n])=>`<button class="st${st===v?' on-'+v:''}" data-st="${v}">${n}</button>`).join('')}
    <button class="st" data-st="note">✏</button></div>
-   ${note?`<div class="snote">${esc(note)}</div>`:''}</div>
+   ${note?`<div class="snote">${esc(note)}${(()=>{const s=window.KVN&&KVN.get('note',[k]);return s&&s.author?`<div class="mut" style="font-size:11px;margin-top:3px">${esc(KVN.signature(s, note))}</div>`:'';})()}</div>`:''}</div>
  </div>`;
 }
 function render(){

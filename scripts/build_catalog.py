@@ -32,10 +32,12 @@ DATA_DIRS = {
     "data": "дашборд сорсеров",
     "ove/data": "ОВЭ-75",
     "gt/data": "ГТУ-библиотека",
+    "library/data": "библиотека рынков",
     "zip/data": "база ЗИП",
     "zip/customs/out": "база ЗИП · таможня",
     "gpu/data": "ГПУ-библиотека",
     "gidromet/data": "гидрометаллургия",
+    "pnw/data": "каталог PN · данные",
     "pnw/public": "каталог PN (веб)",
 }
 CODE_EXT = {".py", ".js", ".mjs", ".html", ".yml", ".yaml", ".toml"}
@@ -50,6 +52,7 @@ SENSITIVE_MARKERS = [
      "выручка и маржа сделок"),
     (re.compile(r'"(executor|assessment|eng|prof)"\s*:', re.I), "оценки и данные сотрудников"),
     (re.compile(r'"(importer|exporter)"\s*:\s*"', re.I), "участники внешнеэкономических сделок"),
+    (re.compile(r'"(price_rub|sum_rub)"\s*:', re.I), "договорные цены контрагентов"),
 ]
 
 
@@ -115,7 +118,15 @@ def consumers(rel: str, code_files: list[Path]) -> list[str]:
 
 
 def build() -> dict:
-    tracked = [ROOT / p for p in sh("git", "ls-files").splitlines() if p]
+    # Файлы берём отслеживаемые ПЛЮС новые, ещё не закоммиченные (но не игнорируемые).
+    # Иначе каталог собирается с разным составом до и после коммита: новый сборщик
+    # в момент локального прогона git не видит, а в CI он уже в индексе — и проверка
+    # --check краснеет на каждом PR, который добавляет файл кода. Так дважды падал
+    # гейт (PR #210 и #234). В CI дерево чистое, поэтому --others там ничего не добавляет
+    # и поведение не меняется; меняется только локальный прогон, который теперь
+    # предсказывает результат CI точно.
+    listed = sh("git", "ls-files", "--cached", "--others", "--exclude-standard")
+    tracked = [ROOT / p for p in dict.fromkeys(listed.splitlines()) if p]
     code_files = [f for f in tracked if f.suffix in CODE_EXT and f.exists()
                   and "public/index.html" not in str(f) and f.stat().st_size < 3_000_000]
     notes = json.loads(NOTES.read_text(encoding="utf-8")) if NOTES.exists() else {}
@@ -169,6 +180,17 @@ def build() -> dict:
     }
 
 
+def untracked_datasets(cat: dict) -> list[str]:
+    """Наборы каталога, которых git не знает.
+
+    Сборщик намеренно берёт и неотслеживаемые файлы: иначе --check краснеет на
+    каждом PR, добавляющем файл кода. Обратная сторона — файл, лежащий в дереве,
+    но не вошедший в коммит, попадает в каталог у нас и отсутствует в CI.
+    """
+    known = set(sh("git", "ls-files", "--cached").splitlines())
+    return [d["path"] for d in cat["datasets"] if d["path"] not in known]
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description="Сборка каталога данных репозитория")
     ap.add_argument("--check", action="store_true", help="только проверить, что каталог актуален")
@@ -197,9 +219,33 @@ def main() -> int:
                 out["main_collection"] = {k: v for k, v in mc.items() if k != "records"}
             return out
 
-        strip = lambda c: [shape(d) for d in c["datasets"]]
-        if strip(old) != strip(fresh):
-            print("✗ каталог данных устарел — выполните: python scripts/build_catalog.py", file=sys.stderr)
+        strip = lambda c: {d["path"]: shape(d) for d in c["datasets"]}
+        was, now = strip(old), strip(fresh)
+        if was != now:
+            # Раньше здесь была одна строка «устарел», и по ней нельзя было понять
+            # ни что разошлось, ни почему. Разбор занимал отдельный клон ветки.
+            # Теперь расхождение называется поимённо: гейт падает на чужой машине,
+            # а чинить его приходится по журналу.
+            print("✗ каталог данных устарел — выполните: python scripts/build_catalog.py",
+                  file=sys.stderr)
+            add, gone = sorted(set(now) - set(was)), sorted(set(was) - set(now))
+            for rel in add:
+                print(f"   в каталоге нет набора: {rel}", file=sys.stderr)
+            for rel in gone:
+                print(f"   в каталоге есть, а на диске нет: {rel}", file=sys.stderr)
+            for rel in sorted(set(was) & set(now)):
+                if was[rel] != now[rel]:
+                    diff = sorted(f for f in set(was[rel]) | set(now[rel])
+                                  if was[rel].get(f) != now[rel].get(f))
+                    print(f"   изменился набор {rel}: поля {', '.join(diff)}", file=sys.stderr)
+            # Самая частая причина расхождения — незакоммиченный файл данных:
+            # сборщик берёт и неотслеживаемые (иначе --check краснеет на каждом
+            # PR с новым файлом кода), а гейт видит только коммит.
+            if untracked_datasets(fresh):
+                print("   ↳ эти наборы не в git, поэтому в CI их не будет: "
+                      + ", ".join(untracked_datasets(fresh)), file=sys.stderr)
+                print("   ↳ сначала git commit, потом build_catalog.py — "
+                      "порядок описан в CLAUDE.md, правило 6", file=sys.stderr)
             return 1
         print(f"✓ каталог актуален: {len(fresh['datasets'])} наборов")
         return 0
@@ -208,6 +254,18 @@ def main() -> int:
     s = fresh["summary"]
     print(f"✓ {OUT.relative_to(ROOT)}: {s['datasets']} наборов, "
           f"{s['total_bytes'] / 1e6:.1f} МБ, по чувствительности: {s['by_sensitivity']}")
+    # Набор, которого нет в git, попадёт в каталог у нас и не попадёт в CI:
+    # у него пустые дата, автор и хеш, а гейт считает состав по коммиту. Так
+    # гейт упал на ветке claude/r1700-ibghje 17.09.2026 — в дереве лежал файл
+    # от фоновой разведки, не вошедший в коммит.
+    #
+    # Имена наборов здесь намеренно не пишутся: consumers() считает потребителем
+    # любой файл кода, где встретилось имя файла данных, — и упоминание в
+    # комментарии само добавило бы этот сборщик в referenced_by набора.
+    miss = untracked_datasets(fresh)
+    if miss:
+        print("  ! не в git, в CI этих наборов не будет — закоммить их до сборки "
+              "каталога: " + ", ".join(miss))
     return 0
 
 

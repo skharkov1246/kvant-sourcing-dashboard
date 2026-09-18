@@ -1,0 +1,81 @@
+{
+ "updated": "2026-09-18",
+ "source": "Группы витрин, принадлежащих одному оператору. Собрано разбором подвалов, кода страниц и складских номеров при перепроверке заявки ЛУКОЙЛ 17–18.09.2026.",
+ "why": "«Два независимых продавца» — главный довод, которым закрывается строка: одна цена может быть наценкой одного перепродавца, две совпадающие цены разных компаний — уже рынок. За ночь этот довод развалился шесть раз: витрины оказывались одним оператором под разными вывесками. Поэтому признак независимости считается по этому списку, а не на глаз по разным доменам.",
+ "method": "Группа записывается только при ПРЯМОЙ улике на странице: общий объект в коде, общий складской номер, общая почта или телефон, посимвольно совпадающее описание. Похожесть дизайна или соседство в выдаче уликой не считаются.",
+ "groups": [
+  {
+   "group": "Sonepar (платформа Net1)",
+   "kind": "дистрибьюторская группа",
+   "domains": [
+    "northcoast.com",
+    "codale.com",
+    "needco.com",
+    "irby.com",
+    "1sourcedist.com",
+    "revereelectric.com",
+    "stateelectric.com"
+   ],
+   "evidence": "В коде страниц объект Sonepar.Net1.CurrentPricing, в подвале ссылки вида sonepar.com/go/North-Coast/ и sonepar.com/go/Codale/. Цены между филиалами РАСХОДЯТСЯ (например 10 557,83 против 12 452,38 по одному номеру), то есть прайс не единым файлом, а по филиалам — но независимости это не даёт.",
+   "affects": "Весь блок Allen-Bradley и Rockwell в заявке: именно здесь стоят цены нового авторизованного канала."
+  },
+  {
+   "group": "Оператор из Сямыня (camvect / cambia)",
+   "kind": "перепродавец под несколькими вывесками",
+   "domains": [
+    "camvect.com",
+    "cambia.cn",
+    "newgenplc.com",
+    "plcdcspro.com",
+    "topbrandsplc.com"
+   ],
+   "evidence": "Все витрины сидят на двух общих почтовых доменах camvect.com и cambia.cn: newgenplc@camvect.com и manskiwong@cambia.cn, price@camvect.com и trixie@cambia.cn, ask@camvect.com, topbrandsplc@camvect.com и sales7@cambia.cn. Отдельная улика против их наличия: карточка одной из витрин указывает в характеристиках ЧУЖОЙ модельный номер — признак скопированного каталога, а не склада.",
+   "affects": "Снятая номенклатура Bently Nevada и ProSoft: там это единственные «продавцы», которые вообще отдают карточку."
+  },
+  {
+   "group": "Aeliya Marine Tech (Индия)",
+   "kind": "перепродавец под несколькими вывесками",
+   "domains": [
+    "aeliyamarinetech.com",
+    "aeliyamarine.net",
+    "aeliyamarine.com",
+    "auto2mation.com"
+   ],
+   "evidence": "Один складской номер на разных доменах (SKU 51337), одинаковая цена и одинаковая перечёркнутая цена, посимвольно совпадающее описание вплоть до строки с номером Solar и ревизией логики, одинаковый остаток. Телефоны из одного блока +91 97252 185-32/35/36/37, причём на страницах одного домена прописаны сразу три номера «конкурентов».",
+   "affects": "Контроллер противоаварийной защиты Det-Tronics: весь остаток по строке — один пул на четыре витрины."
+  },
+  {
+   "group": "Modern Group",
+   "kind": "одна компания, две витрины",
+   "domains": [
+    "moderngroup.com",
+    "modernequipmentparts.com"
+   ],
+   "evidence": "Общая почта gparts@moderngroup.com и общий телефон +1 800 219 9773 на обеих витринах.",
+   "affects": "Фильтроэлементы Cummins: по одному номеру это был единственный продавец вообще."
+  },
+  {
+   "group": "FPS Technologies / FastPartsSource",
+   "kind": "заявочная витрина под несколькими именами",
+   "domains": [
+    "surplusstock.parts",
+    "fastpartssource.com",
+    "fpstechnologies.in"
+   ],
+   "evidence": "В разметке Organization на витрине стоят почта info@fpstechnologies.in, телефон +91 9754513579 и ссылки на соцсети fastpartssource. Цену витрина не публикует вовсе: в offers есть priceCurrency, а ключа price нет.",
+   "affects": "Расходники Cummins: витрина пишет «IN STOCK», не публикуя цены."
+  },
+  {
+   "group": "Hard-To-Find / turbine.parts",
+   "kind": "один оператор под четырьмя доменами",
+   "domains": [
+    "hard-to-find.parts",
+    "hardtoget.parts",
+    "turbine.parts",
+    "zip-solutions.com"
+   ],
+   "evidence": "Прямая улика в коде страницы: zip-solutions.com отдаёт документ с «<base href=\"https://hard-to-find.parts/\">» — то есть это буквально тот же сайт. Меню и подвал (COMPANY · VENDORS · SHOP · WANTED · STOCK · CONTACT) и слоган «Hard-To-Find Equipment & Spare Parts | Genuine | Obsolete | Discontinued | OEM Certified | Highly Experienced Non-OEM Manufacturers» совпадают с turbine.parts посимвольно. Телефон +7 495 1081005 и одна маска почты общие у hardtoget.parts и hard-to-find.parts; почта группы — info@hard-to-find.parts и hello@turbine.parts.",
+   "affects": "Сток-лист, по которому измерено пересечение с заявкой (78 наших номеров), принадлежит ЭТОМУ оператору. Значит строка, ссылающаяся и на turbine.parts, и на hardtoget.parts, опирается на ОДИН источник, а не на два. Сюда же попадает фильтроэлемент газового топлива Solar, по которому вердикт «занижена» вынесен по ask именно этого листа."
+  }
+ ]
+}

@@ -1,0 +1,653 @@
+{
+ "brands": [
+  {
+   "scope": "osborn-astec",
+   "identities": [
+    {
+     "brand": "Telsmith, Inc. (Мекуон, Висконсин, США)",
+     "model": "Модель 3858 (зев 965 × 1473 мм / 38 × 58 дюймов)",
+     "relation": "Исходная конструкция и исходное имя машины. Важное уточнение по постановке задачи: в собственной литературе Telsmith 3858 проходит НЕ как серия Iron Giant, а как самостоятельная модель. В корпоративной брошюре Telsmith 2019 г. раздел «Jaw Crushers» разделён так: Hydra-Jaw (2238, 2550, 3244, 3450), IRON GIANT — «available in two sizes: 4448 (1118×1219 мм) и 5060 (1270×1524 мм)», затем отдельными позициями «MODEL 3858 (965 mm × 1473 mm)», «MODEL 3258 (813 mm × 1473 mm)» и «MODELS 3042 … THRU 3648». Профильная брошюра серии озаглавлена буквально «TELSMITH 5060 & 4448 IRON GIANT SERIES JAW CRUSHERS» — упоминаний 3858/3258 в ней нет (проверено извлечением текста PDF). Практический вывод: при поиске запчастей запрос «Iron Giant 3858» уводит в сторону; корректный ключ — «Telsmith 3858» либо прямой номер детали.",
+     "evidence": "Корпоративная брошюра Telsmith 2019 (PDF, извлечение текста): «IRON GIANT SERIES … Available in two sizes: 4448 (1,118mm x 1,219mm) … 5060 (1,270mm x 1,524mm)»; «MODEL 3858 (965 MM X 1,473 MM) … features hydraulic chamber clearing and overload relief». Брошюра серии Iron Giant (PDF): заголовок «TELSMITH 5060 & 4448 IRON GIANT SERIES JAW CRUSHERS», вхождений «3858» — 0. Существование заводского каталога деталей именно на 3858 подтверждается публикацией «Telsmith 3858 Jaw Crusher Parts Catalog».",
+     "parts_system": "Собственная система Telsmith формата «две буквы – 3 цифры – 3–4 цифры (+ буква исполнения)»: 273-xxxx — группа дробящих/камерных деталей, 277-xxx — смежная группа. Совпадает с номерами заказчика (DA-273-1917W, FA-273-1917, ZF-273-1922, CN/CP-273-1923, A-/BA-/BB-277-619, B1-277-601). Независимое подтверждение формата на другой машине того же поколения: щёки 44×48 IG — WG-273-918 (неподвижная) и XG-273-918 (подвижная). Параллельно у Telsmith/Astec идут 7-значные чисто числовые номера (у заказчика — 1082397, 1050402, 1064057), характерные для покупных и стандартных изделий; внутренние коды вида 14T47, 62H48, 65D47 — заводские коды покупных позиций, вовне не котируются.",
+     "market": "Глобально. Производство в Мекуоне (Висконсин) остановлено 14.08.2020, площадка закрыта к 31.03.2021; продуктовые линии Telsmith переведены на другие площадки Astec, поддержка и запчасти — через прямой и дилерский каналы Astec.",
+     "urls": [
+      "https://crushingandscreening.com/uploads/2020/02/Telsmith-Product-Overview.pdf",
+      "https://cdn.website-editor.net/0aa5c8c8bf0f4cbc90c7591420430079/files/uploaded/Iron-Giant-Series-Jaw-Crushers.pdf",
+      "https://www.scribd.com/document/476121345/3858-Parts-Catalogue",
+      "https://miningspareparts.com/en/product/telsmith_44x48_jaw_plate/",
+      "https://www.equipmentjournal.com/construction-news/telsmith-astec-crusher-wisconsin/"
+     ],
+     "confidence": "высокая"
+    },
+    {
+     "brand": "Astec Industries (единый бренд ASTEC)",
+     "model": "Те же модельные коды под маркой Astec: Iron Giant 4448IG / 5060IG, Hydra-Jaw 2238H / 3244H / 3450H; новая линия A-Series (A50)",
+     "relation": "Та же конструкция под другим именем — по причине смены владельческого бренда, а не переработки машины. С 2021 г. Astec провела консолидацию «OneASTEC»: Telsmith, Osborn, KPI-JCI, Astec Mobile Screens, Breaker Technology (BTI), Peterson, Roadtec сведены под единую марку ASTEC и единый сайт. В прайс-листах дилеров дробилки Telsmith фигурируют уже как Astec/KPI-JCI с индексом IG. Отдельной позиции 3858 в актуальной номенклатуре Astec/KPI-JCI не обнаружено — модель, судя по всему, снята с производства и живёт только как объект сервиса и запчастей. Новая A-Series (первая модель A50, март 2026) заявлена как синтез наработок Pioneer, Telsmith и Osborn — то есть преемник, но не тождество.",
+     "evidence": "Пресс-релиз о ребрендинге Osborn под маркой Astec (2021) с перечнем сведённых брендов; перечень моделей дилерского канала KPI-JCI/Astec: 2742, 2650, 3055, 3365, 4448IG, 5060IG, 2238H, 3244H, 3450H (3858 отсутствует); карточка «4448IG Iron Giant Jaw Crusher From: Astec Industries Inc.»; статья о запуске A50 с прямым указанием на наследие Pioneer, Telsmith и Osborn.",
+     "parts_system": "Номера Telsmith сохраняются в каталогах Astec; поверх них действует единая номенклатура Astec Parts. Практически: номера 273-/277- остаются рабочим ключом поиска.",
+     "market": "Глобально, через прямой канал Astec и дилерскую сеть; в Африке/на Ближнем Востоке — через Astec Industries Africa & Middle East (Эландсфонтейн, ЮАР).",
+     "urls": [
+      "https://www.engineeringnews.co.za/article/osborn-engineered-products-unites-under-new-astec-industries-brand-2021-08-13",
+      "https://www.ironpros.com/product-categories/aggregates/crushers/jaw-crushers/product/22897639/astec-industries-inc-4448ig-iron-giant-jaw-crusher",
+      "https://www.engineeringnews.co.za/article/new-jaw-crusher-promises-safer-operation-2026-03-19",
+      "https://astecindustries.com/product-type/aggregates/crushing/jaw-crushers/",
+      "https://www.miningweekly.com/article/osborn-engineered-products-and-astec-industries-africa-middle-east-2020-04-29"
+     ],
+     "confidence": "высокая"
+    },
+    {
+     "brand": "Osborn Engineered Products SA (Pty) Ltd (Эландсфонтейн, ЮАР)",
+     "model": "Лицензионный ряд Osborn Telsmith в дюймах: 8×12, 5×24, 10×21, 12×36, 14×24, 20×36, 25×36, 30×42 (SA3042), 42×48, 50×60 — по фирменной брошюре «Osborn Telsmith Jaw Crusher (SA)», ref. 1-CJM-2002. Аftermarket-каталоги добавляют 10×36, 15×24, 18×32, 25×40, 36×46, 44×48, 60×48, а также 32×48, 38×48, 48×28/36/42, 47×60. Модели 38×58 (3858) в ряду Osborn НЕ НАЙДЕНО.",
+     "relation": "Лицензионная сборка. Факт лицензии подтверждён однозначно и на нескольких источниках: Osborn выпускает щековые дробилки конструкции Telsmith в ЮАР с 1950 г., машины при этом дорабатывались под южноафриканскую крепкую породу и «фактически стали южноафриканскими изделиями». Модельные индексы Osborn совпадают с индексами Telsmith по конструктиву «дюйм×дюйм», поэтому Osborn 3042 = Telsmith 3042. НО: лицензионный ряд Osborn — это классическое «имперское» поколение Telsmith типов B/C/D (роликоподшипниковые, с клиновой регулировкой), а 3858 относится к позднему поколению с гидравликой (гидроочистка камеры, гидроразгрузка от недробимого). Прямого соответствия Osborn для 38×58 не обнаружено ни в фирменной брошюре, ни в каталогах CMS Cepcor (Osborn Telsmith), ни в перечнях независимых поставщиков, ни в объявлениях о продаже техники в ЮАР. Ближайшие по типоразмеру машины Osborn — 42×48 (4248) и 38×48 (3848) снизу, 50×60 (5060) сверху; ни та, ни другая по камере 38×58 не эквивалентна. Отдельно: флагман Osborn 80×60 (140 т) — это линия Hadfields (шеффилдское наследие Samuel Osborn), самостоятельная конструкция, к Telsmith отношения не имеющая.",
+     "evidence": "Крауновская публикация к столетию Osborn: «Osborn started manufacturing in South Africa under licence to Telsmith as far back as 1950» и «some of the Telsmith machines … had to be adapted to cope with our hard rock, ultimately becoming, to all intents and purposes, South African products». Профиль Osborn (ckit.co.za): «long-established licence agreements with major international principals — such as Telsmith and American Pulverizer (USA), Mogensen (UK), and IFE (Austria)», плюс лицензия с KPI-JCI. Фирменная брошюра «Osborn Telsmith Jaw Crusher (SA)» (архив osborn.co.za, ref. 1-CJM-2002) с таблицей моделей 812/524/1021/1424/1236/2036/2536/3042/4248/5060 — 3858 отсутствует. CMS Cepcor ведёт раздел «Osborn Telsmith» и описывает его как «the imperial range of crushers manufactured by Osborn», перечень типоразмеров совпадает с их же перечнем по Telsmith типов B, C и D — 3858/38×58 нет ни в одном. Перечень моделей Osborn у независимого изготовителя запчастей (4812, 3023, 3020, 3625, 3623, 4842, 4836, 4828, 4248, 3848, 5060, 4760, 3042, 2842, 3648, 3248) — 3858 также отсутствует.",
+     "parts_system": "Да, Osborn ведёт СВОЮ систему номеров, структурно несовместимую с телсмитовской. Формат: буквенный префикс + код модели + код позиции, например по дробилке Osborn-Telsmith SA3042: AH3042J381A (toggle seat), AH3042F382A (toggle seat clamp), AH3042J040A и AH3042A0348 (jawstock wearing plates), AH3042J055A (toe plate); крепёж — вида ZE-12-M10x025. Встречается и чисто числовой формат 00-000006322. Сам индекс модели у Osborn несёт префикс «SA» (SA3042 — «D-Style Roller Bearing Jaw Crusher manufactured in South Africa»), то есть завод помечает южноафриканское исполнение. Кросс-таблицы «номер Telsmith ↔ номер Osborn» в открытом доступе не найдено. Вывод для закупки: телсмитовские номера 273-/277- в канале Osborn напрямую не пробиваются — искать надо по модели и позиции, а не по номеру.",
+     "market": "ЮАР (Эландсфонтейн, 57 Jansen Road, Гаутенг), Южная и Центральная Африка (агенты в Замбии, Намибии, Нигерии, Гане, Зимбабве), поставки также в Россию, Казахстан, Турцию, Испанию, Китай. Обслуживание: собственный отдел запасных частей и сервиса Osborn. Независимо от Astec запчасти к машинам Osborn Telsmith предлагают CMS Cepcor (Великобритания), CMEM (Индия), китайские литейные (Sinco, WJ, Haocheng, Slon) и трейдеры вроде Element Group — они позиционируют Osborn как подтип Telsmith в своих каталогах, то есть отливки поставляются по геометрии Telsmith. Но это канал НЕ южноафриканский; независимого от Astec южноафриканского канала фирменных запчастей Osborn по открытым источникам подтвердить не удалось.",
+     "urls": [
+      "https://www.crown.co.za/modern-mining/industry-news/10113-osborn-celebrates-its-centennial",
+      "http://ckit.co.za/profiles/osborn/osborn_main.htm",
+      "https://web.archive.org/web/20060513025237/http://www.osborn.co.za:80/literature/pdfs/Brochure%20Tel%20Jaw%20Crush%20SA.pdf",
+      "https://www.cmscepcor.com/crusher-parts/brands/osborn-telsmith/osborn-telsmith/",
+      "https://www.cmscepcor.com/crusher-parts/brands/osborn-telsmith/",
+      "https://www.scribd.com/document/690881012/CHANCADORA-OSBORN-SA3042",
+      "https://www.miningelement.com/equipments/wear-and-spare-parts-for-crushers/jaw-crusher/telsmith/osborn-30x42/",
+      "https://www.hcmachineryparts.com/osborn-product/",
+      "https://www.cmemindia.com/osborn-telsmith/"
+     ],
+     "confidence": "высокая по факту лицензии и по системе номеров Osborn; высокая по отсутствию модели 38×58 у Osborn (отрицательный результат по четырём независимым перечням)"
+    },
+    {
+     "brand": "KPI-JCI и Pioneer (Astec, Йанктон/Юджин, США)",
+     "model": "Pioneer 2650, 2742, 3055, 3365; Iron Giant 4448IG, 5060IG; Hydra-Jaw 2238H, 3244H, 3450H",
+     "relation": "Машины того же холдинга, но иной конструктивной линии. Osborn имеет лицензионное соглашение и с KPI-JCI, поэтому в ЮАР под маркой Osborn могут идти машины KPI-JCI-происхождения. Прямого аналога 38×58 в ряду нет: между 3365 и 4448IG размерная ниша не закрыта. Отдельно важно для поиска: четырёхзначные индексы у Pioneer образованы по своей логике и не переводятся напрямую в дюймы зева так же, как у Telsmith, — совпадение цифр между марками не означает совпадения машины.",
+     "evidence": "Перечень моделей щековых дробилок дилерского канала KPI-JCI/Astec (2742, 2650, 3055, 3365, 4448IG, 5060IG, 2238H, 3244H, 3450H); спецификации Pioneer 2650 и 3055; профиль Osborn с указанием лицензионных соглашений с Telsmith и KPI-JCI.",
+     "parts_system": "Собственная номенклатура KPI-JCI/Pioneer, с номерами Telsmith формата 273-/277- не пересекается, кроме позиций Iron Giant, унаследованных от Telsmith.",
+     "market": "США, Канада, глобально через дилеров Astec; в Африке — через Osborn/Astec AME.",
+     "urls": [
+      "https://www.genagg.ca/assets/Uploads/spec-sheet-3055.pdf",
+      "https://pdf.directindustry.com/pdf/kpi-jci/jaw-crusher-model-2650-spec-sheet/55644-285127.html",
+      "http://ckit.co.za/profiles/osborn/osborn_main.htm",
+      "https://astecindustries.com/product-type/aggregates/crushing/jaw-crushers/"
+     ],
+     "confidence": "средняя (перечень моделей собран из дилерских источников, не из первичного каталога KPI-JCI)"
+    },
+    {
+     "brand": "Smith Engineering Works (Милуоки, США)",
+     "model": "Историческое фирменное наименование самого Telsmith; «Telsmith» — торговая марка, образованная от имени основателя Thomas L. Smith",
+     "relation": "Та же фирма под другим именем, а не другая машина. Хронология: 1906 — Smith & Post Co. (Т. Л. Смит и П. Пост), 1913–1915 — переименование в Smith Engineering Works, торговая марка Telsmith введена Чарльзом Смитом от имени отца. То есть машины с шильдиком «Smith Engineering Works / Telsmith» — это тот же завод. Практического значения для дробилки 3858 не имеет: модель относится к 1990–2010-м гг., то есть на полвека позже периода, когда использовалось имя Smith Engineering Works. Ценность только архивная — при поиске старых чертежей и каталогов.",
+     "evidence": "Профиль Telsmith в Pit & Quarry (декабрь 2019): основание Smith & Post Co. в 1906 г., переход к Smith Engineering Works и происхождение марки Telsmith от Thomas L. Smith. Архивный фонд Historical Construction Equipment Association: «The T. L. Smith Company — Smith Engineering Works — Telsmith, Inc. — T. L. Smith Machine Company, 1915–1947».",
+     "parts_system": "Не применимо: отдельной действующей системы номеров нет, историческая нумерация поглощена системой Telsmith.",
+     "market": "Не применимо (наименование не используется с середины XX в.).",
+     "urls": [
+      "https://editions.mydigitalpublication.com/article/Telsmith+Inc/3535246/635362/article.html",
+      "http://archives.hcea.net/?id=352&p=collections%2Ffindingaid&q=&rootcontentid=12241"
+     ],
+     "confidence": "высокая"
+    },
+    {
+     "brand": "Barber-Greene Company (Аврора, Иллинойс, США)",
+     "model": "Дробилки Telsmith периода 1960–1987 гг. (шильдики с двойным брендом Barber-Greene / Telsmith)",
+     "relation": "Родственное предприятие по владению, не отдельная конструкция. В 1960 г. Telsmith был продан и стал подразделением Barber-Greene; в январе 1987 г. Astec Industries приобрела Telsmith именно у Barber-Greene (сама Barber-Greene была куплена Astec в конце 1986 г.). Таким образом марка Barber-Greene — реальное историческое звено в цепочке владения Telsmith, и машины 1960–1987 гг. могут нести это имя. Однако модель 3858 к этому периоду не относится, поэтому для снабжения по данной машине канал Barber-Greene пустой. Отдельно: асфальтовое подразделение Barber-Greene в Де-Калбе куплено Caterpillar в 1991 г. — это уже другая линия и к дробилкам отношения не имеет.",
+     "evidence": "Публикация о закрытии завода Telsmith: «Astec Industries purchased Telsmith in 1987 from the Barber-Green company». Профиль Telsmith в Pit & Quarry: «In 1960, Telsmith was sold and became a division of Barber-Greene». Wikipedia по Barber-Greene: остановка завода в Авроре в 1985 г., покупка Astec Industries в конце 1986 г., продажа завода в Де-Калбе Caterpillar в 1991 г.",
+     "parts_system": "Отдельной действующей системы нет; номера того периода — телсмитовские, поддерживаются каталогами Telsmith/Astec.",
+     "market": "Марка не действует. Запчасти к машинам той эпохи — вторичный рынок США и независимые изготовители отливок.",
+     "urls": [
+      "https://www.equipmentjournal.com/construction-news/telsmith-astec-crusher-wisconsin/",
+      "https://editions.mydigitalpublication.com/article/Telsmith+Inc/3535246/635362/article.html",
+      "https://en.wikipedia.org/wiki/Barber-Greene"
+     ],
+     "confidence": "высокая по факту владения; версия о шильдиках «Barber-Greene Telsmith» на конкретных машинах прямым фотодокументом не подтверждена — средняя"
+    },
+    {
+     "brand": "Iowa Manufacturing Co. / Cedarapids (Сидар-Рапидс, Айова, США)",
+     "model": "Щековые дробилки Cedarapids (напр. JS/JW-серия, Senior Commander 443)",
+     "relation": "НЕ связаны с Telsmith и НЕ входят в Astec. Проверка гипотезы заказчика дала отрицательный результат: Iowa Manufacturing (осн. 1923) в 1972 г. перешла к Raytheon, в 1985 г. приняла имя Cedarapids, в 1999 г. вошла в Terex Materials Processing & Mining и сегодня принадлежит Terex. Это независимый производитель того же типоразмерного класса, конструктивной общности с Telsmith 3858 нет. Рассматривать только как независимый аналог по типоразмеру при подборе замены машины целиком, но не как источник взаимозаменяемых деталей.",
+     "evidence": "Актуальная продуктовая страница Cedarapids на сайте Terex (бренд принадлежит Terex, не Astec). История: Iowa Manufacturing → Raytheon (1972) → имя Cedarapids (1985) → Terex (1999). Ни в одном источнике по Astec (перечень брендов при консолидации 2021 г.: BTI, KPI-JCI, Astec Mobile Screens, Peterson, Roadtec, Telsmith, Osborn) Cedarapids не фигурирует.",
+     "parts_system": "Собственная система номеров Cedarapids/Terex, с телсмитовской не пересекается.",
+     "market": "Глобально через Terex и его дилеров.",
+     "urls": [
+      "https://www.terex.com/cedarapids/products/cedarapids--static-product-solutions/static-jaw-crushers",
+      "https://www.engineeringnews.co.za/article/osborn-engineered-products-unites-under-new-astec-industries-brand-2021-08-13"
+     ],
+     "confidence": "высокая по факту принадлежности Terex; хронология перехода Iowa Manufacturing собрана из вторичных источников — средняя"
+    },
+    {
+     "brand": "Breaker Technology Inc. / BTI (Astec)",
+     "model": "Гидромолоты, стационарные бутобои, мобильные системы",
+     "relation": "Родственное предприятие того же холдинга, но НЕ производитель щековых дробилок. Для темы тождества машин пустая ветвь. Единственная значимая для снабжения деталь: Osborn исторически распространял продукцию BTI в ЮАР под собственными обложками — то есть канал Osborn действительно работает как зонтичный дистрибьютор нескольких брендов Astec, что подтверждает общий вывод о единой сервисной вертикали.",
+     "evidence": "Архив сайта osborn.co.za содержит фирменные брошюры «Osborn BTI Breaker Systems» и «Osborn BTI Mobile Systems». BTI входит в перечень брендов, сведённых под марку Astec в 2021 г.",
+     "parts_system": "Собственная номенклатура BTI; пересечений с номерами дробилок Telsmith нет.",
+     "market": "Северная Америка, глобально через Astec; в ЮАР — через Osborn/Astec.",
+     "urls": [
+      "https://web.archive.org/web/20060513025212/http://www.osborn.co.za:80/literature/pdfs/Osborn%20BTI%20Breaker%20Systems.pdf",
+      "https://www.engineeringnews.co.za/article/osborn-engineered-products-unites-under-new-astec-industries-brand-2021-08-13"
+     ],
+     "confidence": "средняя"
+    },
+    {
+     "brand": "Astec Mobile Screens",
+     "model": "Мобильные грохоты и грохотильные установки",
+     "relation": "Родственное предприятие того же холдинга, щековых дробилок не выпускает. Для задачи идентификации машины и поиска альтернативных номеров деталей значения не имеет.",
+     "evidence": "Входит в перечень брендов, объединённых под маркой Astec при консолидации 2021 г.",
+     "parts_system": "Собственная номенклатура; пересечений с 273-/277- нет.",
+     "market": "Глобально через Astec.",
+     "urls": [
+      "https://www.engineeringnews.co.za/article/osborn-engineered-products-unites-under-new-astec-industries-brand-2021-08-13"
+     ],
+     "confidence": "высокая"
+    }
+   ],
+   "notes": "ГЛАВНЫЙ ОТВЕТ НА ПОСТАВЛЕННЫЙ ВОПРОС\n\n1) Выпускал ли Osborn щековые дробилки конструкции Telsmith под своим именем — ДА, подтверждено. Osborn изготавливает их в ЮАР по лицензии Telsmith с 1950 года, адаптируя конструкцию под местную крепкую породу. Модельные индексы Osborn совпадают с телсмитовскими («дюйм×дюйм»), аftermarket-каталоги ведут единый раздел «Osborn Telsmith».\n\n2) Какая модель Osborn соответствует Telsmith 3858 (38×58) — НЕ НАЙДЕНО. Это отрицательный результат, полученный по четырём независимым перечням: фирменная брошюра «Osborn Telsmith Jaw Crusher (SA)» (812, 524, 1021, 1424, 1236, 2036, 2536, 3042, 4248, 5060); каталог CMS Cepcor «Osborn Telsmith» (10×21, 10×36, 14×24, 15×24, 18×32, 20×36, 25×36, 25×40, 30×42, 36×46, 42×48, 44×48, 50×60, 60×48); перечень независимого изготовителя запчастей по Osborn (4812, 3023, 3020, 3625, 3623, 4842, 4836, 4828, 4248, 3848, 5060, 4760, 3042, 2842, 3648, 3248); объявления о продаже техники Osborn в ЮАР. Ни в одном 38×58 нет.\nПричина расхождения содержательная, а не случайная: лицензионный ряд Osborn воспроизводит классическое «имперское» поколение Telsmith типов B/C/D (роликоподшипниковые, клиновая регулировка) — CMS Cepcor даёт по Telsmith и по Osborn Telsmith ОДИН И ТОТ ЖЕ перечень типоразмеров с пометкой «B, C and D'Style». Модель 3858 относится к более позднему гидравлическому поколению (гидроочистка камеры, гидроразгрузка от недробимого) и в лицензионный периметр Osborn, судя по всему, не попадала.\nЧто это значит для снабжения: канал Osborn как источник взаимозаменяемых деталей на 38×58 закрыт. Ближайшие по типоразмеру машины Osborn — 3848/4248 снизу и 5060 сверху — по камере не эквивалентны, детали не подойдут.\n\n3) Ведёт ли Osborn собственную систему номеров — ДА, ведёт, и она структурно несовместима с телсмитовской. Формат Osborn: префикс + код модели + код позиции (AH3042J381A, AH3042F382A, AH3042J040A, AH3042A0348, AH3042J055A), крепёж ZE-12-M10x025, встречается формат 00-000006322. Индекс модели у Osborn несёт префикс «SA» (SA3042 — исполнение южноафриканской сборки). Формат Telsmith принципиально иной: LL-273-xxxx / LL-277-xxx, что совпадает с номерами заказчика. Публичной кросс-таблицы «Telsmith ↔ Osborn» не существует; поиск в канале Osborn возможен только по модели и наименованию позиции.\n\n4) Доступны ли запчасти Osborn на южноафриканском рынке независимо от Astec — ПОДТВЕРДИТЬ НЕ УДАЛОСЬ. Osborn с 2010-х входит в Astec (приобретён у Boart Longyear), в 2021 г. ребрендирован под маркой ASTEC; собственный отдел запчастей Osborn находится по адресу 57 Jansen Road, Эландсфонтейн, и является частью вертикали Astec. Независимые от Astec поставщики на конструктив Osborn Telsmith существуют, но они НЕ южноафриканские: CMS Cepcor (Великобритания), CMEM (Индия), китайские литейные (Sinco, WJ Crusher Parts, Haocheng, Slon), трейдеры (Element Group). Они прямо классифицируют Osborn как подтип Telsmith, то есть льют по геометрии Telsmith. Существование чисто южноафриканского независимого канала фирменных запчастей Osborn по открытым источникам не подтверждено — пометка «не найдено», а не «нет».\n\nСУЩЕСТВЕННЫЕ ПОПРАВКИ К ИСХОДНЫМ ДАННЫМ ЗАДАЧИ\n\nа) Astec приобрела Telsmith НЕ в 2019 году, а в 1987-м — и приобрела её у компании Barber-Greene, подразделением которой Telsmith являлась с 1960 года. 2019-й — это год, которым датирована последняя корпоративная брошюра Telsmith, и год перед остановкой завода в Мекуоне (производство прекращено 14.08.2020, площадка закрыта к 31.03.2021). Ошибка в дате существенна: она полностью меняет оценку глубины интеграции и того, где искать архивные каталоги.\n\nб) Модель 3858 в собственной литературе Telsmith не относится к серии Iron Giant. Iron Giant — это ровно 4448 и 5060 (профильная брошюра так и озаглавлена, вхождений «3858» в ней нет). 3858 идёт отдельной моделью, между семействами Hydra-Jaw и Iron Giant. Формулировка «Iron Giant 3858» встречается только у перепродавцов отливок и как поисковый ключ ненадёжна.\n\nв) Гипотеза о Barber-Greene подтвердилась, но не в том смысле, в каком ожидалась: это не другое имя той же машины, а историческая материнская компания Telsmith (1960–1987). Для дробилки 3858 канал пустой — модель на полвека моложе.\n\nг) Гипотеза о Smith Engineering Works подтвердилась как корпоративная: это историческое имя самого завода Telsmith (1915 г. и далее), марка «Telsmith» произведена от имени основателя Thomas L. Smith. Для 3858 практического значения нет.\n\nд) Гипотеза об Iowa Manufacturing НЕ подтвердилась: Iowa Manufacturing → Cedarapids принадлежит Terex, а не Astec, конструктивной связи с Telsmith нет. Это независимый аналог по типоразмеру, не источник деталей.\n\nПРАКТИЧЕСКИЕ ВЫВОДЫ ДЛЯ КАНАЛОВ СНАБЖЕНИЯ\n\n— Рабочий ключ поиска по машине заказчика — телсмитовские номера 273-xxxx / 277-xxx, а не название серии. Они признаются и в канале Astec, и независимыми изготовителями отливок (пример проверенного соответствия на соседней машине: 44×48 IG — WG-273-918 / XG-273-918).\n— Семизначные числовые номера (1082397, 1050402, 1064057) с высокой вероятностью относятся к покупным и стандартным изделиям; их стоит отдельно попытаться раскрыть до исходного изготовителя — это самый вероятный источник альтернативного канала.\n— Внутренние коды 14T47, 62H48, 65D47, 62M77, 62K87, 60P88, 63R53 — заводская внутренняя кодировка покупных позиций, вовне не котируется; запрашивать по ним бесполезно.\n— Реалистичный второй канал по этой машине — не Osborn, а независимые изготовители отливок и запчастей на конструктив Telsmith (CMS Cepcor, CMEM, китайские литейные), а также вторичный рынок США, где 3858 распространена.\n\nОГРАНИЧЕНИЯ ПРОВЕРКИ\n\nСайт osborn.co.za в ходе работы отдавал 503 и блокировал прямые запросы; фирменный ряд Osborn восстановлен по архивной копии брошюры 2002 года (web.archive.org) и по независимым каталогам. Документы на Scribd (заводской каталог деталей Telsmith 3858 и руководство Osborn-Telsmith SA3042) существуют и проиндексированы, но их содержимое закрыто регистрацией — пейволл не обходился, поэтому конкретные номера из них взяты только в том объёме, в котором они процитированы в открытых источниках. Официальный каталог KPI-JCI (DirectIndustry) и страницы Rock Machinery отдавали 403. Отсутствие модели Osborn 38×58 — вывод по совокупности отрицательных результатов; окончательное подтверждение стоит взять письмом в отдел запчастей Osborn/Astec в Эландсфонтейне."
+  },
+  {
+   "scope": "лицензии-индия-китай",
+   "identities": [
+    {
+     "brand": "Astec Industries (ASTEC)",
+     "model": "Telsmith 3858 / модельный ряд Telsmith под маркой ASTEC; новое семейство Astec A-Series",
+     "relation": "та же конструкция под другим именем владельца бренда: Telsmith — подразделение Astec, с 2021 г. бренды Telsmith, Osborn, KPI-JCI, BTI сведены под единое имя ASTEC; A-Series прямо заявлена как построенная на наследии платформ Pioneer, Telsmith и Osborn (но это новая линейка, не переименованный 3858)",
+     "evidence": "Каталог Telsmith Product Overview (©2019) — модель 3858 (965 x 1473 мм) описана как отдельная модель; страницы продукции ASTEC; дилерское описание A-Series: «Built on the combined legacy of Pioneer, Telsmith and Osborn jaw crusher platforms». Прямого переименования 3858 в модель ASTEC в открытых источниках не найдено.",
+     "parts_system": "единая система Telsmith: износ — префиксные номера вида DA-/DD-/FA-/EA-/B1-/ZF-/CN-/CP- + 273-xxxx (челюстные плиты, щёки) и 277-xxx; сквозные 7-значные (1082397 и т. п.). Своей отдельной системы у ASTEC для этих узлов не обнаружено",
+     "market": "США, глобально; сервис — дилерская сеть ASTEC/Telsmith",
+     "urls": [
+      "https://crushingandscreening.com/uploads/2020/02/Telsmith-Product-Overview.pdf",
+      "https://astecindustries.com/product-type/aggregates/crushing/jaw-crushers/",
+      "https://www.traceyroad.com/astec-a-series-jaw-crushers/",
+      "https://astecindustries.com/product-brand/telsmith/"
+     ],
+     "confidence": "высокая — по принадлежности бренда; средняя — по преемственности A-Series; «не найдено» — по прямому переименованию модели 3858"
+    },
+    {
+     "brand": "Osborn Engineered Products SA (Pty) Ltd, Эландсфонтейн, ЮАР (с 2010-х — в составе Astec)",
+     "model": "Osborn-Telsmith, обозначения по имперскому размеру зева с префиксом SA (например Osborn-Telsmith SA3042 «D-style»); ряд 10x21, 10x36, 14x24, 15x24, 18x32, 20x36, 25x36, 25x40, 30x42, 36x46, 42x48, 44x48, 50x60, 60x48",
+     "relation": "лицензионная сборка: Osborn изготавливает щековые дробилки конструкции Telsmith в ЮАР по лицензии с 1950 г.; машины адаптированы под твёрдые южноафриканские породы и постепенно стали местным продуктом. Типоразмер 38x58 в опубликованных перечнях Osborn-Telsmith НЕ обнаружен",
+     "evidence": "Modern Mining (Crown Publications), «Osborn celebrates its centennial»: «Osborn started manufacturing in South Africa under licence to Telsmith as far back as 1950… had to be adapted to cope with our hard rock, ultimately becoming… South African products»; профиль Osborn (ckit.co.za): «long-established licence agreements with major international principals — such as Telsmith and American Pulverizer (USA), Mogensen (UK), IFE (Austria)», в номенклатуре — Gyrasphere (торговая марка Telsmith); руководство «Osborn-Telsmith SA3042 D-style» южноафриканского изготовления; перечень моделей у CMS Cepcor (Osborn-Telsmith) — 38x58 отсутствует",
+     "parts_system": "те же номера Telsmith: китайский поставщик каталогизирует «Osborn Telsmith 44x48» челюстные плиты как WG-273-918 (неподвижная) и XG-273-918 (подвижная) — тот же префиксно-числовой формат, что у наших DA-273-1917W / DD-273-1917W",
+     "market": "ЮАР и Африка (железорудные, марганцевые, алмазные рудники), экспорт; сервис — Osborn/ASTEC Africa, аftermarket — CMS Cepcor (Великобритания), индийские и китайские литейные",
+     "urls": [
+      "https://www.crown.co.za/modern-mining/industry-news/10113-osborn-celebrates-its-centennial",
+      "http://ckit.co.za/profiles/osborn/osborn_main.htm",
+      "https://www.cmscepcor.com/crusher-parts/brands/osborn-telsmith/osborn-telsmith/",
+      "https://miningspareparts.com/en/product/telsmith_44x48_jaw_plate/"
+     ],
+     "confidence": "высокая — факт лицензии и общая система номеров; низкая — наличие именно типоразмера 38x58 у Osborn (подтверждения не найдено)"
+    },
+    {
+     "brand": "Pegson (Coalville, Лестершир, Великобритания; позже Powerscreen/Terex)",
+     "model": "«Pegson-Telsmith» щековые дробилки стилей B, C, D'Style — тот же имперский ряд (30x42, 44x48, 50x60 и др.)",
+     "relation": "сборка машин конструкции Telsmith в Великобритании под двойным именем Pegson-Telsmith; формально лицензионный договор в открытых источниках не процитирован, но техдокументация и аftermarket ведут ряд как единый с Telsmith",
+     "evidence": "Техпаспорт «PEGSON TELSMITH 30 X 42 JAW CRUSHER. MANUFACTURER: PEGSON TELSMITH» (International Crusher Solutions); торговая литература «Pegson-Telsmith D style»; CMS Cepcor: запчасти «to suit the imperial range of crushers manufactured by Telsmith, Pegson and CFBK», список моделей идентичен списку Osborn-Telsmith",
+     "parts_system": "тот же имперский ряд и та же логика номеров Telsmith (B/C/D-style); собственной параллельной системы не выявлено",
+     "market": "Великобритания, Европа, вторичный рынок; аftermarket — CMS Cepcor, International Crusher Solutions, crushers.co.uk",
+     "urls": [
+      "https://internationalcrushersolutions.com/perch/resources/brochures/m13025-pegson-telsmith-30-x-42.pdf",
+      "https://crushers.co.uk/download/48/pegsontelsmith-dstyle-sales-literature",
+      "https://www.cmscepcor.com/us/crusher-parts/brands/pegson-b-c-dstyle/"
+     ],
+     "confidence": "средняя — двойное имя и общий ряд документированы, текст лицензии не найден; 38x58 в ряду не найден"
+    },
+    {
+     "brand": "CFBK (Франция)",
+     "model": "щековые дробилки того же имперского ряда, что Telsmith и Pegson",
+     "relation": "предположительно та же конструктивная линия (лицензия/производная); прямых документов о лицензии Telsmith не найдено",
+     "evidence": "CMS Cepcor объединяет в одну товарную группу «the imperial range of crushers manufactured by Telsmith, Pegson and CFBK» с общим перечнем типоразмеров — косвенный признак единой конструкции и взаимозаменяемости износа",
+     "parts_system": "обслуживается тем же имперским рядом запчастей, что Telsmith/Pegson; собственная система номеров не установлена",
+     "market": "Франция/Европа, вторичный рынок",
+     "urls": [
+      "https://www.cmscepcor.com/crusher-parts/brands/telsmith/"
+     ],
+     "confidence": "низкая — только косвенный признак; 38x58 не найден"
+    },
+    {
+     "brand": "Astec do Brasil (Vespasiano, Минас-Жерайс, Бразилия)",
+     "model": "щековые Telsmith H2238, H3244, H3450; конусные 38SBS/44SBS/52SBS/57SBS; грохоты Vibro-King",
+     "relation": "внутригрупповое (не лицензионное) производство машин Telsmith в Бразилии на заводе Astec; типоразмер 3858 в бразильской производственной программе НЕ значится",
+     "evidence": "Revista Minérios & Minerales: «A Astec do Brasil, subsidiária da norte-americana e com fábrica em Vespasiano (MG), destacou… a sua linha de britadores de mandíbulas Telsmith, como o modelo H3450»; отраслевые публикации о заводе в Vespasiano с перечнем локально выпускаемых моделей",
+     "parts_system": "номера Telsmith; локальные бразильские поставщики износа (Sulpeças и др.) ведут позиции по брендам Faço/Telsmith/Barber-Greene",
+     "market": "Бразилия и Латинская Америка; сервис — Astec do Brasil",
+     "urls": [
+      "https://revistaminerios.com/astec-exibe-britador-de-mandibulas-telsmith/"
+     ],
+     "confidence": "средняя — производство Telsmith в Бразилии подтверждено; отсутствие 3858 в бразильской программе — по опубликованному перечню моделей"
+    },
+    {
+     "brand": "Barber-Greene do Brasil Indústria e Comércio (Гуарульюс, Сан-Паулу, Бразилия), исторический",
+     "model": "britadoras (дробилки) и грохоты собственного производства филиала, 1960-е — 1990-е",
+     "relation": "потенциальная историческая линия: Telsmith с 1960 г. был подразделением Barber-Greene, а бразильский филиал Barber-Greene выпускал дробилки на месте. Тождество этих машин конструкции Telsmith документально НЕ подтверждено",
+     "evidence": "Lexicar Brasil: филиал Barber-Greene основан в первой половине 1960-х в Гуарульюсе, «além de usinas de asfalto, começou a produzir britadoras, peneiras vibratórias…»; асфальтовые заводы Barber-Greene выпускались в Бразилии по лицензии FNV с 1959 г. Упоминаний Telsmith в источнике нет",
+     "parts_system": "не установлена",
+     "market": "Бразилия, только вторичный рынок (компания ликвидирована)",
+     "urls": [
+      "https://www.lexicarbrasil.com.br/barber-greene/",
+      "https://en.wikipedia.org/wiki/Barber-Greene"
+     ],
+     "confidence": "низкая — гипотеза по корпоративной принадлежности, прямых подтверждений нет"
+    },
+    {
+     "brand": "Индия (CMEM India; Pranston, Кхеда, Гуджарат)",
+     "model": "не машины, а запчасти для имперского ряда Telsmith / Pegson-Telsmith / Osborn-Telsmith (стили B, C, D'Style): 10x21…60x48",
+     "relation": "лицензионной или копийной сборки самих щековых дробилок Telsmith в Индии НЕ НАЙДЕНО. Найдено индийское производство запчастей: не только износ (челюстные плиты, клинья, болты, боковые щёки), но и механообработанные ответственные детали — эксцентриковые валы, корпуса подшипников, распорные балки (toggle beams), сёдла и распорные плиты, маслосъёмные уплотнения",
+     "evidence": "CMEM India и Pranston (Кхеда, Гуджарат): «premium aftermarket… to suit the imperial range of crushers manufactured by Telsmith, Pegson and CFBK», плюс «India manufactured eccentric shafts, bearing mountings, spacers, retainers, toggle beams, toggle seats, toggle plates and oil seals». Проверка Sayaji/McNally Sayaji, Puzzolana, Marsman на лицензию Telsmith — совпадений не найдено (у McNally Sayaji документирована коллаборация с Poltegor, Польша; Puzzolana заявляет собственную разработку; Marsman — испанская коллаборация по HSI)",
+     "parts_system": "работают по OEM-номерам Telsmith; типоразмер 3858 в их публичных перечнях не заявлен",
+     "market": "Индия + экспорт; закупка через индийских изготовителей запчастей возможна, но по 3858 требуется отдельный запрос по чертежу/номеру",
+     "urls": [
+      "https://www.cmemindia.com/telsmith/",
+      "https://www.pranston.com/telsmith.html",
+      "https://mcnallysayaji.com/about-us/",
+      "https://puzzolana.com/about-us/",
+      "https://www.nbmcw.com/equipment-machinery/crushing-screening-washing-m-sand/marsman-india-manufactures-crushing-screening-equipment.html"
+     ],
+     "confidence": "высокая — по выводу «лицензионных сборок Telsmith в Индии не найдено»; средняя — по возможностям индийских изготовителей запчастей"
+    },
+    {
+     "brand": "Китай (Haocheng/HCMP Foundry; Hyton Group; Slon Machinery; Sunrise Machinery; GTEK Mining; Zhejiang Rock Machinery, Иу; Mining Spare Parts, Цюйчжоу)",
+     "model": "не машины, а копийные детали к Telsmith, в т. ч. прямо к 3858 / «H3858»; заявлен также ряд Osborn (3042, 3248, 3648, 3848, 4248, 4760, 5060 и др.)",
+     "relation": "копий целой машины Iron Giant / 3858 китайскими заводами НЕ НАЙДЕНО. Найдено копирование деталей по полному комплекту чертежей: HCMP заявляет «complete drawings» и отливает не только челюстные плиты, но и станину (frame), эксцентриковый вал, подвижную щёку, распорную балку для ряда H2238/H2550/H3244/H3450/H3258/H3858. Китайские листинги «Telsmith jaw crusher» на Alibaba/Made-in-China — это машины серий PE/PEX собственной китайской конструкции, помеченные ключевым словом Telsmith; конструктивного тождества нет",
+     "evidence": "HC Machinery Parts (Haocheng): ряд «Hydra-Jaw H2238/H2550/H3244/H3450/H3258/H3858» и «Midsize 3042/3055/3648», отливки корпусных деталей; Hyton: плиты Mn18Cr2 «suit Telsmith Tel3858»; GTEK: «Swing Jaw Plate Suits Telsmith 3042 B1-273-881»; Mining Spare Parts: «Osborn Telsmith 44x48» WG-273-918 / XG-273-918; листинг Hangzhou Cohesion по запросу «telsmith jaw crusher» — фактически PE150x250…PE1500x1800 и PEX, серии Shanbao/Gator",
+     "parts_system": "собственной системы номеров нет — китайские поставщики индексируют позиции по OEM-номерам Telsmith (префикс + 273-xxxx / 277-xxx). Китайского типоразмера с зевом 965x1473 мм не существует: стандартный ряд PE идёт 900x1200, 1000x1200, 1200x1500, 1500x1800 — прямого аналога 38x58 нет",
+     "market": "Китай, экспорт по всему миру; поставка износа и корпусных деталей по чертежу/образцу",
+     "urls": [
+      "https://www.hcmachineryparts.com/products/mining-aggregate-parts/jaw-crusher-parts/",
+      "https://www.hcmachineryparts.com/osborn-product/",
+      "https://hytongroup.en.made-in-china.com/product/NCOfDhRVldUu/China-High-Manganese-Steel-Mn18cr2-Jaw-Plate-Suit-Telsmith-Jci-Kpi-Jaw-Crusher-Wear-Parts.html",
+      "https://gtekmining.com/shop/product/swing-jaw-plate-b1-273-881/",
+      "https://miningspareparts.com/en/product/telsmith_44x48_jaw_plate/",
+      "https://cntruemax.en.made-in-china.com/product/SKYmZJsdZxfo/China-telsmith-jaw-crusher-breaker-quality-good-price-on-for-sale.html",
+      "https://www.rock-machinery.com/english/database/telsmith-crusher"
+     ],
+     "confidence": "высокая — по деталям (копирование по чертежам подтверждено самими поставщиками); высокая — по выводу «китайской машины-копии 3858 и китайского типоразмера 965x1473 не найдено»"
+    },
+    {
+     "brand": "Турция (Meka, General Makina, Gürsan, Tek-El и др.)",
+     "model": "собственные серии (например Meka MJ)",
+     "relation": "лицензионных или копийных сборок Telsmith в Турции НЕ НАЙДЕНО; турецкие щековые дробилки — собственные конструкции с собственными обозначениями",
+     "evidence": "Проверка турецкоязычных источников и сайтов производителей (Meka, General Makina, Gürsan): упоминаний лицензии Telsmith нет",
+     "parts_system": "собственные обозначения турецких заводов; связи с номерами Telsmith не обнаружено",
+     "market": "Турция, экспорт",
+     "urls": [
+      "https://www.mekaglobal.com/en/products/crushing-screening-plants/crushers/jaw-crusher",
+      "https://www.general-makina.com.tr/urunler/kiricilar/ceneli-kirici"
+     ],
+     "confidence": "не найдено"
+    },
+    {
+     "brand": "Австралия",
+     "model": "—",
+     "relation": "лицензионных сборок Telsmith в Австралии НЕ НАЙДЕНО (местная школа щековых дробилок — Jaques/Terex Jaques, самостоятельная конструкция)",
+     "evidence": "Целевые поиски по «Telsmith Australia licence/manufactured» результатов не дали; в открытых источниках Telsmith в Австралии присутствует только как импортируемое оборудование и вторичный рынок",
+     "parts_system": "—",
+     "market": "—",
+     "urls": [
+      "https://astecindustries.com/product-brand/telsmith/"
+     ],
+     "confidence": "не найдено"
+    }
+   ],
+   "notes": "ГЛАВНОЕ УТОЧНЕНИЕ ПО МАШИНЕ. По собственной документации изготовителя модель 3858 НЕ входит в серию Iron Giant. В брошюре «Iron Giant Series Jaw Crushers» (©2017 Telsmith) серия состоит из двух типоразмеров — 4448 (1118x1219 мм) и 5060 (1270x1524 мм); в обзорном каталоге Telsmith Product Overview (©2019) прямо написано: «IRON GIANT SERIES… Available in two sizes: 4448, 5060», а 3858 (965x1473 мм) идёт отдельным пунктом «MODEL 3858… features hydraulic chamber clearing and overload relief», рядом с 3258 (813x1473 мм). Hydra-Jaw — это 2238/2550/3244/3450. Практический вывод для снабжения: поиск по ключу «Iron Giant» выведет на 4448/5060 и даст неверные номера износа; искать надо по «Telsmith 3858», «3258/3858», и по самим номерам 273-19xx / 277-6xx. Обозначение «H3858», которое встречается у китайских литейных, официальной номенклатурой Telsmith не подтверждается — это их собственная группировка.\n\nТАКЖЕ ПО ФАКТАМ О ВЛАДЕЛЬЦЕ. Astec владеет Telsmith не с 2019 г.: Telsmith был продан в 1960 г. компании Barber-Greene, а Astec приобрела Barber-Greene в декабре 1986 г. (Telsmith перешёл в состав Astec в 1986/87). В 2021 г. Astec свела бренды Telsmith, Osborn, KPI-JCI, BTI под единое имя ASTEC; производство в Мекуоне (Висконсин) было закрыто (перенос на другие площадки группы). Это влияет на то, у кого сегодня спрашивать оригинал: юрлицо-владелец чертежей — Astec, а не «Telsmith».\n\nСВОДКА ПО ЗАДАННЫМ РЫНКАМ.\n— Индия: лицензионной сборки щековых дробилок Telsmith не найдено. Проверены Sayaji Iron & Engineering / McNally Sayaji, Puzzolana, Marsman India — подтверждений связи с Telsmith нет. Зато найдено индийское производство запчастей под имперский ряд Telsmith/Pegson/Osborn, включая механообработку эксцентриковых валов, корпусов подшипников, распорных балок и сёдел (CMEM India; Pranston, Кхеда, Гуджарат) — это реальный альтернативный канал, но по 3858 позиции публично не заявлены, нужен запрос по чертежу.\n— Китай: машины-копии 3858 не найдено; найдено копирование деталей по полному комплекту чертежей, вплоть до станины и эксцентрикового вала (HCMP/Haocheng заявляет H3858). Своей системы номеров у китайцев нет — они работают по номерам Telsmith. Китайского типоразмера с зевом 965x1473 мм не существует, стандартный ряд PE (900x1200, 1000x1200, 1200x1500, 1500x1800) прямого аналога не даёт.\n— ЮАР: единственная документально подтверждённая лицензионная сборка — Osborn Engineered Products, ЮАР, лицензия Telsmith с 1950 г., машины идут под именем «Osborn-Telsmith» с префиксом SA (SA3042 и др.). Однако именно 38x58 в опубликованных перечнях Osborn-Telsmith отсутствует (ряд: 10x21…60x48, включая 44x48 и 50x60).\n— Великобритания (вне задания, но по существу вопроса): Pegson выпускал тот же ряд под именем «Pegson-Telsmith» (стили B/C/D). Франция: CFBK объединяется аftermarket-поставщиками в ту же имперскую группу — лид, но лицензия не подтверждена.\n— Бразилия: Astec do Brasil (Vespasiano, MG) выпускает Telsmith локально (H2238, H3244, H3450), 3858 в бразильской программе нет; исторический Barber-Greene do Brasil (Гуарульюс) выпускал дробилки, но тождество конструкции Telsmith не подтверждено.\n— Турция, Австралия: лицензионных или копийных сборок Telsmith не найдено.\n\nО ПОСАДОЧНЫХ РАЗМЕРАХ ИЗНОСА. Прямого сопоставления посадочных размеров челюстных плит 3858 с какой-либо машиной другой марки в открытых источниках не найдено — публичных чертежей и таблиц перекрёстных ссылок нет. Что установлено достоверно: система номеров износа Telsmith сквозная и распространяется на лицензионные машины Osborn (аftermarket каталогизирует «Osborn Telsmith 44x48» именно как WG-273-918 / XG-273-918 — тот же формат, что DA-273-1917W / DD-273-1917W у нашей машины). То есть при работе по номеру Telsmith поставщики ЮАР, Великобритании, Индии и Китая понимают позицию однозначно, и это, а не «переименование модели», является практическим ключом к альтернативным каналам. Проверка соответствия 3858 и 3258 (одинаковая ширина зева 58 дюймов, 1473 мм) по общности плит и щёк требует сверки заводского каталога деталей 3858 — публично он лежит только на Scribd за регистрацией, к нему не обращался.\n\nЮРИДИЧЕСКИЙ КОНТЕКСТ КОПИРОВАНИЯ. Ключевая отличительная особенность 3858 — гидравлическая распорная балка с защитой от недробимого и раскрытием камеры — была защищена патентом US6375105B1 (заявка 21.03.2000, выдан 23.04.2002, правообладатель Telsmith, Inc.), срок действия истёк 21.03.2020. Формально это снимает патентные препятствия к изготовлению аналогичных узлов третьими сторонами, что согласуется с появлением у китайских литейных отливок корпусных деталей этого семейства.\n\nВнутренние коды покупных (14T47, 62H48, 65D47, 62M77, 62K87, 60P88, 63R53) в открытых источниках не идентифицируются — это внутризаводская кодировка Telsmith на нормализованные покупные изделия; расшифровка возможна только по заводскому каталогу деталей или через дилера ASTEC."
+  },
+  {
+   "scope": "дюймы-метры",
+   "identities": [
+    {
+     "brand": "Telsmith / Astec Industries",
+     "model": "Model 3858 (38\" x 58\" = 965 x 1473 мм); в той же размерной логике 3258 = 813 x 1473 мм",
+     "relation": "Та же машина, сменился владелец и бренд-архитектура. Проверяемо: Telsmith с 2019 г. в составе Astec; в фирменном Telsmith Product Overview прямо указано «MODEL 3858 (965MM X 1,473MM)» и «MODEL 3258 (813MM X 1,473MM)». ВАЖНАЯ ПОПРАВКА К ИСХОДНЫМ ДАННЫМ: 3858 не относится к серии Iron Giant. В корпоративной брошюре Telsmith серия Iron Giant — это только модели 4448 и 5060 (1118x1219 и 1270x1524 мм), а 3858 и 3258 идут отдельными позициями. В действующем каталоге Astec (Pioneer 2650/2742/3055/3365/3552/4450, Hydra-Jaw 2238H/3244H/3450H, Iron Giant 4448IG/5060IG, A-Series A50) модель 3858 отсутствует — машина снята с производства, поддерживается только запчастями.",
+     "evidence": "Telsmith Product Overview (PDF, стр. с перечнем моделей: 3858 = 965 x 1473 мм; 4448 = 1118 x 1219 мм; 5060 = 1270 x 1524 мм); Telsmith Corporate Brochure 2015 — «Iron Giant™ Models 4448 & 5060», «Model 3858», «Model 3258» разными абзацами; Pit&Quarry: перечень щёк портативных установок «H2238, H2550, H3244, H3450, 3258, 4448 and 3858»; страница продуктов Astec — линейки Iron Giant / Pioneer / Hydra-Jaw / A-Series без 3858.",
+     "parts_system": "Две сосуществующие системы. (1) Старая «буквенно-блочная»: <префикс>-<блок>-<номер>, где 273-xxxx — блок щековых дробилок (273-1917 — комплект плит 3858; 273-918 — плита 44x48), 272-xxxx — конусные; префикс кодирует профиль/сплав (AA-, DA-, DD-, FA-, EA-, B1-, ZF-, CN-, CP-), суффиксы вида M10 / M10M / W — марка марганца и рифление. (2) Новая семизначная Astec/Telsmith: 1050402, 1064057, 1082397, 1149591 (DIE, STA JAW для 3858), встречаются варианты с точкой (1084317.A). Внутренние коды покупных (14T47, 62H48, 65D47 и т. п.) в открытых источниках не подтверждены — не найдено.",
+     "market": "США, Канада, Латинская Америка, Ближний Восток, Африка, Австралия — через дилерскую сеть Astec/Telsmith; на аутмаркете обслуживается независимыми литейными и парт-хаусами.",
+     "urls": [
+      "https://www.crushingandscreening.com/uploads/2017/09/Telsmith_Corporate_Brochure.pdf",
+      "https://www.pitandquarry.com/telsmith-portable-jaw-crusher-plants/",
+      "https://astecindustries.com/product-type/aggregates/crushing/jaw-crushers/",
+      "https://www.sunrisespares.com/telsmith-crusher-parts/",
+      "https://miningspareparts.com/en/product/telsmith-4448-jaw-plate-for-jaw-crusher-273-918/",
+      "https://zoremining.com/product/detail/store/16869/Telsmith%20crusher"
+     ],
+     "confidence": "высокая по размерам 3858/3258/4448/5060 и по факту отсутствия 3858 в текущем каталоге Astec; средняя по логике префиксов номеров"
+    },
+    {
+     "brand": "Osborn Engineered Products (ЮАР, входит в Astec)",
+     "model": "Osborn-Telsmith, имперский ряд: 10x21, 10x36, 14x24, 15x24, 18x32, 20x36, 25x36, 25x40, 30x42, 36x46, 42x48, 44x48, 50x60, 60x48",
+     "relation": "Лицензионная сборка конструкций Telsmith в ЮАР — тот самый случай «одна машина под двумя именами». Но именно типоразмер 38x58 в лицензионном ряду отсутствует: Osborn воспроизводил старое имперское семейство (D-style и др.), а 3858 — более поздняя машина Telsmith с гидравликой. То есть прямого «Osborn 3858» не существует — не найдено.",
+     "evidence": "CMS Cepcor, бренд-страница Osborn Telsmith с полным перечнем типоразмеров; каталог SA3042 с прямым указанием на изготовление по лицензии Smith Engineering Works, Milwaukee (историческое название Telsmith); CMEM India — тот же имперский ряд для Osborn.",
+     "parts_system": "Номенклатура наследует имперские типоразмеры (44x48 и т. д.); независимые поставщики (CMS Cepcor, CMEM) ведут собственные номера и позиционируют детали как «compatible», без ссылки на номера OEM.",
+     "market": "ЮАР и юг Африки, Индия (через CMEM), вторичный рынок Австралии и Латинской Америки.",
+     "urls": [
+      "https://www.cmscepcor.com/crusher-parts/brands/osborn-telsmith/osborn-telsmith/",
+      "https://www.cmemindia.com/osborn-telsmith/",
+      "https://www.scribd.com/document/690881012/CHANCADORA-OSBORN-SA3042"
+     ],
+     "confidence": "высокая по составу ряда и по факту лицензии; высокая по отсутствию 38x58"
+    },
+    {
+     "brand": "Pegson (Великобритания, позже Terex Pegson)",
+     "model": "Pegson-Telsmith B / C / D'Style, ряд 10x21 … 44x48, 50x60, 60x48",
+     "relation": "Второй лицензионный/британский выпуск щековых дробилок Telsmith — «та же конструкция под другим именем» для европейского рынка. Типоразмера 38x58 в ряду нет — не найдено. Пример подтверждённой машины: Pegson-Telsmith 44x48 D'style, 1219x1118 мм, изготовлена Pegson в Великобритании.",
+     "evidence": "CMS Cepcor, бренд-страница Pegson B/C/D'Style с перечнем типоразмеров; карточка машины Pegson-Telsmith 44x48 D'style (crushers.co.uk) — «Manufactured by Pegson in the UK»; исторические брошюры «Pegson Telsmith D'Style Jaw Crushers».",
+     "parts_system": "Британские чертёжные номера Pegson (например, тип 600/2025 для распорных плит Terex/Pegson) — система, не совпадающая ни с Telsmith, ни с Astec.",
+     "market": "Великобритания, Ирландия, континентальная Европа; сегодня — вторичный рынок и афтермаркет (CMS Cepcor, Coalville).",
+     "urls": [
+      "https://www.cmscepcor.com/us/crusher-parts/brands/pegson-b-c-dstyle/",
+      "https://crushers.co.uk/equipment/57/pegsontelsmith-44x48-dstyle",
+      "https://internationalcrushersolutions.com/perch/resources/brochures/pegson-telsmith-d-type-jaw-crushers.pdf"
+     ],
+     "confidence": "высокая по факту связки Pegson-Telsmith и по составу ряда"
+    },
+    {
+     "brand": "KPI-JCI / Pioneer (Astec, США)",
+     "model": "Pioneer 2650 (26x50 = 660x1270 мм), 2742, 3055 (30x55 = 760x1400 мм), 3365, 3552, 4450",
+     "relation": "Машины того же холдинга, но другой конструктивной школы (Pioneer/KPI-JCI), не переименованный Telsmith. Логика обозначения идентична: первые две цифры — зев (гэп) в дюймах, вторые — ширина камеры в дюймах. Типоразмера 38x58 в ряду Pioneer нет. Афтермаркет уже трактует Telsmith и KPI-JCI как одну семью (объявления «KPI-JCI Telsmith 3858 5060 jaw plate»).",
+     "evidence": "Каталог Astec / спецификация FT3055 (30x55 = 760x1400 мм); карточки Pioneer 2650 и 3055 на IRONPROS; торговые объявления с объединённым названием KPI-JCI/Telsmith на плиты 3858 и 5060.",
+     "parts_system": "Семизначные номера Astec (общие с поздним Telsmith), собственные каталоги KPI-JCI/Pioneer.",
+     "market": "США, Канада, экспорт через дилеров Astec.",
+     "urls": [
+      "https://astec-assets-new.azureedge.net/sf-assets/docs/default-source/mobile-crushing-screening-documents/mobile-jaw-crusher-plants/mobile-jaw-crusher-plant-ft3055-spec-sheet-english.pdf",
+      "https://www.ironpros.com/product-categories/aggregates/crushers/jaw-crushers/product/22897373/astec-industries-inc-3055-pioneer-jaw-crusher",
+      "https://www.alibaba.com/product-detail/After-market-Mn13Cr2-KPI-JCI-Telsmith-60733147293.html"
+     ],
+     "confidence": "высокая по 2650/3055 и по отсутствию 38x58; размеры 3365/3552/4450 в дюймах не подтверждены документом — не найдено"
+    },
+    {
+     "brand": "Metso (Nordberg C Series)",
+     "model": "C125 (зев 950 мм / 37\", ширина 1250 мм / 49\"), C130 (1000 / 39\" x 1300 / 51\"), C140 (1070 / 42\" x 1400 / 55\"), C145 (1100 x 1400), C150 (1200 / 47\" x 1400 / 55\"), C160 (1200 x 1600), C3054 (760 / 30\" x 1380 / 54\")",
+     "relation": "Независимые аналоги по типоразмеру, не родственники Telsmith. Ключ к чтению обозначений: индекс C-серии — это ширина камеры в сантиметрах (C130 = 1300 мм ширины), а не зев. Отдельно показателен C3054: та же фирма для американского рынка называет машину в дюймах 30x54 — прямая иллюстрация того, что одна конструкция может нести и метрическое, и дюймовое имя. По зеву к Telsmith 3858 (965 мм) ближе всего C125 (950 мм, отклонение 1,6%), но её камера уже на 223 мм (−15%); по ширине ближе C140/C145/C150 (1400 мм, −73 мм / −5%), но у них зев на 105–235 мм больше. Точного совпадения 965x1473 в C-серии нет.",
+     "evidence": "Metso, Nordberg C Series jaw crusher wear parts Handbook — таблица «Feed opening depth / Cavity width» по всем моделям, включая C125, C140, C145; Metso, брошюра Nordberg C Series 2024 — «Nominal feed opening: Width / Depth» для C80…C200 и C3054.",
+     "parts_system": "Собственная номенклатура Metso (артикулы вида N11xxxxxx / MM-номера), плюс огромный независимый афтермаркет; в Китае C-серия воспроизводится как «PEV/C-type» (например, PEV950x1250 у Chengdu Dahongli, «Metso type C125» у Kinglink).",
+     "market": "Глобально; в СНГ, Китае, Турции C-серия и её копии — самый распространённый метрический эталон.",
+     "urls": [
+      "https://www.metso.com/globalassets/saleshub/documents---episerver/handbook-wear-parts-c-series-3795-en-lowres.pdf",
+      "https://www.metso.com/globalassets/brochure-nordberg-c-series-4226-04-24-en-agg.pdf",
+      "https://www.tradekey.com/product-free/Jaw-Crusher-Pev950-1250-7711143.html",
+      "https://www.machinio.com/listings/75790445-kinglink-metso-type-new-c125-jaw-crusher-in-shanghai-china"
+     ],
+     "confidence": "высокая — цифры взяты из фирменных документов Metso"
+    },
+    {
+     "brand": "Sandvik",
+     "model": "CJ612 = JM1211 (1200x1100), CJ613 = JM1312 (1300x1070), CJ615 = JM1511 (1500x1070), CJ815 = JM1513 (1500x1300); также CJ211=J11, CJ409=JM907, CJ411=JM1108, CJ412=JM1208",
+     "relation": "Независимый аналог, но с наглядным примером двойного именования одной и той же машины: Sandvik в одном документе ставит рядом новое обозначение CJ6xx и старое JM<ширина в дм><зев в дм>. Зев/ширина у Sandvik пишутся как «ширина x зев». По ширине камеры к Telsmith 3858 (1473 мм) ближе всего CJ615 — 1500 мм (+27 мм, +1,8%); по зеву CJ615 крупнее (1070 против 965 мм, +11%). Это самое близкое по ширине серийное метрическое совпадение из найденных.",
+     "evidence": "Sandvik Jaw Crusher Series, Technical specification (PDF): таблица «CRUSHER / CSS / FEED OPENING (MM)» — CJ613 1300x1070, CJ615 1500x1070, CJ815 1500x1300; там же заголовки разделов «CJ615 (JM1511)», «CJ613 (JM1312)», «CJ815 (JM1513)».",
+     "parts_system": "Артикулы вида 400.xxxx-xxx (щёчные плиты) и 402.xxxx-xx (боковые/дефлекторные плиты); дополнительно старые JM-обозначения машин в переписке и на шильдах.",
+     "market": "Глобально; сильные позиции в СНГ, Африке, Латинской Америке.",
+     "urls": [
+      "https://www.mining.sandvik/globalassets/products/stationary-crushers-and-screens/pdf/jaw-crusher-series-technical-specification.pdf",
+      "https://www.rockprocessing.sandvik/en/products/stationary-crushers/stationary-jaw-crushers/cj615-jaw-crusher/"
+     ],
+     "confidence": "высокая — таблица из фирменной спецификации Sandvik"
+    },
+    {
+     "brand": "Kleemann (Wirtgen Group)",
+     "model": "MC 110 (камера 1100 x 700 мм = 44\" x 28\"), MC 120 PRO (1200 x 800), MC 140 — дробилка типа STR 140-103, «Crusher inlet width x depth 1,400 x 1,130 mm»",
+     "relation": "Независимый аналог. Важен как пример третьей системы: в маркетинговом имени MC 1xx зашита ширина камеры в сантиметрах, а внутреннее заводское обозначение дробилки — STR <ширина в см>-<глубина в см> (STR 140-103). Порядок цифр обратный китайскому: у Kleemann первым идёт ширина, вторым зев. Ближайшая к 3858 машина — MC 140 (1400x1130): камера уже на 73 мм, зев больше на 165 мм.",
+     "evidence": "Wirtgen Group, Technical information MOBICAT MC 140 (PDF): «Single toggle jaw crusher type STR 140-103; Crusher inlet width x depth (mm) 1,400 x 1,130»; для MC 110 — 1100 x 700 мм (44\" x 28\").",
+     "parts_system": "Номера Kleemann/Wirtgen (внутренние 7–9-значные), тип дробилки STR как ключ подбора износа.",
+     "market": "Европа, Северная Америка, Ближний Восток; в РФ — вторичный рынок и афтермаркет.",
+     "urls": [
+      "https://www.wirtgen-group.com/binary/full/o5179v101_data_sheet_kleemann_mc140z_engl.pdf",
+      "https://www.wirtgen-group.com/binary/full/o120935v101_Datasheet_kleemann_MOBICAT_110_EVO2_en.pdf"
+     ],
+     "confidence": "высокая по MC 140 (цифры из фирменного даташита); средняя по MC 120 (1200x800 — из вторичных источников)"
+    },
+    {
+     "brand": "Terex (Cedarapids, Pegson, Jaques)",
+     "model": "Cedarapids JW42 (30\" x 42\" = 760 x 1070 мм), JW55 (32\" x 55\" = 820 x 1400 мм), модульные MJ42/MJ55; Terex Pegson Premiertrak 1100x650 мм (44\" x 26\")",
+     "relation": "Независимые машины одного холдинга, но с ДВУМЯ противоположными системами обозначений внутри одной корпорации: американская линия Cedarapids — дюймы «зев x ширина» (JW55 = 32x55), британская линия Pegson — метры «ширина x зев» (1100x650). Это прямой ответ на вопрос о соотношении Terex Pegson с дюймовым зевом: 1100x650 читается как 44\" ширины и 26\" зева, а не наоборот. К Telsmith 3858 ближайшая по ширине — JW55 (1400 мм, −73 мм), но зев меньше на 152 мм.",
+     "evidence": "Terex MPS, страницы Cedarapids JW42 и JW55 и спецлист JW Series; карточки и объявления Terex Pegson Premiertrak 1100x650.",
+     "parts_system": "Cedarapids/Terex MPS — собственные номера; Pegson — исторические британские номера (например, 600/2025); в афтермаркете обслуживается CMS Cepcor и др.",
+     "market": "США, Великобритания, Европа, Австралия (Jaques).",
+     "urls": [
+      "https://www.terex.com/mps/en/product/static-jaw-crusher/jw42",
+      "https://www.terex.com/mps/en-au/product/static-jaw-crusher/jw55",
+      "https://www.terex.com/docs/librariesprovider8/spec-sheets/static/jw-series-specification-sheet.pdf",
+      "https://www.lectura-specs.com/en/model/recycling-waste-management/rubble-recycling-plants-bl-pegson/premiertrak-1100x650-1030017"
+     ],
+     "confidence": "высокая по JW42/JW55; средняя по Pegson 1100x650 (вторичные источники, но согласованные)"
+    },
+    {
+     "brand": "Lippmann-Milwaukee (США)",
+     "model": "LJ3862 (38\" x 62\" = 965 x 1575 мм), LJ3650 (36x50), LJ4248 (42x48), полный ряд LJ2242…LJ5062",
+     "relation": "Независимый аналог по типоразмеру и — важно — единственный найденный серийный конкурент с ТЕМ ЖЕ зевом 38\" (965 мм). Камера шире на 102 мм (+7%). Дюймовая система обозначений полностью совпадает по логике с Telsmith (зев x ширина), поэтому LJ3862 — ближайший «сосед» 3858 в американской размерной сетке. Обозначения 38x58 у Lippmann нет.",
+     "evidence": "Lippmann Full Line Booklet (PDF), таблица «Jaw Crusher Specifications»: LJ3650 36 x 50; LJ3862 38 x 62; LJ4248 42 x 48; LJ5062 50 x 62.",
+     "parts_system": "Собственные номера Lippmann; плиты не взаимозаменяемы с Telsmith.",
+     "market": "США, Канада, экспорт.",
+     "urls": [
+      "https://lippmanncrushers.com/wp-content/uploads/2021/09/Lippmann_FullLineBooklet.pdf",
+      "https://lippmanncrushers.com/new-equipment/jaw-crushers/"
+     ],
+     "confidence": "высокая — таблица из фирменного буклета"
+    },
+    {
+     "brand": "Китайские заводы (серии PE / PEV / PEW): Liming, Sanme, Kinglink, Vanguard, Shanbao и др.",
+     "model": "Стандартный ряд PE: 400x600, 500x750, 600x900, 750x1060, 800x1060, 900x1200, 1000x1200, 1200x1500, 1500x1800; отдельно PEV950x1250 (копия Metso C125), PE 1100x1400, PE 1300x1600",
+     "relation": "Независимые машины со своей размерной сеткой. Система обозначений: PE-<зев> x <длина приёмного отверстия, т.е. ширина камеры> в мм — порядок ОБРАТЕН европейскому. Проверка по заданным размерам: 1000x1200 — существует серийно (PE-1000x1200, зев 1000, ширина 1200); 950x1250 — существует, но это китайская копия Metso C125 в европейском порядке цифр (ширина 1250, зев 950), т.е. PEV950x1250; 900x1500 и 1000x1500 в стандартном ряду PE не найдены (ближайшие — 900x1200, 1000x1200, 1100x1400, 1200x1500). Точного эквивалента 965x1473 нет: PE-1000x1200 совпадает по зеву (+35 мм), но камера уже на 273 мм (−19%); PE-1200x1500 совпадает по ширине (+27 мм), но зев больше на 235 мм.",
+     "evidence": "Vanguard Machinery, таблица PE/PEX с полным рядом моделей; Sanme и Liming — те же типоразмеры; объявления и каталоги на PE-1000x1200 (в т. ч. русскоязычные дилеры: приёмное отверстие 1000x1200, макс. кусок 850 мм, 280–560 т/ч); PEV950x1250 у Chengdu Dahongli; «Metso type C125» у Kinglink.",
+     "parts_system": "Артикулы привязаны к типоразмеру (PE900x1200 и т. д.), единого межзаводского номера нет; те же литейные параллельно льют плиты «под Telsmith 25x36 / 38x58» и «под Osborn/Parker/Telsmith» с собственной нумерацией.",
+     "market": "Китай, СНГ, Африка, Юго-Восточная Азия, Латинская Америка; активный экспорт в РФ.",
+     "urls": [
+      "https://www.vanguardtec.com/crushers/PE-PEX-jaw-crusher.html",
+      "https://specer.ru/katalog/drobilnoe-oborudovanie/schekovye-drobilki/schekovaya-drobilka-pe-1000x1200/",
+      "https://www.tradekey.com/product-free/Jaw-Crusher-Pev950-1250-7711143.html",
+      "https://slonmachinery.en.made-in-china.com/product/MNZxprGWhYck/China-Telsmith-25X36-38X58-Jaw-Crusher-Spare-Parts-Fixed-Swing-Moving-Jaw-Plate.html"
+     ],
+     "confidence": "высокая по составу ряда PE и по существованию PE-1000x1200 и PEV950x1250; высокая по отсутствию серийных 900x1500 и 1000x1500 (в пределах проверенных каталогов)"
+    },
+    {
+     "brand": "Российские/советские заводы (ЭЗТМ, Волгоцеммаш, Дробмаш и др.), ГОСТ 27412-93",
+     "model": "ЩДП-9x12 (900x1200 мм), ЩДП-12x15 (1200x1500 мм, он же СМД-118/118А/118Б), ЩДП-15x21 (1500x2100 мм); дробилки со сложным движением — ЩДС-I и ЩДС-II",
+     "relation": "Независимая размерная сетка. Система обозначений: ЩДП — щековая дробилка с простым движением щеки, цифры — размеры приёмного отверстия в дециметрах, первым идёт ширина (зев), вторым — длина (ширина камеры). Типоразмер 965x1473 в стандартный ряд не попадает и никогда в нём не было: 9x12 (900x1200) заметно меньше по камере (−273 мм), 12x15 (1200x1500) совпадает по ширине (+27 мм), но зев больше на 235 мм. Прямого российского аналога Telsmith 3858 нет — не найдено.",
+     "evidence": "ГОСТ 27412-93 «Дробилки щековые. Общие технические условия», таблица типоразмеров: ЩДП-9x12 900x1200, ЩДП-12x15 1200x1500, ЩДП-15x21 1500x2100; каталоги ЭЗТМ и Волгоцеммаш на ЩДП-12x15 (СМД-118Б), приёмное отверстие 1200x1500, макс. кусок 1000 мм.",
+     "parts_system": "Номера по чертежам заводов (СМД-118..., позиции по РЭ), плиты из стали 110Г13Л; сквозной межзаводской системы номеров нет.",
+     "market": "РФ, Казахстан, Беларусь, Узбекистан; вторичный рынок и капремонт.",
+     "urls": [
+      "https://meganorm.ru/Data2/1/4294827/4294827272.htm",
+      "https://allgosts.ru/73/120/gost_27412-93",
+      "https://www.eztm.ru/catalog/drobilki/drobilki-shchekovye/shchekovaya-drobilka-shchdp-12kh15-fma-s-prostym-dvizheniem-shcheki-/",
+      "https://exkavator.ru/excapedia/technic/volgocemmash_smd-118b_shdp-12x15"
+     ],
+     "confidence": "высокая — ряд закреплён действующим ГОСТ"
+    },
+    {
+     "brand": "Независимые литейные и парт-хаусы (CMS Cepcor, CMEM, Sunrise Machinery, Slon/WJ/Cohesion, Zore Mining, Mellott, Emerald Parts, H&G, Qiming)",
+     "model": "Позиции «Telsmith 3858 / 38x58 jaw plate», «Telsmith 25x36 38x58 fixed / swing jaw plate», «KPI-JCI Telsmith 3858 5060 jaw plate»",
+     "relation": "Не другая машина, а другая система номеров на ту же машину: афтермаркет уже держит модельную оснастку под 38x58 и продаёт плиты по собственным артикулам со ссылкой на модель, а не на номер Telsmith. Это и есть практический второй канал снабжения по данной дробилке.",
+     "evidence": "Sunrise Machinery — каталог ASTEC Telsmith с явными позициями «3858» и «38X58» (пример: 1149591 «DIE, STA JAW», Telsmith 3858) и смешанными форматами номеров (1056392, B-272-430C, SEW-2436A68, 1084317.A); Zore Mining — AA-273-1917M10M / AA-273-1917M10 (тот же корневой номер 273-1917, что в исходном перечне, с иными префиксом и суффиксом сплава); miningspareparts — Telsmith 44x48 jaw plate 273-918; торговые площадки с позициями Mn13Cr2/Mn18Cr2/Mn22Cr2 под 3858.",
+     "parts_system": "Каждый поставщик ведёт свой артикул + поле «reference OEM». Устойчивый ключ поиска — не номер, а связка «модель 3858 / 38x58 + тип детали (fixed jaw die, swing jaw die, cheek plate, toggle plate)».",
+     "market": "Великобритания (CMS Cepcor), Индия (CMEM), Китай (Sunrise, Slon, H&G, Qiming), США (Mellott, Emerald).",
+     "urls": [
+      "https://www.sunrisespares.com/telsmith-crusher-parts/",
+      "https://zoremining.com/product/detail/store/16869/Telsmith%20crusher",
+      "https://www.wjcrusherparts.com/showroom/telsmith-25x36-38x58-jaw-crusher-spare-parts-fixed-swing-moving-jaw-plate.html",
+      "https://www.alibaba.com/product-detail/After-market-Mn13Cr2-KPI-JCI-Telsmith-60733147293.html",
+      "https://www.cmscepcor.com/crusher-parts/brands/telsmith/"
+     ],
+     "confidence": "высокая по факту наличия позиций под 38x58; низкая по конкретным перекрёстным номерам — сводных кросс-таблиц в открытом доступе не найдено"
+    }
+   ],
+   "notes": "1. КАК ЧИТАЮТСЯ ОБОЗНАЧЕНИЯ (главный практический вывод). Существуют четыре несовместимые конвенции, и пара чисел в них означает разное:\n— США (Telsmith, Lippmann, Cedarapids, Pioneer): дюймы, ЗЕВ x ШИРИНА камеры. 3858 = зев 38\" (965 мм) x ширина 58\" (1473 мм).\n— Европа (Metso, Sandvik, Kleemann, Terex Pegson): миллиметры, ШИРИНА x ЗЕВ — порядок обратный. C125 = 1250 ширины x 950 зева; CJ615 = 1500 x 1070; Kleemann 1400 x 1130; Pegson 1100 x 650.\n— Китай (PE/PEX): миллиметры, ЗЕВ x ДЛИНА приёмного отверстия (= ширина камеры), как в США. PE-1000x1200 = зев 1000 x ширина 1200.\n— Россия (ГОСТ 27412-93): дециметры, ШИРИНА приёмного отверстия (зев) x ДЛИНА. ЩДП-12x15 = 1200 x 1500.\nОтсюда типовая ошибка снабжения: «950x1250» и «1250x950» — одна и та же машина (Metso C125), а «1000x1200» (Китай) и «1200x1000» (Metso C130) — разные машины с почти зеркальными числами. Кроме того, у одного производителя может быть несколько имён одной машины: Sandvik CJ615 = JM1511, Kleemann MC 140 = дробилка STR 140-103, Metso C3054 — метрическая C-серия, названная в дюймах 30x54.\n\n2. ПОПРАВКА К ИСХОДНЫМ ДАННЫМ. Telsmith 3858 не входит в серию Iron Giant: по фирменным материалам Telsmith Iron Giant — это 4448 (1118x1219 мм) и 5060 (1270x1524 мм), а 3858 и 3258 — отдельные модели. Это важно при запросах: поиск «Iron Giant 3858» у дилеров и литейных даёт ложные попадания, корректные ключи — «Telsmith 3858», «Telsmith 38x58», «Astec Telsmith 3858».\n\n3. ЧТО СУЩЕСТВУЕТ ИЗ ЗАПРОШЕННЫХ РАЗМЕРОВ.\n— 950x1250 — да: Metso Nordberg C125 (зев 950, ширина 1250) и её китайские копии (PEV950x1250, «Metso type C125» у Kinglink).\n— 1000x1200 — да: китайский серийный PE-1000x1200 (зев 1000, ширина 1200); в европейском порядке те же числа дают Metso C130 (1300x1000), это другая машина.\n— 900x1500 — серийной машины с таким приёмным отверстием не найдено (нет ни в ряду PE, ни в ГОСТ 27412-93, ни у Metso/Sandvik/Kleemann).\n— 1000x1500 — серийной машины не найдено. Это и есть метрический эквивалент Telsmith 3858 (965x1473 ≈ 1000x1500), и он в чужие размерные сетки не попал: китайский ряд перескакивает с 1000x1200 на 1100x1400 и 1200x1500, российский — с 900x1200 на 1200x1500.\n\n4. БЛИЖАЙШИЕ ПО КАМЕРЕ (отклонения от 965 x 1473 мм):\n— Lippmann LJ3862: 965 x 1575 — зев совпадает точно, камера шире на 102 мм (+7%). Ближайший «сосед» в дюймовой сетке.\n— Sandvik CJ615 (JM1511): 1070 x 1500 — ширина ближе всех (+27 мм, +1,8%), зев больше на 105 мм (+11%).\n— Metso C150 / C140 / C145: ширина 1400 (−73 мм, −5%), зев 1070–1200 (+11…+24%).\n— Kleemann MC 140 (STR 140-103): 1130 x 1400 — ширина −73 мм, зев +165 мм.\n— Cedarapids JW55: 813 x 1400 — ширина −73 мм, зев −152 мм.\n— Metso C125: зев 950 (−15 мм, −1,6%) — лучшее совпадение по зеву, но камера уже на 223 мм (−15%).\n— PE-1200x1500 и ЩДП-12x15: ширина 1500 (+27 мм), зев 1200 (+235 мм).\nНи одна серийная машина не совпадает по обоим размерам: 965x1473 — «телсмитовский» типоразмер, которого нет ни у одного другого производителя.\n\n5. О ФУТЕРОВКАХ (ключевой вывод по цели запроса). Совпадение габаритов камеры НЕ означает взаимозаменяемости плит. Посадка щёчных плит задаётся не зевом и шириной, а способом крепления (клин/распорный брус против сквозных болтов), профилем тыльной стороны плиты, шагом и высотой зуба, вырезами под боковые плиты и клинья. У Telsmith, Metso, Sandvik и Kleemann эти узлы конструктивно разные, поэтому рассматривать футеровки C125/C130/CJ615/MC140 как источник для 3858 нельзя — переделка посадки под сменную плиту в 3–5 тонн экономически и по безопасности не оправдана. Реальные каналы по футеровке 3858 — только два: (а) OEM Astec/Telsmith по семизначным и старым буквенным номерам; (б) независимые литейные, у которых уже есть модельная оснастка под 38x58 (см. соответствующую запись). Внутри самого Telsmith перспективна проверка родства 3858 и 3258: у них одинаковая ширина камеры 1473 мм (58\"), поэтому боковые (щёчные) плиты и часть крепежа могут быть общими — по открытым источникам это не подтверждено, требуется сверка по каталогу запчастей 3858 и 3258.\n\n6. ЧТО НЕ ПОДТВЕРЖДЕНО И ГДЕ ПРЕДЕЛЫ ПРОВЕРКИ. Каталог запчастей Telsmith 3858 доступен только на Scribd за регистрацией — не открывался (правило о пейволлах), поэтому точные габариты и масса плит 273-1917, а также перечень общих с 3258 позиций не проверены. Внутренние коды покупных (14T47, 62H48, 65D47, 62M77, 62K87, 60P88, 63R53) в открытых источниках не встречаются — не найдено; по формату они не похожи ни на номера Telsmith, ни на Astec и, вероятнее всего, принадлежат внутренней системе владельца парка. Сводных кросс-таблиц «Telsmith → Metso/Sandvik/китайский аналог» в открытом доступе не существует; все встреченные «кроссы» — это привязка к модели машины, а не к номеру детали. Лицензионные выпуски Telsmith (Osborn в ЮАР, Pegson в Великобритании) типоразмер 38x58 не воспроизводили, поэтому альтернативного «европейского» или «африканского» имени именно у этой машины нет."
+  },
+  {
+   "scope": "номера-чужие",
+   "identities": [
+    {
+     "brand": "Astec Industries (бренд Telsmith)",
+     "model": "Telsmith 3858 / Astec Telsmith (щековые дробилки, включая 4448IG, 5060IG)",
+     "relation": "та же машина под корпоративным зонтиком: Telsmith с 2019 г. — бренд Astec; каталог запчастей ведётся как «Astec Telsmith»",
+     "evidence": "Независимый поставщик Uptime Spares публикует позицию «DIE, STA JAW for Astec Telsmith 4448IG» под номером 1142828 — 7-значный числовой номер эпохи Astec. Такие же 7-значные номера для Telsmith встречаются в базе cncrusher.net: 1162237 (concave), 1084428 (mantle), 1086862, 1143406, 1125277 (jaw plate). Это подтверждает, что формат ваших номеров 1082397 / 1050402 / 1064057 — действующая нумерация Astec/Telsmith, а не сторонняя. САМИ номера 1082397, 1050402, 1064057 в открытых источниках НЕ НАЙДЕНЫ ни под Telsmith, ни под другой маркой.",
+     "parts_system": "Две параллельные системы у одного производителя: (1) историческая буквенно-цифровая Telsmith вида <буквенный префикс>-<группа>-<позиция> (DA-273-1917W, B1-273-1723, CN-273-1923, A-277-619) — префикс кодирует исполнение/материал, средняя группа 273 = щёчные плиты/футеровка камеры, 277 = узел распорной плиты; (2) 7-значная числовая Astec (1082397, 1050402). Опубликованной таблицы перевода одной в другую НЕ НАЙДЕНО.",
+     "market": "США, глобально через дилерскую сеть Astec; сервис — заводские представители Astec/Telsmith",
+     "urls": [
+      "https://www.uptimespares.com/parts/astec-telsmith-4448ig-1142828/",
+      "https://www.cncrusher.net/english/parts-database/telsmith-crusher/2",
+      "https://astecindustries.com/product-brand/telsmith/"
+     ],
+     "confidence": "высокая — по формату нумерации; низкая — по конкретным номерам 1082397/1050402/1064057 (не найдены)"
+    },
+    {
+     "brand": "Osborn Engineered Products (ЮАР, входит в Astec)",
+     "model": "Osborn Telsmith (типоразмерный ряд 10x21, 10x36, 14x24, 15x24, 18x32, 20x36, 25x36, 25x40, 30x42, 36x46, 42x48, 44x48, 50x60, 60x48). Размера 38x58 в опубликованном ряду НЕТ",
+     "relation": "лицензионная сборка: Osborn выпускает щековые дробилки по лицензии Telsmith в ЮАР с 1950 г., часть машин адаптирована под твёрдые породы и стала самостоятельным южноафриканским продуктом",
+     "evidence": "Факт лицензии подтверждён публикацией Modern Mining к столетию Osborn и корпоративным профилем Osborn на ckit.co.za (лицензионные соглашения с Telsmith и American Pulverizer, США). Aftermarket-каталоги (CMS Cepcor) ведут объединённую товарную группу «Osborn Telsmith». ОДНАКО: прямого подтверждения, что ваши номера (DA-273-1917W, B1-273-1723, CN-273-1923, A-277-619) продаются под номерами Osborn, НЕ НАЙДЕНО; размер 38x58 в опубликованном ряду Osborn Telsmith отсутствует.",
+     "parts_system": "Своя, отличная от Telsmith. В каталоге запчастей дробилки Osborn SA3042 применяются номера вида AH3042J381A, AH3042F382A — модель зашита в сам номер. Соответствий формату 273-1917 не обнаружено. Публичной таблицы кросс-референса Osborn ↔ Telsmith НЕ НАЙДЕНО.",
+     "market": "ЮАР и Африка, Индия (через дилеров типа CMEM); сервис — Osborn Johannesburg",
+     "urls": [
+      "https://www.crown.co.za/modern-mining/industry-news/10113-osborn-celebrates-its-centennial",
+      "http://ckit.co.za/profiles/osborn/osborn_main.htm",
+      "https://www.cmscepcor.com/crusher-parts/brands/osborn-telsmith/osborn-telsmith/",
+      "https://www.scribd.com/document/690881012/CHANCADORA-OSBORN-SA3042"
+     ],
+     "confidence": "средняя — лицензионная связь марок доказана; тождество деталей для 38x58 и общность номеров НЕ доказаны"
+    },
+    {
+     "brand": "KPI-JCI (Kolberg-Pioneer / Johnson Crushers International, Astec)",
+     "model": "Vanguard / Vanguard Plus (щековые дробилки)",
+     "relation": "машина того же холдинга, но другая конструкторская линия; признаков тождества с Telsmith 3858 не обнаружено",
+     "evidence": "НЕ НАЙДЕНО: ни одного вхождения номеров DA-273-1917W, B1-273-1723, CN-273-1923, A-277-619, 1082397, 1050402 в материалах KPI-JCI; типоразмера 3858 в опубликованных данных по Vanguard/Vanguard Plus не подтверждено. KPI, JCI и Astec Mobile Screens подтверждённо входят в Astec Industries, но общность каталога запчастей с Telsmith публично не заявлена.",
+     "parts_system": "Собственная нумерация KPI-JCI. Пересечений с форматом 273-xxxx не обнаружено.",
+     "market": "США, Канада; сеть дилеров KPI-JCI",
+     "urls": [
+      "https://astecindustries.com/product-brand/kpi-jci/",
+      "https://www.directindustry.com/prod/kpi-jci/product-55644-589334.html"
+     ],
+     "confidence": "низкая (отрицательный результат: подтверждений связи не найдено)"
+    },
+    {
+     "brand": "Mining Element (торговая марка «Element», РФ/СНГ)",
+     "model": "позиции к Telsmith Jaw crusher 38x58",
+     "relation": "независимый производитель-аналогист по типоразмеру; работает по номеру Telsmith как по «номеру OEM»",
+     "evidence": "Опубликована карточка: регулировочная прокладка AC-273-1922, применяемость — «Telsmith Jaw crusher 38x58», поле «OEM article: AC-273-1922», бренд поставщика — Element. Это ПРЯМОЕ подтверждение, что группа номеров 273-19xx относится именно к машине 38x58 и что она обращается вне заводской системы. Ваш номер ZF-273-1922 — тот же узел с другим префиксом исполнения; сам ZF-273-1922 вербатим не найден.",
+     "parts_system": "Своей независимой нумерации не вводит: сохраняет номер Telsmith как поисковый ключ, добавляя собственный бренд. Заявлен «подбор аналогов», но опубликованной таблицы соответствия нет.",
+     "market": "РФ и СНГ, поставка по запросу",
+     "urls": [
+      "https://www.miningelement.com/article/adjustment-shim-ac-273-1922/"
+     ],
+     "confidence": "высокая (для номера AC-273-1922 и привязки группы 273-19xx к 38x58)"
+    },
+    {
+     "brand": "Texas Bearing Company (независимый дистрибьютор, США)",
+     "model": "каталожная позиция «TEL CD-273-1917W»",
+     "relation": "складской дистрибьютор, торгует под номером Telsmith с собственным префиксом марки",
+     "evidence": "В каталоге Telsmith (стр. 564) присутствует позиция «TEL CD-273-1917W» — прямое вхождение вашей группы номеров 273-1917W в чужой (дистрибьюторский) каталог. Префикс CD- — ещё одно исполнение того же узла, что и ваши DA-/DD-/FA-/EA-273-1917W. Прямое обращение к странице возвращает HTTP 403, факт зафиксирован по индексу поисковой системы — рекомендую подтвердить запросом в компанию.",
+     "parts_system": "Не своя: номер Telsmith берётся как есть, добавляется префикс марки «TEL» (внутренний признак производителя в общей номенклатуре дистрибьютора).",
+     "market": "США, Техас; продажа со склада",
+     "urls": [
+      "https://www.texasbearing.com/catsearch/161/telsmith/564"
+     ],
+     "confidence": "средняя (вхождение подтверждено индексом, прямая страница недоступна — 403)"
+    },
+    {
+     "brand": "Mellott Company (авторизованный дистрибьютор, США)",
+     "model": "раздел Telsmith / crusher parts",
+     "relation": "дистрибьютор оригинальных деталей, интернет-магазин по номерам Telsmith",
+     "evidence": "Позиции опубликованы прямо по номерам Telsmith: «Die, Fixed, Telsmith 15x38, Style D» — B-273-581 (URL магазина содержит сам номер). Это подтверждает, что группа 273-xxx — общая нумерация щёчных плит Telsmith по всем типоразмерам. Ваших номеров DA-273-1917W и A-277-619 в открытой части каталога найти НЕ УДАЛОСЬ (поиск по сайту через внешний доступ не отдаёт результаты).",
+     "parts_system": "Не своя: номера Telsmith используются как артикулы магазина.",
+     "market": "США, Восточное побережье; продажа онлайн и со склада",
+     "urls": [
+      "https://shop.mellottcompany.com/brands/Telsmith",
+      "https://shop.mellottcompany.com/brands/Telsmith/all-parts/crusher-parts/11009/B-273-581"
+     ],
+     "confidence": "средняя"
+    },
+    {
+     "brand": "Китайские aftermarket-производители и базы (zoremining, cncrusher.net / crusher.ltd, miningspareparts, Sinco, Sunrise Machinery, wjcrusherparts, Slon)",
+     "model": "плиты и футеровка к Telsmith 25x36, 38x58, 44x48, H3042 и др.",
+     "relation": "независимые аналоги по типоразмеру, изготавливаемые по номеру Telsmith",
+     "evidence": "Подтверждённые вхождения родственных вашим номеров: AA-273-1917M10M и AA-273-1917M10 (щёчная плита, zoremining) — тот же узел 273-1917, что и ваши DA-/DD-/FA-/EA-273-1917W, отличается префикс исполнения и суффикс марки стали (M10M = Mn10 с модификацией); EB-273-1417, DB-273-1417, B1-273-968 (cncrusher.net); B1-273-888 для H3042 — тот же префикс B1-, что и в вашем B1-273-1723; 273-918 для 44x48. Sunrise Machinery прямо указывает типоразмер 38X58 в перечне обслуживаемых моделей Telsmith.",
+     "parts_system": "Гибрид: номер Telsmith берётся как базовый ключ, к нему приписывается собственный суффикс марки стали (…M10M, …M14, …M18). Отдельной независимой нумерации нет, опубликованных кросс-таблиц на другие марки нет.",
+     "market": "Китай, экспорт по всему миру, в том числе в СНГ; продажа напрямую с завода и через Alibaba/Made-in-China",
+     "urls": [
+      "https://zoremining.com/product/detail/store/16869/Telsmith%20crusher",
+      "https://www.cncrusher.net/english/parts-database/telsmith-crusher/2",
+      "https://miningspareparts.com/en/product/h3042-fixed-jaw-die-for-jaw-crusher-b1-273-888/",
+      "https://miningspareparts.com/en/product/telsmith-4448-jaw-plate-for-jaw-crusher-273-918/",
+      "https://www.sunrisespares.com/telsmith-crusher-parts/"
+     ],
+     "confidence": "высокая (для факта обращения номеров группы 273-xxxx вне заводской системы)"
+    },
+    {
+     "brand": "CMS Cepcor (Великобритания)",
+     "model": "товарные группы «Telsmith, Pegson and CFBK» и отдельно «Osborn Telsmith»",
+     "relation": "премиальный независимый аналогист; единственный найденный источник, который на уровне товарной группы объединяет Osborn и Telsmith в один бренд",
+     "evidence": "Опубликован ряд «Osborn Telsmith»: 10x21, 10x36, 14x24, 15x24, 18x32, 20x36, 25x36, 25x40, 30x42, 36x46, 42x48, 44x48, 50x60, 60x48 — размера 38x58 в ряду НЕТ. Номера деталей на страницах не публикуются, следовательно подтвердить или опровергнуть совпадение номеров по этому источнику невозможно.",
+     "parts_system": "Своя внутренняя нумерация CMS Cepcor, не публикуемая в открытом каталоге; подбор ведётся по модели дробилки, а не по номеру OEM.",
+     "market": "Великобритания, ЕС, США (домен /us/), экспорт",
+     "urls": [
+      "https://www.cmscepcor.com/us/crusher-parts/brands/telsmith/",
+      "https://www.cmscepcor.com/crusher-parts/brands/osborn-telsmith/osborn-telsmith/"
+     ],
+     "confidence": "средняя"
+    }
+   ],
+   "notes": "ГЛАВНЫЙ ВЫВОД ПО ЗАДАЧЕ. Опубликованной таблицы соответствия номеров Telsmith номерам Osborn, Astec, KPI-JCI или иной марки НЕ НАЙДЕНО. Ни один из запрошенных номеров не обнаружен в чужой заводской системе обозначений — везде, где номера группы 273-xxxx / 277-xxx встречаются вне Telsmith, они используются как есть, в качестве ключа применяемости, а не переименовываются.\n\n1. ПОИМЁННО ПО ЗАПРОШЕННЫМ НОМЕРАМ.\n   - DA-273-1917W — вербатим НЕ НАЙДЕН. Найдены соседи по тому же узлу: CD-273-1917W (Texas Bearing), AA-273-1917M10M и AA-273-1917M10 (zoremining, щёчная плита). Вывод: 273-1917 — это позиция щёчной плиты, буквенный префикс кодирует исполнение (DA/DD/FA/EA/CD/AA), суффикс W — признак исполнения Telsmith, суффикс M10/M14 — марка стали у китайских изготовителей.\n   - B1-273-1723 — вербатим НЕ НАЙДЕН. Префикс B1- подтверждён на других позициях: B1-273-888 (H3042), B1-273-968.\n   - CN-273-1923 — вербатим НЕ НАЙДЕН. Подтверждён соседний номер AC-273-1922 с прямой привязкой «Telsmith Jaw crusher 38x58» (Mining Element) — это самое сильное найденное доказательство, что вся группа 273-19xx относится именно к вашей машине.\n   - A-277-619 — вербатим НЕ НАЙДЕН нигде. Группа 277 (узел распорной плиты) в открытых каталогах не индексируется.\n   - 1082397 и 1050402 — вербатим НЕ НАЙДЕНЫ. Формат подтверждён как действующая 7-значная нумерация Astec/Telsmith (см. 1142828 у Uptime Spares, 1162237/1084428/1143406/1125277 в базе cncrusher).\n   - 14T47, 62H48, 62M77, 63R53 — НЕ НАЙДЕНО ни одного вхождения ни в одном каталоге, ни в одной базе кросс-референсов, ни в объявлениях складских остатков.\n\n2. ПО ВОПРОСУ О ФОРМАТЕ 62M77 (общий ли он для группы Astec). ПОДТВЕРЖДЕНИЙ НЕТ, но и опровержения нет. Открытые каталоги Astec, KPI-JCI и Osborn кодов такого вида не публикуют. Косвенно: структура «две цифры + буква + две цифры» типична для внутренних кодов групп закупаемых комплектующих (крепёж, подшипники, РТИ, гидравлика), которые в заводских спецификациях идут отдельным полем и в дилерских каталогах не показываются. Практический вывод для снабжения: расшифровку этих кодов из открытых источников получить нельзя — только через сборочный чертёж/спецификацию или запросом в Astec Product Support. Искать их у сторонних дилеров бессмысленно, они по ним ничего не найдут; заказывать такие позиции нужно по описанию узла и посадочным размерам, а не по коду.\n\n3. ВАЖНАЯ ФАКТИЧЕСКАЯ ПОПРАВКА К ИСХОДНЫМ ДАННЫМ. Отнесение модели 3858 к серии Iron Giant документально НЕ ПОДТВЕРЖДАЕТСЯ. По публикации Pit & Quarry линия Iron Giant представлена двумя типоразмерами — 4448 и 5060 (индекс IG в дилерских каталогах: «Astec Telsmith 4448IG», «Telsmith 44x48 IG»). Telsmith 3858 фигурирует как отдельная модель щековой дробилки с гидравлической очисткой камеры и защитой от перегруза, с собственным каталогом запчастей. Ошибка в серии критична при заказе: у 4448 и 3858 разные номера плит (273-918 против 273-19xx). Рекомендую сверить серию по заводской табличке машины до размещения заказа.\n\n4. ЧТО ЭТО ДАЁТ ДЛЯ КАНАЛОВ СНАБЖЕНИЯ.\n   - Расширять поиск по чужим маркам смысла нет: второй заводской системы номеров для этой машины не существует.\n   - Реальное расширение канала даёт поиск по «корню» номера без префикса — «273-1917», «273-1922», «273-1723» — именно так позиции индексируются у дистрибьюторов (Texas Bearing, Mellott) и у аналогистов (zoremining, cncrusher, Mining Element, Sinco, Sunrise). Префикс исполнения при этом надо проверять отдельно, он определяет геометрию и материал.\n   - Второй рабочий ключ — не номер, а типоразмер «Telsmith 38x58»: по нему выдают применяемость Sunrise Machinery, Mining Element, Slon, wjcrusherparts.\n   - Линия Osborn (ЮАР) как альтернативный канал остаётся гипотезой: лицензионная связь с Telsmith с 1950 г. доказана, но типоразмера 38x58 в опубликованном ряду Osborn Telsmith нет, а нумерация Osborn построена иначе (AH3042J381A). Проверять эту линию имеет смысл только адресным запросом в Osborn Johannesburg с приложением чертежа.\n\n5. ОГРАНИЧЕНИЯ ПРОВЕРКИ. Прямой доступ к каталогу Texas Bearing закрыт (HTTP 403), к документам Scribd (каталог запчастей Telsmith 3858, каталог Osborn SA3042) — через предпросмотр не открылись, пейволлы не обходились. Внутренний поиск shop.mellottcompany.com извне результатов не отдаёт. Официальный портал подбора запчастей Astec (find-oem-parts) возвращает 404. Поэтому отрицательные результаты по номерам DA-273-1917W, A-277-619, 1082397, 1050402 следует читать как «нет в открытом индексе», а не как «не существует». Достоверную сверку номеров даст только официальный каталог запчастей Telsmith 3858 либо запрос в Astec Product Support."
+  }
+ ],
+ "synth": {
+  "verdict": "Второго заводского имени у этой машины нет: 38×58 (965×1473 мм) — собственный телсмитовский типоразмер, который не воспроизводили ни лицензионные производства (Osborn в ЮАР, Pegson в Великобритании), ни площадка Astec do Brasil, ни индийские, китайские, турецкие и австралийские заводы; отсутствие подтверждено отрицательными результатами по четырём независимым перечням Osborn и по опубликованным рядам Pegson/CFBK, а не одним источником. Что действительно меняет имя — владелец бренда: Telsmith перешёл к Astec в 1986/87 гг. (не в 2019 и не напрямую, а через Barber-Greene, подразделением которой Telsmith был с 1960 г.), а с 2021 г. Telsmith, Osborn, KPI-JCI и BTI сведены под единое имя ASTEC — держатель чертежей сегодня Astec, а не «Telsmith». Существенная поправка к постановке задачи: 3858 не относится к серии Iron Giant — по фирменной литературе Iron Giant это ровно 4448 и 5060, а 3858 идёт отдельной моделью рядом с 3258, поэтому ключ «Iron Giant 3858» уводит на чужую машину и чужие номера (273-918 вместо 273-19xx). Вместо второго имени машины снабжению открывается другое — сквозной номер: группа 273-xxxx (камера, плиты) и 277-xxx (узел распорной плиты) обращается вне заводской системы как ключ применимости, и привязка группы 273-19xx именно к 38×58 подтверждена прямо (позиция AC-273-1922 опубликована с применимостью «Telsmith Jaw crusher 38x58»), а соседние исполнения того же узла найдены у трёх независимых поставщиков (CD-273-1917W, AA-273-1917M10, AA-273-1917M10M). Практический вывод: расширять поиск надо не по чужим маркам, а по корню номера без префикса исполнения (273-1917, 273-1922, 273-1723, 277-619) и по типоразмеру «Telsmith 38x58» — по этим двум ключам отвечают дистрибьюторы США, CMS Cepcor, индийские механообрабатывающие производства и китайские литейные, у части которых модельная оснастка под 38×58 уже есть. Прочие «имена» проверены и закрыты: Smith Engineering Works и Barber-Greene — историческое имя самого завода и его материнской компании, к машине 1990–2010-х отношения не имеющие; Iowa Manufacturing/Cedarapids принадлежит Terex, конструктивной связи с Telsmith нет; KPI-JCI/Pioneer — другая конструкторская школа того же холдинга, 38×58 в её ряду отсутствует. Близкие типоразмеры чужих марок (Lippmann LJ3862 с тем же зевом 38\", Metso C125/C140/C150, Sandvik CJ615=JM1511, Kleemann MC 140=STR 140-103) — аналоги по классу, а не тождество конструкции: посадка футеровки задаётся способом крепления, профилем тыльной стороны плиты и вырезами, а не габаритом камеры, поэтому взаимозаменяемости плит нет ни с одной из них, и серийного эквивалента 965×1473 (≈1000×1500) не существует ни в одной размерной сетке. Внутренние коды покупных (14T47, 62H48, 65D47, 62M77, 62K87, 60P88, 63R53) вовне не котируются — расшифровка возможна только по сборочной спецификации или через Astec Product Support, запрашивать по ним у сторонних поставщиков бесполезно.",
+  "channels": [
+   {
+    "channel": "Корневой номер Telsmith как межканальный ключ: группы 273-xxxx (камера, плиты) и 277-xxx (узел распорной плиты). Не марка и не рынок, а единственная система номеров, которую эта машина имеет — второй заводской системы для неё не существует.",
+    "what_to_do": "Искать и запрашивать по корню БЕЗ префикса исполнения: «273-1917», «273-1922», «273-1723», «277-619», «277-601». Вторым ключом всегда давать типоразмер — «Telsmith 38x58» / «Telsmith 3858». Префикс (DA/DD/FA/EA/CD/AA/B1/ZF/CN/CP) и суффикс (W, M10, M10M, M14, M18) фиксировать отдельным полем и сверять у поставщика — это исполнение, профиль зуба и марка марганца. Ключ «Iron Giant 3858» из всех запросов исключить: он выводит на 4448/5060 и на номера 273-918.",
+    "value": "Один ключ открывает сразу все каналы — дистрибьюторы США, Британию, Индию, Китай, СНГ. Все они берут телсмитовский номер как есть, в качестве поля применимости, и не переименовывают его; значит, поиск не надо дробить по маркам. Это самое дешёвое расширение канала: стоит нуля, даёт доступ к нескольким десяткам поставщиков.",
+    "risk": "Совпадение корня не гарантирует совпадения геометрии: при неверном префиксе придёт другое исполнение плиты того же узла. Кросс-таблиц префиксов в открытом доступе нет. Подтверждённая привязка к 38×58 есть только по AC-273-1922; сами наши номера (DA-273-1917W, B1-273-1723, CN-273-1923, A-277-619) в открытом индексе вербатим не найдены — это «нет в индексе», а не «не существует»."
+   },
+   {
+    "channel": "OEM: Astec Product Support и дилерская сеть Astec (США, глобально). Держатель чертежей и обеих систем номеров — старой буквенной Telsmith и действующей 7-значной Astec.",
+    "what_to_do": "Письменный запрос в Astec Product Support и профильному дилеру: (1) заводской каталог запчастей на модель 3858; (2) перевод старых буквенных номеров (DA-/DD-/FA-/EA-273-1917W, B1-273-1723, ZF-273-1922, CN-/CP-273-1923, A-/BA-/BB-277-619, B1-277-601) в действующие 7-значные и обратно; (3) расшифровка внутренних кодов покупных 14T47, 62H48, 65D47, 62M77, 62K87, 60P88, 63R53. До размещения любого заказа сверить модель и серию по заводской табличке машины — отнесение 3858 к Iron Giant документально не подтверждается, а у 4448 и 3858 разные номера плит.",
+    "value": "Единственный источник достоверной сверки номеров и оригинальной геометрии. Без него все отрицательные результаты по открытым источникам остаются неокончательными, а расшифровка внутренних кодов покупных недоступна в принципе. Даёт также подтверждение применимости при закупке на аутмаркете.",
+    "risk": "Модель снята с производства и в действующем каталоге Astec отсутствует — поддерживается только запчастями. Площадка в Мекуоне остановлена 14.08.2020 и закрыта к 31.03.2021, линии перенесены на другие заводы группы: сроки и цена OEM. Официальный портал подбора (find-oem-parts) отдаёт 404 — работает только письмо или дилер."
+   },
+   {
+    "channel": "Независимые и авторизованные дистрибьюторы США плюс вторичный рынок (Texas Bearing, Mellott, Uptime Spares, Emerald). Работают напрямую по номерам Telsmith, собственной нумерации не вводят.",
+    "what_to_do": "Адресные запросы на складские остатки по CD-273-1917W (позиция зафиксирована в каталоге Texas Bearing — то же исполнение узла 273-1917), по корню 273-1917 и по 7-значным номерам. У Mellott запрашивать в формате магазина по номеру Telsmith (подтверждённый пример формата — B-273-581). Обязательно требовать письменное подтверждение наличия и применимости к 38×58.",
+    "value": "Наличие со склада на рынке, где парк 3858 наиболее распространён; оригинальные и авторизованные позиции без ожидания изготовления оснастки и отливки. Самый быстрый путь по срочным позициям.",
+    "risk": "Прямые страницы Texas Bearing отдают 403, вхождение зафиксировано только по поисковому индексу — требуется подтверждение запросом в компанию. Внутренний поиск Mellott извне результатов не отдаёт. По снятой с производства модели складские остатки могут оказаться единичными. Логистика и стоимость доставки из США."
+   },
+   {
+    "channel": "Китайские литейные с заявленной модельной оснасткой под 38×58: Sunrise Machinery, Slon, WJ Crusher Parts, Hyton, Zore Mining, GTEK, Haocheng/HCMP. Своей системы номеров нет — индексируют позиции по номерам Telsmith.",
+    "what_to_do": "Запрос по связке «Telsmith 38x58» + корень номера, с явным указанием марки стали (Mn13Cr2 / Mn18Cr2 / Mn22Cr2, суффиксы M10/M14/M18) и профиля зуба; требовать чертёж или замер посадочных размеров до запуска. У HCMP отдельно уточнить заявленный «полный комплект чертежей» по группе H3858 — станина, эксцентриковый вал, подвижная щека, распорная балка. У Zore проверить AA-273-1917M10 / AA-273-1917M10M как тот же узел 273-1917.",
+    "value": "Самый быстрый и дешёвый второй канал по футеровке: оснастка под 38×58 уже существует, отдельные поставщики публикуют позиции прямо с этим типоразмером. Патент US6375105B1 на гидравлическую распорную балку (правообладатель Telsmith) истёк 21.03.2020 — юридических препятствий к изготовлению аналогичных узлов третьими сторонами нет.",
+    "risk": "Обозначение «H3858» — собственная группировка поставщиков, заводской номенклатурой Telsmith не подтверждена. Суффиксы марок стали у них свои и исполнению Telsmith не тождественны — по одному корню номера можно получить другой сплав и другое рифление. По корпусным деталям «complete drawings» — заявление поставщика, не проверенный факт; на станину и эксцентриковый вал риск несоизмерим с экономией. Машины-копии 3858 и китайского типоразмера 965×1473 не существует — «аналог целиком» получить нельзя."
+   },
+   {
+    "channel": "Индия — механообработка ответственных деталей под имперский ряд Telsmith: CMEM India и Pranston (Кхеда, Гуджарат). Лицензионной сборки самих дробилок Telsmith в Индии не найдено (проверены Sayaji/McNally Sayaji, Puzzolana, Marsman).",
+    "what_to_do": "Адресный запрос по чертежу или образцу — не по каталогу, позиции под 3858 публично не заявлены. Перечень: эксцентриковый вал, корпуса подшипников, распорная балка (toggle beam), сёдла и распорные плиты, маслосъёмные уплотнения, клинья, боковые щёки. В запросе давать «Telsmith 38x58» плюс корневой номер, требовать сертификат материала и протокол термообработки.",
+    "value": "Единственный найденный канал, закрывающий не только износ, но и механообработанные ответственные позиции, которые обычно доступны только у OEM. Цена и сроки ниже заводских; ориентирован на экспорт, работает по OEM-номерам Telsmith.",
+    "risk": "По 3858 позиции публично не заявлены — оснастка и чертёж делаются под заказ, срок первой партии выше. Требуется входной контроль материала, термообработки и допусков. На эксцентриковый вал и распорную балку цена отказа несопоставима с экономией — эти позиции рационально брать у OEM, а у индийского изготовителя пробовать сначала менее критичные."
+   },
+   {
+    "channel": "CMS Cepcor (Великобритания, домен /us/ для США) — премиальный независимый аналогист. Ведёт товарные группы «Telsmith, Pegson и CFBK» и отдельно «Osborn Telsmith»; номеров в открытом каталоге не публикует, подбор ведёт по модели.",
+    "what_to_do": "Запрос по модели и наименованию позиции, а не по номеру: «Telsmith 38x58 — fixed jaw die, swing jaw die, cheek plate, toggle plate, toggle seat». Первым вопросом — есть ли у них оснастка именно под 38×58 и по какому чертежу она снята. При положительном ответе запросить их внутренний артикул и поле reference OEM для дальнейшей сверки.",
+    "value": "Европейское литьё и подбор по модели, альтернатива OEM по цене и срокам, работает и на рынок США. Полезен также как эксперт по имперскому ряду — их перечни типоразмеров использованы как один из независимых источников по отсутствию 38×58 у Osborn и Pegson.",
+    "risk": "38×58 в опубликованных рядах Cepcor отсутствует: их имперский ряд — поколение B/C/D'Style (10×21 … 44×48, 50×60, 60×48), куда 3858 как более позднее гидравлическое поколение не входит. Наличие оснастки под 38×58 нужно подтвердить до заказа, иначе получится изготовление с нуля по цене премиального аналогиста. Собственная нумерация без публичного OEM-кросса — сверку придётся вести переписью."
+   },
+   {
+    "channel": "7-значные номера Astec (1082397, 1050402, 1064057) как выход на исходных изготовителей покупных изделий. Формат подтверждён как действующая нумерация Astec/Telsmith (аналоги 1142828, 1149591, 1084317.A, 1162237).",
+    "what_to_do": "Раскрыть номера до первичного изготовителя: запросить у дилера Astec наименование позиции, узел и посадочные размеры, затем искать по типу изделия (подшипник, гидроцилиндр, уплотнение, крепёж), а не по номеру Astec. Внутренние коды 14T47, 62H48, 65D47, 62M77, 62K87, 60P88, 63R53 по внешним каналам не запрашивать вовсе — это внутризаводская кодировка покупных, вовне не котируется; такие позиции заказывать по описанию узла и посадочным размерам.",
+    "value": "Наиболее вероятный источник дешёвого и быстрого альтернативного снабжения: нормализованные покупные изделия закупаются напрямую у изготовителя, минуя наценку и сроки OEM. По ряду позиций это разница в разы по цене и в неделях по сроку.",
+    "risk": "Сами три номера в открытом индексе не найдены — подтверждён только формат нумерации, не позиции. Часть 7-значных номеров может относиться к собственному литью Astec, а не к покупным, и тогда канал по ним не открывается. Без описания позиции от дилера поиск невозможен в принципе."
+   },
+   {
+    "channel": "Внутреннее родство 3858 и 3258 в собственной номенклатуре Telsmith: одинаковая ширина камеры 1473 мм (58\"), зев 965 против 813 мм. Обе модели идут в фирменной литературе соседними позициями.",
+    "what_to_do": "Получить и сверить заводские каталоги запчастей 3858 и 3258, выписать позиции с совпадающими номерами — в первую очередь боковые (щёчные) плиты, клинья, крепёж, элементы узла 277-. По общим позициям добавить в поиск ключ «Telsmith 3258» / «Telsmith 32x58» — этот типоразмер присутствует и в перечнях китайских поставщиков (H3258 у HCMP).",
+    "value": "Прямое расширение предложения по совпадающим позициям без выхода за пределы конструкции: где деталь общая, доступны сразу оба модельных ключа и оба круга поставщиков. Дешёвый ход — стоит одной сверки каталогов.",
+    "risk": "Не подтверждено ни одним открытым источником. Общая только ширина камеры; зев отличается на 152 мм, поэтому общими могут оказаться боковые плиты и крепёж, но заведомо не футеровка щёк и не распорная плита. Проверка требует заводского каталога, а публичный экземпляр лежит на Scribd за регистрацией — сверку даёт только запрос в Astec."
+   },
+   {
+    "channel": "Osborn Engineered Products (Эландсфонтейн, ЮАР) / Astec Africa & Middle East. Лицензионная сборка конструкций Telsmith с 1950 г. — факт доказан. Собственная система номеров вида AH3042J381A, крепёж ZE-12-M10x025, встречается формат 00-000006322.",
+    "what_to_do": "Письменный запрос в отдел запчастей Osborn (57 Jansen Road, Эландсфонтейн) с чертежом и фото заводской таблички — чтобы закрыть отрицательный результат по 38×58 официально, а не по совокупности косвенных. Телсмитовские номера 273-/277- по этому каналу не пробиваются: спрашивать надо по модели и наименованию позиции. Сайт osborn.co.za отдавал 503 — идти через контакты Astec AME.",
+    "value": "Если бы подтвердилось — второй завод, физически владеющий конструктивом Telsmith, со своим литьём и своим складом. На практике же ценность канала сейчас в другом: официальный ответ закрывает направление и снимает его из плана работ, чтобы снабжение не тратило на него время.",
+    "risk": "38×58 отсутствует в четырёх независимых перечнях: фирменная брошюра «Osborn Telsmith Jaw Crusher (SA)» (1-CJM-2002), каталог CMS Cepcor, перечень независимого изготовителя запчастей, объявления о продаже техники в ЮАР. Причина содержательная: лицензионный ряд Osborn воспроизводит старое имперское поколение B/C/D (роликоподшипники, клиновая регулировка), а 3858 — позднее гидравлическое поколение. Ближайшие 3848/4248 снизу и 5060 сверху по камере не эквивалентны — детали не подойдут. Плюс Osborn с 2010-х внутри Astec и с 2021 г. ребрендирован под ASTEC — независимым каналом он не является."
+   },
+   {
+    "channel": "Pegson (Coalville, Великобритания) и CFBK (Франция) — тот же имперский ряд Telsmith под другими именами: «Pegson-Telsmith» стилей B/C/D'Style. Собственные британские чертёжные номера Pegson (например тип 600/2025).",
+    "what_to_do": "По 3858 запросы не строить: ряд Pegson (10×21 … 44×48, 50×60, 60×48) типоразмера 38×58 не содержит. Направление держать только для работы со старым парком типов B/C/D — исторические брошюры и техпаспорта держат International Crusher Solutions и crushers.co.uk. Если понадобится документальное подтверждение самого факта двойного именования — брать оттуда.",
+    "value": "Даёт окончательный ответ на поставленный вопрос: конструкции Telsmith действительно выпускались под чужими именами (Pegson-Telsmith в Великобритании, Osborn-Telsmith в ЮАР), но для типоразмера 38×58 такого имени не появилось ни на одном рынке. Это и есть проверенная граница расширения поиска.",
+    "risk": "Текст лицензионного договора Pegson в открытых источниках не найден — связка документирована двойным именем на шильдиках и техпаспортах плюс объединением товарных групп в афтермаркете, то есть подтверждена косвенно. По CFBK связь ещё слабее: только отнесение CMS Cepcor к общей имперской товарной группе, лицензия не подтверждена — это лид, а не факт. Номера Pegson с телсмитовскими не совпадают."
+   },
+   {
+    "channel": "Близкие типоразмеры других марок: Lippmann LJ3862 (965×1575, тот же зев 38\"), Metso C125/C140/C145/C150, Sandvik CJ615 (=JM1511, 1500×1070), Kleemann MC 140 (=STR 140-103, 1400×1130), Cedarapids JW55, ЩДП-12×15 по ГОСТ 27412-93, китайские PE-1000×1200 и PE-1200×1500.",
+    "what_to_do": "Использовать только при подборе замены машины целиком или при оценке параметров дробления. Запросы на футеровку и посадочные детали по этим маркам не отправлять. Обязательно применять правило чтения обозначений: США (Telsmith, Lippmann, Cedarapids, Pioneer) — дюймы, зев×ширина; Европа (Metso, Sandvik, Kleemann, Terex Pegson) — мм, ширина×зев; Китай (PE/PEX) — мм, зев×длина; ГОСТ — дециметры, зев×длина.",
+    "value": "Снимает типовую ошибку снабжения, когда «950×1250» и «1250×950» принимают за разные машины, а «1000×1200» (Китай) и «1200×1000» (Metso C130) — за одну. Полезно и то, что у одного изготовителя бывает несколько имён одной машины (Sandvik CJ615=JM1511, Metso C3054 — метрическая C-серия под дюймовым именем): это подтверждает саму постановку задачи, но по нашей машине второго имени не даёт.",
+    "risk": "Главная ловушка — подмена тождества конструкции сходством по классу. Посадка щёчных плит задаётся способом крепления (клин против сквозных болтов), профилем тыльной стороны, шагом и высотой зуба, вырезами под боковые плиты и клинья, а не габаритом камеры; у Telsmith, Metso, Sandvik и Kleemann эти узлы разные, взаимозаменяемости плит нет ни с одной из машин. Ни одна серийная модель не совпадает с 965×1473 по обоим размерам, метрического эквивалента (≈1000×1500) не существует ни в китайском ряду PE, ни в ГОСТ 27412-93, ни у Metso/Sandvik/Kleemann. Переделка посадки под сменную плиту массой 3–5 т не оправдана ни экономически, ни по безопасности."
+   }
+  ]
+ }
+}

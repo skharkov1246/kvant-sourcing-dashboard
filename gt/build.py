@@ -6,6 +6,7 @@
 __PARTS_JSON__, __PN_JSON__, __CUSTOMS_JSON__, __BUILT_AT__.
 """
 import json
+import shutil
 import re
 from collections import Counter, defaultdict
 from datetime import date
@@ -118,6 +119,12 @@ def main():
     out.parent.mkdir(exist_ok=True)
     out.write_text(tpl, encoding="utf-8")
     print(f"OK → {out} ({out.stat().st_size // 1024} КБ)")
+
+    # Общий модуль правок инженеров (заметки, статусы, подпись автора, спасение
+    # осиротевших). Лежит рядом со страницами и подключается всеми: держать его
+    # копией внутри каждой страницы — значит однажды забыть обновить одну из них.
+    shutil.copy2(ROOT / "site/notes.js", ROOT / "public/notes.js")
+    print(f"OK → {ROOT / 'public/notes.js'}")
 
 
 if __name__ == "__main__":

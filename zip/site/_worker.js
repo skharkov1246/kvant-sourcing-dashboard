@@ -21,11 +21,25 @@ export default {
 
     const path = new URL(request.url).pathname;
     const gt = path === "/gt" || path.startsWith("/gt/");   // без слэша Pages сам перебросит
-    if (!(await siteAllowed(request, env, gt ? "gt" : SITE))) {
-      return denyPage(gt ? "Библиотека ГТУ · КВАНТ" : "ГШО · КВАНТ");
+    // Служебные адреса страниц (кто вошёл, доступ к базе) общие для обоих разделов:
+    // они лежат не под /gt/, и проверять их правом «zip» нельзя — инженер библиотеки
+    // ГТУ, у которого права «zip» нет, иначе не смог бы ни подписать заметку, ни
+    // сохранить её. Поэтому здесь достаточно ЛЮБОГО из двух прав.
+    const api = path === "/api/me" || path === "/db" || path.startsWith("/db/");
+    const allowed = api
+      ? (await siteAllowed(request, env, SITE)) || (await siteAllowed(request, env, "gt"))
+      : await siteAllowed(request, env, gt ? "gt" : SITE);
+    if (!allowed) return denyPage(gt ? "Библиотека ГТУ · КВАНТ" : "ГШО · КВАНТ");
+
+    // Кто вошёл — для подписи правок в библиотеке ГТУ. Отдаём только собственную
+    // почту спрашивающего: она и так уже у него, узнать чужую этим нельзя.
+    if (path === "/api/me") {
+      return new Response(JSON.stringify({ email: who.email }), {
+        headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" },
+      });
     }
 
-    if (path === "/db" || path.startsWith("/db/")) return proxyDb(request, env);
+    if (path === "/db" || path.startsWith("/db/")) return proxyDb(request, env, who);
 
     const resp = await env.ASSETS.fetch(request);
     const out = new Response(resp.body, resp);
@@ -48,23 +62,177 @@ const SUPA_ORIGIN = "https://vpjliavuuxjcvtxbthlp.supabase.co";
 // После задания SUPABASE_SERVICE_KEY и сужения RLS этот ключ станет бесполезен.
 const SUPA_FALLBACK_KEY = "sb_publishable_z74BF5VzezeQfTc9fni-ZA_HMyTKRTJ";
 
-async function proxyDb(request, env) {
+// Правки инженеров в библиотеке ГТУ: таблица gt_notes. Автора проставляет воркер по
+// подписи Cloudflare Access, а не страница: подпись, которую можно подделать из
+// браузера, не подпись. Удаление запрещено — снятая правка помечается removed и
+// остаётся в истории, иначе «пропало» повторится, только уже необратимо.
+const NOTES_PATH = "/rest/v1/gt_notes";
+
+// The browser only needs these ZIP tables and GT notes. A service key must never
+// turn /db into a general PostgREST, Storage, Auth, or Functions gateway.
+const ZIP_DB_METHODS = new Map([
+  ["positions", ["GET", "HEAD", "PATCH"]],
+  ["odm_suppliers", ["GET", "HEAD", "PATCH"]],
+  ["price_records", ["GET", "HEAD", "POST", "PATCH", "DELETE"]],
+  ["drawings", ["GET", "HEAD", "POST", "PATCH", "DELETE"]],
+  ["samples", ["GET", "HEAD", "POST", "PATCH", "DELETE"]],
+  ["rfq_requests", ["POST"]],
+  ["change_log", ["GET", "HEAD"]],
+  ["gt_notes", ["GET", "HEAD", "POST", "PATCH"]],
+]);
+const ZIP_FILE_BUCKETS = new Set(["drawings", "samples"]);
+
+function dbReject(error, status = 403) {
+  return new Response(JSON.stringify({ error }), { status, headers: {
+    "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store",
+    "X-Content-Type-Options": "nosniff", "Referrer-Policy": "no-referrer",
+  } });
+}
+
+function zipObjectKey(value) {
+  return typeof value === "string" && value.length > 0 && value.length <= 2048 &&
+    !/[\\%\x00-\x1f\x7f]/.test(value) &&
+    value.split("/").every((part) => part && part !== "." && part !== "..");
+}
+
+function zipRestQuery(url, table) {
+  const seen = new Set();
+  for (const [name, value] of url.searchParams) {
+    if (seen.has(name) || /[\x00-\x1f\x7f]/.test(value) || value.length > 4096) return false;
+    seen.add(name);
+    if (name === "select") {
+      // No embedded relations, computed projections, aliases, casts, or schema.
+      if (value !== "*") return false;
+    } else if (name === "order") {
+      // Ordering by an arbitrary computed field can execute a database function
+      // even when select is '*'. The two clients only sort the physical 'at'.
+      if (!["change_log", "gt_notes"].includes(table) || !["at.asc", "at.desc"].includes(value)) return false;
+    } else if (name === "limit" || name === "offset") {
+      if (!/^[0-9]{1,9}$/.test(value)) return false;
+    } else if (name === "id") {
+      if (!["positions", "odm_suppliers", "price_records", "drawings", "samples"].includes(table) ||
+          !/^eq\.[0-9]+$/.test(value)) return false;
+    } else if (name === "scope") {
+      if (table !== "gt_notes" || !value.startsWith("eq.") || value.length < 4) return false;
+    } else if (name === "removed") {
+      if (table !== "gt_notes" || (value !== "is.false" && value !== "is.true")) return false;
+    } else return false;
+  }
+  return true;
+}
+
+function zipDbRoute(url, method) {
+  const rest = /^\/db\/rest\/v1\/([a-z_]+)$/.exec(url.pathname);
+  if (rest) {
+    const methods = ZIP_DB_METHODS.get(rest[1]);
+    if (!methods) return { error: "db_route_forbidden" };
+    if (!methods.includes(method)) return { error: "db_method_forbidden", status: 405 };
+    if (!zipRestQuery(url, rest[1])) return { error: "db_query_forbidden" };
+    return { kind: "rest", notes: rest[1] === "gt_notes" };
+  }
+  const storage = /^\/db\/storage\/v1\/object\/(sign\/)?(drawings|samples)(?:\/(.+))?$/.exec(url.pathname);
+  if (!storage || !ZIP_FILE_BUCKETS.has(storage[2])) return { error: "db_route_forbidden" };
+  let objectKey;
+  try { objectKey = storage[3] === undefined ? null : decodeURIComponent(storage[3]); }
+  catch { return { error: "db_route_forbidden" }; }
+  if (objectKey !== null && !zipObjectKey(objectKey)) return { error: "db_route_forbidden" };
+  const signed = !!storage[1];
+  const kind = signed && objectKey && method === "POST" ? "sign" :
+    signed && objectKey && (method === "GET" || method === "HEAD") ? "download" :
+    !signed && objectKey && method === "POST" ? "upload" :
+    !signed && objectKey === null && method === "DELETE" ? "remove" : null;
+  if (!kind) return { error: "db_method_forbidden", status: 405 };
+  const seen = new Set();
+  for (const [name, value] of url.searchParams) {
+    if (kind !== "download" || seen.has(name) || !["token", "download"].includes(name) ||
+        value.length > 16384 || /[\x00-\x1f\x7f]/.test(value)) return { error: "db_query_forbidden" };
+    seen.add(name);
+  }
+  if (kind === "download" && !url.searchParams.get("token")) return { error: "db_query_forbidden" };
+  return { kind, notes: false };
+}
+
+async function zipStorageBody(request, kind) {
+  // Only control requests are JSON. An upload remains file bytes, never a
+  // generic Storage command that can choose a different source/destination.
+  const length = request.headers.get("Content-Length");
+  if (length && (!/^[0-9]+$/.test(length) || Number(length) > 65536)) return null;
+  const reader = request.body?.getReader();
+  if (!reader) return null;
+  const chunks = []; let size = 0;
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    size += value.byteLength;
+    if (size > 65536) { await reader.cancel(); return null; }
+    chunks.push(value);
+  }
+  const bytes = new Uint8Array(size); let offset = 0;
+  for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.byteLength; }
+  let data;
+  try { data = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes)); }
+  catch { return null; }
+  if (!data || typeof data !== "object" || Array.isArray(data)) return null;
+  if (kind === "sign") {
+    if (Object.keys(data).length !== 1 || !Number.isSafeInteger(data.expiresIn) ||
+        data.expiresIn < 1 || data.expiresIn > 3600) return null;
+  } else if (Object.keys(data).length !== 1 || !Array.isArray(data.prefixes) ||
+      !data.prefixes.length || data.prefixes.length > 100 || !data.prefixes.every(zipObjectKey)) return null;
+  return JSON.stringify(data);
+}
+
+async function stampAuthor(request, who) {
+  const body = await request.text();
+  if (!body) return body;
+  let data;
+  try { data = JSON.parse(body); } catch { return body; }   // не JSON — не наше дело
+  const stamp = (r) => {
+    if (!r || typeof r !== "object") return r;
+    r.author = who && who.email ? who.email : "";
+    r.at = new Date().toISOString();
+    return r;
+  };
+  return JSON.stringify(Array.isArray(data) ? data.map(stamp) : stamp(data));
+}
+
+async function proxyDb(request, env, who) {
   const url = new URL(request.url);
+  // Keep the explicit notes guard and its existing user-facing explanation.
+  if (url.pathname === "/db" + NOTES_PATH && request.method === "DELETE")
+    return dbReject("правки не удаляются: снимайте флагом removed", 405);
+  const route = zipDbRoute(url, request.method);
+  if (route.error) return dbReject(route.error, route.status || 403);
+  for (const name of ["Accept-Profile", "Content-Profile"]) {
+    const value = request.headers.get(name);
+    if (value !== null && value !== "public") return dbReject("db_schema_forbidden");
+  }
+  let storageBody;
+  if (route.kind === "sign" || route.kind === "remove") {
+    try { storageBody = await zipStorageBody(request, route.kind); }
+    catch { return dbReject("db_body_invalid", 400); }
+    if (storageBody === null) return dbReject("db_body_invalid", 400);
+  }
   const target = SUPA_ORIGIN + url.pathname.slice("/db".length) + url.search;
   const key = (env && env.SUPABASE_SERVICE_KEY) || SUPA_FALLBACK_KEY;
-
-  const headers = new Headers(request.headers);
+  const notes = route.notes;
+  const headers = new Headers();
+  for (const name of ["Accept", "Content-Type", "Prefer", "Range", "Range-Unit", "X-Upsert", "Cache-Control"]) {
+    const value = request.headers.get(name);
+    if (value !== null) headers.set(name, value);
+  }
   headers.set("apikey", key);
-  headers.set("Authorization", "Bearer " + key);
-  // куки Access и служебные заголовки Cloudflare базе не нужны и наружу не уходят
-  headers.delete("cookie");
-  headers.delete("cf-access-jwt-assertion");
-  headers.delete("cf-connecting-ip");
-  headers.delete("x-forwarded-for");
+  if (!key.startsWith("sb_secret_")) headers.set("Authorization", "Bearer " + key);
+  if (route.kind === "rest") {
+    headers.set("Accept-Profile", "public");
+    headers.set("Content-Profile", "public");
+  }
 
   const method = request.method;
   const init = { method, headers, redirect: "manual" };
-  if (method !== "GET" && method !== "HEAD") init.body = request.body;
+  if (method !== "GET" && method !== "HEAD") {
+    init.body = storageBody !== undefined ? storageBody : notes ? await stampAuthor(request, who) : request.body;
+    if (notes || storageBody !== undefined) headers.set("Content-Type", "application/json");
+  }
 
   const upstream = await fetch(target, init);
   const out = new Response(upstream.body, upstream);
@@ -74,7 +242,7 @@ async function proxyDb(request, env) {
 }
 
 // экспорт для тестов (на исполнение воркера не влияет)
-export { proxyDb, SUPA_ORIGIN };
+export { proxyDb, SUPA_ORIGIN, stampAuthor, NOTES_PATH };
 
 // служебная страница отказа: без внешних ресурсов, светлая и тёмная тема
 function denyPage(title) {
@@ -105,7 +273,7 @@ const rightsCache = new Map();
 // Что стоит журнала: страницы и выгружаемые файлы. Разметка, картинки, шрифты и
 // обращения страницы к данным (/db/…) — часть страницы, а не действие человека,
 // и в журнал не идут.
-const AUDIT_SKIP = /^\/db\/|\.(css|js|mjs|map|woff2?|ttf|png|jpe?g|gif|svg|webp|ico|avif)$/i;
+const AUDIT_SKIP = /^\/db\/|^\/api\/|\.(css|js|mjs|map|woff2?|ttf|png|jpe?g|gif|svg|webp|ico|avif)$/i;
 
 async function siteAllowed(request, env, site) {
   if (env && env.SITE_RIGHTS === "off") return true;

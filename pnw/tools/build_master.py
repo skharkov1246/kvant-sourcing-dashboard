@@ -57,6 +57,11 @@ def main():
             "kv": kv, "name": name, "brand": brand, "maker": maker,
             "node": node, "machine": machine, "section": src, **extra,
         })
+        # Собственный номер — тоже номер, по которому деталь ищут. Без этой строки
+        # поиск по KV давал ноль: в указателе лежали номера бренда, изготовителя и
+        # аналогов, а своего не было — при том что именно KV приведён примером
+        # в подсказке search.html и в pnw/НУМЕРАЦИЯ.md.
+        add_number(len(items) - 1, kv, "свой", "КВАНТ")
         return len(items) - 1, kv
 
     def add_number(idx, number, kind, owner):

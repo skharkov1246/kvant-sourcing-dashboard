@@ -1,0 +1,520 @@
+{
+  "note": "Карта узлов ГТУ: сведение 54 меток к каноническим узлам плюс классификатор по тексту наименования с ИЗМЕРЕННОЙ точностью. В источник ничего не пишется: предложение классификатора — гипотеза, она попадёт в gt/data/pn_db.json только решением владельца.",
+  "nodes": [
+    {
+      "node": "hot",
+      "title": "Горячий тракт: камера сгорания, горелки, зажигание, лопатки"
+    },
+    {
+      "node": "compressor",
+      "title": "Компрессор, ВНА, воздушный тракт"
+    },
+    {
+      "node": "rotor",
+      "title": "Ротор, подшипники, силовая турбина"
+    },
+    {
+      "node": "fuel",
+      "title": "Топливная система и клапаны"
+    },
+    {
+      "node": "controls",
+      "title": "САУ, КИП, электрика, защиты"
+    },
+    {
+      "node": "seals",
+      "title": "Уплотнения и прокладки"
+    },
+    {
+      "node": "fasteners",
+      "title": "Крепёж"
+    },
+    {
+      "node": "filters",
+      "title": "Фильтры и расходники"
+    },
+    {
+      "node": "oil",
+      "title": "Маслосистема"
+    },
+    {
+      "node": "exhaust",
+      "title": "Выхлоп и диффузор"
+    },
+    {
+      "node": "package",
+      "title": "Пакет и навесное оборудование"
+    },
+    {
+      "node": "tooling",
+      "title": "Оснастка и инструмент"
+    },
+    {
+      "node": "chemicals",
+      "title": "Химия и расходка"
+    },
+    {
+      "node": "start",
+      "title": "Пусковая система"
+    },
+    {
+      "node": "other",
+      "title": "Не определено"
+    }
+  ],
+  "labels": {
+    "total": 2642,
+    "distinct": 54,
+    "unmapped": [],
+    "map": [
+      {
+        "label": "Крепёж",
+        "count": 825,
+        "node": "fasteners",
+        "mapped": true
+      },
+      {
+        "label": "Прочее / требует разметки",
+        "count": 545,
+        "node": "other",
+        "mapped": true
+      },
+      {
+        "label": "Уплотнения и прокладки",
+        "count": 311,
+        "node": "seals",
+        "mapped": true
+      },
+      {
+        "label": "САУ, КИП, электрика",
+        "count": 306,
+        "node": "controls",
+        "mapped": true
+      },
+      {
+        "label": "Топливная система, клапаны",
+        "count": 176,
+        "node": "fuel",
+        "mapped": true
+      },
+      {
+        "label": "Фильтры и расходники",
+        "count": 101,
+        "node": "filters",
+        "mapped": true
+      },
+      {
+        "label": "Оснастка и инструмент",
+        "count": 72,
+        "node": "tooling",
+        "mapped": true
+      },
+      {
+        "label": "Пакет / навесное (BOP)",
+        "count": 57,
+        "node": "package",
+        "mapped": true
+      },
+      {
+        "label": "Горячий тракт: камеры, горелки, зажигание",
+        "count": 29,
+        "node": "hot",
+        "mapped": true
+      },
+      {
+        "label": "горячий тракт",
+        "count": 26,
+        "node": "hot",
+        "mapped": true
+      },
+      {
+        "label": "Ротор, подшипники, уплотнения",
+        "count": 20,
+        "node": "rotor",
+        "mapped": true
+      },
+      {
+        "label": "топливо",
+        "count": 20,
+        "node": "fuel",
+        "mapped": true
+      },
+      {
+        "label": "Химия и расходка",
+        "count": 19,
+        "node": "chemicals",
+        "mapped": true
+      },
+      {
+        "label": "компрессор",
+        "count": 18,
+        "node": "compressor",
+        "mapped": true
+      },
+      {
+        "label": "лопатки",
+        "count": 14,
+        "node": "hot",
+        "mapped": true
+      },
+      {
+        "label": "уплотнения",
+        "count": 10,
+        "node": "seals",
+        "mapped": true
+      },
+      {
+        "label": "зажигание",
+        "count": 9,
+        "node": "hot",
+        "mapped": true
+      },
+      {
+        "label": "КИП",
+        "count": 8,
+        "node": "controls",
+        "mapped": true
+      },
+      {
+        "label": "подшипники",
+        "count": 7,
+        "node": "rotor",
+        "mapped": true
+      },
+      {
+        "label": "камера сгорания",
+        "count": 6,
+        "node": "hot",
+        "mapped": true
+      },
+      {
+        "label": "лопатки / СА",
+        "count": 6,
+        "node": "hot",
+        "mapped": true
+      },
+      {
+        "label": "топливо / горелки",
+        "count": 5,
+        "node": "fuel",
+        "mapped": true
+      },
+      {
+        "label": "пусковая система",
+        "count": 4,
+        "node": "start",
+        "mapped": true
+      },
+      {
+        "label": "маслосистема",
+        "count": 4,
+        "node": "oil",
+        "mapped": true
+      },
+      {
+        "label": "ротор",
+        "count": 3,
+        "node": "rotor",
+        "mapped": true
+      },
+      {
+        "label": "воздушная система",
+        "count": 3,
+        "node": "compressor",
+        "mapped": true
+      },
+      {
+        "label": "горячий тракт / СА",
+        "count": 3,
+        "node": "hot",
+        "mapped": true
+      },
+      {
+        "label": "воздушный тракт",
+        "count": 3,
+        "node": "compressor",
+        "mapped": true
+      },
+      {
+        "label": "САУ",
+        "count": 3,
+        "node": "controls",
+        "mapped": true
+      },
+      {
+        "label": "привод агрегатов",
+        "count": 2,
+        "node": "rotor",
+        "mapped": true
+      },
+      {
+        "label": "КИП/вибрация",
+        "count": 2,
+        "node": "controls",
+        "mapped": true
+      },
+      {
+        "label": "топливо / горелка",
+        "count": 2,
+        "node": "fuel",
+        "mapped": true
+      },
+      {
+        "label": "крепёж",
+        "count": 2,
+        "node": "fasteners",
+        "mapped": true
+      },
+      {
+        "label": "Лопатки и сопловые",
+        "count": 1,
+        "node": "hot",
+        "mapped": true
+      },
+      {
+        "label": "компрессор / механизация ВНА",
+        "count": 1,
+        "node": "compressor",
+        "mapped": true
+      },
+      {
+        "label": "маслосистема/фильтрация",
+        "count": 1,
+        "node": "filters",
+        "mapped": true
+      },
+      {
+        "label": "КИП/управление",
+        "count": 1,
+        "node": "controls",
+        "mapped": true
+      },
+      {
+        "label": "корпус/инспекция",
+        "count": 1,
+        "node": "package",
+        "mapped": true
+      },
+      {
+        "label": "пожарная система",
+        "count": 1,
+        "node": "package",
+        "mapped": true
+      },
+      {
+        "label": "электрика пакета",
+        "count": 1,
+        "node": "controls",
+        "mapped": true
+      },
+      {
+        "label": "управление/топливо",
+        "count": 1,
+        "node": "controls",
+        "mapped": true
+      },
+      {
+        "label": "горячий тракт / камера сгорания",
+        "count": 1,
+        "node": "hot",
+        "mapped": true
+      },
+      {
+        "label": "лопатки / ротор",
+        "count": 1,
+        "node": "hot",
+        "mapped": true
+      },
+      {
+        "label": "горячий тракт / корпус",
+        "count": 1,
+        "node": "package",
+        "mapped": true
+      },
+      {
+        "label": "силовая турбина",
+        "count": 1,
+        "node": "rotor",
+        "mapped": true
+      },
+      {
+        "label": "компрессор / ВНА",
+        "count": 1,
+        "node": "compressor",
+        "mapped": true
+      },
+      {
+        "label": "компрессор / механизация",
+        "count": 1,
+        "node": "compressor",
+        "mapped": true
+      },
+      {
+        "label": "компрессор / уплотнения",
+        "count": 1,
+        "node": "seals",
+        "mapped": true
+      },
+      {
+        "label": "выхлоп / диффузор",
+        "count": 1,
+        "node": "exhaust",
+        "mapped": true
+      },
+      {
+        "label": "выхлоп",
+        "count": 1,
+        "node": "exhaust",
+        "mapped": true
+      },
+      {
+        "label": "КИП / защиты",
+        "count": 1,
+        "node": "controls",
+        "mapped": true
+      },
+      {
+        "label": "защиты",
+        "count": 1,
+        "node": "controls",
+        "mapped": true
+      },
+      {
+        "label": "трубопроводы",
+        "count": 1,
+        "node": "package",
+        "mapped": true
+      },
+      {
+        "label": "ротор / крепёж",
+        "count": 1,
+        "node": "fasteners",
+        "mapped": true
+      }
+    ]
+  },
+  "classifier": {
+    "measured_on": "строки, размеченные человеком, кроме «требует разметки»",
+    "judged": 1601,
+    "correct": 1394,
+    "wrong": 207,
+    "no_rule_matched": 496,
+    "precision_pct": 87,
+    "coverage_pct": 76,
+    "top_confusions": [
+      {
+        "pair": "tooling → controls",
+        "n": 51
+      },
+      {
+        "pair": "fasteners → rotor",
+        "n": 38
+      },
+      {
+        "pair": "hot → seals",
+        "n": 14
+      },
+      {
+        "pair": "fuel → hot",
+        "n": 14
+      },
+      {
+        "pair": "package → rotor",
+        "n": 13
+      },
+      {
+        "pair": "rotor → seals",
+        "n": 5
+      },
+      {
+        "pair": "fasteners → tooling",
+        "n": 5
+      },
+      {
+        "pair": "fasteners → oil",
+        "n": 5
+      },
+      {
+        "pair": "seals → fasteners",
+        "n": 4
+      },
+      {
+        "pair": "package → oil",
+        "n": 4
+      }
+    ],
+    "honest_note": "Точность измерена, а не заявлена. Правила, дающие путаницу из top_confusions, уточняются в первую очередь."
+  },
+  "proposal": {
+    "rows_without_label": 9800,
+    "would_classify": 4361,
+    "would_leave_unresolved": 5439,
+    "by_node": [
+      {
+        "node": "fasteners",
+        "title": "Крепёж",
+        "n": 1114
+      },
+      {
+        "node": "seals",
+        "title": "Уплотнения и прокладки",
+        "n": 792
+      },
+      {
+        "node": "controls",
+        "title": "САУ, КИП, электрика, защиты",
+        "n": 505
+      },
+      {
+        "node": "hot",
+        "title": "Горячий тракт: камера сгорания, горелки, зажигание, лопатки",
+        "n": 491
+      },
+      {
+        "node": "fuel",
+        "title": "Топливная система и клапаны",
+        "n": 482
+      },
+      {
+        "node": "rotor",
+        "title": "Ротор, подшипники, силовая турбина",
+        "n": 327
+      },
+      {
+        "node": "oil",
+        "title": "Маслосистема",
+        "n": 204
+      },
+      {
+        "node": "filters",
+        "title": "Фильтры и расходники",
+        "n": 172
+      },
+      {
+        "node": "compressor",
+        "title": "Компрессор, ВНА, воздушный тракт",
+        "n": 116
+      },
+      {
+        "node": "tooling",
+        "title": "Оснастка и инструмент",
+        "n": 70
+      },
+      {
+        "node": "exhaust",
+        "title": "Выхлоп и диффузор",
+        "n": 41
+      },
+      {
+        "node": "start",
+        "title": "Пусковая система",
+        "n": 33
+      },
+      {
+        "node": "package",
+        "title": "Пакет и навесное оборудование",
+        "n": 14
+      }
+    ]
+  }
+}
