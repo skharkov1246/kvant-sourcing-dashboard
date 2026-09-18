@@ -1,19 +1,23 @@
 {
- "rows_with_offer": 776,
- "above_ceiling": 222,
- "inside_band": 78,
- "below_floor": 106,
- "no_band": 370,
- "request_rows": 1642,
- "reverified": {
-  "rows": 46,
-  "with_offer": 22,
-  "overstated_confirmed": 13,
-  "understated_confirmed": 7,
-  "band_right": 2,
-  "no_offer": 24
- },
- "scope": "Энергосети",
+ "updated": "2026-09-18",
  "source": "Счётчики по всей заявке: что письменные предложения поставщиков из вложений сделок делают с НАШИМИ вилками. Ни цен, ни привязки цены к артикулу здесь нет и быть не может — это коммерческие данные контрагентов, они остаются в артефакте прогона.",
- "method": "Предложение сравнивается с вилкой строки заявки (usd_lo, usd_hi в gt/data/ship_lukoil.json). Выше потолка — наша оценка занижена, ниже пола — завышена, внутри — верна. Считает gt/tools/ship_offer.py."
+ "method": "Предложение сравнивается с вилкой строки заявки (usd_lo, usd_hi в gt/data/ship_lukoil.json). Выше потолка — наша оценка занижена, ниже пола — завышена, внутри — верна. Считает gt/tools/ship_offer.py. Охваты не складываются: это разные заявки.",
+ "scopes": {
+  "Энергосети": {
+   "rows_with_offer": 776,
+   "above_ceiling": 222,
+   "inside_band": 78,
+   "below_floor": 106,
+   "no_band": 370,
+   "request_rows": 1642,
+   "reverified": {
+    "rows": 46,
+    "with_offer": 22,
+    "overstated_confirmed": 13,
+    "understated_confirmed": 7,
+    "band_right": 2,
+    "no_offer": 24
+   }
+  }
+ }
 }

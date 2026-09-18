@@ -145,7 +145,7 @@ jobs:
             exit 1
           fi
           # Счётчики по вилкам — тоже в репозиторий, и в них тем более не должно
-          # быть ни цен, ни номенклатурных номеров: только счёт строк.
+          # быть ни цен, ни номенклатурных номеров: только счёт строк по охватам.
           if [ -f gt/data/ship_offer_stats.json ]; then
             if grep -qE '"(price|usd|pn)"[[:space:]]*:' gt/data/ship_offer_stats.json; then
               echo "::error::в счётчиках по вилкам найдены цены или артикулы — коммит отменён"
@@ -179,8 +179,13 @@ jobs:
             python scripts/merge_tkp_index.py \
               --mine "$RUNNER_TEMP/mine.json" \
               --into gt/data/bitrix_tkp_index.json || exit 1
+            # Слияние, а не запись поверх: счётчики живут по охватам, и прогон
+            # по одному листу не имеет права стереть цифры по другому — они
+            # стоят в листе решений владельцу.
             [ -f "$RUNNER_TEMP/stats.json" ] \
-              && cp "$RUNNER_TEMP/stats.json" gt/data/ship_offer_stats.json \
+              && python scripts/merge_offer_stats.py \
+                   --mine "$RUNNER_TEMP/stats.json" \
+                   --into gt/data/ship_offer_stats.json \
               && git add gt/data/ship_offer_stats.json
             git add gt/data/bitrix_tkp_index.json
             git diff --cached --quiet && { echo "опись не изменилась"; exit 0; }

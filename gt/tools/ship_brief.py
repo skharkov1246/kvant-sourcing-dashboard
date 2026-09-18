@@ -155,6 +155,21 @@ def width(r):
     return float(hi) / float(lo)
 
 
+def offer_scope(st: dict, prefer: str = "Энергосети") -> tuple[str, dict]:
+    """Счётчики КП по одному охвату: охваты — разные заявки и не складываются.
+
+    Форма до разделения (счётчики одного прогона прямо в корне файла) читается
+    тоже: иначе первый же прогон по другому листу оставил бы документ пустым.
+    """
+    sc = st.get("scopes")
+    if not isinstance(sc, dict) or not sc:
+        return (st.get("scope") or "—", st) if st.get("rows_with_offer") else ("—", {})
+    if prefer in sc:
+        return prefer, sc[prefer]
+    name = max(sc, key=lambda k: (sc[k] or {}).get("rows_with_offer") or 0)
+    return name, sc[name] or {}
+
+
 def build() -> str:
     lk = load("ship_lukoil.json")
     rows = lk["rows"] if isinstance(lk, dict) else lk
@@ -440,14 +455,15 @@ def build() -> str:
           f"открывал.</p>")
         a("</div>")
 
-    st = load("ship_offer_stats.json") or {}
+    st_doc = load("ship_offer_stats.json") or {}
+    st_scope, st = offer_scope(st_doc)
     if st.get("rows_with_offer"):
         tot_off = st["rows_with_offer"]
         a("<div class='sec'><h2>Что письменные предложения поставщиков делают с нашими вилками</h2>")
         a(f"<p class='lead'>Перепроверка идёт по сорока строкам, а письменные предложения "
           f"контрагентов лежат по {ru(tot_off)} строкам заявки. Значит на главный вопрос "
           f"защиты — «наши вилки вообще низкие или высокие» — отвечает не выборка, а счёт "
-          f"по всему пересечению. Охват прогона: {E(st.get('scope') or '—')}.</p>")
+          f"по всему пересечению. Охват прогона: {E(st_scope)}.</p>")
         a("<table class='k'>")
         for key, label, why in (
             ("above_ceiling", "предложение ВЫШЕ потолка вилки",

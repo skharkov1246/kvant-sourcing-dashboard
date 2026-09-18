@@ -104,12 +104,28 @@ def top_gap(rows: list, rv: list, top: int = 60) -> tuple[int, float, float]:
     return len(rest), sum(e for e, _ in rest), covered / whole * 100
 
 
+def offer_scope(st: dict, prefer: str = "Энергосети") -> tuple[str, dict]:
+    """Счётчики КП по одному охвату: охваты — разные заявки и не складываются.
+
+    Форма до разделения (счётчики одного прогона прямо в корне файла) читается
+    тоже: иначе первый же прогон по другому листу оставил бы документ пустым.
+    """
+    sc = st.get("scopes")
+    if not isinstance(sc, dict) or not sc:
+        return (st.get("scope") or "—", st) if st.get("rows_with_offer") else ("—", {})
+    if prefer in sc:
+        return prefer, sc[prefer]
+    name = max(sc, key=lambda k: (sc[k] or {}).get("rows_with_offer") or 0)
+    return name, sc[name] or {}
+
+
 def build() -> str:
     rows = (load("ship_lukoil.json") or {}).get("rows") or []
     ch = load("ship_channels.json") or {}
     col = load("ship_collisions.json") or {}
     cf = load("ship_confidence.json") or {}
-    st = load("ship_offer_stats.json") or {}
+    st_doc = load("ship_offer_stats.json") or {}
+    st_scope, st = offer_scope(st_doc)
     rv = (load("ship_reverify.json") or {}).get("rows") or []
     qs = (load("ship_questions.json") or {}).get("questions") or []
     en = load("ship_english_source.json") or {}
