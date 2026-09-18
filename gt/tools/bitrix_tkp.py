@@ -165,7 +165,16 @@ CYR = str.maketrans({"А": "A", "В": "B", "С": "C", "Е": "E", "К": "K", "М"
                      "Н": "H", "О": "O", "Р": "P", "Т": "T", "Х": "X"})
 NUM_RE = re.compile(r"(?<![\dA-Za-z./-])(\d{1,3}(?:[ \u00a0]\d{3})+(?:[.,]\d{1,2})?"
                     r"|\d+[.,]\d{1,2}|\d{2,9})(?![\dA-Za-z/-])")
-CUR_RE = re.compile(r"\b(USD|EUR|RUB|RUR|GBP|CNY|руб|долл|евро|\$|€|₽)\b", re.I)
+# Знаки и коды валют, которые могут стоять в строке предложения. Прежний список
+# не знал знака ¥, и замер 18.09.2026 показал цену этого: в выгрузке по слову
+# ЛУКОЙЛ 14 значений, взятых ИЗ КОЛОНКИ «цена», несли ¥ и пустую валюту, то есть
+# считались долларами. При юане это завышение в 6,7 раза, при иене — в 154.
+CUR_RE = re.compile(r"\b(USD|EUR|RUB|RUR|GBP|CNY|RMB|JPY|INR|AED|CHF|SEK|TRY|KRW|PLN|CZK"
+                    r"|руб|долл|евро|юан)\b|[$€₽₹₩£¥]", re.I)
+# Знак ¥ значит и юань, и иену, а курсы различаются в 22,8 раза. Молча выбрать
+# нельзя: ошибка в любую сторону переворачивает вывод по строке. Поэтому валюта
+# помечается неустановленной, и пересчёт делает тот, кто примет решение.
+YEN_MARK = "¥ (юань или иена — не установлено)"
 H_PRICE = re.compile(r"цена|стоим|price|amount|сумма|тариф|ставка", re.I)
 H_QTY = re.compile(r"кол-?в|количест|qty|quantity|шт\b|ед\b", re.I)
 H_PN = re.compile(r"артик|парт|номер|part|p/?n|каталож|обознач", re.I)
@@ -576,7 +585,45 @@ def header_map(rows: list) -> dict:
     return best if best_hits >= 2 else {}
 
 
-def price_rows(rows: list, hdr: dict) -> list[dict]:
+def file_currency(rows: list) -> tuple[str, str]:
+    """Валюта файла целиком и то, чем она опознана.
+
+    Нужна потому, что в предложении валюта стоит в шапке, а не в каждой строке.
+    Замер 18.09.2026 по выгрузке «Энергосети»: из 317 цен, взятых по колонке,
+    валюта в самой строке была ровно у одной. Без валюты файла всякая такая цена
+    молча читается долларом.
+
+    Если в файле встретилась ровно одна валюта — она и возвращается. Если
+    несколько, валюта не назначается: смешанное предложение бывает, и подставить
+    одну из двух значит выдать догадку за факт.
+    """
+    seen: set[str] = set()
+    yen = False
+    for _sheet, _i, cells in rows:
+        text = " ".join(str(c) for c in cells if c not in (None, ""))
+        for m in CUR_RE.finditer(text):
+            t = m.group(0).upper()
+            if t == "¥":
+                yen = True
+                continue
+            seen.add(t)
+    codes = {"RMB": "CNY", "RUR": "RUB", "РУБ": "RUB", "ДОЛЛ": "USD", "ЕВРО": "EUR",
+             "ЮАН": "CNY", "$": "USD", "€": "EUR", "₽": "RUB", "₹": "INR", "₩": "KRW",
+             "£": "GBP"}
+    seen = {codes.get(t, t) for t in seen}
+    if yen:
+        if seen == {"CNY"} or seen == {"JPY"}:
+            return next(iter(seen)), "знак ¥ и код валюты в файле"
+        if not seen:
+            return YEN_MARK, "в файле только знак ¥, кода валюты нет"
+    if len(seen) == 1:
+        return next(iter(seen)), "единственная валюта, встреченная в файле"
+    if len(seen) > 1:
+        return "", f"в файле несколько валют: {'/'.join(sorted(seen))}"
+    return "", "валюты в файле нет"
+
+
+def price_rows(rows: list, hdr: dict, fcur: tuple[str, str] = ("", "")) -> list[dict]:
     """Пары «артикул — цена». Если заголовки нашлись, берём колонки по ним; иначе
     ищем в строке артикул и число. Исходная строка сохраняется целиком: без неё
     следующая ошибка снова будет неизмеримой (правило 16 CLAUDE.md)."""
@@ -618,6 +665,15 @@ def price_rows(rows: list, hdr: dict) -> list[dict]:
                 price = nums[-1]
                 rule = "последнее число строки (заголовок не опознан)"
         if pn and price:
+            m = CUR_RE.search(joined)
+            rowcur = m.group(0).upper() if m else ""
+            rowcur = {"RMB": "CNY", "RUR": "RUB", "РУБ": "RUB", "ДОЛЛ": "USD",
+                      "ЕВРО": "EUR", "ЮАН": "CNY", "$": "USD", "€": "EUR", "₽": "RUB",
+                      "₹": "INR", "₩": "KRW", "£": "GBP"}.get(rowcur, rowcur)
+            rowcur_why = "валюта названа в самой строке"
+            if rowcur == "¥":
+                # Знак без кода: в строке решить нельзя, отдаём решение файлу.
+                rowcur, rowcur_why = "", "в строке только знак ¥"
             # ГРАДУС ЦЕНЫ. Замер 18.09.2026 по выгрузке «Энергосети»: из 6 619
             # значений только 317 взяты из колонки «цена» по заголовку, а 6 302 —
             # правилом «последнее число строки». И это правило берёт не цену: в
@@ -632,7 +688,10 @@ def price_rows(rows: list, hdr: dict) -> list[dict]:
             graded = rule.startswith("колонка")
             out.append({
                 "pn": pn, "price": price, "sheet": sheet, "row": i,
-                "currency": (CUR_RE.search(joined) or [""])[0] if CUR_RE.search(joined) else "",
+                "currency": rowcur or fcur[0],
+                "currency_source": ("строка" if rowcur else
+                                    ("файл" if fcur[0] else "не установлена")),
+                "currency_why": (rowcur_why if rowcur else fcur[1]),
                 "raw": joined[:400], "class_rule": rule,
                 "is_price": graded,
                 "price_grade": ("цена по колонке" if graded
@@ -1219,7 +1278,8 @@ def main() -> int:
         # загадкой, и следующая ошибка снова будет неизмеримой (правило 16)
         rec["sniffed"] = sniff(body)
         hdr = header_map(rows) if rows else {}
-        pr = price_rows(rows, hdr) if rows else []
+        fcur = file_currency(rows) if rows else ("", "")
+        pr = price_rows(rows, hdr, fcur) if rows else []
         n_rows += len(rows)
         n_price += len(pr)
         # статус не должен врать (правило 15 CLAUDE.md): pdf без текстового
@@ -1260,7 +1320,8 @@ def main() -> int:
     for b in bodies:
         rows = rows_from_text(b["text"].encode("utf-8", "ignore"))
         hdr = header_map(rows) if rows else {}
-        pr = price_rows(rows, hdr) if rows else []
+        fcur = file_currency(rows) if rows else ("", "")
+        pr = price_rows(rows, hdr, fcur) if rows else []
         if not pr:
             continue
         n_mail += 1

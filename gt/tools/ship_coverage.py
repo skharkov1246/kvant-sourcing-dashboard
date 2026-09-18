@@ -36,6 +36,7 @@ REVERIFY = ROOT / "gt/data/ship_reverify.json"
 LISTS = ROOT / "gt/data/ship_parts_lists.json"
 QUESTIONS = ROOT / "gt/data/ship_questions.json"
 INSIDE = ROOT / "gt/data/ship_inside_quotes.json"
+PRICED = ROOT / "gt/data/ship_inside_priced.json"
 OUT = ROOT / "gt/data/ship_coverage.json"
 
 
@@ -67,6 +68,72 @@ QUOTE_ONLY = ("только по запросу", "только «под зап�
 def quote_only(r: dict) -> bool:
     text = " ".join(str(r.get(f) or "") for f in ("channel", "price_kind", "blocker")).lower()
     return any(m in text for m in QUOTE_ONLY)
+
+
+# Оговорки, при которых цифра в поле остатка остатком НЕ является. Список
+# закрытый и он только СНИМАЕТ утверждение, поэтому щедрость тут безопасна:
+# ошибка в эту сторону стоит полноты, ошибка в обратную — выдаёт за отгружаемое
+# то, что не отгружаемо.
+#
+# Замер 18.09.2026: правило «в поле есть цифра» насчитало 362 строки с остатком
+# числом, и у 69 из них поле ПРЯМО говорит, что числа нет. Цифры приходили из
+# срока поставки («1–3 рабочих дня», «Lieferzeit: 2-5 Tage»), из года
+# просроченной записи («только в записи 2016 года»), из отвергнутого значения
+# («16 в столбце «Наличие». Остатком это считать нельзя») и из самой фразы
+# отказа. Ступень «отгружаема» — та, по которой решают, можно ли везти, и
+# завышать её нельзя.
+# Поле остатка — ПРОЗА, и по одной цифре в нём судить нельзя. Замер 18.09.2026:
+# правило «в поле есть цифра» насчитало 362 строки с остатком числом, а у 231 из
+# них в том же поле стоит прямой отказ — цифры приходили из срока поставки
+# («Lieferzeit: 2-5 Tage»), года просроченной записи («только в записи 2016
+# года»), отвергнутого значения («16 в столбце «Наличие». Остатком это считать
+# нельзя») и из самой фразы отказа.
+#
+# Но и плоский отказ по всему полю неверен: у 173 снятых строк в поле есть И
+# отказ, И настоящее число, потому что продавцов несколько («Числом остаток
+# назван один раз: PLCCable — Current Stock: 3», «UPP — 2 шт по 920 EUR»). Такую
+# строку нельзя ни считать отгружаемой, ни молча выбросить.
+#
+# Поэтому счёт трёхчастный: назван числом, не назван, СПОРНО. В ступень
+# «отгружаема» идёт только первое. Спорное печатается числом — это работа на
+# один проход глазами, а не повод завысить или потерять.
+STOCK_DENIED = ("числом не", "числом — только", "числом только", "числа нет",
+                "числа остатка нет", "остатка числом нет", "остатком это",
+                "считать нельзя", "не назван", "не названо", "не раскрыт",
+                "не отслеж", "не указан", "не заявлен", "не опубликован",
+                "не подтверждён", "не подтвержден", "нет ни на одной",
+                "нет ни у кого", "ни у одного", "просроченн", "пусто —",
+                "склада нет", "остатка нет", "под заказ", "special order",
+                "числа не да", "числа не пуб")
+# Положительные формы: продавец называет количество на полке.
+STOCK_NUM = re.compile(
+    r"(?<!\d)(?!0\b)\d[\d\s]*\s*(?:шт|pcs|pieces|ea\b|штук|единиц|комплект)"
+    r"|current stock:?\s*(?!0\b)\d"
+    r"|(?:остаток|в наличии|на складе|in stock)\s*:?\s*(?!0\b)\d", re.I)
+
+
+def stock_state(stock) -> str:
+    """«числом», «нет» или «спорно» — по прозе поля остатка.
+
+    Спорно — когда в одном поле и прямой отказ, и названное количество: у разных
+    продавцов по-разному, и решить это может только человек, открыв страницу.
+    """
+    text = str(stock or "")
+    if not re.search(r"\d", text):
+        return "нет"
+    low = text.lower()
+    denied = any(m in low for m in STOCK_DENIED)
+    positive = bool(STOCK_NUM.search(text))
+    if denied and positive:
+        return "спорно"
+    if denied:
+        return "нет"
+    return "числом" if positive else "нет"
+
+
+def stock_is_number(stock) -> bool:
+    """Остаток назван числом БЕЗ оговорок. Спорное сюда не идёт."""
+    return stock_state(stock) == "числом"
 
 
 def asked_keys() -> set:
@@ -103,6 +170,24 @@ def answered_keys() -> set:
             for r in json.loads(INSIDE.read_text(encoding="utf-8")).get("rows", [])}
 
 
+def priced_by_offer() -> set:
+    """Номера, по которым цену назвал сам контрагент в приложенном предложении.
+
+    Ступень «цена найдена» считалась только по набору перепроверки, то есть по
+    разведке витрин. Но самое сильное доказательство цены — письменная цифра
+    контрагента по этой самой заявке, и она лежит во вложениях сделок. Замер
+    18.09.2026: таких позиций 195, и в лестницу они не попадали вовсе — она
+    показывала наше знание хуже, чем оно есть.
+
+    Сами цены здесь не нужны и их нет: набор хранит только факт и происхождение
+    (gt/tools/tkp_tables.py --keys-out).
+    """
+    if not PRICED.exists():
+        return set()
+    return {key(p.get("pn")) for p in
+            json.loads(PRICED.read_text(encoding="utf-8")).get("parts", [])}
+
+
 def measure() -> dict:
     ask = json.loads(ASK.read_text(encoding="utf-8"))["rows"]
     rv = {key(r.get("pn")): r for r in json.loads(REVERIFY.read_text(encoding="utf-8"))["rows"]}
@@ -115,6 +200,9 @@ def measure() -> dict:
     # ПРИЗНАКИ независимы: канал бывает назван там, где цены нет, и наоборот.
     asked = asked_keys()
     answered = answered_keys()
+    offered = priced_by_offer()
+    from_offer = [0, 0.0]          # сколько ступень «цена» добрала предложениями
+    stock_disputed = [0, 0.0]      # в поле и отказ, и число: решает человек
     gap_answered = 0
     gap_answered_usd = 0.0
     gap_wait = gap_open = 0
@@ -141,10 +229,19 @@ def measure() -> dict:
         named = bool(li and str(li.get("descriptions") or "")) or bool(
             x and str(x.get("what_it_is") or "").strip())
         maker = bool(x and str(x.get("maker_short") or "").strip())
-        price = bool(x and num(x.get("price_low")))
+        # Цена есть, если её нашла разведка ЛИБО назвал контрагент письменно.
+        price_rv = bool(x and num(x.get("price_low")))
+        price = price_rv or k in offered
+        if price and not price_rv:
+            from_offer[0] += 1
+            from_offer[1] += e
         channel = bool(x and str(x.get("channel") or "").strip())
         # остаток ЧИСЛОМ: в поле остатка есть цифра, а не только слова
-        stock = bool(x and re.search(r"\d", str(x.get("stock") or "")))
+        st_state = stock_state(x.get("stock") if x else None)
+        stock = st_state == "числом"
+        if st_state == "спорно":
+            stock_disputed[0] += 1
+            stock_disputed[1] += e
 
         for name, ok in zip(steps, (named, maker, price, channel, stock)):
             if ok:
@@ -193,14 +290,37 @@ def measure() -> dict:
     # поиском: цену из наших же вложений и вопрос заказчику.
     never = [r for r in ask if key(r.get("pn")) and key(r.get("pn")) not in rv and expo(r) > 0]
     asked, inside = asked_keys(), answered_keys()
+    # ОСТАТОК ПОД ПОИСК вычитает только то, что закрыто ПО-НАСТОЯЩЕМУ: строки с
+    # письменной ценой контрагента и строки, по которым вопрос заказчику уже
+    # стоит. Прежде вычитался ещё и «адрес цены», и это была та же структурная
+    # слепота, что у rv_pricehunt: строка, чей адрес указывает на файл без цены
+    # по нашей позиции, для задания была невидима, хотя работы по ней ровно
+    # столько же, сколько по любой неразобранной. Замер 18.09.2026: так
+    # прятались 178 строк.
     hunt = [r for r in never
-            if key(r.get("pn")) not in asked and key(r.get("pn")) not in inside]
+            if key(r.get("pn")) not in asked and key(r.get("pn")) not in offered]
     return {
         "quoted_never_reverified": {
             "rows": len(never),
             "usd": round(sum(map(expo, never)), 2),
             "of_them_price_in_our_attachments": sum(
                 1 for r in never if key(r.get("pn")) in inside),
+            # РАЗЛИЧЕНИЕ, КОТОРОЕ СТОИЛО ТРЁХ ОШИБОЧНЫХ ОТЧЁТОВ. «Адрес цены» —
+            # это файл, в котором есть хоть одна цена И есть наш номер. Ценой по
+            # НАШЕЙ строке это не является, и замер 18.09.2026 показал разницу:
+            # из 757 строк с адресом цена по строке нашлась у 51, а 371 строка
+            # указывала на Quotation p76057 — ответ поставщика, где 316 значений
+            # и все до одного $0.00, то есть цен нет вовсе. Ещё 990 попаданий
+            # приходились на suppliers_22566.xlsx — нашу собственную таблицу.
+            # Поэтому «цена лежит в наших вложениях» делится на две части:
+            # подтверждённую предложением и всего лишь адрес.
+            "of_them_price_confirmed_by_offer": sum(
+                1 for r in never if key(r.get("pn")) in offered),
+            "usd_price_confirmed_by_offer": round(sum(
+                expo(r) for r in never if key(r.get("pn")) in offered), 2),
+            "of_them_address_only": sum(
+                1 for r in never
+                if key(r.get("pn")) in inside and key(r.get("pn")) not in offered),
             "of_them_asked_customer": sum(1 for r in never if key(r.get("pn")) in asked),
             "left_to_search": len(hunt),
             "usd_left_to_search": round(sum(map(expo, hunt)), 2),
@@ -232,6 +352,23 @@ def measure() -> dict:
                        "share_rows": round(100 * v[0] / total_rows, 1),
                        "share_usd": round(100 * v[1] / total_usd, 1) if total_usd else 0.0}
                    for k, v in ladder.items()},
+        "stock_disputed": {
+            "rows": stock_disputed[0], "usd": round(stock_disputed[1], 2),
+            "what_it_means": ("Строки, где в поле остатка стоит И прямой отказ, И названное "
+                              "количество: продавцов несколько, и у разных по-разному. В "
+                              "ступень «отгружаема» они НЕ идут — завышать её нельзя, — но и "
+                              "терять их нельзя: это работа на один проход глазами. Прежнее "
+                              "правило «в поле есть цифра» считало отгружаемыми все 362 такие "
+                              "строки, включая те, где цифра была сроком поставки или годом "
+                              "просроченной записи."),
+        },
+        "price_from_offer": {
+            "rows": from_offer[0], "usd": round(from_offer[1], 2),
+            "what_it_means": ("Строки, где цену назвал сам контрагент в приложенном к сделке "
+                              "предложении, а разведка по витринам её не нашла. Это сильнейшее "
+                              "доказательство цены из доступных, и до 18.09.2026 ступень "
+                              "«цена найдена» его не учитывала вовсе."),
+        },
         "rows_total": total_rows,
         "usd_total": round(total_usd, 2),
         "rows_without_band": no_band[0],
@@ -273,11 +410,21 @@ def main() -> None:
     print(f"  {g['of_them_open_to_search']:>4} строк | {g['usd_open_to_search']:>11,.0f} USD | "
           f"НАША работа: цена публикуется, её надо найти — задание печатает "
           f"gt/tools/rv_pricehunt.py".replace(",", " "))
+    sd = m["stock_disputed"]
+    print(f"  СПОРНЫЙ ОСТАТОК: {sd['rows']} строк на {sd['usd']:,.0f} USD — в поле остатка и "
+          f"отказ, и число; в «отгружаема» не идут, решает человек".replace(",", " "))
+    po = m["price_from_offer"]
+    print(f"  из ступени «цена найдена» {po['rows']} строк на {po['usd']:,.0f} USD дали "
+          f"письменные предложения контрагентов из вложений, а не разведка витрин"
+          .replace(",", " "))
     n = m["quoted_never_reverified"]
     print(f"ВЫДАНО В КП, НЕ ПЕРЕПРОВЕРЯЛОСЬ НИ РАЗУ: {n['rows']} строк на "
           f"{n['usd']:,.0f} USD".replace(",", " "))
-    print(f"  {n['of_them_price_in_our_attachments']:>4} строк — цена лежит в наших же "
-          f"вложениях (открыть файл, а не искать)")
+    print(f"  {n.get('of_them_price_confirmed_by_offer', 0):>4} строк | "
+          f"{n.get('usd_price_confirmed_by_offer', 0):>11,.0f} USD | цену назвал контрагент "
+          f"письменно: брать из предложения, не искать".replace(",", " "))
+    print(f"  {n.get('of_them_address_only', 0):>4} строк — в приложенном файле наш номер есть, "
+          f"а цены по нашей строке в нём нет: адрес, а не цена")
     print(f"  {n['of_them_asked_customer']:>4} строк — вопрос заказчику уже поставлен")
     print(f"  {n['left_to_search']:>4} строк | {n['usd_left_to_search']:>11,.0f} USD | остаток "
           f"под поиск: задание печатает gt/tools/rv_brief.py --top N".replace(",", " "))

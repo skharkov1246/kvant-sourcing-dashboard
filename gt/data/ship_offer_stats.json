@@ -26,21 +26,34 @@
    }
   },
   "НВН": {
-   "rows_with_offer": 170,
-   "above_ceiling": 31,
-   "inside_band": 8,
-   "below_floor": 23,
-   "no_band": 108,
+   "rows_with_offer": 21,
+   "above_ceiling": 1,
+   "inside_band": 4,
+   "below_floor": 4,
+   "no_band": 12,
    "request_rows": 1642,
    "reverified": {
-    "rows": 63,
-    "with_offer": 4,
-    "overstated_confirmed": 2,
-    "understated_confirmed": 2,
-    "band_right": 0,
-    "no_offer": 59
+    "rows": 719,
+    "with_offer": 9,
+    "overstated_confirmed": 4,
+    "understated_confirmed": 1,
+    "band_right": 4,
+    "no_offer": 710
    },
-   "stale_warning": "СЧИТАНО ДО РАЗДЕЛЕНИЯ ЦЕН ПО ГРАДУСУ (18.09.2026) и с охватом «Энергосети» НЕ сравнимо. Тогда ценой считалось и значение, взятое правилом «последнее число строки», а оно брало номера позиций и количество: по «Энергосети» такой счёт давал 776 строк с предложением и 222 заниженные, после исправления — 104 и 33. Числа ниже верны только как верхняя граница; пересчитать их можно лишь прогоном «Bitrix входящие КП» по слову НВН."
+   "price_grades": {
+    "values_total": 4725,
+    "prices_by_column": 76,
+    "guesses_last_number_in_row": 4649,
+    "what_it_means": "Ценой считается только значение из колонки «цена» по заголовку. Догадка «последнее число строки» не отброшена из выгрузки, но в счёт денег не идёт: она брала номера позиций и количество."
+   },
+   "inside_claim": {
+    "rows_with_address": 757,
+    "price_joined": 6,
+    "value_is_guess": 109,
+    "row_absent_in_parsed_file": 5,
+    "address_outside_this_dump": 637,
+    "what_it_means": "Адрес «цена лежит в нашем вложении» — файловый признак, и он НЕ равен цене по строке. В деньги имеет право идти только price_joined. Остальное — работа: догадка требует открыть файл глазами, отсутствие размеченной строки означает, что разбор эту строку не взял."
+   }
   },
   "ЛУКОЙЛ": {
    "rows_with_offer": 0,
