@@ -92,3 +92,53 @@ def test_замер_называет_повод_а_не_только_цифры(
     why = (d.get("why") or "").lower()
     assert "класс" in why and "каталог" in why, (
         "замер должен говорить, почему он сделан: иначе через месяц это просто счётчик")
+
+
+NEGATION = ("не вскрыт", "не раскрыт", "не установлен", "не подтвержд", "не найден",
+            "нигде не", "вероятно", "гипотез")
+GUESS = ("(по типу)", "(тип.)", "по типу", "тип.")
+
+
+def test_короткое_имя_изготовителя_не_содержит_отрицаний_и_догадок():
+    """maker_short — это ФАКТ с внешнего каталога, а не пересказ поисков.
+
+    Оплачено разбором прозы: замер определял закрытые строки по тексту поля
+    real_maker, и это не работало в обе стороны. Строка «Не найден, и по типу
+    изделия его, скорее всего, нет» проходила как положительная, а строка
+    «Cummins Inc. — владелец номера … Физический изготовитель катушки не
+    вскрыт» отбраковывалась из-за слов в середине текста. Из-за этого замер
+    насчитал 55 закрытых строк на 5,3 млн USD, и число было завышено.
+    """
+    src = ROOT / "gt/data/ship_reverify.json"
+    if not src.exists():
+        pytest.skip("набора перепроверки нет")
+    rows = json.loads(src.read_text(encoding="utf-8"))["rows"]
+    bad = []
+    for r in rows:
+        mk = str(r.get("maker_short") or "").strip()
+        if not mk:
+            continue
+        low = mk.lower()
+        if any(w in low for w in NEGATION):
+            bad.append(f'{r["pn"]}: отрицание в «{mk}»')
+        if any(w in low for w in GUESS):
+            bad.append(f'{r["pn"]}: догадка по типу в «{mk}»')
+        if len(mk) > 90:
+            bad.append(f'{r["pn"]}: имя длиной {len(mk)} — это проза, а не имя')
+        if low.count("/") > 2:
+            bad.append(f'{r["pn"]}: перечень через слэш в «{mk}» — это не один изготовитель')
+    assert not bad, f"поле короткого имени изготовителя испорчено: {bad}"
+
+
+def test_замер_считает_ровно_строки_с_коротким_именем():
+    """Иначе счёт закрытого снова начнёт зависеть от разбора прозы."""
+    import sys
+    sys.path.insert(0, str(ROOT / "gt/tools"))
+    from maker_basis import checked_by_reverify
+
+    src = ROOT / "gt/data/ship_reverify.json"
+    if not src.exists():
+        pytest.skip("набора перепроверки нет")
+    rows = json.loads(src.read_text(encoding="utf-8"))["rows"]
+    want = sum(1 for r in rows if str(r.get("maker_short") or "").strip())
+    assert len(checked_by_reverify()) == want

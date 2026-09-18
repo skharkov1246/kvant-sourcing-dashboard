@@ -5,24 +5,24 @@
  "why": "Звено «исполнитель» отвечает на вопрос «у кого спрашивать», и ответ стоит ровно столько, сколько его основание. 18.09.2026 разведка открыла каталоги изготовителей и опровергла нашу разметку дважды: масляный фильтр Fleetguard был приписан четырём фильтровым домам «по типу», а наконечник свечи Jenbacher — авиационному поставщику зажигания «типично». Оба раза изготовитель был выведен из КЛАССА изделия, а не из документа.",
  "totals": {
   "db_rows": 12442,
-  "maker_named": 2842,
+  "maker_named": 2860,
   "request_rows_with_band": 857,
   "request_exposure": 9277409.8,
   "weak_rows_in_request": 171,
   "weak_usd_in_request": 397627.45,
-  "weak_by_db_basis_rows": 193,
-  "weak_by_db_basis_usd": 2124537.45,
-  "weak_closed_by_reverify_rows": 22,
-  "weak_closed_by_reverify_usd": 1726910.0,
-  "closed_by_reverify_rows": 55,
-  "closed_by_reverify_usd": 5302502.5
+  "weak_by_db_basis_rows": 171,
+  "weak_by_db_basis_usd": 397627.45,
+  "weak_closed_by_reverify_rows": 0,
+  "weak_closed_by_reverify_usd": 0.0,
+  "closed_by_reverify_rows": 65,
+  "closed_by_reverify_usd": 5231067.5
  },
  "classes": [
   {
    "basis": "каталог изготовителя (перепроверка)",
-   "rows_in_db": 55,
-   "rows_in_request": 55,
-   "usd_in_request": 5302502.5,
+   "rows_in_db": 65,
+   "rows_in_request": 65,
+   "usd_in_request": 5231067.5,
    "why": "изготовитель вскрыт по каталогу при перепроверке строки — это факт со страницы, а не наша оценка; счёт берётся из gt/data/ship_reverify.json и растёт сам по ходу перепроверки"
   },
   {
@@ -41,16 +41,16 @@
   },
   {
    "basis": "назван заказчиком",
-   "rows_in_db": 121,
-   "rows_in_request": 121,
-   "usd_in_request": 156866.0,
+   "rows_in_db": 120,
+   "rows_in_request": 120,
+   "usd_in_request": 131216.0,
    "why": "изготовитель взят из наименования заявки — это слова заказчика, а не каталог"
   },
   {
    "basis": "чертёж или узел пакета",
-   "rows_in_db": 237,
-   "rows_in_request": 225,
-   "usd_in_request": 640362.0,
+   "rows_in_db": 240,
+   "rows_in_request": 228,
+   "usd_in_request": 1027362.0,
    "why": "принадлежность к чертежу или к пакету поставки; изготовитель узла может быть чужим"
   },
   {
@@ -76,9 +76,9 @@
   },
   {
    "basis": "основание не записано",
-   "rows_in_db": 477,
-   "rows_in_request": 198,
-   "usd_in_request": 376404.1,
+   "rows_in_db": 483,
+   "rows_in_request": 204,
+   "usd_in_request": 690894.1,
    "why": "поле основания пустое"
   }
  ]

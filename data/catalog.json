@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 230,
-    "total_bytes": 102783214,
+    "total_bytes": 104071074,
     "by_sensitivity": {
       "конфиденциально": 62,
       "внутреннее": 128,
@@ -83,6 +83,66 @@
         ]
       },
       "referenced_by": []
+    },
+    {
+      "path": "gt/data/pn_db.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 7424071,
+      "note": "База номенклатуры (part numbers) ГТУ. Дублируется в gt/public/wizard/data.js и pnw/public/data.js — при правке обновлять все три или собирать из одного источника.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "rows",
+        "source",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 12442,
+        "record_keys": [
+          "b",
+          "cli",
+          "cu",
+          "desc",
+          "dq",
+          "ev",
+          "gold",
+          "mach",
+          "mk",
+          "mpn",
+          "oem",
+          "org",
+          "pat",
+          "pn",
+          "qt",
+          "qty",
+          "seg",
+          "sn",
+          "src",
+          "su",
+          "vf"
+        ]
+      },
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "58cba3b",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/build.py",
+        "gt/tools/apply_makers.py",
+        "gt/tools/maker_basis.py",
+        "library/load_crossrefs.py",
+        "library/load_equipment.py",
+        "pnw/tools/build_master.py",
+        "scripts/build_chain_coverage.py",
+        "scripts/build_dict.py",
+        "scripts/build_node_map.py",
+        "scripts/library_units_check.py"
+      ]
     },
     {
       "path": "zip/customs/out/customs_8207_2024-01-01_2024-12-31.json",
@@ -163,69 +223,9 @@
       ]
     },
     {
-      "path": "gt/data/pn_db.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 6142433,
-      "note": "База номенклатуры (part numbers) ГТУ. Дублируется в gt/public/wizard/data.js и pnw/public/data.js — при правке обновлять все три или собирать из одного источника.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "rows",
-        "source",
-        "updated"
-      ],
-      "main_collection": {
-        "key": "rows",
-        "records": 12442,
-        "record_keys": [
-          "b",
-          "cli",
-          "cu",
-          "desc",
-          "dq",
-          "ev",
-          "gold",
-          "mach",
-          "mk",
-          "mpn",
-          "oem",
-          "org",
-          "pat",
-          "pn",
-          "qt",
-          "qty",
-          "seg",
-          "sn",
-          "src",
-          "su",
-          "vf"
-        ]
-      },
-      "last_change": "2026-08-31",
-      "last_author": "github-actions[bot]",
-      "last_commit": "11f2331",
-      "updated_by": "бот (workflow)",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "gt/build.py",
-        "gt/tools/maker_basis.py",
-        "library/load_crossrefs.py",
-        "library/load_equipment.py",
-        "pnw/tools/build_master.py",
-        "scripts/build_chain_coverage.py",
-        "scripts/build_dict.py",
-        "scripts/build_node_map.py",
-        "scripts/library_units_check.py",
-        "tests/test_core.py"
-      ]
-    },
-    {
       "path": "gt/data/ship_lukoil.json",
       "subproject": "ГТУ-библиотека",
-      "bytes": 6122672,
+      "bytes": 6125473,
       "note": "Сводная карта закупки по всей заявке ЛУКОЙЛ: 1642 уникальных артикула обоих листов («Энергосети» 1198, НВН 444) с результатом проверки наличия. Производный файл — собирается gt/tools/ship_merge.py из rfq_demand.json и трёх поколений проверок (rfq_prices.json:checks, ship_energoseti.json, ship_sweep.json); поздняя проверка перекрывает раннюю, непроверенные строки помечены not_checked. Руками не заполнять. Отчёт — gt/tools/ship_map.py → gt/docs/ЗАКУПКА-ЛУКОЙЛ.pdf: карта «у кого что брать», изготовители узлов под шильдой OEM, позиции под подбор по стандарту, расхождения цен.",
       "format": "json",
       "shape": "объект",
@@ -277,8 +277,8 @@
         ]
       },
       "last_change": "2026-09-18",
-      "last_author": "skharkov1246",
-      "last_commit": "8df72dd",
+      "last_author": "Claude",
+      "last_commit": "6f51082",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -1003,7 +1003,7 @@
     {
       "path": "gt/data/ship_reverify.json",
       "subproject": "ГТУ-библиотека",
-      "bytes": 1112003,
+      "bytes": 1115431,
       "note": "Перепроверка крупнейших строк заявки ЛУКОЙЛ: по каждой строке заново установлено, что это за изделие, кто его делает на самом деле и под каким своим номером, жив ли номер, сколько позиция стоит в открытых каналах, есть ли рабочий канал закупки и что мешает закрыть строку. Отбор строк — по экспозиции: топ-60 дают 67 % от 9 277 410 USD экспозиции всей заявки (экспозиция = середина нашей оценочной вилки, умноженная на количество). Поле band_verdict говорит, что стало с нашей прежней оценкой: ЗАНИЖЕНА, ЗАВЫШЕНА, ВЕРНА или НЕЧЕМ ПРОВЕРИТЬ. Последнее — НЕ «дорого» и не «дёшево», а отсутствие открытой цены во всех каналах; складывать эти группы в одну цифру нельзя. Поле skeptics несёт результат проверки вывода на опровержение; пустой список означает, что проверка не прогонялась, и приравнивать это к подтверждению нельзя — исследователь уже был пойман на выдуманной цитате. ВНИМАНИЕ: набор пополняется по ходу, и до окончания прогона он ЧАСТИЧНЫЙ — число строк в нём меньше шестидесяти. Собирается рабочим процессом перепроверки, читается gt/tools/ship_reverify.py. Цены здесь рыночные, из открытых карточек продавцов; выставленных заказчику цен в наборе нет.",
       "format": "json",
       "shape": "объект",
@@ -1022,6 +1022,7 @@
           "contacts",
           "lead_time",
           "lifecycle",
+          "maker_short",
           "note",
           "pn",
           "price_authorized",
@@ -1040,19 +1041,21 @@
       },
       "last_change": "2026-09-18",
       "last_author": "Claude",
-      "last_commit": "a010c11",
+      "last_commit": "58cba3b",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
         "markers": []
       },
       "referenced_by": [
+        "gt/tools/apply_makers.py",
         "gt/tools/maker_basis.py",
         "gt/tools/seller_groups.py",
         "gt/tools/ship_brief.py",
         "gt/tools/ship_decisions.py",
         "gt/tools/ship_offer.py",
         "gt/tools/ship_reverify.py",
+        "tests/test_maker_basis.py",
         "tests/test_ship_reverify_consistency.py"
       ]
     },
@@ -5119,8 +5122,8 @@
         "gt/docs/ЗАПРОС-ЦЕН-АНГЛИЙСКИЙ.pdf"
       ],
       "last_change": "2026-09-18",
-      "last_author": "Claude",
-      "last_commit": "92cdb4b",
+      "last_author": "skharkov1246",
+      "last_commit": "d02f5a1",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -7995,9 +7998,9 @@
           "what"
         ]
       },
-      "last_change": "2026-09-17",
-      "last_author": "skharkov1246",
-      "last_commit": "3f6b4d4",
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "58cba3b",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -8369,8 +8372,8 @@
         ]
       },
       "last_change": "2026-09-18",
-      "last_author": "Claude",
-      "last_commit": "92cdb4b",
+      "last_author": "skharkov1246",
+      "last_commit": "d02f5a1",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
@@ -9315,8 +9318,8 @@
         ]
       },
       "last_change": "2026-09-18",
-      "last_author": "Claude",
-      "last_commit": "a010c11",
+      "last_author": "skharkov1246",
+      "last_commit": "d02f5a1",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
@@ -9354,8 +9357,8 @@
         ]
       },
       "last_change": "2026-09-18",
-      "last_author": "Claude",
-      "last_commit": "92cdb4b",
+      "last_author": "skharkov1246",
+      "last_commit": "d02f5a1",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
@@ -9445,7 +9448,7 @@
     {
       "path": "gt/data/ship_maker_basis.json",
       "subproject": "ГТУ-библиотека",
-      "bytes": 4704,
+      "bytes": 4697,
       "note": "Замер: на чём стоит «изготовитель» в gt/data/pn_db.json — на документе (таможенная декларация, открытый стандарт) или на догадке по классу изделия. Считает gt/tools/maker_basis.py. Поводом стали два опровержения 18.09.2026: масляному фильтру Fleetguard были приписаны четыре фильтровых дома «по типу», а наконечнику свечи Jenbacher — авиационный поставщик зажигания «типично»; оба раза изготовитель был выведен из класса, а не из документа. Содержит только счётчики и экспозицию по нашим же вилкам: ни цен контрагентов, ни персональных данных.",
       "format": "json",
       "shape": "объект",
@@ -9463,7 +9466,7 @@
       },
       "last_change": "2026-09-18",
       "last_author": "Claude",
-      "last_commit": "a010c11",
+      "last_commit": "58cba3b",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",

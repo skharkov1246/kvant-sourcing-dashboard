@@ -1,6 +1,6 @@
 {
   "note": "Производители: ключ nkey(name) и все написания, найденные в базах. Разные написания одной компании собраны под одним ключом — это и есть то, чего сегодня нет ни в одном подпроекте.",
-  "count": 277,
+  "count": 292,
   "records": [
     {
       "oem_key": "skf",
@@ -573,6 +573,25 @@
       "n_spellings": 4
     },
     {
+      "oem_key": "bentlynevadabakerhughes",
+      "name": "Bently Nevada / Baker Hughes",
+      "spellings": [
+        {
+          "spelling": "Bently Nevada (Baker Hughes)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Bently Nevada / Baker Hughes",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        },
+        {
+          "spelling": "Bently Nevada (Baker Hughes)",
+          "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 3
+    },
+    {
       "oem_key": "deutz",
       "name": "Deutz",
       "spellings": [
@@ -871,21 +890,6 @@
         },
         {
           "spelling": "Bell & Gossett (Xylem)",
-          "where": "pnw/data/item_master.json:items[].maker"
-        }
-      ],
-      "n_spellings": 2
-    },
-    {
-      "oem_key": "bentlynevadabakerhughes",
-      "name": "Bently Nevada (Baker Hughes)",
-      "spellings": [
-        {
-          "spelling": "Bently Nevada (Baker Hughes)",
-          "where": "gt/data/pn_db.json:rows[].mk"
-        },
-        {
-          "spelling": "Bently Nevada (Baker Hughes)",
           "where": "pnw/data/item_master.json:items[].maker"
         }
       ],
@@ -3869,12 +3873,78 @@
       "n_spellings": 1
     },
     {
+      "oem_key": "abbсиловоймодульinfineonfs450r17ke3",
+      "name": "ABB (силовой модуль Infineon FS450R17KE3)",
+      "spellings": [
+        {
+          "spelling": "ABB (силовой модуль Infineon FS450R17KE3)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
       "oem_key": "amotvernathermпотипу",
       "name": "AMOT / Vernatherm (по типу)",
       "spellings": [
         {
           "spelling": "AMOT / Vernatherm (по типу)",
           "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "baslerelectric",
+      "name": "Basler Electric",
+      "spellings": [
+        {
+          "spelling": "Basler Electric",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "belimo",
+      "name": "Belimo",
+      "spellings": [
+        {
+          "spelling": "Belimo",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "denso",
+      "name": "DENSO",
+      "spellings": [
+        {
+          "spelling": "DENSO",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "dettronicsemerson",
+      "name": "Det-Tronics (Emerson)",
+      "spellings": [
+        {
+          "spelling": "Det-Tronics (Emerson)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "fleetguardcumminsfiltration",
+      "name": "Fleetguard (Cummins Filtration)",
+      "spellings": [
+        {
+          "spelling": "Fleetguard (Cummins Filtration)",
+          "where": "gt/data/pn_db.json:rows[].mk"
         }
       ],
       "n_spellings": 1
@@ -3897,6 +3967,50 @@
         {
           "spelling": "Guascor (Siemens Energy)",
           "where": "gpu/data/models.json:adjacent[].name"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "heinzmann",
+      "name": "HEINZMANN",
+      "spellings": [
+        {
+          "spelling": "HEINZMANN",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "holsetcumminsturbotechnologies",
+      "name": "Holset / Cummins Turbo Technologies",
+      "spellings": [
+        {
+          "spelling": "Holset / Cummins Turbo Technologies",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "jenbacherinnio",
+      "name": "Jenbacher / INNIO",
+      "spellings": [
+        {
+          "spelling": "Jenbacher / INNIO",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "jenbacherinnioкартриджальтернативыmannhu",
+      "name": "Jenbacher / INNIO (картридж альтернативы — Mann & Hummel)",
+      "spellings": [
+        {
+          "spelling": "Jenbacher / INNIO (картридж альтернативы — Mann & Hummel)",
+          "where": "gt/data/pn_db.json:rows[].mk"
         }
       ],
       "n_spellings": 1
@@ -3946,6 +4060,17 @@
       "n_spellings": 1
     },
     {
+      "oem_key": "mwmcaterpillarenergysolutionsсвечаfedera",
+      "name": "MWM / Caterpillar Energy Solutions (свеча Federal-Mogul/BERU)",
+      "spellings": [
+        {
+          "spelling": "MWM / Caterpillar Energy Solutions (свеча Federal-Mogul/BERU)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
       "oem_key": "palldonaldsonparkerpecofacetпотипу",
       "name": "Pall/Donaldson/Parker/PECOFacet (по типу)",
       "spellings": [
@@ -3990,6 +4115,28 @@
       "n_spellings": 1
     },
     {
+      "oem_key": "prosofttechnology",
+      "name": "ProSoft Technology",
+      "spellings": [
+        {
+          "spelling": "ProSoft Technology",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "renk",
+      "name": "RENK",
+      "spellings": [
+        {
+          "spelling": "RENK",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
       "oem_key": "siemensdigitalindustriesпрямойзаказпокод",
       "name": "Siemens Digital Industries — прямой заказ по коду (SIMATIC/SIRIUS)",
       "spellings": [
@@ -4023,6 +4170,17 @@
       "n_spellings": 1
     },
     {
+      "oem_key": "siemensenergyчертежзаводалинкольн",
+      "name": "Siemens Energy (чертёж завода Линкольн)",
+      "spellings": [
+        {
+          "spelling": "Siemens Energy (чертёж завода Линкольн)",
+          "where": "gt/data/pn_db.json:rows[].mk"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
       "oem_key": "siemenssgt100400заводлинкольнвеликобрита",
       "name": "Siemens SGT-100…400 (завод Линкольн, Великобритания)",
       "spellings": [
@@ -4051,6 +4209,17 @@
         {
           "spelling": "SKF / Timken / RENK (по типу)",
           "where": "pnw/data/item_master.json:items[].maker"
+        }
+      ],
+      "n_spellings": 1
+    },
+    {
+      "oem_key": "solahdemerson",
+      "name": "SolaHD (Emerson)",
+      "spellings": [
+        {
+          "spelling": "SolaHD (Emerson)",
+          "where": "gt/data/pn_db.json:rows[].mk"
         }
       ],
       "n_spellings": 1
