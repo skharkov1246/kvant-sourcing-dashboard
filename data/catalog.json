@@ -4,16 +4,16 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 252,
-    "total_bytes": 113493091,
+    "datasets": 253,
+    "total_bytes": 113637991,
     "by_sensitivity": {
       "конфиденциально": 65,
-      "внутреннее": 138,
+      "внутреннее": 139,
       "публикуемо": 49
     },
     "by_subproject": {
       "ГПУ-библиотека": 29,
-      "ГТУ-библиотека": 75,
+      "ГТУ-библиотека": 76,
       "ОВЭ-75": 45,
       "база ЗИП": 49,
       "база ЗИП · таможня": 18,
@@ -87,7 +87,7 @@
     {
       "path": "gt/data/ship_reverify.json",
       "subproject": "ГТУ-библиотека",
-      "bytes": 8188109,
+      "bytes": 8210228,
       "note": "Перепроверка крупнейших строк заявки ЛУКОЙЛ: по каждой строке заново установлено, что это за изделие, кто его делает на самом деле и под каким своим номером, жив ли номер, сколько позиция стоит в открытых каналах, есть ли рабочий канал закупки и что мешает закрыть строку. Отбор строк — по экспозиции: топ-60 дают 67 % от 9 277 410 USD экспозиции всей заявки (экспозиция = середина нашей оценочной вилки, умноженная на количество). Поле band_verdict говорит, что стало с нашей прежней оценкой: ЗАНИЖЕНА, ЗАВЫШЕНА, ВЕРНА или НЕЧЕМ ПРОВЕРИТЬ. Последнее — НЕ «дорого» и не «дёшево», а отсутствие открытой цены во всех каналах; складывать эти группы в одну цифру нельзя. Поле skeptics несёт результат проверки вывода на опровержение; пустой список означает, что проверка не прогонялась, и приравнивать это к подтверждению нельзя — исследователь уже был пойман на выдуманной цитате. ВНИМАНИЕ: набор пополняется по ходу, и до окончания прогона он ЧАСТИЧНЫЙ — число строк в нём меньше шестидесяти. Собирается рабочим процессом перепроверки, читается gt/tools/ship_reverify.py. Цены здесь рыночные, из открытых карточек продавцов; выставленных заказчику цен в наборе нет.",
       "format": "json",
       "shape": "объект",
@@ -125,7 +125,7 @@
       },
       "last_change": "2026-09-18",
       "last_author": "Claude",
-      "last_commit": "f4e19e8",
+      "last_commit": "ed8e639",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -4523,6 +4523,53 @@
       ]
     },
     {
+      "path": "gt/data/ship_stock_letters.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 120553,
+      "note": "Готовые письма на подтверждение остатка по заявке ЛУКОЙЛ, по одному на адресата: кому, о чём, сколько позиций, наша экспозиция по ним и текст письма. Пишет gt/tools/stock_letters.py --write; руками не заполнять. Наша вилка, наша сумма и имя заказчика в тексты писем не идут — в наборе они есть только в служебных полях, для нас. Отдельным полем помечены письма, где адрес выловлен из описания канала, а не из контактов по детали: такой адрес может быть родовым, и получателя надо проверить перед отправкой.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "letters",
+        "letters_withheld_for_leak",
+        "rows_disputed",
+        "rows_total",
+        "rows_with_address",
+        "rows_without_address",
+        "source",
+        "updated",
+        "usd_with_address",
+        "usd_without_address",
+        "what_is_not_in_the_letter",
+        "why_these_rows"
+      ],
+      "main_collection": {
+        "key": "letters",
+        "records": 75,
+        "record_keys": [
+          "address_check",
+          "body",
+          "our_exposure",
+          "pns",
+          "rows",
+          "rows_disputed",
+          "subject",
+          "to"
+        ]
+      },
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "ed8e639",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/stock_letters.py"
+      ]
+    },
+    {
       "path": "zip/data/r1700_recon/spec.json",
       "subproject": "база ЗИП",
       "bytes": 116414,
@@ -4593,58 +4640,9 @@
       ]
     },
     {
-      "path": "gt/data/sgt400_checklist.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 111620,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "rows",
-        "segments",
-        "source",
-        "updated"
-      ],
-      "main_collection": {
-        "key": "rows",
-        "records": 128,
-        "record_keys": [
-          "conf",
-          "country",
-          "email",
-          "name",
-          "phone",
-          "prior",
-          "proof",
-          "seg",
-          "seg_name",
-          "site",
-          "what"
-        ]
-      },
-      "last_change": "2026-08-31",
-      "last_author": "github-actions[bot]",
-      "last_commit": "11f2331",
-      "updated_by": "бот (workflow)",
-      "sensitivity": {
-        "level": "конфиденциально",
-        "markers": [
-          "адреса электронной почты",
-          "телефоны"
-        ]
-      },
-      "referenced_by": [
-        "gt/build.py",
-        "gt/tools/build_rfq.py",
-        "gt/tools/drop_ru.py",
-        "library/load_suppliers.py",
-        "scripts/build_chain_coverage.py"
-      ]
-    },
-    {
       "path": "data/catalog_notes.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 110308,
+      "bytes": 112535,
       "note": "",
       "format": "json",
       "shape": "объект",
@@ -4692,7 +4690,7 @@
       ],
       "last_change": "2026-09-18",
       "last_author": "Claude",
-      "last_commit": "ea84c47",
+      "last_commit": "ed8e639",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -4701,6 +4699,55 @@
       "referenced_by": [
         "scripts/build_catalog.py",
         "tests/test_catalog_guard.py"
+      ]
+    },
+    {
+      "path": "gt/data/sgt400_checklist.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 111620,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "rows",
+        "segments",
+        "source",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 128,
+        "record_keys": [
+          "conf",
+          "country",
+          "email",
+          "name",
+          "phone",
+          "prior",
+          "proof",
+          "seg",
+          "seg_name",
+          "site",
+          "what"
+        ]
+      },
+      "last_change": "2026-08-31",
+      "last_author": "github-actions[bot]",
+      "last_commit": "11f2331",
+      "updated_by": "бот (workflow)",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "адреса электронной почты",
+          "телефоны"
+        ]
+      },
+      "referenced_by": [
+        "gt/build.py",
+        "gt/tools/build_rfq.py",
+        "gt/tools/drop_ru.py",
+        "library/load_suppliers.py",
+        "scripts/build_chain_coverage.py"
       ]
     },
     {
@@ -10064,7 +10111,7 @@
     {
       "path": "gt/data/ship_coverage.json",
       "subproject": "ГТУ-библиотека",
-      "bytes": 5894,
+      "bytes": 5895,
       "note": "Покрытие заявки ЛУКОЙЛ по ступеням понимания: опознана → есть кому написать → есть цена и адрес → отгружаема. Лестница накопительна (каждая ступень требует предыдущих), признаки по отдельности независимы и в лестницу не складываются. Считается и в строках, и в деньгах; строки без нашей оценки в денежный счёт не входят и названы отдельно. Считает gt/tools/ship_coverage.py.",
       "format": "json",
       "shape": "объект",
@@ -10090,7 +10137,7 @@
       },
       "last_change": "2026-09-18",
       "last_author": "Claude",
-      "last_commit": "f4e19e8",
+      "last_commit": "ed8e639",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
