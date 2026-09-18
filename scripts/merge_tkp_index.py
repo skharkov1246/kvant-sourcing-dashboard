@@ -15,6 +15,14 @@ push отбился «fetch first»).
 
 Старый однопрогонный формат (с верхним `inventory`) переносится в охват
 «(прежний прогон)», чтобы прежние цифры не исчезли молча.
+
+ОДИН ОХВАТ ТОЖЕ НЕЛЬЗЯ ЗАМЕНЯТЬ ЦЕЛИКОМ. Замерено 18.09.2026: прогон по «НВН»
+записал 361 файл там, где прежний прогон того же охвата записал 389, и 28
+записей исчезли молча — прогон дошёл не до всех файлов (таймаут, отказ
+скачивания, другое состояние Bitrix). Поэтому опись внутри охвата сливается
+ПО ФАЙЛУ: запись свежего прогона побеждает, запись прежнего, которой в свежем
+нет, остаётся. Сколько записей пришло от прежнего прогона, видно числом в поле
+`inventory_kept` — иначе усадка снова будет незаметной.
 """
 from __future__ import annotations
 
@@ -49,12 +57,51 @@ def load(path: Path) -> dict:
         return {}
 
 
+def key_of(item: dict) -> str:
+    """Чем один файл описи отличается от другого."""
+    fid = str(item.get("file_id") or "").strip()
+    if fid:
+        return f"id:{fid}"
+    return "nm:{}|{}".format(item.get("origin") or "", item.get("file_name") or "")
+
+
+def merge_scope(old: dict, new: dict) -> dict:
+    """Свежий прогон поверх прежнего, но опись файлов — объединением.
+
+    Счётчики прогона (deals, files, downloaded, state) описывают ИМЕННО этот
+    прогон, поэтому берутся свежие: подменять их суммой нельзя, это было бы
+    выдуманное число. А опись файлов — знание о том, что в сделках лежит, и
+    оно не должно уменьшаться от того, что прогон не дошёл до части файлов.
+    """
+    out = dict(old or {})
+    out.update({k: v for k, v in (new or {}).items() if k != "inventory"})
+    by = {key_of(x): x for x in ((old or {}).get("inventory") or []) if isinstance(x, dict)}
+    was = set(by)
+    for x in ((new or {}).get("inventory") or []):
+        if isinstance(x, dict):
+            by[key_of(x)] = x
+    fresh_keys = {key_of(x) for x in ((new or {}).get("inventory") or []) if isinstance(x, dict)}
+    kept = len(was - fresh_keys)
+    if "inventory" in (new or {}) or by:
+        out["inventory"] = list(by.values())
+    if kept:
+        out["inventory_kept"] = kept
+        out["inventory_note"] = (
+            f"{kept} записей перенесены от прежнего прогона этого же охвата: свежий прогон до "
+            f"них не дошёл. Счётчики выше — про свежий прогон, опись — про всё, что мы знаем.")
+    else:
+        out.pop("inventory_kept", None)
+        out.pop("inventory_note", None)
+    return out
+
+
 def merge(mine: dict, into: dict) -> tuple[dict, list[str], list[str]]:
     """Итог, список обновлённых охватов и список сохранённых чужих."""
     base = scopes_of(into)
     fresh = scopes_of(mine)
     kept = [k for k in base if k not in fresh]
-    base.update(fresh)
+    for name, body in fresh.items():
+        base[name] = merge_scope(base.get(name) or {}, body)
     out = {
         "updated": mine.get("updated") or into.get("updated") or "",
         "source": mine.get("source") or into.get("source")
@@ -78,9 +125,13 @@ def main() -> int:
     Path(a.into).write_text(json.dumps(out, ensure_ascii=False, indent=1),
                             encoding="utf-8")
     files = sum(len(v.get("inventory") or []) for v in out["scopes"].values())
+    carried = sum(int(v.get("inventory_kept") or 0) for v in out["scopes"].values())
     print(f"обновлено охватов: {', '.join(updated) or '—'}")
     print(f"сохранено чужих охватов: {', '.join(kept) or '—'}")
     print(f"в описи стало охватов {len(out['scopes'])}, файлов {files}")
+    if carried:
+        print(f"перенесено записей от прежних прогонов тех же охватов: {carried} "
+              f"(свежий прогон до них не дошёл)")
     return 0
 
 

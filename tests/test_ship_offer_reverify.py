@@ -128,3 +128,72 @@ def test_агрегат_по_вилкам_печатает_только_счёт
     # ни одной цены в журнале
     for price in ("99", "15.0", "1.0", "7.0"):
         assert price not in out.split("строк заявки с КП поставщика")[1]
+
+
+def test_строки_без_вилки_с_кп_собираются_отдельным_разделом():
+    """По ним оценку не надо искать: она уже написана контрагентом."""
+    rows = [{"pn": "NB-1", "name": "Придуманный фильтр", "qty": 10,
+             "usd_lo": None, "usd_hi": None},
+            {"pn": "WB-2", "name": "Придуманный клапан", "qty": 2,
+             "usd_lo": 100, "usd_hi": 200}]
+    def offer(usd, pn):
+        return {"usd": usd, "raw_price": str(usd), "currency": "USD", "origin": "СП-166 9",
+                "field": "Offer from supplier", "file": "q.pdf", "row": "1", "sheet": "",
+                "rule": "", "direction": "входящее", "line": ""}
+    supp = {"NB1": offer(50.0, "NB-1"), "WB2": offer(150.0, "WB-2")}
+    html = so.no_band_section(rows, supp)
+    assert "NB-1" in html
+    assert "WB-2" not in html, "строка С вилкой в этот раздел попадать не должна"
+    assert "q.pdf" in html and "СП-166 9" in html
+    assert "НЕ закупка и НЕ экспозиция" in html
+
+
+def test_раздел_без_вилки_пуст_когда_нечего_показать():
+    assert so.no_band_section([{"pn": "X-1", "usd_lo": 1, "usd_hi": 2, "qty": 1}], {}) == ""
+
+
+def test_сумма_раздела_не_складывается_с_экспозицией():
+    """Оговорка обязательна: это сумма предложений, а не закупка."""
+    rows = [{"pn": "NB-3", "name": "Придуманная прокладка", "qty": 4,
+             "usd_lo": None, "usd_hi": None}]
+    supp = {"NB3": {"usd": 25.0, "raw_price": "25", "currency": "USD", "origin": "СП-166 1",
+                    "field": "Offer from supplier", "file": "q.pdf", "row": "2", "sheet": "",
+                    "rule": "", "direction": "входящее", "line": ""}}
+    html = so.no_band_section(rows, supp)
+    assert "100" in html, "сумма на объём должна считаться"
+    assert "Складывать её с экспозицией заявки нельзя" in html
+
+
+def test_счёт_по_перепроверенным_строкам_отдельный(monkeypatch):
+    """Картина по крупным перепроверенным строкам ОБРАТНАЯ общей по заявке.
+
+    Замер прогона 18.09.2026: по 776 строкам заявки предложение выше потолка у
+    222 и ниже пола у 106, а по 22 перепроверенным — наоборот, завышение
+    подтверждено 13 раз против занижения 7. Складывать эти два счёта в один
+    нельзя, поэтому они и считаются отдельно.
+    """
+    monkeypatch.setattr(so, "reverify_rows", lambda: [
+        {"pn": "AA-1"}, {"pn": "BB-2"}, {"pn": "CC-3"}, {"pn": "DD-4"}])
+    rows = [{"pn": "AA-1", "usd_lo": 10, "usd_hi": 20, "qty": 1},
+            {"pn": "BB-2", "usd_lo": 10, "usd_hi": 20, "qty": 1},
+            {"pn": "CC-3", "usd_lo": 10, "usd_hi": 20, "qty": 1},
+            {"pn": "DD-4", "usd_lo": 10, "usd_hi": 20, "qty": 1}]
+    def offer(usd):
+        return {"usd": usd, "raw_price": str(usd), "currency": "USD", "origin": "СП-166 1",
+                "field": "Offer from supplier", "file": "q.pdf", "row": "1", "sheet": "",
+                "rule": "", "direction": "входящее", "line": ""}
+    supp = {"AA1": offer(99.0), "BB2": offer(1.0), "CC3": offer(15.0)}
+    st = so.reverify_stats(rows, supp)
+    assert st == {"rows": 4, "with_offer": 3, "overstated_confirmed": 1,
+                  "understated_confirmed": 1, "band_right": 1, "no_offer": 1}
+
+
+def test_счётчики_по_перепроверке_не_несут_ни_цен_ни_номеров():
+    """Они идут в репозиторий, значит в них может быть только счёт."""
+    rows = [{"pn": "AA-1", "usd_lo": 10, "usd_hi": 20, "qty": 1}]
+    st = so.reverify_stats(rows, {"AA1": {"usd": 99.0, "raw_price": "99", "currency": "USD",
+                                          "origin": "СП-166 1", "field": "f", "file": "q.pdf",
+                                          "row": "1", "sheet": "", "rule": "",
+                                          "direction": "входящее", "line": ""}})
+    for v in st.values():
+        assert isinstance(v, int)

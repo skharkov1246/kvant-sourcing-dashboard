@@ -1,18 +1,426 @@
 {
  "updated": "2026-09-18",
  "source": "Англоязычный первоисточник листа «Энергосети» заявки ЛУКОЙЛ: http://www.gas-turbine-parts.com/News/Product_FAQ/151.html",
- "method": "Строка страницы имеет вид «№ · номер · наименование на английском · количество · единица». Сверка с gt/data/rfq_demand.json идёт по нормализованному номеру.",
- "not_a_confirmation": "Эта страница НЕ подтверждает заявку: она и есть её англоязычный первоисточник — 431 строка из 436 стоит в заявке, количества совпадают у 425. Ссылаться на неё как на независимый каталог нельзя, вывод получится круговым.",
+ "method": "Строка страницы имеет вид «№ · номер · наименование на английском · количество · единица». Сверка с gt/data/rfq_demand.json идёт по нормализованному номеру. Количество сверяется двумя мерами: qty_match_line — количество первоисточника встречается среди строк заявки; qty_match_total — сумма строк заявки равна сумме строк первоисточника. Сильная мера — вторая.",
+ "not_a_confirmation": "Эта страница НЕ подтверждает заявку: она и есть её англоязычный первоисточник — 431 строк из 436 стоят в заявке. Ссылаться на неё как на независимый каталог нельзя, вывод получится круговым.",
  "what_it_is_for": "Расшифровка. Русское наименование — построчный машинный перевод, он не ищется ни в одном каталоге; английский оригинал ищется и идёт в запрос цены западному продавцу (поле ask_as).",
+ "qty_warning": "Сильная мера расходится со слабой: количество сходится у 337 строк из 431, а не у 425, как показывала слабая. У 66 номеров заявка просит больше своего же английского листа — это 489666 USD экспозиции на количестве, которое первоисточником не подтверждено. Объяснений два, и выбрать может только заказчик: лист покрывает меньше машин, чем заявка, либо сводка складывает строку-перевод первоисточника со строкой русского блока об одной и той же позиции.",
  "totals": {
   "source_rows": 436,
   "source_pns": 370,
   "in_request": 431,
   "share_pct": 98.9,
-  "qty_match": 425,
+  "qty_match_line": 425,
+  "qty_match_total": 337,
   "sheets": [
    "Энергосети"
-  ]
+  ],
+  "qty_gap": {
+   "pns_measured": 234,
+   "qty_equal": 168,
+   "qty_summary_above_source": 66,
+   "usd_by_summary_qty": 2253710.6,
+   "usd_by_source_qty": 1764044.6,
+   "usd_at_stake": 489666.0,
+   "top": [
+    {
+     "pn": "CT95038/01",
+     "qty_summary": 10.0,
+     "qty_source": 2.0,
+     "usd_gap": 88000.0
+    },
+    {
+     "pn": "RW21223/1",
+     "qty_summary": 356.0,
+     "qty_source": 36.0,
+     "usd_gap": 36000.0
+    },
+    {
+     "pn": "64/60082044/1",
+     "qty_summary": 10.0,
+     "qty_source": 2.0,
+     "usd_gap": 28000.0
+    },
+    {
+     "pn": "64/60082039/1",
+     "qty_summary": 6.0,
+     "qty_source": 2.0,
+     "usd_gap": 26000.0
+    },
+    {
+     "pn": "64/05002092/4",
+     "qty_summary": 40.0,
+     "qty_source": 8.0,
+     "usd_gap": 25280.0
+    },
+    {
+     "pn": "64/05002096/3",
+     "qty_summary": 40.0,
+     "qty_source": 8.0,
+     "usd_gap": 25280.0
+    },
+    {
+     "pn": "SP040571",
+     "qty_summary": 18.0,
+     "qty_source": 2.0,
+     "usd_gap": 22400.0
+    },
+    {
+     "pn": "MW35024B/01",
+     "qty_summary": 24.0,
+     "qty_source": 8.0,
+     "usd_gap": 19200.0
+    },
+    {
+     "pn": "64/60082038/1",
+     "qty_summary": 6.0,
+     "qty_source": 2.0,
+     "usd_gap": 18000.0
+    },
+    {
+     "pn": "RW21222/4",
+     "qty_summary": 1168.0,
+     "qty_source": 16.0,
+     "usd_gap": 16704.0
+    },
+    {
+     "pn": "64/60082041/1",
+     "qty_summary": 6.0,
+     "qty_source": 2.0,
+     "usd_gap": 15600.0
+    },
+    {
+     "pn": "MW35025B/01",
+     "qty_summary": 20.0,
+     "qty_source": 4.0,
+     "usd_gap": 14560.0
+    },
+    {
+     "pn": "SP103393",
+     "qty_summary": 18.0,
+     "qty_source": 2.0,
+     "usd_gap": 14000.0
+    },
+    {
+     "pn": "64/60082040/1",
+     "qty_summary": 6.0,
+     "qty_source": 2.0,
+     "usd_gap": 14000.0
+    },
+    {
+     "pn": "64/04012024/3",
+     "qty_summary": 16.0,
+     "qty_source": 2.0,
+     "usd_gap": 11900.0
+    },
+    {
+     "pn": "64/60082046/1",
+     "qty_summary": 6.0,
+     "qty_source": 2.0,
+     "usd_gap": 10600.0
+    },
+    {
+     "pn": "64/05002092/2",
+     "qty_summary": 40.0,
+     "qty_source": 8.0,
+     "usd_gap": 10400.0
+    },
+    {
+     "pn": "64/05002096/6",
+     "qty_summary": 40.0,
+     "qty_source": 8.0,
+     "usd_gap": 10400.0
+    },
+    {
+     "pn": "64/05002095/2",
+     "qty_summary": 18.0,
+     "qty_source": 2.0,
+     "usd_gap": 8560.0
+    },
+    {
+     "pn": "SP027886",
+     "qty_summary": 18.0,
+     "qty_source": 2.0,
+     "usd_gap": 8160.0
+    },
+    {
+     "pn": "MW03627",
+     "qty_summary": 12.0,
+     "qty_source": 4.0,
+     "usd_gap": 7120.0
+    },
+    {
+     "pn": "346328041",
+     "qty_summary": 138.0,
+     "qty_source": 10.0,
+     "usd_gap": 6976.0
+    },
+    {
+     "pn": "MW21224A",
+     "qty_summary": 28.0,
+     "qty_source": 12.0,
+     "usd_gap": 4320.0
+    },
+    {
+     "pn": "SP103394",
+     "qty_summary": 20.0,
+     "qty_source": 4.0,
+     "usd_gap": 4080.0
+    },
+    {
+     "pn": "346321100",
+     "qty_summary": 62.0,
+     "qty_source": 30.0,
+     "usd_gap": 3680.0
+    },
+    {
+     "pn": "115510040",
+     "qty_summary": 252.0,
+     "qty_source": 12.0,
+     "usd_gap": 3240.0
+    },
+    {
+     "pn": "115612090",
+     "qty_summary": 120.0,
+     "qty_source": 24.0,
+     "usd_gap": 2736.0
+    },
+    {
+     "pn": "64/09001231/091",
+     "qty_summary": 38.0,
+     "qty_source": 6.0,
+     "usd_gap": 2640.0
+    },
+    {
+     "pn": "119410060",
+     "qty_summary": 152.0,
+     "qty_source": 8.0,
+     "usd_gap": 2592.0
+    },
+    {
+     "pn": "119410045",
+     "qty_summary": 102.0,
+     "qty_source": 6.0,
+     "usd_gap": 2496.0
+    },
+    {
+     "pn": "277306012",
+     "qty_summary": 108.0,
+     "qty_source": 12.0,
+     "usd_gap": 2400.0
+    },
+    {
+     "pn": "346820025",
+     "qty_summary": 40.0,
+     "qty_source": 4.0,
+     "usd_gap": 2196.0
+    },
+    {
+     "pn": "211166010",
+     "qty_summary": 252.0,
+     "qty_source": 12.0,
+     "usd_gap": 1920.0
+    },
+    {
+     "pn": "RW54017",
+     "qty_summary": 6.0,
+     "qty_source": 2.0,
+     "usd_gap": 1640.0
+    },
+    {
+     "pn": "SP108194",
+     "qty_summary": 18.0,
+     "qty_source": 2.0,
+     "usd_gap": 1640.0
+    },
+    {
+     "pn": "211165010",
+     "qty_summary": 106.0,
+     "qty_source": 10.0,
+     "usd_gap": 1584.0
+    },
+    {
+     "pn": "151510025",
+     "qty_summary": 360.0,
+     "qty_source": 40.0,
+     "usd_gap": 1440.0
+    },
+    {
+     "pn": "JP3612",
+     "qty_summary": 18.0,
+     "qty_source": 2.0,
+     "usd_gap": 1320.0
+    },
+    {
+     "pn": "219562012",
+     "qty_summary": 160.0,
+     "qty_source": 64.0,
+     "usd_gap": 1152.0
+    },
+    {
+     "pn": "SP029079",
+     "qty_summary": 18.0,
+     "qty_source": 2.0,
+     "usd_gap": 1120.0
+    },
+    {
+     "pn": "CT91035/239",
+     "qty_summary": 452.0,
+     "qty_source": 52.0,
+     "usd_gap": 1100.0
+    },
+    {
+     "pn": "219551010",
+     "qty_summary": 108.0,
+     "qty_source": 12.0,
+     "usd_gap": 1056.0
+    },
+    {
+     "pn": "231122010",
+     "qty_summary": 252.0,
+     "qty_source": 12.0,
+     "usd_gap": 1020.0
+    },
+    {
+     "pn": "219561010",
+     "qty_summary": 140.0,
+     "qty_source": 44.0,
+     "usd_gap": 840.0
+    },
+    {
+     "pn": "CT1126C/1",
+     "qty_summary": 8.0,
+     "qty_source": 4.0,
+     "usd_gap": 720.0
+    },
+    {
+     "pn": "231121012",
+     "qty_summary": 188.0,
+     "qty_source": 92.0,
+     "usd_gap": 552.0
+    },
+    {
+     "pn": "JP4316",
+     "qty_summary": 18.0,
+     "qty_source": 2.0,
+     "usd_gap": 480.0
+    },
+    {
+     "pn": "346321080",
+     "qty_summary": 16.0,
+     "qty_source": 8.0,
+     "usd_gap": 420.0
+    },
+    {
+     "pn": "030519/000",
+     "qty_summary": 16.0,
+     "qty_source": 8.0,
+     "usd_gap": 360.0
+    },
+    {
+     "pn": "231115010",
+     "qty_summary": 224.0,
+     "qty_source": 64.0,
+     "usd_gap": 344.0
+    },
+    {
+     "pn": "346321050",
+     "qty_summary": 28.0,
+     "qty_source": 20.0,
+     "usd_gap": 312.0
+    },
+    {
+     "pn": "346321150",
+     "qty_summary": 10.0,
+     "qty_source": 6.0,
+     "usd_gap": 310.0
+    },
+    {
+     "pn": "CT887B/6",
+     "qty_summary": 6.0,
+     "qty_source": 2.0,
+     "usd_gap": 310.0
+    },
+    {
+     "pn": "CT886/16",
+     "qty_summary": 6.0,
+     "qty_source": 2.0,
+     "usd_gap": 310.0
+    },
+    {
+     "pn": "MW06026",
+     "qty_summary": 8.0,
+     "qty_source": 4.0,
+     "usd_gap": 280.0
+    },
+    {
+     "pn": "64/06016003/5",
+     "qty_summary": 10.0,
+     "qty_source": 6.0,
+     "usd_gap": 250.0
+    },
+    {
+     "pn": "346328051",
+     "qty_summary": 16.0,
+     "qty_source": 12.0,
+     "usd_gap": 244.0
+    },
+    {
+     "pn": "CT886/13",
+     "qty_summary": 6.0,
+     "qty_source": 2.0,
+     "usd_gap": 244.0
+    },
+    {
+     "pn": "CT1014/3",
+     "qty_summary": 12.0,
+     "qty_source": 8.0,
+     "usd_gap": 230.0
+    },
+    {
+     "pn": "CT4017A/1",
+     "qty_summary": 6.0,
+     "qty_source": 2.0,
+     "usd_gap": 210.0
+    },
+    {
+     "pn": "354573793",
+     "qty_summary": 6.0,
+     "qty_source": 2.0,
+     "usd_gap": 152.0
+    },
+    {
+     "pn": "354574993",
+     "qty_summary": 6.0,
+     "qty_source": 2.0,
+     "usd_gap": 152.0
+    },
+    {
+     "pn": "505728/000",
+     "qty_summary": 16.0,
+     "qty_source": 8.0,
+     "usd_gap": 136.0
+    },
+    {
+     "pn": "030528/000",
+     "qty_summary": 12.0,
+     "qty_source": 4.0,
+     "usd_gap": 126.0
+    },
+    {
+     "pn": "231121010",
+     "qty_summary": 40.0,
+     "qty_source": 24.0,
+     "usd_gap": 108.0
+    },
+    {
+     "pn": "231121016",
+     "qty_summary": 74.0,
+     "qty_source": 66.0,
+     "usd_gap": 64.0
+    }
+   ]
+  }
  },
  "rows": [
   {
@@ -26,7 +434,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "COMPRESSOR INLET SCREEN"
   },
   {
@@ -40,7 +450,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "GASKET - INLET"
   },
   {
@@ -54,7 +466,9 @@
    "sheet": "Энергосети",
    "qty_request": 8.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 8.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "ALUMINIUM WASHER - 1/2 BSP"
   },
   {
@@ -68,7 +482,9 @@
    "sheet": "Энергосети",
    "qty_request": 16.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 16.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "NICKEL PLATED BOLT - M16 x 140MM"
   },
   {
@@ -82,7 +498,9 @@
    "sheet": "Энергосети",
    "qty_request": 24.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 24.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "NICKEL PLATED SETSCREW - M16 x 45MM"
   },
   {
@@ -96,7 +514,9 @@
    "sheet": "Энергосети",
    "qty_request": 8.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 8.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "COUNTERSUNK SCREW - M6 x 16MM"
   },
   {
@@ -110,7 +530,9 @@
    "sheet": "Энергосети",
    "qty_request": 74.0,
    "lines_in_request": 7,
-   "qty_match": true,
+   "qty_source_pn": 66.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "NICKEL PLATED PLAIN WASHER - M16"
   },
   {
@@ -124,7 +546,9 @@
    "sheet": "Энергосети",
    "qty_request": 76.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 76.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "PLAIN WASHER - M6"
   },
   {
@@ -138,7 +562,9 @@
    "sheet": "Энергосети",
    "qty_request": 38.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 38.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "SELF LOCKING WASHER - M6"
   },
   {
@@ -152,7 +578,9 @@
    "sheet": "Энергосети",
    "qty_request": 54.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 54.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "NICKEL PLATED NUT - M6"
   },
   {
@@ -166,7 +594,9 @@
    "sheet": "Энергосети",
    "qty_request": 92.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 92.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "SELF-LOCKING NUT - M6"
   },
   {
@@ -180,7 +610,9 @@
    "sheet": "Энергосети",
    "qty_request": 36.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 36.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "LEVER"
   },
   {
@@ -194,7 +626,9 @@
    "sheet": "Энергосети",
    "qty_request": 8.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 8.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "THRUST WASHER"
   },
   {
@@ -208,7 +642,9 @@
    "sheet": "Энергосети",
    "qty_request": 18.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 18.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "THRUST WASHER - 16MM I/D"
   },
   {
@@ -222,7 +658,9 @@
    "sheet": "Энергосети",
    "qty_request": 106.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 10.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "NICKEL PLATED NUT - M10"
   },
   {
@@ -236,7 +674,9 @@
    "sheet": "Энергосети",
    "qty_request": 224.0,
    "lines_in_request": 3,
-   "qty_match": true,
+   "qty_source_pn": 64.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "PLAIN WASHER - M10"
   },
   {
@@ -250,7 +690,9 @@
    "sheet": "Энергосети",
    "qty_request": 10.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 10.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "ROD END - RIGHT HAND THREAD - M10"
   },
   {
@@ -264,7 +706,9 @@
    "sheet": "Энергосети",
    "qty_request": 20.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 20.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "SELF-LOCKING NUT - M10"
   },
   {
@@ -278,7 +722,9 @@
    "sheet": "Энергосети",
    "qty_request": 10.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 10.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "ROD END - LEFT HAND THREAD - M10"
   },
   {
@@ -292,7 +738,9 @@
    "sheet": "Энергосети",
    "qty_request": 10.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 10.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "NICKLE PLATED NUT - M10 LEFT HAND THREAD"
   },
   {
@@ -306,7 +754,9 @@
    "sheet": "Энергосети",
    "qty_request": 18.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 18.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "NICKEL PLATED BOLT - M12 x 55MM"
   },
   {
@@ -320,7 +770,9 @@
    "sheet": "Энергосети",
    "qty_request": 6.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 6.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "BOLT - M12 x 35MM"
   },
   {
@@ -334,7 +786,9 @@
    "sheet": "Энергосети",
    "qty_request": 12.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 12.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "PLAIN WASHER - M8"
   },
   {
@@ -348,7 +802,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "PLUG - BOROSCOPE STG 3"
   },
   {
@@ -362,7 +818,9 @@
    "sheet": "Энергосети",
    "qty_request": 16.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 16.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "BOLT - 12 POINT HEAD"
   },
   {
@@ -376,7 +834,9 @@
    "sheet": "Энергосети",
    "qty_request": 44.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 44.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "NUT - M12 BI-HEX HEAD"
   },
   {
@@ -390,7 +850,9 @@
    "sheet": "Энергосети",
    "qty_request": 44.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 44.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "NICKEL PLATED STUD - M12 x 90MM"
   },
   {
@@ -404,7 +866,9 @@
    "sheet": "Энергосети",
    "qty_request": 16.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 16.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "THREAD INSERT - M16 x 24MM"
   },
   {
@@ -418,7 +882,9 @@
    "sheet": "Энергосети",
    "qty_request": 92.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 92.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "SELF-LOCKING NUT - M6"
   },
   {
@@ -432,7 +898,9 @@
    "sheet": "Энергосети",
    "qty_request": 8.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 8.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "GASKET"
   },
   {
@@ -446,7 +914,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "GASKET - LUB OIL SUPPLY"
   },
   {
@@ -460,7 +930,9 @@
    "sheet": "Энергосети",
    "qty_request": 4.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "NICKEL PLATED HELI-LOCKNUT - M20"
   },
   {
@@ -474,7 +946,9 @@
    "sheet": "Энергосети",
    "qty_request": 12.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 12.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "NICKEL PLATED HELI-LOCKNUT - M16"
   },
   {
@@ -488,7 +962,9 @@
    "sheet": "Энергосети",
    "qty_request": 74.0,
    "lines_in_request": 7,
-   "qty_match": true,
+   "qty_source_pn": 66.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "NICKEL PLATED PLAIN WASHER - M16"
   },
   {
@@ -502,7 +978,9 @@
    "sheet": "Энергосети",
    "qty_request": 188.0,
    "lines_in_request": 7,
-   "qty_match": true,
+   "qty_source_pn": 92.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "NICKEL PLATED PLAIN WASHER - M12"
   },
   {
@@ -516,7 +994,9 @@
    "sheet": "Энергосети",
    "qty_request": 160.0,
    "lines_in_request": 5,
-   "qty_match": true,
+   "qty_source_pn": 64.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "NICKEL PLATED HELI-LOCKNUT - M12"
   },
   {
@@ -530,7 +1010,9 @@
    "sheet": "Энергосети",
    "qty_request": 4.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "GASKET"
   },
   {
@@ -544,7 +1026,9 @@
    "sheet": "Энергосети",
    "qty_request": 12.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 12.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "COMBUSTION CHAMBER"
   },
   {
@@ -558,7 +1042,9 @@
    "sheet": "Энергосети",
    "qty_request": 12.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 12.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "DISC SPRING"
   },
   {
@@ -572,7 +1058,9 @@
    "sheet": "Энергосети",
    "qty_request": 28.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 12.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "PISTON RING"
   },
   {
@@ -586,7 +1074,9 @@
    "sheet": "Энергосети",
    "qty_request": 356.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 36.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "BI-HEXAGON HEAD BOLT"
   },
   {
@@ -600,7 +1090,9 @@
    "sheet": "Энергосети",
    "qty_request": 12.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 12.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "MAIN BURNER ASSY - DUAL DLE - GOLD SEALS"
   },
   {
@@ -614,7 +1106,9 @@
    "sheet": "",
    "qty_request": null,
    "lines_in_request": 0,
-   "qty_match": false,
+   "qty_source_pn": 12.0,
+   "qty_match_line": false,
+   "qty_match_total": false,
    "ask_as": "PILOT BURNER ASSEMBLY  - DUAL FUEL"
   },
   {
@@ -628,7 +1122,9 @@
    "sheet": "",
    "qty_request": null,
    "lines_in_request": 0,
-   "qty_match": false,
+   "qty_source_pn": 12.0,
+   "qty_match_line": false,
+   "qty_match_total": false,
    "ask_as": "LIQUID CORE ASSEMBLY"
   },
   {
@@ -642,7 +1138,9 @@
    "sheet": "Энергосети",
    "qty_request": 1168.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 16.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "CAP SCREW - M8"
   },
   {
@@ -656,7 +1154,9 @@
    "sheet": "Энергосети",
    "qty_request": 12.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 12.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "C SEAL"
   },
   {
@@ -670,7 +1170,9 @@
    "sheet": "",
    "qty_request": null,
    "lines_in_request": 0,
-   "qty_match": false,
+   "qty_source_pn": 12.0,
+   "qty_match_line": false,
+   "qty_match_total": false,
    "ask_as": "C SEAL"
   },
   {
@@ -684,7 +1186,9 @@
    "sheet": "Энергосети",
    "qty_request": 22.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 22.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "STUD - M10 x 50"
   },
   {
@@ -698,7 +1202,9 @@
    "sheet": "Энергосети",
    "qty_request": 224.0,
    "lines_in_request": 3,
-   "qty_match": true,
+   "qty_source_pn": 64.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "PLAIN WASHER - M10"
   },
   {
@@ -712,7 +1218,9 @@
    "sheet": "Энергосети",
    "qty_request": 140.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 44.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "NICKEL PLATED HELI-LOCKNUT - M10"
   },
   {
@@ -726,7 +1234,9 @@
    "sheet": "Энергосети",
    "qty_request": 108.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 12.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "SPRING PIN - 6MM DIA x 12MM"
   },
   {
@@ -740,7 +1250,9 @@
    "sheet": "Энергосети",
    "qty_request": 12.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 12.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "C SEAL"
   },
   {
@@ -754,7 +1266,9 @@
    "sheet": "Энергосети",
    "qty_request": 12.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 12.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "THERMOCOUPLE"
   },
   {
@@ -768,7 +1282,9 @@
    "sheet": "Энергосети",
    "qty_request": 12.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 12.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "CAPSCREW"
   },
   {
@@ -782,7 +1298,9 @@
    "sheet": "Энергосети",
    "qty_request": 24.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 24.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "CAPSCREW - SPECIAL"
   },
   {
@@ -796,7 +1314,9 @@
    "sheet": "Энергосети",
    "qty_request": 16.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 16.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "NICKEL PLATED SETSCREW - M16 x 60MM"
   },
   {
@@ -810,7 +1330,9 @@
    "sheet": "Энергосети",
    "qty_request": 8.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 8.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "NICKEL PLATED SETSCREW - M16 x 50MM"
   },
   {
@@ -824,7 +1346,9 @@
    "sheet": "Энергосети",
    "qty_request": 74.0,
    "lines_in_request": 7,
-   "qty_match": true,
+   "qty_source_pn": 66.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "NICKEL PLATED PLAIN WASHER - M16"
   },
   {
@@ -838,7 +1362,9 @@
    "sheet": "Энергосети",
    "qty_request": 120.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 24.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "NICKEL PLATED BOLT - M12 x 90MM"
   },
   {
@@ -852,7 +1378,9 @@
    "sheet": "Энергосети",
    "qty_request": 188.0,
    "lines_in_request": 7,
-   "qty_match": true,
+   "qty_source_pn": 92.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "NICKEL PLATED PLAIN WASHER - M12"
   },
   {
@@ -866,7 +1394,9 @@
    "sheet": "Энергосети",
    "qty_request": 160.0,
    "lines_in_request": 5,
-   "qty_match": true,
+   "qty_source_pn": 64.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "NICKEL PLATED HELI-LOCKNUT - M12"
   },
   {
@@ -880,7 +1410,9 @@
    "sheet": "Энергосети",
    "qty_request": 10.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 10.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "GASKET"
   },
   {
@@ -894,7 +1426,9 @@
    "sheet": "Энергосети",
    "qty_request": 360.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 40.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "CAPSCREW - M10 x 25MM"
   },
   {
@@ -908,7 +1442,9 @@
    "sheet": "Энергосети",
    "qty_request": 10.0,
    "lines_in_request": 3,
-   "qty_match": true,
+   "qty_source_pn": 10.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "BORESCOPE PLUG BLOCK"
   },
   {
@@ -922,7 +1458,9 @@
    "sheet": "Энергосети",
    "qty_request": 4.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "BORESCOPE PLUG - CT STAGE 1"
   },
   {
@@ -936,7 +1474,9 @@
    "sheet": "Энергосети",
    "qty_request": 10.0,
    "lines_in_request": 3,
-   "qty_match": true,
+   "qty_source_pn": 10.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "NICKEL PLATED LOCKNUT - M16"
   },
   {
@@ -950,7 +1490,9 @@
    "sheet": "Энергосети",
    "qty_request": 10.0,
    "lines_in_request": 3,
-   "qty_match": true,
+   "qty_source_pn": 10.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "BORESCOPE PLUG BLOCK"
   },
   {
@@ -964,7 +1506,9 @@
    "sheet": "Энергосети",
    "qty_request": 4.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "BORESCOPE PLUG - CT STAGE 2 - UPSTREAM"
   },
   {
@@ -978,7 +1522,9 @@
    "sheet": "Энергосети",
    "qty_request": 6.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 6.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "SPRING PIN - 3MM DIA x 10MM"
   },
   {
@@ -992,7 +1538,9 @@
    "sheet": "Энергосети",
    "qty_request": 10.0,
    "lines_in_request": 3,
-   "qty_match": true,
+   "qty_source_pn": 10.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "NICKEL PLATED LOCKNUT - M16"
   },
   {
@@ -1006,7 +1554,9 @@
    "sheet": "Энергосети",
    "qty_request": 10.0,
    "lines_in_request": 3,
-   "qty_match": true,
+   "qty_source_pn": 10.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "BORESCOPE PLUG BLOCK"
   },
   {
@@ -1020,7 +1570,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "BORESCOPE PLUG - CT STAGE 2 - DOWNSTREAM"
   },
   {
@@ -1034,7 +1586,9 @@
    "sheet": "Энергосети",
    "qty_request": 6.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 6.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "SPRING PIN - 3MM DIA x 10MM"
   },
   {
@@ -1048,7 +1602,9 @@
    "sheet": "Энергосети",
    "qty_request": 10.0,
    "lines_in_request": 3,
-   "qty_match": true,
+   "qty_source_pn": 10.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "NICKEL PLATED LOCKNUT - M16"
   },
   {
@@ -1062,7 +1618,9 @@
    "sheet": "Энергосети",
    "qty_request": 12.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 12.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "LOCKNUT"
   },
   {
@@ -1076,7 +1634,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "EXTERNAL CIRCLIP - 50MM"
   },
   {
@@ -1090,7 +1650,9 @@
    "sheet": "Энергосети",
    "qty_request": 10.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 10.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "NICKEL PLATED BOLT - M16 x 80MM"
   },
   {
@@ -1104,7 +1666,9 @@
    "sheet": "Энергосети",
    "qty_request": 16.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 16.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "NICKEL PLATED SETSCREW - M12 x 35MM"
   },
   {
@@ -1118,7 +1682,9 @@
    "sheet": "Энергосети",
    "qty_request": 16.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 16.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "NICKEL PLATED BOLT - M12 x 80MM"
   },
   {
@@ -1132,7 +1698,9 @@
    "sheet": "Энергосети",
    "qty_request": 74.0,
    "lines_in_request": 7,
-   "qty_match": true,
+   "qty_source_pn": 66.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "NICKEL PLATED PLAIN WASHER - M16"
   },
   {
@@ -1146,7 +1714,9 @@
    "sheet": "Энергосети",
    "qty_request": 188.0,
    "lines_in_request": 7,
-   "qty_match": true,
+   "qty_source_pn": 92.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "NICKEL PLATED PLAIN WASHER - M12"
   },
   {
@@ -1160,7 +1730,9 @@
    "sheet": "Энергосети",
    "qty_request": 8.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 8.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "NICKEL PLATED FLAT WASHER - 5/8"
   },
   {
@@ -1174,7 +1746,9 @@
    "sheet": "Энергосети",
    "qty_request": 16.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 16.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "NICKEL PLATED FLAT WASHER - 3/4"
   },
   {
@@ -1188,7 +1762,9 @@
    "sheet": "Энергосети",
    "qty_request": 8.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 8.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "NUT - 5/8 UNC"
   },
   {
@@ -1202,7 +1778,9 @@
    "sheet": "Энергосети",
    "qty_request": 16.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 16.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "NUT - 3/4 UNC"
   },
   {
@@ -1216,7 +1794,9 @@
    "sheet": "Энергосети",
    "qty_request": 54.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 54.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "NICKEL PLATED NUT - M6"
   },
   {
@@ -1230,7 +1810,9 @@
    "sheet": "Энергосети",
    "qty_request": 16.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 16.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "NICKEL PLATED SPRING WASHER - M6"
   },
   {
@@ -1244,7 +1826,9 @@
    "sheet": "Энергосети",
    "qty_request": 40.0,
    "lines_in_request": 5,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "SPIRAL GASKET - 1 IN NPS CL300"
   },
   {
@@ -1258,7 +1842,9 @@
    "sheet": "Энергосети",
    "qty_request": 138.0,
    "lines_in_request": 5,
-   "qty_match": true,
+   "qty_source_pn": 10.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "SPIRAL GASKET - 1.1/2 NPS CL300 OR CL600"
   },
   {
@@ -1272,7 +1858,9 @@
    "sheet": "Энергосети",
    "qty_request": 8.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 8.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "BOLT - 5/8 UNC x 2.1/2"
   },
   {
@@ -1286,7 +1874,9 @@
    "sheet": "Энергосети",
    "qty_request": 16.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 16.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "BOLT - 3/4 UNC x 3 IN"
   },
   {
@@ -1300,7 +1890,9 @@
    "sheet": "Энергосети",
    "qty_request": 16.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 16.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "GASKET"
   },
   {
@@ -1314,7 +1906,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "FILTER ASSEMBLY"
   },
   {
@@ -1328,7 +1922,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "SELF LOCKING WASHER - M12"
   },
   {
@@ -1342,7 +1938,9 @@
    "sheet": "Энергосети",
    "qty_request": 6.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 6.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "NICKEL PLATED LOCKNUT - M12"
   },
   {
@@ -1356,7 +1954,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "MALE ROD END - 12MM I/D x M12"
   },
   {
@@ -1370,7 +1970,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "ELECTRIC ACTUATOR AND FITTINGS"
   },
   {
@@ -1384,7 +1986,9 @@
    "sheet": "Энергосети",
    "qty_request": 8.0,
    "lines_in_request": 3,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "JOINT - 1.1/2 SAE"
   },
   {
@@ -1398,7 +2002,9 @@
    "sheet": "Энергосети",
    "qty_request": 8.0,
    "lines_in_request": 3,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "GASKET"
   },
   {
@@ -1412,7 +2018,9 @@
    "sheet": "Энергосети",
    "qty_request": 160.0,
    "lines_in_request": 5,
-   "qty_match": true,
+   "qty_source_pn": 64.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "NICKEL PLATED HELI-LOCKNUT - M12"
   },
   {
@@ -1426,7 +2034,9 @@
    "sheet": "Энергосети",
    "qty_request": 4.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "CHECK VALVE"
   },
   {
@@ -1440,7 +2050,9 @@
    "sheet": "Энергосети",
    "qty_request": 12.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 12.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "NUT - M6"
   },
   {
@@ -1454,7 +2066,9 @@
    "sheet": "Энергосети",
    "qty_request": 20.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 20.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "NICKEL PLATED PLAIN WASHER - M6"
   },
   {
@@ -1468,7 +2082,9 @@
    "sheet": "Энергосети",
    "qty_request": 188.0,
    "lines_in_request": 7,
-   "qty_match": true,
+   "qty_source_pn": 92.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "NICKEL PLATED PLAIN WASHER - M12"
   },
   {
@@ -1482,7 +2098,9 @@
    "sheet": "Энергосети",
    "qty_request": 6.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "GASKET - INTERSTAGE BLEED VALVE"
   },
   {
@@ -1496,7 +2114,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "SEAL KIT"
   },
   {
@@ -1510,7 +2130,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "NICKEL PLATED CAPSCREW - M6 x 45MM"
   },
   {
@@ -1524,7 +2146,9 @@
    "sheet": "Энергосети",
    "qty_request": 22.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 22.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "SELF-LOCKING NUT - M6"
   },
   {
@@ -1538,7 +2162,9 @@
    "sheet": "Энергосети",
    "qty_request": 8.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 8.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "SELF-LOCKING NUT - M12"
   },
   {
@@ -1552,7 +2178,9 @@
    "sheet": "Энергосети",
    "qty_request": 12.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 12.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "SPRING WASHER - M6"
   },
   {
@@ -1566,7 +2194,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "SETSCREW - M6 x 12MM"
   },
   {
@@ -1580,7 +2210,9 @@
    "sheet": "Энергосети",
    "qty_request": 20.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 20.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "NICKEL PLATED PLAIN WASHER - M6"
   },
   {
@@ -1594,7 +2226,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "GASKET INTERSTAGE BLEED VALVE"
   },
   {
@@ -1608,7 +2242,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "TRIPLE SEAL ASSEMBLY"
   },
   {
@@ -1622,7 +2258,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "BELLOWS ASSEMBLY"
   },
   {
@@ -1636,7 +2274,9 @@
    "sheet": "Энергосети",
    "qty_request": 8.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 8.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "SPIRAL GASKET - 6 IN NPS CL300"
   },
   {
@@ -1650,7 +2290,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "ELECTRO-PNEUMATIC POSITIONER"
   },
   {
@@ -1664,7 +2306,9 @@
    "sheet": "Энергосети",
    "qty_request": 24.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 24.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "PLAIN WASHER - M20"
   },
   {
@@ -1678,7 +2322,9 @@
    "sheet": "Энергосети",
    "qty_request": 24.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 24.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "NUT - M20"
   },
   {
@@ -1692,7 +2338,9 @@
    "sheet": "Энергосети",
    "qty_request": 24.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 8.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "BORESCOPE PLUG ASSEMBLY - PT STAGE 1"
   },
   {
@@ -1706,7 +2354,9 @@
    "sheet": "Энергосети",
    "qty_request": 20.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "BORESCOPE PLUG ASSEMBLY - PT STAGE 2"
   },
   {
@@ -1720,7 +2370,9 @@
    "sheet": "Энергосети",
    "qty_request": 18.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 18.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "NICKEL PLATED BOLT - M12 x 55MM"
   },
   {
@@ -1734,7 +2386,9 @@
    "sheet": "Энергосети",
    "qty_request": 16.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 16.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "BI-HEXAGON HEAD BOLT - M16 x 130MM"
   },
   {
@@ -1748,7 +2402,9 @@
    "sheet": "Энергосети",
    "qty_request": 4.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "CAPSCREW - M8 x 30MM"
   },
   {
@@ -1762,7 +2418,9 @@
    "sheet": "Энергосети",
    "qty_request": 16.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 16.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "BI-HEXAGON HEAD NUT - M16"
   },
   {
@@ -1776,7 +2434,9 @@
    "sheet": "Энергосети",
    "qty_request": 188.0,
    "lines_in_request": 7,
-   "qty_match": true,
+   "qty_source_pn": 92.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "NICKEL PLATED PLAIN WASHER - M12"
   },
   {
@@ -1790,7 +2450,9 @@
    "sheet": "Энергосети",
    "qty_request": 74.0,
    "lines_in_request": 7,
-   "qty_match": true,
+   "qty_source_pn": 66.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "NICKEL PLATED PLAIN WASHER - M16"
   },
   {
@@ -1804,7 +2466,9 @@
    "sheet": "Энергосети",
    "qty_request": 94.0,
    "lines_in_request": 3,
-   "qty_match": true,
+   "qty_source_pn": 94.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "CABLE TIE"
   },
   {
@@ -1818,7 +2482,9 @@
    "sheet": "Энергосети",
    "qty_request": 24.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 24.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "SEALING WASHER - 32MM I/D"
   },
   {
@@ -1832,7 +2498,9 @@
    "sheet": "Энергосети",
    "qty_request": 14.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 14.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "CABLE GLAND - M32"
   },
   {
@@ -1846,7 +2514,9 @@
    "sheet": "Энергосети",
    "qty_request": 4.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "RESISTANCE TEMPERATURE DETECTOR"
   },
   {
@@ -1860,7 +2530,9 @@
    "sheet": "Энергосети",
    "qty_request": 8.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 8.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "THERMOCOUPLE PROBE"
   },
   {
@@ -1874,7 +2546,9 @@
    "sheet": "Энергосети",
    "qty_request": 120.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 120.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "CABLE TIE"
   },
   {
@@ -1888,7 +2562,9 @@
    "sheet": "Энергосети",
    "qty_request": 4.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "ALUMINIUM WASHER - 1/4 BSP"
   },
   {
@@ -1902,7 +2578,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "NICKEL PLATED SETSCREW - M6 x 16MM"
   },
   {
@@ -1916,7 +2594,9 @@
    "sheet": "Энергосети",
    "qty_request": 16.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 8.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "JOINT RING - 33/64 I/D"
   },
   {
@@ -1930,7 +2610,9 @@
    "sheet": "Энергосети",
    "qty_request": 8.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 8.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "CABLE CLIP"
   },
   {
@@ -1944,7 +2626,9 @@
    "sheet": "Энергосети",
    "qty_request": 14.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 14.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "CABLE CLIP - 16MM"
   },
   {
@@ -1958,7 +2642,9 @@
    "sheet": "Энергосети",
    "qty_request": 20.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 20.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "CABLE CLIP - STAINLESS"
   },
   {
@@ -1972,7 +2658,9 @@
    "sheet": "Энергосети",
    "qty_request": 94.0,
    "lines_in_request": 3,
-   "qty_match": true,
+   "qty_source_pn": 94.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "CABLE TIE"
   },
   {
@@ -1986,7 +2674,9 @@
    "sheet": "Энергосети",
    "qty_request": 6.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 6.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "WASHER - PTFE - 20.07MM I/D"
   },
   {
@@ -2000,7 +2690,9 @@
    "sheet": "Энергосети",
    "qty_request": 4.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "SHAKEPROOF LOCKWASHER - M3"
   },
   {
@@ -2014,7 +2706,9 @@
    "sheet": "Энергосети",
    "qty_request": 8.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 8.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "TABWASHER - M6"
   },
   {
@@ -2028,7 +2722,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "LOCKNUT - BRASS 20MM"
   },
   {
@@ -2042,7 +2738,9 @@
    "sheet": "Энергосети",
    "qty_request": 4.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "CABLE GLAND - M20"
   },
   {
@@ -2056,7 +2754,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "JUNCTION BOX SUPPORT BRACKET"
   },
   {
@@ -2070,7 +2770,9 @@
    "sheet": "Энергосети",
    "qty_request": 4.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "NICKEL PLATED SETSCREW - M12 x 50MM"
   },
   {
@@ -2084,7 +2786,9 @@
    "sheet": "Энергосети",
    "qty_request": 8.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 8.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "NICKEL PLATED SETSCREW - M12 x 80MM"
   },
   {
@@ -2098,7 +2802,9 @@
    "sheet": "Энергосети",
    "qty_request": 8.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 8.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "NICKEL PLATED CAPSCREW - M16 x 65MM"
   },
   {
@@ -2112,7 +2818,9 @@
    "sheet": "Энергосети",
    "qty_request": 102.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 6.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "NICKEL PLATED SETSCREW - M10 x 45MM"
   },
   {
@@ -2126,7 +2834,9 @@
    "sheet": "Энергосети",
    "qty_request": 152.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 8.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "NICKEL PLATED SETSCREW - M10 x 60MM"
   },
   {
@@ -2140,7 +2850,9 @@
    "sheet": "Энергосети",
    "qty_request": 108.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 12.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "NICKEL PLATED HELI-NUT - M10"
   },
   {
@@ -2154,7 +2866,9 @@
    "sheet": "Энергосети",
    "qty_request": 40.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 24.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "NICKEL PLATED PLAIN WASHER - M10"
   },
   {
@@ -2168,7 +2882,9 @@
    "sheet": "Энергосети",
    "qty_request": 94.0,
    "lines_in_request": 3,
-   "qty_match": true,
+   "qty_source_pn": 94.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "CABLE TIE"
   },
   {
@@ -2182,7 +2898,9 @@
    "sheet": "Энергосети",
    "qty_request": 8.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 8.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "CABLE GLAND - M25"
   },
   {
@@ -2196,7 +2914,9 @@
    "sheet": "Энергосети",
    "qty_request": 14.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 14.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "CABLE GLAND - M32"
   },
   {
@@ -2210,7 +2930,9 @@
    "sheet": "Энергосети",
    "qty_request": 4.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "THERMOCOUPLE PROBE"
   },
   {
@@ -2224,7 +2946,9 @@
    "sheet": "Энергосети",
    "qty_request": 12.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "THERMOCOUPLE PROBE"
   },
   {
@@ -2238,7 +2962,9 @@
    "sheet": "Энергосети",
    "qty_request": 452.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 52.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "CABLE TIE - HIGH TEMPERATURE"
   },
   {
@@ -2252,7 +2978,9 @@
    "sheet": "Энергосети",
    "qty_request": 6.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 6.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "NICKEL PLATED LOCKNUT - M12"
   },
   {
@@ -2266,7 +2994,9 @@
    "sheet": "Энергосети",
    "qty_request": 12.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 12.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "LOCKNUT"
   },
   {
@@ -2280,7 +3010,9 @@
    "sheet": "Энергосети",
    "qty_request": 16.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 16.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "NICKEL PLATED CAPSCREW - M12 x 70MM"
   },
   {
@@ -2294,7 +3026,9 @@
    "sheet": "Энергосети",
    "qty_request": 16.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 16.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "NICKEL PLATED SETSCREW - M16 x 70MM"
   },
   {
@@ -2308,7 +3042,9 @@
    "sheet": "Энергосети",
    "qty_request": 16.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 16.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "NICKEL PLATED NUT - M16"
   },
   {
@@ -2322,7 +3058,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "FLEXIBLE JOINT"
   },
   {
@@ -2336,7 +3074,9 @@
    "sheet": "Энергосети",
    "qty_request": 10.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 10.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "NICKEL PLATED NUT - M12"
   },
   {
@@ -2350,7 +3090,9 @@
    "sheet": "Энергосети",
    "qty_request": 188.0,
    "lines_in_request": 7,
-   "qty_match": true,
+   "qty_source_pn": 92.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "NICKEL PLATED PLAIN WASHER - M12"
   },
   {
@@ -2364,7 +3106,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "PRESSURE TRANSMITTER"
   },
   {
@@ -2378,7 +3122,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "PRESSURE TRANSMITTER"
   },
   {
@@ -2392,7 +3138,9 @@
    "sheet": "Энергосети",
    "qty_request": 14.0,
    "lines_in_request": 4,
-   "qty_match": true,
+   "qty_source_pn": 14.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "BONDED SEAL - 1/4 BSP"
   },
   {
@@ -2406,7 +3154,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "INSTRUMENT VALVE"
   },
   {
@@ -2420,7 +3170,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "PRESSURE TRANSDUCER"
   },
   {
@@ -2434,7 +3186,9 @@
    "sheet": "Энергосети",
    "qty_request": 8.0,
    "lines_in_request": 4,
-   "qty_match": true,
+   "qty_source_pn": 8.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "PRESSURE TRANSMITTER"
   },
   {
@@ -2448,7 +3202,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "FILTER"
   },
   {
@@ -2462,7 +3218,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "PUMP SEAL KIT"
   },
   {
@@ -2476,7 +3234,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "PUMP VALVE KIT"
   },
   {
@@ -2490,7 +3250,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "PISTON CERAMICS"
   },
   {
@@ -2504,7 +3266,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "HOSE OUTLET"
   },
   {
@@ -2518,7 +3282,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "HOSE PRESSURE GAUGE"
   },
   {
@@ -2532,7 +3298,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "OVERLOAD 6/10A"
   },
   {
@@ -2546,7 +3314,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "CONTACTOR 24V"
   },
   {
@@ -2560,7 +3330,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "TRANSFORMER 24V"
   },
   {
@@ -2574,7 +3346,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "HEATER SWITCH BACK"
   },
   {
@@ -2588,7 +3362,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "RELAY 24V"
   },
   {
@@ -2602,7 +3378,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "HEATER SWITCH FRONT"
   },
   {
@@ -2616,7 +3394,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "RELAY BASE 24V"
   },
   {
@@ -2630,7 +3410,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "LEVEL SENSOR"
   },
   {
@@ -2644,7 +3426,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "GAUGE PRESSURE"
   },
   {
@@ -2658,7 +3442,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "STOP BUTTON"
   },
   {
@@ -2672,7 +3458,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "CCT BKR 20A"
   },
   {
@@ -2686,7 +3474,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "START BUTTON"
   },
   {
@@ -2700,7 +3490,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "SAFETY VALVE"
   },
   {
@@ -2714,7 +3506,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "HOSE LOW PRESSURE"
   },
   {
@@ -2728,7 +3522,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "SEALS KIT OIL PUMP"
   },
   {
@@ -2742,7 +3538,9 @@
    "sheet": "Энергосети",
    "qty_request": 14.0,
    "lines_in_request": 4,
-   "qty_match": true,
+   "qty_source_pn": 14.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "BONDED SEAL - 1/4 BSP"
   },
   {
@@ -2756,7 +3554,9 @@
    "sheet": "Энергосети",
    "qty_request": 8.0,
    "lines_in_request": 3,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "GASKET"
   },
   {
@@ -2770,7 +3570,9 @@
    "sheet": "Энергосети",
    "qty_request": 8.0,
    "lines_in_request": 3,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "JOINT - 1.1/2 SAE"
   },
   {
@@ -2784,7 +3586,9 @@
    "sheet": "Энергосети",
    "qty_request": 4.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "CHECK VALVE"
   },
   {
@@ -2798,7 +3602,9 @@
    "sheet": "Энергосети",
    "qty_request": 160.0,
    "lines_in_request": 5,
-   "qty_match": true,
+   "qty_source_pn": 64.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "NICKEL PLATED HELI-LOCKNUT - M12"
   },
   {
@@ -2812,7 +3618,9 @@
    "sheet": "Энергосети",
    "qty_request": 12.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 12.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "NUT - M6"
   },
   {
@@ -2826,7 +3634,9 @@
    "sheet": "Энергосети",
    "qty_request": 12.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 12.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "SPRING WASHER - M6"
   },
   {
@@ -2840,7 +3650,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "BALL VALVE - 1 IN REDUCED BORE"
   },
   {
@@ -2854,7 +3666,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "SOFT SEAL KIT"
   },
   {
@@ -2868,7 +3682,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "BODY SEALS"
   },
   {
@@ -2882,7 +3698,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "BALL VALVE - 1 IN REDUCED BORE"
   },
   {
@@ -2896,7 +3714,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "SOFT SEAL KIT"
   },
   {
@@ -2910,7 +3730,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "BODY SEALS"
   },
   {
@@ -2924,7 +3746,9 @@
    "sheet": "Энергосети",
    "qty_request": 4.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "ACTUATOR REPAIR KIT"
   },
   {
@@ -2938,7 +3762,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "SOLENOID VALVE"
   },
   {
@@ -2952,7 +3778,9 @@
    "sheet": "Энергосети",
    "qty_request": 6.0,
    "lines_in_request": 3,
-   "qty_match": true,
+   "qty_source_pn": 6.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "SOLENOID COIL"
   },
   {
@@ -2966,7 +3794,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "SEAL KIT"
   },
   {
@@ -2980,7 +3810,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "SOLENOID VALVE"
   },
   {
@@ -2994,7 +3826,9 @@
    "sheet": "Энергосети",
    "qty_request": 4.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "BONDED SEAL - 1/2 BSP"
   },
   {
@@ -3008,7 +3842,9 @@
    "sheet": "Энергосети",
    "qty_request": 14.0,
    "lines_in_request": 4,
-   "qty_match": true,
+   "qty_source_pn": 14.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "BONDED SEAL - 1/4 BSP"
   },
   {
@@ -3022,7 +3858,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "NON-RETURN VALVE - 1 PSI"
   },
   {
@@ -3036,7 +3874,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "NON-RETURN VALVE - 1 PSI"
   },
   {
@@ -3050,7 +3890,9 @@
    "sheet": "Энергосети",
    "qty_request": 8.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 8.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "THERMOCOUPLE PROBE"
   },
   {
@@ -3064,7 +3906,9 @@
    "sheet": "Энергосети",
    "qty_request": 74.0,
    "lines_in_request": 7,
-   "qty_match": true,
+   "qty_source_pn": 66.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "NICKEL PLATED PLAIN WASHER - M16"
   },
   {
@@ -3078,7 +3922,9 @@
    "sheet": "Энергосети",
    "qty_request": 6.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "O RING SEAL - 379.3MM I/D"
   },
   {
@@ -3092,7 +3938,9 @@
    "sheet": "Энергосети",
    "qty_request": 6.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "O RING SEAL - 499.3MM I/D"
   },
   {
@@ -3106,7 +3954,9 @@
    "sheet": "Энергосети",
    "qty_request": 252.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 12.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "ZINC PLATED BOLT - M10 x 40MM"
   },
   {
@@ -3120,7 +3970,9 @@
    "sheet": "Энергосети",
    "qty_request": 252.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 12.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "ZINC PLATED NUT - M10"
   },
   {
@@ -3134,7 +3986,9 @@
    "sheet": "Энергосети",
    "qty_request": 252.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 12.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "ZINC PLATED PLAIN WASHER - M10"
   },
   {
@@ -3148,7 +4002,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "FILTER ELEMENT"
   },
   {
@@ -3162,7 +4018,9 @@
    "sheet": "Энергосети",
    "qty_request": 18.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "SEAL KIT"
   },
   {
@@ -3176,7 +4034,9 @@
    "sheet": "Энергосети",
    "qty_request": 16.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 8.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "O RING SEAL - 1.5/16 I/D"
   },
   {
@@ -3190,7 +4050,9 @@
    "sheet": "Энергосети",
    "qty_request": 4.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "O RING SEAL - 1.1/2 I/D"
   },
   {
@@ -3204,7 +4066,9 @@
    "sheet": "Энергосети",
    "qty_request": 12.0,
    "lines_in_request": 3,
-   "qty_match": true,
+   "qty_source_pn": 12.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "BONDED SEAL - 3/4 BSP"
   },
   {
@@ -3218,7 +4082,9 @@
    "sheet": "Энергосети",
    "qty_request": 10.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 10.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "BONDED SEAL - 1.1/4 BSP"
   },
   {
@@ -3232,7 +4098,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "BONDED SEAL - 1.1/2 BSP"
   },
   {
@@ -3246,7 +4114,9 @@
    "sheet": "Энергосети",
    "qty_request": 4.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "HOSE- HIGH PRESSURE"
   },
   {
@@ -3260,7 +4130,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "SEALING WASHER"
   },
   {
@@ -3274,7 +4146,9 @@
    "sheet": "Энергосети",
    "qty_request": 4.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "SEAL"
   },
   {
@@ -3288,7 +4162,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "NON-RETURN VALVE"
   },
   {
@@ -3302,7 +4178,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "COALESCER ELEMENTS - SET OF 3"
   },
   {
@@ -3316,7 +4194,9 @@
    "sheet": "Энергосети",
    "qty_request": 4.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "NON-RETURN VALVE - 4 INCH"
   },
   {
@@ -3330,7 +4210,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "NON-RETURN VALVE - 4 INCH"
   },
   {
@@ -3344,7 +4226,9 @@
    "sheet": "Энергосети",
    "qty_request": 62.0,
    "lines_in_request": 3,
-   "qty_match": false,
+   "qty_source_pn": 30.0,
+   "qty_match_line": false,
+   "qty_match_total": false,
    "ask_as": "GASKET - 4 IN NPS CL150"
   },
   {
@@ -3358,7 +4242,9 @@
    "sheet": "Энергосети",
    "qty_request": 18.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "FILTER ELEMENT"
   },
   {
@@ -3372,7 +4258,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "FLEXIBLE  PIPE"
   },
   {
@@ -3386,7 +4274,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "FLEXIBLE  PIPE"
   },
   {
@@ -3400,7 +4290,9 @@
    "sheet": "Энергосети",
    "qty_request": 36.0,
    "lines_in_request": 3,
-   "qty_match": true,
+   "qty_source_pn": 36.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "BONDED SEAL - 1/4 BSP - HIGH TEMPERATURE"
   },
   {
@@ -3414,7 +4306,9 @@
    "sheet": "Энергосети",
    "qty_request": 14.0,
    "lines_in_request": 4,
-   "qty_match": true,
+   "qty_source_pn": 14.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "BONDED SEAL - 1/4 BSP"
   },
   {
@@ -3428,7 +4322,9 @@
    "sheet": "Энергосети",
    "qty_request": 12.0,
    "lines_in_request": 3,
-   "qty_match": true,
+   "qty_source_pn": 12.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "BONDED SEAL - 3/4 BSP"
   },
   {
@@ -3442,7 +4338,9 @@
    "sheet": "Энергосети",
    "qty_request": 10.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 10.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "BONDED SEAL - 1.1/4 BSP"
   },
   {
@@ -3456,7 +4354,9 @@
    "sheet": "Энергосети",
    "qty_request": 4.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "BONDED SEAL - 3 IN BSP"
   },
   {
@@ -3470,7 +4370,9 @@
    "sheet": "Энергосети",
    "qty_request": 10.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 10.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "GASKET - 1.1/2 NPS CL150"
   },
   {
@@ -3484,7 +4386,9 @@
    "sheet": "Энергосети",
    "qty_request": 28.0,
    "lines_in_request": 4,
-   "qty_match": true,
+   "qty_source_pn": 20.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "GASKET - 2 IN NPS CL150"
   },
   {
@@ -3498,7 +4402,9 @@
    "sheet": "Энергосети",
    "qty_request": 16.0,
    "lines_in_request": 3,
-   "qty_match": false,
+   "qty_source_pn": 8.0,
+   "qty_match_line": false,
+   "qty_match_total": false,
    "ask_as": "GASKET - 3 IN NPS CL150"
   },
   {
@@ -3512,7 +4418,9 @@
    "sheet": "Энергосети",
    "qty_request": 28.0,
    "lines_in_request": 4,
-   "qty_match": true,
+   "qty_source_pn": 20.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "GASKET - 2 IN NPS CL150"
   },
   {
@@ -3526,7 +4434,9 @@
    "sheet": "Энергосети",
    "qty_request": 62.0,
    "lines_in_request": 3,
-   "qty_match": false,
+   "qty_source_pn": 30.0,
+   "qty_match_line": false,
+   "qty_match_total": false,
    "ask_as": "GASKET - 4 IN NPS CL150"
   },
   {
@@ -3540,7 +4450,9 @@
    "sheet": "Энергосети",
    "qty_request": 10.0,
    "lines_in_request": 3,
-   "qty_match": true,
+   "qty_source_pn": 6.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "GASKET - 6 IN NPS CL150"
   },
   {
@@ -3554,7 +4466,9 @@
    "sheet": "Энергосети",
    "qty_request": 4.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "NON-RETURN VALVE - 4 INCH"
   },
   {
@@ -3568,7 +4482,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "NON-RETURN VALVE - 1.1/2 INCH"
   },
   {
@@ -3582,7 +4498,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "LUB OIL STRAINER"
   },
   {
@@ -3596,7 +4514,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "OIL LEVEL SIGHT INDICATOR"
   },
   {
@@ -3610,7 +4530,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "LUB OIL LEVEL POINTER"
   },
   {
@@ -3624,7 +4546,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "LUBE OIL LEVEL GAUGE"
   },
   {
@@ -3638,7 +4562,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "ZINC PLATED PLAIN WASHER - M4"
   },
   {
@@ -3652,7 +4578,9 @@
    "sheet": "Энергосети",
    "qty_request": 8.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 8.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "ZINC PLATED PLAIN WASHER - M6"
   },
   {
@@ -3666,7 +4594,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "ZINC PLATED SPRING WASHER - M4"
   },
   {
@@ -3680,7 +4610,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "LEVEL TRANSMITTER - 1240MM"
   },
   {
@@ -3694,7 +4626,9 @@
    "sheet": "Энергосети",
    "qty_request": 4.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "DIFFERENTIAL PRESSURE TRANSMITTER"
   },
   {
@@ -3708,7 +4642,9 @@
    "sheet": "Энергосети",
    "qty_request": 8.0,
    "lines_in_request": 4,
-   "qty_match": true,
+   "qty_source_pn": 8.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "PRESSURE TRANSMITTER"
   },
   {
@@ -3722,7 +4658,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "RESISTANCE TEMPERATURE TRANSMITTER"
   },
   {
@@ -3736,7 +4674,9 @@
    "sheet": "Энергосети",
    "qty_request": 4.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "RESISTANCE TEMPERATURE TRANSMITTER"
   },
   {
@@ -3750,7 +4690,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "GASKET KIT"
   },
   {
@@ -3764,7 +4706,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "GLACIER BUSHES SET"
   },
   {
@@ -3778,7 +4722,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "RELIEF VALVE"
   },
   {
@@ -3792,7 +4738,9 @@
    "sheet": "Энергосети",
    "qty_request": 12.0,
    "lines_in_request": 3,
-   "qty_match": true,
+   "qty_source_pn": 12.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "BONDED SEAL - 3/4 BSP"
   },
   {
@@ -3806,7 +4754,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "SOFT SEAL KIT"
   },
   {
@@ -3820,7 +4770,9 @@
    "sheet": "Энергосети",
    "qty_request": 4.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "ACTUATOR REPAIR KIT"
   },
   {
@@ -3834,7 +4786,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "SEAL SERVICE KIT"
   },
   {
@@ -3848,7 +4802,9 @@
    "sheet": "Энергосети",
    "qty_request": 40.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 8.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "LUB OIL FILTER ELEMENT"
   },
   {
@@ -3862,7 +4818,9 @@
    "sheet": "Энергосети",
    "qty_request": 40.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 8.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "SEAL KIT"
   },
   {
@@ -3876,7 +4834,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "METERING NEEDLE VALVE"
   },
   {
@@ -3890,7 +4850,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "FLOWMETER"
   },
   {
@@ -3904,7 +4866,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "GASKET - 8 IN NPS CL150"
   },
   {
@@ -3918,7 +4882,9 @@
    "sheet": "Энергосети",
    "qty_request": 10.0,
    "lines_in_request": 3,
-   "qty_match": true,
+   "qty_source_pn": 6.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "GASKET - 6 IN NPS CL150"
   },
   {
@@ -3932,7 +4898,9 @@
    "sheet": "Энергосети",
    "qty_request": 62.0,
    "lines_in_request": 3,
-   "qty_match": false,
+   "qty_source_pn": 30.0,
+   "qty_match_line": false,
+   "qty_match_total": false,
    "ask_as": "GASKET - 4 IN NPS CL150"
   },
   {
@@ -3946,7 +4914,9 @@
    "sheet": "Энергосети",
    "qty_request": 16.0,
    "lines_in_request": 3,
-   "qty_match": false,
+   "qty_source_pn": 8.0,
+   "qty_match_line": false,
+   "qty_match_total": false,
    "ask_as": "GASKET - 3 IN NPS CL150"
   },
   {
@@ -3960,7 +4930,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "GASKET - 2.1/2 NPS CL150"
   },
   {
@@ -3974,7 +4946,9 @@
    "sheet": "Энергосети",
    "qty_request": 28.0,
    "lines_in_request": 4,
-   "qty_match": true,
+   "qty_source_pn": 20.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "GASKET - 2 IN NPS CL150"
   },
   {
@@ -3988,7 +4962,9 @@
    "sheet": "Энергосети",
    "qty_request": 4.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "GASKET - 3/4 NPS CL150"
   },
   {
@@ -4002,7 +4978,9 @@
    "sheet": "Энергосети",
    "qty_request": 12.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "O RING SEAL - 2.1/4 I/D"
   },
   {
@@ -4016,7 +4994,9 @@
    "sheet": "Энергосети",
    "qty_request": 4.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "FUSE - ANTI-SURGE - 20MM 2AMP"
   },
   {
@@ -4030,7 +5010,9 @@
    "sheet": "Энергосети",
    "qty_request": 12.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 12.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "FUSE - ANTI-SURGE - 20MM 1AMP"
   },
   {
@@ -4044,7 +5026,9 @@
    "sheet": "Энергосети",
    "qty_request": 8.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 8.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "FUSE - ANTI SURGE - 6.3AMP"
   },
   {
@@ -4058,7 +5042,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "RESISTANCE TEMPERATURE TRANSMITTER"
   },
   {
@@ -4072,7 +5058,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "RESISTANCE TEMPERATURE TRANSMITTER"
   },
   {
@@ -4086,7 +5074,9 @@
    "sheet": "Энергосети",
    "qty_request": 18.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "SPARES KIT"
   },
   {
@@ -4100,7 +5090,9 @@
    "sheet": "Энергосети",
    "qty_request": 16.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 12.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "SPIRAL GASKET - 2 IN NPS CL300 OR CL600"
   },
   {
@@ -4114,7 +5106,9 @@
    "sheet": "Энергосети",
    "qty_request": 6.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 6.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "SPIRAL GASKET - 1/2 NPS CL300"
   },
   {
@@ -4128,7 +5122,9 @@
    "sheet": "Энергосети",
    "qty_request": 36.0,
    "lines_in_request": 3,
-   "qty_match": true,
+   "qty_source_pn": 36.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "BONDED SEAL - 1/4 BSP - HIGH TEMPERATURE"
   },
   {
@@ -4142,7 +5138,9 @@
    "sheet": "Энергосети",
    "qty_request": 8.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 8.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "O-RING SEAL"
   },
   {
@@ -4156,7 +5154,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "ACTUATOR SEAL KIT"
   },
   {
@@ -4170,7 +5170,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "SEAL KIT"
   },
   {
@@ -4184,7 +5186,9 @@
    "sheet": "Энергосети",
    "qty_request": 12.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 12.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "LIMIT SWITCH"
   },
   {
@@ -4198,7 +5202,9 @@
    "sheet": "Энергосети",
    "qty_request": 4.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "VALVE SEAL KIT"
   },
   {
@@ -4212,7 +5218,9 @@
    "sheet": "Энергосети",
    "qty_request": 6.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 6.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "ACTUATOR SEAL KIT"
   },
   {
@@ -4226,7 +5234,9 @@
    "sheet": "Энергосети",
    "qty_request": 4.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "SOLENOID COIL"
   },
   {
@@ -4240,7 +5250,9 @@
    "sheet": "Энергосети",
    "qty_request": 4.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "REPAIR KIT"
   },
   {
@@ -4254,7 +5266,9 @@
    "sheet": "Энергосети",
    "qty_request": 12.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 12.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "LIMIT SWITCH"
   },
   {
@@ -4268,7 +5282,9 @@
    "sheet": "Энергосети",
    "qty_request": 4.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "LIMIT SWITCH SEAL KIT"
   },
   {
@@ -4282,7 +5298,9 @@
    "sheet": "Энергосети",
    "qty_request": 40.0,
    "lines_in_request": 5,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "SPIRAL GASKET - 1 IN NPS CL300"
   },
   {
@@ -4296,7 +5314,9 @@
    "sheet": "Энергосети",
    "qty_request": 138.0,
    "lines_in_request": 5,
-   "qty_match": true,
+   "qty_source_pn": 10.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "SPIRAL GASKET - 1.1/2 NPS CL300 OR CL600"
   },
   {
@@ -4310,7 +5330,9 @@
    "sheet": "Энергосети",
    "qty_request": 20.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "FILTER ELEMENT - 5 MICRON"
   },
   {
@@ -4324,7 +5346,9 @@
    "sheet": "Энергосети",
    "qty_request": 18.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "SERVICE KIT"
   },
   {
@@ -4338,7 +5362,9 @@
    "sheet": "Энергосети",
    "qty_request": 4.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "BONDED SEAL - 3/8 BSP - HIGH TEMPERATURE"
   },
   {
@@ -4352,7 +5378,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "BONDED SEAL - 1/8 BSP - HIGH TEMPERATURE"
   },
   {
@@ -4366,7 +5394,9 @@
    "sheet": "Энергосети",
    "qty_request": 138.0,
    "lines_in_request": 5,
-   "qty_match": true,
+   "qty_source_pn": 10.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "SPIRAL GASKET - 1.1/2 NPS CL300 OR CL600"
   },
   {
@@ -4380,7 +5410,9 @@
    "sheet": "Энергосети",
    "qty_request": 20.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 20.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "BONDED SEAL - 1/2 BSP - HIGH TEMPERATURE"
   },
   {
@@ -4394,7 +5426,9 @@
    "sheet": "Энергосети",
    "qty_request": 4.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "BONDED SEAL - 1 INCH BSP - HIGH TEMP"
   },
   {
@@ -4408,7 +5442,9 @@
    "sheet": "Энергосети",
    "qty_request": 42.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 42.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "BONDED SEAL - 3/4 BSP - HIGH TEMPERATURE"
   },
   {
@@ -4422,7 +5458,9 @@
    "sheet": "Энергосети",
    "qty_request": 36.0,
    "lines_in_request": 3,
-   "qty_match": true,
+   "qty_source_pn": 36.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "BONDED SEAL - 1/4 BSP - HIGH TEMPERATURE"
   },
   {
@@ -4436,7 +5474,9 @@
    "sheet": "Энергосети",
    "qty_request": 4.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "PRESSURE RELIEF VALVE"
   },
   {
@@ -4450,7 +5490,9 @@
    "sheet": "Энергосети",
    "qty_request": 16.0,
    "lines_in_request": 2,
-   "qty_match": false,
+   "qty_source_pn": 2.0,
+   "qty_match_line": false,
+   "qty_match_total": false,
    "ask_as": "BLEED KIT"
   },
   {
@@ -4464,7 +5506,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "PRIMING AND COMMISIONING - LIQUID FUEL"
   },
   {
@@ -4478,7 +5522,9 @@
    "sheet": "Энергосети",
    "qty_request": 40.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 8.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "FILTER ELEMENT"
   },
   {
@@ -4492,7 +5538,9 @@
    "sheet": "Энергосети",
    "qty_request": 40.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 8.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "SEAL KIT"
   },
   {
@@ -4506,7 +5554,9 @@
    "sheet": "Энергосети",
    "qty_request": 4.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "DIFFERENTIAL PRESSURE TRANSMITTER"
   },
   {
@@ -4520,7 +5570,9 @@
    "sheet": "Энергосети",
    "qty_request": 4.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "PRESSURE TRANSMITTER"
   },
   {
@@ -4534,7 +5586,9 @@
    "sheet": "Энергосети",
    "qty_request": 8.0,
    "lines_in_request": 4,
-   "qty_match": true,
+   "qty_source_pn": 8.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "PRESSURE TRANSMITTER"
   },
   {
@@ -4548,7 +5602,9 @@
    "sheet": "Энергосети",
    "qty_request": 8.0,
    "lines_in_request": 4,
-   "qty_match": true,
+   "qty_source_pn": 8.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "PRESSURE TRANSMITTER"
   },
   {
@@ -4562,7 +5618,9 @@
    "sheet": "Энергосети",
    "qty_request": 4.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "RESISTANCE TEMPERATURE TRANSMITTER"
   },
   {
@@ -4576,7 +5634,9 @@
    "sheet": "Энергосети",
    "qty_request": 18.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "GASKET"
   },
   {
@@ -4590,7 +5650,9 @@
    "sheet": "Энергосети",
    "qty_request": 4.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "SEAL KIT"
   },
   {
@@ -4604,7 +5666,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "SOFT SEAL KIT"
   },
   {
@@ -4618,7 +5682,9 @@
    "sheet": "Энергосети",
    "qty_request": 6.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 6.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "ACTUATOR SEAL KIT"
   },
   {
@@ -4632,7 +5698,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "ACTUATOR SPRING UNIT"
   },
   {
@@ -4646,7 +5714,9 @@
    "sheet": "Энергосети",
    "qty_request": 4.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "SEAL KIT"
   },
   {
@@ -4660,7 +5730,9 @@
    "sheet": "Энергосети",
    "qty_request": 4.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "SWITCH"
   },
   {
@@ -4674,7 +5746,9 @@
    "sheet": "Энергосети",
    "qty_request": 6.0,
    "lines_in_request": 3,
-   "qty_match": true,
+   "qty_source_pn": 6.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "SOLENOID COIL"
   },
   {
@@ -4688,7 +5762,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "SOFT SEAL KIT"
   },
   {
@@ -4702,7 +5778,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "ACTUATOR"
   },
   {
@@ -4716,7 +5794,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "ACTUATOR SEAL KIT"
   },
   {
@@ -4730,7 +5810,9 @@
    "sheet": "Энергосети",
    "qty_request": 4.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "SEAL KIT"
   },
   {
@@ -4744,7 +5826,9 @@
    "sheet": "Энергосети",
    "qty_request": 4.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "SWITCH"
   },
   {
@@ -4758,7 +5842,9 @@
    "sheet": "Энергосети",
    "qty_request": 6.0,
    "lines_in_request": 3,
-   "qty_match": true,
+   "qty_source_pn": 6.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "SOLENOID COIL"
   },
   {
@@ -4772,7 +5858,9 @@
    "sheet": "Энергосети",
    "qty_request": 4.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "LENS CLEANING FLUID - PACK OF SIX"
   },
   {
@@ -4786,7 +5874,9 @@
    "sheet": "Энергосети",
    "qty_request": 4.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "LENS CLEANING FLUID - PACK OF SIX"
   },
   {
@@ -4800,7 +5890,9 @@
    "sheet": "Энергосети",
    "qty_request": 8.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 8.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "LAMP - 80W"
   },
   {
@@ -4814,7 +5906,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "SPARE GLASSES FOR BGU - PACK OF 50"
   },
   {
@@ -4828,7 +5922,9 @@
    "sheet": "Энергосети",
    "qty_request": 80.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 80.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "FILTER PAD M80 - 24 x 24 x 4 IN"
   },
   {
@@ -4842,7 +5938,9 @@
    "sheet": "Энергосети",
    "qty_request": 60.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 60.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "HYDROCEL 95 FILTER ELEMENT"
   },
   {
@@ -4856,7 +5954,9 @@
    "sheet": "Энергосети",
    "qty_request": 10.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 10.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "CIRCUIT BREAKER 25A"
   },
   {
@@ -4870,7 +5970,9 @@
    "sheet": "Энергосети",
    "qty_request": 10.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 10.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "CIRCUIT BREAKER 16A"
   },
   {
@@ -4884,7 +5986,9 @@
    "sheet": "Энергосети",
    "qty_request": 10.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 10.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "FUSE 2A"
   },
   {
@@ -4898,7 +6002,9 @@
    "sheet": "Энергосети",
    "qty_request": 10.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 10.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "FUSE 500V 2A"
   },
   {
@@ -4912,7 +6018,9 @@
    "sheet": "Энергосети",
    "qty_request": 20.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 20.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "TERMINAL BLOCK"
   },
   {
@@ -4926,7 +6034,9 @@
    "sheet": "Энергосети",
    "qty_request": 6.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 6.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "TERMINAL BLOCK"
   },
   {
@@ -4940,7 +6050,9 @@
    "sheet": "Энергосети",
    "qty_request": 6.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 6.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "TERMINAL BLOCK"
   },
   {
@@ -4954,7 +6066,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "ACTIVE BUS MODULE"
   },
   {
@@ -4968,7 +6082,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "SLAVE INTERFACE MODULE"
   },
   {
@@ -4982,7 +6098,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "COUNTER MODULE"
   },
   {
@@ -4996,7 +6114,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "DIGITAL OUTPUT MODULE"
   },
   {
@@ -5010,7 +6130,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "DIGITAL INPUT MODULE"
   },
   {
@@ -5024,7 +6146,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "ANALOGUE OUTPUT MODULE"
   },
   {
@@ -5038,7 +6162,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "ANALOGUE INPUT MODULE"
   },
   {
@@ -5052,7 +6178,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "MOUNTING RAIL - 620MM"
   },
   {
@@ -5066,7 +6194,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "ACTIVE BUS MODULE"
   },
   {
@@ -5080,7 +6210,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "OVERSPEED TRIP MODULE"
   },
   {
@@ -5094,7 +6226,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "OVERSPEED TRIP MODULE"
   },
   {
@@ -5108,7 +6242,9 @@
    "sheet": "Энергосети",
    "qty_request": 38.0,
    "lines_in_request": 3,
-   "qty_match": true,
+   "qty_source_pn": 6.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "BACK UP BATTERY 3.6 V/2.3AH"
   },
   {
@@ -5122,7 +6258,9 @@
    "sheet": "Энергосети",
    "qty_request": 16.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 16.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "FUSE - ANTI-SURGE - 1 AMP"
   },
   {
@@ -5136,7 +6274,9 @@
    "sheet": "Энергосети",
    "qty_request": 8.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 8.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "FUSED DISCONNECT TERMINAL"
   },
   {
@@ -5150,7 +6290,9 @@
    "sheet": "Энергосети",
    "qty_request": 8.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 8.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "STEPDOWN JUMPER - 16-4MM"
   },
   {
@@ -5164,7 +6306,9 @@
    "sheet": "Энергосети",
    "qty_request": 8.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 8.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "END PLATE"
   },
   {
@@ -5178,7 +6322,9 @@
    "sheet": "Энергосети",
    "qty_request": 16.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 16.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "ADJACENT JUMPER"
   },
   {
@@ -5192,7 +6338,9 @@
    "sheet": "Энергосети",
    "qty_request": 32.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 32.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "THRU TERM BLK-4MM-4 CONDUCTOR."
   },
   {
@@ -5206,7 +6354,9 @@
    "sheet": "Энергосети",
    "qty_request": 38.0,
    "lines_in_request": 3,
-   "qty_match": true,
+   "qty_source_pn": 6.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "BACK UP BATTERY 3.6 V/2.3AH"
   },
   {
@@ -5220,7 +6370,9 @@
    "sheet": "Энергосети",
    "qty_request": 12.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 12.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "MINIATURE CIRCUIT BREAKER - 6 AMP"
   },
   {
@@ -5234,7 +6386,9 @@
    "sheet": "Энергосети",
    "qty_request": 12.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 12.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "MINIATURE CIRCUIT BREAKER - 8 AMP"
   },
   {
@@ -5248,7 +6402,9 @@
    "sheet": "Энергосети",
    "qty_request": 16.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 16.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "MINIATURE CIRCUIT BREAKER - 4 AMP"
   },
   {
@@ -5262,7 +6418,9 @@
    "sheet": "Энергосети",
    "qty_request": 4.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "MINIATURE CIRCUIT BREAKER - 2 AMP"
   },
   {
@@ -5276,7 +6434,9 @@
    "sheet": "Энергосети",
    "qty_request": 32.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 32.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "FUSE - ANTI-SURGE - 2 AMP"
   },
   {
@@ -5290,7 +6450,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "KEYPHASOR MODULE"
   },
   {
@@ -5304,7 +6466,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "PROXIMITOR/SEISMIC MODULE"
   },
   {
@@ -5318,7 +6482,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "PROXIMITOR MONITOR MODULE"
   },
   {
@@ -5332,7 +6498,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "RELAY MODULE - 4 CHANNEL"
   },
   {
@@ -5346,7 +6514,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "PRESSURE MONITORING MODULE"
   },
   {
@@ -5360,7 +6530,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "MODBUS COMMUNICATION MODULE"
   },
   {
@@ -5374,7 +6546,9 @@
    "sheet": "Энергосети",
    "qty_request": 8.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 8.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "VOLTAGE REPEATER"
   },
   {
@@ -5388,7 +6562,9 @@
    "sheet": "Энергосети",
    "qty_request": 4.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "MINIATURE CIRCUIT BREAKER 32A"
   },
   {
@@ -5402,7 +6578,9 @@
    "sheet": "Энергосети",
    "qty_request": 4.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "MINIATURE CIRCUIT BREAKER 20A"
   },
   {
@@ -5416,7 +6594,9 @@
    "sheet": "Энергосети",
    "qty_request": 12.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 12.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "MINIATURE CIRCUIT BREAKER 16A"
   },
   {
@@ -5430,7 +6610,9 @@
    "sheet": "Энергосети",
    "qty_request": 12.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 12.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "MINIATURE CIRCUIT BREAKER 10A"
   },
   {
@@ -5444,7 +6626,9 @@
    "sheet": "Энергосети",
    "qty_request": 4.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "MINIATURE CIRCUIT BREAKER 8A"
   },
   {
@@ -5458,7 +6642,9 @@
    "sheet": "Энергосети",
    "qty_request": 40.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 40.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "MINIATURE CIRCUIT BREAKER 6A"
   },
   {
@@ -5472,7 +6658,9 @@
    "sheet": "Энергосети",
    "qty_request": 4.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "MINIATURE CIRCUIT BREAKER 4A"
   },
   {
@@ -5486,7 +6674,9 @@
    "sheet": "Энергосети",
    "qty_request": 4.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 4.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "MINIATURE CIRCUIT BREAKER 2A"
   },
   {
@@ -5500,7 +6690,9 @@
    "sheet": "Энергосети",
    "qty_request": 20.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 20.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "LOCKING WIRE - 0.7MM"
   },
   {
@@ -5514,7 +6706,9 @@
    "sheet": "Энергосети",
    "qty_request": 6.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 6.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "LOCKING WIRE - 16SWG INCALLOY DS"
   },
   {
@@ -5528,7 +6722,9 @@
    "sheet": "Энергосети",
    "qty_request": 6.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "ADHESIVE - 65 GRAMME TUBE"
   },
   {
@@ -5542,7 +6738,9 @@
    "sheet": "Энергосети",
    "qty_request": 18.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "EASING OIL - 250ML TIN"
   },
   {
@@ -5556,7 +6754,9 @@
    "sheet": "Энергосети",
    "qty_request": 18.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "SILICONE GREASE"
   },
   {
@@ -5570,7 +6770,9 @@
    "sheet": "Энергосети",
    "qty_request": 18.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "MASKING TAPE - 50MM x 50 METRE ROLL"
   },
   {
@@ -5584,7 +6786,9 @@
    "sheet": "Энергосети",
    "qty_request": 6.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "ANTI-SEIZE COMPOUND - 0.5KG"
   },
   {
@@ -5598,7 +6802,9 @@
    "sheet": "Энергосети",
    "qty_request": 12.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 8.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "JOINTING COMPOUND x 100gm TUBE"
   },
   {
@@ -5612,7 +6818,9 @@
    "sheet": "",
    "qty_request": null,
    "lines_in_request": 0,
-   "qty_match": false,
+   "qty_source_pn": 2.0,
+   "qty_match_line": false,
+   "qty_match_total": false,
    "ask_as": "JOINTING COMPOUND - 0.5 LITRE TIN"
   },
   {
@@ -5626,7 +6834,9 @@
    "sheet": "Энергосети",
    "qty_request": 10.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 6.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "STEAMSEAL"
   },
   {
@@ -5640,7 +6850,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "HYDRAULIC SEALANT - 50 ML TUBE"
   },
   {
@@ -5654,7 +6866,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "STUDLOCK - 50 ML TUBE"
   },
   {
@@ -5668,7 +6882,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "SCREWLOCK - 10 ML"
   },
   {
@@ -5682,7 +6898,9 @@
    "sheet": "Энергосети",
    "qty_request": 6.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "PIPE SEALANT - 50 ML TUBE"
   },
   {
@@ -5696,7 +6914,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "GASKET ELIMINATOR - 65 ML"
   },
   {
@@ -5710,7 +6930,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "ADHESIVE CEMENT"
   },
   {
@@ -5724,7 +6946,9 @@
    "sheet": "Энергосети",
    "qty_request": 6.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "NUTLOCK - 10 ML TUBE"
   },
   {
@@ -5738,7 +6962,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "LIQUID GASKET-HYLOSIL - 85 GRAMME TUBE"
   },
   {
@@ -5752,7 +6978,9 @@
    "sheet": "",
    "qty_request": null,
    "lines_in_request": 0,
-   "qty_match": false,
+   "qty_source_pn": 200.0,
+   "qty_match_line": false,
+   "qty_match_total": false,
    "ask_as": "CLEANING FLUID"
   },
   {
@@ -5766,7 +6994,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "PILOT OPERATED THREE WAY VALVE"
   },
   {
@@ -5780,7 +7010,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "LUB OIL LEVEL INDICATOR"
   },
   {
@@ -5794,7 +7026,9 @@
    "sheet": "Энергосети",
    "qty_request": 6.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "TEMPERATURE CONTROL VALVE"
   },
   {
@@ -5808,7 +7042,9 @@
    "sheet": "Энергосети",
    "qty_request": 10.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "GAS FUEL VALVE ASSEMBLY - 1.1/2 INCH"
   },
   {
@@ -5822,7 +7058,9 @@
    "sheet": "Энергосети",
    "qty_request": 16.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 16.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "PRESSURE TRANSMITTER AND ADAPTOR"
   },
   {
@@ -5836,7 +7074,9 @@
    "sheet": "Энергосети",
    "qty_request": 256.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 256.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "SPADE TERMINAL"
   },
   {
@@ -5850,7 +7090,9 @@
    "sheet": "Энергосети",
    "qty_request": 80.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 80.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "BOOTLACE FERRULE - 0.5MM SQ"
   },
   {
@@ -5864,7 +7106,9 @@
    "sheet": "Энергосети",
    "qty_request": 16.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 16.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "CABLE - SINGLE CORE RED"
   },
   {
@@ -5878,7 +7122,9 @@
    "sheet": "Энергосети",
    "qty_request": 16.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 16.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "CABLE - SINGLE CORE YELLOW"
   },
   {
@@ -5892,7 +7138,9 @@
    "sheet": "Энергосети",
    "qty_request": 256.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 256.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "CRIMP TERMINAL"
   },
   {
@@ -5906,7 +7154,9 @@
    "sheet": "Энергосети",
    "qty_request": 80.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 80.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "GMS BOOTLACE FERRULE 1.0MM 2"
   },
   {
@@ -5920,7 +7170,9 @@
    "sheet": "Энергосети",
    "qty_request": 16.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 16.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "CABLE SINGLE CORE - RED"
   },
   {
@@ -5934,7 +7186,9 @@
    "sheet": "Энергосети",
    "qty_request": 16.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 16.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "CABLE SINGLE CORE - YELLOW"
   },
   {
@@ -5948,7 +7202,9 @@
    "sheet": "Энергосети",
    "qty_request": 4.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "AIR FILTER AND SHUT OFF VALVE ASSEMBLY"
   },
   {
@@ -5962,7 +7218,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "PROPANE BLOCK VALVE ASSEMBLY"
   },
   {
@@ -5976,7 +7234,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "TANDEM LIQUID FUEL METERING PUMP"
   },
   {
@@ -5990,7 +7250,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "FIVE VALVE MANIFOLD"
   },
   {
@@ -6004,7 +7266,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "THERMAL RELIEF VALVE"
   },
   {
@@ -6018,7 +7282,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "SHUT-OFF AND PURGE VALVE ASSEMBLY"
   },
   {
@@ -6032,7 +7298,9 @@
    "sheet": "Энергосети",
    "qty_request": 6.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "PURGE/DRAIN VALVE"
   },
   {
@@ -6046,7 +7314,9 @@
    "sheet": "Энергосети",
    "qty_request": 6.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "PURGE SELECTOR VALVE"
   },
   {
@@ -6060,7 +7330,9 @@
    "sheet": "Энергосети",
    "qty_request": 10.0,
    "lines_in_request": 3,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "TWO WAY ACTUATED BALL VALVE ASSEMBLY"
   },
   {
@@ -6074,7 +7346,9 @@
    "sheet": "Энергосети",
    "qty_request": 6.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "PURGE VALVE ASSEMBLY"
   },
   {
@@ -6088,7 +7362,9 @@
    "sheet": "Энергосети",
    "qty_request": 6.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "PRIMING VALVE ASSEMBLY"
   },
   {
@@ -6102,7 +7378,9 @@
    "sheet": "Энергосети",
    "qty_request": 2.0,
    "lines_in_request": 1,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": true,
    "ask_as": "NON-RETURN VALVE - 1 PSI"
   },
   {
@@ -6116,7 +7394,9 @@
    "sheet": "Энергосети",
    "qty_request": 6.0,
    "lines_in_request": 2,
-   "qty_match": true,
+   "qty_source_pn": 2.0,
+   "qty_match_line": true,
+   "qty_match_total": false,
    "ask_as": "CONTROL VALVE"
   }
  ]

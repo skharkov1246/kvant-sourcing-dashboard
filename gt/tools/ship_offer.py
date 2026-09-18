@@ -390,6 +390,7 @@ def build(rows: list, ours: dict, fx_day: str, supp: dict | None = None) -> str:
                      f'<p class="lead">{E(lead)}</p>' + table(js) + "</div>")
 
     parts.append(reverify_section(rows, supp))
+    parts.append(no_band_section(rows, supp))
 
     return ("<!doctype html><html lang='ru'><head><meta charset='utf-8'>"
             "<title>Выставленные цены против рынка</title>"
@@ -428,6 +429,45 @@ def verdict_vs_offer(lo, hi, offer) -> str:
     return "вилка верна: предложение поставщика внутри неё"
 
 
+def reverify_split(rows: list) -> Counter:
+    """Счёт по перепроверенным строкам: что предложение делает с вилкой.
+
+    Отдельной функцией, потому что этот счёт идёт и в журнал прогона, и в
+    счётчики репозитория: по крупным перепроверенным строкам картина ОБРАТНАЯ
+    общей по заявке, и складывать два числа в одно нельзя.
+    """
+    kinds = Counter()
+    for z in rows:
+        w = z.get("what") or ""
+        kinds["занижение подтверждено" if w.startswith("ЗАНИЖЕНИЕ")
+              else "завышение подтверждено" if w.startswith("ЗАВЫШЕНИЕ")
+              else "вилка верна" if w.startswith("вилка верна")
+              else "предложения нет"] += 1
+    return kinds
+
+
+def reverify_stats(rows: list, supp: dict) -> dict:
+    """Те же счётчики, но пригодные для записи в набор: без цен и без номеров."""
+    rv = reverify_rows()
+    if not rv:
+        return {}
+    by = {norm_key(r["pn"]): r for r in rows if r.get("pn")}
+    zs = []
+    for x in rv:
+        pn = str(x.get("pn") or "").split("(")[0].strip()
+        r = by.get(norm_key(pn)) or {}
+        sp, _ = lookup(supp, pn)
+        offer = sp["usd"] if sp else None
+        zs.append({"what": verdict_vs_offer(r.get("usd_lo"), r.get("usd_hi"), offer)})
+    k = reverify_split(zs)
+    return {"rows": len(zs), "with_offer": sum(v for kk, v in k.items()
+                                               if kk != "предложения нет"),
+            "overstated_confirmed": k.get("завышение подтверждено", 0),
+            "understated_confirmed": k.get("занижение подтверждено", 0),
+            "band_right": k.get("вилка верна", 0),
+            "no_offer": k.get("предложения нет", 0)}
+
+
 def reverify_section(rows: list, supp: dict) -> str:
     """Таблица «наш вердикт против того, что прислал поставщик».
 
@@ -453,16 +493,10 @@ def reverify_section(rows: list, supp: dict) -> str:
                     "offer": offer, "sp": sp,
                     "what": verdict_vs_offer(r.get("usd_lo"), r.get("usd_hi"), offer)})
     out.sort(key=lambda z: (z["offer"] is None, -(z["offer"] or 0) * z["qty"]))
-    # Агрегат в журнал прогона: сколько перепроверенных строк закрыто письменным
-    # предложением контрагента и что оно делает с вилкой. Только счётчики —
-    # журнал публичный (правило 17 CLAUDE.md).
-    kinds = Counter()
-    for z in out:
-        w = z["what"]
-        kinds["занижение подтверждено" if w.startswith("ЗАНИЖЕНИЕ")
-              else "завышение подтверждено" if w.startswith("ЗАВЫШЕНИЕ")
-              else "вилка верна" if w.startswith("вилка верна")
-              else "предложения нет"] += 1
+    # Агрегат в журнал прогона и в счётчики: сколько перепроверенных строк закрыто
+    # письменным предложением контрагента и что оно делает с вилкой. Только
+    # счётчики — журнал и репозиторий публичные (правило 17 CLAUDE.md).
+    kinds = reverify_split(out)
     print(f"  перепроверенных строк: {len(out)} · КП поставщика нашлось по {hits}")
     for k, v in kinds.most_common():
         print(f"    {k}: {v}")
@@ -495,6 +529,56 @@ def reverify_section(rows: list, supp: dict) -> str:
                     f'<td>{E(z["verdict"][:60])}</td><td>{E(z["what"])}</td></tr>'
                     f'{src}</tbody>')
     return head + f'<table class="t"><thead>{th}</thead>{"".join(body)}</table></div>'
+
+
+def no_band_section(rows: list, supp: dict) -> str:
+    """Строки БЕЗ нашей вилки, по которым есть письменное предложение поставщика.
+
+    Замер прогона 18.09.2026: таких строк 370 — почти половина всех, где КП
+    поставщика нашлось. По ним оценку не нужно искать разведкой, она уже
+    написана контрагентом; достаточно перенести её в заявку с оговоркой, что это
+    предложение, а не подтверждённая закупка с остатком.
+
+    Раздел идёт в документ-артефакт, а не в репозиторий: здесь цены.
+    """
+    out = []
+    for r in rows:
+        if r.get("usd_lo") not in (None, "") and r.get("usd_hi") not in (None, ""):
+            continue
+        sp, _ = lookup(supp, r.get("pn"))
+        if not sp or sp.get("usd") is None:
+            continue
+        qty = float(r.get("qty") or 0)
+        out.append({"r": r, "sp": sp, "qty": qty, "usd": float(sp["usd"]),
+                    "total": float(sp["usd"]) * qty})
+    if not out:
+        return ""
+    out.sort(key=lambda z: -z["total"])
+    head = (f'<div class="sec"><h2>Строки без нашей оценки, по которым поставщик уже назвал '
+            f'цену — {len(out)}</h2>'
+            '<p class="lead">По этим строкам вилки у нас нет вовсе, а письменное предложение '
+            'контрагента есть. Значит оценку не надо искать разведкой: она уже написана, и её '
+            'достаточно перенести в заявку. Оговорка обязательна и стоит в каждой строке: это '
+            'предложение, а не подтверждённая закупка с остатком, и покрытие количества '
+            'поставщик отдельно не подтверждал.</p>')
+    th = ('<tr><th style="width:11%">Артикул</th><th style="width:26%">Наименование</th>'
+          '<th style="width:6%">Кол-во</th><th style="width:9%">КП, USD/шт</th>'
+          '<th style="width:10%">На объём, USD</th><th style="width:38%">Откуда КП</th></tr>')
+    body = []
+    for z in out:
+        sp, r = z["sp"], z["r"]
+        body.append(
+            f'<tbody class="p"><tr><td><span class="pn">{E(r.get("pn"))}</span></td>'
+            f'<td>{E((r.get("name") or "")[:110])}</td><td>{ru(z["qty"])}</td>'
+            f'<td>{money(z["usd"])}</td><td>{ru(z["total"])}</td>'
+            f'<td>{E(sp["origin"])}, поле «{E(sp.get("field") or "")}», файл '
+            f'«{E(sp["file"])}», строка {E(sp["row"])}, {money(sp["raw_price"])} '
+            f'{E(sp["currency"])}</td></tr></tbody>')
+    tail = (f'<p class="dim">Сумма по разделу — {ru(sum(z["total"] for z in out))} USD. Это НЕ '
+            f'закупка и НЕ экспозиция: это сумма предложений контрагентов по строкам, у которых '
+            f'нашей оценки не было. Складывать её с экспозицией заявки нельзя — она её '
+            f'дополняет, а не входит в неё.</p></div>')
+    return head + f'<table class="t"><thead>{th}</thead>{"".join(body)}</table>' + tail
 
 
 def diagnose(rows: list, ours: dict, supp: dict | None = None,
@@ -664,17 +748,25 @@ def main() -> int:
     diagnose(rows, ours, supp, unk)
     if a.stats_out:
         st = band_stats(rows, supp)
-        st["scope"] = a.scope
-        st["source"] = ("Счётчики по всей заявке: что письменные предложения поставщиков из "
-                        "вложений сделок делают с НАШИМИ вилками. Ни цен, ни привязки цены к "
-                        "артикулу здесь нет и быть не может — это коммерческие данные "
-                        "контрагентов, они остаются в артефакте прогона.")
-        st["method"] = ("Предложение сравнивается с вилкой строки заявки (usd_lo, usd_hi в "
-                        "gt/data/ship_lukoil.json). Выше потолка — наша оценка занижена, ниже "
-                        "пола — завышена, внутри — верна. Считает gt/tools/ship_offer.py.")
+        st["reverified"] = reverify_stats(rows, supp)
+        # Счётчики живут ПО ОХВАТАМ, как и опись. Один файл на прогон уже трижды
+        # уносил чужую работу: прогон по «НВН» перезаписывал цифры по
+        # «Энергосети», хотя это разные заявки и складывать их нельзя.
+        doc = {
+            "updated": "2026-09-18",
+            "source": ("Счётчики по заявке: что письменные предложения поставщиков из вложений "
+                       "сделок делают с НАШИМИ вилками. Ни цен, ни привязки цены к артикулу "
+                       "здесь нет и быть не может — это коммерческие данные контрагентов, они "
+                       "остаются в артефакте прогона."),
+            "method": ("Предложение сравнивается с вилкой строки заявки (usd_lo, usd_hi в "
+                       "gt/data/ship_lukoil.json). Выше потолка — наша оценка занижена, ниже "
+                       "пола — завышена, внутри — верна. Считает gt/tools/ship_offer.py. "
+                       "Охваты не складываются: это разные заявки."),
+            "scopes": {a.scope or "без охвата": st},
+        }
         Path(a.stats_out).write_text(
-            json.dumps(st, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
-        print(f"счётчики по вилкам записаны в {a.stats_out}: "
+            json.dumps(doc, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+        print(f"счётчики по вилкам записаны в {a.stats_out}, охват «{a.scope}»: "
               f"строк с КП {st['rows_with_offer']}, выше потолка {st['above_ceiling']}, "
               f"внутри {st['inside_band']}, ниже пола {st['below_floor']}")
     print(f"{out} — {out.stat().st_size / 1e6:.1f} МБ (вне репозитория, не коммитится)")

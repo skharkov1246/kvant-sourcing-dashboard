@@ -83,8 +83,8 @@ li { margin-bottom: 1.6mm; line-height: 1.42; }
 # наблюдение одно и оно не выдерживает проверки — брокерская витрина, страница за
 # антиботом, цифра из сниппета. Это не «дорого» и не «дёшево», а отсутствие
 # подтверждения, и смешивать это с вердиктом по цене нельзя.
-VERDICTS = ["ЗАНИЖЕНА", "ЗАВЫШЕНА", "ВЕРНА", "НЕ ПОДТВЕРЖДЕНА", "ДУБЛЬ",
-            "НЕЧЕМ ПРОВЕРИТЬ"]
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from verdicts import VERDICTS, vkey  # noqa: E402  один список и один способ считать
 V_WHAT = {
     "ЗАНИЖЕНА": ("закупка дороже, чем мы считали — запаса на снижение нет, "
                  "а на части строк выставленная цена может оказаться ниже закупки"),
@@ -131,14 +131,6 @@ def ru(n) -> str:
 
 def norm(pn: str) -> str:
     return re.sub(r"[^A-Z0-9]", "", str(pn or "").upper())
-
-
-def vkey(r: dict) -> str:
-    v = (r.get("band_verdict") or "").upper()
-    for k in VERDICTS:
-        if k in v:
-            return k
-    return "НЕЧЕМ ПРОВЕРИТЬ"
 
 
 def expo(r: dict) -> float:
