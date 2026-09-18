@@ -106,18 +106,29 @@ def expo(r: dict) -> float:
 PRICED = {"ЗАНИЖЕНА", "ЗАВЫШЕНА", "ВЕРНА"}
 
 
-def group_of(rv: dict) -> str:
-    """Куда строка идёт: в закупку, в ожидание или в стоп.
+def group_of(rv: dict, in_house: set | None = None) -> str:
+    """Куда строка идёт: в закупку, в ожидание, в своё вложение или в стоп.
 
     БЕРЁМ — цена за штуку найдена числом И названо, у кого её брать.
     ЖДЁМ — цена есть, но чего-то не хватает: вилка не подтверждена, предмет
       спорен, количество не сходится с первоисточником заявки.
+    ОТКРЫТЬ СВОЁ ВЛОЖЕНИЕ — цены у нас в наборе нет, но номер стоит в
+      предложении, которое поставщик НАМ УЖЕ ПРИСЛАЛ.
     НЕ БЕРЁМ — цены нет ни у кого; закупать нечем, и это результат, а не пробел.
+
+    ЧЕТВЁРТЫЙ РАЗРЯД ДОБАВЛЕН 18.09.2026 ПО НАЙДЕННОМУ ПРОТИВОРЕЧИЮ. До него
+    строка без цены в наборе шла в «не берём» с формулировкой «цены нет ни у
+    одного проверенного продавца». Сверка с описью вложений показала, что таких
+    строк 114 на 3 446 303 USD, и цена по ним лежит в нашем же полученном
+    предложении. То есть отчёт предлагал руководству отказаться от трёх с
+    половиной миллионов долларов заявки на основании, которое неверно.
     """
     v = vkey(rv)
     has_price = isinstance(rv.get("price_low"), (int, float))
     has_channel = bool(str(rv.get("channel") or "").strip())
     if not has_price:
+        if in_house and key(rv.get("pn")) in in_house:
+            return "открыть своё вложение"
         return "не берём"
     if v in PRICED and has_channel:
         return "берём"
@@ -166,6 +177,9 @@ def build() -> str:
     inq = load("ship_inside_quotes.json") or {}
     pl = load("ship_parts_lists.json") or {}
     cov = load("ship_coverage.json") or {}
+    # Номера, по которым предложение поставщика уже лежит в нашем вложении.
+    # Без них строка без цены уходила в «не берём» как «цены нет ни у кого».
+    in_house = {key(r.get("pn")) for r in (inq.get("rows") or [])}
 
     band = {}
     for r in lk:
@@ -174,7 +188,8 @@ def build() -> str:
     rows = []
     for rv in rvs:
         b = band.get(key(rv.get("pn"))) or {}
-        rows.append({"rv": rv, "b": b, "expo": expo(b), "group": group_of(rv)})
+        rows.append({"rv": rv, "b": b, "expo": expo(b),
+                     "group": group_of(rv, in_house)})
     rows.sort(key=lambda x: -x["expo"])
 
     priced_rows = [r for r in lk if expo(r) > 0]
@@ -212,6 +227,7 @@ def build() -> str:
                 "est": est, "n_price": n_price}
 
     take, hold, stop = sums("берём"), sums("ждём"), sums("не берём")
+    inhouse = sums("открыть своё вложение")
     n_take, e_take = take["n"], take["expo"]
     n_hold, e_hold = hold["n"], hold["expo"]
     n_stop, e_stop = stop["n"], stop["expo"]
@@ -604,6 +620,14 @@ def build() -> str:
       f"подтверждены (нужен второй независимый продавец), либо спорен сам предмет поставки, "
       f"либо количество в заявке расходится с её же исходным перечнем на английском языке. "
       f"Что именно спрашивать — в разделе 3 и в письмах.</td></tr>")
+    a(f"<tr class='hold'><td class='k'>Открыть своё вложение</td>"
+      f"<td class='n'>{ru(inhouse['n'])}</td><td class='n'>{ru(inhouse['expo'])}</td>"
+      f"<td class='n'>—</td>"
+      f"<td>Цены в нашем наборе нет, но номер стоит в предложении, которое поставщик НАМ "
+      f"УЖЕ ПРИСЛАЛ. Это не отказ и не поиск: надо открыть своё вложение и выписать цифру. "
+      f"Адреса — в «ГДЕ-ЦЕНА-УЖЕ-ЕСТЬ-ЛУКОЙЛ.pdf», тринадцать файлов на всю группу. До "
+      f"18.09.2026 эти строки стояли в разряде «не забираем» с пометкой «цены нет ни у "
+      f"кого» — отчёт предлагал отказаться от них по неверному основанию.</td></tr>")
     a(f"<tr class='stop'><td class='k'>Не забираем сейчас</td><td class='n'>{ru(n_stop)}</td>"
       f"<td class='n'>{ru(e_stop)}</td><td class='n'>—</td>"
       f"<td>Цены нет ни у одного проверенного продавца, и это измеренный результат, а не "
@@ -827,7 +851,8 @@ def build() -> str:
       "<th>у кого брать</th><th>решение</th><th>комментарий исполнителю</th></tr></thead>")
     for x in rows:
         rv, b = x["rv"], x["b"]
-        cls = {"берём": "take", "ждём": "hold", "не берём": "stop"}[x["group"]]
+        cls = {"берём": "take", "ждём": "hold", "не берём": "stop",
+               "открыть своё вложение": "hold"}[x["group"]]
         lo, hi = rv.get("price_low"), rv.get("price_high")
         if isinstance(lo, (int, float)):
             price = money(lo) if lo == hi else f"{money(lo)} – {money(hi)}"

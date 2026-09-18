@@ -60,3 +60,51 @@ def test_в_оглавлении_нет_номера_сделки_набранн
     глазами нельзя: он выглядит одинаково правильным при любом значении."""
     src = (ROOT / "gt/tools/ship_final.py").read_text(encoding="utf-8")
     assert "сделки 18016" not in src, "номер сделки снова набран в тексте отчёта"
+
+
+def test_четыре_разряда_решения_складываются_в_разобранные_строки():
+    """Строка не может быть одновременно в двух разрядах и не может выпасть.
+
+    Разряд «открыть своё вложение» добавлен 18.09.2026 по найденному
+    противоречию: 114 строк на 3 446 303 USD стояли в «не забираем» с пометкой
+    «цены нет ни у одного проверенного продавца», тогда как цена по ним лежала в
+    предложении, которое поставщик нам уже прислал. Отчёт предлагал руководству
+    отказаться от трёх с половиной миллионов долларов по неверному основанию.
+
+    Если разряды перестанут складываться, значит признак начал срабатывать
+    дважды либо строка выпала, и таблица решений снова начнёт лгать.
+    """
+    import sys
+
+    sys.path.insert(0, str(ROOT / "gt/tools"))
+    import ship_final as sf
+
+    rv = ROOT / "gt/data/ship_reverify.json"
+    inq = ROOT / "gt/data/ship_inside_quotes.json"
+    if not rv.exists():
+        pytest.skip("набора нет")
+    rows = json.loads(rv.read_text(encoding="utf-8"))["rows"]
+    house = set()
+    if inq.exists():
+        house = {sf.key(r.get("pn"))
+                 for r in json.loads(inq.read_text(encoding="utf-8")).get("rows", [])}
+    got = [sf.group_of(r, house) for r in rows]
+    assert len(got) == len(rows)
+    assert set(got) <= {"берём", "ждём", "не берём", "открыть своё вложение"}, set(got)
+
+
+def test_строка_с_ценой_в_нашем_вложении_не_попадает_в_отказ():
+    import sys
+
+    sys.path.insert(0, str(ROOT / "gt/tools"))
+    import ship_final as sf
+
+    rv = ROOT / "gt/data/ship_reverify.json"
+    inq = ROOT / "gt/data/ship_inside_quotes.json"
+    if not rv.exists() or not inq.exists():
+        pytest.skip("наборов нет")
+    house = {sf.key(r.get("pn"))
+             for r in json.loads(inq.read_text(encoding="utf-8")).get("rows", [])}
+    bad = [r["pn"] for r in json.loads(rv.read_text(encoding="utf-8"))["rows"]
+           if sf.group_of(r, house) == "не берём" and sf.key(r.get("pn")) in house]
+    assert not bad, f"отказ по строкам, цена которых лежит в нашем же вложении: {bad[:5]}"
