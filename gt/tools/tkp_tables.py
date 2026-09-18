@@ -262,7 +262,20 @@ def extract(doc: dict, yen: str = "") -> tuple[list[dict], Counter]:
             if not pn:
                 why["арифметика сошлась, номера нет"] += 1
                 continue
-            cur, cur_why = currency_of(raw)
+            # Валюта, УЖЕ УСТАНОВЛЕННАЯ первым проходом, сильнее нашего разбора
+            # строки: он видит только строку, а первый проход видел файл целиком.
+            # Замер по выгрузке «НВН» 18.09.2026: своим разбором строки валюта не
+            # находилась ни у одного из 46 значений, а по файлу она известна у
+            # 643 — 264 USD, 259 CNY, 69 RUB, 13 EUR, 24 GBP. Без этого 69
+            # значений в рублях читались бы долларами: ошибка в 84 раза.
+            if p.get("currency") and "currency_source" in p:
+                cur = str(p["currency"])
+                cur_why = (f'{p.get("currency_why") or "валюта из первого прохода"} '
+                           f'(источник: {p["currency_source"]})')
+                if cur.startswith(YEN):
+                    cur = YEN_MARK
+            else:
+                cur, cur_why = currency_of(raw)
             usd, conv = to_usd(unit, cur, rates, yen)
             if usd is None:
                 why[f"цена есть, в доллары не приведена: {cur_why}"] += 1
@@ -351,7 +364,18 @@ def main() -> int:
         # найденной ценой в лестницу не попадали вовсе, и она показывала знание
         # хуже, чем оно есть. Здесь пишется ровно факт «по этому номеру цена в
         # предложении есть» и её происхождение. Ни числа, ни валюты суммы.
+        # СЛИЯНИЕ, А НЕ ЗАПИСЬ ПОВЕРХ. Охватов несколько («Энергосети», «НВН»), и
+        # прогон по одному не имеет права стереть номера, найденные другим: так
+        # уже трижды вымывалась опись входящих КП. Ключ — номер, и запись первого
+        # прогона сохраняется: она несёт свой файл и свою сделку.
         seen: dict[str, dict] = {}
+        out_path = Path(a.keys_out)
+        if out_path.exists():
+            for old_part in json.loads(out_path.read_text(encoding="utf-8")).get("parts", []):
+                k = old_part.get("key") or norm_key(old_part.get("pn"))
+                if k:
+                    seen[k] = {kk: vv for kk, vv in old_part.items() if kk != "key"}
+        was = len(seen)
         for r in rows:
             if r.get("usd") is None:
                 continue
@@ -362,7 +386,7 @@ def main() -> int:
                                        str(r.get("currency"))),
                 "rule": r.get("rule", ""),
             })
-        Path(a.keys_out).write_text(json.dumps({
+        out_path.write_text(json.dumps({
             "updated": "2026-09-18",
             "source": ("Номера, по которым цена закупки подтверждена письменным предложением "
                        "контрагента из вложений сделки: единица × количество = итог в той же "
@@ -374,7 +398,8 @@ def main() -> int:
                               "найденной ценой в неё не попадали, и она занижала наше знание."),
             "parts": [dict(v, key=k) for k, v in sorted(seen.items())],
         }, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
-        print(f"номеров с подтверждённой ценой записано в {a.keys_out}: {len(seen)}")
+        print(f"номеров с подтверждённой ценой в {a.keys_out}: {len(seen)} "
+              f"(было {was}, прибавка {len(seen) - was})")
     if a.counters:
         Path(a.counters).write_text(json.dumps({
             "updated": "2026-09-18",

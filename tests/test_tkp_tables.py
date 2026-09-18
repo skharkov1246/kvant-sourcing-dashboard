@@ -190,3 +190,46 @@ def test_счётчики_не_несут_ни_цен_ни_номеров(tmp_pa
     text = json.dumps(c, ensure_ascii=False)
     assert "2273" not in text and "ZZ-1701" not in text and "413700" not in text
     assert c["rows_confirmed_by_arithmetic"] >= 2
+
+
+def test_валюта_первого_прохода_сильнее_разбора_строки(tmp_path):
+    """Первый проход видел файл целиком, наш разбор — только строку.
+
+    Замер по выгрузке «НВН» 18.09.2026: разбором строки валюта не находилась ни у
+    одного из 46 значений, а по файлу она известна у 643 — 264 USD, 259 CNY, 69
+    RUB, 13 EUR, 24 GBP. Без этого правила 69 значений в рублях читались бы
+    долларами: ошибка в 84 раза.
+    """
+    doc = {"files": [{"file_name": "kp.xlsx", "direction": "входящее", "prices": [
+        {"pn": "ZZ-7007", "raw": "1 | ZZ-7007 | 10 | 5,00 | 50,00", "currency": "RUB",
+         "currency_source": "файл", "currency_why": "единственная валюта в файле"},
+    ]}]}
+    d = tmp_path / "d.json"
+    d.write_text(json.dumps(doc, ensure_ascii=False), encoding="utf-8")
+    rows, _ = T.extract(json.loads(d.read_text(encoding="utf-8")), yen="cny")
+    assert rows and rows[0]["currency"] == "RUB"
+    assert "файл" in rows[0]["currency_why"]
+    # 5 рублей — это не 5 долларов, и пересчёт обязан это показать
+    assert rows[0]["usd"] is not None and rows[0]["usd"] < 1.0
+
+
+def test_список_номеров_сливается_а_не_затирается(tmp_path):
+    """Прогонов по охватам несколько, и один не имеет права стереть другой.
+
+    Так уже трижды вымывалась опись входящих КП: слияние по охватам делается
+    по смыслу, а не текстом.
+    """
+    import subprocess
+    import sys as _s
+    out = tmp_path / "keys.json"
+    first = {"files": [{"file_name": "a.xlsx", "direction": "входящее", "prices": [
+        {"pn": "ZZ-1001", "raw": "1 | ZZ-1001 | 10 | $5.25 | $52.50"}]}]}
+    second = {"files": [{"file_name": "b.xlsx", "direction": "входящее", "prices": [
+        {"pn": "ZZ-2002", "raw": "1 | ZZ-2002 | 10 | $7.30 | $73.00"}]}]}
+    for name, doc in (("a.json", first), ("b.json", second)):
+        (tmp_path / name).write_text(json.dumps(doc, ensure_ascii=False), encoding="utf-8")
+        subprocess.run([_s.executable, str(ROOT / "gt/tools/tkp_tables.py"),
+                        "--tkp", str(tmp_path / name), "--keys-out", str(out)],
+                       check=True, capture_output=True)
+    keys = {p["key"] for p in json.loads(out.read_text(encoding="utf-8"))["parts"]}
+    assert keys == {"ZZ1001", "ZZ2002"}, f"слияние потеряло номера: {keys}"
