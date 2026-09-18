@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 250,
-    "total_bytes": 111678016,
+    "total_bytes": 111710764,
     "by_sensitivity": {
       "конфиденциально": 65,
       "внутреннее": 137,
@@ -3050,6 +3050,67 @@
       ]
     },
     {
+      "path": "gt/data/ship_quote_letters.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 201879,
+      "note": "Третий пакет писем по заявке ЛУКОЙЛ: ЗАПРОС ЦЕНЫ И НАЛИЧИЯ по строкам, где адресат известен из разбора, а спрашивать никто не начал. Замер 18.09.2026 вскрыл дыру между двумя правильными условиями: ship_rfq берёт строки с НАЙДЕННЫМ складом, volume_letters — строки с ценой без остатка числом, и строки, где известен только адрес, не подходили ни туда, ни туда. Их 522 на 8 629 058 USD — больше, чем в двух других пакетах вместе. Адрес есть у 267 строк на 6 518 358 USD: 112 писем, порядок отправки по нашей экспозиции. По 255 строкам на 2 110 700 USD адреса нет — это следующая работа, и подбирать получателя по классу изделия нельзя. Пять вопросов в письме: цена за штуку и за объём, остаток числом, срок под наше количество, срок действия цены, базис поставки; отказ «нет» назван полноценным ответом. Ни нашей вилки, ни суммы, ни имени заказчика в письме нет. Адресат, уже опубликовавший нашу заявку (gt/data/ship_leak.json), помечен. Тест следит, что один номер не получает двух писем из разных пакетов. Считает gt/tools/quote_letters.py, он же собирает gt/docs/ЗАПРОС-ЦЕНЫ-И-НАЛИЧИЯ-ЛУКОЙЛ.pdf.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "form_tasks",
+        "how_rows_split",
+        "letters",
+        "rows_no_address_list",
+        "rows_to_form",
+        "rows_to_maker",
+        "rows_total",
+        "rows_with_address",
+        "rows_without_address",
+        "source",
+        "updated",
+        "usd_to_form",
+        "usd_to_maker",
+        "usd_total",
+        "usd_with_address",
+        "usd_without_address",
+        "what_is_not_in_the_letter",
+        "what_it_is",
+        "what_maker_letter_asks",
+        "why_form_is_not_nothing",
+        "why_third_set"
+      ],
+      "main_collection": {
+        "key": "letters",
+        "records": 121,
+        "record_keys": [
+          "body",
+          "kind",
+          "our_exposure",
+          "pns",
+          "rows",
+          "subject",
+          "to",
+          "warning"
+        ]
+      },
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "369cbb3",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "телефоны"
+        ]
+      },
+      "referenced_by": [
+        "gt/tools/quote_letters.py",
+        "gt/tools/ship_final.py",
+        "tests/test_quote_letters.py",
+        "tests/test_report_numbers.py"
+      ]
+    },
+    {
       "path": "zip/data/material_suppliers.json",
       "subproject": "база ЗИП",
       "bytes": 195837,
@@ -3268,66 +3329,6 @@
         "gt/tools/ship_final.py",
         "gt/tools/ship_questions.py",
         "tests/test_ship_collisions.py"
-      ]
-    },
-    {
-      "path": "gt/data/ship_quote_letters.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 183591,
-      "note": "Третий пакет писем по заявке ЛУКОЙЛ: ЗАПРОС ЦЕНЫ И НАЛИЧИЯ по строкам, где адресат известен из разбора, а спрашивать никто не начал. Замер 18.09.2026 вскрыл дыру между двумя правильными условиями: ship_rfq берёт строки с НАЙДЕННЫМ складом, volume_letters — строки с ценой без остатка числом, и строки, где известен только адрес, не подходили ни туда, ни туда. Их 522 на 8 629 058 USD — больше, чем в двух других пакетах вместе. Адрес есть у 267 строк на 6 518 358 USD: 112 писем, порядок отправки по нашей экспозиции. По 255 строкам на 2 110 700 USD адреса нет — это следующая работа, и подбирать получателя по классу изделия нельзя. Пять вопросов в письме: цена за штуку и за объём, остаток числом, срок под наше количество, срок действия цены, базис поставки; отказ «нет» назван полноценным ответом. Ни нашей вилки, ни суммы, ни имени заказчика в письме нет. Адресат, уже опубликовавший нашу заявку (gt/data/ship_leak.json), помечен. Тест следит, что один номер не получает двух писем из разных пакетов. Считает gt/tools/quote_letters.py, он же собирает gt/docs/ЗАПРОС-ЦЕНЫ-И-НАЛИЧИЯ-ЛУКОЙЛ.pdf.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "form_tasks",
-        "how_rows_split",
-        "letters",
-        "rows_no_address_list",
-        "rows_to_form",
-        "rows_to_maker",
-        "rows_total",
-        "rows_with_address",
-        "rows_without_address",
-        "source",
-        "updated",
-        "usd_to_form",
-        "usd_to_maker",
-        "usd_total",
-        "usd_with_address",
-        "usd_without_address",
-        "what_is_not_in_the_letter",
-        "what_it_is",
-        "what_maker_letter_asks",
-        "why_form_is_not_nothing",
-        "why_third_set"
-      ],
-      "main_collection": {
-        "key": "letters",
-        "records": 120,
-        "record_keys": [
-          "body",
-          "kind",
-          "our_exposure",
-          "pns",
-          "rows",
-          "subject",
-          "to",
-          "warning"
-        ]
-      },
-      "last_change": "2026-09-18",
-      "last_author": "Claude",
-      "last_commit": "c93540a",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "конфиденциально",
-        "markers": [
-          "телефоны"
-        ]
-      },
-      "referenced_by": [
-        "gt/tools/quote_letters.py",
-        "gt/tools/ship_final.py",
-        "tests/test_quote_letters.py"
       ]
     },
     {
@@ -4692,7 +4693,8 @@
       "referenced_by": [
         "gt/tools/ship_final.py",
         "gt/tools/ship_underpriced.py",
-        "gt/tools/underpriced_doc.py"
+        "gt/tools/underpriced_doc.py",
+        "tests/test_report_numbers.py"
       ]
     },
     {
@@ -4860,7 +4862,7 @@
     {
       "path": "data/catalog_notes.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 103399,
+      "bytes": 103660,
       "note": "",
       "format": "json",
       "shape": "объект",
@@ -4908,7 +4910,7 @@
       ],
       "last_change": "2026-09-18",
       "last_author": "Claude",
-      "last_commit": "e278e44",
+      "last_commit": "369cbb3",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -6291,6 +6293,56 @@
       ]
     },
     {
+      "path": "gt/data/maker_contacts.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 56666,
+      "note": "Адреса служб запчастей изготовителей — точка обращения там, где адреса продавца нет. Собрано тремя разведками 18.09.2026 прямыми обращениями к сайтам изготовителей (бюджет веб-поиска сессии был исчерпан), принято gt/tools/mc_merge.py: 25 изготовителей, из них с почтой 15 (включая канал Solar: Shop@solarturbines.com, прочитан в снимке архива его же страницы и подтверждён на русской версии — живой сайт закрыт 403 на кромке Akamai), у остальных только форма обращения или телефон. Правило приёмника: почта принимается ТОЛЬКО с полем read_on — адресом страницы, где она напечатана, — и только если метка домена почты совпадает с меткой страницы либо связь названа (дистрибьютор, юридическое лицо или разбор). Адрес вида «parts@домен» без прочитанной страницы — догадка: письмо уходит в никуда, а строка при этом считается закрытой, то есть ошибка ещё и прячется. Метка домена берётся слева от зоны: сверка «по части после первой точки» отключала проверку во всей зоне .com. Записи с пометкой «низкая уверенность» в наборе остаются, но письма по ним не собираются — это обычно общая приёмная или канал ПО КЛАССУ изделий (по свече промышленного газового двигателя нашёлся автомобильный послепродажный канал). Отказано: Solar (сайт закрыт 403 на всех путях — самый дорогой изготовитель списка, 83 строки), Det-Tronics и Oleobi (связь домена почты со страницей не записана). Читает gt/tools/quote_letters.py.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "rows",
+        "rows_form_only",
+        "rows_with_email",
+        "rule",
+        "source",
+        "updated",
+        "what_it_is"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 25,
+        "record_keys": [
+          "confidence",
+          "distributor_quote",
+          "email",
+          "email_kind",
+          "form_url",
+          "found_on",
+          "legal_name",
+          "maker",
+          "note",
+          "phone",
+          "read_on",
+          "via_distributor"
+        ]
+      },
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "369cbb3",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "адреса электронной почты",
+          "телефоны"
+        ]
+      },
+      "referenced_by": [
+        "gt/tools/mc_merge.py",
+        "gt/tools/quote_letters.py"
+      ]
+    },
+    {
       "path": "gpu/data/machines.json",
       "subproject": "ГПУ-библиотека",
       "bytes": 56132,
@@ -7071,56 +7123,6 @@
         "ove/tools/calc_ove.py",
         "ove/tools/check_tkp.py",
         "ove/tools/equip2ifc.py"
-      ]
-    },
-    {
-      "path": "gt/data/maker_contacts.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 43785,
-      "note": "Адреса служб запчастей изготовителей — точка обращения там, где адреса продавца нет. Собрано тремя разведками 18.09.2026 прямыми обращениями к сайтам изготовителей (бюджет веб-поиска сессии был исчерпан), принято gt/tools/mc_merge.py: 21 изготовитель, из них с почтой 11, у остальных только форма обращения или телефон. Правило приёмника: почта принимается ТОЛЬКО с полем read_on — адресом страницы, где она напечатана, — и только если метка домена почты совпадает с меткой страницы либо связь названа (дистрибьютор, юридическое лицо или разбор). Адрес вида «parts@домен» без прочитанной страницы — догадка: письмо уходит в никуда, а строка при этом считается закрытой, то есть ошибка ещё и прячется. Метка домена берётся слева от зоны: сверка «по части после первой точки» отключала проверку во всей зоне .com. Записи с пометкой «низкая уверенность» в наборе остаются, но письма по ним не собираются — это обычно общая приёмная или канал ПО КЛАССУ изделий (по свече промышленного газового двигателя нашёлся автомобильный послепродажный канал). Отказано: Solar (сайт закрыт 403 на всех путях — самый дорогой изготовитель списка, 83 строки), Det-Tronics и Oleobi (связь домена почты со страницей не записана). Читает gt/tools/quote_letters.py.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "rows",
-        "rows_form_only",
-        "rows_with_email",
-        "rule",
-        "source",
-        "updated",
-        "what_it_is"
-      ],
-      "main_collection": {
-        "key": "rows",
-        "records": 21,
-        "record_keys": [
-          "confidence",
-          "distributor_quote",
-          "email",
-          "email_kind",
-          "form_url",
-          "found_on",
-          "legal_name",
-          "maker",
-          "note",
-          "phone",
-          "read_on",
-          "via_distributor"
-        ]
-      },
-      "last_change": "2026-09-18",
-      "last_author": "Claude",
-      "last_commit": "e278e44",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "конфиденциально",
-        "markers": [
-          "адреса электронной почты",
-          "телефоны"
-        ]
-      },
-      "referenced_by": [
-        "gt/tools/mc_merge.py",
-        "gt/tools/quote_letters.py"
       ]
     },
     {
@@ -8243,7 +8245,8 @@
         "gt/tools/quote_letters.py",
         "gt/tools/ship_final.py",
         "gt/tools/volume_letters.py",
-        "tests/test_quote_letters.py"
+        "tests/test_quote_letters.py",
+        "tests/test_report_numbers.py"
       ]
     },
     {
@@ -8446,6 +8449,48 @@
       ]
     },
     {
+      "path": "gt/data/ship_seller_groups.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 22118,
+      "note": "Группы витрин, принадлежащих ОДНОМУ оператору, с уликой по каждой. Нужны, чтобы признак «два независимых продавца» считался по списку, а не на глаз по разным доменам: за ночь 17–18.09.2026 этот довод развалился шесть раз (Sonepar под пятью вывесками, оператор из Сямыня под пятью, индийский перепродавец под четырьмя). Группа записывается только при прямой улике на странице: общий объект в коде, общий складской номер, общая почта или телефон, посимвольно совпадающее описание. Заполняется руками по разбору, не производная от данных. Персональных данных нет, только публичные контакты компаний.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "groups",
+        "method",
+        "pools",
+        "source",
+        "updated",
+        "why",
+        "why_pools"
+      ],
+      "main_collection": {
+        "key": "groups",
+        "records": 14,
+        "record_keys": [
+          "affects",
+          "domains",
+          "evidence",
+          "group",
+          "kind"
+        ]
+      },
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "369cbb3",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/seller_groups.py",
+        "gt/tools/ship_brief.py",
+        "gt/tools/stocklist_cross.py",
+        "tests/test_seller_groups.py"
+      ]
+    },
+    {
       "path": "ove/data/audit_log.json",
       "subproject": "ОВЭ-75",
       "bytes": 21236,
@@ -8524,48 +8569,6 @@
         "tests/test_dict.py",
         "tests/test_faults_slices.py",
         "tests/test_r1700_dossier.py"
-      ]
-    },
-    {
-      "path": "gt/data/ship_seller_groups.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 20800,
-      "note": "Группы витрин, принадлежащих ОДНОМУ оператору, с уликой по каждой. Нужны, чтобы признак «два независимых продавца» считался по списку, а не на глаз по разным доменам: за ночь 17–18.09.2026 этот довод развалился шесть раз (Sonepar под пятью вывесками, оператор из Сямыня под пятью, индийский перепродавец под четырьмя). Группа записывается только при прямой улике на странице: общий объект в коде, общий складской номер, общая почта или телефон, посимвольно совпадающее описание. Заполняется руками по разбору, не производная от данных. Персональных данных нет, только публичные контакты компаний.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "groups",
-        "method",
-        "pools",
-        "source",
-        "updated",
-        "why",
-        "why_pools"
-      ],
-      "main_collection": {
-        "key": "groups",
-        "records": 14,
-        "record_keys": [
-          "affects",
-          "domains",
-          "evidence",
-          "group",
-          "kind"
-        ]
-      },
-      "last_change": "2026-09-18",
-      "last_author": "Claude",
-      "last_commit": "2ba5cd9",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "gt/tools/seller_groups.py",
-        "gt/tools/ship_brief.py",
-        "gt/tools/stocklist_cross.py",
-        "tests/test_seller_groups.py"
       ]
     },
     {
@@ -9979,7 +9982,8 @@
       },
       "referenced_by": [
         "gt/tools/ship_final.py",
-        "gt/tools/ship_margin.py"
+        "gt/tools/ship_margin.py",
+        "tests/test_report_numbers.py"
       ]
     },
     {
@@ -10225,6 +10229,7 @@
       "referenced_by": [
         "gt/tools/ship_coverage.py",
         "gt/tools/ship_final.py",
+        "tests/test_report_numbers.py",
         "tests/test_ship_coverage.py"
       ]
     },
