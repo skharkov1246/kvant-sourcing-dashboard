@@ -269,3 +269,60 @@ def test_индекс_ссылается_только_на_источники_а
     idx = _index()
     copies = [f["path"] for f in idx["files"] if "/public/" in f["path"]]
     assert not copies, f"в индексе сборочные копии: {copies[:3]}"
+
+
+# ── кто заводит запросы ──────────────────────────────────────────────────────
+# Разбор нужен владельцу, чтобы видеть, кто грузит очередь запросов помимо
+# отдела поиска поставщиков. Считается по автору карточки, а не по ответственному.
+
+def _origin():
+    from tests import fixture
+    return fixture.build_metrics()["origin"]
+
+
+def test_происхождение_запросов_разложено_без_потерь():
+    o = _origin()
+    s = o["summary"]
+    assert s["sourcing"] + s["outside"] + s["auto"] == s["total"], (
+        "сумма по источникам разошлась с общим числом запросов")
+    assert sum(d["n"] for d in o["byDept"]) == s["total"], (
+        "сумма по подразделениям разошлась с общим числом запросов")
+
+
+def test_автор_вне_отдела_попадает_в_список_с_подразделением():
+    o = _origin()
+    out = o["outsideCreators"]
+    assert out, "в синтетике есть авторы из смежных отделов, список не должен быть пуст"
+    for c in out:
+        assert not c["src"] and not c["auto"], "в список вне отдела попал сорсер или автоматика"
+        assert c["dept"], f"у автора {c['name']} не указано подразделение"
+        assert c["n"] > 0
+
+
+def test_карточки_без_автора_считаются_автоматикой_а_не_человеком():
+    o = _origin()
+    auto = [c for c in o["byCreator"] if c["auto"]]
+    assert auto, "карточки без автора должны выделяться отдельно"
+    assert o["summary"]["auto"] == sum(c["n"] for c in auto)
+    assert o["summary"]["people"] == len([c for c in o["byCreator"] if not c["auto"]])
+
+
+def test_передача_сорсингу_считается_только_от_заведённых_вне_отдела():
+    o = _origin()
+    s = o["summary"]
+    assert s["handoff"] <= s["outside"], (
+        "передано сорсингу не может превышать число заведённых вне отдела")
+
+
+def test_разбор_не_падает_без_карты_подразделений():
+    """Карта подразделений необязательна: при её отсутствии разбор остаётся,
+    а подразделение помечается как неуказанное."""
+    import metrics as metrics_mod
+    from tests import fixture
+    d = fixture.make_dataset()
+    m = metrics_mod.build(d["period"], d["rfqs"], d["deal_index"], d["period_deals"],
+                          d["dept_a_ids"], d["names"], d["since"],
+                          d["deal_stage_names"], d["category_names"])
+    o = m["origin"]
+    assert o["summary"]["total"] == m["kpi"]["total"]
+    assert any(c["dept"] == "подразделение не указано" for c in o["byCreator"])

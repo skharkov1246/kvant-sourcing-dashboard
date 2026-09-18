@@ -52,6 +52,7 @@ class BitrixClient:
         self._categories: dict[str, str] | None = None
         self._uf: dict[str, dict] | None = None
         self._departments: list[dict] | None = None
+        self._user_depts: dict[str, str] | None = None
 
     # ----------------------------------------------------------------- low level
     def call_envelope(self, method: str, params: dict | None = None, *, retries: int | None = None) -> dict:
@@ -437,15 +438,39 @@ class BitrixClient:
     # ----------------------------------------------------------------- reference maps (cached)
     def users(self) -> dict[str, str]:
         if self._users is None:
-            m: dict[str, str] = {}
-            rows = self.list_paged("user.get", {})
-            for u in rows:
-                uid = str(u.get("ID"))
-                name = " ".join(x for x in [u.get("NAME"), u.get("LAST_NAME")] if x).strip() or f"user#{uid}"
-                pos = u.get("WORK_POSITION")
-                m[uid] = f"{name} ({pos})" if pos else name
-            self._users = m
+            self._load_users()
         return self._users
+
+    def user_dept_names(self) -> dict[str, str]:
+        """Пользователь → название его подразделения.
+
+        Нужно, чтобы отличать запросы, заведённые сорсингом, от заведённых кем-то
+        ещё: одного признака «в отделе 172 или нет» мало — владельцу нужно видеть,
+        какое именно подразделение грузит очередь. Если человек числится в нескольких
+        подразделениях, берём первое: в портале это основное место работы.
+        """
+        if self._user_depts is None:
+            self._load_users()
+        return self._user_depts
+
+    def _load_users(self) -> None:
+        """Одна выгрузка user.get на обе карты: имена и подразделения."""
+        dep_names = {str(d.get("ID")): str(d.get("NAME") or f"подразделение #{d.get('ID')}")
+                     for d in self.departments()}
+        names: dict[str, str] = {}
+        depts: dict[str, str] = {}
+        for u in self.list_paged("user.get", {}):
+            uid = str(u.get("ID"))
+            name = " ".join(x for x in [u.get("NAME"), u.get("LAST_NAME")] if x).strip() or f"user#{uid}"
+            pos = u.get("WORK_POSITION")
+            names[uid] = f"{name} ({pos})" if pos else name
+            raw = u.get("UF_DEPARTMENT") or []
+            if not isinstance(raw, list):
+                raw = [raw]
+            got = [dep_names[str(x)] for x in raw if str(x) in dep_names]
+            depts[uid] = got[0] if got else ""
+        self._users = names
+        self._user_depts = depts
 
     def user_name(self, uid: Any) -> str:
         if uid in (None, "", 0, "0"):
