@@ -101,7 +101,12 @@ def top_gap(rows: list, rv: list, top: int = 60) -> tuple[int, float, float]:
     whole = sum(e for e, _ in live) or 1.0
     covered = sum(e for e, r in live if k(r.get("pn")) in done)
     rest = [(e, r) for e, r in live[:top] if k(r.get("pn")) not in done]
-    return len(rest), sum(e for e, _ in rest), covered / whole * 100
+    # Доля считается от ЭКСПОЗИЦИИ, а экспозиция есть только у строк с вилкой.
+    # Поэтому вместе с процентом возвращается, по скольким строкам он посчитан:
+    # без этого «79,3 % экспозиции» читается как «79 % заявки проверено», хотя у
+    # 785 строк из 1 642 оценки нет вовсе и в экспозицию они не входят.
+    return (len(rest), sum(e for e, _ in rest), covered / whole * 100,
+            sum(1 for r in rows if expo(r) > 0), len(rows))
 
 
 def metrology(rows: list, rv: list) -> dict:
@@ -131,6 +136,18 @@ def metrology(rows: list, rv: list) -> dict:
             qty += float(b.get("qty") or 0)
     makers = sorted({str(r.get("maker_short") or "").strip() for r in hit} - {""})
     return {"rows": len(hit), "usd": usd, "qty": qty, "makers": makers}
+
+
+def next_frontier(rows: list, rv: list) -> tuple[int, float]:
+    """Сколько оценённых строк заявки ещё не разобрано и сколько это денег."""
+    import re as _re
+
+    def k(pn) -> str:
+        return _re.sub(r"[^A-Z0-9]", "", str(pn or "").split("(")[0].upper())
+
+    done = {k(r.get("pn")) for r in rv}
+    rest = [r for r in rows if expo(r) > 0 and k(r.get("pn")) not in done]
+    return len(rest), sum(map(expo, rest))
 
 
 def offer_scope(st: dict, prefer: str = "Энергосети") -> tuple[str, dict]:
@@ -295,10 +312,23 @@ def build() -> str:
     a("</table>")
 
     a("<h2>Что я делаю дальше без вас</h2><ol>")
-    gap_rows, gap_usd, cov_pct = top_gap(rows, rv)
-    a(f"<li>Добираю строки из топ-60, про которые не знаем ничего: осталось {ru(gap_rows)} строк "
-      f"на {ru(gap_usd)} USD. По всей заявке перепроверкой закрыто {cov_pct:.1f} % "
-      f"экспозиции.</li>")
+    gap_rows, gap_usd, cov_pct, priced_rows, all_rows = top_gap(rows, rv)
+    # Когда топ-60 закрыт целиком, «осталось 0 строк» — не работа, а отчёт. Тогда
+    # в листе должно стоять, ГДЕ следующий рубеж, иначе пункт «что я делаю дальше»
+    # не говорит ничего.
+    if gap_rows:
+        head = (f"Добираю строки из топ-60, про которые не знаем ничего: осталось "
+                f"{ru(gap_rows)} строк на {ru(gap_usd)} USD.")
+    else:
+        left_rows, left_usd = next_frontier(rows, rv)
+        head = (f"Топ-60 по деньгам разобран целиком. Следующий рубеж — остальные "
+                f"{ru(left_rows)} оценённых строк на {ru(left_usd)} USD, беру их "
+                f"кластерами по изготовителю и по каналу.")
+    a(f"<li>{head} Перепроверкой закрыто {cov_pct:.1f} % экспозиции — и вот чего "
+      f"эта доля НЕ значит: экспозиция есть только у {ru(priced_rows)} строк заявки из "
+      f"{ru(all_rows)}, у остальных {ru(all_rows - priced_rows)} вилки нет вовсе и в знаменатель "
+      f"они не входят. То есть это доля проверенного от ОЦЕНЁННОЙ части заявки, а не от "
+      f"заявки.</li>")
     a("<li>Веду перепроверку крупных строк с проверкой на опровержение — без неё не устояло "
       f"{ru(fell)} выводов, и это цена отсутствия такой проверки раньше.</li>")
     a("<li>Держу прогон выгрузки на охвате «Энергосети»: он даёт цены поставщиков по нашим "
