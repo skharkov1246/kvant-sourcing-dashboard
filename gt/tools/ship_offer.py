@@ -389,9 +389,99 @@ def build(rows: list, ours: dict, fx_day: str, supp: dict | None = None) -> str:
         parts.append(f'<div class="sec"><h2>{n}. {E(title)} — {len(js)} строк</h2>'
                      f'<p class="lead">{E(lead)}</p>' + table(js) + "</div>")
 
+    parts.append(reverify_section(rows, supp))
+
     return ("<!doctype html><html lang='ru'><head><meta charset='utf-8'>"
             "<title>Выставленные цены против рынка</title>"
             f"<style>{CSS}</style></head><body>{''.join(parts)}</body></html>")
+
+
+def reverify_rows() -> list[dict]:
+    """Строки перепроверки: только номер, вердикт и основание, без чисел.
+
+    Количество и вилка берутся из сводки заявки, а не отсюда: в самом наборе
+    перепроверки числа хранить запрещено (три строки уже несли выдуманные).
+    """
+    src = ROOT / "gt/data/ship_reverify.json"
+    if not src.exists():
+        return []
+    doc = json.loads(src.read_text(encoding="utf-8"))
+    return doc["rows"] if isinstance(doc, dict) else doc
+
+
+def verdict_vs_offer(lo, hi, offer) -> str:
+    """Что КП поставщика делает с нашей вилкой.
+
+    Это и есть решающее сравнение: письменное предложение контрагента по этой
+    самой заявке сильнее любой карточки с витрины. Где предложения нет, так и
+    написано — «в файлах сделки этой строки нет», без домысла.
+    """
+    if offer is None:
+        return "в файлах сделки этой строки нет"
+    if lo in (None, "") or hi in (None, ""):
+        return "вилки по строке нет — сравнивать не с чем"
+    lo, hi = float(lo), float(hi)
+    if offer > hi:
+        return f"ЗАНИЖЕНИЕ подтверждено поставщиком: он просит выше потолка {money(hi)}"
+    if offer < lo:
+        return f"ЗАВЫШЕНИЕ подтверждено поставщиком: он просит ниже пола {money(lo)}"
+    return "вилка верна: предложение поставщика внутри неё"
+
+
+def reverify_section(rows: list, supp: dict) -> str:
+    """Таблица «наш вердикт против того, что прислал поставщик».
+
+    Зачем отдельным разделом: по этим строкам решение принимается на защите, и
+    разведка по витринам для них — слабейшее доказательство. КП поставщика из
+    вложения сделки закрывает вопрос одной строкой.
+    """
+    rv = reverify_rows()
+    if not rv:
+        return ""
+    by = {norm_key(r["pn"]): r for r in rows if r.get("pn")}
+    out, hits = [], 0
+    for x in rv:
+        pn = str(x.get("pn") or "").split("(")[0].strip()
+        r = by.get(norm_key(pn)) or {}
+        sp, _ = lookup(supp, pn)
+        offer = sp["usd"] if sp else None
+        if offer is not None:
+            hits += 1
+        out.append({"pn": pn, "verdict": (x.get("band_verdict") or ""),
+                    "name": (r.get("name") or ""), "qty": int(r.get("qty") or 0),
+                    "lo": r.get("usd_lo"), "hi": r.get("usd_hi"),
+                    "offer": offer, "sp": sp,
+                    "what": verdict_vs_offer(r.get("usd_lo"), r.get("usd_hi"), offer)})
+    out.sort(key=lambda z: (z["offer"] is None, -(z["offer"] or 0) * z["qty"]))
+    head = (f'<div class="sec"><h2>Перепроверенные строки против КП поставщиков — '
+            f'{len(out)} строк, предложение нашлось по {hits}</h2>'
+            '<p class="lead">По этим строкам решение принимается на защите. '
+            'Письменное предложение контрагента по этой самой заявке сильнее любой '
+            'карточки с витрины, поэтому здесь наш вердикт стоит рядом с тем, что '
+            'поставщик реально прислал. Где предложения в файлах нет, так и '
+            'написано — домысла в этой таблице нет.</p>')
+    th = ('<tr><th style="width:10%">Артикул</th><th style="width:24%">Наименование</th>'
+          '<th style="width:5%">Кол-во</th><th style="width:10%">Наша вилка, USD/шт</th>'
+          '<th style="width:9%">КП поставщика, USD/шт</th>'
+          '<th style="width:14%">Наш вердикт</th>'
+          '<th style="width:28%">Что с этим делает предложение поставщика</th></tr>')
+    body = []
+    for z in out:
+        band = ("—" if z["lo"] in (None, "") or z["hi"] in (None, "")
+                else f'{money(z["lo"])} – {money(z["hi"])}')
+        src = ""
+        if z["sp"]:
+            src = (f'<tr class="b"><td colspan="7"><b>Откуда КП:</b> '
+                   f'{E(z["sp"]["origin"])}, поле «{E(z["sp"].get("field") or "")}», файл '
+                   f'«{E(z["sp"]["file"])}», строка {E(z["sp"]["row"])}, '
+                   f'{money(z["sp"]["raw_price"])} {E(z["sp"]["currency"])}</td></tr>')
+        body.append(f'<tbody class="p"><tr><td><span class="pn">{E(z["pn"])}</span></td>'
+                    f'<td>{E(z["name"][:110])}</td><td>{ru(z["qty"])}</td>'
+                    f'<td>{band}</td>'
+                    f'<td>{money(z["offer"]) if z["offer"] is not None else ""}</td>'
+                    f'<td>{E(z["verdict"][:60])}</td><td>{E(z["what"])}</td></tr>'
+                    f'{src}</tbody>')
+    return head + f'<table class="t"><thead>{th}</thead>{"".join(body)}</table></div>'
 
 
 def diagnose(rows: list, ours: dict, supp: dict | None = None,
