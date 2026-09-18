@@ -974,28 +974,6 @@
     {
       "from": "Solar Turbines",
       "from_key": "solarturbines",
-      "to": "Versa Products (OE Solar по соленоидам) — серия V/VSG",
-      "to_key": "versaproductsoesolarпосоленоидамсерияvvs",
-      "kind": "maker",
-      "relation": "makes_for",
-      "scope": [
-        "Taurus 70 и Taurus 70MD (унифицированнные)",
-        "Taurus 60S",
-        "Taurus 60S, Taurus 70 и Taurus 70MD (унифицированнные)",
-        "Taurus 70MD"
-      ],
-      "proof": [
-        "П3 — Versa доказан OE по SEPOC-кроссу"
-      ],
-      "sources": [
-        "gt/data/pn_db.json"
-      ],
-      "n": 8,
-      "from_is_bucket": false
-    },
-    {
-      "from": "Solar Turbines",
-      "from_key": "solarturbines",
       "to": "Типовые: EAO/ABB/Schneider — по формату",
       "to_key": "типовыеeaoabbschneiderпоформату",
       "kind": "maker",
@@ -1093,6 +1071,28 @@
       ],
       "proof": [
         "П1"
+      ],
+      "sources": [
+        "gt/data/pn_db.json"
+      ],
+      "n": 7,
+      "from_is_bucket": false
+    },
+    {
+      "from": "Solar Turbines",
+      "from_key": "solarturbines",
+      "to": "Versa Products (OE Solar по соленоидам) — серия V/VSG",
+      "to_key": "versaproductsoesolarпосоленоидамсерияvvs",
+      "kind": "maker",
+      "relation": "makes_for",
+      "scope": [
+        "Taurus 70 и Taurus 70MD (унифицированнные)",
+        "Taurus 60S",
+        "Taurus 60S, Taurus 70 и Taurus 70MD (унифицированнные)",
+        "Taurus 70MD"
+      ],
+      "proof": [
+        "П3 — Versa доказан OE по SEPOC-кроссу"
       ],
       "sources": [
         "gt/data/pn_db.json"

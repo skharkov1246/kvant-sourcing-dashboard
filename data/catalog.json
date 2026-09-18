@@ -4,16 +4,16 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 235,
-    "total_bytes": 107750788,
+    "datasets": 236,
+    "total_bytes": 108040963,
     "by_sensitivity": {
       "конфиденциально": 62,
       "внутреннее": 132,
-      "публикуемо": 41
+      "публикуемо": 42
     },
     "by_subproject": {
       "ГПУ-библиотека": 29,
-      "ГТУ-библиотека": 58,
+      "ГТУ-библиотека": 59,
       "ОВЭ-75": 45,
       "база ЗИП": 49,
       "база ЗИП · таможня": 18,
@@ -87,7 +87,7 @@
     {
       "path": "gt/data/pn_db.json",
       "subproject": "ГТУ-библиотека",
-      "bytes": 7430282,
+      "bytes": 7430783,
       "note": "База номенклатуры (part numbers) ГТУ. Дублируется в gt/public/wizard/data.js и pnw/public/data.js — при правке обновлять все три или собирать из одного источника.",
       "format": "json",
       "shape": "объект",
@@ -390,7 +390,7 @@
     {
       "path": "gt/data/ship_reverify.json",
       "subproject": "ГТУ-библиотека",
-      "bytes": 4092141,
+      "bytes": 4372793,
       "note": "Перепроверка крупнейших строк заявки ЛУКОЙЛ: по каждой строке заново установлено, что это за изделие, кто его делает на самом деле и под каким своим номером, жив ли номер, сколько позиция стоит в открытых каналах, есть ли рабочий канал закупки и что мешает закрыть строку. Отбор строк — по экспозиции: топ-60 дают 67 % от 9 277 410 USD экспозиции всей заявки (экспозиция = середина нашей оценочной вилки, умноженная на количество). Поле band_verdict говорит, что стало с нашей прежней оценкой: ЗАНИЖЕНА, ЗАВЫШЕНА, ВЕРНА или НЕЧЕМ ПРОВЕРИТЬ. Последнее — НЕ «дорого» и не «дёшево», а отсутствие открытой цены во всех каналах; складывать эти группы в одну цифру нельзя. Поле skeptics несёт результат проверки вывода на опровержение; пустой список означает, что проверка не прогонялась, и приравнивать это к подтверждению нельзя — исследователь уже был пойман на выдуманной цитате. ВНИМАНИЕ: набор пополняется по ходу, и до окончания прогона он ЧАСТИЧНЫЙ — число строк в нём меньше шестидесяти. Собирается рабочим процессом перепроверки, читается gt/tools/ship_reverify.py. Цены здесь рыночные, из открытых карточек продавцов; выставленных заказчику цен в наборе нет.",
       "format": "json",
       "shape": "объект",
@@ -401,7 +401,7 @@
       ],
       "main_collection": {
         "key": "rows",
-        "records": 423,
+        "records": 465,
         "record_keys": [
           "band_verdict",
           "blocker",
@@ -428,7 +428,7 @@
       },
       "last_change": "2026-09-18",
       "last_author": "Claude",
-      "last_commit": "411aee9",
+      "last_commit": "2ba5cd9",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -443,8 +443,8 @@
         "gt/tools/rv_merge.py",
         "gt/tools/seller_groups.py",
         "gt/tools/ship_brief.py",
-        "gt/tools/ship_decisions.py",
-        "gt/tools/ship_export.py"
+        "gt/tools/ship_coverage.py",
+        "gt/tools/ship_decisions.py"
       ]
     },
     {
@@ -1815,7 +1815,7 @@
       },
       "last_change": "2026-09-18",
       "last_author": "Claude",
-      "last_commit": "7bb4a57",
+      "last_commit": "2ba5cd9",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -1823,6 +1823,7 @@
       },
       "referenced_by": [
         "gt/tools/lists_fold.py",
+        "gt/tools/ship_coverage.py",
         "gt/tools/ship_final.py",
         "tests/test_lists_fold.py"
       ]
@@ -3385,6 +3386,51 @@
       ]
     },
     {
+      "path": "gt/data/ship_questions.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 166355,
+      "note": "Вопросы к заказчику по заявке ЛУКОЙЛ: 54 позиции. Часть ведётся руками (вывод инженера по разбору проверок), часть дописывает gt/tools/collisions.py --questions по замеру gt/data/ship_collisions.json — 32 вопроса о номерах, под которыми в заявке идут РАЗНЫЕ детали: такой вопрос механический, и писать его руками тридцать два раза нечего. У дописанных стоит поле source. Дозапись идемпотентна: повторный прогон не плодит дубликаты, уже заданные номера он называет. Прежний состав, ведомый руками — 22 позиции на 5 208 штук: 13 позиций на 5 208 штук, по которым запрос цены уйдёт впустую, пока не расшифрована номенклатура. Не производная от данных, а вывод инженера по разбору проверок, поэтому файл ведётся руками. Шесть родов неясности: неизвестна фасовка (DCA4 — не артикул, а семейство: пинта, канистра 1,89 л, ведро 18,9 л, бочка 208 л или вовсе фильтр, разброс по деньгам в двадцать раз); комплекты или штуки (свечи Jenbacher идут банками по 4, 587 комплектов это 2 348 свечей); снятый или несуществующий номер (цепочки 334976 → 389588 → 433894, 201601 → 255377 → 1219674, 263174 → 1219670; номер 265174 не найден ни у одного из семи поставщиков); не определён тип машины (657541 для Type 2/3/4 кабель зажигания, для Type 6 наконечник свечи — разные изделия); не определено исполнение (класс прочности крепежа SGT-400 в номере Ruston не закодирован; размер высокотемпературной стяжки из номера не выводится); наименование расходится с каталогом (4970773 в заявке уплотнительная шайба, у Cummins RING, SPARK PLUG). По каждой строке записано, что уже установлено самостоятельно, чтобы заказчик подтверждал, а не искал заново. Правило: пока строка здесь, она не идёт ни в письма запроса цен, ни в сумму закупки. Читаемая версия — gt/docs/ВОПРОСЫ-ЗАКАЗЧИКУ-ЛУКОЙЛ.pdf, собирается gt/tools/ship_questions.py.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "method",
+        "questions",
+        "rule",
+        "source",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "questions",
+        "records": 91,
+        "record_keys": [
+          "ask",
+          "cost",
+          "kind",
+          "known",
+          "pn",
+          "qty",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "2ba5cd9",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/collisions.py",
+        "gt/tools/questions_doc.py",
+        "gt/tools/ship_brief.py",
+        "gt/tools/ship_decisions.py",
+        "gt/tools/ship_final.py",
+        "gt/tools/ship_questions.py",
+        "tests/test_ship_collisions.py"
+      ]
+    },
+    {
       "path": "gt/data/lm6000.json",
       "subproject": "ГТУ-библиотека",
       "bytes": 162366,
@@ -3421,51 +3467,6 @@
         "gt/tools/build_lm6000.py",
         "gt/tools/drop_ru.py",
         "library/load_suppliers.py"
-      ]
-    },
-    {
-      "path": "gt/data/ship_questions.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 160779,
-      "note": "Вопросы к заказчику по заявке ЛУКОЙЛ: 54 позиции. Часть ведётся руками (вывод инженера по разбору проверок), часть дописывает gt/tools/collisions.py --questions по замеру gt/data/ship_collisions.json — 32 вопроса о номерах, под которыми в заявке идут РАЗНЫЕ детали: такой вопрос механический, и писать его руками тридцать два раза нечего. У дописанных стоит поле source. Дозапись идемпотентна: повторный прогон не плодит дубликаты, уже заданные номера он называет. Прежний состав, ведомый руками — 22 позиции на 5 208 штук: 13 позиций на 5 208 штук, по которым запрос цены уйдёт впустую, пока не расшифрована номенклатура. Не производная от данных, а вывод инженера по разбору проверок, поэтому файл ведётся руками. Шесть родов неясности: неизвестна фасовка (DCA4 — не артикул, а семейство: пинта, канистра 1,89 л, ведро 18,9 л, бочка 208 л или вовсе фильтр, разброс по деньгам в двадцать раз); комплекты или штуки (свечи Jenbacher идут банками по 4, 587 комплектов это 2 348 свечей); снятый или несуществующий номер (цепочки 334976 → 389588 → 433894, 201601 → 255377 → 1219674, 263174 → 1219670; номер 265174 не найден ни у одного из семи поставщиков); не определён тип машины (657541 для Type 2/3/4 кабель зажигания, для Type 6 наконечник свечи — разные изделия); не определено исполнение (класс прочности крепежа SGT-400 в номере Ruston не закодирован; размер высокотемпературной стяжки из номера не выводится); наименование расходится с каталогом (4970773 в заявке уплотнительная шайба, у Cummins RING, SPARK PLUG). По каждой строке записано, что уже установлено самостоятельно, чтобы заказчик подтверждал, а не искал заново. Правило: пока строка здесь, она не идёт ни в письма запроса цен, ни в сумму закупки. Читаемая версия — gt/docs/ВОПРОСЫ-ЗАКАЗЧИКУ-ЛУКОЙЛ.pdf, собирается gt/tools/ship_questions.py.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "method",
-        "questions",
-        "rule",
-        "source",
-        "updated"
-      ],
-      "main_collection": {
-        "key": "questions",
-        "records": 87,
-        "record_keys": [
-          "ask",
-          "cost",
-          "kind",
-          "known",
-          "pn",
-          "qty",
-          "unit"
-        ]
-      },
-      "last_change": "2026-09-18",
-      "last_author": "Claude",
-      "last_commit": "411aee9",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "gt/tools/collisions.py",
-        "gt/tools/questions_doc.py",
-        "gt/tools/ship_brief.py",
-        "gt/tools/ship_decisions.py",
-        "gt/tools/ship_final.py",
-        "gt/tools/ship_questions.py",
-        "tests/test_ship_collisions.py"
       ]
     },
     {
@@ -5088,7 +5089,7 @@
     {
       "path": "data/catalog_notes.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 82792,
+      "bytes": 83490,
       "note": "",
       "format": "json",
       "shape": "объект",
@@ -5117,6 +5118,7 @@
         "gt/data/ship_channels.json",
         "gt/data/ship_collisions.json",
         "gt/data/ship_confidence.json",
+        "gt/data/ship_coverage.json",
         "gt/data/ship_decoded.json",
         "gt/data/ship_demand_collisions.json",
         "gt/data/ship_energoseti.json",
@@ -5131,8 +5133,7 @@
         "gt/data/ship_recheck.json",
         "gt/data/ship_reverify.json",
         "gt/data/ship_rfq_letters.json",
-        "gt/data/ship_seller_groups.json",
-        "gt/data/ship_seller_independence.json"
+        "gt/data/ship_seller_groups.json"
       ],
       "last_change": "2026-09-18",
       "last_author": "Claude",
@@ -8176,7 +8177,7 @@
       },
       "last_change": "2026-09-18",
       "last_author": "Claude",
-      "last_commit": "fa796d6",
+      "last_commit": "2ba5cd9",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -8903,6 +8904,8 @@
         "gpu/build.py",
         "gpu/tools/coverage.py",
         "gt/public/faults.html",
+        "gt/tools/ship_coverage.py",
+        "gt/tools/ship_final.py",
         "scripts/build_chain_coverage.py",
         "scripts/build_chain_page.py",
         "tests/test_dict.py",
@@ -9872,7 +9875,7 @@
       },
       "last_change": "2026-09-18",
       "last_author": "Claude",
-      "last_commit": "411aee9",
+      "last_commit": "2ba5cd9",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
@@ -9961,6 +9964,43 @@
         "gt/tools/homoglyphs.py",
         "gt/tools/ship_final.py",
         "tests/test_homoglyphs.py"
+      ]
+    },
+    {
+      "path": "gt/data/ship_coverage.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 2748,
+      "note": "Покрытие заявки ЛУКОЙЛ по ступеням понимания: опознана → есть кому написать → есть цена и адрес → отгружаема. Лестница накопительна (каждая ступень требует предыдущих), признаки по отдельности независимы и в лестницу не складываются. Считается и в строках, и в деньгах; строки без нашей оценки в денежный счёт не входят и названы отдельно. Считает gt/tools/ship_coverage.py.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "caveat",
+        "ladder",
+        "rows_total",
+        "rows_without_band",
+        "rows_without_band_identified",
+        "source",
+        "steps",
+        "updated",
+        "usd_total",
+        "why_steps"
+      ],
+      "main_collection": {
+        "key": "steps",
+        "records": 5
+      },
+      "last_change": null,
+      "last_author": null,
+      "last_commit": null,
+      "updated_by": "неизвестно",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/ship_coverage.py",
+        "gt/tools/ship_final.py",
+        "tests/test_ship_coverage.py"
       ]
     },
     {
