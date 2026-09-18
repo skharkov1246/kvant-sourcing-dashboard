@@ -83,6 +83,27 @@ def rfq_en_size(rows: list, en: dict) -> tuple[int, float]:
     return len(sel), sum(float(r.get("qty") or 0) for r in sel)
 
 
+def top_gap(rows: list, rv: list, top: int = 60) -> tuple[int, float, float]:
+    """Сколько крупных строк ещё не разобрано и сколько это денег.
+
+    Считается, а не вписывается: замер «705 095 USD на девятнадцати строках»
+    стоял в листе числом и устаревал каждый раз, как разведка закрывала строку.
+    Возвращает: строк без разбора в топ-N, их экспозиция, доля разобранной
+    экспозиции по всей заявке.
+    """
+    import re as _re
+
+    def k(pn) -> str:
+        return _re.sub(r"[^A-Z0-9]", "", str(pn or "").split("(")[0].upper())
+
+    done = {k(r.get("pn")) for r in rv}
+    live = sorted(((expo(r), r) for r in rows if expo(r) > 0), key=lambda x: -x[0])
+    whole = sum(e for e, _ in live) or 1.0
+    covered = sum(e for e, r in live if k(r.get("pn")) in done)
+    rest = [(e, r) for e, r in live[:top] if k(r.get("pn")) not in done]
+    return len(rest), sum(e for e, _ in rest), covered / whole * 100
+
+
 def build() -> str:
     rows = (load("ship_lukoil.json") or {}).get("rows") or []
     ch = load("ship_channels.json") or {}
@@ -148,6 +169,15 @@ def build() -> str:
       f"<td class='dim'>не устояло выводов: {ru(fell)}. Каждое возражение — либо цифра не с той "
       f"страницы, либо вывод не о том предмете, либо сравнение с вилкой, которой в данных "
       f"нет</td></tr>")
+    g = ((en.get("totals") or {}).get("qty_gap") or {})
+    if g.get("qty_summary_above_source"):
+        a(f"<tr class='big'><td>артикулов, где заявка просит больше своего же английского "
+          f"листа</td><td class='n'>{ru(g['qty_summary_above_source'])} из "
+          f"{ru(g['pns_measured'])}</td>"
+          f"<td class='dim'>{ru(g['usd_at_stake'])} USD экспозиции стоит на количестве, которое "
+          f"первоисточником не подтверждено. Это НЕ обвинение в переплате: лист может покрывать "
+          f"меньше машин, чем заявка. Но у одного болта 16 штук листа превратились в 1 168, и "
+          f"так это не объясняется</td></tr>")
     if (en.get("totals") or {}).get("in_request"):
         a(f"<tr><td>строк с восстановленным английским оригиналом наименования</td>"
           f"<td class='n'>{ru(en['totals']['in_request'])}</td>"
@@ -191,6 +221,14 @@ def build() -> str:
       "<td class='n'>прогон без Actions</td><td>настройка</td>"
       "<td>сейчас выгрузка идёт только через Actions, и документ с ценами приходится забирать "
       "артефактом</td></tr>")
+    if g.get("qty_summary_above_source"):
+        a("<tr><td><b>Письменное подтверждение количества и числа машин</b> у заказчика</td>"
+          f"<td class='n'>{ru(g['usd_at_stake'])} USD<br>{ru(g['qty_summary_above_source'])} "
+          f"артикулов</td><td>один запрос</td>"
+          f"<td>по этим артикулам заявка просит больше своего английского листа. Пока количество "
+          f"не подтверждено, запрашивать по ним цену бессмысленно: по болту камеры сгорания "
+          f"подтверждение количества стоит дороже любой цены, какую по нему можно найти</td>"
+          f"</tr>")
     tail = ((ch.get("measure") or {}).get("tail") or {})
     a("<tr><td><b>Решение по остатку заявки вне карты каналов</b></td>"
       f"<td class='n'>{ru(tail.get('usd'))} USD<br>{ru(tail.get('rows'))} строк</td>"
@@ -201,9 +239,10 @@ def build() -> str:
     a("</table>")
 
     a("<h2>Что я делаю дальше без вас</h2><ol>")
-    a("<li>Добираю строки из топ-60, про которые не знаем ничего: по деньгам это "
-      "705 095 USD на девятнадцати строках — замер на 18.09.2026, он уменьшается по ходу "
-      "разведки.</li>")
+    gap_rows, gap_usd, cov_pct = top_gap(rows, rv)
+    a(f"<li>Добираю строки из топ-60, про которые не знаем ничего: осталось {ru(gap_rows)} строк "
+      f"на {ru(gap_usd)} USD. По всей заявке перепроверкой закрыто {cov_pct:.1f} % "
+      f"экспозиции.</li>")
     a("<li>Веду перепроверку крупных строк с проверкой на опровержение — без неё не устояло "
       f"{ru(fell)} выводов, и это цена отсутствия такой проверки раньше.</li>")
     a("<li>Держу прогон выгрузки на охвате «Энергосети»: он даёт цены поставщиков по нашим "
