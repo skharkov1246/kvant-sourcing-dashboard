@@ -179,6 +179,16 @@ def measure() -> dict:
         "weak_by_db_basis_usd": round(db_usd, 2),
         "weak_closed_by_reverify_rows": both_rows,
         "weak_closed_by_reverify_usd": round(both_usd, 2),
+        # ПОСЛЕ apply_makers ЭТО ПЕРЕСЕЧЕНИЕ СТРУКТУРНО НУЛЕВОЕ, и молчать об этом
+        # нельзя. Инструмент apply_makers заменяет догадку в разметке настоящим
+        # именем и ставит основание «П0 — каталог изготовителя», поэтому закрытая
+        # строка перестаёт быть догадкой и в пересечение больше не попадает.
+        # Печатать ноль как измерение — это ровно правило 1 CLAUDE.md: эталон,
+        # выведенный из правила, а не из данных. Флаг отличает «ничего не закрыли»
+        # от «закрытое уже вычтено из разметки».
+        "weak_closed_tautological": bool(both_rows == 0 and next(
+            (c["rows_in_request"] for c in classes
+             if c["basis"] == "каталог изготовителя (перепроверка)"), 0) > 0),
         "closed_by_reverify_rows": next(
             (c["rows_in_request"] for c in classes
              if c["basis"] == "каталог изготовителя (перепроверка)"), 0),
@@ -205,9 +215,15 @@ def main() -> int:
              if m["request_exposure"] else 0)
     print(f"догадка по классу в самой разметке: {m['weak_by_db_basis_rows']} строк на "
           f"{m['weak_by_db_basis_usd']:,.0f} USD".replace(",", " "))
-    print(f"из них перепроверка уже закрыла каталогом {m['weak_closed_by_reverify_rows']} строк "
-          f"на {m['weak_closed_by_reverify_usd']:,.0f} USD; ОСТАЛОСЬ РАБОТЫ "
-          f"{m['weak_usd_in_request']:,.0f} USD ({share:.1f} % экспозиции)".replace(",", " "))
+    if m["weak_closed_tautological"]:
+        print(f"закрытое перепроверкой из разметки уже вычтено: применённый изготовитель "
+              f"заменил догадку — поэтому пересечение здесь структурно нулевое. ОСТАЛОСЬ "
+              f"РАБОТЫ {m['weak_usd_in_request']:,.0f} USD "
+              f"({share:.1f} % экспозиции)".replace(",", " "))
+    else:
+        print(f"из них перепроверка уже закрыла каталогом {m['weak_closed_by_reverify_rows']} "
+              f"строк на {m['weak_closed_by_reverify_usd']:,.0f} USD; ОСТАЛОСЬ РАБОТЫ "
+              f"{m['weak_usd_in_request']:,.0f} USD ({share:.1f} % экспозиции)".replace(",", " "))
     print(f"всего закрыто каталогом при перепроверке: {m['closed_by_reverify_rows']} строк на "
           f"{m['closed_by_reverify_usd']:,.0f} USD — это НЕ подмножество догадок, там есть "
           f"строки с другим основанием".replace(",", " "))
