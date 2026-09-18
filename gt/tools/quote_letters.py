@@ -38,6 +38,8 @@ from datetime import date
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from pnkey import key as _key  # noqa: E402
 ASK = ROOT / "gt/data/ship_lukoil.json"
 RV = ROOT / "gt/data/ship_reverify.json"
 LEAK = ROOT / "gt/data/ship_leak.json"
@@ -88,7 +90,8 @@ tr { page-break-inside: avoid; }
 
 
 def key(x) -> str:
-    return re.sub(r"[^A-Z0-9]", "", str(x or "").split("(")[0].upper())
+    """Ключ сведения номера — один на все инструменты, см. gt/tools/pnkey.py."""
+    return _key(x)
 
 
 def expo(r: dict) -> float:

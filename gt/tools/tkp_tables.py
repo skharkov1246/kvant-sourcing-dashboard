@@ -47,6 +47,8 @@ from collections import Counter
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from pnkey import key as _key  # noqa: E402
 ASK = ROOT / "gt/data/ship_lukoil.json"
 FX = ROOT / "gt/data/fx_rates.json"
 
@@ -87,7 +89,8 @@ MIN_QTY = 2
 
 
 def norm_key(pn) -> str:
-    return re.sub(r"[^A-Z0-9]", "", str(pn or "").split("(")[0].upper())
+    """Ключ сведения номера — один на все инструменты, см. gt/tools/pnkey.py."""
+    return _key(pn)
 
 
 # Слова-единицы и служебные пометки: номером быть не могут.
