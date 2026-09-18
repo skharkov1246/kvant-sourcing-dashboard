@@ -150,3 +150,27 @@ def test_англицизм_чистится_на_входе(tmp_path, monkeypat
     got = r["took"][0]["note"]
     assert "прейскуранта" in got
     assert "«price list 2026»" in got
+
+
+def test_нечитаемый_файл_роняет_код_возврата_а_не_строку_в_списке(tmp_path, monkeypatch):
+    """Отказ на уровне ФАЙЛА виден плохо в общем списке отказов.
+
+    18.09.2026 одна выдача разведки читалась в момент записи. Приёмник честно
+    записал отказ — но одной строкой среди сотни, и двенадцать разобранных
+    строк уцелели только потому, что я сверил суммы вручную. Теперь такие
+    отказы идут отдельным набором и роняют код возврата: пропустить их нельзя.
+    """
+    import rv_merge as rm
+
+    a = tmp_path / "ask.json"
+    a.write_text(json.dumps({"rows": [{"pn": "AB-1"}]}, ensure_ascii=False), encoding="utf-8")
+    o = tmp_path / "out.json"
+    o.write_text(json.dumps({"rows": []}, ensure_ascii=False), encoding="utf-8")
+    broken = tmp_path / "broken.json"
+    broken.write_text('{"rows": [{"pn": "AB-1",', encoding="utf-8")   # обрыв записи
+    monkeypatch.setattr(rm, "ASK", a)
+    monkeypatch.setattr(rm, "OUT", o)
+    r = rm.merge([broken], dry=True)
+    assert r["bad_files"], "нечитаемый файл обязан попасть в отдельный набор"
+    assert not r["left"], "он не должен маскироваться под отказ по строке"
+    assert r["bad_files"][0][0] == "broken.json"

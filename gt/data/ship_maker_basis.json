@@ -5,25 +5,25 @@
  "why": "Звено «исполнитель» отвечает на вопрос «у кого спрашивать», и ответ стоит ровно столько, сколько его основание. 18.09.2026 разведка открыла каталоги изготовителей и опровергла нашу разметку дважды: масляный фильтр Fleetguard был приписан четырём фильтровым домам «по типу», а наконечник свечи Jenbacher — авиационному поставщику зажигания «типично». Оба раза изготовитель был выведен из КЛАССА изделия, а не из документа.",
  "totals": {
   "db_rows": 12442,
-  "maker_named": 2860,
+  "maker_named": 2855,
   "request_rows_with_band": 857,
   "request_exposure": 9277409.8,
-  "weak_rows_in_request": 153,
-  "weak_usd_in_request": 260270.2,
+  "weak_rows_in_request": 146,
+  "weak_usd_in_request": 252510.2,
   "weak_by_db_basis_rows": 153,
   "weak_by_db_basis_usd": 260270.2,
-  "weak_closed_by_reverify_rows": 0,
-  "weak_closed_by_reverify_usd": 0.0,
-  "weak_closed_tautological": true,
-  "closed_by_reverify_rows": 86,
-  "closed_by_reverify_usd": 5388000.75
+  "weak_closed_by_reverify_rows": 7,
+  "weak_closed_by_reverify_usd": 7760.0,
+  "weak_closed_tautological": false,
+  "closed_by_reverify_rows": 183,
+  "closed_by_reverify_usd": 5776278.75
  },
  "classes": [
   {
    "basis": "каталог изготовителя (перепроверка)",
-   "rows_in_db": 86,
-   "rows_in_request": 86,
-   "usd_in_request": 5388000.75,
+   "rows_in_db": 183,
+   "rows_in_request": 183,
+   "usd_in_request": 5776278.75,
    "why": "изготовитель вскрыт по каталогу при перепроверке строки — это факт со страницы, а не наша оценка; счёт берётся из gt/data/ship_reverify.json и растёт сам по ходу перепроверки"
   },
   {
@@ -35,23 +35,23 @@
   },
   {
    "basis": "заказной код",
-   "rows_in_db": 142,
-   "rows_in_request": 92,
-   "usd_in_request": 199762.0,
+   "rows_in_db": 92,
+   "rows_in_request": 42,
+   "usd_in_request": 15687.0,
    "why": "номер сам по себе является кодом изготовителя: проверять нечего"
   },
   {
    "basis": "назван заказчиком",
-   "rows_in_db": 121,
-   "rows_in_request": 121,
-   "usd_in_request": 134390.0,
+   "rows_in_db": 95,
+   "rows_in_request": 95,
+   "usd_in_request": 65510.0,
    "why": "изготовитель взят из наименования заявки — это слова заказчика, а не каталог"
   },
   {
    "basis": "чертёж или узел пакета",
-   "rows_in_db": 239,
-   "rows_in_request": 227,
-   "usd_in_request": 1013362.0,
+   "rows_in_db": 236,
+   "rows_in_request": 224,
+   "usd_in_request": 986862.0,
    "why": "принадлежность к чертежу или к пакету поставки; изготовитель узла может быть чужим"
   },
   {
@@ -63,9 +63,9 @@
   },
   {
    "basis": "догадка по классу",
-   "rows_in_db": 208,
-   "rows_in_request": 153,
-   "usd_in_request": 260270.2,
+   "rows_in_db": 201,
+   "rows_in_request": 146,
+   "usd_in_request": 252510.2,
    "why": "изготовитель выведен из КЛАССА изделия. Это тот же приём, которым VS-4-57 стал виброизолятором; за 18.09.2026 опровергнут дважды открытыми каталогами"
   },
   {
@@ -77,9 +77,9 @@
   },
   {
    "basis": "основание не записано",
-   "rows_in_db": 483,
-   "rows_in_request": 204,
-   "usd_in_request": 690894.1,
+   "rows_in_db": 467,
+   "rows_in_request": 189,
+   "usd_in_request": 539001.1,
    "why": "поле основания пустое"
   }
  ]

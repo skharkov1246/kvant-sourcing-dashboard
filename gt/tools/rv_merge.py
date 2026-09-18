@@ -71,6 +71,14 @@ CIRCULAR = (
     ("github.com/skharkov1246", "наш собственный репозиторий: подтверждение самим собой"),
     ("claude.ai/code", "наша собственная сессия работы, а не источник"),
     ("kvant-sourcing-dashboard", "наш собственный репозиторий: подтверждение самим собой"),
+    # Зеркало нашей же заявки. Найдено разведкой 18.09.2026: страница дословно
+    # повторяет строки заявки НА РУССКОМ, вместе с позиционными пометками вида
+    # «п H06», и при этом остаётся единственной в мире, где эти номера NOV
+    # вообще встречаются. Ровно поэтому она опасна: выглядит как сильнейшее
+    # подтверждение номера, а является отражением нашего же текста. Цен на ней
+    # нет — как канал обращения годится, как свидетель нет.
+    ("ausenist.com", "страница дословно повторяет строки нашей заявки на русском: "
+                     "это зеркало нашего же текста, а не независимый источник"),
 )
 SEARCH_ENGINES = ("google.com/search", "yandex.ru/search", "bing.com/search",
                   "duckduckgo.com/?q", "search.marcia", "ya.ru/search")
@@ -172,11 +180,18 @@ def merge(paths: list[Path], dry: bool = False, update: bool = False) -> dict:
     have = {key(r.get("pn")) for r in out["rows"]}
     by_key = {key(r.get("pn")): r for r in out["rows"]}
     took, left = [], []
+    bad_files: list[tuple[str, str]] = []
     for p in paths:
         try:
             d = json.loads(p.read_text(encoding="utf-8"))
         except Exception as e:                                  # noqa: BLE001
-            left.append((p.name, "—", f"файл не читается: {e}"))
+            # Отказ на уровне ФАЙЛА — не то же, что отказ по строке, и в общем
+            # списке отказов его видно плохо. 18.09.2026 одна выдача читалась в
+            # момент записи, приёмник честно записал отказ — но одной строкой
+            # среди сотни, и двенадцать разобранных строк уцелели только потому,
+            # что я сверил суммы вручную. Такие отказы печатаются отдельным
+            # блоком и роняют код возврата.
+            bad_files.append((p.name, f"{type(e).__name__}: {e}"))
             continue
         for r in (d["rows"] if isinstance(d, dict) else d):
             why = check(r, ask, have, update)
@@ -198,7 +213,8 @@ def merge(paths: list[Path], dry: bool = False, update: bool = False) -> dict:
             out["rows"] = out["rows"] + took
         OUT.write_text(json.dumps(out, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     grown = 0 if update else (len(took) if dry else 0)
-    return {"took": took, "left": left, "total": len(out["rows"]) + grown}
+    return {"took": took, "left": left, "bad_files": bad_files,
+            "total": len(out["rows"]) + grown}
 
 
 def main() -> int:
@@ -214,6 +230,15 @@ def main() -> int:
         print(f"  + {str(row['pn']):18} {vkey(row):18} {str(row.get('price_low'))}")
     for name, pn, why in r["left"]:
         print(f"  ОТКАЗ {name} / {pn}: {why}")
+    if r["bad_files"]:
+        print("\nФАЙЛЫ НЕ ПРОЧИТАНЫ — РАЗВЕДКА ПО НИМ НЕ СЛИТА:", file=sys.stderr)
+        for name, why in r["bad_files"]:
+            print(f"  {name}: {why}", file=sys.stderr)
+        print("Это не отказ по строке: строки этих файлов не рассматривались вовсе. "
+              "Частая причина — файл читался в момент записи; повторите слияние по нему "
+              "отдельно и сверьте, что число строк набора выросло на ожидаемое.",
+              file=sys.stderr)
+        return 2
     return 0
 
 

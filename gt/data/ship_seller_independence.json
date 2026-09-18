@@ -4,20 +4,24 @@
  "method": "Из текста строки вынимаются домены, каждый сводится к своей группе. Строка попадает в замер, если названы ДВЕ и более витрины одной группы. Отдельно считается, сказано ли в самой строке, что это один оператор: без этого деления замер был бы тавтологией — строка, где мы сами написали «это одна компания», попадала бы в дефект наравне со строкой, где две витрины выданы за рынок.",
  "why": "«Два независимых продавца» — главный довод, которым закрывается строка: одна цена может быть наценкой одного перепродавца, две совпадающие цены разных компаний — уже рынок. За ночь этот довод развалился шесть раз: витрины оказывались одним оператором под разными вывесками. Поэтому признак независимости считается по этому списку, а не на глаз по разным доменам.",
  "totals": {
-  "groups_known": 11,
-  "domains_known": 43,
-  "rows_checked": 141,
-  "rows_citing_one_group_twice": 33,
-  "usd_on_those_rows": 964541.0,
-  "rows_marked_as_one_operator": 31,
-  "rows_not_marked": 2,
-  "usd_not_marked": 12580.0
+  "groups_known": 14,
+  "domains_known": 49,
+  "rows_checked": 657,
+  "rows_citing_one_group_twice": 64,
+  "usd_on_those_rows": 1129271.5,
+  "rows_marked_as_one_operator": 55,
+  "rows_not_marked": 9,
+  "usd_not_marked": 51545.0,
+  "rows_not_marked_with_price": 0,
+  "usd_not_marked_with_price": 0,
+  "what_not_marked_means": "Строка называет две витрины одной группы и не говорит, что это один оператор. Искажает вывод только там, где вердикт вынесен ПО ЦЕНЕ: без цены строка и не утверждает, что подтверждена двумя источниками. Поэтому счёт двойной."
  },
  "rows": [
   {
    "pn": "68569591",
    "usd": 112010.0,
    "verdict": "ВЕРНА",
+   "verdict_rests_on_price": true,
    "groups": {
     "Оператор из Сямыня (camvect / cambia)": [
      "cambia.cn",
@@ -33,6 +37,7 @@
    "pn": "1794-IRT8",
    "usd": 76000.0,
    "verdict": "ЗАНИЖЕНА ТОЛЬКО ПРОТИВ АВТОРИЗОВАННОГО КАНАЛА",
+   "verdict_rests_on_price": true,
    "groups": {
     "Sonepar (платформа Net1)": [
      "codale.com",
@@ -45,6 +50,7 @@
    "pn": "1056369-30",
    "usd": 68475.0,
    "verdict": "ЗАНИЖЕНА",
+   "verdict_rests_on_price": true,
    "groups": {
     "Hard-To-Find / turbine.parts": [
      "hard-to-find.parts",
@@ -57,11 +63,13 @@
   {
    "pn": "1019431-1600",
    "usd": 68000.0,
-   "verdict": "НЕ ПОДТВЕРЖДЕНА, риск в сторону занижения",
+   "verdict": "ЗАНИЖЕНА — и не на проценты, а в разы. Вилка 3 000–14 000 USD за штуку, единственная найденная цена 106 200 USD за штуку: это в 7,6 раза выше потолка вилки. Экспозиция по середине считалась 68 000 USD, по найденной цене 8 шт стоят 849 600 USD. Оговорка обязательна: это ask одного брокера по обсолету на половину объёма, а не подтверждённая цена канала, и покупаемой её делает только ответ продавца по письму.",
+   "verdict_rests_on_price": true,
    "groups": {
     "Hard-To-Find / turbine.parts": [
      "hard-to-find.parts",
-     "hardtoget.parts"
+     "hardtoget.parts",
+     "turbine.parts"
     ]
    },
    "marked": true
@@ -70,6 +78,7 @@
    "pn": "1794-IRT8XT",
    "usd": 64200.0,
    "verdict": "ВЕРНА",
+   "verdict_rests_on_price": true,
    "groups": {
     "Sonepar (платформа Net1)": [
      "codale.com",
@@ -82,6 +91,7 @@
    "pn": "4025166",
    "usd": 60550.0,
    "verdict": "ЗАНИЖЕНА ДЛЯ ОРИГИНАЛА",
+   "verdict_rests_on_price": true,
    "groups": {
     "Modern Group": [
      "modernequipmentparts.com",
@@ -94,6 +104,7 @@
    "pn": "EQ3005PCNW",
    "usd": 43050.0,
    "verdict": "ВЕРНА",
+   "verdict_rests_on_price": true,
    "groups": {
     "Aeliya Marine Tech (Индия)": [
      "aeliyamarine.com",
@@ -107,23 +118,29 @@
   {
    "pn": "4351035",
    "usd": 38650.0,
-   "verdict": "НЕ ПОДТВЕРЖДЕНА",
+   "verdict": "НЕ ПОДТВЕРЖДЕНА: ни одной читаемой цены именно этой детали. Число «50,72 USD MSRP», которое возвращает поисковая машина по карточке FinditParts, ценой не является — страницу я не открыл, а выдача за сессию соврала уже семь раз.",
+   "verdict_rests_on_price": false,
    "groups": {
     "FPS Technologies / FastPartsSource": [
+     "fastpartssource.com",
      "fpstechnologies.in",
      "surplusstock.parts"
     ]
    },
-   "marked": true
+   "marked": false
   },
   {
    "pn": "1701/06",
    "usd": 38000.0,
-   "verdict": "НЕЧЕМ ПРОВЕРИТЬ",
+   "verdict": "НЕ ПОДТВЕРЖДЕНА — цены этой детали я не прочитал ни одной настоящей. Вилка 800–3 000 USD за штуку не опирается ни на что. Важнее: то, что по этому номеру выглядит как рынок из трёх независимых продавцов, рынком не является — см. note, и на этом основании прежний вывод «нечем проверить» надо читать жёстче: по номеру есть видимость цен, и она обманчива.",
+   "verdict_rests_on_price": false,
    "groups": {
     "Оператор из Сямыня (camvect / cambia)": [
      "cambia.cn",
-     "camvect.com"
+     "camvect.com",
+     "newgenplc.com",
+     "plcdcspro.com",
+     "topbrandsplc.com"
     ]
    },
    "marked": true
@@ -132,6 +149,7 @@
    "pn": "1794-IE8",
    "usd": 33640.0,
    "verdict": "ВЕРНА",
+   "verdict_rests_on_price": true,
    "groups": {
     "Sonepar (платформа Net1)": [
      "1sourcedist.com",
@@ -147,6 +165,7 @@
    "pn": "6181X-12A2SWX1DC",
    "usd": 30800.0,
    "verdict": "ЗАНИЖЕНА",
+   "verdict_rests_on_price": true,
    "groups": {
     "Sonepar (платформа Net1)": [
      "1sourcedist.com",
@@ -160,6 +179,7 @@
    "pn": "4011553",
    "usd": 30800.0,
    "verdict": "ВЕРНА",
+   "verdict_rests_on_price": true,
    "groups": {
     "Modern Group": [
      "moderngroup.com",
@@ -172,6 +192,7 @@
    "pn": "1060817-10",
    "usd": 26775.0,
    "verdict": "ЗАНИЖЕНА",
+   "verdict_rests_on_price": true,
    "groups": {
     "Hard-To-Find / turbine.parts": [
      "hard-to-find.parts",
@@ -183,7 +204,50 @@
   {
    "pn": "70-30108-1",
    "usd": 24500.0,
-   "verdict": "НЕЧЕМ ПРОВЕРИТЬ",
+   "verdict": "ВЕРНА — вилка 900–4000 USD за штуку накрывает найденную цену 1160,31 USD. Но накрывает краем: найденная цена стоит в нижней четверти вилки, и середина вилки",
+   "verdict_rests_on_price": true,
+   "groups": {
+    "Hard-To-Find / turbine.parts": [
+     "hardtoget.parts",
+     "turbine.parts"
+    ]
+   },
+   "marked": true
+  },
+  {
+   "pn": "1794-OB8EP",
+   "usd": 21535.0,
+   "verdict": "ВЕРНА",
+   "verdict_rests_on_price": true,
+   "groups": {
+    "Sonepar (платформа Net1)": [
+     "1sourcedist.com",
+     "codale.com",
+     "irby.com",
+     "needco.com",
+     "northcoast.com"
+    ]
+   },
+   "marked": true
+  },
+  {
+   "pn": "KFD2-VR2-Ex1.50M",
+   "usd": 21060.0,
+   "verdict": "ВЕРНА. Найденные цены на это же изделие — 454,77 USD",
+   "verdict_rests_on_price": true,
+   "groups": {
+    "nexinstrument / quicktimeonline": [
+     "nexinstrument.com",
+     "quicktimeonline.com"
+    ]
+   },
+   "marked": true
+  },
+  {
+   "pn": "1094726-10",
+   "usd": 21000.0,
+   "verdict": "НЕЧЕМ ПРОВЕРИТЬ — цены исполнения -10 нет, а цена соседнего исполнения по правилу в поле цены не идёт. Отдельно и важно: соседнее исполнение стоит 68 458 USD за штуку, то есть в 7,6 раза выше ВЕРХА нашей вилки",
+   "verdict_rests_on_price": false,
    "groups": {
     "Hard-To-Find / turbine.parts": [
      "hard-to-find.parts",
@@ -195,14 +259,13 @@
    "marked": true
   },
   {
-   "pn": "1794-IF2XOF2I",
-   "usd": 23750.0,
-   "verdict": "НЕ ПОДТВЕРЖДЕНА: вилка не накрывает ни один из двух рынков",
+   "pn": "1794-IF2XOF2IXT",
+   "usd": 19800.0,
+   "verdict": "ВЕРНА. Цена именно этого исполнения XT найдена дословно: 2 702,45 USD за штуку у авторизованного дистрибьютора NorthEast Electrical. Она внутри вилки 1200-3200 USD и близка к её верхней границе. Нижний край 1200 USD живым листингом не подтверждён: ни одной цены ниже 2 702,45 USD по этому артикулу увидеть не удалось, витрины сток-трейдеров закрыты отказом 403.",
+   "verdict_rests_on_price": true,
    "groups": {
     "Sonepar (платформа Net1)": [
-     "1sourcedist.com",
      "codale.com",
-     "irby.com",
      "needco.com",
      "northcoast.com"
     ]
@@ -210,79 +273,38 @@
    "marked": true
   },
   {
-   "pn": "199515-1",
-   "usd": 23655.0,
-   "verdict": "НЕ ПОДТВЕРЖДЕНА",
+   "pn": "1756-CN2R",
+   "usd": 17100.0,
+   "verdict": "ВЕРНА. Цена именно этого артикула найдена у трёх независимых продавцов, и все три — 700,00, 1 199,00 и 1 342,00 USD — лежат внутри вилки 450-2400 USD. Оговорка, которая обязана идти рядом: вилка верна только для вторичного рынка. Прейскурант авторизованного дистрибьютора по тому же артикулу — 6 159,33 USD за штуку, это в 2,6 раза выше верхней границы вилки; сток «как есть» в Ванкувере, наоборот, на 4 % ниже нижней границы",
+   "verdict_rests_on_price": true,
+   "groups": {
+    "Sonepar (платформа Net1)": [
+     "codale.com",
+     "needco.com"
+    ]
+   },
+   "marked": true
+  },
+  {
+   "pn": "1063325-1",
+   "usd": 16600.0,
+   "verdict": "НЕЧЕМ ПРОВЕРИТЬ — цены именно этой детали не найдено ни в одном канале. Вилка 1800–6500 USD остаётся экспертной, ценовой вердикт невозможен.",
+   "verdict_rests_on_price": false,
    "groups": {
     "Hard-To-Find / turbine.parts": [
      "hard-to-find.parts",
-     "turbine.parts"
+     "hardtoget.parts",
+     "turbine.parts",
+     "zip-solutions.com"
     ]
    },
    "marked": true
   },
   {
-   "pn": "DESC200",
-   "usd": 23400.0,
-   "verdict": "НЕ ПОДТВЕРЖДЕНА",
-   "groups": {
-    "Оператор из Сямыня (camvect / cambia)": [
-     "cambia.cn",
-     "camvect.com",
-     "topbrandsplc.com"
-    ]
-   },
-   "marked": true
-  },
-  {
-   "pn": "6181P-15A2MW71DC ser.F",
-   "usd": 22600.0,
-   "verdict": "НЕЧЕМ ПРОВЕРИТЬ",
-   "groups": {
-    "Sonepar (платформа Net1)": [
-     "1sourcedist.com",
-     "codale.com",
-     "irby.com",
-     "needco.com",
-     "northcoast.com"
-    ]
-   },
-   "marked": true
-  },
-  {
-   "pn": "MVI56E-MCMXT",
-   "usd": 21600.0,
-   "verdict": "НЕЧЕМ ПРОВЕРИТЬ",
-   "groups": {
-    "Оператор из Сямыня (camvect / cambia)": [
-     "cambia.cn",
-     "camvect.com",
-     "newgenplc.com",
-     "plcdcspro.com",
-     "topbrandsplc.com"
-    ]
-   },
-   "marked": true
-  },
-  {
-   "pn": "1794-OB8EP",
-   "usd": 21535.0,
+   "pn": "997396C1",
+   "usd": 16560.0,
    "verdict": "ВЕРНА",
-   "groups": {
-    "Sonepar (платформа Net1)": [
-     "1sourcedist.com",
-     "codale.com",
-     "irby.com",
-     "needco.com",
-     "northcoast.com"
-    ]
-   },
-   "marked": true
-  },
-  {
-   "pn": "1087491-3",
-   "usd": 15120.0,
-   "verdict": "НЕ ПОДТВЕРЖДЕНА: один продавец назвал четыре цены на одно изделие",
+   "verdict_rests_on_price": true,
    "groups": {
     "Hard-To-Find / turbine.parts": [
      "hardtoget.parts",
@@ -292,9 +314,122 @@
    "marked": true
   },
   {
+   "pn": "KFD2-RR-Ex1",
+   "usd": 15910.0,
+   "verdict": "НЕ ПОДТВЕРЖДЕНА. Цены именно этой детали найдены две, и обе не годятся в основание закупки: 249,00 USD — восстановленное изделие в количестве 2 шт., и 157,00 USD — прейскурант сток-трейдера при отсутствии товара на складе. Формально оба числа лежат внутри нашей вилки 110–320 USD, но они описывают рынок излишков на единичные штуки, а не поставку 74 шт.; цены на новое изделие под этим артикулом не существует, потому что артикул снят с производства. Поэтому вилку нельзя ни подтвердить, ни опровергнуть по той закупке, которая нам нужна. Оговорка для понимания порядка величин, а не как вердикт: единственный путь купить 74 шт. — преемник KCD2-RR2-Ex1, у него цена 558,00 USD у изготовителя и 342,43 GBP",
+   "verdict_rests_on_price": false,
+   "groups": {
+    "nexinstrument / quicktimeonline": [
+     "nexinstrument.com",
+     "quicktimeonline.com"
+    ]
+   },
+   "marked": true
+  },
+  {
+   "pn": "1794-OB16P",
+   "usd": 15625.0,
+   "verdict": "ВЕРНА. Цена именно этого артикула в обычном",
+   "verdict_rests_on_price": true,
+   "groups": {
+    "Оператор из Сямыня (camvect / cambia)": [
+     "camvect.com",
+     "plcdcspro.com",
+     "topbrandsplc.com"
+    ],
+    "Sonepar (платформа Net1)": [
+     "codale.com",
+     "needco.com",
+     "northcoast.com"
+    ]
+   },
+   "marked": true
+  },
+  {
+   "pn": "BN1701/15",
+   "usd": 15600.0,
+   "verdict": "ДУБЛЬ. Строка BN1701/15",
+   "verdict_rests_on_price": false,
+   "groups": {
+    "Оператор из Сямыня (camvect / cambia)": [
+     "camvect.com",
+     "topbrandsplc.com"
+    ]
+   },
+   "marked": true
+  },
+  {
+   "pn": "1794-OB8EPXT",
+   "usd": 14400.0,
+   "verdict": "ВЕРНА. Цена именно этого исполнения XT найдена дословно: 515,57 USD за штуку у Williams Automation с остатком 3 шт, и 350,00 USD в товарных данных Top Brands PLC — обе внутри вилки 300-900 USD. Оговорка обязательна: вилка верна для вторичного рынка, а единственная увиденная авторизованная цена — 1 434,11 USD за штуку у North Coast",
+   "verdict_rests_on_price": true,
+   "groups": {
+    "Оператор из Сямыня (camvect / cambia)": [
+     "cambia.cn",
+     "camvect.com",
+     "topbrandsplc.com"
+    ]
+   },
+   "marked": true
+  },
+  {
+   "pn": "186232-3000",
+   "usd": 12750.0,
+   "verdict": "ЗАНИЖЕНА",
+   "verdict_rests_on_price": true,
+   "groups": {
+    "Hard-To-Find / turbine.parts": [
+     "hardtoget.parts",
+     "turbine.parts"
+    ]
+   },
+   "marked": true
+  },
+  {
+   "pn": "STP 42-28-100",
+   "usd": 11800.0,
+   "verdict": "ВЕРНА. Найденные цены на это же изделие — 2 169,90 USD",
+   "verdict_rests_on_price": true,
+   "groups": {
+    "Power/Mation и Southern Controls": [
+     "shop.powermation.com",
+     "southerncontrols.com"
+    ]
+   },
+   "marked": true
+  },
+  {
+   "pn": "4067146",
+   "usd": 11595.0,
+   "verdict": "ВЕРНА — подтверждённая цена 10,35 USD за штуку лежит внутри заявленной вилки 5–25 USD, примерно посередине. Цена снята с живой страницы авторизованного дилера дословно. Оговорка: это розничная цена за штуку, а закупается партия 773 штуки, поэтому реальная цена сделки ожидается ближе к нижней границе вилки — вилка накрывает и этот сценарий.",
+   "verdict_rests_on_price": true,
+   "groups": {
+    "Modern Group": [
+     "modernequipmentparts.com",
+     "moderngroup.com",
+     "shop.moderngroup.com"
+    ]
+   },
+   "marked": true
+  },
+  {
+   "pn": "1794-IB10XOB6",
+   "usd": 11500.0,
+   "verdict": "ВЕРНА. Цена именно этого артикула найдена дословно у трёх витрин: 662,25 USD за штуку в авторизованном канале",
+   "verdict_rests_on_price": true,
+   "groups": {
+    "Sonepar (платформа Net1)": [
+     "codale.com",
+     "needco.com"
+    ]
+   },
+   "marked": true
+  },
+  {
    "pn": "186212-100",
    "usd": 11400.0,
    "verdict": "НЕ ПОДТВЕРЖДЕНА",
+   "verdict_rests_on_price": false,
    "groups": {
     "Hard-To-Find / turbine.parts": [
      "hard-to-find.parts",
@@ -308,6 +443,7 @@
    "pn": "1064728-1",
    "usd": 11070.0,
    "verdict": "ЗАНИЖЕНА",
+   "verdict_rests_on_price": true,
    "groups": {
     "Hard-To-Find / turbine.parts": [
      "hard-to-find.parts",
@@ -319,9 +455,36 @@
    "marked": true
   },
   {
+   "pn": "1794-IB16XT",
+   "usd": 11025.0,
+   "verdict": "ВЕРНА. Цена именно этого исполнения XT найдена дословно: 743,97 USD за штуку у авторизованного дистрибьютора NorthEast Electrical, внутри вилки 250-800 USD и близко к её верхней границе. Нижний край вилки 250 USD живым листингом не подтверждён: ни одной цены ниже 743,97 USD по этому артикулу увидеть не удалось. Прежнее обоснование низа вилки ссылкой на новые запечатанные лоты eBay заметно ниже проверке не поддаётся — eBay отдаёт 403 и роботу, и браузерным заголовкам. Реальная розница держится у верхней границы вилки.",
+   "verdict_rests_on_price": true,
+   "groups": {
+    "Sonepar (платформа Net1)": [
+     "codale.com",
+     "needco.com"
+    ]
+   },
+   "marked": true
+  },
+  {
+   "pn": "1064405-1",
+   "usd": 10800.0,
+   "verdict": "НЕЧЕМ ПРОВЕРИТЬ",
+   "verdict_rests_on_price": false,
+   "groups": {
+    "Hard-To-Find / turbine.parts": [
+     "hardtoget.parts",
+     "turbine.parts"
+    ]
+   },
+   "marked": true
+  },
+  {
    "pn": "MW03627",
    "usd": 10680.0,
    "verdict": "НЕЧЕМ ПРОВЕРИТЬ",
+   "verdict_rests_on_price": false,
    "groups": {
     "Enapart (impexron / ontrium / onrion / usaron)": [
      "enapart.com",
@@ -335,22 +498,10 @@
    "marked": true
   },
   {
-   "pn": "CT4010J/1",
-   "usd": 10600.0,
-   "verdict": "НЕЧЕМ ПРОВЕРИТЬ",
-   "groups": {
-    "Enapart (impexron / ontrium / onrion / usaron)": [
-     "enapart.com",
-     "impexron.de",
-     "onrion.com"
-    ]
-   },
-   "marked": true
-  },
-  {
    "pn": "PLC-RSC-24DC/21-21/ATEX, 2980461",
    "usd": 9906.0,
    "verdict": "ВЕРНА",
+   "verdict_rests_on_price": true,
    "groups": {
     "Aeliya Marine Tech (Индия)": [
      "aeliyamarine.com",
@@ -360,15 +511,14 @@
    "marked": true
   },
   {
-   "pn": "1060817-40",
-   "usd": 9720.0,
-   "verdict": "НЕ ПОДТВЕРЖДЕНА",
+   "pn": "3423495",
+   "usd": 9360.0,
+   "verdict": "ЗАНИЖЕНА — подтверждённая цена оригинала 2 194,48 USD и цена неоригинала 2 175,22 USD лежат ВЫШЕ верхней границы заявленной вилки 180–600 USD. Верхняя граница вилки ниже реальной цены примерно в 3,6 раза, нижняя — примерно в 12 раз. Вилка не накрывает реальную цену ни одним концом; это не смещение середины, а промах всего диапазона.",
+   "verdict_rests_on_price": true,
    "groups": {
-    "Hard-To-Find / turbine.parts": [
-     "hard-to-find.parts",
-     "hardtoget.parts",
-     "turbine.parts",
-     "zip-solutions.com"
+    "Modern Group": [
+     "modernequipmentparts.com",
+     "shop.moderngroup.com"
     ]
    },
    "marked": true
@@ -377,6 +527,7 @@
    "pn": "1069873-1",
    "usd": 9180.0,
    "verdict": "ЗАНИЖЕНА",
+   "verdict_rests_on_price": true,
    "groups": {
     "Hard-To-Find / turbine.parts": [
      "hard-to-find.parts",
@@ -387,22 +538,91 @@
    "marked": true
   },
   {
+   "pn": "1794-IВ10XOB6XT",
+   "usd": 9000.0,
+   "verdict": "ВЕРНА. Единственная реально увиденная цена на это исполнение — 1 065,00 USD за штуку, новое изделие в заводской упаковке, в наличии, отгрузка 1–7 рабочих дней — лежит внутри вилки 500–1500 USD. Оговорка: подтверждение одно и получено с витрины сток-трейдера одной группы; цена авторизованного канала неизвестна, а заводской срок поставки 51 день означает, что при срочности реальная цена может оказаться выше верхней границы.",
+   "verdict_rests_on_price": true,
+   "groups": {
+    "nexinstrument / quicktimeonline": [
+     "nexinstrument.com",
+     "quicktimeonline.com"
+    ]
+   },
+   "marked": true
+  },
+  {
+   "pn": "1794-OB16PXT",
+   "usd": 8325.0,
+   "verdict": "ЗАВЫШЕНА. Реально увиденные цены на это исполнение — 360,00 USD",
+   "verdict_rests_on_price": true,
+   "groups": {
+    "nexinstrument / quicktimeonline": [
+     "nexinstrument.com",
+     "quicktimeonline.com"
+    ]
+   },
+   "marked": true
+  },
+  {
+   "pn": "6ES7153-2BA02-0XB0",
+   "usd": 8160.0,
+   "verdict": "ВЕРНА. Вилка 180–500 USD за штуку подтверждена двумя увиденными ценами именно по этому номеру, и обе лежат внутри неё: 289,00 USD за восстановленный модуль у Classic Automation и 268,20 евро у SPS-SERVICE.eu за новый, что по курсу из gt/data/fx_rates.json составляет около 311 USD. Вилка накрывает оба состояния товара и оба канала, то есть верна не случайно, а по существу. Две оговорки, которые к вердикту не относятся, но обязаны стоять рядом. Первая: перечёркнутая «обычная» цена 596,00 евро",
+   "verdict_rests_on_price": true,
+   "groups": {
+    "Greinert & Glatt (automation-base / sps-markt)": [
+     "automation-base.com",
+     "greinert-glatt.de",
+     "sps-markt.de"
+    ]
+   },
+   "marked": true
+  },
+  {
    "pn": "KOP160j7MWVPN22",
    "usd": 7250.0,
-   "verdict": "НЕЧЕМ ПРОВЕРИТЬ",
+   "verdict": "НЕ ПОДТВЕРЖДЕНА — цены по KOP160J7MWVPN22 на открытой странице нет. Опора появилась",
+   "verdict_rests_on_price": false,
    "groups": {
     "Enapart (impexron / ontrium / onrion / usaron)": [
+     "enapart.com",
      "onrion.com",
      "ontrium.com",
      "usaron.com"
     ]
    },
+   "marked": true
+  },
+  {
+   "pn": "p/n Solar: 127147-1",
+   "usd": 6200.0,
+   "verdict": "НЕ ПОДТВЕРЖДЕНА. Вилка 700–2400 USD за штуку ничем не закрыта: цены именно по -1 на открытых страницах нет.",
+   "verdict_rests_on_price": false,
+   "groups": {
+    "Aeliya Marine Tech (Индия)": [
+     "aeliyamarinetech.com",
+     "auto2mation.com"
+    ]
+   },
    "marked": false
+  },
+  {
+   "pn": "4010887",
+   "usd": 5670.0,
+   "verdict": "ВЕРНА. Найденная цена этой детали — 21,80 USD за штуку у дилера Cummins и 19,28 USD у независимого торговца; обе внутри вилки 15–30 USD, ближе к её середине. Третья цена, 19,19 USD, тоже внутри вилки, но карточка помечена «Sold Out». Ни одного значения за пределами вилки не найдено.",
+   "verdict_rests_on_price": true,
+   "groups": {
+    "Modern Group": [
+     "moderngroup.com",
+     "shop.moderngroup.com"
+    ]
+   },
+   "marked": true
   },
   {
    "pn": "1794-OW8",
    "usd": 5330.0,
    "verdict": "ВЕРНА",
+   "verdict_rests_on_price": true,
    "groups": {
     "Sonepar (платформа Net1)": [
      "codale.com",
@@ -410,12 +630,39 @@
      "stateelectric.com"
     ]
    },
-   "marked": false
+   "marked": true
+  },
+  {
+   "pn": "3AXD50000000753",
+   "usd": 5300.0,
+   "verdict": "НЕ ПОДТВЕРЖДЕНА. Вилка 450–2200 USD за штуку не подтверждена и не опровергнута: цены этой платы не показал ни один канал, страницу которого удалось открыть и прочитать.",
+   "verdict_rests_on_price": false,
+   "groups": {
+    "Оператор из Сямыня (camvect / cambia)": [
+     "camvect.com",
+     "topbrandsplc.com"
+    ]
+   },
+   "marked": true
+  },
+  {
+   "pn": "MVI56-MCM",
+   "usd": 5250.0,
+   "verdict": "ЗАНИЖЕНА. Цена этой детали у авторизованного дистрибьютора — 5 433,39 USD за штуку, это в 4,5 раза выше верхней границы вилки 300–1200 USD. Внутрь вилки попадает только б/у экземпляр за 780,89 USD, и он один против потребности в семи.",
+   "verdict_rests_on_price": true,
+   "groups": {
+    "Sonepar (платформа Net1)": [
+     "needco.com",
+     "northcoast.com"
+    ]
+   },
+   "marked": true
   },
   {
    "pn": "630870",
    "usd": 4600.0,
    "verdict": "ЗАНИЖЕНА",
+   "verdict_rests_on_price": true,
    "groups": {
     "Иркутский оператор (iroil / gkunicom)": [
      "gkunicom.ru",
@@ -428,6 +675,7 @@
    "pn": "1089034-3",
    "usd": 4252.5,
    "verdict": "ЗАНИЖЕНА",
+   "verdict_rests_on_price": true,
    "groups": {
     "Hard-To-Find / turbine.parts": [
      "hard-to-find.parts",
@@ -438,14 +686,214 @@
    "marked": true
   },
   {
-   "pn": "700-FSM3UU23-EX",
-   "usd": 3442.5,
-   "verdict": "НЕ ПОДТВЕРЖДЕНА",
+   "pn": "3265500",
+   "usd": 3700.0,
+   "verdict": "ЗАНИЖЕНА — реально увиденная цена 1 550,99 USD выше верхней границы 1 500 USD на 3,4 %.",
+   "verdict_rests_on_price": true,
    "groups": {
-    "Rexel USA / Platt Electric Supply": [
-     "platt.com",
-     "rexelapps.com",
-     "rexelusa.com"
+    "Aeliya Marine Tech (Индия)": [
+     "aeliyamarine.net",
+     "aeliyamarinetech.com",
+     "auto2mation.com"
+    ]
+   },
+   "marked": true
+  },
+  {
+   "pn": "p/n Solar: 186665-245",
+   "usd": 3400.0,
+   "verdict": "НЕ ПОДТВЕРЖДЕНА. Вилка 400–1300 USD за штуку не закрыта: цены именно по 186665-245 на открытых страницах нет.",
+   "verdict_rests_on_price": false,
+   "groups": {
+    "Aeliya Marine Tech (Индия)": [
+     "aeliyamarinetech.com",
+     "auto2mation.com"
+    ]
+   },
+   "marked": false
+  },
+  {
+   "pn": "p/n Solar: 962308С1",
+   "usd": 2900.0,
+   "verdict": "НЕ ПОДТВЕРЖДЕНА. Вилка 350–1100 USD за штуку не закрыта: цены по номеру на открытых страницах нет.",
+   "verdict_rests_on_price": false,
+   "groups": {
+    "Hard-To-Find / turbine.parts": [
+     "hard-to-find.parts",
+     "turbine.parts"
+    ]
+   },
+   "marked": false
+  },
+  {
+   "pn": "p/n Solar: 186533-1",
+   "usd": 2460.0,
+   "verdict": "ВЕРНА. Вилка 280–950 USD накрывает найденную цену 581,39 USD за штуку.",
+   "verdict_rests_on_price": true,
+   "groups": {
+    "Aeliya Marine Tech (Индия)": [
+     "aeliyamarine.com",
+     "aeliyamarinetech.com"
+    ]
+   },
+   "marked": true
+  },
+  {
+   "pn": "p/n Solar: 186583-2",
+   "usd": 2300.0,
+   "verdict": "ВЕРНА — $507,29 за штуку попадает внутрь нашей вилки 250–900 USD, примерно в её середину. Оговорка обязательна: подтверждена ценой ПОДЕРЖАННОГО прибора у одного продавца на один экземпляр, а цена нового прибора у Weschler или у Solar не измерена и может лежать выше вилки; на объём заявки эта цена не распространяется",
+   "verdict_rests_on_price": true,
+   "groups": {
+    "Aeliya Marine Tech (Индия)": [
+     "aeliyamarinetech.com",
+     "auto2mation.com"
+    ]
+   },
+   "marked": true
+  },
+  {
+   "pn": "120554",
+   "usd": 1155.0,
+   "verdict": "ВЕРНА — 8,34-11,42 USD за штуку по двум независимым продавцам ложатся внутрь нашей вилки 6,5-14,5 USD, ближе к её середине. Оговорка: обе цены розничные и неавторизованные, на 110 шт дистрибьютор Cummins почти наверняка даст дешевле, то есть вилка скорее верна с запасом вверх, чем занижена.",
+   "verdict_rests_on_price": true,
+   "groups": {
+    "Modern Group": [
+     "modernequipmentparts.com",
+     "shop.moderngroup.com"
+    ]
+   },
+   "marked": true
+  },
+  {
+   "pn": "MR-C",
+   "usd": 936.0,
+   "verdict": "НЕ ПОДТВЕРЖДЕНА — годной цены не получено. Единственная прочитанная цифра 70,99 USD снята как заглушка витрины",
+   "verdict_rests_on_price": false,
+   "groups": {
+    "Aeliya Marine Tech (Индия)": [
+     "aeliyamarine.com",
+     "aeliyamarinetech.com"
+    ]
+   },
+   "marked": true
+  },
+  {
+   "pn": "82749",
+   "usd": 880.0,
+   "verdict": "НЕ ПОДТВЕРЖДЕНА — цифра 280,24 USD прочитана и укладывается в вилку 140–300, что дало бы ВЕРНА, но свидетель один и он же уличён в заглушечных ценах: на витрине того же оператора 70,99 USD стоит почти на всех 186 реле серии MR-C подряд, а у соседнего артикула 82750 цена 275,49 при перечёркнутых 289,99 — почти та же, что у нашего 280,24 при 294,99. Вилку это не опровергает, но и не подтверждает.",
+   "verdict_rests_on_price": false,
+   "groups": {
+    "Aeliya Marine Tech (Индия)": [
+     "aeliyamarine.com",
+     "aeliyamarinetech.com"
+    ]
+   },
+   "marked": true
+  },
+  {
+   "pn": "336519020",
+   "usd": 102.0,
+   "verdict": "НЕЧЕМ ПРОВЕРИТЬ — номер закрытой номенклатуры Siemens Energy, открытых цен по нему нет, вилку 6–45 USD сравнивать не с чем",
+   "verdict_rests_on_price": false,
+   "groups": {
+    "Enapart (impexron / ontrium / onrion / usaron)": [
+     "enapart.com",
+     "ontrium.com"
+    ]
+   },
+   "marked": true
+  },
+  {
+   "pn": "328745100",
+   "usd": 90.0,
+   "verdict": "НЕЧЕМ ПРОВЕРИТЬ — номер закрытой номенклатуры Siemens Energy, открытых цен нет, вилку 5–40 USD сравнивать не с чем",
+   "verdict_rests_on_price": false,
+   "groups": {
+    "Enapart (impexron / ontrium / onrion / usaron)": [
+     "enapart.com",
+     "ontrium.com"
+    ]
+   },
+   "marked": false
+  },
+  {
+   "pn": "328747130",
+   "usd": 90.0,
+   "verdict": "НЕЧЕМ ПРОВЕРИТЬ — номер закрытой номенклатуры Siemens Energy, открытых цен нет, вилку 5–40 USD сравнивать не с чем",
+   "verdict_rests_on_price": false,
+   "groups": {
+    "Enapart (impexron / ontrium / onrion / usaron)": [
+     "enapart.com",
+     "ontrium.com"
+    ]
+   },
+   "marked": false
+  },
+  {
+   "pn": "336611014",
+   "usd": 90.0,
+   "verdict": "НЕЧЕМ ПРОВЕРИТЬ — номер закрытой номенклатуры Siemens Energy, открытых цен нет, вилку 0,5–4 USD сравнивать не с чем",
+   "verdict_rests_on_price": false,
+   "groups": {
+    "Enapart (impexron / ontrium / onrion / usaron)": [
+     "enapart.com",
+     "ontrium.com"
+    ]
+   },
+   "marked": false
+  },
+  {
+   "pn": "336611017",
+   "usd": 90.0,
+   "verdict": "НЕЧЕМ ПРОВЕРИТЬ — номер закрытой номенклатуры Siemens Energy, открытых цен нет, вилку 0,5–4 USD сравнивать не с чем",
+   "verdict_rests_on_price": false,
+   "groups": {
+    "Enapart (impexron / ontrium / onrion / usaron)": [
+     "enapart.com",
+     "ontrium.com"
+    ]
+   },
+   "marked": false
+  },
+  {
+   "pn": "420004",
+   "usd": 35.0,
+   "verdict": "НЕ ПОДТВЕРЖДЕНА — цены по номеру 420004 ни на одной открытой странице нет; соседи 420002 и 420010 по $2,00 за штуку лежат внутри вилки 2–12 USD, но цена соседа в число по строке не идёт",
+   "verdict_rests_on_price": false,
+   "groups": {
+    "Enapart (impexron / ontrium / onrion / usaron)": [
+     "enapart.com",
+     "ontrium.com"
+    ]
+   },
+   "marked": false
+  },
+  {
+   "pn": "1034347-1",
+   "usd": 0.0,
+   "verdict": "НЕ ПОДТВЕРЖДЕНА",
+   "verdict_rests_on_price": false,
+   "groups": {
+    "Hard-To-Find / turbine.parts": [
+     "hard-to-find.parts",
+     "hardtoget.parts",
+     "turbine.parts",
+     "zip-solutions.com"
+    ]
+   },
+   "marked": true
+  },
+  {
+   "pn": "950232C1",
+   "usd": 0.0,
+   "verdict": "НЕ ПОДТВЕРЖДЕНА",
+   "verdict_rests_on_price": false,
+   "groups": {
+    "Hard-To-Find / turbine.parts": [
+     "hard-to-find.parts",
+     "hardtoget.parts",
+     "turbine.parts",
+     "zip-solutions.com"
     ]
    },
    "marked": true

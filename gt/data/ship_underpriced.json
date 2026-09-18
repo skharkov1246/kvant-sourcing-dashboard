@@ -4,28 +4,28 @@
  "what_it_is": "Разрыв «найденная закупочная цена за штуку минус наш потолок» × количество. Цены владельца заказчику твёрдые, торг идёт вниз, поэтому такая строка — убыток по позиции, а не повод уточнить.",
  "what_it_is_not": "НЕ смета закупки. Разряды складывать нельзя: в закупочную сумму идёт только «в сумму идёт». Разрыв по двум остальным — верхняя граница при допущении, что весь объём купится по найденной цене, а её никто не подтверждал.",
  "headline": "Решение принимается по нашей экспозиции: сколько денег НАШЕГО предложения стоит на строках, где единственная найденная цена выше нашего потолка.",
- "our_exposure_usd": 989411.5,
+ "our_exposure_usd": 994961.5,
  "tiers": {
   "в сумму идёт": {
-   "rows": 5,
-   "gap_usd": 27637.2,
-   "our_exposure_usd": 11320.0
+   "rows": 6,
+   "gap_usd": 28632.0,
+   "our_exposure_usd": 13670.0
   },
   "покрытие не подтверждено": {
-   "rows": 55,
-   "gap_usd": 775938.46,
-   "our_exposure_usd": 540464.5
+   "rows": 54,
+   "gap_usd": 570245.82,
+   "our_exposure_usd": 541509.5
   },
   "цена не закупочная": {
-   "rows": 14,
-   "gap_usd": 1978776.38,
-   "our_exposure_usd": 437627.0
+   "rows": 16,
+   "gap_usd": 2184566.62,
+   "our_exposure_usd": 439782.0
   }
  },
  "skipped": {
   "цена снята как подстановка": 0,
   "строки нет в сводке заявки": 0,
-  "нет числа по одну из сторон": 11
+  "нет числа по одну из сторон": 12
  },
  "rows": [
   {
@@ -92,8 +92,8 @@
    "found_unit": 12763.42,
    "found_kind": "сток-трейдер (строка сток-листа, не карточка товара с корзиной)",
    "covers_qty": "unknown",
-   "tier": "покрытие не подтверждено",
-   "why_tier": "покрытие количества «unknown», а не полное",
+   "tier": "цена не закупочная",
+   "why_tier": "цена стоит на одном операторе под разными доменами — свидетель один",
    "gap_unit": 11263.42,
    "gap_total": 168951.3,
    "our_exposure": 12750.0,
@@ -182,8 +182,8 @@
    "found_unit": 2175.22,
    "found_kind": "две открытые розничные цены: оригинал у авторизованного дилера и неоригинал у независимого продавца",
    "covers_qty": "unknown",
-   "tier": "покрытие не подтверждено",
-   "why_tier": "покрытие количества «unknown», а не полное",
+   "tier": "цена не закупочная",
+   "why_tier": "цена стоит на одном операторе под разными доменами — свидетель один",
    "gap_unit": 1575.22,
    "gap_total": 37805.28,
    "our_exposure": 9360.0,
@@ -1136,8 +1136,8 @@
    "found_unit": 46.41,
    "found_kind": "цена сток-трейдера за штуку (ea)",
    "covers_qty": "unknown",
-   "tier": "цена не закупочная",
-   "why_tier": "цена стоит на одном операторе под разными доменами — свидетель один",
+   "tier": "покрытие не подтверждено",
+   "why_tier": "покрытие количества «unknown», а не полное",
    "gap_unit": 1.41,
    "gap_total": 1170.3,
    "our_exposure": 23655.0,
@@ -1179,6 +1179,24 @@
    "our_exposure": 7200.0,
    "source": "http://www.hardware1688.com/sale-7582932-siemens-simatic-s7-400-6es7197-1la04-0xa0-6es71971la040xa0.html — дословно: «Price: $1635.00 (USD/PCS)», «Minimum Order Quantity: 1 /PCS», в списке того же продавца строка «6ES7197-1LA04-0XA0 / SIMATIC S7-400H, Y-LINK FOR CONNECTING SINGLE-CHANNEL / $1635.00/",
    "channel": "Siemens по номеру (заводская страница закрыта). Авторизованный дистрибьютор Kempston Controls номер ведёт, но как снятый и без цены. Склады остатков: Classic Automation (наличие есть, цена «Ask»), San"
+  },
+  {
+   "pn": "750-880",
+   "name": "Контроллер Ethernet WAGO 750-880",
+   "sheet": "НВН",
+   "qty": 5,
+   "our_hi": 690,
+   "our_lo": 250,
+   "found_unit": 888.96,
+   "found_kind": "дистрибьютор, карточка склада (на снятое с производства изделие; авторизованной цены больше не существует)",
+   "covers_qty": "full",
+   "tier": "в сумму идёт",
+   "why_tier": "покрытие полное, цена не брокерская, свидетель не один",
+   "gap_unit": 198.96,
+   "gap_total": 994.8,
+   "our_exposure": 2350.0,
+   "source": "https://www.wagoproducts.com/remote-i-o/series-750/wago-750-880/ — карточка прочитана, блоком дословно: «Manufacturer Wago / SKU 750-880 / Weight 0.36 lbs / MPN 750-880 / Our price: $ 888.96 / Quantity / Price / *Note: Please Contact Us for Stock Availability». Цена за штуку: поставочная единица у W",
+   "channel": "Прямого канала изготовителя нет: изделие снято. Прочитанный склад с ценой — On-Line Electronics, распространитель WAGO, карточка https://www.wagoproducts.com/remote-i-o/series-750/wago-750-880/ (на ст"
   },
   {
    "pn": "6ES7960-1AA06-0XA0",
@@ -1316,13 +1334,31 @@
    "found_unit": 1550.99,
    "found_kind": "розничная цена сток-трейдера",
    "covers_qty": "unknown",
-   "tier": "покрытие не подтверждено",
-   "why_tier": "покрытие количества «unknown», а не полное",
+   "tier": "цена не закупочная",
+   "why_tier": "цена стоит на одном операторе под разными доменами — свидетель один",
    "gap_unit": 50.99,
    "gap_total": 203.96,
    "our_exposure": 3700.0,
    "source": "Aeliya Marine Tech: «Fmc 3265500 Plug Valve Repair Kit», «US $1,550.99» (со скидкой от «US $1,649.99»), «New - Brand-new and unused product», «Only 1 left», доставка из Индии (https://aeliyamarinetech.com/products/fmc-3265500-plug-valve-repair-kit)",
    "channel": "Независимый склад — Aeliya Marine Tech Pvt. Ltd. (Бхавнагар, Индия), цена открыта, остаток назван числом. Независимый изготовитель-поставщик — Jining Donghong Machinery Co., Ltd (dhparts.com, КНР): по"
+  },
+  {
+   "pn": "1SDA067560R1",
+   "name": "Выкл.авт. ABB Tmax XT2S 1SDA067560R1",
+   "sheet": "НВН",
+   "qty": 10,
+   "our_hi": 500,
+   "our_lo": 140,
+   "found_unit": 509.76,
+   "found_kind": "дистрибьютор (RS Components) и розница продавца (LED Controls)",
+   "covers_qty": "unknown",
+   "tier": "покрытие не подтверждено",
+   "why_tier": "покрытие количества «unknown», а не полное",
+   "gap_unit": 9.76,
+   "gap_total": 97.6,
+   "our_exposure": 3200.0,
+   "source": "Два источника, оба прочитаны. 1) https://africa.rsdelivers.com/product/abb/1sda067560r1-xt2s-160-tma-160a-ff/abb-sace-tmax-xt-xt2s-molded-case-circuit-breaker/2320263 — дословно «€ 485.85 Each (ex VAT)», «Stock information temporarily unavailable.»; 485,85 EUR / 0,861838 = 563,74 USD. 2) https://www",
+   "channel": "Авторизованный дистрибьютор: RS Components, https://africa.rsdelivers.com/product/abb/1sda067560r1-xt2s-160-tma-160a-ff/abb-sace-tmax-xt-xt2s-molded-case-circuit-breaker/2320263. Ещё продавцы: LED Con"
   },
   {
    "pn": "3422444",
