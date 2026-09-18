@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 226,
-    "total_bytes": 102290742,
+    "total_bytes": 102451721,
     "by_sensitivity": {
       "конфиденциально": 62,
       "внутреннее": 128,
@@ -288,13 +288,13 @@
         "gt/tools/channels.py",
         "gt/tools/collisions.py",
         "gt/tools/confidence_audit.py",
+        "gt/tools/english_source.py",
         "gt/tools/rfq_en.py",
         "gt/tools/ship_brand.py",
         "gt/tools/ship_brief.py",
         "gt/tools/ship_decisions.py",
         "gt/tools/ship_export.py",
-        "gt/tools/ship_map.py",
-        "gt/tools/ship_merge.py"
+        "gt/tools/ship_map.py"
       ]
     },
     {
@@ -985,7 +985,7 @@
       },
       "last_change": "2026-09-18",
       "last_author": "Claude",
-      "last_commit": "fd22253",
+      "last_commit": "8b03557",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -1263,6 +1263,60 @@
       ]
     },
     {
+      "path": "gt/data/ship_reverify.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 825758,
+      "note": "Перепроверка крупнейших строк заявки ЛУКОЙЛ: по каждой строке заново установлено, что это за изделие, кто его делает на самом деле и под каким своим номером, жив ли номер, сколько позиция стоит в открытых каналах, есть ли рабочий канал закупки и что мешает закрыть строку. Отбор строк — по экспозиции: топ-60 дают 67 % от 9 277 410 USD экспозиции всей заявки (экспозиция = середина нашей оценочной вилки, умноженная на количество). Поле band_verdict говорит, что стало с нашей прежней оценкой: ЗАНИЖЕНА, ЗАВЫШЕНА, ВЕРНА или НЕЧЕМ ПРОВЕРИТЬ. Последнее — НЕ «дорого» и не «дёшево», а отсутствие открытой цены во всех каналах; складывать эти группы в одну цифру нельзя. Поле skeptics несёт результат проверки вывода на опровержение; пустой список означает, что проверка не прогонялась, и приравнивать это к подтверждению нельзя — исследователь уже был пойман на выдуманной цитате. ВНИМАНИЕ: набор пополняется по ходу, и до окончания прогона он ЧАСТИЧНЫЙ — число строк в нём меньше шестидесяти. Собирается рабочим процессом перепроверки, читается gt/tools/ship_reverify.py. Цены здесь рыночные, из открытых карточек продавцов; выставленных заказчику цен в наборе нет.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "rows",
+        "source",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 63,
+        "record_keys": [
+          "band_verdict",
+          "blocker",
+          "channel",
+          "contacts",
+          "lead_time",
+          "lifecycle",
+          "note",
+          "pn",
+          "price_authorized",
+          "price_high",
+          "price_kind",
+          "price_low",
+          "price_source",
+          "real_maker",
+          "real_pn",
+          "recommended",
+          "skeptics",
+          "stock",
+          "volume_note",
+          "what_it_is"
+        ]
+      },
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "052e98d",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/ship_brief.py",
+        "gt/tools/ship_decisions.py",
+        "gt/tools/ship_offer.py",
+        "gt/tools/ship_reverify.py",
+        "tests/test_ship_reverify_consistency.py"
+      ]
+    },
+    {
       "path": "pnw/data/supplier_master.json",
       "subproject": "каталог PN · данные",
       "bytes": 777443,
@@ -1357,60 +1411,6 @@
         ]
       },
       "referenced_by": []
-    },
-    {
-      "path": "gt/data/ship_reverify.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 693976,
-      "note": "Перепроверка крупнейших строк заявки ЛУКОЙЛ: по каждой строке заново установлено, что это за изделие, кто его делает на самом деле и под каким своим номером, жив ли номер, сколько позиция стоит в открытых каналах, есть ли рабочий канал закупки и что мешает закрыть строку. Отбор строк — по экспозиции: топ-60 дают 67 % от 9 277 410 USD экспозиции всей заявки (экспозиция = середина нашей оценочной вилки, умноженная на количество). Поле band_verdict говорит, что стало с нашей прежней оценкой: ЗАНИЖЕНА, ЗАВЫШЕНА, ВЕРНА или НЕЧЕМ ПРОВЕРИТЬ. Последнее — НЕ «дорого» и не «дёшево», а отсутствие открытой цены во всех каналах; складывать эти группы в одну цифру нельзя. Поле skeptics несёт результат проверки вывода на опровержение; пустой список означает, что проверка не прогонялась, и приравнивать это к подтверждению нельзя — исследователь уже был пойман на выдуманной цитате. ВНИМАНИЕ: набор пополняется по ходу, и до окончания прогона он ЧАСТИЧНЫЙ — число строк в нём меньше шестидесяти. Собирается рабочим процессом перепроверки, читается gt/tools/ship_reverify.py. Цены здесь рыночные, из открытых карточек продавцов; выставленных заказчику цен в наборе нет.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "rows",
-        "source",
-        "updated"
-      ],
-      "main_collection": {
-        "key": "rows",
-        "records": 46,
-        "record_keys": [
-          "band_verdict",
-          "blocker",
-          "channel",
-          "contacts",
-          "lead_time",
-          "lifecycle",
-          "note",
-          "pn",
-          "price_authorized",
-          "price_high",
-          "price_kind",
-          "price_low",
-          "price_source",
-          "real_maker",
-          "real_pn",
-          "recommended",
-          "skeptics",
-          "stock",
-          "volume_note",
-          "what_it_is"
-        ]
-      },
-      "last_change": "2026-09-18",
-      "last_author": "Claude",
-      "last_commit": "052e98d",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "gt/tools/ship_brief.py",
-        "gt/tools/ship_decisions.py",
-        "gt/tools/ship_offer.py",
-        "gt/tools/ship_reverify.py",
-        "tests/test_ship_reverify_consistency.py"
-      ]
     },
     {
       "path": "data/chat_snapshot.json",
@@ -2832,6 +2832,59 @@
       "referenced_by": []
     },
     {
+      "path": "gt/data/ship_english_source.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 197889,
+      "note": "Англоязычный первоисточник листа «Энергосети» заявки ЛУКОЙЛ: 436 строк вида «№ · номер · наименование на английском · количество · единица» со страницы gas-turbine-parts.com/News/Product_FAQ/151.html. ДВА ВЫВОДА, и второй важнее. (1) Это НЕ независимый каталог и заявку он не подтверждает: 431 его строка из 436 стоит в заявке (98,9 %), количества совпадают у 425 — русские наименования заявки суть его построчный машинный перевод. Ссылка на него как на проверку номера даёт круговой вывод; одна такая ссылка уже стояла в перепроверке и снята. (2) Это расшифровка: у 365 строк сводки появляется наименование на языке западного продавца, и 159 из них — с вердиктом «номер не найден». Перевод искажает предмет («СОПРОТИВЛЕНИЕ ДАТЧИКА ТЕМПЕРАТУРЫ» в оригинале RESISTANCE TEMPERATURE TRANSMITTER — преобразователь, а не сопротивление), поэтому в запрос цены идёт поле ask_as. Собирает и сверяет gt/tools/english_source.py (--check по нормализованному номеру).",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "method",
+        "not_a_confirmation",
+        "qty_warning",
+        "rows",
+        "source",
+        "totals",
+        "updated",
+        "what_it_is_for"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 436,
+        "record_keys": [
+          "ask_as",
+          "in_request",
+          "lines_in_request",
+          "name_en",
+          "name_ru",
+          "no",
+          "pn",
+          "qty_en",
+          "qty_match_line",
+          "qty_match_total",
+          "qty_request",
+          "qty_source_pn",
+          "sheet",
+          "unit"
+        ]
+      },
+      "last_change": "2026-09-18",
+      "last_author": "skharkov1246",
+      "last_commit": "d7d8f56",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/english_source.py",
+        "gt/tools/rfq_en.py",
+        "gt/tools/ship_brief.py",
+        "gt/tools/ship_decisions.py",
+        "tests/test_english_source_qty.py"
+      ]
+    },
+    {
       "path": "zip/data/material_suppliers.json",
       "subproject": "база ЗИП",
       "bytes": 195837,
@@ -3244,55 +3297,6 @@
         "gt/tools/build_solar.py",
         "gt/tools/drop_ru.py",
         "library/load_suppliers.py"
-      ]
-    },
-    {
-      "path": "gt/data/ship_english_source.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 168692,
-      "note": "Англоязычный первоисточник листа «Энергосети» заявки ЛУКОЙЛ: 436 строк вида «№ · номер · наименование на английском · количество · единица» со страницы gas-turbine-parts.com/News/Product_FAQ/151.html. ДВА ВЫВОДА, и второй важнее. (1) Это НЕ независимый каталог и заявку он не подтверждает: 431 его строка из 436 стоит в заявке (98,9 %), количества совпадают у 425 — русские наименования заявки суть его построчный машинный перевод. Ссылка на него как на проверку номера даёт круговой вывод; одна такая ссылка уже стояла в перепроверке и снята. (2) Это расшифровка: у 365 строк сводки появляется наименование на языке западного продавца, и 159 из них — с вердиктом «номер не найден». Перевод искажает предмет («СОПРОТИВЛЕНИЕ ДАТЧИКА ТЕМПЕРАТУРЫ» в оригинале RESISTANCE TEMPERATURE TRANSMITTER — преобразователь, а не сопротивление), поэтому в запрос цены идёт поле ask_as. Собирает и сверяет gt/tools/english_source.py (--check по нормализованному номеру).",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "method",
-        "not_a_confirmation",
-        "rows",
-        "source",
-        "totals",
-        "updated",
-        "what_it_is_for"
-      ],
-      "main_collection": {
-        "key": "rows",
-        "records": 436,
-        "record_keys": [
-          "ask_as",
-          "in_request",
-          "lines_in_request",
-          "name_en",
-          "name_ru",
-          "no",
-          "pn",
-          "qty_en",
-          "qty_match",
-          "qty_request",
-          "sheet",
-          "unit"
-        ]
-      },
-      "last_change": "2026-09-18",
-      "last_author": "skharkov1246",
-      "last_commit": "d7d8f56",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "gt/tools/english_source.py",
-        "gt/tools/rfq_en.py",
-        "gt/tools/ship_brief.py",
-        "gt/tools/ship_decisions.py"
       ]
     },
     {
@@ -9696,7 +9700,7 @@
       },
       "last_change": "2026-09-18",
       "last_author": "Claude",
-      "last_commit": "2111328",
+      "last_commit": "8b03557",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
