@@ -4,16 +4,16 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 248,
-    "total_bytes": 111416156,
+    "datasets": 249,
+    "total_bytes": 111572349,
     "by_sensitivity": {
       "конфиденциально": 63,
-      "внутреннее": 137,
+      "внутреннее": 138,
       "публикуемо": 48
     },
     "by_subproject": {
       "ГПУ-библиотека": 29,
-      "ГТУ-библиотека": 71,
+      "ГТУ-библиотека": 72,
       "ОВЭ-75": 45,
       "база ЗИП": 49,
       "база ЗИП · таможня": 18,
@@ -199,9 +199,9 @@
         "gt/tools/jenbacher_fold.py",
         "gt/tools/lists_rfq.py",
         "gt/tools/maker_basis.py",
+        "gt/tools/quote_letters.py",
         "gt/tools/rejudge_rate.py",
-        "gt/tools/rv_brief.py",
-        "gt/tools/rv_merge.py"
+        "gt/tools/rv_brief.py"
       ]
     },
     {
@@ -2118,7 +2118,9 @@
       },
       "referenced_by": [
         "gt/tools/lists_rfq.py",
+        "gt/tools/quote_letters.py",
         "gt/tools/ship_final.py",
+        "tests/test_quote_letters.py",
         "tests/test_report_numbers.py"
       ]
     },
@@ -2300,8 +2302,10 @@
         "markers": []
       },
       "referenced_by": [
+        "gt/tools/quote_letters.py",
         "gt/tools/ship_final.py",
-        "gt/tools/ship_rfq.py"
+        "gt/tools/ship_rfq.py",
+        "tests/test_quote_letters.py"
       ]
     },
     {
@@ -3674,6 +3678,45 @@
       "referenced_by": []
     },
     {
+      "path": "gt/data/ship_quote_letters.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 154300,
+      "note": "Третий пакет писем по заявке ЛУКОЙЛ: ЗАПРОС ЦЕНЫ И НАЛИЧИЯ по строкам, где адресат известен из разбора, а спрашивать никто не начал. Замер 18.09.2026 вскрыл дыру между двумя правильными условиями: ship_rfq берёт строки с НАЙДЕННЫМ складом, volume_letters — строки с ценой без остатка числом, и строки, где известен только адрес, не подходили ни туда, ни туда. Их 522 на 8 629 058 USD — больше, чем в двух других пакетах вместе. Адрес есть у 267 строк на 6 518 358 USD: 112 писем, порядок отправки по нашей экспозиции. По 255 строкам на 2 110 700 USD адреса нет — это следующая работа, и подбирать получателя по классу изделия нельзя. Пять вопросов в письме: цена за штуку и за объём, остаток числом, срок под наше количество, срок действия цены, базис поставки; отказ «нет» назван полноценным ответом. Ни нашей вилки, ни суммы, ни имени заказчика в письме нет. Адресат, уже опубликовавший нашу заявку (gt/data/ship_leak.json), помечен. Тест следит, что один номер не получает двух писем из разных пакетов. Считает gt/tools/quote_letters.py, он же собирает gt/docs/ЗАПРОС-ЦЕНЫ-И-НАЛИЧИЯ-ЛУКОЙЛ.pdf.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "letters",
+        "rows_no_address_list",
+        "rows_total",
+        "rows_with_address",
+        "rows_without_address",
+        "source",
+        "updated",
+        "usd_total",
+        "usd_with_address",
+        "usd_without_address",
+        "what_is_not_in_the_letter",
+        "what_it_is",
+        "why_third_set"
+      ],
+      "main_collection": {
+        "key": "rows_no_address_list",
+        "records": 255
+      },
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "6db11e4",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/quote_letters.py",
+        "tests/test_quote_letters.py"
+      ]
+    },
+    {
       "path": "gpu/data/overhaul_qsk60.json",
       "subproject": "ГПУ-библиотека",
       "bytes": 154146,
@@ -4890,6 +4933,68 @@
       "referenced_by": []
     },
     {
+      "path": "data/catalog_notes.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 101188,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "data/budget_snapshot.json",
+        "data/chain_coverage.json",
+        "data/chat_snapshot.json",
+        "data/import_cost.json",
+        "data/index.json",
+        "dict/",
+        "dict/node_map.json",
+        "gidromet/data/",
+        "gpu/data/bitrix_gpu.json",
+        "gpu/data/coverage.json",
+        "gpu/data/faults.json",
+        "gpu/data/overhaul_qsk60.json",
+        "gt/data/ansaldo.json",
+        "gt/data/bitrix_gt.json",
+        "gt/data/bitrix_tkp_index.json",
+        "gt/data/dossiers.json",
+        "gt/data/faults.json",
+        "gt/data/fx_rates.json",
+        "gt/data/pn_db.json",
+        "gt/data/ship_band_basis.json",
+        "gt/data/ship_blocked.json",
+        "gt/data/ship_channels.json",
+        "gt/data/ship_collisions.json",
+        "gt/data/ship_confidence.json",
+        "gt/data/ship_coverage.json",
+        "gt/data/ship_decoded.json",
+        "gt/data/ship_demand_collisions.json",
+        "gt/data/ship_energoseti.json",
+        "gt/data/ship_english_source.json",
+        "gt/data/ship_homoglyphs.json",
+        "gt/data/ship_inside_quotes.json",
+        "gt/data/ship_jenbacher_prices.json",
+        "gt/data/ship_leak.json",
+        "gt/data/ship_lists_rfq.json",
+        "gt/data/ship_lukoil.json",
+        "gt/data/ship_maker_basis.json",
+        "gt/data/ship_margin.json",
+        "gt/data/ship_offer_stats.json",
+        "gt/data/ship_overpriced.json",
+        "gt/data/ship_parts_lists.json"
+      ],
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "6db11e4",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "scripts/build_catalog.py",
+        "tests/test_catalog_guard.py"
+      ]
+    },
+    {
       "path": "zip/data/perf_test_requests.json",
       "subproject": "база ЗИП",
       "bytes": 100422,
@@ -5045,68 +5150,6 @@
         "gt/tools/drop_ru.py",
         "gt/tools/ship_merge.py",
         "library/load_suppliers.py"
-      ]
-    },
-    {
-      "path": "data/catalog_notes.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 99295,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "data/budget_snapshot.json",
-        "data/chain_coverage.json",
-        "data/chat_snapshot.json",
-        "data/import_cost.json",
-        "data/index.json",
-        "dict/",
-        "dict/node_map.json",
-        "gidromet/data/",
-        "gpu/data/bitrix_gpu.json",
-        "gpu/data/coverage.json",
-        "gpu/data/faults.json",
-        "gpu/data/overhaul_qsk60.json",
-        "gt/data/ansaldo.json",
-        "gt/data/bitrix_gt.json",
-        "gt/data/bitrix_tkp_index.json",
-        "gt/data/dossiers.json",
-        "gt/data/faults.json",
-        "gt/data/fx_rates.json",
-        "gt/data/pn_db.json",
-        "gt/data/ship_band_basis.json",
-        "gt/data/ship_blocked.json",
-        "gt/data/ship_channels.json",
-        "gt/data/ship_collisions.json",
-        "gt/data/ship_confidence.json",
-        "gt/data/ship_coverage.json",
-        "gt/data/ship_decoded.json",
-        "gt/data/ship_demand_collisions.json",
-        "gt/data/ship_energoseti.json",
-        "gt/data/ship_english_source.json",
-        "gt/data/ship_homoglyphs.json",
-        "gt/data/ship_inside_quotes.json",
-        "gt/data/ship_jenbacher_prices.json",
-        "gt/data/ship_leak.json",
-        "gt/data/ship_lists_rfq.json",
-        "gt/data/ship_lukoil.json",
-        "gt/data/ship_maker_basis.json",
-        "gt/data/ship_margin.json",
-        "gt/data/ship_offer_stats.json",
-        "gt/data/ship_overpriced.json",
-        "gt/data/ship_parts_lists.json"
-      ],
-      "last_change": "2026-09-18",
-      "last_author": "Claude",
-      "last_commit": "ff86321",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "scripts/build_catalog.py",
-        "tests/test_catalog_guard.py"
       ]
     },
     {
@@ -8123,7 +8166,9 @@
         "markers": []
       },
       "referenced_by": [
-        "gt/tools/volume_letters.py"
+        "gt/tools/quote_letters.py",
+        "gt/tools/volume_letters.py",
+        "tests/test_quote_letters.py"
       ]
     },
     {
@@ -10299,6 +10344,7 @@
         "markers": []
       },
       "referenced_by": [
+        "gt/tools/quote_letters.py",
         "gt/tools/ship_final.py",
         "gt/tools/ship_leak.py",
         "gt/tools/volume_letters.py"
