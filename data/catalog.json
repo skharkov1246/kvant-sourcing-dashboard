@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 242,
-    "total_bytes": 109436093,
+    "total_bytes": 109448601,
     "by_sensitivity": {
       "конфиденциально": 62,
       "внутреннее": 134,
@@ -1746,6 +1746,7 @@
       "referenced_by": [
         "gt/tools/inside_quotes.py",
         "gt/tools/inside_quotes_doc.py",
+        "gt/tools/lists_rfq.py",
         "gt/tools/ship_coverage.py",
         "gt/tools/ship_final.py",
         "tests/test_inside_quotes.py",
@@ -2068,6 +2069,52 @@
       ]
     },
     {
+      "path": "gt/data/ship_lists_rfq.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 365385,
+      "note": "Письма держателям открытых перечней запасных частей по строкам заявки ЛУКОЙЛ, где изделие опознано перечнем, а канал закупки не назван: 13 писем на 820 позиций. Адрес здесь ПО ДЕТАЛИ (наш номер напечатан у держателя в перечне дословно), но наличие детали и её происхождение перечнем не подтверждаются — письмо спрашивает об этом первым пунктом. Хранилища документов (Интернет-архив, площадки публикации) исключены явно: они не продавцы. Собирает gt/tools/lists_rfq.py.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "letters",
+        "rows_already_quoted",
+        "rows_covered",
+        "skipped",
+        "source",
+        "updated",
+        "what_already_quoted_means",
+        "what_this_address_is"
+      ],
+      "main_collection": {
+        "key": "letters",
+        "records": 18,
+        "record_keys": [
+          "already_quoted",
+          "body",
+          "body_head",
+          "body_tail",
+          "host",
+          "is_discovery",
+          "pns",
+          "rows",
+          "subject"
+        ]
+      },
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "de71e39",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/lists_rfq.py",
+        "gt/tools/ship_final.py",
+        "tests/test_report_numbers.py"
+      ]
+    },
+    {
       "path": "zip/data/telsmith_prices.json",
       "subproject": "база ЗИП",
       "bytes": 362458,
@@ -2101,48 +2148,6 @@
       "referenced_by": [
         "zip/tools/build_telsmith_page.py",
         "zip/tools/telsmith_report.py"
-      ]
-    },
-    {
-      "path": "gt/data/ship_lists_rfq.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 352877,
-      "note": "Письма держателям открытых перечней запасных частей по строкам заявки ЛУКОЙЛ, где изделие опознано перечнем, а канал закупки не назван: 13 писем на 820 позиций. Адрес здесь ПО ДЕТАЛИ (наш номер напечатан у держателя в перечне дословно), но наличие детали и её происхождение перечнем не подтверждаются — письмо спрашивает об этом первым пунктом. Хранилища документов (Интернет-архив, площадки публикации) исключены явно: они не продавцы. Собирает gt/tools/lists_rfq.py.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "letters",
-        "rows_covered",
-        "skipped",
-        "source",
-        "updated",
-        "what_this_address_is"
-      ],
-      "main_collection": {
-        "key": "letters",
-        "records": 17,
-        "record_keys": [
-          "body",
-          "body_head",
-          "body_tail",
-          "host",
-          "pns",
-          "rows",
-          "subject"
-        ]
-      },
-      "last_change": "2026-09-18",
-      "last_author": "Claude",
-      "last_commit": "95957b0",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "gt/tools/lists_rfq.py",
-        "gt/tools/ship_final.py",
-        "tests/test_report_numbers.py"
       ]
     },
     {
