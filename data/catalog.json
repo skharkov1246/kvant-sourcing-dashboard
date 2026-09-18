@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 238,
-    "total_bytes": 108765747,
+    "total_bytes": 108765885,
     "by_sensitivity": {
       "конфиденциально": 62,
       "внутреннее": 133,
@@ -2004,12 +2004,12 @@
         "gt/tools/questions_doc.py",
         "gt/tools/rv_pricehunt.py",
         "gt/tools/ship_brief.py",
+        "gt/tools/ship_coverage.py",
         "gt/tools/ship_decisions.py",
         "gt/tools/ship_final.py",
         "gt/tools/ship_questions.py",
         "ove/build.py",
-        "ove/tools/build_questions.py",
-        "tests/test_ship_collisions.py"
+        "ove/tools/build_questions.py"
       ]
     },
     {
@@ -3187,6 +3187,7 @@
         "gt/tools/questions_doc.py",
         "gt/tools/rv_pricehunt.py",
         "gt/tools/ship_brief.py",
+        "gt/tools/ship_coverage.py",
         "gt/tools/ship_decisions.py",
         "gt/tools/ship_final.py",
         "gt/tools/ship_questions.py",
@@ -9861,7 +9862,7 @@
     {
       "path": "gt/data/ship_coverage.json",
       "subproject": "ГТУ-библиотека",
-      "bytes": 3414,
+      "bytes": 3552,
       "note": "Покрытие заявки ЛУКОЙЛ по ступеням понимания: опознана → есть кому написать → есть цена и адрес → отгружаема. Лестница накопительна (каждая ступень требует предыдущих), признаки по отдельности независимы и в лестницу не складываются. Считается и в строках, и в деньгах; строки без нашей оценки в денежный счёт не входят и названы отдельно. Считает gt/tools/ship_coverage.py.",
       "format": "json",
       "shape": "объект",
@@ -9880,11 +9881,11 @@
       ],
       "main_collection": {
         "key": "channel_without_price",
-        "records": 5
+        "records": 9
       },
       "last_change": "2026-09-18",
       "last_author": "Claude",
-      "last_commit": "95957b0",
+      "last_commit": "70a2eac",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "публикуемо",
