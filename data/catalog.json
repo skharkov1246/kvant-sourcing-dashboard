@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 230,
-    "total_bytes": 104576357,
+    "total_bytes": 104577214,
     "by_sensitivity": {
       "конфиденциально": 62,
       "внутреннее": 129,
@@ -6412,6 +6412,43 @@
       ]
     },
     {
+      "path": "gt/data/ship_stocklist_cross.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 48779,
+      "note": "Пересечение открытого сток-листа продавца с номерами заявки: сколько наших строк он закрывает и куда ask бьёт по нашим вилкам. Считает gt/tools/stocklist_cross.py. ЦЕН В НАБОРЕ НЕТ И БЫТЬ НЕ МОЖЕТ: репозиторий публичный, а сток-лист — коммерческий документ контрагента, выкладывать его целиком нельзя даже при открытой странице. Набор несёт только счёт и класс (ask выше потолка, внутри, ниже пола, вилки нет), это закреплено тестом. Отдельная цена приводится в перепроверке как довод по конкретной строке с названной страницей — это довод, а не перепечатка листа.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "cross_note",
+        "disagreements",
+        "method",
+        "no_band_reach",
+        "no_prices",
+        "sellers",
+        "source",
+        "updated",
+        "what_it_is_not",
+        "why_many_sellers"
+      ],
+      "main_collection": {
+        "key": "sellers",
+        "records": 7
+      },
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "42f6932",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/ship_brief.py",
+        "gt/tools/stocklist_cross.py",
+        "tests/test_stocklist_cross.py"
+      ]
+    },
+    {
       "path": "gidromet/data/project.json",
       "subproject": "гидрометаллургия",
       "bytes": 48385,
@@ -6489,42 +6526,6 @@
       },
       "referenced_by": [
         "ove/build.py"
-      ]
-    },
-    {
-      "path": "gt/data/ship_stocklist_cross.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 47922,
-      "note": "Пересечение открытого сток-листа продавца с номерами заявки: сколько наших строк он закрывает и куда ask бьёт по нашим вилкам. Считает gt/tools/stocklist_cross.py. ЦЕН В НАБОРЕ НЕТ И БЫТЬ НЕ МОЖЕТ: репозиторий публичный, а сток-лист — коммерческий документ контрагента, выкладывать его целиком нельзя даже при открытой странице. Набор несёт только счёт и класс (ask выше потолка, внутри, ниже пола, вилки нет), это закреплено тестом. Отдельная цена приводится в перепроверке как довод по конкретной строке с названной страницей — это довод, а не перепечатка листа.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "cross_note",
-        "disagreements",
-        "method",
-        "no_prices",
-        "sellers",
-        "source",
-        "updated",
-        "what_it_is_not",
-        "why_many_sellers"
-      ],
-      "main_collection": {
-        "key": "sellers",
-        "records": 7
-      },
-      "last_change": "2026-09-18",
-      "last_author": "Claude",
-      "last_commit": "1ffdfee",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "gt/tools/ship_brief.py",
-        "gt/tools/stocklist_cross.py",
-        "tests/test_stocklist_cross.py"
       ]
     },
     {
