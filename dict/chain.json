@@ -1,7 +1,7 @@
 {
   "note": "Ребро, а не карточка: уровень субпоставщика — свойство пути, а не компании. Одна и та же компания бывает первым уровнем для одного владельца конструкции и вторым, если между ними стоит пакаджер, поэтому уровень не хранится, а считается обходом. Записи вида routing_note — не компании, а указания к закупке из поля mk базы PN: «закупка по спецификации», «любой дистрибьютор». Для сорсера это ответ не хуже имени завода, поэтому они сохранены отдельным видом.",
-  "count": 285,
-  "makers": 247,
+  "count": 303,
+  "makers": 265,
   "routing_notes": 38,
   "records": [
     {
@@ -131,42 +131,13 @@
       ],
       "proof": [
         "П2 — производитель назван в позиции заказчика",
-        "П2 — заказной код ABB"
+        "П2 — заказной код ABB",
+        "П0 — каталог изготовителя, перепроверка 18.09.2026"
       ],
       "sources": [
         "gt/data/pn_db.json"
       ],
-      "n": 49,
-      "from_is_bucket": true
-    },
-    {
-      "from": "Прочие",
-      "from_key": "прочие",
-      "to": "Pall/Donaldson/Parker/PECOFacet (по типу)",
-      "to_key": "",
-      "kind": "routing_note",
-      "relation": "makes_for",
-      "scope": [
-        "Фильтр масляный",
-        "Вкладыш воздушного фильтра",
-        "Фильтр масляный турбокомпрессора",
-        "Вкладыш фильтра",
-        "Гидравлическая силовая установка",
-        "Фильтр сменный",
-        "Верхний привод TDS-8SA",
-        "Бумажная вставка центробежного насоса",
-        "Комплект уплотнений центробежного фильтра",
-        "Вставка газового фильтра",
-        "Лебедка буровая MAS7000GD-006A",
-        "Лебедка буровая MAS7000GD-002A, Лебедка буровая MAS7000GD-006A"
-      ],
-      "proof": [
-        "П4: сегмент фильтров"
-      ],
-      "sources": [
-        "gt/data/pn_db.json"
-      ],
-      "n": 44,
+      "n": 48,
       "from_is_bucket": true
     },
     {
@@ -217,7 +188,8 @@
       ],
       "proof": [
         "П2 — производитель назван в позиции заказчика",
-        "П2 — заказной номер Drillmec"
+        "П2 — заказной номер Drillmec",
+        "П0 — каталог изготовителя, перепроверка 18.09.2026"
       ],
       "sources": [
         "gt/data/pn_db.json"
@@ -246,25 +218,6 @@
       "from_is_bucket": false
     },
     {
-      "from": "Siemens Energy",
-      "from_key": "siemensenergy",
-      "to": "Siemens Energy (Линкольн) или реверс по образцу/чертежу",
-      "to_key": "",
-      "kind": "routing_note",
-      "relation": "makes_for",
-      "scope": [
-        "SGT-400"
-      ],
-      "proof": [
-        "П3 — чертёжная деталь Линкольна"
-      ],
-      "sources": [
-        "gt/data/pn_db.json"
-      ],
-      "n": 35,
-      "from_is_bucket": false
-    },
-    {
       "from": "Solar Turbines",
       "from_key": "solarturbines",
       "to": "Rockwell Automation (Allen-Bradley)",
@@ -277,18 +230,50 @@
         "Taurus 60S",
         "Taurus 70, Шкаф управления PMS МЛСПК",
         "Taurus 60S, Taurus 70",
+        "Taurus 70",
         "Шкаф управления PMS МЛСПК",
         "Solar (сток)"
       ],
       "proof": [
         "П2 — это и есть заказной код AB",
+        "П0 — каталог изготовителя, перепроверка 18.09.2026",
         "П2"
       ],
       "sources": [
         "gt/data/pn_db.json"
       ],
-      "n": 32,
+      "n": 37,
       "from_is_bucket": false
+    },
+    {
+      "from": "Прочие",
+      "from_key": "прочие",
+      "to": "Pall/Donaldson/Parker/PECOFacet (по типу)",
+      "to_key": "",
+      "kind": "routing_note",
+      "relation": "makes_for",
+      "scope": [
+        "Фильтр масляный",
+        "Вкладыш воздушного фильтра",
+        "Фильтр масляный турбокомпрессора",
+        "Гидравлическая силовая установка",
+        "Верхний привод TDS-8SA",
+        "Вкладыш фильтра",
+        "Бумажная вставка центробежного насоса",
+        "Комплект уплотнений центробежного фильтра",
+        "Лебедка буровая MAS7000GD-006A",
+        "Лебедка буровая MAS7000GD-002A, Лебедка буровая MAS7000GD-006A",
+        "Гидравлическая силовая установка AV1.01539.00.00",
+        "Гидравлическая силовая установка AV1.01540.00.OQ"
+      ],
+      "proof": [
+        "П4: сегмент фильтров"
+      ],
+      "sources": [
+        "gt/data/pn_db.json"
+      ],
+      "n": 36,
+      "from_is_bucket": true
     },
     {
       "from": "GE",
@@ -305,6 +290,25 @@
         "П2 — это и есть заказной код Bently",
         "П2",
         "П3"
+      ],
+      "sources": [
+        "gt/data/pn_db.json"
+      ],
+      "n": 31,
+      "from_is_bucket": false
+    },
+    {
+      "from": "Siemens Energy",
+      "from_key": "siemensenergy",
+      "to": "Siemens Energy (Линкольн) или реверс по образцу/чертежу",
+      "to_key": "",
+      "kind": "routing_note",
+      "relation": "makes_for",
+      "scope": [
+        "SGT-400"
+      ],
+      "proof": [
+        "П3 — чертёжная деталь Линкольна"
       ],
       "sources": [
         "gt/data/pn_db.json"
@@ -408,7 +412,7 @@
     {
       "from": "Solar Turbines",
       "from_key": "solarturbines",
-      "to": "Bently Nevada (Baker Hughes)",
+      "to": "Bently Nevada / Baker Hughes",
       "to_key": "bentlynevadabakerhughes",
       "kind": "maker",
       "relation": "makes_for",
@@ -421,10 +425,10 @@
         "Solar (сток)"
       ],
       "proof": [
+        "П0 — каталог изготовителя, перепроверка 18.09.2026",
         "П2 — номер вендора в ведомости заказчика",
         "П2: имя/серия вендора в описании",
-        "П2",
-        "П3"
+        "П2"
       ],
       "sources": [
         "gt/data/pn_db.json"
@@ -561,6 +565,36 @@
       ],
       "n": 14,
       "from_is_bucket": false
+    },
+    {
+      "from": "Прочие",
+      "from_key": "прочие",
+      "to": "Cummins",
+      "to_key": "cummins",
+      "kind": "maker",
+      "relation": "makes_for",
+      "scope": [
+        "Катушка зажигания",
+        "Колпачек свечи зажигания",
+        "Свеча зажигания",
+        "Подогреватель двигателя, Тэн для подогрева ОЖ",
+        "Фильтрующий элемент картера",
+        "Датчик давлени",
+        "Датчик давления масла",
+        "Датчик температуры",
+        "Датчик оборотов",
+        "Прокладка",
+        "Вставка газового фильтра"
+      ],
+      "proof": [
+        "П0 — каталог изготовителя, перепроверка 18.09.2026",
+        "П2 — производитель назван в позиции заказчика"
+      ],
+      "sources": [
+        "gt/data/pn_db.json"
+      ],
+      "n": 14,
+      "from_is_bucket": true
     },
     {
       "from": "Прочие",
@@ -759,27 +793,6 @@
     {
       "from": "Solar Turbines",
       "from_key": "solarturbines",
-      "to": "Mean Well/Phoenix Contact — 24 VDC по мощности",
-      "to_key": "meanwellphoenixcontact24vdcпомощности",
-      "kind": "maker",
-      "relation": "makes_for",
-      "scope": [
-        "Taurus 70",
-        "Taurus 70MD",
-        "Taurus 60S"
-      ],
-      "proof": [
-        "П4 — по мощности/напряжению"
-      ],
-      "sources": [
-        "gt/data/pn_db.json"
-      ],
-      "n": 11,
-      "from_is_bucket": false
-    },
-    {
-      "from": "Solar Turbines",
-      "from_key": "solarturbines",
       "to": "Parker Hannifin (тип.)",
       "to_key": "parkerhannifinтип",
       "kind": "maker",
@@ -796,6 +809,27 @@
         "gt/data/pn_db.json"
       ],
       "n": 11,
+      "from_is_bucket": false
+    },
+    {
+      "from": "Solar Turbines",
+      "from_key": "solarturbines",
+      "to": "Mean Well/Phoenix Contact — 24 VDC по мощности",
+      "to_key": "meanwellphoenixcontact24vdcпомощности",
+      "kind": "maker",
+      "relation": "makes_for",
+      "scope": [
+        "Taurus 70",
+        "Taurus 70MD",
+        "Taurus 60S"
+      ],
+      "proof": [
+        "П4 — по мощности/напряжению"
+      ],
+      "sources": [
+        "gt/data/pn_db.json"
+      ],
+      "n": 10,
       "from_is_bucket": false
     },
     {
@@ -944,30 +978,6 @@
     {
       "from": "Прочие",
       "from_key": "прочие",
-      "to": "Champion Aerospace (тип.)",
-      "to_key": "championaerospaceтип",
-      "kind": "maker",
-      "relation": "makes_for",
-      "scope": [
-        "Запальная свеча, артикул",
-        "Свеча зажигания",
-        "К-кт свечей зажигания DENSO 518 (4шт",
-        "Колпачек свечи зажигания",
-        "Уплотнительная шайба свечи зажигания",
-        "Наконечник контактный запальной свечи"
-      ],
-      "proof": [
-        "П3: OE-поставщик зажигания Solar"
-      ],
-      "sources": [
-        "gt/data/pn_db.json"
-      ],
-      "n": 9,
-      "from_is_bucket": true
-    },
-    {
-      "from": "Прочие",
-      "from_key": "прочие",
       "to": "MarFlex",
       "to_key": "marflex",
       "kind": "maker",
@@ -1092,30 +1102,6 @@
       "from_is_bucket": false
     },
     {
-      "from": "Прочие",
-      "from_key": "прочие",
-      "to": "Cummins",
-      "to_key": "cummins",
-      "kind": "maker",
-      "relation": "makes_for",
-      "scope": [
-        "Подогреватель двигателя, Тэн для подогрева ОЖ",
-        "Датчик давлени",
-        "Датчик давления масла",
-        "Датчик температуры",
-        "Датчик оборотов",
-        "Прокладка"
-      ],
-      "proof": [
-        "П2 — производитель назван в позиции заказчика"
-      ],
-      "sources": [
-        "gt/data/pn_db.json"
-      ],
-      "n": 7,
-      "from_is_bucket": true
-    },
-    {
       "from": "Solar Turbines",
       "from_key": "solarturbines",
       "to": "Detector Electronics (Det-Tronics)",
@@ -1225,29 +1211,6 @@
     {
       "from": "Прочие",
       "from_key": "прочие",
-      "to": "SKF / Timken / RENK (по типу)",
-      "to_key": "",
-      "kind": "routing_note",
-      "relation": "makes_for",
-      "scope": [
-        "Цементировочный агрегат CPS-763",
-        "Лебедка буровая MAS7000GD-002A, Лебедка буровая MAS7000GD-006A",
-        "Электродвигатель 1RQ1 502-2JJ60-Z",
-        "Электродвигатель AMI 500L2W BSFH",
-        "Насос MarFlex MDPC-200"
-      ],
-      "proof": [
-        "П4: сегмент подшипников"
-      ],
-      "sources": [
-        "gt/data/pn_db.json"
-      ],
-      "n": 6,
-      "from_is_bucket": true
-    },
-    {
-      "from": "Прочие",
-      "from_key": "прочие",
       "to": "Tesco Corporation",
       "to_key": "tescocorporation",
       "kind": "maker",
@@ -1344,6 +1307,25 @@
       "from_is_bucket": false
     },
     {
+      "from": "Siemens Energy",
+      "from_key": "siemensenergy",
+      "to": "Siemens Energy (чертёж завода Линкольн)",
+      "to_key": "siemensenergyчертежзаводалинкольн",
+      "kind": "maker",
+      "relation": "makes_for",
+      "scope": [
+        "SGT-400"
+      ],
+      "proof": [
+        "П0 — каталог изготовителя, перепроверка 18.09.2026"
+      ],
+      "sources": [
+        "gt/data/pn_db.json"
+      ],
+      "n": 5,
+      "from_is_bucket": false
+    },
+    {
       "from": "Solar Turbines",
       "from_key": "solarturbines",
       "to": "Крепёжный завод по спецификации (размер из описания, IH-стандарты Solar)",
@@ -1391,6 +1373,28 @@
       ],
       "n": 5,
       "from_is_bucket": false
+    },
+    {
+      "from": "Прочие",
+      "from_key": "прочие",
+      "to": "Fleetguard (Cummins Filtration)",
+      "to_key": "fleetguardcumminsfiltration",
+      "kind": "maker",
+      "relation": "makes_for",
+      "scope": [
+        "Дополнительные присадки к охлаждающей жидкости",
+        "Фильтр воздушный",
+        "Картридж масляного фильтра",
+        "Фильтр масляный"
+      ],
+      "proof": [
+        "П0 — каталог изготовителя, перепроверка 18.09.2026"
+      ],
+      "sources": [
+        "gt/data/pn_db.json"
+      ],
+      "n": 5,
+      "from_is_bucket": true
     },
     {
       "from": "GE",
@@ -1499,6 +1503,27 @@
       ],
       "proof": [
         "П2"
+      ],
+      "sources": [
+        "gt/data/pn_db.json"
+      ],
+      "n": 4,
+      "from_is_bucket": false
+    },
+    {
+      "from": "Solar Turbines",
+      "from_key": "solarturbines",
+      "to": "Det-Tronics (Emerson)",
+      "to_key": "dettronicsemerson",
+      "kind": "maker",
+      "relation": "makes_for",
+      "scope": [
+        "Taurus 60S, Taurus 70",
+        "Taurus 70MD",
+        "Taurus 60S"
+      ],
+      "proof": [
+        "П0 — каталог изготовителя, перепроверка 18.09.2026"
       ],
       "sources": [
         "gt/data/pn_db.json"
@@ -1650,16 +1675,17 @@
     {
       "from": "Прочие",
       "from_key": "прочие",
-      "to": "Champion Aerospace / Unison (тип.)",
-      "to_key": "championaerospaceunisonтип",
-      "kind": "maker",
+      "to": "SKF / Timken / RENK (по типу)",
+      "to_key": "",
+      "kind": "routing_note",
       "relation": "makes_for",
       "scope": [
-        "Модуль управления зажиганием",
-        "Катушка зажигания"
+        "Цементировочный агрегат CPS-763",
+        "Лебедка буровая MAS7000GD-002A, Лебедка буровая MAS7000GD-006A",
+        "Насос MarFlex MDPC-200"
       ],
       "proof": [
-        "П4: сегмент зажигания"
+        "П4: сегмент подшипников"
       ],
       "sources": [
         "gt/data/pn_db.json"
@@ -1680,6 +1706,7 @@
         "Уплотнение"
       ],
       "proof": [
+        "П0 — каталог изготовителя, перепроверка 18.09.2026",
         "П2"
       ],
       "sources": [
@@ -1687,26 +1714,6 @@
       ],
       "n": 4,
       "from_is_bucket": true
-    },
-    {
-      "from": "Siemens Energy",
-      "from_key": "siemensenergy",
-      "to": "SKF / Timken / RENK (по типу)",
-      "to_key": "",
-      "kind": "routing_note",
-      "relation": "makes_for",
-      "scope": [
-        "Электродвигатель 1RA1 452-2HA60-Z",
-        "Электродвигатель AMI 500L2W BSFH"
-      ],
-      "proof": [
-        "П4: сегмент подшипников"
-      ],
-      "sources": [
-        "gt/data/pn_db.json"
-      ],
-      "n": 3,
-      "from_is_bucket": false
     },
     {
       "from": "Siemens Energy",
@@ -1720,25 +1727,6 @@
       ],
       "proof": [
         "П2"
-      ],
-      "sources": [
-        "gt/data/pn_db.json"
-      ],
-      "n": 3,
-      "from_is_bucket": false
-    },
-    {
-      "from": "Solar Turbines",
-      "from_key": "solarturbines",
-      "to": "Bently Nevada (OE Solar по вибрации)",
-      "to_key": "bentlynevadaoesolarповибрации",
-      "kind": "maker",
-      "relation": "makes_for",
-      "scope": [
-        "Taurus 70MD"
-      ],
-      "proof": [
-        "П3 — Bently доказан (SEPOC + офиц. документ)"
       ],
       "sources": [
         "gt/data/pn_db.json"
@@ -1850,27 +1838,6 @@
     {
       "from": "Solar Turbines",
       "from_key": "solarturbines",
-      "to": "TC Ltd / Thermo Electric (тип.)",
-      "to_key": "tcthermoelectricтип",
-      "kind": "maker",
-      "relation": "makes_for",
-      "scope": [
-        "Taurus 60S, Taurus 70",
-        "Taurus 70MD",
-        "Taurus 60S"
-      ],
-      "proof": [
-        "П4: сегмент термопар"
-      ],
-      "sources": [
-        "gt/data/pn_db.json"
-      ],
-      "n": 3,
-      "from_is_bucket": false
-    },
-    {
-      "from": "Solar Turbines",
-      "from_key": "solarturbines",
       "to": "Welker Engineering",
       "to_key": "welkerengineering",
       "kind": "maker",
@@ -1901,6 +1868,27 @@
       ],
       "proof": [
         "П4: батареи"
+      ],
+      "sources": [
+        "gt/data/pn_db.json"
+      ],
+      "n": 3,
+      "from_is_bucket": true
+    },
+    {
+      "from": "Прочие",
+      "from_key": "прочие",
+      "to": "Jenbacher / INNIO",
+      "to_key": "jenbacherinnio",
+      "kind": "maker",
+      "relation": "makes_for",
+      "scope": [
+        "Наконечник контактный запальной свечи",
+        "Мотор установочный",
+        "Фильтр сменный"
+      ],
+      "proof": [
+        "П0 — каталог изготовителя, перепроверка 18.09.2026"
       ],
       "sources": [
         "gt/data/pn_db.json"
@@ -2044,6 +2032,26 @@
     {
       "from": "Siemens Energy",
       "from_key": "siemensenergy",
+      "to": "SKF / Timken / RENK (по типу)",
+      "to_key": "",
+      "kind": "routing_note",
+      "relation": "makes_for",
+      "scope": [
+        "Электродвигатель 1RA1 452-2HA60-Z",
+        "Электродвигатель AMI 500L2W BSFH"
+      ],
+      "proof": [
+        "П4: сегмент подшипников"
+      ],
+      "sources": [
+        "gt/data/pn_db.json"
+      ],
+      "n": 2,
+      "from_is_bucket": false
+    },
+    {
+      "from": "Siemens Energy",
+      "from_key": "siemensenergy",
       "to": "Druck (Baker Hughes)",
       "to_key": "druckbakerhughes",
       "kind": "maker",
@@ -2052,6 +2060,26 @@
         "SGT-400"
       ],
       "proof": [
+        "П2"
+      ],
+      "sources": [
+        "gt/data/pn_db.json"
+      ],
+      "n": 2,
+      "from_is_bucket": false
+    },
+    {
+      "from": "Siemens Energy",
+      "from_key": "siemensenergy",
+      "to": "Moog",
+      "to_key": "moog",
+      "kind": "maker",
+      "relation": "makes_for",
+      "scope": [
+        "SGT-400"
+      ],
+      "proof": [
+        "П0 — каталог изготовителя, перепроверка 18.09.2026",
         "П2"
       ],
       "sources": [
@@ -2170,6 +2198,25 @@
       ],
       "proof": [
         "П2"
+      ],
+      "sources": [
+        "gt/data/pn_db.json"
+      ],
+      "n": 2,
+      "from_is_bucket": false
+    },
+    {
+      "from": "Solar Turbines",
+      "from_key": "solarturbines",
+      "to": "Bently Nevada (OE Solar по вибрации)",
+      "to_key": "bentlynevadaoesolarповибрации",
+      "kind": "maker",
+      "relation": "makes_for",
+      "scope": [
+        "Taurus 70MD"
+      ],
+      "proof": [
+        "П3 — Bently доказан (SEPOC + офиц. документ)"
       ],
       "sources": [
         "gt/data/pn_db.json"
@@ -2372,6 +2419,26 @@
     {
       "from": "Solar Turbines",
       "from_key": "solarturbines",
+      "to": "Pepperl+Fuchs",
+      "to_key": "pepperlfuchs",
+      "kind": "maker",
+      "relation": "makes_for",
+      "scope": [
+        "Taurus 70MD",
+        "Taurus 60S, Taurus 70"
+      ],
+      "proof": [
+        "П0 — каталог изготовителя, перепроверка 18.09.2026"
+      ],
+      "sources": [
+        "gt/data/pn_db.json"
+      ],
+      "n": 2,
+      "from_is_bucket": false
+    },
+    {
+      "from": "Solar Turbines",
+      "from_key": "solarturbines",
       "to": "Rochester Gauges",
       "to_key": "rochestergauges",
       "kind": "maker",
@@ -2486,6 +2553,66 @@
     {
       "from": "Прочие",
       "from_key": "прочие",
+      "to": "Champion Aerospace / Unison (тип.)",
+      "to_key": "championaerospaceunisonтип",
+      "kind": "maker",
+      "relation": "makes_for",
+      "scope": [
+        "Модуль управления зажиганием",
+        "Катушка зажигания"
+      ],
+      "proof": [
+        "П4: сегмент зажигания"
+      ],
+      "sources": [
+        "gt/data/pn_db.json"
+      ],
+      "n": 2,
+      "from_is_bucket": true
+    },
+    {
+      "from": "Прочие",
+      "from_key": "прочие",
+      "to": "Champion Aerospace (тип.)",
+      "to_key": "championaerospaceтип",
+      "kind": "maker",
+      "relation": "makes_for",
+      "scope": [
+        "Запальная свеча, артикул",
+        "Уплотнительная шайба свечи зажигания"
+      ],
+      "proof": [
+        "П3: OE-поставщик зажигания Solar"
+      ],
+      "sources": [
+        "gt/data/pn_db.json"
+      ],
+      "n": 2,
+      "from_is_bucket": true
+    },
+    {
+      "from": "Прочие",
+      "from_key": "прочие",
+      "to": "DENSO",
+      "to_key": "denso",
+      "kind": "maker",
+      "relation": "makes_for",
+      "scope": [
+        "К-кт свечей зажигания DENSO 518 (4шт",
+        "Свеча зажигания"
+      ],
+      "proof": [
+        "П0 — каталог изготовителя, перепроверка 18.09.2026"
+      ],
+      "sources": [
+        "gt/data/pn_db.json"
+      ],
+      "n": 2,
+      "from_is_bucket": true
+    },
+    {
+      "from": "Прочие",
+      "from_key": "прочие",
       "to": "Dwyer Instruments",
       "to_key": "dwyerinstruments",
       "kind": "maker",
@@ -2505,16 +2632,15 @@
     {
       "from": "Прочие",
       "from_key": "прочие",
-      "to": "Fleetguard (Cummins)",
-      "to_key": "fleetguardcummins",
+      "to": "Jenbacher / INNIO (картридж альтернативы — Mann & Hummel)",
+      "to_key": "jenbacherinnioкартриджальтернативыmannhu",
       "kind": "maker",
       "relation": "makes_for",
       "scope": [
-        "Дополнительные присадки к охлаждающей жидкости",
-        "Фильтр воздушный"
+        "Вкладыш фильтра"
       ],
       "proof": [
-        "П2: имя вендора"
+        "П0 — каталог изготовителя, перепроверка 18.09.2026"
       ],
       "sources": [
         "gt/data/pn_db.json"
@@ -2554,6 +2680,26 @@
       ],
       "proof": [
         "П2 — производитель назван в документе заказчика"
+      ],
+      "sources": [
+        "gt/data/pn_db.json"
+      ],
+      "n": 2,
+      "from_is_bucket": true
+    },
+    {
+      "from": "Прочие",
+      "from_key": "прочие",
+      "to": "RENK",
+      "to_key": "renk",
+      "kind": "maker",
+      "relation": "makes_for",
+      "scope": [
+        "Электродвигатель 1RQ1 502-2JJ60-Z",
+        "Электродвигатель AMI 500L2W BSFH"
+      ],
+      "proof": [
+        "П0 — каталог изготовителя, перепроверка 18.09.2026"
       ],
       "sources": [
         "gt/data/pn_db.json"
@@ -2885,6 +3031,25 @@
     {
       "from": "Siemens Energy",
       "from_key": "siemensenergy",
+      "to": "Basler Electric",
+      "to_key": "baslerelectric",
+      "kind": "maker",
+      "relation": "makes_for",
+      "scope": [
+        "Шкафа генератора газотурбинных установок SIEMENS SGT400 МЛСКФ-1"
+      ],
+      "proof": [
+        "П0 — каталог изготовителя, перепроверка 18.09.2026"
+      ],
+      "sources": [
+        "gt/data/pn_db.json"
+      ],
+      "n": 1,
+      "from_is_bucket": false
+    },
+    {
+      "from": "Siemens Energy",
+      "from_key": "siemensenergy",
       "to": "Det-Tronics (по профилю F&G)",
       "to_key": "dettronicsпопрофилюfg",
       "kind": "maker",
@@ -2999,25 +3164,6 @@
     {
       "from": "Siemens Energy",
       "from_key": "siemensenergy",
-      "to": "Moog",
-      "to_key": "moog",
-      "kind": "maker",
-      "relation": "makes_for",
-      "scope": [
-        "SGT-400"
-      ],
-      "proof": [
-        "П2"
-      ],
-      "sources": [
-        "gt/data/pn_db.json"
-      ],
-      "n": 1,
-      "from_is_bucket": false
-    },
-    {
-      "from": "Siemens Energy",
-      "from_key": "siemensenergy",
       "to": "Pall (Danaher)",
       "to_key": "palldanaher",
       "kind": "maker",
@@ -3075,6 +3221,25 @@
     {
       "from": "Siemens Energy",
       "from_key": "siemensenergy",
+      "to": "RENK",
+      "to_key": "renk",
+      "kind": "maker",
+      "relation": "makes_for",
+      "scope": [
+        "Электродвигатель 1RA1 452-2HA60-Z"
+      ],
+      "proof": [
+        "П0 — каталог изготовителя, перепроверка 18.09.2026"
+      ],
+      "sources": [
+        "gt/data/pn_db.json"
+      ],
+      "n": 1,
+      "from_is_bucket": false
+    },
+    {
+      "from": "Siemens Energy",
+      "from_key": "siemensenergy",
       "to": "Rocol",
       "to_key": "rocol",
       "kind": "maker",
@@ -3103,6 +3268,25 @@
       ],
       "proof": [
         "П2"
+      ],
+      "sources": [
+        "gt/data/pn_db.json"
+      ],
+      "n": 1,
+      "from_is_bucket": false
+    },
+    {
+      "from": "Siemens Energy",
+      "from_key": "siemensenergy",
+      "to": "Siemens",
+      "to_key": "siemens",
+      "kind": "maker",
+      "relation": "makes_for",
+      "scope": [
+        "SKC62/F"
+      ],
+      "proof": [
+        "П0 — каталог изготовителя, перепроверка 18.09.2026"
       ],
       "sources": [
         "gt/data/pn_db.json"
@@ -3987,6 +4171,25 @@
     {
       "from": "Solar Turbines",
       "from_key": "solarturbines",
+      "to": "ProSoft Technology",
+      "to_key": "prosofttechnology",
+      "kind": "maker",
+      "relation": "makes_for",
+      "scope": [
+        "Taurus 70MD"
+      ],
+      "proof": [
+        "П0 — каталог изготовителя, перепроверка 18.09.2026"
+      ],
+      "sources": [
+        "gt/data/pn_db.json"
+      ],
+      "n": 1,
+      "from_is_bucket": false
+    },
+    {
+      "from": "Solar Turbines",
+      "from_key": "solarturbines",
       "to": "Rochem",
       "to_key": "rochem",
       "kind": "maker",
@@ -4243,6 +4446,25 @@
       ],
       "proof": [
         "П3"
+      ],
+      "sources": [
+        "gt/data/pn_db.json"
+      ],
+      "n": 1,
+      "from_is_bucket": false
+    },
+    {
+      "from": "Solar Turbines",
+      "from_key": "solarturbines",
+      "to": "TC Ltd / Thermo Electric (тип.)",
+      "to_key": "tcthermoelectricтип",
+      "kind": "maker",
+      "relation": "makes_for",
+      "scope": [
+        "Taurus 60S"
+      ],
+      "proof": [
+        "П4: сегмент термопар"
       ],
       "sources": [
         "gt/data/pn_db.json"
@@ -5415,6 +5637,44 @@
     {
       "from": "Прочие",
       "from_key": "прочие",
+      "to": "ABB (силовой модуль Infineon FS450R17KE3)",
+      "to_key": "abbсиловоймодульinfineonfs450r17ke3",
+      "kind": "maker",
+      "relation": "makes_for",
+      "scope": [
+        "IGBT-модуль, Комплект силового IGBT-модуля"
+      ],
+      "proof": [
+        "П0 — каталог изготовителя, перепроверка 18.09.2026"
+      ],
+      "sources": [
+        "gt/data/pn_db.json"
+      ],
+      "n": 1,
+      "from_is_bucket": true
+    },
+    {
+      "from": "Прочие",
+      "from_key": "прочие",
+      "to": "Belimo",
+      "to_key": "belimo",
+      "kind": "maker",
+      "relation": "makes_for",
+      "scope": [
+        "Электрический привод AF24-SR-S (исполнение L) AC/DC 24V, 10VA 50Hz – 1шт.,"
+      ],
+      "proof": [
+        "П0 — каталог изготовителя, перепроверка 18.09.2026"
+      ],
+      "sources": [
+        "gt/data/pn_db.json"
+      ],
+      "n": 1,
+      "from_is_bucket": true
+    },
+    {
+      "from": "Прочие",
+      "from_key": "прочие",
       "to": "Comair Rotron",
       "to_key": "comairrotron",
       "kind": "maker",
@@ -5453,6 +5713,25 @@
     {
       "from": "Прочие",
       "from_key": "прочие",
+      "to": "Fleetguard (Cummins)",
+      "to_key": "fleetguardcummins",
+      "kind": "maker",
+      "relation": "makes_for",
+      "scope": [
+        "Фильтр воздушный"
+      ],
+      "proof": [
+        "П2: имя вендора"
+      ],
+      "sources": [
+        "gt/data/pn_db.json"
+      ],
+      "n": 1,
+      "from_is_bucket": true
+    },
+    {
+      "from": "Прочие",
+      "from_key": "прочие",
       "to": "Gilkes (ClydeUnion)",
       "to_key": "gilkesclydeunion",
       "kind": "maker",
@@ -5462,6 +5741,63 @@
       ],
       "proof": [
         "П2 — производитель назван в позиции заказчика"
+      ],
+      "sources": [
+        "gt/data/pn_db.json"
+      ],
+      "n": 1,
+      "from_is_bucket": true
+    },
+    {
+      "from": "Прочие",
+      "from_key": "прочие",
+      "to": "HEINZMANN",
+      "to_key": "heinzmann",
+      "kind": "maker",
+      "relation": "makes_for",
+      "scope": [
+        "Мотор установочный"
+      ],
+      "proof": [
+        "П0 — каталог изготовителя, перепроверка 18.09.2026"
+      ],
+      "sources": [
+        "gt/data/pn_db.json"
+      ],
+      "n": 1,
+      "from_is_bucket": true
+    },
+    {
+      "from": "Прочие",
+      "from_key": "прочие",
+      "to": "Holset / Cummins Turbo Technologies",
+      "to_key": "holsetcumminsturbotechnologies",
+      "kind": "maker",
+      "relation": "makes_for",
+      "scope": [
+        "Турбокомпрессор"
+      ],
+      "proof": [
+        "П0 — каталог изготовителя, перепроверка 18.09.2026"
+      ],
+      "sources": [
+        "gt/data/pn_db.json"
+      ],
+      "n": 1,
+      "from_is_bucket": true
+    },
+    {
+      "from": "Прочие",
+      "from_key": "прочие",
+      "to": "MWM / Caterpillar Energy Solutions (свеча Federal-Mogul/BERU)",
+      "to_key": "mwmcaterpillarenergysolutionsсвечаfedera",
+      "kind": "maker",
+      "relation": "makes_for",
+      "scope": [
+        "Свеча зажигания"
+      ],
+      "proof": [
+        "П0 — каталог изготовителя, перепроверка 18.09.2026"
       ],
       "sources": [
         "gt/data/pn_db.json"
@@ -5538,6 +5874,25 @@
       ],
       "proof": [
         "П2 — производитель назван в позиции заказчика"
+      ],
+      "sources": [
+        "gt/data/pn_db.json"
+      ],
+      "n": 1,
+      "from_is_bucket": true
+    },
+    {
+      "from": "Прочие",
+      "from_key": "прочие",
+      "to": "SolaHD (Emerson)",
+      "to_key": "solahdemerson",
+      "kind": "maker",
+      "relation": "makes_for",
+      "scope": [
+        "Блок питания"
+      ],
+      "proof": [
+        "П0 — каталог изготовителя, перепроверка 18.09.2026"
       ],
       "sources": [
         "gt/data/pn_db.json"
