@@ -149,6 +149,45 @@ def group_of(seller: str) -> str:
     return ""
 
 
+def no_band_reach(sellers: dict) -> dict:
+    """Номера БЕЗ нашей вилки, у которых появился хоть какой-то ориентир.
+
+    У 785 строк заявки из 1 642 вилки нет вовсе, и в экспозицию они не входят —
+    то есть их не видно ни в одной сумме. Открытые листы часть из них называют,
+    и это первый ориентир по таким строкам.
+
+    ЧЕГО ЗДЕСЬ НЕТ И ПОЧЕМУ. Вилка по этим номерам НЕ ставится из этих же листов.
+    Поставить её из листа, против которого потом считается класс, — значит
+    получить «ask внутри вилки» по построению: эталон стал бы производным от
+    правила. Лист годится как повод запросить цену у второго ТИПА свидетеля
+    (изготовитель, авторизованный канал), и только его ответ может стать вилкой.
+    """
+    seen: dict[str, set[str]] = collections.defaultdict(set)
+    qty: dict[str, float] = {}
+    for name, sl in sellers.items():
+        who = sl.get("group") or name          # лист группы — один свидетель
+        for r in (sl.get("rows") or []):
+            if (r.get("where") or "") != "вилки нет":
+                continue
+            pn = str(r.get("pn") or "")
+            if not pn:
+                continue
+            seen[pn].add(who)
+            qty[pn] = float(r.get("qty_request") or 0)
+    two = {pn for pn, w in seen.items() if len(w) > 1}
+    return {
+        "pns_without_band_on_lists": len(seen),
+        "pns_without_band_on_two_independent_lists": len(two),
+        "qty_without_band_on_lists": round(sum(qty.values()), 0),
+        "why_no_band_set_from_here": "Вилка из этих листов НЕ ставится: иначе класс "
+                                     "«ask внутри вилки» получился бы по построению. "
+                                     "Лист — повод запросить цену у изготовителя или "
+                                     "авторизованного канала, и вилкой может стать только "
+                                     "его ответ.",
+        "on_two_independent": sorted(two)[:60],
+    }
+
+
 def load_out() -> dict:
     """Прежний набор, приведённый к многопродавцовому виду.
 
@@ -238,6 +277,7 @@ def main() -> int:
                              "group": group_of(a.seller),
                              "rows": m["rows"]}
         dis = disagreements(sellers)
+        nob = no_band_reach(sellers)
         OUT.write_text(json.dumps({
             "updated": "2026-09-18",
             "source": "Пересечение открытых сток-листов продавцов с номерами заявки "
@@ -265,11 +305,16 @@ def main() -> int:
                                 "держат. Складывать можно только внутри одного листа.",
             "sellers": sellers,
             "disagreements": dis,
+            "no_band_reach": nob,
         }, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
         print(f"замер записан в {OUT.relative_to(ROOT)}: продавцов {len(sellers)}, "
               f"номеров больше чем на одном листе {dis['pns_on_more_than_one_list']}, "
               f"из них класс расходится у {dis['pns_with_conflicting_class']} "
               f"на {dis['usd_in_conflict']:,.0f} USD".replace(",", " "))
+        print(f"  номеров БЕЗ нашей вилки листы называют {nob['pns_without_band_on_lists']}, "
+              f"из них на двух независимых листах "
+              f"{nob['pns_without_band_on_two_independent_lists']}; вилку из этих листов "
+              f"не ставим — стала бы тавтологией")
     return 0
 
 
