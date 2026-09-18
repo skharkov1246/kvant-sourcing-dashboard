@@ -4,19 +4,25 @@
  "method": "Предложение сравнивается с вилкой строки заявки (usd_lo, usd_hi в gt/data/ship_lukoil.json). Выше потолка — наша оценка занижена, ниже пола — завышена, внутри — верна. Считает gt/tools/ship_offer.py. Охваты не складываются: это разные заявки.",
  "scopes": {
   "Энергосети": {
-   "rows_with_offer": 776,
-   "above_ceiling": 222,
-   "inside_band": 78,
-   "below_floor": 106,
-   "no_band": 370,
+   "rows_with_offer": 104,
+   "above_ceiling": 33,
+   "inside_band": 31,
+   "below_floor": 15,
+   "no_band": 25,
    "request_rows": 1642,
    "reverified": {
-    "rows": 489,
-    "with_offer": 206,
-    "overstated_confirmed": 89,
-    "understated_confirmed": 66,
-    "band_right": 51,
-    "no_offer": 283
+    "rows": 657,
+    "with_offer": 54,
+    "overstated_confirmed": 12,
+    "understated_confirmed": 17,
+    "band_right": 25,
+    "no_offer": 603
+   },
+   "price_grades": {
+    "values_total": 6619,
+    "prices_by_column": 317,
+    "guesses_last_number_in_row": 6302,
+    "what_it_means": "Ценой считается только значение из колонки «цена» по заголовку. Догадка «последнее число строки» не отброшена из выгрузки, но в счёт денег не идёт: она брала номера позиций и количество."
    }
   },
   "НВН": {
@@ -33,7 +39,8 @@
     "understated_confirmed": 2,
     "band_right": 0,
     "no_offer": 59
-   }
+   },
+   "stale_warning": "СЧИТАНО ДО РАЗДЕЛЕНИЯ ЦЕН ПО ГРАДУСУ (18.09.2026) и с охватом «Энергосети» НЕ сравнимо. Тогда ценой считалось и значение, взятое правилом «последнее число строки», а оно брало номера позиций и количество: по «Энергосети» такой счёт давал 776 строк с предложением и 222 заниженные, после исправления — 104 и 33. Числа ниже верны только как верхняя граница; пересчитать их можно лишь прогоном «Bitrix входящие КП» по слову НВН."
   }
  }
 }

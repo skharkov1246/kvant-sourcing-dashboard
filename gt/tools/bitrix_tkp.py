@@ -618,10 +618,25 @@ def price_rows(rows: list, hdr: dict) -> list[dict]:
                 price = nums[-1]
                 rule = "последнее число строки (заголовок не опознан)"
         if pn and price:
+            # ГРАДУС ЦЕНЫ. Замер 18.09.2026 по выгрузке «Энергосети»: из 6 619
+            # значений только 317 взяты из колонки «цена» по заголовку, а 6 302 —
+            # правилом «последнее число строки». И это правило берёт не цену: в
+            # Quotation p76057.pdf оно вытащило НОМЕРА ПОЗИЦИЙ (94, 101, 104,
+            # 105, 107 — подряд, 187 пар из 474 идут с шагом ровно 1), а в
+            # файлах-заявках — количество. Счётчики по вилкам, построенные на
+            # этом, дали 222 «заниженные» строки вместо 31.
+            #
+            # Значение НЕ выбрасывается: иногда оно и есть цена, а решает
+            # открытый файл. Но ценой оно не называется, и всякий, кто считает
+            # деньги, обязан взять только градус «цена по колонке».
+            graded = rule.startswith("колонка")
             out.append({
                 "pn": pn, "price": price, "sheet": sheet, "row": i,
                 "currency": (CUR_RE.search(joined) or [""])[0] if CUR_RE.search(joined) else "",
                 "raw": joined[:400], "class_rule": rule,
+                "is_price": graded,
+                "price_grade": ("цена по колонке" if graded
+                                else "догадка: последнее число строки, ценой не является"),
             })
     return out
 
@@ -1191,7 +1206,8 @@ def main() -> int:
         rec["download"] = how
         rec["size"] = len(body) if body else 0
         if not body:
-            index.append(dict(rec, rows=0, priced=0, parse_path="", status="не скачан"))
+            index.append(dict(rec, rows=0, priced=0, price_guesses=0, parse_path="",
+                              status="не скачан"))
             if n % 10 == 0 or n == len(todo):
                 say(f"  [{n}/{min(len(todo), a.max_files)}] скачано {n_dl}, "
                     f"строк {n_rows}, с ценой {n_price}, {(time.time()-t0)/60:.1f} мин")
@@ -1230,7 +1246,9 @@ def main() -> int:
             status = "не разобрался"
         full.append(dict(rec, parse_path=how_parsed, header=hdr, status=status, prices=pr))
         index.append(dict(rec, parse_path=how_parsed, status=status, rows=len(rows),
-                          priced=len(pr), pns=sorted({p["pn"] for p in pr})[:400]))
+                          priced=sum(1 for p in pr if p.get("is_price")),
+                          price_guesses=sum(1 for p in pr if not p.get("is_price")),
+                          pns=sorted({p["pn"] for p in pr})[:400]))
         if n % 10 == 0 or n == min(len(todo), a.max_files):
             say(f"  [{n}/{min(len(todo), a.max_files)}] скачано {n_dl}, "
                 f"строк {n_rows}, с ценой {n_price}, {(time.time()-t0)/60:.1f} мин")
@@ -1252,7 +1270,9 @@ def main() -> int:
                "download": "не требуется", "size": len(b["text"])}
         full.append(dict(rec, parse_path="текст", header=hdr, status="разобран", prices=pr))
         index.append(dict(rec, parse_path="текст", status="разобран", rows=len(rows),
-                          priced=len(pr), pns=sorted({x["pn"] for x in pr})[:400]))
+                          priced=sum(1 for x in pr if x.get("is_price")),
+                          price_guesses=sum(1 for x in pr if not x.get("is_price")),
+                          pns=sorted({x["pn"] for x in pr})[:400]))
         n_price += len(pr)
     if bodies:
         say(f"тел писем просмотрено: {len(bodies)}, с ценами: {n_mail}")
