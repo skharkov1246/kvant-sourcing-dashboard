@@ -26,20 +26,20 @@ def corpus(tmp_path: Path) -> Path:
     doc = {"files": [
         {"direction": "наша цена", "field_name": "Result, ТКП",
          "file_name": "ТКП.xlsx", "origin": "сделка 1",
-         "prices": [{"pn": "AF25545", "price": 300, "currency": "USD", "row": 4},
-                    {"pn": "MW21215M", "price": 50000, "currency": "USD", "row": 9}]},
+         "prices": [{"pn": "AF25545", "price": 300, "currency": "USD", "is_price": True, "row": 4},
+                    {"pn": "MW21215M", "price": 50000, "currency": "USD", "is_price": True, "row": 9}]},
         {"direction": "входящее", "field_name": "Offer from supplier",
          "file_name": "offer.xlsx", "origin": "СП-166 7",
-         "prices": [{"pn": "AF25545", "price": 120, "currency": "USD", "row": 2}]},
+         "prices": [{"pn": "AF25545", "price": 120, "currency": "USD", "is_price": True, "row": 2}]},
         {"direction": "наш запрос", "field_name": "Request file",
          "file_name": "req.xlsx", "origin": "СП-166 7",
-         "prices": [{"pn": "AF25545", "price": 10, "currency": "USD", "row": 1}]},
+         "prices": [{"pn": "AF25545", "price": 10, "currency": "USD", "is_price": True, "row": 1}]},
         {"direction": "заявка", "field_name": "Техническая спецификация",
          "file_name": "spec.xlsx", "origin": "сделка 1",
-         "prices": [{"pn": "AF25545", "price": 5, "currency": "USD", "row": 1}]},
+         "prices": [{"pn": "AF25545", "price": 5, "currency": "USD", "is_price": True, "row": 1}]},
         {"direction": "неизвестно", "field_name": "Documents, Bot",
          "file_name": "bot.xlsx", "origin": "сделка 1",
-         "prices": [{"pn": "AF25545", "price": 7, "currency": "USD", "row": 1}]},
+         "prices": [{"pn": "AF25545", "price": 7, "currency": "USD", "is_price": True, "row": 1}]},
     ]}
     p = tmp_path / "tkp.json"
     p.write_text(json.dumps(doc, ensure_ascii=False), encoding="utf-8")
@@ -72,10 +72,10 @@ def test_минимум_внутри_направления_а_не_первая
     """Один артикул в нескольких наших файлах: берём меньшую выставленную."""
     doc = {"files": [
         {"direction": "наша цена", "field_name": "Result, ТКП", "file_name": "a",
-         "origin": "o", "prices": [{"pn": "X1", "price": 900, "currency": "USD"}]},
+         "origin": "o", "prices": [{"pn": "X1", "price": 900, "currency": "USD", "is_price": True}]},
         {"direction": "наша цена", "field_name": "Economics of the project",
          "file_name": "b", "origin": "o",
-         "prices": [{"pn": "X1", "price": 700, "currency": "USD"}]},
+         "prices": [{"pn": "X1", "price": 700, "currency": "USD", "is_price": True}]},
     ]}
     p = tmp_path / "t.json"
     p.write_text(json.dumps(doc, ensure_ascii=False), encoding="utf-8")
@@ -152,7 +152,7 @@ def test_строка_с_кп_поставщика_без_нашей_цены_п
     doc = {"files": [
         {"direction": "входящее", "field_name": "Offer from supplier",
          "file_name": "offer.xlsx", "origin": "СП-166 9",
-         "prices": [{"pn": "ZZ100", "price": 150, "currency": "USD", "row": 3}]},
+         "prices": [{"pn": "ZZ100", "price": 150, "currency": "USD", "is_price": True, "row": 3}]},
     ]}
     tk = tmp_path / "t.json"
     tk.write_text(json.dumps(doc, ensure_ascii=False), encoding="utf-8")
@@ -172,7 +172,7 @@ def test_запас_не_считается_когда_нашей_цены_не�
     doc = {"files": [
         {"direction": "входящее", "field_name": "Offer from supplier",
          "file_name": "o", "origin": "o",
-         "prices": [{"pn": "ZZ200", "price": 10, "currency": "USD"}]},
+         "prices": [{"pn": "ZZ200", "price": 10, "currency": "USD", "is_price": True}]},
     ]}
     tk = tmp_path / "t.json"
     tk.write_text(json.dumps(doc, ensure_ascii=False), encoding="utf-8")
@@ -210,7 +210,7 @@ def test_в_документе_видно_что_нашлось_по_полов�
     doc = {"files": [
         {"direction": "входящее", "field_name": "Offer from supplier",
          "file_name": "o.xlsx", "origin": "СП-166 3",
-         "prices": [{"pn": "433894", "price": 300, "currency": "USD", "row": 7}]},
+         "prices": [{"pn": "433894", "price": 300, "currency": "USD", "is_price": True, "row": 7}]},
     ]}
     tk = tmp_path / "t.json"
     tk.write_text(json.dumps(doc, ensure_ascii=False), encoding="utf-8")
@@ -226,3 +226,49 @@ def test_не_склеивает_разные_номера_одинаковой_
     """Половина одного номера не должна подхватывать чужую строку."""
     assert O.keys_of("245488-631265")[1] == "631265"
     assert "631265" not in O.keys_of("265174-263174")
+
+
+def test_догадка_последнее_число_строки_ценой_не_считается(tmp_path):
+    """Значение без названного происхождения ценой не является.
+
+    ОПЛАЧЕНО 18.09.2026 самым крупным исправлением за сутки. Из 6 619 значений
+    выгрузки «Энергосети» по колонке «цена» взято 317, остальные — правилом
+    «последнее число строки». Правило брало НОМЕРА ПОЗИЦИЙ (в Quotation
+    p76057.pdf: 94, 101, 104, 105, 107 подряд, 187 пар из 474 с шагом ровно 1) и
+    количество из файлов-заявок. Счётчики на этом основании дали 222 заниженные
+    строки вместо 33, и я успел записать это число в отчёт владельцу.
+
+    Корпус придуман, а не взят из выгрузки.
+    """
+    doc = {"files": [
+        {"direction": "входящее", "field_name": "Offer from supplier",
+         "file_name": "предложение.pdf", "origin": "сделка 9",
+         "prices": [
+             {"pn": "AA1000", "price": 99, "currency": "USD",
+              "class_rule": "колонка «цена» по заголовку", "is_price": True},
+             {"pn": "BB2000", "price": 107, "currency": "USD",
+              "class_rule": "последнее число строки (заголовок не опознан)",
+              "is_price": False},
+         ]},
+    ]}
+    p = tmp_path / "tkp.json"
+    p.write_text(json.dumps(doc, ensure_ascii=False), encoding="utf-8")
+    _, supp, _ = O.prices_by_direction(p, RATES)
+    assert O.norm_key("AA1000") in supp, "цена по колонке обязана пройти"
+    assert O.norm_key("BB2000") not in supp, "догадка не должна попасть в счёт денег"
+    # отсев называется числом, а не молчит
+    g = O.guess_stats(p)
+    assert g == dict(g, values_total=2, prices_by_column=1, guesses_last_number_in_row=1), g
+
+
+def test_выгрузка_без_градуса_читается_по_правилу_извлечения(tmp_path):
+    """Выгрузки, снятые до разделения по градусу, поля is_price не несут.
+
+    Тогда решает само правило: иначе старая выгрузка молча вернула бы прежние
+    завышенные счётчики, и исправление не подействовало бы там, где оно нужнее
+    всего — на уже снятых данных.
+    """
+    assert O.price_graded({"class_rule": "колонка «цена» по заголовку"})
+    assert not O.price_graded({"class_rule": "последнее число строки (заголовок не опознан)"})
+    # происхождение не названо вовсе — значит ценой не считается
+    assert not O.price_graded({})
