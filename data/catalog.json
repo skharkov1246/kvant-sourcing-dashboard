@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 252,
-    "total_bytes": 113491979,
+    "total_bytes": 113493091,
     "by_sensitivity": {
       "конфиденциально": 65,
       "внутреннее": 138,
@@ -4644,7 +4644,7 @@
     {
       "path": "data/catalog_notes.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 109196,
+      "bytes": 110308,
       "note": "",
       "format": "json",
       "shape": "объект",
@@ -4656,6 +4656,7 @@
         "data/index.json",
         "dict/",
         "dict/node_map.json",
+        "docs/ПРАВИЛА-ОСТАТКА.md",
         "gidromet/data/",
         "gpu/data/bitrix_gpu.json",
         "gpu/data/coverage.json",
@@ -4687,12 +4688,11 @@
         "gt/data/ship_lists_rfq.json",
         "gt/data/ship_lukoil.json",
         "gt/data/ship_maker_basis.json",
-        "gt/data/ship_margin.json",
-        "gt/data/ship_offer_stats.json"
+        "gt/data/ship_margin.json"
       ],
       "last_change": "2026-09-18",
       "last_author": "Claude",
-      "last_commit": "42ba24b",
+      "last_commit": "ea84c47",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
