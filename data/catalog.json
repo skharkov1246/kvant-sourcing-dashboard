@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 251,
-    "total_bytes": 112465461,
+    "total_bytes": 112471333,
     "by_sensitivity": {
       "конфиденциально": 65,
       "внутреннее": 137,
@@ -147,7 +147,7 @@
     {
       "path": "gt/data/ship_reverify.json",
       "subproject": "ГТУ-библиотека",
-      "bytes": 7238584,
+      "bytes": 7243343,
       "note": "Перепроверка крупнейших строк заявки ЛУКОЙЛ: по каждой строке заново установлено, что это за изделие, кто его делает на самом деле и под каким своим номером, жив ли номер, сколько позиция стоит в открытых каналах, есть ли рабочий канал закупки и что мешает закрыть строку. Отбор строк — по экспозиции: топ-60 дают 67 % от 9 277 410 USD экспозиции всей заявки (экспозиция = середина нашей оценочной вилки, умноженная на количество). Поле band_verdict говорит, что стало с нашей прежней оценкой: ЗАНИЖЕНА, ЗАВЫШЕНА, ВЕРНА или НЕЧЕМ ПРОВЕРИТЬ. Последнее — НЕ «дорого» и не «дёшево», а отсутствие открытой цены во всех каналах; складывать эти группы в одну цифру нельзя. Поле skeptics несёт результат проверки вывода на опровержение; пустой список означает, что проверка не прогонялась, и приравнивать это к подтверждению нельзя — исследователь уже был пойман на выдуманной цитате. ВНИМАНИЕ: набор пополняется по ходу, и до окончания прогона он ЧАСТИЧНЫЙ — число строк в нём меньше шестидесяти. Собирается рабочим процессом перепроверки, читается gt/tools/ship_reverify.py. Цены здесь рыночные, из открытых карточек продавцов; выставленных заказчику цен в наборе нет.",
       "format": "json",
       "shape": "объект",
@@ -185,7 +185,7 @@
       },
       "last_change": "2026-09-18",
       "last_author": "Claude",
-      "last_commit": "8b43d94",
+      "last_commit": "23a2cc7",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -352,9 +352,9 @@
         "gt/tools/demand_collisions.py",
         "gt/tools/english_source.py",
         "gt/tools/homoglyphs.py",
+        "gt/tools/inside_found.py",
         "gt/tools/inside_quotes.py",
-        "gt/tools/jenbacher_fold.py",
-        "gt/tools/lists_fold.py"
+        "gt/tools/jenbacher_fold.py"
       ]
     },
     {
@@ -1956,6 +1956,7 @@
         "markers": []
       },
       "referenced_by": [
+        "gt/tools/inside_found.py",
         "gt/tools/inside_quotes.py",
         "gt/tools/inside_quotes_doc.py",
         "gt/tools/lists_rfq.py",
@@ -1964,8 +1965,7 @@
         "gt/tools/ship_coverage.py",
         "gt/tools/ship_final.py",
         "gt/tools/ship_offer.py",
-        "tests/test_inside_quotes.py",
-        "tests/test_report_numbers.py"
+        "tests/test_inside_quotes.py"
       ]
     },
     {
@@ -4727,49 +4727,9 @@
       ]
     },
     {
-      "path": "gt/data/ms6001b.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 106907,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "companies",
-        "facts",
-        "model",
-        "stock",
-        "updated"
-      ],
-      "main_collection": {
-        "key": "facts",
-        "records": 95,
-        "record_keys": [
-          "claim",
-          "cross",
-          "source"
-        ]
-      },
-      "last_change": "2026-08-31",
-      "last_author": "github-actions[bot]",
-      "last_commit": "11f2331",
-      "updated_by": "бот (workflow)",
-      "sensitivity": {
-        "level": "конфиденциально",
-        "markers": [
-          "адреса электронной почты",
-          "участники внешнеэкономических сделок"
-        ]
-      },
-      "referenced_by": [
-        "gt/tools/build_ms6001b.py",
-        "gt/tools/drop_ru.py",
-        "library/load_suppliers.py"
-      ]
-    },
-    {
       "path": "data/catalog_notes.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 105857,
+      "bytes": 106970,
       "note": "",
       "format": "json",
       "shape": "объект",
@@ -4817,7 +4777,7 @@
       ],
       "last_change": "2026-09-18",
       "last_author": "Claude",
-      "last_commit": "38d907b",
+      "last_commit": "23a2cc7",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -4826,6 +4786,46 @@
       "referenced_by": [
         "scripts/build_catalog.py",
         "tests/test_catalog_guard.py"
+      ]
+    },
+    {
+      "path": "gt/data/ms6001b.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 106907,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "companies",
+        "facts",
+        "model",
+        "stock",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "facts",
+        "records": 95,
+        "record_keys": [
+          "claim",
+          "cross",
+          "source"
+        ]
+      },
+      "last_change": "2026-08-31",
+      "last_author": "github-actions[bot]",
+      "last_commit": "11f2331",
+      "updated_by": "бот (workflow)",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "адреса электронной почты",
+          "участники внешнеэкономических сделок"
+        ]
+      },
+      "referenced_by": [
+        "gt/tools/build_ms6001b.py",
+        "gt/tools/drop_ru.py",
+        "library/load_suppliers.py"
       ]
     },
     {
@@ -10828,6 +10828,7 @@
         "markers": []
       },
       "referenced_by": [
+        "gt/tools/inside_found.py",
         "gt/tools/jenbacher_fold.py",
         "gt/tools/pricelist_fold.py",
         "gt/tools/ship_brand.py",
@@ -10836,8 +10837,7 @@
         "gt/tools/ship_merge.py",
         "gt/tools/ship_offer.py",
         "gt/tools/ship_priced.py",
-        "gt/tools/stocklist_cross.py",
-        "gt/tools/stocklist_fold.py"
+        "gt/tools/stocklist_cross.py"
       ]
     },
     {
