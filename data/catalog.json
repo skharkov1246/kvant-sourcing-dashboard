@@ -1170,7 +1170,8 @@
         "gt/tools/ship_merge.py",
         "library/load_crossrefs.py",
         "library/load_parts.py",
-        "library/load_suppliers.py"
+        "library/load_suppliers.py",
+        "tests/test_dataset_has_reader.py"
       ]
     },
     {
@@ -1854,7 +1855,8 @@
       },
       "referenced_by": [
         "gt/tools/ship_merge.py",
-        "library/load_suppliers.py"
+        "library/load_suppliers.py",
+        "tests/test_dataset_has_reader.py"
       ]
     },
     {
@@ -2675,7 +2677,8 @@
         "gt/tools/bitrix_gt.py",
         "gt/tools/drop_ru.py",
         "scripts/build_index.py",
-        "scripts/preflight.py"
+        "scripts/preflight.py",
+        "tests/test_dataset_has_reader.py"
       ]
     },
     {
@@ -4024,7 +4027,8 @@
       "referenced_by": [
         "gt/build.py",
         "gt/tools/build_rfq.py",
-        "gt/tools/drop_ru.py"
+        "gt/tools/drop_ru.py",
+        "tests/test_dataset_has_reader.py"
       ]
     },
     {
@@ -4938,7 +4942,8 @@
         "markers": []
       },
       "referenced_by": [
-        "gt/tools/ship_merge.py"
+        "gt/tools/ship_merge.py",
+        "tests/test_dataset_has_reader.py"
       ]
     },
     {
@@ -5386,7 +5391,8 @@
         "markers": []
       },
       "referenced_by": [
-        "gt/tools/ship_merge.py"
+        "gt/tools/ship_merge.py",
+        "tests/test_dataset_has_reader.py"
       ]
     },
     {
@@ -6014,7 +6020,8 @@
         "gt/tools/drop_ru.py",
         "library/load_suppliers.py",
         "pnw/tools/build_suppliers.py",
-        "scripts/build_chain_coverage.py"
+        "scripts/build_chain_coverage.py",
+        "tests/test_dataset_has_reader.py"
       ]
     },
     {
@@ -9813,6 +9820,7 @@
       "referenced_by": [
         "gt/tools/ship_final.py",
         "gt/tools/source_control.py",
+        "tests/test_dataset_has_reader.py",
         "tests/test_source_control.py"
       ]
     },
@@ -10280,6 +10288,7 @@
       },
       "referenced_by": [
         "gt/tools/ship_merge.py",
+        "tests/test_dataset_has_reader.py",
         "tests/test_price_substitutions.py"
       ]
     },
