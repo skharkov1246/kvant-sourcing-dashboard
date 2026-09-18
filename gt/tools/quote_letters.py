@@ -41,6 +41,7 @@ ROOT = Path(__file__).resolve().parents[2]
 ASK = ROOT / "gt/data/ship_lukoil.json"
 RV = ROOT / "gt/data/ship_reverify.json"
 LEAK = ROOT / "gt/data/ship_leak.json"
+MAKER_CONTACTS = ROOT / "gt/data/maker_contacts.json"
 OTHER_SETS = ("ship_rfq_letters.json", "ship_volume_letters.json", "ship_lists_rfq.json")
 OUT = ROOT / "gt/data/ship_quote_letters.json"
 DOCS = ROOT / "gt/docs"
@@ -118,6 +119,63 @@ def leak_domains() -> dict[str, str]:
     return out
 
 
+def maker_key(t) -> str:
+    """Ключ изготовителя: только буквы и цифры, регистр снят.
+
+    «Drillmec S.p.A.» и «Drillmec» должны сойтись, а «Drillmec S.p.A. / Oleobi
+    S.r.l.» — нет: это два изготовителя, и адрес у них разный.
+    """
+    return re.sub(r"[^a-z0-9а-яё]", "", str(t or "").lower())
+
+
+def maker_contacts() -> dict[str, dict]:
+    """Адреса служб запчастей изготовителей — только с прочитанной страницы.
+
+    Запись без поля read_on не берётся: адрес, о котором не сказано, где он
+    напечатан, — это догадка вида «parts@домен», и письмо по ней уходит в
+    никуда. То же правило, что и для цен: значение без названного
+    происхождения в дело не идёт.
+    """
+    if not MAKER_CONTACTS.exists():
+        return {}
+    out = {}
+    for r in json.loads(MAKER_CONTACTS.read_text(encoding="utf-8")).get("rows") or []:
+        if not str(r.get("read_on") or "").strip():
+            continue
+        mails = MAIL.findall(str(r.get("email") or ""))
+        if not mails:
+            continue
+        out[maker_key(r.get("maker"))] = dict(r, email=mails[0])
+    return out
+
+
+def maker_body(maker: str, items: list[dict]) -> str:
+    """Письмо ИЗГОТОВИТЕЛЮ. Спрашивается другое, чем у продавца.
+
+    Главный вопрос здесь — не цена, а расшифровка внутреннего номера в
+    коммерческий: по обозначениям вида SP1xxxxx, CT9xxxx, RM13xxx у Siemens и
+    по чертёжным позициям Bornemann в открытом доступе нет ни одной цены, и
+    разведка это установила по шести перечням. Пока номер не переведён в
+    изделие поставщика-изготовителя узла, цена недостижима ни у кого.
+    """
+    lines = [f"Добрый день!", "",
+             f"Обращаемся как покупатель запасных частей {maker}.",
+             "Просим по позициям ниже:", "",
+             "1) назвать цену и срок поставки либо указать авторизованный канал, "
+             "через который вы продаёте эти позиции;",
+             "2) подтвердить, действующее ли это обозначение, и назвать замену, "
+             "если позиция снята;",
+             "3) если обозначение внутреннее, назвать соответствующий "
+             "коммерческий номер изделия и его изготовителя — по внутренним "
+             "обозначениям цену получить невозможно ни у одного продавца.", "",
+             "Позиции:"]
+    for i, it in enumerate(items, 1):
+        qty = f" — {it['qty']} {it['unit']}" if it.get("qty") else ""
+        lines.append(f"{i}. {it['pn']}{qty}")
+    lines += ["", "С уважением,", "КВАНТ"]
+    return "\n".join(lines)
+
+
 def candidates() -> tuple[list, list]:
     ask = {key(r.get("pn")): r for r in json.loads(ASK.read_text(encoding="utf-8"))["rows"]
            if key(r.get("pn"))}
@@ -161,6 +219,18 @@ def body(items: list[dict]) -> str:
 def build() -> dict:
     with_mail, without = candidates()
     leaks = leak_domains()
+    # Строки без адреса продавца: если у изготовителя адрес известен и прочитан,
+    # письмо идёт ему — с другим вопросом (см. maker_body).
+    mc = maker_contacts()
+    to_maker: dict[str, list] = collections.defaultdict(list)
+    still_without = []
+    for it in without:
+        rec = mc.get(maker_key(it.get("maker")))
+        if rec:
+            to_maker[rec["email"]].append(dict(it, _maker_rec=rec))
+        else:
+            still_without.append(it)
+    without = still_without
     groups: dict[str, list] = collections.defaultdict(list)
     for it in with_mail:
         groups[it["mail"]].append(it)
@@ -180,7 +250,26 @@ def build() -> dict:
             "rows": len(items),
             "our_exposure": round(sum(x["our_exposure"] for x in items), 2),
             "pns": [x["pn"] for x in items],
+            "kind": "продавцу",
             "body": body(items),
+        })
+    for mail, items in sorted(to_maker.items(),
+                              key=lambda kv: -sum(x["our_exposure"] for x in kv[1])):
+        items.sort(key=lambda x: -x["our_exposure"])
+        rec = items[0]["_maker_rec"]
+        clean = [{k: v for k, v in it.items() if k != "_maker_rec"} for it in items]
+        letters.append({
+            "to": mail,
+            "warning": "",
+            "subject": f"Запрос по запасным частям {rec.get('maker')}: {len(clean)} позиц.",
+            "rows": len(clean),
+            "our_exposure": round(sum(x["our_exposure"] for x in clean), 2),
+            "pns": [x["pn"] for x in clean],
+            "kind": "изготовителю",
+            "maker": rec.get("maker"),
+            "address_read_on": rec.get("read_on"),
+            "address_kind": rec.get("email_kind"),
+            "body": maker_body(str(rec.get("maker")), clean),
         })
     return {
         "updated": date.today().isoformat(),
@@ -199,6 +288,13 @@ def build() -> dict:
         "usd_with_address": round(sum(x["our_exposure"] for x in with_mail), 2),
         "rows_without_address": len(without),
         "usd_without_address": round(sum(x["our_exposure"] for x in without), 2),
+        "rows_to_maker": sum(len(v) for v in to_maker.values()),
+        "usd_to_maker": round(sum(x["our_exposure"] for v in to_maker.values() for x in v), 2),
+        "what_maker_letter_asks": ("Изготовителю задаётся не цена, а расшифровка внутреннего "
+                                  "обозначения в коммерческий номер: по SP1xxxxx, CT9xxxx, "
+                                  "RM13xxx и чертёжным позициям в открытом доступе нет ни "
+                                  "одной цены — это установлено по шести перечням. Пока номер "
+                                  "не переведён, цена недостижима ни у одного продавца."),
         "letters": letters,
         "rows_no_address_list": [x["pn"] for x in
                                  sorted(without, key=lambda z: -z["our_exposure"])],

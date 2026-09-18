@@ -89,3 +89,46 @@ def test_адресат_опубликовавший_заявку_помечен
         dom = L["to"].split("@")[-1].lower()
         if any(dom == k or dom.endswith("." + k) for k in doms):
             assert L.get("warning"), f"{L['to']} без пометки об утечке"
+
+
+def test_письмо_изготовителю_спрашивает_расшифровку_а_не_только_цену():
+    """У изготовителя главный вопрос другой.
+
+    По внутренним обозначениям (SP1xxxxx, CT9xxxx, RM13xxx у Siemens, чертёжные
+    позиции Bornemann) в открытом доступе нет ни одной цены — это установлено по
+    шести перечням. Пока номер не переведён в коммерческий, цена недостижима ни
+    у одного продавца, поэтому письмо изготовителю просит перевод, а не только
+    прейскурант.
+    """
+    q = ql()
+    body = q.maker_body("Siemens Energy", [{"pn": "SP106916", "qty": 2, "unit": "шт",
+                                            "our_exposure": 100.0}])
+    assert "коммерческий номер" in body
+    assert "авторизованный канал" in body
+    for forbidden in ("USD", "вилк", "ЛУКОЙЛ", "экспозиц"):
+        assert forbidden not in body
+
+
+def test_адрес_изготовителя_без_прочитанной_страницы_не_берётся(tmp_path, monkeypatch):
+    """Адрес вида «parts@домен» без названной страницы — догадка.
+
+    То же правило, что и для цен: значение без названного происхождения в дело
+    не идёт. Письмо по сочинённому адресу уходит в никуда, а строка при этом
+    считается закрытой — то есть ошибка ещё и прячется.
+    """
+    q = ql()
+    f = tmp_path / "mc.json"
+    f.write_text(json.dumps({"rows": [
+        {"maker": "Хорошая", "email": "spares@example.com", "read_on": "https://example.com/service"},
+        {"maker": "Плохая", "email": "parts@example.org", "read_on": ""},
+        {"maker": "Безадресная", "email": None, "read_on": "https://example.org/contact"},
+    ]}, ensure_ascii=False), encoding="utf-8")
+    monkeypatch.setattr(q, "MAKER_CONTACTS", f)
+    got = q.maker_contacts()
+    assert set(got) == {q.maker_key("Хорошая")}, got
+
+
+def test_ключ_изготовителя_сводит_формы_имени_но_не_склеивает_разных():
+    q = ql()
+    assert q.maker_key("Drillmec S.p.A.") == q.maker_key("drillmec spa")
+    assert q.maker_key("Drillmec") != q.maker_key("Drillmec S.p.A. / Oleobi S.r.l.")
