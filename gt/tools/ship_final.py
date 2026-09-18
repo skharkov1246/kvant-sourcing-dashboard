@@ -160,6 +160,7 @@ def build() -> str:
     sl = load("ship_stocklist_cross.json") or {}
     dc = load("ship_demand_collisions.json") or {}
     bb = load("ship_band_basis.json") or {}
+    conf = load("ship_confidence.json") or {}
     pl = load("ship_parts_lists.json") or {}
     cov = load("ship_coverage.json") or {}
 
@@ -310,6 +311,43 @@ def build() -> str:
           "замер её не порицает. Недопустимо другое: выдавать её за найденную цену. Считает "
           "gt/tools/band_basis.py, набор gt/data/ship_band_basis.json.</p>")
     a("</div>")
+
+    # Вторая проверка нашей собственной работы, отдельная от первой: там мерялось,
+    # чем ОБОСНОВАНА цифра, здесь — выдерживает ли её основание открытие
+    # страницы. Ответ на обвинение обязан стоять рядом с обвинением, иначе
+    # «треть денег висит в воздухе» уйдёт в голову владельца как итог.
+    ct, cw = conf.get("totals") or {}, conf.get("worked_off") or {}
+    if ct and cw:
+        a("<div class='sec'>")
+        a("<h2>Проверка нашей собственной разведки цен: что выдержало открытие страницы</h2>")
+        a(f"<p>По каждой записи разведки цен адрес источника был открыт заново. "
+          f"<span class='k'>{ru(ct['rows'])} записей</span> на "
+          f"<span class='k'>{ru(ct['exposure'])} долларов США</span> "
+          f"({pct(ct['share_pct'])} % денег заявки) проверку не выдержали: ссылка ведёт на "
+          f"другой артикул, ссылка мертва, на странице другая цена, либо по адресу вообще не "
+          f"продавец. Это обвинение нашей прежней работе, и оно здесь названо числом.</p>")
+        a("<table><thead><tr><th>что именно не так</th><th class='n'>строк</th>"
+          "<th class='n'>деньги, USD</th></tr></thead><tbody>")
+        for v, c in sorted((conf.get("classes") or {}).items(),
+                           key=lambda kv: -kv[1]["exposure"]):
+            a(f"<tr><td>{E(c['means'])}</td><td class='n'>{ru(c['rows'])}</td>"
+              f"<td class='n'>{ru(c['exposure'])}</td></tr>")
+        a("</tbody></table>")
+        a(f"<p><b>Что с этим уже сделано.</b> Перепроверка прошла по "
+          f"<span class='k'>{ru(cw['rows_reverified'])}</span> из этих "
+          f"{ru(ct['rows'])} строк, и это "
+          f"<span class='k'>{ru(cw['exposure_reverified'])} долларов</span> из "
+          f"{ru(ct['exposure'])}. По {ru(cw['rows_price_found_again'])} строкам на "
+          f"<span class='k'>{ru(cw['exposure_price_found_again'])} долларов</span> цена "
+          f"найдена заново и записана с адресом страницы; по остальным записан отказ с "
+          f"доказательством. <b>Открытой работы осталось "
+          f"{ru(cw['rows_still_open'])} строк на "
+          f"<span class='k'>{ru(cw['exposure_still_open'])} долларов</span></b> — это строки, "
+          f"которых перепроверка не касалась вовсе.</p>")
+        a("<p class='dim'>Одним числом это читать нельзя: «треть денег висит в воздухе» было "
+          "бы неправдой. Считает gt/tools/confidence_audit.py, набор "
+          "gt/data/ship_confidence.json.</p>")
+        a("</div>")
 
     # Лестница понимания: чем «разобрано N строк» плохо как мера и что стоит за
     # ним на самом деле. Ступени накопительны, и отгружаемой строка становится
