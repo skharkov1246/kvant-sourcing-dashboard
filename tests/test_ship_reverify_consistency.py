@@ -226,3 +226,75 @@ def test_вердикт_опознаётся_началом_текста_а_не
     import collections
     by = collections.Counter(vkey(r) for r in rows())
     assert sum(by.values()) == len(rows())
+
+
+def test_цена_в_строке_это_число_а_не_проза():
+    """price_low и price_high — числа в долларах за штуку, либо null.
+
+    Оплачено разбором 44 строк, где в этих полях лежала проза: «319,31 GBP за
+    штуку (£1 277,25 за коробку из 4) — аналог ERS/Hatraco…», «805 EUR за к-кт
+    из 4 шт», «356,32 USD за ведро 18,9 л». Проверка «есть ли в поле число»
+    такую строку принимала, то есть вердикт по цене считался обоснованным, а
+    сравнить цифру с вилкой было нельзя: единица другая, валюта другая, а
+    иногда в одной строке стояли две цифры сразу.
+
+    Проза сохраняется в price_note — там она и должна быть.
+    """
+    bad = []
+    for r in rows():
+        for f in ("price_low", "price_high"):
+            v = r.get(f)
+            if v is None:
+                continue
+            if not isinstance(v, (int, float)):
+                bad.append(f'{r["pn"]}.{f} = {type(v).__name__} «{str(v)[:40]}»')
+            elif isinstance(v, bool) or v <= 0:
+                bad.append(f'{r["pn"]}.{f} = {v!r}')
+    assert not bad, ("цена в строке перепроверки должна быть положительным числом в долларах "
+                     f"за штуку или null; проза живёт в price_note: {bad}")
+
+
+def test_пол_цены_не_выше_потолка():
+    bad = [r["pn"] for r in rows()
+           if isinstance(r.get("price_low"), (int, float))
+           and isinstance(r.get("price_high"), (int, float))
+           and r["price_low"] > r["price_high"]]
+    assert not bad, f"найденный пол выше найденного потолка: {bad}"
+
+
+def test_цена_внутри_вилки_не_даёт_вердикта_занижена_или_завышена():
+    """Если найденная цена ЦЕЛИКОМ внутри вилки, вилка верна — и точка.
+
+    Оплачено тремя строками. У двух из них вердикт стоял «ЗАНИЖЕНА» при цене
+    внутри вилки: 4 101,36 против вилки 1 200–4 150 и 463,96–558,00 против
+    280–560. Занижала не вилка, а её СЕРЕДИНА — а это другое утверждение, и в
+    сводке «занижена» читается как «вилку надо поднимать». У третьей в числовом
+    поле цены лежала ОТВЕРГНУТАЯ цифра (106 200 USD, ask одного перепродавца на
+    половину объёма), и любой счёт по строке выносил «занижена в сорок раз» —
+    ровно то, чего текст той же строки велел не делать.
+
+    Правило: вердикт по вилке отвечает на вопрос «вилка верна или нет». Про
+    середину есть оговорка в тексте вердикта.
+    """
+    src = ROOT / "gt/data/ship_lukoil.json"
+    if not src.exists():
+        pytest.skip("сводки заявки нет")
+    band = {re.sub(r"[^A-Z0-9]", "", str(r.get("pn") or "").upper()): r
+            for r in json.loads(src.read_text(encoding="utf-8"))["rows"]}
+    bad = []
+    for r in rows():
+        k = re.sub(r"[^A-Z0-9]", "", str(r.get("pn") or "").split("(")[0].upper())
+        b = band.get(k)
+        if b is None or b.get("usd_lo") in (None, "") or b.get("usd_hi") in (None, ""):
+            continue
+        lo, hi = float(b["usd_lo"]), float(b["usd_hi"])
+        plo, phi = r.get("price_low"), r.get("price_high")
+        if not isinstance(plo, (int, float)) or not isinstance(phi, (int, float)):
+            continue
+        if plo < lo or phi > hi:          # вилку задевают — вердикт может быть любым
+            continue
+        v = verdict(r)
+        if v in ("ЗАНИЖЕНА", "ЗАВЫШЕНА"):
+            bad.append(f'{r["pn"]}: цена {plo}–{phi} внутри вилки {lo}–{hi}, а вердикт «{v}»')
+    assert not bad, ("вердикт по вилке отвечает на «вилка верна или нет», а не на «верна ли её "
+                     f"середина»: {bad}")
