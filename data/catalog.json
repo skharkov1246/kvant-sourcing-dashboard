@@ -4,16 +4,16 @@
   "generated_by": "scripts/build_catalog.py",
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
-    "datasets": 250,
-    "total_bytes": 111710764,
+    "datasets": 251,
+    "total_bytes": 111714380,
     "by_sensitivity": {
       "конфиденциально": 65,
       "внутреннее": 137,
-      "публикуемо": 48
+      "публикуемо": 49
     },
     "by_subproject": {
       "ГПУ-библиотека": 29,
-      "ГТУ-библиотека": 73,
+      "ГТУ-библиотека": 74,
       "ОВЭ-75": 45,
       "база ЗИП": 49,
       "база ЗИП · таможня": 18,
@@ -4767,6 +4767,68 @@
       ]
     },
     {
+      "path": "data/catalog_notes.json",
+      "subproject": "дашборд сорсеров",
+      "bytes": 105857,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "data/budget_snapshot.json",
+        "data/chain_coverage.json",
+        "data/chat_snapshot.json",
+        "data/import_cost.json",
+        "data/index.json",
+        "dict/",
+        "dict/node_map.json",
+        "gidromet/data/",
+        "gpu/data/bitrix_gpu.json",
+        "gpu/data/coverage.json",
+        "gpu/data/faults.json",
+        "gpu/data/overhaul_qsk60.json",
+        "gt/data/ansaldo.json",
+        "gt/data/bitrix_gt.json",
+        "gt/data/bitrix_tkp_index.json",
+        "gt/data/dossiers.json",
+        "gt/data/faults.json",
+        "gt/data/fx_rates.json",
+        "gt/data/maker_contacts.json",
+        "gt/data/pn_db.json",
+        "gt/data/ship_band_basis.json",
+        "gt/data/ship_blocked.json",
+        "gt/data/ship_channels.json",
+        "gt/data/ship_collisions.json",
+        "gt/data/ship_confidence.json",
+        "gt/data/ship_coverage.json",
+        "gt/data/ship_decoded.json",
+        "gt/data/ship_demand_collisions.json",
+        "gt/data/ship_energoseti.json",
+        "gt/data/ship_english_source.json",
+        "gt/data/ship_homoglyphs.json",
+        "gt/data/ship_inside_quotes.json",
+        "gt/data/ship_jenbacher_prices.json",
+        "gt/data/ship_leak.json",
+        "gt/data/ship_lists_rfq.json",
+        "gt/data/ship_lukoil.json",
+        "gt/data/ship_maker_basis.json",
+        "gt/data/ship_margin.json",
+        "gt/data/ship_offer_stats.json",
+        "gt/data/ship_overpriced.json"
+      ],
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "38d907b",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "scripts/build_catalog.py",
+        "tests/test_catalog_guard.py"
+      ]
+    },
+    {
       "path": "ove/data/market.json",
       "subproject": "ОВЭ-75",
       "bytes": 105198,
@@ -4858,68 +4920,6 @@
         ]
       },
       "referenced_by": []
-    },
-    {
-      "path": "data/catalog_notes.json",
-      "subproject": "дашборд сорсеров",
-      "bytes": 103660,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "data/budget_snapshot.json",
-        "data/chain_coverage.json",
-        "data/chat_snapshot.json",
-        "data/import_cost.json",
-        "data/index.json",
-        "dict/",
-        "dict/node_map.json",
-        "gidromet/data/",
-        "gpu/data/bitrix_gpu.json",
-        "gpu/data/coverage.json",
-        "gpu/data/faults.json",
-        "gpu/data/overhaul_qsk60.json",
-        "gt/data/ansaldo.json",
-        "gt/data/bitrix_gt.json",
-        "gt/data/bitrix_tkp_index.json",
-        "gt/data/dossiers.json",
-        "gt/data/faults.json",
-        "gt/data/fx_rates.json",
-        "gt/data/maker_contacts.json",
-        "gt/data/pn_db.json",
-        "gt/data/ship_band_basis.json",
-        "gt/data/ship_blocked.json",
-        "gt/data/ship_channels.json",
-        "gt/data/ship_collisions.json",
-        "gt/data/ship_confidence.json",
-        "gt/data/ship_coverage.json",
-        "gt/data/ship_decoded.json",
-        "gt/data/ship_demand_collisions.json",
-        "gt/data/ship_energoseti.json",
-        "gt/data/ship_english_source.json",
-        "gt/data/ship_homoglyphs.json",
-        "gt/data/ship_inside_quotes.json",
-        "gt/data/ship_jenbacher_prices.json",
-        "gt/data/ship_leak.json",
-        "gt/data/ship_lists_rfq.json",
-        "gt/data/ship_lukoil.json",
-        "gt/data/ship_maker_basis.json",
-        "gt/data/ship_margin.json",
-        "gt/data/ship_offer_stats.json",
-        "gt/data/ship_overpriced.json"
-      ],
-      "last_change": "2026-09-18",
-      "last_author": "Claude",
-      "last_commit": "369cbb3",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "scripts/build_catalog.py",
-        "tests/test_catalog_guard.py"
-      ]
     },
     {
       "path": "zip/data/r1700_bitrix.json",
@@ -10839,6 +10839,32 @@
         "gt/tools/stocklist_cross.py",
         "gt/tools/stocklist_fold.py"
       ]
+    },
+    {
+      "path": "gt/data/tkp_tables_stats.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 1419,
+      "note": "Счётчики второго прохода по вложениям: сколько строк предложений подтвердили цену арифметикой, сколько из них номера заявки ЛУКОЙЛ, сколько приведено к долларам и по каким причинам остальные не приведены. Пишет gt/tools/tkp_tables.py --counters; руками не заполнять. Ни цен, ни привязки цены к номеру здесь нет и быть не может — это коммерческие данные контрагентов, они остаются в выгрузке вне репозитория.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "counters",
+        "source",
+        "updated"
+      ],
+      "main_collection": {
+        "key": "counters",
+        "records": 8
+      },
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "38d907b",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "публикуемо",
+        "markers": []
+      },
+      "referenced_by": []
     }
   ]
 }
