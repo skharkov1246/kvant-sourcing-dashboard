@@ -162,6 +162,8 @@ def build() -> str:
     bb = load("ship_band_basis.json") or {}
     conf = load("ship_confidence.json") or {}
     sale = load("ship_sale_side.json") or {}
+    syst = load("ship_system_coverage.json") or {}
+    inq = load("ship_inside_quotes.json") or {}
     pl = load("ship_parts_lists.json") or {}
     cov = load("ship_coverage.json") or {}
 
@@ -465,6 +467,74 @@ def build() -> str:
           "поле не «неизвестно» — она лежит в перечисленных выше файлах, и это работа "
           "разбора, а не поиска. Считает gt/tools/sale_side.py, набор "
           "gt/data/ship_sale_side.json.</p>")
+    if syst:
+        a("<p><b>И отдельно: какую часть системы мы вообще прочитали.</b> Задача звучала "
+          "«собрать всё, что есть в системе», поэтому доля здесь обязательна.</p>")
+        a("<table><thead><tr><th>состояние вложения</th><th class='n'>записей</th>"
+          "<th>что это значит</th></tr></thead><tbody>")
+        a(f"<tr><td class='k'>прочитано</td><td class='n'>{ru(syst['downloaded'])}</td>"
+          f"<td>Из них цены нашлись в {ru(syst['downloaded_with_prices'])} файлах — это "
+          f"{pct(syst['share_priced_among_downloaded_pct'])} % прочитанного. Всего разобрано "
+          f"{ru(syst['rows_parsed'])} строк, с ценой "
+          f"{ru(syst['rows_with_price'])}.</td></tr>")
+        a(f"<tr><td class='k'>скачивать не требовалось</td>"
+          f"<td class='n'>{ru(syst['not_needed'])}</td>"
+          f"<td>Ссылка вела на то, что уже разобрано другим путём.</td></tr>")
+        a(f"<tr class='stop'><td class='k'>НЕ СКАЧАНО ВОВСЕ</td>"
+          f"<td class='n'>{ru(syst['not_downloaded'])}</td>"
+          f"<td>Причину называет сама система, дословно: "
+          f"«{E(syst['why_not_downloaded'][0]['reason'])}». Это не отказ сети и не наша "
+          f"недоработка в разборе — это ПРАВА ДОСТУПА у ключа подключения.</td></tr>")
+        a("</tbody></table>")
+        dirs = syst.get("not_downloaded_by_direction") or {}
+        a(f"<p>Что именно осталось непрочитанным: "
+          + ", ".join(f"<span class='k'>{ru(v)}</span> — {E(k)}"
+                      for k, v in sorted(dirs.items(), key=lambda kv: -kv[1]))
+          + ". То есть подавляющая часть — ВХОДЯЩИЕ предложения поставщиков, а это ровно "
+          "цены.</p>")
+        a(f"<p><b>Что с этим делать.</b> {E(syst['next_step'])}</p>")
+        if inq and inq.get("rows_without_our_price"):
+            a("<div class='warn'>")
+            a("<b>И самое важное из всего этого раздела: по большей части заявки цену не "
+              "надо искать — она уже у нас</b>")
+            a(f"<p>Опись помнит не только имя файла, но и КАКИЕ АРТИКУЛЫ стоят в каждом "
+              f"присланном предложении. Сверка номеров заявки с "
+              f"<span class='k'>{ru(inq['quote_files_scanned'])}</span> присланными "
+              f"предложениями, где есть строки с ценой, дала "
+              f"<span class='k'>{ru(inq['rows_of_request_found'])}</span> совпадений на "
+              f"<span class='k'>{ru(inq['usd_found'])} долларов</span>. Из них у "
+              f"<span class='k'>{ru(inq['rows_without_our_price'])}</span> строк на "
+              f"<span class='k'>{ru(inq['usd_without_our_price'])} долларов</span> НАШЕЙ "
+              f"цены до сих пор нет — то есть по ним разведка искала в интернете то, что "
+              f"лежало в почте.</p>")
+            a("<table><thead><tr><th>строка заявки</th><th class='n'>деньги, USD</th>"
+              "<th>где лежит цена</th></tr></thead><tbody>")
+            # имя переменной цикла НЕ h: h — накопитель разметки отчёта, и его
+            # затенение обнуляет весь документ. Поймано 18.09.2026 сторожем
+            # «отчёт вышел пустым».
+            for it in inq["rows"][:12]:
+                f = it["found_in"][0]
+                a(f"<tr><td class='k'>{E(str(it['pn']))}<br>"
+                  f"<span class='dim'>{E(str(it['name'])[:70])}</span></td>"
+                  f"<td class='n'>{ru(it['usd_exposure'])}</td>"
+                  f"<td>{E(str(f['deal']))} · {E(str(f['file']))}<br>"
+                  f"<span class='dim'>строк {ru(f['rows'])}, из них с ценой "
+                  f"{ru(f['rows_with_price'])}</span></td></tr>")
+            a("</tbody></table>")
+            a("<p><b>Это адрес, а не цена.</b> Номер стоит в файле, где есть строки с "
+              "ценой; стоит ли цена именно против него — покажет открытый файл. Но искать "
+              "по такой строке в интернете больше не нужно: надо открыть своё же "
+              "вложение. По двум самым дорогим строкам всей заявки это меняет и вывод "
+              "выше: мы относили их к каналу, где цены нет в принципе, а предложение по "
+              "ним у нас уже есть.</p>")
+            a(f"<p class='dim'>{E(inq['caveat'])} Самих цен набор не хранит: репозиторий "
+              f"публичный. Считает gt/tools/inside_quotes.py, набор "
+              f"gt/data/ship_inside_quotes.json.</p>")
+            a("</div>")
+        a(f"<p class='dim'>Если доля файлов с ценами среди непрочитанных такая же, как "
+          f"среди прочитанных, там лежит около {ru(syst['estimate_lost_priced_files'])} "
+          f"файлов с ценами. {E(syst['estimate_caveat'])} Считает "
+          f"gt/tools/system_coverage.py, набор gt/data/ship_system_coverage.json.</p>")
     else:
         a("<p>Чтобы закрыть вторую половину, нужно одно из трёх, любое: назвать поле сделки, "
           "где лежит выставленная заказчику цена; либо дать выгрузку наших коммерческих "
