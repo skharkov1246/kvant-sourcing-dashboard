@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 226,
-    "total_bytes": 102289161,
+    "total_bytes": 102290592,
     "by_sensitivity": {
       "конфиденциально": 62,
       "внутреннее": 128,
@@ -291,10 +291,10 @@
         "gt/tools/rfq_en.py",
         "gt/tools/ship_brand.py",
         "gt/tools/ship_brief.py",
+        "gt/tools/ship_decisions.py",
         "gt/tools/ship_export.py",
         "gt/tools/ship_map.py",
-        "gt/tools/ship_merge.py",
-        "gt/tools/ship_offer.py"
+        "gt/tools/ship_merge.py"
       ]
     },
     {
@@ -985,7 +985,7 @@
       },
       "last_change": "2026-09-18",
       "last_author": "Claude",
-      "last_commit": "2111328",
+      "last_commit": "fd22253",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -1406,6 +1406,7 @@
       },
       "referenced_by": [
         "gt/tools/ship_brief.py",
+        "gt/tools/ship_decisions.py",
         "gt/tools/ship_offer.py",
         "gt/tools/ship_reverify.py",
         "tests/test_ship_reverify_consistency.py"
@@ -1958,6 +1959,7 @@
       "referenced_by": [
         "gt/tools/collisions.py",
         "gt/tools/ship_brief.py",
+        "gt/tools/ship_decisions.py",
         "gt/tools/ship_questions.py",
         "ove/build.py",
         "ove/tools/build_questions.py",
@@ -3200,6 +3202,7 @@
       "referenced_by": [
         "gt/tools/collisions.py",
         "gt/tools/ship_brief.py",
+        "gt/tools/ship_decisions.py",
         "tests/test_ship_collisions.py"
       ]
     },
@@ -3288,7 +3291,8 @@
       "referenced_by": [
         "gt/tools/english_source.py",
         "gt/tools/rfq_en.py",
-        "gt/tools/ship_brief.py"
+        "gt/tools/ship_brief.py",
+        "gt/tools/ship_decisions.py"
       ]
     },
     {
@@ -3777,6 +3781,7 @@
       "referenced_by": [
         "gt/tools/confidence_audit.py",
         "gt/tools/ship_brief.py",
+        "gt/tools/ship_decisions.py",
         "tests/test_confidence_audit.py"
       ]
     },
@@ -4810,6 +4815,7 @@
       "referenced_by": [
         "gt/tools/collisions.py",
         "gt/tools/ship_brief.py",
+        "gt/tools/ship_decisions.py",
         "gt/tools/ship_questions.py",
         "tests/test_ship_collisions.py"
       ]
@@ -5105,49 +5111,9 @@
       ]
     },
     {
-      "path": "gidromet/data/postav.json",
-      "subproject": "гидрометаллургия",
-      "bytes": 73868,
-      "note": "",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "blocks",
-        "boxes",
-        "footnote",
-        "lead",
-        "sections",
-        "tiles"
-      ],
-      "main_collection": {
-        "key": "blocks",
-        "records": 18,
-        "record_keys": [
-          "blok",
-          "cn",
-          "critical",
-          "dostupnost",
-          "rf",
-          "sostav",
-          "zamechanie"
-        ]
-      },
-      "last_change": "2026-09-01",
-      "last_author": "skharkov1246",
-      "last_commit": "9ebf5b2",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "gidromet/build.py"
-      ]
-    },
-    {
       "path": "data/catalog_notes.json",
       "subproject": "дашборд сорсеров",
-      "bytes": 72608,
+      "bytes": 74039,
       "note": "",
       "format": "json",
       "shape": "объект",
@@ -5194,8 +5160,8 @@
         "gt/docs/РАЗВЕДКА-ЦЕН-ЛУКОЙЛ.pdf"
       ],
       "last_change": "2026-09-18",
-      "last_author": "skharkov1246",
-      "last_commit": "d7d8f56",
+      "last_author": "Claude",
+      "last_commit": "f7f8f26",
       "updated_by": "человек/агент",
       "sensitivity": {
         "level": "внутреннее",
@@ -5204,6 +5170,46 @@
       "referenced_by": [
         "scripts/build_catalog.py",
         "tests/test_catalog_guard.py"
+      ]
+    },
+    {
+      "path": "gidromet/data/postav.json",
+      "subproject": "гидрометаллургия",
+      "bytes": 73868,
+      "note": "",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "blocks",
+        "boxes",
+        "footnote",
+        "lead",
+        "sections",
+        "tiles"
+      ],
+      "main_collection": {
+        "key": "blocks",
+        "records": 18,
+        "record_keys": [
+          "blok",
+          "cn",
+          "critical",
+          "dostupnost",
+          "rf",
+          "sostav",
+          "zamechanie"
+        ]
+      },
+      "last_change": "2026-09-01",
+      "last_author": "skharkov1246",
+      "last_commit": "9ebf5b2",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gidromet/build.py"
       ]
     },
     {
@@ -7611,6 +7617,7 @@
       "referenced_by": [
         "gt/tools/channels.py",
         "gt/tools/ship_brief.py",
+        "gt/tools/ship_decisions.py",
         "tests/test_ship_channels.py"
       ]
     },
@@ -8630,6 +8637,7 @@
         "gpu/build.py",
         "gt/tools/channels.py",
         "gt/tools/ship_brief.py",
+        "gt/tools/ship_decisions.py",
         "tests/test_ship_channels.py"
       ]
     },
@@ -9691,7 +9699,8 @@
       },
       "referenced_by": [
         ".github/workflows/bitrix-tkp.yml",
-        "gt/tools/ship_brief.py"
+        "gt/tools/ship_brief.py",
+        "gt/tools/ship_decisions.py"
       ]
     }
   ]
