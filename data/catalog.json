@@ -5,7 +5,7 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 235,
-    "total_bytes": 106649414,
+    "total_bytes": 106864767,
     "by_sensitivity": {
       "конфиденциально": 62,
       "внутреннее": 132,
@@ -2113,6 +2113,38 @@
         "library/load_suppliers.py",
         "pnw/tools/build_suppliers.py",
         "zip/tools/bearing_report.py"
+      ]
+    },
+    {
+      "path": "gt/data/ship_parts_lists.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 323130,
+      "note": "Открытые перечни запасных частей, снятые целиком и сверенные с номерами заявки ЛУКОЙЛ. Даёт ОПОЗНАНИЕ: дословное наименование изделия по номеру, адрес источника и число независимых держателей, подтвердивших номер (два перечня одного владельца — один свидетель). НЕ даёт цены: в таких перечнях её нет вовсе, вместо неё стоит «запросить». Признак наличия здесь не подтверждённый остаток. Замеры по разным машинам не складываются. Считает gt/tools/lists_fold.py.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "machines",
+        "source",
+        "updated",
+        "what_it_does_not_give",
+        "what_it_gives"
+      ],
+      "main_collection": {
+        "key": "machines",
+        "records": 2
+      },
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "7bb4a57",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "внутреннее",
+        "markers": []
+      },
+      "referenced_by": [
+        "gt/tools/lists_fold.py",
+        "gt/tools/ship_final.py",
+        "tests/test_lists_fold.py"
       ]
     },
     {
@@ -4445,38 +4477,6 @@
       "referenced_by": [
         "library/load_suppliers.py",
         "zip/build.py"
-      ]
-    },
-    {
-      "path": "gt/data/ship_parts_lists.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 107777,
-      "note": "Открытые перечни запасных частей, снятые целиком и сверенные с номерами заявки ЛУКОЙЛ. Даёт ОПОЗНАНИЕ: дословное наименование изделия по номеру, адрес источника и число независимых держателей, подтвердивших номер (два перечня одного владельца — один свидетель). НЕ даёт цены: в таких перечнях её нет вовсе, вместо неё стоит «запросить». Признак наличия здесь не подтверждённый остаток. Замеры по разным машинам не складываются. Считает gt/tools/lists_fold.py.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "machines",
-        "source",
-        "updated",
-        "what_it_does_not_give",
-        "what_it_gives"
-      ],
-      "main_collection": {
-        "key": "machines",
-        "records": 1
-      },
-      "last_change": "2026-09-18",
-      "last_author": "Claude",
-      "last_commit": "2c5aa60",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "gt/tools/lists_fold.py",
-        "gt/tools/ship_final.py",
-        "tests/test_lists_fold.py"
       ]
     },
     {
