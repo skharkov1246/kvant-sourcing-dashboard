@@ -5,11 +5,11 @@
   "how_to_refresh": "python scripts/build_catalog.py",
   "summary": {
     "datasets": 256,
-    "total_bytes": 115311074,
+    "total_bytes": 115327328,
     "by_sensitivity": {
-      "внутреннее": 141,
-      "конфиденциально": 65,
-      "публикуемо": 50
+      "внутреннее": 140,
+      "конфиденциально": 67,
+      "публикуемо": 49
     },
     "by_subproject": {
       "ГПУ-библиотека": 29,
@@ -3669,6 +3669,58 @@
       ]
     },
     {
+      "path": "gt/data/seller_index.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 167773,
+      "note": "Строки заявки ЛУКОЙЛ, по которым у торговца ЕСТЬ карточка ПО САМОМУ НОМЕРУ, с адресом этой карточки. Собран не поиском, а чтением карт сайтов, которые продавцы публикуют сами: замер 18.09.2026 — 394 328 адресов у трёх доменов, совпало 401 строка заявки, и у 220 из них адреса продавца у нас до этого не было вовсе. Зачем так: веб-поиск расходуем и в этом окружении ненадёжен (лимит запросов кончается, машины отдают капчу, 403 или выдачу не по запросу), а карта сайта отвечает на вопрос «есть ли карточка по номеру» разом по всей заявке и бесплатно. Совпадением считается АДРЕС, ЗАКАНЧИВАЮЩИЙСЯ нашим номером: у продавца он выглядит как /product/solar-turbines-1013121-1/, то есть перед номером стоит имя изготовителя или магазина, и первая редакция инструмента, сверявшая отрезок целиком, не нашла ни одной строки при 396 тысячах адресов. Все 401 совпадение проверены на то, что адрес действительно заканчивается номером; ключ короче пяти знаков номером не считается. Что это ДОКАЗЫВАЕТ: адрес по самой детали, а не по классу. Чего НЕ доказывает: ни цены, ни остатка, ни срока — за ними надо открыть карточку, это отдельный разбор. Список доменов лежит рядом (gt/data/seller_sitemaps.json), чтобы его можно было оспорить. Пишет gt/tools/seller_index.py; руками не заполнять.",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "addresses_indexed",
+        "ask_rows_matched",
+        "hosts",
+        "keys_indexed",
+        "letters",
+        "min_key_length",
+        "of_them_had_no_address_before",
+        "rows",
+        "source",
+        "updated",
+        "what_it_does_not_prove",
+        "what_it_proves",
+        "why_min_key",
+        "why_not_search",
+        "why_one_letter"
+      ],
+      "main_collection": {
+        "key": "rows",
+        "records": 401,
+        "record_keys": [
+          "cards",
+          "had_contacts",
+          "had_price",
+          "pn",
+          "qty",
+          "sheet"
+        ]
+      },
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "a7c08a1",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "телефоны"
+        ]
+      },
+      "referenced_by": [
+        "gt/tools/seller_index.py",
+        "gt/tools/ship_decisions.py",
+        "tests/test_seller_index.py"
+      ]
+    },
+    {
       "path": "gt/data/lm6000.json",
       "subproject": "ГТУ-библиотека",
       "bytes": 162366,
@@ -3883,54 +3935,6 @@
       "referenced_by": [
         "zip/tools/build_telsmith_page.py",
         "zip/tools/telsmith_report.py"
-      ]
-    },
-    {
-      "path": "gt/data/seller_index.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 152323,
-      "note": "Строки заявки ЛУКОЙЛ, по которым у торговца ЕСТЬ карточка ПО САМОМУ НОМЕРУ, с адресом этой карточки. Собран не поиском, а чтением карт сайтов, которые продавцы публикуют сами: замер 18.09.2026 — 394 328 адресов у трёх доменов, совпало 401 строка заявки, и у 220 из них адреса продавца у нас до этого не было вовсе. Зачем так: веб-поиск расходуем и в этом окружении ненадёжен (лимит запросов кончается, машины отдают капчу, 403 или выдачу не по запросу), а карта сайта отвечает на вопрос «есть ли карточка по номеру» разом по всей заявке и бесплатно. Совпадением считается АДРЕС, ЗАКАНЧИВАЮЩИЙСЯ нашим номером: у продавца он выглядит как /product/solar-turbines-1013121-1/, то есть перед номером стоит имя изготовителя или магазина, и первая редакция инструмента, сверявшая отрезок целиком, не нашла ни одной строки при 396 тысячах адресов. Все 401 совпадение проверены на то, что адрес действительно заканчивается номером; ключ короче пяти знаков номером не считается. Что это ДОКАЗЫВАЕТ: адрес по самой детали, а не по классу. Чего НЕ доказывает: ни цены, ни остатка, ни срока — за ними надо открыть карточку, это отдельный разбор. Список доменов лежит рядом (gt/data/seller_sitemaps.json), чтобы его можно было оспорить. Пишет gt/tools/seller_index.py; руками не заполнять.",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "addresses_indexed",
-        "ask_rows_matched",
-        "hosts",
-        "keys_indexed",
-        "min_key_length",
-        "of_them_had_no_address_before",
-        "rows",
-        "source",
-        "updated",
-        "what_it_does_not_prove",
-        "what_it_proves",
-        "why_min_key",
-        "why_not_search"
-      ],
-      "main_collection": {
-        "key": "rows",
-        "records": 401,
-        "record_keys": [
-          "cards",
-          "had_contacts",
-          "had_price",
-          "pn",
-          "qty",
-          "sheet"
-        ]
-      },
-      "last_change": "2026-09-18",
-      "last_author": "Claude",
-      "last_commit": "d6ff0f6",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "внутреннее",
-        "markers": []
-      },
-      "referenced_by": [
-        "gt/tools/seller_index.py",
-        "gt/tools/ship_decisions.py",
-        "tests/test_seller_index.py"
       ]
     },
     {
@@ -10905,6 +10909,47 @@
       ]
     },
     {
+      "path": "gt/data/seller_sitemaps.json",
+      "subproject": "ГТУ-библиотека",
+      "bytes": 2908,
+      "note": "Продавцы, чью КАРТУ САЙТА читает gt/tools/seller_index.py, чтобы узнать, есть ли у них карточка по нашему номеру. Читается только карта сайта — продавец публикует её сам для того, чтобы его карточки находили; страницы товаров пачками не выкачиваются. У каждого домена сказано, откуда он взялся и что о нём известно, включая то, что turbine.parts, hardtoget.parts и zip-solutions.com — один оператор и считаются одним свидетелем. Заполняется руками осознанно: домен, попавший сюда по ошибке, даёт ложные «адреса по детали».",
+      "format": "json",
+      "shape": "объект",
+      "top_keys": [
+        "hosts",
+        "updated",
+        "what_it_is",
+        "why_visible"
+      ],
+      "main_collection": {
+        "key": "hosts",
+        "records": 3,
+        "record_keys": [
+          "host",
+          "mail",
+          "mail_note",
+          "mail_read_on",
+          "phone",
+          "same_operator_as",
+          "why"
+        ]
+      },
+      "last_change": "2026-09-18",
+      "last_author": "Claude",
+      "last_commit": "a7c08a1",
+      "updated_by": "человек/агент",
+      "sensitivity": {
+        "level": "конфиденциально",
+        "markers": [
+          "адреса электронной почты",
+          "телефоны"
+        ]
+      },
+      "referenced_by": [
+        "gt/tools/seller_index.py"
+      ]
+    },
+    {
       "path": "gt/data/ship_price_substitutions.json",
       "subproject": "ГТУ-библиотека",
       "bytes": 2828,
@@ -10974,40 +11019,6 @@
         "tests/test_demand_collisions.py",
         "zip/customs/glbs_pull.mjs",
         "zip/tools/cat_stock.py"
-      ]
-    },
-    {
-      "path": "gt/data/seller_sitemaps.json",
-      "subproject": "ГТУ-библиотека",
-      "bytes": 2104,
-      "note": "Продавцы, чью КАРТУ САЙТА читает gt/tools/seller_index.py, чтобы узнать, есть ли у них карточка по нашему номеру. Читается только карта сайта — продавец публикует её сам для того, чтобы его карточки находили; страницы товаров пачками не выкачиваются. У каждого домена сказано, откуда он взялся и что о нём известно, включая то, что turbine.parts, hardtoget.parts и zip-solutions.com — один оператор и считаются одним свидетелем. Заполняется руками осознанно: домен, попавший сюда по ошибке, даёт ложные «адреса по детали».",
-      "format": "json",
-      "shape": "объект",
-      "top_keys": [
-        "hosts",
-        "updated",
-        "what_it_is",
-        "why_visible"
-      ],
-      "main_collection": {
-        "key": "hosts",
-        "records": 3,
-        "record_keys": [
-          "host",
-          "same_operator_as",
-          "why"
-        ]
-      },
-      "last_change": "2026-09-18",
-      "last_author": "Claude",
-      "last_commit": "d6ff0f6",
-      "updated_by": "человек/агент",
-      "sensitivity": {
-        "level": "публикуемо",
-        "markers": []
-      },
-      "referenced_by": [
-        "gt/tools/seller_index.py"
       ]
     },
     {
