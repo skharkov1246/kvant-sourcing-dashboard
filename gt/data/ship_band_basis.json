@@ -9,8 +9,8 @@
  "usd_on_transfer": 1243502.4,
  "share_not_a_found_price": 64.1,
  "closed_by_reverify": {
-  "records": 71,
-  "usd_exposure": 1332001.0,
+  "records": 72,
+  "usd_exposure": 1336751.0,
   "what_it_means": "Строки, где основанием было мнение или перенос по классу, а перепроверка нашла цену числом. Столько мнения уже заменено замером."
  },
  "by_basis": {
@@ -18,15 +18,15 @@
    "records": 518,
    "usd_exposure": 4704793.9,
    "what_it_means": "Основание прямо называет себя оценкой специалиста. Найденной цены за ней нет.",
-   "records_with_found_price": 40,
-   "usd_with_found_price": 347919.0
+   "records_with_found_price": 41,
+   "usd_with_found_price": 352669.0
   },
   "цена продавца: розница или дистрибьютор": {
    "records": 158,
    "usd_exposure": 3047140.0,
    "what_it_means": "За вилкой стоит цена с карточки продавца или дистрибьютора.",
-   "records_with_found_price": 58,
-   "usd_with_found_price": 2225531.75
+   "records_with_found_price": 67,
+   "usd_with_found_price": 2261310.75
   },
   "перенос по аналогу или классу": {
    "records": 141,
@@ -39,8 +39,8 @@
    "records": 31,
    "usd_exposure": 238728.5,
    "what_it_means": "За вилкой стоит цена торговой площадки или брокерского перечня.",
-   "records_with_found_price": 10,
-   "usd_with_found_price": 72634.5
+   "records_with_found_price": 13,
+   "usd_with_found_price": 77014.5
   },
   "основание записано, но не отнесено к классу": {
    "records": 9,
