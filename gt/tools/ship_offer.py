@@ -390,6 +390,7 @@ def build(rows: list, ours: dict, fx_day: str, supp: dict | None = None) -> str:
                      f'<p class="lead">{E(lead)}</p>' + table(js) + "</div>")
 
     parts.append(reverify_section(rows, supp))
+    parts.append(no_band_section(rows, supp))
 
     return ("<!doctype html><html lang='ru'><head><meta charset='utf-8'>"
             "<title>Выставленные цены против рынка</title>"
@@ -495,6 +496,56 @@ def reverify_section(rows: list, supp: dict) -> str:
                     f'<td>{E(z["verdict"][:60])}</td><td>{E(z["what"])}</td></tr>'
                     f'{src}</tbody>')
     return head + f'<table class="t"><thead>{th}</thead>{"".join(body)}</table></div>'
+
+
+def no_band_section(rows: list, supp: dict) -> str:
+    """Строки БЕЗ нашей вилки, по которым есть письменное предложение поставщика.
+
+    Замер прогона 18.09.2026: таких строк 370 — почти половина всех, где КП
+    поставщика нашлось. По ним оценку не нужно искать разведкой, она уже
+    написана контрагентом; достаточно перенести её в заявку с оговоркой, что это
+    предложение, а не подтверждённая закупка с остатком.
+
+    Раздел идёт в документ-артефакт, а не в репозиторий: здесь цены.
+    """
+    out = []
+    for r in rows:
+        if r.get("usd_lo") not in (None, "") and r.get("usd_hi") not in (None, ""):
+            continue
+        sp, _ = lookup(supp, r.get("pn"))
+        if not sp or sp.get("usd") is None:
+            continue
+        qty = float(r.get("qty") or 0)
+        out.append({"r": r, "sp": sp, "qty": qty, "usd": float(sp["usd"]),
+                    "total": float(sp["usd"]) * qty})
+    if not out:
+        return ""
+    out.sort(key=lambda z: -z["total"])
+    head = (f'<div class="sec"><h2>Строки без нашей оценки, по которым поставщик уже назвал '
+            f'цену — {len(out)}</h2>'
+            '<p class="lead">По этим строкам вилки у нас нет вовсе, а письменное предложение '
+            'контрагента есть. Значит оценку не надо искать разведкой: она уже написана, и её '
+            'достаточно перенести в заявку. Оговорка обязательна и стоит в каждой строке: это '
+            'предложение, а не подтверждённая закупка с остатком, и покрытие количества '
+            'поставщик отдельно не подтверждал.</p>')
+    th = ('<tr><th style="width:11%">Артикул</th><th style="width:26%">Наименование</th>'
+          '<th style="width:6%">Кол-во</th><th style="width:9%">КП, USD/шт</th>'
+          '<th style="width:10%">На объём, USD</th><th style="width:38%">Откуда КП</th></tr>')
+    body = []
+    for z in out:
+        sp, r = z["sp"], z["r"]
+        body.append(
+            f'<tbody class="p"><tr><td><span class="pn">{E(r.get("pn"))}</span></td>'
+            f'<td>{E((r.get("name") or "")[:110])}</td><td>{ru(z["qty"])}</td>'
+            f'<td>{money(z["usd"])}</td><td>{ru(z["total"])}</td>'
+            f'<td>{E(sp["origin"])}, поле «{E(sp.get("field") or "")}», файл '
+            f'«{E(sp["file"])}», строка {E(sp["row"])}, {money(sp["raw_price"])} '
+            f'{E(sp["currency"])}</td></tr></tbody>')
+    tail = (f'<p class="dim">Сумма по разделу — {ru(sum(z["total"] for z in out))} USD. Это НЕ '
+            f'закупка и НЕ экспозиция: это сумма предложений контрагентов по строкам, у которых '
+            f'нашей оценки не было. Складывать её с экспозицией заявки нельзя — она её '
+            f'дополняет, а не входит в неё.</p></div>')
+    return head + f'<table class="t"><thead>{th}</thead>{"".join(body)}</table>' + tail
 
 
 def diagnose(rows: list, ours: dict, supp: dict | None = None,
