@@ -256,6 +256,62 @@ def rows_from_xlsx(content: bytes) -> list[tuple[str, int, list]]:
     return out
 
 
+def rows_from_xlsx_raw(content: bytes) -> list[tuple[str, int, list]]:
+    """Тот же xlsx, но читаемый напрямую как архив с разметкой.
+
+    ЗАЧЕМ. Замер 18.09.2026 по описи вложений: продажная сторона заявки —
+    восемнадцать файлов «result.xlsx» примерно по 5 КБ, приложенных к полю
+    «Result, ТКП». Они скачались без единой ошибки и НЕ ОТКРЫЛИСЬ обычным
+    путём. Пока они не читаются, сопоставить продажу с закупкой построчно
+    нельзя, а значит и марж по заявке не существует.
+
+    Обычный читатель книг придирчив к устройству файла: ему нужны и описание
+    книги, и связи листов, и общий словарь строк на своих местах. Выгрузка из
+    учётной системы кладёт их иначе, и читатель отказывается ещё до данных.
+    Здесь данные берутся прямо: словарь строк из sharedStrings, значения ячеек
+    из каждого листа, номер строки — из её собственного признака.
+
+    Это ЗАПАСНОЙ путь, а не замена: он не считает формулы и не знает форматов.
+    Поэтому он включается только после отказа основного.
+    """
+    import zipfile
+    import xml.etree.ElementTree as ET
+
+    ns = "{http://schemas.openxmlformats.org/spreadsheetml/2006/main}"
+    z = zipfile.ZipFile(io.BytesIO(content))
+    names = z.namelist()
+
+    shared: list[str] = []
+    if "xl/sharedStrings.xml" in names:
+        root = ET.fromstring(z.read("xl/sharedStrings.xml"))
+        for si in root.iter(f"{ns}si"):
+            shared.append("".join(t.text or "" for t in si.iter(f"{ns}t")))
+
+    out: list[tuple[str, int, list]] = []
+    sheets = sorted(n for n in names
+                    if n.startswith("xl/worksheets/") and n.endswith(".xml"))
+    for sheet in sheets:
+        title = sheet.rsplit("/", 1)[-1][:-4]
+        root = ET.fromstring(z.read(sheet))
+        for row in root.iter(f"{ns}row"):
+            i = int(row.get("r") or (len(out) + 1))
+            cells = []
+            for c in row.iter(f"{ns}c"):
+                v = c.find(f"{ns}v")
+                text = v.text if v is not None else None
+                if c.get("t") == "s" and text is not None:
+                    idx = int(text)
+                    text = shared[idx] if 0 <= idx < len(shared) else ""
+                elif c.get("t") == "inlineStr":
+                    isx = c.find(f"{ns}is")
+                    text = ("".join(t.text or "" for t in isx.iter(f"{ns}t"))
+                            if isx is not None else None)
+                cells.append(text)
+            if any(x not in (None, "") for x in cells):
+                out.append((title, i, cells))
+    return out
+
+
 def rows_from_xls(content: bytes) -> list[tuple[str, int, list]]:
     import xlrd
     out = []
@@ -474,6 +530,19 @@ def parse(name: str, content: bytes):
                     if got:
                         return got, how
                     return [], f"{tag}: не разобрался ({type(e).__name__}); {how}"
+                # Книга, которую придирчивый читатель не открыл, ещё не потеряна:
+                # пробуем прочитать её напрямую как архив с разметкой. Этот путь
+                # добавлен 18.09.2026 из-за восемнадцати файлов продажной стороны
+                # заявки, которые скачались без ошибок и не открылись.
+                if low.endswith((".xlsx", ".xlsm")):
+                    try:
+                        rows = rows_from_xlsx_raw(content)
+                    except Exception as e2:                      # noqa: BLE001
+                        return [], (f"{tag}: не разобрался ({type(e).__name__}), "
+                                    f"прямое чтение тоже ({type(e2).__name__})")
+                    if rows:
+                        return rows, f"{tag} прямым чтением архива"
+                    return [], f"{tag}: не разобрался ({type(e).__name__}), листы пусты"
                 return [], f"{tag}: не разобрался ({type(e).__name__})"
             # pdf без текстового слоя — это скан, и он идёт в распознавание, а
             # не объявляется пустым (правило 15 CLAUDE.md: статус не должен врать)
