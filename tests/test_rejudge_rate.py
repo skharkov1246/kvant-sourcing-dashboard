@@ -48,11 +48,30 @@ def test_смена_вида_отказа_опровержением_не_счи
 
 
 def test_части_складываются_в_число_пересуженных():
+    """Четыре части, а не три. Четвёртая добавлена 18.09.2026 по замеру: у
+    тридцати строк вердикт не изменился, а ЦИФРА появилась — вилки по ним в
+    заявке нет, сравнивать не с чем, но число для запроса теперь есть. Без этой
+    категории пересуд выглядел бесплодным там, где он дал больше всего."""
     if not SRC.exists():
         pytest.skip("замера нет")
     d = json.loads(SRC.read_text(encoding="utf-8"))
-    total = d["overturned"] + d["reclassified"] + d["unchanged"]
+    if "price_gained_same_verdict" not in d:
+        pytest.skip("замер старой сборки")
+    total = (d["overturned"] + d["reclassified"] + d["unchanged"]
+             + d["price_gained_same_verdict"])
     assert total == d["rejudged"], (total, d["rejudged"])
+
+
+def test_появившаяся_цифра_опровержением_не_считается():
+    if not SRC.exists():
+        pytest.skip("замера нет")
+    d = json.loads(SRC.read_text(encoding="utf-8"))
+    if "price_gained_same_verdict" not in d:
+        pytest.skip("замер старой сборки")
+    assert d["price_gained_same_verdict"] > 0
+    # опровержения перечислены поимённо и в их числе нет строк с тем же вердиктом
+    for r in d["rows"]:
+        assert r["was"] != r["now"], r
 
 
 def test_в_опровержения_попадают_только_ценовые_вердикты():
