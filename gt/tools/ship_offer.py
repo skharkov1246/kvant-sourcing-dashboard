@@ -128,6 +128,46 @@ def our_prices(tkp_path: Path, rates: dict) -> dict:
     return prices_by_direction(tkp_path, rates)[0]
 
 
+DOUBLE_PN = re.compile(r"^(\d{6,7})-(\d{6,7})$")
+
+
+def keys_of(pn) -> list[str]:
+    """Ключи, под которыми строку стоит искать в файлах сделки.
+
+    Замер 18.09.2026: в пяти строках Jenbacher в поле артикула стоят ДВА номера
+    через дефис — старый и новый (404492-1214569, 334976-433894 и ещё три,
+    вместе 589 633 USD экспозиции). Составного номера не существует нигде, и
+    сопоставление по нему целиком не находило ничего, хотя в приложенных файлах
+    вполне может стоять один из двух номеров по отдельности.
+
+    Поэтому кроме полного ключа пробуем каждую половину. Порядок значим:
+    сперва полный, потом ВТОРОЙ номер (он действующий — по 334976-433894
+    установлено, что 433894 заменил 389588), потом первый.
+
+    ЗАМЕР ПРИБАВКИ: НОЛЬ. Прогон по «Энергосети» 18.09.2026 напечатал «строк с
+    двойным номером: 5 · пересечение с учётом половин: 697» — ровно столько же,
+    сколько без половин. Значит половин этих номеров в приложенных файлах тоже
+    нет, и правка на ЭТОМ корпусе не дала ничего. Оставлена намеренно: она
+    верна по существу, ничего не портит и сработает на файлах, где отдельный
+    номер встретится. Но выдавать её за прибавку нельзя — прибавки нет.
+    """
+    raw = str(pn or "").strip()
+    out = [norm_key(raw)]
+    m = DOUBLE_PN.match(raw)
+    if m:
+        out.append(norm_key(m.group(2)))
+        out.append(norm_key(m.group(1)))
+    return [k for k in out if k]
+
+
+def lookup(d: dict, pn):
+    """Цена по строке заявки с учётом двойных номеров. Возвращает (цена, ключ)."""
+    for k in keys_of(pn):
+        if k in d:
+            return d[k], k
+    return None, ""
+
+
 def price_side(ours: dict, unk: dict) -> dict:
     """Левая часть документа: цена из файла сделки, с указанием поля.
 
@@ -185,9 +225,22 @@ def build(rows: list, ours: dict, fx_day: str, supp: dict | None = None) -> str:
     supp = supp or {}
     joined = []
     for r in rows:
-        o = ours.get(norm_key(r["pn"]))
-        if not o:
+        o, okey = lookup(ours, r["pn"])
+        sp0, spkey = lookup(supp, r["pn"])
+        # Строку берём, если есть ХОТЬ ОДНА цена из файлов сделки — наша или
+        # присланная поставщиком. Прежде требовалась именно наша, и прогон по
+        # «НВН» выдал пустой документ при 167 артикулах заявки, покрытых
+        # ВХОДЯЩИМИ КП. Терялось самое ценное: письменное предложение
+        # контрагента по этой самой заявке.
+        if not o and not sp0:
             continue
+        # если нашлось по половине двойного номера — это надо видеть в документе
+        halfkey = next((k for k in (okey, spkey)
+                        if k and k != norm_key(r["pn"])), "")
+        if not o:
+            o = {"usd": None, "raw_price": "", "currency": "",
+                 "direction": "", "field": "", "file": "", "origin": "",
+                 "sheet": "", "row": "", "rule": "", "line": ""}
         web = r.get("unit_price_usd")
         web = float(web) if web not in (None, "") else None
         if web is not None and web <= 0:
@@ -196,20 +249,26 @@ def build(rows: list, ours: dict, fx_day: str, supp: dict | None = None) -> str:
         # витрины: это письменное предложение контрагента по этой самой заявке,
         # а не цена неизвестного продавца неизвестного исполнения. Поэтому за
         # цену закупки берём его, когда оно есть, а витрину держим рядом.
-        sp = supp.get(norm_key(r["pn"]))
+        sp = sp0
         offer = sp["usd"] if sp else None
         mk = offer if offer is not None else web
         src = "КП поставщика" if offer is not None else ("витрина" if web else "")
         qty = int(r.get("qty") or 0)
-        room = (o["usd"] - mk) if mk is not None else None
+        # Запас считается только когда есть И выставленная цена, И цена закупки.
+        # Нет нашей цены — нет и запаса: вычитать из пустоты нельзя.
+        room = (o["usd"] - mk) if (mk is not None and o["usd"] is not None) else None
         joined.append({"r": r, "o": o, "mk": mk, "web": web, "offer": offer,
                        "sp": sp, "src": src, "qty": qty, "room": room,
+                       "halfkey": halfkey,
                        "room_total": (room * qty) if room is not None else None})
 
-    checked = [j for j in joined if j["mk"] is not None]
+    withours = [j for j in joined if j["o"]["usd"] is not None]
+    onlyoffer = sorted((j for j in joined if j["o"]["usd"] is None),
+                       key=lambda j: -(j["offer"] or 0) * j["qty"])
+    checked = [j for j in withours if j["mk"] is not None and j["room"] is not None]
     under = sorted((j for j in checked if j["room"] < 0), key=lambda j: j["room_total"])
     ok = sorted((j for j in checked if j["room"] >= 0), key=lambda j: -j["room_total"])
-    nomk = [j for j in joined if j["mk"] is None]
+    nomk = [j for j in withours if j["mk"] is None]
     room_sum = sum(j["room_total"] for j in ok)
     loss_sum = sum(-j["room_total"] for j in under)
     firm = Counter(j["r"].get("stock_grade", "нет") for j in joined)
@@ -221,6 +280,10 @@ def build(rows: list, ours: dict, fx_day: str, supp: dict | None = None) -> str:
         'проверкой у продавцов. Разница и есть запас на снижение. Где рынок дороже '
         'выставленного, запаса нет: строка убыточна при текущей цене.</p>',
         f"""<table class="k"><tbody>
+<tr><td class="l">Строк с КП поставщика без нашей цены</td>
+<td class="big">{len(onlyoffer)}</td>
+<td class="dim">по ним есть письменное предложение контрагента, но выставленной
+заказчику цены в файлах сделки нет — запас посчитать нечем, а цену закупки знаем</td></tr>
 <tr><td class="l">Сошлось с заявкой</td><td class="big">{len(joined)}</td>
 <td class="dim">позиций, где есть и цена из файла сделки, и строка заявки. Из них
 направление файла установлено как «выставлено нами» у
@@ -252,11 +315,17 @@ def build(rows: list, ours: dict, fx_day: str, supp: dict | None = None) -> str:
     ]
 
     cols = [
-        ("Артикул", 9, lambda j: f'<span class="pn">{E(j["r"]["pn"])}</span>'),
+        ("Артикул", 9, lambda j: (f'<span class="pn">{E(j["r"]["pn"])}</span>'
+                                  + (f'<br><span class="bad">найдено по '
+                                     f'{E(j["halfkey"])}</span>'
+                                     if j.get("halfkey") else ""))),
         ("Наименование", 18, lambda j: E((j["r"].get("name") or "")[:120])),
         ("Кол-во", 4, lambda j: ru(j["qty"])),
-        ("Выставлено, USD/шт", 7, lambda j: money(j["o"]["usd"])),
-        ("В валюте ТКП", 7, lambda j: f'{money(j["o"]["raw_price"])} {E(j["o"]["currency"])}'),
+        ("Выставлено, USD/шт", 7,
+         lambda j: money(j["o"]["usd"]) if j["o"]["usd"] is not None else "—"),
+        ("В валюте ТКП", 7,
+         lambda j: (f'{money(j["o"]["raw_price"])} {E(j["o"]["currency"])}'
+                    if j["o"]["usd"] is not None else "—")),
         ("КП поставщика, USD/шт", 7,
          lambda j: money(j["offer"]) if j["offer"] is not None else ""),
         ("Витрина, USD/шт", 6, lambda j: money(j["web"]) if j["web"] is not None else ""),
@@ -283,9 +352,13 @@ def build(rows: list, ours: dict, fx_day: str, supp: dict | None = None) -> str:
         for j in js:
             tds = "".join(f"<td>{fn(j)}</td>" for _, _, fn in cols)
             o = j["o"]
-            src = (f'<b>Откуда выставленная цена:</b> {E(o["origin"])}, поле '
-                   f'«{E(o.get("field") or "")}», файл «{E(o["file"])}», лист '
-                   f'{E(o["sheet"])}, строка {E(o["row"])}; {E(o["rule"])}')
+            if o["usd"] is None:
+                src = ('<b>Выставленной цены в файлах сделки НЕТ</b> — строка '
+                       'попала в документ по входящему КП поставщика')
+            else:
+                src = (f'<b>Откуда выставленная цена:</b> {E(o["origin"])}, поле '
+                       f'«{E(o.get("field") or "")}», файл «{E(o["file"])}», лист '
+                       f'{E(o["sheet"])}, строка {E(o["row"])}; {E(o["rule"])}')
             sp = j.get("sp")
             if sp:
                 src += (f' <b>· Откуда КП поставщика:</b> {E(sp["origin"])}, поле '
@@ -301,6 +374,11 @@ def build(rows: list, ours: dict, fx_day: str, supp: dict | None = None) -> str:
          "Самое опасное на защите. Сортировка по размеру убытка на объём."),
         ("Запас на снижение есть", ok,
          "Сортировка по размеру запаса на объём: здесь есть чем торговаться."),
+        ("Есть КП поставщика, выставленной цены в файлах нет", onlyoffer,
+         "Строки, по которым в приложенных файлах нашлось письменное "
+         "предложение контрагента, а нашей выставленной цены нет. Запас "
+         "посчитать нечем, но цена закупки подтверждена документом, а не "
+         "карточкой с витрины — это готовое основание для торга."),
         ("Цена закупки не найдена — запас неизвестен", nomk,
          "Выставленная цена есть, а подтверждения закупочной нет ни КП "
          "поставщика, ни карточкой продавца. Это не «дорого» и не «дёшево» — "
@@ -331,7 +409,13 @@ def diagnose(rows: list, ours: dict, supp: dict | None = None,
     CLAUDE.md), а номенклатурные номера в репозитории и так открыты.
     """
     want = {norm_key(r["pn"]) for r in rows if r.get("pn")}
+    # у двойных номеров считаем и половины, иначе покрытие занижается
+    want_any = {k for r in rows if r.get("pn") for k in keys_of(r["pn"])}
     got = set(ours)
+    if want_any != want:
+        print(f"  строк с двойным номером: "
+              f"{sum(1 for r in rows if DOUBLE_PN.match(str(r.get('pn') or '')))}"
+              f" · пересечение с учётом половин: {len(want_any & got)}")
     print(f"  артикулов в заявке: {len(want)} · извлечено из файлов: {len(got)} "
           f"· пересечение точное: {len(want & got)}")
     # ПОКРЫТИЕ ПО КП ПОСТАВЩИКОВ измеряется отдельно, и это не мелочь: прогон по
