@@ -90,12 +90,28 @@ def main() -> int:
             return 1
     else:
         done = {key(r.get("pn")) for r in json.loads(REVERIFY.read_text(encoding="utf-8"))["rows"]}
+        # Строка БЕЗ артикула в задание не идёт, и это не придирка. Ключ по
+        # такой строке пуст, поэтому набор перепроверки её не примет НИКОГДА:
+        # приёмник справедливо отбивает строку с пустым номером. Раз принять
+        # нельзя, то и разбирать её разведкой бессмысленно — она возвращалась
+        # бы в верх остатка после каждого прогона и съедала разведку заново.
+        # Такие строки закрываются вопросом заказчику, а не поиском, и вопрос
+        # по ним уже поставлен. Сколько их — печатается числом, чтобы отсев не
+        # был молчаливым.
+        keyless = [r for r in rows if not key(r.get("pn")) and expo(r) > 0]
         sel = [r for r in rows
-               if key(r.get("pn")) not in done and expo(r) > 0
+               if key(r.get("pn")) and key(r.get("pn")) not in done and expo(r) > 0
                and str(r.get("man") or "").startswith(a.maker)
                and (not a.sheet or r.get("sheet") == a.sheet)]
         sel.sort(key=expo, reverse=True)
         sel = sel[:a.top or 20]
+        if keyless:
+            print(f"ОТСЕЯНО БЕЗ АРТИКУЛА: {len(keyless)} строк на "
+                  f"{sum(map(expo, keyless)):,.0f} USD — у них в поле артикула нет ни одной "
+                  f"буквы и ни одной цифры, поэтому набор перепроверки их не примет и "
+                  f"разбирать их разведкой бесполезно. Они закрываются вопросом заказчику: "
+                  f"{', '.join(str(r.get('pn')) for r in keyless[:5])}".replace(",", " "),
+                  file=sys.stderr)
     print(brief(sel))
     return 0
 

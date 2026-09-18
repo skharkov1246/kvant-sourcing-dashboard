@@ -58,12 +58,33 @@ def expo(r: dict) -> float:
     return (float(lo) + float(hi)) / 2 * float(q)
 
 
+# Окончания, которые сами по себе держателем не являются: у «kempstoncontrols.co.uk»
+# домен второго уровня — «co.uk», и по нему все британские продавцы сливаются в
+# одного свидетеля. Замечено 18.09.2026 на прогоне листа «Энергосети»: 31 номер
+# был приписан держателю с именем «co.uk». Ошибка считает независимость в
+# меньшую сторону (два разных британских перечня становятся одним), то есть
+# занижает подтверждённость, и делает имя источника нечитаемым в отчёте.
+PUBLIC_SUFFIX = frozenset("""
+co.uk org.uk ac.uk gov.uk me.uk ltd.uk plc.uk net.uk sch.uk
+com.cn net.cn org.cn gov.cn com.hk com.tw com.sg com.my com.ph
+com.au net.au org.au co.nz com.br com.ar com.mx com.co
+co.jp or.jp ne.jp co.kr co.in co.za co.il com.tr com.ua com.pl com.ru
+""".split())
+
+
 def host(url: str) -> str:
     """Держатель перечня — по домену второго уровня: разные страницы одного
-    сайта не образуют двух независимых свидетельств."""
+    сайта не образуют двух независимых свидетельств. Для доменов вида
+    «что-то.co.uk» берётся третий уровень: «co.uk» — не держатель, а окончание
+    (см. PUBLIC_SUFFIX)."""
     h = (urlparse(str(url or "")).hostname or "").lower().removeprefix("www.")
     parts = h.split(".")
-    return ".".join(parts[-2:]) if len(parts) >= 2 else h
+    if len(parts) < 2:
+        return h
+    two = ".".join(parts[-2:])
+    if two in PUBLIC_SUFFIX and len(parts) >= 3:
+        return ".".join(parts[-3:])
+    return two
 
 
 def build(src: dict, machine: str) -> dict:

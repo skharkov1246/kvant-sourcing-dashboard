@@ -40,6 +40,25 @@ def test_независимость_считается_по_держателю_�
     assert lf.host("") == ""
 
 
+def test_окончание_вроде_co_uk_держателем_не_является():
+    """Два разных британских продавца — два свидетеля, а не один.
+
+    Прогон листа «Энергосети» 18.09.2026 приписал 31 номер держателю с именем
+    «co.uk»: домен второго уровня у «kempstoncontrols.co.uk» — это окончание, а
+    не компания. Ошибка занижает подтверждённость (два независимых перечня
+    сливаются в один) и делает имя источника в отчёте бессмысленным.
+    """
+    import lists_fold as lf
+
+    assert lf.host("https://www.kempstoncontrols.co.uk/p/1") == "kempstoncontrols.co.uk"
+    assert lf.host("https://shop.someseller.co.uk/x") == "someseller.co.uk"
+    assert lf.host("https://a.co.uk/1") != lf.host("https://b.co.uk/1")
+    # обычный двухуровневый домен считается по-прежнему
+    assert lf.host("https://parts.example.org/1") == "example.org"
+    # окончание без третьего уровня не ломает разбор
+    assert lf.host("https://co.uk/1") == "co.uk"
+
+
 def test_две_страницы_одного_сайта_не_дают_двух_подтверждений(tmp_path, monkeypatch):
     import lists_fold as lf
 
