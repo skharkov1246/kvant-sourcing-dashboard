@@ -139,3 +139,46 @@ def test_своя_цена_не_помечается_неустановленн�
     html = O.build(rows, O.price_side(ours, unk), "17.09", supp)
     assert "Result, ТКП" in html
     assert "направление не установлено" not in html
+
+
+def test_строка_с_кп_поставщика_без_нашей_цены_попадает_в_документ(tmp_path):
+    """Иначе теряется самое ценное свидетельство.
+
+    Прогон по «НВН» 18.09.2026 выдал ПУСТОЙ документ при 167 артикулах заявки,
+    покрытых входящими КП поставщиков: build требовал именно НАШУ цену и
+    выбрасывал строку, если её нет. Письменное предложение контрагента по этой
+    самой заявке при этом просто исчезало.
+    """
+    doc = {"files": [
+        {"direction": "входящее", "field_name": "Offer from supplier",
+         "file_name": "offer.xlsx", "origin": "СП-166 9",
+         "prices": [{"pn": "ZZ100", "price": 150, "currency": "USD", "row": 3}]},
+    ]}
+    tk = tmp_path / "t.json"
+    tk.write_text(json.dumps(doc, ensure_ascii=False), encoding="utf-8")
+    ours, supp, unk = O.prices_by_direction(tk, RATES)
+    assert ours == {} and "ZZ100" in supp
+    rows = [{"pn": "ZZ100", "name": "деталь", "qty": 4,
+             "unit_price_usd": None, "stock_grade": "нет", "sellers": []}]
+    html = O.build(rows, O.price_side(ours, unk), "17.09", supp)
+    assert "ZZ100" in html, "строка с КП поставщика выброшена"
+    assert "Выставленной цены в файлах сделки НЕТ" in html
+    assert "Есть КП поставщика, выставленной цены в файлах нет" in html
+    # запас не выдуман: вычитать из пустоты нельзя
+    assert "150.00" in html
+
+
+def test_запас_не_считается_когда_нашей_цены_нет(tmp_path):
+    doc = {"files": [
+        {"direction": "входящее", "field_name": "Offer from supplier",
+         "file_name": "o", "origin": "o",
+         "prices": [{"pn": "ZZ200", "price": 10, "currency": "USD"}]},
+    ]}
+    tk = tmp_path / "t.json"
+    tk.write_text(json.dumps(doc, ensure_ascii=False), encoding="utf-8")
+    ours, supp, unk = O.prices_by_direction(tk, RATES)
+    rows = [{"pn": "ZZ200", "name": "д", "qty": 2, "unit_price_usd": 999,
+             "stock_grade": "нет", "sellers": []}]
+    html = O.build(rows, O.price_side(ours, unk), "17.09", supp)
+    # 999 - 10 = 989 быть не должно: нашей цены нет, запас неизвестен
+    assert "989" not in html, "запас посчитан от пустой выставленной цены"
