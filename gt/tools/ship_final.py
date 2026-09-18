@@ -550,6 +550,15 @@ def build() -> str:
               "вложение. По двум самым дорогим строкам всей заявки это меняет и вывод "
               "выше: мы относили их к каналу, где цены нет в принципе, а предложение по "
               "ним у нас уже есть.</p>")
+            c = inq.get("negative_control") or {}
+            if c:
+                a(f"<p><b>Проверено наоборот.</b> Теми же предложениями сверены ВЫДУМАННЫЕ "
+                  f"номера той же формы. Настоящие совпали в "
+                  f"<span class='k'>{pct(c['real_matched_pct'])} %</span> случаев "
+                  f"({ru(c['real_matched'])} из {ru(c['real_checked'])}), выдуманные — в "
+                  f"<span class='k'>{pct(c['fake_matched_pct'])} %</span> "
+                  f"({ru(c['fake_matched'])} из {ru(c['fake_checked'])}). Значит "
+                  f"совпадение несёт сведение, а не шум.</p>")
             a(f"<p class='dim'>{E(inq['caveat'])} Самих цен набор не хранит: репозиторий "
               f"публичный. Считает gt/tools/inside_quotes.py, набор "
               f"gt/data/ship_inside_quotes.json.</p>")

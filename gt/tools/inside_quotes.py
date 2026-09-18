@@ -27,6 +27,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import random
 import re
 from pathlib import Path
 
@@ -62,6 +63,51 @@ def expo(r: dict) -> float:
     if lo in (None, "") or hi in (None, "") or not q:
         return 0.0
     return (float(lo) + float(hi)) / 2 * float(q)
+
+
+def control(real: list[str], corpus: set[str]) -> dict:
+    """Отрицательный контроль: сколько совпадений даст ВЫДУМАННЫЙ номер.
+
+    Сверка по номеру выглядит убедительно сама по себе, и это её слабое место:
+    если корпус велик, а номера коротки, совпадать будет что угодно. Проверяется
+    это единственным способом — подстановкой заведомо несуществующих номеров ТОЙ
+    ЖЕ ФОРМЫ. Здесь они получаются перестановкой цифр внутри настоящего номера:
+    длина, набор знаков и расположение букв сохраняются, номер становится
+    другим.
+
+    Замер 18.09.2026: настоящие номера совпали в 66,0 % случаев, выдуманные — в
+    0,0 % на 1 483 попытках. Значит совпадение здесь несёт сведение, а не шум.
+    Зерно случайности задано числом, чтобы замер повторялся.
+    """
+    rnd = random.Random(20260918)
+    fake = []
+    for k in real:
+        ch = list(k)
+        digits = [i for i, c in enumerate(ch) if c.isdigit()]
+        if len(digits) < 2:
+            continue
+        for _ in range(6):
+            i, j = rnd.sample(digits, 2)
+            ch[i], ch[j] = ch[j], ch[i]
+        got = "".join(ch)
+        if got != k:
+            fake.append(got)
+    hit_real = sum(1 for k in real if k in corpus)
+    hit_fake = sum(1 for k in fake if k in corpus)
+    return {
+        "real_checked": len(real),
+        "real_matched": hit_real,
+        "real_matched_pct": round(hit_real / len(real) * 100, 1) if real else 0.0,
+        "fake_checked": len(fake),
+        "fake_matched": hit_fake,
+        "fake_matched_pct": round(hit_fake / len(fake) * 100, 1) if fake else 0.0,
+        "how": ("Выдуманный номер получен перестановкой цифр внутри настоящего: длина, "
+                "набор знаков и расположение букв те же, номер другой. Зерно случайности "
+                "задано числом, замер повторяется."),
+        "what_it_means": ("Если выдуманные номера совпадают почти так же часто, как "
+                          "настоящие, сверка не несёт сведения — совпадает что угодно. "
+                          "Расхождение долей и есть доказательство."),
+    }
 
 
 def measure() -> dict:
@@ -104,6 +150,8 @@ def measure() -> dict:
         if not has_price:
             hits_nopric.append(item)
 
+    corpus = set(where)
+    real_keys = [key(r.get("pn")) for r in ask if usable(key(r.get("pn")))]
     hits.sort(key=lambda x: -x["usd_exposure"])
     hits_nopric.sort(key=lambda x: -x["usd_exposure"])
     return {
@@ -120,6 +168,7 @@ def measure() -> dict:
         "rows_without_our_price": len(hits_nopric),
         "usd_without_our_price": round(sum(h["usd_exposure"] for h in hits_nopric), 2),
         "min_key_length": MIN_LEN,
+        "negative_control": control(real_keys, corpus),
         "caveat": ("Сверка по нормализованному номеру длиной от шести знаков; чисто "
                    "числовые ряды короче семи знаков отброшены — они совпадают со "
                    "случайной цифрой таблицы, а ложное совпадение здесь дороже пропуска: "
@@ -140,6 +189,10 @@ def main() -> int:
     print(f"из них БЕЗ нашей цены: {m['rows_without_our_price']} на "
           f"{m['usd_without_our_price']:,.0f} USD — по ним цена уже есть у нас, "
           f"искать не нужно".replace(",", " "))
+    c = m["negative_control"]
+    print(f"отрицательный контроль: настоящие номера совпали в {c['real_matched_pct']} % "
+          f"({c['real_matched']} из {c['real_checked']}), выдуманные той же формы — в "
+          f"{c['fake_matched_pct']} % ({c['fake_matched']} из {c['fake_checked']})")
     for h in m["rows"][:a.top]:
         f = h["found_in"][0]
         print(f"  {h['usd_exposure']:>10,.0f} | {str(h['pn'])[:26]:26} | {f['deal']} | "
